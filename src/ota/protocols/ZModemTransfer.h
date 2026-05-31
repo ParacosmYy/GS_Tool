@@ -90,6 +90,25 @@ private:
 
     QByteArray toHex(quint32 val, int digits); ///< 数值→HEX ASCII
 
+    // ---- 状态处理方法(processReceivedData状态分发) ----
+    /** @brief 处理WaitingRinit状态: 收到ZRINIT后发送ZFILE */
+    void handleStateWaitingRinit(int type);
+
+    /** @brief 处理SendingFile状态: 收到ZRPOS/ZSKIP/ZRINIT后转移状态 */
+    void handleStateSendingFile(int type, const QByteArray& headerData);
+
+    /** @brief 处理SendingData状态: 收到ZRPOS/ZACK后重传或确认 */
+    void handleStateSendingData(int type, const QByteArray& headerData);
+
+    /** @brief 处理WaitingZAck状态: 收到ZACK/ZRPOS后发送ZEOF */
+    void handleStateWaitingZAck(int type);
+
+    /** @brief 处理SendingEof状态: 收到ZRINIT/ZSKIP后发送ZFIN */
+    void handleStateSendingEof(int type);
+
+    /** @brief 处理SendingFin状态: 收到ZFIN后完成传输 */
+    void handleStateSendingFin(int type);
+
     // ---- 成员 ----
     QString m_filePath;                ///< 文件路径
     QByteArray m_fileData;             ///< 文件内容(一次性读入)

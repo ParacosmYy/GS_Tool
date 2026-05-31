@@ -23,12 +23,7 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     , m_directionFilter(new DirectionFilter(this))
     , m_selectionManager(new TerminalSelectionManager(this))
     , m_searchManager(new TerminalSearchManager(this))
-    , m_contextMenu(nullptr)
-    , m_copyAction(nullptr)
-    , m_pasteAction(nullptr)
-    , m_clearAction(nullptr)
-    , m_selectAllAction(nullptr)
-    , m_searchAction(nullptr)
+    , m_contextMenuManager(new TerminalContextMenuManager(this))
 {
     m_font = QFont("Consolas", 10);
     m_font.setStyleHint(QFont::Monospace);
@@ -67,7 +62,19 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     m_lineHeight = m_fontMetrics.height() + 2;
     setMinimumSize(400, 200);
 
-    createContextMenu();
+    connect(m_contextMenuManager, &TerminalContextMenuManager::copyRequested,
+            this, [this]() {
+                QString text = selectedText();
+                if (!text.isEmpty()) QApplication::clipboard()->setText(text);
+            });
+    connect(m_contextMenuManager, &TerminalContextMenuManager::pasteRequested,
+            this, &TerminalWidget::pasteRequested);
+    connect(m_contextMenuManager, &TerminalContextMenuManager::clearRequested,
+            this, [this]() { clear(); emit clearRequested(); });
+    connect(m_contextMenuManager, &TerminalContextMenuManager::selectAllRequested,
+            this, &TerminalWidget::selectAll);
+    connect(m_contextMenuManager, &TerminalContextMenuManager::searchRequested,
+            this, &TerminalWidget::searchRequested);
 
     // 转发搜索管理器的信号
     connect(m_searchManager, &TerminalSearchManager::searchMatchesChanged,
@@ -436,56 +443,18 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 
 // ---- 右键菜单 ----
 /** @brief 创建终端右键菜单(复制/粘贴/清屏/全选/搜索)，样式由QSS主题控制 */
-void TerminalWidget::createContextMenu()
-{
-    m_contextMenu = new QMenu(this);
-    m_contextMenu->setObjectName("terminalContextMenu");
-
-    // 复制 — 只有选中文本时才可用
-    m_copyAction = m_contextMenu->addAction(
-        tr("复制") + QString("\t") + QKeySequence(QKeySequence::Copy).toString());
-    connect(m_copyAction, &QAction::triggered, this, [this]() {
-        QString text = selectedText();
-        if (!text.isEmpty()) QApplication::clipboard()->setText(text);
-    });
-
-    // 粘贴
-    m_pasteAction = m_contextMenu->addAction(
-        tr("粘贴") + QString("\t") + QKeySequence(QKeySequence::Paste).toString());
-    connect(m_pasteAction, &QAction::triggered, this, [this]() {
-        QString text = QApplication::clipboard()->text();
-        if (!text.isEmpty()) emit pasteRequested(text);
-    });
-
-    m_contextMenu->addSeparator();
-
-    // 清屏
-    m_clearAction = m_contextMenu->addAction(tr("清屏"));
-    connect(m_clearAction, &QAction::triggered, this, [this]() { clear(); emit clearRequested(); });
-
-    // 全选
-    m_selectAllAction = m_contextMenu->addAction(
-        tr("全选") + QString("\t") + QKeySequence(QKeySequence::SelectAll).toString());
-    connect(m_selectAllAction, &QAction::triggered, this, &TerminalWidget::selectAll);
-
-    m_contextMenu->addSeparator();
-
-    // 搜索(Ctrl+F)
-    m_searchAction = m_contextMenu->addAction(
-        tr("搜索") + QString("\t") + QKeySequence(QKeySequence::Find).toString());
-    connect(m_searchAction, &QAction::triggered, this, &TerminalWidget::searchRequested);
-}
 
 /** @brief 右键菜单事件 - 根据选区状态动态设置"复制"可用性 */
-void TerminalWidget::contextMenuEvent(QContextMenuEvent* event)
-{
-    if (!m_contextMenu) return;
-    m_copyAction->setEnabled(!selectedText().isEmpty());
-    m_contextMenu->popup(event->globalPos());
-    event->accept();
-}
+
 
 /** @brief 全选终端所有内容(包含方向过滤后的总行数) */
+
+// ---- context menu (delegated) ----
+void TerminalWidget::contextMenuEvent(QContextMenuEvent* event)
+{
+    m_contextMenuManager->showContextMenu(event, !selectedText().isEmpty());
+}
+
 void TerminalWidget::selectAll()
 {
     int totalLines = m_directionFilter->isFiltered()

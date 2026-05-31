@@ -132,6 +132,28 @@ private:
     void updateTransferStats();             ///< 更新速率/ETA并发射transferStats
     bool loadNextFile();                    ///< 加载下个文件。失败时emit transferError
 
+    // ---- 状态处理方法(processReceivedData状态分发) ----
+    /** @brief 处理WaitingStart状态: 收到C/NAK后发送Block0 */
+    void handleStateWaitingStart(char ch);
+
+    /** @brief 处理SendingBlock0状态: 收到ACK/C/NAK/CAN后转移状态 */
+    void handleStateSendingBlock0(char ch, int& readIdx);
+
+    /** @brief 处理SendingData状态: 收到ACK/NAK/CAN后更新进度或重发 */
+    void handleStateSendingData(char ch, int& readIdx);
+
+    /** @brief 处理SendingEOT状态: 收到ACK/NAK/CAN后进入下一文件或结束 */
+    void handleStateSendingEOT(char ch, int& readIdx);
+
+    /** @brief 处理WaitBlock0Ack状态: 收到C/NAK后加载下一文件 */
+    void handleStateWaitBlock0Ack(char ch, int& readIdx);
+
+    /** @brief 处理WaitFinalC状态: 收到C/NAK后发送空Block0 */
+    void handleStateWaitFinalC(char ch);
+
+    /** @brief 处理SendingFinalBlock0状态: 收到ACK/NAK/CAN后完成或重发 */
+    void handleStateSendingFinalBlock0(char ch, int& readIdx);
+
     // ---- 成员变量 ----
     QStringList m_filePaths;        ///< 待传输文件路径列表
     QByteArray m_currentData;       ///< 当前文件全部内容

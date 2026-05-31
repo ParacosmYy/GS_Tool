@@ -10,8 +10,6 @@
 #include <QFile>
 #include <QFileInfo>
 
-// ---- 辅助方法 ----
-
 QString ZModemTransfer::stateToString(State s)
 {
     switch (s) {
@@ -28,8 +26,6 @@ QString ZModemTransfer::stateToString(State s)
     return QStringLiteral("Unknown");
 }
 
-// ---- 构造与配置 ----
-
 ZModemTransfer::ZModemTransfer(QObject* parent)
     : BaseTransfer(parent)
 {
@@ -39,7 +35,6 @@ ZModemTransfer::ZModemTransfer(QObject* parent)
 void ZModemTransfer::setFilePath(const QString& path) { m_filePath = path; }
 
 // ---- BaseTransfer钩子实现 ----
-
 bool ZModemTransfer::onStartInit()
 {
     // 文件路径非空校验
@@ -141,104 +136,23 @@ void ZModemTransfer::processReceivedData()
             case State::Error:
                 return;
             case State::WaitingRinit:
-                if (type == ZRINIT) {
-                    m_timeoutTimer->stop();
-                    m_retryCount = 0;
-                    m_zmodemState = State::SendingFile;
-                    sendZFILE();
-                    m_timeoutTimer->start(m_timeoutMs);
-                } else {
-                    qWarning() << "ZModem: unexpected frame" << type << "in WaitingRinit";
-                }
+                handleStateWaitingRinit(type);
                 break;
             case State::SendingFile:
-                if (type == ZRPOS) {
-                    m_timeoutTimer->stop();
-                    m_retryCount = 0;
-                    if (headerData.size() >= 4) {
-                        m_fileOffset = 0;
-                        for (int i = 3; i >= 0; --i)
-                            m_fileOffset = (m_fileOffset << 8) | static_cast<quint8>(headerData[i]);
-                    }
-                    qWarning() << "ZModem: ZRPOS resume at offset" << m_fileOffset;
-                    m_bytesSent = m_fileOffset;
-                    m_zmodemState = State::SendingData;
-                    sendDataSubpackets();
-                } else if (type == ZSKIP) {
-                    m_timeoutTimer->stop();
-                    qWarning() << "ZModem: receiver skipped file";
-                    m_zmodemState = State::SendingFin;
-                    sendZFIN();
-                    m_timeoutTimer->start(m_timeoutMs);
-                } else if (type == ZRINIT) {
-                    m_timeoutTimer->stop();
-                    sendZFILE();
-                    m_timeoutTimer->start(m_timeoutMs);
-                } else {
-                    qWarning() << "ZModem: unexpected frame" << type << "in SendingFile";
-                }
+                handleStateSendingFile(type, headerData);
                 break;
             case State::SendingData:
-                if (type == ZRPOS) {
-                    m_timeoutTimer->stop();
-                    m_retryCount++;
-                    if (m_retryCount > m_maxRetries) {
-                        sendCancelBytes();
-                        m_zmodemState = State::Error;
-                        emit transferError(
-                            tr("重传请求次数过多 (已重试 %1 次, 上限 %2 次), "
-                               "当前偏移: %3 字节, 文件大小: %4 字节")
-                                .arg(m_retryCount).arg(m_maxRetries)
-                                .arg(m_fileOffset).arg(m_fileData.size()));
-                        return;
-                    }
-                    if (headerData.size() >= 4) {
-                        m_fileOffset = 0;
-                        for (int i = 3; i >= 0; --i)
-                            m_fileOffset = (m_fileOffset << 8) | static_cast<quint8>(headerData[i]);
-                    }
-                    qWarning() << "ZModem: ZRPOS retransmit at offset" << m_fileOffset
-                               << "retry" << m_retryCount << "/" << m_maxRetries;
-                    m_bytesSent = m_fileOffset;
-                    sendDataSubpackets();
-                } else if (type == ZACK) {
-                    m_timeoutTimer->stop();
-                    m_retryCount = 0;
-                } else {
-                    qWarning() << "ZModem: unexpected frame" << type << "in SendingData, offset:" << m_fileOffset;
-                }
+                handleStateSendingData(type, headerData);
+                if (m_zmodemState == State::Error) return;
                 break;
             case State::WaitingZAck:
-                if (type == ZACK || type == ZRPOS) {
-                    m_timeoutTimer->stop();
-                    m_retryCount = 0;
-                    m_zmodemState = State::SendingEof;
-                    sendZEOF();
-                    m_timeoutTimer->start(m_timeoutMs);
-                } else {
-                    qWarning() << "ZModem: unexpected frame" << type << "in WaitingZAck, bytes:" << m_bytesSent;
-                }
+                handleStateWaitingZAck(type);
                 break;
             case State::SendingEof:
-                if (type == ZRINIT || type == ZSKIP) {
-                    m_timeoutTimer->stop();
-                    m_retryCount = 0;
-                    m_zmodemState = State::SendingFin;
-                    sendZFIN();
-                    m_timeoutTimer->start(m_timeoutMs);
-                } else {
-                    qWarning() << "ZModem: unexpected frame" << type << "in SendingEof";
-                }
+                handleStateSendingEof(type);
                 break;
             case State::SendingFin:
-                if (type == ZFIN) {
-                    m_timeoutTimer->stop();
-                    if (m_conn) m_conn->write(QByteArray("OO"));
-                    emit progress(100, m_fileData.size(), m_fileData.size());
-                    finishTransfer();
-                } else {
-                    qWarning() << "ZModem: unexpected frame" << type << "in SendingFin";
-                }
+                handleStateSendingFin(type);
                 break;
             }
         } else {
@@ -253,8 +167,115 @@ void ZModemTransfer::processReceivedData()
     }
 }
 
-// ---- 帧解析(含CRC16校验) ----
+// ---- 状态处理方法 ----
+void ZModemTransfer::handleStateWaitingRinit(int type)
+{
+    if (type == ZRINIT) {
+        m_timeoutTimer->stop();
+        m_retryCount = 0;
+        m_zmodemState = State::SendingFile;
+        sendZFILE();
+        m_timeoutTimer->start(m_timeoutMs);
+    } else {
+        qWarning() << "ZModem: unexpected frame" << type << "in WaitingRinit";
+    }
+}
+void ZModemTransfer::handleStateSendingFile(int type, const QByteArray& headerData)
+{
+    if (type == ZRPOS) {
+        m_timeoutTimer->stop();
+        m_retryCount = 0;
+        if (headerData.size() >= 4) {
+            m_fileOffset = 0;
+            for (int i = 3; i >= 0; --i)
+                m_fileOffset = (m_fileOffset << 8) | static_cast<quint8>(headerData[i]);
+        }
+        qWarning() << "ZModem: ZRPOS resume at offset" << m_fileOffset;
+        m_bytesSent = m_fileOffset;
+        m_zmodemState = State::SendingData;
+        sendDataSubpackets();
+    } else if (type == ZSKIP) {
+        m_timeoutTimer->stop();
+        qWarning() << "ZModem: receiver skipped file";
+        m_zmodemState = State::SendingFin;
+        sendZFIN();
+        m_timeoutTimer->start(m_timeoutMs);
+    } else if (type == ZRINIT) {
+        m_timeoutTimer->stop();
+        sendZFILE();
+        m_timeoutTimer->start(m_timeoutMs);
+    } else {
+        qWarning() << "ZModem: unexpected frame" << type << "in SendingFile";
+    }
+}
+void ZModemTransfer::handleStateSendingData(int type, const QByteArray& headerData)
+{
+    if (type == ZRPOS) {
+        m_timeoutTimer->stop();
+        m_retryCount++;
+        if (m_retryCount > m_maxRetries) {
+            sendCancelBytes();
+            m_zmodemState = State::Error;
+            emit transferError(
+                tr("重传请求次数过多 (已重试 %1 次, 上限 %2 次), "
+                   "当前偏移: %3 字节, 文件大小: %4 字节")
+                    .arg(m_retryCount).arg(m_maxRetries)
+                    .arg(m_fileOffset).arg(m_fileData.size()));
+            return;
+        }
+        if (headerData.size() >= 4) {
+            m_fileOffset = 0;
+            for (int i = 3; i >= 0; --i)
+                m_fileOffset = (m_fileOffset << 8) | static_cast<quint8>(headerData[i]);
+        }
+        qWarning() << "ZModem: ZRPOS retransmit at offset" << m_fileOffset
+                   << "retry" << m_retryCount << "/" << m_maxRetries;
+        m_bytesSent = m_fileOffset;
+        sendDataSubpackets();
+    } else if (type == ZACK) {
+        m_timeoutTimer->stop();
+        m_retryCount = 0;
+    } else {
+        qWarning() << "ZModem: unexpected frame" << type << "in SendingData, offset:" << m_fileOffset;
+    }
+}
+void ZModemTransfer::handleStateWaitingZAck(int type)
+{
+    if (type == ZACK || type == ZRPOS) {
+        m_timeoutTimer->stop();
+        m_retryCount = 0;
+        m_zmodemState = State::SendingEof;
+        sendZEOF();
+        m_timeoutTimer->start(m_timeoutMs);
+    } else {
+        qWarning() << "ZModem: unexpected frame" << type << "in WaitingZAck, bytes:" << m_bytesSent;
+    }
+}
+void ZModemTransfer::handleStateSendingEof(int type)
+{
+    if (type == ZRINIT || type == ZSKIP) {
+        m_timeoutTimer->stop();
+        m_retryCount = 0;
+        m_zmodemState = State::SendingFin;
+        sendZFIN();
+        m_timeoutTimer->start(m_timeoutMs);
+    } else {
+        qWarning() << "ZModem: unexpected frame" << type << "in SendingEof";
+    }
+}
+void ZModemTransfer::handleStateSendingFin(int type)
+{
+    if (type == ZFIN) {
+        m_timeoutTimer->stop();
+        if (m_conn) m_conn->write(QByteArray("OO"));
+        emit progress(100, m_fileData.size(), m_fileData.size());
+        finishTransfer();
+    } else {
+        qWarning() << "ZModem: unexpected frame" << type << "in SendingFin";
+    }
+}
 
+// ---- 帧解析(含CRC16校验) ----
 bool ZModemTransfer::parseHexFrame(const QByteArray& data, int& type, QByteArray& headerData)
 {
     if (data.size() < 7) return false;
@@ -313,9 +334,7 @@ bool ZModemTransfer::parseHexFrame(const QByteArray& data, int& type, QByteArray
     m_receiveBuffer.remove(0, idx);
     return true;
 }
-
 // ---- 帧构建 ----
-
 QByteArray ZModemTransfer::buildHexHeader(quint8 frameType, const QByteArray& data)
 {
     QByteArray frame;
@@ -399,7 +418,6 @@ QByteArray ZModemTransfer::buildDataSubpacket(char endFlag, const QByteArray& da
 }
 
 // ---- 发送流程方法 ----
-
 void ZModemTransfer::sendZRQINIT() { if (m_conn) m_conn->write(buildHexHeader(ZRQINIT)); }
 
 void ZModemTransfer::sendZFILE()
@@ -466,7 +484,6 @@ void ZModemTransfer::sendZEOF()
 void ZModemTransfer::sendZFIN() { if (m_conn) m_conn->write(buildHexHeader(ZFIN)); }
 
 // ---- 工具方法 ----
-
 void ZModemTransfer::setState(State s) { m_zmodemState = s; }
 
 QByteArray ZModemTransfer::toHex(quint32 val, int digits)

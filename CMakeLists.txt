@@ -56,6 +56,7 @@ set(SOURCES
     src/terminal/TerminalSelectionManager.cpp
     src/terminal/TerminalSearchManager.cpp
     src/terminal/TerminalSearchRenderer.cpp
+    src/terminal/TerminalContextMenuManager.cpp
     src/serial/SerialConfigPanel.cpp
     src/serial/QuickCommandBar.cpp
     src/serial/BookmarkWidget.cpp
@@ -121,6 +122,7 @@ set(HEADERS
     src/terminal/TerminalSelectionManager.h
     src/terminal/TerminalSearchManager.h
     src/terminal/TerminalSearchRenderer.h
+    src/terminal/TerminalContextMenuManager.h
     src/terminal/TerminalTypes.h
     src/serial/SerialConfigPanel.h
     src/serial/QuickCommandBar.h

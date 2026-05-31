@@ -130,6 +130,16 @@ private:
     /** @brief 获取当前模式块大小: OneK=1024, Checksum/CRC=128 */
     int blockSize() const { return (m_mode == OneK) ? 1024 : 128; }
 
+    // ---- 状态处理方法(processReceivedData状态分发) ----
+    /** @brief 处理WaitingForStart状态: 收到NAK/C后启动数据发送 */
+    void handleStateWaitingForStart(char ch);
+
+    /** @brief 处理SendingBlock状态: 收到ACK/NAK/CAN后更新进度或重发 */
+    void handleStateSendingBlock(char ch, int& readIdx);
+
+    /** @brief 处理SendingEOT状态: 收到ACK/NAK/CAN后完成或重发 */
+    void handleStateSendingEOT(char ch, int& readIdx);
+
     // ---- 成员变量 ----
     Mode m_mode = CRC;               ///< 传输模式
     QString m_filePath;              ///< 文件路径
