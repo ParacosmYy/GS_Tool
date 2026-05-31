@@ -177,6 +177,8 @@ void MainWindow::connectSignals()
     // 串口配置面板的连接/断开信号
     connect(m_serialConfig, &SerialConfigPanel::connectRequested,
             this, &MainWindow::onConnectSerial);
+    connect(m_serialConfig, &SerialConfigPanel::disconnectRequested,
+            this, &MainWindow::onDisconnectSerial);
 
     // 发送按钮
     connect(m_sendBtn, &QPushButton::clicked,
@@ -255,7 +257,7 @@ void MainWindow::onConnectSerial()
 void MainWindow::onDisconnectSerial()
 {
     if (m_currentConn) {
-        m_currentConn->close();
+        m_currentConn->close();    // 触发 stateChanged → 更新UI
         m_connManager->removeConnection(m_currentConn);
         m_currentConn = nullptr;
     }
@@ -326,10 +328,15 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
         m_connStatusLbl->setText(tr("Connected: %1").arg(
             m_currentConn ? m_currentConn->name() : ""));
         m_connStatusLbl->setStyleSheet("color: #a6e3a1;");
+        m_serialConfig->setConnected(true);
+        // 切换到终端视图
+        m_serialConfig->setVisible(false);
+        m_terminal->setVisible(true);
         break;
     case ConnectionState::Disconnected:
         m_connStatusLbl->setText(tr("Disconnected"));
         m_connStatusLbl->setStyleSheet("color: #f38ba8;");
+        m_serialConfig->setConnected(false);
         break;
     case ConnectionState::Connecting:
         m_connStatusLbl->setText(tr("Connecting..."));
@@ -338,6 +345,7 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
     case ConnectionState::Error:
         m_connStatusLbl->setText(tr("Error"));
         m_connStatusLbl->setStyleSheet("color: #f38ba8;");
+        m_serialConfig->setConnected(false);
         break;
     }
 }

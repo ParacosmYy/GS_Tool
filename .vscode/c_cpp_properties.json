@@ -1,0 +1,35 @@
+{
+    "configurations": [
+        {
+            "name": "EmbedDebug",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/**",
+                "E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/QtCore",
+                "E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/QtGui",
+                "E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/QtWidgets",
+                "E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/QtSerialPort",
+                "E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/QtCharts",
+                "E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/QtNetwork",
+                "E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/QtOpenGL",
+                "E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/QtOpenGLWidgets",
+                "E:/Tool/DevEnv/x86_64-14.2.0-release-win32-seh-msvcrt-rt_v12-rev2/mingw64/include/c++/14.2.0"
+            ],
+            "defines": [
+                "UNICODE",
+                "_UNICODE",
+                "QT_CORE_LIB",
+                "QT_GUI_LIB",
+                "QT_WIDGETS_LIB",
+                "QT_SERIALPORT_LIB",
+                "QT_CHARTS_LIB",
+                "QT_NETWORK_LIB"
+            ],
+            "compilerPath": "E:/Tool/DevEnv/x86_64-14.2.0-release-win32-seh-msvcrt-rt_v12-rev2/mingw64/bin/g++.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}

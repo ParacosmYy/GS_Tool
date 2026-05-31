@@ -90,7 +90,11 @@ void SerialConfigPanel::setupUI()
         "QPushButton { background-color: #a6e3a1; color: #1e1e2e; font-weight: bold; font-size: 14px; }"
         "QPushButton:hover { background-color: #94e2d5; }");
     connect(m_connectBtn, &QPushButton::clicked, this, [this]() {
-        emit connectRequested();
+        if (m_connected) {
+            emit disconnectRequested();
+        } else {
+            emit connectRequested();
+        }
     });
     mainLayout->addWidget(m_connectBtn);
 
@@ -99,7 +103,8 @@ void SerialConfigPanel::setupUI()
 
 void SerialConfigPanel::applyConfigToConnection(SerialConnection* conn)
 {
-    conn->setPortName(m_portCombo->currentText());
+    // currentData() 返回的是实际端口名 "COM3"，而非显示文本 "COM3 - USB Serial"
+    conn->setPortName(m_portCombo->currentData().toString());
     conn->setBaudRate(m_baudCombo->currentText().toInt());
 
     // 数据位
@@ -166,4 +171,41 @@ void SerialConfigPanel::refreshPorts()
             m_portCombo->setCurrentIndex(idx);
         }
     }
+}
+
+void SerialConfigPanel::setConnected(bool connected)
+{
+    m_connected = connected;
+    if (connected) {
+        m_connectBtn->setText(tr("Disconnect"));
+        m_connectBtn->setStyleSheet(
+            "QPushButton { background-color: #f38ba8; color: #1e1e2e; font-weight: bold; font-size: 14px; }"
+            "QPushButton:hover { background-color: #eba0ac; }");
+        // 连接后禁用配置修改
+        m_portCombo->setEnabled(false);
+        m_baudCombo->setEnabled(false);
+        m_dataBitsCombo->setEnabled(false);
+        m_parityCombo->setEnabled(false);
+        m_stopBitsCombo->setEnabled(false);
+        m_flowControlCombo->setEnabled(false);
+        m_refreshBtn->setEnabled(false);
+    } else {
+        m_connectBtn->setText(tr("Connect"));
+        m_connectBtn->setStyleSheet(
+            "QPushButton { background-color: #a6e3a1; color: #1e1e2e; font-weight: bold; font-size: 14px; }"
+            "QPushButton:hover { background-color: #94e2d5; }");
+        // 断开后恢复配置可编辑
+        m_portCombo->setEnabled(true);
+        m_baudCombo->setEnabled(true);
+        m_dataBitsCombo->setEnabled(true);
+        m_parityCombo->setEnabled(true);
+        m_stopBitsCombo->setEnabled(true);
+        m_flowControlCombo->setEnabled(true);
+        m_refreshBtn->setEnabled(true);
+    }
+}
+
+bool SerialConfigPanel::isConnected() const
+{
+    return m_connected;
 }

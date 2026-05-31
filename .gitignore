@@ -6,7 +6,13 @@ Debug/
 Release/
 
 # IDE files
-.vscode/
+# 保留项目级 .vscode 配置 (c_cpp_properties.json, settings.json)
+.vscode/*
+!.vscode/settings.json
+!.vscode/c_cpp_properties.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
 .idea/
 *.user
 *.pro.user

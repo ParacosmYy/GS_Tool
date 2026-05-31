@@ -26,6 +26,12 @@ public:
     // 刷新可用端口列表
     void refreshPorts();
 
+    // 设置连接状态(更新按钮文字和可用性)
+    void setConnected(bool connected);
+
+    // 当前是否处于连接状态
+    bool isConnected() const;
+
 signals:
     // 用户点击连接/断开按钮
     void connectRequested();
@@ -44,6 +50,7 @@ private:
     QCheckBox* m_dtrCheck;         // DTR控制
     QCheckBox* m_rtsCheck;         // RTS控制
     QPushButton* m_connectBtn;     // 连接/断开按钮
+    bool m_connected = false;       // 当前连接状态
 };
 
 #endif // SERIALCONFIGPANEL_H
