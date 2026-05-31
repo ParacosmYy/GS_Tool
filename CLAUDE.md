@@ -486,6 +486,7 @@ docs/prd/PRD_<编号>_<简述>.md
 | 6 | TCP Client/Server + UDP网络连接实现 | 7 |
 | 7 | XMODEM协议传输(Checksum/CRC/1K)+OTA管理器+OTA操作面板 | 8 |
 | 8 | YMODEM协议传输(Block 0文件信息+批量传输)+OTA集成 | 9 |
+| 9 | ZMODEM协议传输(CRC32+连续发送+HEX/BIN帧)+OTA集成 | 10 |
 | ... | 目标: 1000分 | 1000 |
 
 ---

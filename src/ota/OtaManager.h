@@ -4,6 +4,7 @@
 #include <QObject>
 #include "ota/protocols/XModemTransfer.h"
 #include "ota/protocols/YModemTransfer.h"
+#include "ota/protocols/ZModemTransfer.h"
 #include "connection/IConnection.h"
 
 // OTA升级管理器 - 协调传输协议和连接
@@ -18,7 +19,7 @@ public:
     void setConnection(IConnection* conn);
 
     // 开始OTA传输
-    // protocol: "xmodem-checksum" / "xmodem-crc" / "xmodem-1k" / "ymodem"
+    // protocol: "xmodem-checksum" / "xmodem-crc" / "xmodem-1k" / "ymodem" / "zmodem"
     bool startTransfer(const QString& filePath, const QString& protocol = "xmodem-crc");
 
     // 取消传输
@@ -36,6 +37,7 @@ private:
     IConnection* m_conn = nullptr;
     XModemTransfer* m_xmodem = nullptr;
     YModemTransfer* m_ymodem = nullptr;
+    ZModemTransfer* m_zmodem = nullptr;
 };
 
 #endif // OTAMANAGER_H
