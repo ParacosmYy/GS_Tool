@@ -26,6 +26,14 @@ public:
     // 刷新可用端口列表
     void refreshPorts();
 
+    // 获取当前配置值（供 IConnection::configure() 使用，无需强转）
+    QString currentPortData() const;
+    int currentBaudRate() const;
+    int currentDataBitsIndex() const;
+    int currentParityIndex() const;
+    int currentStopBitsIndex() const;
+    int currentFlowControlIndex() const;
+
     // 设置连接状态(更新按钮文字和可用性)
     void setConnected(bool connected);
 

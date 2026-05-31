@@ -1,5 +1,6 @@
 #include "SerialConnection.h"
 #include <QDebug>
+#include <QVariant>
 
 SerialConnection::SerialConnection(QObject* parent)
     : IConnection(parent)
@@ -135,6 +136,52 @@ void SerialConnection::setDtr(bool enabled)
 void SerialConnection::setRts(bool enabled)
 {
     m_serial.setRequestToSend(enabled);
+}
+
+// 通过参数映射配置串口（工厂模式下的统一配置入口）
+void SerialConnection::configure(const QVariantMap& params)
+{
+    if (params.contains("portName"))
+        setPortName(params["portName"].toString());
+    if (params.contains("baudRate"))
+        setBaudRate(params["baudRate"].toInt());
+    if (params.contains("dataBits")) {
+        int db = params["dataBits"].toInt();
+        QSerialPort::DataBits bits[] = {
+            QSerialPort::Data5, QSerialPort::Data6,
+            QSerialPort::Data7, QSerialPort::Data8
+        };
+        if (db >= 5 && db <= 8) setDataBits(bits[db - 5]);
+    }
+    if (params.contains("parity")) {
+        QSerialPort::Parity p[] = {
+            QSerialPort::NoParity, QSerialPort::EvenParity,
+            QSerialPort::OddParity, QSerialPort::MarkParity,
+            QSerialPort::SpaceParity
+        };
+        int idx = params["parity"].toInt();
+        if (idx >= 0 && idx <= 4) setParity(p[idx]);
+    }
+    if (params.contains("stopBits")) {
+        QSerialPort::StopBits s[] = {
+            QSerialPort::OneStop, QSerialPort::OneAndHalfStop,
+            QSerialPort::TwoStop
+        };
+        int idx = params["stopBits"].toInt();
+        if (idx >= 0 && idx <= 2) setStopBits(s[idx]);
+    }
+    if (params.contains("flowControl")) {
+        QSerialPort::FlowControl f[] = {
+            QSerialPort::NoFlowControl, QSerialPort::HardwareControl,
+            QSerialPort::SoftwareControl
+        };
+        int idx = params["flowControl"].toInt();
+        if (idx >= 0 && idx <= 2) setFlowControl(f[idx]);
+    }
+    if (params.contains("dtr"))
+        setDtr(params["dtr"].toBool());
+    if (params.contains("rts"))
+        setRts(params["rts"].toBool());
 }
 
 QList<QSerialPortInfo> SerialConnection::availablePorts()

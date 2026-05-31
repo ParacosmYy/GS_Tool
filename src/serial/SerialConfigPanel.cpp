@@ -209,3 +209,33 @@ bool SerialConfigPanel::isConnected() const
 {
     return m_connected;
 }
+
+QString SerialConfigPanel::currentPortData() const
+{
+    return m_portCombo->currentData().toString();
+}
+
+int SerialConfigPanel::currentBaudRate() const
+{
+    return m_baudCombo->currentText().toInt();
+}
+
+int SerialConfigPanel::currentDataBitsIndex() const
+{
+    return m_dataBitsCombo->currentIndex();
+}
+
+int SerialConfigPanel::currentParityIndex() const
+{
+    return m_parityCombo->currentIndex();
+}
+
+int SerialConfigPanel::currentStopBitsIndex() const
+{
+    return m_stopBitsCombo->currentIndex();
+}
+
+int SerialConfigPanel::currentFlowControlIndex() const
+{
+    return m_flowControlCombo->currentIndex();
+}

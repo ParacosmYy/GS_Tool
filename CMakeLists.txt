@@ -27,6 +27,7 @@ set(SOURCES
     src/main.cpp
     src/core/MainWindow.cpp
     src/core/ConnectionManager.cpp
+    src/core/ConnectionFactory.cpp
     src/core/ThemeManager.cpp
     src/connection/SerialConnection.cpp
     src/terminal/TerminalWidget.cpp
@@ -34,7 +35,10 @@ set(SOURCES
     src/serial/SerialConfigPanel.cpp
     src/serial/QuickCommandBar.cpp
     src/serial/TimedSender.cpp
+    src/serial/SendHistory.cpp
+    src/serial/DataStatistics.cpp
     src/utils/SettingsManager.cpp
+    src/utils/DataExporter.cpp
     src/utils/HexConverter.h
     src/utils/RingBuffer.h
     src/utils/CRC.h
@@ -43,6 +47,7 @@ set(SOURCES
 set(HEADERS
     src/core/MainWindow.h
     src/core/ConnectionManager.h
+    src/core/ConnectionFactory.h
     src/core/ThemeManager.h
     src/core/Constants.h
     src/connection/IConnection.h
@@ -52,7 +57,10 @@ set(HEADERS
     src/serial/SerialConfigPanel.h
     src/serial/QuickCommandBar.h
     src/serial/TimedSender.h
+    src/serial/SendHistory.h
+    src/serial/DataStatistics.h
     src/utils/SettingsManager.h
+    src/utils/DataExporter.h
 )
 
 set(RESOURCES

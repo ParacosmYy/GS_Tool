@@ -14,7 +14,10 @@ public:
     explicit ConnectionManager(QObject* parent = nullptr);
     ~ConnectionManager() override;
 
-    // 创建一个新的串口连接，返回连接对象指针
+    // 创建指定类型的连接（委托给 ConnectionFactory）
+    IConnection* createConnection(ConnectionType type);
+
+    // 串口便捷方法（内部调用 createConnection(Serial)）
     IConnection* createSerialConnection();
 
     // 删除一个连接

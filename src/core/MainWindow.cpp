@@ -9,12 +9,18 @@
 #include <QCloseEvent>
 #include <QApplication>
 #include <QSplitter>
+#include <QFileDialog>
+#include <QTimer>
+#include <QStringListModel>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_connManager(new ConnectionManager(this))
     , m_terminalModel(new TerminalModel(this))
     , m_timedSender(new TimedSender(this))
+    , m_sendHistory(new SendHistory(this))
+    , m_dataExporter(new DataExporter(this))
+    , m_statsTimer(new QTimer(this))
 {
     setupUI();
     setupToolbar();
@@ -23,6 +29,10 @@ MainWindow::MainWindow(QWidget* parent)
 
     // 加载主题
     ThemeManager::instance().loadTheme("dark_terminal");
+
+    // 统计刷新定时器: 每500ms刷新一次
+    m_statsTimer->setInterval(500);
+    m_statsTimer->start();
 
     // 设置窗口属性
     setWindowTitle(App::APP_NAME);
@@ -36,7 +46,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupUI()
 {
-    // 主分割器：左侧导航 + 右侧内容
     m_mainSplitter = new QSplitter(Qt::Horizontal, this);
     setCentralWidget(m_mainSplitter);
 
@@ -47,7 +56,6 @@ void MainWindow::setupUI()
     m_navTree->setMaximumWidth(280);
     m_navTree->setIndentation(16);
 
-    // 创建一个简单的树模型
     auto* treeModel = new QStandardItemModel(this);
     auto* rootItem = treeModel->invisibleRootItem();
 
@@ -57,8 +65,11 @@ void MainWindow::setupUI()
     configItem->setEditable(false);
     auto* terminalItem = new QStandardItem(tr("Terminal"));
     terminalItem->setEditable(false);
+    auto* statsItem = new QStandardItem(tr("Statistics"));
+    statsItem->setEditable(false);
     serialItem->appendRow(configItem);
     serialItem->appendRow(terminalItem);
+    serialItem->appendRow(statsItem);
 
     rootItem->appendRow(serialItem);
 
@@ -73,7 +84,6 @@ void MainWindow::setupUI()
     rightLayout->setContentsMargins(0, 0, 0, 0);
     rightLayout->setSpacing(0);
 
-    // 右侧使用 QStackedWidget 切换不同面板
     m_rightPanel = new QStackedWidget;
     rightLayout->addWidget(m_rightPanel, 1);
 
@@ -83,10 +93,15 @@ void MainWindow::setupUI()
     serialLayout->setContentsMargins(0, 0, 0, 0);
     serialLayout->setSpacing(0);
 
-    // 串口配置面板(默认隐藏，点击"Config"时显示)
+    // 串口配置面板(点击"Config"时显示)
     m_serialConfig = new SerialConfigPanel;
     m_serialConfig->setVisible(false);
     serialLayout->addWidget(m_serialConfig);
+
+    // 数据统计面板(点击"Statistics"时显示)
+    m_dataStats = new DataStatistics;
+    m_dataStats->setVisible(false);
+    serialLayout->addWidget(m_dataStats);
 
     // 终端显示区
     m_terminal = new TerminalWidget;
@@ -95,7 +110,6 @@ void MainWindow::setupUI()
 
     // 快捷指令栏
     m_quickCmdBar = new QuickCommandBar;
-    // 添加一些默认快捷指令
     m_quickCmdBar->setCommands({
         {"AT", "AT\r\n", false},
         {"Reset", "AA 55 01 00 FE", true},
@@ -103,7 +117,7 @@ void MainWindow::setupUI()
     });
     serialLayout->addWidget(m_quickCmdBar);
 
-    // 发送区域
+    // 发送区域（带历史自动补全）
     auto* sendFrame = new QFrame;
     sendFrame->setFrameShape(QFrame::StyledPanel);
     auto* sendLayout = new QHBoxLayout(sendFrame);
@@ -116,6 +130,12 @@ void MainWindow::setupUI()
     m_sendInput = new QLineEdit;
     m_sendInput->setPlaceholderText(tr("Enter data to send..."));
 
+    // 发送历史自动补全
+    m_sendCompleter = new QCompleter(m_sendHistory->recentTexts(), this);
+    m_sendCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    m_sendCompleter->setCompletionMode(QCompleter::PopupCompletion);
+    m_sendInput->setCompleter(m_sendCompleter);
+
     m_sendBtn = new QPushButton(tr("Send"));
     m_sendBtn->setFixedWidth(70);
 
@@ -126,13 +146,9 @@ void MainWindow::setupUI()
     serialLayout->addWidget(sendFrame);
 
     m_rightPanel->addWidget(serialPanel);
-
-    // 默认显示串口面板
     m_rightPanel->setCurrentIndex(0);
 
     m_mainSplitter->addWidget(rightWidget);
-
-    // 设置分割比例
     m_mainSplitter->setSizes({200, 1000});
     m_mainSplitter->setStretchFactor(0, 0);
     m_mainSplitter->setStretchFactor(1, 1);
@@ -144,21 +160,21 @@ void MainWindow::setupToolbar()
     m_toolbar->setMovable(false);
     m_toolbar->setFloatable(false);
 
-    // 显示模式切换
     m_displayModeCombo = new QComboBox;
     m_displayModeCombo->addItems({tr("Text"), tr("HEX"), tr("Mixed")});
     m_displayModeCombo->setFixedWidth(80);
     m_toolbar->addWidget(m_displayModeCombo);
 
-    // 时间戳开关
     m_timestampAction = m_toolbar->addAction(tr("Timestamp"));
     m_timestampAction->setCheckable(true);
     m_timestampAction->setChecked(false);
 
-    // 清空按钮
     m_clearAction = m_toolbar->addAction(tr("Clear"));
 
     m_toolbar->addSeparator();
+
+    // 导出按钮
+    m_exportAction = m_toolbar->addAction(tr("Export"));
 }
 
 void MainWindow::setupStatusBar()
@@ -174,17 +190,15 @@ void MainWindow::setupStatusBar()
 
 void MainWindow::connectSignals()
 {
-    // 串口配置面板的连接/断开信号
+    // 串口连接/断开
     connect(m_serialConfig, &SerialConfigPanel::connectRequested,
             this, &MainWindow::onConnectSerial);
     connect(m_serialConfig, &SerialConfigPanel::disconnectRequested,
             this, &MainWindow::onDisconnectSerial);
 
     // 发送按钮
-    connect(m_sendBtn, &QPushButton::clicked,
-            this, &MainWindow::onSendData);
-    connect(m_sendInput, &QLineEdit::returnPressed,
-            this, &MainWindow::onSendData);
+    connect(m_sendBtn, &QPushButton::clicked, this, &MainWindow::onSendData);
+    connect(m_sendInput, &QLineEdit::returnPressed, this, &MainWindow::onSendData);
 
     // 快捷指令
     connect(m_quickCmdBar, &QuickCommandBar::commandTriggered,
@@ -193,14 +207,12 @@ void MainWindow::connectSignals()
     // 工具栏
     connect(m_displayModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onDisplayModeChanged);
-    connect(m_timestampAction, &QAction::toggled,
-            this, &MainWindow::onTimestampToggled);
-    connect(m_clearAction, &QAction::triggered,
-            this, &MainWindow::onClearTerminal);
+    connect(m_timestampAction, &QAction::toggled, this, &MainWindow::onTimestampToggled);
+    connect(m_clearAction, &QAction::triggered, this, &MainWindow::onClearTerminal);
+    connect(m_exportAction, &QAction::triggered, this, &MainWindow::onExportData);
 
     // 定时发送器
-    connect(m_timedSender, &TimedSender::sendData,
-            this, [this](const QByteArray& data) {
+    connect(m_timedSender, &TimedSender::sendData, this, [this](const QByteArray& data) {
         if (m_currentConn && m_currentConn->state() == ConnectionState::Connected) {
             m_currentConn->write(data);
             m_terminalModel->appendSent(data);
@@ -208,27 +220,53 @@ void MainWindow::connectSignals()
         }
     });
 
+    // 发送历史变化时更新自动补全
+    connect(m_sendHistory, &SendHistory::historyChanged, this, [this]() {
+        m_sendCompleter->setModel(new QStringListModel(m_sendHistory->recentTexts(), this));
+    });
+
+    // 统计刷新定时器
+    connect(m_statsTimer, &QTimer::timeout, this, &MainWindow::updateDataStatistics);
+
     // 导航树点击切换面板
     connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
         QString text = index.data().toString();
         if (text == tr("Config")) {
             m_serialConfig->setVisible(true);
             m_terminal->setVisible(false);
+            m_dataStats->setVisible(false);
         } else if (text == tr("Terminal")) {
             m_serialConfig->setVisible(false);
             m_terminal->setVisible(true);
+            m_dataStats->setVisible(false);
+        } else if (text == tr("Statistics")) {
+            m_serialConfig->setVisible(false);
+            m_terminal->setVisible(false);
+            m_dataStats->setVisible(true);
         }
     });
 }
 
 void MainWindow::onConnectSerial()
 {
-    // 创建新的串口连接
-    m_currentConn = m_connManager->createSerialConnection();
+    // 通过工厂创建连接（不依赖具体类型）
+    m_currentConn = m_connManager->createConnection(ConnectionType::Serial);
+    if (!m_currentConn) {
+        QMessageBox::warning(this, tr("Not Supported"), tr("Serial connection not available"));
+        return;
+    }
 
-    // 应用配置
-    auto* serialConn = qobject_cast<SerialConnection*>(m_currentConn);
-    m_serialConfig->applyConfigToConnection(serialConn);
+    // 使用 IConnection::configure() 统一配置（消除强转）
+    QVariantMap params;
+    params["portName"] = m_serialConfig->currentPortData();
+    params["baudRate"] = m_serialConfig->currentBaudRate();
+    params["dataBits"] = m_serialConfig->currentDataBitsIndex() + 5;
+    params["parity"] = m_serialConfig->currentParityIndex();
+    params["stopBits"] = m_serialConfig->currentStopBitsIndex();
+    params["flowControl"] = m_serialConfig->currentFlowControlIndex();
+    params["dtr"] = true;
+    params["rts"] = true;
+    m_currentConn->configure(params);
 
     // 连接数据信号
     connect(m_currentConn, &IConnection::dataReceived,
@@ -243,21 +281,17 @@ void MainWindow::onConnectSerial()
     // 尝试连接
     if (!m_currentConn->open()) {
         QMessageBox::warning(this, tr("Connection Failed"),
-                             tr("Cannot open serial port: ") + m_currentConn->name());
+                             tr("Cannot open serial port"));
         m_connManager->removeConnection(m_currentConn);
         m_currentConn = nullptr;
         return;
     }
-
-    // 切换到终端视图
-    m_serialConfig->setVisible(false);
-    m_terminal->setVisible(true);
 }
 
 void MainWindow::onDisconnectSerial()
 {
     if (m_currentConn) {
-        m_currentConn->close();    // 触发 stateChanged → 更新UI
+        m_currentConn->close();
         m_connManager->removeConnection(m_currentConn);
         m_currentConn = nullptr;
     }
@@ -272,22 +306,22 @@ void MainWindow::onSendData()
     QString text = m_sendInput->text();
     if (text.isEmpty()) return;
 
+    bool isHex = (m_sendModeCombo->currentIndex() == 1);
     QByteArray data;
-    if (m_sendModeCombo->currentIndex() == 1) {
-        // HEX模式
+    if (isHex) {
         data = HexConverter::fromHexString(text);
         if (data.isEmpty()) {
             m_sendInput->setStyleSheet("QLineEdit { border: 1px solid red; }");
             return;
         }
     } else {
-        // 文本模式
         data = text.toUtf8();
     }
 
     qint64 written = m_currentConn->write(data);
     if (written > 0) {
         m_terminalModel->appendSent(data);
+        m_sendHistory->addEntry(text, isHex);  // 记录到发送历史
         m_sendInput->clear();
         m_sendInput->setStyleSheet("");
         updateStatusBar();
@@ -318,7 +352,34 @@ void MainWindow::onTimestampToggled(bool checked)
 void MainWindow::onClearTerminal()
 {
     m_terminalModel->clear();
+    m_dataStats->reset();
     updateStatusBar();
+}
+
+void MainWindow::onExportData()
+{
+    if (m_terminalModel->lineCount() == 0) {
+        QMessageBox::information(this, tr("Export"), tr("No data to export"));
+        return;
+    }
+
+    QString filter = tr("Text files (*.txt);;CSV files (*.csv);;Binary files (*.bin)");
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Export Data"),
+                                                     QString(), filter);
+    if (filePath.isEmpty()) return;
+
+    // 根据扩展名选择格式
+    DataExporter::Format format = DataExporter::Txt;
+    if (filePath.endsWith(".csv", Qt::CaseInsensitive))
+        format = DataExporter::Csv;
+    else if (filePath.endsWith(".bin", Qt::CaseInsensitive))
+        format = DataExporter::Bin;
+
+    if (m_dataExporter->exportToFile(filePath, format, m_terminalModel->lines())) {
+        statusBar()->showMessage(tr("Exported to %1").arg(filePath), 3000);
+    } else {
+        QMessageBox::warning(this, tr("Export Failed"), tr("Cannot write to file"));
+    }
 }
 
 void MainWindow::onConnectionStateChanged(ConnectionState state)
@@ -329,9 +390,9 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
             m_currentConn ? m_currentConn->name() : ""));
         m_connStatusLbl->setStyleSheet("color: #a6e3a1;");
         m_serialConfig->setConnected(true);
-        // 切换到终端视图
         m_serialConfig->setVisible(false);
         m_terminal->setVisible(true);
+        m_dataStats->setVisible(false);
         break;
     case ConnectionState::Disconnected:
         m_connStatusLbl->setText(tr("Disconnected"));
@@ -361,22 +422,25 @@ void MainWindow::updateStatusBar()
     if (m_terminalModel) {
         auto rx = m_terminalModel->rxBytes();
         auto tx = m_terminalModel->txBytes();
-
-        // 格式化字节数为人类可读格式
         auto formatBytes = [](quint64 bytes) -> QString {
             if (bytes < 1024) return QString("%1 B").arg(bytes);
             if (bytes < 1024 * 1024) return QString("%1 KB").arg(bytes / 1024.0, 0, 'f', 1);
             return QString("%1 MB").arg(bytes / (1024.0 * 1024.0), 0, 'f', 1);
         };
-
         m_rxBytesLbl->setText("RX: " + formatBytes(rx));
         m_txBytesLbl->setText("TX: " + formatBytes(tx));
     }
 }
 
+void MainWindow::updateDataStatistics()
+{
+    if (m_terminalModel && m_dataStats) {
+        m_dataStats->update(m_terminalModel->rxBytes(), m_terminalModel->txBytes());
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    // 关闭所有连接
     auto connections = m_connManager->connections();
     for (auto* conn : connections) {
         conn->close();

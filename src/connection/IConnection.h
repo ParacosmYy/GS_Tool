@@ -34,6 +34,12 @@ public:
     // 发送数据，返回实际发送的字节数，-1表示失败
     virtual qint64 write(const QByteArray& data) = 0;
 
+    // 使用参数映射配置连接（消除上层对具体类型的强转依赖）
+    // 串口参数: "portName", "baudRate", "dataBits", "parity", "stopBits", "flowControl", "dtr", "rts"
+    // TCP参数: "host", "port"
+    // 子类自行解析自己需要的参数，忽略不认识的key
+    virtual void configure(const QVariantMap& params) = 0;
+
 signals:
     // 收到数据时发出
     void dataReceived(const QByteArray& data);

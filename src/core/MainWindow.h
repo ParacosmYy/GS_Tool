@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QAction>
+#include <QCompleter>
 #include "ConnectionManager.h"
 #include "ThemeManager.h"
 #include "terminal/TerminalWidget.h"
@@ -19,6 +20,9 @@
 #include "serial/SerialConfigPanel.h"
 #include "serial/QuickCommandBar.h"
 #include "serial/TimedSender.h"
+#include "serial/SendHistory.h"
+#include "serial/DataStatistics.h"
+#include "utils/DataExporter.h"
 #include "Constants.h"
 
 // 主窗口 - 左侧导航树 + 右侧功能面板
@@ -53,6 +57,9 @@ private slots:
     // 清空终端
     void onClearTerminal();
 
+    // 导出数据
+    void onExportData();
+
     // 连接状态变化
     void onConnectionStateChanged(ConnectionState state);
 
@@ -65,6 +72,7 @@ private:
     void setupStatusBar();
     void connectSignals();
     void updateStatusBar();
+    void updateDataStatistics();
 
     // 核心组件
     ConnectionManager* m_connManager;
@@ -72,6 +80,10 @@ private:
     // 当前活动的连接和模型
     IConnection* m_currentConn = nullptr;
     TerminalModel* m_terminalModel;
+
+    // 业务组件
+    SendHistory* m_sendHistory;
+    DataExporter* m_dataExporter;
 
     // UI组件 - 布局
     QSplitter* m_mainSplitter;
@@ -83,6 +95,7 @@ private:
     QComboBox* m_displayModeCombo;
     QAction* m_timestampAction;
     QAction* m_clearAction;
+    QAction* m_exportAction;
 
     // UI组件 - 串口配置
     SerialConfigPanel* m_serialConfig;
@@ -93,11 +106,14 @@ private:
     // UI组件 - 发送区域
     QLineEdit* m_sendInput;
     QPushButton* m_sendBtn;
-    QPushButton* m_sendHexBtn;
     QComboBox* m_sendModeCombo;    // 文本/HEX切换
+    QCompleter* m_sendCompleter;   // 发送历史自动补全
 
     // UI组件 - 快捷指令
     QuickCommandBar* m_quickCmdBar;
+
+    // UI组件 - 数据统计
+    DataStatistics* m_dataStats;
 
     // UI组件 - 状态栏
     QLabel* m_connStatusLbl;
@@ -106,6 +122,9 @@ private:
 
     // 定时发送器
     TimedSender* m_timedSender;
+
+    // 统计定时器
+    QTimer* m_statsTimer;
 };
 
 #endif // MAINWINDOW_H

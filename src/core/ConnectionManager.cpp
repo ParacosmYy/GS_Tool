@@ -1,5 +1,5 @@
 #include "ConnectionManager.h"
-#include "connection/SerialConnection.h"
+#include "ConnectionFactory.h"
 
 ConnectionManager::ConnectionManager(QObject* parent)
     : QObject(parent)
@@ -9,6 +9,7 @@ ConnectionManager::ConnectionManager(QObject* parent)
 ConnectionManager::~ConnectionManager()
 {
     // 关闭并删除所有连接
+    // 注意: 连接对象没有设parent，需要手动delete
     for (auto* conn : m_connections) {
         conn->close();
         delete conn;
@@ -16,19 +17,29 @@ ConnectionManager::~ConnectionManager()
     m_connections.clear();
 }
 
+// 创建指定类型的连接（委托给ConnectionFactory）
+IConnection* ConnectionManager::createConnection(ConnectionType type)
+{
+    // 不传parent，由ConnectionManager手动管理生命周期，避免双重删除
+    auto* conn = ConnectionFactory::create(type, nullptr);
+    if (conn) {
+        m_connections.append(conn);
+        emit connectionAdded(conn);
+    }
+    return conn;
+}
+
+// 保留旧接口的兼容性，内部委托给通用方法
 IConnection* ConnectionManager::createSerialConnection()
 {
-    auto* conn = new SerialConnection(this);
-    m_connections.append(conn);
-    emit connectionAdded(conn);
-    return conn;
+    return createConnection(ConnectionType::Serial);
 }
 
 void ConnectionManager::removeConnection(IConnection* conn)
 {
     if (m_connections.removeOne(conn)) {
         conn->close();
-        conn->deleteLater();
+        delete conn;  // 直接delete（没有parent，不会双重删除）
         emit connectionRemoved(conn);
     }
 }

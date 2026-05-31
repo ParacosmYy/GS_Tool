@@ -21,6 +21,12 @@ public:
     void close() override;
     qint64 write(const QByteArray& data) override;
 
+    // 通过QVariantMap配置连接参数（IConnection接口）
+    // 支持的key: "portName"(string), "baudRate"(int), "dataBits"(int:5-8),
+    //           "parity"(int:0-4), "stopBits"(int:0-2), "flowControl"(int:0-2),
+    //           "dtr"(bool), "rts"(bool)
+    void configure(const QVariantMap& params) override;
+
     // ---- 串口配置 ----
 
     void setPortName(const QString& portName);
