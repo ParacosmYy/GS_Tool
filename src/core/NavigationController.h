@@ -50,13 +50,10 @@ public:
     const QVector<NavPanelMapping>& mappings() const { return m_navPanelMappings; }
 
 signals:
-    // 面板切换完成时发出（可用于外部同步状态）
-    void panelSwitchRequested(QWidget* oldPanel, QWidget* newPanel);
+    // 面板切换完成时发出（动画结束后，可用于外部同步状态）
+    void panelSwitched(QWidget* panel);
 
 private:
-    // 淡出动画辅助: 200ms InCubic opacity 1.0 → 0.0
-    void fadeOutPanel(QWidget* panel, QPropertyAnimation* anim);
-
     // 淡入动画辅助: 250ms OutCubic opacity 0.0 → 1.0
     void fadeInPanel(QWidget* panel);
 

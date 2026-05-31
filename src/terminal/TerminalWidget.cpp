@@ -131,6 +131,11 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
 
     // 如果缓存失效，只格式化新增的行（增量更新）
     if (m_cachedLineCount != totalLines) {
+        // 环形缓冲区回绕检测：当行数减少时说明旧数据被驱逐，逻辑索引已偏移，必须清空整个缓存
+        if (m_cachedLineCount > totalLines) {
+            m_cachedLineCount = 0;
+            m_cachedLines.clear();
+        }
         m_cachedLines.resize(totalLines);
         for (int i = m_cachedLineCount; i < totalLines; ++i) {
             m_cachedLines[i] = formatToCache(m_model->lineAt(i));
@@ -150,6 +155,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
 
     // 逐行绘制 — 完全从缓存读取，不调用lineAt()
     int y = 0;
+    QFontMetrics fm(m_font);  // 在循环外构造，避免每行重复创建
     for (int i = startLine; i < endLine; ++i) {
         const CachedLine& cached = m_cachedLines[i];
 
@@ -173,7 +179,6 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
             QString ts = QDateTime::fromMSecsSinceEpoch(cached.timestamp)
                              .toString("HH:mm:ss.zzz");
             painter.drawText(4, y + m_lineHeight - 4, ts);
-            QFontMetrics fm(m_font);
             xOffset = fm.horizontalAdvance(ts) + 12;
 
             // 恢复数据颜色

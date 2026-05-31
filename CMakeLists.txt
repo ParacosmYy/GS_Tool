@@ -28,6 +28,7 @@ set(SOURCES
     src/core/MainWindow.cpp
     src/core/RecordingController.cpp
     src/core/NavigationController.cpp
+    src/core/SendController.cpp
     src/core/ConnectionManager.cpp
     src/core/ConnectionFactory.cpp
     src/core/ThemeManager.cpp
@@ -70,6 +71,7 @@ set(HEADERS
     src/core/MainWindow.h
     src/core/RecordingController.h
     src/core/NavigationController.h
+    src/core/SendController.h
     src/core/ConnectionManager.h
     src/core/ConnectionFactory.h
     src/core/ThemeManager.h

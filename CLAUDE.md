@@ -330,6 +330,9 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 | `Constants` | `core/Constants.h` | 全局枚举和常量 |
 | `ChannelConfig` | `chart/ChannelConfig.h/cpp` | 通道配置（JSON序列化+数据源映射） |
 | `ChartModel` | `chart/ChartModel.h/cpp` | 图表数据模型（滑动窗口+降采样） |
+| `SendController` | `core/SendController.h/cpp` | 发送控制器（发送栏UI+输入解析+HEX转换+连接写入+终端记录） |
+| `NavigationController` | `core/NavigationController.h/cpp` | 导航控制器（导航树+面板切换动画+呼吸动画） |
+| `RecordingController` | `core/RecordingController.h/cpp` | 录制控制器（录制/回放按钮+DataLogger交互） |
 
 **规则**: 上表中的组件已经过验证，任何新功能需要CRC/HEX/缓冲区/配置等能力时，直接复用，不得重写。
 
@@ -808,6 +811,7 @@ docs/prd/PRD_<编号>_<简述>.md
 | 19 | 代码审查修复: sendAndRecord统一+completer泄漏+QStackedWidget降级+lineAt线程安全+objectName审计+DataLogger回放修复 | 21 |
 | 20 | 架构审查+DataExporter流式导出+ProtocolView右键菜单/JSON导出+TerminalWidget方向缓存+连接类型图标+翻译补全+ChartWidget宽度修复 | 22 |
 | 21 | MainWindow拆分NavigationController+RecordingController+34条翻译补全+QSS protocolView修复+JustFloat特性提案 | 23 |
+| 22 | SendController提取+sendAndRecord静默失败修复+TerminalWidget环形缓存失效修复+QSS protocolToolbar修复+代码审查修复(死代码清除+翻译上下文修正+setConnected连线) | 24 |
 | ... | 目标: 1000分 | 1000 |
 
 ---

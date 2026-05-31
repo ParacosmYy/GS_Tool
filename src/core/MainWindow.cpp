@@ -20,11 +20,11 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_connManager(new ConnectionManager(this))
     , m_terminalModel(new TerminalModel(this))
-    , m_timedSender(new TimedSender(this))
     , m_sendHistory(new SendHistory(this))
     , m_dataExporter(new DataExporter(this))
     , m_dataLogger(new DataLogger(this))
     , m_recordingController(new RecordingController(m_dataLogger, this))
+    , m_sendController(new SendController(m_terminalModel, m_dataLogger, m_sendHistory, this))
     , m_statsTimer(new QTimer(this))
     , m_frameParser(new FrameParser(this))
     , m_otaManager(new OtaManager(this))
@@ -155,36 +155,9 @@ void MainWindow::setupUI()
     });
     serialLayout->addWidget(m_quickCmdBar);
 
-    // 发送区域（带历史自动补全）
-    auto* sendFrame = new QFrame;
-    sendFrame->setFrameShape(QFrame::StyledPanel);
-    auto* sendLayout = new QHBoxLayout(sendFrame);
-    sendLayout->setContentsMargins(8, 4, 8, 4);
-
-    m_sendModeCombo = new QComboBox;
-    m_sendModeCombo->addItems({tr("文本"), tr("HEX")});
-    m_sendModeCombo->setFixedWidth(60);
-
-    m_sendInput = new QLineEdit;
-    m_sendInput->setObjectName("sendInput");
-    m_sendInput->setPlaceholderText(tr("输入要发送的数据..."));
-
-    // 发送历史自动补全（复用同一个QStringListModel，避免每次new泄漏）
-    m_sendCompleterModel = new QStringListModel(m_sendHistory->recentTexts(), this);
-    m_sendCompleter = new QCompleter(m_sendCompleterModel, this);
-    m_sendCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    m_sendCompleter->setCompletionMode(QCompleter::PopupCompletion);
-    m_sendInput->setCompleter(m_sendCompleter);
-
-    m_sendBtn = new QPushButton(tr("发送"));
-    m_sendBtn->setObjectName("sendButton");
-    m_sendBtn->setFixedWidth(70);
-
-    sendLayout->addWidget(m_sendModeCombo);
-    sendLayout->addWidget(m_sendInput, 1);
-    sendLayout->addWidget(m_sendBtn);
-
-    serialLayout->addWidget(sendFrame);
+    // 发送区域: 由SendController创建和管理
+    QWidget* sendBar = m_sendController->createSendBar(this);
+    serialLayout->addWidget(sendBar);
 
     rightPanelLayout->addWidget(serialPanel);
 
@@ -279,13 +252,17 @@ void MainWindow::connectSignals()
     connect(m_serialConfig, &SerialConfigPanel::disconnectRequested,
             this, &MainWindow::onDisconnectSerial);
 
-    // 发送按钮
-    connect(m_sendBtn, &QPushButton::clicked, this, &MainWindow::onSendData);
-    connect(m_sendInput, &QLineEdit::returnPressed, this, &MainWindow::onSendData);
-
-    // 快捷指令
+    // 快捷指令 → SendController
     connect(m_quickCmdBar, &QuickCommandBar::commandTriggered,
-            this, &MainWindow::onQuickCommand);
+            m_sendController, &SendController::onQuickCommand);
+
+    // SendController信号 → MainWindow状态栏更新
+    connect(m_sendController, &SendController::dataSent,
+            this, [this](qint64) { updateStatusBar(); });
+    connect(m_sendController, &SendController::statusMessage,
+            this, [this](const QString& msg) {
+                statusBar()->showMessage(msg, 3000);
+            });
 
     // 工具栏
     connect(m_displayModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -325,16 +302,6 @@ void MainWindow::connectSignals()
             this, &MainWindow::onSearchCleared);
     connect(m_searchBar, &TerminalSearchBar::closed, this, [this]() {
         // 搜索栏关闭时清除终端搜索高亮（后续实现）
-    });
-
-    // 定时发送器
-    connect(m_timedSender, &TimedSender::sendData, this, [this](const QByteArray& data) {
-        sendAndRecord(data);
-    });
-
-    // 发送历史变化时更新自动补全（复用模型，不泄漏QStringListModel）
-    connect(m_sendHistory, &SendHistory::historyChanged, this, [this]() {
-        m_sendCompleterModel->setStringList(m_sendHistory->recentTexts());
     });
 
     // 统计刷新定时器
@@ -481,7 +448,8 @@ void MainWindow::onConnectSerial()
         return;
     }
 
-    // 同步连接到OTA管理器
+    // 同步连接到SendController和OTA管理器
+    m_sendController->setConnection(m_currentConn);
     m_otaManager->setConnection(m_currentConn);
 }
 
@@ -491,60 +459,8 @@ void MainWindow::onDisconnectSerial()
         m_currentConn->close();
         m_connManager->removeConnection(m_currentConn);
         m_currentConn = nullptr;
+        m_sendController->setConnection(nullptr);
     }
-}
-
-bool MainWindow::sendAndRecord(const QByteArray& data, bool isHex)
-{
-    Q_UNUSED(isHex);
-    if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
-        return false;
-    }
-    qint64 written = m_currentConn->write(data);
-    if (written > 0) {
-        m_terminalModel->appendSent(data);
-        m_dataLogger->logData(data, DataLogger::Direction::Sent);
-        updateStatusBar();
-        return true;
-    }
-    return false;
-}
-
-void MainWindow::onSendData()
-{
-    if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
-        return;
-    }
-
-    QString text = m_sendInput->text();
-    if (text.isEmpty()) return;
-
-    bool isHex = (m_sendModeCombo->currentIndex() == 1);
-    QByteArray data;
-    if (isHex) {
-        data = HexConverter::fromHexString(text);
-        if (data.isEmpty()) {
-            m_sendInput->setProperty("hasError", true);
-            m_sendInput->style()->unpolish(m_sendInput);
-            m_sendInput->style()->polish(m_sendInput);
-            return;
-        }
-    } else {
-        data = text.toUtf8();
-    }
-
-    if (sendAndRecord(data)) {
-        m_sendHistory->addEntry(text, isHex);
-        m_sendInput->clear();
-        m_sendInput->setProperty("hasError", false);
-        m_sendInput->style()->unpolish(m_sendInput);
-        m_sendInput->style()->polish(m_sendInput);
-    }
-}
-
-void MainWindow::onQuickCommand(const QByteArray& data)
-{
-    sendAndRecord(data);
 }
 
 void MainWindow::onDisplayModeChanged(int index)
@@ -671,6 +587,9 @@ void MainWindow::onConnectNetwork(ConnectionType type)
         m_currentConn = nullptr;
         return;
     }
+
+    // 同步连接到SendController
+    m_sendController->setConnection(m_currentConn);
 }
 
 void MainWindow::onConnectionStateChanged(ConnectionState state)
@@ -682,6 +601,7 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
             m_currentConn ? m_currentConn->name() : ""));
         stateStr = "connected";
         m_serialConfig->setConnected(true);
+        m_recordingController->setConnected(true);
         // 连接成功后自动切换到终端面板（带动画）
         m_navController->switchToPanel(m_terminal);
         m_navController->stopBreathingAnimation(m_connStatusLbl);
@@ -690,6 +610,7 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
         m_connStatusLbl->setText(tr("未连接"));
         stateStr = "disconnected";
         m_serialConfig->setConnected(false);
+        m_recordingController->setConnected(false);
         m_navController->stopBreathingAnimation(m_connStatusLbl);
         break;
     case ConnectionState::Connecting:
@@ -701,6 +622,7 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
         m_connStatusLbl->setText(tr("连接错误"));
         stateStr = "error";
         m_serialConfig->setConnected(false);
+        m_recordingController->setConnected(false);
         m_navController->stopBreathingAnimation(m_connStatusLbl);
         break;
     }
@@ -758,5 +680,3 @@ void MainWindow::closeEvent(QCloseEvent* event)
     }
     event->accept();
 }
-
-

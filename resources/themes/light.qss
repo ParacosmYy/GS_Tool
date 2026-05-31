@@ -417,6 +417,9 @@ QLineEdit#sendInput[hasError="true"] { border: 2px solid #ef4444; }
 /* === ProtocolView 协议解析面板 === */
 QWidget#protocolView { background-color: #ffffff; }
 QWidget#protocolToolbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
 QLabel#protocolStatusLabel {
     color: #6b7280;
     font-size: 12px;

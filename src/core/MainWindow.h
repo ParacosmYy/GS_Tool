@@ -4,16 +4,11 @@
 #include <QMainWindow>
 #include <QTreeView>
 #include <QSplitter>
-#include <QStringListModel>
 #include <QToolBar>
 #include <QStatusBar>
 #include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
 #include <QComboBox>
 #include <QAction>
-#include <QCompleter>
-#include <QVector>
 #include <functional>
 #include "ConnectionManager.h"
 #include "ThemeManager.h"
@@ -21,13 +16,13 @@
 #include "terminal/TerminalModel.h"
 #include "serial/SerialConfigPanel.h"
 #include "serial/QuickCommandBar.h"
-#include "serial/TimedSender.h"
 #include "serial/SendHistory.h"
 #include "serial/DataStatistics.h"
 #include "utils/DataExporter.h"
 #include "utils/DataLogger.h"
 #include "core/RecordingController.h"
 #include "core/NavigationController.h"
+#include "core/SendController.h"
 #include "utils/SettingsManager.h"
 #include "terminal/TerminalSearchBar.h"
 #include "protocol/FrameParser.h"
@@ -54,12 +49,6 @@ private slots:
     // 串口连接/断开
     void onConnectSerial();
     void onDisconnectSerial();
-
-    // 发送数据
-    void onSendData();
-
-    // 快捷指令触发
-    void onQuickCommand(const QByteArray& data);
 
     // 显示模式切换
     void onDisplayModeChanged(int index);
@@ -102,9 +91,6 @@ private:
     void loadSettings();
     void saveSettings();
 
-    // 统一发送方法: 写入连接 + 记录终端 + 日志 + 更新状态栏，返回是否成功写入
-    bool sendAndRecord(const QByteArray& data, bool isHex = false);
-
     // 核心组件
     ConnectionManager* m_connManager;
 
@@ -117,6 +103,9 @@ private:
     DataExporter* m_dataExporter;
     DataLogger* m_dataLogger;
     RecordingController* m_recordingController;
+
+    // 发送控制器（管理发送栏UI、发送逻辑、定时发送器）
+    SendController* m_sendController;
 
     // UI组件 - 布局
     QSplitter* m_mainSplitter;
@@ -138,13 +127,6 @@ private:
     // UI组件 - 终端
     TerminalWidget* m_terminal;
     TerminalSearchBar* m_searchBar;
-
-    // UI组件 - 发送区域
-    QLineEdit* m_sendInput;
-    QPushButton* m_sendBtn;
-    QComboBox* m_sendModeCombo;    // 文本/HEX切换
-    QCompleter* m_sendCompleter;   // 发送历史自动补全
-    QStringListModel* m_sendCompleterModel; // 补全数据模型（复用，避免每次new泄漏）
 
     // UI组件 - 快捷指令
     QuickCommandBar* m_quickCmdBar;
@@ -168,9 +150,6 @@ private:
     QLabel* m_connStatusLbl;
     QLabel* m_rxBytesLbl;
     QLabel* m_txBytesLbl;
-
-    // 定时发送器
-    TimedSender* m_timedSender;
 
     // 统计定时器
     QTimer* m_statsTimer;

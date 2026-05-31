@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QLabel>
+#include <QCoreApplication>
 
 // 创建导航树连接类型指示圆点图标（8x8透明底+抗锯齿彩色圆）
 static QIcon createDotIcon(const QColor& color)
@@ -111,7 +112,7 @@ void NavigationController::setCurrentPanel(QWidget* panel)
 QWidget* NavigationController::lookupPanel(const QString& translatedName) const
 {
     for (const auto& mapping : m_navPanelMappings) {
-        if (translatedName == tr(mapping.name)) {
+        if (translatedName == QCoreApplication::translate("MainWindow", mapping.name)) {
             return mapping.widget;
         }
     }
@@ -177,13 +178,6 @@ void NavigationController::switchToPanel(QWidget* newPanel)
     }
 }
 
-void NavigationController::fadeOutPanel(QWidget* panel, QPropertyAnimation* anim)
-{
-    Q_UNUSED(panel);
-    Q_UNUSED(anim);
-    // fadeOut 逻辑已内联在 switchToPanel 中，此方法预留用于未来扩展
-}
-
 void NavigationController::fadeInPanel(QWidget* panel)
 {
     // 新面板: 250ms OutCubic opacity 0.0 → 1.0 淡入
@@ -209,8 +203,9 @@ void NavigationController::fadeInPanel(QWidget* panel)
         }
     });
 
-    connect(fadeIn, &QPropertyAnimation::finished, this, [this]() {
+    connect(fadeIn, &QPropertyAnimation::finished, this, [this, panel]() {
         m_panelSwitching = false;
+        emit panelSwitched(panel);
     });
 
     fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
