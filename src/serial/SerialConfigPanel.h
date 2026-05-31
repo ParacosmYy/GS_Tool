@@ -1,18 +1,14 @@
 /**
  * @file SerialConfigPanel.h
- * @brief 串口配置面板 - 提供完整的串口参数配置和连接控制
+ * @brief 串口配置面板 - 串口参数配置、连接控制和状态指示
  *
- * 职责:
- *   1. 端口选择（自动刷新 + 手动刷新）
- *   2. 串口参数配置（波特率/数据位/校验/停止位/流控）
- *   3. DTR/RTS 线路信号控制
- *   4. 连接/断开按钮（带"连接中"中间状态和防重复点击保护）
- *   5. 驱动检测信息展示
- *   6. 配置持久化（保存/恢复全部参数含 DTR/RTS）
+ * 职责: 端口选择、参数配置、DTR/RTS控制、连接按钮(含连接中中间状态)、
+ * 状态指示器(彩色圆点+呼吸动画)、驱动检测信息、配置持久化
  *
  * 协作关系:
  *   - ConnectionController: 接收 connectRequested/disconnectRequested 信号
  *   - MainWindow: 调用 setConnected() 同步连接状态
+ *   - setError() / setConnecting() 更新状态指示器颜色
  */
 
 #ifndef SERIALCONFIGPANEL_H
@@ -27,13 +23,10 @@
 #include <QVariantMap>
 
 /**
- * @brief 串口配置面板 - 选择端口、波特率、数据位等参数并控制连接
+ * @brief 串口配置面板 - 端口选择、参数配置、连接控制和状态指示
  *
- * 连接按钮有三种视觉状态:
- *   - 默认: "连接" 绿色背景
- *   - 连接中: "连接中..." 黄色背景 + 按钮禁用（防重复点击）
- *   - 已连接: "断开" 红色背景
- * 空端口时自动禁用连接按钮。
+ * 状态指示器: 绿色圆点(已连接)、黄色圆点+呼吸动画(连接中)、灰色圆点(断开)、红色圆点(错误)
+ * 圆点大小8px，通过QSS的statusIndicator控制，不硬编码颜色。
  */
 class SerialConfigPanel : public QWidget {
     Q_OBJECT
@@ -41,84 +34,45 @@ class SerialConfigPanel : public QWidget {
 public:
     explicit SerialConfigPanel(QWidget* parent = nullptr);
 
-    /** @brief 刷新可用端口列表，尝试保持当前选择 */
-    void refreshPorts();
-
-    // ---- 配置读取接口（供 ConnectionController 构建 QVariantMap） ----
-
-    /** @brief 获取当前选中的端口系统名（如 "COM3"） */
-    QString currentPortData() const;
-
-    /** @brief 获取当前波特率值 */
-    int currentBaudRate() const;
-
-    /** @brief 获取数据位索引（0=5位, 1=6位, 2=7位, 3=8位） */
-    int currentDataBitsIndex() const;
-
-    /** @brief 获取校验位索引（0=无, 1=偶, 2=奇, 3=Mark, 4=Space） */
-    int currentParityIndex() const;
-
-    /** @brief 获取停止位索引（0=1, 1=1.5, 2=2） */
-    int currentStopBitsIndex() const;
-
-    /** @brief 获取流控索引（0=无, 1=RTS/CTS, 2=XON/XOFF） */
-    int currentFlowControlIndex() const;
-
-    /** @brief DTR 信号是否启用 */
-    bool dtrEnabled() const;
-
-    /** @brief RTS 信号是否启用 */
-    bool rtsEnabled() const;
+    void refreshPorts();                     ///< 刷新可用端口列表
+    QString currentPortData() const;         ///< 获取端口系统名(如COM3)
+    int currentBaudRate() const;             ///< 获取波特率
+    int currentDataBitsIndex() const;        ///< 数据位索引(0=5,3=8)
+    int currentParityIndex() const;          ///< 校验位索引
+    int currentStopBitsIndex() const;        ///< 停止位索引
+    int currentFlowControlIndex() const;     ///< 流控索引
+    bool dtrEnabled() const;                 ///< DTR是否启用
+    bool rtsEnabled() const;                 ///< RTS是否启用
+    void setConnected(bool connected);       ///< 设置连接状态
+    bool isConnected() const;                ///< 当前是否已连接
+    void restoreConfig(const QVariantMap& config); ///< 恢复配置
 
     /**
-     * @brief 设置连接状态（由 MainWindow 在连接成功/失败/断开时调用）
-     *
-     * 更新按钮文字/颜色、锁定/解锁配置控件。
-     * 同时清除"连接中"中间状态。
-     * @param connected true=已连接, false=已断开
+     * @brief 设置连接错误状态
+     * @param errorMsg 错误信息，显示在状态指示器tooltip中
      */
-    void setConnected(bool connected);
+    void setError(const QString& errorMsg);
 
-    /** @brief 当前是否处于已连接状态 */
-    bool isConnected() const;
-
-    /**
-     * @brief 从保存的配置恢复到界面
-     *
-     * 恢复所有参数包括 DTR/RTS 复选框状态。
-     * @param config 配置映射表
-     */
-    void restoreConfig(const QVariantMap& config);
+    /** @brief 设置连接中状态(由外部连接流程调用) */
+    void setConnecting();
 
 signals:
-    /** @brief 用户点击"连接"按钮（已通过空端口检查和防重复点击保护） */
-    void connectRequested();
-
-    /** @brief 用户点击"断开"按钮 */
-    void disconnectRequested();
-
-    /** @brief DTR 复选框状态变化（运行时实时控制） */
-    void dtrChanged(bool enabled);
-
-    /** @brief RTS 复选框状态变化（运行时实时控制） */
-    void rtsChanged(bool enabled);
+    void connectRequested();      ///< 用户点击连接按钮
+    void disconnectRequested();   ///< 用户点击断开按钮
+    void dtrChanged(bool enabled);///< DTR状态变化
+    void rtsChanged(bool enabled);///< RTS状态变化
 
 private slots:
-    /** @brief 端口列表变化时更新连接按钮可用性 */
-    void onPortComboChanged();
+    void onPortComboChanged();    ///< 端口变化时更新按钮状态
 
 private:
-    /** @brief 构建 UI 布局和控件 */
     void setupUI();
-
-    /** @brief 更新驱动检测信息标签 */
     void updateDriverInfo();
-
-    /** @brief 根据端口列表是否为空，启用/禁用连接按钮 */
     void updateConnectButtonState();
+    /** @brief 更新状态指示器的颜色状态property并刷新样式 */
+    void updateStatusIndicator(const QString& state);
 
     // ---- 控件指针 ----
-
     QComboBox* m_portCombo;        ///< 端口选择下拉框
     QPushButton* m_refreshBtn;     ///< 刷新端口列表按钮
     QComboBox* m_baudCombo;        ///< 波特率选择
@@ -126,15 +80,20 @@ private:
     QComboBox* m_parityCombo;      ///< 校验位选择
     QComboBox* m_stopBitsCombo;    ///< 停止位选择
     QComboBox* m_flowControlCombo; ///< 流控模式选择
-    QCheckBox* m_dtrCheck;         ///< DTR 信号控制
-    QCheckBox* m_rtsCheck;         ///< RTS 信号控制
+    QCheckBox* m_dtrCheck;         ///< DTR信号控制
+    QCheckBox* m_rtsCheck;         ///< RTS信号控制
     QPushButton* m_connectBtn;     ///< 连接/断开按钮
     QLabel* m_driverInfoLbl;       ///< 驱动检测信息标签
+    QLabel* m_statusIndicator;     ///< 连接状态指示器(彩色圆点)
 
     // ---- 状态标志 ----
-
     bool m_connected = false;       ///< 当前是否已连接
-    bool m_connecting = false;      ///< 正在连接中（防重复点击保护）
+    bool m_connecting = false;      ///< 正在连接中(防重复点击)
+
+    // ---- 呼吸动画 ----
+    QTimer* m_breathTimer;          ///< 连接中状态的呼吸动画定时器
+    qreal m_breathOpacity = 1.0;    ///< 呼吸动画当前透明度
+    bool m_breathIncreasing = false;///< 呼吸动画方向(true=变亮,false=变暗)
 };
 
 #endif // SERIALCONFIGPANEL_H

@@ -110,9 +110,24 @@ OtaManager::OtaState OtaManager::otaState() const
 // 连接和传输控制
 // ============================================================================
 
-/** @brief 设置数据连接，同步到三个协议实例 */
+/**
+ * @brief 设置数据连接，同步到三个协议实例
+ * @param conn 新的数据连接（串口/TCP/UDP），可为 nullptr
+ *
+ * 安全机制:
+ *   1. 如果当前有活跃传输（非Idle状态），先调用 cancelTransfer() 停止传输
+ *   2. 切换期间记录警告日志，提醒开发者注意连接切换时机
+ *   3. OtaWidget 在调用此方法前应先检查 OtaManager::isTransferring()
+ */
 void OtaManager::setConnection(IConnection* conn)
 {
+    // 活跃传输期间切换连接: 先取消当前传输，避免协议实例持有失效的连接
+    if (m_otaState != OtaState::Idle) {
+        qWarning() << "OtaManager: 活跃传输期间切换连接，当前状态:"
+                   << static_cast<int>(m_otaState) << "，自动取消传输";
+        cancelTransfer();
+    }
+
     m_conn = conn;
     m_xmodem->setConnection(conn);
     m_ymodem->setConnection(conn);

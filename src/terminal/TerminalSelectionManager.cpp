@@ -111,3 +111,10 @@ void TerminalSelectionManager::setSelectionBgColor(const QColor& color)
 {
     m_selectionBg = color;
 }
+
+void TerminalSelectionManager::setSelection(int startLine, int endLine)
+{
+    m_selectionStartLine = startLine;
+    m_selectionEndLine = endLine;
+    m_isSelecting = false;
+}

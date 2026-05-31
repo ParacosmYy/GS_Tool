@@ -26,6 +26,10 @@ RecordingController::RecordingController(DataLogger* logger, QObject* parent)
             this, &RecordingController::onPlaybackProgress);
     connect(m_logger, &DataLogger::recordingStopped,
             this, &RecordingController::onRecordingStopped);
+    // 录制开始: 显示状态提示
+    connect(m_logger, &DataLogger::recordingStarted, this, [this]() {
+        emit statusMessage(tr("Recording started"), 2000);
+    });
     // 回放完成: 恢复按钮状态
     connect(m_logger, &DataLogger::playbackFinished, this, [this]() {
         m_stopPlaybackAction->setEnabled(false);

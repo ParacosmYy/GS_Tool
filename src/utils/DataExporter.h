@@ -11,6 +11,8 @@
 #include <QObject>
 #include <QVector>
 #include <QDateTime>
+#include <QFile>
+#include <QTextStream>
 #include <functional>
 #include "terminal/TerminalTypes.h"
 
@@ -65,6 +67,10 @@ public:
                         LineProvider lineProvider,
                         int totalLines, int batchSize = 1000);
 
+signals:
+    /** @brief 导出失败信号 @param filePath 文件路径 @param errorString 错误描述 */
+    void exportError(const QString& filePath, const QString& errorString);
+
 private:
     // ---- 全量导出方法（按格式分发） ----
 
@@ -98,6 +104,9 @@ private:
                            int totalLines, int batchSize);
 
     // ---- 辅助方法 ----
+
+    /** @brief 刷新文本流并检查文件写入错误，失败时发射 exportError 信号 */
+    bool flushAndCheck(QFile& file, QTextStream& out, const QString& path);
 
     /** @brief 按时间范围过滤行数据，from/to 均可选 */
     QVector<TerminalLine> filterByTime(const QVector<TerminalLine>& lines,

@@ -327,10 +327,9 @@ void NavigationController::fadeInPanel(QWidget* panel)
         }
     });
 
-    // 动画结束后重置切换标志并通知外部
-    connect(fadeIn, &QPropertyAnimation::finished, this, [this, panel]() {
+    // 动画结束后重置切换标志
+    connect(fadeIn, &QPropertyAnimation::finished, this, [this]() {
         m_panelSwitching = false;
-        emit panelSwitched(panel);
     });
 
     fadeIn->start(QAbstractAnimation::DeleteWhenStopped);

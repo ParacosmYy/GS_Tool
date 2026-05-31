@@ -35,7 +35,20 @@ OtaWidget::OtaWidget(OtaManager* manager, QWidget* parent)
     connect(m_manager, &OtaManager::otaStateChanged, this, &OtaWidget::onOtaStateChanged);
 }
 
-void OtaWidget::setConnection(IConnection* conn) { m_manager->setConnection(conn); }
+/**
+ * @brief 设置数据连接，转发到 OtaManager
+ * @param conn 新的数据连接
+ *
+ * 安全机制: 如果当前有活跃传输，先警告用户并自动取消，
+ * 避免传输协议持有已失效的连接导致数据损坏
+ */
+void OtaWidget::setConnection(IConnection* conn)
+{
+    if (m_manager->isTransferring()) {
+        appendLog(tr("警告: 活跃传输期间切换连接，已自动取消当前传输"));
+    }
+    m_manager->setConnection(conn);
+}
 
 // ============================================================================
 // UI 初始化
@@ -106,7 +119,7 @@ void OtaWidget::setupUI()
     auto* progressLayout = new QVBoxLayout(progressGroup);
     progressLayout->setSpacing(6);
 
-    m_progressBar = new QProgressBar;
+    m_progressBar = new AnimatedProgressBar;
     m_progressBar->setObjectName("otaProgressBar");
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
@@ -339,8 +352,11 @@ void OtaWidget::setTransferring(bool transferring)
     if (transferring) {
         m_progressBar->setValue(0);
         m_progressBar->setStyleSheet(QString());
+        m_progressBar->startShimmer();
         m_speedLbl->setText("");
         m_etaLbl->setText("");
+    } else {
+        m_progressBar->stopShimmer();
     }
 }
 

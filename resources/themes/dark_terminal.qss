@@ -895,6 +895,51 @@ QMenu::indicator {
     margin-left: 6px;
 }
 
+/* === TerminalWidget 右键菜单 === */
+QMenu#terminalContextMenu {
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+    border: 1px solid #45475a;
+    border-radius: 6px;
+    padding: 4px 0px;
+}
+QMenu#terminalContextMenu::item {
+    padding: 6px 24px;
+    border-radius: 4px;
+    margin: 1px 4px;
+}
+QMenu#terminalContextMenu::item:selected {
+    background-color: #313244;
+    color: #89b4fa;
+}
+QMenu#terminalContextMenu::item:disabled {
+    color: #6c7086;
+}
+QMenu#terminalContextMenu::separator {
+    height: 1px;
+    background-color: #313244;
+    margin: 4px 8px;
+}
+
+/* === SerialConfigPanel 连接状态指示器(彩色圆点) === */
+QLabel#statusIndicator {
+    background-color: #6c7086;
+    border: none;
+    border-radius: 4px;
+}
+QLabel#statusIndicator[state="connected"] {
+    background-color: #a6e3a1;
+}
+QLabel#statusIndicator[state="connecting"] {
+    background-color: #f9e2af;
+}
+QLabel#statusIndicator[state="disconnected"] {
+    background-color: #6c7086;
+}
+QLabel#statusIndicator[state="error"] {
+    background-color: #f38ba8;
+}
+
 /* === 工具栏下拉框 - 布局/主题/语言选择 === */
 QComboBox#layoutCombo,
 QComboBox#themeCombo,

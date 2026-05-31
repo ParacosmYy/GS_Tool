@@ -43,18 +43,11 @@
 /**
  * @brief 主窗口 - EmbedDebug 应用的顶层窗口
  *
- * 职责:
- *   1. 构建 IDE 风格布局: 左侧导航树 + 右侧功能面板
- *   2. 作为所有子 Controller/Manager 的组装点（依赖注入协调者）
- *   3. 连接各模块的信号/槽，完成跨模块协作
- *   4. 不包含业务逻辑本身，业务逻辑全部委托给各 Controller
- *
- * 设计模式: 中介者模式（Mediator）- 协调各 Controller 之间的交互
- *
- * 协作关系:
- *   - ConnectionController/SendController/NavigationController
- *   - ToolbarController/SettingsController/TerminalController
- *   - RecordingController/BackgroundWidget
+ * 职责: IDE布局构建 + 子Controller组装(依赖注入协调者) + 信号/槽连接
+ * 不包含业务逻辑，所有逻辑委托给各 Controller。
+ * 设计模式: 中介者模式(Mediator) - 协调各 Controller 交互
+ * 协作: ConnectionController/SendController/NavigationController/
+ *        ToolbarController/SettingsController/TerminalController/RecordingController
  */
 class MainWindow : public QMainWindow {
     Q_OBJECT

@@ -91,6 +91,13 @@ public:
     /** @brief 设置选中背景色 */
     void setSelectionBgColor(const QColor& color);
 
+    /**
+     * @brief 程序化设置选区范围（用于全选操作）
+     * @param startLine 起始行号
+     * @param endLine 结束行号
+     */
+    void setSelection(int startLine, int endLine);
+
 private:
     int m_selectionStartLine = -1;  ///< 选区起始行号(可能是拖拽起点或终点)
     int m_selectionEndLine = -1;    ///< 选区结束行号(可能是拖拽起点或终点)

@@ -50,7 +50,6 @@ signals:
     void playbackData(const QByteArray& data, qint64 direction);
     void playbackProgress(qreal percent);
     void playbackFinished();
-    void playbackSpeedChanged(qreal speed);
     void error(const QString& reason);
 
 private slots:

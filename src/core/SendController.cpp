@@ -117,6 +117,10 @@ QWidget* SendController::createSendBar(QWidget* parent)
 void SendController::setConnection(IConnection* conn)
 {
     m_currentConn = conn;
+    // 断开连接时停止定时发送，防止 use-after-free
+    if (!conn && m_timedSender) {
+        m_timedSender->stop();
+    }
 }
 
 /** @brief 获取定时发送器实例 */

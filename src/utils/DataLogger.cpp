@@ -225,7 +225,6 @@ void DataLogger::setPlaybackSpeed(qreal speed)
     }
 
     m_playbackSpeed = newSpeed;
-    emit playbackSpeedChanged(m_playbackSpeed);
 }
 
 bool DataLogger::isPlaying() const

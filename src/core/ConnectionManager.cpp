@@ -24,7 +24,6 @@ IConnection* ConnectionManager::createConnection(ConnectionType type)
     auto* conn = ConnectionFactory::create(type, nullptr);
     if (conn) {
         m_connections.append(conn);
-        emit connectionAdded(conn);
     }
     return conn;
 }
@@ -39,8 +38,7 @@ void ConnectionManager::removeConnection(IConnection* conn)
 {
     if (m_connections.removeOne(conn)) {
         conn->close();
-        emit connectionRemoved(conn);  // 先发信号，再delete，避免悬挂指针
-        delete conn;
+        conn->deleteLater();           // deleteLater确保所有已排队的槽执行完毕后再销毁
     }
 }
 

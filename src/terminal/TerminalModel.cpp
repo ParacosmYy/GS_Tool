@@ -71,10 +71,26 @@ QVector<TerminalLine> TerminalModel::lines(int start, int count) const
     return result;
 }
 
+/**
+ * @brief 获取指定索引行的拷贝
+ * @param index 行索引，范围 [0, lineCount())
+ * @return 行数据拷贝；索引越界时返回空的 TerminalLine
+ *
+ * 运行时安全检查: 如果 index 越界，返回默认构造的 TerminalLine（空数据），
+ * 并记录警告日志。Release 模式下 Q_ASSERT 会被编译器移除，
+ * 因此使用实际的运行时检查替代断言。
+ */
 TerminalLine TerminalModel::lineAt(int index) const
 {
     QMutexLocker locker(&m_mutex);
-    Q_ASSERT(index >= 0 && index < m_count);
+
+    // 运行时边界检查: 替代 Q_ASSERT，在 Release 模式下仍然有效
+    if (index < 0 || index >= m_count) {
+        qWarning() << "TerminalModel::lineAt: 索引越界，index=" << index
+                   << "，有效范围 [0," << m_count << ")";
+        return TerminalLine{};
+    }
+
     return m_buffer[physicalIndex(index)];
 }
 
@@ -134,6 +150,9 @@ void TerminalModel::setMaxLines(int max)
 
     m_head = 0;
     m_count = keepCount;
+    locker.unlock();
+    // 通知视图数据已重置，避免显示过期内容
+    emit dataCleared();
 }
 
 int TerminalModel::maxLines() const

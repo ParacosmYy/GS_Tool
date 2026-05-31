@@ -23,7 +23,6 @@
 #define OTAWIDGET_H
 
 #include <QWidget>
-#include <QProgressBar>
 #include <QPushButton>
 #include <QLineEdit>
 #include <QComboBox>
@@ -35,6 +34,7 @@
 #include <QPropertyAnimation>
 #include "ota/OtaManager.h"
 #include "ota/OtaHistoryModel.h"
+#include "ota/AnimatedProgressBar.h"
 
 /**
  * @brief OTA升级操作面板
@@ -144,7 +144,7 @@ private:
     QPushButton* m_cancelBtn;           ///< 取消传输按钮
 
     // ---- 进度显示组 ----
-    QProgressBar* m_progressBar;        ///< 传输进度条
+    AnimatedProgressBar* m_progressBar; ///< 传输进度条（带shimmer流动效果）
     QLabel* m_statusLbl;                ///< 状态文字标签
     QLabel* m_speedLbl;                 ///< 传输速率标签
     QLabel* m_etaLbl;                   ///< 预计剩余时间标签

@@ -2,13 +2,8 @@
  * @file TerminalWidget.cpp
  * @brief 自绘制终端控件实现 - QPainter高性能终端渲染
  *
- * 核心渲染逻辑保留在此文件中:
- *   - paintEvent: 主渲染循环，增量缓存更新，逐行绘制
- *   - paintLine: 单行绘制(时间戳+选区背景+搜索高亮+方向前缀+数据文本)
- *   - formatToCache: 数据行格式化为缓存结构
- *   - 滚动/缩放/键盘事件处理
- *
- * 选区管理和搜索功能分别委托给 TerminalSelectionManager 和 TerminalSearchManager。
+ * 核心渲染: paintEvent(主循环), paintLine(单行), formatToCache(缓存格式化)
+ * 选区管理和搜索功能委托给 TerminalSelectionManager 和 TerminalSearchManager。
  */
 
 #include "terminal/TerminalWidget.h"
@@ -19,7 +14,8 @@
 #include <QScrollBar>
 #include <QApplication>
 #include <QClipboard>
-#include <QDebug>
+#include <QContextMenuEvent>
+#include <QKeySequence>
 
 // ---- 构造与基本配置 ----
 
@@ -28,6 +24,12 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     , m_directionFilter(new DirectionFilter(this))
     , m_selectionManager(new TerminalSelectionManager(this))
     , m_searchManager(new TerminalSearchManager(this))
+    , m_contextMenu(nullptr)
+    , m_copyAction(nullptr)
+    , m_pasteAction(nullptr)
+    , m_clearAction(nullptr)
+    , m_selectAllAction(nullptr)
+    , m_searchAction(nullptr)
 {
     m_font = QFont("Consolas", 10);
     m_font.setStyleHint(QFont::Monospace);
@@ -66,6 +68,8 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     m_lineHeight = m_fontMetrics.height() + 2;
     setMinimumSize(400, 200);
 
+    createContextMenu();
+
     // 转发搜索管理器的信号
     connect(m_searchManager, &TerminalSearchManager::searchMatchesChanged,
             this, &TerminalWidget::searchMatchesChanged);
@@ -73,15 +77,11 @@ TerminalWidget::TerminalWidget(QWidget* parent)
 
 void TerminalWidget::setModel(TerminalModel* model)
 {
-    if (m_model) {
-        disconnect(m_model, nullptr, this, nullptr);
-    }
+    if (m_model) disconnect(m_model, nullptr, this, nullptr);
     m_model = model;
     if (m_model) {
-        connect(m_model, &TerminalModel::dataAppended,
-                this, &TerminalWidget::onDataAppended);
-        connect(m_model, &TerminalModel::dataCleared,
-                this, &TerminalWidget::onDataCleared);
+        connect(m_model, &TerminalModel::dataAppended, this, &TerminalWidget::onDataAppended);
+        connect(m_model, &TerminalModel::dataCleared, this, &TerminalWidget::onDataCleared);
     }
     m_cachedLineCount = 0;
     m_cachedLines.clear();
@@ -107,42 +107,18 @@ void TerminalWidget::clearDirectionFilter()
     update();
 }
 
-void TerminalWidget::setDisplayMode(DisplayMode mode)
-{
-    m_displayMode = mode;
-    m_cachedLineCount = 0;
-    update();
-}
-
+void TerminalWidget::setDisplayMode(DisplayMode mode) { m_displayMode = mode; m_cachedLineCount = 0; update(); }
 DisplayMode TerminalWidget::displayMode() const { return m_displayMode; }
-
-void TerminalWidget::setShowTimestamp(bool show)
-{
-    m_showTimestamp = show;
-    m_cachedLineCount = 0;
-    update();
-}
-
+void TerminalWidget::setShowTimestamp(bool show) { m_showTimestamp = show; m_cachedLineCount = 0; update(); }
 bool TerminalWidget::showTimestamp() const { return m_showTimestamp; }
-
-void TerminalWidget::setShowDirectionPrefix(bool show)
-{
-    m_showDirectionPrefix = show;
-    m_cachedLineCount = 0;
-    update();
-}
-
+void TerminalWidget::setShowDirectionPrefix(bool show) { m_showDirectionPrefix = show; m_cachedLineCount = 0; update(); }
 bool TerminalWidget::showDirectionPrefix() const { return m_showDirectionPrefix; }
 
 void TerminalWidget::setAutoScroll(bool autoScroll)
 {
     m_autoScroll = autoScroll;
-    if (m_autoScroll) {
-        m_scrollOffset = m_maxScrollOffset;
-        update();
-    }
+    if (m_autoScroll) { m_scrollOffset = m_maxScrollOffset; update(); }
 }
-
 bool TerminalWidget::autoScroll() const { return m_autoScroll; }
 
 void TerminalWidget::clear()
@@ -174,12 +150,7 @@ void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool
     update();
 }
 
-void TerminalWidget::clearSearchHighlight()
-{
-    m_searchManager->clearSearchHighlight();
-    update();
-}
-
+void TerminalWidget::clearSearchHighlight() { m_searchManager->clearSearchHighlight(); update(); }
 int TerminalWidget::searchMatchCount() const { return m_searchManager->searchMatchCount(); }
 int TerminalWidget::currentMatchIndex() const { return m_searchManager->currentMatchIndex(); }
 
@@ -203,23 +174,22 @@ void TerminalWidget::scrollToMatch(int line)
     }
 }
 
+/** @brief 重新执行搜索(缓存更新后调用) */
 void TerminalWidget::refreshSearch()
 {
     if (m_searchManager->searchPattern().isEmpty()) return;
     QString pat = m_searchManager->searchPattern();
-    bool rx = m_searchManager->searchRegex();
-    bool hx = m_searchManager->searchHex();
+    bool rx = m_searchManager->searchRegex(), hx = m_searchManager->searchHex();
     m_searchManager->clearSearchHighlight();
     setSearchHighlight(pat, rx, hx);
 }
 
-/** @brief 缓存更新后重新执行搜索(在paintEvent中调用，避免递归) */
+/** @brief 缓存更新后重新搜索(paintEvent中调用，先清空pattern避免递归) */
 void TerminalWidget::refreshSearchAfterCacheUpdate()
 {
     if (m_searchManager->searchPattern().isEmpty()) return;
     QString pat = m_searchManager->searchPattern();
-    bool rx = m_searchManager->searchRegex();
-    bool hx = m_searchManager->searchHex();
+    bool rx = m_searchManager->searchRegex(), hx = m_searchManager->searchHex();
     m_searchManager->clearSearchHighlight();
     setSearchHighlight(pat, rx, hx);
 }
@@ -228,7 +198,6 @@ void TerminalWidget::refreshSearchAfterCacheUpdate()
 
 int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y, int displayLine)
 {
-    // 计算时间戳偏移
     int xOffset = 0;
     if (m_showTimestamp) {
         painter.setPen(m_timestampColor);
@@ -237,13 +206,12 @@ int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y
         xOffset = m_fontMetrics.horizontalAdvance(ts) + 12;
     }
 
-    // 选择背景色(正规化范围)
+    // 选择背景色
     if (m_selectionManager->hasSelection()) {
         int selStart = m_selectionManager->normalizedStartLine();
         int selEnd = m_selectionManager->normalizedEndLine();
-        if (displayLine >= selStart && displayLine <= selEnd) {
+        if (displayLine >= selStart && displayLine <= selEnd)
             painter.fillRect(0, y, width(), m_lineHeight, m_selectionManager->selectionBgColor());
-        }
     }
 
     // 搜索高亮
@@ -308,9 +276,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
     // ---- 方向过滤模式 ----
     if (m_directionFilter->isFiltered()) {
         if (m_cachedLineCount > modelTotalLines) {
-            m_cachedLineCount = 0;
-            m_cachedLines.clear();
-            m_directionFilter->reset();
+            m_cachedLineCount = 0; m_cachedLines.clear(); m_directionFilter->reset();
         }
         if (m_cachedLineCount != modelTotalLines) {
             m_cachedLines.resize(modelTotalLines);
@@ -338,8 +304,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
     int totalLines = modelTotalLines;
     if (m_cachedLineCount != totalLines) {
         if (m_cachedLineCount > totalLines) {
-            m_cachedLineCount = 0;
-            m_cachedLines.clear();
+            m_cachedLineCount = 0; m_cachedLines.clear();
         }
         m_cachedLines.resize(totalLines);
         for (int i = m_cachedLineCount; i < totalLines; ++i)
@@ -358,19 +323,14 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
 
 // ---- 事件处理 ----
 
-void TerminalWidget::resizeEvent(QResizeEvent* event)
-{
-    QWidget::resizeEvent(event);
-    updateVisibleRange();
-}
+void TerminalWidget::resizeEvent(QResizeEvent* event) { QWidget::resizeEvent(event); updateVisibleRange(); }
 
 void TerminalWidget::wheelEvent(QWheelEvent* event)
 {
     int delta = event->angleDelta().y();
     m_scrollOffset -= delta / 120 * 3;
     m_scrollOffset = qMax(0, qMin(m_scrollOffset, m_maxScrollOffset));
-    if (delta < 0 && m_scrollOffset < m_maxScrollOffset)
-        m_autoScroll = false;
+    if (delta < 0 && m_scrollOffset < m_maxScrollOffset) m_autoScroll = false;
     update();
     event->accept();
 }
@@ -395,8 +355,7 @@ void TerminalWidget::mouseMoveEvent(QMouseEvent* event)
 
 void TerminalWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton)
-        m_selectionManager->onMouseRelease();
+    if (event->button() == Qt::LeftButton) m_selectionManager->onMouseRelease();
     QWidget::mouseReleaseEvent(event);
 }
 
@@ -420,8 +379,7 @@ void TerminalWidget::keyPressEvent(QKeyEvent* event)
 
 void TerminalWidget::onDataAppended(int firstNewLine, int count)
 {
-    Q_UNUSED(firstNewLine);
-    Q_UNUSED(count);
+    Q_UNUSED(firstNewLine); Q_UNUSED(count);
     if (m_directionFilter->isFiltered()) { update(); return; }
     if (m_model) {
         m_maxScrollOffset = qMax(0, m_model->lineCount() - m_visibleLines);
@@ -432,12 +390,9 @@ void TerminalWidget::onDataAppended(int firstNewLine, int count)
 
 void TerminalWidget::onDataCleared()
 {
-    m_cachedLines.clear();
-    m_cachedLineCount = 0;
-    m_directionFilter->reset();
-    m_selectionManager->reset();
-    m_scrollOffset = 0;
-    m_maxScrollOffset = 0;
+    m_cachedLines.clear(); m_cachedLineCount = 0;
+    m_directionFilter->reset(); m_selectionManager->reset();
+    m_scrollOffset = 0; m_maxScrollOffset = 0;
     update();
 }
 
@@ -464,21 +419,81 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 
     switch (m_displayMode) {
     case DisplayMode::Hex:
-        cached.text = prefix + HexConverter::toHexString(line.data);
-        break;
+        cached.text = prefix + HexConverter::toHexString(line.data); break;
     case DisplayMode::Mixed:
-        cached.text = prefix + QString::fromUtf8(line.data) + "  |  " + HexConverter::toHexString(line.data);
-        break;
+        cached.text = prefix + QString::fromUtf8(line.data) + "  |  " + HexConverter::toHexString(line.data); break;
     case DisplayMode::Decimal: {
         QStringList decBytes;
         for (unsigned char b : line.data) decBytes << QString::number(b);
-        cached.text = prefix + decBytes.join(' ');
-        break;
+        cached.text = prefix + decBytes.join(' '); break;
     }
     case DisplayMode::Text:
     default:
-        cached.text = prefix + QString::fromUtf8(line.data);
-        break;
+        cached.text = prefix + QString::fromUtf8(line.data); break;
     }
     return cached;
+}
+
+// ---- 右键菜单 ----
+
+/** @brief 创建终端右键菜单(复制/粘贴/清屏/全选/搜索)，样式由QSS主题控制 */
+void TerminalWidget::createContextMenu()
+{
+    m_contextMenu = new QMenu(this);
+    m_contextMenu->setObjectName("terminalContextMenu");
+
+    // 复制 — 只有选中文本时才可用
+    m_copyAction = m_contextMenu->addAction(
+        tr("复制") + QString("\t") + QKeySequence(QKeySequence::Copy).toString());
+    connect(m_copyAction, &QAction::triggered, this, [this]() {
+        QString text = selectedText();
+        if (!text.isEmpty()) QApplication::clipboard()->setText(text);
+    });
+
+    // 粘贴
+    m_pasteAction = m_contextMenu->addAction(
+        tr("粘贴") + QString("\t") + QKeySequence(QKeySequence::Paste).toString());
+    connect(m_pasteAction, &QAction::triggered, this, [this]() {
+        QString text = QApplication::clipboard()->text();
+        if (!text.isEmpty()) emit pasteRequested(text);
+    });
+
+    m_contextMenu->addSeparator();
+
+    // 清屏
+    m_clearAction = m_contextMenu->addAction(tr("清屏"));
+    connect(m_clearAction, &QAction::triggered, this, [this]() { clear(); emit clearRequested(); });
+
+    // 全选
+    m_selectAllAction = m_contextMenu->addAction(
+        tr("全选") + QString("\t") + QKeySequence(QKeySequence::SelectAll).toString());
+    connect(m_selectAllAction, &QAction::triggered, this, &TerminalWidget::selectAll);
+
+    m_contextMenu->addSeparator();
+
+    // 搜索(Ctrl+F)
+    m_searchAction = m_contextMenu->addAction(
+        tr("搜索") + QString("\t") + QKeySequence(QKeySequence::Find).toString());
+    connect(m_searchAction, &QAction::triggered, this, &TerminalWidget::searchRequested);
+}
+
+/** @brief 右键菜单事件 - 根据选区状态动态设置"复制"可用性 */
+void TerminalWidget::contextMenuEvent(QContextMenuEvent* event)
+{
+    if (!m_contextMenu) return;
+    m_copyAction->setEnabled(!selectedText().isEmpty());
+    m_contextMenu->popup(event->globalPos());
+    event->accept();
+}
+
+/** @brief 全选终端所有内容(包含方向过滤后的总行数) */
+void TerminalWidget::selectAll()
+{
+    int totalLines = m_directionFilter->isFiltered()
+        ? m_directionFilter->filteredLineCount()
+        : (m_model ? m_model->lineCount() : 0);
+    if (totalLines > 0 && m_selectionManager) {
+        m_selectionManager->setSelection(0, totalLines - 1);
+        update();
+    }
 }

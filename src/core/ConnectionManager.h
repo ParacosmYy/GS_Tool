@@ -32,11 +32,6 @@ public:
     // 获取连接数量
     int count() const;
 
-signals:
-    // 连接列表变化
-    void connectionAdded(IConnection* conn);
-    void connectionRemoved(IConnection* conn);
-
 private:
     QList<IConnection*> m_connections;  // 连接列表
 };

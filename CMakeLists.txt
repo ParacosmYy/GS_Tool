@@ -140,6 +140,7 @@ set(HEADERS
     src/ota/OtaManager.h
     src/ota/OtaWidget.h
     src/ota/OtaHistoryModel.h
+    src/ota/AnimatedProgressBar.h
     src/ota/protocols/BaseTransfer.h
     src/ota/protocols/XModemTransfer.h
     src/ota/protocols/YModemTransfer.h

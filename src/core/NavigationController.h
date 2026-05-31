@@ -130,14 +130,6 @@ public:
      */
     bool restorePanelByIndex(int index);
 
-signals:
-    /**
-     * @brief 面板切换完成信号
-     * 动画结束后发出，可用于外部同步状态
-     * @param panel 切换到的目标面板
-     */
-    void panelSwitched(QWidget* panel);
-
 private:
     /**
      * @brief 淡入动画辅助
