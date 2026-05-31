@@ -817,6 +817,7 @@ docs/prd/PRD_<编号>_<简述>.md
 | 21 | MainWindow拆分NavigationController+RecordingController+34条翻译补全+QSS protocolView修复+JustFloat特性提案 | 23 |
 | 22 | SendController提取+sendAndRecord静默失败修复+TerminalWidget环形缓存失效修复+QSS protocolToolbar修复+代码审查修复(死代码清除+翻译上下文修正+setConnected连线) | 24 |
 | 23 | ConnectionController提取+JustFloat/FireWater协议桥实现+SendBar StyledPanel修复+sendAndRecord未连接反馈+代码审查修复(isHex参数移除+静默失败修复) | 25 |
+| 24 | ProtocolBridgeManager协议源选择器+objectName审计补全(8控件)+QSS交互状态补全(SpinBox/ComboBox/ToolButton disabled)+ConnectionController悬空指针修复(断开时清除SendController/OtaManager+网络连接补OtaManager)+桥接单元测试 | 26 |
 | ... | 目标: 1000分 | 1000 |
 
 ---

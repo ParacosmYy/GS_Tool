@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget* parent)
     , m_sendController(new SendController(m_terminalModel, m_dataLogger, m_sendHistory, this))
     , m_statsTimer(new QTimer(this))
     , m_frameParser(new FrameParser(this))
+    , m_protocolBridgeMgr(new ProtocolBridgeManager(m_frameParser, this))
     , m_otaManager(new OtaManager(this))
     , m_navController(new NavigationController(this))
 {
@@ -243,7 +244,9 @@ void MainWindow::setupStatusBar()
     m_connStatusLbl->setObjectName("connStatus");
     m_connStatusLbl->setProperty("state", "disconnected");
     m_rxBytesLbl = new QLabel("RX: 0 B");
+    m_rxBytesLbl->setObjectName("rxBytesLabel");
     m_txBytesLbl = new QLabel("TX: 0 B");
+    m_txBytesLbl->setObjectName("txBytesLabel");
 
     statusBar()->addWidget(m_connStatusLbl, 1);
     statusBar()->addPermanentWidget(m_rxBytesLbl);
@@ -308,7 +311,7 @@ void MainWindow::connectSignals()
     connect(m_connController, &ConnectionController::dataReceived,
             this, [this](const QByteArray& data) {
         m_terminalModel->appendReceived(data);
-        m_frameParser->feed(data);
+        m_protocolBridgeMgr->feedData(data);
         m_dataLogger->logData(data, DataLogger::Direction::Received);
     });
 
@@ -376,13 +379,14 @@ void MainWindow::connectSignals()
     // 统计刷新定时器
     connect(m_statsTimer, &QTimer::timeout, this, &MainWindow::updateDataStatistics);
 
-    // 帧解析器 → 协议视图 + 波形图数据模型
-    connect(m_frameParser, &FrameParser::frameParsed,
+    // 协议桥管理器 → 协议视图 + 波形图数据模型
+    // 所有协议源(FrameParser/JustFloat/FireWater)的frameParsed统一经由ProtocolBridgeManager路由
+    connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
             m_protocolView, &ProtocolView::onFrameParsed);
-    connect(m_frameParser, &FrameParser::frameError,
+    connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameError,
             m_protocolView, &ProtocolView::onFrameError);
     // 帧数据通过ChartModel分发，ChartWidget内部连接model信号刷新渲染
-    connect(m_frameParser, &FrameParser::frameParsed,
+    connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
             m_chartWidget->model(), &ChartModel::onFrameParsed);
 
     // 帧编辑器 → 帧解析器 + 波形图通道配置（定义变更时同步更新）

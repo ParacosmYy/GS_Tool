@@ -38,19 +38,23 @@ void ChartWidget::setupUI()
     toolLayout->setContentsMargins(8, 4, 8, 4);
 
     m_pauseBtn = new QPushButton(tr("Pause"));
+    m_pauseBtn->setObjectName("chartPauseBtn");
     m_pauseBtn->setCheckable(true);
     m_pauseBtn->setMinimumWidth(60);
 
     m_clearBtn = new QPushButton(tr("Clear"));
+    m_clearBtn->setObjectName("chartClearBtn");
     m_clearBtn->setMinimumWidth(50);
 
     toolLayout->addWidget(new QLabel(tr("Window:")));
     m_windowSizeCombo = new QComboBox;
+    m_windowSizeCombo->setObjectName("chartWindowCombo");
     m_windowSizeCombo->addItems({"100", "200", "500", "1000", "2000"});
     m_windowSizeCombo->setCurrentIndex(1);
     m_windowSizeCombo->setMinimumWidth(75);
 
     m_statusLabel = new QLabel;
+    m_statusLabel->setObjectName("chartStatusLabel");
     m_statusLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
     toolLayout->addWidget(m_pauseBtn);

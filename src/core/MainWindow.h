@@ -29,6 +29,7 @@
 #include "protocol/FrameParser.h"
 #include "protocol/ProtocolView.h"
 #include "protocol/FrameVisualEditor.h"
+#include "protocol/ProtocolBridgeManager.h"
 #include "chart/ChartWidget.h"
 #include "ota/OtaManager.h"
 #include "ota/OtaWidget.h"
@@ -125,6 +126,7 @@ private:
     // UI组件 - 协议解析
     ProtocolView* m_protocolView;
     FrameParser* m_frameParser;
+    ProtocolBridgeManager* m_protocolBridgeMgr;
     FrameVisualEditor* m_frameEditor;
 
     // UI组件 - 波形图

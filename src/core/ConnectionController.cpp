@@ -120,6 +120,10 @@ void ConnectionController::connectNetwork(ConnectionType type)
     if (m_sendController) {
         m_sendController->setConnection(m_currentConn);
     }
+    // 同步连接到OtaManager（修复: 原遗漏导致TCP/UDP下OTA不可用）
+    if (m_otaManager) {
+        m_otaManager->setConnection(m_currentConn);
+    }
 }
 
 IConnection* ConnectionController::currentConnection() const
@@ -129,9 +133,9 @@ IConnection* ConnectionController::currentConnection() const
 
 void ConnectionController::onConnectionStateChanged(ConnectionState state)
 {
+    // 先缓存连接名称，避免后续操作导致指针失效
     QString connName = m_currentConn ? m_currentConn->name() : "";
 
-    // 同步连接状态到RecordingController
     switch (state) {
     case ConnectionState::Connected:
         if (m_recordingController) {
@@ -140,6 +144,13 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
         break;
     case ConnectionState::Disconnected:
     case ConnectionState::Error:
+        // 同步清除下游控制器的连接引用，防止悬空指针
+        if (m_sendController) {
+            m_sendController->setConnection(nullptr);
+        }
+        if (m_otaManager) {
+            m_otaManager->setConnection(nullptr);
+        }
         if (m_recordingController) {
             m_recordingController->setConnected(false);
         }

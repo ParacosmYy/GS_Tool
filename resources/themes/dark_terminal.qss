@@ -55,6 +55,12 @@ QToolButton:pressed {
     background-color: #45475a;
 }
 
+QToolButton:disabled {
+    background-color: transparent;
+    color: #6c7086;
+    border: 1px solid transparent;
+}
+
 QToolButton:checked {
     background-color: #313244;
     border: 1px solid #89b4fa;
@@ -169,6 +175,7 @@ QPushButton#quickCmdAddBtn {
 }
 QPushButton#quickCmdAddBtn:hover { background-color: #45475a; color: #b4d0fb; }
 QPushButton#quickCmdAddBtn:pressed { background-color: #585b70; }
+QPushButton#quickCmdAddBtn:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }
 
 /* 快捷指令按钮 - 动态命令按钮 (匹配 quickCmdBtn_序号) */
 QPushButton[quickCmdBtn="true"] {
@@ -200,6 +207,12 @@ QComboBox::drop-down {
     border: none;
 }
 
+QComboBox:disabled {
+    background-color: #313244;
+    color: #6c7086;
+    border: 1px solid #313244;
+}
+
 QComboBox QAbstractItemView {
     background-color: #1e1e2e;
     color: #cdd6f4;
@@ -214,6 +227,20 @@ QSpinBox {
     border-radius: 4px;
     padding: 4px;
     font-size: 13px;
+}
+
+QSpinBox:hover {
+    border: 1px solid #89b4fa;
+}
+
+QSpinBox:focus {
+    border: 1px solid #89b4fa;
+}
+
+QSpinBox:disabled {
+    background-color: #313244;
+    color: #6c7086;
+    border: 1px solid #313244;
 }
 
 /* CheckBox */

@@ -51,6 +51,7 @@ set(SOURCES
     src/protocol/IntelHexParser.cpp
     src/protocol/JustFloatBridge.cpp
     src/protocol/FireWaterBridge.cpp
+    src/protocol/ProtocolBridgeManager.cpp
     src/chart/ChartWidget.cpp
     src/chart/ChannelConfig.cpp
     src/chart/ChartModel.cpp
@@ -101,6 +102,7 @@ set(HEADERS
     src/protocol/IProtocolBridge.h
     src/protocol/JustFloatBridge.h
     src/protocol/FireWaterBridge.h
+    src/protocol/ProtocolBridgeManager.h
     src/chart/ChartWidget.h
     src/chart/ChannelConfig.h
     src/chart/ChartModel.h
