@@ -6,6 +6,14 @@
 #include "TerminalModel.h"
 #include "core/Constants.h"
 
+// 缓存行的完整信息，避免paintEvent中调用lineAt()访问环形缓冲区
+// 每次缓存更新时一次性填充，渲染时只读缓存即可
+struct CachedLine {
+    QString text;            // 按当前DisplayMode格式化后的文本
+    DataDirection direction; // 收/发方向，用于选择文字颜色
+    qint64 timestamp;        // epoch毫秒时间戳，用于时间戳显示
+};
+
 // 自绘制终端控件 - 使用QPainter直接绘制文本
 // 比QTextEdit/QPlainTextEdit性能更好，适合大流量数据显示
 class TerminalWidget : public QWidget {
@@ -55,8 +63,8 @@ private:
     // 计算可见区域可以显示多少行
     void updateVisibleRange();
 
-    // 将数据按显示模式格式化为文本行
-    QString formatLine(const TerminalLine& line) const;
+    // 将数据行转换为缓存结构（格式化文本 + 方向 + 时间戳）
+    CachedLine formatToCache(const TerminalLine& line) const;
 
     TerminalModel* m_model = nullptr;
     DisplayMode m_displayMode = DisplayMode::Text;
@@ -82,8 +90,8 @@ private:
     int m_selectionEndLine = -1;
     bool m_isSelecting = false;
 
-    // 缓存格式化后的文本行，避免每帧都重新计算
-    mutable QVector<QString> m_cachedLines;
+    // 缓存格式化后的行信息（文本+方向+时间戳），避免paintEvent访问环形缓冲区
+    mutable QVector<CachedLine> m_cachedLines;
     mutable int m_cachedLineCount = 0;
 };
 

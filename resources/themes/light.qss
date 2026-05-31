@@ -451,6 +451,32 @@ QTableView#protocolTable::item {
     padding: 4px 8px;
 }
 
+/* ProtocolView 右键上下文菜单 */
+QMenu#protocolContextMenu {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 4px 0px;
+}
+QMenu#protocolContextMenu::item {
+    padding: 6px 24px;
+    border-radius: 4px;
+    margin: 1px 4px;
+}
+QMenu#protocolContextMenu::item:selected {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+QMenu#protocolContextMenu::item:disabled {
+    color: #9ca3af;
+}
+QMenu#protocolContextMenu::separator {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 4px 8px;
+}
+
 /* === FrameVisualEditor 帧编辑器 === */
 QGroupBox#frameHeaderGroup,
 QGroupBox#frameLengthGroup,

@@ -12,6 +12,7 @@ ProtocolView::ProtocolView(QWidget* parent)
     : QWidget(parent)
 {
     setupUI();
+    setupContextMenu();
 }
 
 void ProtocolView::setupUI()
@@ -60,6 +61,9 @@ void ProtocolView::setupUI()
     m_table->setColumnWidth(0, 50);
     m_table->setColumnWidth(1, 100);
 
+    // 启用右键上下文菜单
+    m_table->setContextMenuPolicy(Qt::CustomContextMenu);
+
     layout->addWidget(m_table, 1);
 
     // 信号连接
@@ -101,6 +105,171 @@ void ProtocolView::setupUI()
         file.close();
         m_statusLabel->setText(tr("Exported %1 frames").arg(m_frames.size()));
     });
+}
+
+void ProtocolView::setupContextMenu()
+{
+    // 创建右键上下文菜单
+    m_contextMenu = new QMenu(this);
+    m_contextMenu->setObjectName("protocolContextMenu");
+
+    // 复制行 - 将选中行的数据以制表符分隔复制到剪贴板
+    m_copyRowAction = new QAction(tr("Copy Row"), this);
+    m_copyRowAction->setObjectName("protocolCopyRowAction");
+    connect(m_copyRowAction, &QAction::triggered, this, &ProtocolView::copyRow);
+    m_contextMenu->addAction(m_copyRowAction);
+
+    // 复制原始数据 - 复制选中帧的原始十六进制数据
+    m_copyRawAction = new QAction(tr("Copy Raw"), this);
+    m_copyRawAction->setObjectName("protocolCopyRawAction");
+    connect(m_copyRawAction, &QAction::triggered, this, &ProtocolView::copyRaw);
+    m_contextMenu->addAction(m_copyRawAction);
+
+    m_contextMenu->addSeparator();
+
+    // 导出JSON - 将所有帧数据导出为JSON格式
+    m_exportJsonAction = new QAction(tr("Export JSON"), this);
+    m_exportJsonAction->setObjectName("protocolExportJsonAction");
+    connect(m_exportJsonAction, &QAction::triggered, this, &ProtocolView::exportJson);
+    m_contextMenu->addAction(m_exportJsonAction);
+
+    m_contextMenu->addSeparator();
+
+    // 清空 - 清除所有数据
+    m_clearAction = new QAction(tr("Clear"), this);
+    m_clearAction->setObjectName("protocolClearAction");
+    connect(m_clearAction, &QAction::triggered, this, &ProtocolView::clear);
+    m_contextMenu->addAction(m_clearAction);
+
+    // 连接表格的右键信号
+    connect(m_table, &QTableView::customContextMenuRequested,
+            this, &ProtocolView::onCustomContextMenu);
+}
+
+void ProtocolView::onCustomContextMenu(const QPoint& pos)
+{
+    // 无数据时只显示清空和导出JSON（置灰）
+    bool hasSelection = m_table->selectionModel()->hasSelection();
+    m_copyRowAction->setEnabled(hasSelection);
+    m_copyRawAction->setEnabled(hasSelection);
+    m_exportJsonAction->setEnabled(!m_frames.isEmpty());
+
+    m_contextMenu->popup(m_table->viewport()->mapToGlobal(pos));
+}
+
+void ProtocolView::copyRow()
+{
+    QModelIndexList selected = m_table->selectionModel()->selectedRows();
+    if (selected.isEmpty()) return;
+
+    int row = selected.first().row();
+    if (row < 0 || row >= m_frames.size()) return;
+
+    // 收集该行所有列的文本，用制表符分隔
+    QStringList cols;
+
+    // 序号列
+    QModelIndex idx = m_model->index(row, 0);
+    cols << m_model->data(idx).toString();
+
+    // 时间列
+    QModelIndex timeIdx = m_model->index(row, 1);
+    cols << m_model->data(timeIdx).toString();
+
+    // 动态字段列
+    for (int i = 0; i < m_fieldNames.size(); ++i) {
+        QModelIndex fieldIdx = m_model->index(row, kFixedColumns + i);
+        cols << m_model->data(fieldIdx).toString();
+    }
+
+    QApplication::clipboard()->setText(cols.join("\t"));
+    m_statusLabel->setText(tr("Row copied"));
+}
+
+void ProtocolView::copyRaw()
+{
+    QModelIndexList selected = m_table->selectionModel()->selectedRows();
+    if (selected.isEmpty()) return;
+
+    int row = selected.first().row();
+    if (row < 0 || row >= m_frames.size()) return;
+
+    // 从保存的帧数据中提取原始十六进制数据
+    const QVariantMap& frame = m_frames[row];
+    QString rawData = frame.value("RawData").toString();
+
+    // 如果没有RawData字段（正常帧），则尝试拼接所有字段值
+    if (rawData.isEmpty()) {
+        QStringList parts;
+        for (const auto& name : m_fieldNames) {
+            parts << frame.value(name).toString();
+        }
+        rawData = parts.join(" ");
+    }
+
+    QApplication::clipboard()->setText(rawData);
+    m_statusLabel->setText(tr("Raw data copied"));
+}
+
+void ProtocolView::exportJson()
+{
+    if (m_frames.isEmpty()) {
+        QMessageBox::information(this, tr("Export JSON"), tr("No data to export"));
+        return;
+    }
+
+    QString filePath = QFileDialog::getSaveFileName(
+        this, tr("Export JSON"),
+        QString(), tr("JSON files (*.json)"));
+
+    if (filePath.isEmpty()) return;
+
+    // 构建JSON文档
+    QJsonObject root;
+    QJsonArray framesArray;
+
+    for (int i = 0; i < m_frames.size(); ++i) {
+        const auto& frame = m_frames[i];
+        QJsonObject frameObj;
+
+        // 序号（从1开始）
+        frameObj["#"] = i + 1;
+        // 时间戳
+        frameObj["Time"] = frame.value("_frameTime").toString();
+
+        // 动态字段
+        for (const auto& name : m_fieldNames) {
+            QString value = frame.value(name).toString();
+            // 尝试将纯数字字符串转为数值类型
+            bool ok = false;
+            double numVal = value.toDouble(&ok);
+            if (ok) {
+                frameObj[name] = numVal;
+            } else {
+                frameObj[name] = value;
+            }
+        }
+
+        framesArray.append(frameObj);
+    }
+
+    root["frames"] = framesArray;
+    root["exportTime"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+    root["totalFrames"] = static_cast<qint64>(m_totalFrames);
+    root["totalErrors"] = static_cast<qint64>(m_totalErrors);
+
+    // 写入文件
+    QJsonDocument doc(root);
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, tr("Export JSON"), tr("Cannot write to file"));
+        return;
+    }
+
+    file.write(doc.toJson(QJsonDocument::Indented));
+    file.close();
+
+    m_statusLabel->setText(tr("Exported %1 frames to JSON").arg(m_frames.size()));
 }
 
 void ProtocolView::addFrame(const QVariantMap& fields)

@@ -139,3 +139,115 @@ QString DataExporter::toAsciiString(const QByteArray& data)
 
     return result;
 }
+
+// ---- 批量流式导出 ----
+
+bool DataExporter::exportStreamed(const QString& filePath, Format format,
+                                   LineProvider lineProvider,
+                                   int totalLines, int batchSize)
+{
+    if (totalLines <= 0 || !lineProvider || filePath.isEmpty()) {
+        return false;
+    }
+
+    switch (format) {
+    case Txt:  return exportStreamedTxt(filePath, lineProvider, totalLines, batchSize);
+    case Csv:  return exportStreamedCsv(filePath, lineProvider, totalLines, batchSize);
+    case Bin:  return exportStreamedBin(filePath, lineProvider, totalLines, batchSize);
+    }
+    return false;
+}
+
+bool DataExporter::exportStreamedTxt(const QString& path, LineProvider provider,
+                                      int totalLines, int batchSize)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    QTextStream out(&file);
+    out.setEncoding(QStringConverter::Utf8);
+
+    int offset = 0;
+    while (offset < totalLines) {
+        int count = qMin(batchSize, totalLines - offset);
+        QVector<TerminalLine> batch = provider(offset, count);
+        if (batch.isEmpty()) break;
+
+        for (const TerminalLine& line : batch) {
+            QString timeStr = line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz");
+            QString dirStr = (line.direction == DataDirection::Rx) ? "RX" : "TX";
+            QString hex = HexConverter::toHexString(line.data);
+            QString ascii = toAsciiString(line.data);
+            out << QString("[%1] [%2] %3 | %4\n").arg(timeStr, dirStr, hex, ascii);
+        }
+
+        offset += batch.size();
+    }
+
+    file.close();
+    return true;
+}
+
+bool DataExporter::exportStreamedCsv(const QString& path, LineProvider provider,
+                                      int totalLines, int batchSize)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    QTextStream out(&file);
+    out.setEncoding(QStringConverter::Utf8);
+
+    // 写入 CSV 表头
+    out << "timestamp,direction,data_hex,data_ascii\n";
+
+    int offset = 0;
+    while (offset < totalLines) {
+        int count = qMin(batchSize, totalLines - offset);
+        QVector<TerminalLine> batch = provider(offset, count);
+        if (batch.isEmpty()) break;
+
+        for (const TerminalLine& line : batch) {
+            QString timeStr = line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz");
+            QString dirStr = (line.direction == DataDirection::Rx) ? "RX" : "TX";
+            QString hex = HexConverter::toHexString(line.data);
+            QString ascii = toAsciiString(line.data);
+
+            out << timeStr << ',' << dirStr << ',' << hex << ','
+                << '"' << ascii << '"' << '\n';
+        }
+
+        offset += batch.size();
+    }
+
+    file.close();
+    return true;
+}
+
+bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
+                                      int totalLines, int batchSize)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+
+    int offset = 0;
+    while (offset < totalLines) {
+        int count = qMin(batchSize, totalLines - offset);
+        QVector<TerminalLine> batch = provider(offset, count);
+        if (batch.isEmpty()) break;
+
+        for (const TerminalLine& line : batch) {
+            file.write(line.data);
+        }
+
+        offset += batch.size();
+    }
+
+    file.close();
+    return true;
+}

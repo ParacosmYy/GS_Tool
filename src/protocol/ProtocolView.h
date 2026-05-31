@@ -10,6 +10,13 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QDateTime>
+#include <QMenu>
+#include <QAction>
+#include <QClipboard>
+#include <QApplication>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 // 协议解析结果展示 - 以表格形式展示解析出的帧数据
 // 每行一帧，列 = 序号 + 时间 + 各字段名
@@ -41,15 +48,32 @@ public slots:
     // 帧解析错误
     void onFrameError(const QString& reason, const QByteArray& rawFrame);
 
+private slots:
+    // 右键上下文菜单
+    void onCustomContextMenu(const QPoint& pos);
+
 private:
     void setupUI();
+    void setupContextMenu();
     void updateColumnHeaders(const QVariantMap& fields);
+
+    // 右键菜单操作
+    void copyRow();
+    void copyRaw();
+    void exportJson();
 
     QTableView* m_table;
     QStandardItemModel* m_model;
     QLabel* m_statusLabel;
     QPushButton* m_clearBtn;
     QPushButton* m_exportBtn;
+
+    // 右键菜单及其动作
+    QMenu* m_contextMenu;
+    QAction* m_copyRowAction;
+    QAction* m_copyRawAction;
+    QAction* m_exportJsonAction;
+    QAction* m_clearAction;
 
     int m_maxRows = 1000;
     quint64 m_totalFrames = 0;

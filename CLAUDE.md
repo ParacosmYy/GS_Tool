@@ -328,6 +328,8 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 | `TerminalModel` | `terminal/TerminalModel.h/cpp` | 终端数据模型 |
 | `TerminalWidget` | `terminal/TerminalWidget.h/cpp` | 自绘制终端控件 |
 | `Constants` | `core/Constants.h` | 全局枚举和常量 |
+| `ChannelConfig` | `chart/ChannelConfig.h/cpp` | 通道配置（JSON序列化+数据源映射） |
+| `ChartModel` | `chart/ChartModel.h/cpp` | 图表数据模型（滑动窗口+降采样） |
 
 **规则**: 上表中的组件已经过验证，任何新功能需要CRC/HEX/缓冲区/配置等能力时，直接复用，不得重写。
 
@@ -339,6 +341,43 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 - [ ] 它的依赖是否满足单向规则（不反向依赖）？
 - [ ] 是否需要新的设计模式？如果需要，在PRD中说明
 - [ ] 接口是否足够抽象，方便未来扩展？
+
+### 4.6 文件体积与整洁度约束（铁律）
+
+> 核心理念: 大文件是设计退化的信号。MainWindow作为"上帝对象"是最容易膨胀的文件，
+> 必须通过持续拆分保持精简。每个文件应该只有一个明确的职责。
+
+**文件行数上限**:
+
+| 文件类型 | 行数上限 | 说明 |
+|---------|---------|------|
+| `.cpp` 实现文件 | **500行** | 超过说明职责过多，需要拆分 |
+| `.h` 头文件 | **200行** | 超过说明成员/方法过多 |
+| 单个方法 | **80行** | 超过说明逻辑过于复杂 |
+
+**MainWindow特殊规则**:
+- MainWindow.cpp 当前 1092 行，**必须在后续迭代中持续拆分至500行以下**
+- 拆分策略: 将业务逻辑委托给专门的管理类，MainWindow只做UI布局和信号连接
+- 每个被委托的管理类遵循单一职责原则:
+  - 连接管理 → ConnectionManager
+  - 日志录制 → DataLogger
+  - 数据导出 → DataExporter
+  - 主题切换 → ThemeManager
+  - 发送逻辑 → 提取到 SendController 类
+  - 面板导航 → 提取到 NavigationController 类
+
+**数据结构设计原则**:
+- 新增数据结构前必须在PRD中说明设计理由
+- 优先使用 Qt 内置类型 (QByteArray, QVector, QMap, QHash)
+- 自定义数据结构必须放在对应层的头文件中，并添加清晰的注释说明每个字段的含义
+- struct 用于纯数据，class 用于带行为的对象
+- 枚举类 (enum class) 优先于传统枚举 (enum)
+
+**架构整洁度检查**（每次commit前自检）:
+- [ ] 本commit是否让某个文件突破了行数上限？
+- [ ] MainWindow.cpp是否比上次commit更精简了？
+- [ ] 新增逻辑是否应该提取到独立的管理类中？
+- [ ] 数据结构是否放在了正确的层次？
 
 ---
 
@@ -766,6 +805,8 @@ docs/prd/PRD_<编号>_<简述>.md
 | 16 | QSS主题迁移+UI全面中文化+OTA性能优化O(n^2)→O(n)+ChannelConfig/ChartModel实现 | 18 |
 | 17 | 过渡动画+ChartModel集成+QSS按钮状态修复+硬编码颜色清除+中英语言选择 | 19 |
 | 18 | 架构审查+TerminalModel环形缓冲区+导航面板重构+FrameEditor/OtaWidget中文化+light对比度修复+新特性准入机制 | 20 |
+| 19 | 代码审查修复: sendAndRecord统一+completer泄漏+QStackedWidget降级+lineAt线程安全+objectName审计+DataLogger回放修复 | 21 |
+| 20 | 架构审查+DataExporter流式导出+ProtocolView右键菜单/JSON导出+TerminalWidget方向缓存+连接类型图标+翻译补全+ChartWidget宽度修复 | 22 |
 | ... | 目标: 1000分 | 1000 |
 
 ---

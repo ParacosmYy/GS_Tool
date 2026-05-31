@@ -133,7 +133,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
     if (m_cachedLineCount != totalLines) {
         m_cachedLines.resize(totalLines);
         for (int i = m_cachedLineCount; i < totalLines; ++i) {
-            m_cachedLines[i] = formatLine(m_model->lineAt(i));
+            m_cachedLines[i] = formatToCache(m_model->lineAt(i));
         }
         m_cachedLineCount = totalLines;
 
@@ -148,11 +148,10 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
     int startLine = m_scrollOffset;
     int endLine = qMin(startLine + m_visibleLines + 1, totalLines);
 
-    // 逐行绘制
+    // 逐行绘制 — 完全从缓存读取，不调用lineAt()
     int y = 0;
     for (int i = startLine; i < endLine; ++i) {
-        // 通过 lineAt() 直接访问单行数据，避免全量拷贝
-        const TerminalLine& line = m_model->lineAt(i);
+        const CachedLine& cached = m_cachedLines[i];
 
         // 选择背景色
         if (i >= m_selectionStartLine && i <= m_selectionEndLine
@@ -160,24 +159,25 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
             painter.fillRect(0, y, width(), m_lineHeight, m_selectionBg);
         }
 
-        // 根据方向设置文字颜色
-        if (line.direction == DataDirection::Tx) {
+        // 根据方向设置文字颜色（使用缓存的方向）
+        if (cached.direction == DataDirection::Tx) {
             painter.setPen(m_txColor);
         } else {
             painter.setPen(m_rxColor);
         }
 
-        // 绘制时间戳
+        // 绘制时间戳（使用缓存的epoch毫秒时间戳）
         int xOffset = 0;
         if (m_showTimestamp) {
             painter.setPen(m_timestampColor);
-            QString ts = line.timestamp.toString("HH:mm:ss.zzz");
+            QString ts = QDateTime::fromMSecsSinceEpoch(cached.timestamp)
+                             .toString("HH:mm:ss.zzz");
             painter.drawText(4, y + m_lineHeight - 4, ts);
             QFontMetrics fm(m_font);
             xOffset = fm.horizontalAdvance(ts) + 12;
 
             // 恢复数据颜色
-            if (line.direction == DataDirection::Tx) {
+            if (cached.direction == DataDirection::Tx) {
                 painter.setPen(m_txColor);
             } else {
                 painter.setPen(m_rxColor);
@@ -185,7 +185,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
         }
 
         // 绘制数据内容
-        painter.drawText(xOffset + 4, y + m_lineHeight - 4, m_cachedLines[i]);
+        painter.drawText(xOffset + 4, y + m_lineHeight - 4, cached.text);
         y += m_lineHeight;
     }
 }
@@ -293,15 +293,24 @@ void TerminalWidget::updateVisibleRange()
     }
 }
 
-QString TerminalWidget::formatLine(const TerminalLine& line) const
+CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 {
+    CachedLine cached;
+    cached.direction = line.direction;
+    cached.timestamp = line.timestamp.toMSecsSinceEpoch();
+
     switch (m_displayMode) {
     case DisplayMode::Hex:
-        return HexConverter::toHexString(line.data);
+        cached.text = HexConverter::toHexString(line.data);
+        break;
     case DisplayMode::Mixed:
-        return QString::fromUtf8(line.data) + "  |  " + HexConverter::toHexString(line.data);
+        cached.text = QString::fromUtf8(line.data) + "  |  " + HexConverter::toHexString(line.data);
+        break;
     case DisplayMode::Text:
     default:
-        return QString::fromUtf8(line.data);
+        cached.text = QString::fromUtf8(line.data);
+        break;
     }
+
+    return cached;
 }

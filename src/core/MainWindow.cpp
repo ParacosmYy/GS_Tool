@@ -18,6 +18,8 @@
 #include <QGraphicsOpacityEffect>
 #include <QTranslator>
 #include <QDir>
+#include <QPainter>
+#include <QPixmap>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -57,6 +59,19 @@ MainWindow::~MainWindow()
 {
 }
 
+// 创建导航树连接类型指示圆点图标（8x8透明底+抗锯齿彩色圆）
+static QIcon createDotIcon(const QColor& color)
+{
+    QPixmap dot(8, 8);
+    dot.fill(Qt::transparent);
+    QPainter painter(&dot);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setBrush(color);
+    painter.setPen(Qt::NoPen);
+    painter.drawEllipse(1, 1, 6, 6);
+    return QIcon(dot);
+}
+
 void MainWindow::setupUI()
 {
     m_mainSplitter = new QSplitter(Qt::Horizontal, this);
@@ -73,8 +88,8 @@ void MainWindow::setupUI()
     auto* treeModel = new QStandardItemModel(this);
     auto* rootItem = treeModel->invisibleRootItem();
 
-    // 串口分组
-    auto* serialItem = new QStandardItem(tr("串口"));
+    // 串口分组 — 蓝色圆点
+    auto* serialItem = new QStandardItem(createDotIcon(QColor(NavColors::kSerialDot)), tr("串口"));
     serialItem->setEditable(false);
     auto* configItem = new QStandardItem(tr("配置"));
     configItem->setEditable(false);
@@ -101,11 +116,13 @@ void MainWindow::setupUI()
     // 网络分组
     auto* networkItem = new QStandardItem(tr("网络"));
     networkItem->setEditable(false);
-    auto* tcpClientItem = new QStandardItem(tr("TCP客户端"));
+    // TCP客户端/服务端 — 绿色圆点
+    auto* tcpClientItem = new QStandardItem(createDotIcon(QColor(NavColors::kTcpDot)), tr("TCP客户端"));
     tcpClientItem->setEditable(false);
-    auto* tcpServerItem = new QStandardItem(tr("TCP服务端"));
+    auto* tcpServerItem = new QStandardItem(createDotIcon(QColor(NavColors::kTcpDot)), tr("TCP服务端"));
     tcpServerItem->setEditable(false);
-    auto* udpItem = new QStandardItem(tr("UDP"));
+    // UDP — 黄色圆点
+    auto* udpItem = new QStandardItem(createDotIcon(QColor(NavColors::kUdpDot)), tr("UDP"));
     udpItem->setEditable(false);
     networkItem->appendRow(tcpClientItem);
     networkItem->appendRow(tcpServerItem);
@@ -771,7 +788,14 @@ void MainWindow::onExportData()
     else if (filePath.endsWith(".bin", Qt::CaseInsensitive))
         format = DataExporter::Bin;
 
-    if (m_dataExporter->exportToFile(filePath, format, m_terminalModel->lines())) {
+    // 使用批量流式导出，分批从 TerminalModel 拉取数据，避免一次性深拷贝全部行
+    // lines(offset, count) 内部已加锁，线程安全
+    int totalLines = m_terminalModel->lineCount();
+    auto lineProvider = [this](int offset, int count) -> QVector<TerminalLine> {
+        return m_terminalModel->lines(offset, count);
+    };
+
+    if (m_dataExporter->exportStreamed(filePath, format, lineProvider, totalLines)) {
         statusBar()->showMessage(tr("Exported to %1").arg(filePath), 3000);
     } else {
         QMessageBox::warning(this, tr("Export Failed"), tr("Cannot write to file"));

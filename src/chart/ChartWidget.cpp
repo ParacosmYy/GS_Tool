@@ -39,16 +39,16 @@ void ChartWidget::setupUI()
 
     m_pauseBtn = new QPushButton(tr("Pause"));
     m_pauseBtn->setCheckable(true);
-    m_pauseBtn->setFixedWidth(60);
+    m_pauseBtn->setMinimumWidth(60);
 
     m_clearBtn = new QPushButton(tr("Clear"));
-    m_clearBtn->setFixedWidth(50);
+    m_clearBtn->setMinimumWidth(50);
 
     toolLayout->addWidget(new QLabel(tr("Window:")));
     m_windowSizeCombo = new QComboBox;
     m_windowSizeCombo->addItems({"100", "200", "500", "1000", "2000"});
     m_windowSizeCombo->setCurrentIndex(1);
-    m_windowSizeCombo->setFixedWidth(70);
+    m_windowSizeCombo->setMinimumWidth(75);
 
     m_statusLabel = new QLabel;
     m_statusLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);

@@ -53,6 +53,14 @@ namespace ThemeColors {
     constexpr const char* kAccentHex  = "#89b4fa";
 }
 
+// 导航树连接类型指示色
+namespace NavColors {
+    constexpr const char* kSerialDot = "#89b4fa";  // 串口 - 蓝色
+    constexpr const char* kTcpDot    = "#a6e3a1";  // TCP  - 绿色
+    constexpr const char* kUdpDot    = "#f9e2af";  // UDP  - 黄色
+    constexpr const char* kRttDot    = "#cba6f7";  // RTT  - 紫色
+}
+
 // 语言选项
 namespace Language {
     constexpr const char* CHINESE  = "zh_CN";
