@@ -30,6 +30,8 @@ set(SOURCES
     src/core/ConnectionFactory.cpp
     src/core/ThemeManager.cpp
     src/connection/SerialConnection.cpp
+    src/connection/TcpConnection.cpp
+    src/connection/UdpConnection.cpp
     src/terminal/TerminalWidget.cpp
     src/terminal/TerminalModel.cpp
     src/terminal/TerminalSearchBar.cpp
@@ -60,6 +62,8 @@ set(HEADERS
     src/core/Constants.h
     src/connection/IConnection.h
     src/connection/SerialConnection.h
+    src/connection/TcpConnection.h
+    src/connection/UdpConnection.h
     src/terminal/TerminalWidget.h
     src/terminal/TerminalModel.h
     src/terminal/TerminalSearchBar.h

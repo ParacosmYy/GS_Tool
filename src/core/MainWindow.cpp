@@ -84,6 +84,19 @@ void MainWindow::setupUI()
     serialItem->appendRow(frameEditorItem);
     serialItem->appendRow(chartItem);
 
+    // 网络分组
+    auto* networkItem = new QStandardItem(tr("Network"));
+    networkItem->setEditable(false);
+    auto* tcpClientItem = new QStandardItem(tr("TCP Client"));
+    tcpClientItem->setEditable(false);
+    auto* tcpServerItem = new QStandardItem(tr("TCP Server"));
+    tcpServerItem->setEditable(false);
+    auto* udpItem = new QStandardItem(tr("UDP"));
+    udpItem->setEditable(false);
+    networkItem->appendRow(tcpClientItem);
+    networkItem->appendRow(tcpServerItem);
+    networkItem->appendRow(udpItem);
+
     // 工具分组
     auto* toolsItem = new QStandardItem(tr("Tools"));
     toolsItem->setEditable(false);
@@ -92,6 +105,7 @@ void MainWindow::setupUI()
     toolsItem->appendRow(exportItem);
 
     rootItem->appendRow(serialItem);
+    rootItem->appendRow(networkItem);
     rootItem->appendRow(toolsItem);
 
     m_navTree->setModel(treeModel);
@@ -370,6 +384,12 @@ void MainWindow::connectSignals()
             m_chartWidget->setVisible(true);
         } else if (text == tr("Data Export")) {
             onExportData();
+        } else if (text == tr("TCP Client")) {
+            onConnectNetwork(ConnectionType::TcpClient);
+        } else if (text == tr("TCP Server")) {
+            onConnectNetwork(ConnectionType::TcpServer);
+        } else if (text == tr("UDP")) {
+            onConnectNetwork(ConnectionType::Udp);
         }
     });
 }
@@ -578,6 +598,48 @@ void MainWindow::onThemeChanged(int index)
     QString themeName = m_themeCombo->itemData(index).toString();
     if (!themeName.isEmpty()) {
         ThemeManager::instance().loadTheme(themeName);
+    }
+}
+
+void MainWindow::onConnectNetwork(ConnectionType type)
+{
+    m_currentConn = m_connManager->createConnection(type);
+    if (!m_currentConn) {
+        QMessageBox::warning(this, tr("Not Supported"), tr("This connection type is not yet available"));
+        return;
+    }
+
+    // 默认网络参数配置
+    QVariantMap params;
+    if (type == ConnectionType::TcpClient) {
+        params["mode"] = "client";
+        params["host"] = "127.0.0.1";
+        params["port"] = 8080;
+    } else if (type == ConnectionType::TcpServer) {
+        params["mode"] = "server";
+        params["port"] = 8080;
+    } else if (type == ConnectionType::Udp) {
+        params["localPort"] = 8888;
+        params["remoteHost"] = "127.0.0.1";
+        params["remotePort"] = 8080;
+    }
+    m_currentConn->configure(params);
+
+    connect(m_currentConn, &IConnection::dataReceived,
+            this, &MainWindow::onDataReceived);
+    connect(m_currentConn, &IConnection::stateChanged,
+            this, &MainWindow::onConnectionStateChanged);
+    connect(m_currentConn, &IConnection::errorOccurred,
+            this, [](const QString& msg) {
+        qWarning() << "Network connection error:" << msg;
+    });
+
+    if (!m_currentConn->open()) {
+        QMessageBox::warning(this, tr("Connection Failed"),
+                             tr("Cannot establish network connection"));
+        m_connManager->removeConnection(m_currentConn);
+        m_currentConn = nullptr;
+        return;
     }
 }
 

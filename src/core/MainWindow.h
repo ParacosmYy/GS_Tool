@@ -70,6 +70,9 @@ private slots:
     void onSearchRequested(const QString& pattern, bool regex, bool hex);
     void onSearchCleared();
 
+    // 网络连接
+    void onConnectNetwork(ConnectionType type);
+
     // 主题切换
     void onThemeChanged(int index);
 
