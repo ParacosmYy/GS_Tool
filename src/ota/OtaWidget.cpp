@@ -122,7 +122,7 @@ void OtaWidget::setupUI()
     progressLayout->setSpacing(6);
 
     m_progressBar = new AnimatedProgressBar;
-    m_progressBar->setObjectName("otaProgressBar");
+    m_progressBar->setObjectName("otaProgress");
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
     m_progressBar->setTextVisible(true);

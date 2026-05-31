@@ -55,8 +55,10 @@ set(SOURCES
     src/terminal/TerminalLayoutManager.cpp
     src/terminal/TerminalSelectionManager.cpp
     src/terminal/TerminalSearchManager.cpp
+    src/terminal/TerminalSearchRenderer.cpp
     src/serial/SerialConfigPanel.cpp
     src/serial/QuickCommandBar.cpp
+    src/serial/BookmarkWidget.cpp
     src/serial/TimedSender.cpp
     src/serial/SendHistory.cpp
     src/serial/DataStatistics.cpp
@@ -118,9 +120,11 @@ set(HEADERS
     src/terminal/TerminalLayoutManager.h
     src/terminal/TerminalSelectionManager.h
     src/terminal/TerminalSearchManager.h
+    src/terminal/TerminalSearchRenderer.h
     src/terminal/TerminalTypes.h
     src/serial/SerialConfigPanel.h
     src/serial/QuickCommandBar.h
+    src/serial/BookmarkWidget.h
     src/serial/TimedSender.h
     src/serial/SendHistory.h
     src/serial/DataStatistics.h

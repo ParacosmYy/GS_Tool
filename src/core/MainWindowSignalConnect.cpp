@@ -34,6 +34,7 @@
 #include "serial/PortWatcher.h"
 #include "core/ToastWidget.h"
 #include "core/ThemeManager.h"
+#include "serial/BookmarkWidget.h"
 #include "ota/OtaWidget.h"
 #include <QMessageBox>
 
@@ -357,5 +358,33 @@ void MainWindow::connectSignals()
         statusBar()->showMessage(
             tr("书签列表已更新 (%1)").arg(m_dataLogger->bookmarks().size()), 3000);
     });
+
+    // ---- BookmarkWidget 书签面板信号路由 ----
+    // BookmarkWidget 作为面板提供可视化的书签管理界面，
+    // 所有书签操作通过信号路由到 DataLogger 执行
+
+    // BookmarkWidget 添加书签请求 → RecordingController 转发 → DataLogger
+    // 用户在书签面板点击"添加书签"按钮时触发，通过 RecordingController 转发
+    connect(m_panelManager->bookmarkWidget(), &BookmarkWidget::addBookmarkRequested,
+            m_recordingController, &RecordingController::addBookmarkRequested);
+
+    // DataLogger 书签变化 → BookmarkWidget 列表刷新
+    // 当 DataLogger 的书签集合发生变化时，刷新书签面板的列表显示
+    connect(m_dataLogger, &DataLogger::bookmarksChanged,
+            this, [this]() {
+        m_panelManager->bookmarkWidget()->refreshBookmarks(m_dataLogger->bookmarks());
+    });
+
+    // BookmarkWidget 删除请求 → DataLogger 删除指定书签
+    connect(m_panelManager->bookmarkWidget(), &BookmarkWidget::removeBookmarkRequested,
+            m_dataLogger, &DataLogger::removeBookmark);
+
+    // BookmarkWidget 清空请求 → DataLogger 清空所有书签
+    connect(m_panelManager->bookmarkWidget(), &BookmarkWidget::clearBookmarksRequested,
+            m_dataLogger, &DataLogger::clearBookmarks);
+
+    // BookmarkWidget 双击书签 → DataLogger 跳转到书签时间点（回放模式下有效）
+    connect(m_panelManager->bookmarkWidget(), &BookmarkWidget::bookmarkDoubleClicked,
+            m_dataLogger, &DataLogger::seekToBookmark);
     ///@}
 }

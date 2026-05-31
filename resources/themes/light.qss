@@ -1089,6 +1089,101 @@ QPushButton#quickCmdDelRowBtn:hover { background-color: #e5e7eb; border-color: #
 QPushButton#quickCmdDelRowBtn:pressed { background-color: #d1d5db; }
 QPushButton#quickCmdDelRowBtn:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
 
+/* === BookmarkWidget 书签管理面板 === */
+QWidget#bookmarkWidget {
+    background-color: transparent;
+}
+
+/* 标题标签 */
+QLabel#bookmarkTitleLabel {
+    color: #1f2937;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 0px;
+}
+
+/* 书签列表 */
+QListWidget#bookmarkList {
+    background-color: #ffffff;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 12px;
+    outline: none;
+}
+QListWidget#bookmarkList::item {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f3f4f6;
+}
+QListWidget#bookmarkList::item:selected {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+QListWidget#bookmarkList::item:hover {
+    background-color: #f3f4f6;
+}
+
+/* 添加书签按钮 - accent 主操作 */
+QPushButton#bookmarkAddBtn {
+    background-color: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+QPushButton#bookmarkAddBtn:hover { background-color: #2563eb; }
+QPushButton#bookmarkAddBtn:pressed { background-color: #1d4ed8; }
+QPushButton#bookmarkAddBtn:disabled { background-color: #d1d5db; color: #9ca3af; }
+
+/* 删除选中书签按钮 - 次要操作 */
+QPushButton#bookmarkRemoveBtn {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#bookmarkRemoveBtn:hover { background-color: #e5e7eb; border-color: #ef4444; color: #ef4444; }
+QPushButton#bookmarkRemoveBtn:pressed { background-color: #d1d5db; }
+QPushButton#bookmarkRemoveBtn:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+
+/* 清空所有书签按钮 - 危险操作 */
+QPushButton#bookmarkClearBtn {
+    background-color: transparent;
+    color: #9ca3af;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#bookmarkClearBtn:hover { color: #ef4444; border-color: #ef4444; }
+QPushButton#bookmarkClearBtn:pressed { background-color: rgba(239,68,68,0.1); }
+QPushButton#bookmarkClearBtn:disabled { color: #d1d5db; border-color: #d1d5db; }
+
+/* 添加书签对话框 */
+QDialog#bookmarkAddDlg {
+    background-color: #ffffff;
+}
+QLabel#bookmarkDlgHint {
+    color: #6b7280;
+    font-size: 12px;
+}
+QLineEdit#bookmarkLabelInput {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 6px;
+    font-size: 13px;
+}
+QLineEdit#bookmarkLabelInput:focus {
+    border: 1px solid #3b82f6;
+}
+
 /* === NavIndicatorWidget 导航树滑动指示器 === */
 /* 控件使用 QPainter 自绘，WA_TranslucentBackground 已在代码中设置 */
 /* QSS 仅确保透明背景，不干扰自绘内容 */

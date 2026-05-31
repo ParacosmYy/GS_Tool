@@ -18,7 +18,6 @@
 #include <QKeySequence>
 
 // ---- 构造与基本配置 ----
-
 TerminalWidget::TerminalWidget(QWidget* parent)
     : QWidget(parent)
     , m_directionFilter(new DirectionFilter(this))
@@ -138,7 +137,6 @@ QString TerminalWidget::selectedText() const
 QSize TerminalWidget::sizeHint() const { return QSize(800, 600); }
 
 // ---- 搜索功能 - 委托给 TerminalSearchManager ----
-
 void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool hex)
 {
     auto lineAtFn = [this](int idx) -> QByteArray {
@@ -157,13 +155,13 @@ int TerminalWidget::currentMatchIndex() const { return m_searchManager->currentM
 void TerminalWidget::gotoNextMatch()
 {
     int line = m_searchManager->gotoNextMatch();
-    if (line >= 0) { scrollToMatch(line); update(); }
+    if (line >= 0) scrollToMatch(line); update();
 }
 
 void TerminalWidget::gotoPrevMatch()
 {
     int line = m_searchManager->gotoPrevMatch();
-    if (line >= 0) { scrollToMatch(line); update(); }
+    if (line >= 0) scrollToMatch(line); update();
 }
 
 void TerminalWidget::scrollToMatch(int line)
@@ -174,17 +172,7 @@ void TerminalWidget::scrollToMatch(int line)
     }
 }
 
-/** @brief 重新执行搜索(缓存更新后调用) */
-void TerminalWidget::refreshSearch()
-{
-    if (m_searchManager->searchPattern().isEmpty()) return;
-    QString pat = m_searchManager->searchPattern();
-    bool rx = m_searchManager->searchRegex(), hx = m_searchManager->searchHex();
-    m_searchManager->clearSearchHighlight();
-    setSearchHighlight(pat, rx, hx);
-}
-
-/** @brief 缓存更新后重新搜索(paintEvent中调用，先清空pattern避免递归) */
+/** @brief 缓存更新后重新搜索(paintEvent中调用) */
 void TerminalWidget::refreshSearchAfterCacheUpdate()
 {
     if (m_searchManager->searchPattern().isEmpty()) return;
@@ -195,7 +183,6 @@ void TerminalWidget::refreshSearchAfterCacheUpdate()
 }
 
 // ---- 单行绘制 ----
-
 int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y, int displayLine)
 {
     int xOffset = 0;
@@ -231,33 +218,10 @@ int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y
         }
     }
 
-    // 搜索高亮 — 基于 textXOffset 计算，match.startCol 是在 cached.text 中的列偏移
-    // 需要跳过方向前缀的列数，与文本渲染使用相同的基准
-    const auto& matches = m_searchManager->searchMatches();
-    if (!matches.isEmpty()) {
-        int curIdx = m_searchManager->currentMatchIndex();
-        int prefixLen = 0;
-        if (m_showDirectionPrefix) {
-            const QString& prefix = isTx ? kTxPrefix : kRxPrefix;
-            if (cached.text.startsWith(prefix)) {
-                prefixLen = prefix.length();
-            }
-        }
-        for (int mi = 0; mi < matches.size(); ++mi) {
-            const auto& match = matches[mi];
-            if (match.line != displayLine) continue;
-            // match.startCol 是包含前缀的文本中的列偏移，需要减去前缀长度
-            // 使高亮起始位置与实际显示的文本内容对齐
-            int col = match.startCol - prefixLen;
-            if (col < 0) col = 0;
-            QString textForWidth = cached.text.mid(prefixLen);
-            int xStart = textXOffset + m_fontMetrics.horizontalAdvance(textForWidth.left(col));
-            int matchWidth = m_fontMetrics.horizontalAdvance(textForWidth.mid(col, match.length));
-            painter.fillRect(xStart, y + 2, matchWidth, m_lineHeight - 4,
-                             (mi == curIdx) ? m_searchManager->currentMatchColor()
-                                            : m_searchManager->searchHighlightColor());
-        }
-    }
+    // 搜索高亮 — 委托给 TerminalSearchRenderer 绘制
+    TerminalSearchRenderer::drawHighlights(painter, m_fontMetrics, m_searchManager,
+                                           cached, displayLine, textXOffset,
+                                           y, m_lineHeight, m_showDirectionPrefix);
 
     // 绘制文本内容（方向前缀 + 实际数据）
     if (m_showDirectionPrefix) {
@@ -280,7 +244,6 @@ int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y
 }
 
 // ---- 核心渲染 ----
-
 void TerminalWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
@@ -346,7 +309,6 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
 }
 
 // ---- 事件处理 ----
-
 void TerminalWidget::resizeEvent(QResizeEvent* event) { QWidget::resizeEvent(event); updateVisibleRange(); }
 
 void TerminalWidget::wheelEvent(QWheelEvent* event)
@@ -416,7 +378,6 @@ void TerminalWidget::keyPressEvent(QKeyEvent* event)
 }
 
 // ---- 模型数据回调 ----
-
 void TerminalWidget::onDataAppended(int firstNewLine, int count)
 {
     Q_UNUSED(firstNewLine); Q_UNUSED(count);
@@ -448,7 +409,6 @@ void TerminalWidget::updateVisibleRange()
 }
 
 // ---- 缓存格式化 ----
-
 CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 {
     CachedLine cached;
@@ -475,7 +435,6 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 }
 
 // ---- 右键菜单 ----
-
 /** @brief 创建终端右键菜单(复制/粘贴/清屏/全选/搜索)，样式由QSS主题控制 */
 void TerminalWidget::createContextMenu()
 {

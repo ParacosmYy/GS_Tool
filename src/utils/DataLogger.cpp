@@ -2,6 +2,7 @@
 #include <QDataStream>
 #include <QFileInfo>
 #include <QDateTime>
+#include <QMutexLocker>
 #include <algorithm>
 
 DataLogger::DataLogger(QObject* parent)
@@ -162,6 +163,7 @@ bool DataLogger::startPlayback(const QString& filePath)
 
     m_playedRecords = 0;
     m_playbackBaseTime = 0;
+    m_playbackOffset = 0;
     m_nextRecordTime = 0;
     m_playbackPaused = false;
     m_playing = true;
@@ -307,8 +309,9 @@ void DataLogger::onPlaybackTick()
     if (!m_playing || m_playbackPaused) return;
 
     // 计算回放时间进度(考虑速度)
+    // currentTime = m_playbackOffset(基准) + m_playbackBaseTime(暂停/变速累积) + elapsed * speed
     qint64 elapsed = static_cast<qint64>(m_playbackElapsed.elapsed() * m_playbackSpeed);
-    qint64 currentTime = m_playbackBaseTime + elapsed;
+    qint64 currentTime = m_playbackOffset + m_playbackBaseTime + elapsed;
 
     // 发送所有到期记录
     while (m_playing && m_nextRecordTime <= currentTime) {
@@ -330,6 +333,128 @@ void DataLogger::onPlaybackTick()
             return;
         }
     }
+}
+
+// ---- 跳转定位(Seek) ----
+
+qint64 DataLogger::scanToTimestamp(qint64 targetTimestamp)
+{
+    if (!m_playbackFile) return -1;
+
+    // 回到数据区起始位置（跳过文件头 kHeaderSize 字节）
+    m_playbackFile->seek(kHeaderSize);
+
+    qint64 foundTimestamp = -1;
+    qint64 lastValidPos = kHeaderSize;
+    int recordsFound = 0;
+
+    // 逐条扫描记录，找到 timestamp <= targetTimestamp 的最后一条
+    RecordHeader hdr;
+    QByteArray data;
+    while (readNextRecord(hdr, data)) {
+        qint64 recordTs = static_cast<qint64>(hdr.timestamp);
+        if (recordTs > targetTimestamp) {
+            // 已超过目标时间戳，上条记录就是最近的
+            break;
+        }
+        foundTimestamp = recordTs;
+        lastValidPos = m_playbackFile->pos();
+        recordsFound++;
+    }
+
+    if (foundTimestamp < 0) {
+        // 所有记录时间戳都 > targetTimestamp，定位到文件开头（第一条记录之前）
+        m_playbackFile->seek(kHeaderSize);
+        m_playedRecords = 0;
+        m_nextRecordTime = 0;
+        // 重新读取第一条记录时间戳
+        if (readNextRecord(hdr, data)) {
+            m_nextRecordTime = static_cast<qint64>(hdr.timestamp);
+            // 重新回到第一条记录之前，等待 playbackTick 正常播放
+            m_playbackFile->seek(kHeaderSize);
+        }
+        return 0;
+    }
+
+    // 文件指针定位到最后一条 <= targetTimestamp 的记录之后
+    m_playbackFile->seek(lastValidPos);
+    m_playedRecords = recordsFound;
+
+    // 读取下一条记录的时间戳
+    if (readNextRecord(hdr, data)) {
+        m_nextRecordTime = static_cast<qint64>(hdr.timestamp);
+        // 回退到这条记录之前（下次 playbackTick 会再次读取它）
+        m_playbackFile->seek(lastValidPos);
+    } else {
+        // 已到文件末尾
+        m_nextRecordTime = std::numeric_limits<qint64>::max();
+    }
+
+    return foundTimestamp;
+}
+
+bool DataLogger::seekToTimestamp(qint64 timestamp)
+{
+    QMutexLocker locker(&m_mutex);
+
+    // seek 仅在播放模式下有效，录制模式返回 false
+    if (!m_playing) {
+        return false;
+    }
+
+    // 时间戳有效性检查
+    if (timestamp < 0) {
+        emit error(tr("Invalid seek timestamp: %1").arg(timestamp));
+        return false;
+    }
+
+    // 暂停播放定时器，防止在 seek 过程中 playbackTick 干扰
+    bool wasTimerRunning = m_playbackTimer->isActive();
+    if (wasTimerRunning) {
+        m_playbackTimer->stop();
+    }
+
+    // 扫描文件，定位到目标时间戳最近的记录
+    qint64 actualTimestamp = scanToTimestamp(timestamp);
+    if (actualTimestamp < 0) {
+        emit error(tr("Failed to seek to timestamp: %1").arg(timestamp));
+        if (wasTimerRunning) m_playbackTimer->start();
+        return false;
+    }
+
+    // 更新播放偏移：将 playbackOffset 设为 seek 目标位置，
+    // 重置 baseTime 和 elapsed，使 currentTime = offset + 0 = offset
+    m_playbackOffset = actualTimestamp;
+    m_playbackBaseTime = 0;
+    m_playbackElapsed.restart();
+
+    // 恢复播放定时器
+    if (wasTimerRunning) {
+        m_playbackTimer->start();
+    }
+
+    // 更新进度
+    if (m_totalRecords > 0) {
+        qreal progress = static_cast<qreal>(m_playedRecords) / m_totalRecords;
+        emit playbackProgress(progress);
+    }
+
+    emit seekCompleted(actualTimestamp);
+    return true;
+}
+
+bool DataLogger::seekToBookmark(int index)
+{
+    // 验证书签索引有效性
+    if (index < 0 || index >= m_bookmarks.size()) {
+        return false;
+    }
+
+    // 注意: 书签时间戳是 Unix epoch 时间（ms since epoch），
+    // 但录制文件中的时间戳是距录制开始的偏移量（ms）。
+    // 此处直接使用书签时间戳调用 seekToTimestamp，
+    // 调用者需确保书签时间戳与录制文件时间戳处于同一时间参考系。
+    return seekToTimestamp(m_bookmarks[index].timestamp);
 }
 
 // ---- 书签管理 ----

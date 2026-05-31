@@ -16,6 +16,7 @@ class TerminalWidget;
 class TerminalModel;
 class TerminalSearchBar;
 class QuickCommandBar;
+class BookmarkWidget;
 
 /**
  * @brief 面板管理器 - 统一创建和管理所有功能面板 widget
@@ -91,6 +92,9 @@ public:
     /** @brief 获取快捷指令栏（预置常用 AT 命令和自定义指令） */
     QuickCommandBar* quickCmdBar() const;
 
+    /** @brief 获取书签面板（展示和管理录制时间轴上的书签标记） */
+    BookmarkWidget* bookmarkWidget() const;
+
     // ==================== 映射表接口 ====================
 
     /**
@@ -136,6 +140,9 @@ private:
 
     /** @brief 快捷指令栏 */
     QuickCommandBar* m_quickCmdBar = nullptr;
+
+    /** @brief 书签面板 */
+    BookmarkWidget* m_bookmarkWidget = nullptr;
 };
 
 #endif // PANEL_MANAGER_H

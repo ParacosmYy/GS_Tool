@@ -108,6 +108,9 @@ void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPan
     auto* otaItem = new QStandardItem(tr("OTA升级"));
     otaItem->setEditable(false);
     serialItem->appendRow(otaItem);
+    auto* bookmarkItem = new QStandardItem(tr("书签"));
+    bookmarkItem->setEditable(false);
+    serialItem->appendRow(bookmarkItem);
 
     // 网络分组 -- TCP 绿色圆点, UDP 黄色圆点（从ThemeManager获取语义色）
     auto* networkItem = new QStandardItem(tr("网络"));

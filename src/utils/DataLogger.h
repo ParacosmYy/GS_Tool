@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QTimer>
 #include <QElapsedTimer>
+#include <QMutex>
 
 // 数据日志记录器 - 录制和回放串口/TCP数据流
 // 二进制格式(.edl): Header + Records(timestamp + direction + data)
@@ -46,6 +47,30 @@ public:
     int recordCount() const;
     qint64 recordingDuration() const;
 
+    // ---- 跳转定位(Seek) ----
+
+    /**
+     * @brief 跳转到指定时间戳位置（仅在播放模式下有效）
+     *
+     * 从文件头重新扫描所有记录，找到时间戳 <= timestamp 的最后一条记录，
+     * 将播放位置调整到该记录之后。跳转完成后发射 seekCompleted() 信号。
+     *
+     * @param timestamp 目标时间戳（毫秒，相对于录制开始的偏移量）
+     * @return true 跳转成功；false 不在播放模式或发生错误
+     */
+    bool seekToTimestamp(qint64 timestamp);
+
+    /**
+     * @brief 跳转到指定书签位置
+     *
+     * 验证 index 有效性后，调用 seekToTimestamp(bookmark.timestamp)。
+     * 仅在播放模式下有效（由 seekToTimestamp 内部判断）。
+     *
+     * @param index 书签在 bookmarks() 列表中的索引，越界时返回 false
+     * @return true 跳转成功；false 索引无效或不在播放模式
+     */
+    bool seekToBookmark(int index);
+
     // ---- 书签管理 ----
 
     /**
@@ -82,6 +107,12 @@ signals:
     /** @brief 书签列表变化信号（增/删/清空时发射） */
     void bookmarksChanged();
 
+    /**
+     * @brief seek操作完成信号
+     * @param timestamp 实际跳转到的原始时间戳（可能不等于请求值，取最近匹配）
+     */
+    void seekCompleted(qint64 timestamp);
+
 private slots:
     void onPlaybackTick();
 
@@ -102,6 +133,17 @@ private:
     void writeRecord(quint64 timestamp, Direction dir, const QByteArray& data);
     bool readNextRecord(RecordHeader& header, QByteArray& data);
 
+    /**
+     * @brief 从文件头开始扫描，定位到目标时间戳最近的记录
+     *
+     * 遍历所有记录，找到 timestamp <= targetTimestamp 的最后一条。
+     * 调用后文件指针位于该条记录之后，m_nextRecordTime 指向其下一条。
+     *
+     * @param targetTimestamp 目标时间戳（毫秒）
+     * @return 实际定位到的时间戳；-1 表示无记录或文件错误
+     */
+    qint64 scanToTimestamp(qint64 targetTimestamp);
+
     // 录制相关
     QFile* m_recordFile = nullptr;
     QElapsedTimer m_recordTimer;
@@ -115,13 +157,17 @@ private:
     QFile* m_playbackFile = nullptr;
     QTimer* m_playbackTimer = nullptr;
     QElapsedTimer m_playbackElapsed;
-    qint64 m_playbackBaseTime = 0;  // 回放基准时间(累计已回放的原始时间)
-    qint64 m_nextRecordTime = 0;    // 下一条记录的时间戳
+    qint64 m_playbackBaseTime = 0;  ///< 回放基准时间(累计已回放的原始时间)
+    qint64 m_nextRecordTime = 0;    ///< 下一条记录的时间戳
+    qint64 m_playbackOffset = 0;    ///< seek操作导致的时间偏移量（原始时间轴上的当前位置）
     int m_totalRecords = 0;
     int m_playedRecords = 0;
     qreal m_playbackSpeed = 1.0;
     bool m_playing = false;
     bool m_playbackPaused = false;
+
+    /** @brief 线程安全互斥锁，保护 seek/录制/回放操作的原子性 */
+    QMutex m_mutex;
 
     // 书签相关
     /** @brief 书签集合，按添加顺序存储 */

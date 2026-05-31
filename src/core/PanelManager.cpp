@@ -18,6 +18,7 @@
 #include "terminal/TerminalWidget.h"
 #include "terminal/TerminalModel.h"
 #include "terminal/TerminalSearchBar.h"
+#include "serial/BookmarkWidget.h"
 
 /** @brief 构造面板管理器，初始化所有面板指针为空 */
 PanelManager::PanelManager(QObject* parent)
@@ -99,6 +100,12 @@ void PanelManager::createPanels(OtaManager* otaManager, TerminalModel* terminalM
         {"Reset", "AA 55 01 00 FE", true},
         {"Status", "AT+STATUS?\r\n", false}
     });
+
+    // ---- 书签面板: 展示和管理录制时间轴上的书签标记 ----
+    // 支持双击跳转、添加/删除/清空书签操作，与 DataLogger 联动
+    m_bookmarkWidget = new BookmarkWidget();
+    m_bookmarkWidget->setObjectName("bookmarkWidgetPanel");
+    m_bookmarkWidget->setVisible(false);
 }
 
 // ==================== Getter 实现 ====================
@@ -130,6 +137,9 @@ TerminalSearchBar* PanelManager::searchBar() const { return m_searchBar; }
 /** @brief 获取快捷指令栏 */
 QuickCommandBar* PanelManager::quickCmdBar() const { return m_quickCmdBar; }
 
+/** @brief 获取书签面板 */
+BookmarkWidget* PanelManager::bookmarkWidget() const { return m_bookmarkWidget; }
+
 /**
  * @brief 获取面板映射表
  *
@@ -146,6 +156,7 @@ QVector<NavPanelMapping> PanelManager::panelMappings() const
         {QT_TRANSLATE_NOOP("MainWindow", "帧编辑器"), m_frameEditor},
         {QT_TRANSLATE_NOOP("MainWindow", "波形图"),   m_chartWidget},
         {QT_TRANSLATE_NOOP("MainWindow", "OTA升级"),  m_otaWidget},
+        {QT_TRANSLATE_NOOP("MainWindow", "书签"),     m_bookmarkWidget},
     };
 }
 
@@ -165,5 +176,6 @@ QVector<QWidget*> PanelManager::allPanels() const
         m_frameEditor,
         m_chartWidget,
         m_otaWidget,
+        m_bookmarkWidget,
     };
 }
