@@ -5,147 +5,146 @@
  * 基于XMODEM-CRC，增加Block 0文件信息和批量传输。
  * 继承BaseTransfer，通过4个纯虚钩子注入协议特有逻辑。
  *
- * 增强特性:
- *   - Block 0文件信息帧(文件名+大小+修改日期)
- *   - 批量传输支持(多个文件连续传输)
- *   - 完善接收方应答处理(ACK+NAK+CAN+CRC)
- *   - 传输速率计算和ETA
+ * == Block 0 文件信息帧格式 (128字节) ==
+ * 偏移0: 文件名(ASCII, null-terminated)
+ * 偏移N: 文件大小(ASCII十进制, null-terminated, 如"65536")
+ * 偏移M: 修改时间(ASCII八进制Unix时间戳, null-terminated)
+ * 偏移K: 权限(ASCII, 如"100644", null-terminated)
+ * 剩余:  0x00填充至128字节。超过128字节时截断。
  *
- * 协作关系:
- *   - BaseTransfer: 提供传输框架、超时重试、连接管理
- *   - IConnection: 数据收发通道
- *   - CRC: 提供CRC16-CCITT计算
+ * == 状态流转 ==
+ * WaitingStart → SendingBlock0 → SendingData → SendingEOT
+ *   → [批量: WaitBlock0Ack → SendingBlock0] → WaitFinalC
+ *   → SendingFinalBlock0(空Block0) → Done
+ *
+ * == 边界情况 ==
+ * 1. 文件>1MB: onStartInit()拒绝  2. 空文件/空列表: onStartInit()拒绝
+ * 3. Block0超128B: buildBlock0()截断  4. 数据不足128B: 0x1A填充
+ * 5. 块序号: Block0=0, 数据块从1递增   6. 接收方CAN: 立即中止
+ * 7. 重试上限: 每阶段独立计数, 超10次发CAN取消
+ *
+ * 协作: BaseTransfer(框架), IConnection(通道), CRC(校验), OtaManager(业务层)
  */
 #ifndef YMODEMTRANSFER_H
 #define YMODEMTRANSFER_H
 
+#include <QElapsedTimer>
+
 #include "ota/protocols/BaseTransfer.h"
 #include "utils/CRC.h"
 
-#include <QElapsedTimer>
-
+/**
+ * @brief YMODEM协议传输器 - PC端Sender
+ *
+ * 独立状态机管理协议详细状态，与BaseTransfer的TransferState
+ * (Idle/Active/Done/Error)双状态机协同。
+ * 速率通过QElapsedTimer累计发送量计算平均值，每次ACK后更新。
+ */
 class YModemTransfer : public BaseTransfer {
     Q_OBJECT
 
 public:
+    /** @brief 构造YMODEM传输器。默认超时5s, 最大重试10次。
+     *  @param parent 父对象(Qt对象树管理生命周期)
+     *  构造后调用setFilePath()→start()开始传输 */
     explicit YModemTransfer(QObject* parent = nullptr);
 
-    /** @brief 设置单个文件路径 */
+    /** @brief 设置单个文件路径，替换内部列表为单元素。须在start()前调用 */
     void setFilePath(const QString& path);
 
-    /** @brief 设置多个文件路径(批量传输) */
+    /** @brief 设置多个文件路径(批量传输模式)。每个文件有独立Block0。须在start()前调用 */
     void setFilePaths(const QStringList& paths);
 
-    /**
-     * @brief 获取当前传输速率(字节/秒)
-     * @return 传输速率，未开始传输时返回0
-     */
+    /** @brief 当前传输速率(字节/秒)。未开始时返回0。基于累计发送量/耗时计算 */
     double transferRate() const;
 
-    /**
-     * @brief 获取预计剩余时间(秒)
-     * @return ETA秒数，无法估算时返回-1
-     */
+    /** @brief 预计剩余时间(秒)。速率<=0或总量<=0时返回-1。ETA=剩余字节/当前速率 */
     double etaSeconds() const;
 
 signals:
-    /**
-     * @brief 传输速率和ETA更新信号
-     * @param rateBytesPerSec 当前传输速率(字节/秒)
-     * @param etaSec 预计剩余时间(秒)
-     * @param fileName 当前传输的文件名
-     */
+    /** @brief 速率和ETA更新。每次收到ACK后发射。
+     *  @param rateBytesPerSec 速率 @param etaSec ETA(-1=无法估算)
+     *  @param fileName 当前文件名(不含路径)。OtaManager转发时去除此参数 */
     void transferStats(double rateBytesPerSec, double etaSec,
                        const QString& fileName);
 
-    /**
-     * @brief 单个文件传输完成信号(批量传输时使用)
-     * @param fileName 完成的文件名
-     * @param index 文件在列表中的索引
-     */
+    /** @brief 单文件传输完成(批量模式)。EOT被ACK后发射。
+     *  @param fileName 文件名 @param index 在m_filePaths中的索引(从0起) */
     void fileTransferComplete(const QString& fileName, int index);
 
 protected:
     // === BaseTransfer 钩子实现 ===
+
+    /** @brief 初始化: 校验文件(非空/<=1MB/可读)→计算总量→加载首文件→等C/NAK
+     *  @return true=进入WaitingStart, false=校验失败。超时设为3倍(15s) */
     bool onStartInit() override;
+
+    /** @brief 发送2个CAN(0x18)取消。m_conn为空时空操作 */
     void sendCancelBytes() override;
+
+    /** @brief 接收状态机核心。逐字节解析ACK/NAK/CAN/C，驱动状态转移 */
     void processReceivedData() override;
+
+    /** @brief 超时处理。WaitingStart等仅重启定时器; Sending*状态重发+递增重试。
+     *  重试超10次发CAN取消 */
     void handleTimeout() override;
 
 private:
     // ---- YMODEM协议控制字节 ----
-    static constexpr char SOH = 0x01;
-    static constexpr char EOT = 0x04;
-    static constexpr char ACK = 0x06;
-    static constexpr char NAK = 0x15;
-    static constexpr char CAN = 0x18;
-    static constexpr char CRC_CHAR = 'C';
-
+    static constexpr char SOH = 0x01;       ///< 128字节块起始标记
+    static constexpr char EOT = 0x04;       ///< 传输结束标记
+    static constexpr char ACK = 0x06;       ///< 确认应答
+    static constexpr char NAK = 0x15;       ///< 否定确认(Checksum回退)
+    static constexpr char CAN = 0x18;       ///< 取消传输
+    static constexpr char CRC_CHAR = 'C';   ///< CRC模式请求
     static constexpr int kBlockSize = 128;  ///< YMODEM固定128字节块
 
-    /** @brief YMODEM内部状态 */
+    /** @brief YMODEM内部协议状态 */
     enum class State {
-        Idle,
-        WaitingStart,      ///< 等待接收方发送C或NAK
-        SendingBlock0,     ///< 发送Block 0文件信息等待ACK
-        SendingData,       ///< 发送数据块等待ACK
-        SendingEOT,        ///< 发送EOT等待ACK
-        WaitBlock0Ack,     ///< 等待下一个文件的C/NAK触发
-        WaitFinalC,        ///< 等待最终结束的C/NAK
-        SendingFinalBlock0,///< 发送空Block 0结束会话
-        Done,
-        Error
+        Idle,               ///< 空闲
+        WaitingStart,      ///< 等待接收方C或NAK
+        SendingBlock0,     ///< 已发Block0文件信息, 等ACK/C
+        SendingData,       ///< 发送数据块中, 等ACK
+        SendingEOT,        ///< 已发EOT, 等ACK
+        WaitBlock0Ack,     ///< 批量: 等下一文件C/NAK
+        WaitFinalC,        ///< 全部完成: 等最终C发空Block0
+        SendingFinalBlock0,///< 已发空Block0结束会话, 等ACK
+        Done, Error
     };
 
-    // ---- 状态管理 ----
-    void setState(State s);
+    void sendBlock0();                      ///< 发送Block0文件信息帧
+    void sendBlock();                       ///< 发送当前数据块(128B)
+    void sendEOT();                         ///< 发送EOT字节
+    void sendFinalBlock0();                 ///< 发送空Block0结束会话
 
-    // ---- 数据发送 ----
-    void sendBlock0();
-    void sendBlock();
-    void sendEOT();
-    void sendFinalBlock0();
-
-    /**
-     * @brief 构建YMODEM数据块(含头部、序号、CRC16)
-     * @param blockNum 块序号(Block 0 = 0, 数据块从1开始)
-     * @param blockData 块数据(128字节)
-     * @return 完整数据包(SOH+序号+数据+CRC16)
-     */
+    /** @brief 构建数据包: SOH + blockNum + ~blockNum + data(128B) + CRC16(2B)
+     *  @param blockNum 块序号(Block0=0, 数据块从1起)
+     *  @param blockData 128字节数据载荷 */
     QByteArray buildBlock(int blockNum, const QByteArray& blockData);
 
-    /**
-     * @brief 构建Block 0文件信息帧
-     * @param fileName 文件名(不含路径)
-     * @param fileSize 文件大小(字节)
-     * @param modTime 文件修改时间(Unix时间戳)
-     * @return 128字节的Block 0数据
-     */
+    /** @brief 构建Block0数据载荷(128B)
+     *  @param fileName 文件名(不含路径) @param fileSize 文件大小(字节)
+     *  @param modTime 修改时间(Unix时间戳)
+     *  @return 128字节载荷: fileName\0size\0modTime\0"100644"\0+0x00填充 */
     QByteArray buildBlock0(const QString& fileName, qint64 fileSize,
                            qint64 modTime);
 
-    // ---- 速率统计 ----
-    void updateTransferStats();
-
-    // ---- 文件管理 ----
-    bool loadNextFile();
+    void updateTransferStats();             ///< 更新速率/ETA并发射transferStats
+    bool loadNextFile();                    ///< 加载下个文件。失败时emit transferError
 
     // ---- 成员变量 ----
-    QStringList m_filePaths;        ///< 待传输文件列表
-    QByteArray m_currentData;       ///< 当前文件数据
+    QStringList m_filePaths;        ///< 待传输文件路径列表
+    QByteArray m_currentData;       ///< 当前文件全部内容
     QString m_currentFileName;      ///< 当前文件名(不含路径)
-
     State m_ymodemState = State::Idle; ///< 协议内部状态
-    int m_blockNumber = 0;            ///< 当前块序号
+    int m_blockNumber = 0;            ///< 当前块序号(Block0=0, 数据块从1起)
     qint64 m_bytesSent = 0;           ///< 当前文件已发送字节数
     qint64 m_totalBytes = 0;          ///< 所有文件总字节数
-    qint64 m_totalBytesSent = 0;      ///< 已发送的总字节数
-    int m_fileIndex = 0;              ///< 当前传输的文件索引
-    int m_blockRetryCount = 0;        ///< 当前块重试次数
-
-    // ---- 速率计算 ----
-    QElapsedTimer m_transferTimer;    ///< 传输耗时计时器
-    double m_currentRate = 0.0;       ///< 当前传输速率(字节/秒)
+    qint64 m_totalBytesSent = 0;      ///< 已发送总字节数
+    int m_fileIndex = 0;              ///< 当前文件索引
+    int m_blockRetryCount = 0;        ///< 当前阶段重试次数(上限10)
+    QElapsedTimer m_transferTimer;    ///< 传输计时器
+    double m_currentRate = 0.0;       ///< 当前速率(字节/秒)
 };
 
 #endif // YMODEMTRANSFER_H

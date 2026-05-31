@@ -8,14 +8,14 @@
  * 信号流向（详见 connectSignals() 方法内部分组注释）:
  *   SerialConfigPanel → ConnectionController → MainWindow(状态更新)
  *   ConnectionController → TerminalModel(接收数据) + ProtocolBridgeMgr(协议解析)
- *   ConnectionController → ToastWidget(连接成功/断开/错误通知)
+ *   ConnectionController → ToastWidget(连接成功/断开/错误通知, 错误通知使用 showDebounced 防抖)
  *   QuickCommandBar → SendController(发送数据)
  *   ToolbarController → TerminalController(显示模式/时间戳/清屏/导出)
  *   ToolbarController → SettingsController(主题/语言)
  *   RecordingController → MainWindow(回放数据写入终端)
  *   TerminalSearchBar → TerminalController(搜索高亮)
  *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形配置)
- *   OtaWidget → ToastWidget(传输开始/完成/失败通知)
+ *   OtaWidget → ToastWidget(传输开始/完成通知 + 失败通知使用 showDebounced 防抖)
  *   NavTree → NavigationController(面板切换)
  */
 
@@ -33,14 +33,14 @@
  * 信号流向:
  *   SerialConfigPanel → ConnectionController → MainWindow(状态更新)
  *   ConnectionController → TerminalModel(接收数据) + ProtocolBridgeMgr(协议解析)
- *   ConnectionController → ToastWidget(连接成功/断开/错误通知)
+ *   ConnectionController → ToastWidget(连接成功/断开/错误通知, 错误通知使用 showDebounced 防抖)
  *   QuickCommandBar → SendController(发送数据)
  *   ToolbarController → TerminalController(显示模式/时间戳/清屏/导出)
  *   ToolbarController → SettingsController(主题/语言)
  *   RecordingController → MainWindow(回放数据写入终端)
  *   TerminalSearchBar → TerminalController(搜索高亮)
  *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形配置)
- *   OtaWidget → ToastWidget(传输开始/完成/失败通知)
+ *   OtaWidget → ToastWidget(传输开始/完成通知 + 失败通知使用 showDebounced 防抖)
  *   NavTree → NavigationController(面板切换)
  */
 void MainWindow::connectSignals()
@@ -88,10 +88,11 @@ void MainWindow::connectSignals()
             this, [this](const QString& title, const QString& message) {
         QMessageBox::warning(this, title, message);
     });
-    // 连接失败 → 吐司通知（Error 类型）
+    // 连接失败 → 防抖吐司（Error 类型）— 自动重连时 connectionFailed 会快速连续触发，
+    // 使用 showDebounced 防止同一错误消息在 3 秒内重复弹出
     connect(m_connController, &ConnectionController::connectionFailed,
             this, [this](const QString&, const QString& message) {
-        ToastWidget::show(this, message, ToastWidget::ToastType::Error);
+        ToastWidget::showDebounced(this, message, ToastWidget::ToastType::Error, 3000);
     });
 
     // 快捷指令 → 发送控制器
@@ -105,10 +106,10 @@ void MainWindow::connectSignals()
             this, [this](const QString& msg) {
                 statusBar()->showMessage(msg, 3000);
             });
-    // 发送状态消息 → 吐司通知
+    // 发送状态消息 → 防抖吐司通知（快速连续发送时可能频繁触发）
     connect(m_sendController, &SendController::statusMessage,
             this, [this](const QString& msg) {
-                ToastWidget::show(this, msg);
+                ToastWidget::showDebounced(this, msg);
             });
 
     // ---- 工具栏信号 → 委托给 TerminalController ----
@@ -226,36 +227,57 @@ void MainWindow::connectSignals()
     connect(&ThemeManager::instance(), &ThemeManager::themeChanged,
             m_navIndicator, &NavIndicatorWidget::updateThemeColor);
 
-    // ---- 连接状态 → 吐司通知 ----
-    // 连接成功时显示 Success 类型吐司（替代旧版 connectionStateChanged 过滤方式，
-    // 直接使用 ConnectionController 专用信号 connectionSucceeded）
+    /**
+     * @name Toast 防抖策略
+     *
+     * 吐司通知的 debounce 策略:
+     *
+     * **使用 showDebounced()（防抖）** — 可能因自动重连、网络抖动等场景快速重复触发的信号:
+     *   - connectionFailed: 自动重连失败时会连续触发，3 秒冷却避免重复弹窗
+     *   - connectionError:  连接中途因错误断开，重连时可能重复触发，3 秒冷却
+     *   - SendController::statusMessage: 快速连续发送时可能频繁触发，2 秒冷却（默认值）
+     *   - OtaWidget::transferFailed: 传输失败重试时可能连续触发，3 秒冷却
+     *
+     * **使用 show()（无防抖）** — 确定性的一次性事件，不会在短时间内重复:
+     *   - connectionSucceeded: 连接成功是一次性事件
+     *   - connectionDisconnected: 用户主动断开是一次性事件
+     *   - OtaWidget::transferStarted: 传输开始是一次性事件
+     *   - OtaWidget::transferCompleted: 传输完成是一次性事件（含耗时/大小信息，不应丢弃）
+     *   - RecordingController::statusMessage: 录制/回放状态切换是一次性事件
+     *
+     * 冷却键 = ToastType 编号 + "|" + 消息文本，同一消息+类型在冷却期内静默跳过。
+     * 不同消息（如不同端口的错误）互不影响，各自独立计时。
+     */
+    ///@{
+
+    // 连接成功时显示 Success 类型吐司（一次性事件，无需防抖）
     connect(m_connController, &ConnectionController::connectionSucceeded,
             this, [this](const QString& portName) {
         ToastWidget::show(this, tr("已连接: %1").arg(portName),
                           ToastWidget::ToastType::Success);
     });
-    // 用户主动断开连接时显示 Info 类型吐司
+    // 用户主动断开连接时显示 Info 类型吐司（一次性事件，无需防抖）
     connect(m_connController, &ConnectionController::connectionDisconnected,
             this, [this](const QString& portName) {
         ToastWidget::show(this, tr("已断开: %1").arg(portName),
                           ToastWidget::ToastType::Info);
     });
-    // 连接因错误中断时显示 Error 类型吐司（与 connectionFailed 的 QMessageBox 互补，
-    // connectionFailed 弹对话框用于严重错误，connectionError 弹吐司用于状态提示）
+    // 连接因错误中断 → 防抖吐司（Error 类型）— 自动重连/网络抖动时可能快速重复触发，
+    // 使用 showDebounced 防止同一端口+错误消息在 3 秒内重复弹出
     connect(m_connController, &ConnectionController::connectionError,
             this, [this](const QString& portName, const QString& error) {
-        ToastWidget::show(this, tr("连接错误: %1\n%2").arg(portName, error),
-                          ToastWidget::ToastType::Error);
+        ToastWidget::showDebounced(this, tr("连接错误: %1\n%2").arg(portName, error),
+                                   ToastWidget::ToastType::Error, 3000);
     });
 
     // ---- OTA 传输状态 → 吐司通知 ----
-    // 传输开始时显示 Info 类型吐司
+    // 传输开始 → 非防抖吐司（Info 类型，一次性事件）
     connect(m_panelManager->otaWidget(), &OtaWidget::transferStarted,
             this, [this](const QString& filename) {
         ToastWidget::show(this, tr("开始传输: %1").arg(filename),
                           ToastWidget::ToastType::Info);
     });
-    // 传输完成时显示 Success 类型吐司（含耗时和文件大小）
+    // 传输完成 → 非防抖吐司（Success 类型，含耗时和文件大小，一次性事件）
     connect(m_panelManager->otaWidget(), &OtaWidget::transferCompleted,
             this, [this](const QString& filename, int elapsed, int size) {
         // 耗时格式化: 秒或毫秒
@@ -270,10 +292,12 @@ void MainWindow::connectSignals()
                               .arg(filename, timeStr, sizeStr),
                           ToastWidget::ToastType::Success);
     });
-    // 传输失败时显示 Error 类型吐司（含错误原因）
+    // 传输失败 → 防抖吐司（Error 类型，含错误原因）— 重试或连续传输失败时可能快速重复触发，
+    // 使用 showDebounced 防止同一文件+错误消息在 3 秒内重复弹出
     connect(m_panelManager->otaWidget(), &OtaWidget::transferFailed,
             this, [this](const QString& filename, const QString& error) {
-        ToastWidget::show(this, tr("传输失败: %1\n%2").arg(filename, error),
-                          ToastWidget::ToastType::Error);
+        ToastWidget::showDebounced(this, tr("传输失败: %1\n%2").arg(filename, error),
+                                   ToastWidget::ToastType::Error, 3000);
     });
+    ///@}
 }

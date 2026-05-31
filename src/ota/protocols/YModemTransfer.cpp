@@ -476,7 +476,7 @@ bool YModemTransfer::loadNextFile()
     QFile file(m_filePaths[m_fileIndex]);
     if (!file.open(QIODevice::ReadOnly)) {
         emit transferError(
-            QString("Cannot open file: %1").arg(m_filePaths[m_fileIndex]));
+            tr("无法打开文件: %1").arg(m_filePaths[m_fileIndex]));
         return false;
     }
     m_currentData = file.readAll();
@@ -487,7 +487,4 @@ bool YModemTransfer::loadNextFile()
     return true;
 }
 
-void YModemTransfer::setState(State s)
-{
-    m_ymodemState = s;
-}
+// setState() 已移除 — 内部状态通过直接赋值 m_ymodemState 管理

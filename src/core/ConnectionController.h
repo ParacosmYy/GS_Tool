@@ -125,6 +125,20 @@ private:
     void clearDownstreamConnections();             ///< 清除下游控制器的连接引用(防止悬空指针)
     void stopConnectionTimeout();                  ///< 停止连接超时定时器
 
+    /**
+     * @brief 统一的连接断开清理流程
+     *
+     * 从 disconnectCurrent()、onConnectionTimeout()、onPortRemoved() 中提取的公共逻辑:
+     *   1. 停止超时定时器
+     *   2. 缓存并清空 m_currentConn / m_connectedPortName
+     *   3. 断开信号连接（防止 close() 触发状态变化回调）
+     *   4. 从 ConnectionManager 移除并销毁连接实例
+     *   5. 清除下游控制器的连接引用
+     *
+     * @param reason 断开原因描述，用于日志输出（如 "user disconnect"、"timeout"）
+     */
+    void teardownConnection(const QString& reason);
+
     ConnectionManager* m_connManager;              ///< 连接管理器(工厂)
     IConnection* m_currentConn = nullptr;          ///< 当前活跃连接实例
     SendController* m_sendController = nullptr;    ///< 发送控制器引用

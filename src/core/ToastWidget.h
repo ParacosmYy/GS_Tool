@@ -19,6 +19,7 @@
 #include <QPainterPath>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
 #include <QTimer>
 #include <QFontMetrics>
 #include <QMap>
@@ -33,14 +34,12 @@ class ToastWidget : public QWidget {
 
 public:
     enum class ToastType { Success, Error, Info }; ///< 通知类型
-
-    /** @brief 显示吐司(基础接口), 在 parent 右下角创建并显示
-     *  @param parent 父窗口 @param message 消息 @param type 类型 @param durationMs 显示时长 */
-    static void show(QWidget* parent, const QString& message,
-                     ToastType type = ToastType::Info, int durationMs = 3000)
+    /** @brief 显示吐司 @param parent 父窗口 @param msg 消息 @param type 类型 @param ms 显示时长 */
+    static void show(QWidget* parent, const QString& msg,
+                     ToastType type = ToastType::Info, int ms = 3000)
     {
         if (!parent) return;
-        auto* toast = new ToastWidget(parent, message, type);
+        auto* toast = new ToastWidget(parent, msg, type);
         activeToasts(parent).append(toast);
         connect(parent, &QObject::destroyed, parent, [parent]() { activeToastsMap().remove(parent); });
         const auto& list = activeToasts(parent);
@@ -59,19 +58,14 @@ public:
         auto* fade = new QPropertyAnimation(toast->m_opacityEffect, "opacity");
         fade->setEndValue(1.0); fade->setDuration(300);
         fade->setEasingCurve(QEasingCurve::OutBack);
-        connect(slide, &QAbstractAnimation::finished, toast, [toast, durationMs]() {
-            QTimer::singleShot(durationMs, toast, [toast]() { toast->dismiss(); });
+        connect(slide, &QAbstractAnimation::finished, toast, [toast, ms]() {
+            QTimer::singleShot(ms, toast, [toast]() { toast->dismiss(); });
         });
         slide->start(QAbstractAnimation::DeleteWhenStopped);
         fade->start(QAbstractAnimation::DeleteWhenStopped);
     }
-
     /** @brief 防抖吐司 — 同一消息+类型在冷却期内静默跳过
-     *
-     * 使用静态 QHash<QString,QElapsedTimer> 跟踪最后显示时间。
-     * 若距离上次显示不足 cooldownMs 则跳过。典型场景: 自动重连防重复吐司。
-     * @param parent 父窗口 @param msg 消息文本(去重键) @param type 类型(去重键)
-     * @param cooldownMs 冷却间隔，默认 2000ms */
+     *  @param parent 父窗口 @param msg 消息 @param type 类型 @param cooldownMs 冷却间隔 */
     static void showDebounced(QWidget* parent, const QString& msg,
                               ToastType type = ToastType::Info, int cooldownMs = 2000)
     {
@@ -86,25 +80,20 @@ public:
 protected:
     void paintEvent(QPaintEvent*) override
     {
-        QPainter p(this);
-        p.setRenderHint(QPainter::Antialiasing);
+        QPainter p(this); p.setRenderHint(QPainter::Antialiasing);
         auto& theme = ThemeManager::instance();
         QColor bg = theme.color(ThemeManager::SemanticColor::BgSecondary);
         QColor accent = semanticColor();
         QColor txt = theme.color(ThemeManager::SemanticColor::TextPrimary);
         QPainterPath path;
         path.addRoundedRect(rect().adjusted(1, 1, -1, -1), kRadius, kRadius);
-        p.fillPath(path, bg);
-        p.save(); p.setClipPath(path);
-        p.fillRect(QRect(0, 0, kLeftBorder, height()), accent);
-        p.restore();
+        p.fillPath(path, bg); p.save(); p.setClipPath(path);
+        p.fillRect(QRect(0, 0, kLeftBorder, height()), accent); p.restore();
         int iconX = kLeftBorder + kPad;
-        p.setPen(accent);
-        p.setFont(QFont("Segoe UI Emoji", kIconSize, QFont::Bold));
+        p.setPen(accent); p.setFont(QFont("Segoe UI Emoji", kIconSize, QFont::Bold));
         p.drawText(QRect(iconX, 0, kIconArea, height()), Qt::AlignCenter, iconChar());
         int textX = iconX + kIconArea + kPad;
-        p.setPen(txt);
-        p.setFont(QFont("Microsoft YaHei UI", 12));
+        p.setPen(txt); p.setFont(QFont("Microsoft YaHei UI", 12));
         p.drawText(QRect(textX, kPad, width() - textX - kPad, height() - kPad * 2),
                    Qt::AlignVCenter | Qt::AlignLeft | Qt::TextWordWrap, m_message);
     }
@@ -144,16 +133,23 @@ private:
         return QStringLiteral("ℹ");
     }
 
-    void dismiss() {                                         ///< 250ms InCubic消失动画
+    /** @brief 消失动画: 250ms InCubic，向上飘出30px + 淡出（并行） */
+    void dismiss() {
+        auto* group = new QParallelAnimationGroup(this);
         auto* fadeOut = new QPropertyAnimation(m_opacityEffect, "opacity");
         fadeOut->setEndValue(0.0); fadeOut->setDuration(250);
         fadeOut->setEasingCurve(QEasingCurve::InCubic);
-        connect(fadeOut, &QAbstractAnimation::finished, this, [this]() {
+        group->addAnimation(fadeOut);
+        auto* drift = new QPropertyAnimation(this, "pos");
+        drift->setStartValue(pos()); drift->setEndValue(pos() + QPoint(0, -30));
+        drift->setDuration(250); drift->setEasingCurve(QEasingCurve::InCubic);
+        group->addAnimation(drift);
+        connect(group, &QAbstractAnimation::finished, this, [this]() {
             QWidget* pw = parentWidget();
             if (pw) { activeToasts(pw).removeOne(this); repositionToasts(pw); }
             deleteLater();
         });
-        fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
+        group->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
     static QList<ToastWidget*>& activeToasts(QWidget* parent) { return activeToastsMap()[parent]; }

@@ -1,5 +1,10 @@
 /* EmbedDebug - 现代深色主题 (VS Code / Tokyo Night 风格) */
 
+/* 全局UI字体 - 确保所有控件使用统一字体 */
+* {
+    font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
 /*
  * 语义色板定义 — ThemeManager 从此块解析自绘控件颜色
  */
@@ -135,6 +140,11 @@ QLineEdit:disabled {
     background-color: #292e42;
     color: #565f89;
     border-color: #292e42;
+}
+
+QLineEdit[hasError="true"] {
+    border: 2px solid #f7768e;
+    background-color: rgba(247, 118, 142, 0.05);
 }
 
 QPushButton {
@@ -294,13 +304,13 @@ QComboBox:disabled {
 }
 
 QComboBox QAbstractItemView {
-    background-color: #1a1b26;
+    background-color: #24283b;
     color: #a9b1d6;
-    selection-background-color: #283457;
+    selection-background-color: #414868;
     selection-color: #7aa2f7;
     outline: none;
     border: 1px solid #3b4261;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 /* SpinBox */

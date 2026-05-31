@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
+#include <QSequentialAnimationGroup>
 #include <QGraphicsOpacityEffect>
 
 class QTreeView;
@@ -144,8 +145,8 @@ private:
     /** @brief 当前面板切换动画组（用于析构时清理进行中的动画） */
     QParallelAnimationGroup* m_switchAnimGroup = nullptr;
 
-    /** @brief 连接状态呼吸动画实例（loopCount=-1 无限循环，需手动管理生命周期） */
-    QPropertyAnimation* m_breathingAnim = nullptr;
+    /** @brief 连接状态呼吸动画实例（QSequentialAnimationGroup 实现平滑往返循环） */
+    QSequentialAnimationGroup* m_breathingAnim = nullptr;
 
     /** @brief 连接状态标签的透明度效果实例 */
     QGraphicsOpacityEffect* m_connStatusEffect = nullptr;

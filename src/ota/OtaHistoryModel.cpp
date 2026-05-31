@@ -1,3 +1,14 @@
+/**
+ * @file OtaHistoryModel.cpp
+ * @brief OTA升级历史记录表格模型实现
+ *
+ * 提供OTA升级历史的增删查和持久化功能。
+ * 数据存储在 SettingsManager 中，以 JSON 数组格式序列化。
+ * 模型最多保留 kMaxRecords=200 条记录，超出时移除最旧的记录。
+ *
+ * 列定义: 时间 | 文件名 | 协议 | 大小 | 耗时 | 结果
+ * 特殊渲染: 结果列使用语义色（成功=绿/失败=红），失败行 Tooltip 显示错误详情
+ */
 #include "ota/OtaHistoryModel.h"
 #include "utils/SettingsManager.h"
 #include "core/ThemeManager.h"
@@ -7,24 +18,37 @@
 #include <QDateTime>
 #include <QColor>
 
+/** @brief 构造模型并从 SettingsManager 加载历史记录 @param parent 父对象 */
 OtaHistoryModel::OtaHistoryModel(QObject* parent)
     : QAbstractTableModel(parent)
 {
     loadFromSettings();
 }
 
+/** @brief 返回记录行数 @param parent 父索引（表格模型中无效） */
 int OtaHistoryModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.isValid()) return 0;
     return m_records.size();
 }
 
+/** @brief 返回列数（固定为 ColCount=6） @param parent 父索引 */
 int OtaHistoryModel::columnCount(const QModelIndex& parent) const
 {
     if (parent.isValid()) return 0;
     return ColCount;
 }
 
+/**
+ * @brief 返回指定单元格的数据
+ *
+ * 支持的角色:
+ *   - DisplayRole: 格式化显示文本（时间/文件名/协议/大小/耗时/结果）
+ *   - ForegroundRole: 结果列使用语义色（成功=Success, 失败=Error）
+ *   - ToolTipRole: 失败行显示错误详情
+ *
+ * @param index 单元格索引 @param role 数据角色 @return 格式化后的数据
+ */
 QVariant OtaHistoryModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid() || index.row() >= m_records.size()) return QVariant();
@@ -67,6 +91,11 @@ QVariant OtaHistoryModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
+/**
+ * @brief 返回水平表头文本
+ * @param section 列号 @param orientation 方向 @param role 数据角色
+ * @return 列标题文本（仅支持 Horizontal + DisplayRole）
+ */
 QVariant OtaHistoryModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole || orientation != Qt::Horizontal) return QVariant();
@@ -82,9 +111,17 @@ QVariant OtaHistoryModel::headerData(int section, Qt::Orientation orientation, i
     }
 }
 
+/**
+ * @brief 添加一条OTA记录到模型头部
+ *
+ * 新记录插入到第0行（最新的在前）。如果超出 kMaxRecords 上限，
+ * 先移除最后一行（最旧的），避免嵌套 beginInsert/beginRemove 导致视图混乱。
+ * 添加后自动持久化到 SettingsManager。
+ *
+ * @param record 要添加的OTA记录
+ */
 void OtaHistoryModel::addRecord(const OtaRecord& record)
 {
-    // 先移除超出上限的旧记录（在插入之前），避免嵌套 beginInsert/beginRemove 导致视图混乱
     if (m_records.size() >= kMaxRecords) {
         int last = m_records.size() - 1;
         beginRemoveRows(QModelIndex(), last, last);
@@ -98,6 +135,7 @@ void OtaHistoryModel::addRecord(const OtaRecord& record)
     saveToSettings();
 }
 
+/** @brief 清空所有历史记录并持久化 */
 void OtaHistoryModel::clearHistory()
 {
     beginResetModel();
@@ -106,6 +144,11 @@ void OtaHistoryModel::clearHistory()
     saveToSettings();
 }
 
+/**
+ * @brief 获取指定行的记录（只读引用）
+ * @param row 行号（0~count-1），越界时返回静态空记录
+ * @return 记录的常引用
+ */
 const OtaRecord& OtaHistoryModel::record(int row) const
 {
     if (row < 0 || row >= m_records.size()) {
@@ -115,11 +158,13 @@ const OtaRecord& OtaHistoryModel::record(int row) const
     return m_records.at(row);
 }
 
+/** @brief 返回记录总数 */
 int OtaHistoryModel::count() const
 {
     return m_records.size();
 }
 
+/** @brief 将所有记录序列化为 JSON 数组并写入 SettingsManager */
 void OtaHistoryModel::saveToSettings()
 {
     QJsonArray arr;
@@ -140,6 +185,7 @@ void OtaHistoryModel::saveToSettings()
     settings.set("ota_history/records", doc.toJson(QJsonDocument::Compact));
 }
 
+/** @brief 从 SettingsManager 读取 JSON 数组并反序列化为记录列表 */
 void OtaHistoryModel::loadFromSettings()
 {
     beginResetModel();

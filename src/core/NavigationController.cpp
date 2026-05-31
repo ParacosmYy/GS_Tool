@@ -344,8 +344,12 @@ void NavigationController::switchToPanel(QWidget* newPanel)
 
 /**
  * @brief 启动连接状态呼吸动画
- * 1500ms 循环, InOutSine, opacity 0.3 <-> 1.0 脉冲闪烁
- * 用于"连接中..."状态，让用户知道正在连接而非卡死
+ *
+ * 使用 QSequentialAnimationGroup 实现平滑往返脉冲:
+ *   上半周期: opacity 0.3 -> 1.0, 1500ms, InOutSine (淡入)
+ *   下半周期: opacity 1.0 -> 0.3, 1500ms, InOutSine (淡出)
+ *   无限循环, 避免单方向动画结束时从1.0跳变到0.3的突兀感
+ *
  * @param statusLabel 状态标签控件
  */
 void NavigationController::startBreathingAnimation(QLabel* statusLabel)
@@ -362,32 +366,47 @@ void NavigationController::startBreathingAnimation(QLabel* statusLabel)
     }
     m_connStatusEffect->setOpacity(1.0);
 
-    // 创建呼吸脉冲动画: 1500ms循环, InOutSine, opacity 0.3 <-> 1.0
-    if (m_breathingAnim) {
-        m_breathingAnim->stop();
-        delete m_breathingAnim;
-    }
-    m_breathingAnim = new QPropertyAnimation(m_connStatusEffect, "opacity");
-    m_breathingAnim->setStartValue(0.3);
-    m_breathingAnim->setEndValue(1.0);
-    m_breathingAnim->setDuration(1500);
-    m_breathingAnim->setEasingCurve(QEasingCurve::InOutSine);
-    m_breathingAnim->setLoopCount(-1);  // 无限循环
-    // 注意: loopCount=-1 时动画不会自行停止，不能用 DeleteWhenStopped
-    // 生命周期由 startBreathingAnimation/stopBreathingAnimation 手动管理
-    m_breathingAnim->start();
+    // 销毁旧动画(如果存在)
+    delete m_breathingAnim;
+    m_breathingAnim = nullptr;
+
+    // 构建呼吸动画: 顺序组 [0.3->1.0, 1500ms] + [1.0->0.3, 1500ms], 无限循环
+    auto* group = new QSequentialAnimationGroup(this);
+
+    // 上半周期: 0.3 -> 1.0 (淡入)
+    auto* fadeIn = new QPropertyAnimation(m_connStatusEffect, "opacity");
+    fadeIn->setStartValue(0.3);
+    fadeIn->setEndValue(1.0);
+    fadeIn->setDuration(1500);
+    fadeIn->setEasingCurve(QEasingCurve::InOutSine);
+    group->addAnimation(fadeIn);
+
+    // 下半周期: 1.0 -> 0.3 (淡出)
+    auto* fadeOut = new QPropertyAnimation(m_connStatusEffect, "opacity");
+    fadeOut->setStartValue(1.0);
+    fadeOut->setEndValue(0.3);
+    fadeOut->setDuration(1500);
+    fadeOut->setEasingCurve(QEasingCurve::InOutSine);
+    group->addAnimation(fadeOut);
+
+    group->setLoopCount(-1);  // 无限循环
+    group->start(QAbstractAnimation::DeleteWhenStopped);
+    m_breathingAnim = group;
 }
 
 /**
  * @brief 停止连接状态呼吸动画
- * 停止动画 -> 恢复标签完全不透明 -> 清理 effect 和 anim 对象
+ *
+ * 停止动画组 -> 恢复标签完全不透明 -> 清理 effect 对象。
+ * 动画组使用 DeleteWhenStopped，stop() 后 Qt 自动销毁，此处仅清空指针。
+ *
  * @param statusLabel 状态标签控件（析构时可传 nullptr）
  */
 void NavigationController::stopBreathingAnimation(QLabel* statusLabel)
 {
     if (m_breathingAnim) {
+        // DeleteWhenStopped: stop() 后 Qt 自动 delete，不可再次 delete
         m_breathingAnim->stop();
-        delete m_breathingAnim;
         m_breathingAnim = nullptr;
     }
     // 恢复状态标签完全不透明

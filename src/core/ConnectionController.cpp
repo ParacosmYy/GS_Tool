@@ -143,28 +143,12 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
 void ConnectionController::disconnectCurrent()
 {
     m_userInitiatedDisconnect = true;
-    stopConnectionTimeout();
     m_reconnectTimer.stop();
 
     if (m_currentConn) {
         // 缓存端口名称，断开后 m_connectedPortName 会被清空
         const QString portName = m_connectedPortName;
-
-        // 缓存指针并立即清空成员，防止信号回调中访问
-        IConnection* conn = m_currentConn;
-        m_currentConn = nullptr;
-        m_connectedPortName.clear();
-
-        // 先断开信号，防止 removeConnection 内部 close() 触发的
-        // stateChanged 信号进入 onConnectionStateChanged
-        disconnect(conn, nullptr, this, nullptr);
-
-        // 从管理器移除并销毁（removeConnection 内部执行 close + delete）
-        m_connManager->removeConnection(conn);
-
-        // 清除下游控制器的连接引用
-        clearDownstreamConnections();
-
+        teardownConnection(tr("user disconnect"));
         // 通知 Toast: 用户主动断开连接
         emit connectionDisconnected(portName);
     }
@@ -326,15 +310,7 @@ void ConnectionController::onConnectionTimeout()
 
     qWarning() << "Connection timeout for" << timeoutName;
 
-    // 清理当前连接（不手动 close，由 removeConnection 统一处理）
-    if (m_currentConn) {
-        IConnection* conn = m_currentConn;
-        m_currentConn = nullptr;
-        m_connectedPortName.clear();
-        disconnect(conn, nullptr, this, nullptr);
-        m_connManager->removeConnection(conn);
-        clearDownstreamConnections();
-    }
+    teardownConnection(tr("connection timeout"));
 
     emit connectionFailed(tr("Connection Timeout"),
                          tr("Connection timed out after %1 seconds. "
@@ -378,16 +354,7 @@ void ConnectionController::onPortRemoved(const QString& portName)
         // 标记为非用户主动断开（物理拔出属于意外断开，可触发自动重连）
         m_userInitiatedDisconnect = false;
 
-        // 执行断开流程
-        if (m_currentConn) {
-            stopConnectionTimeout();
-            IConnection* conn = m_currentConn;
-            m_currentConn = nullptr;
-            m_connectedPortName.clear();
-            disconnect(conn, nullptr, this, nullptr);
-            m_connManager->removeConnection(conn);
-            clearDownstreamConnections();
-        }
+        teardownConnection(tr("port removed: %1").arg(portName));
 
         // 通知 UI 连接因端口拔出而断开
         emit connectionStateChanged(ConnectionState::Disconnected, portName);
@@ -423,6 +390,42 @@ void ConnectionController::connectSignals(IConnection* conn)
         emit connectionFailed(tr("Connection Error"), msg);
         emit connectionError(errPortName, msg);
     });
+}
+
+/**
+ * @brief 统一的连接断开清理流程
+ *
+ * 从 disconnectCurrent()、onConnectionTimeout()、onPortRemoved() 提取的公共逻辑:
+ *   1. 停止超时定时器
+ *   2. 缓存并清空 m_currentConn / m_connectedPortName
+ *   3. 断开信号连接（防止 close() 触发 onConnectionStateChanged 回调）
+ *   4. 从 ConnectionManager 移除并销毁连接实例
+ *   5. 清除下游控制器的连接引用
+ *
+ * @param reason 断开原因描述，用于日志输出
+ */
+void ConnectionController::teardownConnection(const QString& reason)
+{
+    stopConnectionTimeout();
+
+    if (!m_currentConn) return;
+
+    qInfo() << "Tearing down connection:" << reason;
+
+    // 缓存指针并立即清空成员，防止信号回调中访问
+    IConnection* conn = m_currentConn;
+    m_currentConn = nullptr;
+    m_connectedPortName.clear();
+
+    // 先断开信号，防止 removeConnection 内部 close() 触发的
+    // stateChanged 信号进入 onConnectionStateChanged
+    disconnect(conn, nullptr, this, nullptr);
+
+    // 从管理器移除并销毁（removeConnection 内部执行 close + delete）
+    m_connManager->removeConnection(conn);
+
+    // 清除下游控制器的连接引用
+    clearDownstreamConnections();
 }
 
 /**
