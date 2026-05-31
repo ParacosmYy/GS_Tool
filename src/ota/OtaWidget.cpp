@@ -5,6 +5,8 @@
 #include <QFileDialog>
 #include <QElapsedTimer>
 #include <QTime>
+#include <QFileInfo>
+#include <QDateTime>
 
 OtaWidget::OtaWidget(OtaManager* manager, QWidget* parent)
     : QWidget(parent)
@@ -140,6 +142,48 @@ void OtaWidget::setupUI()
     logLayout->addWidget(m_logView);
 
     mainLayout->addWidget(logGroup, 1);
+
+    // ---- 历史记录组 ----
+    auto* historyGroup = new QGroupBox(tr("OTA History"));
+    auto* historyLayout = new QVBoxLayout(historyGroup);
+    historyLayout->setSpacing(6);
+
+    m_historyModel = new OtaHistoryModel(this);
+
+    m_historyView = new QTreeView;
+    m_historyView->setModel(m_historyModel);
+    m_historyView->setRootIsDecorated(false);
+    m_historyView->setAlternatingRowColors(true);
+    m_historyView->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_historyView->setStyleSheet(
+        "QTreeView { background-color: #1e1e2e; color: #cdd6f4; "
+        "  border: 1px solid #313244; border-radius: 4px; font-size: 12px; }"
+        "QTreeView::alternate-background-color: #181825; }"
+    );
+    // 列宽设置
+    m_historyView->setColumnWidth(OtaHistoryModel::ColTime, 150);
+    m_historyView->setColumnWidth(OtaHistoryModel::ColFileName, 160);
+    m_historyView->setColumnWidth(OtaHistoryModel::ColProtocol, 80);
+    m_historyView->setColumnWidth(OtaHistoryModel::ColSize, 80);
+    m_historyView->setColumnWidth(OtaHistoryModel::ColDuration, 80);
+    historyLayout->addWidget(m_historyView);
+
+    auto* histBtnLayout = new QHBoxLayout;
+    m_clearHistoryBtn = new QPushButton(tr("Clear History"));
+    m_clearHistoryBtn->setFixedHeight(28);
+    m_clearHistoryBtn->setStyleSheet(
+        "QPushButton { background-color: transparent; color: #6c7086; "
+        "  border: 1px solid #45475a; border-radius: 4px; padding: 2px 8px; }"
+        "QPushButton:hover { color: #f38ba8; border-color: #f38ba8; }"
+    );
+    connect(m_clearHistoryBtn, &QPushButton::clicked, this, [this]() {
+        m_historyModel->clearHistory();
+    });
+    histBtnLayout->addStretch();
+    histBtnLayout->addWidget(m_clearHistoryBtn);
+    historyLayout->addLayout(histBtnLayout);
+
+    mainLayout->addWidget(historyGroup, 1);
 }
 
 void OtaWidget::onBrowseFile()
@@ -160,6 +204,12 @@ void OtaWidget::onStartTransfer()
         appendLog(tr("Error: No firmware file selected"));
         return;
     }
+
+    QFileInfo fileInfo(filePath);
+    m_currentFileName = fileInfo.fileName();
+    m_currentProtocol = m_protocolCombo->currentData().toString();
+    m_currentFileSize = fileInfo.size();
+    m_transferStartTime = QDateTime::currentDateTime();
 
     QString protocol = m_protocolCombo->currentData().toString();
     appendLog(tr("Starting transfer: %1, Protocol: %2").arg(filePath, protocol));
@@ -221,6 +271,16 @@ void OtaWidget::onTransferComplete()
 
     qint64 elapsed = m_transferTimer.elapsed();
     appendLog(tr("Transfer completed in %1s").arg(elapsed / 1000.0, 0, 'f', 1));
+
+    // 记录成功历史
+    OtaRecord rec;
+    rec.fileName = m_currentFileName;
+    rec.protocol = m_currentProtocol;
+    rec.fileSize = m_currentFileSize;
+    rec.startTime = m_transferStartTime;
+    rec.durationMs = elapsed;
+    rec.success = true;
+    m_historyModel->addRecord(rec);
 }
 
 void OtaWidget::onTransferError(const QString& reason)
@@ -228,6 +288,17 @@ void OtaWidget::onTransferError(const QString& reason)
     setTransferring(false);
     m_statusLbl->setText(tr("Error: %1").arg(reason));
     appendLog(tr("Error: %1").arg(reason));
+
+    // 记录失败历史
+    OtaRecord rec;
+    rec.fileName = m_currentFileName;
+    rec.protocol = m_currentProtocol;
+    rec.fileSize = m_currentFileSize;
+    rec.startTime = m_transferStartTime;
+    rec.durationMs = m_transferTimer.elapsed();
+    rec.success = false;
+    rec.errorMessage = reason;
+    m_historyModel->addRecord(rec);
 }
 
 void OtaWidget::appendLog(const QString& msg)

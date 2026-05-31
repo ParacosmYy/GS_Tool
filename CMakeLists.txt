@@ -48,6 +48,7 @@ set(SOURCES
     src/chart/ChartWidget.cpp
     src/ota/OtaManager.cpp
     src/ota/OtaWidget.cpp
+    src/ota/OtaHistoryModel.cpp
     src/ota/protocols/XModemTransfer.cpp
     src/ota/protocols/YModemTransfer.cpp
     src/ota/protocols/ZModemTransfer.cpp
@@ -87,6 +88,7 @@ set(HEADERS
     src/chart/ChartWidget.h
     src/ota/OtaManager.h
     src/ota/OtaWidget.h
+    src/ota/OtaHistoryModel.h
     src/ota/protocols/XModemTransfer.h
     src/ota/protocols/YModemTransfer.h
     src/ota/protocols/ZModemTransfer.h

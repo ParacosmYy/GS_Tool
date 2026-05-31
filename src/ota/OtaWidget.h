@@ -9,8 +9,10 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QTextEdit>
+#include <QTreeView>
 #include <QElapsedTimer>
 #include "ota/OtaManager.h"
+#include "ota/OtaHistoryModel.h"
 
 // OTA升级操作面板
 // 提供文件选择、协议选择、进度显示、日志输出
@@ -58,9 +60,20 @@ private:
     // 日志
     QTextEdit* m_logView;
 
+    // 历史记录
+    OtaHistoryModel* m_historyModel;
+    QTreeView* m_historyView;
+    QPushButton* m_clearHistoryBtn;
+
     // 传输计时
     QElapsedTimer m_transferTimer;
     qint64 m_lastBytesSent = 0;
+
+    // 当前传输信息(用于记录历史)
+    QString m_currentFileName;
+    QString m_currentProtocol;
+    qint64 m_currentFileSize = 0;
+    QDateTime m_transferStartTime;
 };
 
 #endif // OTAWIDGET_H
