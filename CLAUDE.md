@@ -121,10 +121,11 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 
 ### 3.4 Commit 规则（铁律）
 
-1. **每次commit必须 ≥ 200行代码变更**（不含空行和注释）
-2. **每次commit = +1分**
+1. **每次commit必须 ≥ 300行代码变更**（不含空行和注释）
+2. **每次commit = +1分，不足300行不允许commit**
 3. **零编译错误才能commit** — 编译不过必须先修
-4. **commit message格式**:
+4. **每次commit后必须验证 EmbedDebug.bat 能正常启动应用** — bat启动失败不允许commit
+5. **commit message格式**:
 
 ```
 <模块名>: <简述改了什么>
@@ -135,11 +136,47 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 变更: <文件数> files, <+新增行数> insertions, <-删除行数> deletions
 ```
 
-5. **禁止的行为**:
+6. **禁止的行为**:
    - 禁止提交编译不过的代码
    - 禁止重复造轮子（公共组件只写一次）
    - 禁止不经PRD直接写代码
    - 禁止不经架构审查直接加新类
+   - 禁止不足300行变更就提交commit
+   - 禁止提交后bat无法启动应用
+
+### 3.5 多Agent并行工作流（每次迭代必须执行）
+
+每次迭代必须同时启动以下 8 个 Agent 进行并行工作，形成完整的 workflow 闭环:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    每次迭代启动 8 Agent                          │
+├──────────┬──────────────────┬──────────────────────────────────────┤
+│ # │ 角色       │ Agent类型            │ 职责                     │
+├──────────┼──────────────────┼──────────────────────────────────────┤
+│ 1 │ 产品经理   │ requirements-analyst │ 编写/更新PRD，定义需求边界 │
+│ 2 │ 系统架构师 │ system-architect     │ 设计类图、接口、模式选型   │
+│ 3 │ 核心开发   │ general-purpose      │ 基础设施层+核心代码实现    │
+│ 4 │ UI开发     │ frontend-architect   │ 表现层UI开发+QSS主题       │
+│ 5 │ 协议开发   │ general-purpose      │ 业务层协议/解析器开发      │
+│ 6 │ UI/UX审查  │ frontend-architect   │ 观感评审，硬编码颜色检测   │
+│ 7 │ 代码审查   │ self-review          │ 代码质量+模式合规+分层检查 │
+│ 8 │ QA工程师   │ quality-engineer     │ 编译验证+测试计划+边界测试 │
+└──────────┴──────────────────┴──────────────────────────────────────┘
+```
+
+**执行顺序**:
+1. **第一波（并行启动 Agent 1+2）**: 产品经理写PRD + 架构师设计，两个Agent同时工作
+2. **第二波（并行启动 Agent 3+4+5）**: 三个开发Agent根据PRD和架构同时编码
+3. **第三波（并行启动 Agent 6+7+8）**: 开发完成后，三个审查Agent并行审查
+4. **主线程汇总**: 收集8个Agent的结果 → 修复问题 → 编译验证 → commit
+
+**强制要求**:
+- 每次迭代必须使用 `Agent` 工具启动8个子Agent，不得省略
+- 所有Agent使用 `run_in_background: true` 并行执行
+- 主线程等待所有Agent完成后汇总结果
+- 汇总后修复Agent发现的问题，确保编译通过
+- 最终验证 `EmbedDebug.bat` 能正常启动应用
 
 ---
 
@@ -418,6 +455,45 @@ UI/UX 产品体验师每次迭代后检查:
 - [ ] 窗口 resize 时布局不错乱
 - [ ] 暗色/亮色主题切换后所有控件可读
 
+### 6.8 UI执行强制规则（铁律，违反不允许commit）
+
+1. **禁止在C++代码中硬编码颜色值到setStyleSheet()** — 所有颜色必须从主题QSS文件中获取
+   - 错误示例: `m_btn->setStyleSheet("QPushButton { background-color: #89b4fa; }")`
+   - 正确做法: 在QSS主题文件中定义 `QPushButton#startBtn { background-color: var(--accent); }`
+   - 唯一例外: TerminalWidget自绘引擎中使用QPainter时，颜色从ThemeManager获取
+2. **所有QWidget必须设置objectName** — QSS选择器依赖objectName
+3. **新增面板/控件必须在所有主题QSS中添加对应样式** — 不允许只改一个主题
+4. **按钮必须有hover和pressed状态** — 纯色按钮不能只有默认状态
+5. **所有用户可见文字必须使用tr()包裹** — 支持中英双语
+
+### 6.9 主题QSS文件管理规范
+
+每个主题QSS文件必须定义完整的语义色板变量:
+
+```css
+/* 必须定义的颜色变量 */
+--bg-primary:      #1e1e2e;   /* 主背景 */
+--bg-secondary:    #313244;   /* 面板/卡片背景 */
+--bg-tertiary:     #45475a;   /* 输入框背景 */
+--text-primary:    #cdd6f4;   /* 主文字 */
+--text-secondary:  #a6adc8;   /* 次文字 */
+--text-muted:      #6c7086;   /* 弱文字 */
+--accent:          #89b4fa;   /* 强调色 */
+--accent-hover:    #b4d0fb;   /* 强调色悬停 */
+--border:          #313244;   /* 边框 */
+--border-focus:    #89b4fa;   /* 焦点边框 */
+--success:         #a6e3a1;   /* 成功 */
+--warning:         #f9e2af;   /* 警告 */
+--error:           #f38ba8;   /* 错误 */
+--scrollbar:       #45475a;   /* 滚动条 */
+--scrollbar-hover: #585b70;   /* 滚动条悬停 */
+```
+
+每个新增控件必须在三个主题文件中同步添加样式:
+- `resources/themes/dark_terminal.qss`
+- `resources/themes/modern_dark.qss`
+- `resources/themes/light.qss`
+
 ---
 
 ## 七、PRD文档规范
@@ -491,6 +567,7 @@ docs/prd/PRD_<编号>_<简述>.md
 | 11 | DataLogger数据日志记录和回放(EDL二进制格式+变速回放) | 12 |
 | 12 | OtaHistoryModel OTA历史记录模型(持久化+表格展示+自动记录) | 13 |
 | 13 | README中文版重写+bat启动验证 | 14 |
+| 14 | CLAUDE.md约束文档更新:UI强制规则+QSS规范+多Agent工作流+300行规则 | 15 |
 | ... | 目标: 1000分 | 1000 |
 
 ---

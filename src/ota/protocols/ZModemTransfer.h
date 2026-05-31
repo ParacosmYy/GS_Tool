@@ -1,33 +1,26 @@
 #ifndef ZMODEMTRANSFER_H
 #define ZMODEMTRANSFER_H
 
-#include <QObject>
-#include <QTimer>
-#include "connection/IConnection.h"
+#include "ota/protocols/BaseTransfer.h"
 #include "utils/CRC.h"
 
 // ZMODEM协议传输器 - PC端Sender实现
 // 支持连续发送、CRC32校验、1024字节数据帧
-class ZModemTransfer : public QObject {
+// 继承BaseTransfer，通过4个纯虚钩子注入协议特有逻辑
+class ZModemTransfer : public BaseTransfer {
     Q_OBJECT
 
 public:
     explicit ZModemTransfer(QObject* parent = nullptr);
 
-    void setConnection(IConnection* conn);
     void setFilePath(const QString& path);
-    bool start();
-    void cancel();
-    bool isRunning() const;
 
-signals:
-    void progress(int percent, qint64 bytesSent, qint64 totalBytes);
-    void transferComplete();
-    void transferError(const QString& reason);
-
-private slots:
-    void onConnectionReadyRead(const QByteArray& data);
-    void onTimeout();
+protected:
+    // === BaseTransfer 钩子实现 ===
+    bool onStartInit() override;
+    void sendCancelBytes() override;
+    void processReceivedData() override;
+    void handleTimeout() override;
 
 private:
     // ZMODEM帧类型
@@ -62,9 +55,8 @@ private:
     static constexpr char ZCRCW  = 'k';     // CRC+ZACK等待
 
     static constexpr int kDataLen = 1024;
-    static constexpr int kMaxRetries = 10;
-    static constexpr int kTimeoutMs = 10000;
 
+    // ZMODEM内部状态(独立于BaseTransfer的TransferState)
     enum class State {
         Idle,
         WaitingRinit,
@@ -78,7 +70,6 @@ private:
     };
 
     void setState(State s);
-    void processReceivedData();
     bool parseHexFrame(const QByteArray& data, int& type, QByteArray& headerData);
     QByteArray buildHexHeader(quint8 type, const QByteArray& data = QByteArray());
     QByteArray buildBinHeader(quint8 type, const QByteArray& data = QByteArray());
@@ -89,24 +80,17 @@ private:
     void sendZDATA();
     void sendZEOF();
     void sendZFIN();
-    void sendCancel();
-    void finishTransfer();
+
     quint32 encodeCrc32(quint32 crc);
     QByteArray toHex(quint32 val, int digits);
 
-    IConnection* m_conn = nullptr;
     QString m_filePath;
     QByteArray m_fileData;
-    QByteArray m_receiveBuffer;
 
-    State m_state = State::Idle;
+    State m_zmodemState = State::Idle;
     qint64 m_bytesSent = 0;
     qint64 m_fileOffset = 0;
-    int m_retryCount = 0;
-    bool m_cancelled = false;
     quint32 m_senderCrc32 = 0;
-
-    QTimer* m_timeoutTimer;
 };
 
 #endif // ZMODEMTRANSFER_H

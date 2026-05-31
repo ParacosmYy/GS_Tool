@@ -3,23 +3,8 @@
 #include <QFileInfo>
 
 YModemTransfer::YModemTransfer(QObject* parent)
-    : QObject(parent)
-    , m_timeoutTimer(new QTimer(this))
+    : BaseTransfer(parent)
 {
-    m_timeoutTimer->setSingleShot(true);
-    connect(m_timeoutTimer, &QTimer::timeout, this, &YModemTransfer::onTimeout);
-}
-
-void YModemTransfer::setConnection(IConnection* conn)
-{
-    if (m_conn) {
-        disconnect(m_conn, nullptr, this, nullptr);
-    }
-    m_conn = conn;
-    if (m_conn) {
-        connect(m_conn, &IConnection::dataReceived,
-                this, &YModemTransfer::onConnectionReadyRead);
-    }
 }
 
 void YModemTransfer::setFilePath(const QString& path)
@@ -32,13 +17,8 @@ void YModemTransfer::setFilePaths(const QStringList& paths)
     m_filePaths = paths;
 }
 
-bool YModemTransfer::start()
+bool YModemTransfer::onStartInit()
 {
-    if (m_state != State::Idle) return false;
-    if (!m_conn) {
-        emit transferError("No connection set");
-        return false;
-    }
     if (m_filePaths.isEmpty()) {
         emit transferError("No files to transfer");
         return false;
@@ -56,9 +36,6 @@ bool YModemTransfer::start()
 
     m_fileIndex = 0;
     m_bytesSent = 0;
-    m_retryCount = 0;
-    m_cancelled = false;
-    m_receiveBuffer.clear();
 
     // 加载第一个文件
     QFile file(m_filePaths[0]);
@@ -71,72 +48,46 @@ bool YModemTransfer::start()
     m_currentFileName = QFileInfo(m_filePaths[0]).fileName();
 
     // YMODEM启动: 等待接收方发送'C'(CRC模式)
-    setState(State::WaitingStart);
-    m_timeoutTimer->start(kTimeoutMs * 3);
+    m_ymodemState = State::WaitingStart;
+    m_timeoutTimer->start(m_timeoutMs * 3);
     return true;
 }
 
-void YModemTransfer::cancel()
+void YModemTransfer::sendCancelBytes()
 {
-    m_cancelled = true;
-    if (m_conn && m_state != State::Idle) {
-        sendCancel();
+    if (m_conn) {
+        m_conn->write(QByteArray(2, CAN));
     }
-    m_timeoutTimer->stop();
-    setState(State::Idle);
-    emit transferError("Transfer cancelled by user");
 }
 
-bool YModemTransfer::isRunning() const
+void YModemTransfer::handleTimeout()
 {
-    return m_state != State::Idle && m_state != State::Done && m_state != State::Error;
-}
-
-void YModemTransfer::onConnectionReadyRead(const QByteArray& data)
-{
-    m_receiveBuffer.append(data);
-    processReceivedData();
-}
-
-void YModemTransfer::onTimeout()
-{
-    if (m_state == State::Idle) return;
-
-    m_retryCount++;
-    if (m_retryCount > kMaxRetries) {
-        sendCancel();
-        setState(State::Error);
-        emit transferError("Transfer timeout: max retries exceeded");
-        return;
-    }
-
     // 超时重发当前状态
-    switch (m_state) {
+    switch (m_ymodemState) {
     case State::WaitingStart:
-        m_timeoutTimer->start(kTimeoutMs * 3);
+        m_timeoutTimer->start(m_timeoutMs * 3);
         break;
     case State::SendingBlock0:
         sendBlock0();
-        m_timeoutTimer->start(kTimeoutMs);
+        m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::SendingData:
         sendBlock();
-        m_timeoutTimer->start(kTimeoutMs);
+        m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::SendingEOT:
         sendEOT();
-        m_timeoutTimer->start(kTimeoutMs);
+        m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::WaitBlock0Ack:
-        // 接收方在Block 0 ACK后应再发'C'请求下一个Block 0
-        m_timeoutTimer->start(kTimeoutMs);
+        m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::WaitFinalC:
-        m_timeoutTimer->start(kTimeoutMs);
+        m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::SendingFinalBlock0:
         sendFinalBlock0();
-        m_timeoutTimer->start(kTimeoutMs);
+        m_timeoutTimer->start(m_timeoutMs);
         break;
     default:
         break;
@@ -151,7 +102,7 @@ void YModemTransfer::processReceivedData()
 
         if (m_cancelled) return;
 
-        switch (m_state) {
+        switch (m_ymodemState) {
         case State::Idle:
         case State::Done:
         case State::Error:
@@ -161,34 +112,32 @@ void YModemTransfer::processReceivedData()
             if (ch == CRC_CHAR || ch == NAK) {
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
-                // 发送Block 0(文件信息)
-                setState(State::SendingBlock0);
+                m_ymodemState = State::SendingBlock0;
                 sendBlock0();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             }
             break;
 
         case State::SendingBlock0:
             if (ch == ACK) {
-                // Block 0被接受，等待接收方再发'C'开始数据传输
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
-                setState(State::SendingData);
+                m_ymodemState = State::SendingData;
                 m_blockNumber = 1;
             } else if (ch == NAK) {
                 m_timeoutTimer->stop();
                 m_retryCount++;
-                if (m_retryCount > kMaxRetries) {
-                    sendCancel();
-                    setState(State::Error);
+                if (m_retryCount > m_maxRetries) {
+                    sendCancelBytes();
+                    m_ymodemState = State::Error;
                     emit transferError("Block 0 rejected: too many retries");
                     return;
                 }
                 sendBlock0();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             } else if (ch == CAN) {
                 m_timeoutTimer->stop();
-                setState(State::Error);
+                m_ymodemState = State::Error;
                 emit transferError("Transfer cancelled by receiver");
                 return;
             }
@@ -200,33 +149,31 @@ void YModemTransfer::processReceivedData()
                 m_retryCount = 0;
                 m_blockNumber++;
 
-                // 更新进度
                 int percent = static_cast<int>((m_bytesSent * 100) / m_totalBytes);
                 emit progress(percent, m_bytesSent, m_totalBytes);
 
                 if (m_bytesSent >= m_currentData.size()) {
-                    // 当前文件传输完毕，发EOT
-                    setState(State::SendingEOT);
+                    m_ymodemState = State::SendingEOT;
                     sendEOT();
-                    m_timeoutTimer->start(kTimeoutMs);
+                    m_timeoutTimer->start(m_timeoutMs);
                 } else {
                     sendBlock();
-                    m_timeoutTimer->start(kTimeoutMs);
+                    m_timeoutTimer->start(m_timeoutMs);
                 }
             } else if (ch == NAK) {
                 m_timeoutTimer->stop();
                 m_retryCount++;
-                if (m_retryCount > kMaxRetries) {
-                    sendCancel();
-                    setState(State::Error);
+                if (m_retryCount > m_maxRetries) {
+                    sendCancelBytes();
+                    m_ymodemState = State::Error;
                     emit transferError("Too many NAK retries");
                     return;
                 }
                 sendBlock();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             } else if (ch == CAN) {
                 m_timeoutTimer->stop();
-                setState(State::Error);
+                m_ymodemState = State::Error;
                 emit transferError("Transfer cancelled by receiver");
                 return;
             }
@@ -239,24 +186,22 @@ void YModemTransfer::processReceivedData()
                 m_fileIndex++;
 
                 if (m_fileIndex < m_filePaths.size()) {
-                    // 还有更多文件，等待接收方发'C'然后发下一个Block 0
-                    setState(State::WaitBlock0Ack);
-                    m_timeoutTimer->start(kTimeoutMs);
+                    m_ymodemState = State::WaitBlock0Ack;
+                    m_timeoutTimer->start(m_timeoutMs);
                 } else {
-                    // 所有文件传输完毕，等待'C'然后发空Block 0
-                    setState(State::WaitFinalC);
-                    m_timeoutTimer->start(kTimeoutMs);
+                    m_ymodemState = State::WaitFinalC;
+                    m_timeoutTimer->start(m_timeoutMs);
                 }
             } else if (ch == NAK) {
                 m_timeoutTimer->stop();
                 m_retryCount++;
-                if (m_retryCount > kMaxRetries) {
-                    setState(State::Error);
+                if (m_retryCount > m_maxRetries) {
+                    m_ymodemState = State::Error;
                     emit transferError("EOT acknowledgment failed");
                     return;
                 }
                 sendEOT();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             }
             break;
 
@@ -268,8 +213,8 @@ void YModemTransfer::processReceivedData()
                 // 加载下一个文件
                 QFile file(m_filePaths[m_fileIndex]);
                 if (!file.open(QIODevice::ReadOnly)) {
-                    sendCancel();
-                    setState(State::Error);
+                    sendCancelBytes();
+                    m_ymodemState = State::Error;
                     emit transferError(QString("Cannot open file: %1").arg(m_filePaths[m_fileIndex]));
                     return;
                 }
@@ -278,10 +223,9 @@ void YModemTransfer::processReceivedData()
                 m_currentFileName = QFileInfo(m_filePaths[m_fileIndex]).fileName();
                 m_bytesSent = 0;
 
-                // 发送下一个文件的Block 0
-                setState(State::SendingBlock0);
+                m_ymodemState = State::SendingBlock0;
                 sendBlock0();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             }
             break;
 
@@ -289,27 +233,28 @@ void YModemTransfer::processReceivedData()
             if (ch == CRC_CHAR || ch == NAK) {
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
-                setState(State::SendingFinalBlock0);
+                m_ymodemState = State::SendingFinalBlock0;
                 sendFinalBlock0();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             }
             break;
 
         case State::SendingFinalBlock0:
             if (ch == ACK) {
                 m_timeoutTimer->stop();
+                emit progress(100, m_totalBytes, m_totalBytes);
                 finishTransfer();
             } else if (ch == NAK) {
                 m_timeoutTimer->stop();
                 m_retryCount++;
-                if (m_retryCount > kMaxRetries) {
-                    sendCancel();
-                    setState(State::Error);
+                if (m_retryCount > m_maxRetries) {
+                    sendCancelBytes();
+                    m_ymodemState = State::Error;
                     emit transferError("Final Block 0 rejected");
                     return;
                 }
                 sendFinalBlock0();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             }
             break;
         }
@@ -331,10 +276,9 @@ void YModemTransfer::sendBlock()
     int dataSize = qMin(static_cast<int>(m_currentData.size() - offset), kBlockSize);
 
     if (dataSize <= 0) {
-        // 当前文件数据发完，发EOT
-        setState(State::SendingEOT);
+        m_ymodemState = State::SendingEOT;
         sendEOT();
-        m_timeoutTimer->start(kTimeoutMs);
+        m_timeoutTimer->start(m_timeoutMs);
         return;
     }
 
@@ -359,26 +303,11 @@ void YModemTransfer::sendEOT()
 
 void YModemTransfer::sendFinalBlock0()
 {
-    // 空Block 0表示批量传输结束
     QByteArray emptyBlock0(kBlockSize, 0x00);
     QByteArray packet = buildBlock(0, emptyBlock0);
     if (m_conn) {
         m_conn->write(packet);
     }
-}
-
-void YModemTransfer::sendCancel()
-{
-    if (m_conn) {
-        m_conn->write(QByteArray(2, CAN));
-    }
-}
-
-void YModemTransfer::finishTransfer()
-{
-    setState(State::Done);
-    emit progress(100, m_totalBytes, m_totalBytes);
-    emit transferComplete();
 }
 
 QByteArray YModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
@@ -411,11 +340,11 @@ QByteArray YModemTransfer::buildBlock0(const QString& fileName, qint64 fileSize)
     block0.append(QString::number(fileSize).toUtf8());
     block0.append('\0');
 
-    // 修改时间(Octal, 可选, 这里简化为0)
+    // 修改时间(Octal, 简化为0)
     block0.append('0');
     block0.append('\0');
 
-    // 文件权限(可选, 简化为0)
+    // 文件权限(简化为0)
     block0.append('0');
     block0.append('\0');
 
@@ -431,5 +360,5 @@ QByteArray YModemTransfer::buildBlock0(const QString& fileName, qint64 fileSize)
 
 void YModemTransfer::setState(State s)
 {
-    m_state = s;
+    m_ymodemState = s;
 }

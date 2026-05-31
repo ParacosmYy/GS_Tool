@@ -2,23 +2,8 @@
 #include <QFile>
 
 XModemTransfer::XModemTransfer(QObject* parent)
-    : QObject(parent)
-    , m_timeoutTimer(new QTimer(this))
+    : BaseTransfer(parent)
 {
-    m_timeoutTimer->setSingleShot(true);
-    connect(m_timeoutTimer, &QTimer::timeout, this, &XModemTransfer::onTimeout);
-}
-
-void XModemTransfer::setConnection(IConnection* conn)
-{
-    if (m_conn) {
-        disconnect(m_conn, nullptr, this, nullptr);
-    }
-    m_conn = conn;
-    if (m_conn) {
-        connect(m_conn, &IConnection::dataReceived,
-                this, &XModemTransfer::onConnectionReadyRead);
-    }
 }
 
 void XModemTransfer::setMode(Mode mode)
@@ -37,14 +22,8 @@ void XModemTransfer::setData(const QByteArray& data)
     m_filePath.clear();
 }
 
-bool XModemTransfer::start()
+bool XModemTransfer::onStartInit()
 {
-    if (m_state != State::Idle) return false;
-    if (!m_conn) {
-        emit transferError("No connection set");
-        return false;
-    }
-
     // 加载文件数据
     if (m_data.isEmpty() && !m_filePath.isEmpty()) {
         QFile file(m_filePath);
@@ -63,60 +42,31 @@ bool XModemTransfer::start()
 
     m_blockNumber = 1;
     m_bytesSent = 0;
-    m_retryCount = 0;
-    m_cancelled = false;
-    m_receiveBuffer.clear();
 
     // 等待接收方发送启动信号(NAK=Checksum模式, 'C'=CRC模式)
-    setState(State::WaitingForStart);
-    m_timeoutTimer->start(kTimeoutMs * 3); // 启动等待超时较长
+    m_xmodemState = State::WaitingForStart;
+    m_timeoutTimer->start(m_timeoutMs * 3);
     return true;
 }
 
-void XModemTransfer::cancel()
+void XModemTransfer::sendCancelBytes()
 {
-    m_cancelled = true;
-    if (m_conn && m_state != State::Idle) {
-        // 发送两次CAN表示取消
+    if (m_conn) {
         m_conn->write(QByteArray(2, CAN));
     }
-    m_timeoutTimer->stop();
-    setState(State::Idle);
-    emit transferError("Transfer cancelled by user");
 }
 
-bool XModemTransfer::isRunning() const
+void XModemTransfer::handleTimeout()
 {
-    return m_state != State::Idle && m_state != State::Done && m_state != State::Error;
-}
-
-void XModemTransfer::onConnectionReadyRead(const QByteArray& data)
-{
-    m_receiveBuffer.append(data);
-    processReceivedData();
-}
-
-void XModemTransfer::onTimeout()
-{
-    if (m_state == State::Idle) return;
-
-    m_retryCount++;
-    if (m_retryCount > kMaxRetries) {
-        if (m_conn) m_conn->write(QByteArray(2, CAN));
-        setState(State::Error);
-        emit transferError("Transfer timeout: max retries exceeded");
-        return;
-    }
-
-    // 超时重发当前块
-    if (m_state == State::SendingBlock) {
+    // 超时重发当前状态
+    if (m_xmodemState == State::SendingBlock) {
         sendBlock();
-        m_timeoutTimer->start(kTimeoutMs);
-    } else if (m_state == State::SendingEOT) {
+        m_timeoutTimer->start(m_timeoutMs);
+    } else if (m_xmodemState == State::SendingEOT) {
         sendEOT();
-        m_timeoutTimer->start(kTimeoutMs);
-    } else if (m_state == State::WaitingForStart) {
-        m_timeoutTimer->start(kTimeoutMs * 3);
+        m_timeoutTimer->start(m_timeoutMs);
+    } else if (m_xmodemState == State::WaitingForStart) {
+        m_timeoutTimer->start(m_timeoutMs * 3);
     }
 }
 
@@ -128,7 +78,7 @@ void XModemTransfer::processReceivedData()
 
         if (m_cancelled) return;
 
-        switch (m_state) {
+        switch (m_xmodemState) {
         case State::Idle:
         case State::Done:
         case State::Error:
@@ -137,29 +87,22 @@ void XModemTransfer::processReceivedData()
         case State::WaitingForStart:
             if (ch == NAK) {
                 // 接收方请求Checksum模式
-                if (m_mode == Checksum) {
-                    m_timeoutTimer->stop();
-                    m_retryCount = 0;
-                    setState(State::SendingBlock);
-                    sendBlock();
-                    m_timeoutTimer->start(kTimeoutMs);
-                } else {
-                    // 我们想用CRC/1K模式，但对方只支持Checksum
+                if (m_mode != Checksum) {
                     // 降级到Checksum模式
                     m_mode = Checksum;
-                    m_timeoutTimer->stop();
-                    m_retryCount = 0;
-                    setState(State::SendingBlock);
-                    sendBlock();
-                    m_timeoutTimer->start(kTimeoutMs);
                 }
+                m_timeoutTimer->stop();
+                m_retryCount = 0;
+                m_xmodemState = State::SendingBlock;
+                sendBlock();
+                m_timeoutTimer->start(m_timeoutMs);
             } else if (ch == CRC_CHAR) {
                 // 接收方请求CRC模式
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
-                setState(State::SendingBlock);
+                m_xmodemState = State::SendingBlock;
                 sendBlock();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             }
             break;
 
@@ -168,34 +111,34 @@ void XModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
                 m_blockNumber++;
-                // 更新进度
+                // XMODEM块号1-255循环
+                if (m_blockNumber > 255) m_blockNumber = 1;
+
                 int percent = static_cast<int>((m_bytesSent * 100) / m_data.size());
                 emit progress(percent, m_bytesSent, m_data.size());
 
                 if (m_bytesSent >= m_data.size()) {
-                    // 所有数据发送完毕，发EOT
-                    setState(State::SendingEOT);
+                    m_xmodemState = State::SendingEOT;
                     sendEOT();
-                    m_timeoutTimer->start(kTimeoutMs);
+                    m_timeoutTimer->start(m_timeoutMs);
                 } else {
                     sendBlock();
-                    m_timeoutTimer->start(kTimeoutMs);
+                    m_timeoutTimer->start(m_timeoutMs);
                 }
             } else if (ch == NAK) {
-                // 重发当前块
                 m_timeoutTimer->stop();
                 m_retryCount++;
-                if (m_retryCount > kMaxRetries) {
+                if (m_retryCount > m_maxRetries) {
                     if (m_conn) m_conn->write(QByteArray(2, CAN));
-                    setState(State::Error);
+                    m_xmodemState = State::Error;
                     emit transferError("Too many NAK retries");
                     return;
                 }
                 sendBlock();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             } else if (ch == CAN) {
                 m_timeoutTimer->stop();
-                setState(State::Error);
+                m_xmodemState = State::Error;
                 emit transferError("Transfer cancelled by receiver");
                 return;
             }
@@ -204,17 +147,18 @@ void XModemTransfer::processReceivedData()
         case State::SendingEOT:
             if (ch == ACK) {
                 m_timeoutTimer->stop();
+                emit progress(100, m_data.size(), m_data.size());
                 finishTransfer();
             } else if (ch == NAK) {
                 m_timeoutTimer->stop();
                 m_retryCount++;
-                if (m_retryCount > kMaxRetries) {
-                    setState(State::Error);
+                if (m_retryCount > m_maxRetries) {
+                    m_xmodemState = State::Error;
                     emit transferError("EOT acknowledgment failed");
                     return;
                 }
                 sendEOT();
-                m_timeoutTimer->start(kTimeoutMs);
+                m_timeoutTimer->start(m_timeoutMs);
             }
             break;
         }
@@ -224,14 +168,13 @@ void XModemTransfer::processReceivedData()
 void XModemTransfer::sendBlock()
 {
     int bs = blockSize();
-    qint64 offset = static_cast<qint64>(m_blockNumber - 1) * bs;
+    qint64 offset = static_cast<qint64>((m_blockNumber - 1) % 256) * bs;
     int dataSize = qMin(static_cast<int>(m_data.size() - offset), bs);
 
     if (dataSize <= 0) {
-        // 没有更多数据，发EOT
-        setState(State::SendingEOT);
+        m_xmodemState = State::SendingEOT;
         sendEOT();
-        m_timeoutTimer->start(kTimeoutMs);
+        m_timeoutTimer->start(m_timeoutMs);
         return;
     }
 
@@ -255,13 +198,6 @@ void XModemTransfer::sendEOT()
     }
 }
 
-void XModemTransfer::finishTransfer()
-{
-    setState(State::Done);
-    emit progress(100, m_data.size(), m_data.size());
-    emit transferComplete();
-}
-
 QByteArray XModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
 {
     QByteArray packet;
@@ -272,17 +208,15 @@ QByteArray XModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
     // 块号: blockNum(1-255循环)
     char bn = static_cast<char>(blockNum & 0xFF);
     packet.append(bn);
-    packet.append(static_cast<char>(~bn & 0xFF)); // 块号反码
+    packet.append(static_cast<char>(~bn & 0xFF));
 
     // 数据
     packet.append(blockData);
 
     // 校验
     if (m_mode == Checksum) {
-        // Sum8: 所有字节之和的低8位
         packet.append(static_cast<char>(CRC::checksum(blockData)));
     } else {
-        // CRC16 (CRC和1K模式都用CRC16)
         quint16 crc = xmodemCrc(blockData);
         packet.append(static_cast<char>((crc >> 8) & 0xFF));
         packet.append(static_cast<char>(crc & 0xFF));
@@ -293,11 +227,10 @@ QByteArray XModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
 
 quint16 XModemTransfer::xmodemCrc(const QByteArray& data)
 {
-    // XMODEM使用的CRC16-CCITT
     return CRC::crc16Ccitt(data);
 }
 
 void XModemTransfer::setState(State newState)
 {
-    m_state = newState;
+    m_xmodemState = newState;
 }

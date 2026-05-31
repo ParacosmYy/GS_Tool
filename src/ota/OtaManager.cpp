@@ -6,25 +6,18 @@ OtaManager::OtaManager(QObject* parent)
     , m_ymodem(new YModemTransfer(this))
     , m_zmodem(new ZModemTransfer(this))
 {
-    connect(m_xmodem, &XModemTransfer::progress,
-            this, &OtaManager::progress);
-    connect(m_xmodem, &XModemTransfer::transferComplete,
-            this, &OtaManager::transferComplete);
-    connect(m_xmodem, &XModemTransfer::transferError,
-            this, &OtaManager::transferError);
+    connectTransferSignals(m_xmodem);
+    connectTransferSignals(m_ymodem);
+    connectTransferSignals(m_zmodem);
+}
 
-    connect(m_ymodem, &YModemTransfer::progress,
+void OtaManager::connectTransferSignals(BaseTransfer* transfer)
+{
+    connect(transfer, &BaseTransfer::progress,
             this, &OtaManager::progress);
-    connect(m_ymodem, &YModemTransfer::transferComplete,
+    connect(transfer, &BaseTransfer::transferComplete,
             this, &OtaManager::transferComplete);
-    connect(m_ymodem, &YModemTransfer::transferError,
-            this, &OtaManager::transferError);
-
-    connect(m_zmodem, &ZModemTransfer::progress,
-            this, &OtaManager::progress);
-    connect(m_zmodem, &ZModemTransfer::transferComplete,
-            this, &OtaManager::transferComplete);
-    connect(m_zmodem, &ZModemTransfer::transferError,
+    connect(transfer, &BaseTransfer::transferError,
             this, &OtaManager::transferError);
 }
 
