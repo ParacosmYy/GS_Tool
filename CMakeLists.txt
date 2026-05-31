@@ -55,7 +55,6 @@ set(SOURCES
     src/terminal/TerminalLayoutManager.cpp
     src/terminal/TerminalSelectionManager.cpp
     src/terminal/TerminalSearchManager.cpp
-    src/terminal/TerminalTypes.h
     src/serial/SerialConfigPanel.cpp
     src/serial/QuickCommandBar.cpp
     src/serial/TimedSender.cpp
@@ -84,9 +83,6 @@ set(SOURCES
     src/utils/SettingsManager.cpp
     src/utils/DataExporter.cpp
     src/utils/DataLogger.cpp
-    src/utils/HexConverter.h
-    src/utils/RingBuffer.h
-    src/utils/CRC.h
     src/protocol/FrameDefinition.cpp
     src/core/SessionManager.cpp
 )
@@ -136,10 +132,10 @@ set(HEADERS
     src/protocol/JustFloatBridge.h
     src/protocol/FireWaterBridge.h
     src/protocol/ProtocolBridgeManager.h
-src/chart/ChartWidget.h
-     src/chart/ChartColors.h
-     src/chart/ChannelConfig.h
-     src/chart/ChartModel.h
+    src/chart/ChartWidget.h
+    src/chart/ChartColors.h
+    src/chart/ChannelConfig.h
+    src/chart/ChartModel.h
     src/ota/OtaManager.h
     src/ota/OtaWidget.h
     src/ota/OtaHistoryModel.h
@@ -150,6 +146,10 @@ src/chart/ChartWidget.h
     src/utils/SettingsManager.h
     src/utils/DataExporter.h
     src/utils/DataLogger.h
+    src/utils/ByteFormat.h
+    src/utils/CRC.h
+    src/utils/HexConverter.h
+    src/utils/RingBuffer.h
 )
 
 set(RESOURCES

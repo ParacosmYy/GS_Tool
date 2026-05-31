@@ -1,6 +1,13 @@
+/**
+ * @file QuickCommandBar.cpp
+ * @brief 快捷指令栏实现 - 可配置的底部按钮行，点击即发送预设命令
+ */
+
 #include "QuickCommandBar.h"
 #include "utils/HexConverter.h"
+
 #include <QSettings>
+#include <QVBoxLayout>
 
 QuickCommandBar::QuickCommandBar(QWidget* parent)
     : QWidget(parent)
@@ -15,17 +22,20 @@ QuickCommandBar::QuickCommandBar(QWidget* parent)
 
     mainLayout->addStretch();
 
-    // 编辑按钮
+    // ---- 编辑按钮 ----
+    // 使用 setMinimumHeight(32) 替代 setFixedSize，允许水平自适应内容
+    // 与 SerialConfigPanel 连接按钮(36px)视觉协调: 次要操作按钮略矮
     m_editBtn = new QPushButton(tr("Edit"));
     m_editBtn->setObjectName("quickCmdEditBtn");
-    m_editBtn->setFixedSize(56, 32);
+    m_editBtn->setMinimumHeight(32);
     connect(m_editBtn, &QPushButton::clicked, this, &QuickCommandBar::onEditRequested);
     mainLayout->addWidget(m_editBtn);
 
-    // 添加按钮
+    // ---- 添加按钮 ----
+    // 使用 setMinimumHeight(32) 替代 setFixedSize(32,32)，保持与其他按钮等高
     m_addBtn = new QPushButton(tr("+"));
     m_addBtn->setObjectName("quickCmdAddBtn");
-    m_addBtn->setFixedSize(32, 32);
+    m_addBtn->setMinimumHeight(32);
     connect(m_addBtn, &QPushButton::clicked, this, [this]() {
         QuickCommand cmd{tr("Command"), "", false};
         addCommand(cmd);
@@ -35,32 +45,54 @@ QuickCommandBar::QuickCommandBar(QWidget* parent)
     setObjectName("quickCommandBar");
 }
 
+/**
+ * @brief 设置指令列表，替换当前全部指令并重建按钮
+ * @param commands 新的指令列表
+ */
 void QuickCommandBar::setCommands(const QList<QuickCommand>& commands)
 {
     m_commands = commands;
     rebuildButtons();
 }
 
+/** @brief 获取当前指令列表的副本 */
 QList<QuickCommand> QuickCommandBar::commands() const
 {
     return m_commands;
 }
 
+/**
+ * @brief 添加一条指令到列表末尾并重建按钮
+ * @param cmd 要添加的指令
+ */
 void QuickCommandBar::addCommand(const QuickCommand& cmd)
 {
     m_commands.append(cmd);
     rebuildButtons();
 }
 
+/** @brief 清空所有指令并移除按钮 */
 void QuickCommandBar::clearCommands()
 {
     m_commands.clear();
     rebuildButtons();
 }
 
+/**
+ * @brief 根据当前 m_commands 列表重建所有快捷指令按钮
+ *
+ * 先清除 m_buttonLayout 中的旧按钮（deleteLater安全销毁），
+ * 再为每条指令创建新按钮，设置 objectName 和 dynamic property
+ * 以便 QSS 选择器匹配样式。
+ *
+ * 每个按钮通过 connect 绑定点击事件:
+ *   - HEX 模式: 使用 HexConverter::fromHexString 转换后发射
+ *   - 文本模式: 使用 toUtf8() 转换后发射
+ *   - 数据为空时不发射信号
+ */
 void QuickCommandBar::rebuildButtons()
 {
-    // 清除旧按钮
+    // 清除旧按钮（安全销毁旧 QWidget）
     QLayoutItem* item;
     while ((item = m_buttonLayout->takeAt(0)) != nullptr) {
         if (item->widget()) {
@@ -69,22 +101,27 @@ void QuickCommandBar::rebuildButtons()
         delete item;
     }
 
-    // 创建新按钮
+    // 为每条指令创建新按钮
     for (int i = 0; i < m_commands.size(); ++i) {
         const auto& cmd = m_commands[i];
         auto* btn = new QPushButton(cmd.name);
         btn->setObjectName(QString("quickCmdBtn_%1").arg(i));
+        // dynamic property 供 QSS 选择器 [quickCmdBtn="true"] 匹配
         btn->setProperty("quickCmdBtn", true);
+        // 最小80x32，最大宽度160px，与工具栏按钮高度协调
         btn->setMinimumSize(80, 32);
         btn->setMaximumWidth(160);
+        // 工具提示: 数据非空时显示原始数据，否则显示名称
         btn->setToolTip(cmd.data.isEmpty() ? cmd.name : cmd.data);
 
-        // 点击按钮时发送数据
+        // 点击按钮时发送数据（lambda 捕获 cmd 副本）
         connect(btn, &QPushButton::clicked, this, [this, cmd]() {
             QByteArray data;
             if (cmd.isHex) {
+                // HEX 模式: 将十六进制字符串转为原始字节
                 data = HexConverter::fromHexString(cmd.data);
             } else {
+                // 文本模式: 将字符串转为 UTF-8 字节
                 data = cmd.data.toUtf8();
             }
             if (!data.isEmpty()) {
@@ -96,18 +133,25 @@ void QuickCommandBar::rebuildButtons()
     }
 }
 
+/**
+ * @brief 打开指令编辑对话框，支持增删改指令
+ *
+ * 使用 QTableWidget 实现简单的表格编辑: 名称 | 数据 | HEX
+ * 对话框内按钮设置 objectName 以便 QSS 定制样式。
+ */
 void QuickCommandBar::onEditRequested()
 {
     // ---- 指令编辑对话框 ----
-    // 使用QTableWidget实现简单的表格编辑：名称 | 数据 | HEX
     QDialog dlg(window());
     dlg.setWindowTitle(tr("编辑快捷指令"));
     dlg.setMinimumSize(480, 320);
+    dlg.setObjectName("quickCmdEditDlg");
 
     auto* layout = new QVBoxLayout(&dlg);
 
     // 表格: 3列 — 名称、数据、HEX开关
     auto* table = new QTableWidget(m_commands.size(), 3, &dlg);
+    table->setObjectName("quickCmdEditTable");
     table->setHorizontalHeaderLabels({tr("名称"), tr("数据"), tr("HEX")});
     table->horizontalHeader()->setStretchLastSection(false);
     table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
@@ -128,10 +172,12 @@ void QuickCommandBar::onEditRequested()
 
     layout->addWidget(table);
 
-    // 按钮行: 添加行 / 删除行 / 确定 / 取消
+    // ---- 按钮行: 添加行 / 删除行 / 确定 / 取消 ----
     auto* btnLayout = new QHBoxLayout;
     auto* addRowBtn = new QPushButton(tr("添加行"), &dlg);
+    addRowBtn->setObjectName("quickCmdAddRowBtn");
     auto* delRowBtn = new QPushButton(tr("删除行"), &dlg);
+    delRowBtn->setObjectName("quickCmdDelRowBtn");
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
 
     btnLayout->addWidget(addRowBtn);

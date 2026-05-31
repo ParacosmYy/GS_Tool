@@ -1,25 +1,32 @@
 /**
  * @file FrameParserHelpers.cpp
- * @brief 帧解析辅助方法实现 — 字段提取、校验计算、长度解析
+ * @brief 帧解析辅助方法实现 — 字段提取、校验计算、长度解析、Payload子路径处理
  *
  * 从 FrameParser.cpp 中拆分出的辅助方法，职责:
  *   1. extractFields  — 从完整帧数据中提取各字段值
  *   2. verifyChecksum — 计算并验证校验值
  *   3. computeChecksum — 根据校验类型计算校验字节
  *   4. parseLengthField — 解析帧内长度字段值
+ *   5. handlePayloadWithLength  — 有长度字段时的Payload接收处理
+ *   6. handlePayloadWithFooter  — 无长度字段有帧尾时的Payload接收处理
+ *   7. handlePayloadMinimal     — 最简帧的Payload接收处理
  *
  * 这些方法都是 FrameParser 类的 private 方法，
- * 操作的是已接收完成的帧数据，与状态机主循环(processByte)解耦。
+ * 操作的是已接收完成的帧数据或Payload子路径逻辑，与状态机主循环(processByte)解耦。
  */
 
 #include "FrameParser.h"
 #include "utils/HexConverter.h"
 #include <QDateTime>
 
+// ============================================================================
+// 字段提取与校验计算
+// ============================================================================
+
 /**
  * @brief 提取帧内各字段值
  * @param frameData 完整帧数据
- * @return 字段名→值的映射
+ * @return 字段名->值的映射
  *
  * 提取 payload 区域后，逐字段调用 FieldDef::extractValue。
  * 元数据字段: _rawPayload, _rawFrame(HEX), _frameTime
@@ -27,6 +34,7 @@
 QVariantMap FrameParser::extractFields(const QByteArray& frameData) const
 {
     QVariantMap result;
+
     // 提取payload区域（帧头之后，校验/帧尾之前）
     int payloadStart = m_def.header.size();
     if (m_def.lengthFieldOffset >= 0) {
@@ -77,42 +85,9 @@ bool FrameParser::verifyChecksum(const QByteArray& frameData) const
 
     QByteArray checkRegion = frameData.mid(start, end - start);
     QByteArray computed = computeChecksum(checkRegion);
-
-    // 从帧数据中提取校验字段
     QByteArray actual = frameData.mid(m_def.checksumOffset, m_def.checksumSize);
 
     return (computed == actual);
-}
-
-/**
- * @brief 解析长度字段值
- * @param frameData 包含长度字段的帧数据
- * @return 解析出的长度值，-1 表示解析失败
- *
- * 支持 1 字节和 2 字节长度字段，大小端由 lengthBigEndian 决定。
- * 返回值 = 原始长度值 - lengthAdjust
- */
-int FrameParser::parseLengthField(const QByteArray& frameData) const
-{
-    if (m_def.lengthFieldOffset < 0) return -1;
-
-    int offset = m_def.lengthFieldOffset;
-    if (offset + m_def.lengthFieldSize > frameData.size()) return -1;
-
-    int length = 0;
-    if (m_def.lengthFieldSize == 1) {
-        length = static_cast<unsigned char>(frameData.at(offset));
-    } else if (m_def.lengthFieldSize == 2) {
-        if (m_def.lengthBigEndian) {
-            length = (static_cast<unsigned char>(frameData.at(offset)) << 8) |
-                     static_cast<unsigned char>(frameData.at(offset + 1));
-        } else {
-            length = static_cast<unsigned char>(frameData.at(offset)) |
-                     (static_cast<unsigned char>(frameData.at(offset + 1)) << 8);
-        }
-    }
-
-    return length - m_def.lengthAdjust;
 }
 
 /**
@@ -156,4 +131,35 @@ QByteArray FrameParser::computeChecksum(const QByteArray& data) const
     }
     }
     return result;
+}
+
+/**
+ * @brief 解析长度字段值
+ * @param frameData 包含长度字段的帧数据
+ * @return 解析出的长度值，-1 表示解析失败
+ *
+ * 支持 1 字节和 2 字节长度字段，大小端由 lengthBigEndian 决定。
+ * 返回值 = 原始长度值 - lengthAdjust
+ */
+int FrameParser::parseLengthField(const QByteArray& frameData) const
+{
+    if (m_def.lengthFieldOffset < 0) return -1;
+
+    int offset = m_def.lengthFieldOffset;
+    if (offset + m_def.lengthFieldSize > frameData.size()) return -1;
+
+    int length = 0;
+    if (m_def.lengthFieldSize == 1) {
+        length = static_cast<unsigned char>(frameData.at(offset));
+    } else if (m_def.lengthFieldSize == 2) {
+        if (m_def.lengthBigEndian) {
+            length = (static_cast<unsigned char>(frameData.at(offset)) << 8) |
+                     static_cast<unsigned char>(frameData.at(offset + 1));
+        } else {
+            length = static_cast<unsigned char>(frameData.at(offset)) |
+                     (static_cast<unsigned char>(frameData.at(offset + 1)) << 8);
+        }
+    }
+
+    return length - m_def.lengthAdjust;
 }

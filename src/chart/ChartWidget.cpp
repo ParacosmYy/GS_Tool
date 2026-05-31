@@ -27,6 +27,7 @@ void ChartWidget::setupUI()
 
     // 顶部控制栏
     auto* toolbar = new QWidget;
+    toolbar->setObjectName("chartToolbar");
     auto* toolLayout = new QHBoxLayout(toolbar);
     toolLayout->setContentsMargins(8, 4, 8, 4);
 

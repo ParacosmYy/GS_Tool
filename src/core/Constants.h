@@ -50,24 +50,7 @@ enum class TerminalLayout {
     SplitVertical     // 上下分栏: 上方显示RX数据，下方显示TX数据
 };
 
-// 语义色常量 — 用于C++代码中无法通过QSS设置颜色的场景（如model data roles）
-// 与主题QSS中的语义色保持一致，主题切换时这些值不会自动更新
-// 后续应由ThemeManager动态提供
-namespace ThemeColors {
-    // 暗色终端 (dark_terminal) 默认色值
-    constexpr const char* kSuccessHex = "#a6e3a1";
-    constexpr const char* kErrorHex   = "#f38ba8";
-    constexpr const char* kWarningHex = "#f9e2af";
-    constexpr const char* kAccentHex  = "#89b4fa";
-}
-
-// 导航树连接类型指示色
-namespace NavColors {
-    constexpr const char* kSerialDot = "#89b4fa";  // 串口 - 蓝色
-    constexpr const char* kTcpDot    = "#a6e3a1";  // TCP  - 绿色
-    constexpr const char* kUdpDot    = "#f9e2af";  // UDP  - 黄色
-    constexpr const char* kRttDot    = "#cba6f7";  // RTT  - 紫色
-}
+// 语义色和导航指示色已迁移至 ThemeManager 动态提供
 
 // 语言选项
 namespace Language {

@@ -1,3 +1,10 @@
+/**
+ * @file DataExporter.h
+ * @brief 数据导出器 - 将终端数据导出为 Plain/HexDump/CSV/Timestamped/Bin 五种格式
+ *
+ * 两种导出模式: exportToFile(全量+时间过滤) / exportStreamed(流式批量)
+ * 设计模式: 策略模式简化实现（枚举 + switch 分发）
+ */
 #ifndef DATA_EXPORTER_H
 #define DATA_EXPORTER_H
 
@@ -7,64 +14,104 @@
 #include <functional>
 #include "terminal/TerminalTypes.h"
 
-// 数据导出器 - 将终端数据导出为不同格式文件
-// 支持 TXT/CSV/BIN 三种格式，支持按时间范围过滤
-//
-// 两种导出模式:
-// 1. exportToFile: 全量导出，调用者传入完整的 QVector<TerminalLine>，适合数据量小的场景
-// 2. exportStreamed: 批量流式导出，通过 lineProvider 分批拉取数据，避免对全部数据做深拷贝
+/**
+ * @brief 数据导出器 - 支持多格式的终端数据导出
+ *
+ * 协作: TerminalModel(数据源) / HexConverter(HEX编码) / RecordingController(调用方)
+ * 依赖方向: 基础设施层 <- 数据层(TerminalTypes)
+ */
 class DataExporter : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 导出格式: Plain(纯文本) / HexDump(地址|HEX|ASCII) / CSV(带表头) / Timestamped(带时间戳) / Bin(原始字节) */
     enum Format {
-        Txt,    // 纯文本 - [时间戳] [方向] HEX | ASCII
-        Csv,    // CSV - 带表头，可被Excel/pandas读取
-        Bin     // 二进制 - 仅原始字节
+        Plain,       ///< 纯文本 - [时间戳] [方向] HEX | ASCII
+        HexDump,     ///< 十六进制转储 - 地址|HEX|ASCII（经典格式，16字节/行）
+        Csv,         ///< CSV - 带表头(timestamp,direction,data_hex,data_ascii)
+        Timestamped, ///< 带时间戳 - 每行前缀精确时间戳 + HEX
+        Bin          ///< 二进制 - 仅原始字节
     };
 
-    // 行数据提供回调: 返回从 offset 开始的 count 条记录
-    // 调用者负责线程安全和数据生命周期
+    /** @brief 行数据提供回调: 从 offset 开始返回 count 条记录，调用者负责线程安全 */
     using LineProvider = std::function<QVector<TerminalLine>(int offset, int count)>;
 
     explicit DataExporter(QObject* parent = nullptr);
 
-    // 全量导出: 调用者传入完整的行数据，内部可选按时间范围过滤
-    // 适合数据量小（< 5000 行）或已有全量数据的场景
+    /**
+     * @brief 全量导出 - 支持 from/to 时间范围过滤
+     * @param filePath  输出文件路径
+     * @param format    导出格式
+     * @param lines     完整的行数据
+     * @param from      起始时间过滤（无效值=不限制）
+     * @param to        结束时间过滤（无效值=不限制）
+     * @return true 成功，false 失败（空数据/文件无法打开）
+     */
     bool exportToFile(const QString& filePath, Format format,
                       const QVector<TerminalLine>& lines,
                       const QDateTime& from = QDateTime(),
                       const QDateTime& to = QDateTime());
 
-    // 批量流式导出: 通过 lineProvider 分批拉取数据，避免一次性深拷贝全部行
-    // totalLines: 数据总行数，用于预计算和进度报告
-    // batchSize: 每批拉取的行数，默认 1000
-    // 注意: 不支持时间范围过滤，因为无法在不加载全部数据的情况下高效过滤
-    //       如需时间过滤，请使用 exportToFile 并传入完整数据
+    /**
+     * @brief 流式导出 - 分批拉取数据，不支持时间过滤
+     * @param filePath      输出文件路径
+     * @param format        导出格式
+     * @param lineProvider  行数据回调
+     * @param totalLines    数据总行数
+     * @param batchSize     每批行数，默认 1000
+     * @return true 成功，false 失败
+     */
     bool exportStreamed(const QString& filePath, Format format,
                         LineProvider lineProvider,
                         int totalLines, int batchSize = 1000);
 
 private:
-    bool exportTxt(const QString& path, const QVector<TerminalLine>& lines);
+    // ---- 全量导出方法（按格式分发） ----
+
+    /** @brief 纯文本导出: [时间戳] [方向] HEX | ASCII */
+    bool exportPlain(const QString& path, const QVector<TerminalLine>& lines);
+    /** @brief 十六进制转储导出: 地址 | HEX(16字节/行) | ASCII */
+    bool exportHexDump(const QString& path, const QVector<TerminalLine>& lines);
+    /** @brief CSV导出: 带表头，逗号分隔 */
     bool exportCsv(const QString& path, const QVector<TerminalLine>& lines);
+    /** @brief 时间戳导出: 每行前缀精确时间戳 + HEX数据 */
+    bool exportTimestamped(const QString& path, const QVector<TerminalLine>& lines);
+    /** @brief 二进制导出: 仅原始字节 */
     bool exportBin(const QString& path, const QVector<TerminalLine>& lines);
 
-    // 流式写入: 打开文件后逐批拉取并写入，避免持有全部数据
-    bool exportStreamedTxt(const QString& path, LineProvider provider,
-                           int totalLines, int batchSize);
+    // ---- 流式导出方法（按格式分发） ----
+
+    /** @brief 流式纯文本导出 */
+    bool exportStreamedPlain(const QString& path, LineProvider provider,
+                             int totalLines, int batchSize);
+    /** @brief 流式十六进制转储导出 */
+    bool exportStreamedHexDump(const QString& path, LineProvider provider,
+                               int totalLines, int batchSize);
+    /** @brief 流式CSV导出 */
     bool exportStreamedCsv(const QString& path, LineProvider provider,
                            int totalLines, int batchSize);
+    /** @brief 流式时间戳导出 */
+    bool exportStreamedTimestamped(const QString& path, LineProvider provider,
+                                   int totalLines, int batchSize);
+    /** @brief 流式二进制导出 */
     bool exportStreamedBin(const QString& path, LineProvider provider,
                            int totalLines, int batchSize);
 
+    // ---- 辅助方法 ----
+
+    /** @brief 按时间范围过滤行数据，from/to 均可选 */
     QVector<TerminalLine> filterByTime(const QVector<TerminalLine>& lines,
                                         const QDateTime& from,
                                         const QDateTime& to) const;
 
-    // 将字节数组转换为可打印 ASCII 字符串
-    // 不可打印字符替换为 '.'
+    /** @brief 不可打印字符替换为 '.' */
     static QString toAsciiString(const QByteArray& data);
+
+    /** @brief 拼接所有行数据为连续字节数组（HexDump用） */
+    static QByteArray concatData(const QVector<TerminalLine>& lines);
+
+    /** @brief 格式化单行HexDump: 地址 | HEX(16字节) | ASCII，不足16字节空格补齐 */
+    static QString formatHexDumpLine(const QByteArray& data, quint64 address);
 };
 
 #endif // DATA_EXPORTER_H

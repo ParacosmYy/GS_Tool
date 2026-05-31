@@ -1,3 +1,8 @@
+/**
+ * @file QuickCommandBar.h
+ * @brief 快捷指令栏 - 底部可配置按钮栏，点击即发送预设命令
+ */
+
 #ifndef QUICKCOMMANDBAR_H
 #define QUICKCOMMANDBAR_H
 
@@ -45,16 +50,16 @@ class QuickCommandBar : public QWidget {
 public:
     explicit QuickCommandBar(QWidget* parent = nullptr);
 
-    // 设置指令列表
+    /** @brief 设置指令列表，替换当前全部指令并重建按钮 */
     void setCommands(const QList<QuickCommand>& commands);
 
-    // 获取当前指令列表
+    /** @brief 获取当前指令列表 */
     QList<QuickCommand> commands() const;
 
-    // 添加一条指令
+    /** @brief 添加一条指令到列表末尾并重建按钮 */
     void addCommand(const QuickCommand& cmd);
 
-    // 清空所有指令
+    /** @brief 清空所有指令并移除按钮 */
     void clearCommands();
 
     /**
@@ -78,10 +83,13 @@ public:
     void loadCommands();
 
 signals:
-    // 用户点击某个快捷指令，发出要发送的数据
+    /**
+     * @brief 用户点击某个快捷指令时发射，携带要发送的数据
+     * @param data 要发送的原始字节数据（已根据 isHex 完成转换）
+     */
     void commandTriggered(const QByteArray& data);
 
-    // 用户想编辑指令列表（外部可监听，用于自定义编辑面板）
+    /** @brief 编辑对话框关闭后发射，通知外部做额外处理 */
     void editRequested();
 
 private slots:
@@ -89,12 +97,18 @@ private slots:
     void onEditRequested();
 
 private:
+    /**
+     * @brief 根据当前 m_commands 列表重建所有快捷指令按钮
+     *
+     * 先清除 m_buttonLayout 中的旧按钮，再为每条指令创建新按钮。
+     * 每个按钮通过 connect 绑定点击事件到 commandTriggered 信号。
+     */
     void rebuildButtons();
 
-    QList<QuickCommand> m_commands;
-    QHBoxLayout* m_buttonLayout = nullptr;
-    QPushButton* m_addBtn = nullptr;
-    QPushButton* m_editBtn = nullptr;
+    QList<QuickCommand> m_commands;     ///< 当前指令列表
+    QHBoxLayout* m_buttonLayout = nullptr;  ///< 指令按钮的布局
+    QPushButton* m_addBtn = nullptr;    ///< 快速添加按钮（objectName: quickCmdAddBtn）
+    QPushButton* m_editBtn = nullptr;   ///< 打开编辑对话框按钮（objectName: quickCmdEditBtn）
 };
 
 #endif // QUICKCOMMANDBAR_H

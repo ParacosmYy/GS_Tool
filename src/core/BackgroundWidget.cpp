@@ -7,6 +7,7 @@
  */
 
 #include "BackgroundWidget.h"
+#include "ThemeManager.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMouseEvent>
@@ -24,6 +25,11 @@ BackgroundWidget::BackgroundWidget(QWidget* parent)
 {
     m_rippleTimer->setInterval(16); // ~60fps
     connect(m_rippleTimer, &QTimer::timeout, this, &BackgroundWidget::advanceRipples);
+
+    // 从 ThemeManager 初始化主题色（遮罩用 BgPrimary，涟漪用 Accent）
+    updateThemeColors();
+    connect(&ThemeManager::instance(), &ThemeManager::themeChanged,
+            this, &BackgroundWidget::updateThemeColors);
 
     // 加载默认背景图
     setBackgroundImage(":/backgrounds/default_bg.png");
@@ -352,5 +358,18 @@ void BackgroundWidget::advanceRipples()
         m_rippleTimer->stop();
     }
 
+    update();
+}
+
+/**
+ * @brief 从 ThemeManager 更新主题色并触发重绘
+ * 遮罩颜色使用 BgPrimary（深色背景），涟漪颜色使用 Accent（强调色）
+ * 主题切换时自动调用，无需手动更新
+ */
+void BackgroundWidget::updateThemeColors()
+{
+    auto& tm = ThemeManager::instance();
+    m_overlayColor = tm.color(ThemeManager::SemanticColor::BgPrimary);
+    m_rippleColor = tm.color(ThemeManager::SemanticColor::Accent);
     update();
 }

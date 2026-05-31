@@ -25,205 +25,92 @@
  * 协作关系:
  *   - BackgroundSettingsPopup: 提供模糊/透明度/涟漪开关/自定义背景图的 UI 控制
  *   - MainWindow: 作为中央部件承载所有面板
+ *   - ThemeManager: 提供涟漪和遮罩的主题色，监听 themeChanged 自动更新
  */
 class BackgroundWidget : public QWidget {
     Q_OBJECT
-    /** @brief 模糊半径属性，可通过 QSS 设置 (0=无模糊, 1~30) */
     Q_PROPERTY(qreal blurRadius READ blurRadius WRITE setBlurRadius NOTIFY blurChanged)
-    /** @brief 背景透明度属性，可通过 QSS 设置 (0=完全透明, 1=完全不透明) */
     Q_PROPERTY(qreal bgOpacity READ bgOpacity WRITE setBgOpacity NOTIFY opacityChanged)
 
 public:
-    /**
-     * @brief 构造背景控件
-     * 初始化涟漪动画定时器（~60fps）并加载默认背景图
-     * @param parent 父 widget
-     */
+    /** @brief 构造背景控件，初始化涟漪定时器（~60fps）并加载默认背景图 */
     explicit BackgroundWidget(QWidget* parent = nullptr);
 
-    /**
-     * @brief 设置背景图片
-     * 加载图片资源并生成模糊版本，触发重绘
-     * @param resourcePath Qt 资源路径或本地文件系统路径
-     */
+    /** @brief 设置背景图片（Qt 资源路径或本地文件系统路径） */
     void setBackgroundImage(const QString& resourcePath);
 
-    /**
-     * @brief 设置磨砂玻璃模糊半径
-     * @param radius 模糊半径 (0=无模糊, 最大30)
-     */
+    /** @brief 设置磨砂玻璃模糊半径 (0=无模糊, 最大30) */
     void setBlurRadius(qreal radius);
+    qreal blurRadius() const;                       ///< 当前模糊半径
 
-    /** @brief 获取当前模糊半径 */
-    qreal blurRadius() const;
-
-    /**
-     * @brief 设置背景透明度
-     * @param opacity 透明度 (0=完全透明, 1=完全不透明)
-     */
+    /** @brief 设置背景透明度 (0=完全透明, 1=完全不透明) */
     void setBgOpacity(qreal opacity);
+    qreal bgOpacity() const;                        ///< 当前背景透明度
 
-    /** @brief 获取当前背景透明度 */
-    qreal bgOpacity() const;
-
-    /**
-     * @brief 设置涟漪特效开关
-     * @param enabled true=启用点击涟漪, false=禁用并清除已有涟漪
-     */
+    /** @brief 设置涟漪特效开关（禁用时清除已有涟漪） */
     void setRippleEnabled(bool enabled);
+    bool rippleEnabled() const;                     ///< 涟漪是否启用
 
-    /** @brief 获取涟漪特效是否启用 */
-    bool rippleEnabled() const;
-
-    /**
-     * @brief 设置涟漪颜色（用于主题适配）
-     * @param color 涟漪颜色，默认跟随 accent 色 #89b4fa
-     */
+    /** @brief 设置涟漪颜色（默认跟随 ThemeManager Accent 色） */
     void setRippleColor(const QColor& color);
+    QColor rippleColor() const;                     ///< 当前涟漪颜色
 
-    /** @brief 获取当前涟漪颜色 */
-    QColor rippleColor() const;
-
-    /**
-     * @brief 设置半透明遮罩颜色
-     * @param color 遮罩颜色，默认黑色
-     */
+    /** @brief 设置半透明遮罩颜色（默认跟随 ThemeManager BgPrimary） */
     void setOverlayColor(const QColor& color);
+    QColor overlayColor() const;                    ///< 当前遮罩颜色
 
-    /** @brief 获取当前遮罩颜色 */
-    QColor overlayColor() const;
-
-    /**
-     * @brief 设置遮罩透明度
-     * @param opacity 透明度 (0=无遮罩, 1=全黑，默认0.2)
-     */
+    /** @brief 设置遮罩透明度 (0=无遮罩, 1=全黑) */
     void setOverlayOpacity(qreal opacity);
+    qreal overlayOpacity() const;                   ///< 当前遮罩透明度
 
-    /** @brief 获取当前遮罩透明度 */
-    qreal overlayOpacity() const;
-
-    /**
-     * @brief 设置模糊迭代次数
-     * @param iterations 迭代次数 (2~10)，次数越多磨砂效果越自然，默认5次
-     */
+    /** @brief 设置模糊迭代次数 (2~10)，越多磨砂效果越自然 */
     void setBlurIterations(int iterations);
+    int blurIterations() const;                     ///< 当前模糊迭代次数
 
-    /** @brief 获取当前模糊迭代次数 */
-    int blurIterations() const;
-
-    /** @brief 恢复为资源中的默认背景图 */
-    void resetToDefault();
-
-    /** @brief 获取当前背景图片路径 */
-    QString currentImagePath() const;
+    void resetToDefault();                          ///< 恢复默认背景图
+    QString currentImagePath() const;               ///< 当前背景图路径
 
 signals:
-    /** @brief 模糊半径变化信号 */
-    void blurChanged(qreal radius);
-
-    /** @brief 透明度变化信号 */
-    void opacityChanged(qreal opacity);
-
-    /** @brief 背景图片路径变化信号 */
-    void backgroundImageChanged(const QString& path);
+    void blurChanged(qreal radius);                 ///< 模糊半径变化
+    void opacityChanged(qreal opacity);             ///< 透明度变化
+    void backgroundImageChanged(const QString& path); ///< 背景图路径变化
 
 protected:
-    /**
-     * @brief 自绘事件 - 按层次渲染背景
-     * 绘制顺序: 黑色底色 → 模糊背景图(Cover模式) → 半透明遮罩 → 涟漪特效
-     * @param event 绘制事件
-     */
-    void paintEvent(QPaintEvent* event) override;
-
-    /**
-     * @brief 鼠标按下事件 - 创建涟漪动画
-     * 在点击位置生成一个新的涟漪并启动动画定时器
-     * @param event 鼠标事件
-     */
-    void mousePressEvent(QMouseEvent* event) override;
-
-    /**
-     * @brief 窗口尺寸变化事件 - 重新缓存缩放后的背景图
-     * 避免在 paintEvent 中每帧重复缩放，保证渲染性能
-     * @param event 尺寸变化事件
-     */
-    void resizeEvent(QResizeEvent* event) override;
+    void paintEvent(QPaintEvent* event) override;   ///< 四层渲染: 黑底→模糊图→遮罩→涟漪
+    void mousePressEvent(QMouseEvent* event) override; ///< 点击生成涟漪
+    void resizeEvent(QResizeEvent* event) override; ///< 重新缓存缩放背景图
 
 private:
-    /**
-     * @brief 从原始图片生成模糊版本
-     * 使用缩放法快速近似高斯模糊: 缩小→放大→放大，利用双线性插值平滑
-     * @param src 原始像素图
-     * @param radius 模糊半径
-     * @return 模糊后的像素图
-     */
+    /** @brief 缩放法快速近似高斯模糊（缩小→放大利用双线性插值平滑） */
     QPixmap generateBlurred(const QPixmap& src, qreal radius) const;
+    void regenerateScaledBackground();  ///< 缓存当前窗口尺寸的缩放背景图
+    void advanceRipples();              ///< 涟漪动画帧更新（扩散+衰减）
+    void updateThemeColors();           ///< 从 ThemeManager 加载主题色并重绘
 
-    /**
-     * @brief 缓存当前窗口尺寸下的缩放背景图
-     * 在 resize/blur/image 变化时调用，避免 paintEvent 每帧都做缩放
-     */
-    void regenerateScaledBackground();
+    QPixmap m_originalImage;            ///< 原始背景图（未模糊）
+    QPixmap m_blurredImage;             ///< 模糊后的背景图（原始尺寸）
+    QPixmap m_scaledBlurredImage;       ///< 缓存: 已缩放到当前窗口尺寸的模糊图
+    QPoint m_scaledOffset;              ///< 缓存: 缩放图的居中偏移量
 
-    /**
-     * @brief 涟漪动画帧更新
-     * 每帧: 扩大涟漪半径 + 降低透明度，移除已完成的涟漪
-     * 当所有涟漪完成后自动停止定时器
-     */
-    void advanceRipples();
+    qreal m_blurRadius = 10.0;          ///< 模糊半径 [0, 30]
+    qreal m_bgOpacity = 0.35;           ///< 背景透明度 [0, 1]
+    bool m_rippleEnabled = true;        ///< 涟漪特效开关
+    int m_blurIterations = 5;           ///< 模糊迭代次数 (2~10)
+    QColor m_overlayColor;              ///< 遮罩颜色（从 ThemeManager 初始化）
+    qreal m_overlayOpacity = 0.2;       ///< 遮罩透明度 [0, 1]
+    QColor m_rippleColor;               ///< 涟漪颜色（从 ThemeManager 初始化）
+    QString m_currentImagePath;         ///< 当前背景图路径
 
-    /** @brief 原始背景图（未模糊） */
-    QPixmap m_originalImage;
-
-    /** @brief 模糊后的背景图（原始尺寸，设置模糊半径时重新生成） */
-    QPixmap m_blurredImage;
-
-    /** @brief 缓存: 已缩放到当前窗口尺寸的模糊图（避免 paintEvent 中重复缩放） */
-    QPixmap m_scaledBlurredImage;
-
-    /** @brief 缓存: 缩放图的居中偏移量，避免 paintEvent 中重复计算 */
-    QPoint m_scaledOffset;
-
-    /** @brief 模糊半径，范围 [0, 30] */
-    qreal m_blurRadius = 10.0;
-
-    /** @brief 背景透明度，范围 [0, 1] */
-    qreal m_bgOpacity = 0.35;
-
-    /** @brief 涟漪特效开关 */
-    bool m_rippleEnabled = true;
-
-    /** @brief 模糊缩放迭代次数 (2~10)，次数越多磨砂效果越自然 */
-    int m_blurIterations = 5;
-
-    /** @brief 遮罩颜色，默认黑色 */
-    QColor m_overlayColor = QColor(0, 0, 0);
-
-    /** @brief 遮罩透明度 (0=无遮罩, 1=全黑) */
-    qreal m_overlayOpacity = 0.2;
-
-    /** @brief 涟漪颜色，默认 accent 色 #89b4fa */
-    QColor m_rippleColor = QColor(137, 180, 250);
-
-    /** @brief 当前背景图路径（资源路径或文件系统路径） */
-    QString m_currentImagePath;
-
-    /**
-     * @brief 涟漪特效数据结构
-     * 每次鼠标点击创建一个 Ripple，定时器驱动其扩散和衰减
-     */
+    /// @brief 涟漪数据: 每次点击创建一个，定时器驱动扩散和衰减
     struct Ripple {
-        QPointF center;             ///< 涟漪圆心（点击位置）
-        qreal currentRadius = 0.0;  ///< 当前扩散半径
-        qreal maxRadius = 150.0;    ///< 最大扩散半径（到达后移除）
-        qreal opacity = 0.6;        ///< 当前不透明度（递减至0时移除）
+        QPointF center;                 ///< 涟漪圆心
+        qreal currentRadius = 0.0;      ///< 当前扩散半径
+        qreal maxRadius = 150.0;        ///< 最大扩散半径
+        qreal opacity = 0.6;            ///< 不透明度（递减至0时移除）
     };
 
-    /** @brief 活跃涟漪列表 */
-    QVector<Ripple> m_ripples;
-
-    /** @brief 涟漪动画定时器，16ms 间隔（~60fps） */
-    QTimer* m_rippleTimer;
+    QVector<Ripple> m_ripples;          ///< 活跃涟漪列表
+    QTimer* m_rippleTimer;              ///< 涟漪动画定时器（~60fps）
 };
 
 #endif // BACKGROUNDWIDGET_H

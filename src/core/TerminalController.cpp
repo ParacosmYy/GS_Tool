@@ -215,7 +215,7 @@ void TerminalController::onExportData(QWidget* parent)
     if (filePath.isEmpty()) return;
 
     // 根据文件扩展名自动选择导出格式
-    DataExporter::Format format = DataExporter::Txt;
+    DataExporter::Format format = DataExporter::Plain;
     if (filePath.endsWith(".csv", Qt::CaseInsensitive))
         format = DataExporter::Csv;
     else if (filePath.endsWith(".bin", Qt::CaseInsensitive))

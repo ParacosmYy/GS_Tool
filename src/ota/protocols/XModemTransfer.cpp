@@ -277,7 +277,9 @@ void XModemTransfer::processReceivedData()
 void XModemTransfer::sendBlock()
 {
     int bs = blockSize();
-    qint64 offset = static_cast<qint64>((m_blockNumber - 1) % 256) * bs;
+    // 使用累计已发送字节数作为偏移，而非从块号反算。
+    // XModem 块号在 1-255 间循环，不能用于计算文件偏移。
+    qint64 offset = m_bytesSent;
     int dataSize = qMin(static_cast<int>(m_data.size() - offset), bs);
 
     if (dataSize <= 0) {

@@ -912,3 +912,107 @@ QLabel#driverInfoLbl {
     padding: 4px 8px;
     background-color: transparent;
 }
+
+/* === 波形图 (ChartWidget) === */
+
+/* 图表控制栏背景 */
+QWidget#chartToolbar {
+    background-color: #181825;
+    border-bottom: 1px solid #313244;
+}
+
+/* 图表区域背景 - 与面板底色协调 */
+QChartView {
+    background-color: #1e1e2e;
+}
+
+/* 暂停按钮 - checked 时显示 accent 色表示"暂停中" */
+QPushButton#chartPauseBtn {
+    background-color: #313244;
+    color: #cdd6f4;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 12px;
+}
+QPushButton#chartPauseBtn:hover { background-color: #45475a; border-color: #89b4fa; }
+QPushButton#chartPauseBtn:pressed { background-color: #585b70; }
+QPushButton#chartPauseBtn:checked {
+    background-color: #89b4fa;
+    color: #1e1e2e;
+    border-color: #89b4fa;
+    font-weight: bold;
+}
+QPushButton#chartPauseBtn:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }
+
+/* 清除按钮 */
+QPushButton#chartClearBtn {
+    background-color: #313244;
+    color: #cdd6f4;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 12px;
+}
+QPushButton#chartClearBtn:hover { background-color: #45475a; border-color: #f38ba8; color: #f38ba8; }
+QPushButton#chartClearBtn:pressed { background-color: #585b70; }
+QPushButton#chartClearBtn:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }
+
+/* 窗口大小下拉框 */
+QComboBox#chartWindowCombo {
+    background-color: #181825;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    padding: 3px 8px;
+    color: #cdd6f4;
+    font-size: 12px;
+}
+QComboBox#chartWindowCombo:hover { border-color: #89b4fa; }
+QComboBox#chartWindowCombo::drop-down { border: none; width: 20px; }
+
+/* 状态标签 */
+QLabel#chartStatusLabel {
+    color: #6c7086;
+    font-size: 11px;
+}
+
+/* === QuickCommandBar 编辑对话框 === */
+QDialog#quickCmdEditDlg {
+    background-color: #1e1e2e;
+}
+
+QTableWidget#quickCmdEditTable {
+    background-color: #181825;
+    alternate-background-color: #1e1e2e;
+    color: #cdd6f4;
+    border: 1px solid #313244;
+    gridline-color: #313244;
+    font-size: 12px;
+    selection-background-color: #313244;
+    selection-color: #89b4fa;
+}
+QTableWidget#quickCmdEditTable::item {
+    padding: 4px 6px;
+}
+
+QPushButton#quickCmdAddRowBtn {
+    background-color: #313244;
+    color: #89b4fa;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#quickCmdAddRowBtn:hover { background-color: #45475a; border-color: #89b4fa; }
+QPushButton#quickCmdAddRowBtn:pressed { background-color: #585b70; }
+
+QPushButton#quickCmdDelRowBtn {
+    background-color: #313244;
+    color: #f38ba8;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#quickCmdDelRowBtn:hover { background-color: #45475a; border-color: #f38ba8; }
+QPushButton#quickCmdDelRowBtn:pressed { background-color: #585b70; }
