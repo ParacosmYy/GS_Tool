@@ -70,6 +70,7 @@ public:
     static constexpr qint64 kMaxFirmwareSize = 64 * 1024 * 1024;
 
     explicit OtaManager(QObject* parent = nullptr);
+    ~OtaManager() override;  // 清理HEX转换产生的临时BIN文件
 
     /** @brief 设置数据连接(串口/TCP/UDP) */
     void setConnection(IConnection* conn);

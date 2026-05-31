@@ -51,6 +51,14 @@ OtaManager::OtaManager(QObject* parent)
             });
 }
 
+/** @brief 析构函数 — 清理HEX转换产生的临时BIN文件 */
+OtaManager::~OtaManager()
+{
+    if (!m_tempBinPath.isEmpty()) {
+        QFile::remove(m_tempBinPath);
+    }
+}
+
 // ============================================================================
 // 信号连接
 // ============================================================================

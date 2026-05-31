@@ -9,7 +9,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTimer>
-
 QString ZModemTransfer::stateToString(State s)
 {
     switch (s) {
@@ -25,15 +24,12 @@ QString ZModemTransfer::stateToString(State s)
     }
     return QStringLiteral("Unknown");
 }
-
 ZModemTransfer::ZModemTransfer(QObject* parent)
     : BaseTransfer(parent)
 {
     m_timeoutMs = 10000;
 }
-
 void ZModemTransfer::setFilePath(const QString& path) { m_filePath = path; }
-
 // ---- BaseTransfer钩子实现 ----
 bool ZModemTransfer::onStartInit()
 {
@@ -407,7 +403,6 @@ QByteArray ZModemTransfer::buildDataSubpacket(char endFlag, const QByteArray& da
 
 // ---- 发送流程方法 ----
 void ZModemTransfer::sendZRQINIT() { if (m_conn) m_conn->write(buildHexHeader(ZRQINIT)); }
-
 void ZModemTransfer::sendZFILE()
 {
     if (!m_conn) return;
@@ -417,7 +412,6 @@ void ZModemTransfer::sendZFILE()
     fi.append('\0');
     m_conn->write(buildDataSubpacket(ZCRCW, fi));
 }
-
 void ZModemTransfer::sendZDATA()
 {
     if (!m_conn) return;
@@ -428,7 +422,6 @@ void ZModemTransfer::sendZDATA()
     offsetData.append(static_cast<char>((m_fileOffset >> 24) & 0xFF));
     m_conn->write(buildBinHeader(ZDATA, offsetData));
 }
-
 void ZModemTransfer::sendDataSubpackets()
 {
     if (!m_conn) return;
@@ -465,7 +458,6 @@ void ZModemTransfer::sendDataSubpackets()
         QTimer::singleShot(0, this, &ZModemTransfer::sendDataSubpackets);
     }
 }
-
 void ZModemTransfer::sendZEOF()
 {
     if (!m_conn) return;
@@ -477,7 +469,6 @@ void ZModemTransfer::sendZEOF()
     offsetData.append(static_cast<char>((size >> 24) & 0xFF));
     m_conn->write(buildHexHeader(ZEOF, offsetData));
 }
-
 void ZModemTransfer::sendZFIN() { if (m_conn) m_conn->write(buildHexHeader(ZFIN)); }
 
 // ---- 工具方法 ----

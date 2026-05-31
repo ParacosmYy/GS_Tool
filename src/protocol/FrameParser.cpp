@@ -372,21 +372,15 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
         return;  // 有校验的帧走校验路径，不进入header-only逻辑
     }
 
-    // 路径D: 纯header帧(无长度/无帧尾/无校验)
-    // 通过检测下一个帧头的出现来确定当前帧结束
-    if (m_def.header.size() > 0 && m_buffer.size() > static_cast<int>(m_def.header.size())) {
-        if (byte == static_cast<unsigned char>(m_def.header.at(0))) {
-            // 回退最后一个字节(它属于下一帧的帧头)
-            m_buffer.chop(1);
-            completeFrame();
-            // 将当前字节作为新帧的第一个字节重新开始匹配
-            m_buffer.append(static_cast<char>(byte));
-            m_headerMatchPos = 1;
-            m_state = State::HeaderMatching;
-            if (!m_frameTimer.isValid() && m_frameTimeoutMs > 0) {
-                m_frameTimer.start();
-            }
-        }
+    // 路径D: 纯header帧 — 检测下一个帧头出现作为当前帧结束标记
+    if (m_def.header.size() > 0 && m_buffer.size() > static_cast<int>(m_def.header.size())
+        && byte == static_cast<unsigned char>(m_def.header.at(0))) {
+        m_buffer.chop(1);  // 回退属于下一帧的字节
+        completeFrame();
+        m_buffer.append(static_cast<char>(byte));
+        m_headerMatchPos = 1;
+        m_state = State::HeaderMatching;
+        if (!m_frameTimer.isValid() && m_frameTimeoutMs > 0) m_frameTimer.start();
     }
 }
 

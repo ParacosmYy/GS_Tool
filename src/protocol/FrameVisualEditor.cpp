@@ -388,14 +388,10 @@ void FrameVisualEditor::rebuildDefinition()
     m_def.checksumType = static_cast<ChecksumType>(m_checksumTypeCombo->currentIndex());
     m_def.checksumOffset = m_checksumOffsetSpin->value();
     m_def.checksumStart = m_checksumStartSpin->value();
-    switch (m_def.checksumType) {
-    case ChecksumType::None:      m_def.checksumSize = 0; break;
-    case ChecksumType::Sum8:      m_def.checksumSize = 1; break;
-    case ChecksumType::CRC8:      m_def.checksumSize = 1; break;
-    case ChecksumType::CRC16CCITT: m_def.checksumSize = 2; break;
-    case ChecksumType::CRC16Modbus: m_def.checksumSize = 2; break;
-    case ChecksumType::CRC32:     m_def.checksumSize = 4; break;
-    }
+    // 校验字节数: None=0, Sum8/CRC8=1, CRC16*=2, CRC32=4
+    static constexpr int csSizes[] = {0, 1, 1, 2, 2, 4};
+    m_def.checksumSize = (static_cast<int>(m_def.checksumType) < 6)
+        ? csSizes[static_cast<int>(m_def.checksumType)] : 0;
     m_def.checksumEnd = m_def.checksumOffset;
 
     m_def.fields.clear();
@@ -405,6 +401,16 @@ void FrameVisualEditor::rebuildDefinition()
         field.name = nameItem ? nameItem->text() : QString("field_%1").arg(i);
         auto* typeCombo = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(i, 1));
         field.type = typeCombo ? static_cast<FieldDef::Type>(typeCombo->currentIndex()) : FieldDef::UInt8;
+        // 读取字节序ComboBox，调整类型中的LE/BE标记
+        if (auto* ec = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(i, 4))) {
+            bool be = (ec->currentText() == "BE");
+            if (be && field.type == FieldDef::UInt16LE) field.type = FieldDef::UInt16BE;
+            else if (be && field.type == FieldDef::UInt32LE) field.type = FieldDef::UInt32BE;
+            else if (be && field.type == FieldDef::Int16LE) field.type = FieldDef::Int16BE;
+            else if (!be && field.type == FieldDef::UInt16BE) field.type = FieldDef::UInt16LE;
+            else if (!be && field.type == FieldDef::UInt32BE) field.type = FieldDef::UInt32LE;
+            else if (!be && field.type == FieldDef::Int16BE) field.type = FieldDef::Int16LE;
+        }
         auto* offsetItem = m_fieldTable->item(i, 2);
         field.offset = offsetItem ? offsetItem->text().toInt() : 0;
         auto* sizeItem = m_fieldTable->item(i, 3);
