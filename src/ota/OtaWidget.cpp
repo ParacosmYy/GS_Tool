@@ -254,7 +254,7 @@ void OtaWidget::onProgress(int percent, qint64 bytesSent, qint64 totalBytes)
     Q_UNUSED(totalBytes)
 
     if (m_progressAnim && m_progressAnim->state() == QAbstractAnimation::Running) m_progressAnim->stop();
-    delete m_progressAnim;
+    if (m_progressAnim) m_progressAnim->deleteLater();  // 延迟销毁，避免动画信号回调访问已释放对象
     m_progressAnim = nullptr;
 
     int oldValue = m_progressBar->value();
@@ -397,7 +397,7 @@ void OtaWidget::startCompletionAnimation()
         accent.blueF() * 0.5 + success.blueF() * 0.5);
 
     if (m_colorAnim && m_colorAnim->state() == QAbstractAnimation::Running) m_colorAnim->stop();
-    delete m_colorAnim;
+    if (m_colorAnim) m_colorAnim->deleteLater();  // 延迟销毁，避免动画信号回调访问已释放对象
     m_colorAnim = nullptr;
 
     // 阶段1: 立即设置中间混合色（布局属性由QSS主题控制）

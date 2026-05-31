@@ -172,9 +172,16 @@ void XModemTransfer::processReceivedData()
 
         case State::WaitingForStart:
             if (ch == NAK) {
-                // 接收方请求Checksum模式 — 但不覆盖用户显式选择的模式
-                // 仅当用户未显式选择(默认CRC)且接收方只支持Checksum时才降级
-                // NAK 在 SendingBlock 阶段仍然按协议处理(块重发)
+                // XMODEM协议规范: NAK表示接收方仅支持Checksum模式
+                // 当发送方配置为CRC/1K时，必须自动降级为Checksum模式
+                // 这是与仅支持Checksum的STM32 bootloader通信的必要兼容措施
+                if (m_mode == CRC || m_mode == OneK) {
+                    QString fromName = (m_mode == OneK)
+                        ? tr("XMODEM-1K") : tr("XMODEM-CRC");
+                    m_mode = Checksum;
+                    qWarning() << "XModem: receiver sent NAK, degraded to Checksum mode";
+                    emit modeDegraded(fromName, tr("XMODEM-Checksum"));
+                }
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
                 m_blockRetryCount = 0;

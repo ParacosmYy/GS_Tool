@@ -108,6 +108,7 @@ void ChartWidget::setupUI()
     m_yAxis->setRange(0, 100);
 
     m_chartView = new QChartView(m_chart);
+    m_chartView->setObjectName("chartView");  // QSS 选择器需要
     m_chartView->setRenderHint(QPainter::Antialiasing);
     layout->addWidget(m_chartView, 1);
 
@@ -351,6 +352,7 @@ void ChartWidget::applyThemeColors()
     // ---- 5. 数据线颜色 ----
     // 从当前主题对应的调色板中按通道索引重新分配颜色
     const QVector<QColor>& palette = ChartColors::colorsForTheme(isDark);
+    if (palette.isEmpty()) return;  // 防御性检查: 空调色板无法分配颜色
     int index = 0;
     for (auto it = m_seriesMap.begin(); it != m_seriesMap.end(); ++it, ++index) {
         QColor lineColor = palette[index % palette.size()];
@@ -371,7 +373,11 @@ void ChartWidget::createSeries(const QString& name, const QColor& color)
     if (!chColor.isValid()) {
         bool isDark = ThemeManager::instance().currentTheme().contains("dark");
         const QVector<QColor>& palette = ChartColors::colorsForTheme(isDark);
-        chColor = palette[m_seriesMap.size() % palette.size()];
+        if (!palette.isEmpty()) {
+            chColor = palette[m_seriesMap.size() % palette.size()];
+        } else {
+            chColor = Qt::cyan;  // 防御性回退: 空调色板时使用默认颜色
+        }
     }
 
     auto* series = new QLineSeries;

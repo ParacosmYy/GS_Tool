@@ -153,12 +153,14 @@ void MainWindow::setupUI()
 {
     // ---- 背景: 磨砂玻璃背景层作为中央部件 ----
     m_backgroundWidget = new BackgroundWidget(this);
+    m_backgroundWidget->setObjectName("backgroundWidget");  // QSS 选择器需要
     setCentralWidget(m_backgroundWidget);
     auto* bgLayout = new QVBoxLayout(m_backgroundWidget);
     bgLayout->setContentsMargins(0, 0, 0, 0);
     bgLayout->setSpacing(0);
 
     m_mainSplitter = new QSplitter(Qt::Horizontal, m_backgroundWidget);
+    m_mainSplitter->setObjectName("mainSplitter");  // QSS 选择器需要
 
     // ---- 左侧导航树（数据模型由 NavigationController.buildNavTree() 构建） ----
     m_navTree = new QTreeView;

@@ -324,6 +324,11 @@ QComboBox QAbstractItemView {
     border-radius: 6px;
 }
 
+/* 可编辑ComboBox内部QLineEdit使用等宽字体(波特率等数字输入) */
+QComboBox QLineEdit {
+    font-family: Consolas, "Courier New", monospace;
+}
+
 /* SpinBox */
 QSpinBox {
     background-color: #181825;
@@ -453,6 +458,38 @@ QTreeView#otaHistoryView {
 }
 QTreeView#otaHistoryView::alternate-background-color {
     background-color: #181825;
+}
+
+QPushButton#otaBrowseBtn {
+    background-color: #313244;
+    color: #89b4fa;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+QPushButton#otaBrowseBtn:hover { background-color: #45475a; border-color: #89b4fa; }
+QPushButton#otaBrowseBtn:pressed { background-color: #585b70; }
+QPushButton#otaBrowseBtn:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }
+
+QLabel#otaFileInfo {
+    color: #6c7086;
+    font-size: 11px;
+}
+
+QLabel#otaStatusLbl {
+    color: #a6adc8;
+    font-size: 13px;
+}
+QLabel#otaSpeedLbl {
+    color: #a6adc8;
+    font-size: 12px;
+    font-family: monospace;
+}
+QLabel#otaEtaLbl {
+    color: #6c7086;
+    font-size: 12px;
+    font-family: monospace;
 }
 
 QPushButton#otaClearHistory {
@@ -773,11 +810,59 @@ QPushButton#frameRemoveFieldBtn:hover { background-color: #45475a; border-color:
 QPushButton#frameRemoveFieldBtn:pressed { background-color: #585b70; }
 QPushButton#frameRemoveFieldBtn:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }
 
+QPushButton#frameMoveUpBtn,
+QPushButton#frameMoveDownBtn {
+    background-color: #313244;
+    color: #cdd6f4;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#frameMoveUpBtn:hover,
+QPushButton#frameMoveDownBtn:hover { background-color: #45475a; border-color: #89b4fa; color: #89b4fa; }
+QPushButton#frameMoveUpBtn:pressed,
+QPushButton#frameMoveDownBtn:pressed { background-color: #585b70; }
+QPushButton#frameMoveUpBtn:disabled,
+QPushButton#frameMoveDownBtn:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }
+
+QGroupBox#framePreviewGroup {
+    color: #cdd6f4;
+    border: 1px solid #313244;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding-top: 16px;
+    font-weight: bold;
+}
+
+QLabel#framePreviewLabel {
+    color: #a6adc8;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    background-color: #181825;
+    border: 1px solid #313244;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+/* === PanelManager 面板容器 - 透明背景让面板内容自主控制 === */
+QWidget#serialConfigPanel,
+QWidget#dataStatsPanel,
+QWidget#protocolViewPanel,
+QWidget#frameEditorPanel,
+QWidget#chartWidgetPanel,
+QWidget#otaWidgetPanel,
+QWidget#terminalPanel,
+QWidget#searchBarPanel,
+QWidget#bookmarkWidgetPanel {
+    background-color: transparent;
+}
+
 /* === 背景设置弹出面板 === */
 QWidget#bgSettingsPopup {
     background-color: #1e1e2e;
     border: 1px solid #45475a;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 QSlider#bgBlurSlider, QSlider#bgOpacitySlider {
     background: transparent;

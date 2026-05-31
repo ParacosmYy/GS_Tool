@@ -281,6 +281,7 @@ void FrameVisualEditor::onAddField()
 
     // 类型ComboBox(10种类型)
     auto* typeCombo = new QComboBox;
+    typeCombo->setObjectName("fieldTypeCombo");  // QSS 选择器需要
     typeCombo->addItems(fieldTypeNames());
     m_fieldTable->setCellWidget(row, 1, typeCombo);
     connect(typeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -297,6 +298,7 @@ void FrameVisualEditor::onAddField()
 
     // 字节序ComboBox(LE/BE/-)
     auto* endianCombo = new QComboBox;
+    endianCombo->setObjectName("fieldEndianCombo");  // QSS 选择器需要
     endianCombo->addItems({"LE", "BE", "-"});
     endianCombo->setToolTip(tr("字节序: LE=小端, BE=大端, -=不适用"));
     m_fieldTable->setCellWidget(row, 4, endianCombo);
@@ -371,6 +373,7 @@ void FrameVisualEditor::updateFieldTable()
         m_fieldTable->setItem(row, 0, new QTableWidgetItem(field.name));
 
         auto* typeCombo = new QComboBox;
+        typeCombo->setObjectName("fieldTypeCombo");  // QSS 选择器需要
         typeCombo->addItems(fieldTypeNames());
         typeCombo->setCurrentIndex(static_cast<int>(field.type));
         m_fieldTable->setCellWidget(row, 1, typeCombo);
@@ -381,6 +384,7 @@ void FrameVisualEditor::updateFieldTable()
         m_fieldTable->setItem(row, 3, new QTableWidgetItem(QString::number(field.size)));
 
         auto* endianCombo = new QComboBox;
+        endianCombo->setObjectName("fieldEndianCombo");  // QSS 选择器需要
         endianCombo->addItems({"LE", "BE", "-"});
         bool isBE = (field.type == FieldDef::UInt16BE || field.type == FieldDef::Int16BE);
         bool noEnd = (field.type == FieldDef::UInt8 || field.type == FieldDef::Int8 ||

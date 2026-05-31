@@ -127,6 +127,9 @@ signals:
     /** @brief OTA状态变化 @param state 新状态 */
     void otaStateChanged(OtaManager::OtaState state);
 
+    /** @brief 协议模式自动降级通知(如CRC→Checksum) @param message 降级描述消息 */
+    void modeDegraded(const QString& message);
+
 private:
     /** @brief 统一绑定BaseTransfer的信号到OtaManager的转发 */
     void connectTransferSignals(BaseTransfer* transfer);

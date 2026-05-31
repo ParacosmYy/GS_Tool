@@ -57,6 +57,9 @@ signals:
     /** @brief 传输速率和ETA更新信号 @param rateBytesPerSec 速率 @param etaSec ETA秒数，-1无法估算 */
     void transferStats(double rateBytesPerSec, double etaSec);
 
+    /** @brief 协议模式自动降级通知 @param fromMode 降级前模式名 @param toMode 降级后模式名 */
+    void modeDegraded(const QString& fromMode, const QString& toMode);
+
 protected:
     // === BaseTransfer 钩子实现 ===
 

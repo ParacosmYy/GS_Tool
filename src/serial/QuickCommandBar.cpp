@@ -179,6 +179,7 @@ void QuickCommandBar::onEditRequested()
     auto* delRowBtn = new QPushButton(tr("删除行"), &dlg);
     delRowBtn->setObjectName("quickCmdDelRowBtn");
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+    buttons->setObjectName("quickCmdDlgButtons");  // QSS 选择器需要
 
     btnLayout->addWidget(addRowBtn);
     btnLayout->addWidget(delRowBtn);

@@ -40,6 +40,15 @@ OtaManager::OtaManager(QObject* parent)
     // 连接各协议的传输速率信号
     connectXModemStats();
     connectYModemStats();
+
+    // 连接XModem模式降级信号
+    connect(m_xmodem, &XModemTransfer::modeDegraded,
+            this, [this](const QString& from, const QString& to) {
+                QString msg = tr("接收方仅支持Checksum模式，已自动从 %1 降级为 %2")
+                                  .arg(from, to);
+                qWarning() << "OtaManager:" << msg;
+                emit modeDegraded(msg);
+            });
 }
 
 // ============================================================================

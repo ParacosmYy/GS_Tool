@@ -370,8 +370,11 @@ void NavigationController::startBreathingAnimation(QLabel* statusLabel)
     m_connStatusEffect->setOpacity(1.0);
 
     // 销毁旧动画(如果存在)
-    delete m_breathingAnim;
-    m_breathingAnim = nullptr;
+    // 旧动画使用 DeleteWhenStopped + 无限循环，stop() 触发自动销毁
+    if (m_breathingAnim) {
+        m_breathingAnim->stop();
+        m_breathingAnim = nullptr;
+    }
 
     // 构建呼吸动画: 顺序组 [0.3->1.0, 1500ms] + [1.0->0.3, 1500ms], 无限循环
     auto* group = new QSequentialAnimationGroup(this);
@@ -413,12 +416,12 @@ void NavigationController::stopBreathingAnimation(QLabel* statusLabel)
         m_breathingAnim = nullptr;
     }
     // 恢复状态标签完全不透明
+    // 注意: setGraphicsEffect(nullptr) 会自动 delete 旧的 effect，不可手动再 delete
     if (m_connStatusEffect) {
         m_connStatusEffect->setOpacity(1.0);
         if (statusLabel) {
-            statusLabel->setGraphicsEffect(nullptr);
+            statusLabel->setGraphicsEffect(nullptr);  // Qt 自动 delete m_connStatusEffect
         }
-        delete m_connStatusEffect;
         m_connStatusEffect = nullptr;
     }
 }

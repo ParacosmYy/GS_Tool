@@ -450,10 +450,8 @@ bool DataLogger::seekToBookmark(int index)
         return false;
     }
 
-    // 注意: 书签时间戳是 Unix epoch 时间（ms since epoch），
-    // 但录制文件中的时间戳是距录制开始的偏移量（ms）。
-    // 此处直接使用书签时间戳调用 seekToTimestamp，
-    // 调用者需确保书签时间戳与录制文件时间戳处于同一时间参考系。
+    // 书签时间戳已与录制文件使用相同时间参考系（距录制开始的相对偏移量），
+    // 因此可直接传递给 seekToTimestamp() 进行定位
     return seekToTimestamp(m_bookmarks[index].timestamp);
 }
 
@@ -461,10 +459,16 @@ bool DataLogger::seekToBookmark(int index)
 
 void DataLogger::addBookmark(const QString& label, const QString& streamId)
 {
-    // 使用当前系统时间作为时间戳（毫秒精度 Unix 纪元时间）
-    qint64 ts = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    qint64 ts;
+    if (m_recording) {
+        // 录制中: 使用距录制开始的相对偏移量(ms)，与.edl文件时间戳一致
+        // 这样 seekToBookmark() 可以直接定位到正确的文件位置
+        ts = m_recordTimer.elapsed() - m_pauseOffset;
+    } else {
+        // 非录制状态: 使用系统纪元时间（此时seek无意义，但保持数据完整性）
+        ts = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    }
     m_bookmarks.append(DataBookmark(ts, label, streamId));
-    // 按时间戳升序排序，确保书签集合有序
     std::sort(m_bookmarks.begin(), m_bookmarks.end());
     emit bookmarksChanged();
 }

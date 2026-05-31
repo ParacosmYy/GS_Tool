@@ -103,8 +103,8 @@ void PanelManager::createPanels(OtaManager* otaManager, TerminalModel* terminalM
 
     // ---- 书签面板: 展示和管理录制时间轴上的书签标记 ----
     // 支持双击跳转、添加/删除/清空书签操作，与 DataLogger 联动
+    // objectName由BookmarkWidget构造函数设置("bookmarkWidget")，匹配QSS选择器
     m_bookmarkWidget = new BookmarkWidget();
-    m_bookmarkWidget->setObjectName("bookmarkWidgetPanel");
     m_bookmarkWidget->setVisible(false);
 }
 

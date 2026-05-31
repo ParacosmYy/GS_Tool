@@ -38,12 +38,14 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
     // ---- 模糊半径滑块 ----
     auto* blurLayout = new QHBoxLayout;
     auto* blurLbl = new QLabel(tr("磨砂模糊:"), this);
+    blurLbl->setObjectName("bgBlurLabel");  // QSS 选择器需要
     blurLbl->setFixedWidth(70);
     m_blurSlider = new QSlider(Qt::Horizontal, this);
     m_blurSlider->setObjectName("bgBlurSlider");
     m_blurSlider->setRange(0, 30);
     m_blurSlider->setValue(int(m_bgWidget->blurRadius()));
     m_blurValueLbl = new QLabel(QString::number(int(m_bgWidget->blurRadius())), this);
+    m_blurValueLbl->setObjectName("bgBlurValueLabel");  // QSS 选择器需要
     m_blurValueLbl->setFixedWidth(28);
     blurLayout->addWidget(blurLbl);
     blurLayout->addWidget(m_blurSlider, 1);
@@ -59,12 +61,14 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
     // ---- 背景透明度滑块 ----
     auto* opacityLayout = new QHBoxLayout;
     auto* opacityLbl = new QLabel(tr("背景透明度:"), this);
+    opacityLbl->setObjectName("bgOpacityLabel");  // QSS 选择器需要
     opacityLbl->setFixedWidth(70);
     m_opacitySlider = new QSlider(Qt::Horizontal, this);
     m_opacitySlider->setObjectName("bgOpacitySlider");
     m_opacitySlider->setRange(0, 100);
     m_opacitySlider->setValue(int(m_bgWidget->bgOpacity() * 100));
     m_opacityValueLbl = new QLabel(QString::number(int(m_bgWidget->bgOpacity() * 100)) + "%", this);
+    m_opacityValueLbl->setObjectName("bgOpacityValueLabel");  // QSS 选择器需要
     m_opacityValueLbl->setFixedWidth(36);
     opacityLayout->addWidget(opacityLbl);
     opacityLayout->addWidget(m_opacitySlider, 1);
@@ -79,6 +83,7 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
 
     // ---- 涟漪特效开关 ----
     auto* rippleCheck = new QCheckBox(tr("点击涟漪特效"), this);
+    rippleCheck->setObjectName("bgRippleCheck");  // QSS 选择器需要
     rippleCheck->setChecked(m_bgWidget->rippleEnabled());
     mainLayout->addWidget(rippleCheck);
 
@@ -86,6 +91,7 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
 
     // ---- 分隔线 ----
     auto* separator = new QFrame(this);
+    separator->setObjectName("bgSeparator");  // QSS 选择器需要
     separator->setFrameShape(QFrame::HLine);
     separator->setFrameShadow(QFrame::Sunken);
     mainLayout->addWidget(separator);
