@@ -56,7 +56,7 @@ void OtaWidget::setupUI()
     configLayout->setSpacing(8);
 
     m_protocolCombo = new QComboBox;
-    m_protocolCombo->addItem(tr("XMODEM-CRC (Recommended)"), "xmodem-crc");
+    m_protocolCombo->addItem(tr("XMODEM-CRC (推荐)"), "xmodem-crc");
     m_protocolCombo->addItem(tr("XMODEM-Checksum"), "xmodem-checksum");
     m_protocolCombo->addItem(tr("XMODEM-1K"), "xmodem-1k");
     m_protocolCombo->addItem(tr("YMODEM"), "ymodem");
@@ -160,12 +160,12 @@ void OtaWidget::setupUI()
 
 void OtaWidget::onBrowseFile()
 {
-    QString filter = tr("Firmware files (*.bin *.hex);;Binary files (*.bin);;Intel HEX (*.hex);;All files (*.*)");
-    QString path = QFileDialog::getOpenFileName(this, tr("Select Firmware File"),
+    QString filter = tr("固件文件 (*.bin *.hex);;二进制文件 (*.bin);;Intel HEX (*.hex);;所有文件 (*.*)");
+    QString path = QFileDialog::getOpenFileName(this, tr("选择固件文件"),
                                                  QString(), filter);
     if (!path.isEmpty()) {
         m_filePathEdit->setText(path);
-        appendLog(tr("Selected file: %1").arg(path));
+        appendLog(tr("已选择文件: %1").arg(path));
     }
 }
 
@@ -173,7 +173,7 @@ void OtaWidget::onStartTransfer()
 {
     QString filePath = m_filePathEdit->text().trimmed();
     if (filePath.isEmpty()) {
-        appendLog(tr("Error: No firmware file selected"));
+        appendLog(tr("错误: 未选择固件文件"));
         return;
     }
 
@@ -184,7 +184,7 @@ void OtaWidget::onStartTransfer()
     m_transferStartTime = QDateTime::currentDateTime();
 
     QString protocol = m_protocolCombo->currentData().toString();
-    appendLog(tr("Starting transfer: %1, Protocol: %2").arg(filePath, protocol));
+    appendLog(tr("开始传输: %1, 协议: %2").arg(filePath, protocol));
 
     m_transferTimer.start();
     m_lastBytesSent = 0;
@@ -192,21 +192,21 @@ void OtaWidget::onStartTransfer()
 
     if (!m_manager->startTransfer(filePath, protocol)) {
         setTransferring(false);
-        appendLog(tr("Failed to start transfer"));
+        appendLog(tr("传输启动失败"));
     }
 }
 
 void OtaWidget::onCancelTransfer()
 {
     m_manager->cancelTransfer();
-    appendLog(tr("Transfer cancelled by user"));
+    appendLog(tr("用户已取消传输"));
     setTransferring(false);
 }
 
 void OtaWidget::onProgress(int percent, qint64 bytesSent, qint64 totalBytes)
 {
     m_progressBar->setValue(percent);
-    m_statusLbl->setText(tr("Transferring: %1%").arg(percent));
+    m_statusLbl->setText(tr("传输中: %1%").arg(percent));
 
     // 计算速率和ETA
     qint64 elapsed = m_transferTimer.elapsed();
@@ -238,11 +238,11 @@ void OtaWidget::onTransferComplete()
 {
     setTransferring(false);
     m_progressBar->setValue(100);
-    m_statusLbl->setText(tr("Transfer Complete"));
+    m_statusLbl->setText(tr("传输完成"));
     m_etaLbl->setText("");
 
     qint64 elapsed = m_transferTimer.elapsed();
-    appendLog(tr("Transfer completed in %1s").arg(elapsed / 1000.0, 0, 'f', 1));
+    appendLog(tr("传输完成，耗时 %1s").arg(elapsed / 1000.0, 0, 'f', 1));
 
     // 记录成功历史
     OtaRecord rec;
@@ -258,8 +258,8 @@ void OtaWidget::onTransferComplete()
 void OtaWidget::onTransferError(const QString& reason)
 {
     setTransferring(false);
-    m_statusLbl->setText(tr("Error: %1").arg(reason));
-    appendLog(tr("Error: %1").arg(reason));
+    m_statusLbl->setText(tr("错误: %1").arg(reason));
+    appendLog(tr("错误: %1").arg(reason));
 
     // 记录失败历史
     OtaRecord rec;

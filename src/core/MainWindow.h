@@ -15,6 +15,8 @@
 #include <QCompleter>
 #include <QPropertyAnimation>
 #include <QGraphicsOpacityEffect>
+#include <QVector>
+#include <functional>
 #include "ConnectionManager.h"
 #include "ThemeManager.h"
 #include "terminal/TerminalWidget.h"
@@ -35,6 +37,14 @@
 #include "ota/OtaManager.h"
 #include "ota/OtaWidget.h"
 #include "Constants.h"
+
+// 导航树 → 面板映射条目
+// name: 导航树叶子节点的显示文本（使用裸字符串，运行时通过 tr() 匹配翻译后的值）
+// widget: 对应的面板 QWidget 指针（在 buildNavPanelMappings 中绑定）
+struct NavPanelMapping {
+    const char* name;       // 翻译键，传给 tr() 进行运行时翻译匹配
+    QWidget* widget;        // 目标面板指针
+};
 
 // 主窗口 - 左侧导航树 + 右侧功能面板
 // IDE风格布局，支持多连接Tab切换
@@ -108,6 +118,15 @@ private:
     void updateDataStatistics();
     void loadSettings();
     void saveSettings();
+
+    // 构建导航树名称 → 面板widget的映射表（在所有面板创建完成后调用）
+    void buildNavPanelMappings();
+
+    // 面板切换: 带淡出旧面板 + 淡入新面板动画
+    void switchToPanel(QWidget* newPanel);
+
+    // 收集所有可切换面板widget（用于全部隐藏）
+    QVector<QWidget*> allSwitchablePanels() const;
 
     // 核心组件
     ConnectionManager* m_connManager;
@@ -188,6 +207,15 @@ private:
     // 启动/停止连接状态呼吸动画
     void startBreathingAnimation();
     void stopBreathingAnimation();
+
+    // 导航面板映射表（数据驱动，消除 if-else 链）
+    QVector<NavPanelMapping> m_navPanelMappings;
+
+    // 当前显示的面板（用于淡出动画）
+    QWidget* m_currentPanel = nullptr;
+
+    // 是否正在执行面板切换动画（防止动画期间重复触发切换）
+    bool m_panelSwitching = false;
 };
 
 #endif // MAINWINDOW_H

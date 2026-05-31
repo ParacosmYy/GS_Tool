@@ -126,15 +126,14 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
         return;
     }
 
-    // 获取模型数据
-    auto lines = m_model->lines();
-    int totalLines = lines.size();
+    // 获取模型数据行数（不拷贝数据）
+    int totalLines = m_model->lineCount();
 
-    // 如果缓存失效，重新格式化
+    // 如果缓存失效，只格式化新增的行（增量更新）
     if (m_cachedLineCount != totalLines) {
         m_cachedLines.resize(totalLines);
         for (int i = m_cachedLineCount; i < totalLines; ++i) {
-            m_cachedLines[i] = formatLine(lines[i]);
+            m_cachedLines[i] = formatLine(m_model->lineAt(i));
         }
         m_cachedLineCount = totalLines;
 
@@ -152,6 +151,9 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
     // 逐行绘制
     int y = 0;
     for (int i = startLine; i < endLine; ++i) {
+        // 通过 lineAt() 直接访问单行数据，避免全量拷贝
+        const TerminalLine& line = m_model->lineAt(i);
+
         // 选择背景色
         if (i >= m_selectionStartLine && i <= m_selectionEndLine
             && m_selectionStartLine >= 0) {
@@ -159,7 +161,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
         }
 
         // 根据方向设置文字颜色
-        if (lines[i].direction == DataDirection::Tx) {
+        if (line.direction == DataDirection::Tx) {
             painter.setPen(m_txColor);
         } else {
             painter.setPen(m_rxColor);
@@ -169,13 +171,13 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
         int xOffset = 0;
         if (m_showTimestamp) {
             painter.setPen(m_timestampColor);
-            QString ts = lines[i].timestamp.toString("HH:mm:ss.zzz");
+            QString ts = line.timestamp.toString("HH:mm:ss.zzz");
             painter.drawText(4, y + m_lineHeight - 4, ts);
             QFontMetrics fm(m_font);
             xOffset = fm.horizontalAdvance(ts) + 12;
 
             // 恢复数据颜色
-            if (lines[i].direction == DataDirection::Tx) {
+            if (line.direction == DataDirection::Tx) {
                 painter.setPen(m_txColor);
             } else {
                 painter.setPen(m_rxColor);

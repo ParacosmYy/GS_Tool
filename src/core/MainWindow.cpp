@@ -35,7 +35,11 @@ MainWindow::MainWindow(QWidget* parent)
     setupUI();
     setupToolbar();
     setupStatusBar();
+    buildNavPanelMappings();
     connectSignals();
+
+    // 初始面板状态: 终端为默认可见面板
+    m_currentPanel = m_terminal;
 
     // 加载保存的设置（主题、窗口几何、串口配置）
     loadSettings();
@@ -321,6 +325,127 @@ void MainWindow::setupStatusBar()
     statusBar()->addPermanentWidget(m_txBytesLbl);
 }
 
+void MainWindow::buildNavPanelMappings()
+{
+    // 映射表: 导航树叶子节点名称 → 对应的面板widget
+    // name 字段是翻译键，运行时通过 tr(name) 匹配导航树中翻译后的文本
+    m_navPanelMappings = {
+        {QT_TRANSLATE_NOOP("MainWindow", "配置"),       m_serialConfig},
+        {QT_TRANSLATE_NOOP("MainWindow", "终端"),       m_terminal},
+        {QT_TRANSLATE_NOOP("MainWindow", "统计"),       m_dataStats},
+        {QT_TRANSLATE_NOOP("MainWindow", "协议"),       m_protocolView},
+        {QT_TRANSLATE_NOOP("MainWindow", "帧编辑器"),   m_frameEditor},
+        {QT_TRANSLATE_NOOP("MainWindow", "波形图"),     m_chartWidget},
+        {QT_TRANSLATE_NOOP("MainWindow", "OTA升级"),    m_otaWidget},
+    };
+}
+
+QVector<QWidget*> MainWindow::allSwitchablePanels() const
+{
+    return {m_serialConfig, m_terminal, m_dataStats,
+            m_protocolView, m_frameEditor, m_chartWidget, m_otaWidget};
+}
+
+void MainWindow::switchToPanel(QWidget* newPanel)
+{
+    // 防止动画期间重复触发切换
+    if (m_panelSwitching) return;
+
+    // 如果目标是当前已显示的面板，无需切换
+    if (m_currentPanel == newPanel) return;
+
+    QWidget* oldPanel = m_currentPanel;
+
+    // 更新当前面板追踪
+    m_currentPanel = newPanel;
+
+    // 隐藏所有非当前、非旧面板，并清除残留的 opacity effect
+    for (auto* w : allSwitchablePanels()) {
+        if (w && w != newPanel && w != oldPanel) {
+            if (w->graphicsEffect()) {
+                w->setGraphicsEffect(nullptr);
+            }
+            w->setVisible(false);
+        }
+    }
+
+    if (!newPanel) return;
+
+    // 如果有旧面板且旧面板可见，执行: 淡出旧面板 → 显示新面板 → 淡入新面板
+    if (oldPanel && oldPanel->isVisible()) {
+        m_panelSwitching = true;
+
+        // 旧面板: 200ms InCubic opacity 1.0 → 0.0 淡出
+        QGraphicsOpacityEffect* fadeOutEffect = new QGraphicsOpacityEffect(oldPanel);
+        oldPanel->setGraphicsEffect(fadeOutEffect);
+
+        QPropertyAnimation* fadeOut = new QPropertyAnimation(fadeOutEffect, "opacity");
+        fadeOut->setStartValue(1.0);
+        fadeOut->setEndValue(0.0);
+        fadeOut->setDuration(200);
+        fadeOut->setEasingCurve(QEasingCurve::InCubic);
+
+        // 淡出完成后: 隐藏旧面板 → 显示新面板 → 淡入新面板
+        connect(fadeOut, &QPropertyAnimation::finished, this, [this, oldPanel, newPanel]() {
+            // 清除旧面板的 effect 并隐藏
+            if (oldPanel->graphicsEffect()) {
+                oldPanel->setGraphicsEffect(nullptr);
+            }
+            oldPanel->setVisible(false);
+
+            // 显示新面板
+            newPanel->setVisible(true);
+
+            // 新面板: 250ms OutCubic opacity 0.0 → 1.0 淡入
+            QGraphicsOpacityEffect* fadeInEffect = new QGraphicsOpacityEffect(newPanel);
+            fadeInEffect->setOpacity(0.0);
+            newPanel->setGraphicsEffect(fadeInEffect);
+
+            QPropertyAnimation* fadeIn = new QPropertyAnimation(fadeInEffect, "opacity");
+            fadeIn->setStartValue(0.0);
+            fadeIn->setEndValue(1.0);
+            fadeIn->setDuration(250);
+            fadeIn->setEasingCurve(QEasingCurve::OutCubic);
+
+            // 淡入完成后清除 effect，恢复正常绘制性能
+            connect(fadeIn, &QPropertyAnimation::finished, newPanel, [newPanel, fadeInEffect]() {
+                if (newPanel->graphicsEffect() == fadeInEffect) {
+                    newPanel->setGraphicsEffect(nullptr);
+                }
+            });
+
+            connect(fadeIn, &QPropertyAnimation::finished, this, [this]() {
+                m_panelSwitching = false;
+            });
+
+            fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
+        });
+
+        fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
+    } else {
+        // 无旧面板（首次切换或旧面板已隐藏），直接淡入新面板
+        newPanel->setVisible(true);
+
+        QGraphicsOpacityEffect* fadeInEffect = new QGraphicsOpacityEffect(newPanel);
+        fadeInEffect->setOpacity(0.0);
+        newPanel->setGraphicsEffect(fadeInEffect);
+
+        QPropertyAnimation* fadeIn = new QPropertyAnimation(fadeInEffect, "opacity");
+        fadeIn->setStartValue(0.0);
+        fadeIn->setEndValue(1.0);
+        fadeIn->setDuration(250);
+        fadeIn->setEasingCurve(QEasingCurve::OutCubic);
+
+        connect(fadeIn, &QPropertyAnimation::finished, newPanel, [newPanel, fadeInEffect]() {
+            if (newPanel->graphicsEffect() == fadeInEffect) {
+                newPanel->setGraphicsEffect(nullptr);
+            }
+        });
+
+        fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+}
+
 void MainWindow::connectSignals()
 {
     // 串口连接/断开
@@ -415,69 +540,30 @@ void MainWindow::connectSignals()
                 m_chartWidget->configureFromFrameDefinition(def);
             });
 
-    // 导航树点击切换面板 — 使用map映射面板名称到widget，消除重复的setVisible调用
+    // 导航树点击切换面板 — 数据驱动映射表查找，无 if-else 链
     connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
         QString text = index.data().toString();
 
-        // 面板映射: 导航名 → 对应的widget
-        static const QVector<QPair<QString, QWidget*>> panels = {
-            {tr("配置"), nullptr},       // 特殊处理，用m_serialConfig
-            {tr("终端"), nullptr},     // 特殊处理，用m_terminal
-            {tr("统计"), nullptr},
-            {tr("协议"), nullptr},
-            {tr("帧编辑器"), nullptr},
-            {tr("波形图"), nullptr},
-            {tr("OTA升级"), nullptr},
-        };
-
-        // 功能性节点（不走面板切换）
+        // 功能性节点（不走面板切换，直接触发动作）
         if (text == tr("数据导出")) { onExportData(); return; }
         if (text == tr("TCP客户端")) { onConnectNetwork(ConnectionType::TcpClient); return; }
         if (text == tr("TCP服务端")) { onConnectNetwork(ConnectionType::TcpServer); return; }
         if (text == tr("UDP")) { onConnectNetwork(ConnectionType::Udp); return; }
 
-        // 收集所有可切换面板widget
-        QWidget* allPanels[] = {
-            m_serialConfig, m_terminal, m_dataStats,
-            m_protocolView, m_frameEditor, m_chartWidget, m_otaWidget
-        };
-
-        // 确定要显示的widget
+        // 通过映射表查找目标面板widget
         QWidget* target = nullptr;
-        if (text == tr("配置"))        target = m_serialConfig;
-        else if (text == tr("终端")) target = m_terminal;
-        else if (text == tr("统计"))   target = m_dataStats;
-        else if (text == tr("协议"))     target = m_protocolView;
-        else if (text == tr("帧编辑器")) target = m_frameEditor;
-        else if (text == tr("波形图"))        target = m_chartWidget;
-        else if (text == tr("OTA升级"))          target = m_otaWidget;
-
-        // 切换: 隐藏所有，只显示目标
-        for (auto* w : allPanels) {
-            if (w) w->setVisible(w == target);
+        for (const auto& mapping : m_navPanelMappings) {
+            if (text == tr(mapping.name)) {
+                target = mapping.widget;
+                break;
+            }
         }
 
-        // 面板滑入淡入动画: 250ms, OutCubic, opacity 0.0 → 1.0
-        if (target) {
-            // 为目标面板创建透明度效果（如果尚未创建或被移除）
-            QGraphicsOpacityEffect* fadeEffect = new QGraphicsOpacityEffect(target);
-            fadeEffect->setOpacity(0.0);
-            target->setGraphicsEffect(fadeEffect);
+        // 未匹配的面板节点（如分组节点"串口""网络""工具"），忽略
+        if (!target) return;
 
-            QPropertyAnimation* fadeIn = new QPropertyAnimation(fadeEffect, "opacity");
-            fadeIn->setStartValue(0.0);
-            fadeIn->setEndValue(1.0);
-            fadeIn->setDuration(250);
-            fadeIn->setEasingCurve(QEasingCurve::OutCubic);
-            // 动画结束后清除 effect，恢复正常绘制性能
-            connect(fadeIn, &QPropertyAnimation::finished, target, [target, fadeEffect]() {
-                // 检查 effect 是否仍关联到该 widget（防止面板已切换）
-                if (target->graphicsEffect() == fadeEffect) {
-                    target->setGraphicsEffect(nullptr);
-                }
-            });
-            fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
-        }
+        // 调用统一的带动画面板切换方法
+        switchToPanel(target);
     });
 }
 
@@ -713,11 +799,11 @@ void MainWindow::onLanguageChanged(int index)
     QString langCode = m_langCombo->itemData(index).toString();
     SettingsManager::instance().saveLanguage(langCode);
 
-    // 提示用户需要重启生效（QTranslator需要在main()中重新加载）
+    // 用硬编码字符串而非tr()，因为翻译此刻尚未生效
     if (langCode == Language::ENGLISH) {
-        statusBar()->showMessage(tr("语言已切换为English，重启后生效"), 3000);
+        statusBar()->showMessage(QStringLiteral("Language changed to English, restart to apply"), 3000);
     } else {
-        statusBar()->showMessage(tr("语言已切换为中文，重启后生效"), 3000);
+        statusBar()->showMessage(QStringLiteral("语言已切换为中文，重启后生效"), 3000);
     }
 }
 
@@ -772,9 +858,8 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
             m_currentConn ? m_currentConn->name() : ""));
         stateStr = "connected";
         m_serialConfig->setConnected(true);
-        m_serialConfig->setVisible(false);
-        m_terminal->setVisible(true);
-        m_dataStats->setVisible(false);
+        // 连接成功后自动切换到终端面板（带动画）
+        switchToPanel(m_terminal);
         stopBreathingAnimation();
         break;
     case ConnectionState::Disconnected:

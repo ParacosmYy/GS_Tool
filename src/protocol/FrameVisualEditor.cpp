@@ -19,74 +19,74 @@ void FrameVisualEditor::setupUI()
     mainLayout->setContentsMargins(12, 8, 12, 8);
 
     // ---- 帧头/帧尾配置 ----
-    auto* headerGroup = new QGroupBox(tr("Frame Header/Footer"));
+    auto* headerGroup = new QGroupBox(tr("帧头/帧尾配置"));
     auto* headerLayout = new QFormLayout(headerGroup);
 
     m_headerEdit = new QLineEdit;
     m_headerEdit->setPlaceholderText("AA 55");
-    m_headerEdit->setToolTip(tr("Frame header bytes in HEX, e.g. AA 55"));
-    headerLayout->addRow(tr("Header:"), m_headerEdit);
+    m_headerEdit->setToolTip(tr("帧头HEX字节，如 AA 55"));
+    headerLayout->addRow(tr("帧头:"), m_headerEdit);
 
     m_footerEdit = new QLineEdit;
     m_footerEdit->setPlaceholderText("0D 0A");
-    m_footerEdit->setToolTip(tr("Frame footer bytes in HEX (optional)"));
-    headerLayout->addRow(tr("Footer:"), m_footerEdit);
+    m_footerEdit->setToolTip(tr("帧尾HEX字节（可选）"));
+    headerLayout->addRow(tr("帧尾:"), m_footerEdit);
 
     mainLayout->addWidget(headerGroup);
 
     // ---- 长度字段配置 ----
-    auto* lengthGroup = new QGroupBox(tr("Length Field"));
+    auto* lengthGroup = new QGroupBox(tr("长度字段"));
     auto* lengthLayout = new QFormLayout(lengthGroup);
 
     m_lengthOffsetSpin = new QSpinBox;
     m_lengthOffsetSpin->setRange(-1, 255);
     m_lengthOffsetSpin->setValue(-1);
-    m_lengthOffsetSpin->setSpecialValueText(tr("None"));
-    lengthLayout->addRow(tr("Offset:"), m_lengthOffsetSpin);
+    m_lengthOffsetSpin->setSpecialValueText(tr("无"));
+    lengthLayout->addRow(tr("偏移:"), m_lengthOffsetSpin);
 
     m_lengthSizeCombo = new QComboBox;
     m_lengthSizeCombo->addItems({"1 byte", "2 bytes"});
-    lengthLayout->addRow(tr("Size:"), m_lengthSizeCombo);
+    lengthLayout->addRow(tr("大小:"), m_lengthSizeCombo);
 
-    m_lengthBEndianCheck = new QCheckBox(tr("Big Endian"));
+    m_lengthBEndianCheck = new QCheckBox(tr("大端序"));
     lengthLayout->addRow(m_lengthBEndianCheck);
 
     m_lengthAdjustSpin = new QSpinBox;
     m_lengthAdjustSpin->setRange(-256, 256);
     m_lengthAdjustSpin->setValue(0);
-    m_lengthAdjustSpin->setToolTip(tr("Actual payload = length field value - adjust"));
-    lengthLayout->addRow(tr("Adjust:"), m_lengthAdjustSpin);
+    m_lengthAdjustSpin->setToolTip(tr("实际负载 = 长度字段值 - 调整值"));
+    lengthLayout->addRow(tr("调整:"), m_lengthAdjustSpin);
 
     mainLayout->addWidget(lengthGroup);
 
     // ---- 校验配置 ----
-    auto* checksumGroup = new QGroupBox(tr("Checksum"));
+    auto* checksumGroup = new QGroupBox(tr("校验配置"));
     auto* checksumLayout = new QFormLayout(checksumGroup);
 
     m_checksumTypeCombo = new QComboBox;
     m_checksumTypeCombo->addItems({"None", "Sum8", "CRC8", "CRC16-CCITT", "CRC16-Modbus", "CRC32"});
-    checksumLayout->addRow(tr("Type:"), m_checksumTypeCombo);
+    checksumLayout->addRow(tr("类型:"), m_checksumTypeCombo);
 
     m_checksumOffsetSpin = new QSpinBox;
     m_checksumOffsetSpin->setRange(-1, 255);
     m_checksumOffsetSpin->setValue(-1);
-    m_checksumOffsetSpin->setSpecialValueText(tr("Auto"));
-    checksumLayout->addRow(tr("Offset:"), m_checksumOffsetSpin);
+    m_checksumOffsetSpin->setSpecialValueText(tr("自动"));
+    checksumLayout->addRow(tr("偏移:"), m_checksumOffsetSpin);
 
     m_checksumStartSpin = new QSpinBox;
     m_checksumStartSpin->setRange(0, 255);
     m_checksumStartSpin->setValue(0);
-    checksumLayout->addRow(tr("Start:"), m_checksumStartSpin);
+    checksumLayout->addRow(tr("起始:"), m_checksumStartSpin);
 
     mainLayout->addWidget(checksumGroup);
 
     // ---- 字段定义表 ----
-    auto* fieldGroup = new QGroupBox(tr("Data Fields"));
+    auto* fieldGroup = new QGroupBox(tr("数据字段"));
     auto* fieldLayout = new QVBoxLayout(fieldGroup);
 
     m_fieldTable = new QTableWidget(0, 5);
     m_fieldTable->setHorizontalHeaderLabels({
-        tr("Name"), tr("Type"), tr("Offset"), tr("Size"), tr("Unit")
+        tr("名称"), tr("类型"), tr("偏移"), tr("大小"), tr("单位")
     });
     m_fieldTable->horizontalHeader()->setStretchLastSection(true);
     m_fieldTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -95,8 +95,8 @@ void FrameVisualEditor::setupUI()
     fieldLayout->addWidget(m_fieldTable);
 
     auto* fieldBtnLayout = new QHBoxLayout;
-    m_addFieldBtn = new QPushButton(tr("Add Field"));
-    m_removeFieldBtn = new QPushButton(tr("Remove Field"));
+    m_addFieldBtn = new QPushButton(tr("添加字段"));
+    m_removeFieldBtn = new QPushButton(tr("删除字段"));
     fieldBtnLayout->addWidget(m_addFieldBtn);
     fieldBtnLayout->addWidget(m_removeFieldBtn);
     fieldBtnLayout->addStretch();
@@ -105,7 +105,7 @@ void FrameVisualEditor::setupUI()
     mainLayout->addWidget(fieldGroup, 1);
 
     // ---- 应用按钮 ----
-    m_applyBtn = new QPushButton(tr("Apply Definition"));
+    m_applyBtn = new QPushButton(tr("应用定义"));
     m_applyBtn->setObjectName("applyDefBtn");
     m_applyBtn->setMinimumHeight(32);
     mainLayout->addWidget(m_applyBtn);

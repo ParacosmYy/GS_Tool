@@ -292,103 +292,103 @@
 <context>
     <name>FrameVisualEditor</name>
     <message>
-        <source>Frame Header/Footer</source>
+        <source>帧头/帧尾配置</source>
         <translation>Frame Header/Footer</translation>
     </message>
     <message>
-        <source>Frame header bytes in HEX, e.g. AA 55</source>
+        <source>帧头HEX字节，如 AA 55</source>
         <translation>Frame header bytes in HEX, e.g. AA 55</translation>
     </message>
     <message>
-        <source>Header:</source>
+        <source>帧头:</source>
         <translation>Header:</translation>
     </message>
     <message>
-        <source>Frame footer bytes in HEX (optional)</source>
+        <source>帧尾HEX字节（可选）</source>
         <translation>Frame footer bytes in HEX (optional)</translation>
     </message>
     <message>
-        <source>Footer:</source>
+        <source>帧尾:</source>
         <translation>Footer:</translation>
     </message>
     <message>
-        <source>Length Field</source>
+        <source>长度字段</source>
         <translation>Length Field</translation>
     </message>
     <message>
-        <source>None</source>
+        <source>无</source>
         <translation>None</translation>
     </message>
     <message>
-        <source>Offset:</source>
+        <source>偏移:</source>
         <translation>Offset:</translation>
     </message>
     <message>
-        <source>Size:</source>
+        <source>大小:</source>
         <translation>Size:</translation>
     </message>
     <message>
-        <source>Big Endian</source>
+        <source>大端序</source>
         <translation>Big Endian</translation>
     </message>
     <message>
-        <source>Actual payload = length field value - adjust</source>
+        <source>实际负载 = 长度字段值 - 调整值</source>
         <translation>Actual payload = length field value - adjust</translation>
     </message>
     <message>
-        <source>Adjust:</source>
+        <source>调整:</source>
         <translation>Adjust:</translation>
     </message>
     <message>
-        <source>Checksum</source>
+        <source>校验配置</source>
         <translation>Checksum</translation>
     </message>
     <message>
-        <source>Type:</source>
+        <source>类型:</source>
         <translation>Type:</translation>
     </message>
     <message>
-        <source>Auto</source>
+        <source>自动</source>
         <translation>Auto</translation>
     </message>
     <message>
-        <source>Start:</source>
+        <source>起始:</source>
         <translation>Start:</translation>
     </message>
     <message>
-        <source>Data Fields</source>
+        <source>数据字段</source>
         <translation>Data Fields</translation>
     </message>
     <message>
-        <source>Name</source>
+        <source>名称</source>
         <translation>Name</translation>
     </message>
     <message>
-        <source>Type</source>
+        <source>类型</source>
         <translation>Type</translation>
     </message>
     <message>
-        <source>Offset</source>
+        <source>偏移</source>
         <translation>Offset</translation>
     </message>
     <message>
-        <source>Size</source>
+        <source>大小</source>
         <translation>Size</translation>
     </message>
     <message>
-        <source>Unit</source>
+        <source>单位</source>
         <translation>Unit</translation>
     </message>
     <message>
-        <source>Add Field</source>
+        <source>添加字段</source>
         <translation>Add Field</translation>
     </message>
     <message>
-        <source>Remove Field</source>
+        <source>删除字段</source>
         <translation>Remove Field</translation>
     </message>
     <message>
-        <source>Apply Definition</source>
+        <source>应用定义</source>
         <translation>Apply Definition</translation>
     </message>
 </context>
@@ -454,7 +454,7 @@
         <translation>Transfer Settings</translation>
     </message>
     <message>
-        <source>XMODEM-CRC (Recommended)</source>
+        <source>XMODEM-CRC (推荐)</source>
         <translation>XMODEM-CRC (Recommended)</translation>
     </message>
     <message>
@@ -490,28 +490,48 @@
         <translation>Clear History</translation>
     </message>
     <message>
-        <source>Select Firmware File</source>
+        <source>选择固件文件</source>
         <translation>Select Firmware File</translation>
     </message>
     <message>
-        <source>Firmware files (*.bin *.hex);;Binary files (*.bin);;Intel HEX (*.hex);;All files (*.*)</source>
+        <source>固件文件 (*.bin *.hex);;二进制文件 (*.bin);;Intel HEX (*.hex);;所有文件 (*.*)</source>
         <translation>Firmware files (*.bin *.hex);;Binary files (*.bin);;Intel HEX (*.hex);;All files (*.*)</translation>
     </message>
     <message>
-        <source>Transferring: %1%</source>
+        <source>传输中: %1%</source>
         <translation>Transferring: %1%</translation>
     </message>
     <message>
-        <source>Transfer Complete</source>
+        <source>传输完成</source>
         <translation>Transfer Complete</translation>
     </message>
     <message>
-        <source>Transfer completed in %1s</source>
+        <source>传输完成，耗时 %1s</source>
         <translation>Transfer completed in %1s</translation>
     </message>
     <message>
-        <source>Error: %1</source>
+        <source>错误: %1</source>
         <translation>Error: %1</translation>
+    </message>
+    <message>
+        <source>已选择文件: %1</source>
+        <translation>Selected file: %1</translation>
+    </message>
+    <message>
+        <source>错误: 未选择固件文件</source>
+        <translation>Error: No firmware file selected</translation>
+    </message>
+    <message>
+        <source>开始传输: %1, 协议: %2</source>
+        <translation>Starting transfer: %1, Protocol: %2</translation>
+    </message>
+    <message>
+        <source>传输启动失败</source>
+        <translation>Failed to start transfer</translation>
+    </message>
+    <message>
+        <source>用户已取消传输</source>
+        <translation>Transfer cancelled by user</translation>
     </message>
 </context>
 <context>

@@ -263,7 +263,7 @@ QProgressBar#otaProgress::chunk {
 
 QTextEdit#otaLogView {
     background-color: #ffffff;
-    color: #6b7280;
+    color: #4b5563;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
     font-family: Consolas, 'Courier New', monospace;
@@ -309,9 +309,9 @@ QPushButton#connectBtn[state="connected"]:hover { background-color: #dc2626; }
 /* === 连接状态标签 === */
 QLabel#connStatus { font-size: 12px; }
 QLabel#connStatus[state="connected"] { color: #22c55e; }
-QLabel#connStatus[state="disconnected"] { color: #ef4444; }
+QLabel#connStatus[state="disconnected"] { color: #dc2626; }
 QLabel#connStatus[state="connecting"] { color: #f59e0b; }
-QLabel#connStatus[state="error"] { color: #ef4444; }
+QLabel#connStatus[state="error"] { color: #dc2626; }
 
 /* === 数据统计面板 === */
 QFrame#statsFrame {
@@ -364,7 +364,7 @@ QCheckBox#searchBarHexCheck::indicator:unchecked {
     background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 2px;
 }
 
-QLabel#searchBarResult { color: #9ca3af; padding: 0 4px; }
+QLabel#searchBarResult { color: #6b7280; padding: 0 4px; }
 QLabel#searchBarResult[hasError="true"] { color: #ef4444; padding: 0 4px; }
 
 QPushButton#searchBarCloseBtn {
