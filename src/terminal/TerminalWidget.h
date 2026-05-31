@@ -98,7 +98,8 @@ private:
     int m_lineHeight = 18;          // 每行像素高度
     int m_visibleLines = 0;         // 可见行数
     int m_maxScrollOffset = 0;      // 最大滚动偏移
-    QFont m_font;                   // 终端字体(等宽)
+    QFont m_font{"Consolas", 10};               // 终端字体(等宽)
+    QFontMetrics m_fontMetrics{m_font};         // 字体度量缓存，字体变更时同步更新
 
     // 颜色配置
     QColor m_bgColor;               // 背景色

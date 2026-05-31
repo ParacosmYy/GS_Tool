@@ -1,4 +1,5 @@
 #include "SerialConfigPanel.h"
+#include "SerialDriverDetector.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFormLayout>
@@ -10,21 +11,26 @@ SerialConfigPanel::SerialConfigPanel(QWidget* parent)
 {
     setupUI();
     refreshPorts();
+    updateDriverInfo();
 }
 
 void SerialConfigPanel::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(12, 12, 12, 12);
+    mainLayout->setSpacing(12);
 
     // ---- 端口选择区域 ----
     auto* portGroup = new QGroupBox(tr("端口"));
+    portGroup->setObjectName("portGroup");
     auto* portLayout = new QHBoxLayout(portGroup);
 
     m_portCombo = new QComboBox;
+    m_portCombo->setObjectName("portCombo");
     m_portCombo->setMinimumWidth(150);
 
     m_refreshBtn = new QPushButton(tr("刷新"));
+    m_refreshBtn->setObjectName("refreshBtn");
     connect(m_refreshBtn, &QPushButton::clicked, this, &SerialConfigPanel::refreshPorts);
 
     portLayout->addWidget(m_portCombo, 1);
@@ -33,10 +39,12 @@ void SerialConfigPanel::setupUI()
 
     // ---- 串口参数区域 ----
     auto* paramGroup = new QGroupBox(tr("参数"));
+    paramGroup->setObjectName("paramGroup");
     auto* formLayout = new QFormLayout(paramGroup);
 
     // 波特率
     m_baudCombo = new QComboBox;
+    m_baudCombo->setObjectName("baudCombo");
     m_baudCombo->setEditable(true);  // 允许自定义波特率
     QStringList baudRates = {"1200", "2400", "4800", "9600", "19200",
                              "38400", "57600", "115200", "230400",
@@ -47,23 +55,27 @@ void SerialConfigPanel::setupUI()
 
     // 数据位
     m_dataBitsCombo = new QComboBox;
+    m_dataBitsCombo->setObjectName("dataBitsCombo");
     m_dataBitsCombo->addItems({"5", "6", "7", "8"});
     m_dataBitsCombo->setCurrentIndex(3);  // 默认8
     formLayout->addRow(tr("数据位:"), m_dataBitsCombo);
 
     // 校验
     m_parityCombo = new QComboBox;
+    m_parityCombo->setObjectName("parityCombo");
     m_parityCombo->addItems({tr("无"), tr("偶校验"), tr("奇校验"),
                               tr("Mark"), tr("Space")});
     formLayout->addRow(tr("校验位:"), m_parityCombo);
 
     // 停止位
     m_stopBitsCombo = new QComboBox;
+    m_stopBitsCombo->setObjectName("stopBitsCombo");
     m_stopBitsCombo->addItems({"1", "1.5", "2"});
     formLayout->addRow(tr("停止位:"), m_stopBitsCombo);
 
     // 流控
     m_flowControlCombo = new QComboBox;
+    m_flowControlCombo->setObjectName("flowControlCombo");
     m_flowControlCombo->addItems({tr("无"), tr("RTS/CTS"), tr("XON/XOFF")});
     formLayout->addRow(tr("流控:"), m_flowControlCombo);
 
@@ -88,6 +100,13 @@ void SerialConfigPanel::setupUI()
     connect(m_dtrCheck, &QCheckBox::toggled, this, &SerialConfigPanel::dtrChanged);
     connect(m_rtsCheck, &QCheckBox::toggled, this, &SerialConfigPanel::rtsChanged);
     mainLayout->addWidget(signalGroup);
+
+    // ---- 驱动检测信息 ----
+    m_driverInfoLbl = new QLabel;
+    m_driverInfoLbl->setObjectName("driverInfoLbl");
+    m_driverInfoLbl->setWordWrap(true);
+    m_driverInfoLbl->setStyleSheet("font-size: 11px; padding: 4px;");
+    mainLayout->addWidget(m_driverInfoLbl);
 
     // ---- 连接按钮 ----
     m_connectBtn = new QPushButton(tr("连接"));
@@ -121,13 +140,14 @@ void SerialConfigPanel::refreshPorts()
         }
     }
 
-    // 恢复之前的选择
     if (!currentPort.isEmpty()) {
         int idx = m_portCombo->findData(currentPort);
         if (idx >= 0) {
             m_portCombo->setCurrentIndex(idx);
         }
     }
+
+    updateDriverInfo();
 }
 
 void SerialConfigPanel::setConnected(bool connected)
@@ -228,4 +248,10 @@ void SerialConfigPanel::restoreConfig(const QVariantMap& config)
             m_flowControlCombo->setCurrentIndex(idx);
         }
     }
+}
+
+void SerialConfigPanel::updateDriverInfo()
+{
+    QString summary = SerialDriverDetector::driverStatusSummary();
+    m_driverInfoLbl->setText(summary);
 }

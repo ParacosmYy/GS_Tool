@@ -370,6 +370,68 @@ QPushButton#connectBtn[state="connected"] {
 }
 QPushButton#connectBtn[state="connected"]:hover { background-color: #dc2626; }
 
+/* === SerialConfigPanel 控件 === */
+QGroupBox {
+    font-weight: bold;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding-top: 16px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 6px;
+    color: #374151;
+}
+QCheckBox#dtrCheck, QCheckBox#rtsCheck {
+    spacing: 6px;
+    color: #111827;
+    font-size: 13px;
+}
+QCheckBox#dtrCheck::indicator, QCheckBox#rtsCheck::indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid #9ca3af;
+    background-color: #ffffff;
+}
+QCheckBox#dtrCheck::indicator:checked, QCheckBox#rtsCheck::indicator:checked {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+QCheckBox#dtrCheck::indicator:hover, QCheckBox#rtsCheck::indicator:hover {
+    border-color: #3b82f6;
+}
+
+/* === 发送栏控件 === */
+QComboBox#sendModeCombo, QComboBox#newlineCombo {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: #111827;
+    font-size: 12px;
+}
+QComboBox#sendModeCombo:hover, QComboBox#newlineCombo:hover {
+    border-color: #3b82f6;
+}
+QComboBox#sendModeCombo::drop-down, QComboBox#newlineCombo::drop-down {
+    border: none;
+    width: 20px;
+}
+
+/* === 工具栏显示模式下拉 === */
+QComboBox#displayModeCombo {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: #111827;
+    font-size: 12px;
+}
+QComboBox#displayModeCombo:hover { border-color: #3b82f6; }
+
 /* === 连接状态标签 === */
 QLabel#connStatus { font-size: 12px; }
 QLabel#connStatus[state="connected"] { color: #22c55e; }

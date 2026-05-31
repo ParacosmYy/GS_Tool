@@ -52,6 +52,7 @@ signals:
 
 private:
     void setupUI();
+    void updateDriverInfo();
 
     QComboBox* m_portCombo;        // 端口选择
     QPushButton* m_refreshBtn;     // 刷新端口列表
@@ -63,6 +64,7 @@ private:
     QCheckBox* m_dtrCheck;         // DTR控制
     QCheckBox* m_rtsCheck;         // RTS控制
     QPushButton* m_connectBtn;     // 连接/断开按钮
+    QLabel* m_driverInfoLbl;       // 驱动检测信息标签
     bool m_connected = false;       // 当前连接状态
 };
 

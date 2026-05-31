@@ -79,6 +79,10 @@ void ChartWidget::setupUI()
     m_yAxis->setTitleText(tr("Value"));
     m_chart->addAxis(m_yAxis, Qt::AlignLeft);
 
+    // 设置初始轴范围，使图表在没有数据时也能渲染背景
+    m_xAxis->setRange(0, 10);
+    m_yAxis->setRange(0, 100);
+
     m_chartView = new QChartView(m_chart);
     m_chartView->setRenderHint(QPainter::Antialiasing);
     layout->addWidget(m_chartView, 1);

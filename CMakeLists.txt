@@ -45,6 +45,7 @@ set(SOURCES
     src/serial/TimedSender.cpp
     src/serial/SendHistory.cpp
     src/serial/DataStatistics.cpp
+    src/serial/SerialDriverDetector.cpp
     src/protocol/FrameParser.cpp
     src/protocol/ProtocolView.cpp
     src/protocol/FrameVisualEditor.cpp
@@ -94,6 +95,7 @@ set(HEADERS
     src/serial/TimedSender.h
     src/serial/SendHistory.h
     src/serial/DataStatistics.h
+    src/serial/SerialDriverDetector.h
     src/protocol/FrameDefinition.h
     src/protocol/FrameParser.h
     src/protocol/ProtocolView.h

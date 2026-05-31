@@ -14,6 +14,7 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     // 设置等宽字体
     m_font = QFont("Consolas", 10);
     m_font.setStyleHint(QFont::Monospace);
+    m_fontMetrics = QFontMetrics(m_font);
 
     // 暗色主题配色
     m_bgColor = QColor(30, 30, 46);         // #1e1e2e
@@ -32,8 +33,7 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     setMouseTracking(true);
 
     // 计算行高
-    QFontMetrics fm(m_font);
-    m_lineHeight = fm.height() + 2;
+    m_lineHeight = m_fontMetrics.height() + 2;
 
     setMinimumSize(400, 200);
 }
@@ -193,7 +193,6 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
 
     // 逐行绘制 — 完全从缓存读取，不调用lineAt()
     int y = 0;
-    QFontMetrics fm(m_font);  // 在循环外构造，避免每行重复创建
     for (int i = startLine; i < endLine; ++i) {
         const CachedLine& cached = m_cachedLines[i];
 
@@ -204,7 +203,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
             QString ts = QDateTime::fromMSecsSinceEpoch(cached.timestamp)
                              .toString("HH:mm:ss.zzz");
             painter.drawText(4, y + m_lineHeight - 4, ts);
-            xOffset = fm.horizontalAdvance(ts) + 12;
+            xOffset = m_fontMetrics.horizontalAdvance(ts) + 12;
         }
 
         // 选择背景色（使用正规化范围，支持反向拖选）
@@ -219,23 +218,58 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
             for (int mi = 0; mi < m_searchMatches.size(); ++mi) {
                 const auto& match = m_searchMatches[mi];
                 if (match.line != i) continue;
-                int xStart = xOffset + 4 + fm.horizontalAdvance(cached.text.left(match.startCol));
-                int matchWidth = fm.horizontalAdvance(cached.text.mid(match.startCol, match.length));
+                int xStart = xOffset + 4 + m_fontMetrics.horizontalAdvance(cached.text.left(match.startCol));
+                int matchWidth = m_fontMetrics.horizontalAdvance(cached.text.mid(match.startCol, match.length));
                 QColor highlightColor = (mi == m_currentMatchIndex)
                     ? m_currentMatchColor : m_searchHighlightColor;
                 painter.fillRect(xStart, y + 2, matchWidth, m_lineHeight - 4, highlightColor);
             }
         }
 
-        // 根据方向设置文字颜色（使用缓存的方向）
-        if (cached.direction == DataDirection::Tx) {
-            painter.setPen(m_txColor);
-        } else {
-            painter.setPen(m_rxColor);
-        }
+        // 方向前缀 "[TX:] " / "[RX:] " 用不同颜色渲染
+        static const QString kTxPrefix = QStringLiteral("[TX:] ");
+        static const QString kRxPrefix = QStringLiteral("[RX:] ");
 
-        // 绘制数据内容
-        painter.drawText(xOffset + 4, y + m_lineHeight - 4, cached.text);
+        if (m_showDirectionPrefix) {
+            const QString& prefix = (cached.direction == DataDirection::Tx)
+                ? kTxPrefix : kRxPrefix;
+            if (cached.text.startsWith(prefix)) {
+                // 前缀颜色: TX用稍暗的绿色区分数据，RX用稍暗的蓝色区分数据
+                QColor prefixColor = (cached.direction == DataDirection::Tx)
+                    ? QColor(129, 199, 123)   // #81c77b — 比m_txColor(#a6e3a1)稍暗
+                    : QColor(166, 173, 200);  // #a6adc8 — 比m_rxColor(#cdd6f4)稍暗
+
+                // 绘制前缀（着色）
+                painter.setPen(prefixColor);
+                painter.drawText(xOffset + 4, y + m_lineHeight - 4, prefix);
+
+                // 绘制前缀后的数据内容（用方向颜色）
+                int prefixWidth = m_fontMetrics.horizontalAdvance(prefix);
+                if (cached.direction == DataDirection::Tx) {
+                    painter.setPen(m_txColor);
+                } else {
+                    painter.setPen(m_rxColor);
+                }
+                painter.drawText(xOffset + 4 + prefixWidth, y + m_lineHeight - 4,
+                                 cached.text.mid(prefix.length()));
+            } else {
+                // 缓存文本不以方向前缀开头（不应出现），正常绘制
+                if (cached.direction == DataDirection::Tx) {
+                    painter.setPen(m_txColor);
+                } else {
+                    painter.setPen(m_rxColor);
+                }
+                painter.drawText(xOffset + 4, y + m_lineHeight - 4, cached.text);
+            }
+        } else {
+            // 无方向前缀时，按方向着色，整体绘制
+            if (cached.direction == DataDirection::Tx) {
+                painter.setPen(m_txColor);
+            } else {
+                painter.setPen(m_rxColor);
+            }
+            painter.drawText(xOffset + 4, y + m_lineHeight - 4, cached.text);
+        }
         y += m_lineHeight;
     }
 }

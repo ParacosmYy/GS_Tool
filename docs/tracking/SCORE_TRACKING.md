@@ -1,0 +1,35 @@
+# EmbedDebug 评分追踪
+
+> 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
+> 起点: 1分 | 目标: 1000分 | 每次commit = +1分
+
+| # | Commit内容 | 分数 |
+|---|-----------|------|
+| 0 | 项目初始状态 | 1 |
+| 1 | 工厂模式+数据导出+发送历史+数据统计+架构重构 | 2 |
+| 2 | 搜索栏+多主题切换+会话持久化+UI/UX产品体验师角色+现代化UI标准 | 3 |
+| 3 | 协议帧格式定义+状态机解析器+解析结果表格展示 | 4 |
+| 4 | 帧可视化编辑器+实时波形图+IntelHEX解析器 | 5 |
+| 5 | 架构审查修复: 悬挂指针+重复代码+反向依赖解耦 | 6 |
+| 6 | TCP Client/Server + UDP网络连接实现 | 7 |
+| 7 | XMODEM协议传输(Checksum/CRC/1K)+OTA管理器+OTA操作面板 | 8 |
+| 8 | YMODEM协议传输(Block 0文件信息+批量传输)+OTA集成 | 9 |
+| 9 | ZMODEM协议传输(CRC32+连续发送+HEX/BIN帧)+OTA集成 | 10 |
+| 10 | 架构审查修复: SerialConfigPanel分层违规+HEX验证复用+TcpConnection类型bug+面板切换重构 | 11 |
+| 11 | DataLogger数据日志记录和回放(EDL二进制格式+变速回放) | 12 |
+| 12 | OtaHistoryModel OTA历史记录模型(持久化+表格展示+自动记录) | 13 |
+| 13 | README中文版重写+bat启动验证 | 14 |
+| 14 | CLAUDE.md约束文档更新:UI强制规则+QSS规范+多Agent工作流+300行规则 | 15 |
+| 15 | BaseTransfer模板方法基类提取+XModem/YModem/ZModem重构+架构审查+PRD文档 | 16 |
+| 16 | QSS主题迁移+UI全面中文化+OTA性能优化O(n^2)→O(n)+ChannelConfig/ChartModel实现 | 18 |
+| 17 | 过渡动画+ChartModel集成+QSS按钮状态修复+硬编码颜色清除+中英语言选择 | 19 |
+| 18 | 架构审查+TerminalModel环形缓冲区+导航面板重构+FrameEditor/OtaWidget中文化+light对比度修复+新特性准入机制 | 20 |
+| 19 | 代码审查修复: sendAndRecord统一+completer泄漏+QStackedWidget降级+lineAt线程安全+objectName审计+DataLogger回放修复 | 21 |
+| 20 | 架构审查+DataExporter流式导出+ProtocolView右键菜单/JSON导出+TerminalWidget方向缓存+连接类型图标+翻译补全+ChartWidget宽度修复 | 22 |
+| 21 | MainWindow拆分NavigationController+RecordingController+34条翻译补全+QSS protocolView修复+JustFloat特性提案 | 23 |
+| 22 | SendController提取+sendAndRecord静默失败修复+TerminalWidget环形缓存失效修复+QSS protocolToolbar修复+代码审查修复(死代码清除+翻译上下文修正+setConnected连线) | 24 |
+| 23 | ConnectionController提取+JustFloat/FireWater协议桥实现+SendBar StyledPanel修复+sendAndRecord未连接反馈+代码审查修复(isHex参数移除+静默失败修复) | 25 |
+| 24 | ProtocolBridgeManager协议源选择器+objectName审计补全(8控件)+QSS交互状态补全(SpinBox/ComboBox/ToolButton disabled)+ConnectionController悬空指针修复(断开时清除SendController/OtaManager+网络连接补OtaManager)+桥接单元测试 | 26 |
+| 25 | P0串口修复: TerminalWidget复制功能实现+搜索高亮(F3导航/正则/HEX/匹配计数)+DTR/RTS运行时控制(连接后保持可切换)+自动追加换行符(无/\r\n/\n/\r)+CLAUDE.md更新(Bug修复冲刺机制+VOFA+超越目标+驱动检测需求) | 27 |
+| 26 | ChartWidget初始化背景修复+SerialDriverDetector驱动检测+方向前缀着色+objectName补全+QSS三主题补全 | 28 |
+| ... | 目标: 1000分 | 1000 |
