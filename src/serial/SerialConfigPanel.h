@@ -21,6 +21,8 @@
 #include <QVariantMap>
 #include <QSerialPortInfo>
 
+#include "connection/IConnection.h"  // PinoutSignals
+
 class QAbstractAnimation;
 class QVBoxLayout;
 class QGroupBox;
@@ -61,6 +63,12 @@ public:
     /** @brief 设置连接中状态(由外部连接流程调用) */
     void setConnecting();
 
+public slots:
+    /** @brief 更新信号线状态LED指示灯
+     * @param signals 当前信号线电平状态
+     */
+    void updatePinoutLeds(const PinoutSignals& pinSignals);
+
 signals:
     void connectRequested();      ///< 用户点击连接按钮
     void disconnectRequested();   ///< 用户点击断开按钮
@@ -91,10 +99,8 @@ private:
     void updateStatusIndicator(const QString& state);
     /** @brief 停止呼吸动画并重置透明度特效 */
     void stopBreathAnimation();
-    /** @brief 刷新DTR按钮的视觉状态(HIGH=绿, LOW=灰) */
-    void refreshDtrStyle();
-    /** @brief 刷新RTS按钮的视觉状态(HIGH=绿, LOW=灰) */
-    void refreshRtsStyle();
+    /** @brief 刷新信号按钮视觉状态(HIGH=绿, LOW=灰) */
+    void refreshSignalStyle(QPushButton* btn, bool high);
     /** @brief 构建端口详情tooltip(VID/PID/制造商/序列号) */
     QString buildPortTooltip(const QSerialPortInfo& info) const;
 
@@ -111,6 +117,10 @@ private:
     AnimatedButton* m_connectBtn;  ///< 连接/断开按钮(带hover/press动画)
     QLabel* m_driverInfoLbl;       ///< 驱动检测信息标签
     QLabel* m_statusIndicator;     ///< 连接状态指示器(彩色圆点)
+    QLabel* m_ctsLed;              ///< CTS信号指示灯
+    QLabel* m_dsrLed;              ///< DSR信号指示灯
+    QLabel* m_dcdLed;              ///< DCD信号指示灯
+    QLabel* m_riLed;               ///< RI信号指示灯
 
     // ---- 状态标志 ----
     bool m_connected = false;       ///< 当前是否已连接

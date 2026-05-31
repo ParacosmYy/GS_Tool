@@ -35,7 +35,6 @@ SerialConfigPanel::SerialConfigPanel(QWidget* parent)
 }
 
 // ---- UI布局 ----
-
 void SerialConfigPanel::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
@@ -200,23 +199,35 @@ QGroupBox* SerialConfigPanel::createControlSignalsGroup()
 
     signalLayout->addWidget(m_dtrBtn);
     signalLayout->addWidget(m_rtsBtn);
+
+    // ---- 输入信号线状态LED ----
+    auto makeLed = [](const char* name) -> QLabel* {
+        auto* l = new QLabel(name);
+        l->setObjectName("signalLed"); l->setAlignment(Qt::AlignCenter);
+        l->setFixedSize(36, 20); l->setProperty("active", false);
+        return l;
+    };
+    m_ctsLed = makeLed("CTS"); m_dsrLed = makeLed("DSR");
+    m_dcdLed = makeLed("DCD"); m_riLed = makeLed("RI");
+    signalLayout->addWidget(m_ctsLed); signalLayout->addWidget(m_dsrLed);
+    signalLayout->addWidget(m_dcdLed); signalLayout->addWidget(m_riLed);
     signalLayout->addStretch();
 
     connect(m_dtrBtn, &QPushButton::toggled, this, [this](bool checked) {
         m_dtrState = checked;
         m_dtrBtn->setText(checked ? tr("DTR HIGH") : tr("DTR LOW"));
-        refreshDtrStyle();
+        refreshSignalStyle(m_dtrBtn, m_dtrState);
         emit dtrChanged(checked);
     });
     connect(m_rtsBtn, &QPushButton::toggled, this, [this](bool checked) {
         m_rtsState = checked;
         m_rtsBtn->setText(checked ? tr("RTS HIGH") : tr("RTS LOW"));
-        refreshRtsStyle();
+        refreshSignalStyle(m_rtsBtn, m_rtsState);
         emit rtsChanged(checked);
     });
-    // Initialize visual state to match default HIGH
-    refreshDtrStyle();
-    refreshRtsStyle();
+    // 初始化视觉状态为默认HIGH
+    refreshSignalStyle(m_dtrBtn, m_dtrState);
+    refreshSignalStyle(m_rtsBtn, m_rtsState);
     return signalGroup;
 }
 
@@ -300,30 +311,22 @@ void SerialConfigPanel::setConnecting()
     }
     effect->setOpacity(1.0);
 
-    // 销毁旧动画(如果存在)
+    // 销毁旧动画
     delete m_breathAnim;
-    m_breathAnim = nullptr;
 
-    // 构建呼吸动画: 顺序组 [0.3→1.0, 1500ms] + [1.0→0.3, 1500ms], 无限循环
+    // 用lambda创建呼吸动画半周期(0.3↔1.0, 1500ms, InOutSine缓动)
+    auto makeFade = [effect](qreal from, qreal to) -> QPropertyAnimation* {
+        auto* a = new QPropertyAnimation(effect, "opacity");
+        a->setStartValue(from);
+        a->setEndValue(to);
+        a->setDuration(1500);
+        a->setEasingCurve(QEasingCurve::InOutSine);
+        return a;
+    };
     auto* group = new QSequentialAnimationGroup(this);
-
-    // 上半周期: 0.3 → 1.0 (淡入)
-    auto* fadeIn = new QPropertyAnimation(effect, "opacity");
-    fadeIn->setStartValue(0.3);
-    fadeIn->setEndValue(1.0);
-    fadeIn->setDuration(1500);
-    fadeIn->setEasingCurve(QEasingCurve::InOutSine);
-    group->addAnimation(fadeIn);
-
-    // 下半周期: 1.0 → 0.3 (淡出)
-    auto* fadeOut = new QPropertyAnimation(effect, "opacity");
-    fadeOut->setStartValue(1.0);
-    fadeOut->setEndValue(0.3);
-    fadeOut->setDuration(1500);
-    fadeOut->setEasingCurve(QEasingCurve::InOutSine);
-    group->addAnimation(fadeOut);
-
-    group->setLoopCount(-1);  // 无限循环
+    group->addAnimation(makeFade(0.3, 1.0));
+    group->addAnimation(makeFade(1.0, 0.3));
+    group->setLoopCount(-1);
     group->start(QAbstractAnimation::DeleteWhenStopped);
     m_breathAnim = group;
 }
@@ -350,7 +353,6 @@ void SerialConfigPanel::stopBreathAnimation()
 }
 
 // ---- 端口管理 ----
-
 void SerialConfigPanel::refreshPorts()
 {
     QString currentPort = m_portCombo->currentData().toString();
@@ -360,14 +362,8 @@ void SerialConfigPanel::refreshPorts()
     for (const auto& port : ports) {
         QString name = port.portName();
         QString desc = port.description();
-        QString displayText;
-
-        // 格式: "COM3 - CH340 (VID:1A86 PID:7523)" 或 "COM3 - 描述"
-        if (!desc.isEmpty()) {
-            displayText = QString("%1 - %2").arg(name, desc);
-        } else {
-            displayText = name;
-        }
+        // 格式: "COM3 - CH340 (VID:1A86 PID:7523)" 或 "COM3"
+        QString displayText = desc.isEmpty() ? name : QString("%1 - %2").arg(name, desc);
         if (port.hasVendorIdentifier() || port.hasProductIdentifier()) {
             QStringList ids;
             if (port.hasVendorIdentifier())
@@ -392,7 +388,6 @@ void SerialConfigPanel::refreshPorts()
 }
 
 // ---- 配置读取 ----
-
 bool SerialConfigPanel::isConnected() const { return m_connected; }
 QString SerialConfigPanel::currentPortData() const { return m_portCombo->currentData().toString(); }
 int SerialConfigPanel::currentBaudRate() const { return m_baudCombo->currentText().toInt(); }
@@ -429,7 +424,7 @@ void SerialConfigPanel::restoreConfig(const QVariantMap& config)
         m_dtrBtn->setChecked(m_dtrState);
         m_dtrBtn->setText(m_dtrState ? tr("DTR HIGH") : tr("DTR LOW"));
         m_dtrBtn->blockSignals(false);
-        refreshDtrStyle();
+        refreshSignalStyle(m_dtrBtn, m_dtrState);
     }
     if (config.contains("rts")) {
         m_rtsState = config["rts"].toBool();
@@ -437,26 +432,31 @@ void SerialConfigPanel::restoreConfig(const QVariantMap& config)
         m_rtsBtn->setChecked(m_rtsState);
         m_rtsBtn->setText(m_rtsState ? tr("RTS HIGH") : tr("RTS LOW"));
         m_rtsBtn->blockSignals(false);
-        refreshRtsStyle();
+        refreshSignalStyle(m_rtsBtn, m_rtsState);
     }
 }
 
 // ---- 内部方法 ----
-
-/** @brief 刷新DTR按钮视觉状态，通过QSS property驱动颜色切换 */
-void SerialConfigPanel::refreshDtrStyle()
+/** @brief 更新信号线状态LED指示灯
+ *  @param pinSignals 当前信号线电平状态
+ */
+void SerialConfigPanel::updatePinoutLeds(const PinoutSignals& pinSignals)
 {
-    m_dtrBtn->setProperty("signalState", m_dtrState ? "high" : "low");
-    m_dtrBtn->style()->unpolish(m_dtrBtn);
-    m_dtrBtn->style()->polish(m_dtrBtn);
+    auto updateLed = [](QLabel* led, bool active) {
+        if (!led) return;
+        led->setProperty("active", active);
+        led->style()->unpolish(led); led->style()->polish(led);
+    };
+    updateLed(m_ctsLed, pinSignals.cts); updateLed(m_dsrLed, pinSignals.dsr);
+    updateLed(m_dcdLed, pinSignals.dcd); updateLed(m_riLed, pinSignals.ri);
 }
 
-/** @brief 刷新RTS按钮视觉状态，通过QSS property驱动颜色切换 */
-void SerialConfigPanel::refreshRtsStyle()
+/** @brief 刷新信号按钮视觉状态，通过QSS property驱动颜色切换 */
+void SerialConfigPanel::refreshSignalStyle(QPushButton* btn, bool high)
 {
-    m_rtsBtn->setProperty("signalState", m_rtsState ? "high" : "low");
-    m_rtsBtn->style()->unpolish(m_rtsBtn);
-    m_rtsBtn->style()->polish(m_rtsBtn);
+    btn->setProperty("signalState", high ? "high" : "low");
+    btn->style()->unpolish(btn);
+    btn->style()->polish(btn);
 }
 
 void SerialConfigPanel::updateDriverInfo()
