@@ -38,11 +38,14 @@ set(SOURCES
     src/serial/TimedSender.cpp
     src/serial/SendHistory.cpp
     src/serial/DataStatistics.cpp
+    src/protocol/FrameParser.cpp
+    src/protocol/ProtocolView.cpp
     src/utils/SettingsManager.cpp
     src/utils/DataExporter.cpp
     src/utils/HexConverter.h
     src/utils/RingBuffer.h
     src/utils/CRC.h
+    src/protocol/FrameDefinition.h
 )
 
 set(HEADERS
@@ -61,6 +64,9 @@ set(HEADERS
     src/serial/TimedSender.h
     src/serial/SendHistory.h
     src/serial/DataStatistics.h
+    src/protocol/FrameDefinition.h
+    src/protocol/FrameParser.h
+    src/protocol/ProtocolView.h
     src/utils/SettingsManager.h
     src/utils/DataExporter.h
 )

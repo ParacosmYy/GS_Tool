@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget* parent)
     , m_sendHistory(new SendHistory(this))
     , m_dataExporter(new DataExporter(this))
     , m_statsTimer(new QTimer(this))
+    , m_frameParser(new FrameParser(this))
 {
     setupUI();
     setupToolbar();
@@ -73,6 +74,9 @@ void MainWindow::setupUI()
     serialItem->appendRow(configItem);
     serialItem->appendRow(terminalItem);
     serialItem->appendRow(statsItem);
+    auto* protocolItem = new QStandardItem(tr("Protocol"));
+    protocolItem->setEditable(false);
+    serialItem->appendRow(protocolItem);
 
     // 工具分组
     auto* toolsItem = new QStandardItem(tr("Tools"));
@@ -113,6 +117,11 @@ void MainWindow::setupUI()
     m_dataStats = new DataStatistics;
     m_dataStats->setVisible(false);
     serialLayout->addWidget(m_dataStats);
+
+    // 协议解析面板(点击"Protocol"时显示)
+    m_protocolView = new ProtocolView;
+    m_protocolView->setVisible(false);
+    serialLayout->addWidget(m_protocolView);
 
     // 终端容器: 搜索栏 + 终端
     auto* terminalContainer = new QWidget;
@@ -290,6 +299,12 @@ void MainWindow::connectSignals()
     // 统计刷新定时器
     connect(m_statsTimer, &QTimer::timeout, this, &MainWindow::updateDataStatistics);
 
+    // 帧解析器 → 协议视图
+    connect(m_frameParser, &FrameParser::frameParsed,
+            m_protocolView, &ProtocolView::onFrameParsed);
+    connect(m_frameParser, &FrameParser::frameError,
+            m_protocolView, &ProtocolView::onFrameError);
+
     // 导航树点击切换面板
     connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
         QString text = index.data().toString();
@@ -297,14 +312,22 @@ void MainWindow::connectSignals()
             m_serialConfig->setVisible(true);
             m_terminal->setVisible(false);
             m_dataStats->setVisible(false);
+            m_protocolView->setVisible(false);
         } else if (text == tr("Terminal")) {
             m_serialConfig->setVisible(false);
             m_terminal->setVisible(true);
             m_dataStats->setVisible(false);
+            m_protocolView->setVisible(false);
         } else if (text == tr("Statistics")) {
             m_serialConfig->setVisible(false);
             m_terminal->setVisible(false);
             m_dataStats->setVisible(true);
+            m_protocolView->setVisible(false);
+        } else if (text == tr("Protocol")) {
+            m_serialConfig->setVisible(false);
+            m_terminal->setVisible(false);
+            m_dataStats->setVisible(false);
+            m_protocolView->setVisible(true);
         } else if (text == tr("Data Export")) {
             onExportData();
         }
@@ -550,6 +573,7 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
 void MainWindow::onDataReceived(const QByteArray& data)
 {
     m_terminalModel->appendReceived(data);
+    m_frameParser->feed(data);
     updateStatusBar();
 }
 

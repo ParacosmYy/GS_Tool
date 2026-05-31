@@ -25,6 +25,8 @@
 #include "utils/DataExporter.h"
 #include "utils/SettingsManager.h"
 #include "terminal/TerminalSearchBar.h"
+#include "protocol/FrameParser.h"
+#include "protocol/ProtocolView.h"
 #include "Constants.h"
 
 // 主窗口 - 左侧导航树 + 右侧功能面板
@@ -127,6 +129,10 @@ private:
 
     // UI组件 - 数据统计
     DataStatistics* m_dataStats;
+
+    // UI组件 - 协议解析
+    ProtocolView* m_protocolView;
+    FrameParser* m_frameParser;
 
     // UI组件 - 状态栏
     QLabel* m_connStatusLbl;
