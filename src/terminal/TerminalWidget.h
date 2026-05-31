@@ -58,9 +58,6 @@ private:
     // 将数据按显示模式格式化为文本行
     QString formatLine(const TerminalLine& line) const;
 
-    // 将QByteArray格式化为HEX字符串
-    QString toHexString(const QByteArray& data) const;
-
     TerminalModel* m_model = nullptr;
     DisplayMode m_displayMode = DisplayMode::Text;
     bool m_showTimestamp = false;

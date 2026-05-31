@@ -6,14 +6,7 @@
 #include <QVector>
 #include <QMutex>
 #include <QDateTime>
-#include "core/Constants.h"
-
-// 单条终端数据记录
-struct TerminalLine {
-    QByteArray data;                 // 原始数据
-    DataDirection direction;         // 收/发方向
-    QDateTime timestamp;             // 时间戳(精确到ms)
-};
+#include "terminal/TerminalTypes.h"
 
 // 终端数据模型 - 管理接收/发送的数据缓冲区
 // 线程安全，可从任意线程添加数据
@@ -31,6 +24,9 @@ public:
 
     // 获取所有行 (用于渲染)
     QVector<TerminalLine> lines() const;
+
+    // 获取指定范围的行 (避免全量拷贝)
+    QVector<TerminalLine> lines(int start, int count) const;
 
     // 获取总行数
     int lineCount() const;

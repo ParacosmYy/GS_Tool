@@ -1,4 +1,5 @@
 #include "TerminalWidget.h"
+#include "utils/HexConverter.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QScrollBar>
@@ -294,23 +295,11 @@ QString TerminalWidget::formatLine(const TerminalLine& line) const
 {
     switch (m_displayMode) {
     case DisplayMode::Hex:
-        return toHexString(line.data);
+        return HexConverter::toHexString(line.data);
     case DisplayMode::Mixed:
-        return QString::fromUtf8(line.data) + "  |  " + toHexString(line.data);
+        return QString::fromUtf8(line.data) + "  |  " + HexConverter::toHexString(line.data);
     case DisplayMode::Text:
     default:
         return QString::fromUtf8(line.data);
     }
-}
-
-QString TerminalWidget::toHexString(const QByteArray& data) const
-{
-    // 将字节数组格式化为 "AA BB CC DD ..." 形式
-    QString result;
-    result.reserve(data.size() * 3);
-    for (int i = 0; i < data.size(); ++i) {
-        if (i > 0) result += ' ';
-        result += QString("%1").arg(static_cast<unsigned char>(data[i]), 2, 16, QChar('0')).toUpper();
-    }
-    return result;
 }

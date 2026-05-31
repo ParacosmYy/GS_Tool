@@ -48,6 +48,15 @@ QVector<TerminalLine> TerminalModel::lines() const
     return m_lines;
 }
 
+QVector<TerminalLine> TerminalModel::lines(int start, int count) const
+{
+    QMutexLocker locker(&m_mutex);
+    if (start < 0) start = 0;
+    if (start >= m_lines.size()) return {};
+    int actualCount = qMin(count, m_lines.size() - start);
+    return m_lines.mid(start, actualCount);
+}
+
 int TerminalModel::lineCount() const
 {
     QMutexLocker locker(&m_mutex);

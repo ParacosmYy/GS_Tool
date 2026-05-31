@@ -39,8 +39,8 @@ void ConnectionManager::removeConnection(IConnection* conn)
 {
     if (m_connections.removeOne(conn)) {
         conn->close();
-        delete conn;  // 直接delete（没有parent，不会双重删除）
-        emit connectionRemoved(conn);
+        emit connectionRemoved(conn);  // 先发信号，再delete，避免悬挂指针
+        delete conn;
     }
 }
 
