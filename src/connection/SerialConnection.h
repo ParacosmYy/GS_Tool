@@ -16,7 +16,6 @@
  *   - ConnectionController: 上层控制器，通过 IConnection 指针管理本类
  *   - ConnectionFactory: 工厂创建本类实例
  */
-
 #ifndef SERIALCONNECTION_H
 #define SERIALCONNECTION_H
 
@@ -26,9 +25,8 @@
 
 /**
  * @brief 串口连接实现 - 封装 QSerialPort
- *
- * 通过 IConnection 接口暴露串口能力，上层模块不需要直接接触 QSerialPort。
- * 所有串口特有的错误都会被翻译成人类可读的中文描述后通过 errorOccurred 信号发出。
+ * 上层通过 IConnection 接口操作，无需直接接触 QSerialPort。
+ * 串口错误翻译为中文描述后通过 errorOccurred 信号发出。
  */
 class SerialConnection : public IConnection {
     Q_OBJECT
@@ -58,12 +56,7 @@ public:
      * @brief 打开串口连接
      *
      * 失败时会根据错误类型发出详细的中文错误描述:
-     *   - 端口名为空
-     *   - 端口不存在
-     *   - 端口被其他程序占用
-     *   - 权限不足
-     *   - 其他系统错误
-     *
+     * 端口名为空/端口不存在/被占用/权限不足/系统错误
      * @return true=打开成功, false=打开失败
      */
     bool open() override;
@@ -81,17 +74,8 @@ public:
     /**
      * @brief 通过 QVariantMap 配置串口参数
      *
-     * 支持的 key:
-     *   - "portName" (string): 端口名，如 "COM3"
-     *   - "baudRate" (int): 波特率，如 115200
-     *   - "dataBits" (int): 数据位，范围 5-8
-     *   - "parity" (int): 校验，0=无 1=偶 2=奇 3=Mark 4=Space
-     *   - "stopBits" (int): 停止位，0=1 1=1.5 2=2
-     *   - "flowControl" (int): 流控，0=无 1=RTS/CTS 2=XON/XOFF
-     *   - "dtr" (bool): DTR 信号
-     *   - "rts" (bool): RTS 信号
-     *
-     * 未识别的 key 会被安全忽略。
+     * 支持的 key: portName, baudRate, dataBits, parity, stopBits,
+     * flowControl, dtr, rts。未识别的 key 会被安全忽略。
      * @param params 参数映射表
      */
     void configure(const QVariantMap& params) override;
@@ -146,11 +130,30 @@ public:
     /** @brief 查询 RTS 信号当前状态（重写 IConnection 虚方法） */
     bool isRts() const override;
 
+    /** @brief 发送Break信号（重写 IConnection 虚方法） */
+    void sendBreak(int duration = 100) override;
+
     /**
      * @brief 获取系统中所有可用的串口列表
      * @return QSerialPortInfo 列表，包含端口名、描述、制造商等信息
      */
     static QList<QSerialPortInfo> availablePorts();
+
+    // ---- 串口错误统计 ----
+
+    /** @brief 串口错误计数器 - 统计通信过程中的各类错误次数 */
+    struct SerialErrorCounters {
+        int framingErrors = 0;   ///< 帧错误计数(停止位不匹配)
+        int parityErrors = 0;    ///< 校验错误计数(奇偶校验失败)
+        int overrunErrors = 0;   ///< 溢出错误计数(接收缓冲区溢出)
+        int unknownErrors = 0;   ///< 未分类错误计数
+    };
+
+    /** @brief 获取错误计数器(只读) */
+    const SerialErrorCounters& errorCounters() const { return m_errorCounters; }
+
+    /** @brief 重置错误计数器 */
+    void resetErrorCounters();
 
 private slots:
     /** @brief QSerialPort::readyRead 信号处理，读取所有可用数据并转发 */
@@ -158,23 +161,18 @@ private slots:
 
     /**
      * @brief QSerialPort::errorOccurred 信号处理
-     *
-     * 将 QSerialPort 的系统错误码翻译为人类可读的中文描述，
-     * 更新内部状态为 Error，并通过 IConnection::errorOccurred 信号通知上层。
+     * 翻译错误码为中文描述，更新状态为Error，统计错误类型。
      * @param error QSerialPort 的错误码
      */
     void onError(QSerialPort::SerialPortError error);
 
+    /** @brief QSerialPort::bytesWritten 信号处理 */
+    void onBytesWritten(qint64 bytes);
+
 private:
     /**
-     * @brief 将 QSerialPort 错误码翻译为详细的中文错误描述
-     *
-     * 根据错误类型结合当前上下文给出具体的诊断信息，帮助用户快速定位问题:
-     *   - 端口不存在 → 提示检查设备连接
-     *   - 被占用 → 提示关闭占用程序
-     *   - 权限不足 → 提示以管理员身份运行
-     *   - 意外断开 → 提示设备可能被拔出
-     *
+     * @brief 将 QSerialPort 错误码翻译为中文错误描述
+     * 针对每种错误给出具体诊断: 端口不存在/被占用/权限不足/意外断开等
      * @param error QSerialPort 错误码
      * @return 人类可读的中文错误描述
      */
@@ -188,6 +186,9 @@ private:
 
     /** @brief 当前连接状态 */
     ConnectionState m_state = ConnectionState::Disconnected;
+
+    /** @brief 串口错误统计计数器 */
+    SerialErrorCounters m_errorCounters;
 };
 
 #endif // SERIALCONNECTION_H

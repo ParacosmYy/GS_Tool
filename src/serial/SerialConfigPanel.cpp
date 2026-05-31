@@ -22,6 +22,7 @@
 #include <QTimer>
 
 #include "serial/SerialDriverDetector.h"
+#include "core/AnimatedButton.h"
 
 // ---- 构造 ----
 
@@ -41,7 +42,13 @@ void SerialConfigPanel::setupUI()
     mainLayout->setContentsMargins(12, 12, 12, 12);
     mainLayout->setSpacing(12);
 
-    // ---- 端口选择区域 ----
+    mainLayout->addWidget(createPortGroup());
+    mainLayout->addWidget(createParamGroup());
+    setupSignalAndConnectControls(mainLayout);
+}
+
+QGroupBox* SerialConfigPanel::createPortGroup()
+{
     auto* portGroup = new QGroupBox(tr("端口"));
     portGroup->setObjectName("portGroup");
     auto* portLayout = new QHBoxLayout(portGroup);
@@ -52,16 +59,18 @@ void SerialConfigPanel::setupUI()
     connect(m_portCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &SerialConfigPanel::onPortComboChanged);
 
-    m_refreshBtn = new QPushButton(tr("刷新"));
+    m_refreshBtn = new AnimatedButton(tr("刷新"));
     m_refreshBtn->setObjectName("refreshBtn");
     m_refreshBtn->setToolTip(tr("重新扫描系统中的串口设备"));
     connect(m_refreshBtn, &QPushButton::clicked, this, &SerialConfigPanel::refreshPorts);
 
     portLayout->addWidget(m_portCombo, 1);
     portLayout->addWidget(m_refreshBtn);
-    mainLayout->addWidget(portGroup);
+    return portGroup;
+}
 
-    // ---- 串口参数区域 ----
+QGroupBox* SerialConfigPanel::createParamGroup()
+{
     auto* paramGroup = new QGroupBox(tr("参数"));
     paramGroup->setObjectName("paramGroup");
     auto* formLayout = new QFormLayout(paramGroup);
@@ -75,6 +84,16 @@ void SerialConfigPanel::setupUI()
                            "460800", "921600", "1000000"});
     m_baudCombo->setCurrentText("115200");
     m_baudCombo->lineEdit()->setValidator(new QIntValidator(300, 10000000, this));
+    // 运行时波特率切换: 连接后用户修改波特率时通知上层
+    connect(m_baudCombo, &QComboBox::currentTextChanged, this, [this](const QString& text) {
+        if (m_connected) {
+            bool ok = false;
+            qint32 baud = text.toInt(&ok);
+            if (ok && baud > 0) {
+                emit baudRateChanged(baud);
+            }
+        }
+    });
     formLayout->addRow(tr("波特率:"), m_baudCombo);
 
     m_dataBitsCombo = new QComboBox;
@@ -102,12 +121,7 @@ void SerialConfigPanel::setupUI()
     m_flowControlCombo->addItems({tr("无"), tr("RTS/CTS"), tr("XON/XOFF")});
     formLayout->addRow(tr("流控:"), m_flowControlCombo);
 
-    mainLayout->addWidget(paramGroup);
-
-    // ---- 控制信号 + 驱动检测 + 连接按钮 ----
-    setupSignalAndConnectControls(mainLayout);
-
-    mainLayout->addStretch();
+    return paramGroup;
 }
 
 /**
@@ -118,7 +132,52 @@ void SerialConfigPanel::setupUI()
  */
 void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
 {
-    // ---- 控制信号 (DTR/RTS切换按钮，连接后可用) ----
+    // ---- 控制信号 (DTR/RTS) ----
+    mainLayout->addWidget(createControlSignalsGroup());
+
+    // ---- 驱动检测信息 ----
+    m_driverInfoLbl = new QLabel;
+    m_driverInfoLbl->setObjectName("driverInfoLbl");
+    m_driverInfoLbl->setWordWrap(true);
+    mainLayout->addWidget(m_driverInfoLbl);
+
+    // ---- 连接按钮 + 状态指示器 ----
+    auto* connectLayout = new QHBoxLayout;
+
+    m_statusIndicator = new QLabel;
+    m_statusIndicator->setObjectName("statusIndicator");
+    m_statusIndicator->setFixedSize(8, 8);
+    m_statusIndicator->setToolTip(tr("未连接"));
+    m_statusIndicator->setProperty("state", "disconnected");
+    m_statusIndicator->style()->unpolish(m_statusIndicator);
+    m_statusIndicator->style()->polish(m_statusIndicator);
+
+    m_connectBtn = new AnimatedButton(tr("连接"));
+    m_connectBtn->setObjectName("connectBtn");
+    m_connectBtn->setMinimumHeight(36);
+    connect(m_connectBtn, &QPushButton::clicked, this, [this]() {
+        if (m_connecting) return;
+        if (m_connected) {
+            emit disconnectRequested();
+        } else {
+            m_connecting = true;
+            m_connectBtn->setEnabled(false);
+            m_connectBtn->setText(tr("连接中..."));
+            m_connectBtn->setProperty("state", "connecting");
+            m_connectBtn->style()->unpolish(m_connectBtn);
+            m_connectBtn->style()->polish(m_connectBtn);
+            emit connectRequested();
+        }
+    });
+
+    connectLayout->addWidget(m_statusIndicator);
+    connectLayout->addWidget(m_connectBtn, 1);
+    mainLayout->addLayout(connectLayout);
+}
+
+/** @brief 创建DTR/RTS控制信号分组(含按钮、工具提示、信号连接和视觉刷新) */
+QGroupBox* SerialConfigPanel::createControlSignalsGroup()
+{
     auto* signalGroup = new QGroupBox(tr("控制信号"));
     signalGroup->setObjectName("signalGroup");
     auto* signalLayout = new QHBoxLayout(signalGroup);
@@ -158,46 +217,7 @@ void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
     // Initialize visual state to match default HIGH
     refreshDtrStyle();
     refreshRtsStyle();
-    mainLayout->addWidget(signalGroup);
-
-    // ---- 驱动检测信息 ----
-    m_driverInfoLbl = new QLabel;
-    m_driverInfoLbl->setObjectName("driverInfoLbl");
-    m_driverInfoLbl->setWordWrap(true);
-    mainLayout->addWidget(m_driverInfoLbl);
-
-    // ---- 连接按钮 + 状态指示器 ----
-    auto* connectLayout = new QHBoxLayout;
-
-    m_statusIndicator = new QLabel;
-    m_statusIndicator->setObjectName("statusIndicator");
-    m_statusIndicator->setFixedSize(8, 8);
-    m_statusIndicator->setToolTip(tr("未连接"));
-    m_statusIndicator->setProperty("state", "disconnected");
-    m_statusIndicator->style()->unpolish(m_statusIndicator);
-    m_statusIndicator->style()->polish(m_statusIndicator);
-
-    m_connectBtn = new QPushButton(tr("连接"));
-    m_connectBtn->setObjectName("connectBtn");
-    m_connectBtn->setMinimumHeight(36);
-    connect(m_connectBtn, &QPushButton::clicked, this, [this]() {
-        if (m_connecting) return;
-        if (m_connected) {
-            emit disconnectRequested();
-        } else {
-            m_connecting = true;
-            m_connectBtn->setEnabled(false);
-            m_connectBtn->setText(tr("连接中..."));
-            m_connectBtn->setProperty("state", "connecting");
-            m_connectBtn->style()->unpolish(m_connectBtn);
-            m_connectBtn->style()->polish(m_connectBtn);
-            emit connectRequested();
-        }
-    });
-
-    connectLayout->addWidget(m_statusIndicator);
-    connectLayout->addWidget(m_connectBtn, 1);
-    mainLayout->addLayout(connectLayout);
+    return signalGroup;
 }
 
 // ---- 状态管理 ----
@@ -213,9 +233,9 @@ void SerialConfigPanel::setConnected(bool connected)
     m_connectBtn->style()->unpolish(m_connectBtn);
     m_connectBtn->style()->polish(m_connectBtn);
 
-    // 锁定/解锁配置控件
+    // 锁定/解锁配置控件(波特率保持可编辑，支持运行时切换)
     m_portCombo->setEnabled(!connected);
-    m_baudCombo->setEnabled(!connected);
+    // m_baudCombo stays enabled for runtime baud rate switching
     m_dataBitsCombo->setEnabled(!connected);
     m_parityCombo->setEnabled(!connected);
     m_stopBitsCombo->setEnabled(!connected);
@@ -340,8 +360,27 @@ void SerialConfigPanel::refreshPorts()
     for (const auto& port : ports) {
         QString name = port.portName();
         QString desc = port.description();
-        if (!desc.isEmpty()) m_portCombo->addItem(name + " - " + desc, name);
-        else m_portCombo->addItem(name, name);
+        QString displayText;
+
+        // 格式: "COM3 - CH340 (VID:1A86 PID:7523)" 或 "COM3 - 描述"
+        if (!desc.isEmpty()) {
+            displayText = QString("%1 - %2").arg(name, desc);
+        } else {
+            displayText = name;
+        }
+        if (port.hasVendorIdentifier() || port.hasProductIdentifier()) {
+            QStringList ids;
+            if (port.hasVendorIdentifier())
+                ids << QString("VID:%1").arg(port.vendorIdentifier(), 4, 16, QLatin1Char('0')).toUpper();
+            if (port.hasProductIdentifier())
+                ids << QString("PID:%1").arg(port.productIdentifier(), 4, 16, QLatin1Char('0')).toUpper();
+            displayText += " (" + ids.join(" ") + ")";
+        }
+
+        m_portCombo->addItem(displayText, name);
+        // 设置tooltip显示完整设备信息
+        int lastIdx = m_portCombo->count() - 1;
+        m_portCombo->setItemData(lastIdx, buildPortTooltip(port), Qt::ToolTipRole);
     }
 
     if (!currentPort.isEmpty()) {
@@ -434,4 +473,28 @@ void SerialConfigPanel::updateConnectButtonState()
         m_connectBtn->setEnabled(hasPorts);
         m_connectBtn->setText(hasPorts ? tr("连接") : tr("无端口"));
     }
+}
+
+/**
+ * @brief 构建端口详情tooltip(VID/PID/制造商/序列号)
+ * @param info QSerialPortInfo端口信息
+ * @return 多行tooltip字符串，包含端口名/描述/制造商/VID/PID/序列号/系统路径
+ */
+QString SerialConfigPanel::buildPortTooltip(const QSerialPortInfo& info) const
+{
+    QStringList details;
+    details << tr("端口: %1").arg(info.portName());
+    if (!info.description().isEmpty())
+        details << tr("描述: %1").arg(info.description());
+    if (!info.manufacturer().isEmpty())
+        details << tr("制造商: %1").arg(info.manufacturer());
+    if (info.hasVendorIdentifier())
+        details << tr("VID: %1").arg(info.vendorIdentifier(), 4, 16, QLatin1Char('0')).toUpper();
+    if (info.hasProductIdentifier())
+        details << tr("PID: %1").arg(info.productIdentifier(), 4, 16, QLatin1Char('0')).toUpper();
+    if (!info.serialNumber().isEmpty())
+        details << tr("序列号: %1").arg(info.serialNumber());
+    if (!info.systemLocation().isEmpty())
+        details << tr("系统路径: %1").arg(info.systemLocation());
+    return details.join("\n");
 }

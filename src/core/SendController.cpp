@@ -11,6 +11,7 @@
 #include "connection/IConnection.h"
 #include "utils/HexConverter.h"
 #include "core/Constants.h"
+#include "core/AnimatedButton.h"
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -75,7 +76,7 @@ QWidget* SendController::createSendBar(QWidget* parent)
     m_sendInput->setCompleter(m_sendCompleter);
 
     // 发送按钮
-    m_sendBtn = new QPushButton(tr("发送"));
+    m_sendBtn = new AnimatedButton(tr("发送"));
     m_sendBtn->setObjectName("sendButton");
     m_sendBtn->setFixedWidth(70);
 

@@ -2,38 +2,18 @@
  * @file MainWindowSignalConnect.cpp
  * @brief 主窗口信号/槽连接 - 所有模块间信号路由的集中连接点
  *
- * 本文件从 MainWindow.cpp 拆分而来，包含 connectSignals() 方法及其 8 个子方法:
- *   connectSerialSignals()          - 串口连接/断开/重连
- *   connectSerialSendSignals()      - 快捷指令/发送控制器
- *   connectToolbarSignals()         - 工具栏/录制状态消息
- *   connectSearchAndProtocolSignals() - 搜索/协议桥/帧编辑/导航
- *   connectPortWatchSignals()       - 串口热插拔通知
- *   connectThemeSignals()           - 主题切换 + Toast
- *   connectOtaSignals()             - OTA传输通知
- *   connectBookmarkSignals()        - 书签面板信号路由
+ * 从 MainWindow.cpp 拆分，包含 connectSignals() 及 8 个子方法:
+ *   connectSerial/Send/Toolbar/SearchAndProtocol/PortWatch/Theme/Ota/BookmarkSignals
  *
- * 信号流向（详见 connectSignals() 方法内部分组注释）:
+ * 主要信号流:
  *   SerialConfigPanel → ConnectionController → MainWindow(状态更新)
- *   ConnectionController → TerminalModel(接收数据) + ProtocolBridgeMgr(协议解析)
- *   ConnectionController → ToastWidget(连接成功/断开/错误通知, 错误通知使用 showDebounced 防抖)
- *   QuickCommandBar → SendController(发送数据)
- *   ToolbarController → TerminalController(显示模式/时间戳/清屏/导出)
- *   ToolbarController → SettingsController(主题/语言)
- *   RecordingController → MainWindow(回放数据写入终端)
- *   RecordingController::addBookmarkRequested → DataLogger::addBookmark(书签添加)
- *   DataLogger::bookmarksChanged → ToastWidget(书签变化吐司通知)
- *   TerminalSearchBar → TerminalController(搜索高亮)
- *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形配置)
- *   OtaWidget → ToastWidget(传输开始/完成通知 + 失败通知使用 showDebounced 防抖)
+ *   ConnectionController → TerminalModel + ProtocolBridgeMgr + ToastWidget
+ *   QuickCommandBar → SendController → IConnection(数据发送)
+ *   ToolbarController → TerminalController(显示/时间戳/清屏) + SettingsController(主题/语言)
+ *   RecordingController → DataLogger(书签) + ToastWidget(反馈)
+ *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形)
+ *   OtaWidget → ToastWidget(传输通知)
  *   NavTree → NavigationController(面板切换)
- *
- * 书签信号流（DataBookmark 集成）:
- *   RecordingController::addBookmarkRequested(label)
- *     → DataLogger::addBookmark(label)   // UI层 → 数据层: 将书签请求路由到 DataLogger
- *   RecordingController::addBookmarkRequested(label)
- *     → ToastWidget("书签已添加: label")  // UI反馈: Success 吐司即时提示
- *   DataLogger::bookmarksChanged()
- *     → 状态栏消息                        // 通知书签集合发生变化
  */
 
 #include "core/MainWindow.h"
@@ -43,6 +23,7 @@
 #include "core/ThemeManager.h"
 #include "serial/BookmarkWidget.h"
 #include "ota/OtaWidget.h"
+#include "connection/SerialConnection.h"
 #include <QMessageBox>
 
 /**
@@ -61,6 +42,7 @@
 void MainWindow::connectSignals()
 {
     connectSerialSignals();
+    connectReconnectSignals();
     connectSerialSendSignals();
     connectToolbarSignals();
     connectSearchAndProtocolSignals();
@@ -99,6 +81,18 @@ void MainWindow::connectSerialSignals()
             m_connController, &ConnectionController::setDtr);
     connect(m_panelManager->serialConfig(), &SerialConfigPanel::rtsChanged,
             m_connController, &ConnectionController::setRts);
+    // 运行时波特率切换: 用户在连接状态下更改波特率
+    connect(m_panelManager->serialConfig(), &SerialConfigPanel::baudRateChanged,
+            this, [this](qint32 baud) {
+        auto* conn = m_connController->currentConnection();
+        if (conn && conn->type() == ConnectionType::Serial) {
+            if (auto* serial = qobject_cast<SerialConnection*>(conn)) {
+                serial->setBaudRate(baud);
+                ToastWidget::show(this, tr("波特率已切换为 %1").arg(baud),
+                                  ToastWidget::ToastType::Info);
+            }
+        }
+    });
     // 连接状态变化 -> 更新 UI（状态栏文本、配置面板按钮状态、呼吸动画）
     connect(m_connController, &ConnectionController::connectionStateChanged,
             this, [this](ConnectionState state, const QString& connName) {
@@ -126,8 +120,16 @@ void MainWindow::connectSerialSignals()
             this, [this](const QString&, const QString& message) {
         ToastWidget::showDebounced(this, message, ToastWidget::ToastType::Error, 3000);
     });
+}
 
-    // ---- 自动重连状态指示 ----
+/**
+ * @brief 自动重连状态指示信号连接
+ *
+ * 包含: 重连尝试次数 → 状态栏文本更新，
+ *       重连成功/失败 → Toast 通知。
+ */
+void MainWindow::connectReconnectSignals()
+{
     // 重连尝试中: 更新状态栏显示当前尝试次数
     connect(m_connController, &ConnectionController::reconnectAttempt,
             this, [this](int attempt, int maxRetries) {

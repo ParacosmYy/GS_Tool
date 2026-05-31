@@ -30,65 +30,39 @@ void DataStatistics::setupUI()
     mainLayout->setContentsMargins(12, 12, 12, 12);
     mainLayout->setSpacing(8);
 
-    // ---- 接收（RX）统计区域 ----
-    auto* rxFrame = new QFrame;
-    rxFrame->setObjectName("statsFrame");
-    rxFrame->setFrameShape(QFrame::StyledPanel);
-    auto* rxLayout = new QFormLayout(rxFrame);
-    rxLayout->setContentsMargins(8, 6, 8, 6);
-    rxLayout->setSpacing(4);
-    rxLayout->setLabelAlignment(Qt::AlignRight);
+    // ---- 收发统计区域(使用统一框架) ----
+    mainLayout->addWidget(createStatsFrame(tr("接收:"), m_rxTotalLabel, "rxTotalLabel"));
+    mainLayout->addWidget(createStatsFrame(tr("速率:"), m_rxRateLabel, "rxRateLabel"));
+    mainLayout->addWidget(createStatsFrame(tr("发送:"), m_txTotalLabel, "txTotalLabel"));
+    mainLayout->addWidget(createStatsFrame(tr("速率:"), m_txRateLabel, "txRateLabel"));
+    mainLayout->addWidget(createStatsFrame(tr("峰值:"), m_peakRateLabel, "peakRateLabel"));
+    mainLayout->addWidget(createStatsFrame(tr("时间:"), m_elapsedLabel, "elapsedLabel"));
 
-    // RX累计标签
-    m_rxTotalLabel = new QLabel(QStringLiteral("0 B"));
-    m_rxTotalLabel->setObjectName("rxTotalLabel");
-    rxLayout->addRow(tr("接收:"), m_rxTotalLabel);
-
-    // RX速率标签
-    m_rxRateLabel = new QLabel(QStringLiteral("0 B/s"));
-    m_rxRateLabel->setObjectName("rxRateLabel");
-    rxLayout->addRow(tr("速率:"), m_rxRateLabel);
-
-    mainLayout->addWidget(rxFrame);
-
-    // ---- 发送（TX）统计区域 ----
-    auto* txFrame = new QFrame;
-    txFrame->setObjectName("statsFrame");
-    txFrame->setFrameShape(QFrame::StyledPanel);
-    auto* txLayout = new QFormLayout(txFrame);
-    txLayout->setContentsMargins(8, 6, 8, 6);
-    txLayout->setSpacing(4);
-    txLayout->setLabelAlignment(Qt::AlignRight);
-
-    // TX累计标签
-    m_txTotalLabel = new QLabel(QStringLiteral("0 B"));
-    m_txTotalLabel->setObjectName("txTotalLabel");
-    txLayout->addRow(tr("发送:"), m_txTotalLabel);
-
-    // TX速率标签
-    m_txRateLabel = new QLabel(QStringLiteral("0 B/s"));
-    m_txRateLabel->setObjectName("txRateLabel");
-    txLayout->addRow(tr("速率:"), m_txRateLabel);
-
-    mainLayout->addWidget(txFrame);
-
-    // ---- 连接持续时间 ----
-    auto* elapsedFrame = new QFrame;
-    elapsedFrame->setObjectName("statsFrame");
-    elapsedFrame->setFrameShape(QFrame::StyledPanel);
-    auto* elapsedLayout = new QFormLayout(elapsedFrame);
-    elapsedLayout->setContentsMargins(8, 6, 8, 6);
-    elapsedLayout->setSpacing(4);
-    elapsedLayout->setLabelAlignment(Qt::AlignRight);
-
-    m_elapsedLabel = new QLabel(QStringLiteral("00:00:00"));
-    m_elapsedLabel->setObjectName("elapsedLabel");
-    elapsedLayout->addRow(tr("时间:"), m_elapsedLabel);
-
-    mainLayout->addWidget(elapsedFrame);
+    // ---- 串口错误计数（默认隐藏，有错误时显示） ----
+    m_errorLabel = new QLabel;
+    m_errorLabel->setObjectName("errorLabel");
+    m_errorLabel->setWordWrap(true);
+    m_errorLabel->hide();  // 无错误时不占用空间
+    mainLayout->addWidget(m_errorLabel);
 
     // 底部弹性空间
     mainLayout->addStretch();
+}
+
+QFrame* DataStatistics::createStatsFrame(const QString& label, QLabel*& valueLabel, const QString& objectName)
+{
+    auto* frame = new QFrame;
+    frame->setObjectName("statsFrame");
+    frame->setFrameShape(QFrame::StyledPanel);
+    auto* layout = new QFormLayout(frame);
+    layout->setContentsMargins(8, 6, 8, 6);
+    layout->setSpacing(4);
+    layout->setLabelAlignment(Qt::AlignRight);
+
+    valueLabel = new QLabel(QStringLiteral("0 B"));
+    valueLabel->setObjectName(objectName);
+    layout->addRow(label, valueLabel);
+    return frame;
 }
 
 void DataStatistics::update(quint64 rxBytes, quint64 txBytes)
@@ -122,13 +96,22 @@ void DataStatistics::reset()
     m_lastTxBytes = 0;
     m_rxRate = 0.0;
     m_txRate = 0.0;
+    m_peakRxRate = 0.0;
+    m_peakTxRate = 0.0;
+
+    // 重置错误计数
+    m_framingErrors = 0;
+    m_parityErrors = 0;
+    m_overrunErrors = 0;
 
     // 重置UI显示
     m_rxTotalLabel->setText("0 B");
     m_txTotalLabel->setText("0 B");
     m_rxRateLabel->setText("0 B/s");
     m_txRateLabel->setText("0 B/s");
+    m_peakRateLabel->setText("0 B/s");
     m_elapsedLabel->setText("00:00:00");
+    m_errorLabel->hide();
 
     // 重启计时器
     m_stopwatch.restart();
@@ -146,11 +129,6 @@ double DataStatistics::txRate() const
 
 void DataStatistics::onRefreshTimer()
 {
-    // 读取当前累计值（从标签文本无法直接获取数值，所以从label无法计算）
-    // 这里需要外部通过update()传入累计值，我们存储上次采样值来计算速率
-    // 注意：实际的速率计算依赖于update()被调用时保存的lastRxBytes/lastTxBytes
-    //       这里我们用一个简单的方案：每次定时器触发时，速率 = 上次update传来的累计值 - 上次采样值
-
     // 更新持续时间显示
     qint64 elapsedSec = m_stopwatch.elapsed() / 1000;
     int hours   = static_cast<int>(elapsedSec / 3600);
@@ -166,6 +144,36 @@ void DataStatistics::onRefreshTimer()
     // 更新速率显示
     m_rxRateLabel->setText(formatRate(m_rxRate));
     m_txRateLabel->setText(formatRate(m_txRate));
+
+    // 更新峰值速率（取历史最大值）
+    if (m_rxRate > m_peakRxRate) m_peakRxRate = m_rxRate;
+    if (m_txRate > m_peakTxRate) m_peakTxRate = m_txRate;
+    double peakRate = qMax(m_peakRxRate, m_peakTxRate);
+    m_peakRateLabel->setText(formatRate(peakRate));
+}
+
+void DataStatistics::updateErrors(int framingErrors, int parityErrors, int overrunErrors)
+{
+    // 更新内部计数器
+    m_framingErrors = framingErrors;
+    m_parityErrors = parityErrors;
+    m_overrunErrors = overrunErrors;
+
+    // 有错误时显示错误面板
+    int totalErrors = framingErrors + parityErrors + overrunErrors;
+    if (totalErrors > 0) {
+        QStringList parts;
+        if (framingErrors > 0)
+            parts << tr("帧错误: %1").arg(framingErrors);
+        if (parityErrors > 0)
+            parts << tr("校验错误: %1").arg(parityErrors);
+        if (overrunErrors > 0)
+            parts << tr("溢出: %1").arg(overrunErrors);
+        m_errorLabel->setText(tr("⚠ 通信错误 - ") + parts.join(" | "));
+        m_errorLabel->show();
+    } else {
+        m_errorLabel->hide();
+    }
 }
 
 QString DataStatistics::formatBytes(quint64 bytes) const

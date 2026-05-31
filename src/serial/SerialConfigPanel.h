@@ -19,9 +19,12 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QVariantMap>
+#include <QSerialPortInfo>
 
 class QAbstractAnimation;
 class QVBoxLayout;
+class QGroupBox;
+class AnimatedButton;
 
 /**
  * @brief 串口配置面板 - 端口选择、参数配置、连接控制和状态指示
@@ -64,13 +67,24 @@ signals:
     void dtrChanged(bool enabled);///< DTR状态变化(true=HIGH, false=LOW)
     void rtsChanged(bool enabled);///< RTS状态变化(true=HIGH, false=LOW)
 
+    /** @brief 运行时波特率变化信号(连接后用户更改波特率时发射)
+     * @param baud 新的波特率值
+     */
+    void baudRateChanged(qint32 baud);
+
 private slots:
     void onPortComboChanged();    ///< 端口变化时更新按钮状态
 
 private:
     void setupUI();
+    /** @brief 创建端口选择区域(端口下拉框+刷新按钮) */
+    QGroupBox* createPortGroup();
+    /** @brief 创建串口参数区域(波特率/数据位/校验位/停止位/流控) */
+    QGroupBox* createParamGroup();
     /** @brief 构建控制信号+驱动检测+连接按钮区域(从setupUI拆分) */
     void setupSignalAndConnectControls(QVBoxLayout* mainLayout);
+    /** @brief 创建DTR/RTS控制信号分组(含按钮+信号连接) */
+    QGroupBox* createControlSignalsGroup();
     void updateDriverInfo();
     void updateConnectButtonState();
     /** @brief 更新状态指示器的颜色状态property并刷新样式 */
@@ -81,10 +95,12 @@ private:
     void refreshDtrStyle();
     /** @brief 刷新RTS按钮的视觉状态(HIGH=绿, LOW=灰) */
     void refreshRtsStyle();
+    /** @brief 构建端口详情tooltip(VID/PID/制造商/序列号) */
+    QString buildPortTooltip(const QSerialPortInfo& info) const;
 
     // ---- 控件指针 ----
     QComboBox* m_portCombo;        ///< 端口选择下拉框
-    QPushButton* m_refreshBtn;     ///< 刷新端口列表按钮
+    AnimatedButton* m_refreshBtn;   ///< 刷新端口列表按钮(带hover/press动画)
     QComboBox* m_baudCombo;        ///< 波特率选择
     QComboBox* m_dataBitsCombo;    ///< 数据位选择
     QComboBox* m_parityCombo;      ///< 校验位选择
@@ -92,7 +108,7 @@ private:
     QComboBox* m_flowControlCombo; ///< 流控模式选择
     QPushButton* m_dtrBtn;         ///< DTR信号切换按钮(HIGH/LOW)
     QPushButton* m_rtsBtn;         ///< RTS信号切换按钮(HIGH/LOW)
-    QPushButton* m_connectBtn;     ///< 连接/断开按钮
+    AnimatedButton* m_connectBtn;  ///< 连接/断开按钮(带hover/press动画)
     QLabel* m_driverInfoLbl;       ///< 驱动检测信息标签
     QLabel* m_statusIndicator;     ///< 连接状态指示器(彩色圆点)
 

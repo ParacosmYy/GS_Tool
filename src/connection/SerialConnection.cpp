@@ -5,6 +5,7 @@
 
 #include "connection/SerialConnection.h"
 #include <QDebug>
+#include <QTimer>
 #include <QVariant>
 
 /**
@@ -24,6 +25,8 @@ SerialConnection::SerialConnection(QObject* parent)
             this, &SerialConnection::onReadyRead);
     connect(&m_serial, &QSerialPort::errorOccurred,
             this, &SerialConnection::onError);
+    connect(&m_serial, &QSerialPort::bytesWritten,
+            this, &SerialConnection::onBytesWritten);
 }
 
 /** @brief 析构函数，确保串口被正确关闭 */
@@ -99,6 +102,7 @@ bool SerialConnection::open()
 
     // 步骤5: 打开成功
     m_state = ConnectionState::Connected;
+    resetErrorCounters();  // 每次打开串口时重置错误计数器
     emit stateChanged(m_state);
     qDebug() << "Serial opened:" << m_portName
              << "baud:" << m_serial.baudRate();
@@ -344,6 +348,26 @@ void SerialConnection::onError(QSerialPort::SerialPortError error)
     QString errorMsg = translateError(error);
     qWarning() << "Serial error on" << m_portName << ":" << error << errorMsg;
 
+    // 统计错误类型（Qt 6.8.3无FramingError/ParityError枚举，
+    // 按ReadError/WriteError/TimeoutError分类统计）
+    switch (error) {
+    case QSerialPort::ReadError:
+        m_errorCounters.framingErrors++;
+        break;
+    case QSerialPort::WriteError:
+        m_errorCounters.parityErrors++;
+        break;
+    case QSerialPort::TimeoutError:
+        m_errorCounters.overrunErrors++;
+        break;
+    case QSerialPort::ResourceError:
+        /* 资源错误不算通信错误，不统计 */
+        break;
+    default:
+        m_errorCounters.unknownErrors++;
+        break;
+    }
+
     m_state = ConnectionState::Error;
     emit stateChanged(m_state);
     emit errorOccurred(errorMsg);
@@ -411,4 +435,45 @@ QString SerialConnection::translateError(QSerialPort::SerialPortError error)
         return tr("端口 %1 发生未识别的错误(代码:%2): %3")
             .arg(m_portName).arg(static_cast<int>(error)).arg(systemError);
     }
+}
+
+/**
+ * @brief QSerialPort::bytesWritten 信号处理
+ *
+ * 将 QSerialPort 的写入完成事件转发为 IConnection::bytesWritten 信号，
+ * 上层模块可通过此信号跟踪实际写入的字节数（如OTA进度追踪）。
+ *
+ * @param bytes 实际写入的字节数
+ */
+void SerialConnection::onBytesWritten(qint64 bytes)
+{
+    emit bytesWritten(bytes);
+}
+
+/**
+ * @brief 发送Break信号
+ *
+ * 部分嵌入式设备的bootloader需要通过串口Break信号触发升级模式。
+ * 实现方式: 拉低TX线指定时间后恢复，模拟标准Break条件。
+ *
+ * @param duration Break持续时间(毫秒)，默认100ms
+ */
+void SerialConnection::sendBreak(int duration)
+{
+    if (m_serial.isOpen()) {
+        m_serial.setBreakEnabled(true);
+        QTimer::singleShot(duration, this, [this]() {
+            m_serial.setBreakEnabled(false);
+        });
+    }
+}
+
+/**
+ * @brief 重置错误计数器
+ *
+ * 将所有错误计数归零。通常在串口重新打开时自动调用。
+ */
+void SerialConnection::resetErrorCounters()
+{
+    m_errorCounters = SerialErrorCounters{};
 }

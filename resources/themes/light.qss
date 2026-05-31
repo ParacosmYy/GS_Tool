@@ -648,7 +648,16 @@ QLabel#rxTotalLabel { color: #22c55e; font-size: 13px; font-weight: bold; }
 QLabel#rxRateLabel { color: #22c55e; font-size: 11px; }
 QLabel#txTotalLabel { color: #ef4444; font-size: 13px; font-weight: bold; }
 QLabel#txRateLabel { color: #ef4444; font-size: 11px; }
+QLabel#peakRateLabel { color: #3b82f6; font-size: 12px; font-weight: bold; }
 QLabel#elapsedLabel { color: #374151; font-size: 13px; font-family: monospace; }
+QLabel#errorLabel {
+    color: #ef4444;
+    font-size: 12px;
+    background-color: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 4px;
+    padding: 6px 8px;
+}
 
 /* === 终端搜索栏 === */
 QWidget#terminalSearchBar { background: #f3f4f6; }

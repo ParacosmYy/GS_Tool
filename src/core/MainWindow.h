@@ -86,8 +86,9 @@ private:
     void setupStatusBar();
 
     void connectSignals();                 ///< 连接所有模块间信号/槽
-    void connectSerialSignals();           ///< 串口连接/断开/重连信号路由
+    void connectSerialSignals();           ///< 串口连接/断开信号路由
     void connectSerialSendSignals();       ///< 快捷指令/发送控制器信号路由
+    void connectReconnectSignals();        ///< 自动重连状态指示信号路由
     void connectToolbarSignals();          ///< 工具栏/录制状态消息信号路由
     void connectSearchAndProtocolSignals();///< 搜索/协议桥/帧编辑/导航信号路由
     void connectPortWatchSignals();        ///< 热插拔状态栏通知

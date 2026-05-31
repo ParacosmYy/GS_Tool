@@ -38,6 +38,7 @@ class DataLogger;
 class SendHistory;
 class TimedSender;
 class IConnection;
+class AnimatedButton;
 
 /**
  * @brief 发送控制器 - 管理数据发送的完整生命周期
@@ -171,8 +172,8 @@ private:
     /** @brief 发送输入框，支持文本和 HEX 输入，带发送历史自动补全 */
     QLineEdit* m_sendInput = nullptr;
 
-    /** @brief 发送按钮，点击或回车触发 onSendData() */
-    QPushButton* m_sendBtn = nullptr;
+    /** @brief 发送按钮(带hover/press动画)，点击或回车触发 onSendData() */
+    AnimatedButton* m_sendBtn = nullptr;
 
     /** @brief 发送模式切换下拉框: 0=文本, 1=HEX */
     QComboBox* m_sendModeCombo = nullptr;

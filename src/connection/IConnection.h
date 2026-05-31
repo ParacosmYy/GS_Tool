@@ -92,6 +92,12 @@ public:
      */
     virtual bool isRts() const { return false; }
 
+    /**
+     * @brief 发送Break信号(部分bootloader需要)
+     * @param duration Break持续时间(毫秒)，默认100ms
+     */
+    virtual void sendBreak(int duration = 100) { Q_UNUSED(duration); }
+
 signals:
     /** @brief 收到数据时发出 */
     void dataReceived(const QByteArray& data);
@@ -101,6 +107,12 @@ signals:
 
     /** @brief 发生错误时发出 */
     void errorOccurred(const QString& errorMsg);
+
+    /**
+     * @brief 数据已写入底层传输通道信号
+     * @param bytes 实际写入的字节数
+     */
+    void bytesWritten(qint64 bytes);
 };
 
 #endif // ICONNECTION_H
