@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "chart/ChartModel.h"
 #include "serial/PortWatcher.h"
+#include "core/ToastWidget.h"
 #include <QMessageBox>
 
 /**
@@ -81,6 +82,11 @@ void MainWindow::connectSignals()
             this, [this](const QString& title, const QString& message) {
         QMessageBox::warning(this, title, message);
     });
+    // 连接失败 → 吐司通知（Error 类型）
+    connect(m_connController, &ConnectionController::connectionFailed,
+            this, [this](const QString&, const QString& message) {
+        ToastWidget::show(this, message, ToastWidget::ToastType::Error);
+    });
 
     // 快捷指令 → 发送控制器
     connect(m_panelManager->quickCmdBar(), &QuickCommandBar::commandTriggered,
@@ -92,6 +98,11 @@ void MainWindow::connectSignals()
     connect(m_sendController, &SendController::statusMessage,
             this, [this](const QString& msg) {
                 statusBar()->showMessage(msg, 3000);
+            });
+    // 发送状态消息 → 吐司通知
+    connect(m_sendController, &SendController::statusMessage,
+            this, [this](const QString& msg) {
+                ToastWidget::show(this, msg);
             });
 
     // ---- 工具栏信号 → 委托给 TerminalController ----
@@ -124,6 +135,12 @@ void MainWindow::connectSignals()
     connect(m_recordingController, &RecordingController::statusMessage,
             this, [this](const QString& msg, int timeoutMs) {
                 statusBar()->showMessage(msg, timeoutMs);
+            });
+    // 录制/回放状态消息 → 吐司通知
+    connect(m_recordingController, &RecordingController::statusMessage,
+            this, [this](const QString& msg, int timeoutMs) {
+                ToastWidget::show(this, msg, ToastWidget::ToastType::Info,
+                                  timeoutMs > 0 ? timeoutMs : 3000);
             });
     // 回放数据写入终端
     connect(m_recordingController, &RecordingController::playbackData,
@@ -170,6 +187,9 @@ void MainWindow::connectSignals()
     // 导航树点击 → 面板切换
     connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
         QString text = index.data().toString();
+
+        // 触发导航指示器滑动动画
+        m_navIndicator->moveToIndex(index);
 
         if (text == tr("数据导出")) { m_terminalController->onExportData(this); return; }
         if (text == tr("TCP客户端")) { m_connController->connectNetwork(ConnectionType::TcpClient); return; }

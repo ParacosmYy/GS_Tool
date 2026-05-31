@@ -322,7 +322,7 @@ void YModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_ymodemState = State::Error;
                 markError();
-                emit transferError("Cancelled during final handshake");
+                emit transferError(tr("Cancelled during final handshake"));
                 m_receiveBuffer.remove(0, readIdx);
                 return;
             }

@@ -10,8 +10,7 @@
  */
 
 #include "ota/OtaWidget.h"
-#include "core/ThemeManager.h"
-#include "utils/ByteFormat.h"
+
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
@@ -19,6 +18,9 @@
 #include <QTime>
 #include <QFileInfo>
 #include <QDateTime>
+
+#include "core/ThemeManager.h"
+#include "utils/ByteFormat.h"
 
 // ============================================================================
 // 构造 / 公开接口
@@ -351,7 +353,7 @@ void OtaWidget::setTransferring(bool transferring)
     m_filePathEdit->setEnabled(!transferring);
     if (transferring) {
         m_progressBar->setValue(0);
-        m_progressBar->setStyleSheet(QString());
+        m_progressBar->resetChunkColor();  // 恢复QSS主题默认颜色
         m_progressBar->startShimmer();
         m_speedLbl->setText("");
         m_etaLbl->setText("");
@@ -363,9 +365,10 @@ void OtaWidget::setTransferring(bool transferring)
 /**
  * @brief 启动进度条完成变色动画（accent -> success，400ms OutCubic）
  *
- * 由于 QProgressBar 没有可直接动画的颜色属性，
- * 采用两阶段方案: 先设置中间混合色，400ms 后切换为最终 success 色。
- * 使用 QPropertyAnimation 的 value(100->100) 作为定时器控制。
+ * 从 ThemeManager 获取 accent 和 success 语义色，采用两阶段渐变:
+ *   阶段1: 立即设置中间混合色（50% accent + 50% success）
+ *   阶段2: 400ms 后切换为最终 success 色
+ * 颜色通过 setChunkColor() 设置，布局属性由 QSS 主题文件控制。
  */
 void OtaWidget::startCompletionAnimation()
 {
@@ -383,10 +386,8 @@ void OtaWidget::startCompletionAnimation()
     delete m_colorAnim;
     m_colorAnim = nullptr;
 
-    // 阶段1: 立即设置中间混合色
-    m_progressBar->setStyleSheet(
-        QString("QProgressBar#otaProgressBar::chunk { background-color: %1; border-radius: 3px; }")
-            .arg(mid.name()));
+    // 阶段1: 立即设置中间混合色（布局属性由QSS主题控制）
+    m_progressBar->setChunkColor(mid);
 
     // 阶段2: 400ms 后切换为最终 success 色
     m_colorAnim = new QPropertyAnimation(m_progressBar, "value");
@@ -396,9 +397,7 @@ void OtaWidget::startCompletionAnimation()
     m_colorAnim->setEasingCurve(QEasingCurve::OutCubic);
 
     connect(m_colorAnim, &QPropertyAnimation::finished, this, [this, success]() {
-        m_progressBar->setStyleSheet(
-            QString("QProgressBar#otaProgressBar::chunk { background-color: %1; border-radius: 3px; }")
-                .arg(success.name()));
+        m_progressBar->setChunkColor(success);
     });
 
     m_colorAnim->start(QAbstractAnimation::DeleteWhenStopped);

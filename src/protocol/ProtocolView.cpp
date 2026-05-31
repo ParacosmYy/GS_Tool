@@ -40,12 +40,12 @@ void ProtocolView::setupUI()
     toolbar->setObjectName("protocolToolbar");
     auto* toolLayout = new QHBoxLayout(toolbar);
     toolLayout->setContentsMargins(8, 4, 8, 4);
-    m_statusLabel = new QLabel(tr("No frames"));
+    m_statusLabel = new QLabel(tr("暂无数据"));
     m_statusLabel->setObjectName("protocolStatusLabel");
-    m_clearBtn = new QPushButton(tr("Clear"));
+    m_clearBtn = new QPushButton(tr("清除"));
     m_clearBtn->setObjectName("protocolClearBtn");
     m_clearBtn->setFixedWidth(60);
-    m_exportBtn = new QPushButton(tr("Export"));
+    m_exportBtn = new QPushButton(tr("导出"));
     m_exportBtn->setObjectName("protocolExportBtn");
     m_exportBtn->setFixedWidth(60);
     toolLayout->addWidget(m_statusLabel, 1);
@@ -74,7 +74,7 @@ void ProtocolView::setupUI()
     connect(m_clearBtn, &QPushButton::clicked, this, &ProtocolView::clear);
     connect(m_exportBtn, &QPushButton::clicked, this, [this]() {
         if (m_frames.isEmpty()) {
-            QMessageBox::information(this, tr("Export"), tr("No data to export"));
+            QMessageBox::information(this, tr("导出"), tr("No data to export"));
             return;
         }
         QString filePath = QFileDialog::getSaveFileName(
@@ -82,7 +82,7 @@ void ProtocolView::setupUI()
         if (filePath.isEmpty()) return;
         QFile file(filePath);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QMessageBox::warning(this, tr("Export"), tr("Cannot write to file"));
+            QMessageBox::warning(this, tr("导出"), tr("Cannot write to file"));
             return;
         }
         QTextStream stream(&file);
@@ -105,21 +105,21 @@ void ProtocolView::setupContextMenu()
 {
     m_contextMenu = new QMenu(this);
     m_contextMenu->setObjectName("protocolContextMenu");
-    m_copyRowAction = new QAction(tr("Copy Row"), this);
+    m_copyRowAction = new QAction(tr("复制行"), this);
     m_copyRowAction->setObjectName("protocolCopyRowAction");
     connect(m_copyRowAction, &QAction::triggered, this, &ProtocolView::copyRow);
     m_contextMenu->addAction(m_copyRowAction);
-    m_copyRawAction = new QAction(tr("Copy Raw"), this);
+    m_copyRawAction = new QAction(tr("复制原始数据"), this);
     m_copyRawAction->setObjectName("protocolCopyRawAction");
     connect(m_copyRawAction, &QAction::triggered, this, &ProtocolView::copyRaw);
     m_contextMenu->addAction(m_copyRawAction);
     m_contextMenu->addSeparator();
-    m_exportJsonAction = new QAction(tr("Export JSON"), this);
+    m_exportJsonAction = new QAction(tr("导出JSON"), this);
     m_exportJsonAction->setObjectName("protocolExportJsonAction");
     connect(m_exportJsonAction, &QAction::triggered, this, &ProtocolView::exportJson);
     m_contextMenu->addAction(m_exportJsonAction);
     m_contextMenu->addSeparator();
-    m_clearAction = new QAction(tr("Clear"), this);
+    m_clearAction = new QAction(tr("清除"), this);
     m_clearAction->setObjectName("protocolClearAction");
     connect(m_clearAction, &QAction::triggered, this, &ProtocolView::clear);
     m_contextMenu->addAction(m_clearAction);
@@ -153,7 +153,7 @@ void ProtocolView::copyRow()
     for (int i = 0; i < m_fieldNames.size(); ++i)
         cols << m_model->data(m_model->index(row, kFixedColumns + i)).toString();
     QApplication::clipboard()->setText(cols.join("\t"));
-    m_statusLabel->setText(tr("Row copied"));
+    m_statusLabel->setText(tr("已复制行"));
 }
 
 /** @brief 复制选中帧的原始HEX数据 */
@@ -171,18 +171,18 @@ void ProtocolView::copyRaw()
         rawData = parts.join(" ");
     }
     QApplication::clipboard()->setText(rawData);
-    m_statusLabel->setText(tr("Raw data copied"));
+    m_statusLabel->setText(tr("已复制原始数据"));
 }
 
 /** @brief 导出所有帧为JSON */
 void ProtocolView::exportJson()
 {
     if (m_frames.isEmpty()) {
-        QMessageBox::information(this, tr("Export JSON"), tr("No data to export"));
+        QMessageBox::information(this, tr("导出JSON"), tr("No data to export"));
         return;
     }
     QString filePath = QFileDialog::getSaveFileName(
-        this, tr("Export JSON"), QString(), tr("JSON files (*.json)"));
+        this, tr("导出JSON"), QString(), tr("JSON files (*.json)"));
     if (filePath.isEmpty()) return;
 
     QJsonObject root;
@@ -207,7 +207,7 @@ void ProtocolView::exportJson()
 
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, tr("Export JSON"), tr("Cannot write to file"));
+        QMessageBox::warning(this, tr("导出JSON"), tr("Cannot write to file"));
         return;
     }
     file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
@@ -262,7 +262,7 @@ void ProtocolView::clear()
     m_frames.clear();
     m_totalFrames = 0;
     m_totalErrors = 0;
-    m_statusLabel->setText(tr("No frames"));
+    m_statusLabel->setText(tr("暂无数据"));
 }
 
 void ProtocolView::setMaxRows(int max) { m_maxRows = max; }

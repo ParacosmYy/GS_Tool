@@ -27,6 +27,7 @@
 #include "core/PanelManager.h"
 #include "core/BackgroundWidget.h"
 #include "core/BackgroundSettingsPopup.h"
+#include "core/NavIndicatorWidget.h"
 #include "core/SessionManager.h"
 #include "utils/SettingsManager.h"
 #include "terminal/TerminalSearchBar.h"
@@ -130,6 +131,9 @@ private:
 
     /** @brief 左侧导航树控件，由 NavigationController 构建数据模型 */
     QTreeView* m_navTree;
+
+    /** @brief 导航树选中滑动指示器，在 navTree 左侧绘制动画 accent 色竖线 */
+    NavIndicatorWidget* m_navIndicator;
 
     /** @brief 右侧面板容器，内部包含 serialPanel 面板栈 */
     QWidget* m_rightPanel;

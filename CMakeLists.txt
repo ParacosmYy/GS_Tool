@@ -103,6 +103,8 @@ set(HEADERS
     src/core/ConnectionManager.h
     src/core/ConnectionFactory.h
     src/core/ThemeManager.h
+    src/core/ToastWidget.h
+    src/core/NavIndicatorWidget.h
     src/core/Constants.h
     src/core/SessionManager.h
     src/connection/IConnection.h

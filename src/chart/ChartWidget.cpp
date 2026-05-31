@@ -59,16 +59,18 @@ void ChartWidget::setupUI()
     auto* toolLayout = new QHBoxLayout(toolbar);
     toolLayout->setContentsMargins(8, 4, 8, 4);
 
-    m_pauseBtn = new QPushButton(tr("Pause"));
+    m_pauseBtn = new QPushButton(tr("暂停"));
     m_pauseBtn->setObjectName("chartPauseBtn");
     m_pauseBtn->setCheckable(true);
     m_pauseBtn->setMinimumWidth(60);
 
-    m_clearBtn = new QPushButton(tr("Clear"));
+    m_clearBtn = new QPushButton(tr("清除"));
     m_clearBtn->setObjectName("chartClearBtn");
     m_clearBtn->setMinimumWidth(50);
 
-    toolLayout->addWidget(new QLabel(tr("Window:")));
+    auto* windowLabel = new QLabel(tr("窗口:"));
+    windowLabel->setObjectName("chartWindowLabel");
+    toolLayout->addWidget(windowLabel);
     m_windowSizeCombo = new QComboBox;
     m_windowSizeCombo->setObjectName("chartWindowCombo");
     m_windowSizeCombo->addItems({"100", "200", "500", "1000", "2000"});
@@ -93,12 +95,12 @@ void ChartWidget::setupUI()
     m_chart->setMargins(QMargins(4, 4, 4, 4));
 
     m_xAxis = new QValueAxis;
-    m_xAxis->setTitleText(tr("Samples"));
+    m_xAxis->setTitleText(tr("采样数"));
     m_xAxis->setLabelFormat("%d");
     m_chart->addAxis(m_xAxis, Qt::AlignBottom);
 
     m_yAxis = new QValueAxis;
-    m_yAxis->setTitleText(tr("Value"));
+    m_yAxis->setTitleText(tr("数值"));
     m_chart->addAxis(m_yAxis, Qt::AlignLeft);
 
     // 设置初始轴范围，使图表在没有数据时也能渲染背景
@@ -118,7 +120,7 @@ void ChartWidget::setupUI()
                 setWindowSize(sizes[idx]);
             });
 
-    m_statusLabel->setText(tr("Channels: 0"));
+    m_statusLabel->setText(tr("通道: 0"));
 }
 
 // ============================================================================
@@ -208,7 +210,7 @@ void ChartWidget::updateChart(const QStringList& updatedChannels)
     }
 
     // 更新状态标签
-    m_statusLabel->setText(tr("Channels: %1 | Frames: %2")
+    m_statusLabel->setText(tr("通道: %1 | 帧: %2")
         .arg(m_seriesMap.size())
         .arg(m_model->currentFrameIndex()));
 }
@@ -238,7 +240,7 @@ void ChartWidget::onChannelsChanged()
         }
     }
 
-    m_statusLabel->setText(tr("Channels: %1").arg(m_seriesMap.size()));
+    m_statusLabel->setText(tr("通道: %1").arg(m_seriesMap.size()));
 }
 
 void ChartWidget::onDataCleared()
@@ -258,7 +260,7 @@ void ChartWidget::onDataCleared()
 void ChartWidget::onPauseToggled(bool paused)
 {
     m_paused = paused;
-    m_pauseBtn->setText(paused ? tr("Resume") : tr("Pause"));
+    m_pauseBtn->setText(paused ? tr("继续") : tr("暂停"));
 }
 
 void ChartWidget::onClearClicked()

@@ -170,6 +170,9 @@ void MainWindow::setupUI()
 
     m_mainSplitter->addWidget(m_navTree);
 
+    // 导航树选中滑动指示器（覆盖在 navTree 上方，透明背景，accent 色竖线动画）
+    m_navIndicator = new NavIndicatorWidget(m_navTree);
+
     // ---- 右侧内容面板 ----
     auto* rightWidget = new QWidget;
     rightWidget->setObjectName("rightWidget");
@@ -242,9 +245,9 @@ void MainWindow::setupStatusBar()
     m_connStatusLbl = new QLabel(tr("未连接"));
     m_connStatusLbl->setObjectName("connStatus");
     m_connStatusLbl->setProperty("state", "disconnected");
-    auto* rxLbl = new QLabel("RX: 0 B");
+    auto* rxLbl = new QLabel(tr("RX: 0 B"));
     rxLbl->setObjectName("rxBytesLabel");
-    auto* txLbl = new QLabel("TX: 0 B");
+    auto* txLbl = new QLabel(tr("TX: 0 B"));
     txLbl->setObjectName("txBytesLabel");
 
     statusBar()->addWidget(m_connStatusLbl, 1);

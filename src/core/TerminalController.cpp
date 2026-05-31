@@ -190,8 +190,8 @@ void TerminalController::updateStatusBar()
         if (bytes < 1024 * 1024) return QString("%1 KB").arg(bytes / 1024.0, 0, 'f', 1);
         return QString("%1 MB").arg(bytes / (1024.0 * 1024.0), 0, 'f', 1);
     };
-    m_rxBytesLbl->setText("RX: " + formatBytes(rx));
-    m_txBytesLbl->setText("TX: " + formatBytes(tx));
+    m_rxBytesLbl->setText(tr("RX: ") + formatBytes(rx));
+    m_txBytesLbl->setText(tr("TX: ") + formatBytes(tx));
 }
 
 /**

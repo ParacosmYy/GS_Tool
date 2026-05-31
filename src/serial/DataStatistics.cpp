@@ -42,12 +42,12 @@ void DataStatistics::setupUI()
     // RX累计标签
     m_rxTotalLabel = new QLabel(QStringLiteral("0 B"));
     m_rxTotalLabel->setObjectName("rxTotalLabel");
-    rxLayout->addRow(tr("RX:"), m_rxTotalLabel);
+    rxLayout->addRow(tr("接收:"), m_rxTotalLabel);
 
     // RX速率标签
     m_rxRateLabel = new QLabel(QStringLiteral("0 B/s"));
     m_rxRateLabel->setObjectName("rxRateLabel");
-    rxLayout->addRow(tr("Rate:"), m_rxRateLabel);
+    rxLayout->addRow(tr("速率:"), m_rxRateLabel);
 
     mainLayout->addWidget(rxFrame);
 
@@ -63,12 +63,12 @@ void DataStatistics::setupUI()
     // TX累计标签
     m_txTotalLabel = new QLabel(QStringLiteral("0 B"));
     m_txTotalLabel->setObjectName("txTotalLabel");
-    txLayout->addRow(tr("TX:"), m_txTotalLabel);
+    txLayout->addRow(tr("发送:"), m_txTotalLabel);
 
     // TX速率标签
     m_txRateLabel = new QLabel(QStringLiteral("0 B/s"));
     m_txRateLabel->setObjectName("txRateLabel");
-    txLayout->addRow(tr("Rate:"), m_txRateLabel);
+    txLayout->addRow(tr("速率:"), m_txRateLabel);
 
     mainLayout->addWidget(txFrame);
 
@@ -83,7 +83,7 @@ void DataStatistics::setupUI()
 
     m_elapsedLabel = new QLabel(QStringLiteral("00:00:00"));
     m_elapsedLabel->setObjectName("elapsedLabel");
-    elapsedLayout->addRow(tr("Time:"), m_elapsedLabel);
+    elapsedLayout->addRow(tr("时间:"), m_elapsedLabel);
 
     mainLayout->addWidget(elapsedFrame);
 

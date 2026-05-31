@@ -104,8 +104,8 @@ private slots:
 private:
     void updateVisibleRange();           ///< 计算可见行数
     void scrollToMatch(int line);        ///< 滚动到搜索匹配行
-    void refreshSearch();                ///< 重新执行搜索
     void refreshSearchAfterCacheUpdate();///< 缓存更新后重新搜索
+    void refreshSearch();                ///< 重新执行搜索(搜索参数不变)
     void createContextMenu();            ///< 创建右键菜单
     CachedLine formatToCache(const TerminalLine& line) const;  ///< 数据行转缓存结构
     int paintLine(QPainter& painter, const CachedLine& cached, int y, int displayLine); ///< 绘制单行

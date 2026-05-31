@@ -118,11 +118,11 @@ void SerialConfigPanel::setupUI()
     signalGroup->setObjectName("signalGroup");
     auto* signalLayout = new QHBoxLayout(signalGroup);
 
-    m_dtrCheck = new QCheckBox("DTR");
+    m_dtrCheck = new QCheckBox(tr("DTR"));
     m_dtrCheck->setChecked(true);
     m_dtrCheck->setObjectName("dtrCheck");
     m_dtrCheck->setToolTip(tr("数据终端就绪信号，部分设备需要 DTR 拉低才能复位"));
-    m_rtsCheck = new QCheckBox("RTS");
+    m_rtsCheck = new QCheckBox(tr("RTS"));
     m_rtsCheck->setChecked(true);
     m_rtsCheck->setObjectName("rtsCheck");
     m_rtsCheck->setToolTip(tr("请求发送信号，部分设备需要 RTS 拉低进入 bootloader"));
@@ -223,14 +223,25 @@ void SerialConfigPanel::setError(const QString& errorMsg)
     m_breathTimer->stop();
 
     m_connectBtn->setEnabled(true);
-    m_connectBtn->setText(tr("连接"));
-    m_connectBtn->setProperty("state", "");
+    m_connectBtn->setText(tr("连接失败"));
+    m_connectBtn->setProperty("state", "error");
     m_connectBtn->style()->unpolish(m_connectBtn);
     m_connectBtn->style()->polish(m_connectBtn);
 
     updateStatusIndicator("error");
     m_statusIndicator->setToolTip(tr("连接错误: ") + errorMsg);
-    updateConnectButtonState();
+
+    // 3秒后自动恢复为正常断开状态
+    QTimer::singleShot(3000, this, [this]() {
+        if (!m_connected && !m_connecting) {
+            m_connectBtn->setText(tr("连接"));
+            m_connectBtn->setProperty("state", "");
+            m_connectBtn->style()->unpolish(m_connectBtn);
+            m_connectBtn->style()->polish(m_connectBtn);
+            updateStatusIndicator("disconnected");
+            m_statusIndicator->setToolTip(tr("未连接"));
+        }
+    });
 }
 
 void SerialConfigPanel::setConnecting()

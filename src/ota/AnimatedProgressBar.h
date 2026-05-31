@@ -30,10 +30,15 @@
  * 传输进行时，进度条chunk上显示一条水平移动的亮光带，
  * 视觉上形成"数据正在流动"的反馈效果。
  * 使用 QPropertyAnimation 驱动，符合 CLAUDE.md §6.5 动画规范。
+ *
+ * 额外功能:
+ *   - setChunkColor(): 设置chunk区域的背景色（用于传输完成变色动画）
+ *   - resetChunkColor(): 恢复QSS主题默认颜色
+ *   - 布局属性（border-radius等）由QSS主题文件控制，不在C++中硬编码
  */
 class AnimatedProgressBar : public QProgressBar {
     Q_OBJECT
-    Q_PROPERTY(qreal shimmerOffset READ shimmerOffset WRITE setShimmerOffset)
+    Q_PROPERTY(qreal shimmerOffset READ shimmerOffset WRITE setShimmerOffset NOTIFY shimmerOffsetChanged)
 
 public:
     /**
@@ -42,6 +47,7 @@ public:
      */
     explicit AnimatedProgressBar(QWidget* parent = nullptr)
         : QProgressBar(parent), m_shimmerOffset(0.0), m_shimmerAnim(nullptr)
+        , m_customChunkColor(false)
     {}
 
     /** @brief 当前shimmer偏移量，范围 [0.0, 1.0] */
@@ -51,16 +57,31 @@ public:
     void setShimmerOffset(qreal offset) {
         if (!qFuzzyCompare(m_shimmerOffset, offset)) {
             m_shimmerOffset = offset;
+            emit shimmerOffsetChanged();
             update();  // 触发重绘
         }
     }
 
-    /**
-     * @brief 启动shimmer流动动画
-     *
-     * 创建2000ms循环的QPropertyAnimation，驱动shimmerOffset从0→1，
-     * 缓动曲线为Linear，无限循环。传输开始时调用。
-     */
+signals:
+    /** @brief shimmerOffset属性变更通知信号 */
+    void shimmerOffsetChanged();
+
+public:
+    /** @brief 设置chunk区域自定义颜色(传输完成变色动画) */
+    void setChunkColor(const QColor& color) {
+        m_chunkColor = color;
+        m_customChunkColor = true;
+        update();
+    }
+
+    /** @brief 恢复QSS主题默认chunk颜色 */
+    void resetChunkColor() {
+        m_customChunkColor = false;
+        m_chunkColor = QColor();
+        update();
+    }
+
+    /** @brief 启动shimmer流动动画(2000ms循环) */
     void startShimmer() {
         stopShimmer();
         m_shimmerAnim = new QPropertyAnimation(this, "shimmerOffset");
@@ -68,15 +89,11 @@ public:
         m_shimmerAnim->setEndValue(1.0);
         m_shimmerAnim->setDuration(2000);
         m_shimmerAnim->setEasingCurve(QEasingCurve::Linear);
-        m_shimmerAnim->setLoopCount(-1);  // 无限循环
+        m_shimmerAnim->setLoopCount(-1);
         m_shimmerAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
-    /**
-     * @brief 停止shimmer流动动画
-     *
-     * 停止动画并重置偏移量为0，传输结束/出错时调用。
-     */
+    /** @brief 停止shimmer流动动画 */
     void stopShimmer() {
         if (m_shimmerAnim) {
             m_shimmerAnim->stop();
@@ -88,20 +105,16 @@ public:
 
 protected:
     /**
-     * @brief 重绘进度条，在chunk上叠加shimmer渐变
+     * @brief 重绘进度条，在chunk上叠加自定义颜色和shimmer渐变
      *
      * 绘制流程:
      *   1. 先调用基类paintEvent绘制默认进度条（含QSS样式）
-     *   2. 获取chunk区域，在其上叠加水平移动的QLinearGradient
-     *   3. 渐变色带: accent → lighterAccent → accent，宽度约chunk的40%
+     *   2. 若设置了自定义chunk颜色，在chunk区域覆盖绘制
+     *   3. 若shimmer激活，在其上叠加水平移动的QLinearGradient
      */
     void paintEvent(QPaintEvent* event) override {
         // 先绘制基类进度条（保留QSS样式）
         QProgressBar::paintEvent(event);
-
-        // shimmer未激活时不叠加效果
-        if (m_shimmerOffset <= 0.0 || value() <= minimum())
-            return;
 
         // 获取chunk区域
         QStyleOptionProgressBar opt;
@@ -114,6 +127,18 @@ protected:
         opt.textAlignment = alignment();
         QRect chunkRect = style()->subElementRect(QStyle::SE_ProgressBarContents, &opt, this);
         if (!chunkRect.isValid())
+            return;
+
+        QPainter p(this);
+        p.setClipRect(chunkRect);
+
+        // 阶段1: 若设置了自定义chunk颜色，覆盖绘制chunk区域
+        if (m_customChunkColor && m_chunkColor.isValid()) {
+            p.fillRect(chunkRect, m_chunkColor);
+        }
+
+        // 阶段2: shimmer未激活时跳过流动效果
+        if (m_shimmerOffset <= 0.0 || value() <= minimum())
             return;
 
         // 构建shimmer渐变: accent → lighterAccent → accent
@@ -133,7 +158,6 @@ protected:
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(0.0, accent);
 
-        // 在gradStart位置开始变亮
         qreal normalizedStart = qBound(0.0, gradStart, 1.0);
         qreal normalizedMid = qBound(0.0, offset, 1.0);
         qreal normalizedEnd = qBound(0.0, gradEnd, 1.0);
@@ -144,14 +168,14 @@ protected:
         gradient.setColorAt(1.0, accent);
 
         // 在chunk上叠加半透明渐变
-        QPainter p(this);
-        p.setClipRect(chunkRect);
         p.fillRect(chunkRect, gradient);
     }
 
 private:
-    qreal m_shimmerOffset;          ///< shimmer偏移量 [0.0, 1.0]
+    qreal m_shimmerOffset;              ///< shimmer偏移量 [0.0, 1.0]
     QPropertyAnimation* m_shimmerAnim;  ///< shimmer动画实例
+    QColor m_chunkColor;                ///< 自定义chunk颜色（传输完成变色动画）
+    bool m_customChunkColor;            ///< 是否使用自定义chunk颜色（false时使用QSS默认色）
 };
 
 #endif // ANIMATEDPROGRESSBAR_H
