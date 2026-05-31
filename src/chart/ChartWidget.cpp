@@ -227,7 +227,10 @@ void ChartWidget::onChannelsChanged()
     // 获取当前主题对应的调色板
     bool isDark = ThemeManager::instance().isSystemDarkMode()
         || ThemeManager::instance().currentTheme().contains("dark");
-    const QVector<QColor>& palette = ChartColors::colorsForTheme(isDark);
+    QVector<QColor> palette = ChartColors::colorsForTheme(isDark);
+    if (palette.isEmpty()) {
+        palette = {Qt::cyan};  // 降级回退色，防止除零崩溃
+    }
 
     // 根据新的通道配置创建series
     const QVector<ChannelConfig>& channels = m_configSet.channels();

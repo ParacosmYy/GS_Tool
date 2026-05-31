@@ -19,8 +19,9 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
-#include <QTimer>
 #include <QVariantMap>
+
+class QAbstractAnimation;
 
 /**
  * @brief 串口配置面板 - 端口选择、参数配置、连接控制和状态指示
@@ -71,6 +72,8 @@ private:
     void updateConnectButtonState();
     /** @brief 更新状态指示器的颜色状态property并刷新样式 */
     void updateStatusIndicator(const QString& state);
+    /** @brief 停止呼吸动画并重置透明度特效 */
+    void stopBreathAnimation();
 
     // ---- 控件指针 ----
     QComboBox* m_portCombo;        ///< 端口选择下拉框
@@ -91,9 +94,7 @@ private:
     bool m_connecting = false;      ///< 正在连接中(防重复点击)
 
     // ---- 呼吸动画 ----
-    QTimer* m_breathTimer;          ///< 连接中状态的呼吸动画定时器
-    qreal m_breathOpacity = 1.0;    ///< 呼吸动画当前透明度
-    bool m_breathIncreasing = false;///< 呼吸动画方向(true=变亮,false=变暗)
+    QAbstractAnimation* m_breathAnim = nullptr;  ///< 连接中状态的呼吸动画(0.3↔1.0循环)
 };
 
 #endif // SERIALCONFIGPANEL_H

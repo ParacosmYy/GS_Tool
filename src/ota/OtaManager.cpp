@@ -70,10 +70,13 @@ void OtaManager::connectTransferSignals(BaseTransfer* transfer)
     connect(transfer, &BaseTransfer::transferError,
             this, [this](const QString& reason) {
                 setOtaState(OtaState::Error);
-                // 增强错误消息: 如果原因中不含文件名则追加上下文
+                // 增强错误消息: 追加协议名称上下文
                 QString enriched = reason;
+                if (!m_currentProtocol.isEmpty()) {
+                    enriched = tr("[%1] %2").arg(protocolDisplayName(m_currentProtocol), enriched);
+                }
                 if (!m_currentFileName.isEmpty() && !reason.contains(m_currentFileName)) {
-                    enriched = tr("[%1] %2").arg(m_currentFileName, reason);
+                    enriched = tr("[%1] %2").arg(m_currentFileName, enriched);
                 }
                 emit transferError(enriched);
             });
@@ -194,8 +197,9 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
         qDebug() << "OtaManager: Unknown firmware type, treating as binary:" << filePath;
     }
 
-    // ---- 步骤5: 记录当前文件名（用于错误消息上下文） ----
+    // ---- 步骤5: 记录当前文件名和协议（用于错误消息上下文） ----
     m_currentFileName = QFileInfo(effectivePath).fileName();
+    m_currentProtocol = protocol;
 
     // ---- 步骤6: 切换到传输状态 ----
     setOtaState(OtaState::Transferring);
@@ -365,4 +369,22 @@ bool OtaManager::convertHexToBin(const QString& hexPath, QString& outBinPath)
              << "size:" << binary.size() << "startAddr: 0x" << Qt::hex << startAddr;
 
     return true;
+}
+
+/**
+ * @brief 获取协议的可读显示名称
+ * @param protocol 协议标识字符串
+ * @return 人类可读的协议名称
+ *
+ * 将内部协议标识(如"xmodem-crc")转换为错误消息中的可读名称(如"XMODEM-CRC")。
+ * 未知协议原样返回，保证不会丢失上下文信息。
+ */
+QString OtaManager::protocolDisplayName(const QString& protocol) const
+{
+    if (protocol == "xmodem-crc")      return tr("XMODEM-CRC");
+    if (protocol == "xmodem-checksum") return tr("XMODEM-Checksum");
+    if (protocol == "xmodem-1k")       return tr("XMODEM-1K");
+    if (protocol == "ymodem")          return tr("YMODEM");
+    if (protocol == "zmodem")          return tr("ZMODEM");
+    return protocol.toUpper();
 }

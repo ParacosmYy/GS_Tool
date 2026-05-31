@@ -7,7 +7,7 @@
  */
 
 #include "SerialConfigPanel.h"
-#include "SerialDriverDetector.h"
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLineEdit>
@@ -16,30 +16,21 @@
 #include <QSerialPortInfo>
 #include <QIntValidator>
 #include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
+#include <QSequentialAnimationGroup>
+#include <QTimer>
+
+#include "SerialDriverDetector.h"
 
 // ---- 构造 ----
 
 SerialConfigPanel::SerialConfigPanel(QWidget* parent)
     : QWidget(parent)
-    , m_breathTimer(new QTimer(this))
 {
     setupUI();
     refreshPorts();
     updateDriverInfo();
-
-    // 呼吸动画定时器: 连接中状态时周期性更新透明度
-    m_breathTimer->setInterval(50);  // 50ms一帧，约20fps
-    connect(m_breathTimer, &QTimer::timeout, this, [this]() {
-        if (m_breathIncreasing) {
-            m_breathOpacity += 0.05;
-            if (m_breathOpacity >= 1.0) { m_breathOpacity = 1.0; m_breathIncreasing = false; }
-        } else {
-            m_breathOpacity -= 0.05;
-            if (m_breathOpacity <= 0.3) { m_breathOpacity = 0.3; m_breathIncreasing = true; }
-        }
-        if (auto* effect = qobject_cast<QGraphicsOpacityEffect*>(m_statusIndicator->graphicsEffect()))
-            effect->setOpacity(m_breathOpacity);
-    });
 }
 
 // ---- UI布局 ----
@@ -205,11 +196,11 @@ void SerialConfigPanel::setConnected(bool connected)
 
     // 更新状态指示器
     if (connected) {
-        m_breathTimer->stop();
+        stopBreathAnimation();
         updateStatusIndicator("connected");
         m_statusIndicator->setToolTip(tr("已连接"));
     } else {
-        m_breathTimer->stop();
+        stopBreathAnimation();
         updateStatusIndicator("disconnected");
         m_statusIndicator->setToolTip(tr("未连接"));
         updateConnectButtonState();
@@ -220,7 +211,7 @@ void SerialConfigPanel::setError(const QString& errorMsg)
 {
     m_connected = false;
     m_connecting = false;
-    m_breathTimer->stop();
+    stopBreathAnimation();
 
     m_connectBtn->setEnabled(true);
     m_connectBtn->setText(tr("连接失败"));
@@ -250,12 +241,41 @@ void SerialConfigPanel::setConnecting()
     updateStatusIndicator("connecting");
     m_statusIndicator->setToolTip(tr("正在连接..."));
 
-    // 启动呼吸动画
-    m_breathOpacity = 1.0;
-    m_breathIncreasing = false;
-    auto* effect = new QGraphicsOpacityEffect(m_statusIndicator);
-    m_statusIndicator->setGraphicsEffect(effect);
-    m_breathTimer->start();
+    // 创建或复用透明度特效
+    auto* effect = qobject_cast<QGraphicsOpacityEffect*>(
+        m_statusIndicator->graphicsEffect());
+    if (!effect) {
+        effect = new QGraphicsOpacityEffect(m_statusIndicator);
+        m_statusIndicator->setGraphicsEffect(effect);
+    }
+    effect->setOpacity(1.0);
+
+    // 销毁旧动画(如果存在)
+    delete m_breathAnim;
+    m_breathAnim = nullptr;
+
+    // 构建呼吸动画: 顺序组 [0.3→1.0, 1500ms] + [1.0→0.3, 1500ms], 无限循环
+    auto* group = new QSequentialAnimationGroup(this);
+
+    // 上半周期: 0.3 → 1.0 (淡入)
+    auto* fadeIn = new QPropertyAnimation(effect, "opacity");
+    fadeIn->setStartValue(0.3);
+    fadeIn->setEndValue(1.0);
+    fadeIn->setDuration(1500);
+    fadeIn->setEasingCurve(QEasingCurve::InOutSine);
+    group->addAnimation(fadeIn);
+
+    // 下半周期: 1.0 → 0.3 (淡出)
+    auto* fadeOut = new QPropertyAnimation(effect, "opacity");
+    fadeOut->setStartValue(1.0);
+    fadeOut->setEndValue(0.3);
+    fadeOut->setDuration(1500);
+    fadeOut->setEasingCurve(QEasingCurve::InOutSine);
+    group->addAnimation(fadeOut);
+
+    group->setLoopCount(-1);  // 无限循环
+    group->start(QAbstractAnimation::DeleteWhenStopped);
+    m_breathAnim = group;
 }
 
 void SerialConfigPanel::updateStatusIndicator(const QString& state)
@@ -263,6 +283,20 @@ void SerialConfigPanel::updateStatusIndicator(const QString& state)
     m_statusIndicator->setProperty("state", state);
     m_statusIndicator->style()->unpolish(m_statusIndicator);
     m_statusIndicator->style()->polish(m_statusIndicator);
+}
+
+void SerialConfigPanel::stopBreathAnimation()
+{
+    if (m_breathAnim) {
+        m_breathAnim->stop();
+        delete m_breathAnim;
+        m_breathAnim = nullptr;
+    }
+    // 重置透明度特效到完全不透明
+    if (auto* effect = qobject_cast<QGraphicsOpacityEffect*>(
+            m_statusIndicator->graphicsEffect())) {
+        effect->setOpacity(1.0);
+    }
 }
 
 // ---- 端口管理 ----

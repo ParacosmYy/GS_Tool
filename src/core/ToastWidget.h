@@ -6,7 +6,9 @@
  * 动画: 弹出 300ms OutBack, 消失 250ms InCubic (CLAUDE.md §6.5)
  * 颜色全部从 ThemeManager 获取, 无硬编码
  *
- * 使用: ToastWidget::show(this, tr("连接成功"), ToastWidget::ToastType::Success);
+ * 使用:
+ *   ToastWidget::show(this, tr("连接成功"), ToastWidget::ToastType::Success);
+ *   ToastWidget::showDebounced(this, tr("连接错误"), ToastType::Error); // 防抖
  */
 
 #ifndef TOASTWIDGET_H
@@ -20,7 +22,9 @@
 #include <QTimer>
 #include <QFontMetrics>
 #include <QMap>
+#include <QHash>
 #include <QList>
+#include <QElapsedTimer>
 #include "core/ThemeManager.h"
 
 /** @brief 通知吐司 — 临时弹出通知, 自动消失, 多条自动垂直堆叠 */
@@ -30,19 +34,15 @@ class ToastWidget : public QWidget {
 public:
     enum class ToastType { Success, Error, Info }; ///< 通知类型
 
-    /** @brief 显示吐司(唯一公开接口), 在 parent 右下角创建并显示 */
+    /** @brief 显示吐司(基础接口), 在 parent 右下角创建并显示
+     *  @param parent 父窗口 @param message 消息 @param type 类型 @param durationMs 显示时长 */
     static void show(QWidget* parent, const QString& message,
                      ToastType type = ToastType::Info, int durationMs = 3000)
     {
         if (!parent) return;
         auto* toast = new ToastWidget(parent, message, type);
         activeToasts(parent).append(toast);
-
-        // 父控件销毁时清理静态 map 中的悬挂指针条目
-        connect(parent, &QObject::destroyed, parent, [parent]() {
-            activeToastsMap().remove(parent);
-        });
-
+        connect(parent, &QObject::destroyed, parent, [parent]() { activeToastsMap().remove(parent); });
         const auto& list = activeToasts(parent);
         int bottomY = parent->height() - kMargin;
         for (auto* t : list) {
@@ -54,21 +54,33 @@ public:
         toast->QWidget::show();
 
         auto* slide = new QPropertyAnimation(toast, "pos");
-        slide->setEndValue(target);
-        slide->setDuration(300);
+        slide->setEndValue(target); slide->setDuration(300);
         slide->setEasingCurve(QEasingCurve::OutBack);
-
         auto* fade = new QPropertyAnimation(toast->m_opacityEffect, "opacity");
-        fade->setEndValue(1.0);
-        fade->setDuration(300);
+        fade->setEndValue(1.0); fade->setDuration(300);
         fade->setEasingCurve(QEasingCurve::OutBack);
-
         connect(slide, &QAbstractAnimation::finished, toast, [toast, durationMs]() {
             QTimer::singleShot(durationMs, toast, [toast]() { toast->dismiss(); });
         });
-
         slide->start(QAbstractAnimation::DeleteWhenStopped);
         fade->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+
+    /** @brief 防抖吐司 — 同一消息+类型在冷却期内静默跳过
+     *
+     * 使用静态 QHash<QString,QElapsedTimer> 跟踪最后显示时间。
+     * 若距离上次显示不足 cooldownMs 则跳过。典型场景: 自动重连防重复吐司。
+     * @param parent 父窗口 @param msg 消息文本(去重键) @param type 类型(去重键)
+     * @param cooldownMs 冷却间隔，默认 2000ms */
+    static void showDebounced(QWidget* parent, const QString& msg,
+                              ToastType type = ToastType::Info, int cooldownMs = 2000)
+    {
+        QString key = QString::number(static_cast<int>(type)) + "|" + msg;
+        auto& map = debounceMap();
+        if (map.contains(key) && map[key].elapsed() < cooldownMs)
+            return;  /* 冷却期未过，静默跳过 */
+        map[key].start();
+        show(parent, msg, type);
     }
 
 protected:
@@ -80,21 +92,16 @@ protected:
         QColor bg = theme.color(ThemeManager::SemanticColor::BgSecondary);
         QColor accent = semanticColor();
         QColor txt = theme.color(ThemeManager::SemanticColor::TextPrimary);
-
         QPainterPath path;
         path.addRoundedRect(rect().adjusted(1, 1, -1, -1), kRadius, kRadius);
         p.fillPath(path, bg);
-
-        p.save();
-        p.setClipPath(path);
+        p.save(); p.setClipPath(path);
         p.fillRect(QRect(0, 0, kLeftBorder, height()), accent);
         p.restore();
-
         int iconX = kLeftBorder + kPad;
         p.setPen(accent);
         p.setFont(QFont("Segoe UI Emoji", kIconSize, QFont::Bold));
         p.drawText(QRect(iconX, 0, kIconArea, height()), Qt::AlignCenter, iconChar());
-
         int textX = iconX + kIconArea + kPad;
         p.setPen(txt);
         p.setFont(QFont("Microsoft YaHei UI", 12));
@@ -108,18 +115,14 @@ private:
     {
         setObjectName("toastWidget");
         setProperty("type", type == ToastType::Success ? "success"
-                     : type == ToastType::Error   ? "error"
-                                                  : "info");
-        setAttribute(Qt::WA_TranslucentBackground);
-        setFixedWidth(kWidth);
-        QFont font("Microsoft YaHei UI", 12);
-        QFontMetrics fm(font);
+                     : type == ToastType::Error ? "error" : "info");
+        setAttribute(Qt::WA_TranslucentBackground); setFixedWidth(kWidth);
+        QFont font("Microsoft YaHei UI", 12); QFontMetrics fm(font);
         int textW = kWidth - kLeftBorder - kPad * 3 - kIconArea;
         QRect bound = fm.boundingRect(0, 0, textW, 0, Qt::TextWordWrap, message);
         setFixedHeight(qMax(kMinHeight, bound.height() + kPad * 2));
         m_opacityEffect = new QGraphicsOpacityEffect(this);
-        m_opacityEffect->setOpacity(0.0);
-        setGraphicsEffect(m_opacityEffect);
+        m_opacityEffect->setOpacity(0.0); setGraphicsEffect(m_opacityEffect);
     }
 
     QColor semanticColor() const {                          ///< 获取语义色(ThemeManager)
@@ -134,17 +137,16 @@ private:
 
     QString iconChar() const {                               ///< 图标Unicode字符
         switch (m_type) {
-        case ToastType::Success: return QStringLiteral("\u2713");
-        case ToastType::Error:   return QStringLiteral("\u2715");
-        case ToastType::Info:    return QStringLiteral("\u2139");
+        case ToastType::Success: return QStringLiteral("✓");
+        case ToastType::Error:   return QStringLiteral("✕");
+        case ToastType::Info:    return QStringLiteral("ℹ");
         }
-        return QStringLiteral("\u2139");
+        return QStringLiteral("ℹ");
     }
 
     void dismiss() {                                         ///< 250ms InCubic消失动画
         auto* fadeOut = new QPropertyAnimation(m_opacityEffect, "opacity");
-        fadeOut->setEndValue(0.0);
-        fadeOut->setDuration(250);
+        fadeOut->setEndValue(0.0); fadeOut->setDuration(250);
         fadeOut->setEasingCurve(QEasingCurve::InCubic);
         connect(fadeOut, &QAbstractAnimation::finished, this, [this]() {
             QWidget* pw = parentWidget();
@@ -154,16 +156,16 @@ private:
         fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
-    static QList<ToastWidget*>& activeToasts(QWidget* parent) { ///< 活跃吐司列表
-        return activeToastsMap()[parent];
+    static QList<ToastWidget*>& activeToasts(QWidget* parent) { return activeToastsMap()[parent]; }
+    static QMap<QWidget*, QList<ToastWidget*>>& activeToastsMap() {
+        static QMap<QWidget*, QList<ToastWidget*>> map; return map;
+    }
+    /** @brief 防抖计时器映射 — key=类型编号+"|"+消息, value=上次显示时刻 */
+    static QHash<QString, QElapsedTimer>& debounceMap() {
+        static QHash<QString, QElapsedTimer> map; return map;
     }
 
-    static QMap<QWidget*, QList<ToastWidget*>>& activeToastsMap() { ///< 活跃吐司静态映射
-        static QMap<QWidget*, QList<ToastWidget*>> map;
-        return map;
-    }
-
-    static void repositionToasts(QWidget* parent) {              ///< 消失后重排位置
+    static void repositionToasts(QWidget* parent) {          ///< 消失后重排位置
         if (!parent) return;
         auto& list = activeToasts(parent);
         int bottomY = parent->height() - kMargin;
@@ -172,8 +174,7 @@ private:
             QPoint target(parent->width() - kMargin - t->width(), y);
             if (t->pos() != target) {
                 auto* slide = new QPropertyAnimation(t, "pos");
-                slide->setEndValue(target);
-                slide->setDuration(200);
+                slide->setEndValue(target); slide->setDuration(200);
                 slide->setEasingCurve(QEasingCurve::OutCubic);
                 slide->start(QAbstractAnimation::DeleteWhenStopped);
             }

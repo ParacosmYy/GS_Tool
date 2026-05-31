@@ -108,6 +108,7 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
     if (!m_currentConn->open()) {
         stopConnectionTimeout();
         emit connectionFailed(tr("Connection Failed"), tr("Cannot open serial port"));
+        disconnect(m_currentConn, nullptr, this, nullptr);  // 断开信号，防止 removeConnection 触发已连接的槽
         m_connManager->removeConnection(m_currentConn);
         m_currentConn = nullptr;
         m_connectedPortName.clear();

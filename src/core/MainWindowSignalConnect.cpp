@@ -8,12 +8,14 @@
  * 信号流向（详见 connectSignals() 方法内部分组注释）:
  *   SerialConfigPanel → ConnectionController → MainWindow(状态更新)
  *   ConnectionController → TerminalModel(接收数据) + ProtocolBridgeMgr(协议解析)
+ *   ConnectionController → ToastWidget(连接成功/断开/错误通知)
  *   QuickCommandBar → SendController(发送数据)
  *   ToolbarController → TerminalController(显示模式/时间戳/清屏/导出)
  *   ToolbarController → SettingsController(主题/语言)
  *   RecordingController → MainWindow(回放数据写入终端)
  *   TerminalSearchBar → TerminalController(搜索高亮)
  *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形配置)
+ *   OtaWidget → ToastWidget(传输开始/完成/失败通知)
  *   NavTree → NavigationController(面板切换)
  */
 
@@ -22,6 +24,7 @@
 #include "serial/PortWatcher.h"
 #include "core/ToastWidget.h"
 #include "core/ThemeManager.h"
+#include "ota/OtaWidget.h"
 #include <QMessageBox>
 
 /**
@@ -30,12 +33,14 @@
  * 信号流向:
  *   SerialConfigPanel → ConnectionController → MainWindow(状态更新)
  *   ConnectionController → TerminalModel(接收数据) + ProtocolBridgeMgr(协议解析)
+ *   ConnectionController → ToastWidget(连接成功/断开/错误通知)
  *   QuickCommandBar → SendController(发送数据)
  *   ToolbarController → TerminalController(显示模式/时间戳/清屏/导出)
  *   ToolbarController → SettingsController(主题/语言)
  *   RecordingController → MainWindow(回放数据写入终端)
  *   TerminalSearchBar → TerminalController(搜索高亮)
  *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形配置)
+ *   OtaWidget → ToastWidget(传输开始/完成/失败通知)
  *   NavTree → NavigationController(面板切换)
  */
 void MainWindow::connectSignals()
@@ -222,12 +227,53 @@ void MainWindow::connectSignals()
             m_navIndicator, &NavIndicatorWidget::updateThemeColor);
 
     // ---- 连接状态 → 吐司通知 ----
-    // 连接成功时显示 Success 类型吐司
-    connect(m_connController, &ConnectionController::connectionStateChanged,
-            this, [this](ConnectionState state, const QString& connName) {
-        if (state == ConnectionState::Connected) {
-            ToastWidget::show(this, tr("已连接: %1").arg(connName),
-                              ToastWidget::ToastType::Success);
-        }
+    // 连接成功时显示 Success 类型吐司（替代旧版 connectionStateChanged 过滤方式，
+    // 直接使用 ConnectionController 专用信号 connectionSucceeded）
+    connect(m_connController, &ConnectionController::connectionSucceeded,
+            this, [this](const QString& portName) {
+        ToastWidget::show(this, tr("已连接: %1").arg(portName),
+                          ToastWidget::ToastType::Success);
+    });
+    // 用户主动断开连接时显示 Info 类型吐司
+    connect(m_connController, &ConnectionController::connectionDisconnected,
+            this, [this](const QString& portName) {
+        ToastWidget::show(this, tr("已断开: %1").arg(portName),
+                          ToastWidget::ToastType::Info);
+    });
+    // 连接因错误中断时显示 Error 类型吐司（与 connectionFailed 的 QMessageBox 互补，
+    // connectionFailed 弹对话框用于严重错误，connectionError 弹吐司用于状态提示）
+    connect(m_connController, &ConnectionController::connectionError,
+            this, [this](const QString& portName, const QString& error) {
+        ToastWidget::show(this, tr("连接错误: %1\n%2").arg(portName, error),
+                          ToastWidget::ToastType::Error);
+    });
+
+    // ---- OTA 传输状态 → 吐司通知 ----
+    // 传输开始时显示 Info 类型吐司
+    connect(m_panelManager->otaWidget(), &OtaWidget::transferStarted,
+            this, [this](const QString& filename) {
+        ToastWidget::show(this, tr("开始传输: %1").arg(filename),
+                          ToastWidget::ToastType::Info);
+    });
+    // 传输完成时显示 Success 类型吐司（含耗时和文件大小）
+    connect(m_panelManager->otaWidget(), &OtaWidget::transferCompleted,
+            this, [this](const QString& filename, int elapsed, int size) {
+        // 耗时格式化: 秒或毫秒
+        QString timeStr = elapsed >= 1000
+            ? tr("%1秒").arg(elapsed / 1000.0, 0, 'f', 1)
+            : tr("%1毫秒").arg(elapsed);
+        // 文件大小格式化: KB 或 字节
+        QString sizeStr = size >= 1024
+            ? tr("%1 KB").arg(size / 1024.0, 0, 'f', 1)
+            : tr("%1 字节").arg(size);
+        ToastWidget::show(this, tr("传输完成: %1 (%2, %3)")
+                              .arg(filename, timeStr, sizeStr),
+                          ToastWidget::ToastType::Success);
+    });
+    // 传输失败时显示 Error 类型吐司（含错误原因）
+    connect(m_panelManager->otaWidget(), &OtaWidget::transferFailed,
+            this, [this](const QString& filename, const QString& error) {
+        ToastWidget::show(this, tr("传输失败: %1\n%2").arg(filename, error),
+                          ToastWidget::ToastType::Error);
     });
 }

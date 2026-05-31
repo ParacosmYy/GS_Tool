@@ -26,7 +26,7 @@ double YModemTransfer::etaSeconds() const
 bool YModemTransfer::onStartInit()
 {
     if (m_filePaths.isEmpty()) {
-        emit transferError("No files to transfer");
+        emit transferError(tr("无文件可传输"));
         return false;
     }
 
@@ -38,14 +38,14 @@ bool YModemTransfer::onStartInit()
         if (sz > kMaxFileSize) {
             qWarning() << "YModem: file too large:" << path << sz
                        << "bytes (max" << kMaxFileSize << "bytes)";
-            emit transferError(QString("File too large: %1 (%2 bytes, max %3 bytes)")
+            emit transferError(tr("文件过大: %1 (%2 字节, 上限 %3 字节)")
                                    .arg(path).arg(sz).arg(kMaxFileSize));
             return false;
         }
         m_totalBytes += sz;
     }
     if (m_totalBytes == 0) {
-        emit transferError("All files are empty");
+        emit transferError(tr("所有文件均为空"));
         return false;
     }
 
@@ -95,7 +95,7 @@ void YModemTransfer::handleTimeout()
         sendCancelBytes();
         m_ymodemState = State::Error;
         markError();
-        emit transferError("Timeout: retries exceeded (10)");
+        emit transferError(tr("超时: 重试次数耗尽 (10次)"));
         return;
     }
 
@@ -166,7 +166,7 @@ void YModemTransfer::processReceivedData()
                     sendCancelBytes();
                     m_ymodemState = State::Error;
                     markError();
-                    emit transferError("Block 0 rejected: too many retries");
+                    emit transferError(tr("Block 0 被拒绝: 重试次数过多"));
                     m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
@@ -176,7 +176,7 @@ void YModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_ymodemState = State::Error;
                 markError();
-                emit transferError("Transfer cancelled by receiver");
+                emit transferError(tr("接收方取消传输"));
                 m_receiveBuffer.remove(0, readIdx);
                 return;
             }
@@ -212,7 +212,7 @@ void YModemTransfer::processReceivedData()
                     sendCancelBytes();
                     m_ymodemState = State::Error;
                     markError();
-                    emit transferError("Too many NAK retries");
+                    emit transferError(tr("NAK重试次数过多"));
                     m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
@@ -222,7 +222,7 @@ void YModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_ymodemState = State::Error;
                 markError();
-                emit transferError("Transfer cancelled by receiver");
+                emit transferError(tr("接收方取消传输"));
                 m_receiveBuffer.remove(0, readIdx);
                 return;
             }
@@ -254,7 +254,7 @@ void YModemTransfer::processReceivedData()
                     sendCancelBytes();
                     m_ymodemState = State::Error;
                     markError();
-                    emit transferError("EOT acknowledgment failed");
+                    emit transferError(tr("EOT确认失败"));
                     m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
@@ -264,7 +264,7 @@ void YModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_ymodemState = State::Error;
                 markError();
-                emit transferError("Transfer cancelled during EOT");
+                emit transferError(tr("EOT阶段传输被取消"));
                 m_receiveBuffer.remove(0, readIdx);
                 return;
             }
@@ -312,7 +312,7 @@ void YModemTransfer::processReceivedData()
                     sendCancelBytes();
                     m_ymodemState = State::Error;
                     markError();
-                    emit transferError("Final Block 0 rejected");
+                    emit transferError(tr("最终 Block 0 被拒绝"));
                     m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
@@ -469,7 +469,7 @@ void YModemTransfer::updateTransferStats()
 bool YModemTransfer::loadNextFile()
 {
     if (m_fileIndex >= m_filePaths.size()) {
-        emit transferError("No more files to transfer");
+        emit transferError(tr("无更多文件可传输"));
         return false;
     }
 

@@ -148,6 +148,13 @@ private:
      */
     bool convertHexToBin(const QString& hexPath, QString& outBinPath);
 
+    /**
+     * @brief 获取协议的可读名称（用于错误消息）
+     * @param protocol 协议标识("xmodem-crc"/"ymodem"/"zmodem"等)
+     * @return 人类可读的协议名称（如 "XMODEM-CRC"）
+     */
+    QString protocolDisplayName(const QString& protocol) const;
+
     IConnection* m_conn = nullptr;
     XModemTransfer* m_xmodem = nullptr;
     YModemTransfer* m_ymodem = nullptr;
@@ -156,6 +163,7 @@ private:
     OtaState m_otaState = OtaState::Idle;   ///< 当前OTA状态
     QString m_tempBinPath;                   ///< HEX转BIN的临时文件路径
     QString m_currentFileName;               ///< 当前传输的文件名（用于错误信息上下文）
+    QString m_currentProtocol;               ///< 当前传输协议名称（用于错误信息上下文）
 };
 
 #endif // OTAMANAGER_H

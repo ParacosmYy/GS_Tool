@@ -84,14 +84,16 @@ QVariant OtaHistoryModel::headerData(int section, Qt::Orientation orientation, i
 
 void OtaHistoryModel::addRecord(const OtaRecord& record)
 {
-    beginInsertRows(QModelIndex(), 0, 0);
-    m_records.prepend(record);
-    // 限制最大记录数
-    if (m_records.size() > kMaxRecords) {
-        beginRemoveRows(QModelIndex(), m_records.size() - 1, m_records.size() - 1);
+    // 先移除超出上限的旧记录（在插入之前），避免嵌套 beginInsert/beginRemove 导致视图混乱
+    if (m_records.size() >= kMaxRecords) {
+        int last = m_records.size() - 1;
+        beginRemoveRows(QModelIndex(), last, last);
         m_records.removeLast();
         endRemoveRows();
     }
+
+    beginInsertRows(QModelIndex(), 0, 0);
+    m_records.prepend(record);
     endInsertRows();
     saveToSettings();
 }
@@ -106,6 +108,10 @@ void OtaHistoryModel::clearHistory()
 
 const OtaRecord& OtaHistoryModel::record(int row) const
 {
+    if (row < 0 || row >= m_records.size()) {
+        static const OtaRecord empty;
+        return empty;
+    }
     return m_records.at(row);
 }
 

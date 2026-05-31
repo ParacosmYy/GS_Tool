@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QVector>
 #include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
 #include <QGraphicsOpacityEffect>
 
 class QTreeView;
@@ -11,7 +12,7 @@ class QLabel;
 class QWidget;
 
 /**
- * @brief 导航树 → 面板映射条目
+ * @brief 导航树 -> 面板映射条目
  *
  * 数据驱动的面板查找结构，消除 if-else 链。
  * name: 导航树叶子节点的显示文本（使用裸字符串，运行时通过 tr() 匹配翻译后的值）
@@ -23,21 +24,12 @@ struct NavPanelMapping {
 };
 
 /**
- * @brief 导航控制器 - 负责导航树构建、面板切换动画、呼吸动画
+ * @brief 导航控制器 - 导航树构建、面板切换滑动动画、呼吸动画
  *
- * 职责:
- *   1. 构建导航树的数据模型（串口/网络/工具三组）
- *   2. 通过映射表实现面板名称到 QWidget 的查找
- *   3. 执行面板切换动画（淡出旧面板 → 淡入新面板）
- *   4. 管理连接状态呼吸动画（连接中时的脉冲闪烁效果）
- *
- * 设计模式:
- *   - 数据驱动: 使用 NavPanelMapping 映射表替代 if-else 链
- *   - 动画封装: 将 QPropertyAnimation 细节封装在此控制器中
- *
- * 协作关系:
- *   - MainWindow: 调用 buildNavTree() 构建导航树，调用 switchToPanel() 切换面板
- *   - ConnectionController: 通过 MainWindow 间接调用呼吸动画
+ * 职责: 导航树模型构建 / 面板名称查找 / 滑入滑出切换动画 / 连接状态呼吸动画
+ * 动画规范 (CLAUDE.md 6.5): 旧面板 200ms InCubic 滑出+淡出, 新面板 250ms OutCubic 滑入+淡入
+ * 设计模式: 数据驱动(NavPanelMapping映射表) / 动画封装(QPropertyAnimation)
+ * 协作: MainWindow(调用buildNavTree/switchToPanel) / ConnectionController(间接调用呼吸动画)
  */
 class NavigationController : public QObject {
     Q_OBJECT
@@ -51,7 +43,7 @@ public:
 
     /**
      * @brief 析构导航控制器
-     * 清理呼吸动画相关资源
+     * 清理呼吸动画和进行中的切换动画相关资源
      */
     ~NavigationController() override;
 
@@ -64,8 +56,13 @@ public:
     void buildNavTree(QTreeView* navTree, const QVector<NavPanelMapping>& mappings);
 
     /**
-     * @brief 面板切换（带动画）
-     * 执行: 并行交叉淡入淡出(150ms OutCubic) - 旧面板淡出的同时新面板淡入
+     * @brief 面板切换（带滑入滑出动画）
+     *
+     * 执行滑动 + 淡入淡出动画:
+     *   旧面板: pos (0,0)->(-width,0) 200ms InCubic + opacity 1->0
+     *   新面板: pos (width,0)->(0,0) 250ms OutCubic + opacity 0->1
+     * 动画期间禁用导航树防止重复触发。
+     *
      * @param newPanel 目标面板 widget
      */
     void switchToPanel(QWidget* newPanel);
@@ -79,7 +76,7 @@ public:
 
     /**
      * @brief 启动连接状态呼吸动画
-     * 1500ms 循环, InOutSine, opacity 0.3 ↔ 1.0 脉冲闪烁
+     * 1500ms 循环, InOutSine, opacity 0.3 <-> 1.0 脉冲闪烁
      * @param statusLabel 状态标签控件
      */
     void startBreathingAnimation(QLabel* statusLabel);
@@ -119,25 +116,18 @@ public:
      */
     int currentPanelIndex() const;
 
-    /**
-     * @brief 通过索引恢复面板显示（启动时使用，不触发动画）
-     *
-     * 根据保存的面板索引找到对应的 widget，隐藏所有其他面板，
-     * 直接显示目标面板（无淡入淡出动画），并更新 m_currentPanel。
-     *
-     * @param index 面板索引（由 currentPanelIndex() 返回的值）
-     * @return true 恢复成功，false 索引越界或面板为空
-     */
+    /** @brief 通过索引恢复面板（启动/会话恢复用，无动画） @return true成功 false越界/空 */
     bool restorePanelByIndex(int index);
 
 private:
-    /**
-     * @brief 淡入动画辅助
-     * 150ms OutCubic opacity 0.0 → 1.0
-     * 动画完成后自动清除 QGraphicsOpacityEffect 以恢复正常绘制性能
-     * @param panel 需要淡入的面板 widget
-     */
-    void fadeInPanel(QWidget* panel);
+    /** @brief 旧面板滑出+淡出: pos (0,0)->(-width,0) 200ms InCubic, opacity 1->0 */
+    void animateSlideOut(QWidget* oldPanel, QParallelAnimationGroup* group);
+
+    /** @brief 新面板滑入+淡入: pos (width,0)->(0,0) 250ms OutCubic, opacity 0->1 */
+    void animateSlideIn(QWidget* newPanel, QParallelAnimationGroup* group);
+
+    /** @brief 获取面板父容器宽度作为滑动距离 */
+    int parentContainerWidth(QWidget* panel) const;
 
     /** @brief 导航面板映射表（数据驱动，消除 if-else 链） */
     QVector<NavPanelMapping> m_navPanelMappings;
@@ -147,6 +137,12 @@ private:
 
     /** @brief 是否正在执行面板切换动画（防止动画期间重复触发切换） */
     bool m_panelSwitching = false;
+
+    /** @brief 导航树视图指针（动画期间禁用交互，动画完成后恢复） */
+    QTreeView* m_navTree = nullptr;
+
+    /** @brief 当前面板切换动画组（用于析构时清理进行中的动画） */
+    QParallelAnimationGroup* m_switchAnimGroup = nullptr;
 
     /** @brief 连接状态呼吸动画实例（loopCount=-1 无限循环，需手动管理生命周期） */
     QPropertyAnimation* m_breathingAnim = nullptr;

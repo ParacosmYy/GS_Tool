@@ -113,7 +113,7 @@ private:
     ChannelConfigSet m_configSet;
     QMap<QString, ChannelBuffer> m_buffers;     // displayName -> buffer
     int m_windowSize = 200;
-    int m_frameIndex = 0;                       // 全局帧计数器（X轴）
+    qint64 m_frameIndex = 0;                      ///< 全局帧计数器（X轴），qint64 防止长时间运行后溢出
     int m_totalPoints = 0;
 
     // 刷新合并
