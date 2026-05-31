@@ -1,3 +1,10 @@
+/**
+ * @file IConnection.h
+ * @brief 连接抽象接口 - 所有连接类型(串口/TCP/UDP/RTT)的统一协议
+ *
+ * 定义了连接的抽象基类和通用数据结构(PinoutSignals, SerialErrorCounters)。
+ * 上层功能通过此接口与底层通信，无需关心具体连接方式。
+ */
 #ifndef ICONNECTION_H
 #define ICONNECTION_H
 
@@ -5,6 +12,30 @@
 #include <QByteArray>
 #include <QVariant>
 #include "core/Constants.h"
+
+/**
+ * @brief 串口信号线状态结构体
+ * 包含6个标准信号线的当前电平状态(true=HIGH, false=LOW)
+ */
+struct PinoutSignals {
+    bool cts = false;  ///< Clear To Send (输入)
+    bool dsr = false;  ///< Data Set Ready (输入)
+    bool dcd = false;  ///< Data Carrier Detect (输入)
+    bool ri = false;   ///< Ring Indicator (输入)
+    bool dtr = false;  ///< Data Terminal Ready (输出)
+    bool rts = false;  ///< Request To Send (输出)
+};
+
+/**
+ * @brief 串口通信错误计数器结构体
+ * 记录各类通信错误的累计次数，用于诊断连接质量
+ */
+struct SerialErrorCounters {
+    int framingErrors = 0;  ///< 帧错误计数（起始位/停止位不匹配）
+    int parityErrors = 0;   ///< 校验错误计数（奇偶校验失败）
+    int overrunErrors = 0;  ///< 溢出错误计数（接收缓冲区满导致数据丢失）
+    int unknownErrors = 0;  ///< 未知错误计数（无法分类的通信错误）
+};
 
 /**
  * @brief 连接抽象接口 - 所有连接类型(串口/TCP/UDP/RTT)的统一协议
@@ -98,6 +129,18 @@ public:
      */
     virtual void sendBreak(int duration = 100) { Q_UNUSED(duration); }
 
+    /** @brief 查询当前信号线电平状态(CTS/DSR/DCD/RI/DTR/RTS)
+     *  默认返回全false(无信号); SerialConnection覆盖实现
+     */
+    virtual PinoutSignals pinoutSignals() const { return {}; }
+
+    /**
+     * @brief 查询通信错误计数器
+     * 默认返回全零; SerialConnection覆盖实现
+     * @return 各类错误的累计计数
+     */
+    virtual SerialErrorCounters errorCounters() const { return {}; }
+
 signals:
     /** @brief 收到数据时发出 */
     void dataReceived(const QByteArray& data);
@@ -114,5 +157,8 @@ signals:
      */
     void bytesWritten(qint64 bytes);
 };
+
+Q_DECLARE_METATYPE(PinoutSignals)
+Q_DECLARE_METATYPE(SerialErrorCounters)
 
 #endif // ICONNECTION_H

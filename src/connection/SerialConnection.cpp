@@ -477,3 +477,19 @@ void SerialConnection::resetErrorCounters()
 {
     m_errorCounters = SerialErrorCounters{};
 }
+
+PinoutSignals SerialConnection::pinoutSignals() const
+{
+    PinoutSignals result;
+    if (!m_serial.isOpen()) {
+        return result;
+    }
+    QSerialPort::PinoutSignals qtSignals = const_cast<QSerialPort&>(m_serial).pinoutSignals();
+    result.cts = qtSignals & QSerialPort::ClearToSendSignal;
+    result.dsr = qtSignals & QSerialPort::DataSetReadySignal;
+    result.dcd = qtSignals & QSerialPort::DataCarrierDetectSignal;
+    result.ri  = qtSignals & QSerialPort::RingIndicatorSignal;
+    result.dtr = qtSignals & QSerialPort::DataTerminalReadySignal;
+    result.rts = qtSignals & QSerialPort::RequestToSendSignal;
+    return result;
+}

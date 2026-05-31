@@ -98,6 +98,14 @@ void MainWindow::connectSerialSignals()
             this, [this](ConnectionState state, const QString& connName) {
         handleConnectionState(state, connName);
     });
+    // 通信错误计数更新 -> 数据统计面板（表现层直接连接，避免业务层依赖表现层）
+    connect(m_connController, &ConnectionController::errorCountersUpdated,
+            this, [this](int framing, int parity, int overrun) {
+        m_panelManager->dataStats()->updateErrors(framing, parity, overrun);
+    });
+    // 信号线状态变化 -> 更新串口配置面板LED指示灯
+    connect(m_connController, &ConnectionController::pinoutSignalsChanged,
+            m_panelManager->serialConfig(), &SerialConfigPanel::updatePinoutLeds);
 
     // 接收数据 -> 终端模型 + 协议解析 + 日志记录
     connect(m_connController, &ConnectionController::dataReceived,

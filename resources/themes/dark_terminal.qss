@@ -600,6 +600,26 @@ QPushButton#dtrBtn:disabled, QPushButton#rtsBtn:disabled {
     border-color: #313244;
 }
 
+/* === SerialConfigPanel 信号线状态LED === */
+QLabel#signalLed {
+    color: #6c7086;
+    background-color: #313244;
+    border: 1px solid #45475a;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+}
+QLabel#signalLed[active="true"] {
+    color: #1e1e2e;
+    background-color: #a6e3a1;
+    border-color: #a6e3a1;
+}
+QLabel#signalLed[active="false"] {
+    color: #6c7086;
+    background-color: #313244;
+    border-color: #45475a;
+}
+
 /* === 发送栏控件 === */
 QFrame#sendBarFrame {
     background-color: rgba(24, 24, 37, 180);

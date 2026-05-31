@@ -19,9 +19,9 @@
 #ifndef SERIALCONNECTION_H
 #define SERIALCONNECTION_H
 
-#include "connection/IConnection.h"
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include "connection/IConnection.h"
 
 /**
  * @brief 串口连接实现 - 封装 QSerialPort
@@ -133,6 +133,9 @@ public:
     /** @brief 发送Break信号（重写 IConnection 虚方法） */
     void sendBreak(int duration = 100) override;
 
+    /** @brief 查询串口信号线电平状态，通过QSerialPort::pinoutSignals()获取 */
+    PinoutSignals pinoutSignals() const override;
+
     /**
      * @brief 获取系统中所有可用的串口列表
      * @return QSerialPortInfo 列表，包含端口名、描述、制造商等信息
@@ -141,16 +144,8 @@ public:
 
     // ---- 串口错误统计 ----
 
-    /** @brief 串口错误计数器 - 统计通信过程中的各类错误次数 */
-    struct SerialErrorCounters {
-        int framingErrors = 0;   ///< 帧错误计数(停止位不匹配)
-        int parityErrors = 0;    ///< 校验错误计数(奇偶校验失败)
-        int overrunErrors = 0;   ///< 溢出错误计数(接收缓冲区溢出)
-        int unknownErrors = 0;   ///< 未分类错误计数
-    };
-
-    /** @brief 获取错误计数器(只读) */
-    const SerialErrorCounters& errorCounters() const { return m_errorCounters; }
+    /** @brief 获取错误计数器(只读)，覆盖IConnection默认实现 */
+    SerialErrorCounters errorCounters() const override { return m_errorCounters; }
 
     /** @brief 重置错误计数器 */
     void resetErrorCounters();

@@ -122,6 +122,18 @@ signals:
     /** @brief 自动重连失败通知(达到最大重连次数) @param reason 失败原因描述 */
     void reconnectFailed(const QString& reason);
 
+    /** @brief 信号线状态变化通知(由200ms轮询定时器触发，仅变化时发射)
+     *  @param pinout 当前6个信号线的电平状态(CTS/DSR/DCD/RI/DTR/RTS) */
+    void pinoutSignalsChanged(const PinoutSignals& pinout);
+
+    /**
+     * @brief 通信错误计数器更新通知
+     * @param framingErrors 帧错误计数
+     * @param parityErrors 校验错误计数
+     * @param overrunErrors 溢出错误计数
+     */
+    void errorCountersUpdated(int framingErrors, int parityErrors, int overrunErrors);
+
 private slots:
     void onConnectionStateChanged(ConnectionState state); ///< 底层状态变化: 清除下游/触发重连/发射Toast
     void onDataReceived(const QByteArray& data);          ///< 转发数据并请求状态栏刷新
@@ -155,6 +167,9 @@ private:
     OtaManager* m_otaManager = nullptr;            ///< OTA 管理器引用
     RecordingController* m_recordingController = nullptr; ///< 录制控制器引用
     PortWatcher* m_portWatcher = nullptr;          ///< 端口热插拔监控器
+
+    QTimer* m_pinoutPollTimer = nullptr;           ///< 信号线轮询定时器(200ms)
+    PinoutSignals m_lastPinout;                    ///< 上次轮询的信号线状态(用于变化检测)
 
     QTimer m_connectionTimer;                      ///< 连接超时定时器(单次触发)
     static constexpr int kConnectionTimeoutMs = 5000; ///< 超时阈值 5 秒

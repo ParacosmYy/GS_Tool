@@ -53,6 +53,17 @@ ConnectionController::ConnectionController(ConnectionManager* connMgr, QObject* 
 
     // 启动热插拔检测（应用运行期间持续监控）
     m_portWatcher->start();
+    // 信号线状态轮询定时器(200ms)，仅当信号线实际变化时才发射通知
+    m_pinoutPollTimer = new QTimer(this);
+    m_pinoutPollTimer->setInterval(200);
+    connect(m_pinoutPollTimer, &QTimer::timeout, this, [this]() {
+        if (!m_currentConn) return;
+        auto current = m_currentConn->pinoutSignals();
+        if (memcmp(&current, &m_lastPinout, sizeof(PinoutSignals)) != 0) {
+            m_lastPinout = current;
+            emit pinoutSignalsChanged(current);
+        }
+    });
 }
 
 /** @brief 析构函数，停止所有定时器和 PortWatcher */
@@ -60,9 +71,8 @@ ConnectionController::~ConnectionController()
 {
     stopConnectionTimeout();
     m_reconnectTimer.stop();
-    if (m_portWatcher) {
-        m_portWatcher->stop();
-    }
+    if (m_pinoutPollTimer) m_pinoutPollTimer->stop();
+    if (m_portWatcher) m_portWatcher->stop();
 }
 
 void ConnectionController::setSendController(SendController* ctrl) { m_sendController = ctrl; }
@@ -117,19 +127,12 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
 
     // 步骤8: 打开成功，停止超时定时器
     stopConnectionTimeout();
-
     // 设置 DTR/RTS（某些芯片在 open 时会重置线路信号）
     m_currentConn->setDtr(dtrEnabled);
     m_currentConn->setRts(rtsEnabled);
-
     // 注入到下游控制器
-    if (m_sendController) {
-        m_sendController->setConnection(m_currentConn);
-    }
-    if (m_otaManager) {
-        m_otaManager->setConnection(m_currentConn);
-    }
-
+    if (m_sendController) m_sendController->setConnection(m_currentConn);
+    if (m_otaManager) m_otaManager->setConnection(m_currentConn);
     // 记录成功的连接参数，用于自动重连和端口拔出检测
     m_lastConnectParams = serialParams;
     m_lastConnectType = ConnectionType::Serial;
@@ -214,14 +217,9 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
     }
 
     stopConnectionTimeout();
-
     // 注入到下游控制器
-    if (m_sendController) {
-        m_sendController->setConnection(m_currentConn);
-    }
-    if (m_otaManager) {
-        m_otaManager->setConnection(m_currentConn);
-    }
+    if (m_sendController) m_sendController->setConnection(m_currentConn);
+    if (m_otaManager) m_otaManager->setConnection(m_currentConn);
 
     m_lastConnectType = type;
     m_lastConnectParams = params;  // 保存网络连接参数，用于自动重连
@@ -271,11 +269,13 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
         if (m_recordingController) {
             m_recordingController->setConnected(true);
         }
+        m_pinoutPollTimer->start();
         break;
 
     case ConnectionState::Disconnected:
     case ConnectionState::Error:
         stopConnectionTimeout();
+        m_pinoutPollTimer->stop();
         clearDownstreamConnections();
 
         // 清除已连接端口名（连接已断开）
@@ -424,6 +424,12 @@ void ConnectionController::connectSignals(IConnection* conn)
         emit connectionFailed(tr("Connection Error"), msg);
         emit connectionError(errPortName, msg);
     });
+    // 连接错误计数更新 → 通过信号通知表现层(避免业务层直接依赖表现层)
+    connect(conn, &IConnection::errorOccurred, this, [this, conn]() {
+        auto counters = conn->errorCounters();
+        emit errorCountersUpdated(
+            counters.framingErrors, counters.parityErrors, counters.overrunErrors);
+    });
 }
 
 /**
@@ -441,6 +447,7 @@ void ConnectionController::connectSignals(IConnection* conn)
 void ConnectionController::teardownConnection(const QString& reason)
 {
     stopConnectionTimeout();
+    if (m_pinoutPollTimer) m_pinoutPollTimer->stop();
 
     if (!m_currentConn) return;
 

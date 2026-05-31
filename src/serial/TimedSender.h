@@ -10,8 +10,9 @@
  *
  * 线程安全设计:
  *   - start() / stop() 可在定时器回调中安全调用（加锁保护）
- *   - m_isRunning / m_interval 由 QMutex 保护，跨线程读写安全
+ *   - m_isRunning / m_interval / m_queue / m_queueIndex 由 QMutex 保护，跨线程读写安全
  *   - onTimeout() 通过 QMetaObject::invokeMethod 调度到主线程
+ *   - doSend() 在锁内拷贝数据后释放锁再 emit，避免信号回调死锁
  *
  * 协作关系:
  *   - SendController: 创建并管理 TimedSender，连接 sendData 信号
@@ -128,7 +129,7 @@ private:
     QList<QByteArray> m_queue;      ///< 数据队列
     int m_queueIndex = 0;           ///< 当前队列位置
 
-    mutable QMutex m_mutex;         ///< 保护 m_isRunning 和 m_interval 的互斥锁
+    mutable QMutex m_mutex;         ///< 保护所有状态的互斥锁（m_isRunning / m_interval / m_queue / m_queueIndex）
     bool m_isRunning = false;       ///< 定时发送运行状态（受 m_mutex 保护）
     int m_interval = 1000;          ///< 发送间隔（毫秒，受 m_mutex 保护）
 };

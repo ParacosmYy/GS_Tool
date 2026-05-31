@@ -4,7 +4,7 @@
  *
  * 实现:
  *   - 构造: 连接定时器超时信号到 onTimeout 槽
- *   - 线程安全: QMutex 保护 m_isRunning / m_interval 的并发读写
+ *   - 线程安全: QMutex 保护 m_isRunning / m_interval / m_queue / m_queueIndex 的并发读写
  *   - 主线程调度: onTimeout 中使用 QMetaObject::invokeMethod
  *     确保实际发送动作在主线程执行
  *   - 连接检查: 发送前验证队列非空，空则自动停止定时器
@@ -62,6 +62,7 @@ int TimedSender::interval() const
  */
 void TimedSender::setData(const QByteArray& data)
 {
+    QMutexLocker locker(&m_mutex);
     m_queue = {data};
     m_queueIndex = 0;
 }
@@ -74,6 +75,7 @@ void TimedSender::setData(const QByteArray& data)
  */
 void TimedSender::setDataQueue(const QList<QByteArray>& queue)
 {
+    QMutexLocker locker(&m_mutex);
     m_queue = queue;
     m_queueIndex = 0;
 }
@@ -86,11 +88,11 @@ void TimedSender::setDataQueue(const QList<QByteArray>& queue)
  */
 void TimedSender::start()
 {
+    QMutexLocker locker(&m_mutex);
     if (m_queue.isEmpty()) {
         return;
     }
 
-    QMutexLocker locker(&m_mutex);
     m_queueIndex = 0;
     m_isRunning = true;
     m_timer.start(m_interval);
@@ -145,23 +147,27 @@ void TimedSender::onTimeout()
  */
 void TimedSender::doSend()
 {
-    // 检查队列有效性
-    if (m_queue.isEmpty()) {
-        stop();
-        return;
-    }
-
-    // 检查运行状态（连接有效性）
+    QByteArray dataToSend;
     {
         QMutexLocker locker(&m_mutex);
+
+        // 检查队列有效性
+        if (m_queue.isEmpty()) {
+            m_isRunning = false;
+            m_timer.stop();
+            return;
+        }
+
+        // 检查运行状态
         if (!m_isRunning) {
             return;
         }
+
+        // 在锁内拷贝数据，避免 emit 时持锁导致信号回调死锁
+        dataToSend = m_queue[m_queueIndex];
+        m_queueIndex = (m_queueIndex + 1) % m_queue.size();
     }
 
-    // 发送当前队列位置的数据
-    emit sendData(m_queue[m_queueIndex]);
-
-    // 移到下一个位置，循环
-    m_queueIndex = (m_queueIndex + 1) % m_queue.size();
+    // 释放锁后发射信号，避免下游回调死锁
+    emit sendData(dataToSend);
 }
