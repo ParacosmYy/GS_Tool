@@ -40,5 +40,7 @@
 | 32-49 | (方法提取+Bug修复+架构审查+OTA增强+主题完善+终端拆分+书签面板+驱动检测+背景系统+面板切换动画+Toast通知等) | 50 |
 | 50 | 方法长度违规修复: setupUI拆分+全部方法≤80行 | 50 |
 | 51 | R12串口深度+UI动画增强: AnimatedButton(悬停渐变200ms+按下回弹100ms)+SerialConnection深度(sendBreak+bytesWritten+SerialErrorCounters错误计数)+运行时波特率切换+VID/PID端口信息tooltip+DataStatistics峰值速率+错误计数显示+QSS三主题peakRateLabel/errorLabel+MainWindowSignalConnect压缩至473行 | 51 |
-| 52 | R13信号线监控+错误计数器接线+架构修复+P0 TimedSender修复: PinoutSignals结构体+IConnection.pinoutSignals()/errorCounters()虚方法+ConnectionController 200ms轮询(含变化检测)+errorCountersUpdated信号(消除业务层→表现层反向依赖)+TimedSender m_queue/m_queueIndex互斥锁保护(P0 BUG-01修复)+QSS signalLed×3主题+SerialConfigPanel CTS/DSR/DCD/RI LED指示灯+新特性评估(高级波形引擎) | 52 |
+| 52 | Qt关键字'signals'参数名冲突修复(ConnectionController信号参数pinout→避免Qt宏冲突)+.gitignore补充build2/ | 52 |
+| 53 | R13信号线监控+错误计数器接线+架构修复+P0 TimedSender修复: PinoutSignals结构体+IConnection.pinoutSignals()/errorCounters()虚方法+ConnectionController 200ms轮询(含变化检测)+errorCountersUpdated信号(消除业务层→表现层反向依赖)+TimedSender m_queue/m_queueIndex互斥锁保护(P0 BUG-01修复)+QSS signalLed×3主题+SerialConfigPanel CTS/DSR/DCD/RI LED指示灯+新特性评估(高级波形引擎) | 53 |
+| 54 | EmbedDebug.bat启动脚本修复: 支持build和build2目录自动检测 | 54 |
 | ... | 目标: 1000分 | 1000 |
