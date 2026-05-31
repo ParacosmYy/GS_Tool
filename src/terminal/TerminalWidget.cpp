@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
+#include <QRegularExpression>
 
 TerminalWidget::TerminalWidget(QWidget* parent)
     : QWidget(parent)
@@ -20,6 +21,10 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     m_txColor = QColor(166, 227, 161);       // #a6e3a1 发送数据(绿色)
     m_timestampColor = QColor(147, 153, 178); // #9399b2 时间戳(灰色)
     m_selectionBg = QColor(69, 71, 90);      // #45475a 选中背景
+
+    // 搜索高亮配色
+    m_searchHighlightColor = QColor(249, 226, 175, 80);  // #f9e2af 半透明黄
+    m_currentMatchColor = QColor(249, 226, 175, 180);    // #f9e2af 高亮当前匹配
 
     // 基础设置
     setFont(m_font);
@@ -74,6 +79,18 @@ bool TerminalWidget::showTimestamp() const
     return m_showTimestamp;
 }
 
+void TerminalWidget::setShowDirectionPrefix(bool show)
+{
+    m_showDirectionPrefix = show;
+    m_cachedLineCount = 0;
+    update();
+}
+
+bool TerminalWidget::showDirectionPrefix() const
+{
+    return m_showDirectionPrefix;
+}
+
 void TerminalWidget::setAutoScroll(bool autoScroll)
 {
     m_autoScroll = autoScroll;
@@ -98,8 +115,19 @@ void TerminalWidget::clear()
 
 QString TerminalWidget::selectedText() const
 {
-    // TODO: 实现文本选择
-    return QString();
+    if (m_selectionStartLine < 0 || m_selectionEndLine < 0) return {};
+    if (m_cachedLines.isEmpty()) return {};
+
+    int start = qMin(m_selectionStartLine, m_selectionEndLine);
+    int end = qMax(m_selectionStartLine, m_selectionEndLine);
+    end = qMin(end, m_cachedLines.size() - 1);
+    if (start >= m_cachedLines.size()) return {};
+
+    QStringList lines;
+    for (int i = start; i <= end; ++i) {
+        lines << m_cachedLines[i].text;
+    }
+    return lines.join('\n');
 }
 
 QSize TerminalWidget::sizeHint() const
@@ -142,6 +170,16 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
         }
         m_cachedLineCount = totalLines;
 
+        // 缓存更新后重新搜索（确保搜索结果与缓存内容同步）
+        if (!m_searchPattern.isEmpty() && m_cachedLineCount > 0) {
+            // 直接在此处执行搜索，不调用refreshSearch()避免递归
+            QString pat = m_searchPattern;
+            bool rx = m_searchRegex;
+            bool hx = m_searchHex;
+            m_searchPattern.clear();
+            setSearchHighlight(pat, rx, hx);
+        }
+
         // 更新最大滚动偏移
         m_maxScrollOffset = qMax(0, totalLines - m_visibleLines);
         if (m_autoScroll) {
@@ -159,20 +197,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
     for (int i = startLine; i < endLine; ++i) {
         const CachedLine& cached = m_cachedLines[i];
 
-        // 选择背景色
-        if (i >= m_selectionStartLine && i <= m_selectionEndLine
-            && m_selectionStartLine >= 0) {
-            painter.fillRect(0, y, width(), m_lineHeight, m_selectionBg);
-        }
-
-        // 根据方向设置文字颜色（使用缓存的方向）
-        if (cached.direction == DataDirection::Tx) {
-            painter.setPen(m_txColor);
-        } else {
-            painter.setPen(m_rxColor);
-        }
-
-        // 绘制时间戳（使用缓存的epoch毫秒时间戳）
+        // 计算时间戳偏移（后续绘制搜索高亮和数据内容都需要此偏移）
         int xOffset = 0;
         if (m_showTimestamp) {
             painter.setPen(m_timestampColor);
@@ -180,13 +205,33 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
                              .toString("HH:mm:ss.zzz");
             painter.drawText(4, y + m_lineHeight - 4, ts);
             xOffset = fm.horizontalAdvance(ts) + 12;
+        }
 
-            // 恢复数据颜色
-            if (cached.direction == DataDirection::Tx) {
-                painter.setPen(m_txColor);
-            } else {
-                painter.setPen(m_rxColor);
+        // 选择背景色（使用正规化范围，支持反向拖选）
+        int selStart = qMin(m_selectionStartLine, m_selectionEndLine);
+        int selEnd = qMax(m_selectionStartLine, m_selectionEndLine);
+        if (m_selectionStartLine >= 0 && i >= selStart && i <= selEnd) {
+            painter.fillRect(0, y, width(), m_lineHeight, m_selectionBg);
+        }
+
+        // 搜索高亮: 绘制匹配区域背景
+        if (!m_searchMatches.isEmpty()) {
+            for (int mi = 0; mi < m_searchMatches.size(); ++mi) {
+                const auto& match = m_searchMatches[mi];
+                if (match.line != i) continue;
+                int xStart = xOffset + 4 + fm.horizontalAdvance(cached.text.left(match.startCol));
+                int matchWidth = fm.horizontalAdvance(cached.text.mid(match.startCol, match.length));
+                QColor highlightColor = (mi == m_currentMatchIndex)
+                    ? m_currentMatchColor : m_searchHighlightColor;
+                painter.fillRect(xStart, y + 2, matchWidth, m_lineHeight - 4, highlightColor);
             }
+        }
+
+        // 根据方向设置文字颜色（使用缓存的方向）
+        if (cached.direction == DataDirection::Tx) {
+            painter.setPen(m_txColor);
+        } else {
+            painter.setPen(m_rxColor);
         }
 
         // 绘制数据内容
@@ -259,6 +304,15 @@ void TerminalWidget::keyPressEvent(QKeyEvent* event)
         }
         return;
     }
+    // F3 / Shift+F3 搜索导航
+    if (event->key() == Qt::Key_F3) {
+        if (event->modifiers() & Qt::ShiftModifier) {
+            gotoPrevMatch();
+        } else {
+            gotoNextMatch();
+        }
+        return;
+    }
     QWidget::keyPressEvent(event);
 }
 
@@ -267,7 +321,6 @@ void TerminalWidget::onDataAppended(int firstNewLine, int count)
     Q_UNUSED(firstNewLine);
     Q_UNUSED(count);
 
-    // 更新最大滚动偏移
     if (m_model) {
         int totalLines = m_model->lineCount();
         m_maxScrollOffset = qMax(0, totalLines - m_visibleLines);
@@ -275,6 +328,7 @@ void TerminalWidget::onDataAppended(int firstNewLine, int count)
             m_scrollOffset = m_maxScrollOffset;
         }
     }
+
     update();
 }
 
@@ -298,22 +352,160 @@ void TerminalWidget::updateVisibleRange()
     }
 }
 
+void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool hex)
+{
+    m_searchPattern = pattern;
+    m_searchRegex = regex;
+    m_searchHex = hex;
+    m_currentMatchIndex = -1;
+    m_searchMatches.clear();
+
+    if (pattern.isEmpty() || m_cachedLines.isEmpty()) {
+        emit searchMatchesChanged(0, -1);
+        update();
+        return;
+    }
+
+    QString searchStr = pattern;
+    if (hex) {
+        QByteArray bytes = HexConverter::fromHexString(pattern);
+        if (bytes.isEmpty()) {
+            emit searchMatchesChanged(0, -1);
+            update();
+            return;
+        }
+        // HEX模式: 在每行的HEX表示中搜索
+        for (int i = 0; i < m_cachedLines.size(); ++i) {
+            QString hexText = HexConverter::toHexString(
+                m_model ? m_model->lineAt(i).data : QByteArray());
+            int pos = 0;
+            while ((pos = hexText.indexOf(searchStr, pos, Qt::CaseInsensitive)) >= 0) {
+                m_searchMatches.append({i, pos, (int)searchStr.length()});
+                pos += (int)searchStr.length();
+            }
+        }
+    } else if (regex) {
+        QRegularExpression re(pattern);
+        if (!re.isValid()) {
+            emit searchMatchesChanged(0, -1);
+            update();
+            return;
+        }
+        for (int i = 0; i < m_cachedLines.size(); ++i) {
+            QRegularExpressionMatchIterator it = re.globalMatch(m_cachedLines[i].text);
+            while (it.hasNext()) {
+                auto match = it.next();
+                m_searchMatches.append({i, (int)match.capturedStart(), (int)match.capturedLength()});
+            }
+        }
+    } else {
+        for (int i = 0; i < m_cachedLines.size(); ++i) {
+            const QString& text = m_cachedLines[i].text;
+            int pos = 0;
+            while ((pos = text.indexOf(pattern, pos)) >= 0) {
+                m_searchMatches.append({i, pos, (int)pattern.length()});
+                pos += pattern.length();
+            }
+        }
+    }
+
+    if (!m_searchMatches.isEmpty()) {
+        m_currentMatchIndex = 0;
+    }
+
+    emit searchMatchesChanged(m_searchMatches.size(), m_currentMatchIndex);
+    update();
+}
+
+void TerminalWidget::clearSearchHighlight()
+{
+    m_searchPattern.clear();
+    m_searchMatches.clear();
+    m_currentMatchIndex = -1;
+    emit searchMatchesChanged(0, -1);
+    update();
+}
+
+int TerminalWidget::searchMatchCount() const
+{
+    return m_searchMatches.size();
+}
+
+int TerminalWidget::currentMatchIndex() const
+{
+    return m_currentMatchIndex;
+}
+
+void TerminalWidget::gotoNextMatch()
+{
+    if (m_searchMatches.isEmpty()) return;
+    m_currentMatchIndex = (m_currentMatchIndex + 1) % m_searchMatches.size();
+    // 滚动到匹配行
+    const auto& match = m_searchMatches[m_currentMatchIndex];
+    scrollToMatch(match.line);
+    emit searchMatchesChanged(m_searchMatches.size(), m_currentMatchIndex);
+    update();
+}
+
+void TerminalWidget::gotoPrevMatch()
+{
+    if (m_searchMatches.isEmpty()) return;
+    m_currentMatchIndex = (m_currentMatchIndex - 1 + m_searchMatches.size()) % m_searchMatches.size();
+    const auto& match = m_searchMatches[m_currentMatchIndex];
+    scrollToMatch(match.line);
+    emit searchMatchesChanged(m_searchMatches.size(), m_currentMatchIndex);
+    update();
+}
+
+void TerminalWidget::scrollToMatch(int line)
+{
+    if (line < m_scrollOffset || line >= m_scrollOffset + m_visibleLines) {
+        m_scrollOffset = qMax(0, line - m_visibleLines / 3);
+        m_autoScroll = false;
+    }
+}
+
+void TerminalWidget::refreshSearch()
+{
+    if (m_searchPattern.isEmpty()) return;
+    // 保存当前参数，调用setSearchHighlight重新扫描
+    QString pat = m_searchPattern;
+    bool rx = m_searchRegex;
+    bool hx = m_searchHex;
+    m_searchPattern.clear();  // 防止setSearchHighlight内部重复
+    setSearchHighlight(pat, rx, hx);
+}
+
 CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 {
     CachedLine cached;
     cached.direction = line.direction;
     cached.timestamp = line.timestamp.toMSecsSinceEpoch();
 
+    // 方向前缀
+    QString prefix;
+    if (m_showDirectionPrefix) {
+        prefix = (line.direction == DataDirection::Tx) ? "[TX:] " : "[RX:] ";
+    }
+
     switch (m_displayMode) {
     case DisplayMode::Hex:
-        cached.text = HexConverter::toHexString(line.data);
+        cached.text = prefix + HexConverter::toHexString(line.data);
         break;
     case DisplayMode::Mixed:
-        cached.text = QString::fromUtf8(line.data) + "  |  " + HexConverter::toHexString(line.data);
+        cached.text = prefix + QString::fromUtf8(line.data) + "  |  " + HexConverter::toHexString(line.data);
         break;
+    case DisplayMode::Decimal: {
+        QStringList decBytes;
+        for (unsigned char b : line.data) {
+            decBytes << QString::number(b);
+        }
+        cached.text = prefix + decBytes.join(' ');
+        break;
+    }
     case DisplayMode::Text:
     default:
-        cached.text = QString::fromUtf8(line.data);
+        cached.text = prefix + QString::fromUtf8(line.data);
         break;
     }
 

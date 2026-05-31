@@ -4,6 +4,7 @@
 #include "core/RecordingController.h"
 #include "utils/DataLogger.h"
 #include "terminal/TerminalModel.h"
+#include "connection/SerialConnection.h"
 
 ConnectionController::ConnectionController(ConnectionManager* connMgr, QObject* parent)
     : QObject(parent)
@@ -129,6 +130,22 @@ void ConnectionController::connectNetwork(ConnectionType type)
 IConnection* ConnectionController::currentConnection() const
 {
     return m_currentConn;
+}
+
+void ConnectionController::setDtr(bool enabled)
+{
+    if (m_currentConn && m_currentConn->type() == ConnectionType::Serial) {
+        auto* serial = qobject_cast<SerialConnection*>(m_currentConn);
+        if (serial) serial->setDtr(enabled);
+    }
+}
+
+void ConnectionController::setRts(bool enabled)
+{
+    if (m_currentConn && m_currentConn->type() == ConnectionType::Serial) {
+        auto* serial = qobject_cast<SerialConnection*>(m_currentConn);
+        if (serial) serial->setRts(enabled);
+    }
 }
 
 void ConnectionController::onConnectionStateChanged(ConnectionState state)

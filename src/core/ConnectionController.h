@@ -37,6 +37,10 @@ public:
     // 获取当前连接
     IConnection* currentConnection() const;
 
+    // 运行时线路控制（DTR/RTS）- 透传给当前串口连接
+    void setDtr(bool enabled);
+    void setRts(bool enabled);
+
 signals:
     // 通知MainWindow更新UI
     void connectionStateChanged(ConnectionState state, const QString& connName);

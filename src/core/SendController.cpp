@@ -58,7 +58,15 @@ QWidget* SendController::createSendBar(QWidget* parent)
     m_sendBtn->setObjectName("sendButton");
     m_sendBtn->setFixedWidth(70);
 
+    // 自动追加换行符选择
+    m_newlineCombo = new QComboBox;
+    m_newlineCombo->setObjectName("newlineCombo");
+    m_newlineCombo->addItems({tr("无"), "\\r\\n", "\\n", "\\r"});
+    m_newlineCombo->setFixedWidth(70);
+    m_newlineCombo->setToolTip(tr("自动追加换行符"));
+
     sendLayout->addWidget(m_sendModeCombo);
+    sendLayout->addWidget(m_newlineCombo);
     sendLayout->addWidget(m_sendInput, 1);
     sendLayout->addWidget(m_sendBtn);
 
@@ -130,6 +138,15 @@ void SendController::onSendData()
         }
     } else {
         data = text.toUtf8();
+    }
+
+    // 追加换行符（仅文本模式下生效）
+    if (!isHex && m_newlineCombo && m_newlineCombo->currentIndex() > 0) {
+        switch (m_newlineCombo->currentIndex()) {
+        case 1: data.append("\r\n"); break;
+        case 2: data.append("\n"); break;
+        case 3: data.append("\r"); break;
+        }
     }
 
     if (sendAndRecord(data)) {

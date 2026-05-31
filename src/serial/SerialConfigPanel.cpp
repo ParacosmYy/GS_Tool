@@ -75,12 +75,18 @@ void SerialConfigPanel::setupUI()
 
     m_dtrCheck = new QCheckBox("DTR");
     m_dtrCheck->setChecked(true);
+    m_dtrCheck->setObjectName("dtrCheck");
     m_rtsCheck = new QCheckBox("RTS");
     m_rtsCheck->setChecked(true);
+    m_rtsCheck->setObjectName("rtsCheck");
 
     signalLayout->addWidget(m_dtrCheck);
     signalLayout->addWidget(m_rtsCheck);
     signalLayout->addStretch();
+
+    // DTR/RTS运行时控制信号
+    connect(m_dtrCheck, &QCheckBox::toggled, this, &SerialConfigPanel::dtrChanged);
+    connect(m_rtsCheck, &QCheckBox::toggled, this, &SerialConfigPanel::rtsChanged);
     mainLayout->addWidget(signalGroup);
 
     // ---- 连接按钮 ----
@@ -139,6 +145,9 @@ void SerialConfigPanel::setConnected(bool connected)
     m_stopBitsCombo->setEnabled(!connected);
     m_flowControlCombo->setEnabled(!connected);
     m_refreshBtn->setEnabled(!connected);
+    // DTR/RTS 保持可用，允许连接后实时切换
+    m_dtrCheck->setEnabled(true);
+    m_rtsCheck->setEnabled(true);
 }
 
 bool SerialConfigPanel::isConnected() const
@@ -174,6 +183,16 @@ int SerialConfigPanel::currentStopBitsIndex() const
 int SerialConfigPanel::currentFlowControlIndex() const
 {
     return m_flowControlCombo->currentIndex();
+}
+
+bool SerialConfigPanel::dtrEnabled() const
+{
+    return m_dtrCheck->isChecked();
+}
+
+bool SerialConfigPanel::rtsEnabled() const
+{
+    return m_rtsCheck->isChecked();
 }
 
 void SerialConfigPanel::restoreConfig(const QVariantMap& config)

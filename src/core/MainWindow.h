@@ -107,6 +107,7 @@ private:
     QComboBox* m_themeCombo;
     QComboBox* m_langCombo;
     QAction* m_timestampAction;
+    QAction* m_dirPrefixAction;
     QAction* m_clearAction;
     QAction* m_exportAction;
 

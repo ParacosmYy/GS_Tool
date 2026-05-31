@@ -47,3 +47,5 @@ Desktop.ini
 
 # Settings (local)
 embeddebug_settings.json
+build-test/
+test_output_*.txt

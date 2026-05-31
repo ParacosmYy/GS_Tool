@@ -31,6 +31,9 @@ public slots:
     // 关闭搜索栏并清除
     void deactivate();
 
+    // 设置匹配结果显示文本（如 "3/15"）
+    void setResultText(const QString& text);
+
 signals:
     // 搜索触发: pattern=搜索内容, regex=是否正则, hex=是否HEX
     void searchRequested(const QString& pattern, bool regex, bool hex);

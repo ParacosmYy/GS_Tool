@@ -8,6 +8,7 @@
 class QLineEdit;
 class QPushButton;
 class QComboBox;
+class QCheckBox;
 class QWidget;
 class TerminalModel;
 class DataLogger;
@@ -71,6 +72,7 @@ private:
     QLineEdit* m_sendInput = nullptr;
     QPushButton* m_sendBtn = nullptr;
     QComboBox* m_sendModeCombo = nullptr;
+    QComboBox* m_newlineCombo = nullptr;     // 自动追加换行符选择
 
     // 发送历史自动补全
     QStringListModel* m_sendCompleterModel = nullptr;

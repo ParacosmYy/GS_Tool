@@ -173,6 +173,27 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 - 被暂缓的提案在下一轮自动重新评估（最多暂缓2次，超过则驳回）
 - 新特性的实现必须在通过后的 **3个迭代内** 完成，否则自动降级为"暂缓"
 
+#### 3.4.5 Bug修复冲刺（每3次迭代执行）
+
+每完成 **3次commit**（与新特性评估同步），必须执行一次全面的Bug审查和修复冲刺:
+
+**流程**:
+1. 启动 Explore Agent 全面扫描当前工具中的所有已知Bug
+2. 按优先级分类: P0(功能完全不可用) > P1(功能受限) > P2(体验不佳)
+3. **优先修复P0和P1级别的Bug**，新特性开发在Bug清零前暂停
+4. 记录到 `docs/prd/BUG_AUDIT_xxx.md`
+
+**审查范围**:
+- 终端功能: 复制/粘贴/搜索/滚轮/选中/清屏
+- 串口功能: 连接/断开/DTR/RTS/波特率/数据位/流控
+- 发送功能: 文本/HEX发送/定时发送/快捷指令/自动换行
+- 波形图: 数据显示/通道配置/Clear/暂停/缩放
+- OTA: 文件选择/传输/进度/错误处理
+- UI/UX: 主题切换/面板切换/动画/响应性/控件一致性
+- 配置持久化: 设置保存/恢复/串口配置/会话
+
+**铁律**: P0 Bug存在时禁止开发新特性。工具必须先能用，再好用。
+
 #### 3.4.3 新特性候选池
 
 以下是经过初步筛选的新特性候选列表，按优先级排列:
@@ -187,6 +208,7 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 | **P1** | MQTT/串口网关 | 将串口数据通过MQTT协议转发到云端/IoT平台，实现远程监控 | MQTT Explorer | 中 |
 | **P2** | 多语言帧解析模板 | 预置常见协议模板（Modbus RTU/ASCII、自定义协议），用户选择模板即可自动解析 | Docklight, Serial Studio | 中 |
 | **P2** | 虚拟串口回环测试 | 内置虚拟串口对（com0com模式），无需硬件即可测试收发功能 | com0com | 低 |
+| **P2** | 串口驱动检测 | 启动时检测系统是否安装了串口驱动(CH340/CP2102/FT232/PL2303等)，无驱动时给出安装提示 | Device Manager | 低 |
 | **P2** | 主题编辑器 | 可视化主题编辑器，用户拖拽调色板自定义主题颜色，实时预览 | VS Code Settings | 中 |
 | **P3** | SSH/Serial终端增强 | 支持SSH连接（远程设备调试），终端支持ANSI颜色码解析 | WindTerm, Tabby | 高 |
 | **P3** | 插件系统 | 提供插件API，第三方可开发协议解析插件、数据源插件、UI面板插件 | VOFA+ | 极高 |
@@ -195,7 +217,7 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 
 | 标杆产品 | 值得借鉴的特性 | 在EmbedDebug中的应用 |
 |---------|--------------|---------------------|
-| **VOFA+** | JustFloat/FireWater协议、拖拽添加控件、嵌入式FFT/直方图、实时波形渲染引擎 | 波形引擎核心参考，协议兼容性 |
+| **VOFA+** | JustFloat/FireWater协议、拖拽添加控件、嵌入式FFT/直方图、实时波形渲染引擎、串口数据直接出波形 | 波形引擎核心参考，协议兼容性，**目标：超越VOFA+的波形体验** |
 | **Serial Studio** | 仪表盘式数据展示、MQTT桥接、JSON驱动的仪表布局 | 仪表盘可视化、IoT集成 |
 | **CANoe** | CAN总线仿真、DBC数据库、交互面板、自动化测试序列 | CAN/CANFD模块参考 |
 | **PulseView (sigrok)** | 多通道逻辑分析仪、协议栈解码器、时间轴对齐、缩放/游标测量 | 数据录制回放参考 |
@@ -326,7 +348,8 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 | `DataLogger` | `utils/DataLogger.h/cpp` | 日志记录/回放 |
 | `IConnection` | `connection/IConnection.h` | 连接抽象接口 |
 | `TerminalModel` | `terminal/TerminalModel.h/cpp` | 终端数据模型 |
-| `TerminalWidget` | `terminal/TerminalWidget.h/cpp` | 自绘制终端控件 |
+| `TerminalWidget` | `terminal/TerminalWidget.h/cpp` | 自绘制终端控件（搜索高亮+F3导航+十进制模式+方向前缀） |
+| `TerminalSearchBar` | `terminal/TerminalSearchBar.h/cpp` | 终端搜索栏（正则/HEX/匹配计数/展开收起动画） |
 | `Constants` | `core/Constants.h` | 全局枚举和常量 |
 | `ChannelConfig` | `chart/ChannelConfig.h/cpp` | 通道配置（JSON序列化+数据源映射） |
 | `ChartModel` | `chart/ChartModel.h/cpp` | 图表数据模型（滑动窗口+降采样） |
@@ -818,6 +841,7 @@ docs/prd/PRD_<编号>_<简述>.md
 | 22 | SendController提取+sendAndRecord静默失败修复+TerminalWidget环形缓存失效修复+QSS protocolToolbar修复+代码审查修复(死代码清除+翻译上下文修正+setConnected连线) | 24 |
 | 23 | ConnectionController提取+JustFloat/FireWater协议桥实现+SendBar StyledPanel修复+sendAndRecord未连接反馈+代码审查修复(isHex参数移除+静默失败修复) | 25 |
 | 24 | ProtocolBridgeManager协议源选择器+objectName审计补全(8控件)+QSS交互状态补全(SpinBox/ComboBox/ToolButton disabled)+ConnectionController悬空指针修复(断开时清除SendController/OtaManager+网络连接补OtaManager)+桥接单元测试 | 26 |
+| 25 | P0串口修复: TerminalWidget复制功能实现+搜索高亮(F3导航/正则/HEX/匹配计数)+DTR/RTS运行时控制(连接后保持可切换)+自动追加换行符(无/\r\n/\n/\r)+CLAUDE.md更新(Bug修复冲刺机制+VOFA+超越目标+驱动检测需求) | 27 |
 | ... | 目标: 1000分 | 1000 |
 
 ---

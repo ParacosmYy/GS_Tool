@@ -28,6 +28,10 @@ public:
     int currentStopBitsIndex() const;
     int currentFlowControlIndex() const;
 
+    // DTR/RTS状态（连接时读取初始值）
+    bool dtrEnabled() const;
+    bool rtsEnabled() const;
+
     // 设置连接状态(更新按钮文字和可用性)
     void setConnected(bool connected);
 
@@ -41,6 +45,10 @@ signals:
     // 用户点击连接/断开按钮
     void connectRequested();
     void disconnectRequested();
+
+    // DTR/RTS运行时控制
+    void dtrChanged(bool enabled);
+    void rtsChanged(bool enabled);
 
 private:
     void setupUI();

@@ -185,13 +185,19 @@ void MainWindow::setupToolbar()
     m_toolbar->setFloatable(false);
 
     m_displayModeCombo = new QComboBox;
-    m_displayModeCombo->addItems({tr("文本"), tr("HEX"), tr("混合")});
+    m_displayModeCombo->setObjectName("displayModeCombo");
+    m_displayModeCombo->addItems({tr("文本"), tr("HEX"), tr("混合"), tr("十进制")});
     m_displayModeCombo->setFixedWidth(80);
     m_toolbar->addWidget(m_displayModeCombo);
 
     m_timestampAction = m_toolbar->addAction(tr("时间戳"));
     m_timestampAction->setCheckable(true);
     m_timestampAction->setChecked(false);
+
+    m_dirPrefixAction = m_toolbar->addAction(tr("[TX/RX]"));
+    m_dirPrefixAction->setCheckable(true);
+    m_dirPrefixAction->setChecked(false);
+    m_dirPrefixAction->setToolTip(tr("显示收发方向前缀"));
 
     m_clearAction = m_toolbar->addAction(tr("清屏"));
 
@@ -265,12 +271,18 @@ void MainWindow::connectSignals()
         params["parity"] = m_serialConfig->currentParityIndex();
         params["stopBits"] = m_serialConfig->currentStopBitsIndex();
         params["flowControl"] = m_serialConfig->currentFlowControlIndex();
-        params["dtr"] = true;
-        params["rts"] = true;
+        params["dtr"] = m_serialConfig->dtrEnabled();
+        params["rts"] = m_serialConfig->rtsEnabled();
         m_connController->connectSerial(params);
     });
     connect(m_serialConfig, &SerialConfigPanel::disconnectRequested,
             m_connController, &ConnectionController::disconnectSerial);
+
+    // DTR/RTS运行时控制
+    connect(m_serialConfig, &SerialConfigPanel::dtrChanged,
+            m_connController, &ConnectionController::setDtr);
+    connect(m_serialConfig, &SerialConfigPanel::rtsChanged,
+            m_connController, &ConnectionController::setRts);
 
     // ConnectionController → MainWindow UI 更新
     connect(m_connController, &ConnectionController::connectionStateChanged,
@@ -340,6 +352,7 @@ void MainWindow::connectSignals()
     connect(m_displayModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onDisplayModeChanged);
     connect(m_timestampAction, &QAction::toggled, this, &MainWindow::onTimestampToggled);
+    connect(m_dirPrefixAction, &QAction::toggled, m_terminal, &TerminalWidget::setShowDirectionPrefix);
     connect(m_clearAction, &QAction::triggered, this, &MainWindow::onClearTerminal);
     connect(m_exportAction, &QAction::triggered, this, &MainWindow::onExportData);
 
@@ -373,8 +386,19 @@ void MainWindow::connectSignals()
     connect(m_searchBar, &TerminalSearchBar::searchCleared,
             this, &MainWindow::onSearchCleared);
     connect(m_searchBar, &TerminalSearchBar::closed, this, [this]() {
-        // 搜索栏关闭时清除终端搜索高亮（后续实现）
+        m_terminal->clearSearchHighlight();
     });
+
+    // 终端搜索匹配结果 → 搜索栏显示匹配计数
+    connect(m_terminal, &TerminalWidget::searchMatchesChanged,
+            this, [this](int total, int current) {
+                if (total == 0) {
+                    m_searchBar->setResultText(QString());
+                } else {
+                    m_searchBar->setResultText(
+                        tr("%1/%2").arg(current + 1).arg(total));
+                }
+            });
 
     // 统计刷新定时器
     connect(m_statsTimer, &QTimer::timeout, this, &MainWindow::updateDataStatistics);
@@ -483,7 +507,7 @@ void MainWindow::saveSettings()
 
 void MainWindow::onDisplayModeChanged(int index)
 {
-    DisplayMode modes[] = {DisplayMode::Text, DisplayMode::Hex, DisplayMode::Mixed};
+    DisplayMode modes[] = {DisplayMode::Text, DisplayMode::Hex, DisplayMode::Mixed, DisplayMode::Decimal};
     m_terminal->setDisplayMode(modes[index]);
 }
 
@@ -534,14 +558,12 @@ void MainWindow::onExportData()
 
 void MainWindow::onSearchRequested(const QString& pattern, bool regex, bool hex)
 {
-    // 将搜索请求传递给终端模型（后续在TerminalModel中实现搜索高亮）
-    // 目前仅做日志输出
-    qDebug() << "Search:" << pattern << "regex:" << regex << "hex:" << hex;
+    m_terminal->setSearchHighlight(pattern, regex, hex);
 }
 
 void MainWindow::onSearchCleared()
 {
-    // 清除终端搜索高亮（后续实现）
+    m_terminal->clearSearchHighlight();
 }
 
 void MainWindow::onThemeChanged(int index)

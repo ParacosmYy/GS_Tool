@@ -197,3 +197,8 @@ bool TerminalSearchBar::isValidHex(const QString& text) const
 {
     return HexConverter::isValidHex(text);
 }
+
+void TerminalSearchBar::setResultText(const QString& text)
+{
+    m_resultLabel->setText(text);
+}

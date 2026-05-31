@@ -25,7 +25,8 @@ enum class ConnectionType {
 enum class DisplayMode {
     Text,       // 纯文本
     Hex,        // 十六进制
-    Mixed       // 文本+HEX混合
+    Mixed,      // 文本+HEX混合
+    Decimal     // 十进制
 };
 
 // 连接状态
