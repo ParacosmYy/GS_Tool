@@ -79,6 +79,18 @@ private slots:
 private:
     /** @brief 初始化所有UI控件和布局 */
     void setupUI();
+    /** @brief 创建帧头/帧尾配置分组 */
+    QGroupBox* setupHeaderGroup();
+    /** @brief 创建长度字段配置分组 */
+    QGroupBox* setupLengthGroup();
+    /** @brief 创建校验配置分组 */
+    QGroupBox* setupChecksumGroup();
+    /** @brief 创建数据字段表格分组(含拖拽排序和操作按钮) */
+    QGroupBox* setupFieldsGroup();
+    /** @brief 创建二进制布局预览分组 */
+    QGroupBox* setupPreviewGroup();
+    /** @brief 连接所有信号/槽 */
+    void setupConnections();
     /** @brief 从UI控件收集数据重建FrameDefinition */
     void rebuildDefinition();
     /** @brief 从FrameDefinition填充字段表格 */

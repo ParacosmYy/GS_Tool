@@ -133,6 +133,34 @@ private:
 
     QColor m_searchHighlightColor;          ///< 搜索高亮背景色(半透明黄)
     QColor m_currentMatchColor;             ///< 当前匹配高亮色(高透明度黄)
+
+    // ---- 内部搜索构建方法 ----
+
+    /**
+     * @brief 纯文本模式搜索，遍历行并收集匹配
+     * @param pattern 搜索文本
+     * @param lineProvider 提供 (displayIdx, text) 对的回调，返回false结束迭代
+     */
+    void buildPlainSearch(const QString& pattern,
+                          const std::function<bool(int*, QString*)>& lineProvider);
+
+    /**
+     * @brief 正则表达式模式搜索，遍历行并收集匹配
+     * @param pattern 正则表达式字符串
+     * @param lineProvider 提供 (displayIdx, text) 对的回调，返回false结束迭代
+     * @return true 表示正则有效并完成搜索，false 表示正则无效
+     */
+    bool buildRegexSearch(const QString& pattern,
+                          const std::function<bool(int*, QString*)>& lineProvider);
+
+    /**
+     * @brief HEX模式搜索，将原始字节转为HEX字符串后匹配
+     * @param pattern HEX搜索串
+     * @param lineProvider 提供 (displayIdx, text) 对的回调，返回false结束迭代
+     * @return true 表示HEX转换有效并完成搜索，false 表示HEX串无效
+     */
+    bool buildHexSearch(const QString& pattern,
+                        const std::function<bool(int*, QString*)>& lineProvider);
 };
 
 #endif // TERMINALSEARCHMANAGER_H

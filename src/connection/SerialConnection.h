@@ -20,7 +20,7 @@
 #ifndef SERIALCONNECTION_H
 #define SERIALCONNECTION_H
 
-#include "IConnection.h"
+#include "connection/IConnection.h"
 #include <QSerialPort>
 #include <QSerialPortInfo>
 

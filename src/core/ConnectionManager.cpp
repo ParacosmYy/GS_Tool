@@ -1,5 +1,5 @@
-#include "ConnectionManager.h"
-#include "ConnectionFactory.h"
+#include "core/ConnectionManager.h"
+#include "core/ConnectionFactory.h"
 
 ConnectionManager::ConnectionManager(QObject* parent)
     : QObject(parent)

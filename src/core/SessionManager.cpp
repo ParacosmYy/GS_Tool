@@ -10,7 +10,7 @@
 #include "core/SettingsController.h"
 #include "serial/SerialConfigPanel.h"
 #include "utils/SettingsManager.h"
-#include "ThemeManager.h"
+#include "core/ThemeManager.h"
 
 #include <QMainWindow>
 

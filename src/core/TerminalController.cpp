@@ -6,7 +6,7 @@
  * 终端相关业务逻辑集中管理，使 MainWindow 只负责 UI 布局和信号连接。
  */
 
-#include "TerminalController.h"
+#include "core/TerminalController.h"
 #include "terminal/TerminalModel.h"
 #include "terminal/TerminalWidget.h"
 #include "terminal/TerminalLayoutManager.h"

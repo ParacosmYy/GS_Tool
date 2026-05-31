@@ -80,6 +80,9 @@ private:
     QByteArray buildBinHeader(quint8 frameType, const QByteArray& data = QByteArray());
     QByteArray buildDataSubpacket(char endFlag, const QByteArray& data);
 
+    /** @brief ZDLE转义: 对data中的控制字符进行转义 */
+    QByteArray escapeZdle(const QByteArray& data) const;
+
     // ---- 发送流程 ----
     void sendZRQINIT();        ///< 发送初始化请求
     void sendZFILE();          ///< 发送文件信息

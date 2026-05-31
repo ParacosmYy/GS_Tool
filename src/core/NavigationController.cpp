@@ -13,9 +13,9 @@
  *   6. 动画对象使用 DeleteWhenStopped 自动清理
  */
 
-#include "NavigationController.h"
-#include "Constants.h"
-#include "ThemeManager.h"
+#include "core/NavigationController.h"
+#include "core/Constants.h"
+#include "core/ThemeManager.h"
 #include <QTreeView>
 #include <QStandardItemModel>
 #include <QPainter>

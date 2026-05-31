@@ -8,7 +8,7 @@
  *   3. 方向匹配: 新行的方向 == m_direction 时，将其模型行号追加到索引表
  */
 
-#include "DirectionFilter.h"
+#include "terminal/DirectionFilter.h"
 
 DirectionFilter::DirectionFilter(QObject* parent)
     : QObject(parent)

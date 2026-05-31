@@ -1,4 +1,4 @@
-#include "TerminalModel.h"
+#include "terminal/TerminalModel.h"
 
 TerminalModel::TerminalModel(QObject* parent)
     : QObject(parent)

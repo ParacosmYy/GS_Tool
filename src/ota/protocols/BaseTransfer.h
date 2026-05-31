@@ -63,6 +63,15 @@ protected:
     int m_timeoutMs = 5000;             ///< 单次超时(ms)
     static constexpr int kMaxReceiveBufferSize = 1024 * 1024; ///< 缓冲区上限(1MB)
 
+    // ---- OTA协议共享控制字节 ----
+    static constexpr char SOH = 0x01;       ///< 128字节块起始标记
+    static constexpr char EOT = 0x04;       ///< 传输结束标记
+    static constexpr char ACK = 0x06;       ///< 确认应答
+    static constexpr char NAK = 0x15;       ///< 否定确认(Checksum模式)
+    static constexpr char CAN = 0x18;       ///< 取消传输
+    static constexpr char CRC_CHAR = 'C';   ///< CRC模式请求
+    static constexpr qint64 kMaxFileSize = 1024 * 1024; ///< 文件大小上限(1MB)
+
     // === 纯虚钩子 ===
     /** @brief start()的协议特有初始化 @return true=成功 */
     virtual bool onStartInit() = 0;

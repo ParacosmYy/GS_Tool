@@ -90,14 +90,7 @@ protected:
     void handleTimeout() override;
 
 private:
-    // ---- XMODEM协议控制字节 ----
-    static constexpr char SOH = 0x01;      ///< 128字节块头
-    static constexpr char STX = 0x02;      ///< 1024字节块头
-    static constexpr char EOT = 0x04;      ///< 传输结束
-    static constexpr char ACK = 0x06;      ///< 确认
-    static constexpr char NAK = 0x15;      ///< 否定确认(Checksum模式)
-    static constexpr char CAN = 0x18;      ///< 取消传输
-    static constexpr char CRC_CHAR = 'C';  ///< CRC模式请求
+    static constexpr char STX = 0x02;      ///< 1024字节块头(XMODEM-1K专用)
 
     /** @brief XMODEM内部状态(独立于BaseTransfer::TransferState) */
     enum class State {

@@ -39,14 +39,8 @@
 /**
  * @brief OTA升级操作面板
  *
- * 职责:
- *   1. 文件选择和路径显示
- *   2. 协议选择（XMODEM-CRC/Checksum/1K, YMODEM, ZMODEM）
- *   3. 传输进度显示（带平滑动画的进度条 + 百分比文字）
- *   4. 传输速率和ETA实时显示（使用ByteFormat格式化）
- *   5. 传输完成/失败状态反馈（进度条变色动画）
- *   6. 传输日志实时输出（带时间戳）
- *   7. OTA历史记录查看和清除
+ * 职责: 文件选择、协议选择(XMODEM/YMODEM/ZMODEM)、进度显示(平滑动画)、
+ * 速率/ETA实时显示、完成/失败状态反馈(变色动画)、日志输出、历史记录
  */
 class OtaWidget : public QWidget {
     Q_OBJECT
@@ -72,19 +66,10 @@ signals:
      */
     void transferStarted(const QString& filename);
 
-    /**
-     * @brief 传输完成信号 -- MainWindow可连接到ToastWidget显示成功通知
-     * @param filename 固件文件名（不含路径）
-     * @param elapsed 传输耗时（毫秒）
-     * @param size 传输文件大小（字节）
-     */
+    /** @brief 传输完成信号 @param filename 文件名 @param elapsed 耗时(ms) @param size 文件大小(字节) */
     void transferCompleted(const QString& filename, int elapsed, int size);
 
-    /**
-     * @brief 传输失败信号 -- MainWindow可连接到ToastWidget显示错误通知
-     * @param filename 固件文件名（不含路径）
-     * @param error 错误原因描述
-     */
+    /** @brief 传输失败信号 @param filename 文件名 @param error 错误原因 */
     void transferFailed(const QString& filename, const QString& error);
 
 private slots:
@@ -97,12 +82,7 @@ private slots:
     /** @brief 取消传输按钮点击 */
     void onCancelTransfer();
 
-    /**
-     * @brief 传输进度更新
-     * @param percent 进度百分比 (0-100)
-     * @param bytesSent 已发送字节数
-     * @param totalBytes 总字节数
-     */
+    /** @brief 传输进度更新 @param percent 百分比(0-100) @param bytesSent 已发送 @param totalBytes 总字节 */
     void onProgress(int percent, qint64 bytesSent, qint64 totalBytes);
 
     /** @brief 传输完成处理 -- 设置进度条100%、触发变色动画 */
@@ -114,22 +94,25 @@ private slots:
      */
     void onTransferError(const QString& reason);
 
-    /**
-     * @brief 传输速率和ETA更新
-     * @param rateBytesPerSec 当前传输速率(字节/秒)
-     * @param etaSec 预计剩余时间(秒)
-     */
+    /** @brief 速率和ETA更新 @param rateBytesPerSec 速率(字节/秒) @param etaSec 剩余时间(秒) */
     void onTransferStats(double rateBytesPerSec, double etaSec);
 
-    /**
-     * @brief OTA状态变化处理
-     * @param state 新的OTA状态
-     */
+    /** @brief OTA状态变化 @param state 新状态 */
     void onOtaStateChanged(OtaManager::OtaState state);
 
 private:
     /** @brief 初始化UI布局和所有子控件 */
     void setupUI();
+    /** @brief 创建文件选择分组(路径输入框+浏览按钮+文件信息) */
+    QGroupBox* setupFileGroup();
+    /** @brief 创建传输配置分组(协议选择+开始/取消按钮) */
+    QGroupBox* setupConfigGroup();
+    /** @brief 创建进度显示分组(进度条+状态/速率/ETA标签) */
+    QGroupBox* setupProgressGroup();
+    /** @brief 创建日志输出分组 */
+    QGroupBox* setupLogGroup();
+    /** @brief 创建OTA历史记录分组(树形视图+清除按钮) */
+    QGroupBox* setupHistoryGroup();
 
     /**
      * @brief 追加带时间戳的日志消息
@@ -143,13 +126,7 @@ private:
      */
     void setTransferring(bool transferring);
 
-    /**
-     * @brief 启动进度条完成变色动画
-     *
-     * 传输完成后将进度条样式从 accent 色渐变为 success 色。
-     * 使用 QPropertyAnimation 对自定义 progressColor 属性进行动画，
-     * 持续 400ms，缓动曲线 OutCubic。
-     */
+    /** @brief 启动进度条完成变色动画(accent->success, 400ms OutCubic) */
     void startCompletionAnimation();
 
     OtaManager* m_manager;              ///< OTA管理器（业务逻辑层）

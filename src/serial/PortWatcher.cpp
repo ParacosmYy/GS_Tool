@@ -11,7 +11,7 @@
  *   4. 有变化时更新快照并发射 portsChanged 信号
  */
 
-#include "PortWatcher.h"
+#include "serial/PortWatcher.h"
 #include <QSerialPortInfo>
 #include <algorithm>
 

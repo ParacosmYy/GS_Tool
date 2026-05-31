@@ -10,7 +10,7 @@
  * 辅助方法实现在 FrameParserHelpers.cpp 中。
  */
 
-#include "FrameParser.h"
+#include "protocol/FrameParser.h"
 #include <QDebug>
 
 // ============================================================================

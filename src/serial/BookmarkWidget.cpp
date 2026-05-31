@@ -3,7 +3,7 @@
  * @brief 书签管理面板实现 - 嵌入导航树的书签浏览和管理界面
  */
 
-#include "BookmarkWidget.h"
+#include "serial/BookmarkWidget.h"
 
 #include <QMessageBox>
 

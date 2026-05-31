@@ -3,7 +3,7 @@
  * @brief 串口连接实现 - 封装 QSerialPort 的完整串口通信逻辑
  */
 
-#include "SerialConnection.h"
+#include "connection/SerialConnection.h"
 #include <QDebug>
 #include <QVariant>
 

@@ -8,7 +8,7 @@
  *   - 列宽自动调整: 每50帧或前3帧触发
  *   - 右键菜单: 复制行/原始数据/导出JSON
  */
-#include "ProtocolView.h"
+#include "protocol/ProtocolView.h"
 #include "utils/HexConverter.h"
 #include "core/Constants.h"
 #include "core/ThemeManager.h"

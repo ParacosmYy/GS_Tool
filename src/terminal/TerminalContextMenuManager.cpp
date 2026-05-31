@@ -1,6 +1,10 @@
 /**
  * @file TerminalContextMenuManager.cpp
- * @brief Terminal context menu manager implementation
+ * @brief 终端右键菜单管理器实现 - 菜单项创建和事件处理
+ *
+ * 菜单项布局:
+ *   复制(Ctrl+C) | 粘贴(Ctrl+V) | --- | 清屏 | 全选(Ctrl+A) | --- | 搜索(Ctrl+F)
+ * 粘贴操作直接读取系统剪贴板内容，其他操作通过信号委托给外部。
  */
 #include "terminal/TerminalContextMenuManager.h"
 #include <QAction>

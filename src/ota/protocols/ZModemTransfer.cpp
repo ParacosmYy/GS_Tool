@@ -49,10 +49,9 @@ bool ZModemTransfer::onStartInit()
         return false;
     }
     // 文件大小校验(最大1MB)
-    static constexpr qint64 kMaxFileSize = 1024 * 1024;
-    if (fileInfo.size() > kMaxFileSize) {
+    if (fileInfo.size() > BaseTransfer::kMaxFileSize) {
         emit transferError(tr("文件过大: %1 (%2 字节, 上限 %3 字节)")
-                               .arg(m_filePath).arg(fileInfo.size()).arg(kMaxFileSize));
+                               .arg(m_filePath).arg(fileInfo.size()).arg(BaseTransfer::kMaxFileSize));
         return false;
     }
     QFile file(m_filePath);
@@ -61,6 +60,10 @@ bool ZModemTransfer::onStartInit()
         return false;
     }
     m_fileData = file.readAll();
+    if (m_fileData.size() != fileInfo.size()) {
+        emit transferError(tr("Failed to read file"));
+        return false;
+    }
     file.close();
     // 空文件无法传输
     if (m_fileData.isEmpty()) {
@@ -372,12 +375,11 @@ QByteArray ZModemTransfer::buildBinHeader(quint8 frameType, const QByteArray& da
     // ZDLE转义: 控制字符 + 帧头前8字节内的0x00
     for (char b : payload) {
         quint8 c = static_cast<quint8>(b);
-        if (c == 0x18 || c == 0x0D || c == 0x0A || c == 0x11 || c == 0x13 ||
-            c == 0x2A || (c == 0x00 && frame.size() < 8)) {
+        if (c == 0x00 && frame.size() < 8) {
             frame.append(ZDLE);
             frame.append(static_cast<char>(c ^ 0x40));
         } else {
-            frame.append(b);
+            frame.append(escapeZdle(QByteArray(1, b)));
         }
     }
     return frame;
@@ -386,15 +388,7 @@ QByteArray ZModemTransfer::buildBinHeader(quint8 frameType, const QByteArray& da
 QByteArray ZModemTransfer::buildDataSubpacket(char endFlag, const QByteArray& data)
 {
     QByteArray packet;
-    for (char b : data) {
-        quint8 c = static_cast<quint8>(b);
-        if (c == 0x18 || c == 0x0D || c == 0x0A || c == 0x11 || c == 0x13 || c == 0x2A) {
-            packet.append(ZDLE);
-            packet.append(static_cast<char>(c ^ 0x40));
-        } else {
-            packet.append(b);
-        }
-    }
+    packet.append(escapeZdle(data));
     QByteArray crcInput = data;
     crcInput.append(endFlag);
     quint32 crc = CRC::crc32(crcInput);
@@ -405,15 +399,7 @@ QByteArray ZModemTransfer::buildDataSubpacket(char endFlag, const QByteArray& da
     crcBytes.append(static_cast<char>((crc >> 16) & 0xFF));
     crcBytes.append(static_cast<char>((crc >> 8) & 0xFF));
     crcBytes.append(static_cast<char>(crc & 0xFF));
-    for (char b : crcBytes) {
-        quint8 c = static_cast<quint8>(b);
-        if (c == 0x18 || c == 0x0D || c == 0x0A || c == 0x11 || c == 0x13 || c == 0x2A) {
-            packet.append(ZDLE);
-            packet.append(static_cast<char>(c ^ 0x40));
-        } else {
-            packet.append(b);
-        }
-    }
+    packet.append(escapeZdle(crcBytes));
     return packet;
 }
 
@@ -492,6 +478,21 @@ QByteArray ZModemTransfer::toHex(quint32 val, int digits)
     for (int i = digits - 1; i >= 0; --i) {
         int nibble = (val >> (i * 4)) & 0xF;
         result.append(nibble < 10 ? ('0' + nibble) : ('A' + nibble - 10));
+    }
+    return result;
+}
+
+QByteArray ZModemTransfer::escapeZdle(const QByteArray& data) const
+{
+    QByteArray result;
+    for (char b : data) {
+        quint8 c = static_cast<quint8>(b);
+        if (c == 0x18 || c == 0x0D || c == 0x0A || c == 0x11 || c == 0x13 || c == 0x2A) {
+            result.append(ZDLE);
+            result.append(static_cast<char>(c ^ 0x40));
+        } else {
+            result.append(b);
+        }
     }
     return result;
 }

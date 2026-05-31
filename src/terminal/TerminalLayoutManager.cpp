@@ -1,7 +1,7 @@
-#include "TerminalLayoutManager.h"
-#include "TerminalWidget.h"
-#include "TerminalSearchBar.h"
-#include "TerminalModel.h"
+#include "terminal/TerminalLayoutManager.h"
+#include "terminal/TerminalWidget.h"
+#include "terminal/TerminalSearchBar.h"
+#include "terminal/TerminalModel.h"
 
 #include <QVBoxLayout>
 #include <QBoxLayout>

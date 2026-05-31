@@ -49,6 +49,20 @@ public:
     QToolBar* createToolbar(QMainWindow* parent);
 
     /**
+     * @brief 创建显示模式相关控件组
+     * 包含: 显示模式下拉框(文本/HEX/混合/十进制)、终端布局下拉框、时间戳开关、方向前缀开关、清屏按钮
+     * @param toolbar 目标工具栏
+     */
+    void createDisplayModeGroup(QToolBar* toolbar);
+
+    /**
+     * @brief 创建连接相关控制组
+     * 包含: 导出按钮、背景设置按钮、录制/回放(委托RecordingController)、主题/语言下拉框
+     * @param toolbar 目标工具栏
+     */
+    void createConnectionGroup(QToolBar* toolbar);
+
+    /**
      * @brief 获取工具栏指针
      * 用于定位弹出面板（如背景设置面板需要在工具栏下方弹出）
      * @return 工具栏指针

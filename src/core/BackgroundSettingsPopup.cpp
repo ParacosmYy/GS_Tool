@@ -6,8 +6,8 @@
  * 所有调节实时反映到 BackgroundWidget。
  */
 
-#include "BackgroundSettingsPopup.h"
-#include "BackgroundWidget.h"
+#include "core/BackgroundSettingsPopup.h"
+#include "core/BackgroundWidget.h"
 #include "utils/SettingsManager.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>

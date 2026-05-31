@@ -10,9 +10,9 @@
  *   5. 解析QSS中的 --semantic-XXX 自定义属性为语义色板
  */
 
-#include "ThemeManager.h"
+#include "core/ThemeManager.h"
 #include "utils/SettingsManager.h"
-#include "Constants.h"
+#include "core/Constants.h"
 
 #include <QApplication>
 #include <QFile>

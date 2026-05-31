@@ -10,7 +10,7 @@
  * 所有业务逻辑委托给各 Controller 处理。
  */
 
-#include "MainWindow.h"
+#include "core/MainWindow.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QCloseEvent>

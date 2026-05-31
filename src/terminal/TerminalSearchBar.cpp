@@ -7,7 +7,7 @@
  *   - 收起: 36 -> 0, 150ms, QEasingCurve::InCubic
  */
 
-#include "TerminalSearchBar.h"
+#include "terminal/TerminalSearchBar.h"
 #include "utils/HexConverter.h"
 
 #include <QHBoxLayout>

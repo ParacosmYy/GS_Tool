@@ -6,8 +6,8 @@
  * 所有缩放在 resize 时预缓存到 m_scaledBlurredImage。
  */
 
-#include "BackgroundWidget.h"
-#include "ThemeManager.h"
+#include "core/BackgroundWidget.h"
+#include "core/ThemeManager.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMouseEvent>

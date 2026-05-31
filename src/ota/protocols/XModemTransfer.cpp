@@ -59,15 +59,14 @@ bool XModemTransfer::onStartInit()
     // 加载文件数据
     if (m_data.isEmpty() && !m_filePath.isEmpty()) {
         // 文件大小校验: 拒绝超过1MB的文件，防止内存耗尽
-        static constexpr qint64 kMaxFileSize = 1024 * 1024; // 1MB
         QFileInfo fileInfo(m_filePath);
-        if (fileInfo.size() > kMaxFileSize) {
+        if (fileInfo.size() > BaseTransfer::kMaxFileSize) {
             qWarning() << "XModem: file too large:" << fileInfo.size()
-                       << "bytes (max" << kMaxFileSize << "bytes)";
+                       << "bytes (max" << BaseTransfer::kMaxFileSize << "bytes)";
             emit transferError(tr("文件过大: %1 (%2 字节, 上限 %3 字节)")
                                    .arg(fileInfo.fileName())
                                    .arg(fileInfo.size())
-                                   .arg(kMaxFileSize));
+                                   .arg(BaseTransfer::kMaxFileSize));
             return false;
         }
 
@@ -77,6 +76,10 @@ bool XModemTransfer::onStartInit()
             return false;
         }
         m_data = file.readAll();
+        if (m_data.size() != fileInfo.size()) {
+            emit transferError(tr("Failed to read file"));
+            return false;
+        }
         file.close();
     }
 

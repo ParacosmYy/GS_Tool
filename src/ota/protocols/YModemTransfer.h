@@ -91,12 +91,6 @@ protected:
 
 private:
     // ---- YMODEM协议控制字节 ----
-    static constexpr char SOH = 0x01;       ///< 128字节块起始标记
-    static constexpr char EOT = 0x04;       ///< 传输结束标记
-    static constexpr char ACK = 0x06;       ///< 确认应答
-    static constexpr char NAK = 0x15;       ///< 否定确认(Checksum回退)
-    static constexpr char CAN = 0x18;       ///< 取消传输
-    static constexpr char CRC_CHAR = 'C';   ///< CRC模式请求
     static constexpr int kBlockSize = 128;  ///< YMODEM固定128字节块
 
     /** @brief YMODEM内部协议状态 */

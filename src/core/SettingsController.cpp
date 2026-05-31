@@ -7,12 +7,12 @@
  * 底层持久化委托给 SettingsManager 单例（QSettings 封装）
  */
 
-#include "SettingsController.h"
-#include "ToolbarController.h"
+#include "core/SettingsController.h"
+#include "core/ToolbarController.h"
 #include "utils/SettingsManager.h"
-#include "ThemeManager.h"
+#include "core/ThemeManager.h"
 #include "serial/SerialConfigPanel.h"
-#include "Constants.h"
+#include "core/Constants.h"
 
 #include <QMainWindow>
 #include <QStatusBar>

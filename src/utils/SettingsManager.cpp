@@ -9,7 +9,7 @@
  *   - 便捷方法: 串口配置、窗口几何、主题、语言
  */
 
-#include "SettingsManager.h"
+#include "utils/SettingsManager.h"
 #include "core/Constants.h"
 
 // ============================================================

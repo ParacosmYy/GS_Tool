@@ -41,96 +41,58 @@ int TerminalSearchManager::setSearchHighlight(
         return 0;
     }
 
-    QString searchStr = pattern;
+    // 构建行遍历回调: 每次调用填入 (displayIdx, text)，返回false表示遍历结束
+    // 方向过滤模式从过滤映射获取行，普通模式直接遍历缓存
+    int cursor = 0;
+    const int totalCount = (directionFilter && directionFilter->isFiltered())
+                               ? directionFilter->filteredLineCount()
+                               : cachedLines.size();
 
-    // 方向过滤模式: 只在过滤后的行中搜索
+    // HEX模式需要将原始字节转为HEX字符串后再搜索，不能直接用cachedLines.text
+    const bool useHexConversion = hex;
+
+    std::function<bool(int*, QString*)> lineProvider;
     if (directionFilter && directionFilter->isFiltered()) {
-        int filteredCount = directionFilter->filteredLineCount();
-        if (hex) {
-            QByteArray bytes = HexConverter::fromHexString(pattern);
-            if (bytes.isEmpty()) {
-                emit searchMatchesChanged(0, -1);
-                return 0;
-            }
-            for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
+        // 方向过滤模式: displayIdx → modelLine → text
+        lineProvider = [&](int* outIdx, QString* outText) -> bool {
+            while (cursor < totalCount) {
+                int displayIdx = cursor++;
                 int modelLine = directionFilter->modelIndex(displayIdx);
                 if (modelLine < 0 || modelLine >= cachedLines.size()) continue;
-                QString hexText = HexConverter::toHexString(lineAtFn(modelLine));
-                int pos = 0;
-                while ((pos = hexText.indexOf(searchStr, pos, Qt::CaseInsensitive)) >= 0) {
-                    m_searchMatches.append({displayIdx, pos, static_cast<int>(searchStr.length())});
-                    pos += static_cast<int>(searchStr.length());
-                }
+                *outIdx = displayIdx;
+                *outText = useHexConversion ? HexConverter::toHexString(lineAtFn(modelLine))
+                                            : cachedLines[modelLine].text;
+                return true;
             }
-        } else if (regex) {
-            QRegularExpression re(pattern);
-            if (!re.isValid()) {
-                emit searchMatchesChanged(0, -1);
-                return 0;
-            }
-            for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
-                int modelLine = directionFilter->modelIndex(displayIdx);
-                if (modelLine < 0 || modelLine >= cachedLines.size()) continue;
-                const QString& text = cachedLines[modelLine].text;
-                QRegularExpressionMatchIterator it = re.globalMatch(text);
-                while (it.hasNext()) {
-                    auto match = it.next();
-                    m_searchMatches.append({displayIdx, static_cast<int>(match.capturedStart()),
-                                            static_cast<int>(match.capturedLength())});
-                }
-            }
-        } else {
-            for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
-                int modelLine = directionFilter->modelIndex(displayIdx);
-                if (modelLine < 0 || modelLine >= cachedLines.size()) continue;
-                const QString& text = cachedLines[modelLine].text;
-                int pos = 0;
-                while ((pos = text.indexOf(pattern, pos)) >= 0) {
-                    m_searchMatches.append({displayIdx, pos, static_cast<int>(pattern.length())});
-                    pos += pattern.length();
-                }
-            }
-        }
+            return false;
+        };
     } else {
-        // 普通模式: 在全部缓存行中搜索
-        if (hex) {
-            QByteArray bytes = HexConverter::fromHexString(pattern);
-            if (bytes.isEmpty()) {
-                emit searchMatchesChanged(0, -1);
-                return 0;
+        // 普通模式: 直接遍历缓存行
+        lineProvider = [&](int* outIdx, QString* outText) -> bool {
+            while (cursor < totalCount) {
+                int i = cursor++;
+                *outIdx = i;
+                *outText = useHexConversion ? HexConverter::toHexString(lineAtFn(i))
+                                            : cachedLines[i].text;
+                return true;
             }
-            for (int i = 0; i < cachedLines.size(); ++i) {
-                QString hexText = HexConverter::toHexString(lineAtFn(i));
-                int pos = 0;
-                while ((pos = hexText.indexOf(searchStr, pos, Qt::CaseInsensitive)) >= 0) {
-                    m_searchMatches.append({i, pos, static_cast<int>(searchStr.length())});
-                    pos += static_cast<int>(searchStr.length());
-                }
-            }
-        } else if (regex) {
-            QRegularExpression re(pattern);
-            if (!re.isValid()) {
-                emit searchMatchesChanged(0, -1);
-                return 0;
-            }
-            for (int i = 0; i < cachedLines.size(); ++i) {
-                QRegularExpressionMatchIterator it = re.globalMatch(cachedLines[i].text);
-                while (it.hasNext()) {
-                    auto match = it.next();
-                    m_searchMatches.append({i, static_cast<int>(match.capturedStart()),
-                                            static_cast<int>(match.capturedLength())});
-                }
-            }
-        } else {
-            for (int i = 0; i < cachedLines.size(); ++i) {
-                const QString& text = cachedLines[i].text;
-                int pos = 0;
-                while ((pos = text.indexOf(pattern, pos)) >= 0) {
-                    m_searchMatches.append({i, pos, static_cast<int>(pattern.length())});
-                    pos += pattern.length();
-                }
-            }
-        }
+            return false;
+        };
+    }
+
+    // 按搜索模式分发到对应的构建方法
+    bool valid = true;
+    if (hex) {
+        valid = buildHexSearch(pattern, lineProvider);
+    } else if (regex) {
+        valid = buildRegexSearch(pattern, lineProvider);
+    } else {
+        buildPlainSearch(pattern, lineProvider);
+    }
+
+    if (!valid) {
+        emit searchMatchesChanged(0, -1);
+        return 0;
     }
 
     if (!m_searchMatches.isEmpty()) {
@@ -139,6 +101,60 @@ int TerminalSearchManager::setSearchHighlight(
 
     emit searchMatchesChanged(m_searchMatches.size(), m_currentMatchIndex);
     return m_searchMatches.size();
+}
+
+void TerminalSearchManager::buildPlainSearch(
+    const QString& pattern,
+    const std::function<bool(int*, QString*)>& lineProvider)
+{
+    int displayIdx;
+    QString text;
+    while (lineProvider(&displayIdx, &text)) {
+        int pos = 0;
+        while ((pos = text.indexOf(pattern, pos)) >= 0) {
+            m_searchMatches.append({displayIdx, pos, static_cast<int>(pattern.length())});
+            pos += static_cast<int>(pattern.length());
+        }
+    }
+}
+
+bool TerminalSearchManager::buildRegexSearch(
+    const QString& pattern,
+    const std::function<bool(int*, QString*)>& lineProvider)
+{
+    QRegularExpression re(pattern);
+    if (!re.isValid()) return false;
+
+    int displayIdx;
+    QString text;
+    while (lineProvider(&displayIdx, &text)) {
+        QRegularExpressionMatchIterator it = re.globalMatch(text);
+        while (it.hasNext()) {
+            auto match = it.next();
+            m_searchMatches.append({displayIdx, static_cast<int>(match.capturedStart()),
+                                    static_cast<int>(match.capturedLength())});
+        }
+    }
+    return true;
+}
+
+bool TerminalSearchManager::buildHexSearch(
+    const QString& pattern,
+    const std::function<bool(int*, QString*)>& lineProvider)
+{
+    QByteArray bytes = HexConverter::fromHexString(pattern);
+    if (bytes.isEmpty()) return false;
+
+    int displayIdx;
+    QString text;
+    while (lineProvider(&displayIdx, &text)) {
+        int pos = 0;
+        while ((pos = text.indexOf(pattern, pos, Qt::CaseInsensitive)) >= 0) {
+            m_searchMatches.append({displayIdx, pos, static_cast<int>(pattern.length())});
+            pos += static_cast<int>(pattern.length());
+        }
+    }
+    return true;
 }
 
 void TerminalSearchManager::clearSearchHighlight()

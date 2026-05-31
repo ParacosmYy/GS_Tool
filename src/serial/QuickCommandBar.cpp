@@ -3,7 +3,7 @@
  * @brief 快捷指令栏实现 - 可配置的底部按钮行，点击即发送预设命令
  */
 
-#include "QuickCommandBar.h"
+#include "serial/QuickCommandBar.h"
 #include "utils/HexConverter.h"
 
 #include <QSettings>

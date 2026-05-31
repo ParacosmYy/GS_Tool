@@ -10,7 +10,7 @@
  *   - 连接检查: 发送前验证队列非空，空则自动停止定时器
  */
 
-#include "TimedSender.h"
+#include "serial/TimedSender.h"
 
 /**
  * @brief 构造定时发送器

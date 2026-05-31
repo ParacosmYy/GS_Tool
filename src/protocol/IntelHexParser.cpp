@@ -6,7 +6,7 @@
  * HEX转BIN输出和解析统计信息计算。
  */
 
-#include "IntelHexParser.h"
+#include "protocol/IntelHexParser.h"
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>

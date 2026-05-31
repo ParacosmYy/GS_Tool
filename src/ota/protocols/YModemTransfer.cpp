@@ -29,15 +29,14 @@ bool YModemTransfer::onStartInit()
     }
 
     // 计算总字节数
-    static constexpr qint64 kMaxFileSize = 1024 * 1024; // 1MB
     m_totalBytes = 0;
     for (const QString& path : m_filePaths) {
         qint64 sz = QFileInfo(path).size();
-        if (sz > kMaxFileSize) {
+        if (sz > BaseTransfer::kMaxFileSize) {
             qWarning() << "YModem: file too large:" << path << sz
-                       << "bytes (max" << kMaxFileSize << "bytes)";
+                       << "bytes (max" << BaseTransfer::kMaxFileSize << "bytes)";
             emit transferError(tr("文件过大: %1 (%2 字节, 上限 %3 字节)")
-                                   .arg(path).arg(sz).arg(kMaxFileSize));
+                                   .arg(path).arg(sz).arg(BaseTransfer::kMaxFileSize));
             return false;
         }
         m_totalBytes += sz;
@@ -483,6 +482,10 @@ bool YModemTransfer::loadNextFile()
         return false;
     }
     m_currentData = file.readAll();
+    if (m_currentData.size() != file.size()) {
+        emit transferError(tr("Failed to read file"));
+        return false;
+    }
     file.close();
     m_currentFileName = QFileInfo(m_filePaths[m_fileIndex]).fileName();
     m_bytesSent = 0;

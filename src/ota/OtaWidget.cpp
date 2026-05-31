@@ -62,11 +62,23 @@ void OtaWidget::setupUI()
     mainLayout->setContentsMargins(12, 12, 12, 12);
     mainLayout->setSpacing(12);
 
-    // ---- 文件选择组 ----
-    auto* fileGroup = new QGroupBox(tr("固件文件"));
-    fileGroup->setObjectName("otaFileGroup");
-    auto* fileOuter = new QVBoxLayout(fileGroup);
-    fileOuter->setSpacing(4);
+    mainLayout->addWidget(setupFileGroup());
+    mainLayout->addWidget(setupConfigGroup());
+    mainLayout->addWidget(setupProgressGroup());
+    mainLayout->addWidget(setupLogGroup(), 1);
+    mainLayout->addWidget(setupHistoryGroup(), 1);
+}
+
+/**
+ * @brief 创建文件选择分组
+ * @return 文件选择GroupBox(包含路径输入框、浏览按钮、文件信息标签)
+ */
+QGroupBox* OtaWidget::setupFileGroup()
+{
+    auto* group = new QGroupBox(tr("固件文件"));
+    group->setObjectName("otaFileGroup");
+    auto* outer = new QVBoxLayout(group);
+    outer->setSpacing(4);
 
     auto* fileRow = new QHBoxLayout;
     m_filePathEdit = new QLineEdit;
@@ -78,18 +90,24 @@ void OtaWidget::setupUI()
     connect(m_browseBtn, &QPushButton::clicked, this, &OtaWidget::onBrowseFile);
     fileRow->addWidget(m_filePathEdit, 1);
     fileRow->addWidget(m_browseBtn);
-    fileOuter->addLayout(fileRow);
+    outer->addLayout(fileRow);
 
     m_fileInfoLbl = new QLabel(tr("未选择文件"));
     m_fileInfoLbl->setObjectName("otaFileInfo");
-    fileOuter->addWidget(m_fileInfoLbl);
-    mainLayout->addWidget(fileGroup);
+    outer->addWidget(m_fileInfoLbl);
+    return group;
+}
 
-    // ---- 传输配置组 ----
-    auto* configGroup = new QGroupBox(tr("传输设置"));
-    configGroup->setObjectName("otaConfigGroup");
-    auto* configLayout = new QFormLayout(configGroup);
-    configLayout->setSpacing(8);
+/**
+ * @brief 创建传输配置分组
+ * @return 配置GroupBox(包含协议选择下拉框、开始/取消按钮)
+ */
+QGroupBox* OtaWidget::setupConfigGroup()
+{
+    auto* group = new QGroupBox(tr("传输设置"));
+    group->setObjectName("otaConfigGroup");
+    auto* layout = new QFormLayout(group);
+    layout->setSpacing(8);
 
     m_protocolCombo = new QComboBox;
     m_protocolCombo->setObjectName("otaProtocolCombo");
@@ -98,7 +116,7 @@ void OtaWidget::setupUI()
     m_protocolCombo->addItem(tr("XMODEM-1K"), "xmodem-1k");
     m_protocolCombo->addItem(tr("YMODEM"), "ymodem");
     m_protocolCombo->addItem(tr("ZMODEM"), "zmodem");
-    configLayout->addRow(tr("协议:"), m_protocolCombo);
+    layout->addRow(tr("协议:"), m_protocolCombo);
 
     auto* btnLayout = new QHBoxLayout;
     m_startBtn = new QPushButton(tr("开始传输"));
@@ -110,16 +128,22 @@ void OtaWidget::setupUI()
     m_cancelBtn->setEnabled(false);
     btnLayout->addWidget(m_startBtn, 1);
     btnLayout->addWidget(m_cancelBtn, 1);
-    configLayout->addRow(btnLayout);
+    layout->addRow(btnLayout);
     connect(m_startBtn, &QPushButton::clicked, this, &OtaWidget::onStartTransfer);
     connect(m_cancelBtn, &QPushButton::clicked, this, &OtaWidget::onCancelTransfer);
-    mainLayout->addWidget(configGroup);
+    return group;
+}
 
-    // ---- 进度显示组 ----
-    auto* progressGroup = new QGroupBox(tr("传输进度"));
-    progressGroup->setObjectName("otaProgressGroup");
-    auto* progressLayout = new QVBoxLayout(progressGroup);
-    progressLayout->setSpacing(6);
+/**
+ * @brief 创建进度显示分组
+ * @return 进度GroupBox(包含进度条、状态/速率/ETA标签)
+ */
+QGroupBox* OtaWidget::setupProgressGroup()
+{
+    auto* group = new QGroupBox(tr("传输进度"));
+    group->setObjectName("otaProgressGroup");
+    auto* layout = new QVBoxLayout(group);
+    layout->setSpacing(6);
 
     m_progressBar = new AnimatedProgressBar;
     m_progressBar->setObjectName("otaProgress");
@@ -127,7 +151,7 @@ void OtaWidget::setupUI()
     m_progressBar->setValue(0);
     m_progressBar->setTextVisible(true);
     m_progressBar->setFixedHeight(24);
-    progressLayout->addWidget(m_progressBar);
+    layout->addWidget(m_progressBar);
 
     auto* statsLayout = new QHBoxLayout;
     m_statusLbl = new QLabel(tr("就绪"));
@@ -139,25 +163,38 @@ void OtaWidget::setupUI()
     statsLayout->addWidget(m_statusLbl, 1);
     statsLayout->addWidget(m_speedLbl, 1);
     statsLayout->addWidget(m_etaLbl, 1);
-    progressLayout->addLayout(statsLayout);
-    mainLayout->addWidget(progressGroup);
+    layout->addLayout(statsLayout);
+    return group;
+}
 
-    // ---- 日志输出 ----
-    auto* logGroup = new QGroupBox(tr("传输日志"));
-    logGroup->setObjectName("otaLogGroup");
-    auto* logLayout = new QVBoxLayout(logGroup);
+/**
+ * @brief 创建日志输出分组
+ * @return 日志GroupBox(包含只读文本编辑框)
+ */
+QGroupBox* OtaWidget::setupLogGroup()
+{
+    auto* group = new QGroupBox(tr("传输日志"));
+    group->setObjectName("otaLogGroup");
+    auto* layout = new QVBoxLayout(group);
     m_logView = new QTextEdit;
     m_logView->setObjectName("otaLogView");
     m_logView->setReadOnly(true);
     m_logView->setMaximumHeight(160);
-    logLayout->addWidget(m_logView);
-    mainLayout->addWidget(logGroup, 1);
+    layout->addWidget(m_logView);
+    return group;
+}
 
-    // ---- 历史记录组 ----
-    auto* histGroup = new QGroupBox(tr("OTA历史记录"));
-    histGroup->setObjectName("otaHistoryGroup");
-    auto* histLayout = new QVBoxLayout(histGroup);
-    histLayout->setSpacing(6);
+/**
+ * @brief 创建OTA历史记录分组
+ * @return 历史记录GroupBox(包含树形视图和清除历史按钮)
+ */
+QGroupBox* OtaWidget::setupHistoryGroup()
+{
+    auto* group = new QGroupBox(tr("OTA历史记录"));
+    group->setObjectName("otaHistoryGroup");
+    auto* layout = new QVBoxLayout(group);
+    layout->setSpacing(6);
+
     m_historyModel = new OtaHistoryModel(this);
     m_historyView = new QTreeView;
     m_historyView->setObjectName("otaHistoryView");
@@ -170,17 +207,17 @@ void OtaWidget::setupUI()
     m_historyView->setColumnWidth(OtaHistoryModel::ColProtocol, 80);
     m_historyView->setColumnWidth(OtaHistoryModel::ColSize, 80);
     m_historyView->setColumnWidth(OtaHistoryModel::ColDuration, 80);
-    histLayout->addWidget(m_historyView);
+    layout->addWidget(m_historyView);
 
-    auto* histBtnRow = new QHBoxLayout;
+    auto* btnRow = new QHBoxLayout;
     m_clearHistoryBtn = new QPushButton(tr("清除历史"));
     m_clearHistoryBtn->setObjectName("otaClearHistory");
     m_clearHistoryBtn->setFixedHeight(28);
     connect(m_clearHistoryBtn, &QPushButton::clicked, this, [this]() { m_historyModel->clearHistory(); });
-    histBtnRow->addStretch();
-    histBtnRow->addWidget(m_clearHistoryBtn);
-    histLayout->addLayout(histBtnRow);
-    mainLayout->addWidget(histGroup, 1);
+    btnRow->addStretch();
+    btnRow->addWidget(m_clearHistoryBtn);
+    layout->addLayout(btnRow);
+    return group;
 }
 
 // ============================================================================

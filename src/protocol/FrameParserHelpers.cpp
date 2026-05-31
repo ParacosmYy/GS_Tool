@@ -15,7 +15,7 @@
  * 操作的是已接收完成的帧数据或Payload子路径逻辑，与状态机主循环(processByte)解耦。
  */
 
-#include "FrameParser.h"
+#include "protocol/FrameParser.h"
 #include "utils/HexConverter.h"
 #include <QDateTime>
 

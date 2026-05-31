@@ -3,7 +3,7 @@
  * @brief 录制/回放控制器实现 - 管理录制/回放按钮的交互和数据流转发
  */
 
-#include "RecordingController.h"
+#include "core/RecordingController.h"
 #include "utils/DataLogger.h"
 #include <QToolBar>
 #include <QFileDialog>

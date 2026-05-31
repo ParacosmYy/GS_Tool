@@ -29,7 +29,7 @@
  *     → 状态栏消息                        // 通知书签集合发生变化
  */
 
-#include "MainWindow.h"
+#include "core/MainWindow.h"
 #include "chart/ChartModel.h"
 #include "serial/PortWatcher.h"
 #include "core/ToastWidget.h"
@@ -57,6 +57,23 @@
  *   NavTree → NavigationController(面板切换)
  */
 void MainWindow::connectSignals()
+{
+    connectSerialSignals();
+    connectToolbarSignals();
+    connectPortWatchSignals();
+    connectThemeSignals();
+    connectOtaSignals();
+    connectBookmarkSignals();
+}
+
+/**
+ * @brief 串口连接/断开相关信号连接
+ *
+ * 包含: SerialConfigPanel → ConnectionController 的连接/断开/DTR/RTS 控制，
+ *       ConnectionController → MainWindow 的状态更新/数据接收/失败通知，
+ *       QuickCommandBar → SendController 的快捷指令发送。
+ */
+void MainWindow::connectSerialSignals()
 {
     // ---- 串口连接/断开: 委托 ConnectionController 处理 ----
     connect(m_panelManager->serialConfig(), &SerialConfigPanel::connectRequested,
@@ -124,7 +141,20 @@ void MainWindow::connectSignals()
             this, [this](const QString& msg) {
                 ToastWidget::showDebounced(this, msg);
             });
+}
 
+/**
+ * @brief 工具栏信号连接
+ *
+ * 包含: ToolbarController → TerminalController/SettingsController 的工具栏事件，
+ *       TerminalController/RecordingController 状态消息 → 状态栏/吐司，
+ *       搜索栏 → TerminalController 搜索处理，
+ *       协议桥 → 协议视图/波形图，
+ *       帧编辑器 → 帧解析器/波形图配置，
+ *       导航树 → 面板切换。
+ */
+void MainWindow::connectToolbarSignals()
+{
     // ---- 工具栏信号 → 委托给 TerminalController ----
     connect(m_toolbarController, &ToolbarController::displayModeChanged,
             m_terminalController, &TerminalController::onDisplayModeChanged);
@@ -220,7 +250,15 @@ void MainWindow::connectSignals()
         if (!target) return;
         m_navController->switchToPanel(target);
     });
+}
 
+/**
+ * @brief 串口热插拔状态栏通知连接
+ *
+ * 检测串口设备的物理接入/拔出事件，在状态栏显示提示信息。
+ */
+void MainWindow::connectPortWatchSignals()
+{
     // ---- 串口热插拔状态栏通知 ----
     // 检测到新串口设备接入时，在状态栏显示提示信息
     connect(m_connController, &ConnectionController::portAdded,
@@ -234,7 +272,16 @@ void MainWindow::connectSignals()
             this, [this](const QString& portName) {
         statusBar()->showMessage(tr("端口已拔出: %1").arg(portName), 4000);
     });
+}
 
+/**
+ * @brief 主题切换信号连接
+ *
+ * 包含: ThemeManager → NavIndicatorWidget 颜色刷新，
+ *       连接成功/断开/错误 → Toast 通知（含防抖策略说明）。
+ */
+void MainWindow::connectThemeSignals()
+{
     // ---- 主题切换 → NavIndicatorWidget 颜色刷新 ----
     // 当用户切换主题时，指示线的 accent 颜色需要同步更新
     connect(&ThemeManager::instance(), &ThemeManager::themeChanged,
@@ -282,7 +329,16 @@ void MainWindow::connectSignals()
         ToastWidget::showDebounced(this, tr("连接错误: %1\n%2").arg(portName, error),
                                    ToastWidget::ToastType::Error, 3000);
     });
+    ///@}
+}
 
+/**
+ * @brief OTA 传输状态信号连接
+ *
+ * 包含: OtaWidget 传输开始/完成/失败 → Toast 通知（含防抖策略）。
+ */
+void MainWindow::connectOtaSignals()
+{
     // ---- OTA 传输状态 → 吐司通知 ----
     // 传输开始 → 非防抖吐司（Info 类型，一次性事件）
     connect(m_panelManager->otaWidget(), &OtaWidget::transferStarted,
@@ -313,7 +369,17 @@ void MainWindow::connectSignals()
                                    ToastWidget::ToastType::Error, 3000);
     });
     ///@}
+}
 
+/**
+ * @brief 书签面板信号路由
+ *
+ * 包含: RecordingController → DataLogger 的书签添加路由 + Toast 反馈，
+ *       DataLogger::bookmarksChanged → 状态栏消息，
+ *       BookmarkWidget ↔ DataLogger 的书签 CRUD 操作。
+ */
+void MainWindow::connectBookmarkSignals()
+{
     /**
      * @name 书签信号路由（DataBookmark 集成）
      *

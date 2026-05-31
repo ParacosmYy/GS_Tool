@@ -6,7 +6,7 @@
  * 状态指示器通过QSS的statusIndicator[state="xxx"]控制圆点颜色。
  */
 
-#include "SerialConfigPanel.h"
+#include "serial/SerialConfigPanel.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -21,7 +21,7 @@
 #include <QSequentialAnimationGroup>
 #include <QTimer>
 
-#include "SerialDriverDetector.h"
+#include "serial/SerialDriverDetector.h"
 
 // ---- 构造 ----
 
@@ -155,6 +155,9 @@ void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
         refreshRtsStyle();
         emit rtsChanged(checked);
     });
+    // Initialize visual state to match default HIGH
+    refreshDtrStyle();
+    refreshRtsStyle();
     mainLayout->addWidget(signalGroup);
 
     // ---- 驱动检测信息 ----

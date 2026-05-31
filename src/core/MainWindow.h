@@ -7,8 +7,8 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <functional>
-#include "ConnectionManager.h"
-#include "ThemeManager.h"
+#include "core/ConnectionManager.h"
+#include "core/ThemeManager.h"
 #include "terminal/TerminalWidget.h"
 #include "terminal/TerminalModel.h"
 #include "serial/SerialConfigPanel.h"
@@ -39,7 +39,7 @@
 #include "chart/ChartWidget.h"
 #include "ota/OtaManager.h"
 #include "ota/OtaWidget.h"
-#include "Constants.h"
+#include "core/Constants.h"
 
 /**
  * @brief 主窗口 - EmbedDebug 应用的顶层窗口
@@ -82,12 +82,13 @@ private:
     /** @brief 创建并初始化状态栏（连接状态、RX/TX 字节数） */
     void setupStatusBar();
 
-    /**
-     * @brief 连接所有模块间的信号/槽
-     * 包括: 串口连接/断开、数据收发、工具栏事件、录制/回放、搜索、
-     *        协议解析、帧编辑器、导航树面板切换
-     */
-    void connectSignals();
+    void connectSignals();             ///< 连接所有模块间信号/槽
+    void connectSerialSignals();       ///< 串口连接/断开信号路由
+    void connectToolbarSignals();      ///< 工具栏/录制/搜索/协议/导航信号
+    void connectPortWatchSignals();    ///< 热插拔状态栏通知
+    void connectThemeSignals();        ///< 主题切换 + Toast通知
+    void connectOtaSignals();          ///< OTA传输Toast通知
+    void connectBookmarkSignals();     ///< 书签面板信号路由
 
     /**
      * @brief 处理连接状态变更（更新状态栏、配置面板按钮、呼吸动画）
@@ -138,62 +139,28 @@ private:
     /** @brief 右侧面板容器，内部包含 serialPanel 面板栈 */
     QWidget* m_rightPanel;
 
-    // ==================== UI组件 - 工具栏 ====================
-
-    /** @brief 工具栏控制器，创建和管理所有工具栏控件（显示模式/主题/语言/录制等） */
-    ToolbarController* m_toolbarController;
-
-    // ==================== 面板管理 ====================
-
-    /** @brief 面板管理器，统一创建和管理所有功能面板 */
-    PanelManager* m_panelManager;
-
-    // ==================== UI组件 - 终端布局 ====================
-
-    /** @brief 终端布局管理器，管理混合/左右分栏/上下分栏三种布局模式切换 */
-    TerminalLayoutManager* m_layoutManager;
-
-    // ==================== UI组件 - 协议解析 ====================
-
-    /** @brief 帧解析器，根据 FrameDefinition 定义的状态机解析原始字节流 */
-    FrameParser* m_frameParser;
-
-    /** @brief 协议桥管理器，将帧解析器的输出分发到 ProtocolView 和 ChartWidget */
-    ProtocolBridgeManager* m_protocolBridgeMgr;
-
-    // ==================== UI组件 - OTA升级 ====================
-
-    /** @brief OTA 管理器，协调 XModem/YModem/ZModem 传输协议 */
-    OtaManager* m_otaManager;
-
-    // ==================== UI组件 - 状态栏 ====================
-
-    /** @brief 连接状态标签，显示"未连接"/"已连接: xxx"/"连接中..."等状态 */
-    QLabel* m_connStatusLbl;
-
-    // ==================== 子控制器 ====================
-
-    /** @brief 导航控制器，负责导航树构建、面板切换动画（淡入淡出）和呼吸动画 */
-    NavigationController* m_navController;
-
-    /** @brief 设置控制器，负责窗口几何/主题/串口配置/语言的持久化加载与保存 */
-    SettingsController* m_settingsController;
-
-    /** @brief 终端控制器，负责终端显示/搜索/导出/统计/状态栏字节显示 */
-    TerminalController* m_terminalController;
-
-    // ==================== 背景组件 ====================
-
-    /** @brief 背景层控件，提供自定义背景图、磨砂玻璃模糊、透明度调节和点击涟漪特效 */
-    BackgroundWidget* m_backgroundWidget;
-
-    /** @brief 背景设置弹出面板，浮动在工具栏下方，提供模糊半径/透明度/涟漪开关调节 */
-    BackgroundSettingsPopup* m_bgSettingsPopup;
-
-    // ==================== 会话管理 ====================
-
-    /** @brief 会话管理器，统一协调窗口几何/串口配置/主题/面板索引的保存与恢复 */
-    SessionManager* m_sessionManager;
+    // ---- 工具栏 ----
+    ToolbarController* m_toolbarController;    ///< 工具栏控制器(显示模式/主题/语言/录制)
+    // ---- 面板管理 ----
+    PanelManager* m_panelManager;              ///< 面板管理器(创建和管理所有功能面板)
+    // ---- 终端布局 ----
+    TerminalLayoutManager* m_layoutManager;    ///< 终端布局管理器(混合/左右/上下分栏)
+    // ---- 协议解析 ----
+    FrameParser* m_frameParser;                ///< 帧解析器(状态机解析字节流)
+    ProtocolBridgeManager* m_protocolBridgeMgr; ///< 协议桥管理器(分发到ProtocolView+ChartWidget)
+    // ---- OTA升级 ----
+    OtaManager* m_otaManager;                  ///< OTA管理器(协调X/Y/ZModem传输)
+    // ---- 状态栏 ----
+    QLabel* m_connStatusLbl;                   ///< 连接状态标签
+    // ---- 子控制器 ----
+    NavigationController* m_navController;     ///< 导航控制器(面板切换+呼吸动画)
+    SettingsController* m_settingsController;  ///< 设置控制器(配置持久化)
+    TerminalController* m_terminalController;  ///< 终端控制器(显示/搜索/导出)
+    // ---- 背景组件 ----
+    BackgroundWidget* m_backgroundWidget;      ///< 背景层控件(模糊+涟漪特效)
+    BackgroundSettingsPopup* m_bgSettingsPopup; ///< 背景设置弹出面板
+    // ---- 会话管理 ----
+    SessionManager* m_sessionManager;          ///< 会话管理器(窗口/配置保存恢复)
 };
 
 #endif // MAINWINDOW_H
