@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget* parent)
     , m_timedSender(new TimedSender(this))
     , m_sendHistory(new SendHistory(this))
     , m_dataExporter(new DataExporter(this))
+    , m_dataLogger(new DataLogger(this))
     , m_statsTimer(new QTimer(this))
     , m_frameParser(new FrameParser(this))
     , m_otaManager(new OtaManager(this))
@@ -253,6 +254,21 @@ void MainWindow::setupToolbar()
 
     m_toolbar->addSeparator();
 
+    // 日志录制按钮
+    m_recordAction = m_toolbar->addAction(tr("Record"));
+    m_recordAction->setCheckable(true);
+    m_recordAction->setChecked(false);
+
+    m_stopRecordAction = m_toolbar->addAction(tr("Stop Rec"));
+    m_stopRecordAction->setEnabled(false);
+
+    // 日志回放按钮
+    m_playbackAction = m_toolbar->addAction(tr("Play Log"));
+    m_stopPlaybackAction = m_toolbar->addAction(tr("Stop Play"));
+    m_stopPlaybackAction->setEnabled(false);
+
+    m_toolbar->addSeparator();
+
     // 主题切换下拉框
     auto* themeLabel = new QLabel(tr(" Theme: "));
     m_toolbar->addWidget(themeLabel);
@@ -307,6 +323,26 @@ void MainWindow::connectSignals()
     connect(m_timestampAction, &QAction::toggled, this, &MainWindow::onTimestampToggled);
     connect(m_clearAction, &QAction::triggered, this, &MainWindow::onClearTerminal);
     connect(m_exportAction, &QAction::triggered, this, &MainWindow::onExportData);
+
+    // 日志录制/回放
+    connect(m_recordAction, &QAction::toggled, this, &MainWindow::onToggleRecording);
+    connect(m_stopRecordAction, &QAction::triggered, this, &MainWindow::onStopRecording);
+    connect(m_playbackAction, &QAction::triggered, this, &MainWindow::onOpenPlayback);
+    connect(m_stopPlaybackAction, &QAction::triggered, this, &MainWindow::onStopPlayback);
+    connect(m_dataLogger, &DataLogger::playbackData,
+            this, &MainWindow::onPlaybackData);
+    connect(m_dataLogger, &DataLogger::playbackProgress,
+            this, &MainWindow::onPlaybackProgress);
+    connect(m_dataLogger, &DataLogger::recordingStopped,
+            this, &MainWindow::onRecordingStopped);
+    connect(m_dataLogger, &DataLogger::playbackFinished, this, [this]() {
+        m_stopPlaybackAction->setEnabled(false);
+        m_playbackAction->setEnabled(true);
+        statusBar()->showMessage(tr("Playback finished"), 3000);
+    });
+    connect(m_dataLogger, &DataLogger::error, this, [this](const QString& msg) {
+        statusBar()->showMessage(msg, 5000);
+    });
 
     // 主题切换
     connect(m_themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -525,6 +561,7 @@ void MainWindow::onSendData()
     qint64 written = m_currentConn->write(data);
     if (written > 0) {
         m_terminalModel->appendSent(data);
+        m_dataLogger->logData(data, DataLogger::Direction::Sent);
         m_sendHistory->addEntry(text, isHex);
         m_sendInput->clear();
         m_sendInput->setStyleSheet("");
@@ -539,6 +576,7 @@ void MainWindow::onQuickCommand(const QByteArray& data)
     }
     m_currentConn->write(data);
     m_terminalModel->appendSent(data);
+    m_dataLogger->logData(data, DataLogger::Direction::Sent);
     updateStatusBar();
 }
 
@@ -681,6 +719,7 @@ void MainWindow::onDataReceived(const QByteArray& data)
 {
     m_terminalModel->appendReceived(data);
     m_frameParser->feed(data);
+    m_dataLogger->logData(data, DataLogger::Direction::Received);
     updateStatusBar();
 }
 
@@ -708,6 +747,10 @@ void MainWindow::updateDataStatistics()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+    // 停止录制/回放
+    if (m_dataLogger->isRecording()) m_dataLogger->stopRecording();
+    if (m_dataLogger->isPlaying()) m_dataLogger->stopPlayback();
+
     // 保存设置到磁盘
     saveSettings();
 
@@ -717,4 +760,86 @@ void MainWindow::closeEvent(QCloseEvent* event)
         conn->close();
     }
     event->accept();
+}
+
+void MainWindow::onToggleRecording()
+{
+    if (m_dataLogger->isRecording()) {
+        // 正在录制 → 暂停
+        if (m_dataLogger->isPaused()) {
+            m_dataLogger->resumeRecording();
+            m_recordAction->setText(tr("Pause"));
+        } else {
+            m_dataLogger->pauseRecording();
+            m_recordAction->setText(tr("Resume"));
+        }
+    } else {
+        // 开始录制
+        QString filter = tr("EmbedDebug Log (*.edl);;All files (*.*)");
+        QString path = QFileDialog::getSaveFileName(this, tr("Record Log"),
+                                                     QString(), filter);
+        if (path.isEmpty()) {
+            m_recordAction->setChecked(false);
+            return;
+        }
+        if (!path.endsWith(".edl")) path += ".edl";
+
+        m_dataLogger->startRecording(path);
+        m_stopRecordAction->setEnabled(true);
+        m_recordAction->setText(tr("Pause"));
+        statusBar()->showMessage(tr("Recording: %1").arg(path));
+    }
+}
+
+void MainWindow::onStopRecording()
+{
+    m_dataLogger->stopRecording();
+    m_recordAction->setChecked(false);
+    m_recordAction->setText(tr("Record"));
+    m_stopRecordAction->setEnabled(false);
+}
+
+void MainWindow::onOpenPlayback()
+{
+    QString filter = tr("EmbedDebug Log (*.edl);;All files (*.*)");
+    QString path = QFileDialog::getOpenFileName(this, tr("Open Log for Playback"),
+                                                  QString(), filter);
+    if (path.isEmpty()) return;
+
+    m_dataLogger->startPlayback(path);
+    m_stopPlaybackAction->setEnabled(true);
+    m_playbackAction->setEnabled(false);
+    statusBar()->showMessage(tr("Playing: %1").arg(path));
+}
+
+void MainWindow::onStopPlayback()
+{
+    m_dataLogger->stopPlayback();
+    m_stopPlaybackAction->setEnabled(false);
+    m_playbackAction->setEnabled(true);
+}
+
+void MainWindow::onPlaybackData(const QByteArray& data, qint64 direction)
+{
+    if (direction == 0) {
+        m_terminalModel->appendReceived(data);
+    } else {
+        m_terminalModel->appendSent(data);
+    }
+    updateStatusBar();
+}
+
+void MainWindow::onPlaybackProgress(qreal percent)
+{
+    statusBar()->showMessage(tr("Playback: %1%").arg(static_cast<int>(percent * 100)));
+}
+
+void MainWindow::onRecordingStopped(const QString& filePath, int count, qint64 durationMs)
+{
+    statusBar()->showMessage(
+        tr("Recording saved: %1 (%2 records, %3s)")
+            .arg(filePath)
+            .arg(count)
+            .arg(durationMs / 1000.0, 0, 'f', 1),
+        5000);
 }

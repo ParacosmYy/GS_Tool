@@ -53,6 +53,7 @@ set(SOURCES
     src/ota/protocols/ZModemTransfer.cpp
     src/utils/SettingsManager.cpp
     src/utils/DataExporter.cpp
+    src/utils/DataLogger.cpp
     src/utils/HexConverter.h
     src/utils/RingBuffer.h
     src/utils/CRC.h
@@ -91,6 +92,7 @@ set(HEADERS
     src/ota/protocols/ZModemTransfer.h
     src/utils/SettingsManager.h
     src/utils/DataExporter.h
+    src/utils/DataLogger.h
 )
 
 set(RESOURCES

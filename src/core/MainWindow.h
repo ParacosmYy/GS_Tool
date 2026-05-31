@@ -23,6 +23,7 @@
 #include "serial/SendHistory.h"
 #include "serial/DataStatistics.h"
 #include "utils/DataExporter.h"
+#include "utils/DataLogger.h"
 #include "utils/SettingsManager.h"
 #include "terminal/TerminalSearchBar.h"
 #include "protocol/FrameParser.h"
@@ -84,6 +85,15 @@ private slots:
     // 接收到数据
     void onDataReceived(const QByteArray& data);
 
+    // 日志录制/回放
+    void onToggleRecording();
+    void onStopRecording();
+    void onOpenPlayback();
+    void onStopPlayback();
+    void onPlaybackData(const QByteArray& data, qint64 direction);
+    void onPlaybackProgress(qreal percent);
+    void onRecordingStopped(const QString& filePath, int count, qint64 duration);
+
 private:
     void setupUI();
     void setupToolbar();
@@ -104,6 +114,7 @@ private:
     // 业务组件
     SendHistory* m_sendHistory;
     DataExporter* m_dataExporter;
+    DataLogger* m_dataLogger;
 
     // UI组件 - 布局
     QSplitter* m_mainSplitter;
@@ -117,6 +128,10 @@ private:
     QAction* m_timestampAction;
     QAction* m_clearAction;
     QAction* m_exportAction;
+    QAction* m_recordAction;
+    QAction* m_stopRecordAction;
+    QAction* m_playbackAction;
+    QAction* m_stopPlaybackAction;
 
     // UI组件 - 串口配置
     SerialConfigPanel* m_serialConfig;

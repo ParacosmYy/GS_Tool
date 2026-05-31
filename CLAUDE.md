@@ -488,6 +488,7 @@ docs/prd/PRD_<编号>_<简述>.md
 | 8 | YMODEM协议传输(Block 0文件信息+批量传输)+OTA集成 | 9 |
 | 9 | ZMODEM协议传输(CRC32+连续发送+HEX/BIN帧)+OTA集成 | 10 |
 | 10 | 架构审查修复: SerialConfigPanel分层违规+HEX验证复用+TcpConnection类型bug+面板切换重构 | 11 |
+| 11 | DataLogger数据日志记录和回放(EDL二进制格式+变速回放) | 12 |
 | ... | 目标: 1000分 | 1000 |
 
 ---
