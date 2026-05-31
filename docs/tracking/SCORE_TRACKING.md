@@ -33,4 +33,8 @@
 | 25 | P0串口修复: TerminalWidget复制功能实现+搜索高亮(F3导航/正则/HEX/匹配计数)+DTR/RTS运行时控制(连接后保持可切换)+自动追加换行符(无/\r\n/\n/\r)+CLAUDE.md更新(Bug修复冲刺机制+VOFA+超越目标+驱动检测需求) | 27 |
 | 26 | ChartWidget初始化背景修复+SerialDriverDetector驱动检测+方向前缀着色+objectName补全+QSS三主题补全 | 28 |
 | 27 | 架构拆分: ToolbarController+SettingsController提取+lineAt悬空引用P0修复+objectName补全+内联样式迁移 | 29 |
+| 28 | 背景系统: BackgroundWidget磨砂玻璃+透明度调节+点击涟漪特效+BackgroundSettingsPopup控制面板 | 30 |
+| 29 | 注释规范+终端分栏+背景性能优化+下拉箭头修复 | 31 |
+| 30 | PanelManager提取+DirectionFilter拆分+SVG下拉箭头+面板透明度优化 | 32 |
+| 31 | 串口完善: IConnection接口DTR/RTS虚方法+错误分类+连接超时+自动重连+SerialConfigPanel UX改进+FrameDefinition拆分+QSS完善 | 33 |
 | ... | 目标: 1000分 | 1000 |
