@@ -1,9 +1,12 @@
 #include "ProtocolView.h"
 #include "utils/HexConverter.h"
+#include "core/Constants.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
+#include <QApplication>
+#include <QPalette>
 
 ProtocolView::ProtocolView(QWidget* parent)
     : QWidget(parent)
@@ -206,8 +209,8 @@ void ProtocolView::onFrameError(const QString& reason, const QByteArray& rawFram
         QString value = errorFields.value(m_fieldNames[i]).toString();
         auto* item = new QStandardItem(value);
         item->setTextAlignment(Qt::AlignCenter);
-        // 错误行标红
-        item->setForeground(QColor("#f38ba8"));
+        // 错误行用语义色标红（从应用palette获取error色）
+        item->setForeground(QColor(ThemeColors::kErrorHex));
         m_model->setItem(row, kFixedColumns + i, item);
     }
 

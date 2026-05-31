@@ -1,5 +1,6 @@
 #include "ota/OtaHistoryModel.h"
 #include "utils/SettingsManager.h"
+#include "core/Constants.h"
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -53,8 +54,7 @@ QVariant OtaHistoryModel::data(const QModelIndex& index, int role) const
 
     if (role == Qt::ForegroundRole) {
         if (index.column() == ColResult) {
-            // 成功/失败用颜色区分 — 语义色由QSS控制，这里返回提示role
-            return rec.success ? QColor("#a6e3a1") : QColor("#f38ba8");
+            return rec.success ? QColor(ThemeColors::kSuccessHex) : QColor(ThemeColors::kErrorHex);
         }
     }
 

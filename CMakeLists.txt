@@ -135,6 +135,18 @@ if(WIN32)
     )
 endif()
 
+# 翻译文件处理: .ts → .qm
+find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+set(TS_FILES
+    ${CMAKE_SOURCE_DIR}/resources/translations/embeddebug_en.ts
+)
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION
+    ${CMAKE_BINARY_DIR}/translations
+)
+qt_add_translations(${PROJECT_NAME} TS_FILES ${TS_FILES})
+# 确保translations目录存在
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/translations)
+
 # 测试
 option(BUILD_TESTS "Build tests" OFF)
 if(BUILD_TESTS)

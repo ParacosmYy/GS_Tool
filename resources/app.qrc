@@ -4,4 +4,7 @@
         <file>themes/modern_dark.qss</file>
         <file>themes/light.qss</file>
     </qresource>
+    <qresource prefix="/translations">
+        <file>translations/embeddebug_en.qm</file>
+    </qresource>
 </RCC>

@@ -49,6 +49,12 @@ public:
     // 加载主题名称, 不存在时返回默认主题
     QString loadTheme() const;
 
+    // --- 便捷方法: 语言 ---
+    // 保存语言选择 (zh_CN / en)
+    void saveLanguage(const QString& langCode);
+    // 加载语言选择, 不存在时返回默认语言
+    QString loadLanguage() const;
+
 private:
     SettingsManager(QObject* parent = nullptr);
     ~SettingsManager() override;

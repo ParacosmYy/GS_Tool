@@ -678,6 +678,8 @@ docs/prd/PRD_<编号>_<简述>.md
 | 13 | README中文版重写+bat启动验证 | 14 |
 | 14 | CLAUDE.md约束文档更新:UI强制规则+QSS规范+多Agent工作流+300行规则 | 15 |
 | 15 | BaseTransfer模板方法基类提取+XModem/YModem/ZModem重构+架构审查+PRD文档 | 16 |
+| 16 | QSS主题迁移+UI全面中文化+OTA性能优化O(n^2)→O(n)+ChannelConfig/ChartModel实现 | 18 |
+| 17 | 过渡动画+ChartModel集成+QSS按钮状态修复+硬编码颜色清除+中英语言选择 | 19 |
 | ... | 目标: 1000分 | 1000 |
 
 ---

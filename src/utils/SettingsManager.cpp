@@ -99,3 +99,14 @@ QString SettingsManager::loadTheme() const
     // 不存在时返回默认主题
     return m_settings.value("theme/name", App::DEFAULT_THEME).toString();
 }
+
+void SettingsManager::saveLanguage(const QString& langCode)
+{
+    m_settings.setValue("language/code", langCode);
+    m_settings.sync();
+}
+
+QString SettingsManager::loadLanguage() const
+{
+    return m_settings.value("language/code", Language::DEFAULT).toString();
+}

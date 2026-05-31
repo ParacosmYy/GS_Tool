@@ -93,6 +93,38 @@ QPushButton:pressed {
     background-color: #585b70;
 }
 
+QPushButton:disabled {
+    background-color: #313244;
+    color: #6c7086;
+    border-color: #313244;
+}
+
+/* 发送按钮 - accent高亮 */
+QPushButton#sendButton {
+    background-color: #89b4fa;
+    color: #1e1e2e;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: bold;
+}
+QPushButton#sendButton:hover { background-color: #b4d0fb; }
+QPushButton#sendButton:pressed { background-color: #74a8f7; }
+QPushButton#sendButton:disabled { background-color: #45475a; color: #6c7086; }
+
+/* 应用定义按钮 - accent高亮 */
+QPushButton#applyDefBtn {
+    background-color: #89b4fa;
+    color: #1e1e2e;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+QPushButton#applyDefBtn:hover { background-color: #b4d0fb; }
+QPushButton#applyDefBtn:pressed { background-color: #74a8f7; }
+QPushButton#applyDefBtn:disabled { background-color: #45475a; color: #6c7086; }
+
 /* 状态栏 */
 QStatusBar {
     background-color: #181825;

@@ -3,6 +3,8 @@
 
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
 #include <QRegularExpression>
 #include <QStyle>
 
@@ -103,7 +105,29 @@ bool TerminalSearchBar::isHexMode() const
 
 void TerminalSearchBar::activate()
 {
+    // 如果已经可见，仅聚焦
+    if (isVisible()) {
+        m_searchInput->setFocus();
+        m_searchInput->selectAll();
+        return;
+    }
+
+    // 展开动画: maximumHeight 从 0 → 36, 200ms, OutCubic
+    // 先设为0高度并显示，然后动画展开
+    setMaximumHeight(0);
     show();
+
+    QPropertyAnimation* expandAnim = new QPropertyAnimation(this, "maximumHeight");
+    expandAnim->setStartValue(0);
+    expandAnim->setEndValue(36);
+    expandAnim->setDuration(200);
+    expandAnim->setEasingCurve(QEasingCurve::OutCubic);
+    // 动画结束后恢复固定高度，避免布局异常
+    connect(expandAnim, &QPropertyAnimation::finished, this, [this]() {
+        setFixedHeight(36);
+    });
+    expandAnim->start(QAbstractAnimation::DeleteWhenStopped);
+
     m_searchInput->setFocus();
     m_searchInput->selectAll();
 }
@@ -112,8 +136,21 @@ void TerminalSearchBar::deactivate()
 {
     m_searchInput->clear();
     m_resultLabel->clear();
-    hide();
-    emit closed();
+
+    // 收起动画: maximumHeight 从 36 → 0, 150ms, InCubic
+    // 完成后隐藏并恢复状态
+    QPropertyAnimation* collapseAnim = new QPropertyAnimation(this, "maximumHeight");
+    collapseAnim->setStartValue(36);
+    collapseAnim->setEndValue(0);
+    collapseAnim->setDuration(150);
+    collapseAnim->setEasingCurve(QEasingCurve::InCubic);
+    connect(collapseAnim, &QPropertyAnimation::finished, this, [this]() {
+        hide();
+        // 恢复固定高度，为下次展开做准备
+        setFixedHeight(36);
+        emit closed();
+    });
+    collapseAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void TerminalSearchBar::onSearchTextChanged(const QString& text)

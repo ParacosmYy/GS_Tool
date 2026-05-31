@@ -1,5 +1,8 @@
-#include "ChartWidget.h"
+#include "chart/ChartWidget.h"
+#include "protocol/FrameDefinition.h"
+
 #include <QtCharts>
+#include <algorithm>
 
 const QVector<QColor> ChartWidget::kDefaultColors = {
     QColor("#89b4fa"), QColor("#a6e3a1"), QColor("#f9e2af"),
@@ -10,8 +13,17 @@ const QVector<QColor> ChartWidget::kDefaultColors = {
 
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
+    , m_model(new ChartModel(this))
 {
     setupUI();
+
+    // 连接 ChartModel 信号到渲染槽
+    connect(m_model, &ChartModel::dataUpdated,
+            this, &ChartWidget::updateChart);
+    connect(m_model, &ChartModel::channelsChanged,
+            this, &ChartWidget::onChannelsChanged);
+    connect(m_model, &ChartModel::dataCleared,
+            this, &ChartWidget::onDataCleared);
 }
 
 void ChartWidget::setupUI()
@@ -75,111 +87,41 @@ void ChartWidget::setupUI()
                 int sizes[] = {100, 200, 500, 1000, 2000};
                 setWindowSize(sizes[idx]);
             });
+
+    m_statusLabel->setText(tr("Channels: 0"));
 }
 
-void ChartWidget::addChannel(const QString& name, const QColor& color)
+// ============================================================================
+// 公开接口
+// ============================================================================
+
+ChartModel* ChartWidget::model() const
 {
-    if (m_channels.contains(name)) return;
-
-    QColor chColor = color.isValid() ? color :
-        kDefaultColors[m_channels.size() % kDefaultColors.size()];
-
-    auto* series = new QLineSeries;
-    series->setName(name);
-    series->setColor(chColor);
-    series->setUseOpenGL(true); // 使用OpenGL加速渲染
-
-    m_chart->addSeries(series);
-    series->attachAxis(m_xAxis);
-    series->attachAxis(m_yAxis);
-
-    ChannelData data;
-    data.series = series;
-    m_channels[name] = data;
-
-    m_statusLabel->setText(tr("Channels: %1").arg(m_channels.size()));
+    return m_model;
 }
 
-void ChartWidget::removeChannel(const QString& name)
+void ChartWidget::configureFromFrameDefinition(const FrameDefinition& def)
 {
-    auto it = m_channels.find(name);
-    if (it == m_channels.end()) return;
+    // 从帧定义的字段列表自动生成通道配置
+    m_configSet = ChannelConfigSet::generateDefaults(def.fields);
 
-    m_chart->removeSeries(it->series);
-    it->series->deleteLater();
-    m_channels.erase(it);
-
-    m_statusLabel->setText(tr("Channels: %1").arg(m_channels.size()));
-}
-
-void ChartWidget::appendData(const QString& channel, double value)
-{
-    if (m_paused) return;
-
-    auto it = m_channels.find(channel);
-    if (it == m_channels.end()) return;
-
-    // 添加数据点
-    it->points.append(QPointF(m_xCounter, value));
-
-    // 维护滑动窗口
-    while (it->points.size() > m_windowSize) {
-        it->points.removeFirst();
-    }
-
-    // 更新Y轴范围
-    if (m_autoYRange) {
-        double globalMin = std::numeric_limits<double>::max();
-        double globalMax = std::numeric_limits<double>::lowest();
-        for (auto& ch : m_channels) {
-            for (const auto& pt : ch.points) {
-                if (pt.y() < globalMin) globalMin = pt.y();
-                if (pt.y() > globalMax) globalMax = pt.y();
-            }
-        }
-        double margin = (globalMax - globalMin) * 0.1;
-        if (margin < 0.001) margin = 1.0;
-        m_yAxis->setRange(globalMin - margin, globalMax + margin);
-    }
-
-    // 批量更新series（高性能：替换所有点而非逐个添加）
-    QVector<QPointF> visiblePoints = it->points;
-    it->series->replace(visiblePoints);
-
-    // 每个通道独立计数会不同，但所有通道共享X轴
-    // 只在第一个通道增加X计数
-    if (channel == m_channels.firstKey()) {
-        m_xCounter++;
-        // 更新X轴范围
-        if (it->points.size() >= m_windowSize) {
-            m_xAxis->setRange(m_xCounter - m_windowSize, m_xCounter);
-        } else {
-            m_xAxis->setRange(0, m_xCounter + 10);
-        }
-    }
+    // 应用到ChartModel（会触发 channelsChanged 信号 → 重建渲染层）
+    m_model->setChannelConfigSet(m_configSet);
 }
 
 void ChartWidget::setWindowSize(int points)
 {
-    m_windowSize = points;
+    m_model->setWindowSize(points);
 }
 
 void ChartWidget::clear()
 {
-    m_xCounter = 0;
-    for (auto& ch : m_channels) {
-        ch.points.clear();
-        ch.series->clear();
-        ch.yMin = 0;
-        ch.yMax = 0;
-    }
-    m_xAxis->setRange(0, 10);
-    m_yAxis->setRange(0, 100);
+    m_model->clear();
 }
 
 QStringList ChartWidget::channels() const
 {
-    return m_channels.keys();
+    return m_model->channelNames();
 }
 
 void ChartWidget::setYRange(double min, double max)
@@ -193,25 +135,87 @@ void ChartWidget::setAutoYRange(bool enabled)
     m_autoYRange = enabled;
 }
 
+// ============================================================================
+// 槽函数 -- 帧数据接收（兼容旧接口，委托给ChartModel）
+// ============================================================================
+
 void ChartWidget::onFrameParsed(const QVariantMap& fields, const QByteArray& rawFrame)
 {
-    Q_UNUSED(rawFrame);
-    // 自动从解析字段中提取数值并添加到对应通道
-    for (auto it = fields.constBegin(); it != fields.constEnd(); ++it) {
-        // 跳过内部字段和非数值字段
-        if (it.key().startsWith('_')) continue;
-
-        bool ok;
-        double value = it.value().toDouble(&ok);
-        if (!ok) continue;
-
-        // 如果通道不存在，自动创建
-        if (!m_channels.contains(it.key())) {
-            addChannel(it.key());
-        }
-        appendData(it.key(), value);
-    }
+    if (m_paused) return;
+    m_model->onFrameParsed(fields, rawFrame);
 }
+
+// ============================================================================
+// 槽函数 -- ChartModel 信号驱动的渲染更新
+// ============================================================================
+
+void ChartWidget::updateChart(const QStringList& updatedChannels)
+{
+    if (m_paused) return;
+
+    // 刷新每个更新通道的series数据
+    for (const QString& name : updatedChannels) {
+        auto it = m_seriesMap.find(name);
+        if (it == m_seriesMap.end()) continue;
+
+        QLineSeries* series = it.value();
+        QVector<QPointF> data = m_model->channelData(name);
+        series->replace(data);
+    }
+
+    // 更新X轴范围
+    QPair<double, double> xRange = m_model->xRange();
+    m_xAxis->setRange(xRange.first, xRange.second);
+
+    // 自动Y轴范围
+    if (m_autoYRange) {
+        QPair<double, double> yRange = m_model->globalYRange();
+        if (yRange.first != 0.0 || yRange.second != 0.0) {
+            double margin = (yRange.second - yRange.first) * 0.1;
+            if (margin < 0.001) margin = 1.0;
+            m_yAxis->setRange(yRange.first - margin, yRange.second + margin);
+        }
+    }
+
+    // 更新状态标签
+    m_statusLabel->setText(tr("Channels: %1 | Frames: %2")
+        .arg(m_seriesMap.size())
+        .arg(m_model->currentFrameIndex()));
+}
+
+void ChartWidget::onChannelsChanged()
+{
+    // 清除旧的series
+    for (auto* series : m_seriesMap) {
+        m_chart->removeSeries(series);
+        series->deleteLater();
+    }
+    m_seriesMap.clear();
+
+    // 根据新的通道配置创建series
+    const QVector<ChannelConfig>& channels = m_configSet.channels();
+    for (const ChannelConfig& cfg : channels) {
+        if (cfg.enabled) {
+            createSeries(cfg.displayName, cfg.color);
+        }
+    }
+
+    m_statusLabel->setText(tr("Channels: %1").arg(m_seriesMap.size()));
+}
+
+void ChartWidget::onDataCleared()
+{
+    // 清除所有series的数据点
+    for (auto* series : m_seriesMap) {
+        series->clear();
+    }
+    m_xAxis->setRange(0, 10);
+    m_yAxis->setRange(0, 100);
+}
+
+// ============================================================================
+// 槽函数 -- 控制栏按钮
+// ============================================================================
 
 void ChartWidget::onPauseToggled(bool paused)
 {
@@ -222,4 +226,37 @@ void ChartWidget::onPauseToggled(bool paused)
 void ChartWidget::onClearClicked()
 {
     clear();
+}
+
+// ============================================================================
+// 内部方法 -- Series管理
+// ============================================================================
+
+void ChartWidget::createSeries(const QString& name, const QColor& color)
+{
+    if (m_seriesMap.contains(name)) return;
+
+    QColor chColor = color.isValid() ? color :
+        kDefaultColors[m_seriesMap.size() % kDefaultColors.size()];
+
+    auto* series = new QLineSeries;
+    series->setName(name);
+    series->setColor(chColor);
+    series->setUseOpenGL(true);
+
+    m_chart->addSeries(series);
+    series->attachAxis(m_xAxis);
+    series->attachAxis(m_yAxis);
+
+    m_seriesMap[name] = series;
+}
+
+void ChartWidget::removeSeries(const QString& name)
+{
+    auto it = m_seriesMap.find(name);
+    if (it == m_seriesMap.end()) return;
+
+    m_chart->removeSeries(it.value());
+    it.value()->deleteLater();
+    m_seriesMap.erase(it);
 }

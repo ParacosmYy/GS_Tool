@@ -13,6 +13,8 @@
 #include <QComboBox>
 #include <QAction>
 #include <QCompleter>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
 #include "ConnectionManager.h"
 #include "ThemeManager.h"
 #include "terminal/TerminalWidget.h"
@@ -79,6 +81,9 @@ private slots:
     // 主题切换
     void onThemeChanged(int index);
 
+    // 语言切换
+    void onLanguageChanged(int index);
+
     // 连接状态变化
     void onConnectionStateChanged(ConnectionState state);
 
@@ -125,6 +130,7 @@ private:
     QToolBar* m_toolbar;
     QComboBox* m_displayModeCombo;
     QComboBox* m_themeCombo;
+    QComboBox* m_langCombo;
     QAction* m_timestampAction;
     QAction* m_clearAction;
     QAction* m_exportAction;
@@ -174,6 +180,14 @@ private:
 
     // 统计定时器
     QTimer* m_statsTimer;
+
+    // 连接状态呼吸动画（connecting状态时脉冲闪烁）
+    QPropertyAnimation* m_breathingAnim = nullptr;
+    QGraphicsOpacityEffect* m_connStatusEffect = nullptr;
+
+    // 启动/停止连接状态呼吸动画
+    void startBreathingAnimation();
+    void stopBreathingAnimation();
 };
 
 #endif // MAINWINDOW_H

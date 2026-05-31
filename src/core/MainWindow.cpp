@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "chart/ChartModel.h"
 #include "utils/HexConverter.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -14,6 +15,10 @@
 #include <QStringListModel>
 #include <QShortcut>
 #include <QKeySequence>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
+#include <QTranslator>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -211,6 +216,7 @@ void MainWindow::setupUI()
     m_sendInput->setCompleter(m_sendCompleter);
 
     m_sendBtn = new QPushButton(tr("发送"));
+    m_sendBtn->setObjectName("sendButton");
     m_sendBtn->setFixedWidth(70);
 
     sendLayout->addWidget(m_sendModeCombo);
@@ -290,6 +296,16 @@ void MainWindow::setupToolbar()
     }
     m_themeCombo->setFixedWidth(130);
     m_toolbar->addWidget(m_themeCombo);
+
+    // 语言切换下拉框
+    auto* langLabel = new QLabel(tr(" 语言: "));
+    m_toolbar->addWidget(langLabel);
+
+    m_langCombo = new QComboBox;
+    m_langCombo->addItem(QStringLiteral("中文"), Language::CHINESE);
+    m_langCombo->addItem(QStringLiteral("English"), Language::ENGLISH);
+    m_langCombo->setFixedWidth(90);
+    m_toolbar->addWidget(m_langCombo);
 }
 
 void MainWindow::setupStatusBar()
@@ -352,6 +368,10 @@ void MainWindow::connectSignals()
     connect(m_themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onThemeChanged);
 
+    // 语言切换
+    connect(m_langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onLanguageChanged);
+
     // 搜索栏
     connect(m_searchBar, &TerminalSearchBar::searchRequested,
             this, &MainWindow::onSearchRequested);
@@ -378,18 +398,21 @@ void MainWindow::connectSignals()
     // 统计刷新定时器
     connect(m_statsTimer, &QTimer::timeout, this, &MainWindow::updateDataStatistics);
 
-    // 帧解析器 → 协议视图 + 波形图
+    // 帧解析器 → 协议视图 + 波形图数据模型
     connect(m_frameParser, &FrameParser::frameParsed,
             m_protocolView, &ProtocolView::onFrameParsed);
     connect(m_frameParser, &FrameParser::frameError,
             m_protocolView, &ProtocolView::onFrameError);
+    // 帧数据通过ChartModel分发，ChartWidget内部连接model信号刷新渲染
     connect(m_frameParser, &FrameParser::frameParsed,
-            m_chartWidget, &ChartWidget::onFrameParsed);
+            m_chartWidget->model(), &ChartModel::onFrameParsed);
 
-    // 帧编辑器 → 帧解析器（定义变更时更新解析器）
+    // 帧编辑器 → 帧解析器 + 波形图通道配置（定义变更时同步更新）
     connect(m_frameEditor, &FrameVisualEditor::definitionChanged,
             this, [this](const FrameDefinition& def) {
                 m_frameParser->setDefinition(def);
+                // 自动根据帧定义生成通道配置
+                m_chartWidget->configureFromFrameDefinition(def);
             });
 
     // 导航树点击切换面板 — 使用map映射面板名称到widget，消除重复的setVisible调用
@@ -433,6 +456,28 @@ void MainWindow::connectSignals()
         for (auto* w : allPanels) {
             if (w) w->setVisible(w == target);
         }
+
+        // 面板滑入淡入动画: 250ms, OutCubic, opacity 0.0 → 1.0
+        if (target) {
+            // 为目标面板创建透明度效果（如果尚未创建或被移除）
+            QGraphicsOpacityEffect* fadeEffect = new QGraphicsOpacityEffect(target);
+            fadeEffect->setOpacity(0.0);
+            target->setGraphicsEffect(fadeEffect);
+
+            QPropertyAnimation* fadeIn = new QPropertyAnimation(fadeEffect, "opacity");
+            fadeIn->setStartValue(0.0);
+            fadeIn->setEndValue(1.0);
+            fadeIn->setDuration(250);
+            fadeIn->setEasingCurve(QEasingCurve::OutCubic);
+            // 动画结束后清除 effect，恢复正常绘制性能
+            connect(fadeIn, &QPropertyAnimation::finished, target, [target, fadeEffect]() {
+                // 检查 effect 是否仍关联到该 widget（防止面板已切换）
+                if (target->graphicsEffect() == fadeEffect) {
+                    target->setGraphicsEffect(nullptr);
+                }
+            });
+            fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
+        }
     });
 }
 
@@ -463,6 +508,15 @@ void MainWindow::loadSettings()
     if (!serialConfig.isEmpty()) {
         m_serialConfig->restoreConfig(serialConfig);
     }
+
+    // 恢复语言选择
+    QString savedLang = settings.loadLanguage();
+    for (int i = 0; i < m_langCombo->count(); ++i) {
+        if (m_langCombo->itemData(i).toString() == savedLang) {
+            m_langCombo->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 void MainWindow::saveSettings()
@@ -474,6 +528,8 @@ void MainWindow::saveSettings()
 
     // 保存当前主题
     settings.saveTheme(ThemeManager::instance().currentTheme());
+
+    // 保存语言选择（已在onLanguageChanged中实时保存，此处确保一致性）
 
     // 保存串口配置（从配置面板获取当前值）
     QVariantMap serialConfig;
@@ -652,6 +708,19 @@ void MainWindow::onThemeChanged(int index)
     }
 }
 
+void MainWindow::onLanguageChanged(int index)
+{
+    QString langCode = m_langCombo->itemData(index).toString();
+    SettingsManager::instance().saveLanguage(langCode);
+
+    // 提示用户需要重启生效（QTranslator需要在main()中重新加载）
+    if (langCode == Language::ENGLISH) {
+        statusBar()->showMessage(tr("语言已切换为English，重启后生效"), 3000);
+    } else {
+        statusBar()->showMessage(tr("语言已切换为中文，重启后生效"), 3000);
+    }
+}
+
 void MainWindow::onConnectNetwork(ConnectionType type)
 {
     m_currentConn = m_connManager->createConnection(type);
@@ -706,20 +775,24 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
         m_serialConfig->setVisible(false);
         m_terminal->setVisible(true);
         m_dataStats->setVisible(false);
+        stopBreathingAnimation();
         break;
     case ConnectionState::Disconnected:
         m_connStatusLbl->setText(tr("未连接"));
         stateStr = "disconnected";
         m_serialConfig->setConnected(false);
+        stopBreathingAnimation();
         break;
     case ConnectionState::Connecting:
         m_connStatusLbl->setText(tr("连接中..."));
         stateStr = "connecting";
+        startBreathingAnimation();
         break;
     case ConnectionState::Error:
         m_connStatusLbl->setText(tr("连接错误"));
         stateStr = "error";
         m_serialConfig->setConnected(false);
+        stopBreathingAnimation();
         break;
     }
     m_connStatusLbl->setProperty("state", stateStr);
@@ -757,8 +830,57 @@ void MainWindow::updateDataStatistics()
     }
 }
 
+void MainWindow::startBreathingAnimation()
+{
+    // 如果已有呼吸动画在运行，不重复创建
+    if (m_breathingAnim && m_breathingAnim->state() == QAbstractAnimation::Running) {
+        return;
+    }
+
+    // 为状态标签创建透明度效果
+    if (!m_connStatusEffect) {
+        m_connStatusEffect = new QGraphicsOpacityEffect(m_connStatusLbl);
+        m_connStatusLbl->setGraphicsEffect(m_connStatusEffect);
+    }
+    m_connStatusEffect->setOpacity(1.0);
+
+    // 创建呼吸脉冲动画: 1500ms循环, InOutSine, opacity 0.3 ↔ 1.0
+    if (m_breathingAnim) {
+        m_breathingAnim->stop();
+        delete m_breathingAnim;
+    }
+    m_breathingAnim = new QPropertyAnimation(m_connStatusEffect, "opacity");
+    m_breathingAnim->setStartValue(0.3);
+    m_breathingAnim->setEndValue(1.0);
+    m_breathingAnim->setDuration(1500);
+    m_breathingAnim->setEasingCurve(QEasingCurve::InOutSine);
+    m_breathingAnim->setLoopCount(-1);  // 无限循环
+    // 注意: loopCount=-1 时动画不会自行停止，所以不能用 DeleteWhenStopped。
+    // 生命周期由 startBreathingAnimation/stopBreathingAnimation 手动管理。
+    m_breathingAnim->start();
+}
+
+void MainWindow::stopBreathingAnimation()
+{
+    if (m_breathingAnim) {
+        m_breathingAnim->stop();
+        delete m_breathingAnim;
+        m_breathingAnim = nullptr;
+    }
+    // 恢复状态标签完全不透明
+    if (m_connStatusEffect) {
+        m_connStatusEffect->setOpacity(1.0);
+        m_connStatusLbl->setGraphicsEffect(nullptr);
+        delete m_connStatusEffect;
+        m_connStatusEffect = nullptr;
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+    // 停止呼吸动画
+    stopBreathingAnimation();
+
     // 停止录制/回放
     if (m_dataLogger->isRecording()) m_dataLogger->stopRecording();
     if (m_dataLogger->isPlaying()) m_dataLogger->stopPlayback();

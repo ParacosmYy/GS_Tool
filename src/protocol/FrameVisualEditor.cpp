@@ -106,10 +106,8 @@ void FrameVisualEditor::setupUI()
 
     // ---- 应用按钮 ----
     m_applyBtn = new QPushButton(tr("Apply Definition"));
+    m_applyBtn->setObjectName("applyDefBtn");
     m_applyBtn->setMinimumHeight(32);
-    m_applyBtn->setStyleSheet(
-        "QPushButton { background-color: #89b4fa; color: #1e1e2e; font-weight: bold; }"
-        "QPushButton:hover { background-color: #74c7ec; }");
     mainLayout->addWidget(m_applyBtn);
 
     // 信号连接

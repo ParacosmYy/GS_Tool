@@ -42,4 +42,22 @@ enum class DataDirection {
     Tx      // 发送
 };
 
+// 语义色常量 — 用于C++代码中无法通过QSS设置颜色的场景（如model data roles）
+// 与主题QSS中的语义色保持一致，主题切换时这些值不会自动更新
+// 后续应由ThemeManager动态提供
+namespace ThemeColors {
+    // 暗色终端 (dark_terminal) 默认色值
+    constexpr const char* kSuccessHex = "#a6e3a1";
+    constexpr const char* kErrorHex   = "#f38ba8";
+    constexpr const char* kWarningHex = "#f9e2af";
+    constexpr const char* kAccentHex  = "#89b4fa";
+}
+
+// 语言选项
+namespace Language {
+    constexpr const char* CHINESE  = "zh_CN";
+    constexpr const char* ENGLISH  = "en";
+    constexpr const char* DEFAULT  = CHINESE;
+}
+
 #endif // CONSTANTS_H
