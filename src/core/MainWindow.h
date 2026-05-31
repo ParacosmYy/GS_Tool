@@ -23,6 +23,7 @@
 #include "core/SendController.h"
 #include "core/ToolbarController.h"
 #include "core/SettingsController.h"
+#include "core/PanelManager.h"
 #include "core/BackgroundWidget.h"
 #include "core/BackgroundSettingsPopup.h"
 #include "utils/SettingsManager.h"
@@ -181,36 +182,17 @@ private:
     /** @brief 工具栏控制器，创建和管理所有工具栏控件（显示模式/主题/语言/录制等） */
     ToolbarController* m_toolbarController;
 
-    // ==================== UI组件 - 串口配置 ====================
+    // ==================== 面板管理 ====================
 
-    /** @brief 串口配置面板，提供端口/波特率/数据位/校验/流控等参数选择 */
-    SerialConfigPanel* m_serialConfig;
+    /** @brief 面板管理器，统一创建和管理所有功能面板（串口配置/终端/统计/协议/波形图/OTA等） */
+    PanelManager* m_panelManager;
 
-    // ==================== UI组件 - 终端 ====================
-
-    /** @brief 终端显示控件，自绘引擎支持搜索高亮、HEX/文本/十进制显示 */
-    TerminalWidget* m_terminal;
-
-    /** @brief 终端搜索栏，支持正则/HEX 搜索和匹配计数显示 */
-    TerminalSearchBar* m_searchBar;
+    // ==================== UI组件 - 终端布局 ====================
 
     /** @brief 终端布局管理器，管理混合/左右分栏/上下分栏三种布局模式切换 */
     TerminalLayoutManager* m_layoutManager;
 
-    // ==================== UI组件 - 快捷指令 ====================
-
-    /** @brief 快捷指令栏，预置常用 AT 命令和自定义指令的一键发送 */
-    QuickCommandBar* m_quickCmdBar;
-
-    // ==================== UI组件 - 数据统计 ====================
-
-    /** @brief 数据统计面板，显示 RX/TX 累计字节数和速率 */
-    DataStatistics* m_dataStats;
-
     // ==================== UI组件 - 协议解析 ====================
-
-    /** @brief 协议解析视图，以表格形式展示解析后的帧数据 */
-    ProtocolView* m_protocolView;
 
     /** @brief 帧解析器，根据 FrameDefinition 定义的状态机解析原始字节流 */
     FrameParser* m_frameParser;
@@ -218,21 +200,10 @@ private:
     /** @brief 协议桥管理器，将帧解析器的输出分发到 ProtocolView 和 ChartWidget */
     ProtocolBridgeManager* m_protocolBridgeMgr;
 
-    /** @brief 帧可视化编辑器，提供 GUI 界面定义帧结构（帧头/字段/CRC） */
-    FrameVisualEditor* m_frameEditor;
-
-    // ==================== UI组件 - 波形图 ====================
-
-    /** @brief 波形图控件，实时绘制解析后的数值数据，支持滑动窗口和降采样 */
-    ChartWidget* m_chartWidget;
-
     // ==================== UI组件 - OTA升级 ====================
 
     /** @brief OTA 管理器，协调 XModem/YModem/ZModem 传输协议 */
     OtaManager* m_otaManager;
-
-    /** @brief OTA 升级面板，提供文件选择、协议选择、进度显示和错误反馈 */
-    OtaWidget* m_otaWidget;
 
     // ==================== UI组件 - 状态栏 ====================
 

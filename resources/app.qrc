@@ -4,5 +4,9 @@
         <file>themes/modern_dark.qss</file>
         <file>themes/light.qss</file>
         <file>backgrounds/default_bg.png</file>
+        <file>icons/dropdown_arrow.svg</file>
+        <file>icons/dropdown_arrow_disabled.svg</file>
+        <file>icons/dropdown_arrow_light.svg</file>
+        <file>icons/dropdown_arrow_light_disabled.svg</file>
     </qresource>
 </RCC>

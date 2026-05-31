@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget* parent)
     , m_frameParser(new FrameParser(this))
     , m_protocolBridgeMgr(new ProtocolBridgeManager(m_frameParser, this))
     , m_otaManager(new OtaManager(this))
+    , m_panelManager(new PanelManager(this))
     , m_navController(new NavigationController(this))
     , m_toolbarController(new ToolbarController(m_recordingController, this))
     , m_settingsController(new SettingsController(this, this))
@@ -78,24 +79,15 @@ MainWindow::MainWindow(QWidget* parent)
     // 连接所有模块间的信号/槽
     connectSignals();
 
-    // 构建导航树模型: 将面板名称与 QWidget 指针的映射表传给 NavigationController
-    // 使用 QT_TRANSLATE_NOOP 标记翻译键，运行时通过 tr() 翻译
-    m_navController->buildNavTree(m_navTree, {
-        {QT_TRANSLATE_NOOP("MainWindow", "配置"),       m_serialConfig},
-        {QT_TRANSLATE_NOOP("MainWindow", "终端"),       m_terminal},
-        {QT_TRANSLATE_NOOP("MainWindow", "统计"),       m_dataStats},
-        {QT_TRANSLATE_NOOP("MainWindow", "协议"),       m_protocolView},
-        {QT_TRANSLATE_NOOP("MainWindow", "帧编辑器"),   m_frameEditor},
-        {QT_TRANSLATE_NOOP("MainWindow", "波形图"),     m_chartWidget},
-        {QT_TRANSLATE_NOOP("MainWindow", "OTA升级"),    m_otaWidget},
-    });
+    // 构建导航树模型: 通过 PanelManager 获取面板映射表
+    m_navController->buildNavTree(m_navTree, m_panelManager->panelMappings());
 
     // 初始面板状态: 终端为默认可见面板（不触发动画）
-    m_navController->setCurrentPanel(m_terminal);
+    m_navController->setCurrentPanel(m_panelManager->terminal());
 
     // 注入 UI 引用到 SettingsController，用于同步主题/语言下拉框和串口配置面板
     m_settingsController->setToolbarController(m_toolbarController);
-    m_settingsController->setSerialConfigPanel(m_serialConfig);
+    m_settingsController->setSerialConfigPanel(m_panelManager->serialConfig());
 
     // 从磁盘加载上次保存的设置（主题、窗口几何、串口配置、语言）
     m_settingsController->loadSettings();
@@ -175,52 +167,26 @@ void MainWindow::setupUI()
     serialLayout->setContentsMargins(0, 0, 0, 0);
     serialLayout->setSpacing(0);
 
-    // 以下面板初始全部隐藏，由 NavigationController.switchToPanel() 按需显示
-    m_serialConfig = new SerialConfigPanel;
-    m_serialConfig->setVisible(false);
-    serialLayout->addWidget(m_serialConfig);
+    // 通过 PanelManager 统一创建所有面板（面板初始全部隐藏，由 NavigationController 按需显示）
+    m_panelManager->createPanels(m_otaManager, m_terminalModel);
 
-    m_dataStats = new DataStatistics;
-    m_dataStats->setVisible(false);
-    serialLayout->addWidget(m_dataStats);
-
-    m_protocolView = new ProtocolView;
-    m_protocolView->setVisible(false);
-    serialLayout->addWidget(m_protocolView);
-
-    m_frameEditor = new FrameVisualEditor;
-    m_frameEditor->setVisible(false);
-    serialLayout->addWidget(m_frameEditor);
-
-    m_chartWidget = new ChartWidget;
-    m_chartWidget->setVisible(false);
-    serialLayout->addWidget(m_chartWidget);
-
-    m_otaWidget = new OtaWidget(m_otaManager);
-    m_otaWidget->setVisible(false);
-    serialLayout->addWidget(m_otaWidget);
-
-    // 终端容器: 搜索栏 + 终端显示区（始终占据面板栈主要空间）
-    // 终端显示区由 TerminalLayoutManager 管理，支持混合/左右分栏/上下分栏切换
-    m_terminal = new TerminalWidget;
-    m_terminal->setModel(m_terminalModel);
-    m_searchBar = new TerminalSearchBar;
+    // 将所有面板添加到面板栈布局
+    serialLayout->addWidget(m_panelManager->serialConfig());
+    serialLayout->addWidget(m_panelManager->dataStats());
+    serialLayout->addWidget(m_panelManager->protocolView());
+    serialLayout->addWidget(m_panelManager->frameEditor());
+    serialLayout->addWidget(m_panelManager->chartWidget());
+    serialLayout->addWidget(m_panelManager->otaWidget());
 
     // 终端布局管理器: 管理混合/分栏模式切换，封装终端容器内的widget层次
     m_layoutManager = new TerminalLayoutManager(this);
-    m_layoutManager->initialize(m_terminal, m_searchBar);
+    m_layoutManager->initialize(m_panelManager->terminal(), m_panelManager->searchBar());
     m_layoutManager->setTerminalModel(m_terminalModel);
 
     serialLayout->addWidget(m_layoutManager->container(), 1);
 
-    // 快捷指令栏（预置常用命令，如 AT、Reset、Status）
-    m_quickCmdBar = new QuickCommandBar;
-    m_quickCmdBar->setCommands({
-        {"AT", "AT\r\n", false},
-        {"Reset", "AA 55 01 00 FE", true},
-        {"Status", "AT+STATUS?\r\n", false}
-    });
-    serialLayout->addWidget(m_quickCmdBar);
+    // 快捷指令栏
+    serialLayout->addWidget(m_panelManager->quickCmdBar());
 
     // 发送区域: 由 SendController 创建和管理（输入框+模式切换+发送按钮+换行符选择）
     QWidget* sendBar = m_sendController->createSendBar(this);
@@ -240,7 +206,7 @@ void MainWindow::setupUI()
 
     // Ctrl+F 快捷键激活搜索栏
     auto* searchShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
-    connect(searchShortcut, &QShortcut::activated, m_searchBar, &TerminalSearchBar::activate);
+    connect(searchShortcut, &QShortcut::activated, m_panelManager->searchBar(), &TerminalSearchBar::activate);
 }
 
 /**
@@ -279,25 +245,25 @@ void MainWindow::connectSignals()
 {
     // ---- 串口连接/断开: 委托 ConnectionController 处理 ----
     // 用户点击"连接"时，从 SerialConfigPanel 收集参数并调用 ConnectionController
-    connect(m_serialConfig, &SerialConfigPanel::connectRequested,
+    connect(m_panelManager->serialConfig(), &SerialConfigPanel::connectRequested,
             this, [this]() {
         QVariantMap params;
-        params["portName"] = m_serialConfig->currentPortData();
-        params["baudRate"] = m_serialConfig->currentBaudRate();
-        params["dataBits"] = m_serialConfig->currentDataBitsIndex() + 5;  // 索引0对应5位
-        params["parity"] = m_serialConfig->currentParityIndex();
-        params["stopBits"] = m_serialConfig->currentStopBitsIndex();
-        params["flowControl"] = m_serialConfig->currentFlowControlIndex();
-        params["dtr"] = m_serialConfig->dtrEnabled();
-        params["rts"] = m_serialConfig->rtsEnabled();
+        params["portName"] = m_panelManager->serialConfig()->currentPortData();
+        params["baudRate"] = m_panelManager->serialConfig()->currentBaudRate();
+        params["dataBits"] = m_panelManager->serialConfig()->currentDataBitsIndex() + 5;  // 索引0对应5位
+        params["parity"] = m_panelManager->serialConfig()->currentParityIndex();
+        params["stopBits"] = m_panelManager->serialConfig()->currentStopBitsIndex();
+        params["flowControl"] = m_panelManager->serialConfig()->currentFlowControlIndex();
+        params["dtr"] = m_panelManager->serialConfig()->dtrEnabled();
+        params["rts"] = m_panelManager->serialConfig()->rtsEnabled();
         m_connController->connectSerial(params);
     });
-    connect(m_serialConfig, &SerialConfigPanel::disconnectRequested,
+    connect(m_panelManager->serialConfig(), &SerialConfigPanel::disconnectRequested,
             m_connController, &ConnectionController::disconnectSerial);
     // DTR/RTS 线路控制信号直连
-    connect(m_serialConfig, &SerialConfigPanel::dtrChanged,
+    connect(m_panelManager->serialConfig(), &SerialConfigPanel::dtrChanged,
             m_connController, &ConnectionController::setDtr);
-    connect(m_serialConfig, &SerialConfigPanel::rtsChanged,
+    connect(m_panelManager->serialConfig(), &SerialConfigPanel::rtsChanged,
             m_connController, &ConnectionController::setRts);
 
     // 连接状态变化 → 更新 UI（状态栏文本、配置面板按钮状态、呼吸动画）
@@ -308,15 +274,15 @@ void MainWindow::connectSignals()
         case ConnectionState::Connected:
             m_connStatusLbl->setText(tr("已连接: %1").arg(connName));
             stateStr = "connected";
-            m_serialConfig->setConnected(true);
+            m_panelManager->serialConfig()->setConnected(true);
             // 连接成功后自动切换到终端面板（带淡入动画）
-            m_navController->switchToPanel(m_terminal);
+            m_navController->switchToPanel(m_panelManager->terminal());
             m_navController->stopBreathingAnimation(m_connStatusLbl);
             break;
         case ConnectionState::Disconnected:
             m_connStatusLbl->setText(tr("未连接"));
             stateStr = "disconnected";
-            m_serialConfig->setConnected(false);
+            m_panelManager->serialConfig()->setConnected(false);
             m_navController->stopBreathingAnimation(m_connStatusLbl);
             break;
         case ConnectionState::Connecting:
@@ -328,7 +294,7 @@ void MainWindow::connectSignals()
         case ConnectionState::Error:
             m_connStatusLbl->setText(tr("连接错误"));
             stateStr = "error";
-            m_serialConfig->setConnected(false);
+            m_panelManager->serialConfig()->setConnected(false);
             m_navController->stopBreathingAnimation(m_connStatusLbl);
             break;
         }
@@ -355,7 +321,7 @@ void MainWindow::connectSignals()
     });
 
     // 快捷指令 → 发送控制器
-    connect(m_quickCmdBar, &QuickCommandBar::commandTriggered,
+    connect(m_panelManager->quickCmdBar(), &QuickCommandBar::commandTriggered,
             m_sendController, &SendController::onQuickCommand);
     // 发送成功后更新状态栏
     connect(m_sendController, &SendController::dataSent,
@@ -408,19 +374,19 @@ void MainWindow::connectSignals()
             });
 
     // 搜索栏 → 终端搜索高亮（搜索只作用于主终端/混合模式终端）
-    connect(m_searchBar, &TerminalSearchBar::searchRequested,
+    connect(m_panelManager->searchBar(), &TerminalSearchBar::searchRequested,
             this, &MainWindow::onSearchRequested);
-    connect(m_searchBar, &TerminalSearchBar::searchCleared,
+    connect(m_panelManager->searchBar(), &TerminalSearchBar::searchCleared,
             this, &MainWindow::onSearchCleared);
-    connect(m_searchBar, &TerminalSearchBar::closed, this, [this]() {
-        m_terminal->clearSearchHighlight();
+    connect(m_panelManager->searchBar(), &TerminalSearchBar::closed, this, [this]() {
+        m_panelManager->terminal()->clearSearchHighlight();
     });
 
     // 搜索匹配结果 → 搜索栏显示匹配计数（如 "3/15"）
     // 分栏模式下不连接分栏终端的搜索信号（搜索功能仅作用于主终端）
-    connect(m_terminal, &TerminalWidget::searchMatchesChanged,
+    connect(m_panelManager->terminal(), &TerminalWidget::searchMatchesChanged,
             this, [this](int total, int current) {
-                m_searchBar->setResultText(total == 0 ? QString() :
+                m_panelManager->searchBar()->setResultText(total == 0 ? QString() :
                     tr("%1/%2").arg(current + 1).arg(total));
             });
     // 定时刷新数据统计面板
@@ -428,17 +394,17 @@ void MainWindow::connectSignals()
 
     // 协议桥 → 协议视图 + 波形图（帧数据分发）
     connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
-            m_protocolView, &ProtocolView::onFrameParsed);
+            m_panelManager->protocolView(), &ProtocolView::onFrameParsed);
     connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameError,
-            m_protocolView, &ProtocolView::onFrameError);
+            m_panelManager->protocolView(), &ProtocolView::onFrameError);
     connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
-            m_chartWidget->model(), &ChartModel::onFrameParsed);
+            m_panelManager->chartWidget()->model(), &ChartModel::onFrameParsed);
 
     // 帧编辑器 → 更新帧解析器定义 + 波形图通道配置
-    connect(m_frameEditor, &FrameVisualEditor::definitionChanged,
+    connect(m_panelManager->frameEditor(), &FrameVisualEditor::definitionChanged,
             this, [this](const FrameDefinition& def) {
                 m_frameParser->setDefinition(def);
-                m_chartWidget->configureFromFrameDefinition(def);
+                m_panelManager->chartWidget()->configureFromFrameDefinition(def);
             });
 
     // 导航树点击 → 面板切换
@@ -491,7 +457,7 @@ void MainWindow::onTimestampToggled(bool checked)
 void MainWindow::onClearTerminal()
 {
     m_terminalModel->clear();
-    m_dataStats->reset();
+    m_panelManager->dataStats()->reset();
     updateStatusBar();
 }
 
@@ -541,13 +507,13 @@ void MainWindow::onExportData()
  */
 void MainWindow::onSearchRequested(const QString& pattern, bool regex, bool hex)
 {
-    m_terminal->setSearchHighlight(pattern, regex, hex);
+    m_panelManager->terminal()->setSearchHighlight(pattern, regex, hex);
 }
 
 /** @brief 清除终端搜索高亮 */
 void MainWindow::onSearchCleared()
 {
-    m_terminal->clearSearchHighlight();
+    m_panelManager->terminal()->clearSearchHighlight();
 }
 
 /**
@@ -606,8 +572,8 @@ void MainWindow::updateStatusBar()
 /** @brief 定时刷新数据统计面板（由 m_statsTimer 每 500ms 触发） */
 void MainWindow::updateDataStatistics()
 {
-    if (m_terminalModel && m_dataStats) {
-        m_dataStats->update(m_terminalModel->rxBytes(), m_terminalModel->txBytes());
+    if (m_terminalModel && m_panelManager->dataStats()) {
+        m_panelManager->dataStats()->update(m_terminalModel->rxBytes(), m_terminalModel->txBytes());
     }
 }
 

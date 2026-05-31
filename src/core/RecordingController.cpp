@@ -1,42 +1,63 @@
+/**
+ * @file RecordingController.cpp
+ * @brief 录制/回放控制器实现 - 管理录制/回放按钮的交互和数据流转发
+ */
+
 #include "RecordingController.h"
 #include "utils/DataLogger.h"
 #include <QToolBar>
 #include <QFileDialog>
 #include <QMessageBox>
 
+/**
+ * @brief 构造录制控制器
+ * 连接 DataLogger 的信号到内部槽，建立录制/回放数据流管道
+ * @param logger 数据日志记录器，底层的录制/回放引擎
+ * @param parent 父对象
+ */
 RecordingController::RecordingController(DataLogger* logger, QObject* parent)
     : QObject(parent)
     , m_logger(logger)
 {
-    // DataLogger信号 → RecordingController槽
+    // DataLogger 信号 → RecordingController 槽
     connect(m_logger, &DataLogger::playbackData,
             this, &RecordingController::onPlaybackData);
     connect(m_logger, &DataLogger::playbackProgress,
             this, &RecordingController::onPlaybackProgress);
     connect(m_logger, &DataLogger::recordingStopped,
             this, &RecordingController::onRecordingStopped);
+    // 回放完成: 恢复按钮状态
     connect(m_logger, &DataLogger::playbackFinished, this, [this]() {
         m_stopPlaybackAction->setEnabled(false);
         m_playbackAction->setEnabled(true);
         emit statusMessage(tr("Playback finished"), 3000);
     });
+    // 错误通知
     connect(m_logger, &DataLogger::error, this, [this](const QString& msg) {
         emit statusMessage(msg, 5000);
     });
 }
 
+/**
+ * @brief 将录制/回放按钮添加到工具栏
+ * 创建四个按钮: 录制(可切换) | 停止录制 | 回放日志 | 停止回放
+ * @param toolbar 主窗口的工具栏
+ */
 void RecordingController::setupActions(QToolBar* toolbar)
 {
-    // 日志录制按钮
+    // 日志录制按钮（可切换: 未录制→开始录制, 录制中→暂停/继续）
     m_recordAction = toolbar->addAction(tr("录制"));
     m_recordAction->setCheckable(true);
     m_recordAction->setChecked(false);
 
+    // 停止录制按钮（仅在录制进行中启用）
     m_stopRecordAction = toolbar->addAction(tr("停止录制"));
     m_stopRecordAction->setEnabled(false);
 
-    // 日志回放按钮
+    // 日志回放按钮（打开文件对话框选择 .edl 日志文件）
     m_playbackAction = toolbar->addAction(tr("回放日志"));
+
+    // 停止回放按钮（仅在回放进行中启用）
     m_stopPlaybackAction = toolbar->addAction(tr("停止回放"));
     m_stopPlaybackAction->setEnabled(false);
 
@@ -51,11 +72,23 @@ void RecordingController::setupActions(QToolBar* toolbar)
             this, &RecordingController::onStopPlayback);
 }
 
+/**
+ * @brief 连接状态变化通知
+ * @param connected true=已连接, false=已断开
+ */
 void RecordingController::setConnected(bool connected)
 {
     m_connected = connected;
 }
 
+/**
+ * @brief 录制按钮切换处理
+ *
+ * 三种状态转换:
+ *   未录制 + 点击 → 开始录制（弹出文件对话框）
+ *   录制中 + 点击 → 暂停录制
+ *   已暂停 + 点击 → 继续录制
+ */
 void RecordingController::onToggleRecording()
 {
     if (m_logger->isRecording()) {
@@ -68,11 +101,12 @@ void RecordingController::onToggleRecording()
             m_recordAction->setText(tr("继续"));
         }
     } else {
-        // 开始录制
+        // 开始录制: 弹出文件对话框选择保存路径
         QString filter = tr("EmbedDebug Log (*.edl);;All files (*.*)");
         QString path = QFileDialog::getSaveFileName(
             nullptr, tr("录制日志"), QString(), filter);
         if (path.isEmpty()) {
+            // 用户取消，恢复按钮状态
             m_recordAction->setChecked(false);
             return;
         }
@@ -85,6 +119,10 @@ void RecordingController::onToggleRecording()
     }
 }
 
+/**
+ * @brief 停止录制按钮处理
+ * 停止录制并恢复所有按钮到初始状态
+ */
 void RecordingController::onStopRecording()
 {
     m_logger->stopRecording();
@@ -93,6 +131,10 @@ void RecordingController::onStopRecording()
     m_stopRecordAction->setEnabled(false);
 }
 
+/**
+ * @brief 打开日志文件并开始回放
+ * 弹出文件对话框选择 .edl 日志文件，开始回放
+ */
 void RecordingController::onOpenPlayback()
 {
     QString filter = tr("EmbedDebug Log (*.edl);;All files (*.*)");
@@ -106,6 +148,10 @@ void RecordingController::onOpenPlayback()
     emit statusMessage(tr("Playing: %1").arg(path));
 }
 
+/**
+ * @brief 停止当前回放
+ * 停止回放并恢复按钮状态
+ */
 void RecordingController::onStopPlayback()
 {
     m_logger->stopPlayback();
@@ -113,17 +159,33 @@ void RecordingController::onStopPlayback()
     m_playbackAction->setEnabled(true);
 }
 
+/**
+ * @brief 回放数据转发
+ * 将 DataLogger 的回放数据转发给 MainWindow 写入终端
+ * @param data 回放的字节数据
+ * @param direction 数据方向: 0=接收(绿色), 1=发送(蓝色)
+ */
 void RecordingController::onPlaybackData(const QByteArray& data, qint64 direction)
 {
-    // 转发给MainWindow处理终端显示
     emit playbackData(data, direction);
 }
 
+/**
+ * @brief 回放进度更新
+ * @param percent 回放进度百分比 (0.0~1.0)
+ */
 void RecordingController::onPlaybackProgress(qreal percent)
 {
     emit statusMessage(tr("Playback: %1%").arg(static_cast<int>(percent * 100)));
 }
 
+/**
+ * @brief 录制停止通知
+ * DataLogger 在录制停止时发出此信号，包含录制统计信息
+ * @param filePath 录制文件路径
+ * @param count 录制的记录数量
+ * @param durationMs 录制总时长（毫秒）
+ */
 void RecordingController::onRecordingStopped(const QString& filePath, int count, qint64 durationMs)
 {
     emit statusMessage(

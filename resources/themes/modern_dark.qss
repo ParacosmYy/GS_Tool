@@ -9,14 +9,14 @@ BackgroundWidget {
     background-color: transparent;
 }
 
-/* 面板半透明背景 - 让磨砂玻璃效果透出来 */
+/* 面板半透明背景 - 让磨砂玻璃效果和背景图透出来 */
 QWidget#serialPanel {
-    background-color: rgba(22, 22, 30, 200);
+    background-color: rgba(22, 22, 30, 160);
     border-radius: 6px;
 }
 
 QWidget#rightWidget {
-    background-color: rgba(22, 22, 30, 120);
+    background-color: rgba(22, 22, 30, 80);
 }
 
 QWidget#rightPanel {
@@ -231,21 +231,19 @@ QComboBox:hover {
 QComboBox::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: center right;
-    width: 20px;
+    width: 24px;
     border: none;
+    border-left: 1px solid #3b4261;
 }
 
 QComboBox::down-arrow {
-    width: 8px;
-    height: 8px;
-    image: none;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 5px solid #a9b1d6;
+    width: 14px;
+    height: 14px;
+    image: url(:/icons/dropdown_arrow.svg);
 }
 
 QComboBox::down-arrow:disabled {
-    border-top-color: #565f89;
+    image: url(:/icons/dropdown_arrow_disabled.svg);
 }
 
 QComboBox:disabled {

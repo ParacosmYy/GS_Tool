@@ -1,3 +1,11 @@
+/**
+ * @file BackgroundSettingsPopup.cpp
+ * @brief 背景设置弹出面板实现 - 磨砂玻璃/透明度/涟漪开关/自定义背景图的实时调节
+ *
+ * 作为浮动弹出窗口（Qt::Popup），点击外部区域自动关闭。
+ * 所有调节实时反映到 BackgroundWidget。
+ */
+
 #include "BackgroundSettingsPopup.h"
 #include "BackgroundWidget.h"
 #include "utils/SettingsManager.h"
@@ -9,8 +17,14 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 
+/**
+ * @brief 构造背景设置弹出面板
+ * 创建所有 UI 控件并连接到 BackgroundWidget 的属性方法
+ * @param bgWidget 被控的背景控件实例
+ * @param parent 父 widget
+ */
 BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWidget* parent)
-    : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
+    : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)  // Popup: 点击外部关闭, Frameless: 无标题栏
     , m_bgWidget(bgWidget)
 {
     setObjectName("bgSettingsPopup");
@@ -21,7 +35,7 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
     mainLayout->setContentsMargins(12, 12, 12, 12);
     mainLayout->setSpacing(8);
 
-    // ---- 模糊半径 ----
+    // ---- 模糊半径滑块 ----
     auto* blurLayout = new QHBoxLayout;
     auto* blurLbl = new QLabel(tr("磨砂模糊:"), this);
     blurLbl->setFixedWidth(70);
@@ -36,12 +50,13 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
     blurLayout->addWidget(m_blurValueLbl);
     mainLayout->addLayout(blurLayout);
 
+    // 滑块值变化 → 实时更新模糊半径和标签显示
     connect(m_blurSlider, &QSlider::valueChanged, this, [this](int val) {
         m_bgWidget->setBlurRadius(val);
         m_blurValueLbl->setText(QString::number(val));
     });
 
-    // ---- 透明度 ----
+    // ---- 背景透明度滑块 ----
     auto* opacityLayout = new QHBoxLayout;
     auto* opacityLbl = new QLabel(tr("背景透明度:"), this);
     opacityLbl->setFixedWidth(70);
@@ -56,6 +71,7 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
     opacityLayout->addWidget(m_opacityValueLbl);
     mainLayout->addLayout(opacityLayout);
 
+    // 滑块值变化 → 实时更新透明度（0~100 映射到 0.0~1.0）
     connect(m_opacitySlider, &QSlider::valueChanged, this, [this](int val) {
         m_bgWidget->setBgOpacity(val / 100.0);
         m_opacityValueLbl->setText(QString::number(val) + "%");
@@ -88,16 +104,20 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
 
     connect(m_resetBtn, &QPushButton::clicked, this, [this]() {
         m_bgWidget->resetToDefault();
-        // 清除用户保存的自定义背景路径
+        // 清除用户保存的自定义背景路径，下次启动加载默认背景
         SettingsManager::instance().remove("background/customImagePath");
         SettingsManager::instance().sync();
         emit resetToDefaultRequested();
     });
 }
 
+/**
+ * @brief 打开文件对话框选择背景图
+ * 记住上次打开的目录，选择后保存路径到 SettingsManager 以便下次启动自动加载
+ */
 void BackgroundSettingsPopup::onSelectBackground()
 {
-    // 打开文件对话框，筛选图片格式
+    // 从设置恢复上次打开的目录，默认为系统图片目录
     QString lastDir = SettingsManager::instance().get(
         "background/lastOpenDir",
         QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)
@@ -126,6 +146,10 @@ void BackgroundSettingsPopup::onSelectBackground()
     emit backgroundImageSelected(filePath);
 }
 
+/**
+ * @brief 从 BackgroundWidget 同步当前值到 UI 控件
+ * 每次显示弹出面板前调用，确保滑块位置与实际值一致
+ */
 void BackgroundSettingsPopup::syncFromWidget()
 {
     m_blurSlider->setValue(int(m_bgWidget->blurRadius()));
@@ -134,6 +158,10 @@ void BackgroundSettingsPopup::syncFromWidget()
     m_opacityValueLbl->setText(QString::number(int(m_bgWidget->bgOpacity() * 100)) + "%");
 }
 
+/**
+ * @brief 隐藏事件处理
+ * 在面板隐藏时发出 hidden() 信号，通知 MainWindow 更新工具栏按钮状态
+ */
 void BackgroundSettingsPopup::hideEvent(QHideEvent* event)
 {
     emit hidden();

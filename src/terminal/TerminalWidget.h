@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTimer>
 #include "TerminalModel.h"
+#include "DirectionFilter.h"
 #include "core/Constants.h"
 
 // 缓存行的完整信息，避免paintEvent中调用lineAt()访问环形缓冲区
@@ -136,10 +137,8 @@ private:
     QColor m_searchHighlightColor;
     QColor m_currentMatchColor;
 
-    // 方向过滤 — 用于分栏模式
-    bool m_directionFiltered = false;   // 是否启用了方向过滤
-    DataDirection m_filterDirection = DataDirection::Rx;  // 过滤方向(仅当m_directionFiltered为true时有效)
-    QVector<int> m_filteredIndices;     // 过滤后的模型行号索引表: m_filteredIndices[显示行号] = 模型行号
+    // 方向过滤 — 用于分栏模式(委托给DirectionFilter处理)
+    DirectionFilter* m_directionFilter; ///< 方向过滤器实例，构造时创建
 
     // 缓存格式化后的行信息（文本+方向+时间戳），避免paintEvent访问环形缓冲区
     mutable QVector<CachedLine> m_cachedLines;

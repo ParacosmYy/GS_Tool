@@ -32,6 +32,7 @@ set(SOURCES
     src/core/SendController.cpp
     src/core/SettingsController.cpp
     src/core/ToolbarController.cpp
+    src/core/PanelManager.cpp
     src/core/BackgroundWidget.cpp
     src/core/BackgroundSettingsPopup.cpp
     src/core/ConnectionManager.cpp
@@ -43,6 +44,7 @@ set(SOURCES
     src/terminal/TerminalWidget.cpp
     src/terminal/TerminalModel.cpp
     src/terminal/TerminalSearchBar.cpp
+    src/terminal/DirectionFilter.cpp
     src/terminal/TerminalLayoutManager.cpp
     src/terminal/TerminalTypes.h
     src/serial/SerialConfigPanel.cpp
@@ -85,6 +87,7 @@ set(HEADERS
     src/core/SendController.h
     src/core/SettingsController.h
     src/core/ToolbarController.h
+    src/core/PanelManager.h
     src/core/BackgroundWidget.h
     src/core/BackgroundSettingsPopup.h
     src/core/ConnectionManager.h
@@ -98,6 +101,7 @@ set(HEADERS
     src/terminal/TerminalWidget.h
     src/terminal/TerminalModel.h
     src/terminal/TerminalSearchBar.h
+    src/terminal/DirectionFilter.h
     src/terminal/TerminalLayoutManager.h
     src/terminal/TerminalTypes.h
     src/serial/SerialConfigPanel.h

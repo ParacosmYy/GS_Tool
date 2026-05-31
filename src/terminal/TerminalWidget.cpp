@@ -10,6 +10,7 @@
 
 TerminalWidget::TerminalWidget(QWidget* parent)
     : QWidget(parent)
+    , m_directionFilter(new DirectionFilter(this))
 {
     // 设置等宽字体
     m_font = QFont("Consolas", 10);
@@ -52,28 +53,27 @@ void TerminalWidget::setModel(TerminalModel* model)
     }
     m_cachedLineCount = 0;
     m_cachedLines.clear();
-    m_filteredIndices.clear();
+    m_directionFilter->reset();
     update();
 }
 
 void TerminalWidget::setDirectionFilter(DataDirection direction)
 {
-    m_directionFiltered = true;
-    m_filterDirection = direction;
+    m_directionFilter->setDirection(direction);
     // 强制重建过滤索引和缓存
     m_cachedLineCount = 0;
     m_cachedLines.clear();
-    m_filteredIndices.clear();
+    m_directionFilter->reset();
     update();
 }
 
 void TerminalWidget::clearDirectionFilter()
 {
-    m_directionFiltered = false;
+    m_directionFilter->clearFilter();
     // 强制重建缓存
     m_cachedLineCount = 0;
     m_cachedLines.clear();
-    m_filteredIndices.clear();
+    m_directionFilter->reset();
     update();
 }
 
@@ -132,7 +132,7 @@ void TerminalWidget::clear()
 {
     m_cachedLines.clear();
     m_cachedLineCount = 0;
-    m_filteredIndices.clear();
+    m_directionFilter->reset();
     update();
 }
 
@@ -144,14 +144,15 @@ QString TerminalWidget::selectedText() const
     int end = qMax(m_selectionStartLine, m_selectionEndLine);
 
     // 方向过滤模式: 从过滤索引表获取选中文本
-    if (m_directionFiltered) {
-        if (m_filteredIndices.isEmpty()) return {};
-        end = qMin(end, m_filteredIndices.size() - 1);
-        if (start >= m_filteredIndices.size()) return {};
+    if (m_directionFilter->isFiltered()) {
+        int filteredCount = m_directionFilter->filteredLineCount();
+        if (filteredCount == 0) return {};
+        end = qMin(end, filteredCount - 1);
+        if (start >= filteredCount) return {};
 
         QStringList lines;
         for (int i = start; i <= end; ++i) {
-            int modelLine = m_filteredIndices[i];
+            int modelLine = m_directionFilter->modelIndex(i);
             if (modelLine >= 0 && modelLine < m_cachedLines.size()) {
                 lines << m_cachedLines[modelLine].text;
             }
@@ -279,13 +280,13 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
     // 获取模型数据行数（不拷贝数据）
     int modelTotalLines = m_model->lineCount();
 
-    // ---- 方向过滤模式: 增量构建过滤索引表，只保留匹配方向的行 ----
-    if (m_directionFiltered) {
+    // ---- 方向过滤模式: 通过DirectionFilter增量构建过滤索引表 ----
+    if (m_directionFilter->isFiltered()) {
         // 环形缓冲区回绕检测: 模型行数减少说明旧数据被驱逐，需全量重建
         if (m_cachedLineCount > modelTotalLines) {
             m_cachedLineCount = 0;
             m_cachedLines.clear();
-            m_filteredIndices.clear();
+            m_directionFilter->reset();
         }
 
         // 增量构建: 只处理新增的模型行
@@ -293,16 +294,15 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
             m_cachedLines.resize(modelTotalLines);
             for (int i = m_cachedLineCount; i < modelTotalLines; ++i) {
                 m_cachedLines[i] = formatToCache(m_model->lineAt(i));
-                // 只将匹配过滤方向的行号加入索引表
-                if (m_cachedLines[i].direction == m_filterDirection) {
-                    m_filteredIndices.append(i);
-                }
             }
+            // 委托DirectionFilter更新过滤索引表
+            m_directionFilter->onDataAppended(modelTotalLines,
+                [this](int idx) { return m_model->lineAt(idx); });
             m_cachedLineCount = modelTotalLines;
         }
 
         // 过滤后的总行数
-        int totalLines = m_filteredIndices.size();
+        int totalLines = m_directionFilter->filteredLineCount();
 
         // 缓存更新后重新搜索
         if (!m_searchPattern.isEmpty() && totalLines > 0) {
@@ -326,7 +326,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
         // 逐行绘制 -- 通过过滤索引表映射到模型行
         int y = 0;
         for (int i = startLine; i < endLine; ++i) {
-            int modelLine = m_filteredIndices[i];
+            int modelLine = m_directionFilter->modelIndex(i);
             const CachedLine& cached = m_cachedLines[modelLine];
             y = paintLine(painter, cached, y, i);
         }
@@ -461,7 +461,7 @@ void TerminalWidget::onDataAppended(int firstNewLine, int count)
 
     // 方向过滤模式: 不在此处更新滚动偏移，由paintEvent统一处理
     // 因为过滤后的行数可能与模型行数不同
-    if (m_directionFiltered) {
+    if (m_directionFilter->isFiltered()) {
         update();
         return;
     }
@@ -481,7 +481,7 @@ void TerminalWidget::onDataCleared()
 {
     m_cachedLines.clear();
     m_cachedLineCount = 0;
-    m_filteredIndices.clear();
+    m_directionFilter->reset();
     m_scrollOffset = 0;
     m_maxScrollOffset = 0;
     m_selectionStartLine = -1;
@@ -493,9 +493,9 @@ void TerminalWidget::updateVisibleRange()
 {
     m_visibleLines = height() / m_lineHeight;
     if (m_model) {
-        if (m_directionFiltered) {
+        if (m_directionFilter->isFiltered()) {
             // 方向过滤模式: 基于过滤后的行数计算滚动范围
-            m_maxScrollOffset = qMax(0, m_filteredIndices.size() - m_visibleLines);
+            m_maxScrollOffset = qMax(0, m_directionFilter->filteredLineCount() - m_visibleLines);
         } else {
             m_maxScrollOffset = qMax(0, m_model->lineCount() - m_visibleLines);
         }
@@ -520,7 +520,8 @@ void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool
     QString searchStr = pattern;
 
     // 方向过滤模式: 只在过滤后的行中搜索
-    if (m_directionFiltered) {
+    if (m_directionFilter->isFiltered()) {
+        int filteredCount = m_directionFilter->filteredLineCount();
         if (hex) {
             QByteArray bytes = HexConverter::fromHexString(pattern);
             if (bytes.isEmpty()) {
@@ -528,8 +529,8 @@ void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool
                 update();
                 return;
             }
-            for (int displayIdx = 0; displayIdx < m_filteredIndices.size(); ++displayIdx) {
-                int modelLine = m_filteredIndices[displayIdx];
+            for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
+                int modelLine = m_directionFilter->modelIndex(displayIdx);
                 QString hexText = HexConverter::toHexString(
                     m_model ? m_model->lineAt(modelLine).data : QByteArray());
                 int pos = 0;
@@ -545,8 +546,8 @@ void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool
                 update();
                 return;
             }
-            for (int displayIdx = 0; displayIdx < m_filteredIndices.size(); ++displayIdx) {
-                int modelLine = m_filteredIndices[displayIdx];
+            for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
+                int modelLine = m_directionFilter->modelIndex(displayIdx);
                 const QString& text = m_cachedLines[modelLine].text;
                 QRegularExpressionMatchIterator it = re.globalMatch(text);
                 while (it.hasNext()) {
@@ -555,8 +556,8 @@ void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool
                 }
             }
         } else {
-            for (int displayIdx = 0; displayIdx < m_filteredIndices.size(); ++displayIdx) {
-                int modelLine = m_filteredIndices[displayIdx];
+            for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
+                int modelLine = m_directionFilter->modelIndex(displayIdx);
                 const QString& text = m_cachedLines[modelLine].text;
                 int pos = 0;
                 while ((pos = text.indexOf(pattern, pos)) >= 0) {
