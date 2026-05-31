@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget* parent)
     , m_dataExporter(new DataExporter(this))
     , m_statsTimer(new QTimer(this))
     , m_frameParser(new FrameParser(this))
+    , m_otaManager(new OtaManager(this))
 {
     setupUI();
     setupToolbar();
@@ -83,6 +84,9 @@ void MainWindow::setupUI()
     serialItem->appendRow(protocolItem);
     serialItem->appendRow(frameEditorItem);
     serialItem->appendRow(chartItem);
+    auto* otaItem = new QStandardItem(tr("OTA"));
+    otaItem->setEditable(false);
+    serialItem->appendRow(otaItem);
 
     // 网络分组
     auto* networkItem = new QStandardItem(tr("Network"));
@@ -152,6 +156,11 @@ void MainWindow::setupUI()
     m_chartWidget = new ChartWidget;
     m_chartWidget->setVisible(false);
     serialLayout->addWidget(m_chartWidget);
+
+    // OTA升级面板(点击"OTA"时显示)
+    m_otaWidget = new OtaWidget(m_otaManager);
+    m_otaWidget->setVisible(false);
+    serialLayout->addWidget(m_otaWidget);
 
     // 终端容器: 搜索栏 + 终端
     auto* terminalContainer = new QWidget;
@@ -351,16 +360,25 @@ void MainWindow::connectSignals()
             m_terminal->setVisible(false);
             m_dataStats->setVisible(false);
             m_protocolView->setVisible(false);
+            m_frameEditor->setVisible(false);
+            m_chartWidget->setVisible(false);
+            m_otaWidget->setVisible(false);
         } else if (text == tr("Terminal")) {
             m_serialConfig->setVisible(false);
             m_terminal->setVisible(true);
             m_dataStats->setVisible(false);
             m_protocolView->setVisible(false);
+            m_frameEditor->setVisible(false);
+            m_chartWidget->setVisible(false);
+            m_otaWidget->setVisible(false);
         } else if (text == tr("Statistics")) {
             m_serialConfig->setVisible(false);
             m_terminal->setVisible(false);
             m_dataStats->setVisible(true);
             m_protocolView->setVisible(false);
+            m_frameEditor->setVisible(false);
+            m_chartWidget->setVisible(false);
+            m_otaWidget->setVisible(false);
         } else if (text == tr("Protocol")) {
             m_serialConfig->setVisible(false);
             m_terminal->setVisible(false);
@@ -368,6 +386,7 @@ void MainWindow::connectSignals()
             m_protocolView->setVisible(true);
             m_frameEditor->setVisible(false);
             m_chartWidget->setVisible(false);
+            m_otaWidget->setVisible(false);
         } else if (text == tr("Frame Editor")) {
             m_serialConfig->setVisible(false);
             m_terminal->setVisible(false);
@@ -375,6 +394,7 @@ void MainWindow::connectSignals()
             m_protocolView->setVisible(false);
             m_frameEditor->setVisible(true);
             m_chartWidget->setVisible(false);
+            m_otaWidget->setVisible(false);
         } else if (text == tr("Chart")) {
             m_serialConfig->setVisible(false);
             m_terminal->setVisible(false);
@@ -382,6 +402,15 @@ void MainWindow::connectSignals()
             m_protocolView->setVisible(false);
             m_frameEditor->setVisible(false);
             m_chartWidget->setVisible(true);
+            m_otaWidget->setVisible(false);
+        } else if (text == tr("OTA")) {
+            m_serialConfig->setVisible(false);
+            m_terminal->setVisible(false);
+            m_dataStats->setVisible(false);
+            m_protocolView->setVisible(false);
+            m_frameEditor->setVisible(false);
+            m_chartWidget->setVisible(false);
+            m_otaWidget->setVisible(true);
         } else if (text == tr("Data Export")) {
             onExportData();
         } else if (text == tr("TCP Client")) {
@@ -485,6 +514,9 @@ void MainWindow::onConnectSerial()
         m_currentConn = nullptr;
         return;
     }
+
+    // 同步连接到OTA管理器
+    m_otaManager->setConnection(m_currentConn);
 }
 
 void MainWindow::onDisconnectSerial()

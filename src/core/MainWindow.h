@@ -29,6 +29,8 @@
 #include "protocol/ProtocolView.h"
 #include "protocol/FrameVisualEditor.h"
 #include "chart/ChartWidget.h"
+#include "ota/OtaManager.h"
+#include "ota/OtaWidget.h"
 #include "Constants.h"
 
 // 主窗口 - 左侧导航树 + 右侧功能面板
@@ -142,6 +144,10 @@ private:
 
     // UI组件 - 波形图
     ChartWidget* m_chartWidget;
+
+    // UI组件 - OTA升级
+    OtaManager* m_otaManager;
+    OtaWidget* m_otaWidget;
 
     // UI组件 - 状态栏
     QLabel* m_connStatusLbl;
