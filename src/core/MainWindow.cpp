@@ -5,7 +5,6 @@
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QGroupBox>
-#include <QStandardItemModel>
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QApplication>
@@ -14,12 +13,8 @@
 #include <QTimer>
 #include <QShortcut>
 #include <QKeySequence>
-#include <QPropertyAnimation>
-#include <QGraphicsOpacityEffect>
 #include <QTranslator>
 #include <QDir>
-#include <QPainter>
-#include <QPixmap>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -29,18 +24,30 @@ MainWindow::MainWindow(QWidget* parent)
     , m_sendHistory(new SendHistory(this))
     , m_dataExporter(new DataExporter(this))
     , m_dataLogger(new DataLogger(this))
+    , m_recordingController(new RecordingController(m_dataLogger, this))
     , m_statsTimer(new QTimer(this))
     , m_frameParser(new FrameParser(this))
     , m_otaManager(new OtaManager(this))
+    , m_navController(new NavigationController(this))
 {
     setupUI();
     setupToolbar();
     setupStatusBar();
-    buildNavPanelMappings();
     connectSignals();
 
+    // 构建面板映射表并传递给NavigationController构建导航树
+    m_navController->buildNavTree(m_navTree, {
+        {QT_TRANSLATE_NOOP("MainWindow", "配置"),       m_serialConfig},
+        {QT_TRANSLATE_NOOP("MainWindow", "终端"),       m_terminal},
+        {QT_TRANSLATE_NOOP("MainWindow", "统计"),       m_dataStats},
+        {QT_TRANSLATE_NOOP("MainWindow", "协议"),       m_protocolView},
+        {QT_TRANSLATE_NOOP("MainWindow", "帧编辑器"),   m_frameEditor},
+        {QT_TRANSLATE_NOOP("MainWindow", "波形图"),     m_chartWidget},
+        {QT_TRANSLATE_NOOP("MainWindow", "OTA升级"),    m_otaWidget},
+    });
+
     // 初始面板状态: 终端为默认可见面板
-    m_currentPanel = m_terminal;
+    m_navController->setCurrentPanel(m_terminal);
 
     // 加载保存的设置（主题、窗口几何、串口配置）
     loadSettings();
@@ -59,88 +66,18 @@ MainWindow::~MainWindow()
 {
 }
 
-// 创建导航树连接类型指示圆点图标（8x8透明底+抗锯齿彩色圆）
-static QIcon createDotIcon(const QColor& color)
-{
-    QPixmap dot(8, 8);
-    dot.fill(Qt::transparent);
-    QPainter painter(&dot);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setBrush(color);
-    painter.setPen(Qt::NoPen);
-    painter.drawEllipse(1, 1, 6, 6);
-    return QIcon(dot);
-}
-
 void MainWindow::setupUI()
 {
     m_mainSplitter = new QSplitter(Qt::Horizontal, this);
     setCentralWidget(m_mainSplitter);
 
-    // ---- 左侧导航树 ----
+    // ---- 左侧导航树（模型由NavigationController构建） ----
     m_navTree = new QTreeView;
     m_navTree->setObjectName("navTree");
     m_navTree->setHeaderHidden(true);
     m_navTree->setMinimumWidth(180);
     m_navTree->setMaximumWidth(280);
     m_navTree->setIndentation(16);
-
-    auto* treeModel = new QStandardItemModel(this);
-    auto* rootItem = treeModel->invisibleRootItem();
-
-    // 串口分组 — 蓝色圆点
-    auto* serialItem = new QStandardItem(createDotIcon(QColor(NavColors::kSerialDot)), tr("串口"));
-    serialItem->setEditable(false);
-    auto* configItem = new QStandardItem(tr("配置"));
-    configItem->setEditable(false);
-    auto* terminalItem = new QStandardItem(tr("终端"));
-    terminalItem->setEditable(false);
-    auto* statsItem = new QStandardItem(tr("统计"));
-    statsItem->setEditable(false);
-    serialItem->appendRow(configItem);
-    serialItem->appendRow(terminalItem);
-    serialItem->appendRow(statsItem);
-    auto* protocolItem = new QStandardItem(tr("协议"));
-    protocolItem->setEditable(false);
-    auto* frameEditorItem = new QStandardItem(tr("帧编辑器"));
-    frameEditorItem->setEditable(false);
-    auto* chartItem = new QStandardItem(tr("波形图"));
-    chartItem->setEditable(false);
-    serialItem->appendRow(protocolItem);
-    serialItem->appendRow(frameEditorItem);
-    serialItem->appendRow(chartItem);
-    auto* otaItem = new QStandardItem(tr("OTA升级"));
-    otaItem->setEditable(false);
-    serialItem->appendRow(otaItem);
-
-    // 网络分组
-    auto* networkItem = new QStandardItem(tr("网络"));
-    networkItem->setEditable(false);
-    // TCP客户端/服务端 — 绿色圆点
-    auto* tcpClientItem = new QStandardItem(createDotIcon(QColor(NavColors::kTcpDot)), tr("TCP客户端"));
-    tcpClientItem->setEditable(false);
-    auto* tcpServerItem = new QStandardItem(createDotIcon(QColor(NavColors::kTcpDot)), tr("TCP服务端"));
-    tcpServerItem->setEditable(false);
-    // UDP — 黄色圆点
-    auto* udpItem = new QStandardItem(createDotIcon(QColor(NavColors::kUdpDot)), tr("UDP"));
-    udpItem->setEditable(false);
-    networkItem->appendRow(tcpClientItem);
-    networkItem->appendRow(tcpServerItem);
-    networkItem->appendRow(udpItem);
-
-    // 工具分组
-    auto* toolsItem = new QStandardItem(tr("工具"));
-    toolsItem->setEditable(false);
-    auto* exportItem = new QStandardItem(tr("数据导出"));
-    exportItem->setEditable(false);
-    toolsItem->appendRow(exportItem);
-
-    rootItem->appendRow(serialItem);
-    rootItem->appendRow(networkItem);
-    rootItem->appendRow(toolsItem);
-
-    m_navTree->setModel(treeModel);
-    m_navTree->expandAll();
 
     m_mainSplitter->addWidget(m_navTree);
 
@@ -285,18 +222,8 @@ void MainWindow::setupToolbar()
 
     m_toolbar->addSeparator();
 
-    // 日志录制按钮
-    m_recordAction = m_toolbar->addAction(tr("录制"));
-    m_recordAction->setCheckable(true);
-    m_recordAction->setChecked(false);
-
-    m_stopRecordAction = m_toolbar->addAction(tr("停止录制"));
-    m_stopRecordAction->setEnabled(false);
-
-    // 日志回放按钮
-    m_playbackAction = m_toolbar->addAction(tr("回放日志"));
-    m_stopPlaybackAction = m_toolbar->addAction(tr("停止回放"));
-    m_stopPlaybackAction->setEnabled(false);
+    // 日志录制/回放按钮（委托给RecordingController管理）
+    m_recordingController->setupActions(m_toolbar);
 
     m_toolbar->addSeparator();
 
@@ -344,127 +271,6 @@ void MainWindow::setupStatusBar()
     statusBar()->addPermanentWidget(m_txBytesLbl);
 }
 
-void MainWindow::buildNavPanelMappings()
-{
-    // 映射表: 导航树叶子节点名称 → 对应的面板widget
-    // name 字段是翻译键，运行时通过 tr(name) 匹配导航树中翻译后的文本
-    m_navPanelMappings = {
-        {QT_TRANSLATE_NOOP("MainWindow", "配置"),       m_serialConfig},
-        {QT_TRANSLATE_NOOP("MainWindow", "终端"),       m_terminal},
-        {QT_TRANSLATE_NOOP("MainWindow", "统计"),       m_dataStats},
-        {QT_TRANSLATE_NOOP("MainWindow", "协议"),       m_protocolView},
-        {QT_TRANSLATE_NOOP("MainWindow", "帧编辑器"),   m_frameEditor},
-        {QT_TRANSLATE_NOOP("MainWindow", "波形图"),     m_chartWidget},
-        {QT_TRANSLATE_NOOP("MainWindow", "OTA升级"),    m_otaWidget},
-    };
-}
-
-QVector<QWidget*> MainWindow::allSwitchablePanels() const
-{
-    return {m_serialConfig, m_terminal, m_dataStats,
-            m_protocolView, m_frameEditor, m_chartWidget, m_otaWidget};
-}
-
-void MainWindow::switchToPanel(QWidget* newPanel)
-{
-    // 防止动画期间重复触发切换
-    if (m_panelSwitching) return;
-
-    // 如果目标是当前已显示的面板，无需切换
-    if (m_currentPanel == newPanel) return;
-
-    QWidget* oldPanel = m_currentPanel;
-
-    // 更新当前面板追踪
-    m_currentPanel = newPanel;
-
-    // 隐藏所有非当前、非旧面板，并清除残留的 opacity effect
-    for (auto* w : allSwitchablePanels()) {
-        if (w && w != newPanel && w != oldPanel) {
-            if (w->graphicsEffect()) {
-                w->setGraphicsEffect(nullptr);
-            }
-            w->setVisible(false);
-        }
-    }
-
-    if (!newPanel) return;
-
-    // 如果有旧面板且旧面板可见，执行: 淡出旧面板 → 显示新面板 → 淡入新面板
-    if (oldPanel && oldPanel->isVisible()) {
-        m_panelSwitching = true;
-
-        // 旧面板: 200ms InCubic opacity 1.0 → 0.0 淡出
-        QGraphicsOpacityEffect* fadeOutEffect = new QGraphicsOpacityEffect(oldPanel);
-        oldPanel->setGraphicsEffect(fadeOutEffect);
-
-        QPropertyAnimation* fadeOut = new QPropertyAnimation(fadeOutEffect, "opacity");
-        fadeOut->setStartValue(1.0);
-        fadeOut->setEndValue(0.0);
-        fadeOut->setDuration(200);
-        fadeOut->setEasingCurve(QEasingCurve::InCubic);
-
-        // 淡出完成后: 隐藏旧面板 → 显示新面板 → 淡入新面板
-        connect(fadeOut, &QPropertyAnimation::finished, this, [this, oldPanel, newPanel]() {
-            // 清除旧面板的 effect 并隐藏
-            if (oldPanel->graphicsEffect()) {
-                oldPanel->setGraphicsEffect(nullptr);
-            }
-            oldPanel->setVisible(false);
-
-            // 显示新面板
-            newPanel->setVisible(true);
-
-            // 新面板: 250ms OutCubic opacity 0.0 → 1.0 淡入
-            QGraphicsOpacityEffect* fadeInEffect = new QGraphicsOpacityEffect(newPanel);
-            fadeInEffect->setOpacity(0.0);
-            newPanel->setGraphicsEffect(fadeInEffect);
-
-            QPropertyAnimation* fadeIn = new QPropertyAnimation(fadeInEffect, "opacity");
-            fadeIn->setStartValue(0.0);
-            fadeIn->setEndValue(1.0);
-            fadeIn->setDuration(250);
-            fadeIn->setEasingCurve(QEasingCurve::OutCubic);
-
-            // 淡入完成后清除 effect，恢复正常绘制性能
-            connect(fadeIn, &QPropertyAnimation::finished, newPanel, [newPanel, fadeInEffect]() {
-                if (newPanel->graphicsEffect() == fadeInEffect) {
-                    newPanel->setGraphicsEffect(nullptr);
-                }
-            });
-
-            connect(fadeIn, &QPropertyAnimation::finished, this, [this]() {
-                m_panelSwitching = false;
-            });
-
-            fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
-        });
-
-        fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
-    } else {
-        // 无旧面板（首次切换或旧面板已隐藏），直接淡入新面板
-        newPanel->setVisible(true);
-
-        QGraphicsOpacityEffect* fadeInEffect = new QGraphicsOpacityEffect(newPanel);
-        fadeInEffect->setOpacity(0.0);
-        newPanel->setGraphicsEffect(fadeInEffect);
-
-        QPropertyAnimation* fadeIn = new QPropertyAnimation(fadeInEffect, "opacity");
-        fadeIn->setStartValue(0.0);
-        fadeIn->setEndValue(1.0);
-        fadeIn->setDuration(250);
-        fadeIn->setEasingCurve(QEasingCurve::OutCubic);
-
-        connect(fadeIn, &QPropertyAnimation::finished, newPanel, [newPanel, fadeInEffect]() {
-            if (newPanel->graphicsEffect() == fadeInEffect) {
-                newPanel->setGraphicsEffect(nullptr);
-            }
-        });
-
-        fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
-    }
-}
-
 void MainWindow::connectSignals()
 {
     // 串口连接/断开
@@ -488,25 +294,21 @@ void MainWindow::connectSignals()
     connect(m_clearAction, &QAction::triggered, this, &MainWindow::onClearTerminal);
     connect(m_exportAction, &QAction::triggered, this, &MainWindow::onExportData);
 
-    // 日志录制/回放
-    connect(m_recordAction, &QAction::toggled, this, &MainWindow::onToggleRecording);
-    connect(m_stopRecordAction, &QAction::triggered, this, &MainWindow::onStopRecording);
-    connect(m_playbackAction, &QAction::triggered, this, &MainWindow::onOpenPlayback);
-    connect(m_stopPlaybackAction, &QAction::triggered, this, &MainWindow::onStopPlayback);
-    connect(m_dataLogger, &DataLogger::playbackData,
-            this, &MainWindow::onPlaybackData);
-    connect(m_dataLogger, &DataLogger::playbackProgress,
-            this, &MainWindow::onPlaybackProgress);
-    connect(m_dataLogger, &DataLogger::recordingStopped,
-            this, &MainWindow::onRecordingStopped);
-    connect(m_dataLogger, &DataLogger::playbackFinished, this, [this]() {
-        m_stopPlaybackAction->setEnabled(false);
-        m_playbackAction->setEnabled(true);
-        statusBar()->showMessage(tr("Playback finished"), 3000);
-    });
-    connect(m_dataLogger, &DataLogger::error, this, [this](const QString& msg) {
-        statusBar()->showMessage(msg, 5000);
-    });
+    // 日志录制/回放: RecordingController内部已连接DataLogger信号
+    // 仅连接外部通知信号 → MainWindow
+    connect(m_recordingController, &RecordingController::statusMessage,
+            this, [this](const QString& msg, int timeoutMs) {
+                statusBar()->showMessage(msg, timeoutMs);
+            });
+    connect(m_recordingController, &RecordingController::playbackData,
+            this, [this](const QByteArray& data, qint64 direction) {
+                if (direction == 0) {
+                    m_terminalModel->appendReceived(data);
+                } else {
+                    m_terminalModel->appendSent(data);
+                }
+                updateStatusBar();
+            });
 
     // 主题切换
     connect(m_themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -555,7 +357,7 @@ void MainWindow::connectSignals()
                 m_chartWidget->configureFromFrameDefinition(def);
             });
 
-    // 导航树点击切换面板 — 数据驱动映射表查找，无 if-else 链
+    // 导航树点击切换面板 — 委托NavigationController处理面板切换
     connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
         QString text = index.data().toString();
 
@@ -565,20 +367,14 @@ void MainWindow::connectSignals()
         if (text == tr("TCP服务端")) { onConnectNetwork(ConnectionType::TcpServer); return; }
         if (text == tr("UDP")) { onConnectNetwork(ConnectionType::Udp); return; }
 
-        // 通过映射表查找目标面板widget
-        QWidget* target = nullptr;
-        for (const auto& mapping : m_navPanelMappings) {
-            if (text == tr(mapping.name)) {
-                target = mapping.widget;
-                break;
-            }
-        }
+        // 通过NavigationController映射表查找目标面板widget
+        QWidget* target = m_navController->lookupPanel(text);
 
         // 未匹配的面板节点（如分组节点"串口""网络""工具"），忽略
         if (!target) return;
 
-        // 调用统一的带动画面板切换方法
-        switchToPanel(target);
+        // 委托NavigationController执行面板切换动画
+        m_navController->switchToPanel(target);
     });
 }
 
@@ -887,25 +683,25 @@ void MainWindow::onConnectionStateChanged(ConnectionState state)
         stateStr = "connected";
         m_serialConfig->setConnected(true);
         // 连接成功后自动切换到终端面板（带动画）
-        switchToPanel(m_terminal);
-        stopBreathingAnimation();
+        m_navController->switchToPanel(m_terminal);
+        m_navController->stopBreathingAnimation(m_connStatusLbl);
         break;
     case ConnectionState::Disconnected:
         m_connStatusLbl->setText(tr("未连接"));
         stateStr = "disconnected";
         m_serialConfig->setConnected(false);
-        stopBreathingAnimation();
+        m_navController->stopBreathingAnimation(m_connStatusLbl);
         break;
     case ConnectionState::Connecting:
         m_connStatusLbl->setText(tr("连接中..."));
         stateStr = "connecting";
-        startBreathingAnimation();
+        m_navController->startBreathingAnimation(m_connStatusLbl);
         break;
     case ConnectionState::Error:
         m_connStatusLbl->setText(tr("连接错误"));
         stateStr = "error";
         m_serialConfig->setConnected(false);
-        stopBreathingAnimation();
+        m_navController->stopBreathingAnimation(m_connStatusLbl);
         break;
     }
     m_connStatusLbl->setProperty("state", stateStr);
@@ -943,56 +739,10 @@ void MainWindow::updateDataStatistics()
     }
 }
 
-void MainWindow::startBreathingAnimation()
-{
-    // 如果已有呼吸动画在运行，不重复创建
-    if (m_breathingAnim && m_breathingAnim->state() == QAbstractAnimation::Running) {
-        return;
-    }
-
-    // 为状态标签创建透明度效果
-    if (!m_connStatusEffect) {
-        m_connStatusEffect = new QGraphicsOpacityEffect(m_connStatusLbl);
-        m_connStatusLbl->setGraphicsEffect(m_connStatusEffect);
-    }
-    m_connStatusEffect->setOpacity(1.0);
-
-    // 创建呼吸脉冲动画: 1500ms循环, InOutSine, opacity 0.3 ↔ 1.0
-    if (m_breathingAnim) {
-        m_breathingAnim->stop();
-        delete m_breathingAnim;
-    }
-    m_breathingAnim = new QPropertyAnimation(m_connStatusEffect, "opacity");
-    m_breathingAnim->setStartValue(0.3);
-    m_breathingAnim->setEndValue(1.0);
-    m_breathingAnim->setDuration(1500);
-    m_breathingAnim->setEasingCurve(QEasingCurve::InOutSine);
-    m_breathingAnim->setLoopCount(-1);  // 无限循环
-    // 注意: loopCount=-1 时动画不会自行停止，所以不能用 DeleteWhenStopped。
-    // 生命周期由 startBreathingAnimation/stopBreathingAnimation 手动管理。
-    m_breathingAnim->start();
-}
-
-void MainWindow::stopBreathingAnimation()
-{
-    if (m_breathingAnim) {
-        m_breathingAnim->stop();
-        delete m_breathingAnim;
-        m_breathingAnim = nullptr;
-    }
-    // 恢复状态标签完全不透明
-    if (m_connStatusEffect) {
-        m_connStatusEffect->setOpacity(1.0);
-        m_connStatusLbl->setGraphicsEffect(nullptr);
-        delete m_connStatusEffect;
-        m_connStatusEffect = nullptr;
-    }
-}
-
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     // 停止呼吸动画
-    stopBreathingAnimation();
+    m_navController->stopBreathingAnimation(m_connStatusLbl);
 
     // 停止录制/回放
     if (m_dataLogger->isRecording()) m_dataLogger->stopRecording();
@@ -1009,84 +759,4 @@ void MainWindow::closeEvent(QCloseEvent* event)
     event->accept();
 }
 
-void MainWindow::onToggleRecording()
-{
-    if (m_dataLogger->isRecording()) {
-        // 正在录制 → 暂停
-        if (m_dataLogger->isPaused()) {
-            m_dataLogger->resumeRecording();
-            m_recordAction->setText(tr("Pause"));
-        } else {
-            m_dataLogger->pauseRecording();
-            m_recordAction->setText(tr("Resume"));
-        }
-    } else {
-        // 开始录制
-        QString filter = tr("EmbedDebug Log (*.edl);;All files (*.*)");
-        QString path = QFileDialog::getSaveFileName(this, tr("Record Log"),
-                                                     QString(), filter);
-        if (path.isEmpty()) {
-            m_recordAction->setChecked(false);
-            return;
-        }
-        if (!path.endsWith(".edl")) path += ".edl";
 
-        m_dataLogger->startRecording(path);
-        m_stopRecordAction->setEnabled(true);
-        m_recordAction->setText(tr("Pause"));
-        statusBar()->showMessage(tr("Recording: %1").arg(path));
-    }
-}
-
-void MainWindow::onStopRecording()
-{
-    m_dataLogger->stopRecording();
-    m_recordAction->setChecked(false);
-    m_recordAction->setText(tr("Record"));
-    m_stopRecordAction->setEnabled(false);
-}
-
-void MainWindow::onOpenPlayback()
-{
-    QString filter = tr("EmbedDebug Log (*.edl);;All files (*.*)");
-    QString path = QFileDialog::getOpenFileName(this, tr("Open Log for Playback"),
-                                                  QString(), filter);
-    if (path.isEmpty()) return;
-
-    m_dataLogger->startPlayback(path);
-    m_stopPlaybackAction->setEnabled(true);
-    m_playbackAction->setEnabled(false);
-    statusBar()->showMessage(tr("Playing: %1").arg(path));
-}
-
-void MainWindow::onStopPlayback()
-{
-    m_dataLogger->stopPlayback();
-    m_stopPlaybackAction->setEnabled(false);
-    m_playbackAction->setEnabled(true);
-}
-
-void MainWindow::onPlaybackData(const QByteArray& data, qint64 direction)
-{
-    if (direction == 0) {
-        m_terminalModel->appendReceived(data);
-    } else {
-        m_terminalModel->appendSent(data);
-    }
-    updateStatusBar();
-}
-
-void MainWindow::onPlaybackProgress(qreal percent)
-{
-    statusBar()->showMessage(tr("Playback: %1%").arg(static_cast<int>(percent * 100)));
-}
-
-void MainWindow::onRecordingStopped(const QString& filePath, int count, qint64 durationMs)
-{
-    statusBar()->showMessage(
-        tr("Recording saved: %1 (%2 records, %3s)")
-            .arg(filePath)
-            .arg(count)
-            .arg(durationMs / 1000.0, 0, 'f', 1),
-        5000);
-}

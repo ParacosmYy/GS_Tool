@@ -415,10 +415,8 @@ QPushButton#searchBarCloseBtn:pressed { background: #7aa2f7; }
 QLineEdit#sendInput[hasError="true"] { border: 2px solid #f7768e; }
 
 /* === ProtocolView 协议解析面板 === */
+QWidget#protocolView { background-color: #1a1b26; }
 QWidget#protocolToolbar {
-    background-color: #16161e;
-    border-bottom: 1px solid #292e42;
-}
 QLabel#protocolStatusLabel {
     color: #565f89;
     font-size: 12px;

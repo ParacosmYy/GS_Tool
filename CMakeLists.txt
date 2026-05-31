@@ -26,6 +26,8 @@ find_package(Qt6 REQUIRED COMPONENTS
 set(SOURCES
     src/main.cpp
     src/core/MainWindow.cpp
+    src/core/RecordingController.cpp
+    src/core/NavigationController.cpp
     src/core/ConnectionManager.cpp
     src/core/ConnectionFactory.cpp
     src/core/ThemeManager.cpp
@@ -66,6 +68,8 @@ set(SOURCES
 
 set(HEADERS
     src/core/MainWindow.h
+    src/core/RecordingController.h
+    src/core/NavigationController.h
     src/core/ConnectionManager.h
     src/core/ConnectionFactory.h
     src/core/ThemeManager.h

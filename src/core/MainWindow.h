@@ -13,8 +13,6 @@
 #include <QComboBox>
 #include <QAction>
 #include <QCompleter>
-#include <QPropertyAnimation>
-#include <QGraphicsOpacityEffect>
 #include <QVector>
 #include <functional>
 #include "ConnectionManager.h"
@@ -28,6 +26,8 @@
 #include "serial/DataStatistics.h"
 #include "utils/DataExporter.h"
 #include "utils/DataLogger.h"
+#include "core/RecordingController.h"
+#include "core/NavigationController.h"
 #include "utils/SettingsManager.h"
 #include "terminal/TerminalSearchBar.h"
 #include "protocol/FrameParser.h"
@@ -37,14 +37,6 @@
 #include "ota/OtaManager.h"
 #include "ota/OtaWidget.h"
 #include "Constants.h"
-
-// 导航树 → 面板映射条目
-// name: 导航树叶子节点的显示文本（使用裸字符串，运行时通过 tr() 匹配翻译后的值）
-// widget: 对应的面板 QWidget 指针（在 buildNavPanelMappings 中绑定）
-struct NavPanelMapping {
-    const char* name;       // 翻译键，传给 tr() 进行运行时翻译匹配
-    QWidget* widget;        // 目标面板指针
-};
 
 // 主窗口 - 左侧导航树 + 右侧功能面板
 // IDE风格布局，支持多连接Tab切换
@@ -100,15 +92,6 @@ private slots:
     // 接收到数据
     void onDataReceived(const QByteArray& data);
 
-    // 日志录制/回放
-    void onToggleRecording();
-    void onStopRecording();
-    void onOpenPlayback();
-    void onStopPlayback();
-    void onPlaybackData(const QByteArray& data, qint64 direction);
-    void onPlaybackProgress(qreal percent);
-    void onRecordingStopped(const QString& filePath, int count, qint64 duration);
-
 private:
     void setupUI();
     void setupToolbar();
@@ -122,15 +105,6 @@ private:
     // 统一发送方法: 写入连接 + 记录终端 + 日志 + 更新状态栏，返回是否成功写入
     bool sendAndRecord(const QByteArray& data, bool isHex = false);
 
-    // 构建导航树名称 → 面板widget的映射表（在所有面板创建完成后调用）
-    void buildNavPanelMappings();
-
-    // 面板切换: 带淡出旧面板 + 淡入新面板动画
-    void switchToPanel(QWidget* newPanel);
-
-    // 收集所有可切换面板widget（用于全部隐藏）
-    QVector<QWidget*> allSwitchablePanels() const;
-
     // 核心组件
     ConnectionManager* m_connManager;
 
@@ -142,6 +116,7 @@ private:
     SendHistory* m_sendHistory;
     DataExporter* m_dataExporter;
     DataLogger* m_dataLogger;
+    RecordingController* m_recordingController;
 
     // UI组件 - 布局
     QSplitter* m_mainSplitter;
@@ -156,10 +131,6 @@ private:
     QAction* m_timestampAction;
     QAction* m_clearAction;
     QAction* m_exportAction;
-    QAction* m_recordAction;
-    QAction* m_stopRecordAction;
-    QAction* m_playbackAction;
-    QAction* m_stopPlaybackAction;
 
     // UI组件 - 串口配置
     SerialConfigPanel* m_serialConfig;
@@ -204,22 +175,8 @@ private:
     // 统计定时器
     QTimer* m_statsTimer;
 
-    // 连接状态呼吸动画（connecting状态时脉冲闪烁）
-    QPropertyAnimation* m_breathingAnim = nullptr;
-    QGraphicsOpacityEffect* m_connStatusEffect = nullptr;
-
-    // 启动/停止连接状态呼吸动画
-    void startBreathingAnimation();
-    void stopBreathingAnimation();
-
-    // 导航面板映射表（数据驱动，消除 if-else 链）
-    QVector<NavPanelMapping> m_navPanelMappings;
-
-    // 当前显示的面板（用于淡出动画）
-    QWidget* m_currentPanel = nullptr;
-
-    // 是否正在执行面板切换动画（防止动画期间重复触发切换）
-    bool m_panelSwitching = false;
+    // 导航控制器（面板切换动画 + 呼吸动画 + 导航树构建）
+    NavigationController* m_navController;
 };
 
 #endif // MAINWINDOW_H

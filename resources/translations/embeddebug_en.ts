@@ -223,6 +223,61 @@
         <source>Cannot establish network connection</source>
         <translation>Cannot establish network connection</translation>
     </message>
+    <message>
+        <source>Open Log for Playback</source>
+        <translation>Open Log for Playback</translation>
+    </message>
+    <message>
+        <source>Playback: %1%</source>
+        <translation>Playback: %1%</translation>
+    </message>
+    <message>
+        <source>Playing: %1</source>
+        <translation>Playing: %1</translation>
+    </message>
+    <message>
+        <source>Recording saved: %1 (%2 records, %3s)</source>
+        <translation>Recording saved: %1 (%2 records, %3s)</translation>
+    </message>
+</context>
+<context>
+    <name>ChartWidget</name>
+    <message>
+        <source>Channels: %1 | Frames: %2</source>
+        <translation>Channels: %1 | Frames: %2</translation>
+    </message>
+    <message>
+        <source>Channels: %1</source>
+        <translation>Channels: %1</translation>
+    </message>
+    <message>
+        <source>Channels: 0</source>
+        <translation>Channels: 0</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Clear</translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation>Pause</translation>
+    </message>
+    <message>
+        <source>Resume</source>
+        <translation>Resume</translation>
+    </message>
+    <message>
+        <source>Samples</source>
+        <translation>Samples</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>Value</translation>
+    </message>
+    <message>
+        <source>Window:</source>
+        <translation>Window:</translation>
+    </message>
 </context>
 <context>
     <name>SerialConfigPanel</name>
@@ -393,6 +448,29 @@
     </message>
 </context>
 <context>
+    <name>DataLogger</name>
+    <message>
+        <source>Cannot create log file: %1</source>
+        <translation>Cannot create log file: %1</translation>
+    </message>
+    <message>
+        <source>Cannot open log file: %1</source>
+        <translation>Cannot open log file: %1</translation>
+    </message>
+    <message>
+        <source>Invalid log file format</source>
+        <translation>Invalid log file format</translation>
+    </message>
+    <message>
+        <source>Log file is empty</source>
+        <translation>Log file is empty</translation>
+    </message>
+    <message>
+        <source>Unsupported log version: %1</source>
+        <translation>Unsupported log version: %1</translation>
+    </message>
+</context>
+<context>
     <name>ProtocolView</name>
     <message>
         <source>No frames</source>
@@ -433,6 +511,30 @@
     <message>
         <source>Frames: %1 | Errors: %2</source>
         <translation>Frames: %1 | Errors: %2</translation>
+    </message>
+    <message>
+        <source>Copy Row</source>
+        <translation>Copy Row</translation>
+    </message>
+    <message>
+        <source>Copy Raw</source>
+        <translation>Copy Raw</translation>
+    </message>
+    <message>
+        <source>Export JSON</source>
+        <translation>Export JSON</translation>
+    </message>
+    <message>
+        <source>Row copied</source>
+        <translation>Row copied</translation>
+    </message>
+    <message>
+        <source>Raw data copied</source>
+        <translation>Raw data copied</translation>
+    </message>
+    <message>
+        <source>JSON files (*.json)</source>
+        <translation>JSON files (*.json)</translation>
     </message>
 </context>
 <context>
@@ -533,6 +635,26 @@
         <source>用户已取消传输</source>
         <translation>Transfer cancelled by user</translation>
     </message>
+    <message>
+        <source>ETA: %1</source>
+        <translation>ETA: %1</translation>
+    </message>
+    <message>
+        <source>XMODEM-1K</source>
+        <translation>XMODEM-1K</translation>
+    </message>
+    <message>
+        <source>XMODEM-Checksum</source>
+        <translation>XMODEM-Checksum</translation>
+    </message>
+    <message>
+        <source>YMODEM</source>
+        <translation>YMODEM</translation>
+    </message>
+    <message>
+        <source>ZMODEM</source>
+        <translation>ZMODEM</translation>
+    </message>
 </context>
 <context>
     <name>OtaHistoryModel</name>
@@ -570,6 +692,21 @@
     </message>
 </context>
 <context>
+    <name>QuickCommandBar</name>
+    <message>
+        <source>Edit</source>
+        <translation>Edit</translation>
+    </message>
+    <message>
+        <source>+</source>
+        <translation>+</translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation>Command</translation>
+    </message>
+</context>
+<context>
     <name>DataStatistics</name>
     <message>
         <source>接收统计</source>
@@ -590,6 +727,22 @@
     <message>
         <source>已用时间</source>
         <translation>Elapsed</translation>
+    </message>
+    <message>
+        <source>RX:</source>
+        <translation>RX:</translation>
+    </message>
+    <message>
+        <source>TX:</source>
+        <translation>TX:</translation>
+    </message>
+    <message>
+        <source>Rate:</source>
+        <translation>Rate:</translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation>Time:</translation>
     </message>
 </context>
 </TS>
