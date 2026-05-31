@@ -485,6 +485,7 @@ docs/prd/PRD_<编号>_<简述>.md
 | 5 | 架构审查修复: 悬挂指针+重复代码+反向依赖解耦 | 6 |
 | 6 | TCP Client/Server + UDP网络连接实现 | 7 |
 | 7 | XMODEM协议传输(Checksum/CRC/1K)+OTA管理器+OTA操作面板 | 8 |
+| 8 | YMODEM协议传输(Block 0文件信息+批量传输)+OTA集成 | 9 |
 | ... | 目标: 1000分 | 1000 |
 
 ---

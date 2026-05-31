@@ -49,6 +49,7 @@ set(SOURCES
     src/ota/OtaManager.cpp
     src/ota/OtaWidget.cpp
     src/ota/protocols/XModemTransfer.cpp
+    src/ota/protocols/YModemTransfer.cpp
     src/utils/SettingsManager.cpp
     src/utils/DataExporter.cpp
     src/utils/HexConverter.h
@@ -85,6 +86,7 @@ set(HEADERS
     src/ota/OtaManager.h
     src/ota/OtaWidget.h
     src/ota/protocols/XModemTransfer.h
+    src/ota/protocols/YModemTransfer.h
     src/utils/SettingsManager.h
     src/utils/DataExporter.h
 )

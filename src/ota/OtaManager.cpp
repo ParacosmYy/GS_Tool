@@ -3,6 +3,7 @@
 OtaManager::OtaManager(QObject* parent)
     : QObject(parent)
     , m_xmodem(new XModemTransfer(this))
+    , m_ymodem(new YModemTransfer(this))
 {
     connect(m_xmodem, &XModemTransfer::progress,
             this, &OtaManager::progress);
@@ -10,12 +11,20 @@ OtaManager::OtaManager(QObject* parent)
             this, &OtaManager::transferComplete);
     connect(m_xmodem, &XModemTransfer::transferError,
             this, &OtaManager::transferError);
+
+    connect(m_ymodem, &YModemTransfer::progress,
+            this, &OtaManager::progress);
+    connect(m_ymodem, &YModemTransfer::transferComplete,
+            this, &OtaManager::transferComplete);
+    connect(m_ymodem, &YModemTransfer::transferError,
+            this, &OtaManager::transferError);
 }
 
 void OtaManager::setConnection(IConnection* conn)
 {
     m_conn = conn;
     m_xmodem->setConnection(conn);
+    m_ymodem->setConnection(conn);
 }
 
 bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
@@ -25,7 +34,12 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
         return false;
     }
 
-    // 设置传输模式
+    if (protocol == "ymodem") {
+        m_ymodem->setFilePath(filePath);
+        return m_ymodem->start();
+    }
+
+    // XMODEM模式选择
     if (protocol == "xmodem-checksum") {
         m_xmodem->setMode(XModemTransfer::Checksum);
     } else if (protocol == "xmodem-1k") {
@@ -40,10 +54,15 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
 
 void OtaManager::cancelTransfer()
 {
-    m_xmodem->cancel();
+    if (m_xmodem->isRunning()) {
+        m_xmodem->cancel();
+    }
+    if (m_ymodem->isRunning()) {
+        m_ymodem->cancel();
+    }
 }
 
 bool OtaManager::isTransferring() const
 {
-    return m_xmodem->isRunning();
+    return m_xmodem->isRunning() || m_ymodem->isRunning();
 }

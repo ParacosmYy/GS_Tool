@@ -57,6 +57,7 @@ void OtaWidget::setupUI()
     m_protocolCombo->addItem(tr("XMODEM-CRC (Recommended)"), "xmodem-crc");
     m_protocolCombo->addItem(tr("XMODEM-Checksum"), "xmodem-checksum");
     m_protocolCombo->addItem(tr("XMODEM-1K"), "xmodem-1k");
+    m_protocolCombo->addItem(tr("YMODEM"), "ymodem");
     configLayout->addRow(tr("Protocol:"), m_protocolCombo);
 
     auto* btnLayout = new QHBoxLayout;
