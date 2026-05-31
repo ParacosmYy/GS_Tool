@@ -43,6 +43,13 @@ enum class DataDirection {
     Tx      // 发送
 };
 
+// 终端布局模式 — 控制TX/RX数据的显示方式
+enum class TerminalLayout {
+    Mixed,            // 混合模式: TX和RX数据在同一终端中按时间顺序显示
+    SplitHorizontal,  // 左右分栏: 左侧显示RX数据，右侧显示TX数据
+    SplitVertical     // 上下分栏: 上方显示RX数据，下方显示TX数据
+};
+
 // 语义色常量 — 用于C++代码中无法通过QSS设置颜色的场景（如model data roles）
 // 与主题QSS中的语义色保持一致，主题切换时这些值不会自动更新
 // 后续应由ThemeManager动态提供

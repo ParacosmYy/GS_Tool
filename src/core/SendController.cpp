@@ -1,3 +1,8 @@
+/**
+ * @file SendController.cpp
+ * @brief 发送控制器实现 - 管理发送栏 UI 创建、输入解析、数据发送和历史记录
+ */
+
 #include "core/SendController.h"
 #include "terminal/TerminalModel.h"
 #include "utils/DataLogger.h"
@@ -14,6 +19,13 @@
 #include <QFrame>
 #include <QStyle>
 
+/**
+ * @brief 构造发送控制器
+ * @param model 终端数据模型，发送的数据追加到此模型
+ * @param logger 数据日志记录器
+ * @param history 发送历史管理器
+ * @param parent 父对象
+ */
 SendController::SendController(TerminalModel* model, DataLogger* logger,
                                SendHistory* history, QObject* parent)
     : QObject(parent)
@@ -24,10 +36,19 @@ SendController::SendController(TerminalModel* model, DataLogger* logger,
 {
 }
 
+/** @brief 析构函数 */
 SendController::~SendController()
 {
 }
 
+/**
+ * @brief 创建发送输入区域并返回容器 widget
+ *
+ * 控件布局: [模式切换(文本/HEX)] [换行符选择] [输入框(带自动补全)] [发送按钮]
+ * 自动补全数据源为 SendHistory 的最近发送记录
+ * @param parent 父 widget
+ * @return 发送栏容器 widget
+ */
 QWidget* SendController::createSendBar(QWidget* parent)
 {
     auto* sendFrame = new QFrame(parent);
@@ -46,7 +67,7 @@ QWidget* SendController::createSendBar(QWidget* parent)
     m_sendInput->setObjectName("sendInput");
     m_sendInput->setPlaceholderText(tr("输入要发送的数据..."));
 
-    // 发送历史自动补全（复用同一个QStringListModel，避免每次new泄漏）
+    // 发送历史自动补全（复用同一个 QStringListModel，避免每次 new 造成内存泄漏）
     m_sendCompleterModel = new QStringListModel(m_sendHistory->recentTexts(), this);
     m_sendCompleter = new QCompleter(m_sendCompleterModel, this);
     m_sendCompleter->setCaseSensitivity(Qt::CaseInsensitive);
@@ -76,7 +97,7 @@ QWidget* SendController::createSendBar(QWidget* parent)
     connect(m_sendBtn, &QPushButton::clicked, this, &SendController::onSendData);
     connect(m_sendInput, &QLineEdit::returnPressed, this, &SendController::onSendData);
 
-    // 发送历史变化时更新自动补全（复用模型，不泄漏QStringListModel）
+    // 发送历史变化时更新自动补全数据源
     connect(m_sendHistory, &SendHistory::historyChanged, this, [this]() {
         m_sendCompleterModel->setStringList(m_sendHistory->recentTexts());
     });
@@ -89,34 +110,55 @@ QWidget* SendController::createSendBar(QWidget* parent)
     return sendFrame;
 }
 
+/**
+ * @brief 设置当前连接
+ * @param conn 新的连接实例，断开时传 nullptr
+ */
 void SendController::setConnection(IConnection* conn)
 {
     m_currentConn = conn;
 }
 
+/** @brief 获取定时发送器实例 */
 TimedSender* SendController::timedSender() const
 {
     return m_timedSender;
 }
 
+/**
+ * @brief 统一发送方法
+ *
+ * 写入连接 + 记录终端 + 记录日志，返回是否成功写入
+ * @param data 待发送的原始字节数据
+ * @return true=写入成功, false=写入失败或未连接
+ */
 bool SendController::sendAndRecord(const QByteArray& data)
 {
+    // 前置检查: 连接是否存在且处于已连接状态
     if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
         emit statusMessage(tr("发送失败: 未连接"));
         return false;
     }
+    // 写入数据到连接
     qint64 written = m_currentConn->write(data);
     if (written > 0) {
+        // 写入成功: 追加到终端模型（TX 显示）+ 记录日志
         m_terminalModel->appendSent(data);
         m_dataLogger->logData(data, DataLogger::Direction::Sent);
         emit dataSent(written);
         return true;
     }
-    // 写入失败时发出状态消息（修复: 原MainWindow缺少此反馈）
+    // 写入失败时发出状态消息
     emit statusMessage(tr("发送失败: 写入返回 %1").arg(written));
     return false;
 }
 
+/**
+ * @brief 发送按钮/回车触发的发送逻辑
+ *
+ * 流程: 读取输入 → 解析(文本/HEX) → 追加换行符 → sendAndRecord → 记录历史 → 清空输入框
+ * HEX 模式下输入无效时，通过动态属性触发 QSS 错误样式
+ */
 void SendController::onSendData()
 {
     if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
@@ -126,11 +168,13 @@ void SendController::onSendData()
     QString text = m_sendInput->text();
     if (text.isEmpty()) return;
 
+    // 根据发送模式解析输入
     bool isHex = (m_sendModeCombo->currentIndex() == 1);
     QByteArray data;
     if (isHex) {
         data = HexConverter::fromHexString(text);
         if (data.isEmpty()) {
+            // HEX 解析失败: 设置错误属性触发 QSS 错误样式（红色边框）
             m_sendInput->setProperty("hasError", true);
             m_sendInput->style()->unpolish(m_sendInput);
             m_sendInput->style()->polish(m_sendInput);
@@ -140,7 +184,7 @@ void SendController::onSendData()
         data = text.toUtf8();
     }
 
-    // 追加换行符（仅文本模式下生效）
+    // 追加换行符（仅文本模式下生效，HEX 模式用户需要手动输入）
     if (!isHex && m_newlineCombo && m_newlineCombo->currentIndex() > 0) {
         switch (m_newlineCombo->currentIndex()) {
         case 1: data.append("\r\n"); break;
@@ -150,6 +194,7 @@ void SendController::onSendData()
     }
 
     if (sendAndRecord(data)) {
+        // 发送成功: 记录到历史 → 清空输入框 → 清除错误状态
         m_sendHistory->addEntry(text, isHex);
         m_sendInput->clear();
         m_sendInput->setProperty("hasError", false);
@@ -158,6 +203,10 @@ void SendController::onSendData()
     }
 }
 
+/**
+ * @brief 快捷指令触发处理
+ * @param data 预编码的原始字节数据（已是 HEX 或 UTF-8 编码后的结果）
+ */
 void SendController::onQuickCommand(const QByteArray& data)
 {
     sendAndRecord(data);

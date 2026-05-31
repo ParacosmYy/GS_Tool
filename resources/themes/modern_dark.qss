@@ -9,6 +9,20 @@ BackgroundWidget {
     background-color: transparent;
 }
 
+/* 面板半透明背景 - 让磨砂玻璃效果透出来 */
+QWidget#serialPanel {
+    background-color: rgba(22, 22, 30, 200);
+    border-radius: 6px;
+}
+
+QWidget#rightWidget {
+    background-color: rgba(22, 22, 30, 120);
+}
+
+QWidget#rightPanel {
+    background-color: transparent;
+}
+
 /* 左侧导航树 */
 QTreeView {
     background-color: #16161e;
@@ -215,7 +229,23 @@ QComboBox:hover {
 }
 
 QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 20px;
     border: none;
+}
+
+QComboBox::down-arrow {
+    width: 8px;
+    height: 8px;
+    image: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #a9b1d6;
+}
+
+QComboBox::down-arrow:disabled {
+    border-top-color: #565f89;
 }
 
 QComboBox:disabled {
@@ -658,3 +688,25 @@ QSlider#bgBlurSlider::handle:horizontal, QSlider#bgOpacitySlider::handle:horizon
 QSlider#bgBlurSlider::handle:horizontal:hover, QSlider#bgOpacitySlider::handle:horizontal:hover {
     background: #89b4fa;
 }
+
+QPushButton#bgSelectImageBtn {
+    background-color: #292e42;
+    color: #7aa2f7;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+QPushButton#bgSelectImageBtn:hover { background-color: #3b4261; border-color: #7aa2f7; }
+QPushButton#bgSelectImageBtn:pressed { background-color: #414868; }
+
+QPushButton#bgResetBtn {
+    background-color: transparent;
+    color: #565f89;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+QPushButton#bgResetBtn:hover { color: #f7768e; border-color: #f7768e; }
+QPushButton#bgResetBtn:pressed { background-color: rgba(247,118,142,0.15); }

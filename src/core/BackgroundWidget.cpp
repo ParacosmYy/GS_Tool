@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMouseEvent>
+#include <QResizeEvent>
 #include <QRandomGenerator>
 #include <QtMath>
 
@@ -19,7 +20,9 @@ BackgroundWidget::BackgroundWidget(QWidget* parent)
 void BackgroundWidget::setBackgroundImage(const QString& resourcePath)
 {
     m_originalImage.load(resourcePath);
+    m_currentImagePath = resourcePath;
     m_blurredImage = generateBlurred(m_originalImage, m_blurRadius);
+    regenerateScaledBackground();
     update();
 }
 
@@ -28,6 +31,7 @@ void BackgroundWidget::setBlurRadius(qreal radius)
     if (qFuzzyCompare(m_blurRadius, radius)) return;
     m_blurRadius = qBound(0.0, radius, 30.0);
     m_blurredImage = generateBlurred(m_originalImage, m_blurRadius);
+    regenerateScaledBackground();
     emit blurChanged(m_blurRadius);
     update();
 }
@@ -65,44 +69,98 @@ bool BackgroundWidget::rippleEnabled() const
     return m_rippleEnabled;
 }
 
+void BackgroundWidget::setRippleColor(const QColor& color)
+{
+    m_rippleColor = color;
+}
+
+QColor BackgroundWidget::rippleColor() const
+{
+    return m_rippleColor;
+}
+
+void BackgroundWidget::setOverlayColor(const QColor& color)
+{
+    m_overlayColor = color;
+    update();
+}
+
+QColor BackgroundWidget::overlayColor() const
+{
+    return m_overlayColor;
+}
+
+void BackgroundWidget::setOverlayOpacity(qreal opacity)
+{
+    m_overlayOpacity = qBound(0.0, opacity, 1.0);
+    update();
+}
+
+qreal BackgroundWidget::overlayOpacity() const
+{
+    return m_overlayOpacity;
+}
+
+void BackgroundWidget::setBlurIterations(int iterations)
+{
+    m_blurIterations = qBound(2, iterations, 10);
+    m_blurredImage = generateBlurred(m_originalImage, m_blurRadius);
+    regenerateScaledBackground();
+    update();
+}
+
+int BackgroundWidget::blurIterations() const
+{
+    return m_blurIterations;
+}
+
+void BackgroundWidget::resetToDefault()
+{
+    setBackgroundImage(":/backgrounds/default_bg.png");
+    emit backgroundImageChanged(m_currentImagePath);
+}
+
+QString BackgroundWidget::currentImagePath() const
+{
+    return m_currentImagePath;
+}
+
 void BackgroundWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // 1. 绘制纯黑底色
+    // 第1层：纯黑底色
     painter.fillRect(rect(), Qt::black);
 
-    // 2. 绘制背景图（模糊版），居中裁剪覆盖
-    if (!m_blurredImage.isNull()) {
+    // 第2层：背景图（模糊版），居中裁剪覆盖，使用预缓存避免每帧缩放
+    if (!m_scaledBlurredImage.isNull()) {
         painter.setOpacity(m_bgOpacity);
-
-        // Cover模式: 等比缩放填满整个widget，裁剪多余部分
-        QSize widgetSize = size();
-        QSize imgSize = m_blurredImage.size();
-        qreal scaleX = (qreal)widgetSize.width() / imgSize.width();
-        qreal scaleY = (qreal)widgetSize.height() / imgSize.height();
-        qreal scale = qMax(scaleX, scaleY);
-
-        QSize scaledSize = imgSize * scale;
-        QPoint offset(
-            (widgetSize.width() - scaledSize.width()) / 2,
-            (widgetSize.height() - scaledSize.height()) / 2
-        );
-
-        painter.drawPixmap(offset, m_blurredImage.scaled(
-            scaledSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+        painter.drawPixmap(m_scaledOffset, m_scaledBlurredImage);
         painter.setOpacity(1.0);
     }
 
-    // 3. 绘制涟漪特效
+    // 第3层：半透明遮罩层（暗色遮罩让文字更易读）
+    if (m_overlayOpacity > 0.0) {
+        QColor overlay = m_overlayColor;
+        overlay.setAlphaF(m_overlayOpacity);
+        painter.fillRect(rect(), overlay);
+    }
+
+    // 第4层：涟漪特效（使用主题accent色）
     if (!m_ripples.isEmpty()) {
         for (const auto& ripple : m_ripples) {
             QRadialGradient gradient(ripple.center, ripple.currentRadius);
-            gradient.setColorAt(0, QColor(255, 255, 255, int(ripple.opacity * 80)));
-            gradient.setColorAt(0.5, QColor(255, 255, 255, int(ripple.opacity * 30)));
-            gradient.setColorAt(1, QColor(255, 255, 255, 0));
+            QColor inner = m_rippleColor;
+            inner.setAlpha(int(ripple.opacity * 80));
+            QColor mid = m_rippleColor;
+            mid.setAlpha(int(ripple.opacity * 30));
+            QColor outer = m_rippleColor;
+            outer.setAlpha(0);
+            gradient.setColorAt(0, inner);
+            gradient.setColorAt(0.5, mid);
+            gradient.setColorAt(1, outer);
             painter.setBrush(gradient);
             painter.setPen(Qt::NoPen);
             painter.drawEllipse(ripple.center, ripple.currentRadius, ripple.currentRadius);
@@ -131,23 +189,62 @@ void BackgroundWidget::mousePressEvent(QMouseEvent* event)
     update();
 }
 
+void BackgroundWidget::resizeEvent(QResizeEvent* event)
+{
+    QWidget::resizeEvent(event);
+    regenerateScaledBackground();
+}
+
 QPixmap BackgroundWidget::generateBlurred(const QPixmap& src, qreal radius) const
 {
     if (src.isNull() || radius <= 0) return src;
 
-    // 快速模糊: 先缩小再放大，利用SmoothTransformation的双线性插值近似高斯模糊
-    qreal factor = 1.0 / (1.0 + radius * 0.15);
-    QSize scaled = src.size() * factor;
+    // 快速模糊: 多次缩放增强磨砂效果
+    // 每次迭代的缩放系数逐步增大，产生更自然的高斯模糊近似
+    qreal baseFactor = 1.0 / (1.0 + radius * 0.15);
 
-    // 多次缩放增强模糊效果
-    QPixmap result = src.scaled(scaled, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    // 二次模糊
-    QSize mid = src.size() * (factor * 0.7);
-    result = result.scaled(mid, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    // 放回原尺寸
+    QPixmap result = src;
+
+    for (int i = 0; i < m_blurIterations; ++i) {
+        // 第一次缩小最多，后续逐步放大回原尺寸
+        qreal stepFactor = baseFactor + (1.0 - baseFactor) * (qreal(i) / qreal(m_blurIterations));
+        QSize targetSize = src.size() * stepFactor;
+        targetSize = targetSize.expandedTo(QSize(1, 1));
+        result = result.scaled(targetSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    }
+
+    // 最终放大回原尺寸
     result = result.scaled(src.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     return result;
+}
+
+void BackgroundWidget::regenerateScaledBackground()
+{
+    if (m_blurredImage.isNull()) {
+        m_scaledBlurredImage = QPixmap();
+        m_scaledOffset = QPoint();
+        return;
+    }
+
+    // Cover模式: 等比缩放填满整个widget，裁剪多余部分
+    QSize widgetSize = size();
+    if (widgetSize.isEmpty()) return;
+
+    QSize imgSize = m_blurredImage.size();
+    qreal scaleX = (qreal)widgetSize.width() / imgSize.width();
+    qreal scaleY = (qreal)widgetSize.height() / imgSize.height();
+    qreal scale = qMax(scaleX, scaleY);
+
+    QSize scaledSize = imgSize * scale;
+    m_scaledOffset = QPoint(
+        (widgetSize.width() - scaledSize.width()) / 2,
+        (widgetSize.height() - scaledSize.height()) / 2
+    );
+
+    // 预先缩放并缓存，paintEvent直接drawPixmap不再做scaled()
+    m_scaledBlurredImage = m_blurredImage.scaled(
+        scaledSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 }
 
 void BackgroundWidget::advanceRipples()

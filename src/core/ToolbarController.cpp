@@ -14,6 +14,7 @@ ToolbarController::ToolbarController(RecordingController* recordingController, Q
     , m_recordingController(recordingController)
     , m_toolbar(nullptr)
     , m_displayModeCombo(nullptr)
+    , m_layoutCombo(nullptr)
     , m_themeCombo(nullptr)
     , m_langCombo(nullptr)
     , m_timestampAction(nullptr)
@@ -42,6 +43,14 @@ QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
     m_displayModeCombo->addItems({tr("文本"), tr("HEX"), tr("混合"), tr("十进制")});
     m_displayModeCombo->setFixedWidth(80);
     m_toolbar->addWidget(m_displayModeCombo);
+
+    // 终端布局模式下拉框: 混合/左右分栏/上下分栏
+    m_layoutCombo = new QComboBox;
+    m_layoutCombo->setObjectName("layoutCombo");
+    m_layoutCombo->addItems({tr("混合"), tr("左右分栏"), tr("上下分栏")});
+    m_layoutCombo->setFixedWidth(90);
+    m_layoutCombo->setToolTip(tr("终端布局: 混合显示或TX/RX分栏"));
+    m_toolbar->addWidget(m_layoutCombo);
 
     // 时间戳开关
     m_timestampAction = m_toolbar->addAction(tr("时间戳"));
@@ -103,6 +112,8 @@ QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
     // 连接内部信号转发
     connect(m_displayModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &ToolbarController::displayModeChanged);
+    connect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &ToolbarController::terminalLayoutChanged);
     connect(m_timestampAction, &QAction::toggled,
             this, &ToolbarController::timestampToggled);
     connect(m_dirPrefixAction, &QAction::toggled,

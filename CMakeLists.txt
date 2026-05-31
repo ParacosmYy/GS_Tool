@@ -43,6 +43,7 @@ set(SOURCES
     src/terminal/TerminalWidget.cpp
     src/terminal/TerminalModel.cpp
     src/terminal/TerminalSearchBar.cpp
+    src/terminal/TerminalLayoutManager.cpp
     src/terminal/TerminalTypes.h
     src/serial/SerialConfigPanel.cpp
     src/serial/QuickCommandBar.cpp
@@ -97,6 +98,7 @@ set(HEADERS
     src/terminal/TerminalWidget.h
     src/terminal/TerminalModel.h
     src/terminal/TerminalSearchBar.h
+    src/terminal/TerminalLayoutManager.h
     src/terminal/TerminalTypes.h
     src/serial/SerialConfigPanel.h
     src/serial/QuickCommandBar.h

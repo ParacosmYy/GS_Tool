@@ -421,6 +421,65 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 - Qt信号/槽用新式connect语法（函数指针），**禁止** SIGNAL/SLOT 宏
 - 每个类一对 .h/.cpp 文件，放在对应子目录中
 
+### 5.1.1 MainWindow 嵌入式 main 哲学（铁律）
+
+MainWindow 必须像嵌入式项目的 `main.c` 一样简洁:
+- **只做三件事**: 初始化对象 → 组装 UI → 连接信号/槽
+- **禁止在 MainWindow 中编写业务逻辑** — 所有逻辑委托给 Controller/Manager 类
+- **MainWindow.cpp 目标行数: ≤500行** — 超过说明职责泄漏，需要拆分到新的 Controller
+- **每个 Controller 遵循单一职责**: ConnectionController(连接管理)、SendController(发送逻辑)、NavigationController(面板导航)、RecordingController(录制回放)、ToolbarController(工具栏)、SettingsController(设置)
+
+```
+// MainWindow 应该长这样:
+int main() {
+    init_objects();
+    setup_ui();
+    connect_signals();
+    load_settings();
+}
+// 就这样，没有其他东西了
+```
+
+### 5.1.2 注释规范（铁律）
+
+**注释是强制性的，必须详细到让 C++/Qt 初学者也能完全理解。**
+
+每个文件、类、方法、成员变量都必须有注释:
+
+| 元素 | 注释格式 | 必须包含 |
+|------|---------|---------|
+| 文件头 | `/** @file 文件名 @brief 一行描述 */` | 文件用途、设计思路 |
+| 类 | `/** @brief 类描述 ... */` | 类的职责、协作关系、设计模式 |
+| 公开方法 | `/** @brief 描述 @param 参数说明 @return 返回值说明 */` | 功能、参数含义、返回值 |
+| 私有方法 | `/** @brief 描述 */` 或 `// 一行说明` | 功能说明 |
+| 成员变量 | `///< 行内说明` 或 `/** @brief 说明 */` | 用途、取值范围 |
+| 信号 | `/** @brief 信号描述 @param 参数说明 */` | 何时发射、参数含义 |
+| 代码块 | `// ---- 分组标题 ----` | 逻辑分组 |
+
+**Doxygen 格式示例**:
+```cpp
+/**
+ * @brief 背景层控件 - 提供自定义背景图、磨砂玻璃模糊和点击涟漪特效
+ *
+ * 作为 MainWindow 的中央部件，承载所有面板的底层背景。
+ * 绘制层次: 黑色底色 → 模糊背景图 → 半透明遮罩 → 涟漪特效
+ *
+ * 协作关系:
+ *   - BackgroundSettingsPopup: UI 控制
+ *   - MainWindow: 作为中央部件
+ */
+class BackgroundWidget : public QWidget {
+    ...
+    /** @brief 模糊半径，范围 [0, 30] */
+    qreal m_blurRadius = 10.0;
+};
+```
+
+**禁止**:
+- 禁止无注释的公开方法
+- 禁止无注释的成员变量
+- 禁止"// TODO"或"// FIXME"式注释长期存在（应在当次迭代中处理）
+
 ### 5.2 命名规范
 
 | 类型 | 规范 | 示例 |

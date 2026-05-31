@@ -148,14 +148,14 @@ void NavigationController::switchToPanel(QWidget* newPanel)
     if (oldPanel && oldPanel->isVisible()) {
         m_panelSwitching = true;
 
-        // 旧面板: 200ms InCubic opacity 1.0 → 0.0 淡出
+        // 旧面板: 150ms InCubic opacity 1.0 → 0.0 淡出
         QGraphicsOpacityEffect* fadeOutEffect = new QGraphicsOpacityEffect(oldPanel);
         oldPanel->setGraphicsEffect(fadeOutEffect);
 
         QPropertyAnimation* fadeOut = new QPropertyAnimation(fadeOutEffect, "opacity");
         fadeOut->setStartValue(1.0);
         fadeOut->setEndValue(0.0);
-        fadeOut->setDuration(200);
+        fadeOut->setDuration(150);
         fadeOut->setEasingCurve(QEasingCurve::InCubic);
 
         // 淡出完成后: 隐藏旧面板 → 显示新面板 → 淡入新面板
@@ -180,7 +180,7 @@ void NavigationController::switchToPanel(QWidget* newPanel)
 
 void NavigationController::fadeInPanel(QWidget* panel)
 {
-    // 新面板: 250ms OutCubic opacity 0.0 → 1.0 淡入
+    // 新面板: 150ms OutCubic opacity 0.0 → 1.0 淡入
     QGraphicsOpacityEffect* fadeInEffect = new QGraphicsOpacityEffect(panel);
     fadeInEffect->setOpacity(0.0);
     panel->setGraphicsEffect(fadeInEffect);
@@ -193,7 +193,7 @@ void NavigationController::fadeInPanel(QWidget* panel)
     QPropertyAnimation* fadeIn = new QPropertyAnimation(fadeInEffect, "opacity");
     fadeIn->setStartValue(0.0);
     fadeIn->setEndValue(1.0);
-    fadeIn->setDuration(250);
+    fadeIn->setDuration(150);
     fadeIn->setEasingCurve(QEasingCurve::OutCubic);
 
     // 淡入完成后清除 effect，恢复正常绘制性能

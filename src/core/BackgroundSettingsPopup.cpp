@@ -1,16 +1,20 @@
 #include "BackgroundSettingsPopup.h"
 #include "BackgroundWidget.h"
+#include "utils/SettingsManager.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QCheckBox>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QStandardPaths>
 
 BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWidget* parent)
     : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
     , m_bgWidget(bgWidget)
 {
     setObjectName("bgSettingsPopup");
-    setFixedSize(260, 220);
+    setFixedSize(280, 280);
     setAttribute(Qt::WA_TranslucentBackground, false);
 
     auto* mainLayout = new QVBoxLayout(this);
@@ -63,6 +67,63 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
     mainLayout->addWidget(rippleCheck);
 
     connect(rippleCheck, &QCheckBox::toggled, m_bgWidget, &BackgroundWidget::setRippleEnabled);
+
+    // ---- 分隔线 ----
+    auto* separator = new QFrame(this);
+    separator->setFrameShape(QFrame::HLine);
+    separator->setFrameShadow(QFrame::Sunken);
+    mainLayout->addWidget(separator);
+
+    // ---- 选择背景图按钮 ----
+    m_selectImageBtn = new QPushButton(tr("选择背景图..."), this);
+    m_selectImageBtn->setObjectName("bgSelectImageBtn");
+    mainLayout->addWidget(m_selectImageBtn);
+
+    connect(m_selectImageBtn, &QPushButton::clicked, this, &BackgroundSettingsPopup::onSelectBackground);
+
+    // ---- 恢复默认按钮 ----
+    m_resetBtn = new QPushButton(tr("恢复默认背景"), this);
+    m_resetBtn->setObjectName("bgResetBtn");
+    mainLayout->addWidget(m_resetBtn);
+
+    connect(m_resetBtn, &QPushButton::clicked, this, [this]() {
+        m_bgWidget->resetToDefault();
+        // 清除用户保存的自定义背景路径
+        SettingsManager::instance().remove("background/customImagePath");
+        SettingsManager::instance().sync();
+        emit resetToDefaultRequested();
+    });
+}
+
+void BackgroundSettingsPopup::onSelectBackground()
+{
+    // 打开文件对话框，筛选图片格式
+    QString lastDir = SettingsManager::instance().get(
+        "background/lastOpenDir",
+        QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)
+    ).toString();
+
+    QString filePath = QFileDialog::getOpenFileName(
+        this,
+        tr("选择背景图片"),
+        lastDir,
+        tr("图片文件 (*.png *.jpg *.jpeg *.bmp *.webp *.gif)")
+    );
+
+    if (filePath.isEmpty()) return;
+
+    // 记住最后打开的目录
+    QFileInfo fi(filePath);
+    SettingsManager::instance().set("background/lastOpenDir", fi.absolutePath());
+
+    // 设置背景图
+    m_bgWidget->setBackgroundImage(filePath);
+
+    // 保存用户选择的图片路径到设置，下次启动自动加载
+    SettingsManager::instance().set("background/customImagePath", filePath);
+    SettingsManager::instance().sync();
+
+    emit backgroundImageSelected(filePath);
 }
 
 void BackgroundSettingsPopup::syncFromWidget()

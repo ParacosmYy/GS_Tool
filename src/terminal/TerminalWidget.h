@@ -28,6 +28,12 @@ public:
     // 设置数据模型
     void setModel(TerminalModel* model);
 
+    // 设置方向过滤器 — 只显示指定方向的数据行
+    // 不设置过滤器时(默认)显示所有方向的数据
+    // 用于分栏模式: 一个TerminalWidget只显示RX，另一个只显示TX
+    void setDirectionFilter(DataDirection direction);
+    void clearDirectionFilter();
+
     // 显示模式
     void setDisplayMode(DisplayMode mode);
     DisplayMode displayMode() const;
@@ -87,6 +93,11 @@ private:
     // 将数据行转换为缓存结构（格式化文本 + 方向 + 时间戳）
     CachedLine formatToCache(const TerminalLine& line) const;
 
+    // 绘制单行数据（从paintEvent中提取的公共渲染逻辑）
+    // painter: 画布对象, cached: 缓存行数据, y: 当前Y坐标, displayLine: 显示行号(用于选择/搜索定位)
+    // 返回值: 绘制完该行后的Y坐标（= y + m_lineHeight）
+    int paintLine(QPainter& painter, const CachedLine& cached, int y, int displayLine);
+
     TerminalModel* m_model = nullptr;
     DisplayMode m_displayMode = DisplayMode::Text;
     bool m_showTimestamp = false;
@@ -124,6 +135,11 @@ private:
     bool m_searchHex = false;
     QColor m_searchHighlightColor;
     QColor m_currentMatchColor;
+
+    // 方向过滤 — 用于分栏模式
+    bool m_directionFiltered = false;   // 是否启用了方向过滤
+    DataDirection m_filterDirection = DataDirection::Rx;  // 过滤方向(仅当m_directionFiltered为true时有效)
+    QVector<int> m_filteredIndices;     // 过滤后的模型行号索引表: m_filteredIndices[显示行号] = 模型行号
 
     // 缓存格式化后的行信息（文本+方向+时间戳），避免paintEvent访问环形缓冲区
     mutable QVector<CachedLine> m_cachedLines;
