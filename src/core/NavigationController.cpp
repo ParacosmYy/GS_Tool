@@ -9,6 +9,7 @@
 
 #include "NavigationController.h"
 #include "Constants.h"
+#include "ThemeManager.h"
 #include <QTreeView>
 #include <QStandardItemModel>
 #include <QPainter>
@@ -67,8 +68,9 @@ void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPan
     auto* treeModel = new QStandardItemModel(this);
     auto* rootItem = treeModel->invisibleRootItem();
 
-    // 串口分组 — 蓝色圆点标识
-    auto* serialItem = new QStandardItem(createDotIcon(QColor(NavColors::kSerialDot)), tr("串口"));
+    // 串口分组 — 蓝色圆点标识（从ThemeManager获取Accent色）
+    auto* serialItem = new QStandardItem(createDotIcon(
+        ThemeManager::instance().color(ThemeManager::SemanticColor::Accent)), tr("串口"));
     serialItem->setEditable(false);
     auto* configItem = new QStandardItem(tr("配置"));
     configItem->setEditable(false);
@@ -92,14 +94,17 @@ void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPan
     otaItem->setEditable(false);
     serialItem->appendRow(otaItem);
 
-    // 网络分组 — TCP 绿色圆点, UDP 黄色圆点
+    // 网络分组 — TCP 绿色圆点, UDP 黄色圆点（从ThemeManager获取语义色）
     auto* networkItem = new QStandardItem(tr("网络"));
     networkItem->setEditable(false);
-    auto* tcpClientItem = new QStandardItem(createDotIcon(QColor(NavColors::kTcpDot)), tr("TCP客户端"));
+    auto* tcpClientItem = new QStandardItem(createDotIcon(
+        ThemeManager::instance().color(ThemeManager::SemanticColor::Success)), tr("TCP客户端"));
     tcpClientItem->setEditable(false);
-    auto* tcpServerItem = new QStandardItem(createDotIcon(QColor(NavColors::kTcpDot)), tr("TCP服务端"));
+    auto* tcpServerItem = new QStandardItem(createDotIcon(
+        ThemeManager::instance().color(ThemeManager::SemanticColor::Success)), tr("TCP服务端"));
     tcpServerItem->setEditable(false);
-    auto* udpItem = new QStandardItem(createDotIcon(QColor(NavColors::kUdpDot)), tr("UDP"));
+    auto* udpItem = new QStandardItem(createDotIcon(
+        ThemeManager::instance().color(ThemeManager::SemanticColor::Warning)), tr("UDP"));
     udpItem->setEditable(false);
     networkItem->appendRow(tcpClientItem);
     networkItem->appendRow(tcpServerItem);

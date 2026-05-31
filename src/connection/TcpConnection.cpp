@@ -153,8 +153,11 @@ void TcpConnection::onNewConnection()
                 this, &TcpConnection::onSocketReadyRead);
         connect(m_clientSocket, &QTcpSocket::disconnected,
                 this, [this]() {
-                    m_clientSocket->deleteLater();
-                    m_clientSocket = nullptr;
+                    // 防御性空指针检查: close()可能已将m_clientSocket置空
+                    if (m_clientSocket) {
+                        m_clientSocket->deleteLater();
+                        m_clientSocket = nullptr;
+                    }
                 });
         connect(m_clientSocket, &QTcpSocket::errorOccurred,
                 this, &TcpConnection::onSocketError);

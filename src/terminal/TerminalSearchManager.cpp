@@ -9,12 +9,18 @@
 #include "terminal/TerminalSearchManager.h"
 #include "terminal/DirectionFilter.h"
 #include "utils/HexConverter.h"
+#include "core/ThemeManager.h"
 
 TerminalSearchManager::TerminalSearchManager(QObject* parent)
     : QObject(parent)
-    , m_searchHighlightColor(249, 226, 175, 80)    // #f9e2af 半透明黄
-    , m_currentMatchColor(249, 226, 175, 180)       // #f9e2af 高透明度黄(当前匹配)
+    , m_searchHighlightColor(ThemeManager::instance().color(ThemeManager::SemanticColor::TermSearchHighlight))
+    , m_currentMatchColor(ThemeManager::instance().color(ThemeManager::SemanticColor::TermCurrentMatch))
 {
+    // 主题切换时动态更新搜索高亮颜色
+    connect(&ThemeManager::instance(), &ThemeManager::themeChanged, this, [this]() {
+        m_searchHighlightColor = ThemeManager::instance().color(ThemeManager::SemanticColor::TermSearchHighlight);
+        m_currentMatchColor = ThemeManager::instance().color(ThemeManager::SemanticColor::TermCurrentMatch);
+    });
 }
 
 int TerminalSearchManager::setSearchHighlight(
@@ -48,6 +54,7 @@ int TerminalSearchManager::setSearchHighlight(
             }
             for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
                 int modelLine = directionFilter->modelIndex(displayIdx);
+                if (modelLine < 0 || modelLine >= cachedLines.size()) continue;
                 QString hexText = HexConverter::toHexString(lineAtFn(modelLine));
                 int pos = 0;
                 while ((pos = hexText.indexOf(searchStr, pos, Qt::CaseInsensitive)) >= 0) {
@@ -63,6 +70,7 @@ int TerminalSearchManager::setSearchHighlight(
             }
             for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
                 int modelLine = directionFilter->modelIndex(displayIdx);
+                if (modelLine < 0 || modelLine >= cachedLines.size()) continue;
                 const QString& text = cachedLines[modelLine].text;
                 QRegularExpressionMatchIterator it = re.globalMatch(text);
                 while (it.hasNext()) {
@@ -74,6 +82,7 @@ int TerminalSearchManager::setSearchHighlight(
         } else {
             for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
                 int modelLine = directionFilter->modelIndex(displayIdx);
+                if (modelLine < 0 || modelLine >= cachedLines.size()) continue;
                 const QString& text = cachedLines[modelLine].text;
                 int pos = 0;
                 while ((pos = text.indexOf(pattern, pos)) >= 0) {

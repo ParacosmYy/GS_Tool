@@ -2,7 +2,8 @@
  * @file SettingsController.cpp
  * @brief 设置控制器实现 - 应用设置的持久化加载与保存
  *
- * 设置项: 窗口几何位置/大小、主题名称、串口配置参数、语言偏好
+ * 设置项: 窗口几何位置/大小、主题名称、串口配置参数（含DTR/RTS）、
+ *         语言偏好、上次活跃面板索引
  * 底层持久化委托给 SettingsManager 单例（QSettings 封装）
  */
 
@@ -48,7 +49,7 @@ void SettingsController::setSerialConfigPanel(SerialConfigPanel* panel)
 
 /**
  * @brief 恢复所有保存的设置
- * 加载顺序: 窗口几何 → 主题 → 串口配置 → 语言
+ * 加载顺序: 窗口几何 → 主题 → 串口配置 → 语言 → 上次面板
  */
 void SettingsController::loadSettings()
 {
@@ -68,7 +69,7 @@ void SettingsController::loadSettings()
         }
     }
 
-    // 恢复串口配置到配置面板（端口/波特率/数据位/校验/流控）
+    // 恢复串口配置到配置面板（端口/波特率/数据位/校验/流控/DTR/RTS）
     if (m_serialConfig) {
         QVariantMap serialConfig = settings.loadSerialConfig();
         if (!serialConfig.isEmpty()) {
@@ -81,11 +82,14 @@ void SettingsController::loadSettings()
         QString savedLang = settings.loadLanguage();
         m_toolbarController->setCurrentLanguage(savedLang);
     }
+
+    // 注意: 上次面板索引由 MainWindow 在导航树构建完成后单独读取，
+    // 因为面板切换依赖 NavigationController 和 PanelManager 都已就绪。
 }
 
 /**
  * @brief 持久化当前设置到磁盘
- * 保存: 窗口几何 → 主题名称 → 串口配置参数 → 同步写入磁盘
+ * 保存: 窗口几何 → 主题名称 → 串口配置参数（含DTR/RTS） → 上次面板索引 → 同步写入磁盘
  */
 void SettingsController::saveSettings()
 {
@@ -97,20 +101,109 @@ void SettingsController::saveSettings()
     // 保存当前主题名称
     settings.saveTheme(ThemeManager::instance().currentTheme());
 
-    // 保存串口配置（从配置面板获取当前值）
+    // 保存完整串口配置（从配置面板获取当前值，含 DTR/RTS）
     if (m_serialConfig) {
         QVariantMap serialConfig;
-        serialConfig["portName"] = m_serialConfig->currentPortData();
-        serialConfig["baudRate"] = m_serialConfig->currentBaudRate();
-        serialConfig["dataBits"] = m_serialConfig->currentDataBitsIndex();
-        serialConfig["parity"] = m_serialConfig->currentParityIndex();
-        serialConfig["stopBits"] = m_serialConfig->currentStopBitsIndex();
+        serialConfig["portName"]    = m_serialConfig->currentPortData();
+        serialConfig["baudRate"]    = m_serialConfig->currentBaudRate();
+        serialConfig["dataBits"]    = m_serialConfig->currentDataBitsIndex();
+        serialConfig["parity"]      = m_serialConfig->currentParityIndex();
+        serialConfig["stopBits"]    = m_serialConfig->currentStopBitsIndex();
         serialConfig["flowControl"] = m_serialConfig->currentFlowControlIndex();
+        serialConfig["dtr"]         = m_serialConfig->dtrEnabled();
+        serialConfig["rts"]         = m_serialConfig->rtsEnabled();
         settings.saveSerialConfig(serialConfig);
     }
 
     // 同步写入磁盘
     settings.sync();
+}
+
+/**
+ * @brief 保存完整串口配置到磁盘
+ *
+ * 收集 SerialConfigPanel 中所有参数（含 DTR/RTS 线路信号状态），
+ * 委托给 SettingsManager 持久化存储。
+ * 无 SerialConfigPanel 引用时不执行任何操作。
+ */
+void SettingsController::saveSerialConfig()
+{
+    if (!m_serialConfig) return;
+
+    auto& settings = SettingsManager::instance();
+    QVariantMap serialConfig;
+    serialConfig["portName"]    = m_serialConfig->currentPortData();
+    serialConfig["baudRate"]    = m_serialConfig->currentBaudRate();
+    serialConfig["dataBits"]    = m_serialConfig->currentDataBitsIndex();
+    serialConfig["parity"]      = m_serialConfig->currentParityIndex();
+    serialConfig["stopBits"]    = m_serialConfig->currentStopBitsIndex();
+    serialConfig["flowControl"] = m_serialConfig->currentFlowControlIndex();
+    serialConfig["dtr"]         = m_serialConfig->dtrEnabled();
+    serialConfig["rts"]         = m_serialConfig->rtsEnabled();
+    settings.saveSerialConfig(serialConfig);
+}
+
+/**
+ * @brief 从磁盘加载串口配置
+ * @return 串口配置 QVariantMap，无保存数据时返回空 map
+ */
+QVariantMap SettingsController::loadSerialConfig() const
+{
+    return SettingsManager::instance().loadSerialConfig();
+}
+
+/**
+ * @brief 保存窗口几何信息
+ * @param geometry QMainWindow::saveGeometry() 返回的字节数组
+ */
+void SettingsController::saveWindowGeometry(const QByteArray& geometry)
+{
+    SettingsManager::instance().saveWindowGeometry(geometry);
+}
+
+/**
+ * @brief 加载窗口几何信息
+ * @return 窗口几何字节数组，无保存数据时返回空 QByteArray
+ */
+QByteArray SettingsController::loadWindowGeometry() const
+{
+    return SettingsManager::instance().loadWindowGeometry();
+}
+
+/**
+ * @brief 保存当前主题名称
+ * @param themeName 主题文件名（如 "dark_terminal"）
+ */
+void SettingsController::saveTheme(const QString& themeName)
+{
+    SettingsManager::instance().saveTheme(themeName);
+}
+
+/**
+ * @brief 加载保存的主题名称
+ * @return 主题名称字符串，无保存数据时返回默认主题
+ */
+QString SettingsController::loadTheme() const
+{
+    return SettingsManager::instance().loadTheme();
+}
+
+/**
+ * @brief 保存上次活跃的面板索引
+ * @param panelIndex 面板索引值
+ */
+void SettingsController::saveLastPanel(int panelIndex)
+{
+    SettingsManager::instance().set("session/lastPanel", panelIndex);
+}
+
+/**
+ * @brief 加载上次活跃的面板索引
+ * @return 面板索引值，无保存数据时返回 -1
+ */
+int SettingsController::loadLastPanel() const
+{
+    return SettingsManager::instance().get("session/lastPanel", -1).toInt();
 }
 
 /**
@@ -124,7 +217,10 @@ void SettingsController::onThemeChanged(int index)
 
     QString themeName = m_toolbarController->themeNameAt(index);
     if (!themeName.isEmpty()) {
+        // 加载新主题（带淡入淡出动画）
         ThemeManager::instance().loadTheme(themeName);
+        // 立即持久化主题选择
+        ThemeManager::instance().saveTheme();
     }
 }
 

@@ -27,8 +27,8 @@ void DataStatistics::setupUI()
 {
     // 主布局：上下排列，紧凑边距
     auto* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(8, 8, 8, 8);
-    mainLayout->setSpacing(4);
+    mainLayout->setContentsMargins(12, 12, 12, 12);
+    mainLayout->setSpacing(8);
 
     // ---- 接收（RX）统计区域 ----
     auto* rxFrame = new QFrame;

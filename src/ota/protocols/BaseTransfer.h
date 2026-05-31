@@ -61,6 +61,9 @@ protected:
     int m_maxRetries = 10;
     int m_timeoutMs = 5000;
 
+    /// 接收缓冲区最大容量(1MB)，防止恶意发送方耗尽内存
+    static constexpr int kMaxReceiveBufferSize = 1024 * 1024;
+
     // === 纯虚钩子(子类必须实现) ===
 
     // start()的协议特有初始化阶段

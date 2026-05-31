@@ -19,7 +19,6 @@
 #include <QGroupBox>
 #include <QSerialPortInfo>
 #include <QIntValidator>
-#include <QLineEdit>
 
 /**
  * @brief 构造串口配置面板

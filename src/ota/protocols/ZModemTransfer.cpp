@@ -15,6 +15,19 @@ void ZModemTransfer::setFilePath(const QString& path)
 
 bool ZModemTransfer::onStartInit()
 {
+    // 文件大小校验: 拒绝超过1MB的文件，防止内存耗尽
+    static constexpr qint64 kMaxFileSize = 1024 * 1024; // 1MB
+    QFileInfo fileInfo(m_filePath);
+    if (fileInfo.size() > kMaxFileSize) {
+        qWarning() << "ZModem: file too large:" << fileInfo.size()
+                   << "bytes (max" << kMaxFileSize << "bytes)";
+        emit transferError(QString("File too large: %1 (%2 bytes, max %3 bytes)")
+                               .arg(m_filePath)
+                               .arg(fileInfo.size())
+                               .arg(kMaxFileSize));
+        return false;
+    }
+
     QFile file(m_filePath);
     if (!file.open(QIODevice::ReadOnly)) {
         emit transferError(QString("Cannot open file: %1").arg(m_filePath));

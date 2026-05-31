@@ -23,6 +23,7 @@
 #include "core/SendController.h"
 #include "core/ToolbarController.h"
 #include "core/SettingsController.h"
+#include "core/TerminalController.h"
 #include "core/PanelManager.h"
 #include "core/BackgroundWidget.h"
 #include "core/BackgroundSettingsPopup.h"
@@ -50,13 +51,9 @@
  * 设计模式: 中介者模式（Mediator）- 协调各 Controller 之间的交互
  *
  * 协作关系:
- *   - ConnectionController: 管理串口/网络连接的生命周期
- *   - SendController: 管理发送栏 UI 和数据发送
- *   - NavigationController: 管理导航树和面板切换动画
- *   - ToolbarController: 管理工具栏控件创建和事件转发
- *   - SettingsController: 管理设置的加载/保存
- *   - RecordingController: 管理数据录制和回放
- *   - BackgroundWidget: 提供磨砂玻璃背景和涟漪特效
+ *   - ConnectionController/SendController/NavigationController
+ *   - ToolbarController/SettingsController/TerminalController
+ *   - RecordingController/BackgroundWidget
  */
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -80,43 +77,8 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private slots:
-    /**
-     * @brief 终端显示模式切换（文本/HEX/混合/十进制）
-     * @param index 下拉框选中索引: 0=文本, 1=HEX, 2=混合, 3=十进制
-     */
-    void onDisplayModeChanged(int index);
-
-    /**
-     * @brief 时间戳显示开关切换
-     * @param checked true=显示时间戳, false=不显示
-     */
-    void onTimestampToggled(bool checked);
-
-    /** @brief 清空终端内容和数据统计，重置 RX/TX 字节计数 */
-    void onClearTerminal();
-
-    /** @brief 导出终端数据到文件（支持 TXT/CSV/BIN 格式） */
-    void onExportData();
-
-    /**
-     * @brief 终端搜索请求处理
-     * @param pattern 搜索模式字符串
-     * @param regex 是否使用正则表达式
-     * @param hex 是否为 HEX 模式搜索
-     */
-    void onSearchRequested(const QString& pattern, bool regex, bool hex);
-
-    /** @brief 清除终端搜索高亮 */
-    void onSearchCleared();
-
     /** @brief 切换背景设置弹出面板的显示/隐藏 */
     void onBgSettingsToggled();
-
-    /**
-     * @brief 终端布局模式切换（混合/左右分栏/上下分栏）
-     * @param index 下拉框选中索引: 0=混合, 1=左右分栏, 2=上下分栏
-     */
-    void onTerminalLayoutChanged(int index);
 
 private:
     /** @brief 构建完整的 UI 布局（背景层→分割器→导航树→面板栈→发送栏） */
@@ -132,11 +94,12 @@ private:
      */
     void connectSignals();
 
-    /** @brief 刷新状态栏中的 RX/TX 字节数显示 */
-    void updateStatusBar();
-
-    /** @brief 定时刷新数据统计面板的 RX/TX 累计字节 */
-    void updateDataStatistics();
+    /**
+     * @brief 处理连接状态变更（更新状态栏、配置面板按钮、呼吸动画）
+     * @param state 新的连接状态枚举
+     * @param connName 连接名称
+     */
+    void handleConnectionState(ConnectionState state, const QString& connName);
 
     // ==================== 核心组件 ====================
 
@@ -184,7 +147,7 @@ private:
 
     // ==================== 面板管理 ====================
 
-    /** @brief 面板管理器，统一创建和管理所有功能面板（串口配置/终端/统计/协议/波形图/OTA等） */
+    /** @brief 面板管理器，统一创建和管理所有功能面板 */
     PanelManager* m_panelManager;
 
     // ==================== UI组件 - 终端布局 ====================
@@ -210,17 +173,6 @@ private:
     /** @brief 连接状态标签，显示"未连接"/"已连接: xxx"/"连接中..."等状态 */
     QLabel* m_connStatusLbl;
 
-    /** @brief 接收字节计数标签，格式: "RX: xxx B/KB/MB" */
-    QLabel* m_rxBytesLbl;
-
-    /** @brief 发送字节计数标签，格式: "TX: xxx B/KB/MB" */
-    QLabel* m_txBytesLbl;
-
-    // ==================== 定时器 ====================
-
-    /** @brief 统计刷新定时器，每 500ms 触发一次 updateDataStatistics() */
-    QTimer* m_statsTimer;
-
     // ==================== 子控制器 ====================
 
     /** @brief 导航控制器，负责导航树构建、面板切换动画（淡入淡出）和呼吸动画 */
@@ -228,6 +180,9 @@ private:
 
     /** @brief 设置控制器，负责窗口几何/主题/串口配置/语言的持久化加载与保存 */
     SettingsController* m_settingsController;
+
+    /** @brief 终端控制器，负责终端显示/搜索/导出/统计/状态栏字节显示 */
+    TerminalController* m_terminalController;
 
     // ==================== 背景组件 ====================
 

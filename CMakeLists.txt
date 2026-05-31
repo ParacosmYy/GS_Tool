@@ -31,12 +31,14 @@ find_package(Qt6 REQUIRED COMPONENTS
 set(SOURCES
     src/main.cpp
     src/core/MainWindow.cpp
+    src/core/MainWindowSignalConnect.cpp
     src/core/ConnectionController.cpp
     src/core/RecordingController.cpp
     src/core/NavigationController.cpp
     src/core/SendController.cpp
     src/core/SettingsController.cpp
     src/core/ToolbarController.cpp
+    src/core/TerminalController.cpp
     src/core/PanelManager.cpp
     src/core/BackgroundWidget.cpp
     src/core/BackgroundSettingsPopup.cpp
@@ -62,6 +64,7 @@ set(SOURCES
     src/serial/SerialDriverDetector.cpp
     src/serial/PortWatcher.cpp
     src/protocol/FrameParser.cpp
+    src/protocol/FrameParserHelpers.cpp
     src/protocol/ProtocolView.cpp
     src/protocol/FrameVisualEditor.cpp
     src/protocol/IntelHexParser.cpp
@@ -85,6 +88,7 @@ set(SOURCES
     src/utils/RingBuffer.h
     src/utils/CRC.h
     src/protocol/FrameDefinition.cpp
+    src/core/SessionManager.cpp
 )
 
 set(HEADERS
@@ -95,6 +99,7 @@ set(HEADERS
     src/core/SendController.h
     src/core/SettingsController.h
     src/core/ToolbarController.h
+    src/core/TerminalController.h
     src/core/PanelManager.h
     src/core/BackgroundWidget.h
     src/core/BackgroundSettingsPopup.h
@@ -102,6 +107,7 @@ set(HEADERS
     src/core/ConnectionFactory.h
     src/core/ThemeManager.h
     src/core/Constants.h
+    src/core/SessionManager.h
     src/connection/IConnection.h
     src/connection/SerialConnection.h
     src/connection/TcpConnection.h

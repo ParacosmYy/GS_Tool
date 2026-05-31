@@ -1,6 +1,6 @@
 #include "ota/OtaHistoryModel.h"
 #include "utils/SettingsManager.h"
-#include "core/Constants.h"
+#include "core/ThemeManager.h"
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -54,7 +54,9 @@ QVariant OtaHistoryModel::data(const QModelIndex& index, int role) const
 
     if (role == Qt::ForegroundRole) {
         if (index.column() == ColResult) {
-            return rec.success ? QColor(ThemeColors::kSuccessHex) : QColor(ThemeColors::kErrorHex);
+            return rec.success
+                ? ThemeManager::instance().color(ThemeManager::SemanticColor::Success)
+                : ThemeManager::instance().color(ThemeManager::SemanticColor::Error);
         }
     }
 

@@ -1,5 +1,34 @@
 /* EmbedDebug - 现代深色主题 (VS Code / Tokyo Night 风格) */
 
+/*
+ * 语义色板定义 — ThemeManager 从此块解析自绘控件颜色
+ */
+--semantic-BgPrimary: #1a1b26;
+--semantic-BgSecondary: #24283b;
+--semantic-BgTertiary: #414868;
+--semantic-BgHover: #414868;
+--semantic-TextPrimary: #c0caf5;
+--semantic-TextSecondary: #a9b1d6;
+--semantic-TextMuted: #565f89;
+--semantic-Accent: #7aa2f7;
+--semantic-AccentHover: #a0b8f9;
+--semantic-AccentPressed: #6a90e8;
+--semantic-Border: #24283b;
+--semantic-BorderFocus: #7aa2f7;
+--semantic-Success: #9ece6a;
+--semantic-Warning: #e0af68;
+--semantic-Error: #f7768e;
+--semantic-Scrollbar: #414868;
+--semantic-ScrollbarHover: #565f89;
+--semantic-TermBackground: #1a1b26;
+--semantic-TermRxText: #c0caf5;
+--semantic-TermTxText: #9ece6a;
+--semantic-TermTimestamp: #565f89;
+--semantic-TermSelection: #414868;
+--semantic-TermSearchHighlight: rgba(224, 175, 104, 80);
+--semantic-TermCurrentMatch: rgba(224, 175, 104, 180);
+
+
 /* 全局背景 */
 QMainWindow {
     background-color: #1a1b26;
@@ -286,11 +315,11 @@ QSpinBox:disabled {
     border: 1px solid #292e42;
 }
 
-/* CheckBox */
+/* CheckBox - 统一自定义指示器样式 */
 QCheckBox {
     color: #a9b1d6;
     font-size: 13px;
-    spacing: 6px;
+    spacing: 8px;
 }
 
 QCheckBox::indicator {
@@ -306,25 +335,37 @@ QCheckBox::indicator:checked {
     border: 1px solid #7aa2f7;
 }
 
+QCheckBox::indicator:hover {
+    border-color: #7aa2f7;
+}
+
+QCheckBox::indicator:disabled {
+    background-color: #292e42;
+    border-color: #292e42;
+}
+
 /* 配置面板标签 */
 QLabel {
     color: #9aa5ce;
     font-size: 13px;
 }
 
+/* QGroupBox - 统一标题样式（字体大小、颜色、间距） */
 QGroupBox {
     color: #a9b1d6;
     border: 1px solid #292e42;
     border-radius: 6px;
-    margin-top: 12px;
-    padding-top: 16px;
+    margin-top: 14px;
+    padding-top: 18px;
     font-weight: bold;
+    font-size: 13px;
 }
 
 QGroupBox::title {
     subcontrol-origin: margin;
     left: 12px;
-    padding: 0 6px;
+    padding: 0 8px;
+    color: #9aa5ce;
 }
 
 /* === OTA Widget === */
@@ -443,19 +484,6 @@ QPushButton#refreshBtn:disabled {
 }
 
 /* === SerialConfigPanel 控件 ===*/
-QGroupBox {
-    font-weight: bold;
-    border: 1px solid #292e42;
-    border-radius: 6px;
-    margin-top: 12px;
-    padding-top: 16px;
-}
-QGroupBox::title {
-    subcontrol-origin: margin;
-    left: 10px;
-    padding: 0 6px;
-    color: #a9b1d6;
-}
 QCheckBox#dtrCheck, QCheckBox#rtsCheck {
     spacing: 6px;
     color: #c0caf5;
@@ -730,6 +758,10 @@ QSlider#bgBlurSlider::handle:horizontal:hover, QSlider#bgOpacitySlider::handle:h
     background: #89b4fa;
 }
 
+QSlider#bgBlurSlider::handle:horizontal:disabled, QSlider#bgOpacitySlider::handle:horizontal:disabled {
+    background: #414868;
+}
+
 QPushButton#bgSelectImageBtn {
     background-color: #292e42;
     color: #7aa2f7;
@@ -862,4 +894,12 @@ QComboBox#langCombo:disabled {
     background-color: #292e42;
     color: #565f89;
     border-color: #292e42;
+}
+
+/* === PortWatcher 提示文字样式 === */
+QLabel#driverInfoLbl {
+    font-size: 11px;
+    color: #565f89;
+    padding: 4px 8px;
+    background-color: transparent;
 }

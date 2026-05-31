@@ -1,6 +1,7 @@
 #include "ProtocolView.h"
 #include "utils/HexConverter.h"
 #include "core/Constants.h"
+#include "core/ThemeManager.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
@@ -385,12 +386,19 @@ void ProtocolView::onFrameError(const QString& reason, const QByteArray& rawFram
         QString value = errorFields.value(m_fieldNames[i]).toString();
         auto* item = new QStandardItem(value);
         item->setTextAlignment(Qt::AlignCenter);
-        // 错误行用语义色标红（从应用palette获取error色）
-        item->setForeground(QColor(ThemeColors::kErrorHex));
+        // 错误行用语义色标红（从ThemeManager获取error色，适配主题切换）
+        item->setForeground(ThemeManager::instance().color(ThemeManager::SemanticColor::Error));
         m_model->setItem(row, kFixedColumns + i, item);
     }
 
     m_frames.append(errorFields);
+
+    // 错误行同样受最大行数限制，超出时从头部移除旧行（与addFrame一致）
+    while (m_model->rowCount() > m_maxRows) {
+        m_model->removeRow(0);
+        if (!m_frames.isEmpty()) m_frames.removeFirst();
+    }
+
     m_table->scrollToBottom();
     m_statusLabel->setText(tr("Frames: %1 | Errors: %2")
                                .arg(m_totalFrames)

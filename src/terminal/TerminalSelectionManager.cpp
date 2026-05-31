@@ -8,15 +8,21 @@
 
 #include "terminal/TerminalSelectionManager.h"
 #include "terminal/DirectionFilter.h"
+#include "core/ThemeManager.h"
 
 TerminalSelectionManager::TerminalSelectionManager(QObject* parent)
     : QObject(parent)
-    , m_selectionBg(69, 71, 90)  // #45475a 选中背景(Catppuccin Mocha)
+    , m_selectionBg(ThemeManager::instance().color(ThemeManager::SemanticColor::TermSelection))
 {
+    // 主题切换时动态更新选中背景色
+    connect(&ThemeManager::instance(), &ThemeManager::themeChanged, this, [this]() {
+        m_selectionBg = ThemeManager::instance().color(ThemeManager::SemanticColor::TermSelection);
+    });
 }
 
 void TerminalSelectionManager::onMousePress(double y, int scrollOffset, int lineHeight)
 {
+    if (lineHeight <= 0) return;  // 防止除零
     m_isSelecting = true;
     int line = scrollOffset + static_cast<int>(y) / lineHeight;
     m_selectionStartLine = line;
@@ -25,7 +31,7 @@ void TerminalSelectionManager::onMousePress(double y, int scrollOffset, int line
 
 void TerminalSelectionManager::onMouseMove(double y, int scrollOffset, int lineHeight)
 {
-    if (m_isSelecting) {
+    if (m_isSelecting && lineHeight > 0) {
         int line = scrollOffset + static_cast<int>(y) / lineHeight;
         m_selectionEndLine = line;
     }

@@ -70,6 +70,18 @@ void BaseTransfer::onConnectionReadyRead(const QByteArray& data)
 {
     // 终止态不再处理数据，防止cancel/error后残留数据触发状态机
     if (isIdle() || isDone() || isError()) return;
+
+    // 缓冲区溢出保护: 超过最大容量时中止传输，防止恶意数据耗尽内存
+    if (m_receiveBuffer.size() + data.size() > kMaxReceiveBufferSize) {
+        qWarning() << "BaseTransfer: receive buffer overflow, size:"
+                   << m_receiveBuffer.size() << "+ incoming:" << data.size()
+                   << "exceeds max:" << kMaxReceiveBufferSize;
+        sendCancelBytes();
+        markError();
+        emit transferError("Receive buffer overflow: connection may be malicious");
+        return;
+    }
+
     m_receiveBuffer.append(data);
     processReceivedData();
 }

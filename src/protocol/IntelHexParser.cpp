@@ -1,3 +1,11 @@
+/**
+ * @file IntelHexParser.cpp
+ * @brief Intel HEX文件解析器实现
+ *
+ * 完整支持所有记录类型(00-05)，包含校验和验证、
+ * HEX转BIN输出和解析统计信息计算。
+ */
+
 #include "IntelHexParser.h"
 #include <QFile>
 #include <QTextStream>
@@ -20,24 +28,30 @@ bool parseLine(const QString& line, Record& outRecord)
 
     bool ok;
 
-    // 字节计数
+    // 字节计数(LL)
     outRecord.byteCount = hexData.mid(0, 2).toUInt(&ok, 16);
     if (!ok) return false;
 
-    // 地址
+    // 地址(AAAA)
     outRecord.address = hexData.mid(2, 4).toUInt(&ok, 16);
     if (!ok) return false;
 
-    // 记录类型
+    // 记录类型(TT)
     outRecord.type = hexData.mid(6, 2).toUInt(&ok, 16);
     if (!ok) return false;
 
-    // 数据
+    // 验证记录类型范围(00-05)
+    if (outRecord.type > 0x05) {
+        return false;
+    }
+
+    // 数据字段长度检查
     int dataChars = outRecord.byteCount * 2;
     if (hexData.length() < 8 + dataChars + 2) {
         return false;
     }
 
+    // 解析数据字节
     outRecord.data.clear();
     outRecord.data.reserve(outRecord.byteCount);
     for (int i = 0; i < outRecord.byteCount; ++i) {
@@ -47,10 +61,11 @@ bool parseLine(const QString& line, Record& outRecord)
         outRecord.data.append(byte);
     }
 
-    // 校验和
+    // 校验和(CC)
     outRecord.checksum = hexData.mid(8 + dataChars, 2).toUInt(&ok, 16);
     if (!ok) return false;
 
+    // 验证校验和
     return verifyChecksum(outRecord);
 }
 
@@ -99,7 +114,8 @@ bool parseRecords(const QString& filePath, QVector<Record>& outRecords)
     return !outRecords.isEmpty();
 }
 
-bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary, quint32& startAddress)
+bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary,
+                  quint32& startAddress)
 {
     if (records.isEmpty()) return false;
 
@@ -121,14 +137,23 @@ bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary, quint32
             break;
         }
         case ExtendedLinearAddr:
-            baseAddr = (static_cast<quint8>(rec.data[0]) << 24) |
-                       (static_cast<quint8>(rec.data[1]) << 16);
+            // 类型04: 设置32位地址高16位
+            if (rec.data.size() >= 2) {
+                baseAddr = (static_cast<quint8>(rec.data[0]) << 24) |
+                           (static_cast<quint8>(rec.data[1]) << 16);
+            }
             break;
         case ExtendedSegmentAddr:
-            baseAddr = (static_cast<quint8>(rec.data[0]) << 12) |
-                       (static_cast<quint8>(rec.data[1]) << 4);
+            // 类型02: 设置20位段地址(左移4位)
+            if (rec.data.size() >= 2) {
+                baseAddr = (static_cast<quint8>(rec.data[0]) << 12) |
+                           (static_cast<quint8>(rec.data[1]) << 4);
+            }
             break;
-        default:
+        case StartSegmentAddr:
+        case StartLinearAddr:
+        case EndOfFile:
+            // 这些类型不影响地址范围计算
             break;
         }
     }
@@ -142,7 +167,7 @@ bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary, quint32
         return false;
     }
 
-    // 初始化输出缓冲区（填充0xFF，与Flash默认值一致）
+    // 初始化输出缓冲区(填充0xFF，与Flash默认值一致)
     outBinary.fill(static_cast<char>(0xFF), static_cast<int>(totalSize));
 
     // 第二遍: 填充数据
@@ -153,19 +178,26 @@ bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary, quint32
             quint32 absAddr = baseAddr + rec.address;
             quint32 offset = absAddr - minAddr;
             if (offset + rec.byteCount <= totalSize) {
-                memcpy(outBinary.data() + offset, rec.data.constData(), rec.byteCount);
+                memcpy(outBinary.data() + offset,
+                       rec.data.constData(), rec.byteCount);
             }
             break;
         }
         case ExtendedLinearAddr:
-            baseAddr = (static_cast<quint8>(rec.data[0]) << 24) |
-                       (static_cast<quint8>(rec.data[1]) << 16);
+            if (rec.data.size() >= 2) {
+                baseAddr = (static_cast<quint8>(rec.data[0]) << 24) |
+                           (static_cast<quint8>(rec.data[1]) << 16);
+            }
             break;
         case ExtendedSegmentAddr:
-            baseAddr = (static_cast<quint8>(rec.data[0]) << 12) |
-                       (static_cast<quint8>(rec.data[1]) << 4);
+            if (rec.data.size() >= 2) {
+                baseAddr = (static_cast<quint8>(rec.data[0]) << 12) |
+                           (static_cast<quint8>(rec.data[1]) << 4);
+            }
             break;
-        default:
+        case StartSegmentAddr:
+        case StartLinearAddr:
+        case EndOfFile:
             break;
         }
     }
@@ -173,12 +205,125 @@ bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary, quint32
     return true;
 }
 
-bool parse(const QString& filePath, QByteArray& outBinary, quint32& startAddress)
+bool parse(const QString& filePath, QByteArray& outBinary,
+           quint32& startAddress)
 {
     QVector<Record> records;
     if (!parseRecords(filePath, records)) {
         return false;
     }
+    return mergeRecords(records, outBinary, startAddress);
+}
+
+// ---- 统计信息 ----
+
+void computeStats(const QVector<Record>& records, ParseStats& stats)
+{
+    stats = ParseStats();
+    quint32 baseAddr = 0;
+    quint32 minAddr = 0xFFFFFFFF;
+    quint32 maxAddr = 0;
+
+    for (const auto& rec : records) {
+        stats.totalLines++;
+
+        if (rec.type == DataRecord) {
+            stats.dataRecordCount++;
+            stats.totalDataBytes += rec.byteCount;
+
+            quint32 absAddr = baseAddr + rec.address;
+            if (absAddr < minAddr) minAddr = absAddr;
+            quint32 endAddr = absAddr + rec.byteCount;
+            if (endAddr > maxAddr) maxAddr = endAddr;
+        } else if (rec.type == ExtendedLinearAddr) {
+            if (rec.data.size() >= 2) {
+                baseAddr = (static_cast<quint8>(rec.data[0]) << 24) |
+                           (static_cast<quint8>(rec.data[1]) << 16);
+            }
+        } else if (rec.type == ExtendedSegmentAddr) {
+            if (rec.data.size() >= 2) {
+                baseAddr = (static_cast<quint8>(rec.data[0]) << 12) |
+                           (static_cast<quint8>(rec.data[1]) << 4);
+            }
+        } else if (rec.type == StartSegmentAddr) {
+            // 类型03: 80x86 CS:IP (4字节: CS高+CS低+IP高+IP低)
+            if (rec.data.size() >= 4) {
+                quint32 cs = (static_cast<quint8>(rec.data[0]) << 8) |
+                             static_cast<quint8>(rec.data[1]);
+                quint32 ip = (static_cast<quint8>(rec.data[2]) << 8) |
+                             static_cast<quint8>(rec.data[3]);
+                stats.executionAddress = (cs << 4) + ip;
+                stats.hasExecutionAddress = true;
+            }
+        } else if (rec.type == StartLinearAddr) {
+            // 类型05: 32位EIP (4字节: 高→低)
+            if (rec.data.size() >= 4) {
+                stats.executionAddress =
+                    (static_cast<quint8>(rec.data[0]) << 24) |
+                    (static_cast<quint8>(rec.data[1]) << 16) |
+                    (static_cast<quint8>(rec.data[2]) << 8) |
+                    static_cast<quint8>(rec.data[3]);
+                stats.hasExecutionAddress = true;
+            }
+        }
+    }
+
+    if (stats.dataRecordCount > 0) {
+        stats.startAddress = minAddr;
+        stats.endAddress = maxAddr;
+    }
+}
+
+bool parseWithStats(const QString& filePath, QByteArray& outBinary,
+                    quint32& startAddress, ParseStats& stats)
+{
+    QVector<Record> records;
+
+    // 先解析记录，同时统计校验和错误
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open HEX file:" << filePath;
+        return false;
+    }
+
+    records.clear();
+    QTextStream stream(&file);
+    stats = ParseStats();
+
+    while (!stream.atEnd()) {
+        QString line = stream.readLine().trimmed();
+        if (line.isEmpty()) continue;
+
+        Record record;
+        if (!parseLine(line, record)) {
+            // 解析失败可能是校验和错误或其他格式错误
+            // 尝试仅做校验和检查
+            QString hexData = line.trimmed().mid(1);
+            if (hexData.length() >= 10) {
+                // 如果能解析出基本字段但校验和失败，计入错误
+                stats.checksumErrors++;
+            }
+            qWarning() << "Invalid HEX record:" << line;
+            continue;
+        }
+        records.append(record);
+
+        if (record.type == EndOfFile) {
+            break;
+        }
+    }
+    file.close();
+
+    if (records.isEmpty()) return false;
+
+    // 计算统计信息
+    ParseStats computedStats;
+    computeStats(records, computedStats);
+    // 保留checksumErrors(已被parseLine过滤的记录)
+    computedStats.checksumErrors = stats.checksumErrors;
+    stats = computedStats;
+
+    // 合并为二进制
     return mergeRecords(records, outBinary, startAddress);
 }
 
