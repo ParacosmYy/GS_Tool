@@ -23,6 +23,8 @@
 #include "serial/SendHistory.h"
 #include "serial/DataStatistics.h"
 #include "utils/DataExporter.h"
+#include "utils/SettingsManager.h"
+#include "terminal/TerminalSearchBar.h"
 #include "Constants.h"
 
 // 主窗口 - 左侧导航树 + 右侧功能面板
@@ -60,6 +62,13 @@ private slots:
     // 导出数据
     void onExportData();
 
+    // 搜索相关
+    void onSearchRequested(const QString& pattern, bool regex, bool hex);
+    void onSearchCleared();
+
+    // 主题切换
+    void onThemeChanged(int index);
+
     // 连接状态变化
     void onConnectionStateChanged(ConnectionState state);
 
@@ -73,6 +82,8 @@ private:
     void connectSignals();
     void updateStatusBar();
     void updateDataStatistics();
+    void loadSettings();
+    void saveSettings();
 
     // 核心组件
     ConnectionManager* m_connManager;
@@ -93,6 +104,7 @@ private:
     // UI组件 - 工具栏
     QToolBar* m_toolbar;
     QComboBox* m_displayModeCombo;
+    QComboBox* m_themeCombo;
     QAction* m_timestampAction;
     QAction* m_clearAction;
     QAction* m_exportAction;
@@ -102,6 +114,7 @@ private:
 
     // UI组件 - 终端
     TerminalWidget* m_terminal;
+    TerminalSearchBar* m_searchBar;
 
     // UI组件 - 发送区域
     QLineEdit* m_sendInput;

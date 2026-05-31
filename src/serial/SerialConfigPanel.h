@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QSerialPort>
 #include <QLabel>
+#include <QVariantMap>
 #include "connection/SerialConnection.h"
 
 // 串口配置面板 - 选择端口、波特率、数据位等参数
@@ -39,6 +40,9 @@ public:
 
     // 当前是否处于连接状态
     bool isConnected() const;
+
+    // 从保存的配置恢复到界面
+    void restoreConfig(const QVariantMap& config);
 
 signals:
     // 用户点击连接/断开按钮

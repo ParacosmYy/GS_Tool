@@ -32,6 +32,7 @@ set(SOURCES
     src/connection/SerialConnection.cpp
     src/terminal/TerminalWidget.cpp
     src/terminal/TerminalModel.cpp
+    src/terminal/TerminalSearchBar.cpp
     src/serial/SerialConfigPanel.cpp
     src/serial/QuickCommandBar.cpp
     src/serial/TimedSender.cpp
@@ -54,6 +55,7 @@ set(HEADERS
     src/connection/SerialConnection.h
     src/terminal/TerminalWidget.h
     src/terminal/TerminalModel.h
+    src/terminal/TerminalSearchBar.h
     src/serial/SerialConfigPanel.h
     src/serial/QuickCommandBar.h
     src/serial/TimedSender.h

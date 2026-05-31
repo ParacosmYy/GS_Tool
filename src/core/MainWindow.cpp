@@ -12,6 +12,8 @@
 #include <QFileDialog>
 #include <QTimer>
 #include <QStringListModel>
+#include <QShortcut>
+#include <QKeySequence>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -27,8 +29,8 @@ MainWindow::MainWindow(QWidget* parent)
     setupStatusBar();
     connectSignals();
 
-    // 加载主题
-    ThemeManager::instance().loadTheme("dark_terminal");
+    // 加载保存的设置（主题、窗口几何、串口配置）
+    loadSettings();
 
     // 统计刷新定时器: 每500ms刷新一次
     m_statsTimer->setInterval(500);
@@ -59,6 +61,7 @@ void MainWindow::setupUI()
     auto* treeModel = new QStandardItemModel(this);
     auto* rootItem = treeModel->invisibleRootItem();
 
+    // 串口分组
     auto* serialItem = new QStandardItem(tr("Serial Port"));
     serialItem->setEditable(false);
     auto* configItem = new QStandardItem(tr("Config"));
@@ -71,7 +74,15 @@ void MainWindow::setupUI()
     serialItem->appendRow(terminalItem);
     serialItem->appendRow(statsItem);
 
+    // 工具分组
+    auto* toolsItem = new QStandardItem(tr("Tools"));
+    toolsItem->setEditable(false);
+    auto* exportItem = new QStandardItem(tr("Data Export"));
+    exportItem->setEditable(false);
+    toolsItem->appendRow(exportItem);
+
     rootItem->appendRow(serialItem);
+    rootItem->appendRow(toolsItem);
 
     m_navTree->setModel(treeModel);
     m_navTree->expandAll();
@@ -103,10 +114,22 @@ void MainWindow::setupUI()
     m_dataStats->setVisible(false);
     serialLayout->addWidget(m_dataStats);
 
+    // 终端容器: 搜索栏 + 终端
+    auto* terminalContainer = new QWidget;
+    auto* terminalLayout = new QVBoxLayout(terminalContainer);
+    terminalLayout->setContentsMargins(0, 0, 0, 0);
+    terminalLayout->setSpacing(0);
+
+    // 搜索栏嵌入终端顶部
+    m_searchBar = new TerminalSearchBar(terminalContainer);
+    terminalLayout->addWidget(m_searchBar);
+
     // 终端显示区
     m_terminal = new TerminalWidget;
     m_terminal->setModel(m_terminalModel);
-    serialLayout->addWidget(m_terminal, 1);
+    terminalLayout->addWidget(m_terminal, 1);
+
+    serialLayout->addWidget(terminalContainer, 1);
 
     // 快捷指令栏
     m_quickCmdBar = new QuickCommandBar;
@@ -152,6 +175,10 @@ void MainWindow::setupUI()
     m_mainSplitter->setSizes({200, 1000});
     m_mainSplitter->setStretchFactor(0, 0);
     m_mainSplitter->setStretchFactor(1, 1);
+
+    // Ctrl+F 快捷键激活搜索栏
+    auto* searchShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
+    connect(searchShortcut, &QShortcut::activated, m_searchBar, &TerminalSearchBar::activate);
 }
 
 void MainWindow::setupToolbar()
@@ -175,6 +202,28 @@ void MainWindow::setupToolbar()
 
     // 导出按钮
     m_exportAction = m_toolbar->addAction(tr("Export"));
+
+    m_toolbar->addSeparator();
+
+    // 主题切换下拉框
+    auto* themeLabel = new QLabel(tr(" Theme: "));
+    m_toolbar->addWidget(themeLabel);
+
+    m_themeCombo = new QComboBox;
+    QStringList themes = ThemeManager::instance().availableThemes();
+    for (const QString& name : themes) {
+        // 显示友好名称: dark_terminal -> Dark Terminal
+        QString display = name;
+        display[0] = display[0].toUpper();
+        // 将下划线替换为空格并大写每个单词首字母
+        QStringList parts = display.split('_');
+        for (auto& part : parts) {
+            if (!part.isEmpty()) part[0] = part[0].toUpper();
+        }
+        m_themeCombo->addItem(parts.join(" "), name);
+    }
+    m_themeCombo->setFixedWidth(130);
+    m_toolbar->addWidget(m_themeCombo);
 }
 
 void MainWindow::setupStatusBar()
@@ -211,6 +260,19 @@ void MainWindow::connectSignals()
     connect(m_clearAction, &QAction::triggered, this, &MainWindow::onClearTerminal);
     connect(m_exportAction, &QAction::triggered, this, &MainWindow::onExportData);
 
+    // 主题切换
+    connect(m_themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onThemeChanged);
+
+    // 搜索栏
+    connect(m_searchBar, &TerminalSearchBar::searchRequested,
+            this, &MainWindow::onSearchRequested);
+    connect(m_searchBar, &TerminalSearchBar::searchCleared,
+            this, &MainWindow::onSearchCleared);
+    connect(m_searchBar, &TerminalSearchBar::closed, this, [this]() {
+        // 搜索栏关闭时清除终端搜索高亮（后续实现）
+    });
+
     // 定时发送器
     connect(m_timedSender, &TimedSender::sendData, this, [this](const QByteArray& data) {
         if (m_currentConn && m_currentConn->state() == ConnectionState::Connected) {
@@ -243,8 +305,62 @@ void MainWindow::connectSignals()
             m_serialConfig->setVisible(false);
             m_terminal->setVisible(false);
             m_dataStats->setVisible(true);
+        } else if (text == tr("Data Export")) {
+            onExportData();
         }
     });
+}
+
+void MainWindow::loadSettings()
+{
+    auto& settings = SettingsManager::instance();
+
+    // 恢复窗口几何
+    QByteArray geometry = settings.loadWindowGeometry();
+    if (!geometry.isEmpty()) {
+        restoreGeometry(geometry);
+    }
+
+    // 恢复主题
+    QString savedTheme = settings.loadTheme();
+    if (ThemeManager::instance().loadTheme(savedTheme)) {
+        // 同步主题下拉框选中项
+        for (int i = 0; i < m_themeCombo->count(); ++i) {
+            if (m_themeCombo->itemData(i).toString() == savedTheme) {
+                m_themeCombo->setCurrentIndex(i);
+                break;
+            }
+        }
+    }
+
+    // 恢复串口配置到配置面板
+    QVariantMap serialConfig = settings.loadSerialConfig();
+    if (!serialConfig.isEmpty()) {
+        m_serialConfig->restoreConfig(serialConfig);
+    }
+}
+
+void MainWindow::saveSettings()
+{
+    auto& settings = SettingsManager::instance();
+
+    // 保存窗口几何
+    settings.saveWindowGeometry(saveGeometry());
+
+    // 保存当前主题
+    settings.saveTheme(ThemeManager::instance().currentTheme());
+
+    // 保存串口配置（从配置面板获取当前值）
+    QVariantMap serialConfig;
+    serialConfig["portName"] = m_serialConfig->currentPortData();
+    serialConfig["baudRate"] = m_serialConfig->currentBaudRate();
+    serialConfig["dataBits"] = m_serialConfig->currentDataBitsIndex();
+    serialConfig["parity"] = m_serialConfig->currentParityIndex();
+    serialConfig["stopBits"] = m_serialConfig->currentStopBitsIndex();
+    serialConfig["flowControl"] = m_serialConfig->currentFlowControlIndex();
+    settings.saveSerialConfig(serialConfig);
+
+    settings.sync();
 }
 
 void MainWindow::onConnectSerial()
@@ -321,7 +437,7 @@ void MainWindow::onSendData()
     qint64 written = m_currentConn->write(data);
     if (written > 0) {
         m_terminalModel->appendSent(data);
-        m_sendHistory->addEntry(text, isHex);  // 记录到发送历史
+        m_sendHistory->addEntry(text, isHex);
         m_sendInput->clear();
         m_sendInput->setStyleSheet("");
         updateStatusBar();
@@ -379,6 +495,26 @@ void MainWindow::onExportData()
         statusBar()->showMessage(tr("Exported to %1").arg(filePath), 3000);
     } else {
         QMessageBox::warning(this, tr("Export Failed"), tr("Cannot write to file"));
+    }
+}
+
+void MainWindow::onSearchRequested(const QString& pattern, bool regex, bool hex)
+{
+    // 将搜索请求传递给终端模型（后续在TerminalModel中实现搜索高亮）
+    // 目前仅做日志输出
+    qDebug() << "Search:" << pattern << "regex:" << regex << "hex:" << hex;
+}
+
+void MainWindow::onSearchCleared()
+{
+    // 清除终端搜索高亮（后续实现）
+}
+
+void MainWindow::onThemeChanged(int index)
+{
+    QString themeName = m_themeCombo->itemData(index).toString();
+    if (!themeName.isEmpty()) {
+        ThemeManager::instance().loadTheme(themeName);
     }
 }
 
@@ -441,6 +577,10 @@ void MainWindow::updateDataStatistics()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+    // 保存设置到磁盘
+    saveSettings();
+
+    // 关闭所有连接
     auto connections = m_connManager->connections();
     for (auto* conn : connections) {
         conn->close();

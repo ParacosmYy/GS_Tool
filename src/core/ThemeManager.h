@@ -15,6 +15,9 @@ public:
     // 加载指定主题
     bool loadTheme(const QString& themeName);
 
+    // 从外部文件加载自定义主题（方便用户自定义QSS）
+    bool loadThemeFromFile(const QString& filePath);
+
     // 获取可用主题列表
     QStringList availableThemes() const;
 

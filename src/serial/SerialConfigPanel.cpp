@@ -239,3 +239,38 @@ int SerialConfigPanel::currentFlowControlIndex() const
 {
     return m_flowControlCombo->currentIndex();
 }
+
+void SerialConfigPanel::restoreConfig(const QVariantMap& config)
+{
+    if (config.contains("portName")) {
+        QString portName = config["portName"].toString();
+        int idx = m_portCombo->findData(portName);
+        if (idx >= 0) {
+            m_portCombo->setCurrentIndex(idx);
+        }
+    }
+    if (config.contains("baudRate")) {
+        m_baudCombo->setCurrentText(QString::number(config["baudRate"].toInt()));
+    }
+    if (config.contains("dataBits")) {
+        m_dataBitsCombo->setCurrentIndex(config["dataBits"].toInt());
+    }
+    if (config.contains("parity")) {
+        int idx = config["parity"].toInt();
+        if (idx >= 0 && idx < m_parityCombo->count()) {
+            m_parityCombo->setCurrentIndex(idx);
+        }
+    }
+    if (config.contains("stopBits")) {
+        int idx = config["stopBits"].toInt();
+        if (idx >= 0 && idx < m_stopBitsCombo->count()) {
+            m_stopBitsCombo->setCurrentIndex(idx);
+        }
+    }
+    if (config.contains("flowControl")) {
+        int idx = config["flowControl"].toInt();
+        if (idx >= 0 && idx < m_flowControlCombo->count()) {
+            m_flowControlCombo->setCurrentIndex(idx);
+        }
+    }
+}
