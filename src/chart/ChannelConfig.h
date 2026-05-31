@@ -8,6 +8,7 @@
 #include <QVariantMap>
 #include <QJsonObject>
 #include <QJsonArray>
+#include "chart/ChartColors.h"
 
 // 前向声明，避免直接依赖协议层头文件
 struct FieldDef;
@@ -127,9 +128,6 @@ public:
 
 private:
     QVector<ChannelConfig> m_channels;
-
-    // 默认颜色表（与ChartWidget保持一致）
-    static const QVector<QColor> kDefaultColors;
 };
 
 #endif // CHANNELCONFIG_H

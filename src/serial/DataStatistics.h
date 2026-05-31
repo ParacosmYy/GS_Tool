@@ -50,6 +50,7 @@ private:
 
     QTimer m_refreshTimer;         // 1秒刷新定时器，用于速率采样和UI更新
     QElapsedTimer m_stopwatch;     // 连接持续计时器
+    QElapsedTimer m_sampleTimer;   // 采样间隔计时器，用于计算精确速率
 
     quint64 m_lastRxBytes = 0;     // 上一次采样时的RX累计值
     quint64 m_lastTxBytes = 0;     // 上一次采样时的TX累计值

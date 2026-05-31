@@ -127,14 +127,6 @@ ChannelConfig ChannelConfig::fromJson(const QJsonObject& obj)
 // ChannelConfigSet 实现
 // ============================================================
 
-// 默认颜色表 -- 与ChartWidget::kDefaultColors保持一致
-const QVector<QColor> ChannelConfigSet::kDefaultColors = {
-    QColor("#89b4fa"), QColor("#a6e3a1"), QColor("#f9e2af"),
-    QColor("#f38ba8"), QColor("#94e2d5"), QColor("#cba6f7"),
-    QColor("#fab387"), QColor("#74c7ec"), QColor("#f5c2e7"),
-    QColor("#b4befe")
-};
-
 void ChannelConfigSet::addChannel(const ChannelConfig& config)
 {
     m_channels.append(config);
@@ -241,7 +233,7 @@ ChannelConfigSet ChannelConfigSet::generateDefaults(const QVector<FieldDef>& fie
         cfg.scale = field.scale;
         cfg.offset = field.offsetVal;
         cfg.displayName = field.name;
-        cfg.color = kDefaultColors[colorIndex % kDefaultColors.size()];
+        cfg.color = ChartColors::defaultColors()[colorIndex % ChartColors::defaultColors().size()];
         cfg.enabled = true;
         cfg.unit = field.unit;
         cfg.sampleDivisor = 1;

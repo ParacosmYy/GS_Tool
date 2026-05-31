@@ -4,13 +4,6 @@
 #include <QtCharts>
 #include <algorithm>
 
-const QVector<QColor> ChartWidget::kDefaultColors = {
-    QColor("#89b4fa"), QColor("#a6e3a1"), QColor("#f9e2af"),
-    QColor("#f38ba8"), QColor("#94e2d5"), QColor("#cba6f7"),
-    QColor("#fab387"), QColor("#74c7ec"), QColor("#f5c2e7"),
-    QColor("#b4befe")
-};
-
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
     , m_model(new ChartModel(this))
@@ -245,7 +238,7 @@ void ChartWidget::createSeries(const QString& name, const QColor& color)
     if (m_seriesMap.contains(name)) return;
 
     QColor chColor = color.isValid() ? color :
-        kDefaultColors[m_seriesMap.size() % kDefaultColors.size()];
+        ChartColors::defaultColors()[m_seriesMap.size() % ChartColors::defaultColors().size()];
 
     auto* series = new QLineSeries;
     series->setName(name);

@@ -65,6 +65,10 @@ int DirectionFilter::filteredLineCount() const
 
 int DirectionFilter::modelIndex(int filteredIndex) const
 {
+    // 越界保护: 返回 -1 表示无效索引，调用方已有 if (modelLine >= 0) 的保护
+    if (filteredIndex < 0 || filteredIndex >= m_filteredIndices.size()) {
+        return -1;
+    }
     return m_filteredIndices[filteredIndex];
 }
 

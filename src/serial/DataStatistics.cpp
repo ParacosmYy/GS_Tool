@@ -10,12 +10,15 @@ DataStatistics::DataStatistics(QWidget* parent)
 {
     setupUI();
 
-    // 启动1秒定时器，用于采样速率和刷新UI
+    // 启动1秒定时器，用于刷新速率显示和持续时间
     connect(&m_refreshTimer, &QTimer::timeout,
             this, &DataStatistics::onRefreshTimer);
     m_refreshTimer.setInterval(1000);
 
-    // 启动计时器
+    // 启动采样间隔计时器（用于计算精确速率）
+    m_sampleTimer.start();
+
+    // 启动持续时间计时器
     m_stopwatch.start();
     m_refreshTimer.start();
 }
@@ -90,12 +93,18 @@ void DataStatistics::setupUI()
 
 void DataStatistics::update(quint64 rxBytes, quint64 txBytes)
 {
-    // 计算自上次采样以来的增量，除以秒数得到速率
-    // 第一次调用时 lastXxxBytes 为0，速率为累计值/秒
+    // 计算自上次采样以来的实际时间间隔（毫秒）
+    qint64 elapsedMs = m_sampleTimer.elapsed();
+    m_sampleTimer.restart();
+
+    // 计算增量字节
     quint64 rxDelta = rxBytes - m_lastRxBytes;
     quint64 txDelta = txBytes - m_lastTxBytes;
-    m_rxRate = static_cast<double>(rxDelta);   // 每秒调用一次，即增量值
-    m_txRate = static_cast<double>(txDelta);
+
+    // 按实际时间间隔换算为 bytes/s，避免调用间隔不等于 1s 时速率失真
+    double seconds = qMax(elapsedMs, static_cast<qint64>(1)) / 1000.0;
+    m_rxRate = static_cast<double>(rxDelta) / seconds;
+    m_txRate = static_cast<double>(txDelta) / seconds;
 
     // 记录本次采样值，供下次计算增量
     m_lastRxBytes = rxBytes;

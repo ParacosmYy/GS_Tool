@@ -259,7 +259,7 @@ void MainWindow::connectSignals()
         m_connController->connectSerial(params);
     });
     connect(m_panelManager->serialConfig(), &SerialConfigPanel::disconnectRequested,
-            m_connController, &ConnectionController::disconnectSerial);
+            m_connController, &ConnectionController::disconnectCurrent);
     // DTR/RTS 线路控制信号直连
     connect(m_panelManager->serialConfig(), &SerialConfigPanel::dtrChanged,
             m_connController, &ConnectionController::setDtr);

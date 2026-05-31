@@ -8,6 +8,7 @@
 #include <QString>
 #include <QTimer>
 #include <QVBoxLayout>
+#include "chart/ChartColors.h"
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QComboBox>
@@ -94,9 +95,6 @@ private:
     QComboBox* m_windowSizeCombo;
     QLabel* m_statusLabel;
     bool m_paused = false;
-
-    // 预定义颜色表
-    static const QVector<QColor> kDefaultColors;
 };
 
 #endif // CHARTWIDGET_H

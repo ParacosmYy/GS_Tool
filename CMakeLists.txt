@@ -4,6 +4,11 @@ project(EmbedDebug VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 默认使用Release构建（若未指定）— 确保性能优化和正确的NDEBUG断言行为
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -76,7 +81,7 @@ set(SOURCES
     src/utils/HexConverter.h
     src/utils/RingBuffer.h
     src/utils/CRC.h
-    src/protocol/FrameDefinition.h
+    src/protocol/FrameDefinition.cpp
 )
 
 set(HEADERS
@@ -119,9 +124,10 @@ set(HEADERS
     src/protocol/JustFloatBridge.h
     src/protocol/FireWaterBridge.h
     src/protocol/ProtocolBridgeManager.h
-    src/chart/ChartWidget.h
-    src/chart/ChannelConfig.h
-    src/chart/ChartModel.h
+src/chart/ChartWidget.h
+     src/chart/ChartColors.h
+     src/chart/ChannelConfig.h
+     src/chart/ChartModel.h
     src/ota/OtaManager.h
     src/ota/OtaWidget.h
     src/ota/OtaHistoryModel.h

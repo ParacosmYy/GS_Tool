@@ -65,7 +65,7 @@ public:
 
     /**
      * @brief 面板切换（带动画）
-     * 执行: 淡出旧面板(200ms InCubic) → 隐藏旧面板 → 显示新面板 → 淡入新面板(250ms OutCubic)
+     * 执行: 并行交叉淡入淡出(150ms OutCubic) - 旧面板淡出的同时新面板淡入
      * @param newPanel 目标面板 widget
      */
     void switchToPanel(QWidget* newPanel);
@@ -121,7 +121,7 @@ signals:
 private:
     /**
      * @brief 淡入动画辅助
-     * 250ms OutCubic opacity 0.0 → 1.0
+     * 150ms OutCubic opacity 0.0 → 1.0
      * 动画完成后自动清除 QGraphicsOpacityEffect 以恢复正常绘制性能
      * @param panel 需要淡入的面板 widget
      */

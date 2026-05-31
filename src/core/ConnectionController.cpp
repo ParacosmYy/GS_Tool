@@ -1,6 +1,13 @@
 /**
  * @file ConnectionController.cpp
  * @brief 连接控制器实现 - 管理串口/网络连接的创建、断开和状态分发
+ *
+ * 完整的连接生命周期管理:
+ *   - 串口连接: connectSerial() → 配置 → 打开 → DTR/RTS设置 → 注入下游
+ *   - 网络连接: connectNetwork() → 配置 → 打开 → 注入下游
+ *   - 断开连接: disconnectCurrent() → 关闭 → 清理 → 清空下游
+ *   - 超时保护: 5秒连接超时自动中断
+ *   - 自动重连: 意外断开后自动尝试恢复连接
  */
 
 #include "core/ConnectionController.h"
@@ -9,10 +16,11 @@
 #include "core/RecordingController.h"
 #include "utils/DataLogger.h"
 #include "terminal/TerminalModel.h"
-#include "connection/SerialConnection.h"
 
 /**
  * @brief 构造连接控制器
+ *
+ * 初始化超时定时器和自动重连定时器，连接各自的信号到槽。
  * @param connMgr 连接管理器（工厂），负责创建和销毁 IConnection 实例
  * @param parent 父对象
  */
@@ -20,6 +28,21 @@ ConnectionController::ConnectionController(ConnectionManager* connMgr, QObject* 
     : QObject(parent)
     , m_connManager(connMgr)
 {
+    // 连接超时定时器：单次触发，超时后中断连接
+    m_connectionTimer.setSingleShot(true);
+    connect(&m_connectionTimer, &QTimer::timeout,
+            this, &ConnectionController::onConnectionTimeout);
+
+    // 自动重连定时器：间隔触发，每次检查是否需要重连
+    connect(&m_reconnectTimer, &QTimer::timeout,
+            this, &ConnectionController::onAutoReconnect);
+}
+
+/** @brief 析构函数，停止所有定时器 */
+ConnectionController::~ConnectionController()
+{
+    stopConnectionTimeout();
+    m_reconnectTimer.stop();
 }
 
 /** @brief 注入发送控制器引用 */
@@ -43,76 +66,125 @@ void ConnectionController::setRecordingController(RecordingController* ctrl)
 /**
  * @brief 创建并打开串口连接
  *
- * 流程: 关闭已有连接 → 工厂创建 SerialConnection → 配置参数 → 连接信号 → 打开端口 → 注入到下游控制器
- * @param serialParams 串口参数 QMap（portName/baudRate/dataBits/parity/stopBits/flowControl/dtr/rts）
+ * 完整流程:
+ *   1. 关闭已有连接（避免资源泄漏）
+ *   2. 提取 DTR/RTS 参数（在 open 后单独设置）
+ *   3. 通过工厂创建 SerialConnection 实例
+ *   4. 配置串口参数（波特率/数据位/校验/停止位/流控）
+ *   5. 连接 IConnection 信号到内部槽
+ *   6. 启动连接超时定时器
+ *   7. 尝试 open() 打开端口
+ *   8. 成功后设置 DTR/RTS 并注入到下游控制器
+ *
+ * DTR/RTS 必须在 open() 之后设置: 某些 USB 转串口芯片(CH340/CP2102)
+ * 在 open() 时会重置线路信号为默认值，覆盖 configure() 中的设置。
+ *
+ * @param serialParams 串口参数（portName/baudRate/dataBits/parity/stopBits/flowControl/dtr/rts）
  */
 void ConnectionController::connectSerial(const QVariantMap& serialParams)
 {
-    // 关闭已有连接，避免资源泄漏
+    // 步骤1: 关闭已有连接
     if (m_currentConn) {
-        disconnectSerial();
+        m_userInitiatedDisconnect = true;
+        disconnectCurrent();
     }
+    m_userInitiatedDisconnect = false;
 
-    // 通过工厂创建连接（不依赖具体类型，由 ConnectionManager 根据 ConnectionType 选择）
+    // 步骤2: 提取 DTR/RTS 参数，在 open() 成功后再设置
+    bool dtrEnabled = serialParams.value("dtr", true).toBool();
+    bool rtsEnabled = serialParams.value("rts", true).toBool();
+
+    // 构建 configure() 参数（排除 DTR/RTS）
+    QVariantMap configParams = serialParams;
+    configParams.remove("dtr");
+    configParams.remove("rts");
+
+    // 步骤3: 通过工厂创建连接
     m_currentConn = m_connManager->createConnection(ConnectionType::Serial);
     if (!m_currentConn) {
         emit connectionFailed(tr("Not Supported"), tr("Serial connection not available"));
         return;
     }
 
-    // 使用 IConnection::configure() 统一配置（消除强转，由具体实现类解析参数）
-    m_currentConn->configure(serialParams);
+    // 步骤4: 配置串口参数
+    m_currentConn->configure(configParams);
 
-    // 连接 IConnection 的数据接收/状态变化/错误信号到内部槽
+    // 步骤5: 连接信号
     connectSignals(m_currentConn);
 
-    // 尝试打开端口
+    // 步骤6: 启动超时定时器
+    m_connectionTimer.start(kConnectionTimeoutMs);
+
+    // 步骤7: 尝试打开端口
     if (!m_currentConn->open()) {
+        stopConnectionTimeout();
         emit connectionFailed(tr("Connection Failed"), tr("Cannot open serial port"));
         m_connManager->removeConnection(m_currentConn);
         m_currentConn = nullptr;
         return;
     }
 
-    // 同步连接到 SendController 和 OTA 管理器（它们需要 IConnection 指针进行数据读写）
+    // 步骤8: 打开成功，停止超时定时器
+    stopConnectionTimeout();
+
+    // 设置 DTR/RTS（某些芯片在 open 时会重置线路信号）
+    m_currentConn->setDtr(dtrEnabled);
+    m_currentConn->setRts(rtsEnabled);
+
+    // 注入到下游控制器
     if (m_sendController) {
         m_sendController->setConnection(m_currentConn);
     }
     if (m_otaManager) {
         m_otaManager->setConnection(m_currentConn);
     }
+
+    // 记录成功的连接参数，用于自动重连
+    m_lastConnectParams = serialParams;
+    m_lastConnectType = ConnectionType::Serial;
 }
 
 /**
- * @brief 关闭当前串口连接
- * 关闭端口 → 从管理器移除 → 清空当前连接指针 → 清除下游控制器的连接引用
+ * @brief 关闭当前活跃连接（串口或网络）
+ *
+ * 流程: 关闭端口 → 清空指针 → 从管理器移除并销毁 → 清除下游引用
+ * 设置 m_userInitiatedDisconnect 标志防止触发自动重连。
  */
-void ConnectionController::disconnectSerial()
+void ConnectionController::disconnectCurrent()
 {
+    m_userInitiatedDisconnect = true;
+    stopConnectionTimeout();
+    m_reconnectTimer.stop();
+
     if (m_currentConn) {
-        m_currentConn->close();
-        m_connManager->removeConnection(m_currentConn);
+        // 缓存指针并立即清空成员，防止信号回调中访问
+        IConnection* conn = m_currentConn;
         m_currentConn = nullptr;
 
-        // 清除下游控制器的连接引用，防止悬空指针
-        if (m_sendController) {
-            m_sendController->setConnection(nullptr);
-        }
+        // 关闭连接（SerialConnection::close() 有 isOpen() 保护，不会重复关闭）
+        conn->close();
+        // 从管理器移除并销毁（removeConnection 内部也会 close + delete）
+        m_connManager->removeConnection(conn);
+
+        // 清除下游控制器的连接引用
+        clearDownstreamConnections();
     }
 }
 
 /**
  * @brief 创建并打开网络连接（TCP/UDP）
  *
- * 流程与串口类似，区别在于参数由内部构建默认值（host/port/mode）
+ * 流程与串口类似，区别在于参数由内部构建默认值。
  * @param type 连接类型: TcpClient, TcpServer, Udp
  */
 void ConnectionController::connectNetwork(ConnectionType type)
 {
     // 关闭已有连接
     if (m_currentConn) {
-        disconnectSerial();
+        m_userInitiatedDisconnect = true;
+        disconnectCurrent();
     }
+    m_userInitiatedDisconnect = false;
 
     m_currentConn = m_connManager->createConnection(type);
     if (!m_currentConn) {
@@ -120,7 +192,7 @@ void ConnectionController::connectNetwork(ConnectionType type)
         return;
     }
 
-    // 构建默认网络参数（后续可由设置面板覆盖）
+    // 构建默认网络参数
     QVariantMap params;
     if (type == ConnectionType::TcpClient) {
         params["mode"] = "client";
@@ -136,10 +208,14 @@ void ConnectionController::connectNetwork(ConnectionType type)
     }
     m_currentConn->configure(params);
 
-    // 连接数据信号
+    // 连接信号
     connectSignals(m_currentConn);
 
+    // 启动超时定时器
+    m_connectionTimer.start(kConnectionTimeoutMs);
+
     if (!m_currentConn->open()) {
+        stopConnectionTimeout();
         emit connectionFailed(tr("Connection Failed"),
                              tr("Cannot establish network connection"));
         m_connManager->removeConnection(m_currentConn);
@@ -147,14 +223,17 @@ void ConnectionController::connectNetwork(ConnectionType type)
         return;
     }
 
-    // 同步连接到 SendController
+    stopConnectionTimeout();
+
+    // 注入到下游控制器
     if (m_sendController) {
         m_sendController->setConnection(m_currentConn);
     }
-    // 同步连接到 OtaManager（网络连接也支持 OTA 传输）
     if (m_otaManager) {
         m_otaManager->setConnection(m_currentConn);
     }
+
+    m_lastConnectType = type;
 }
 
 /** @brief 获取当前活跃的连接实例 */
@@ -165,76 +244,143 @@ IConnection* ConnectionController::currentConnection() const
 
 /**
  * @brief 运行时控制 DTR 线路信号
- * 仅串口连接有效，通过 qobject_cast 安全转换后调用
- * @param enabled true=拉高 DTR, false=拉低 DTR
+ * 通过 IConnection 虚方法调用，非串口连接为空操作
  */
 void ConnectionController::setDtr(bool enabled)
 {
-    if (m_currentConn && m_currentConn->type() == ConnectionType::Serial) {
-        auto* serial = qobject_cast<SerialConnection*>(m_currentConn);
-        if (serial) serial->setDtr(enabled);
+    if (m_currentConn) {
+        m_currentConn->setDtr(enabled);
     }
 }
 
 /**
  * @brief 运行时控制 RTS 线路信号
- * 仅串口连接有效，通过 qobject_cast 安全转换后调用
- * @param enabled true=拉高 RTS, false=拉低 RTS
+ * 通过 IConnection 虚方法调用，非串口连接为空操作
  */
 void ConnectionController::setRts(bool enabled)
 {
-    if (m_currentConn && m_currentConn->type() == ConnectionType::Serial) {
-        auto* serial = qobject_cast<SerialConnection*>(m_currentConn);
-        if (serial) serial->setRts(enabled);
+    if (m_currentConn) {
+        m_currentConn->setRts(enabled);
     }
 }
 
 /**
+ * @brief 启用或禁用自动重连
+ * @param enabled true=启用
+ * @param intervalMs 重连间隔（毫秒），默认 3000ms
+ */
+void ConnectionController::enableAutoReconnect(bool enabled, int intervalMs)
+{
+    m_autoReconnectEnabled = enabled;
+    if (enabled) {
+        m_reconnectTimer.setInterval(intervalMs);
+    } else {
+        m_reconnectTimer.stop();
+    }
+}
+
+/** @brief 查询自动重连是否已启用 */
+bool ConnectionController::isAutoReconnectEnabled() const
+{
+    return m_autoReconnectEnabled;
+}
+
+/**
  * @brief 连接状态变化内部处理
- * 在断开/错误状态下同步清除下游控制器的连接引用，防止悬空指针
- * @param state 新连接状态
+ *
+ * 在断开/错误状态下:
+ *   - 清除下游控制器的连接引用
+ *   - 如果启用了自动重连且非用户主动断开，启动重连定时器
  */
 void ConnectionController::onConnectionStateChanged(ConnectionState state)
 {
-    // 先缓存连接名称，避免后续操作导致指针失效
+    // 先缓存连接名称
     QString connName = m_currentConn ? m_currentConn->name() : "";
 
     switch (state) {
     case ConnectionState::Connected:
+        // 连接成功，停止超时定时器
+        stopConnectionTimeout();
         if (m_recordingController) {
             m_recordingController->setConnected(true);
         }
         break;
+
     case ConnectionState::Disconnected:
     case ConnectionState::Error:
-        // 同步清除下游控制器的连接引用，防止悬空指针
-        if (m_sendController) {
-            m_sendController->setConnection(nullptr);
-        }
-        if (m_otaManager) {
-            m_otaManager->setConnection(nullptr);
-        }
-        if (m_recordingController) {
-            m_recordingController->setConnected(false);
+        stopConnectionTimeout();
+        clearDownstreamConnections();
+
+        // 自动重连: 仅在非用户主动断开且已启用时触发
+        if (m_autoReconnectEnabled && !m_userInitiatedDisconnect) {
+            m_reconnectTimer.start();
         }
         break;
+
     case ConnectionState::Connecting:
         break;
     }
 
-    // 转发状态变化信号到 MainWindow 用于 UI 更新
+    // 转发状态变化信号
     emit connectionStateChanged(state, connName);
 }
 
 /**
  * @brief 接收数据内部处理
  * 转发数据到 MainWindow 并请求状态栏刷新
- * @param data 接收到的原始字节
  */
 void ConnectionController::onDataReceived(const QByteArray& data)
 {
     emit dataReceived(data);
     emit statusBarUpdateRequested();
+}
+
+/**
+ * @brief 连接超时处理
+ *
+ * 当 open() 后超过 kConnectionTimeoutMs 仍未变为 Connected 时触发。
+ * 中断当前连接并通知用户。
+ */
+void ConnectionController::onConnectionTimeout()
+{
+    qWarning() << "Connection timeout for"
+               << (m_currentConn ? m_currentConn->name() : "unknown");
+
+    // 清理当前连接
+    if (m_currentConn) {
+        IConnection* conn = m_currentConn;
+        m_currentConn = nullptr;
+        conn->close();
+        m_connManager->removeConnection(conn);
+        clearDownstreamConnections();
+    }
+
+    emit connectionFailed(tr("Connection Timeout"),
+                         tr("Connection timed out after %1 seconds. "
+                            "Please check the device and try again.")
+                             .arg(kConnectionTimeoutMs / 1000));
+}
+
+/**
+ * @brief 自动重连定时器触发
+ *
+ * 检查是否仍在断开状态且未由用户主动断开，若是则尝试重新连接。
+ */
+void ConnectionController::onAutoReconnect()
+{
+    // 如果已经连接或用户主动断开，停止重连
+    if (m_currentConn || m_userInitiatedDisconnect) {
+        m_reconnectTimer.stop();
+        return;
+    }
+
+    qInfo() << "Auto-reconnect attempt...";
+
+    if (m_lastConnectType == ConnectionType::Serial) {
+        connectSerial(m_lastConnectParams);
+    } else {
+        connectNetwork(m_lastConnectType);
+    }
 }
 
 /**
@@ -247,9 +393,37 @@ void ConnectionController::connectSignals(IConnection* conn)
             this, &ConnectionController::onDataReceived);
     connect(conn, &IConnection::stateChanged,
             this, &ConnectionController::onConnectionStateChanged);
-    // 连接错误信号，仅打印日志（错误状态通过 stateChanged 处理）
+    // 连接错误信号，转发详细错误信息到UI（状态栏已显示Error状态，此处补充详细信息）
     connect(conn, &IConnection::errorOccurred,
-            this, [](const QString& msg) {
+            this, [this](const QString& msg) {
         qWarning() << "Connection error:" << msg;
+        // 将详细错误信息通过 connectionFailed 信号转发到 MainWindow 状态栏
+        emit connectionFailed(tr("连接错误"), msg);
     });
+}
+
+/**
+ * @brief 清除所有下游控制器的连接引用
+ *
+ * 在连接断开或发生错误时调用，防止下游控制器持有悬空指针。
+ */
+void ConnectionController::clearDownstreamConnections()
+{
+    if (m_sendController) {
+        m_sendController->setConnection(nullptr);
+    }
+    if (m_otaManager) {
+        m_otaManager->setConnection(nullptr);
+    }
+    if (m_recordingController) {
+        m_recordingController->setConnected(false);
+    }
+}
+
+/** @brief 停止连接超时定时器 */
+void ConnectionController::stopConnectionTimeout()
+{
+    if (m_connectionTimer.isActive()) {
+        m_connectionTimer.stop();
+    }
 }

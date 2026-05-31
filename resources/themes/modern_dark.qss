@@ -213,6 +213,7 @@ QPushButton[quickCmdBtn="true"] {
 }
 QPushButton[quickCmdBtn="true"]:hover { background-color: #3b4261; border-color: #7aa2f7; color: #7aa2f7; }
 QPushButton[quickCmdBtn="true"]:pressed { background-color: #414868; }
+QPushButton[quickCmdBtn="true"]:disabled { background-color: #292e42; color: #565f89; border-color: #292e42; }
 
 /* ComboBox */
 QComboBox {
@@ -385,6 +386,8 @@ QPushButton#otaClearHistory {
     padding: 2px 8px;
 }
 QPushButton#otaClearHistory:hover { color: #f7768e; border-color: #f7768e; }
+QPushButton#otaClearHistory:pressed { background-color: rgba(247,118,142,0.15); }
+QPushButton#otaClearHistory:disabled { color: #3b4261; border-color: #3b4261; }
 
 /* === SerialConfigPanel 连接按钮 === */
 QPushButton#connectBtn {
@@ -396,11 +399,19 @@ QPushButton#connectBtn {
     font-size: 14px;
 }
 QPushButton#connectBtn:hover { background-color: #b4f0a0; }
+QPushButton#connectBtn:pressed { background-color: #8ce070; }
+QPushButton#connectBtn:disabled { background-color: #3b4261; color: #565f89; }
 QPushButton#connectBtn[state="connected"] {
     background-color: #f7768e;
     color: #1a1b26;
 }
 QPushButton#connectBtn[state="connected"]:hover { background-color: #ff9e9e; }
+QPushButton#connectBtn[state="connected"]:pressed { background-color: #e88aa0; }
+QPushButton#connectBtn[state="connected"]:disabled { background-color: #3b4261; color: #565f89; }
+QPushButton#connectBtn[state="connecting"] {
+    background-color: #e0af68;
+    color: #1a1b26;
+}
 
 QLabel#driverInfoLbl {
     font-size: 11px;
@@ -537,6 +548,7 @@ QPushButton#searchBarCloseBtn {
 }
 QPushButton#searchBarCloseBtn:hover { background: #7aa2f7; }
 QPushButton#searchBarCloseBtn:pressed { background: #7aa2f7; }
+QPushButton#searchBarCloseBtn:disabled { background: #3b4261; color: #565f89; }
 
 /* === 发送输入框错误状态 === */
 QLineEdit#sendInput[hasError="true"] { border: 2px solid #f7768e; }
@@ -564,6 +576,8 @@ QPushButton#protocolClearBtn:hover,
 QPushButton#protocolExportBtn:hover { background-color: #292e42; border-color: #7aa2f7; color: #7aa2f7; }
 QPushButton#protocolClearBtn:pressed,
 QPushButton#protocolExportBtn:pressed { background-color: #3b4261; }
+QPushButton#protocolClearBtn:disabled,
+QPushButton#protocolExportBtn:disabled { background-color: transparent; color: #565f89; border-color: #292e42; }
 
 QTableView#protocolTable {
     background-color: #1a1b26;
@@ -649,6 +663,7 @@ QPushButton#frameAddFieldBtn {
 }
 QPushButton#frameAddFieldBtn:hover { background-color: #292e42; border-color: #7aa2f7; }
 QPushButton#frameAddFieldBtn:pressed { background-color: #3b4261; }
+QPushButton#frameAddFieldBtn:disabled { background-color: #292e42; color: #565f89; border-color: #292e42; }
 
 QPushButton#frameRemoveFieldBtn {
     background-color: #1a1b26;
@@ -660,6 +675,7 @@ QPushButton#frameRemoveFieldBtn {
 }
 QPushButton#frameRemoveFieldBtn:hover { background-color: #292e42; border-color: #f7768e; }
 QPushButton#frameRemoveFieldBtn:pressed { background-color: #3b4261; }
+QPushButton#frameRemoveFieldBtn:disabled { background-color: #292e42; color: #565f89; border-color: #292e42; }
 
 /* === 背景设置弹出面板 === */
 QWidget#bgSettingsPopup {
@@ -697,6 +713,7 @@ QPushButton#bgSelectImageBtn {
 }
 QPushButton#bgSelectImageBtn:hover { background-color: #3b4261; border-color: #7aa2f7; }
 QPushButton#bgSelectImageBtn:pressed { background-color: #414868; }
+QPushButton#bgSelectImageBtn:disabled { background-color: #292e42; color: #565f89; border-color: #292e42; }
 
 QPushButton#bgResetBtn {
     background-color: transparent;
@@ -708,3 +725,114 @@ QPushButton#bgResetBtn {
 }
 QPushButton#bgResetBtn:hover { color: #f7768e; border-color: #f7768e; }
 QPushButton#bgResetBtn:pressed { background-color: rgba(247,118,142,0.15); }
+QPushButton#bgResetBtn:disabled { color: #3b4261; border-color: #3b4261; }
+
+/* === QScrollBar 滚动条 - 现代极细圆角风格 === */
+
+/* 垂直滚动条 */
+QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0;
+}
+QScrollBar::handle:vertical {
+    background: #292e42;
+    min-height: 30px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #3b4261;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* 水平滚动条 */
+QScrollBar:horizontal {
+    background: transparent;
+    height: 8px;
+    margin: 0;
+}
+QScrollBar::handle:horizontal {
+    background: #292e42;
+    min-width: 30px;
+    border-radius: 4px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: #3b4261;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/* === QToolTip 工具提示 === */
+QToolTip {
+    background-color: #1a1b26;
+    color: #a9b1d6;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* === QMenu 通用菜单样式 - 所有菜单统一风格 === */
+QMenu {
+    background-color: #1a1b26;
+    color: #a9b1d6;
+    border: 1px solid #3b4261;
+    border-radius: 6px;
+    padding: 4px 0px;
+}
+QMenu::item {
+    padding: 6px 24px;
+    border-radius: 4px;
+    margin: 1px 4px;
+}
+QMenu::item:selected {
+    background-color: #292e42;
+    color: #7aa2f7;
+}
+QMenu::item:disabled {
+    color: #565f89;
+}
+QMenu::separator {
+    height: 1px;
+    background-color: #292e42;
+    margin: 4px 8px;
+}
+QMenu::indicator {
+    width: 14px;
+    height: 14px;
+    margin-left: 6px;
+}
+
+/* === 工具栏下拉框 - 布局/主题/语言选择 === */
+QComboBox#layoutCombo,
+QComboBox#themeCombo,
+QComboBox#langCombo {
+    background-color: #292e42;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: #a9b1d6;
+    font-size: 12px;
+    min-width: 80px;
+}
+QComboBox#layoutCombo:hover,
+QComboBox#themeCombo:hover,
+QComboBox#langCombo:hover {
+    border-color: #7aa2f7;
+}
+QComboBox#layoutCombo:disabled,
+QComboBox#themeCombo:disabled,
+QComboBox#langCombo:disabled {
+    background-color: #292e42;
+    color: #565f89;
+    border-color: #292e42;
+}

@@ -1,3 +1,26 @@
+/**
+ * @file SendController.h
+ * @brief 发送控制器 - 管理数据发送的完整生命周期
+ *
+ * 职责:
+ *   1. 创建和管理发送栏 UI（输入框 + 模式切换 + 发送按钮 + 换行符选择）
+ *   2. 解析用户输入（文本/HEX）并通过 IConnection 写入
+ *   3. 记录发送数据到终端模型和日志
+ *   4. 维护发送历史自动补全
+ *   5. 管理定时发送器（TimedSender）
+ *
+ * 设计模式:
+ *   - 策略模式: 文本/HEX 两种发送模式通过条件分支切换解析策略
+ *   - 观察者模式: 通过 Qt 信号/槽通知发送状态
+ *
+ * 协作关系:
+ *   - IConnection: 数据写入通道（由 ConnectionController 注入）
+ *   - TerminalModel: 发送数据追加到终端显示
+ *   - DataLogger: 发送数据记录到日志
+ *   - SendHistory: 维护发送历史用于自动补全
+ *   - TimedSender: 定时发送器，定时触发时通过 sendAndRecord 发出数据
+ */
+
 #ifndef SENDCONTROLLER_H
 #define SENDCONTROLLER_H
 
@@ -19,23 +42,13 @@ class IConnection;
 /**
  * @brief 发送控制器 - 管理数据发送的完整生命周期
  *
- * 职责:
- *   1. 创建和管理发送栏 UI（输入框 + 模式切换 + 发送按钮 + 换行符选择）
- *   2. 解析用户输入（文本/HEX）并通过 IConnection 写入
- *   3. 记录发送数据到终端模型和日志
- *   4. 维护发送历史自动补全
- *   5. 管理定时发送器（TimedSender）
+ * 核心发送流程:
+ *   用户输入 → 解析(文本/HEX) → 追加换行符 → write() → 记录终端+日志
  *
- * 设计模式:
- *   - 策略模式: 文本/HEX 两种发送模式通过条件分支切换解析策略
- *   - 观察者模式: 通过 Qt 信号/槽通知发送状态
- *
- * 协作关系:
- *   - IConnection: 数据写入通道（由 ConnectionController 注入）
- *   - TerminalModel: 发送数据追加到终端显示
- *   - DataLogger: 发送数据记录到日志
- *   - SendHistory: 维护发送历史用于自动补全
- *   - TimedSender: 定时发送器，定时触发时通过 sendAndRecord 发出数据
+ * 错误处理:
+ *   - 未连接时发送 → statusMessage 通知用户
+ *   - HEX 格式错误 → 输入框红色边框提示
+ *   - 写入失败 → statusMessage 通知用户具体的错误信息
  */
 class SendController : public QObject {
     Q_OBJECT
@@ -56,7 +69,10 @@ public:
 
     /**
      * @brief 创建发送输入区域并返回容器 widget
-     * 包含: 模式切换(文本/HEX) + 换行符选择 + 输入框(带自动补全) + 发送按钮
+     *
+     * 控件布局: [模式切换(文本/HEX)] [换行符选择] [输入框(带自动补全)] [发送按钮]
+     * 自动补全数据源为 SendHistory 的最近发送记录
+     *
      * @param parent 父 widget
      * @return 发送栏容器 widget，调用方将其加入布局
      */
@@ -64,7 +80,10 @@ public:
 
     /**
      * @brief 设置当前连接
-     * 由 ConnectionController 在连接/断开时调用
+     *
+     * 由 ConnectionController 在连接/断开时调用。
+     * 设置为 nullptr 后所有发送操作将返回失败并通过 statusMessage 通知用户。
+     *
      * @param conn 新的连接实例，断开时传 nullptr
      */
     void setConnection(IConnection* conn);
@@ -84,7 +103,12 @@ signals:
     void dataSent(qint64 bytes);
 
     /**
-     * @brief 状态消息信号（用于状态栏显示）
+     * @brief 状态消息信号（用于状态栏显示或通知提示）
+     *
+     * 发送时机:
+     *   - 发送失败: 未连接、写入失败
+     *   - HEX 解析错误: 无效的 HEX 格式
+     *
      * @param msg 状态消息文本
      */
     void statusMessage(const QString& msg);
@@ -100,14 +124,24 @@ public slots:
 private slots:
     /**
      * @brief 发送按钮/回车触发的发送逻辑
-     * 流程: 读取输入 → 解析(文本/HEX) → 追加换行符 → sendAndRecord → 记录历史 → 清空输入框
+     *
+     * 流程:
+     *   1. 前置检查（连接状态、输入非空）
+     *   2. 根据发送模式解析输入（文本=toUtf8, HEX=HexConverter::fromHexString）
+     *   3. HEX 解析失败时设置输入框错误样式（红色边框）
+     *   4. 文本模式下追加换行符（\r\n/\n/\r）
+     *   5. 调用 sendAndRecord() 写入数据
+     *   6. 成功后记录历史并清空输入框
      */
     void onSendData();
 
 private:
     /**
      * @brief 统一发送方法
-     * 写入连接 + 记录终端 + 记录日志，返回是否成功写入
+     *
+     * 写入连接 + 记录终端 + 记录日志，返回是否成功写入。
+     * 失败时通过 statusMessage 信号通知用户具体的错误原因。
+     *
      * @param data 待发送的原始字节数据
      * @return true=写入成功, false=写入失败或未连接
      */

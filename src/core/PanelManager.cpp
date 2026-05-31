@@ -53,34 +53,42 @@ void PanelManager::createPanels(OtaManager* otaManager, TerminalModel* terminalM
 {
     // ---- 串口配置面板: 端口/波特率/数据位/校验/流控参数选择 ----
     m_serialConfig = new SerialConfigPanel;
+    m_serialConfig->setObjectName("serialConfigPanel");
     m_serialConfig->setVisible(false);
 
     // ---- 数据统计面板: RX/TX 累计字节数和速率显示 ----
     m_dataStats = new DataStatistics;
+    m_dataStats->setObjectName("dataStatsPanel");
     m_dataStats->setVisible(false);
 
     // ---- 协议解析视图: 以表格形式展示解析后的帧数据 ----
     m_protocolView = new ProtocolView;
+    m_protocolView->setObjectName("protocolViewPanel");
     m_protocolView->setVisible(false);
 
     // ---- 帧可视化编辑器: GUI 界面定义帧结构（帧头/字段/CRC） ----
     m_frameEditor = new FrameVisualEditor;
+    m_frameEditor->setObjectName("frameEditorPanel");
     m_frameEditor->setVisible(false);
 
     // ---- 波形图控件: 实时绘制解析后的数值数据，支持滑动窗口和降采样 ----
     m_chartWidget = new ChartWidget;
+    m_chartWidget->setObjectName("chartWidgetPanel");
     m_chartWidget->setVisible(false);
 
     // ---- OTA 升级面板: 文件选择、协议选择、进度显示和错误反馈 ----
     m_otaWidget = new OtaWidget(otaManager);
+    m_otaWidget->setObjectName("otaWidgetPanel");
     m_otaWidget->setVisible(false);
 
     // ---- 终端显示控件: 自绘引擎支持搜索高亮、HEX/文本/十进制显示 ----
     m_terminal = new TerminalWidget;
+    m_terminal->setObjectName("terminalPanel");
     m_terminal->setModel(terminalModel);
 
     // ---- 终端搜索栏: 支持正则/HEX 搜索和匹配计数显示 ----
     m_searchBar = new TerminalSearchBar;
+    m_searchBar->setObjectName("searchBarPanel");
 
     // ---- 快捷指令栏: 预置常用 AT 命令和自定义指令的一键发送 ----
     m_quickCmdBar = new QuickCommandBar;

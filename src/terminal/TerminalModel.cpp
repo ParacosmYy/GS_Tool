@@ -9,28 +9,38 @@ TerminalModel::TerminalModel(QObject* parent)
 
 void TerminalModel::appendReceived(const QByteArray& data)
 {
-    QMutexLocker locker(&m_mutex);
+    int newLineIndex;
+    {
+        QMutexLocker locker(&m_mutex);
 
-    TerminalLine line;
-    line.data = data;
-    line.direction = DataDirection::Rx;
-    line.timestamp = QDateTime::currentDateTime();
-    m_rxBytes += data.size();
+        TerminalLine line;
+        line.data = data;
+        line.direction = DataDirection::Rx;
+        line.timestamp = QDateTime::currentDateTime();
+        m_rxBytes += data.size();
 
-    appendLine(std::move(line));
+        appendLine(std::move(line));
+        newLineIndex = m_count - 1;
+    } // 锁已释放，安全发信号
+    emit dataAppended(newLineIndex, 1);
 }
 
 void TerminalModel::appendSent(const QByteArray& data)
 {
-    QMutexLocker locker(&m_mutex);
+    int newLineIndex;
+    {
+        QMutexLocker locker(&m_mutex);
 
-    TerminalLine line;
-    line.data = data;
-    line.direction = DataDirection::Tx;
-    line.timestamp = QDateTime::currentDateTime();
-    m_txBytes += data.size();
+        TerminalLine line;
+        line.data = data;
+        line.direction = DataDirection::Tx;
+        line.timestamp = QDateTime::currentDateTime();
+        m_txBytes += data.size();
 
-    appendLine(std::move(line));
+        appendLine(std::move(line));
+        newLineIndex = m_count - 1;
+    } // 锁已释放，安全发信号
+    emit dataAppended(newLineIndex, 1);
 }
 
 QVector<TerminalLine> TerminalModel::lines() const
@@ -88,11 +98,13 @@ quint64 TerminalModel::txBytes() const
 
 void TerminalModel::clear()
 {
-    QMutexLocker locker(&m_mutex);
-    m_head = 0;
-    m_count = 0;
-    m_rxBytes = 0;
-    m_txBytes = 0;
+    {
+        QMutexLocker locker(&m_mutex);
+        m_head = 0;
+        m_count = 0;
+        m_rxBytes = 0;
+        m_txBytes = 0;
+    } // 锁已释放，安全发信号
     emit dataCleared();
 }
 
@@ -137,6 +149,7 @@ int TerminalModel::physicalIndex(int logicalIndex) const
 void TerminalModel::appendLine(TerminalLine&& line)
 {
     // 必须在已持有 m_mutex 的情况下调用
+    // 注意: 不在此处 emit 信号，由调用者在释放锁后负责 emit，避免持锁发信号导致死锁
 
     if (m_count < m_buffer.size()) {
         // 缓冲区未满，直接顺序写入
@@ -147,6 +160,4 @@ void TerminalModel::appendLine(TerminalLine&& line)
         m_buffer[m_head] = std::move(line);
         m_head = (m_head + 1) % m_buffer.size();
     }
-
-    emit dataAppended(m_count - 1, 1);
 }

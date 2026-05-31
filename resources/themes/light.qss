@@ -213,6 +213,7 @@ QPushButton[quickCmdBtn="true"] {
 }
 QPushButton[quickCmdBtn="true"]:hover { background-color: #e5e7eb; border-color: #3b82f6; color: #1d4ed8; }
 QPushButton[quickCmdBtn="true"]:pressed { background-color: #d1d5db; }
+QPushButton[quickCmdBtn="true"]:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
 
 /* ComboBox */
 QComboBox {
@@ -385,6 +386,8 @@ QPushButton#otaClearHistory {
     padding: 2px 8px;
 }
 QPushButton#otaClearHistory:hover { color: #ef4444; border-color: #ef4444; }
+QPushButton#otaClearHistory:pressed { background-color: rgba(239,68,68,0.1); }
+QPushButton#otaClearHistory:disabled { color: #d1d5db; border-color: #d1d5db; }
 
 /* === SerialConfigPanel 连接按钮 === */
 QPushButton#connectBtn {
@@ -396,11 +399,19 @@ QPushButton#connectBtn {
     font-size: 14px;
 }
 QPushButton#connectBtn:hover { background-color: #16a34a; }
+QPushButton#connectBtn:pressed { background-color: #15803d; }
+QPushButton#connectBtn:disabled { background-color: #d1d5db; color: #9ca3af; }
 QPushButton#connectBtn[state="connected"] {
     background-color: #ef4444;
     color: #ffffff;
 }
 QPushButton#connectBtn[state="connected"]:hover { background-color: #dc2626; }
+QPushButton#connectBtn[state="connected"]:pressed { background-color: #b91c1c; }
+QPushButton#connectBtn[state="connected"]:disabled { background-color: #d1d5db; color: #9ca3af; }
+QPushButton#connectBtn[state="connecting"] {
+    background-color: #f59e0b;
+    color: #ffffff;
+}
 
 QLabel#driverInfoLbl {
     font-size: 11px;
@@ -537,6 +548,7 @@ QPushButton#searchBarCloseBtn {
 }
 QPushButton#searchBarCloseBtn:hover { background: #3b82f6; color: #ffffff; }
 QPushButton#searchBarCloseBtn:pressed { background: #2563eb; color: #ffffff; }
+QPushButton#searchBarCloseBtn:disabled { background: #d1d5db; color: #9ca3af; }
 
 /* === 发送输入框错误状态 === */
 QLineEdit#sendInput[hasError="true"] { border: 2px solid #ef4444; }
@@ -564,6 +576,8 @@ QPushButton#protocolClearBtn:hover,
 QPushButton#protocolExportBtn:hover { background-color: #f3f4f6; border-color: #3b82f6; color: #3b82f6; }
 QPushButton#protocolClearBtn:pressed,
 QPushButton#protocolExportBtn:pressed { background-color: #e5e7eb; }
+QPushButton#protocolClearBtn:disabled,
+QPushButton#protocolExportBtn:disabled { background-color: transparent; color: #9ca3af; border-color: #e5e7eb; }
 
 QTableView#protocolTable {
     background-color: #ffffff;
@@ -649,6 +663,7 @@ QPushButton#frameAddFieldBtn {
 }
 QPushButton#frameAddFieldBtn:hover { background-color: #f3f4f6; border-color: #3b82f6; }
 QPushButton#frameAddFieldBtn:pressed { background-color: #e5e7eb; }
+QPushButton#frameAddFieldBtn:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
 
 QPushButton#frameRemoveFieldBtn {
     background-color: #ffffff;
@@ -660,6 +675,7 @@ QPushButton#frameRemoveFieldBtn {
 }
 QPushButton#frameRemoveFieldBtn:hover { background-color: #f3f4f6; border-color: #ef4444; }
 QPushButton#frameRemoveFieldBtn:pressed { background-color: #e5e7eb; }
+QPushButton#frameRemoveFieldBtn:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
 
 /* === 背景设置弹出面板 === */
 QWidget#bgSettingsPopup {
@@ -697,6 +713,7 @@ QPushButton#bgSelectImageBtn {
 }
 QPushButton#bgSelectImageBtn:hover { background-color: #e5e7eb; border-color: #3b82f6; }
 QPushButton#bgSelectImageBtn:pressed { background-color: #d1d5db; }
+QPushButton#bgSelectImageBtn:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
 
 QPushButton#bgResetBtn {
     background-color: transparent;
@@ -708,3 +725,114 @@ QPushButton#bgResetBtn {
 }
 QPushButton#bgResetBtn:hover { color: #ef4444; border-color: #ef4444; }
 QPushButton#bgResetBtn:pressed { background-color: rgba(239,68,68,0.1); }
+QPushButton#bgResetBtn:disabled { color: #d1d5db; border-color: #d1d5db; }
+
+/* === QScrollBar 滚动条 - 现代极细圆角风格 === */
+
+/* 垂直滚动条 */
+QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 0;
+}
+QScrollBar::handle:vertical {
+    background: #d1d5db;
+    min-height: 30px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #9ca3af;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* 水平滚动条 */
+QScrollBar:horizontal {
+    background: transparent;
+    height: 8px;
+    margin: 0;
+}
+QScrollBar::handle:horizontal {
+    background: #d1d5db;
+    min-width: 30px;
+    border-radius: 4px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: #9ca3af;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/* === QToolTip 工具提示 === */
+QToolTip {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* === QMenu 通用菜单样式 - 所有菜单统一风格 === */
+QMenu {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 4px 0px;
+}
+QMenu::item {
+    padding: 6px 24px;
+    border-radius: 4px;
+    margin: 1px 4px;
+}
+QMenu::item:selected {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+QMenu::item:disabled {
+    color: #9ca3af;
+}
+QMenu::separator {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 4px 8px;
+}
+QMenu::indicator {
+    width: 14px;
+    height: 14px;
+    margin-left: 6px;
+}
+
+/* === 工具栏下拉框 - 布局/主题/语言选择 === */
+QComboBox#layoutCombo,
+QComboBox#themeCombo,
+QComboBox#langCombo {
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: #1f2937;
+    font-size: 12px;
+    min-width: 80px;
+}
+QComboBox#layoutCombo:hover,
+QComboBox#themeCombo:hover,
+QComboBox#langCombo:hover {
+    border-color: #3b82f6;
+}
+QComboBox#layoutCombo:disabled,
+QComboBox#themeCombo:disabled,
+QComboBox#langCombo:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}

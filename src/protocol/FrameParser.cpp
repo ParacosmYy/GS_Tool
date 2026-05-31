@@ -1,6 +1,7 @@
 #include "FrameParser.h"
 #include "utils/HexConverter.h"
 #include <QDebug>
+#include <QDateTime>
 
 FrameParser::FrameParser(QObject* parent)
     : QObject(parent)

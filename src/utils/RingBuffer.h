@@ -76,7 +76,10 @@ public:
         QMutexLocker locker(&m_mutex);
         m_capacity = capacity;
         m_buffer.resize(capacity);
-        clear();
+        // 内联 clear() 逻辑，避免对同一非递归 mutex 二次加锁导致死锁
+        m_head = 0;
+        m_tail = 0;
+        m_count = 0;
     }
 
     // 按索引读取元素(0=最旧, count-1=最新)，不删除

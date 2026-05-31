@@ -128,17 +128,45 @@ TimedSender* SendController::timedSender() const
 /**
  * @brief 统一发送方法
  *
- * 写入连接 + 记录终端 + 记录日志，返回是否成功写入
+ * 完整流程:
+ *   1. 检查连接是否存在且处于已连接状态
+ *   2. 写入数据到连接
+ *   3. 成功时追加到终端模型和日志
+ *   4. 失败时通过 statusMessage 通知用户具体原因
+ *
  * @param data 待发送的原始字节数据
  * @return true=写入成功, false=写入失败或未连接
  */
 bool SendController::sendAndRecord(const QByteArray& data)
 {
-    // 前置检查: 连接是否存在且处于已连接状态
-    if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
-        emit statusMessage(tr("发送失败: 未连接"));
+    // 前置检查1: 连接是否存在
+    if (!m_currentConn) {
+        emit statusMessage(tr("发送失败: 未建立连接，请先连接串口"));
         return false;
     }
+
+    // 前置检查2: 连接是否处于已连接状态
+    ConnectionState state = m_currentConn->state();
+    if (state != ConnectionState::Connected) {
+        QString stateText;
+        switch (state) {
+        case ConnectionState::Disconnected:
+            stateText = tr("已断开");
+            break;
+        case ConnectionState::Connecting:
+            stateText = tr("连接中");
+            break;
+        case ConnectionState::Error:
+            stateText = tr("错误");
+            break;
+        default:
+            stateText = tr("未知");
+            break;
+        }
+        emit statusMessage(tr("发送失败: 连接状态为 %1，无法发送数据").arg(stateText));
+        return false;
+    }
+
     // 写入数据到连接
     qint64 written = m_currentConn->write(data);
     if (written > 0) {
@@ -148,20 +176,32 @@ bool SendController::sendAndRecord(const QByteArray& data)
         emit dataSent(written);
         return true;
     }
-    // 写入失败时发出状态消息
-    emit statusMessage(tr("发送失败: 写入返回 %1").arg(written));
+
+    // 写入失败: 通知用户（IConnection::write() 内部已通过 errorOccurred 发出具体错误）
+    emit statusMessage(tr("发送失败: 写入返回 %1，请检查连接状态").arg(written));
     return false;
 }
 
 /**
  * @brief 发送按钮/回车触发的发送逻辑
  *
- * 流程: 读取输入 → 解析(文本/HEX) → 追加换行符 → sendAndRecord → 记录历史 → 清空输入框
- * HEX 模式下输入无效时，通过动态属性触发 QSS 错误样式
+ * 流程:
+ *   1. 前置检查（连接状态、输入非空）
+ *   2. 根据发送模式解析输入:
+ *      - 文本模式: toUtf8() 编码
+ *      - HEX 模式: HexConverter::fromHexString() 解析
+ *   3. HEX 解析失败时设置输入框错误样式（红色边框）并通过 statusMessage 提示
+ *   4. 文本模式下追加换行符（\r\n/\n/\r）
+ *   5. 调用 sendAndRecord() 写入数据
+ *   6. 成功后记录历史、清空输入框、清除错误状态
+ *
+ * HEX 模式支持的格式示例: "AA 55 01 00 FE", "AA,55,01,00,FE", "AA550100FE", "0xAA 0x55"
  */
 void SendController::onSendData()
 {
+    // 前置检查: 连接状态
     if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
+        emit statusMessage(tr("发送失败: 未连接"));
         return;
     }
 
@@ -178,6 +218,7 @@ void SendController::onSendData()
             m_sendInput->setProperty("hasError", true);
             m_sendInput->style()->unpolish(m_sendInput);
             m_sendInput->style()->polish(m_sendInput);
+            emit statusMessage(tr("HEX 格式错误: 请输入有效的十六进制数据，如 \"AA 55 01 00 FE\""));
             return;
         }
     } else {
