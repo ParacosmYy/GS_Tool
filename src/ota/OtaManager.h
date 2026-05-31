@@ -155,6 +155,7 @@ private:
 
     OtaState m_otaState = OtaState::Idle;   ///< 当前OTA状态
     QString m_tempBinPath;                   ///< HEX转BIN的临时文件路径
+    QString m_currentFileName;               ///< 当前传输的文件名（用于错误信息上下文）
 };
 
 #endif // OTAMANAGER_H

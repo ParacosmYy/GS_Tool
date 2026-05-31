@@ -73,15 +73,17 @@ public:
 
         // 监听主题切换，刷新指示线颜色
         connect(&ThemeManager::instance(), &ThemeManager::themeChanged,
-                this, qOverload<>(&NavIndicatorWidget::update));
+                this, &NavIndicatorWidget::updateThemeColor);
     }
 
     /**
-     * @brief 动画滑动到指定索引位置
-     *
-     * 计算目标项的视觉矩形 Y 坐标和高度，然后启动滑动动画。
-     * 在导航树 clicked 信号中调用此方法。
-     *
+     * @brief 动画滑动到指定索引（moveToIndex 的语义别名，便于信号/槽连接）
+     * @param index 目标模型索引
+     */
+    void animateTo(const QModelIndex& index) { moveToIndex(index); }
+
+    /**
+     * @brief 动画滑动到指定索引位置（250ms OutCubic）
      * @param index 目标模型索引
      */
     void moveToIndex(const QModelIndex& index)
@@ -107,10 +109,7 @@ public:
         m_slideAnim->start();
     }
 
-    /**
-     * @brief 无动画跳转到指定索引位置（用于初始化和恢复会话）
-     * @param index 目标模型索引
-     */
+    /** @brief 无动画跳转到指定索引位置（用于初始化和恢复会话） */
     void jumpToIndex(const QModelIndex& index)
     {
         QRect visualRect = m_navTree->visualRect(index);
@@ -121,13 +120,10 @@ public:
         update();
     }
 
-    /** @brief 获取指示线 Y 坐标（QPropertyAnimation 读访问器） */
+    /** @brief 指示线 Y 坐标（QPropertyAnimation 读访问器） */
     qreal indicatorY() const { return m_indicatorY; }
 
-    /**
-     * @brief 设置指示线 Y 坐标（QPropertyAnimation 写访问器）
-     * @param y 新的 Y 坐标
-     */
+    /** @brief 设置指示线 Y 坐标（QPropertyAnimation 写访问器） */
     void setIndicatorY(qreal y)
     {
         if (qFuzzyCompare(m_indicatorY, y)) return;
@@ -140,11 +136,12 @@ signals:
     /** @brief 指示线 Y 坐标变化信号 */
     void indicatorYChanged(qreal y);
 
+public slots:
+    /** @brief 主题切换时刷新指示线颜色（触发 paintEvent 从 ThemeManager 重新取色） */
+    void updateThemeColor() { update(); }
+
 protected:
-    /**
-     * @brief 绘制指示线 -- 左侧 3px 宽 accent 色竖线，上下圆角
-     * @param event 绘制事件
-     */
+    /** @brief 绘制指示线 -- 左侧 3px 宽 accent 色竖线，上下圆角 */
     void paintEvent(QPaintEvent* event) override
     {
         Q_UNUSED(event)
@@ -173,9 +170,7 @@ protected:
         painter.drawRoundedRect(indicatorRect, kRadius, kRadius);
     }
 
-    /**
-     * @brief 事件过滤器 -- 监听 navTree 的 resize 事件，同步调整自身大小
-     */
+    /** @brief 事件过滤器 -- 监听 navTree 的 resize 事件，同步调整自身大小 */
     bool eventFilter(QObject* watched, QEvent* event) override
     {
         if (watched == m_navTree && event->type() == QEvent::Resize) {

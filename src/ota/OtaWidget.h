@@ -65,6 +65,28 @@ public:
      */
     void setConnection(IConnection* conn);
 
+signals:
+    /**
+     * @brief 传输开始信号 -- MainWindow可连接到ToastWidget显示通知
+     * @param filename 固件文件名（不含路径）
+     */
+    void transferStarted(const QString& filename);
+
+    /**
+     * @brief 传输完成信号 -- MainWindow可连接到ToastWidget显示成功通知
+     * @param filename 固件文件名（不含路径）
+     * @param elapsed 传输耗时（毫秒）
+     * @param size 传输文件大小（字节）
+     */
+    void transferCompleted(const QString& filename, int elapsed, int size);
+
+    /**
+     * @brief 传输失败信号 -- MainWindow可连接到ToastWidget显示错误通知
+     * @param filename 固件文件名（不含路径）
+     * @param error 错误原因描述
+     */
+    void transferFailed(const QString& filename, const QString& error);
+
 private slots:
     /** @brief 浏览固件文件按钮点击 */
     void onBrowseFile();

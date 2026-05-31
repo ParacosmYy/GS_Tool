@@ -5,12 +5,6 @@
  * 支持三种模式: Checksum(Sum8), CRC16, 1K(1024字节块+CRC16)。
  * 继承BaseTransfer，通过4个纯虚钩子注入协议特有逻辑。
  *
- * 增强特性:
- *   - 传输速率计算和ETA(预计剩余时间)显示
- *   - 取消传输支持(发送CAN取消帧)
- *   - 超时重传机制(每块最多重试10次)
- *   - 完善错误处理和状态转换
- *
  * 协议交互流程(Sender端):
  *   1. 等待接收方发送NAK(Checksum模式)或'C'(CRC模式)
  *   2. 循环发送数据块，等待ACK/NAK/CAN
@@ -41,42 +35,55 @@ public:
         OneK      ///< XMODEM-1K: STX + 1024B + CRC16
     };
 
+    /** @brief 构造XMODEM传输器，默认CRC模式 */
     explicit XModemTransfer(QObject* parent = nullptr);
 
-    /** @brief 设置传输模式 */
+    /** @brief 设置传输模式，须在start()前调用。接收方NAK会自动回退Checksum */
     void setMode(Mode mode);
 
-    /** @brief 设置要传输的文件路径 */
+    /** @brief 设置文件路径，须在start()前调用。文件限制1MB，setData优先 */
     void setFilePath(const QString& path);
 
-    /** @brief 直接设置要传输的数据(无需文件) */
+    /** @brief 直接设置传输数据(清除filePath)，适用于内存中已有数据场景 */
     void setData(const QByteArray& data);
 
-    /**
-     * @brief 获取当前传输速率(字节/秒)
-     * @return 传输速率，未开始传输时返回0
-     */
+    /** @brief 获取当前传输速率(字节/秒)，未开始时返回0 */
     double transferRate() const;
 
-    /**
-     * @brief 获取预计剩余时间(秒)
-     * @return ETA秒数，无法估算时返回-1
-     */
+    /** @brief 获取ETA(秒)，无法估算时返回-1 */
     double etaSeconds() const;
 
 signals:
-    /**
-     * @brief 传输速率和ETA更新信号
-     * @param rateBytesPerSec 当前传输速率(字节/秒)
-     * @param etaSec 预计剩余时间(秒)，-1表示无法估算
-     */
+    /** @brief 传输速率和ETA更新信号 @param rateBytesPerSec 速率 @param etaSec ETA秒数，-1无法估算 */
     void transferStats(double rateBytesPerSec, double etaSec);
 
 protected:
     // === BaseTransfer 钩子实现 ===
+
+    /**
+     * @brief 协议初始化: 加载文件→校验→重置计数器→等待接收方启动信号
+     * @return true=成功进入WaitingForStart, false=文件加载失败
+     *
+     * 边界: 文件>1MB拒绝, 文件不可读拒绝, 数据为空拒绝。
+     * 连接断开后不再收到数据，由超时机制兜底。
+     */
     bool onStartInit() override;
+
+    /** @brief 发送2个CAN字节取消传输。m_conn为空时空操作 */
     void sendCancelBytes() override;
+
+    /**
+     * @brief 接收数据状态机: WaitingForStart→SendingBlock→SendingEOT→Done
+     *
+     * 每块最多重试10次。块序号1-255循环(不用于文件偏移)。
+     * m_bytesSent累计已发送字节数作为文件偏移。
+     */
     void processReceivedData() override;
+
+    /**
+     * @brief 超时重发: SendingBlock重发当前块, SendingEOT重发EOT,
+     *        WaitingForStart延长等待(3倍超时)
+     */
     void handleTimeout() override;
 
 private:
@@ -89,7 +96,7 @@ private:
     static constexpr char CAN = 0x18;      ///< 取消传输
     static constexpr char CRC_CHAR = 'C';  ///< CRC模式请求
 
-    /** @brief XMODEM内部状态(独立于BaseTransfer的TransferState) */
+    /** @brief XMODEM内部状态(独立于BaseTransfer::TransferState) */
     enum class State {
         Idle,
         WaitingForStart,  ///< 等待接收方发送NAK或'C'
@@ -99,31 +106,26 @@ private:
         Error
     };
 
-    // ---- 状态管理 ----
+    /** @brief 设置XMODEM内部状态，独立于基类TransferState */
     void setState(State newState);
 
-    // ---- 数据发送 ----
+    /** @brief 发送当前数据块。数据不足时0x1A填充，发完自动切EOT。m_conn为空不写入 */
     void sendBlock();
+
+    /** @brief 发送EOT字节，等待ACK后由processReceivedData调finishTransfer */
     void sendEOT();
 
-    /**
-     * @brief 构建XMODEM数据包
-     * @param blockNum 块序号(1-255循环)
-     * @param blockData 块数据(已填充至块大小)
-     * @return 完整数据包(头+序号+数据+校验)
-     */
+    /** @brief 构建XMODEM数据包: 头(SOH/STX) + 序号+反码 + 数据 + 校验(Sum8/CRC16) */
     QByteArray buildBlock(int blockNum, const QByteArray& blockData);
 
-    /** @brief 计算XMODEM CRC16(等同于CRC::crc16Ccitt) */
+    /** @brief 计算XMODEM CRC16，委托给CRC::crc16Xmodem */
     quint16 xmodemCrc(const QByteArray& data);
 
-    // ---- 速率统计 ----
+    /** @brief 更新平均速率和ETA，发射transferStats信号。elapsed<=0时跳过 */
     void updateTransferStats();
 
-    /** @brief 获取当前模式的块大小 */
-    int blockSize() const {
-        return (m_mode == OneK) ? 1024 : 128;
-    }
+    /** @brief 获取当前模式块大小: OneK=1024, Checksum/CRC=128 */
+    int blockSize() const { return (m_mode == OneK) ? 1024 : 128; }
 
     // ---- 成员变量 ----
     Mode m_mode = CRC;               ///< 传输模式
@@ -136,7 +138,7 @@ private:
 
     int m_blockRetryCount = 0;       ///< 当前块的重试次数(每块最多10次)
 
-    // ---- 速率计算相关 ----
+    // ---- 速率计算 ----
     QElapsedTimer m_transferTimer;   ///< 传输耗时计时器
     qint64 m_lastStatsBytes = 0;     ///< 上次统计时的已发送字节数
     double m_currentRate = 0.0;      ///< 当前传输速率(字节/秒)

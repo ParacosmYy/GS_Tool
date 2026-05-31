@@ -52,6 +52,11 @@ OtaManager::OtaManager(QObject* parent)
  *
  * 三个协议共享相同的progress/transferComplete/transferError信号定义，
  * 统一转发到OtaManager的同名信号，OtaWidget只需连接OtaManager。
+ *
+ * 错误消息增强:
+ *   - 超时错误: 包含文件名
+ *   - CRC校验失败: 包含块号（由协议层提供）
+ *   - 连接中断: 包含已传输字节数（由协议层提供）
  */
 void OtaManager::connectTransferSignals(BaseTransfer* transfer)
 {
@@ -65,7 +70,12 @@ void OtaManager::connectTransferSignals(BaseTransfer* transfer)
     connect(transfer, &BaseTransfer::transferError,
             this, [this](const QString& reason) {
                 setOtaState(OtaState::Error);
-                emit transferError(reason);
+                // 增强错误消息: 如果原因中不含文件名则追加上下文
+                QString enriched = reason;
+                if (!m_currentFileName.isEmpty() && !reason.contains(m_currentFileName)) {
+                    enriched = tr("[%1] %2").arg(m_currentFileName, reason);
+                }
+                emit transferError(enriched);
             });
 }
 
@@ -184,10 +194,13 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
         qDebug() << "OtaManager: Unknown firmware type, treating as binary:" << filePath;
     }
 
-    // ---- 步骤5: 切换到传输状态 ----
+    // ---- 步骤5: 记录当前文件名（用于错误消息上下文） ----
+    m_currentFileName = QFileInfo(effectivePath).fileName();
+
+    // ---- 步骤6: 切换到传输状态 ----
     setOtaState(OtaState::Transferring);
 
-    // ---- 步骤6: 根据协议选择传输实例 ----
+    // ---- 步骤7: 根据协议选择传输实例 ----
     if (protocol == "ymodem") {
         m_ymodem->setFilePath(effectivePath);
         return m_ymodem->start();

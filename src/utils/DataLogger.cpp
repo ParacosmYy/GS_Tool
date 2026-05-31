@@ -287,6 +287,11 @@ bool DataLogger::readNextRecord(RecordHeader& header, QByteArray& data)
     if (stream.status() != QDataStream::Ok) return false;
 
     // Data
+    // 防御性校验: 拒绝异常大的记录长度（上限1MB），防止恶意/损坏的 .edl 文件导致崩溃
+    if (length > 1024 * 1024) {
+        qWarning() << "DataLogger: record too large:" << length;
+        return false;
+    }
     data.resize(static_cast<int>(length));
     if (stream.readRawData(data.data(), static_cast<int>(length)) != static_cast<int>(length)) {
         return false;

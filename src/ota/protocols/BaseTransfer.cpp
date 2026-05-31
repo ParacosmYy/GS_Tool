@@ -25,7 +25,7 @@ bool BaseTransfer::start()
 {
     if (!isIdle()) return false;
     if (!m_conn) {
-        emit transferError("No connection set");
+        emit transferError(tr("无可用连接"));
         return false;
     }
 
@@ -52,7 +52,7 @@ void BaseTransfer::cancel()
     }
     m_timeoutTimer->stop();
     markIdle();
-    emit transferError("Transfer cancelled by user");
+    emit transferError(tr("用户取消传输"));
 }
 
 bool BaseTransfer::isRunning() const
@@ -78,7 +78,7 @@ void BaseTransfer::onConnectionReadyRead(const QByteArray& data)
                    << "exceeds max:" << kMaxReceiveBufferSize;
         sendCancelBytes();
         markError();
-        emit transferError("Receive buffer overflow: connection may be malicious");
+        emit transferError(tr("接收缓冲区溢出: 连接可能异常"));
         return;
     }
 
@@ -94,7 +94,7 @@ void BaseTransfer::onTimeout()
     if (m_retryCount > m_maxRetries) {
         sendCancelBytes();
         markError();
-        emit transferError("Transfer timeout: max retries exceeded");
+        emit transferError(tr("传输超时: 全局重试次数耗尽 (%1次)").arg(m_maxRetries));
         return;
     }
 

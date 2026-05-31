@@ -64,8 +64,8 @@ bool XModemTransfer::onStartInit()
         if (fileInfo.size() > kMaxFileSize) {
             qWarning() << "XModem: file too large:" << fileInfo.size()
                        << "bytes (max" << kMaxFileSize << "bytes)";
-            emit transferError(QString("File too large: %1 (%2 bytes, max %3 bytes)")
-                                   .arg(m_filePath)
+            emit transferError(tr("文件过大: %1 (%2 字节, 上限 %3 字节)")
+                                   .arg(fileInfo.fileName())
                                    .arg(fileInfo.size())
                                    .arg(kMaxFileSize));
             return false;
@@ -73,7 +73,7 @@ bool XModemTransfer::onStartInit()
 
         QFile file(m_filePath);
         if (!file.open(QIODevice::ReadOnly)) {
-            emit transferError(QString("Cannot open file: %1").arg(m_filePath));
+            emit transferError(tr("无法打开文件: %1").arg(m_filePath));
             return false;
         }
         m_data = file.readAll();
@@ -81,7 +81,13 @@ bool XModemTransfer::onStartInit()
     }
 
     if (m_data.isEmpty()) {
-        emit transferError("No data to transfer");
+        emit transferError(tr("无传输数据"));
+        return false;
+    }
+
+    // 连接有效性检查: 防止空连接下启动传输
+    if (!m_conn) {
+        emit transferError(tr("传输启动失败: 连接未就绪"));
         return false;
     }
 
@@ -118,8 +124,10 @@ void XModemTransfer::handleTimeout()
             m_xmodemState = State::Error;
             markError();
             emit transferError(
-                QString("Block %1 timeout: block retries exceeded (10)")
-                    .arg(m_blockNumber));
+                tr("块 %1 超时: 重试次数耗尽 (10次), 已传输 %2/%3 字节")
+                    .arg(m_blockNumber)
+                    .arg(m_bytesSent)
+                    .arg(m_data.size()));
             return;
         }
         sendBlock();
@@ -130,7 +138,7 @@ void XModemTransfer::handleTimeout()
             sendCancelBytes();
             m_xmodemState = State::Error;
             markError();
-            emit transferError("EOT acknowledgment timeout: retries exceeded");
+            emit transferError(tr("EOT确认超时: 重试次数耗尽 (10次)"));
             return;
         }
         sendEOT();
@@ -211,7 +219,7 @@ void XModemTransfer::processReceivedData()
                     m_timeoutTimer->start(m_timeoutMs);
                 }
             } else if (ch == NAK) {
-                // 块被拒绝，重发当前块
+                // 块被拒绝(CRC/校验和错误)，重发当前块
                 m_timeoutTimer->stop();
                 m_blockRetryCount++;
                 if (m_blockRetryCount > 10) {
@@ -219,8 +227,10 @@ void XModemTransfer::processReceivedData()
                     m_xmodemState = State::Error;
                     markError();
                     emit transferError(
-                        QString("Block %1 rejected: retries exceeded (10)")
-                            .arg(m_blockNumber));
+                        tr("块 %1 CRC校验失败: 被接收方拒绝次数过多 (10次), 已传输 %2/%3 字节")
+                            .arg(m_blockNumber)
+                            .arg(m_bytesSent)
+                            .arg(m_data.size()));
                     m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
@@ -231,7 +241,11 @@ void XModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_xmodemState = State::Error;
                 markError();
-                emit transferError("Transfer cancelled by receiver");
+                emit transferError(
+                    tr("接收方取消传输, 已传输 %1/%2 字节 (块 %3)")
+                        .arg(m_bytesSent)
+                        .arg(m_data.size())
+                        .arg(m_blockNumber));
                 m_receiveBuffer.remove(0, readIdx);
                 return;
             }
@@ -250,7 +264,7 @@ void XModemTransfer::processReceivedData()
                     sendCancelBytes();
                     m_xmodemState = State::Error;
                     markError();
-                    emit transferError("EOT rejected: retries exceeded (10)");
+                    emit transferError(tr("EOT被拒绝: 重试次数耗尽 (10次)"));
                     m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
@@ -260,7 +274,8 @@ void XModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_xmodemState = State::Error;
                 markError();
-                emit transferError("Transfer cancelled by receiver during EOT");
+                emit transferError(tr("接收方在EOT阶段取消传输, 已传输 %1/%2 字节")
+                                       .arg(m_bytesSent).arg(m_data.size()));
                 m_receiveBuffer.remove(0, readIdx);
                 return;
             }
@@ -299,7 +314,18 @@ void XModemTransfer::sendBlock()
 
     QByteArray packet = buildBlock(m_blockNumber, blockData);
     if (m_conn) {
-        m_conn->write(packet);
+        qint64 written = m_conn->write(packet);
+        // 检测连接断开: write返回-1表示连接已不可用
+        if (written < 0) {
+            m_xmodemState = State::Error;
+            markError();
+            emit transferError(
+                tr("连接中断: 写入失败, 已传输 %1/%2 字节 (块 %3)")
+                    .arg(m_bytesSent)
+                    .arg(m_data.size())
+                    .arg(m_blockNumber));
+            return;
+        }
     }
     m_bytesSent = qMin(offset + dataSize, static_cast<qint64>(m_data.size()));
 }
@@ -307,7 +333,15 @@ void XModemTransfer::sendBlock()
 void XModemTransfer::sendEOT()
 {
     if (m_conn) {
-        m_conn->write(QByteArray(1, EOT));
+        qint64 written = m_conn->write(QByteArray(1, EOT));
+        // 检测连接断开
+        if (written < 0) {
+            m_xmodemState = State::Error;
+            markError();
+            emit transferError(
+                tr("连接中断: EOT发送失败, 已传输 %1/%2 字节")
+                    .arg(m_bytesSent).arg(m_data.size()));
+        }
     }
 }
 

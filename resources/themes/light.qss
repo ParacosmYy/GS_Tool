@@ -1073,3 +1073,51 @@ QPushButton#quickCmdDelRowBtn {
 QPushButton#quickCmdDelRowBtn:hover { background-color: #e5e7eb; border-color: #ef4444; }
 QPushButton#quickCmdDelRowBtn:pressed { background-color: #d1d5db; }
 QPushButton#quickCmdDelRowBtn:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+
+/* === NavIndicatorWidget 导航树滑动指示器 === */
+/* 控件使用 QPainter 自绘，WA_TranslucentBackground 已在代码中设置 */
+/* QSS 仅确保透明背景，不干扰自绘内容 */
+QWidget#navIndicator {
+    background-color: transparent;
+}
+
+/* === ToastWidget 通知吐司 === */
+/* 控件使用 QPainter 自绘全部内容（背景、左边框、图标、文字） */
+/* WA_TranslucentBackground 已在代码中设置，QSS 提供透明基底 */
+/* 语义色由 ThemeManager::SemanticColor 提供:
+ *   Success -> #22c55e (绿), Error -> #ef4444 (红), Accent -> #3b82f6 (蓝)
+ * 若未来改为子控件布局，以下 QSS 规则提供后备样式 */
+QWidget#toastWidget {
+    background-color: transparent;
+}
+QWidget#toastWidget[type="success"] {
+    background-color: transparent;
+}
+QWidget#toastWidget[type="error"] {
+    background-color: transparent;
+}
+QWidget#toastWidget[type="info"] {
+    background-color: transparent;
+}
+/* 后备: 若 ToastWidget 改用 QLabel 子控件 */
+QLabel#toastLabel {
+    color: #1f2937;
+    font-size: 13px;
+}
+/* 后备: 若 ToastWidget 改用 QPushButton 关闭按钮 */
+QPushButton#toastCloseBtn {
+    background-color: transparent;
+    color: #6b7280;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 14px;
+    font-weight: bold;
+}
+QPushButton#toastCloseBtn:hover {
+    background-color: #e5e7eb;
+    color: #1f2937;
+}
+QPushButton#toastCloseBtn:pressed {
+    background-color: #d1d5db;
+}

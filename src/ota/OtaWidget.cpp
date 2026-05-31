@@ -224,9 +224,15 @@ void OtaWidget::onStartTransfer()
     m_transferTimer.start();
     m_lastBytesSent = 0;
     setTransferring(true);
+
+    // 发射传输开始信号，供Toast通知使用
+    emit transferStarted(m_currentFileName);
+
     if (!m_manager->startTransfer(filePath, protocol)) {
         setTransferring(false);
         appendLog(tr("传输启动失败"));
+        // 启动失败也通知Toast
+        emit transferFailed(m_currentFileName, tr("传输启动失败"));
     }
 }
 
@@ -305,6 +311,11 @@ void OtaWidget::onTransferComplete()
     appendLog(tr("传输完成，耗时 %1").arg(ByteFormat::formatDuration(elapsed)));
     startCompletionAnimation();
 
+    // 发射传输完成信号，供Toast通知使用
+    emit transferCompleted(m_currentFileName,
+                           static_cast<int>(elapsed),
+                           static_cast<int>(m_currentFileSize));
+
     OtaRecord rec;
     rec.fileName = m_currentFileName;
     rec.protocol = m_currentProtocol;
@@ -321,6 +332,9 @@ void OtaWidget::onTransferError(const QString& reason)
     setTransferring(false);
     m_statusLbl->setText(tr("错误: %1").arg(reason));
     appendLog(tr("错误: %1").arg(reason));
+
+    // 发射传输失败信号，供Toast通知使用
+    emit transferFailed(m_currentFileName, reason);
 
     OtaRecord rec;
     rec.fileName = m_currentFileName;

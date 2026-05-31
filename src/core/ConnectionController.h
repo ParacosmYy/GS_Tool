@@ -27,8 +27,8 @@ class PortWatcher;
  * @brief 连接控制器 - 连接层的中介者，协调各模块的连接实例传递和状态同步
  *
  * 核心流程:
- *   连接: connectSerial() → 工厂创建 → 配置 → 打开 → DTR/RTS → 注入下游
- *   断开: disconnectCurrent() → 关闭 → 移除 → 清空下游引用
+ *   连接: connectSerial() -> 工厂创建 -> 配置 -> 打开 -> DTR/RTS -> 注入下游
+ *   断开: disconnectCurrent() -> 关闭 -> 移除 -> 清空下游引用
  *   超时: 定时器守护，超时自动中断并报告失败
  *   重连: 意外断开时可选自动重连
  */
@@ -36,56 +36,106 @@ class ConnectionController : public QObject {
     Q_OBJECT
 
 public:
-    explicit ConnectionController(ConnectionManager* connMgr, QObject* parent = nullptr);
-    ~ConnectionController() override;
+    explicit ConnectionController(ConnectionManager* connMgr, QObject* parent = nullptr); ///< @param connMgr 连接管理器(工厂)
+    ~ConnectionController() override; ///< 停止所有定时器和 PortWatcher
 
-    void setSendController(SendController* ctrl);       ///< 注入发送控制器
-    void setOtaManager(OtaManager* mgr);                ///< 注入OTA管理器
+    void setSendController(SendController* ctrl);       ///< 注入发送控制器，连接成功后注入 IConnection
+    void setOtaManager(OtaManager* mgr);                ///< 注入 OTA 管理器
     void setRecordingController(RecordingController* ctrl); ///< 注入录制控制器
 
-    void connectSerial(const QVariantMap& serialParams); ///< 创建并打开串口连接
-    void disconnectCurrent();                            ///< 关闭当前连接（不触发自动重连）
-    void connectNetwork(ConnectionType type);            ///< 创建网络连接
-    IConnection* currentConnection() const;              ///< 获取当前活跃连接
+    void connectSerial(const QVariantMap& serialParams); ///< 创建并打开串口连接 @param serialParams 端口/波特率等参数
+    void disconnectCurrent();                            ///< 关闭当前连接(用户主动，不触发自动重连)
+    void connectNetwork(ConnectionType type);            ///< 创建网络连接 @param type TcpClient/TcpServer/Udp
+    IConnection* currentConnection() const;              ///< 获取当前活跃连接，无连接时返回 nullptr
 
-    void setDtr(bool enabled);                           ///< 控制DTR线路信号
-    void setRts(bool enabled);                           ///< 控制RTS线路信号
+    void setDtr(bool enabled);                           ///< 控制当前连接的 DTR 线路信号
+    void setRts(bool enabled);                           ///< 控制当前连接的 RTS 线路信号
 
-    void enableAutoReconnect(bool enabled, int intervalMs = 3000); ///< 启用/禁用自动重连
+    void enableAutoReconnect(bool enabled, int intervalMs = 3000); ///< 启用/禁用自动重连 @param intervalMs 重连间隔(毫秒)
     bool isAutoReconnectEnabled() const;                 ///< 查询自动重连状态
-    PortWatcher* portWatcher() const;                    ///< 获取PortWatcher实例
+    PortWatcher* portWatcher() const;                    ///< 获取 PortWatcher 实例
 
 signals:
-    void connectionStateChanged(ConnectionState state, const QString& connName); ///< 连接状态变化
-    void dataReceived(const QByteArray& data);          ///< 接收到数据
-    void statusBarUpdateRequested();                     ///< 请求刷新状态栏
-    void connectionFailed(const QString& title, const QString& message); ///< 连接失败
-    void portAdded(const QString& portName);             ///< 检测到新端口接入
+    /** @brief 连接状态变化通知 @param state 新状态 @param connName 连接名称 */
+    void connectionStateChanged(ConnectionState state, const QString& connName);
+
+    /** @brief 接收到数据，转发自底层 IConnection::dataReceived */
+    void dataReceived(const QByteArray& data);
+
+    /** @brief 请求状态栏刷新 */
+    void statusBarUpdateRequested();
+
+    /**
+     * @brief 连接失败通知(带标题和详细信息)
+     *
+     * 发射场景: 端口打开失败、连接超时、通信错误、端口物理拔出等。
+     * 由 connectSignals() 中的 errorOccurred lambda、onConnectionTimeout()、
+     * onPortRemoved() 触发。
+     *
+     * @param title   错误标题(如 "Connection Timeout")
+     * @param message 错误详细信息(人类可读中文描述)
+     */
+    void connectionFailed(const QString& title, const QString& message);
+
+    /** @brief 检测到新端口接入，由 PortWatcher 转发 @param portName 新端口名称 */
+    void portAdded(const QString& portName);
+
+    /**
+     * @brief 连接成功通知 (Toast)
+     *
+     * 当串口或网络连接成功建立时发出。
+     * 发射时机: connectSerial() / connectNetwork() 中 open() 成功后。
+     *
+     * @param portName 成功连接的端口名称(如 "COM3")，网络连接为连接描述
+     */
+    void connectionSucceeded(const QString& portName);
+
+    /**
+     * @brief 连接正常断开通知 (Toast)
+     *
+     * 用户主动断开(disconnectCurrent())时发出。
+     * 用于 Toast 显示"已断开连接"等提示。
+     *
+     * @param portName 已断开的端口名称，可能为空
+     */
+    void connectionDisconnected(const QString& portName);
+
+    /**
+     * @brief 连接错误通知 (Toast)
+     *
+     * 连接因错误中断时发出。与 connectionFailed 不同，此信号专注于
+     * Toast 展示，提供端口号和简短错误描述。
+     * 发射场景: 通信错误(Error状态)、连接超时、端口物理拔出。
+     *
+     * @param portName 发生错误的端口名称
+     * @param error    简短错误描述(人类可读)
+     */
+    void connectionError(const QString& portName, const QString& error);
 
 private slots:
-    void onConnectionStateChanged(ConnectionState state);
-    void onDataReceived(const QByteArray& data);
-    void onConnectionTimeout();
-    void onAutoReconnect();
-    void onPortRemoved(const QString& portName);
-    void onPortAdded(const QString& portName);
+    void onConnectionStateChanged(ConnectionState state); ///< 底层状态变化: 清除下游/触发重连/发射Toast
+    void onDataReceived(const QByteArray& data);          ///< 转发数据并请求状态栏刷新
+    void onConnectionTimeout();                           ///< 连接超时: 中断连接并通知失败
+    void onAutoReconnect();                               ///< 自动重连定时器触发
+    void onPortRemoved(const QString& portName);          ///< 端口拔出: 匹配当前连接则断开 @param portName 被拔出的端口
+    void onPortAdded(const QString& portName);            ///< 端口接入: 转发 portAdded 信号
 
 private:
-    void connectSignals(IConnection* conn);       ///< 连接IConnection信号到内部槽
-    void clearDownstreamConnections();             ///< 清除下游控制器的连接引用
+    void connectSignals(IConnection* conn);       ///< 连接 IConnection 信号到内部槽
+    void clearDownstreamConnections();             ///< 清除下游控制器的连接引用(防止悬空指针)
     void stopConnectionTimeout();                  ///< 停止连接超时定时器
 
     ConnectionManager* m_connManager;              ///< 连接管理器(工厂)
     IConnection* m_currentConn = nullptr;          ///< 当前活跃连接实例
     SendController* m_sendController = nullptr;    ///< 发送控制器引用
-    OtaManager* m_otaManager = nullptr;            ///< OTA管理器引用
+    OtaManager* m_otaManager = nullptr;            ///< OTA 管理器引用
     RecordingController* m_recordingController = nullptr; ///< 录制控制器引用
     PortWatcher* m_portWatcher = nullptr;          ///< 端口热插拔监控器
 
-    QTimer m_connectionTimer;                      ///< 连接超时定时器
-    static constexpr int kConnectionTimeoutMs = 5000; ///< 超时阈值5秒
+    QTimer m_connectionTimer;                      ///< 连接超时定时器(单次触发)
+    static constexpr int kConnectionTimeoutMs = 5000; ///< 超时阈值 5 秒
 
-    QTimer m_reconnectTimer;                       ///< 自动重连定时器
+    QTimer m_reconnectTimer;                       ///< 自动重连定时器(间隔触发)
     bool m_autoReconnectEnabled = false;           ///< 是否启用自动重连
     bool m_userInitiatedDisconnect = false;        ///< 用户主动断开标志(不触发自动重连)
     QVariantMap m_lastConnectParams;               ///< 上次连接参数(用于重连)

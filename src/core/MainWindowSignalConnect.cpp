@@ -21,6 +21,7 @@
 #include "chart/ChartModel.h"
 #include "serial/PortWatcher.h"
 #include "core/ToastWidget.h"
+#include "core/ThemeManager.h"
 #include <QMessageBox>
 
 /**
@@ -189,7 +190,7 @@ void MainWindow::connectSignals()
         QString text = index.data().toString();
 
         // 触发导航指示器滑动动画
-        m_navIndicator->moveToIndex(index);
+        m_navIndicator->animateTo(index);
 
         if (text == tr("数据导出")) { m_terminalController->onExportData(this); return; }
         if (text == tr("TCP客户端")) { m_connController->connectNetwork(ConnectionType::TcpClient); return; }
@@ -213,5 +214,20 @@ void MainWindow::connectSignals()
     connect(m_connController->portWatcher(), &PortWatcher::portRemoved,
             this, [this](const QString& portName) {
         statusBar()->showMessage(tr("端口已拔出: %1").arg(portName), 4000);
+    });
+
+    // ---- 主题切换 → NavIndicatorWidget 颜色刷新 ----
+    // 当用户切换主题时，指示线的 accent 颜色需要同步更新
+    connect(&ThemeManager::instance(), &ThemeManager::themeChanged,
+            m_navIndicator, &NavIndicatorWidget::updateThemeColor);
+
+    // ---- 连接状态 → 吐司通知 ----
+    // 连接成功时显示 Success 类型吐司
+    connect(m_connController, &ConnectionController::connectionStateChanged,
+            this, [this](ConnectionState state, const QString& connName) {
+        if (state == ConnectionState::Connected) {
+            ToastWidget::show(this, tr("已连接: %1").arg(connName),
+                              ToastWidget::ToastType::Success);
+        }
     });
 }

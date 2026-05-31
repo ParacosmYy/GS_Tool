@@ -77,11 +77,13 @@ bool TcpConnection::open()
 void TcpConnection::close()
 {
     if (m_socket) {
+        disconnect(m_socket, nullptr, this, nullptr);  // 防止信号在 deleteLater 之前到达
         m_socket->disconnectFromHost();
         m_socket->deleteLater();
         m_socket = nullptr;
     }
     if (m_clientSocket) {
+        disconnect(m_clientSocket, nullptr, this, nullptr);  // 防止信号在 deleteLater 之前到达
         m_clientSocket->disconnectFromHost();
         m_clientSocket->deleteLater();
         m_clientSocket = nullptr;
@@ -143,23 +145,26 @@ void TcpConnection::onSocketError(QAbstractSocket::SocketError error)
 void TcpConnection::onNewConnection()
 {
     if (m_clientSocket) {
+        // 断开旧客户端的所有信号连接，防止 disconnected lambda 在新客户端赋值后删除错误的 socket
+        disconnect(m_clientSocket, nullptr, this, nullptr);
         m_clientSocket->disconnectFromHost();
         m_clientSocket->deleteLater();
     }
 
     m_clientSocket = m_server->nextPendingConnection();
     if (m_clientSocket) {
-        connect(m_clientSocket, &QTcpSocket::readyRead,
+        QTcpSocket* sock = m_clientSocket;  // 捕获当前 socket 指针，防止 lambda 通过 m_clientSocket 访问到新 socket
+        connect(sock, &QTcpSocket::readyRead,
                 this, &TcpConnection::onSocketReadyRead);
-        connect(m_clientSocket, &QTcpSocket::disconnected,
-                this, [this]() {
-                    // 防御性空指针检查: close()可能已将m_clientSocket置空
-                    if (m_clientSocket) {
+        connect(sock, &QTcpSocket::disconnected,
+                this, [this, sock]() {
+                    // 仅当 m_clientSocket 仍指向本 socket 时才清理（新连接已替换则跳过）
+                    if (m_clientSocket == sock) {
                         m_clientSocket->deleteLater();
                         m_clientSocket = nullptr;
                     }
                 });
-        connect(m_clientSocket, &QTcpSocket::errorOccurred,
+        connect(sock, &QTcpSocket::errorOccurred,
                 this, &TcpConnection::onSocketError);
         updateState(ConnectionState::Connected);
     }

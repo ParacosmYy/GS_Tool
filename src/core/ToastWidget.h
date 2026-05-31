@@ -38,6 +38,11 @@ public:
         auto* toast = new ToastWidget(parent, message, type);
         activeToasts(parent).append(toast);
 
+        // 父控件销毁时清理静态 map 中的悬挂指针条目
+        connect(parent, &QObject::destroyed, parent, [parent]() {
+            activeToastsMap().remove(parent);
+        });
+
         const auto& list = activeToasts(parent);
         int bottomY = parent->height() - kMargin;
         for (auto* t : list) {
@@ -101,6 +106,10 @@ private:
     explicit ToastWidget(QWidget* parent, const QString& message, ToastType type)
         : QWidget(parent), m_type(type), m_message(message)
     {
+        setObjectName("toastWidget");
+        setProperty("type", type == ToastType::Success ? "success"
+                     : type == ToastType::Error   ? "error"
+                                                  : "info");
         setAttribute(Qt::WA_TranslucentBackground);
         setFixedWidth(kWidth);
         QFont font("Microsoft YaHei UI", 12);
@@ -146,8 +155,12 @@ private:
     }
 
     static QList<ToastWidget*>& activeToasts(QWidget* parent) { ///< 活跃吐司列表
+        return activeToastsMap()[parent];
+    }
+
+    static QMap<QWidget*, QList<ToastWidget*>>& activeToastsMap() { ///< 活跃吐司静态映射
         static QMap<QWidget*, QList<ToastWidget*>> map;
-        return map[parent];
+        return map;
     }
 
     static void repositionToasts(QWidget* parent) {              ///< 消失后重排位置

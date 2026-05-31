@@ -417,6 +417,7 @@ void ZModemTransfer::sendDataSubpackets()
     sendZDATA();
 
     qint64 offset = m_fileOffset;
+    int lastPercent = static_cast<int>((offset * 100) / qMax(m_fileData.size(), qint64(1)));
     while (offset < m_fileData.size()) {
         int chunkSize = qMin(static_cast<int>(m_fileData.size() - offset), kDataLen);
         QByteArray chunk = m_fileData.mid(offset, chunkSize);
@@ -427,7 +428,11 @@ void ZModemTransfer::sendDataSubpackets()
         offset += chunkSize;
         m_bytesSent = offset;
         int percent = static_cast<int>((offset * 100) / m_fileData.size());
-        emit progress(percent, offset, m_fileData.size());
+        // 每 1% 变化或最后一帧才发射进度信号，避免 UI 线程被高频信号淹没
+        if (percent != lastPercent || isLast) {
+            emit progress(percent, offset, m_fileData.size());
+            lastPercent = percent;
+        }
     }
 
     m_fileOffset = offset;
