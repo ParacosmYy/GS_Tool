@@ -333,6 +333,10 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 | `SendController` | `core/SendController.h/cpp` | 发送控制器（发送栏UI+输入解析+HEX转换+连接写入+终端记录） |
 | `NavigationController` | `core/NavigationController.h/cpp` | 导航控制器（导航树+面板切换动画+呼吸动画） |
 | `RecordingController` | `core/RecordingController.h/cpp` | 录制控制器（录制/回放按钮+DataLogger交互） |
+| `ConnectionController` | `core/ConnectionController.h/cpp` | 连接控制器（串口/网络连接管理+状态分发+SendController/OtaManager连接注入） |
+| `IProtocolBridge` | `protocol/IProtocolBridge.h` | 协议桥抽象接口（原始字节→frameParsed信号，兼容ChartModel/ProtocolView管道） |
+| `JustFloatBridge` | `protocol/JustFloatBridge.h/cpp` | JustFloat协议桥（VOFA+小端浮点字节流解析） |
+| `FireWaterBridge` | `protocol/FireWaterBridge.h/cpp` | FireWater协议桥（VOFA+ CSV尾标记协议解析） |
 
 **规则**: 上表中的组件已经过验证，任何新功能需要CRC/HEX/缓冲区/配置等能力时，直接复用，不得重写。
 
@@ -812,6 +816,7 @@ docs/prd/PRD_<编号>_<简述>.md
 | 20 | 架构审查+DataExporter流式导出+ProtocolView右键菜单/JSON导出+TerminalWidget方向缓存+连接类型图标+翻译补全+ChartWidget宽度修复 | 22 |
 | 21 | MainWindow拆分NavigationController+RecordingController+34条翻译补全+QSS protocolView修复+JustFloat特性提案 | 23 |
 | 22 | SendController提取+sendAndRecord静默失败修复+TerminalWidget环形缓存失效修复+QSS protocolToolbar修复+代码审查修复(死代码清除+翻译上下文修正+setConnected连线) | 24 |
+| 23 | ConnectionController提取+JustFloat/FireWater协议桥实现+SendBar StyledPanel修复+sendAndRecord未连接反馈+代码审查修复(isHex参数移除+静默失败修复) | 25 |
 | ... | 目标: 1000分 | 1000 |
 
 ---

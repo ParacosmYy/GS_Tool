@@ -20,6 +20,7 @@
 #include "serial/DataStatistics.h"
 #include "utils/DataExporter.h"
 #include "utils/DataLogger.h"
+#include "core/ConnectionController.h"
 #include "core/RecordingController.h"
 #include "core/NavigationController.h"
 #include "core/SendController.h"
@@ -46,10 +47,6 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private slots:
-    // 串口连接/断开
-    void onConnectSerial();
-    void onDisconnectSerial();
-
     // 显示模式切换
     void onDisplayModeChanged(int index);
 
@@ -66,20 +63,11 @@ private slots:
     void onSearchRequested(const QString& pattern, bool regex, bool hex);
     void onSearchCleared();
 
-    // 网络连接
-    void onConnectNetwork(ConnectionType type);
-
     // 主题切换
     void onThemeChanged(int index);
 
     // 语言切换
     void onLanguageChanged(int index);
-
-    // 连接状态变化
-    void onConnectionStateChanged(ConnectionState state);
-
-    // 接收到数据
-    void onDataReceived(const QByteArray& data);
 
 private:
     void setupUI();
@@ -93,9 +81,9 @@ private:
 
     // 核心组件
     ConnectionManager* m_connManager;
+    ConnectionController* m_connController;
 
-    // 当前活动的连接和模型
-    IConnection* m_currentConn = nullptr;
+    // 当前活动的终端模型
     TerminalModel* m_terminalModel;
 
     // 业务组件

@@ -19,6 +19,7 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_connManager(new ConnectionManager(this))
+    , m_connController(new ConnectionController(m_connManager, this))
     , m_terminalModel(new TerminalModel(this))
     , m_sendHistory(new SendHistory(this))
     , m_dataExporter(new DataExporter(this))
@@ -30,6 +31,11 @@ MainWindow::MainWindow(QWidget* parent)
     , m_otaManager(new OtaManager(this))
     , m_navController(new NavigationController(this))
 {
+    // 依赖注入: ConnectionController 需要通知 SendController/OtaManager/RecordingController
+    m_connController->setSendController(m_sendController);
+    m_connController->setOtaManager(m_otaManager);
+    m_connController->setRecordingController(m_recordingController);
+
     setupUI();
     setupToolbar();
     setupStatusBar();
@@ -246,11 +252,74 @@ void MainWindow::setupStatusBar()
 
 void MainWindow::connectSignals()
 {
-    // 串口连接/断开
+    // ---- 串口连接/断开: 委托ConnectionController ----
     connect(m_serialConfig, &SerialConfigPanel::connectRequested,
-            this, &MainWindow::onConnectSerial);
+            this, [this]() {
+        QVariantMap params;
+        params["portName"] = m_serialConfig->currentPortData();
+        params["baudRate"] = m_serialConfig->currentBaudRate();
+        params["dataBits"] = m_serialConfig->currentDataBitsIndex() + 5;
+        params["parity"] = m_serialConfig->currentParityIndex();
+        params["stopBits"] = m_serialConfig->currentStopBitsIndex();
+        params["flowControl"] = m_serialConfig->currentFlowControlIndex();
+        params["dtr"] = true;
+        params["rts"] = true;
+        m_connController->connectSerial(params);
+    });
     connect(m_serialConfig, &SerialConfigPanel::disconnectRequested,
-            this, &MainWindow::onDisconnectSerial);
+            m_connController, &ConnectionController::disconnectSerial);
+
+    // ConnectionController → MainWindow UI 更新
+    connect(m_connController, &ConnectionController::connectionStateChanged,
+            this, [this](ConnectionState state, const QString& connName) {
+        const char* stateStr = "";
+        switch (state) {
+        case ConnectionState::Connected:
+            m_connStatusLbl->setText(tr("已连接: %1").arg(connName));
+            stateStr = "connected";
+            m_serialConfig->setConnected(true);
+            // 连接成功后自动切换到终端面板（带动画）
+            m_navController->switchToPanel(m_terminal);
+            m_navController->stopBreathingAnimation(m_connStatusLbl);
+            break;
+        case ConnectionState::Disconnected:
+            m_connStatusLbl->setText(tr("未连接"));
+            stateStr = "disconnected";
+            m_serialConfig->setConnected(false);
+            m_navController->stopBreathingAnimation(m_connStatusLbl);
+            break;
+        case ConnectionState::Connecting:
+            m_connStatusLbl->setText(tr("连接中..."));
+            stateStr = "connecting";
+            m_navController->startBreathingAnimation(m_connStatusLbl);
+            break;
+        case ConnectionState::Error:
+            m_connStatusLbl->setText(tr("连接错误"));
+            stateStr = "error";
+            m_serialConfig->setConnected(false);
+            m_navController->stopBreathingAnimation(m_connStatusLbl);
+            break;
+        }
+        m_connStatusLbl->setProperty("state", stateStr);
+        m_connStatusLbl->style()->unpolish(m_connStatusLbl);
+        m_connStatusLbl->style()->polish(m_connStatusLbl);
+    });
+
+    connect(m_connController, &ConnectionController::dataReceived,
+            this, [this](const QByteArray& data) {
+        m_terminalModel->appendReceived(data);
+        m_frameParser->feed(data);
+        m_dataLogger->logData(data, DataLogger::Direction::Received);
+    });
+
+    connect(m_connController, &ConnectionController::statusBarUpdateRequested,
+            this, &MainWindow::updateStatusBar);
+
+    // 连接失败弹窗
+    connect(m_connController, &ConnectionController::connectionFailed,
+            this, [this](const QString& title, const QString& message) {
+        QMessageBox::warning(this, title, message);
+    });
 
     // 快捷指令 → SendController
     connect(m_quickCmdBar, &QuickCommandBar::commandTriggered,
@@ -330,9 +399,9 @@ void MainWindow::connectSignals()
 
         // 功能性节点（不走面板切换，直接触发动作）
         if (text == tr("数据导出")) { onExportData(); return; }
-        if (text == tr("TCP客户端")) { onConnectNetwork(ConnectionType::TcpClient); return; }
-        if (text == tr("TCP服务端")) { onConnectNetwork(ConnectionType::TcpServer); return; }
-        if (text == tr("UDP")) { onConnectNetwork(ConnectionType::Udp); return; }
+        if (text == tr("TCP客户端")) { m_connController->connectNetwork(ConnectionType::TcpClient); return; }
+        if (text == tr("TCP服务端")) { m_connController->connectNetwork(ConnectionType::TcpServer); return; }
+        if (text == tr("UDP")) { m_connController->connectNetwork(ConnectionType::Udp); return; }
 
         // 通过NavigationController映射表查找目标面板widget
         QWidget* target = m_navController->lookupPanel(text);
@@ -406,61 +475,6 @@ void MainWindow::saveSettings()
     settings.saveSerialConfig(serialConfig);
 
     settings.sync();
-}
-
-void MainWindow::onConnectSerial()
-{
-    // 通过工厂创建连接（不依赖具体类型）
-    m_currentConn = m_connManager->createConnection(ConnectionType::Serial);
-    if (!m_currentConn) {
-        QMessageBox::warning(this, tr("Not Supported"), tr("Serial connection not available"));
-        return;
-    }
-
-    // 使用 IConnection::configure() 统一配置（消除强转）
-    QVariantMap params;
-    params["portName"] = m_serialConfig->currentPortData();
-    params["baudRate"] = m_serialConfig->currentBaudRate();
-    params["dataBits"] = m_serialConfig->currentDataBitsIndex() + 5;
-    params["parity"] = m_serialConfig->currentParityIndex();
-    params["stopBits"] = m_serialConfig->currentStopBitsIndex();
-    params["flowControl"] = m_serialConfig->currentFlowControlIndex();
-    params["dtr"] = true;
-    params["rts"] = true;
-    m_currentConn->configure(params);
-
-    // 连接数据信号
-    connect(m_currentConn, &IConnection::dataReceived,
-            this, &MainWindow::onDataReceived);
-    connect(m_currentConn, &IConnection::stateChanged,
-            this, &MainWindow::onConnectionStateChanged);
-    connect(m_currentConn, &IConnection::errorOccurred,
-            this, [](const QString& msg) {
-        qWarning() << "Connection error:" << msg;
-    });
-
-    // 尝试连接
-    if (!m_currentConn->open()) {
-        QMessageBox::warning(this, tr("Connection Failed"),
-                             tr("Cannot open serial port"));
-        m_connManager->removeConnection(m_currentConn);
-        m_currentConn = nullptr;
-        return;
-    }
-
-    // 同步连接到SendController和OTA管理器
-    m_sendController->setConnection(m_currentConn);
-    m_otaManager->setConnection(m_currentConn);
-}
-
-void MainWindow::onDisconnectSerial()
-{
-    if (m_currentConn) {
-        m_currentConn->close();
-        m_connManager->removeConnection(m_currentConn);
-        m_currentConn = nullptr;
-        m_sendController->setConnection(nullptr);
-    }
 }
 
 void MainWindow::onDisplayModeChanged(int index)
@@ -545,98 +559,6 @@ void MainWindow::onLanguageChanged(int index)
     } else {
         statusBar()->showMessage(QStringLiteral("语言已切换为中文，重启后生效"), 3000);
     }
-}
-
-void MainWindow::onConnectNetwork(ConnectionType type)
-{
-    m_currentConn = m_connManager->createConnection(type);
-    if (!m_currentConn) {
-        QMessageBox::warning(this, tr("Not Supported"), tr("This connection type is not yet available"));
-        return;
-    }
-
-    // 默认网络参数配置
-    QVariantMap params;
-    if (type == ConnectionType::TcpClient) {
-        params["mode"] = "client";
-        params["host"] = "127.0.0.1";
-        params["port"] = 8080;
-    } else if (type == ConnectionType::TcpServer) {
-        params["mode"] = "server";
-        params["port"] = 8080;
-    } else if (type == ConnectionType::Udp) {
-        params["localPort"] = 8888;
-        params["remoteHost"] = "127.0.0.1";
-        params["remotePort"] = 8080;
-    }
-    m_currentConn->configure(params);
-
-    connect(m_currentConn, &IConnection::dataReceived,
-            this, &MainWindow::onDataReceived);
-    connect(m_currentConn, &IConnection::stateChanged,
-            this, &MainWindow::onConnectionStateChanged);
-    connect(m_currentConn, &IConnection::errorOccurred,
-            this, [](const QString& msg) {
-        qWarning() << "Network connection error:" << msg;
-    });
-
-    if (!m_currentConn->open()) {
-        QMessageBox::warning(this, tr("Connection Failed"),
-                             tr("Cannot establish network connection"));
-        m_connManager->removeConnection(m_currentConn);
-        m_currentConn = nullptr;
-        return;
-    }
-
-    // 同步连接到SendController
-    m_sendController->setConnection(m_currentConn);
-}
-
-void MainWindow::onConnectionStateChanged(ConnectionState state)
-{
-    const char* stateStr = "";
-    switch (state) {
-    case ConnectionState::Connected:
-        m_connStatusLbl->setText(tr("已连接: %1").arg(
-            m_currentConn ? m_currentConn->name() : ""));
-        stateStr = "connected";
-        m_serialConfig->setConnected(true);
-        m_recordingController->setConnected(true);
-        // 连接成功后自动切换到终端面板（带动画）
-        m_navController->switchToPanel(m_terminal);
-        m_navController->stopBreathingAnimation(m_connStatusLbl);
-        break;
-    case ConnectionState::Disconnected:
-        m_connStatusLbl->setText(tr("未连接"));
-        stateStr = "disconnected";
-        m_serialConfig->setConnected(false);
-        m_recordingController->setConnected(false);
-        m_navController->stopBreathingAnimation(m_connStatusLbl);
-        break;
-    case ConnectionState::Connecting:
-        m_connStatusLbl->setText(tr("连接中..."));
-        stateStr = "connecting";
-        m_navController->startBreathingAnimation(m_connStatusLbl);
-        break;
-    case ConnectionState::Error:
-        m_connStatusLbl->setText(tr("连接错误"));
-        stateStr = "error";
-        m_serialConfig->setConnected(false);
-        m_recordingController->setConnected(false);
-        m_navController->stopBreathingAnimation(m_connStatusLbl);
-        break;
-    }
-    m_connStatusLbl->setProperty("state", stateStr);
-    m_connStatusLbl->style()->unpolish(m_connStatusLbl);
-    m_connStatusLbl->style()->polish(m_connStatusLbl);
-}
-
-void MainWindow::onDataReceived(const QByteArray& data)
-{
-    m_terminalModel->appendReceived(data);
-    m_frameParser->feed(data);
-    m_dataLogger->logData(data, DataLogger::Direction::Received);
-    updateStatusBar();
 }
 
 void MainWindow::updateStatusBar()

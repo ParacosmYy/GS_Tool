@@ -56,7 +56,7 @@ private slots:
 
 private:
     // 统一发送方法: 写入连接 + 记录终端 + 日志，返回是否成功写入
-    bool sendAndRecord(const QByteArray& data, bool isHex = false);
+    bool sendAndRecord(const QByteArray& data);
 
     // 核心依赖
     TerminalModel* m_terminalModel;

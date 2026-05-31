@@ -31,7 +31,6 @@ SendController::~SendController()
 QWidget* SendController::createSendBar(QWidget* parent)
 {
     auto* sendFrame = new QFrame(parent);
-    sendFrame->setFrameShape(QFrame::StyledPanel);
     auto* sendLayout = new QHBoxLayout(sendFrame);
     sendLayout->setContentsMargins(8, 4, 8, 4);
 
@@ -90,10 +89,10 @@ TimedSender* SendController::timedSender() const
     return m_timedSender;
 }
 
-bool SendController::sendAndRecord(const QByteArray& data, bool isHex)
+bool SendController::sendAndRecord(const QByteArray& data)
 {
-    Q_UNUSED(isHex);
     if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
+        emit statusMessage(tr("发送失败: 未连接"));
         return false;
     }
     qint64 written = m_currentConn->write(data);

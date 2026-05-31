@@ -26,6 +26,7 @@ find_package(Qt6 REQUIRED COMPONENTS
 set(SOURCES
     src/main.cpp
     src/core/MainWindow.cpp
+    src/core/ConnectionController.cpp
     src/core/RecordingController.cpp
     src/core/NavigationController.cpp
     src/core/SendController.cpp
@@ -48,6 +49,8 @@ set(SOURCES
     src/protocol/ProtocolView.cpp
     src/protocol/FrameVisualEditor.cpp
     src/protocol/IntelHexParser.cpp
+    src/protocol/JustFloatBridge.cpp
+    src/protocol/FireWaterBridge.cpp
     src/chart/ChartWidget.cpp
     src/chart/ChannelConfig.cpp
     src/chart/ChartModel.cpp
@@ -69,6 +72,7 @@ set(SOURCES
 
 set(HEADERS
     src/core/MainWindow.h
+    src/core/ConnectionController.h
     src/core/RecordingController.h
     src/core/NavigationController.h
     src/core/SendController.h
@@ -94,6 +98,9 @@ set(HEADERS
     src/protocol/ProtocolView.h
     src/protocol/FrameVisualEditor.h
     src/protocol/IntelHexParser.h
+    src/protocol/IProtocolBridge.h
+    src/protocol/JustFloatBridge.h
+    src/protocol/FireWaterBridge.h
     src/chart/ChartWidget.h
     src/chart/ChannelConfig.h
     src/chart/ChartModel.h
