@@ -6,7 +6,7 @@
 #include <QVector>
 #include <QMutex>
 #include <QDateTime>
-#include "Constants.h"
+#include "core/Constants.h"
 
 // 单条终端数据记录
 struct TerminalLine {

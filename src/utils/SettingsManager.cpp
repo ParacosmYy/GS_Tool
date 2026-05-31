@@ -11,7 +11,7 @@ SettingsManager::SettingsManager(QObject* parent)
     : QObject(parent)
     , m_settings(App::SETTINGS_FILE, QSettings::IniFormat)
 {
-    m_settings.setFallbackToDefaults(true);
+    m_settings.setFallbacksEnabled(true);
 }
 
 SettingsManager::~SettingsManager()

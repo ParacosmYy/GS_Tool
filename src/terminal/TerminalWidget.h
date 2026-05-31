@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QTimer>
 #include "TerminalModel.h"
-#include "Constants.h"
+#include "core/Constants.h"
 
 // 自绘制终端控件 - 使用QPainter直接绘制文本
 // 比QTextEdit/QPlainTextEdit性能更好，适合大流量数据显示

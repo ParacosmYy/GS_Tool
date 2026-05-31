@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QByteArray>
-#include "Constants.h"
+#include "core/Constants.h"
 
 // 连接抽象接口 - 所有连接类型(串口/TCP/UDP/RTT)都实现这个接口
 // 这样上层功能(终端/协议解析/OTA)不需要关心底层连接方式
