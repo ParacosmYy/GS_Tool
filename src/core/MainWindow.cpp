@@ -352,73 +352,46 @@ void MainWindow::connectSignals()
                 m_frameParser->setDefinition(def);
             });
 
-    // 导航树点击切换面板
+    // 导航树点击切换面板 — 使用map映射面板名称到widget，消除重复的setVisible调用
     connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
         QString text = index.data().toString();
-        if (text == tr("Config")) {
-            m_serialConfig->setVisible(true);
-            m_terminal->setVisible(false);
-            m_dataStats->setVisible(false);
-            m_protocolView->setVisible(false);
-            m_frameEditor->setVisible(false);
-            m_chartWidget->setVisible(false);
-            m_otaWidget->setVisible(false);
-        } else if (text == tr("Terminal")) {
-            m_serialConfig->setVisible(false);
-            m_terminal->setVisible(true);
-            m_dataStats->setVisible(false);
-            m_protocolView->setVisible(false);
-            m_frameEditor->setVisible(false);
-            m_chartWidget->setVisible(false);
-            m_otaWidget->setVisible(false);
-        } else if (text == tr("Statistics")) {
-            m_serialConfig->setVisible(false);
-            m_terminal->setVisible(false);
-            m_dataStats->setVisible(true);
-            m_protocolView->setVisible(false);
-            m_frameEditor->setVisible(false);
-            m_chartWidget->setVisible(false);
-            m_otaWidget->setVisible(false);
-        } else if (text == tr("Protocol")) {
-            m_serialConfig->setVisible(false);
-            m_terminal->setVisible(false);
-            m_dataStats->setVisible(false);
-            m_protocolView->setVisible(true);
-            m_frameEditor->setVisible(false);
-            m_chartWidget->setVisible(false);
-            m_otaWidget->setVisible(false);
-        } else if (text == tr("Frame Editor")) {
-            m_serialConfig->setVisible(false);
-            m_terminal->setVisible(false);
-            m_dataStats->setVisible(false);
-            m_protocolView->setVisible(false);
-            m_frameEditor->setVisible(true);
-            m_chartWidget->setVisible(false);
-            m_otaWidget->setVisible(false);
-        } else if (text == tr("Chart")) {
-            m_serialConfig->setVisible(false);
-            m_terminal->setVisible(false);
-            m_dataStats->setVisible(false);
-            m_protocolView->setVisible(false);
-            m_frameEditor->setVisible(false);
-            m_chartWidget->setVisible(true);
-            m_otaWidget->setVisible(false);
-        } else if (text == tr("OTA")) {
-            m_serialConfig->setVisible(false);
-            m_terminal->setVisible(false);
-            m_dataStats->setVisible(false);
-            m_protocolView->setVisible(false);
-            m_frameEditor->setVisible(false);
-            m_chartWidget->setVisible(false);
-            m_otaWidget->setVisible(true);
-        } else if (text == tr("Data Export")) {
-            onExportData();
-        } else if (text == tr("TCP Client")) {
-            onConnectNetwork(ConnectionType::TcpClient);
-        } else if (text == tr("TCP Server")) {
-            onConnectNetwork(ConnectionType::TcpServer);
-        } else if (text == tr("UDP")) {
-            onConnectNetwork(ConnectionType::Udp);
+
+        // 面板映射: 导航名 → 对应的widget
+        static const QVector<QPair<QString, QWidget*>> panels = {
+            {tr("Config"), nullptr},       // 特殊处理，用m_serialConfig
+            {tr("Terminal"), nullptr},     // 特殊处理，用m_terminal
+            {tr("Statistics"), nullptr},
+            {tr("Protocol"), nullptr},
+            {tr("Frame Editor"), nullptr},
+            {tr("Chart"), nullptr},
+            {tr("OTA"), nullptr},
+        };
+
+        // 功能性节点（不走面板切换）
+        if (text == tr("Data Export")) { onExportData(); return; }
+        if (text == tr("TCP Client")) { onConnectNetwork(ConnectionType::TcpClient); return; }
+        if (text == tr("TCP Server")) { onConnectNetwork(ConnectionType::TcpServer); return; }
+        if (text == tr("UDP")) { onConnectNetwork(ConnectionType::Udp); return; }
+
+        // 收集所有可切换面板widget
+        QWidget* allPanels[] = {
+            m_serialConfig, m_terminal, m_dataStats,
+            m_protocolView, m_frameEditor, m_chartWidget, m_otaWidget
+        };
+
+        // 确定要显示的widget
+        QWidget* target = nullptr;
+        if (text == tr("Config"))        target = m_serialConfig;
+        else if (text == tr("Terminal")) target = m_terminal;
+        else if (text == tr("Statistics"))   target = m_dataStats;
+        else if (text == tr("Protocol"))     target = m_protocolView;
+        else if (text == tr("Frame Editor")) target = m_frameEditor;
+        else if (text == tr("Chart"))        target = m_chartWidget;
+        else if (text == tr("OTA"))          target = m_otaWidget;
+
+        // 切换: 隐藏所有，只显示目标
+        for (auto* w : allPanels) {
+            if (w) w->setVisible(w == target);
         }
     });
 }

@@ -1,4 +1,5 @@
 #include "TerminalSearchBar.h"
+#include "utils/HexConverter.h"
 
 #include <QHBoxLayout>
 #include <QKeyEvent>
@@ -242,33 +243,5 @@ void TerminalSearchBar::onCloseClicked()
 
 bool TerminalSearchBar::isValidHex(const QString& text) const
 {
-    // HEX格式: 允许 "AA BB CC" 或 "AABBCC" 或 "AA BB CC DD"
-    // 只能包含 0-9, A-F, a-f 和空格
-    // 空字符串由调用方判断, 这里只验证格式
-    QString trimmed = text.trimmed();
-    if (trimmed.isEmpty()) {
-        return true;
-    }
-
-    // 逐字符检查: 只允许HEX字符和空格
-    for (const QChar& ch : trimmed) {
-        if (!((ch >= '0' && ch <= '9')
-              || (ch >= 'A' && ch <= 'F')
-              || (ch >= 'a' && ch <= 'f')
-              || ch == ' ')) {
-            return false;
-        }
-    }
-
-    // 去掉空格后检查长度: 必须是偶数(每两个字符表示一个字节)
-    QString compact = trimmed;
-    compact.remove(' ');
-    if (compact.isEmpty()) {
-        return true;
-    }
-    if (compact.length() % 2 != 0) {
-        return false;
-    }
-
-    return true;
+    return HexConverter::isValidHex(text);
 }

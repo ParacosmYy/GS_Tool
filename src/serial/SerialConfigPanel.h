@@ -9,7 +9,6 @@
 #include <QSerialPort>
 #include <QLabel>
 #include <QVariantMap>
-#include "connection/SerialConnection.h"
 
 // 串口配置面板 - 选择端口、波特率、数据位等参数
 class SerialConfigPanel : public QWidget {
@@ -17,12 +16,6 @@ class SerialConfigPanel : public QWidget {
 
 public:
     explicit SerialConfigPanel(QWidget* parent = nullptr);
-
-    // 从界面读取当前配置
-    void applyConfigToConnection(SerialConnection* conn);
-
-    // 从连接对象读取配置到界面
-    void loadConfigFromConnection(SerialConnection* conn);
 
     // 刷新可用端口列表
     void refreshPorts();

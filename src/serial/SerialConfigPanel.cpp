@@ -101,53 +101,6 @@ void SerialConfigPanel::setupUI()
     mainLayout->addStretch();
 }
 
-void SerialConfigPanel::applyConfigToConnection(SerialConnection* conn)
-{
-    // currentData() 返回的是实际端口名 "COM3"，而非显示文本 "COM3 - USB Serial"
-    conn->setPortName(m_portCombo->currentData().toString());
-    conn->setBaudRate(m_baudCombo->currentText().toInt());
-
-    // 数据位
-    int dataBitsIndex = m_dataBitsCombo->currentIndex();
-    QSerialPort::DataBits dataBits[] = {
-        QSerialPort::Data5, QSerialPort::Data6,
-        QSerialPort::Data7, QSerialPort::Data8
-    };
-    conn->setDataBits(dataBits[dataBitsIndex]);
-
-    // 校验
-    QSerialPort::Parity parity[] = {
-        QSerialPort::NoParity, QSerialPort::EvenParity,
-        QSerialPort::OddParity, QSerialPort::MarkParity,
-        QSerialPort::SpaceParity
-    };
-    conn->setParity(parity[m_parityCombo->currentIndex()]);
-
-    // 停止位
-    QSerialPort::StopBits stopBits[] = {
-        QSerialPort::OneStop, QSerialPort::OneAndHalfStop,
-        QSerialPort::TwoStop
-    };
-    conn->setStopBits(stopBits[m_stopBitsCombo->currentIndex()]);
-
-    // 流控
-    QSerialPort::FlowControl flow[] = {
-        QSerialPort::NoFlowControl, QSerialPort::HardwareControl,
-        QSerialPort::SoftwareControl
-    };
-    conn->setFlowControl(flow[m_flowControlCombo->currentIndex()]);
-
-    // DTR/RTS
-    conn->setDtr(m_dtrCheck->isChecked());
-    conn->setRts(m_rtsCheck->isChecked());
-}
-
-void SerialConfigPanel::loadConfigFromConnection(SerialConnection* conn)
-{
-    m_portCombo->setCurrentText(conn->portName());
-    m_baudCombo->setCurrentText(QString::number(conn->baudRate()));
-}
-
 void SerialConfigPanel::refreshPorts()
 {
     QString currentPort = m_portCombo->currentText();

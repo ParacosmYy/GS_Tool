@@ -13,7 +13,7 @@ TcpConnection::~TcpConnection()
 
 ConnectionType TcpConnection::type() const
 {
-    return ConnectionType::TcpClient;
+    return (m_mode == Server) ? ConnectionType::TcpServer : ConnectionType::TcpClient;
 }
 
 QString TcpConnection::name() const
