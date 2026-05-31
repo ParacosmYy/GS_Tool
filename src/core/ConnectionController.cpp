@@ -147,8 +147,11 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
 /**
  * @brief 关闭当前活跃连接（串口或网络）
  *
- * 流程: 关闭端口 → 清空指针 → 从管理器移除并销毁 → 清除下游引用
+ * 流程: 清空指针 → 断开信号 → 从管理器移除(close+delete) → 清除下游引用
  * 设置 m_userInitiatedDisconnect 标志防止触发自动重连。
+ *
+ * 不手动调用 conn->close()，由 removeConnection() 统一负责 close+delete，
+ * 避免双重 close 和 stateChanged 信号的重复发射。
  */
 void ConnectionController::disconnectCurrent()
 {
@@ -161,9 +164,11 @@ void ConnectionController::disconnectCurrent()
         IConnection* conn = m_currentConn;
         m_currentConn = nullptr;
 
-        // 关闭连接（SerialConnection::close() 有 isOpen() 保护，不会重复关闭）
-        conn->close();
-        // 从管理器移除并销毁（removeConnection 内部也会 close + delete）
+        // 先断开信号，防止 removeConnection 内部 close() 触发的
+        // stateChanged 信号进入 onConnectionStateChanged
+        disconnect(conn, nullptr, this, nullptr);
+
+        // 从管理器移除并销毁（removeConnection 内部执行 close + delete）
         m_connManager->removeConnection(conn);
 
         // 清除下游控制器的连接引用
@@ -346,11 +351,15 @@ void ConnectionController::onConnectionTimeout()
     qWarning() << "Connection timeout for"
                << (m_currentConn ? m_currentConn->name() : "unknown");
 
-    // 清理当前连接
+    // 标记为非用户主动断开但禁止自动重连（超时重连毫无意义）
+    m_userInitiatedDisconnect = true;
+    m_reconnectTimer.stop();
+
+    // 清理当前连接（不手动 close，由 removeConnection 统一处理）
     if (m_currentConn) {
         IConnection* conn = m_currentConn;
         m_currentConn = nullptr;
-        conn->close();
+        disconnect(conn, nullptr, this, nullptr);
         m_connManager->removeConnection(conn);
         clearDownstreamConnections();
     }

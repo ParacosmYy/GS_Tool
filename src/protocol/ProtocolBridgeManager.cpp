@@ -1,10 +1,29 @@
+/**
+ * @file ProtocolBridgeManager.cpp
+ * @brief 协议桥管理器实现
+ *
+ * 实现:
+ *   - 构造/析构: 持有三个数据源对象，默认使用 FrameParser 模式
+ *   - 模式切换: 重置旧源 → 断开旧信号 → 连接新信号 → 通知 UI
+ *   - 数据路由: feedData() 根据当前模式将数据转发到对应的数据源
+ *   - 空数据保护: 空数据直接忽略，避免无意义的处理开销
+ */
+
 #include "protocol/ProtocolBridgeManager.h"
 
 #include <QMetaObject>
 #include <QMetaMethod>
+#include <QDebug>
 
-// 构造函数: 持有三个数据源对象，默认使用FrameParser模式
-// frameParser由MainWindow创建并传入，this成为其parent
+/**
+ * @brief 构造协议桥管理器
+ * @param frameParser 外部创建的帧解析器
+ * @param parent 父对象
+ *
+ * frameParser 由 MainWindow 创建并传入。如果 frameParser 尚未设置 parent，
+ * 则归本对象管理（setParent）。同时创建 JustFloatBridge 和 FireWaterBridge。
+ * 初始连接 FrameParser 的信号。
+ */
 ProtocolBridgeManager::ProtocolBridgeManager(FrameParser* frameParser, QObject* parent)
     : QObject(parent)
     , m_frameParser(frameParser)
@@ -22,16 +41,27 @@ ProtocolBridgeManager::ProtocolBridgeManager(FrameParser* frameParser, QObject* 
     switchSource();
 }
 
+/**
+ * @brief 析构协议桥管理器
+ *
+ * QObject 父子树自动销毁 m_justFloat、m_fireWater。
+ * m_frameParser 如果 parent 是本对象也会被自动销毁。
+ */
 ProtocolBridgeManager::~ProtocolBridgeManager()
 {
 }
 
-// 设置协议模式
-// 切换时会:
-//   1. 重置旧源的内部状态（清空缓冲区）
-//   2. 断开旧源的信号连接
-//   3. 连接新源的信号
-//   4. 发出protocolModeChanged信号通知UI
+/**
+ * @brief 设置协议模式
+ * @param mode 目标协议模式
+ *
+ * 切换流程:
+ *   1. 如果 mode 与当前模式相同，直接返回
+ *   2. 重置旧源的内部状态（清空缓冲区）
+ *   3. 更新 m_mode
+ *   4. 重新连接信号（switchSource）
+ *   5. 发出 protocolModeChanged 信号通知 UI
+ */
 void ProtocolBridgeManager::setProtocolMode(ChartProtocolMode mode)
 {
     if (m_mode == mode) {
@@ -55,55 +85,115 @@ void ProtocolBridgeManager::setProtocolMode(ChartProtocolMode mode)
     emit protocolModeChanged(m_mode);
 }
 
-// 获取当前协议模式
+/**
+ * @brief 获取当前协议模式
+ * @return 当前活动协议模式
+ */
 ProtocolBridgeManager::ChartProtocolMode ProtocolBridgeManager::protocolMode() const
 {
     return m_mode;
 }
 
-// 接收原始串口数据，路由到当前活动的协议源
+/**
+ * @brief 接收原始串口数据，转发到当前活动的协议源
+ * @param data 原始字节数据
+ *
+ * 空数据保护: 传入空 QByteArray 时直接返回，不触发任何处理。
+ * 这避免了空数据导致的状态机无意义调用和潜在的边界问题。
+ *
+ * 无效模式保护: switch 的 default 分支会输出 qWarning 日志，
+ * 理论上不会触发（枚举覆盖完整），但作为防御性编程的保底措施。
+ */
 void ProtocolBridgeManager::feedData(const QByteArray& data)
 {
+    // ---- 空数据保护 ----
+    // 串口在特殊情况下（如连接刚建立/断开瞬间）可能产生空数据，
+    // 直接忽略以避免无意义的处理开销和潜在的边界问题
+    if (data.isEmpty()) {
+        return;
+    }
+
     switch (m_mode) {
     case ChartProtocolMode::FrameParser:
-        m_frameParser->feed(data);
+        if (m_frameParser) {
+            m_frameParser->feed(data);
+        } else {
+            qWarning() << "ProtocolBridgeManager::feedData: FrameParser mode but m_frameParser is null";
+        }
         break;
+
     case ChartProtocolMode::JustFloat:
-        m_justFloat->feed(data);
+        if (m_justFloat) {
+            m_justFloat->feed(data);
+        } else {
+            qWarning() << "ProtocolBridgeManager::feedData: JustFloat mode but m_justFloat is null";
+        }
         break;
+
     case ChartProtocolMode::FireWater:
-        m_fireWater->feed(data);
+        if (m_fireWater) {
+            m_fireWater->feed(data);
+        } else {
+            qWarning() << "ProtocolBridgeManager::feedData: FireWater mode but m_fireWater is null";
+        }
+        break;
+
+    default:
+        // 防御性编程: 枚举覆盖完整时不应该到达这里
+        qWarning() << "ProtocolBridgeManager::feedData: unknown protocol mode:" << static_cast<int>(m_mode);
         break;
     }
 }
 
-// 获取当前活动的桥（FrameParser模式下返回nullptr）
+/**
+ * @brief 获取当前活动的桥
+ * @return 当前活动桥指针，FrameParser 模式下返回 nullptr
+ */
 IProtocolBridge* ProtocolBridgeManager::activeBridge() const
 {
     return m_activeBridge;
 }
 
-// 获取FrameParser指针
+/**
+ * @brief 获取 FrameParser 指针
+ * @return 帧解析器指针
+ */
 FrameParser* ProtocolBridgeManager::frameParser() const
 {
     return m_frameParser;
 }
 
-// 获取JustFloatBridge指针
+/**
+ * @brief 获取 JustFloatBridge 指针
+ * @return JustFloat 协议桥指针
+ */
 JustFloatBridge* ProtocolBridgeManager::justFloatBridge() const
 {
     return m_justFloat;
 }
 
-// 获取FireWaterBridge指针
+/**
+ * @brief 获取 FireWaterBridge 指针
+ * @return FireWater 协议桥指针
+ */
 FireWaterBridge* ProtocolBridgeManager::fireWaterBridge() const
 {
     return m_fireWater;
 }
 
-// 切换数据源连接
-// 根据当前m_mode，断开所有源到本manager的信号，然后仅连接活动源
-// 这样Manager::frameParsed始终转发的是当前活动源的解析结果
+/**
+ * @brief 切换数据源连接
+ *
+ * 根据当前 m_mode，断开所有源到本 Manager 的信号连接，
+ * 然后仅连接活动源的信号。
+ *
+ * FrameParser 模式: 连接 frameParsed + frameError
+ * JustFloat 模式: 连接 frameParsed
+ * FireWater 模式: 连接 frameParsed
+ *
+ * 断开操作使用 disconnect(sender, signal, this, slot) 精确匹配，
+ * 不会影响其他对象的信号连接。
+ */
 void ProtocolBridgeManager::switchSource()
 {
     // ---- 先断开所有源到本manager转发的连接 ----

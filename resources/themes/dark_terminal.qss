@@ -158,6 +158,19 @@ QStatusBar {
     font-size: 12px;
 }
 
+QLabel#rxBytesLabel {
+    color: #a6e3a1;
+    font-size: 12px;
+}
+QLabel#txBytesLabel {
+    color: #f38ba8;
+    font-size: 12px;
+}
+QLabel#connStatusLbl {
+    font-size: 12px;
+    padding: 0 4px;
+}
+
 /* 分隔器 */
 QSplitter::handle {
     background-color: #313244;
@@ -413,6 +426,28 @@ QLabel#driverInfoLbl {
     padding: 4px;
 }
 
+QPushButton#refreshBtn {
+    background-color: transparent;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    color: #a6adc8;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#refreshBtn:hover {
+    background-color: #313244;
+    border-color: #89b4fa;
+    color: #cdd6f4;
+}
+QPushButton#refreshBtn:pressed {
+    background-color: #45475a;
+}
+QPushButton#refreshBtn:disabled {
+    background-color: transparent;
+    border-color: #313244;
+    color: #6c7086;
+}
+
 /* === SerialConfigPanel 控件 === */
 QGroupBox {
     font-weight: bold;
@@ -448,6 +483,10 @@ QCheckBox#dtrCheck::indicator:hover, QCheckBox#rtsCheck::indicator:hover {
 }
 
 /* === 发送栏控件 === */
+QFrame#sendBarFrame {
+    background-color: rgba(24, 24, 37, 180);
+    border-top: 1px solid #313244;
+}
 QComboBox#sendModeCombo, QComboBox#newlineCombo {
     background-color: #313244;
     border: 1px solid #45475a;

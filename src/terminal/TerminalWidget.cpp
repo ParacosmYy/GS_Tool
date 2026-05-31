@@ -1,42 +1,74 @@
-#include "TerminalWidget.h"
+/**
+ * @file TerminalWidget.cpp
+ * @brief 自绘制终端控件实现 - QPainter高性能终端渲染
+ *
+ * 核心渲染逻辑保留在此文件中:
+ *   - paintEvent: 主渲染循环，增量缓存更新，逐行绘制
+ *   - paintLine: 单行绘制(时间戳+选区背景+搜索高亮+方向前缀+数据文本)
+ *   - formatToCache: 数据行格式化为缓存结构
+ *   - 滚动/缩放/键盘事件处理
+ *
+ * 选区管理和搜索功能分别委托给 TerminalSelectionManager 和 TerminalSearchManager。
+ */
+
+#include "terminal/TerminalWidget.h"
 #include "utils/HexConverter.h"
+#include "core/ThemeManager.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QScrollBar>
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
-#include <QRegularExpression>
+
+// ---- 构造与基本配置 ----
 
 TerminalWidget::TerminalWidget(QWidget* parent)
     : QWidget(parent)
     , m_directionFilter(new DirectionFilter(this))
+    , m_selectionManager(new TerminalSelectionManager(this))
+    , m_searchManager(new TerminalSearchManager(this))
 {
-    // 设置等宽字体
     m_font = QFont("Consolas", 10);
     m_font.setStyleHint(QFont::Monospace);
     m_fontMetrics = QFontMetrics(m_font);
 
-    // 暗色主题配色
-    m_bgColor = QColor(30, 30, 46);         // #1e1e2e
-    m_rxColor = QColor(205, 214, 244);       // #cdd6f4 接收数据(白色)
-    m_txColor = QColor(166, 227, 161);       // #a6e3a1 发送数据(绿色)
-    m_timestampColor = QColor(147, 153, 178); // #9399b2 时间戳(灰色)
-    m_selectionBg = QColor(69, 71, 90);      // #45475a 选中背景
+    // 从ThemeManager加载语义色板
+    auto& theme = ThemeManager::instance();
+    m_bgColor          = theme.color(ThemeManager::SemanticColor::TermBackground);
+    m_rxColor          = theme.color(ThemeManager::SemanticColor::TermRxText);
+    m_txColor          = theme.color(ThemeManager::SemanticColor::TermTxText);
+    m_timestampColor   = theme.color(ThemeManager::SemanticColor::TermTimestamp);
+    m_selectionManager->setSelectionBgColor(
+        theme.color(ThemeManager::SemanticColor::TermSelection));
+    m_searchManager->setSearchColors(
+        theme.color(ThemeManager::SemanticColor::TermSearchHighlight),
+        theme.color(ThemeManager::SemanticColor::TermCurrentMatch));
 
-    // 搜索高亮配色
-    m_searchHighlightColor = QColor(249, 226, 175, 80);  // #f9e2af 半透明黄
-    m_currentMatchColor = QColor(249, 226, 175, 180);    // #f9e2af 高亮当前匹配
+    // 监听主题切换，动态更新颜色
+    connect(&theme, &ThemeManager::themeChanged, this, [this]() {
+        auto& t = ThemeManager::instance();
+        m_bgColor          = t.color(ThemeManager::SemanticColor::TermBackground);
+        m_rxColor          = t.color(ThemeManager::SemanticColor::TermRxText);
+        m_txColor          = t.color(ThemeManager::SemanticColor::TermTxText);
+        m_timestampColor   = t.color(ThemeManager::SemanticColor::TermTimestamp);
+        m_selectionManager->setSelectionBgColor(
+            t.color(ThemeManager::SemanticColor::TermSelection));
+        m_searchManager->setSearchColors(
+            t.color(ThemeManager::SemanticColor::TermSearchHighlight),
+            t.color(ThemeManager::SemanticColor::TermCurrentMatch));
+        update();
+    });
 
-    // 基础设置
     setFont(m_font);
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
-
-    // 计算行高
     m_lineHeight = m_fontMetrics.height() + 2;
-
     setMinimumSize(400, 200);
+
+    // 转发搜索管理器的信号
+    connect(m_searchManager, &TerminalSearchManager::searchMatchesChanged,
+            this, &TerminalWidget::searchMatchesChanged);
 }
 
 void TerminalWidget::setModel(TerminalModel* model)
@@ -60,7 +92,6 @@ void TerminalWidget::setModel(TerminalModel* model)
 void TerminalWidget::setDirectionFilter(DataDirection direction)
 {
     m_directionFilter->setDirection(direction);
-    // 强制重建过滤索引和缓存
     m_cachedLineCount = 0;
     m_cachedLines.clear();
     m_directionFilter->reset();
@@ -70,7 +101,6 @@ void TerminalWidget::setDirectionFilter(DataDirection direction)
 void TerminalWidget::clearDirectionFilter()
 {
     m_directionFilter->clearFilter();
-    // 强制重建缓存
     m_cachedLineCount = 0;
     m_cachedLines.clear();
     m_directionFilter->reset();
@@ -80,14 +110,11 @@ void TerminalWidget::clearDirectionFilter()
 void TerminalWidget::setDisplayMode(DisplayMode mode)
 {
     m_displayMode = mode;
-    m_cachedLineCount = 0;  // 清缓存，强制重新格式化
+    m_cachedLineCount = 0;
     update();
 }
 
-DisplayMode TerminalWidget::displayMode() const
-{
-    return m_displayMode;
-}
+DisplayMode TerminalWidget::displayMode() const { return m_displayMode; }
 
 void TerminalWidget::setShowTimestamp(bool show)
 {
@@ -96,10 +123,7 @@ void TerminalWidget::setShowTimestamp(bool show)
     update();
 }
 
-bool TerminalWidget::showTimestamp() const
-{
-    return m_showTimestamp;
-}
+bool TerminalWidget::showTimestamp() const { return m_showTimestamp; }
 
 void TerminalWidget::setShowDirectionPrefix(bool show)
 {
@@ -108,554 +132,67 @@ void TerminalWidget::setShowDirectionPrefix(bool show)
     update();
 }
 
-bool TerminalWidget::showDirectionPrefix() const
-{
-    return m_showDirectionPrefix;
-}
+bool TerminalWidget::showDirectionPrefix() const { return m_showDirectionPrefix; }
 
 void TerminalWidget::setAutoScroll(bool autoScroll)
 {
     m_autoScroll = autoScroll;
     if (m_autoScroll) {
-        // 跳到最新
         m_scrollOffset = m_maxScrollOffset;
         update();
     }
 }
 
-bool TerminalWidget::autoScroll() const
-{
-    return m_autoScroll;
-}
+bool TerminalWidget::autoScroll() const { return m_autoScroll; }
 
 void TerminalWidget::clear()
 {
     m_cachedLines.clear();
     m_cachedLineCount = 0;
     m_directionFilter->reset();
+    m_selectionManager->reset();
     update();
 }
 
 QString TerminalWidget::selectedText() const
 {
-    if (m_selectionStartLine < 0 || m_selectionEndLine < 0) return {};
-
-    int start = qMin(m_selectionStartLine, m_selectionEndLine);
-    int end = qMax(m_selectionStartLine, m_selectionEndLine);
-
-    // 方向过滤模式: 从过滤索引表获取选中文本
-    if (m_directionFilter->isFiltered()) {
-        int filteredCount = m_directionFilter->filteredLineCount();
-        if (filteredCount == 0) return {};
-        end = qMin(end, filteredCount - 1);
-        if (start >= filteredCount) return {};
-
-        QStringList lines;
-        for (int i = start; i <= end; ++i) {
-            int modelLine = m_directionFilter->modelIndex(i);
-            if (modelLine >= 0 && modelLine < m_cachedLines.size()) {
-                lines << m_cachedLines[modelLine].text;
-            }
-        }
-        return lines.join('\n');
-    }
-
-    // 普通模式: 直接从缓存获取
-    if (m_cachedLines.isEmpty()) return {};
-    end = qMin(end, m_cachedLines.size() - 1);
-    if (start >= m_cachedLines.size()) return {};
-
-    QStringList lines;
-    for (int i = start; i <= end; ++i) {
-        lines << m_cachedLines[i].text;
-    }
-    return lines.join('\n');
+    return m_selectionManager->selectedText(m_cachedLines, m_directionFilter);
 }
 
-QSize TerminalWidget::sizeHint() const
-{
-    return QSize(800, 600);
-}
+QSize TerminalWidget::sizeHint() const { return QSize(800, 600); }
 
-// ---- 单行绘制辅助方法 ----
-// 从 paintEvent 中提取的公共渲染逻辑，普通模式和过滤模式共用
-int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y, int displayLine)
-{
-    // 计算时间戳偏移（后续绘制搜索高亮和数据内容都需要此偏移）
-    int xOffset = 0;
-    if (m_showTimestamp) {
-        painter.setPen(m_timestampColor);
-        QString ts = QDateTime::fromMSecsSinceEpoch(cached.timestamp)
-                         .toString("HH:mm:ss.zzz");
-        painter.drawText(4, y + m_lineHeight - 4, ts);
-        xOffset = m_fontMetrics.horizontalAdvance(ts) + 12;
-    }
-
-    // 选择背景色（使用正规化范围，支持反向拖选）
-    int selStart = qMin(m_selectionStartLine, m_selectionEndLine);
-    int selEnd = qMax(m_selectionStartLine, m_selectionEndLine);
-    if (m_selectionStartLine >= 0 && displayLine >= selStart && displayLine <= selEnd) {
-        painter.fillRect(0, y, width(), m_lineHeight, m_selectionBg);
-    }
-
-    // 搜索高亮: 绘制匹配区域背景
-    if (!m_searchMatches.isEmpty()) {
-        for (int mi = 0; mi < m_searchMatches.size(); ++mi) {
-            const auto& match = m_searchMatches[mi];
-            if (match.line != displayLine) continue;
-            int xStart = xOffset + 4 + m_fontMetrics.horizontalAdvance(cached.text.left(match.startCol));
-            int matchWidth = m_fontMetrics.horizontalAdvance(cached.text.mid(match.startCol, match.length));
-            QColor highlightColor = (mi == m_currentMatchIndex)
-                ? m_currentMatchColor : m_searchHighlightColor;
-            painter.fillRect(xStart, y + 2, matchWidth, m_lineHeight - 4, highlightColor);
-        }
-    }
-
-    // 方向前缀 "[TX:] " / "[RX:] " 用不同颜色渲染
-    static const QString kTxPrefix = QStringLiteral("[TX:] ");
-    static const QString kRxPrefix = QStringLiteral("[RX:] ");
-
-    if (m_showDirectionPrefix) {
-        const QString& prefix = (cached.direction == DataDirection::Tx)
-            ? kTxPrefix : kRxPrefix;
-        if (cached.text.startsWith(prefix)) {
-            // 前缀颜色: TX用稍暗的绿色区分数据，RX用稍暗的蓝色区分数据
-            QColor prefixColor = (cached.direction == DataDirection::Tx)
-                ? QColor(129, 199, 123)   // #81c77b -- 比m_txColor(#a6e3a1)稍暗
-                : QColor(166, 173, 200);  // #a6adc8 -- 比m_rxColor(#cdd6f4)稍暗
-
-            // 绘制前缀（着色）
-            painter.setPen(prefixColor);
-            painter.drawText(xOffset + 4, y + m_lineHeight - 4, prefix);
-
-            // 绘制前缀后的数据内容（用方向颜色）
-            int prefixWidth = m_fontMetrics.horizontalAdvance(prefix);
-            if (cached.direction == DataDirection::Tx) {
-                painter.setPen(m_txColor);
-            } else {
-                painter.setPen(m_rxColor);
-            }
-            painter.drawText(xOffset + 4 + prefixWidth, y + m_lineHeight - 4,
-                             cached.text.mid(prefix.length()));
-        } else {
-            // 缓存文本不以方向前缀开头（不应出现），正常绘制
-            if (cached.direction == DataDirection::Tx) {
-                painter.setPen(m_txColor);
-            } else {
-                painter.setPen(m_rxColor);
-            }
-            painter.drawText(xOffset + 4, y + m_lineHeight - 4, cached.text);
-        }
-    } else {
-        // 无方向前缀时，按方向着色，整体绘制
-        if (cached.direction == DataDirection::Tx) {
-            painter.setPen(m_txColor);
-        } else {
-            painter.setPen(m_rxColor);
-        }
-        painter.drawText(xOffset + 4, y + m_lineHeight - 4, cached.text);
-    }
-    return y + m_lineHeight;
-}
-
-void TerminalWidget::paintEvent(QPaintEvent* event)
-{
-    Q_UNUSED(event);
-
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, false);
-
-    // 填充背景
-    painter.fillRect(rect(), m_bgColor);
-    painter.setFont(m_font);
-
-    if (!m_model) {
-        // 没有模型时显示提示
-        painter.setPen(m_timestampColor);
-        painter.drawText(rect(), Qt::AlignCenter,
-                         tr("未连接 - 等待数据..."));
-        return;
-    }
-
-    // 获取模型数据行数（不拷贝数据）
-    int modelTotalLines = m_model->lineCount();
-
-    // ---- 方向过滤模式: 通过DirectionFilter增量构建过滤索引表 ----
-    if (m_directionFilter->isFiltered()) {
-        // 环形缓冲区回绕检测: 模型行数减少说明旧数据被驱逐，需全量重建
-        if (m_cachedLineCount > modelTotalLines) {
-            m_cachedLineCount = 0;
-            m_cachedLines.clear();
-            m_directionFilter->reset();
-        }
-
-        // 增量构建: 只处理新增的模型行
-        if (m_cachedLineCount != modelTotalLines) {
-            m_cachedLines.resize(modelTotalLines);
-            for (int i = m_cachedLineCount; i < modelTotalLines; ++i) {
-                m_cachedLines[i] = formatToCache(m_model->lineAt(i));
-            }
-            // 委托DirectionFilter更新过滤索引表
-            m_directionFilter->onDataAppended(modelTotalLines,
-                [this](int idx) { return m_model->lineAt(idx); });
-            m_cachedLineCount = modelTotalLines;
-        }
-
-        // 过滤后的总行数
-        int totalLines = m_directionFilter->filteredLineCount();
-
-        // 缓存更新后重新搜索
-        if (!m_searchPattern.isEmpty() && totalLines > 0) {
-            QString pat = m_searchPattern;
-            bool rx = m_searchRegex;
-            bool hx = m_searchHex;
-            m_searchPattern.clear();
-            setSearchHighlight(pat, rx, hx);
-        }
-
-        // 更新最大滚动偏移（基于过滤后的行数）
-        m_maxScrollOffset = qMax(0, totalLines - m_visibleLines);
-        if (m_autoScroll) {
-            m_scrollOffset = m_maxScrollOffset;
-        }
-
-        // 计算可见范围（基于过滤后的行号）
-        int startLine = m_scrollOffset;
-        int endLine = qMin(startLine + m_visibleLines + 1, totalLines);
-
-        // 逐行绘制 -- 通过过滤索引表映射到模型行
-        int y = 0;
-        for (int i = startLine; i < endLine; ++i) {
-            int modelLine = m_directionFilter->modelIndex(i);
-            const CachedLine& cached = m_cachedLines[modelLine];
-            y = paintLine(painter, cached, y, i);
-        }
-        return;
-    }
-
-    // ---- 普通模式（无方向过滤）: 显示所有数据 ----
-    int totalLines = modelTotalLines;
-
-    // 如果缓存失效，只格式化新增的行（增量更新）
-    if (m_cachedLineCount != totalLines) {
-        // 环形缓冲区回绕检测：当行数减少时说明旧数据被驱逐，逻辑索引已偏移，必须清空整个缓存
-        if (m_cachedLineCount > totalLines) {
-            m_cachedLineCount = 0;
-            m_cachedLines.clear();
-        }
-        m_cachedLines.resize(totalLines);
-        for (int i = m_cachedLineCount; i < totalLines; ++i) {
-            m_cachedLines[i] = formatToCache(m_model->lineAt(i));
-        }
-        m_cachedLineCount = totalLines;
-
-        // 缓存更新后重新搜索（确保搜索结果与缓存内容同步）
-        if (!m_searchPattern.isEmpty() && m_cachedLineCount > 0) {
-            // 直接在此处执行搜索，不调用refreshSearch()避免递归
-            QString pat = m_searchPattern;
-            bool rx = m_searchRegex;
-            bool hx = m_searchHex;
-            m_searchPattern.clear();
-            setSearchHighlight(pat, rx, hx);
-        }
-
-        // 更新最大滚动偏移
-        m_maxScrollOffset = qMax(0, totalLines - m_visibleLines);
-        if (m_autoScroll) {
-            m_scrollOffset = m_maxScrollOffset;
-        }
-    }
-
-    // 计算可见范围
-    int startLine = m_scrollOffset;
-    int endLine = qMin(startLine + m_visibleLines + 1, totalLines);
-
-    // 逐行绘制 -- 完全从缓存读取，不调用lineAt()
-    int y = 0;
-    for (int i = startLine; i < endLine; ++i) {
-        const CachedLine& cached = m_cachedLines[i];
-        y = paintLine(painter, cached, y, i);
-    }
-}
-
-void TerminalWidget::resizeEvent(QResizeEvent* event)
-{
-    QWidget::resizeEvent(event);
-    updateVisibleRange();
-}
-
-void TerminalWidget::wheelEvent(QWheelEvent* event)
-{
-    // 鼠标滚轮滚动
-    int delta = event->angleDelta().y();
-    int scrollLines = delta / 120 * 3;  // 每次滚轮滚动3行
-
-    m_scrollOffset -= scrollLines;
-    m_scrollOffset = qMax(0, qMin(m_scrollOffset, m_maxScrollOffset));
-
-    // 滚动时关闭自动滚动
-    if (delta < 0 && m_scrollOffset < m_maxScrollOffset) {
-        m_autoScroll = false;
-    }
-
-    update();
-    event->accept();
-}
-
-void TerminalWidget::mousePressEvent(QMouseEvent* event)
-{
-    if (event->button() == Qt::LeftButton) {
-        m_isSelecting = true;
-        int line = m_scrollOffset + event->position().y() / m_lineHeight;
-        m_selectionStartLine = line;
-        m_selectionEndLine = line;
-        update();
-    }
-    QWidget::mousePressEvent(event);
-}
-
-void TerminalWidget::mouseMoveEvent(QMouseEvent* event)
-{
-    if (m_isSelecting) {
-        int line = m_scrollOffset + event->position().y() / m_lineHeight;
-        m_selectionEndLine = line;
-        update();
-    }
-    QWidget::mouseMoveEvent(event);
-}
-
-void TerminalWidget::mouseReleaseEvent(QMouseEvent* event)
-{
-    if (event->button() == Qt::LeftButton) {
-        m_isSelecting = false;
-    }
-    QWidget::mouseReleaseEvent(event);
-}
-
-void TerminalWidget::keyPressEvent(QKeyEvent* event)
-{
-    // Ctrl+C 复制选中内容
-    if (event->key() == Qt::Key_C && event->modifiers() & Qt::ControlModifier) {
-        QString text = selectedText();
-        if (!text.isEmpty()) {
-            QApplication::clipboard()->setText(text);
-        }
-        return;
-    }
-    // F3 / Shift+F3 搜索导航
-    if (event->key() == Qt::Key_F3) {
-        if (event->modifiers() & Qt::ShiftModifier) {
-            gotoPrevMatch();
-        } else {
-            gotoNextMatch();
-        }
-        return;
-    }
-    QWidget::keyPressEvent(event);
-}
-
-void TerminalWidget::onDataAppended(int firstNewLine, int count)
-{
-    Q_UNUSED(firstNewLine);
-    Q_UNUSED(count);
-
-    // 方向过滤模式: 不在此处更新滚动偏移，由paintEvent统一处理
-    // 因为过滤后的行数可能与模型行数不同
-    if (m_directionFilter->isFiltered()) {
-        update();
-        return;
-    }
-
-    if (m_model) {
-        int totalLines = m_model->lineCount();
-        m_maxScrollOffset = qMax(0, totalLines - m_visibleLines);
-        if (m_autoScroll) {
-            m_scrollOffset = m_maxScrollOffset;
-        }
-    }
-
-    update();
-}
-
-void TerminalWidget::onDataCleared()
-{
-    m_cachedLines.clear();
-    m_cachedLineCount = 0;
-    m_directionFilter->reset();
-    m_scrollOffset = 0;
-    m_maxScrollOffset = 0;
-    m_selectionStartLine = -1;
-    m_selectionEndLine = -1;
-    update();
-}
-
-void TerminalWidget::updateVisibleRange()
-{
-    m_visibleLines = height() / m_lineHeight;
-    if (m_model) {
-        if (m_directionFilter->isFiltered()) {
-            // 方向过滤模式: 基于过滤后的行数计算滚动范围
-            m_maxScrollOffset = qMax(0, m_directionFilter->filteredLineCount() - m_visibleLines);
-        } else {
-            m_maxScrollOffset = qMax(0, m_model->lineCount() - m_visibleLines);
-        }
-        m_scrollOffset = qMin(m_scrollOffset, m_maxScrollOffset);
-    }
-}
+// ---- 搜索功能 - 委托给 TerminalSearchManager ----
 
 void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool hex)
 {
-    m_searchPattern = pattern;
-    m_searchRegex = regex;
-    m_searchHex = hex;
-    m_currentMatchIndex = -1;
-    m_searchMatches.clear();
-
-    if (pattern.isEmpty() || m_cachedLines.isEmpty()) {
-        emit searchMatchesChanged(0, -1);
-        update();
-        return;
-    }
-
-    QString searchStr = pattern;
-
-    // 方向过滤模式: 只在过滤后的行中搜索
-    if (m_directionFilter->isFiltered()) {
-        int filteredCount = m_directionFilter->filteredLineCount();
-        if (hex) {
-            QByteArray bytes = HexConverter::fromHexString(pattern);
-            if (bytes.isEmpty()) {
-                emit searchMatchesChanged(0, -1);
-                update();
-                return;
-            }
-            for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
-                int modelLine = m_directionFilter->modelIndex(displayIdx);
-                QString hexText = HexConverter::toHexString(
-                    m_model ? m_model->lineAt(modelLine).data : QByteArray());
-                int pos = 0;
-                while ((pos = hexText.indexOf(searchStr, pos, Qt::CaseInsensitive)) >= 0) {
-                    m_searchMatches.append({displayIdx, pos, (int)searchStr.length()});
-                    pos += (int)searchStr.length();
-                }
-            }
-        } else if (regex) {
-            QRegularExpression re(pattern);
-            if (!re.isValid()) {
-                emit searchMatchesChanged(0, -1);
-                update();
-                return;
-            }
-            for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
-                int modelLine = m_directionFilter->modelIndex(displayIdx);
-                const QString& text = m_cachedLines[modelLine].text;
-                QRegularExpressionMatchIterator it = re.globalMatch(text);
-                while (it.hasNext()) {
-                    auto match = it.next();
-                    m_searchMatches.append({displayIdx, (int)match.capturedStart(), (int)match.capturedLength()});
-                }
-            }
-        } else {
-            for (int displayIdx = 0; displayIdx < filteredCount; ++displayIdx) {
-                int modelLine = m_directionFilter->modelIndex(displayIdx);
-                const QString& text = m_cachedLines[modelLine].text;
-                int pos = 0;
-                while ((pos = text.indexOf(pattern, pos)) >= 0) {
-                    m_searchMatches.append({displayIdx, pos, (int)pattern.length()});
-                    pos += pattern.length();
-                }
-            }
-        }
-    } else {
-        // 普通模式: 在全部缓存行中搜索
-        if (hex) {
-            QByteArray bytes = HexConverter::fromHexString(pattern);
-            if (bytes.isEmpty()) {
-                emit searchMatchesChanged(0, -1);
-                update();
-                return;
-            }
-            for (int i = 0; i < m_cachedLines.size(); ++i) {
-                QString hexText = HexConverter::toHexString(
-                    m_model ? m_model->lineAt(i).data : QByteArray());
-                int pos = 0;
-                while ((pos = hexText.indexOf(searchStr, pos, Qt::CaseInsensitive)) >= 0) {
-                    m_searchMatches.append({i, pos, (int)searchStr.length()});
-                    pos += (int)searchStr.length();
-                }
-            }
-        } else if (regex) {
-            QRegularExpression re(pattern);
-            if (!re.isValid()) {
-                emit searchMatchesChanged(0, -1);
-                update();
-                return;
-            }
-            for (int i = 0; i < m_cachedLines.size(); ++i) {
-                QRegularExpressionMatchIterator it = re.globalMatch(m_cachedLines[i].text);
-                while (it.hasNext()) {
-                    auto match = it.next();
-                    m_searchMatches.append({i, (int)match.capturedStart(), (int)match.capturedLength()});
-                }
-            }
-        } else {
-            for (int i = 0; i < m_cachedLines.size(); ++i) {
-                const QString& text = m_cachedLines[i].text;
-                int pos = 0;
-                while ((pos = text.indexOf(pattern, pos)) >= 0) {
-                    m_searchMatches.append({i, pos, (int)pattern.length()});
-                    pos += pattern.length();
-                }
-            }
-        }
-    }
-
-    if (!m_searchMatches.isEmpty()) {
-        m_currentMatchIndex = 0;
-    }
-
-    emit searchMatchesChanged(m_searchMatches.size(), m_currentMatchIndex);
+    auto lineAtFn = [this](int idx) -> QByteArray {
+        return m_model ? m_model->lineAt(idx).data : QByteArray();
+    };
+    m_searchManager->setSearchHighlight(pattern, regex, hex,
+                                         m_cachedLines, m_directionFilter,
+                                         m_cachedLineCount, lineAtFn);
     update();
 }
 
 void TerminalWidget::clearSearchHighlight()
 {
-    m_searchPattern.clear();
-    m_searchMatches.clear();
-    m_currentMatchIndex = -1;
-    emit searchMatchesChanged(0, -1);
+    m_searchManager->clearSearchHighlight();
     update();
 }
 
-int TerminalWidget::searchMatchCount() const
-{
-    return m_searchMatches.size();
-}
-
-int TerminalWidget::currentMatchIndex() const
-{
-    return m_currentMatchIndex;
-}
+int TerminalWidget::searchMatchCount() const { return m_searchManager->searchMatchCount(); }
+int TerminalWidget::currentMatchIndex() const { return m_searchManager->currentMatchIndex(); }
 
 void TerminalWidget::gotoNextMatch()
 {
-    if (m_searchMatches.isEmpty()) return;
-    m_currentMatchIndex = (m_currentMatchIndex + 1) % m_searchMatches.size();
-    // 滚动到匹配行
-    const auto& match = m_searchMatches[m_currentMatchIndex];
-    scrollToMatch(match.line);
-    emit searchMatchesChanged(m_searchMatches.size(), m_currentMatchIndex);
-    update();
+    int line = m_searchManager->gotoNextMatch();
+    if (line >= 0) { scrollToMatch(line); update(); }
 }
 
 void TerminalWidget::gotoPrevMatch()
 {
-    if (m_searchMatches.isEmpty()) return;
-    m_currentMatchIndex = (m_currentMatchIndex - 1 + m_searchMatches.size()) % m_searchMatches.size();
-    const auto& match = m_searchMatches[m_currentMatchIndex];
-    scrollToMatch(match.line);
-    emit searchMatchesChanged(m_searchMatches.size(), m_currentMatchIndex);
-    update();
+    int line = m_searchManager->gotoPrevMatch();
+    if (line >= 0) { scrollToMatch(line); update(); }
 }
 
 void TerminalWidget::scrollToMatch(int line)
@@ -668,26 +205,262 @@ void TerminalWidget::scrollToMatch(int line)
 
 void TerminalWidget::refreshSearch()
 {
-    if (m_searchPattern.isEmpty()) return;
-    // 保存当前参数，调用setSearchHighlight重新扫描
-    QString pat = m_searchPattern;
-    bool rx = m_searchRegex;
-    bool hx = m_searchHex;
-    m_searchPattern.clear();  // 防止setSearchHighlight内部重复
+    if (m_searchManager->searchPattern().isEmpty()) return;
+    QString pat = m_searchManager->searchPattern();
+    bool rx = m_searchManager->searchRegex();
+    bool hx = m_searchManager->searchHex();
+    m_searchManager->clearSearchHighlight();
     setSearchHighlight(pat, rx, hx);
 }
+
+/** @brief 缓存更新后重新执行搜索(在paintEvent中调用，避免递归) */
+void TerminalWidget::refreshSearchAfterCacheUpdate()
+{
+    if (m_searchManager->searchPattern().isEmpty()) return;
+    QString pat = m_searchManager->searchPattern();
+    bool rx = m_searchManager->searchRegex();
+    bool hx = m_searchManager->searchHex();
+    m_searchManager->clearSearchHighlight();
+    setSearchHighlight(pat, rx, hx);
+}
+
+// ---- 单行绘制 ----
+
+int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y, int displayLine)
+{
+    // 计算时间戳偏移
+    int xOffset = 0;
+    if (m_showTimestamp) {
+        painter.setPen(m_timestampColor);
+        QString ts = QDateTime::fromMSecsSinceEpoch(cached.timestamp).toString("HH:mm:ss.zzz");
+        painter.drawText(4, y + m_lineHeight - 4, ts);
+        xOffset = m_fontMetrics.horizontalAdvance(ts) + 12;
+    }
+
+    // 选择背景色(正规化范围)
+    if (m_selectionManager->hasSelection()) {
+        int selStart = m_selectionManager->normalizedStartLine();
+        int selEnd = m_selectionManager->normalizedEndLine();
+        if (displayLine >= selStart && displayLine <= selEnd) {
+            painter.fillRect(0, y, width(), m_lineHeight, m_selectionManager->selectionBgColor());
+        }
+    }
+
+    // 搜索高亮
+    const auto& matches = m_searchManager->searchMatches();
+    if (!matches.isEmpty()) {
+        int curIdx = m_searchManager->currentMatchIndex();
+        for (int mi = 0; mi < matches.size(); ++mi) {
+            const auto& match = matches[mi];
+            if (match.line != displayLine) continue;
+            int xStart = xOffset + 4 + m_fontMetrics.horizontalAdvance(cached.text.left(match.startCol));
+            int matchWidth = m_fontMetrics.horizontalAdvance(cached.text.mid(match.startCol, match.length));
+            painter.fillRect(xStart, y + 2, matchWidth, m_lineHeight - 4,
+                             (mi == curIdx) ? m_searchManager->currentMatchColor()
+                                            : m_searchManager->searchHighlightColor());
+        }
+    }
+
+    // 方向前缀 "[TX:] " / "[RX:] " 分色渲染
+    static const QString kTxPrefix = QStringLiteral("[TX:] ");
+    static const QString kRxPrefix = QStringLiteral("[RX:] ");
+    bool isTx = (cached.direction == DataDirection::Tx);
+    QColor dataColor = isTx ? m_txColor : m_rxColor;
+
+    if (m_showDirectionPrefix) {
+        const QString& prefix = isTx ? kTxPrefix : kRxPrefix;
+        if (cached.text.startsWith(prefix)) {
+            painter.setPen(dataColor.darker(130));
+            painter.drawText(xOffset + 4, y + m_lineHeight - 4, prefix);
+            int prefixWidth = m_fontMetrics.horizontalAdvance(prefix);
+            painter.setPen(dataColor);
+            painter.drawText(xOffset + 4 + prefixWidth, y + m_lineHeight - 4,
+                             cached.text.mid(prefix.length()));
+        } else {
+            painter.setPen(dataColor);
+            painter.drawText(xOffset + 4, y + m_lineHeight - 4, cached.text);
+        }
+    } else {
+        painter.setPen(dataColor);
+        painter.drawText(xOffset + 4, y + m_lineHeight - 4, cached.text);
+    }
+    return y + m_lineHeight;
+}
+
+// ---- 核心渲染 ----
+
+void TerminalWidget::paintEvent(QPaintEvent* event)
+{
+    Q_UNUSED(event);
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, false);
+    painter.fillRect(rect(), m_bgColor);
+    painter.setFont(m_font);
+
+    if (!m_model) {
+        painter.setPen(m_timestampColor);
+        painter.drawText(rect(), Qt::AlignCenter, tr("未连接 - 等待数据..."));
+        return;
+    }
+
+    int modelTotalLines = m_model->lineCount();
+
+    // ---- 方向过滤模式 ----
+    if (m_directionFilter->isFiltered()) {
+        if (m_cachedLineCount > modelTotalLines) {
+            m_cachedLineCount = 0;
+            m_cachedLines.clear();
+            m_directionFilter->reset();
+        }
+        if (m_cachedLineCount != modelTotalLines) {
+            m_cachedLines.resize(modelTotalLines);
+            for (int i = m_cachedLineCount; i < modelTotalLines; ++i)
+                m_cachedLines[i] = formatToCache(m_model->lineAt(i));
+            m_directionFilter->onDataAppended(modelTotalLines,
+                [this](int idx) { return m_model->lineAt(idx); });
+            m_cachedLineCount = modelTotalLines;
+        }
+        int totalLines = m_directionFilter->filteredLineCount();
+        if (!m_searchManager->searchPattern().isEmpty() && totalLines > 0)
+            refreshSearchAfterCacheUpdate();
+        m_maxScrollOffset = qMax(0, totalLines - m_visibleLines);
+        if (m_autoScroll) m_scrollOffset = m_maxScrollOffset;
+        int endLine = qMin(m_scrollOffset + m_visibleLines + 1, totalLines);
+        int y = 0;
+        for (int i = m_scrollOffset; i < endLine; ++i) {
+            int modelLine = m_directionFilter->modelIndex(i);
+            y = paintLine(painter, m_cachedLines[modelLine], y, i);
+        }
+        return;
+    }
+
+    // ---- 普通模式(无方向过滤) ----
+    int totalLines = modelTotalLines;
+    if (m_cachedLineCount != totalLines) {
+        if (m_cachedLineCount > totalLines) {
+            m_cachedLineCount = 0;
+            m_cachedLines.clear();
+        }
+        m_cachedLines.resize(totalLines);
+        for (int i = m_cachedLineCount; i < totalLines; ++i)
+            m_cachedLines[i] = formatToCache(m_model->lineAt(i));
+        m_cachedLineCount = totalLines;
+        if (!m_searchManager->searchPattern().isEmpty() && m_cachedLineCount > 0)
+            refreshSearchAfterCacheUpdate();
+        m_maxScrollOffset = qMax(0, totalLines - m_visibleLines);
+        if (m_autoScroll) m_scrollOffset = m_maxScrollOffset;
+    }
+    int endLine = qMin(m_scrollOffset + m_visibleLines + 1, totalLines);
+    int y = 0;
+    for (int i = m_scrollOffset; i < endLine; ++i)
+        y = paintLine(painter, m_cachedLines[i], y, i);
+}
+
+// ---- 事件处理 ----
+
+void TerminalWidget::resizeEvent(QResizeEvent* event)
+{
+    QWidget::resizeEvent(event);
+    updateVisibleRange();
+}
+
+void TerminalWidget::wheelEvent(QWheelEvent* event)
+{
+    int delta = event->angleDelta().y();
+    m_scrollOffset -= delta / 120 * 3;
+    m_scrollOffset = qMax(0, qMin(m_scrollOffset, m_maxScrollOffset));
+    if (delta < 0 && m_scrollOffset < m_maxScrollOffset)
+        m_autoScroll = false;
+    update();
+    event->accept();
+}
+
+void TerminalWidget::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_selectionManager->onMousePress(event->position().y(), m_scrollOffset, m_lineHeight);
+        update();
+    }
+    QWidget::mousePressEvent(event);
+}
+
+void TerminalWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    if (event->buttons() & Qt::LeftButton) {
+        m_selectionManager->onMouseMove(event->position().y(), m_scrollOffset, m_lineHeight);
+        update();
+    }
+    QWidget::mouseMoveEvent(event);
+}
+
+void TerminalWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton)
+        m_selectionManager->onMouseRelease();
+    QWidget::mouseReleaseEvent(event);
+}
+
+void TerminalWidget::keyPressEvent(QKeyEvent* event)
+{
+    // Ctrl+C 复制选中内容
+    if (event->key() == Qt::Key_C && event->modifiers() & Qt::ControlModifier) {
+        QString text = selectedText();
+        if (!text.isEmpty()) QApplication::clipboard()->setText(text);
+        return;
+    }
+    // F3 / Shift+F3 搜索导航
+    if (event->key() == Qt::Key_F3) {
+        (event->modifiers() & Qt::ShiftModifier) ? gotoPrevMatch() : gotoNextMatch();
+        return;
+    }
+    QWidget::keyPressEvent(event);
+}
+
+// ---- 模型数据回调 ----
+
+void TerminalWidget::onDataAppended(int firstNewLine, int count)
+{
+    Q_UNUSED(firstNewLine);
+    Q_UNUSED(count);
+    if (m_directionFilter->isFiltered()) { update(); return; }
+    if (m_model) {
+        m_maxScrollOffset = qMax(0, m_model->lineCount() - m_visibleLines);
+        if (m_autoScroll) m_scrollOffset = m_maxScrollOffset;
+    }
+    update();
+}
+
+void TerminalWidget::onDataCleared()
+{
+    m_cachedLines.clear();
+    m_cachedLineCount = 0;
+    m_directionFilter->reset();
+    m_selectionManager->reset();
+    m_scrollOffset = 0;
+    m_maxScrollOffset = 0;
+    update();
+}
+
+void TerminalWidget::updateVisibleRange()
+{
+    m_visibleLines = height() / m_lineHeight;
+    if (m_model) {
+        m_maxScrollOffset = m_directionFilter->isFiltered()
+            ? qMax(0, m_directionFilter->filteredLineCount() - m_visibleLines)
+            : qMax(0, m_model->lineCount() - m_visibleLines);
+        m_scrollOffset = qMin(m_scrollOffset, m_maxScrollOffset);
+    }
+}
+
+// ---- 缓存格式化 ----
 
 CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 {
     CachedLine cached;
     cached.direction = line.direction;
     cached.timestamp = line.timestamp.toMSecsSinceEpoch();
-
-    // 方向前缀
-    QString prefix;
-    if (m_showDirectionPrefix) {
-        prefix = (line.direction == DataDirection::Tx) ? "[TX:] " : "[RX:] ";
-    }
+    QString prefix = m_showDirectionPrefix
+        ? ((line.direction == DataDirection::Tx) ? "[TX:] " : "[RX:] ") : QString();
 
     switch (m_displayMode) {
     case DisplayMode::Hex:
@@ -698,9 +471,7 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
         break;
     case DisplayMode::Decimal: {
         QStringList decBytes;
-        for (unsigned char b : line.data) {
-            decBytes << QString::number(b);
-        }
+        for (unsigned char b : line.data) decBytes << QString::number(b);
         cached.text = prefix + decBytes.join(' ');
         break;
     }
@@ -709,6 +480,5 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
         cached.text = prefix + QString::fromUtf8(line.data);
         break;
     }
-
     return cached;
 }

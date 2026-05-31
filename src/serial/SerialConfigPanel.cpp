@@ -14,9 +14,12 @@
 #include "SerialDriverDetector.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QLineEdit>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QSerialPortInfo>
+#include <QIntValidator>
+#include <QLineEdit>
 
 /**
  * @brief 构造串口配置面板
@@ -80,6 +83,8 @@ void SerialConfigPanel::setupUI()
                              "460800", "921600", "1000000"};
     m_baudCombo->addItems(baudRates);
     m_baudCombo->setCurrentText("115200");
+    // 为波特率输入框安装整数校验器，限制范围 300 ~ 10000000
+    m_baudCombo->lineEdit()->setValidator(new QIntValidator(300, 10000000, this));
     formLayout->addRow(tr("波特率:"), m_baudCombo);
 
     // 数据位
@@ -342,12 +347,17 @@ void SerialConfigPanel::restoreConfig(const QVariantMap& config)
             m_flowControlCombo->setCurrentIndex(idx);
         }
     }
-    // 恢复 DTR/RTS 状态（之前缺失，现已补齐）
+    // 恢复 DTR/RTS 状态（blockSignals 防止恢复时触发 dtrChanged/rtsChanged 信号
+    // 导致实际改变已连接设备的线路状态）
     if (config.contains("dtr")) {
+        m_dtrCheck->blockSignals(true);
         m_dtrCheck->setChecked(config["dtr"].toBool());
+        m_dtrCheck->blockSignals(false);
     }
     if (config.contains("rts")) {
+        m_rtsCheck->blockSignals(true);
         m_rtsCheck->setChecked(config["rts"].toBool());
+        m_rtsCheck->blockSignals(false);
     }
 }
 

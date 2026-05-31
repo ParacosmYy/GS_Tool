@@ -51,6 +51,8 @@ set(SOURCES
     src/terminal/TerminalSearchBar.cpp
     src/terminal/DirectionFilter.cpp
     src/terminal/TerminalLayoutManager.cpp
+    src/terminal/TerminalSelectionManager.cpp
+    src/terminal/TerminalSearchManager.cpp
     src/terminal/TerminalTypes.h
     src/serial/SerialConfigPanel.cpp
     src/serial/QuickCommandBar.cpp
@@ -58,6 +60,7 @@ set(SOURCES
     src/serial/SendHistory.cpp
     src/serial/DataStatistics.cpp
     src/serial/SerialDriverDetector.cpp
+    src/serial/PortWatcher.cpp
     src/protocol/FrameParser.cpp
     src/protocol/ProtocolView.cpp
     src/protocol/FrameVisualEditor.cpp
@@ -108,6 +111,8 @@ set(HEADERS
     src/terminal/TerminalSearchBar.h
     src/terminal/DirectionFilter.h
     src/terminal/TerminalLayoutManager.h
+    src/terminal/TerminalSelectionManager.h
+    src/terminal/TerminalSearchManager.h
     src/terminal/TerminalTypes.h
     src/serial/SerialConfigPanel.h
     src/serial/QuickCommandBar.h
@@ -115,6 +120,7 @@ set(HEADERS
     src/serial/SendHistory.h
     src/serial/DataStatistics.h
     src/serial/SerialDriverDetector.h
+    src/serial/PortWatcher.h
     src/protocol/FrameDefinition.h
     src/protocol/FrameParser.h
     src/protocol/ProtocolView.h

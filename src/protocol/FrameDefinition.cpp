@@ -1,16 +1,51 @@
+/**
+ * @file FrameDefinition.cpp
+ * @brief 帧格式定义和字段解析实现
+ *
+ * 包含:
+ *   - FieldDef: 字段提取和格式化（带边界保护）
+ *   - FrameDefinition: 帧结构定义的JSON序列化
+ */
+
 #include "protocol/FrameDefinition.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDebug>
 
 // ---- FieldDef 方法实现 ----
 
+/**
+ * @brief 从原始字节中提取并转换字段值
+ * @param payload 帧有效数据区域（不含帧头/帧尾/校验）
+ * @return 提取出的字段值（经过 scale + offsetVal 变换），越界时返回无效 QVariant
+ *
+ * 边界保护:
+ *   - offset < 0 时返回无效 QVariant 并输出警告日志
+ *   - offset + size > payload.size() 时返回无效 QVariant 并输出警告日志
+ *   - 这两种情况说明帧定义与实际数据不匹配，通常是用户配置错误
+ */
 QVariant FieldDef::extractValue(const QByteArray& payload) const
 {
-    if (offset < 0 || offset + size > payload.size()) {
+    // ---- 边界检查: offset 和 size 必须在 payload 范围内 ----
+    if (offset < 0) {
+        qWarning() << "FieldDef::extractValue: offset (" << offset << ") is negative, field:" << name;
         return QVariant();
     }
+
+    if (size <= 0) {
+        qWarning() << "FieldDef::extractValue: size (" << size << ") is non-positive, field:" << name;
+        return QVariant();
+    }
+
+    if (offset + size > payload.size()) {
+        qWarning() << "FieldDef::extractValue: offset (" << offset << ") + size (" << size
+                   << ") = " << (offset + size) << "exceeds payload size (" << payload.size()
+                   << "), field:" << name;
+        return QVariant();
+    }
+
     const char* d = payload.constData() + offset;
     double raw = 0.0;
 
@@ -71,6 +106,13 @@ QVariant FieldDef::extractValue(const QByteArray& payload) const
     return raw * scale + offsetVal;
 }
 
+/**
+ * @brief 格式化显示值（带单位）
+ * @param payload 帧有效数据区域
+ * @return 格式化后的字符串，越界时返回 "N/A"
+ *
+ * Raw 类型显示为 HEX 字符串，数值类型保留 2 位小数（整数时不显示小数点）。
+ */
 QString FieldDef::formatValue(const QByteArray& payload) const
 {
     QVariant val = extractValue(payload);
@@ -100,6 +142,10 @@ QString FieldDef::formatValue(const QByteArray& payload) const
     return text;
 }
 
+/**
+ * @brief 序列化为JSON对象
+ * @return 包含字段所有属性的JSON对象
+ */
 QJsonObject FieldDef::toJson() const
 {
     QJsonObject obj;
@@ -113,6 +159,11 @@ QJsonObject FieldDef::toJson() const
     return obj;
 }
 
+/**
+ * @brief 从JSON对象反序列化
+ * @param obj JSON对象
+ * @return 反序列化后的 FieldDef 实例
+ */
 FieldDef FieldDef::fromJson(const QJsonObject& obj)
 {
     FieldDef f;
@@ -128,6 +179,13 @@ FieldDef FieldDef::fromJson(const QJsonObject& obj)
 
 // ---- FrameDefinition 方法实现 ----
 
+/**
+ * @brief 计算整个帧的最大长度（用于缓冲区预分配）
+ * @return 最小帧长度估算值，-1 表示无帧头（变长帧无法预知）
+ *
+ * 计算: header + lengthField + checksum + footer
+ * 注意: 不含 payload，因为 payload 长度由长度字段决定
+ */
 int FrameDefinition::maxFrameLength() const
 {
     if (header.isEmpty()) return -1;
@@ -139,6 +197,12 @@ int FrameDefinition::maxFrameLength() const
     return minLen;
 }
 
+/**
+ * @brief 序列化为JSON对象
+ * @return 包含帧定义所有属性的JSON对象
+ *
+ * header/footer 转为 HEX 字符串存储，fields 转为 JSON 数组。
+ */
 QJsonObject FrameDefinition::toJson() const
 {
     QJsonObject obj;
@@ -171,6 +235,13 @@ QJsonObject FrameDefinition::toJson() const
     return obj;
 }
 
+/**
+ * @brief 从JSON对象反序列化
+ * @param obj JSON对象
+ * @return 反序列化后的 FrameDefinition 实例
+ *
+ * header/footer 从 HEX 字符串解析为字节数组。
+ */
 FrameDefinition FrameDefinition::fromJson(const QJsonObject& obj)
 {
     FrameDefinition def;
