@@ -27,6 +27,8 @@
 #include "terminal/TerminalSearchBar.h"
 #include "protocol/FrameParser.h"
 #include "protocol/ProtocolView.h"
+#include "protocol/FrameVisualEditor.h"
+#include "chart/ChartWidget.h"
 #include "Constants.h"
 
 // 主窗口 - 左侧导航树 + 右侧功能面板
@@ -133,6 +135,10 @@ private:
     // UI组件 - 协议解析
     ProtocolView* m_protocolView;
     FrameParser* m_frameParser;
+    FrameVisualEditor* m_frameEditor;
+
+    // UI组件 - 波形图
+    ChartWidget* m_chartWidget;
 
     // UI组件 - 状态栏
     QLabel* m_connStatusLbl;

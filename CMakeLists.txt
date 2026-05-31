@@ -40,6 +40,9 @@ set(SOURCES
     src/serial/DataStatistics.cpp
     src/protocol/FrameParser.cpp
     src/protocol/ProtocolView.cpp
+    src/protocol/FrameVisualEditor.cpp
+    src/protocol/IntelHexParser.cpp
+    src/chart/ChartWidget.cpp
     src/utils/SettingsManager.cpp
     src/utils/DataExporter.cpp
     src/utils/HexConverter.h
@@ -67,6 +70,9 @@ set(HEADERS
     src/protocol/FrameDefinition.h
     src/protocol/FrameParser.h
     src/protocol/ProtocolView.h
+    src/protocol/FrameVisualEditor.h
+    src/protocol/IntelHexParser.h
+    src/chart/ChartWidget.h
     src/utils/SettingsManager.h
     src/utils/DataExporter.h
 )

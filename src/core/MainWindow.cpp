@@ -76,7 +76,13 @@ void MainWindow::setupUI()
     serialItem->appendRow(statsItem);
     auto* protocolItem = new QStandardItem(tr("Protocol"));
     protocolItem->setEditable(false);
+    auto* frameEditorItem = new QStandardItem(tr("Frame Editor"));
+    frameEditorItem->setEditable(false);
+    auto* chartItem = new QStandardItem(tr("Chart"));
+    chartItem->setEditable(false);
     serialItem->appendRow(protocolItem);
+    serialItem->appendRow(frameEditorItem);
+    serialItem->appendRow(chartItem);
 
     // 工具分组
     auto* toolsItem = new QStandardItem(tr("Tools"));
@@ -122,6 +128,16 @@ void MainWindow::setupUI()
     m_protocolView = new ProtocolView;
     m_protocolView->setVisible(false);
     serialLayout->addWidget(m_protocolView);
+
+    // 帧编辑器面板(点击"Frame Editor"时显示)
+    m_frameEditor = new FrameVisualEditor;
+    m_frameEditor->setVisible(false);
+    serialLayout->addWidget(m_frameEditor);
+
+    // 波形图面板(点击"Chart"时显示)
+    m_chartWidget = new ChartWidget;
+    m_chartWidget->setVisible(false);
+    serialLayout->addWidget(m_chartWidget);
 
     // 终端容器: 搜索栏 + 终端
     auto* terminalContainer = new QWidget;
@@ -299,11 +315,19 @@ void MainWindow::connectSignals()
     // 统计刷新定时器
     connect(m_statsTimer, &QTimer::timeout, this, &MainWindow::updateDataStatistics);
 
-    // 帧解析器 → 协议视图
+    // 帧解析器 → 协议视图 + 波形图
     connect(m_frameParser, &FrameParser::frameParsed,
             m_protocolView, &ProtocolView::onFrameParsed);
     connect(m_frameParser, &FrameParser::frameError,
             m_protocolView, &ProtocolView::onFrameError);
+    connect(m_frameParser, &FrameParser::frameParsed,
+            m_chartWidget, &ChartWidget::onFrameParsed);
+
+    // 帧编辑器 → 帧解析器（定义变更时更新解析器）
+    connect(m_frameEditor, &FrameVisualEditor::definitionChanged,
+            this, [this](const FrameDefinition& def) {
+                m_frameParser->setDefinition(def);
+            });
 
     // 导航树点击切换面板
     connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
@@ -328,6 +352,22 @@ void MainWindow::connectSignals()
             m_terminal->setVisible(false);
             m_dataStats->setVisible(false);
             m_protocolView->setVisible(true);
+            m_frameEditor->setVisible(false);
+            m_chartWidget->setVisible(false);
+        } else if (text == tr("Frame Editor")) {
+            m_serialConfig->setVisible(false);
+            m_terminal->setVisible(false);
+            m_dataStats->setVisible(false);
+            m_protocolView->setVisible(false);
+            m_frameEditor->setVisible(true);
+            m_chartWidget->setVisible(false);
+        } else if (text == tr("Chart")) {
+            m_serialConfig->setVisible(false);
+            m_terminal->setVisible(false);
+            m_dataStats->setVisible(false);
+            m_protocolView->setVisible(false);
+            m_frameEditor->setVisible(false);
+            m_chartWidget->setVisible(true);
         } else if (text == tr("Data Export")) {
             onExportData();
         }
