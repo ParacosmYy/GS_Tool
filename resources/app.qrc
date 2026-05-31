@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>themes/dark_terminal.qss</file>
+    </qresource>
+</RCC>
