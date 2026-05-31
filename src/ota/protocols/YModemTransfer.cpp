@@ -21,7 +21,6 @@ double YModemTransfer::etaSeconds() const
     return static_cast<double>(remaining) / m_currentRate;
 }
 
-// ---- BaseTransfer钩子实现 ----
 bool YModemTransfer::onStartInit()
 {
     if (m_filePaths.isEmpty()) {
@@ -159,8 +158,6 @@ void YModemTransfer::processReceivedData()
     // 单次O(n)压缩
     m_receiveBuffer.remove(0, readIdx);
 }
-
-// ---- 状态处理方法 ----
 
 void YModemTransfer::handleStateWaitingStart(char ch)
 {
@@ -362,8 +359,6 @@ void YModemTransfer::handleStateSendingFinalBlock0(char ch, int& readIdx)
     }
 }
 
-// ---- 数据发送 ----
-
 void YModemTransfer::sendBlock0()
 {
     // 获取文件修改时间
@@ -463,8 +458,6 @@ QByteArray YModemTransfer::buildBlock0(const QString& fileName,
     return block0;
 }
 
-// ---- 速率统计 ----
-
 void YModemTransfer::updateTransferStats()
 {
     qint64 elapsedMs = m_transferTimer.elapsed();
@@ -476,8 +469,6 @@ void YModemTransfer::updateTransferStats()
     double eta = etaSeconds();
     emit transferStats(m_currentRate, eta, m_currentFileName);
 }
-
-// ---- 文件管理 ----
 
 bool YModemTransfer::loadNextFile()
 {

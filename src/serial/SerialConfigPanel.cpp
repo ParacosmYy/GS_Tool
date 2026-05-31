@@ -104,26 +104,57 @@ void SerialConfigPanel::setupUI()
 
     mainLayout->addWidget(paramGroup);
 
-    // ---- 控制信号 ----
+    // ---- 控制信号 + 驱动检测 + 连接按钮 ----
+    setupSignalAndConnectControls(mainLayout);
+
+    mainLayout->addStretch();
+}
+
+/**
+ * @brief 构建控制信号(DTR/RTS)、驱动检测信息和连接按钮区域
+ *
+ * 从 setupUI() 拆分出来，避免单个方法超过80行限制。
+ * 包含: 控制信号GroupBox → 驱动检测信息 → 连接按钮+状态指示器
+ */
+void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
+{
+    // ---- 控制信号 (DTR/RTS切换按钮，连接后可用) ----
     auto* signalGroup = new QGroupBox(tr("控制信号"));
     signalGroup->setObjectName("signalGroup");
     auto* signalLayout = new QHBoxLayout(signalGroup);
 
-    m_dtrCheck = new QCheckBox(tr("DTR"));
-    m_dtrCheck->setChecked(true);
-    m_dtrCheck->setObjectName("dtrCheck");
-    m_dtrCheck->setToolTip(tr("数据终端就绪信号，部分设备需要 DTR 拉低才能复位"));
-    m_rtsCheck = new QCheckBox(tr("RTS"));
-    m_rtsCheck->setChecked(true);
-    m_rtsCheck->setObjectName("rtsCheck");
-    m_rtsCheck->setToolTip(tr("请求发送信号，部分设备需要 RTS 拉低进入 bootloader"));
+    m_dtrBtn = new QPushButton(tr("DTR HIGH"));
+    m_dtrBtn->setObjectName("dtrBtn");
+    m_dtrBtn->setCheckable(true);
+    m_dtrBtn->setChecked(true);
+    m_dtrBtn->setEnabled(false);
+    m_dtrBtn->setToolTip(tr("数据终端就绪信号，点击切换 HIGH/LOW\n"
+                            "部分设备需要 DTR 拉低才能复位(如 ESP32)"));
 
-    signalLayout->addWidget(m_dtrCheck);
-    signalLayout->addWidget(m_rtsCheck);
+    m_rtsBtn = new QPushButton(tr("RTS HIGH"));
+    m_rtsBtn->setObjectName("rtsBtn");
+    m_rtsBtn->setCheckable(true);
+    m_rtsBtn->setChecked(true);
+    m_rtsBtn->setEnabled(false);
+    m_rtsBtn->setToolTip(tr("请求发送信号，点击切换 HIGH/LOW\n"
+                            "部分设备需要 RTS 拉低进入 bootloader(如 STM32)"));
+
+    signalLayout->addWidget(m_dtrBtn);
+    signalLayout->addWidget(m_rtsBtn);
     signalLayout->addStretch();
 
-    connect(m_dtrCheck, &QCheckBox::toggled, this, &SerialConfigPanel::dtrChanged);
-    connect(m_rtsCheck, &QCheckBox::toggled, this, &SerialConfigPanel::rtsChanged);
+    connect(m_dtrBtn, &QPushButton::toggled, this, [this](bool checked) {
+        m_dtrState = checked;
+        m_dtrBtn->setText(checked ? tr("DTR HIGH") : tr("DTR LOW"));
+        refreshDtrStyle();
+        emit dtrChanged(checked);
+    });
+    connect(m_rtsBtn, &QPushButton::toggled, this, [this](bool checked) {
+        m_rtsState = checked;
+        m_rtsBtn->setText(checked ? tr("RTS HIGH") : tr("RTS LOW"));
+        refreshRtsStyle();
+        emit rtsChanged(checked);
+    });
     mainLayout->addWidget(signalGroup);
 
     // ---- 驱动检测信息 ----
@@ -139,7 +170,6 @@ void SerialConfigPanel::setupUI()
     m_statusIndicator->setObjectName("statusIndicator");
     m_statusIndicator->setFixedSize(8, 8);
     m_statusIndicator->setToolTip(tr("未连接"));
-    // 初始状态为断开(灰色圆点)
     m_statusIndicator->setProperty("state", "disconnected");
     m_statusIndicator->style()->unpolish(m_statusIndicator);
     m_statusIndicator->style()->polish(m_statusIndicator);
@@ -147,7 +177,6 @@ void SerialConfigPanel::setupUI()
     m_connectBtn = new QPushButton(tr("连接"));
     m_connectBtn->setObjectName("connectBtn");
     m_connectBtn->setMinimumHeight(36);
-    m_connectBtn->setToolTip(tr("建立串口连接，快捷键: 无"));
     connect(m_connectBtn, &QPushButton::clicked, this, [this]() {
         if (m_connecting) return;
         if (m_connected) {
@@ -166,8 +195,6 @@ void SerialConfigPanel::setupUI()
     connectLayout->addWidget(m_statusIndicator);
     connectLayout->addWidget(m_connectBtn, 1);
     mainLayout->addLayout(connectLayout);
-
-    mainLayout->addStretch();
 }
 
 // ---- 状态管理 ----
@@ -191,8 +218,8 @@ void SerialConfigPanel::setConnected(bool connected)
     m_stopBitsCombo->setEnabled(!connected);
     m_flowControlCombo->setEnabled(!connected);
     m_refreshBtn->setEnabled(!connected);
-    m_dtrCheck->setEnabled(true);
-    m_rtsCheck->setEnabled(true);
+    m_dtrBtn->setEnabled(connected);
+    m_rtsBtn->setEnabled(connected);
 
     // 更新状态指示器
     if (connected) {
@@ -331,8 +358,8 @@ int SerialConfigPanel::currentDataBitsIndex() const { return m_dataBitsCombo->cu
 int SerialConfigPanel::currentParityIndex() const { return m_parityCombo->currentIndex(); }
 int SerialConfigPanel::currentStopBitsIndex() const { return m_stopBitsCombo->currentIndex(); }
 int SerialConfigPanel::currentFlowControlIndex() const { return m_flowControlCombo->currentIndex(); }
-bool SerialConfigPanel::dtrEnabled() const { return m_dtrCheck->isChecked(); }
-bool SerialConfigPanel::rtsEnabled() const { return m_rtsCheck->isChecked(); }
+bool SerialConfigPanel::dtrEnabled() const { return m_dtrState; }
+bool SerialConfigPanel::rtsEnabled() const { return m_rtsState; }
 
 void SerialConfigPanel::restoreConfig(const QVariantMap& config)
 {
@@ -355,18 +382,40 @@ void SerialConfigPanel::restoreConfig(const QVariantMap& config)
         && config["flowControl"].toInt() < m_flowControlCombo->count())
         m_flowControlCombo->setCurrentIndex(config["flowControl"].toInt());
     if (config.contains("dtr")) {
-        m_dtrCheck->blockSignals(true);
-        m_dtrCheck->setChecked(config["dtr"].toBool());
-        m_dtrCheck->blockSignals(false);
+        m_dtrState = config["dtr"].toBool();
+        m_dtrBtn->blockSignals(true);
+        m_dtrBtn->setChecked(m_dtrState);
+        m_dtrBtn->setText(m_dtrState ? tr("DTR HIGH") : tr("DTR LOW"));
+        m_dtrBtn->blockSignals(false);
+        refreshDtrStyle();
     }
     if (config.contains("rts")) {
-        m_rtsCheck->blockSignals(true);
-        m_rtsCheck->setChecked(config["rts"].toBool());
-        m_rtsCheck->blockSignals(false);
+        m_rtsState = config["rts"].toBool();
+        m_rtsBtn->blockSignals(true);
+        m_rtsBtn->setChecked(m_rtsState);
+        m_rtsBtn->setText(m_rtsState ? tr("RTS HIGH") : tr("RTS LOW"));
+        m_rtsBtn->blockSignals(false);
+        refreshRtsStyle();
     }
 }
 
 // ---- 内部方法 ----
+
+/** @brief 刷新DTR按钮视觉状态，通过QSS property驱动颜色切换 */
+void SerialConfigPanel::refreshDtrStyle()
+{
+    m_dtrBtn->setProperty("signalState", m_dtrState ? "high" : "low");
+    m_dtrBtn->style()->unpolish(m_dtrBtn);
+    m_dtrBtn->style()->polish(m_dtrBtn);
+}
+
+/** @brief 刷新RTS按钮视觉状态，通过QSS property驱动颜色切换 */
+void SerialConfigPanel::refreshRtsStyle()
+{
+    m_rtsBtn->setProperty("signalState", m_rtsState ? "high" : "low");
+    m_rtsBtn->style()->unpolish(m_rtsBtn);
+    m_rtsBtn->style()->polish(m_rtsBtn);
+}
 
 void SerialConfigPanel::updateDriverInfo()
 {

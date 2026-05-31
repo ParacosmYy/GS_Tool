@@ -67,6 +67,25 @@ public:
                         LineProvider lineProvider,
                         int totalLines, int batchSize = 1000);
 
+    /**
+     * @brief EDL范围导出 - 从录制文件中提取指定时间范围的记录并导出
+     * @param edlPath    EDL录制文件路径
+     * @param format     导出格式
+     * @param outPath    输出文件路径
+     * @param fromMs     起始时间偏移（毫秒，距录制开始，-1=不限制）
+     * @param toMs       结束时间偏移（毫秒，距录制开始，-1=不限制）
+     * @return true 成功，false 失败（文件无法打开/无匹配数据）
+     */
+    bool exportRange(const QString& edlPath, Format format,
+                     const QString& outPath,
+                     qint64 fromMs = -1, qint64 toMs = -1);
+
+    /**
+     * @brief 获取上次exportRange调用导出的记录数量
+     * @return 导出的记录条数，未调用过返回0
+     */
+    int lastExportRangeCount() const;
+
 signals:
     /** @brief 导出失败信号 @param filePath 文件路径 @param errorString 错误描述 */
     void exportError(const QString& filePath, const QString& errorString);
@@ -113,6 +132,22 @@ private:
                                         const QDateTime& from,
                                         const QDateTime& to) const;
 
+    // ---- EDL文件格式常量（与DataLogger一致） ----
+    static constexpr const char* kEdlMagic = "EDL";       ///< EDL文件魔数（3字节）
+    static constexpr quint8 kEdlVersion = 1;              ///< EDL文件版本号
+    static constexpr int kEdlHeaderSize = 8;              ///< 头部大小: magic(3)+version(1)+padding(4)
+    static constexpr quint32 kEdlMaxRecordSize = 1024*1024; ///< 单条记录数据上限(1MB)，防御性校验
+
+    /**
+     * @brief 从EDL文件中读取指定时间范围的记录
+     * @param edlPath  EDL文件路径
+     * @param fromMs   起始时间偏移（毫秒，-1=不限制）
+     * @param toMs     结束时间偏移（毫秒，-1=不限制）
+     * @return 过滤后的TerminalLine列表，空列表表示无匹配或读取失败
+     */
+    QVector<TerminalLine> readEdlRange(const QString& edlPath,
+                                        qint64 fromMs, qint64 toMs);
+
     /** @brief 不可打印字符替换为 '.' */
     static QString toAsciiString(const QByteArray& data);
 
@@ -121,6 +156,10 @@ private:
 
     /** @brief 格式化单行HexDump: 地址 | HEX(16字节) | ASCII，不足16字节空格补齐 */
     static QString formatHexDumpLine(const QByteArray& data, quint64 address);
+
+    // ---- 成员变量 ----
+
+    int m_lastExportRangeCount = 0;  ///< 上次exportRange导出的记录数量
 };
 
 #endif // DATA_EXPORTER_H

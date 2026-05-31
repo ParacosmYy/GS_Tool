@@ -16,18 +16,19 @@
 
 #include <QWidget>
 #include <QComboBox>
-#include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
 #include <QVariantMap>
 
 class QAbstractAnimation;
+class QVBoxLayout;
 
 /**
  * @brief 串口配置面板 - 端口选择、参数配置、连接控制和状态指示
  *
  * 状态指示器: 绿色圆点(已连接)、黄色圆点+呼吸动画(连接中)、灰色圆点(断开)、红色圆点(错误)
  * 圆点大小8px，通过QSS的statusIndicator控制，不硬编码颜色。
+ * DTR/RTS切换按钮: 连接后可用，绿色=HIGH，灰色=LOW，点击切换电平
  */
 class SerialConfigPanel : public QWidget {
     Q_OBJECT
@@ -42,8 +43,8 @@ public:
     int currentParityIndex() const;          ///< 校验位索引
     int currentStopBitsIndex() const;        ///< 停止位索引
     int currentFlowControlIndex() const;     ///< 流控索引
-    bool dtrEnabled() const;                 ///< DTR是否启用
-    bool rtsEnabled() const;                 ///< RTS是否启用
+    bool dtrEnabled() const;                 ///< DTR是否为HIGH
+    bool rtsEnabled() const;                 ///< RTS是否为HIGH
     void setConnected(bool connected);       ///< 设置连接状态
     bool isConnected() const;                ///< 当前是否已连接
     void restoreConfig(const QVariantMap& config); ///< 恢复配置
@@ -60,20 +61,26 @@ public:
 signals:
     void connectRequested();      ///< 用户点击连接按钮
     void disconnectRequested();   ///< 用户点击断开按钮
-    void dtrChanged(bool enabled);///< DTR状态变化
-    void rtsChanged(bool enabled);///< RTS状态变化
+    void dtrChanged(bool enabled);///< DTR状态变化(true=HIGH, false=LOW)
+    void rtsChanged(bool enabled);///< RTS状态变化(true=HIGH, false=LOW)
 
 private slots:
     void onPortComboChanged();    ///< 端口变化时更新按钮状态
 
 private:
     void setupUI();
+    /** @brief 构建控制信号+驱动检测+连接按钮区域(从setupUI拆分) */
+    void setupSignalAndConnectControls(QVBoxLayout* mainLayout);
     void updateDriverInfo();
     void updateConnectButtonState();
     /** @brief 更新状态指示器的颜色状态property并刷新样式 */
     void updateStatusIndicator(const QString& state);
     /** @brief 停止呼吸动画并重置透明度特效 */
     void stopBreathAnimation();
+    /** @brief 刷新DTR按钮的视觉状态(HIGH=绿, LOW=灰) */
+    void refreshDtrStyle();
+    /** @brief 刷新RTS按钮的视觉状态(HIGH=绿, LOW=灰) */
+    void refreshRtsStyle();
 
     // ---- 控件指针 ----
     QComboBox* m_portCombo;        ///< 端口选择下拉框
@@ -83,8 +90,8 @@ private:
     QComboBox* m_parityCombo;      ///< 校验位选择
     QComboBox* m_stopBitsCombo;    ///< 停止位选择
     QComboBox* m_flowControlCombo; ///< 流控模式选择
-    QCheckBox* m_dtrCheck;         ///< DTR信号控制
-    QCheckBox* m_rtsCheck;         ///< RTS信号控制
+    QPushButton* m_dtrBtn;         ///< DTR信号切换按钮(HIGH/LOW)
+    QPushButton* m_rtsBtn;         ///< RTS信号切换按钮(HIGH/LOW)
     QPushButton* m_connectBtn;     ///< 连接/断开按钮
     QLabel* m_driverInfoLbl;       ///< 驱动检测信息标签
     QLabel* m_statusIndicator;     ///< 连接状态指示器(彩色圆点)
@@ -92,6 +99,8 @@ private:
     // ---- 状态标志 ----
     bool m_connected = false;       ///< 当前是否已连接
     bool m_connecting = false;      ///< 正在连接中(防重复点击)
+    bool m_dtrState = true;         ///< DTR信号状态(true=HIGH, 默认HIGH)
+    bool m_rtsState = true;         ///< RTS信号状态(true=HIGH, 默认HIGH)
 
     // ---- 呼吸动画 ----
     QAbstractAnimation* m_breathAnim = nullptr;  ///< 连接中状态的呼吸动画(0.3↔1.0循环)

@@ -14,6 +14,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
+#include <QDataStream>
+#include <QTimeZone>
 
 // ---- 构造函数 ----
 
@@ -409,4 +411,88 @@ bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
     }
     file.close();
     return true;
+}
+
+// ============================================================
+// EDL范围导出
+// ============================================================
+
+/** @brief EDL范围导出 - 参数校验 → readEdlRange过滤 → 格式分发 */
+bool DataExporter::exportRange(const QString& edlPath, Format format,
+                                const QString& outPath,
+                                qint64 fromMs, qint64 toMs)
+{
+    if (edlPath.isEmpty() || outPath.isEmpty()) return false;
+    // fromMs/toMs都为-1表示不过滤，fromMs > toMs且都不为-1则无效
+    if (fromMs >= 0 && toMs >= 0 && fromMs > toMs) return false;
+
+    QVector<TerminalLine> lines = readEdlRange(edlPath, fromMs, toMs);
+    m_lastExportRangeCount = lines.size();
+    if (lines.isEmpty()) return false;
+
+    switch (format) {
+    case Plain:       return exportPlain(outPath, lines);
+    case HexDump:     return exportHexDump(outPath, lines);
+    case Csv:         return exportCsv(outPath, lines);
+    case Timestamped: return exportTimestamped(outPath, lines);
+    case Bin:         return exportBin(outPath, lines);
+    }
+    return false;
+}
+
+/** @brief 上次exportRange导出的记录数量 */
+int DataExporter::lastExportRangeCount() const { return m_lastExportRangeCount; }
+
+/**
+ * @brief 从EDL二进制文件中读取指定时间范围的记录
+ * 流程: 验证magic+version头 → 顺序扫描记录 → 时间戳范围过滤(提前终止优化)
+ * EDL记录(BigEndian): timestamp(8B) + direction(1B) + length(4B) + data(length B)
+ */
+QVector<TerminalLine> DataExporter::readEdlRange(const QString& edlPath,
+                                                  qint64 fromMs, qint64 toMs)
+{
+    QVector<TerminalLine> result;
+    QFile file(edlPath);
+    if (!file.open(QIODevice::ReadOnly)) return result;
+
+    // 验证文件头: magic(3B) + version(1B) + padding(4B) = kEdlHeaderSize
+    QByteArray magic = file.read(3);
+    if (magic.size() != 3 || magic != kEdlMagic) return result;
+    quint8 version = 0;
+    if (file.read(reinterpret_cast<char*>(&version), 1) != 1 || version != kEdlVersion)
+        return result;
+    if (!file.seek(kEdlHeaderSize)) return result;
+
+    QDataStream stream(&file);
+    stream.setByteOrder(QDataStream::BigEndian);
+    // 基准时间: UTC epoch，导出时显示为偏移时间戳
+    const QDateTime baseTime = QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0), QTimeZone::UTC);
+
+    while (!file.atEnd()) {
+        quint64 timestamp = 0;
+        stream >> timestamp;
+        if (stream.status() != QDataStream::Ok) break;
+        quint8 direction = 0;
+        stream >> direction;
+        if (stream.status() != QDataStream::Ok) break;
+        quint32 length = 0;
+        stream >> length;
+        if (stream.status() != QDataStream::Ok) break;
+        if (length > kEdlMaxRecordSize) break; // 防御性校验
+
+        QByteArray data(static_cast<int>(length), Qt::Uninitialized);
+        if (stream.readRawData(data.data(), static_cast<int>(length)) != static_cast<int>(length))
+            break;
+
+        qint64 tsMs = static_cast<qint64>(timestamp);
+        if (toMs >= 0 && tsMs > toMs) break;   // 提前终止: 超过上界
+        if (fromMs >= 0 && tsMs < fromMs) continue; // 跳过: 未达下界
+
+        TerminalLine line;
+        line.data = data;
+        line.direction = (direction == 0) ? DataDirection::Rx : DataDirection::Tx;
+        line.timestamp = baseTime.addMSecs(tsMs);
+        result.append(line);
+    }
+    return result;
 }

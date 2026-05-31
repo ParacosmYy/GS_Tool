@@ -548,24 +548,48 @@ QPushButton#refreshBtn:disabled {
 }
 
 /* === SerialConfigPanel 控件 === */
-QCheckBox#dtrCheck, QCheckBox#rtsCheck {
-    spacing: 6px;
-    color: #111827;
-    font-size: 13px;
+/* DTR/RTS 信号切换按钮 - 绿色=HIGH, 灰色=LOW */
+QPushButton#dtrBtn, QPushButton#rtsBtn {
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 80px;
 }
-QCheckBox#dtrCheck::indicator, QCheckBox#rtsCheck::indicator {
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
-    border: 1px solid #9ca3af;
-    background-color: #ffffff;
+/* HIGH 状态 - accent 色(绿) */
+QPushButton#dtrBtn[signalState="high"], QPushButton#rtsBtn[signalState="high"] {
+    background-color: #22c55e;
+    color: #ffffff;
+    border-color: #22c55e;
 }
-QCheckBox#dtrCheck::indicator:checked, QCheckBox#rtsCheck::indicator:checked {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
+QPushButton#dtrBtn[signalState="high"]:hover, QPushButton#rtsBtn[signalState="high"]:hover {
+    background-color: #16a34a;
+    border-color: #16a34a;
 }
-QCheckBox#dtrCheck::indicator:hover, QCheckBox#rtsCheck::indicator:hover {
-    border-color: #3b82f6;
+QPushButton#dtrBtn[signalState="high"]:pressed, QPushButton#rtsBtn[signalState="high"]:pressed {
+    background-color: #15803d;
+    border-color: #15803d;
+}
+/* LOW 状态 - bg-tertiary 色(灰) */
+QPushButton#dtrBtn[signalState="low"], QPushButton#rtsBtn[signalState="low"] {
+    background-color: #e5e7eb;
+    color: #6b7280;
+    border-color: #d1d5db;
+}
+QPushButton#dtrBtn[signalState="low"]:hover, QPushButton#rtsBtn[signalState="low"]:hover {
+    background-color: #d1d5db;
+    border-color: #9ca3af;
+}
+QPushButton#dtrBtn[signalState="low"]:pressed, QPushButton#rtsBtn[signalState="low"]:pressed {
+    background-color: #9ca3af;
+    border-color: #9ca3af;
+}
+/* 禁用状态 - 未连接时 */
+QPushButton#dtrBtn:disabled, QPushButton#rtsBtn:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
 }
 
 /* === 发送栏控件 === */
@@ -1315,4 +1339,220 @@ QPushButton#toastCloseBtn:hover {
 }
 QPushButton#toastCloseBtn:pressed {
     background-color: #d1d5db;
+}
+
+/* === NavIndicatorWidget 导航树滑动指示器动画过渡 === */
+/* QPropertyAnimation 驱动 indicatorY 属性, 250ms OutCubic */
+/* 指示线颜色从 ThemeManager::Accent 获取, 主题切换时 updateThemeColor() 刷新 */
+
+/* === TerminalSearchBar 搜索栏展开/收起动画过渡 === */
+/* 展开动画: maximumHeight 0->36, 200ms, OutCubic */
+/* 收起动画: maximumHeight 36->0, 150ms, InCubic */
+/* 代码使用 QPropertyAnimation 驱动, QSS 无需额外属性 */
+
+/* === PanelManager 面板切换淡入/淡出过渡 === */
+/* 淡入: QGraphicsOpacityEffect opacity 0->1, 250ms, OutCubic */
+/* 淡出: QGraphicsOpacityEffect opacity 1->0, 200ms, InCubic */
+/* 代码使用 QPropertyAnimation + QGraphicsOpacityEffect 驱动 */
+
+/* === 主窗口导航树 (objectName 钩子) === */
+QTreeView#navTree {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: none;
+    outline: none;
+    font-size: 13px;
+}
+
+/* === 主窗口分割器 === */
+QSplitter#mainSplitter::handle {
+    background-color: #e5e7eb;
+    width: 1px;
+}
+
+/* === 终端容器和分割器 === */
+QWidget#terminalContainer {
+    background-color: transparent;
+}
+QSplitter#terminalSplitter::handle {
+    background-color: #e5e7eb;
+    width: 1px;
+}
+
+/* === 图表区域 QChartView === */
+QWidget#chartView {
+    background-color: #ffffff;
+}
+QLabel#chartWindowLabel {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+/* === 工具栏 (objectName 钩子) === */
+QToolBar#mainToolbar {
+    background-color: #ffffff;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    spacing: 4px;
+    padding: 4px;
+    min-height: 36px;
+    max-height: 40px;
+}
+
+/* === 背景设置弹出面板子控件 === */
+QLabel#bgBlurLabel, QLabel#bgOpacityLabel {
+    color: #1f2937;
+    font-size: 12px;
+}
+QLabel#bgBlurValueLabel, QLabel#bgOpacityValueLabel {
+    color: #6b7280;
+    font-size: 11px;
+    font-family: Consolas, monospace;
+}
+QCheckBox#bgRippleCheck {
+    color: #1f2937;
+    spacing: 6px;
+}
+QFrame#bgSeparator {
+    background-color: #e5e7eb;
+    max-height: 1px;
+    border: none;
+}
+
+/* === OTA 分组框 === */
+QGroupBox#otaFileGroup,
+QGroupBox#otaConfigGroup,
+QGroupBox#otaProgressGroup,
+QGroupBox#otaLogGroup,
+QGroupBox#otaHistoryGroup {
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-top: 14px;
+    padding-top: 18px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+/* === OTA 子控件 === */
+QLineEdit#otaFileLabel {
+    background-color: #ffffff;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+QComboBox#otaProtocolCombo {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+QComboBox#otaProtocolCombo:hover { border-color: #3b82f6; }
+QComboBox#otaProtocolCombo:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
+
+/* === 帧编辑器子控件 === */
+QLineEdit#frameHeaderEdit,
+QLineEdit#frameFooterEdit {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+}
+QLineEdit#frameHeaderEdit:focus,
+QLineEdit#frameFooterEdit:focus {
+    border: 1px solid #3b82f6;
+}
+QSpinBox#frameLengthOffsetSpin,
+QSpinBox#frameChecksumOffsetSpin,
+QSpinBox#frameChecksumStartSpin,
+QSpinBox#frameLengthAdjustSpin {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 12px;
+}
+QComboBox#frameLengthSizeCombo,
+QComboBox#frameChecksumTypeCombo {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+QComboBox#frameLengthSizeCombo:hover,
+QComboBox#frameChecksumTypeCombo:hover { border-color: #3b82f6; }
+QCheckBox#frameLengthEndianCheck {
+    color: #1f2937;
+    spacing: 6px;
+}
+QComboBox#fieldTypeCombo,
+QComboBox#fieldEndianCombo {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 12px;
+}
+
+/* === 串口配置面板分组 === */
+QGroupBox#portGroup,
+QGroupBox#paramGroup,
+QGroupBox#signalGroup {
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-top: 14px;
+    padding-top: 18px;
+    font-weight: bold;
+    font-size: 13px;
+}
+QComboBox#portCombo,
+QComboBox#baudCombo,
+QComboBox#dataBitsCombo,
+QComboBox#parityCombo,
+QComboBox#stopBitsCombo,
+QComboBox#flowControlCombo {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 13px;
+}
+QComboBox#portCombo:hover,
+QComboBox#baudCombo:hover,
+QComboBox#dataBitsCombo:hover,
+QComboBox#parityCombo:hover,
+QComboBox#stopBitsCombo:hover,
+QComboBox#flowControlCombo:hover { border-color: #3b82f6; }
+QComboBox#portCombo:disabled,
+QComboBox#baudCombo:disabled,
+QComboBox#dataBitsCombo:disabled,
+QComboBox#parityCombo:disabled,
+QComboBox#stopBitsCombo:disabled,
+QComboBox#flowControlCombo:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
+
+/* === 对话框按钮容器 === */
+QDialogButtonBox#quickCmdDlgButtons,
+QDialogButtonBox#bookmarkDlgButtons {
+    background-color: transparent;
 }
