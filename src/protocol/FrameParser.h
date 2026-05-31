@@ -100,6 +100,9 @@ private:
     void handleChecksumVerifying(unsigned char byte);
     void handleFooterMatching(unsigned char byte);
 
+    /** @brief 处理完整载荷(校验→帧尾→完成) */
+    void processCompletePayload();
+
     // ---- 辅助方法（实现在 FrameParserHelpers.cpp） ----
     QVariantMap extractFields(const QByteArray& frameData) const;
     bool verifyChecksum(const QByteArray& frameData) const;

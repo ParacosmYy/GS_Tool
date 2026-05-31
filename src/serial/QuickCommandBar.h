@@ -105,6 +105,9 @@ private:
      */
     void rebuildButtons();
 
+    /** @brief 创建编辑对话框UI(表格+按钮行+信号连接) */
+    void createEditDialog(QDialog& dlg, QTableWidget*& table, QDialogButtonBox*& buttons);
+
     QList<QuickCommand> m_commands;     ///< 当前指令列表
     QHBoxLayout* m_buttonLayout = nullptr;  ///< 指令按钮的布局
     QPushButton* m_addBtn = nullptr;    ///< 快速添加按钮（objectName: quickCmdAddBtn）

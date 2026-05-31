@@ -2,8 +2,15 @@
  * @file MainWindowSignalConnect.cpp
  * @brief 主窗口信号/槽连接 - 所有模块间信号路由的集中连接点
  *
- * 本文件从 MainWindow.cpp 拆分而来，仅包含 connectSignals() 方法。
- * 将信号连接逻辑独立成文件，便于快速定位和维护模块间的通信关系。
+ * 本文件从 MainWindow.cpp 拆分而来，包含 connectSignals() 方法及其 8 个子方法:
+ *   connectSerialSignals()          - 串口连接/断开/重连
+ *   connectSerialSendSignals()      - 快捷指令/发送控制器
+ *   connectToolbarSignals()         - 工具栏/录制状态消息
+ *   connectSearchAndProtocolSignals() - 搜索/协议桥/帧编辑/导航
+ *   connectPortWatchSignals()       - 串口热插拔通知
+ *   connectThemeSignals()           - 主题切换 + Toast
+ *   connectOtaSignals()             - OTA传输通知
+ *   connectBookmarkSignals()        - 书签面板信号路由
  *
  * 信号流向（详见 connectSignals() 方法内部分组注释）:
  *   SerialConfigPanel → ConnectionController → MainWindow(状态更新)
@@ -39,27 +46,24 @@
 #include <QMessageBox>
 
 /**
- * @brief 连接所有模块间的信号/槽
+ * @brief 连接所有模块间的信号/槽（调用 8 个子方法按功能分组）
  *
- * 信号流向:
- *   SerialConfigPanel → ConnectionController → MainWindow(状态更新)
- *   ConnectionController → TerminalModel(接收数据) + ProtocolBridgeMgr(协议解析)
- *   ConnectionController → ToastWidget(连接成功/断开/错误通知, 错误通知使用 showDebounced 防抖)
- *   QuickCommandBar → SendController(发送数据)
- *   ToolbarController → TerminalController(显示模式/时间戳/清屏/导出)
- *   ToolbarController → SettingsController(主题/语言)
- *   RecordingController → MainWindow(回放数据写入终端)
- *   RecordingController::addBookmarkRequested → DataLogger::addBookmark(书签添加)
- *   DataLogger::bookmarksChanged → ToastWidget(书签变化吐司通知)
- *   TerminalSearchBar → TerminalController(搜索高亮)
- *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形配置)
- *   OtaWidget → ToastWidget(传输开始/完成通知 + 失败通知使用 showDebounced 防抖)
- *   NavTree → NavigationController(面板切换)
+ * 子方法调用顺序:
+ *   connectSerialSignals()           - 串口连接/断开/重连
+ *   connectSerialSendSignals()       - 快捷指令/发送控制器
+ *   connectToolbarSignals()          - 工具栏/录制状态消息
+ *   connectSearchAndProtocolSignals() - 搜索/协议桥/帧编辑/导航
+ *   connectPortWatchSignals()        - 热插拔通知
+ *   connectThemeSignals()            - 主题切换 + Toast
+ *   connectOtaSignals()              - OTA传输通知
+ *   connectBookmarkSignals()         - 书签面板
  */
 void MainWindow::connectSignals()
 {
     connectSerialSignals();
+    connectSerialSendSignals();
     connectToolbarSignals();
+    connectSearchAndProtocolSignals();
     connectPortWatchSignals();
     connectThemeSignals();
     connectOtaSignals();
@@ -67,11 +71,10 @@ void MainWindow::connectSignals()
 }
 
 /**
- * @brief 串口连接/断开相关信号连接
+ * @brief 串口连接/断开/重连相关信号连接
  *
  * 包含: SerialConfigPanel → ConnectionController 的连接/断开/DTR/RTS 控制，
- *       ConnectionController → MainWindow 的状态更新/数据接收/失败通知，
- *       QuickCommandBar → SendController 的快捷指令发送。
+ *       ConnectionController → MainWindow 的状态更新/数据接收/失败通知/自动重连。
  */
 void MainWindow::connectSerialSignals()
 {
@@ -96,7 +99,6 @@ void MainWindow::connectSerialSignals()
             m_connController, &ConnectionController::setDtr);
     connect(m_panelManager->serialConfig(), &SerialConfigPanel::rtsChanged,
             m_connController, &ConnectionController::setRts);
-
     // 连接状态变化 -> 更新 UI（状态栏文本、配置面板按钮状态、呼吸动画）
     connect(m_connController, &ConnectionController::connectionStateChanged,
             this, [this](ConnectionState state, const QString& connName) {
@@ -153,7 +155,17 @@ void MainWindow::connectSerialSignals()
         ToastWidget::show(this, tr("重连失败: %1").arg(reason),
                           ToastWidget::ToastType::Error);
     });
+}
 
+/**
+ * @brief 快捷指令和发送控制器信号连接
+ *
+ * 包含: QuickCommandBar → SendController 快捷指令发送，
+ *       SendController → TerminalController 状态栏更新，
+ *       SendController → ToastWidget 防抖吐司通知。
+ */
+void MainWindow::connectSerialSendSignals()
+{
     // 快捷指令 → 发送控制器
     connect(m_panelManager->quickCmdBar(), &QuickCommandBar::commandTriggered,
             m_sendController, &SendController::onQuickCommand);
@@ -173,14 +185,11 @@ void MainWindow::connectSerialSignals()
 }
 
 /**
- * @brief 工具栏信号连接
+ * @brief 工具栏和录制状态消息信号连接
  *
  * 包含: ToolbarController → TerminalController/SettingsController 的工具栏事件，
  *       TerminalController/RecordingController 状态消息 → 状态栏/吐司，
- *       搜索栏 → TerminalController 搜索处理，
- *       协议桥 → 协议视图/波形图，
- *       帧编辑器 → 帧解析器/波形图配置，
- *       导航树 → 面板切换。
+ *       录制回放数据写入终端。
  */
 void MainWindow::connectToolbarSignals()
 {
@@ -231,7 +240,18 @@ void MainWindow::connectToolbarSignals()
                 }
                 m_terminalController->updateStatusBar();
             });
+}
 
+/**
+ * @brief 搜索栏、协议桥、帧编辑器和导航树信号连接
+ *
+ * 包含: TerminalSearchBar → TerminalController 搜索处理，
+ *       ProtocolBridgeManager → ProtocolView/ChartModel 协议数据分发，
+ *       FrameVisualEditor → FrameParser 帧定义更新，
+ *       导航树点击 → 面板切换。
+ */
+void MainWindow::connectSearchAndProtocolSignals()
+{
     // 搜索栏 → TerminalController 搜索处理
     connect(m_panelManager->searchBar(), &TerminalSearchBar::searchRequested,
             m_terminalController, &TerminalController::onSearchRequested);

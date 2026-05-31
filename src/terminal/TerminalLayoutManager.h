@@ -9,6 +9,7 @@
 class TerminalWidget;
 class TerminalModel;
 class TerminalSearchBar;
+class QBoxLayout;
 
 // 终端布局管理器 - 管理终端的显示布局模式
 // 封装了混合/左右分栏/上下分栏三种布局的切换逻辑
@@ -57,6 +58,8 @@ private:
 
     // 应用当前布局: 重建容器内的widget层次
     void applyLayout();
+    void applyMixedLayout(QBoxLayout* containerLayout);  ///< 应用混合布局(单终端)
+    void applySplitLayout(QBoxLayout* containerLayout);   ///< 应用分栏布局(RX/TX双终端)
 
     // 将当前主终端的显示设置同步到分栏终端
     void syncDisplaySettings(TerminalWidget* target) const;

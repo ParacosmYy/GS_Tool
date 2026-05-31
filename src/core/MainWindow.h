@@ -79,13 +79,18 @@ private:
     /** @brief 构建完整的 UI 布局（背景层→分割器→导航树→面板栈→发送栏） */
     void setupUI();
 
+    QWidget* createNavigationArea();  ///< 创建左侧导航树区域(导航树+选中滑动指示器)
+    QWidget* createContentArea();     ///< 创建右侧面板内容区域(面板栈+终端+快捷指令+发送栏)
+
     /** @brief 创建并初始化状态栏（连接状态、RX/TX 字节数） */
     void setupStatusBar();
 
-    void connectSignals();             ///< 连接所有模块间信号/槽
-    void connectSerialSignals();       ///< 串口连接/断开信号路由
-    void connectToolbarSignals();      ///< 工具栏/录制/搜索/协议/导航信号
-    void connectPortWatchSignals();    ///< 热插拔状态栏通知
+    void connectSignals();                 ///< 连接所有模块间信号/槽
+    void connectSerialSignals();           ///< 串口连接/断开/重连信号路由
+    void connectSerialSendSignals();       ///< 快捷指令/发送控制器信号路由
+    void connectToolbarSignals();          ///< 工具栏/录制状态消息信号路由
+    void connectSearchAndProtocolSignals();///< 搜索/协议桥/帧编辑/导航信号路由
+    void connectPortWatchSignals();        ///< 热插拔状态栏通知
     void connectThemeSignals();        ///< 主题切换 + Toast通知
     void connectOtaSignals();          ///< OTA传输Toast通知
     void connectBookmarkSignals();     ///< 书签面板信号路由

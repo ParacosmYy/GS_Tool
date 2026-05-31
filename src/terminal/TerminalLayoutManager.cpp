@@ -141,63 +141,74 @@ void TerminalLayoutManager::applyLayout()
     }
 
     if (m_layout == TerminalLayout::Mixed) {
-        // ---- 混合模式: 显示主终端（包含TX和RX所有数据） ----
-        // 销毁分栏终端（如果存在）
-        if (m_rxTerminal) {
-            m_rxTerminal->deleteLater();
-            m_rxTerminal = nullptr;
-        }
-        if (m_txTerminal) {
-            m_txTerminal->deleteLater();
-            m_txTerminal = nullptr;
-        }
-
-        // 恢复主终端的无过滤状态
-        if (m_mainTerminal) {
-            m_mainTerminal->clearDirectionFilter();
-            m_mainTerminal->setParent(m_container);
-            containerLayout->addWidget(m_mainTerminal, 1);
-            m_mainTerminal->show();
-        }
+        applyMixedLayout(containerLayout);
     } else {
-        // ---- 分栏模式: 创建RX/TX两个终端，用QSplitter分割 ----
-        Qt::Orientation orient = (m_layout == TerminalLayout::SplitHorizontal)
-            ? Qt::Horizontal : Qt::Vertical;
-
-        // 隐藏主终端（分栏模式下不使用主终端显示数据，但仍保留其模型连接）
-        if (m_mainTerminal) {
-            m_mainTerminal->hide();
-            m_mainTerminal->setParent(nullptr);
-        }
-
-        // 创建分割器
-        m_splitter = new QSplitter(orient, m_container);
-        m_splitter->setObjectName("terminalSplitter");
-        m_splitter->setChildrenCollapsible(false);  // 不允许完全折叠子面板
-
-        // 创建/重建分栏终端
-        if (m_rxTerminal) {
-            m_rxTerminal->deleteLater();
-        }
-        if (m_txTerminal) {
-            m_txTerminal->deleteLater();
-        }
-
-        // RX终端: 左侧(左右分栏) 或 上方(上下分栏)
-        m_rxTerminal = createSplitTerminal(DataDirection::Rx,
-            tr("RX (接收)"));
-        m_splitter->addWidget(m_rxTerminal);
-
-        // TX终端: 右侧(左右分栏) 或 下方(上下分栏)
-        m_txTerminal = createSplitTerminal(DataDirection::Tx,
-            tr("TX (发送)"));
-        m_splitter->addWidget(m_txTerminal);
-
-        // 均分分割器空间
-        m_splitter->setSizes({1, 1});
-
-        containerLayout->addWidget(m_splitter, 1);
+        applySplitLayout(containerLayout);
     }
+}
+
+/** @brief 应用混合布局: 显示主终端（包含TX和RX所有数据） */
+void TerminalLayoutManager::applyMixedLayout(QBoxLayout* containerLayout)
+{
+    // 销毁分栏终端（如果存在）
+    if (m_rxTerminal) {
+        m_rxTerminal->deleteLater();
+        m_rxTerminal = nullptr;
+    }
+    if (m_txTerminal) {
+        m_txTerminal->deleteLater();
+        m_txTerminal = nullptr;
+    }
+
+    // 恢复主终端的无过滤状态
+    if (m_mainTerminal) {
+        m_mainTerminal->clearDirectionFilter();
+        m_mainTerminal->setParent(m_container);
+        containerLayout->addWidget(m_mainTerminal, 1);
+        m_mainTerminal->show();
+    }
+}
+
+/** @brief 应用分栏布局: 创建RX/TX两个终端，用QSplitter分割 */
+void TerminalLayoutManager::applySplitLayout(QBoxLayout* containerLayout)
+{
+    // ---- 分栏模式: 创建RX/TX两个终端，用QSplitter分割 ----
+    Qt::Orientation orient = (m_layout == TerminalLayout::SplitHorizontal)
+        ? Qt::Horizontal : Qt::Vertical;
+
+    // 隐藏主终端（分栏模式下不使用主终端显示数据，但仍保留其模型连接）
+    if (m_mainTerminal) {
+        m_mainTerminal->hide();
+        m_mainTerminal->setParent(nullptr);
+    }
+
+    // 创建分割器
+    m_splitter = new QSplitter(orient, m_container);
+    m_splitter->setObjectName("terminalSplitter");
+    m_splitter->setChildrenCollapsible(false);  // 不允许完全折叠子面板
+
+    // 创建/重建分栏终端
+    if (m_rxTerminal) {
+        m_rxTerminal->deleteLater();
+    }
+    if (m_txTerminal) {
+        m_txTerminal->deleteLater();
+    }
+
+    // RX终端: 左侧(左右分栏) 或 上方(上下分栏)
+    m_rxTerminal = createSplitTerminal(DataDirection::Rx,
+        tr("RX (接收)"));
+    m_splitter->addWidget(m_rxTerminal);
+
+    // TX终端: 右侧(左右分栏) 或 下方(上下分栏)
+    m_txTerminal = createSplitTerminal(DataDirection::Tx,
+        tr("TX (发送)"));
+    m_splitter->addWidget(m_txTerminal);
+
+    // 均分分割器空间
+    m_splitter->setSizes({1, 1});
+
+    containerLayout->addWidget(m_splitter, 1);
 }
 
 TerminalWidget* TerminalLayoutManager::createSplitTerminal(DataDirection direction, const QString& label)

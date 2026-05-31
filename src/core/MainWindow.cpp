@@ -162,6 +162,22 @@ void MainWindow::setupUI()
     m_mainSplitter = new QSplitter(Qt::Horizontal, m_backgroundWidget);
     m_mainSplitter->setObjectName("mainSplitter");  // QSS 选择器需要
 
+    m_mainSplitter->addWidget(createNavigationArea());
+    m_mainSplitter->addWidget(createContentArea());
+    m_mainSplitter->setSizes({200, 1000});
+    m_mainSplitter->setStretchFactor(0, 0);
+    m_mainSplitter->setStretchFactor(1, 1);
+
+    bgLayout->addWidget(m_mainSplitter, 1);
+
+    // Ctrl+F 快捷键激活搜索栏
+    auto* searchShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
+    connect(searchShortcut, &QShortcut::activated, m_panelManager->searchBar(), &TerminalSearchBar::activate);
+}
+
+/** @brief 创建左侧导航树区域(导航树+选中滑动指示器) */
+QWidget* MainWindow::createNavigationArea()
+{
     // ---- 左侧导航树（数据模型由 NavigationController.buildNavTree() 构建） ----
     m_navTree = new QTreeView;
     m_navTree->setObjectName("navTree");
@@ -170,11 +186,15 @@ void MainWindow::setupUI()
     m_navTree->setMaximumWidth(280);
     m_navTree->setIndentation(16);
 
-    m_mainSplitter->addWidget(m_navTree);
-
     // 导航树选中滑动指示器（覆盖在 navTree 上方，透明背景，accent 色竖线动画）
     m_navIndicator = new NavIndicatorWidget(m_navTree);
 
+    return m_navTree;
+}
+
+/** @brief 创建右侧面板内容区域(面板栈+终端+快捷指令+发送栏) */
+QWidget* MainWindow::createContentArea()
+{
     // ---- 右侧内容面板 ----
     auto* rightWidget = new QWidget;
     rightWidget->setObjectName("rightWidget");
@@ -225,17 +245,7 @@ void MainWindow::setupUI()
     serialLayout->addWidget(sendBar);
 
     rightPanelLayout->addWidget(serialPanel);
-
-    m_mainSplitter->addWidget(rightWidget);
-    m_mainSplitter->setSizes({200, 1000});
-    m_mainSplitter->setStretchFactor(0, 0);
-    m_mainSplitter->setStretchFactor(1, 1);
-
-    bgLayout->addWidget(m_mainSplitter, 1);
-
-    // Ctrl+F 快捷键激活搜索栏
-    auto* searchShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
-    connect(searchShortcut, &QShortcut::activated, m_panelManager->searchBar(), &TerminalSearchBar::activate);
+    return rightWidget;
 }
 
 /**

@@ -143,6 +143,36 @@ void QuickCommandBar::onEditRequested()
 {
     // ---- 指令编辑对话框 ----
     QDialog dlg(window());
+    QTableWidget* table = nullptr;
+    QDialogButtonBox* buttons = nullptr;
+    createEditDialog(dlg, table, buttons);
+
+    // 用户确认后，从表格读回数据到指令列表
+    if (dlg.exec() == QDialog::Accepted) {
+        QList<QuickCommand> newCmds;
+        for (int i = 0; i < table->rowCount(); ++i) {
+            QuickCommand cmd;
+            auto* nameItem = table->item(i, 0);
+            auto* dataItem = table->item(i, 1);
+            auto* hexItem  = table->item(i, 2);
+            cmd.name  = nameItem ? nameItem->text() : QString();
+            cmd.data  = dataItem ? dataItem->text() : QString();
+            cmd.isHex = hexItem ? (hexItem->checkState() == Qt::Checked) : false;
+            // 跳过完全空的行
+            if (!cmd.name.isEmpty() || !cmd.data.isEmpty()) {
+                newCmds.append(cmd);
+            }
+        }
+        setCommands(newCmds);
+    }
+
+    // 同时发射editRequested信号，允许外部监听者做额外处理
+    emit editRequested();
+}
+
+/** @brief 创建编辑对话框UI(表格+按钮行+信号连接) */
+void QuickCommandBar::createEditDialog(QDialog& dlg, QTableWidget*& table, QDialogButtonBox*& buttons)
+{
     dlg.setWindowTitle(tr("编辑快捷指令"));
     dlg.setMinimumSize(480, 320);
     dlg.setObjectName("quickCmdEditDlg");
@@ -150,7 +180,7 @@ void QuickCommandBar::onEditRequested()
     auto* layout = new QVBoxLayout(&dlg);
 
     // 表格: 3列 — 名称、数据、HEX开关
-    auto* table = new QTableWidget(m_commands.size(), 3, &dlg);
+    table = new QTableWidget(m_commands.size(), 3, &dlg);
     table->setObjectName("quickCmdEditTable");
     table->setHorizontalHeaderLabels({tr("名称"), tr("数据"), tr("HEX")});
     table->horizontalHeader()->setStretchLastSection(false);
@@ -178,7 +208,7 @@ void QuickCommandBar::onEditRequested()
     addRowBtn->setObjectName("quickCmdAddRowBtn");
     auto* delRowBtn = new QPushButton(tr("删除行"), &dlg);
     delRowBtn->setObjectName("quickCmdDelRowBtn");
-    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+    buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
     buttons->setObjectName("quickCmdDlgButtons");  // QSS 选择器需要
 
     btnLayout->addWidget(addRowBtn);
@@ -211,28 +241,6 @@ void QuickCommandBar::onEditRequested()
     // 确定/取消
     connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
-
-    // 用户确认后，从表格读回数据到指令列表
-    if (dlg.exec() == QDialog::Accepted) {
-        QList<QuickCommand> newCmds;
-        for (int i = 0; i < table->rowCount(); ++i) {
-            QuickCommand cmd;
-            auto* nameItem = table->item(i, 0);
-            auto* dataItem = table->item(i, 1);
-            auto* hexItem  = table->item(i, 2);
-            cmd.name  = nameItem ? nameItem->text() : QString();
-            cmd.data  = dataItem ? dataItem->text() : QString();
-            cmd.isHex = hexItem ? (hexItem->checkState() == Qt::Checked) : false;
-            // 跳过完全空的行
-            if (!cmd.name.isEmpty() || !cmd.data.isEmpty()) {
-                newCmds.append(cmd);
-            }
-        }
-        setCommands(newCmds);
-    }
-
-    // 同时发射editRequested信号，允许外部监听者做额外处理
-    emit editRequested();
 }
 
 /**

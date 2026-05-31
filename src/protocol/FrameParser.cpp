@@ -307,23 +307,7 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
         }
 
         if (expectedTotal > 0 && m_buffer.size() >= expectedTotal) {
-            if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
-                if (verifyChecksum(m_buffer)) {
-                    if (!m_def.footer.isEmpty()) {
-                        m_state = State::FooterMatching;
-                    } else {
-                        completeFrame();
-                    }
-                } else {
-                    m_errorCount++;
-                    emit frameError(tr("Checksum mismatch"), m_buffer);
-                    resetIntermediateState();
-                }
-            } else if (!m_def.footer.isEmpty()) {
-                m_state = State::FooterMatching;
-            } else {
-                completeFrame();
-            }
+            processCompletePayload();
         }
         return;
     }
@@ -424,5 +408,27 @@ void FrameParser::handleFooterMatching(unsigned char byte)
         m_errorCount++;
         emit frameError(tr("Footer mismatch"), m_buffer);
         resetIntermediateState();
+    }
+}
+
+/** @brief 处理完整载荷: 校验→帧尾→完成 */
+void FrameParser::processCompletePayload()
+{
+    if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
+        if (verifyChecksum(m_buffer)) {
+            if (!m_def.footer.isEmpty()) {
+                m_state = State::FooterMatching;
+            } else {
+                completeFrame();
+            }
+        } else {
+            m_errorCount++;
+            emit frameError(tr("Checksum mismatch"), m_buffer);
+            resetIntermediateState();
+        }
+    } else if (!m_def.footer.isEmpty()) {
+        m_state = State::FooterMatching;
+    } else {
+        completeFrame();
     }
 }
