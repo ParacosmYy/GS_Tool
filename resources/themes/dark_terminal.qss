@@ -132,6 +132,12 @@ QLineEdit:focus {
     border: 1px solid #89b4fa;
 }
 
+QLineEdit:disabled {
+    background-color: #313244;
+    color: #6c7086;
+    border-color: #313244;
+}
+
 QPushButton {
     background-color: #313244;
     color: #cdd6f4;
@@ -295,6 +301,10 @@ QComboBox QAbstractItemView {
     background-color: #1e1e2e;
     color: #cdd6f4;
     selection-background-color: #313244;
+    selection-color: #89b4fa;
+    outline: none;
+    border: 1px solid #45475a;
+    border-radius: 4px;
 }
 
 /* SpinBox */
@@ -528,6 +538,11 @@ QComboBox#sendModeCombo, QComboBox#newlineCombo {
 QComboBox#sendModeCombo:hover, QComboBox#newlineCombo:hover {
     border-color: #89b4fa;
 }
+QComboBox#sendModeCombo:disabled, QComboBox#newlineCombo:disabled {
+    background-color: #313244;
+    color: #6c7086;
+    border-color: #313244;
+}
 QComboBox#sendModeCombo::drop-down, QComboBox#newlineCombo::drop-down {
     border: none;
     width: 20px;
@@ -543,6 +558,7 @@ QComboBox#displayModeCombo {
     font-size: 12px;
 }
 QComboBox#displayModeCombo:hover { border-color: #89b4fa; }
+QComboBox#displayModeCombo:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }
 
 /* === 连接状态标签 === */
 QLabel#connStatus { font-size: 12px; }
@@ -969,6 +985,7 @@ QComboBox#chartWindowCombo {
 }
 QComboBox#chartWindowCombo:hover { border-color: #89b4fa; }
 QComboBox#chartWindowCombo::drop-down { border: none; width: 20px; }
+QComboBox#chartWindowCombo:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }
 
 /* 状态标签 */
 QLabel#chartStatusLabel {
@@ -1005,6 +1022,7 @@ QPushButton#quickCmdAddRowBtn {
 }
 QPushButton#quickCmdAddRowBtn:hover { background-color: #45475a; border-color: #89b4fa; }
 QPushButton#quickCmdAddRowBtn:pressed { background-color: #585b70; }
+QPushButton#quickCmdAddRowBtn:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }
 
 QPushButton#quickCmdDelRowBtn {
     background-color: #313244;
@@ -1016,3 +1034,4 @@ QPushButton#quickCmdDelRowBtn {
 }
 QPushButton#quickCmdDelRowBtn:hover { background-color: #45475a; border-color: #f38ba8; }
 QPushButton#quickCmdDelRowBtn:pressed { background-color: #585b70; }
+QPushButton#quickCmdDelRowBtn:disabled { background-color: #313244; color: #6c7086; border-color: #313244; }

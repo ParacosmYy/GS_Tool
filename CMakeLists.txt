@@ -90,6 +90,7 @@ set(SOURCES
 set(HEADERS
     src/core/MainWindow.h
     src/core/ConnectionController.h
+
     src/core/RecordingController.h
     src/core/NavigationController.h
     src/core/SendController.h

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QByteArray>
 #include <QElapsedTimer>
+#include <QTimer>
 #include "protocol/FrameDefinition.h"
 #include "utils/CRC.h"
 
@@ -44,6 +45,7 @@ public:
      * @param parent 父对象（通常为 ProtocolBridgeManager）
      */
     explicit FrameParser(QObject* parent = nullptr);
+    ~FrameParser() override;
 
     /** @brief 设置帧格式定义，设置后自动 reset() */
     void setDefinition(const FrameDefinition& def);
@@ -168,6 +170,12 @@ private:
     /** @brief 帧完成后的通用处理: 提取字段、发射信号、重置状态 */
     void completeFrame();
 
+    /** @brief 停止独立的超时检查定时器 */
+    void stopTimeoutTimer();
+
+    /** @brief 启动独立的超时检查定时器 */
+    void startTimeoutTimer();
+
     // ---- 成员变量 ----
 
     State m_state = State::Idle;            ///< 当前解析状态
@@ -181,6 +189,7 @@ private:
     int m_maxFrameLength = kMaxFrameSize;   ///< 用户可配置的帧长度上限
     int m_frameTimeoutMs = 500;             ///< 帧超时阈值（毫秒），0=禁用
     QElapsedTimer m_frameTimer;             ///< 帧接收计时器（帧头匹配成功后启动）
+    QTimer* m_timeoutCheckTimer = nullptr;  ///< 独立的超时检查定时器(解决数据流中断时不触发的问题)
 
     static constexpr int kMaxFrameSize = 4096; ///< 硬性上限：单帧最大长度保护
 };

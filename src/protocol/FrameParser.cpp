@@ -19,15 +19,28 @@
 /** @brief 构造帧解析器，初始化状态为 Idle */
 FrameParser::FrameParser(QObject* parent)
     : QObject(parent)
+    , m_timeoutCheckTimer(new QTimer(this))
 {
+    // 独立的超时检查定时器: 周期性检查帧接收是否超时
+    // 解决问题: 原来checkTimeout()只在processByte中调用，
+    // 如果数据流中断(串口断开/设备停发)，超时永远不会触发。
+    // 定时器周期设为超时阈值的1/2，确保及时检测到超时
+    m_timeoutCheckTimer->setSingleShot(false);
+    connect(m_timeoutCheckTimer, &QTimer::timeout,
+            this, [this]() { checkTimeout(); });
 }
 
 /**
- * @brief 设置帧格式定义，设置后自动 reset()
+ * @brief 析构帧解析器，确保超时检查定时器停止
  *
- * 如果 FrameDefinition::maxFrameLength() 返回有效正值，
- * 则使用该值作为帧长度上限（不超过 kMaxFrameSize）。
+ * QTimer作为this的子对象会由Qt自动删除，但需显式停止。
  */
+FrameParser::~FrameParser()
+{
+    stopTimeoutTimer();
+}
+
+/** @brief 设置帧格式定义，设置后自动reset()。启动独立超时检查定时器 */
 void FrameParser::setDefinition(const FrameDefinition& def)
 {
     m_def = def;
@@ -37,6 +50,10 @@ void FrameParser::setDefinition(const FrameDefinition& def)
     if (defMaxLen > 0 && defMaxLen <= kMaxFrameSize) {
         m_maxFrameLength = defMaxLen;
     }
+
+    // 设置帧格式后启动独立的超时检查定时器
+    // 周期 = 超时阈值 / 2，确保及时检测到超时
+    startTimeoutTimer();
 }
 
 /** @brief 获取当前帧格式定义 */
@@ -70,6 +87,9 @@ void FrameParser::reset()
     m_headerMatchPos = 0;
     m_expectedPayload = 0;
     m_frameTimer.invalidate();
+    // 注意: reset()不停止m_timeoutCheckTimer，
+    // 因为定时器需要持续运行以检测未来的超时。
+    // 只有析构函数和setFrameTimeout(0)才停止定时器。
 }
 
 quint64 FrameParser::frameCount() const { return m_frameCount; }
@@ -86,10 +106,18 @@ void FrameParser::setMaxFrameLength(int maxLen)
 
 int FrameParser::maxFrameLength() const { return m_maxFrameLength; }
 
-/** @brief 设置状态机超时阈值，0 表示禁用 */
+/** @brief 设置超时阈值，0禁用。设置后重启/停止独立超时检查定时器 */
 void FrameParser::setFrameTimeout(int timeoutMs)
 {
     m_frameTimeoutMs = (timeoutMs < 0) ? 0 : timeoutMs;
+
+    if (m_frameTimeoutMs > 0) {
+        // 重新启动定时器，使用新的周期
+        startTimeoutTimer();
+    } else {
+        // 禁用超时，停止定时器
+        stopTimeoutTimer();
+    }
 }
 
 int FrameParser::frameTimeout() const { return m_frameTimeoutMs; }
@@ -98,12 +126,7 @@ int FrameParser::frameTimeout() const { return m_frameTimeoutMs; }
 // 状态机基础设施
 // ============================================================================
 
-/**
- * @brief 检查状态机是否超时
- * @return true=已超时需要重置，false=未超时或计时未启动
- *
- * 仅在非 Idle 状态下检查。超时后发射 frameError 信号并重置状态机。
- */
+/** @brief 检查是否超时，非Idle状态下检查。超时后发射frameError并reset() */
 bool FrameParser::checkTimeout()
 {
     if (m_frameTimeoutMs <= 0 || !m_frameTimer.isValid() || m_state == State::Idle) {
@@ -116,10 +139,30 @@ bool FrameParser::checkTimeout()
                             .arg(m_buffer.size()).arg(m_frameTimeoutMs),
                         discarded);
         m_errorCount++;
+        stopTimeoutTimer();
         reset();
+        // reset后重新启动定时器，等待下一帧的超时检测
+        startTimeoutTimer();
         return true;
     }
     return false;
+}
+
+/** @brief 停止独立超时检查定时器(析构/超时触发/禁用时调用) */
+void FrameParser::stopTimeoutTimer()
+{
+    if (m_timeoutCheckTimer) {
+        m_timeoutCheckTimer->stop();
+    }
+}
+
+/** @brief 启动独立超时检查定时器，周期=timeout/2(50ms~500ms) */
+void FrameParser::startTimeoutTimer()
+{
+    if (m_timeoutCheckTimer && m_frameTimeoutMs > 0) {
+        int interval = qBound(50, m_frameTimeoutMs / 2, 500);
+        m_timeoutCheckTimer->start(interval);
+    }
 }
 
 /**
@@ -296,10 +339,11 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
 
     // ---- 路径A: 有长度字段 → 精确总长接收 ----
     if (m_def.lengthFieldOffset >= 0) {
+        // 计算到校验字段结束的总长度（不含帧尾）
+        // 帧尾由 FooterMatching 状态单独接收，避免在 PayloadReceiving 中多收字节
         int expectedTotal = m_def.lengthFieldOffset + m_def.lengthFieldSize
-                            + m_expectedPayload + m_def.checksumSize;
-        if (!m_def.footer.isEmpty()) expectedTotal += m_def.footer.size();
-        expectedTotal += m_def.lengthAdjust;
+                            + m_expectedPayload + m_def.checksumSize
+                            + m_def.lengthAdjust;
 
         if (expectedTotal > effectiveMax) {
             emit frameError(QString("Expected total frame length (%1) exceeds max (%2)")
@@ -311,7 +355,20 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
 
         if (expectedTotal > 0 && m_buffer.size() >= expectedTotal) {
             if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
-                m_state = State::ChecksumVerifying;
+                // 校验字段已收齐，转入 ChecksumVerifying
+                // 注意：缓冲区已包含校验字节，ChecksumVerifying 的首个字节是多余的
+                // 需要直接验证而非等待更多字节
+                if (verifyChecksum(m_buffer)) {
+                    if (!m_def.footer.isEmpty()) {
+                        m_state = State::FooterMatching;
+                    } else {
+                        completeFrame();
+                    }
+                } else {
+                    emit frameError("Checksum mismatch", m_buffer);
+                    m_errorCount++;
+                    reset();
+                }
             } else if (!m_def.footer.isEmpty()) {
                 m_state = State::FooterMatching;
             } else {

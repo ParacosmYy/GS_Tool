@@ -19,6 +19,7 @@
 
 #include "MainWindow.h"
 #include "chart/ChartModel.h"
+#include "serial/PortWatcher.h"
 #include <QMessageBox>
 
 /**
@@ -178,5 +179,19 @@ void MainWindow::connectSignals()
         QWidget* target = m_navController->lookupPanel(text);
         if (!target) return;
         m_navController->switchToPanel(target);
+    });
+
+    // ---- 串口热插拔状态栏通知 ----
+    // 检测到新串口设备接入时，在状态栏显示提示信息
+    connect(m_connController, &ConnectionController::portAdded,
+            this, [this](const QString& portName) {
+        statusBar()->showMessage(tr("检测到新端口: %1").arg(portName), 4000);
+    });
+
+    // 端口物理拔出时，除了 ConnectionController 自动断开连接外，
+    // 额外在状态栏显示拔出提示（通过 PortWatcher 的 portRemoved 信号）
+    connect(m_connController->portWatcher(), &PortWatcher::portRemoved,
+            this, [this](const QString& portName) {
+        statusBar()->showMessage(tr("端口已拔出: %1").arg(portName), 4000);
     });
 }

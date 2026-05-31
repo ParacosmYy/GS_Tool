@@ -117,7 +117,7 @@ QToolButton:checked {
 /* 发送区域 */
 QLineEdit {
     background-color: #ffffff;
-    color: #166534;
+    color: #1f2937;
     border: 1px solid #d1d5db;
     border-radius: 4px;
     padding: 6px;
@@ -127,6 +127,12 @@ QLineEdit {
 
 QLineEdit:focus {
     border: 1px solid #3b82f6;
+}
+
+QLineEdit:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
 }
 
 QPushButton {
@@ -289,6 +295,10 @@ QComboBox QAbstractItemView {
     background-color: #ffffff;
     color: #1f2937;
     selection-background-color: #dbeafe;
+    selection-color: #1d4ed8;
+    outline: none;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
 }
 
 /* SpinBox */
@@ -520,6 +530,11 @@ QComboBox#sendModeCombo, QComboBox#newlineCombo {
 QComboBox#sendModeCombo:hover, QComboBox#newlineCombo:hover {
     border-color: #3b82f6;
 }
+QComboBox#sendModeCombo:disabled, QComboBox#newlineCombo:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
 QComboBox#sendModeCombo::drop-down, QComboBox#newlineCombo::drop-down {
     border: none;
     width: 20px;
@@ -535,6 +550,7 @@ QComboBox#displayModeCombo {
     font-size: 12px;
 }
 QComboBox#displayModeCombo:hover { border-color: #3b82f6; }
+QComboBox#displayModeCombo:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
 
 /* === 连接状态标签 === */
 QLabel#connStatus { font-size: 12px; }
@@ -960,6 +976,7 @@ QComboBox#chartWindowCombo {
 }
 QComboBox#chartWindowCombo:hover { border-color: #3b82f6; }
 QComboBox#chartWindowCombo::drop-down { border: none; width: 20px; }
+QComboBox#chartWindowCombo:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
 
 /* 状态标签 */
 QLabel#chartStatusLabel {
@@ -996,6 +1013,7 @@ QPushButton#quickCmdAddRowBtn {
 }
 QPushButton#quickCmdAddRowBtn:hover { background-color: #e5e7eb; border-color: #3b82f6; }
 QPushButton#quickCmdAddRowBtn:pressed { background-color: #d1d5db; }
+QPushButton#quickCmdAddRowBtn:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
 
 QPushButton#quickCmdDelRowBtn {
     background-color: #f3f4f6;
@@ -1007,3 +1025,4 @@ QPushButton#quickCmdDelRowBtn {
 }
 QPushButton#quickCmdDelRowBtn:hover { background-color: #e5e7eb; border-color: #ef4444; }
 QPushButton#quickCmdDelRowBtn:pressed { background-color: #d1d5db; }
+QPushButton#quickCmdDelRowBtn:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }

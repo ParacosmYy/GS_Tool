@@ -1,8 +1,24 @@
+/**
+ * @file ChartWidget.cpp
+ * @brief 实时波形图控件实现
+ *
+ * 实现要点:
+ *   1. 构造时连接 ChartModel 信号 + ThemeManager::themeChanged 信号
+ *   2. 主题切换时通过 ThemeManager::color() 更新图表背景/网格/轴标签/图例
+ *   3. 主题切换时通过 ChartColors::colorsForTheme() 更新数据线颜色
+ *   4. 数据线颜色随主题变化，确保在暗色/亮色背景下均清晰可读
+ */
+
 #include "chart/ChartWidget.h"
 #include "protocol/FrameDefinition.h"
+#include "core/ThemeManager.h"
 
 #include <QtCharts>
 #include <algorithm>
+
+// ============================================================================
+// 构造函数
+// ============================================================================
 
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
@@ -10,14 +26,26 @@ ChartWidget::ChartWidget(QWidget* parent)
 {
     setupUI();
 
-    // 连接 ChartModel 信号到渲染槽
+    // ---- 连接 ChartModel 信号到渲染槽 ----
     connect(m_model, &ChartModel::dataUpdated,
             this, &ChartWidget::updateChart);
     connect(m_model, &ChartModel::channelsChanged,
             this, &ChartWidget::onChannelsChanged);
     connect(m_model, &ChartModel::dataCleared,
             this, &ChartWidget::onDataCleared);
+
+    // ---- 连接 ThemeManager 主题切换信号 ----
+    // 主题切换时更新图表背景、网格、轴标签、图例和数据线颜色
+    connect(&ThemeManager::instance(), &ThemeManager::themeChanged,
+            this, &ChartWidget::onThemeChanged);
+
+    // 初始应用当前主题颜色
+    applyThemeColors();
 }
+
+// ============================================================================
+// UI 初始化
+// ============================================================================
 
 void ChartWidget::setupUI()
 {
@@ -25,7 +53,7 @@ void ChartWidget::setupUI()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    // 顶部控制栏
+    // ---- 顶部控制栏 ----
     auto* toolbar = new QWidget;
     toolbar->setObjectName("chartToolbar");
     auto* toolLayout = new QHBoxLayout(toolbar);
@@ -58,7 +86,7 @@ void ChartWidget::setupUI()
     toolLayout->addWidget(m_statusLabel);
     layout->addWidget(toolbar);
 
-    // 图表
+    // ---- 图表区域 ----
     m_chart = new QChart;
     m_chart->legend()->setVisible(true);
     m_chart->legend()->setAlignment(Qt::AlignBottom);
@@ -81,7 +109,7 @@ void ChartWidget::setupUI()
     m_chartView->setRenderHint(QPainter::Antialiasing);
     layout->addWidget(m_chartView, 1);
 
-    // 信号连接
+    // ---- 控制栏信号连接 ----
     connect(m_pauseBtn, &QPushButton::toggled, this, &ChartWidget::onPauseToggled);
     connect(m_clearBtn, &QPushButton::clicked, this, &ChartWidget::onClearClicked);
     connect(m_windowSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -107,7 +135,7 @@ void ChartWidget::configureFromFrameDefinition(const FrameDefinition& def)
     // 从帧定义的字段列表自动生成通道配置
     m_configSet = ChannelConfigSet::generateDefaults(def.fields);
 
-    // 应用到ChartModel（会触发 channelsChanged 信号 → 重建渲染层）
+    // 应用到ChartModel（会触发 channelsChanged 信号 -> 重建渲染层）
     m_model->setChannelConfigSet(m_configSet);
 }
 
@@ -194,11 +222,19 @@ void ChartWidget::onChannelsChanged()
     }
     m_seriesMap.clear();
 
+    // 获取当前主题对应的调色板
+    bool isDark = ThemeManager::instance().isSystemDarkMode()
+        || ThemeManager::instance().currentTheme().contains("dark");
+    const QVector<QColor>& palette = ChartColors::colorsForTheme(isDark);
+
     // 根据新的通道配置创建series
     const QVector<ChannelConfig>& channels = m_configSet.channels();
     for (const ChannelConfig& cfg : channels) {
         if (cfg.enabled) {
-            createSeries(cfg.displayName, cfg.color);
+            // 如果通道配置有自定义颜色则使用，否则从主题调色板获取
+            QColor chColor = cfg.color.isValid() ? cfg.color :
+                palette[m_seriesMap.size() % palette.size()];
+            createSeries(cfg.displayName, chColor);
         }
     }
 
@@ -231,6 +267,93 @@ void ChartWidget::onClearClicked()
 }
 
 // ============================================================================
+// 主题切换 -- 响应 ThemeManager::themeChanged 信号
+// ============================================================================
+
+/**
+ * @brief 主题切换时重绘所有图表视觉元素
+ *
+ * 调用 applyThemeColors() 更新:
+ *   - 图表背景色 (ThemeManager::BgPrimary)
+ *   - 网格线颜色 (ThemeManager::Border)
+ *   - 坐标轴标签颜色 (ThemeManager::TextSecondary)
+ *   - 图例文字颜色 (ThemeManager::TextSecondary)
+ *   - 所有数据线颜色 (ChartColors::colorsForTheme)
+ */
+void ChartWidget::onThemeChanged()
+{
+    applyThemeColors();
+}
+
+/**
+ * @brief 应用当前主题颜色到图表所有视觉元素
+ *
+ * 从 ThemeManager 获取语义色值并应用到:
+ *   1. QChart 背景画刷 (BgPrimary)
+ *   2. QChart 绘图区域背景 (BgPrimary)
+ *   3. X/Y 坐标轴网格线颜色 (Border)
+ *   4. X/Y 坐标轴刻度标签颜色 (TextSecondary)
+ *   5. X/Y 坐标轴标题颜色 (TextSecondary)
+ *   6. 图例标签颜色 (TextSecondary)
+ *   7. 所有 QLineSeries 数据线颜色 (ChartColors 主题调色板)
+ *
+ * 数据线颜色更新策略:
+ *   - 主题切换时，所有数据线按通道索引从新调色板中重新分配颜色
+ *   - 这确保在暗色/亮色背景下线条都有足够对比度
+ */
+void ChartWidget::applyThemeColors()
+{
+    auto& theme = ThemeManager::instance();
+
+    // 判断当前是否为暗色主题（根据主题名称判断）
+    QString themeName = theme.currentTheme();
+    bool isDark = themeName.contains("dark");
+
+    // ---- 1. 图表背景色 ----
+    QColor bgColor = theme.color(ThemeManager::SemanticColor::BgPrimary);
+    m_chart->setBackgroundBrush(QBrush(bgColor));
+    m_chart->setPlotAreaBackgroundBrush(QBrush(bgColor));
+    m_chart->setPlotAreaBackgroundVisible(true);
+
+    // ---- 2. 网格线颜色 ----
+    QColor gridColor = theme.color(ThemeManager::SemanticColor::Border);
+
+    // X轴网格线和标签颜色
+    m_xAxis->setGridLineColor(gridColor);
+    m_xAxis->setLinePen(QPen(gridColor, 1));
+
+    // Y轴网格线和标签颜色
+    m_yAxis->setGridLineColor(gridColor);
+    m_yAxis->setLinePen(QPen(gridColor, 1));
+
+    // ---- 3. 坐标轴标签颜色 ----
+    QColor labelColor = theme.color(ThemeManager::SemanticColor::TextSecondary);
+
+    // X轴标签和标题
+    QBrush labelBrush(labelColor);
+    m_xAxis->setLabelsBrush(labelBrush);
+    m_xAxis->setTitleBrush(labelColor);
+
+    // Y轴标签和标题
+    m_yAxis->setLabelsBrush(labelBrush);
+    m_yAxis->setTitleBrush(labelColor);
+
+    // ---- 4. 图例文字颜色 ----
+    if (m_chart->legend()) {
+        m_chart->legend()->setLabelColor(labelColor);
+    }
+
+    // ---- 5. 数据线颜色 ----
+    // 从当前主题对应的调色板中按通道索引重新分配颜色
+    const QVector<QColor>& palette = ChartColors::colorsForTheme(isDark);
+    int index = 0;
+    for (auto it = m_seriesMap.begin(); it != m_seriesMap.end(); ++it, ++index) {
+        QColor lineColor = palette[index % palette.size()];
+        it.value()->setColor(lineColor);
+    }
+}
+
+// ============================================================================
 // 内部方法 -- Series管理
 // ============================================================================
 
@@ -238,8 +361,13 @@ void ChartWidget::createSeries(const QString& name, const QColor& color)
 {
     if (m_seriesMap.contains(name)) return;
 
-    QColor chColor = color.isValid() ? color :
-        ChartColors::defaultColors()[m_seriesMap.size() % ChartColors::defaultColors().size()];
+    // 如果没有提供有效颜色，从当前主题调色板中按索引选取
+    QColor chColor = color;
+    if (!chColor.isValid()) {
+        bool isDark = ThemeManager::instance().currentTheme().contains("dark");
+        const QVector<QColor>& palette = ChartColors::colorsForTheme(isDark);
+        chColor = palette[m_seriesMap.size() % palette.size()];
+    }
 
     auto* series = new QLineSeries;
     series->setName(name);

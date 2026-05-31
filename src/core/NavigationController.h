@@ -110,6 +110,26 @@ public:
      */
     const QVector<NavPanelMapping>& mappings() const { return m_navPanelMappings; }
 
+    /**
+     * @brief 获取当前面板在映射表中的索引
+     *
+     * 遍历映射表找到 m_currentPanel 对应的索引，用于持久化保存上次活跃面板。
+     *
+     * @return 面板索引（0~N-1），未找到或无当前面板时返回 -1
+     */
+    int currentPanelIndex() const;
+
+    /**
+     * @brief 通过索引恢复面板显示（启动时使用，不触发动画）
+     *
+     * 根据保存的面板索引找到对应的 widget，隐藏所有其他面板，
+     * 直接显示目标面板（无淡入淡出动画），并更新 m_currentPanel。
+     *
+     * @param index 面板索引（由 currentPanelIndex() 返回的值）
+     * @return true 恢复成功，false 索引越界或面板为空
+     */
+    bool restorePanelByIndex(int index);
+
 signals:
     /**
      * @brief 面板切换完成信号

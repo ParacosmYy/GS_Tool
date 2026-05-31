@@ -27,6 +27,7 @@
 #include "core/PanelManager.h"
 #include "core/BackgroundWidget.h"
 #include "core/BackgroundSettingsPopup.h"
+#include "core/SessionManager.h"
 #include "utils/SettingsManager.h"
 #include "terminal/TerminalSearchBar.h"
 #include "terminal/TerminalLayoutManager.h"
@@ -191,6 +192,11 @@ private:
 
     /** @brief 背景设置弹出面板，浮动在工具栏下方，提供模糊半径/透明度/涟漪开关调节 */
     BackgroundSettingsPopup* m_bgSettingsPopup;
+
+    // ==================== 会话管理 ====================
+
+    /** @brief 会话管理器，统一协调窗口几何/串口配置/主题/面板索引的保存与恢复 */
+    SessionManager* m_sessionManager;
 };
 
 #endif // MAINWINDOW_H

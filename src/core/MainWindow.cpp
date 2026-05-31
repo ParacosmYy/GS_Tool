@@ -93,8 +93,32 @@ MainWindow::MainWindow(QWidget* parent)
     m_settingsController->setToolbarController(m_toolbarController);
     m_settingsController->setSerialConfigPanel(m_panelManager->serialConfig());
 
-    // 从磁盘加载上次保存的设置（主题、窗口几何、串口配置、语言）
-    m_settingsController->loadSettings();
+    // 创建会话管理器，注入依赖引用
+    m_sessionManager = new SessionManager(this, this);
+    m_sessionManager->setSettingsController(m_settingsController);
+    m_sessionManager->setSerialConfigPanel(m_panelManager->serialConfig());
+
+    // 从磁盘恢复上次保存的完整工作区（窗口几何、串口配置、面板索引）
+    int lastPanel = m_sessionManager->loadSession();
+
+    // 恢复语言选择到工具栏下拉框
+    if (m_toolbarController) {
+        QString savedLang = SettingsManager::instance().loadLanguage();
+        m_toolbarController->setCurrentLanguage(savedLang);
+    }
+
+    // 恢复主题: 加载主题文件 + 同步工具栏下拉框选中项
+    QString savedTheme = SettingsManager::instance().loadTheme();
+    if (ThemeManager::instance().loadTheme(savedTheme)) {
+        if (m_toolbarController) {
+            m_toolbarController->setCurrentTheme(savedTheme);
+        }
+    }
+
+    // 恢复上次活跃面板（如果有保存记录）
+    if (lastPanel >= 0) {
+        m_navController->restorePanelByIndex(lastPanel);
+    }
 
     // 启动统计刷新定时器（每 500ms 触发一次）
     m_terminalController->startStatsTimer();
@@ -314,8 +338,16 @@ void MainWindow::closeEvent(QCloseEvent* event)
     // 停止统计刷新定时器
     m_terminalController->stopStatsTimer();
 
-    // 保存当前设置到磁盘（窗口几何、主题、串口配置）
-    m_settingsController->saveSettings();
+    // 保存当前面板索引（供下次恢复使用）
+    if (m_navController) {
+        int currentIdx = m_navController->currentPanelIndex();
+        if (currentIdx >= 0) {
+            m_settingsController->saveLastPanel(currentIdx);
+        }
+    }
+
+    // 通过会话管理器保存完整工作区到磁盘（窗口几何、串口配置、主题）
+    m_sessionManager->saveSession();
 
     // 关闭所有活跃连接
     auto connections = m_connManager->connections();

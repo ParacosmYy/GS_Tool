@@ -207,24 +207,11 @@ void SettingsManager::removeGroup(const QString& group)
  */
 bool SettingsManager::containsGroup(const QString& group) const
 {
-    // QSettings 的 beginGroup/endGroup 是非 const 方法，需要 const_cast
-    // 仅做读取操作，不会修改 m_settings 的实际内容
-    QSettings& settings = const_cast<QSettings&>(m_settings);
-
-    // 保存当前分组状态
-    QString originalGroup = settings.group();
-
-    settings.beginGroup(group);
-    bool hasKeys = !settings.childKeys().isEmpty();
-    bool hasChildGroups = !settings.childGroups().isEmpty();
-    settings.endGroup();
-
-    // 恢复原始分组状态
-    // 如果原来就在某个分组中，需要重新进入
-    if (!originalGroup.isEmpty()) {
-        settings.beginGroup(originalGroup);
-    }
-
+    // 使用独立的QSettings实例查询，避免干扰m_settings的分组状态
+    QSettings temp(m_settings.fileName(), m_settings.format());
+    temp.beginGroup(group);
+    bool hasKeys = !temp.childKeys().isEmpty();
+    bool hasChildGroups = !temp.childGroups().isEmpty();
     return hasKeys || hasChildGroups;
 }
 
@@ -239,26 +226,12 @@ bool SettingsManager::containsGroup(const QString& group) const
  */
 QStringList SettingsManager::groupKeys(const QString& group) const
 {
-    QSettings& settings = const_cast<QSettings&>(m_settings);
-
-    // 保存当前分组状态
-    QString originalGroup = settings.group();
-
-    // 如果指定了分组，进入该分组
+    // 使用独立的QSettings实例查询，避免干扰m_settings的分组状态
+    QSettings temp(m_settings.fileName(), m_settings.format());
     if (!group.isEmpty()) {
-        settings.beginGroup(group);
+        temp.beginGroup(group);
     }
-
-    QStringList keys = settings.childKeys();
-
-    // 恢复原始分组状态
-    if (!group.isEmpty()) {
-        settings.endGroup();
-    }
-    if (!originalGroup.isEmpty()) {
-        settings.beginGroup(originalGroup);
-    }
-
+    QStringList keys = temp.childKeys();
     return keys;
 }
 
@@ -273,26 +246,12 @@ QStringList SettingsManager::groupKeys(const QString& group) const
  */
 QStringList SettingsManager::childGroups(const QString& group) const
 {
-    QSettings& settings = const_cast<QSettings&>(m_settings);
-
-    // 保存当前分组状态
-    QString originalGroup = settings.group();
-
-    // 如果指定了分组，进入该分组
+    // 使用独立的QSettings实例查询，避免干扰m_settings的分组状态
+    QSettings temp(m_settings.fileName(), m_settings.format());
     if (!group.isEmpty()) {
-        settings.beginGroup(group);
+        temp.beginGroup(group);
     }
-
-    QStringList groups = settings.childGroups();
-
-    // 恢复原始分组状态
-    if (!group.isEmpty()) {
-        settings.endGroup();
-    }
-    if (!originalGroup.isEmpty()) {
-        settings.beginGroup(originalGroup);
-    }
-
+    QStringList groups = temp.childGroups();
     return groups;
 }
 

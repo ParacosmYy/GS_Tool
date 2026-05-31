@@ -142,6 +142,60 @@ QVector<QWidget*> NavigationController::allSwitchablePanels() const
 }
 
 /**
+ * @brief 获取当前面板在映射表中的索引
+ *
+ * 遍历映射表查找 m_currentPanel 对应的位置，
+ * 用于在关闭窗口时保存用户上次查看的面板。
+ *
+ * @return 面板索引（0~N-1），未找到时返回 -1
+ */
+int NavigationController::currentPanelIndex() const
+{
+    if (!m_currentPanel) return -1;
+
+    for (int i = 0; i < m_navPanelMappings.size(); ++i) {
+        if (m_navPanelMappings[i].widget == m_currentPanel) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/**
+ * @brief 通过索引恢复面板显示（启动时使用，不触发动画）
+ *
+ * 与 switchToPanel() 不同，此方法:
+ *   - 不执行淡入淡出动画（启动时不需要过渡效果）
+ *   - 直接隐藏所有面板后显示目标面板
+ *   - 更新 m_currentPanel 为目标面板
+ *
+ * @param index 面板索引
+ * @return true 恢复成功，false 索引越界或面板为空
+ */
+bool NavigationController::restorePanelByIndex(int index)
+{
+    if (index < 0 || index >= m_navPanelMappings.size()) {
+        return false;
+    }
+
+    QWidget* target = m_navPanelMappings[index].widget;
+    if (!target) return false;
+
+    // 隐藏所有面板
+    for (auto* w : allSwitchablePanels()) {
+        if (w && w != target) {
+            w->setVisible(false);
+        }
+    }
+
+    // 直接显示目标面板（无动画）
+    target->setVisible(true);
+    m_currentPanel = target;
+
+    return true;
+}
+
+/**
  * @brief 设置当前面板（初始化用，不触发动画）
  * @param panel 当前应显示的面板 widget
  */
