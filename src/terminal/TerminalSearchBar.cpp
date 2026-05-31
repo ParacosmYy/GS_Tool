@@ -39,8 +39,8 @@ void TerminalSearchBar::setupUI()
 
     // --- 搜索输入框 ---
     m_searchInput = new QLineEdit(this);
-    m_searchInput->setPlaceholderText(QStringLiteral("搜索..."));
-    m_searchInput->setMinimumWidth(200);
+    m_searchInput->setPlaceholderText(tr("搜索... (支持正则表达式)"));
+    m_searchInput->setMinimumWidth(240);
     m_searchInput->setClearButtonEnabled(true);
     // 暗色主题样式表
     m_searchInput->setStyleSheet(
