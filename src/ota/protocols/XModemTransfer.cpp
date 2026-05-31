@@ -72,23 +72,29 @@ void XModemTransfer::handleTimeout()
 
 void XModemTransfer::processReceivedData()
 {
-    while (!m_receiveBuffer.isEmpty()) {
-        char ch = m_receiveBuffer.at(0);
-        m_receiveBuffer.remove(0, 1);
+    int readIdx = 0;
+    const int len = m_receiveBuffer.size();
 
-        if (m_cancelled) return;
+    while (readIdx < len) {
+        char ch = m_receiveBuffer.at(readIdx);
+        readIdx++;
+
+        if (m_cancelled) {
+            m_receiveBuffer.remove(0, readIdx);
+            return;
+        }
 
         switch (m_xmodemState) {
         case State::Idle:
         case State::Done:
         case State::Error:
+            m_receiveBuffer.remove(0, readIdx);
             return;
 
         case State::WaitingForStart:
             if (ch == NAK) {
                 // 接收方请求Checksum模式
                 if (m_mode != Checksum) {
-                    // 降级到Checksum模式
                     m_mode = Checksum;
                 }
                 m_timeoutTimer->stop();
@@ -97,7 +103,6 @@ void XModemTransfer::processReceivedData()
                 sendBlock();
                 m_timeoutTimer->start(m_timeoutMs);
             } else if (ch == CRC_CHAR) {
-                // 接收方请求CRC模式
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
                 m_xmodemState = State::SendingBlock;
@@ -111,7 +116,6 @@ void XModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
                 m_blockNumber++;
-                // XMODEM块号1-255循环
                 if (m_blockNumber > 255) m_blockNumber = 1;
 
                 int percent = static_cast<int>((m_bytesSent * 100) / m_data.size());
@@ -132,6 +136,7 @@ void XModemTransfer::processReceivedData()
                     if (m_conn) m_conn->write(QByteArray(2, CAN));
                     m_xmodemState = State::Error;
                     emit transferError("Too many NAK retries");
+                    m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
                 sendBlock();
@@ -140,6 +145,7 @@ void XModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_xmodemState = State::Error;
                 emit transferError("Transfer cancelled by receiver");
+                m_receiveBuffer.remove(0, readIdx);
                 return;
             }
             break;
@@ -155,6 +161,7 @@ void XModemTransfer::processReceivedData()
                 if (m_retryCount > m_maxRetries) {
                     m_xmodemState = State::Error;
                     emit transferError("EOT acknowledgment failed");
+                    m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
                 sendEOT();
@@ -163,6 +170,9 @@ void XModemTransfer::processReceivedData()
             break;
         }
     }
+
+    // 单次O(n)压缩，替代循环中每次O(n)的remove
+    m_receiveBuffer.remove(0, readIdx);
 }
 
 void XModemTransfer::sendBlock()

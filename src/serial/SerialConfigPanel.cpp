@@ -18,13 +18,13 @@ void SerialConfigPanel::setupUI()
     mainLayout->setContentsMargins(12, 12, 12, 12);
 
     // ---- 端口选择区域 ----
-    auto* portGroup = new QGroupBox(tr("Port"));
+    auto* portGroup = new QGroupBox(tr("端口"));
     auto* portLayout = new QHBoxLayout(portGroup);
 
     m_portCombo = new QComboBox;
     m_portCombo->setMinimumWidth(150);
 
-    m_refreshBtn = new QPushButton(tr("Refresh"));
+    m_refreshBtn = new QPushButton(tr("刷新"));
     connect(m_refreshBtn, &QPushButton::clicked, this, &SerialConfigPanel::refreshPorts);
 
     portLayout->addWidget(m_portCombo, 1);
@@ -32,7 +32,7 @@ void SerialConfigPanel::setupUI()
     mainLayout->addWidget(portGroup);
 
     // ---- 串口参数区域 ----
-    auto* paramGroup = new QGroupBox(tr("Parameters"));
+    auto* paramGroup = new QGroupBox(tr("参数"));
     auto* formLayout = new QFormLayout(paramGroup);
 
     // 波特率
@@ -43,34 +43,34 @@ void SerialConfigPanel::setupUI()
                              "460800", "921600", "1000000"};
     m_baudCombo->addItems(baudRates);
     m_baudCombo->setCurrentText("115200");
-    formLayout->addRow(tr("Baud Rate:"), m_baudCombo);
+    formLayout->addRow(tr("波特率:"), m_baudCombo);
 
     // 数据位
     m_dataBitsCombo = new QComboBox;
     m_dataBitsCombo->addItems({"5", "6", "7", "8"});
     m_dataBitsCombo->setCurrentIndex(3);  // 默认8
-    formLayout->addRow(tr("Data Bits:"), m_dataBitsCombo);
+    formLayout->addRow(tr("数据位:"), m_dataBitsCombo);
 
     // 校验
     m_parityCombo = new QComboBox;
-    m_parityCombo->addItems({tr("None"), tr("Even"), tr("Odd"),
+    m_parityCombo->addItems({tr("无"), tr("偶校验"), tr("奇校验"),
                               tr("Mark"), tr("Space")});
-    formLayout->addRow(tr("Parity:"), m_parityCombo);
+    formLayout->addRow(tr("校验位:"), m_parityCombo);
 
     // 停止位
     m_stopBitsCombo = new QComboBox;
     m_stopBitsCombo->addItems({"1", "1.5", "2"});
-    formLayout->addRow(tr("Stop Bits:"), m_stopBitsCombo);
+    formLayout->addRow(tr("停止位:"), m_stopBitsCombo);
 
     // 流控
     m_flowControlCombo = new QComboBox;
-    m_flowControlCombo->addItems({tr("None"), tr("RTS/CTS"), tr("XON/XOFF")});
-    formLayout->addRow(tr("Flow Control:"), m_flowControlCombo);
+    m_flowControlCombo->addItems({tr("无"), tr("RTS/CTS"), tr("XON/XOFF")});
+    formLayout->addRow(tr("流控:"), m_flowControlCombo);
 
     mainLayout->addWidget(paramGroup);
 
     // ---- 控制信号 ----
-    auto* signalGroup = new QGroupBox(tr("Control Signals"));
+    auto* signalGroup = new QGroupBox(tr("控制信号"));
     auto* signalLayout = new QHBoxLayout(signalGroup);
 
     m_dtrCheck = new QCheckBox("DTR");
@@ -84,11 +84,9 @@ void SerialConfigPanel::setupUI()
     mainLayout->addWidget(signalGroup);
 
     // ---- 连接按钮 ----
-    m_connectBtn = new QPushButton(tr("Connect"));
+    m_connectBtn = new QPushButton(tr("连接"));
+    m_connectBtn->setObjectName("connectBtn");
     m_connectBtn->setMinimumHeight(36);
-    m_connectBtn->setStyleSheet(
-        "QPushButton { background-color: #a6e3a1; color: #1e1e2e; font-weight: bold; font-size: 14px; }"
-        "QPushButton:hover { background-color: #94e2d5; }");
     connect(m_connectBtn, &QPushButton::clicked, this, [this]() {
         if (m_connected) {
             emit disconnectRequested();
@@ -129,33 +127,18 @@ void SerialConfigPanel::refreshPorts()
 void SerialConfigPanel::setConnected(bool connected)
 {
     m_connected = connected;
-    if (connected) {
-        m_connectBtn->setText(tr("Disconnect"));
-        m_connectBtn->setStyleSheet(
-            "QPushButton { background-color: #f38ba8; color: #1e1e2e; font-weight: bold; font-size: 14px; }"
-            "QPushButton:hover { background-color: #eba0ac; }");
-        // 连接后禁用配置修改
-        m_portCombo->setEnabled(false);
-        m_baudCombo->setEnabled(false);
-        m_dataBitsCombo->setEnabled(false);
-        m_parityCombo->setEnabled(false);
-        m_stopBitsCombo->setEnabled(false);
-        m_flowControlCombo->setEnabled(false);
-        m_refreshBtn->setEnabled(false);
-    } else {
-        m_connectBtn->setText(tr("Connect"));
-        m_connectBtn->setStyleSheet(
-            "QPushButton { background-color: #a6e3a1; color: #1e1e2e; font-weight: bold; font-size: 14px; }"
-            "QPushButton:hover { background-color: #94e2d5; }");
-        // 断开后恢复配置可编辑
-        m_portCombo->setEnabled(true);
-        m_baudCombo->setEnabled(true);
-        m_dataBitsCombo->setEnabled(true);
-        m_parityCombo->setEnabled(true);
-        m_stopBitsCombo->setEnabled(true);
-        m_flowControlCombo->setEnabled(true);
-        m_refreshBtn->setEnabled(true);
-    }
+    m_connectBtn->setText(connected ? tr("断开") : tr("连接"));
+    m_connectBtn->setProperty("state", connected ? "connected" : "");
+    m_connectBtn->style()->unpolish(m_connectBtn);
+    m_connectBtn->style()->polish(m_connectBtn);
+
+    m_portCombo->setEnabled(!connected);
+    m_baudCombo->setEnabled(!connected);
+    m_dataBitsCombo->setEnabled(!connected);
+    m_parityCombo->setEnabled(!connected);
+    m_stopBitsCombo->setEnabled(!connected);
+    m_flowControlCombo->setEnabled(!connected);
+    m_refreshBtn->setEnabled(!connected);
 }
 
 bool SerialConfigPanel::isConnected() const

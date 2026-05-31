@@ -56,6 +56,7 @@ void MainWindow::setupUI()
 
     // ---- 左侧导航树 ----
     m_navTree = new QTreeView;
+    m_navTree->setObjectName("navTree");
     m_navTree->setHeaderHidden(true);
     m_navTree->setMinimumWidth(180);
     m_navTree->setMaximumWidth(280);
@@ -65,36 +66,36 @@ void MainWindow::setupUI()
     auto* rootItem = treeModel->invisibleRootItem();
 
     // 串口分组
-    auto* serialItem = new QStandardItem(tr("Serial Port"));
+    auto* serialItem = new QStandardItem(tr("串口"));
     serialItem->setEditable(false);
-    auto* configItem = new QStandardItem(tr("Config"));
+    auto* configItem = new QStandardItem(tr("配置"));
     configItem->setEditable(false);
-    auto* terminalItem = new QStandardItem(tr("Terminal"));
+    auto* terminalItem = new QStandardItem(tr("终端"));
     terminalItem->setEditable(false);
-    auto* statsItem = new QStandardItem(tr("Statistics"));
+    auto* statsItem = new QStandardItem(tr("统计"));
     statsItem->setEditable(false);
     serialItem->appendRow(configItem);
     serialItem->appendRow(terminalItem);
     serialItem->appendRow(statsItem);
-    auto* protocolItem = new QStandardItem(tr("Protocol"));
+    auto* protocolItem = new QStandardItem(tr("协议"));
     protocolItem->setEditable(false);
-    auto* frameEditorItem = new QStandardItem(tr("Frame Editor"));
+    auto* frameEditorItem = new QStandardItem(tr("帧编辑器"));
     frameEditorItem->setEditable(false);
-    auto* chartItem = new QStandardItem(tr("Chart"));
+    auto* chartItem = new QStandardItem(tr("波形图"));
     chartItem->setEditable(false);
     serialItem->appendRow(protocolItem);
     serialItem->appendRow(frameEditorItem);
     serialItem->appendRow(chartItem);
-    auto* otaItem = new QStandardItem(tr("OTA"));
+    auto* otaItem = new QStandardItem(tr("OTA升级"));
     otaItem->setEditable(false);
     serialItem->appendRow(otaItem);
 
     // 网络分组
-    auto* networkItem = new QStandardItem(tr("Network"));
+    auto* networkItem = new QStandardItem(tr("网络"));
     networkItem->setEditable(false);
-    auto* tcpClientItem = new QStandardItem(tr("TCP Client"));
+    auto* tcpClientItem = new QStandardItem(tr("TCP客户端"));
     tcpClientItem->setEditable(false);
-    auto* tcpServerItem = new QStandardItem(tr("TCP Server"));
+    auto* tcpServerItem = new QStandardItem(tr("TCP服务端"));
     tcpServerItem->setEditable(false);
     auto* udpItem = new QStandardItem(tr("UDP"));
     udpItem->setEditable(false);
@@ -103,9 +104,9 @@ void MainWindow::setupUI()
     networkItem->appendRow(udpItem);
 
     // 工具分组
-    auto* toolsItem = new QStandardItem(tr("Tools"));
+    auto* toolsItem = new QStandardItem(tr("工具"));
     toolsItem->setEditable(false);
-    auto* exportItem = new QStandardItem(tr("Data Export"));
+    auto* exportItem = new QStandardItem(tr("数据导出"));
     exportItem->setEditable(false);
     toolsItem->appendRow(exportItem);
 
@@ -196,11 +197,12 @@ void MainWindow::setupUI()
     sendLayout->setContentsMargins(8, 4, 8, 4);
 
     m_sendModeCombo = new QComboBox;
-    m_sendModeCombo->addItems({tr("Text"), tr("HEX")});
+    m_sendModeCombo->addItems({tr("文本"), tr("HEX")});
     m_sendModeCombo->setFixedWidth(60);
 
     m_sendInput = new QLineEdit;
-    m_sendInput->setPlaceholderText(tr("Enter data to send..."));
+    m_sendInput->setObjectName("sendInput");
+    m_sendInput->setPlaceholderText(tr("输入要发送的数据..."));
 
     // 发送历史自动补全
     m_sendCompleter = new QCompleter(m_sendHistory->recentTexts(), this);
@@ -208,7 +210,7 @@ void MainWindow::setupUI()
     m_sendCompleter->setCompletionMode(QCompleter::PopupCompletion);
     m_sendInput->setCompleter(m_sendCompleter);
 
-    m_sendBtn = new QPushButton(tr("Send"));
+    m_sendBtn = new QPushButton(tr("发送"));
     m_sendBtn->setFixedWidth(70);
 
     sendLayout->addWidget(m_sendModeCombo);
@@ -232,45 +234,45 @@ void MainWindow::setupUI()
 
 void MainWindow::setupToolbar()
 {
-    m_toolbar = addToolBar(tr("Main Toolbar"));
+    m_toolbar = addToolBar(tr("主工具栏"));
     m_toolbar->setMovable(false);
     m_toolbar->setFloatable(false);
 
     m_displayModeCombo = new QComboBox;
-    m_displayModeCombo->addItems({tr("Text"), tr("HEX"), tr("Mixed")});
+    m_displayModeCombo->addItems({tr("文本"), tr("HEX"), tr("混合")});
     m_displayModeCombo->setFixedWidth(80);
     m_toolbar->addWidget(m_displayModeCombo);
 
-    m_timestampAction = m_toolbar->addAction(tr("Timestamp"));
+    m_timestampAction = m_toolbar->addAction(tr("时间戳"));
     m_timestampAction->setCheckable(true);
     m_timestampAction->setChecked(false);
 
-    m_clearAction = m_toolbar->addAction(tr("Clear"));
+    m_clearAction = m_toolbar->addAction(tr("清屏"));
 
     m_toolbar->addSeparator();
 
     // 导出按钮
-    m_exportAction = m_toolbar->addAction(tr("Export"));
+    m_exportAction = m_toolbar->addAction(tr("导出"));
 
     m_toolbar->addSeparator();
 
     // 日志录制按钮
-    m_recordAction = m_toolbar->addAction(tr("Record"));
+    m_recordAction = m_toolbar->addAction(tr("录制"));
     m_recordAction->setCheckable(true);
     m_recordAction->setChecked(false);
 
-    m_stopRecordAction = m_toolbar->addAction(tr("Stop Rec"));
+    m_stopRecordAction = m_toolbar->addAction(tr("停止录制"));
     m_stopRecordAction->setEnabled(false);
 
     // 日志回放按钮
-    m_playbackAction = m_toolbar->addAction(tr("Play Log"));
-    m_stopPlaybackAction = m_toolbar->addAction(tr("Stop Play"));
+    m_playbackAction = m_toolbar->addAction(tr("回放日志"));
+    m_stopPlaybackAction = m_toolbar->addAction(tr("停止回放"));
     m_stopPlaybackAction->setEnabled(false);
 
     m_toolbar->addSeparator();
 
     // 主题切换下拉框
-    auto* themeLabel = new QLabel(tr(" Theme: "));
+    auto* themeLabel = new QLabel(tr(" 主题: "));
     m_toolbar->addWidget(themeLabel);
 
     m_themeCombo = new QComboBox;
@@ -292,7 +294,9 @@ void MainWindow::setupToolbar()
 
 void MainWindow::setupStatusBar()
 {
-    m_connStatusLbl = new QLabel(tr("Disconnected"));
+    m_connStatusLbl = new QLabel(tr("未连接"));
+    m_connStatusLbl->setObjectName("connStatus");
+    m_connStatusLbl->setProperty("state", "disconnected");
     m_rxBytesLbl = new QLabel("RX: 0 B");
     m_txBytesLbl = new QLabel("TX: 0 B");
 
@@ -394,19 +398,19 @@ void MainWindow::connectSignals()
 
         // 面板映射: 导航名 → 对应的widget
         static const QVector<QPair<QString, QWidget*>> panels = {
-            {tr("Config"), nullptr},       // 特殊处理，用m_serialConfig
-            {tr("Terminal"), nullptr},     // 特殊处理，用m_terminal
-            {tr("Statistics"), nullptr},
-            {tr("Protocol"), nullptr},
-            {tr("Frame Editor"), nullptr},
-            {tr("Chart"), nullptr},
-            {tr("OTA"), nullptr},
+            {tr("配置"), nullptr},       // 特殊处理，用m_serialConfig
+            {tr("终端"), nullptr},     // 特殊处理，用m_terminal
+            {tr("统计"), nullptr},
+            {tr("协议"), nullptr},
+            {tr("帧编辑器"), nullptr},
+            {tr("波形图"), nullptr},
+            {tr("OTA升级"), nullptr},
         };
 
         // 功能性节点（不走面板切换）
-        if (text == tr("Data Export")) { onExportData(); return; }
-        if (text == tr("TCP Client")) { onConnectNetwork(ConnectionType::TcpClient); return; }
-        if (text == tr("TCP Server")) { onConnectNetwork(ConnectionType::TcpServer); return; }
+        if (text == tr("数据导出")) { onExportData(); return; }
+        if (text == tr("TCP客户端")) { onConnectNetwork(ConnectionType::TcpClient); return; }
+        if (text == tr("TCP服务端")) { onConnectNetwork(ConnectionType::TcpServer); return; }
         if (text == tr("UDP")) { onConnectNetwork(ConnectionType::Udp); return; }
 
         // 收集所有可切换面板widget
@@ -417,13 +421,13 @@ void MainWindow::connectSignals()
 
         // 确定要显示的widget
         QWidget* target = nullptr;
-        if (text == tr("Config"))        target = m_serialConfig;
-        else if (text == tr("Terminal")) target = m_terminal;
-        else if (text == tr("Statistics"))   target = m_dataStats;
-        else if (text == tr("Protocol"))     target = m_protocolView;
-        else if (text == tr("Frame Editor")) target = m_frameEditor;
-        else if (text == tr("Chart"))        target = m_chartWidget;
-        else if (text == tr("OTA"))          target = m_otaWidget;
+        if (text == tr("配置"))        target = m_serialConfig;
+        else if (text == tr("终端")) target = m_terminal;
+        else if (text == tr("统计"))   target = m_dataStats;
+        else if (text == tr("协议"))     target = m_protocolView;
+        else if (text == tr("帧编辑器")) target = m_frameEditor;
+        else if (text == tr("波形图"))        target = m_chartWidget;
+        else if (text == tr("OTA升级"))          target = m_otaWidget;
 
         // 切换: 隐藏所有，只显示目标
         for (auto* w : allPanels) {
@@ -551,7 +555,9 @@ void MainWindow::onSendData()
     if (isHex) {
         data = HexConverter::fromHexString(text);
         if (data.isEmpty()) {
-            m_sendInput->setStyleSheet("QLineEdit { border: 1px solid red; }");
+            m_sendInput->setProperty("hasError", true);
+            m_sendInput->style()->unpolish(m_sendInput);
+            m_sendInput->style()->polish(m_sendInput);
             return;
         }
     } else {
@@ -564,7 +570,9 @@ void MainWindow::onSendData()
         m_dataLogger->logData(data, DataLogger::Direction::Sent);
         m_sendHistory->addEntry(text, isHex);
         m_sendInput->clear();
-        m_sendInput->setStyleSheet("");
+        m_sendInput->setProperty("hasError", false);
+        m_sendInput->style()->unpolish(m_sendInput);
+        m_sendInput->style()->polish(m_sendInput);
         updateStatusBar();
     }
 }
@@ -688,31 +696,35 @@ void MainWindow::onConnectNetwork(ConnectionType type)
 
 void MainWindow::onConnectionStateChanged(ConnectionState state)
 {
+    const char* stateStr = "";
     switch (state) {
     case ConnectionState::Connected:
-        m_connStatusLbl->setText(tr("Connected: %1").arg(
+        m_connStatusLbl->setText(tr("已连接: %1").arg(
             m_currentConn ? m_currentConn->name() : ""));
-        m_connStatusLbl->setStyleSheet("color: #a6e3a1;");
+        stateStr = "connected";
         m_serialConfig->setConnected(true);
         m_serialConfig->setVisible(false);
         m_terminal->setVisible(true);
         m_dataStats->setVisible(false);
         break;
     case ConnectionState::Disconnected:
-        m_connStatusLbl->setText(tr("Disconnected"));
-        m_connStatusLbl->setStyleSheet("color: #f38ba8;");
+        m_connStatusLbl->setText(tr("未连接"));
+        stateStr = "disconnected";
         m_serialConfig->setConnected(false);
         break;
     case ConnectionState::Connecting:
-        m_connStatusLbl->setText(tr("Connecting..."));
-        m_connStatusLbl->setStyleSheet("color: #f9e2af;");
+        m_connStatusLbl->setText(tr("连接中..."));
+        stateStr = "connecting";
         break;
     case ConnectionState::Error:
-        m_connStatusLbl->setText(tr("Error"));
-        m_connStatusLbl->setStyleSheet("color: #f38ba8;");
+        m_connStatusLbl->setText(tr("连接错误"));
+        stateStr = "error";
         m_serialConfig->setConnected(false);
         break;
     }
+    m_connStatusLbl->setProperty("state", stateStr);
+    m_connStatusLbl->style()->unpolish(m_connStatusLbl);
+    m_connStatusLbl->style()->polish(m_connStatusLbl);
 }
 
 void MainWindow::onDataReceived(const QByteArray& data)

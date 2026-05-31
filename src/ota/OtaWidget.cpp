@@ -35,13 +35,13 @@ void OtaWidget::setupUI()
     mainLayout->setSpacing(12);
 
     // ---- 文件选择组 ----
-    auto* fileGroup = new QGroupBox(tr("Firmware File"));
+    auto* fileGroup = new QGroupBox(tr("固件文件"));
     auto* fileLayout = new QHBoxLayout(fileGroup);
 
     m_filePathEdit = new QLineEdit;
-    m_filePathEdit->setPlaceholderText(tr("Select firmware file (.bin / .hex) ..."));
+    m_filePathEdit->setPlaceholderText(tr("选择固件文件 (.bin / .hex) ..."));
 
-    m_browseBtn = new QPushButton(tr("Browse"));
+    m_browseBtn = new QPushButton(tr("浏览"));
     m_browseBtn->setFixedWidth(80);
     connect(m_browseBtn, &QPushButton::clicked,
             this, &OtaWidget::onBrowseFile);
@@ -51,7 +51,7 @@ void OtaWidget::setupUI()
     mainLayout->addWidget(fileGroup);
 
     // ---- 传输配置组 ----
-    auto* configGroup = new QGroupBox(tr("Transfer Settings"));
+    auto* configGroup = new QGroupBox(tr("传输设置"));
     auto* configLayout = new QFormLayout(configGroup);
     configLayout->setSpacing(8);
 
@@ -61,29 +61,17 @@ void OtaWidget::setupUI()
     m_protocolCombo->addItem(tr("XMODEM-1K"), "xmodem-1k");
     m_protocolCombo->addItem(tr("YMODEM"), "ymodem");
     m_protocolCombo->addItem(tr("ZMODEM"), "zmodem");
-    configLayout->addRow(tr("Protocol:"), m_protocolCombo);
+    configLayout->addRow(tr("协议:"), m_protocolCombo);
 
     auto* btnLayout = new QHBoxLayout;
-    m_startBtn = new QPushButton(tr("Start Transfer"));
+    m_startBtn = new QPushButton(tr("开始传输"));
+    m_startBtn->setObjectName("otaStartBtn");
     m_startBtn->setFixedHeight(32);
-    m_startBtn->setStyleSheet(
-        "QPushButton { background-color: #89b4fa; color: #1e1e2e; "
-        "  border: none; border-radius: 4px; font-weight: bold; }"
-        "QPushButton:hover { background-color: #b4d0fb; }"
-        "QPushButton:pressed { background-color: #74a8f7; }"
-        "QPushButton:disabled { background-color: #45475a; color: #6c7086; }"
-    );
 
-    m_cancelBtn = new QPushButton(tr("Cancel"));
+    m_cancelBtn = new QPushButton(tr("取消"));
+    m_cancelBtn->setObjectName("otaCancelBtn");
     m_cancelBtn->setFixedHeight(32);
     m_cancelBtn->setEnabled(false);
-    m_cancelBtn->setStyleSheet(
-        "QPushButton { background-color: transparent; color: #f38ba8; "
-        "  border: 1px solid #f38ba8; border-radius: 4px; }"
-        "QPushButton:hover { background-color: rgba(243,139,168,0.15); }"
-        "QPushButton:pressed { background-color: rgba(243,139,168,0.3); }"
-        "QPushButton:disabled { color: #45475a; border-color: #45475a; }"
-    );
 
     btnLayout->addWidget(m_startBtn, 1);
     btnLayout->addWidget(m_cancelBtn, 1);
@@ -97,25 +85,21 @@ void OtaWidget::setupUI()
     mainLayout->addWidget(configGroup);
 
     // ---- 进度显示组 ----
-    auto* progressGroup = new QGroupBox(tr("Progress"));
+    auto* progressGroup = new QGroupBox(tr("传输进度"));
     auto* progressLayout = new QVBoxLayout(progressGroup);
     progressLayout->setSpacing(6);
 
     m_progressBar = new QProgressBar;
+    m_progressBar->setObjectName("otaProgress");
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
     m_progressBar->setTextVisible(true);
     m_progressBar->setFixedHeight(24);
-    m_progressBar->setStyleSheet(
-        "QProgressBar { background-color: #313244; border: none; "
-        "  border-radius: 4px; text-align: center; color: #cdd6f4; }"
-        "QProgressBar::chunk { background-color: #89b4fa; border-radius: 4px; }"
-    );
     progressLayout->addWidget(m_progressBar);
 
     // 状态信息行
     auto* statsLayout = new QHBoxLayout;
-    m_statusLbl = new QLabel(tr("Ready"));
+    m_statusLbl = new QLabel(tr("就绪"));
     m_speedLbl = new QLabel("");
     m_etaLbl = new QLabel("");
     m_speedLbl->setAlignment(Qt::AlignCenter);
@@ -128,38 +112,30 @@ void OtaWidget::setupUI()
     mainLayout->addWidget(progressGroup);
 
     // ---- 日志输出 ----
-    auto* logGroup = new QGroupBox(tr("Transfer Log"));
+    auto* logGroup = new QGroupBox(tr("传输日志"));
     auto* logLayout = new QVBoxLayout(logGroup);
 
     m_logView = new QTextEdit;
+    m_logView->setObjectName("otaLogView");
     m_logView->setReadOnly(true);
     m_logView->setMaximumHeight(160);
-    m_logView->setStyleSheet(
-        "QTextEdit { background-color: #1e1e2e; color: #a6adc8; "
-        "  border: 1px solid #313244; border-radius: 4px; "
-        "  font-family: Consolas, 'Courier New', monospace; font-size: 12px; }"
-    );
     logLayout->addWidget(m_logView);
 
     mainLayout->addWidget(logGroup, 1);
 
     // ---- 历史记录组 ----
-    auto* historyGroup = new QGroupBox(tr("OTA History"));
+    auto* historyGroup = new QGroupBox(tr("OTA历史记录"));
     auto* historyLayout = new QVBoxLayout(historyGroup);
     historyLayout->setSpacing(6);
 
     m_historyModel = new OtaHistoryModel(this);
 
     m_historyView = new QTreeView;
+    m_historyView->setObjectName("otaHistoryView");
     m_historyView->setModel(m_historyModel);
     m_historyView->setRootIsDecorated(false);
     m_historyView->setAlternatingRowColors(true);
     m_historyView->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_historyView->setStyleSheet(
-        "QTreeView { background-color: #1e1e2e; color: #cdd6f4; "
-        "  border: 1px solid #313244; border-radius: 4px; font-size: 12px; }"
-        "QTreeView::alternate-background-color: #181825; }"
-    );
     // 列宽设置
     m_historyView->setColumnWidth(OtaHistoryModel::ColTime, 150);
     m_historyView->setColumnWidth(OtaHistoryModel::ColFileName, 160);
@@ -169,13 +145,9 @@ void OtaWidget::setupUI()
     historyLayout->addWidget(m_historyView);
 
     auto* histBtnLayout = new QHBoxLayout;
-    m_clearHistoryBtn = new QPushButton(tr("Clear History"));
+    m_clearHistoryBtn = new QPushButton(tr("清除历史"));
+    m_clearHistoryBtn->setObjectName("otaClearHistory");
     m_clearHistoryBtn->setFixedHeight(28);
-    m_clearHistoryBtn->setStyleSheet(
-        "QPushButton { background-color: transparent; color: #6c7086; "
-        "  border: 1px solid #45475a; border-radius: 4px; padding: 2px 8px; }"
-        "QPushButton:hover { color: #f38ba8; border-color: #f38ba8; }"
-    );
     connect(m_clearHistoryBtn, &QPushButton::clicked, this, [this]() {
         m_historyModel->clearHistory();
     });

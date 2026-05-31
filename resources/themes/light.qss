@@ -206,3 +206,153 @@ QGroupBox::title {
     left: 12px;
     padding: 0 6px;
 }
+
+/* === OTA Widget === */
+QPushButton#otaStartBtn {
+    background-color: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+QPushButton#otaStartBtn:hover { background-color: #2563eb; }
+QPushButton#otaStartBtn:pressed { background-color: #1d4ed8; }
+QPushButton#otaStartBtn:disabled { background-color: #d1d5db; color: #9ca3af; }
+
+QPushButton#otaCancelBtn {
+    background-color: transparent;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    border-radius: 4px;
+}
+QPushButton#otaCancelBtn:hover { background-color: rgba(239,68,68,0.1); }
+QPushButton#otaCancelBtn:pressed { background-color: rgba(239,68,68,0.2); }
+QPushButton#otaCancelBtn:disabled { color: #d1d5db; border-color: #d1d5db; }
+
+QProgressBar#otaProgress {
+    background-color: #f3f4f6;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    color: #374151;
+}
+QProgressBar#otaProgress::chunk {
+    background-color: #3b82f6;
+    border-radius: 4px;
+}
+
+QTextEdit#otaLogView {
+    background-color: #ffffff;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 12px;
+}
+
+QTreeView#otaHistoryView {
+    background-color: #ffffff;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 12px;
+}
+QTreeView#otaHistoryView::alternate-background-color {
+    background-color: #f9fafb;
+}
+
+QPushButton#otaClearHistory {
+    background-color: transparent;
+    color: #9ca3af;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+QPushButton#otaClearHistory:hover { color: #ef4444; border-color: #ef4444; }
+
+/* === SerialConfigPanel 连接按钮 === */
+QPushButton#connectBtn {
+    background-color: #22c55e;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+}
+QPushButton#connectBtn:hover { background-color: #16a34a; }
+QPushButton#connectBtn[state="connected"] {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+QPushButton#connectBtn[state="connected"]:hover { background-color: #dc2626; }
+
+/* === 连接状态标签 === */
+QLabel#connStatus { font-size: 12px; }
+QLabel#connStatus[state="connected"] { color: #22c55e; }
+QLabel#connStatus[state="disconnected"] { color: #ef4444; }
+QLabel#connStatus[state="connecting"] { color: #f59e0b; }
+QLabel#connStatus[state="error"] { color: #ef4444; }
+
+/* === 数据统计面板 === */
+QFrame#statsFrame {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 6px;
+}
+QLabel#rxTotalLabel { color: #22c55e; font-size: 13px; font-weight: bold; }
+QLabel#rxRateLabel { color: #22c55e; font-size: 11px; }
+QLabel#txTotalLabel { color: #ef4444; font-size: 13px; font-weight: bold; }
+QLabel#txRateLabel { color: #ef4444; font-size: 11px; }
+QLabel#elapsedLabel { color: #374151; font-size: 13px; font-family: monospace; }
+
+/* === 终端搜索栏 === */
+QWidget#terminalSearchBar { background: #f3f4f6; }
+
+QLineEdit#searchBarInput {
+    background: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    selection-background-color: #3b82f6;
+}
+QLineEdit#searchBarInput:focus { border: 1px solid #3b82f6; }
+QLineEdit#searchBarInput[hasError="true"] {
+    background: #ffffff;
+    color: #1f2937;
+    border: 2px solid #ef4444;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+QCheckBox#searchBarRegexCheck,
+QCheckBox#searchBarHexCheck {
+    color: #1f2937;
+    spacing: 4px;
+}
+QCheckBox#searchBarRegexCheck::indicator,
+QCheckBox#searchBarHexCheck::indicator {
+    width: 14px; height: 14px;
+}
+QCheckBox#searchBarRegexCheck::indicator:checked,
+QCheckBox#searchBarHexCheck::indicator:checked {
+    background: #3b82f6; border-radius: 2px;
+}
+QCheckBox#searchBarRegexCheck::indicator:unchecked,
+QCheckBox#searchBarHexCheck::indicator:unchecked {
+    background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 2px;
+}
+
+QLabel#searchBarResult { color: #9ca3af; padding: 0 4px; }
+QLabel#searchBarResult[hasError="true"] { color: #ef4444; padding: 0 4px; }
+
+QPushButton#searchBarCloseBtn {
+    background: #e5e7eb; color: #374151;
+    border: none; border-radius: 4px; font-weight: bold;
+}
+QPushButton#searchBarCloseBtn:hover { background: #3b82f6; color: #ffffff; }
+QPushButton#searchBarCloseBtn:pressed { background: #2563eb; color: #ffffff; }
+
+/* === 发送输入框错误状态 === */
+QLineEdit#sendInput[hasError="true"] { border: 2px solid #ef4444; }

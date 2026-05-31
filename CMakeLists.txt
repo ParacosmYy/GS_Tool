@@ -46,6 +46,8 @@ set(SOURCES
     src/protocol/FrameVisualEditor.cpp
     src/protocol/IntelHexParser.cpp
     src/chart/ChartWidget.cpp
+    src/chart/ChannelConfig.cpp
+    src/chart/ChartModel.cpp
     src/ota/OtaManager.cpp
     src/ota/OtaWidget.cpp
     src/ota/OtaHistoryModel.cpp
@@ -87,6 +89,8 @@ set(HEADERS
     src/protocol/FrameVisualEditor.h
     src/protocol/IntelHexParser.h
     src/chart/ChartWidget.h
+    src/chart/ChannelConfig.h
+    src/chart/ChartModel.h
     src/ota/OtaManager.h
     src/ota/OtaWidget.h
     src/ota/OtaHistoryModel.h

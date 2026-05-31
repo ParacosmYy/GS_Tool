@@ -122,7 +122,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
         // 没有模型时显示提示
         painter.setPen(m_timestampColor);
         painter.drawText(rect(), Qt::AlignCenter,
-                         tr("No connection - waiting for data..."));
+                         tr("未连接 - 等待数据..."));
         return;
     }
 

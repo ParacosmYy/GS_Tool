@@ -96,16 +96,23 @@ void YModemTransfer::handleTimeout()
 
 void YModemTransfer::processReceivedData()
 {
-    while (!m_receiveBuffer.isEmpty()) {
-        char ch = m_receiveBuffer.at(0);
-        m_receiveBuffer.remove(0, 1);
+    int readIdx = 0;
+    const int len = m_receiveBuffer.size();
 
-        if (m_cancelled) return;
+    while (readIdx < len) {
+        char ch = m_receiveBuffer.at(readIdx);
+        readIdx++;
+
+        if (m_cancelled) {
+            m_receiveBuffer.remove(0, readIdx);
+            return;
+        }
 
         switch (m_ymodemState) {
         case State::Idle:
         case State::Done:
         case State::Error:
+            m_receiveBuffer.remove(0, readIdx);
             return;
 
         case State::WaitingStart:
@@ -131,6 +138,7 @@ void YModemTransfer::processReceivedData()
                     sendCancelBytes();
                     m_ymodemState = State::Error;
                     emit transferError("Block 0 rejected: too many retries");
+                    m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
                 sendBlock0();
@@ -139,6 +147,7 @@ void YModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_ymodemState = State::Error;
                 emit transferError("Transfer cancelled by receiver");
+                m_receiveBuffer.remove(0, readIdx);
                 return;
             }
             break;
@@ -167,6 +176,7 @@ void YModemTransfer::processReceivedData()
                     sendCancelBytes();
                     m_ymodemState = State::Error;
                     emit transferError("Too many NAK retries");
+                    m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
                 sendBlock();
@@ -175,6 +185,7 @@ void YModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_ymodemState = State::Error;
                 emit transferError("Transfer cancelled by receiver");
+                m_receiveBuffer.remove(0, readIdx);
                 return;
             }
             break;
@@ -198,6 +209,7 @@ void YModemTransfer::processReceivedData()
                 if (m_retryCount > m_maxRetries) {
                     m_ymodemState = State::Error;
                     emit transferError("EOT acknowledgment failed");
+                    m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
                 sendEOT();
@@ -210,12 +222,12 @@ void YModemTransfer::processReceivedData()
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
 
-                // 加载下一个文件
                 QFile file(m_filePaths[m_fileIndex]);
                 if (!file.open(QIODevice::ReadOnly)) {
                     sendCancelBytes();
                     m_ymodemState = State::Error;
                     emit transferError(QString("Cannot open file: %1").arg(m_filePaths[m_fileIndex]));
+                    m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
                 m_currentData = file.readAll();
@@ -251,6 +263,7 @@ void YModemTransfer::processReceivedData()
                     sendCancelBytes();
                     m_ymodemState = State::Error;
                     emit transferError("Final Block 0 rejected");
+                    m_receiveBuffer.remove(0, readIdx);
                     return;
                 }
                 sendFinalBlock0();
@@ -259,6 +272,9 @@ void YModemTransfer::processReceivedData()
             break;
         }
     }
+
+    // 单次O(n)压缩，替代循环中每次O(n)的remove
+    m_receiveBuffer.remove(0, readIdx);
 }
 
 void YModemTransfer::sendBlock0()

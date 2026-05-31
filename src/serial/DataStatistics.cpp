@@ -29,15 +29,8 @@ void DataStatistics::setupUI()
 
     // ---- 接收（RX）统计区域 ----
     auto* rxFrame = new QFrame;
+    rxFrame->setObjectName("statsFrame");
     rxFrame->setFrameShape(QFrame::StyledPanel);
-    rxFrame->setStyleSheet(
-        "QFrame {"
-        "  background-color: #1e1e2e;"        // 深色背景
-        "  border: 1px solid #313244;"         // 边框
-        "  border-radius: 6px;"
-        "  padding: 6px;"
-        "}"
-    );
     auto* rxLayout = new QFormLayout(rxFrame);
     rxLayout->setContentsMargins(8, 6, 8, 6);
     rxLayout->setSpacing(4);
@@ -45,34 +38,20 @@ void DataStatistics::setupUI()
 
     // RX累计标签
     m_rxTotalLabel = new QLabel("0 B");
-    m_rxTotalLabel->setStyleSheet(
-        "color: #a6e3a1;"                      // 绿色表示接收
-        "font-size: 13px;"
-        "font-weight: bold;"
-    );
+    m_rxTotalLabel->setObjectName("rxTotalLabel");
     rxLayout->addRow("RX:", m_rxTotalLabel);
 
     // RX速率标签
     m_rxRateLabel = new QLabel("0 B/s");
-    m_rxRateLabel->setStyleSheet(
-        "color: #a6e3a1;"
-        "font-size: 11px;"
-    );
+    m_rxRateLabel->setObjectName("rxRateLabel");
     rxLayout->addRow("Rate:", m_rxRateLabel);
 
     mainLayout->addWidget(rxFrame);
 
     // ---- 发送（TX）统计区域 ----
     auto* txFrame = new QFrame;
+    txFrame->setObjectName("statsFrame");
     txFrame->setFrameShape(QFrame::StyledPanel);
-    txFrame->setStyleSheet(
-        "QFrame {"
-        "  background-color: #1e1e2e;"
-        "  border: 1px solid #313244;"
-        "  border-radius: 6px;"
-        "  padding: 6px;"
-        "}"
-    );
     auto* txLayout = new QFormLayout(txFrame);
     txLayout->setContentsMargins(8, 6, 8, 6);
     txLayout->setSpacing(4);
@@ -80,45 +59,27 @@ void DataStatistics::setupUI()
 
     // TX累计标签
     m_txTotalLabel = new QLabel("0 B");
-    m_txTotalLabel->setStyleSheet(
-        "color: #f38ba8;"                      // 红色表示发送
-        "font-size: 13px;"
-        "font-weight: bold;"
-    );
+    m_txTotalLabel->setObjectName("txTotalLabel");
     txLayout->addRow("TX:", m_txTotalLabel);
 
     // TX速率标签
     m_txRateLabel = new QLabel("0 B/s");
-    m_txRateLabel->setStyleSheet(
-        "color: #f38ba8;"
-        "font-size: 11px;"
-    );
+    m_txRateLabel->setObjectName("txRateLabel");
     txLayout->addRow("Rate:", m_txRateLabel);
 
     mainLayout->addWidget(txFrame);
 
     // ---- 连接持续时间 ----
     auto* elapsedFrame = new QFrame;
+    elapsedFrame->setObjectName("statsFrame");
     elapsedFrame->setFrameShape(QFrame::StyledPanel);
-    elapsedFrame->setStyleSheet(
-        "QFrame {"
-        "  background-color: #1e1e2e;"
-        "  border: 1px solid #313244;"
-        "  border-radius: 6px;"
-        "  padding: 6px;"
-        "}"
-    );
     auto* elapsedLayout = new QFormLayout(elapsedFrame);
     elapsedLayout->setContentsMargins(8, 6, 8, 6);
     elapsedLayout->setSpacing(4);
     elapsedLayout->setLabelAlignment(Qt::AlignRight);
 
     m_elapsedLabel = new QLabel("00:00:00");
-    m_elapsedLabel->setStyleSheet(
-        "color: #cdd6f4;"                      // 通用文字色
-        "font-size: 13px;"
-        "font-family: monospace;"
-    );
+    m_elapsedLabel->setObjectName("elapsedLabel");
     elapsedLayout->addRow("Time:", m_elapsedLabel);
 
     mainLayout->addWidget(elapsedFrame);
