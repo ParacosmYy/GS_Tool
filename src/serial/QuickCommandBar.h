@@ -92,6 +92,9 @@ signals:
     /** @brief 编辑对话框关闭后发射，通知外部做额外处理 */
     void editRequested();
 
+    /** @brief HEX指令数据无效时发射，用于显示错误提示 @param msg 错误消息 */
+    void commandError(const QString& msg);
+
 private slots:
     /** @brief 打开指令编辑对话框，支持增删改指令 */
     void onEditRequested();
@@ -107,6 +110,8 @@ private:
 
     /** @brief 创建编辑对话框UI(表格+按钮行+信号连接) */
     void createEditDialog(QDialog& dlg, QTableWidget*& table, QDialogButtonBox*& buttons);
+    /** @brief 将当前指令填充到编辑对话框表格中 */
+    void populateDialogFields(QTableWidget* table);
 
     QList<QuickCommand> m_commands;     ///< 当前指令列表
     QHBoxLayout* m_buttonLayout = nullptr;  ///< 指令按钮的布局

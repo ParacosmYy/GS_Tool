@@ -233,7 +233,20 @@ void ChartWidget::onChannelsChanged()
         palette = {Qt::cyan};  // 降级回退色，防止除零崩溃
     }
 
-    // 根据新的通道配置创建series
+    // ---- 降级路径: m_configSet 尚未配置时，直接从 model 获取通道名 ----
+    // 场景: 协议桥数据先于帧编辑器配置到达，此时 channelsChanged 信号已触发
+    //       但 configureFromFrameDefinition() 还未被调用，m_configSet 为空
+    if (m_configSet.channels().isEmpty() && m_model) {
+        const QStringList names = m_model->channelNames();
+        for (int i = 0; i < names.size(); ++i) {
+            QColor chColor = palette[m_seriesMap.size() % palette.size()];
+            createSeries(names[i], chColor);
+        }
+        m_statusLabel->setText(tr("通道: %1").arg(m_seriesMap.size()));
+        return;
+    }
+
+    // ---- 主路径: 根据完整的通道配置创建series ----
     const QVector<ChannelConfig>& channels = m_configSet.channels();
     for (const ChannelConfig& cfg : channels) {
         if (cfg.enabled) {

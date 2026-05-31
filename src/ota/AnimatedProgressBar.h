@@ -101,16 +101,18 @@ public:
 
     /** @brief 停止shimmer流动动画
      *
-     * 安全处理: 仅调用 stop()，不手动置 nullptr。
-     * 动画以 DeleteWhenStopped 启动，stop() 后 Qt 事件循环会自动删除动画对象。
-     * 避免手动 nullptr 导致的竞态: 若 stop() 后立即 nullptr，而 Qt 尚未完成异步删除，
-     * startShimmer() 中的 new 操作可能与旧动画的 delete 产生竞争。
+     * 安全处理: 调用 stop() 后立即置 nullptr。
+     * DeleteWhenStopped会在事件循环中异步删除动画对象，
+     * 必须立即置nullptr，否则下次startShimmer()调用stopShimmer()时
+     * if(m_shimmerAnim)仍为true（悬空指针），导致use-after-free崩溃。
      */
     void stopShimmer() {
         if (m_shimmerAnim) {
             m_shimmerAnim->stop();
-            // DeleteWhenStopped 会在事件循环中自动 delete m_shimmerAnim
-            // 不手动置 nullptr，避免与 Qt 异步删除竞争
+            // DeleteWhenStopped会在事件循环中异步删除动画对象
+            // 必须立即置nullptr，否则下次startShimmer()调用stopShimmer()时
+            // if(m_shimmerAnim)仍为true（悬空指针），导致use-after-free崩溃
+            m_shimmerAnim = nullptr;
         }
         m_shimmerOffset = 0.0;
         update();

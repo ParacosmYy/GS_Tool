@@ -97,11 +97,10 @@ private:
     void handleHeaderMatching(unsigned char byte);
     void handleLengthReceiving(unsigned char byte);
     void handlePayloadReceiving(unsigned char byte);
+    void processCompletePayload();   ///< 长度字段模式下帧完成处理(校验→帧尾→完成)
+    bool handleCrcValidation();      ///< CRC校验验证，通过返回true
     void handleChecksumVerifying(unsigned char byte);
     void handleFooterMatching(unsigned char byte);
-
-    /** @brief 处理完整载荷(校验→帧尾→完成) */
-    void processCompletePayload();
 
     // ---- 辅助方法（实现在 FrameParserHelpers.cpp） ----
     QVariantMap extractFields(const QByteArray& frameData) const;

@@ -145,13 +145,17 @@ bool TerminalSearchManager::buildHexSearch(
     QByteArray bytes = HexConverter::fromHexString(pattern);
     if (bytes.isEmpty()) return false;
 
+    // 将用户输入规范化为空格分隔的大写HEX字符串，与HexConverter::toHexString()输出格式一致
+    // 例如: "AA55" → "AA 55", "aa 55" → "AA 55"
+    QString normalized = HexConverter::toHexString(bytes);
+
     int displayIdx;
     QString text;
     while (lineProvider(&displayIdx, &text)) {
         int pos = 0;
-        while ((pos = text.indexOf(pattern, pos, Qt::CaseInsensitive)) >= 0) {
-            m_searchMatches.append({displayIdx, pos, static_cast<int>(pattern.length())});
-            pos += static_cast<int>(pattern.length());
+        while ((pos = text.indexOf(normalized, pos)) >= 0) {
+            m_searchMatches.append({displayIdx, pos, static_cast<int>(normalized.length())});
+            pos += static_cast<int>(normalized.length());
         }
     }
     return true;

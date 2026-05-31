@@ -316,20 +316,24 @@ void SettingsManager::saveSerialConfig(const QVariantMap& config)
 
 /**
  * @brief 加载串口配置
+ *
+ * 使用独立的临时 QSettings 实例进行分组读取，
+ * 避免修改单例 m_settings 的内部分组栈，保证异常安全。
+ * 即使读取过程中发生异常或提前返回，也不会破坏全局实例的状态。
+ *
  * @return 串口配置键值对，不存在时返回空 map
  */
 QVariantMap SettingsManager::loadSerialConfig() const
 {
     QVariantMap result;
-    // QSettings::beginGroup/endGroup 是非 const 方法，需要 const_cast
-    // 仅做读取操作，不会修改 m_settings 的实际内容
-    QSettings& settings = const_cast<QSettings&>(m_settings);
-    settings.beginGroup("serial");
-    const QStringList keys = settings.childKeys();
+    // 使用临时 QSettings 实例，避免 const_cast 破坏单例的分组栈
+    QSettings tempSettings(m_settings.fileName(), m_settings.format());
+    tempSettings.beginGroup("serial");
+    const QStringList keys = tempSettings.childKeys();
     for (const QString& key : keys) {
-        result.insert(key, settings.value(key));
+        result.insert(key, tempSettings.value(key));
     }
-    settings.endGroup();
+    tempSettings.endGroup();
     return result;
 }
 

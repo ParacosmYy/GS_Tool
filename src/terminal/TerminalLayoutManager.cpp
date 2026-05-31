@@ -141,15 +141,18 @@ void TerminalLayoutManager::applyLayout()
     }
 
     if (m_layout == TerminalLayout::Mixed) {
-        applyMixedLayout(containerLayout);
+        applyMixedLayout();
     } else {
-        applySplitLayout(containerLayout);
+        applySplitLayout();
     }
 }
 
-/** @brief 应用混合布局: 显示主终端（包含TX和RX所有数据） */
-void TerminalLayoutManager::applyMixedLayout(QBoxLayout* containerLayout)
+/** @brief 应用混合布局: 销毁分栏终端，恢复主终端无过滤状态 */
+void TerminalLayoutManager::applyMixedLayout()
 {
+    auto* containerLayout = qobject_cast<QBoxLayout*>(m_container->layout());
+
+    // ---- 混合模式: 显示主终端（包含TX和RX所有数据） ----
     // 销毁分栏终端（如果存在）
     if (m_rxTerminal) {
         m_rxTerminal->deleteLater();
@@ -169,9 +172,11 @@ void TerminalLayoutManager::applyMixedLayout(QBoxLayout* containerLayout)
     }
 }
 
-/** @brief 应用分栏布局: 创建RX/TX两个终端，用QSplitter分割 */
-void TerminalLayoutManager::applySplitLayout(QBoxLayout* containerLayout)
+/** @brief 应用分栏布局: 创建RX/TX终端，用QSplitter分割 */
+void TerminalLayoutManager::applySplitLayout()
 {
+    auto* containerLayout = qobject_cast<QBoxLayout*>(m_container->layout());
+
     // ---- 分栏模式: 创建RX/TX两个终端，用QSplitter分割 ----
     Qt::Orientation orient = (m_layout == TerminalLayout::SplitHorizontal)
         ? Qt::Horizontal : Qt::Vertical;

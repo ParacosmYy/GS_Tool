@@ -22,6 +22,7 @@
 #define OTAMANAGER_H
 
 #include <QObject>
+#include <QTemporaryFile>
 #include "ota/protocols/BaseTransfer.h"
 #include "ota/protocols/XModemTransfer.h"
 #include "ota/protocols/YModemTransfer.h"
@@ -164,6 +165,7 @@ private:
     ZModemTransfer* m_zmodem = nullptr;
 
     OtaState m_otaState = OtaState::Idle;   ///< 当前OTA状态
+    QTemporaryFile* m_tempBinFile = nullptr; ///< HEX转换临时BIN文件(复用而非累积)
     QString m_tempBinPath;                   ///< HEX转BIN的临时文件路径
     QString m_currentFileName;               ///< 当前传输的文件名（用于错误信息上下文）
     QString m_currentProtocol;               ///< 当前传输协议名称（用于错误信息上下文）

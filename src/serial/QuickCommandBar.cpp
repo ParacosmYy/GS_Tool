@@ -118,10 +118,16 @@ void QuickCommandBar::rebuildButtons()
         connect(btn, &QPushButton::clicked, this, [this, cmd]() {
             QByteArray data;
             if (cmd.isHex) {
-                // HEX 模式: 将十六进制字符串转为原始字节
+                // HEX模式: 将十六进制字符串转为原始字节
                 data = HexConverter::fromHexString(cmd.data);
+                if (data.isEmpty() && !cmd.data.isEmpty()) {
+                    // HEX格式无效(如"ZZ")，通知用户而非静默忽略
+                    emit commandError(tr("HEX格式无效: 指令'%1'的数据'%2'不是合法的十六进制")
+                                      .arg(cmd.name, cmd.data));
+                    return;
+                }
             } else {
-                // 文本模式: 将字符串转为 UTF-8 字节
+                // 文本模式: 将字符串转为UTF-8字节
                 data = cmd.data.toUtf8();
             }
             if (!data.isEmpty()) {
@@ -146,6 +152,7 @@ void QuickCommandBar::onEditRequested()
     QTableWidget* table = nullptr;
     QDialogButtonBox* buttons = nullptr;
     createEditDialog(dlg, table, buttons);
+    populateDialogFields(table);
 
     // 用户确认后，从表格读回数据到指令列表
     if (dlg.exec() == QDialog::Accepted) {
@@ -170,26 +177,66 @@ void QuickCommandBar::onEditRequested()
     emit editRequested();
 }
 
-/** @brief 创建编辑对话框UI(表格+按钮行+信号连接) */
-void QuickCommandBar::createEditDialog(QDialog& dlg, QTableWidget*& table, QDialogButtonBox*& buttons)
+/** @brief 创建编辑对话框的UI控件(表格、按钮行、信号连接) */
+void QuickCommandBar::createEditDialog(QDialog& dlg, QTableWidget*& outTable, QDialogButtonBox*& outButtons)
 {
-    dlg.setWindowTitle(tr("编辑快捷指令"));
-    dlg.setMinimumSize(480, 320);
-    dlg.setObjectName("quickCmdEditDlg");
-
     auto* layout = new QVBoxLayout(&dlg);
 
     // 表格: 3列 — 名称、数据、HEX开关
-    table = new QTableWidget(m_commands.size(), 3, &dlg);
-    table->setObjectName("quickCmdEditTable");
-    table->setHorizontalHeaderLabels({tr("名称"), tr("数据"), tr("HEX")});
-    table->horizontalHeader()->setStretchLastSection(false);
-    table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    outTable = new QTableWidget(m_commands.size(), 3, &dlg);
+    outTable->setObjectName("quickCmdEditTable");
+    outTable->setHorizontalHeaderLabels({tr("名称"), tr("数据"), tr("HEX")});
+    outTable->horizontalHeader()->setStretchLastSection(false);
+    outTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    outTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    outTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    outTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    layout->addWidget(outTable);
 
-    // 填充现有指令到表格
+    // ---- 按钮行: 添加行 / 删除行 / 确定 / 取消 ----
+    auto* btnLayout = new QHBoxLayout;
+    auto* addRowBtn = new QPushButton(tr("添加行"), &dlg);
+    addRowBtn->setObjectName("quickCmdAddRowBtn");
+    auto* delRowBtn = new QPushButton(tr("删除行"), &dlg);
+    delRowBtn->setObjectName("quickCmdDelRowBtn");
+    outButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+    outButtons->setObjectName("quickCmdDlgButtons");  // QSS 选择器需要
+
+    btnLayout->addWidget(addRowBtn);
+    btnLayout->addWidget(delRowBtn);
+    btnLayout->addStretch();
+    btnLayout->addWidget(outButtons);
+    layout->addLayout(btnLayout);
+
+    // 添加行按钮: 在表格末尾追加空行
+    connect(addRowBtn, &QPushButton::clicked, this, [outTable]() {
+        int row = outTable->rowCount();
+        outTable->insertRow(row);
+        outTable->setItem(row, 0, new QTableWidgetItem(tr("指令")));
+        outTable->setItem(row, 1, new QTableWidgetItem{});
+        auto* check = new QTableWidgetItem;
+        check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        check->setCheckState(Qt::Unchecked);
+        outTable->setItem(row, 2, check);
+    });
+
+    // 删除行按钮: 删除选中行
+    connect(delRowBtn, &QPushButton::clicked, this, [outTable]() {
+        auto selected = outTable->selectionModel()->selectedRows();
+        // 从后往前删，避免索引偏移
+        for (int i = selected.size() - 1; i >= 0; --i) {
+            outTable->removeRow(selected[i].row());
+        }
+    });
+
+    // 确定/取消
+    connect(outButtons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    connect(outButtons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+}
+
+/** @brief 将当前指令列表填充到编辑对话框表格中 */
+void QuickCommandBar::populateDialogFields(QTableWidget* table)
+{
     for (int i = 0; i < m_commands.size(); ++i) {
         const auto& cmd = m_commands[i];
         table->setItem(i, 0, new QTableWidgetItem(cmd.name));
@@ -199,48 +246,6 @@ void QuickCommandBar::createEditDialog(QDialog& dlg, QTableWidget*& table, QDial
         hexCheck->setCheckState(cmd.isHex ? Qt::Checked : Qt::Unchecked);
         table->setItem(i, 2, hexCheck);
     }
-
-    layout->addWidget(table);
-
-    // ---- 按钮行: 添加行 / 删除行 / 确定 / 取消 ----
-    auto* btnLayout = new QHBoxLayout;
-    auto* addRowBtn = new QPushButton(tr("添加行"), &dlg);
-    addRowBtn->setObjectName("quickCmdAddRowBtn");
-    auto* delRowBtn = new QPushButton(tr("删除行"), &dlg);
-    delRowBtn->setObjectName("quickCmdDelRowBtn");
-    buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
-    buttons->setObjectName("quickCmdDlgButtons");  // QSS 选择器需要
-
-    btnLayout->addWidget(addRowBtn);
-    btnLayout->addWidget(delRowBtn);
-    btnLayout->addStretch();
-    btnLayout->addWidget(buttons);
-    layout->addLayout(btnLayout);
-
-    // 添加行按钮: 在表格末尾追加空行
-    connect(addRowBtn, &QPushButton::clicked, this, [table]() {
-        int row = table->rowCount();
-        table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(tr("指令")));
-        table->setItem(row, 1, new QTableWidgetItem{});
-        auto* check = new QTableWidgetItem;
-        check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        check->setCheckState(Qt::Unchecked);
-        table->setItem(row, 2, check);
-    });
-
-    // 删除行按钮: 删除选中行
-    connect(delRowBtn, &QPushButton::clicked, this, [table]() {
-        auto selected = table->selectionModel()->selectedRows();
-        // 从后往前删，避免索引偏移
-        for (int i = selected.size() - 1; i >= 0; --i) {
-            table->removeRow(selected[i].row());
-        }
-    });
-
-    // 确定/取消
-    connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
-    connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
 }
 
 /**

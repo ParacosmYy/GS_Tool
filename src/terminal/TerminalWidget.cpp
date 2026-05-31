@@ -16,6 +16,7 @@
 #include <QClipboard>
 #include <QContextMenuEvent>
 #include <QKeySequence>
+#include <QTimer>
 
 // ---- 构造与基本配置 ----
 TerminalWidget::TerminalWidget(QWidget* parent)
@@ -101,6 +102,7 @@ void TerminalWidget::setDirectionFilter(DataDirection direction)
     m_cachedLineCount = 0;
     m_cachedLines.clear();
     m_directionFilter->reset();
+    m_selectionManager->reset();  // 方向过滤切换时重置选择，避免坐标空间不一致(BUG-02)
     update();
 }
 
@@ -110,6 +112,7 @@ void TerminalWidget::clearDirectionFilter()
     m_cachedLineCount = 0;
     m_cachedLines.clear();
     m_directionFilter->reset();
+    m_selectionManager->reset();  // 清除方向过滤时同步重置选择
     update();
 }
 
@@ -133,6 +136,8 @@ void TerminalWidget::clear()
     m_cachedLineCount = 0;
     m_directionFilter->reset();
     m_selectionManager->reset();
+    m_scrollOffset = 0;          // 防御性重置：防止未来调用模式变更导致滚动位置残留
+    m_maxScrollOffset = 0;       // 同步重置最大滚动偏移
     update();
 }
 
@@ -185,7 +190,8 @@ void TerminalWidget::refreshSearchAfterCacheUpdate()
     if (m_searchManager->searchPattern().isEmpty()) return;
     QString pat = m_searchManager->searchPattern();
     bool rx = m_searchManager->searchRegex(), hx = m_searchManager->searchHex();
-    m_searchManager->clearSearchHighlight();
+    // setSearchHighlight内部会先清除旧匹配(line 37)，无需额外调用clearSearchHighlight
+    // 移除clearSearchHighlight()避免中间态信号导致搜索计数闪烁
     setSearchHighlight(pat, rx, hx);
 }
 
@@ -282,7 +288,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
         }
         int totalLines = m_directionFilter->filteredLineCount();
         if (!m_searchManager->searchPattern().isEmpty() && totalLines > 0)
-            refreshSearchAfterCacheUpdate();
+            QTimer::singleShot(0, this, [this]() { refreshSearchAfterCacheUpdate(); });
         m_maxScrollOffset = qMax(0, totalLines - m_visibleLines);
         if (m_autoScroll) m_scrollOffset = m_maxScrollOffset;
         int endLine = qMin(m_scrollOffset + m_visibleLines + 1, totalLines);
@@ -305,7 +311,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
             m_cachedLines[i] = formatToCache(m_model->lineAt(i));
         m_cachedLineCount = totalLines;
         if (!m_searchManager->searchPattern().isEmpty() && m_cachedLineCount > 0)
-            refreshSearchAfterCacheUpdate();
+            QTimer::singleShot(0, this, [this]() { refreshSearchAfterCacheUpdate(); });
         m_maxScrollOffset = qMax(0, totalLines - m_visibleLines);
         if (m_autoScroll) m_scrollOffset = m_maxScrollOffset;
     }
@@ -323,7 +329,8 @@ void TerminalWidget::wheelEvent(QWheelEvent* event)
     int delta = event->angleDelta().y();
     m_scrollOffset -= delta / 120 * 3;
     m_scrollOffset = qMax(0, qMin(m_scrollOffset, m_maxScrollOffset));
-    if (delta < 0 && m_scrollOffset < m_maxScrollOffset) m_autoScroll = false;
+    // 任何手动滚动只要不在底部就禁用自动滚动（修复向上滚动立即回弹问题）
+    if (m_scrollOffset < m_maxScrollOffset) m_autoScroll = false;
     update();
     event->accept();
 }

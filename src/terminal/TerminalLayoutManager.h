@@ -58,8 +58,11 @@ private:
 
     // 应用当前布局: 重建容器内的widget层次
     void applyLayout();
-    void applyMixedLayout(QBoxLayout* containerLayout);  ///< 应用混合布局(单终端)
-    void applySplitLayout(QBoxLayout* containerLayout);   ///< 应用分栏布局(RX/TX双终端)
+
+    /** @brief 应用混合布局模式(销毁分栏终端，显示主终端) */
+    void applyMixedLayout();
+    /** @brief 应用分栏布局模式(创建RX/TX终端) */
+    void applySplitLayout();
 
     // 将当前主终端的显示设置同步到分栏终端
     void syncDisplaySettings(TerminalWidget* target) const;

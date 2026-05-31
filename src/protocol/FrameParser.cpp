@@ -246,12 +246,31 @@ void FrameParser::handleHeaderMatching(unsigned char byte)
             }
         }
     } else {
-        // 匹配失败: 重置并检查当前字节是否为新帧头起始
-        m_buffer.clear();
-        m_headerMatchPos = 0;
-        m_state = State::Idle;
-
-        if (!m_def.header.isEmpty()
+        // 匹配失败: 回溯检查缓冲区尾部是否有与帧头前缀的重叠
+        // 处理 [AA,AA,55] 在流 [AA,AA,AA,55] 中的情况:
+        // 原始匹配在位置2失败后，回溯到缓冲区[AA]处重新开始
+        int bestOverlap = 0;
+        for (int len = qMin(m_buffer.size() - 1, m_def.header.size() - 1); len >= 1; --len) {
+            bool ok = true;
+            for (int j = 0; j < len && ok; ++j) {
+                if (static_cast<unsigned char>(m_buffer.at(m_buffer.size() - len + j))
+                    != static_cast<unsigned char>(m_def.header.at(j))) {
+                    ok = false;
+                }
+            }
+            if (ok) { bestOverlap = len; break; }
+        }
+        if (bestOverlap > 0) {
+            m_buffer = m_buffer.right(bestOverlap);
+            m_headerMatchPos = bestOverlap;
+            m_state = State::HeaderMatching;
+        } else {
+            m_buffer.clear();
+            m_headerMatchPos = 0;
+            m_state = State::Idle;
+        }
+        // 当前字节可能是新帧头的起始
+        if (m_state == State::Idle && !m_def.header.isEmpty()
             && byte == static_cast<unsigned char>(m_def.header.at(0))) {
             m_buffer.append(byte);
             m_headerMatchPos = 1;
@@ -350,7 +369,50 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
         if (m_buffer.size() >= m_def.checksumOffset + m_def.checksumSize) {
             m_state = State::ChecksumVerifying;
         }
+        return;  // 有校验的帧走校验路径，不进入header-only逻辑
     }
+
+    // 路径D: 纯header帧(无长度/无帧尾/无校验)
+    // 通过检测下一个帧头的出现来确定当前帧结束
+    if (m_def.header.size() > 0 && m_buffer.size() > static_cast<int>(m_def.header.size())) {
+        if (byte == static_cast<unsigned char>(m_def.header.at(0))) {
+            // 回退最后一个字节(它属于下一帧的帧头)
+            m_buffer.chop(1);
+            completeFrame();
+            // 将当前字节作为新帧的第一个字节重新开始匹配
+            m_buffer.append(static_cast<char>(byte));
+            m_headerMatchPos = 1;
+            m_state = State::HeaderMatching;
+            if (!m_frameTimer.isValid() && m_frameTimeoutMs > 0) {
+                m_frameTimer.start();
+            }
+        }
+    }
+}
+
+/** @brief 长度字段模式下帧接收完成后的处理(校验+帧尾判断) */
+void FrameParser::processCompletePayload()
+{
+    if (!handleCrcValidation()) return;
+    if (!m_def.footer.isEmpty()) {
+        m_state = State::FooterMatching;
+    } else {
+        completeFrame();
+    }
+}
+
+/** @brief CRC校验验证，通过返回true，失败则emit错误并重置 */
+bool FrameParser::handleCrcValidation()
+{
+    if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
+        if (!verifyChecksum(m_buffer)) {
+            m_errorCount++;
+            emit frameError(tr("Checksum mismatch"), m_buffer);
+            resetIntermediateState();
+            return false;
+        }
+    }
+    return true;
 }
 
 void FrameParser::handleChecksumVerifying(unsigned char byte)
@@ -408,27 +470,5 @@ void FrameParser::handleFooterMatching(unsigned char byte)
         m_errorCount++;
         emit frameError(tr("Footer mismatch"), m_buffer);
         resetIntermediateState();
-    }
-}
-
-/** @brief 处理完整载荷: 校验→帧尾→完成 */
-void FrameParser::processCompletePayload()
-{
-    if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
-        if (verifyChecksum(m_buffer)) {
-            if (!m_def.footer.isEmpty()) {
-                m_state = State::FooterMatching;
-            } else {
-                completeFrame();
-            }
-        } else {
-            m_errorCount++;
-            emit frameError(tr("Checksum mismatch"), m_buffer);
-            resetIntermediateState();
-        }
-    } else if (!m_def.footer.isEmpty()) {
-        m_state = State::FooterMatching;
-    } else {
-        completeFrame();
     }
 }

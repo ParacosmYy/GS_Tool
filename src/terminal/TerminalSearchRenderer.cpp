@@ -20,6 +20,9 @@ void TerminalSearchRenderer::drawHighlights(
     int lineHeight,
     bool showDirectionPrefix)
 {
+    // 注意: HEX搜索时，lineProvider返回HexConverter::toHexString()格式的文本进行匹配，
+    // 而cached.text可能是Text/Mixed/Decimal格式。高亮位置仅在Hex显示模式下准确。
+    // 建议HEX搜索时自动切换到Hex显示模式以保证高亮对齐。
     const auto& matches = searchManager->searchMatches();
     if (matches.isEmpty()) return;
 

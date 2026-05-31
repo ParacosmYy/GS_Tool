@@ -349,30 +349,37 @@ bool OtaManager::convertHexToBin(const QString& hexPath, QString& outBinPath)
         return false;
     }
 
-    // 创建临时BIN文件
-    QTemporaryFile* tempFile = new QTemporaryFile(QDir::tempPath() + "/EmbedDebug_XXXXXX.bin", this);
-    if (!tempFile->open()) {
-        delete tempFile;
+    // 删除上一次的临时文件对象(释放文件句柄和堆内存)
+    if (m_tempBinFile) {
+        m_tempBinFile->close();
+        delete m_tempBinFile;
+    }
+
+    // 创建新的临时BIN文件
+    m_tempBinFile = new QTemporaryFile(QDir::tempPath() + "/EmbedDebug_XXXXXX.bin", this);
+    if (!m_tempBinFile->open()) {
+        delete m_tempBinFile;
+        m_tempBinFile = nullptr;
         return false;
     }
 
-    if (tempFile->write(binary) != binary.size()) {
-        delete tempFile;
+    if (m_tempBinFile->write(binary) != binary.size()) {
+        delete m_tempBinFile;
+        m_tempBinFile = nullptr;
         return false;
     }
-    tempFile->close();
+    m_tempBinFile->close();
 
-    // 保存路径，清理旧的临时文件
+    // 清理旧的临时文件(磁盘上)
     if (!m_tempBinPath.isEmpty()) {
         QFile::remove(m_tempBinPath);
     }
 
-    m_tempBinPath = tempFile->fileName();
+    m_tempBinPath = m_tempBinFile->fileName();
     outBinPath = m_tempBinPath;
 
-    // tempFile由this管理生命周期，但keep on disk直到手动删除
     // 不自动删除，因为传输过程需要读取
-    tempFile->setAutoRemove(false);
+    m_tempBinFile->setAutoRemove(false);
 
     qDebug() << "OtaManager: HEX converted to BIN:" << m_tempBinPath
              << "size:" << binary.size() << "startAddr: 0x" << Qt::hex << startAddr;

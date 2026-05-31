@@ -6,9 +6,9 @@
  * 数据子帧发送(ZCRCG/ZCRCW)、超时重发、断点续传(ZRPOS偏移处理)
  */
 #include "ota/protocols/ZModemTransfer.h"
-
 #include <QFile>
 #include <QFileInfo>
+#include <QTimer>
 
 QString ZModemTransfer::stateToString(State s)
 {
@@ -112,9 +112,12 @@ void ZModemTransfer::handleTimeout()
         break;
     case State::SendingData:
         qWarning() << "ZModem: timeout in" << curState << "- offset:" << m_fileOffset << "bytes:" << m_bytesSent;
+        sendDataSubpackets();  // 重发数据子包（内部已启动定时器）
         break;
     case State::SendingEof:
-        qWarning() << "ZModem: timeout in" << curState << "- file size:" << m_fileData.size();
+        qWarning() << "ZModem: timeout in" << curState << "- retrying ZEOF";
+        sendZEOF();
+        m_timeoutTimer->start(m_timeoutMs);  // 重启定时器等待ZRINIT响应
         break;
     default:
         qWarning() << "ZModem: unexpected timeout in state" << curState;
@@ -183,8 +186,7 @@ void ZModemTransfer::handleStateWaitingRinit(int type)
         qWarning() << "ZModem: unexpected frame" << type << "in WaitingRinit";
     }
 }
-void ZModemTransfer::handleStateSendingFile(int type, const QByteArray& headerData)
-{
+void ZModemTransfer::handleStateSendingFile(int type, const QByteArray& headerData){
     if (type == ZRPOS) {
         m_timeoutTimer->stop();
         m_retryCount = 0;
@@ -375,7 +377,7 @@ QByteArray ZModemTransfer::buildBinHeader(quint8 frameType, const QByteArray& da
     // ZDLE转义: 控制字符 + 帧头前8字节内的0x00
     for (char b : payload) {
         quint8 c = static_cast<quint8>(b);
-        if (c == 0x00 && frame.size() < 8) {
+        if (c == 0x00 && frame.size() < 3 + 9) {  // ZPAD+ZDLE+ZBIN32 + 9 payload bytes (type+data+CRC)
             frame.append(ZDLE);
             frame.append(static_cast<char>(c ^ 0x40));
         } else {
@@ -431,9 +433,13 @@ void ZModemTransfer::sendDataSubpackets()
 {
     if (!m_conn) return;
     sendZDATA();
+    // 异步分块发送: 每次最多kChunksPerTick个子包，然后让出事件循环
+    // 防止大数据传输时UI冻结和取消按钮无响应
+    static const int kChunksPerTick = 32;
     qint64 offset = m_fileOffset;
-    int lastPercent = static_cast<int>((offset * 100) / qMax(m_fileData.size(), qint64(1)));
-    while (offset < m_fileData.size()) {
+    int lastPct = static_cast<int>((offset * 100) / qMax(m_fileData.size(), qint64(1)));
+    int sent = 0;
+    while (offset < m_fileData.size() && sent < kChunksPerTick) {
         int chunkSize = qMin(static_cast<int>(m_fileData.size() - offset), kDataLen);
         QByteArray chunk = m_fileData.mid(offset, chunkSize);
         bool isLast = (offset + chunkSize >= m_fileData.size());
@@ -441,17 +447,22 @@ void ZModemTransfer::sendDataSubpackets()
         m_conn->write(buildDataSubpacket(endFlag, chunk));
         offset += chunkSize;
         m_bytesSent = offset;
-        int percent = static_cast<int>((offset * 100) / m_fileData.size());
-        if (percent != lastPercent || isLast) {
-            emit progress(percent, offset, m_fileData.size());
-            lastPercent = percent;
+        int pct = static_cast<int>((offset * 100) / m_fileData.size());
+        if (pct != lastPct || isLast) {
+            emit progress(pct, offset, m_fileData.size());
+            lastPct = pct;
         }
+        sent++;
     }
     m_fileOffset = offset;
     m_bytesSent = offset;
     if (m_bytesSent >= m_fileData.size()) {
+        // 所有数据发送完成，等待接收方确认
         m_zmodemState = State::WaitingZAck;
         m_timeoutTimer->start(m_timeoutMs);
+    } else {
+        // 还有数据未发送，让出事件循环后继续发送下一批
+        QTimer::singleShot(0, this, &ZModemTransfer::sendDataSubpackets);
     }
 }
 
