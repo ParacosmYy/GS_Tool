@@ -172,10 +172,9 @@ void XModemTransfer::processReceivedData()
 
         case State::WaitingForStart:
             if (ch == NAK) {
-                // 接收方请求Checksum模式
-                if (m_mode != Checksum) {
-                    m_mode = Checksum;
-                }
+                // 接收方请求Checksum模式 — 但不覆盖用户显式选择的模式
+                // 仅当用户未显式选择(默认CRC)且接收方只支持Checksum时才降级
+                // NAK 在 SendingBlock 阶段仍然按协议处理(块重发)
                 m_timeoutTimer->stop();
                 m_retryCount = 0;
                 m_blockRetryCount = 0;

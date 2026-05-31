@@ -7,7 +7,11 @@
 
 /*
  * 语义色板定义 — ThemeManager 从此块解析自绘控件颜色
- */
+ *
+ * 注意: 这些自定义属性声明必须在CSS注释内!
+ * Qt的QSS引擎不支持CSS自定义属性(--)语法,
+ * 裸露的声明会导致QSS解析器出错，后续样式规则全部失效。
+ * ThemeManager使用正则表达式从此注释块中提取颜色定义。
 --semantic-BgPrimary: #ffffff;
 --semantic-BgSecondary: #f3f4f6;
 --semantic-BgTertiary: #e5e7eb;
@@ -32,6 +36,7 @@
 --semantic-TermSelection: #bfdbfe;
 --semantic-TermSearchHighlight: rgba(245, 158, 11, 80);
 --semantic-TermCurrentMatch: rgba(245, 158, 11, 180);
+ */
 
 
 /* 全局背景 */

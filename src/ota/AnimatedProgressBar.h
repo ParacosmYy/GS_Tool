@@ -81,9 +81,15 @@ public:
         update();
     }
 
-    /** @brief 启动shimmer流动动画(2000ms循环) */
+    /** @brief 启动shimmer流动动画(2000ms循环)
+     *
+     * 安全处理: 先停止旧动画，再创建新动画。
+     * 如果旧动画已停止但尚未被 Qt 删除(DeleteWhenStopped是异步的)，
+     * 设置 parent 为 this 确保旧对象在新对象创建前被安全管理。
+     */
     void startShimmer() {
         stopShimmer();
+        // 安全创建新动画: 父对象为 this，确保生命周期受控
         m_shimmerAnim = new QPropertyAnimation(this, "shimmerOffset");
         m_shimmerAnim->setStartValue(0.0);
         m_shimmerAnim->setEndValue(1.0);
@@ -93,11 +99,18 @@ public:
         m_shimmerAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
-    /** @brief 停止shimmer流动动画 */
+    /** @brief 停止shimmer流动动画
+     *
+     * 安全处理: 仅调用 stop()，不手动置 nullptr。
+     * 动画以 DeleteWhenStopped 启动，stop() 后 Qt 事件循环会自动删除动画对象。
+     * 避免手动 nullptr 导致的竞态: 若 stop() 后立即 nullptr，而 Qt 尚未完成异步删除，
+     * startShimmer() 中的 new 操作可能与旧动画的 delete 产生竞争。
+     */
     void stopShimmer() {
         if (m_shimmerAnim) {
             m_shimmerAnim->stop();
-            m_shimmerAnim = nullptr;
+            // DeleteWhenStopped 会在事件循环中自动 delete m_shimmerAnim
+            // 不手动置 nullptr，避免与 Qt 异步删除竞争
         }
         m_shimmerOffset = 0.0;
         update();

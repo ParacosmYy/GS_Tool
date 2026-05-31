@@ -1,6 +1,8 @@
 #include "utils/DataLogger.h"
 #include <QDataStream>
 #include <QFileInfo>
+#include <QDateTime>
+#include <algorithm>
 
 DataLogger::DataLogger(QObject* parent)
     : QObject(parent)
@@ -328,4 +330,35 @@ void DataLogger::onPlaybackTick()
             return;
         }
     }
+}
+
+// ---- 书签管理 ----
+
+void DataLogger::addBookmark(const QString& label, const QString& streamId)
+{
+    // 使用当前系统时间作为时间戳（毫秒精度 Unix 纪元时间）
+    qint64 ts = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    m_bookmarks.append(DataBookmark(ts, label, streamId));
+    // 按时间戳升序排序，确保书签集合有序
+    std::sort(m_bookmarks.begin(), m_bookmarks.end());
+    emit bookmarksChanged();
+}
+
+QVector<DataBookmark> DataLogger::bookmarks() const
+{
+    return m_bookmarks;
+}
+
+void DataLogger::removeBookmark(int index)
+{
+    if (index < 0 || index >= m_bookmarks.size()) return;
+    m_bookmarks.removeAt(index);
+    emit bookmarksChanged();
+}
+
+void DataLogger::clearBookmarks()
+{
+    if (m_bookmarks.isEmpty()) return;
+    m_bookmarks.clear();
+    emit bookmarksChanged();
 }

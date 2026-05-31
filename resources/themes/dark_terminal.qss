@@ -9,7 +9,11 @@
  * 语义色板定义 — ThemeManager 从此块解析自绘控件颜色
  * 格式: --semantic-<枚举名>: <颜色值>;
  * TerminalWidget/ChartWidget 等自绘控件通过 ThemeManager::color() 查询
- */
+ *
+ * 注意: 这些自定义属性声明必须在CSS注释内!
+ * Qt的QSS引擎不支持CSS自定义属性(--)语法,
+ * 裸露的声明会导致QSS解析器出错，后续样式规则全部失效。
+ * ThemeManager使用正则表达式从此注释块中提取颜色定义。
 --semantic-BgPrimary: #1e1e2e;
 --semantic-BgSecondary: #313244;
 --semantic-BgTertiary: #45475a;
@@ -34,6 +38,7 @@
 --semantic-TermSelection: #45475a;
 --semantic-TermSearchHighlight: rgba(249, 226, 175, 80);
 --semantic-TermCurrentMatch: rgba(249, 226, 175, 180);
+ */
 
 
 /* 全局背景 */

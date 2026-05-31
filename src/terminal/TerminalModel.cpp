@@ -126,33 +126,46 @@ void TerminalModel::clear()
 
 void TerminalModel::setMaxLines(int max)
 {
-    QMutexLocker locker(&m_mutex);
+    // 重入保护: 若 dataCleared 信号的槽函数回调 setMaxLines，
+    // 直接返回，避免 m_buffer 的 resize 和 std::move 在两个调用栈中并发执行
+    if (m_settingMaxLines) return;
 
-    if (max == m_maxLines) return;
+    m_settingMaxLines = true;
 
-    // 将旧数据按逻辑顺序拷贝到临时缓冲区
-    QVector<TerminalLine> oldLines;
-    oldLines.reserve(qMin(m_count, max));
-    int copyStart = (m_count > max) ? (m_count - max) : 0;
-    for (int i = copyStart; i < m_count; ++i) {
-        oldLines.append(std::move(m_buffer[physicalIndex(i)]));
-    }
+    {
+        QMutexLocker locker(&m_mutex);
 
-    // 重新分配缓冲区
-    m_maxLines = max;
-    m_buffer.resize(max);
+        if (max == m_maxLines) {
+            m_settingMaxLines = false;
+            return;
+        }
 
-    // 将保留的数据放回新缓冲区
-    int keepCount = qMin(static_cast<int>(oldLines.size()), max);
-    for (int i = 0; i < keepCount; ++i) {
-        m_buffer[i] = std::move(oldLines[i]);
-    }
+        // 将旧数据按逻辑顺序拷贝到临时缓冲区
+        QVector<TerminalLine> oldLines;
+        oldLines.reserve(qMin(m_count, max));
+        int copyStart = (m_count > max) ? (m_count - max) : 0;
+        for (int i = copyStart; i < m_count; ++i) {
+            oldLines.append(std::move(m_buffer[physicalIndex(i)]));
+        }
 
-    m_head = 0;
-    m_count = keepCount;
-    locker.unlock();
+        // 重新分配缓冲区
+        m_maxLines = max;
+        m_buffer.resize(max);
+
+        // 将保留的数据放回新缓冲区
+        int keepCount = qMin(static_cast<int>(oldLines.size()), max);
+        for (int i = 0; i < keepCount; ++i) {
+            m_buffer[i] = std::move(oldLines[i]);
+        }
+
+        m_head = 0;
+        m_count = keepCount;
+    } // 锁已释放，安全发信号
+
     // 通知视图数据已重置，避免显示过期内容
     emit dataCleared();
+
+    m_settingMaxLines = false;
 }
 
 int TerminalModel::maxLines() const

@@ -66,6 +66,14 @@ signals:
      */
     void playbackData(const QByteArray& data, qint64 direction);
 
+    /**
+     * @brief 请求添加书签信号
+     * 由 UI 交互触发（如工具栏书签按钮或快捷键），
+     * MainWindow 应将此信号连接到 DataLogger::addBookmark
+     * @param label 书签标签文本
+     */
+    void addBookmarkRequested(const QString& label);
+
 private slots:
     /** @brief 录制按钮切换处理: 开始/暂停/继续录制 */
     void onToggleRecording();

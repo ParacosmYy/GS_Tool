@@ -45,7 +45,8 @@ public:
 
     void connectSerial(const QVariantMap& serialParams); ///< 创建并打开串口连接 @param serialParams 端口/波特率等参数
     void disconnectCurrent();                            ///< 关闭当前连接(用户主动，不触发自动重连)
-    void connectNetwork(ConnectionType type);            ///< 创建网络连接 @param type TcpClient/TcpServer/Udp
+    void connectNetwork(ConnectionType type);            ///< 创建网络连接(默认参数) @param type TcpClient/TcpServer/Udp
+    void connectNetwork(ConnectionType type, const QVariantMap& params); ///< 创建网络连接(指定参数，用于自动重连) @param type 连接类型 @param params host/port等参数
     IConnection* currentConnection() const;              ///< 获取当前活跃连接，无连接时返回 nullptr
 
     void setDtr(bool enabled);                           ///< 控制当前连接的 DTR 线路信号

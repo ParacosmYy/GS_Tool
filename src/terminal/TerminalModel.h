@@ -65,13 +65,14 @@ private:
     // 向环形缓冲区追加一行，自动处理容量和覆盖
     void appendLine(TerminalLine&& line);
 
-    QVector<TerminalLine> m_buffer;    // 环形缓冲区，容量 = m_maxLines
-    int m_head = 0;                    // 环形缓冲区头指针（最旧数据位置）
-    int m_count = 0;                   // 当前有效数据行数
-    mutable QMutex m_mutex;            // 线程安全锁
-    int m_maxLines = 50000;            // 最大行数限制
-    quint64 m_rxBytes = 0;             // 接收总字节数
-    quint64 m_txBytes = 0;             // 发送总字节数
+    QVector<TerminalLine> m_buffer;    ///< 环形缓冲区，容量 = m_maxLines
+    int m_head = 0;                    ///< 环形缓冲区头指针（最旧数据位置）
+    int m_count = 0;                   ///< 当前有效数据行数
+    mutable QMutex m_mutex;            ///< 线程安全锁
+    int m_maxLines = 50000;            ///< 最大行数限制
+    bool m_settingMaxLines = false;    ///< 重入保护标志，防止 dataCleared 信号回调 setMaxLines
+    quint64 m_rxBytes = 0;             ///< 接收总字节数
+    quint64 m_txBytes = 0;             ///< 发送总字节数
 };
 
 #endif // TERMINALMODEL_H

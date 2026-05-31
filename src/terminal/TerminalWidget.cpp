@@ -214,35 +214,59 @@ int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y
             painter.fillRect(0, y, width(), m_lineHeight, m_selectionManager->selectionBgColor());
     }
 
-    // 搜索高亮
+    // 方向前缀 "[TX:] " / "[RX:] " 分色渲染
+    // 计算文本绘制基线: 先算出方向前缀占用的像素宽度，
+    // 搜索高亮和实际文本内容都基于这个基线对齐，避免双倍偏移
+    static const QString kTxPrefix = QStringLiteral("[TX:] ");
+    static const QString kRxPrefix = QStringLiteral("[RX:] ");
+    bool isTx = (cached.direction == DataDirection::Tx);
+    QColor dataColor = isTx ? m_txColor : m_rxColor;
+
+    // textXOffset = 文本内容的起始像素位置（时间戳宽度 + 边距 + 方向前缀宽度）
+    int textXOffset = xOffset + 4;
+    if (m_showDirectionPrefix) {
+        const QString& prefix = isTx ? kTxPrefix : kRxPrefix;
+        if (cached.text.startsWith(prefix)) {
+            textXOffset += m_fontMetrics.horizontalAdvance(prefix);
+        }
+    }
+
+    // 搜索高亮 — 基于 textXOffset 计算，match.startCol 是在 cached.text 中的列偏移
+    // 需要跳过方向前缀的列数，与文本渲染使用相同的基准
     const auto& matches = m_searchManager->searchMatches();
     if (!matches.isEmpty()) {
         int curIdx = m_searchManager->currentMatchIndex();
+        int prefixLen = 0;
+        if (m_showDirectionPrefix) {
+            const QString& prefix = isTx ? kTxPrefix : kRxPrefix;
+            if (cached.text.startsWith(prefix)) {
+                prefixLen = prefix.length();
+            }
+        }
         for (int mi = 0; mi < matches.size(); ++mi) {
             const auto& match = matches[mi];
             if (match.line != displayLine) continue;
-            int xStart = xOffset + 4 + m_fontMetrics.horizontalAdvance(cached.text.left(match.startCol));
-            int matchWidth = m_fontMetrics.horizontalAdvance(cached.text.mid(match.startCol, match.length));
+            // match.startCol 是包含前缀的文本中的列偏移，需要减去前缀长度
+            // 使高亮起始位置与实际显示的文本内容对齐
+            int col = match.startCol - prefixLen;
+            if (col < 0) col = 0;
+            QString textForWidth = cached.text.mid(prefixLen);
+            int xStart = textXOffset + m_fontMetrics.horizontalAdvance(textForWidth.left(col));
+            int matchWidth = m_fontMetrics.horizontalAdvance(textForWidth.mid(col, match.length));
             painter.fillRect(xStart, y + 2, matchWidth, m_lineHeight - 4,
                              (mi == curIdx) ? m_searchManager->currentMatchColor()
                                             : m_searchManager->searchHighlightColor());
         }
     }
 
-    // 方向前缀 "[TX:] " / "[RX:] " 分色渲染
-    static const QString kTxPrefix = QStringLiteral("[TX:] ");
-    static const QString kRxPrefix = QStringLiteral("[RX:] ");
-    bool isTx = (cached.direction == DataDirection::Tx);
-    QColor dataColor = isTx ? m_txColor : m_rxColor;
-
+    // 绘制文本内容（方向前缀 + 实际数据）
     if (m_showDirectionPrefix) {
         const QString& prefix = isTx ? kTxPrefix : kRxPrefix;
         if (cached.text.startsWith(prefix)) {
             painter.setPen(dataColor.darker(130));
             painter.drawText(xOffset + 4, y + m_lineHeight - 4, prefix);
-            int prefixWidth = m_fontMetrics.horizontalAdvance(prefix);
             painter.setPen(dataColor);
-            painter.drawText(xOffset + 4 + prefixWidth, y + m_lineHeight - 4,
+            painter.drawText(textXOffset, y + m_lineHeight - 4,
                              cached.text.mid(prefix.length()));
         } else {
             painter.setPen(dataColor);
@@ -361,10 +385,26 @@ void TerminalWidget::mouseReleaseEvent(QMouseEvent* event)
 
 void TerminalWidget::keyPressEvent(QKeyEvent* event)
 {
-    // Ctrl+C 复制选中内容
-    if (event->key() == Qt::Key_C && event->modifiers() & Qt::ControlModifier) {
+    // Ctrl+C 复制选中内容 — 精确匹配 Ctrl 修饰键，避免 Ctrl+Shift+C 被误拦截
+    if (event->key() == Qt::Key_C && event->modifiers() == Qt::ControlModifier) {
         QString text = selectedText();
         if (!text.isEmpty()) QApplication::clipboard()->setText(text);
+        return;
+    }
+    // Ctrl+A 全选 — 精确匹配，避免 Ctrl+Shift+A 误触发
+    if (event->key() == Qt::Key_A && event->modifiers() == Qt::ControlModifier) {
+        selectAll();
+        return;
+    }
+    // Ctrl+V 粘贴 — 精确匹配，转发粘贴请求
+    if (event->key() == Qt::Key_V && event->modifiers() == Qt::ControlModifier) {
+        QString text = QApplication::clipboard()->text();
+        if (!text.isEmpty()) emit pasteRequested(text);
+        return;
+    }
+    // Ctrl+F 搜索 — 精确匹配，避免 Ctrl+Shift+F 误触发
+    if (event->key() == Qt::Key_F && event->modifiers() == Qt::ControlModifier) {
+        emit searchRequested();
         return;
     }
     // F3 / Shift+F3 搜索导航

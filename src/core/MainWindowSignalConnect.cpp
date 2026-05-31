@@ -13,10 +13,20 @@
  *   ToolbarController → TerminalController(显示模式/时间戳/清屏/导出)
  *   ToolbarController → SettingsController(主题/语言)
  *   RecordingController → MainWindow(回放数据写入终端)
+ *   RecordingController::addBookmarkRequested → DataLogger::addBookmark(书签添加)
+ *   DataLogger::bookmarksChanged → ToastWidget(书签变化吐司通知)
  *   TerminalSearchBar → TerminalController(搜索高亮)
  *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形配置)
  *   OtaWidget → ToastWidget(传输开始/完成通知 + 失败通知使用 showDebounced 防抖)
  *   NavTree → NavigationController(面板切换)
+ *
+ * 书签信号流（DataBookmark 集成）:
+ *   RecordingController::addBookmarkRequested(label)
+ *     → DataLogger::addBookmark(label)   // UI层 → 数据层: 将书签请求路由到 DataLogger
+ *   RecordingController::addBookmarkRequested(label)
+ *     → ToastWidget("书签已添加: label")  // UI反馈: Success 吐司即时提示
+ *   DataLogger::bookmarksChanged()
+ *     → 状态栏消息                        // 通知书签集合发生变化
  */
 
 #include "MainWindow.h"
@@ -38,6 +48,8 @@
  *   ToolbarController → TerminalController(显示模式/时间戳/清屏/导出)
  *   ToolbarController → SettingsController(主题/语言)
  *   RecordingController → MainWindow(回放数据写入终端)
+ *   RecordingController::addBookmarkRequested → DataLogger::addBookmark(书签添加)
+ *   DataLogger::bookmarksChanged → ToastWidget(书签变化吐司通知)
  *   TerminalSearchBar → TerminalController(搜索高亮)
  *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形配置)
  *   OtaWidget → ToastWidget(传输开始/完成通知 + 失败通知使用 showDebounced 防抖)
@@ -298,6 +310,52 @@ void MainWindow::connectSignals()
             this, [this](const QString& filename, const QString& error) {
         ToastWidget::showDebounced(this, tr("传输失败: %1\n%2").arg(filename, error),
                                    ToastWidget::ToastType::Error, 3000);
+    });
+    ///@}
+
+    /**
+     * @name 书签信号路由（DataBookmark 集成）
+     *
+     * 书签信号连接负责将 UI 层的书签添加请求路由到数据层，
+     * 并通过吐司通知向用户提供即时反馈。
+     *
+     * 信号流向:
+     *   1. RecordingController::addBookmarkRequested(label)
+     *        → DataLogger::addBookmark(label)
+     *        UI 层书签请求路由到数据层，DataLogger 创建 DataBookmark 并发射 bookmarksChanged
+     *
+     *   2. RecordingController::addBookmarkRequested(label)
+     *        → ToastWidget::show("书签已添加: label", Success)
+     *        使用 show() 非防抖吐司，因为书签添加是用户主动触发的确定性一次性事件
+     *
+     *   3. DataLogger::bookmarksChanged()
+     *        → 状态栏消息更新
+     *        当书签集合发生变化（增/删/清空）时通知状态栏
+     */
+    ///@{
+
+    // 书签添加请求 → DataLogger：将 UI 层请求路由到数据层
+    // RecordingController 由用户交互（工具栏按钮/快捷键）触发，
+    // DataLogger::addBookmark 会自动生成时间戳并发射 bookmarksChanged
+    connect(m_recordingController, &RecordingController::addBookmarkRequested,
+            m_dataLogger, [this](const QString& label) {
+        m_dataLogger->addBookmark(label);
+    });
+
+    // 书签添加请求 → Success 吐司：即时 UI 反馈
+    // 使用 show() 非防抖，因为用户主动添加书签是确定性的一次性事件
+    connect(m_recordingController, &RecordingController::addBookmarkRequested,
+            this, [this](const QString& label) {
+        ToastWidget::show(this, tr("书签已添加: %1").arg(label),
+                          ToastWidget::ToastType::Success);
+    });
+
+    // 书签集合变化 → 状态栏消息：通知数据层书签列表已更新
+    // DataLogger 在 addBookmark/removeBookmark/clearBookmarks 后发射此信号
+    connect(m_dataLogger, &DataLogger::bookmarksChanged,
+            this, [this]() {
+        statusBar()->showMessage(
+            tr("书签列表已更新 (%1)").arg(m_dataLogger->bookmarks().size()), 3000);
     });
     ///@}
 }

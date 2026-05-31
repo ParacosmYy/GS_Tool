@@ -150,6 +150,7 @@ set(HEADERS
     src/utils/SettingsManager.h
     src/utils/DataExporter.h
     src/utils/DataLogger.h
+    src/utils/DataBookmark.h
     src/utils/ByteFormat.h
     src/utils/CRC.h
     src/utils/HexConverter.h

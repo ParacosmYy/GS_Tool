@@ -157,20 +157,7 @@ void ConnectionController::disconnectCurrent()
 /** @brief 创建网络连接 @param type 连接类型 */
 void ConnectionController::connectNetwork(ConnectionType type)
 {
-    // 关闭已有连接
-    if (m_currentConn) {
-        m_userInitiatedDisconnect = true;
-        disconnectCurrent();
-    }
-    m_userInitiatedDisconnect = false;
-
-    m_currentConn = m_connManager->createConnection(type);
-    if (!m_currentConn) {
-        emit connectionFailed(tr("Not Supported"), tr("This connection type is not yet available"));
-        return;
-    }
-
-    // 构建默认网络参数
+    // 构建默认网络参数(首次连接使用)
     QVariantMap params;
     if (type == ConnectionType::TcpClient) {
         params["mode"] = "client";
@@ -184,6 +171,29 @@ void ConnectionController::connectNetwork(ConnectionType type)
         params["remoteHost"] = "127.0.0.1";
         params["remotePort"] = 8080;
     }
+    connectNetwork(type, params);
+}
+
+/**
+ * @brief 创建网络连接(带参数，用于自动重连)
+ * @param type 连接类型
+ * @param params 网络连接参数(host/port等)
+ */
+void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap& params)
+{
+    // 关闭已有连接
+    if (m_currentConn) {
+        m_userInitiatedDisconnect = true;
+        disconnectCurrent();
+    }
+    m_userInitiatedDisconnect = false;
+
+    m_currentConn = m_connManager->createConnection(type);
+    if (!m_currentConn) {
+        emit connectionFailed(tr("Not Supported"), tr("This connection type is not yet available"));
+        return;
+    }
+
     m_currentConn->configure(params);
 
     // 连接信号
@@ -213,6 +223,7 @@ void ConnectionController::connectNetwork(ConnectionType type)
     }
 
     m_lastConnectType = type;
+    m_lastConnectParams = params;  // 保存网络连接参数，用于自动重连
     m_connectedPortName.clear();  // 网络连接无串口端口名
 
     // 通知 Toast: 网络连接成功
@@ -339,7 +350,8 @@ void ConnectionController::onAutoReconnect()
     if (m_lastConnectType == ConnectionType::Serial) {
         connectSerial(m_lastConnectParams);
     } else {
-        connectNetwork(m_lastConnectType);
+        // 使用保存的网络参数重连，而非硬编码默认值
+        connectNetwork(m_lastConnectType, m_lastConnectParams);
     }
 }
 

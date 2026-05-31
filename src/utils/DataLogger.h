@@ -1,6 +1,8 @@
 #ifndef DATALOGGER_H
 #define DATALOGGER_H
 
+#include "utils/DataBookmark.h"
+
 #include <QObject>
 #include <QFile>
 #include <QTimer>
@@ -44,6 +46,31 @@ public:
     int recordCount() const;
     qint64 recordingDuration() const;
 
+    // ---- 书签管理 ----
+
+    /**
+     * @brief 在当前时间点添加书签
+     * 自动使用当前系统时间作为时间戳
+     * @param label 书签标签文本
+     * @param streamId 数据流标识（默认为空，表示全局书签）
+     */
+    void addBookmark(const QString& label, const QString& streamId = QString());
+
+    /**
+     * @brief 获取所有书签（按添加顺序）
+     * @return 书签列表的只读引用
+     */
+    QVector<DataBookmark> bookmarks() const;
+
+    /**
+     * @brief 删除指定索引的书签
+     * @param index 书签索引，越界时忽略
+     */
+    void removeBookmark(int index);
+
+    /** @brief 清除所有书签 */
+    void clearBookmarks();
+
 signals:
     void recordingStarted();
     void recordingStopped(const QString& filePath, int recordCount, qint64 durationMs);
@@ -51,6 +78,9 @@ signals:
     void playbackProgress(qreal percent);
     void playbackFinished();
     void error(const QString& reason);
+
+    /** @brief 书签列表变化信号（增/删/清空时发射） */
+    void bookmarksChanged();
 
 private slots:
     void onPlaybackTick();
@@ -92,6 +122,10 @@ private:
     qreal m_playbackSpeed = 1.0;
     bool m_playing = false;
     bool m_playbackPaused = false;
+
+    // 书签相关
+    /** @brief 书签集合，按添加顺序存储 */
+    QVector<DataBookmark> m_bookmarks;
 };
 
 #endif // DATALOGGER_H
