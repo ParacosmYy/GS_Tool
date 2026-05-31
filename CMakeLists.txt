@@ -32,6 +32,8 @@ set(SOURCES
     src/core/SendController.cpp
     src/core/SettingsController.cpp
     src/core/ToolbarController.cpp
+    src/core/BackgroundWidget.cpp
+    src/core/BackgroundSettingsPopup.cpp
     src/core/ConnectionManager.cpp
     src/core/ConnectionFactory.cpp
     src/core/ThemeManager.cpp
@@ -82,6 +84,8 @@ set(HEADERS
     src/core/SendController.h
     src/core/SettingsController.h
     src/core/ToolbarController.h
+    src/core/BackgroundWidget.h
+    src/core/BackgroundSettingsPopup.h
     src/core/ConnectionManager.h
     src/core/ConnectionFactory.h
     src/core/ThemeManager.h

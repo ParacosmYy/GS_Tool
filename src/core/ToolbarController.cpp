@@ -20,7 +20,13 @@ ToolbarController::ToolbarController(RecordingController* recordingController, Q
     , m_dirPrefixAction(nullptr)
     , m_clearAction(nullptr)
     , m_exportAction(nullptr)
+    , m_bgAction(nullptr)
 {
+}
+
+QToolBar* ToolbarController::toolbar() const
+{
+    return m_toolbar;
 }
 
 QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
@@ -59,6 +65,11 @@ QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
     // 导出按钮
     m_exportAction = m_toolbar->addAction(tr("导出"));
     m_exportAction->setObjectName("exportAction");
+
+    // 背景设置按钮
+    m_bgAction = m_toolbar->addAction(tr("背景"));
+    m_bgAction->setObjectName("bgSettingsAction");
+    m_bgAction->setToolTip(tr("背景图设置: 磨砂/透明度/特效"));
 
     m_toolbar->addSeparator();
 
@@ -100,6 +111,8 @@ QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
             this, &ToolbarController::clearRequested);
     connect(m_exportAction, &QAction::triggered,
             this, &ToolbarController::exportRequested);
+    connect(m_bgAction, &QAction::triggered,
+            this, &ToolbarController::bgSettingsRequested);
     connect(m_themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &ToolbarController::themeChanged);
     connect(m_langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),

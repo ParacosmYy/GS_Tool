@@ -42,6 +42,10 @@ MainWindow::MainWindow(QWidget* parent)
     setupUI();
     m_toolbarController->createToolbar(this);
     setupStatusBar();
+
+    // 背景设置弹出面板
+    m_bgSettingsPopup = new BackgroundSettingsPopup(m_backgroundWidget, this);
+
     connectSignals();
 
     // 构建面板映射表并传递给NavigationController构建导航树
@@ -81,8 +85,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupUI()
 {
-    m_mainSplitter = new QSplitter(Qt::Horizontal, this);
-    setCentralWidget(m_mainSplitter);
+    // ---- 背景: 磨砂玻璃背景层 ----
+    m_backgroundWidget = new BackgroundWidget(this);
+    setCentralWidget(m_backgroundWidget);
+    auto* bgLayout = new QVBoxLayout(m_backgroundWidget);
+    bgLayout->setContentsMargins(0, 0, 0, 0);
+    bgLayout->setSpacing(0);
+
+    m_mainSplitter = new QSplitter(Qt::Horizontal, m_backgroundWidget);
 
     // ---- 左侧导航树（模型由NavigationController构建） ----
     m_navTree = new QTreeView;
@@ -108,39 +118,33 @@ void MainWindow::setupUI()
     rightPanelLayout->setSpacing(0);
     rightLayout->addWidget(m_rightPanel, 1);
 
-    // ---- 面板0: 串口配置 + 终端 ----
+    // 面板: 串口配置 + 终端
     auto* serialPanel = new QWidget;
     serialPanel->setObjectName("serialPanel");
     auto* serialLayout = new QVBoxLayout(serialPanel);
     serialLayout->setContentsMargins(0, 0, 0, 0);
     serialLayout->setSpacing(0);
 
-    // 串口配置面板(点击"Config"时显示)
     m_serialConfig = new SerialConfigPanel;
     m_serialConfig->setVisible(false);
     serialLayout->addWidget(m_serialConfig);
 
-    // 数据统计面板(点击"Statistics"时显示)
     m_dataStats = new DataStatistics;
     m_dataStats->setVisible(false);
     serialLayout->addWidget(m_dataStats);
 
-    // 协议解析面板(点击"Protocol"时显示)
     m_protocolView = new ProtocolView;
     m_protocolView->setVisible(false);
     serialLayout->addWidget(m_protocolView);
 
-    // 帧编辑器面板(点击"Frame Editor"时显示)
     m_frameEditor = new FrameVisualEditor;
     m_frameEditor->setVisible(false);
     serialLayout->addWidget(m_frameEditor);
 
-    // 波形图面板(点击"Chart"时显示)
     m_chartWidget = new ChartWidget;
     m_chartWidget->setVisible(false);
     serialLayout->addWidget(m_chartWidget);
 
-    // OTA升级面板(点击"OTA"时显示)
     m_otaWidget = new OtaWidget(m_otaManager);
     m_otaWidget->setVisible(false);
     serialLayout->addWidget(m_otaWidget);
@@ -183,6 +187,9 @@ void MainWindow::setupUI()
     m_mainSplitter->setStretchFactor(0, 0);
     m_mainSplitter->setStretchFactor(1, 1);
 
+    // 将splitter放入背景层布局
+    bgLayout->addWidget(m_mainSplitter, 1);
+
     // Ctrl+F 快捷键激活搜索栏
     auto* searchShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
     connect(searchShortcut, &QShortcut::activated, m_searchBar, &TerminalSearchBar::activate);
@@ -221,14 +228,12 @@ void MainWindow::connectSignals()
     });
     connect(m_serialConfig, &SerialConfigPanel::disconnectRequested,
             m_connController, &ConnectionController::disconnectSerial);
-
-    // DTR/RTS运行时控制
     connect(m_serialConfig, &SerialConfigPanel::dtrChanged,
             m_connController, &ConnectionController::setDtr);
     connect(m_serialConfig, &SerialConfigPanel::rtsChanged,
             m_connController, &ConnectionController::setRts);
 
-    // ConnectionController -> MainWindow UI 更新
+    // 连接状态 → UI更新
     connect(m_connController, &ConnectionController::connectionStateChanged,
             this, [this](ConnectionState state, const QString& connName) {
         const char* stateStr = "";
@@ -273,18 +278,14 @@ void MainWindow::connectSignals()
 
     connect(m_connController, &ConnectionController::statusBarUpdateRequested,
             this, &MainWindow::updateStatusBar);
-
-    // 连接失败弹窗
     connect(m_connController, &ConnectionController::connectionFailed,
             this, [this](const QString& title, const QString& message) {
         QMessageBox::warning(this, title, message);
     });
 
-    // 快捷指令 -> SendController
+    // 快捷指令 + 发送
     connect(m_quickCmdBar, &QuickCommandBar::commandTriggered,
             m_sendController, &SendController::onQuickCommand);
-
-    // SendController信号 -> MainWindow状态栏更新
     connect(m_sendController, &SendController::dataSent,
             this, [this](qint64) { updateStatusBar(); });
     connect(m_sendController, &SendController::statusMessage,
@@ -303,15 +304,14 @@ void MainWindow::connectSignals()
             this, &MainWindow::onClearTerminal);
     connect(m_toolbarController, &ToolbarController::exportRequested,
             this, &MainWindow::onExportData);
-
-    // 主题/语言切换 -> 委托SettingsController处理
+    connect(m_toolbarController, &ToolbarController::bgSettingsRequested,
+            this, &MainWindow::onBgSettingsToggled);
     connect(m_toolbarController, &ToolbarController::themeChanged,
             m_settingsController, &SettingsController::onThemeChanged);
     connect(m_toolbarController, &ToolbarController::languageChanged,
             m_settingsController, &SettingsController::onLanguageChanged);
 
-    // 日志录制/回放: RecordingController内部已连接DataLogger信号
-    // 仅连接外部通知信号 -> MainWindow
+    // 录制/回放
     connect(m_recordingController, &RecordingController::statusMessage,
             this, [this](const QString& msg, int timeoutMs) {
                 statusBar()->showMessage(msg, timeoutMs);
@@ -335,39 +335,30 @@ void MainWindow::connectSignals()
         m_terminal->clearSearchHighlight();
     });
 
-    // 终端搜索匹配结果 -> 搜索栏显示匹配计数
+    // 搜索匹配结果 → 搜索栏显示
     connect(m_terminal, &TerminalWidget::searchMatchesChanged,
             this, [this](int total, int current) {
-                if (total == 0) {
-                    m_searchBar->setResultText(QString());
-                } else {
-                    m_searchBar->setResultText(
-                        tr("%1/%2").arg(current + 1).arg(total));
-                }
+                m_searchBar->setResultText(total == 0 ? QString() :
+                    tr("%1/%2").arg(current + 1).arg(total));
             });
-
-    // 统计刷新定时器
     connect(m_statsTimer, &QTimer::timeout, this, &MainWindow::updateDataStatistics);
 
-    // 协议桥管理器 -> 协议视图 + 波形图数据模型
-    // 所有协议源(FrameParser/JustFloat/FireWater)的frameParsed统一经由ProtocolBridgeManager路由
+    // 协议桥 → 视图 + 波形图
     connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
             m_protocolView, &ProtocolView::onFrameParsed);
     connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameError,
             m_protocolView, &ProtocolView::onFrameError);
-    // 帧数据通过ChartModel分发，ChartWidget内部连接model信号刷新渲染
     connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
             m_chartWidget->model(), &ChartModel::onFrameParsed);
 
-    // 帧编辑器 -> 帧解析器 + 波形图通道配置（定义变更时同步更新）
+    // 帧编辑器 → 帧解析器 + 波形图
     connect(m_frameEditor, &FrameVisualEditor::definitionChanged,
             this, [this](const FrameDefinition& def) {
                 m_frameParser->setDefinition(def);
-                // 自动根据帧定义生成通道配置
                 m_chartWidget->configureFromFrameDefinition(def);
             });
 
-    // 导航树点击切换面板 -- 委托NavigationController处理面板切换
+    // 导航树点击切换面板
     connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
         QString text = index.data().toString();
 
@@ -447,6 +438,20 @@ void MainWindow::onSearchRequested(const QString& pattern, bool regex, bool hex)
 void MainWindow::onSearchCleared()
 {
     m_terminal->clearSearchHighlight();
+}
+
+void MainWindow::onBgSettingsToggled()
+{
+    if (m_bgSettingsPopup->isVisible()) {
+        m_bgSettingsPopup->hide();
+    } else {
+        m_bgSettingsPopup->syncFromWidget();
+        // 在工具栏下方弹出
+        QToolBar* tb = m_toolbarController->toolbar();
+        QPoint pos = tb->mapToGlobal(QPoint(tb->width() - 270, tb->height() + 2));
+        m_bgSettingsPopup->move(pos);
+        m_bgSettingsPopup->show();
+    }
 }
 
 void MainWindow::updateStatusBar()

@@ -5,6 +5,10 @@ QMainWindow {
     background-color: #1a1b26;
 }
 
+BackgroundWidget {
+    background-color: transparent;
+}
+
 /* 左侧导航树 */
 QTreeView {
     background-color: #16161e;
@@ -628,3 +632,29 @@ QPushButton#frameRemoveFieldBtn {
 }
 QPushButton#frameRemoveFieldBtn:hover { background-color: #292e42; border-color: #f7768e; }
 QPushButton#frameRemoveFieldBtn:pressed { background-color: #3b4261; }
+
+/* === 背景设置弹出面板 === */
+QWidget#bgSettingsPopup {
+    background-color: #1a1b26;
+    border: 1px solid #292e42;
+    border-radius: 8px;
+}
+QSlider#bgBlurSlider, QSlider#bgOpacitySlider {
+    background: transparent;
+    min-height: 20px;
+}
+QSlider#bgBlurSlider::groove:horizontal, QSlider#bgOpacitySlider::groove:horizontal {
+    height: 4px;
+    background: #292e42;
+    border-radius: 2px;
+}
+QSlider#bgBlurSlider::handle:horizontal, QSlider#bgOpacitySlider::handle:horizontal {
+    width: 14px;
+    height: 14px;
+    margin: -5px 0;
+    background: #7aa2f7;
+    border-radius: 7px;
+}
+QSlider#bgBlurSlider::handle:horizontal:hover, QSlider#bgOpacitySlider::handle:horizontal:hover {
+    background: #89b4fa;
+}

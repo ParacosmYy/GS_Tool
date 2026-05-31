@@ -5,9 +5,14 @@ QMainWindow {
     background-color: #1e1e2e;
 }
 
-/* 左侧导航树 */
+/* 背景组件 - 透明背景让面板覆盖层可见 */
+BackgroundWidget {
+    background-color: transparent;
+}
+
+/* 左侧导航树 - 半透明让磨砂玻璃透出 */
 QTreeView {
-    background-color: #181825;
+    background-color: rgba(24, 24, 37, 200);
     color: #cdd6f4;
     border: none;
     outline: none;
@@ -621,3 +626,29 @@ QPushButton#frameRemoveFieldBtn {
 }
 QPushButton#frameRemoveFieldBtn:hover { background-color: #45475a; border-color: #f38ba8; }
 QPushButton#frameRemoveFieldBtn:pressed { background-color: #585b70; }
+
+/* === 背景设置弹出面板 === */
+QWidget#bgSettingsPopup {
+    background-color: #1e1e2e;
+    border: 1px solid #45475a;
+    border-radius: 8px;
+}
+QSlider#bgBlurSlider, QSlider#bgOpacitySlider {
+    background: transparent;
+    min-height: 20px;
+}
+QSlider#bgBlurSlider::groove:horizontal, QSlider#bgOpacitySlider::groove:horizontal {
+    height: 4px;
+    background: #45475a;
+    border-radius: 2px;
+}
+QSlider#bgBlurSlider::handle:horizontal, QSlider#bgOpacitySlider::handle:horizontal {
+    width: 14px;
+    height: 14px;
+    margin: -5px 0;
+    background: #89b4fa;
+    border-radius: 7px;
+}
+QSlider#bgBlurSlider::handle:horizontal:hover, QSlider#bgOpacitySlider::handle:horizontal:hover {
+    background: #b4d0fb;
+}

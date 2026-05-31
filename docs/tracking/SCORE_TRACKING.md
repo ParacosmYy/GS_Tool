@@ -32,4 +32,5 @@
 | 24 | ProtocolBridgeManager协议源选择器+objectName审计补全(8控件)+QSS交互状态补全(SpinBox/ComboBox/ToolButton disabled)+ConnectionController悬空指针修复(断开时清除SendController/OtaManager+网络连接补OtaManager)+桥接单元测试 | 26 |
 | 25 | P0串口修复: TerminalWidget复制功能实现+搜索高亮(F3导航/正则/HEX/匹配计数)+DTR/RTS运行时控制(连接后保持可切换)+自动追加换行符(无/\r\n/\n/\r)+CLAUDE.md更新(Bug修复冲刺机制+VOFA+超越目标+驱动检测需求) | 27 |
 | 26 | ChartWidget初始化背景修复+SerialDriverDetector驱动检测+方向前缀着色+objectName补全+QSS三主题补全 | 28 |
+| 27 | 架构拆分: ToolbarController+SettingsController提取+lineAt悬空引用P0修复+objectName补全+内联样式迁移 | 29 |
 | ... | 目标: 1000分 | 1000 |

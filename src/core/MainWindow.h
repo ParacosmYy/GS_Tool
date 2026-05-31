@@ -23,6 +23,8 @@
 #include "core/SendController.h"
 #include "core/ToolbarController.h"
 #include "core/SettingsController.h"
+#include "core/BackgroundWidget.h"
+#include "core/BackgroundSettingsPopup.h"
 #include "utils/SettingsManager.h"
 #include "terminal/TerminalSearchBar.h"
 #include "protocol/FrameParser.h"
@@ -62,6 +64,9 @@ private slots:
     // 搜索相关
     void onSearchRequested(const QString& pattern, bool regex, bool hex);
     void onSearchCleared();
+
+    // 背景设置
+    void onBgSettingsToggled();
 
 private:
     void setupUI();
@@ -133,6 +138,10 @@ private:
 
     // 设置控制器（窗口几何/主题/串口配置/语言的加载与保存）
     SettingsController* m_settingsController;
+
+    // 背景组件（背景图+磨砂玻璃+涟漪特效）
+    BackgroundWidget* m_backgroundWidget;
+    BackgroundSettingsPopup* m_bgSettingsPopup;
 };
 
 #endif // MAINWINDOW_H

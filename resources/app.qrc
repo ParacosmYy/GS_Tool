@@ -3,5 +3,6 @@
         <file>themes/dark_terminal.qss</file>
         <file>themes/modern_dark.qss</file>
         <file>themes/light.qss</file>
+        <file>backgrounds/default_bg.png</file>
     </qresource>
 </RCC>

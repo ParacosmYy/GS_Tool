@@ -21,6 +21,9 @@ public:
     // 创建并返回工具栏，添加到parent的主窗口
     QToolBar* createToolbar(QMainWindow* parent);
 
+    // 获取工具栏指针（用于定位弹出面板等）
+    QToolBar* toolbar() const;
+
     // 主题管理接口
     void setAvailableThemes(const QStringList& themes);
     void setCurrentTheme(const QString& themeName);
@@ -36,6 +39,7 @@ signals:
     void dirPrefixToggled(bool checked);
     void clearRequested();
     void exportRequested();
+    void bgSettingsRequested();
     void themeChanged(int index);
     void languageChanged(int index);
 
@@ -51,6 +55,7 @@ private:
     QAction* m_dirPrefixAction;
     QAction* m_clearAction;
     QAction* m_exportAction;
+    QAction* m_bgAction;
 };
 
 #endif // TOOLBARCONTROLLER_H
