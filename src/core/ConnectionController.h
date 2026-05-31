@@ -52,7 +52,7 @@ public:
     void setDtr(bool enabled);                           ///< 控制当前连接的 DTR 线路信号
     void setRts(bool enabled);                           ///< 控制当前连接的 RTS 线路信号
 
-    void enableAutoReconnect(bool enabled, int intervalMs = 3000); ///< 启用/禁用自动重连 @param intervalMs 重连间隔(毫秒)
+    void enableAutoReconnect(bool enabled, int intervalMs = 3000, int maxRetries = 0); ///< 启用/禁用自动重连 @param intervalMs 重连间隔(毫秒) @param maxRetries 最大重连次数(0=无限制)
     bool isAutoReconnectEnabled() const;                 ///< 查询自动重连状态
     PortWatcher* portWatcher() const;                    ///< 获取 PortWatcher 实例
 
@@ -113,6 +113,15 @@ signals:
      */
     void connectionError(const QString& portName, const QString& error);
 
+    /** @brief 自动重连尝试通知 @param attempt 当前第几次尝试 @param maxRetries 最大重连次数(0=无限制) */
+    void reconnectAttempt(int attempt, int maxRetries);
+
+    /** @brief 自动重连成功通知 @param connName 重连成功的连接名称 */
+    void reconnectSucceeded(const QString& connName);
+
+    /** @brief 自动重连失败通知(达到最大重连次数) @param reason 失败原因描述 */
+    void reconnectFailed(const QString& reason);
+
 private slots:
     void onConnectionStateChanged(ConnectionState state); ///< 底层状态变化: 清除下游/触发重连/发射Toast
     void onDataReceived(const QByteArray& data);          ///< 转发数据并请求状态栏刷新
@@ -153,6 +162,8 @@ private:
     QTimer m_reconnectTimer;                       ///< 自动重连定时器(间隔触发)
     bool m_autoReconnectEnabled = false;           ///< 是否启用自动重连
     bool m_userInitiatedDisconnect = false;        ///< 用户主动断开标志(不触发自动重连)
+    int m_reconnectMaxRetries = 0;                 ///< 最大重连次数(0=无限制)
+    int m_reconnectAttemptCount = 0;               ///< 当前已重连次数
     QVariantMap m_lastConnectParams;               ///< 上次连接参数(用于重连)
     ConnectionType m_lastConnectType = ConnectionType::Serial; ///< 上次连接类型
     QString m_connectedPortName;                   ///< 当前连接的串口名称

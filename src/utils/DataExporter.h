@@ -124,9 +124,10 @@ private:
 
     // ---- 辅助方法 ----
 
+    /** @brief 打开文本文件并设置UTF8编码，失败时发射exportError */
+    bool openTextFile(QFile& file, QTextStream& out, const QString& path);
     /** @brief 刷新文本流并检查文件写入错误，失败时发射 exportError 信号 */
     bool flushAndCheck(QFile& file, QTextStream& out, const QString& path);
-
     /** @brief 按时间范围过滤行数据，from/to 均可选 */
     QVector<TerminalLine> filterByTime(const QVector<TerminalLine>& lines,
                                         const QDateTime& from,

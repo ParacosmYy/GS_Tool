@@ -51,7 +51,8 @@ FrameVisualEditor::FrameVisualEditor(QWidget* parent) : QWidget(parent) { setupU
 void FrameVisualEditor::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(12, 8, 12, 8);
+    mainLayout->setContentsMargins(12, 12, 12, 12);
+    mainLayout->setSpacing(12);
 
     mainLayout->addWidget(setupHeaderGroup());
     mainLayout->addWidget(setupLengthGroup());
@@ -199,42 +200,48 @@ QGroupBox* FrameVisualEditor::setupFieldsGroup()
     btnLayout->addStretch();
     layout->addLayout(btnLayout);
 
-    // 上移按钮: 交换当前行与上一行的数据和控件
-    connect(moveUpBtn, &QPushButton::clicked, this, [this]() {
-        int row = m_fieldTable->currentRow();
-        if (row <= 0) return;
-        for (int col = 0; col < m_fieldTable->columnCount(); ++col) {
-            auto* a = m_fieldTable->takeItem(row, col);
-            auto* b = m_fieldTable->takeItem(row - 1, col);
-            m_fieldTable->setItem(row, col, b);
-            m_fieldTable->setItem(row - 1, col, a);
-        }
-        for (int col : {1, 4}) {
-            auto* w1 = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(row, col));
-            auto* w2 = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(row - 1, col));
-            if (w1 && w2) { int t = w1->currentIndex(); w1->setCurrentIndex(w2->currentIndex()); w2->setCurrentIndex(t); }
-        }
-        m_fieldTable->selectRow(row - 1);
-    });
-    // 下移按钮: 交换当前行与下一行的数据和控件
-    connect(moveDownBtn, &QPushButton::clicked, this, [this]() {
-        int row = m_fieldTable->currentRow();
-        if (row < 0 || row >= m_fieldTable->rowCount() - 1) return;
-        for (int col = 0; col < m_fieldTable->columnCount(); ++col) {
-            auto* a = m_fieldTable->takeItem(row, col);
-            auto* b = m_fieldTable->takeItem(row + 1, col);
-            m_fieldTable->setItem(row, col, b);
-            m_fieldTable->setItem(row + 1, col, a);
-        }
-        for (int col : {1, 4}) {
-            auto* w1 = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(row, col));
-            auto* w2 = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(row + 1, col));
-            if (w1 && w2) { int t = w1->currentIndex(); w1->setCurrentIndex(w2->currentIndex()); w2->setCurrentIndex(t); }
-        }
-        m_fieldTable->selectRow(row + 1);
-    });
+    connect(moveUpBtn, &QPushButton::clicked, this, &FrameVisualEditor::onMoveFieldUp);
+    connect(moveDownBtn, &QPushButton::clicked, this, &FrameVisualEditor::onMoveFieldDown);
 
     return group;
+}
+
+/** @brief 将当前选中行上移一行(交换所有列数据和控件) */
+void FrameVisualEditor::onMoveFieldUp()
+{
+    int row = m_fieldTable->currentRow();
+    if (row <= 0) return;
+    for (int col = 0; col < m_fieldTable->columnCount(); ++col) {
+        auto* a = m_fieldTable->takeItem(row, col);
+        auto* b = m_fieldTable->takeItem(row - 1, col);
+        m_fieldTable->setItem(row, col, b);
+        m_fieldTable->setItem(row - 1, col, a);
+    }
+    for (int col : {1, 4}) {
+        auto* w1 = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(row, col));
+        auto* w2 = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(row - 1, col));
+        if (w1 && w2) { int t = w1->currentIndex(); w1->setCurrentIndex(w2->currentIndex()); w2->setCurrentIndex(t); }
+    }
+    m_fieldTable->selectRow(row - 1);
+}
+
+/** @brief 将当前选中行下移一行(交换所有列数据和控件) */
+void FrameVisualEditor::onMoveFieldDown()
+{
+    int row = m_fieldTable->currentRow();
+    if (row < 0 || row >= m_fieldTable->rowCount() - 1) return;
+    for (int col = 0; col < m_fieldTable->columnCount(); ++col) {
+        auto* a = m_fieldTable->takeItem(row, col);
+        auto* b = m_fieldTable->takeItem(row + 1, col);
+        m_fieldTable->setItem(row, col, b);
+        m_fieldTable->setItem(row + 1, col, a);
+    }
+    for (int col : {1, 4}) {
+        auto* w1 = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(row, col));
+        auto* w2 = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(row + 1, col));
+        if (w1 && w2) { int t = w1->currentIndex(); w1->setCurrentIndex(w2->currentIndex()); w2->setCurrentIndex(t); }
+    }
+    m_fieldTable->selectRow(row + 1);
 }
 
 /**

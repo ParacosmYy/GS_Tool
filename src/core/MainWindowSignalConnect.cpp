@@ -125,6 +125,35 @@ void MainWindow::connectSerialSignals()
         ToastWidget::showDebounced(this, message, ToastWidget::ToastType::Error, 3000);
     });
 
+    // ---- 自动重连状态指示 ----
+    // 重连尝试中: 更新状态栏显示当前尝试次数
+    connect(m_connController, &ConnectionController::reconnectAttempt,
+            this, [this](int attempt, int maxRetries) {
+        QString msg = maxRetries > 0
+            ? tr("重连中... (第 %1/%2 次)").arg(attempt).arg(maxRetries)
+            : tr("重连中... (第 %1 次)").arg(attempt);
+        m_connStatusLbl->setText(msg);
+        m_connStatusLbl->setProperty("state", "connecting");
+        m_connStatusLbl->style()->unpolish(m_connStatusLbl);
+        m_connStatusLbl->style()->polish(m_connStatusLbl);
+    });
+    // 重连成功: 状态栏由 handleConnectionState(Connected) 自动更新，此处仅显示 Toast
+    connect(m_connController, &ConnectionController::reconnectSucceeded,
+            this, [this](const QString& connName) {
+        ToastWidget::show(this, tr("重连成功: %1").arg(connName),
+                          ToastWidget::ToastType::Success);
+    });
+    // 重连最终失败: 更新状态栏 + 显示 Error 类型 Toast
+    connect(m_connController, &ConnectionController::reconnectFailed,
+            this, [this](const QString& reason) {
+        m_connStatusLbl->setText(tr("重连失败"));
+        m_connStatusLbl->setProperty("state", "error");
+        m_connStatusLbl->style()->unpolish(m_connStatusLbl);
+        m_connStatusLbl->style()->polish(m_connStatusLbl);
+        ToastWidget::show(this, tr("重连失败: %1").arg(reason),
+                          ToastWidget::ToastType::Error);
+    });
+
     // 快捷指令 → 发送控制器
     connect(m_panelManager->quickCmdBar(), &QuickCommandBar::commandTriggered,
             m_sendController, &SendController::onQuickCommand);

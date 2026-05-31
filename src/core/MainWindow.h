@@ -97,41 +97,19 @@ private:
      */
     void handleConnectionState(ConnectionState state, const QString& connName);
 
-    // ==================== 核心组件 ====================
-
-    /** @brief 连接管理器，管理所有 IConnection 实例的生命周期 */
-    ConnectionManager* m_connManager;
-
-    /** @brief 连接控制器，负责创建/断开连接并分发连接状态 */
-    ConnectionController* m_connController;
-
-    /** @brief 终端数据模型，存储收发数据行和 RX/TX 字节计数 */
-    TerminalModel* m_terminalModel;
-
-    // ==================== 业务组件 ====================
-
-    /** @brief 发送历史管理器，维护最近发送记录用于自动补全 */
-    SendHistory* m_sendHistory;
-
-    /** @brief 数据导出器，支持 TXT/CSV/BIN 格式的流式批量导出 */
-    DataExporter* m_dataExporter;
-
-    /** @brief 数据日志记录器，负责录制/回放 .edl 日志文件 */
-    DataLogger* m_dataLogger;
-
-    /** @brief 录制/回放控制器，管理录制和回放按钮的交互 */
-    RecordingController* m_recordingController;
-
-    /** @brief 发送控制器，管理发送栏 UI、输入解析（文本/HEX）、连接写入、终端记录 */
-    SendController* m_sendController;
-
-    // ==================== UI组件 - 布局 ====================
-
-    /** @brief 主水平分割器，左导航树 + 右面板区 */
-    QSplitter* m_mainSplitter;
-
-    /** @brief 左侧导航树控件，由 NavigationController 构建数据模型 */
-    QTreeView* m_navTree;
+    // ---- 核心组件 ----
+    ConnectionManager* m_connManager;          ///< 连接管理器(IConnection生命周期)
+    ConnectionController* m_connController;    ///< 连接控制器(创建/断开连接)
+    TerminalModel* m_terminalModel;            ///< 终端数据模型(收发数据+RX/TX计数)
+    // ---- 业务组件 ----
+    SendHistory* m_sendHistory;                ///< 发送历史管理器(自动补全)
+    DataExporter* m_dataExporter;              ///< 数据导出器(TXT/CSV/BIN)
+    DataLogger* m_dataLogger;                  ///< 数据日志记录器(录制/回放.edl)
+    RecordingController* m_recordingController; ///< 录制/回放控制器
+    SendController* m_sendController;          ///< 发送控制器(发送栏UI+HEX解析)
+    // ---- UI组件 - 布局 ----
+    QSplitter* m_mainSplitter;                 ///< 主水平分割器(导航树+面板区)
+    QTreeView* m_navTree;                      ///< 左侧导航树
 
     /** @brief 导航树选中滑动指示器，在 navTree 左侧绘制动画 accent 色竖线 */
     NavIndicatorWidget* m_navIndicator;

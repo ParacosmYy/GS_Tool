@@ -144,6 +144,7 @@ void ConnectionController::disconnectCurrent()
 {
     m_userInitiatedDisconnect = true;
     m_reconnectTimer.stop();
+    m_reconnectAttemptCount = 0;
 
     if (m_currentConn) {
         // 缓存端口名称，断开后 m_connectedPortName 会被清空
@@ -233,10 +234,11 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
 IConnection* ConnectionController::currentConnection() const { return m_currentConn; }
 void ConnectionController::setDtr(bool enabled) { if (m_currentConn) m_currentConn->setDtr(enabled); }
 void ConnectionController::setRts(bool enabled) { if (m_currentConn) m_currentConn->setRts(enabled); }
-/** @brief 启用/禁用自动重连 */
-void ConnectionController::enableAutoReconnect(bool enabled, int intervalMs)
+/** @brief 启用/禁用自动重连 @param enabled 是否启用 @param intervalMs 重连间隔(毫秒) @param maxRetries 最大重连次数(0=无限制) */
+void ConnectionController::enableAutoReconnect(bool enabled, int intervalMs, int maxRetries)
 {
     m_autoReconnectEnabled = enabled;
+    m_reconnectMaxRetries = maxRetries;
     if (enabled) m_reconnectTimer.setInterval(intervalMs);
     else m_reconnectTimer.stop();
 }
@@ -258,8 +260,14 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
 
     switch (state) {
     case ConnectionState::Connected:
-        // 连接成功，停止超时定时器
+        // 连接成功，停止超时定时器和重连定时器
         stopConnectionTimeout();
+        m_reconnectTimer.stop();
+        // 如果是重连成功，发出通知并重置计数
+        if (m_reconnectAttemptCount > 0) {
+            emit reconnectSucceeded(connName);
+            m_reconnectAttemptCount = 0;
+        }
         if (m_recordingController) {
             m_recordingController->setConnected(true);
         }
@@ -336,16 +344,30 @@ void ConnectionController::onConnectionTimeout()
  * @brief 自动重连定时器触发
  *
  * 检查是否仍在断开状态且未由用户主动断开，若是则尝试重新连接。
+ * 支持最大重连次数限制: 达到上限后停止重连并发出失败通知。
  */
 void ConnectionController::onAutoReconnect()
 {
     // 如果已经连接或用户主动断开，停止重连
     if (m_currentConn || m_userInitiatedDisconnect) {
         m_reconnectTimer.stop();
+        m_reconnectAttemptCount = 0;
         return;
     }
 
-    qInfo() << "Auto-reconnect attempt...";
+    // 检查是否达到最大重连次数（0 表示无限制）
+    if (m_reconnectMaxRetries > 0 && m_reconnectAttemptCount >= m_reconnectMaxRetries) {
+        m_reconnectTimer.stop();
+        const QString reason = tr("Max reconnect attempts reached (%1)").arg(m_reconnectMaxRetries);
+        emit reconnectFailed(reason);
+        m_reconnectAttemptCount = 0;
+        return;
+    }
+
+    m_reconnectAttemptCount++;
+    emit reconnectAttempt(m_reconnectAttemptCount, m_reconnectMaxRetries);
+    qInfo() << "Auto-reconnect attempt" << m_reconnectAttemptCount << "/ "
+            << (m_reconnectMaxRetries > 0 ? QString::number(m_reconnectMaxRetries) : "unlimited");
 
     if (m_lastConnectType == ConnectionType::Serial) {
         connectSerial(m_lastConnectParams);

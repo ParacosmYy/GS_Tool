@@ -99,6 +99,10 @@ private:
     void updateBinaryPreview();
     /** @brief 刷新预览和布局提示 */
     void onPreviewTimerTick();
+    /** @brief 将当前选中行上移一行(交换数据和控件) */
+    void onMoveFieldUp();
+    /** @brief 将当前选中行下移一行(交换数据和控件) */
+    void onMoveFieldDown();
 
     /**
      * @brief 计算字段类型占用的字节数

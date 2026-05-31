@@ -27,6 +27,9 @@ private slots:
     void onError(QAbstractSocket::SocketError error);
 
 private:
+    /** @brief 将Qt网络错误码映射为中文描述 */
+    static QString translateNetworkError(QAbstractSocket::SocketError error,
+                                         const QString& systemError);
     void updateState(ConnectionState newState);
 
     quint16 m_localPort = 0;
