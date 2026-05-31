@@ -30,6 +30,8 @@ set(SOURCES
     src/core/RecordingController.cpp
     src/core/NavigationController.cpp
     src/core/SendController.cpp
+    src/core/SettingsController.cpp
+    src/core/ToolbarController.cpp
     src/core/ConnectionManager.cpp
     src/core/ConnectionFactory.cpp
     src/core/ThemeManager.cpp
@@ -78,6 +80,8 @@ set(HEADERS
     src/core/RecordingController.h
     src/core/NavigationController.h
     src/core/SendController.h
+    src/core/SettingsController.h
+    src/core/ToolbarController.h
     src/core/ConnectionManager.h
     src/core/ConnectionFactory.h
     src/core/ThemeManager.h

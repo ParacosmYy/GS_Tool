@@ -61,10 +61,10 @@ QVector<TerminalLine> TerminalModel::lines(int start, int count) const
     return result;
 }
 
-const TerminalLine& TerminalModel::lineAt(int index) const
+TerminalLine TerminalModel::lineAt(int index) const
 {
-    Q_ASSERT(index >= 0 && index < m_count);
     QMutexLocker locker(&m_mutex);
+    Q_ASSERT(index >= 0 && index < m_count);
     return m_buffer[physicalIndex(index)];
 }
 

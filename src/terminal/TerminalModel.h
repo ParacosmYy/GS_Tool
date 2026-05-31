@@ -29,9 +29,11 @@ public:
     // 获取指定范围的行 (用于导出，返回深拷贝)
     QVector<TerminalLine> lines(int start, int count) const;
 
-    // 获取单行的const引用，避免全量拷贝 (用于渲染)
+    // 获取单行的拷贝 (用于渲染)
+    // 返回值而非引用，避免QMutexLocker释放后引用悬空
+    // 拷贝成本可接受: QByteArray(隐式共享/COW) + QDateTime + enum
     // 调用者必须保证 index 在 [0, lineCount()) 范围内
-    const TerminalLine& lineAt(int index) const;
+    TerminalLine lineAt(int index) const;
 
     // 获取总行数
     int lineCount() const;

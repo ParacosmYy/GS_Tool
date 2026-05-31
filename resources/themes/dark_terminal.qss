@@ -363,6 +363,12 @@ QPushButton#connectBtn[state="connected"] {
 }
 QPushButton#connectBtn[state="connected"]:hover { background-color: #eba0ac; }
 
+QLabel#driverInfoLbl {
+    font-size: 11px;
+    color: #6c7086;
+    padding: 4px;
+}
+
 /* === SerialConfigPanel 控件 === */
 QGroupBox {
     font-weight: bold;

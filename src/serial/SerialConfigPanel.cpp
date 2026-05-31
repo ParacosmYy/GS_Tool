@@ -105,7 +105,6 @@ void SerialConfigPanel::setupUI()
     m_driverInfoLbl = new QLabel;
     m_driverInfoLbl->setObjectName("driverInfoLbl");
     m_driverInfoLbl->setWordWrap(true);
-    m_driverInfoLbl->setStyleSheet("font-size: 11px; padding: 4px;");
     mainLayout->addWidget(m_driverInfoLbl);
 
     // ---- 连接按钮 ----

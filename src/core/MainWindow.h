@@ -4,11 +4,8 @@
 #include <QMainWindow>
 #include <QTreeView>
 #include <QSplitter>
-#include <QToolBar>
 #include <QStatusBar>
 #include <QLabel>
-#include <QComboBox>
-#include <QAction>
 #include <functional>
 #include "ConnectionManager.h"
 #include "ThemeManager.h"
@@ -24,6 +21,8 @@
 #include "core/RecordingController.h"
 #include "core/NavigationController.h"
 #include "core/SendController.h"
+#include "core/ToolbarController.h"
+#include "core/SettingsController.h"
 #include "utils/SettingsManager.h"
 #include "terminal/TerminalSearchBar.h"
 #include "protocol/FrameParser.h"
@@ -64,21 +63,12 @@ private slots:
     void onSearchRequested(const QString& pattern, bool regex, bool hex);
     void onSearchCleared();
 
-    // 主题切换
-    void onThemeChanged(int index);
-
-    // 语言切换
-    void onLanguageChanged(int index);
-
 private:
     void setupUI();
-    void setupToolbar();
     void setupStatusBar();
     void connectSignals();
     void updateStatusBar();
     void updateDataStatistics();
-    void loadSettings();
-    void saveSettings();
 
     // 核心组件
     ConnectionManager* m_connManager;
@@ -101,15 +91,8 @@ private:
     QTreeView* m_navTree;
     QWidget* m_rightPanel;
 
-    // UI组件 - 工具栏
-    QToolBar* m_toolbar;
-    QComboBox* m_displayModeCombo;
-    QComboBox* m_themeCombo;
-    QComboBox* m_langCombo;
-    QAction* m_timestampAction;
-    QAction* m_dirPrefixAction;
-    QAction* m_clearAction;
-    QAction* m_exportAction;
+    // UI组件 - 工具栏（由ToolbarController管理）
+    ToolbarController* m_toolbarController;
 
     // UI组件 - 串口配置
     SerialConfigPanel* m_serialConfig;
@@ -147,6 +130,9 @@ private:
 
     // 导航控制器（面板切换动画 + 呼吸动画 + 导航树构建）
     NavigationController* m_navController;
+
+    // 设置控制器（窗口几何/主题/串口配置/语言的加载与保存）
+    SettingsController* m_settingsController;
 };
 
 #endif // MAINWINDOW_H

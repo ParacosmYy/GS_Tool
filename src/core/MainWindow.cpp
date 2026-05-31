@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget* parent)
     , m_protocolBridgeMgr(new ProtocolBridgeManager(m_frameParser, this))
     , m_otaManager(new OtaManager(this))
     , m_navController(new NavigationController(this))
+    , m_toolbarController(new ToolbarController(m_recordingController, this))
+    , m_settingsController(new SettingsController(this, this))
 {
     // 依赖注入: ConnectionController 需要通知 SendController/OtaManager/RecordingController
     m_connController->setSendController(m_sendController);
@@ -38,7 +40,7 @@ MainWindow::MainWindow(QWidget* parent)
     m_connController->setRecordingController(m_recordingController);
 
     setupUI();
-    setupToolbar();
+    m_toolbarController->createToolbar(this);
     setupStatusBar();
     connectSignals();
 
@@ -56,8 +58,12 @@ MainWindow::MainWindow(QWidget* parent)
     // 初始面板状态: 终端为默认可见面板
     m_navController->setCurrentPanel(m_terminal);
 
-    // 加载保存的设置（主题、窗口几何、串口配置）
-    loadSettings();
+    // 注入UI引用到SettingsController（通过ToolbarController接口同步主题/语言）
+    m_settingsController->setToolbarController(m_toolbarController);
+    m_settingsController->setSerialConfigPanel(m_serialConfig);
+
+    // 加载保存的设置（主题、窗口几何、串口配置、语言）
+    m_settingsController->loadSettings();
 
     // 统计刷新定时器: 每500ms刷新一次
     m_statsTimer->setInterval(500);
@@ -90,11 +96,13 @@ void MainWindow::setupUI()
 
     // ---- 右侧内容面板 ----
     auto* rightWidget = new QWidget;
+    rightWidget->setObjectName("rightWidget");
     auto* rightLayout = new QVBoxLayout(rightWidget);
     rightLayout->setContentsMargins(0, 0, 0, 0);
     rightLayout->setSpacing(0);
 
     m_rightPanel = new QWidget;
+    m_rightPanel->setObjectName("rightPanel");
     auto* rightPanelLayout = new QVBoxLayout(m_rightPanel);
     rightPanelLayout->setContentsMargins(0, 0, 0, 0);
     rightPanelLayout->setSpacing(0);
@@ -102,6 +110,7 @@ void MainWindow::setupUI()
 
     // ---- 面板0: 串口配置 + 终端 ----
     auto* serialPanel = new QWidget;
+    serialPanel->setObjectName("serialPanel");
     auto* serialLayout = new QVBoxLayout(serialPanel);
     serialLayout->setContentsMargins(0, 0, 0, 0);
     serialLayout->setSpacing(0);
@@ -138,6 +147,7 @@ void MainWindow::setupUI()
 
     // 终端容器: 搜索栏 + 终端
     auto* terminalContainer = new QWidget;
+    terminalContainer->setObjectName("terminalContainer");
     auto* terminalLayout = new QVBoxLayout(terminalContainer);
     terminalLayout->setContentsMargins(0, 0, 0, 0);
     terminalLayout->setSpacing(0);
@@ -176,72 +186,6 @@ void MainWindow::setupUI()
     // Ctrl+F 快捷键激活搜索栏
     auto* searchShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
     connect(searchShortcut, &QShortcut::activated, m_searchBar, &TerminalSearchBar::activate);
-}
-
-void MainWindow::setupToolbar()
-{
-    m_toolbar = addToolBar(tr("主工具栏"));
-    m_toolbar->setMovable(false);
-    m_toolbar->setFloatable(false);
-
-    m_displayModeCombo = new QComboBox;
-    m_displayModeCombo->setObjectName("displayModeCombo");
-    m_displayModeCombo->addItems({tr("文本"), tr("HEX"), tr("混合"), tr("十进制")});
-    m_displayModeCombo->setFixedWidth(80);
-    m_toolbar->addWidget(m_displayModeCombo);
-
-    m_timestampAction = m_toolbar->addAction(tr("时间戳"));
-    m_timestampAction->setCheckable(true);
-    m_timestampAction->setChecked(false);
-
-    m_dirPrefixAction = m_toolbar->addAction(tr("[TX/RX]"));
-    m_dirPrefixAction->setCheckable(true);
-    m_dirPrefixAction->setChecked(false);
-    m_dirPrefixAction->setToolTip(tr("显示收发方向前缀"));
-
-    m_clearAction = m_toolbar->addAction(tr("清屏"));
-
-    m_toolbar->addSeparator();
-
-    // 导出按钮
-    m_exportAction = m_toolbar->addAction(tr("导出"));
-
-    m_toolbar->addSeparator();
-
-    // 日志录制/回放按钮（委托给RecordingController管理）
-    m_recordingController->setupActions(m_toolbar);
-
-    m_toolbar->addSeparator();
-
-    // 主题切换下拉框
-    auto* themeLabel = new QLabel(tr(" 主题: "));
-    m_toolbar->addWidget(themeLabel);
-
-    m_themeCombo = new QComboBox;
-    QStringList themes = ThemeManager::instance().availableThemes();
-    for (const QString& name : themes) {
-        // 显示友好名称: dark_terminal -> Dark Terminal
-        QString display = name;
-        display[0] = display[0].toUpper();
-        // 将下划线替换为空格并大写每个单词首字母
-        QStringList parts = display.split('_');
-        for (auto& part : parts) {
-            if (!part.isEmpty()) part[0] = part[0].toUpper();
-        }
-        m_themeCombo->addItem(parts.join(" "), name);
-    }
-    m_themeCombo->setFixedWidth(130);
-    m_toolbar->addWidget(m_themeCombo);
-
-    // 语言切换下拉框
-    auto* langLabel = new QLabel(tr(" 语言: "));
-    m_toolbar->addWidget(langLabel);
-
-    m_langCombo = new QComboBox;
-    m_langCombo->addItem(QStringLiteral("中文"), Language::CHINESE);
-    m_langCombo->addItem(QStringLiteral("English"), Language::ENGLISH);
-    m_langCombo->setFixedWidth(90);
-    m_toolbar->addWidget(m_langCombo);
 }
 
 void MainWindow::setupStatusBar()
@@ -284,7 +228,7 @@ void MainWindow::connectSignals()
     connect(m_serialConfig, &SerialConfigPanel::rtsChanged,
             m_connController, &ConnectionController::setRts);
 
-    // ConnectionController → MainWindow UI 更新
+    // ConnectionController -> MainWindow UI 更新
     connect(m_connController, &ConnectionController::connectionStateChanged,
             this, [this](ConnectionState state, const QString& connName) {
         const char* stateStr = "";
@@ -336,11 +280,11 @@ void MainWindow::connectSignals()
         QMessageBox::warning(this, title, message);
     });
 
-    // 快捷指令 → SendController
+    // 快捷指令 -> SendController
     connect(m_quickCmdBar, &QuickCommandBar::commandTriggered,
             m_sendController, &SendController::onQuickCommand);
 
-    // SendController信号 → MainWindow状态栏更新
+    // SendController信号 -> MainWindow状态栏更新
     connect(m_sendController, &SendController::dataSent,
             this, [this](qint64) { updateStatusBar(); });
     connect(m_sendController, &SendController::statusMessage,
@@ -348,16 +292,26 @@ void MainWindow::connectSignals()
                 statusBar()->showMessage(msg, 3000);
             });
 
-    // 工具栏
-    connect(m_displayModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    // 工具栏信号 -> 委托ToolbarController转发
+    connect(m_toolbarController, &ToolbarController::displayModeChanged,
             this, &MainWindow::onDisplayModeChanged);
-    connect(m_timestampAction, &QAction::toggled, this, &MainWindow::onTimestampToggled);
-    connect(m_dirPrefixAction, &QAction::toggled, m_terminal, &TerminalWidget::setShowDirectionPrefix);
-    connect(m_clearAction, &QAction::triggered, this, &MainWindow::onClearTerminal);
-    connect(m_exportAction, &QAction::triggered, this, &MainWindow::onExportData);
+    connect(m_toolbarController, &ToolbarController::timestampToggled,
+            this, &MainWindow::onTimestampToggled);
+    connect(m_toolbarController, &ToolbarController::dirPrefixToggled,
+            m_terminal, &TerminalWidget::setShowDirectionPrefix);
+    connect(m_toolbarController, &ToolbarController::clearRequested,
+            this, &MainWindow::onClearTerminal);
+    connect(m_toolbarController, &ToolbarController::exportRequested,
+            this, &MainWindow::onExportData);
+
+    // 主题/语言切换 -> 委托SettingsController处理
+    connect(m_toolbarController, &ToolbarController::themeChanged,
+            m_settingsController, &SettingsController::onThemeChanged);
+    connect(m_toolbarController, &ToolbarController::languageChanged,
+            m_settingsController, &SettingsController::onLanguageChanged);
 
     // 日志录制/回放: RecordingController内部已连接DataLogger信号
-    // 仅连接外部通知信号 → MainWindow
+    // 仅连接外部通知信号 -> MainWindow
     connect(m_recordingController, &RecordingController::statusMessage,
             this, [this](const QString& msg, int timeoutMs) {
                 statusBar()->showMessage(msg, timeoutMs);
@@ -372,14 +326,6 @@ void MainWindow::connectSignals()
                 updateStatusBar();
             });
 
-    // 主题切换
-    connect(m_themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &MainWindow::onThemeChanged);
-
-    // 语言切换
-    connect(m_langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &MainWindow::onLanguageChanged);
-
     // 搜索栏
     connect(m_searchBar, &TerminalSearchBar::searchRequested,
             this, &MainWindow::onSearchRequested);
@@ -389,7 +335,7 @@ void MainWindow::connectSignals()
         m_terminal->clearSearchHighlight();
     });
 
-    // 终端搜索匹配结果 → 搜索栏显示匹配计数
+    // 终端搜索匹配结果 -> 搜索栏显示匹配计数
     connect(m_terminal, &TerminalWidget::searchMatchesChanged,
             this, [this](int total, int current) {
                 if (total == 0) {
@@ -403,7 +349,7 @@ void MainWindow::connectSignals()
     // 统计刷新定时器
     connect(m_statsTimer, &QTimer::timeout, this, &MainWindow::updateDataStatistics);
 
-    // 协议桥管理器 → 协议视图 + 波形图数据模型
+    // 协议桥管理器 -> 协议视图 + 波形图数据模型
     // 所有协议源(FrameParser/JustFloat/FireWater)的frameParsed统一经由ProtocolBridgeManager路由
     connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
             m_protocolView, &ProtocolView::onFrameParsed);
@@ -413,7 +359,7 @@ void MainWindow::connectSignals()
     connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
             m_chartWidget->model(), &ChartModel::onFrameParsed);
 
-    // 帧编辑器 → 帧解析器 + 波形图通道配置（定义变更时同步更新）
+    // 帧编辑器 -> 帧解析器 + 波形图通道配置（定义变更时同步更新）
     connect(m_frameEditor, &FrameVisualEditor::definitionChanged,
             this, [this](const FrameDefinition& def) {
                 m_frameParser->setDefinition(def);
@@ -421,7 +367,7 @@ void MainWindow::connectSignals()
                 m_chartWidget->configureFromFrameDefinition(def);
             });
 
-    // 导航树点击切换面板 — 委托NavigationController处理面板切换
+    // 导航树点击切换面板 -- 委托NavigationController处理面板切换
     connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
         QString text = index.data().toString();
 
@@ -440,69 +386,6 @@ void MainWindow::connectSignals()
         // 委托NavigationController执行面板切换动画
         m_navController->switchToPanel(target);
     });
-}
-
-void MainWindow::loadSettings()
-{
-    auto& settings = SettingsManager::instance();
-
-    // 恢复窗口几何
-    QByteArray geometry = settings.loadWindowGeometry();
-    if (!geometry.isEmpty()) {
-        restoreGeometry(geometry);
-    }
-
-    // 恢复主题
-    QString savedTheme = settings.loadTheme();
-    if (ThemeManager::instance().loadTheme(savedTheme)) {
-        // 同步主题下拉框选中项
-        for (int i = 0; i < m_themeCombo->count(); ++i) {
-            if (m_themeCombo->itemData(i).toString() == savedTheme) {
-                m_themeCombo->setCurrentIndex(i);
-                break;
-            }
-        }
-    }
-
-    // 恢复串口配置到配置面板
-    QVariantMap serialConfig = settings.loadSerialConfig();
-    if (!serialConfig.isEmpty()) {
-        m_serialConfig->restoreConfig(serialConfig);
-    }
-
-    // 恢复语言选择
-    QString savedLang = settings.loadLanguage();
-    for (int i = 0; i < m_langCombo->count(); ++i) {
-        if (m_langCombo->itemData(i).toString() == savedLang) {
-            m_langCombo->setCurrentIndex(i);
-            break;
-        }
-    }
-}
-
-void MainWindow::saveSettings()
-{
-    auto& settings = SettingsManager::instance();
-
-    // 保存窗口几何
-    settings.saveWindowGeometry(saveGeometry());
-
-    // 保存当前主题
-    settings.saveTheme(ThemeManager::instance().currentTheme());
-
-    // 保存语言选择（已在onLanguageChanged中实时保存，此处确保一致性）
-
-    // 保存串口配置（从配置面板获取当前值）
-    QVariantMap serialConfig;
-    serialConfig["portName"] = m_serialConfig->currentPortData();
-    serialConfig["baudRate"] = m_serialConfig->currentBaudRate();
-    serialConfig["dataBits"] = m_serialConfig->currentDataBitsIndex();
-    serialConfig["parity"] = m_serialConfig->currentParityIndex();
-    serialConfig["stopBits"] = m_serialConfig->currentStopBitsIndex();
-    serialConfig["flowControl"] = m_serialConfig->currentFlowControlIndex();
-    settings.saveSerialConfig(serialConfig);
-
-    settings.sync();
 }
 
 void MainWindow::onDisplayModeChanged(int index)
@@ -566,27 +449,6 @@ void MainWindow::onSearchCleared()
     m_terminal->clearSearchHighlight();
 }
 
-void MainWindow::onThemeChanged(int index)
-{
-    QString themeName = m_themeCombo->itemData(index).toString();
-    if (!themeName.isEmpty()) {
-        ThemeManager::instance().loadTheme(themeName);
-    }
-}
-
-void MainWindow::onLanguageChanged(int index)
-{
-    QString langCode = m_langCombo->itemData(index).toString();
-    SettingsManager::instance().saveLanguage(langCode);
-
-    // 用硬编码字符串而非tr()，因为翻译此刻尚未生效
-    if (langCode == Language::ENGLISH) {
-        statusBar()->showMessage(QStringLiteral("Language changed to English, restart to apply"), 3000);
-    } else {
-        statusBar()->showMessage(QStringLiteral("语言已切换为中文，重启后生效"), 3000);
-    }
-}
-
 void MainWindow::updateStatusBar()
 {
     if (m_terminalModel) {
@@ -619,7 +481,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
     if (m_dataLogger->isPlaying()) m_dataLogger->stopPlayback();
 
     // 保存设置到磁盘
-    saveSettings();
+    m_settingsController->saveSettings();
 
     // 关闭所有连接
     auto connections = m_connManager->connections();
