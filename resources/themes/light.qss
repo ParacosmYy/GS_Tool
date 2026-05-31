@@ -147,10 +147,47 @@ QSplitter::handle {
 }
 
 /* 快捷指令栏 */
-QFrame#quickCommandBar {
+QFrame#quickCommandBar,
+QWidget#quickCommandBar {
     background-color: #ffffff;
     border-top: 1px solid #e5e7eb;
 }
+
+/* 快捷指令按钮 - 统一样式 */
+QPushButton#quickCmdEditBtn {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#quickCmdEditBtn:hover { background-color: #e5e7eb; }
+QPushButton#quickCmdEditBtn:pressed { background-color: #d1d5db; }
+QPushButton#quickCmdEditBtn:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+
+QPushButton#quickCmdAddBtn {
+    background-color: #f3f4f6;
+    color: #3b82f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+}
+QPushButton#quickCmdAddBtn:hover { background-color: #e5e7eb; color: #2563eb; }
+QPushButton#quickCmdAddBtn:pressed { background-color: #d1d5db; }
+
+/* 快捷指令按钮 - 动态命令按钮 */
+QPushButton[quickCmdBtn="true"] {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton[quickCmdBtn="true"]:hover { background-color: #e5e7eb; border-color: #3b82f6; color: #1d4ed8; }
+QPushButton[quickCmdBtn="true"]:pressed { background-color: #d1d5db; }
 
 /* ComboBox */
 QComboBox {
@@ -376,3 +413,96 @@ QPushButton#searchBarCloseBtn:pressed { background: #2563eb; color: #ffffff; }
 
 /* === 发送输入框错误状态 === */
 QLineEdit#sendInput[hasError="true"] { border: 2px solid #ef4444; }
+
+/* === ProtocolView 协议解析面板 === */
+QWidget#protocolToolbar {
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+QLabel#protocolStatusLabel {
+    color: #6b7280;
+    font-size: 12px;
+}
+QPushButton#protocolClearBtn,
+QPushButton#protocolExportBtn {
+    background-color: transparent;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#protocolClearBtn:hover,
+QPushButton#protocolExportBtn:hover { background-color: #f3f4f6; border-color: #3b82f6; color: #3b82f6; }
+QPushButton#protocolClearBtn:pressed,
+QPushButton#protocolExportBtn:pressed { background-color: #e5e7eb; }
+
+QTableView#protocolTable {
+    background-color: #ffffff;
+    alternate-background-color: #f9fafb;
+    color: #374151;
+    border: none;
+    gridline-color: #e5e7eb;
+    font-size: 12px;
+    selection-background-color: #eff6ff;
+    selection-color: #3b82f6;
+}
+QTableView#protocolTable::item {
+    padding: 4px 8px;
+}
+
+/* === FrameVisualEditor 帧编辑器 === */
+QGroupBox#frameHeaderGroup,
+QGroupBox#frameLengthGroup,
+QGroupBox#frameChecksumGroup,
+QGroupBox#frameFieldGroup {
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding-top: 16px;
+    font-weight: bold;
+}
+
+QTableWidget#frameFieldTable {
+    background-color: #ffffff;
+    alternate-background-color: #f9fafb;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    gridline-color: #e5e7eb;
+    font-size: 12px;
+    selection-background-color: #eff6ff;
+}
+QTableWidget#frameFieldTable::item {
+    padding: 4px 6px;
+}
+QHeaderView::section {
+    background-color: #f9fafb;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+QPushButton#frameAddFieldBtn {
+    background-color: #ffffff;
+    color: #3b82f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#frameAddFieldBtn:hover { background-color: #f3f4f6; border-color: #3b82f6; }
+QPushButton#frameAddFieldBtn:pressed { background-color: #e5e7eb; }
+
+QPushButton#frameRemoveFieldBtn {
+    background-color: #ffffff;
+    color: #ef4444;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#frameRemoveFieldBtn:hover { background-color: #f3f4f6; border-color: #ef4444; }
+QPushButton#frameRemoveFieldBtn:pressed { background-color: #e5e7eb; }

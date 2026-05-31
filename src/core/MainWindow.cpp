@@ -12,7 +12,6 @@
 #include <QSplitter>
 #include <QFileDialog>
 #include <QTimer>
-#include <QStringListModel>
 #include <QShortcut>
 #include <QKeySequence>
 #include <QPropertyAnimation>
@@ -134,7 +133,10 @@ void MainWindow::setupUI()
     rightLayout->setContentsMargins(0, 0, 0, 0);
     rightLayout->setSpacing(0);
 
-    m_rightPanel = new QStackedWidget;
+    m_rightPanel = new QWidget;
+    auto* rightPanelLayout = new QVBoxLayout(m_rightPanel);
+    rightPanelLayout->setContentsMargins(0, 0, 0, 0);
+    rightPanelLayout->setSpacing(0);
     rightLayout->addWidget(m_rightPanel, 1);
 
     // ---- 面板0: 串口配置 + 终端 ----
@@ -213,8 +215,9 @@ void MainWindow::setupUI()
     m_sendInput->setObjectName("sendInput");
     m_sendInput->setPlaceholderText(tr("输入要发送的数据..."));
 
-    // 发送历史自动补全
-    m_sendCompleter = new QCompleter(m_sendHistory->recentTexts(), this);
+    // 发送历史自动补全（复用同一个QStringListModel，避免每次new泄漏）
+    m_sendCompleterModel = new QStringListModel(m_sendHistory->recentTexts(), this);
+    m_sendCompleter = new QCompleter(m_sendCompleterModel, this);
     m_sendCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     m_sendCompleter->setCompletionMode(QCompleter::PopupCompletion);
     m_sendInput->setCompleter(m_sendCompleter);
@@ -229,8 +232,7 @@ void MainWindow::setupUI()
 
     serialLayout->addWidget(sendFrame);
 
-    m_rightPanel->addWidget(serialPanel);
-    m_rightPanel->setCurrentIndex(0);
+    rightPanelLayout->addWidget(serialPanel);
 
     m_mainSplitter->addWidget(rightWidget);
     m_mainSplitter->setSizes({200, 1000});
@@ -508,16 +510,12 @@ void MainWindow::connectSignals()
 
     // 定时发送器
     connect(m_timedSender, &TimedSender::sendData, this, [this](const QByteArray& data) {
-        if (m_currentConn && m_currentConn->state() == ConnectionState::Connected) {
-            m_currentConn->write(data);
-            m_terminalModel->appendSent(data);
-            updateStatusBar();
-        }
+        sendAndRecord(data);
     });
 
-    // 发送历史变化时更新自动补全
+    // 发送历史变化时更新自动补全（复用模型，不泄漏QStringListModel）
     connect(m_sendHistory, &SendHistory::historyChanged, this, [this]() {
-        m_sendCompleter->setModel(new QStringListModel(m_sendHistory->recentTexts(), this));
+        m_sendCompleterModel->setStringList(m_sendHistory->recentTexts());
     });
 
     // 统计刷新定时器
@@ -683,6 +681,22 @@ void MainWindow::onDisconnectSerial()
     }
 }
 
+bool MainWindow::sendAndRecord(const QByteArray& data, bool isHex)
+{
+    Q_UNUSED(isHex);
+    if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
+        return false;
+    }
+    qint64 written = m_currentConn->write(data);
+    if (written > 0) {
+        m_terminalModel->appendSent(data);
+        m_dataLogger->logData(data, DataLogger::Direction::Sent);
+        updateStatusBar();
+        return true;
+    }
+    return false;
+}
+
 void MainWindow::onSendData()
 {
     if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
@@ -706,28 +720,18 @@ void MainWindow::onSendData()
         data = text.toUtf8();
     }
 
-    qint64 written = m_currentConn->write(data);
-    if (written > 0) {
-        m_terminalModel->appendSent(data);
-        m_dataLogger->logData(data, DataLogger::Direction::Sent);
+    if (sendAndRecord(data)) {
         m_sendHistory->addEntry(text, isHex);
         m_sendInput->clear();
         m_sendInput->setProperty("hasError", false);
         m_sendInput->style()->unpolish(m_sendInput);
         m_sendInput->style()->polish(m_sendInput);
-        updateStatusBar();
     }
 }
 
 void MainWindow::onQuickCommand(const QByteArray& data)
 {
-    if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
-        return;
-    }
-    m_currentConn->write(data);
-    m_terminalModel->appendSent(data);
-    m_dataLogger->logData(data, DataLogger::Direction::Sent);
-    updateStatusBar();
+    sendAndRecord(data);
 }
 
 void MainWindow::onDisplayModeChanged(int index)

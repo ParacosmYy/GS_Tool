@@ -63,13 +63,14 @@ QVector<TerminalLine> TerminalModel::lines(int start, int count) const
 
 const TerminalLine& TerminalModel::lineAt(int index) const
 {
-    // 不加锁：只在主线程调用，与 appendLine 的写操作通过 Qt 信号槽机制串行化
+    Q_ASSERT(index >= 0 && index < m_count);
+    QMutexLocker locker(&m_mutex);
     return m_buffer[physicalIndex(index)];
 }
 
 int TerminalModel::lineCount() const
 {
-    // 不加锁：原子读操作，且只在主线程调用
+    QMutexLocker locker(&m_mutex);
     return m_count;
 }
 

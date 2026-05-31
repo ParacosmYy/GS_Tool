@@ -28,7 +28,7 @@ bool DataLogger::startRecording(const QString& filePath)
 
     m_recordFile = new QFile(filePath, this);
     if (!m_recordFile->open(QIODevice::WriteOnly)) {
-        emit error(QString("Cannot create log file: %1").arg(filePath));
+        emit error(tr("Cannot create log file: %1").arg(filePath));
         delete m_recordFile;
         m_recordFile = nullptr;
         return false;
@@ -119,7 +119,7 @@ bool DataLogger::startPlayback(const QString& filePath)
 
     m_playbackFile = new QFile(filePath, this);
     if (!m_playbackFile->open(QIODevice::ReadOnly)) {
-        emit error(QString("Cannot open log file: %1").arg(filePath));
+        emit error(tr("Cannot open log file: %1").arg(filePath));
         delete m_playbackFile;
         m_playbackFile = nullptr;
         return false;
@@ -128,7 +128,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     // 验证文件头
     QByteArray magic = m_playbackFile->read(3);
     if (magic != kMagic) {
-        emit error("Invalid log file format");
+        emit error(tr("Invalid log file format"));
         m_playbackFile->close();
         delete m_playbackFile;
         m_playbackFile = nullptr;
@@ -138,7 +138,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     quint8 version = 0;
     m_playbackFile->read(reinterpret_cast<char*>(&version), 1);
     if (version != kVersion) {
-        emit error(QString("Unsupported log version: %1").arg(version));
+        emit error(tr("Unsupported log version: %1").arg(version));
         m_playbackFile->close();
         delete m_playbackFile;
         m_playbackFile = nullptr;
@@ -151,7 +151,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     m_totalRecords = static_cast<int>(count);
 
     if (m_totalRecords == 0) {
-        emit error("Log file is empty");
+        emit error(tr("Log file is empty"));
         m_playbackFile->close();
         delete m_playbackFile;
         m_playbackFile = nullptr;
@@ -200,19 +200,31 @@ void DataLogger::pausePlayback()
     if (!m_playing || m_playbackPaused) return;
     m_playbackPaused = true;
     m_playbackTimer->stop();
+    // 记录暂停时已经过的时间(考虑速度)，累加到baseTime
+    m_playbackBaseTime += static_cast<qint64>(m_playbackElapsed.elapsed() * m_playbackSpeed);
 }
 
 void DataLogger::resumePlayback()
 {
     if (!m_playing || !m_playbackPaused) return;
     m_playbackPaused = false;
+    // m_playbackBaseTime已在pausePlayback()中累加了已播放偏移
+    // 重启计时器后elapsed()从0开始，currentTime = baseTime + 0 = 正确的恢复点
     m_playbackElapsed.restart();
     m_playbackTimer->start();
 }
 
 void DataLogger::setPlaybackSpeed(qreal speed)
 {
-    m_playbackSpeed = qBound(0.1, speed, 100.0);
+    qreal newSpeed = qBound(0.1, speed, 100.0);
+
+    if (m_playing && !m_playbackPaused) {
+        // 变速时先将当前已播放时间(按旧速度)累加到baseTime
+        m_playbackBaseTime += static_cast<qint64>(m_playbackElapsed.elapsed() * m_playbackSpeed);
+        m_playbackElapsed.restart();
+    }
+
+    m_playbackSpeed = newSpeed;
     emit playbackSpeedChanged(m_playbackSpeed);
 }
 

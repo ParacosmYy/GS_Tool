@@ -147,10 +147,47 @@ QSplitter::handle {
 }
 
 /* 快捷指令栏 */
-QFrame#quickCommandBar {
+QFrame#quickCommandBar,
+QWidget#quickCommandBar {
     background-color: #1a1b26;
     border-top: 1px solid #292e42;
 }
+
+/* 快捷指令按钮 - 统一样式 */
+QPushButton#quickCmdEditBtn {
+    background-color: #292e42;
+    color: #a9b1d6;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#quickCmdEditBtn:hover { background-color: #3b4261; }
+QPushButton#quickCmdEditBtn:pressed { background-color: #414868; }
+QPushButton#quickCmdEditBtn:disabled { background-color: #292e42; color: #565f89; border-color: #292e42; }
+
+QPushButton#quickCmdAddBtn {
+    background-color: #292e42;
+    color: #7aa2f7;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+}
+QPushButton#quickCmdAddBtn:hover { background-color: #3b4261; color: #89b4fa; }
+QPushButton#quickCmdAddBtn:pressed { background-color: #414868; }
+
+/* 快捷指令按钮 - 动态命令按钮 */
+QPushButton[quickCmdBtn="true"] {
+    background-color: #292e42;
+    color: #a9b1d6;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton[quickCmdBtn="true"]:hover { background-color: #3b4261; border-color: #7aa2f7; color: #7aa2f7; }
+QPushButton[quickCmdBtn="true"]:pressed { background-color: #414868; }
 
 /* ComboBox */
 QComboBox {
@@ -376,3 +413,96 @@ QPushButton#searchBarCloseBtn:pressed { background: #7aa2f7; }
 
 /* === 发送输入框错误状态 === */
 QLineEdit#sendInput[hasError="true"] { border: 2px solid #f7768e; }
+
+/* === ProtocolView 协议解析面板 === */
+QWidget#protocolToolbar {
+    background-color: #16161e;
+    border-bottom: 1px solid #292e42;
+}
+QLabel#protocolStatusLabel {
+    color: #565f89;
+    font-size: 12px;
+}
+QPushButton#protocolClearBtn,
+QPushButton#protocolExportBtn {
+    background-color: transparent;
+    color: #a9b1d6;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#protocolClearBtn:hover,
+QPushButton#protocolExportBtn:hover { background-color: #292e42; border-color: #7aa2f7; color: #7aa2f7; }
+QPushButton#protocolClearBtn:pressed,
+QPushButton#protocolExportBtn:pressed { background-color: #3b4261; }
+
+QTableView#protocolTable {
+    background-color: #1a1b26;
+    alternate-background-color: #16161e;
+    color: #a9b1d6;
+    border: none;
+    gridline-color: #292e42;
+    font-size: 12px;
+    selection-background-color: #292e42;
+    selection-color: #7aa2f7;
+}
+QTableView#protocolTable::item {
+    padding: 4px 8px;
+}
+
+/* === FrameVisualEditor 帧编辑器 === */
+QGroupBox#frameHeaderGroup,
+QGroupBox#frameLengthGroup,
+QGroupBox#frameChecksumGroup,
+QGroupBox#frameFieldGroup {
+    color: #a9b1d6;
+    border: 1px solid #292e42;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding-top: 16px;
+    font-weight: bold;
+}
+
+QTableWidget#frameFieldTable {
+    background-color: #1a1b26;
+    alternate-background-color: #16161e;
+    color: #a9b1d6;
+    border: 1px solid #292e42;
+    gridline-color: #292e42;
+    font-size: 12px;
+    selection-background-color: #292e42;
+}
+QTableWidget#frameFieldTable::item {
+    padding: 4px 6px;
+}
+QHeaderView::section {
+    background-color: #16161e;
+    color: #565f89;
+    border: 1px solid #292e42;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+QPushButton#frameAddFieldBtn {
+    background-color: #1a1b26;
+    color: #7aa2f7;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#frameAddFieldBtn:hover { background-color: #292e42; border-color: #7aa2f7; }
+QPushButton#frameAddFieldBtn:pressed { background-color: #3b4261; }
+
+QPushButton#frameRemoveFieldBtn {
+    background-color: #1a1b26;
+    color: #f7768e;
+    border: 1px solid #3b4261;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#frameRemoveFieldBtn:hover { background-color: #292e42; border-color: #f7768e; }
+QPushButton#frameRemoveFieldBtn:pressed { background-color: #3b4261; }

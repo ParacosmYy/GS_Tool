@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QTreeView>
 #include <QSplitter>
-#include <QStackedWidget>
+#include <QStringListModel>
 #include <QToolBar>
 #include <QStatusBar>
 #include <QLabel>
@@ -119,6 +119,9 @@ private:
     void loadSettings();
     void saveSettings();
 
+    // 统一发送方法: 写入连接 + 记录终端 + 日志 + 更新状态栏，返回是否成功写入
+    bool sendAndRecord(const QByteArray& data, bool isHex = false);
+
     // 构建导航树名称 → 面板widget的映射表（在所有面板创建完成后调用）
     void buildNavPanelMappings();
 
@@ -143,7 +146,7 @@ private:
     // UI组件 - 布局
     QSplitter* m_mainSplitter;
     QTreeView* m_navTree;
-    QStackedWidget* m_rightPanel;
+    QWidget* m_rightPanel;
 
     // UI组件 - 工具栏
     QToolBar* m_toolbar;
@@ -170,6 +173,7 @@ private:
     QPushButton* m_sendBtn;
     QComboBox* m_sendModeCombo;    // 文本/HEX切换
     QCompleter* m_sendCompleter;   // 发送历史自动补全
+    QStringListModel* m_sendCompleterModel; // 补全数据模型（复用，避免每次new泄漏）
 
     // UI组件 - 快捷指令
     QuickCommandBar* m_quickCmdBar;

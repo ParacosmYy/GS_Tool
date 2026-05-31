@@ -16,19 +16,25 @@ ProtocolView::ProtocolView(QWidget* parent)
 
 void ProtocolView::setupUI()
 {
+    setObjectName("protocolView");
+
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     // 顶部工具栏
     auto* toolbar = new QWidget;
+    toolbar->setObjectName("protocolToolbar");
     auto* toolLayout = new QHBoxLayout(toolbar);
     toolLayout->setContentsMargins(8, 4, 8, 4);
 
     m_statusLabel = new QLabel(tr("No frames"));
+    m_statusLabel->setObjectName("protocolStatusLabel");
     m_clearBtn = new QPushButton(tr("Clear"));
+    m_clearBtn->setObjectName("protocolClearBtn");
     m_clearBtn->setFixedWidth(60);
     m_exportBtn = new QPushButton(tr("Export"));
+    m_exportBtn->setObjectName("protocolExportBtn");
     m_exportBtn->setFixedWidth(60);
 
     toolLayout->addWidget(m_statusLabel, 1);
@@ -38,6 +44,7 @@ void ProtocolView::setupUI()
 
     // 表格
     m_table = new QTableView;
+    m_table->setObjectName("protocolTable");
     m_model = new QStandardItemModel(this);
     // 初始列: 序号 + 时间
     m_model->setHorizontalHeaderLabels({tr("#"), tr("Time")});
