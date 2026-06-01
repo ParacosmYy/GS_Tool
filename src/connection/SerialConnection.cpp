@@ -29,10 +29,15 @@ SerialConnection::SerialConnection(QObject* parent)
             this, &SerialConnection::onBytesWritten);
 }
 
-/** @brief 析构函数，确保串口被正确关闭 */
+/** @brief 析构函数，静默关闭串口(不发射信号，避免析构期间信号回调访问半销毁对象) */
 SerialConnection::~SerialConnection()
 {
-    close();
+    // 析构时静默关闭: 仅关闭物理端口，不发射stateChanged信号
+    // 正常关闭由ConnectionManager::~ConnectionManager()通过close()完成
+    if (m_serial.isOpen()) {
+        m_serial.close();
+        m_state = ConnectionState::Disconnected;
+    }
 }
 
 /** @brief 返回端口名称 */

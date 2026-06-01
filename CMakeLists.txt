@@ -38,6 +38,7 @@ set(SOURCES
     src/core/ConnectionControllerHandlers.cpp
     src/core/RecordingController.cpp
     src/core/NavigationController.cpp
+    src/core/NavigationControllerAnimations.cpp
     src/core/SendController.cpp
     src/core/SettingsController.cpp
     src/core/ToolbarController.cpp

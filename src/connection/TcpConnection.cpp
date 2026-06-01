@@ -18,9 +18,23 @@ TcpConnection::TcpConnection(QObject* parent)
 {
 }
 
+/** @brief 析构函数，静默关闭(不发射stateChanged信号) */
 TcpConnection::~TcpConnection()
 {
-    close();
+    // 析构时仅释放资源，不发射信号(避免析构期间回调)
+    if (m_clientSocket) {
+        m_clientSocket->disconnectFromHost();
+        m_clientSocket = nullptr;
+    }
+    if (m_server) {
+        m_server->close();
+        m_server = nullptr;
+    }
+    if (m_connectTimer) {
+        m_connectTimer->stop();
+        m_connectTimer = nullptr;
+    }
+    m_state = ConnectionState::Disconnected;
 }
 
 /** @brief 返回连接类型(TCP客户端或TCP服务端) @return ConnectionType枚举 */

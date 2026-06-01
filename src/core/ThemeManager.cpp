@@ -302,6 +302,14 @@ void ThemeManager::applyStylesheetWithAnimation(const QString& qss)
     fadeOut->setEndValue(0.0);
     fadeOut->setEasingCurve(QEasingCurve::InOutCubic);
 
+    // 清理上一次未完成的淡入动画(防止快速切换主题时fadeIn泄漏)
+    // 查找ThemeManager的所有QPropertyAnimation子对象并停止/删除
+    const auto fadeChildren = findChildren<QPropertyAnimation*>();
+    for (auto* oldAnim : fadeChildren) {
+        if (oldAnim->state() == QAbstractAnimation::Running) oldAnim->stop();
+        delete oldAnim;
+    }
+
     // 淡入动画: InOutCubic
     QPropertyAnimation* fadeIn = new QPropertyAnimation(m_opacityEffect, "opacity");
     fadeIn->setParent(this);  // 父对象设为ThemeManager，生命周期独立于fadeOut

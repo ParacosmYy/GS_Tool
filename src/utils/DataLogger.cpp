@@ -26,8 +26,25 @@ DataLogger::DataLogger(QObject* parent)
 
 DataLogger::~DataLogger()
 {
-    if (m_recording) stopRecording();
-    if (m_playing) stopPlayback();
+    // 析构时静默停止: 仅释放资源，不发射信号(避免析构期间回调访问半销毁对象)
+    // 正常停止由RecordingController调用stopRecording()/stopPlayback()完成
+    if (m_recording) {
+        m_recording = false;
+        if (m_recordFile) {
+            m_recordFile->close();
+            delete m_recordFile;
+            m_recordFile = nullptr;
+        }
+    }
+    if (m_playing) {
+        m_playing = false;
+        if (m_playbackTimer) m_playbackTimer->stop();
+        if (m_playbackFile) {
+            m_playbackFile->close();
+            delete m_playbackFile;
+            m_playbackFile = nullptr;
+        }
+    }
 }
 
 // ---- 录制控制 ----

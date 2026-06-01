@@ -18,6 +18,9 @@
 
 #include "core/NavigationController.h"
 #include "core/Constants.h"
+#include <QWidget>
+#include <QLabel>
+#include <QTreeView>
 
 /** @brief 获取面板父容器宽度（serialPanel）作为滑动距离 */
 int NavigationController::parentContainerWidth(QWidget* panel) const

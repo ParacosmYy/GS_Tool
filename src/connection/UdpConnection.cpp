@@ -18,9 +18,15 @@ UdpConnection::UdpConnection(QObject* parent)
 {
 }
 
+/** @brief 析构函数，静默关闭(不发射stateChanged信号) */
 UdpConnection::~UdpConnection()
 {
-    close();
+    // 析构时仅释放资源，不发射信号(避免析构期间回调)
+    if (m_socket) {
+        m_socket->close();
+        m_socket = nullptr;  // deleteLater在析构中无效，直接置空
+    }
+    m_state = ConnectionState::Disconnected;
 }
 
 /** @brief 返回连接类型(Udp) @return ConnectionType::Udp */
