@@ -88,6 +88,7 @@ set(SOURCES
     src/chart/ChartModel.cpp
     src/ota/OtaManager.cpp
     src/ota/OtaWidget.cpp
+    src/ota/OtaWidgetSlots.cpp
     src/ota/OtaHistoryModel.cpp
     src/ota/protocols/BaseTransfer.cpp
     src/ota/protocols/XModemTransfer.cpp

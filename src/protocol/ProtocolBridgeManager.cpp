@@ -54,10 +54,6 @@ ProtocolBridgeManager::ProtocolBridgeManager(FrameParser* frameParser, QObject* 
  * QObject 父子树自动销毁 m_justFloat、m_fireWater。
  * m_frameParser 如果 parent 是本对象也会被自动销毁。
  */
-ProtocolBridgeManager::~ProtocolBridgeManager()
-{
-}
-
 // ============================================================================
 // 模式设置 / 数据路由
 // ============================================================================

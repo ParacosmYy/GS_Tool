@@ -39,12 +39,6 @@ TerminalLayoutManager::TerminalLayoutManager(QObject* parent)
     layout->setSpacing(0);
 }
 
-/** @brief 析构终端布局管理器 */
-TerminalLayoutManager::~TerminalLayoutManager()
-{
-    // m_container 由Qt父子树管理，无需手动delete
-}
-
 /** @brief 初始化布局管理器，缓存主终端显示设置并应用默认混合布局 @param mainTerminal 主终端控件指针 @param searchBar 搜索栏控件指针 */
 void TerminalLayoutManager::initialize(TerminalWidget* mainTerminal, TerminalSearchBar* searchBar)
 {

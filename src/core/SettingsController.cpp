@@ -30,11 +30,6 @@ SettingsController::SettingsController(QMainWindow* mainWindow, QObject* parent)
 {
 }
 
-/** @brief 析构函数 */
-SettingsController::~SettingsController()
-{
-}
-
 /** @brief 注入工具栏控制器引用 */
 void SettingsController::setToolbarController(ToolbarController* controller)
 {

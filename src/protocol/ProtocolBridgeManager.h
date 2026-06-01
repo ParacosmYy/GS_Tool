@@ -59,7 +59,7 @@ public:
     explicit ProtocolBridgeManager(FrameParser* frameParser, QObject* parent = nullptr);
 
     /** @brief 析构，QObject 父子树自动销毁持有的桥对象 */
-    ~ProtocolBridgeManager() override;
+    ~ProtocolBridgeManager() override = default;
 
     ProtocolBridgeManager(const ProtocolBridgeManager&) = delete;
     ProtocolBridgeManager& operator=(const ProtocolBridgeManager&) = delete;

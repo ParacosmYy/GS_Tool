@@ -42,7 +42,7 @@ public:
     /** @brief 构造函数 @param parent 父对象 */
     explicit TerminalLayoutManager(QObject* parent = nullptr);
     /** @brief 析构函数，销毁分栏终端 */
-    ~TerminalLayoutManager() override;
+    ~TerminalLayoutManager() override = default;
 
     /**
      * @brief 初始化管理器，传入主终端控件和搜索栏

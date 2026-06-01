@@ -63,7 +63,7 @@ public:
     explicit SessionManager(QMainWindow* mainWindow, QObject* parent = nullptr);
 
     /** @brief 析构函数 */
-    ~SessionManager() override;
+    ~SessionManager() override = default;
 
     // 禁止拷贝和赋值
     SessionManager(const SessionManager&) = delete;

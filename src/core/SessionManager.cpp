@@ -27,11 +27,6 @@ SessionManager::SessionManager(QMainWindow* mainWindow, QObject* parent)
 {
 }
 
-/** @brief 析构函数 */
-SessionManager::~SessionManager()
-{
-}
-
 /** @brief 注入串口配置面板引用 */
 void SessionManager::setSerialConfigPanel(SerialConfigPanel* panel)
 {
