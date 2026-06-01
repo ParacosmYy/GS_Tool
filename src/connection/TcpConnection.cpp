@@ -54,7 +54,7 @@ bool TcpConnection::open()
         updateState(ConnectionState::Connecting);
         m_socket->connectToHost(m_host, m_port);
 
-        // 启动连接超时定时器（10秒），防止用户长时间等待无响应的主机
+        // 启动10秒连接超时定时器，防止连接不可达主机时无限等待
         if (!m_connectTimer) {
             m_connectTimer = new QTimer(this);
             m_connectTimer->setSingleShot(true);
@@ -66,7 +66,7 @@ bool TcpConnection::open()
                 }
             });
         }
-        m_connectTimer->start(10000);  // 10秒连接超时
+        m_connectTimer->start(10000);
 
         // 异步连接，不等待结果
         return true;
@@ -91,7 +91,8 @@ bool TcpConnection::open()
 
 void TcpConnection::close()
 {
-    if (m_connectTimer) m_connectTimer->stop();  // 关闭时取消超时定时器
+    // 停止连接超时定时器
+    if (m_connectTimer) m_connectTimer->stop();
 
     if (m_socket) {
         disconnect(m_socket, nullptr, this, nullptr);  // 防止信号在 deleteLater 之前到达
@@ -131,7 +132,8 @@ qint64 TcpConnection::write(const QByteArray& data)
 
 void TcpConnection::onSocketConnected()
 {
-    if (m_connectTimer) m_connectTimer->stop();  // 连接成功，取消超时
+    // 连接成功，取消超时定时器
+    if (m_connectTimer) m_connectTimer->stop();
     updateState(ConnectionState::Connected);
 }
 

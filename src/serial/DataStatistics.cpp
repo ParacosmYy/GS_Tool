@@ -141,8 +141,8 @@ void DataStatistics::onRefreshTimer()
             .arg(seconds, 2, 10, QLatin1Char('0'))
     );
 
-    // 速率衰减: 如果超过2秒未收到update()调用，将速率衰减至0
-    // 避免空闲时仍显示非零速率误导用户
+    // 速率衰减: 如果超过2秒未收到update()调用，将速率归零
+    // 避免连接空闲时仍显示非零速率误导用户
     qint64 sampleAge = m_sampleTimer.elapsed();
     if (sampleAge > 2000) {
         m_rxRate = 0.0;

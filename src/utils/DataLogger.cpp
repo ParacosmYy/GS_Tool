@@ -138,9 +138,10 @@ bool DataLogger::startPlayback(const QString& filePath)
         return false;
     }
 
-    // 使用QDataStream读取版本号，与writeHeader()保持一致（单字节无字节序问题，但统一风格）
+    // 使用QDataStream读取version和count，确保字节序与writeHeader()一致(BigEndian)
     QDataStream headerStream(m_playbackFile);
     headerStream.setByteOrder(QDataStream::BigEndian);
+
     quint8 version = 0;
     headerStream >> version;
     if (version != kVersion) {
@@ -151,12 +152,9 @@ bool DataLogger::startPlayback(const QString& filePath)
         return false;
     }
 
-    // 使用QDataStream以BigEndian读取记录数，与stopRecording()写入时的字节序一致
-    // 修复: 原先使用raw read在x86(LE)上会错误解释BigEndian字节序的count
-    QDataStream countStream(m_playbackFile);
-    countStream.setByteOrder(QDataStream::BigEndian);
+    // 读取record count（BigEndian，与writeHeader()/stopRecording()写入格式一致）
     quint32 count = 0;
-    countStream >> count;
+    headerStream >> count;
     m_totalRecords = static_cast<int>(count);
 
     if (m_totalRecords == 0) {

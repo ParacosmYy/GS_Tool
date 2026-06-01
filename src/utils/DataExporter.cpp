@@ -143,7 +143,7 @@ bool DataExporter::exportCsv(const QString& path, const QVector<TerminalLine>& l
     QTextStream out;
     if (!openTextFile(file, out, path)) return false;
 
-    // 写入UTF-8 BOM，确保中文Windows下Excel能正确识别编码
+    // UTF-8 BOM: 确保Excel中文环境下正确识别编码
     file.write("\xEF\xBB\xBF");
 
     out << "timestamp,direction,data_hex,data_ascii\n";
@@ -155,7 +155,6 @@ bool DataExporter::exportCsv(const QString& path, const QVector<TerminalLine>& l
     }
     return flushAndCheck(file, out, path);
 }
-
 bool DataExporter::exportTimestamped(const QString& path, const QVector<TerminalLine>& lines)
 {
     QFile file(path);
@@ -205,13 +204,15 @@ QString DataExporter::toAsciiString(const QByteArray& data)
 
 QString DataExporter::escapeCsvField(const QString& field)
 {
-    // CSV规范(RFC 4180): 包含逗号、双引号或换行符的字段需要用双引号包裹
-    // 内部的双引号需要转义为两个连续双引号
-    if (!field.contains(',') && !field.contains('"') && !field.contains('\n'))
+    // RFC 4180: 字段含逗号、双引号或换行时，用双引号包裹，内部双引号翻倍
+    if (!field.contains(QLatin1Char(',')) &&
+        !field.contains(QLatin1Char('"')) &&
+        !field.contains(QLatin1Char('\n'))) {
         return field;
+    }
     QString escaped = field;
-    escaped.replace('"', "\"\"");
-    return '"' + escaped + '"';
+    escaped.replace(QLatin1Char('"'), QStringLiteral("\"\""));
+    return QLatin1Char('"') + escaped + QLatin1Char('"');
 }
 
 QByteArray DataExporter::concatData(const QVector<TerminalLine>& lines)
@@ -302,13 +303,13 @@ bool DataExporter::exportStreamedHexDump(const QString& path, LineProvider provi
 }
 
 bool DataExporter::exportStreamedCsv(const QString& path, LineProvider provider,
-                                      int totalLines, int batchSize)
+                                       int totalLines, int batchSize)
 {
     QFile file(path);
     QTextStream out;
     if (!openTextFile(file, out, path)) return false;
 
-    // 写入UTF-8 BOM，确保中文Windows下Excel能正确识别编码
+    // UTF-8 BOM: 确保Excel中文环境下正确识别编码
     file.write("\xEF\xBB\xBF");
 
     out << "timestamp,direction,data_hex,data_ascii\n";

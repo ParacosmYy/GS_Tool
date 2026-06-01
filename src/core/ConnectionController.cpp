@@ -232,6 +232,8 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
 IConnection* ConnectionController::currentConnection() const { return m_currentConn; }
 void ConnectionController::setDtr(bool enabled) { if (m_currentConn) m_currentConn->setDtr(enabled); }
 void ConnectionController::setRts(bool enabled) { if (m_currentConn) m_currentConn->setRts(enabled); }
+/** @brief 发送Break信号(用于STM32/ESP32进入Bootloader) @param duration Break持续时间(毫秒) */
+void ConnectionController::sendBreak(int duration) { if (m_currentConn) m_currentConn->sendBreak(duration); }
 /** @brief 启用/禁用自动重连 @param enabled 是否启用 @param intervalMs 重连间隔(毫秒) @param maxRetries 最大重连次数(0=无限制) */
 void ConnectionController::enableAutoReconnect(bool enabled, int intervalMs, int maxRetries)
 {

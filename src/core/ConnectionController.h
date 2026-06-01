@@ -51,6 +51,7 @@ public:
 
     void setDtr(bool enabled);                           ///< 控制当前连接的 DTR 线路信号
     void setRts(bool enabled);                           ///< 控制当前连接的 RTS 线路信号
+    void sendBreak(int duration = 100);                  ///< 发送Break信号(用于STM32/ESP32进入Bootloader)
 
     void enableAutoReconnect(bool enabled, int intervalMs = 3000, int maxRetries = 0); ///< 启用/禁用自动重连 @param intervalMs 重连间隔(毫秒) @param maxRetries 最大重连次数(0=无限制)
     bool isAutoReconnectEnabled() const;                 ///< 查询自动重连状态
