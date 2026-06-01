@@ -28,13 +28,13 @@ RecordingController::RecordingController(DataLogger* logger, QObject* parent)
             this, &RecordingController::onRecordingStopped);
     // 录制开始: 显示状态提示
     connect(m_logger, &DataLogger::recordingStarted, this, [this]() {
-        emit statusMessage(tr("Recording started"), 2000);
+        emit statusMessage(tr("录制已开始"), 2000);
     });
     // 回放完成: 恢复按钮状态
     connect(m_logger, &DataLogger::playbackFinished, this, [this]() {
         m_stopPlaybackAction->setEnabled(false);
         m_playbackAction->setEnabled(true);
-        emit statusMessage(tr("Playback finished"), 3000);
+        emit statusMessage(tr("回放完成"), 3000);
     });
     // 错误通知
     connect(m_logger, &DataLogger::error, this, [this](const QString& msg) {
@@ -106,7 +106,7 @@ void RecordingController::onToggleRecording()
         }
     } else {
         // 开始录制: 弹出文件对话框选择保存路径
-        QString filter = tr("EmbedDebug Log (*.edl);;All files (*.*)");
+        QString filter = tr("EmbedDebug 日志 (*.edl);;所有文件 (*.*)");
         QString path = QFileDialog::getSaveFileName(
             nullptr, tr("录制日志"), QString(), filter);
         if (path.isEmpty()) {
@@ -121,7 +121,7 @@ void RecordingController::onToggleRecording()
         m_logger->startRecording(path);
         m_stopRecordAction->setEnabled(true);
         m_recordAction->setText(tr("暂停"));
-        emit statusMessage(tr("Recording: %1").arg(path));
+        emit statusMessage(tr("录制中: %1").arg(path));
     }
 }
 
@@ -143,7 +143,7 @@ void RecordingController::onStopRecording()
  */
 void RecordingController::onOpenPlayback()
 {
-    QString filter = tr("EmbedDebug Log (*.edl);;All files (*.*)");
+    QString filter = tr("EmbedDebug 日志 (*.edl);;所有文件 (*.*)");
     QString path = QFileDialog::getOpenFileName(
         nullptr, tr("打开日志回放"), QString(), filter);
     if (path.isEmpty()) return;
@@ -151,7 +151,7 @@ void RecordingController::onOpenPlayback()
     m_logger->startPlayback(path);
     m_stopPlaybackAction->setEnabled(true);
     m_playbackAction->setEnabled(false);
-    emit statusMessage(tr("Playing: %1").arg(path));
+    emit statusMessage(tr("回放中: %1").arg(path));
 }
 
 /**
@@ -182,7 +182,7 @@ void RecordingController::onPlaybackData(const QByteArray& data, qint64 directio
  */
 void RecordingController::onPlaybackProgress(qreal percent)
 {
-    emit statusMessage(tr("Playback: %1%").arg(static_cast<int>(percent * 100)));
+    emit statusMessage(tr("回放进度: %1%").arg(static_cast<int>(percent * 100)));
 }
 
 /**
@@ -195,7 +195,7 @@ void RecordingController::onPlaybackProgress(qreal percent)
 void RecordingController::onRecordingStopped(const QString& filePath, int count, qint64 durationMs)
 {
     emit statusMessage(
-        tr("Recording saved: %1 (%2 records, %3s)")
+        tr("录制已保存: %1 (%2 条记录, %3秒)")
             .arg(filePath)
             .arg(count)
             .arg(durationMs / 1000.0, 0, 'f', 1),

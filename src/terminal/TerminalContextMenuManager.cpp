@@ -25,13 +25,13 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
     m_contextMenu->setObjectName("terminalContextMenu");
 
     m_copyAction = m_contextMenu->addAction(
-        tr("Copy") + QString("\t") + QKeySequence(QKeySequence::Copy).toString());
+        tr("复制") + QString("\t") + QKeySequence(QKeySequence::Copy).toString());
     connect(m_copyAction, &QAction::triggered, this, [this]() {
         emit copyRequested();
     });
 
     m_pasteAction = m_contextMenu->addAction(
-        tr("Paste") + QString("\t") + QKeySequence(QKeySequence::Paste).toString());
+        tr("粘贴") + QString("\t") + QKeySequence(QKeySequence::Paste).toString());
     connect(m_pasteAction, &QAction::triggered, this, [this]() {
         QString text = QApplication::clipboard()->text();
         if (!text.isEmpty()) emit pasteRequested(text);
@@ -39,13 +39,13 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
 
     m_contextMenu->addSeparator();
 
-    m_clearAction = m_contextMenu->addAction(tr("Clear"));
+    m_clearAction = m_contextMenu->addAction(tr("清空"));
     connect(m_clearAction, &QAction::triggered, this, [this]() {
         emit clearRequested();
     });
 
     m_selectAllAction = m_contextMenu->addAction(
-        tr("Select All") + QString("\t") + QKeySequence(QKeySequence::SelectAll).toString());
+        tr("全选") + QString("\t") + QKeySequence(QKeySequence::SelectAll).toString());
     connect(m_selectAllAction, &QAction::triggered, this, [this]() {
         emit selectAllRequested();
     });
@@ -53,7 +53,7 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
     m_contextMenu->addSeparator();
 
     m_searchAction = m_contextMenu->addAction(
-        tr("Search") + QString("\t") + QKeySequence(QKeySequence::Find).toString());
+        tr("搜索") + QString("\t") + QKeySequence(QKeySequence::Find).toString());
     connect(m_searchAction, &QAction::triggered, this, [this]() {
         emit searchRequested();
     });

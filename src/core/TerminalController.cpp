@@ -186,8 +186,8 @@ void TerminalController::updateStatusBar()
     auto rx = m_terminalModel->rxBytes();
     auto tx = m_terminalModel->txBytes();
     // 使用公共 ByteFormat::formatSize 替代本地重复实现
-    m_rxBytesLbl->setText(tr("RX: ") + ByteFormat::formatSize(rx));
-    m_txBytesLbl->setText(tr("TX: ") + ByteFormat::formatSize(tx));
+    m_rxBytesLbl->setText(tr("接收: ") + ByteFormat::formatSize(rx));
+    m_txBytesLbl->setText(tr("发送: ") + ByteFormat::formatSize(tx));
 }
 
 /**
@@ -201,12 +201,12 @@ void TerminalController::updateStatusBar()
 void TerminalController::onExportData(QWidget* parent)
 {
     if (m_terminalModel->lineCount() == 0) {
-        QMessageBox::information(parent, tr("Export"), tr("No data to export"));
+        QMessageBox::information(parent, tr("导出"), tr("没有数据可导出"));
         return;
     }
 
-    QString filter = tr("Text files (*.txt);;CSV files (*.csv);;Binary files (*.bin)");
-    QString filePath = QFileDialog::getSaveFileName(parent, tr("Export Data"),
+    QString filter = tr("文本文件 (*.txt);;CSV文件 (*.csv);;二进制文件 (*.bin)");
+    QString filePath = QFileDialog::getSaveFileName(parent, tr("导出数据"),
                                                      QString(), filter);
     if (filePath.isEmpty()) return;
 
@@ -224,9 +224,9 @@ void TerminalController::onExportData(QWidget* parent)
     };
 
     if (m_dataExporter->exportStreamed(filePath, format, lineProvider, totalLines)) {
-        emit statusMessage(tr("Exported to %1").arg(filePath), 3000);
+        emit statusMessage(tr("已导出至 %1").arg(filePath), 3000);
     } else {
-        QMessageBox::warning(parent, tr("Export Failed"), tr("Cannot write to file"));
+        QMessageBox::warning(parent, tr("导出失败"), tr("无法写入文件"));
     }
 }
 

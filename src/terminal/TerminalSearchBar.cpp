@@ -60,7 +60,7 @@ void TerminalSearchBar::setupUI()
     layout->addWidget(m_searchInput);
 
     // ---- 正则模式复选框 ----
-    m_regexCheck = new QCheckBox(tr("Regex"), this);
+    m_regexCheck = new QCheckBox(tr("正则"), this);
     m_regexCheck->setObjectName("searchBarRegexCheck");
     layout->addWidget(m_regexCheck);
 

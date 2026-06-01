@@ -121,7 +121,7 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
     // 步骤3: 通过工厂创建连接
     m_currentConn = m_connManager->createConnection(ConnectionType::Serial);
     if (!m_currentConn) {
-        emit connectionFailed(tr("Not Supported"), tr("Serial connection not available"));
+        emit connectionFailed(tr("不支持"), tr("串口连接不可用"));
         return;
     }
 
@@ -137,7 +137,7 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
     // 步骤7: 尝试打开端口
     if (!m_currentConn->open()) {
         stopConnectionTimeout();
-        emit connectionFailed(tr("Connection Failed"), tr("Cannot open serial port"));
+        emit connectionFailed(tr("连接失败"), tr("无法打开串口"));
         disconnect(m_currentConn, nullptr, this, nullptr);  // 断开信号，防止 removeConnection 触发已连接的槽
         m_connManager->removeConnection(m_currentConn);
         m_currentConn = nullptr;
@@ -172,7 +172,7 @@ void ConnectionController::disconnectCurrent()
     if (m_currentConn) {
         // 缓存端口名称，断开后 m_connectedPortName 会被清空
         const QString portName = m_connectedPortName;
-        teardownConnection(tr("user disconnect"));
+        teardownConnection(tr("用户主动断开"));
         // 通知 Toast: 用户主动断开连接
         emit connectionDisconnected(portName);
     }
@@ -214,7 +214,7 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
 
     m_currentConn = m_connManager->createConnection(type);
     if (!m_currentConn) {
-        emit connectionFailed(tr("Not Supported"), tr("This connection type is not yet available"));
+        emit connectionFailed(tr("不支持"), tr("该连接类型尚未实现"));
         return;
     }
 
@@ -228,8 +228,8 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
 
     if (!m_currentConn->open()) {
         stopConnectionTimeout();
-        emit connectionFailed(tr("Connection Failed"),
-                             tr("Cannot establish network connection"));
+        emit connectionFailed(tr("连接失败"),
+                             tr("无法建立网络连接"));
         // 先断开信号，防止 removeConnection 触发 close() 导致的 stateChanged 信号
         // 回调到 onConnectionStateChanged 产生重复错误通知
         disconnect(m_currentConn, nullptr, this, nullptr);
@@ -249,7 +249,7 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
     m_connectedPortName.clear();  // 网络连接无串口端口名
 
     // 通知 Toast: 网络连接成功
-    emit connectionSucceeded(m_currentConn ? m_currentConn->name() : tr("Network"));
+    emit connectionSucceeded(m_currentConn ? m_currentConn->name() : tr("网络"));
 }
 
 IConnection* ConnectionController::currentConnection() const { return m_currentConn; }
@@ -313,7 +313,7 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
 
         // 错误状态: 发送 Toast 错误通知（区分 Error 和普通 Disconnected）
         if (state == ConnectionState::Error) {
-            emit connectionError(connName, tr("Connection error occurred"));
+            emit connectionError(connName, tr("连接发生错误"));
         }
 
         // 自动重连: 仅在非用户主动断开且已启用时触发
@@ -357,20 +357,20 @@ void ConnectionController::onConnectionTimeout()
 
     // 缓存端口名称，清理后 m_connectedPortName 会被清空
     const QString timeoutName = m_connectedPortName.isEmpty()
-        ? (m_currentConn ? m_currentConn->name() : tr("Unknown"))
+        ? (m_currentConn ? m_currentConn->name() : tr("未知"))
         : m_connectedPortName;
 
     qWarning() << "Connection timeout for" << timeoutName;
 
     teardownConnection(tr("connection timeout"));
 
-    emit connectionFailed(tr("Connection Timeout"),
-                         tr("Connection timed out after %1 seconds. "
+        emit connectionFailed(tr("连接超时"),
+                             tr("连接在 %1 秒后超时。 "
                             "Please check the device and try again.")
                              .arg(kConnectionTimeoutMs / 1000));
 
     // 通知 Toast: 连接超时
-    emit connectionError(timeoutName, tr("Connection timed out"));
+        emit connectionError(timeoutName, tr("连接超时"));
 }
 
 /**
@@ -396,7 +396,7 @@ void ConnectionController::onAutoReconnect()
     // 检查是否达到最大重连次数（0 表示无限制）
     if (m_reconnectMaxRetries > 0 && m_reconnectAttemptCount >= m_reconnectMaxRetries) {
         m_reconnectTimer.stop();
-        const QString reason = tr("Max reconnect attempts reached (%1)").arg(m_reconnectMaxRetries);
+        const QString reason = tr("已达到最大重连次数 (%1)").arg(m_reconnectMaxRetries);
         emit reconnectFailed(reason);
         m_reconnectAttemptCount = 0;
         return;
@@ -444,12 +444,12 @@ void ConnectionController::onPortRemoved(const QString& portName)
 
         // 通知 UI 连接因端口拔出而断开
         emit connectionStateChanged(ConnectionState::Disconnected, portName);
-        emit connectionFailed(tr("Port Removed"),
-                             tr("Serial port %1 was disconnected. "
+        emit connectionFailed(tr("端口移除"),
+                             tr("串口 %1 已断开。 "
                                 "Please reconnect the device.")
                                  .arg(portName));
         // 通知 Toast: 端口被物理拔出
-        emit connectionError(portName, tr("Port was physically removed"));
+        emit connectionError(portName, tr("端口已被物理移除"));
     }
 }
 
@@ -471,9 +471,9 @@ void ConnectionController::connectSignals(IConnection* conn)
             this, [this](const QString& msg) {
         qWarning() << "Connection error:" << msg;
         const QString errPortName = m_connectedPortName.isEmpty()
-            ? (m_currentConn ? m_currentConn->name() : tr("Unknown"))
+            ? (m_currentConn ? m_currentConn->name() : tr("未知"))
             : m_connectedPortName;
-        emit connectionFailed(tr("Connection Error"), msg);
+        emit connectionFailed(tr("连接错误"), msg);
         emit connectionError(errPortName, msg);
     });
     // 连接错误计数更新 → 通过信号通知表现层(避免业务层直接依赖表现层)
