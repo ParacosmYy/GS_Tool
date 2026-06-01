@@ -156,6 +156,15 @@ signals:
      * @param bytes 实际写入的字节数
      */
     void bytesWritten(qint64 bytes);
+
+    /**
+     * @brief 错误计数器更新信号
+     *
+     * 每次错误分类完成后发出，携带最新的错误统计数据。
+     * 上层模块(如DataStatistics)可连接此信号实时刷新显示。
+     * @param counters 最新错误统计
+     */
+    void errorCountersUpdated(const SerialErrorCounters& counters);
 };
 
 Q_DECLARE_METATYPE(PinoutSignals)

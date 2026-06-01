@@ -178,13 +178,12 @@ QPair<double, double> ChartModel::xRange() const
 }
 
 /** @brief 返回累计接收的数据点总数 @return 点数 */
-int ChartModel::totalPointsReceived() const
+qint64 ChartModel::totalPointsReceived() const
 {
     return m_totalPoints;
 }
 
-/** @brief 返回当前全局帧索引(X轴位置) @return 帧索引 */
-int ChartModel::currentFrameIndex() const
+qint64 ChartModel::currentFrameIndex() const
 {
     return m_frameIndex;
 }

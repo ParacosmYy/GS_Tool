@@ -173,6 +173,18 @@ private:
      */
     QString translateError(QSerialPort::SerialPortError error);
 
+    /**
+     * @brief 通过平台API获取底层串口通信错误统计
+     *
+     * Windows平台使用ClearCommError()读取COMSTAT结构中的错误标志:
+     *   - TX FIFO满导致发送停滞
+     *   - 帧错误(起始位/停止位不匹配)
+     *   - 硬件奇偶校验错误
+     *   - 接收缓冲区溢出
+     * 非Windows平台为空实现(未来可扩展TIOCGICOUNT)。
+     */
+    void queryPlatformErrors();
+
     /** @brief Qt 串口对象，提供底层串口操作能力 */
     QSerialPort m_serial;
 

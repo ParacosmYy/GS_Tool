@@ -125,6 +125,15 @@ public:
     /** @brief 通过索引恢复面板（启动/会话恢复用，无动画） @return true成功 false越界/空 */
     bool restorePanelByIndex(int index);
 
+private slots:
+    /**
+     * @brief 主题切换时刷新导航树圆点图标颜色
+     *
+     * buildNavTree()中的圆点图标在构建时读取ThemeManager颜色，
+     * 主题切换后需要重新着色以匹配新主题。
+     */
+    void onThemeChanged();
+
 private:
     /** @brief 旧面板滑出+淡出: pos (0,0)->(-width,0) 200ms InCubic, opacity 1->0 */
     void animateSlideOut(QWidget* oldPanel, QParallelAnimationGroup* group);

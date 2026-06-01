@@ -118,7 +118,14 @@ void RecordingController::onToggleRecording()
         }
         if (!path.endsWith(".edl")) path += ".edl";
 
-        m_logger->startRecording(path);
+        if (!m_logger->startRecording(path)) {
+            // 录制启动失败(文件权限/磁盘满)，恢复按钮状态
+            m_recordAction->blockSignals(true);
+            m_recordAction->setChecked(false);
+            m_recordAction->blockSignals(false);
+            emit statusMessage(tr("录制启动失败，请检查文件路径和权限"), 5000);
+            return;
+        }
         m_stopRecordAction->setEnabled(true);
         m_recordAction->setText(tr("暂停"));
         emit statusMessage(tr("录制中: %1").arg(path));

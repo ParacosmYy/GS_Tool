@@ -82,8 +82,8 @@ public:
     QPair<double, double> xRange() const;
 
     // 获取统计信息
-    int totalPointsReceived() const;    // 总共接收的数据点数
-    int currentFrameIndex() const;      // 当前帧索引（X轴计数器）
+    qint64 totalPointsReceived() const;    // 总共接收的数据点数（qint64防溢出）
+    qint64 currentFrameIndex() const;      // 当前帧索引（X轴计数器）
 
     // ---- 操作 ----
 
@@ -129,7 +129,7 @@ private:
     QMap<QString, ChannelBuffer> m_buffers;     // displayName -> buffer
     int m_windowSize = 200;
     qint64 m_frameIndex = 0;                      ///< 全局帧计数器（X轴），qint64 防止长时间运行后溢出
-    int m_totalPoints = 0;
+    qint64 m_totalPoints = 0;                        ///< 总数据点计数（qint64防溢出）
 
     // 刷新合并
     QTimer* m_refreshTimer;

@@ -12,6 +12,7 @@
 
 #include "core/MainWindow.h"
 #include "serial/BookmarkWidget.h"
+#include "serial/TimedSender.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QCloseEvent>
@@ -357,6 +358,11 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
     // 停止统计刷新定时器
     m_terminalController->stopStatsTimer();
+
+    // 停止定时发送器（防止关闭后仍有挂起的发送）
+    if (m_sendController && m_sendController->timedSender()) {
+        m_sendController->timedSender()->stop();
+    }
 
     // 保存当前面板索引（供下次恢复使用）
     if (m_navController) {

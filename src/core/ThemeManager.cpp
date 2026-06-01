@@ -79,6 +79,7 @@ void ThemeManager::loadDefaultColors()
     m_colorMap[SemanticColor::Error]           = QColor(243, 139, 168); // #f38ba8
     m_colorMap[SemanticColor::Scrollbar]       = QColor(69, 71, 90);    // #45475a
     m_colorMap[SemanticColor::ScrollbarHover]  = QColor(88, 91, 112);   // #585b70
+    m_colorMap[SemanticColor::Shadow]          = QColor(0, 0, 0, 77);   // rgba(0,0,0,0.3)
 
     // ---- 终端专用颜色（Catppuccin Mocha）----
     m_colorMap[SemanticColor::TermBackground]      = QColor(30, 30, 46);    // #1e1e2e
@@ -361,6 +362,7 @@ void ThemeManager::parseColorsFromQss(const QString& qssContent)
         {"Error",           SemanticColor::Error},
         {"Scrollbar",       SemanticColor::Scrollbar},
         {"ScrollbarHover",  SemanticColor::ScrollbarHover},
+        {"Shadow",          SemanticColor::Shadow},
         {"TermBackground",      SemanticColor::TermBackground},
         {"TermRxText",          SemanticColor::TermRxText},
         {"TermTxText",          SemanticColor::TermTxText},

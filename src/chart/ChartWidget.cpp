@@ -341,9 +341,8 @@ void ChartWidget::applyThemeColors()
 {
     auto& theme = ThemeManager::instance();
 
-    // 判断当前是否为暗色主题（根据主题名称判断）
-    QString themeName = theme.currentTheme();
-    bool isDark = themeName.contains("dark");
+    // 判断当前是否为暗色主题（与 onChannelsChanged 一致：同时检查系统暗色模式和主题名称）
+    bool isDark = theme.isSystemDarkMode() || theme.currentTheme().contains("dark");
 
     // ---- 1. 图表背景色 ----
     QColor bgColor = theme.color(ThemeManager::SemanticColor::BgPrimary);

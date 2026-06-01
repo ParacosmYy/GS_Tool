@@ -45,6 +45,9 @@ static QIcon createDotIcon(const QColor& color)
 NavigationController::NavigationController(QObject* parent)
     : QObject(parent)
 {
+    // 主题切换时刷新导航树图标颜色
+    connect(&ThemeManager::instance(), &ThemeManager::themeChanged,
+            this, &NavigationController::onThemeChanged);
 }
 
 /**
@@ -423,5 +426,55 @@ void NavigationController::stopBreathingAnimation(QLabel* statusLabel)
             statusLabel->setGraphicsEffect(nullptr);  // Qt 自动 delete m_connStatusEffect
         }
         m_connStatusEffect = nullptr;
+    }
+}
+
+/**
+ * @brief 主题切换时刷新导航树圆点图标颜色
+ *
+ * buildNavTree()中的圆点图标在构建时读取ThemeManager颜色，
+ * 主题切换后需要重新着色以匹配新主题。
+ * 导航树结构: root -> 串口(0, Accent蓝) / 网络(1) -> TCP客户端(0,Success绿)
+ *                                            -> TCP服务端(1,Success绿)
+ *                                            -> UDP(2,Warning黄)
+ */
+void NavigationController::onThemeChanged()
+{
+    if (!m_navTree) return;
+
+    auto* model = qobject_cast<QStandardItemModel*>(m_navTree->model());
+    if (!model) return;
+
+    auto* root = model->invisibleRootItem();
+    if (!root) return;
+
+    // 串口分组(第0行) — 蓝色圆点(Accent)
+    auto* serialItem = root->child(0);
+    if (serialItem) {
+        serialItem->setIcon(createDotIcon(
+            ThemeManager::instance().color(ThemeManager::SemanticColor::Accent)));
+    }
+
+    // 网络分组(第1行) — 子项有TCP(绿/Success)和UDP(黄/Warning)
+    auto* networkItem = root->child(1);
+    if (networkItem) {
+        // TCP客户端(第0行)
+        auto* tcpClient = networkItem->child(0);
+        if (tcpClient) {
+            tcpClient->setIcon(createDotIcon(
+                ThemeManager::instance().color(ThemeManager::SemanticColor::Success)));
+        }
+        // TCP服务端(第1行)
+        auto* tcpServer = networkItem->child(1);
+        if (tcpServer) {
+            tcpServer->setIcon(createDotIcon(
+                ThemeManager::instance().color(ThemeManager::SemanticColor::Success)));
+        }
+        // UDP(第2行)
+        auto* udpItem = networkItem->child(2);
+        if (udpItem) {
+            udpItem->setIcon(createDotIcon(
+                ThemeManager::instance().color(ThemeManager::SemanticColor::Warning)));
+        }
     }
 }

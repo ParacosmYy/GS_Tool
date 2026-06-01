@@ -76,8 +76,13 @@ void TerminalController::setMainTerminal(QWidget* terminal)
 /** @brief 启动统计刷新定时器（每 500ms 触发一次） */
 void TerminalController::startStatsTimer()
 {
-    m_statsTimer->setInterval(Timers::kStatsRefreshMs);
-    connect(m_statsTimer, &QTimer::timeout, this, &TerminalController::updateDataStatistics);
+    static bool s_connected = false;
+    m_statsTimer->setInterval(500);
+    // 仅首次连接信号，防止重复调用导致 updateDataStatistics 多次触发
+    if (!s_connected) {
+        connect(m_statsTimer, &QTimer::timeout, this, &TerminalController::updateDataStatistics);
+        s_connected = true;
+    }
     m_statsTimer->start();
 }
 

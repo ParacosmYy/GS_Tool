@@ -31,6 +31,7 @@
 --semantic-Error: #f38ba8;
 --semantic-Scrollbar: #45475a;
 --semantic-ScrollbarHover: #585b70;
+--semantic-Shadow: rgba(0,0,0,0.3);
 --semantic-TermBackground: #1e1e2e;
 --semantic-TermRxText: #cdd6f4;
 --semantic-TermTxText: #a6e3a1;

@@ -49,6 +49,7 @@ set(SOURCES
     src/core/ConnectionFactory.cpp
     src/core/ThemeManager.cpp
     src/connection/SerialConnection.cpp
+    src/connection/SerialConnectionError.cpp
     src/connection/TcpConnection.cpp
     src/connection/UdpConnection.cpp
     src/terminal/TerminalWidget.cpp

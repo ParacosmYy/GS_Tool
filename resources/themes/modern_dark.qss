@@ -29,6 +29,7 @@
 --semantic-Error: #f7768e;
 --semantic-Scrollbar: #414868;
 --semantic-ScrollbarHover: #565f89;
+--semantic-Shadow: rgba(0,0,0,0.3);
 --semantic-TermBackground: #1a1b26;
 --semantic-TermRxText: #c0caf5;
 --semantic-TermTxText: #9ece6a;

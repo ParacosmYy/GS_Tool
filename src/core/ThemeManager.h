@@ -57,6 +57,7 @@ public:
         Error,           ///< 错误色
         Scrollbar,       ///< 滚动条默认色
         ScrollbarHover,  ///< 滚动条悬停色
+        Shadow,          ///< 阴影色（面板浮起时的阴影）
         // ---- 终端专用颜色 ----
         TermBackground,  ///< 终端背景色
         TermRxText,      ///< 终端接收文本色
