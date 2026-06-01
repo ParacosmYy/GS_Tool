@@ -65,4 +65,5 @@
 | 74 | 串口深度: Win32 ClearCommError错误分类+错误恢复策略+导航树主题刷新+Shadow语义色+SerialConnection拆分 | 74 |
 | 75 | 代码质量+串口深度: 波特率扩展(12→20标准速率)+魔术数提取(break/stats/font)+SendController部分写入重试+PortWatcher热插拔防抖(2次确认)+AnimatedButton统一(20个按钮) | 75 |
 | 76 | 代码质量: Animations命名空间(12常量)+Layout命名空间(10常量)+ConnectionDefaults(2常量)+tr()合规(8处FrameVisualEditor)+连接默认值(TCP/UDP)+动画/布局魔术数替换(43处) | 76 |
+| 77 | UI动画: OTA进度条完成动画(QPropertyAnimation 400ms OutCubic accent->success)+FrameParser拆分(488->180+330)+DataExporterStreamed修复 | 77 |
 | ... | 目标: 1000分 | 1000 |
