@@ -1,10 +1,13 @@
 /**
  * @file DataExporter.cpp
- * @brief 数据导出器实现 - Plain/HexDump/CSV/Timestamped/Bin 五种格式
+ * @brief 数据导出器实现 - Plain/HexDump/CSV/Timestamped/Bin/Json 五种格式
  *
  * HexDump 格式将所有行数据拼接后按经典16字节/行输出。
  * 时间范围过滤仅在 exportToFile 模式下支持。
  * 所有写入操作均检查 QFile 错误状态，失败时发射 exportError 信号。
+ *
+ * 流式导出方法见 DataExporterStreamed.cpp
+ * EDL范围导出方法见 DataExporterEdl.cpp
  */
 
 #include "utils/DataExporter.h"
@@ -14,8 +17,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
-#include <QDataStream>
-#include <QTimeZone>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -42,24 +43,6 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
     case Timestamped: return exportTimestamped(filePath, filtered);
     case Bin:         return exportBin(filePath, filtered);
     case Json:        return exportJson(filePath, filtered);
-    }
-    return false;
-}
-
-/** @brief 导出数据到文件(流式模式，适合大数据量) @param filePath 目标路径 @param format 格式 @param lineProvider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
-bool DataExporter::exportStreamed(const QString& filePath, Format format,
-                                   LineProvider lineProvider,
-                                   int totalLines, int batchSize)
-{
-    if (totalLines <= 0 || !lineProvider || filePath.isEmpty()) return false;
-
-    switch (format) {
-    case Plain:       return exportStreamedPlain(filePath, lineProvider, totalLines, batchSize);
-    case HexDump:     return exportStreamedHexDump(filePath, lineProvider, totalLines, batchSize);
-    case Csv:         return exportStreamedCsv(filePath, lineProvider, totalLines, batchSize);
-    case Timestamped: return exportStreamedTimestamped(filePath, lineProvider, totalLines, batchSize);
-    case Bin:         return exportStreamedBin(filePath, lineProvider, totalLines, batchSize);
-    case Json:        return exportStreamedJson(filePath, lineProvider, totalLines, batchSize);
     }
     return false;
 }
@@ -313,270 +296,4 @@ QString DataExporter::formatHexDumpLine(const QByteArray& data, quint64 address)
         }
     }
     return QString("%1 | %2 | %3").arg(addrStr, hexPart, toAsciiString(data));
-}
-
-// ---- 流式导出方法 ----
-
-/** @brief 流式导出纯文本格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
-bool DataExporter::exportStreamedPlain(const QString& path, LineProvider provider,
-                                        int totalLines, int batchSize)
-{
-    QFile file(path);
-    QTextStream out;
-    if (!openTextFile(file, out, path)) return false;
-
-    int offset = 0;
-    while (offset < totalLines) {
-        QVector<TerminalLine> batch = provider(offset, qMin(batchSize, totalLines - offset));
-        if (batch.isEmpty()) break;
-        for (const TerminalLine& line : batch) {
-            out << QString("[%1] [%2] %3 | %4\n")
-                    .arg(line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz"),
-                         (line.direction == DataDirection::Rx) ? "RX" : "TX",
-                         HexConverter::toHexString(line.data), toAsciiString(line.data));
-        }
-        offset += batch.size();
-    }
-    return flushAndCheck(file, out, path);
-}
-
-/** @brief 流式HexDump - 维护全局地址偏移和跨批次残余缓冲区 */
-/** @brief 流式导出HEX转储格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
-bool DataExporter::exportStreamedHexDump(const QString& path, LineProvider provider,
-                                          int totalLines, int batchSize)
-{
-    QFile file(path);
-    QTextStream out;
-    if (!openTextFile(file, out, path)) return false;
-
-    const int bytesPerLine = 16;
-    QByteArray residual;
-    quint64 globalAddr = 0;
-    int offset = 0;
-
-    while (offset < totalLines) {
-        QVector<TerminalLine> batch = provider(offset, qMin(batchSize, totalLines - offset));
-        if (batch.isEmpty()) break;
-        QByteArray batchData = residual + concatData(batch);
-
-        int pos = 0;
-        while (pos + bytesPerLine <= batchData.size()) {
-            out << formatHexDumpLine(batchData.mid(pos, bytesPerLine), globalAddr) << '\n';
-            pos += bytesPerLine;
-            globalAddr += bytesPerLine;
-        }
-        residual = batchData.mid(pos);
-        offset += batch.size();
-    }
-    if (!residual.isEmpty())
-        out << formatHexDumpLine(residual, globalAddr) << '\n';
-
-    return flushAndCheck(file, out, path);
-}
-
-/** @brief 流式导出CSV格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
-bool DataExporter::exportStreamedCsv(const QString& path, LineProvider provider,
-                                       int totalLines, int batchSize)
-{
-    QFile file(path);
-    QTextStream out;
-    if (!openTextFile(file, out, path)) return false;
-
-    // UTF-8 BOM: 确保Excel中文环境下正确识别编码
-    file.write("\xEF\xBB\xBF");
-
-    out << "timestamp,direction,data_hex,data_ascii\n";
-    int offset = 0;
-    while (offset < totalLines) {
-        QVector<TerminalLine> batch = provider(offset, qMin(batchSize, totalLines - offset));
-        if (batch.isEmpty()) break;
-        for (const TerminalLine& line : batch) {
-            out << line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz") << ','
-                << ((line.direction == DataDirection::Rx) ? "RX" : "TX") << ','
-                << HexConverter::toHexString(line.data) << ','
-                << escapeCsvField(toAsciiString(line.data)) << '\n';
-        }
-        offset += batch.size();
-    }
-    return flushAndCheck(file, out, path);
-}
-
-/** @brief 流式导出带时间戳格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
-bool DataExporter::exportStreamedTimestamped(const QString& path, LineProvider provider,
-                                              int totalLines, int batchSize)
-{
-    QFile file(path);
-    QTextStream out;
-    if (!openTextFile(file, out, path)) return false;
-
-    int offset = 0;
-    while (offset < totalLines) {
-        QVector<TerminalLine> batch = provider(offset, qMin(batchSize, totalLines - offset));
-        if (batch.isEmpty()) break;
-        for (const TerminalLine& line : batch) {
-            out << QString("[%1] %2\n")
-                    .arg(line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz"),
-                         HexConverter::toHexString(line.data));
-        }
-        offset += batch.size();
-    }
-    return flushAndCheck(file, out, path);
-}
-
-/** @brief 流式导出原始二进制格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
-bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
-                                       int totalLines, int batchSize)
-{
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly)) {
-        emit exportError(path, tr("无法打开文件: %1").arg(file.errorString()));
-        return false;
-    }
-    int offset = 0;
-    while (offset < totalLines) {
-        QVector<TerminalLine> batch = provider(offset, qMin(batchSize, totalLines - offset));
-        if (batch.isEmpty()) break;
-        for (const TerminalLine& line : batch) {
-            if (file.write(line.data) != line.data.size()) {
-                emit exportError(path, tr("写入文件失败: %1").arg(file.errorString()));
-                file.close();
-                return false;
-            }
-        }
-        offset += batch.size();
-    }
-    file.close();
-    return true;
-}
-
-/**
- * @brief 流式JSON导出 - 分批构建JSON数组，适合大数据量场景
- *
- * 与exportJson输出格式相同，但通过LineProvider分批拉取数据，
- * 避免一次性将所有行加载到内存中。
- *
- * @param path 输出文件路径
- * @param provider 行数据回调
- * @param totalLines 数据总行数
- * @param batchSize 每批行数
- * @return true 成功，false 失败
- */
-/** @brief 流式导出JSON格式(结构化数组) @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
-bool DataExporter::exportStreamedJson(const QString& path, LineProvider provider,
-                                       int totalLines, int batchSize)
-{
-    QJsonArray linesArray;
-    int offset = 0;
-    while (offset < totalLines) {
-        QVector<TerminalLine> batch = provider(offset, qMin(batchSize, totalLines - offset));
-        if (batch.isEmpty()) break;
-        for (const TerminalLine& line : batch) {
-            QJsonObject lineObj;
-            lineObj["timestamp"] = line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz");
-            lineObj["direction"] = (line.direction == DataDirection::Rx) ? "RX" : "TX";
-            lineObj["hex"] = HexConverter::toHexString(line.data);
-            lineObj["ascii"] = toAsciiString(line.data);
-            linesArray.append(lineObj);
-        }
-        offset += batch.size();
-    }
-
-    QJsonObject root;
-    root["export_time"] = QDateTime::currentDateTime().toString(Qt::ISODate);
-    root["total_lines"] = totalLines;
-    root["lines"] = linesArray;
-
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly)) {
-        emit exportError(path, tr("无法打开文件: %1").arg(file.errorString()));
-        return false;
-    }
-    QJsonDocument doc(root);
-    if (file.write(doc.toJson(QJsonDocument::Indented)) == -1) {
-        emit exportError(path, tr("写入文件失败: %1").arg(file.errorString()));
-        file.close();
-        return false;
-    }
-    file.close();
-    return true;
-}
-
-// ---- EDL范围导出 ----
-
-/** @brief 从EDL日志文件导出指定时间范围的数据 @param edlPath 日志文件路径 @param format 导出格式 @param from 起始时间 @param to 结束时间 @return 是否成功 */
-bool DataExporter::exportRange(const QString& edlPath, Format format,
-                                const QString& outPath,
-                                qint64 fromMs, qint64 toMs)
-{
-    if (edlPath.isEmpty() || outPath.isEmpty()) return false;
-    if (fromMs >= 0 && toMs >= 0 && fromMs > toMs) return false;
-
-    QVector<TerminalLine> lines = readEdlRange(edlPath, fromMs, toMs);
-    m_lastExportRangeCount = lines.size();
-    if (lines.isEmpty()) return false;
-
-    switch (format) {
-    case Plain:       return exportPlain(outPath, lines);
-    case HexDump:     return exportHexDump(outPath, lines);
-    case Csv:         return exportCsv(outPath, lines);
-    case Timestamped: return exportTimestamped(outPath, lines);
-    case Bin:         return exportBin(outPath, lines);
-    case Json:        return exportJson(outPath, lines);
-    }
-    return false;
-}
-
-/** @brief 返回上次exportRange调用实际导出的行数 @return 导出行数 */
-int DataExporter::lastExportRangeCount() const { return m_lastExportRangeCount; }
-
-/**
- * @brief 从EDL二进制文件中读取指定时间范围的记录
- * EDL记录(BigEndian): timestamp(8B) + direction(1B) + length(4B) + data(length B)
- */
-QVector<TerminalLine> DataExporter::readEdlRange(const QString& edlPath,
-                                                  qint64 fromMs, qint64 toMs)
-{
-    QVector<TerminalLine> result;
-    QFile file(edlPath);
-    if (!file.open(QIODevice::ReadOnly)) return result;
-
-    // 验证文件头: magic(3B) + version(1B) + padding(4B)
-    QByteArray magic = file.read(3);
-    if (magic.size() != 3 || magic != kEdlMagic) return result;
-    quint8 version = 0;
-    if (file.read(reinterpret_cast<char*>(&version), 1) != 1 || version != kEdlVersion)
-        return result;
-    if (!file.seek(kEdlHeaderSize)) return result;
-
-    QDataStream stream(&file);
-    stream.setByteOrder(QDataStream::BigEndian);
-    const QDateTime baseTime = QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0), QTimeZone::UTC);
-
-    while (!file.atEnd()) {
-        quint64 timestamp = 0;
-        stream >> timestamp;
-        if (stream.status() != QDataStream::Ok) break;
-        quint8 direction = 0;
-        stream >> direction;
-        if (stream.status() != QDataStream::Ok) break;
-        quint32 length = 0;
-        stream >> length;
-        if (stream.status() != QDataStream::Ok) break;
-        if (length > kEdlMaxRecordSize) break;
-
-        QByteArray data(static_cast<int>(length), Qt::Uninitialized);
-        if (stream.readRawData(data.data(), static_cast<int>(length)) != static_cast<int>(length))
-            break;
-
-        qint64 tsMs = static_cast<qint64>(timestamp);
-        if (toMs >= 0 && tsMs > toMs) break;
-        if (fromMs >= 0 && tsMs < fromMs) continue;
-
-        TerminalLine line;
-        line.data = data;
-        line.direction = (direction == 0) ? DataDirection::Rx : DataDirection::Tx;
-        line.timestamp = baseTime.addMSecs(tsMs);
-        result.append(line);
-    }
-    return result;
 }

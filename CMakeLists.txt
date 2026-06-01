@@ -34,6 +34,7 @@ set(SOURCES
     src/core/MainWindowSignalConnect.cpp
     src/core/MainWindowPanelConnect.cpp
     src/core/ConnectionController.cpp
+    src/core/ConnectionControllerReconnect.cpp
     src/core/RecordingController.cpp
     src/core/NavigationController.cpp
     src/core/SendController.cpp
@@ -87,6 +88,8 @@ set(SOURCES
     src/ota/protocols/ZModemTransfer.cpp
     src/utils/SettingsManager.cpp
     src/utils/DataExporter.cpp
+    src/utils/DataExporterStreamed.cpp
+    src/utils/DataExporterEdl.cpp
     src/utils/DataLogger.cpp
     src/protocol/FrameDefinition.cpp
     src/core/SessionManager.cpp
