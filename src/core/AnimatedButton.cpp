@@ -7,6 +7,7 @@
  */
 
 #include "core/AnimatedButton.h"
+#include "core/Constants.h"
 
 #include <QPropertyAnimation>
 #include <QEasingCurve>
@@ -39,32 +40,32 @@ void AnimatedButton::setAnimOpacity(qreal opacity)
 
 // ---- 事件处理 ----
 
-/** @brief 鼠标进入：触发hover渐入动画(opacity→1.0, 200ms) @param event 进入事件 */
+/** @brief 鼠标进入：触发hover渐入动画(opacity→1.0) @param event 进入事件 */
 void AnimatedButton::enterEvent(QEnterEvent* event)
 {
     QPushButton::enterEvent(event);
-    startOpacityAnim(1.0, 200, QEasingCurve::OutCubic);
+    startOpacityAnim(1.0, Animations::kButtonHoverMs, QEasingCurve::OutCubic);
 }
 
-/** @brief 鼠标离开：触发hover渐出动画(opacity→0.85, 200ms) @param event 离开事件 */
+/** @brief 鼠标离开：触发hover渐出动画(opacity→0.85) @param event 离开事件 */
 void AnimatedButton::leaveEvent(QEvent* event)
 {
     QPushButton::leaveEvent(event);
-    startOpacityAnim(0.85, 200, QEasingCurve::OutCubic);
+    startOpacityAnim(0.85, Animations::kButtonHoverMs, QEasingCurve::OutCubic);
 }
 
-/** @brief 鼠标按下：触发按下反馈动画(opacity→0.75, 100ms) @param event 鼠标事件 */
+/** @brief 鼠标按下：触发按下反馈动画(opacity→0.75) @param event 鼠标事件 */
 void AnimatedButton::mousePressEvent(QMouseEvent* event)
 {
     QPushButton::mousePressEvent(event);
-    startOpacityAnim(0.75, 100, QEasingCurve::Linear);
+    startOpacityAnim(0.75, Animations::kButtonPressMs, QEasingCurve::Linear);
 }
 
-/** @brief 鼠标释放：触发回弹动画(opacity→1.0, 100ms) @param event 鼠标事件 */
+/** @brief 鼠标释放：触发回弹动画(opacity→1.0) @param event 鼠标事件 */
 void AnimatedButton::mouseReleaseEvent(QMouseEvent* event)
 {
     QPushButton::mouseReleaseEvent(event);
-    startOpacityAnim(1.0, 100, QEasingCurve::OutCubic);
+    startOpacityAnim(1.0, Animations::kButtonPressMs, QEasingCurve::OutCubic);
 }
 
 // ---- 内部方法 ----

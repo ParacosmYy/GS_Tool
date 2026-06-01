@@ -223,7 +223,7 @@ int NavigationController::parentContainerWidth(QWidget* panel) const
     return parent ? parent->width() : 0;
 }
 
-/** @brief 旧面板滑出+淡出: pos (0,0)->(-width,0) 200ms InCubic, opacity 1->0 */
+/** @brief 旧面板滑出+淡出: pos (0,0)->(-width,0) InCubic, opacity 1->0 */
 void NavigationController::animateSlideOut(QWidget* oldPanel, QParallelAnimationGroup* group)
 {
     const int slideWidth = parentContainerWidth(oldPanel);
@@ -236,13 +236,13 @@ void NavigationController::animateSlideOut(QWidget* oldPanel, QParallelAnimation
     QPropertyAnimation* slideOut = new QPropertyAnimation(oldPanel, "pos");
     slideOut->setStartValue(QPoint(0, 0));
     slideOut->setEndValue(QPoint(-slideWidth, 0));
-    slideOut->setDuration(200);
+    slideOut->setDuration(Animations::kPanelSlideOutMs);
     slideOut->setEasingCurve(QEasingCurve::InCubic);
 
     QPropertyAnimation* fadeOut = new QPropertyAnimation(fadeOutEffect, "opacity");
     fadeOut->setStartValue(1.0);
     fadeOut->setEndValue(0.0);
-    fadeOut->setDuration(200);
+    fadeOut->setDuration(Animations::kPanelSlideOutMs);
     fadeOut->setEasingCurve(QEasingCurve::InCubic);
 
     // 滑出完成: 清除 effect + 隐藏 + 恢复位置
@@ -256,7 +256,7 @@ void NavigationController::animateSlideOut(QWidget* oldPanel, QParallelAnimation
     group->addAnimation(fadeOut);
 }
 
-/** @brief 新面板滑入+淡入: pos (width,0)->(0,0) 250ms OutCubic, opacity 0->1 */
+/** @brief 新面板滑入+淡入: pos (width,0)->(0,0) OutCubic, opacity 0->1 */
 void NavigationController::animateSlideIn(QWidget* newPanel, QParallelAnimationGroup* group)
 {
     const int slideWidth = parentContainerWidth(newPanel);
@@ -277,13 +277,13 @@ void NavigationController::animateSlideIn(QWidget* newPanel, QParallelAnimationG
     QPropertyAnimation* slideIn = new QPropertyAnimation(newPanel, "pos");
     slideIn->setStartValue(QPoint(slideWidth, 0));
     slideIn->setEndValue(QPoint(0, 0));
-    slideIn->setDuration(250);
+    slideIn->setDuration(Animations::kPanelSlideInMs);
     slideIn->setEasingCurve(QEasingCurve::OutCubic);
 
     QPropertyAnimation* fadeIn = new QPropertyAnimation(fadeInEffect, "opacity");
     fadeIn->setStartValue(0.0);
     fadeIn->setEndValue(1.0);
-    fadeIn->setDuration(250);
+    fadeIn->setDuration(Animations::kPanelSlideInMs);
     fadeIn->setEasingCurve(QEasingCurve::OutCubic);
 
     // 滑入完成: 清除 effect 恢复正常绘制性能
@@ -386,7 +386,7 @@ void NavigationController::startBreathingAnimation(QLabel* statusLabel)
     auto* fadeIn = new QPropertyAnimation(m_connStatusEffect, "opacity");
     fadeIn->setStartValue(0.3);
     fadeIn->setEndValue(1.0);
-    fadeIn->setDuration(1500);
+    fadeIn->setDuration(Animations::kBreatheCycleMs);
     fadeIn->setEasingCurve(QEasingCurve::InOutSine);
     group->addAnimation(fadeIn);
 
@@ -394,7 +394,7 @@ void NavigationController::startBreathingAnimation(QLabel* statusLabel)
     auto* fadeOut = new QPropertyAnimation(m_connStatusEffect, "opacity");
     fadeOut->setStartValue(1.0);
     fadeOut->setEndValue(0.3);
-    fadeOut->setDuration(1500);
+    fadeOut->setDuration(Animations::kBreatheCycleMs);
     fadeOut->setEasingCurve(QEasingCurve::InOutSine);
     group->addAnimation(fadeOut);
 

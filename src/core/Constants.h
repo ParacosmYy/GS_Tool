@@ -10,6 +10,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QtTypes>
 
 /**
  * @brief 标准串口波特率常量 — 统一管理波特率列表和默认选项
@@ -111,6 +112,57 @@ namespace Timers {
 namespace TerminalDefaults {
     constexpr const char* kFontFamily = "Consolas";  ///< 终端默认字体(等宽)
     constexpr int kFontSize = 13;                     ///< 终端默认字号(像素)
+}
+
+/**
+ * @brief 动画时长常量 — 统一管理所有 UI 动画持续时间(CLAUDE.md §6.5)
+ *
+ * 所有动画时长集中定义，便于全局调整和保持一致性。
+ * 命名规范: k<Action><Purpose>Ms
+ * 缓动曲线约定: 展开/滑入用 OutCubic, 收起/滑出用 InCubic
+ */
+namespace Animations {
+    constexpr int kPanelSlideInMs    = 250;   ///< 面板滑入动画时长(OutCubic)
+    constexpr int kPanelSlideOutMs   = 200;   ///< 面板滑出动画时长(InCubic)
+    constexpr int kSearchExpandMs    = 200;   ///< 搜索栏展开动画时长(OutCubic)
+    constexpr int kSearchCollapseMs  = 150;   ///< 搜索栏收起动画时长(InCubic)
+    constexpr int kThemeFadeMs       = 300;   ///< 主题切换淡入淡出动画时长(InOutCubic)
+    constexpr int kBreatheCycleMs    = 1500;  ///< 连接状态呼吸动画周期(InOutSine)
+    constexpr int kConnPulseMs      = 1500;  ///< 连接脉冲动画周期
+    constexpr int kToastPopMs       = 300;    ///< 通知弹出动画时长(OutBack)
+    constexpr int kToastDismissMs   = 250;    ///< 通知消失动画时长(InCubic)
+    constexpr int kNavIndicatorMs   = 250;    ///< 导航指示线滑动时长(OutCubic)
+    constexpr int kButtonHoverMs    = 200;    ///< 按钮悬浮动画时长(OutCubic)
+    constexpr int kButtonPressMs    = 100;    ///< 按钮按下动画时长
+}
+
+/**
+ * @brief 布局间距常量 — 统一管理面板内边距、控件间距、尺寸下限(CLAUDE.md §6.3)
+ *
+ * 所有布局数值集中定义，确保全局一致的视觉节奏。
+ * 命名规范: k<ElementType><Property>
+ */
+namespace Layout {
+    constexpr int kPanelPadding     = 12;  ///< 面板内边距
+    constexpr int kPanelSpacing     = 12;  ///< 面板内控件间距
+    constexpr int kToolbarPadding   = 8;   ///< 工具栏内边距
+    constexpr int kToolbarSpacing   = 4;   ///< 工具栏内控件间距
+    constexpr int kGroupSpacing     = 8;   ///< 分组间距
+    constexpr int kControlSpacing   = 6;   ///< 同行控件间距
+    constexpr int kMinButtonWidth   = 60;  ///< 按钮最小宽度
+    constexpr int kMinButtonHeight  = 28;  ///< 按钮最小高度(CLAUDE.md §6.3)
+    constexpr int kComboFixedWidth  = 90;  ///< 下拉框固定宽度
+    constexpr int kInputHeight      = 32;  ///< 输入框高度(CLAUDE.md §6.3)
+}
+
+/**
+ * @brief 网络连接默认参数 — 统一管理TCP/UDP连接的默认主机地址和端口
+ *
+ * 集中定义默认网络连接参数，避免在各Connection类中硬编码。
+ */
+namespace ConnectionDefaults {
+    constexpr const char* kDefaultHost = "127.0.0.1";  ///< 默认TCP/UDP主机地址
+    constexpr quint16 kDefaultPort = 8080;              ///< 默认TCP/UDP端口
 }
 
 #endif // CONSTANTS_H

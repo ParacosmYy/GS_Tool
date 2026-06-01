@@ -13,6 +13,7 @@
  */
 #include "protocol/FrameVisualEditor.h"
 #include "core/AnimatedButton.h"
+#include "core/Constants.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
@@ -210,7 +211,7 @@ QGroupBox* FrameVisualEditor::setupPreviewGroup()
     m_previewLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     m_previewLabel->setMinimumHeight(60);
     m_previewLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    m_previewLabel->setFont(QFont("Consolas", 10));
+    m_previewLabel->setFont(QFont(TerminalDefaults::kFontFamily, TerminalDefaults::kFontSize));
     layout->addWidget(m_previewLabel);
     return group;
 }

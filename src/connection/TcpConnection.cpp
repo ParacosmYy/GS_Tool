@@ -47,8 +47,8 @@ ConnectionState TcpConnection::state() const
 /** @brief 从参数映射配置连接(host/port/mode) @param params 参数映射，支持"host"/"port"/"mode"键 */
 void TcpConnection::configure(const QVariantMap& params)
 {
-    m_host = params.value("host", "127.0.0.1").toString();
-    m_port = static_cast<quint16>(params.value("port", 8080).toInt());
+    m_host = params.value("host", ConnectionDefaults::kDefaultHost).toString();
+    m_port = static_cast<quint16>(params.value("port", ConnectionDefaults::kDefaultPort).toInt());
     m_mode = params.value("mode", "client").toString() == "server" ? Server : Client;
 }
 

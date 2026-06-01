@@ -27,6 +27,7 @@
 #include <QList>
 #include <QElapsedTimer>
 #include "core/ThemeManager.h"
+#include "core/Constants.h"
 
 /** @brief 通知吐司 — 临时弹出通知, 自动消失, 多条自动垂直堆叠 */
 class ToastWidget : public QWidget {
@@ -53,10 +54,10 @@ public:
         toast->QWidget::show();
 
         auto* slide = new QPropertyAnimation(toast, "pos");
-        slide->setEndValue(target); slide->setDuration(300);
+        slide->setEndValue(target); slide->setDuration(Animations::kToastPopMs);
         slide->setEasingCurve(QEasingCurve::OutBack);
         auto* fade = new QPropertyAnimation(toast->m_opacityEffect, "opacity");
-        fade->setEndValue(1.0); fade->setDuration(300);
+        fade->setEndValue(1.0); fade->setDuration(Animations::kToastPopMs);
         fade->setEasingCurve(QEasingCurve::OutBack);
         connect(slide, &QAbstractAnimation::finished, toast, [toast, ms]() {
             QTimer::singleShot(ms, toast, [toast]() { toast->dismiss(); });
@@ -138,16 +139,16 @@ private:
         return QStringLiteral("ℹ");
     }
 
-    /** @brief 消失动画: 250ms InCubic，向上飘出30px + 淡出（并行） */
+    /** @brief 消失动画: InCubic，向上飘出30px + 淡出（并行） */
     void dismiss() {
         auto* group = new QParallelAnimationGroup(this);
         auto* fadeOut = new QPropertyAnimation(m_opacityEffect, "opacity");
-        fadeOut->setEndValue(0.0); fadeOut->setDuration(250);
+        fadeOut->setEndValue(0.0); fadeOut->setDuration(Animations::kToastDismissMs);
         fadeOut->setEasingCurve(QEasingCurve::InCubic);
         group->addAnimation(fadeOut);
         auto* drift = new QPropertyAnimation(this, "pos");
         drift->setStartValue(pos()); drift->setEndValue(pos() + QPoint(0, -30));
-        drift->setDuration(250); drift->setEasingCurve(QEasingCurve::InCubic);
+        drift->setDuration(Animations::kToastDismissMs); drift->setEasingCurve(QEasingCurve::InCubic);
         group->addAnimation(drift);
         connect(group, &QAbstractAnimation::finished, this, [this]() {
             QWidget* pw = parentWidget();
@@ -175,7 +176,7 @@ private:
             QPoint target(parent->width() - kMargin - t->width(), y);
             if (t->pos() != target) {
                 auto* slide = new QPropertyAnimation(t, "pos");
-                slide->setEndValue(target); slide->setDuration(200);
+                slide->setEndValue(target); slide->setDuration(Animations::kNavIndicatorMs);
                 slide->setEasingCurve(QEasingCurve::OutCubic);
                 slide->start(QAbstractAnimation::DeleteWhenStopped);
             }

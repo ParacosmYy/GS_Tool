@@ -295,17 +295,17 @@ void ThemeManager::applyStylesheetWithAnimation(const QString& qss)
         return;
     }
 
-    // 淡出动画: 300ms InOutCubic
+    // 淡出动画: InOutCubic
     QPropertyAnimation* fadeOut = new QPropertyAnimation(m_opacityEffect, "opacity");
-    fadeOut->setDuration(300);
+    fadeOut->setDuration(Animations::kThemeFadeMs);
     fadeOut->setStartValue(1.0);
     fadeOut->setEndValue(0.0);
     fadeOut->setEasingCurve(QEasingCurve::InOutCubic);
 
-    // 淡入动画: 300ms InOutCubic
+    // 淡入动画: InOutCubic
     QPropertyAnimation* fadeIn = new QPropertyAnimation(m_opacityEffect, "opacity");
     fadeIn->setParent(this);  // 父对象设为ThemeManager，生命周期独立于fadeOut
-    fadeIn->setDuration(300);
+    fadeIn->setDuration(Animations::kThemeFadeMs);
     fadeIn->setStartValue(0.0);
     fadeIn->setEndValue(1.0);
     fadeIn->setEasingCurve(QEasingCurve::InOutCubic);

@@ -9,6 +9,7 @@
 #include "core/BackgroundSettingsPopup.h"
 #include "core/AnimatedButton.h"
 #include "core/BackgroundWidget.h"
+#include "core/Constants.h"
 #include "utils/SettingsManager.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -33,8 +34,9 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
     setAttribute(Qt::WA_TranslucentBackground, false);
 
     auto* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(12, 12, 12, 12);
-    mainLayout->setSpacing(8);
+    mainLayout->setContentsMargins(Layout::kPanelPadding, Layout::kPanelPadding,
+                                   Layout::kPanelPadding, Layout::kPanelPadding);
+    mainLayout->setSpacing(Layout::kGroupSpacing);
 
     // 创建所有滑块、开关和分隔线控件
     createControls(mainLayout);

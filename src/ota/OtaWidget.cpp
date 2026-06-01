@@ -64,8 +64,9 @@ void OtaWidget::setConnection(IConnection* conn)
 void OtaWidget::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(12, 12, 12, 12);
-    mainLayout->setSpacing(12);
+    mainLayout->setContentsMargins(Layout::kPanelPadding, Layout::kPanelPadding,
+                                   Layout::kPanelPadding, Layout::kPanelPadding);
+    mainLayout->setSpacing(Layout::kPanelSpacing);
 
     mainLayout->addWidget(setupFileGroup());
     mainLayout->addWidget(setupConfigGroup());
@@ -83,7 +84,7 @@ QGroupBox* OtaWidget::setupFileGroup()
     auto* group = new QGroupBox(tr("固件文件"));
     group->setObjectName("otaFileGroup");
     auto* outer = new QVBoxLayout(group);
-    outer->setSpacing(4);
+    outer->setSpacing(Layout::kToolbarSpacing);
 
     auto* fileRow = new QHBoxLayout;
     m_filePathEdit = new QLineEdit;
@@ -112,7 +113,7 @@ QGroupBox* OtaWidget::setupConfigGroup()
     auto* group = new QGroupBox(tr("传输设置"));
     group->setObjectName("otaConfigGroup");
     auto* layout = new QFormLayout(group);
-    layout->setSpacing(8);
+    layout->setSpacing(Layout::kGroupSpacing);
 
     m_protocolCombo = new QComboBox;
     m_protocolCombo->setObjectName("otaProtocolCombo");
@@ -126,10 +127,10 @@ QGroupBox* OtaWidget::setupConfigGroup()
     auto* btnLayout = new QHBoxLayout;
     m_startBtn = new AnimatedButton(tr("开始传输"));
     m_startBtn->setObjectName("otaStartBtn");
-    m_startBtn->setFixedHeight(32);
+    m_startBtn->setFixedHeight(Layout::kInputHeight);
     m_cancelBtn = new AnimatedButton(tr("取消"));
     m_cancelBtn->setObjectName("otaCancelBtn");
-    m_cancelBtn->setFixedHeight(32);
+    m_cancelBtn->setFixedHeight(Layout::kInputHeight);
     m_cancelBtn->setEnabled(false);
     btnLayout->addWidget(m_startBtn, 1);
     btnLayout->addWidget(m_cancelBtn, 1);
@@ -143,12 +144,12 @@ QGroupBox* OtaWidget::setupConfigGroup()
  * @brief 创建进度显示分组
  * @return 进度GroupBox(包含进度条、状态/速率/ETA标签)
  */
-QGroupBox* OtaWidget::setupProgressGroup()
+    QGroupBox* OtaWidget::setupProgressGroup()
 {
     auto* group = new QGroupBox(tr("传输进度"));
     group->setObjectName("otaProgressGroup");
     auto* layout = new QVBoxLayout(group);
-    layout->setSpacing(6);
+    layout->setSpacing(Layout::kControlSpacing);
 
     m_progressBar = new AnimatedProgressBar;
     m_progressBar->setObjectName("otaProgress");
@@ -193,12 +194,12 @@ QGroupBox* OtaWidget::setupLogGroup()
  * @brief 创建OTA历史记录分组
  * @return 历史记录GroupBox(包含树形视图和清除历史按钮)
  */
-QGroupBox* OtaWidget::setupHistoryGroup()
+    QGroupBox* OtaWidget::setupHistoryGroup()
 {
     auto* group = new QGroupBox(tr("OTA历史记录"));
     group->setObjectName("otaHistoryGroup");
     auto* layout = new QVBoxLayout(group);
-    layout->setSpacing(6);
+    layout->setSpacing(Layout::kControlSpacing);
 
     m_historyModel = new OtaHistoryModel(this);
     m_historyView = new QTreeView(this);
@@ -217,7 +218,7 @@ QGroupBox* OtaWidget::setupHistoryGroup()
     auto* btnRow = new QHBoxLayout;
     m_clearHistoryBtn = new AnimatedButton(tr("清除历史"));
     m_clearHistoryBtn->setObjectName("otaClearHistory");
-    m_clearHistoryBtn->setFixedHeight(28);
+    m_clearHistoryBtn->setFixedHeight(Layout::kMinButtonHeight);
     connect(m_clearHistoryBtn, &QPushButton::clicked, this, [this]() { m_historyModel->clearHistory(); });
     btnRow->addStretch();
     btnRow->addWidget(m_clearHistoryBtn);

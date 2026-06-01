@@ -121,7 +121,7 @@ void SerialConfigPanel::setConnecting()
     auto makeFade = [effect](qreal from, qreal to) -> QPropertyAnimation* {
         auto* a = new QPropertyAnimation(effect, "opacity");
         a->setStartValue(from); a->setEndValue(to);
-        a->setDuration(1500); a->setEasingCurve(QEasingCurve::InOutSine); return a;
+        a->setDuration(Animations::kConnPulseMs); a->setEasingCurve(QEasingCurve::InOutSine); return a;
     };
     auto* group = new QSequentialAnimationGroup(this);
     group->addAnimation(makeFade(0.3, 1.0));

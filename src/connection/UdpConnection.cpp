@@ -9,6 +9,7 @@
  */
 
 #include "connection/UdpConnection.h"
+#include "core/Constants.h"
 #include <QVariant>
 
 /** @brief 构造UDP连接(初始化QUdpSocket) @param parent 父对象 */
@@ -53,8 +54,8 @@ ConnectionState UdpConnection::state() const
 void UdpConnection::configure(const QVariantMap& params)
 {
     m_localPort = static_cast<quint16>(params.value("localPort", QVariant(0)).toInt());
-    m_remoteHost = QHostAddress(params.value("remoteHost", QVariant("127.0.0.1")).toString());
-    m_remotePort = static_cast<quint16>(params.value("remotePort", QVariant(8080)).toInt());
+    m_remoteHost = QHostAddress(params.value("remoteHost", QVariant(ConnectionDefaults::kDefaultHost)).toString());
+    m_remotePort = static_cast<quint16>(params.value("remotePort", QVariant(ConnectionDefaults::kDefaultPort)).toInt());
     m_broadcast = params.value("broadcast", QVariant(false)).toBool();
 }
 

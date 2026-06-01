@@ -8,6 +8,7 @@
  */
 
 #include "terminal/TerminalSearchBar.h"
+#include "core/Constants.h"
 #include "utils/HexConverter.h"
 
 #include <QHBoxLayout>
@@ -48,8 +49,9 @@ void TerminalSearchBar::setupUI()
 
     // 水平布局: 输入框 + 正则复选框 + HEX复选框 + 结果标签 + 弹簧 + 关闭按钮
     auto* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(8, 4, 8, 4);
-    layout->setSpacing(6);
+    layout->setContentsMargins(Layout::kToolbarPadding, Layout::kToolbarSpacing,
+                               Layout::kToolbarPadding, Layout::kToolbarSpacing);
+    layout->setSpacing(Layout::kControlSpacing);
 
     // ---- 搜索输入框 ----
     m_searchInput = new QLineEdit(this);
@@ -153,7 +155,7 @@ void TerminalSearchBar::activate()
     QPropertyAnimation* expandAnim = new QPropertyAnimation(this, "maximumHeight");
     expandAnim->setStartValue(0);
     expandAnim->setEndValue(36);
-    expandAnim->setDuration(200);
+    expandAnim->setDuration(Animations::kSearchExpandMs);
     expandAnim->setEasingCurve(QEasingCurve::OutCubic);
     // 动画结束后恢复固定高度，避免布局异常
     connect(expandAnim, &QPropertyAnimation::finished, this, [this]() {
@@ -184,7 +186,7 @@ void TerminalSearchBar::deactivate()
     QPropertyAnimation* collapseAnim = new QPropertyAnimation(this, "maximumHeight");
     collapseAnim->setStartValue(36);
     collapseAnim->setEndValue(0);
-    collapseAnim->setDuration(150);
+    collapseAnim->setDuration(Animations::kSearchCollapseMs);
     collapseAnim->setEasingCurve(QEasingCurve::InCubic);
     connect(collapseAnim, &QPropertyAnimation::finished, this, [this]() {
         hide();

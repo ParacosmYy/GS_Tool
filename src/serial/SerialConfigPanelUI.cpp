@@ -31,8 +31,9 @@
 void SerialConfigPanel::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(12, 12, 12, 12);
-    mainLayout->setSpacing(12);
+    mainLayout->setContentsMargins(Layout::kPanelPadding, Layout::kPanelPadding,
+                                   Layout::kPanelPadding, Layout::kPanelPadding);
+    mainLayout->setSpacing(Layout::kPanelSpacing);
 
     mainLayout->addWidget(createPortGroup());
     mainLayout->addWidget(createParamGroup());

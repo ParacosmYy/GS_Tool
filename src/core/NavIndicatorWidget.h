@@ -29,6 +29,7 @@
 #include <QTreeView>
 
 #include "core/ThemeManager.h"
+#include "core/Constants.h"
 
 /**
  * @brief 导航树选中滑动指示器
@@ -65,7 +66,7 @@ public:
 
         // 初始化滑动动画（250ms OutCubic，符合 CLAUDE.md §6.5 规范）
         m_slideAnim = new QPropertyAnimation(this, "indicatorY", this);
-        m_slideAnim->setDuration(250);
+        m_slideAnim->setDuration(Animations::kNavIndicatorMs);
         m_slideAnim->setEasingCurve(QEasingCurve::OutCubic);
 
         // 安装事件过滤器，跟随 navTree 尺寸变化自动调整大小

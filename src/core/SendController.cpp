@@ -55,13 +55,14 @@ QWidget* SendController::createSendBar(QWidget* parent)
     auto* sendFrame = new QFrame(parent);
     sendFrame->setObjectName("sendBarFrame");
     auto* sendLayout = new QHBoxLayout(sendFrame);
-    sendLayout->setContentsMargins(8, 4, 8, 4);
+    sendLayout->setContentsMargins(Layout::kToolbarPadding, Layout::kToolbarSpacing,
+                                   Layout::kToolbarPadding, Layout::kToolbarSpacing);
 
     // 发送模式切换: 文本 / HEX
     m_sendModeCombo = new QComboBox;
     m_sendModeCombo->setObjectName("sendModeCombo");
     m_sendModeCombo->addItems({tr("文本"), tr("HEX")});
-    m_sendModeCombo->setFixedWidth(60);
+    m_sendModeCombo->setFixedWidth(Layout::kMinButtonWidth);
 
     // 发送输入框
     m_sendInput = new QLineEdit;

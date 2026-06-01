@@ -272,33 +272,33 @@ void FrameVisualEditor::updateBinaryPreview()
 
     if (!m_def.header.isEmpty()) {
         int len = m_def.header.size();
-        parts << QString("[帧头:%1-%2]").arg(bytePos).arg(bytePos + len - 1);
+        parts << tr("[帧头:%1-%2]").arg(bytePos).arg(bytePos + len - 1);
         bytePos += len;
     }
     if (m_def.lengthFieldOffset >= 0) {
         int start = m_def.lengthFieldOffset;
-        if (start > bytePos) parts << QString("[预留:%1-%2]").arg(bytePos).arg(start - 1);
-        parts << QString("[长度:%1-%2]").arg(start).arg(start + m_def.lengthFieldSize - 1);
+        if (start > bytePos) parts << tr("[预留:%1-%2]").arg(bytePos).arg(start - 1);
+        parts << tr("[长度:%1-%2]").arg(start).arg(start + m_def.lengthFieldSize - 1);
         bytePos = start + m_def.lengthFieldSize;
     }
     for (const auto& f : m_def.fields) {
         int start = f.offset;
-        if (start > bytePos) parts << QString("[预留:%1-%2]").arg(bytePos).arg(start - 1);
+        if (start > bytePos) parts << tr("[预留:%1-%2]").arg(bytePos).arg(start - 1);
         const char* ts[] = {"u8","u16LE","u16BE","u32LE","u32BE","i8","i16LE","i16BE","f32","raw"};
-        parts << QString("[%1(%2):%3-%4]").arg(f.name)
+        parts << tr("[%1(%2):%3-%4]").arg(f.name)
                      .arg(ts[static_cast<int>(f.type)]).arg(start).arg(start + f.size - 1);
         bytePos = start + f.size;
     }
     if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
         int start = m_def.checksumOffset;
-        if (start > bytePos) parts << QString("[预留:%1-%2]").arg(bytePos).arg(start - 1);
+        if (start > bytePos) parts << tr("[预留:%1-%2]").arg(bytePos).arg(start - 1);
         const char* cn[] = {"","Sum8","CRC8","CRC16","CRC16M","CRC32"};
-        parts << QString("[%1:%2-%3]").arg(cn[static_cast<int>(m_def.checksumType)])
+        parts << tr("[%1:%2-%3]").arg(cn[static_cast<int>(m_def.checksumType)])
                      .arg(start).arg(start + m_def.checksumSize - 1);
         bytePos = start + m_def.checksumSize;
     }
     if (!m_def.footer.isEmpty()) {
-        parts << QString("[帧尾:%1-%2]").arg(bytePos).arg(bytePos + m_def.footer.size() - 1);
+        parts << tr("[帧尾:%1-%2]").arg(bytePos).arg(bytePos + m_def.footer.size() - 1);
     }
     m_previewLabel->setText(parts.isEmpty() ? tr("未定义字段") : parts.join(" "));
 }

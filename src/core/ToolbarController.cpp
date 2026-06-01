@@ -108,7 +108,7 @@ void ToolbarController::createDisplayModeGroup(QToolBar* toolbar)
     m_layoutCombo = new QComboBox(toolbar->parentWidget());
     m_layoutCombo->setObjectName("layoutCombo");
     m_layoutCombo->addItems({tr("混合"), tr("左右分栏"), tr("上下分栏")});
-    m_layoutCombo->setFixedWidth(90);
+    m_layoutCombo->setFixedWidth(Layout::kComboFixedWidth);
     m_layoutCombo->setToolTip(tr("终端布局: 混合显示或TX/RX分栏"));
     toolbar->addWidget(m_layoutCombo);
 
@@ -175,7 +175,7 @@ void ToolbarController::createConnectionGroup(QToolBar* toolbar)
     m_langCombo->setObjectName("langCombo");
     m_langCombo->addItem(QStringLiteral("中文"), Language::CHINESE);
     m_langCombo->addItem(QStringLiteral("English"), Language::ENGLISH);
-    m_langCombo->setFixedWidth(90);
+    m_langCombo->setFixedWidth(Layout::kComboFixedWidth);
     toolbar->addWidget(m_langCombo);
 }
 

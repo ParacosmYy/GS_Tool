@@ -47,6 +47,14 @@ void ConnectionController::onAutoReconnect()
         return;
     }
 
+    // 防御: 检查上一次连接参数是否有效，无参数则无法重连
+    if (m_lastConnectParams.isEmpty()) {
+        m_reconnectTimer.stop();
+        emit reconnectFailed(tr("无有效的重连参数"));
+        m_reconnectAttemptCount = 0;
+        return;
+    }
+
     // 检查是否达到最大重连次数（0 表示无限制）
     if (m_reconnectMaxRetries > 0 && m_reconnectAttemptCount >= m_reconnectMaxRetries) {
         m_reconnectTimer.stop();
