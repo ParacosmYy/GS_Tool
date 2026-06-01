@@ -1,3 +1,10 @@
+/**
+ * @file TerminalLayoutManager.cpp
+ * @brief 终端布局管理器实现 — 管理终端区域的布局和搜索栏动画
+ *
+ * 负责组装TerminalWidget、TerminalSearchBar、DirectionFilter等组件，
+ * 处理搜索栏的展开/收起动画，以及终端区域的布局调整。
+ */
 #include "terminal/TerminalLayoutManager.h"
 #include "terminal/TerminalWidget.h"
 #include "terminal/TerminalSearchBar.h"

@@ -1,3 +1,7 @@
+/**
+ * @file DataLogger.h
+ * @brief 数据录制/回放管理器 — 二进制日志文件的读写和回放接口
+ */
 #ifndef DATALOGGER_H
 #define DATALOGGER_H
 

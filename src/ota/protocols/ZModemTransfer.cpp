@@ -57,7 +57,7 @@ bool ZModemTransfer::onStartInit()
     }
     m_fileData = file.readAll();
     if (m_fileData.size() != fileInfo.size()) {
-        emit transferError(tr("Failed to read file"));
+        emit transferError(tr("读取文件失败"));
         return false;
     }
     file.close();

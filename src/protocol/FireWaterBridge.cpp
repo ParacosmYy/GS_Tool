@@ -1,3 +1,10 @@
+/**
+ * @file FireWaterBridge.cpp
+ * @brief FireWater协议桥实现 — VOFA+ CSV尾标记协议解析器
+ *
+ * 将CSV格式数据流（以换行符结尾的浮点数据）解析为通道数据，
+ * 兼容VOFA+的FireWater协议规范。
+ */
 #include "protocol/FireWaterBridge.h"
 
 #include <QStringList>

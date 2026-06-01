@@ -129,7 +129,7 @@ void ProtocolBridgeManager::feedData(const QByteArray& data)
         if (m_frameParser) {
             m_frameParser->feed(data);
         } else {
-            qWarning() << tr("FrameParser mode but parser is null");
+            qWarning() << tr("帧解析模式但解析器为空");
         }
         break;
 
@@ -137,7 +137,7 @@ void ProtocolBridgeManager::feedData(const QByteArray& data)
         if (m_justFloat) {
             m_justFloat->feed(data);
         } else {
-            qWarning() << tr("JustFloat mode but bridge is null");
+            qWarning() << tr("JustFloat模式但桥接器为空");
         }
         break;
 
@@ -145,13 +145,13 @@ void ProtocolBridgeManager::feedData(const QByteArray& data)
         if (m_fireWater) {
             m_fireWater->feed(data);
         } else {
-            qWarning() << tr("FireWater mode but bridge is null");
+            qWarning() << tr("FireWater模式但桥接器为空");
         }
         break;
 
     default:
         // 防御性编程: 枚举覆盖完整时不应该到达这里
-        qWarning() << tr("Unknown protocol mode: %1").arg(static_cast<int>(m_mode));
+        qWarning() << tr("未知协议模式: %1").arg(static_cast<int>(m_mode));
         break;
     }
 }

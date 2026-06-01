@@ -57,7 +57,7 @@ void ProtocolView::setupUI()
     m_table = new QTableView;
     m_table->setObjectName("protocolTable");
     m_model = new QStandardItemModel(this);
-    m_model->setHorizontalHeaderLabels({tr("#"), tr("Time")});
+    m_model->setHorizontalHeaderLabels({tr("#"), tr("时间")});
     m_table->setModel(m_model);
     m_table->setAlternatingRowColors(true);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -74,15 +74,15 @@ void ProtocolView::setupUI()
     connect(m_clearBtn, &QPushButton::clicked, this, &ProtocolView::clear);
     connect(m_exportBtn, &QPushButton::clicked, this, [this]() {
         if (m_frames.isEmpty()) {
-            QMessageBox::information(this, tr("导出"), tr("No data to export"));
+            QMessageBox::information(this, tr("导出"), tr("无数据可导出"));
             return;
         }
         QString filePath = QFileDialog::getSaveFileName(
-            this, tr("Export Protocol Data"), QString(), tr("CSV files (*.csv)"));
+            this, tr("导出协议数据"), QString(), tr("CSV 文件 (*.csv)"));
         if (filePath.isEmpty()) return;
         QFile file(filePath);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QMessageBox::warning(this, tr("导出"), tr("Cannot write to file"));
+            QMessageBox::warning(this, tr("导出"), tr("无法写入文件"));
             return;
         }
         QTextStream stream(&file);
@@ -96,7 +96,7 @@ void ProtocolView::setupUI()
             stream << "\n";
         }
         file.close();
-        m_statusLabel->setText(tr("Exported %1 frames").arg(m_frames.size()));
+        m_statusLabel->setText(tr("已导出 %1 帧").arg(m_frames.size()));
     });
 }
 
@@ -178,11 +178,11 @@ void ProtocolView::copyRaw()
 void ProtocolView::exportJson()
 {
     if (m_frames.isEmpty()) {
-        QMessageBox::information(this, tr("导出JSON"), tr("No data to export"));
+        QMessageBox::information(this, tr("导出JSON"), tr("无数据可导出"));
         return;
     }
     QString filePath = QFileDialog::getSaveFileName(
-        this, tr("导出JSON"), QString(), tr("JSON files (*.json)"));
+        this, tr("导出JSON"), QString(), tr("JSON 文件 (*.json)"));
     if (filePath.isEmpty()) return;
 
     QJsonObject root;
@@ -207,12 +207,12 @@ void ProtocolView::exportJson()
 
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, tr("导出JSON"), tr("Cannot write to file"));
+        QMessageBox::warning(this, tr("导出JSON"), tr("无法写入文件"));
         return;
     }
     file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
     file.close();
-    m_statusLabel->setText(tr("Exported %1 frames to JSON").arg(m_frames.size()));
+    m_statusLabel->setText(tr("已导出 %1 帧到JSON").arg(m_frames.size()));
 }
 
 // ============================================================
@@ -253,7 +253,7 @@ void ProtocolView::addFrame(const QVariantMap& fields)
     m_table->scrollToBottom();
     // 自动调整列宽(每50帧或前3帧)
     if (m_totalFrames % 50 == 0 || m_totalFrames <= 3) autoResizeColumns();
-    m_statusLabel->setText(tr("Frames: %1 | Errors: %2").arg(m_totalFrames).arg(m_totalErrors));
+    m_statusLabel->setText(tr("帧数: %1 | 错误: %2").arg(m_totalFrames).arg(m_totalErrors));
 }
 
 void ProtocolView::clear()
@@ -328,7 +328,7 @@ void ProtocolView::onFrameError(const QString& reason, const QByteArray& rawFram
         if (!m_frames.isEmpty()) m_frames.removeFirst();
     }
     m_table->scrollToBottom();
-    m_statusLabel->setText(tr("Frames: %1 | Errors: %2").arg(m_totalFrames).arg(m_totalErrors));
+    m_statusLabel->setText(tr("帧数: %1 | 错误: %2").arg(m_totalFrames).arg(m_totalErrors));
 }
 
 // ============================================================

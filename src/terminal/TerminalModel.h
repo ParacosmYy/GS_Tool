@@ -1,3 +1,7 @@
+/**
+ * @file TerminalModel.h
+ * @brief 终端数据模型 — 管理终端显示数据的环形缓冲区接口
+ */
 #ifndef TERMINALMODEL_H
 #define TERMINALMODEL_H
 

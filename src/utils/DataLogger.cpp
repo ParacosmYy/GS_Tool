@@ -1,3 +1,10 @@
+/**
+ * @file DataLogger.cpp
+ * @brief 数据录制/回放管理器实现 — 二进制日志文件的读写和回放
+ *
+ * 实现自定义二进制格式的日志录制（含时间戳、方向、数据），
+ * 以及基于时间戳的随机访问回放。支持录制启停、回放控制和回放速率调整。
+ */
 #include "utils/DataLogger.h"
 #include <QDataStream>
 #include <QFileInfo>
@@ -31,7 +38,7 @@ bool DataLogger::startRecording(const QString& filePath)
 
     m_recordFile = new QFile(filePath, this);
     if (!m_recordFile->open(QIODevice::WriteOnly)) {
-        emit error(tr("Cannot create log file: %1").arg(filePath));
+        emit error(tr("无法创建日志文件: %1").arg(filePath));
         delete m_recordFile;
         m_recordFile = nullptr;
         return false;
@@ -122,7 +129,7 @@ bool DataLogger::startPlayback(const QString& filePath)
 
     m_playbackFile = new QFile(filePath, this);
     if (!m_playbackFile->open(QIODevice::ReadOnly)) {
-        emit error(tr("Cannot open log file: %1").arg(filePath));
+        emit error(tr("无法打开日志文件: %1").arg(filePath));
         delete m_playbackFile;
         m_playbackFile = nullptr;
         return false;
@@ -131,7 +138,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     // 验证文件头
     QByteArray magic = m_playbackFile->read(3);
     if (magic != kMagic) {
-        emit error(tr("Invalid log file format"));
+        emit error(tr("无效的日志文件格式"));
         m_playbackFile->close();
         delete m_playbackFile;
         m_playbackFile = nullptr;
@@ -145,7 +152,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     quint8 version = 0;
     headerStream >> version;
     if (version != kVersion) {
-        emit error(tr("Unsupported log version: %1").arg(version));
+        emit error(tr("不支持的日志版本: %1").arg(version));
         m_playbackFile->close();
         delete m_playbackFile;
         m_playbackFile = nullptr;
@@ -158,7 +165,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     m_totalRecords = static_cast<int>(count);
 
     if (m_totalRecords == 0) {
-        emit error(tr("Log file is empty"));
+        emit error(tr("日志文件为空"));
         m_playbackFile->close();
         delete m_playbackFile;
         m_playbackFile = nullptr;
@@ -408,7 +415,7 @@ bool DataLogger::seekToTimestamp(qint64 timestamp)
 
     // 时间戳有效性检查
     if (timestamp < 0) {
-        emit error(tr("Invalid seek timestamp: %1").arg(timestamp));
+        emit error(tr("无效的查找时间戳: %1").arg(timestamp));
         return false;
     }
 
@@ -421,7 +428,7 @@ bool DataLogger::seekToTimestamp(qint64 timestamp)
     // 扫描文件，定位到目标时间戳最近的记录
     qint64 actualTimestamp = scanToTimestamp(timestamp);
     if (actualTimestamp < 0) {
-        emit error(tr("Failed to seek to timestamp: %1").arg(timestamp));
+        emit error(tr("查找时间戳失败: %1").arg(timestamp));
         if (wasTimerRunning) m_playbackTimer->start();
         return false;
     }

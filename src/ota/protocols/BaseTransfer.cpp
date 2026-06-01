@@ -1,3 +1,10 @@
+/**
+ * @file BaseTransfer.cpp
+ * @brief OTA传输基类实现 — 模板方法模式的核心骨架
+ *
+ * 提供超时管理、取消机制和传输状态控制。
+ * 具体协议（XMODEM/YMODEM/ZMODEM）通过重写纯虚方法实现各自流程。
+ */
 #include "ota/protocols/BaseTransfer.h"
 
 BaseTransfer::BaseTransfer(QObject* parent)

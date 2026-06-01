@@ -72,7 +72,7 @@ QVariant OtaHistoryModel::data(const QModelIndex& index, int role) const
             if (rec.durationMs < 1000) return QString("%1 ms").arg(rec.durationMs);
             return QString("%1 s").arg(rec.durationMs / 1000.0, 0, 'f', 1);
         case ColResult:
-            return rec.success ? QObject::tr("Success") : QObject::tr("Failed");
+            return rec.success ? QObject::tr("成功") : QObject::tr("失败");
         }
     }
 
@@ -101,12 +101,12 @@ QVariant OtaHistoryModel::headerData(int section, Qt::Orientation orientation, i
     if (role != Qt::DisplayRole || orientation != Qt::Horizontal) return QVariant();
 
     switch (section) {
-    case ColTime:     return tr("Time");
-    case ColFileName: return tr("File");
-    case ColProtocol: return tr("Protocol");
-    case ColSize:     return tr("Size");
-    case ColDuration: return tr("Duration");
-    case ColResult:   return tr("Result");
+    case ColTime:     return tr("时间");
+    case ColFileName: return tr("文件");
+    case ColProtocol: return tr("协议");
+    case ColSize:     return tr("大小");
+    case ColDuration: return tr("耗时");
+    case ColResult:   return tr("结果");
     default:          return QVariant();
     }
 }

@@ -1,3 +1,7 @@
+/**
+ * @file JustFloatBridge.h
+ * @brief JustFloat协议桥 — VOFA+小端浮点字节流解析器接口
+ */
 #ifndef JUSTFLOATBRIDGE_H
 #define JUSTFLOATBRIDGE_H
 

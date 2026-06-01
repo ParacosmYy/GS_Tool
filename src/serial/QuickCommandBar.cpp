@@ -37,7 +37,7 @@ QuickCommandBar::QuickCommandBar(QWidget* parent)
     m_addBtn->setObjectName("quickCmdAddBtn");
     m_addBtn->setMinimumHeight(32);
     connect(m_addBtn, &QPushButton::clicked, this, [this]() {
-        QuickCommand cmd{tr("Command"), "", false};
+        QuickCommand cmd{tr("指令"), "", false};
         addCommand(cmd);
     });
     mainLayout->addWidget(m_addBtn);

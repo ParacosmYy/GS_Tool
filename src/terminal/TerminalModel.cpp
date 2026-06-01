@@ -1,3 +1,10 @@
+/**
+ * @file TerminalModel.cpp
+ * @brief 终端数据模型实现 — 管理终端显示数据的环形缓冲区
+ *
+ * 维护固定大小的环形缓冲区存储终端行数据，支持追加接收/发送数据、
+ * 行数统计、方向过滤和内容搜索。线程安全设计。
+ */
 #include "terminal/TerminalModel.h"
 
 TerminalModel::TerminalModel(QObject* parent)

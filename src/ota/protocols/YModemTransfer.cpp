@@ -486,7 +486,7 @@ bool YModemTransfer::loadNextFile()
     }
     m_currentData = file.readAll();
     if (m_currentData.size() != file.size()) {
-        emit transferError(tr("Failed to read file"));
+        emit transferError(tr("读取文件失败"));
         return false;
     }
     file.close();

@@ -1,3 +1,10 @@
+/**
+ * @file DataStatistics.cpp
+ * @brief 数据统计面板实现 — 实时显示收发字节/速率/包计数/平均速率
+ *
+ * 提供RX/TX字节数、实时速率、平均速率、包计数和连接运行时间的
+ * 实时统计显示。使用ByteFormat进行字节格式化。
+ */
 #include "serial/DataStatistics.h"
 #include "utils/ByteFormat.h"
 

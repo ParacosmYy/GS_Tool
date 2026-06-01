@@ -128,7 +128,7 @@ bool FrameParser::checkTimeout()
         m_errorCount++;
 
         emit frameError(
-            tr("Frame timeout: received %1 bytes in %2ms, incomplete frame discarded")
+            tr("帧超时: 已接收 %1 字节 (%2ms)，不完整帧已丢弃")
                 .arg(discardedSize).arg(m_frameTimeoutMs),
             discarded);
 
@@ -181,7 +181,7 @@ void FrameParser::processByte(unsigned char byte)
         resetIntermediateState();
 
         emit frameError(
-            tr("Frame exceeds max length (%1 bytes), discarded %2 bytes")
+            tr("帧超过最大长度 (%1 字节)，已丢弃 %2 字节")
                 .arg(effectiveMax).arg(discarded.size()),
             discarded);
     }
@@ -294,7 +294,7 @@ void FrameParser::handleLengthReceiving(unsigned char byte)
     if (m_expectedPayload < 0 || m_expectedPayload > effectiveMax) {
         m_errorCount++;
         emit frameError(
-            tr("Invalid frame length: %1 (max allowed: %2)")
+            tr("无效帧长度: %1 (最大允许: %2)")
                 .arg(m_expectedPayload).arg(effectiveMax),
             m_buffer);
         resetIntermediateState();
@@ -318,7 +318,7 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
         if (expectedTotal > effectiveMax) {
             m_errorCount++;
             emit frameError(
-                tr("Expected total frame length (%1) exceeds max (%2)")
+                tr("期望总帧长度 (%1) 超过最大值 (%2)")
                     .arg(expectedTotal).arg(effectiveMax),
                 m_buffer);
             resetIntermediateState();
@@ -336,7 +336,7 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
         if (m_buffer.size() > effectiveMax) {
             m_errorCount++;
             emit frameError(
-                tr("Frame buffer (%1) exceeds max (%2) while searching for footer")
+                tr("帧缓冲区 (%1) 超过最大值 (%2)，搜索帧尾时溢出")
                     .arg(m_buffer.size()).arg(effectiveMax),
                 m_buffer);
             resetIntermediateState();
@@ -401,7 +401,7 @@ bool FrameParser::handleCrcValidation()
     if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
         if (!verifyChecksum(m_buffer)) {
             m_errorCount++;
-            emit frameError(tr("Checksum mismatch"), m_buffer);
+            emit frameError(tr("校验和不匹配"), m_buffer);
             resetIntermediateState();
             return false;
         }
@@ -457,12 +457,12 @@ void FrameParser::handleFooterMatching(unsigned char byte)
             completeFrame();
         } else {
             m_errorCount++;
-            emit frameError(tr("Checksum mismatch"), m_buffer);
+            emit frameError(tr("校验和不匹配"), m_buffer);
             resetIntermediateState();
         }
     } else {
         m_errorCount++;
-        emit frameError(tr("Footer mismatch"), m_buffer);
+        emit frameError(tr("帧尾不匹配"), m_buffer);
         resetIntermediateState();
     }
 }

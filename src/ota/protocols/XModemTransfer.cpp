@@ -77,7 +77,7 @@ bool XModemTransfer::onStartInit()
         }
         m_data = file.readAll();
         if (m_data.size() != fileInfo.size()) {
-            emit transferError(tr("Failed to read file"));
+            emit transferError(tr("读取文件失败"));
             return false;
         }
         file.close();

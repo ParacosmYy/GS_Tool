@@ -1,3 +1,7 @@
+/**
+ * @file TerminalLayoutManager.h
+ * @brief 终端布局管理器 — 管理终端区域的组件布局和搜索栏动画
+ */
 #ifndef TERMINALLAYOUTMANAGER_H
 #define TERMINALLAYOUTMANAGER_H
 

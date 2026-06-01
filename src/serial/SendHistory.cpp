@@ -1,3 +1,10 @@
+/**
+ * @file SendHistory.cpp
+ * @brief 发送历史管理器实现 — 记录和检索用户发送数据的历史
+ *
+ * 维护最近发送记录的环形缓冲区，支持去重、最大条目数限制，
+ * 以及持久化到QSettings。
+ */
 #include "serial/SendHistory.h"
 
 SendHistory::SendHistory(QObject* parent)

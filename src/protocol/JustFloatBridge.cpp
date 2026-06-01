@@ -1,3 +1,10 @@
+/**
+ * @file JustFloatBridge.cpp
+ * @brief JustFloat协议桥实现 — VOFA+小端浮点字节流解析器
+ *
+ * 将小端浮点字节流（4字节float + 4字节尾标记）解析为通道数据，
+ * 兼容VOFA+的JustFloat协议规范。
+ */
 #include "protocol/JustFloatBridge.h"
 
 #include <cstring>
