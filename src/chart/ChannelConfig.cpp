@@ -126,6 +126,7 @@ ChannelConfig ChannelConfig::fromJson(const QJsonObject& obj)
     int co = obj["combineOp"].toInt(0);
     cfg.combineOp = (co >= 0 && co <= 3) ? static_cast<CombineOp>(co) : CombineOp::Add;
     cfg.scale = obj["scale"].toDouble(1.0);
+    if (cfg.scale == 0.0) cfg.scale = 1.0;
     cfg.offset = obj["offset"].toDouble(0.0);
     cfg.displayName = obj["displayName"].toString();
     // 颜色反序列化: 空字符串表示无效颜色（自动分配）

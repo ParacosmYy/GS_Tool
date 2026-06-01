@@ -292,15 +292,17 @@ void FrameVisualEditor::updateBinaryPreview()
         int start = f.offset;
         if (start > bytePos) parts << tr("[预留:%1-%2]").arg(bytePos).arg(start - 1);
         const char* ts[] = {"u8","u16LE","u16BE","u32LE","u32BE","i8","i16LE","i16BE","f32","raw"};
+        int typeIdx = qBound(0, static_cast<int>(f.type), 9);
         parts << tr("[%1(%2):%3-%4]").arg(f.name)
-                     .arg(ts[static_cast<int>(f.type)]).arg(start).arg(start + f.size - 1);
+                     .arg(ts[typeIdx]).arg(start).arg(start + f.size - 1);
         bytePos = start + f.size;
     }
     if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
         int start = m_def.checksumOffset;
         if (start > bytePos) parts << tr("[预留:%1-%2]").arg(bytePos).arg(start - 1);
         const char* cn[] = {"","Sum8","CRC8","CRC16","CRC16M","CRC32"};
-        parts << tr("[%1:%2-%3]").arg(cn[static_cast<int>(m_def.checksumType)])
+        int csIdx = qBound(0, static_cast<int>(m_def.checksumType), 5);
+        parts << tr("[%1:%2-%3]").arg(cn[csIdx])
                      .arg(start).arg(start + m_def.checksumSize - 1);
         bytePos = start + m_def.checksumSize;
     }

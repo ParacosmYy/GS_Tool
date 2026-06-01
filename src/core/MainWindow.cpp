@@ -313,6 +313,9 @@ void MainWindow::handleConnectionState(ConnectionState state, const QString& con
         m_panelManager->serialConfig()->setConnected(false);
         m_navController->stopBreathingAnimation(m_connStatusLbl);
         break;
+    default:
+        stateStr = "unknown";
+        break;
     }
     // 通过动态属性驱动 QSS 状态样式切换
     m_connStatusLbl->setProperty("state", stateStr);

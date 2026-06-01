@@ -102,6 +102,9 @@ QVariant FieldDef::extractValue(const QByteArray& payload) const
     }
     case Raw:
         return QVariant(QByteArray(d, size));
+    default:
+        qWarning() << "FieldDef::extractValue: unknown field type" << static_cast<int>(type) << "field:" << name;
+        return QVariant();
     }
 
     return raw * scale + offsetVal;

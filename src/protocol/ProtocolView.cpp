@@ -87,6 +87,7 @@ void ProtocolView::setupUI()
             return;
         }
         QTextStream stream(&file);
+        stream.setEncoding(QStringConverter::Utf8);
         stream << "#,Time";
         for (const auto& name : m_fieldNames) stream << "," << name;
         stream << "\n";
@@ -95,6 +96,12 @@ void ProtocolView::setupUI()
             stream << (i + 1) << "," << frame.value("_frameTime").toString();
             for (const auto& name : m_fieldNames) stream << "," << frame.value(name).toString();
             stream << "\n";
+        }
+        stream.flush();
+        if (file.error() != QFile::NoError) {
+            QMessageBox::warning(this, tr("导出"), tr("写入文件失败: %1").arg(file.errorString()));
+            file.close();
+            return;
         }
         file.close();
         m_statusLabel->setText(tr("已导出 %1 帧").arg(m_frames.size()));
@@ -135,6 +142,7 @@ void ProtocolView::setupContextMenu()
 /** @brief 右键菜单弹出回调 @param pos 点击位置 */
 void ProtocolView::onCustomContextMenu(const QPoint& pos)
 {
+    if (!m_table->selectionModel()) return;
     bool hasSelection = m_table->selectionModel()->hasSelection();
     m_copyRowAction->setEnabled(hasSelection);
     m_copyRawAction->setEnabled(hasSelection);
@@ -145,6 +153,7 @@ void ProtocolView::onCustomContextMenu(const QPoint& pos)
 /** @brief 复制选中行文本(制表符分隔) */
 void ProtocolView::copyRow()
 {
+    if (!m_table->selectionModel()) return;
     QModelIndexList selected = m_table->selectionModel()->selectedRows();
     if (selected.isEmpty()) return;
     int row = selected.first().row();
@@ -161,6 +170,7 @@ void ProtocolView::copyRow()
 /** @brief 复制选中帧的原始HEX数据 */
 void ProtocolView::copyRaw()
 {
+    if (!m_table->selectionModel()) return;
     QModelIndexList selected = m_table->selectionModel()->selectedRows();
     if (selected.isEmpty()) return;
     int row = selected.first().row();

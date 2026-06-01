@@ -147,7 +147,9 @@ void UdpConnection::onReadyRead()
         buffer.resize(static_cast<int>(m_socket->pendingDatagramSize()));
         QHostAddress senderAddr;
         quint16 senderPort;
-        m_socket->readDatagram(buffer.data(), buffer.size(), &senderAddr, &senderPort);
+        qint64 bytesRead = m_socket->readDatagram(buffer.data(), buffer.size(), &senderAddr, &senderPort);
+        if (bytesRead < 0) continue;
+        buffer.resize(static_cast<int>(bytesRead));
         if (!buffer.isEmpty()) {
             emit dataReceived(buffer);
         }

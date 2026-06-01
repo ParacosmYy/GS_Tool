@@ -181,7 +181,8 @@ bool SendController::sendAndRecord(const QByteArray& data)
     constexpr int kMaxPartialRetries = 3;
 
     while (totalWritten < data.size() && retryCount < kMaxPartialRetries) {
-        qint64 written = m_currentConn->write(data.mid(static_cast<int>(totalWritten)));
+        int remaining = static_cast<int>(data.size() - totalWritten);
+        qint64 written = m_currentConn->write(data.mid(static_cast<int>(totalWritten), remaining));
         if (written <= 0) {
             // 写入返回 0 或负值: 连接可能已断开，立即终止
             emit statusMessage(tr("发送失败: 写入返回 %1，已发送 %2/%3 字节")

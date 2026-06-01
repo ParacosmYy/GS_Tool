@@ -63,6 +63,7 @@ QVector<TerminalLine> DataExporter::readEdlRange(const QString& edlPath,
 
     QDataStream stream(&file);
     stream.setByteOrder(QDataStream::BigEndian);
+    stream.setVersion(QDataStream::Qt_6_8);
     const QDateTime baseTime = QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0), QTimeZone::UTC);
 
     while (!file.atEnd()) {

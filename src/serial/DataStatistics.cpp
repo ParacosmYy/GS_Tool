@@ -196,8 +196,8 @@ void DataStatistics::onRefreshTimer()
 
     // 计算会话平均速率（总字节/总时间）
     double elapsedSecF = qMax(m_stopwatch.elapsed() / 1000.0, 1.0);
-    m_avgRxRate = m_lastRxBytes / elapsedSecF;
-    m_avgTxRate = m_lastTxBytes / elapsedSecF;
+    m_avgRxRate = static_cast<double>(m_lastRxBytes) / elapsedSecF;
+    m_avgTxRate = static_cast<double>(m_lastTxBytes) / elapsedSecF;
     double avgRate = m_avgRxRate + m_avgTxRate;
     m_avgRateLabel->setText(formatRate(avgRate));
 }

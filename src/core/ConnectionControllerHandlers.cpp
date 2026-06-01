@@ -81,6 +81,10 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
 
     case ConnectionState::Connecting:
         break;
+
+    default:
+        qWarning() << "ConnectionController: unknown state" << static_cast<int>(state);
+        break;
     }
 
     // 转发状态变化信号

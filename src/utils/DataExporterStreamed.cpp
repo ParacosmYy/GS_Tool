@@ -34,8 +34,10 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
     case Timestamped: return exportStreamedTimestamped(filePath, lineProvider, totalLines, batchSize);
     case Bin:         return exportStreamedBin(filePath, lineProvider, totalLines, batchSize);
     case Json:        return exportStreamedJson(filePath, lineProvider, totalLines, batchSize);
+    default:
+        emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
+        return false;
     }
-    return false;
 }
 
 // ---- 流式导出方法 ----

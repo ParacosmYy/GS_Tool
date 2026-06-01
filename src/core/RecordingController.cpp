@@ -32,8 +32,8 @@ RecordingController::RecordingController(DataLogger* logger, QObject* parent)
     });
     // 回放完成: 恢复按钮状态
     connect(m_logger, &DataLogger::playbackFinished, this, [this]() {
-        m_stopPlaybackAction->setEnabled(false);
-        m_playbackAction->setEnabled(true);
+        if (m_stopPlaybackAction) m_stopPlaybackAction->setEnabled(false);
+        if (m_playbackAction) m_playbackAction->setEnabled(true);
         emit statusMessage(tr("回放完成"), 3000);
     });
     // 错误通知

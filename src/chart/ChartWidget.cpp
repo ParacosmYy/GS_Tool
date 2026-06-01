@@ -383,7 +383,7 @@ void ChartWidget::applyThemeColors()
 
     // ---- 5. 数据线颜色 ----
     // 从当前主题对应的调色板中按通道索引重新分配颜色
-    const QVector<QColor>& palette = ChartColors::colorsForTheme(isDark);
+    QVector<QColor> palette = ChartColors::colorsForTheme(isDark);
     if (palette.isEmpty()) return;  // 防御性检查: 空调色板无法分配颜色
     int index = 0;
     for (auto it = m_seriesMap.begin(); it != m_seriesMap.end(); ++it, ++index) {
@@ -405,7 +405,7 @@ void ChartWidget::createSeries(const QString& name, const QColor& color)
     QColor chColor = color;
     if (!chColor.isValid()) {
         bool isDark = ThemeManager::instance().currentTheme().contains("dark");
-        const QVector<QColor>& palette = ChartColors::colorsForTheme(isDark);
+        QVector<QColor> palette = ChartColors::colorsForTheme(isDark);
         if (!palette.isEmpty()) {
             chColor = palette[m_seriesMap.size() % palette.size()];
         } else {

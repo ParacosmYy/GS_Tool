@@ -117,6 +117,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
         int y = 0;
         for (int i = m_scrollOffset; i < endLine; ++i) {
             int modelLine = m_directionFilter->modelIndex(i);
+            if (modelLine < 0 || modelLine >= m_cachedLines.size()) break;
             y = paintLine(painter, m_cachedLines[modelLine], y, i);
         }
         return;

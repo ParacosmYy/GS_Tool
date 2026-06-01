@@ -170,10 +170,10 @@ void MainWindow::connectReconnectSignals()
         QString msg;
         if (maxRetries > 0) {
             msg = tr("正在重连... 第%1/%2次 (下次%3s后)")
-                      .arg(attempt).arg(maxRetries).arg(nextMs / 1000);
+                      .arg(attempt).arg(maxRetries).arg(nextMs / 1000.0, 0, 'f', 1);
         } else {
             msg = tr("正在重连... 第%1次 (下次%2s后)")
-                      .arg(attempt).arg(nextMs / 1000);
+                      .arg(attempt).arg(nextMs / 1000.0, 0, 'f', 1);
         }
         ToastWidget::showDebounced(this, msg, ToastWidget::ToastType::Info, 2500);
     });

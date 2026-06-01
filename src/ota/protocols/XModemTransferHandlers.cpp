@@ -61,7 +61,7 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
         // 更新速率统计
         updateTransferStats();
 
-        int percent = static_cast<int>((m_bytesSent * 100) / m_data.size());
+        int percent = static_cast<int>((static_cast<qint64>(m_bytesSent) * 100) / m_data.size());
         emit progress(percent, m_bytesSent, m_data.size());
 
         if (m_bytesSent >= m_data.size()) {

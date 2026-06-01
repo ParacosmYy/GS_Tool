@@ -24,8 +24,8 @@ QString ZModemTransfer::stateToString(State s)
     case State::SendingFin:   return QStringLiteral("SendingFin");
     case State::Done:         return QStringLiteral("Done");
     case State::Error:        return QStringLiteral("Error");
+    default:                  return QStringLiteral("Unknown");
     }
-    return QStringLiteral("Unknown");
 }
 /** @brief 构造函数，初始化ZMODEM传输器并设置默认超时10秒 */
 ZModemTransfer::ZModemTransfer(QObject* parent)
@@ -192,6 +192,9 @@ void ZModemTransfer::processReceivedData()
             case State::SendingFin:
                 handleStateSendingFin(type);
                 break;
+            default:
+                qWarning() << "ZModem: unknown state" << static_cast<int>(m_zmodemState);
+                return;
             }
         } else {
             // 缓冲区过大(>4096)且无法解析时清空，防止垃圾数据堆积

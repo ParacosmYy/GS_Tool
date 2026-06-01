@@ -162,6 +162,10 @@ void XModemTransfer::processReceivedData()
         case State::SendingEOT:
             handleStateSendingEOT(ch, readIdx);
             break;
+        default:
+            qWarning() << "XModem: unknown state" << static_cast<int>(m_xmodemState);
+            m_receiveBuffer.remove(0, readIdx);
+            return;
         }
 
         // 处理函数可能导致early return, 重新检查

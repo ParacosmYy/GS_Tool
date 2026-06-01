@@ -17,6 +17,7 @@ void DataLogger::writeHeader()
 
     QDataStream stream(m_recordFile);
     stream.setByteOrder(QDataStream::BigEndian);
+    stream.setVersion(QDataStream::Qt_6_8);
 
     // Magic
     stream.writeRawData(kMagic, 3);
@@ -38,6 +39,7 @@ void DataLogger::writeRecord(quint64 timestamp, Direction dir, const QByteArray&
 
     QDataStream stream(m_recordFile);
     stream.setByteOrder(QDataStream::BigEndian);
+    stream.setVersion(QDataStream::Qt_6_8);
 
     // Timestamp (8 bytes)
     stream << timestamp;
@@ -56,6 +58,7 @@ bool DataLogger::readNextRecord(RecordHeader& header, QByteArray& data)
 
     QDataStream stream(m_playbackFile);
     stream.setByteOrder(QDataStream::BigEndian);
+    stream.setVersion(QDataStream::Qt_6_8);
 
     // Timestamp
     stream >> header.timestamp;

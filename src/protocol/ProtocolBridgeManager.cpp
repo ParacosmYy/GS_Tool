@@ -431,5 +431,10 @@ void ProtocolBridgeManager::switchSource()
         connect(m_fireWater, &FireWaterBridge::frameParsed,
                 this, &ProtocolBridgeManager::onBridgeParsed);
         break;
+
+    default:
+        qWarning() << "ProtocolBridgeManager: unknown mode" << static_cast<int>(m_mode);
+        m_activeBridge = nullptr;
+        break;
     }
 }

@@ -61,6 +61,10 @@ void FrameParser::processByte(unsigned char byte)
     case State::FooterMatching:
         handleFooterMatching(byte);
         break;
+    default:
+        qWarning() << "FrameParser: unknown state" << static_cast<int>(m_state) << ", resetting";
+        resetIntermediateState();
+        break;
     }
 }
 

@@ -183,6 +183,10 @@ void YModemTransfer::processReceivedData()
         case State::SendingFinalBlock0:
             handleStateSendingFinalBlock0(ch, readIdx);
             break;
+        default:
+            qWarning() << "YModem: unknown state" << static_cast<int>(m_ymodemState);
+            m_receiveBuffer.remove(0, readIdx);
+            return;
         }
 
         // 处理函数可能导致early return, 重新检查
@@ -216,7 +220,8 @@ void YModemTransfer::sendBlock0()
 /** @brief 构建并发送数据块，不足128字节时用0x1A填充 */
 void YModemTransfer::sendBlock()
 {
-    qint64 offset = static_cast<qint64>(m_blockNumber - 1) * kBlockSize;
+    // Use cumulative bytes sent as offset (block number wraps 1-255, can't compute offset from it)
+    qint64 offset = m_bytesSent;
     int dataSize = qMin(static_cast<int>(m_currentData.size() - offset),
                         kBlockSize);
     if (dataSize <= 0) {

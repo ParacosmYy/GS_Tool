@@ -83,7 +83,7 @@ void YModemTransfer::handleStateSendingData(char ch, int& readIdx)
         // 更新速率统计
         updateTransferStats();
         int percent = static_cast<int>(
-            (m_totalBytesSent * 100) / m_totalBytes);
+            (static_cast<qint64>(m_totalBytesSent) * 100) / m_totalBytes);
         emit progress(percent, m_totalBytesSent, m_totalBytes);
         if (m_bytesSent >= m_currentData.size()) {
             m_ymodemState = State::SendingEOT;

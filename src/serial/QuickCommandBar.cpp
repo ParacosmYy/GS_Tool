@@ -71,6 +71,8 @@ void QuickCommandBar::addCommand(const QuickCommand& cmd)
 {
     m_commands.append(cmd);
     rebuildButtons();
+    // 新增指令后持久化到QSettings
+    saveCommands();
 }
 
 /** @brief 清空所有指令并移除按钮 */
@@ -78,6 +80,8 @@ void QuickCommandBar::clearCommands()
 {
     m_commands.clear();
     rebuildButtons();
+    // 清空指令后持久化到QSettings
+    saveCommands();
 }
 
 /**
@@ -173,6 +177,8 @@ void QuickCommandBar::onEditRequested()
             }
         }
         setCommands(newCmds);
+        // 编辑确认后持久化到QSettings，防止重启后丢失
+        saveCommands();
     }
 
     // 同时发射editRequested信号，允许外部监听者做额外处理

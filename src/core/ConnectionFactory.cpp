@@ -34,6 +34,8 @@ IConnection* ConnectionFactory::create(ConnectionType type, QObject* parent)
     case ConnectionType::Rtt:
         // RTT连接: 尚未实现（依赖J-Link SDK），返回nullptr
         return nullptr;
+    default:
+        qWarning() << "ConnectionFactory: unknown connection type" << static_cast<int>(type);
+        return nullptr;
     }
-    return nullptr;
 }

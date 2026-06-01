@@ -202,7 +202,12 @@ void TcpConnection::onSocketReadyRead()
 void TcpConnection::onSocketError(QAbstractSocket::SocketError error)
 {
     QTcpSocket* sock = qobject_cast<QTcpSocket*>(sender());
-    QString systemError = sock ? sock->errorString() : QString();
+    if (!sock) {
+        emit errorOccurred(translateNetworkError(error, QString()));
+        updateState(ConnectionState::Error);
+        return;
+    }
+    QString systemError = sock->errorString();
     emit errorOccurred(translateNetworkError(error, systemError));
     updateState(ConnectionState::Error);
 }

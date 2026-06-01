@@ -216,7 +216,9 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
     }
 
     // ---- 步骤5: 记录当前文件名和协议（用于错误消息上下文） ----
-    m_currentFileName = QFileInfo(effectivePath).fileName();
+    // 注意: 始终使用用户选择的原始文件名，而非HEX转换后的临时BIN文件名
+    // 避免在错误消息和Toast通知中显示类似 "EmbedDebug_XXXXXX.bin" 的临时文件名
+    m_currentFileName = QFileInfo(filePath).fileName();
     m_currentProtocol = protocol;
 
     // ---- 步骤6: 切换到传输状态 ----

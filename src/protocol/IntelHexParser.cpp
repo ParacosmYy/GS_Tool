@@ -155,6 +155,9 @@ bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary,
         case EndOfFile:
             // 这些类型不影响地址范围计算
             break;
+        default:
+            qWarning() << "IntelHex: unknown record type" << rec.type << "in address scan";
+            break;
         }
     }
 
@@ -198,6 +201,9 @@ bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary,
         case StartSegmentAddr:
         case StartLinearAddr:
         case EndOfFile:
+            break;
+        default:
+            qWarning() << "IntelHex: unknown record type" << rec.type << "in data fill";
             break;
         }
     }

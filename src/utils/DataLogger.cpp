@@ -85,9 +85,10 @@ void DataLogger::stopRecording()
 
     if (m_recordFile) {
         // 回写header中的record count
-        m_recordFile->seek(4); // 跳过magic(3) + version(1)
-        QDataStream stream(m_recordFile);
-        stream << static_cast<quint32>(m_recordCount);
+        if (m_recordFile->seek(4)) { // 跳过magic(3) + version(1)
+            QDataStream stream(m_recordFile);
+            stream << static_cast<quint32>(m_recordCount);
+        }
         m_recordFile->close();
         QString path = m_recordFile->fileName();
         delete m_recordFile;
@@ -327,7 +328,7 @@ qint64 DataLogger::scanToTimestamp(qint64 targetTimestamp)
     if (!m_playbackFile) return -1;
 
     // 回到数据区起始位置（跳过文件头 kHeaderSize 字节）
-    m_playbackFile->seek(kHeaderSize);
+    if (!m_playbackFile->seek(kHeaderSize)) return -1;
 
     qint64 foundTimestamp = -1;
     qint64 lastValidPos = kHeaderSize;
@@ -349,7 +350,7 @@ qint64 DataLogger::scanToTimestamp(qint64 targetTimestamp)
 
     if (foundTimestamp < 0) {
         // 所有记录时间戳都 > targetTimestamp，定位到文件开头（第一条记录之前）
-        m_playbackFile->seek(kHeaderSize);
+        if (!m_playbackFile->seek(kHeaderSize)) return -1;
         m_playedRecords = 0;
         m_nextRecordTime = 0;
         // 重新读取第一条记录时间戳
@@ -362,7 +363,7 @@ qint64 DataLogger::scanToTimestamp(qint64 targetTimestamp)
     }
 
     // 文件指针定位到最后一条 <= targetTimestamp 的记录之后
-    m_playbackFile->seek(lastValidPos);
+    if (!m_playbackFile->seek(lastValidPos)) return -1;
     m_playedRecords = recordsFound;
 
     // 读取下一条记录的时间戳

@@ -129,6 +129,8 @@ QByteArray FrameParser::computeChecksum(const QByteArray& data) const
         result.append(static_cast<char>((crc >> 24) & 0xFF));
         break;
     }
+    default:
+        break;
     }
     return result;
 }
