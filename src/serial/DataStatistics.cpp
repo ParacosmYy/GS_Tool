@@ -1,4 +1,5 @@
 #include "serial/DataStatistics.h"
+#include "utils/ByteFormat.h"
 
 #include <QFormLayout>
 #include <QVBoxLayout>
@@ -36,6 +37,7 @@ void DataStatistics::setupUI()
     mainLayout->addWidget(createStatsFrame(tr("发送:"), m_txTotalLabel, "txTotalLabel", "statsTxFrame"));
     mainLayout->addWidget(createStatsFrame(tr("速率:"), m_txRateLabel, "txRateLabel", "statsTxFrame"));
     mainLayout->addWidget(createStatsFrame(tr("峰值:"), m_peakRateLabel, "peakRateLabel", "statsPeakFrame"));
+    mainLayout->addWidget(createStatsFrame(tr("均值:"), m_avgRateLabel, "avgRateLabel", "statsAvgFrame"));
     mainLayout->addWidget(createStatsFrame(tr("时间:"), m_elapsedLabel, "elapsedLabel", "statsTimeFrame"));
 
     // ---- 串口错误计数（默认隐藏，有错误时显示） ----
@@ -47,7 +49,7 @@ void DataStatistics::setupUI()
 
     // ---- 连接健康状态（默认隐藏，空闲超10秒时显示） ----
     m_healthLabel = new QLabel;
-    m_healthLabel->setObjectName("healthLabel");
+    m_healthLabel->setObjectName("healthStatusLabel");
     m_healthLabel->setWordWrap(true);
     m_healthLabel->hide();  // 数据正常流动时隐藏
     mainLayout->addWidget(m_healthLabel);
@@ -92,8 +94,12 @@ void DataStatistics::update(quint64 rxBytes, quint64 txBytes)
     m_lastTxBytes = txBytes;
 
     // 更新累计字节数显示
-    m_rxTotalLabel->setText(formatBytes(rxBytes));
-    m_txTotalLabel->setText(formatBytes(txBytes));
+    m_rxTotalLabel->setText(ByteFormat::formatSize(rxBytes));
+    m_txTotalLabel->setText(ByteFormat::formatSize(txBytes));
+
+    // 累加数据包计数（每次调用视为一次数据包到达）
+    if (rxDelta > 0) ++m_rxPackets;
+    if (txDelta > 0) ++m_txPackets;
 }
 
 void DataStatistics::reset()
@@ -105,6 +111,10 @@ void DataStatistics::reset()
     m_txRate = 0.0;
     m_peakRxRate = 0.0;
     m_peakTxRate = 0.0;
+    m_avgRxRate = 0.0;
+    m_avgTxRate = 0.0;
+    m_rxPackets = 0;
+    m_txPackets = 0;
 
     // 重置错误计数
     m_framingErrors = 0;
@@ -117,6 +127,7 @@ void DataStatistics::reset()
     m_rxRateLabel->setText("0 B/s");
     m_txRateLabel->setText("0 B/s");
     m_peakRateLabel->setText("0 B/s");
+    m_avgRateLabel->setText("0 B/s");
     m_elapsedLabel->setText("00:00:00");
     m_errorLabel->hide();
     m_healthLabel->hide();
@@ -166,6 +177,13 @@ void DataStatistics::onRefreshTimer()
     if (m_txRate > m_peakTxRate) m_peakTxRate = m_txRate;
     double peakRate = qMax(m_peakRxRate, m_peakTxRate);
     m_peakRateLabel->setText(formatRate(peakRate));
+
+    // 计算会话平均速率（总字节/总时间）
+    double elapsedSecF = qMax(m_stopwatch.elapsed() / 1000.0, 1.0);
+    m_avgRxRate = m_lastRxBytes / elapsedSecF;
+    m_avgTxRate = m_lastTxBytes / elapsedSecF;
+    double avgRate = m_avgRxRate + m_avgTxRate;
+    m_avgRateLabel->setText(formatRate(avgRate));
 }
 
 void DataStatistics::updateErrors(int framingErrors, int parityErrors, int overrunErrors)
@@ -189,23 +207,6 @@ void DataStatistics::updateErrors(int framingErrors, int parityErrors, int overr
         m_errorLabel->show();
     } else {
         m_errorLabel->hide();
-    }
-}
-
-QString DataStatistics::formatBytes(quint64 bytes) const
-{
-    if (bytes < 1024) {
-        // 小于1KB，直接显示字节
-        return QString("%1 B").arg(bytes);
-    } else if (bytes < 1024ULL * 1024) {
-        // 小于1MB，显示KB，保留1位小数
-        return QString("%1 KB").arg(bytes / 1024.0, 0, 'f', 1);
-    } else if (bytes < 1024ULL * 1024 * 1024) {
-        // 小于1GB，显示MB，保留2位小数
-        return QString("%1 MB").arg(bytes / (1024.0 * 1024.0), 0, 'f', 2);
-    } else {
-        // 大于等于1GB，显示GB，保留2位小数
-        return QString("%1 GB").arg(bytes / (1024.0 * 1024.0 * 1024.0), 0, 'f', 2);
     }
 }
 
@@ -269,9 +270,11 @@ QString DataStatistics::sessionSummary() const
     summary += tr("会话统计\n");
     summary += tr("─────────────────\n");
     summary += tr("持续时间: %1\n").arg(timeStr);
-    summary += tr("接收: %1\n").arg(formatBytes(m_lastRxBytes));
-    summary += tr("发送: %1\n").arg(formatBytes(m_lastTxBytes));
+    summary += tr("接收: %1\n").arg(ByteFormat::formatSize(m_lastRxBytes));
+    summary += tr("发送: %1\n").arg(ByteFormat::formatSize(m_lastTxBytes));
     summary += tr("峰值速率: %1\n").arg(formatRate(peakRate));
+    summary += tr("平均速率: %1\n").arg(formatRate(m_avgRxRate + m_avgTxRate));
+    summary += tr("数据包: RX %1 / TX %2\n").arg(m_rxPackets).arg(m_txPackets);
     if (totalErrors > 0) {
         summary += tr("错误: %1 (帧%2 校验%3 溢出%4)")
                        .arg(totalErrors)

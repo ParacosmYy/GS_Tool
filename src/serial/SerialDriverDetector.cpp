@@ -87,11 +87,11 @@ QString SerialDriverDetector::driverStatusSummary()
 
     // 情况1: 没有检测到任何串口设备
     if (ports.isEmpty()) {
-        return QObject::tr("No serial port devices detected.\n"
-                           "Please check:\n"
-                           "1. USB serial adapter is connected\n"
-                           "2. Serial driver is installed (CH340/CP2102/FT232/PL2303)\n"
-                           "3. Device is powered on");
+        return QObject::tr("未检测到串口设备。\n"
+                           "请检查:\n"
+                           "1. USB转串口适配器已连接\n"
+                           "2. 已安装串口驱动 (CH340/CP2102/FT232/PL2303)\n"
+                           "3. 设备已上电");
     }
 
     // 情况2: 有串口设备，但没有匹配到已知驱动关键词
@@ -108,8 +108,8 @@ QString SerialDriverDetector::driverStatusSummary()
     }
 
     if (anyKnown) {
-        return QObject::tr("Detected serial drivers:\n%1\n\n"
-                           "Available ports: %2")
+        return QObject::tr("已检测到的串口驱动:\n%1\n\n"
+                           "可用端口数: %2")
             .arg(detectedList.join(QLatin1Char('\n')),
                  QString::number(ports.size()));
     }
@@ -120,8 +120,8 @@ QString SerialDriverDetector::driverStatusSummary()
         portNames.append(portInfo.portName());
     }
 
-    return QObject::tr("Serial ports detected but no known USB-serial driver matched.\n"
-                       "Available ports: %1\n"
-                       "Ports may still be usable (native COM port or unrecognized adapter).")
+    return QObject::tr("检测到串口但未匹配已知USB转串口驱动。\n"
+                       "可用端口: %1\n"
+                       "端口仍可能正常使用（原生COM口或未识别的适配器）。")
         .arg(portNames.join(QStringLiteral(", ")));
 }

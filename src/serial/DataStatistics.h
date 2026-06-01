@@ -92,9 +92,6 @@ private:
     QFrame* createStatsFrame(const QString& label, QLabel*& valueLabel,
                              const QString& objectName, const QString& frameName = QString());
 
-    /** @brief 将字节数格式化为人类可读字符串(B/KB/MB/GB) */
-    QString formatBytes(quint64 bytes) const;
-
     /** @brief 将速率格式化为带"/s"后缀的人类可读字符串 */
     QString formatRate(double bytesPerSec) const;
 
@@ -107,6 +104,7 @@ private:
     QLabel* m_elapsedLabel;        ///< 连接持续时间显示
     QLabel* m_errorLabel;          ///< 串口错误计数显示(默认隐藏)
     QLabel* m_healthLabel;         ///< 连接健康状态显示(空闲提示,默认隐藏)
+    QLabel* m_avgRateLabel;        ///< 平均速率显示(RX+TX合计)
 
     // ---- 定时器 ----
     QTimer m_refreshTimer;         ///< 1秒刷新定时器，用于速率采样和UI更新
@@ -120,6 +118,10 @@ private:
     double m_txRate = 0.0;         ///< 当前TX速率（bytes/s）
     double m_peakRxRate = 0.0;     ///< RX峰值速率（bytes/s）
     double m_peakTxRate = 0.0;     ///< TX峰值速率（bytes/s）
+    double m_avgRxRate = 0.0;      ///< RX平均速率（bytes/s，基于整个会话）
+    double m_avgTxRate = 0.0;      ///< TX平均速率（bytes/s，基于整个会话）
+    quint64 m_rxPackets = 0;       ///< RX数据包计数（每次update调用+1）
+    quint64 m_txPackets = 0;       ///< TX数据包计数（每次update调用+1）
 
     // ---- 错误计数 ----
     int m_framingErrors = 0;       ///< 帧错误累计

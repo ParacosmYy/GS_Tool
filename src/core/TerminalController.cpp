@@ -12,6 +12,7 @@
 #include "terminal/TerminalLayoutManager.h"
 #include "serial/DataStatistics.h"
 #include "utils/DataExporter.h"
+#include "utils/ByteFormat.h"
 #include "core/Constants.h"
 
 #include <QFileDialog>
@@ -184,14 +185,9 @@ void TerminalController::updateStatusBar()
 
     auto rx = m_terminalModel->rxBytes();
     auto tx = m_terminalModel->txBytes();
-    // 字节数格式化: <1KB 显示 B, <1MB 显示 KB, 否则显示 MB
-    auto formatBytes = [](quint64 bytes) -> QString {
-        if (bytes < 1024) return QString("%1 B").arg(bytes);
-        if (bytes < 1024 * 1024) return QString("%1 KB").arg(bytes / 1024.0, 0, 'f', 1);
-        return QString("%1 MB").arg(bytes / (1024.0 * 1024.0), 0, 'f', 1);
-    };
-    m_rxBytesLbl->setText(tr("RX: ") + formatBytes(rx));
-    m_txBytesLbl->setText(tr("TX: ") + formatBytes(tx));
+    // 使用公共 ByteFormat::formatSize 替代本地重复实现
+    m_rxBytesLbl->setText(tr("RX: ") + ByteFormat::formatSize(rx));
+    m_txBytesLbl->setText(tr("TX: ") + ByteFormat::formatSize(tx));
 }
 
 /**

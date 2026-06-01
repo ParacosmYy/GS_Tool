@@ -681,7 +681,7 @@ QComboBox#displayModeCombo:hover { border-color: #3b82f6; }
 QComboBox#displayModeCombo:disabled { background-color: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
 
 /* === 连接状态标签 === */
-QLabel#connStatus { font-size: 12px; }
+QLabel#connStatus { font-size: 12px; padding: 0 4px; }
 QLabel#connStatus[state="connected"] { color: #22c55e; }
 QLabel#connStatus[state="disconnected"] { color: #dc2626; }
 QLabel#connStatus[state="connecting"] { color: #f59e0b; }
@@ -735,6 +735,17 @@ QFrame#statsPeakFrame {
     border: 1px solid rgba(37, 99, 235, 0.15);
     border-radius: 6px;
     padding: 8px;
+}
+QFrame#statsAvgFrame {
+    background-color: rgba(124, 58, 237, 0.04);
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    border-radius: 6px;
+    padding: 8px;
+}
+QLabel#avgRateLabel {
+    color: #7c3aed;
+    font-size: 12px;
+    font-weight: bold;
 }
 QFrame#statsTimeFrame {
     background-color: rgba(107, 114, 128, 0.04);

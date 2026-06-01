@@ -25,7 +25,7 @@ QuickCommandBar::QuickCommandBar(QWidget* parent)
     // ---- 编辑按钮 ----
     // 使用 setMinimumHeight(32) 替代 setFixedSize，允许水平自适应内容
     // 与 SerialConfigPanel 连接按钮(36px)视觉协调: 次要操作按钮略矮
-    m_editBtn = new QPushButton(tr("Edit"));
+    m_editBtn = new QPushButton(tr("编辑"));
     m_editBtn->setObjectName("quickCmdEditBtn");
     m_editBtn->setMinimumHeight(32);
     connect(m_editBtn, &QPushButton::clicked, this, &QuickCommandBar::onEditRequested);

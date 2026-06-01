@@ -59,10 +59,15 @@ bool TcpConnection::open()
                     this, &TcpConnection::onSocketReadyRead);
             connect(m_socket, &QTcpSocket::errorOccurred,
                     this, &TcpConnection::onSocketError);
+            // 转发底层写入完成信号，供上层OTA进度追踪和发送统计
+            connect(m_socket, &QTcpSocket::bytesWritten,
+                    this, &TcpConnection::bytesWritten);
         }
 
         updateState(ConnectionState::Connecting);
         m_socket->connectToHost(m_host, m_port);
+        // 启用TCP KeepAlive，长连接场景下可及时检测对端断开
+        m_socket->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
 
         // 启动10秒连接超时定时器，防止连接不可达主机时无限等待
         if (!m_connectTimer) {
@@ -137,7 +142,11 @@ qint64 TcpConnection::write(const QByteArray& data)
         return -1;
     }
 
-    return target->write(data);
+    qint64 written = target->write(data);
+    if (written < 0) {
+        emit errorOccurred(tr("TCP写入失败: %1").arg(target->errorString()));
+    }
+    return written;
 }
 
 void TcpConnection::onSocketConnected()

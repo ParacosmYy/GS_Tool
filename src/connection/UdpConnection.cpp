@@ -111,12 +111,20 @@ qint64 UdpConnection::write(const QByteArray& data)
         return -1;
     }
 
+    qint64 written = 0;
     if (m_broadcast) {
         QHostAddress broadcastAddr = QHostAddress::Broadcast;
-        return m_socket->writeDatagram(data, broadcastAddr, m_remotePort);
+        written = m_socket->writeDatagram(data, broadcastAddr, m_remotePort);
+    } else {
+        written = m_socket->writeDatagram(data, m_remoteHost, m_remotePort);
     }
 
-    return m_socket->writeDatagram(data, m_remoteHost, m_remotePort);
+    if (written > 0) {
+        emit bytesWritten(written);
+    } else if (written < 0) {
+        emit errorOccurred(tr("UDP发送失败: %1").arg(m_socket->errorString()));
+    }
+    return written;
 }
 
 /** @brief readyRead信号处理: 读取所有到达的数据报并转发给上层 */

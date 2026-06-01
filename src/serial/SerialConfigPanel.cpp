@@ -104,19 +104,19 @@ QGroupBox* SerialConfigPanel::createParamGroup()
 
     m_parityCombo = new QComboBox;
     m_parityCombo->setObjectName("parityCombo");
-    m_parityCombo->setToolTip(tr("校验方式:\n无 - 不校验(最常用)\n偶校验/奇校验 - 简单错误检测"));
+    m_parityCombo->setToolTip(tr("校验方式:\n无 - 不校验(最常用，适合短距离稳定通信)\n偶校验 - 数据位+校验位1的个数为偶数\n奇校验 - 数据位+校验位1的个数为奇数"));
     m_parityCombo->addItems({tr("无"), tr("偶校验"), tr("奇校验"), tr("Mark"), tr("Space")});
     formLayout->addRow(tr("校验位:"), m_parityCombo);
 
     m_stopBitsCombo = new QComboBox;
     m_stopBitsCombo->setObjectName("stopBitsCombo");
-    m_stopBitsCombo->setToolTip(tr("帧结束的停止位数，绝大多数设备使用 1 位"));
+    m_stopBitsCombo->setToolTip(tr("停止位数:\n1位 - 标准设置(绝大多数设备)\n1.5位 - 极少见\n2位 - 调制解调器/低速通信"));
     m_stopBitsCombo->addItems({"1", "1.5", "2"});
     formLayout->addRow(tr("停止位:"), m_stopBitsCombo);
 
     m_flowControlCombo = new QComboBox;
     m_flowControlCombo->setObjectName("flowControlCombo");
-    m_flowControlCombo->setToolTip(tr("流量控制:\n无 - 不使用流控(最常用)\nRTS/CTS - 硬件流控\nXON/XOFF - 软件流控"));
+    m_flowControlCombo->setToolTip(tr("流量控制:\n无 - 不使用流控(最常用，短距离无需流控)\nRTS/CTS - 硬件流控(需额外2根信号线，高速通信推荐)\nXON/XOFF - 软件流控(XOFF=0x13暂停, XON=0x11恢复)"));
     m_flowControlCombo->addItems({tr("无"), tr("RTS/CTS"), tr("XON/XOFF")});
     formLayout->addRow(tr("流控:"), m_flowControlCombo);
 

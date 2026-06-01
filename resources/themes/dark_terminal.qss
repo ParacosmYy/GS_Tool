@@ -744,6 +744,17 @@ QFrame#statsPeakFrame {
     border-radius: 6px;
     padding: 8px;
 }
+QFrame#statsAvgFrame {
+    background-color: rgba(203, 166, 247, 0.04);
+    border: 1px solid rgba(203, 166, 247, 0.15);
+    border-radius: 6px;
+    padding: 8px;
+}
+QLabel#avgRateLabel {
+    color: #cba6f7;
+    font-size: 12px;
+    font-weight: bold;
+}
 QFrame#statsTimeFrame {
     background-color: rgba(186, 194, 222, 0.04);
     border: 1px solid rgba(186, 194, 222, 0.12);
