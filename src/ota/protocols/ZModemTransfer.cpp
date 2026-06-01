@@ -44,7 +44,7 @@ bool ZModemTransfer::onStartInit()
         emit transferError(tr("文件不存在: %1").arg(m_filePath));
         return false;
     }
-    // 文件大小校验(最大1MB)
+    // 文件大小校验(最大16MB)
     if (fileInfo.size() > BaseTransfer::kMaxFileSize) {
         emit transferError(tr("文件过大: %1 (%2 字节, 上限 %3 字节)")
                                .arg(m_filePath).arg(fileInfo.size()).arg(BaseTransfer::kMaxFileSize));

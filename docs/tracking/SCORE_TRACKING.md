@@ -44,5 +44,5 @@
 | 53 | R13信号线监控+错误计数器接线+架构修复+P0 TimedSender修复: PinoutSignals结构体+IConnection.pinoutSignals()/errorCounters()虚方法+ConnectionController 200ms轮询(含变化检测)+errorCountersUpdated信号(消除业务层→表现层反向依赖)+TimedSender m_queue/m_queueIndex互斥锁保护(P0 BUG-01修复)+QSS signalLed×3主题+SerialConfigPanel CTS/DSR/DCD/RI LED指示灯+新特性评估(高级波形引擎) | 53 |
 | 54 | EmbedDebug.bat启动脚本修复: 支持build和build2目录自动检测 | 54 |
 | 55 | P1 Bug修复x5+冲突标记清理+FrameParser回溯增强: BUG-02 TerminalWidget选择重置+BUG-03 paintEvent递归(QTimer延迟)+BUG-04 ChartWidget空配置兜底+BUG-05 SettingsManager const_cast替换+BUG-06 OtaManager临时文件泄漏+冲突标记清理(MainWindow/QuickCommandBar/TerminalLayoutManager)+FrameParser帧头匹配回溯算法+纯header帧路径D实现+QuickCommandBar createEditDialog提取+TerminalLayoutManager参数化重构 | 55 |
-| 56 | R18: P0 DataLogger BigEndian字节序修复(startPlayback raw→QDataStream)+P1 DataExporter CSV RFC4180转义(escapeCsvField)+UTF-8 BOM+ThemeManager fadeIn内存泄漏(setParent)+TcpConnection 10s连接超时+DataStatistics速率衰减(>2s归零)+ConnectionController::sendBreak补全+FrameVisualEditor文件行数合规(510→499) | 56 |
+| 56 | R18: P0 DataLogger BigEndian字节序修复+DataExporter CSV RFC4180转义+ThemeManager fadeIn内存修复+TcpConnection连接超时+DataStatistics速率衰减+ConnectionController::sendBreak+FrameVisualEditor合规 | 56 |
 | ... | 目标: 1000分 | 1000 |

@@ -446,9 +446,9 @@ void SerialConfigPanel::updateConnectButtonState()
 }
 
 /**
- * @brief 构建端口详情tooltip(VID/PID/制造商/序列号)
+ * @brief 构建端口详情tooltip(VID/PID/制造商/序列号/系统路径/推荐波特率)
  * @param info QSerialPortInfo端口信息
- * @return 多行tooltip字符串，包含端口名/描述/制造商/VID/PID/序列号/系统路径
+ * @return 多行tooltip字符串，包含端口名/描述/制造商/VID/PID/序列号/系统路径/常用波特率
  */
 QString SerialConfigPanel::buildPortTooltip(const QSerialPortInfo& info) const
 {
@@ -464,8 +464,11 @@ QString SerialConfigPanel::buildPortTooltip(const QSerialPortInfo& info) const
         details << tr("PID: %1").arg(info.productIdentifier(), 4, 16, QLatin1Char('0')).toUpper();
     if (!info.serialNumber().isEmpty())
         details << tr("序列号: %1").arg(info.serialNumber());
+    // 系统路径: Linux下为/dev/ttyUSB0等，Windows下为\\?\USB#VID_xxxx&PID_xxxx...完整设备路径
     if (!info.systemLocation().isEmpty())
         details << tr("系统路径: %1").arg(info.systemLocation());
+    // 常用波特率提示
+    details << tr("常用波特率: 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600");
     return details.join("\n");
 }
 

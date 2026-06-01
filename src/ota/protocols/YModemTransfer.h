@@ -18,7 +18,7 @@
  *   → SendingFinalBlock0(空Block0) → Done
  *
  * == 边界情况 ==
- * 1. 文件>1MB: onStartInit()拒绝  2. 空文件/空列表: onStartInit()拒绝
+ * 1. 文件>kMaxFileSize(16MB): onStartInit()拒绝  2. 空文件/空列表: onStartInit()拒绝
  * 3. Block0超128B: buildBlock0()截断  4. 数据不足128B: 0x1A填充
  * 5. 块序号: Block0=0, 数据块从1递增   6. 接收方CAN: 立即中止
  * 7. 重试上限: 每阶段独立计数, 超10次发CAN取消
@@ -75,7 +75,7 @@ signals:
 protected:
     // === BaseTransfer 钩子实现 ===
 
-    /** @brief 初始化: 校验文件(非空/<=1MB/可读)→计算总量→加载首文件→等C/NAK
+    /** @brief 初始化: 校验文件(非空/<=kMaxFileSize/可读)→计算总量→加载首文件→等C/NAK
      *  @return true=进入WaitingStart, false=校验失败。超时设为3倍(15s) */
     bool onStartInit() override;
 

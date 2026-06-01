@@ -67,61 +67,51 @@ signals:
     /** @brief 请求状态栏刷新 */
     void statusBarUpdateRequested();
 
-    /**
-     * @brief 连接失败通知(带标题和详细信息)
-     *
-     * 发射场景: 端口打开失败、连接超时、通信错误、端口物理拔出等。
-     * 由 connectSignals() 中的 errorOccurred lambda、onConnectionTimeout()、
-     * onPortRemoved() 触发。
-     *
-     * @param title   错误标题(如 "Connection Timeout")
-     * @param message 错误详细信息(人类可读中文描述)
-     */
+    /** @brief 连接失败通知(带标题和详细信息)，由端口打开失败/超时/错误/拔出触发 @param title 错误标题 @param message 详细中文描述 */
     void connectionFailed(const QString& title, const QString& message);
 
     /** @brief 检测到新端口接入，由 PortWatcher 转发 @param portName 新端口名称 */
     void portAdded(const QString& portName);
 
-    /**
-     * @brief 连接成功通知 (Toast)
-     *
-     * 当串口或网络连接成功建立时发出。
-     * 发射时机: connectSerial() / connectNetwork() 中 open() 成功后。
-     *
-     * @param portName 成功连接的端口名称(如 "COM3")，网络连接为连接描述
-     */
+    /** @brief 连接成功通知(Toast)，串口/网络open()成功后发射 @param portName 端口名或连接描述 */
     void connectionSucceeded(const QString& portName);
 
-    /**
-     * @brief 连接正常断开通知 (Toast)
-     *
-     * 用户主动断开(disconnectCurrent())时发出。
-     * 用于 Toast 显示"已断开连接"等提示。
-     *
-     * @param portName 已断开的端口名称，可能为空
-     */
+    /** @brief 连接正常断开通知(Toast)，用户主动断开时发射 @param portName 端口名 */
     void connectionDisconnected(const QString& portName);
 
-    /**
-     * @brief 连接错误通知 (Toast)
-     *
-     * 连接因错误中断时发出。与 connectionFailed 不同，此信号专注于
-     * Toast 展示，提供端口号和简短错误描述。
-     * 发射场景: 通信错误(Error状态)、连接超时、端口物理拔出。
-     *
-     * @param portName 发生错误的端口名称
-     * @param error    简短错误描述(人类可读)
-     */
+    /** @brief 连接错误通知(Toast)，通信错误/超时/端口拔出时发射 @param portName 端口名 @param error 简短错误描述 */
     void connectionError(const QString& portName, const QString& error);
 
     /** @brief 自动重连尝试通知 @param attempt 当前第几次尝试 @param maxRetries 最大重连次数(0=无限制) */
     void reconnectAttempt(int attempt, int maxRetries);
+
+    /**
+     * @brief 自动重连进度通知(含指数退避间隔)
+     *
+     * 每次重连尝试前发射，携带下次重连的等待间隔，供UI显示倒计时或进度。
+     *
+     * @param attempt 当前第几次尝试(从1开始)
+     * @param maxRetries 最大重连次数(0=无限制)
+     * @param nextIntervalMs 下次重连的等待间隔(毫秒，经指数退避计算)
+     */
+    void reconnectProgress(int attempt, int maxRetries, int nextIntervalMs);
 
     /** @brief 自动重连成功通知 @param connName 重连成功的连接名称 */
     void reconnectSucceeded(const QString& connName);
 
     /** @brief 自动重连失败通知(达到最大重连次数) @param reason 失败原因描述 */
     void reconnectFailed(const QString& reason);
+
+    /**
+     * @brief 连接健康状态通知
+     *
+     * 每5秒由健康检测定时器触发，报告当前连接是否存活以及距上次收到数据的时间间隔。
+     * UI可据此显示"连接空闲"警告或"数据停滞"提示。
+     *
+     * @param alive true=连接仍处于Connected状态，false=连接已断开或异常
+     * @param lastDataAgeMs 距上次收到数据的毫秒数，-1表示从未收到数据
+     */
+    void connectionHealth(bool alive, qint64 lastDataAgeMs);
 
     /** @brief 信号线状态变化通知(由200ms轮询定时器触发，仅变化时发射)
      *  @param pinout 当前6个信号线的电平状态(CTS/DSR/DCD/RI/DTR/RTS) */
@@ -148,18 +138,7 @@ private:
     void clearDownstreamConnections();             ///< 清除下游控制器的连接引用(防止悬空指针)
     void stopConnectionTimeout();                  ///< 停止连接超时定时器
 
-    /**
-     * @brief 统一的连接断开清理流程
-     *
-     * 从 disconnectCurrent()、onConnectionTimeout()、onPortRemoved() 中提取的公共逻辑:
-     *   1. 停止超时定时器
-     *   2. 缓存并清空 m_currentConn / m_connectedPortName
-     *   3. 断开信号连接（防止 close() 触发状态变化回调）
-     *   4. 从 ConnectionManager 移除并销毁连接实例
-     *   5. 清除下游控制器的连接引用
-     *
-     * @param reason 断开原因描述，用于日志输出（如 "user disconnect"、"timeout"）
-     */
+    /** @brief 统一的连接断开清理流程: 停超时→缓存清空→断信号→移除连接→清下游 @param reason 断开原因(用于日志) */
     void teardownConnection(const QString& reason);
 
     ConnectionManager* m_connManager;              ///< 连接管理器(工厂)
@@ -180,9 +159,13 @@ private:
     bool m_userInitiatedDisconnect = false;        ///< 用户主动断开标志(不触发自动重连)
     int m_reconnectMaxRetries = 0;                 ///< 最大重连次数(0=无限制)
     int m_reconnectAttemptCount = 0;               ///< 当前已重连次数
+    int m_reconnectBaseIntervalMs = 3000;          ///< 重连基础间隔(毫秒)，实际间隔=baseInterval * 2^min(attempt,4)，上限30秒
     QVariantMap m_lastConnectParams;               ///< 上次连接参数(用于重连)
     ConnectionType m_lastConnectType = ConnectionType::Serial; ///< 上次连接类型
     QString m_connectedPortName;                   ///< 当前连接的串口名称
+
+    QTimer m_healthTimer;                          ///< 连接健康检测定时器(5秒间隔)
+    qint64 m_lastDataTimestamp = 0;                ///< 上次收到数据时的epoch毫秒时间戳(0=从未收到)
 };
 
 #endif // CONNECTIONCONTROLLER_H

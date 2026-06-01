@@ -41,7 +41,7 @@ public:
     /** @brief 设置传输模式，须在start()前调用。接收方NAK会自动回退Checksum */
     void setMode(Mode mode);
 
-    /** @brief 设置文件路径，须在start()前调用。文件限制1MB，setData优先 */
+    /** @brief 设置文件路径，须在start()前调用。文件限制kMaxFileSize(16MB)，setData优先 */
     void setFilePath(const QString& path);
 
     /** @brief 直接设置传输数据(清除filePath)，适用于内存中已有数据场景 */
@@ -67,7 +67,7 @@ protected:
      * @brief 协议初始化: 加载文件→校验→重置计数器→等待接收方启动信号
      * @return true=成功进入WaitingForStart, false=文件加载失败
      *
-     * 边界: 文件>1MB拒绝, 文件不可读拒绝, 数据为空拒绝。
+     * 边界: 文件>kMaxFileSize(16MB)拒绝, 文件不可读拒绝, 数据为空拒绝。
      * 连接断开后不再收到数据，由超时机制兜底。
      */
     bool onStartInit() override;

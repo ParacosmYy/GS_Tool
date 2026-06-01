@@ -26,13 +26,14 @@ class DataExporter : public QObject {
     Q_OBJECT
 
 public:
-    /** @brief 导出格式: Plain(纯文本) / HexDump(地址|HEX|ASCII) / CSV(带表头) / Timestamped(带时间戳) / Bin(原始字节) */
+    /** @brief 导出格式: Plain(纯文本) / HexDump(地址|HEX|ASCII) / CSV(带表头) / Timestamped(带时间戳) / Bin(原始字节) / Json(JSON结构) */
     enum Format {
         Plain,       ///< 纯文本 - [时间戳] [方向] HEX | ASCII
         HexDump,     ///< 十六进制转储 - 地址|HEX|ASCII（经典格式，16字节/行）
         Csv,         ///< CSV - 带表头(timestamp,direction,data_hex,data_ascii)
         Timestamped, ///< 带时间戳 - 每行前缀精确时间戳 + HEX
-        Bin          ///< 二进制 - 仅原始字节
+        Bin,         ///< 二进制 - 仅原始字节
+        Json         ///< JSON - 结构化JSON格式(含export_time/total_lines/lines数组)
     };
 
     /** @brief 行数据提供回调: 从 offset 开始返回 count 条记录，调用者负责线程安全 */
@@ -103,6 +104,8 @@ private:
     bool exportTimestamped(const QString& path, const QVector<TerminalLine>& lines);
     /** @brief 二进制导出: 仅原始字节 */
     bool exportBin(const QString& path, const QVector<TerminalLine>& lines);
+    /** @brief JSON导出: 结构化JSON，含导出时间/总行数/每行数据(timestamp/direction/hex/ascii) */
+    bool exportJson(const QString& path, const QVector<TerminalLine>& lines);
 
     // ---- 流式导出方法（按格式分发） ----
 
@@ -121,6 +124,9 @@ private:
     /** @brief 流式二进制导出 */
     bool exportStreamedBin(const QString& path, LineProvider provider,
                            int totalLines, int batchSize);
+    /** @brief 流式JSON导出: 分批构建JSON数组，适合大数据量场景 */
+    bool exportStreamedJson(const QString& path, LineProvider provider,
+                            int totalLines, int batchSize);
 
     // ---- 辅助方法 ----
 

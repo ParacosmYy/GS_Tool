@@ -14,6 +14,8 @@
 #include "core/ConnectionController.h"
 
 #include <QTimer>
+#include <QElapsedTimer>
+#include <QDateTime>
 
 #include "core/SendController.h"
 #include "ota/OtaManager.h"
@@ -45,6 +47,23 @@ ConnectionController::ConnectionController(ConnectionManager* connMgr, QObject* 
     connect(&m_reconnectTimer, &QTimer::timeout,
             this, &ConnectionController::onAutoReconnect);
 
+    // 连接健康检测定时器: 每5秒检查一次连接状态和数据活跃度
+    m_healthTimer.setInterval(5000);
+    connect(&m_healthTimer, &QTimer::timeout, this, [this]() {
+        if (!m_currentConn) {
+            emit connectionHealth(false, -1);
+            return;
+        }
+        // 判断连接是否仍处于Connected状态
+        bool alive = (m_currentConn->state() == ConnectionState::Connected);
+        // 计算距上次收到数据的时间间隔
+        qint64 ageMs = -1;
+        if (m_lastDataTimestamp > 0) {
+            ageMs = QDateTime::currentMSecsSinceEpoch() - m_lastDataTimestamp;
+        }
+        emit connectionHealth(alive, ageMs);
+    });
+
     // PortWatcher 信号: 端口拔出时自动断开，端口接入时通知上层
     connect(m_portWatcher, &PortWatcher::portRemoved,
             this, &ConnectionController::onPortRemoved);
@@ -71,6 +90,7 @@ ConnectionController::~ConnectionController()
 {
     stopConnectionTimeout();
     m_reconnectTimer.stop();
+    m_healthTimer.stop();
     if (m_pinoutPollTimer) m_pinoutPollTimer->stop();
     if (m_portWatcher) m_portWatcher->stop();
 }
@@ -234,11 +254,12 @@ void ConnectionController::setDtr(bool enabled) { if (m_currentConn) m_currentCo
 void ConnectionController::setRts(bool enabled) { if (m_currentConn) m_currentConn->setRts(enabled); }
 /** @brief 发送Break信号(用于STM32/ESP32进入Bootloader) @param duration Break持续时间(毫秒) */
 void ConnectionController::sendBreak(int duration) { if (m_currentConn) m_currentConn->sendBreak(duration); }
-/** @brief 启用/禁用自动重连 @param enabled 是否启用 @param intervalMs 重连间隔(毫秒) @param maxRetries 最大重连次数(0=无限制) */
+/** @brief 启用/禁用自动重连 @param enabled 是否启用 @param intervalMs 重连基础间隔(毫秒) @param maxRetries 最大重连次数(0=无限制) */
 void ConnectionController::enableAutoReconnect(bool enabled, int intervalMs, int maxRetries)
 {
     m_autoReconnectEnabled = enabled;
     m_reconnectMaxRetries = maxRetries;
+    m_reconnectBaseIntervalMs = intervalMs;
     if (enabled) m_reconnectTimer.setInterval(intervalMs);
     else m_reconnectTimer.stop();
 }
@@ -272,12 +293,16 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
             m_recordingController->setConnected(true);
         }
         m_pinoutPollTimer->start();
+        // 启动连接健康检测定时器
+        m_lastDataTimestamp = QDateTime::currentMSecsSinceEpoch();
+        m_healthTimer.start();
         break;
 
     case ConnectionState::Disconnected:
     case ConnectionState::Error:
         stopConnectionTimeout();
         m_pinoutPollTimer->stop();
+        m_healthTimer.stop();
         clearDownstreamConnections();
 
         // 清除已连接端口名（连接已断开）
@@ -304,10 +329,13 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
 
 /**
  * @brief 接收数据内部处理
- * 转发数据到 MainWindow 并请求状态栏刷新
+ *
+ * 转发数据到 MainWindow 并请求状态栏刷新，
+ * 同时更新最近收到数据的时间戳（用于连接健康检测）。
  */
 void ConnectionController::onDataReceived(const QByteArray& data)
 {
+    m_lastDataTimestamp = QDateTime::currentMSecsSinceEpoch();
     emit dataReceived(data);
     emit statusBarUpdateRequested();
 }
@@ -343,10 +371,15 @@ void ConnectionController::onConnectionTimeout()
 }
 
 /**
- * @brief 自动重连定时器触发
+ * @brief 自动重连定时器触发（支持指数退避）
  *
  * 检查是否仍在断开状态且未由用户主动断开，若是则尝试重新连接。
  * 支持最大重连次数限制: 达到上限后停止重连并发出失败通知。
+ *
+ * 指数退避策略:
+ *   actualInterval = baseInterval * 2^min(attempt, 4)，上限30秒
+ *   例如: base=3s → 3s → 6s → 12s → 24s → 30s → 30s...
+ * 每次尝试前通过 reconnectProgress 信号通知UI当前进度和下次等待时间。
  */
 void ConnectionController::onAutoReconnect()
 {
@@ -367,15 +400,32 @@ void ConnectionController::onAutoReconnect()
     }
 
     m_reconnectAttemptCount++;
+
+    // 计算指数退避间隔: baseInterval * 2^min(attempt, 4)，上限30秒
+    const int maxExpShift = 4;
+    const int maxIntervalMs = 30000;
+    int expShift = qMin(m_reconnectAttemptCount, maxExpShift);
+    int actualInterval = qMin(m_reconnectBaseIntervalMs * (1 << expShift), maxIntervalMs);
+
+    // 通知UI当前重连进度和下次等待时间
+    emit reconnectProgress(m_reconnectAttemptCount, m_reconnectMaxRetries, actualInterval);
     emit reconnectAttempt(m_reconnectAttemptCount, m_reconnectMaxRetries);
-    qInfo() << "Auto-reconnect attempt" << m_reconnectAttemptCount << "/ "
-            << (m_reconnectMaxRetries > 0 ? QString::number(m_reconnectMaxRetries) : "unlimited");
+
+    qDebug() << "[" << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz") << "]"
+             << "Auto-reconnect attempt" << m_reconnectAttemptCount << "/"
+             << (m_reconnectMaxRetries > 0 ? QString::number(m_reconnectMaxRetries) : "unlimited")
+             << "next interval:" << actualInterval << "ms";
 
     if (m_lastConnectType == ConnectionType::Serial) {
         connectSerial(m_lastConnectParams);
     } else {
         // 使用保存的网络参数重连，而非硬编码默认值
         connectNetwork(m_lastConnectType, m_lastConnectParams);
+    }
+
+    // 设置下次重连的间隔（指数退避）
+    if (m_reconnectTimer.isActive()) {
+        m_reconnectTimer.setInterval(actualInterval);
     }
 }
 

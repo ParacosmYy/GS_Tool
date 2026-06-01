@@ -16,6 +16,9 @@
 #include <QDateTime>
 #include <QDataStream>
 #include <QTimeZone>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 DataExporter::DataExporter(QObject* parent) : QObject(parent) {}
 
@@ -36,6 +39,7 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
     case Csv:         return exportCsv(filePath, filtered);
     case Timestamped: return exportTimestamped(filePath, filtered);
     case Bin:         return exportBin(filePath, filtered);
+    case Json:        return exportJson(filePath, filtered);
     }
     return false;
 }
@@ -52,6 +56,7 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
     case Csv:         return exportStreamedCsv(filePath, lineProvider, totalLines, batchSize);
     case Timestamped: return exportStreamedTimestamped(filePath, lineProvider, totalLines, batchSize);
     case Bin:         return exportStreamedBin(filePath, lineProvider, totalLines, batchSize);
+    case Json:        return exportStreamedJson(filePath, lineProvider, totalLines, batchSize);
     }
     return false;
 }
@@ -182,6 +187,55 @@ bool DataExporter::exportBin(const QString& path, const QVector<TerminalLine>& l
             file.close();
             return false;
         }
+    }
+    file.close();
+    return true;
+}
+
+/**
+ * @brief JSON全量导出 - 生成结构化JSON文件
+ *
+ * 输出格式:
+ * {
+ *   "export_time": "2026-06-01T12:00:00",
+ *   "total_lines": 100,
+ *   "lines": [
+ *     {"timestamp": "2026-06-01 12:00:00.123", "direction": "RX", "hex": "48656C6C6F", "ascii": "Hello"},
+ *     ...
+ *   ]
+ * }
+ *
+ * @param path 输出文件路径
+ * @param lines 过滤后的行数据
+ * @return true 成功，false 失败
+ */
+bool DataExporter::exportJson(const QString& path, const QVector<TerminalLine>& lines)
+{
+    QJsonObject root;
+    root["export_time"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+    root["total_lines"] = lines.size();
+
+    QJsonArray linesArray;
+    for (const TerminalLine& line : lines) {
+        QJsonObject lineObj;
+        lineObj["timestamp"] = line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz");
+        lineObj["direction"] = (line.direction == DataDirection::Rx) ? "RX" : "TX";
+        lineObj["hex"] = HexConverter::toHexString(line.data);
+        lineObj["ascii"] = toAsciiString(line.data);
+        linesArray.append(lineObj);
+    }
+    root["lines"] = linesArray;
+
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly)) {
+        emit exportError(path, tr("无法打开文件: %1").arg(file.errorString()));
+        return false;
+    }
+    QJsonDocument doc(root);
+    if (file.write(doc.toJson(QJsonDocument::Indented)) == -1) {
+        emit exportError(path, tr("写入文件失败: %1").arg(file.errorString()));
+        file.close();
+        return false;
     }
     file.close();
     return true;
@@ -350,7 +404,7 @@ bool DataExporter::exportStreamedTimestamped(const QString& path, LineProvider p
 }
 
 bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
-                                      int totalLines, int batchSize)
+                                       int totalLines, int batchSize)
 {
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -369,6 +423,57 @@ bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
             }
         }
         offset += batch.size();
+    }
+    file.close();
+    return true;
+}
+
+/**
+ * @brief 流式JSON导出 - 分批构建JSON数组，适合大数据量场景
+ *
+ * 与exportJson输出格式相同，但通过LineProvider分批拉取数据，
+ * 避免一次性将所有行加载到内存中。
+ *
+ * @param path 输出文件路径
+ * @param provider 行数据回调
+ * @param totalLines 数据总行数
+ * @param batchSize 每批行数
+ * @return true 成功，false 失败
+ */
+bool DataExporter::exportStreamedJson(const QString& path, LineProvider provider,
+                                       int totalLines, int batchSize)
+{
+    QJsonArray linesArray;
+    int offset = 0;
+    while (offset < totalLines) {
+        QVector<TerminalLine> batch = provider(offset, qMin(batchSize, totalLines - offset));
+        if (batch.isEmpty()) break;
+        for (const TerminalLine& line : batch) {
+            QJsonObject lineObj;
+            lineObj["timestamp"] = line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz");
+            lineObj["direction"] = (line.direction == DataDirection::Rx) ? "RX" : "TX";
+            lineObj["hex"] = HexConverter::toHexString(line.data);
+            lineObj["ascii"] = toAsciiString(line.data);
+            linesArray.append(lineObj);
+        }
+        offset += batch.size();
+    }
+
+    QJsonObject root;
+    root["export_time"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+    root["total_lines"] = totalLines;
+    root["lines"] = linesArray;
+
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly)) {
+        emit exportError(path, tr("无法打开文件: %1").arg(file.errorString()));
+        return false;
+    }
+    QJsonDocument doc(root);
+    if (file.write(doc.toJson(QJsonDocument::Indented)) == -1) {
+        emit exportError(path, tr("写入文件失败: %1").arg(file.errorString()));
+        file.close();
+        return false;
     }
     file.close();
     return true;
@@ -393,6 +498,7 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
     case Csv:         return exportCsv(outPath, lines);
     case Timestamped: return exportTimestamped(outPath, lines);
     case Bin:         return exportBin(outPath, lines);
+    case Json:        return exportJson(outPath, lines);
     }
     return false;
 }
