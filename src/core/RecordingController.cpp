@@ -108,7 +108,7 @@ void RecordingController::onToggleRecording()
         // 开始录制: 弹出文件对话框选择保存路径
         QString filter = tr("EmbedDebug 日志 (*.edl);;所有文件 (*.*)");
         QString path = QFileDialog::getSaveFileName(
-            nullptr, tr("录制日志"), QString(), filter);
+            qobject_cast<QWidget*>(parent()), tr("录制日志"), QString(), filter);
         if (path.isEmpty()) {
             // 用户取消，恢复按钮状态（阻塞信号避免触发递归 onToggleRecording）
             m_recordAction->blockSignals(true);
@@ -145,7 +145,7 @@ void RecordingController::onOpenPlayback()
 {
     QString filter = tr("EmbedDebug 日志 (*.edl);;所有文件 (*.*)");
     QString path = QFileDialog::getOpenFileName(
-        nullptr, tr("打开日志回放"), QString(), filter);
+        qobject_cast<QWidget*>(parent()), tr("打开日志回放"), QString(), filter);
     if (path.isEmpty()) return;
 
     m_logger->startPlayback(path);

@@ -24,7 +24,6 @@
 #include "serial/BookmarkWidget.h"
 #include "ota/OtaWidget.h"
 #include "connection/SerialConnection.h"
-#include <QMessageBox>
 
 /**
  * @brief 连接所有模块间的信号/槽（调用 8 个子方法按功能分组）
@@ -138,11 +137,7 @@ void MainWindow::connectSerialDataFlow()
     // 状态栏更新和连接失败通知
     connect(m_connController, &ConnectionController::statusBarUpdateRequested,
             m_terminalController, &TerminalController::updateStatusBar);
-    connect(m_connController, &ConnectionController::connectionFailed,
-            this, [this](const QString& title, const QString& message) {
-        QMessageBox::warning(this, title, message);
-    });
-    // 连接失败 → 防抖吐司（Error 类型）— 自动重连时 connectionFailed 会快速连续触发，
+    // 连接失败 → 仅Toast通知（不再使用QMessageBox，避免自动重连时弹窗叠加阻塞UI）
     // 使用 showDebounced 防止同一错误消息在 3 秒内重复弹出
     connect(m_connController, &ConnectionController::connectionFailed,
             this, [this](const QString&, const QString& message) {
@@ -257,10 +252,8 @@ void MainWindow::connectPortWatchSignals()
  */
 void MainWindow::connectThemeSignals()
 {
-    // ---- 主题切换 → NavIndicatorWidget 颜色刷新 ----
-    // 当用户切换主题时，指示线的 accent 颜色需要同步更新
-    connect(&ThemeManager::instance(), &ThemeManager::themeChanged,
-            m_navIndicator, &NavIndicatorWidget::updateThemeColor);
+    // ---- NavIndicatorWidget 主题刷新已在构造函数中连接，此处无需重复 ----
+    // (移除重复连接，NavIndicatorWidget构造函数已连接themeChanged→updateThemeColor)
 
     /**
      * @name Toast 防抖策略

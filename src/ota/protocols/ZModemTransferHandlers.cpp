@@ -64,6 +64,7 @@ void ZModemTransfer::handleStateSendingData(int type, const QByteArray& headerDa
         if (m_retryCount > m_maxRetries) {
             sendCancelBytes();
             m_zmodemState = State::Error;
+            markError();  // 通知BaseTransfer状态已转为Error，否则isRunning()永远为true
             emit transferError(
                 tr("重传请求次数过多 (已重试 %1 次, 上限 %2 次), "
                    "当前偏移: %3 字节, 文件大小: %4 字节")

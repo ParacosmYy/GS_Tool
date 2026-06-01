@@ -43,52 +43,28 @@ void AnimatedButton::setAnimOpacity(qreal opacity)
 void AnimatedButton::enterEvent(QEnterEvent* event)
 {
     QPushButton::enterEvent(event);
-    // hover渐入: 当前opacity → 1.0, 200ms OutCubic
-    auto* anim = new QPropertyAnimation(this, "animOpacity");
-    anim->setStartValue(m_animOpacity);
-    anim->setEndValue(1.0);
-    anim->setDuration(200);
-    anim->setEasingCurve(QEasingCurve::OutCubic);
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
+    startOpacityAnim(1.0, 200, QEasingCurve::OutCubic);
 }
 
 /** @brief 鼠标离开：触发hover渐出动画(opacity→0.85, 200ms) @param event 离开事件 */
 void AnimatedButton::leaveEvent(QEvent* event)
 {
     QPushButton::leaveEvent(event);
-    // hover渐出: 当前opacity → 0.85, 200ms OutCubic
-    auto* anim = new QPropertyAnimation(this, "animOpacity");
-    anim->setStartValue(m_animOpacity);
-    anim->setEndValue(0.85);
-    anim->setDuration(200);
-    anim->setEasingCurve(QEasingCurve::OutCubic);
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
+    startOpacityAnim(0.85, 200, QEasingCurve::OutCubic);
 }
 
 /** @brief 鼠标按下：触发按下反馈动画(opacity→0.75, 100ms) @param event 鼠标事件 */
 void AnimatedButton::mousePressEvent(QMouseEvent* event)
 {
     QPushButton::mousePressEvent(event);
-    // 按下反馈: 当前opacity → 0.75, 100ms Linear
-    auto* anim = new QPropertyAnimation(this, "animOpacity");
-    anim->setStartValue(m_animOpacity);
-    anim->setEndValue(0.75);
-    anim->setDuration(100);
-    anim->setEasingCurve(QEasingCurve::Linear);
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
+    startOpacityAnim(0.75, 100, QEasingCurve::Linear);
 }
 
 /** @brief 鼠标释放：触发回弹动画(opacity→1.0, 100ms) @param event 鼠标事件 */
 void AnimatedButton::mouseReleaseEvent(QMouseEvent* event)
 {
     QPushButton::mouseReleaseEvent(event);
-    // 释放回弹: 当前opacity → 1.0, 100ms OutCubic
-    auto* anim = new QPropertyAnimation(this, "animOpacity");
-    anim->setStartValue(m_animOpacity);
-    anim->setEndValue(1.0);
-    anim->setDuration(100);
-    anim->setEasingCurve(QEasingCurve::OutCubic);
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
+    startOpacityAnim(1.0, 100, QEasingCurve::OutCubic);
 }
 
 // ---- 内部方法 ----
@@ -101,4 +77,28 @@ void AnimatedButton::ensureOpacityEffect()
         setGraphicsEffect(m_opacityEffect);
         m_opacityEffect->setOpacity(1.0);
     }
+}
+
+/** @brief 启动opacity动画，自动停止前一个动画防止并发冲突
+ *  @param targetOpacity 目标opacity值
+ *  @param durationMs 持续时间(毫秒)
+ *  @param curve 缓动曲线 */
+void AnimatedButton::startOpacityAnim(qreal targetOpacity, int durationMs, QEasingCurve curve)
+{
+    // 停止并销毁前一个动画，防止两个动画同时写同一属性导致闪烁
+    if (m_activeAnim) {
+        m_activeAnim->stop();
+        m_activeAnim->deleteLater();
+        m_activeAnim = nullptr;
+    }
+    m_activeAnim = new QPropertyAnimation(this, "animOpacity");
+    m_activeAnim->setStartValue(m_animOpacity);
+    m_activeAnim->setEndValue(targetOpacity);
+    m_activeAnim->setDuration(durationMs);
+    m_activeAnim->setEasingCurve(curve);
+    // 动画结束后自动清理指针（但不清除m_activeAnim，由deleteLater处理）
+    connect(m_activeAnim, &QPropertyAnimation::finished, this, [this]() {
+        m_activeAnim = nullptr;
+    });
+    m_activeAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }

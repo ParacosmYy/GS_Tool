@@ -149,6 +149,9 @@ void TerminalModel::clear()
  */
 void TerminalModel::setMaxLines(int max)
 {
+    // 防御性校验: maxLines必须≥1，否则physicalIndex()中%m_buffer.size()会除零崩溃
+    if (max < 1) max = 1;
+
     // 重入保护: 若 dataCleared 信号的槽函数回调 setMaxLines，
     // 直接返回，避免 m_buffer 的 resize 和 std::move 在两个调用栈中并发执行
     if (m_settingMaxLines) return;

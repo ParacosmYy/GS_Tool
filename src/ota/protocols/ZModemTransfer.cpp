@@ -287,15 +287,18 @@ QByteArray ZModemTransfer::buildBinHeader(quint8 frameType, const QByteArray& da
     payload.append(static_cast<char>((crc >> 16) & 0xFF));
     payload.append(static_cast<char>((crc >> 8) & 0xFF));
     payload.append(static_cast<char>(crc & 0xFF));
-    // ZDLE转义: 控制字符 + 帧头前8字节内的0x00
+    // ZDLE转义: 控制字符 + 前8字节载荷(type+4B data)内的0x00
+    // 使用payload字节索引而非frame.size()，避免ZDLE扩展导致索引偏移
+    int payloadIdx = 0;
     for (char b : payload) {
         quint8 c = static_cast<quint8>(b);
-        if (c == 0x00 && frame.size() < 3 + 9) {  // ZPAD+ZDLE+ZBIN32 + 9 payload bytes (type+data+CRC)
+        if (c == 0x00 && payloadIdx < 8) {  // 前8字节(type+4B data)中的NUL需要转义
             frame.append(ZDLE);
             frame.append(static_cast<char>(c ^ 0x40));
         } else {
             frame.append(escapeZdle(QByteArray(1, b)));
         }
+        ++payloadIdx;
     }
     return frame;
 }
@@ -349,7 +352,8 @@ void ZModemTransfer::sendZDATA()
 /** @brief 异步分块发送数据子包，每批最多kChunksPerTick个，防止UI冻结 */
 void ZModemTransfer::sendDataSubpackets()
 {
-    if (!m_conn) return;
+    // 取消或空闲时立即停止发送，防止CAN字节后继续发送数据
+    if (!m_conn || m_cancelled || isIdle()) return;
     sendZDATA();
     // 异步分块发送: 每次最多kChunksPerTick个子包，然后让出事件循环
     // 防止大数据传输时UI冻结和取消按钮无响应

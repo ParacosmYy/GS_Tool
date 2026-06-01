@@ -356,6 +356,13 @@ void SerialConnection::onError(QSerialPort::SerialPortError error)
     }
 
     m_state = ConnectionState::Error;
+
+    // ResourceError(设备拔出/驱动崩溃)时立即关闭端口，防止僵尸状态
+    // 后续close()调用对已关闭端口是安全的(no-op)
+    if (error == QSerialPort::ResourceError && m_serial.isOpen()) {
+        m_serial.close();
+    }
+
     emit stateChanged(m_state);
     emit errorOccurred(errorMsg);
 }

@@ -11,6 +11,7 @@
  */
 
 #include "core/MainWindow.h"
+#include "serial/BookmarkWidget.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QCloseEvent>
@@ -232,6 +233,7 @@ QWidget* MainWindow::createContentArea()
     serialLayout->addWidget(m_panelManager->frameEditor());
     serialLayout->addWidget(m_panelManager->chartWidget());
     serialLayout->addWidget(m_panelManager->otaWidget());
+    serialLayout->addWidget(m_panelManager->bookmarkWidget());
 
     // 终端布局管理器
     m_layoutManager = new TerminalLayoutManager(this);

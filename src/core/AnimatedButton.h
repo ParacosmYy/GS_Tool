@@ -24,6 +24,7 @@
 
 #include <QPushButton>
 #include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
 
 /**
  * @brief 通用动画按钮 - 为QPushButton添加hover渐变和press回弹效果
@@ -72,8 +73,12 @@ private:
     /** @brief 确保opacity特效已创建(惰性初始化) */
     void ensureOpacityEffect();
 
+    /** @brief 启动opacity动画，自动停止前一个动画防止冲突 @param targetOpacity 目标值 @param durationMs 持续时间 @param curve 缓动曲线 */
+    void startOpacityAnim(qreal targetOpacity, int durationMs, QEasingCurve curve);
+
     qreal m_animOpacity = 1.0;                ///< 当前动画opacity(0.75~1.0)
     QGraphicsOpacityEffect* m_opacityEffect = nullptr;  ///< opacity特效(由this拥有)
+    QPropertyAnimation* m_activeAnim = nullptr;         ///< 当前活跃的动画(防止并发冲突)
 };
 
 #endif // ANIMATEDBUTTON_H

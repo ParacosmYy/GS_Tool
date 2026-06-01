@@ -141,7 +141,8 @@ void SerialConfigPanel::updateStatusIndicator(const QString& state)
 /** @brief 停止连接状态呼吸动画(连接成功或失败时调用) */
 void SerialConfigPanel::stopBreathAnimation()
 {
-    if (m_breathAnim) { m_breathAnim->stop(); delete m_breathAnim; m_breathAnim = nullptr; }
+    // DeleteWhenStopped会在stop()后自动deleteLater()，不再手动delete防止双重释放
+    if (m_breathAnim) { m_breathAnim->stop(); m_breathAnim = nullptr; }
     if (auto* effect = qobject_cast<QGraphicsOpacityEffect*>(m_statusIndicator->graphicsEffect()))
         effect->setOpacity(1.0);
 }

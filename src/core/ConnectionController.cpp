@@ -358,11 +358,11 @@ void ConnectionController::onConnectionTimeout()
 
     qWarning() << "Connection timeout for" << timeoutName;
 
-    teardownConnection(tr("connection timeout"));
+    teardownConnection(tr("连接超时"));
 
         emit connectionFailed(tr("连接超时"),
                              tr("连接在 %1 秒后超时。 "
-                            "Please check the device and try again.")
+                             "请检查设备连接后重试。")
                              .arg(kConnectionTimeoutMs / 1000));
 
     // 通知 Toast: 连接超时
@@ -388,7 +388,7 @@ void ConnectionController::onPortRemoved(const QString& portName)
         emit connectionStateChanged(ConnectionState::Disconnected, portName);
         emit connectionFailed(tr("端口移除"),
                              tr("串口 %1 已断开。 "
-                                "Please reconnect the device.")
+                                "请重新连接设备。")
                                  .arg(portName));
         // 通知 Toast: 端口被物理拔出
         emit connectionError(portName, tr("端口已被物理移除"));

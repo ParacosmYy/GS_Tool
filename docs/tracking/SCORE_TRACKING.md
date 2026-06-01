@@ -47,5 +47,17 @@
 | 56 | R18: DataLogger BigEndian修复+DataExporter CSV转义+ThemeManager内存修复+TcpConnection超时+DataStatistics衰减+sendBreak+FrameVisualEditor合规 | 56 |
 | 57 | R15串口深度+自动重连指数退避(interval*2^min(attempt,4)上限30s)+连接健康监控(5s心跳connectionHealth信号)+JSON导出(exportJson+exportStreamedJson)+OTA 16MB限制+端口波特率提示 | 57 |
 | 58 | 6个P2 Bug修复+连接健康UI+safeFromUtf8(二进制安全UTF8解码)+会话摘要+Toast字体回退链+OtaWidget QPropertyAnimation滥用修复+FrameDefinition uint32_t移位UB修复+RecordingController blockSignals递归修复 | 58 |
-| 59 | 新特性评估(高级波形引擎提案通过)+BackgroundSettingsPopup重构(createControls提取)+UDP重连socket泄漏修复+ChannelConfig JSON键验证+XModemTransfer start timeout+ConnectionController健康信号增强+SerialDriverDetector驱动信息增强 | 59 |
+| 59 | 新特性评估(高级波形引擎提案通过)+BackgroundSettingsPopup重构+UDP重连socket泄漏修复+ChannelConfig JSON键验证+XModemTransfer start timeout+ConnectionController健康信号增强+SerialDriverDetector驱动信息增强 | 59 |
+| 60 | QSS死代码清理+TCP/UDP bytesWritten信号+平均速率+包计数 | 60 |
+| 61 | SendController部分写入修复(P0)+connectNetwork()信号断连修复+多文件Doxygen | 61 |
+| 62 | tr()英文字符串全面中文化(37个字符串) | 62 |
+| 63 | tr()中文化42个+@file Doxygen头补全16文件+3个头文件Doxygen重写 | 63 |
+| 64 | 方法级Doxygen补全4个cpp+15个@file头+4个tr()中文化+2个头文件Doxygen重写 | 64 |
+| 65 | 12文件80+方法Doxygen全量补全+displayMode()缺失getter修复 | 65 |
+| 66 | ChannelConfig.cpp全量方法Doxygen补全(13方法) | 66 |
+| 67 | 19文件120+方法Doxygen大规模补全(OTA协议层+终端管理层+协议桥+工具类) | 67 |
+| 68 | Doxygen全面收尾: 方法+类级+信号+成员变量文档+RingBuffer注释规范化(19文件) | 68 |
+| 69 | 文件拆分: DataExporter(582→299)+ConnectionController(564→492) | 69 |
+| 70 | 文件拆分: DataLogger(540→466)+TerminalWidget(537→406)+SerialConfigPanel(525→290) | 70 |
+| 71 | 文件拆分: ZModem(557→436)+YModem(545→323)+FrameVisualEditor(512→307) 全部≤500行达标 | 71 |
 | ... | 目标: 1000分 | 1000 |
