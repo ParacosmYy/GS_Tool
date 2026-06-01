@@ -1,3 +1,13 @@
+/**
+ * @file main.cpp
+ * @brief 应用程序入口 — 初始化Qt应用、加载翻译、创建主窗口
+ *
+ * 启动流程:
+ *   1. 创建QApplication实例
+ *   2. 加载Qt翻译(对话框等标准组件中文化)
+ *   3. 加载应用翻译(EmbedDebug自身的tr()翻译)
+ *   4. 创建MainWindow并显示
+ */
 #include <QApplication>
 #include <QTranslator>
 #include <QFileInfo>

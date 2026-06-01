@@ -1,3 +1,7 @@
+/**
+ * @file BackgroundSettingsPopup.h
+ * @brief 背景设置弹出面板 — 提供模糊/透明度/涟漪开关/自定义背景图的UI控制
+ */
 #ifndef BACKGROUNDSETTINGSPOPUP_H
 #define BACKGROUNDSETTINGSPOPUP_H
 

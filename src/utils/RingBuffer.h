@@ -1,3 +1,11 @@
+/**
+ * @file RingBuffer.h
+ * @brief 线程安全环形缓冲区模板 — 固定容量，覆盖最旧数据
+ *
+ * 模板参数T需支持默认构造和赋值操作。
+ * 内部使用QMutex保证线程安全，适用于多生产者-单消费者场景。
+ * 当缓冲区满时新数据覆盖最旧数据(覆盖策略)。
+ */
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H
 

@@ -1,3 +1,10 @@
+/**
+ * @file HexConverter.h
+ * @brief HEX编码/解码工具 — 纯函数，无状态，全局复用
+ *
+ * 提供HEX字符串与QByteArray之间的双向转换、校验和计算。
+ * 所有方法均为静态函数，无需实例化。
+ */
 #ifndef HEXCONVERTER_H
 #define HEXCONVERTER_H
 

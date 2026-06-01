@@ -1,3 +1,10 @@
+/**
+ * @file TerminalTypes.h
+ * @brief 共享终端数据类型定义 — 供TerminalModel/DataExporter/TerminalWidget共同使用
+ *
+ * 避免基础设施层(DataExporter)反向依赖表现层(TerminalModel)。
+ * 包含TerminalLine结构体和DataDirection枚举。
+ */
 #ifndef TERMINALTYPES_H
 #define TERMINALTYPES_H
 

@@ -1,3 +1,10 @@
+/**
+ * @file ChannelConfig.h
+ * @brief 通道配置管理 — JSON序列化的数据源映射和通道颜色配置
+ *
+ * 管理波形图通道的配置信息：数据源映射(协议字段→通道)、颜色、可见性等。
+ * 支持JSON序列化/反序列化，可持久化到SettingsManager。
+ */
 #ifndef CHANNELCONFIG_H
 #define CHANNELCONFIG_H
 

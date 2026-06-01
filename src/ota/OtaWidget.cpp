@@ -316,9 +316,9 @@ void OtaWidget::onTransferStats(double rateBytesPerSec, double etaSec)
 
     if (etaSec > 0) {
         qint64 etaMs = static_cast<qint64>(etaSec * 1000.0);
-        m_etaLbl->setText(tr("ETA: %1").arg(ByteFormat::formatDuration(etaMs)));
+        m_etaLbl->setText(tr("预计剩余: %1").arg(ByteFormat::formatDuration(etaMs)));
     } else {
-        m_etaLbl->setText(tr("ETA: --"));
+        m_etaLbl->setText(tr("预计剩余: --"));
     }
 }
 

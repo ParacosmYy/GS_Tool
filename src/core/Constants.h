@@ -1,3 +1,10 @@
+/**
+ * @file Constants.h
+ * @brief 全局枚举和常量定义 — 应用范围内共享的数据类型
+ *
+ * 包含连接类型(ConnectionType)、连接状态(ConnectionState)、数据方向(DataDirection)、
+ * 终端显示模式等枚举定义。所有模块通过此文件共享类型定义，避免循环依赖。
+ */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 

@@ -355,7 +355,7 @@ void YModemTransfer::handleStateSendingFinalBlock0(char ch, int& readIdx)
         m_timeoutTimer->stop();
         m_ymodemState = State::Error;
         markError();
-        emit transferError(tr("Cancelled during final handshake"));
+        emit transferError(tr("最终握手阶段被取消"));
         m_receiveBuffer.remove(0, readIdx);
         return;
     }

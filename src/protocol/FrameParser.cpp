@@ -428,7 +428,7 @@ void FrameParser::handleChecksumVerifying(unsigned char byte)
         }
     } else {
         m_errorCount++;
-        emit frameError(tr("Checksum mismatch"), m_buffer);
+        emit frameError(tr("校验和不匹配"), m_buffer);
         resetIntermediateState();
     }
 }

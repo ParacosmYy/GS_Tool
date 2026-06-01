@@ -1,6 +1,14 @@
 /**
  * @file TerminalLayoutManager.h
  * @brief 终端布局管理器 — 管理终端区域的组件布局和搜索栏动画
+ *
+ * 管理混合/左右分栏/上下分栏三种终端显示布局的切换逻辑。
+ * 将分栏逻辑从MainWindow中解耦，避免MainWindow膨胀。
+ *
+ * 布局模式:
+ *   - Mixed(混合): 搜索栏 + 主终端，所有方向数据混合显示
+ *   - LeftRight(左右分栏): 搜索栏 + Splitter(RX终端 | TX终端)
+ *   - TopBottom(上下分栏): 搜索栏 + Splitter(RX终端 / TX终端)
  */
 #ifndef TERMINALLAYOUTMANAGER_H
 #define TERMINALLAYOUTMANAGER_H
@@ -15,52 +23,92 @@ class TerminalModel;
 class TerminalSearchBar;
 class QBoxLayout;
 
-// 终端布局管理器 - 管理终端的显示布局模式
-// 封装了混合/左右分栏/上下分栏三种布局的切换逻辑
-// 将分栏逻辑从MainWindow中解耦，避免MainWindow膨胀
+/**
+ * @brief 终端布局管理器 — 管理终端的显示布局模式
+ *
+ * 封装混合/左右分栏/上下分栏三种布局的切换逻辑。
+ * 分栏模式下自动创建RX/TX专用终端，共用同一个TerminalModel。
+ *
+ * 协作关系:
+ *   - MainWindow: 创建并初始化此管理器
+ *   - TerminalWidget: 提供终端显示控件
+ *   - TerminalSearchBar: 提供搜索功能
+ *   - NavigationController: 触发布局切换
+ */
 class TerminalLayoutManager : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造函数 @param parent 父对象 */
     explicit TerminalLayoutManager(QObject* parent = nullptr);
+    /** @brief 析构函数，销毁分栏终端 */
     ~TerminalLayoutManager() override;
 
-    // 初始化: 传入主终端控件和搜索栏（混合模式下使用）
-    // 调用此方法后，manager获得这些控件的所有权管理权
+    /**
+     * @brief 初始化管理器，传入主终端控件和搜索栏
+     *
+     * 调用后管理器获得这些控件的所有权管理权。
+     * @param mainTerminal 主终端控件(混合模式下使用)
+     * @param searchBar 搜索栏(三种模式共用)
+     */
     void initialize(TerminalWidget* mainTerminal, TerminalSearchBar* searchBar);
 
-    // 设置共享的数据模型 — 分栏终端和主终端共用同一个TerminalModel
-    // 必须在initialize()之后调用
+    /**
+     * @brief 设置共享的数据模型
+     *
+     * 分栏终端和主终端共用同一个TerminalModel。
+     * 必须在initialize()之后调用。
+     * @param model 数据模型指针
+     */
     void setTerminalModel(TerminalModel* model);
 
-    // 获取终端容器widget，可嵌入到外部布局中
-    // 容器内容随布局模式变化: 混合=searchBar+terminal, 分栏=searchBar+splitter(rx+tx)
+    /**
+     * @brief 获取终端容器widget
+     *
+     * 容器内容随布局模式变化:
+     *   - 混合=searchBar+terminal
+     *   - 分栏=searchBar+splitter(rx+tx)
+     * @return 可嵌入外部布局的容器widget
+     */
     QWidget* container() const;
 
-    // 获取当前布局模式
+    /** @brief 获取当前布局模式 @return TerminalLayout枚举 */
     TerminalLayout layout() const;
 
-    // 获取当前活动的终端widget列表（用于显示模式/时间戳等批量设置）
-    // 混合模式返回1个, 分栏模式返回2个
+    /**
+     * @brief 获取当前活动的终端widget列表
+     *
+     * 用于显示模式/时间戳等批量设置。
+     * @return 混合模式1个，分栏模式2个
+     */
     QList<TerminalWidget*> terminalWidgets() const;
 
-    // 获取主终端widget（混合模式下唯一的一个, 分栏模式下为RX终端）
+    /**
+     * @brief 获取主终端widget
+     * @return 混合模式下唯一的一个，分栏模式下为RX终端
+     */
     TerminalWidget* primaryTerminal() const;
 
 signals:
-    // 布局模式变化信号，通知MainWindow更新导航树等引用
+    /** @brief 布局模式变化信号 @param newLayout 新的布局模式 */
     void layoutChanged(TerminalLayout newLayout);
 
 public slots:
-    // 切换布局模式
+    /** @brief 按索引切换布局模式 @param layoutIndex 布局索引(0=混合,1=左右,2=上下) */
     void setLayout(int layoutIndex);
+    /** @brief 切换布局模式 @param layout TerminalLayout枚举 */
     void setLayout(TerminalLayout layout);
 
 private:
-    // 创建分栏模式的RX/TX终端widget
+    /**
+     * @brief 创建分栏模式的RX/TX终端widget
+     * @param direction 数据方向(RX/TX)
+     * @param label 终端标签
+     * @return 新创建的终端widget
+     */
     TerminalWidget* createSplitTerminal(DataDirection direction, const QString& label);
 
-    // 应用当前布局: 重建容器内的widget层次
+    /** @brief 应用当前布局: 重建容器内的widget层次 */
     void applyLayout();
 
     /** @brief 应用混合布局模式(销毁分栏终端，显示主终端) */
@@ -68,23 +116,26 @@ private:
     /** @brief 应用分栏布局模式(创建RX/TX终端) */
     void applySplitLayout();
 
-    // 将当前主终端的显示设置同步到分栏终端
+    /**
+     * @brief 将主终端的显示设置同步到目标终端
+     * @param target 目标终端widget
+     */
     void syncDisplaySettings(TerminalWidget* target) const;
 
-    TerminalWidget* m_mainTerminal;      // 主终端（混合模式使用）
-    TerminalWidget* m_rxTerminal;        // 分栏RX终端（仅分栏模式创建）
-    TerminalWidget* m_txTerminal;        // 分栏TX终端（仅分栏模式创建）
-    TerminalSearchBar* m_searchBar;      // 搜索栏（三种模式共用）
-    QWidget* m_container;               // 容器widget，内含搜索栏+终端/分割器
-    QSplitter* m_splitter;              // 分栏分割器（仅分栏模式时有效）
+    TerminalWidget* m_mainTerminal;      ///< 主终端(混合模式使用)
+    TerminalWidget* m_rxTerminal;        ///< 分栏RX终端(仅分栏模式创建)
+    TerminalWidget* m_txTerminal;        ///< 分栏TX终端(仅分栏模式创建)
+    TerminalSearchBar* m_searchBar;      ///< 搜索栏(三种模式共用)
+    QWidget* m_container;               ///< 容器widget(搜索栏+终端/分割器)
+    QSplitter* m_splitter;              ///< 分栏分割器(仅分栏模式时有效)
 
-    TerminalLayout m_layout;             // 当前布局模式
-    TerminalModel* m_model;              // 共享的数据模型引用
+    TerminalLayout m_layout;             ///< 当前布局模式
+    TerminalModel* m_model;              ///< 共享的数据模型引用
 
     // 主终端的显示设置缓存，用于同步到分栏终端
-    DisplayMode m_displayMode;
-    bool m_showTimestamp;
-    bool m_showDirectionPrefix;
+    DisplayMode m_displayMode;           ///< 显示模式缓存
+    bool m_showTimestamp;                ///< 时间戳显示开关缓存
+    bool m_showDirectionPrefix;          ///< 方向前缀显示开关缓存
 };
 
 #endif // TERMINALLAYOUTMANAGER_H

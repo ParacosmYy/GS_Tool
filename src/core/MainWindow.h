@@ -1,3 +1,10 @@
+/**
+ * @file MainWindow.h
+ * @brief 主窗口 — 应用程序入口界面，组装所有面板和控制器
+ *
+ * MainWindow像嵌入式main.c一样简洁：初始化对象→组装UI→连接信号/槽。
+ * 所有业务逻辑委托给Controller/Manager类，MainWindow本身不包含业务逻辑。
+ */
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 

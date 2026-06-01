@@ -26,6 +26,7 @@ QStringList FrameVisualEditor::fieldTypeNames()
             "Int8", "Int16LE", "Int16BE", "Float", "Raw"};
 }
 
+/** @brief 根据数据类型索引返回该类型占用的字节数 @param typeIndex 类型ComboBox索引 @return 字节数(1/2/4) */
 int FrameVisualEditor::typeSizeFromIndex(int typeIndex) const
 {
     switch (typeIndex) {
@@ -40,6 +41,7 @@ int FrameVisualEditor::typeSizeFromIndex(int typeIndex) const
 // 构造与UI
 // ============================================================
 
+/** @brief 构造函数，初始化UI @param parent 父控件 */
 FrameVisualEditor::FrameVisualEditor(QWidget* parent) : QWidget(parent) { setupUI(); }
 
 /**
@@ -289,13 +291,18 @@ void FrameVisualEditor::setupConnections()
 }
 
 // ---- 空实现(预留) ----
+/** @brief 帧头变更回调(预留) */
 void FrameVisualEditor::onHeaderChanged() {}
+/** @brief 帧尾变更回调(预留) */
 void FrameVisualEditor::onFooterChanged() {}
+/** @brief 长度字段配置变更回调(预留) */
 void FrameVisualEditor::onLengthConfigChanged() {}
+/** @brief 校验配置变更回调(预留) */
 void FrameVisualEditor::onChecksumConfigChanged() {}
 
 // ---- 数据读写 ----
 
+/** @brief 返回当前编辑器中的帧定义 @return 当前FrameDefinition */
 FrameDefinition FrameVisualEditor::currentDefinition() const { return m_def; }
 
 /** @brief 从外部FrameDefinition加载到编辑器UI */
@@ -317,6 +324,7 @@ void FrameVisualEditor::setDefinition(const FrameDefinition& def)
     m_updating = false;
 }
 
+/** @brief 应用当前编辑器配置，发射definitionChanged信号 */
 void FrameVisualEditor::onApply()
 {
     rebuildDefinition();
@@ -360,6 +368,7 @@ void FrameVisualEditor::onAddField()
     m_fieldTable->setItem(row, 5, new QTableWidgetItem("1.0"));
 }
 
+/** @brief 删除当前选中行的字段 */
 void FrameVisualEditor::onRemoveField()
 {
     int row = m_fieldTable->currentRow();
@@ -369,6 +378,7 @@ void FrameVisualEditor::onRemoveField()
     }
 }
 
+/** @brief 字段表格单元格变更回调 @param row 行号 @param col 列号 */
 void FrameVisualEditor::onFieldChanged(int row, int col)
 {
     Q_UNUSED(row); Q_UNUSED(col);
@@ -457,6 +467,7 @@ void FrameVisualEditor::updateFieldTable()
  * @brief 更新二进制布局预览
  * 格式: [帧头:0-1] [温度(u16LE):2-3] [电压(u32LE):4-7] [CRC16:8-9]
  */
+/** @brief 更新二进制预览区，根据当前字段配置生成示例帧的HEX显示 */
 void FrameVisualEditor::updateBinaryPreview()
 {
     rebuildDefinition();
@@ -496,4 +507,5 @@ void FrameVisualEditor::updateBinaryPreview()
     m_previewLabel->setText(parts.isEmpty() ? tr("未定义字段") : parts.join(" "));
 }
 
+/** @brief 预览定时器回调，触发二进制预览刷新 */
 void FrameVisualEditor::onPreviewTimerTick() { updateBinaryPreview(); }

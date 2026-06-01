@@ -7,6 +7,7 @@
  */
 #include "terminal/TerminalModel.h"
 
+/** @brief 构造函数，预分配环形缓冲区容量 @param parent 父对象 */
 TerminalModel::TerminalModel(QObject* parent)
     : QObject(parent)
 {
@@ -14,6 +15,7 @@ TerminalModel::TerminalModel(QObject* parent)
     m_buffer.resize(m_maxLines);
 }
 
+/** @brief 追加接收数据到环形缓冲区 @param data 接收到的原始字节 */
 void TerminalModel::appendReceived(const QByteArray& data)
 {
     int newLineIndex;
@@ -32,6 +34,7 @@ void TerminalModel::appendReceived(const QByteArray& data)
     emit dataAppended(newLineIndex, 1);
 }
 
+/** @brief 追加发送数据到环形缓冲区 @param data 发送的原始字节 */
 void TerminalModel::appendSent(const QByteArray& data)
 {
     int newLineIndex;
@@ -50,6 +53,7 @@ void TerminalModel::appendSent(const QByteArray& data)
     emit dataAppended(newLineIndex, 1);
 }
 
+/** @brief 返回所有行的拷贝(线程安全) @return 行数据向量 */
 QVector<TerminalLine> TerminalModel::lines() const
 {
     QMutexLocker locker(&m_mutex);
@@ -62,6 +66,7 @@ QVector<TerminalLine> TerminalModel::lines() const
     return result;
 }
 
+/** @brief 返回指定范围的行拷贝(线程安全) @param start 起始行索引 @param count 请求数量 @return 行数据向量 */
 QVector<TerminalLine> TerminalModel::lines(int start, int count) const
 {
     QMutexLocker locker(&m_mutex);
@@ -101,24 +106,28 @@ TerminalLine TerminalModel::lineAt(int index) const
     return m_buffer[physicalIndex(index)];
 }
 
+/** @brief 返回当前行数(线程安全) @return 行数 */
 int TerminalModel::lineCount() const
 {
     QMutexLocker locker(&m_mutex);
     return m_count;
 }
 
+/** @brief 返回接收总字节数 @return 字节数 */
 quint64 TerminalModel::rxBytes() const
 {
     QMutexLocker locker(&m_mutex);
     return m_rxBytes;
 }
 
+/** @brief 返回发送总字节数 @return 字节数 */
 quint64 TerminalModel::txBytes() const
 {
     QMutexLocker locker(&m_mutex);
     return m_txBytes;
 }
 
+/** @brief 清空所有缓冲区数据和统计计数，发射dataCleared信号 */
 void TerminalModel::clear()
 {
     {
@@ -131,6 +140,13 @@ void TerminalModel::clear()
     emit dataCleared();
 }
 
+/**
+ * @brief 设置最大行数并重新分配缓冲区
+ *
+ * 保留最新数据（如果新容量小于当前数据量则丢弃最旧数据）。
+ * 包含重入保护：防止dataCleared信号的槽函数回调导致并发resize。
+ * @param max 新的最大行数
+ */
 void TerminalModel::setMaxLines(int max)
 {
     // 重入保护: 若 dataCleared 信号的槽函数回调 setMaxLines，
@@ -175,16 +191,25 @@ void TerminalModel::setMaxLines(int max)
     m_settingMaxLines = false;
 }
 
+/** @brief 返回最大行数 @return 最大行数 */
 int TerminalModel::maxLines() const
 {
     return m_maxLines;
 }
 
+/** @brief 将逻辑索引转换为环形缓冲区的物理索引 @param logicalIndex 逻辑索引 @return 物理索引 */
 int TerminalModel::physicalIndex(int logicalIndex) const
 {
     return (m_head + logicalIndex) % m_buffer.size();
 }
 
+/**
+ * @brief 内部追加一行到环形缓冲区(必须已持有m_mutex)
+ *
+ * 缓冲区未满时顺序写入，已满时覆盖最旧数据(head位置)。
+ * 不在此处emit信号，由调用者在释放锁后负责emit，避免持锁发信号导致死锁。
+ * @param line 行数据(右值引用，避免拷贝)
+ */
 void TerminalModel::appendLine(TerminalLine&& line)
 {
     // 必须在已持有 m_mutex 的情况下调用

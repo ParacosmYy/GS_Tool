@@ -1,3 +1,11 @@
+/**
+ * @file ChartModel.h
+ * @brief 图表数据模型 — 滑动窗口+降采样的实时波形数据管理
+ *
+ * 管理多通道波形数据的存储、滑动窗口截取和降采样显示。
+ * 支持暂停/继续、缩放、通道动态增减。
+ * 数据层：不依赖表现层，通过信号通知ChartWidget更新。
+ */
 #ifndef CHARTMODEL_H
 #define CHARTMODEL_H
 

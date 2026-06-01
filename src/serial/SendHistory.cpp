@@ -7,11 +7,20 @@
  */
 #include "serial/SendHistory.h"
 
+/** @brief 构造函数 @param parent 父对象 */
 SendHistory::SendHistory(QObject* parent)
     : QObject(parent)
 {
 }
 
+/**
+ * @brief 添加一条发送记录
+ *
+ * 空内容忽略，与最后一条相同时去重(避免连续发送同一命令导致历史刷屏)。
+ * 超过最大记录数时自动淘汰最旧条目。
+ * @param text 发送文本内容
+ * @param isHex 是否为HEX模式发送
+ */
 void SendHistory::addEntry(const QString& text, bool isHex)
 {
     // 忽略空内容
@@ -43,6 +52,7 @@ void SendHistory::addEntry(const QString& text, bool isHex)
     emit historyChanged();
 }
 
+/** @brief 获取最近count条发送文本(从新到旧) @param count 请求数量 @return 文本列表 */
 QStringList SendHistory::recentTexts(int count) const
 {
     QStringList result;
@@ -56,11 +66,13 @@ QStringList SendHistory::recentTexts(int count) const
     return result;
 }
 
+/** @brief 返回所有发送记录 @return 条目列表 */
 QList<SendEntry> SendHistory::entries() const
 {
     return m_entries;
 }
 
+/** @brief 按关键词搜索发送记录(大小写不敏感) @param keyword 搜索关键词 @return 匹配的条目列表 */
 QList<SendEntry> SendHistory::search(const QString& keyword) const
 {
     QList<SendEntry> result;
@@ -80,12 +92,19 @@ QList<SendEntry> SendHistory::search(const QString& keyword) const
     return result;
 }
 
+/** @brief 清空所有发送记录，发射historyChanged信号 */
 void SendHistory::clear()
 {
     m_entries.clear();
     emit historyChanged();
 }
 
+/**
+ * @brief 设置最大记录数
+ *
+ * 最小值为1(防止设为0)。如果当前记录数已超过新上限，裁剪掉多余的旧记录。
+ * @param max 新的最大记录数
+ */
 void SendHistory::setMaxEntries(int max)
 {
     // 限制最大记录数的最小值为1，防止设为0导致异常

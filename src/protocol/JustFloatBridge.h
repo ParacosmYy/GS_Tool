@@ -1,6 +1,20 @@
 /**
  * @file JustFloatBridge.h
  * @brief JustFloat协议桥 — VOFA+小端浮点字节流解析器接口
+ *
+ * 解析VOFA+兼容的JustFloat字节流。
+ *
+ * 协议格式:
+ *   [float1_le][float2_le]...[floatN_le][tail_marker]
+ *   其中 tail_marker = 0x00 0x00 0x80 0x7f (小端IEEE 754正NaN)
+ *
+ * 帧结构:
+ *   - 每帧由N个4字节小端float组成，紧跟4字节尾部标记
+ *   - 尾部标记是IEEE 754正NaN的小端表示: 00 00 80 7F
+ *   - 第一帧自动检测通道数量 = (帧总长度 - 4) / 4
+ *   - 通道自动命名: "CH1", "CH2", ..., "CHn"
+ *
+ * 数据层: 不依赖任何表现层类。
  */
 #ifndef JUSTFLOATBRIDGE_H
 #define JUSTFLOATBRIDGE_H
@@ -12,61 +26,67 @@
 #include <QString>
 #include <QVector>
 
-// JustFloat协议桥 -- 解析VOFA+兼容的JustFloat字节流
-//
-// 协议格式:
-//   [float1_le][float2_le]...[floatN_le][tail_marker]
-//   其中 tail_marker = 0x00 0x00 0x80 0x7f (小端IEEE 754正NaN)
-//
-// 帧结构:
-//   - 每帧由N个4字节小端float组成，紧跟4字节尾部标记
-//   - 尾部标记是IEEE 754正NaN的小端表示: 00 00 80 7F
-//   - 第一帧自动检测通道数量 = (帧总长度 - 4) / 4
-//   - 通道自动命名: "CH1", "CH2", ..., "CHn"
-//
-// 数据层: 不依赖任何表现层类
+/**
+ * @brief JustFloat协议桥 — 解析VOFA+小端浮点字节流
+ *
+ * 将4字节小端浮点数组+尾部标记的字节流解析为通道数据。
+ * 支持自动通道检测和固定通道数配置。
+ *
+ * 协作关系:
+ *   - ProtocolBridgeManager: 创建和管理此桥
+ *   - ChartModel: 接收frameParsed信号
+ */
 class JustFloatBridge : public IProtocolBridge {
     Q_OBJECT
 
 public:
+    /** @brief 构造函数 @param parent 父对象 */
     explicit JustFloatBridge(QObject* parent = nullptr);
 
-    // IProtocolBridge接口实现
+    /** @brief 喂入原始字节流 @param data 原始数据 */
     void feed(const QByteArray& data) override;
+    /** @brief 重置内部状态(清空缓冲区，保留通道配置) */
     void reset() override;
+    /** @brief 返回协议名称 @return "JustFloat" */
     QString name() const override;
 
-    // 设置固定的通道数量（跳过自动检测阶段）
-    // 如果设为0（默认），则通过第一帧自动检测通道数
+    /**
+     * @brief 设置固定的通道数量(跳过自动检测阶段)
+     * @param count 通道数量，设为0(默认)则通过第一帧自动检测
+     */
     void setFixedChannelCount(int count);
 
-    // 获取当前通道数量（自动检测后生效）
+    /** @brief 获取当前通道数量(自动检测后生效) @return 通道数 */
     int channelCount() const;
 
 private:
-    // 尝试从缓冲区中解析完整的帧
-    // 返回: 解析消耗的字节数，0表示没有完整帧
+    /**
+     * @brief 尝试从缓冲区中解析完整的帧
+     * @return 解析消耗的字节数，0表示没有完整帧
+     */
     int tryParseFrame();
 
-    // 解析一帧数据并发射frameParsed信号
-    // frameSize: 帧总字节数（含尾部标记）
+    /**
+     * @brief 解析一帧数据并发射frameParsed信号
+     * @param frameSize 帧总字节数(含尾部标记)
+     */
     void parseAndEmit(int frameSize);
 
-    // 自动检测通道数量（根据第一帧的大小推算）
-    // floatPayloadSize: 去掉尾部标记后的float数据字节数
+    /**
+     * @brief 自动检测通道数量(根据第一帧的大小推算)
+     * @param floatPayloadSize 去掉尾部标记后的float数据字节数
+     */
     void autoDetectChannels(int floatPayloadSize);
 
-    QByteArray m_buffer;            // 累积的原始字节缓冲区
+    QByteArray m_buffer;            ///< 累积的原始字节缓冲区
+    int m_channelCount;             ///< 通道数量(0=尚未检测)
+    bool m_channelsDetected;        ///< 是否已完成通道检测
 
-    int m_channelCount;             // 通道数量（0=尚未检测）
-    bool m_channelsDetected;        // 是否已完成通道检测
-
-    // JustFloat尾部标记: 00 00 80 7F（小端IEEE 754正NaN）
-    static constexpr unsigned char kTailMarker[4] = {0x00, 0x00, 0x80, 0x7F};
-    static constexpr int kTailSize = 4;              // 尾部标记长度
-    static constexpr int kFloatSize = 4;             // 单个float长度
-    static constexpr int kMaxBufferSize = 4096;      // 最大缓冲区保护
-    static constexpr int kMaxChannels = 32;          // 最大通道数保护
+    static constexpr unsigned char kTailMarker[4] = {0x00, 0x00, 0x80, 0x7F}; ///< 尾部标记
+    static constexpr int kTailSize = 4;             ///< 尾部标记长度
+    static constexpr int kFloatSize = 4;            ///< 单个float长度
+    static constexpr int kMaxBufferSize = 4096;     ///< 最大缓冲区保护
+    static constexpr int kMaxChannels = 32;         ///< 最大通道数保护
 };
 
 #endif // JUSTFLOATBRIDGE_H

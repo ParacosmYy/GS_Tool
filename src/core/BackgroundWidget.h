@@ -1,3 +1,9 @@
+/**
+ * @file BackgroundWidget.h
+ * @brief 背景层控件 — 提供自定义背景图、磨砂玻璃模糊、透明度调节和点击涟漪特效
+ *
+ * 作为MainWindow的中央部件(centralWidget)，承载所有面板的底层背景。
+ */
 #ifndef BACKGROUNDWIDGET_H
 #define BACKGROUNDWIDGET_H
 
