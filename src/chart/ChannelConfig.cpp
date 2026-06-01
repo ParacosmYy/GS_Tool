@@ -18,6 +18,7 @@
 // ChannelConfig 实现
 // ============================================================
 
+/** @brief 计算通道值(Direct模式取字段值, Combine模式执行四则运算, 最终应用线性变换) @param fields 帧字段映射 @return 计算结果，字段缺失/计算失败返回NaN */
 double ChannelConfig::compute(const QVariantMap& fields) const
 {
     // 禁用的通道不参与计算
@@ -75,6 +76,7 @@ double ChannelConfig::compute(const QVariantMap& fields) const
     return scale * rawValue + offset;
 }
 
+/** @brief 检查通道是否能从给定字段中计算值 @param fields 帧字段映射 @return true=字段齐全可计算 */
 bool ChannelConfig::canCompute(const QVariantMap& fields) const
 {
     if (!enabled) {
@@ -89,6 +91,7 @@ bool ChannelConfig::canCompute(const QVariantMap& fields) const
     }
 }
 
+/** @brief 序列化通道配置为JSON对象 @return QJsonObject */
 QJsonObject ChannelConfig::toJson() const
 {
     QJsonObject obj;
@@ -110,6 +113,7 @@ QJsonObject ChannelConfig::toJson() const
     return obj;
 }
 
+/** @brief 从JSON对象反序列化通道配置(含枚举范围校验) @param obj JSON对象 @return ChannelConfig */
 ChannelConfig ChannelConfig::fromJson(const QJsonObject& obj)
 {
     ChannelConfig cfg;
@@ -140,11 +144,13 @@ ChannelConfig ChannelConfig::fromJson(const QJsonObject& obj)
 // ChannelConfigSet 实现
 // ============================================================
 
+/** @brief 添加通道配置到集合 */
 void ChannelConfigSet::addChannel(const ChannelConfig& config)
 {
     m_channels.append(config);
 }
 
+/** @brief 按displayName移除通道 @param displayName 通道显示名 */
 void ChannelConfigSet::removeChannel(const QString& displayName)
 {
     for (int i = 0; i < m_channels.size(); ++i) {
@@ -155,11 +161,13 @@ void ChannelConfigSet::removeChannel(const QString& displayName)
     }
 }
 
+/** @brief 返回通道列表(只读引用) @return 通道配置向量 */
 const QVector<ChannelConfig>& ChannelConfigSet::channels() const
 {
     return m_channels;
 }
 
+/** @brief 按名称查找通道(可修改) @param displayName 通道显示名 @return 通道指针，未找到返回nullptr */
 ChannelConfig* ChannelConfigSet::findChannel(const QString& displayName)
 {
     for (auto& cfg : m_channels) {
@@ -170,6 +178,7 @@ ChannelConfig* ChannelConfigSet::findChannel(const QString& displayName)
     return nullptr;
 }
 
+/** @brief 按名称查找通道(只读) @param displayName 通道显示名 @return 通道const指针，未找到返回nullptr */
 const ChannelConfig* ChannelConfigSet::findChannel(const QString& displayName) const
 {
     for (const auto& cfg : m_channels) {
@@ -180,6 +189,7 @@ const ChannelConfig* ChannelConfigSet::findChannel(const QString& displayName) c
     return nullptr;
 }
 
+/** @brief 计算所有启用通道的值(跳过禁用/字段缺失/NaN) @param fields 帧字段映射 @return 通道名→计算值映射 */
 QMap<QString, double> ChannelConfigSet::computeAll(const QVariantMap& fields) const
 {
     QMap<QString, double> result;
@@ -204,6 +214,7 @@ QMap<QString, double> ChannelConfigSet::computeAll(const QVariantMap& fields) co
     return result;
 }
 
+/** @brief 序列化通道集合为JSON对象 @return QJsonObject */
 QJsonObject ChannelConfigSet::toJson() const
 {
     QJsonArray channelsArr;
@@ -216,6 +227,7 @@ QJsonObject ChannelConfigSet::toJson() const
     return obj;
 }
 
+/** @brief 从JSON对象反序列化通道集合 @param obj JSON对象 @return ChannelConfigSet */
 ChannelConfigSet ChannelConfigSet::fromJson(const QJsonObject& obj)
 {
     ChannelConfigSet set;
@@ -228,6 +240,7 @@ ChannelConfigSet ChannelConfigSet::fromJson(const QJsonObject& obj)
     return set;
 }
 
+/** @brief 根据帧字段定义生成默认通道配置(自动分配颜色，跳过Raw类型字段) @param fields 帧字段定义列表 @return 默认ChannelConfigSet */
 ChannelConfigSet ChannelConfigSet::generateDefaults(const QVector<FieldDef>& fields)
 {
     ChannelConfigSet set;
