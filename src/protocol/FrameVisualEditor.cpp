@@ -157,7 +157,7 @@ void FrameVisualEditor::onAddField()
     // 字节序ComboBox(LE/BE/-)
     auto* endianCombo = new QComboBox;
     endianCombo->setObjectName("fieldEndianCombo");  // QSS 选择器需要
-    endianCombo->addItems({"LE", "BE", "-"});
+    endianCombo->addItems({tr("LE"), tr("BE"), tr("-")});
     endianCombo->setToolTip(tr("字节序: LE=小端, BE=大端, -=不适用"));
     m_fieldTable->setCellWidget(row, 4, endianCombo);
 
@@ -249,7 +249,7 @@ void FrameVisualEditor::updateFieldTable()
 
         auto* endianCombo = new QComboBox;
         endianCombo->setObjectName("fieldEndianCombo");  // QSS 选择器需要
-        endianCombo->addItems({"LE", "BE", "-"});
+        endianCombo->addItems({tr("LE"), tr("BE"), tr("-")});
         bool isBE = (field.type == FieldDef::UInt16BE || field.type == FieldDef::Int16BE);
         bool noEnd = (field.type == FieldDef::UInt8 || field.type == FieldDef::Int8 ||
                       field.type == FieldDef::Float || field.type == FieldDef::Raw);

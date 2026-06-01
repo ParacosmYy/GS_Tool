@@ -71,6 +71,8 @@ protected:
     static constexpr char CAN = 0x18;       ///< 取消传输
     static constexpr char CRC_CHAR = 'C';   ///< CRC模式请求
     static constexpr qint64 kMaxFileSize = 16 * 1024 * 1024; ///< 文件大小上限(16MB, 覆盖STM32H7等大Flash)
+    static constexpr int kMaxBlockRetries = 10;       ///< 每阶段/每块最大重试次数
+    static constexpr int kStartTimeoutMultiplier = 3; ///< 启动等待阶段超时倍率(×N倍单次超时)
 
     // === 纯虚钩子 ===
     /** @brief start()的协议特有初始化 @return true=成功 */

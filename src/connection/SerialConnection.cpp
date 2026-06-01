@@ -165,10 +165,12 @@ QString SerialConnection::portName() const
     return m_portName;
 }
 
-/** @brief 设置波特率 */
+/** @brief 设置波特率 — 检查返回值，失败时输出警告 */
 void SerialConnection::setBaudRate(qint32 baud)
 {
-    m_serial.setBaudRate(baud);
+    if (!m_serial.setBaudRate(baud)) {
+        qWarning() << "设置波特率失败, baud=" << baud;
+    }
 }
 
 /** @brief 获取当前波特率 */
@@ -177,10 +179,12 @@ qint32 SerialConnection::baudRate() const
     return m_serial.baudRate();
 }
 
-/** @brief 设置数据位 */
+/** @brief 设置数据位 — 检查返回值，失败时输出警告 */
 void SerialConnection::setDataBits(QSerialPort::DataBits bits)
 {
-    m_serial.setDataBits(bits);
+    if (!m_serial.setDataBits(bits)) {
+        qWarning() << "设置数据位失败, bits=" << bits;
+    }
 }
 
 /** @brief 获取当前数据位 */
@@ -189,10 +193,12 @@ QSerialPort::DataBits SerialConnection::dataBits() const
     return m_serial.dataBits();
 }
 
-/** @brief 设置校验模式 */
+/** @brief 设置校验模式 — 检查返回值，失败时输出警告 */
 void SerialConnection::setParity(QSerialPort::Parity parity)
 {
-    m_serial.setParity(parity);
+    if (!m_serial.setParity(parity)) {
+        qWarning() << "设置校验模式失败, parity=" << parity;
+    }
 }
 
 /** @brief 获取当前校验模式 */
@@ -201,10 +207,12 @@ QSerialPort::Parity SerialConnection::parity() const
     return m_serial.parity();
 }
 
-/** @brief 设置停止位 */
+/** @brief 设置停止位 — 检查返回值，失败时输出警告 */
 void SerialConnection::setStopBits(QSerialPort::StopBits bits)
 {
-    m_serial.setStopBits(bits);
+    if (!m_serial.setStopBits(bits)) {
+        qWarning() << "设置停止位失败, bits=" << bits;
+    }
 }
 
 /** @brief 获取当前停止位 */
@@ -213,10 +221,12 @@ QSerialPort::StopBits SerialConnection::stopBits() const
     return m_serial.stopBits();
 }
 
-/** @brief 设置流控模式 */
+/** @brief 设置流控模式 — 检查返回值，失败时输出警告 */
 void SerialConnection::setFlowControl(QSerialPort::FlowControl control)
 {
-    m_serial.setFlowControl(control);
+    if (!m_serial.setFlowControl(control)) {
+        qWarning() << "设置流控模式失败, control=" << control;
+    }
 }
 
 /** @brief 获取当前流控模式 */

@@ -9,6 +9,7 @@
  */
 
 #include "connection/TcpConnection.h"
+#include "core/Constants.h"
 #include <QNetworkInterface>
 
 /** @brief 构造TCP连接(初始化QTcpSocket) @param parent 父对象 */
@@ -87,7 +88,7 @@ bool TcpConnection::open()
                 }
             });
         }
-        m_connectTimer->start(10000);
+        m_connectTimer->start(Timers::kConnectTimeoutMs);
 
         // 异步连接，不等待结果
         return true;

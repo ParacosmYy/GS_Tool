@@ -100,7 +100,7 @@ QToolButton {
     background-color: transparent;
     color: #1f2937;
     border: 1px solid transparent;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     font-size: 13px;
 }
@@ -131,7 +131,7 @@ QLineEdit {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 6px;
     font-family: "Consolas", "Courier New", monospace;
     font-size: 13px;
@@ -156,7 +156,7 @@ QPushButton {
     background-color: #f3f4f6;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 6px 16px;
     font-size: 13px;
 }
@@ -180,7 +180,7 @@ QPushButton#sendButton {
     background-color: #3b82f6;
     color: #ffffff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 6px 16px;
     font-size: 13px;
     font-weight: bold;
@@ -201,7 +201,7 @@ QPushButton#applyDefBtn {
     background-color: #3b82f6;
     color: #ffffff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: bold;
 }
 QPushButton#applyDefBtn:hover { background-color: #2563eb; }
@@ -237,7 +237,7 @@ QPushButton#quickCmdEditBtn {
     background-color: #f3f4f6;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -249,7 +249,7 @@ QPushButton#quickCmdAddBtn {
     background-color: #f3f4f6;
     color: #3b82f6;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 16px;
     font-weight: bold;
 }
@@ -262,7 +262,7 @@ QPushButton[quickCmdBtn="true"] {
     background-color: #f3f4f6;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -275,7 +275,7 @@ QComboBox {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     font-size: 13px;
 }
@@ -328,7 +328,7 @@ QSpinBox {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px;
     font-size: 13px;
 }
@@ -358,7 +358,7 @@ QCheckBox::indicator {
     width: 16px;
     height: 16px;
     border: 1px solid #d1d5db;
-    border-radius: 3px;
+    border-radius: 6px;
     background-color: #ffffff;
 }
 
@@ -405,7 +405,7 @@ QPushButton#otaStartBtn {
     background-color: #3b82f6;
     color: #ffffff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: bold;
 }
 QPushButton#otaStartBtn:hover { background-color: #2563eb; }
@@ -416,7 +416,7 @@ QPushButton#otaCancelBtn {
     background-color: transparent;
     color: #ef4444;
     border: 1px solid #ef4444;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 QPushButton#otaCancelBtn:hover { background-color: rgba(239,68,68,0.1); }
 QPushButton#otaCancelBtn:pressed { background-color: rgba(239,68,68,0.2); }
@@ -425,13 +425,13 @@ QPushButton#otaCancelBtn:disabled { color: #d1d5db; border-color: #d1d5db; }
 QProgressBar#otaProgress {
     background-color: #f3f4f6;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     text-align: center;
     color: #374151;
 }
 QProgressBar#otaProgress::chunk {
     background-color: #3b82f6;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 QTextEdit#otaLogView {
@@ -458,7 +458,7 @@ QPushButton#otaBrowseBtn {
     background-color: #f3f4f6;
     color: #3b82f6;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 6px 12px;
     font-size: 13px;
 }
@@ -490,7 +490,7 @@ QPushButton#otaClearHistory {
     background-color: transparent;
     color: #9ca3af;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 2px 8px;
 }
 QPushButton#otaClearHistory:hover { color: #ef4444; border-color: #ef4444; }
@@ -502,7 +502,7 @@ QPushButton#connectBtn {
     background-color: #22c55e;
     color: #ffffff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: bold;
     font-size: 14px;
 }
@@ -531,7 +531,7 @@ QPushButton#connectBtn[state="error"]:pressed { background-color: #dc2626; }
 QPushButton#breakBtn {
     background-color: transparent;
     border: 1px solid #f97316;
-    border-radius: 4px;
+    border-radius: 6px;
     color: #f97316;
     padding: 4px 10px;
     font-size: 11px;
@@ -560,7 +560,7 @@ QLabel#driverInfoLbl {
 QPushButton#refreshBtn {
     background-color: transparent;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     color: #6b7280;
     padding: 4px 12px;
     font-size: 12px;
@@ -581,7 +581,7 @@ QPushButton#refreshBtn:disabled {
 /* DTR/RTS 信号切换按钮 - 绿色=HIGH, 灰色=LOW */
 QPushButton#dtrBtn, QPushButton#rtsBtn {
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
     font-weight: bold;
@@ -650,7 +650,7 @@ QFrame#sendBarFrame {
 QComboBox#sendModeCombo, QComboBox#newlineCombo {
     background-color: #ffffff;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     color: #111827;
     font-size: 12px;
@@ -672,7 +672,7 @@ QComboBox#sendModeCombo::drop-down, QComboBox#newlineCombo::drop-down {
 QComboBox#displayModeCombo {
     background-color: #ffffff;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     color: #111827;
     font-size: 12px;
@@ -761,7 +761,7 @@ QLineEdit#searchBarInput {
     background: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     selection-background-color: #3b82f6;
 }
@@ -770,7 +770,7 @@ QLineEdit#searchBarInput[hasError="true"] {
     background: #ffffff;
     color: #1f2937;
     border: 2px solid #ef4444;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
 }
 
@@ -797,7 +797,7 @@ QLabel#searchBarResult[hasError="true"] { color: #ef4444; padding: 0 4px; }
 
 QPushButton#searchBarCloseBtn {
     background: #e5e7eb; color: #374151;
-    border: none; border-radius: 4px; font-weight: bold;
+    border: none; border-radius: 6px; font-weight: bold;
 }
 QPushButton#searchBarCloseBtn:hover { background: #3b82f6; color: #ffffff; }
 QPushButton#searchBarCloseBtn:pressed { background: #2563eb; color: #ffffff; }
@@ -821,7 +821,7 @@ QPushButton#protocolExportBtn {
     background-color: transparent;
     color: #374151;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -910,7 +910,7 @@ QPushButton#frameAddFieldBtn {
     background-color: #ffffff;
     color: #3b82f6;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -922,7 +922,7 @@ QPushButton#frameRemoveFieldBtn {
     background-color: #ffffff;
     color: #ef4444;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -935,7 +935,7 @@ QPushButton#frameMoveDownBtn {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -1012,7 +1012,7 @@ QPushButton#bgSelectImageBtn {
     background-color: #f3f4f6;
     color: #3b82f6;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 6px 12px;
     font-size: 12px;
 }
@@ -1024,7 +1024,7 @@ QPushButton#bgResetBtn {
     background-color: transparent;
     color: #9ca3af;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 6px 12px;
     font-size: 12px;
 }
@@ -1043,7 +1043,7 @@ QScrollBar:vertical {
 QScrollBar::handle:vertical {
     background: #d1d5db;
     min-height: 30px;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 QScrollBar::handle:vertical:hover {
     background: #9ca3af;
@@ -1064,7 +1064,7 @@ QScrollBar:horizontal {
 QScrollBar::handle:horizontal {
     background: #d1d5db;
     min-width: 30px;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 QScrollBar::handle:horizontal:hover {
     background: #9ca3af;
@@ -1168,7 +1168,7 @@ QComboBox#themeCombo,
 QComboBox#langCombo {
     background-color: #f3f4f6;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     color: #1f2937;
     font-size: 12px;
@@ -1205,7 +1205,7 @@ QPushButton#chartPauseBtn {
     background-color: #f3f4f6;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 3px 10px;
     font-size: 12px;
 }
@@ -1224,7 +1224,7 @@ QPushButton#chartClearBtn {
     background-color: #f3f4f6;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 3px 10px;
     font-size: 12px;
 }
@@ -1236,7 +1236,7 @@ QPushButton#chartClearBtn:disabled { background-color: #f3f4f6; color: #9ca3af; 
 QComboBox#chartWindowCombo {
     background-color: #ffffff;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 3px 8px;
     color: #1f2937;
     font-size: 12px;
@@ -1274,7 +1274,7 @@ QPushButton#quickCmdAddRowBtn {
     background-color: #f3f4f6;
     color: #3b82f6;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -1286,7 +1286,7 @@ QPushButton#quickCmdDelRowBtn {
     background-color: #f3f4f6;
     color: #ef4444;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -1334,7 +1334,7 @@ QPushButton#bookmarkAddBtn {
     background-color: #3b82f6;
     color: #ffffff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
     font-weight: bold;
@@ -1348,7 +1348,7 @@ QPushButton#bookmarkRemoveBtn {
     background-color: #f3f4f6;
     color: #374151;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -1361,7 +1361,7 @@ QPushButton#bookmarkClearBtn {
     background-color: transparent;
     color: #9ca3af;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 12px;
     font-size: 12px;
 }
@@ -1381,7 +1381,7 @@ QLineEdit#bookmarkLabelInput {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 6px;
     font-size: 13px;
 }
@@ -1424,7 +1424,7 @@ QPushButton#toastCloseBtn {
     background-color: transparent;
     color: #6b7280;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 2px 6px;
     font-size: 14px;
     font-weight: bold;
@@ -1535,7 +1535,7 @@ QLineEdit#otaFileLabel {
     background-color: #ffffff;
     color: #6b7280;
     border: 1px solid #e5e7eb;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     font-size: 12px;
 }
@@ -1543,7 +1543,7 @@ QComboBox#otaProtocolCombo {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     font-size: 12px;
 }
@@ -1560,7 +1560,7 @@ QLineEdit#frameFooterEdit {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     font-family: Consolas, "Courier New", monospace;
     font-size: 12px;
@@ -1576,7 +1576,7 @@ QSpinBox#frameLengthAdjustSpin {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 2px 4px;
     font-size: 12px;
 }
@@ -1585,7 +1585,7 @@ QComboBox#frameChecksumTypeCombo {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 2px 6px;
     font-size: 12px;
 }
@@ -1600,7 +1600,7 @@ QComboBox#fieldEndianCombo {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 2px 4px;
     font-size: 12px;
 }
@@ -1626,7 +1626,7 @@ QComboBox#flowControlCombo {
     background-color: #ffffff;
     color: #1f2937;
     border: 1px solid #d1d5db;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 8px;
     font-size: 13px;
 }

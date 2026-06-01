@@ -76,7 +76,7 @@ void TerminalController::setMainTerminal(QWidget* terminal)
 /** @brief 启动统计刷新定时器（每 500ms 触发一次） */
 void TerminalController::startStatsTimer()
 {
-    m_statsTimer->setInterval(500);
+    m_statsTimer->setInterval(Timers::kStatsRefreshMs);
     connect(m_statsTimer, &QTimer::timeout, this, &TerminalController::updateDataStatistics);
     m_statsTimer->start();
 }

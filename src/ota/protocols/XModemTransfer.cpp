@@ -117,7 +117,7 @@ bool XModemTransfer::onStartInit()
 
     // 等待接收方发送启动信号(NAK=Checksum模式, C=CRC模式)
     m_xmodemState = State::WaitingForStart;
-    m_timeoutTimer->start(m_timeoutMs * 3);
+    m_timeoutTimer->start(m_timeoutMs * kStartTimeoutMultiplier);
     return true;
 }
 
@@ -134,7 +134,7 @@ void XModemTransfer::handleTimeout()
 {
     if (m_xmodemState == State::SendingBlock) {
         m_blockRetryCount++;
-        if (m_blockRetryCount > 10) {
+        if (m_blockRetryCount > kMaxBlockRetries) {
             // 单块重试10次失败，发送CAN取消传输
             sendCancelBytes();
             m_xmodemState = State::Error;
@@ -150,7 +150,7 @@ void XModemTransfer::handleTimeout()
         m_timeoutTimer->start(m_timeoutMs);
     } else if (m_xmodemState == State::SendingEOT) {
         m_blockRetryCount++;
-        if (m_blockRetryCount > 10) {
+        if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_xmodemState = State::Error;
             markError();
@@ -161,7 +161,7 @@ void XModemTransfer::handleTimeout()
         m_timeoutTimer->start(m_timeoutMs);
     } else if (m_xmodemState == State::WaitingForStart) {
         // 等待启动信号时使用较长超时
-        m_timeoutTimer->start(m_timeoutMs * 3);
+        m_timeoutTimer->start(m_timeoutMs * kStartTimeoutMultiplier);
     }
 }
 
@@ -280,7 +280,7 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
         // 块被拒绝(CRC/校验和错误)，重发当前块
         m_timeoutTimer->stop();
         m_blockRetryCount++;
-        if (m_blockRetryCount > 10) {
+        if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_xmodemState = State::Error;
             markError();
@@ -322,7 +322,7 @@ void XModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
     } else if (ch == NAK) {
         m_timeoutTimer->stop();
         m_blockRetryCount++;
-        if (m_blockRetryCount > 10) {
+        if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_xmodemState = State::Error;
             markError();

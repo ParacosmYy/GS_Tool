@@ -9,6 +9,7 @@
  */
 
 #include "serial/SerialConfigPanel.h"
+#include "core/Constants.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -85,7 +86,7 @@ void SerialConfigPanel::setError(const QString& errorMsg)
     m_statusIndicator->setToolTip(tr("连接错误: ") + errorMsg);
 
     // 3秒后自动恢复为正常断开状态
-    QTimer::singleShot(3000, this, [this]() {
+    QTimer::singleShot(Timers::kConnectFailedDisplayMs, this, [this]() {
         if (!m_connected && !m_connecting) {
             m_connectBtn->setText(tr("连接"));
             m_connectBtn->setProperty("state", "");

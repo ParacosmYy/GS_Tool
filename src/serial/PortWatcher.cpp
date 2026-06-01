@@ -12,6 +12,7 @@
  */
 
 #include "serial/PortWatcher.h"
+#include "core/Constants.h"
 #include <QSerialPortInfo>
 #include <algorithm>
 
@@ -25,7 +26,7 @@ PortWatcher::PortWatcher(QObject* parent)
     : QObject(parent)
     , m_timer(new QTimer(this))
 {
-    m_timer->setInterval(2000);
+    m_timer->setInterval(Timers::kPortPollMs);
 
     // 连接定时器超时到轮询处理函数
     connect(m_timer, &QTimer::timeout, this, &PortWatcher::onTimeout);

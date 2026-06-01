@@ -6,6 +6,7 @@
  * 实时统计显示。使用ByteFormat进行字节格式化。
  */
 #include "serial/DataStatistics.h"
+#include "core/Constants.h"
 #include "utils/ByteFormat.h"
 
 #include <QFormLayout>
@@ -22,7 +23,7 @@ DataStatistics::DataStatistics(QWidget* parent)
     // 启动1秒定时器，用于刷新速率显示和持续时间
     connect(&m_refreshTimer, &QTimer::timeout,
             this, &DataStatistics::onRefreshTimer);
-    m_refreshTimer.setInterval(1000);
+    m_refreshTimer.setInterval(Timers::kDataStatsRefreshMs);
 
     // 启动采样间隔计时器（用于计算精确速率）
     m_sampleTimer.start();
@@ -134,13 +135,13 @@ void DataStatistics::reset()
     m_overrunErrors = 0;
 
     // 重置UI显示
-    m_rxTotalLabel->setText("0 B");
-    m_txTotalLabel->setText("0 B");
-    m_rxRateLabel->setText("0 B/s");
-    m_txRateLabel->setText("0 B/s");
-    m_peakRateLabel->setText("0 B/s");
-    m_avgRateLabel->setText("0 B/s");
-    m_elapsedLabel->setText("00:00:00");
+    m_rxTotalLabel->setText(tr("0 B"));
+    m_txTotalLabel->setText(tr("0 B"));
+    m_rxRateLabel->setText(tr("0 B/s"));
+    m_txRateLabel->setText(tr("0 B/s"));
+    m_peakRateLabel->setText(tr("0 B/s"));
+    m_avgRateLabel->setText(tr("0 B/s"));
+    m_elapsedLabel->setText(tr("00:00:00"));
     m_errorLabel->hide();
     m_healthLabel->hide();
 

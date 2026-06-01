@@ -69,7 +69,7 @@ bool YModemTransfer::onStartInit()
     }
     // YMODEM启动: 等待接收方发送C(CRC模式)
     m_ymodemState = State::WaitingStart;
-    m_timeoutTimer->start(m_timeoutMs * 3);
+    m_timeoutTimer->start(m_timeoutMs * kStartTimeoutMultiplier);
     return true;
 }
 
@@ -87,7 +87,7 @@ void YModemTransfer::handleTimeout()
     // 超时重发当前状态，每个阶段独立重试计数(最多10次)
     switch (m_ymodemState) {
     case State::WaitingStart:
-        m_timeoutTimer->start(m_timeoutMs * 3);
+        m_timeoutTimer->start(m_timeoutMs * kStartTimeoutMultiplier);
         return;
     case State::WaitBlock0Ack:
     case State::WaitFinalC:
@@ -99,7 +99,7 @@ void YModemTransfer::handleTimeout()
 
     // 有重试上限的状态统一处理
     m_blockRetryCount++;
-    if (m_blockRetryCount > 10) {
+    if (m_blockRetryCount > kMaxBlockRetries) {
         sendCancelBytes();
         m_ymodemState = State::Error;
         markError();

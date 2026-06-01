@@ -68,12 +68,12 @@ QGroupBox* FrameVisualEditor::setupHeaderGroup()
     auto* layout = new QFormLayout(group);
     m_headerEdit = new QLineEdit;
     m_headerEdit->setObjectName("frameHeaderEdit");
-    m_headerEdit->setPlaceholderText("AA 55");
+    m_headerEdit->setPlaceholderText(tr("AA 55"));
     m_headerEdit->setToolTip(tr("帧头HEX字节，如 AA 55"));
     layout->addRow(tr("帧头:"), m_headerEdit);
     m_footerEdit = new QLineEdit;
     m_footerEdit->setObjectName("frameFooterEdit");
-    m_footerEdit->setPlaceholderText("0D 0A");
+    m_footerEdit->setPlaceholderText(tr("0D 0A"));
     m_footerEdit->setToolTip(tr("帧尾HEX字节（可选）"));
     layout->addRow(tr("帧尾:"), m_footerEdit);
     return group;
@@ -96,7 +96,7 @@ QGroupBox* FrameVisualEditor::setupLengthGroup()
     layout->addRow(tr("偏移:"), m_lengthOffsetSpin);
     m_lengthSizeCombo = new QComboBox;
     m_lengthSizeCombo->setObjectName("frameLengthSizeCombo");
-    m_lengthSizeCombo->addItems({"1 byte", "2 bytes"});
+    m_lengthSizeCombo->addItems({tr("1 byte"), tr("2 bytes")});
     layout->addRow(tr("大小:"), m_lengthSizeCombo);
     m_lengthBEndianCheck = new QCheckBox(tr("大端序"));
     m_lengthBEndianCheck->setObjectName("frameLengthEndianCheck");
@@ -121,7 +121,7 @@ QGroupBox* FrameVisualEditor::setupChecksumGroup()
     auto* layout = new QFormLayout(group);
     m_checksumTypeCombo = new QComboBox;
     m_checksumTypeCombo->setObjectName("frameChecksumTypeCombo");
-    m_checksumTypeCombo->addItems({tr("无校验"), "Sum8", "CRC8", "CRC16-CCITT", "CRC16-Modbus", "CRC32"});
+    m_checksumTypeCombo->addItems({tr("无校验"), tr("Sum8"), tr("CRC8"), tr("CRC16-CCITT"), tr("CRC16-Modbus"), tr("CRC32")});
     layout->addRow(tr("类型:"), m_checksumTypeCombo);
     m_checksumOffsetSpin = new QSpinBox;
     m_checksumOffsetSpin->setObjectName("frameChecksumOffsetSpin");

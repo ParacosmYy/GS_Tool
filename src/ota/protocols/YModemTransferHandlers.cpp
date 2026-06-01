@@ -36,7 +36,7 @@ void YModemTransfer::handleStateSendingBlock0(char ch, int& readIdx)
         m_blockRetryCount = 0;
         m_blockNumber = 1;
         // 重启超时定时器，防止接收方ACK后不发'C'导致无限挂起
-        m_timeoutTimer->start(m_timeoutMs * 3);
+        m_timeoutTimer->start(m_timeoutMs * kStartTimeoutMultiplier);
     } else if (ch == CRC_CHAR) {
         // 接收方ACK后立即发C，开始数据传输
         m_timeoutTimer->stop();
@@ -50,7 +50,7 @@ void YModemTransfer::handleStateSendingBlock0(char ch, int& readIdx)
         // Block 0被拒绝，重发
         m_timeoutTimer->stop();
         m_blockRetryCount++;
-        if (m_blockRetryCount > 10) {
+        if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_ymodemState = State::Error;
             markError();
@@ -97,7 +97,7 @@ void YModemTransfer::handleStateSendingData(char ch, int& readIdx)
     } else if (ch == NAK) {
         m_timeoutTimer->stop();
         m_blockRetryCount++;
-        if (m_blockRetryCount > 10) {
+        if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_ymodemState = State::Error;
             markError();
@@ -134,16 +134,16 @@ void YModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
         if (m_fileIndex < m_filePaths.size()) {
             // 批量传输: 等待下一个文件的C/NAK
             m_ymodemState = State::WaitBlock0Ack;
-            m_timeoutTimer->start(m_timeoutMs * 3);
+            m_timeoutTimer->start(m_timeoutMs * kStartTimeoutMultiplier);
         } else {
             // 所有文件传输完成: 等待最终C发送空Block 0
             m_ymodemState = State::WaitFinalC;
-            m_timeoutTimer->start(m_timeoutMs * 3);
+            m_timeoutTimer->start(m_timeoutMs * kStartTimeoutMultiplier);
         }
     } else if (ch == NAK) {
         m_timeoutTimer->stop();
         m_blockRetryCount++;
-        if (m_blockRetryCount > 10) {
+        if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_ymodemState = State::Error;
             markError();
@@ -210,7 +210,7 @@ void YModemTransfer::handleStateSendingFinalBlock0(char ch, int& readIdx)
     } else if (ch == NAK) {
         m_timeoutTimer->stop();
         m_blockRetryCount++;
-        if (m_blockRetryCount > 10) {
+        if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_ymodemState = State::Error;
             markError();

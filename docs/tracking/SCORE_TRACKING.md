@@ -60,4 +60,6 @@
 | 69 | 文件拆分: DataExporter(582→299)+ConnectionController(564→492) | 69 |
 | 70 | 文件拆分: DataLogger(540→466)+TerminalWidget(537→406)+SerialConfigPanel(525→290) | 70 |
 | 71 | 文件拆分: ZModem(557→436)+YModem(545→323)+FrameVisualEditor(512→307) 全部≤500行达标 | 71 |
+| 72 | Bug修复冲刺: 4P0+5P1+2P2共11个Bug修复(ZModem CRC/取消/除零/布局/信号/端口/动画) | 72 |
+| 73 | 代码质量冲刺: OTA常量提取(16处)+tr()合规(24处)+定时器常量(10处)+Serial参数验证(5处)+QSS圆角统一(156处) | 73 |
 | ... | 目标: 1000分 | 1000 |

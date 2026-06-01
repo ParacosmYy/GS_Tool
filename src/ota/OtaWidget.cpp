@@ -10,6 +10,7 @@
  */
 
 #include "ota/OtaWidget.h"
+#include "core/Constants.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -450,7 +451,7 @@ void OtaWidget::startCompletionAnimation()
     m_progressBar->setChunkColor(mid);
 
     // 阶段2: 400ms 后切换为最终 success 色（使用QTimer替代QPropertyAnimation误用）
-    QTimer::singleShot(400, this, [this, success]() {
+    QTimer::singleShot(Timers::kCompletionDelayMs, this, [this, success]() {
         m_progressBar->setChunkColor(success);
     });
 }

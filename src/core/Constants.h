@@ -66,4 +66,23 @@ namespace Language {
     constexpr const char* DEFAULT  = CHINESE;
 }
 
+/**
+ * @brief 定时器间隔常量 — 统一管理所有定时器间隔
+ *
+ * 所有定时器间隔集中定义，方便统一调整和维护。
+ * 命名规范: k<Action><Purpose>Ms
+ */
+namespace Timers {
+    constexpr int kConnectTimeoutMs      = 10000;  ///< TCP连接超时(10s)
+    constexpr int kStatsRefreshMs        = 500;    ///< 终端统计刷新间隔(500ms)
+    constexpr int kPortPollMs            = 2000;   ///< 串口热插拔轮询间隔(2s)
+    constexpr int kDataStatsRefreshMs    = 1000;   ///< 数据统计面板刷新间隔(1s)
+    constexpr int kHealthCheckMs         = 5000;   ///< 连接健康检查间隔(5s)
+    constexpr int kPinoutPollMs          = 200;    ///< 串口引脚状态轮询(200ms)
+    constexpr int kRippleFrameMs         = 16;     ///< 涟漪动画帧间隔(~60fps)
+    constexpr int kPlaybackPrecisionMs   = 1;      ///< 回放定时器精度(1ms)
+    constexpr int kConnectFailedDisplayMs = 3000;  ///< 连接失败提示显示时长(3s)
+    constexpr int kCompletionDelayMs     = 400;    ///< OTA完成动画延迟(400ms)
+}
+
 #endif // CONSTANTS_H

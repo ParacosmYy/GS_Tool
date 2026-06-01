@@ -8,6 +8,7 @@
 
 #include "core/BackgroundWidget.h"
 #include "core/ThemeManager.h"
+#include "core/Constants.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMouseEvent>
@@ -23,7 +24,7 @@ BackgroundWidget::BackgroundWidget(QWidget* parent)
     : QWidget(parent)
     , m_rippleTimer(new QTimer(this))
 {
-    m_rippleTimer->setInterval(16); // ~60fps
+    m_rippleTimer->setInterval(Timers::kRippleFrameMs); // ~60fps
     connect(m_rippleTimer, &QTimer::timeout, this, &BackgroundWidget::advanceRipples);
 
     // 从 ThemeManager 初始化主题色（遮罩用 BgPrimary，涟漪用 Accent）

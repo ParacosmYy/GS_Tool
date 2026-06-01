@@ -6,6 +6,7 @@
  * 以及基于时间戳的随机访问回放。支持录制启停、回放控制和回放速率调整。
  */
 #include "utils/DataLogger.h"
+#include "core/Constants.h"
 #include <QDataStream>
 #include <QFileInfo>
 #include <QDateTime>
@@ -18,7 +19,7 @@ DataLogger::DataLogger(QObject* parent)
     , m_playbackTimer(new QTimer(this))
 {
     m_playbackTimer->setSingleShot(false);
-    m_playbackTimer->setInterval(1); // 1ms精度
+    m_playbackTimer->setInterval(Timers::kPlaybackPrecisionMs); // 1ms精度
     connect(m_playbackTimer, &QTimer::timeout,
             this, &DataLogger::onPlaybackTick);
 }

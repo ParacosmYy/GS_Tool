@@ -16,6 +16,7 @@
 #include <QTimer>
 #include <QDateTime>
 
+#include "core/Constants.h"
 #include "core/SendController.h"
 #include "ota/OtaManager.h"
 #include "core/RecordingController.h"
@@ -47,7 +48,7 @@ ConnectionController::ConnectionController(ConnectionManager* connMgr, QObject* 
             this, &ConnectionController::onAutoReconnect);
 
     // 连接健康检测定时器: 每5秒检查一次连接状态和数据活跃度
-    m_healthTimer.setInterval(5000);
+    m_healthTimer.setInterval(Timers::kHealthCheckMs);
     connect(&m_healthTimer, &QTimer::timeout, this, [this]() {
         if (!m_currentConn) {
             emit connectionHealth(false, -1);
@@ -73,7 +74,7 @@ ConnectionController::ConnectionController(ConnectionManager* connMgr, QObject* 
     m_portWatcher->start();
     // 信号线状态轮询定时器(200ms)，仅当信号线实际变化时才发射通知
     m_pinoutPollTimer = new QTimer(this);
-    m_pinoutPollTimer->setInterval(200);
+    m_pinoutPollTimer->setInterval(Timers::kPinoutPollMs);
     connect(m_pinoutPollTimer, &QTimer::timeout, this, [this]() {
         if (!m_currentConn) return;
         auto current = m_currentConn->pinoutSignals();
