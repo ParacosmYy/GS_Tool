@@ -98,14 +98,14 @@ QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
 void ToolbarController::createDisplayModeGroup(QToolBar* toolbar)
 {
     // 显示模式下拉框: 文本/HEX/混合/十进制
-    m_displayModeCombo = new QComboBox;
+    m_displayModeCombo = new QComboBox(toolbar->parentWidget());
     m_displayModeCombo->setObjectName("displayModeCombo");
     m_displayModeCombo->addItems({tr("文本"), tr("HEX"), tr("混合"), tr("十进制")});
     m_displayModeCombo->setFixedWidth(80);
     toolbar->addWidget(m_displayModeCombo);
 
     // 终端布局模式下拉框: 混合/左右分栏/上下分栏
-    m_layoutCombo = new QComboBox;
+    m_layoutCombo = new QComboBox(toolbar->parentWidget());
     m_layoutCombo->setObjectName("layoutCombo");
     m_layoutCombo->addItems({tr("混合"), tr("左右分栏"), tr("上下分栏")});
     m_layoutCombo->setFixedWidth(90);
@@ -161,7 +161,7 @@ void ToolbarController::createConnectionGroup(QToolBar* toolbar)
     themeLabel->setObjectName("themeLabel");
     toolbar->addWidget(themeLabel);
 
-    m_themeCombo = new QComboBox;
+    m_themeCombo = new QComboBox(toolbar->parentWidget());
     m_themeCombo->setObjectName("themeCombo");
     m_themeCombo->setFixedWidth(130);
     toolbar->addWidget(m_themeCombo);
@@ -171,7 +171,7 @@ void ToolbarController::createConnectionGroup(QToolBar* toolbar)
     langLabel->setObjectName("langLabel");
     toolbar->addWidget(langLabel);
 
-    m_langCombo = new QComboBox;
+    m_langCombo = new QComboBox(toolbar->parentWidget());
     m_langCombo->setObjectName("langCombo");
     m_langCombo->addItem(QStringLiteral("中文"), Language::CHINESE);
     m_langCombo->addItem(QStringLiteral("English"), Language::ENGLISH);

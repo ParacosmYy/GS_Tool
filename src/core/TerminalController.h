@@ -159,6 +159,9 @@ private:
 
     /** @brief 统计刷新定时器，每 500ms 触发一次 updateDataStatistics() */
     QTimer* m_statsTimer;
+
+    /** @brief 标记 statsTimer 的 timeout 信号是否已连接，防止重复 connect */
+    bool m_statsSignalConnected = false;
 };
 
 #endif // TERMINALCONTROLLER_H

@@ -95,6 +95,10 @@ void RecordingController::setConnected(bool connected)
  */
 void RecordingController::onToggleRecording()
 {
+    if (!m_logger) {
+        qWarning() << "RecordingController::onToggleRecording: m_logger is null";
+        return;
+    }
     if (m_logger->isRecording()) {
         // 正在录制 → 暂停/恢复切换
         if (m_logger->isPaused()) {
@@ -138,6 +142,7 @@ void RecordingController::onToggleRecording()
  */
 void RecordingController::onStopRecording()
 {
+    if (!m_logger) return;
     m_logger->stopRecording();
     m_recordAction->setChecked(false);
     m_recordAction->setText(tr("录制"));
@@ -150,12 +155,16 @@ void RecordingController::onStopRecording()
  */
 void RecordingController::onOpenPlayback()
 {
+    if (!m_logger) return;
     QString filter = tr("EmbedDebug 日志 (*.edl);;所有文件 (*.*)");
     QString path = QFileDialog::getOpenFileName(
         qobject_cast<QWidget*>(parent()), tr("打开日志回放"), QString(), filter);
     if (path.isEmpty()) return;
 
-    m_logger->startPlayback(path);
+    if (!m_logger->startPlayback(path)) {
+        emit statusMessage(tr("回放启动失败，请检查文件格式"), 5000);
+        return;
+    }
     m_stopPlaybackAction->setEnabled(true);
     m_playbackAction->setEnabled(false);
     emit statusMessage(tr("回放中: %1").arg(path));

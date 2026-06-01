@@ -10,6 +10,7 @@
  */
 
 #include "ota/OtaWidget.h"
+#include "core/AnimatedButton.h"
 #include "core/Constants.h"
 
 #include <QVBoxLayout>
@@ -88,7 +89,7 @@ QGroupBox* OtaWidget::setupFileGroup()
     m_filePathEdit = new QLineEdit;
     m_filePathEdit->setObjectName("otaFileLabel");
     m_filePathEdit->setPlaceholderText(tr("选择固件文件 (.bin / .hex) ..."));
-    m_browseBtn = new QPushButton(tr("浏览"));
+    m_browseBtn = new AnimatedButton(tr("浏览"));
     m_browseBtn->setObjectName("otaBrowseBtn");
     m_browseBtn->setFixedWidth(80);
     connect(m_browseBtn, &QPushButton::clicked, this, &OtaWidget::onBrowseFile);
@@ -123,10 +124,10 @@ QGroupBox* OtaWidget::setupConfigGroup()
     layout->addRow(tr("协议:"), m_protocolCombo);
 
     auto* btnLayout = new QHBoxLayout;
-    m_startBtn = new QPushButton(tr("开始传输"));
+    m_startBtn = new AnimatedButton(tr("开始传输"));
     m_startBtn->setObjectName("otaStartBtn");
     m_startBtn->setFixedHeight(32);
-    m_cancelBtn = new QPushButton(tr("取消"));
+    m_cancelBtn = new AnimatedButton(tr("取消"));
     m_cancelBtn->setObjectName("otaCancelBtn");
     m_cancelBtn->setFixedHeight(32);
     m_cancelBtn->setEnabled(false);
@@ -200,7 +201,7 @@ QGroupBox* OtaWidget::setupHistoryGroup()
     layout->setSpacing(6);
 
     m_historyModel = new OtaHistoryModel(this);
-    m_historyView = new QTreeView;
+    m_historyView = new QTreeView(this);
     m_historyView->setObjectName("otaHistoryView");
     m_historyView->setModel(m_historyModel);
     m_historyView->setRootIsDecorated(false);
@@ -214,7 +215,7 @@ QGroupBox* OtaWidget::setupHistoryGroup()
     layout->addWidget(m_historyView);
 
     auto* btnRow = new QHBoxLayout;
-    m_clearHistoryBtn = new QPushButton(tr("清除历史"));
+    m_clearHistoryBtn = new AnimatedButton(tr("清除历史"));
     m_clearHistoryBtn->setObjectName("otaClearHistory");
     m_clearHistoryBtn->setFixedHeight(28);
     connect(m_clearHistoryBtn, &QPushButton::clicked, this, [this]() { m_historyModel->clearHistory(); });

@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QStringList>
+#include <QMap>
 
 /**
  * @brief 串口热插拔检测器
@@ -157,6 +158,20 @@ private:
 
     QTimer* m_timer;             ///< 轮询定时器
     QStringList m_currentPorts;  ///< 上次快照的端口名称列表
+
+    /**
+     * @name 防抖机制成员
+     *
+     * USB 热插拔时可能出现短暂的端口闪烁（一瞬间出现又消失），
+     * 导致误报 portAdded/portRemoved 信号。防抖策略要求连续
+     * kDebounceThreshold 次轮询都检测到同一变化，才确认并发射信号。
+     * 如果候选端口在确认前恢复原状态，计数器被清零。
+     * @{
+     */
+    QMap<QString, int> m_addedCandidateCount;    ///< 新增候选确认计数: 端口名 → 连续出现次数
+    QMap<QString, int> m_removedCandidateCount;  ///< 移除候选确认计数: 端口名 → 连续消失次数
+    static constexpr int kDebounceThreshold = 2; ///< 连续2次确认才发射信号（约2秒）
+    /** @} */
 };
 
 #endif // PORTWATCHER_H

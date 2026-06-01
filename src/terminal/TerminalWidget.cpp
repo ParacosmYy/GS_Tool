@@ -10,6 +10,7 @@
 #include "terminal/TerminalWidget.h"
 #include "utils/HexConverter.h"
 #include "core/ThemeManager.h"
+#include "core/Constants.h"
 #include <QScrollBar>
 #include <QApplication>
 #include <QClipboard>
@@ -56,7 +57,7 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     , m_searchManager(new TerminalSearchManager(this))
     , m_contextMenuManager(new TerminalContextMenuManager(this))
 {
-    m_font = QFont("Consolas", 10);
+    m_font = QFont(TerminalDefaults::kFontFamily, TerminalDefaults::kFontSize);
     m_font.setStyleHint(QFont::Monospace);
     m_fontMetrics = QFontMetrics(m_font);
 

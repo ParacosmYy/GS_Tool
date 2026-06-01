@@ -131,16 +131,22 @@ TimedSender* SendController::timedSender() const
 }
 
 /**
- * @brief 统一发送方法
+ * @brief 统一发送方法 — 含部分写入重试策略
  *
  * 完整流程:
  *   1. 检查连接是否存在且处于已连接状态
- *   2. 写入数据到连接
+ *   2. 循环写入数据到连接，最多重试 3 次部分写入
  *   3. 成功时追加到终端模型和日志
  *   4. 失败时通过 statusMessage 通知用户具体原因
  *
+ * 部分写入重试策略:
+ *   串口/网络 write() 不保证一次写入全部数据。当返回值小于请求字节数时，
+ *   对剩余字节发起最多 kMaxPartialRetries(3) 次重试，避免未发送字节被静默丢弃。
+ *   每次重试仅发送尚未写入的剩余部分 (data.mid(totalWritten))。
+ *   若重试耗尽仍有剩余字节，记录警告但继续记录已发送部分。
+ *
  * @param data 待发送的原始字节数据
- * @return true=写入成功, false=写入失败或未连接
+ * @return true=至少写入了部分数据, false=写入完全失败或未连接
  */
 bool SendController::sendAndRecord(const QByteArray& data)
 {
@@ -172,26 +178,38 @@ bool SendController::sendAndRecord(const QByteArray& data)
         return false;
     }
 
-    // 写入数据到连接
-    qint64 written = m_currentConn->write(data);
-    if (written > 0) {
-        // 写入成功: 追加到终端模型（TX 显示）+ 记录日志
-        // 处理部分写入：仅记录实际发送的字节，避免终端/日志显示虚假数据
-        QByteArray sentData = (written < data.size()) ? data.left(static_cast<int>(written)) : data;
-        if (written < data.size()) {
-            // 部分写入警告：实际发送少于请求，提示用户
-            emit statusMessage(tr("部分写入: 请求 %1 字节，实际发送 %2 字节")
-                                   .arg(data.size()).arg(written));
+    // ---- 部分写入重试循环 ----
+    // 最多重试 kMaxPartialRetries 次，确保剩余字节不被静默丢弃
+    qint64 totalWritten = 0;
+    int retryCount = 0;
+    constexpr int kMaxPartialRetries = 3;
+
+    while (totalWritten < data.size() && retryCount < kMaxPartialRetries) {
+        qint64 written = m_currentConn->write(data.mid(static_cast<int>(totalWritten)));
+        if (written <= 0) {
+            // 写入返回 0 或负值: 连接可能已断开，立即终止
+            emit statusMessage(tr("发送失败: 写入返回 %1，已发送 %2/%3 字节")
+                                   .arg(written).arg(totalWritten).arg(data.size()));
+            return false;
         }
-        m_terminalModel->appendSent(sentData);
-        m_dataLogger->logData(sentData, DataLogger::Direction::Sent);
-        emit dataSent(written);
-        return true;
+        totalWritten += written;
+        if (totalWritten < data.size()) {
+            ++retryCount;
+        }
     }
 
-    // 写入失败: 通知用户（IConnection::write() 内部已通过 errorOccurred 发出具体错误）
-    emit statusMessage(tr("发送失败: 写入返回 %1，请检查连接状态").arg(written));
-    return false;
+    // 重试耗尽后仍有未发送字节: 记录警告，但不丢弃已发送部分
+    if (totalWritten < data.size()) {
+        emit statusMessage(tr("部分写入: 请求 %1 字节，实际发送 %2 字节（重试 %3 次）")
+                               .arg(data.size()).arg(totalWritten).arg(kMaxPartialRetries));
+    }
+
+    // 记录实际发送的字节到终端模型和日志
+    QByteArray sentData = data.left(static_cast<int>(totalWritten));
+    m_terminalModel->appendSent(sentData);
+    m_dataLogger->logData(sentData, DataLogger::Direction::Sent);
+    emit dataSent(totalWritten);
+    return true;
 }
 
 /**

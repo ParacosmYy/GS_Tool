@@ -78,7 +78,9 @@ ConnectionController::ConnectionController(ConnectionManager* connMgr, QObject* 
     connect(m_pinoutPollTimer, &QTimer::timeout, this, [this]() {
         if (!m_currentConn) return;
         auto current = m_currentConn->pinoutSignals();
-        if (memcmp(&current, &m_lastPinout, sizeof(PinoutSignals)) != 0) {
+        if (current.cts != m_lastPinout.cts || current.dsr != m_lastPinout.dsr ||
+            current.dcd != m_lastPinout.dcd || current.ri != m_lastPinout.ri ||
+            current.dtr != m_lastPinout.dtr || current.rts != m_lastPinout.rts) {
             m_lastPinout = current;
             emit pinoutSignalsChanged(current);
         }

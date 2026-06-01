@@ -23,6 +23,7 @@
 #include <QLineEdit>
 
 #include "core/AnimatedButton.h"
+#include "core/Constants.h"
 
 // ---- UI布局 ----
 
@@ -72,9 +73,9 @@ QGroupBox* SerialConfigPanel::createParamGroup()
     m_baudCombo->setObjectName("baudCombo");
     m_baudCombo->setEditable(true);
     m_baudCombo->setToolTip(tr("通信速率(比特/秒)，常用值: 9600, 115200\n可直接输入自定义波特率"));
-    m_baudCombo->addItems({"1200","2400","4800","9600","19200","38400","57600","115200","230400","460800","921600","1000000"});
-    m_baudCombo->setCurrentText("115200");
-    m_baudCombo->lineEdit()->setValidator(new QIntValidator(300, 10000000, this));
+    m_baudCombo->addItems(BaudRates::kStandardRates);
+    m_baudCombo->setCurrentIndex(BaudRates::kDefaultBaudIndex);
+    m_baudCombo->lineEdit()->setValidator(new QIntValidator(110, 10000000, this));
     // 运行时波特率切换: 连接后用户修改波特率时通知上层
     connect(m_baudCombo, &QComboBox::currentTextChanged, this, [this](const QString& text) {
         if (m_connected) {
@@ -195,7 +196,7 @@ QGroupBox* SerialConfigPanel::createControlSignalsGroup()
     m_breakBtn->setObjectName("breakBtn");
     m_breakBtn->setToolTip(tr("发送Break信号(用于STM32/ESP32进入Bootloader)"));
     m_breakBtn->setEnabled(false);
-    connect(m_breakBtn, &QPushButton::clicked, this, [this]() { emit breakRequested(100); });
+    connect(m_breakBtn, &QPushButton::clicked, this, [this]() { emit breakRequested(Timers::kBreakDurationMs); });
 
     signalLayout->addWidget(m_dtrBtn);
     signalLayout->addWidget(m_rtsBtn);

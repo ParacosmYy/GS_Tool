@@ -63,4 +63,5 @@
 | 72 | Bug修复冲刺: 4P0+5P1+2P2共11个Bug修复(ZModem CRC/取消/除零/布局/信号/端口/动画) | 72 |
 | 73 | 代码质量冲刺: OTA常量提取(16处)+tr()合规(24处)+定时器常量(10处)+Serial参数验证(5处)+QSS圆角统一(156处) | 73 |
 | 74 | 串口深度: Win32 ClearCommError错误分类+错误恢复策略+导航树主题刷新+Shadow语义色+SerialConnection拆分 | 74 |
+| 75 | 代码质量+串口深度: 波特率扩展(12→20标准速率)+魔术数提取(break/stats/font)+SendController部分写入重试+PortWatcher热插拔防抖(2次确认)+AnimatedButton统一(20个按钮) | 75 |
 | ... | 目标: 1000分 | 1000 |

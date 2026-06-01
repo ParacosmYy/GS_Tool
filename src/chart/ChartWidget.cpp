@@ -12,6 +12,7 @@
 #include "chart/ChartWidget.h"
 #include "protocol/FrameDefinition.h"
 #include "core/ThemeManager.h"
+#include "core/AnimatedButton.h"
 
 #include <QtCharts>
 #include <algorithm>
@@ -61,12 +62,12 @@ void ChartWidget::setupUI()
     auto* toolLayout = new QHBoxLayout(toolbar);
     toolLayout->setContentsMargins(8, 4, 8, 4);
 
-    m_pauseBtn = new QPushButton(tr("暂停"));
+    m_pauseBtn = new AnimatedButton(tr("暂停"));
     m_pauseBtn->setObjectName("chartPauseBtn");
     m_pauseBtn->setCheckable(true);
     m_pauseBtn->setMinimumWidth(60);
 
-    m_clearBtn = new QPushButton(tr("清除"));
+    m_clearBtn = new AnimatedButton(tr("清除"));
     m_clearBtn->setObjectName("chartClearBtn");
     m_clearBtn->setMinimumWidth(50);
 
@@ -119,8 +120,10 @@ void ChartWidget::setupUI()
     connect(m_clearBtn, &QPushButton::clicked, this, &ChartWidget::onClearClicked);
     connect(m_windowSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int idx) {
-                int sizes[] = {100, 200, 500, 1000, 2000};
-                setWindowSize(sizes[idx]);
+                static const int sizes[] = {100, 200, 500, 1000, 2000};
+                if (idx >= 0 && idx < 5) {
+                    setWindowSize(sizes[idx]);
+                }
             });
 
     m_statusLabel->setText(tr("通道: 0"));

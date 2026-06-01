@@ -4,6 +4,7 @@
  */
 
 #include "serial/BookmarkWidget.h"
+#include "core/AnimatedButton.h"
 
 #include <QMessageBox>
 
@@ -40,7 +41,7 @@ BookmarkWidget::BookmarkWidget(QWidget* parent)
     toolbarLayout->setSpacing(6);
 
     // 添加书签按钮 - accent 色高亮，主要操作
-    m_addBtn = new QPushButton(tr("添加"), this);
+    m_addBtn = new AnimatedButton(tr("添加"), this);
     m_addBtn->setObjectName("bookmarkAddBtn");
     m_addBtn->setMinimumHeight(28);
     m_addBtn->setToolTip(tr("在当前时间点添加一个新书签"));
@@ -48,7 +49,7 @@ BookmarkWidget::BookmarkWidget(QWidget* parent)
     toolbarLayout->addWidget(m_addBtn);
 
     // 删除选中书签按钮 - 默认禁用，选中项后启用
-    m_removeBtn = new QPushButton(tr("删除"), this);
+    m_removeBtn = new AnimatedButton(tr("删除"), this);
     m_removeBtn->setObjectName("bookmarkRemoveBtn");
     m_removeBtn->setMinimumHeight(28);
     m_removeBtn->setEnabled(false);
@@ -60,7 +61,7 @@ BookmarkWidget::BookmarkWidget(QWidget* parent)
     toolbarLayout->addStretch();
 
     // 清空所有书签按钮 - 危险操作，红色警告风格
-    m_clearBtn = new QPushButton(tr("清空"), this);
+    m_clearBtn = new AnimatedButton(tr("清空"), this);
     m_clearBtn->setObjectName("bookmarkClearBtn");
     m_clearBtn->setMinimumHeight(28);
     m_clearBtn->setEnabled(false);

@@ -12,6 +12,7 @@
  *   - setupConnections(): 信号/槽连接
  */
 #include "protocol/FrameVisualEditor.h"
+#include "core/AnimatedButton.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
@@ -49,7 +50,7 @@ void FrameVisualEditor::setupUI()
     mainLayout->addWidget(setupPreviewGroup());
 
     // ---- 应用按钮 ----
-    m_applyBtn = new QPushButton(tr("应用定义"));
+    m_applyBtn = new AnimatedButton(tr("应用定义"));
     m_applyBtn->setObjectName("applyDefBtn");
     m_applyBtn->setMinimumHeight(32);
     mainLayout->addWidget(m_applyBtn);
@@ -171,14 +172,14 @@ QGroupBox* FrameVisualEditor::setupFieldsGroup()
 
     // 字段操作按钮行
     auto* btnLayout = new QHBoxLayout;
-    m_addFieldBtn = new QPushButton(tr("添加字段"));
+    m_addFieldBtn = new AnimatedButton(tr("添加字段"));
     m_addFieldBtn->setObjectName("frameAddFieldBtn");
-    m_removeFieldBtn = new QPushButton(tr("删除字段"));
+    m_removeFieldBtn = new AnimatedButton(tr("删除字段"));
     m_removeFieldBtn->setObjectName("frameRemoveFieldBtn");
-    auto* moveUpBtn = new QPushButton(tr("上移"));
+    auto* moveUpBtn = new AnimatedButton(tr("上移"));
     moveUpBtn->setObjectName("frameMoveUpBtn");
     moveUpBtn->setFixedWidth(60);
-    auto* moveDownBtn = new QPushButton(tr("下移"));
+    auto* moveDownBtn = new AnimatedButton(tr("下移"));
     moveDownBtn->setObjectName("frameMoveDownBtn");
     moveDownBtn->setFixedWidth(60);
     btnLayout->addWidget(m_addFieldBtn);

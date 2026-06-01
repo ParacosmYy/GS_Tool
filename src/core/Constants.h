@@ -9,6 +9,23 @@
 #define CONSTANTS_H
 
 #include <QString>
+#include <QStringList>
+
+/**
+ * @brief 标准串口波特率常量 — 统一管理波特率列表和默认选项
+ *
+ * 涵盖从110到1000000的工业标准波特率值，升序排列。
+ * 列表供 SerialConfigPanelUI 的波特率下拉框使用。
+ */
+namespace BaudRates {
+    /// 标准串口波特率列表(升序), 涵盖从110到1000000的工业标准值
+    inline const QStringList kStandardRates = {
+        "110","300","600","1200","2400","4800","9600","14400",
+        "19200","28800","38400","57600","56000","115200",
+        "128000","230400","256000","460800","921600","1000000"
+    };
+    constexpr int kDefaultBaudIndex = 12; ///< 默认选中115200(列表第13项)
+}
 
 // 应用全局常量
 namespace App {
@@ -83,6 +100,17 @@ namespace Timers {
     constexpr int kPlaybackPrecisionMs   = 1;      ///< 回放定时器精度(1ms)
     constexpr int kConnectFailedDisplayMs = 3000;  ///< 连接失败提示显示时长(3s)
     constexpr int kCompletionDelayMs     = 400;    ///< OTA完成动画延迟(400ms)
+    constexpr int kBreakDurationMs       = 100;    ///< Break信号持续时间(100ms)
+}
+
+/**
+ * @brief 终端默认显示参数 — 统一管理终端控件的字体和字号默认值
+ *
+ * 终端使用等宽字体以保持字符对齐，Consolas 是 Windows 下最常用的等宽字体。
+ */
+namespace TerminalDefaults {
+    constexpr const char* kFontFamily = "Consolas";  ///< 终端默认字体(等宽)
+    constexpr int kFontSize = 13;                     ///< 终端默认字号(像素)
 }
 
 #endif // CONSTANTS_H

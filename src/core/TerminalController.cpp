@@ -76,12 +76,12 @@ void TerminalController::setMainTerminal(QWidget* terminal)
 /** @brief 启动统计刷新定时器（每 500ms 触发一次） */
 void TerminalController::startStatsTimer()
 {
-    static bool s_connected = false;
-    m_statsTimer->setInterval(500);
+    m_statsTimer->setInterval(Timers::kStatsRefreshMs);
     // 仅首次连接信号，防止重复调用导致 updateDataStatistics 多次触发
-    if (!s_connected) {
+    // 使用成员变量代替 static bool，支持 TerminalController 销毁重建时正确重连
+    if (!m_statsSignalConnected) {
         connect(m_statsTimer, &QTimer::timeout, this, &TerminalController::updateDataStatistics);
-        s_connected = true;
+        m_statsSignalConnected = true;
     }
     m_statsTimer->start();
 }
@@ -99,6 +99,7 @@ void TerminalController::stopStatsTimer()
 void TerminalController::onDisplayModeChanged(int index)
 {
     if (!m_layoutManager) return;
+    if (index < 0 || index > 3) return;  // 防御: ComboBox index 越界保护
 
     DisplayMode modes[] = {DisplayMode::Text, DisplayMode::Hex, DisplayMode::Mixed, DisplayMode::Decimal};
     // 显示模式切换: 同步到所有活动的终端widget（主终端+分栏终端）

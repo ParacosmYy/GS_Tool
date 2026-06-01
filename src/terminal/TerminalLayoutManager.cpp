@@ -31,7 +31,8 @@ TerminalLayoutManager::TerminalLayoutManager(QObject* parent)
     , m_showDirectionPrefix(false)
 {
     // 创建容器widget: 所有布局变化都在这个容器内进行
-    m_container = new QWidget;
+    // parent (QObject*) 实际是 MainWindow*，转型为 QWidget* 用于 QWidget 构造
+    m_container = new QWidget(qobject_cast<QWidget*>(QObject::parent()));
     m_container->setObjectName("terminalContainer");
     auto* layout = new QVBoxLayout(m_container);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -239,7 +240,7 @@ TerminalWidget* TerminalLayoutManager::createSplitTerminal(DataDirection directi
 {
     Q_UNUSED(label);
 
-    auto* terminal = new TerminalWidget;
+    auto* terminal = new TerminalWidget(m_container);
     terminal->setObjectName((direction == DataDirection::Rx)
         ? "rxTerminal" : "txTerminal");
 

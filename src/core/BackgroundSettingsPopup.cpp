@@ -7,6 +7,7 @@
  */
 
 #include "core/BackgroundSettingsPopup.h"
+#include "core/AnimatedButton.h"
 #include "core/BackgroundWidget.h"
 #include "utils/SettingsManager.h"
 #include <QVBoxLayout>
@@ -39,13 +40,13 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
     createControls(mainLayout);
 
     // ---- 选择背景图按钮 ----
-    m_selectImageBtn = new QPushButton(tr("选择背景图..."), this);
+    m_selectImageBtn = new AnimatedButton(tr("选择背景图..."), this);
     m_selectImageBtn->setObjectName("bgSelectImageBtn");
     mainLayout->addWidget(m_selectImageBtn);
     connect(m_selectImageBtn, &QPushButton::clicked, this, &BackgroundSettingsPopup::onSelectBackground);
 
     // ---- 恢复默认按钮 ----
-    m_resetBtn = new QPushButton(tr("恢复默认背景"), this);
+    m_resetBtn = new AnimatedButton(tr("恢复默认背景"), this);
     m_resetBtn->setObjectName("bgResetBtn");
     mainLayout->addWidget(m_resetBtn);
     connect(m_resetBtn, &QPushButton::clicked, this, [this]() {

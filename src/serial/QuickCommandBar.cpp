@@ -4,6 +4,7 @@
  */
 
 #include "serial/QuickCommandBar.h"
+#include "core/AnimatedButton.h"
 #include "utils/HexConverter.h"
 
 #include <QSettings>
@@ -26,7 +27,7 @@ QuickCommandBar::QuickCommandBar(QWidget* parent)
     // ---- 编辑按钮 ----
     // 使用 setMinimumHeight(32) 替代 setFixedSize，允许水平自适应内容
     // 与 SerialConfigPanel 连接按钮(36px)视觉协调: 次要操作按钮略矮
-    m_editBtn = new QPushButton(tr("编辑"));
+    m_editBtn = new AnimatedButton(tr("编辑"));
     m_editBtn->setObjectName("quickCmdEditBtn");
     m_editBtn->setMinimumHeight(32);
     connect(m_editBtn, &QPushButton::clicked, this, &QuickCommandBar::onEditRequested);
@@ -34,7 +35,7 @@ QuickCommandBar::QuickCommandBar(QWidget* parent)
 
     // ---- 添加按钮 ----
     // 使用 setMinimumHeight(32) 替代 setFixedSize(32,32)，保持与其他按钮等高
-    m_addBtn = new QPushButton(tr("+"));
+    m_addBtn = new AnimatedButton(tr("+"));
     m_addBtn->setObjectName("quickCmdAddBtn");
     m_addBtn->setMinimumHeight(32);
     connect(m_addBtn, &QPushButton::clicked, this, [this]() {
@@ -105,7 +106,7 @@ void QuickCommandBar::rebuildButtons()
     // 为每条指令创建新按钮
     for (int i = 0; i < m_commands.size(); ++i) {
         const auto& cmd = m_commands[i];
-        auto* btn = new QPushButton(cmd.name);
+        auto* btn = new AnimatedButton(cmd.name);
         btn->setObjectName(QString("quickCmdBtn_%1").arg(i));
         // dynamic property 供 QSS 选择器 [quickCmdBtn="true"] 匹配
         btn->setProperty("quickCmdBtn", true);

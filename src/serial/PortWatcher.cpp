@@ -115,33 +115,64 @@ QStringList PortWatcher::currentPorts() const
 }
 
 /**
- * @brief 定时轮询回调
+ * @brief 定时轮询回调（带防抖）
  *
  * 查询当前系统可用端口，与上次快照比较:
- *   - 新增的端口 → 逐个发射 portAdded
- *   - 移除的端口 → 逐个发射 portRemoved
- *   - 有任何变化 → 发射 portsChanged
+ *   - 新增候选: 在 newPorts 中但不在 m_currentPorts 中 → 累计计数，
+ *     达到 kDebounceThreshold 后发射 portAdded 并更新快照
+ *   - 移除候选: 在 m_currentPorts 中但不在 newPorts 中 → 累计计数，
+ *     达到 kDebounceThreshold 后发射 portRemoved 并更新快照
+ *   - 候选端口恢复原状态 → 清零对应计数器（防抖消除闪烁）
+ *   - 确认变化后发射 portsChanged 总信号
  */
 void PortWatcher::onTimeout()
 {
     const QStringList newPorts = queryAvailablePorts();
+    bool changed = false;
 
-    // 检测新增端口: 在 newPorts 中但不在 m_currentPorts 中
+    // ---- 处理新增候选: 在 newPorts 中但不在 m_currentPorts 中 ----
     for (const QString& port : newPorts) {
         if (!m_currentPorts.contains(port)) {
-            emit portAdded(port);
+            // 端口是新出现的，累加新增确认计数
+            ++m_addedCandidateCount[port];
+            if (m_addedCandidateCount[port] >= kDebounceThreshold) {
+                emit portAdded(port);
+                m_addedCandidateCount.remove(port);
+                changed = true;
+            }
+        } else {
+            // 端口依然存在，清除残留的新增候选计数（状态未变，无需操作）
+            m_addedCandidateCount.remove(port);
         }
     }
 
-    // 检测移除端口: 在 m_currentPorts 中但不在 newPorts 中
+    // ---- 处理移除候选: 在 m_currentPorts 中但不在 newPorts 中 ----
     for (const QString& port : m_currentPorts) {
         if (!newPorts.contains(port)) {
-            emit portRemoved(port);
+            // 端口消失了，累加移除确认计数
+            ++m_removedCandidateCount[port];
+            if (m_removedCandidateCount[port] >= kDebounceThreshold) {
+                emit portRemoved(port);
+                m_removedCandidateCount.remove(port);
+                changed = true;
+            }
+        } else {
+            // 端口依然存在，清除残留的移除候选计数（端口回来了，闪烁消除）
+            m_removedCandidateCount.remove(port);
         }
     }
 
-    // 有变化时更新快照并发射总信号
-    if (m_currentPorts != newPorts) {
+    // ---- 清理过期候选: 已恢复原状态的候选计数器 ----
+    // 新增候选中出现但实际已存在的端口 → 状态恢复，清零
+    for (const QString& port : m_addedCandidateCount.keys()) {
+        if (m_currentPorts.contains(port)) {
+            m_addedCandidateCount.remove(port);
+        }
+    }
+    // 移除候选中消失但实际已不存在的端口 → 无需清理（上面已处理）
+
+    // ---- 更新快照: 将已确认的端口变化反映到 m_currentPorts ----
+    if (changed) {
         m_currentPorts = newPorts;
         emit portsChanged();
     }
