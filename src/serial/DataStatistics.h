@@ -56,6 +56,25 @@ public:
     /** @brief 获取当前TX速率（bytes/s） */
     double txRate() const;
 
+    /** @brief 更新连接健康状态显示
+     *  @param alive 连接是否存活
+     *  @param lastDataAgeMs 距上次数据的毫秒数
+     *
+     *  当 lastDataAgeMs > 10000 时显示"空闲 Xs"提示，数据正常流动时隐藏
+     */
+    void updateConnectionHealth(bool alive, qint64 lastDataAgeMs);
+
+    /** @brief 生成会话统计摘要文本(用于导出/复制/Toast)
+     *  @return 格式化的多行统计摘要: 总字节/速率/峰值/持续时间/错误
+     */
+    QString sessionSummary() const;
+
+    /** @brief 获取RX累计总字节数 */
+    quint64 totalRxBytes() const;
+
+    /** @brief 获取TX累计总字节数 */
+    quint64 totalTxBytes() const;
+
 private slots:
     /** @brief 定时器回调：每秒刷新速率、峰值和持续时间 */
     void onRefreshTimer();
@@ -66,10 +85,12 @@ private:
     /** @brief 创建统计数据框架(RX/TX/峰值/时间 统一格式)
      * @param label 标签文本(如"接收:")
      * @param valueLabel 用于显示值的QLabel指针(输出参数)
-     * @param objectName QSS objectName
+     * @param objectName valueLabel的QSS objectName
+     * @param frameName QFrame的QSS objectName(如statsRxFrame)
      * @return 创建好的QFrame
      */
-    QFrame* createStatsFrame(const QString& label, QLabel*& valueLabel, const QString& objectName);
+    QFrame* createStatsFrame(const QString& label, QLabel*& valueLabel,
+                             const QString& objectName, const QString& frameName = QString());
 
     /** @brief 将字节数格式化为人类可读字符串(B/KB/MB/GB) */
     QString formatBytes(quint64 bytes) const;
@@ -85,6 +106,7 @@ private:
     QLabel* m_peakRateLabel;       ///< 峰值速率显示(取RX/TX中较大者)
     QLabel* m_elapsedLabel;        ///< 连接持续时间显示
     QLabel* m_errorLabel;          ///< 串口错误计数显示(默认隐藏)
+    QLabel* m_healthLabel;         ///< 连接健康状态显示(空闲提示,默认隐藏)
 
     // ---- 定时器 ----
     QTimer m_refreshTimer;         ///< 1秒刷新定时器，用于速率采样和UI更新

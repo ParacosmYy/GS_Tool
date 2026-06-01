@@ -110,8 +110,10 @@ void RecordingController::onToggleRecording()
         QString path = QFileDialog::getSaveFileName(
             nullptr, tr("录制日志"), QString(), filter);
         if (path.isEmpty()) {
-            // 用户取消，恢复按钮状态
+            // 用户取消，恢复按钮状态（阻塞信号避免触发递归 onToggleRecording）
+            m_recordAction->blockSignals(true);
             m_recordAction->setChecked(false);
+            m_recordAction->blockSignals(false);
             return;
         }
         if (!path.endsWith(".edl")) path += ".edl";

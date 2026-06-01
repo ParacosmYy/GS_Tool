@@ -111,6 +111,11 @@ void MainWindow::connectSerialSignals()
             this, [this](int framing, int parity, int overrun) {
         m_panelManager->dataStats()->updateErrors(framing, parity, overrun);
     });
+    // 连接健康状态 -> 数据统计面板（空闲超10秒时显示提示）
+    connect(m_connController, &ConnectionController::connectionHealth,
+            this, [this](bool alive, qint64 lastDataAgeMs) {
+        m_panelManager->dataStats()->updateConnectionHealth(alive, lastDataAgeMs);
+    });
     // 信号线状态变化 -> 更新串口配置面板LED指示灯
     connect(m_connController, &ConnectionController::pinoutSignalsChanged,
             m_panelManager->serialConfig(), &SerialConfigPanel::updatePinoutLeds);
@@ -156,6 +161,19 @@ void MainWindow::connectReconnectSignals()
         m_connStatusLbl->setProperty("state", "connecting");
         m_connStatusLbl->style()->unpolish(m_connStatusLbl);
         m_connStatusLbl->style()->polish(m_connStatusLbl);
+    });
+    // 重连进度通知(含指数退避间隔) -> Info类型吐司提示下次重连倒计时
+    connect(m_connController, &ConnectionController::reconnectProgress,
+            this, [this](int attempt, int maxRetries, int nextMs) {
+        QString msg;
+        if (maxRetries > 0) {
+            msg = tr("正在重连... 第%1/%2次 (下次%3s后)")
+                      .arg(attempt).arg(maxRetries).arg(nextMs / 1000);
+        } else {
+            msg = tr("正在重连... 第%1次 (下次%2s后)")
+                      .arg(attempt).arg(nextMs / 1000);
+        }
+        ToastWidget::showDebounced(this, msg, ToastWidget::ToastType::Info, 2500);
     });
     // 重连成功: 状态栏由 handleConnectionState(Connected) 自动更新，此处仅显示 Toast
     connect(m_connController, &ConnectionController::reconnectSucceeded,

@@ -31,12 +31,12 @@ void DataStatistics::setupUI()
     mainLayout->setSpacing(8);
 
     // ---- 收发统计区域(使用统一框架) ----
-    mainLayout->addWidget(createStatsFrame(tr("接收:"), m_rxTotalLabel, "rxTotalLabel"));
-    mainLayout->addWidget(createStatsFrame(tr("速率:"), m_rxRateLabel, "rxRateLabel"));
-    mainLayout->addWidget(createStatsFrame(tr("发送:"), m_txTotalLabel, "txTotalLabel"));
-    mainLayout->addWidget(createStatsFrame(tr("速率:"), m_txRateLabel, "txRateLabel"));
-    mainLayout->addWidget(createStatsFrame(tr("峰值:"), m_peakRateLabel, "peakRateLabel"));
-    mainLayout->addWidget(createStatsFrame(tr("时间:"), m_elapsedLabel, "elapsedLabel"));
+    mainLayout->addWidget(createStatsFrame(tr("接收:"), m_rxTotalLabel, "rxTotalLabel", "statsRxFrame"));
+    mainLayout->addWidget(createStatsFrame(tr("速率:"), m_rxRateLabel, "rxRateLabel", "statsRxFrame"));
+    mainLayout->addWidget(createStatsFrame(tr("发送:"), m_txTotalLabel, "txTotalLabel", "statsTxFrame"));
+    mainLayout->addWidget(createStatsFrame(tr("速率:"), m_txRateLabel, "txRateLabel", "statsTxFrame"));
+    mainLayout->addWidget(createStatsFrame(tr("峰值:"), m_peakRateLabel, "peakRateLabel", "statsPeakFrame"));
+    mainLayout->addWidget(createStatsFrame(tr("时间:"), m_elapsedLabel, "elapsedLabel", "statsTimeFrame"));
 
     // ---- 串口错误计数（默认隐藏，有错误时显示） ----
     m_errorLabel = new QLabel;
@@ -45,14 +45,21 @@ void DataStatistics::setupUI()
     m_errorLabel->hide();  // 无错误时不占用空间
     mainLayout->addWidget(m_errorLabel);
 
+    // ---- 连接健康状态（默认隐藏，空闲超10秒时显示） ----
+    m_healthLabel = new QLabel;
+    m_healthLabel->setObjectName("healthLabel");
+    m_healthLabel->setWordWrap(true);
+    m_healthLabel->hide();  // 数据正常流动时隐藏
+    mainLayout->addWidget(m_healthLabel);
+
     // 底部弹性空间
     mainLayout->addStretch();
 }
 
-QFrame* DataStatistics::createStatsFrame(const QString& label, QLabel*& valueLabel, const QString& objectName)
+QFrame* DataStatistics::createStatsFrame(const QString& label, QLabel*& valueLabel, const QString& objectName, const QString& frameName)
 {
     auto* frame = new QFrame;
-    frame->setObjectName("statsFrame");
+    frame->setObjectName(frameName.isEmpty() ? QStringLiteral("statsFrame") : frameName);
     frame->setFrameShape(QFrame::StyledPanel);
     auto* layout = new QFormLayout(frame);
     layout->setContentsMargins(8, 6, 8, 6);
@@ -112,6 +119,7 @@ void DataStatistics::reset()
     m_peakRateLabel->setText("0 B/s");
     m_elapsedLabel->setText("00:00:00");
     m_errorLabel->hide();
+    m_healthLabel->hide();
 
     // 重启计时器
     m_stopwatch.restart();
@@ -216,4 +224,70 @@ QString DataStatistics::formatRate(double bytesPerSec) const
         // 大于等于1GB/s
         return QString("%1 GB/s").arg(bytesPerSec / (1024.0 * 1024.0 * 1024.0), 0, 'f', 2);
     }
+}
+
+void DataStatistics::updateConnectionHealth(bool alive, qint64 lastDataAgeMs)
+{
+    // 连接不存活时直接隐藏健康标签（由连接状态UI负责显示断开信息）
+    if (!alive) {
+        m_healthLabel->hide();
+        return;
+    }
+
+    // 数据正常流动（10秒内收到过数据）时隐藏空闲提示
+    if (lastDataAgeMs < 0 || lastDataAgeMs < 10000) {
+        m_healthLabel->hide();
+        return;
+    }
+
+    // 空闲超过10秒，显示空闲时长提示
+    int idleSec = static_cast<int>(lastDataAgeMs / 1000);
+    if (idleSec >= 60) {
+        int min = idleSec / 60;
+        int sec = idleSec % 60;
+        m_healthLabel->setText(tr("⚠ 空闲 %1m%2s").arg(min).arg(sec));
+    } else {
+        m_healthLabel->setText(tr("⚠ 空闲 %1s").arg(idleSec));
+    }
+    m_healthLabel->show();
+}
+
+QString DataStatistics::sessionSummary() const
+{
+    // 生成多行会话统计摘要，用于导出或Toast通知
+    qint64 elapsedMs = m_stopwatch.isValid() ? m_stopwatch.elapsed() : 0;
+    int sec = static_cast<int>(elapsedMs / 1000);
+    QString timeStr = QString("%1:%2:%3")
+                          .arg(sec / 3600, 2, 10, QChar('0'))
+                          .arg((sec % 3600) / 60, 2, 10, QChar('0'))
+                          .arg(sec % 60, 2, 10, QChar('0'));
+
+    double peakRate = qMax(m_peakRxRate, m_peakTxRate);
+    int totalErrors = m_framingErrors + m_parityErrors + m_overrunErrors;
+
+    QString summary;
+    summary += tr("会话统计\n");
+    summary += tr("─────────────────\n");
+    summary += tr("持续时间: %1\n").arg(timeStr);
+    summary += tr("接收: %1\n").arg(formatBytes(m_lastRxBytes));
+    summary += tr("发送: %1\n").arg(formatBytes(m_lastTxBytes));
+    summary += tr("峰值速率: %1\n").arg(formatRate(peakRate));
+    if (totalErrors > 0) {
+        summary += tr("错误: %1 (帧%2 校验%3 溢出%4)")
+                       .arg(totalErrors)
+                       .arg(m_framingErrors)
+                       .arg(m_parityErrors)
+                       .arg(m_overrunErrors);
+    }
+    return summary;
+}
+
+quint64 DataStatistics::totalRxBytes() const
+{
+    return m_lastRxBytes;
+}
+
+quint64 DataStatistics::totalTxBytes() const
+{
+    return m_lastTxBytes;
 }

@@ -90,10 +90,14 @@ protected:
         p.fillPath(path, bg); p.save(); p.setClipPath(path);
         p.fillRect(QRect(0, 0, kLeftBorder, height()), accent); p.restore();
         int iconX = kLeftBorder + kPad;
-        p.setPen(accent); p.setFont(QFont("Segoe UI Emoji", kIconSize, QFont::Bold));
+        p.setPen(accent);
+        QFont iconFont; iconFont.setFamilies({"Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji"});
+        iconFont.setPointSize(kIconSize); iconFont.setBold(true); p.setFont(iconFont);
         p.drawText(QRect(iconX, 0, kIconArea, height()), Qt::AlignCenter, iconChar());
         int textX = iconX + kIconArea + kPad;
-        p.setPen(txt); p.setFont(QFont("Microsoft YaHei UI", 12));
+        p.setPen(txt);
+        QFont textFont; textFont.setFamilies({"Microsoft YaHei UI", "Segoe UI", "Noto Sans CJK SC"});
+        textFont.setPointSize(12); p.setFont(textFont);
         p.drawText(QRect(textX, kPad, width() - textX - kPad, height() - kPad * 2),
                    Qt::AlignVCenter | Qt::AlignLeft | Qt::TextWordWrap, m_message);
     }
@@ -106,7 +110,8 @@ private:
         setProperty("type", type == ToastType::Success ? "success"
                      : type == ToastType::Error ? "error" : "info");
         setAttribute(Qt::WA_TranslucentBackground); setFixedWidth(kWidth);
-        QFont font("Microsoft YaHei UI", 12); QFontMetrics fm(font);
+        QFont textFont; textFont.setFamilies({"Microsoft YaHei UI", "Segoe UI", "Noto Sans CJK SC"});
+        textFont.setPointSize(12); QFontMetrics fm(textFont);
         int textW = kWidth - kLeftBorder - kPad * 3 - kIconArea;
         QRect bound = fm.boundingRect(0, 0, textW, 0, Qt::TextWordWrap, message);
         setFixedHeight(qMax(kMinHeight, bound.height() + kPad * 2));
@@ -182,15 +187,11 @@ private:
     QString m_message;                                 ///< 消息文本
     QGraphicsOpacityEffect* m_opacityEffect = nullptr; ///< 淡入淡出特效
 
-    static constexpr int kWidth = 320;    ///< 吐司固定宽度
-    static constexpr int kMinHeight = 48; ///< 最小高度
-    static constexpr int kMargin = 16;    ///< 与窗口边缘间距
-    static constexpr int kRadius = 8;     ///< 圆角半径
-    static constexpr int kLeftBorder = 4; ///< 左侧彩色边框宽度
-    static constexpr int kPad = 12;       ///< 内边距
-    static constexpr int kIconArea = 24;  ///< 图标区域宽度
-    static constexpr int kIconSize = 14;  ///< 图标字号
-    static constexpr int kGap = 8;        ///< 吐司间距
+    static constexpr int kWidth = 320, kMinHeight = 48;   ///< 宽度 / 最小高度
+    static constexpr int kMargin = 16, kRadius = 8;       ///< 边距 / 圆角
+    static constexpr int kLeftBorder = 4, kPad = 12;      ///< 左边框 / 内边距
+    static constexpr int kIconArea = 24, kIconSize = 14;  ///< 图标区 / 字号
+    static constexpr int kGap = 8;                         ///< 吐司间距
 };
 
 #endif // TOASTWIDGET_H

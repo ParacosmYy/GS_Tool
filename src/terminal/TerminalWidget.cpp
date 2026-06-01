@@ -18,6 +18,38 @@
 #include <QKeySequence>
 #include <QTimer>
 
+namespace {
+/**
+ * @brief 安全UTF-8解码，将无效字节替换为\xHH而非Unicode替换字符
+ *
+ * 逐字节检查UTF-8序列有效性，无效字节输出\xHH可读转义，
+ * 避免串口二进制数据中的非UTF-8字节被替换为'�'后丢失原始信息(P2-02)
+ */
+QString safeFromUtf8(const QByteArray& data) {
+    QString result; result.reserve(data.size());
+    int i = 0;
+    // 尝试从data[i]开始解码len字节UTF-8序列，成功则追加并前移
+    auto trySeq = [&](int len) -> bool {
+        if (i + len > data.size()) return false;
+        QString c = QString::fromUtf8(data.mid(i, len));
+        if (!c.isEmpty() && c[0].unicode() != 0xFFFD) { result += c; i += len; return true; }
+        return false;
+    };
+    auto esc = [](unsigned char ch) {
+        return QString("\\x%1").arg(ch, 2, 16, QChar('0')).toUpper();
+    };
+    while (i < data.size()) {
+        unsigned char ch = static_cast<unsigned char>(data[i]);
+        if (ch < 0x80) { result += QLatin1Char(ch); ++i; }            // ASCII
+        else if ((ch & 0xE0) == 0xC0 && trySeq(2)) {}                 // 2字节UTF-8
+        else if ((ch & 0xF0) == 0xE0 && trySeq(3)) {}                 // 3字节UTF-8(中文)
+        else if ((ch & 0xF8) == 0xF0 && trySeq(4)) {}                 // 4字节UTF-8(emoji)
+        else { result += esc(ch); ++i; }                              // 无效字节→\xHH
+    }
+    return result;
+}
+} // anonymous namespace
+
 // ---- 构造与基本配置 ----
 TerminalWidget::TerminalWidget(QWidget* parent)
     : QWidget(parent)
@@ -138,6 +170,8 @@ void TerminalWidget::clear()
     m_selectionManager->reset();
     m_scrollOffset = 0;          // 防御性重置：防止未来调用模式变更导致滚动位置残留
     m_maxScrollOffset = 0;       // 同步重置最大滚动偏移
+    // 同步清空底层数据模型，防止缓存清空后下次paintEvent从模型重建导致旧数据闪现(P2-01)
+    if (m_model) m_model->clear();
     update();
 }
 
@@ -435,7 +469,7 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
     case DisplayMode::Hex:
         cached.text = prefix + HexConverter::toHexString(line.data); break;
     case DisplayMode::Mixed:
-        cached.text = prefix + QString::fromUtf8(line.data) + "  |  " + HexConverter::toHexString(line.data); break;
+        cached.text = prefix + safeFromUtf8(line.data) + "  |  " + HexConverter::toHexString(line.data); break;
     case DisplayMode::Decimal: {
         QStringList decBytes;
         for (unsigned char b : line.data) decBytes << QString::number(b);
@@ -443,20 +477,12 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
     }
     case DisplayMode::Text:
     default:
-        cached.text = prefix + QString::fromUtf8(line.data); break;
+        cached.text = prefix + safeFromUtf8(line.data); break;
     }
     return cached;
 }
 
-// ---- 右键菜单 ----
-/** @brief 创建终端右键菜单(复制/粘贴/清屏/全选/搜索)，样式由QSS主题控制 */
-
-/** @brief 右键菜单事件 - 根据选区状态动态设置"复制"可用性 */
-
-
-/** @brief 全选终端所有内容(包含方向过滤后的总行数) */
-
-// ---- context menu (delegated) ----
+// ---- 右键菜单 / 全选 ----
 void TerminalWidget::contextMenuEvent(QContextMenuEvent* event)
 {
     m_contextMenuManager->showContextMenu(event, !selectedText().isEmpty());

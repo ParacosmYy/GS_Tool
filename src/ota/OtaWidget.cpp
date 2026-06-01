@@ -301,6 +301,8 @@ void OtaWidget::onProgress(int percent, qint64 bytesSent, qint64 totalBytes)
         m_progressAnim->setEndValue(percent);
         m_progressAnim->setDuration(qMin(qAbs(percent - oldValue) * 10, 500));
         m_progressAnim->setEasingCurve(QEasingCurve::OutCubic);
+        // DeleteWhenStopped 自动销毁动画，连接 destroyed 信号清空指针避免悬挂
+        connect(m_progressAnim, &QObject::destroyed, this, [this]() { m_progressAnim = nullptr; });
         m_progressAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
     m_statusLbl->setText(tr("传输中: %1%").arg(percent));
@@ -440,16 +442,8 @@ void OtaWidget::startCompletionAnimation()
     // 阶段1: 立即设置中间混合色（布局属性由QSS主题控制）
     m_progressBar->setChunkColor(mid);
 
-    // 阶段2: 400ms 后切换为最终 success 色
-    m_colorAnim = new QPropertyAnimation(m_progressBar, "value");
-    m_colorAnim->setStartValue(100);
-    m_colorAnim->setEndValue(100);  // 值不变，仅用作 400ms 定时器
-    m_colorAnim->setDuration(400);
-    m_colorAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-    connect(m_colorAnim, &QPropertyAnimation::finished, this, [this, success]() {
+    // 阶段2: 400ms 后切换为最终 success 色（使用QTimer替代QPropertyAnimation误用）
+    QTimer::singleShot(400, this, [this, success]() {
         m_progressBar->setChunkColor(success);
     });
-
-    m_colorAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }

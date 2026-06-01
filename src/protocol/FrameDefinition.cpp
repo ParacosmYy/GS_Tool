@@ -64,18 +64,19 @@ QVariant FieldDef::extractValue(const QByteArray& payload) const
             (static_cast<unsigned char>(d[1])));
         break;
     case UInt32LE:
+        // 先转 uint32_t 再移位，避免 unsigned char→int 提升后 << 24 越界（UB）
         raw = static_cast<uint32_t>(
-            (static_cast<unsigned char>(d[0])) |
-            (static_cast<unsigned char>(d[1]) << 8) |
-            (static_cast<unsigned char>(d[2]) << 16) |
-            (static_cast<unsigned char>(d[3]) << 24));
+            (static_cast<uint32_t>(static_cast<unsigned char>(d[0]))) |
+            (static_cast<uint32_t>(static_cast<unsigned char>(d[1])) << 8) |
+            (static_cast<uint32_t>(static_cast<unsigned char>(d[2])) << 16) |
+            (static_cast<uint32_t>(static_cast<unsigned char>(d[3])) << 24));
         break;
     case UInt32BE:
         raw = static_cast<uint32_t>(
-            (static_cast<unsigned char>(d[0]) << 24) |
-            (static_cast<unsigned char>(d[1]) << 16) |
-            (static_cast<unsigned char>(d[2]) << 8) |
-            (static_cast<unsigned char>(d[3])));
+            (static_cast<uint32_t>(static_cast<unsigned char>(d[0])) << 24) |
+            (static_cast<uint32_t>(static_cast<unsigned char>(d[1])) << 16) |
+            (static_cast<uint32_t>(static_cast<unsigned char>(d[2])) << 8) |
+            (static_cast<uint32_t>(static_cast<unsigned char>(d[3]))));
         break;
     case Int8:
         raw = static_cast<signed char>(d[0]);

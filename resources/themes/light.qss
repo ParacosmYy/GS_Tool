@@ -708,6 +708,40 @@ QLabel#errorLabel {
     border-radius: 4px;
     padding: 6px 8px;
 }
+QLabel#healthStatusLabel {
+    color: #d97706;
+    font-size: 11px;
+    background-color: rgba(217, 119, 6, 0.06);
+    border: 1px solid rgba(217, 119, 6, 0.2);
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+/* === DataStatistics 统计面板框架 === */
+QFrame#statsRxFrame {
+    background-color: rgba(22, 163, 74, 0.04);
+    border: 1px solid rgba(22, 163, 74, 0.15);
+    border-radius: 6px;
+    padding: 8px;
+}
+QFrame#statsTxFrame {
+    background-color: rgba(220, 38, 38, 0.04);
+    border: 1px solid rgba(220, 38, 38, 0.15);
+    border-radius: 6px;
+    padding: 8px;
+}
+QFrame#statsPeakFrame {
+    background-color: rgba(37, 99, 235, 0.04);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 6px;
+    padding: 8px;
+}
+QFrame#statsTimeFrame {
+    background-color: rgba(107, 114, 128, 0.04);
+    border: 1px solid rgba(107, 114, 128, 0.12);
+    border-radius: 6px;
+    padding: 8px;
+}
 
 /* === 终端搜索栏 === */
 QWidget#terminalSearchBar { background: #f3f4f6; }
