@@ -52,6 +52,7 @@ set(SOURCES
     src/connection/TcpConnection.cpp
     src/connection/UdpConnection.cpp
     src/terminal/TerminalWidget.cpp
+    src/terminal/TerminalWidgetPaint.cpp
     src/terminal/TerminalModel.cpp
     src/terminal/TerminalSearchBar.cpp
     src/terminal/DirectionFilter.cpp
@@ -60,7 +61,9 @@ set(SOURCES
     src/terminal/TerminalSearchManager.cpp
     src/terminal/TerminalSearchRenderer.cpp
     src/terminal/TerminalContextMenuManager.cpp
+    src/terminal/TerminalWidgetPaint.cpp
     src/serial/SerialConfigPanel.cpp
+    src/serial/SerialConfigPanelUI.cpp
     src/serial/QuickCommandBar.cpp
     src/serial/BookmarkWidget.cpp
     src/serial/TimedSender.cpp
@@ -91,6 +94,7 @@ set(SOURCES
     src/utils/DataExporterStreamed.cpp
     src/utils/DataExporterEdl.cpp
     src/utils/DataLogger.cpp
+    src/utils/DataLoggerEdl.cpp
     src/protocol/FrameDefinition.cpp
     src/core/SessionManager.cpp
 )
