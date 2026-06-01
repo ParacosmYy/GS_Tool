@@ -75,6 +75,7 @@ set(SOURCES
     src/protocol/FrameParserHelpers.cpp
     src/protocol/ProtocolView.cpp
     src/protocol/FrameVisualEditor.cpp
+    src/protocol/FrameVisualEditorUI.cpp
     src/protocol/IntelHexParser.cpp
     src/protocol/JustFloatBridge.cpp
     src/protocol/FireWaterBridge.cpp
@@ -88,7 +89,9 @@ set(SOURCES
     src/ota/protocols/BaseTransfer.cpp
     src/ota/protocols/XModemTransfer.cpp
     src/ota/protocols/YModemTransfer.cpp
+    src/ota/protocols/YModemTransferHandlers.cpp
     src/ota/protocols/ZModemTransfer.cpp
+    src/ota/protocols/ZModemTransferHandlers.cpp
     src/utils/SettingsManager.cpp
     src/utils/DataExporter.cpp
     src/utils/DataExporterStreamed.cpp
