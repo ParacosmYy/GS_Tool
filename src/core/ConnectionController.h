@@ -141,6 +141,17 @@ private:
     /** @brief 统一的连接断开清理流程: 停超时→缓存清空→断信号→移除连接→清下游 @param reason 断开原因(用于日志) */
     void teardownConnection(const QString& reason);
 
+    /**
+     * @brief 计算指数退避重连间隔
+     *
+     * 策略: actualInterval = baseInterval * 2^min(attempt, maxShift)，上限30秒
+     * 例: base=3s → 3s→6s→12s→24s→30s→30s...
+     *
+     * @param attempt 当前重连次数(从1开始)
+     * @return 本次重连后等待的间隔(毫秒)
+     */
+    int calcBackoffInterval(int attempt) const;
+
     ConnectionManager* m_connManager;              ///< 连接管理器(工厂)
     IConnection* m_currentConn = nullptr;          ///< 当前活跃连接实例
     SendController* m_sendController = nullptr;    ///< 发送控制器引用

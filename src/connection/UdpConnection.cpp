@@ -1,3 +1,13 @@
+/**
+ * @file UdpConnection.cpp
+ * @brief UDP连接实现 - 封装 QUdpSocket 的无连接数据报通信
+ *
+ * 支持点对点UDP和广播模式:
+ *   - 点对点: 绑定本地端口，向指定远程主机:端口发送数据报
+ *   - 广播: 绑定本地端口，向广播地址发送数据报
+ *   - 接收: 读取所有到达本地端口的数据报并转发
+ */
+
 #include "connection/UdpConnection.h"
 #include <QVariant>
 
@@ -27,11 +37,16 @@ QString UdpConnection::name() const
         .arg(m_remotePort);
 }
 
+/** @brief 返回当前连接状态 */
 ConnectionState UdpConnection::state() const
 {
     return m_state;
 }
 
+/**
+ * @brief 通过参数映射配置UDP连接参数
+ * @param params 参数映射: localPort(本地端口)/remoteHost(远程主机)/remotePort(远程端口)/broadcast(广播模式)
+ */
 void UdpConnection::configure(const QVariantMap& params)
 {
     m_localPort = static_cast<quint16>(params.value("localPort", QVariant(0)).toInt());
@@ -40,15 +55,27 @@ void UdpConnection::configure(const QVariantMap& params)
     m_broadcast = params.value("broadcast", QVariant(false)).toBool();
 }
 
+/**
+ * @brief 打开UDP连接
+ *
+ * 创建QUdpSocket并绑定到本地端口。已连接时先关闭旧socket防止重复绑定。
+ * 广播模式绑定到AnyIPv4，点对点模式绑定到Any。
+ * @return true=绑定成功, false=绑定失败
+ */
 bool UdpConnection::open()
 {
-    if (!m_socket) {
-        m_socket = new QUdpSocket(this);
-        connect(m_socket, &QUdpSocket::readyRead,
-                this, &UdpConnection::onReadyRead);
-        connect(m_socket, &QUdpSocket::errorOccurred,
-                this, &UdpConnection::onError);
+    // 已连接时先关闭旧socket，防止重复绑定导致 bind 失败
+    if (m_socket) {
+        m_socket->close();
+        m_socket->deleteLater();
+        m_socket = nullptr;
     }
+
+    m_socket = new QUdpSocket(this);
+    connect(m_socket, &QUdpSocket::readyRead,
+            this, &UdpConnection::onReadyRead);
+    connect(m_socket, &QUdpSocket::errorOccurred,
+            this, &UdpConnection::onError);
 
     // 绑定本地端口（0=自动选择）
     QHostAddress bindAddr = m_broadcast ? QHostAddress::AnyIPv4 : QHostAddress::Any;
@@ -62,6 +89,7 @@ bool UdpConnection::open()
     return true;
 }
 
+/** @brief 关闭UDP连接，释放socket资源并重置状态 */
 void UdpConnection::close()
 {
     if (m_socket) {
@@ -72,6 +100,11 @@ void UdpConnection::close()
     updateState(ConnectionState::Disconnected);
 }
 
+/**
+ * @brief 发送数据报到远程主机或广播地址
+ * @param data 待发送的字节数据
+ * @return 实际发送的字节数，-1表示未连接或发送失败
+ */
 qint64 UdpConnection::write(const QByteArray& data)
 {
     if (!m_socket || m_state != ConnectionState::Connected) {
@@ -86,6 +119,7 @@ qint64 UdpConnection::write(const QByteArray& data)
     return m_socket->writeDatagram(data, m_remoteHost, m_remotePort);
 }
 
+/** @brief readyRead信号处理: 读取所有到达的数据报并转发给上层 */
 void UdpConnection::onReadyRead()
 {
     if (!m_socket) return;
@@ -102,6 +136,10 @@ void UdpConnection::onReadyRead()
     }
 }
 
+/**
+ * @brief socket错误处理
+ * @param error Qt网络错误码，翻译为中文描述后通知上层
+ */
 void UdpConnection::onError(QAbstractSocket::SocketError error)
 {
     QString systemError = m_socket ? m_socket->errorString() : QString();
@@ -109,6 +147,12 @@ void UdpConnection::onError(QAbstractSocket::SocketError error)
     updateState(ConnectionState::Error);
 }
 
+/**
+ * @brief 将网络错误码翻译为中文描述
+ * @param error Qt网络错误枚举
+ * @param systemError 系统级错误描述字符串
+ * @return 人类可读的中文错误描述
+ */
 QString UdpConnection::translateNetworkError(QAbstractSocket::SocketError error,
                                               const QString& systemError)
 {
@@ -147,6 +191,7 @@ QString UdpConnection::translateNetworkError(QAbstractSocket::SocketError error,
     return UdpConnection::tr("UDP错误: %1").arg(systemError);
 }
 
+/** @brief 更新连接状态（仅当状态变化时发射信号） */
 void UdpConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {

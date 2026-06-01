@@ -120,6 +120,13 @@ void MainWindow::connectSerialSignals()
     connect(m_connController, &ConnectionController::pinoutSignalsChanged,
             m_panelManager->serialConfig(), &SerialConfigPanel::updatePinoutLeds);
 
+    // 数据流 + 状态/错误通知
+    connectSerialDataFlow();
+}
+
+/** @brief 串口数据流 + 状态/错误信号连接 */
+void MainWindow::connectSerialDataFlow()
+{
     // 接收数据 -> 终端模型 + 协议解析 + 日志记录
     connect(m_connController, &ConnectionController::dataReceived,
             this, [this](const QByteArray& data) {

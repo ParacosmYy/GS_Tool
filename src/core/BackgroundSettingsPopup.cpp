@@ -35,86 +35,71 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
     mainLayout->setContentsMargins(12, 12, 12, 12);
     mainLayout->setSpacing(8);
 
-    // ---- 模糊半径滑块 ----
-    auto* blurLayout = new QHBoxLayout;
-    auto* blurLbl = new QLabel(tr("磨砂模糊:"), this);
-    blurLbl->setObjectName("bgBlurLabel");  // QSS 选择器需要
-    blurLbl->setFixedWidth(70);
-    m_blurSlider = new QSlider(Qt::Horizontal, this);
-    m_blurSlider->setObjectName("bgBlurSlider");
-    m_blurSlider->setRange(0, 30);
-    m_blurSlider->setValue(int(m_bgWidget->blurRadius()));
-    m_blurValueLbl = new QLabel(QString::number(int(m_bgWidget->blurRadius())), this);
-    m_blurValueLbl->setObjectName("bgBlurValueLabel");  // QSS 选择器需要
-    m_blurValueLbl->setFixedWidth(28);
-    blurLayout->addWidget(blurLbl);
-    blurLayout->addWidget(m_blurSlider, 1);
-    blurLayout->addWidget(m_blurValueLbl);
-    mainLayout->addLayout(blurLayout);
-
-    // 滑块值变化 → 实时更新模糊半径和标签显示
-    connect(m_blurSlider, &QSlider::valueChanged, this, [this](int val) {
-        m_bgWidget->setBlurRadius(val);
-        m_blurValueLbl->setText(QString::number(val));
-    });
-
-    // ---- 背景透明度滑块 ----
-    auto* opacityLayout = new QHBoxLayout;
-    auto* opacityLbl = new QLabel(tr("背景透明度:"), this);
-    opacityLbl->setObjectName("bgOpacityLabel");  // QSS 选择器需要
-    opacityLbl->setFixedWidth(70);
-    m_opacitySlider = new QSlider(Qt::Horizontal, this);
-    m_opacitySlider->setObjectName("bgOpacitySlider");
-    m_opacitySlider->setRange(0, 100);
-    m_opacitySlider->setValue(int(m_bgWidget->bgOpacity() * 100));
-    m_opacityValueLbl = new QLabel(QString::number(int(m_bgWidget->bgOpacity() * 100)) + "%", this);
-    m_opacityValueLbl->setObjectName("bgOpacityValueLabel");  // QSS 选择器需要
-    m_opacityValueLbl->setFixedWidth(36);
-    opacityLayout->addWidget(opacityLbl);
-    opacityLayout->addWidget(m_opacitySlider, 1);
-    opacityLayout->addWidget(m_opacityValueLbl);
-    mainLayout->addLayout(opacityLayout);
-
-    // 滑块值变化 → 实时更新透明度（0~100 映射到 0.0~1.0）
-    connect(m_opacitySlider, &QSlider::valueChanged, this, [this](int val) {
-        m_bgWidget->setBgOpacity(val / 100.0);
-        m_opacityValueLbl->setText(QString::number(val) + "%");
-    });
-
-    // ---- 涟漪特效开关 ----
-    auto* rippleCheck = new QCheckBox(tr("点击涟漪特效"), this);
-    rippleCheck->setObjectName("bgRippleCheck");  // QSS 选择器需要
-    rippleCheck->setChecked(m_bgWidget->rippleEnabled());
-    mainLayout->addWidget(rippleCheck);
-
-    connect(rippleCheck, &QCheckBox::toggled, m_bgWidget, &BackgroundWidget::setRippleEnabled);
-
-    // ---- 分隔线 ----
-    auto* separator = new QFrame(this);
-    separator->setObjectName("bgSeparator");  // QSS 选择器需要
-    separator->setFrameShape(QFrame::HLine);
-    separator->setFrameShadow(QFrame::Sunken);
-    mainLayout->addWidget(separator);
+    // 创建所有滑块、开关和分隔线控件
+    createControls(mainLayout);
 
     // ---- 选择背景图按钮 ----
     m_selectImageBtn = new QPushButton(tr("选择背景图..."), this);
     m_selectImageBtn->setObjectName("bgSelectImageBtn");
     mainLayout->addWidget(m_selectImageBtn);
-
     connect(m_selectImageBtn, &QPushButton::clicked, this, &BackgroundSettingsPopup::onSelectBackground);
 
     // ---- 恢复默认按钮 ----
     m_resetBtn = new QPushButton(tr("恢复默认背景"), this);
     m_resetBtn->setObjectName("bgResetBtn");
     mainLayout->addWidget(m_resetBtn);
-
     connect(m_resetBtn, &QPushButton::clicked, this, [this]() {
         m_bgWidget->resetToDefault();
-        // 清除用户保存的自定义背景路径，下次启动加载默认背景
         SettingsManager::instance().remove("background/customImagePath");
         SettingsManager::instance().sync();
         emit resetToDefaultRequested();
     });
+}
+
+/** @brief 创建模糊/透明度滑块、涟漪开关、分隔线并添加到布局 */
+void BackgroundSettingsPopup::createControls(QVBoxLayout* mainLayout)
+{
+    // ---- 模糊半径滑块 ----
+    auto* blurLayout = new QHBoxLayout;
+    auto* blurLbl = new QLabel(tr("磨砂模糊:"), this);
+    blurLbl->setObjectName("bgBlurLabel"); blurLbl->setFixedWidth(70);
+    m_blurSlider = new QSlider(Qt::Horizontal, this);
+    m_blurSlider->setObjectName("bgBlurSlider");
+    m_blurSlider->setRange(0, 30); m_blurSlider->setValue(int(m_bgWidget->blurRadius()));
+    m_blurValueLbl = new QLabel(QString::number(int(m_bgWidget->blurRadius())), this);
+    m_blurValueLbl->setObjectName("bgBlurValueLabel"); m_blurValueLbl->setFixedWidth(28);
+    blurLayout->addWidget(blurLbl); blurLayout->addWidget(m_blurSlider, 1); blurLayout->addWidget(m_blurValueLbl);
+    mainLayout->addLayout(blurLayout);
+    connect(m_blurSlider, &QSlider::valueChanged, this, [this](int val) {
+        m_bgWidget->setBlurRadius(val); m_blurValueLbl->setText(QString::number(val));
+    });
+
+    // ---- 背景透明度滑块 ----
+    auto* opacityLayout = new QHBoxLayout;
+    auto* opacityLbl = new QLabel(tr("背景透明度:"), this);
+    opacityLbl->setObjectName("bgOpacityLabel"); opacityLbl->setFixedWidth(70);
+    m_opacitySlider = new QSlider(Qt::Horizontal, this);
+    m_opacitySlider->setObjectName("bgOpacitySlider");
+    m_opacitySlider->setRange(0, 100); m_opacitySlider->setValue(int(m_bgWidget->bgOpacity() * 100));
+    m_opacityValueLbl = new QLabel(QString::number(int(m_bgWidget->bgOpacity() * 100)) + "%", this);
+    m_opacityValueLbl->setObjectName("bgOpacityValueLabel"); m_opacityValueLbl->setFixedWidth(36);
+    opacityLayout->addWidget(opacityLbl); opacityLayout->addWidget(m_opacitySlider, 1); opacityLayout->addWidget(m_opacityValueLbl);
+    mainLayout->addLayout(opacityLayout);
+    connect(m_opacitySlider, &QSlider::valueChanged, this, [this](int val) {
+        m_bgWidget->setBgOpacity(val / 100.0); m_opacityValueLbl->setText(QString::number(val) + "%");
+    });
+
+    // ---- 涟漪特效开关 ----
+    auto* rippleCheck = new QCheckBox(tr("点击涟漪特效"), this);
+    rippleCheck->setObjectName("bgRippleCheck"); rippleCheck->setChecked(m_bgWidget->rippleEnabled());
+    mainLayout->addWidget(rippleCheck);
+    connect(rippleCheck, &QCheckBox::toggled, m_bgWidget, &BackgroundWidget::setRippleEnabled);
+
+    // ---- 分隔线 ----
+    auto* separator = new QFrame(this);
+    separator->setObjectName("bgSeparator");
+    separator->setFrameShape(QFrame::HLine); separator->setFrameShadow(QFrame::Sunken);
+    mainLayout->addWidget(separator);
 }
 
 /**

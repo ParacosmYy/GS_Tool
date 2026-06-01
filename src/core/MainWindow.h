@@ -87,6 +87,7 @@ private:
 
     void connectSignals();                 ///< 连接所有模块间信号/槽
     void connectSerialSignals();           ///< 串口连接/断开信号路由
+    void connectSerialDataFlow();          ///< 串口数据流+状态/错误信号路由
     void connectSerialSendSignals();       ///< 快捷指令/发送控制器信号路由
     void connectReconnectSignals();        ///< 自动重连状态指示信号路由
     void connectToolbarSignals();          ///< 工具栏/录制状态消息信号路由
@@ -102,6 +103,9 @@ private:
      * @param connName 连接名称
      */
     void handleConnectionState(ConnectionState state, const QString& connName);
+
+    /** @brief 从磁盘恢复用户偏好（语言、主题、面板索引、统计定时器） */
+    void restoreUserSession(int lastPanel);
 
     // ---- 核心组件 ----
     ConnectionManager* m_connManager;          ///< 连接管理器(IConnection生命周期)

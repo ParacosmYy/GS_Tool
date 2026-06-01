@@ -101,6 +101,18 @@ MainWindow::MainWindow(QWidget* parent)
     // 从磁盘恢复上次保存的完整工作区（窗口几何、串口配置、面板索引）
     int lastPanel = m_sessionManager->loadSession();
 
+    // 恢复语言/主题/面板/统计定时器
+    restoreUserSession(lastPanel);
+
+    // 设置窗口属性
+    setWindowTitle(App::APP_NAME);
+    resize(1200, 800);
+    setMinimumSize(900, 600);
+}
+
+/** @brief 从磁盘恢复用户偏好（语言、主题、面板索引）并启动统计定时器 */
+void MainWindow::restoreUserSession(int lastPanel)
+{
     // 恢复语言选择到工具栏下拉框
     if (m_toolbarController) {
         QString savedLang = SettingsManager::instance().loadLanguage();
@@ -110,23 +122,14 @@ MainWindow::MainWindow(QWidget* parent)
     // 恢复主题: 加载主题文件 + 同步工具栏下拉框选中项
     QString savedTheme = SettingsManager::instance().loadTheme();
     if (ThemeManager::instance().loadTheme(savedTheme)) {
-        if (m_toolbarController) {
-            m_toolbarController->setCurrentTheme(savedTheme);
-        }
+        if (m_toolbarController) m_toolbarController->setCurrentTheme(savedTheme);
     }
 
     // 恢复上次活跃面板（如果有保存记录）
-    if (lastPanel >= 0) {
-        m_navController->restorePanelByIndex(lastPanel);
-    }
+    if (lastPanel >= 0) m_navController->restorePanelByIndex(lastPanel);
 
     // 启动统计刷新定时器（每 500ms 触发一次）
     m_terminalController->startStatsTimer();
-
-    // 设置窗口属性
-    setWindowTitle(App::APP_NAME);
-    resize(1200, 800);
-    setMinimumSize(900, 600);
 }
 
 /** @brief 析构函数 - QObject 父子树自动销毁所有子组件，无需手动 delete */

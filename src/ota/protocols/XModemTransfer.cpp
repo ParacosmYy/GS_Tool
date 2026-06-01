@@ -236,6 +236,11 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
         m_blockNumber++;
         if (m_blockNumber > 255) m_blockNumber = 1;
 
+        // ACK确认后推进已发送字节数（sendBlock不再自动推进，防止NAK重传时跳块）
+        int bs = blockSize();
+        qint64 remaining = m_data.size() - m_bytesSent;
+        m_bytesSent += qMin(static_cast<qint64>(bs), remaining);
+
         // 更新速率统计
         updateTransferStats();
 
@@ -356,7 +361,8 @@ void XModemTransfer::sendBlock()
             return;
         }
     }
-    m_bytesSent = qMin(offset + dataSize, static_cast<qint64>(m_data.size()));
+    // 注意: m_bytesSent 不在sendBlock中推进，而是在ACK确认后推进，
+    // 确保NAK重传时发送相同的块（防止跳块导致数据损坏）
 }
 
 void XModemTransfer::sendEOT()

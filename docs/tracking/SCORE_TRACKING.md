@@ -46,4 +46,6 @@
 | 55 | P1 Bug修复x5+冲突标记清理+FrameParser回溯增强: BUG-02 TerminalWidget选择重置+BUG-03 paintEvent递归(QTimer延迟)+BUG-04 ChartWidget空配置兜底+BUG-05 SettingsManager const_cast替换+BUG-06 OtaManager临时文件泄漏+冲突标记清理(MainWindow/QuickCommandBar/TerminalLayoutManager)+FrameParser帧头匹配回溯算法+纯header帧路径D实现+QuickCommandBar createEditDialog提取+TerminalLayoutManager参数化重构 | 55 |
 | 56 | R18: DataLogger BigEndian修复+DataExporter CSV转义+ThemeManager内存修复+TcpConnection超时+DataStatistics衰减+sendBreak+FrameVisualEditor合规 | 56 |
 | 57 | R15串口深度+自动重连指数退避(interval*2^min(attempt,4)上限30s)+连接健康监控(5s心跳connectionHealth信号)+JSON导出(exportJson+exportStreamedJson)+OTA 16MB限制+端口波特率提示 | 57 |
+| 58 | 6个P2 Bug修复+连接健康UI+safeFromUtf8(二进制安全UTF8解码)+会话摘要+Toast字体回退链+OtaWidget QPropertyAnimation滥用修复+FrameDefinition uint32_t移位UB修复+RecordingController blockSignals递归修复 | 58 |
+| 59 | 新特性评估(高级波形引擎提案通过)+BackgroundSettingsPopup重构(createControls提取)+UDP重连socket泄漏修复+ChannelConfig JSON键验证+XModemTransfer start timeout+ConnectionController健康信号增强+SerialDriverDetector驱动信息增强 | 59 |
 | ... | 目标: 1000分 | 1000 |

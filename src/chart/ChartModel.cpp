@@ -1,3 +1,13 @@
+/**
+ * @file ChartModel.cpp
+ * @brief 波形数据模型实现 - 滑动窗口 + 降采样的实时数据管理
+ *
+ * 核心机制:
+ *   - 滑动窗口: 固定容量，旧数据自动丢弃
+ *   - 降采样: 数据量超过显示像素时自动降采样，保留极值
+ *   - 实时速率: 通过定时采样计算每秒数据点数
+ */
+
 #include "chart/ChartModel.h"
 
 #include <QVariantMap>

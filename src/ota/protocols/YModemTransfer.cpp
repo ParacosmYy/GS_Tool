@@ -180,7 +180,8 @@ void YModemTransfer::handleStateSendingBlock0(char ch, int& readIdx)
         m_retryCount = 0;
         m_blockRetryCount = 0;
         m_blockNumber = 1;
-        // 保持在SendingBlock0状态，等待后续的'C'字节
+        // 重启超时定时器，防止接收方ACK后不发'C'导致无限挂起
+        m_timeoutTimer->start(m_timeoutMs * 3);
     } else if (ch == CRC_CHAR) {
         // 接收方ACK后立即发C，开始数据传输
         m_timeoutTimer->stop();

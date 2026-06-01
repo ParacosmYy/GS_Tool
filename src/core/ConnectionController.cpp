@@ -401,11 +401,8 @@ void ConnectionController::onAutoReconnect()
 
     m_reconnectAttemptCount++;
 
-    // 计算指数退避间隔: baseInterval * 2^min(attempt, 4)，上限30秒
-    const int maxExpShift = 4;
-    const int maxIntervalMs = 30000;
-    int expShift = qMin(m_reconnectAttemptCount, maxExpShift);
-    int actualInterval = qMin(m_reconnectBaseIntervalMs * (1 << expShift), maxIntervalMs);
+    // 指数退避: baseInterval * 2^min(attempt, 4)，上限30秒
+    int actualInterval = calcBackoffInterval(m_reconnectAttemptCount);
 
     // 通知UI当前重连进度和下次等待时间
     emit reconnectProgress(m_reconnectAttemptCount, m_reconnectMaxRetries, actualInterval);
@@ -545,4 +542,12 @@ void ConnectionController::stopConnectionTimeout()
     if (m_connectionTimer.isActive()) {
         m_connectionTimer.stop();
     }
+}
+
+/** @brief 计算指数退避重连间隔，策略: base*2^min(attempt,4)，上限30秒 */
+int ConnectionController::calcBackoffInterval(int attempt) const
+{
+    const int maxShift = 4;
+    const int maxMs = 30000;
+    return qMin(m_reconnectBaseIntervalMs * (1 << qMin(attempt, maxShift)), maxMs);
 }

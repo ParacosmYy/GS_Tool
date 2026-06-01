@@ -1,3 +1,12 @@
+/**
+ * @file ChannelConfig.cpp
+ * @brief 通道配置实现 - 波形通道的计算逻辑和JSON序列化
+ *
+ * 支持两种数据源模式:
+ *   - Direct: 从帧字段直接取值
+ *   - Combine: 对两个字段执行加减乘除运算
+ */
+
 #include "chart/ChannelConfig.h"
 #include "protocol/FrameDefinition.h"
 
@@ -104,11 +113,14 @@ QJsonObject ChannelConfig::toJson() const
 ChannelConfig ChannelConfig::fromJson(const QJsonObject& obj)
 {
     ChannelConfig cfg;
-    cfg.sourceMode = static_cast<SourceMode>(obj["sourceMode"].toInt(0));
+    // 枚举值范围校验: 防止损坏的JSON导致 static_cast 产生无效枚举值
+    int sm = obj["sourceMode"].toInt(0);
+    cfg.sourceMode = (sm >= 0 && sm <= 1) ? static_cast<SourceMode>(sm) : SourceMode::Direct;
     cfg.sourceField = obj["sourceField"].toString();
     cfg.sourceFieldA = obj["sourceFieldA"].toString();
     cfg.sourceFieldB = obj["sourceFieldB"].toString();
-    cfg.combineOp = static_cast<CombineOp>(obj["combineOp"].toInt(0));
+    int co = obj["combineOp"].toInt(0);
+    cfg.combineOp = (co >= 0 && co <= 3) ? static_cast<CombineOp>(co) : CombineOp::Add;
     cfg.scale = obj["scale"].toDouble(1.0);
     cfg.offset = obj["offset"].toDouble(0.0);
     cfg.displayName = obj["displayName"].toString();
@@ -119,7 +131,8 @@ ChannelConfig ChannelConfig::fromJson(const QJsonObject& obj)
     }
     cfg.enabled = obj["enabled"].toBool(true);
     cfg.unit = obj["unit"].toString();
-    cfg.sampleDivisor = obj["sampleDivisor"].toInt(1);
+    int sd = obj["sampleDivisor"].toInt(1);
+    cfg.sampleDivisor = (sd >= 1) ? sd : 1;  // 降采样因子最小为1
     return cfg;
 }
 

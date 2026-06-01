@@ -1,3 +1,13 @@
+/**
+ * @file TcpConnection.cpp
+ * @brief TCP连接实现 - 封装 QTcpSocket 的可靠流式通信
+ *
+ * 支持客户端模式连接远程TCP服务器，包含:
+ *   - 10秒连接超时保护（防止无限等待）
+ *   - 自动重连时的正确清理
+ *   - 详细的错误翻译和中文诊断信息
+ */
+
 #include "connection/TcpConnection.h"
 #include <QNetworkInterface>
 

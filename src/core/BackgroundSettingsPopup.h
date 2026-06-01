@@ -64,6 +64,9 @@ private:
      */
     void onSelectBackground();
 
+    /** @brief 创建模糊/透明度滑块、涟漪开关、分隔线并添加到布局 */
+    void createControls(class QVBoxLayout* mainLayout);
+
     /** @brief 被控的背景控件实例 */
     BackgroundWidget* m_bgWidget;
 

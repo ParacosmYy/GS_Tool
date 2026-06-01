@@ -1,3 +1,16 @@
+/**
+ * @file SerialDriverDetector.cpp
+ * @brief 串口驱动检测实现 - 检测系统已安装的USB转串口驱动芯片
+ *
+ * 支持检测的芯片:
+ *   - CH340/CH341 (江苏沁恒)
+ *   - CP2102/CP210x (Silicon Labs)
+ *   - FT232/FTDI (FTDI)
+ *   - PL2303 (Prolific)
+ *
+ * 检测方式: 遍历系统可用串口，匹配VID/PID或设备描述符中的芯片标识
+ */
+
 #include "serial/SerialDriverDetector.h"
 
 #include <QObject>
