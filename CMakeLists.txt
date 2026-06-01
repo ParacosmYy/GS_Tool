@@ -91,6 +91,7 @@ set(SOURCES
     src/ota/OtaHistoryModel.cpp
     src/ota/protocols/BaseTransfer.cpp
     src/ota/protocols/XModemTransfer.cpp
+    src/ota/protocols/XModemTransferHandlers.cpp
     src/ota/protocols/YModemTransfer.cpp
     src/ota/protocols/YModemTransferHandlers.cpp
     src/ota/protocols/ZModemTransfer.cpp

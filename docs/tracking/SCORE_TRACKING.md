@@ -67,4 +67,5 @@
 | 76 | 代码质量: Animations命名空间(12常量)+Layout命名空间(10常量)+ConnectionDefaults(2常量)+tr()合规(8处FrameVisualEditor)+连接默认值(TCP/UDP)+动画/布局魔术数替换(43处) | 76 |
 | 77 | UI动画: OTA进度条完成动画(QPropertyAnimation 400ms OutCubic accent->success)+FrameParser拆分(488->180+330)+DataExporterStreamed修复 | 77 |
 | 78 | 文件拆分: ZModemTransfer(440->350)+ConnectionController(495->278)+新增ConnectionControllerHandlers(249)+YModem进度动画增强 | 78 |
+| 79 | 文件拆分: XModemTransfer(474->306)+新增XModemTransferHandlers(178)+移除未使用include | 79 |
 | ... | 目标: 1000分 | 1000 |
