@@ -57,7 +57,7 @@ void TerminalSearchBar::setupUI()
     m_searchInput = new QLineEdit(this);
     m_searchInput->setObjectName("searchBarInput");
     m_searchInput->setPlaceholderText(tr("搜索... (支持正则表达式)"));
-    m_searchInput->setMinimumWidth(240);
+    m_searchInput->setMinimumWidth(Layout::kSearchInputMinWidth);
     m_searchInput->setClearButtonEnabled(true);
     layout->addWidget(m_searchInput);
 
@@ -74,7 +74,7 @@ void TerminalSearchBar::setupUI()
     // ---- 结果标签 ----
     m_resultLabel = new QLabel(this);
     m_resultLabel->setObjectName("searchBarResult");
-    m_resultLabel->setMinimumWidth(80);
+    m_resultLabel->setMinimumWidth(Layout::kSearchResultMinWidth);
     layout->addWidget(m_resultLabel);
 
     // 弹簧, 将关闭按钮推到右侧
@@ -89,7 +89,7 @@ void TerminalSearchBar::setupUI()
     layout->addWidget(m_closeBtn);
 
     // 固定高度, 不占用过多终端空间
-    setFixedHeight(36);
+    setFixedHeight(Layout::kSearchBarHeight);
 
     // ---- 信号连接 ----
     // 文字变化时触发搜索
@@ -159,7 +159,7 @@ void TerminalSearchBar::activate()
     expandAnim->setEasingCurve(QEasingCurve::OutCubic);
     // 动画结束后恢复固定高度，避免布局异常
     connect(expandAnim, &QPropertyAnimation::finished, this, [this]() {
-        setFixedHeight(36);
+        setFixedHeight(Layout::kSearchBarHeight);
     });
     expandAnim->start(QAbstractAnimation::DeleteWhenStopped);
 
@@ -191,7 +191,7 @@ void TerminalSearchBar::deactivate()
     connect(collapseAnim, &QPropertyAnimation::finished, this, [this]() {
         hide();
         // 恢复固定高度，为下次展开做准备
-        setFixedHeight(36);
+        setFixedHeight(Layout::kSearchBarHeight);
         emit closed();
     });
     collapseAnim->start(QAbstractAnimation::DeleteWhenStopped);

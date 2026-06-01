@@ -128,6 +128,7 @@ void TerminalLayoutManager::applyLayout()
     // 清空容器中的所有子widget
     // 使用QBoxLayout指针以支持addWidget(widget, stretch)语法
     auto* containerLayout = qobject_cast<QBoxLayout*>(m_container->layout());
+    if (!containerLayout) return; ///< 防御性检查: layout必须为QBoxLayout
 
     // 先从布局中移除所有子项（不删除widget，只是脱离布局）
     while (containerLayout->count() > 0) {
@@ -170,6 +171,7 @@ void TerminalLayoutManager::applyLayout()
 void TerminalLayoutManager::applyMixedLayout()
 {
     auto* containerLayout = qobject_cast<QBoxLayout*>(m_container->layout());
+    if (!containerLayout) return;
 
     // ---- 混合模式: 显示主终端（包含TX和RX所有数据） ----
     // 销毁分栏终端（如果存在）
@@ -195,6 +197,7 @@ void TerminalLayoutManager::applyMixedLayout()
 void TerminalLayoutManager::applySplitLayout()
 {
     auto* containerLayout = qobject_cast<QBoxLayout*>(m_container->layout());
+    if (!containerLayout) return;
 
     // ---- 分栏模式: 创建RX/TX两个终端，用QSplitter分割 ----
     Qt::Orientation orient = (m_layout == TerminalLayout::SplitHorizontal)

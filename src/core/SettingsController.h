@@ -57,7 +57,7 @@ public:
     explicit SettingsController(QMainWindow* mainWindow, QObject* parent = nullptr);
 
     /** @brief 析构函数 */
-    ~SettingsController() override;
+    ~SettingsController() override = default;
 
     /**
      * @brief 注入工具栏控制器引用

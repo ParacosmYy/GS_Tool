@@ -49,7 +49,7 @@ QGroupBox* SerialConfigPanel::createPortGroup()
 
     m_portCombo = new QComboBox;
     m_portCombo->setObjectName("portCombo");
-    m_portCombo->setMinimumWidth(150);
+    m_portCombo->setMinimumWidth(Layout::kPortComboMinWidth);
     connect(m_portCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &SerialConfigPanel::onPortComboChanged);
 

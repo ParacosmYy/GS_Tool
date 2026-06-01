@@ -68,7 +68,7 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
 
     /** @brief 析构，QObject 父子树自动销毁所有子组件 */
-    ~MainWindow() override;
+    ~MainWindow() override = default;
 
 protected:
     /**

@@ -53,7 +53,7 @@ void FrameVisualEditor::setupUI()
     // ---- 应用按钮 ----
     m_applyBtn = new AnimatedButton(tr("应用定义"));
     m_applyBtn->setObjectName("applyDefBtn");
-    m_applyBtn->setMinimumHeight(32);
+    m_applyBtn->setMinimumHeight(Layout::kInputHeight);
     mainLayout->addWidget(m_applyBtn);
 
     setupConnections();
@@ -162,7 +162,7 @@ QGroupBox* FrameVisualEditor::setupFieldsGroup()
     m_fieldTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     m_fieldTable->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
     m_fieldTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_fieldTable->setMinimumHeight(120);
+    m_fieldTable->setMinimumHeight(OtaLayout::kFieldTableMinHeight);
     // 启用拖拽排序(行级拖放)
     m_fieldTable->setDragEnabled(true);
     m_fieldTable->setAcceptDrops(true);
@@ -179,10 +179,10 @@ QGroupBox* FrameVisualEditor::setupFieldsGroup()
     m_removeFieldBtn->setObjectName("frameRemoveFieldBtn");
     auto* moveUpBtn = new AnimatedButton(tr("上移"));
     moveUpBtn->setObjectName("frameMoveUpBtn");
-    moveUpBtn->setFixedWidth(60);
+    moveUpBtn->setFixedWidth(OtaLayout::kTableBtnWidth);
     auto* moveDownBtn = new AnimatedButton(tr("下移"));
     moveDownBtn->setObjectName("frameMoveDownBtn");
-    moveDownBtn->setFixedWidth(60);
+    moveDownBtn->setFixedWidth(OtaLayout::kTableBtnWidth);
     btnLayout->addWidget(m_addFieldBtn);
     btnLayout->addWidget(m_removeFieldBtn);
     btnLayout->addWidget(moveUpBtn);
@@ -209,7 +209,7 @@ QGroupBox* FrameVisualEditor::setupPreviewGroup()
     m_previewLabel->setObjectName("framePreviewLabel");
     m_previewLabel->setWordWrap(true);
     m_previewLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    m_previewLabel->setMinimumHeight(60);
+    m_previewLabel->setMinimumHeight(OtaLayout::kPreviewMinHeight);
     m_previewLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_previewLabel->setFont(QFont(TerminalDefaults::kFontFamily, TerminalDefaults::kFontSize));
     layout->addWidget(m_previewLabel);

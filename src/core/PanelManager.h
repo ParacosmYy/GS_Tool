@@ -51,7 +51,7 @@ public:
     explicit PanelManager(QObject* parent = nullptr);
 
     /** @brief 析构，QObject 父子树自动销毁所有面板 widget */
-    ~PanelManager() override;
+    ~PanelManager() override = default;
 
     // 禁止拷贝和赋值（QObject 派生类）
     PanelManager(const PanelManager&) = delete;

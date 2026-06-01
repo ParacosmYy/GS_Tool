@@ -92,7 +92,7 @@ QGroupBox* OtaWidget::setupFileGroup()
     m_filePathEdit->setPlaceholderText(tr("选择固件文件 (.bin / .hex) ..."));
     m_browseBtn = new AnimatedButton(tr("浏览"));
     m_browseBtn->setObjectName("otaBrowseBtn");
-    m_browseBtn->setFixedWidth(80);
+    m_browseBtn->setFixedWidth(Layout::kBrowseBtnWidth);
     connect(m_browseBtn, &QPushButton::clicked, this, &OtaWidget::onBrowseFile);
     fileRow->addWidget(m_filePathEdit, 1);
     fileRow->addWidget(m_browseBtn);
@@ -156,7 +156,7 @@ QGroupBox* OtaWidget::setupConfigGroup()
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
     m_progressBar->setTextVisible(true);
-    m_progressBar->setFixedHeight(24);
+    m_progressBar->setFixedHeight(OtaLayout::kProgressBarHeight);
     layout->addWidget(m_progressBar);
 
     auto* statsLayout = new QHBoxLayout;
@@ -185,7 +185,7 @@ QGroupBox* OtaWidget::setupLogGroup()
     m_logView = new QTextEdit;
     m_logView->setObjectName("otaLogView");
     m_logView->setReadOnly(true);
-    m_logView->setMaximumHeight(160);
+    m_logView->setMaximumHeight(OtaLayout::kLogViewMaxHeight);
     layout->addWidget(m_logView);
     return group;
 }
@@ -208,11 +208,11 @@ QGroupBox* OtaWidget::setupLogGroup()
     m_historyView->setRootIsDecorated(false);
     m_historyView->setAlternatingRowColors(true);
     m_historyView->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_historyView->setColumnWidth(OtaHistoryModel::ColTime, 150);
-    m_historyView->setColumnWidth(OtaHistoryModel::ColFileName, 160);
-    m_historyView->setColumnWidth(OtaHistoryModel::ColProtocol, 80);
-    m_historyView->setColumnWidth(OtaHistoryModel::ColSize, 80);
-    m_historyView->setColumnWidth(OtaHistoryModel::ColDuration, 80);
+    m_historyView->setColumnWidth(OtaHistoryModel::ColTime, OtaLayout::kHistoryColTime);
+    m_historyView->setColumnWidth(OtaHistoryModel::ColFileName, OtaLayout::kHistoryColFileName);
+    m_historyView->setColumnWidth(OtaHistoryModel::ColProtocol, OtaLayout::kHistoryColProtocol);
+    m_historyView->setColumnWidth(OtaHistoryModel::ColSize, OtaLayout::kHistoryColSize);
+    m_historyView->setColumnWidth(OtaHistoryModel::ColDuration, OtaLayout::kHistoryColDuration);
     layout->addWidget(m_historyView);
 
     auto* btnRow = new QHBoxLayout;
@@ -308,7 +308,7 @@ void OtaWidget::onProgress(int percent, qint64 bytesSent, qint64 totalBytes)
         m_progressAnim = new QPropertyAnimation(m_progressBar, "value");
         m_progressAnim->setStartValue(oldValue);
         m_progressAnim->setEndValue(percent);
-        m_progressAnim->setDuration(qMin(qAbs(percent - oldValue) * 10, 500));
+        m_progressAnim->setDuration(qMin(qAbs(percent - oldValue) * 10, Timers::kProgressAnimMaxMs));
         m_progressAnim->setEasingCurve(QEasingCurve::OutCubic);
         // DeleteWhenStopped 自动销毁动画，连接 destroyed 信号清空指针避免悬挂
         connect(m_progressAnim, &QObject::destroyed, this, [this]() { m_progressAnim = nullptr; });
@@ -360,9 +360,7 @@ void OtaWidget::onTransferComplete()
     startCompletionAnimation();
 
     // 发射传输完成信号，供Toast通知使用
-    emit transferCompleted(m_currentFileName,
-                           static_cast<int>(elapsed),
-                           static_cast<int>(m_currentFileSize));
+    emit transferCompleted(m_currentFileName, elapsed, m_currentFileSize);
 
     OtaRecord rec;
     rec.fileName = m_currentFileName;
@@ -449,7 +447,7 @@ void OtaWidget::startCompletionAnimation()
     m_colorAnim = new QPropertyAnimation(m_progressBar, "chunkColor");
     m_colorAnim->setStartValue(accent);
     m_colorAnim->setEndValue(success);
-    m_colorAnim->setDuration(400);
+    m_colorAnim->setDuration(Timers::kCompletionDelayMs);
     m_colorAnim->setEasingCurve(QEasingCurve::OutCubic);
     // DeleteWhenStopped 自动销毁动画，连接 destroyed 信号清空指针避免悬挂
     connect(m_colorAnim, &QObject::destroyed, this, [this]() { m_colorAnim = nullptr; });

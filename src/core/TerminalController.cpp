@@ -39,11 +39,6 @@ TerminalController::TerminalController(TerminalModel* model, DataExporter* expor
 {
 }
 
-/** @brief 析构函数 - QTimer 由 QObject 父子树自动销毁 */
-TerminalController::~TerminalController()
-{
-}
-
 /** @brief 注入终端布局管理器引用 */
 void TerminalController::setLayoutManager(TerminalLayoutManager* manager)
 {

@@ -134,11 +134,6 @@ void MainWindow::restoreUserSession(int lastPanel)
     m_terminalController->startStatsTimer();
 }
 
-/** @brief 析构函数 - QObject 父子树自动销毁所有子组件，无需手动 delete */
-MainWindow::~MainWindow()
-{
-}
-
 /**
  * @brief 构建 UI 布局
  *
@@ -187,8 +182,8 @@ QWidget* MainWindow::createNavigationArea()
     m_navTree = new QTreeView;
     m_navTree->setObjectName("navTree");
     m_navTree->setHeaderHidden(true);
-    m_navTree->setMinimumWidth(180);
-    m_navTree->setMaximumWidth(280);
+    m_navTree->setMinimumWidth(Layout::kNavTreeMinWidth);
+    m_navTree->setMaximumWidth(Layout::kNavTreeMaxWidth);
     m_navTree->setIndentation(16);
 
     // 导航树选中滑动指示器（覆盖在 navTree 上方，透明背景，accent 色竖线动画）

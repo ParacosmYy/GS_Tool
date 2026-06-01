@@ -232,16 +232,16 @@ QString DataStatistics::formatRate(double bytesPerSec) const
 {
     if (bytesPerSec < 1024.0) {
         // 小于1KB/s
-        return QString("%1 B/s").arg(bytesPerSec, 0, 'f', 0);
+        return tr("%1 B/s").arg(bytesPerSec, 0, 'f', 0);
     } else if (bytesPerSec < 1024.0 * 1024) {
         // 小于1MB/s
-        return QString("%1 KB/s").arg(bytesPerSec / 1024.0, 0, 'f', 1);
+        return tr("%1 KB/s").arg(bytesPerSec / 1024.0, 0, 'f', 1);
     } else if (bytesPerSec < 1024.0 * 1024 * 1024) {
         // 小于1GB/s
-        return QString("%1 MB/s").arg(bytesPerSec / (1024.0 * 1024.0), 0, 'f', 2);
+        return tr("%1 MB/s").arg(bytesPerSec / (1024.0 * 1024.0), 0, 'f', 2);
     } else {
         // 大于等于1GB/s
-        return QString("%1 GB/s").arg(bytesPerSec / (1024.0 * 1024.0 * 1024.0), 0, 'f', 2);
+        return tr("%1 GB/s").arg(bytesPerSec / (1024.0 * 1024.0 * 1024.0), 0, 'f', 2);
     }
 }
 

@@ -91,10 +91,13 @@ void ConnectionController::onAutoReconnect()
     }
 }
 
-/** @brief 计算指数退避重连间隔，策略: base*2^min(attempt,4)，上限30秒 */
+/** @brief 计算指数退避重连间隔，策略: base*2^min(attempt,4)，上限30秒
+ *  使用qint64中间变量防止int溢出(base * 2^4可能超出int范围) */
 int ConnectionController::calcBackoffInterval(int attempt) const
 {
     const int maxShift = 4;
-    const int maxMs = 30000;
-    return qMin(m_reconnectBaseIntervalMs * (1 << qMin(attempt, maxShift)), maxMs);
+    const qint64 maxMs = 30000;
+    // 使用qint64防止乘法溢出: base=30000, shift=4 → 480000, 安全
+    qint64 interval = static_cast<qint64>(m_reconnectBaseIntervalMs) * (1 << qMin(attempt, maxShift));
+    return static_cast<int>(qMin(interval, maxMs));
 }

@@ -66,7 +66,7 @@ public:
                             SendHistory* history, QObject* parent = nullptr);
 
     /** @brief 析构函数 */
-    ~SendController() override;
+    ~SendController() override = default;
 
     /**
      * @brief 创建发送输入区域并返回容器 widget

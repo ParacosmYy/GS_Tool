@@ -142,12 +142,19 @@ void FrameVisualEditor::onAddField()
     typeCombo->setObjectName("fieldTypeCombo");  // QSS 选择器需要
     typeCombo->addItems(fieldTypeNames());
     m_fieldTable->setCellWidget(row, 1, typeCombo);
+    // 注意: 不捕获row，因为removeRow/drag-drop会改变行号
+    // 通过遍历cellWidget动态查找当前行，保证删除/移动字段后索引始终正确
     connect(typeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, [this, row](int) {
+            this, [this, typeCombo](int) {
         if (m_updating) return;
-        auto* sizeItem = m_fieldTable->item(row, 3);
-        auto* cb = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(row, 1));
-        if (sizeItem && cb) sizeItem->setText(QString::number(typeSizeFromIndex(cb->currentIndex())));
+        // 动态查找typeCombo所在行(避免removeRow后captured row失效)
+        int currentRow = -1;
+        for (int r = 0; r < m_fieldTable->rowCount(); ++r) {
+            if (m_fieldTable->cellWidget(r, 1) == typeCombo) { currentRow = r; break; }
+        }
+        if (currentRow < 0) return;
+        auto* sizeItem = m_fieldTable->item(currentRow, 3);
+        if (sizeItem) sizeItem->setText(QString::number(typeSizeFromIndex(typeCombo->currentIndex())));
         updateBinaryPreview();
     });
 

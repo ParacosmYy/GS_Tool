@@ -26,10 +26,6 @@ PanelManager::PanelManager(QObject* parent)
 {
 }
 
-/** @brief 析构 - QObject 父子树自动销毁所有面板 widget */
-PanelManager::~PanelManager()
-{
-}
 
 /**
  * @brief 创建所有面板 widget

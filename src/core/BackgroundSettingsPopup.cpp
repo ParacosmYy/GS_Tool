@@ -65,7 +65,7 @@ void BackgroundSettingsPopup::createControls(QVBoxLayout* mainLayout)
     // ---- 模糊半径滑块 ----
     auto* blurLayout = new QHBoxLayout;
     auto* blurLbl = new QLabel(tr("磨砂模糊:"), this);
-    blurLbl->setObjectName("bgBlurLabel"); blurLbl->setFixedWidth(70);
+    blurLbl->setObjectName("bgBlurLabel"); blurLbl->setFixedWidth(Layout::kLabelFixedWidth);
     m_blurSlider = new QSlider(Qt::Horizontal, this);
     m_blurSlider->setObjectName("bgBlurSlider");
     m_blurSlider->setRange(0, 30); m_blurSlider->setValue(int(m_bgWidget->blurRadius()));
@@ -80,12 +80,12 @@ void BackgroundSettingsPopup::createControls(QVBoxLayout* mainLayout)
     // ---- 背景透明度滑块 ----
     auto* opacityLayout = new QHBoxLayout;
     auto* opacityLbl = new QLabel(tr("背景透明度:"), this);
-    opacityLbl->setObjectName("bgOpacityLabel"); opacityLbl->setFixedWidth(70);
+    opacityLbl->setObjectName("bgOpacityLabel"); opacityLbl->setFixedWidth(Layout::kLabelFixedWidth);
     m_opacitySlider = new QSlider(Qt::Horizontal, this);
     m_opacitySlider->setObjectName("bgOpacitySlider");
     m_opacitySlider->setRange(0, 100); m_opacitySlider->setValue(int(m_bgWidget->bgOpacity() * 100));
     m_opacityValueLbl = new QLabel(QString::number(int(m_bgWidget->bgOpacity() * 100)) + "%", this);
-    m_opacityValueLbl->setObjectName("bgOpacityValueLabel"); m_opacityValueLbl->setFixedWidth(36);
+    m_opacityValueLbl->setObjectName("bgOpacityValueLabel"); m_opacityValueLbl->setFixedWidth(Layout::kSliderValueWidth);
     opacityLayout->addWidget(opacityLbl); opacityLayout->addWidget(m_opacitySlider, 1); opacityLayout->addWidget(m_opacityValueLbl);
     mainLayout->addLayout(opacityLayout);
     connect(m_opacitySlider, &QSlider::valueChanged, this, [this](int val) {

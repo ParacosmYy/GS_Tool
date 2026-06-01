@@ -101,7 +101,7 @@ void ToolbarController::createDisplayModeGroup(QToolBar* toolbar)
     m_displayModeCombo = new QComboBox(toolbar->parentWidget());
     m_displayModeCombo->setObjectName("displayModeCombo");
     m_displayModeCombo->addItems({tr("文本"), tr("HEX"), tr("混合"), tr("十进制")});
-    m_displayModeCombo->setFixedWidth(80);
+    m_displayModeCombo->setFixedWidth(Layout::kComboFixedWidth);
     toolbar->addWidget(m_displayModeCombo);
 
     // 终端布局模式下拉框: 混合/左右分栏/上下分栏

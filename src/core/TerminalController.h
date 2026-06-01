@@ -49,7 +49,7 @@ public:
                                 QObject* parent = nullptr);
 
     /** @brief 析构函数 */
-    ~TerminalController() override;
+    ~TerminalController() override = default;
 
     /** @brief 注入终端布局管理器，用于获取活动终端列表和切换布局 */
     void setLayoutManager(TerminalLayoutManager* manager);

@@ -42,7 +42,11 @@ public:
         if (!parent) return;
         auto* toast = new ToastWidget(parent, msg, type);
         activeToasts(parent).append(toast);
-        connect(parent, &QObject::destroyed, parent, [parent]() { activeToastsMap().remove(parent); });
+        // 仅首次连接destroyed信号，避免重复toasts时累积冗余连接
+        if (!parent->property("_toastDestroyConnected").toBool()) {
+            connect(parent, &QObject::destroyed, parent, [parent]() { activeToastsMap().remove(parent); });
+            parent->setProperty("_toastDestroyConnected", true);
+        }
         const auto& list = activeToasts(parent);
         int bottomY = parent->height() - kMargin;
         for (auto* t : list) {

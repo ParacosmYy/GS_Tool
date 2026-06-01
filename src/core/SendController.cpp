@@ -37,11 +37,6 @@ SendController::SendController(TerminalModel* model, DataLogger* logger,
 {
 }
 
-/** @brief 析构函数 */
-SendController::~SendController()
-{
-}
-
 /**
  * @brief 创建发送输入区域并返回容器 widget
  *
@@ -79,13 +74,13 @@ QWidget* SendController::createSendBar(QWidget* parent)
     // 发送按钮
     m_sendBtn = new AnimatedButton(tr("发送"));
     m_sendBtn->setObjectName("sendButton");
-    m_sendBtn->setFixedWidth(70);
+    m_sendBtn->setFixedWidth(Layout::kSendBtnWidth);
 
     // 自动追加换行符选择
     m_newlineCombo = new QComboBox;
     m_newlineCombo->setObjectName("newlineCombo");
     m_newlineCombo->addItems({tr("无"), "\\r\\n", "\\n", "\\r"});
-    m_newlineCombo->setFixedWidth(70);
+    m_newlineCombo->setFixedWidth(Layout::kNewlineComboWidth);
     m_newlineCombo->setToolTip(tr("自动追加换行符"));
 
     sendLayout->addWidget(m_sendModeCombo);

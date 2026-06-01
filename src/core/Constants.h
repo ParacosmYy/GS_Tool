@@ -101,6 +101,7 @@ namespace Timers {
     constexpr int kPlaybackPrecisionMs   = 1;      ///< 回放定时器精度(1ms)
     constexpr int kConnectFailedDisplayMs = 3000;  ///< 连接失败提示显示时长(3s)
     constexpr int kCompletionDelayMs     = 400;    ///< OTA完成动画延迟(400ms)
+    constexpr int kProgressAnimMaxMs     = 500;    ///< 进度条动画最大持续时间(500ms)
     constexpr int kBreakDurationMs       = 100;    ///< Break信号持续时间(100ms)
 }
 
@@ -153,6 +154,37 @@ namespace Layout {
     constexpr int kMinButtonHeight  = 28;  ///< 按钮最小高度(CLAUDE.md §6.3)
     constexpr int kComboFixedWidth  = 90;  ///< 下拉框固定宽度
     constexpr int kInputHeight      = 32;  ///< 输入框高度(CLAUDE.md §6.3)
+    constexpr int kBrowseBtnWidth   = 80;  ///< 文件浏览按钮固定宽度
+    constexpr int kSendBtnWidth     = 70;  ///< 发送按钮固定宽度
+    constexpr int kNewlineComboWidth = 70; ///< 换行符下拉框固定宽度
+    constexpr int kPortComboMinWidth = 150;///< 串口下拉框最小宽度
+    constexpr int kSearchInputMinWidth = 240;///< 搜索输入框最小宽度
+    constexpr int kSearchResultMinWidth = 80;///< 搜索结果标签最小宽度
+    constexpr int kSearchBarHeight   = 36; ///< 搜索栏高度(CLAUDE.md §6.3)
+    constexpr int kLabelFixedWidth   = 70; ///< 设置弹窗标签固定宽度
+    constexpr int kSliderValueWidth  = 36; ///< 滑块数值标签固定宽度
+    constexpr int kNavTreeMinWidth   = 180;///< 导航树最小宽度(CLAUDE.md §6.3)
+    constexpr int kNavTreeMaxWidth   = 280;///< 导航树最大宽度(CLAUDE.md §6.3)
+    constexpr int kConnectBtnMinHeight = 36;///< 连接按钮最小高度
+    constexpr int kQuickCmdBtnMaxWidth = 160;///< 快捷指令按钮最大宽度
+}
+
+/**
+ * @brief OTA面板布局常量 — 统一管理OTA面板中的固定尺寸和列宽
+ *
+ * 集中定义OTA历史表格列宽、进度条高度、日志高度等，避免硬编码。
+ */
+namespace OtaLayout {
+    constexpr int kHistoryColTime     = 150;///< 历史表格-时间列宽
+    constexpr int kHistoryColFileName = 160;///< 历史表格-文件名列宽
+    constexpr int kHistoryColProtocol = 80; ///< 历史表格-协议列宽
+    constexpr int kHistoryColSize     = 80; ///< 历史表格-大小列宽
+    constexpr int kHistoryColDuration = 80; ///< 历史表格-耗时列宽
+    constexpr int kProgressBarHeight  = 24; ///< OTA进度条固定高度
+    constexpr int kLogViewMaxHeight   = 160;///< OTA日志视图最大高度
+    constexpr int kFieldTableMinHeight = 120;///< 帧编辑器字段表格最小高度
+    constexpr int kPreviewMinHeight   = 60; ///< 帧编辑器预览区最小高度
+    constexpr int kTableBtnWidth      = 60; ///< 表格操作按钮(上移/下移/清除)固定宽度
 }
 
 /**

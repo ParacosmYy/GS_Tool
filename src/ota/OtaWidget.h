@@ -67,7 +67,7 @@ signals:
     void transferStarted(const QString& filename);
 
     /** @brief 传输完成信号 @param filename 文件名 @param elapsed 耗时(ms) @param size 文件大小(字节) */
-    void transferCompleted(const QString& filename, int elapsed, int size);
+    void transferCompleted(const QString& filename, qint64 elapsed, qint64 size);
 
     /** @brief 传输失败信号 @param filename 文件名 @param error 错误原因 */
     void transferFailed(const QString& filename, const QString& error);
