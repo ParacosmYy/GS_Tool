@@ -13,6 +13,7 @@
 #include <QFrame>
 #include <QLatin1Char>
 
+/** @brief 构造函数，初始化UI和1秒刷新定时器 @param parent 父控件 */
 DataStatistics::DataStatistics(QWidget* parent)
     : QWidget(parent)
 {
@@ -31,6 +32,7 @@ DataStatistics::DataStatistics(QWidget* parent)
     m_refreshTimer.start();
 }
 
+/** @brief 初始化统计面板UI(收发字节/速率/峰值/均值/时间标签) */
 void DataStatistics::setupUI()
 {
     // 主布局：上下排列，紧凑边距
@@ -65,6 +67,7 @@ void DataStatistics::setupUI()
     mainLayout->addStretch();
 }
 
+/** @brief 创建统计项框架(标签+值标签，用于FormLayout行) @param label 左侧标签文字 @param valueLabel 值标签引用(输出) @param objectName 值标签objectName @param frameName 框架objectName @return QFrame指针 */
 QFrame* DataStatistics::createStatsFrame(const QString& label, QLabel*& valueLabel, const QString& objectName, const QString& frameName)
 {
     auto* frame = new QFrame;
@@ -81,6 +84,7 @@ QFrame* DataStatistics::createStatsFrame(const QString& label, QLabel*& valueLab
     return frame;
 }
 
+/** @brief 用最新收发字节总数更新统计(计算增量速率和包计数) @param rxBytes 接收累计字节 @param txBytes 发送累计字节 */
 void DataStatistics::update(quint64 rxBytes, quint64 txBytes)
 {
     // 计算自上次采样以来的实际时间间隔（毫秒）
@@ -109,6 +113,7 @@ void DataStatistics::update(quint64 rxBytes, quint64 txBytes)
     if (txDelta > 0) ++m_txPackets;
 }
 
+/** @brief 重置所有统计值和UI显示，重启计时器 */
 void DataStatistics::reset()
 {
     // 重置累计值和速率
@@ -143,16 +148,19 @@ void DataStatistics::reset()
     m_stopwatch.restart();
 }
 
+/** @brief 返回当前接收速率(bytes/s) @return 接收速率 */
 double DataStatistics::rxRate() const
 {
     return m_rxRate;
 }
 
+/** @brief 返回当前发送速率(bytes/s) @return 发送速率 */
 double DataStatistics::txRate() const
 {
     return m_txRate;
 }
 
+/** @brief 1秒定时器回调：刷新持续时间、速率(含衰减)、峰值、均值显示 */
 void DataStatistics::onRefreshTimer()
 {
     // 更新持续时间显示
@@ -193,6 +201,7 @@ void DataStatistics::onRefreshTimer()
     m_avgRateLabel->setText(formatRate(avgRate));
 }
 
+/** @brief 更新串口通信错误计数(帧/校验/溢出)，有错误时显示面板 @param framingErrors 帧错误数 @param parityErrors 校验错误数 @param overrunErrors 溢出错误数 */
 void DataStatistics::updateErrors(int framingErrors, int parityErrors, int overrunErrors)
 {
     // 更新内部计数器
@@ -217,6 +226,7 @@ void DataStatistics::updateErrors(int framingErrors, int parityErrors, int overr
     }
 }
 
+/** @brief 格式化速率为人类可读字符串(B/s, KB/s, MB/s, GB/s) @param bytesPerSec 每秒字节数 @return 格式化字符串 */
 QString DataStatistics::formatRate(double bytesPerSec) const
 {
     if (bytesPerSec < 1024.0) {
@@ -234,6 +244,7 @@ QString DataStatistics::formatRate(double bytesPerSec) const
     }
 }
 
+/** @brief 更新连接健康状态(空闲超10秒显示警告) @param alive 连接是否存活 @param lastDataAgeMs 距上次收到数据的毫秒数 */
 void DataStatistics::updateConnectionHealth(bool alive, qint64 lastDataAgeMs)
 {
     // 连接不存活时直接隐藏健康标签（由连接状态UI负责显示断开信息）
@@ -260,6 +271,7 @@ void DataStatistics::updateConnectionHealth(bool alive, qint64 lastDataAgeMs)
     m_healthLabel->show();
 }
 
+/** @brief 生成会话统计摘要(持续时间/收发/峰值/均值/错误)，用于Toast或导出 @return 多行统计文本 */
 QString DataStatistics::sessionSummary() const
 {
     // 生成多行会话统计摘要，用于导出或Toast通知
@@ -292,11 +304,13 @@ QString DataStatistics::sessionSummary() const
     return summary;
 }
 
+/** @brief 返回接收累计字节数 @return 接收字节总数 */
 quint64 DataStatistics::totalRxBytes() const
 {
     return m_lastRxBytes;
 }
 
+/** @brief 返回发送累计字节数 @return 发送字节总数 */
 quint64 DataStatistics::totalTxBytes() const
 {
     return m_lastTxBytes;

@@ -131,6 +131,7 @@ void ProtocolView::setupContextMenu()
 // 右键菜单
 // ============================================================
 
+/** @brief 右键菜单弹出回调 @param pos 点击位置 */
 void ProtocolView::onCustomContextMenu(const QPoint& pos)
 {
     bool hasSelection = m_table->selectionModel()->hasSelection();
@@ -223,6 +224,7 @@ void ProtocolView::exportJson()
  * @brief 添加一帧解析结果
  * 流程: 更新列头 -> 创建着色单元格 -> 保存帧 -> 超限移除 -> 自动调整列宽
  */
+/** @brief 添加帧数据到表格(自动提取字段名创建列) @param fields 解析后的字段映射 */
 void ProtocolView::addFrame(const QVariantMap& fields)
 {
     updateColumnHeaders(fields);
@@ -256,6 +258,7 @@ void ProtocolView::addFrame(const QVariantMap& fields)
     m_statusLabel->setText(tr("帧数: %1 | 错误: %2").arg(m_totalFrames).arg(m_totalErrors));
 }
 
+/** @brief 清除表格所有行 */
 void ProtocolView::clear()
 {
     m_model->removeRows(0, m_model->rowCount());
@@ -265,15 +268,19 @@ void ProtocolView::clear()
     m_statusLabel->setText(tr("暂无数据"));
 }
 
+/** @brief 设置最大显示行数 @param max 行数上限 */
 void ProtocolView::setMaxRows(int max) { m_maxRows = max; }
+/** @brief 返回当前行数 @return 行数 */
 int ProtocolView::rowCount() const { return m_model->rowCount(); }
 QList<QVariantMap> ProtocolView::allFrames() const { return m_frames; }
 
+/** @brief 设置字段颜色范围(值越界时单元格变色) @param fieldName 字段名 @param range 颜色范围配置 */
 void ProtocolView::setFieldColorRange(const QString& fieldName, const FieldColorRange& range)
 {
     m_colorRanges[fieldName] = range;
 }
 
+/** @brief 帧解析成功回调：添加到表格 @param fields 字段映射 @param rawFrame 原始帧 */
 void ProtocolView::onFrameParsed(const QVariantMap& fields, const QByteArray& rawFrame)
 {
     Q_UNUSED(rawFrame);
@@ -284,6 +291,7 @@ void ProtocolView::onFrameParsed(const QVariantMap& fields, const QByteArray& ra
  * @brief 帧解析错误: 整行以Error色高亮
  * 新增Error/RawData列(如不存在)，错误行用ThemeManager::Error色标红
  */
+/** @brief 帧解析错误回调：添加错误行(红色高亮) @param reason 错误原因 @param rawFrame 原始帧 */
 void ProtocolView::onFrameError(const QString& reason, const QByteArray& rawFrame)
 {
     m_totalErrors++;
@@ -387,6 +395,7 @@ QStandardItem* ProtocolView::createColoredItem(const QString& fieldName,
  * @brief 自动调整列宽
  * 序号50px, 时间100px, 数据列按内容自适应(60~200px)
  */
+/** @brief 自动调整所有列宽以适应内容 */
 void ProtocolView::autoResizeColumns()
 {
     m_table->setColumnWidth(0, 50);

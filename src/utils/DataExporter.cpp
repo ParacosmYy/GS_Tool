@@ -24,6 +24,7 @@ DataExporter::DataExporter(QObject* parent) : QObject(parent) {}
 
 // ---- 公共入口 ----
 
+/** @brief 导出数据到文件(批量模式) @param filePath 目标文件路径 @param format 导出格式 @param lines 终端行数据 @param from 起始时间过滤 @param to 结束时间过滤 @return 是否成功 */
 bool DataExporter::exportToFile(const QString& filePath, Format format,
                                  const QVector<TerminalLine>& lines,
                                  const QDateTime& from, const QDateTime& to)
@@ -44,6 +45,7 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
     return false;
 }
 
+/** @brief 导出数据到文件(流式模式，适合大数据量) @param filePath 目标路径 @param format 格式 @param lineProvider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamed(const QString& filePath, Format format,
                                    LineProvider lineProvider,
                                    int totalLines, int batchSize)
@@ -64,6 +66,7 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
 // ---- 辅助方法 ----
 
 /** @brief 打开文本文件并设置UTF8编码，失败时发射exportError */
+/** @brief 打开文本文件用于写入 @param file 文件对象 @param out 文本流 @param path 文件路径 @return 是否成功 */
 bool DataExporter::openTextFile(QFile& file, QTextStream& out, const QString& path)
 {
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -75,6 +78,7 @@ bool DataExporter::openTextFile(QFile& file, QTextStream& out, const QString& pa
     return true;
 }
 
+/** @brief 刷新流并检查写入错误 @param file 文件对象 @param out 文本流 @param path 文件路径(用于错误消息) @return 是否成功 */
 bool DataExporter::flushAndCheck(QFile& file, QTextStream& out, const QString& path)
 {
     out.flush();
@@ -106,6 +110,7 @@ QVector<TerminalLine> DataExporter::filterByTime(
 
 // ---- 全量导出方法 ----
 
+/** @brief 导出纯文本格式 @param path 文件路径 @param lines 行数据 @return 是否成功 */
 bool DataExporter::exportPlain(const QString& path, const QVector<TerminalLine>& lines)
 {
     QFile file(path);
@@ -121,6 +126,7 @@ bool DataExporter::exportPlain(const QString& path, const QVector<TerminalLine>&
     return flushAndCheck(file, out, path);
 }
 
+/** @brief 导出HEX转储格式(地址+HEX+ASCII) @param path 文件路径 @param lines 行数据 @return 是否成功 */
 bool DataExporter::exportHexDump(const QString& path, const QVector<TerminalLine>& lines)
 {
     QFile file(path);
@@ -142,6 +148,7 @@ bool DataExporter::exportHexDump(const QString& path, const QVector<TerminalLine
     return flushAndCheck(file, out, path);
 }
 
+/** @brief 导出CSV格式(时间戳,方向,数据) @param path 文件路径 @param lines 行数据 @return 是否成功 */
 bool DataExporter::exportCsv(const QString& path, const QVector<TerminalLine>& lines)
 {
     QFile file(path);
@@ -160,6 +167,7 @@ bool DataExporter::exportCsv(const QString& path, const QVector<TerminalLine>& l
     }
     return flushAndCheck(file, out, path);
 }
+/** @brief 导出带时间戳格式(ISO时间 [方向] 数据) @param path 文件路径 @param lines 行数据 @return 是否成功 */
 bool DataExporter::exportTimestamped(const QString& path, const QVector<TerminalLine>& lines)
 {
     QFile file(path);
@@ -174,6 +182,7 @@ bool DataExporter::exportTimestamped(const QString& path, const QVector<Terminal
     return flushAndCheck(file, out, path);
 }
 
+/** @brief 导出原始二进制格式(仅数据字节，无时间戳) @param path 文件路径 @param lines 行数据 @return 是否成功 */
 bool DataExporter::exportBin(const QString& path, const QVector<TerminalLine>& lines)
 {
     QFile file(path);
@@ -209,6 +218,7 @@ bool DataExporter::exportBin(const QString& path, const QVector<TerminalLine>& l
  * @param lines 过滤后的行数据
  * @return true 成功，false 失败
  */
+/** @brief 导出JSON格式(结构化数据数组) @param path 文件路径 @param lines 行数据 @return 是否成功 */
 bool DataExporter::exportJson(const QString& path, const QVector<TerminalLine>& lines)
 {
     QJsonObject root;
@@ -243,6 +253,7 @@ bool DataExporter::exportJson(const QString& path, const QVector<TerminalLine>& 
 
 // ---- 静态辅助方法 ----
 
+/** @brief 将字节数据转换为可打印ASCII字符串(不可打印字符替换为'.') @param data 原始字节 @return ASCII字符串 */
 QString DataExporter::toAsciiString(const QByteArray& data)
 {
     if (data.isEmpty()) return QString();
@@ -256,6 +267,7 @@ QString DataExporter::toAsciiString(const QByteArray& data)
     return result;
 }
 
+/** @brief 转义CSV字段中的特殊字符(逗号、引号、换行) @param field 原始字段 @return 转义后的字段 */
 QString DataExporter::escapeCsvField(const QString& field)
 {
     // RFC 4180: 字段含逗号、双引号或换行时，用双引号包裹，内部双引号翻倍
@@ -280,6 +292,7 @@ QByteArray DataExporter::concatData(const QVector<TerminalLine>& lines)
     return result;
 }
 
+/** @brief 格式化单行HEX转储(地址+HEX+ASCII) @param data 原始字节 @param address 起始地址 @return 格式化的HEX转储行 */
 QString DataExporter::formatHexDumpLine(const QByteArray& data, quint64 address)
 {
     const int bytesPerLine = 16;
@@ -301,6 +314,7 @@ QString DataExporter::formatHexDumpLine(const QByteArray& data, quint64 address)
 
 // ---- 流式导出方法 ----
 
+/** @brief 流式导出纯文本格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamedPlain(const QString& path, LineProvider provider,
                                         int totalLines, int batchSize)
 {
@@ -324,6 +338,7 @@ bool DataExporter::exportStreamedPlain(const QString& path, LineProvider provide
 }
 
 /** @brief 流式HexDump - 维护全局地址偏移和跨批次残余缓冲区 */
+/** @brief 流式导出HEX转储格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamedHexDump(const QString& path, LineProvider provider,
                                           int totalLines, int batchSize)
 {
@@ -356,6 +371,7 @@ bool DataExporter::exportStreamedHexDump(const QString& path, LineProvider provi
     return flushAndCheck(file, out, path);
 }
 
+/** @brief 流式导出CSV格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamedCsv(const QString& path, LineProvider provider,
                                        int totalLines, int batchSize)
 {
@@ -382,6 +398,7 @@ bool DataExporter::exportStreamedCsv(const QString& path, LineProvider provider,
     return flushAndCheck(file, out, path);
 }
 
+/** @brief 流式导出带时间戳格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamedTimestamped(const QString& path, LineProvider provider,
                                               int totalLines, int batchSize)
 {
@@ -403,6 +420,7 @@ bool DataExporter::exportStreamedTimestamped(const QString& path, LineProvider p
     return flushAndCheck(file, out, path);
 }
 
+/** @brief 流式导出原始二进制格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
                                        int totalLines, int batchSize)
 {
@@ -440,6 +458,7 @@ bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
  * @param batchSize 每批行数
  * @return true 成功，false 失败
  */
+/** @brief 流式导出JSON格式(结构化数组) @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamedJson(const QString& path, LineProvider provider,
                                        int totalLines, int batchSize)
 {
@@ -481,6 +500,7 @@ bool DataExporter::exportStreamedJson(const QString& path, LineProvider provider
 
 // ---- EDL范围导出 ----
 
+/** @brief 从EDL日志文件导出指定时间范围的数据 @param edlPath 日志文件路径 @param format 导出格式 @param from 起始时间 @param to 结束时间 @return 是否成功 */
 bool DataExporter::exportRange(const QString& edlPath, Format format,
                                 const QString& outPath,
                                 qint64 fromMs, qint64 toMs)
@@ -503,6 +523,7 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
     return false;
 }
 
+/** @brief 返回上次exportRange调用实际导出的行数 @return 导出行数 */
 int DataExporter::lastExportRangeCount() const { return m_lastExportRangeCount; }
 
 /**

@@ -21,11 +21,13 @@ TcpConnection::~TcpConnection()
     close();
 }
 
+/** @brief 返回连接类型(TCP客户端或TCP服务端) @return ConnectionType枚举 */
 ConnectionType TcpConnection::type() const
 {
     return (m_mode == Server) ? ConnectionType::TcpServer : ConnectionType::TcpClient;
 }
 
+/** @brief 返回连接名称(格式: TCP:host:port 或 TCP:server:port) @return 连接名称 */
 QString TcpConnection::name() const
 {
     if (m_mode == Client) {
@@ -34,11 +36,13 @@ QString TcpConnection::name() const
     return QString("TCP Server:%1").arg(m_port);
 }
 
+/** @brief 返回当前连接状态 @return ConnectionState枚举 */
 ConnectionState TcpConnection::state() const
 {
     return m_state;
 }
 
+/** @brief 从参数映射配置连接(host/port/mode) @param params 参数映射，支持"host"/"port"/"mode"键 */
 void TcpConnection::configure(const QVariantMap& params)
 {
     m_host = params.value("host", "127.0.0.1").toString();
@@ -46,6 +50,7 @@ void TcpConnection::configure(const QVariantMap& params)
     m_mode = params.value("mode", "client").toString() == "server" ? Server : Client;
 }
 
+/** @brief 打开TCP连接(客户端模式连接远端，服务端模式监听端口) @return true表示成功发起连接或开始监听 */
 bool TcpConnection::open()
 {
     if (m_mode == Client) {
@@ -104,6 +109,7 @@ bool TcpConnection::open()
     }
 }
 
+/** @brief 关闭TCP连接(释放socket/server/timer资源) */
 void TcpConnection::close()
 {
     // 停止连接超时定时器
@@ -129,6 +135,7 @@ void TcpConnection::close()
     updateState(ConnectionState::Disconnected);
 }
 
+/** @brief 写入数据到TCP连接(客户端写m_socket，服务端写m_clientSocket) @param data 待发送数据 @return 实际写入字节数，-1表示失败 */
 qint64 TcpConnection::write(const QByteArray& data)
 {
     QTcpSocket* target = nullptr;
@@ -149,6 +156,7 @@ qint64 TcpConnection::write(const QByteArray& data)
     return written;
 }
 
+/** @brief 客户端模式：socket连接成功回调，停止超时定时器并更新状态 */
 void TcpConnection::onSocketConnected()
 {
     // 连接成功，取消超时定时器
@@ -156,11 +164,13 @@ void TcpConnection::onSocketConnected()
     updateState(ConnectionState::Connected);
 }
 
+/** @brief 客户端模式：socket断开回调，更新状态为Disconnected */
 void TcpConnection::onSocketDisconnected()
 {
     updateState(ConnectionState::Disconnected);
 }
 
+/** @brief socket可读回调，读取全部数据并发射dataReceived信号 */
 void TcpConnection::onSocketReadyRead()
 {
     QTcpSocket* senderSock = qobject_cast<QTcpSocket*>(sender());
@@ -172,6 +182,7 @@ void TcpConnection::onSocketReadyRead()
     }
 }
 
+/** @brief socket错误回调，翻译错误码并发射errorOccurred信号 @param error Qt网络错误枚举 */
 void TcpConnection::onSocketError(QAbstractSocket::SocketError error)
 {
     QTcpSocket* sock = qobject_cast<QTcpSocket*>(sender());
@@ -180,6 +191,7 @@ void TcpConnection::onSocketError(QAbstractSocket::SocketError error)
     updateState(ConnectionState::Error);
 }
 
+/** @brief 将Qt网络错误码翻译为用户友好的中文诊断信息 @param error Qt网络错误枚举 @param systemError 系统错误字符串 @return 中文错误描述 */
 QString TcpConnection::translateNetworkError(QAbstractSocket::SocketError error,
                                               const QString& systemError)
 {
@@ -224,6 +236,7 @@ QString TcpConnection::translateNetworkError(QAbstractSocket::SocketError error,
     return TcpConnection::tr("TCP错误: %1").arg(systemError);
 }
 
+/** @brief 服务端模式：新客户端连接回调，替换旧客户端并连接信号 */
 void TcpConnection::onNewConnection()
 {
     if (m_clientSocket) {
@@ -252,6 +265,7 @@ void TcpConnection::onNewConnection()
     }
 }
 
+/** @brief 更新连接状态并发射stateChanged信号(仅当状态真正变化时) @param newState 新状态 */
 void TcpConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {

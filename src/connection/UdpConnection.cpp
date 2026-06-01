@@ -21,11 +21,13 @@ UdpConnection::~UdpConnection()
     close();
 }
 
+/** @brief 返回连接类型(Udp) @return ConnectionType::Udp */
 ConnectionType UdpConnection::type() const
 {
     return ConnectionType::Udp;
 }
 
+/** @brief 返回连接名称(格式: UDP:localPort→remoteHost:remotePort 或 UDP:port:broadcast) @return 连接名称 */
 QString UdpConnection::name() const
 {
     if (m_broadcast) {

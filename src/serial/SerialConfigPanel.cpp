@@ -37,6 +37,7 @@ SerialConfigPanel::SerialConfigPanel(QWidget* parent)
 }
 
 // ---- UI布局 ----
+/** @brief 初始化串口配置面板UI(端口/波特率/数据位/校验/停止位/流控/DTR-RTS) */
 void SerialConfigPanel::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
@@ -129,6 +130,7 @@ QGroupBox* SerialConfigPanel::createParamGroup()
  * 从 setupUI() 拆分出来，避免单个方法超过80行限制。
  * 包含: 控制信号GroupBox → 驱动检测信息 → 连接按钮+状态指示器
  */
+/** @brief 连接信号槽并组装底部控制区域(连接按钮+DTR-RTS+自动重连) @param mainLayout 主布局 */
 void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
 {
     // ---- 控制信号 (DTR/RTS) ----
@@ -239,6 +241,7 @@ QGroupBox* SerialConfigPanel::createControlSignalsGroup()
 
 // ---- 状态管理 ----
 
+/** @brief 设置连接状态(更新按钮文字、启用/禁用配置控件) @param connected true=已连接 */
 void SerialConfigPanel::setConnected(bool connected)
 {
     m_connected = connected;
@@ -270,6 +273,7 @@ void SerialConfigPanel::setConnected(bool connected)
     }
 }
 
+/** @brief 显示错误状态(红色指示器+错误信息，停止呼吸动画) @param errorMsg 错误描述 */
 void SerialConfigPanel::setError(const QString& errorMsg)
 {
     m_connected = false;
@@ -298,6 +302,7 @@ void SerialConfigPanel::setError(const QString& errorMsg)
     });
 }
 
+/** @brief 设置连接中状态(黄色指示器+呼吸动画+按钮禁用) */
 void SerialConfigPanel::setConnecting()
 {
     m_connecting = true;
@@ -330,6 +335,7 @@ void SerialConfigPanel::setConnecting()
     m_breathAnim = group;
 }
 
+/** @brief 根据状态名更新指示器颜色(connected=绿,connecting=黄,error=红,disconnected=灰) @param state 状态字符串 */
 void SerialConfigPanel::updateStatusIndicator(const QString& state)
 {
     m_statusIndicator->setProperty("state", state);
@@ -337,6 +343,7 @@ void SerialConfigPanel::updateStatusIndicator(const QString& state)
     m_statusIndicator->style()->polish(m_statusIndicator);
 }
 
+/** @brief 停止连接状态呼吸动画(连接成功或失败时调用) */
 void SerialConfigPanel::stopBreathAnimation()
 {
     if (m_breathAnim) { m_breathAnim->stop(); delete m_breathAnim; m_breathAnim = nullptr; }
@@ -345,6 +352,7 @@ void SerialConfigPanel::stopBreathAnimation()
 }
 
 // ---- 端口管理 ----
+/** @brief 刷新串口端口列表(枚举系统可用端口，含VID/PID/描述/制造商信息) */
 void SerialConfigPanel::refreshPorts()
 {
     QString cur = m_portCombo->currentData().toString();
@@ -370,16 +378,26 @@ void SerialConfigPanel::refreshPorts()
 }
 
 // ---- 配置读取 ----
+/** @brief 返回当前是否已连接 @return true=已连接 */
 bool SerialConfigPanel::isConnected() const { return m_connected; }
+/** @brief 返回当前选中端口的系统路径(COMn) @return 端口路径字符串 */
 QString SerialConfigPanel::currentPortData() const { return m_portCombo->currentData().toString(); }
+/** @brief 返回当前选中的波特率 @return 波特率数值 */
 int SerialConfigPanel::currentBaudRate() const { return m_baudCombo->currentText().toInt(); }
+/** @brief 返回当前选中的数据位索引 @return ComboBox索引 */
 int SerialConfigPanel::currentDataBitsIndex() const { return m_dataBitsCombo->currentIndex(); }
+/** @brief 返回当前选中的校验位索引 @return ComboBox索引 */
 int SerialConfigPanel::currentParityIndex() const { return m_parityCombo->currentIndex(); }
+/** @brief 返回当前选中的停止位索引 @return ComboBox索引 */
 int SerialConfigPanel::currentStopBitsIndex() const { return m_stopBitsCombo->currentIndex(); }
+/** @brief 返回当前选中的流控索引 @return ComboBox索引 */
 int SerialConfigPanel::currentFlowControlIndex() const { return m_flowControlCombo->currentIndex(); }
+/** @brief 返回DTR信号当前状态 @return true=DTR高电平 */
 bool SerialConfigPanel::dtrEnabled() const { return m_dtrState; }
+/** @brief 返回RTS信号当前状态 @return true=RTS高电平 */
 bool SerialConfigPanel::rtsEnabled() const { return m_rtsState; }
 
+/** @brief 从配置映射恢复串口参数(端口/波特率/数据位/校验/停止位/流控/DTR/RTS/自动重连) @param config 配置映射 */
 void SerialConfigPanel::restoreConfig(const QVariantMap& config)
 {
     if (config.contains("portName")) {
@@ -429,13 +447,16 @@ void SerialConfigPanel::refreshSignalStyle(QPushButton* btn, bool high)
     btn->style()->polish(btn);
 }
 
+/** @brief 检测并显示当前端口的驱动信息(CH340/CP2102/FT232等) */
 void SerialConfigPanel::updateDriverInfo()
 {
     m_driverInfoLbl->setText(SerialDriverDetector::driverStatusSummary());
 }
 
+/** @brief 端口ComboBox选中变化时更新连接按钮启用状态 */
 void SerialConfigPanel::onPortComboChanged() { updateConnectButtonState(); }
 
+/** @brief 根据端口选择状态更新连接按钮启用/禁用 */
 void SerialConfigPanel::updateConnectButtonState()
 {
     if (!m_connected && !m_connecting) {
@@ -450,6 +471,7 @@ void SerialConfigPanel::updateConnectButtonState()
  * @param info QSerialPortInfo端口信息
  * @return 多行tooltip字符串，包含端口名/描述/制造商/VID/PID/序列号/系统路径/常用波特率
  */
+/** @brief 构建端口tooltip(端口名+描述+制造商+VID/PID+驱动芯片) @param info 串口信息 @return HTML格式tooltip */
 QString SerialConfigPanel::buildPortTooltip(const QSerialPortInfo& info) const
 {
     QStringList details;

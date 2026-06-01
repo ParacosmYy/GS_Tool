@@ -31,6 +31,7 @@ FrameParser::~FrameParser()
     stopTimeoutTimer();
 }
 
+/** @brief 设置帧定义(配置帧头/长度/CRC/帧尾等解析规则) @param def 帧定义 */
 void FrameParser::setDefinition(const FrameDefinition& def)
 {
     m_def = def;
@@ -49,6 +50,7 @@ FrameDefinition FrameParser::definition() const
     return m_def;
 }
 
+/** @brief 输入原始字节流进行帧解析(逐字节状态机) @param data 原始字节 */
 void FrameParser::feed(const QByteArray& data)
 {
     if (data.isEmpty()) {
@@ -77,6 +79,7 @@ void FrameParser::reset()
  * 比 reset() 更彻底，额外调用 squeeze() 释放内存，
  * 确保下一帧从完全干净的状态开始解析。
  */
+/** @brief 重置解析器中间状态(不清零统计计数器) */
 void FrameParser::resetIntermediateState()
 {
     m_state = State::Idle;
@@ -91,13 +94,16 @@ void FrameParser::resetIntermediateState()
 quint64 FrameParser::frameCount() const { return m_frameCount; }
 quint64 FrameParser::errorCount() const { return m_errorCount; }
 
+/** @brief 设置最大帧长度(超过则视为错误帧) @param maxLen 最大字节数 */
 void FrameParser::setMaxFrameLength(int maxLen)
 {
     m_maxFrameLength = (maxLen <= 0 || maxLen > kMaxFrameSize) ? kMaxFrameSize : maxLen;
 }
 
+/** @brief 返回最大帧长度 @return 字节数 */
 int FrameParser::maxFrameLength() const { return m_maxFrameLength; }
 
+/** @brief 设置帧超时时间(接收中途停止超过此时间视为超时) @param timeoutMs 超时毫秒数 */
 void FrameParser::setFrameTimeout(int timeoutMs)
 {
     m_frameTimeoutMs = (timeoutMs < 0) ? 0 : timeoutMs;
@@ -108,6 +114,7 @@ void FrameParser::setFrameTimeout(int timeoutMs)
     }
 }
 
+/** @brief 返回帧超时时间 @return 毫秒数 */
 int FrameParser::frameTimeout() const { return m_frameTimeoutMs; }
 
 // ============================================================================
@@ -139,6 +146,7 @@ bool FrameParser::checkTimeout()
     return false;
 }
 
+/** @brief 停止超时定时器(帧完成或重置时调用) */
 void FrameParser::stopTimeoutTimer()
 {
     if (m_timeoutCheckTimer) {
@@ -146,6 +154,7 @@ void FrameParser::stopTimeoutTimer()
     }
 }
 
+/** @brief 启动超时定时器(开始接收帧数据时调用) */
 void FrameParser::startTimeoutTimer()
 {
     if (m_timeoutCheckTimer && m_frameTimeoutMs > 0) {
@@ -154,6 +163,7 @@ void FrameParser::startTimeoutTimer()
     }
 }
 
+/** @brief 帧接收完成：提取字段、发射frameParsed信号、重置状态 */
 void FrameParser::completeFrame()
 {
     QVariantMap fields = extractFields(m_buffer);
@@ -166,6 +176,7 @@ void FrameParser::completeFrame()
 // 状态分发器
 // ============================================================================
 
+/** @brief 逐字节状态机核心：根据当前状态分发到对应处理函数 @param byte 输入字节 */
 void FrameParser::processByte(unsigned char byte)
 {
     // 超时检查
@@ -211,6 +222,7 @@ void FrameParser::processByte(unsigned char byte)
 // 各状态处理方法
 // ============================================================================
 
+/** @brief 状态机:帧头匹配阶段(逐字节比较帧头序列) @param byte 输入字节 */
 void FrameParser::handleHeaderMatching(unsigned char byte)
 {
     m_buffer.append(byte);
@@ -279,6 +291,7 @@ void FrameParser::handleHeaderMatching(unsigned char byte)
     }
 }
 
+/** @brief 状态机:长度字段接收阶段(组装多字节长度值) @param byte 输入字节 */
 void FrameParser::handleLengthReceiving(unsigned char byte)
 {
     m_buffer.append(byte);
@@ -304,6 +317,7 @@ void FrameParser::handleLengthReceiving(unsigned char byte)
     m_state = State::PayloadReceiving;
 }
 
+/** @brief 状态机:载荷接收阶段(逐字节填充payload缓冲区) @param byte 输入字节 */
 void FrameParser::handlePayloadReceiving(unsigned char byte)
 {
     m_buffer.append(byte);
@@ -409,6 +423,7 @@ bool FrameParser::handleCrcValidation()
     return true;
 }
 
+/** @brief 状态机:校验和验证阶段(累加字节计算校验和) @param byte 输入字节 */
 void FrameParser::handleChecksumVerifying(unsigned char byte)
 {
     m_buffer.append(byte);
@@ -433,6 +448,7 @@ void FrameParser::handleChecksumVerifying(unsigned char byte)
     }
 }
 
+/** @brief 状态机:帧尾匹配阶段(逐字节比较帧尾序列) @param byte 输入字节 */
 void FrameParser::handleFooterMatching(unsigned char byte)
 {
     m_buffer.append(byte);

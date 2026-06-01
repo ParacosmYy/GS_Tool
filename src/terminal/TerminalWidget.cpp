@@ -114,6 +114,7 @@ TerminalWidget::TerminalWidget(QWidget* parent)
             this, &TerminalWidget::searchMatchesChanged);
 }
 
+/** @brief 设置终端数据模型(断开旧模型信号，连接新模型) @param model TerminalModel指针 */
 void TerminalWidget::setModel(TerminalModel* model)
 {
     if (m_model) disconnect(m_model, nullptr, this, nullptr);
@@ -128,6 +129,7 @@ void TerminalWidget::setModel(TerminalModel* model)
     update();
 }
 
+/** @brief 设置数据方向过滤(仅显示指定方向的数据) @param direction 数据方向(TX/RX/Both) */
 void TerminalWidget::setDirectionFilter(DataDirection direction)
 {
     m_directionFilter->setDirection(direction);
@@ -138,6 +140,7 @@ void TerminalWidget::setDirectionFilter(DataDirection direction)
     update();
 }
 
+/** @brief 清除数据方向过滤(显示所有方向数据) */
 void TerminalWidget::clearDirectionFilter()
 {
     m_directionFilter->clearFilter();
@@ -148,20 +151,29 @@ void TerminalWidget::clearDirectionFilter()
     update();
 }
 
+/** @brief 设置显示模式(HEX/ASCII/HEX-ASCII)并触发重绘 @param mode 显示模式 */
 void TerminalWidget::setDisplayMode(DisplayMode mode) { m_displayMode = mode; m_cachedLineCount = 0; update(); }
+/** @brief 返回当前显示模式 @return DisplayMode枚举 */
 DisplayMode TerminalWidget::displayMode() const { return m_displayMode; }
+/** @brief 设置是否显示时间戳并触发重绘 @param show true=显示 */
 void TerminalWidget::setShowTimestamp(bool show) { m_showTimestamp = show; m_cachedLineCount = 0; update(); }
+/** @brief 返回是否显示时间戳 @return true=显示 */
 bool TerminalWidget::showTimestamp() const { return m_showTimestamp; }
+/** @brief 设置是否显示方向前缀(TX↑/RX↓)并触发重绘 @param show true=显示 */
 void TerminalWidget::setShowDirectionPrefix(bool show) { m_showDirectionPrefix = show; m_cachedLineCount = 0; update(); }
+/** @brief 返回是否显示方向前缀 @return true=显示 */
 bool TerminalWidget::showDirectionPrefix() const { return m_showDirectionPrefix; }
 
+/** @brief 设置自动滚动到底部(新数据到来时自动滚动) @param autoScroll true=自动滚动 */
 void TerminalWidget::setAutoScroll(bool autoScroll)
 {
     m_autoScroll = autoScroll;
     if (m_autoScroll) { m_scrollOffset = m_maxScrollOffset; update(); }
 }
+/** @brief 返回自动滚动状态 @return true=自动滚动已开启 */
 bool TerminalWidget::autoScroll() const { return m_autoScroll; }
 
+/** @brief 清除终端内容和缓存，重置滚动位置 */
 void TerminalWidget::clear()
 {
     m_cachedLines.clear();
@@ -175,14 +187,17 @@ void TerminalWidget::clear()
     update();
 }
 
+/** @brief 返回当前选中的文本内容 @return 选中文本字符串 */
 QString TerminalWidget::selectedText() const
 {
     return m_selectionManager->selectedText(m_cachedLines, m_directionFilter);
 }
 
+/** @brief 返回推荐控件大小(800x600) @return 推荐尺寸 */
 QSize TerminalWidget::sizeHint() const { return QSize(800, 600); }
 
 // ---- 搜索功能 - 委托给 TerminalSearchManager ----
+/** @brief 设置搜索高亮(支持正则/HEX/普通文本) @param pattern 搜索模式 @param regex 是否正则 @param hex 是否HEX模式 */
 void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool hex)
 {
     auto lineAtFn = [this](int idx) -> QByteArray {
@@ -194,22 +209,28 @@ void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool
     update();
 }
 
+/** @brief 清除搜索高亮并重绘 */
 void TerminalWidget::clearSearchHighlight() { m_searchManager->clearSearchHighlight(); update(); }
+/** @brief 返回搜索匹配总数 @return 匹配数量 */
 int TerminalWidget::searchMatchCount() const { return m_searchManager->searchMatchCount(); }
+/** @brief 返回当前高亮的匹配索引 @return 当前索引 */
 int TerminalWidget::currentMatchIndex() const { return m_searchManager->currentMatchIndex(); }
 
+/** @brief 跳转到下一个搜索匹配项 */
 void TerminalWidget::gotoNextMatch()
 {
     int line = m_searchManager->gotoNextMatch();
     if (line >= 0) scrollToMatch(line); update();
 }
 
+/** @brief 跳转到上一个搜索匹配项 */
 void TerminalWidget::gotoPrevMatch()
 {
     int line = m_searchManager->gotoPrevMatch();
     if (line >= 0) scrollToMatch(line); update();
 }
 
+/** @brief 滚动到指定行并确保可见 @param line 目标行号 */
 void TerminalWidget::scrollToMatch(int line)
 {
     if (line < m_scrollOffset || line >= m_scrollOffset + m_visibleLines) {
@@ -219,6 +240,7 @@ void TerminalWidget::scrollToMatch(int line)
 }
 
 /** @brief 缓存更新后重新搜索(paintEvent中调用) */
+/** @brief 缓存更新后刷新搜索匹配(重新计算所有匹配位置) */
 void TerminalWidget::refreshSearchAfterCacheUpdate()
 {
     if (m_searchManager->searchPattern().isEmpty()) return;
@@ -230,6 +252,7 @@ void TerminalWidget::refreshSearchAfterCacheUpdate()
 }
 
 // ---- 单行绘制 ----
+/** @brief 绘制单行终端内容(时间戳+方向前缀+HEX/ASCII数据+搜索高亮) @param painter 画笔 @param cached 缓存行数据 @param y 起始Y坐标 @param displayLine 显示行号 @return 绘制消耗的像素高度 */
 int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y, int displayLine)
 {
     int xOffset = 0;
@@ -291,6 +314,7 @@ int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y
 }
 
 // ---- 核心渲染 ----
+/** @brief 自绘事件：绘制可见区域的终端行(时间戳+方向+数据+搜索高亮+选中) @param event 绘制事件 */
 void TerminalWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
@@ -356,8 +380,10 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
 }
 
 // ---- 事件处理 ----
+/** @brief 窗口大小变化事件：更新可见行范围 @param event 大小变化事件 */
 void TerminalWidget::resizeEvent(QResizeEvent* event) { QWidget::resizeEvent(event); updateVisibleRange(); }
 
+/** @brief 鼠标滚轮事件：Ctrl+滚轮缩放字号，普通滚轮上下滚动 @param event 滚轮事件 */
 void TerminalWidget::wheelEvent(QWheelEvent* event)
 {
     int delta = event->angleDelta().y();
@@ -369,6 +395,7 @@ void TerminalWidget::wheelEvent(QWheelEvent* event)
     event->accept();
 }
 
+/** @brief 鼠标按下事件：记录选区起点 @param event 鼠标事件 */
 void TerminalWidget::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
@@ -378,6 +405,7 @@ void TerminalWidget::mousePressEvent(QMouseEvent* event)
     QWidget::mousePressEvent(event);
 }
 
+/** @brief 鼠标移动事件：更新文本选区并重绘 @param event 鼠标事件 */
 void TerminalWidget::mouseMoveEvent(QMouseEvent* event)
 {
     if (event->buttons() & Qt::LeftButton) {
@@ -387,12 +415,14 @@ void TerminalWidget::mouseMoveEvent(QMouseEvent* event)
     QWidget::mouseMoveEvent(event);
 }
 
+/** @brief 鼠标释放事件：完成文本选区，自动复制选中内容到剪贴板 @param event 鼠标事件 */
 void TerminalWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) m_selectionManager->onMouseRelease();
     QWidget::mouseReleaseEvent(event);
 }
 
+/** @brief 键盘事件：Ctrl+C复制、Ctrl+F搜索、F3/Shift+F3导航匹配、Ctrl+A全选 @param event 键盘事件 */
 void TerminalWidget::keyPressEvent(QKeyEvent* event)
 {
     // Ctrl+C 复制选中内容 — 精确匹配 Ctrl 修饰键，避免 Ctrl+Shift+C 被误拦截
@@ -426,6 +456,7 @@ void TerminalWidget::keyPressEvent(QKeyEvent* event)
 }
 
 // ---- 模型数据回调 ----
+/** @brief 数据追加回调：更新缓存行计数，自动滚动到底部 @param firstNewLine 首行索引 @param count 新增行数 */
 void TerminalWidget::onDataAppended(int firstNewLine, int count)
 {
     Q_UNUSED(firstNewLine); Q_UNUSED(count);
@@ -437,6 +468,7 @@ void TerminalWidget::onDataAppended(int firstNewLine, int count)
     update();
 }
 
+/** @brief 数据清空回调：重置缓存和滚动位置 */
 void TerminalWidget::onDataCleared()
 {
     m_cachedLines.clear(); m_cachedLineCount = 0;
@@ -445,6 +477,7 @@ void TerminalWidget::onDataCleared()
     update();
 }
 
+/** @brief 计算并更新可见行范围(首行索引+可见行数+缓存构建) */
 void TerminalWidget::updateVisibleRange()
 {
     m_visibleLines = height() / m_lineHeight;
@@ -483,11 +516,13 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 }
 
 // ---- 右键菜单 / 全选 ----
+/** @brief 右键菜单事件：弹出复制/全选/清屏/搜索菜单 @param event 右键菜单事件 */
 void TerminalWidget::contextMenuEvent(QContextMenuEvent* event)
 {
     m_contextMenuManager->showContextMenu(event, !selectedText().isEmpty());
 }
 
+/** @brief 全选所有终端行文本 */
 void TerminalWidget::selectAll()
 {
     int totalLines = m_directionFilter->isFiltered()

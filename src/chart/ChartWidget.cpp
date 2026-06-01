@@ -47,6 +47,7 @@ ChartWidget::ChartWidget(QWidget* parent)
 // UI 初始化
 // ============================================================================
 
+/** @brief 初始化波形图UI(QChartView+工具栏:暂停/清除/通道配置) */
 void ChartWidget::setupUI()
 {
     auto* layout = new QVBoxLayout(this);
@@ -128,11 +129,13 @@ void ChartWidget::setupUI()
 // 公开接口
 // ============================================================================
 
+/** @brief 返回波形数据模型指针 @return ChartModel指针 */
 ChartModel* ChartWidget::model() const
 {
     return m_model;
 }
 
+/** @brief 从帧定义配置波形图(自动创建通道映射) @param def 帧定义 */
 void ChartWidget::configureFromFrameDefinition(const FrameDefinition& def)
 {
     // 从帧定义的字段列表自动生成通道配置
@@ -142,27 +145,32 @@ void ChartWidget::configureFromFrameDefinition(const FrameDefinition& def)
     m_model->setChannelConfigSet(m_configSet);
 }
 
+/** @brief 设置滑动窗口大小 @param points 窗口点数 */
 void ChartWidget::setWindowSize(int points)
 {
     m_model->setWindowSize(points);
 }
 
+/** @brief 清除波形数据 */
 void ChartWidget::clear()
 {
     m_model->clear();
 }
 
+/** @brief 返回当前通道名称列表 @return 通道名列表 */
 QStringList ChartWidget::channels() const
 {
     return m_model->channelNames();
 }
 
+/** @brief 设置Y轴固定范围(禁用自动Y轴) @param min 最小值 @param max 最大值 */
 void ChartWidget::setYRange(double min, double max)
 {
     m_autoYRange = false;
     m_yAxis->setRange(min, max);
 }
 
+/** @brief 设置是否启用Y轴自动范围 @param enabled true=自动 */
 void ChartWidget::setAutoYRange(bool enabled)
 {
     m_autoYRange = enabled;
@@ -172,6 +180,7 @@ void ChartWidget::setAutoYRange(bool enabled)
 // 槽函数 -- 帧数据接收（兼容旧接口，委托给ChartModel）
 // ============================================================================
 
+/** @brief 帧解析回调：转发到ChartModel @param fields 字段映射 @param rawFrame 原始帧 */
 void ChartWidget::onFrameParsed(const QVariantMap& fields, const QByteArray& rawFrame)
 {
     if (m_paused) return;
@@ -182,6 +191,7 @@ void ChartWidget::onFrameParsed(const QVariantMap& fields, const QByteArray& raw
 // 槽函数 -- ChartModel 信号驱动的渲染更新
 // ============================================================================
 
+/** @brief 图表数据更新回调：刷新可见通道的series数据和坐标轴范围 @param updatedChannels 更新的通道名称列表 */
 void ChartWidget::updateChart(const QStringList& updatedChannels)
 {
     if (m_paused) return;
@@ -216,6 +226,7 @@ void ChartWidget::updateChart(const QStringList& updatedChannels)
         .arg(m_model->currentFrameIndex()));
 }
 
+/** @brief 通道配置变化回调：同步series(新增/删除通道对应的QLineSeries) */
 void ChartWidget::onChannelsChanged()
 {
     // 清除旧的series
@@ -260,6 +271,7 @@ void ChartWidget::onChannelsChanged()
     m_statusLabel->setText(tr("通道: %1").arg(m_seriesMap.size()));
 }
 
+/** @brief 数据清空回调：清除所有series数据点 */
 void ChartWidget::onDataCleared()
 {
     // 清除所有series的数据点
@@ -274,12 +286,14 @@ void ChartWidget::onDataCleared()
 // 槽函数 -- 控制栏按钮
 // ============================================================================
 
+/** @brief 暂停/继续按钮切换回调 @param paused true=暂停 */
 void ChartWidget::onPauseToggled(bool paused)
 {
     m_paused = paused;
     m_pauseBtn->setText(paused ? tr("继续") : tr("暂停"));
 }
 
+/** @brief 清除按钮回调：清空波形数据和series */
 void ChartWidget::onClearClicked()
 {
     clear();
@@ -299,6 +313,7 @@ void ChartWidget::onClearClicked()
  *   - 图例文字颜色 (ThemeManager::TextSecondary)
  *   - 所有数据线颜色 (ChartColors::colorsForTheme)
  */
+/** @brief 主题切换回调：从ThemeManager获取新颜色并应用到series和图表 */
 void ChartWidget::onThemeChanged()
 {
     applyThemeColors();
@@ -320,6 +335,7 @@ void ChartWidget::onThemeChanged()
  *   - 主题切换时，所有数据线按通道索引从新调色板中重新分配颜色
  *   - 这确保在暗色/亮色背景下线条都有足够对比度
  */
+/** @brief 从ThemeManager获取颜色并应用到图表背景/坐标轴/series/工具栏 */
 void ChartWidget::applyThemeColors()
 {
     auto& theme = ThemeManager::instance();
@@ -377,6 +393,7 @@ void ChartWidget::applyThemeColors()
 // 内部方法 -- Series管理
 // ============================================================================
 
+/** @brief 为指定通道创建QLineSeries并添加到图表 @param name 通道名称 @param color 线条颜色 */
 void ChartWidget::createSeries(const QString& name, const QColor& color)
 {
     if (m_seriesMap.contains(name)) return;
@@ -405,6 +422,7 @@ void ChartWidget::createSeries(const QString& name, const QColor& color)
     m_seriesMap[name] = series;
 }
 
+/** @brief 移除指定通道的QLineSeries @param name 通道名称 */
 void ChartWidget::removeSeries(const QString& name)
 {
     auto it = m_seriesMap.find(name);

@@ -19,6 +19,7 @@
 // 构造 / 析构
 // ============================================================================
 
+/** @brief 构造函数，初始化刷新定时器 @param parent 父对象 */
 ChartModel::ChartModel(QObject* parent)
     : QObject(parent)
     , m_refreshTimer(new QTimer(this))
@@ -33,6 +34,7 @@ ChartModel::ChartModel(QObject* parent)
 // 配置接口
 // ============================================================================
 
+/** @brief 设置通道配置集(重建缓冲区并发射channelsChanged) @param configSet 通道配置集 */
 void ChartModel::setChannelConfigSet(const ChannelConfigSet& configSet)
 {
     m_configSet = configSet;
@@ -40,11 +42,13 @@ void ChartModel::setChannelConfigSet(const ChannelConfigSet& configSet)
     emit channelsChanged();
 }
 
+/** @brief 返回当前通道配置集(只读引用) @return ChannelConfigSet引用 */
 const ChannelConfigSet& ChartModel::channelConfigSet() const
 {
     return m_configSet;
 }
 
+/** @brief 设置滑动窗口大小(超过时裁剪旧数据) @param points 窗口点数(最小1) */
 void ChartModel::setWindowSize(int points)
 {
     if (points < 1) points = 1;
@@ -59,11 +63,13 @@ void ChartModel::setWindowSize(int points)
     }
 }
 
+/** @brief 返回滑动窗口大小 @return 窗口点数 */
 int ChartModel::windowSize() const
 {
     return m_windowSize;
 }
 
+/** @brief 设置刷新间隔(0=立即刷新，>0=批量刷新减少信号频率) @param ms 刷新间隔毫秒数 */
 void ChartModel::setRefreshInterval(int ms)
 {
     if (ms < 0) ms = 0;
@@ -79,6 +85,7 @@ void ChartModel::setRefreshInterval(int ms)
     // 如果 ms > 0，下一次 onFrameParsed 会重新启动定时器
 }
 
+/** @brief 返回刷新间隔 @return 毫秒数 */
 int ChartModel::refreshInterval() const
 {
     return m_refreshInterval;
@@ -168,11 +175,13 @@ QPair<double, double> ChartModel::xRange() const
     return qMakePair(0.0, static_cast<double>(m_frameIndex) + 10.0);
 }
 
+/** @brief 返回累计接收的数据点总数 @return 点数 */
 int ChartModel::totalPointsReceived() const
 {
     return m_totalPoints;
 }
 
+/** @brief 返回当前全局帧索引(X轴位置) @return 帧索引 */
 int ChartModel::currentFrameIndex() const
 {
     return m_frameIndex;
@@ -182,6 +191,7 @@ int ChartModel::currentFrameIndex() const
 // 操作接口
 // ============================================================================
 
+/** @brief 清除所有通道数据、帧索引和待刷新队列，发射dataCleared */
 void ChartModel::clear()
 {
     m_frameIndex = 0;
@@ -201,6 +211,7 @@ void ChartModel::clear()
 // 槽函数 -- 帧数据接收
 // ============================================================================
 
+/** @brief 帧解析回调：计算各通道值、降采样、追加缓冲区、根据刷新策略发射信号 @param fields 解析后的字段映射 @param rawFrame 原始帧数据(未使用) */
 void ChartModel::onFrameParsed(const QVariantMap& fields, const QByteArray& rawFrame)
 {
     Q_UNUSED(rawFrame);
@@ -256,6 +267,7 @@ void ChartModel::onFrameParsed(const QVariantMap& fields, const QByteArray& rawF
 // 槽函数 -- 定时刷新
 // ============================================================================
 
+/** @brief 刷新定时器回调：刷出所有挂起的数据更新 */
 void ChartModel::onRefreshTick()
 {
     flushPendingUpdates();
@@ -265,6 +277,7 @@ void ChartModel::onRefreshTick()
 // 内部方法
 // ============================================================================
 
+/** @brief 重建通道缓冲区(清除所有数据并为启用的通道预分配空间) */
 void ChartModel::rebuildBuffers()
 {
     m_buffers.clear();
@@ -282,6 +295,7 @@ void ChartModel::rebuildBuffers()
     }
 }
 
+/** @brief 向指定通道追加数据点(含降采样和滑动窗口裁剪) @param displayName 通道名称 @param value 数据值 @param sampleDivisor 降采样因子 */
 void ChartModel::appendPoint(const QString& displayName, double value, int sampleDivisor)
 {
     auto it = m_buffers.find(displayName);
@@ -312,6 +326,7 @@ void ChartModel::appendPoint(const QString& displayName, double value, int sampl
     }
 }
 
+/** @brief 刷出所有挂起的通道更新，发射dataUpdated信号通知ChartWidget重绘 */
 void ChartModel::flushPendingUpdates()
 {
     if (m_pendingUpdates.isEmpty()) {

@@ -55,6 +55,7 @@ bool DataLogger::startRecording(const QString& filePath)
     return true;
 }
 
+/** @brief 停止录制，回写header中的recordCount，发射recordingStopped信号 */
 void DataLogger::stopRecording()
 {
     if (!m_recording) return;
@@ -76,6 +77,7 @@ void DataLogger::stopRecording()
     }
 }
 
+/** @brief 暂停录制，记录暂停起始时间 */
 void DataLogger::pauseRecording()
 {
     if (!m_recording || m_paused) return;
@@ -83,6 +85,7 @@ void DataLogger::pauseRecording()
     m_pauseStartTime = m_recordTimer.elapsed();
 }
 
+/** @brief 恢复录制，累加暂停时长到m_pauseOffset */
 void DataLogger::resumeRecording()
 {
     if (!m_recording || !m_paused) return;
@@ -101,6 +104,11 @@ bool DataLogger::isPaused() const
     return m_paused;
 }
 
+/**
+ * @brief 记录一条数据到日志文件
+ * @param data 原始字节数据
+ * @param dir 数据方向(RX/TX)
+ */
 void DataLogger::logData(const QByteArray& data, Direction dir)
 {
     if (!m_recording || m_paused || !m_recordFile) return;
@@ -194,6 +202,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     return true;
 }
 
+/** @brief 停止回放，关闭文件，发射playbackStopped信号 */
 void DataLogger::stopPlayback()
 {
     if (!m_playing) return;
@@ -210,6 +219,7 @@ void DataLogger::stopPlayback()
     emit playbackFinished();
 }
 
+/** @brief 暂停回放 */
 void DataLogger::pausePlayback()
 {
     if (!m_playing || m_playbackPaused) return;
@@ -219,6 +229,7 @@ void DataLogger::pausePlayback()
     m_playbackBaseTime += static_cast<qint64>(m_playbackElapsed.elapsed() * m_playbackSpeed);
 }
 
+/** @brief 恢复回放 */
 void DataLogger::resumePlayback()
 {
     if (!m_playing || !m_playbackPaused) return;
@@ -229,6 +240,7 @@ void DataLogger::resumePlayback()
     m_playbackTimer->start();
 }
 
+/** @brief 设置回放速率 @param speed 速率倍数(1.0=正常) */
 void DataLogger::setPlaybackSpeed(qreal speed)
 {
     qreal newSpeed = qBound(0.1, speed, 100.0);
@@ -249,6 +261,7 @@ bool DataLogger::isPlaying() const
 
 // ---- 内部方法 ----
 
+/** @brief 写入日志文件头(magic+version+recordCount占位+startTime) */
 void DataLogger::writeHeader()
 {
     if (!m_recordFile) return;
@@ -264,6 +277,12 @@ void DataLogger::writeHeader()
     stream << static_cast<quint32>(0);
 }
 
+/**
+ * @brief 写入一条数据记录(时间戳+方向+数据长度+数据)
+ * @param timestamp 相对起始时间的毫秒偏移
+ * @param dir 数据方向
+ * @param data 原始字节
+ */
 void DataLogger::writeRecord(quint64 timestamp, Direction dir, const QByteArray& data)
 {
     if (!m_recordFile) return;
@@ -315,6 +334,7 @@ bool DataLogger::readNextRecord(RecordHeader& header, QByteArray& data)
     return true;
 }
 
+/** @brief 回放定时器回调，按时间戳发射下一条记录 */
 void DataLogger::onPlaybackTick()
 {
     if (!m_playing || m_playbackPaused) return;
@@ -468,6 +488,7 @@ bool DataLogger::seekToBookmark(int index)
 
 // ---- 书签管理 ----
 
+/** @brief 添加书签(标记当前录制位置) @param label 书签标签 @param streamId 数据流标识 */
 void DataLogger::addBookmark(const QString& label, const QString& streamId)
 {
     qint64 ts;
@@ -489,6 +510,7 @@ QVector<DataBookmark> DataLogger::bookmarks() const
     return m_bookmarks;
 }
 
+/** @brief 删除指定索引的书签 @param index 书签索引 */
 void DataLogger::removeBookmark(int index)
 {
     if (index < 0 || index >= m_bookmarks.size()) return;
@@ -496,6 +518,7 @@ void DataLogger::removeBookmark(int index)
     emit bookmarksChanged();
 }
 
+/** @brief 清空所有书签 */
 void DataLogger::clearBookmarks()
 {
     if (m_bookmarks.isEmpty()) return;

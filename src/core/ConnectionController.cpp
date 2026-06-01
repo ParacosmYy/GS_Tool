@@ -95,8 +95,11 @@ ConnectionController::~ConnectionController()
     if (m_portWatcher) m_portWatcher->stop();
 }
 
+/** @brief 注入SendController依赖(用于发送数据时的字节数追踪) @param ctrl SendController指针 */
 void ConnectionController::setSendController(SendController* ctrl) { m_sendController = ctrl; }
+/** @brief 注入OtaManager依赖(用于OTA传输时的连接注入) @param mgr OtaManager指针 */
 void ConnectionController::setOtaManager(OtaManager* mgr) { m_otaManager = mgr; }
+/** @brief 注入RecordingController依赖(用于录制数据转发) @param ctrl RecordingController指针 */
 void ConnectionController::setRecordingController(RecordingController* ctrl) { m_recordingController = ctrl; }
 
 /** @brief 创建并打开串口连接 @param serialParams 串口参数 */
@@ -252,8 +255,11 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
     emit connectionSucceeded(m_currentConn ? m_currentConn->name() : tr("网络"));
 }
 
+/** @brief 返回当前活动连接指针 @return IConnection指针，无连接时为nullptr */
 IConnection* ConnectionController::currentConnection() const { return m_currentConn; }
+/** @brief 设置DTR信号电平 @param enabled true=高电平 */
 void ConnectionController::setDtr(bool enabled) { if (m_currentConn) m_currentConn->setDtr(enabled); }
+/** @brief 设置RTS信号电平 @param enabled true=高电平 */
 void ConnectionController::setRts(bool enabled) { if (m_currentConn) m_currentConn->setRts(enabled); }
 /** @brief 发送Break信号(用于STM32/ESP32进入Bootloader) @param duration Break持续时间(毫秒) */
 void ConnectionController::sendBreak(int duration) { if (m_currentConn) m_currentConn->sendBreak(duration); }
@@ -267,7 +273,9 @@ void ConnectionController::enableAutoReconnect(bool enabled, int intervalMs, int
     else m_reconnectTimer.stop();
 }
 
+/** @brief 返回自动重连是否启用 @return true=已启用 */
 bool ConnectionController::isAutoReconnectEnabled() const { return m_autoReconnectEnabled; }
+/** @brief 返回端口监听器 @return PortWatcher指针 */
 PortWatcher* ConnectionController::portWatcher() const { return m_portWatcher; }
 
 /**
