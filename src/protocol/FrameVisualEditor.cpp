@@ -18,9 +18,7 @@
 #include <QMessageBox>
 #include <QDebug>
 
-// ============================================================
-// 静态辅助方法
-// ============================================================
+// ---- 静态辅助方法 ----
 
 QStringList FrameVisualEditor::fieldTypeNames()
 {
@@ -290,18 +288,13 @@ void FrameVisualEditor::setupConnections()
     });
 }
 
-// ============================================================
-// 空实现(预留)
-// ============================================================
-
+// ---- 空实现(预留) ----
 void FrameVisualEditor::onHeaderChanged() {}
 void FrameVisualEditor::onFooterChanged() {}
 void FrameVisualEditor::onLengthConfigChanged() {}
 void FrameVisualEditor::onChecksumConfigChanged() {}
 
-// ============================================================
-// 数据读写
-// ============================================================
+// ---- 数据读写 ----
 
 FrameDefinition FrameVisualEditor::currentDefinition() const { return m_def; }
 
@@ -331,9 +324,7 @@ void FrameVisualEditor::onApply()
     emit definitionChanged(m_def);
 }
 
-// ============================================================
-// 字段管理
-// ============================================================
+// ---- 字段操作 ----
 
 /** @brief 添加新字段(默认UInt8, 偏移0, 大小1, LE, 缩放1.0) */
 void FrameVisualEditor::onAddField()
@@ -383,9 +374,7 @@ void FrameVisualEditor::onFieldChanged(int row, int col)
     Q_UNUSED(row); Q_UNUSED(col);
 }
 
-// ============================================================
-// 内部方法
-// ============================================================
+// ---- 内部更新 ----
 
 /** @brief 从UI控件收集数据重建FrameDefinition */
 void FrameVisualEditor::rebuildDefinition()

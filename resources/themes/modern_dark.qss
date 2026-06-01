@@ -520,11 +520,41 @@ QPushButton#connectBtn[state="connecting"] {
     background-color: #e0af68;
     color: #1a1b26;
 }
+QPushButton#connectBtn[state="error"] {
+    background-color: #f7768e;
+    color: #1a1b26;
+}
+QPushButton#connectBtn[state="error"]:hover { background-color: #ff9e9e; }
+QPushButton#connectBtn[state="error"]:pressed { background-color: #db4b6c; }
+
+/* Break信号按钮 — 警告色调标识特殊操作 */
+QPushButton#breakBtn {
+    background-color: transparent;
+    border: 1px solid #ff9e64;
+    border-radius: 4px;
+    color: #ff9e64;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+QPushButton#breakBtn:hover {
+    background-color: rgba(255, 158, 100, 0.15);
+    border-color: #ff9e64;
+}
+QPushButton#breakBtn:pressed {
+    background-color: rgba(255, 158, 100, 0.3);
+}
+QPushButton#breakBtn:disabled {
+    background-color: transparent;
+    border-color: #292e42;
+    color: #3b4261;
+}
 
 QLabel#driverInfoLbl {
     font-size: 11px;
     color: #565f89;
-    padding: 4px;
+    padding: 4px 8px;
+    background-color: transparent;
 }
 
 QPushButton#refreshBtn {
@@ -1113,12 +1143,6 @@ QComboBox#langCombo:disabled {
 }
 
 /* === PortWatcher 提示文字样式 === */
-QLabel#driverInfoLbl {
-    font-size: 11px;
-    color: #565f89;
-    padding: 4px 8px;
-    background-color: transparent;
-}
 
 /* === 波形图 (ChartWidget) === */
 

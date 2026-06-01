@@ -526,11 +526,41 @@ QPushButton#connectBtn[state="connecting"] {
     background-color: #f9e2af;
     color: #1e1e2e;
 }
+QPushButton#connectBtn[state="error"] {
+    background-color: #f38ba8;
+    color: #1e1e2e;
+}
+QPushButton#connectBtn[state="error"]:hover { background-color: #f5a0b8; }
+QPushButton#connectBtn[state="error"]:pressed { background-color: #e06c8a; }
+
+/* Break信号按钮 — 警告色调标识特殊操作 */
+QPushButton#breakBtn {
+    background-color: transparent;
+    border: 1px solid #fab387;
+    border-radius: 4px;
+    color: #fab387;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+QPushButton#breakBtn:hover {
+    background-color: rgba(250, 179, 135, 0.15);
+    border-color: #fab387;
+}
+QPushButton#breakBtn:pressed {
+    background-color: rgba(250, 179, 135, 0.3);
+}
+QPushButton#breakBtn:disabled {
+    background-color: transparent;
+    border-color: #45475a;
+    color: #45475a;
+}
 
 QLabel#driverInfoLbl {
     font-size: 11px;
     color: #6c7086;
-    padding: 4px;
+    padding: 4px 8px;
+    background-color: transparent;
 }
 
 QPushButton#refreshBtn {
@@ -1118,15 +1148,6 @@ QComboBox#langCombo:disabled {
     background-color: #313244;
     color: #6c7086;
     border-color: #313244;
-}
-
-/* === PortWatcher 提示文字样式 === */
-/* 用于串口热插拔检测提示、驱动信息提示等 */
-QLabel#driverInfoLbl {
-    font-size: 11px;
-    color: #6c7086;
-    padding: 4px 8px;
-    background-color: transparent;
 }
 
 /* === 波形图 (ChartWidget) === */

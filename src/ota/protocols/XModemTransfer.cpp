@@ -58,7 +58,7 @@ bool XModemTransfer::onStartInit()
 {
     // 加载文件数据
     if (m_data.isEmpty() && !m_filePath.isEmpty()) {
-        // 文件大小校验: 拒绝超过1MB的文件，防止内存耗尽
+        // 文件大小校验: 拒绝超过kMaxFileSize的文件，防止内存耗尽
         QFileInfo fileInfo(m_filePath);
         if (fileInfo.size() > BaseTransfer::kMaxFileSize) {
             qWarning() << "XModem: file too large:" << fileInfo.size()

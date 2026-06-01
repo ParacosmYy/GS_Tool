@@ -483,7 +483,9 @@ QHBoxLayout* SerialConfigPanel::createAutoReconnectLayout()
     m_reconnectIntervalSpin->setSuffix("ms");
     m_reconnectIntervalSpin->setEnabled(false);
     lay->addWidget(m_autoReconnectCheck);
-    lay->addWidget(new QLabel(tr("间隔")));
+    QLabel* intervalLbl = new QLabel(tr("间隔"));
+    intervalLbl->setObjectName("reconnectIntervalLabel");
+    lay->addWidget(intervalLbl);
     lay->addWidget(m_reconnectIntervalSpin);
     connect(m_autoReconnectCheck, &QCheckBox::toggled, this, [this](bool on) {
         m_reconnectIntervalSpin->setEnabled(on);
