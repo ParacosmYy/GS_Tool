@@ -145,7 +145,7 @@ QGroupBox* FrameVisualEditor::setupChecksumGroup()
     auto* layout = new QFormLayout(group);
     m_checksumTypeCombo = new QComboBox;
     m_checksumTypeCombo->setObjectName("frameChecksumTypeCombo");
-    m_checksumTypeCombo->addItems({"None", "Sum8", "CRC8", "CRC16-CCITT", "CRC16-Modbus", "CRC32"});
+    m_checksumTypeCombo->addItems({tr("无校验"), "Sum8", "CRC8", "CRC16-CCITT", "CRC16-Modbus", "CRC32"});
     layout->addRow(tr("类型:"), m_checksumTypeCombo);
     m_checksumOffsetSpin = new QSpinBox;
     m_checksumOffsetSpin->setObjectName("frameChecksumOffsetSpin");

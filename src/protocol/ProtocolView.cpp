@@ -21,6 +21,7 @@
 // 构造与UI
 // ============================================================
 
+/** @brief 构造协议帧视图(表格+右键菜单+滚动到底部) @param parent 父控件 */
 ProtocolView::ProtocolView(QWidget* parent) : QWidget(parent)
 {
     setupUI();
@@ -272,6 +273,7 @@ void ProtocolView::clear()
 void ProtocolView::setMaxRows(int max) { m_maxRows = max; }
 /** @brief 返回当前行数 @return 行数 */
 int ProtocolView::rowCount() const { return m_model->rowCount(); }
+/** @brief 获取所有已解析帧的原始数据列表 @return QVariantMap列表 */
 QList<QVariantMap> ProtocolView::allFrames() const { return m_frames; }
 
 /** @brief 设置字段颜色范围(值越界时单元格变色) @param fieldName 字段名 @param range 颜色范围配置 */

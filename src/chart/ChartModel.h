@@ -20,10 +20,18 @@
 
 #include "chart/ChannelConfig.h"
 
-// 图表数据模型 -- 管理多通道数据缓冲区、滑动窗口、降采样
-// 职责: 接收帧数据 -> 按ChannelConfig分发 -> 维护滑动窗口 -> 通知视图更新
-// 不负责: 图表渲染（由ChartWidget负责）
-// 数据层: 不依赖任何表现层类
+/**
+ * @brief 图表数据模型 — 管理多通道波形数据的滑动窗口截取和降采样显示
+ *
+ * 接收帧解析结果，按ChannelConfig分发到各通道缓冲区，
+ * 维护滑动窗口和降采样计数器，通过信号通知ChartWidget刷新渲染。
+ * 属于数据层，不依赖任何表现层组件。
+ *
+ * 协作关系:
+ *   - ChartWidget: 监听 dataUpdated/channelsChanged 信号进行渲染
+ *   - ChannelConfigSet: 提供通道配置（名称、数据源映射、降采样比率）
+ *   - FrameParser: 通过 onFrameParsed 槽接收帧数据
+ */
 class ChartModel : public QObject {
     Q_OBJECT
 
@@ -83,14 +91,13 @@ public:
     void clear();
 
 signals:
-    // 通道数据更新通知（视图据此刷新渲染）
-    // updatedChannels: 本次数据更新的通道名列表
+    /** @brief 通道数据更新通知（视图据此刷新渲染） @param updatedChannels 本次数据更新的通道名列表 */
     void dataUpdated(const QStringList& updatedChannels);
 
-    // 通道配置变更通知（增删通道时发出）
+    /** @brief 通道配置变更通知（增删通道时发出） */
     void channelsChanged();
 
-    // 全部数据已清除
+    /** @brief 全部数据已清除 */
     void dataCleared();
 
 public slots:

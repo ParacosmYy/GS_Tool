@@ -51,6 +51,7 @@ QString safeFromUtf8(const QByteArray& data) {
 } // anonymous namespace
 
 // ---- 构造与基本配置 ----
+/** @brief 构造终端控件，初始化字体、主题颜色、选区/搜索/右键菜单管理器 @param parent 父Widget */
 TerminalWidget::TerminalWidget(QWidget* parent)
     : QWidget(parent)
     , m_directionFilter(new DirectionFilter(this))
@@ -490,6 +491,7 @@ void TerminalWidget::updateVisibleRange()
 }
 
 // ---- 缓存格式化 ----
+/** @brief 将原始TerminalLine格式化为缓存行(根据显示模式生成HEX/ASCII/混合文本) @param line 原始终端行数据 @return 格式化后的缓存行 */
 CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 {
     CachedLine cached;

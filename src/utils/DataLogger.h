@@ -13,9 +13,19 @@
 #include <QElapsedTimer>
 #include <QMutex>
 
-// 数据日志记录器 - 录制和回放串口/TCP数据流
-// 二进制格式(.edl): Header + Records(timestamp + direction + data)
-// 支持暂停/恢复录制，支持变速回放
+/**
+ * @brief 数据录制/回放管理器 — 二进制日志文件(.edl)的读写和变速回放
+ *
+ * 管理串口/TCP数据流的录制和回放，使用自定义二进制格式(EDL)。
+ * 录制时按时间戳+方向+数据记录，支持暂停/恢复。
+ * 回放时按原始时间间隔逐条回放，支持变速、Seek跳转和书签定位。
+ *
+ * 协作关系:
+ *   - RecordingController: 上层控制器，委托录制/回放交互逻辑
+ *   - DataBookmark: 书签管理，支持在录制时间轴上标记关键节点
+ *
+ * 所属层级: 数据层（纯文件I/O，不涉及UI）
+ */
 class DataLogger : public QObject {
     Q_OBJECT
 
@@ -101,11 +111,17 @@ public:
     void clearBookmarks();
 
 signals:
+    /** @brief 录制已启动 */
     void recordingStarted();
+    /** @brief 录制已停止 @param filePath 录制文件路径 @param recordCount 总记录数 @param durationMs 录制时长(ms) */
     void recordingStopped(const QString& filePath, int recordCount, qint64 durationMs);
+    /** @brief 回放输出一条记录数据 @param data 原始字节 @param direction 数据方向(RX/TX) */
     void playbackData(const QByteArray& data, qint64 direction);
+    /** @brief 回放进度更新 @param percent 进度百分比 0.0~1.0 */
     void playbackProgress(qreal percent);
+    /** @brief 回放结束 */
     void playbackFinished();
+    /** @brief 错误发生 @param reason 错误原因描述 */
     void error(const QString& reason);
 
     /** @brief 书签列表变化信号（增/删/清空时发射） */

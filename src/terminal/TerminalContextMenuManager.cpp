@@ -13,6 +13,7 @@
 #include <QKeySequence>
 #include <QApplication>
 
+/** @brief 构造终端右键菜单管理器，创建复制/粘贴/清屏/全选/搜索菜单项 @param parent 父对象(通常为TerminalWidget) */
 TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
     : QObject(parent)
     , m_contextMenu(new QMenu(qobject_cast<QWidget*>(parent)))
@@ -59,6 +60,7 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
     });
 }
 
+/** @brief 显示右键菜单(根据是否有选中文本来启用/禁用复制按钮) @param event 右键菜单事件 @param hasSelection 当前是否有选中文本 */
 void TerminalContextMenuManager::showContextMenu(QContextMenuEvent* event, bool hasSelection)
 {
     if (!m_contextMenu) return;

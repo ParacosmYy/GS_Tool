@@ -12,6 +12,7 @@
 #include <QMutexLocker>
 #include <algorithm>
 
+/** @brief 构造数据录制/回放器(创建回放定时器) @param parent 父对象 */
 DataLogger::DataLogger(QObject* parent)
     : QObject(parent)
     , m_playbackTimer(new QTimer(this))

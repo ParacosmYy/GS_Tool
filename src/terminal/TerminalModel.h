@@ -12,9 +12,18 @@
 #include <QDateTime>
 #include "terminal/TerminalTypes.h"
 
-// 终端数据模型 - 管理接收/发送的数据缓冲区
-// 线程安全，可从任意线程添加数据
-// 内部使用环形缓冲区，避免 removeFirst() 的 O(n) 开销
+/**
+ * @brief 终端数据模型 — 管理终端显示数据的线程安全环形缓冲区
+ *
+ * 存储RX/TX数据行(TerminalLine)，内部使用环形缓冲区避免removeFirst()的O(n)开销。
+ * 支持最大行数限制防止内存无限增长，可从任意线程安全添加数据。
+ * 属于数据层，不依赖任何表现层组件。
+ *
+ * 协作关系:
+ *   - TerminalWidget: 监听 dataAppended/dataCleared 信号进行渲染
+ *   - TerminalController: 读取 rxBytes/txBytes 统计和行数据用于导出
+ *   - DataExporter: 通过 lines() 接口批量拉取数据进行文件导出
+ */
 class TerminalModel : public QObject {
     Q_OBJECT
 
@@ -56,10 +65,10 @@ public:
     int maxLines() const;
 
 signals:
-    // 新数据到达，需要重新渲染
+    /** @brief 新数据到达通知 @param firstNewLine 新数据起始行号 @param count 新增行数 */
     void dataAppended(int firstNewLine, int count);
 
-    // 数据被清空
+    /** @brief 数据已清空 */
     void dataCleared();
 
 private:

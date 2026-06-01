@@ -28,6 +28,7 @@
 
 // ---- 构造 ----
 
+/** @brief 构造串口配置面板(端口/波特率/数据位/校验/停止位/流控/DTR/RTS) @param parent 父控件 */
 SerialConfigPanel::SerialConfigPanel(QWidget* parent)
     : QWidget(parent)
 {

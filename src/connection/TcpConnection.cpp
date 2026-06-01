@@ -11,6 +11,7 @@
 #include "connection/TcpConnection.h"
 #include <QNetworkInterface>
 
+/** @brief 构造TCP连接(初始化QTcpSocket) @param parent 父对象 */
 TcpConnection::TcpConnection(QObject* parent)
     : IConnection(parent)
 {

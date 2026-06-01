@@ -15,6 +15,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
+/** @brief 构造终端布局管理器 @param parent 父对象 */
 TerminalLayoutManager::TerminalLayoutManager(QObject* parent)
     : QObject(parent)
     , m_mainTerminal(nullptr)
@@ -37,11 +38,13 @@ TerminalLayoutManager::TerminalLayoutManager(QObject* parent)
     layout->setSpacing(0);
 }
 
+/** @brief 析构终端布局管理器 */
 TerminalLayoutManager::~TerminalLayoutManager()
 {
     // m_container 由Qt父子树管理，无需手动delete
 }
 
+/** @brief 初始化布局管理器，缓存主终端显示设置并应用默认混合布局 @param mainTerminal 主终端控件指针 @param searchBar 搜索栏控件指针 */
 void TerminalLayoutManager::initialize(TerminalWidget* mainTerminal, TerminalSearchBar* searchBar)
 {
     m_mainTerminal = mainTerminal;
@@ -58,21 +61,25 @@ void TerminalLayoutManager::initialize(TerminalWidget* mainTerminal, TerminalSea
     applyLayout();
 }
 
+/** @brief 设置共享的数据模型(分栏终端与主终端共用) @param model TerminalModel指针 */
 void TerminalLayoutManager::setTerminalModel(TerminalModel* model)
 {
     m_model = model;
 }
 
+/** @brief 返回终端容器Widget @return 容器Widget指针 */
 QWidget* TerminalLayoutManager::container() const
 {
     return m_container;
 }
 
+/** @brief 返回当前布局模式 @return TerminalLayout枚举值 */
 TerminalLayout TerminalLayoutManager::layout() const
 {
     return m_layout;
 }
 
+/** @brief 返回当前布局下的所有终端控件列表 @return 终端控件指针列表(混合模式返回主终端，分栏模式返回RX/TX终端) */
 QList<TerminalWidget*> TerminalLayoutManager::terminalWidgets() const
 {
     if (m_layout == TerminalLayout::Mixed) {
@@ -82,6 +89,7 @@ QList<TerminalWidget*> TerminalLayoutManager::terminalWidgets() const
     }
 }
 
+/** @brief 返回主要终端控件(混合模式返回主终端，分栏模式返回RX终端) @return 主终端控件指针 */
 TerminalWidget* TerminalLayoutManager::primaryTerminal() const
 {
     if (m_layout == TerminalLayout::Mixed) {
@@ -90,6 +98,7 @@ TerminalWidget* TerminalLayoutManager::primaryTerminal() const
     return m_rxTerminal;
 }
 
+/** @brief 通过下拉框索引设置布局模式(0=混合, 1=水平分栏, 2=垂直分栏) @param layoutIndex 下拉框索引 */
 void TerminalLayoutManager::setLayout(int layoutIndex)
 {
     // 下拉框索引映射: 0=Mixed, 1=SplitHorizontal, 2=SplitVertical
@@ -103,6 +112,7 @@ void TerminalLayoutManager::setLayout(int layoutIndex)
     }
 }
 
+/** @brief 设置布局模式并重新应用布局 @param layout 目标布局模式 */
 void TerminalLayoutManager::setLayout(TerminalLayout layout)
 {
     if (m_layout == layout) return;
@@ -111,6 +121,7 @@ void TerminalLayoutManager::setLayout(TerminalLayout layout)
     emit layoutChanged(m_layout);
 }
 
+/** @brief 应用当前布局模式(清空容器→销毁旧分割器→重建搜索栏和终端区域) */
 void TerminalLayoutManager::applyLayout()
 {
     // 清空容器中的所有子widget
@@ -223,6 +234,7 @@ void TerminalLayoutManager::applySplitLayout()
     containerLayout->addWidget(m_splitter, 1);
 }
 
+/** @brief 创建分栏终端控件(设置共享模型、方向过滤、同步显示设置) @param direction 数据方向(RX/TX) @param label 终端标签 @return 新创建的终端控件指针 */
 TerminalWidget* TerminalLayoutManager::createSplitTerminal(DataDirection direction, const QString& label)
 {
     Q_UNUSED(label);
@@ -248,6 +260,7 @@ TerminalWidget* TerminalLayoutManager::createSplitTerminal(DataDirection directi
     return terminal;
 }
 
+/** @brief 将主终端的显示设置同步到目标终端(显示模式、时间戳、方向前缀、自动滚动) @param target 目标终端控件指针 */
 void TerminalLayoutManager::syncDisplaySettings(TerminalWidget* target) const
 {
     if (!target) return;

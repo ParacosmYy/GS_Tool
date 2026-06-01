@@ -9,6 +9,7 @@
 #include <QSettings>
 #include <QVBoxLayout>
 
+/** @brief 构造快捷指令栏(加载保存的指令+构建按钮行) @param parent 父控件 */
 QuickCommandBar::QuickCommandBar(QWidget* parent)
     : QWidget(parent)
 {

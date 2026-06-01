@@ -24,6 +24,22 @@
 
 #include <QElapsedTimer>
 
+/**
+ * @brief XMODEM协议传输器 — PC端Sender实现，支持Checksum/CRC/1K三种模式
+ *
+ * 继承BaseTransfer，通过4个纯虚钩子(onStartInit/sendCancelBytes/
+ * processReceivedData/handleTimeout)注入协议特有逻辑。
+ * 接收方发送NAK时自动回退到Checksum模式，每块最多重试10次。
+ *
+ * 协作关系:
+ *   - BaseTransfer: 提供传输框架、超时重试、连接管理
+ *   - IConnection: 数据收发通道(串口/TCP/UDP)
+ *   - CRC: 提供CRC16-CCITT和算术校验和计算
+ *
+ * 设计模式:
+ *   - 模板方法模式: BaseTransfer定义传输骨架，本类实现协议特有步骤
+ *   - 策略模式: 三种XMODEM模式作为可互换的传输策略
+ */
 class XModemTransfer : public BaseTransfer {
     Q_OBJECT
 

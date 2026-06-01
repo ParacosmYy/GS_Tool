@@ -11,6 +11,7 @@
 #include "connection/UdpConnection.h"
 #include <QVariant>
 
+/** @brief 构造UDP连接(初始化QUdpSocket) @param parent 父对象 */
 UdpConnection::UdpConnection(QObject* parent)
     : IConnection(parent)
 {

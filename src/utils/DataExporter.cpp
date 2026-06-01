@@ -20,6 +20,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+/** @brief 构造数据导出器 @param parent 父对象 */
 DataExporter::DataExporter(QObject* parent) : QObject(parent) {}
 
 // ---- 公共入口 ----
@@ -91,6 +92,7 @@ bool DataExporter::flushAndCheck(QFile& file, QTextStream& out, const QString& p
     return true;
 }
 
+/** @brief 按时间范围过滤终端行(支持单端/双端/无过滤) @param lines 原始行列表 @param from 起始时间(无效=无下界) @param to 结束时间(无效=无上界) @return 过滤后的行列表 */
 QVector<TerminalLine> DataExporter::filterByTime(
     const QVector<TerminalLine>& lines, const QDateTime& from, const QDateTime& to) const
 {
@@ -281,6 +283,7 @@ QString DataExporter::escapeCsvField(const QString& field)
     return QLatin1Char('"') + escaped + QLatin1Char('"');
 }
 
+/** @brief 将多行数据拼接为单个QByteArray(预分配总大小避免反复重分配) @param lines 终端行列表 @return 拼接后的原始字节 */
 QByteArray DataExporter::concatData(const QVector<TerminalLine>& lines)
 {
     qsizetype totalSize = 0;

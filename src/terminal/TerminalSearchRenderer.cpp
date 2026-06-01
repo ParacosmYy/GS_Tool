@@ -9,6 +9,16 @@
 #include "terminal/TerminalSearchRenderer.h"
 #include "terminal/TerminalSearchManager.h"
 
+/** @brief 在终端绘制搜索高亮矩形(遍历匹配位置→计算字符偏移→填充高亮色)
+ * @param painter QPainter引用
+ * @param fontMetrics 字体度量(计算字符宽度)
+ * @param searchManager 搜索管理器(提供匹配索引)
+ * @param cached 当前行缓存(字符偏移列表)
+ * @param displayLine 显示行号
+ * @param textXOffset 文本X偏移
+ * @param y 当前行Y坐标
+ * @param lineHeight 行高
+ */
 void TerminalSearchRenderer::drawHighlights(
     QPainter& painter,
     const QFontMetrics& fontMetrics,

@@ -100,12 +100,12 @@ public:
     }
 
 private:
-    mutable QMutex m_mutex;
-    QVector<T> m_buffer;
-    int m_capacity;
-    int m_head;      // 读位置
-    int m_tail;      // 写位置
-    int m_count;     // 当前元素数
+    mutable QMutex m_mutex;       ///< 线程安全互斥锁
+    QVector<T> m_buffer;          ///< 底层存储容器
+    int m_capacity;               ///< 环形缓冲区总容量
+    int m_head;                   ///< 读位置索引（最旧元素）
+    int m_tail;                   ///< 写位置索引（下一个写入位置）
+    int m_count;                  ///< 当前有效元素数量
 };
 
 #endif // RINGBUFFER_H

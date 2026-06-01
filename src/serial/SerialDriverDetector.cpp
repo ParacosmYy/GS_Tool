@@ -31,6 +31,7 @@ const QStringList SerialDriverDetector::kKnownDrivers = {
     QStringLiteral("WCH"),
 };
 
+/** @brief 检测系统中所有已知USB串口驱动的安装状态(CH340/CP2102/FT232/PL2303/WCH等) @return DriverInfo列表 */
 QVector<DriverInfo> SerialDriverDetector::detectDrivers()
 {
     QVector<DriverInfo> result;
@@ -69,6 +70,7 @@ QVector<DriverInfo> SerialDriverDetector::detectDrivers()
     return result;
 }
 
+/** @brief 快速检查是否安装了任意一个已知串口驱动 @return true=至少有一个驱动已安装 */
 bool SerialDriverDetector::hasAnyDriverInstalled()
 {
     const QVector<DriverInfo> drivers = detectDrivers();
@@ -80,6 +82,7 @@ bool SerialDriverDetector::hasAnyDriverInstalled()
     return false;
 }
 
+/** @brief 生成驱动状态摘要文本(已安装驱动列表+未安装提示) @return 多行状态文本 */
 QString SerialDriverDetector::driverStatusSummary()
 {
     const QVector<DriverInfo> drivers = detectDrivers();

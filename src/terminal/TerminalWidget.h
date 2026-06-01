@@ -17,13 +17,33 @@
 
 class QContextMenuEvent;
 
+/**
+ * @brief 自绘制终端控件 — 基于QPainter的高性能终端显示
+ *
+ * 自绘引擎实现文本/HEX/混合/十进制四种显示模式，支持搜索高亮、F3导航、
+ * 方向前缀、时间戳、自动滚屏等特性。分栏模式下通过DirectionFilter过滤RX/TX数据行。
+ *
+ * 协作关系:
+ *   - TerminalModel: 数据源，通过 dataAppended 信号驱动增量渲染
+ *   - TerminalSearchManager: 搜索匹配和高亮导航
+ *   - TerminalSelectionManager: 文本选择和复制
+ *   - TerminalContextMenuManager: 右键菜单（复制/粘贴/清屏/搜索/导出）
+ *   - DirectionFilter: 分栏模式下的RX/TX方向过滤
+ *   - TerminalLayoutManager: 管理终端的布局切换
+ *
+ * 所属层级: 表现层（只负责渲染，不包含业务逻辑）
+ */
 class TerminalWidget : public QWidget {
     Q_OBJECT
 
 signals:
+    /** @brief 搜索匹配数变化 @param total 匹配总数 @param current 当前高亮索引 */
     void searchMatchesChanged(int total, int current);
+    /** @brief 用户触发搜索(Ctrl+F) */
     void searchRequested();
+    /** @brief 右键菜单粘贴请求 @param text 待粘贴文本 */
     void pasteRequested(const QString& text);
+    /** @brief 用户请求清屏 */
     void clearRequested();
 
 public:
