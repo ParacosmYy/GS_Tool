@@ -141,6 +141,14 @@ void DataStatistics::onRefreshTimer()
             .arg(seconds, 2, 10, QLatin1Char('0'))
     );
 
+    // 速率衰减: 如果超过2秒未收到update()调用，将速率衰减至0
+    // 避免空闲时仍显示非零速率误导用户
+    qint64 sampleAge = m_sampleTimer.elapsed();
+    if (sampleAge > 2000) {
+        m_rxRate = 0.0;
+        m_txRate = 0.0;
+    }
+
     // 更新速率显示
     m_rxRateLabel->setText(formatRate(m_rxRate));
     m_txRateLabel->setText(formatRate(m_txRate));

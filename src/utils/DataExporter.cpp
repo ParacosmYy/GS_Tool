@@ -143,12 +143,15 @@ bool DataExporter::exportCsv(const QString& path, const QVector<TerminalLine>& l
     QTextStream out;
     if (!openTextFile(file, out, path)) return false;
 
+    // 写入UTF-8 BOM，确保中文Windows下Excel能正确识别编码
+    file.write("\xEF\xBB\xBF");
+
     out << "timestamp,direction,data_hex,data_ascii\n";
     for (const TerminalLine& line : lines) {
         out << line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz") << ','
             << ((line.direction == DataDirection::Rx) ? "RX" : "TX") << ','
-            << HexConverter::toHexString(line.data)
-            << ",\"" << toAsciiString(line.data) << "\"\n";
+            << HexConverter::toHexString(line.data) << ','
+            << escapeCsvField(toAsciiString(line.data)) << '\n';
     }
     return flushAndCheck(file, out, path);
 }
@@ -198,6 +201,17 @@ QString DataExporter::toAsciiString(const QByteArray& data)
         result += (ch >= 0x20 && ch <= 0x7E) ? QLatin1Char(ch) : QLatin1Char('.');
     }
     return result;
+}
+
+QString DataExporter::escapeCsvField(const QString& field)
+{
+    // CSV规范(RFC 4180): 包含逗号、双引号或换行符的字段需要用双引号包裹
+    // 内部的双引号需要转义为两个连续双引号
+    if (!field.contains(',') && !field.contains('"') && !field.contains('\n'))
+        return field;
+    QString escaped = field;
+    escaped.replace('"', "\"\"");
+    return '"' + escaped + '"';
 }
 
 QByteArray DataExporter::concatData(const QVector<TerminalLine>& lines)
@@ -294,6 +308,9 @@ bool DataExporter::exportStreamedCsv(const QString& path, LineProvider provider,
     QTextStream out;
     if (!openTextFile(file, out, path)) return false;
 
+    // 写入UTF-8 BOM，确保中文Windows下Excel能正确识别编码
+    file.write("\xEF\xBB\xBF");
+
     out << "timestamp,direction,data_hex,data_ascii\n";
     int offset = 0;
     while (offset < totalLines) {
@@ -302,7 +319,8 @@ bool DataExporter::exportStreamedCsv(const QString& path, LineProvider provider,
         for (const TerminalLine& line : batch) {
             out << line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz") << ','
                 << ((line.direction == DataDirection::Rx) ? "RX" : "TX") << ','
-                << HexConverter::toHexString(line.data) << ",\"" << toAsciiString(line.data) << "\"\n";
+                << HexConverter::toHexString(line.data) << ','
+                << escapeCsvField(toAsciiString(line.data)) << '\n';
         }
         offset += batch.size();
     }

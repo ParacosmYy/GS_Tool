@@ -300,6 +300,7 @@ void ThemeManager::applyStylesheetWithAnimation(const QString& qss)
 
     // 淡入动画: 300ms InOutCubic
     QPropertyAnimation* fadeIn = new QPropertyAnimation(m_opacityEffect, "opacity");
+    fadeIn->setParent(fadeOut);  // 绑定生命周期：fadeOut删除时自动删除fadeIn
     fadeIn->setDuration(300);
     fadeIn->setStartValue(0.0);
     fadeIn->setEndValue(1.0);

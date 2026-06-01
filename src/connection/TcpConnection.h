@@ -4,6 +4,7 @@
 #include "connection/IConnection.h"
 #include <QTcpSocket>
 #include <QTcpServer>
+#include <QTimer>
 
 // TCP连接实现 - 支持Client和Server两种模式
 // Client: 主动连接远程设备的TCP服务器
@@ -50,6 +51,7 @@ private:
     QTcpSocket* m_socket = nullptr;
     QTcpServer* m_server = nullptr;
     QTcpSocket* m_clientSocket = nullptr; // Server模式下接受到的客户端连接
+    QTimer* m_connectTimer = nullptr;     ///< Client模式连接超时定时器（10秒）
 };
 
 #endif // TCPCONNECTION_H

@@ -46,17 +46,28 @@ FrameVisualEditor::FrameVisualEditor(QWidget* parent) : QWidget(parent) { setupU
 
 /**
  * @brief 初始化UI控件和布局
- * 结构: 帧头帧尾 | 长度字段 | 校验 | 字段表格(拖拽) | 预览 | 应用
+ *
+ * 结构:
+ *   上半部分(水平): 帧头帧尾 | 长度字段 | 校验
+ *   下半部分(垂直): 字段表格(可伸展) | 预览 | 应用按钮
+ *
+ * 三个配置组水平排列，节省垂直空间，避免控件挤到一起。
  */
 void FrameVisualEditor::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(12, 12, 12, 12);
-    mainLayout->setSpacing(12);
+    mainLayout->setSpacing(8);
 
-    mainLayout->addWidget(setupHeaderGroup());
-    mainLayout->addWidget(setupLengthGroup());
-    mainLayout->addWidget(setupChecksumGroup());
+    // ---- 上半部分: 三个配置组水平排列 ----
+    auto* configLayout = new QHBoxLayout;
+    configLayout->setSpacing(8);
+    configLayout->addWidget(setupHeaderGroup());
+    configLayout->addWidget(setupLengthGroup());
+    configLayout->addWidget(setupChecksumGroup());
+    mainLayout->addLayout(configLayout);
+
+    // ---- 下半部分: 字段表格(可伸展) + 预览 + 应用 ----
     mainLayout->addWidget(setupFieldsGroup(), 1);
     mainLayout->addWidget(setupPreviewGroup());
 

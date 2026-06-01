@@ -348,24 +348,11 @@ void SerialConnection::onError(QSerialPort::SerialPortError error)
     QString errorMsg = translateError(error);
     qWarning() << "Serial error on" << m_portName << ":" << error << errorMsg;
 
-    // 统计错误类型（Qt 6.8.3无FramingError/ParityError枚举，
-    // 按ReadError/WriteError/TimeoutError分类统计）
-    switch (error) {
-    case QSerialPort::ReadError:
-        m_errorCounters.framingErrors++;
-        break;
-    case QSerialPort::WriteError:
-        m_errorCounters.parityErrors++;
-        break;
-    case QSerialPort::TimeoutError:
-        m_errorCounters.overrunErrors++;
-        break;
-    case QSerialPort::ResourceError:
-        /* 资源错误不算通信错误，不统计 */
-        break;
-    default:
+    // 统计错误类型（Qt 6.8.3 无 FramingError/ParityError/OverrunError 枚举，
+    // ReadError/WriteError/TimeoutError 无法区分帧/校验/溢出，统一计入 unknownErrors。
+    // ResourceError 为物理断开，不属于通信协议错误，不统计。）
+    if (error != QSerialPort::ResourceError) {
         m_errorCounters.unknownErrors++;
-        break;
     }
 
     m_state = ConnectionState::Error;

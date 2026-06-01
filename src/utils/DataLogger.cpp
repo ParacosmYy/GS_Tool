@@ -138,8 +138,11 @@ bool DataLogger::startPlayback(const QString& filePath)
         return false;
     }
 
+    // 使用QDataStream读取版本号，与writeHeader()保持一致（单字节无字节序问题，但统一风格）
+    QDataStream headerStream(m_playbackFile);
+    headerStream.setByteOrder(QDataStream::BigEndian);
     quint8 version = 0;
-    m_playbackFile->read(reinterpret_cast<char*>(&version), 1);
+    headerStream >> version;
     if (version != kVersion) {
         emit error(tr("Unsupported log version: %1").arg(version));
         m_playbackFile->close();
@@ -148,9 +151,12 @@ bool DataLogger::startPlayback(const QString& filePath)
         return false;
     }
 
-    // 读取record count
+    // 使用QDataStream以BigEndian读取记录数，与stopRecording()写入时的字节序一致
+    // 修复: 原先使用raw read在x86(LE)上会错误解释BigEndian字节序的count
+    QDataStream countStream(m_playbackFile);
+    countStream.setByteOrder(QDataStream::BigEndian);
     quint32 count = 0;
-    m_playbackFile->read(reinterpret_cast<char*>(&count), 4);
+    countStream >> count;
     m_totalRecords = static_cast<int>(count);
 
     if (m_totalRecords == 0) {

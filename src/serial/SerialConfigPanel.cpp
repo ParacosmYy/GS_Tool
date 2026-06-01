@@ -20,6 +20,8 @@
 #include <QEasingCurve>
 #include <QSequentialAnimationGroup>
 #include <QTimer>
+#include <QCheckBox>
+#include <QSpinBox>
 
 #include "serial/SerialDriverDetector.h"
 #include "core/AnimatedButton.h"
@@ -78,9 +80,7 @@ QGroupBox* SerialConfigPanel::createParamGroup()
     m_baudCombo->setObjectName("baudCombo");
     m_baudCombo->setEditable(true);
     m_baudCombo->setToolTip(tr("通信速率(比特/秒)，常用值: 9600, 115200\n可直接输入自定义波特率"));
-    m_baudCombo->addItems({"1200", "2400", "4800", "9600", "19200",
-                           "38400", "57600", "115200", "230400",
-                           "460800", "921600", "1000000"});
+    m_baudCombo->addItems({"1200","2400","4800","9600","19200","38400","57600","115200","230400","460800","921600","1000000"});
     m_baudCombo->setCurrentText("115200");
     m_baudCombo->lineEdit()->setValidator(new QIntValidator(300, 10000000, this));
     // 运行时波特率切换: 连接后用户修改波特率时通知上层
@@ -172,6 +172,7 @@ void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
     connectLayout->addWidget(m_statusIndicator);
     connectLayout->addWidget(m_connectBtn, 1);
     mainLayout->addLayout(connectLayout);
+    mainLayout->addLayout(createAutoReconnectLayout());
 }
 
 /** @brief 创建DTR/RTS控制信号分组(含按钮、工具提示、信号连接和视觉刷新) */
@@ -195,22 +196,27 @@ QGroupBox* SerialConfigPanel::createControlSignalsGroup()
     m_rtsBtn->setChecked(true);
     m_rtsBtn->setEnabled(false);
     m_rtsBtn->setToolTip(tr("请求发送信号，点击切换 HIGH/LOW\n"
-                            "部分设备需要 RTS 拉低进入 bootloader(如 STM32)"));
+                             "部分设备需要 RTS 拉低进入 bootloader(如 STM32)"));
+
+    m_breakBtn = new QPushButton(tr("BRK"));
+    m_breakBtn->setObjectName("breakBtn");
+    m_breakBtn->setToolTip(tr("发送Break信号(用于STM32/ESP32进入Bootloader)"));
+    m_breakBtn->setEnabled(false);
+    connect(m_breakBtn, &QPushButton::clicked, this, [this]() { emit breakRequested(100); });
 
     signalLayout->addWidget(m_dtrBtn);
     signalLayout->addWidget(m_rtsBtn);
+    signalLayout->addWidget(m_breakBtn);
 
     // ---- 输入信号线状态LED ----
-    auto makeLed = [](const char* name) -> QLabel* {
-        auto* l = new QLabel(name);
-        l->setObjectName("signalLed"); l->setAlignment(Qt::AlignCenter);
-        l->setFixedSize(36, 20); l->setProperty("active", false);
-        return l;
+    auto makeLed = [](const char* n) -> QLabel* {
+        auto* l = new QLabel(n); l->setObjectName("signalLed");
+        l->setAlignment(Qt::AlignCenter); l->setFixedSize(36, 20);
+        l->setProperty("active", false); return l;
     };
     m_ctsLed = makeLed("CTS"); m_dsrLed = makeLed("DSR");
     m_dcdLed = makeLed("DCD"); m_riLed = makeLed("RI");
-    signalLayout->addWidget(m_ctsLed); signalLayout->addWidget(m_dsrLed);
-    signalLayout->addWidget(m_dcdLed); signalLayout->addWidget(m_riLed);
+    for (auto* w : {m_ctsLed, m_dsrLed, m_dcdLed, m_riLed}) signalLayout->addWidget(w);
     signalLayout->addStretch();
 
     connect(m_dtrBtn, &QPushButton::toggled, this, [this](bool checked) {
@@ -246,14 +252,10 @@ void SerialConfigPanel::setConnected(bool connected)
 
     // 锁定/解锁配置控件(波特率保持可编辑，支持运行时切换)
     m_portCombo->setEnabled(!connected);
-    // m_baudCombo stays enabled for runtime baud rate switching
-    m_dataBitsCombo->setEnabled(!connected);
-    m_parityCombo->setEnabled(!connected);
-    m_stopBitsCombo->setEnabled(!connected);
-    m_flowControlCombo->setEnabled(!connected);
+    for (auto* w : {m_dataBitsCombo, m_parityCombo, m_stopBitsCombo, m_flowControlCombo})
+        static_cast<QWidget*>(w)->setEnabled(!connected);
     m_refreshBtn->setEnabled(!connected);
-    m_dtrBtn->setEnabled(connected);
-    m_rtsBtn->setEnabled(connected);
+    m_dtrBtn->setEnabled(connected); m_rtsBtn->setEnabled(connected); m_breakBtn->setEnabled(connected);
 
     // 更新状态指示器
     if (connected) {
@@ -317,11 +319,8 @@ void SerialConfigPanel::setConnecting()
     // 用lambda创建呼吸动画半周期(0.3↔1.0, 1500ms, InOutSine缓动)
     auto makeFade = [effect](qreal from, qreal to) -> QPropertyAnimation* {
         auto* a = new QPropertyAnimation(effect, "opacity");
-        a->setStartValue(from);
-        a->setEndValue(to);
-        a->setDuration(1500);
-        a->setEasingCurve(QEasingCurve::InOutSine);
-        return a;
+        a->setStartValue(from); a->setEndValue(to);
+        a->setDuration(1500); a->setEasingCurve(QEasingCurve::InOutSine); return a;
     };
     auto* group = new QSequentialAnimationGroup(this);
     group->addAnimation(makeFade(0.3, 1.0));
@@ -340,49 +339,32 @@ void SerialConfigPanel::updateStatusIndicator(const QString& state)
 
 void SerialConfigPanel::stopBreathAnimation()
 {
-    if (m_breathAnim) {
-        m_breathAnim->stop();
-        delete m_breathAnim;
-        m_breathAnim = nullptr;
-    }
-    // 重置透明度特效到完全不透明
-    if (auto* effect = qobject_cast<QGraphicsOpacityEffect*>(
-            m_statusIndicator->graphicsEffect())) {
+    if (m_breathAnim) { m_breathAnim->stop(); delete m_breathAnim; m_breathAnim = nullptr; }
+    if (auto* effect = qobject_cast<QGraphicsOpacityEffect*>(m_statusIndicator->graphicsEffect()))
         effect->setOpacity(1.0);
-    }
 }
 
 // ---- 端口管理 ----
 void SerialConfigPanel::refreshPorts()
 {
-    QString currentPort = m_portCombo->currentData().toString();
+    QString cur = m_portCombo->currentData().toString();
     m_portCombo->clear();
-
-    auto ports = QSerialPortInfo::availablePorts();
-    for (const auto& port : ports) {
-        QString name = port.portName();
-        QString desc = port.description();
+    for (const auto& p : QSerialPortInfo::availablePorts()) {
+        QString name = p.portName();
         // 格式: "COM3 - CH340 (VID:1A86 PID:7523)" 或 "COM3"
-        QString displayText = desc.isEmpty() ? name : QString("%1 - %2").arg(name, desc);
-        if (port.hasVendorIdentifier() || port.hasProductIdentifier()) {
+        QString display = p.description().isEmpty() ? name : QString("%1 - %2").arg(name, p.description());
+        if (p.hasVendorIdentifier() || p.hasProductIdentifier()) {
             QStringList ids;
-            if (port.hasVendorIdentifier())
-                ids << QString("VID:%1").arg(port.vendorIdentifier(), 4, 16, QLatin1Char('0')).toUpper();
-            if (port.hasProductIdentifier())
-                ids << QString("PID:%1").arg(port.productIdentifier(), 4, 16, QLatin1Char('0')).toUpper();
-            displayText += " (" + ids.join(" ") + ")";
+            if (p.hasVendorIdentifier())
+                ids << QString("VID:%1").arg(p.vendorIdentifier(), 4, 16, QLatin1Char('0')).toUpper();
+            if (p.hasProductIdentifier())
+                ids << QString("PID:%1").arg(p.productIdentifier(), 4, 16, QLatin1Char('0')).toUpper();
+            display += " (" + ids.join(" ") + ")";
         }
-
-        m_portCombo->addItem(displayText, name);
-        // 设置tooltip显示完整设备信息
-        int lastIdx = m_portCombo->count() - 1;
-        m_portCombo->setItemData(lastIdx, buildPortTooltip(port), Qt::ToolTipRole);
+        m_portCombo->addItem(display, name);
+        m_portCombo->setItemData(m_portCombo->count() - 1, buildPortTooltip(p), Qt::ToolTipRole);
     }
-
-    if (!currentPort.isEmpty()) {
-        int idx = m_portCombo->findData(currentPort);
-        if (idx >= 0) m_portCombo->setCurrentIndex(idx);
-    }
+    if (!cur.isEmpty()) { if (int i = m_portCombo->findData(cur); i >= 0) m_portCombo->setCurrentIndex(i); }
     updateDriverInfo();
     updateConnectButtonState();
 }
@@ -406,34 +388,22 @@ void SerialConfigPanel::restoreConfig(const QVariantMap& config)
     }
     if (config.contains("baudRate"))
         m_baudCombo->setCurrentText(QString::number(config["baudRate"].toInt()));
-    if (config.contains("dataBits") && config["dataBits"].toInt() >= 0
-        && config["dataBits"].toInt() < m_dataBitsCombo->count())
-        m_dataBitsCombo->setCurrentIndex(config["dataBits"].toInt());
-    if (config.contains("parity") && config["parity"].toInt() >= 0
-        && config["parity"].toInt() < m_parityCombo->count())
-        m_parityCombo->setCurrentIndex(config["parity"].toInt());
-    if (config.contains("stopBits") && config["stopBits"].toInt() >= 0
-        && config["stopBits"].toInt() < m_stopBitsCombo->count())
-        m_stopBitsCombo->setCurrentIndex(config["stopBits"].toInt());
-    if (config.contains("flowControl") && config["flowControl"].toInt() >= 0
-        && config["flowControl"].toInt() < m_flowControlCombo->count())
-        m_flowControlCombo->setCurrentIndex(config["flowControl"].toInt());
-    if (config.contains("dtr")) {
-        m_dtrState = config["dtr"].toBool();
-        m_dtrBtn->blockSignals(true);
-        m_dtrBtn->setChecked(m_dtrState);
-        m_dtrBtn->setText(m_dtrState ? tr("DTR HIGH") : tr("DTR LOW"));
-        m_dtrBtn->blockSignals(false);
-        refreshSignalStyle(m_dtrBtn, m_dtrState);
-    }
-    if (config.contains("rts")) {
-        m_rtsState = config["rts"].toBool();
-        m_rtsBtn->blockSignals(true);
-        m_rtsBtn->setChecked(m_rtsState);
-        m_rtsBtn->setText(m_rtsState ? tr("RTS HIGH") : tr("RTS LOW"));
-        m_rtsBtn->blockSignals(false);
-        refreshSignalStyle(m_rtsBtn, m_rtsState);
-    }
+    // 通用 ComboBox 索引恢复(dataBits/parity/stopBits/flowControl)
+    auto setIdx = [this, &config](QComboBox* cb, const QString& key) {
+        if (config.contains(key)) { int v = config[key].toInt();
+            if (v >= 0 && v < cb->count()) cb->setCurrentIndex(v); }
+    };
+    setIdx(m_dataBitsCombo, "dataBits"); setIdx(m_parityCombo, "parity");
+    setIdx(m_stopBitsCombo, "stopBits"); setIdx(m_flowControlCombo, "flowControl");
+    // 恢复 DTR/RTS 信号状态(通用 lambda 避免重复 blockSignals 模式)
+    auto restoreSig = [&](const QString& key, bool& state, QPushButton* btn, const char* hi, const char* lo) {
+        if (!config.contains(key)) return;
+        state = config[key].toBool(); btn->blockSignals(true);
+        btn->setChecked(state); btn->setText(state ? tr(hi) : tr(lo));
+        btn->blockSignals(false); refreshSignalStyle(btn, state);
+    };
+    restoreSig("dtr", m_dtrState, m_dtrBtn, "DTR HIGH", "DTR LOW");
+    restoreSig("rts", m_rtsState, m_rtsBtn, "RTS HIGH", "RTS LOW");
 }
 
 // ---- 内部方法 ----
@@ -497,4 +467,31 @@ QString SerialConfigPanel::buildPortTooltip(const QSerialPortInfo& info) const
     if (!info.systemLocation().isEmpty())
         details << tr("系统路径: %1").arg(info.systemLocation());
     return details.join("\n");
+}
+
+/** @brief 创建自动重连控件布局(复选框+间隔微调框, 范围500~30000ms, 步进500ms, 默认3000ms) */
+QHBoxLayout* SerialConfigPanel::createAutoReconnectLayout()
+{
+    auto* lay = new QHBoxLayout;
+    m_autoReconnectCheck = new QCheckBox(tr("自动重连"));
+    m_autoReconnectCheck->setObjectName("autoReconnectCheck");
+    m_reconnectIntervalSpin = new QSpinBox;
+    m_reconnectIntervalSpin->setObjectName("reconnectIntervalSpin");
+    m_reconnectIntervalSpin->setRange(500, 30000);
+    m_reconnectIntervalSpin->setSingleStep(500);
+    m_reconnectIntervalSpin->setValue(3000);
+    m_reconnectIntervalSpin->setSuffix("ms");
+    m_reconnectIntervalSpin->setEnabled(false);
+    lay->addWidget(m_autoReconnectCheck);
+    lay->addWidget(new QLabel(tr("间隔")));
+    lay->addWidget(m_reconnectIntervalSpin);
+    connect(m_autoReconnectCheck, &QCheckBox::toggled, this, [this](bool on) {
+        m_reconnectIntervalSpin->setEnabled(on);
+        emit autoReconnectToggled(on, m_reconnectIntervalSpin->value());
+    });
+    connect(m_reconnectIntervalSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this](int v) {
+        if (m_autoReconnectCheck->isChecked()) emit autoReconnectToggled(true, v);
+    });
+    return lay;
 }

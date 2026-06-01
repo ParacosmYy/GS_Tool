@@ -152,6 +152,13 @@ private:
     /** @brief 不可打印字符替换为 '.' */
     static QString toAsciiString(const QByteArray& data);
 
+    /**
+     * @brief CSV字段转义 - 处理双引号、逗号、换行符
+     * 规则: 包含逗号/双引号/换行 → 用双引号包裹，内部双引号转义为两个双引号
+     * 否则原样返回
+     */
+    static QString escapeCsvField(const QString& field);
+
     /** @brief 拼接所有行数据为连续字节数组（HexDump用） */
     static QByteArray concatData(const QVector<TerminalLine>& lines);
 

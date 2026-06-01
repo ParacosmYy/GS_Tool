@@ -18,14 +18,19 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QCheckBox>
+#include <QSpinBox>
 #include <QVariantMap>
 #include <QSerialPortInfo>
 
 #include "connection/IConnection.h"  // PinoutSignals
 
+class QHBoxLayout;
 class QAbstractAnimation;
 class QVBoxLayout;
 class QGroupBox;
+class QCheckBox;
+class QSpinBox;
 class AnimatedButton;
 
 /**
@@ -80,6 +85,17 @@ signals:
      */
     void baudRateChanged(qint32 baud);
 
+    /** @brief Break信号请求(用于STM32/ESP32进入Bootloader)
+     * @param duration Break持续时间(毫秒)
+     */
+    void breakRequested(int duration = 100);
+
+    /** @brief 自动重连开关切换
+     * @param enabled 是否启用自动重连
+     * @param intervalMs 重连间隔(毫秒)
+     */
+    void autoReconnectToggled(bool enabled, int intervalMs);
+
 private slots:
     void onPortComboChanged();    ///< 端口变化时更新按钮状态
 
@@ -103,6 +119,8 @@ private:
     void refreshSignalStyle(QPushButton* btn, bool high);
     /** @brief 构建端口详情tooltip(VID/PID/制造商/序列号) */
     QString buildPortTooltip(const QSerialPortInfo& info) const;
+    /** @brief 创建自动重连控件布局(复选框+间隔微调框) */
+    QHBoxLayout* createAutoReconnectLayout();
 
     // ---- 控件指针 ----
     QComboBox* m_portCombo;        ///< 端口选择下拉框
@@ -114,6 +132,7 @@ private:
     QComboBox* m_flowControlCombo; ///< 流控模式选择
     QPushButton* m_dtrBtn;         ///< DTR信号切换按钮(HIGH/LOW)
     QPushButton* m_rtsBtn;         ///< RTS信号切换按钮(HIGH/LOW)
+    QPushButton* m_breakBtn;       ///< Break信号按钮(用于STM32/ESP32进入Bootloader)
     AnimatedButton* m_connectBtn;  ///< 连接/断开按钮(带hover/press动画)
     QLabel* m_driverInfoLbl;       ///< 驱动检测信息标签
     QLabel* m_statusIndicator;     ///< 连接状态指示器(彩色圆点)
@@ -121,6 +140,8 @@ private:
     QLabel* m_dsrLed;              ///< DSR信号指示灯
     QLabel* m_dcdLed;              ///< DCD信号指示灯
     QLabel* m_riLed;               ///< RI信号指示灯
+    QCheckBox* m_autoReconnectCheck;  ///< 自动重连开关
+    QSpinBox* m_reconnectIntervalSpin;///< 重连间隔(毫秒)
 
     // ---- 状态标志 ----
     bool m_connected = false;       ///< 当前是否已连接

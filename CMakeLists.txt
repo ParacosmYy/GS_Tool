@@ -32,6 +32,7 @@ set(SOURCES
     src/main.cpp
     src/core/MainWindow.cpp
     src/core/MainWindowSignalConnect.cpp
+    src/core/MainWindowPanelConnect.cpp
     src/core/ConnectionController.cpp
     src/core/RecordingController.cpp
     src/core/NavigationController.cpp

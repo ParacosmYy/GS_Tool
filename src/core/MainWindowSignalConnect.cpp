@@ -1,19 +1,19 @@
 /**
  * @file MainWindowSignalConnect.cpp
- * @brief 主窗口信号/槽连接 - 所有模块间信号路由的集中连接点
+ * @brief 主窗口信号/槽连接 - 串口连接/OTA/主题/书签信号路由
  *
- * 从 MainWindow.cpp 拆分，包含 connectSignals() 及 8 个子方法:
- *   connectSerial/Send/Toolbar/SearchAndProtocol/PortWatch/Theme/Ota/BookmarkSignals
+ * 从 MainWindow.cpp 拆分，包含 connectSignals() 及以下子方法:
+ *   connectSerialSignals()           - 串口连接/断开/DTR/RTS/波特率/数据/错误
+ *   connectReconnectSignals()        - 重连尝试/成功/失败状态
+ *   connectSerialSendSignals()       - 快捷指令 → 发送控制器
+ *   connectPortWatchSignals()        - 热插拔通知
+ *   connectThemeSignals()            - 主题切换 + 连接Toast
+ *   connectOtaSignals()              - OTA传输通知
+ *   connectBookmarkSignals()         - 书签面板CRUD
  *
- * 主要信号流:
- *   SerialConfigPanel → ConnectionController → MainWindow(状态更新)
- *   ConnectionController → TerminalModel + ProtocolBridgeMgr + ToastWidget
- *   QuickCommandBar → SendController → IConnection(数据发送)
- *   ToolbarController → TerminalController(显示/时间戳/清屏) + SettingsController(主题/语言)
- *   RecordingController → DataLogger(书签) + ToastWidget(反馈)
- *   FrameEditor → FrameParser(帧定义) + ChartWidget(波形)
- *   OtaWidget → ToastWidget(传输通知)
- *   NavTree → NavigationController(面板切换)
+ * 另见 MainWindowPanelConnect.cpp:
+ *   connectToolbarSignals()          - 工具栏/录制状态消息
+ *   connectSearchAndProtocolSignals() - 搜索/协议桥/帧编辑/导航树
  */
 
 #include "core/MainWindow.h"
@@ -81,6 +81,14 @@ void MainWindow::connectSerialSignals()
             m_connController, &ConnectionController::setDtr);
     connect(m_panelManager->serialConfig(), &SerialConfigPanel::rtsChanged,
             m_connController, &ConnectionController::setRts);
+    // Break 信号 → 连接控制器
+    connect(m_panelManager->serialConfig(), &SerialConfigPanel::breakRequested,
+            m_connController, &ConnectionController::sendBreak);
+    // 自动重连开关 → 连接控制器
+    connect(m_panelManager->serialConfig(), &SerialConfigPanel::autoReconnectToggled,
+            this, [this](bool enabled, int intervalMs) {
+        m_connController->enableAutoReconnect(enabled, intervalMs);
+    });
     // 运行时波特率切换: 用户在连接状态下更改波特率
     connect(m_panelManager->serialConfig(), &SerialConfigPanel::baudRateChanged,
             this, [this](qint32 baud) {
@@ -192,123 +200,6 @@ void MainWindow::connectSerialSendSignals()
             this, [this](const QString& msg) {
                 ToastWidget::showDebounced(this, msg);
             });
-}
-
-/**
- * @brief 工具栏和录制状态消息信号连接
- *
- * 包含: ToolbarController → TerminalController/SettingsController 的工具栏事件，
- *       TerminalController/RecordingController 状态消息 → 状态栏/吐司，
- *       录制回放数据写入终端。
- */
-void MainWindow::connectToolbarSignals()
-{
-    // ---- 工具栏信号 → 委托给 TerminalController ----
-    connect(m_toolbarController, &ToolbarController::displayModeChanged,
-            m_terminalController, &TerminalController::onDisplayModeChanged);
-    connect(m_toolbarController, &ToolbarController::timestampToggled,
-            m_terminalController, &TerminalController::onTimestampToggled);
-    connect(m_toolbarController, &ToolbarController::dirPrefixToggled,
-            m_terminalController, &TerminalController::onDirPrefixToggled);
-    connect(m_toolbarController, &ToolbarController::clearRequested,
-            m_terminalController, &TerminalController::onClearTerminal);
-    connect(m_toolbarController, &ToolbarController::exportRequested,
-            this, [this]() { m_terminalController->onExportData(this); });
-    connect(m_toolbarController, &ToolbarController::bgSettingsRequested,
-            this, &MainWindow::onBgSettingsToggled);
-    connect(m_toolbarController, &ToolbarController::themeChanged,
-            m_settingsController, &SettingsController::onThemeChanged);
-    connect(m_toolbarController, &ToolbarController::languageChanged,
-            m_settingsController, &SettingsController::onLanguageChanged);
-    connect(m_toolbarController, &ToolbarController::terminalLayoutChanged,
-            m_terminalController, &TerminalController::onTerminalLayoutChanged);
-
-    // TerminalController 状态消息 → 主窗口状态栏
-    connect(m_terminalController, &TerminalController::statusMessage,
-            this, [this](const QString& msg, int timeoutMs) {
-                statusBar()->showMessage(msg, timeoutMs);
-            });
-
-    // 录制/回放状态消息 → 状态栏显示
-    connect(m_recordingController, &RecordingController::statusMessage,
-            this, [this](const QString& msg, int timeoutMs) {
-                statusBar()->showMessage(msg, timeoutMs);
-            });
-    // 录制/回放状态消息 → 吐司通知
-    connect(m_recordingController, &RecordingController::statusMessage,
-            this, [this](const QString& msg, int timeoutMs) {
-                ToastWidget::show(this, msg, ToastWidget::ToastType::Info,
-                                  timeoutMs > 0 ? timeoutMs : 3000);
-            });
-    // 回放数据写入终端
-    connect(m_recordingController, &RecordingController::playbackData,
-            this, [this](const QByteArray& data, qint64 direction) {
-                if (direction == 0) {
-                    m_terminalModel->appendReceived(data);
-                } else {
-                    m_terminalModel->appendSent(data);
-                }
-                m_terminalController->updateStatusBar();
-            });
-}
-
-/**
- * @brief 搜索栏、协议桥、帧编辑器和导航树信号连接
- *
- * 包含: TerminalSearchBar → TerminalController 搜索处理，
- *       ProtocolBridgeManager → ProtocolView/ChartModel 协议数据分发，
- *       FrameVisualEditor → FrameParser 帧定义更新，
- *       导航树点击 → 面板切换。
- */
-void MainWindow::connectSearchAndProtocolSignals()
-{
-    // 搜索栏 → TerminalController 搜索处理
-    connect(m_panelManager->searchBar(), &TerminalSearchBar::searchRequested,
-            m_terminalController, &TerminalController::onSearchRequested);
-    connect(m_panelManager->searchBar(), &TerminalSearchBar::searchCleared,
-            m_terminalController, &TerminalController::onSearchCleared);
-    connect(m_panelManager->searchBar(), &TerminalSearchBar::closed, this, [this]() {
-        m_terminalController->onSearchCleared();
-    });
-
-    // 搜索匹配结果 → 搜索栏显示匹配计数
-    connect(m_panelManager->terminal(), &TerminalWidget::searchMatchesChanged,
-            this, [this](int total, int current) {
-                m_panelManager->searchBar()->setResultText(total == 0 ? QString() :
-                    tr("%1/%2").arg(current + 1).arg(total));
-            });
-
-    // 协议桥 → 协议视图 + 波形图
-    connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
-            m_panelManager->protocolView(), &ProtocolView::onFrameParsed);
-    connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameError,
-            m_panelManager->protocolView(), &ProtocolView::onFrameError);
-    connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
-            m_panelManager->chartWidget()->model(), &ChartModel::onFrameParsed);
-
-    // 帧编辑器 → 更新帧解析器定义 + 波形图通道配置
-    connect(m_panelManager->frameEditor(), &FrameVisualEditor::definitionChanged,
-            this, [this](const FrameDefinition& def) {
-                m_frameParser->setDefinition(def);
-                m_panelManager->chartWidget()->configureFromFrameDefinition(def);
-            });
-
-    // 导航树点击 → 面板切换
-    connect(m_navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
-        QString text = index.data().toString();
-
-        // 触发导航指示器滑动动画
-        m_navIndicator->animateTo(index);
-
-        if (text == tr("数据导出")) { m_terminalController->onExportData(this); return; }
-        if (text == tr("TCP客户端")) { m_connController->connectNetwork(ConnectionType::TcpClient); return; }
-        if (text == tr("TCP服务端")) { m_connController->connectNetwork(ConnectionType::TcpServer); return; }
-        if (text == tr("UDP")) { m_connController->connectNetwork(ConnectionType::Udp); return; }
-
-        QWidget* target = m_navController->lookupPanel(text);
-        if (!target) return;
-        m_navController->switchToPanel(target);
-    });
 }
 
 /**
