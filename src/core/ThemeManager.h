@@ -24,6 +24,7 @@
 #include <QString>
 #include <QMap>
 #include <QColor>
+#include <QPointer>
 
 class QWidget;
 class QGraphicsOpacityEffect;
@@ -180,11 +181,13 @@ private:
     QMap<QString, QString> m_themes;        ///< 主题名 -> QSS文件路径
     QMap<SemanticColor, QColor> m_colorMap; ///< 语义色 -> 当前颜色值
 
-    /** @brief 主题切换动画目标 widget（通常为 MainWindow 中央部件） */
-    QWidget* m_transitionWidget;
+    /** @brief 主题切换动画目标 widget（通常为 MainWindow 中央部件）
+     *  使用QPointer: widget销毁时自动置nullptr，防止悬空指针 */
+    QPointer<QWidget> m_transitionWidget;
 
-    /** @brief 透明度特效，用于主题切换淡入淡出动画 */
-    QGraphicsOpacityEffect* m_opacityEffect;
+    /** @brief 透明度特效，用于主题切换淡入淡出动画
+     *  使用QPointer: effect随widget销毁时自动置nullptr，防止applyStylesheetWithAnimation访问已释放内存 */
+    QPointer<QGraphicsOpacityEffect> m_opacityEffect;
 };
 
 #endif // THEMEMANAGER_H

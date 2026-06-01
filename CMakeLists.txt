@@ -35,6 +35,7 @@ set(SOURCES
     src/core/MainWindowPanelConnect.cpp
     src/core/ConnectionController.cpp
     src/core/ConnectionControllerReconnect.cpp
+    src/core/ConnectionControllerHandlers.cpp
     src/core/RecordingController.cpp
     src/core/NavigationController.cpp
     src/core/SendController.cpp

@@ -73,6 +73,30 @@ bool YModemTransfer::onStartInit()
     return true;
 }
 
+/** @brief 安全写入: 检测write返回值，连接断开时立即终止传输
+ *  @param data 待写入的数据
+ *  @return true=成功写入, false=连接已断开(已设置Error状态) */
+bool YModemTransfer::writeChecked(const QByteArray& data)
+{
+    if (!m_conn) {
+        m_ymodemState = State::Error;
+        markError();
+        emit transferError(tr("连接中断: 连接对象无效"));
+        return false;
+    }
+    qint64 written = m_conn->write(data);
+    if (written < 0) {
+        m_ymodemState = State::Error;
+        markError();
+        emit transferError(
+            tr("连接中断: 写入失败, 已传输 %1/%2 字节")
+                .arg(m_totalBytesSent)
+                .arg(m_totalBytes));
+        return false;
+    }
+    return true;
+}
+
 /** @brief 发送CAN取消字节，连续发送2个CAN通知接收方终止传输 */
 void YModemTransfer::sendCancelBytes()
 {
@@ -185,7 +209,7 @@ void YModemTransfer::sendBlock0()
                                     modTime);
     QByteArray packet = buildBlock(0, block0);
     if (m_conn) {
-        m_conn->write(packet);
+        writeChecked(packet);
     }
 }
 
@@ -208,7 +232,7 @@ void YModemTransfer::sendBlock()
     }
     QByteArray packet = buildBlock(m_blockNumber, blockData);
     if (m_conn) {
-        m_conn->write(packet);
+        writeChecked(packet);
     }
     qint64 sent = qMin(offset + dataSize,
                         static_cast<qint64>(m_currentData.size()));
@@ -220,7 +244,7 @@ void YModemTransfer::sendBlock()
 void YModemTransfer::sendEOT()
 {
     if (m_conn) {
-        m_conn->write(QByteArray(1, EOT));
+        writeChecked(QByteArray(1, EOT));
     }
 }
 
@@ -231,7 +255,7 @@ void YModemTransfer::sendFinalBlock0()
     QByteArray emptyBlock0(kBlockSize, 0x00);
     QByteArray packet = buildBlock(0, emptyBlock0);
     if (m_conn) {
-        m_conn->write(packet);
+        writeChecked(packet);
     }
 }
 

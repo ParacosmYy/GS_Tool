@@ -126,6 +126,13 @@ private:
     void updateTransferStats();             ///< 更新速率/ETA并发射transferStats
     bool loadNextFile();                    ///< 加载下个文件。失败时emit transferError
 
+    /**
+     * @brief 安全写入数据到连接，检测连接断开
+     * @param data 待写入数据
+     * @return true=写入成功, false=连接断开(已触发Error状态)
+     */
+    bool writeChecked(const QByteArray& data);
+
     // ---- 状态处理方法(processReceivedData状态分发) ----
     /** @brief 处理WaitingStart状态: 收到C/NAK后发送Block0 */
     void handleStateWaitingStart(char ch);

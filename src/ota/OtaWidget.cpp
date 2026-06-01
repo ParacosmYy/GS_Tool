@@ -300,7 +300,7 @@ void OtaWidget::onProgress(int percent, qint64 bytesSent, qint64 totalBytes)
     Q_UNUSED(totalBytes)
 
     if (m_progressAnim && m_progressAnim->state() == QAbstractAnimation::Running) m_progressAnim->stop();
-    if (m_progressAnim) m_progressAnim->deleteLater();  // 延迟销毁，避免动画信号回调访问已释放对象
+    // stop()触发DeleteWhenStopped自动deleteLater，无需手动deleteLater
     m_progressAnim = nullptr;
 
     int oldValue = m_progressBar->value();
@@ -441,9 +441,7 @@ void OtaWidget::startCompletionAnimation()
     if (m_colorAnim && m_colorAnim->state() == QAbstractAnimation::Running) {
         m_colorAnim->stop();
     }
-    if (m_colorAnim) {
-        m_colorAnim->deleteLater();
-    }
+    // stop()触发DeleteWhenStopped自动deleteLater，无需手动deleteLater
     m_colorAnim = nullptr;
 
     // 使用 QPropertyAnimation 对 chunkColor 属性进行颜色插值动画

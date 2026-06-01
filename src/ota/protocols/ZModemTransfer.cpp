@@ -36,6 +36,31 @@ ZModemTransfer::ZModemTransfer(QObject* parent)
 /** @brief 设置传输文件路径
  *  @param path 文件绝对路径 */
 void ZModemTransfer::setFilePath(const QString& path) { m_filePath = path; }
+
+/** @brief 安全写入: 检测write返回值，连接断开时立即终止传输
+ *  @param data 待写入的数据
+ *  @return true=成功写入, false=连接已断开(已设置Error状态) */
+bool ZModemTransfer::writeChecked(const QByteArray& data)
+{
+    if (!m_conn) {
+        m_zmodemState = State::Error;
+        markError();
+        emit transferError(tr("连接中断: 连接对象无效"));
+        return false;
+    }
+    qint64 written = m_conn->write(data);
+    if (written < 0) {
+        m_zmodemState = State::Error;
+        markError();
+        emit transferError(
+            tr("连接中断: 写入失败, 已传输 %1/%2 字节")
+                .arg(m_bytesSent)
+                .arg(m_fileData.size()));
+        return false;
+    }
+    return true;
+}
+
 // ---- BaseTransfer钩子实现 ----
 /** @brief 传输启动初始化，校验文件并读取到内存，发送ZRQINIT开始握手
  *  @return 初始化成功返回true，文件不存在或读取失败返回false */
@@ -244,99 +269,18 @@ bool ZModemTransfer::parseHexFrame(const QByteArray& data, int& type, QByteArray
     m_receiveBuffer.remove(0, idx);
     return true;
 }
-// ---- 帧构建 ----
-/** @brief 构建ZMODEM HEX格式帧头(16进制ASCII编码+CRC16校验)
- *  @param frameType 帧类型(ZRQINIT/ZRINIT/ZEOF/ZFIN等)
- *  @param data 帧头附加数据(4字节，不足补零)
- *  @return 完整的HEX帧字节数组 */
-QByteArray ZModemTransfer::buildHexHeader(quint8 frameType, const QByteArray& data)
-{
-    QByteArray frame;
-    frame.append(ZPAD);
-    frame.append(ZDLE);
-    frame.append(ZHEX);
-    QByteArray payload;
-    payload.append(static_cast<char>(frameType));
-    for (int i = 0; i < 4; ++i)
-        payload.append(i < data.size() ? data[i] : '\0');
-    quint16 crc = CRC::crc16Ccitt(payload);
-    payload.append(static_cast<char>((crc >> 8) & 0xFF));
-    payload.append(static_cast<char>(crc & 0xFF));
-    for (char b : payload)
-        frame.append(toHex(static_cast<quint8>(b), 2));
-    frame.append("\r\n");
-    return frame;
-}
-
-/** @brief 构建ZMODEM BIN32格式帧头(二进制编码+CRC32校验+ZDLE转义)
- *  @param frameType 帧类型(ZFILE/ZDATA等)
- *  @param data 帧头附加数据(4字节)
- *  @return 完整的BIN32帧字节数组 */
-QByteArray ZModemTransfer::buildBinHeader(quint8 frameType, const QByteArray& data)
-{
-    QByteArray frame;
-    frame.append(ZPAD);
-    frame.append(ZDLE);
-    frame.append(ZBIN32);
-    QByteArray payload;
-    payload.append(static_cast<char>(frameType));
-    for (int i = 0; i < 4; ++i)
-        payload.append(i < data.size() ? data[i] : '\0');
-    quint32 crc = CRC::crc32(payload);
-    payload.append(static_cast<char>((crc >> 24) & 0xFF));
-    payload.append(static_cast<char>((crc >> 16) & 0xFF));
-    payload.append(static_cast<char>((crc >> 8) & 0xFF));
-    payload.append(static_cast<char>(crc & 0xFF));
-    // ZDLE转义: 控制字符 + 前8字节载荷(type+4B data)内的0x00
-    // 使用payload字节索引而非frame.size()，避免ZDLE扩展导致索引偏移
-    int payloadIdx = 0;
-    for (char b : payload) {
-        quint8 c = static_cast<quint8>(b);
-        if (c == 0x00 && payloadIdx < 8) {  // 前8字节(type+4B data)中的NUL需要转义
-            frame.append(ZDLE);
-            frame.append(static_cast<char>(c ^ 0x40));
-        } else {
-            frame.append(escapeZdle(QByteArray(1, b)));
-        }
-        ++payloadIdx;
-    }
-    return frame;
-}
-
-/** @brief 构建数据子包(ZDLE转义数据+CRC32校验+结束标志)
- *  @param endFlag 结束标志: ZCRCG(继续)/ZCRCW(等待应答)
- *  @param data 子包数据载荷
- *  @return 完整的数据子包字节数组 */
-QByteArray ZModemTransfer::buildDataSubpacket(char endFlag, const QByteArray& data)
-{
-    QByteArray packet;
-    packet.append(escapeZdle(data));
-    QByteArray crcInput = data;
-    crcInput.append(endFlag);
-    quint32 crc = CRC::crc32(crcInput);
-    packet.append(ZDLE);
-    packet.append(endFlag);
-    QByteArray crcBytes;
-    crcBytes.append(static_cast<char>((crc >> 24) & 0xFF));
-    crcBytes.append(static_cast<char>((crc >> 16) & 0xFF));
-    crcBytes.append(static_cast<char>((crc >> 8) & 0xFF));
-    crcBytes.append(static_cast<char>(crc & 0xFF));
-    packet.append(escapeZdle(crcBytes));
-    return packet;
-}
-
 // ---- 发送流程方法 ----
 /** @brief 发送ZRQINIT帧，发起ZMODEM传输握手 */
-void ZModemTransfer::sendZRQINIT() { if (m_conn) m_conn->write(buildHexHeader(ZRQINIT)); }
+void ZModemTransfer::sendZRQINIT() { if (m_conn) writeChecked(buildHexHeader(ZRQINIT)); }
 /** @brief 发送ZFILE帧(文件名+大小)和数据子包，通知接收方文件信息 */
 void ZModemTransfer::sendZFILE()
 {
     if (!m_conn) return;
-    m_conn->write(buildBinHeader(ZFILE));
+    if (!writeChecked(buildBinHeader(ZFILE))) return;
     QFileInfo info(m_filePath);
     QByteArray fi = QString("%1 %2 0").arg(info.fileName()).arg(info.size()).toUtf8();
     fi.append('\0');
-    m_conn->write(buildDataSubpacket(ZCRCW, fi));
+    writeChecked(buildDataSubpacket(ZCRCW, fi));
 }
 /** @brief 发送ZDATA帧头，包含当前文件偏移量 */
 void ZModemTransfer::sendZDATA()
@@ -347,7 +291,7 @@ void ZModemTransfer::sendZDATA()
     offsetData.append(static_cast<char>((m_fileOffset >> 8) & 0xFF));
     offsetData.append(static_cast<char>((m_fileOffset >> 16) & 0xFF));
     offsetData.append(static_cast<char>((m_fileOffset >> 24) & 0xFF));
-    m_conn->write(buildBinHeader(ZDATA, offsetData));
+    writeChecked(buildBinHeader(ZDATA, offsetData));
 }
 /** @brief 异步分块发送数据子包，每批最多kChunksPerTick个，防止UI冻结 */
 void ZModemTransfer::sendDataSubpackets()
@@ -366,7 +310,7 @@ void ZModemTransfer::sendDataSubpackets()
         QByteArray chunk = m_fileData.mid(offset, chunkSize);
         bool isLast = (offset + chunkSize >= m_fileData.size());
         char endFlag = isLast ? ZCRCW : ZCRCG;
-        m_conn->write(buildDataSubpacket(endFlag, chunk));
+        if (!writeChecked(buildDataSubpacket(endFlag, chunk))) return;
         offset += chunkSize;
         m_bytesSent = offset;
         int pct = static_cast<int>((offset * 100) / m_fileData.size());
@@ -397,44 +341,10 @@ void ZModemTransfer::sendZEOF()
     offsetData.append(static_cast<char>((size >> 8) & 0xFF));
     offsetData.append(static_cast<char>((size >> 16) & 0xFF));
     offsetData.append(static_cast<char>((size >> 24) & 0xFF));
-    m_conn->write(buildHexHeader(ZEOF, offsetData));
+    writeChecked(buildHexHeader(ZEOF, offsetData));
 }
 /** @brief 发送ZFIN帧，结束ZMODEM会话 */
-void ZModemTransfer::sendZFIN() { if (m_conn) m_conn->write(buildHexHeader(ZFIN)); }
-
-// ---- 工具方法 ----
+void ZModemTransfer::sendZFIN() { if (m_conn) writeChecked(buildHexHeader(ZFIN)); }
 /** @brief 设置ZMODEM状态机状态
  *  @param s 目标状态 */
 void ZModemTransfer::setState(State s) { m_zmodemState = s; }
-
-/** @brief 将数值转换为指定位数的16进制大写ASCII字符串
- *  @param val 待转换的数值
- *  @param digits 16进制位数
- *  @return 16进制ASCII字节数组 */
-QByteArray ZModemTransfer::toHex(quint32 val, int digits)
-{
-    QByteArray result;
-    for (int i = digits - 1; i >= 0; --i) {
-        int nibble = (val >> (i * 4)) & 0xF;
-        result.append(nibble < 10 ? ('0' + nibble) : ('A' + nibble - 10));
-    }
-    return result;
-}
-
-/** @brief 对数据进行ZDLE转义编码，转义控制字符(CAN/CR/LF/XON/XOFF/0x2A)
- *  @param data 原始数据
- *  @return 转义后的数据 */
-QByteArray ZModemTransfer::escapeZdle(const QByteArray& data) const
-{
-    QByteArray result;
-    for (char b : data) {
-        quint8 c = static_cast<quint8>(b);
-        if (c == 0x18 || c == 0x0D || c == 0x0A || c == 0x11 || c == 0x13 || c == 0x2A) {
-            result.append(ZDLE);
-            result.append(static_cast<char>(c ^ 0x40));
-        } else {
-            result.append(b);
-        }
-    }
-    return result;
-}

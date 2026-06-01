@@ -93,6 +93,13 @@ private:
 
     QByteArray toHex(quint32 val, int digits); ///< 数值→HEX ASCII
 
+    /**
+     * @brief 安全写入数据到连接，检测连接断开
+     * @param data 待写入数据
+     * @return true=写入成功, false=连接断开(已触发Error状态)
+     */
+    bool writeChecked(const QByteArray& data);
+
     // ---- 状态处理方法(processReceivedData状态分发) ----
     /** @brief 处理WaitingRinit状态: 收到ZRINIT后发送ZFILE */
     void handleStateWaitingRinit(int type);
