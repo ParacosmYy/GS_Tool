@@ -427,33 +427,33 @@ void OtaWidget::setTransferring(bool transferring)
 /**
  * @brief 启动进度条完成变色动画（accent -> success，400ms OutCubic）
  *
- * 从 ThemeManager 获取 accent 和 success 语义色，采用两阶段渐变:
- *   阶段1: 立即设置中间混合色（50% accent + 50% success）
- *   阶段2: 400ms 后切换为最终 success 色
- * 颜色通过 setChunkColor() 设置，布局属性由 QSS 主题文件控制。
+ * 使用 QPropertyAnimation 对 AnimatedProgressBar 的 chunkColor 属性做颜色插值，
+ * 从 ThemeManager 获取 accent 和 success 语义色，实现平滑渐变过渡。
+ * 符合 CLAUDE.md §6.5 规范: 400ms OutCubic 缓动曲线。
  */
-/** @brief 传输完成后播放完成动画(进度条满+图标变化+日志提示) */
 void OtaWidget::startCompletionAnimation()
 {
     auto& theme = ThemeManager::instance();
     QColor accent = theme.color(ThemeManager::SemanticColor::Accent);
     QColor success = theme.color(ThemeManager::SemanticColor::Success);
 
-    // 中间混合色（50% accent + 50% success）
-    QColor mid = QColor::fromRgbF(
-        accent.redF() * 0.5 + success.redF() * 0.5,
-        accent.greenF() * 0.5 + success.greenF() * 0.5,
-        accent.blueF() * 0.5 + success.blueF() * 0.5);
-
-    if (m_colorAnim && m_colorAnim->state() == QAbstractAnimation::Running) m_colorAnim->stop();
-    if (m_colorAnim) m_colorAnim->deleteLater();  // 延迟销毁，避免动画信号回调访问已释放对象
+    // 停止并清理旧的变色动画（防止重复触发）
+    if (m_colorAnim && m_colorAnim->state() == QAbstractAnimation::Running) {
+        m_colorAnim->stop();
+    }
+    if (m_colorAnim) {
+        m_colorAnim->deleteLater();
+    }
     m_colorAnim = nullptr;
 
-    // 阶段1: 立即设置中间混合色（布局属性由QSS主题控制）
-    m_progressBar->setChunkColor(mid);
-
-    // 阶段2: 400ms 后切换为最终 success 色（使用QTimer替代QPropertyAnimation误用）
-    QTimer::singleShot(Timers::kCompletionDelayMs, this, [this, success]() {
-        m_progressBar->setChunkColor(success);
-    });
+    // 使用 QPropertyAnimation 对 chunkColor 属性进行颜色插值动画
+    // Qt 的 QPropertyAnimation 支持对 QColor 类型做逐通道线性插值
+    m_colorAnim = new QPropertyAnimation(m_progressBar, "chunkColor");
+    m_colorAnim->setStartValue(accent);
+    m_colorAnim->setEndValue(success);
+    m_colorAnim->setDuration(400);
+    m_colorAnim->setEasingCurve(QEasingCurve::OutCubic);
+    // DeleteWhenStopped 自动销毁动画，连接 destroyed 信号清空指针避免悬挂
+    connect(m_colorAnim, &QObject::destroyed, this, [this]() { m_colorAnim = nullptr; });
+    m_colorAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }

@@ -74,6 +74,7 @@ set(SOURCES
     src/serial/PortWatcher.cpp
     src/protocol/FrameParser.cpp
     src/protocol/FrameParserHelpers.cpp
+    src/protocol/FrameParserStateHandlers.cpp
     src/protocol/ProtocolView.cpp
     src/protocol/FrameVisualEditor.cpp
     src/protocol/FrameVisualEditorUI.cpp

@@ -114,8 +114,11 @@ void SerialConfigPanel::setConnecting()
     }
     effect->setOpacity(1.0);
 
-    // 销毁旧动画
-    delete m_breathAnim;
+    // 安全停止旧动画: 使用stop()触发DeleteWhenStopped自动清理，避免直接delete与DeleteWhenStopped冲突
+    if (m_breathAnim) {
+        m_breathAnim->stop();   // stop()触发DeleteWhenStopped -> deleteLater()
+        m_breathAnim = nullptr;
+    }
 
     // 用lambda创建呼吸动画半周期(0.3↔1.0, 1500ms, InOutSine缓动)
     auto makeFade = [effect](qreal from, qreal to) -> QPropertyAnimation* {

@@ -32,6 +32,7 @@
  * 使用 QPropertyAnimation 驱动，符合 CLAUDE.md §6.5 动画规范。
  *
  * 额外功能:
+ *   - chunkColor Q_PROPERTY: 支持QPropertyAnimation驱动颜色插值动画
  *   - setChunkColor(): 设置chunk区域的背景色（用于传输完成变色动画）
  *   - resetChunkColor(): 恢复QSS主题默认颜色
  *   - 布局属性（border-radius等）由QSS主题文件控制，不在C++中硬编码
@@ -39,6 +40,7 @@
 class AnimatedProgressBar : public QProgressBar {
     Q_OBJECT
     Q_PROPERTY(qreal shimmerOffset READ shimmerOffset WRITE setShimmerOffset NOTIFY shimmerOffsetChanged)
+    Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
 
 public:
     /**
@@ -65,19 +67,28 @@ public:
 signals:
     /** @brief shimmerOffset属性变更通知信号 */
     void shimmerOffsetChanged();
+    /** @brief chunkColor属性变更通知信号 */
+    void chunkColorChanged();
 
 public:
-    /** @brief 设置chunk区域自定义颜色(传输完成变色动画) */
+    /** @brief 获取当前chunk自定义颜色(未设置时返回无效QColor) */
+    QColor chunkColor() const { return m_chunkColor; }
+
+    /** @brief 设置chunk区域自定义颜色(由QPropertyAnimation驱动，用于传输完成变色动画)
+     *  @param color 目标颜色，动画框架逐帧插值调用此方法实现平滑渐变
+     */
     void setChunkColor(const QColor& color) {
         m_chunkColor = color;
         m_customChunkColor = true;
+        emit chunkColorChanged();
         update();
     }
 
-    /** @brief 恢复QSS主题默认chunk颜色 */
+    /** @brief 恢复QSS主题默认chunk颜色，清除自定义颜色标记 */
     void resetChunkColor() {
         m_customChunkColor = false;
         m_chunkColor = QColor();
+        emit chunkColorChanged();
         update();
     }
 

@@ -212,7 +212,11 @@ void ProtocolView::exportJson()
         QMessageBox::warning(this, tr("导出JSON"), tr("无法写入文件"));
         return;
     }
-    file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+    QByteArray json = QJsonDocument(root).toJson(QJsonDocument::Indented);
+    if (file.write(json) != json.size()) {
+        QMessageBox::warning(this, tr("导出JSON"), tr("写入文件失败，磁盘可能已满"));
+        return;
+    }
     file.close();
     m_statusLabel->setText(tr("已导出 %1 帧到JSON").arg(m_frames.size()));
 }

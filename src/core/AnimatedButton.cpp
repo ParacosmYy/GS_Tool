@@ -86,10 +86,9 @@ void AnimatedButton::ensureOpacityEffect()
  *  @param curve 缓动曲线 */
 void AnimatedButton::startOpacityAnim(qreal targetOpacity, int durationMs, QEasingCurve curve)
 {
-    // 停止并销毁前一个动画，防止两个动画同时写同一属性导致闪烁
+    // 停止前一个动画: stop()触发DeleteWhenStopped自动deleteLater，无需手动deleteLater
     if (m_activeAnim) {
-        m_activeAnim->stop();
-        m_activeAnim->deleteLater();
+        m_activeAnim->stop();   // DeleteWhenStopped会自动调用deleteLater
         m_activeAnim = nullptr;
     }
     m_activeAnim = new QPropertyAnimation(this, "animOpacity");

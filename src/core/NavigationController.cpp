@@ -245,8 +245,9 @@ void NavigationController::animateSlideOut(QWidget* oldPanel, QParallelAnimation
     fadeOut->setDuration(Animations::kPanelSlideOutMs);
     fadeOut->setEasingCurve(QEasingCurve::InCubic);
 
-    // 滑出完成: 清除 effect + 隐藏 + 恢复位置
-    connect(slideOut, &QPropertyAnimation::finished, this, [oldPanel]() {
+    // 动画组完成后再清除effect + 隐藏 + 恢复位置
+    // 注意: 不能连接slideOut单独的finished，因为fadeOut可能还在使用fadeOutEffect
+    connect(group, &QParallelAnimationGroup::finished, this, [oldPanel]() {
         if (oldPanel->graphicsEffect()) oldPanel->setGraphicsEffect(nullptr);
         oldPanel->setVisible(false);
         oldPanel->move(0, 0);

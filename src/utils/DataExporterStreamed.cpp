@@ -106,7 +106,10 @@ bool DataExporter::exportStreamedCsv(const QString& path, LineProvider provider,
     if (!openTextFile(file, out, path)) return false;
 
     // UTF-8 BOM: 确保Excel中文环境下正确识别编码
-    file.write("\xEF\xBB\xBF");
+    if (file.write("\xEF\xBB\xBF") != 3) {
+        emit exportError(path, tr("写入BOM失败"));
+        return false;
+    }
 
     out << "timestamp,direction,data_hex,data_ascii\n";
     int offset = 0;
