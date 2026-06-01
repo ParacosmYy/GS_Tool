@@ -10,6 +10,7 @@
 #include "terminal/DirectionFilter.h"
 #include "core/ThemeManager.h"
 
+/** @brief 构造终端选区管理器，初始化选中背景色并监听主题切换信号 */
 TerminalSelectionManager::TerminalSelectionManager(QObject* parent)
     : QObject(parent)
     , m_selectionBg(ThemeManager::instance().color(ThemeManager::SemanticColor::TermSelection))
@@ -20,6 +21,12 @@ TerminalSelectionManager::TerminalSelectionManager(QObject* parent)
     });
 }
 
+/**
+ * @brief 处理鼠标按下事件，开始选区并记录起始行号
+ * @param y 鼠标Y坐标（像素）
+ * @param scrollOffset 当前滚动偏移行数
+ * @param lineHeight 每行像素高度
+ */
 void TerminalSelectionManager::onMousePress(double y, int scrollOffset, int lineHeight)
 {
     if (lineHeight <= 0) return;  // 防止除零
@@ -29,6 +36,12 @@ void TerminalSelectionManager::onMousePress(double y, int scrollOffset, int line
     m_selectionEndLine = line;
 }
 
+/**
+ * @brief 处理鼠标移动事件，正在选择时更新选区结束行号
+ * @param y 鼠标Y坐标（像素）
+ * @param scrollOffset 当前滚动偏移行数
+ * @param lineHeight 每行像素高度
+ */
 void TerminalSelectionManager::onMouseMove(double y, int scrollOffset, int lineHeight)
 {
     if (m_isSelecting && lineHeight > 0) {
@@ -37,11 +50,18 @@ void TerminalSelectionManager::onMouseMove(double y, int scrollOffset, int lineH
     }
 }
 
+/** @brief 处理鼠标释放事件，结束选区操作 */
 void TerminalSelectionManager::onMouseRelease()
 {
     m_isSelecting = false;
 }
 
+/**
+ * @brief 提取选区范围内的文本内容，支持方向过滤模式和普通模式
+ * @param cachedLines 终端缓存行数据
+ * @param directionFilter 方向过滤器指针，为nullptr时使用普通模式
+ * @return 选中的文本内容，多行以换行符连接，无选区时返回空字符串
+ */
 QString TerminalSelectionManager::selectedText(
     const QVector<CachedLine>& cachedLines,
     const DirectionFilter* directionFilter) const
@@ -80,6 +100,7 @@ QString TerminalSelectionManager::selectedText(
     return lines.join('\n');
 }
 
+/** @brief 重置选区状态，清除起始/结束行号并取消选择中标志 */
 void TerminalSelectionManager::reset()
 {
     m_selectionStartLine = -1;
@@ -87,31 +108,44 @@ void TerminalSelectionManager::reset()
     m_isSelecting = false;
 }
 
+/** @brief 获取规范化后的选区起始行号（始终小于等于结束行号） @return 起始行号 */
 int TerminalSelectionManager::normalizedStartLine() const
 {
     return qMin(m_selectionStartLine, m_selectionEndLine);
 }
 
+/** @brief 获取规范化后的选区结束行号（始终大于等于起始行号） @return 结束行号 */
 int TerminalSelectionManager::normalizedEndLine() const
 {
     return qMax(m_selectionStartLine, m_selectionEndLine);
 }
 
+/** @brief 判断当前是否存在有效选区 @return 起始和结束行号均有效时返回true */
 bool TerminalSelectionManager::hasSelection() const
 {
     return m_selectionStartLine >= 0 && m_selectionEndLine >= 0;
 }
 
+/** @brief 获取选区背景色 @return 选区高亮背景颜色 */
 QColor TerminalSelectionManager::selectionBgColor() const
 {
     return m_selectionBg;
 }
 
+/**
+ * @brief 设置选区背景色
+ * @param color 新的选区高亮背景颜色
+ */
 void TerminalSelectionManager::setSelectionBgColor(const QColor& color)
 {
     m_selectionBg = color;
 }
 
+/**
+ * @brief 程序化设置选区范围，直接指定起始和结束行号
+ * @param startLine 选区起始行号
+ * @param endLine 选区结束行号
+ */
 void TerminalSelectionManager::setSelection(int startLine, int endLine)
 {
     m_selectionStartLine = startLine;

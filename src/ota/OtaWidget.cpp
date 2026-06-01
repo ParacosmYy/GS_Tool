@@ -26,6 +26,7 @@
 // 构造 / 公开接口
 // ============================================================================
 
+/** @brief 构造OTA升级面板(文件选择+协议选择+进度条+日志) @param manager OtaManager指针 @param parent 父控件 */
 OtaWidget::OtaWidget(OtaManager* manager, QWidget* parent)
     : QWidget(parent), m_manager(manager), m_progressAnim(nullptr), m_colorAnim(nullptr)
 {
@@ -44,6 +45,7 @@ OtaWidget::OtaWidget(OtaManager* manager, QWidget* parent)
  * 安全机制: 如果当前有活跃传输，先警告用户并自动取消，
  * 避免传输协议持有已失效的连接导致数据损坏
  */
+/** @brief 注入当前连接(OTA传输需要IConnection写入数据) @param conn 连接指针 */
 void OtaWidget::setConnection(IConnection* conn)
 {
     if (m_manager->isTransferring()) {
@@ -56,6 +58,7 @@ void OtaWidget::setConnection(IConnection* conn)
 // UI 初始化
 // ============================================================================
 
+/** @brief 初始化OTA面板UI(文件选择组+协议配置组+进度组+日志组) */
 void OtaWidget::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
@@ -224,6 +227,7 @@ QGroupBox* OtaWidget::setupHistoryGroup()
 // 槽函数 -- 文件浏览 / 传输控制
 // ============================================================================
 
+/** @brief 浏览文件按钮回调：打开文件对话框选择固件文件(.bin/.hex/.fw) */
 void OtaWidget::onBrowseFile()
 {
     QString filter = tr("固件文件 (*.bin *.hex);;二进制文件 (*.bin);;Intel HEX (*.hex);;所有文件 (*.*)");
@@ -236,6 +240,7 @@ void OtaWidget::onBrowseFile()
     appendLog(tr("已选择文件: %1 (%2)").arg(path, sizeStr));
 }
 
+/** @brief 开始传输按钮回调：校验文件路径后调用OtaManager启动传输 */
 void OtaWidget::onStartTransfer()
 {
     QString filePath = m_filePathEdit->text().trimmed();
@@ -273,6 +278,7 @@ void OtaWidget::onStartTransfer()
     }
 }
 
+/** @brief 取消传输按钮回调：中止当前OTA传输并恢复UI状态 */
 void OtaWidget::onCancelTransfer()
 {
     m_manager->cancelTransfer();
@@ -423,6 +429,7 @@ void OtaWidget::setTransferring(bool transferring)
  *   阶段2: 400ms 后切换为最终 success 色
  * 颜色通过 setChunkColor() 设置，布局属性由 QSS 主题文件控制。
  */
+/** @brief 传输完成后播放完成动画(进度条满+图标变化+日志提示) */
 void OtaWidget::startCompletionAnimation()
 {
     auto& theme = ThemeManager::instance();

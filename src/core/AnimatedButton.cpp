@@ -14,6 +14,7 @@
 
 // ---- 构造 ----
 
+/** @brief 构造动画按钮，初始化opacity效果 @param text 按钮文字 @param parent 父控件 */
 AnimatedButton::AnimatedButton(const QString& text, QWidget* parent)
     : QPushButton(text, parent)
 {
@@ -22,11 +23,13 @@ AnimatedButton::AnimatedButton(const QString& text, QWidget* parent)
 
 // ---- 属性访问 ----
 
+/** @brief 获取当前动画opacity值 @return opacity 0.0~1.0 */
 qreal AnimatedButton::animOpacity() const
 {
     return m_animOpacity;
 }
 
+/** @brief 设置动画opacity值(QPropertyAnimation写端) @param opacity 目标opacity */
 void AnimatedButton::setAnimOpacity(qreal opacity)
 {
     m_animOpacity = opacity;
@@ -36,6 +39,7 @@ void AnimatedButton::setAnimOpacity(qreal opacity)
 
 // ---- 事件处理 ----
 
+/** @brief 鼠标进入：触发hover渐入动画(opacity→1.0, 200ms) @param event 进入事件 */
 void AnimatedButton::enterEvent(QEnterEvent* event)
 {
     QPushButton::enterEvent(event);
@@ -48,6 +52,7 @@ void AnimatedButton::enterEvent(QEnterEvent* event)
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+/** @brief 鼠标离开：触发hover渐出动画(opacity→0.85, 200ms) @param event 离开事件 */
 void AnimatedButton::leaveEvent(QEvent* event)
 {
     QPushButton::leaveEvent(event);
@@ -60,6 +65,7 @@ void AnimatedButton::leaveEvent(QEvent* event)
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+/** @brief 鼠标按下：触发按下反馈动画(opacity→0.75, 100ms) @param event 鼠标事件 */
 void AnimatedButton::mousePressEvent(QMouseEvent* event)
 {
     QPushButton::mousePressEvent(event);
@@ -72,6 +78,7 @@ void AnimatedButton::mousePressEvent(QMouseEvent* event)
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+/** @brief 鼠标释放：触发回弹动画(opacity→1.0, 100ms) @param event 鼠标事件 */
 void AnimatedButton::mouseReleaseEvent(QMouseEvent* event)
 {
     QPushButton::mouseReleaseEvent(event);
@@ -86,6 +93,7 @@ void AnimatedButton::mouseReleaseEvent(QMouseEvent* event)
 
 // ---- 内部方法 ----
 
+/** @brief 延迟创建QGraphicsOpacityEffect(首次使用时创建，避免未使用时浪费资源) */
 void AnimatedButton::ensureOpacityEffect()
 {
     if (!m_opacityEffect) {

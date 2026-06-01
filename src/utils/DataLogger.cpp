@@ -30,6 +30,7 @@ DataLogger::~DataLogger()
 
 // ---- 录制控制 ----
 
+/** @brief 开始数据录制(若已在录制则先停止) @param filePath 录制文件路径 @return true=录制启动成功 */
 bool DataLogger::startRecording(const QString& filePath)
 {
     if (m_recording) {
@@ -94,11 +95,13 @@ void DataLogger::resumeRecording()
     m_pauseOffset += (m_recordTimer.elapsed() - m_pauseStartTime);
 }
 
+/** @brief 查询是否正在录制 @return true=录制中 */
 bool DataLogger::isRecording() const
 {
     return m_recording;
 }
 
+/** @brief 查询录制是否暂停 @return true=已暂停 */
 bool DataLogger::isPaused() const
 {
     return m_paused;
@@ -118,11 +121,13 @@ void DataLogger::logData(const QByteArray& data, Direction dir)
     m_recordCount++;
 }
 
+/** @brief 获取已录制的记录数 @return 记录条数 */
 int DataLogger::recordCount() const
 {
     return m_recordCount;
 }
 
+/** @brief 获取录制持续时间(毫秒) @return 毫秒数 */
 qint64 DataLogger::recordingDuration() const
 {
     if (!m_recording) return 0;
@@ -131,6 +136,7 @@ qint64 DataLogger::recordingDuration() const
 
 // ---- 回放控制 ----
 
+/** @brief 开始数据回放(打开录制文件→扫描索引→启动定时器) @param filePath 录制文件路径 @return true=回放启动成功 */
 bool DataLogger::startPlayback(const QString& filePath)
 {
     if (m_playing) stopPlayback();
@@ -254,6 +260,7 @@ void DataLogger::setPlaybackSpeed(qreal speed)
     m_playbackSpeed = newSpeed;
 }
 
+/** @brief 查询是否正在回放 @return true=回放中 */
 bool DataLogger::isPlaying() const
 {
     return m_playing;
@@ -300,6 +307,7 @@ void DataLogger::writeRecord(quint64 timestamp, Direction dir, const QByteArray&
     stream.writeRawData(data.constData(), data.size());
 }
 
+/** @brief 从回放文件中读取下一条记录 @param header 输出记录头 @param data 输出记录数据 @return true=读取成功, false=EOF或错误 */
 bool DataLogger::readNextRecord(RecordHeader& header, QByteArray& data)
 {
     if (!m_playbackFile || m_playbackFile->atEnd()) return false;
@@ -368,6 +376,7 @@ void DataLogger::onPlaybackTick()
 
 // ---- 跳转定位(Seek) ----
 
+/** @brief 线性扫描录制文件到目标时间戳(构建时间索引) @param targetTimestamp 目标时间戳(ms) @return 实际定位到的偏移量 */
 qint64 DataLogger::scanToTimestamp(qint64 targetTimestamp)
 {
     if (!m_playbackFile) return -1;
@@ -424,6 +433,7 @@ qint64 DataLogger::scanToTimestamp(qint64 targetTimestamp)
     return foundTimestamp;
 }
 
+/** @brief 跳转到指定时间戳位置(先扫描索引再seek) @param timestamp 目标时间戳(ms) @return true=跳转成功 */
 bool DataLogger::seekToTimestamp(qint64 timestamp)
 {
     QMutexLocker locker(&m_mutex);
@@ -474,6 +484,7 @@ bool DataLogger::seekToTimestamp(qint64 timestamp)
     return true;
 }
 
+/** @brief 跳转到指定书签位置 @param index 书签索引 @return true=跳转成功 */
 bool DataLogger::seekToBookmark(int index)
 {
     // 验证书签索引有效性
@@ -505,6 +516,7 @@ void DataLogger::addBookmark(const QString& label, const QString& streamId)
     emit bookmarksChanged();
 }
 
+/** @brief 获取所有书签 @return DataBookmark列表 */
 QVector<DataBookmark> DataLogger::bookmarks() const
 {
     return m_bookmarks;

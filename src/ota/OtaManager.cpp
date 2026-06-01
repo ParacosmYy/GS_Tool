@@ -131,6 +131,7 @@ void OtaManager::setOtaState(OtaState state)
     }
 }
 
+/** @brief 获取当前OTA状态(Idle/Selecting/Transferring/Complete/Error) @return OtaState枚举 */
 OtaManager::OtaState OtaManager::otaState() const
 {
     return m_otaState;

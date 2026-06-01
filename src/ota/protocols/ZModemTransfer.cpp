@@ -9,6 +9,9 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTimer>
+/** @brief 将状态枚举转换为可读字符串
+ *  @param s ZMODEM状态枚举值
+ *  @return 状态名称字符串 */
 QString ZModemTransfer::stateToString(State s)
 {
     switch (s) {
@@ -24,13 +27,18 @@ QString ZModemTransfer::stateToString(State s)
     }
     return QStringLiteral("Unknown");
 }
+/** @brief 构造函数，初始化ZMODEM传输器并设置默认超时10秒 */
 ZModemTransfer::ZModemTransfer(QObject* parent)
     : BaseTransfer(parent)
 {
     m_timeoutMs = 10000;
 }
+/** @brief 设置传输文件路径
+ *  @param path 文件绝对路径 */
 void ZModemTransfer::setFilePath(const QString& path) { m_filePath = path; }
 // ---- BaseTransfer钩子实现 ----
+/** @brief 传输启动初始化，校验文件并读取到内存，发送ZRQINIT开始握手
+ *  @return 初始化成功返回true，文件不存在或读取失败返回false */
 bool ZModemTransfer::onStartInit()
 {
     // 文件路径非空校验
@@ -75,6 +83,7 @@ bool ZModemTransfer::onStartInit()
     return true;
 }
 
+/** @brief 发送取消序列: 8个退格符+2个CAN字节，中断ZMODEM传输 */
 void ZModemTransfer::sendCancelBytes()
 {
     if (m_conn) {
@@ -83,6 +92,7 @@ void ZModemTransfer::sendCancelBytes()
     }
 }
 
+/** @brief 超时处理，根据当前状态重发对应帧(ZRQINIT/ZFILE/ZDATA/ZEOF/ZFIN) */
 void ZModemTransfer::handleTimeout()
 {
     QString curState = stateToString(m_zmodemState);
@@ -121,6 +131,7 @@ void ZModemTransfer::handleTimeout()
     }
 }
 
+/** @brief 处理接收缓冲区数据，解析HEX帧并分发给对应状态处理方法 */
 void ZModemTransfer::processReceivedData()
 {
     while (!m_receiveBuffer.isEmpty()) {
@@ -170,6 +181,8 @@ void ZModemTransfer::processReceivedData()
 }
 
 // ---- 状态处理方法 ----
+/** @brief 处理WaitingRinit状态: 收到ZRINIT后发送ZFILE开始文件传输
+ *  @param type 解析到的帧类型 */
 void ZModemTransfer::handleStateWaitingRinit(int type)
 {
     if (type == ZRINIT) {
@@ -182,6 +195,9 @@ void ZModemTransfer::handleStateWaitingRinit(int type)
         qWarning() << "ZModem: unexpected frame" << type << "in WaitingRinit";
     }
 }
+/** @brief 处理SendingFile状态: 解析ZRPOS断点续传/ZSKIP跳过/ZRINIT重发
+ *  @param type 解析到的帧类型
+ *  @param headerData 帧头数据(含ZRPOS偏移量) */
 void ZModemTransfer::handleStateSendingFile(int type, const QByteArray& headerData){
     if (type == ZRPOS) {
         m_timeoutTimer->stop();
@@ -209,6 +225,9 @@ void ZModemTransfer::handleStateSendingFile(int type, const QByteArray& headerDa
         qWarning() << "ZModem: unexpected frame" << type << "in SendingFile";
     }
 }
+/** @brief 处理SendingData状态: 解析ZRPOS重传请求/ZACK确认，超过重试上限则取消
+ *  @param type 解析到的帧类型
+ *  @param headerData 帧头数据(含ZRPOS偏移量) */
 void ZModemTransfer::handleStateSendingData(int type, const QByteArray& headerData)
 {
     if (type == ZRPOS) {
@@ -240,6 +259,8 @@ void ZModemTransfer::handleStateSendingData(int type, const QByteArray& headerDa
         qWarning() << "ZModem: unexpected frame" << type << "in SendingData, offset:" << m_fileOffset;
     }
 }
+/** @brief 处理WaitingZAck状态: 收到ZACK/ZRPOS后发送ZEOF结束文件数据传输
+ *  @param type 解析到的帧类型 */
 void ZModemTransfer::handleStateWaitingZAck(int type)
 {
     if (type == ZACK || type == ZRPOS) {
@@ -252,6 +273,8 @@ void ZModemTransfer::handleStateWaitingZAck(int type)
         qWarning() << "ZModem: unexpected frame" << type << "in WaitingZAck, bytes:" << m_bytesSent;
     }
 }
+/** @brief 处理SendingEof状态: 收到ZRINIT/ZSKIP后发送ZFIN结束会话
+ *  @param type 解析到的帧类型 */
 void ZModemTransfer::handleStateSendingEof(int type)
 {
     if (type == ZRINIT || type == ZSKIP) {
@@ -264,6 +287,8 @@ void ZModemTransfer::handleStateSendingEof(int type)
         qWarning() << "ZModem: unexpected frame" << type << "in SendingEof";
     }
 }
+/** @brief 处理SendingFin状态: 收到ZFIN后发送"OO"结束序列并完成传输
+ *  @param type 解析到的帧类型 */
 void ZModemTransfer::handleStateSendingFin(int type)
 {
     if (type == ZFIN) {
@@ -277,6 +302,11 @@ void ZModemTransfer::handleStateSendingFin(int type)
 }
 
 // ---- 帧解析(含CRC16校验) ----
+/** @brief 解析ZMODEM HEX帧，提取帧类型和帧头数据并校验CRC16
+ *  @param data 接收缓冲区数据
+ *  @param type 输出帧类型
+ *  @param headerData 输出帧头4字节数据
+ *  @return 解析成功返回true，数据不完整或CRC校验失败返回false */
 bool ZModemTransfer::parseHexFrame(const QByteArray& data, int& type, QByteArray& headerData)
 {
     if (data.size() < 7) return false;
@@ -336,6 +366,10 @@ bool ZModemTransfer::parseHexFrame(const QByteArray& data, int& type, QByteArray
     return true;
 }
 // ---- 帧构建 ----
+/** @brief 构建ZMODEM HEX格式帧头(16进制ASCII编码+CRC16校验)
+ *  @param frameType 帧类型(ZRQINIT/ZRINIT/ZEOF/ZFIN等)
+ *  @param data 帧头附加数据(4字节，不足补零)
+ *  @return 完整的HEX帧字节数组 */
 QByteArray ZModemTransfer::buildHexHeader(quint8 frameType, const QByteArray& data)
 {
     QByteArray frame;
@@ -355,6 +389,10 @@ QByteArray ZModemTransfer::buildHexHeader(quint8 frameType, const QByteArray& da
     return frame;
 }
 
+/** @brief 构建ZMODEM BIN32格式帧头(二进制编码+CRC32校验+ZDLE转义)
+ *  @param frameType 帧类型(ZFILE/ZDATA等)
+ *  @param data 帧头附加数据(4字节)
+ *  @return 完整的BIN32帧字节数组 */
 QByteArray ZModemTransfer::buildBinHeader(quint8 frameType, const QByteArray& data)
 {
     QByteArray frame;
@@ -383,6 +421,10 @@ QByteArray ZModemTransfer::buildBinHeader(quint8 frameType, const QByteArray& da
     return frame;
 }
 
+/** @brief 构建数据子包(ZDLE转义数据+CRC32校验+结束标志)
+ *  @param endFlag 结束标志: ZCRCG(继续)/ZCRCW(等待应答)
+ *  @param data 子包数据载荷
+ *  @return 完整的数据子包字节数组 */
 QByteArray ZModemTransfer::buildDataSubpacket(char endFlag, const QByteArray& data)
 {
     QByteArray packet;
@@ -402,7 +444,9 @@ QByteArray ZModemTransfer::buildDataSubpacket(char endFlag, const QByteArray& da
 }
 
 // ---- 发送流程方法 ----
+/** @brief 发送ZRQINIT帧，发起ZMODEM传输握手 */
 void ZModemTransfer::sendZRQINIT() { if (m_conn) m_conn->write(buildHexHeader(ZRQINIT)); }
+/** @brief 发送ZFILE帧(文件名+大小)和数据子包，通知接收方文件信息 */
 void ZModemTransfer::sendZFILE()
 {
     if (!m_conn) return;
@@ -412,6 +456,7 @@ void ZModemTransfer::sendZFILE()
     fi.append('\0');
     m_conn->write(buildDataSubpacket(ZCRCW, fi));
 }
+/** @brief 发送ZDATA帧头，包含当前文件偏移量 */
 void ZModemTransfer::sendZDATA()
 {
     if (!m_conn) return;
@@ -422,6 +467,7 @@ void ZModemTransfer::sendZDATA()
     offsetData.append(static_cast<char>((m_fileOffset >> 24) & 0xFF));
     m_conn->write(buildBinHeader(ZDATA, offsetData));
 }
+/** @brief 异步分块发送数据子包，每批最多kChunksPerTick个，防止UI冻结 */
 void ZModemTransfer::sendDataSubpackets()
 {
     if (!m_conn) return;
@@ -458,6 +504,7 @@ void ZModemTransfer::sendDataSubpackets()
         QTimer::singleShot(0, this, &ZModemTransfer::sendDataSubpackets);
     }
 }
+/** @brief 发送ZEOF帧，通知接收方文件传输完成 */
 void ZModemTransfer::sendZEOF()
 {
     if (!m_conn) return;
@@ -469,11 +516,18 @@ void ZModemTransfer::sendZEOF()
     offsetData.append(static_cast<char>((size >> 24) & 0xFF));
     m_conn->write(buildHexHeader(ZEOF, offsetData));
 }
+/** @brief 发送ZFIN帧，结束ZMODEM会话 */
 void ZModemTransfer::sendZFIN() { if (m_conn) m_conn->write(buildHexHeader(ZFIN)); }
 
 // ---- 工具方法 ----
+/** @brief 设置ZMODEM状态机状态
+ *  @param s 目标状态 */
 void ZModemTransfer::setState(State s) { m_zmodemState = s; }
 
+/** @brief 将数值转换为指定位数的16进制大写ASCII字符串
+ *  @param val 待转换的数值
+ *  @param digits 16进制位数
+ *  @return 16进制ASCII字节数组 */
 QByteArray ZModemTransfer::toHex(quint32 val, int digits)
 {
     QByteArray result;
@@ -484,6 +538,9 @@ QByteArray ZModemTransfer::toHex(quint32 val, int digits)
     return result;
 }
 
+/** @brief 对数据进行ZDLE转义编码，转义控制字符(CAN/CR/LF/XON/XOFF/0x2A)
+ *  @param data 原始数据
+ *  @return 转义后的数据 */
 QByteArray ZModemTransfer::escapeZdle(const QByteArray& data) const
 {
     QByteArray result;

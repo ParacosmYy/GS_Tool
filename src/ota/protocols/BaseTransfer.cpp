@@ -7,6 +7,7 @@
  */
 #include "ota/protocols/BaseTransfer.h"
 
+/** @brief 构造传输基类，创建单次超时定时器 @param parent 父对象 */
 BaseTransfer::BaseTransfer(QObject* parent)
     : QObject(parent)
     , m_timeoutTimer(new QTimer(this))
@@ -16,6 +17,7 @@ BaseTransfer::BaseTransfer(QObject* parent)
             this, &BaseTransfer::onTimeout);
 }
 
+/** @brief 注入连接并绑定dataReceived信号(旧连接自动断开) @param conn IConnection指针 */
 void BaseTransfer::setConnection(IConnection* conn)
 {
     if (m_conn) {
@@ -28,6 +30,7 @@ void BaseTransfer::setConnection(IConnection* conn)
     }
 }
 
+/** @brief 启动传输(检查空闲+连接→重置状态→委托子类onStartInit→激活) @return true=启动成功 */
 bool BaseTransfer::start()
 {
     if (!isIdle()) return false;
@@ -51,6 +54,7 @@ bool BaseTransfer::start()
     return true;
 }
 
+/** @brief 用户取消传输：发送CAN字节→停止定时器→标记空闲→发射错误信号 */
 void BaseTransfer::cancel()
 {
     m_cancelled = true;
@@ -62,17 +66,20 @@ void BaseTransfer::cancel()
     emit transferError(tr("用户取消传输"));
 }
 
+/** @brief 查询传输是否正在进行(非空闲/非完成/非错误) @return true=正在传输 */
 bool BaseTransfer::isRunning() const
 {
     return !isIdle() && !isDone() && !isError();
 }
 
+/** @brief 传输成功完成：标记Done状态并发射transferComplete信号 */
 void BaseTransfer::finishTransfer()
 {
     markDone();
     emit transferComplete();
 }
 
+/** @brief 连接数据到达回调：终止态丢弃→溢出保护→缓冲→委托子类processReceivedData @param data 接收到的原始字节 */
 void BaseTransfer::onConnectionReadyRead(const QByteArray& data)
 {
     // 终止态不再处理数据，防止cancel/error后残留数据触发状态机
@@ -93,6 +100,7 @@ void BaseTransfer::onConnectionReadyRead(const QByteArray& data)
     processReceivedData();
 }
 
+/** @brief 全局超时回调：超过最大重试次数则中止，否则委托子类handleTimeout重试 */
 void BaseTransfer::onTimeout()
 {
     if (isIdle()) return;
@@ -108,21 +116,25 @@ void BaseTransfer::onTimeout()
     handleTimeout();
 }
 
+/** @brief 设置内部传输状态 @param state 目标TransferState */
 void BaseTransfer::setTransferState(TransferState state)
 {
     m_transferState = state;
 }
 
+/** @brief 标记传输为空闲状态(Idle) */
 void BaseTransfer::markIdle()
 {
     setTransferState(TransferState::Idle);
 }
 
+/** @brief 标记传输为完成状态(Done) */
 void BaseTransfer::markDone()
 {
     setTransferState(TransferState::Done);
 }
 
+/** @brief 标记传输为错误状态(Error) */
 void BaseTransfer::markError()
 {
     setTransferState(TransferState::Error);

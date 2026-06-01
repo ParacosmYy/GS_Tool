@@ -20,6 +20,7 @@
 
 // ---- 静态辅助方法 ----
 
+/** @brief 获取所有可用的字段类型名称(UInt8/UInt16LE/Float/Raw等) @return 类型名QStringList */
 QStringList FrameVisualEditor::fieldTypeNames()
 {
     return {"UInt8", "UInt16LE", "UInt16BE", "UInt32LE", "UInt32BE",

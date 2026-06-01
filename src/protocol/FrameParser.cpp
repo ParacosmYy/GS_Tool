@@ -17,6 +17,7 @@
 // 构造 / 配置 / 状态查询
 // ============================================================================
 
+/** @brief 构造帧解析器(创建超时检查定时器) @param parent 父对象 */
 FrameParser::FrameParser(QObject* parent)
     : QObject(parent)
     , m_timeoutCheckTimer(new QTimer(this))
@@ -45,6 +46,7 @@ void FrameParser::setDefinition(const FrameDefinition& def)
     startTimeoutTimer();
 }
 
+/** @brief 获取当前帧定义 @return FrameDefinition副本 */
 FrameDefinition FrameParser::definition() const
 {
     return m_def;
@@ -91,7 +93,9 @@ void FrameParser::resetIntermediateState()
     m_frameTimer.invalidate();
 }
 
+/** @brief 获取已成功解析的帧总数 @return 帧计数 */
 quint64 FrameParser::frameCount() const { return m_frameCount; }
+/** @brief 获取解析错误计数(CRC错/超时/格式错) @return 错误计数 */
 quint64 FrameParser::errorCount() const { return m_errorCount; }
 
 /** @brief 设置最大帧长度(超过则视为错误帧) @param maxLen 最大字节数 */

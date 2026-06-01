@@ -160,16 +160,19 @@ bool ThemeManager::loadThemeFromFile(const QString& filePath)
     return true;
 }
 
+/** @brief 获取所有可用主题名称列表 @return 主题名QStringList */
 QStringList ThemeManager::availableThemes() const
 {
     return m_themes.keys();
 }
 
+/** @brief 获取当前激活主题名称 @return 主题名 */
 QString ThemeManager::currentTheme() const
 {
     return m_currentTheme;
 }
 
+/** @brief 按语义色枚举获取对应QColor(未映射时返回灰色并警告) @param color 语义色枚举 @return QColor */
 QColor ThemeManager::color(SemanticColor color) const
 {
     auto it = m_colorMap.constFind(color);

@@ -19,6 +19,7 @@ constexpr unsigned char JustFloatBridge::kTailMarker[4];
 // 构造 / 析构
 // ============================================================
 
+/** @brief 构造JustFloat协议桥 @param parent 父对象 */
 JustFloatBridge::JustFloatBridge(QObject* parent)
     : IProtocolBridge(parent)
     , m_channelCount(0)
@@ -30,6 +31,7 @@ JustFloatBridge::JustFloatBridge(QObject* parent)
 // IProtocolBridge接口实现
 // ============================================================
 
+/** @brief 喂入原始字节流(追加缓冲区→溢出保护→循环解析完整帧) @param data 原始字节流 */
 void JustFloatBridge::feed(const QByteArray& data)
 {
     if (data.isEmpty()) return;
@@ -50,6 +52,7 @@ void JustFloatBridge::feed(const QByteArray& data)
     }
 }
 
+/** @brief 重置解析器状态(清空缓冲区+通道计数+检测标志) */
 void JustFloatBridge::reset()
 {
     m_buffer.clear();
@@ -57,6 +60,7 @@ void JustFloatBridge::reset()
     m_channelsDetected = false;
 }
 
+/** @brief 获取协议名称 @return "JustFloat" */
 QString JustFloatBridge::name() const
 {
     return QStringLiteral("JustFloat");
@@ -66,6 +70,7 @@ QString JustFloatBridge::name() const
 // 通道配置
 // ============================================================
 
+/** @brief 手动设置固定通道数(覆盖自动检测) @param count 通道数(0=自动检测) */
 void JustFloatBridge::setFixedChannelCount(int count)
 {
     if (count < 0) count = 0;
@@ -74,6 +79,7 @@ void JustFloatBridge::setFixedChannelCount(int count)
     m_channelsDetected = (count > 0);
 }
 
+/** @brief 获取当前通道数 @return 通道数 */
 int JustFloatBridge::channelCount() const
 {
     return m_channelCount;
@@ -83,6 +89,7 @@ int JustFloatBridge::channelCount() const
 // 帧解析核心逻辑
 // ============================================================
 
+/** @brief 尝试从缓冲区解析一帧(搜索尾部标记00 00 80 7F) @return 消耗的字节数，0=无完整帧 */
 int JustFloatBridge::tryParseFrame()
 {
     // 尾部标记至少需要4字节
@@ -140,6 +147,7 @@ int JustFloatBridge::tryParseFrame()
     return 0;
 }
 
+/** @brief 从缓冲区解析float数据并发射frameParsed信号 @param frameSize 帧总字节数(含尾部标记) */
 void JustFloatBridge::parseAndEmit(int frameSize)
 {
     const char* data = m_buffer.constData();
@@ -165,6 +173,7 @@ void JustFloatBridge::parseAndEmit(int frameSize)
     emit frameParsed(fields, rawFrame);
 }
 
+/** @brief 自动检测通道数(由首帧的float字节数决定) @param floatPayloadSize 首帧float数据字节数 */
 void JustFloatBridge::autoDetectChannels(int floatPayloadSize)
 {
     m_channelCount = floatPayloadSize / kFloatSize;

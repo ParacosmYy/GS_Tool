@@ -465,6 +465,7 @@ void SerialConnection::resetErrorCounters()
     m_errorCounters = SerialErrorCounters{};
 }
 
+/** @brief 读取串口引脚信号状态(CTS/DSR/DCD/RI/RTS/DTR) @return PinoutSignals结构体 */
 PinoutSignals SerialConnection::pinoutSignals() const
 {
     PinoutSignals result;

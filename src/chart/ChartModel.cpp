@@ -95,6 +95,7 @@ int ChartModel::refreshInterval() const
 // 数据查询接口
 // ============================================================================
 
+/** @brief 获取指定通道的完整数据点序列 @param displayName 通道显示名 @return QPointF向量(时间,X值) */
 QVector<QPointF> ChartModel::channelData(const QString& displayName) const
 {
     auto it = m_buffers.constFind(displayName);
@@ -158,6 +159,7 @@ QPair<double, double> ChartModel::globalYRange() const
     return qMakePair(globalMin, globalMax);
 }
 
+/** @brief 获取所有已注册通道的显示名列表 @return 通道名QStringList */
 QStringList ChartModel::channelNames() const
 {
     return m_buffers.keys();

@@ -7,12 +7,21 @@
 #include <QFile>
 #include <QFileInfo>
 
+/** @brief 构造函数，初始化YMODEM传输器基类 */
 YModemTransfer::YModemTransfer(QObject* parent) : BaseTransfer(parent) {}
 
+/** @brief 设置单个文件路径用于传输
+ *  @param path 文件绝对路径 */
 void YModemTransfer::setFilePath(const QString& path) { m_filePaths = QStringList{path}; }
+/** @brief 设置多个文件路径用于批量传输
+ *  @param paths 文件路径列表 */
 void YModemTransfer::setFilePaths(const QStringList& paths) { m_filePaths = paths; }
+/** @brief 获取当前传输速率
+ *  @return 传输速率，单位: 字节/秒 */
 double YModemTransfer::transferRate() const { return m_currentRate; }
 
+/** @brief 计算剩余传输时间
+ *  @return 预计剩余秒数，无法计算时返回-1 */
 double YModemTransfer::etaSeconds() const
 {
     if (m_currentRate <= 0.0 || m_totalBytes <= 0) return -1.0;
@@ -21,6 +30,8 @@ double YModemTransfer::etaSeconds() const
     return static_cast<double>(remaining) / m_currentRate;
 }
 
+/** @brief 传输启动初始化，校验文件列表并加载第一个文件
+ *  @return 初始化成功返回true，文件为空或读取失败返回false */
 bool YModemTransfer::onStartInit()
 {
     if (m_filePaths.isEmpty()) {
@@ -62,6 +73,7 @@ bool YModemTransfer::onStartInit()
     return true;
 }
 
+/** @brief 发送CAN取消字节，连续发送2个CAN通知接收方终止传输 */
 void YModemTransfer::sendCancelBytes()
 {
     if (m_conn) {
@@ -69,6 +81,7 @@ void YModemTransfer::sendCancelBytes()
     }
 }
 
+/** @brief 超时处理，根据当前状态重发数据，每个阶段独立重试最多10次 */
 void YModemTransfer::handleTimeout()
 {
     // 超时重发当前状态，每个阶段独立重试计数(最多10次)
@@ -104,6 +117,7 @@ void YModemTransfer::handleTimeout()
     m_timeoutTimer->start(m_timeoutMs);
 }
 
+/** @brief 处理接收缓冲区数据，按字节逐个分发给对应状态处理方法 */
 void YModemTransfer::processReceivedData()
 {
     int readIdx = 0;
@@ -158,6 +172,8 @@ void YModemTransfer::processReceivedData()
     m_receiveBuffer.remove(0, readIdx);
 }
 
+/** @brief 处理WaitingStart状态: 解析C/NAK启动信号，开始发送Block 0
+ *  @param ch 接收到的单字节 */
 void YModemTransfer::handleStateWaitingStart(char ch)
 {
     if (ch == CRC_CHAR || ch == NAK) {
@@ -170,6 +186,9 @@ void YModemTransfer::handleStateWaitingStart(char ch)
     }
 }
 
+/** @brief 处理SendingBlock0状态: 解析Block 0阶段的ACK/C/NAK/CAN响应
+ *  @param ch 接收到的单字节
+ *  @param readIdx 缓冲区读取索引引用 */
 void YModemTransfer::handleStateSendingBlock0(char ch, int& readIdx)
 {
     if (ch == ACK) {
@@ -215,6 +234,9 @@ void YModemTransfer::handleStateSendingBlock0(char ch, int& readIdx)
     }
 }
 
+/** @brief 处理SendingData状态: 解析数据传输阶段的ACK/NAK/CAN响应
+ *  @param ch 接收到的单字节
+ *  @param readIdx 缓冲区读取索引引用 */
 void YModemTransfer::handleStateSendingData(char ch, int& readIdx)
 {
     if (ch == ACK) {
@@ -259,6 +281,9 @@ void YModemTransfer::handleStateSendingData(char ch, int& readIdx)
     }
 }
 
+/** @brief 处理SendingEOT状态: 解析EOT阶段的ACK/NAK/CAN，管理批量文件切换
+ *  @param ch 接收到的单字节
+ *  @param readIdx 缓冲区读取索引引用 */
 void YModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
 {
     if (ch == ACK) {
@@ -302,6 +327,9 @@ void YModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
     }
 }
 
+/** @brief 处理WaitBlock0Ack状态: 等待下一个文件的C/NAK信号后加载并发送Block 0
+ *  @param ch 接收到的单字节
+ *  @param readIdx 缓冲区读取索引引用 */
 void YModemTransfer::handleStateWaitBlock0Ack(char ch, int& readIdx)
 {
     if (ch == CRC_CHAR || ch == NAK) {
@@ -319,6 +347,8 @@ void YModemTransfer::handleStateWaitBlock0Ack(char ch, int& readIdx)
     }
 }
 
+/** @brief 处理WaitFinalC状态: 等待最终C/NAK信号后发送空Block 0结束会话
+ *  @param ch 接收到的单字节 */
 void YModemTransfer::handleStateWaitFinalC(char ch)
 {
     if (ch == CRC_CHAR || ch == NAK) {
@@ -331,6 +361,9 @@ void YModemTransfer::handleStateWaitFinalC(char ch)
     }
 }
 
+/** @brief 处理SendingFinalBlock0状态: 解析最终空Block 0的ACK/NAK/CAN响应
+ *  @param ch 接收到的单字节
+ *  @param readIdx 缓冲区读取索引引用 */
 void YModemTransfer::handleStateSendingFinalBlock0(char ch, int& readIdx)
 {
     if (ch == ACK) {
@@ -361,6 +394,7 @@ void YModemTransfer::handleStateSendingFinalBlock0(char ch, int& readIdx)
     }
 }
 
+/** @brief 构建并发送Block 0(文件信息块)，包含文件名、大小、修改时间和权限 */
 void YModemTransfer::sendBlock0()
 {
     // 获取文件修改时间
@@ -377,6 +411,7 @@ void YModemTransfer::sendBlock0()
     }
 }
 
+/** @brief 构建并发送数据块，不足128字节时用0x1A填充 */
 void YModemTransfer::sendBlock()
 {
     qint64 offset = static_cast<qint64>(m_blockNumber - 1) * kBlockSize;
@@ -403,6 +438,7 @@ void YModemTransfer::sendBlock()
     m_bytesSent = sent;
 }
 
+/** @brief 发送EOT(End of Transmission)字节通知接收方当前文件传输结束 */
 void YModemTransfer::sendEOT()
 {
     if (m_conn) {
@@ -410,6 +446,7 @@ void YModemTransfer::sendEOT()
     }
 }
 
+/** @brief 发送最终空Block 0，表示整个YMODEM传输会话结束 */
 void YModemTransfer::sendFinalBlock0()
 {
     // 空Block 0表示传输会话结束
@@ -420,6 +457,10 @@ void YModemTransfer::sendFinalBlock0()
     }
 }
 
+/** @brief 构建完整数据块包(SOH+块号+数据+CRC16)
+ *  @param blockNum 块编号(0=文件信息块, 1-255=数据块)
+ *  @param blockData 块数据载荷
+ *  @return 完整的数据包字节数组 */
 QByteArray YModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
 {
     QByteArray packet;
@@ -435,6 +476,11 @@ QByteArray YModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
     return packet;
 }
 
+/** @brief 构建Block 0文件信息块(文件名+大小+修改时间+权限)
+ *  @param fileName 文件名
+ *  @param fileSize 文件大小(字节)
+ *  @param modTime 文件修改时间(Unix时间戳)
+ *  @return 128字节的Block 0数据 */
 QByteArray YModemTransfer::buildBlock0(const QString& fileName,
                                         qint64 fileSize, qint64 modTime)
 {
@@ -460,6 +506,7 @@ QByteArray YModemTransfer::buildBlock0(const QString& fileName,
     return block0;
 }
 
+/** @brief 更新传输速率统计并发射transferStats信号 */
 void YModemTransfer::updateTransferStats()
 {
     qint64 elapsedMs = m_transferTimer.elapsed();
@@ -472,6 +519,8 @@ void YModemTransfer::updateTransferStats()
     emit transferStats(m_currentRate, eta, m_currentFileName);
 }
 
+/** @brief 加载下一个待传输文件到内存
+ *  @return 文件加载成功返回true，无更多文件或读取失败返回false */
 bool YModemTransfer::loadNextFile()
 {
     if (m_fileIndex >= m_filePaths.size()) {

@@ -20,6 +20,7 @@
 // 构造函数
 // ============================================================================
 
+/** @brief 构造波形图控件(创建ChartModel+初始化UI+连接信号) @param parent 父控件 */
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
     , m_model(new ChartModel(this))

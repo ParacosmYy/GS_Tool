@@ -14,32 +14,43 @@
 #include <QFileInfo>
 #include <QDateTime>
 
+/** @brief 构造函数，初始化XMODEM传输器基类 */
 XModemTransfer::XModemTransfer(QObject* parent)
     : BaseTransfer(parent)
 {
 }
 
+/** @brief 设置XMODEM传输模式
+ *  @param mode 传输模式: Checksum/CRC/OneK */
 void XModemTransfer::setMode(Mode mode)
 {
     m_mode = mode;
 }
 
+/** @brief 设置传输文件路径
+ *  @param path 文件绝对路径 */
 void XModemTransfer::setFilePath(const QString& path)
 {
     m_filePath = path;
 }
 
+/** @brief 直接设置传输数据，优先于文件路径
+ *  @param data 待传输的原始字节数据 */
 void XModemTransfer::setData(const QByteArray& data)
 {
     m_data = data;
     m_filePath.clear();
 }
 
+/** @brief 获取当前传输速率
+ *  @return 传输速率，单位: 字节/秒 */
 double XModemTransfer::transferRate() const
 {
     return m_currentRate;
 }
 
+/** @brief 计算剩余传输时间
+ *  @return 预计剩余秒数，无法计算时返回-1 */
 double XModemTransfer::etaSeconds() const
 {
     if (m_currentRate <= 0.0 || m_data.isEmpty()) {
@@ -54,6 +65,8 @@ double XModemTransfer::etaSeconds() const
 
 // ---- BaseTransfer钩子实现 ----
 
+/** @brief 传输启动初始化，加载文件数据并等待接收方启动信号
+ *  @return 初始化成功返回true，文件/连接错误返回false */
 bool XModemTransfer::onStartInit()
 {
     // 加载文件数据
@@ -108,17 +121,17 @@ bool XModemTransfer::onStartInit()
     return true;
 }
 
+/** @brief 发送CAN取消字节，连续发送2个CAN通知接收方终止传输 */
 void XModemTransfer::sendCancelBytes()
 {
-    // XMODEM取消协议: 连续发送2个CAN字节
     if (m_conn) {
         m_conn->write(QByteArray(2, CAN));
     }
 }
 
+/** @brief 超时处理，根据当前状态重发数据块或EOT，单块最多重试10次 */
 void XModemTransfer::handleTimeout()
 {
-    // 超时重发当前状态，每块独立计算重试次数
     if (m_xmodemState == State::SendingBlock) {
         m_blockRetryCount++;
         if (m_blockRetryCount > 10) {
@@ -152,6 +165,7 @@ void XModemTransfer::handleTimeout()
     }
 }
 
+/** @brief 处理接收缓冲区数据，按字节逐个分发给对应状态处理方法 */
 void XModemTransfer::processReceivedData()
 {
     int readIdx = 0;
@@ -196,6 +210,8 @@ void XModemTransfer::processReceivedData()
 
 // ---- 状态处理方法 ----
 
+/** @brief 处理WaitingForStart状态: 解析NAK/C启动信号，自动降级模式
+ *  @param ch 接收到的单字节 */
 void XModemTransfer::handleStateWaitingForStart(char ch)
 {
     if (ch == NAK) {
@@ -226,6 +242,9 @@ void XModemTransfer::handleStateWaitingForStart(char ch)
     }
 }
 
+/** @brief 处理SendingBlock状态: 解析ACK/NAK/CAN响应，推进或重传数据块
+ *  @param ch 接收到的单字节
+ *  @param readIdx 缓冲区读取索引引用，错误时用于清空剩余数据 */
 void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
 {
     if (ch == ACK) {
@@ -290,6 +309,9 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
     }
 }
 
+/** @brief 处理SendingEOT状态: 解析EOT阶段的ACK/NAK/CAN响应
+ *  @param ch 接收到的单字节
+ *  @param readIdx 缓冲区读取索引引用 */
 void XModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
 {
     if (ch == ACK) {
@@ -323,6 +345,7 @@ void XModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
 
 // ---- 数据发送 ----
 
+/** @brief 构建并发送一个数据块，不足块大小时用0x1A填充 */
 void XModemTransfer::sendBlock()
 {
     int bs = blockSize();
@@ -365,6 +388,7 @@ void XModemTransfer::sendBlock()
     // 确保NAK重传时发送相同的块（防止跳块导致数据损坏）
 }
 
+/** @brief 发送EOT(End of Transmission)字节通知接收方传输结束 */
 void XModemTransfer::sendEOT()
 {
     if (m_conn) {
@@ -380,6 +404,10 @@ void XModemTransfer::sendEOT()
     }
 }
 
+/** @brief 构建完整数据块包(帧头+块号+数据+校验)
+ *  @param blockNum 块编号(1-255循环)
+ *  @param blockData 块数据载荷
+ *  @return 完整的数据包字节数组 */
 QByteArray XModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
 {
     QByteArray packet;
@@ -407,6 +435,9 @@ QByteArray XModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
     return packet;
 }
 
+/** @brief 计算XMODEM CRC16校验值
+ *  @param data 待校验数据
+ *  @return CRC16校验值 */
 quint16 XModemTransfer::xmodemCrc(const QByteArray& data)
 {
     return CRC::crc16Xmodem(data);
@@ -414,6 +445,7 @@ quint16 XModemTransfer::xmodemCrc(const QByteArray& data)
 
 // ---- 速率统计 ----
 
+/** @brief 更新传输速率统计并发射transferStats信号 */
 void XModemTransfer::updateTransferStats()
 {
     qint64 elapsedMs = m_transferTimer.elapsed();
@@ -434,6 +466,8 @@ void XModemTransfer::updateTransferStats()
     m_lastStatsBytes = m_bytesSent;
 }
 
+/** @brief 设置XMODEM状态机状态
+ *  @param newState 目标状态 */
 void XModemTransfer::setState(State newState)
 {
     m_xmodemState = newState;
