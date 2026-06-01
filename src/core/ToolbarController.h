@@ -1,3 +1,8 @@
+/**
+ * @file ToolbarController.h
+ * @brief 工具栏控制器 - 管理顶部工具栏的按钮布局和交互逻辑
+ */
+
 #ifndef TOOLBARCONTROLLER_H
 #define TOOLBARCONTROLLER_H
 

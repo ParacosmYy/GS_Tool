@@ -1,3 +1,8 @@
+/**
+ * @file NavigationController.h
+ * @brief 导航控制器 - 管理导航树和面板切换动画
+ */
+
 #ifndef NAVIGATION_CONTROLLER_H
 #define NAVIGATION_CONTROLLER_H
 

@@ -176,8 +176,15 @@ bool SendController::sendAndRecord(const QByteArray& data)
     qint64 written = m_currentConn->write(data);
     if (written > 0) {
         // 写入成功: 追加到终端模型（TX 显示）+ 记录日志
-        m_terminalModel->appendSent(data);
-        m_dataLogger->logData(data, DataLogger::Direction::Sent);
+        // 处理部分写入：仅记录实际发送的字节，避免终端/日志显示虚假数据
+        QByteArray sentData = (written < data.size()) ? data.left(static_cast<int>(written)) : data;
+        if (written < data.size()) {
+            // 部分写入警告：实际发送少于请求，提示用户
+            emit statusMessage(tr("部分写入: 请求 %1 字节，实际发送 %2 字节")
+                                   .arg(data.size()).arg(written));
+        }
+        m_terminalModel->appendSent(sentData);
+        m_dataLogger->logData(sentData, DataLogger::Direction::Sent);
         emit dataSent(written);
         return true;
     }

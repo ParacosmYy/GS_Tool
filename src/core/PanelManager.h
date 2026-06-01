@@ -1,3 +1,8 @@
+/**
+ * @file PanelManager.h
+ * @brief 面板管理器 - 管理所有面板的创建、缓存和切换
+ */
+
 #ifndef PANEL_MANAGER_H
 #define PANEL_MANAGER_H
 

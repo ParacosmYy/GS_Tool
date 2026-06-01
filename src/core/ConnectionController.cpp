@@ -230,6 +230,9 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
         stopConnectionTimeout();
         emit connectionFailed(tr("Connection Failed"),
                              tr("Cannot establish network connection"));
+        // 先断开信号，防止 removeConnection 触发 close() 导致的 stateChanged 信号
+        // 回调到 onConnectionStateChanged 产生重复错误通知
+        disconnect(m_currentConn, nullptr, this, nullptr);
         m_connManager->removeConnection(m_currentConn);
         m_currentConn = nullptr;
         m_connectedPortName.clear();

@@ -1,3 +1,8 @@
+/**
+ * @file RecordingController.h
+ * @brief 录制控制器 - 管理数据录制和回放功能
+ */
+
 #ifndef RECORDINGCONTROLLER_H
 #define RECORDINGCONTROLLER_H
 

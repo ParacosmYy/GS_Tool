@@ -1,3 +1,17 @@
+/**
+ * @file SendHistory.h
+ * @brief 发送历史管理器 - 记录和查询发送命令历史，支持去重和搜索
+ *
+ * 职责:
+ *   1. 维护最近N条发送命令的去重记录
+ *   2. 提供关键词搜索能力（大小写不敏感）
+ *   3. 为发送框下拉列表提供文本数据源
+ *
+ * 协作关系:
+ *   - SendController: 每次发送成功后调用addEntry()记录
+ *   - SendController: 通过recentTexts()获取自动补全列表
+ */
+
 #ifndef SENDHISTORY_H
 #define SENDHISTORY_H
 
@@ -6,49 +20,71 @@
 #include <QDateTime>
 #include <QList>
 
-// 发送历史记录条目
+/**
+ * @brief 发送历史记录条目
+ */
 struct SendEntry {
-    QString text;       // 命令内容
-    bool isHex;         // 是否HEX格式
-    QDateTime time;     // 发送时间
+    QString text;       ///< 命令内容
+    bool isHex;         ///< 是否HEX格式
+    QDateTime time;     ///< 发送时间
 };
 
-// 发送历史管理器 - 记录和查询发送历史
-// 职责：
-//   1. 维护最近N条发送命令的去重记录
-//   2. 提供关键词搜索能力（大小写不敏感）
-//   3. 为发送框下拉列表提供文本数据
+/**
+ * @brief 发送历史管理器 - 去重记录和搜索发送命令
+ *
+ * 自动去重：与最后一条内容相同时不添加，防止连续重复刷屏。
+ * 最大记录数默认50，可通过setMaxEntries()调整。
+ */
 class SendHistory : public QObject {
     Q_OBJECT
 public:
+    /** @brief 构造发送历史管理器
+     * @param parent 父对象
+     */
     explicit SendHistory(QObject* parent = nullptr);
 
-    // 添加一条发送记录
-    // 与最后一条内容相同时不添加（防止连续重复刷屏）
+    /**
+     * @brief 添加一条发送记录
+     * @param text 命令文本内容
+     * @param isHex 是否为HEX格式
+     *
+     * 与最后一条内容相同时不添加（防止连续重复刷屏）
+     */
     void addEntry(const QString& text, bool isHex);
 
-    // 获取最近的N条记录（纯文本列表，用于下拉框自动补全）
+    /**
+     * @brief 获取最近的N条记录（纯文本列表，用于下拉框自动补全）
+     * @param count 最大返回条数，默认50
+     * @return 文本字符串列表
+     */
     QStringList recentTexts(int count = 50) const;
 
-    // 获取所有记录
+    /** @brief 获取所有历史记录条目 */
     QList<SendEntry> entries() const;
 
-    // 搜索历史（按关键词过滤，大小写不敏感）
+    /**
+     * @brief 搜索历史（按关键词过滤，大小写不敏感）
+     * @param keyword 搜索关键词
+     * @return 匹配的历史记录列表
+     */
     QList<SendEntry> search(const QString& keyword) const;
 
-    // 清空历史
+    /** @brief 清空所有历史记录 */
     void clear();
 
-    // 设置最大记录数（默认50）
+    /**
+     * @brief 设置最大记录数（默认50）
+     * @param max 最大条目数
+     */
     void setMaxEntries(int max);
 
 signals:
-    // 历史记录发生变更时发出（添加/清空）
+    /** @brief 历史记录发生变更时发出（添加/清空） */
     void historyChanged();
 
 private:
-    QList<SendEntry> m_entries;     // 历史记录列表，按时间顺序排列
-    int m_maxEntries = 50;          // 最大记录条数
+    QList<SendEntry> m_entries;     ///< 历史记录列表，按时间顺序排列
+    int m_maxEntries = 50;          ///< 最大记录条数
 };
 
 #endif // SENDHISTORY_H

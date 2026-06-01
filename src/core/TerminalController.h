@@ -1,3 +1,8 @@
+/**
+ * @file TerminalController.h
+ * @brief 终端控制器 - 管理终端显示、搜索、导出和数据统计的交互逻辑
+ */
+
 #ifndef TERMINALCONTROLLER_H
 #define TERMINALCONTROLLER_H
 
