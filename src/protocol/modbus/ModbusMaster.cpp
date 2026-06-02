@@ -2,8 +2,8 @@
  * @file ModbusMaster.cpp
  * @brief Modbus主站（客户端）实现
  *
- * 通过IConnection发送Modbus请求帧，管理超时和响应解析。
- * TODO: 实现CRC16校验、RTU/ASCII帧封装、响应匹配逻辑。
+ * 通过IConnection发送Modbus请求帧（含CRC16），管理超时和响应解析。
+ * 支持RTU模式的CRC16校验和多种功能码。
  */
 #include "protocol/modbus/ModbusMaster.h"
 
@@ -67,7 +67,7 @@ bool ModbusMaster::writeMultipleRegisters(int slave, int addr,
     frame.startAddress = static_cast<quint16>(addr);
     frame.quantity     = static_cast<quint16>(values.size());
 
-    // 字节数 + 寄存器数据
+    // 字节计数 + 寄存器数据
     QByteArray payload;
     payload.append(static_cast<char>(values.size() * 2));
     for (quint16 val : values) {
@@ -86,7 +86,7 @@ bool ModbusMaster::sendFrame(const QByteArray& rawData) {
     if (!m_connection || m_connection->state() != ConnectionState::Connected) {
         return false;
     }
-    // TODO: 添加CRC16校验
+    // frameToBytes已包含CRC16校验
     m_lastSlave = static_cast<quint8>(rawData.isEmpty() ? 0 : rawData[0]);
     m_rxBuffer.clear();
     m_timer->start(m_timeoutMs);
@@ -97,9 +97,21 @@ bool ModbusMaster::sendFrame(const QByteArray& rawData) {
 
 void ModbusMaster::onRawDataReceived(const QByteArray& data) {
     m_rxBuffer.append(data);
-    // TODO: 实现完整的帧边界检测逻辑
-    // 简化处理：收到足够数据后尝试解析
-    if (m_rxBuffer.size() >= 5) {
+
+    // 根据功能码判断最小响应帧长度
+    // FC01-04响应: slave(1)+func(1)+byteCount(1)+CRC(2) = 5+
+    // FC05-06/15-16响应: slave(1)+func(1)+addr(2)+value(2)+CRC(2) = 8
+    // 异常响应: slave(1)+func|0x80(1)+errCode(1)+CRC(2) = 5
+    int minLen = 5;
+    if (m_rxBuffer.size() >= 2) {
+        quint8 fc = static_cast<quint8>(m_rxBuffer[1]);
+        if ((fc & 0x80) == 0 && (fc == 0x05 || fc == 0x06 ||
+                                  fc == 0x0F || fc == 0x10)) {
+            minLen = 8;
+        }
+    }
+
+    if (m_rxBuffer.size() >= minLen) {
         m_timer->stop();
         parseResponse(m_rxBuffer);
         m_rxBuffer.clear();
@@ -111,7 +123,18 @@ void ModbusMaster::onTimeout() {
 }
 
 void ModbusMaster::parseResponse(const QByteArray& data) {
-    // TODO: 校验CRC16
+    // 校验CRC16（最后2字节为CRC，小端序）
+    if (data.size() < 4) { return; }
+
+    QByteArray payload = data.left(data.size() - 2);
+    quint16 recvCrc = static_cast<quint8>(data[data.size() - 2]) |
+                      (static_cast<quint16>(static_cast<quint8>(
+                          data[data.size() - 1])) << 8);
+    if (crc16(payload) != recvCrc) {
+        // CRC校验失败，丢弃该帧
+        return;
+    }
+
     ModbusFrame frame = bytesToFrame(data);
     if (frame.exception) {
         if (!frame.data.isEmpty()) {

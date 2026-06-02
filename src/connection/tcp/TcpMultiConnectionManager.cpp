@@ -1,10 +1,10 @@
 /**
  * @file TcpMultiConnectionManager.cpp
- * @brief TCP多连接管理器实现 - 骨架
+ * @brief TCP多连接管理器实现
  */
 
 #include "connection/tcp/TcpMultiConnectionManager.h"
-#include "connection/interface/IConnection.h"
+#include <QHostAddress>
 
 /**
  * @brief 构造函数
@@ -21,12 +21,15 @@ TcpMultiConnectionManager::TcpMultiConnectionManager(QObject* parent)
 TcpMultiConnectionManager::~TcpMultiConnectionManager()
 {
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
-        if (it.value()) {
-            it.value()->close();
-            it.value()->deleteLater();
+        QTcpSocket* socket = it.value();
+        if (socket) {
+            socket->disconnectFromHost();
+            socket->deleteLater();
         }
     }
     m_connections.clear();
+    m_hosts.clear();
+    m_ports.clear();
 }
 
 /**
@@ -37,14 +40,24 @@ TcpMultiConnectionManager::~TcpMultiConnectionManager()
  */
 int TcpMultiConnectionManager::addConnection(const QString& host, int port)
 {
-    Q_UNUSED(host)
-    Q_UNUSED(port)
-    // TODO: 创建IConnection实例，配置并打开连接
+    auto* socket = new QTcpSocket(this);
     int id = m_nextId++;
-    // IConnection* conn = ConnectionFactory::create(ConnectionType::TcpClient, this);
-    // conn->configure({{"host", host}, {"port", port}});
-    // m_connections[id] = conn;
-    emit connectionAdded(id);
+
+    m_connections[id] = socket;
+    m_hosts[id] = host;
+    m_ports[id] = port;
+
+    /// 绑定socket信号，使用lambda传递id
+    connect(socket, &QTcpSocket::readyRead,
+            this, &TcpMultiConnectionManager::onReadyRead);
+    connect(socket, &QTcpSocket::disconnected,
+            this, &TcpMultiConnectionManager::onDisconnected);
+    connect(socket, &QAbstractSocket::errorOccurred,
+            this, &TcpMultiConnectionManager::onError);
+
+    /// 发起TCP连接
+    socket->connectToHost(QHostAddress(host), static_cast<quint16>(port));
+    emit connectionAdded(id, host, port);
     return id;
 }
 
@@ -54,14 +67,17 @@ int TcpMultiConnectionManager::addConnection(const QString& host, int port)
  */
 void TcpMultiConnectionManager::removeConnection(int id)
 {
-    if (m_connections.contains(id)) {
-        IConnection* conn = m_connections.take(id);
-        if (conn) {
-            conn->close();
-            conn->deleteLater();
-        }
-        emit connectionRemoved(id);
+    if (!m_connections.contains(id)) return;
+
+    QTcpSocket* socket = m_connections.take(id);
+    m_hosts.remove(id);
+    m_ports.remove(id);
+
+    if (socket) {
+        socket->disconnectFromHost();
+        socket->deleteLater();
     }
+    emit connectionRemoved(id);
 }
 
 /**
@@ -82,19 +98,96 @@ int TcpMultiConnectionManager::sendToAll(const QByteArray& data)
 {
     int count = 0;
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
-        if (it.value() && it.value()->write(data) > 0) {
-            count++;
+        QTcpSocket* socket = it.value();
+        if (socket && socket->state() == QAbstractSocket::ConnectedState) {
+            qint64 written = socket->write(data);
+            if (written > 0) {
+                socket->flush();
+                count++;
+            }
         }
     }
     return count;
 }
 
 /**
- * @brief 连接数据到达的统一处理
- * @param data 收到的数据
+ * @brief 获取连接的主机地址
+ * @param id 连接ID
+ * @return 主机地址字符串
  */
-void TcpMultiConnectionManager::onDataReceived(const QByteArray& data)
+QString TcpMultiConnectionManager::connectionHost(int id) const
 {
-    // TODO: 识别来源连接ID并发射dataReceived信号
-    Q_UNUSED(data)
+    return m_hosts.value(id, QString());
+}
+
+/**
+ * @brief 获取连接的端口号
+ * @param id 连接ID
+ * @return 端口号，-1表示无效
+ */
+int TcpMultiConnectionManager::connectionPort(int id) const
+{
+    return m_ports.value(id, -1);
+}
+
+/**
+ * @brief socket数据到达回调 - 根据sender识别连接ID
+ */
+void TcpMultiConnectionManager::onReadyRead()
+{
+    auto* socket = qobject_cast<QTcpSocket*>(sender());
+    if (!socket) return;
+
+    int id = idForSocket(socket);
+    if (id < 0) return;
+
+    QByteArray data = socket->readAll();
+    if (!data.isEmpty()) {
+        emit dataReceived(id, data);
+    }
+}
+
+/**
+ * @brief socket断开回调 - 自动移除连接
+ */
+void TcpMultiConnectionManager::onDisconnected()
+{
+    auto* socket = qobject_cast<QTcpSocket*>(sender());
+    if (!socket) return;
+
+    int id = idForSocket(socket);
+    if (id >= 0) {
+        removeConnection(id);
+    }
+}
+
+/**
+ * @brief socket错误回调
+ * @param error socket错误码
+ */
+void TcpMultiConnectionManager::onError(QAbstractSocket::SocketError error)
+{
+    Q_UNUSED(error)
+    auto* socket = qobject_cast<QTcpSocket*>(sender());
+    if (!socket) return;
+
+    int id = idForSocket(socket);
+    if (id >= 0) {
+        emit connectionError(id, socket->errorString());
+    }
+}
+
+/**
+ * @brief 查找socket对应的连接ID
+ * @param socket 目标socket
+ * @return 连接ID，-1表示未找到
+ */
+int TcpMultiConnectionManager::idForSocket(QTcpSocket* socket) const
+{
+    for (auto it = m_connections.constBegin(); it != m_connections.constEnd(); ++it) {
+        if (it.value() == socket) {
+            return it.key();
+        }
+    }
+    return -1;
 }

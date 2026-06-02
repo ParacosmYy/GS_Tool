@@ -4,18 +4,16 @@
  * @author Serial Tool Team
  * @date 2026-06-02
  *
- * 提供数据输入、算法选择和结果显示的交互面板。
+ * 提供数据输入（十六进制/ASCII/文件）、算法选择和结果显示的交互面板。
  */
 
 #ifndef CHECKSUMPANEL_H
 #define CHECKSUMPANEL_H
 
 #include <QComboBox>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QTextEdit>
-#include <QVBoxLayout>
 #include <QWidget>
 
 #include "utils/checksum/ChecksumCalculator.h"
@@ -37,7 +35,7 @@ public:
 
     /**
      * @brief 获取输入数据
-     * @return 十六进制输入对应的字节数组
+     * @return 根据当前输入模式解析后的字节数组
      */
     QByteArray inputData() const;
 
@@ -67,11 +65,18 @@ private slots:
      */
     void onCalculate();
 
+    /**
+     * @brief 复制结果到剪贴板
+     */
+    void onCopyResult();
+
 private:
     QTextEdit *m_inputEdit;             ///< 数据输入区
     QComboBox *m_algoCombo;             ///< 算法选择下拉框
+    QComboBox *m_inputModeCombo;        ///< 输入模式（十六进制/ASCII/文件）
     QLabel *m_resultLabel;              ///< 结果显示标签
     QPushButton *m_calcBtn;             ///< 计算按钮
+    QPushButton *m_copyBtn;             ///< 复制结果按钮
     ChecksumCalculator m_calculator;    ///< 计算引擎
     quint64 m_result = 0;               ///< 最近计算结果
 };

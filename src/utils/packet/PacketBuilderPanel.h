@@ -4,7 +4,7 @@
  * @author Serial Tool Team
  * @date 2026-06-02
  *
- * 提供字段编辑表格、添加/删除按钮和十六进制预览的交互面板。
+ * 提供字段编辑表格、添加/删除/构建按钮和十六进制预览的交互面板。
  */
 
 #ifndef PACKETBUILDERPANEL_H
@@ -55,16 +55,35 @@ private slots:
      */
     void onBuild();
 
+    /**
+     * @brief 加载模板文件
+     */
+    void onLoadTemplate();
+
+    /**
+     * @brief 保存模板文件
+     */
+    void onSaveTemplate();
+
 private:
     /**
      * @brief 刷新表格内容
      */
     void refreshTable();
 
+    /**
+     * @brief 将QByteArray格式化为hex dump
+     * @param data 原始数据
+     * @return 格式化的hex dump字符串
+     */
+    QString formatHexDump(const QByteArray &data) const;
+
     QTableWidget *m_fieldTable;         ///< 字段表格
     QPushButton *m_addFieldBtn;         ///< 添加字段按钮
     QPushButton *m_removeFieldBtn;      ///< 删除字段按钮
     QPushButton *m_buildBtn;            ///< 构建按钮
+    QPushButton *m_loadBtn;             ///< 加载模板按钮
+    QPushButton *m_saveBtn;             ///< 保存模板按钮
     QTextEdit *m_hexPreview;            ///< 十六进制预览区
     PacketBuilder *m_builder = nullptr; ///< 关联的构建器
 };

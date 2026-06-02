@@ -4,6 +4,7 @@
  *
  * 职责: BLE设备连接/断开、GATT服务发现、特征值读写，
  * 通过IConnection统一接口供上层使用。
+ * 当前为模拟实现，真实BLE集成需链接Qt Bluetooth模块。
  */
 #ifndef BLECONNECTION_H
 #define BLECONNECTION_H
@@ -15,7 +16,7 @@
  * @brief BLE连接实现
  *
  * 封装BLE底层通信，实现IConnection统一接口。
- * 额外提供GATT服务发现和特征值操作接口。
+ * 模拟连接状态转换和数据回环，GATT服务返回预设列表。
  */
 class BleConnection : public IConnection {
     Q_OBJECT
@@ -32,7 +33,7 @@ public:
 
     // ---- IConnection 接口实现 ----
 
-    /** @brief 返回连接类型 */
+    /** @brief 返回连接类型（当前返回Serial，待枚举扩展） */
     ConnectionType type() const override;
 
     /** @brief 返回BLE设备地址作为连接名称 */
@@ -41,7 +42,7 @@ public:
     /** @brief 返回当前连接状态 */
     ConnectionState state() const override;
 
-    /** @brief 打开BLE连接 */
+    /** @brief 打开BLE连接（模拟异步连接过程） */
     bool open() override;
 
     /** @brief 关闭BLE连接 */
@@ -56,7 +57,7 @@ public:
 
     /**
      * @brief 通过参数映射配置BLE连接
-     * @param params 支持的key: address, serviceUuid
+     * @param params 支持的key: address, deviceName
      */
     void configure(const QVariantMap& params) override;
 
@@ -77,6 +78,12 @@ public:
      */
     QStringList discoverServices();
 
+    /**
+     * @brief 获取设备名称
+     * @return 设备名称，未设置返回空串
+     */
+    QString deviceName() const;
+
 signals:
     /** @brief GATT服务发现完成 */
     void servicesDiscovered(const QStringList& services);
@@ -86,17 +93,34 @@ signals:
      * @param characteristicUuid 特征UUID
      * @param value 读取到的数据
      */
-    void characteristicRead(const QString& characteristicUuid, const QByteArray& value);
+    void characteristicRead(const QString& characteristicUuid,
+                            const QByteArray& value);
+
+private slots:
+    /** @brief 模拟连接建立完成 */
+    void onConnectTimeout();
 
 private:
+    /** @brief 初始化模拟GATT服务列表 */
+    void initMockServices();
+
     /** @brief 目标BLE设备地址 */
     QString m_deviceAddress;
+
+    /** @brief 目标BLE设备名称 */
+    QString m_deviceName;
 
     /** @brief 当前连接状态 */
     ConnectionState m_state = ConnectionState::Disconnected;
 
     /** @brief 已发现的GATT服务列表 */
     QStringList m_services;
+
+    /** @brief 模拟连接延迟定时器 */
+    QTimer* m_connectTimer;
+
+    /** @brief 写入数据累计字节计数 */
+    qint64 m_bytesWritten = 0;
 };
 
 #endif // BLECONNECTION_H

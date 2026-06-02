@@ -5,15 +5,14 @@
  * 职责:
  *   1. 提供URL、子协议、连接类型(WS/WSS)配置
  *   2. 提供连接/断开操作按钮
- *
- * 协作关系:
- *   - WebSocketConnection: WebSocket连接配置
+ *   3. 显示连接状态
  */
 
 #ifndef WSCONFIGPANEL_H
 #define WSCONFIGPANEL_H
 
 #include <QWidget>
+#include <QLabel>
 #include <QLineEdit>
 #include <QComboBox>
 #include <QPushButton>
@@ -40,6 +39,13 @@ public:
      */
     QVariantMap config() const;
 
+signals:
+    /** @brief 用户请求连接 */
+    void connectRequested(const QVariantMap& config);
+
+    /** @brief 用户请求断开 */
+    void disconnectRequested();
+
 private slots:
     /** @brief 连接按钮点击 */
     void onConnectClicked();
@@ -52,10 +58,11 @@ private:
     void setupConnections();
 
     // ---- UI控件 ----
-    QLineEdit* m_urlEdit = nullptr;                  ///< URL输入框
-    QLineEdit* m_protocolEdit = nullptr;             ///< 子协议输入框
-    QComboBox* m_typeCombo = nullptr;                ///< 连接类型(WS/WSS)
-    QPushButton* m_connectBtn = nullptr;             ///< 连接按钮
+    QLineEdit* m_urlEdit = nullptr;      ///< URL输入框
+    QLineEdit* m_protocolEdit = nullptr; ///< 子协议输入框
+    QComboBox* m_typeCombo = nullptr;    ///< 连接类型(WS/WSS)
+    QPushButton* m_connectBtn = nullptr; ///< 连接按钮
+    QLabel* m_statusLabel = nullptr;     ///< 状态标签
 };
 
 #endif // WSCONFIGPANEL_H

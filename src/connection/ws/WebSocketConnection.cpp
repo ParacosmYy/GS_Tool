@@ -1,9 +1,13 @@
 /**
  * @file WebSocketConnection.cpp
- * @brief WebSocket客户端连接实现 - 骨架
+ * @brief WebSocket客户端连接实现 — 基于RFC 6455帧协议
  */
 
 #include "connection/ws/WebSocketConnection.h"
+
+#include <QRandomGenerator>
+#include <QSslSocket>
+#include <QUrl>
 
 /**
  * @brief 构造函数
@@ -13,7 +17,7 @@ WebSocketConnection::WebSocketConnection(QObject* parent)
     : IConnection(parent)
     , m_pingTimer(new QTimer(this))
 {
-    m_pingTimer->setInterval(30000); // 30秒心跳间隔
+    m_pingTimer->setInterval(30000);
     connect(m_pingTimer, &QTimer::timeout,
             this, &WebSocketConnection::onPingTimeout);
 }
@@ -28,7 +32,6 @@ WebSocketConnection::~WebSocketConnection()
 
 /**
  * @brief 获取连接类型
- * @return TCP客户端类型(WebSocket基于HTTP/TCP)
  */
 ConnectionType WebSocketConnection::type() const
 {
@@ -37,7 +40,6 @@ ConnectionType WebSocketConnection::type() const
 
 /**
  * @brief 获取连接显示名称
- * @return WebSocket URL
  */
 QString WebSocketConnection::name() const
 {
@@ -57,7 +59,6 @@ ConnectionState WebSocketConnection::state() const
 
 /**
  * @brief 打开连接
- * @return true=连接已发起
  */
 bool WebSocketConnection::open()
 {
@@ -65,23 +66,30 @@ bool WebSocketConnection::open()
 }
 
 /**
- * @brief 关闭WebSocket连接
+ * @brief 关闭WebSocket连接 — 发送close帧后关闭TCP
  */
 void WebSocketConnection::close()
 {
     if (m_pingTimer) {
         m_pingTimer->stop();
     }
-    if (m_socket) {
-        m_socket->close();
+    if (m_socket && m_handshakeDone) {
+        // 发送close帧
+        m_socket->write(buildFrame(0x08, QByteArray()));
+        m_socket->waitForBytesWritten(500);
     }
+    if (m_socket) {
+        m_socket->disconnectFromHost();
+        m_socket->deleteLater();
+        m_socket = nullptr;
+    }
+    m_handshakeDone = false;
+    m_buffer.clear();
     updateState(ConnectionState::Disconnected);
 }
 
 /**
  * @brief 发送二进制数据
- * @param data 待发送数据
- * @return 发送字节数
  */
 qint64 WebSocketConnection::write(const QByteArray& data)
 {
@@ -90,9 +98,6 @@ qint64 WebSocketConnection::write(const QByteArray& data)
 
 /**
  * @brief 配置WebSocket参数
- * @param params 参数映射:
- *   - "url": QString (WebSocket地址)
- *   - "protocol": QString (子协议)
  */
 void WebSocketConnection::configure(const QVariantMap& params)
 {
@@ -105,94 +110,279 @@ void WebSocketConnection::configure(const QVariantMap& params)
 }
 
 /**
- * @brief 连接到指定URL
- * @param url WebSocket地址
- * @return true=连接已发起
+ * @brief 连接到指定URL — 解析URL并发起TCP+HTTP升级
  */
 bool WebSocketConnection::connectToUrl(const QString& url)
 {
-    Q_UNUSED(url)
-    // TODO: 创建QWebSocket并发起连接
+    if (m_state == ConnectionState::Connected) {
+        close();
+    }
+
+    m_url = url;
+    QUrl wsUrl(url);
+    if (!wsUrl.isValid()) {
+        emit errorOccurred(tr("无效的WebSocket URL"));
+        return false;
+    }
+
+    m_host = wsUrl.host();
+    m_port = static_cast<quint16>(wsUrl.port(wsUrl.scheme() == "wss" ? 443 : 80));
+    m_path = wsUrl.path().isEmpty() ? "/" : wsUrl.path();
+
+    // 生成随机Sec-WebSocket-Key
+    QByteArray randomBytes(16, 0);
+    for (int i = 0; i < 16; ++i) {
+        randomBytes[i] = static_cast<char>(QRandomGenerator::global()->generate());
+    }
+    m_handshakeKey = randomBytes.toBase64();
+
+    // 创建TCP socket
+    m_socket = new QTcpSocket(this);
+    m_handshakeDone = false;
+    m_buffer.clear();
+
+    connect(m_socket, &QTcpSocket::connected,
+            this, &WebSocketConnection::onTcpConnected);
+    connect(m_socket, &QTcpSocket::disconnected,
+            this, &WebSocketConnection::onTcpDisconnected);
+    connect(m_socket, &QTcpSocket::readyRead,
+            this, &WebSocketConnection::onTcpReadyRead);
+    connect(m_socket, &QTcpSocket::errorOccurred,
+            this, [this](QAbstractSocket::SocketError err) {
+        Q_UNUSED(err)
+        emit errorOccurred(m_socket->errorString());
+        updateState(ConnectionState::Error);
+    });
+
     updateState(ConnectionState::Connecting);
+    m_socket->connectToHost(m_host, m_port);
     return true;
 }
 
 /**
+ * @brief 构建WebSocket帧(RFC 6455)
+ * @param opcode 操作码(0x01=text, 0x02=binary, 0x08=close, 0x09=ping, 0x0A=pong)
+ * @param payload 载荷数据
+ * @return 完整帧字节数组
+ */
+QByteArray WebSocketConnection::buildFrame(quint8 opcode,
+                                            const QByteArray& payload) const
+{
+    QByteArray frame;
+    quint8 byte1 = 0x80 | opcode; // FIN=1 + opcode
+    frame.append(static_cast<char>(byte1));
+
+    int len = payload.size();
+    if (len <= 125) {
+        frame.append(static_cast<char>(0x80 | len)); // MASK=1 + length
+    } else if (len <= 65535) {
+        frame.append(static_cast<char>(0x80 | 126));
+        frame.append(static_cast<char>((len >> 8) & 0xFF));
+        frame.append(static_cast<char>(len & 0xFF));
+    } else {
+        frame.append(static_cast<char>(0x80 | 127));
+        quint64 l = static_cast<quint64>(len);
+        for (int i = 56; i >= 0; i -= 8) {
+            frame.append(static_cast<char>((l >> i) & 0xFF));
+        }
+    }
+
+    // 生成4字节mask key
+    QByteArray maskKey(4, 0);
+    for (int i = 0; i < 4; ++i) {
+        maskKey[i] = static_cast<char>(QRandomGenerator::global()->generate());
+    }
+    frame.append(maskKey);
+
+    // 掩码处理payload
+    QByteArray masked = payload;
+    for (int i = 0; i < masked.size(); ++i) {
+        masked[i] = masked[i] ^ maskKey[i % 4];
+    }
+    frame.append(masked);
+    return frame;
+}
+
+/**
+ * @brief 发送HTTP Upgrade握手请求
+ */
+void WebSocketConnection::sendHandshake()
+{
+    QString req = QString("GET %1 HTTP/1.1\r\n"
+                          "Host: %2\r\n"
+                          "Upgrade: websocket\r\n"
+                          "Connection: Upgrade\r\n"
+                          "Sec-WebSocket-Key: %3\r\n"
+                          "Sec-WebSocket-Version: 13\r\n")
+                      .arg(m_path, m_host, m_handshakeKey);
+    if (!m_protocol.isEmpty()) {
+        req += QString("Sec-WebSocket-Protocol: %1\r\n").arg(m_protocol);
+    }
+    req += "\r\n";
+    m_socket->write(req.toUtf8());
+    m_socket->waitForBytesWritten(3000);
+}
+
+/**
+ * @brief 检查握手响应是否完整
+ */
+bool WebSocketConnection::parseHandshakeResponse()
+{
+    if (!m_buffer.contains("\r\n\r\n")) {
+        return false;
+    }
+    int headerEnd = m_buffer.indexOf("\r\n\r\n");
+    QString header = QString::fromUtf8(m_buffer.left(headerEnd));
+
+    if (!header.contains("101")) {
+        emit errorOccurred(tr("WebSocket握手失败: %1").arg(header.left(64)));
+        updateState(ConnectionState::Error);
+        return false;
+    }
+
+    m_buffer.remove(0, headerEnd + 4);
+    m_handshakeDone = true;
+    return true;
+}
+
+/**
+ * @brief 解析缓冲区中的WebSocket帧
+ */
+void WebSocketConnection::parseFrames()
+{
+    while (m_buffer.size() >= 2) {
+        quint8 byte1 = static_cast<quint8>(m_buffer[0]);
+        quint8 byte2 = static_cast<quint8>(m_buffer[1]);
+        // int fin = (byte1 >> 7) & 1;
+        int opcode = byte1 & 0x0F;
+        bool masked = (byte2 & 0x80) != 0;
+        quint64 payloadLen = byte2 & 0x7F;
+
+        int headerSize = 2;
+        if (payloadLen == 126) {
+            if (m_buffer.size() < 4) { break; }
+            payloadLen = (static_cast<quint8>(m_buffer[2]) << 8)
+                         | static_cast<quint8>(m_buffer[3]);
+            headerSize = 4;
+        } else if (payloadLen == 127) {
+            if (m_buffer.size() < 10) { break; }
+            payloadLen = 0;
+            for (int i = 0; i < 8; ++i) {
+                payloadLen = (payloadLen << 8)
+                             | static_cast<quint8>(m_buffer[2 + i]);
+            }
+            headerSize = 10;
+        }
+
+        int maskSize = masked ? 4 : 0;
+        int totalFrameSize = headerSize + maskSize
+                             + static_cast<int>(payloadLen);
+        if (m_buffer.size() < totalFrameSize) { break; }
+
+        // 提取payload
+        QByteArray payload = m_buffer.mid(headerSize + maskSize,
+                                          static_cast<int>(payloadLen));
+
+        // 解除掩码
+        if (masked) {
+            QByteArray maskKey = m_buffer.mid(headerSize, 4);
+            for (int i = 0; i < payload.size(); ++i) {
+                payload[i] = payload[i] ^ maskKey[i % 4];
+            }
+        }
+
+        m_buffer.remove(0, totalFrameSize);
+
+        // 按opcode分发
+        switch (opcode) {
+        case 0x01: // 文本帧
+            emit textMessageReceived(QString::fromUtf8(payload));
+            emit dataReceived(payload);
+            break;
+        case 0x02: // 二进制帧
+            emit binaryMessageReceived(payload);
+            emit dataReceived(payload);
+            break;
+        case 0x08: // close帧
+            close();
+            return;
+        case 0x09: // ping → 回复pong
+            if (m_socket) {
+                m_socket->write(buildFrame(0x0A, payload));
+            }
+            break;
+        case 0x0A: // pong
+            emit pongReceived(payload);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+/**
  * @brief 发送文本消息
- * @param message 文本内容
- * @return 发送字节数
  */
 qint64 WebSocketConnection::sendTextMessage(const QString& message)
 {
-    Q_UNUSED(message)
-    // TODO: 通过m_socket发送文本消息
-    return -1;
+    if (!m_socket || !m_handshakeDone) { return -1; }
+    QByteArray frame = buildFrame(0x01, message.toUtf8());
+    return m_socket->write(frame);
 }
 
 /**
  * @brief 发送二进制消息
- * @param data 二进制数据
- * @return 发送字节数
  */
 qint64 WebSocketConnection::sendBinaryMessage(const QByteArray& data)
 {
-    Q_UNUSED(data)
-    // TODO: 通过m_socket发送二进制消息
-    return -1;
+    if (!m_socket || !m_handshakeDone) { return -1; }
+    QByteArray frame = buildFrame(0x02, data);
+    return m_socket->write(frame);
 }
 
 /**
  * @brief 发送ping帧
- * @param payload 载荷数据
- * @return true=发送成功
  */
 bool WebSocketConnection::ping(const QByteArray& payload)
 {
-    Q_UNUSED(payload)
-    // TODO: 通过m_socket发送ping帧
-    return false;
+    if (!m_socket || !m_handshakeDone) { return false; }
+    QByteArray frame = buildFrame(0x09, payload);
+    return m_socket->write(frame) == frame.size();
 }
 
 /**
- * @brief WebSocket连接成功
+ * @brief TCP连接成功 — 发送握手
  */
-void WebSocketConnection::onConnected()
+void WebSocketConnection::onTcpConnected()
 {
-    updateState(ConnectionState::Connected);
-    if (m_pingTimer) {
-        m_pingTimer->start();
-    }
+    sendHandshake();
 }
 
 /**
- * @brief WebSocket断开
+ * @brief TCP断开
  */
-void WebSocketConnection::onDisconnected()
+void WebSocketConnection::onTcpDisconnected()
 {
-    if (m_pingTimer) {
-        m_pingTimer->stop();
-    }
+    m_pingTimer->stop();
+    m_handshakeDone = false;
     updateState(ConnectionState::Disconnected);
 }
 
 /**
- * @brief 收到文本消息
- * @param message 文本内容
+ * @brief TCP数据就绪 — 先完成握手，再解析帧
  */
-void WebSocketConnection::onTextMessageReceived(const QString& message)
+void WebSocketConnection::onTcpReadyRead()
 {
-    Q_UNUSED(message)
-    // TODO: 转发为dataReceived信号和textMessageReceived信号
-}
+    if (!m_socket) { return; }
+    m_buffer.append(m_socket->readAll());
 
-/**
- * @brief 收到二进制消息
- * @param data 二进制数据
- */
-void WebSocketConnection::onBinaryMessageReceived(const QByteArray& data)
-{
-    Q_UNUSED(data)
-    // TODO: 转发为dataReceived信号和binaryMessageReceived信号
+    if (!m_handshakeDone) {
+        if (!parseHandshakeResponse()) { return; }
+        updateState(ConnectionState::Connected);
+        m_pingTimer->start();
+    }
+
+    parseFrames();
 }
 
 /**

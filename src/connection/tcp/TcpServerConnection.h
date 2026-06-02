@@ -114,8 +114,7 @@ private:
 
     // ---- 网络资源 ----
     QTcpServer* m_server = nullptr;                  ///< TCP服务器
-    QList<QTcpSocket*> m_clientSockets;              ///< 已连接的客户端列表
-    QStringList m_clients;                           ///< 客户端标识列表
+    QMap<qintptr, QTcpSocket*> m_clients;            ///< 客户端socket映射(socket描述符→socket)
     bool m_listening = false;                        ///< 是否正在监听
 };
 

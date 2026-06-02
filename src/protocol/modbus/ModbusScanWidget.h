@@ -3,7 +3,7 @@
  * @brief Modbus从站地址扫描器 — 自动扫描总线上的从站设备
  *
  * 逐个地址发送探测请求，收集响应的从站列表。
- * 提供进度条和结果列表的可视化界面。
+ * 提供进度条、地址范围输入和结果列表的可视化界面。
  */
 #ifndef MODBUS_SCAN_WIDGET_H
 #define MODBUS_SCAN_WIDGET_H
@@ -12,6 +12,7 @@
 #include <QProgressBar>
 #include <QListWidget>
 #include <QPushButton>
+#include <QSpinBox>
 #include "protocol/modbus/ModbusMaster.h"
 
 /**
@@ -68,6 +69,8 @@ private:
     void updateScanButtonState(bool scanning);
 
     ModbusMaster*  m_master       = nullptr; ///< Modbus主站实例
+    QSpinBox*      m_fromSpin     = nullptr; ///< 扫描起始地址
+    QSpinBox*      m_toSpin       = nullptr; ///< 扫描结束地址
     QProgressBar*  m_progressBar  = nullptr; ///< 扫描进度条
     QListWidget*   m_resultList   = nullptr; ///< 扫描结果列表
     QPushButton*   m_scanBtn      = nullptr; ///< 开始/停止扫描按钮

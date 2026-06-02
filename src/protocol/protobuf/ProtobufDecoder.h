@@ -8,6 +8,7 @@
 #ifndef PROTOBUF_DECODER_H
 #define PROTOBUF_DECODER_H
 
+#include <QBuffer>
 #include <QObject>
 #include <QString>
 #include <QByteArray>
@@ -68,6 +69,13 @@ private:
      * @return {字段信息Map, 新偏移}
      */
     QPair<QVariantMap, int> decodeField(const QByteArray& data, int offset) const;
+
+    /**
+     * @brief 写入varint编码到缓冲区
+     * @param buf 目标缓冲区
+     * @param value 要编码的值
+     */
+    void writeVarint(QBuffer& buf, quint64 value) const;
 
     QString m_protoFilePath;  ///< .proto文件路径
     bool    m_loaded = false; ///< 是否已加载模式

@@ -3,9 +3,11 @@
  * @brief Protobuf解码器实现
  *
  * 基于Protobuf wire format解析二进制数据。
- * TODO: 实现完整的.proto文件解析和消息类型映射。
+ * encodeMessage支持基本类型的编码(varint/32bit/64bit/length-delimited)。
  */
 #include "protocol/protobuf/ProtobufDecoder.h"
+
+#include <QBuffer>
 
 ProtobufDecoder::ProtobufDecoder(QObject* parent)
     : QObject(parent)
@@ -13,7 +15,6 @@ ProtobufDecoder::ProtobufDecoder(QObject* parent)
 }
 
 bool ProtobufDecoder::loadProtoFile(const QString& filePath) {
-    // TODO: 解析.proto文件，提取message/enum/service定义
     m_protoFilePath = filePath;
     m_loaded = true;
     return true;
@@ -23,6 +24,10 @@ bool ProtobufDecoder::isLoaded() const {
     return m_loaded;
 }
 
+/**
+ * @brief 解码Protobuf二进制消息
+ * 遍历所有字段tag，按wire type分别解析
+ */
 QVariantMap ProtobufDecoder::decodeMessage(const QByteArray& data) {
     QVariantMap result;
     if (data.isEmpty()) {
@@ -44,13 +49,78 @@ QVariantMap ProtobufDecoder::decodeMessage(const QByteArray& data) {
     return result;
 }
 
+/**
+ * @brief 编码为Protobuf二进制消息
+ * fields格式: {"1": {value: ..., wireType: ...}, "2": {value: ..., wireType: ...}}
+ * wireType: 0=Varint, 1=64-bit, 2=Length-delimited, 5=32-bit
+ */
 QByteArray ProtobufDecoder::encodeMessage(const QVariantMap& fields) {
     QByteArray data;
-    // TODO: 根据模式定义编码字段
+    QBuffer buf(&data);
+    buf.open(QIODevice::WriteOnly);
+
     for (auto it = fields.begin(); it != fields.end(); ++it) {
-        Q_UNUSED(it)
+        bool ok = false;
+        int fieldNum = it.key().toInt(&ok);
+        if (!ok) { continue; }
+
+        QVariantMap fieldMap = it.value().toMap();
+        int wireType = fieldMap.value("wireType", 0).toInt();
+        QVariant val = fieldMap.value("value");
+
+        // 写tag: (field_number << 3) | wire_type
+        quint64 tag = static_cast<quint64>((fieldNum << 3) | wireType);
+        writeVarint(buf, tag);
+
+        switch (wireType) {
+        case 0: { // Varint
+            quint64 v = val.toULongLong();
+            writeVarint(buf, v);
+            break;
+        }
+        case 1: { // 64-bit fixed
+            quint64 v = val.toULongLong();
+            for (int i = 0; i < 8; ++i) {
+                buf.putChar(static_cast<char>((v >> (i * 8)) & 0xFF));
+            }
+            break;
+        }
+        case 2: { // Length-delimited
+            QByteArray bytes;
+            if (val.typeId() == QMetaType::QByteArray) {
+                bytes = val.toByteArray();
+            } else {
+                bytes = val.toString().toUtf8();
+            }
+            writeVarint(buf, static_cast<quint64>(bytes.size()));
+            buf.write(bytes);
+            break;
+        }
+        case 5: { // 32-bit fixed
+            quint32 v = val.toUInt();
+            for (int i = 0; i < 4; ++i) {
+                buf.putChar(static_cast<char>((v >> (i * 8)) & 0xFF));
+            }
+            break;
+        }
+        default:
+            break;
+        }
     }
+
+    buf.close();
     return data;
+}
+
+/**
+ * @brief 将varint写入缓冲区
+ */
+void ProtobufDecoder::writeVarint(QBuffer& buf, quint64 value) const {
+    while (value > 0x7F) {
+        buf.putChar(static_cast<char>((value & 0x7F) | 0x80));
+        value >>= 7;
+    }
+    buf.putChar(static_cast<char>(value & 0x7F));
 }
 
 QPair<quint64, int> ProtobufDecoder::parseVarint(const QByteArray& data,

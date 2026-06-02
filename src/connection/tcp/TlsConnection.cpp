@@ -1,9 +1,11 @@
 /**
  * @file TlsConnection.cpp
- * @brief TLS/SSL安全连接实现 - 骨架
+ * @brief TLS/SSL安全连接实现
  */
 
 #include "connection/tcp/TlsConnection.h"
+#include <QSslConfiguration>
+#include <QFile>
 
 /**
  * @brief 构造函数
@@ -57,8 +59,65 @@ ConnectionState TlsConnection::state() const
  */
 bool TlsConnection::open()
 {
-    // TODO: 创建QSslSocket，加载证书，发起加密连接
+    if (m_state == ConnectionState::Connected) {
+        return true;
+    }
+
+    m_socket = new QSslSocket(this);
+
+    /// 加载本地证书和私钥
+    if (!m_certPath.isEmpty() && !m_keyPath.isEmpty()) {
+        QFile certFile(m_certPath);
+        if (certFile.open(QIODevice::ReadOnly)) {
+            QSslCertificate cert(&certFile, QSsl::Pem);
+            m_socket->setLocalCertificate(cert);
+            certFile.close();
+        }
+        QFile keyFile(m_keyPath);
+        if (keyFile.open(QIODevice::ReadOnly)) {
+            QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem);
+            m_socket->setPrivateKey(key);
+            keyFile.close();
+        }
+    }
+
+    /// 加载CA证书
+    if (!m_caPath.isEmpty()) {
+        QFile caFile(m_caPath);
+        if (caFile.open(QIODevice::ReadOnly)) {
+            QSslCertificate caCert(&caFile, QSsl::Pem);
+            QSslConfiguration sslConfig = m_socket->sslConfiguration();
+            sslConfig.addCaCertificate(caCert);
+            m_socket->setSslConfiguration(sslConfig);
+            caFile.close();
+        }
+    }
+
+    /// 设置对端验证模式
+    if (m_peerVerify) {
+        m_socket->setPeerVerifyMode(QSslSocket::VerifyPeer);
+    } else {
+        m_socket->setPeerVerifyMode(QSslSocket::QueryPeer);
+    }
+
+    /// 连接信号
+    connect(m_socket, &QSslSocket::encrypted,
+            this, &TlsConnection::onEncrypted);
+    connect(m_socket, &QSslSocket::sslErrors,
+            this, &TlsConnection::onSslErrors);
+    connect(m_socket, &QSslSocket::readyRead,
+            this, &TlsConnection::onReadyRead);
+    connect(m_socket, &QSslSocket::stateChanged,
+            this, &TlsConnection::onStateChanged);
+    connect(m_socket, &QAbstractSocket::errorOccurred,
+            this, [this](QAbstractSocket::SocketError err) {
+                Q_UNUSED(err)
+                emit errorOccurred(m_socket->errorString());
+                updateState(ConnectionState::Error);
+            });
+
     updateState(ConnectionState::Connecting);
+    m_socket->connectToHostEncrypted(m_host, m_port);
     return true;
 }
 
@@ -69,6 +128,8 @@ void TlsConnection::close()
 {
     if (m_socket) {
         m_socket->disconnectFromHost();
+        m_socket->deleteLater();
+        m_socket = nullptr;
     }
     updateState(ConnectionState::Disconnected);
 }
@@ -80,20 +141,20 @@ void TlsConnection::close()
  */
 qint64 TlsConnection::write(const QByteArray& data)
 {
-    Q_UNUSED(data)
-    // TODO: 通过QSslSocket发送加密数据
-    return -1;
+    if (!m_socket || m_state != ConnectionState::Connected) {
+        return -1;
+    }
+    qint64 written = m_socket->write(data);
+    if (written > 0) {
+        m_socket->flush();
+        emit bytesWritten(written);
+    }
+    return written;
 }
 
 /**
  * @brief 配置TLS连接参数
- * @param params 参数映射:
- *   - "host": QString
- *   - "port": int
- *   - "certPath": QString
- *   - "keyPath": QString
- *   - "caPath": QString
- *   - "peerVerify": bool
+ * @param params 参数映射
  */
 void TlsConnection::configure(const QVariantMap& params)
 {
@@ -119,8 +180,6 @@ void TlsConnection::configure(const QVariantMap& params)
 
 /**
  * @brief 设置本地证书和私钥
- * @param certPath 证书路径
- * @param keyPath 私钥路径
  */
 void TlsConnection::setCertificate(const QString& certPath, const QString& keyPath)
 {
@@ -130,7 +189,6 @@ void TlsConnection::setCertificate(const QString& certPath, const QString& keyPa
 
 /**
  * @brief 设置CA证书
- * @param caPath CA证书路径
  */
 void TlsConnection::setCaCertificate(const QString& caPath)
 {
@@ -139,7 +197,6 @@ void TlsConnection::setCaCertificate(const QString& caPath)
 
 /**
  * @brief 设置是否验证对端证书
- * @param verify true=验证
  */
 void TlsConnection::setPeerVerify(bool verify)
 {
@@ -160,9 +217,18 @@ void TlsConnection::onEncrypted()
  */
 void TlsConnection::onSslErrors(const QList<QSslError>& errors)
 {
-    Q_UNUSED(errors)
-    // TODO: 处理SSL证书验证错误
-    emit errorOccurred(tr("TLS握手错误"));
+    if (!m_peerVerify) {
+        /// 不验证对端时，忽略所有SSL错误继续连接
+        m_socket->ignoreSslErrors(errors);
+        return;
+    }
+
+    /// 验证模式下报告错误
+    QStringList errorStrs;
+    for (const QSslError& e : errors) {
+        errorStrs.append(e.errorString());
+    }
+    emit errorOccurred(tr("TLS证书验证失败: %1").arg(errorStrs.join("; ")));
 }
 
 /**
@@ -170,7 +236,23 @@ void TlsConnection::onSslErrors(const QList<QSslError>& errors)
  */
 void TlsConnection::onReadyRead()
 {
-    // TODO: 读取解密后的数据并发射dataReceived信号
+    if (!m_socket) return;
+
+    QByteArray data = m_socket->readAll();
+    if (!data.isEmpty()) {
+        emit dataReceived(data);
+    }
+}
+
+/**
+ * @brief socket连接状态变化回调
+ * @param socketState 当前socket状态
+ */
+void TlsConnection::onStateChanged(QAbstractSocket::SocketState socketState)
+{
+    if (socketState == QAbstractSocket::UnconnectedState) {
+        updateState(ConnectionState::Disconnected);
+    }
 }
 
 /**

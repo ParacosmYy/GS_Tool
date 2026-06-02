@@ -3,7 +3,7 @@
  * @brief MQTT订阅管理面板 — 管理MQTT主题订阅/取消订阅操作
  *
  * 职责: 展示当前订阅列表，提供主题输入和QoS选择，
- * 通过信号通知上层执行订阅/取消订阅操作。
+ * 支持右键上下文菜单取消订阅。
  */
 #ifndef MQTTSUBSCRIPTIONPANEL_H
 #define MQTTSUBSCRIPTIONPANEL_H
@@ -13,13 +13,15 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QPushButton>
+#include <QMenu>
+#include <QAction>
 #include <QVariantList>
 
 /**
  * @brief MQTT订阅管理面板
  *
  * 包含订阅列表树、主题输入框、QoS选择和订阅/取消按钮。
- * subscriptions()返回当前所有订阅信息。
+ * 支持右键上下文菜单取消订阅。subscriptions()返回当前所有订阅信息。
  */
 class MqttSubscriptionPanel : public QWidget {
     Q_OBJECT
@@ -58,6 +60,9 @@ private slots:
     /** @brief 取消订阅按钮点击处理 */
     void onUnsubscribeClicked();
 
+    /** @brief 右键上下文菜单 */
+    void onCustomContextMenu(const QPoint& pos);
+
 private:
     /** @brief 订阅列表树控件 */
     QTreeWidget* m_subTree;
@@ -73,6 +78,12 @@ private:
 
     /** @brief 取消订阅按钮 */
     QPushButton* m_unsubBtn;
+
+    /** @brief 右键菜单 */
+    QMenu* m_contextMenu;
+
+    /** @brief 取消订阅动作 */
+    QAction* m_unsubAction;
 };
 
 #endif // MQTTSUBSCRIPTIONPANEL_H

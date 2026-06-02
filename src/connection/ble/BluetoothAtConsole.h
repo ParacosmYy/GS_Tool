@@ -4,6 +4,7 @@
  *
  * 职责: 提供AT指令输入、发送和响应展示功能，
  * 支持通过IConnection接口发送指令到蓝牙模块。
+ * 包含HC-05/HC-06常用AT指令预设按钮面板。
  */
 #ifndef BLUETOOTHATCONSOLE_H
 #define BLUETOOTHATCONSOLE_H
@@ -12,13 +13,15 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QLabel>
+#include <QList>
 
 class IConnection;
 
 /**
  * @brief 蓝牙AT指令控制台
  *
- * 单行输入框 + 发送按钮 + 响应输出区。
+ * 顶部输出区 + 底部输入/发送栏 + 预设AT指令按钮面板。
  * 通过setConnection()绑定连接后可发送AT指令。
  */
 class BluetoothAtConsole : public QWidget {
@@ -47,6 +50,9 @@ private slots:
     /** @brief 发送按钮点击处理 */
     void onSendClicked();
 
+    /** @brief 预设指令按钮点击处理 */
+    void onPresetClicked();
+
 private:
     /** @brief AT指令输入框 */
     QLineEdit* m_cmdInput;
@@ -59,6 +65,9 @@ private:
 
     /** @brief 当前绑定的连接 */
     IConnection* m_connection = nullptr;
+
+    /** @brief 预设AT指令按钮列表 */
+    QList<QPushButton*> m_presetButtons;
 };
 
 #endif // BLUETOOTHATCONSOLE_H

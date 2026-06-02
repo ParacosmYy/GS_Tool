@@ -1,9 +1,11 @@
 /**
  * @file WsConfigPanel.cpp
- * @brief WebSocket配置面板实现 - 骨架
+ * @brief WebSocket配置面板实现
  */
 
 #include "connection/ws/WsConfigPanel.h"
+
+#include <QFormLayout>
 
 /**
  * @brief 构造函数 - 初始化UI
@@ -35,11 +37,22 @@ QVariantMap WsConfigPanel::config() const
 }
 
 /**
- * @brief 连接按钮点击
+ * @brief 连接按钮点击 — 切换连接/断开
  */
 void WsConfigPanel::onConnectClicked()
 {
-    // TODO: 创建WebSocketConnection，配置并打开
+    if (m_connectBtn->text() == tr("连接")) {
+        if (m_urlEdit->text().trimmed().isEmpty()) {
+            m_statusLabel->setText(tr("请输入服务器地址"));
+            return;
+        }
+        m_statusLabel->setText(tr("正在连接..."));
+        emit connectRequested(config());
+    } else {
+        m_statusLabel->setText(tr("已断开"));
+        m_connectBtn->setText(tr("连接"));
+        emit disconnectRequested();
+    }
 }
 
 /**
@@ -47,32 +60,36 @@ void WsConfigPanel::onConnectClicked()
  */
 void WsConfigPanel::setupUi()
 {
-    auto* layout = new QVBoxLayout(this);
+    auto* layout = new QFormLayout(this);
 
     // 连接类型
     m_typeCombo = new QComboBox(this);
-    m_typeCombo->setObjectName("typeCombo");
+    m_typeCombo->setObjectName("wsTypeCombo");
     m_typeCombo->addItem("WS");
     m_typeCombo->addItem("WSS");
+    layout->addRow(tr("协议类型:"), m_typeCombo);
 
     // URL输入
     m_urlEdit = new QLineEdit(this);
-    m_urlEdit->setObjectName("urlEdit");
+    m_urlEdit->setObjectName("wsUrlEdit");
     m_urlEdit->setPlaceholderText(tr("例如: 192.168.1.100:8080/ws"));
+    layout->addRow(tr("服务器地址:"), m_urlEdit);
 
     // 子协议
     m_protocolEdit = new QLineEdit(this);
-    m_protocolEdit->setObjectName("protocolEdit");
+    m_protocolEdit->setObjectName("wsProtocolEdit");
     m_protocolEdit->setPlaceholderText(tr("子协议(可选)"));
+    layout->addRow(tr("子协议:"), m_protocolEdit);
 
     // 连接按钮
     m_connectBtn = new QPushButton(tr("连接"), this);
-    m_connectBtn->setObjectName("connectBtn");
+    m_connectBtn->setObjectName("wsConnectBtn");
+    layout->addRow(m_connectBtn);
 
-    layout->addWidget(m_typeCombo);
-    layout->addWidget(m_urlEdit);
-    layout->addWidget(m_protocolEdit);
-    layout->addWidget(m_connectBtn);
+    // 状态标签
+    m_statusLabel = new QLabel(tr("未连接"), this);
+    m_statusLabel->setObjectName("wsStatusLabel");
+    layout->addRow(tr("状态:"), m_statusLabel);
 }
 
 /**
@@ -82,4 +99,13 @@ void WsConfigPanel::setupConnections()
 {
     connect(m_connectBtn, &QPushButton::clicked,
             this, &WsConfigPanel::onConnectClicked);
+
+    // 协议类型变更时更新placeholder
+    connect(m_typeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+        Q_UNUSED(index)
+        QString scheme = m_typeCombo->currentText().toLower();
+        m_urlEdit->setPlaceholderText(
+            tr("例如: 192.168.1.100:8080/ws (%1)").arg(scheme));
+    });
 }

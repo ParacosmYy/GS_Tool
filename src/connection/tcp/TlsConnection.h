@@ -78,6 +78,9 @@ private slots:
     /** @brief 数据到达回调 */
     void onReadyRead();
 
+    /** @brief socket连接状态变化回调 */
+    void onStateChanged(QAbstractSocket::SocketState socketState);
+
 private:
     /** @brief 更新连接状态 */
     void updateState(ConnectionState newState);

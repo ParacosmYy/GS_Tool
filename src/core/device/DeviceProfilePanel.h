@@ -4,13 +4,15 @@
  * @author Serial Tool Team
  * @date 2026-06-02
  *
- * 提供设备列表、新建/编辑/删除按钮的交互面板。
+ * 提供设备列表、新建/编辑/删除/导入/导出按钮的交互面板。
  */
 
 #ifndef DEVICEPROFILEPANEL_H
 #define DEVICEPROFILEPANEL_H
 
+#include <QFileDialog>
 #include <QHBoxLayout>
+#include <QInputDialog>
 #include <QListWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -80,6 +82,16 @@ private slots:
     void onDeleteProfile();
 
     /**
+     * @brief 导入配置文件
+     */
+    void onImportProfiles();
+
+    /**
+     * @brief 导出配置文件
+     */
+    void onExportProfiles();
+
+    /**
      * @brief 刷新设备列表
      */
     void refreshList();
@@ -89,6 +101,8 @@ private:
     QPushButton *m_newBtn;              ///< 新建按钮
     QPushButton *m_editBtn;             ///< 编辑按钮
     QPushButton *m_deleteBtn;           ///< 删除按钮
+    QPushButton *m_importBtn;           ///< 导入按钮
+    QPushButton *m_exportBtn;           ///< 导出按钮
     DeviceRegistry *m_registry = nullptr; ///< 关联的注册表
 };
 

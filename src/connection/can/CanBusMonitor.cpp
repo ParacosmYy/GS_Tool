@@ -1,59 +1,127 @@
 /**
  * @file CanBusMonitor.cpp
- * @brief CAN总线监控面板实现
+ * @brief CAN总线监控面板实现 — 表格显示、颜色编码、自动滚动
  */
 
 #include "connection/can/CanBusMonitor.h"
 #include <QHeaderView>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QTime>
+#include <QBrush>
+#include <QColor>
 
 CanBusMonitor::CanBusMonitor(QWidget* parent)
     : QWidget(parent)
     , m_frameTable(new QTableWidget(this))
+    , m_countLabel(new QLabel(tr("帧数: 0"), this))
+    , m_clearBtn(new QPushButton(tr("清空"), this))
+    , m_autoScrollCheck(new QCheckBox(tr("自动滚动"), this))
 {
     setObjectName("CanBusMonitor");
 
-    m_frameTable->setColumnCount(6);
+    /* 表格配置: Time, ID, DLC, Data, Extended, RTR, Count */
+    m_frameTable->setColumnCount(7);
     m_frameTable->setHorizontalHeaderLabels({
-        tr("序号"), tr("帧ID"), tr("DLC"), tr("数据"), tr("类型"), tr("时间")
+        tr("时间"), tr("帧ID"), tr("DLC"), tr("数据"),
+        tr("扩展帧"), tr("RTR"), tr("计数")
     });
     m_frameTable->horizontalHeader()->setStretchLastSection(true);
     m_frameTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_frameTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_frameTable->setAlternatingRowColors(true);
+
+    /* 顶部工具栏 */
+    m_autoScrollCheck->setChecked(true);
+
+    auto toolbar = new QHBoxLayout();
+    toolbar->addWidget(m_countLabel, 1);
+    toolbar->addWidget(m_autoScrollCheck);
+    toolbar->addWidget(m_clearBtn);
 
     auto layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_frameTable);
+    layout->setContentsMargins(4, 4, 4, 4);
+    layout->addLayout(toolbar);
+    layout->addWidget(m_frameTable, 1);
+
+    connect(m_clearBtn, &QPushButton::clicked, this, &CanBusMonitor::clearFrames);
 }
 
 void CanBusMonitor::addFrame(const CanFrame& frame)
 {
+    /* 超过上限时移除最旧行 */
+    if (m_frameTable->rowCount() >= kMaxRows) {
+        m_frameTable->removeRow(0);
+    }
+
     const int row = m_frameTable->rowCount();
     m_frameTable->insertRow(row);
-    m_frameTable->setItem(row, 0, new QTableWidgetItem(QString::number(++m_frameCount)));
-    m_frameTable->setItem(row, 1, new QTableWidgetItem(QStringLiteral("0x%1").arg(frame.id, 0, 16).toUpper()));
+    ++m_frameCount;
+
+    /* 时间 */
+    auto* timeItem = new QTableWidgetItem(QTime::currentTime().toString("HH:mm:ss.zzz"));
+    m_frameTable->setItem(row, 0, timeItem);
+
+    /* 帧ID */
+    QString idStr = frame.extended
+        ? QStringLiteral("0x%1").arg(frame.id, 8, 16, QLatin1Char('0')).toUpper()
+        : QStringLiteral("0x%1").arg(frame.id, 3, 16, QLatin1Char('0')).toUpper();
+    m_frameTable->setItem(row, 1, new QTableWidgetItem(idStr));
+
+    /* DLC */
     m_frameTable->setItem(row, 2, new QTableWidgetItem(QString::number(frame.dlc)));
-    m_frameTable->setItem(row, 3, new QTableWidgetItem(frame.data.toHex(' ').toUpper()));
 
-    QString type;
-    if (frame.fd) type += tr("FD ");
-    if (frame.extended) type += tr("EXT ");
-    if (frame.rtr) type += tr("RTR");
-    if (type.isEmpty()) type = tr("标准");
-    m_frameTable->setItem(row, 4, new QTableWidgetItem(type));
+    /* 数据 */
+    m_frameTable->setItem(row, 3,
+        new QTableWidgetItem(QString::fromUtf8(frame.data.toHex(' ').toUpper())));
 
-    m_frameTable->setItem(row, 5, new QTableWidgetItem(QTime::currentTime().toString("HH:mm:ss.zzz")));
-    m_frameTable->scrollToBottom();
+    /* 扩展帧标志 */
+    m_frameTable->setItem(row, 4,
+        new QTableWidgetItem(frame.extended ? tr("是") : tr("否")));
+
+    /* RTR标志 */
+    m_frameTable->setItem(row, 5,
+        new QTableWidgetItem(frame.rtr ? tr("是") : tr("否")));
+
+    /* 累计计数 */
+    m_frameTable->setItem(row, 6, new QTableWidgetItem(QString::number(m_frameCount)));
+
+    /* 颜色编码: 扩展帧浅蓝，RTR帧黄色，标准帧白色 */
+    QBrush bg = rowBrush(frame);
+    for (int col = 0; col < 7; ++col) {
+        if (m_frameTable->item(row, col)) {
+            m_frameTable->item(row, col)->setBackground(bg);
+        }
+    }
+
+    /* 自动滚动 */
+    if (m_autoScrollCheck->isChecked()) {
+        m_frameTable->scrollToBottom();
+    }
+
+    /* 更新计数标签 */
+    m_countLabel->setText(tr("帧数: %1").arg(m_frameCount));
 }
 
 void CanBusMonitor::clearFrames()
 {
     m_frameTable->setRowCount(0);
     m_frameCount = 0;
+    m_countLabel->setText(tr("帧数: 0"));
 }
 
 int CanBusMonitor::frameCount() const
 {
     return m_frameCount;
+}
+
+QBrush CanBusMonitor::rowBrush(const CanFrame& frame) const
+{
+    if (frame.rtr) {
+        return QBrush(QColor(255, 255, 180));   // 黄色背景 — RTR帧
+    }
+    if (frame.extended) {
+        return QBrush(QColor(200, 220, 255));   // 浅蓝背景 — 扩展帧
+    }
+    return QBrush(QColor(255, 255, 255));       // 白色背景 — 标准帧
 }

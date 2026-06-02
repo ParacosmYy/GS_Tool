@@ -4,6 +4,7 @@
  *
  * 职责: 启动/停止BLE设备扫描，维护已发现设备列表，
  * 通过信号通知上层新设备的发现和扫描完成事件。
+ * 当前使用模拟扫描模式（无Qt Bluetooth模块依赖）。
  */
 #ifndef BLESCANNER_H
 #define BLESCANNER_H
@@ -17,6 +18,7 @@
  *
  * 封装BLE设备发现流程，支持限时扫描。
  * 发现的设备以QVariantMap形式上报，包含name/address/rssi等字段。
+ * 模拟模式下会生成演示设备用于开发调试。
  */
 class BleScanner : public QObject {
     Q_OBJECT
@@ -43,6 +45,12 @@ public:
      */
     QVariantList discoveredDevices() const;
 
+    /**
+     * @brief 查询扫描是否正在进行
+     * @return true=正在扫描
+     */
+    bool isScanning() const;
+
 signals:
     /**
      * @brief 发现新设备时发出
@@ -57,12 +65,27 @@ private slots:
     /** @brief 扫描超时处理 */
     void onScanTimeout();
 
+    /** @brief 模拟发现单个设备（渐进式） */
+    void onSimulateDiscovery();
+
 private:
+    /** @brief 生成模拟BLE设备列表 */
+    void generateSimulatedDevices();
+
     /** @brief 扫描超时定时器 */
     QTimer* m_scanTimer;
 
+    /** @brief 模拟发现间隔定时器 */
+    QTimer* m_discoveryTimer;
+
     /** @brief 已发现的设备列表 */
     QVariantList m_devices;
+
+    /** @brief 模拟设备队列（渐进式弹出） */
+    QVariantList m_simQueue;
+
+    /** @brief 当前扫描索引 */
+    int m_simIndex = 0;
 };
 
 #endif // BLESCANNER_H

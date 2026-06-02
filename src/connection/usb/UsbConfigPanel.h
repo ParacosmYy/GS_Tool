@@ -3,6 +3,7 @@
  * @brief USB配置面板 — 配置USB连接参数
  *
  * 提供设备选择、VID/PID输入、接口编号和连接按钮。
+ * 集成UsbDeviceDetector实现设备自动扫描。
  */
 #ifndef USB_CONFIG_PANEL_H
 #define USB_CONFIG_PANEL_H
@@ -11,6 +12,9 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QPushButton>
+#include <QLabel>
+
+class UsbDeviceDetector;
 
 /**
  * @brief USB连接配置面板控件
@@ -22,12 +26,38 @@ class UsbConfigPanel : public QWidget {
 public:
     explicit UsbConfigPanel(QWidget* parent = nullptr);
 
+    /**
+     * @brief 设置设备检测器
+     * @param detector 检测器实例
+     */
+    void setDetector(UsbDeviceDetector* detector);
+
+signals:
+    /** @brief 用户请求连接 */
+    void connectRequested(quint16 vid, quint16 pid, int interface);
+
+    /** @brief 用户请求断开 */
+    void disconnectRequested();
+
+private slots:
+    /** @brief 扫描设备按钮点击 */
+    void onScanClicked();
+
+    /** @brief 设备选择变更 */
+    void onDeviceChanged(int index);
+
+    /** @brief 连接/断开按钮点击 */
+    void onConnectClicked();
+
 private:
     QComboBox*  m_deviceCombo    = nullptr; ///< 设备选择下拉框
     QSpinBox*   m_vidSpin        = nullptr; ///< VID输入 (十六进制)
     QSpinBox*   m_pidSpin        = nullptr; ///< PID输入 (十六进制)
     QSpinBox*   m_interfaceSpin  = nullptr; ///< 接口编号
     QPushButton* m_connectBtn    = nullptr; ///< 连接/断开按钮
+    QPushButton* m_scanBtn       = nullptr; ///< 扫描设备按钮
+    QLabel*     m_statusLabel    = nullptr; ///< 状态标签
+    UsbDeviceDetector* m_detector = nullptr; ///< 设备检测器
 };
 
 #endif // USB_CONFIG_PANEL_H

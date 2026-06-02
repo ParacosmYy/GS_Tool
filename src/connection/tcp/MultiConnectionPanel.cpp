@@ -1,10 +1,16 @@
 /**
  * @file MultiConnectionPanel.cpp
- * @brief 多连接管理面板实现 - 骨架
+ * @brief 多连接管理面板实现
  */
 
 #include "connection/tcp/MultiConnectionPanel.h"
 #include "connection/tcp/TcpMultiConnectionManager.h"
+#include <QInputDialog>
+#include <QDialog>
+#include <QFormLayout>
+#include <QDialogButtonBox>
+#include <QMessageBox>
+#include <QSpinBox>
 
 /**
  * @brief 构造函数 - 初始化UI
@@ -37,11 +43,47 @@ void MultiConnectionPanel::setManager(TcpMultiConnectionManager* manager)
 }
 
 /**
- * @brief 添加连接按钮点击
+ * @brief 添加连接按钮点击 - 弹出对话框输入主机和端口
  */
 void MultiConnectionPanel::onAddClicked()
 {
-    // TODO: 弹出对话框输入主机和端口，调用m_manager->addConnection()
+    if (!m_manager) return;
+
+    /// 创建输入对话框
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("添加TCP连接"));
+    dialog.setObjectName("addConnectionDialog");
+
+    auto* layout = new QFormLayout(&dialog);
+
+    auto* hostEdit = new QLineEdit("127.0.0.1", &dialog);
+    hostEdit->setObjectName("hostEdit");
+    hostEdit->setPlaceholderText(tr("输入主机地址"));
+
+    auto* portSpin = new QSpinBox(&dialog);
+    portSpin->setObjectName("portSpin");
+    portSpin->setRange(1, 65535);
+    portSpin->setValue(8080);
+
+    auto* buttons = new QDialogButtonBox(
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+
+    layout->addRow(tr("主机地址:"), hostEdit);
+    layout->addRow(tr("端口号:"), portSpin);
+    layout->addRow(buttons);
+
+    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        QString host = hostEdit->text().trimmed();
+        int port = portSpin->value();
+        if (host.isEmpty()) {
+            QMessageBox::warning(this, tr("输入错误"), tr("主机地址不能为空"));
+            return;
+        }
+        m_manager->addConnection(host, port);
+    }
 }
 
 /**
@@ -49,25 +91,46 @@ void MultiConnectionPanel::onAddClicked()
  */
 void MultiConnectionPanel::onRemoveClicked()
 {
-    // TODO: 获取当前选中项，调用m_manager->removeConnection()
-    if (!m_connectionList || !m_connectionList->currentItem()) {
+    if (!m_connectionList || !m_connectionList->currentItem() || !m_manager) {
         return;
     }
     int id = m_connectionList->currentItem()->data(Qt::UserRole).toInt();
-    if (m_manager) {
-        m_manager->removeConnection(id);
+    m_manager->removeConnection(id);
+}
+
+/**
+ * @brief 广播发送按钮点击
+ */
+void MultiConnectionPanel::onSendAllClicked()
+{
+    if (!m_manager || !m_broadcastEdit) return;
+
+    QString text = m_broadcastEdit->text();
+    if (text.isEmpty()) return;
+
+    QByteArray data = text.toUtf8();
+    int count = m_manager->sendToAll(data);
+    if (m_statusLabel) {
+        m_statusLabel->setText(tr("已发送到 %1 个连接").arg(count));
     }
 }
 
 /**
  * @brief 新连接添加回调
  * @param id 连接ID
+ * @param host 主机地址
+ * @param port 端口号
  */
-void MultiConnectionPanel::onConnectionAdded(int id)
+void MultiConnectionPanel::onConnectionAdded(int id, const QString& host, int port)
 {
     if (!m_connectionList) return;
-    auto* item = new QListWidgetItem(tr("连接 #%1").arg(id), m_connectionList);
+    auto* item = new QListWidgetItem(
+        tr("#%1 %2:%3").arg(id).arg(host).arg(port), m_connectionList);
     item->setData(Qt::UserRole, id);
+
+    if (m_statusLabel) {
+        m_statusLabel->setText(tr("连接数: %1").arg(m_connectionList->count()));
+    }
 }
 
 /**
@@ -83,6 +146,9 @@ void MultiConnectionPanel::onConnectionRemoved(int id)
             break;
         }
     }
+    if (m_statusLabel) {
+        m_statusLabel->setText(tr("连接数: %1").arg(m_connectionList->count()));
+    }
 }
 
 /**
@@ -92,21 +158,41 @@ void MultiConnectionPanel::setupUi()
 {
     auto* layout = new QVBoxLayout(this);
 
+    /// 连接列表
     m_connectionList = new QListWidget(this);
     m_connectionList->setObjectName("connectionList");
 
+    /// 按钮行：添加 / 移除
+    auto* btnLayout = new QHBoxLayout();
     m_addBtn = new QPushButton(tr("添加连接"), this);
     m_addBtn->setObjectName("addBtn");
 
     m_removeBtn = new QPushButton(tr("移除连接"), this);
     m_removeBtn->setObjectName("removeBtn");
 
-    auto* btnLayout = new QHBoxLayout();
     btnLayout->addWidget(m_addBtn);
     btnLayout->addWidget(m_removeBtn);
 
+    /// 广播消息输入和发送
+    auto* sendLayout = new QHBoxLayout();
+    m_broadcastEdit = new QLineEdit(this);
+    m_broadcastEdit->setObjectName("broadcastEdit");
+    m_broadcastEdit->setPlaceholderText(tr("输入广播消息..."));
+
+    m_sendAllBtn = new QPushButton(tr("发送全部"), this);
+    m_sendAllBtn->setObjectName("sendAllBtn");
+
+    sendLayout->addWidget(m_broadcastEdit);
+    sendLayout->addWidget(m_sendAllBtn);
+
+    /// 状态标签
+    m_statusLabel = new QLabel(tr("连接数: 0"), this);
+    m_statusLabel->setObjectName("statusLabel");
+
     layout->addWidget(m_connectionList);
     layout->addLayout(btnLayout);
+    layout->addLayout(sendLayout);
+    layout->addWidget(m_statusLabel);
 }
 
 /**
@@ -118,4 +204,6 @@ void MultiConnectionPanel::setupConnections()
             this, &MultiConnectionPanel::onAddClicked);
     connect(m_removeBtn, &QPushButton::clicked,
             this, &MultiConnectionPanel::onRemoveClicked);
+    connect(m_sendAllBtn, &QPushButton::clicked,
+            this, &MultiConnectionPanel::onSendAllClicked);
 }

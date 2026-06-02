@@ -6,6 +6,7 @@
  *   1. 提供SPI/I2C模式切换
  *   2. 配置适配器、时钟频率、SPI模式等参数
  *   3. 提供连接/断开操作按钮
+ *   4. 根据模式动态显示/隐藏相关控件
  *
  * 协作关系:
  *   - SpiConnection: SPI连接配置
@@ -19,15 +20,19 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QPushButton>
+#include <QLabel>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <QGroupBox>
+
+class IConnection;
 
 /**
  * @brief SPI/I2C配置面板UI
  *
  * 根据当前模式(SPI/I2C)动态显示不同的配置选项。
  * SPI模式: 时钟频率、SPI模式、片选引脚
- * I2C模式: 设备地址、时钟频率
+ * I2C模式: 设备地址(十六进制)、时钟频率
  */
 class SpiI2cConfigPanel : public QWidget {
     Q_OBJECT
@@ -50,9 +55,19 @@ public:
      */
     void setMode(const QString& mode);
 
+signals:
+    /** @brief 请求连接信号，携带配置参数 */
+    void connectRequested(const QVariantMap& config);
+
+    /** @brief 请求断开连接信号 */
+    void disconnectRequested();
+
 private slots:
     /** @brief 连接按钮点击 */
     void onConnectClicked();
+
+    /** @brief 模式切换(SPI/I2C)回调 */
+    void onModeChanged(int index);
 
 private:
     /** @brief 初始化UI布局 */
@@ -64,13 +79,25 @@ private:
     /** @brief 根据模式更新UI可见性 */
     void updateModeVisibility();
 
-    // ---- UI控件 ----
-    QComboBox* m_adapterCombo = nullptr;            ///< 适配器选择下拉框
-    QSpinBox* m_clockSpin = nullptr;                ///< 时钟频率设置
-    QComboBox* m_modeCombo = nullptr;               ///< SPI模式/I2C模式下拉框
-    QPushButton* m_connectBtn = nullptr;            ///< 连接/断开按钮
+    // ---- 通用控件 ----
+    QComboBox* m_busModeCombo = nullptr;             ///< 总线模式: SPI/I2C
+    QComboBox* m_adapterCombo = nullptr;             ///< 适配器选择下拉框
+    QSpinBox* m_clockSpin = nullptr;                 ///< 时钟频率设置
+    QPushButton* m_connectBtn = nullptr;             ///< 连接/断开按钮
+    QLabel* m_statusLabel = nullptr;                 ///< 状态显示标签
 
-    QString m_currentMode = "spi";                  ///< 当前模式("spi"/"i2c")
+    // ---- SPI专用控件 ----
+    QGroupBox* m_spiGroup = nullptr;                 ///< SPI参数分组
+    QComboBox* m_spiModeCombo = nullptr;             ///< SPI模式(0-3)
+    QSpinBox* m_csPinSpin = nullptr;                 ///< 片选引脚
+
+    // ---- I2C专用控件 ----
+    QGroupBox* m_i2cGroup = nullptr;                 ///< I2C参数分组
+    QSpinBox* m_deviceAddrSpin = nullptr;            ///< 设备地址(十六进制)
+
+    // ---- 状态 ----
+    QString m_currentMode = "spi";                   ///< 当前模式("spi"/"i2c")
+    bool m_connected = false;                        ///< 当前连接状态
 };
 
 #endif // SPII2CCONFIGPANEL_H

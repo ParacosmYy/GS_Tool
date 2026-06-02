@@ -2,8 +2,8 @@
  * @file MqttConfigPanel.h
  * @brief MQTT配置面板 — 提供MQTT服务器连接参数配置界面
  *
- * 职责: 收集MQTT连接参数(主机/端口/客户端ID/用户名/密码)，
- * 通过config()供上层获取。
+ * 职责: 收集MQTT连接参数(主机/端口/客户端ID/用户名/密码/KeepAlive/Clean Session)，
+ * 通过config()供上层获取。支持连接/断开切换和状态显示。
  */
 #ifndef MQTTCONFIGPANEL_H
 #define MQTTCONFIGPANEL_H
@@ -12,13 +12,15 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QPushButton>
+#include <QLabel>
+#include <QCheckBox>
 #include <QVariantMap>
 
 /**
  * @brief MQTT连接配置面板
  *
- * 提供服务器地址、端口、客户端ID、认证信息和连接按钮。
- * config()返回QVariantMap，包含host/port/clientId/username/password字段。
+ * 提供服务器地址、端口、客户端ID、认证信息、KeepAlive、Clean Session和连接按钮。
+ * config()返回QVariantMap，包含host/port/clientId/username/password/keepAlive/cleanSession字段。
  */
 class MqttConfigPanel : public QWidget {
     Q_OBJECT
@@ -32,13 +34,20 @@ public:
 
     /**
      * @brief 获取当前配置参数
-     * @return QVariantMap，包含host/port/clientId/username/password
+     * @return QVariantMap，包含host/port/clientId/username/password/keepAlive/cleanSession
      */
     QVariantMap config() const;
+
+    /**
+     * @brief 设置连接状态(更新按钮文本和状态标签)
+     * @param connected true=已连接
+     */
+    void setConnected(bool connected);
 
 signals:
     /** @brief 用户点击连接按钮 */
     void connectRequested();
+    void disconnectRequested();
 
 private:
     /** @brief 服务器地址输入框 */
@@ -56,8 +65,20 @@ private:
     /** @brief 密码输入框 */
     QLineEdit* m_passwordEdit;
 
-    /** @brief 连接按钮 */
+    /** @brief KeepAlive间隔微调框(秒) */
+    QSpinBox* m_keepAliveSpin;
+
+    /** @brief Clean Session复选框 */
+    QCheckBox* m_cleanSessionCheck;
+
+    /** @brief 连接/断开按钮 */
     QPushButton* m_connectBtn;
+
+    /** @brief 状态标签 */
+    QLabel* m_statusLabel;
+
+    /** @brief 当前是否已连接 */
+    bool m_connected = false;
 };
 
 #endif // MQTTCONFIGPANEL_H

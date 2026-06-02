@@ -3,8 +3,9 @@
  * @brief USB配置面板实现
  */
 #include "connection/usb/UsbConfigPanel.h"
+#include "connection/usb/UsbDeviceDetector.h"
+
 #include <QFormLayout>
-#include <QLabel>
 
 UsbConfigPanel::UsbConfigPanel(QWidget* parent)
     : QWidget(parent)
@@ -13,10 +14,16 @@ UsbConfigPanel::UsbConfigPanel(QWidget* parent)
 
     auto* layout = new QFormLayout(this);
 
-    // 设备选择
+    // 设备选择 + 扫描按钮
+    auto* devLayout = new QHBoxLayout();
     m_deviceCombo = new QComboBox(this);
     m_deviceCombo->setObjectName("usbDeviceCombo");
-    layout->addRow(tr("USB设备:"), m_deviceCombo);
+    m_scanBtn = new QPushButton(tr("扫描"), this);
+    m_scanBtn->setObjectName("usbScanBtn");
+    m_scanBtn->setFixedWidth(60);
+    devLayout->addWidget(m_deviceCombo);
+    devLayout->addWidget(m_scanBtn);
+    layout->addRow(tr("USB设备:"), devLayout);
 
     // VID输入
     m_vidSpin = new QSpinBox(this);
@@ -45,10 +52,79 @@ UsbConfigPanel::UsbConfigPanel(QWidget* parent)
     m_connectBtn->setObjectName("usbConnectBtn");
     layout->addRow(m_connectBtn);
 
-    // 设备选择联动VID/PID
+    // 状态标签
+    m_statusLabel = new QLabel(tr("未连接"), this);
+    m_statusLabel->setObjectName("usbStatusLabel");
+    layout->addRow(tr("状态:"), m_statusLabel);
+
+    // 信号连接
+    connect(m_scanBtn, &QPushButton::clicked,
+            this, &UsbConfigPanel::onScanClicked);
     connect(m_deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, [this](int index) {
-        Q_UNUSED(index)
-        // TODO: 从设备列表中提取VID/PID填入
-    });
+            this, &UsbConfigPanel::onDeviceChanged);
+    connect(m_connectBtn, &QPushButton::clicked,
+            this, &UsbConfigPanel::onConnectClicked);
+}
+
+void UsbConfigPanel::setDetector(UsbDeviceDetector* detector) {
+    m_detector = detector;
+    if (m_detector) {
+        onScanClicked();
+    }
+}
+
+/**
+ * @brief 扫描USB设备并填充下拉框
+ */
+void UsbConfigPanel::onScanClicked() {
+    m_deviceCombo->clear();
+
+    QVariantList devices;
+    if (m_detector) {
+        devices = m_detector->scanDevices();
+    }
+
+    for (const QVariant& var : devices) {
+        QVariantMap dev = var.toMap();
+        QString label = QString("%1 (VID_%2 PID_%3)")
+                            .arg(dev["name"].toString(),
+                                 dev["vidHex"].toString(),
+                                 dev["pidHex"].toString());
+        m_deviceCombo->addItem(label, dev);
+    }
+
+    if (devices.isEmpty()) {
+        m_statusLabel->setText(tr("未发现USB设备"));
+    } else {
+        m_statusLabel->setText(tr("发现 %1 个设备").arg(devices.size()));
+    }
+}
+
+/**
+ * @brief 设备选择变更时更新VID/PID
+ */
+void UsbConfigPanel::onDeviceChanged(int index) {
+    if (index < 0) { return; }
+    QVariantMap dev = m_deviceCombo->itemData(index).toMap();
+    if (!dev.isEmpty()) {
+        m_vidSpin->setValue(dev["vid"].toUInt());
+        m_pidSpin->setValue(dev["pid"].toUInt());
+    }
+}
+
+/**
+ * @brief 连接/断开按钮
+ */
+void UsbConfigPanel::onConnectClicked() {
+    if (m_connectBtn->text() == tr("连接")) {
+        quint16 vid = static_cast<quint16>(m_vidSpin->value());
+        quint16 pid = static_cast<quint16>(m_pidSpin->value());
+        int iface = m_interfaceSpin->value();
+        emit connectRequested(vid, pid, iface);
+        m_statusLabel->setText(tr("正在连接..."));
+    } else {
+        emit disconnectRequested();
+        m_connectBtn->setText(tr("连接"));
+        m_statusLabel->setText(tr("已断开"));
+    }
 }

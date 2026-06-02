@@ -3,11 +3,17 @@
  * @brief 数据格式转换面板 UI 实现
  * @author Serial Tool Team
  * @date 2026-06-02
+ *
+ * 支持格式选择、交换、转换和复制输出。
  */
 
 #include "utils/converter/ConverterPanel.h"
-#include <QLabel>
+
+#include <QApplication>
+#include <QClipboard>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QVBoxLayout>
 
 /**
  * @brief 构造函数，初始化转换面板布局
@@ -17,7 +23,9 @@ ConverterPanel::ConverterPanel(QWidget *parent)
     , m_inputEdit(new QTextEdit(this))
     , m_fromCombo(new QComboBox(this))
     , m_toCombo(new QComboBox(this))
-    , m_convertBtn(new QPushButton(tr("转换"), this))
+    , m_convertBtn(new QPushButton(tr("\xe2\x86\x92"), this)) // →
+    , m_swapBtn(new QPushButton(tr("\xe2\x87\x84"), this))    // ⇄
+    , m_copyBtn(new QPushButton(tr("复制结果"), this))
     , m_outputEdit(new QTextEdit(this))
 {
     setObjectName(QStringLiteral("ConverterPanel"));
@@ -40,25 +48,52 @@ ConverterPanel::ConverterPanel(QWidget *parent)
     }
 
     formatLayout->addWidget(m_fromCombo);
+
+    // 交换按钮
+    m_swapBtn->setObjectName("swapBtn");
+    m_swapBtn->setToolTip(tr("交换源/目标格式"));
+    m_swapBtn->setFixedWidth(40);
+    formatLayout->addWidget(m_swapBtn);
+
     formatLayout->addWidget(new QLabel(tr("目标格式："), this));
     formatLayout->addWidget(m_toCombo);
+
+    // 转换按钮（箭头图标）
+    m_convertBtn->setObjectName("convertBtn");
+    m_convertBtn->setFixedWidth(60);
     formatLayout->addWidget(m_convertBtn);
 
     // 默认选择：Hex → ASCII
     m_fromCombo->setCurrentIndex(0);
     m_toCombo->setCurrentIndex(1);
 
-    // 输入输出区
+    // 输入区
     m_inputEdit->setPlaceholderText(tr("输入待转换数据..."));
+
+    // 输出区（只读）
     m_outputEdit->setReadOnly(true);
     m_outputEdit->setPlaceholderText(tr("转换结果将显示在此..."));
 
+    // 复制按钮行
+    auto *outputHeader = new QHBoxLayout();
+    outputHeader->addWidget(new QLabel(tr("输出："), this));
+    outputHeader->addStretch();
+    m_copyBtn->setObjectName("copyOutputBtn");
+    m_copyBtn->setEnabled(false);
+    outputHeader->addWidget(m_copyBtn);
+
     mainLayout->addLayout(formatLayout);
     mainLayout->addWidget(m_inputEdit);
+    mainLayout->addLayout(outputHeader);
     mainLayout->addWidget(m_outputEdit);
 
+    // 连接信号
     connect(m_convertBtn, &QPushButton::clicked,
             this, &ConverterPanel::onConvert);
+    connect(m_swapBtn, &QPushButton::clicked,
+            this, &ConverterPanel::onSwap);
+    connect(m_copyBtn, &QPushButton::clicked,
+            this, &ConverterPanel::onCopy);
 }
 
 /**
@@ -85,12 +120,43 @@ void ConverterPanel::onConvert()
     QByteArray input = m_inputEdit->toPlainText().toUtf8();
     if (input.isEmpty()) {
         m_outputEdit->clear();
+        m_copyBtn->setEnabled(false);
         return;
     }
 
-    auto from = static_cast<DataConverter::Format>(m_fromCombo->currentData().toInt());
-    auto to = static_cast<DataConverter::Format>(m_toCombo->currentData().toInt());
+    auto from = static_cast<DataConverter::Format>(
+        m_fromCombo->currentData().toInt());
+    auto to = static_cast<DataConverter::Format>(
+        m_toCombo->currentData().toInt());
 
     QByteArray result = m_converter.convert(input, from, to);
     m_outputEdit->setPlainText(QString::fromUtf8(result));
+    m_copyBtn->setEnabled(true);
+}
+
+/**
+ * @brief 交换源/目标格式并重新转换
+ */
+void ConverterPanel::onSwap()
+{
+    int fromIdx = m_fromCombo->currentIndex();
+    int toIdx = m_toCombo->currentIndex();
+
+    m_fromCombo->setCurrentIndex(toIdx);
+    m_toCombo->setCurrentIndex(fromIdx);
+
+    // 如果有输出内容，用它作为新的输入
+    if (!m_outputEdit->toPlainText().isEmpty()) {
+        m_inputEdit->setPlainText(m_outputEdit->toPlainText());
+        onConvert();
+    }
+}
+
+/**
+ * @brief 复制输出到剪贴板
+ */
+void ConverterPanel::onCopy()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(m_outputEdit->toPlainText());
 }

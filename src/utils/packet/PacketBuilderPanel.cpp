@@ -7,6 +7,7 @@
 
 #include "utils/packet/PacketBuilderPanel.h"
 
+#include <QFileDialog>
 #include <QHeaderView>
 
 /**
@@ -18,18 +19,26 @@ PacketBuilderPanel::PacketBuilderPanel(QWidget *parent)
     , m_addFieldBtn(new QPushButton(tr("添加字段"), this))
     , m_removeFieldBtn(new QPushButton(tr("删除字段"), this))
     , m_buildBtn(new QPushButton(tr("构建数据包"), this))
+    , m_loadBtn(new QPushButton(tr("加载模板"), this))
+    , m_saveBtn(new QPushButton(tr("保存模板"), this))
     , m_hexPreview(new QTextEdit(this))
 {
     setObjectName(QStringLiteral("PacketBuilderPanel"));
 
     auto *mainLayout = new QVBoxLayout(this);
 
-    // 按钮行
-    auto *btnLayout = new QHBoxLayout();
-    btnLayout->addWidget(m_addFieldBtn);
-    btnLayout->addWidget(m_removeFieldBtn);
-    btnLayout->addStretch();
-    btnLayout->addWidget(m_buildBtn);
+    // 按钮行1：字段操作
+    auto *fieldBtnLayout = new QHBoxLayout();
+    fieldBtnLayout->addWidget(m_addFieldBtn);
+    fieldBtnLayout->addWidget(m_removeFieldBtn);
+    fieldBtnLayout->addStretch();
+    fieldBtnLayout->addWidget(m_buildBtn);
+
+    // 按钮行2：模板操作
+    auto *tmplBtnLayout = new QHBoxLayout();
+    tmplBtnLayout->addWidget(m_loadBtn);
+    tmplBtnLayout->addWidget(m_saveBtn);
+    tmplBtnLayout->addStretch();
 
     // 字段表格
     m_fieldTable->setColumnCount(5);
@@ -42,9 +51,11 @@ PacketBuilderPanel::PacketBuilderPanel(QWidget *parent)
     // 十六进制预览
     m_hexPreview->setReadOnly(true);
     m_hexPreview->setMaximumHeight(80);
-    m_hexPreview->setPlaceholderText(tr("构建后的数据包将以十六进制显示..."));
+    m_hexPreview->setPlaceholderText(
+        tr("构建后的数据包将以十六进制显示..."));
 
-    mainLayout->addLayout(btnLayout);
+    mainLayout->addLayout(fieldBtnLayout);
+    mainLayout->addLayout(tmplBtnLayout);
     mainLayout->addWidget(m_fieldTable);
     mainLayout->addWidget(m_hexPreview);
 
@@ -55,6 +66,10 @@ PacketBuilderPanel::PacketBuilderPanel(QWidget *parent)
             this, &PacketBuilderPanel::onRemoveField);
     connect(m_buildBtn, &QPushButton::clicked,
             this, &PacketBuilderPanel::onBuild);
+    connect(m_loadBtn, &QPushButton::clicked,
+            this, &PacketBuilderPanel::onLoadTemplate);
+    connect(m_saveBtn, &QPushButton::clicked,
+            this, &PacketBuilderPanel::onSaveTemplate);
 }
 
 /**
@@ -71,9 +86,7 @@ void PacketBuilderPanel::setBuilder(PacketBuilder *builder)
  */
 void PacketBuilderPanel::onAddField()
 {
-    if (!m_builder) {
-        return;
-    }
+    if (!m_builder) { return; }
 
     PacketField field;
     field.name = tr("字段%1").arg(m_builder->fields().size() + 1);
@@ -91,9 +104,7 @@ void PacketBuilderPanel::onAddField()
  */
 void PacketBuilderPanel::onRemoveField()
 {
-    if (!m_builder) {
-        return;
-    }
+    if (!m_builder) { return; }
 
     int row = m_fieldTable->currentRow();
     if (row >= 0) {
@@ -103,16 +114,49 @@ void PacketBuilderPanel::onRemoveField()
 }
 
 /**
- * @brief 构建数据包并更新预览
+ * @brief 构建数据包并更新预览 — hex dump格式
  */
 void PacketBuilderPanel::onBuild()
 {
-    if (!m_builder) {
-        return;
-    }
+    if (!m_builder) { return; }
 
     QByteArray packet = m_builder->buildPacket();
-    m_hexPreview->setPlainText(QString::fromUtf8(packet.toHex(' ').toUpper()));
+    m_hexPreview->setPlainText(formatHexDump(packet));
+}
+
+/**
+ * @brief 加载模板文件
+ */
+void PacketBuilderPanel::onLoadTemplate()
+{
+    if (!m_builder) { return; }
+
+    QString path = QFileDialog::getOpenFileName(
+        this, tr("加载模板"), QString(),
+        tr("JSON模板 (*.json);;所有文件 (*)"));
+    if (path.isEmpty()) { return; }
+
+    if (m_builder->loadTemplate(path)) {
+        refreshTable();
+        m_hexPreview->setPlainText(tr("模板已加载: %1").arg(path));
+    }
+}
+
+/**
+ * @brief 保存模板文件
+ */
+void PacketBuilderPanel::onSaveTemplate()
+{
+    if (!m_builder) { return; }
+
+    QString path = QFileDialog::getSaveFileName(
+        this, tr("保存模板"), QString(),
+        tr("JSON模板 (*.json);;所有文件 (*)"));
+    if (path.isEmpty()) { return; }
+
+    if (m_builder->saveTemplate(path)) {
+        m_hexPreview->setPlainText(tr("模板已保存: %1").arg(path));
+    }
 }
 
 /**
@@ -120,9 +164,7 @@ void PacketBuilderPanel::onBuild()
  */
 void PacketBuilderPanel::refreshTable()
 {
-    if (!m_builder) {
-        return;
-    }
+    if (!m_builder) { return; }
 
     auto fields = m_builder->fields();
     m_fieldTable->setRowCount(fields.size());
@@ -130,9 +172,32 @@ void PacketBuilderPanel::refreshTable()
     for (int i = 0; i < fields.size(); ++i) {
         const auto &f = fields[i];
         m_fieldTable->setItem(i, 0, new QTableWidgetItem(f.name));
-        m_fieldTable->setItem(i, 1, new QTableWidgetItem(QString::number(f.offset)));
-        m_fieldTable->setItem(i, 2, new QTableWidgetItem(QString::number(f.size)));
+        m_fieldTable->setItem(i, 1, new QTableWidgetItem(
+            QString::number(f.offset)));
+        m_fieldTable->setItem(i, 2, new QTableWidgetItem(
+            QString::number(f.size)));
         m_fieldTable->setItem(i, 3, new QTableWidgetItem(f.dataType));
-        m_fieldTable->setItem(i, 4, new QTableWidgetItem(f.value.toString()));
+        m_fieldTable->setItem(i, 4, new QTableWidgetItem(
+            f.value.toString()));
     }
+}
+
+/**
+ * @brief 格式化hex dump输出
+ */
+QString PacketBuilderPanel::formatHexDump(const QByteArray &data) const
+{
+    if (data.isEmpty()) { return tr("(空数据包)"); }
+
+    QString result;
+    for (int i = 0; i < data.size(); ++i) {
+        if (i > 0) {
+            result += (i % 16 == 0) ? "\n" : " ";
+        }
+        result += QString("%1").arg(
+            static_cast<quint8>(data[i]), 2, 16, QChar('0')).toUpper();
+    }
+
+    result += QString("\n\n%1 bytes").arg(data.size());
+    return result;
 }

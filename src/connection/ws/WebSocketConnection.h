@@ -1,9 +1,9 @@
 /**
  * @file WebSocketConnection.h
- * @brief WebSocket客户端连接 - 支持WS/WSS协议的WebSocket通信
+ * @brief WebSocket客户端连接 - 基于QTcpSocket实现WebSocket帧协议
  *
  * 职责:
- *   1. 提供WebSocket客户端连接能力
+ *   1. 提供WebSocket客户端连接能力(RFC 6455)
  *   2. 支持文本帧和二进制帧收发
  *   3. 支持心跳检测(ping/pong)
  *   4. 复用IConnection抽象接口
@@ -24,6 +24,7 @@
  * @brief WebSocket客户端连接实现
  *
  * 支持ws://和wss://协议，可收发文本和二进制消息。
+ * 基于QTcpSocket手工实现RFC 6455 WebSocket帧协议。
  * 内置心跳定时器，定期发送ping帧保持连接活跃。
  */
 class WebSocketConnection : public IConnection {
@@ -94,17 +95,14 @@ signals:
     void pongReceived(const QByteArray& payload);
 
 private slots:
-    /** @brief WebSocket连接成功回调 */
-    void onConnected();
+    /** @brief TCP连接成功回调 */
+    void onTcpConnected();
 
-    /** @brief WebSocket断开回调 */
-    void onDisconnected();
+    /** @brief TCP断开回调 */
+    void onTcpDisconnected();
 
-    /** @brief 收到文本消息回调 */
-    void onTextMessageReceived(const QString& message);
-
-    /** @brief 收到二进制消息回调 */
-    void onBinaryMessageReceived(const QByteArray& data);
+    /** @brief TCP数据就绪回调 — 解析WebSocket帧 */
+    void onTcpReadyRead();
 
     /** @brief 心跳定时器触发 */
     void onPingTimeout();
@@ -113,14 +111,37 @@ private:
     /** @brief 更新连接状态 */
     void updateState(ConnectionState newState);
 
+    /** @brief 构建WebSocket帧
+     * @param opcode 帧操作码(0x01/0x02/0x08/0x09)
+     * @param payload 载荷数据
+     * @return 帧字节数组
+     */
+    QByteArray buildFrame(quint8 opcode, const QByteArray& payload) const;
+
+    /** @brief 解析缓冲区中的WebSocket帧 */
+    void parseFrames();
+
+    /** @brief 发送HTTP Upgrade握手 */
+    void sendHandshake();
+
+    /** @brief 检查握手响应是否完整 */
+    bool parseHandshakeResponse();
+
     // ---- 配置参数 ----
-    QString m_url;                                  ///< WebSocket服务器地址
-    QString m_protocol;                             ///< 子协议名称
-    ConnectionState m_state = ConnectionState::Disconnected; ///< 当前状态
+    QString m_url;          ///< WebSocket服务器地址
+    QString m_protocol;     ///< 子协议名称
+    QString m_host;         ///< 解析后的主机名
+    quint16 m_port = 80;    ///< 解析后的端口号
+    QString m_path;         ///< 解析后的路径
+
+    ConnectionState m_state = ConnectionState::Disconnected;
 
     // ---- 网络资源 ----
-    QTcpSocket* m_socket = nullptr;                  ///< TCP底层socket (WebSockets骨架，待引入QtWebSockets模块)
-    QTimer* m_pingTimer = nullptr;                   ///< 心跳定时器
+    QTcpSocket* m_socket = nullptr;     ///< TCP底层socket
+    QTimer* m_pingTimer = nullptr;      ///< 心跳定时器
+    QByteArray m_buffer;                ///< 接收缓冲区
+    QString m_handshakeKey;             ///< 握手Sec-WebSocket-Key
+    bool m_handshakeDone = false;       ///< 握手是否完成
 };
 
 #endif // WEBSOCKETCONNECTION_H

@@ -1,9 +1,10 @@
 /**
  * @file UdpMulticastConnection.cpp
- * @brief UDP组播连接实现 - 骨架
+ * @brief UDP组播连接实现
  */
 
 #include "connection/tcp/UdpMulticastConnection.h"
+#include <QNetworkInterface>
 
 /**
  * @brief 构造函数
@@ -52,12 +53,45 @@ ConnectionState UdpMulticastConnection::state() const
 }
 
 /**
+ * @brief 初始化socket(懒创建)
+ */
+void UdpMulticastConnection::ensureSocket()
+{
+    if (m_socket) return;
+
+    m_socket = new QUdpSocket(this);
+    connect(m_socket, &QUdpSocket::readyRead,
+            this, &UdpMulticastConnection::onReadyRead);
+    connect(m_socket, &QUdpSocket::errorOccurred,
+            this, &UdpMulticastConnection::onError);
+}
+
+/**
  * @brief 打开连接 - 绑定本地端口并加入组播组
  * @return true=成功
  */
 bool UdpMulticastConnection::open()
 {
-    // TODO: 绑定本地端口，加入组播组
+    ensureSocket();
+
+    /// 绑定到本地端口(ShareAddress允许多个socket绑定同一端口)
+    if (!m_socket->bind(QHostAddress::AnyIPv4, m_localPort,
+                        QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint)) {
+        emit errorOccurred(tr("UDP绑定失败: %1").arg(m_socket->errorString()));
+        updateState(ConnectionState::Error);
+        return false;
+    }
+
+    /// 设置组播网络接口(如已配置)
+    if (m_usingCustomInterface && m_multicastInterface.isValid()) {
+        m_socket->setMulticastInterface(m_multicastInterface);
+    }
+
+    /// 加入组播组
+    if (!m_groupAddress.isNull()) {
+        joinGroup(m_groupAddress);
+    }
+
     updateState(ConnectionState::Connected);
     return true;
 }
@@ -68,7 +102,13 @@ bool UdpMulticastConnection::open()
 void UdpMulticastConnection::close()
 {
     if (m_socket) {
+        if (!m_groupAddress.isNull() &&
+            m_socket->state() != QAbstractSocket::UnconnectedState) {
+            leaveGroup(m_groupAddress);
+        }
         m_socket->close();
+        m_socket->deleteLater();
+        m_socket = nullptr;
     }
     updateState(ConnectionState::Disconnected);
 }
@@ -80,9 +120,16 @@ void UdpMulticastConnection::close()
  */
 qint64 UdpMulticastConnection::write(const QByteArray& data)
 {
-    Q_UNUSED(data)
-    // TODO: 向组播组地址发送数据报
-    return -1;
+    if (!m_socket || m_state != ConnectionState::Connected) {
+        return -1;
+    }
+
+    quint16 destPort = m_remotePort > 0 ? m_remotePort : m_localPort;
+    qint64 written = m_socket->writeDatagram(data, m_groupAddress, destPort);
+    if (written > 0) {
+        emit bytesWritten(written);
+    }
+    return written;
 }
 
 /**
@@ -111,8 +158,17 @@ void UdpMulticastConnection::configure(const QVariantMap& params)
  */
 void UdpMulticastConnection::joinGroup(const QHostAddress& groupAddress)
 {
-    Q_UNUSED(groupAddress)
-    // TODO: 调用m_socket->joinMulticastGroup()
+    if (!m_socket) return;
+
+    if (m_usingCustomInterface && m_multicastInterface.isValid()) {
+        if (!m_socket->joinMulticastGroup(groupAddress, m_multicastInterface)) {
+            emit errorOccurred(tr("加入组播组失败: %1").arg(m_socket->errorString()));
+        }
+    } else {
+        if (!m_socket->joinMulticastGroup(groupAddress)) {
+            emit errorOccurred(tr("加入组播组失败: %1").arg(m_socket->errorString()));
+        }
+    }
 }
 
 /**
@@ -121,8 +177,13 @@ void UdpMulticastConnection::joinGroup(const QHostAddress& groupAddress)
  */
 void UdpMulticastConnection::leaveGroup(const QHostAddress& groupAddress)
 {
-    Q_UNUSED(groupAddress)
-    // TODO: 调用m_socket->leaveMulticastGroup()
+    if (!m_socket) return;
+
+    if (m_usingCustomInterface && m_multicastInterface.isValid()) {
+        m_socket->leaveMulticastGroup(groupAddress, m_multicastInterface);
+    } else {
+        m_socket->leaveMulticastGroup(groupAddress);
+    }
 }
 
 /**
@@ -131,8 +192,14 @@ void UdpMulticastConnection::leaveGroup(const QHostAddress& groupAddress)
  */
 void UdpMulticastConnection::setMulticastInterface(const QString& interfaceName)
 {
-    Q_UNUSED(interfaceName)
-    // TODO: 查找对应网络接口并设置为组播接口
+    for (const QNetworkInterface& iface : QNetworkInterface::allInterfaces()) {
+        if (iface.humanReadableName() == interfaceName) {
+            m_multicastInterface = iface;
+            m_usingCustomInterface = true;
+            return;
+        }
+    }
+    m_usingCustomInterface = false;
 }
 
 /**
@@ -140,7 +207,21 @@ void UdpMulticastConnection::setMulticastInterface(const QString& interfaceName)
  */
 void UdpMulticastConnection::onReadyRead()
 {
-    // TODO: 读取数据报并发射dataReceived信号
+    if (!m_socket) return;
+
+    while (m_socket->hasPendingDatagrams()) {
+        QByteArray buffer;
+        buffer.resize(static_cast<int>(m_socket->pendingDatagramSize()));
+        QHostAddress sender;
+        quint16 senderPort = 0;
+
+        qint64 size = m_socket->readDatagram(buffer.data(), buffer.size(),
+                                              &sender, &senderPort);
+        if (size > 0) {
+            buffer.resize(static_cast<int>(size));
+            emit dataReceived(buffer);
+        }
+    }
 }
 
 /**
@@ -149,7 +230,9 @@ void UdpMulticastConnection::onReadyRead()
 void UdpMulticastConnection::onError(QAbstractSocket::SocketError error)
 {
     Q_UNUSED(error)
-    // TODO: 翻译错误并发射errorOccurred信号
+    if (m_socket) {
+        emit errorOccurred(m_socket->errorString());
+    }
 }
 
 /**

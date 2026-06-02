@@ -3,8 +3,10 @@
  * @brief Modbus从站地址扫描器实现
  *
  * 逐地址发送探测请求，收集在线从站列表并更新UI。
+ * 提供地址范围输入、进度条和结果列表。
  */
 #include "protocol/modbus/ModbusScanWidget.h"
+#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
 
@@ -14,6 +16,27 @@ ModbusScanWidget::ModbusScanWidget(QWidget* parent)
     setObjectName("ModbusScanWidget");
 
     auto* layout = new QVBoxLayout(this);
+
+    // 地址范围行
+    auto* rangeLayout = new QHBoxLayout();
+    rangeLayout->addWidget(new QLabel(tr("起始地址:"), this));
+
+    m_fromSpin = new QSpinBox(this);
+    m_fromSpin->setObjectName("fromSpin");
+    m_fromSpin->setRange(1, 247);
+    m_fromSpin->setValue(1);
+    rangeLayout->addWidget(m_fromSpin);
+
+    rangeLayout->addWidget(new QLabel(tr("结束地址:"), this));
+
+    m_toSpin = new QSpinBox(this);
+    m_toSpin->setObjectName("toSpin");
+    m_toSpin->setRange(1, 247);
+    m_toSpin->setValue(247);
+    rangeLayout->addWidget(m_toSpin);
+
+    rangeLayout->addStretch();
+    layout->addLayout(rangeLayout);
 
     // 进度条
     m_progressBar = new QProgressBar(this);
@@ -36,7 +59,7 @@ ModbusScanWidget::ModbusScanWidget(QWidget* parent)
         if (m_scanning) {
             stopScan();
         } else {
-            startScan(m_scanFrom, m_scanTo);
+            startScan(m_fromSpin->value(), m_toSpin->value());
         }
     });
 }
@@ -68,12 +91,21 @@ void ModbusScanWidget::startScan(int from, int to) {
     m_progressBar->setValue(from);
     updateScanButtonState(true);
 
+    // 禁用范围输入
+    m_fromSpin->setEnabled(false);
+    m_toSpin->setEnabled(false);
+
     scanNext();
 }
 
 void ModbusScanWidget::stopScan() {
     m_scanning = false;
     updateScanButtonState(false);
+
+    // 恢复范围输入
+    m_fromSpin->setEnabled(true);
+    m_toSpin->setEnabled(true);
+
     emit scanCompleted();
 }
 

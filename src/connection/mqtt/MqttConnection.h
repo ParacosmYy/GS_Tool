@@ -1,6 +1,6 @@
 /**
  * @file MqttConnection.h
- * @brief MQTT客户端连接实现 — 适配器模式，封装MQTT协议到IConnection接口
+ * @brief MQTT客户端连接实现 — 基于QTcpSocket实现MQTT v3.1.1线协议
  *
  * 职责: MQTT连接管理、消息发布/订阅、KeepAlive心跳，
  * 通过IConnection统一接口供上层使用。
@@ -9,13 +9,14 @@
 #define MQTTCONNECTION_H
 
 #include "connection/interface/IConnection.h"
+#include <QTcpSocket>
 #include <QTimer>
 
 /**
  * @brief MQTT客户端连接实现
  *
- * 封装MQTT协议通信，实现IConnection统一接口。
- * 额外提供主题订阅/取消订阅和消息发布接口。
+ * 封装MQTT v3.1.1协议通信，基于QTcpSocket实现原始线协议。
+ * 支持CONNECT/PUBLISH/SUBSCRIBE/UNSUBSCRIBE/PINGREQ等基本报文类型。
  */
 class MqttConnection : public IConnection {
     Q_OBJECT
@@ -56,7 +57,7 @@ public:
 
     /**
      * @brief 通过参数映射配置MQTT连接
-     * @param params 支持的key: host, port, clientId, username, password
+     * @param params 支持的key: host, port, clientId, username, password, keepAlive, cleanSession
      */
     void configure(const QVariantMap& params) override;
 
@@ -109,18 +110,87 @@ signals:
     /** @brief MQTT连接已断开 */
     void disconnected();
 
+private slots:
+    /** @brief TCP socket数据到达处理 */
+    void onSocketReadyRead();
+
+    /** @brief TCP连接建立后发送MQTT CONNECT */
+    void onSocketConnected();
+
+    /** @brief TCP连接断开处理 */
+    void onSocketDisconnected();
+
+    /** @brief 发送PINGREQ保活 */
+    void onKeepAlive();
+
 private:
+    /**
+     * @brief 构建MQTT固定头
+     * @param packetType 报文类型(1=CONNECT, 3=PUBLISH, 8=SUBSCRIBE, ...)
+     * @param payload 变长头+负载
+     * @return 完整MQTT报文
+     */
+    QByteArray buildMqttPacket(quint8 packetType, const QByteArray& payload);
+
+    /** @brief 编码剩余长度字段 */
+    QByteArray encodeRemainingLength(int length);
+
+    /** @brief 解析收到的MQTT报文并分发 */
+    void parseIncomingPacket();
+
+    /** @brief 发送MQTT CONNECT报文 */
+    void sendConnect();
+
+    /** @brief 处理CONNACK报文 */
+    void handleConnack(const QByteArray& data);
+
+    /** @brief 处理PUBLISH报文(服务器推送) */
+    void handlePublish(const QByteArray& data, quint8 flags);
+
+    /** @brief 处理SUBACK报文 */
+    void handleSuback(const QByteArray& data);
+
+    /** @brief 生成自动客户端ID */
+    QString generateClientId();
+
     /** @brief MQTT服务器地址 */
     QString m_host;
 
     /** @brief MQTT服务器端口，默认1883 */
     int m_port = 1883;
 
+    /** @brief 客户端ID */
+    QString m_clientId;
+
+    /** @brief 认证用户名 */
+    QString m_username;
+
+    /** @brief 认证密码 */
+    QString m_password;
+
+    /** @brief KeepAlive间隔(秒)，默认60 */
+    int m_keepAliveInterval = 60;
+
+    /** @brief Clean Session标志 */
+    bool m_cleanSession = true;
+
+    /** @brief 报文标识符计数器(用于SUB/UNSUB) */
+    quint16 m_packetId = 0;
+
+    /** @brief TCP socket */
+    QTcpSocket* m_socket;
+
     /** @brief KeepAlive心跳定时器 */
     QTimer* m_keepAlive;
 
     /** @brief 当前连接状态 */
     ConnectionState m_state = ConnectionState::Disconnected;
+
+    /** @brief 接收缓冲区 */
+    QByteArray m_rxBuffer;
+
+    /** @brief 期望的剩余长度(解析中间状态) */
+    int m_expectedLength = -1;
 };
 
 #endif // MQTTCONNECTION_H

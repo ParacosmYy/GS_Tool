@@ -3,7 +3,7 @@
  * @brief Modbus从站（模拟器）— 模拟从站设备响应主站请求
  *
  * 维护寄存器和线圈的内存映射，接收请求帧并返回响应。
- * 用于测试Modbus主站功能，无需真实从站设备。
+ * 支持FC01-06, FC15-16功能码，用于测试Modbus主站功能。
  */
 #ifndef MODBUS_SLAVE_H
 #define MODBUS_SLAVE_H
@@ -58,7 +58,7 @@ public:
 
     /**
      * @brief 处理收到的Modbus请求并返回响应
-     * @param requestData 原始请求帧数据
+     * @param requestData 原始请求帧数据（含CRC）
      * @return 响应帧数据（含CRC），异常时返回异常响应
      */
     QByteArray processRequest(const QByteArray& requestData);
@@ -70,8 +70,17 @@ private:
     /** @brief 构造读线圈响应 */
     QByteArray buildReadCoilsResponse(const ModbusFrame& req);
 
+    /** @brief 构造写单个线圈响应 (FC05) */
+    QByteArray buildWriteSingleCoilResponse(const ModbusFrame& req);
+
     /** @brief 构造写单个寄存器响应 */
     QByteArray buildWriteSingleRegisterResponse(const ModbusFrame& req);
+
+    /** @brief 构造写多个线圈响应 (FC15) */
+    QByteArray buildWriteMultipleCoilsResponse(const ModbusFrame& req);
+
+    /** @brief 构造写多个寄存器响应 (FC16) */
+    QByteArray buildWriteMultipleRegistersResponse(const ModbusFrame& req);
 
     /** @brief 构造异常响应 */
     QByteArray buildExceptionResponse(const ModbusFrame& req, ModbusError err);

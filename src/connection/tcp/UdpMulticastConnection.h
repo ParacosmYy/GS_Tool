@@ -78,10 +78,15 @@ private:
     /** @brief 更新连接状态 */
     void updateState(ConnectionState newState);
 
+    /** @brief 初始化socket(懒创建) */
+    void ensureSocket();
+
     // ---- 配置参数 ----
     QHostAddress m_groupAddress;                     ///< 组播组地址
     quint16 m_localPort = 0;                         ///< 本地绑定端口
     quint16 m_remotePort = 0;                        ///< 远程端口
+    QNetworkInterface m_multicastInterface;           ///< 组播网络接口
+    bool m_usingCustomInterface = false;              ///< 是否使用自定义接口
     ConnectionState m_state = ConnectionState::Disconnected; ///< 当前状态
 
     // ---- 网络资源 ----

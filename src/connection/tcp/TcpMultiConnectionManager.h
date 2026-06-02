@@ -9,7 +9,7 @@
  *
  * 协作关系:
  *   - MultiConnectionPanel: 提供UI管理界面
- *   - IConnection: 每个连接都是IConnection实例
+ *   - QTcpSocket: 底层TCP客户端socket
  */
 
 #ifndef TCPMULTICONNECTIONMANAGER_H
@@ -17,13 +17,13 @@
 
 #include <QObject>
 #include <QMap>
-
-class IConnection;
+#include <QTcpSocket>
 
 /**
  * @brief TCP多连接管理器 - 管理多个独立的TCP连接实例
  *
  * 每个连接通过唯一ID标识，支持添加、移除和批量发送。
+ * 内部直接管理QTcpSocket，无需依赖IConnection。
  */
 class TcpMultiConnectionManager : public QObject {
     Q_OBJECT
@@ -64,11 +64,27 @@ public:
      */
     int sendToAll(const QByteArray& data);
 
+    /**
+     * @brief 获取连接的主机地址
+     * @param id 连接ID
+     * @return 主机地址字符串，空字符串表示无效ID
+     */
+    QString connectionHost(int id) const;
+
+    /**
+     * @brief 获取连接的端口号
+     * @param id 连接ID
+     * @return 端口号，-1表示无效ID
+     */
+    int connectionPort(int id) const;
+
 signals:
     /** @brief 新连接添加时发出
      * @param id 新连接的唯一ID
+     * @param host 目标主机
+     * @param port 目标端口
      */
-    void connectionAdded(int id);
+    void connectionAdded(int id, const QString& host, int port);
 
     /** @brief 连接移除时发出
      * @param id 被移除连接的ID
@@ -81,12 +97,30 @@ signals:
      */
     void dataReceived(int id, const QByteArray& data);
 
-private:
-    /** @brief 连接数据到达的统一处理槽 */
-    void onDataReceived(const QByteArray& data);
+    /** @brief 连接错误时发出
+     * @param id 出错的连接ID
+     * @param errorMsg 错误描述
+     */
+    void connectionError(int id, const QString& errorMsg);
 
-    QMap<int, IConnection*> m_connections;  ///< 连接ID到连接实例的映射
-    int m_nextId = 0;                       ///< 下一个分配的连接ID
+private slots:
+    /** @brief socket数据到达回调 */
+    void onReadyRead();
+
+    /** @brief socket断开回调 */
+    void onDisconnected();
+
+    /** @brief socket错误回调 */
+    void onError(QAbstractSocket::SocketError error);
+
+private:
+    /** @brief 查找socket对应的连接ID */
+    int idForSocket(QTcpSocket* socket) const;
+
+    QMap<int, QTcpSocket*> m_connections;  ///< 连接ID到socket的映射
+    QMap<int, QString> m_hosts;            ///< 连接ID到主机地址映射
+    QMap<int, int> m_ports;                ///< 连接ID到端口号映射
+    int m_nextId = 1;                      ///< 下一个分配的连接ID
 };
 
 #endif // TCPMULTICONNECTIONMANAGER_H

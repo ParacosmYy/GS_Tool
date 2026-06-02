@@ -1,16 +1,18 @@
 /**
  * @file I2cConnection.h
- * @brief I2C总线连接 - 通过I2C适配器进行设备通信
+ * @brief I2C总线连接 - 通过I2C适配器(串口桥接)进行设备通信
  *
  * 职责:
  *   1. 提供I2C总线通信能力(设备地址/寄存器读写)
  *   2. 支持总线扫描和设备发现
- *   3. 复用IConnection抽象接口
+ *   3. 通过串口桥接协议(类Bus Pirate)与I2C适配器通信
+ *   4. 复用IConnection抽象接口
  *
  * 协作关系:
  *   - ConnectionFactory: 通过工厂创建实例
  *   - SpiI2cConfigPanel: I2C参数配置UI
  *   - RegisterEditor: 寄存器读写编辑器
+ *   - IConnection(串口): 底层传输通道
  */
 
 #ifndef I2CCONNECTION_H
@@ -19,10 +21,10 @@
 #include "connection/interface/IConnection.h"
 
 /**
- * @brief I2C总线连接实现
+ * @brief I2C总线连接实现 - 通过串口桥接协议
  *
- * 通过USB-I2C适配器(如FT232H/CH347)进行I2C总线通信，
- * 支持设备扫描、寄存器读写等操作。
+ * 使用串口作为传输通道，封装I2C-over-Serial协议。
+ * 协议帧格式: [CMD(1)][LEN(2)][DATA(N)]
  */
 class I2cConnection : public IConnection {
     Q_OBJECT
@@ -71,6 +73,12 @@ public:
      */
     bool writeRegister(int deviceAddr, int regAddr, const QByteArray& data);
 
+    /**
+     * @brief 设置底层串口传输通道
+     * @param serial 串口IConnection实例(不获取所有权)
+     */
+    void setTransport(IConnection* serial);
+
 signals:
     /** @brief 总线扫描发现设备时发出
      * @param address 设备7位地址
@@ -83,14 +91,38 @@ signals:
      */
     void registerRead(int addr, const QByteArray& data);
 
+private slots:
+    /** @brief 底层串口数据到达回调 */
+    void onTransportData(const QByteArray& data);
+
 private:
     /** @brief 更新连接状态 */
     void updateState(ConnectionState newState);
 
+    /** @brief 发送协议命令帧 */
+    qint64 sendCommand(quint8 cmd, const QByteArray& payload);
+
+    /** @brief 构建I2C读命令帧 */
+    QByteArray buildReadFrame(int deviceAddr, int regAddr, int length);
+
+    /** @brief 构建I2C写命令帧 */
+    QByteArray buildWriteFrame(int deviceAddr, int regAddr, const QByteArray& data);
+
+    // ---- 协议命令定义 ----
+    static constexpr quint8 CMD_I2C_WRITE    = 0x20;  ///< I2C写命令
+    static constexpr quint8 CMD_I2C_READ     = 0x21;  ///< I2C读命令
+    static constexpr quint8 CMD_I2C_SCAN     = 0x22;  ///< I2C扫描命令
+    static constexpr quint8 CMD_I2C_CONFIG   = 0x30;  ///< I2C配置命令
+
     // ---- 配置参数 ----
     int m_deviceAddress = 0x00;                     ///< 当前目标设备7位地址
+    int m_clockSpeed = 100000;                       ///< I2C时钟频率(Hz)
     QString m_adapterDevice;                        ///< 适配器设备路径
     ConnectionState m_state = ConnectionState::Disconnected; ///< 当前状态
+
+    // ---- 传输通道 ----
+    IConnection* m_serial = nullptr;                ///< 底层串口连接(不拥有)
+    QByteArray m_responseBuffer;                    ///< 响应数据缓冲区
 };
 
 #endif // I2CCONNECTION_H

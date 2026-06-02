@@ -1,10 +1,13 @@
 /**
  * @file RegisterEditor.cpp
- * @brief 寄存器编辑器实现 - 骨架
+ * @brief 寄存器编辑器实现
  */
 
 #include "connection/spi_i2c/RegisterEditor.h"
 #include "connection/interface/IConnection.h"
+#include "connection/spi_i2c/I2cConnection.h"
+#include "connection/spi_i2c/SpiConnection.h"
+#include <QHBoxLayout>
 
 /**
  * @brief 构造函数 - 初始化UI
@@ -28,29 +31,99 @@ void RegisterEditor::setConnection(IConnection* connection)
 }
 
 /**
+ * @brief 设置默认读取长度
+ * @param length 读取字节数
+ */
+void RegisterEditor::setReadLength(int length)
+{
+    m_readLength = qMax(1, length);
+    if (m_lengthSpin) {
+        m_lengthSpin->setValue(m_readLength);
+    }
+}
+
+/**
  * @brief 读取指定地址的寄存器
  * @param address 寄存器地址
+ *
+ * 根据连接类型调用I2C或SPI的读方法。
+ * 日志格式: "R ADDR: 0x42 → DATA: 0x1A 0x2B"
  */
 void RegisterEditor::readAddress(int address)
 {
-    Q_UNUSED(address)
-    // TODO: 通过m_connection执行寄存器读取
-    appendLog(QString("R [0x%1] -> ...").arg(address, 2, 16, QChar('0')), false);
+    if (!m_connection) {
+        appendLog(tr("R [0x%1] → 错误: 未连接").arg(address, 2, 16, QChar('0')), false);
+        return;
+    }
+
+    int len = m_lengthSpin ? m_lengthSpin->value() : m_readLength;
+    QByteArray data;
+
+    /// 根据连接类型分派读操作
+    auto* i2c = qobject_cast<I2cConnection*>(m_connection);
+    if (i2c) {
+        data = i2c->readRegister(i2c->name().contains("@") ? 0x00 : 0x00,
+                                  address, len);
+    } else {
+        /// SPI或其他类型: 使用通用write/read方式
+        QByteArray cmd;
+        cmd.append(static_cast<char>(address & 0xFF));
+        m_connection->write(cmd);
+    }
+
+    /// 记录日志
+    QString addrStr = QString("0x%1").arg(address, 2, 16, QChar('0')).toUpper();
+    if (data.isEmpty()) {
+        appendLog(QString("R ADDR: %1 → (无数据)").arg(addrStr), false);
+    } else {
+        appendLog(QString("R ADDR: %1 → DATA: %2")
+            .arg(addrStr)
+            .arg(formatHex(data)), false);
+    }
+
+    emit registerReadComplete(address, data);
 }
 
 /**
  * @brief 向指定地址写入数据
  * @param address 寄存器地址
  * @param data 待写入数据
+ *
+ * 日志格式: "W ADDR: 0x42 ← DATA: 0x1A 0x2B"
  */
 void RegisterEditor::writeAddress(int address, const QByteArray& data)
 {
-    Q_UNUSED(address)
-    Q_UNUSED(data)
-    // TODO: 通过m_connection执行寄存器写入
-    appendLog(QString("W [0x%1] <- %2")
-        .arg(address, 2, 16, QChar('0'))
-        .arg(QString(data.toHex(' ')).toUpper()), true);
+    if (!m_connection) {
+        appendLog(tr("W [0x%1] ← 错误: 未连接").arg(address, 2, 16, QChar('0')), true);
+        return;
+    }
+
+    bool success = false;
+
+    /// 根据连接类型分派写操作
+    auto* i2c = qobject_cast<I2cConnection*>(m_connection);
+    if (i2c) {
+        success = i2c->writeRegister(0x00, address, data);
+    } else {
+        QByteArray cmd;
+        cmd.append(static_cast<char>(address & 0xFF));
+        cmd.append(data);
+        qint64 written = m_connection->write(cmd);
+        success = (written > 0);
+    }
+
+    QString addrStr = QString("0x%1").arg(address, 2, 16, QChar('0')).toUpper();
+    if (success) {
+        appendLog(QString("W ADDR: %1 ← DATA: %2 [OK]")
+            .arg(addrStr)
+            .arg(formatHex(data)), true);
+    } else {
+        appendLog(QString("W ADDR: %1 ← DATA: %2 [FAIL]")
+            .arg(addrStr)
+            .arg(formatHex(data)), true);
+    }
+
+    emit registerWriteComplete(address, success);
 }
 
 /**
@@ -58,9 +131,8 @@ void RegisterEditor::writeAddress(int address, const QByteArray& data)
  */
 void RegisterEditor::onReadClicked()
 {
-    if (!m_addrSpin || !m_dataEdit) return;
-    int addr = m_addrSpin->value();
-    readAddress(addr);
+    if (!m_addrSpin) return;
+    readAddress(m_addrSpin->value());
 }
 
 /**
@@ -75,25 +147,53 @@ void RegisterEditor::onWriteClicked()
 }
 
 /**
+ * @brief 清空日志按钮点击
+ */
+void RegisterEditor::onClearLogClicked()
+{
+    if (m_log) {
+        m_log->clear();
+    }
+}
+
+/**
  * @brief 初始化UI布局
  */
 void RegisterEditor::setupUi()
 {
     auto* layout = new QVBoxLayout(this);
 
-    // 地址输入
+    /// 地址和长度输入行
+    auto* addrLayout = new QHBoxLayout();
+
+    auto* addrLabel = new QLabel(tr("地址:"), this);
+    addrLabel->setObjectName("addrLabel");
+
     m_addrSpin = new QSpinBox(this);
     m_addrSpin->setObjectName("addrSpin");
     m_addrSpin->setRange(0x00, 0xFF);
     m_addrSpin->setDisplayIntegerBase(16);
     m_addrSpin->setPrefix("0x");
 
-    // 数据输入
+    auto* lenLabel = new QLabel(tr("长度:"), this);
+    lenLabel->setObjectName("lenLabel");
+
+    m_lengthSpin = new QSpinBox(this);
+    m_lengthSpin->setObjectName("lengthSpin");
+    m_lengthSpin->setRange(1, 256);
+    m_lengthSpin->setValue(m_readLength);
+
+    addrLayout->addWidget(addrLabel);
+    addrLayout->addWidget(m_addrSpin);
+    addrLayout->addWidget(lenLabel);
+    addrLayout->addWidget(m_lengthSpin);
+
+    /// 数据输入
     m_dataEdit = new QLineEdit(this);
     m_dataEdit->setObjectName("dataEdit");
     m_dataEdit->setPlaceholderText(tr("十六进制数据 (如: AA BB CC)"));
 
-    // 按钮行
+    /// 按钮行
     auto* btnLayout = new QHBoxLayout();
     m_readBtn = new QPushButton(tr("读取"), this);
     m_readBtn->setObjectName("readBtn");
@@ -101,16 +201,20 @@ void RegisterEditor::setupUi()
     m_writeBtn = new QPushButton(tr("写入"), this);
     m_writeBtn->setObjectName("writeBtn");
 
+    m_clearLogBtn = new QPushButton(tr("清空日志"), this);
+    m_clearLogBtn->setObjectName("clearLogBtn");
+
     btnLayout->addWidget(m_readBtn);
     btnLayout->addWidget(m_writeBtn);
+    btnLayout->addWidget(m_clearLogBtn);
 
-    // 日志
+    /// 日志
     m_log = new QTextEdit(this);
     m_log->setObjectName("regLog");
     m_log->setReadOnly(true);
     m_log->setMaximumHeight(150);
 
-    layout->addWidget(m_addrSpin);
+    layout->addLayout(addrLayout);
     layout->addWidget(m_dataEdit);
     layout->addLayout(btnLayout);
     layout->addWidget(m_log);
@@ -125,6 +229,8 @@ void RegisterEditor::setupConnections()
             this, &RegisterEditor::onReadClicked);
     connect(m_writeBtn, &QPushButton::clicked,
             this, &RegisterEditor::onWriteClicked);
+    connect(m_clearLogBtn, &QPushButton::clicked,
+            this, &RegisterEditor::onClearLogClicked);
 }
 
 /**
@@ -137,4 +243,19 @@ void RegisterEditor::appendLog(const QString& msg, bool isTx)
     if (!m_log) return;
     QString color = isTx ? "#4FC3F7" : "#81C784";
     m_log->append(QString("<span style='color:%1'>%2</span>").arg(color, msg));
+}
+
+/**
+ * @brief 格式化字节数组为十六进制字符串
+ * @param data 字节数组
+ * @return "0x1A 0x2B" 格式字符串
+ */
+QString RegisterEditor::formatHex(const QByteArray& data)
+{
+    QStringList hexParts;
+    for (char byte : data) {
+        hexParts.append(QString("0x%1").arg(
+            static_cast<quint8>(byte), 2, 16, QChar('0')).toUpper());
+    }
+    return hexParts.join(" ");
 }

@@ -1,9 +1,10 @@
 /**
  * @file TcpServerConnection.cpp
- * @brief TCP服务器模式连接实现 - 多客户端TCP服务端骨架
+ * @brief TCP服务器模式连接实现 - 多客户端TCP服务端
  */
 
 #include "connection/tcp/TcpServerConnection.h"
+#include <QMap>
 
 /**
  * @brief 构造函数 - 初始化TCP服务器
@@ -103,9 +104,24 @@ void TcpServerConnection::configure(const QVariantMap& params)
  */
 bool TcpServerConnection::listen(const QHostAddress& address, int port)
 {
-    Q_UNUSED(address)
-    Q_UNUSED(port)
-    // TODO: 实现QTcpServer监听逻辑
+    if (m_listening) {
+        return true;  ///< 已在监听，直接返回成功
+    }
+
+    m_server = new QTcpServer(this);
+    connect(m_server, &QTcpServer::newConnection,
+            this, &TcpServerConnection::onNewConnection);
+
+    if (!m_server->listen(address, static_cast<quint16>(port))) {
+        emit errorOccurred(tr("监听失败: %1").arg(m_server->errorString()));
+        m_server->deleteLater();
+        m_server = nullptr;
+        updateState(ConnectionState::Error);
+        return false;
+    }
+
+    m_listenAddress = address;
+    m_listenPort = static_cast<quint16>(port);
     m_listening = true;
     updateState(ConnectionState::Connected);
     return true;
@@ -116,12 +132,26 @@ bool TcpServerConnection::listen(const QHostAddress& address, int port)
  */
 void TcpServerConnection::stopListening()
 {
-    // TODO: 断开所有客户端，关闭服务器
-    for (auto* socket : m_clientSockets) {
-        socket->disconnectFromHost();
+    /// 断开所有客户端
+    for (auto it = m_clients.begin(); it != m_clients.end(); ++it) {
+        QTcpSocket* socket = it.value();
+        if (socket) {
+            socket->disconnectFromHost();
+            if (socket->state() != QAbstractSocket::UnconnectedState) {
+                socket->waitForDisconnected(1000);
+            }
+            socket->deleteLater();
+        }
     }
-    m_clientSockets.clear();
     m_clients.clear();
+
+    /// 关闭服务器
+    if (m_server) {
+        m_server->close();
+        m_server->deleteLater();
+        m_server = nullptr;
+    }
+
     m_listening = false;
     updateState(ConnectionState::Disconnected);
 }
@@ -132,7 +162,14 @@ void TcpServerConnection::stopListening()
  */
 QStringList TcpServerConnection::connectedClients() const
 {
-    return m_clients;
+    QStringList result;
+    for (auto it = m_clients.constBegin(); it != m_clients.constEnd(); ++it) {
+        QTcpSocket* socket = it.value();
+        if (socket && socket->state() == QAbstractSocket::ConnectedState) {
+            result.append(clientInfo(socket));
+        }
+    }
+    return result;
 }
 
 /**
@@ -142,13 +179,16 @@ QStringList TcpServerConnection::connectedClients() const
  */
 int TcpServerConnection::broadcastToClients(const QByteArray& data)
 {
-    Q_UNUSED(data)
-    // TODO: 遍历所有客户端socket发送数据
     int count = 0;
-    for (auto* socket : m_clientSockets) {
-        if (socket->state() == QAbstractSocket::ConnectedState) {
-            socket->write(data);
-            count++;
+    for (auto it = m_clients.begin(); it != m_clients.end(); ++it) {
+        QTcpSocket* socket = it.value();
+        if (socket && socket->state() == QAbstractSocket::ConnectedState) {
+            qint64 written = socket->write(data);
+            if (written > 0) {
+                socket->flush();
+                emit bytesWritten(written);
+                count++;
+            }
         }
     }
     return count;
@@ -159,7 +199,32 @@ int TcpServerConnection::broadcastToClients(const QByteArray& data)
  */
 void TcpServerConnection::onNewConnection()
 {
-    // TODO: 接受新连接，加入客户端列表
+    if (!m_server) return;
+
+    while (m_server->hasPendingConnections()) {
+        QTcpSocket* client = m_server->nextPendingConnection();
+        if (!client) continue;
+
+        qintptr sd = client->socketDescriptor();
+        m_clients[sd] = client;
+
+        connect(client, &QTcpSocket::disconnected,
+                this, &TcpServerConnection::onClientDisconnected);
+        connect(client, &QTcpSocket::readyRead,
+                this, &TcpServerConnection::onClientReadyRead);
+        connect(client, &QAbstractSocket::errorOccurred,
+                this, [this](QAbstractSocket::SocketError err) {
+                    Q_UNUSED(err)
+                    auto* socket = qobject_cast<QTcpSocket*>(sender());
+                    if (socket) {
+                        emit errorOccurred(tr("客户端错误: %1")
+                            .arg(socket->errorString()));
+                    }
+                });
+
+        QString info = clientInfo(client);
+        emit clientConnected(info);
+    }
 }
 
 /**
@@ -167,7 +232,15 @@ void TcpServerConnection::onNewConnection()
  */
 void TcpServerConnection::onClientDisconnected()
 {
-    // TODO: 从客户端列表移除
+    auto* socket = qobject_cast<QTcpSocket*>(sender());
+    if (!socket) return;
+
+    QString info = clientInfo(socket);
+    qintptr sd = socket->socketDescriptor();
+
+    m_clients.remove(sd);
+    emit clientDisconnected(info);
+    socket->deleteLater();
 }
 
 /**
@@ -175,7 +248,16 @@ void TcpServerConnection::onClientDisconnected()
  */
 void TcpServerConnection::onClientReadyRead()
 {
-    // TODO: 读取客户端数据并发射信号
+    auto* socket = qobject_cast<QTcpSocket*>(sender());
+    if (!socket) return;
+
+    QByteArray data = socket->readAll();
+    if (data.isEmpty()) return;
+
+    QString info = clientInfo(socket);
+    emit clientData(info, data);
+    /// 同时发射IConnection标准信号，便于上层统一接收
+    emit dataReceived(data);
 }
 
 /**
