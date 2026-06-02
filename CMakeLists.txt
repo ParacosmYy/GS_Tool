@@ -89,6 +89,8 @@ set(SOURCES
     src/chart/scale/YAxisManager.cpp
     src/chart/overlay/CursorOverlay.cpp
     src/chart/zoom/ZoomController.cpp
+    src/chart/fft/FftEngine.cpp
+    src/chart/fft/FftWidget.cpp
     src/ota/manager/OtaManager.cpp
     src/ota/widget/OtaWidget.cpp
     src/ota/widget/OtaWidgetSlots.cpp
@@ -169,6 +171,8 @@ set(HEADERS
     src/chart/scale/YAxisManager.h
     src/chart/overlay/CursorOverlay.h
     src/chart/zoom/ZoomController.h
+    src/chart/fft/FftEngine.h
+    src/chart/fft/FftWidget.h
     src/ota/manager/OtaManager.h
     src/ota/widget/OtaWidget.h
     src/ota/history/OtaHistoryModel.h
