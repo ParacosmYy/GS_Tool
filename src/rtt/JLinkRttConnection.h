@@ -76,8 +76,9 @@ public:
     int channel() const;
 
 private:
-    int m_channel = 0;                          ///< RTT 通道号
+    int m_channel = 0;                                      ///< RTT 通道号
     ConnectionState m_state = ConnectionState::Disconnected; ///< 连接状态
+    QVariantMap m_config;                                   ///< 当前配置参数
 };
 
 #endif // JLINKRTTCONNECTION_H

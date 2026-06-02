@@ -20,8 +20,9 @@
 /**
  * @brief RTT 配置面板
  *
- * 包含设备选择、调试接口（JTAG/SWD）、连接速度、通道号等配置项。
+ * 包含设备选择、调试接口（JTAG/SWD/cJTAG）、连接速度、通道号等配置项。
  * 修改配置后发出 configChanged() 信号通知外部。
+ * 连接/断开按钮分别发出 connectRequested/disconnectRequested 信号。
  */
 class RttConfigPanel : public QWidget {
     Q_OBJECT
@@ -47,8 +48,11 @@ private:
     /** @brief 初始化 UI 布局和控件 */
     void setupUI();
 
+    /** @brief 表单值变化时的统一处理槽 */
+    void onFormValueChanged();
+
     QComboBox* m_deviceCombo;     ///< 设备选择下拉框
-    QComboBox* m_interfaceCombo;  ///< 调试接口选择（JTAG/SWD）
+    QComboBox* m_interfaceCombo;  ///< 调试接口选择（JTAG/SWD/cJTAG）
     QSpinBox* m_speedSpin;        ///< 连接速度 (kHz)
     QSpinBox* m_channelSpin;      ///< RTT 通道号
 };

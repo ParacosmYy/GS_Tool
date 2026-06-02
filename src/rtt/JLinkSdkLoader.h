@@ -33,18 +33,32 @@ public:
 
     /**
      * @brief 加载 J-Link SDK 动态库
+     *
+     * 使用 QLibrary 加载指定路径的 DLL，并尝试解析一个基础符号
+     * 以验证库的有效性。加载成功后发出 sdkLoaded 信号。
+     *
      * @param path DLL 文件路径，为空则使用系统搜索路径
      * @return true 加载成功，false 加载失败
      */
     bool load(const QString& path = QString());
 
-    /** @brief 卸载 J-Link SDK */
+    /**
+     * @brief 卸载 J-Link SDK
+     *
+     * 释放动态库句柄，重置加载状态。
+     */
     void unload();
 
-    /** @brief 查询 SDK 是否已加载 */
+    /**
+     * @brief 查询 SDK 是否已加载
+     * @return true 已加载，false 未加载
+     */
     bool isLoaded() const;
 
-    /** @brief 获取 SDK 版本字符串 */
+    /**
+     * @brief 获取 SDK 版本字符串
+     * @return 版本号，未加载时返回空字符串
+     */
     QString sdkVersion() const;
 
 signals:

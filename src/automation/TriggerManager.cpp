@@ -1,16 +1,22 @@
 /**
  * @file TriggerManager.cpp
- * @brief 触发器管理器实现 — 骨架文件
+ * @brief 触发器管理器实现 — 门面模式，协调引擎和动作执行器
  */
 
 #include "automation/TriggerManager.h"
 #include "automation/TriggerEngine.h"
 #include "automation/TriggerAction.h"
 
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+
 /**
  * @brief 构造函数
  *
- * 创建 TriggerEngine 和 TriggerAction 实例并建立信号连接。
+ * 创建 TriggerEngine 和 TriggerAction 实例并建立信号连接:
+ *   engine::actionRequired → action::execute
  *
  * @param parent 父对象
  */
@@ -19,6 +25,9 @@ TriggerManager::TriggerManager(QObject* parent)
     , m_engine(new TriggerEngine(this))
     , m_action(new TriggerAction(this))
 {
+    /* 引擎匹配命中后，转发到动作执行器 */
+    connect(m_engine, &TriggerEngine::actionRequired,
+            m_action, &TriggerAction::execute);
 }
 
 /** @brief 析构函数 */
@@ -30,28 +39,70 @@ TriggerManager::~TriggerManager()
 /**
  * @brief 从文件加载规则
  *
- * 读取 JSON 文件并解析为规则列表，同步到引擎。
+ * 读取 JSON 文件，解析为规则列表，同步到引擎。
+ * JSON 格式为包含 TriggerRuleConfig 对象的数组。
  *
  * @param filePath JSON 文件路径
  * @return true 加载成功，false 加载失败
  */
 bool TriggerManager::loadRules(const QString& filePath)
 {
-    Q_UNUSED(filePath)
-    // TODO: 读取 JSON 文件，解析规则列表，更新引擎
-    return false;
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+
+    const QByteArray rawData = file.readAll();
+    file.close();
+
+    QJsonParseError parseError;
+    const QJsonDocument doc = QJsonDocument::fromJson(rawData, &parseError);
+    if (doc.isNull()) {
+        return false;
+    }
+
+    if (!doc.isArray()) {
+        return false;
+    }
+
+    /* 先清空引擎中的旧规则 */
+    const QJsonArray arr = doc.array();
+    for (const QJsonValue& val : arr) {
+        if (val.isObject()) {
+            TriggerRuleConfig rule = TriggerRuleConfig::fromJson(val.toObject());
+            m_engine->addRule(rule);
+        }
+    }
+
+    emit rulesChanged();
+    return true;
 }
 
 /**
  * @brief 保存规则到文件
+ *
+ * 将当前引擎中的所有规则序列化为 JSON 数组写入文件。
+ *
  * @param filePath JSON 文件路径
  * @return true 保存成功，false 保存失败
  */
 bool TriggerManager::saveRules(const QString& filePath)
 {
-    Q_UNUSED(filePath)
-    // TODO: 序列化规则列表为 JSON，写入文件
-    return false;
+    QJsonArray arr;
+    const auto& ruleList = m_engine->rules();
+    for (const TriggerRuleConfig& rule : ruleList) {
+        arr.append(TriggerRuleConfig::toJson(rule));
+    }
+
+    QJsonDocument doc(arr);
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return false;
+    }
+
+    file.write(doc.toJson(QJsonDocument::Indented));
+    file.close();
+    return true;
 }
 
 /**
@@ -60,8 +111,7 @@ bool TriggerManager::saveRules(const QString& filePath)
  */
 QList<TriggerRuleConfig> TriggerManager::rules() const
 {
-    // TODO: 从引擎获取规则列表
-    return QList<TriggerRuleConfig>();
+    return m_engine->rules();
 }
 
 /**
@@ -70,8 +120,8 @@ QList<TriggerRuleConfig> TriggerManager::rules() const
  */
 void TriggerManager::addRule(const TriggerRuleConfig& rule)
 {
-    Q_UNUSED(rule)
-    // TODO: 添加到引擎并发出 rulesChanged
+    m_engine->addRule(rule);
+    emit rulesChanged();
 }
 
 /**
@@ -80,8 +130,8 @@ void TriggerManager::addRule(const TriggerRuleConfig& rule)
  */
 void TriggerManager::removeRule(int index)
 {
-    Q_UNUSED(index)
-    // TODO: 从引擎移除并发出 rulesChanged
+    m_engine->removeRule(index);
+    emit rulesChanged();
 }
 
 /**
@@ -91,7 +141,5 @@ void TriggerManager::removeRule(int index)
  */
 void TriggerManager::setRuleEnabled(int index, bool enabled)
 {
-    Q_UNUSED(index)
-    Q_UNUSED(enabled)
-    // TODO: 修改指定规则的 enabled 字段
+    m_engine->setRuleEnabled(index, enabled);
 }

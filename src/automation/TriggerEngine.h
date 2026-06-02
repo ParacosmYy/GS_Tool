@@ -68,6 +68,25 @@ public:
      */
     void setRulesEnabled(bool enabled);
 
+    /**
+     * @brief 设置指定规则的启用/禁用状态
+     * @param index 规则索引
+     * @param enabled true 启用，false 禁用
+     */
+    void setRuleEnabled(int index, bool enabled);
+
+    /**
+     * @brief 获取所有规则列表
+     * @return 规则配置列表的常引用
+     */
+    const QList<TriggerRuleConfig>& rules() const;
+
+    /**
+     * @brief 获取累计成功匹配次数
+     * @return 匹配次数
+     */
+    int matchCount() const;
+
 signals:
     /**
      * @brief 触发器命中信号
@@ -86,6 +105,7 @@ signals:
 private:
     QList<TriggerRuleConfig> m_rules;   ///< 规则列表
     bool m_enabled = true;              ///< 全局启用标志
+    int m_matchCount = 0;               ///< 累计匹配计数
 };
 
 #endif // TRIGGERENGINE_H

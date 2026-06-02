@@ -22,7 +22,7 @@
  * @brief RTT 通道管理器
  *
  * 管理 RTT 通道的注册/注销和数据路由。
- * 维护通道号到通道名称的映射表。
+ * 维护通道号到通道名称的映射表，支持多通道并行数据分发。
  */
 class RttChannelManager : public QObject {
     Q_OBJECT
@@ -52,6 +52,10 @@ public:
 
     /**
      * @brief 路由数据到指定通道
+     *
+     * 查找通道名称后同时发出 terminalData 和 channelData 信号。
+     * 未知通道的数据仍会被路由（名称为空字符串）。
+     *
      * @param channelId 目标通道号
      * @param data 数据内容
      */

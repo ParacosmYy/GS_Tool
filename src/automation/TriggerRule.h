@@ -82,9 +82,16 @@ struct TriggerRuleConfig {
      */
     static TriggerRuleConfig fromJson(const QJsonObject& json)
     {
-        Q_UNUSED(json)
-        // TODO: 解析 JSON 字段填充结构体
-        return createDefault();
+        TriggerRuleConfig config;
+        config.name = json["name"].toString(QStringLiteral("未命名规则"));
+        config.matchMode = static_cast<MatchMode>(json["matchMode"].toInt(0));
+        config.pattern = json["pattern"].toString();
+        config.valueMin = json["valueMin"].toDouble(0.0);
+        config.valueMax = json["valueMax"].toDouble(0.0);
+        config.actionType = static_cast<ActionType>(json["actionType"].toInt(0));
+        config.actionData = QByteArray::fromBase64(json["actionData"].toString().toUtf8());
+        config.enabled = json["enabled"].toBool(true);
+        return config;
     }
 
     /**
@@ -94,9 +101,16 @@ struct TriggerRuleConfig {
      */
     static QJsonObject toJson(const TriggerRuleConfig& rule)
     {
-        Q_UNUSED(rule)
-        // TODO: 将结构体字段序列化为 JSON
-        return QJsonObject();
+        QJsonObject obj;
+        obj["name"] = rule.name;
+        obj["matchMode"] = static_cast<int>(rule.matchMode);
+        obj["pattern"] = rule.pattern;
+        obj["valueMin"] = rule.valueMin;
+        obj["valueMax"] = rule.valueMax;
+        obj["actionType"] = static_cast<int>(rule.actionType);
+        obj["actionData"] = QString::fromUtf8(rule.actionData.toBase64());
+        obj["enabled"] = rule.enabled;
+        return obj;
     }
 };
 
