@@ -174,6 +174,85 @@ set(SOURCES
     src/plugin/PluginManager.cpp
     src/plugin/PluginApi.cpp
     src/plugin/PluginConfigPanel.cpp
+
+    # ── F12: Bluetooth/BLE 调试 ──
+    src/connection/ble/BleScanner.cpp
+    src/connection/ble/BleConnection.cpp
+    src/connection/ble/BleGattModel.cpp
+    src/connection/ble/BleGattBrowser.cpp
+    src/connection/ble/BleConfigPanel.cpp
+    src/connection/ble/BluetoothAtConsole.cpp
+
+    # ── F13: CAN/CAN-FD 总线 ──
+    src/connection/can/CanConnection.cpp
+    src/connection/can/CanFrameParser.cpp
+    src/connection/can/CanBusMonitor.cpp
+    src/connection/can/CanConfigPanel.cpp
+
+    # ── F14: MQTT 客户端 ──
+    src/connection/mqtt/MqttConnection.cpp
+    src/connection/mqtt/MqttTopicModel.cpp
+    src/connection/mqtt/MqttSubscriptionPanel.cpp
+    src/connection/mqtt/MqttConfigPanel.cpp
+
+    # ── F15: TCP/UDP 增强 ──
+    src/connection/tcp/TcpServerConnection.cpp
+    src/connection/tcp/TcpMultiConnectionManager.cpp
+    src/connection/tcp/UdpMulticastConnection.cpp
+    src/connection/tcp/TlsConnection.cpp
+    src/connection/tcp/MultiConnectionPanel.cpp
+
+    # ── F16: SPI/I2C 桥接 ──
+    src/connection/spi_i2c/SpiConnection.cpp
+    src/connection/spi_i2c/I2cConnection.cpp
+    src/connection/spi_i2c/SpiI2cConfigPanel.cpp
+    src/connection/spi_i2c/RegisterEditor.cpp
+
+    # ── F17: WebSocket 客户端 ──
+    src/connection/ws/WebSocketConnection.cpp
+    src/connection/ws/WsConfigPanel.cpp
+
+    # ── F18: Modbus 主站/从站 ──
+    src/protocol/modbus/ModbusMaster.cpp
+    src/protocol/modbus/ModbusSlave.cpp
+    src/protocol/modbus/ModbusScanWidget.cpp
+    src/protocol/modbus/ModbusConfigPanel.cpp
+
+    # ── F19: Protobuf/FlatBuffers 解码 ──
+    src/protocol/protobuf/ProtobufDecoder.cpp
+    src/protocol/protobuf/FlatBuffersDecoder.cpp
+    src/protocol/protobuf/SchemaViewer.cpp
+
+    # ── F20: USB 调试 ──
+    src/connection/usb/UsbConnection.cpp
+    src/connection/usb/UsbDeviceDetector.cpp
+    src/connection/usb/UsbDescriptorViewer.cpp
+    src/connection/usb/UsbConfigPanel.cpp
+
+    # ── F21: 正则终端过滤器 ──
+    src/terminal/filter/TerminalFilter.cpp
+    src/terminal/filter/TerminalFilterBar.cpp
+    src/terminal/filter/TerminalHighlighter.cpp
+
+    # ── F22: 校验和计算器 ──
+    src/utils/checksum/ChecksumCalculator.cpp
+    src/utils/checksum/ChecksumPanel.cpp
+
+    # ── F23: ASCII/表格转换器 ──
+    src/utils/converter/DataConverter.cpp
+    src/utils/converter/ConverterPanel.cpp
+
+    # ── F24: 时间戳分析器 ──
+    src/utils/timestamp/TimestampAnalyzer.cpp
+    src/utils/timestamp/TimestampPanel.cpp
+
+    # ── F25: 数据包构建器 ──
+    src/utils/packet/PacketBuilder.cpp
+    src/utils/packet/PacketBuilderPanel.cpp
+
+    # ── F26: 设备注册表 ──
+    src/core/device/DeviceRegistry.cpp
+    src/core/device/DeviceProfilePanel.cpp
 )
 
 set(HEADERS
@@ -320,6 +399,88 @@ set(HEADERS
     src/plugin/PluginManager.h
     src/plugin/PluginApi.h
     src/plugin/PluginConfigPanel.h
+
+    # ── F12: Bluetooth/BLE 调试 ──
+    src/connection/ble/BleScanner.h
+    src/connection/ble/BleConnection.h
+    src/connection/ble/BleGattModel.h
+    src/connection/ble/BleGattBrowser.h
+    src/connection/ble/BleConfigPanel.h
+    src/connection/ble/BluetoothAtConsole.h
+
+    # ── F13: CAN/CAN-FD 总线 ──
+    src/connection/can/CanConnection.h
+    src/connection/can/CanFrameParser.h
+    src/connection/can/CanBusMonitor.h
+    src/connection/can/CanConfigPanel.h
+
+    # ── F14: MQTT 客户端 ──
+    src/connection/mqtt/MqttConnection.h
+    src/connection/mqtt/MqttTopicModel.h
+    src/connection/mqtt/MqttSubscriptionPanel.h
+    src/connection/mqtt/MqttConfigPanel.h
+
+    # ── F15: TCP/UDP 增强 ──
+    src/connection/tcp/TcpServerConnection.h
+    src/connection/tcp/TcpMultiConnectionManager.h
+    src/connection/tcp/UdpMulticastConnection.h
+    src/connection/tcp/TlsConnection.h
+    src/connection/tcp/MultiConnectionPanel.h
+
+    # ── F16: SPI/I2C 桥接 ──
+    src/connection/spi_i2c/SpiConnection.h
+    src/connection/spi_i2c/I2cConnection.h
+    src/connection/spi_i2c/SpiI2cConfigPanel.h
+    src/connection/spi_i2c/RegisterEditor.h
+
+    # ── F17: WebSocket 客户端 ──
+    src/connection/ws/WebSocketConnection.h
+    src/connection/ws/WsConfigPanel.h
+
+    # ── F18: Modbus 主站/从站 ──
+    src/protocol/modbus/ModbusTypes.h
+    src/protocol/modbus/ModbusMaster.h
+    src/protocol/modbus/ModbusSlave.h
+    src/protocol/modbus/ModbusScanWidget.h
+    src/protocol/modbus/ModbusConfigPanel.h
+
+    # ── F19: Protobuf/FlatBuffers 解码 ──
+    src/protocol/protobuf/ProtobufDecoder.h
+    src/protocol/protobuf/FlatBuffersDecoder.h
+    src/protocol/protobuf/SchemaViewer.h
+
+    # ── F20: USB 调试 ──
+    src/connection/usb/UsbConnection.h
+    src/connection/usb/UsbDeviceDetector.h
+    src/connection/usb/UsbDescriptorViewer.h
+    src/connection/usb/UsbConfigPanel.h
+
+    # ── F21: 正则终端过滤器 ──
+    src/terminal/filter/TerminalFilter.h
+    src/terminal/filter/TerminalFilterBar.h
+    src/terminal/filter/TerminalHighlighter.h
+
+    # ── F22: 校验和计算器 ──
+    src/utils/checksum/ChecksumCalculator.h
+    src/utils/checksum/ChecksumPanel.h
+
+    # ── F23: ASCII/表格转换器 ──
+    src/utils/converter/DataConverter.h
+    src/utils/converter/ConverterPanel.h
+
+    # ── F24: 时间戳分析器 ──
+    src/utils/timestamp/TimestampAnalyzer.h
+    src/utils/timestamp/TimestampPanel.h
+
+    # ── F25: 数据包构建器 ──
+    src/utils/packet/PacketField.h
+    src/utils/packet/PacketBuilder.h
+    src/utils/packet/PacketBuilderPanel.h
+
+    # ── F26: 设备注册表 ──
+    src/core/device/DeviceProfile.h
+    src/core/device/DeviceRegistry.h
+    src/core/device/DeviceProfilePanel.h
 )
 
 set(RESOURCES

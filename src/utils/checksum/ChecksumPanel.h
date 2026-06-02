@@ -1,0 +1,79 @@
+/**
+ * @file ChecksumPanel.h
+ * @brief 校验和计算面板 UI
+ * @author Serial Tool Team
+ * @date 2026-06-02
+ *
+ * 提供数据输入、算法选择和结果显示的交互面板。
+ */
+
+#ifndef CHECKSUMPANEL_H
+#define CHECKSUMPANEL_H
+
+#include <QComboBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QWidget>
+
+#include "utils/checksum/ChecksumCalculator.h"
+
+/**
+ * @class ChecksumPanel
+ * @brief 校验和计算器 UI 面板
+ */
+class ChecksumPanel : public QWidget
+{
+    Q_OBJECT
+
+public:
+    /**
+     * @brief 构造函数
+     * @param parent 父控件
+     */
+    explicit ChecksumPanel(QWidget *parent = nullptr);
+
+    /**
+     * @brief 获取输入数据
+     * @return 十六进制输入对应的字节数组
+     */
+    QByteArray inputData() const;
+
+    /**
+     * @brief 获取当前选中的算法
+     * @return 算法枚举值
+     */
+    ChecksumCalculator::Algorithm selectedAlgorithm() const;
+
+    /**
+     * @brief 获取计算结果
+     * @return 最近一次校验和结果
+     */
+    quint64 result() const;
+
+signals:
+    /**
+     * @brief 计算完成信号
+     * @param value 校验和值
+     * @param algoName 算法名称
+     */
+    void calculated(quint64 value, const QString &algoName);
+
+private slots:
+    /**
+     * @brief 执行校验和计算
+     */
+    void onCalculate();
+
+private:
+    QTextEdit *m_inputEdit;             ///< 数据输入区
+    QComboBox *m_algoCombo;             ///< 算法选择下拉框
+    QLabel *m_resultLabel;              ///< 结果显示标签
+    QPushButton *m_calcBtn;             ///< 计算按钮
+    ChecksumCalculator m_calculator;    ///< 计算引擎
+    quint64 m_result = 0;               ///< 最近计算结果
+};
+
+#endif // CHECKSUMPANEL_H
