@@ -35,7 +35,7 @@ WebSocketConnection::~WebSocketConnection()
  */
 ConnectionType WebSocketConnection::type() const
 {
-    return ConnectionType::TcpClient;
+    return ConnectionType::WebSocket;
 }
 
 /**
@@ -114,7 +114,8 @@ void WebSocketConnection::configure(const QVariantMap& params)
  */
 bool WebSocketConnection::connectToUrl(const QString& url)
 {
-    if (m_state == ConnectionState::Connected) {
+    /* 无论当前状态，先清理旧连接 */
+    if (m_socket) {
         close();
     }
 
@@ -127,7 +128,10 @@ bool WebSocketConnection::connectToUrl(const QString& url)
 
     m_host = wsUrl.host();
     m_port = static_cast<quint16>(wsUrl.port(wsUrl.scheme() == "wss" ? 443 : 80));
-    m_path = wsUrl.path().isEmpty() ? "/" : wsUrl.path();
+    m_path = wsUrl.path().isEmpty() ? QStringLiteral("/") : wsUrl.path();
+    if (!wsUrl.query().isEmpty()) {
+        m_path += QStringLiteral("?") + wsUrl.query();
+    }
 
     // 生成随机Sec-WebSocket-Key
     QByteArray randomBytes(16, 0);
@@ -275,6 +279,11 @@ void WebSocketConnection::parseFrames()
         }
 
         int maskSize = masked ? 4 : 0;
+        /* 防御超大帧导致int溢出 */
+        if (payloadLen > static_cast<quint64>(INT_MAX) - headerSize - maskSize) {
+            m_buffer.clear();
+            return;
+        }
         int totalFrameSize = headerSize + maskSize
                              + static_cast<int>(payloadLen);
         if (m_buffer.size() < totalFrameSize) { break; }

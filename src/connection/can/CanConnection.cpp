@@ -19,7 +19,7 @@ CanConnection::~CanConnection()
 
 ConnectionType CanConnection::type() const
 {
-    return ConnectionType::Serial;
+    return ConnectionType::Can;
 }
 
 QString CanConnection::name() const
@@ -69,7 +69,6 @@ bool CanConnection::open()
 
     /* LAWICEL: 关闭CAN → 设置波特率 → 打开CAN */
     sendCommand("C");   // 关闭
-    sendCommand("S8");  // 默认500k，后面按m_bitrate发
 
     /* 根据波特率发送S命令 */
     QString bitrateCmd;
@@ -86,7 +85,7 @@ bool CanConnection::open()
 
     /* CAN-FD模式 */
     if (m_canFdEnabled) {
-        sendCommand("#" + QByteArray(1, static_cast<char>(0x11)));  // 启用FD
+        sendCommand(QString("#") + QChar(0x11));  // 启用FD
     }
 
     sendCommand("O");   // 打开CAN通道

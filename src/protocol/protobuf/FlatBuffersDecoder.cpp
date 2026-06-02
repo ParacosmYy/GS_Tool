@@ -43,7 +43,7 @@ QVariantMap FlatBuffersDecoder::parseTable(const QByteArray& data,
     qint32 vtableSoffset = static_cast<qint32>(readOffset(
         data, tableOffset));
     int vtableOffset = tableOffset - vtableSoffset;
-    if (vtableOffset < 0 || vtableOffset >= data.size()) { return result; }
+    if (vtableOffset < 0 || vtableOffset + 1 >= data.size()) { return result; }
 
     // vtable头: [vtable_size(2), table_size(2), field_offsets...]
     quint16 vtableSize = static_cast<quint16>(
@@ -75,7 +75,7 @@ QVariantMap FlatBuffersDecoder::parseTable(const QByteArray& data,
 
 quint32 FlatBuffersDecoder::readOffset(const QByteArray& data,
                                         int offset) const {
-    if (offset < 0 || offset + 3 >= data.size()) { return 0; }
+    if (offset < 0 || offset + 4 > data.size()) { return 0; }
     return static_cast<quint32>(
         static_cast<quint8>(data[offset]) |
         (static_cast<quint8>(data[offset + 1]) << 8) |

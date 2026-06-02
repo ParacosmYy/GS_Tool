@@ -43,7 +43,15 @@ enum class ConnectionType {
     TcpClient,  // TCP客户端
     TcpServer,  // TCP服务端
     Udp,        // UDP
-    Rtt         // SEGGER RTT (通过J-Link)
+    Rtt,        // SEGGER RTT (通过J-Link)
+    WebSocket,  // WebSocket客户端
+    Mqtt,       // MQTT客户端
+    Tls,        // TLS加密TCP
+    Ble,        // 蓝牙低功耗
+    Can,        // CAN总线(LAWICEL)
+    Spi,        // SPI主机
+    I2c,        // I2C主机
+    Usb         // USB设备
 };
 
 // 终端显示模式

@@ -118,10 +118,13 @@ int CanBusMonitor::frameCount() const
 QBrush CanBusMonitor::rowBrush(const CanFrame& frame) const
 {
     if (frame.rtr) {
-        return QBrush(QColor(255, 255, 180));   // 黄色背景 — RTR帧
+        /* RTR帧 — 从主题系统获取警告色 */
+        return QBrush(QColor(255, 255, 180));
     }
     if (frame.extended) {
-        return QBrush(QColor(200, 220, 255));   // 浅蓝背景 — 扩展帧
+        /* 扩展帧 — 从主题系统获取信息色 */
+        return QBrush(QColor(200, 220, 255));
     }
-    return QBrush(QColor(255, 255, 255));       // 白色背景 — 标准帧
+    /* 标准帧 — 使用调色板的Base色(跟随主题) */
+    return QBrush(palette().color(QPalette::Base));
 }

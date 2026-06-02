@@ -99,6 +99,11 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
 }
 
 QByteArray ModbusSlave::buildReadRegistersResponse(const ModbusFrame& req) {
+    /* 防御: quantity上限检查(Modbus最大125个寄存器) */
+    if (req.quantity < 1 || req.quantity > 125) {
+        return buildExceptionResponse(req, ModbusError::IllegalValue);
+    }
+
     QByteArray response;
     response.append(static_cast<char>(m_slaveAddress));
     response.append(static_cast<char>(req.function));
@@ -117,6 +122,11 @@ QByteArray ModbusSlave::buildReadRegistersResponse(const ModbusFrame& req) {
 }
 
 QByteArray ModbusSlave::buildReadCoilsResponse(const ModbusFrame& req) {
+    /* 防御: quantity上限检查(Modbus最大2000个线圈) */
+    if (req.quantity < 1 || req.quantity > 2000) {
+        return buildExceptionResponse(req, ModbusError::IllegalValue);
+    }
+
     QByteArray response;
     response.append(static_cast<char>(m_slaveAddress));
     response.append(static_cast<char>(req.function));
@@ -210,6 +220,10 @@ QByteArray ModbusSlave::buildWriteMultipleRegistersResponse(const ModbusFrame& r
 
     // req.data = [byteCount, regData...]
     quint8 byteCount = static_cast<quint8>(req.data[0]);
+    /* 防御: byteCount必须与quantity×2一致 */
+    if (byteCount != req.quantity * 2) {
+        return buildExceptionResponse(req, ModbusError::IllegalValue);
+    }
     if (req.data.size() < 1 + byteCount) {
         return buildExceptionResponse(req, ModbusError::IllegalValue);
     }

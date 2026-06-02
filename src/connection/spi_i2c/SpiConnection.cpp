@@ -28,7 +28,7 @@ SpiConnection::~SpiConnection()
  */
 ConnectionType SpiConnection::type() const
 {
-    return ConnectionType::Serial;
+    return ConnectionType::Spi;
 }
 
 /**

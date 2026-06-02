@@ -17,7 +17,7 @@ UsbConnection::~UsbConnection() {
 
 ConnectionType UsbConnection::type() const {
     // TODO: 在Constants.h中添加 Usb 到 ConnectionType 枚举
-    return ConnectionType::Serial;
+    return ConnectionType::Usb;
 }
 
 QString UsbConnection::name() const {

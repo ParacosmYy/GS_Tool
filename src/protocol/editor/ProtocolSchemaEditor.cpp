@@ -57,7 +57,7 @@ void ProtocolSchemaEditor::setupUI()
     mainLayout->setSpacing(6);
 
     /* ---- 标题标签 ---- */
-    auto *titleLabel = new QLabel(tr("Protocol Schema Editor"), this);
+    auto *titleLabel = new QLabel(tr("协议模式编辑器"), this);
     titleLabel->setObjectName(QStringLiteral("editorTitleLabel"));
     mainLayout->addWidget(titleLabel);
 
@@ -65,7 +65,7 @@ void ProtocolSchemaEditor::setupUI()
     m_jsonEditor = new QTextEdit(this);
     m_jsonEditor->setObjectName(QStringLiteral("jsonEditor"));
     m_jsonEditor->setPlaceholderText(
-        tr("Paste or write JSON protocol definition here..."));
+        tr("在此粘贴或编写JSON协议定义..."));
 
     QFont monoFont(QStringLiteral("Courier New"), 10);
     monoFont.setStyleHint(QFont::Monospace);
@@ -77,11 +77,11 @@ void ProtocolSchemaEditor::setupUI()
     auto *btnLayout = new QHBoxLayout();
     btnLayout->setSpacing(8);
 
-    m_validateBtn = new QPushButton(tr("Validate"), this);
+    m_validateBtn = new QPushButton(tr("验证"), this);
     m_validateBtn->setObjectName(QStringLiteral("validateBtn"));
     btnLayout->addWidget(m_validateBtn);
 
-    auto *saveBtn = new QPushButton(tr("Save"), this);
+    auto *saveBtn = new QPushButton(tr("保存"), this);
     saveBtn->setObjectName(QStringLiteral("saveBtn"));
     btnLayout->addWidget(saveBtn);
 
@@ -159,12 +159,12 @@ void ProtocolSchemaEditor::validateJson()
 
     if (ok && tmpSchema->isValid()) {
         m_statusLabel->setText(
-            tr("✓ Valid protocol: %1").arg(tmpSchema->name()));
+            tr("✓ 有效协议: %1").arg(tmpSchema->name()));
         m_statusLabel->setProperty("validationState",
                                    QStringLiteral("valid"));
     } else {
         m_statusLabel->setText(
-            tr("✗ Error: %1").arg(tmpSchema->lastError()));
+            tr("✗ 错误: %1").arg(tmpSchema->lastError()));
         m_statusLabel->setProperty("validationState",
                                    QStringLiteral("invalid"));
     }

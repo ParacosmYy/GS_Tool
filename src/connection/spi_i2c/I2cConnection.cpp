@@ -28,7 +28,7 @@ I2cConnection::~I2cConnection()
  */
 ConnectionType I2cConnection::type() const
 {
-    return ConnectionType::Serial;
+    return ConnectionType::I2c;
 }
 
 /**

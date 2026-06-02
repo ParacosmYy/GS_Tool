@@ -150,6 +150,13 @@ quint64 ChecksumCalculator::calculate(const QByteArray &data, Algorithm alg) con
                    | (quint32(static_cast<quint8>(data[i + 2])) << 8)
                    | quint32(static_cast<quint8>(data[i + 3]));
         }
+        /* 处理尾部不足4字节的剩余数据 */
+        int remaining = data.size() % 4;
+        int tailStart = data.size() - remaining;
+        for (int i = tailStart; i < data.size(); ++i) {
+            sum += quint32(static_cast<quint8>(data[i]))
+                   << (24 - 8 * (i - tailStart));
+        }
         return sum & 0xFFFFFFFF;
     }
 

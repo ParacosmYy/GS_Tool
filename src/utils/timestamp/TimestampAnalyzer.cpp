@@ -21,7 +21,7 @@ TimestampAnalyzer::TimestampAnalyzer(QObject *parent)
 QDateTime TimestampAnalyzer::unixToDatetime(qint64 timestamp, bool isMillis) const
 {
     qint64 secs = isMillis ? (timestamp / 1000) : timestamp;
-    return QDateTime::fromSecsSinceEpoch(secs, Qt::LocalTime);
+    return QDateTime::fromSecsSinceEpoch(secs);
 }
 
 /**

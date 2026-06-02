@@ -7,7 +7,15 @@
  *   TcpClient → TcpConnection (Client模式)
  *   TcpServer → TcpConnection (Server模式，同一类不同配置)
  *   Udp       → UdpConnection
- *   Rtt       → nullptr (尚未实现)
+ *   Rtt       → JLinkRttConnection
+ *   WebSocket → WebSocketConnection
+ *   Mqtt      → MqttConnection
+ *   Tls       → TlsConnection
+ *   Ble       → BleConnection
+ *   Can       → CanConnection
+ *   Spi       → SpiConnection
+ *   I2c       → I2cConnection
+ *   Usb       → UsbConnection
  */
 
 #include "core/connect/ConnectionFactory.h"
@@ -15,25 +23,47 @@
 #include "connection/serial_port/SerialConnection.h"
 #include "connection/network/TcpConnection.h"
 #include "connection/network/UdpConnection.h"
+#include "connection/tcp/TcpServerConnection.h"
+#include "connection/tcp/TlsConnection.h"
+#include "connection/tcp/UdpMulticastConnection.h"
+#include "connection/ws/WebSocketConnection.h"
+#include "connection/mqtt/MqttConnection.h"
+#include "connection/ble/BleConnection.h"
+#include "connection/can/CanConnection.h"
+#include "connection/spi_i2c/SpiConnection.h"
+#include "connection/spi_i2c/I2cConnection.h"
+#include "connection/usb/UsbConnection.h"
+#include "rtt/JLinkRttConnection.h"
 
 IConnection* ConnectionFactory::create(ConnectionType type, QObject* parent)
 {
     switch (type) {
     case ConnectionType::Serial:
-        // 串口连接: 封装QSerialPort，支持全双工通信+信号线控制
         return new SerialConnection(parent);
     case ConnectionType::TcpClient:
-        // TCP客户端: 主动连接远程TCP服务器
         return new TcpConnection(parent);
     case ConnectionType::TcpServer:
-        // TCP服务器: 本地监听端口等待连接（同一TcpConnection类，通过configure区分模式）
-        return new TcpConnection(parent);
+        return new TcpServerConnection(parent);
     case ConnectionType::Udp:
-        // UDP连接: 无连接数据报收发，支持单播/广播
         return new UdpConnection(parent);
     case ConnectionType::Rtt:
-        // RTT连接: 尚未实现（依赖J-Link SDK），返回nullptr
-        return nullptr;
+        return new JLinkRttConnection(parent);
+    case ConnectionType::WebSocket:
+        return new WebSocketConnection(parent);
+    case ConnectionType::Mqtt:
+        return new MqttConnection(parent);
+    case ConnectionType::Tls:
+        return new TlsConnection(parent);
+    case ConnectionType::Ble:
+        return new BleConnection(parent);
+    case ConnectionType::Can:
+        return new CanConnection(parent);
+    case ConnectionType::Spi:
+        return new SpiConnection(parent);
+    case ConnectionType::I2c:
+        return new I2cConnection(parent);
+    case ConnectionType::Usb:
+        return new UsbConnection(parent);
     default:
         qWarning() << "ConnectionFactory: unknown connection type" << static_cast<int>(type);
         return nullptr;

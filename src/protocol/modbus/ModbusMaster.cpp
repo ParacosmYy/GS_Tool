@@ -98,23 +98,44 @@ bool ModbusMaster::sendFrame(const QByteArray& rawData) {
 void ModbusMaster::onRawDataReceived(const QByteArray& data) {
     m_rxBuffer.append(data);
 
-    // 根据功能码判断最小响应帧长度
-    // FC01-04响应: slave(1)+func(1)+byteCount(1)+CRC(2) = 5+
+    /* 防御: 缓冲区过大时截断(防止内存泄漏) */
+    if (m_rxBuffer.size() > 256) {
+        m_rxBuffer.clear();
+        return;
+    }
+
+    // 根据功能码判断期望响应帧长度
+    if (m_rxBuffer.size() < 2) return;
+
+    quint8 fc = static_cast<quint8>(m_rxBuffer[1]);
+
+    // 异常响应: slave(1) + func|0x80(1) + errCode(1) + CRC(2) = 5
+    if (fc & 0x80) {
+        if (m_rxBuffer.size() >= 5) {
+            m_timer->stop();
+            parseResponse(m_rxBuffer.left(5));
+            m_rxBuffer.clear();
+        }
+        return;
+    }
+
+    int expectedLen = -1;
     // FC05-06/15-16响应: slave(1)+func(1)+addr(2)+value(2)+CRC(2) = 8
-    // 异常响应: slave(1)+func|0x80(1)+errCode(1)+CRC(2) = 5
-    int minLen = 5;
-    if (m_rxBuffer.size() >= 2) {
-        quint8 fc = static_cast<quint8>(m_rxBuffer[1]);
-        if ((fc & 0x80) == 0 && (fc == 0x05 || fc == 0x06 ||
-                                  fc == 0x0F || fc == 0x10)) {
-            minLen = 8;
+    if (fc == 0x05 || fc == 0x06 || fc == 0x0F || fc == 0x10) {
+        expectedLen = 8;
+    }
+    // FC01-04响应: slave(1)+func(1)+byteCount(1)+data(N)+CRC(2)
+    else if (fc >= 0x01 && fc <= 0x04) {
+        if (m_rxBuffer.size() >= 3) {
+            int byteCount = static_cast<quint8>(m_rxBuffer[2]);
+            expectedLen = 3 + byteCount + 2;  // header + data + CRC
         }
     }
 
-    if (m_rxBuffer.size() >= minLen) {
+    if (expectedLen > 0 && m_rxBuffer.size() >= expectedLen) {
         m_timer->stop();
-        parseResponse(m_rxBuffer);
-        m_rxBuffer.clear();
+        parseResponse(m_rxBuffer.left(expectedLen));
+        m_rxBuffer.remove(0, expectedLen);
     }
 }
 

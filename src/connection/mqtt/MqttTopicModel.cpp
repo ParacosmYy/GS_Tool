@@ -72,15 +72,16 @@ QModelIndex MqttTopicModel::parent(const QModelIndex& child) const
     auto* childNode = nodeFromIndex(child);
     if (!childNode || !childNode->parent) return {};
 
-    auto* grandParent = childNode->parent;
-    if (grandParent == m_rootNode) return {};
+    auto* parentNode = childNode->parent;
+    if (parentNode == m_rootNode) return {};
 
     /* 在祖父节点中查找父节点的行号 */
-    int parentRow = 0;
-    if (grandParent) {
-        parentRow = grandParent->children.indexOf(childNode->parent);
-    }
-    return createIndex(parentRow, 0, childNode->parent);
+    auto* grandParent = parentNode->parent;
+    if (!grandParent) return {};
+
+    int parentRow = grandParent->children.indexOf(parentNode);
+    if (parentRow < 0) parentRow = 0;
+    return createIndex(parentRow, 0, parentNode);
 }
 
 void MqttTopicModel::addTopic(const QString& topic, int qos)

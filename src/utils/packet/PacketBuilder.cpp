@@ -140,9 +140,9 @@ static void writeFieldValue(QByteArray &packet, const PacketField &field)
 }
 
 /**
- * @brief 计算CRC16-CCITT校验
+ * @brief 计算CRC16-Modbus校验 (多项式0xA001)
  */
-static quint16 crc16Ccitt(const QByteArray &data)
+static quint16 crc16Modbus(const QByteArray &data)
 {
     quint16 crc = 0xFFFF;
     for (char b : data) {
@@ -185,7 +185,7 @@ QByteArray PacketBuilder::buildPacket() const
 
     // CRC16校验尾
     if (m_checksumEnabled && !packet.isEmpty()) {
-        quint16 crc = crc16Ccitt(packet);
+        quint16 crc = crc16Modbus(packet);
         packet.append(static_cast<char>(crc & 0xFF));
         packet.append(static_cast<char>((crc >> 8) & 0xFF));
     }

@@ -149,5 +149,8 @@ quint8 CanFrameParser::parseHexByte(const char* hex)
         if (c >= 'a' && c <= 'f') return static_cast<quint8>(c - 'a' + 10);
         return 0;
     };
+    /* 防御空指针 — 调用方已通过rawData.size()确保不会越界
+     * 但仍需保护hex[1]的访问安全性 */
+    if (!hex) return 0;
     return static_cast<quint8>((hexVal(hex[0]) << 4) | hexVal(hex[1]));
 }

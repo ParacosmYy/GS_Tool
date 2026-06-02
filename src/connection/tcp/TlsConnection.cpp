@@ -30,7 +30,7 @@ TlsConnection::~TlsConnection()
  */
 ConnectionType TlsConnection::type() const
 {
-    return ConnectionType::TcpClient;
+    return ConnectionType::Tls;
 }
 
 /**
@@ -61,6 +61,12 @@ bool TlsConnection::open()
 {
     if (m_state == ConnectionState::Connected) {
         return true;
+    }
+
+    /* 防止重复open()导致内存泄漏 — 清理旧socket */
+    if (m_socket) {
+        m_socket->deleteLater();
+        m_socket = nullptr;
     }
 
     m_socket = new QSslSocket(this);

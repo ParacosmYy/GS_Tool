@@ -236,9 +236,19 @@ void TcpServerConnection::onClientDisconnected()
     if (!socket) return;
 
     QString info = clientInfo(socket);
-    qintptr sd = socket->socketDescriptor();
 
-    m_clients.remove(sd);
+    /* socket已断开，descriptor可能无效，遍历查找 */
+    qintptr sd = -1;
+    for (auto it = m_clients.begin(); it != m_clients.end(); ++it) {
+        if (it.value() == socket) {
+            sd = it.key();
+            break;
+        }
+    }
+
+    if (sd >= 0) {
+        m_clients.remove(sd);
+    }
     emit clientDisconnected(info);
     socket->deleteLater();
 }

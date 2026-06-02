@@ -37,7 +37,7 @@ MqttConnection::~MqttConnection()
     close();
 }
 
-ConnectionType MqttConnection::type() const { return ConnectionType::TcpClient; }
+ConnectionType MqttConnection::type() const { return ConnectionType::Mqtt; }
 
 QString MqttConnection::name() const
 {
@@ -119,7 +119,7 @@ bool MqttConnection::publish(const QString& topic, const QByteArray& payload, in
 
     /* QoS > 0 需要Packet Identifier */
     if (qos > 0) {
-        ++m_packetId;
+        m_packetId = (m_packetId % 65535) + 1;  // 保证范围[1, 65535]
         variableHeader.append(static_cast<char>((m_packetId >> 8) & 0xFF));
         variableHeader.append(static_cast<char>(m_packetId & 0xFF));
     }
@@ -160,7 +160,7 @@ void MqttConnection::unsubscribe(const QString& topic)
     if (m_state != ConnectionState::Connected) return;
 
     QByteArray payload;
-    ++m_packetId;
+    m_packetId = (m_packetId % 65535) + 1;  // 保证范围[1, 65535]
     payload.append(static_cast<char>((m_packetId >> 8) & 0xFF));
     payload.append(static_cast<char>(m_packetId & 0xFF));
     const QByteArray topicUtf8 = topic.toUtf8();
@@ -277,10 +277,22 @@ void MqttConnection::parseIncomingPacket()
                 multiplier *= 128;
                 ++idx;
                 if ((byte & 0x80) == 0) break;
+                /* 防止无限循环：剩余长度最多4字节编码 */
+                if (idx > 4) {
+                    m_rxBuffer.clear();
+                    m_expectedLength = -1;
+                    return;
+                }
+            }
+            /* 防御：remLen过大导致内存分配失败 */
+            if (remLen > 256 * 1024 * 1024) {
+                m_rxBuffer.clear();
+                m_expectedLength = -1;
+                return;
             }
             m_expectedLength = static_cast<int>(remLen) + idx;
         }
-        if (m_rxBuffer.size() < m_expectedLength) return;
+        if (m_expectedLength < 2 || m_rxBuffer.size() < m_expectedLength) return;
 
         QByteArray packet = m_rxBuffer.left(m_expectedLength);
         m_rxBuffer.remove(0, m_expectedLength);
@@ -337,9 +349,27 @@ void MqttConnection::handlePublish(const QByteArray& data, quint8 flags)
     QString topic = QString::fromUtf8(data.mid(2, topicLen));
     int offset = 2 + topicLen;
 
-    /* QoS > 0 时有Packet Identifier */
+    /* QoS > 0 时有Packet Identifier，需回复PUBACK/PUBREC */
     const int qos = (flags >> 1) & 0x03;
     if (qos > 0 && data.size() >= offset + 2) {
+        quint16 recvPacketId = (static_cast<quint8>(data.at(offset)) << 8)
+                              | static_cast<quint8>(data.at(offset + 1));
+
+        if (m_socket) {
+            if (qos == 1) {
+                /* QoS 1: 回复PUBACK (type=4) */
+                QByteArray puback;
+                puback.append(static_cast<char>((recvPacketId >> 8) & 0xFF));
+                puback.append(static_cast<char>(recvPacketId & 0xFF));
+                m_socket->write(buildMqttPacket(0x04, puback));
+            } else if (qos == 2) {
+                /* QoS 2: 回复PUBREC (type=5) */
+                QByteArray pubrec;
+                pubrec.append(static_cast<char>((recvPacketId >> 8) & 0xFF));
+                pubrec.append(static_cast<char>(recvPacketId & 0xFF));
+                m_socket->write(buildMqttPacket(0x05, pubrec));
+            }
+        }
         offset += 2;  // 跳过Packet ID
     }
 

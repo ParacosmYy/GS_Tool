@@ -87,7 +87,7 @@ void PluginConfigPanel::setupUI()
     mainLayout->setSpacing(6);
 
     /* 标题 */
-    m_titleLabel = new QLabel(tr("Plugin Manager"), this);
+    m_titleLabel = new QLabel(tr("插件管理器"), this);
     m_titleLabel->setObjectName(QStringLiteral("pluginManagerTitle"));
     mainLayout->addWidget(m_titleLabel);
 
@@ -100,13 +100,13 @@ void PluginConfigPanel::setupUI()
     auto* btnLayout = new QHBoxLayout();
     btnLayout->setSpacing(6);
 
-    m_loadBtn = new QPushButton(tr("Load..."), this);
+    m_loadBtn = new QPushButton(tr("加载..."), this);
     m_loadBtn->setObjectName(QStringLiteral("loadPluginBtn"));
 
-    m_unloadBtn = new QPushButton(tr("Unload"), this);
+    m_unloadBtn = new QPushButton(tr("卸载"), this);
     m_unloadBtn->setObjectName(QStringLiteral("unloadPluginBtn"));
 
-    m_scanBtn = new QPushButton(tr("Scan"), this);
+    m_scanBtn = new QPushButton(tr("扫描"), this);
     m_scanBtn->setObjectName(QStringLiteral("scanPluginBtn"));
 
     btnLayout->addWidget(m_loadBtn);

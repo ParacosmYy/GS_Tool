@@ -180,7 +180,7 @@ void BleGattBrowser::populateTree(const QStringList& services)
         auto* svcItem = new QTreeWidgetItem(m_serviceTree);
         svcItem->setText(0, svcName);
         svcItem->setText(1, svcUuid);
-        svcItem->setText(2, "PRIMARY");
+        svcItem->setText(2, tr("主要"));
         svcItem->setExpanded(true);
 
         // 每个服务下添加模拟特征

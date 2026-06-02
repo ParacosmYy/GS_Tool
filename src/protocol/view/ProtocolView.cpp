@@ -320,12 +320,12 @@ void ProtocolView::onFrameError(const QString& reason, const QByteArray& rawFram
     if (!m_fieldNames.contains("Error")) {
         m_fieldNames.append("Error");
         m_model->setHorizontalHeaderItem(kFixedColumns + m_fieldNames.indexOf("Error"),
-                                          new QStandardItem("Error"));
+                                          new QStandardItem(tr("错误")));
     }
     if (!m_fieldNames.contains("RawData")) {
         m_fieldNames.append("RawData");
         m_model->setHorizontalHeaderItem(kFixedColumns + m_fieldNames.indexOf("RawData"),
-                                          new QStandardItem("RawData"));
+                                          new QStandardItem(tr("原始数据")));
     }
 
     int row = m_model->rowCount();

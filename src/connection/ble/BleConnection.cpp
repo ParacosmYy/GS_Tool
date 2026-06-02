@@ -37,7 +37,7 @@ BleConnection::~BleConnection()
 ConnectionType BleConnection::type() const
 {
     // TODO: ConnectionType枚举添加Ble后改为return ConnectionType::Ble
-    return ConnectionType::Serial;
+    return ConnectionType::Ble;
 }
 
 QString BleConnection::name() const

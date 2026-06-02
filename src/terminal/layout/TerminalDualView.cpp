@@ -62,14 +62,14 @@ void TerminalDualView::setupUI()
     m_textView = new QTextEdit(this);
     m_textView->setObjectName(QStringLiteral("textView"));
     m_textView->setReadOnly(true);
-    m_textView->setPlaceholderText(tr("Text View"));
+    m_textView->setPlaceholderText(tr("文本视图"));
 
     /* 右侧：十六进制视图 */
     m_hexView = new QTextEdit(this);
     m_hexView->setObjectName(QStringLiteral("hexView"));
     m_hexView->setReadOnly(true);
     m_hexView->setFont(QFont(QStringLiteral("Courier New"), 9));
-    m_hexView->setPlaceholderText(tr("Hex View"));
+    m_hexView->setPlaceholderText(tr("十六进制视图"));
 
     m_splitter->addWidget(m_textView);
     m_splitter->addWidget(m_hexView);
