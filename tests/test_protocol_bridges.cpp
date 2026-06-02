@@ -5,8 +5,8 @@
 #include <QVector>
 #include <cstring>
 
-#include "protocol/JustFloatBridge.h"
-#include "protocol/FireWaterBridge.h"
+#include "protocol/bridge/JustFloatBridge.h"
+#include "protocol/bridge/FireWaterBridge.h"
 
 // ============================================================
 // 辅助工具函数

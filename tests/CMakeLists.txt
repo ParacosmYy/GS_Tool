@@ -8,14 +8,14 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 
 # 需要被测试的源文件(不含main.cpp)
 set(BRIDGE_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/protocol/JustFloatBridge.cpp
-    ${CMAKE_SOURCE_DIR}/src/protocol/FireWaterBridge.cpp
+    ${CMAKE_SOURCE_DIR}/src/protocol/bridge/JustFloatBridge.cpp
+    ${CMAKE_SOURCE_DIR}/src/protocol/bridge/FireWaterBridge.cpp
 )
 
 set(BRIDGE_HEADERS
-    ${CMAKE_SOURCE_DIR}/src/protocol/IProtocolBridge.h
-    ${CMAKE_SOURCE_DIR}/src/protocol/JustFloatBridge.h
-    ${CMAKE_SOURCE_DIR}/src/protocol/FireWaterBridge.h
+    ${CMAKE_SOURCE_DIR}/src/protocol/bridge/IProtocolBridge.h
+    ${CMAKE_SOURCE_DIR}/src/protocol/bridge/JustFloatBridge.h
+    ${CMAKE_SOURCE_DIR}/src/protocol/bridge/FireWaterBridge.h
 )
 
 add_executable(test_protocol_bridges

@@ -12,9 +12,9 @@
 #include <QTranslator>
 #include <QFileInfo>
 #include <QDir>
-#include "core/MainWindow.h"
-#include "core/Constants.h"
-#include "utils/SettingsManager.h"
+#include "core/mainwindow/MainWindow.h"
+#include "core/theme/Constants.h"
+#include "utils/settings/SettingsManager.h"
 
 int main(int argc, char* argv[])
 {
