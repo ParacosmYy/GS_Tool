@@ -33,9 +33,21 @@ public:
     /// 绑定数据通道
     void bindChannel(const QString &channelName);
 
+    /// 获取开关状态
+    bool isOn() const { return m_on; }
+
+    /// 获取颜色
+    QColor color() const { return m_color; }
+
+    /// 获取通道名
+    QString channelName() const { return m_channelName; }
+
 protected:
-    /// 绘制事件 —— 暂未实现
+    /// 绘制事件 —— 绘制圆形 LED
     void paintEvent(QPaintEvent *event) override;
+
+    /// 建议最小尺寸
+    QSize minimumSizeHint() const override;
 
 private:
     bool    m_on    = false;        ///< 开关状态

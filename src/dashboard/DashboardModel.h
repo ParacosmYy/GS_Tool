@@ -46,6 +46,12 @@ public:
     QList<QVariantMap> componentConfigs() const;
 
     /**
+     * @brief 获取配置数量
+     * @return 数量
+     */
+    int configCount() const;
+
+    /**
      * @brief 将配置保存到文件
      * @param filePath 目标文件路径
      * @return true=成功

@@ -41,7 +41,7 @@ public:
 
     /**
      * @brief 获取用户选择的导出格式索引
-     * @return 格式索引（0=CSV, 1=PNG, 2=SVG）
+     * @return 格式索引（0=CSV, 1=JSON, 2=PNG, 3=SVG）
      */
     int selectedFormat() const;
 

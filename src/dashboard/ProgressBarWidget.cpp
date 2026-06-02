@@ -1,9 +1,15 @@
 /**
  * @file ProgressBarWidget.cpp
  * @brief 进度条仪表盘控件实现
+ *
+ * 自定义 paintEvent 绘制水平圆角进度条、填充区域、数值与标签文本。
+ * 所有颜色通过 QPen/QBrush 设置，不使用 setStyleSheet 硬编码颜色。
  */
 
 #include "dashboard/ProgressBarWidget.h"
+
+#include <QPainter>
+#include <QtMath>
 
 /**
  * @brief 构造函数
@@ -22,6 +28,7 @@ ProgressBarWidget::ProgressBarWidget(QWidget *parent)
 void ProgressBarWidget::setValue(double value)
 {
     m_value = value;
+    update();
 }
 
 /**
@@ -33,6 +40,7 @@ void ProgressBarWidget::setRange(double min, double max)
 {
     m_min = min;
     m_max = max;
+    update();
 }
 
 /**
@@ -42,6 +50,7 @@ void ProgressBarWidget::setRange(double min, double max)
 void ProgressBarWidget::setLabel(const QString &label)
 {
     m_label = label;
+    update();
 }
 
 /**
@@ -54,11 +63,78 @@ void ProgressBarWidget::bindChannel(const QString &channelName)
 }
 
 /**
- * @brief 绘制事件（暂未实现）
+ * @brief 建议最小尺寸
+ * @return 最小尺寸 150×50
+ */
+QSize ProgressBarWidget::minimumSizeHint() const
+{
+    return QSize(150, 50);
+}
+
+/**
+ * @brief 绘制水平进度条
+ *
+ * 绘制流程：背景圆角矩形 → 填充区域 → 数值文本 → 标签
  * @param event 绘制事件参数
  */
 void ProgressBarWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
-    QWidget::paintEvent(event);
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    const int margin = 8;
+    int labelHeight = 18;
+    int barTop = margin + labelHeight;
+    int barHeight = height() - barTop - margin;
+    if (barHeight < 8) {
+        barHeight = 8;
+    }
+    qreal barRadius = barHeight / 2.0;
+
+    QRectF barRect(margin, barTop, width() - 2 * margin, barHeight);
+
+    /* --- 1. 背景圆角矩形 --- */
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(60, 60, 60));
+    painter.drawRoundedRect(barRect, barRadius, barRadius);
+
+    /* --- 2. 填充区域 --- */
+    qreal range = m_max - m_min;
+    if (qFuzzyIsNull(range)) {
+        range = 1.0;
+    }
+    qreal clamped = qBound(m_min, m_value, m_max);
+    qreal fillRatio = (clamped - m_min) / range;
+    qreal fillWidth = barRect.width() * fillRatio;
+
+    if (fillWidth > 0) {
+        QRectF fillRect(barRect.left(), barRect.top(),
+                        fillWidth, barRect.height());
+        painter.setBrush(QColor(70, 160, 70));
+        painter.drawRoundedRect(fillRect, barRadius, barRadius);
+    }
+
+    /* --- 3. 数值文本（居中于 bar） --- */
+    QFont valueFont = font();
+    valueFont.setPointSize(qMax(9, barHeight / 3));
+    valueFont.setBold(true);
+    painter.setFont(valueFont);
+    painter.setPen(Qt::white);
+
+    QString valueText = QString::number(m_value, 'f', 1);
+    painter.drawText(barRect, Qt::AlignCenter, valueText);
+
+    /* --- 4. 标签（顶部左侧） --- */
+    if (!m_label.isEmpty()) {
+        QFont labelFont = font();
+        labelFont.setPointSize(qMax(8, barHeight / 4));
+        painter.setFont(labelFont);
+        painter.setPen(Qt::white);
+        QRectF labelRect(margin, margin, width() - 2 * margin, labelHeight);
+        painter.drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, m_label);
+    }
+
+    painter.end();
 }

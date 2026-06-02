@@ -1,9 +1,16 @@
 /**
  * @file DashboardModel.cpp
  * @brief 仪表盘配置模型实现
+ *
+ * 管理组件配置的增删查，使用 QJsonDocument 实现文件持久化。
  */
 
 #include "dashboard/DashboardModel.h"
+
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 
 /**
  * @brief 构造函数
@@ -24,6 +31,7 @@ DashboardModel::~DashboardModel() = default;
 void DashboardModel::addComponentConfig(const QVariantMap &config)
 {
     m_configs.append(config);
+    emit configChanged();
 }
 
 /**
@@ -34,6 +42,7 @@ void DashboardModel::removeComponentConfig(int index)
 {
     if (index >= 0 && index < m_configs.size()) {
         m_configs.removeAt(index);
+        emit configChanged();
     }
 }
 
@@ -47,25 +56,82 @@ QList<QVariantMap> DashboardModel::componentConfigs() const
 }
 
 /**
- * @brief 将配置保存到文件（暂未实现）
- * @param filePath 目标文件路径
- * @return false（暂未实现）
+ * @brief 获取配置数量
+ * @return 数量
  */
-bool DashboardModel::saveToFile(const QString &filePath) const
+int DashboardModel::configCount() const
 {
-    Q_UNUSED(filePath)
-    // TODO: 序列化 m_configs 为 JSON 并写入文件
-    return false;
+    return m_configs.size();
 }
 
 /**
- * @brief 从文件加载配置（暂未实现）
+ * @brief 将配置保存到文件
+ *
+ * 序列化 m_configs 为 JSON 数组并写入文件。
+ * @param filePath 目标文件路径
+ * @return true=成功
+ */
+bool DashboardModel::saveToFile(const QString &filePath) const
+{
+    if (filePath.isEmpty()) {
+        return false;
+    }
+
+    QJsonArray arr;
+    for (const auto &config : m_configs) {
+        QJsonObject obj = QJsonObject::fromVariantMap(config);
+        arr.append(obj);
+    }
+
+    QJsonDocument doc(arr);
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return false;
+    }
+
+    file.write(doc.toJson(QJsonDocument::Indented));
+    file.close();
+    return true;
+}
+
+/**
+ * @brief 从文件加载配置
+ *
+ * 从 JSON 文件读取配置并填充到 m_configs。
  * @param filePath 源文件路径
- * @return false（暂未实现）
+ * @return true=成功
  */
 bool DashboardModel::loadFromFile(const QString &filePath)
 {
-    Q_UNUSED(filePath)
-    // TODO: 从文件读取 JSON 并解析到 m_configs
-    return false;
+    if (filePath.isEmpty()) {
+        return false;
+    }
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonParseError err;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &err);
+    if (err.error != QJsonParseError::NoError) {
+        return false;
+    }
+    if (!doc.isArray()) {
+        return false;
+    }
+
+    m_configs.clear();
+    const QJsonArray arr = doc.array();
+    for (const auto &item : arr) {
+        if (item.isObject()) {
+            m_configs.append(item.toObject().toVariantMap());
+        }
+    }
+
+    emit configChanged();
+    return true;
 }

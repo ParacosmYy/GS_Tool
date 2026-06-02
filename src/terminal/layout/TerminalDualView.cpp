@@ -1,18 +1,24 @@
 /**
  * @file TerminalDualView.cpp
  * @brief 文本/十六进制双视图控件实现
+ *
+ * 左右水平分栏布局：左侧 QTextEdit 显示文本视图，
+ * 右侧 QTextEdit 显示十六进制视图。使用等宽数学字体
+ * 确保十六进制对齐。
  */
 
 #include "terminal/layout/TerminalDualView.h"
 
+#include <QFont>
+#include <QList>
 #include <QSplitter>
+#include <QTextEdit>
 #include <QVBoxLayout>
 
 /**
  * @brief 构造函数
  *
- * 创建上方文本视图和下方十六进制视图，
- * 使用 QSplitter 垂直分隔。
+ * 初始化控件并调用 setupUI() 构建双视图界面。
  *
  * @param parent 父控件指针
  */
@@ -28,35 +34,47 @@ TerminalDualView::TerminalDualView(QWidget *parent)
 
 /**
  * @brief 析构函数
+ *
+ * QObject 父子树自动回收子控件，无需手动释放。
  */
 TerminalDualView::~TerminalDualView() = default;
 
 /**
  * @brief 初始化界面布局
  *
- * 创建垂直分割的 QSplitter，上方放置文本视图终端控件，
- * 下方放置十六进制视图终端控件。
- * 使用占位 QWidget 代替实际的 TerminalWidget（待集成）。
+ * 创建水平 QSplitter，左侧放置文本视图 QTextEdit，
+ * 右侧放置十六进制视图 QTextEdit。初始比例为 1:1 (400:400)。
+ *
+ * - textView: 只读，带占位文本 "Text View"
+ * - hexView:  只读，使用 Courier New 9pt 等宽字体，占位文本 "Hex View"
  */
 void TerminalDualView::setupUI()
 {
-    auto *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    auto *mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
 
-    m_splitter = new QSplitter(Qt::Vertical, this);
+    /* 水平分割器，左右布局 */
+    m_splitter = new QSplitter(Qt::Horizontal, this);
+    m_splitter->setObjectName(QStringLiteral("dualViewSplitter"));
 
-    // TODO: 替换为实际的 TerminalWidget 实例
-    m_textView = nullptr; // 将由 TerminalWidget 创建
-    m_hexView = nullptr;  // 将由 TerminalWidget 创建
+    /* 左侧：文本视图 */
+    m_textView = new QTextEdit(this);
+    m_textView->setObjectName(QStringLiteral("textView"));
+    m_textView->setReadOnly(true);
+    m_textView->setPlaceholderText(tr("Text View"));
 
-    auto *textPlaceholder = new QWidget(m_splitter);
-    textPlaceholder->setWindowTitle(tr("文本视图"));
-    m_splitter->addWidget(textPlaceholder);
+    /* 右侧：十六进制视图 */
+    m_hexView = new QTextEdit(this);
+    m_hexView->setObjectName(QStringLiteral("hexView"));
+    m_hexView->setReadOnly(true);
+    m_hexView->setFont(QFont(QStringLiteral("Courier New"), 9));
+    m_hexView->setPlaceholderText(tr("Hex View"));
 
-    auto *hexPlaceholder = new QWidget(m_splitter);
-    hexPlaceholder->setWindowTitle(tr("十六进制视图"));
-    m_splitter->addWidget(hexPlaceholder);
+    m_splitter->addWidget(m_textView);
+    m_splitter->addWidget(m_hexView);
+    m_splitter->setSizes(QList<int>() << 400 << 400);
 
-    layout->addWidget(m_splitter);
-    setLayout(layout);
+    mainLayout->addWidget(m_splitter);
+    setLayout(mainLayout);
 }

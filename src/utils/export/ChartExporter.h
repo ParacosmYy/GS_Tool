@@ -34,12 +34,23 @@ public:
     explicit ChartExporter(QObject* parent = nullptr);
 
     /**
-     * @brief 导出图表数据为 CSV 文件
+     * @brief 导出图表数据为 CSV 文件（ChartModel 版本）
      * @param filePath 目标文件路径
      * @param model 图表数据模型指针
      * @return true 导出成功
      */
     bool exportToCsv(const QString& filePath, ChartModel* model);
+
+    /**
+     * @brief 导出多通道数据为 CSV 文件
+     * @param filePath 目标文件路径
+     * @param channelNames 通道名称列表，如 {"CH1", "CH2"}
+     * @param data 各通道数据列表，外层为通道，内层为采样点
+     * @return true 导出成功
+     */
+    bool exportToCsv(const QString& filePath,
+                     const QStringList& channelNames,
+                     const QList<QList<double>>& data);
 
     /**
      * @brief 将控件渲染为 PNG 图片
@@ -56,6 +67,17 @@ public:
      * @return true 导出成功
      */
     bool exportToSvg(const QString& filePath, QWidget* widget);
+
+    /**
+     * @brief 导出多通道数据为 JSON 文件
+     * @param filePath 目标文件路径
+     * @param channelNames 通道名称列表
+     * @param data 各通道数据列表
+     * @return true 导出成功
+     */
+    bool exportToJson(const QString& filePath,
+                      const QStringList& channelNames,
+                      const QList<QList<double>>& data);
 
 signals:
     /**

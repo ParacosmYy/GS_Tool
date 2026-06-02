@@ -35,9 +35,21 @@ public:
     /// 绑定数据通道
     void bindChannel(const QString &channelName);
 
+    /// 获取当前值
+    double value() const { return m_value; }
+
+    /// 获取标签
+    QString label() const { return m_label; }
+
+    /// 获取通道名
+    QString channelName() const { return m_channelName; }
+
 protected:
-    /// 绘制事件 —— 暂未实现
+    /// 绘制事件 —— 绘制圆形仪表盘、刻度与指针
     void paintEvent(QPaintEvent *event) override;
+
+    /// 建议的最小尺寸
+    QSize minimumSizeHint() const override;
 
 private:
     double  m_value       = 0.0;      ///< 当前值

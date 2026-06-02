@@ -1,17 +1,21 @@
 /**
  * @file TerminalSplitter.cpp
  * @brief 终端分栏布局控件实现
+ *
+ * 实现可动态增删分栏的终端布局。每个分栏内放置
+ * QTextEdit 作为终端占位控件，待后续集成 TerminalWidget。
  */
 
 #include "terminal/layout/TerminalSplitter.h"
 
+#include <QHBoxLayout>
 #include <QSplitter>
-#include <QVBoxLayout>
+#include <QTextEdit>
 
 /**
  * @brief 构造函数
  *
- * 创建内部 QSplitter 并初始化为水平分栏。
+ * 初始化控件并调用 setupUI() 构建界面。
  *
  * @param parent 父控件指针
  */
@@ -26,30 +30,36 @@ TerminalSplitter::TerminalSplitter(QWidget *parent)
 
 /**
  * @brief 析构函数
+ *
+ * QObject 父子树自动回收子控件，无需手动释放。
  */
 TerminalSplitter::~TerminalSplitter() = default;
 
 /**
  * @brief 初始化界面布局
  *
- * 创建 QSplitter 并将其设置为控件的主布局。
+ * 创建 QHBoxLayout 主布局，内嵌 QSplitter 作为分栏容器。
+ * QSplitter 默认水平方向，可通过 setOrientation() 切换。
  */
 void TerminalSplitter::setupUI()
 {
-    auto *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    auto *mainLayout = new QHBoxLayout(this);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
 
     m_splitter = new QSplitter(this);
+    m_splitter->setObjectName(QStringLiteral("terminalSplitter"));
     m_splitter->setOrientation(Qt::Horizontal);
-    layout->addWidget(m_splitter);
 
-    setLayout(layout);
+    mainLayout->addWidget(m_splitter);
+    setLayout(mainLayout);
 }
 
 /**
  * @brief 设置分栏方向
  *
  * 将内部分栏控件的方向切换为水平或垂直。
+ * 仅在 m_splitter 已创建时生效。
  *
  * @param orientation Qt::Horizontal 为水平分栏，Qt::Vertical 为垂直分栏
  */
@@ -63,17 +73,23 @@ void TerminalSplitter::setOrientation(Qt::Orientation orientation)
 /**
  * @brief 添加一个新分栏区域
  *
- * 在分栏控件末尾追加一个新的占位 QWidget，
- * 并发射 sectionAdded 信号。
+ * 创建 QTextEdit 作为终端占位控件，添加到 QSplitter 末尾。
+ * 控件以 "terminalSection_0"、"terminalSection_1" … 命名，
+ * 便于 QSS 选择器匹配。
  *
- * @return 新分栏的索引号
+ * @return 新分栏的索引号（从 0 开始）
  */
 int TerminalSplitter::addSection()
 {
-    auto *section = new QWidget(m_splitter);
-    m_splitter->addWidget(section);
+    auto *placeholder = new QTextEdit(m_splitter);
+    placeholder->setObjectName(QStringLiteral("terminalSection_%1").arg(m_sectionCount));
+    placeholder->setReadOnly(true);
+    placeholder->setPlaceholderText(tr("终端 %1").arg(m_sectionCount + 1));
+
+    m_splitter->addWidget(placeholder);
     const int index = m_sectionCount;
     ++m_sectionCount;
+
     emit sectionAdded(index);
     return index;
 }
@@ -81,15 +97,26 @@ int TerminalSplitter::addSection()
 /**
  * @brief 移除指定索引的分栏区域
  *
- * 从分栏控件中移除指定索引位置的 widget，
- * 并发射 sectionRemoved 信号。
+ * 从 QSplitter 中移除并删除指定索引处的控件。
+ * 若索引无效则不做任何操作。移除后分栏计数递减。
  *
  * @param index 要移除的分栏索引
  */
 void TerminalSplitter::removeSection(int index)
 {
-    Q_UNUSED(index)
-    // TODO: 从 m_splitter 中移除 index 对应的 widget
+    if (!m_splitter) {
+        return;
+    }
+
+    QWidget *widget = m_splitter->widget(index);
+    if (!widget) {
+        return;
+    }
+
+    widget->setParent(nullptr);
+    delete widget;
+
+    --m_sectionCount;
     emit sectionRemoved(index);
 }
 

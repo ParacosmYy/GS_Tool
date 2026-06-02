@@ -30,7 +30,7 @@ public:
 
     /**
      * @brief 添加一个仪表盘子组件
-     * @param type    组件类型（gauge / progressBar / led / numericDisplay）
+     * @param type    组件类型（gauge / progress / led / numeric）
      * @param channel 绑定的数据通道名称
      * @return 新组件的索引，-1 表示失败
      */
@@ -54,16 +54,30 @@ public:
      */
     QVariantMap saveLayout() const;
 
+    /**
+     * @brief 获取指定索引的子组件
+     * @param index 索引
+     * @return 子控件指针，越界返回 nullptr
+     */
+    QWidget *componentAt(int index) const;
+
+    /**
+     * @brief 获取子组件总数
+     * @return 数量
+     */
+    int componentCount() const;
+
 signals:
     /// 布局发生变更时发射
     void layoutChanged();
 
 private:
-    /// 初始化 UI
+    /// 初始化 UI 与示例控件
     void setupUI();
 
     QGridLayout    *m_grid;        ///< 网格布局
     QList<QWidget*> m_components;  ///< 子组件列表
+    static const int kColumns = 3; ///< 网格列数
 };
 
 #endif // DASHBOARD_WIDGET_H
