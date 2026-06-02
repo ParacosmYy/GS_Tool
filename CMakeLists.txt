@@ -91,6 +91,8 @@ set(SOURCES
     src/chart/zoom/ZoomController.cpp
     src/chart/fft/FftEngine.cpp
     src/chart/fft/FftWidget.cpp
+    src/chart/stats/HistogramWidget.cpp
+    src/chart/stats/ScatterWidget.cpp
     src/ota/manager/OtaManager.cpp
     src/ota/widget/OtaWidget.cpp
     src/ota/widget/OtaWidgetSlots.cpp
@@ -110,6 +112,68 @@ set(SOURCES
     src/utils/log/DataLoggerEdl.cpp
     src/protocol/parser/FrameDefinition.cpp
     src/core/settings/SessionManager.cpp
+
+    # ── F1: 数据录制回放 ──
+    src/core/recording/RecordingTimeline.cpp
+    src/core/recording/PlaybackController.cpp
+    src/core/recording/PlaybackWidget.cpp
+    src/core/recording/RecordingMarker.cpp
+    src/utils/log/RecordingFileFormat.cpp
+
+    # ── F3: 多通道数据导出 ──
+    src/utils/export/ChartExporter.cpp
+    src/utils/export/ExportDialog.cpp
+
+    # ── F2: 自定义协议引擎 ──
+    src/protocol/schema/ProtocolSchema.cpp
+    src/protocol/engine/ProtocolEngine.cpp
+    src/protocol/schema/ProtocolTemplateLibrary.cpp
+    src/protocol/editor/ProtocolSchemaEditor.cpp
+    src/protocol/engine/ProtocolFieldMapper.cpp
+
+    # ── F4: 终端增强 ──
+    src/terminal/layout/TerminalSplitter.cpp
+    src/terminal/layout/TerminalTabManager.cpp
+    src/terminal/layout/TerminalDualView.cpp
+
+    # ── F5: 仪表盘 ──
+    src/dashboard/DashboardWidget.cpp
+    src/dashboard/GaugeWidget.cpp
+    src/dashboard/ProgressBarWidget.cpp
+    src/dashboard/LedIndicatorWidget.cpp
+    src/dashboard/NumericDisplayWidget.cpp
+    src/dashboard/DashboardModel.cpp
+
+    # ── F6: J-Link RTT ──
+    src/rtt/JLinkRttConnection.cpp
+    src/rtt/JLinkSdkLoader.cpp
+    src/rtt/RttConfigPanel.cpp
+    src/rtt/RttChannelManager.cpp
+
+    # ── F7: 自动化触发 ──
+    src/automation/TriggerEngine.cpp
+    src/automation/TriggerAction.cpp
+    src/automation/TriggerManager.cpp
+    src/automation/TriggerListPanel.cpp
+
+    # ── F8: 项目管理 ──
+    src/core/settings/ProjectManager.cpp
+    src/core/settings/ProjectWelcomeDialog.cpp
+
+    # ── F9: 串口高级调试 ──
+    src/serial/signals/SignalLineMonitor.cpp
+    src/serial/signals/SignalLineWidget.cpp
+    src/serial/data/TrafficMonitor.cpp
+    src/serial/data/TrafficMonitorWidget.cpp
+
+    # ── F10: 性能监控 ──
+    src/utils/perf/PerformanceMonitor.cpp
+    src/utils/perf/PerformanceOverlay.cpp
+
+    # ── F11: 插件系统 ──
+    src/plugin/PluginManager.cpp
+    src/plugin/PluginApi.cpp
+    src/plugin/PluginConfigPanel.cpp
 )
 
 set(HEADERS
@@ -173,6 +237,8 @@ set(HEADERS
     src/chart/zoom/ZoomController.h
     src/chart/fft/FftEngine.h
     src/chart/fft/FftWidget.h
+    src/chart/stats/HistogramWidget.h
+    src/chart/stats/ScatterWidget.h
     src/ota/manager/OtaManager.h
     src/ota/widget/OtaWidget.h
     src/ota/history/OtaHistoryModel.h
@@ -189,6 +255,71 @@ set(HEADERS
     src/utils/crypto/CRC.h
     src/utils/crypto/HexConverter.h
     src/utils/data/RingBuffer.h
+
+    # ── F1: 数据录制回放 ──
+    src/core/recording/RecordingTimeline.h
+    src/core/recording/PlaybackController.h
+    src/core/recording/PlaybackWidget.h
+    src/core/recording/RecordingMarker.h
+    src/utils/log/RecordingFileFormat.h
+
+    # ── F3: 多通道数据导出 ──
+    src/utils/export/ChartExporter.h
+    src/utils/export/ExportDialog.h
+
+    # ── F2: 自定义协议引擎 ──
+    src/protocol/schema/ProtocolSchema.h
+    src/protocol/engine/ProtocolEngine.h
+    src/protocol/schema/ProtocolTemplateLibrary.h
+    src/protocol/editor/ProtocolSchemaEditor.h
+    src/protocol/engine/ProtocolFieldMapper.h
+
+    # ── F4: 终端增强 ──
+    src/terminal/layout/TerminalSplitter.h
+    src/terminal/layout/TerminalTabManager.h
+    src/terminal/layout/TerminalDualView.h
+
+    # ── F5: 仪表盘 ──
+    src/dashboard/DashboardWidget.h
+    src/dashboard/GaugeWidget.h
+    src/dashboard/ProgressBarWidget.h
+    src/dashboard/LedIndicatorWidget.h
+    src/dashboard/NumericDisplayWidget.h
+    src/dashboard/DashboardModel.h
+
+    # ── F6: J-Link RTT ──
+    src/rtt/JLinkRttConnection.h
+    src/rtt/JLinkSdkLoader.h
+    src/rtt/RttConfigPanel.h
+    src/rtt/RttChannelManager.h
+
+    # ── F7: 自动化触发 ──
+    src/automation/TriggerRule.h
+    src/automation/TriggerEngine.h
+    src/automation/TriggerAction.h
+    src/automation/TriggerManager.h
+    src/automation/TriggerListPanel.h
+
+    # ── F8: 项目管理 ──
+    src/core/settings/Project.h
+    src/core/settings/ProjectManager.h
+    src/core/settings/ProjectWelcomeDialog.h
+
+    # ── F9: 串口高级调试 ──
+    src/serial/signals/SignalLineMonitor.h
+    src/serial/signals/SignalLineWidget.h
+    src/serial/data/TrafficMonitor.h
+    src/serial/data/TrafficMonitorWidget.h
+
+    # ── F10: 性能监控 ──
+    src/utils/perf/PerformanceMonitor.h
+    src/utils/perf/PerformanceOverlay.h
+
+    # ── F11: 插件系统 ──
+    src/plugin/IEmbedDebugPlugin.h
+    src/plugin/PluginManager.h
+    src/plugin/PluginApi.h
+    src/plugin/PluginConfigPanel.h
 )
 
 set(RESOURCES
