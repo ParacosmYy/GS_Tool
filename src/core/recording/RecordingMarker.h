@@ -59,7 +59,40 @@ public:
      */
     QList<MarkerEntry> markers() const;
 
-signals:
+    /**
+     * @brief 获取标记数量
+     * @return 标记总数
+     */
+    int count() const;
+
+    /**
+     * @brief 获取指定索引的标记
+     * @param index 标记索引
+     * @return 对应的标记条目，越界时返回默认构造的 MarkerEntry
+     */
+    MarkerEntry marker(int index) const;
+
+    /**
+     * @brief 清除所有标记
+     */
+    void clear();
+
+    /**
+     * @brief 查找距离给定时间戳最近的标记
+     * @param timestampMs 目标时间戳（毫秒）
+     * @return 最近标记的索引，列表为空时返回 -1
+     */
+    int findNearest(qint64 timestampMs) const;
+
+    /**
+     * @brief 查找指定时间范围内的所有标记
+     * @param fromMs 起始时间戳（毫秒，含）
+     * @param toMs 结束时间戳（毫秒，含）
+     * @return 范围内标记的索引列表
+     */
+    QList<int> findInRange(qint64 fromMs, qint64 toMs) const;
+
+ signals:
     /**
      * @brief 标记已添加信号
      * @param index 新标记的索引

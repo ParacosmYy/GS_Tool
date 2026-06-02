@@ -84,6 +84,7 @@ private:
     QSlider*     m_slider;      ///< 进度滑块
     QComboBox*   m_speedCombo;  ///< 倍速选择下拉框
     QLabel*      m_timeLabel;   ///< 时间显示标签
+    qint64       m_durationMs = 0;  ///< 回放总时长（毫秒）
 };
 
 #endif // PLAYBACK_WIDGET_H

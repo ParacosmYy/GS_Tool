@@ -62,6 +62,27 @@ public:
      */
     QList<qint64> eventTimestamps() const;
 
+    /**
+     * @brief 记录一个事件时间戳
+     *
+     * 将指定时间戳添加到事件列表中，用于标记录制过程中的关键时间点。
+     * 时间戳必须在有效范围内 [0, 当前已录制时长]。
+     *
+     * @param timestampMs 事件发生的时间点（毫秒）
+     */
+    void recordEvent(qint64 timestampMs);
+
+    /**
+     * @brief 清除所有已记录的事件
+     */
+    void clearEvents();
+
+    /**
+     * @brief 获取录制总时长
+     * @return 上次录制结束时的总时长（毫秒），录制中返回当前已过时长
+     */
+    qint64 totalDurationMs() const;
+
 signals:
     /**
      * @brief 时间更新信号
@@ -84,6 +105,7 @@ private:
     qint64 m_startTimeMs;   ///< 录制起始的绝对时间（毫秒）
     qint64 m_elapsedMs;     ///< 已录制的累计时长（毫秒）
     bool   m_recording;     ///< 当前是否正在录制
+    QList<qint64> m_events; ///< 已记录的事件时间戳列表（毫秒）
 };
 
 #endif // RECORDING_TIMELINE_H

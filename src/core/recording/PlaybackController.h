@@ -10,6 +10,7 @@
 #define PLAYBACK_CONTROLLER_H
 
 #include <QObject>
+#include <QElapsedTimer>
 
 class QTimer;
 
@@ -75,6 +76,24 @@ public:
      */
     bool isPlaying() const;
 
+    /**
+     * @brief 设置回放总时长
+     * @param durationMs 总时长（毫秒）
+     */
+    void setDuration(qint64 durationMs);
+
+    /**
+     * @brief 获取当前回放位置
+     * @return 当前时间位置（毫秒）
+     */
+    qint64 currentTimeMs() const;
+
+    /**
+     * @brief 获取回放总时长
+     * @return 总时长（毫秒）
+     */
+    qint64 durationMs() const;
+
 signals:
     /**
      * @brief 回放已启动信号
@@ -97,10 +116,29 @@ signals:
      */
     void speedChanged(qreal speed);
 
+    /**
+     * @brief 回放时间更新信号（约 60fps 周期触发）
+     * @param timeMs 当前回放位置（毫秒）
+     */
+    void timeUpdated(qint64 timeMs);
+
+    /**
+     * @brief 回放到达终点信号
+     */
+    void playbackFinished();
+
 private:
-    qreal    m_speed;     ///< 当前回放倍速
-    bool     m_playing;   ///< 是否正在播放
-    QTimer*  m_timer;     ///< 驱动回放进度的定时器
+    /**
+     * @brief 定时器超时处理槽函数，驱动回放进度
+     */
+    void onTick();
+
+    qreal    m_speed;          ///< 当前回放倍速
+    bool     m_playing;        ///< 是否正在播放
+    QTimer*  m_timer;          ///< 驱动回放进度的定时器
+    qint64   m_durationMs = 0; ///< 回放总时长（毫秒）
+    qint64   m_currentTimeMs = 0; ///< 当前已累积的回放位置（毫秒）
+    QElapsedTimer m_elapsed;   ///< 精确计时器，测量两次累积点之间的真实经过时间
 };
 
 #endif // PLAYBACK_CONTROLLER_H
