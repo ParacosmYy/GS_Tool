@@ -71,13 +71,11 @@ void ChartWidget::setupUI()
     m_xAxis->setLabelFormat("%d");
     m_chart->addAxis(m_xAxis, Qt::AlignBottom);
 
-    m_yAxis = new QValueAxis;
-    m_yAxis->setTitleText(tr("数值"));
-    m_chart->addAxis(m_yAxis, Qt::AlignLeft);
+    // 多通道独立Y轴管理器（替代单一m_yAxis）
+    m_yAxisManager = new YAxisManager(m_chart, this);
 
     // 设置初始轴范围，使图表在没有数据时也能渲染背景
     m_xAxis->setRange(0, 10);
-    m_yAxis->setRange(0, 100);
 
     m_chartView = new QChartView(m_chart);
     m_chartView->setObjectName("chartView");  // QSS 选择器需要
@@ -209,7 +207,10 @@ QStringList ChartWidget::channels() const
 void ChartWidget::setYRange(double min, double max)
 {
     m_autoYRange = false;
-    m_yAxis->setRange(min, max);
+    // 设置所有已有Y轴的范围
+    for (const QString& ch : m_seriesMap.keys()) {
+        m_yAxisManager->updateRange(ch, min, max);
+    }
 }
 
 /** @brief 设置是否启用Y轴自动范围 @param enabled true=自动 */
@@ -252,13 +253,17 @@ void ChartWidget::updateChart(const QStringList& updatedChannels)
     QPair<double, double> xRange = m_model->xRange();
     m_xAxis->setRange(xRange.first, xRange.second);
 
-    // 自动Y轴范围
+    // 自动Y轴范围: 按通道独立更新
     if (m_autoYRange) {
-        QPair<double, double> yRange = m_model->globalYRange();
-        if (yRange.first != 0.0 || yRange.second != 0.0) {
-            double margin = (yRange.second - yRange.first) * 0.1;
-            if (margin < 0.001) margin = 1.0;
-            m_yAxis->setRange(yRange.first - margin, yRange.second + margin);
+        for (const QString& name : updatedChannels) {
+            if (!m_seriesMap.contains(name)) continue;
+            QPair<double, double> yRange = m_model->channelYRange(name);
+            if (yRange.first != 0.0 || yRange.second != 0.0) {
+                double margin = (yRange.second - yRange.first) * 0.1;
+                if (margin < 0.001) margin = 1.0;
+                m_yAxisManager->updateRange(name,
+                    yRange.first - margin, yRange.second + margin);
+            }
         }
     }
 
@@ -278,6 +283,9 @@ void ChartWidget::onChannelsChanged()
     }
     m_seriesMap.clear();
 
+    // 清除所有旧Y轴（全量重建）
+    m_yAxisManager->clearAll();
+
     // 获取当前主题对应的调色板
     bool isDark = ThemeManager::instance().isSystemDarkMode()
         || ThemeManager::instance().currentTheme().contains("dark");
@@ -291,23 +299,46 @@ void ChartWidget::onChannelsChanged()
     //       但 configureFromFrameDefinition() 还未被调用，m_configSet 为空
     if (m_configSet.channels().isEmpty() && m_model) {
         const QStringList names = m_model->channelNames();
+        // 自动分配左右侧
+        QStringList emptyUnits;
+        for (int i = 0; i < names.size(); ++i) emptyUnits.append(QString());
+        QVector<YAxisSide> sides = YAxisManager::autoAssignSides(names, emptyUnits);
+
         for (int i = 0; i < names.size(); ++i) {
-            QColor chColor = palette[m_seriesMap.size() % palette.size()];
+            QColor chColor = palette[i % palette.size()];
+            m_yAxisManager->createAxis(names[i], chColor, sides[i]);
             createSeries(names[i], chColor);
         }
         m_statusLabel->setText(tr("通道: %1").arg(m_seriesMap.size()));
         return;
     }
 
-    // ---- 主路径: 根据完整的通道配置创建series ----
+    // ---- 主路径: 根据完整的通道配置创建series和Y轴 ----
     const QVector<ChannelConfig>& channels = m_configSet.channels();
+    QStringList names, units;
     for (const ChannelConfig& cfg : channels) {
         if (cfg.enabled) {
-            // 如果通道配置有自定义颜色则使用，否则从主题调色板获取
-            QColor chColor = cfg.color.isValid() ? cfg.color :
-                palette[m_seriesMap.size() % palette.size()];
-            createSeries(cfg.displayName, chColor);
+            names.append(cfg.displayName);
+            units.append(cfg.unit);
         }
+    }
+
+    // 自动分配左右侧
+    QVector<YAxisSide> sides = YAxisManager::autoAssignSides(names, units);
+
+    int idx = 0;
+    for (const ChannelConfig& cfg : channels) {
+        if (!cfg.enabled) continue;
+        // 如果通道配置有自定义颜色则使用，否则从主题调色板获取
+        QColor chColor = cfg.color.isValid() ? cfg.color :
+            palette[idx % palette.size()];
+
+        // 创建独立Y轴
+        m_yAxisManager->createAxis(cfg.displayName, chColor,
+            sides[idx], cfg.unit);
+
+        createSeries(cfg.displayName, chColor);
+        ++idx;
     }
 
     m_statusLabel->setText(tr("通道: %1").arg(m_seriesMap.size()));
@@ -321,7 +352,10 @@ void ChartWidget::onDataCleared()
         series->clear();
     }
     m_xAxis->setRange(0, 10);
-    m_yAxis->setRange(0, 100);
+    // 重置所有Y轴到默认范围
+    for (const QString& ch : m_seriesMap.keys()) {
+        m_yAxisManager->updateRange(ch, 0, 100);
+    }
 }
 
 // ============================================================================
@@ -345,39 +379,13 @@ void ChartWidget::onClearClicked()
 // 主题切换 -- 响应 ThemeManager::themeChanged 信号
 // ============================================================================
 
-/**
- * @brief 主题切换时重绘所有图表视觉元素
- *
- * 调用 applyThemeColors() 更新:
- *   - 图表背景色 (ThemeManager::BgPrimary)
- *   - 网格线颜色 (ThemeManager::Border)
- *   - 坐标轴标签颜色 (ThemeManager::TextSecondary)
- *   - 图例文字颜色 (ThemeManager::TextSecondary)
- *   - 所有数据线颜色 (ChartColors::colorsForTheme)
- */
-/** @brief 主题切换回调：从ThemeManager获取新颜色并应用到series和图表 */
+/** @brief 主题切换回调：重绘所有图表视觉元素 */
 void ChartWidget::onThemeChanged()
 {
     applyThemeColors();
 }
 
-/**
- * @brief 应用当前主题颜色到图表所有视觉元素
- *
- * 从 ThemeManager 获取语义色值并应用到:
- *   1. QChart 背景画刷 (BgPrimary)
- *   2. QChart 绘图区域背景 (BgPrimary)
- *   3. X/Y 坐标轴网格线颜色 (Border)
- *   4. X/Y 坐标轴刻度标签颜色 (TextSecondary)
- *   5. X/Y 坐标轴标题颜色 (TextSecondary)
- *   6. 图例标签颜色 (TextSecondary)
- *   7. 所有 QLineSeries 数据线颜色 (ChartColors 主题调色板)
- *
- * 数据线颜色更新策略:
- *   - 主题切换时，所有数据线按通道索引从新调色板中重新分配颜色
- *   - 这确保在暗色/亮色背景下线条都有足够对比度
- */
-/** @brief 从ThemeManager获取颜色并应用到图表背景/坐标轴/series/工具栏 */
+/** @brief 应用当前主题颜色到图表背景/坐标轴/series */
 void ChartWidget::applyThemeColors()
 {
     auto& theme = ThemeManager::instance();
@@ -391,35 +399,25 @@ void ChartWidget::applyThemeColors()
     m_chart->setPlotAreaBackgroundBrush(QBrush(bgColor));
     m_chart->setPlotAreaBackgroundVisible(true);
 
-    // ---- 2. 网格线颜色 ----
+    // ---- 2. 网格线和标签颜色 ----
     QColor gridColor = theme.color(ThemeManager::SemanticColor::Border);
+    QColor labelColor = theme.color(ThemeManager::SemanticColor::TextSecondary);
 
     // X轴网格线和标签颜色
     m_xAxis->setGridLineColor(gridColor);
     m_xAxis->setLinePen(QPen(gridColor, 1));
-
-    // Y轴网格线和标签颜色
-    m_yAxis->setGridLineColor(gridColor);
-    m_yAxis->setLinePen(QPen(gridColor, 1));
-
-    // ---- 3. 坐标轴标签颜色 ----
-    QColor labelColor = theme.color(ThemeManager::SemanticColor::TextSecondary);
-
-    // X轴标签和标题
-    QBrush labelBrush(labelColor);
-    m_xAxis->setLabelsBrush(labelBrush);
+    m_xAxis->setLabelsBrush(QBrush(labelColor));
     m_xAxis->setTitleBrush(labelColor);
 
-    // Y轴标签和标题
-    m_yAxis->setLabelsBrush(labelBrush);
-    m_yAxis->setTitleBrush(labelColor);
+    // Y轴: 委托给 YAxisManager 更新所有Y轴颜色
+    m_yAxisManager->applyThemeColors(gridColor, labelColor);
 
-    // ---- 4. 图例文字颜色 ----
+    // ---- 3. 图例文字颜色 ----
     if (m_chart->legend()) {
         m_chart->legend()->setLabelColor(labelColor);
     }
 
-    // ---- 5. 数据线颜色 ----
+    // ---- 4. 数据线颜色 ----
     // 从当前主题对应的调色板中按通道索引重新分配颜色
     QVector<QColor> palette = ChartColors::colorsForTheme(isDark);
     if (palette.isEmpty()) return;  // 防御性检查: 空调色板无法分配颜色
@@ -471,7 +469,8 @@ void ChartWidget::createSeries(const QString& name, const QColor& color)
 
     m_chart->addSeries(series);
     series->attachAxis(m_xAxis);
-    series->attachAxis(m_yAxis);
+    // 附加到通道对应的独立Y轴（由 YAxisManager 管理）
+    m_yAxisManager->attachSeries(name, series);
 
     m_seriesMap[name] = series;
 }

@@ -35,6 +35,7 @@
 #include "chart/model/ChartModel.h"
 #include "chart/overlay/CursorOverlay.h"
 #include "chart/zoom/ZoomController.h"
+#include "chart/scale/YAxisManager.h"
 
 struct FrameDefinition;
 
@@ -173,10 +174,10 @@ private:
     QChartView* m_chartView;          ///< 图表视图控件
     QChart* m_chart;                  ///< Qt Charts 图表对象
     QValueAxis* m_xAxis;             ///< X轴（采样序号）
-    QValueAxis* m_yAxis;             ///< Y轴（数值）
 
     ChartModel* m_model;              ///< 数据模型（管理通道配置、滑动窗口、降采样）
     ChannelConfigSet m_configSet;     ///< 通道配置集合
+    YAxisManager* m_yAxisManager;     ///< 多通道独立Y轴管理器
 
     /** @brief 通道名 -> QLineSeries 映射（仅用于渲染层） */
     QMap<QString, QLineSeries*> m_seriesMap;

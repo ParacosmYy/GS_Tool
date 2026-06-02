@@ -86,6 +86,7 @@ set(SOURCES
     src/chart/widget/ChartWidget.cpp
     src/chart/model/ChannelConfig.cpp
     src/chart/model/ChartModel.cpp
+    src/chart/scale/YAxisManager.cpp
     src/chart/overlay/CursorOverlay.cpp
     src/chart/zoom/ZoomController.cpp
     src/ota/manager/OtaManager.cpp
@@ -165,6 +166,7 @@ set(HEADERS
     src/chart/widget/ChartColors.h
     src/chart/model/ChannelConfig.h
     src/chart/model/ChartModel.h
+    src/chart/scale/YAxisManager.h
     src/chart/overlay/CursorOverlay.h
     src/chart/zoom/ZoomController.h
     src/ota/manager/OtaManager.h

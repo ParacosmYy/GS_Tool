@@ -16,6 +16,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "chart/widget/ChartColors.h"
+#include "chart/scale/YAxisManager.h"
 
 // 前向声明，避免直接依赖协议层头文件
 struct FieldDef;
@@ -68,6 +69,14 @@ struct ChannelConfig {
 
     // 单位（显示在Y轴标题或图例中）
     QString unit;
+
+    // ---- Y轴配置 ----
+
+    // Y轴放置位置（左侧/右侧）
+    YAxisSide yAxisSide = YAxisSide::Left;
+
+    // 是否自动计算Y轴范围（true=根据数据自适应，false=手动固定）
+    bool autoYRange = true;
 
     // ---- 采样控制 ----
 

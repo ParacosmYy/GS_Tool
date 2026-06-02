@@ -113,6 +113,9 @@ QJsonObject ChannelConfig::toJson() const
     obj["enabled"] = enabled;
     obj["unit"] = unit;
     obj["sampleDivisor"] = sampleDivisor;
+    // yAxisSide: 0=Left, 1=Right
+    obj["yAxisSide"] = static_cast<int>(yAxisSide);
+    obj["autoYRange"] = autoYRange;
     return obj;
 }
 
@@ -141,6 +144,10 @@ ChannelConfig ChannelConfig::fromJson(const QJsonObject& obj)
     cfg.unit = obj["unit"].toString();
     int sd = obj["sampleDivisor"].toInt(1);
     cfg.sampleDivisor = (sd >= 1) ? sd : 1;  // 降采样因子最小为1
+    // yAxisSide 反序列化（0=Left, 1=Right，默认Left）
+    int yas = obj["yAxisSide"].toInt(0);
+    cfg.yAxisSide = (yas >= 0 && yas <= 1) ? static_cast<YAxisSide>(yas) : YAxisSide::Left;
+    cfg.autoYRange = obj["autoYRange"].toBool(true);
     return cfg;
 }
 
