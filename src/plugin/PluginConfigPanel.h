@@ -2,7 +2,7 @@
  * @file PluginConfigPanel.h
  * @brief 插件配置面板 — 插件管理 UI 控件
  *
- * 显示已加载和可用的插件列表，支持加载/卸载操作。
+ * 显示已加载和可用的插件列表，支持加载/卸载/扫描操作。
  * 用户交互通过信号通知外部 PluginManager 执行实际操作。
  *
  * 协作关系:
@@ -14,6 +14,7 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QPushButton>
+#include <QLabel>
 #include <QString>
 
 class PluginManager;
@@ -54,9 +55,14 @@ private:
     /** @brief 初始化 UI 布局和控件 */
     void setupUI();
 
+    /** @brief 从 PluginManager 刷新插件列表显示 */
+    void refreshList();
+
+    QLabel* m_titleLabel;               ///< 标题标签
     QListWidget* m_pluginList;          ///< 插件列表控件
     QPushButton* m_loadBtn;             ///< 加载插件按钮
     QPushButton* m_unloadBtn;           ///< 卸载插件按钮
+    QPushButton* m_scanBtn;             ///< 扫描插件按钮
     PluginManager* m_manager = nullptr; ///< 插件管理器（不拥有）
 };
 

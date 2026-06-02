@@ -63,6 +63,10 @@ signals:
      */
     void rateUpdated(double rxRate, double txRate);
 
+private slots:
+    /** @brief 定时器超时处理，计算瞬时速率 */
+    void calculateRates();
+
 private:
     qint64 m_rxBytes = 0;              ///< 累计接收字节数
     qint64 m_txBytes = 0;              ///< 累计发送字节数

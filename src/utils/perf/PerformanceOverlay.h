@@ -34,6 +34,14 @@ public:
      */
     void setMonitor(PerformanceMonitor *monitor);
 
+    /**
+     * @brief 手动更新统计数据显示
+     * @param fps        帧率
+     * @param avgFrameMs 平均帧耗时（ms）
+     * @param memBytes   内存占用（字节）
+     */
+    void updateStats(double fps, double avgFrameMs, qint64 memBytes);
+
 private slots:
     /**
      * @brief 统计数据更新回调

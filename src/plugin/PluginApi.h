@@ -59,6 +59,14 @@ signals:
     void dataReceived(const QByteArray& data);
 
     /**
+     * @brief 数据发送请求信号
+     * @param data 待发送的数据
+     *
+     * 由 sendData() 发出，上层 SendController 连接此信号执行实际发送。
+     */
+    void dataSendRequested(const QByteArray& data);
+
+    /**
      * @brief 面板已注册信号
      * @param name 面板名称
      * @param panel 面板控件指针

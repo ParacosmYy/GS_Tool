@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QElapsedTimer>
 #include <QMap>
+#include <QList>
 
 /**
  * @class PerformanceMonitor
@@ -54,20 +55,29 @@ public:
     /**
      * @brief 记录某模块的延迟
      * @param tag   模块标签
-     * @param usNanos 延迟（微秒）
+     * @param microseconds 延迟（微秒）
      */
-    void recordLatency(const QString &tag, quint64 usNanos);
+    void recordLatency(const QString &tag, quint64 microseconds);
+
+    /// 便捷方法：标记一帧（beginFrame + endFrame）
+    void recordFrame();
+
+    /**
+     * @brief 获取总帧数
+     * @return 自创建以来的总帧计数
+     */
+    qint64 totalFrames() const;
 
 signals:
     /// 统计数据更新
     void statsUpdated(double fps, double avgFrameMs, qint64 memBytes);
 
 private:
-    QElapsedTimer m_frameTimer;       ///< 帧计时器
-    double        m_fps       = 0.0;  ///< 当前 FPS
-    double        m_avgFrameMs = 0.0; ///< 平均帧耗时
-    int           m_frameCount = 0;   ///< 帧计数
-    QMap<QString, quint64> m_latencyMap; ///< 模块延迟记录
+    QElapsedTimer m_frameTimer;                    ///< 帧计时器
+    double        m_fps       = 0.0;               ///< 当前 FPS
+    double        m_avgFrameMs = 0.0;              ///< 平均帧耗时（EMA）
+    qint64        m_frameCount = 0;                ///< 帧计数
+    QMap<QString, QList<quint64>> m_latencyMap;    ///< 模块延迟记录（每个标签保留最近100条）
 };
 
 #endif // PERFORMANCE_MONITOR_H

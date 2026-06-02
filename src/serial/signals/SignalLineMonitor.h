@@ -50,9 +50,13 @@ public:
 signals:
     /**
      * @brief 信号线状态变化通知
-     * @param signals 最新信号线状态
+     * @param newSignals 最新信号线状态
      */
     void signalsChanged(const PinoutSignals& newSignals);
+
+private slots:
+    /** @brief 定时器超时处理，轮询信号线状态 */
+    void onTick();
 
 private:
     QTimer* m_pollTimer = nullptr;      ///< 轮询定时器

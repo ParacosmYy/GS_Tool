@@ -1,14 +1,17 @@
 /**
  * @file TrafficMonitor.cpp
- * @brief 流量监控器实现 — 骨架文件
+ * @brief 流量监控器实现 — 统计和计算串口收发数据速率
  */
 
 #include "serial/data/TrafficMonitor.h"
 
+/** @brief 速率历史最大保留点数 */
+static constexpr int MAX_HISTORY_POINTS = 300;
+
 /**
  * @brief 构造函数
  *
- * 初始化计时器和定时器，但不自动启动计算。
+ * 创建速率计算定时器（1000ms 间隔），启动经过时间计时器。
  *
  * @param parent 父对象
  */
@@ -16,8 +19,16 @@ TrafficMonitor::TrafficMonitor(QObject* parent)
     : QObject(parent)
     , m_rxBytes(0)
     , m_txBytes(0)
-    , m_calcTimer(nullptr)
+    , m_calcTimer(new QTimer(this))
 {
+    m_calcTimer->setInterval(1000);
+    m_calcTimer->setSingleShot(false);
+
+    connect(m_calcTimer, &QTimer::timeout,
+            this, &TrafficMonitor::calculateRates);
+
+    m_elapsed.start();
+    m_calcTimer->start();
 }
 
 /** @brief 析构函数 */
@@ -53,8 +64,10 @@ void TrafficMonitor::recordRxBytes(qint64 bytes)
  */
 double TrafficMonitor::rxRate() const
 {
-    // TODO: 基于最近周期的字节数差值计算速率
-    return 0.0;
+    if (m_rxHistory.isEmpty()) {
+        return 0.0;
+    }
+    return m_rxHistory.last().y();
 }
 
 /**
@@ -63,8 +76,10 @@ double TrafficMonitor::rxRate() const
  */
 double TrafficMonitor::txRate() const
 {
-    // TODO: 基于最近周期的字节数差值计算速率
-    return 0.0;
+    if (m_txHistory.isEmpty()) {
+        return 0.0;
+    }
+    return m_txHistory.last().y();
 }
 
 /**
@@ -97,4 +112,45 @@ void TrafficMonitor::reset()
     m_rxHistory.clear();
     m_txHistory.clear();
     m_elapsed.restart();
+}
+
+/**
+ * @brief 定时器超时处理 — 计算瞬时速率
+ *
+ * 根据累计字节数和经过时间计算平均速率，
+ * 追加到历史队列（保留最近 300 个点），
+ * 重置计数器并发出 rateUpdated 信号。
+ */
+void TrafficMonitor::calculateRates()
+{
+    double elapsed = m_elapsed.elapsed() / 1000.0;  // 转为秒
+    if (elapsed <= 0.0) {
+        return;
+    }
+
+    // 计算速率
+    double rx = m_rxBytes / elapsed;
+    double tx = m_txBytes / elapsed;
+
+    // 计算总经过时间（秒），用作历史 X 轴
+    double timestamp = m_elapsed.elapsed() / 1000.0;
+
+    // 追加到历史队列
+    m_rxHistory.append(QPointF(timestamp, rx));
+    m_txHistory.append(QPointF(timestamp, tx));
+
+    // 裁剪历史到最大长度
+    while (m_rxHistory.size() > MAX_HISTORY_POINTS) {
+        m_rxHistory.removeFirst();
+    }
+    while (m_txHistory.size() > MAX_HISTORY_POINTS) {
+        m_txHistory.removeFirst();
+    }
+
+    // 重置字节数和计时器
+    m_rxBytes = 0;
+    m_txBytes = 0;
+    m_elapsed.restart();
+
+    emit rateUpdated(rx, tx);
 }

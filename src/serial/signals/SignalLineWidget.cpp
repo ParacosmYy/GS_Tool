@@ -1,12 +1,11 @@
 /**
  * @file SignalLineWidget.cpp
- * @brief 信号线状态显示控件实现 — 骨架文件
+ * @brief 信号线状态显示控件实现 — 可视化展示串口 6 个信号线电平
  */
 
 #include "serial/signals/SignalLineWidget.h"
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QGridLayout>
+#include <QHBoxLayout>
 
 /**
  * @brief 构造函数
@@ -30,44 +29,148 @@ SignalLineWidget::SignalLineWidget(QWidget* parent)
 /**
  * @brief 更新信号线状态显示
  *
- * 根据 signals 更新各信号线标签的状态指示（颜色/文字）。
+ * 根据 newSignals 更新各信号线标签的状态文字（HIGH/LOW）。
+ * 同时更新 DTR/RTS 按钮的选中状态（不触发信号）。
  *
- * @param signals 最新的信号线状态
+ * @param newSignals 最新的信号线状态
  */
 void SignalLineWidget::updateSignals(const PinoutSignals& newSignals)
 {
-    Q_UNUSED(newSignals);
+    // 更新输入信号线标签（只读显示）
+    m_ctsLabel->setText(newSignals.cts ? tr("HIGH") : tr("LOW"));
+    m_dsrLabel->setText(newSignals.dsr ? tr("HIGH") : tr("LOW"));
+    m_dcdLabel->setText(newSignals.dcd ? tr("HIGH") : tr("LOW"));
+    m_riLabel->setText(newSignals.ri   ? tr("HIGH") : tr("LOW"));
+
+    // 更新输出信号线标签（含切换按钮）
+    m_rtsLabel->setText(newSignals.rts ? tr("HIGH") : tr("LOW"));
+    m_dtrLabel->setText(newSignals.dtr ? tr("HIGH") : tr("LOW"));
+
+    // 同步按钮状态（阻塞信号避免递归触发）
+    m_rtsBtn->blockSignals(true);
+    m_rtsBtn->setChecked(newSignals.rts);
+    m_rtsBtn->blockSignals(false);
+
+    m_dtrBtn->blockSignals(true);
+    m_dtrBtn->setChecked(newSignals.dtr);
+    m_dtrBtn->blockSignals(false);
 }
 
 /**
  * @brief 设置 DTR 信号线是否可控
- * @param controllable true 可控，false 只读
+ * @param controllable true 可控（显示切换按钮），false 只读
  */
 void SignalLineWidget::setDtrControllable(bool controllable)
 {
-    Q_UNUSED(controllable)
-    // TODO: 显示/隐藏 DTR 切换按钮
+    m_dtrBtn->setVisible(controllable);
 }
 
 /**
  * @brief 设置 RTS 信号线是否可控
- * @param controllable true 可控，false 只读
+ * @param controllable true 可控（显示切换按钮），false 只读
  */
 void SignalLineWidget::setRtsControllable(bool controllable)
 {
-    Q_UNUSED(controllable)
-    // TODO: 显示/隐藏 RTS 切换按钮
+    m_rtsBtn->setVisible(controllable);
 }
 
 /**
  * @brief 初始化 UI 布局和控件
  *
- * 使用网格布局排列 6 个信号线标签和 2 个切换按钮。
+ * 使用网格布局排列 6 个信号线状态标签和 2 个切换按钮。
+ * 布局:
+ *   Row 0: RTS名称 + RTS状态 | CTS名称 + CTS状态
+ *   Row 1: DTR名称 + DTR状态 | DSR名称 + DSR状态
+ *   Row 2: DCD名称 + DCD状态 | RI名称  + RI状态
+ *   Row 3: DTR切换按钮        | RTS切换按钮
  */
 void SignalLineWidget::setupUI()
 {
-    // TODO: 创建并布局所有 UI 控件
-    // m_rtsLabel = new QLabel(tr("RTS"), this);
-    // m_ctsLabel = new QLabel(tr("CTS"), this);
-    // ... 等等
+    auto* layout = new QGridLayout(this);
+    layout->setContentsMargins(4, 4, 4, 4);
+    layout->setSpacing(6);
+
+    int row = 0;
+
+    // --- Row 0: RTS + CTS ---
+    {
+        auto* nameLbl = new QLabel(tr("RTS"), this);
+        nameLbl->setObjectName(QStringLiteral("rtsNameLabel"));
+        layout->addWidget(nameLbl, row, 0);
+
+        m_rtsLabel = new QLabel(tr("LOW"), this);
+        m_rtsLabel->setObjectName(QStringLiteral("rtsStateLabel"));
+        layout->addWidget(m_rtsLabel, row, 1);
+    }
+    {
+        auto* nameLbl = new QLabel(tr("CTS"), this);
+        nameLbl->setObjectName(QStringLiteral("ctsNameLabel"));
+        layout->addWidget(nameLbl, row, 2);
+
+        m_ctsLabel = new QLabel(tr("LOW"), this);
+        m_ctsLabel->setObjectName(QStringLiteral("ctsStateLabel"));
+        layout->addWidget(m_ctsLabel, row, 3);
+    }
+    ++row;
+
+    // --- Row 1: DTR + DSR ---
+    {
+        auto* nameLbl = new QLabel(tr("DTR"), this);
+        nameLbl->setObjectName(QStringLiteral("dtrNameLabel"));
+        layout->addWidget(nameLbl, row, 0);
+
+        m_dtrLabel = new QLabel(tr("LOW"), this);
+        m_dtrLabel->setObjectName(QStringLiteral("dtrStateLabel"));
+        layout->addWidget(m_dtrLabel, row, 1);
+    }
+    {
+        auto* nameLbl = new QLabel(tr("DSR"), this);
+        nameLbl->setObjectName(QStringLiteral("dsrNameLabel"));
+        layout->addWidget(nameLbl, row, 2);
+
+        m_dsrLabel = new QLabel(tr("LOW"), this);
+        m_dsrLabel->setObjectName(QStringLiteral("dsrStateLabel"));
+        layout->addWidget(m_dsrLabel, row, 3);
+    }
+    ++row;
+
+    // --- Row 2: DCD + RI ---
+    {
+        auto* nameLbl = new QLabel(tr("DCD"), this);
+        nameLbl->setObjectName(QStringLiteral("dcdNameLabel"));
+        layout->addWidget(nameLbl, row, 0);
+
+        m_dcdLabel = new QLabel(tr("LOW"), this);
+        m_dcdLabel->setObjectName(QStringLiteral("dcdStateLabel"));
+        layout->addWidget(m_dcdLabel, row, 1);
+    }
+    {
+        auto* nameLbl = new QLabel(tr("RI"), this);
+        nameLbl->setObjectName(QStringLiteral("riNameLabel"));
+        layout->addWidget(nameLbl, row, 2);
+
+        m_riLabel = new QLabel(tr("LOW"), this);
+        m_riLabel->setObjectName(QStringLiteral("riStateLabel"));
+        layout->addWidget(m_riLabel, row, 3);
+    }
+    ++row;
+
+    // --- Row 3: DTR + RTS 切换按钮 ---
+    m_dtrBtn = new QPushButton(tr("DTR"), this);
+    m_dtrBtn->setObjectName(QStringLiteral("dtrToggleBtn"));
+    m_dtrBtn->setCheckable(true);
+    m_dtrBtn->setVisible(false);  // 默认不可控
+    layout->addWidget(m_dtrBtn, row, 0, 1, 2);
+
+    m_rtsBtn = new QPushButton(tr("RTS"), this);
+    m_rtsBtn->setObjectName(QStringLiteral("rtsToggleBtn"));
+    m_rtsBtn->setCheckable(true);
+    m_rtsBtn->setVisible(false);  // 默认不可控
+    layout->addWidget(m_rtsBtn, row, 2, 1, 2);
+
+    // 连接按钮信号
+    connect(m_dtrBtn, &QPushButton::toggled,
+            this, &SignalLineWidget::dtrToggleRequested);
+    connect(m_rtsBtn, &QPushButton::toggled,
+            this, &SignalLineWidget::rtsToggleRequested);
 }
