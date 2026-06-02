@@ -46,6 +46,18 @@ public:
      */
     ProtocolSchema *currentSchema() const;
 
+    /**
+     * @brief 设置 JSON 编辑器文本内容
+     * @param json 要显示的 JSON 文本
+     */
+    void setJsonText(const QString &json);
+
+    /**
+     * @brief 获取 JSON 编辑器当前文本内容
+     * @return 编辑器中的 JSON 文本
+     */
+    QString jsonText() const;
+
 signals:
     /**
      * @brief 协议定义被修改信号
@@ -57,6 +69,10 @@ signals:
      * @param filePath 保存文件路径
      */
     void saveRequested(const QString &filePath);
+
+private slots:
+    /** @brief 验证当前 JSON 文本是否为合法协议定义 */
+    void validateJson();
 
 private:
     /** @brief 初始化界面布局 */

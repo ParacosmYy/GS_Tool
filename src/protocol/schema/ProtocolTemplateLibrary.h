@@ -62,7 +62,16 @@ public:
      */
     bool exportTemplate(const QString &name, const QString &filePath);
 
+    /**
+     * @brief 获取已加载模板数量
+     * @return 内置 + 用户导入的模板总数
+     */
+    int templateCount() const;
+
 private:
+    /** @brief 初始化内置协议模板（在构造时调用） */
+    void initBuiltinTemplates();
+
     QMap<QString, ProtocolSchema *> m_templates; ///< 模板名称 → 协议定义映射
 };
 

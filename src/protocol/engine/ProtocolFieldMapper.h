@@ -60,6 +60,35 @@ public:
      */
     void applyMappings(const QVariantMap &parsedFields, ChartModel *chartModel);
 
+    /**
+     * @brief 获取当前映射数量
+     * @return 映射条目数
+     */
+    int mappingCount() const;
+
+    /**
+     * @brief 检查指定字段是否已映射
+     * @param fieldName 字段名称
+     * @return 存在映射返回 true
+     */
+    bool hasMapping(const QString &fieldName) const;
+
+    /**
+     * @brief 清除所有映射关系
+     */
+    void clearMappings();
+
+signals:
+    /**
+     * @brief 通道数据映射完成信号
+     *
+     * 当 applyMappings() 成功将数值字段映射到通道后发出，
+     * 可用于日志、调试或将数据转发到其他组件。
+     * @param channel 图表通道名称
+     * @param value 映射的数值
+     */
+    void channelDataMapped(const QString &channel, double value);
+
 private:
     QMap<QString, QString> m_mappings; ///< 字段名 → 图表通道名映射表
 };

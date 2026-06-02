@@ -13,6 +13,7 @@
 #include <QList>
 #include <QString>
 #include <QVector>
+#include <QJsonObject>
 
 /**
  * @class ProtocolSchema
@@ -106,11 +107,64 @@ public:
      */
     bool isValid() const;
 
+    /**
+     * @brief 将当前协议定义序列化为 JSON 对象
+     * @return 包含完整协议定义的 QJsonObject
+     */
+    QJsonObject toJson() const;
+
+    /**
+     * @brief 获取最近一次解析错误的描述信息
+     * @return 错误描述字符串，无错误时为空
+     */
+    QString lastError() const;
+
+    /* —— 可编程构造用 setter —— */
+
+    /**
+     * @brief 设置协议名称
+     * @param name 协议名称
+     */
+    void setName(const QString &name);
+
+    /**
+     * @brief 设置帧定界规则
+     * @param rule 帧定界规则
+     */
+    void setFraming(const FramingRule &rule);
+
+    /**
+     * @brief 追加一个字段定义
+     * @param field 字段定义
+     */
+    void addField(const FieldDefinition &field);
+
+    /**
+     * @brief 设置协议定义是否有效
+     * @param valid 有效标志
+     */
+    void setValid(bool valid);
+
 private:
     QString m_name;                     ///< 协议名称
     FramingRule m_framing;              ///< 帧定界规则
     QList<FieldDefinition> m_fields;    ///< 字段定义列表
     bool m_valid = false;               ///< 协议是否有效
+    QString m_lastError;                ///< 最近一次解析错误信息
+
+    /**
+     * @brief 将校验类型枚举转换为字符串
+     * @param type 校验算法枚举值
+     * @return 字符串标识
+     */
+    QString checksumTypeToString(ChecksumType type) const;
+
+    /**
+     * @brief 将字符串转换为校验类型枚举
+     * @param str 校验算法字符串标识
+     * @return 对应的枚举值
+     */
+    ChecksumType checksumTypeFromString(const QString &str) const;
 };
 
 #endif // PROTOCOL_SCHEMA_H
