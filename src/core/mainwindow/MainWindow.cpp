@@ -222,14 +222,12 @@ QWidget* MainWindow::createContentArea()
     // 通过 PanelManager 统一创建所有面板
     m_panelManager->createPanels(m_otaManager, m_terminalModel);
 
-    // 将所有面板添加到面板栈布局
-    serialLayout->addWidget(m_panelManager->serialConfig());
-    serialLayout->addWidget(m_panelManager->dataStats());
-    serialLayout->addWidget(m_panelManager->protocolView());
-    serialLayout->addWidget(m_panelManager->frameEditor());
-    serialLayout->addWidget(m_panelManager->chartWidget());
-    serialLayout->addWidget(m_panelManager->otaWidget());
-    serialLayout->addWidget(m_panelManager->bookmarkWidget());
+    // 将所有面板添加到面板栈布局（数据驱动，遍历 PanelManager.allPanels()）
+    for (auto* panel : m_panelManager->allPanels()) {
+        if (panel) {
+            serialLayout->addWidget(panel);
+        }
+    }
 
     // 终端布局管理器
     m_layoutManager = new TerminalLayoutManager(this);

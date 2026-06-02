@@ -62,11 +62,13 @@ void ChartWidget::setupUI()
 
     // ---- 图表区域 ----
     m_chart = new QChart;
+    m_chart->setObjectName("chartChart");
     m_chart->legend()->setVisible(true);
     m_chart->legend()->setAlignment(Qt::AlignBottom);
     m_chart->setMargins(QMargins(4, 4, 4, 4));
 
     m_xAxis = new QValueAxis;
+    m_xAxis->setObjectName("chartXAxis");
     m_xAxis->setTitleText(tr("采样数"));
     m_xAxis->setLabelFormat("%d");
     m_chart->addAxis(m_xAxis, Qt::AlignBottom);
@@ -106,7 +108,6 @@ void ChartWidget::setupUI()
 QWidget* ChartWidget::createToolbar()
 {
     auto* toolbar = new QWidget;
-    toolbar->setObjectName("chartToolbar");
     toolbar->setObjectName("chartToolbar");
     auto* toolLayout = new QHBoxLayout(toolbar);
     toolLayout->setContentsMargins(8, 4, 8, 4);

@@ -155,6 +155,15 @@ private:
     QColor m_panelBgColor;          ///< 差值面板背景色
 
     ZoomController* m_zoomController = nullptr; ///< 关联的缩放控制器(绘制框选用)
+
+private slots:
+    /**
+     * @brief 主题切换时更新所有颜色成员
+     *
+     * 重新从ThemeManager读取语义色，刷新游标/面板/文字颜色。
+     * 连接到ThemeManager::themeChanged信号。
+     */
+    void onThemeChanged();
 };
 
 #endif // CURSOROVERLAY_H

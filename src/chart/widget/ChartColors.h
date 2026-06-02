@@ -19,8 +19,23 @@
 
 #include <QColor>
 #include <QVector>
+#include "core/theme/ThemeManager.h"
 
 namespace ChartColors {
+
+/**
+ * @brief 统一的暗色主题检测函数
+ *
+ * 检测逻辑: 系统暗色模式 OR 主题名称包含"dark"
+ * 用于替代分散在各个图表组件中的不一致检测方式。
+ *
+ * @return true=当前为暗色主题
+ */
+inline bool isDarkTheme()
+{
+    auto& theme = ThemeManager::instance();
+    return theme.isSystemDarkMode() || theme.currentTheme().contains("dark");
+}
 
 /**
  * @brief 暗色主题默认通道颜色表（Catppuccin Mocha 调色板）

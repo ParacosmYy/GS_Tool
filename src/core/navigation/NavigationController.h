@@ -22,11 +22,13 @@ class QWidget;
  * @brief 导航树 -> 面板映射条目
  *
  * 数据驱动的面板查找结构，消除 if-else 链。
+ * category: 导航树分组名称（翻译键），相同 category 的面板归入同一分组
  * name: 导航树叶子节点的显示文本（使用裸字符串，运行时通过 tr() 匹配翻译后的值）
  * widget: 对应的面板 QWidget 指针（在 buildNavTree 中绑定）
  */
 struct NavPanelMapping {
-    const char* name;       ///< 翻译键，传给 tr() 进行运行时翻译匹配
+    const char* category;   ///< 分组翻译键（如 "连接"/"终端"/"图表"/"协议"/"工具"/"调试"/"系统"）
+    const char* name;       ///< 面板翻译键，传给 tr() 进行运行时翻译匹配
     QWidget* widget;        ///< 目标面板指针
 };
 

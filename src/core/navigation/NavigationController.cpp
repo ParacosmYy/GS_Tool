@@ -15,6 +15,8 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QCoreApplication>
+#include <QStringList>
+#include <QMap>
 
 /**
  * @brief 创建导航树连接类型指示圆点图标
@@ -61,15 +63,16 @@ NavigationController::~NavigationController()
 }
 
 /**
- * @brief 构建导航树模型并展开全部节点
+ * @brief 构建导航树模型并展开全部节点（数据驱动）
  *
- * 导航树结构:
- *   串口 (蓝点) --+-- 配置 / 终端 / 统计 / 协议 / 帧编辑器 / 波形图 / OTA升级
- *   网络 --+-- TCP客户端(绿点) / TCP服务端(绿点) / UDP(黄点)
- *   工具 --- 数据导出
+ * 从 NavPanelMapping 映射表自动构建导航树:
+ *   - 按 category 字段自动分组
+ *   - 每个 category 分组使用 ThemeManager Accent 色圆点图标
+ *   - 面板名称作为叶子节点
+ *   - 自动展开所有分组
  *
  * @param navTree 导航树视图控件
- * @param mappings 面板名称到 QWidget 的映射表
+ * @param mappings 面板映射表（必须包含 category 字段）
  */
 void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPanelMapping>& mappings)
 {
@@ -79,61 +82,38 @@ void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPan
     auto* treeModel = new QStandardItemModel(this);
     auto* rootItem = treeModel->invisibleRootItem();
 
-    // 串口分组 -- 蓝色圆点标识（从ThemeManager获取Accent色）
-    auto* serialItem = new QStandardItem(createDotIcon(
-        ThemeManager::instance().color(ThemeManager::SemanticColor::Accent)), tr("串口"));
-    serialItem->setEditable(false);
-    auto* configItem = new QStandardItem(tr("配置"));
-    configItem->setEditable(false);
-    auto* terminalItem = new QStandardItem(tr("终端"));
-    terminalItem->setEditable(false);
-    auto* statsItem = new QStandardItem(tr("统计"));
-    statsItem->setEditable(false);
-    serialItem->appendRow(configItem);
-    serialItem->appendRow(terminalItem);
-    serialItem->appendRow(statsItem);
-    auto* protocolItem = new QStandardItem(tr("协议"));
-    protocolItem->setEditable(false);
-    auto* frameEditorItem = new QStandardItem(tr("帧编辑器"));
-    frameEditorItem->setEditable(false);
-    auto* chartItem = new QStandardItem(tr("波形图"));
-    chartItem->setEditable(false);
-    serialItem->appendRow(protocolItem);
-    serialItem->appendRow(frameEditorItem);
-    serialItem->appendRow(chartItem);
-    auto* otaItem = new QStandardItem(tr("OTA升级"));
-    otaItem->setEditable(false);
-    serialItem->appendRow(otaItem);
-    auto* bookmarkItem = new QStandardItem(tr("书签"));
-    bookmarkItem->setEditable(false);
-    serialItem->appendRow(bookmarkItem);
+    // ---- 数据驱动构建: 按 category 分组 ----
+    // 遍历映射表，收集有序且去重的 category 列表
+    QStringList categories;
+    for (const auto& mapping : mappings) {
+        QString cat = QCoreApplication::translate("Nav", mapping.category);
+        if (!categories.contains(cat)) {
+            categories.append(cat);
+        }
+    }
 
-    // 网络分组 -- TCP 绿色圆点, UDP 黄色圆点（从ThemeManager获取语义色）
-    auto* networkItem = new QStandardItem(tr("网络"));
-    networkItem->setEditable(false);
-    auto* tcpClientItem = new QStandardItem(createDotIcon(
-        ThemeManager::instance().color(ThemeManager::SemanticColor::Success)), tr("TCP客户端"));
-    tcpClientItem->setEditable(false);
-    auto* tcpServerItem = new QStandardItem(createDotIcon(
-        ThemeManager::instance().color(ThemeManager::SemanticColor::Success)), tr("TCP服务端"));
-    tcpServerItem->setEditable(false);
-    auto* udpItem = new QStandardItem(createDotIcon(
-        ThemeManager::instance().color(ThemeManager::SemanticColor::Warning)), tr("UDP"));
-    udpItem->setEditable(false);
-    networkItem->appendRow(tcpClientItem);
-    networkItem->appendRow(tcpServerItem);
-    networkItem->appendRow(udpItem);
+    // 每个 category 创建一个分组节点
+    QColor dotColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Accent);
+    QMap<QString, QStandardItem*> categoryItems;
 
-    // 工具分组
-    auto* toolsItem = new QStandardItem(tr("工具"));
-    toolsItem->setEditable(false);
-    auto* exportItem = new QStandardItem(tr("数据导出"));
-    exportItem->setEditable(false);
-    toolsItem->appendRow(exportItem);
+    for (const QString& cat : categories) {
+        auto* catItem = new QStandardItem(createDotIcon(dotColor), cat);
+        catItem->setEditable(false);
+        rootItem->appendRow(catItem);
+        categoryItems[cat] = catItem;
+    }
 
-    rootItem->appendRow(serialItem);
-    rootItem->appendRow(networkItem);
-    rootItem->appendRow(toolsItem);
+    // 将面板叶子节点添加到对应的 category 分组
+    for (const auto& mapping : mappings) {
+        QString cat = QCoreApplication::translate("Nav", mapping.category);
+        auto* catItem = categoryItems.value(cat, nullptr);
+        if (!catItem) continue;
+
+        QString panelName = QCoreApplication::translate("MainWindow", mapping.name);
+        auto* panelItem = new QStandardItem(panelName);
+        panelItem->setEditable(false);
+        catItem->appendRow(panelItem);
+    }
 
     navTree->setModel(treeModel);
     navTree->expandAll();  // 默认展开所有分组
@@ -212,11 +192,8 @@ QWidget* NavigationController::lookupPanel(const QString& translatedName) const
 /**
  * @brief 主题切换时刷新导航树圆点图标颜色
  *
- * buildNavTree()中的圆点图标在构建时读取ThemeManager颜色，
- * 主题切换后需要重新着色以匹配新主题。
- * 导航树结构: root -> 串口(0, Accent蓝) / 网络(1) -> TCP客户端(0,Success绿)
- *                                            -> TCP服务端(1,Success绿)
- *                                            -> UDP(2,Warning黄)
+ * 数据驱动方式: 遍历树模型根节点的所有子节点(category分组)，
+ * 统一刷新为当前ThemeManager Accent色。
  */
 void NavigationController::onThemeChanged()
 {
@@ -228,33 +205,11 @@ void NavigationController::onThemeChanged()
     auto* root = model->invisibleRootItem();
     if (!root) return;
 
-    // 串口分组(第0行) — 蓝色圆点(Accent)
-    auto* serialItem = root->child(0);
-    if (serialItem) {
-        serialItem->setIcon(createDotIcon(
-            ThemeManager::instance().color(ThemeManager::SemanticColor::Accent)));
-    }
-
-    // 网络分组(第1行) — 子项有TCP(绿/Success)和UDP(黄/Warning)
-    auto* networkItem = root->child(1);
-    if (networkItem) {
-        // TCP客户端(第0行)
-        auto* tcpClient = networkItem->child(0);
-        if (tcpClient) {
-            tcpClient->setIcon(createDotIcon(
-                ThemeManager::instance().color(ThemeManager::SemanticColor::Success)));
-        }
-        // TCP服务端(第1行)
-        auto* tcpServer = networkItem->child(1);
-        if (tcpServer) {
-            tcpServer->setIcon(createDotIcon(
-                ThemeManager::instance().color(ThemeManager::SemanticColor::Success)));
-        }
-        // UDP(第2行)
-        auto* udpItem = networkItem->child(2);
-        if (udpItem) {
-            udpItem->setIcon(createDotIcon(
-                ThemeManager::instance().color(ThemeManager::SemanticColor::Warning)));
+    QColor dotColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Accent);
+    for (int i = 0; i < root->rowCount(); ++i) {
+        auto* catItem = root->child(i);
+        if (catItem) {
+            catItem->setIcon(createDotIcon(dotColor));
         }
     }
 }

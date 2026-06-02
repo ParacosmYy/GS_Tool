@@ -44,6 +44,7 @@ set(SOURCES
     src/core/toolbar/ToolbarController.cpp
     src/core/terminal/TerminalController.cpp
     src/core/panels/PanelManager.cpp
+    src/core/panels/PanelManagerCreation.cpp
     src/core/background/BackgroundWidget.cpp
     src/core/background/BackgroundSettingsPopup.cpp
     src/core/widgets/AnimatedButton.cpp
@@ -267,6 +268,7 @@ set(HEADERS
     src/core/toolbar/ToolbarController.h
     src/core/terminal/TerminalController.h
     src/core/panels/PanelManager.h
+    src/core/panels/PanelManagerPanels.h
     src/core/background/BackgroundWidget.h
     src/core/background/BackgroundSettingsPopup.h
     src/core/connect/ConnectionManager.h

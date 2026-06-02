@@ -56,6 +56,10 @@ CursorOverlay::CursorOverlay(QChartView* chartView, ChartModel* model,
                               m_cursorAColor.blue(), 30);
     m_textColor = ThemeManager::instance().color(ThemeManager::SemanticColor::TextPrimary);
     m_panelBgColor = ThemeManager::instance().color(ThemeManager::SemanticColor::BgSecondary);
+
+    // 主题切换时刷新颜色
+    connect(&ThemeManager::instance(), &ThemeManager::themeChanged,
+            this, &CursorOverlay::onThemeChanged);
 }
 
 // ============================================================
@@ -288,28 +292,34 @@ void CursorOverlay::drawHighlightRegion(QPainter& painter, double pixelAX,
  * @param outY 输出Y值
  * @return true=找到并插值成功
  */
-static bool interpolateY(const QVector<QPointF>& data, double x, double& outY)
-{
-    if (data.isEmpty()) return false;
+    static bool interpolateY(const QVector<QPointF>& data, double x, double& outY)
+    {
+        if (data.isEmpty()) return false;
 
-    // X在数据范围外 — 取边界值
-    if (x <= data.first().x()) { outY = data.first().y(); return true; }
-    if (x >= data.last().x()) { outY = data.last().y(); return true; }
+        // X在数据范围外 — 取边界值
+        if (x <= data.first().x()) { outY = data.first().y(); return true; }
+        if (x >= data.last().x()) { outY = data.last().y(); return true; }
 
-    // 二分查找第一个 x >= target 的位置
-    auto it = std::lower_bound(data.begin(), data.end(), x,
-        [](const QPointF& pt, double val) { return pt.x() < val; });
+        // 二分查找第一个 x >= target 的位置
+        auto it = std::lower_bound(data.begin(), data.end(), x,
+            [](const QPointF& pt, double val) { return pt.x() < val; });
 
-    if (it == data.end()) { outY = data.last().y(); return true; }
-    if (it == data.begin()) { outY = it->y(); return true; }
+        if (it == data.end()) { outY = data.last().y(); return true; }
+        if (it == data.begin()) { outY = it->y(); return true; }
 
-    // 线性插值: it-1 和 it 之间
-    const QPointF& p0 = *(it - 1);
-    const QPointF& p1 = *it;
-    double t = (x - p0.x()) / (p1.x() - p0.x());
-    outY = p0.y() + t * (p1.y() - p0.y());
-    return true;
-}
+        // 线性插值: it-1 和 it 之间
+        const QPointF& p0 = *(it - 1);
+        const QPointF& p1 = *it;
+        double dx = p1.x() - p0.x();
+        if (qFuzzyIsNull(dx)) {
+            // 相邻数据点X值相同，取平均值
+            outY = (p0.y() + p1.y()) * 0.5;
+            return true;
+        }
+        double t = (x - p0.x()) / dx;
+        outY = p0.y() + t * (p1.y() - p0.y());
+        return true;
+    }
 
 /**
  * @brief 绘制差值信息面板
@@ -411,7 +421,26 @@ void CursorOverlay::paintEvent(QPaintEvent* /*event*/)
     if (m_zoomController && m_zoomController->isRubberBandActive()) {
         QRectF rubberRect = m_zoomController->rubberBandRect();
         painter.setPen(QPen(m_cursorAColor, 1, Qt::DashLine));
-        painter.setBrush(QColor(255, 255, 255, 30));
+        // 使用主题Accent色半透明填充，在深色和浅色主题下均可见
+        QColor rubberFill = ThemeManager::instance().color(ThemeManager::SemanticColor::Accent);
+        rubberFill.setAlpha(30);
+        painter.setBrush(rubberFill);
         painter.drawRect(rubberRect);
     }
+}
+
+// ============================================================
+// 主题切换
+// ============================================================
+
+/** @brief 主题切换时重新从ThemeManager加载所有颜色成员 */
+void CursorOverlay::onThemeChanged()
+{
+    m_cursorAColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Error);
+    m_cursorBColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Accent);
+    m_highlightColor = QColor(m_cursorAColor.red(), m_cursorAColor.green(),
+                              m_cursorAColor.blue(), 30);
+    m_textColor = ThemeManager::instance().color(ThemeManager::SemanticColor::TextPrimary);
+    m_panelBgColor = ThemeManager::instance().color(ThemeManager::SemanticColor::BgSecondary);
+    update();
 }
