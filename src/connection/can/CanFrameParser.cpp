@@ -54,7 +54,9 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
         if (rawData.size() < 5) return frame;
         bool ok = false;
         frame.id = QByteArray(d, 3).toUInt(&ok, 16);
+        if (!ok) return frame;
         frame.dlc = static_cast<quint8>(QByteArray(d + 3, 1).toUInt(&ok, 16));
+        if (!ok || frame.dlc > 8) return frame;
         frame.extended = false;
         frame.rtr = true;
         break;
@@ -64,7 +66,9 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
         if (rawData.size() < 10) return frame;
         bool ok = false;
         frame.id = QByteArray(d, 8).toUInt(&ok, 16);
+        if (!ok) return frame;
         frame.dlc = static_cast<quint8>(QByteArray(d + 8, 1).toUInt(&ok, 16));
+        if (!ok || frame.dlc > 8) return frame;
         frame.extended = true;
         frame.rtr = true;
         break;

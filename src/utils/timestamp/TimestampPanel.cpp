@@ -32,7 +32,10 @@ TimestampPanel::TimestampPanel(QWidget *parent)
 
     // 输入行
     auto *inputLayout = new QHBoxLayout();
-    inputLayout->addWidget(new QLabel(tr("时间戳："), this));
+    auto* tsLabel = new QLabel(tr("时间戳："), this);
+    tsLabel->setObjectName("timestampLabel");
+    inputLayout->addWidget(tsLabel);
+    m_timestampEdit->setObjectName("timestampInput");
     m_timestampEdit->setPlaceholderText(tr("输入时间戳或日期..."));
     inputLayout->addWidget(m_timestampEdit);
 
@@ -44,12 +47,16 @@ TimestampPanel::TimestampPanel(QWidget *parent)
     m_formatCombo->addItem(tr("ISO 日期"), 3);
 
     inputLayout->addWidget(m_formatCombo);
+    m_convertBtn->setObjectName("timestampConvertBtn");
+    m_nowBtn->setObjectName("timestampNowBtn");
     inputLayout->addWidget(m_convertBtn);
     inputLayout->addWidget(m_nowBtn);
 
     // 结果 + 复制按钮
     auto *resultLayout = new QHBoxLayout();
-    m_resultLabel->setStyleSheet(QStringLiteral("font-size: 12pt;"));
+    /* 结果样式由QSS主题控制，使用objectName匹配 */
+    m_resultLabel->setObjectName("timestampResultLabel");
+    m_resultLabel->setProperty("class", "resultLabel");
     m_resultLabel->setWordWrap(true);
     resultLayout->addWidget(m_resultLabel);
     resultLayout->addStretch();

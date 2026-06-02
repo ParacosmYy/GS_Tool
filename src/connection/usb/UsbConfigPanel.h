@@ -32,6 +32,12 @@ public:
      */
     void setDetector(UsbDeviceDetector* detector);
 
+    /**
+     * @brief 设置连接状态(更新按钮文本和状态标签)
+     * @param connected true=已连接
+     */
+    void setConnected(bool connected);
+
 signals:
     /** @brief 用户请求连接 */
     void connectRequested(quint16 vid, quint16 pid, int interface);
@@ -58,6 +64,7 @@ private:
     QPushButton* m_scanBtn       = nullptr; ///< 扫描设备按钮
     QLabel*     m_statusLabel    = nullptr; ///< 状态标签
     UsbDeviceDetector* m_detector = nullptr; ///< 设备检测器
+    bool m_connected = false;                ///< 当前连接状态
 };
 
 #endif // USB_CONFIG_PANEL_H

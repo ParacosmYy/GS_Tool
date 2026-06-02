@@ -328,7 +328,7 @@ void CursorOverlay::drawDeltaPanel(QPainter& painter)
 
     // 构建差值文本(使用tr()包裹用户可见文字)
     QStringList lines;
-    lines << tr("ΔX: %1 samples").arg(deltaX, 0, 'f', 1);
+    lines << tr("ΔX: %1 采样").arg(deltaX, 0, 'f', 1);
     if (deltaX > 0) {
         lines << tr("1/ΔX: %1").arg(1.0 / deltaX, 0, 'f', 4);
     }

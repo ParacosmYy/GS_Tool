@@ -239,10 +239,15 @@ void YModemTransfer::sendBlock()
     if (m_conn) {
         writeChecked(packet);
     }
+    /* 仅在首次发送该块时更新进度(NAK重传时不重复推进)
+     * m_bytesSent指向当前块起始偏移，首次发送时sent > m_bytesSent
+     * 重传时m_bytesSent已被ACK回调推进，sent == m_bytesSent */
     qint64 sent = qMin(offset + dataSize,
                         static_cast<qint64>(m_currentData.size()));
-    m_totalBytesSent += (sent - m_bytesSent);
-    m_bytesSent = sent;
+    if (sent > m_bytesSent) {
+        m_totalBytesSent += (sent - m_bytesSent);
+        m_bytesSent = sent;
+    }
 }
 
 /** @brief 发送EOT(End of Transmission)字节通知接收方当前文件传输结束 */

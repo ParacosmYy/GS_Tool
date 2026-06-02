@@ -82,6 +82,11 @@ public:
     const QList<TriggerRuleConfig>& rules() const;
 
     /**
+     * @brief 清空所有规则
+     */
+    void clearRules();
+
+    /**
      * @brief 获取累计成功匹配次数
      * @return 匹配次数
      */

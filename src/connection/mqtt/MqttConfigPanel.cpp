@@ -22,28 +22,39 @@ MqttConfigPanel::MqttConfigPanel(QWidget* parent)
     setObjectName("MqttConfigPanel");
 
     /* 服务器地址 — 默认 broker.emqx.io */
+    m_hostEdit->setObjectName("mqttHostEdit");
     m_hostEdit->setPlaceholderText(tr("例如 broker.emqx.io"));
     m_hostEdit->setText("broker.emqx.io");
 
     /* 端口 */
+    m_portSpin->setObjectName("mqttPortSpin");
     m_portSpin->setRange(1, 65535);
     m_portSpin->setValue(1883);
 
     /* 客户端ID */
+    m_clientIdEdit->setObjectName("mqttClientIdEdit");
     m_clientIdEdit->setPlaceholderText(tr("留空则自动生成"));
 
     /* 认证 */
+    m_usernameEdit->setObjectName("mqttUsernameEdit");
     m_usernameEdit->setPlaceholderText(tr("可选"));
+    m_passwordEdit->setObjectName("mqttPasswordEdit");
     m_passwordEdit->setEchoMode(QLineEdit::Password);
     m_passwordEdit->setPlaceholderText(tr("可选"));
 
     /* KeepAlive */
+    m_keepAliveSpin->setObjectName("mqttKeepAliveSpin");
     m_keepAliveSpin->setRange(10, 3600);
     m_keepAliveSpin->setValue(60);
     m_keepAliveSpin->setSuffix(tr(" 秒"));
 
     /* Clean Session — 默认开启 */
+    m_cleanSessionCheck->setObjectName("mqttCleanSessionCheck");
     m_cleanSessionCheck->setChecked(true);
+
+    /* 按钮/状态 */
+    m_connectBtn->setObjectName("mqttConnectBtn");
+    m_statusLabel->setObjectName("mqttStatusLabel");
 
     /* 布局 */
     auto form = new QFormLayout(this);

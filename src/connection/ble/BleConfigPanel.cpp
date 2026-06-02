@@ -38,6 +38,8 @@ BleConfigPanel::BleConfigPanel(QWidget* parent)
     // 地址输入校验: XX:XX:XX:XX:XX:XX 格式
     QRegularExpression addrRegex(
         "([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
+    m_addressEdit->setValidator(
+        new QRegularExpressionValidator(addrRegex, this));
     m_addressEdit->setToolTip(
         tr("蓝牙设备地址格式: XX:XX:XX:XX:XX:XX"));
 
@@ -84,6 +86,12 @@ QVariantMap BleConfigPanel::config() const
 
 void BleConfigPanel::setScanner(BleScanner* scanner)
 {
+    /* 清理旧scanner的信号连接 */
+    if (m_scanner) {
+        disconnect(m_scanner, nullptr, this, nullptr);
+        m_deviceCombo->clear();
+        m_deviceList.clear();
+    }
     m_scanner = scanner;
     if (m_scanner) {
         connect(m_scanner, &BleScanner::deviceFound,
@@ -98,6 +106,18 @@ void BleConfigPanel::onDeviceFound(const QVariantMap& device)
     const QString name = device.value("name").toString();
     const QString addr = device.value("address").toString();
     const int rssi = device.value("rssi").toInt();
+
+    /* 去重: 按地址检查是否已存在 */
+    for (int i = 0; i < m_deviceList.size(); ++i) {
+        if (m_deviceList.at(i).toMap().value("address").toString() == addr) {
+            /* 更新已有条目的RSSI和名称 */
+            m_deviceList[i] = device;
+            m_deviceCombo->setItemText(i,
+                QStringLiteral("%1 (%2) [%3 dBm]")
+                    .arg(name, addr, QString::number(rssi)));
+            return;
+        }
+    }
 
     const QString display = QStringLiteral("%1 (%2) [%3 dBm]")
         .arg(name, addr, QString::number(rssi));

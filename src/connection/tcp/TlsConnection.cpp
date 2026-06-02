@@ -74,29 +74,48 @@ bool TlsConnection::open()
     /// 加载本地证书和私钥
     if (!m_certPath.isEmpty() && !m_keyPath.isEmpty()) {
         QFile certFile(m_certPath);
-        if (certFile.open(QIODevice::ReadOnly)) {
-            QSslCertificate cert(&certFile, QSsl::Pem);
-            m_socket->setLocalCertificate(cert);
-            certFile.close();
+        if (!certFile.open(QIODevice::ReadOnly)) {
+            emit errorOccurred(tr("无法打开证书文件: %1").arg(m_certPath));
+            return false;
         }
+        QSslCertificate cert(&certFile, QSsl::Pem);
+        if (cert.isNull()) {
+            emit errorOccurred(tr("证书解析失败: %1").arg(m_certPath));
+            return false;
+        }
+        m_socket->setLocalCertificate(cert);
+        certFile.close();
+
         QFile keyFile(m_keyPath);
-        if (keyFile.open(QIODevice::ReadOnly)) {
-            QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem);
-            m_socket->setPrivateKey(key);
-            keyFile.close();
+        if (!keyFile.open(QIODevice::ReadOnly)) {
+            emit errorOccurred(tr("无法打开私钥文件: %1").arg(m_keyPath));
+            return false;
         }
+        QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem);
+        if (key.isNull()) {
+            emit errorOccurred(tr("私钥解析失败: %1").arg(m_keyPath));
+            return false;
+        }
+        m_socket->setPrivateKey(key);
+        keyFile.close();
     }
 
     /// 加载CA证书
     if (!m_caPath.isEmpty()) {
         QFile caFile(m_caPath);
-        if (caFile.open(QIODevice::ReadOnly)) {
-            QSslCertificate caCert(&caFile, QSsl::Pem);
-            QSslConfiguration sslConfig = m_socket->sslConfiguration();
-            sslConfig.addCaCertificate(caCert);
-            m_socket->setSslConfiguration(sslConfig);
-            caFile.close();
+        if (!caFile.open(QIODevice::ReadOnly)) {
+            emit errorOccurred(tr("无法打开CA证书文件: %1").arg(m_caPath));
+            return false;
         }
+        QSslCertificate caCert(&caFile, QSsl::Pem);
+        if (caCert.isNull()) {
+            emit errorOccurred(tr("CA证书解析失败: %1").arg(m_caPath));
+            return false;
+        }
+        QSslConfiguration sslConfig = m_socket->sslConfiguration();
+        sslConfig.addCaCertificate(caCert);
+        m_socket->setSslConfiguration(sslConfig);
+        caFile.close();
     }
 
     /// 设置对端验证模式
@@ -133,6 +152,7 @@ bool TlsConnection::open()
 void TlsConnection::close()
 {
     if (m_socket) {
+        disconnect(m_socket, nullptr, this, nullptr);  // 断开所有信号防止析构期间回调
         m_socket->disconnectFromHost();
         m_socket->deleteLater();
         m_socket = nullptr;

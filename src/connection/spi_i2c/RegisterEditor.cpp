@@ -62,8 +62,7 @@ void RegisterEditor::readAddress(int address)
     /// 根据连接类型分派读操作
     auto* i2c = qobject_cast<I2cConnection*>(m_connection);
     if (i2c) {
-        data = i2c->readRegister(i2c->name().contains("@") ? 0x00 : 0x00,
-                                  address, len);
+        data = i2c->readRegister(m_deviceAddress, address, len);
     } else {
         /// SPI或其他类型: 使用通用write/read方式
         QByteArray cmd;
@@ -241,7 +240,9 @@ void RegisterEditor::setupConnections()
 void RegisterEditor::appendLog(const QString& msg, bool isTx)
 {
     if (!m_log) return;
-    QString color = isTx ? "#4FC3F7" : "#81C784";
+    /// TX用Link色，RX用ToolTipText色，跟随QSS主题
+    QString color = isTx ? palette().color(QPalette::Link).name()
+                         : palette().color(QPalette::ToolTipText).name();
     m_log->append(QString("<span style='color:%1'>%2</span>").arg(color, msg));
 }
 

@@ -57,12 +57,29 @@ QVariantMap SpiI2cConfigPanel::config() const
 void SpiI2cConfigPanel::setMode(const QString& mode)
 {
     m_currentMode = mode;
-    /// 同步下拉框
+    /// 同步下拉框(阻止信号防止递归触发onModeChanged)
     if (m_busModeCombo) {
+        m_busModeCombo->blockSignals(true);
         int idx = (mode == "i2c") ? 1 : 0;
         m_busModeCombo->setCurrentIndex(idx);
+        m_busModeCombo->blockSignals(false);
     }
     updateModeVisibility();
+}
+
+/**
+ * @brief 设置连接状态(由外部连接管理器调用)
+ * @param connected true=已连接
+ */
+void SpiI2cConfigPanel::setConnected(bool connected)
+{
+    m_connected = connected;
+    if (m_connectBtn) {
+        m_connectBtn->setText(connected ? tr("断开") : tr("连接"));
+    }
+    if (m_statusLabel) {
+        m_statusLabel->setText(connected ? tr("已连接") : tr("未连接"));
+    }
 }
 
 /**

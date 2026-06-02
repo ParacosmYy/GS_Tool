@@ -55,6 +55,12 @@ public:
      */
     void setMode(const QString& mode);
 
+    /**
+     * @brief 设置连接状态(更新按钮文本和状态标签)
+     * @param connected true=已连接
+     */
+    void setConnected(bool connected);
+
 signals:
     /** @brief 请求连接信号，携带配置参数 */
     void connectRequested(const QVariantMap& config);

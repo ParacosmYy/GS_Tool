@@ -187,8 +187,11 @@ bool ZoomController::popZoomState()
     ZoomState st = m_zoomStack.pop();
     if (auto ax = xAxis()) ax->setRange(st.minX, st.maxX);
     if (auto ay = yAxis()) ay->setRange(st.minY, st.maxY);
-    m_zoomLevel = (m_originalRange.maxX - m_originalRange.minX) /
-                  (st.maxX - st.minX);
+    /* 防御: 若弹出状态范围为0(缩放到单点)，zoomLevel设为1.0 */
+    const double rangeX = st.maxX - st.minX;
+    m_zoomLevel = (rangeX > 0.0)
+        ? (m_originalRange.maxX - m_originalRange.minX) / rangeX
+        : 1.0;
     emit viewChanged();
     return true;
 }

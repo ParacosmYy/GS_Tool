@@ -21,16 +21,22 @@ MqttSubscriptionPanel::MqttSubscriptionPanel(QWidget* parent)
     setObjectName("MqttSubscriptionPanel");
 
     /* 订阅列表树 */
+    m_subTree->setObjectName("mqttSubTree");
     m_subTree->setHeaderLabels({tr("主题"), tr("QoS")});
     m_subTree->setRootIsDecorated(false);
     m_subTree->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_subTree->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    m_topicEdit->setObjectName("mqttTopicEdit");
     m_topicEdit->setPlaceholderText(tr("输入主题，如 sensor/#"));
 
+    m_qosCombo->setObjectName("mqttQosCombo");
     m_qosCombo->addItem("0", 0);
     m_qosCombo->addItem("1", 1);
     m_qosCombo->addItem("2", 2);
+
+    m_subBtn->setObjectName("mqttSubBtn");
+    m_unsubBtn->setObjectName("mqttUnsubBtn");
 
     /* 输入行 */
     auto inputLayout = new QHBoxLayout();
@@ -44,6 +50,7 @@ MqttSubscriptionPanel::MqttSubscriptionPanel(QWidget* parent)
     mainLayout->addWidget(m_subTree, 1);
 
     /* 右键菜单 */
+    m_contextMenu->setObjectName("mqttSubContextMenu");
     m_contextMenu->addAction(m_unsubAction);
 
     /* 信号连接 */

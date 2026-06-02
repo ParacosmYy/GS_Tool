@@ -107,6 +107,7 @@ QWidget* ChartWidget::createToolbar()
 {
     auto* toolbar = new QWidget;
     toolbar->setObjectName("chartToolbar");
+    toolbar->setObjectName("chartToolbar");
     auto* toolLayout = new QHBoxLayout(toolbar);
     toolLayout->setContentsMargins(8, 4, 8, 4);
 

@@ -117,5 +117,5 @@ QString JLinkSdkLoader::sdkVersion() const
     }
 
     // TODO: 调用 JLINK_GetFirmwareString 或 JLINK_GetDLLVersion 获取版本
-    return tr("Unknown");
+    return tr("未知");
 }

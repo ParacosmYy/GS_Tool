@@ -21,6 +21,7 @@ CanBusMonitor::CanBusMonitor(QWidget* parent)
     setObjectName("CanBusMonitor");
 
     /* 表格配置: Time, ID, DLC, Data, Extended, RTR, Count */
+    m_frameTable->setObjectName("canFrameTable");
     m_frameTable->setColumnCount(7);
     m_frameTable->setHorizontalHeaderLabels({
         tr("时间"), tr("帧ID"), tr("DLC"), tr("数据"),
@@ -32,6 +33,9 @@ CanBusMonitor::CanBusMonitor(QWidget* parent)
     m_frameTable->setAlternatingRowColors(true);
 
     /* 顶部工具栏 */
+    m_countLabel->setObjectName("canCountLabel");
+    m_clearBtn->setObjectName("canClearBtn");
+    m_autoScrollCheck->setObjectName("canAutoScrollCheck");
     m_autoScrollCheck->setChecked(true);
 
     auto toolbar = new QHBoxLayout();
@@ -118,12 +122,12 @@ int CanBusMonitor::frameCount() const
 QBrush CanBusMonitor::rowBrush(const CanFrame& frame) const
 {
     if (frame.rtr) {
-        /* RTR帧 — 从主题系统获取警告色 */
-        return QBrush(QColor(255, 255, 180));
+        /* RTR帧 — 使用调色板Midlight作为警告色 */
+        return QBrush(palette().color(QPalette::Midlight));
     }
     if (frame.extended) {
-        /* 扩展帧 — 从主题系统获取信息色 */
-        return QBrush(QColor(200, 220, 255));
+        /* 扩展帧 — 使用调色板AlternateBase作为信息色 */
+        return QBrush(palette().color(QPalette::AlternateBase));
     }
     /* 标准帧 — 使用调色板的Base色(跟随主题) */
     return QBrush(palette().color(QPalette::Base));

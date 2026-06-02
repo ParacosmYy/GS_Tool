@@ -9,6 +9,7 @@
 
 UsbConfigPanel::UsbConfigPanel(QWidget* parent)
     : QWidget(parent)
+    , m_connected(false)
 {
     setObjectName("UsbConfigPanel");
 
@@ -116,7 +117,7 @@ void UsbConfigPanel::onDeviceChanged(int index) {
  * @brief 连接/断开按钮
  */
 void UsbConfigPanel::onConnectClicked() {
-    if (m_connectBtn->text() == tr("连接")) {
+    if (!m_connected) {
         quint16 vid = static_cast<quint16>(m_vidSpin->value());
         quint16 pid = static_cast<quint16>(m_pidSpin->value());
         int iface = m_interfaceSpin->value();
@@ -124,7 +125,14 @@ void UsbConfigPanel::onConnectClicked() {
         m_statusLabel->setText(tr("正在连接..."));
     } else {
         emit disconnectRequested();
+        m_connected = false;
         m_connectBtn->setText(tr("连接"));
         m_statusLabel->setText(tr("已断开"));
     }
+}
+
+void UsbConfigPanel::setConnected(bool connected) {
+    m_connected = connected;
+    m_connectBtn->setText(connected ? tr("断开") : tr("连接"));
+    m_statusLabel->setText(connected ? tr("已连接") : tr("未连接"));
 }

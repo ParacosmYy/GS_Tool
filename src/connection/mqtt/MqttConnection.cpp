@@ -30,6 +30,14 @@ MqttConnection::MqttConnection(QObject* parent)
             this, &MqttConnection::onSocketDisconnected);
     connect(m_keepAlive, &QTimer::timeout,
             this, &MqttConnection::onKeepAlive);
+    connect(m_socket, &QTcpSocket::errorOccurred,
+            this, [this](QAbstractSocket::SocketError err) {
+        Q_UNUSED(err)
+        m_keepAlive->stop();
+        m_state = ConnectionState::Error;
+        emit stateChanged(m_state);
+        emit errorOccurred(tr("MQTT连接失败: %1").arg(m_socket->errorString()));
+    });
 }
 
 MqttConnection::~MqttConnection()
@@ -62,11 +70,16 @@ bool MqttConnection::open()
 void MqttConnection::close()
 {
     m_keepAlive->stop();
-    if (m_socket->state() != QAbstractSocket::UnconnectedState) {
-        /* 发送MQTT DISCONNECT报文 */
-        m_socket->write(buildMqttPacket(DISCONNECT, {}));
-        m_socket->flush();
+    if (m_socket->state() == QAbstractSocket::ConnectedState) {
+        /* 仅在MQTT已连接时发送DISCONNECT报文 */
+        if (m_state == ConnectionState::Connected) {
+            m_socket->write(buildMqttPacket(DISCONNECT, {}));
+            m_socket->flush();
+        }
         m_socket->disconnectFromHost();
+    } else if (m_socket->state() != QAbstractSocket::UnconnectedState) {
+        /* 非已连接状态(如正在连接): 中止连接 */
+        m_socket->abort();
     }
     if (m_state != ConnectionState::Disconnected) {
         m_state = ConnectionState::Disconnected;
@@ -138,7 +151,7 @@ bool MqttConnection::subscribe(const QString& topic, int qos)
     if (m_state != ConnectionState::Connected) return false;
 
     QByteArray payload;
-    ++m_packetId;
+    m_packetId = (m_packetId % 65535) + 1;  // 保证范围[1, 65535]
     /* Packet Identifier */
     payload.append(static_cast<char>((m_packetId >> 8) & 0xFF));
     payload.append(static_cast<char>(m_packetId & 0xFF));

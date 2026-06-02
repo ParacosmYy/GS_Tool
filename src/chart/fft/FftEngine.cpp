@@ -130,7 +130,8 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
 void FftEngine::applyWindow(QVector<std::complex<double>>& data, WindowType window)
 {
     const int N = data.size();
-    if (N == 0) {
+    if (N <= 1) {
+        /* N=1时 (N-1)=0 导致除零; N=0无需处理 */
         return;
     }
 

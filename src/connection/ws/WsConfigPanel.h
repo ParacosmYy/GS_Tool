@@ -39,6 +39,12 @@ public:
      */
     QVariantMap config() const;
 
+    /**
+     * @brief 设置连接状态(更新按钮文本和状态标签)
+     * @param connected true=已连接
+     */
+    void setConnected(bool connected);
+
 signals:
     /** @brief 用户请求连接 */
     void connectRequested(const QVariantMap& config);
@@ -63,6 +69,9 @@ private:
     QComboBox* m_typeCombo = nullptr;    ///< 连接类型(WS/WSS)
     QPushButton* m_connectBtn = nullptr; ///< 连接按钮
     QLabel* m_statusLabel = nullptr;     ///< 状态标签
+
+    // ---- 状态 ----
+    bool m_connected = false;            ///< 当前连接状态
 };
 
 #endif // WSCONFIGPANEL_H

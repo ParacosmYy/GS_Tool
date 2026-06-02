@@ -19,6 +19,7 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
     setObjectName("CanConfigPanel");
 
     /* 填充可用串口到适配器列表 */
+    m_adapterCombo->setObjectName("canAdapterCombo");
     const auto ports = QSerialPortInfo::availablePorts();
     for (const auto& info : ports) {
         m_adapterCombo->addItem(info.portName() + " - " + info.description(),
@@ -26,6 +27,7 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
     }
 
     /* 波特率: 125k, 250k, 500k(默认), 1M */
+    m_bitrateCombo->setObjectName("canBitrateCombo");
     struct BitrateEntry { QString label; int value; };
     const BitrateEntry bitrates[] = {
         {"125 kbps", 125000}, {"250 kbps", 250000},
@@ -37,6 +39,9 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
     m_bitrateCombo->setCurrentIndex(2);  // 默认500kbps
 
     /* 连接/断开按钮 + 状态 */
+    m_canFdCheck->setObjectName("canFdCheck");
+    m_connectBtn->setObjectName("canConnectBtn");
+    m_statusLabel->setObjectName("canStatusLabel");
     auto connectLayout = new QHBoxLayout();
     connectLayout->addWidget(m_canFdCheck);
     connectLayout->addStretch();
@@ -62,7 +67,7 @@ QVariantMap CanConfigPanel::config() const
 {
     QVariantMap cfg;
     cfg["adapter"] = m_adapterCombo->currentData().toString();
-    cfg["bitrate"] = m_bitrateCombo->currentData().toInt();
+    cfg["bitrate"] = m_bitrateCombo->currentData().toUInt();
     cfg["canFd"] = m_canFdCheck->isChecked();
     return cfg;
 }

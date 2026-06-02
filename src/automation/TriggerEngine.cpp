@@ -162,6 +162,16 @@ const QList<TriggerRuleConfig>& TriggerEngine::rules() const
 }
 
 /**
+ * @brief 清空所有规则
+ *
+ * 移除引擎中所有已注册的触发器规则，用于重新加载配置前清空旧数据。
+ */
+void TriggerEngine::clearRules()
+{
+    m_rules.clear();
+}
+
+/**
  * @brief 获取累计成功匹配次数
  * @return 匹配次数
  */

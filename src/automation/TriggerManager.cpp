@@ -66,6 +66,8 @@ bool TriggerManager::loadRules(const QString& filePath)
     }
 
     /* 先清空引擎中的旧规则 */
+    m_engine->clearRules();
+
     const QJsonArray arr = doc.array();
     for (const QJsonValue& val : arr) {
         if (val.isObject()) {

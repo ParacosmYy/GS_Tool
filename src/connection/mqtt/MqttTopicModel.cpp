@@ -115,18 +115,43 @@ void MqttTopicModel::removeTopic(const QString& topic)
     beginResetModel();
     m_topics.removeAll(topic);
 
+    /* 保存所有主题的QoS映射 */
+    QMap<QString, int> qosMap;
+    for (const auto& t : m_topics) {
+        /* 从旧树中查找QoS（遍历叶节点） */
+        TopicNode* node = findLeafNode(m_rootNode, t);
+        if (node) {
+            qosMap[t] = node->qos;
+        }
+    }
+
     /* 查找并删除叶节点(简化实现：重建整棵树) */
     delete m_rootNode;
     m_rootNode = new TopicNode;
     m_rootNode->name = "<root>";
 
-    /* 重新添加剩余主题 */
+    /* 重新添加剩余主题，保留QoS */
     QStringList saved = m_topics;
     m_topics.clear();
     for (const auto& t : saved) {
-        addTopic(t, 0);  // QoS信息丢失，简化处理
+        addTopic(t, qosMap.value(t, 0));
     }
     endResetModel();
+}
+
+TopicNode* MqttTopicModel::findLeafNode(TopicNode* root, const QString& fullPath) const
+{
+    if (!root) return nullptr;
+
+    /* 叶节点匹配完整路径 */
+    if (root->fullPath == fullPath) return root;
+
+    /* 递归搜索子节点 */
+    for (auto* child : root->children) {
+        TopicNode* found = findLeafNode(child, fullPath);
+        if (found) return found;
+    }
+    return nullptr;
 }
 
 QStringList MqttTopicModel::topics() const

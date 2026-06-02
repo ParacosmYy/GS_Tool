@@ -103,7 +103,8 @@ signals:
 
 private:
     qint64 m_startTimeMs;   ///< 录制起始的绝对时间（毫秒）
-    qint64 m_elapsedMs;     ///< 已录制的累计时长（毫秒）
+    qint64 m_elapsedMs;     ///< 已录制的累计时长（毫秒，仅stopRecording更新）
+    qint64 m_seekPositionMs;///< 回放定位位置（毫秒，仅seekTo更新）
     bool   m_recording;     ///< 当前是否正在录制
     QList<qint64> m_events; ///< 已记录的事件时间戳列表（毫秒）
 };

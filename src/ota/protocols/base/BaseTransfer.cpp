@@ -105,6 +105,8 @@ void BaseTransfer::onTimeout()
 {
     if (isIdle()) return;
 
+    /* 注意: m_retryCount仅作为全局安全阀，子类handleTimeout()
+     * 负责在成功处理后将m_retryCount重置，避免跨块累积 */
     m_retryCount++;
     if (m_retryCount > m_maxRetries) {
         sendCancelBytes();

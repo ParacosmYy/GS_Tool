@@ -20,6 +20,7 @@ RecordingTimeline::RecordingTimeline(QObject* parent)
     : QObject(parent)
     , m_startTimeMs(0)
     , m_elapsedMs(0)
+    , m_seekPositionMs(0)
     , m_recording(false)
 {
 }
@@ -73,7 +74,7 @@ qint64 RecordingTimeline::currentTimeMs() const
     if (m_recording) {
         return QDateTime::currentMSecsSinceEpoch() - m_startTimeMs;
     }
-    return m_elapsedMs;
+    return m_seekPositionMs;
 }
 
 /**
@@ -98,8 +99,8 @@ void RecordingTimeline::seekTo(qint64 timeMs)
         timeMs = m_elapsedMs;
     }
 
-    m_elapsedMs = timeMs;
-    emit timeUpdated(m_elapsedMs);
+    m_seekPositionMs = timeMs;
+    emit timeUpdated(m_seekPositionMs);
 }
 
 /**

@@ -34,7 +34,9 @@ ChecksumPanel::ChecksumPanel(QWidget *parent)
 
     // 算法选择行
     auto *algoLayout = new QHBoxLayout();
-    algoLayout->addWidget(new QLabel(tr("算法："), this));
+    auto* algoLabel = new QLabel(tr("算法："), this);
+    algoLabel->setObjectName("checksumAlgoLabel");
+    algoLayout->addWidget(algoLabel);
 
     const auto algorithms = {
         ChecksumCalculator::CRC8, ChecksumCalculator::CRC16Ccitt,
@@ -48,13 +50,17 @@ ChecksumPanel::ChecksumPanel(QWidget *parent)
         m_algoCombo->addItem(ChecksumCalculator::algorithmName(alg),
                              static_cast<int>(alg));
     }
+    m_algoCombo->setObjectName("checksumAlgoCombo");
     algoLayout->addWidget(m_algoCombo);
     algoLayout->addStretch();
+    m_calcBtn->setObjectName("checksumCalcBtn");
     algoLayout->addWidget(m_calcBtn);
 
     // 输入模式行
     auto *modeLayout = new QHBoxLayout();
-    modeLayout->addWidget(new QLabel(tr("输入模式："), this));
+    auto* modeLabel = new QLabel(tr("输入模式："), this);
+    modeLabel->setObjectName("checksumModeLabel");
+    modeLayout->addWidget(modeLabel);
 
     m_inputModeCombo->setObjectName("inputModeCombo");
     m_inputModeCombo->addItem(tr("十六进制"), 0);
@@ -64,14 +70,16 @@ ChecksumPanel::ChecksumPanel(QWidget *parent)
     modeLayout->addStretch();
 
     // 输入区
+    m_inputEdit->setObjectName("checksumInputEdit");
     m_inputEdit->setPlaceholderText(
         tr("输入十六进制数据（如：01 02 FF）..."));
     m_inputEdit->setMaximumHeight(100);
 
     // 结果行
     auto *resultLayout = new QHBoxLayout();
-    m_resultLabel->setStyleSheet(
-        QStringLiteral("font-weight: bold; font-size: 14pt;"));
+    /* 结果样式由QSS主题控制，使用objectName匹配 */
+    m_resultLabel->setObjectName("checksumResultLabel");
+    m_resultLabel->setProperty("class", "resultLabel");
     resultLayout->addWidget(m_resultLabel);
     resultLayout->addStretch();
     m_copyBtn->setObjectName("copyResultBtn");

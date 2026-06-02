@@ -41,6 +41,12 @@ void ZModemTransfer::handleStateSendingFile(int type, const QByteArray& headerDa
             m_timeoutTimer->start(m_timeoutMs);
             return;
         }
+        /* 防御: 断点续传偏移量不能超过文件大小 */
+        if (m_fileOffset >= m_fileData.size()) {
+            qWarning() << "ZModem: ZRPOS offset" << m_fileOffset
+                       << "exceeds file size" << m_fileData.size() << ", resetting to 0";
+            m_fileOffset = 0;
+        }
         qWarning() << "ZModem: ZRPOS resume at offset" << m_fileOffset;
         m_bytesSent = m_fileOffset;
         m_zmodemState = State::SendingData;

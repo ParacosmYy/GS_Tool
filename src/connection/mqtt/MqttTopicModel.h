@@ -106,6 +106,14 @@ private:
      */
     TopicNode* findOrCreateChild(TopicNode* parentNode, const QString& name);
 
+    /**
+     * @brief 在树中查找指定完整路径的叶节点
+     * @param root 搜索起始节点
+     * @param fullPath 目标完整路径
+     * @return 匹配的节点指针，未找到返回nullptr
+     */
+    TopicNode* findLeafNode(TopicNode* root, const QString& fullPath) const;
+
     /** @brief 根节点(虚拟根，不显示) */
     TopicNode* m_rootNode;
 

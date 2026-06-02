@@ -41,7 +41,7 @@ QVariantMap WsConfigPanel::config() const
  */
 void WsConfigPanel::onConnectClicked()
 {
-    if (m_connectBtn->text() == tr("连接")) {
+    if (!m_connected) {
         if (m_urlEdit->text().trimmed().isEmpty()) {
             m_statusLabel->setText(tr("请输入服务器地址"));
             return;
@@ -49,10 +49,22 @@ void WsConfigPanel::onConnectClicked()
         m_statusLabel->setText(tr("正在连接..."));
         emit connectRequested(config());
     } else {
+        m_connected = false;
         m_statusLabel->setText(tr("已断开"));
         m_connectBtn->setText(tr("连接"));
         emit disconnectRequested();
     }
+}
+
+/**
+ * @brief 设置连接状态(由外部连接管理器调用)
+ * @param connected true=已连接
+ */
+void WsConfigPanel::setConnected(bool connected)
+{
+    m_connected = connected;
+    m_connectBtn->setText(connected ? tr("断开") : tr("连接"));
+    m_statusLabel->setText(connected ? tr("已连接") : tr("未连接"));
 }
 
 /**

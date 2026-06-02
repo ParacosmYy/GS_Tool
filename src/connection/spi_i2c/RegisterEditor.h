@@ -50,6 +50,12 @@ public:
     void setConnection(IConnection* connection);
 
     /**
+     * @brief 设置I2C设备地址(7位)
+     * @param addr 设备地址(0x00-0x7F)
+     */
+    void setDeviceAddress(int addr) { m_deviceAddress = addr; }
+
+    /**
      * @brief 读取指定地址的寄存器
      * @param address 寄存器地址
      */
@@ -109,6 +115,7 @@ private:
 
     IConnection* m_connection = nullptr;            ///< 底层连接实例
     int m_readLength = 1;                            ///< 默认读取长度
+    int m_deviceAddress = 0x00;                      ///< I2C设备7位地址
 
     // ---- UI控件 ----
     QSpinBox* m_addrSpin = nullptr;                 ///< 寄存器地址输入
