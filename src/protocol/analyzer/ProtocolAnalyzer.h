@@ -16,7 +16,6 @@ public:
         QString displayValue;
         QString description;
     };
-
     struct ProtocolMessage {
         QByteArray rawData;
         QString protocolName;
@@ -24,21 +23,17 @@ public:
         bool valid = false;
         QString errorMessage;
     };
-
     explicit ProtocolAnalyzer(QObject *parent = nullptr);
     ~ProtocolAnalyzer() override;
-
-    void setProtocolTemplate(const QString &name, const QList<Field> &templateFields);
+    void setProtocolTemplate(const QString &name, const QList<Field> &tpl);
     void removeTemplate(const QString &name);
-    ProtocolMessage parse(const QByteArray &data, const QString &templateName);
-    QList<ProtocolMessage> parseStream(const QByteArray &data, const QString &templateName, int frameSize);
+    ProtocolMessage parse(const QByteArray &data, const QString &tplName);
+    QList<ProtocolMessage> parseStream(const QByteArray &data, const QString &tplName, int frameSize);
     QStringList templates() const;
     void clearTemplates();
-
 signals:
     void messageParsed(const ProtocolMessage &msg);
-    void parseError(const QString &templateName, const QString &error);
-
+    void parseError(const QString &tplName, const QString &error);
 private:
     QMap<QString, QList<Field>> m_templates;
 };
