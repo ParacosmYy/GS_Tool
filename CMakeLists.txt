@@ -118,9 +118,11 @@ set(SOURCES
     src/chart/model/ChartModelStats.cpp
     src/chart/scale/YAxisManager.cpp
     src/chart/overlay/CursorOverlay.cpp
+    src/chart/overlay/CursorOverlayPaint.cpp
     src/chart/zoom/ZoomController.cpp
     src/chart/fft/FftEngine.cpp
     src/chart/fft/FftWidget.cpp
+    src/chart/fft/FftWidgetSetup.cpp
     src/chart/stats/HistogramWidget.cpp
     src/chart/stats/ScatterWidget.cpp
     src/ota/manager/OtaManager.cpp
@@ -229,6 +231,7 @@ set(SOURCES
 
     # ── F14: MQTT 客户端 ──
     src/connection/mqtt/MqttConnection.cpp
+    src/connection/mqtt/MqttConnectionProtocol.cpp
     src/connection/mqtt/MqttTopicModel.cpp
     src/connection/mqtt/MqttSubscriptionPanel.cpp
     src/connection/mqtt/MqttConfigPanel.cpp

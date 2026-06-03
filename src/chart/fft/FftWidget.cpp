@@ -1,23 +1,21 @@
 /**
  * @file FftWidget.cpp
- * @brief FFT频谱显示控件实现 -- 主题感知的频谱分析面板
+ * @brief FFT频谱显示控件实现 -- 构造、频谱计算、槽函数与统计接口
  *
- * 实现FftWidget的UI布局、信号连接、频谱计算和渲染逻辑。
- * 从ChartModel读取通道时域数据，经FftEngine计算FFT后，
- * 使用QLineSeries绘制频率-幅度频谱图。
+ * 本文件包含FftWidget的核心逻辑层:
+ *   - 构造函数: 初始化引擎、信号连接、首次主题/通道加载
+ *   - 公共接口: setSampleRate / sampleRate / 统计计数器
+ *   - refreshSpectrum(): 从ChartModel读取时域数据→FftEngine计算→更新曲线和坐标轴
+ *   - 槽函数: 通道切换、窗函数切换、FFT大小变更、自动刷新、数据更新、主题切换
+ *
+ * UI搭建和主题样式方法见 FftWidgetSetup.cpp。
  */
 
 #include "chart/fft/FftWidget.h"
 #include "chart/model/ChartModel.h"
 #include "core/theme/ThemeManager.h"
 
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QLabel>
 #include <QComboBox>
-#include <QSpinBox>
-#include <QPushButton>
-#include <QCheckBox>
 #include <QtCharts>
 #include <algorithm>
 
@@ -78,160 +76,30 @@ double FftWidget::sampleRate() const
     return m_sampleRate;
 }
 
-// ============================================================
-// UI搭建
-// ============================================================
-
-/** @brief 初始化UI布局(工具栏+图表区域) */
-void FftWidget::setupUI()
+/** @brief 获取累计FFT变换次数 */
+quint64 FftWidget::totalTransforms() const
 {
-    auto* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(4, 4, 4, 4);
-    mainLayout->setSpacing(4);
-
-    // 工具栏
-    mainLayout->addWidget(createToolbar());
-
-    // 图表区域
-    setupChart();
-    mainLayout->addWidget(m_chartView);
-
-    setLayout(mainLayout);
+    return m_totalTransforms;
 }
 
-/** @brief 创建顶部配置工具栏(通道/窗函数/FFT大小/采样率/刷新按钮) @return 工具栏Widget指针 */
-QWidget* FftWidget::createToolbar()
+/** @brief 获取累计窗函数变更次数 */
+quint64 FftWidget::totalWindowChanges() const
 {
-    auto* toolbar = new QWidget(this);
-    toolbar->setObjectName(QStringLiteral("FftToolbar"));
-    auto* layout = new QHBoxLayout(toolbar);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(8);
-
-    // 通道选择
-    auto* channelLabel = new QLabel(tr("通道:"), toolbar);
-    channelLabel->setObjectName(QStringLiteral("FftChannelLabel"));
-    m_channelCombo = new QComboBox(toolbar);
-    m_channelCombo->setObjectName(QStringLiteral("FftChannelCombo"));
-    m_channelCombo->setMinimumWidth(100);
-    connect(m_channelCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &FftWidget::onChannelChanged);
-
-    // 窗函数选择
-    auto* windowLabel = new QLabel(tr("窗函数:"), toolbar);
-    windowLabel->setObjectName(QStringLiteral("FftWindowLabel"));
-    m_windowCombo = new QComboBox(toolbar);
-    m_windowCombo->setObjectName(QStringLiteral("FftWindowCombo"));
-    m_windowCombo->addItem(tr("矩形窗"), static_cast<int>(FftEngine::WindowType::Rectangular));
-    m_windowCombo->addItem(tr("汉宁窗"), static_cast<int>(FftEngine::WindowType::Hanning));
-    m_windowCombo->addItem(tr("海明窗"), static_cast<int>(FftEngine::WindowType::Hamming));
-    m_windowCombo->addItem(tr("布莱克曼窗"), static_cast<int>(FftEngine::WindowType::Blackman));
-    m_windowCombo->setCurrentIndex(1); // 默认汉宁窗
-    connect(m_windowCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &FftWidget::onWindowChanged);
-
-    // FFT大小选择
-    auto* fftSizeLabel = new QLabel(tr("FFT大小:"), toolbar);
-    fftSizeLabel->setObjectName(QStringLiteral("FftSizeLabel"));
-    m_fftSizeCombo = new QComboBox(toolbar);
-    m_fftSizeCombo->setObjectName(QStringLiteral("FftSizeCombo"));
-    populateFftSizes();
-    m_fftSizeCombo->setCurrentIndex(2); // 默认1024
-    connect(m_fftSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &FftWidget::onFftSizeChanged);
-
-    // 采样率输入
-    auto* rateLabel = new QLabel(tr("采样率(Hz):"), toolbar);
-    rateLabel->setObjectName(QStringLiteral("FftRateLabel"));
-    m_sampleRateSpin = new QSpinBox(toolbar);
-    m_sampleRateSpin->setObjectName(QStringLiteral("FftSampleRateSpin"));
-    m_sampleRateSpin->setRange(1, 10000000);
-    m_sampleRateSpin->setValue(static_cast<int>(m_sampleRate));
-    m_sampleRateSpin->setSingleStep(100);
-    connect(m_sampleRateSpin, QOverload<int>::of(&QSpinBox::valueChanged), [this](int val) {
-        m_sampleRate = static_cast<double>(val);
-    });
-
-    // 刷新按钮
-    m_refreshBtn = new QPushButton(tr("刷新"), toolbar);
-    m_refreshBtn->setObjectName(QStringLiteral("FftRefreshBtn"));
-    connect(m_refreshBtn, &QPushButton::clicked,
-            this, &FftWidget::refreshSpectrum);
-
-    // 自动刷新
-    m_autoRefreshCheck = new QCheckBox(tr("自动刷新"), toolbar);
-    m_autoRefreshCheck->setObjectName(QStringLiteral("FftAutoRefreshCheck"));
-    m_autoRefreshCheck->setChecked(m_autoRefresh);
-    connect(m_autoRefreshCheck, &QCheckBox::toggled,
-            this, &FftWidget::onAutoRefreshToggled);
-
-    // 信息标签
-    m_infoLabel = new QLabel(toolbar);
-    m_infoLabel->setObjectName(QStringLiteral("FftInfoLabel"));
-    m_infoLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-    // 布局
-    layout->addWidget(channelLabel);
-    layout->addWidget(m_channelCombo);
-    layout->addWidget(windowLabel);
-    layout->addWidget(m_windowCombo);
-    layout->addWidget(fftSizeLabel);
-    layout->addWidget(m_fftSizeCombo);
-    layout->addWidget(rateLabel);
-    layout->addWidget(m_sampleRateSpin);
-    layout->addWidget(m_refreshBtn);
-    layout->addWidget(m_autoRefreshCheck);
-    layout->addStretch();
-    layout->addWidget(m_infoLabel);
-
-    return toolbar;
+    return m_totalWindowChanges;
 }
 
-/** @brief 创建频谱图表区域(曲线+X/Y坐标轴+图表视图) */
-void FftWidget::setupChart()
+/** @brief 获取累计FFT大小变更次数 */
+quint64 FftWidget::totalSizeChanges() const
 {
-    m_chart = new QChart();
-    m_chart->setObjectName(QStringLiteral("FftChart"));
-    m_chart->legend()->hide();
-    m_chart->setMargins(QMargins(2, 2, 2, 2));
-
-    // 频谱曲线
-    m_spectrumSeries = new QLineSeries(m_chart);
-    m_spectrumSeries->setObjectName(QStringLiteral("FftSpectrumSeries"));
-    m_chart->addSeries(m_spectrumSeries);
-
-    // X轴: 频率 (Hz)
-    m_xAxis = new QValueAxis(m_chart);
-    m_xAxis->setObjectName(QStringLiteral("FftXAxis"));
-    m_xAxis->setTitleText(tr("频率 (Hz)"));
-    m_xAxis->setLabelFormat(QStringLiteral("%g"));
-    m_xAxis->setRange(0, 500);
-
-    // Y轴: 幅度
-    m_yAxis = new QValueAxis(m_chart);
-    m_yAxis->setObjectName(QStringLiteral("FftYAxis"));
-    m_yAxis->setTitleText(tr("幅度"));
-    m_yAxis->setLabelFormat(QStringLiteral("%g"));
-    m_yAxis->setRange(0, 1);
-
-    m_chart->addAxis(m_xAxis, Qt::AlignBottom);
-    m_chart->addAxis(m_yAxis, Qt::AlignLeft);
-    m_spectrumSeries->attachAxis(m_xAxis);
-    m_spectrumSeries->attachAxis(m_yAxis);
-
-    m_chartView = new QChartView(m_chart, this);
-    m_chartView->setObjectName(QStringLiteral("FftChartView"));
-    m_chartView->setRenderHint(QPainter::Antialiasing);
+    return m_totalSizeChanges;
 }
 
-/** @brief 填充FFT大小下拉框(256/512/1024/2048/4096) */
-void FftWidget::populateFftSizes()
+/** @brief 重置所有FFT控件统计计数器 */
+void FftWidget::resetFftWidgetStatistics()
 {
-    m_fftSizeCombo->addItem(QStringLiteral("256"),   256);
-    m_fftSizeCombo->addItem(QStringLiteral("512"),   512);
-    m_fftSizeCombo->addItem(QStringLiteral("1024"),  1024);
-    m_fftSizeCombo->addItem(QStringLiteral("2048"),  2048);
-    m_fftSizeCombo->addItem(QStringLiteral("4096"),  4096);
+    m_totalTransforms = 0;
+    m_totalWindowChanges = 0;
+    m_totalSizeChanges = 0;
 }
 
 // ============================================================
@@ -387,71 +255,4 @@ void FftWidget::onChannelsChanged()
 void FftWidget::onThemeChanged()
 {
     applyThemeColors();
-}
-
-// ============================================================
-// 主题样式
-// ============================================================
-
-/** @brief 应用当前主题颜色到图表背景、网格线、坐标轴标签和频谱曲线 */
-void FftWidget::applyThemeColors()
-{
-    auto& theme = ThemeManager::instance();
-
-    // 图表背景
-    QColor bgColor = theme.color(ThemeManager::SemanticColor::BgPrimary);
-    m_chart->setBackgroundBrush(bgColor);
-
-    // 网格线和坐标轴颜色
-    QColor gridColor = theme.color(ThemeManager::SemanticColor::Border);
-    QColor labelColor = theme.color(ThemeManager::SemanticColor::TextSecondary);
-
-    // X轴样式
-    m_xAxis->setLinePen(QPen(gridColor, 1));
-    m_xAxis->setGridLinePen(QPen(gridColor, 1, Qt::DashLine));
-    m_xAxis->setLabelsBrush(labelColor);
-    m_xAxis->setTitleBrush(labelColor);
-
-    // Y轴样式
-    m_yAxis->setLinePen(QPen(gridColor, 1));
-    m_yAxis->setGridLinePen(QPen(gridColor, 1, Qt::DashLine));
-    m_yAxis->setLabelsBrush(labelColor);
-    m_yAxis->setTitleBrush(labelColor);
-
-    // 频谱线条颜色: 使用ChartColors调色板第一色（蓝色系）
-    bool isDark = (theme.currentTheme().startsWith(QStringLiteral("dark")));
-    const auto& colors = ChartColors::colorsForTheme(isDark);
-    QColor spectrumColor = colors.isEmpty() ? QColor("#89b4fa") : colors.first();
-    m_spectrumSeries->setPen(QPen(spectrumColor, 1.5));
-
-    // 图表绘图区背景（与整体背景保持一致）
-    QBrush plotAreaBrush(bgColor);
-    m_chart->setPlotAreaBackgroundBrush(plotAreaBrush);
-    m_chart->setPlotAreaBackgroundVisible(true);
-}
-
-/** @brief 获取累计FFT变换次数 */
-quint64 FftWidget::totalTransforms() const
-{
-    return m_totalTransforms;
-}
-
-/** @brief 获取累计窗函数变更次数 */
-quint64 FftWidget::totalWindowChanges() const
-{
-    return m_totalWindowChanges;
-}
-
-/** @brief 获取累计FFT大小变更次数 */
-quint64 FftWidget::totalSizeChanges() const
-{
-    return m_totalSizeChanges;
-}
-
-/** @brief 重置所有FFT控件统计计数器 */
-void FftWidget::resetFftWidgetStatistics()
-{
-    m_totalTransforms = 0;
-    m_totalWindowChanges = 0;
-    m_totalSizeChanges = 0;
 }
