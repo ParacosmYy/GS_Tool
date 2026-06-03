@@ -14,7 +14,7 @@
 // HEX编码解码工具 - 纯静态方法，不需要实例化
 namespace HexConverter {
 
-// 将字节数组转为HEX字符串 "AA BB CC"
+/** @brief 将字节数组转为HEX字符串 @param data 原始字节数组 @param separator 字节间分隔符，默认空格 @return 大写HEX字符串，如 "AA BB CC" */
 inline QString toHexString(const QByteArray& data, char separator = ' ')
 {
     QString result;
@@ -26,8 +26,12 @@ inline QString toHexString(const QByteArray& data, char separator = ' ')
     return result;
 }
 
-// 将HEX字符串转为字节数组
-// 支持格式: "AA BB CC" / "AABBCC" / "AA,BB,CC" / "0xAA 0xBB"
+/**
+ * @brief 将HEX字符串转为字节数组
+ * 支持格式: "AA BB CC" / "AABBCC" / "AA,BB,CC" / "0xAA 0xBB"
+ * @param hexStr HEX格式字符串
+ * @return 解析后的字节数组，解析失败返回空
+ */
 inline QByteArray fromHexString(const QString& hexStr)
 {
     // 移除所有分隔符和前缀
@@ -58,7 +62,7 @@ inline QByteArray fromHexString(const QString& hexStr)
     return result;
 }
 
-// 检查字符串是否是有效的HEX格式（空字符串视为无效）
+/** @brief 检查字符串是否是有效的HEX格式（空字符串视为无效） @param str 待检查字符串 @return true有效HEX */
 inline bool isValidHex(const QString& str)
 {
     if (str.trimmed().isEmpty()) return false;

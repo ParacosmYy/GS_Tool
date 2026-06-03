@@ -25,7 +25,7 @@ SignalLineWidget::SignalLineWidget(QWidget* parent)
     , m_totalDtrToggles(0)
     , m_totalRtsToggles(0)
 {
-    setObjectName(QStringLiteral("SignalLineWidget"));
+    setObjectName(QStringLiteral("signalLineWidget"));
     setupUI();
 }
 
@@ -190,21 +190,25 @@ void SignalLineWidget::setupUI()
 
 // ---- 统计接口 ----
 
+/** @brief 获取累计信号线状态更新次数 @return 更新总次数 */
 quint64 SignalLineWidget::totalSignalUpdates() const
 {
     return m_totalSignalUpdates;
 }
 
+/** @brief 获取累计DTR切换请求次数 @return DTR切换总次数 */
 quint64 SignalLineWidget::totalDtrToggles() const
 {
     return m_totalDtrToggles;
 }
 
+/** @brief 获取累计RTS切换请求次数 @return RTS切换总次数 */
 quint64 SignalLineWidget::totalRtsToggles() const
 {
     return m_totalRtsToggles;
 }
 
+/** @brief 重置所有统计计数器归零 */
 void SignalLineWidget::resetSignalWidgetStatistics()
 {
     m_totalSignalUpdates = 0;

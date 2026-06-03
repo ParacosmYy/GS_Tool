@@ -40,47 +40,47 @@ class SettingsManager : public QObject {
     Q_OBJECT
 
 public:
-    /// 获取全局唯一实例
+    /** @brief 获取全局唯一实例 @return SettingsManager引用 */
     static SettingsManager& instance();
 
     // ---- 基本读写接口 ----
 
-    /// 读取配置值，支持 "/" 分隔符访问嵌套键（如 "serial/baudRate"）
+    /** @brief 读取配置值，支持 "/" 分隔符访问嵌套键 @param key 配置键名 @param defaultValue 默认值 @return 配置值或默认值 */
     QVariant get(const QString& key, const QVariant& defaultValue = QVariant()) const;
 
-    /// 写入配置值
+    /** @brief 写入配置值 @param key 配置键名 @param value 配置值 */
     void set(const QString& key, const QVariant& value);
 
-    /// 删除单个配置项
+    /** @brief 删除单个配置项 @param key 配置键名 */
     void remove(const QString& key);
 
-    /// 检查配置项是否存在（在当前分组上下文中查找）
+    /** @brief 检查配置项是否存在（在当前分组上下文中查找） @param key 配置键名 @return true存在 */
     bool contains(const QString& key) const;
 
-    /// 将配置同步写入磁盘（析构函数中也会自动调用）
+    /** @brief 将配置同步写入磁盘（析构函数中也会自动调用） */
     void sync();
 
     // ---- 分组操作接口 ----
 
-    /// 进入配置分组，支持嵌套调用（beginGroup("app"); beginGroup("serial"); → "app/serial"）
+    /** @brief 进入配置分组，支持嵌套调用 @param group 分组名称 */
     void beginGroup(const QString& group);
 
-    /// 退出当前分组（必须与 beginGroup 配对调用，无活跃分组时无效）
+    /** @brief 退出当前分组（必须与 beginGroup 配对调用） */
     void endGroup();
 
-    /// 获取当前分组路径（如 "app/serial"），不在任何分组中时返回空字符串
+    /** @brief 获取当前分组路径 @return 分组路径如 "app/serial"，不在分组中返回空串 */
     QString currentGroup() const;
 
-    /// 删除整个配置分组及其所有子项（不影响当前分组上下文）
+    /** @brief 删除整个配置分组及其所有子项 @param group 分组名称 */
     void removeGroup(const QString& group);
 
-    /// 检查指定分组是否存在且有内容（使用临时分组上下文查询）
+    /** @brief 检查指定分组是否存在且有内容 @param group 分组名称 @return true存在且有内容 */
     bool containsGroup(const QString& group) const;
 
-    /// 获取指定分组下的所有键名（空字符串表示根级别）
+    /** @brief 获取指定分组下的所有键名 @param group 分组名称（空串=根级别） @return 键名列表 */
     QStringList groupKeys(const QString& group = QString()) const;
 
-    /// 获取指定分组下的所有子分组名（空字符串表示根级别）
+    /** @brief 获取指定分组下的所有子分组名 @param group 分组名称（空串=根级别） @return 子分组名列表 */
     QStringList childGroups(const QString& group = QString()) const;
 
     // ---- RAII 分组守卫 ----
@@ -105,39 +105,39 @@ public:
         SettingsManager& m_settings;  ///< 关联的配置管理器引用
     };
 
-    /// 创建 RAII 分组守卫（推荐用于分组操作）
+    /** @brief 创建 RAII 分组守卫（推荐用于分组操作） @param group 分组名称 @return GroupGuard对象 */
     GroupGuard groupGuard(const QString& group);
 
     // ---- 便捷方法: 串口配置 ----
 
-    /// 保存串口配置到 "serial" 分组（先清除旧配置再写入）
+    /** @brief 保存串口配置到 "serial" 分组 @param config 串口配置键值对 */
     void saveSerialConfig(const QVariantMap& config);
 
-    /// 加载串口配置，不存在时返回空 map
+    /** @brief 加载串口配置 @return 配置键值对，不存在时返回空map */
     QVariantMap loadSerialConfig() const;
 
     // ---- 便捷方法: 窗口几何 ----
 
-    /// 保存窗口位置和大小（由 QWidget::saveGeometry() 生成）
+    /** @brief 保存窗口位置和大小 @param geometry 由QWidget::saveGeometry()生成 */
     void saveWindowGeometry(const QByteArray& geometry);
 
-    /// 加载窗口位置和大小，不存在时返回空 QByteArray
+    /** @brief 加载窗口位置和大小 @return 几何信息，不存在返回空QByteArray */
     QByteArray loadWindowGeometry() const;
 
     // ---- 便捷方法: 主题 ----
 
-    /// 保存主题名称（如 "dark_terminal", "modern_dark", "light"）
+    /** @brief 保存主题名称 @param themeName 主题名称如 "dark_terminal" */
     void saveTheme(const QString& themeName);
 
-    /// 加载主题名称，默认 "dark_terminal"
+    /** @brief 加载主题名称 @return 主题名称，默认 "dark_terminal" */
     QString loadTheme() const;
 
     // ---- 便捷方法: 语言 ----
 
-    /// 保存语言代码（"zh_CN" 或 "en"）
+    /** @brief 保存语言代码 @param langCode 语言代码如 "zh_CN" */
     void saveLanguage(const QString& langCode);
 
-    /// 加载语言代码，默认 "zh_CN"
+    /** @brief 加载语言代码 @return 语言代码，默认 "zh_CN" */
     QString loadLanguage() const;
 
     // ---- 统计计数器 ----
@@ -158,10 +158,10 @@ public:
     void resetSettingsStatistics();
 
 private:
-    /// 私有构造函数（单例模式）
+    /** @brief 私有构造函数（单例模式） @param parent 父对象 */
     explicit SettingsManager(QObject* parent = nullptr);
 
-    /// 析构函数 - 同步配置到磁盘，退出所有未关闭的分组
+    /** @brief 析构函数 - 同步配置到磁盘，退出所有未关闭的分组 */
     ~SettingsManager() override;
 
     SettingsManager(const SettingsManager&) = delete;

@@ -64,13 +64,13 @@ QVariant OtaHistoryModel::data(const QModelIndex& index, int role) const
         case ColProtocol:
             return rec.protocol.toUpper();
         case ColSize: {
-            if (rec.fileSize < 1024) return QString("%1 B").arg(rec.fileSize);
-            if (rec.fileSize < 1024 * 1024) return QString("%1 KB").arg(rec.fileSize / 1024.0, 0, 'f', 1);
-            return QString("%1 MB").arg(rec.fileSize / (1024.0 * 1024.0), 0, 'f', 2);
+            if (rec.fileSize < 1024) return tr("%1 B").arg(rec.fileSize);
+            if (rec.fileSize < 1024 * 1024) return tr("%1 KB").arg(rec.fileSize / 1024.0, 0, 'f', 1);
+            return tr("%1 MB").arg(rec.fileSize / (1024.0 * 1024.0), 0, 'f', 2);
         }
         case ColDuration:
-            if (rec.durationMs < 1000) return QString("%1 ms").arg(rec.durationMs);
-            return QString("%1 s").arg(rec.durationMs / 1000.0, 0, 'f', 1);
+            if (rec.durationMs < 1000) return tr("%1 ms").arg(rec.durationMs);
+            return tr("%1 s").arg(rec.durationMs / 1000.0, 0, 'f', 1);
         case ColResult:
             return rec.success ? QObject::tr("成功") : QObject::tr("失败");
         default:

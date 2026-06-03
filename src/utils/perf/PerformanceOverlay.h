@@ -34,10 +34,10 @@ class PerformanceOverlay : public QWidget
     Q_OBJECT
 
 public:
-    /// 构造函数
+    /** @brief 构造函数 @param parent 父控件 */
     explicit PerformanceOverlay(QWidget *parent = nullptr);
 
-    /// 析构函数
+    /** @brief 析构函数 */
     ~PerformanceOverlay() override;
 
     /**
@@ -91,7 +91,7 @@ private slots:
     void onStatsUpdated(double fps, double avgFrameMs, qint64 memBytes);
 
 private:
-    /// 初始化 UI
+    /** @brief 初始化 UI */
     void setupUI();
 
     PerformanceMonitor *m_monitor  = nullptr;  ///< 性能监视器
@@ -112,8 +112,11 @@ private:
     quint64 m_totalUpdates = 0;      ///< 累计统计更新次数
     quint64 m_totalLowFpsWarnings = 0;///< 累计低FPS警告次数
 public:
+    /** @brief 获取累计统计更新次数 @return 更新次数 */
     quint64 totalUpdates() const { return m_totalUpdates; }
+    /** @brief 获取累计低FPS警告次数 @return 警告次数 */
     quint64 totalLowFpsWarnings() const { return m_totalLowFpsWarnings; }
+    /** @brief 重置叠加层统计计数器(更新次数/低FPS警告次数) */
     void resetOverlayStatistics() { m_totalUpdates = 0; m_totalLowFpsWarnings = 0; }
 };
 

@@ -222,7 +222,7 @@ QString PacketBuilderPanel::formatHexDump(const QByteArray &data) const
             static_cast<quint8>(data[i]), 2, 16, QChar('0')).toUpper();
     }
 
-    result += QString("\n\n%1 bytes").arg(data.size());
+    result += tr("\n\n%1 字节").arg(data.size());
     return result;
 }
 

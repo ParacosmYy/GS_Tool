@@ -73,13 +73,19 @@ public slots:
     void refreshBookmarks(const QVector<DataBookmark>& bookmarks);
 
 private slots:
+    /** @brief 处理添加书签按钮点击 */
     void onAddClicked();
+    /** @brief 处理删除选中书签按钮点击 */
     void onRemoveClicked();
+    /** @brief 处理清空所有书签按钮点击 */
     void onClearClicked();
+    /** @brief 处理列表项双击，发射bookmarkDoubleClicked信号 @param item 被双击的列表项 */
     void onItemDoubleClicked(QListWidgetItem* item);
 
 private:
+    /** @brief 将毫秒时间戳格式化为 "HH:mm:ss.zzz" 字符串 @param timestampMs 毫秒时间戳 @return 格式化时间字符串 */
     static QString formatTimestamp(qint64 timestampMs);
+    /** @brief 根据列表选中状态更新删除/清空按钮的启用状态 */
     void updateButtonStates();
 
     QLabel* m_titleLabel = nullptr;      ///< 标题标签

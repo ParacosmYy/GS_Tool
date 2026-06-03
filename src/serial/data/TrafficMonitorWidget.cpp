@@ -18,11 +18,11 @@
 static QString formatRate(double bytesPerSec)
 {
     if (bytesPerSec < 1024.0) {
-        return QString("%1 B/s").arg(qRound(bytesPerSec));
+        return QObject::tr("%1 B/s").arg(qRound(bytesPerSec));
     } else if (bytesPerSec < 1024.0 * 1024.0) {
-        return QString("%1 KB/s").arg(bytesPerSec / 1024.0, 0, 'f', 1);
+        return QObject::tr("%1 KB/s").arg(bytesPerSec / 1024.0, 0, 'f', 1);
     } else {
-        return QString("%1 MB/s").arg(bytesPerSec / (1024.0 * 1024.0), 0, 'f', 2);
+        return QObject::tr("%1 MB/s").arg(bytesPerSec / (1024.0 * 1024.0), 0, 'f', 2);
     }
 }
 
@@ -39,7 +39,7 @@ TrafficMonitorWidget::TrafficMonitorWidget(QWidget* parent)
     , m_peakRxRate(0.0)
     , m_peakTxRate(0.0)
 {
-    setObjectName(QStringLiteral("TrafficMonitorWidget"));
+    setObjectName(QStringLiteral("trafficMonitorWidget"));
     setupUI();
 }
 
@@ -106,21 +106,25 @@ void TrafficMonitorWidget::setupUI()
 
 // ---- 统计接口 ----
 
+/** @brief 获取累计速率更新次数 @return 更新总次数 */
 quint64 TrafficMonitorWidget::totalRateUpdates() const
 {
     return m_totalRateUpdates;
 }
 
+/** @brief 获取历史最高RX速率（字节/秒） @return RX峰值速率 */
 double TrafficMonitorWidget::peakRxRate() const
 {
     return m_peakRxRate;
 }
 
+/** @brief 获取历史最高TX速率（字节/秒） @return TX峰值速率 */
 double TrafficMonitorWidget::peakTxRate() const
 {
     return m_peakTxRate;
 }
 
+/** @brief 重置所有统计计数器归零 */
 void TrafficMonitorWidget::resetTrafficWidgetStatistics()
 {
     m_totalRateUpdates = 0;

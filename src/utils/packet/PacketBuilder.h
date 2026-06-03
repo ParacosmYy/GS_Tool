@@ -28,6 +28,10 @@ class PacketBuilder : public QObject
     Q_OBJECT
 
 public:
+    /**
+     * @brief 构造函数
+     * @param parent 父对象
+     */
     explicit PacketBuilder(QObject *parent = nullptr);
 
     /** @brief 添加字段 */

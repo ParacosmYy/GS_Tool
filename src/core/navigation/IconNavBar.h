@@ -37,6 +37,10 @@ class IconNavBar : public QWidget {
     Q_OBJECT
 
 public:
+    /**
+     * @brief 构造图标导航栏
+     * @param parent 父widget
+     */
     explicit IconNavBar(QWidget* parent = nullptr);
 
     /** @brief 设置导航分类列表 */

@@ -42,7 +42,7 @@ TimestampPanel::TimestampPanel(QWidget *parent)
     inputLayout->addWidget(m_timestampEdit);
 
     // 格式选择
-    m_formatCombo->setObjectName("formatCombo");
+    m_formatCombo->setObjectName("timestampFormatCombo");
     m_formatCombo->addItem(tr("自动检测"), 0);
     m_formatCombo->addItem(tr("Unix 秒"), 1);
     m_formatCombo->addItem(tr("Unix 毫秒"), 2);
@@ -63,7 +63,7 @@ TimestampPanel::TimestampPanel(QWidget *parent)
     resultLayout->addWidget(m_resultLabel);
     resultLayout->addStretch();
 
-    m_copyBtn->setObjectName("copyResultBtn");
+    m_copyBtn->setObjectName("timestampCopyResultBtn");
     m_copyBtn->setEnabled(false);
     resultLayout->addWidget(m_copyBtn);
 

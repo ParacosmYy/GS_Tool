@@ -79,9 +79,13 @@ QStringList PortWatcher::currentPorts() const
     return m_currentPorts;
 }
 
+/** @brief 获取累计检测到的端口新增次数 @return 新增总次数 */
 quint64 PortWatcher::totalArrivals() const { return m_totalArrivals; }
+/** @brief 获取累计检测到的端口移除次数 @return 移除总次数 */
 quint64 PortWatcher::totalRemovals() const { return m_totalRemovals; }
+/** @brief 获取累计轮询次数 @return 轮询总次数 */
 quint64 PortWatcher::totalPolls() const { return m_totalPolls; }
+/** @brief 获取累计检测到变化的次数(新增+移除事件合计) @return 变化总次数 */
 quint64 PortWatcher::totalChanges() const { return m_totalChanges; }
 
 /** @brief 重置所有统计计数器 */

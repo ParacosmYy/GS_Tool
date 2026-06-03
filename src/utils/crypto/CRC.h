@@ -12,8 +12,8 @@
 #include <cstdint>
 #include <QByteArray>
 
-/// CRC校验计算工具 - 用于OTA协议和帧校验
-/// 全部是静态方法，不需要实例化
+/** @brief CRC校验计算工具 - 用于OTA协议和帧校验
+ *  全部是静态方法，不需要实例化 */
 namespace CRC {
 
 // ---- 统计计数 ----
@@ -47,7 +47,7 @@ inline uint8_t crc8(const uint8_t* data, int length)
     return crc;
 }
 
-/// @brief QByteArray重载版本
+/** @brief QByteArray重载版本 @param ba 字节数组 @return CRC8校验值 */
 inline uint8_t crc8(const QByteArray& ba)
 {
     return crc8(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size());
@@ -75,7 +75,7 @@ inline uint16_t crc16Ccitt(const uint8_t* data, int length)
     return crc;
 }
 
-/// @brief QByteArray重载版本
+/** @brief QByteArray重载版本 @param ba 字节数组 @return CRC16-CCITT校验值 */
 inline uint16_t crc16Ccitt(const QByteArray& ba)
 {
     return crc16Ccitt(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size());
@@ -90,7 +90,7 @@ inline uint16_t crc16Xmodem(const uint8_t* data, int length)
     return crc16Ccitt(data, length);
 }
 
-/// @brief QByteArray重载版本
+/** @brief QByteArray重载版本 @param ba 字节数组 @return CRC16-XMODEM校验值 */
 inline uint16_t crc16Xmodem(const QByteArray& ba)
 {
     return crc16Xmodem(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size());
@@ -118,7 +118,7 @@ inline uint16_t crc16Modbus(const uint8_t* data, int length)
     return crc;
 }
 
-/// @brief QByteArray重载版本
+/** @brief QByteArray重载版本 @param ba 字节数组 @return CRC16-Modbus校验值 */
 inline uint16_t crc16Modbus(const QByteArray& ba)
 {
     return crc16Modbus(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size());
@@ -146,7 +146,7 @@ inline uint32_t crc32(const uint8_t* data, int length)
     return crc ^ 0xFFFFFFFF;
 }
 
-/// @brief QByteArray重载版本
+/** @brief QByteArray重载版本 @param ba 字节数组 @return CRC32校验值 */
 inline uint32_t crc32(const QByteArray& ba)
 {
     return crc32(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size());
@@ -167,7 +167,7 @@ inline uint8_t checksum(const uint8_t* data, int length)
     return sum;
 }
 
-/// @brief QByteArray重载版本
+/** @brief QByteArray重载版本 @param ba 字节数组 @return 算术校验和 */
 inline uint8_t checksum(const QByteArray& ba)
 {
     return checksum(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size());

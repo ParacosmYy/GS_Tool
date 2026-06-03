@@ -81,7 +81,7 @@ QFrame* DataStatistics::createStatsFrame(const QString& label, QLabel*& valueLab
     layout->setSpacing(4);
     layout->setLabelAlignment(Qt::AlignRight);
 
-    valueLabel = new QLabel(QStringLiteral("0 B"));
+    valueLabel = new QLabel(tr("0 B"));
     valueLabel->setObjectName(objectName);
     layout->addRow(label, valueLabel);
     return frame;

@@ -83,8 +83,11 @@ private:
     quint64 m_totalConversions = 0; ///< 累计转换次数
     quint64 m_totalCopyActions = 0; ///< 累计复制操作次数
 public:
+    /** @brief 获取累计转换次数 @return 转换次数 */
     quint64 totalConversions() const { return m_totalConversions; }
+    /** @brief 获取累计复制操作次数 @return 复制次数 */
     quint64 totalCopyActions() const { return m_totalCopyActions; }
+    /** @brief 重置时间戳面板统计计数器(转换次数/复制次数) */
     void resetTimestampPanelStatistics() { m_totalConversions = 0; m_totalCopyActions = 0; }
 };
 

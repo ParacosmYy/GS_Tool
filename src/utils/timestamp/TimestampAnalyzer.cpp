@@ -5,6 +5,7 @@
 
 #include "utils/timestamp/TimestampAnalyzer.h"
 
+/** @brief 构造函数 @param parent 父对象 */
 TimestampAnalyzer::TimestampAnalyzer(QObject *parent)
     : QObject(parent)
 {
@@ -26,6 +27,7 @@ qint64 TimestampAnalyzer::datetimeToUnix(const QDateTime &datetime, bool asMilli
     return asMillis ? (secs * 1000) : secs;
 }
 
+/** @brief 获取当前Unix时间戳 @param millis 是否返回毫秒精度 @return 当前时间戳 */
 qint64 TimestampAnalyzer::currentUnix(bool millis)
 {
     qint64 secs = QDateTime::currentSecsSinceEpoch();

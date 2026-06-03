@@ -45,13 +45,13 @@ public:
      */
     QString output() const;
 
-    /** @brief 获取累计转换操作次数 */
+    /** @brief 获取累计转换操作次数 @return 转换次数 */
     quint64 totalConversions() const { return m_totalConversions; }
 
-    /** @brief 获取累计复制操作次数 */
+    /** @brief 获取累计复制操作次数 @return 复制次数 */
     quint64 totalCopyActions() const { return m_totalCopyActions; }
 
-    /** @brief 重置所有统计计数器 */
+    /** @brief 重置所有转换器统计计数器(转换次数/复制次数) */
     void resetStatistics();
 
 private slots:

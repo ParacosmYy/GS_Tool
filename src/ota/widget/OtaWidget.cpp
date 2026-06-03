@@ -263,7 +263,7 @@ void OtaWidget::onStartTransfer()
     QString protocol = m_protocolCombo->currentData().toString();
 
     auto fwType = m_manager->detectFirmwareType(filePath);
-    QString typeStr = (fwType == OtaManager::FirmwareType::IntelHex) ? "HEX->BIN" : "BIN";
+    QString typeStr = (fwType == OtaManager::FirmwareType::IntelHex) ? tr("HEX->BIN") : tr("BIN");
     appendLog(tr("开始传输: %1 [%2, %3], 协议: %4")
         .arg(m_currentFileName, typeStr, ByteFormat::formatSize(m_currentFileSize), protocol));
 

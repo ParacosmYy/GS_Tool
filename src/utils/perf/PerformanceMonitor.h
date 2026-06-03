@@ -23,16 +23,16 @@ class PerformanceMonitor : public QObject
     Q_OBJECT
 
 public:
-    /// 构造函数
+    /** @brief 构造函数 @param parent 父对象 */
     explicit PerformanceMonitor(QObject *parent = nullptr);
 
-    /// 析构函数
+    /** @brief 析构函数 */
     ~PerformanceMonitor() override;
 
-    /// 标记帧开始
+    /** @brief 标记帧开始 */
     void beginFrame();
 
-    /// 标记帧结束，更新统计数据
+    /** @brief 标记帧结束，更新统计数据 */
     void endFrame();
 
     /**
@@ -60,7 +60,7 @@ public:
      */
     void recordLatency(const QString &tag, quint64 microseconds);
 
-    /// 便捷方法：标记一帧（beginFrame + endFrame）
+    /** @brief 便捷方法：标记完整一帧（beginFrame + endFrame） */
     void recordFrame();
 
     /**
@@ -125,7 +125,7 @@ public:
     void resetPerformanceStatistics();
 
 signals:
-    /// 统计数据更新
+    /** @brief 统计数据更新信号 @param fps 帧率 @param avgFrameMs 平均帧耗时(ms) @param memBytes 内存占用(字节) */
     void statsUpdated(double fps, double avgFrameMs, qint64 memBytes);
 
 private:

@@ -114,9 +114,13 @@ private:
     quint64 m_totalLoads = 0;       ///< 累计加载次数
     quint64 m_totalErrors = 0;      ///< 累计错误次数
 public:
+    /** @brief 获取累计保存次数 @return 保存次数 */
     quint64 totalSaves() const { return m_totalSaves; }
+    /** @brief 获取累计加载次数 @return 加载次数 */
     quint64 totalLoads() const { return m_totalLoads; }
+    /** @brief 获取累计错误次数 @return 错误次数 */
     quint64 totalErrors() const { return m_totalErrors; }
+    /** @brief 重置文件格式统计计数器(保存次数/加载次数/错误次数) */
     void resetFileFormatStatistics() { m_totalSaves = 0; m_totalLoads = 0; m_totalErrors = 0; }
 };
 

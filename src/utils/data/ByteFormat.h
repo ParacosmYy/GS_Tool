@@ -22,6 +22,7 @@
 #define BYTEFORMAT_H
 
 #include <QString>
+#include <QCoreApplication>
 #include <QtGlobal>
 
 /**
@@ -265,17 +266,17 @@ inline QString formatDurationPrecise(qint64 ms)
 inline QString formatEta(qint64 completed, qint64 total, qint64 elapsedMs)
 {
     if (completed <= 0 || total <= 0 || elapsedMs <= 0 || completed >= total) {
-        if (completed >= total) return QStringLiteral("即将完成");
+        if (completed >= total) return QCoreApplication::translate("ByteFormat", "即将完成");
         return QStringLiteral("--");
     }
 
     double rate = static_cast<double>(completed) / static_cast<double>(elapsedMs);
     qint64 remainingMs = static_cast<qint64>((total - completed) / rate);
 
-    if (remainingMs < 1000) return QStringLiteral("即将完成");
-    if (remainingMs < 60000) return QString("预计剩余 %1秒").arg(remainingMs / 1000);
-    if (remainingMs < 3600000) return QString("预计剩余 %1分钟").arg(remainingMs / 60000);
-    return QString("预计剩余 %1小时").arg(remainingMs / 3600000);
+    if (remainingMs < 1000) return QCoreApplication::translate("ByteFormat", "即将完成");
+    if (remainingMs < 60000) return QCoreApplication::translate("ByteFormat", "预计剩余 %1秒").arg(remainingMs / 1000);
+    if (remainingMs < 3600000) return QCoreApplication::translate("ByteFormat", "预计剩余 %1分钟").arg(remainingMs / 60000);
+    return QCoreApplication::translate("ByteFormat", "预计剩余 %1小时").arg(remainingMs / 3600000);
 }
 
 } // namespace ByteFormat
