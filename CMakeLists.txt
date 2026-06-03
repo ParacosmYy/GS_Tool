@@ -275,6 +275,12 @@ set(SOURCES
 )
 
 set(HEADERS
+    # 接口层 - 零出站依赖的纯虚接口
+    src/interfaces/IPanelProvider.h
+    src/interfaces/IDataSink.h
+    src/interfaces/IProtocolParser.h
+    src/interfaces/IDevice.h
+
     src/core/mainwindow/MainWindow.h
     src/core/connect/ConnectionController.h
 

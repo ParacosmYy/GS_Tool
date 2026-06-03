@@ -80,6 +80,23 @@ public:
      */
     void setTransport(IConnection* serial);
 
+    // ---- 统计信息接口 ----
+
+    /** @brief 获取总传输次数 */
+    quint64 totalTransactions() const { return m_totalTransactions; }
+
+    /** @brief 获取总发送字节数 */
+    quint64 totalBytesSent() const { return m_totalBytesSent; }
+
+    /** @brief 获取总接收字节数 */
+    quint64 totalBytesReceived() const { return m_totalBytesReceived; }
+
+    /** @brief 获取错误计数 */
+    quint64 errorCount() const { return m_errorCount; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
 private slots:
     /** @brief 底层串口数据到达回调 */
     void onTransportData(const QByteArray& data);
@@ -114,6 +131,12 @@ private:
     // ---- 传输通道 ----
     IConnection* m_serial = nullptr;                ///< 底层串口连接(不拥有)
     QByteArray m_responseBuffer;                    ///< 响应数据缓冲区
+
+    // ---- 统计计数器 ----
+    quint64 m_totalTransactions = 0;                ///< 总传输次数
+    quint64 m_totalBytesSent = 0;                   ///< 总发送字节数
+    quint64 m_totalBytesReceived = 0;               ///< 总接收字节数
+    quint64 m_errorCount = 0;                       ///< 错误计数
 };
 
 #endif // SPICONNECTION_H

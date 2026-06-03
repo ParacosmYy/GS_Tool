@@ -96,6 +96,26 @@ public:
      */
     IConnection* serialPort() const;
 
+    // ---- 统计信息接口 ----
+
+    /** @brief 获取总发送帧数 */
+    quint64 totalFramesSent() const { return m_totalFramesSent; }
+
+    /** @brief 获取总接收帧数 */
+    quint64 totalFramesReceived() const { return m_totalFramesReceived; }
+
+    /** @brief 获取总发送字节数 */
+    quint64 totalBytesSent() const { return m_totalBytesSent; }
+
+    /** @brief 获取总接收字节数 */
+    quint64 totalBytesReceived() const { return m_totalBytesReceived; }
+
+    /** @brief 获取错误计数 */
+    quint64 errorCount() const { return m_errorCount; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
 signals:
     /**
      * @brief 收到CAN帧时发出
@@ -113,7 +133,7 @@ private slots:
 private:
     /**
      * @brief 向适配器发送LAWICEL命令并等待回车
-     * @param cmd LAWICEL协议命令字符串(不含\\r)
+     * @param cmd LAWICEL协议命令字符串(不含\r)
      * @return 写入字节数
      */
     qint64 sendCommand(const QString& cmd);
@@ -138,6 +158,13 @@ private:
 
     /** @brief 串口接收缓冲区，用于按行解析LAWICEL帧 */
     QByteArray m_rxBuffer;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalFramesSent = 0;          ///< 总发送帧数
+    quint64 m_totalFramesReceived = 0;      ///< 总接收帧数
+    quint64 m_totalBytesSent = 0;           ///< 总发送字节数
+    quint64 m_totalBytesReceived = 0;       ///< 总接收字节数
+    quint64 m_errorCount = 0;               ///< 错误计数
 };
 
 #endif // CANCONNECTION_H

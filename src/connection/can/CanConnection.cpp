@@ -54,6 +54,7 @@ bool CanConnection::open()
 {
     if (!m_serialPort) {
         emit errorOccurred(tr("未设置底层串口连接"));
+        ++m_errorCount;
         return false;
     }
     m_state = ConnectionState::Connecting;
@@ -64,6 +65,7 @@ bool CanConnection::open()
         m_state = ConnectionState::Error;
         emit stateChanged(m_state);
         emit errorOccurred(tr("串口打开失败"));
+        ++m_errorCount;
         return false;
     }
 
@@ -107,8 +109,20 @@ void CanConnection::close()
 
 qint64 CanConnection::write(const QByteArray& data)
 {
-    if (!m_serialPort || m_state != ConnectionState::Connected) return -1;
-    return m_serialPort->write(data);
+    if (!m_serialPort || m_state != ConnectionState::Connected) {
+        ++m_errorCount;
+        return -1;
+    }
+
+    qint64 written = m_serialPort->write(data);
+
+    if (written > 0) {
+        ++m_totalFramesSent;
+        m_totalBytesSent += static_cast<quint64>(written);
+    } else {
+        ++m_errorCount;
+    }
+    return written;
 }
 
 void CanConnection::configure(const QVariantMap& params)
@@ -142,7 +156,10 @@ void CanConnection::setCanFdEnabled(bool enabled)
 
 bool CanConnection::sendFrame(int id, const QByteArray& data, bool extended)
 {
-    if (m_state != ConnectionState::Connected) return false;
+    if (m_state != ConnectionState::Connected) {
+        ++m_errorCount;
+        return false;
+    }
 
     CanFrame frame;
     frame.id = static_cast<quint32>(id);
@@ -154,10 +171,21 @@ bool CanConnection::sendFrame(int id, const QByteArray& data, bool extended)
 
     CanFrameParser parser;
     QByteArray raw = parser.buildFrame(frame);
-    if (raw.isEmpty()) return false;
+    if (raw.isEmpty()) {
+        ++m_errorCount;
+        return false;
+    }
 
     raw.append('\r');  // LAWICEL命令以\r结尾
-    return m_serialPort && m_serialPort->write(raw) > 0;
+    qint64 written = m_serialPort ? m_serialPort->write(raw) : 0;
+
+    if (written > 0) {
+        ++m_totalFramesSent;
+        m_totalBytesSent += static_cast<quint64>(written);
+    } else {
+        ++m_errorCount;
+    }
+    return written > 0;
 }
 
 qint64 CanConnection::sendCommand(const QString& cmd)
@@ -184,6 +212,7 @@ void CanConnection::parseBuffer()
         if (line.isEmpty() || line == "z") continue;  // ACK或空行
         if (line.startsWith('\a')) {
             emit errorOccurred(tr("CAN适配器报告错误"));
+            ++m_errorCount;
             continue;
         }
 
@@ -191,9 +220,25 @@ void CanConnection::parseBuffer()
         CanFrameParser parser;
         CanFrame frame = parser.parseFrame(line);
         if (frame.dlc > 0 || frame.rtr) {
+            /// 更新统计: 接收到有效CAN帧
+            ++m_totalFramesReceived;
+            m_totalBytesReceived += static_cast<quint64>(frame.data.size());
+
             emit frameReceived(static_cast<int>(frame.id),
                                frame.data, frame.extended, frame.rtr);
             emit dataReceived(line);  // 也向上层转发原始数据
         }
     }
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void CanConnection::resetStats()
+{
+    m_totalFramesSent = 0;
+    m_totalFramesReceived = 0;
+    m_totalBytesSent = 0;
+    m_totalBytesReceived = 0;
+    m_errorCount = 0;
 }

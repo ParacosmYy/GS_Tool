@@ -254,7 +254,14 @@ void SerialConfigPanel::updateDriverInfo()
 }
 
 /** @brief 端口ComboBox选中变化时更新连接按钮启用状态 */
-void SerialConfigPanel::onPortComboChanged() { updateConnectButtonState(); }
+void SerialConfigPanel::onPortComboChanged()
+{
+    // Statistics: count port switches when user selects a different port
+    if (!m_portCombo->currentData().toString().isEmpty()) {
+        m_totalPortSwitches++;
+    }
+    updateConnectButtonState();
+}
 
 /** @brief 根据端口选择状态更新连接按钮启用/禁用 */
 void SerialConfigPanel::updateConnectButtonState()
@@ -292,4 +299,11 @@ QString SerialConfigPanel::buildPortTooltip(const QSerialPortInfo& info) const
     // 常用波特率提示
     details << tr("常用波特率: 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600");
     return details.join("\n");
+}
+
+/** @brief Reset all operation statistics counters */
+void SerialConfigPanel::resetStats()
+{
+    m_totalConfigChanges = 0;
+    m_totalPortSwitches = 0;
 }

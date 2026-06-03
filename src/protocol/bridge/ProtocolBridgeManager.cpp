@@ -391,6 +391,7 @@ void ProtocolBridgeManager::onFrameParserError(
         m_checksumErrors++;
     }
     m_totalErrors++;
+    ++m_totalParseErrors;
 
     emit frameError(reason, rawFrame);
 }
@@ -406,6 +407,7 @@ void ProtocolBridgeManager::onBridgeParsed(
     const QVariantMap& fields, const QByteArray& rawFrame)
 {
     m_totalFramesParsed++;
+    ++m_totalFramesParsedAll;
     emit frameParsed(fields, rawFrame);
 }
 

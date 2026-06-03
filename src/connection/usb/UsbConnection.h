@@ -83,6 +83,23 @@ public:
                                quint16 value, quint16 index,
                                const QByteArray& data);
 
+    // ---- 统计信息接口 ----
+
+    /** @brief 获取总传输次数 */
+    quint64 totalTransfers() const { return m_totalTransfers; }
+
+    /** @brief 获取总发送字节数 */
+    quint64 totalBytesSent() const { return m_totalBytesSent; }
+
+    /** @brief 获取总接收字节数 */
+    quint64 totalBytesReceived() const { return m_totalBytesReceived; }
+
+    /** @brief 获取错误计数 */
+    quint64 errorCount() const { return m_errorCount; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
 private:
     quint16 m_vid       = 0;    ///< 厂商ID
     quint16 m_pid       = 0;    ///< 产品ID
@@ -92,6 +109,12 @@ private:
     void*   m_usbContext = nullptr;     ///< libusb上下文 (不透明指针)
     bool    m_interfaceClaimed = false; ///< 接口是否已声明
     unsigned int m_timeout = 5000;      ///< USB传输超时(ms)
+
+    // ---- 统计计数器 ----
+    quint64 m_totalTransfers = 0;       ///< 总传输次数
+    quint64 m_totalBytesSent = 0;       ///< 总发送字节数
+    quint64 m_totalBytesReceived = 0;   ///< 总接收字节数
+    quint64 m_errorCount = 0;           ///< 错误计数
 };
 
 #endif // USB_CONNECTION_H

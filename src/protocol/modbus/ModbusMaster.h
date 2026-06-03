@@ -4,6 +4,7 @@
  *
  * 通过IConnection接口发送Modbus请求帧，接收并解析响应。
  * 支持RTU/ASCII/TCP模式，提供标准功能码便捷方法和自定义帧发送。
+ * 统计增强: 请求数/响应数/超时数/错误数独立计数，支持统一重置。
  */
 #ifndef MODBUS_MASTER_H
 #define MODBUS_MASTER_H
@@ -16,6 +17,7 @@
 /**
  * @brief Modbus主站控制器
  * 负责构造请求帧、发送并等待响应、超时管理。
+ * 提供运行时统计接口用于诊断和监控。
  */
 class ModbusMaster : public QObject {
     Q_OBJECT
@@ -72,23 +74,39 @@ public:
      */
     bool sendCustomFrame(const ModbusFrame& frame);
 
-    /** @brief 获取已发送请求计数 */
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计发送的请求总数 */
+    quint64 totalRequests() const;
+
+    /** @brief 获取累计接收的有效响应总数 */
+    quint64 totalResponses() const;
+
+    /** @brief 获取累计超时次数 */
+    quint64 totalTimeouts() const;
+
+    /** @brief 获取累计Modbus异常响应总数 */
+    quint64 totalErrors() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
+    // ---- 兼容旧接口 ----
+
+    /** @brief 获取已发送请求计数（兼容旧接口，等同 totalRequests） */
     quint64 requestCount() const;
 
-    /** @brief 获取已接收响应计数 */
+    /** @brief 获取已接收响应计数（兼容旧接口，等同 totalResponses） */
     quint64 responseCount() const;
 
-    /** @brief 获取超时次数 */
+    /** @brief 获取超时次数（兼容旧接口，等同 totalTimeouts） */
     quint64 timeoutCount() const;
 
-    /** @brief 获取Modbus异常响应计数 */
+    /** @brief 获取Modbus异常响应计数（兼容旧接口，等同 totalErrors） */
     quint64 errorCount() const;
 
-    /** @brief 重置统计数据 */
+    /** @brief 重置统计数据（兼容旧接口，等同 resetStats） */
     void resetStatistics();
-
-    /** @brief 重置统计数据(等同于resetStatistics) */
-    void resetStats();
 
 signals:
     /** @brief 收到有效响应 */
@@ -120,14 +138,10 @@ private:
     QTimer*      m_timer       = nullptr; ///< 响应超时定时器
     QByteArray   m_rxBuffer;              ///< 接收缓冲区
 
-    /** @brief 已发送请求计数 */
-    quint64 m_requestCount = 0;
-    /** @brief 已接收响应计数 */
-    quint64 m_responseCount = 0;
-    /** @brief 超时次数 */
-    quint64 m_timeoutCount = 0;
-    /** @brief Modbus异常响应计数 */
-    quint64 m_errorCount = 0;
+    quint64 m_totalRequests  = 0;         ///< 累计发送请求总数
+    quint64 m_totalResponses = 0;         ///< 累计接收有效响应总数
+    quint64 m_totalTimeouts  = 0;         ///< 累计超时次数
+    quint64 m_totalErrors    = 0;         ///< 累计Modbus异常响应总数
 };
 
 #endif // MODBUS_MASTER_H

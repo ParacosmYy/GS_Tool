@@ -90,7 +90,7 @@ bool ModbusMaster::sendFrame(const QByteArray& rawData) {
     m_lastSlave = static_cast<quint8>(rawData.isEmpty() ? 0 : rawData[0]);
     m_rxBuffer.clear();
     m_timer->start(m_timeoutMs);
-    ++m_requestCount;
+    ++m_totalRequests;
 
     qint64 written = m_connection->write(rawData);
     return written > 0;
@@ -141,7 +141,7 @@ void ModbusMaster::onRawDataReceived(const QByteArray& data) {
 }
 
 void ModbusMaster::onTimeout() {
-    ++m_timeoutCount;
+    ++m_totalTimeouts;
     emit timeout(static_cast<int>(m_lastSlave), 0);
 }
 
@@ -166,7 +166,7 @@ void ModbusMaster::parseResponse(const QByteArray& data) {
                 static_cast<quint8>(frame.data[0])));
         }
     } else {
-        ++m_responseCount;
+        ++m_totalResponses;
         emit responseReceived(frame);
     }
 }
@@ -176,7 +176,7 @@ void ModbusMaster::parseResponse(const QByteArray& data) {
  */
 quint64 ModbusMaster::requestCount() const
 {
-    return m_requestCount;
+    return m_totalRequests;
 }
 
 /**
@@ -184,7 +184,7 @@ quint64 ModbusMaster::requestCount() const
  */
 quint64 ModbusMaster::responseCount() const
 {
-    return m_responseCount;
+    return m_totalResponses;
 }
 
 /**
@@ -192,7 +192,7 @@ quint64 ModbusMaster::responseCount() const
  */
 quint64 ModbusMaster::timeoutCount() const
 {
-    return m_timeoutCount;
+    return m_totalTimeouts;
 }
 
 /**
@@ -208,8 +208,16 @@ quint64 ModbusMaster::errorCount() const
  */
 void ModbusMaster::resetStatistics()
 {
-    m_requestCount = 0;
-    m_responseCount = 0;
-    m_timeoutCount = 0;
+    m_totalRequests = 0;
+    m_totalResponses = 0;
+    m_totalTimeouts = 0;
     m_errorCount = 0;
+}
+
+/**
+ * @brief 重置统计数据(等同于resetStatistics)
+ */
+void ModbusMaster::resetStats()
+{
+    resetStatistics();
 }

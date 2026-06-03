@@ -84,6 +84,26 @@ public:
      */
     QString deviceName() const;
 
+    // ---- 统计信息接口 ----
+
+    /** @brief 获取总写入次数 */
+    quint64 totalWrites() const { return m_totalWrites; }
+
+    /** @brief 获取总读取次数 */
+    quint64 totalReads() const { return m_totalReads; }
+
+    /** @brief 获取总写入字节数 */
+    quint64 totalBytesWritten() const { return m_totalBytesWritten; }
+
+    /** @brief 获取总读取字节数 */
+    quint64 totalBytesRead() const { return m_totalBytesRead; }
+
+    /** @brief 获取错误计数 */
+    quint64 errorCount() const { return m_errorCount; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
 signals:
     /** @brief GATT服务发现完成 */
     void servicesDiscovered(const QStringList& services);
@@ -119,8 +139,15 @@ private:
     /** @brief 模拟连接延迟定时器 */
     QTimer* m_connectTimer;
 
-    /** @brief 写入数据累计字节计数 */
+    /** @brief 写入数据累计字节计数(旧接口保留) */
     qint64 m_bytesWritten = 0;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalWrites = 0;                  ///< 总写入次数
+    quint64 m_totalReads = 0;                   ///< 总读取次数
+    quint64 m_totalBytesWritten = 0;            ///< 总写入字节数
+    quint64 m_totalBytesRead = 0;               ///< 总读取字节数
+    quint64 m_errorCount = 0;                   ///< 错误计数
 };
 
 #endif // BLECONNECTION_H

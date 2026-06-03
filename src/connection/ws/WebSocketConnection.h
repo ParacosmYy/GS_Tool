@@ -78,6 +78,26 @@ public:
      */
     bool ping(const QByteArray& payload = QByteArray());
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取已发送消息总数(文本+二进制) */
+    quint64 totalMessagesSent() const;
+
+    /** @brief 获取已接收消息总数(文本+二进制) */
+    quint64 totalMessagesReceived() const;
+
+    /** @brief 获取已发送字节总数(帧级别) */
+    quint64 totalBytesSent() const;
+
+    /** @brief 获取已接收字节总数(帧级别) */
+    quint64 totalBytesReceived() const;
+
+    /** @brief 获取错误计数 */
+    quint64 errorCount() const;
+
+    /** @brief 重置所有统计数据为零 */
+    void resetStats();
+
 signals:
     /** @brief 收到文本消息时发出
      * @param message 文本内容
@@ -142,6 +162,13 @@ private:
     QByteArray m_buffer;                ///< 接收缓冲区
     QString m_handshakeKey;             ///< 握手Sec-WebSocket-Key
     bool m_handshakeDone = false;       ///< 握手是否完成
+
+    // ---- 统计计数器 ----
+    quint64 m_totalMessagesSent = 0;    ///< 已发送消息总数(文本+二进制)
+    quint64 m_totalMessagesReceived = 0;///< 已接收消息总数(文本+二进制)
+    quint64 m_totalBytesSent = 0;       ///< 已发送字节总数(帧级别)
+    quint64 m_totalBytesReceived = 0;   ///< 已接收字节总数(帧级别)
+    quint64 m_errorCount = 0;           ///< 错误发生次数
 };
 
 #endif // WEBSOCKETCONNECTION_H

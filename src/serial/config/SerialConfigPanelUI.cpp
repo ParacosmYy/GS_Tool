@@ -83,6 +83,7 @@ QGroupBox* SerialConfigPanel::createParamGroup()
             bool ok = false;
             qint32 baud = text.toInt(&ok);
             if (ok && baud > 0) {
+                m_totalConfigChanges++;  // Statistics: runtime baud rate change
                 emit baudRateChanged(baud);
             }
         }

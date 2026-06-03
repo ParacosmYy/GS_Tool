@@ -53,6 +53,7 @@ bool BleConnection::open()
 {
     if (m_deviceAddress.isEmpty()) {
         emit errorOccurred(tr("BLE设备地址未设置"));
+        ++m_errorCount;
         return false;
     }
     if (m_state == ConnectionState::Connected ||
@@ -79,6 +80,7 @@ qint64 BleConnection::write(const QByteArray& data)
 {
     if (m_state != ConnectionState::Connected) {
         emit errorOccurred(tr("BLE未连接，无法写入数据"));
+        ++m_errorCount;
         return -1;
     }
     if (data.isEmpty()) {
@@ -89,8 +91,15 @@ qint64 BleConnection::write(const QByteArray& data)
     m_bytesWritten += written;
     emit bytesWritten(written);
 
+    /// 更新统计: GATT写入操作
+    ++m_totalWrites;
+    m_totalBytesWritten += static_cast<quint64>(written);
+
     // 模拟BLE回环: 将写入数据作为接收数据回传
     QTimer::singleShot(50, this, [this, data]() {
+        /// 更新统计: 回环读取
+        ++m_totalReads;
+        m_totalBytesRead += static_cast<quint64>(data.size());
         emit dataReceived(data);
     });
 
@@ -148,4 +157,16 @@ void BleConnection::onConnectTimeout()
 void BleConnection::initMockServices()
 {
     m_services = MOCK_SERVICES;
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void BleConnection::resetStats()
+{
+    m_totalWrites = 0;
+    m_totalReads = 0;
+    m_totalBytesWritten = 0;
+    m_totalBytesRead = 0;
+    m_errorCount = 0;
 }

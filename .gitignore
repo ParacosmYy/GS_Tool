@@ -57,3 +57,12 @@ test_output_*.txt
 
 # Dependencies
 node_modules/
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Dependencies
+node_modules/

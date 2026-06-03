@@ -75,12 +75,14 @@ bool SpiConnection::open()
 {
     if (!m_serial) {
         emit errorOccurred(tr("未设置串口传输通道"));
+        ++m_errorCount;
         updateState(ConnectionState::Error);
         return false;
     }
 
     if (!m_serial->open()) {
         emit errorOccurred(tr("串口打开失败"));
+        ++m_errorCount;
         updateState(ConnectionState::Error);
         return false;
     }
@@ -118,11 +120,21 @@ void SpiConnection::close()
  */
 qint64 SpiConnection::write(const QByteArray& data)
 {
-    if (m_state != ConnectionState::Connected) return -1;
+    if (m_state != ConnectionState::Connected) {
+        ++m_errorCount;
+        return -1;
+    }
 
     setChipSelect(m_csPin, true);
     qint64 written = sendCommand(CMD_SPI_WRITE, data);
     setChipSelect(m_csPin, false);
+
+    if (written > 0) {
+        ++m_totalTransactions;
+        m_totalBytesSent += static_cast<quint64>(written);
+    } else {
+        ++m_errorCount;
+    }
     return written;
 }
 
@@ -172,6 +184,7 @@ void SpiConnection::setClockSpeed(int speedHz)
 QByteArray SpiConnection::transfer(const QByteArray& txData)
 {
     if (m_state != ConnectionState::Connected || !m_serial) {
+        ++m_errorCount;
         return QByteArray();
     }
 
@@ -186,6 +199,12 @@ QByteArray SpiConnection::transfer(const QByteArray& txData)
     if (!m_responseBuffer.isEmpty()) {
         rxData = m_responseBuffer;
     }
+
+    /// 更新统计: 全双工同时计发送和接收
+    ++m_totalTransactions;
+    m_totalBytesSent += static_cast<quint64>(txData.size());
+    m_totalBytesReceived += static_cast<quint64>(rxData.size());
+
     emit dataReceived(rxData);
     return rxData;
 }
@@ -260,4 +279,15 @@ QByteArray SpiConnection::buildTransferFrame(const QByteArray& txData)
     frame.append(static_cast<char>((len >> 8) & 0xFF));
     frame.append(txData);
     return frame;
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void SpiConnection::resetStats()
+{
+    m_totalTransactions = 0;
+    m_totalBytesSent = 0;
+    m_totalBytesReceived = 0;
+    m_errorCount = 0;
 }

@@ -68,6 +68,18 @@ public:
     /** @brief 设置连接中状态(由外部连接流程调用) */
     void setConnecting();
 
+
+    // ---- Operation statistics ----
+
+    /** @brief Get cumulative config change count @return Total config changes since last reset */
+    quint64 totalConfigChanges() const { return m_totalConfigChanges; }
+
+    /** @brief Get cumulative port switch count @return Total port switches since last reset */
+    quint64 totalPortSwitches() const { return m_totalPortSwitches; }
+
+    /** @brief Reset all operation statistics counters to zero */
+    void resetStats();
+
 public slots:
     /** @brief 更新信号线状态LED指示灯
      * @param signals 当前信号线电平状态
