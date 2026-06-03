@@ -40,10 +40,7 @@ void UsbDescriptorViewer::setDevice(quint16 vid, quint16 pid) {
     loadDescriptors(vid, pid);
 }
 
-/**
- * @brief 加载设备描述符并填充树
- * 使用占位数据构建标准描述符层次结构
- */
+/** @brief 加载设备描述符并填充树(使用占位数据构建标准描述符层次结构) @param vid 厂商ID @param pid 产品ID */
 void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
     m_descriptorTree->clear();
     m_rawView->clear();
@@ -153,9 +150,7 @@ void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
     m_rawView->setPlainText(hexDump);
 }
 
-/**
- * @brief 解析18字节设备描述符
- */
+/** @brief 解析18字节设备描述符 @param parent 父节点 @param raw 原始描述符数据 */
 void UsbDescriptorViewer::addDeviceDescriptor(QTreeWidgetItem* parent,
                                                const QByteArray& raw) {
     if (raw.size() < 18) { return; }

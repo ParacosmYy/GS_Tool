@@ -115,6 +115,7 @@ set(SOURCES
     src/chart/widget/ChartWidgetTheme.cpp
     src/chart/model/ChannelConfig.cpp
     src/chart/model/ChartModel.cpp
+    src/chart/model/ChartModelStats.cpp
     src/chart/scale/YAxisManager.cpp
     src/chart/overlay/CursorOverlay.cpp
     src/chart/zoom/ZoomController.cpp
@@ -287,6 +288,7 @@ set(SOURCES
 
     # ── F25: 数据包构建器 ──
     src/utils/packet/PacketBuilder.cpp
+    src/utils/packet/PacketBuilderTemplate.cpp
     src/utils/packet/PacketBuilderPanel.cpp
 
     # ── F26: 设备注册表 ──

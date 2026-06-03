@@ -52,9 +52,7 @@ bool WebSocketConnection::open()
     return connectToUrl(m_url);
 }
 
-/**
- * @brief 关闭WebSocket连接 — 发送close帧后关闭TCP
- */
+/** @brief 关闭WebSocket连接(发送close帧后关闭TCP) */
 void WebSocketConnection::close()
 {
     if (m_pingTimer) {
@@ -92,9 +90,7 @@ void WebSocketConnection::configure(const QVariantMap& params)
     }
 }
 
-/**
- * @brief 连接到指定URL — 解析URL并发起TCP+HTTP升级
- */
+/** @brief 连接到指定URL(解析URL并发起TCP+HTTP升级) @param url WebSocket地址 @return true=连接已发起 */
 bool WebSocketConnection::connectToUrl(const QString& url)
 {
     // 无论当前状态，先清理旧连接
@@ -147,12 +143,7 @@ bool WebSocketConnection::connectToUrl(const QString& url)
     return true;
 }
 
-/**
- * @brief 构建WebSocket帧(RFC 6455)
- * @param opcode 操作码(0x01=text, 0x02=binary, 0x08=close, 0x09=ping, 0x0A=pong)
- * @param payload 载荷数据
- * @return 完整帧字节数组
- */
+/** @brief 构建WebSocket帧(RFC 6455) @param opcode 操作码(0x01/0x02/0x08/0x09/0x0A) @param payload 载荷数据 @return 完整帧字节数组 */
 QByteArray WebSocketConnection::buildFrame(quint8 opcode,
                                             const QByteArray& payload) const
 {

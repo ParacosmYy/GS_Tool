@@ -7,10 +7,7 @@
 
 #include <QFormLayout>
 
-/**
- * @brief 构造函数 - 初始化UI
- * @param parent 父控件
- */
+/** @brief 构造函数 - 初始化UI @param parent 父控件 */
 WsConfigPanel::WsConfigPanel(QWidget* parent)
     : QWidget(parent)
 {
@@ -19,10 +16,7 @@ WsConfigPanel::WsConfigPanel(QWidget* parent)
     setupConnections();
 }
 
-/**
- * @brief 获取当前配置参数
- * @return 配置键值对
- */
+/** @brief 获取当前配置参数 @return 配置键值对 */
 QVariantMap WsConfigPanel::config() const
 {
     QVariantMap cfg;
@@ -36,9 +30,7 @@ QVariantMap WsConfigPanel::config() const
     return cfg;
 }
 
-/**
- * @brief 连接按钮点击 — 切换连接/断开
- */
+/** @brief 连接按钮点击 - 切换连接/断开 */
 void WsConfigPanel::onConnectClicked()
 {
     if (!m_connected) {
@@ -58,10 +50,7 @@ void WsConfigPanel::onConnectClicked()
     }
 }
 
-/**
- * @brief 设置连接状态(由外部连接管理器调用)
- * @param connected true=已连接
- */
+/** @brief 设置连接状态(由外部连接管理器调用) @param connected true=已连接 */
 void WsConfigPanel::setConnected(bool connected)
 {
     m_connected = connected;
@@ -69,9 +58,7 @@ void WsConfigPanel::setConnected(bool connected)
     m_statusLabel->setText(connected ? tr("已连接") : tr("未连接"));
 }
 
-/**
- * @brief 初始化UI布局
- */
+/** @brief 初始化UI布局 */
 void WsConfigPanel::setupUi()
 {
     auto* layout = new QFormLayout(this);
@@ -106,9 +93,7 @@ void WsConfigPanel::setupUi()
     layout->addRow(tr("状态:"), m_statusLabel);
 }
 
-/**
- * @brief 初始化信号连接
- */
+/** @brief 初始化信号连接 */
 void WsConfigPanel::setupConnections()
 {
     connect(m_connectBtn, &QPushButton::clicked,
@@ -124,10 +109,7 @@ void WsConfigPanel::setupConnections()
     });
 }
 
-/**
- * @brief 保存WebSocket配置到QSettings
- * @param settings QSettings对象
- */
+/** @brief 保存WebSocket配置到QSettings @param settings QSettings对象 */
 void WsConfigPanel::saveSettings(QSettings& settings) const
 {
     settings.setValue(QStringLiteral("ws/type"), m_typeCombo->currentIndex());
@@ -135,10 +117,7 @@ void WsConfigPanel::saveSettings(QSettings& settings) const
     settings.setValue(QStringLiteral("ws/protocol"), m_protocolEdit->text());
 }
 
-/**
- * @brief 从QSettings加载WebSocket配置
- * @param settings QSettings对象
- */
+/** @brief 从QSettings加载WebSocket配置 @param settings QSettings对象 */
 void WsConfigPanel::loadSettings(QSettings& settings)
 {
     m_typeCombo->setCurrentIndex(
@@ -149,9 +128,7 @@ void WsConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("ws/protocol")).toString());
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器 */
 void WsConfigPanel::resetStatistics()
 {
     m_totalConnectAttempts = 0;

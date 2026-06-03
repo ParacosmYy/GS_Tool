@@ -18,12 +18,7 @@
 #include <QRegularExpression>
 #include <QStyle>
 
-/**
- * @brief 构造函数 - 初始化界面并隐藏搜索栏
- * @param parent 父控件
- *
- * 初始状态为隐藏，等待 TerminalWidget 的 Ctrl+F 快捷键调用 activate()。
- */
+/** @brief 构造函数 - 初始化界面并隐藏搜索栏(Ctrl+F激活) @param parent 父控件 */
 TerminalSearchBar::TerminalSearchBar(QWidget* parent)
     : QWidget(parent)
     , m_searchInput(nullptr)
@@ -37,12 +32,7 @@ TerminalSearchBar::TerminalSearchBar(QWidget* parent)
     hide();
 }
 
-/**
- * @brief 构建界面布局和样式
- *
- * 水平布局: 搜索输入框 | 正则复选框 | HEX复选框 | 结果标签 | 弹簧 | 关闭按钮
- * 固定高度 36px，与工具栏高度协调。
- */
+/** @brief 构建界面布局和样式(水平布局:输入框|正则|HEX|结果|弹簧|关闭) */
 void TerminalSearchBar::setupUI()
 {
     setObjectName("terminalSearchBar");
@@ -129,15 +119,7 @@ bool TerminalSearchBar::isHexMode() const
     return m_hexCheck->isChecked();
 }
 
-/**
- * @brief 激活搜索栏并聚焦输入框
- *
- * 如果已经可见，仅聚焦并全选文本，不重新播放动画。
- * 如果不可见:
- *   1. 设置 maximumHeight 为 0 并 show()
- *   2. 启动 QPropertyAnimation: maximumHeight 0 -> 36, 200ms, OutCubic
- *   3. 动画结束后恢复 setFixedHeight(36)，避免布局异常
- */
+/** @brief 激活搜索栏并聚焦输入框(已可见仅聚焦，不可见播放展开动画200ms OutCubic) */
 void TerminalSearchBar::activate()
 {
     // 如果已经可见，仅聚焦
@@ -173,15 +155,7 @@ void TerminalSearchBar::activate()
     m_searchInput->selectAll();
 }
 
-/**
- * @brief 关闭搜索栏并清除内容
- *
- * 清除搜索文本和结果标签后，播放收起动画:
- *   1. QPropertyAnimation: maximumHeight 36 -> 0, 150ms, InCubic
- *   2. 动画完成后隐藏控件
- *   3. 恢复 setFixedHeight(36) 为下次展开做准备
- *   4. 发射 closed() 信号通知 TerminalWidget
- */
+/** @brief 关闭搜索栏并清除内容(收起动画150ms InCubic完成后发射closed信号) */
 void TerminalSearchBar::deactivate()
 {
     m_searchInput->clear();
@@ -209,17 +183,7 @@ void TerminalSearchBar::deactivate()
     m_activeAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-/**
- * @brief 搜索文本变化时触发搜索或清除
- * @param text 当前搜索框文本
- *
- * 处理逻辑:
- *   1. HEX 模式下验证输入合法性，非法时设置 hasError 属性切换错误样式
- *   2. 恢复正常样式（清除 hasError）
- *   3. 文本为空时发射 searchCleared()，非空时发射 searchRequested()
- *
- * 动态属性切换通过 style()->unpolish() + style()->polish() 触发 QSS 重新应用。
- */
+/** @brief 搜索文本变化时触发搜索或清除(HEX模式验证合法性+错误样式) @param text 当前搜索框文本 */
 void TerminalSearchBar::onSearchTextChanged(const QString& text)
 {
     // HEX模式下验证输入合法性
@@ -262,22 +226,13 @@ void TerminalSearchBar::onCloseClicked()
     deactivate();
 }
 
-/**
- * @brief 验证HEX输入是否合法
- * @param text 待验证的字符串
- * @return true 如果是合法的十六进制字符串
- *
- * 委托给公共组件 HexConverter::isValidHex() 实现，不重复造轮子。
- */
+/** @brief 验证HEX输入是否合法(委托给HexConverter::isValidHex) @param text 待验证的字符串 @return true合法 */
 bool TerminalSearchBar::isValidHex(const QString& text) const
 {
     return HexConverter::isValidHex(text);
 }
 
-/**
- * @brief 设置匹配结果显示文本
- * @param text 要显示的结果文本（如 "3/15" 或 "非法HEX"）
- */
+/** @brief 设置匹配结果显示文本 @param text 要显示的结果文本(如"3/15"或"非法HEX") */
 void TerminalSearchBar::setResultText(const QString& text)
 {
     m_resultLabel->setText(text);
