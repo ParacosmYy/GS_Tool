@@ -15,13 +15,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 
-/**
- * @brief 构造函数
- *
- * 初始化控件并调用 setupUI() 构建双视图界面。
- *
- * @param parent 父控件指针
- */
+/** @brief 构造函数，初始化双视图控件并调用setupUI() @param parent 父控件指针 */
 TerminalDualView::TerminalDualView(QWidget *parent)
     : QWidget(parent)
     , m_textView(nullptr)

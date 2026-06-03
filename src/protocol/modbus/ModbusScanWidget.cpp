@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 
+/** @brief 构造Modbus从站扫描器(地址范围+进度条+结果列表) @param parent 父控件 */
 ModbusScanWidget::ModbusScanWidget(QWidget* parent)
     : QWidget(parent)
 {
@@ -64,6 +65,7 @@ ModbusScanWidget::ModbusScanWidget(QWidget* parent)
     });
 }
 
+/** @brief 设置ModbusMaster实例(绑定响应/超时信号) @param master Modbus主站指针 */
 void ModbusScanWidget::setModbusMaster(ModbusMaster* master) {
     if (m_master) {
         disconnect(m_master, &ModbusMaster::responseReceived,
@@ -80,6 +82,7 @@ void ModbusScanWidget::setModbusMaster(ModbusMaster* master) {
     }
 }
 
+/** @brief 开始扫描指定地址范围 @param from 起始地址 @param to 结束地址 */
 void ModbusScanWidget::startScan(int from, int to) {
     m_scanFrom    = from;
     m_scanTo      = to;
@@ -99,6 +102,7 @@ void ModbusScanWidget::startScan(int from, int to) {
     scanNext();
 }
 
+/** @brief 停止正在进行的扫描，恢复UI状态并发射scanCompleted信号 */
 void ModbusScanWidget::stopScan() {
     m_scanning = false;
     updateScanButtonState(false);
@@ -110,6 +114,7 @@ void ModbusScanWidget::stopScan() {
     emit scanCompleted();
 }
 
+/** @brief 获取已发现的从站地址列表 @return 从站地址列表 */
 QList<int> ModbusScanWidget::foundSlaves() const {
     QList<int> slaves;
     for (int i = 0; i < m_resultList->count(); ++i) {
@@ -119,6 +124,7 @@ QList<int> ModbusScanWidget::foundSlaves() const {
     return slaves;
 }
 
+/** @brief ModbusMaster响应到达回调，添加从站到结果列表并继续扫描 @param frame 接收到的Modbus帧 */
 void ModbusScanWidget::onResponseReceived(const ModbusFrame& frame) {
     int addr = static_cast<int>(frame.slaveAddress);
     QString desc = tr("从站 %1 (功能码: %2)")
@@ -132,12 +138,14 @@ void ModbusScanWidget::onResponseReceived(const ModbusFrame& frame) {
     if (m_scanning) { scanNext(); }
 }
 
+/** @brief 超时回调：跳过当前地址，继续扫描下一个 @param slave 超时从站地址 @param function 超时功能码 */
 void ModbusScanWidget::onScanTimeout(int slave, int function) {
     Q_UNUSED(slave)
     Q_UNUSED(function)
     if (m_scanning) { scanNext(); }
 }
 
+/** @brief 发送下一个地址的探测请求(读1个保持寄存器)并更新进度条 */
 void ModbusScanWidget::scanNext() {
     if (m_currentAddr > m_scanTo || !m_scanning) {
         stopScan();
@@ -155,6 +163,7 @@ void ModbusScanWidget::scanNext() {
     m_currentAddr++;
 }
 
+/** @brief 更新扫描按钮文字(扫描中="停止扫描"/空闲="开始扫描") @param scanning true=正在扫描 */
 void ModbusScanWidget::updateScanButtonState(bool scanning) {
     if (scanning) {
         m_scanBtn->setText(tr("停止扫描"));

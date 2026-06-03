@@ -63,8 +63,7 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
 
 // ---- 辅助方法 ----
 
-/** @brief 打开文本文件并设置UTF8编码，失败时发射exportError */
-/** @brief 打开文本文件用于写入 @param file 文件对象 @param out 文本流 @param path 文件路径 @return 是否成功 */
+/** @brief 打开文本文件用于写入并设置UTF8编码，失败时发射exportError @param file 文件对象 @param out 文本流 @param path 文件路径 @return 是否成功 */
 bool DataExporter::openTextFile(QFile& file, QTextStream& out, const QString& path)
 {
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -204,24 +203,7 @@ bool DataExporter::exportBin(const QString& path, const QVector<TerminalLine>& l
     return true;
 }
 
-/**
- * @brief JSON全量导出 - 生成结构化JSON文件
- *
- * 输出格式:
- * {
- *   "export_time": "2026-06-01T12:00:00",
- *   "total_lines": 100,
- *   "lines": [
- *     {"timestamp": "2026-06-01 12:00:00.123", "direction": "RX", "hex": "48656C6C6F", "ascii": "Hello"},
- *     ...
- *   ]
- * }
- *
- * @param path 输出文件路径
- * @param lines 过滤后的行数据
- * @return true 成功，false 失败
- */
-/** @brief 导出JSON格式(结构化数据数组) @param path 文件路径 @param lines 行数据 @return 是否成功 */
+/** @brief 导出JSON格式(结构化数据数组，含export_time/total_lines/lines字段) @param path 文件路径 @param lines 行数据 @return 是否成功 */
 bool DataExporter::exportJson(const QString& path, const QVector<TerminalLine>& lines)
 {
     QJsonObject root;

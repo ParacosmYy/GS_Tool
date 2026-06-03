@@ -1,24 +1,43 @@
+/**
+ * @file ScopeWidget.cpp
+ * @brief 示波器Widget实现 — 多通道采样缓冲+网格绘制+触发控制
+ */
 #include "widgets/scope/ScopeWidget.h"
 #include <QPainter>
 #include <QResizeEvent>
 #include <QtMath>
 
+/** @brief 构造函数，默认2通道 @param parent 父Widget */
 ScopeWidget::ScopeWidget(QWidget *parent) : QWidget(parent) { setObjectName("ScopeWidget"); setChannelCount(2); }
+/** @brief 析构函数 */
 ScopeWidget::~ScopeWidget() = default;
 
+/** @brief 设置通道数量 @param c 通道数 */
 void ScopeWidget::setChannelCount(int c) { m_channels.resize(c); for (auto &ch : m_channels) ch.resize(m_bufferSize); }
+/** @brief 设置采样缓冲区大小 @param s 缓冲区采样数 */
 void ScopeWidget::setSampleBuffer(int s) { m_bufferSize = s; for (auto &ch : m_channels) ch.resize(s); m_writePos = 0; }
+/** @brief 添加单个采样值 @param ch 通道索引 @param v 采样值 */
 void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.size()) { m_channels[ch][m_writePos % m_bufferSize] = v; if (ch == 0) { m_writePos++; if (m_writePos >= m_bufferSize) { m_writePos = 0; emit dataOverflow(); } } } }
+/** @brief 批量添加采样值 @param ch 通道索引 @param vals 采样值向量 */
 void ScopeWidget::addSamples(int ch, const QVector<double> &vals) { for (auto v : vals) addSample(ch, v); }
+/** @brief 设置时间轴缩放 @param ms 时间刻度(毫秒) */
 void ScopeWidget::setTimeScale(double ms) { m_timeScale = ms; }
+/** @brief 设置电压轴缩放 @param v 电压刻度 */
 void ScopeWidget::setVoltageScale(double v) { m_voltScale = v; }
+/** @brief 设置触发通道 @param c 通道索引 */
 void ScopeWidget::setTriggerChannel(int c) { m_triggerCh = c; }
+/** @brief 设置触发电平 @param l 触发电平值 */
 void ScopeWidget::setTriggerLevel(double l) { m_triggerLevel = l; }
+/** @brief 启停采集 @param on true启动 */
 void ScopeWidget::setRunning(bool on) { m_running = on; }
+/** @brief 清空所有通道数据 */
 void ScopeWidget::clearData() { for (auto &ch : m_channels) ch.fill(0); m_writePos = 0; }
+/** @brief 获取通道数量 @return 通道数 */
 int ScopeWidget::channelCount() const { return m_channels.size(); }
+/** @brief 查询是否正在采集 @return 运行中返回true */
 bool ScopeWidget::isRunning() const { return m_running; }
 
+/** @brief 绘制示波器波形 — 暗色背景+网格+多通道波形路径 */
 void ScopeWidget::paintEvent(QPaintEvent *) {
     QPainter p(this); p.setRenderHint(QPainter::Antialiasing);
     int w = width(), h = height();
@@ -39,6 +58,7 @@ void ScopeWidget::paintEvent(QPaintEvent *) {
     }
 }
 
+/** @brief 绘制网格线 — 点状网格+中心十字线 @param p 画笔 @param w 宽度 @param h 高度 */
 void ScopeWidget::drawGrid(QPainter &p, int w, int h) {
     p.setPen(QPen(QColor(60, 60, 80), 1, Qt::DotLine));
     for (int i = 1; i < kDivisions; ++i) {
@@ -54,4 +74,5 @@ void ScopeWidget::drawGrid(QPainter &p, int w, int h) {
     p.drawLine(0, h/2, w, h/2);
 }
 
+/** @brief 窗口大小变更事件 @param e 重设事件 */
 void ScopeWidget::resizeEvent(QResizeEvent *e) { QWidget::resizeEvent(e); update(); }

@@ -5,36 +5,25 @@
 
 #include "connection/spi_i2c/SpiConnection.h"
 
-/**
- * @brief 构造函数
- * @param parent 父对象
- */
+/** @brief 构造SPI连接对象 @param parent 父QObject指针 */
 SpiConnection::SpiConnection(QObject* parent)
     : IConnection(parent)
 {
 }
 
-/**
- * @brief 析构函数
- */
+/** @brief 析构SPI连接，关闭并释放资源 */
 SpiConnection::~SpiConnection()
 {
     close();
 }
 
-/**
- * @brief 获取连接类型
- * @return Serial类型(SPI归入串行总线)
- */
+/** @brief 获取连接类型 @return ConnectionType::Spi */
 ConnectionType SpiConnection::type() const
 {
     return ConnectionType::Spi;
 }
 
-/**
- * @brief 获取连接显示名称
- * @return "SPI:适配器" 格式
- */
+/** @brief 获取连接显示名称 @return 已连接时返回"SPI:适配器"格式，否则返回"未连接" */
 QString SpiConnection::name() const
 {
     if (m_state == ConnectionState::Connected) {
@@ -43,18 +32,13 @@ QString SpiConnection::name() const
     return tr("SPI (未连接)");
 }
 
-/**
- * @brief 获取当前状态
- */
+/** @brief 获取当前连接状态 @return 当前连接状态枚举值 */
 ConnectionState SpiConnection::state() const
 {
     return m_state;
 }
 
-/**
- * @brief 设置底层串口传输通道
- * @param serial 串口IConnection实例
- */
+/** @brief 设置底层串口传输通道，断开旧通道并连接dataReceived信号 @param serial 串口IConnection实例 */
 void SpiConnection::setTransport(IConnection* serial)
 {
     if (m_serial) {
@@ -67,10 +51,7 @@ void SpiConnection::setTransport(IConnection* serial)
     }
 }
 
-/**
- * @brief 打开SPI连接 - 通过串口桥接器初始化
- * @return true=成功
- */
+/** @brief 打开SPI连接，通过串口桥接器发送模式/时钟配置 @return true=成功，false=通道未设置或串口打开失败 */
 bool SpiConnection::open()
 {
     if (!m_serial) {
@@ -101,9 +82,7 @@ bool SpiConnection::open()
     return true;
 }
 
-/**
- * @brief 关闭SPI连接
- */
+/** @brief 关闭SPI连接，释放片选引脚并重置状态 */
 void SpiConnection::close()
 {
     if (m_serial && m_state == ConnectionState::Connected) {
@@ -113,11 +92,7 @@ void SpiConnection::close()
     updateState(ConnectionState::Disconnected);
 }
 
-/**
- * @brief 发送数据(SPI半双工写)
- * @param data 待发送数据
- * @return 发送字节数
- */
+/** @brief SPI半双工写操作，自动控制片选 @param data 待发送数据 @return 发送字节数，未连接返回-1 */
 qint64 SpiConnection::write(const QByteArray& data)
 {
     if (m_state != ConnectionState::Connected) {
@@ -138,10 +113,7 @@ qint64 SpiConnection::write(const QByteArray& data)
     return written;
 }
 
-/**
- * @brief 配置SPI参数
- * @param params 参数映射
- */
+/** @brief 配置SPI参数(mode/clockSpeed/csPin/adapter) @param params 参数映射 */
 void SpiConnection::configure(const QVariantMap& params)
 {
     if (params.contains("mode")) {
@@ -158,29 +130,19 @@ void SpiConnection::configure(const QVariantMap& params)
     }
 }
 
-/**
- * @brief 设置SPI模式
- * @param mode SPI模式(0-3)
- */
+/** @brief 设置SPI模式，限制范围0~3 @param mode SPI模式(0-3) */
 void SpiConnection::setSpiMode(int mode)
 {
     m_mode = qBound(0, mode, 3);
 }
 
-/**
- * @brief 设置时钟频率
- * @param speedHz 时钟频率(Hz)
- */
+/** @brief 设置时钟频率 @param speedHz 时钟频率(Hz) */
 void SpiConnection::setClockSpeed(int speedHz)
 {
     m_clockSpeed = speedHz;
 }
 
-/**
- * @brief SPI全双工传输
- * @param txData 发送数据
- * @return 接收数据
- */
+/** @brief SPI全双工传输，同时发送和接收数据 @param txData 发送数据 @return 接收到的MISO数据 */
 QByteArray SpiConnection::transfer(const QByteArray& txData)
 {
     if (m_state != ConnectionState::Connected || !m_serial) {
@@ -209,11 +171,7 @@ QByteArray SpiConnection::transfer(const QByteArray& txData)
     return rxData;
 }
 
-/**
- * @brief 控制片选引脚
- * @param csPin 片选引脚
- * @param active true=选中
- */
+/** @brief 控制片选引脚电平 @param csPin 片选引脚编号 @param active true=拉低(选中)，false=拉高(释放) */
 void SpiConnection::setChipSelect(int csPin, bool active)
 {
     if (!m_serial || m_state != ConnectionState::Connected) return;
@@ -224,18 +182,13 @@ void SpiConnection::setChipSelect(int csPin, bool active)
     sendCommand(CMD_SPI_CS, payload);
 }
 
-/**
- * @brief 底层串口数据到达回调
- * @param data 从串口适配器收到的响应数据
- */
+/** @brief 底层串口数据到达回调，追加到响应缓冲区 @param data 从串口适配器收到的响应数据 */
 void SpiConnection::onTransportData(const QByteArray& data)
 {
     m_responseBuffer.append(data);
 }
 
-/**
- * @brief 更新连接状态
- */
+/** @brief 更新连接状态，状态变化时发射stateChanged信号 @param newState 新连接状态 */
 void SpiConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {
@@ -244,12 +197,7 @@ void SpiConnection::updateState(ConnectionState newState)
     }
 }
 
-/**
- * @brief 发送协议命令帧
- * @param cmd 命令字节
- * @param payload 负载数据
- * @return 发送字节数
- */
+/** @brief 发送协议命令帧[CMD][LEN(2字节小端)][PAYLOAD] @param cmd 命令字节 @param payload 负载数据 @return 发送字节数 */
 qint64 SpiConnection::sendCommand(quint8 cmd, const QByteArray& payload)
 {
     if (!m_serial) return -1;
@@ -265,11 +213,7 @@ qint64 SpiConnection::sendCommand(quint8 cmd, const QByteArray& payload)
     return m_serial->write(frame);
 }
 
-/**
- * @brief 组装SPI传输命令帧
- * @param txData 发送数据
- * @return 完整协议帧
- */
+/** @brief 组装SPI全双工传输命令帧[CMD][LEN][txData] @param txData 发送数据 @return 完整协议帧 */
 QByteArray SpiConnection::buildTransferFrame(const QByteArray& txData)
 {
     QByteArray frame;
@@ -281,9 +225,7 @@ QByteArray SpiConnection::buildTransferFrame(const QByteArray& txData)
     return frame;
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有SPI统计计数器(传输次数/字节数/错误计数) */
 void SpiConnection::resetStats()
 {
     m_totalTransactions = 0;

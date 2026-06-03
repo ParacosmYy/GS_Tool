@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QSerialPortInfo>
 
+/** @brief 构造CAN配置面板，初始化适配器列表/波特率/连接按钮 @param parent 父控件 */
 CanConfigPanel::CanConfigPanel(QWidget* parent)
     : QWidget(parent)
     , m_adapterCombo(new QComboBox(this))
@@ -72,6 +73,7 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
             this, [this]() { ++m_totalConfigChanges; });
 }
 
+/** @brief 获取当前CAN配置参数 @return 包含adapter/bitrate/canFd字段的QVariantMap */
 QVariantMap CanConfigPanel::config() const
 {
     QVariantMap cfg;
@@ -81,6 +83,7 @@ QVariantMap CanConfigPanel::config() const
     return cfg;
 }
 
+/** @brief 设置连接状态，更新按钮文本和控件可用性 @param connected true=已连接 */
 void CanConfigPanel::setConnected(bool connected)
 {
     m_connected = connected;
@@ -90,10 +93,7 @@ void CanConfigPanel::setConnected(bool connected)
     m_bitrateCombo->setEnabled(!connected);
 }
 
-/**
- * @brief 保存CAN配置到QSettings
- * @param settings QSettings对象
- */
+/** @brief 保存CAN配置到QSettings @param settings QSettings对象 */
 void CanConfigPanel::saveSettings(QSettings& settings) const
 {
     settings.setValue(QStringLiteral("can/adapter"),
@@ -104,10 +104,7 @@ void CanConfigPanel::saveSettings(QSettings& settings) const
                      m_canFdCheck->isChecked());
 }
 
-/**
- * @brief 从QSettings加载CAN配置
- * @param settings QSettings对象
- */
+/** @brief 从QSettings加载CAN配置 @param settings QSettings对象 */
 void CanConfigPanel::loadSettings(QSettings& settings)
 {
     const QString adapter = settings.value(
@@ -124,9 +121,7 @@ void CanConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("can/canFd"), false).toBool());
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器 */
 void CanConfigPanel::resetStatistics()
 {
     m_totalConfigChanges = 0;

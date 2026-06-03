@@ -60,7 +60,7 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 
 ## 三、模块清单
 
-> src/ 下共 12 个顶层模块，外加 2 个规划中的基础设施模块。
+> src/ 下有主模块，另有基础层处于收敛落地阶段。
 
 ### 现有模块（12个）
 
@@ -68,8 +68,8 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 |------|------|------|---------|
 | `automation` | `src/automation/` | 脚本自动化引擎、触发器 | 业务层 |
 | `chart` | `src/chart/` | 数据波形显示（折线/FFT/散点/直方） | 表现层 |
-| `connection` | `src/connection/` | 连接抽象与13种连接方式实现 | 基础设施层 |
-| `core` | `src/core/` | 核心编排（MainWindow, PanelManager, ThemeManager, 各Controller） | 表现层+业务层 |
+| `connection` | `src/connection/` | 连接抽象与多种连接方式实现 | 基础设施层 |
+| `core` | `src/core/` | 应用协调 + 基础 UI（MainWindow, PanelManager, ThemeManager, 各Controller） | 应用协调层 |
 | `dashboard` | `src/dashboard/` | 仪表盘模式（Gauge/LED/数值） | 表现层 |
 | `ota` | `src/ota/` | 固件OTA升级（XMODEM/YMODEM/ZMODEM） | 业务层 |
 | `plugin` | `src/plugin/` | 插件系统（DLL动态加载） | 业务层 |
@@ -79,9 +79,9 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 | `terminal` | `src/terminal/` | 终端显示（自绘制控件/搜索/选择/过滤） | 表现层 |
 | `utils` | `src/utils/` | 公共工具（CRC/RingBuffer/DataLogger/SettingsManager） | 基础设施层 |
 
-### 规划中模块（2个）
+### 收敛中的基础层
 
 | 模块 | 路径 | 职责 | 状态 |
 |------|------|------|------|
-| `interfaces` | `src/interfaces/` | 纯虚接口定义（IConnection, IPanelProvider, IDataSink, IProtocolParser, IDevice） | 🔄 规划中 |
-| `shared` | `src/shared/` | 共享常量+枚举（ColorConstants, LayoutConstants等6个域头文件） | 🔄 规划中 |
+| `interfaces` | `src/interfaces/` | 纯虚接口定义（IConnection, IPanelProvider, IDataSink, IProtocolParser, IDevice） | 已定义，持续扩展 |
+| `shared` | `src/shared/` | 共享常量+枚举正式层（当前由 `core/theme/Constants.h` 兼容承接） | 🔧 收敛中 |

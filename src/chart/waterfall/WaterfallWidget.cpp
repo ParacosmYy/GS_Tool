@@ -1,3 +1,11 @@
+/**
+ * @file WaterfallWidget.cpp
+ * @brief 瀑布图控件实现 — 频谱数据的时频二维可视化
+ *
+ * 将连续的频谱数据按时间轴纵向滚动显示，
+ * 使用冷暖色渐变映射幅度值，支持暂停/恢复和滚动速度调节。
+ */
+
 #include "chart/waterfall/WaterfallWidget.h"
 #include <QPainter>
 #include <QPaintEvent>
@@ -5,6 +13,7 @@
 #include <QMouseEvent>
 #include <QLinearGradient>
 
+/** @brief 构造瀑布图控件，初始化鼠标追踪和滚动定时器 @param parent 父控件指针 */
 WaterfallWidget::WaterfallWidget(QWidget *parent)
     : QWidget(parent)
 {
@@ -15,8 +24,10 @@ WaterfallWidget::WaterfallWidget(QWidget *parent)
     m_scrollTimer.setInterval(m_scrollSpeed);
 }
 
+/** @brief 析构函数，使用默认实现 */
 WaterfallWidget::~WaterfallWidget() = default;
 
+/** @brief 添加一帧频谱数据到历史记录并绘制新行 @param spectrum 频谱幅度值向量 */
 void WaterfallWidget::addSpectrum(const QVector<double> &spectrum)
 {
     if (m_paused) return;
@@ -45,6 +56,7 @@ void WaterfallWidget::addSpectrum(const QVector<double> &spectrum)
     update();
 }
 
+/** @brief 设置瀑布图最大显示行数 @param lines 行数(最小10) */
 void WaterfallWidget::setMaxLines(int lines)
 {
     m_maxLines = qMax(10, lines);
@@ -53,18 +65,21 @@ void WaterfallWidget::setMaxLines(int lines)
     update();
 }
 
+/** @brief 设置颜色映射的值域范围 @param min 值域下界 @param max 值域上界 */
 void WaterfallWidget::setColorRange(double min, double max)
 {
     m_minValue = min;
     m_maxValue = max;
 }
 
+/** @brief 设置滚动刷新间隔 @param ms 间隔毫秒数(最小10ms) */
 void WaterfallWidget::setScrollSpeed(int ms)
 {
     m_scrollSpeed = qMax(10, ms);
     m_scrollTimer.setInterval(m_scrollSpeed);
 }
 
+/** @brief 清除所有历史数据和缓存像素图 */
 void WaterfallWidget::clear()
 {
     m_history.clear();
@@ -73,9 +88,13 @@ void WaterfallWidget::clear()
     update();
 }
 
+/** @brief 暂停瀑布图数据接收和滚动 */
 void WaterfallWidget::pause() { m_paused = true; m_scrollTimer.stop(); }
+
+/** @brief 恢复瀑布图数据接收和滚动 */
 void WaterfallWidget::resume() { m_paused = false; m_scrollTimer.start(); }
 
+/** @brief 绘制事件处理，将缓存瀑布图缩放绘制到控件上 @param event 绘制事件参数(未使用) */
 void WaterfallWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
@@ -90,12 +109,14 @@ void WaterfallWidget::paintEvent(QPaintEvent *event)
     p.drawPixmap(0, 0, m_waterfall.scaled(size(), Qt::IgnoreAspectRatio, Qt::FastTransformation));
 }
 
+/** @brief 窗口大小变更事件处理，清除缓存以触发重绘 @param event 大小变更事件参数 */
 void WaterfallWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     m_waterfall = QPixmap();
 }
 
+/** @brief 鼠标移动事件处理，计算光标处的频率索引和幅度值并发送信号 @param event 鼠标事件参数 */
 void WaterfallWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int x = event->pos().x();
@@ -107,11 +128,13 @@ void WaterfallWidget::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+/** @brief 滚动定时器回调，触发控件重绘 */
 void WaterfallWidget::scrollImage()
 {
     update();
 }
 
+/** @brief 将数值映射为颜色，黑→蓝→青→绿→黄→红渐变 @param value 待映射的数值 @return 对应的QColor颜色 */
 QColor WaterfallWidget::valueToColor(double value) const
 {
     double t = (value - m_minValue) / (m_maxValue - m_minValue);

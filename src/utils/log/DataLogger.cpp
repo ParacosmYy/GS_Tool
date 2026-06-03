@@ -1,6 +1,6 @@
 /**
  * @file DataLogger.cpp
- * @brief 数据录制/回放管理器实现 — 二进制日志文件的读写和回放
+ * @brief 数据录制/回放管理器实现
  *
  * 实现自定义二进制格式的日志录制（含时间戳、方向、数据），
  * 以及基于时间戳的随机访问回放。支持录制启停、回放控制和回放速率调整。
@@ -126,11 +126,7 @@ bool DataLogger::isPaused() const
     return m_paused;
 }
 
-/**
- * @brief 记录一条数据到日志文件
- * @param data 原始字节数据
- * @param dir 数据方向(RX/TX)
- */
+/** @brief 记录一条数据到日志文件 @param data 原始字节数据 @param dir 数据方向(RX/TX) */
 void DataLogger::logData(const QByteArray& data, Direction dir)
 {
     if (!m_recording || m_paused || !m_recordFile) return;
@@ -142,7 +138,9 @@ void DataLogger::logData(const QByteArray& data, Direction dir)
     ++m_totalRecords;      // 累计录制记录计数
     m_totalBytesRecorded += static_cast<quint64>(data.size());  // 累计录制字节计数
 }
+/** @brief 获取当前录制会话已记录的数据条数 @return 已记录条数 */
 int DataLogger::recordCount() const { return m_recordCount; }
+/** @brief 获取当前录制会话的持续时间(毫秒，扣除暂停时间) @return 持续时间(ms) */
 qint64 DataLogger::recordingDuration() const
 {
     if (!m_recording) return 0;

@@ -8,9 +8,7 @@
 #include "terminal/filter/TerminalHighlighter.h"
 #include "core/theme/ThemeManager.h"
 
-/**
- * @brief 构造函数，初始化默认高亮格式
- */
+/** @brief 构造函数，初始化默认高亮格式 @param parent 关联的文本文档 */
 TerminalHighlighter::TerminalHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
     , m_color(ThemeManager::instance().color(ThemeManager::SemanticColor::TermSearchHighlight))
@@ -19,9 +17,7 @@ TerminalHighlighter::TerminalHighlighter(QTextDocument *parent)
     m_format.setFontWeight(QFont::Bold);
 }
 
-/**
- * @brief 设置高亮正则模式并重新高亮
- */
+/** @brief 设置高亮正则模式并重新高亮 @param pattern 正则表达式字符串 */
 void TerminalHighlighter::setPattern(const QString &pattern)
 {
     m_pattern = pattern;
@@ -30,9 +26,7 @@ void TerminalHighlighter::setPattern(const QString &pattern)
     rehighlight();
 }
 
-/**
- * @brief 设置高亮颜色
- */
+/** @brief 设置高亮颜色 @param color 高亮前景色 */
 void TerminalHighlighter::setHighlightColor(const QColor &color)
 {
     m_color = color;
@@ -41,9 +35,7 @@ void TerminalHighlighter::setHighlightColor(const QColor &color)
     rehighlight();
 }
 
-/**
- * @brief 高亮文本块中所有匹配内容
- */
+/** @brief 高亮文本块中所有匹配内容 @param text 待处理文本 */
 void TerminalHighlighter::highlightBlock(const QString &text)
 {
     if (m_pattern.isEmpty() || !m_regex.isValid()) {
@@ -58,9 +50,7 @@ void TerminalHighlighter::highlightBlock(const QString &text)
     }
 }
 
-/**
- * @brief 重置所有统计计数器为零
- */
+/** @brief 重置所有统计计数器为零 */
 void TerminalHighlighter::resetStatistics()
 {
     m_totalHighlights = 0;

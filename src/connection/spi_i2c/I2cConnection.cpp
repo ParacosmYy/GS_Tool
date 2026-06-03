@@ -5,36 +5,25 @@
 
 #include "connection/spi_i2c/I2cConnection.h"
 
-/**
- * @brief 构造函数
- * @param parent 父对象
- */
+/** @brief 构造I2C连接对象 @param parent 父QObject指针 */
 I2cConnection::I2cConnection(QObject* parent)
     : IConnection(parent)
 {
 }
 
-/**
- * @brief 析构函数
- */
+/** @brief 析构I2C连接，关闭并释放资源 */
 I2cConnection::~I2cConnection()
 {
     close();
 }
 
-/**
- * @brief 获取连接类型
- * @return Serial类型(I2C归入串行总线)
- */
+/** @brief 获取连接类型 @return ConnectionType::I2c */
 ConnectionType I2cConnection::type() const
 {
     return ConnectionType::I2c;
 }
 
-/**
- * @brief 获取连接显示名称
- * @return "I2C:适配器@地址" 格式
- */
+/** @brief 获取连接显示名称 @return 已连接时返回"I2C:适配器@地址"格式，否则返回"未连接" */
 QString I2cConnection::name() const
 {
     if (m_state == ConnectionState::Connected) {
@@ -45,18 +34,13 @@ QString I2cConnection::name() const
     return tr("I2C (未连接)");
 }
 
-/**
- * @brief 获取当前状态
- */
+/** @brief 获取当前连接状态 @return 当前连接状态枚举值 */
 ConnectionState I2cConnection::state() const
 {
     return m_state;
 }
 
-/**
- * @brief 设置底层串口传输通道
- * @param serial 串口IConnection实例
- */
+/** @brief 设置底层串口传输通道，断开旧通道并连接dataReceived信号 @param serial 串口IConnection实例 */
 void I2cConnection::setTransport(IConnection* serial)
 {
     if (m_serial) {
@@ -69,10 +53,7 @@ void I2cConnection::setTransport(IConnection* serial)
     }
 }
 
-/**
- * @brief 打开I2C连接 - 通过串口桥接器初始化
- * @return true=成功
- */
+/** @brief 打开I2C连接，通过串口桥接器发送配置命令 @return true=成功，false=通道未设置或串口打开失败 */
 bool I2cConnection::open()
 {
     if (!m_serial) {
@@ -103,19 +84,13 @@ bool I2cConnection::open()
     return true;
 }
 
-/**
- * @brief 关闭I2C连接
- */
+/** @brief 关闭I2C连接，将状态重置为Disconnected */
 void I2cConnection::close()
 {
     updateState(ConnectionState::Disconnected);
 }
 
-/**
- * @brief 发送数据(I2C写操作)
- * @param data 待发送数据
- * @return 发送字节数
- */
+/** @brief 发送I2C写操作数据 @param data 待发送数据 @return 发送字节数，未连接返回-1 */
 qint64 I2cConnection::write(const QByteArray& data)
 {
     if (m_state != ConnectionState::Connected) {
@@ -134,10 +109,7 @@ qint64 I2cConnection::write(const QByteArray& data)
     return written;
 }
 
-/**
- * @brief 配置I2C参数
- * @param params 参数映射
- */
+/** @brief 配置I2C参数(deviceAddress/adapter/clockSpeed) @param params 参数映射 */
 void I2cConnection::configure(const QVariantMap& params)
 {
     if (params.contains("deviceAddress")) {
@@ -151,13 +123,7 @@ void I2cConnection::configure(const QVariantMap& params)
     }
 }
 
-/**
- * @brief 扫描I2C总线
- * @return 发现的设备地址列表
- *
- * 向适配器发送扫描命令，遍历标准地址范围0x03~0x77。
- * 适配器对每个地址尝试ACK，有响应的地址加入结果列表。
- */
+/** @brief 扫描I2C总线，遍历标准地址范围0x03~0x77发现设备 @return 发现的设备地址列表 */
 QList<int> I2cConnection::scanBus()
 {
     QList<int> found;
@@ -187,15 +153,7 @@ QList<int> I2cConnection::scanBus()
     return found;
 }
 
-/**
- * @brief 从寄存器读取数据
- * @param deviceAddr 设备地址
- * @param regAddr 寄存器地址
- * @param length 读取长度
- * @return 读取的数据
- *
- * I2C读时序: [START][ADDR+W][REG][RESTART][ADDR+R][DATA...][STOP]
- */
+/** @brief 从指定设备的寄存器读取数据(I2C读时序) @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param length 读取长度 @return 读取到的数据 */
 QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
 {
     QByteArray data;
@@ -231,15 +189,7 @@ QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
     return data;
 }
 
-/**
- * @brief 向寄存器写入数据
- * @param deviceAddr 设备地址
- * @param regAddr 寄存器地址
- * @param data 待写入数据
- * @return true=成功
- *
- * I2C写时序: [START][ADDR+W][REG][DATA...][STOP]
- */
+/** @brief 向指定设备的寄存器写入数据(I2C写时序) @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param data 待写入数据 @return true=写入成功 */
 bool I2cConnection::writeRegister(int deviceAddr, int regAddr, const QByteArray& data)
 {
     if (m_state != ConnectionState::Connected || !m_serial) {
@@ -259,18 +209,13 @@ bool I2cConnection::writeRegister(int deviceAddr, int regAddr, const QByteArray&
     return written > 0;
 }
 
-/**
- * @brief 底层串口数据到达回调
- * @param data 从串口适配器收到的响应数据
- */
+/** @brief 底层串口数据到达回调，追加到响应缓冲区 @param data 从串口适配器收到的响应数据 */
 void I2cConnection::onTransportData(const QByteArray& data)
 {
     m_responseBuffer.append(data);
 }
 
-/**
- * @brief 更新连接状态
- */
+/** @brief 更新连接状态，状态变化时发射stateChanged信号 @param newState 新连接状态 */
 void I2cConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {
@@ -279,12 +224,7 @@ void I2cConnection::updateState(ConnectionState newState)
     }
 }
 
-/**
- * @brief 发送协议命令帧
- * @param cmd 命令字节
- * @param payload 负载数据
- * @return 发送字节数
- */
+/** @brief 发送协议命令帧[CMD][LEN(2字节小端)][PAYLOAD] @param cmd 命令字节 @param payload 负载数据 @return 发送字节数 */
 qint64 I2cConnection::sendCommand(quint8 cmd, const QByteArray& payload)
 {
     if (!m_serial) return -1;
@@ -299,13 +239,7 @@ qint64 I2cConnection::sendCommand(quint8 cmd, const QByteArray& payload)
     return m_serial->write(frame);
 }
 
-/**
- * @brief 构建I2C读命令帧
- * @param deviceAddr 设备7位地址
- * @param regAddr 寄存器地址
- * @param length 读取长度
- * @return 完整协议帧
- */
+/** @brief 构建I2C读命令帧[CMD][LEN][deviceAddr+regAddr+length] @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param length 读取长度 @return 完整协议帧 */
 QByteArray I2cConnection::buildReadFrame(int deviceAddr, int regAddr, int length)
 {
     QByteArray payload;
@@ -318,13 +252,7 @@ QByteArray I2cConnection::buildReadFrame(int deviceAddr, int regAddr, int length
                        .append(payload);
 }
 
-/**
- * @brief 构建I2C写命令帧
- * @param deviceAddr 设备7位地址
- * @param regAddr 寄存器地址
- * @param data 写入数据
- * @return 完整协议帧
- */
+/** @brief 构建I2C写命令帧[CMD][LEN][deviceAddr+regAddr+data] @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param data 写入数据 @return 完整协议帧 */
 QByteArray I2cConnection::buildWriteFrame(int deviceAddr, int regAddr, const QByteArray& data)
 {
     QByteArray payload;
@@ -337,9 +265,7 @@ QByteArray I2cConnection::buildWriteFrame(int deviceAddr, int regAddr, const QBy
                        .append(payload);
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有I2C统计计数器(传输次数/字节数/错误计数) */
 void I2cConnection::resetStats()
 {
     m_totalTransactions = 0;

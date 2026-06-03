@@ -208,33 +208,25 @@ QVariantMap FireWaterBridge::parseValueLine(const QString& line) const
     return fields;
 }
 
-/**
- * @brief 获取已解析的帧计数
- */
+/** @brief 获取已解析的帧计数 @return 帧数 */
 quint64 FireWaterBridge::frameCount() const
 {
     return m_frameCount;
 }
 
-/**
- * @brief 获取解析错误计数
- */
+/** @brief 获取解析错误计数 @return 错误数 */
 quint64 FireWaterBridge::errorCount() const
 {
     return m_errorCount;
 }
 
-/**
- * @brief 获取已处理的字节总数
- */
+/** @brief 获取已处理的字节总数 @return 字节数 */
 qint64 FireWaterBridge::totalBytesProcessed() const
 {
     return m_totalBytes;
 }
 
-/**
- * @brief 重置统计数据
- */
+/** @brief 重置统计数据(帧计数/错误计数/字节数) */
 void FireWaterBridge::resetStatistics()
 {
     m_frameCount = 0;

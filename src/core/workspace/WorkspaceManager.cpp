@@ -1,23 +1,32 @@
+/**
+ * @file WorkspaceManager.cpp
+ * @brief 工作区管理器实现 — 工作区布局的增删改查、导入导出、激活切换
+ */
 #include "core/workspace/WorkspaceManager.h"
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 
+/** @brief 构造函数 @param parent 父对象 */
 WorkspaceManager::WorkspaceManager(QObject *parent) : QObject(parent) {}
+/** @brief 析构函数 */
 WorkspaceManager::~WorkspaceManager() = default;
 
+/** @brief 保存工作区布局到内存映射 @param layout 工作区布局配置 */
 void WorkspaceManager::saveWorkspace(const WorkspaceLayout &layout)
 {
     m_workspaces[layout.name] = layout;
     emit workspaceSaved(layout.name);
 }
 
+/** @brief 按名称加载工作区布局 @param name 工作区名称 @return 工作区布局，不存在时返回默认构造 */
 WorkspaceLayout WorkspaceManager::loadWorkspace(const QString &name) const
 {
     return m_workspaces.value(name);
 }
 
+/** @brief 删除指定工作区，若为当前激活则清空激活状态 @param name 工作区名称 */
 void WorkspaceManager::deleteWorkspace(const QString &name)
 {
     m_workspaces.remove(name);
@@ -25,9 +34,12 @@ void WorkspaceManager::deleteWorkspace(const QString &name)
     emit workspaceDeleted(name);
 }
 
+/** @brief 获取所有已保存的工作区名称 @return 名称列表 */
 QStringList WorkspaceManager::workspaceNames() const { return m_workspaces.keys(); }
+/** @brief 检查指定名称的工作区是否存在 @param name 工作区名称 @return 存在返回true */
 bool WorkspaceManager::exists(const QString &name) const { return m_workspaces.contains(name); }
 
+/** @brief 设置当前激活工作区 @param name 工作区名称 */
 void WorkspaceManager::setActiveWorkspace(const QString &name)
 {
     if (m_activeWorkspace != name) {
@@ -36,8 +48,10 @@ void WorkspaceManager::setActiveWorkspace(const QString &name)
     }
 }
 
+/** @brief 获取当前激活的工作区名称 @return 工作区名称 */
 QString WorkspaceManager::activeWorkspace() const { return m_activeWorkspace; }
 
+/** @brief 将工作区布局导出为JSON文件 @param name 工作区名称 @param filePath 导出文件路径 */
 void WorkspaceManager::exportToFile(const QString &name, const QString &filePath) const
 {
     auto it = m_workspaces.constFind(name);
@@ -58,6 +72,7 @@ void WorkspaceManager::exportToFile(const QString &name, const QString &filePath
     if (f.open(QIODevice::WriteOnly)) f.write(QJsonDocument(root).toJson());
 }
 
+/** @brief 从JSON文件导入工作区布局 @param filePath 导入文件路径 @return 导入成功返回true */
 bool WorkspaceManager::importFromFile(const QString &filePath)
 {
     QFile f(filePath);

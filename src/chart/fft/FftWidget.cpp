@@ -25,6 +25,7 @@
 // 构造 / 初始化
 // ============================================================
 
+/** @brief 构造FFT频谱控件 @param model 数据模型指针(外部拥有) @param parent 父控件 */
 FftWidget::FftWidget(ChartModel* model, QWidget* parent)
     : QWidget(parent)
     , m_model(model)
@@ -62,6 +63,7 @@ FftWidget::FftWidget(ChartModel* model, QWidget* parent)
 // 公共接口
 // ============================================================
 
+/** @brief 设置采样率(Hz)，用于计算频率轴 @param rate 采样率(Hz)，无效值自动修正为1000Hz */
 void FftWidget::setSampleRate(double rate)
 {
     m_sampleRate = (rate > 0.0) ? rate : 1000.0;
@@ -70,6 +72,7 @@ void FftWidget::setSampleRate(double rate)
     }
 }
 
+/** @brief 获取当前采样率 @return 采样率(Hz) */
 double FftWidget::sampleRate() const
 {
     return m_sampleRate;
@@ -79,6 +82,7 @@ double FftWidget::sampleRate() const
 // UI搭建
 // ============================================================
 
+/** @brief 初始化UI布局(工具栏+图表区域) */
 void FftWidget::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
@@ -95,6 +99,7 @@ void FftWidget::setupUI()
     setLayout(mainLayout);
 }
 
+/** @brief 创建顶部配置工具栏(通道/窗函数/FFT大小/采样率/刷新按钮) @return 工具栏Widget指针 */
 QWidget* FftWidget::createToolbar()
 {
     auto* toolbar = new QWidget(this);
@@ -182,6 +187,7 @@ QWidget* FftWidget::createToolbar()
     return toolbar;
 }
 
+/** @brief 创建频谱图表区域(曲线+X/Y坐标轴+图表视图) */
 void FftWidget::setupChart()
 {
     m_chart = new QChart();
@@ -218,6 +224,7 @@ void FftWidget::setupChart()
     m_chartView->setRenderHint(QPainter::Antialiasing);
 }
 
+/** @brief 填充FFT大小下拉框(256/512/1024/2048/4096) */
 void FftWidget::populateFftSizes()
 {
     m_fftSizeCombo->addItem(QStringLiteral("256"),   256);
@@ -231,6 +238,7 @@ void FftWidget::populateFftSizes()
 // 频谱计算与显示
 // ============================================================
 
+/** @brief 刷新频谱: 从ChartModel读取通道数据→FftEngine计算→更新曲线和坐标轴 */
 void FftWidget::refreshSpectrum()
 {
     if (!m_model || !m_spectrumSeries) {
@@ -296,6 +304,7 @@ void FftWidget::refreshSpectrum()
 // 槽函数
 // ============================================================
 
+/** @brief 通道选择变更槽函数，自动刷新模式下触发频谱重算 @param index 下拉框新索引(未使用) */
 void FftWidget::onChannelChanged(int /*index*/)
 {
     if (m_autoRefresh) {
@@ -303,6 +312,7 @@ void FftWidget::onChannelChanged(int /*index*/)
     }
 }
 
+/** @brief 窗函数选择变更槽函数，自动刷新模式下触发频谱重算 @param index 下拉框新索引(未使用) */
 void FftWidget::onWindowChanged(int /*index*/)
 {
     ++m_totalWindowChanges;
@@ -311,6 +321,7 @@ void FftWidget::onWindowChanged(int /*index*/)
     }
 }
 
+/** @brief FFT大小变更槽函数，自动刷新模式下触发频谱重算 @param value 新的FFT大小(未使用) */
 void FftWidget::onFftSizeChanged(int /*value*/)
 {
     ++m_totalSizeChanges;
@@ -319,11 +330,13 @@ void FftWidget::onFftSizeChanged(int /*value*/)
     }
 }
 
+/** @brief 自动刷新开关切换槽函数 @param checked true=开启自动刷新 */
 void FftWidget::onAutoRefreshToggled(bool checked)
 {
     m_autoRefresh = checked;
 }
 
+/** @brief ChartModel数据更新槽函数，仅当当前通道有新数据时自动刷新 @param updatedChannels 本次更新的通道名列表 */
 void FftWidget::onDataUpdated(const QStringList& updatedChannels)
 {
     if (!m_autoRefresh) {
@@ -337,6 +350,7 @@ void FftWidget::onDataUpdated(const QStringList& updatedChannels)
     }
 }
 
+/** @brief 通道列表变更槽函数，重建通道下拉框并尝试恢复之前的选择 */
 void FftWidget::onChannelsChanged()
 {
     if (!m_model) {
@@ -369,6 +383,7 @@ void FftWidget::onChannelsChanged()
     }
 }
 
+/** @brief 主题切换槽函数，重新应用颜色到图表 */
 void FftWidget::onThemeChanged()
 {
     applyThemeColors();
@@ -378,6 +393,7 @@ void FftWidget::onThemeChanged()
 // 主题样式
 // ============================================================
 
+/** @brief 应用当前主题颜色到图表背景、网格线、坐标轴标签和频谱曲线 */
 void FftWidget::applyThemeColors()
 {
     auto& theme = ThemeManager::instance();

@@ -103,6 +103,7 @@ QVector<QPointF> ChartModel::channelData(const QString& displayName) const
     return it.value().points;
 }
 
+/** @brief 获取所有启用通道的数据 @return 通道名→数据点序列的映射 */
 QMap<QString, QVector<QPointF>> ChartModel::allChannelData() const
 {
     QMap<QString, QVector<QPointF>> result;
@@ -112,6 +113,7 @@ QMap<QString, QVector<QPointF>> ChartModel::allChannelData() const
     return result;
 }
 
+/** @brief 获取指定通道的Y值范围 @param displayName 通道显示名 @return <最小值,最大值>，无数据返回<0,0> */
 QPair<double, double> ChartModel::channelYRange(const QString& displayName) const
 {
     auto it = m_buffers.constFind(displayName);
@@ -134,6 +136,7 @@ QPair<double, double> ChartModel::channelYRange(const QString& displayName) cons
     return qMakePair(yMin, yMax);
 }
 
+/** @brief 获取所有通道的全局Y值范围 @return <全局最小值,全局最大值>，无数据返回<0,0> */
 QPair<double, double> ChartModel::globalYRange() const
 {
     double globalMin = std::numeric_limits<double>::max();
@@ -162,6 +165,7 @@ QStringList ChartModel::channelNames() const
     return m_buffers.keys();
 }
 
+/** @brief 获取当前X轴范围(基于帧索引和窗口大小) @return <起始值,结束值> */
 QPair<double, double> ChartModel::xRange() const
 {
     if (m_frameIndex <= 0) {
@@ -180,6 +184,7 @@ qint64 ChartModel::totalPointsReceived() const
     return m_totalPoints;
 }
 
+/** @brief 获取当前帧索引(X轴计数器) @return 帧索引值 */
 qint64 ChartModel::currentFrameIndex() const
 {
     return m_frameIndex;

@@ -22,15 +22,7 @@
 // 构造 / 析构
 // ============================================================================
 
-/**
- * @brief 构造协议桥管理器
- * @param frameParser 外部创建的帧解析器
- * @param parent 父对象
- *
- * frameParser 由 MainWindow 创建并传入。如果 frameParser 尚未设置 parent，
- * 则归本对象管理（setParent）。同时创建 JustFloatBridge 和 FireWaterBridge。
- * 初始连接 FrameParser 的信号。
- */
+/** @brief 构造协议桥管理器 @param frameParser 外部创建的帧解析器 @param parent 父对象 */
 ProtocolBridgeManager::ProtocolBridgeManager(FrameParser* frameParser, QObject* parent)
     : QObject(parent)
     , m_frameParser(frameParser)
@@ -48,27 +40,12 @@ ProtocolBridgeManager::ProtocolBridgeManager(FrameParser* frameParser, QObject* 
     switchSource();
 }
 
-/**
- * @brief 析构协议桥管理器
- *
- * QObject 父子树自动销毁 m_justFloat、m_fireWater。
- * m_frameParser 如果 parent 是本对象也会被自动销毁。
- */
+/** @brief 析构协议桥管理器，QObject父子树自动销毁子对象 */
 // ============================================================================
 // 模式设置 / 数据路由
 // ============================================================================
 
-/**
- * @brief 设置协议模式
- * @param mode 目标协议模式
- *
- * 切换流程:
- *   1. 如果 mode 与当前模式相同，直接返回
- *   2. 重置旧源的内部状态（清空缓冲区）
- *   3. 更新 m_mode
- *   4. 重新连接信号（switchSource）
- *   5. 发出 protocolModeChanged 信号通知 UI
- */
+/** @brief 设置协议模式(重置旧源→切换→重连信号→通知UI) @param mode 目标协议模式 */
 void ProtocolBridgeManager::setProtocolMode(ChartProtocolMode mode)
 {
     if (m_mode == mode) {
@@ -93,25 +70,13 @@ void ProtocolBridgeManager::setProtocolMode(ChartProtocolMode mode)
     emit protocolModeChanged(m_mode);
 }
 
-/**
- * @brief 获取当前协议模式
- * @return 当前活动协议模式
- */
+/** @brief 获取当前协议模式 @return 当前活动协议模式 */
 ProtocolBridgeManager::ChartProtocolMode ProtocolBridgeManager::protocolMode() const
 {
     return m_mode;
 }
 
-/**
- * @brief 接收原始串口数据，转发到当前活动的协议源
- * @param data 原始字节数据
- *
- * 空数据保护: 传入空 QByteArray 时直接返回，不触发任何处理。
- * 这避免了空数据导致的状态机无意义调用和潜在的边界问题。
- *
- * 无效模式保护: switch 的 default 分支会输出 qWarning 日志，
- * 理论上不会触发（枚举覆盖完整），但作为防御性编程的保底措施。
- */
+/** @brief 接收原始串口数据并转发到当前活动的协议源 @param data 原始字节数据 */
 void ProtocolBridgeManager::feedData(const QByteArray& data)
 {
     // ---- 空数据保护 ----
@@ -160,37 +125,25 @@ void ProtocolBridgeManager::feedData(const QByteArray& data)
 // 桥接器访问器
 // ============================================================================
 
-/**
- * @brief 获取当前活动的桥
- * @return 当前活动桥指针，FrameParser 模式下返回 nullptr
- */
+/** @brief 获取当前活动的桥 @return 当前活动桥指针，FrameParser模式下返回nullptr */
 IProtocolBridge* ProtocolBridgeManager::activeBridge() const
 {
     return m_activeBridge;
 }
 
-/**
- * @brief 获取 FrameParser 指针
- * @return 帧解析器指针
- */
+/** @brief 获取FrameParser指针 @return 帧解析器指针 */
 FrameParser* ProtocolBridgeManager::frameParser() const
 {
     return m_frameParser;
 }
 
-/**
- * @brief 获取 JustFloatBridge 指针
- * @return JustFloat 协议桥指针
- */
+/** @brief 获取JustFloatBridge指针 @return JustFloat协议桥指针 */
 JustFloatBridge* ProtocolBridgeManager::justFloatBridge() const
 {
     return m_justFloat;
 }
 
-/**
- * @brief 获取 FireWaterBridge 指针
- * @return FireWater 协议桥指针
- */
+/** @brief 获取FireWaterBridge指针 @return FireWater协议桥指针 */
 FireWaterBridge* ProtocolBridgeManager::fireWaterBridge() const
 {
     return m_fireWater;
@@ -200,14 +153,7 @@ FireWaterBridge* ProtocolBridgeManager::fireWaterBridge() const
 // 桥接器状态查询接口
 // ============================================================================
 
-/**
- * @brief 获取当前活动桥接器的运行时统计信息
- * @return BridgeStats 结构体
- *
- * FrameParser 模式: 从 FrameParser 获取详细统计（帧数/错误数），
- * 并补充内部追踪的校验错误计数。
- * 其他模式: 使用内部累计计数器。
- */
+/** @brief 获取当前活动桥接器的运行时统计信息 @return BridgeStats结构体 */
 ProtocolBridgeManager::BridgeStats ProtocolBridgeManager::bridgeStats() const
 {
     BridgeStats stats;
@@ -230,40 +176,25 @@ ProtocolBridgeManager::BridgeStats ProtocolBridgeManager::bridgeStats() const
     return stats;
 }
 
-/**
- * @brief 查询当前活动桥接器是否正在解析
- * @return true=正在解析，false=空闲
- *
- * FrameParser 模式: 始终返回 false（状态机内部状态未暴露）。
- * 此方法主要用于未来扩展。
- */
+/** @brief 查询当前活动桥接器是否正在解析 @return true=正在解析，false=空闲 */
 bool ProtocolBridgeManager::isParsing() const
 {
     return bridgeStats().isParsing;
 }
 
-/**
- * @brief 获取当前活动桥接器的累计成功解析帧数
- * @return 帧数
- */
+/** @brief 获取当前活动桥接器的累计成功解析帧数 @return 帧数 */
 quint64 ProtocolBridgeManager::totalFramesParsed() const
 {
     return bridgeStats().totalFramesParsed;
 }
 
-/**
- * @brief 获取当前活动桥接器的累计解析错误次数
- * @return 错误次数
- */
+/** @brief 获取当前活动桥接器的累计解析错误次数 @return 错误次数 */
 quint64 ProtocolBridgeManager::totalErrors() const
 {
     return bridgeStats().totalErrors;
 }
 
-/**
- * @brief 获取当前活动桥接器的累计校验错误次数
- * @return 校验错误次数
- */
+/** @brief 获取当前活动桥接器的累计校验错误次数 @return 校验错误次数 */
 quint64 ProtocolBridgeManager::checksumErrors() const
 {
     return m_checksumErrors;
@@ -273,17 +204,7 @@ quint64 ProtocolBridgeManager::checksumErrors() const
 // 运行时动态切换
 // ============================================================================
 
-/**
- * @brief 动态切换活跃桥接器（不中断数据流）
- * @param mode 目标协议模式
- *
- * 与 setProtocolMode 的区别:
- *   - setProtocolMode: 重置旧源状态，清空缓冲区
- *   - switchActiveBridge: 不重置旧源状态，保留中间数据，
- *     适合快速切换场景（如自动检测协议类型）
- *
- * 切换后发出 protocolModeChanged 信号。
- */
+/** @brief 动态切换活跃桥接器(不重置旧源，保留中间数据) @param mode 目标协议模式 */
 void ProtocolBridgeManager::switchActiveBridge(ChartProtocolMode mode)
 {
     if (m_mode == mode) {
@@ -304,13 +225,7 @@ void ProtocolBridgeManager::switchActiveBridge(ChartProtocolMode mode)
     emit protocolModeChanged(m_mode);
 }
 
-/**
- * @brief 重置所有桥接器的错误和帧计数统计
- *
- * 将所有桥接器的累计计数器归零。不影响当前运行状态。
- * 同时重置管理器级统计（桥接器切换、总帧数、总错误数、处理字节数）。
- * FrameParser 自身的计数器也一并重置。
- */
+/** @brief 重置所有桥接器和管理器的统计计数器(帧数/错误/字节/桥接器切换) */
 void ProtocolBridgeManager::resetStats()
 {
     m_totalFramesParsed = 0;

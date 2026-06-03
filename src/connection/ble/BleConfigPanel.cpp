@@ -12,13 +12,7 @@
 #include <QHBoxLayout>
 #include <QRegularExpression>
 
-/**
- * @brief 构造函数 - 初始化BLE配置面板UI
- * @param parent 父控件
- *
- * 创建设备下拉框、扫描按钮、地址输入框、连接按钮和状态标签。
- * 地址输入框自动校验MAC地址格式(XX:XX:XX:XX:XX:XX)。
- */
+/** @brief 构造BLE配置面板UI，创建设备下拉框/扫描按钮/地址输入/连接按钮 @param parent 父控件 */
 BleConfigPanel::BleConfigPanel(QWidget* parent)
     : QWidget(parent)
     , m_deviceCombo(new QComboBox(this))
@@ -77,12 +71,7 @@ BleConfigPanel::BleConfigPanel(QWidget* parent)
             this, &BleConfigPanel::onDeviceSelected);
 }
 
-/**
- * @brief 获取当前BLE连接配置
- * @return 包含address和deviceName的配置Map
- *
- * 优先使用下拉框选中的设备地址，否则使用手动输入的地址。
- */
+/** @brief 获取当前BLE连接配置，优先使用下拉框选中地址 @return 包含address和deviceName的配置Map */
 QVariantMap BleConfigPanel::config() const
 {
     QVariantMap cfg;
@@ -99,12 +88,7 @@ QVariantMap BleConfigPanel::config() const
     return cfg;
 }
 
-/**
- * @brief 设置BLE扫描器实例
- * @param scanner BleScanner对象指针
- *
- * 断开旧实例的信号，连接新实例的deviceFound/scanFinished信号。
- */
+/** @brief 设置BLE扫描器实例，断开旧信号并连接deviceFound/scanFinished @param scanner BleScanner对象指针 */
 void BleConfigPanel::setScanner(BleScanner* scanner)
 {
     /* 清理旧scanner的信号连接 */
@@ -122,12 +106,7 @@ void BleConfigPanel::setScanner(BleScanner* scanner)
     }
 }
 
-/**
- * @brief 设备发现回调 — 更新设备列表和下拉框
- * @param device 包含name/address/rssi的设备信息Map
- *
- * 按地址去重，已存在则更新RSSI和名称。
- */
+/** @brief 设备发现回调，按地址去重并更新下拉框 @param device 包含name/address/rssi的设备信息Map */
 void BleConfigPanel::onDeviceFound(const QVariantMap& device)
 {
     const QString name = device.value("name").toString();
@@ -155,14 +134,14 @@ void BleConfigPanel::onDeviceFound(const QVariantMap& device)
         tr("发现设备: %1").arg(name));
 }
 
-/** @brief 扫描完成回调 — 更新状态标签显示发现设备数量 */
+/** @brief 扫描完成回调，更新状态标签显示发现设备数量 */
 void BleConfigPanel::onScanFinished()
 {
     m_statusLabel->setText(
         tr("扫描完成，发现 %1 个设备").arg(m_deviceList.size()));
 }
 
-/** @brief 设备选中回调 — 将选中设备地址填入输入框 */
+/** @brief 设备选中回调，将选中设备地址填入输入框 @param index 下拉框选中索引 */
 void BleConfigPanel::onDeviceSelected(int index)
 {
     if (index >= 0 && index < m_deviceList.size()) {
@@ -172,20 +151,14 @@ void BleConfigPanel::onDeviceSelected(int index)
     }
 }
 
-/**
- * @brief 保存BLE配置到QSettings
- * @param settings QSettings对象
- */
+/** @brief 保存BLE地址配置到QSettings @param settings QSettings对象 */
 void BleConfigPanel::saveSettings(QSettings& settings) const
 {
     settings.setValue(QStringLiteral("ble/address"),
                      m_addressEdit->text().trimmed());
 }
 
-/**
- * @brief 从QSettings加载BLE配置
- * @param settings QSettings对象
- */
+/** @brief 从QSettings加载BLE地址配置 @param settings QSettings对象 */
 void BleConfigPanel::loadSettings(QSettings& settings)
 {
     const QString addr = settings.value(
@@ -195,9 +168,7 @@ void BleConfigPanel::loadSettings(QSettings& settings)
     }
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器 */
 void BleConfigPanel::resetStatistics()
 {
     m_totalScansInitiated = 0;

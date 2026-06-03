@@ -138,12 +138,7 @@ QString SerialDriverDetector::driverStatusSummary()
         .arg(portNames.join(QStringLiteral(", ")));
 }
 
-/**
- * @brief 重置扫描统计计数器
- *
- * 将 totalScans/totalDriversFound 归零。
- * 适用于会话切换或统计面板刷新场景。
- */
+/** @brief 重置扫描统计计数器(扫描次数/驱动发现次数归零) */
 void SerialDriverDetector::resetStats()
 {
     m_totalScans = 0;

@@ -6,6 +6,7 @@
 #include <QFormLayout>
 #include <QLabel>
 
+/** @brief 构造Modbus配置面板(模式/从站地址/超时时间) @param parent 父控件 */
 ModbusConfigPanel::ModbusConfigPanel(QWidget* parent)
     : QWidget(parent)
 {
@@ -45,6 +46,7 @@ ModbusConfigPanel::ModbusConfigPanel(QWidget* parent)
             this, [this]() { ++m_totalConfigChanges; });
 }
 
+/** @brief 获取当前配置(模式/从站地址/超时) @return 配置QVariantMap */
 QVariantMap ModbusConfigPanel::config() const {
     QVariantMap cfg;
     cfg["mode"]         = m_modeCombo->currentText();
@@ -53,10 +55,7 @@ QVariantMap ModbusConfigPanel::config() const {
     return cfg;
 }
 
-/**
- * @brief 保存Modbus配置到QSettings
- * @param settings QSettings对象
- */
+/** @brief 保存Modbus配置到QSettings @param settings QSettings对象 */
 void ModbusConfigPanel::saveSettings(QSettings& settings) const
 {
     settings.setValue(QStringLiteral("modbus/mode"),
@@ -67,10 +66,7 @@ void ModbusConfigPanel::saveSettings(QSettings& settings) const
                      m_timeoutSpin->value());
 }
 
-/**
- * @brief 从QSettings加载Modbus配置
- * @param settings QSettings对象
- */
+/** @brief 从QSettings加载Modbus配置 @param settings QSettings对象 */
 void ModbusConfigPanel::loadSettings(QSettings& settings)
 {
     m_modeCombo->setCurrentIndex(
@@ -81,9 +77,7 @@ void ModbusConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("modbus/timeout"), 1000).toInt());
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器(配置变更数/扫描请求数) */
 void ModbusConfigPanel::resetStatistics()
 {
     m_totalConfigChanges = 0;

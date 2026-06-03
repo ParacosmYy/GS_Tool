@@ -276,12 +276,7 @@ void SerialConfigPanel::updateConnectButtonState()
     }
 }
 
-/**
- * @brief 构建端口详情tooltip(VID/PID/制造商/序列号/系统路径/推荐波特率)
- * @param info QSerialPortInfo端口信息
- * @return 多行tooltip字符串，包含端口名/描述/制造商/VID/PID/序列号/系统路径/常用波特率
- */
-/** @brief 构建端口tooltip(端口名+描述+制造商+VID/PID+驱动芯片) @param info 串口信息 @return HTML格式tooltip */
+/** @brief 构建端口详情tooltip(端口名+描述+制造商+VID/PID+序列号+系统路径+常用波特率) @param info 串口信息 @return 多行tooltip字符串 */
 QString SerialConfigPanel::buildPortTooltip(const QSerialPortInfo& info) const
 {
     QStringList details;
@@ -304,7 +299,7 @@ QString SerialConfigPanel::buildPortTooltip(const QSerialPortInfo& info) const
     return details.join("\n");
 }
 
-/** @brief Reset all operation statistics counters */
+/** @brief 重置所有操作统计计数器(配置变更/端口切换/刷新/连接尝试归零) */
 void SerialConfigPanel::resetStats()
 {
     m_totalConfigChanges = 0;

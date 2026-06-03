@@ -118,13 +118,7 @@ QGroupBox* SerialConfigPanel::createParamGroup()
     return paramGroup;
 }
 
-/**
- * @brief 构建控制信号(DTR/RTS)、驱动检测信息和连接按钮区域
- *
- * 从 setupUI() 拆分出来，避免单个方法超过80行限制。
- * 包含: 控制信号GroupBox → 驱动检测信息 → 连接按钮+状态指示器
- */
-/** @brief 连接信号槽并组装底部控制区域(连接按钮+DTR-RTS+自动重连) @param mainLayout 主布局 */
+/** @brief 构建控制信号(DTR/RTS)+驱动检测信息+连接按钮区域(从setupUI拆分，避免超过80行) @param mainLayout 主布局 */
 void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
 {
     // ---- 控制信号 (DTR/RTS) ----

@@ -11,6 +11,7 @@
 #include <QBrush>
 #include <QColor>
 
+/** @brief 构造CAN总线监控面板，初始化表格控件和工具栏布局 @param parent 父控件 */
 CanBusMonitor::CanBusMonitor(QWidget* parent)
     : QWidget(parent)
     , m_frameTable(new QTableWidget(this))
@@ -51,6 +52,7 @@ CanBusMonitor::CanBusMonitor(QWidget* parent)
     connect(m_clearBtn, &QPushButton::clicked, this, &CanBusMonitor::clearFrames);
 }
 
+/** @brief 添加一帧CAN数据到监控表格，带颜色编码和自动滚动 @param frame CAN帧数据结构 */
 void CanBusMonitor::addFrame(const CanFrame& frame)
 {
     /* 超过上限时移除最旧行 */
@@ -114,6 +116,7 @@ void CanBusMonitor::addFrame(const CanFrame& frame)
     m_countLabel->setText(tr("帧数: %1").arg(m_frameCount));
 }
 
+/** @brief 清空所有帧记录并重置帧计数器和频率统计 */
 void CanBusMonitor::clearFrames()
 {
     m_frameTable->setRowCount(0);
@@ -122,11 +125,13 @@ void CanBusMonitor::clearFrames()
     m_countLabel->setText(tr("帧数: 0"));
 }
 
+/** @brief 获取当前帧总数 @return 已记录的帧数量 */
 int CanBusMonitor::frameCount() const
 {
     return m_frameCount;
 }
 
+/** @brief 根据帧类型获取行背景色(RTR黄色/扩展帧浅蓝/标准帧白色) @param frame CAN帧 @return 背景QBrush */
 QBrush CanBusMonitor::rowBrush(const CanFrame& frame) const
 {
     if (frame.rtr) {
@@ -141,19 +146,13 @@ QBrush CanBusMonitor::rowBrush(const CanFrame& frame) const
     return QBrush(palette().color(QPalette::Base));
 }
 
-/**
- * @brief 获取唯一帧ID数量
- * @return 不同帧ID的数量
- */
+/** @brief 获取唯一帧ID数量 @return 不同帧ID的数量 */
 int CanBusMonitor::uniqueFrameIdCount() const
 {
     return m_idFrequency.size();
 }
 
-/**
- * @brief 获取统计摘要文本
- * @return 格式化的CAN帧统计信息
- */
+/** @brief 获取统计摘要文本 @return 格式化的CAN帧统计信息 */
 QString CanBusMonitor::statisticsSummary() const
 {
     QString summary;
@@ -177,10 +176,7 @@ QString CanBusMonitor::statisticsSummary() const
     return summary.trimmed();
 }
 
-/**
- * @brief 设置帧ID过滤器
- * @param filterText 帧ID过滤文本（如 "0x123"），空字符串清除过滤
- */
+/** @brief 设置帧ID过滤器 @param filterText 帧ID过滤文本(如"0x123")，空字符串清除过滤 */
 void CanBusMonitor::setFrameIdFilter(const QString& filterText)
 {
     m_frameIdFilter = filterText.trimmed();

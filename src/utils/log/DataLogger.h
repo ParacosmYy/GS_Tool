@@ -63,36 +63,15 @@ public:
 
     // ---- 跳转定位(Seek) ----
 
-    /**
-     * @brief 跳转到指定时间戳位置（仅在播放模式下有效）
-     *
-     * 从文件头重新扫描所有记录，找到时间戳 <= timestamp 的最后一条记录，
-     * 将播放位置调整到该记录之后。跳转完成后发射 seekCompleted() 信号。
-     *
-     * @param timestamp 目标时间戳（毫秒，相对于录制开始的偏移量）
-     * @return true 跳转成功；false 不在播放模式或发生错误
-     */
+    /** @brief 跳转到指定时间戳位置(仅播放模式有效，从文件头扫描到<=timestamp的最后一条记录) @param timestamp 目标时间戳(ms，相对于录制开始的偏移量) @return true=跳转成功 */
     bool seekToTimestamp(qint64 timestamp);
 
-    /**
-     * @brief 跳转到指定书签位置
-     *
-     * 验证 index 有效性后，调用 seekToTimestamp(bookmark.timestamp)。
-     * 仅在播放模式下有效（由 seekToTimestamp 内部判断）。
-     *
-     * @param index 书签在 bookmarks() 列表中的索引，越界时返回 false
-     * @return true 跳转成功；false 索引无效或不在播放模式
-     */
+    /** @brief 跳转到指定书签位置(验证索引后委托seekToTimestamp) @param index 书签在bookmarks()列表中的索引 @return true=跳转成功 */
     bool seekToBookmark(int index);
 
     // ---- 书签管理 ----
 
-    /**
-     * @brief 在当前时间点添加书签
-     * 自动使用当前系统时间作为时间戳
-     * @param label 书签标签文本
-     * @param streamId 数据流标识（默认为空，表示全局书签）
-     */
+    /** @brief 在当前时间点添加书签(录制中使用相对偏移，非录制使用系统纪元时间) @param label 书签标签文本 @param streamId 数据流标识(默认为空，表示全局书签) */
     void addBookmark(const QString& label, const QString& streamId = QString());
 
     /** @brief 获取所有书签（按添加顺序） @return 书签列表 */
@@ -106,13 +85,20 @@ public:
 
     // ---- 会话统计 ----
 
-    quint64 totalLogsWritten() const;     ///< 获取累计写入的日志记录总数
-    quint64 totalBookmarks() const;       ///< 获取累计添加的书签总数(含已删除)
-    quint64 totalRecords() const;         ///< 获取累计录制的记录条数
-    quint64 totalBytesRecorded() const;   ///< 获取累计录制的字节总数
-    quint64 totalPlaybacks() const;       ///< 获取累计回放启动次数
-    quint64 totalErrors() const;          ///< 获取累计发生的错误次数
-    void resetStats();                    ///< 重置所有会话统计计数器
+    /** @brief 获取累计写入的日志记录总数 @return 日志写入总次数 */
+    quint64 totalLogsWritten() const;
+    /** @brief 获取累计添加的书签总数(含已删除) @return 书签总数 */
+    quint64 totalBookmarks() const;
+    /** @brief 获取累计录制的记录条数 @return 记录总数 */
+    quint64 totalRecords() const;
+    /** @brief 获取累计录制的字节总数 @return 字节总数 */
+    quint64 totalBytesRecorded() const;
+    /** @brief 获取累计回放启动次数 @return 回放总次数 */
+    quint64 totalPlaybacks() const;
+    /** @brief 获取累计发生的错误次数 @return 错误总次数 */
+    quint64 totalErrors() const;
+    /** @brief 重置所有会话统计计数器 */
+    void resetStats();
 
 signals:
     /** @brief 录制已启动 */

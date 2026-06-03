@@ -6,10 +6,7 @@
 #include "connection/spi_i2c/SpiI2cConfigPanel.h"
 #include <QFormLayout>
 
-/**
- * @brief 构造函数 - 初始化UI
- * @param parent 父控件
- */
+/** @brief 构造SPI/I2C配置面板UI，初始化布局和信号 @param parent 父控件 */
 SpiI2cConfigPanel::SpiI2cConfigPanel(QWidget* parent)
     : QWidget(parent)
 {
@@ -19,10 +16,7 @@ SpiI2cConfigPanel::SpiI2cConfigPanel(QWidget* parent)
     updateModeVisibility();
 }
 
-/**
- * @brief 获取当前配置参数
- * @return 配置键值对
- */
+/** @brief 获取当前配置参数，根据模式包含不同字段 @return 包含busMode/adapter/clockSpeed等字段的配置Map */
 QVariantMap SpiI2cConfigPanel::config() const
 {
     QVariantMap cfg;
@@ -50,10 +44,7 @@ QVariantMap SpiI2cConfigPanel::config() const
     return cfg;
 }
 
-/**
- * @brief 设置当前模式
- * @param mode "spi" 或 "i2c"
- */
+/** @brief 设置当前总线模式并同步UI @param mode "spi"或"i2c" */
 void SpiI2cConfigPanel::setMode(const QString& mode)
 {
     m_currentMode = mode;
@@ -67,10 +58,7 @@ void SpiI2cConfigPanel::setMode(const QString& mode)
     updateModeVisibility();
 }
 
-/**
- * @brief 设置连接状态(由外部连接管理器调用)
- * @param connected true=已连接
- */
+/** @brief 设置连接状态，更新按钮文本和状态标签 @param connected true=已连接 */
 void SpiI2cConfigPanel::setConnected(bool connected)
 {
     m_connected = connected;
@@ -82,9 +70,7 @@ void SpiI2cConfigPanel::setConnected(bool connected)
     }
 }
 
-/**
- * @brief 连接按钮点击
- */
+/** @brief 连接按钮点击处理，切换连接/断开并发射相应信号 */
 void SpiI2cConfigPanel::onConnectClicked()
 {
     if (m_connected) {
@@ -104,19 +90,14 @@ void SpiI2cConfigPanel::onConnectClicked()
     }
 }
 
-/**
- * @brief 模式切换(SPI/I2C)回调
- * @param index 下拉框当前索引
- */
+/** @brief 模式切换(SPI/I2C)回调，更新当前模式和UI可见性 @param index 下拉框当前索引 */
 void SpiI2cConfigPanel::onModeChanged(int index)
 {
     m_currentMode = (index == 1) ? "i2c" : "spi";
     updateModeVisibility();
 }
 
-/**
- * @brief 初始化UI布局
- */
+/** @brief 初始化UI布局: 模式选择/适配器/时钟/SPI参数组/I2C参数组/连接按钮/状态标签 */
 void SpiI2cConfigPanel::setupUi()
 {
     auto* mainLayout = new QVBoxLayout(this);
@@ -213,9 +194,7 @@ void SpiI2cConfigPanel::setupUi()
     mainLayout->addWidget(m_statusLabel);
 }
 
-/**
- * @brief 初始化信号连接
- */
+/** @brief 初始化信号连接: 连接按钮/模式切换/配置变更 */
 void SpiI2cConfigPanel::setupConnections()
 {
     connect(m_connectBtn, &QPushButton::clicked,
@@ -230,9 +209,7 @@ void SpiI2cConfigPanel::setupConnections()
             this, [this]() { ++m_totalConfigChanges; });
 }
 
-/**
- * @brief 根据模式更新UI可见性
- */
+/** @brief 根据当前模式(SPI/I2C)动态显示/隐藏对应参数分组 */
 void SpiI2cConfigPanel::updateModeVisibility()
 {
     if (m_spiGroup) {
@@ -243,10 +220,7 @@ void SpiI2cConfigPanel::updateModeVisibility()
     }
 }
 
-/**
- * @brief 保存SPI/I2C配置到QSettings
- * @param settings QSettings对象
- */
+/** @brief 保存SPI/I2C配置到QSettings @param settings QSettings对象 */
 void SpiI2cConfigPanel::saveSettings(QSettings& settings) const
 {
     settings.setValue(QStringLiteral("spi_i2c/mode"), m_currentMode);
@@ -262,10 +236,7 @@ void SpiI2cConfigPanel::saveSettings(QSettings& settings) const
                      m_deviceAddrSpin->value());
 }
 
-/**
- * @brief 从QSettings加载SPI/I2C配置
- * @param settings QSettings对象
- */
+/** @brief 从QSettings加载SPI/I2C配置 @param settings QSettings对象 */
 void SpiI2cConfigPanel::loadSettings(QSettings& settings)
 {
     const QString mode = settings.value(
@@ -292,9 +263,7 @@ void SpiI2cConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("spi_i2c/deviceAddr"), 0).toInt());
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器 */
 void SpiI2cConfigPanel::resetStatistics()
 {
     m_totalTransfers = 0;

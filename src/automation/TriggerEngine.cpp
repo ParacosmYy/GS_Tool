@@ -20,17 +20,7 @@ TriggerEngine::TriggerEngine(QObject* parent)
 {
 }
 
-/**
- * @brief 评估原始字节数据
- *
- * 遍历所有已启用规则，对数据执行匹配:
- *   - ExactString: 在 data 中搜索 pattern 的 UTF-8 编码
- *   - Regex: 使用 QRegularExpression 正则匹配
- *   - HexBytes: 将 pattern 解析为十六进制字节序列后搜索
- *   - ValueRange: 跳过（需解析后的数值，非原始数据）
- *
- * @param data 待评估的原始数据
- */
+/** @brief 评估原始字节数据，遍历已启用规则执行匹配(ExactString/Regex/HexBytes) @param data 待评估的原始数据 */
 void TriggerEngine::evaluateData(const QByteArray& data)
 {
     if (!m_enabled || data.isEmpty()) {
@@ -95,14 +85,7 @@ void TriggerEngine::evaluateData(const QByteArray& data)
     }
 }
 
-/**
- * @brief 评估解析后的数值
- *
- * 仅匹配 ValueRange 类型的规则，检查数值是否在 [valueMin, valueMax] 范围内。
- *
- * @param name 数据标识
- * @param value 数值
- */
+/** @brief 评估解析后的数值，仅匹配ValueRange规则检查数值范围 @param name 数据标识 @param value 数值 */
 void TriggerEngine::evaluateValue(const QString& name, double value)
 {
     Q_UNUSED(name)
@@ -189,11 +172,7 @@ const QList<TriggerRuleConfig>& TriggerEngine::rules() const
     return m_rules;
 }
 
-/**
- * @brief 清空所有规则
- *
- * 移除引擎中所有已注册的触发器规则，用于重新加载配置前清空旧数据。
- */
+/** @brief 清空所有规则和匹配计数，用于重新加载配置前清空旧数据 */
 void TriggerEngine::clearRules()
 {
     m_rules.clear();
@@ -270,13 +249,7 @@ quint64 TriggerEngine::totalErrors() const
     return m_totalErrors;
 }
 
-/**
- * @brief 重置所有扩展统计计数器为初始值
- *
- * 将 m_totalEvaluations、m_totalMatches、m_totalActionsExecuted、m_totalErrors
- * 以及原有统计计数器（m_matchCount、m_ruleMatchCounts）全部清零。
- * 不影响规则列表和启用状态。
- */
+/** @brief 重置所有扩展统计计数器为初始值(不影响规则列表和启用状态) */
 void TriggerEngine::resetStats()
 {
     m_totalEvaluations = 0;

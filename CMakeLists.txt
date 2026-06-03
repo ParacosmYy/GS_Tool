@@ -221,6 +221,7 @@ set(SOURCES
     src/connection/can/CanBusMonitor.cpp
     src/connection/can/CanConfigPanel.cpp
     src/protocol/can/DbcParser.cpp
+    src/protocol/can/DbcParserParse.cpp
 
     # ── F14: MQTT 客户端 ──
     src/connection/mqtt/MqttConnection.cpp

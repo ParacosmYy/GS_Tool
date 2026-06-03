@@ -7,6 +7,7 @@
 #include "core/widgets/AnimatedButton.h"
 #include "core/widgets/EdDialog.h"
 
+/** @brief 构造书签管理面板(标题+添加/删除/清空按钮+列表) @param parent 父控件 */
 BookmarkWidget::BookmarkWidget(QWidget* parent)
     : QWidget(parent)
 {

@@ -16,11 +16,13 @@
 // 构造 / 工具
 // ============================================================
 
+/** @brief 构造FFT引擎 @param parent 父对象 */
 FftEngine::FftEngine(QObject* parent)
     : QObject(parent)
 {
 }
 
+/** @brief 计算大于等于n的最小2的幂 @param n 输入值 @return >=n的最小2的幂 */
 int FftEngine::nextPowerOf2(int n)
 {
     if (n <= 0) {
@@ -37,6 +39,7 @@ int FftEngine::nextPowerOf2(int n)
     return (1 << highest);
 }
 
+/** @brief 计算以2为底的对数(整数部分) @param n 输入值(必须为2的幂) @return log2(n) */
 int FftEngine::log2Int(int n)
 {
     int bits = 0;
@@ -47,6 +50,7 @@ int FftEngine::log2Int(int n)
     return bits;
 }
 
+/** @brief 计算位反转索引(蝶形运算前数据重排用) @param index 原始索引 @param bits 索引位数 @return 位反转后的索引 */
 int FftEngine::bitReverse(int index, int bits)
 {
     int reversed = 0;
@@ -57,6 +61,7 @@ int FftEngine::bitReverse(int index, int bits)
     return reversed;
 }
 
+/** @brief 将窗函数类型转换为可读字符串 @param window 窗函数类型 @return 窗函数英文名称 */
 QString FftEngine::windowTypeName(WindowType window)
 {
     switch (window) {
@@ -72,6 +77,7 @@ QString FftEngine::windowTypeName(WindowType window)
 // 主计算接口
 // ============================================================
 
+/** @brief 执行FFT频谱计算: 加窗→FFT→单边幅度谱 @param timeData 时域采样点(x=序号,y=采样值) @param sampleRate 采样率(Hz) @param window 窗函数类型 @param fftSize FFT长度(2的幂,0=自动) @return 频谱数据(x=频率Hz,y=幅度)，长度为fftSize/2 */
 QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
                                     double sampleRate,
                                     WindowType window,
@@ -134,6 +140,7 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
 // 窗函数
 // ============================================================
 
+/** @brief 对复数序列应用窗函数(原地修改) @param data 输入/输出复数序列 @param window 窗函数类型 */
 void FftEngine::applyWindow(QVector<std::complex<double>>& data, WindowType window)
 {
     const int N = data.size();
@@ -174,6 +181,7 @@ void FftEngine::applyWindow(QVector<std::complex<double>>& data, WindowType wind
 // Cooley-Tukey radix-2 DIT FFT
 // ============================================================
 
+/** @brief 执行Cooley-Tukey radix-2 DIT FFT原地计算 @param data 输入/输出复数序列(长度必须为2的幂) */
 void FftEngine::fftRadix2(QVector<std::complex<double>>& data)
 {
     const int N = data.size();
@@ -231,6 +239,7 @@ void FftEngine::fftRadix2(QVector<std::complex<double>>& data)
 // 单边幅度谱
 // ============================================================
 
+/** @brief 计算单边幅度谱(FFT输出→频率-幅度点集) @param fftResult FFT输出复数序列 @param sampleRate 采样率(Hz) @return 频率-幅度点集 */
 QVector<QPointF> FftEngine::magnitudeSpectrum(
     const QVector<std::complex<double>>& fftResult,
     double sampleRate)

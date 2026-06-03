@@ -17,19 +17,7 @@ TriggerAction::TriggerAction(QObject* parent)
 {
 }
 
-/**
- * @brief 执行动作
- *
- * 根据 actionType 分发到不同的执行路径:
- *   - SendData: 优先调用回调函数，否则发送 sendDataRequested 信号
- *   - StartRecording: 发送 startRecordingRequested 信号
- *   - StopRecording: 发送 stopRecordingRequested 信号
- *   - ShowToast: 发送 showToastRequested 信号
- *   - PlaySound: 使用QApplication::beep或平台音频播放
- *
- * @param actionType 动作类型（对应 ActionType 枚举值）
- * @param actionData 动作附加数据
- */
+/** @brief 执行动作，根据ActionType分发到不同执行路径 @param actionType 动作类型(对应ActionType枚举值) @param actionData 动作附加数据 */
 void TriggerAction::execute(int actionType, const QByteArray& actionData)
 {
     const auto type = static_cast<ActionType>(actionType);
@@ -86,42 +74,31 @@ void TriggerAction::execute(int actionType, const QByteArray& actionData)
     }
 }
 
-/**
- * @brief 设置数据发送回调函数
- * @param callback 发送数据的回调函数
- */
+/** @brief 设置数据发送回调函数 @param callback 发送数据的回调函数 */
 void TriggerAction::setSendCallback(std::function<void(QByteArray)> callback)
 {
     m_sendCallback = std::move(callback);
 }
 
-/**
- * @brief 获取累计执行动作次数
- */
+/** @brief 获取累计执行动作次数 @return 所有类型的动作执行总次数 */
 quint64 TriggerAction::totalExecCount() const
 {
     return m_totalExecCount;
 }
 
-/**
- * @brief 获取指定类型动作的执行次数
- */
+/** @brief 获取指定类型动作的执行次数 @param actionType 动作类型 @return 该类型动作的执行次数 */
 quint64 TriggerAction::execCountByType(int actionType) const
 {
     return m_execCountByType.value(actionType, 0);
 }
 
-/**
- * @brief 获取累计发送数据字节数
- */
+/** @brief 获取累计发送数据字节数 @return 已发送字节总数 */
 quint64 TriggerAction::totalSendBytes() const
 {
     return m_totalSendBytes;
 }
 
-/**
- * @brief 重置执行统计
- */
+/** @brief 重置执行统计计数器为零 */
 void TriggerAction::resetExecStatistics()
 {
     m_totalExecCount = 0;

@@ -124,7 +124,6 @@ void TcpMultiConnectionManager::resetConnectionStatistics()
     m_errorCount = 0;
 }
 
-/** @brief socket数据到达回调 — 累计接收字节数 */
 /** @brief socket数据到达回调，累计接收字节数并转发数据信号 */
 void TcpMultiConnectionManager::onReadyRead()
 {
@@ -141,7 +140,6 @@ void TcpMultiConnectionManager::onReadyRead()
     }
 }
 
-/** @brief socket断开回调 — 自动移除连接 */
 /** @brief socket断开回调，自动移除连接 */
 void TcpMultiConnectionManager::onDisconnected()
 {
@@ -154,7 +152,6 @@ void TcpMultiConnectionManager::onDisconnected()
     }
 }
 
-/** @brief socket错误回调 — 累计错误计数 */
 /** @brief socket错误回调，累计错误计数并转发错误信号 @param error socket错误类型 */
 void TcpMultiConnectionManager::onError(QAbstractSocket::SocketError error)
 {

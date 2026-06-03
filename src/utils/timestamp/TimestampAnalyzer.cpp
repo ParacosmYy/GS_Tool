@@ -11,7 +11,7 @@ TimestampAnalyzer::TimestampAnalyzer(QObject *parent)
 {
 }
 
-/** @brief Unix时间戳转日期时间 — 累计转换计数 */
+/** @brief Unix时间戳转日期时间，累计转换计数 @param timestamp 时间戳值 @param isMillis true=毫秒精度 false=秒精度 @return 对应的QDateTime对象 */
 QDateTime TimestampAnalyzer::unixToDatetime(qint64 timestamp, bool isMillis) const
 {
     ++m_totalConversions;
@@ -19,7 +19,7 @@ QDateTime TimestampAnalyzer::unixToDatetime(qint64 timestamp, bool isMillis) con
     return QDateTime::fromSecsSinceEpoch(secs);
 }
 
-/** @brief 日期时间转Unix时间戳 — 累计转换计数 */
+/** @brief 日期时间转Unix时间戳，累计转换计数 @param datetime 日期时间对象 @param asMillis true=返回毫秒精度 false=返回秒精度 @return Unix时间戳 */
 qint64 TimestampAnalyzer::datetimeToUnix(const QDateTime &datetime, bool asMillis) const
 {
     ++m_totalConversions;
@@ -34,7 +34,7 @@ qint64 TimestampAnalyzer::currentUnix(bool millis)
     return millis ? (secs * 1000) : secs;
 }
 
-/** @brief 解析时间戳字符串 — 累计解析计数和字节数 */
+/** @brief 解析时间戳字符串(支持Unix秒/毫秒/ISO日期)，累计解析计数和字节数 @param text 时间戳文本 @return 解析后的QDateTime，失败返回无效对象 */
 QDateTime TimestampAnalyzer::parseTimestamp(const QString &text) const
 {
     ++m_totalParses;
@@ -63,6 +63,7 @@ QDateTime TimestampAnalyzer::parseTimestamp(const QString &text) const
     return {};
 }
 
+/** @brief 格式化为相对时间描述(如"3分钟前"、"2小时后") @param datetime 目标日期时间 @return 相对时间字符串 */
 QString TimestampAnalyzer::formatRelativeTime(const QDateTime& datetime)
 {
     if (!datetime.isValid()) return QString();
@@ -86,6 +87,7 @@ QString TimestampAnalyzer::formatRelativeTime(const QDateTime& datetime)
     return QObject::tr("%1年前").arg(secs / 31536000);
 }
 
+/** @brief 格式化两个时间点之间的差值(如"2天3小时15分钟") @param from 起始时间 @param to 结束时间 @return 差值描述字符串 */
 QString TimestampAnalyzer::formatDifference(const QDateTime& from, const QDateTime& to)
 {
     if (!from.isValid() || !to.isValid()) return QString();
@@ -108,7 +110,11 @@ QString TimestampAnalyzer::formatDifference(const QDateTime& from, const QDateTi
     return parts.isEmpty() ? QObject::tr("0秒") : parts.join(QString());
 }
 
+/** @brief 获取累计时间戳转换次数 @return 转换总次数 */
 quint64 TimestampAnalyzer::totalConversions() const { return m_totalConversions; }
+/** @brief 获取累计时间戳解析次数 @return 解析总次数 */
 quint64 TimestampAnalyzer::totalParses() const { return m_totalParses; }
+/** @brief 获取累计解析的字节总数 @return 字节总数 */
 quint64 TimestampAnalyzer::totalBytesAnalyzed() const { return m_totalBytesAnalyzed; }
+/** @brief 重置所有统计计数器(转换次数/解析次数/字节数归零) */
 void TimestampAnalyzer::resetStats() { m_totalConversions = 0; m_totalParses = 0; m_totalBytesAnalyzed = 0; }

@@ -6,92 +6,190 @@
 
 ## 一、语言和风格
 
-- C++17 标准
-- 详细中文注释（开发者是C++/Qt新手）
-- 头文件引用使用相对src目录的路径: `#include "core/Constants.h"`
-- Qt信号/槽用新式connect语法（函数指针），**禁止** SIGNAL/SLOT 宏
-- 每个类一对 .h/.cpp 文件，放在对应子目录中
+- 统一使用 C++17。
+- 头文件引用顺序固定为：Qt -> STL -> 项目头文件。
+- 项目内头文件优先使用相对 `src` 根目录的路径，例如 `#include "core/Constants.h"`。
+- Qt 信号/槽必须使用新式 `connect` 语法，禁止 `SIGNAL` / `SLOT` 宏。
+- 注释以中文为主，公开接口必须能让接手者快速理解职责和约束。
 
 ---
 
-## 二、MainWindow 嵌入式 main 哲学（铁律）
+## 二、文件组织规则
 
-MainWindow 必须像嵌入式项目的 `main.c` 一样简洁:
-- **只做三件事**: 初始化对象 → 组装 UI → 连接信号/槽
-- **禁止在 MainWindow 中编写业务逻辑** — 所有逻辑委托给 Controller/Manager 类
-- **MainWindow.cpp 目标行数: ≤500行**
-- **每个 Controller 遵循单一职责**: ConnectionController、SendController、NavigationController、RecordingController、ToolbarController、SettingsController
+### 2.1 默认组织方式
 
+- 默认情况下，每个可复用类使用独立的 `.h` / `.cpp` 文件。
+- 默认情况下，文件名与类名保持一致，采用 PascalCase。
+- 默认情况下，源文件放在职责对应的子目录中，避免把不同层次的实现堆在一起。
+
+### 2.2 允许的例外
+
+以下情况可以不遵循“一类一对 `.h/.cpp`”：
+
+- 纯接口类，只有抽象声明，没有实现细节时，可以只有 `.h`。
+- 模板类、内联工具函数、编译期常量集合，若必须头文件内实现，可以采用 header-only。
+- 仅供单个 `.cpp` 使用的内部辅助类型，可以放在同文件内作为匿名命名空间或局部私有类型。
+- 由 Qt 元对象机制要求的简单类型封装，若拆分只会增加噪音，可以按可读性优先处理。
+
+### 2.3 例外要求
+
+- 选择例外时，必须在 PR 描述里说明原因。
+- header-only 方案必须保证接口稳定、包含关系清晰，避免把实现细节扩散到全工程。
+- 单文件内放多个类型时，必须保持“一个主职责 + 少量紧密辅助类型”的边界，禁止把无关功能塞进同一文件。
+
+---
+
+## 三、规模目标和拆分规则
+
+### 3.1 默认目标值
+
+以下是默认目标，不是死线：
+
+| 项目 | 默认目标 | 说明 |
+|------|----------|------|
+| `.cpp` 文件 | 300 行以内 | 方便单次 review 和后续维护 |
+| `.h` 文件 | 160 行以内 | 保持接口聚焦，减少包含负担 |
+| 单个公开类 | 6 个以内核心职责点 | 超出时优先考虑拆分协作类 |
+| 单个方法 | 60 行以内 | 超过时优先提炼为私有 helper |
+| `MainWindow.cpp` | 300 行以内 | 作为主装配层，而不是业务层 |
+
+### 3.2 触发拆分的信号
+
+出现以下任一情况时，默认应拆分，而不是继续堆代码：
+
+- 一个类同时负责数据处理、状态管理、UI 更新和持久化。
+- 一个方法同时包含输入校验、状态转换、错误处理和 UI 反馈。
+- 一个 `.cpp` 文件里出现多个“看起来独立”的流程函数，且彼此只通过成员变量传递状态。
+- 公开方法数量快速增长，但外部调用点只有少数几个。
+- 需要在同一文件里反复写“先做 A，再做 B，再做 C”的模板式流程。
+
+### 3.3 例外机制
+
+- 超过默认目标值不一定立即违规，但必须在 PR 中解释为什么暂时不拆。
+- 允许短期超过目标值的场景包括：迁移期、一次性重构中间态、需要保持原子改动的修复、强约束的 Qt 绑定代码。
+- 若文件已经超过 500 行，或方法已经超过 80 行，必须给出明确拆分计划，不能只写“后续优化”。
+- 例外不能无限延期；如果同一文件在后续迭代里继续增长，应优先拆分而不是重复申请例外。
+
+---
+
+## 四、MainWindow 约束
+
+### 4.1 默认职责
+
+`MainWindow` 只承担“装配”和“转发”职责：
+
+- 创建顶层对象并完成依赖注入。
+- 组织 UI 容器、布局和页面切换。
+- 连接信号/槽，把用户操作转发给 Controller / Manager。
+- 保存和恢复窗口级别的界面状态。
+
+### 4.2 明确禁止
+
+- 禁止在 `MainWindow` 中编写串口、协议解析、文件导出、脚本回放等业务逻辑。
+- 禁止把状态机、数据缓存、数据处理算法塞进 `MainWindow`。
+- 禁止把复杂 if/else 流程写成“按钮点击即完成所有事情”的巨型槽函数。
+
+### 4.3 默认目标与升级规则
+
+| 项目 | 默认目标 | 升级条件 |
+|------|----------|----------|
+| `MainWindow.cpp` | 300 行以内 | 超过后优先拆分到 Controller / Manager / Helper |
+| `MainWindow` 公开槽函数 | 8 个以内 | 超过后说明页面职责是否过载 |
+| `MainWindow` 直接依赖对象 | 10 个以内 | 超过后检查是否需要门面类或页面分层 |
+
+### 4.4 允许的例外
+
+- 应用启动阶段的临时装配代码可以集中在 `MainWindow`，但必须保持可读。
+- 少量纯 UI 跳转逻辑可以保留在 `MainWindow`，前提是不涉及业务状态修改。
+- 若某个短期重构需要让 `MainWindow` 暂时变大，必须同时提供拆分后的落点说明。
+
+### 4.5 推荐拆分方向
+
+- 页面切换和导航逻辑交给 `NavigationController`。
+- 串口连接和会话状态交给 `ConnectionController`。
+- 发送与快捷输入交给 `SendController`。
+- 录制、回放和历史数据交给 `RecordingController`。
+- 设置项和持久化交给 `SettingsController`。
+
+---
+
+## 五、注释和文档规范
+
+### 5.1 必须注释的对象
+
+以下内容必须有中文注释：
+
+- 公开类。
+- 公开方法。
+- 公开信号。
+- 公共枚举及其关键枚举值。
+- 需要外部维护者理解的成员变量。
+- 非显而易见的生命周期、线程、拥有权约束。
+
+### 5.2 注释的最低要求
+
+注释不要求堆砌背景故事，但必须回答三个问题：
+
+- 这个对象做什么。
+- 它依赖什么、输出什么。
+- 有哪些调用约束或副作用。
+
+### 5.3 推荐格式
+
+```cpp
+/**
+ * @brief 说明这个类或方法的职责
+ * @param xxx 参数含义
+ * @return 返回值含义
+ *
+ * 补充说明适用场景、线程约束或拥有权约束。
+ */
 ```
-// MainWindow 应该长这样:
-int main() {
-    init_objects();
-    setup_ui();
-    connect_signals();
-    load_settings();
-}
-// 就这样，没有其他东西了
-```
+
+### 5.4 禁止项
+
+- 禁止用空泛描述代替真正解释，例如“用于管理某某”但不说明边界。
+- 禁止让公开接口完全没有说明。
+- 禁止长期保留 `TODO` / `FIXME` 而没有对应任务或追踪链接。
 
 ---
 
-## 三、注释规范（铁律）
-
-**注释是强制性的，必须详细到让 C++/Qt 初学者也能完全理解。**
-
-| 元素 | 注释格式 | 必须包含 |
-|------|---------|---------|
-| 文件头 | `/** @file 文件名 @brief 一行描述 */` | 文件用途、设计思路 |
-| 类 | `/** @brief 类描述 ... */` | 职责、协作关系、设计模式 |
-| 公开方法 | `/** @brief 描述 @param 参数说明 @return 返回值说明 */` | 功能、参数含义、返回值 |
-| 私有方法 | `/** @brief 描述 */` 或 `// 一行说明` | 功能说明 |
-| 成员变量 | `///< 行内说明` 或 `/** @brief 说明 */` | 用途、取值范围 |
-| 信号 | `/** @brief 信号描述 @param 参数说明 */` | 何时发射、参数含义 |
-| 代码块 | `// ---- 分组标题 ----` | 逻辑分组 |
-
-**禁止**:
-- 禁止无注释的公开方法
-- 禁止无注释的成员变量
-- 禁止"// TODO"或"// FIXME"式注释长期存在
-
----
-
-## 四、命名规范
+## 六、命名规范
 
 | 类型 | 规范 | 示例 |
 |------|------|------|
 | 类名 | PascalCase | `SerialConnection` |
 | 方法 | camelCase | `setBaudRate()` |
-| 成员变量 | m_ 前缀 + camelCase | `m_portName` |
-| 常量 | k 前缀 + PascalCase | `kMaxBufferSize` |
+| 成员变量 | `m_` 前缀 + camelCase | `m_portName` |
+| 常量 | `k` 前缀 + PascalCase | `kMaxBufferSize` |
 | 枚举值 | PascalCase | `ConnectionState::Connected` |
-| 文件名 | PascalCase.h/cpp | `SerialConnection.h` |
-| 头文件卫士 | 全大写 | `#ifndef SERIAL_CONNECTION_H` |
+| 文件名 | PascalCase.h / PascalCase.cpp | `SerialConnection.h` |
+| 头文件卫士 | 全大写 | `SERIAL_CONNECTION_H` |
 | 命名空间 | camelCase | `namespace hexConvert` |
-| 宏 | UPPER_SNAKE_CASE | `#define EMBEDDEBUG_VERSION` |
+| 宏 | UPPER_SNAKE_CASE | `EMBEDDEBUG_VERSION` |
 
 ---
 
-## 五、头文件规则
+## 七、头文件规则
 
 ```cpp
-#ifndef NAMESPACE_CLASS_NAME_H     // 头文件卫士
-#define NAMESPACE_CLASS_NAME_H
+#ifndef SERIAL_CONNECTION_H
+#define SERIAL_CONNECTION_H
 
-#include <Qt先>                     // Qt头文件在前
-#include <STL次>                     // STL头文件次之
-#include "项目头文件最后"            // 项目头文件最后
+#include <QtCore/QString>
+#include <memory>
 
-class ClassName : public QObject {  // 继承用public
+#include "core/Types.h"
+
+class SerialConnection : public QObject {
     Q_OBJECT
 
 public:
-    explicit ClassName(QObject* parent = nullptr);
-    ~ClassName() override;
+    explicit SerialConnection(QObject* parent = nullptr);
+    ~SerialConnection() override;
 
-    // 禁止拷贝和赋值（QObject派生类）
-    ClassName(const ClassName&) = delete;
-    ClassName& operator=(const ClassName&) = delete;
+    SerialConnection(const SerialConnection&) = delete;
+    SerialConnection& operator=(const SerialConnection&) = delete;
 
 signals:
     void dataReady(const QByteArray& data);
@@ -100,131 +198,128 @@ private slots:
     void onInternalEvent();
 
 private:
-    QString m_memberVar;             // 成员变量在底部
+    QString m_portName;
 };
+#endif // SERIAL_CONNECTION_H
 ```
 
+### 7.1 排序要求
+
+- Qt 头文件在前。
+- STL 头文件在中。
+- 项目头文件放最后。
+
+### 7.2 使用边界
+
+- 头文件中只放声明和极少量必须内联的代码。
+- 如果某个实现细节只是为了隐藏复杂度，不要把它们扩散到头文件。
+- 对于模板、泛型或强依赖内联的工具类型，允许 header-only，但必须控制包含成本。
+
 ---
 
-## 六、内存管理
+## 八、内存管理
 
-- QObject父子树管理生命周期，优先用 `new Xxx(parent)`
-- 非QObject对象用 `std::unique_ptr` / `std::shared_ptr`
-- **禁止裸 `new` 不配对 `delete`** — 必须有明确的拥有者
-- 大缓冲区用 `QByteArray` 或 `std::vector`，不要手动 `malloc`
+- QObject 派生对象优先交给父子树管理生命周期。
+- 非 QObject 对象优先使用 `std::unique_ptr`，只有确有共享所有权时才使用 `std::shared_ptr`。
+- 禁止裸 `new` 之后没有明确拥有者的写法。
+- 大缓冲区优先使用 `QByteArray`、`QVector`、`std::vector`，避免手工管理 `malloc` / `free`。
 
 ---
 
-## 七、错误处理规范
+## 九、错误处理规范
 
-### 错误严重等级
+### 9.1 严重等级
 
-| 等级 | 枚举值 | 含义 | 处理方式 | 示例 |
-|------|--------|------|---------|------|
-| **INFO** | `ErrorLevel::Info` | 正常提示信息 | 日志记录，不中断流程 | "连接已断开" |
-| **WARNING** | `ErrorLevel::Warning` | 可恢复的异常 | 日志记录 + 用户提示（ToastWidget） | "数据帧校验失败，已丢弃" |
-| **ERROR** | `ErrorLevel::Error` | 功能不可用 | 日志记录 + 用户提示 + 禁用相关功能 | "串口打开失败" |
-| **FATAL** | `ErrorLevel::Fatal` | 应用无法继续 | 日志记录 + 弹窗通知 + 安全退出 | "配置文件损坏" |
+| 等级 | 含义 | 处理方式 |
+|------|------|----------|
+| INFO | 正常提示信息 | 记录日志，不中断流程 |
+| WARNING | 可恢复异常 | 记录日志并提示用户 |
+| ERROR | 功能不可用 | 记录日志、提示用户、禁用相关功能 |
+| FATAL | 应用无法继续 | 记录日志、提示用户、安全退出 |
 
-### 错误传播规则
+### 9.2 传播规则
 
-1. **基础设施层向上传播** — 底层错误通过信号 `errorOccurred(ErrorLevel, QString)` 逐层上报
-2. **禁止吞没错误** — catch块中至少记录日志，不允许空catch
-3. **错误信息用中文** — 面向用户的所有错误提示必须是中文（tr()包裹）
-4. **错误码规范** — 业务错误用枚举类定义，不使用裸数字
+1. 基础设施层错误必须向上传播，不能在底层静默吞掉。
+2. catch 块至少要记录日志，禁止空 catch。
+3. 面向用户的错误信息必须中文化，并使用 `tr()` 包裹。
+4. 业务错误优先用枚举类或错误对象表达，禁止使用裸数字作为语义错误码。
 
 ```cpp
-// 正确的错误传播模式
 emit errorOccurred(ErrorLevel::Error, tr("串口 %1 打开失败: %2").arg(m_portName, error));
-
-// 禁止的做法
-catch (...) { /* 吞没错误 */ }
 ```
 
-### 错误处理检查清单
+### 9.3 检查清单
 
-- [ ] 所有可能失败的IO操作有错误处理（open/send/read/connect）
-- [ ] 错误信号已连接到UI提示
-- [ ] catch块不为空
-- [ ] 面向用户的错误信息已tr()包裹
+- 所有可能失败的 IO 操作都有错误处理。
+- 错误信号接到了 UI 提示或状态系统。
+- catch 块不为空。
+- 面向用户的错误文本已 `tr()` 包裹。
 
 ---
 
-## 八、线程规范
+## 十、线程规范
 
-### 主线程约束（铁律）
+### 10.1 主线程约束
 
 | 对象类型 | 线程要求 | 原因 |
 |---------|---------|------|
-| 所有 QWidget 及其子类 | **必须在主线程** | Qt GUI操作不是线程安全的 |
-| ThemeManager 操作 | **必须在主线程** | QSS应用涉及QWidget |
-| PanelManager 操作 | **必须在主线程** | 面板增删涉及UI |
+| 所有 `QWidget` 及其子类 | 必须在主线程 | GUI 操作不是线程安全的 |
+| ThemeManager 操作 | 必须在主线程 | QSS 应用会触发界面刷新 |
+| PanelManager 操作 | 必须在主线程 | 面板增删涉及 UI 生命周期 |
 
-### 线程安全模式
+### 10.2 线程安全模式
 
-1. **数据生产者-消费者** — 使用 `RingBuffer<T>`（已内置线程安全）
-2. **跨线程信号通信** — 使用 Qt 自动连接类型（`Qt::AutoConnection`），跨线程自动变为队列连接
-3. **后台任务** — 串口IO/协议解析等耗时操作放在QThread中，通过信号返回结果
+1. 数据生产者-消费者优先使用已封装的线程安全缓冲结构。
+2. 跨线程通信优先用 Qt 信号/槽，让连接类型由 Qt 自动决定。
+3. 串口 IO、协议解析等耗时工作放在后台线程，结果通过信号返回主线程。
 
-```cpp
-// 正确: 后台线程发信号，主线程更新UI
-// Worker线程中:
-emit dataParsed(result);  // 自动队列连接到主线程
-
-// 主线程slot中:
-void onUpdateUI(const ParsedResult& result) {
-    m_chartWidget->updateData(result);  // 安全，在主线程
-}
-```
-
-### 禁止事项
+### 10.3 禁止事项
 
 | 禁止 | 原因 | 正确做法 |
-|------|------|---------|
-| **禁止在非主线程操作QWidget** | Qt GUI不是线程安全的 | 信号/槽跨线程通信 |
-| **禁止在非主线程调用setStyleSheet** | 触发QWidget重绘 | 通过信号通知主线程 |
-| **禁止使用QThread::sleep阻塞主线程** | 冻结UI | QTimer或QThread worker |
+|------|------|----------|
+| 在非主线程操作 QWidget | GUI 不线程安全 | 通过信号通知主线程 |
+| 在非主线程调用 `setStyleSheet()` | 会触发界面更新 | 回到主线程统一刷新 |
+| 在主线程用 `QThread::sleep()` 阻塞 | 冻结 UI | 使用事件驱动或 worker 线程 |
 
 ---
 
-## 九、单元测试标准
+## 十一、单元测试标准
 
-### 测试文件命名与位置
+### 11.1 测试文件命名与位置
 
 ```
 tests/
-├── test_crc.cpp                    # 测试 CRC 计算正确性
-├── test_hexconverter.cpp           # 测试 HEX 编解码
-├── test_ringbuffer.cpp             # 测试环形缓冲区
-├── test_frameparser.cpp            # 测试协议帧解析
-└── test_<模块名>_<功能>.cpp        # 命名规则
+├── test_crc.cpp
+├── test_hexconverter.cpp
+├── test_ringbuffer.cpp
+├── test_frameparser.cpp
+└── test_<模块名>_<功能>.cpp
 ```
 
-**命名规则**: `test_<被测模块>_<被测功能>.cpp`
+命名规则：`test_<被测模块>_<被测功能>.cpp`
 
-### 测试编写要求
+### 11.2 编写要求
 
 | 要求 | 说明 |
 |------|------|
-| **测试框架** | Qt Test（QTest） |
-| **每个公开方法至少1个测试** | 正常路径 + 边界条件 |
-| **独立可运行** | 每个测试文件可独立编译运行 |
-| **不依赖外部状态** | 不依赖具体串口/网络连接，使用mock数据 |
-| **中文测试描述** | QTest的描述信息用中文 |
+| 测试框架 | Qt Test（QTest） |
+| 公开方法 | 优先覆盖正常路径和边界条件 |
+| 独立可运行 | 单个测试文件可单独编译运行 |
+| 不依赖外部状态 | 不依赖具体串口/网络连接 |
+| 中文描述 | QTest 的描述信息用中文 |
 
-### 覆盖率期望
+### 11.3 覆盖率期望
 
 | 模块类型 | 期望覆盖率 | 优先测试 |
 |---------|-----------|---------|
-| utils/（工具类） | ≥ 80% | CRC, HexConverter, RingBuffer |
-| protocol/（协议解析） | ≥ 70% | FrameParser, ModbusEngine |
-| connection/（连接层） | ≥ 50% | IConnection接口, SerialConnection |
-| UI层（core/widgets/） | ≥ 30% | 关键交互逻辑 |
+| utils/ | ≥ 80% | CRC、HexConverter、RingBuffer |
+| protocol/ | ≥ 70% | FrameParser、ModbusEngine |
+| connection/ | ≥ 50% | IConnection 接口、SerialConnection |
+| UI 层 | ≥ 30% | 关键交互逻辑 |
 
-### 测试运行
+### 11.4 运行方式
 
 ```bash
-# 构建并运行全部测试
 cmake --build build --target test
 cd build && ctest --output-on-failure
 ```

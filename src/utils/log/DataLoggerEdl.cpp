@@ -27,12 +27,7 @@ void DataLogger::writeHeader()
     stream << static_cast<quint32>(0);
 }
 
-/**
- * @brief 写入一条数据记录(时间戳+方向+数据长度+数据)
- * @param timestamp 相对起始时间的毫秒偏移
- * @param dir 数据方向
- * @param data 原始字节
- */
+/** @brief 写入一条数据记录(时间戳8B+方向1B+长度4B+数据NB) @param timestamp 相对起始时间的毫秒偏移 @param dir 数据方向 @param data 原始字节 */
 void DataLogger::writeRecord(quint64 timestamp, Direction dir, const QByteArray& data)
 {
     if (!m_recordFile) return;

@@ -7,6 +7,7 @@
  */
 #include "protocol/modbus/ModbusMaster.h"
 
+/** @brief 构造Modbus主站(创建超时定时器) @param parent 父对象 */
 ModbusMaster::ModbusMaster(QObject* parent)
     : QObject(parent)
     , m_timer(new QTimer(this))
@@ -15,6 +16,7 @@ ModbusMaster::ModbusMaster(QObject* parent)
     connect(m_timer, &QTimer::timeout, this, &ModbusMaster::onTimeout);
 }
 
+/** @brief 设置数据连接(旧连接自动断开信号) @param connection IConnection指针 */
 void ModbusMaster::setConnection(IConnection* connection) {
     if (m_connection) {
         disconnect(m_connection, &IConnection::dataReceived,
@@ -27,10 +29,12 @@ void ModbusMaster::setConnection(IConnection* connection) {
     }
 }
 
+/** @brief 设置响应超时时间 @param ms 超时毫秒数 */
 void ModbusMaster::setTimeout(int ms) {
     m_timeoutMs = ms;
 }
 
+/** @brief 发送FC01读线圈请求 @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=发送成功 */
 bool ModbusMaster::readCoils(int slave, int start, int count) {
     ModbusFrame frame;
     frame.slaveAddress = static_cast<quint8>(slave);
@@ -40,6 +44,7 @@ bool ModbusMaster::readCoils(int slave, int start, int count) {
     return sendFrame(frameToBytes(frame));
 }
 
+/** @brief 发送FC03读保持寄存器请求 @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=发送成功 */
 bool ModbusMaster::readRegisters(int slave, int start, int count) {
     ModbusFrame frame;
     frame.slaveAddress = static_cast<quint8>(slave);
@@ -49,6 +54,7 @@ bool ModbusMaster::readRegisters(int slave, int start, int count) {
     return sendFrame(frameToBytes(frame));
 }
 
+/** @brief 发送FC06写单个寄存器请求 @param slave 从站地址 @param addr 寄存器地址 @param value 写入值 @return true=发送成功 */
 bool ModbusMaster::writeSingleRegister(int slave, int addr, quint16 value) {
     ModbusFrame frame;
     frame.slaveAddress = static_cast<quint8>(slave);
@@ -59,6 +65,7 @@ bool ModbusMaster::writeSingleRegister(int slave, int addr, quint16 value) {
     return sendFrame(frameToBytes(frame));
 }
 
+/** @brief 发送FC16写多个寄存器请求 @param slave 从站地址 @param addr 起始寄存器地址 @param values 写入值列表 @return true=发送成功 */
 bool ModbusMaster::writeMultipleRegisters(int slave, int addr,
                                           const QList<quint16>& values) {
     ModbusFrame frame;
@@ -78,10 +85,12 @@ bool ModbusMaster::writeMultipleRegisters(int slave, int addr,
     return sendFrame(frameToBytes(frame));
 }
 
+/** @brief 发送自定义Modbus帧 @param frame 自定义帧结构 @return true=发送成功 */
 bool ModbusMaster::sendCustomFrame(const ModbusFrame& frame) {
     return sendFrame(frameToBytes(frame));
 }
 
+/** @brief 发送原始Modbus帧数据(含CRC16) @param rawData 完整帧字节数组 @return true=写入成功 */
 bool ModbusMaster::sendFrame(const QByteArray& rawData) {
     if (!m_connection || m_connection->state() != ConnectionState::Connected) {
         return false;
@@ -96,6 +105,7 @@ bool ModbusMaster::sendFrame(const QByteArray& rawData) {
     return written > 0;
 }
 
+/** @brief 连接数据到达回调(缓冲+溢出保护+按功能码判断帧长度) @param data 接收到的原始字节 */
 void ModbusMaster::onRawDataReceived(const QByteArray& data) {
     m_rxBuffer.append(data);
 
@@ -140,11 +150,13 @@ void ModbusMaster::onRawDataReceived(const QByteArray& data) {
     }
 }
 
+/** @brief 超时回调：递增超时计数并发射timeout信号 */
 void ModbusMaster::onTimeout() {
     ++m_totalTimeouts;
     emit timeout(static_cast<int>(m_lastSlave), 0);
 }
 
+/** @brief 解析Modbus响应帧(CRC16校验+异常码检测+发射responseReceived/error) @param data 响应帧数据 */
 void ModbusMaster::parseResponse(const QByteArray& data) {
     // 校验CRC16（最后2字节为CRC，小端序）
     if (data.size() < 4) { return; }

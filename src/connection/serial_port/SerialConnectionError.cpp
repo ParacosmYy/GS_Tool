@@ -20,15 +20,7 @@
 #include <windows.h>
 #endif
 
-/**
- * @brief 通过平台API获取底层串口通信错误统计
- *
- * Windows平台使用ClearCommError()读取COMSTAT结构中的错误标志:
- *   - CE_FRAME: 帧错误(起始位/停止位不匹配)
- *   - CE_RXPARITY: 硬件奇偶校验错误
- *   - CE_OVERRUN/CE_RXOVER: 接收缓冲区溢出
- * 非Windows平台为空实现，未来可扩展Linux的TIOCGICOUNT ioctl。
- */
+/** @brief 通过平台API获取底层串口通信错误统计，Win32使用ClearCommError()读取帧/校验/溢出错误 */
 void SerialConnection::queryPlatformErrors()
 {
 #ifdef Q_OS_WIN
@@ -65,18 +57,7 @@ void SerialConnection::queryPlatformErrors()
 #endif
 }
 
-/**
- * @brief QSerialPort::errorOccurred 信号处理
- *
- * 错误分类与恢复策略:
- *   - 致命错误(ResourceError/PermissionError/OpenError/DeviceNotFoundError):
- *     将状态设为Error并关闭端口，需要用户手动重连
- *   - 可恢复错误(TimeoutError/ReadError/WriteError等):
- *     保持连接状态不变，通过queryPlatformErrors()查询底层错误分类，
- *     仅更新错误计数器，不触发断开
- *
- * @param error QSerialPort 的错误码
- */
+/** @brief QSerialPort::errorOccurred信号处理，按致命/可恢复分类处理错误 @param error QSerialPort错误码 */
 void SerialConnection::onError(QSerialPort::SerialPortError error)
 {
     // 忽略无错误的情况 (Qt在某些操作后会触发NoError)
@@ -143,22 +124,7 @@ void SerialConnection::onError(QSerialPort::SerialPortError error)
     emit errorCountersUpdated(m_errorCounters);
 }
 
-/**
- * @brief 将 QSerialPort 错误码翻译为详细的中文错误描述
- *
- * 针对每种错误类型给出具体的诊断信息和操作建议:
- *   - DeviceNotFoundError: 端口不存在，检查设备连接
- *   - PermissionError: 权限不足，建议管理员运行或关闭占用程序
- *   - OpenError: 端口被占用或打开失败
- *   - NotOpenError: 操作在未打开时执行
- *   - TimeoutError: 读写超时
- *   - ResourceError: 资源意外释放（设备被拔出等）
- *   - UnsupportedOperationError: 不支持的操作
- *   - UnknownError: 未知错误，附带系统错误信息
- *
- * @param error QSerialPort 错误码
- * @return 人类可读的中文错误描述
- */
+/** @brief 将QSerialPort错误码翻译为详细的中文错误描述，含诊断信息和操作建议 @param error QSerialPort错误码 @return 人类可读的中文错误描述 */
 QString SerialConnection::translateError(QSerialPort::SerialPortError error)
 {
     // 先获取系统级的错误描述作为补充信息
@@ -207,27 +173,13 @@ QString SerialConnection::translateError(QSerialPort::SerialPortError error)
     }
 }
 
-/**
- * @brief QSerialPort::bytesWritten 信号处理
- *
- * 将 QSerialPort 的写入完成事件转发为 IConnection::bytesWritten 信号，
- * 上层模块可通过此信号跟踪实际写入的字节数（如OTA进度追踪）。
- *
- * @param bytes 实际写入的字节数
- */
+/** @brief QSerialPort::bytesWritten信号处理，转发为IConnection::bytesWritten信号 @param bytes 实际写入的字节数 */
 void SerialConnection::onBytesWritten(qint64 bytes)
 {
     emit bytesWritten(bytes);
 }
 
-/**
- * @brief 发送Break信号
- *
- * 部分嵌入式设备的bootloader需要通过串口Break信号触发升级模式。
- * 实现方式: 拉低TX线指定时间后恢复，模拟标准Break条件。
- *
- * @param duration Break持续时间(毫秒)，默认100ms
- */
+/** @brief 发送Break信号，拉低TX线指定时间后恢复，用于触发bootloader升级模式 @param duration Break持续时间(毫秒)，默认100ms */
 void SerialConnection::sendBreak(int duration)
 {
     if (m_serial.isOpen()) {
@@ -238,11 +190,7 @@ void SerialConnection::sendBreak(int duration)
     }
 }
 
-/**
- * @brief 重置错误计数器
- *
- * 将所有错误计数归零。通常在串口重新打开时自动调用。
- */
+/** @brief 重置会话级错误计数器(帧/校验/溢出/未知)，通常在串口重新打开时调用 */
 void SerialConnection::resetErrorCounters()
 {
     m_errorCounters = SerialErrorCounters{};
@@ -265,13 +213,7 @@ PinoutSignals SerialConnection::pinoutSignals() const
     return result;
 }
 
-/**
- * @brief 重置所有错误分类统计计数器
- *
- * 将 totalErrorsTracked/totalFramingErrors/totalParityErrors/totalOverrunErrors 归零。
- * 不影响 SerialErrorCounters(会话级错误计数)，
- * 那些由 resetErrorCounters() 单独管理。
- */
+/** @brief 重置错误分类统计计数器(totalErrorsTracked/totalFramingErrors/totalParityErrors/totalOverrunErrors) */
 void SerialConnection::resetErrorClassificationStats()
 {
     m_totalErrorsTracked = 0;

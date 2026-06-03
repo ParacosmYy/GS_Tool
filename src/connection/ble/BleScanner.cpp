@@ -24,6 +24,7 @@ static const QStringList SIM_DEVICE_ADDRS = {
     "44:65:0D:AA:BB:CC", "78:02:B8:CD:EF:01"
 };
 
+/** @brief 构造BLE扫描器，初始化扫描定时器和模拟发现定时器 @param parent 父QObject指针 */
 BleScanner::BleScanner(QObject* parent)
     : QObject(parent)
     , m_scanTimer(new QTimer(this))
@@ -38,11 +39,13 @@ BleScanner::BleScanner(QObject* parent)
             this, &BleScanner::onSimulateDiscovery);
 }
 
+/** @brief 析构BLE扫描器，停止正在进行的扫描 */
 BleScanner::~BleScanner()
 {
     stopScan();
 }
 
+/** @brief 开始BLE设备扫描，清空设备列表并启动定时器 */
 void BleScanner::startScan()
 {
     m_devices.clear();
@@ -54,6 +57,7 @@ void BleScanner::startScan()
     m_discoveryTimer->start();
 }
 
+/** @brief 停止BLE设备扫描，停止扫描定时器和发现定时器 */
 void BleScanner::stopScan()
 {
     if (m_scanTimer->isActive()) {
@@ -64,16 +68,19 @@ void BleScanner::stopScan()
     }
 }
 
+/** @brief 获取已发现的所有BLE设备列表 @return QVariantList，每项包含name/address/rssi字段 */
 QVariantList BleScanner::discoveredDevices() const
 {
     return m_devices;
 }
 
+/** @brief 查询当前是否正在扫描 @return true=扫描进行中 */
 bool BleScanner::isScanning() const
 {
     return m_scanTimer->isActive();
 }
 
+/** @brief 扫描超时回调，停止发现定时器并发射scanFinished信号 */
 void BleScanner::onScanTimeout()
 {
     m_discoveryTimer->stop();
@@ -81,6 +88,7 @@ void BleScanner::onScanTimeout()
     emit scanFinished();
 }
 
+/** @brief 模拟发现单个BLE设备，从队列中逐个弹出并发射deviceFound信号 */
 void BleScanner::onSimulateDiscovery()
 {
     if (m_simIndex >= m_simQueue.size()) {
@@ -105,6 +113,7 @@ void BleScanner::onSimulateDiscovery()
     emit deviceFound(device);
 }
 
+/** @brief 生成模拟BLE设备列表，填充名称/地址/RSSI到队列中 */
 void BleScanner::generateSimulatedDevices()
 {
     m_simQueue.clear();
@@ -120,36 +129,32 @@ void BleScanner::generateSimulatedDevices()
     }
 }
 
-/**
- * @brief 获取已完成的扫描次数
- * @return 累计扫描完成计数
- */
+/** @brief 获取已完成的扫描次数 @return 累计扫描完成计数 */
 int BleScanner::scanCount() const
 {
     return m_scanCount;
 }
 
-/**
- * @brief 获取累计发现的设备总数（去重后）
- * @return 不同设备地址的数量
- */
+/** @brief 获取累计发现的设备总数(去重后) @return 不同设备地址的数量 */
 int BleScanner::totalDevicesFound() const
 {
     return m_seenAddresses.size();
 }
 
-/**
- * @brief 清空扫描历史记录
- */
+/** @brief 清空扫描历史记录和已发现设备地址集合 */
 void BleScanner::clearHistory()
 {
     m_scanCount = 0;
     m_seenAddresses.clear();
 }
 
+/** @brief 获取累计启动扫描次数 @return 启动扫描总次数 */
 quint64 BleScanner::totalScanStarts() const { return m_totalScanStarts; }
+
+/** @brief 获取累计发现设备事件次数(不去重) @return 发现设备事件总次数 */
 quint64 BleScanner::totalDiscoveryEvents() const { return m_totalDiscoveryEvents; }
 
+/** @brief 重置所有扫描器统计计数器 */
 void BleScanner::resetScannerStatistics()
 {
     m_totalScanStarts = 0;

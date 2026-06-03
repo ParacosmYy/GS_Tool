@@ -7,35 +7,43 @@
  */
 #include "protocol/modbus/ModbusSlave.h"
 
+/** @brief 构造Modbus从站模拟器 @param parent 父对象 */
 ModbusSlave::ModbusSlave(QObject* parent)
     : QObject(parent)
 {
 }
 
+/** @brief 设置从站地址 @param address 从站地址(1-247) */
 void ModbusSlave::setSlaveAddress(int address) {
     m_slaveAddress = static_cast<quint8>(address);
 }
 
+/** @brief 获取从站地址 @return 当前从站地址 */
 quint8 ModbusSlave::slaveAddress() const {
     return m_slaveAddress;
 }
 
+/** @brief 设置保持寄存器值 @param addr 寄存器地址 @param value 寄存器值 */
 void ModbusSlave::setRegisterValue(int addr, quint16 value) {
     m_registers[addr] = value;
 }
 
+/** @brief 获取保持寄存器值 @param addr 寄存器地址 @return 寄存器值，不存在时返回0 */
 quint16 ModbusSlave::registerValue(int addr) const {
     return m_registers.value(addr, 0);
 }
 
+/** @brief 设置线圈值 @param addr 线圈地址 @param value 线圈状态 */
 void ModbusSlave::setCoilValue(int addr, bool value) {
     m_coils[addr] = value;
 }
 
+/** @brief 获取线圈值 @param addr 线圈地址 @return 线圈状态，不存在时返回false */
 bool ModbusSlave::coilValue(int addr) const {
     return m_coils.value(addr, false);
 }
 
+/** @brief 处理接收到的Modbus请求帧(CRC校验+地址匹配+功能码分派) @param requestData 原始请求帧数据 @return 响应帧数据(含CRC16)，无效请求返回空 */
 QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
     // 最小帧长度: slave(1)+func(1)+CRC(2) = 4字节
     if (requestData.size() < 4) {
@@ -102,6 +110,7 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
     return responsePayload;
 }
 
+/** @brief 构建FC03/FC04读寄存器响应(大端序数据) @param req 请求帧 @return 响应帧(不含CRC) */
 QByteArray ModbusSlave::buildReadRegistersResponse(const ModbusFrame& req) {
     /* 防御: quantity上限检查(Modbus最大125个寄存器) */
     if (req.quantity < 1 || req.quantity > 125) {
@@ -125,6 +134,7 @@ QByteArray ModbusSlave::buildReadRegistersResponse(const ModbusFrame& req) {
     return response;
 }
 
+/** @brief 构建FC01/FC02读线圈响应(每8线圈打包为1字节) @param req 请求帧 @return 响应帧(不含CRC) */
 QByteArray ModbusSlave::buildReadCoilsResponse(const ModbusFrame& req) {
     /* 防御: quantity上限检查(Modbus最大2000个线圈) */
     if (req.quantity < 1 || req.quantity > 2000) {
@@ -153,6 +163,7 @@ QByteArray ModbusSlave::buildReadCoilsResponse(const ModbusFrame& req) {
     return response;
 }
 
+/** @brief 构建FC05写单线圈响应(写入+回显请求) @param req 请求帧 @return 响应帧(不含CRC) */
 QByteArray ModbusSlave::buildWriteSingleCoilResponse(const ModbusFrame& req) {
     // FC05: 写入线圈值并回显请求
     if (req.data.size() >= 2) {
@@ -171,6 +182,7 @@ QByteArray ModbusSlave::buildWriteSingleCoilResponse(const ModbusFrame& req) {
     return response;
 }
 
+/** @brief 构建FC06写单寄存器响应(写入+回显请求) @param req 请求帧 @return 响应帧(不含CRC) */
 QByteArray ModbusSlave::buildWriteSingleRegisterResponse(const ModbusFrame& req) {
     // FC06: 写入寄存器值并回显请求
     if (req.data.size() >= 2) {
@@ -189,6 +201,7 @@ QByteArray ModbusSlave::buildWriteSingleRegisterResponse(const ModbusFrame& req)
     return response;
 }
 
+/** @brief 构建FC15写多线圈响应(解析线圈数据+写入+回显起始地址和数量) @param req 请求帧 @return 响应帧(不含CRC) */
 QByteArray ModbusSlave::buildWriteMultipleCoilsResponse(const ModbusFrame& req) {
     // FC15: 解析线圈数据并写入
     if (req.data.size() < 1) {
@@ -216,6 +229,7 @@ QByteArray ModbusSlave::buildWriteMultipleCoilsResponse(const ModbusFrame& req) 
     return response;
 }
 
+/** @brief 构建FC16写多寄存器响应(解析寄存器数据+写入+回显起始地址和数量) @param req 请求帧 @return 响应帧(不含CRC) */
 QByteArray ModbusSlave::buildWriteMultipleRegistersResponse(const ModbusFrame& req) {
     // FC16: 解析寄存器数据并写入
     if (req.data.size() < 1) {
@@ -251,6 +265,7 @@ QByteArray ModbusSlave::buildWriteMultipleRegistersResponse(const ModbusFrame& r
     return response;
 }
 
+/** @brief 构建Modbus异常响应(功能码最高位置1+异常码) @param req 请求帧 @param err 异常码 @return 异常响应帧(不含CRC) */
 QByteArray ModbusSlave::buildExceptionResponse(const ModbusFrame& req,
                                                 ModbusError err) {
     QByteArray response;
@@ -261,37 +276,30 @@ QByteArray ModbusSlave::buildExceptionResponse(const ModbusFrame& req,
     return response;
 }
 
+/** @brief 计算CRC16校验值(委托全局crc16函数) @param data 待校验数据 @return CRC16校验值 */
 quint16 ModbusSlave::calculateCrc16(const QByteArray& data) const {
     return crc16(data);
 }
 
-/**
- * @brief 获取已处理请求总数
- */
+/** @brief 获取已处理请求总数 @return 请求数 */
 quint64 ModbusSlave::requestCount() const
 {
     return m_requestCount;
 }
 
-/**
- * @brief 获取异常响应计数
- */
+/** @brief 获取异常响应计数 @return 异常数 */
 quint64 ModbusSlave::exceptionCount() const
 {
     return m_exceptionCount;
 }
 
-/**
- * @brief 获取各功能码调用次数统计
- */
+/** @brief 获取各功能码调用次数统计 @return 功能码→调用次数映射 */
 QMap<int, int> ModbusSlave::functionCodeStats() const
 {
     return m_fcStats;
 }
 
-/**
- * @brief 重置统计数据
- */
+/** @brief 重置所有统计计数器(请求数/异常数/功能码统计) */
 void ModbusSlave::resetStatistics()
 {
     m_requestCount = 0;

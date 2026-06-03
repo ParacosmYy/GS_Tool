@@ -179,18 +179,7 @@ bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
     return true;
 }
 
-/**
- * @brief 流式导出JSON格式(结构化数组) - 分批构建JSON数组，适合大数据量场景
- *
- * 与exportJson输出格式相同，但通过LineProvider分批拉取数据，
- * 避免一次性将所有行加载到内存中。
- *
- * @param path 输出文件路径
- * @param provider 行数据回调
- * @param totalLines 数据总行数
- * @param batchSize 每批行数
- * @return true 成功，false 失败
- */
+/** @brief 流式导出JSON格式(分批构建JSON数组，适合大数据量场景) @param path 输出文件路径 @param provider 行数据回调 @param totalLines 数据总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamedJson(const QString& path, LineProvider provider,
                                        int totalLines, int batchSize)
 {

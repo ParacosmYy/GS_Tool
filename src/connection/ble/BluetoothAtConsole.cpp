@@ -30,6 +30,7 @@ static const QVector<QPair<QString, QString>> PRESET_COMMANDS = {
     { "AT+RESET",           "AT+RESET" },
 };
 
+/** @brief 构造AT控制台，初始化输出区/输入栏/预设指令面板UI @param parent 父控件 */
 BluetoothAtConsole::BluetoothAtConsole(QWidget* parent)
     : QWidget(parent)
     , m_cmdInput(new QLineEdit(this))
@@ -104,6 +105,7 @@ BluetoothAtConsole::BluetoothAtConsole(QWidget* parent)
             this, &BluetoothAtConsole::onSendClicked);
 }
 
+/** @brief 通过连接发送AT指令并显示在输出区 @param command AT指令字符串(如AT+VERSION) */
 void BluetoothAtConsole::sendCommand(const QString& command)
 {
     if (!m_connection) {
@@ -123,6 +125,7 @@ void BluetoothAtConsole::sendCommand(const QString& command)
     ++m_totalCommandsSent;
 }
 
+/** @brief 绑定IConnection连接实例，连接dataReceived信号用于显示响应 @param connection IConnection连接对象 */
 void BluetoothAtConsole::setConnection(IConnection* connection)
 {
     // 断开旧连接的信号
@@ -142,6 +145,7 @@ void BluetoothAtConsole::setConnection(IConnection* connection)
     }
 }
 
+/** @brief 发送按钮点击处理，读取输入框文本并发送AT指令 */
 void BluetoothAtConsole::onSendClicked()
 {
     const QString cmd = m_cmdInput->text().trimmed();
@@ -151,12 +155,7 @@ void BluetoothAtConsole::onSendClicked()
     }
 }
 
-/**
- * @brief 预设指令按钮点击的统一处理槽
- *
- * 从sender()获取触发按钮，提取关联的AT指令并发送。
- * 同时支持从构造函数中的lambda直接调用sendCommand的兼容路径。
- */
+/** @brief 预设指令按钮点击统一处理槽，从sender()提取AT指令并发送 */
 void BluetoothAtConsole::onPresetClicked()
 {
     auto* btn = qobject_cast<QPushButton*>(sender());

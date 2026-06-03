@@ -13,14 +13,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-/**
- * @brief 构造函数
- *
- * 创建 TriggerEngine 和 TriggerAction 实例并建立信号连接:
- *   engine::actionRequired → action::execute
- *
- * @param parent 父对象
- */
+/** @brief 构造函数，创建引擎和动作执行器并建立信号连接 @param parent 父对象 */
 TriggerManager::TriggerManager(QObject* parent)
     : QObject(parent)
     , m_engine(new TriggerEngine(this))
@@ -45,15 +38,7 @@ TriggerManager::~TriggerManager()
     // QObject 父子树自动销毁 m_engine 和 m_action
 }
 
-/**
- * @brief 从文件加载规则
- *
- * 读取 JSON 文件，解析为规则列表，同步到引擎。
- * JSON 格式为包含 TriggerRuleConfig 对象的数组。
- *
- * @param filePath JSON 文件路径
- * @return true 加载成功，false 加载失败
- */
+/** @brief 从JSON文件加载规则并同步到引擎 @param filePath JSON文件路径 @return true=加载成功，false=加载失败 */
 bool TriggerManager::loadRules(const QString& filePath)
 {
     QFile file(filePath);
@@ -89,14 +74,7 @@ bool TriggerManager::loadRules(const QString& filePath)
     return true;
 }
 
-/**
- * @brief 保存规则到文件
- *
- * 将当前引擎中的所有规则序列化为 JSON 数组写入文件。
- *
- * @param filePath JSON 文件路径
- * @return true 保存成功，false 保存失败
- */
+/** @brief 将当前所有规则序列化为JSON写入文件 @param filePath JSON文件路径 @return true=保存成功，false=保存失败 */
 bool TriggerManager::saveRules(const QString& filePath)
 {
     QJsonArray arr;

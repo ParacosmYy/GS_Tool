@@ -27,14 +27,7 @@ TriggerListPanel::TriggerListPanel(QWidget* parent)
     setupUI();
 }
 
-/**
- * @brief 设置要显示的规则列表
- *
- * 清空列表控件，将每条规则添加为列表项。
- * 显示格式: "[启用/禁用] 规则名称 - 匹配模式"
- *
- * @param rules 规则配置列表
- */
+/** @brief 设置要显示的规则列表，清空后逐条添加为列表项 @param rules 规则配置列表 */
 void TriggerListPanel::setRules(const QList<TriggerRuleConfig>& rules)
 {
     m_ruleList->clear();
@@ -70,17 +63,7 @@ void TriggerListPanel::updateRuleCount(int total, int enabled)
     m_countLabel->setText(tr("规则: %1/%2 启用").arg(enabled).arg(total));
 }
 
-/**
- * @brief 初始化 UI 布局和控件
- *
- * 布局结构:
- *   - 上方: QListWidget 显示规则列表
- *   - 下方: 水平排列的添加/移除按钮
- *
- * 信号连接:
- *   - addBtn → addRuleRequested()
- *   - removeBtn → removeRuleRequested(currentRow)
- */
+/** @brief 初始化UI布局(规则列表+计数标签+按钮栏)并连接信号 */
 void TriggerListPanel::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);

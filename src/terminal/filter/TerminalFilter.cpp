@@ -8,20 +8,14 @@
 #include "terminal/filter/TerminalFilter.h"
 #include "core/theme/ThemeManager.h"
 
-/**
- * @brief 构造函数，初始化默认正则（大小写不敏感）
- */
+/** @brief 构造函数，初始化默认正则(大小写不敏感) @param parent 父对象 */
 TerminalFilter::TerminalFilter(QObject *parent)
     : QObject(parent)
     , m_caseSensitive(false)
 {
 }
 
-/**
- * @brief 设置正则表达式模式
- * @param pattern 正则表达式字符串
- * @return 模式是否有效
- */
+/** @brief 设置正则表达式模式并编译 @param pattern 正则表达式字符串 @return true=模式有效，false=编译失败 */
 bool TerminalFilter::setPattern(const QString &pattern)
 {
     m_pattern = pattern;
@@ -41,9 +35,7 @@ bool TerminalFilter::setPattern(const QString &pattern)
     return true;
 }
 
-/**
- * @brief 对文本执行正则匹配
- */
+/** @brief 对文本执行正则匹配 @param text 待匹配文本 @return true=匹配成功 */
 bool TerminalFilter::match(const QString &text) const
 {
     if (!m_regex.isValid()) {
@@ -57,9 +49,7 @@ bool TerminalFilter::match(const QString &text) const
     return result;
 }
 
-/**
- * @brief 提取捕获组内容
- */
+/** @brief 提取捕获组内容 @param text 待提取文本 @return 捕获组字符串列表 */
 QStringList TerminalFilter::captureGroups(const QString &text) const
 {
     if (!m_regex.isValid()) {
@@ -76,9 +66,7 @@ QStringList TerminalFilter::captureGroups(const QString &text) const
     return result;
 }
 
-/**
- * @brief 设置大小写敏感并重新编译正则
- */
+/** @brief 设置大小写敏感并重新编译正则 @param sensitive true=区分大小写 */
 void TerminalFilter::setCaseSensitive(bool sensitive)
 {
     m_caseSensitive = sensitive;
@@ -88,33 +76,25 @@ void TerminalFilter::setCaseSensitive(bool sensitive)
     }
 }
 
-/**
- * @brief 返回高亮颜色名称
- */
+/** @brief 返回高亮颜色名称 @return 颜色HEX字符串 */
 QString TerminalFilter::highlightColor() const
 {
     return ThemeManager::instance().color(ThemeManager::SemanticColor::TermSearchHighlight).name();
 }
 
-/**
- * @brief 获取匹配次数
- */
+/** @brief 获取累计匹配次数 @return 匹配总次数 */
 quint64 TerminalFilter::matchCount() const
 {
     return m_matchCount;
 }
 
-/**
- * @brief 获取最近一次匹配的文本
- */
+/** @brief 获取最近一次匹配的文本 @return 最后匹配的文本 */
 QString TerminalFilter::lastMatchText() const
 {
     return m_lastMatch;
 }
 
-/**
- * @brief 重置匹配统计
- */
+/** @brief 重置匹配统计计数器为零 */
 void TerminalFilter::resetStatistics()
 {
     m_matchCount = 0;

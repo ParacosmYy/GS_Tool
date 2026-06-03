@@ -19,37 +19,69 @@
 
 ---
 
-## 二、分层架构
+## 二、统一依赖矩阵
+
+### 2.1 分层定义
+
+> 下面的分层是本项目的唯一架构口径。`shared/` 不是“未来规划项”，而是正式的公共基础层；当前仓库仍在使用 `core/theme/Constants.h` 作为兼容伞头，但它只允许承接旧入口，不允许继续扩张。
+
+| 层级 | 目录 | 职责边界 | 允许依赖 |
+|------|------|----------|---------|
+| L0 | `src/interfaces/` | 纯虚接口和契约，不承载业务实现 | 无 |
+| L1 | `src/shared/` | 跨模块共享常量、枚举、轻量类型别名、无状态工具 | 仅 Qt 基础类型 |
+| L2 | `src/utils/` | 通用算法、编解码、导出、日志、缓存等基础能力 | L1, L0 |
+| L3 | `src/connection/`、`src/protocol/`、`src/serial/` | 外设接入、协议解析、串口相关功能 | L2, L1, L0 |
+| L4 | `src/terminal/`、`src/chart/`、`src/rtt/` | 终端显示、图表展示、RTT 接入等面向数据呈现的模块 | L3, L2, L1, L0 |
+| L5 | `src/ota/`、`src/automation/`、`src/dashboard/`、`src/plugin/` | 面向场景的业务编排、扩展和自动化 | L4, L3, L2, L1, L0 |
+| L6 | `src/core/` | 应用协调、基础 UI、面板编排、导航、会话、主题运行时 | 可依赖全部下层，不得被下层依赖 |
+
+### 2.2 依赖矩阵
 
 ```
-┌─────────────────────────────────┐
-│        表现层 (Presentation)     │  QWidget / QPainter
-│  MainWindow, ConfigPanel, View  │  只做UI展示，不含业务逻辑
-├─────────────────────────────────┤
-│        业务层 (Business)        │  QObject
-│  ConnectionMgr, OtaManager,    │  业务逻辑编排，协调各模块
-│  ProtocolEngine, ChartManager  │
-├─────────────────────────────────┤
-│        数据层 (Data)            │  QObject / 纯C++
-│  TerminalModel, FrameParser,   │  数据模型、解析、计算
-│  CRC, RingBuffer, DataLogger   │
-├─────────────────────────────────┤
-│        基础设施层 (Infra)       │  纯C++ / Qt底层封装
-│  IConnection, SerialConnection │  硬件/OS抽象、IO操作
-│  JLinkBridge, SettingsManager │
-└─────────────────────────────────┘
+L6 core/        →  L5 / L4 / L3 / L2 / L1 / L0
+L5 ota...       →  L4 / L3 / L2 / L1 / L0
+L4 terminal...  →  L3 / L2 / L1 / L0
+L3 connection.. →  L2 / L1 / L0
+L2 utils/       →  L1 / L0
+L1 shared/      →  仅 Qt 基础类型
+L0 interfaces/  →  无
 ```
 
-### 依赖规则（单向，不可反向）
+### 2.3 依赖规则
 
-```
-表现层 → 业务层 → 数据层 → 基础设施层
-```
+- 依赖方向只能自下而上，禁止反向 include。
+- 同层模块之间禁止横向 include，必须通过接口、事件总线或下沉到 shared/ 的纯数据定义解耦。
+- 除 `core/` 外，任何模块都不得跳过中间层直接依赖高层实现。
+- `shared/` 只放“跨模块稳定事实”，不放 UI 逻辑、不放业务编排、不放可变状态。
+- `core/theme/Constants.h` 只做过渡伞头，新增常量必须写入 `shared/` 的正式入口，不能继续堆在伞头里。
 
-- 表现层可以依赖业务层和数据层
-- 业务层可以依赖数据层和基础设施层
-- **基础设施层不能依赖任何上层**
-- **数据层不能依赖表现层**
+### 2.4 唯一真相路径
+
+| 主题 | 唯一真相路径 | 备注 |
+|------|--------------|------|
+| 共享常量与枚举 | `src/shared/` | 新增跨模块常量、枚举、轻量值类型优先落这里 |
+| 旧常量伞头 | `src/core/theme/Constants.h` | 仅兼容旧 include，不再新增域定义 |
+| 应用协调入口 | `src/core/mainwindow/MainWindow.*` | 顶层窗口组装与生命周期协调 |
+| 面板编排 | `src/core/panels/PanelManager.*` | 面板创建、注册、包装、映射、切换统计 |
+| 基础 UI 组件 | `src/core/widgets/` | BasePanel、EmptyStateWidget、LoadingSpinner 等复用壳层 |
+| 导航与切换 | `src/core/navigation/` | 导航树、指示器、切换动画、路由控制 |
+| 主题运行时 | `src/core/theme/ThemeManager.*` | 主题切换、QSS 加载、运行时主题状态 |
+
+### 2.5 核心收敛原则
+
+- `core/` 的定位是“应用协调 + 基础 UI”，不是功能桶。
+- 新功能如果属于外设接入、协议、终端、图表、自动化，优先归回各自模块，不要再塞进 `core/`。
+- `PanelManager` 和 `MainWindow` 只能做编排，不能回流业务计算、解析、IO、缓存和协议分发逻辑。
+- 任何新公共能力先判断是否属于 `shared/`，只有真正需要运行时行为的内容才进入 `core/`。
+
+### 2.6 中心化风险与整改阶段
+
+| 风险点 | 当前表现 | 整改建议 |
+|--------|----------|----------|
+| `MainWindow` 过载 | 仍持有较多控制器、面板、布局和信号路由入口 | Phase 1 先冻结新增职责，新增交互优先下沉到独立 Controller/Manager |
+| `PanelManager` 过载 | 集中创建大量面板，容易演变成“面板总桶” | Phase 2 把面板创建、包装、注册拆成更细的 Provider/Factory 边界，避免继续膨胀 |
+| `core/theme/Constants.h` 伞头化 | 旧常量入口承接过多 include，掩盖真实依赖 | Phase 3 迁移新常量到 `shared/`，仅保留向后兼容的转发头 |
+| `core/` 职责回流 | 新特性容易以“先放 core/ 里再说”的方式进入主线 | Phase 4 以模块归属表做准入检查，非协调类逻辑不得进入 `core/` |
 
 ---
 
@@ -62,13 +94,12 @@
 ```
 允许的依赖方向（自上而下）:
 Layer 0: interfaces/    — 零出站依赖，纯虚接口
-Layer 1: shared/        — 仅依赖 interfaces/，常量+枚举
-Layer 2: utils/         — 依赖 shared/
-Layer 3: serial/, protocol/  — 依赖 utils, shared, interfaces
-Layer 4: connection/, terminal/, chart/, rtt/  — 依赖 Layer 3 + shared + interfaces
-Layer 5: ota/, automation/, dashboard/  — 依赖 Layer 4 + shared + interfaces
-Layer 6: plugin/        — 仅依赖 interfaces/ + shared/
-Layer 7: core/          — 依赖所有模块（但仅通过 interfaces/ 指针）
+Layer 1: shared/        — 仅依赖 Qt 基础类型，常量+枚举
+Layer 2: utils/         — 依赖 shared/、interfaces/
+Layer 3: connection/, protocol/, serial/  — 依赖 utils/shared/interfaces
+Layer 4: terminal/, chart/, rtt/  — 依赖 Layer 3 + shared + interfaces
+Layer 5: ota/, automation/, dashboard/, plugin/  — 依赖 Layer 4 + shared + interfaces
+Layer 6: core/          — 依赖所有下层，但不得被下层依赖
 ```
 
 ### 禁止规则
@@ -77,7 +108,7 @@ Layer 7: core/          — 依赖所有模块（但仅通过 interfaces/ 指针
 |------|------|------|
 | **禁止反向依赖** | 低层模块不得 `#include` 高层模块头文件 | `utils/` 不能 include `core/` |
 | **禁止同层横向依赖** | 同层模块之间不得直接 include | `chart/` 不能直接 include `terminal/` |
-| **禁止跨层依赖** | 除 core 外，不得跳层 include | `ota/` 不能直接 include `utils/`（应通过 shared） |
+| **禁止跨层依赖** | 除 core 外，不得跳层 include | `ota/` 不能直接 include `core/` |
 | **唯一例外: core/** | core/ 可直接依赖所有模块，但推荐通过接口指针 | `core/` 可 include `connection/IConnection.h` |
 
 ### 违规检测
@@ -91,13 +122,13 @@ Layer 7: core/          — 依赖所有模块（但仅通过 interfaces/ 指针
 
 ## 三-B、接口契约
 
-> 规划中的纯虚接口，定义在 `src/interfaces/`。详见 `docs/architecture/DECOUPLING_PROPOSAL.md`。
+> 纯虚接口定义在 `src/interfaces/`。详见 `docs/architecture/DECOUPLING_PROPOSAL.md`。
 
 ### IConnection — 连接抽象
 
 | 项 | 说明 |
 |-----|------|
-| **用途** | 统一13种连接方式（串口/TCP/UDP/BLE/CAN/MQTT/WebSocket等）的操作接口 |
+| **用途** | 统一多种连接方式（串口/TCP/UDP/BLE/CAN/MQTT/WebSocket等）的操作接口 |
 | **实现模块** | `connection/` 下各具体连接类（SerialConnection, TcpConnection等） |
 | **消费模块** | `core/`（ConnectionController）, `ota/`, `rtt/` |
 
@@ -191,7 +222,7 @@ public:
 
 ## 三-C、解耦指南
 
-> 完整方案详见 `docs/architecture/DECOUPLING_PROPOSAL.md`（待创建）。
+> 完整方案详见 `docs/architecture/DECOUPLING_PROPOSAL.md`。
 
 ### 解耦检查清单
 
@@ -199,7 +230,7 @@ public:
 
 - [ ] **模块间通信通过接口指针** — 不直接 include 具体实现类的头文件
 - [ ] **模块注册通过自注册模式** — 使用 IPanelProvider 等接口自动注册，不在 core/ 硬编码
-- [ ] **常量从 shared/ 引入** — 颜色/布局/字体等常量统一由 shared/ 域头文件提供
+- [ ] **常量从 shared/ 引入** — 跨模块常量、枚举和轻量类型统一由 shared/ 域头文件提供
 - [ ] **跨模块事件通过事件总线** — 不直接 connect 不同模块的信号，通过中间事件总线路由
 
 ### 解耦优先级
@@ -207,7 +238,7 @@ public:
 | 阶段 | 目标 | 涉及模块 |
 |------|------|---------|
 | Phase 1 | 抽取 interfaces/ 纯虚接口 | IConnection, IProtocolParser, IDataSink |
-| Phase 2 | 抽取 shared/ 常量+枚举 | ColorConstants, LayoutConstants 等6个域头文件 |
+| Phase 2 | 落地 shared/ 常量+枚举 | AppConstants, AnimationConstants, LayoutConstants, ConnectionConstants, TimerConstants |
 | Phase 3 | 模块自注册机制 | IPanelProvider, 插件式面板加载 |
 | Phase 4 | 事件总线 | 跨模块数据分发，替代直接信号连接 |
 
@@ -274,16 +305,16 @@ public:
 | `IconNavBar` | `core/widgets/IconNavBar.h/cpp` | 图标导航栏（三栏布局左侧） |
 | `IconManager` | `core/widgets/IconManager.h/cpp` | SVG图标管理器（Lucide集 + 着色管线） |
 
-### 常量域头文件（新增，规划迁移至 shared/）
+### 常量域头文件（正式层：shared/，过渡兼容：core/theme/Constants.h）
 
 | 组件 | 文件 | 用途 |
 |------|------|------|
-| `ColorConstants` | `core/theme/Constants.h` 内分区 | 颜色常量（主题色/语义色/状态色） |
-| `LayoutConstants` | `core/theme/Constants.h` 内分区 | 布局常量（间距/圆角/边距） |
-| `FontConstants` | `core/theme/Constants.h` 内分区 | 字体常量（字号/字重/行高） |
-| `AnimationConstants` | `core/theme/Constants.h` 内分区 | 动画常量（时长/曲线/延迟） |
-| `IconConstants` | `core/theme/Constants.h` 内分区 | 图标常量（尺寸/默认色/名称映射） |
-| `ComponentConstants` | `core/theme/Constants.h` 内分区 | 组件常量（控件尺寸/阈值/限制） |
+| `AppConstants` | `shared/AppConstants.h` | 应用级枚举和全局常量 |
+| `AnimationConstants` | `shared/AnimationConstants.h` | 动画时长、曲线、延迟 |
+| `LayoutConstants` | `shared/LayoutConstants.h` | 间距、圆角、边距、布局阈值 |
+| `ConnectionConstants` | `shared/ConnectionConstants.h` | 连接状态、协议相关常量 |
+| `TimerConstants` | `shared/TimerConstants.h` | 定时器间隔、轮询周期、节流阈值 |
+| `core/theme/Constants.h` | 兼容伞头 | 仅转发以上域头文件，不再新增常量定义 |
 
 **规则**: 任何新功能需要上述能力时，直接复用，不得重写。新增公共组件必须在此清单中登记。
 

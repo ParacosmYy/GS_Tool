@@ -11,264 +11,160 @@
 | 库名 | Lucide Icons |
 | 地址 | https://lucide.dev/ |
 | 许可 | MIT License |
-| 风格 | 线条风格(Line icons), 1.5px 描边 |
-| 格式 | SVG (矢量, 支持任意缩放和着色) |
+| 风格 | 线条风格（Line icons），统一描边风格 |
+| 格式 | SVG |
 
-选型理由:
-- MIT许可, 无法律风险
-- 线条风格与 EmbedDebug 极简暗色UI一致
-- 图标数量 1000+, 覆盖常见场景
-- SVG 格式支持 `currentColor` 运行时着色
-- 社区活跃, 持续更新
+### 选型原则
 
----
-
-## 二、资源路径
-
-- 图标文件存放: `resources/icons/lucide/<name>.svg`
-- 示例:
-  - `resources/icons/lucide/cable.svg` (串口连接)
-  - `resources/icons/lucide/bluetooth.svg` (BLE连接)
-  - `resources/icons/lucide/terminal.svg` (终端)
-- 资源注册: `resources/app.qrc` 中统一注册
-- 命名: kebab-case, 与 Lucide 原始文件名一致
+- 选型必须优先考虑可维护性和统一风格，不追求一次性覆盖所有稀有图标。
+- 优先使用社区成熟、许可证清晰、可批量管理的图标库。
+- 不允许为某个单点需求随意混用多个风格完全不同的图标库。
 
 ---
 
-## 三、图标尺寸规范
+## 二、资源路径与注册
 
-| 用途 | 尺寸(px) | 颜色 | 说明 |
-|------|----------|------|------|
-| 导航树节点图标 | 16 | TextSecondary | 树节点前的连接类型图标 |
-| 面板标题图标 | 16 | TextSecondary | BasePanel 标题栏左侧 |
-| 工具栏按钮 | 20 | TextSecondary | 工具栏各功能按钮 |
-| 空状态图标 | 48 | TextMuted (60%) | EmptyStateWidget 中心图标 |
-| 命令面板图标 | 16 | TextSecondary | CommandPalette 列表项 |
-| Tab标签图标 | 16 | TextSecondary | 标签页图标 |
+- 图标文件统一存放在 `resources/icons/lucide/<name>.svg`。
+- 资源必须通过 `resources/app.qrc` 注册后再供代码使用。
+- 项目代码中只引用图标逻辑名，不直接散写磁盘路径。
 
----
+### 路径规则
 
-## 四、IconManager API
-
-```cpp
-/**
- * @brief 图标管理器, 负责图标加载、缓存和着色
- *
- * 单例, 通过 ThemeManager 感知主题变化。
- * 主题切换时自动清空缓存并重新着色。
- */
-class IconManager : public QObject {
-    Q_OBJECT
-public:
-    static IconManager& instance();
-
-    /**
-     * @brief 获取图标(自动缓存+着色)
-     * @param name Lucide图标名(不含路径和后缀), 如 "cable"
-     * @return 着色后的QIcon
-     */
-    QIcon icon(const QString& name) const;
-
-    /**
-     * @brief 获取指定尺寸的Pixmap
-     * @param name 图标名
-     * @param size 目标尺寸, 默认16
-     * @return 着色后的QPixmap
-     */
-    QPixmap pixmap(const QString& name, int size = 16) const;
-
-    /**
-     * @brief 清空缓存(主题切换时调用)
-     */
-    void clearCache();
-
-private:
-    IconManager(QObject* parent = nullptr);
-    mutable QMap<QString, QIcon> m_cache;  // 图标缓存
-    QString tintSvg(const QString& svgPath, const QColor& color) const;
-};
-```
+- 文件名必须与图标逻辑名一致。
+- 命名采用 kebab-case。
+- 路径层级不要额外加业务前缀，避免后续迁移成本过高。
 
 ---
 
-## 五、着色规则
+## 三、尺寸规范
 
-### 默认着色流程
+图标尺寸必须和用途绑定，而不是靠感觉临时选：
 
-1. SVG 文件中所有 `fill` 和 `stroke` 属性使用 `currentColor`
-2. IconManager 读取当前主题的 `TextSecondary` 色值
-3. 运行时将 SVG 中的 `currentColor` 替换为实际色值
-4. 缓存着色结果, 同一主题下不重复处理
+| 用途 | 默认尺寸(px) | 说明 |
+|------|--------------|------|
+| 导航树节点图标 | 16 | 连接类型、模块入口 |
+| 面板标题图标 | 16 | BasePanel 标题栏 |
+| 工具栏按钮 | 20 | 常用操作按钮 |
+| 命令面板列表项 | 16 | CommandPalette 结果项 |
+| Tab 标签图标 | 16 | 标签页入口 |
+| 空状态图标 | 48 | EmptyStateWidget 中心视觉 |
 
-### 状态着色
+### 使用规则
 
-| 状态 | 颜色 | 说明 |
-|------|------|------|
-| 默认 | TextSecondary | IconManager 默认着色 |
-| 选中/激活 | Accent | 导航树选中项、激活Tab |
-| 悬停 | TextPrimary | 工具栏按钮hover |
-| 禁用 | TextMuted (opacity 40%) | 按钮不可用时 |
-| 错误 | Error | 连接断开指示 |
-| 成功 | Success | 连接成功指示 |
-| 警告 | Warning | 警告状态指示 |
+- 同一组件族尽量保持固定尺寸，不要在同一页面里一会儿 16px 一会儿 18px。
+- 若需要非默认尺寸，必须说明用途，例如“用于空状态强调”或“用于工具栏主操作”。
 
 ---
 
-## 六、图标子集注册表
+## 四、命名规则
 
-EmbedDebug 使用的 Lucide 图标子集(~50个):
+- 图标逻辑名统一使用 kebab-case。
+- 图标名应尽量语义化，避免过度抽象。
+- 同一概念只保留一个主名字，别名通过代码层适配，不要在资源层制造重复文件。
 
-### 导航 (10个)
+### 命名示例
 
-| 图标名 | 用途 |
-|--------|------|
-| `cable` | 串口连接 |
-| `globe` | TCP/UDP连接 |
-| `bluetooth` | BLE连接 |
-| `radio` | 无线连接(CAN) |
-| `wifi` | MQTT连接 |
-| `cpu` | USB连接 |
-| `circuit-board` | SPI/I2C连接 |
-| `terminal` | 终端 |
-| `layout-dashboard` | 仪表盘 |
-| `plug` | 无连接占位 |
+- `cable`
+- `bluetooth`
+- `terminal`
+- `layout-dashboard`
+- `alert-circle`
 
-### 连接操作 (12个)
+### 命名检查
 
-| 图标名 | 用途 |
-|--------|------|
-| `plug-zap` | 连接中 |
-| `link` | 已连接 |
-| `unlink` | 已断开 |
-| `refresh-cw` | 重连 |
-| `settings-2` | 连接设置 |
-| `scan` | 扫描设备 |
-| `search` | 搜索 |
-| `x` | 关闭/取消 |
-| `check` | 确认/成功 |
-| `alert-circle` | 错误 |
-| `alert-triangle` | 警告 |
-| `info` | 信息提示 |
-
-### 终端 (8个)
-
-| 图标名 | 用途 |
-|--------|------|
-| `terminal-square` | 终端面板 |
-| `trash-2` | 清除终端 |
-| `copy` | 复制 |
-| `clipboard` | 粘贴 |
-| `download` | 导出 |
-| `upload` | 导入 |
-| `filter` | 过滤 |
-| `scroll-text` | 自动滚动 |
-
-### 数据/图表 (8个)
-
-| 图标名 | 用途 |
-|--------|------|
-| `bar-chart-2` | 波形图 |
-| `trending-up` | FFT频谱 |
-| `git-commit` | 数据点 |
-| `book-marked` | 书签 |
-| `hash` | 数据统计 |
-| `table-2` | 数据表格 |
-| `activity` | 实时数据 |
-| `layers` | 多通道 |
-
-### 文件/操作 (8个)
-
-| 图标名 | 用途 |
-|--------|------|
-| `folder-open` | 打开文件 |
-| `save` | 保存 |
-| `file-text` | 文件 |
-| `hard-drive` | 固件文件 |
-| `play` | 开始录制 |
-| `square` | 停止录制 |
-| `circle` | 录制中指示 |
-| `clock` | 时间戳 |
-
-### 动作 (12个)
-
-| 图标名 | 用途 |
-|--------|------|
-| `send` | 发送数据 |
-| `corner-down-left` | 回车发送 |
-| `zap` | 快捷发送 |
-| `repeat` | 定时发送 |
-| `command` | 命令面板 |
-| `maximize-2` | 全屏 |
-| `minimize-2` | 退出全屏 |
-| `chevron-down` | 折叠/展开 |
-| `chevron-right` | 折叠指示 |
-| `palette` | 主题切换 |
-| `moon` | 暗色主题 |
-| `sun` | 亮色主题 |
-
-### 状态 (5个)
-
-| 图标名 | 用途 |
-|--------|------|
-| `loader` | 加载中 |
-| `circle-check` | 成功 |
-| `circle-x` | 失败 |
-| `shield-check` | 安全/校验通过 |
-| `signal` | 信号强度 |
-
-### 布局 (6个)
-
-| 图标名 | 用途 |
-|--------|------|
-| `panel-left` | 左侧面板 |
-| `panel-right` | 右侧面板 |
-| `panel-bottom` | 底部面板 |
-| `columns-2` | 双栏布局 |
-| `rows-2` | 双行布局 |
-| `sidebar` | 侧边栏 |
-
-### 特殊 (9个)
-
-| 图标名 | 用途 |
-|--------|------|
-| `bluetooth-searching` | BLE扫描中 |
-| `radio-tower` | 无线信号 |
-| `puzzle` | 插件 |
-| `code-2` | 协议编辑 |
-| `binary` | 二进制数据 |
-| `arrow-up-down` | 上下行指示 |
-| `package` | OTA固件包 |
-| `key` | 加密/密钥 |
-| `inbox` | 空数据状态 |
+- 名字要能让 review 人员直接猜到用途。
+- 如果命名含义模糊，优先重命名而不是继续堆注释。
 
 ---
 
-## 七、新增图标规则
+## 五、IconManager 责任边界
 
-添加新图标到项目中时, 必须遵循以下步骤:
+`IconManager` 负责三件事：
 
-1. **从 Lucide 图标库选取**, 不自行绘制
-   - 访问 https://lucide.dev/icons/ 搜索图标
-   - 确认图标名和风格符合项目需求
+1. 从资源中加载 SVG。
+2. 按当前主题着色。
+3. 缓存已经生成的 `QIcon` / `QPixmap`。
 
-2. **在本文档子集注册表中登记**
-   - 按分类添加到§六的对应表格中
-   - 注明用途说明
+### 5.1 接口要求
 
-3. **放置 SVG 文件**
-   - 下载原始SVG放入 `resources/icons/lucide/<name>.svg`
-   - 确认 SVG 内容使用 `currentColor` 作为填充色
+- 图标获取必须有统一入口，禁止在业务代码里各自解析 SVG。
+- 主题切换时必须清空或重建相关缓存。
+- 缓存 key 必须包含图标名、尺寸和颜色语义，避免串色。
 
-4. **注册到 Qt 资源文件**
-   - 在 `resources/app.qrc` 中添加 `<file>icons/lucide/<name>.svg</file>`
+### 5.2 责任边界
 
-5. **代码中使用**
-   ```cpp
-   // 通过 IconManager 获取图标
-   QIcon cableIcon = IconManager::instance().icon("cable");
-   button->setIcon(cableIcon);
-   ```
+- `IconManager` 只负责图标，不负责布局、不负责按钮样式、不负责业务状态推断。
+- 图标的“什么时候用什么状态”属于业务层或 UI 层，不属于图标加载层。
 
-6. **三主题验证**
-   - 确认图标在暗色/浅色/终端风三套主题下均正确着色
-   - 主题切换后图标颜色自动更新
+---
+
+## 六、着色规则
+
+### 6.1 默认规则
+
+1. SVG 内部应使用可继承的着色方式，优先支持 `currentColor`。
+2. 默认图标颜色从主题的 `TextSecondary` 或等价 token 获取。
+3. 选中、激活、成功、警告、错误等状态颜色由调用方指定语义色。
+4. 禁用态应降低对比度，并与正常态有清晰区分。
+
+### 6.2 颜色语义
+
+| 状态 | 默认颜色语义 | 说明 |
+|------|--------------|------|
+| 默认 | `TextSecondary` | 普通图标 |
+| 选中 / 激活 | `Accent` | 当前焦点、活动入口 |
+| 悬停 | `TextPrimary` | 强化可交互感 |
+| 禁用 | `TextMuted` | 降低优先级 |
+| 错误 | `Error` | 断开、失败、异常 |
+| 成功 | `Success` | 成功、连接正常 |
+| 警告 | `Warning` | 风险、注意事项 |
+
+### 6.3 检查规则
+
+- 图标颜色必须与状态语义一致，不能为了“好看”乱换。
+- 主题切换后，图标必须能跟着重新着色。
+- 不允许把某个颜色直接写死在单个 SVG 使用点上而绕开统一管理。
+
+---
+
+## 七、SVG 资源规范
+
+### 7.1 文件要求
+
+- SVG 源文件应尽量保持可编辑、可替换。
+- 不要把复杂位图嵌进 SVG，避免后续放大失真或维护困难。
+- 图标文件应保持轻量，避免因为后处理过重而增加加载成本。
+
+### 7.2 兼容性要求
+
+- 资源应支持不同缩放级别下清晰显示。
+- 主题切换后不应出现明显锯齿、残留颜色或状态串色。
+
+---
+
+## 八、新增图标流程
+
+新增图标时，按下面顺序执行：
+
+1. 从 Lucide 图标库中选取合适图标。
+2. 在本文件中登记图标逻辑名和用途。
+3. 将 SVG 文件放入 `resources/icons/lucide/<name>.svg`。
+4. 在 `resources/app.qrc` 中完成注册。
+5. 通过 `IconManager` 提供统一访问。
+6. 在三套主题下验证颜色和尺寸是否正常。
+
+### 8.1 验收点
+
+- 图标是否真的需要新增，而不是复用已有图标。
+- 命名是否清晰、可搜索、可复用。
+- 尺寸是否符合使用场景。
+- 着色是否遵循当前主题。
+- 是否已经完成资源注册和缓存接入。
+
+---
+
+## 九、维护原则
+
+- 图标规范的重点不是“列出多少个图标”，而是保证图标可持续扩展。
+- 当已有图标可以复用时，优先复用，不要制造新的近义词图标。
+- 当图标需求开始变复杂时，优先考虑是否应当通过状态色、标签文本或布局补充信息，而不是继续增加图标数量。

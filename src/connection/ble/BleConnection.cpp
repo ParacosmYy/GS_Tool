@@ -174,9 +174,7 @@ void BleConnection::initMockServices()
     m_services = MOCK_SERVICES;
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器 */
 void BleConnection::resetStats()
 {
     m_totalWrites = 0;
