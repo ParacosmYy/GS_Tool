@@ -12,7 +12,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QApplication>
 #include <QFileInfo>
 

@@ -157,6 +157,7 @@ set(SOURCES
     src/dashboard/LedIndicatorWidget.cpp
     src/dashboard/NumericDisplayWidget.cpp
     src/dashboard/DashboardModel.cpp
+    src/dashboard/DashboardSerializer.cpp
 
     # ── F6: J-Link RTT ──
     src/rtt/JLinkRttConnection.cpp
@@ -202,6 +203,7 @@ set(SOURCES
     src/connection/can/CanFrameParser.cpp
     src/connection/can/CanBusMonitor.cpp
     src/connection/can/CanConfigPanel.cpp
+    src/protocol/can/DbcParser.cpp
 
     # ── F14: MQTT 客户端 ──
     src/connection/mqtt/MqttConnection.cpp
@@ -397,6 +399,7 @@ set(HEADERS
     src/dashboard/LedIndicatorWidget.h
     src/dashboard/NumericDisplayWidget.h
     src/dashboard/DashboardModel.h
+    src/dashboard/DashboardSerializer.h
 
     # ── F6: J-Link RTT ──
     src/rtt/JLinkRttConnection.h
@@ -445,6 +448,7 @@ set(HEADERS
     src/connection/can/CanFrameParser.h
     src/connection/can/CanBusMonitor.h
     src/connection/can/CanConfigPanel.h
+    src/protocol/can/DbcParser.h
 
     # ── F14: MQTT 客户端 ──
     src/connection/mqtt/MqttConnection.h

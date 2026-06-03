@@ -7,7 +7,6 @@
 #include "utils/log/DataLogger.h"
 #include <QToolBar>
 #include <QFileDialog>
-#include <QMessageBox>
 
 /**
  * @brief 构造录制控制器

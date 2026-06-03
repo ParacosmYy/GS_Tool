@@ -14,7 +14,6 @@
 #include "protocol/editor/FrameVisualEditor.h"
 #include "utils/crypto/HexConverter.h"
 #include <QHeaderView>
-#include <QMessageBox>
 #include <QDebug>
 
 // ---- 静态辅助方法 ----

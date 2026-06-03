@@ -16,7 +16,6 @@
 #include <QGroupBox>
 #include <QCheckBox>
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QStandardPaths>
 
 /**
