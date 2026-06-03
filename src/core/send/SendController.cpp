@@ -4,6 +4,7 @@
  */
 
 #include "core/send/SendController.h"
+#include "core/send/SendHistoryManager.h"
 #include "terminal/model/TerminalModel.h"
 #include "utils/log/DataLogger.h"
 #include "serial/commands/SendHistory.h"
@@ -12,7 +13,6 @@
 #include "utils/crypto/HexConverter.h"
 #include "core/theme/Constants.h"
 #include "core/widgets/AnimatedButton.h"
-#include "core/widgets/SmartAutoComplete.h"
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -20,22 +20,20 @@
 #include <QHBoxLayout>
 #include <QFrame>
 #include <QStyle>
-#include <QKeyEvent>
-#include <QMap>
 
 /**
  * @brief 构造发送控制器
  * @param model 终端数据模型，发送的数据追加到此模型
  * @param logger 数据日志记录器
- * @param history 发送历史管理器
+ * @param history 发送历史存储
  * @param parent 父对象
  */
 SendController::SendController(TerminalModel* model, DataLogger* logger,
-                               SendHistory* history, QObject* parent)
+                                SendHistory* history, QObject* parent)
     : QObject(parent)
     , m_terminalModel(model)
     , m_dataLogger(logger)
-    , m_sendHistory(history)
+    , m_historyManager(new SendHistoryManager(history, this))
     , m_timedSender(new TimedSender(this))
 {
 }
@@ -44,7 +42,7 @@ SendController::SendController(TerminalModel* model, DataLogger* logger,
  * @brief 创建发送输入区域并返回容器 widget
  *
  * 控件布局: [模式切换(文本/HEX)] [换行符选择] [输入框(带自动补全)] [发送按钮]
- * 自动补全数据源为 SendHistory 的最近发送记录
+ * 自动补全委托给 SendHistoryManager 管理
  * @param parent 父 widget
  * @return 发送栏容器 widget
  */
@@ -67,29 +65,8 @@ QWidget* SendController::createSendBar(QWidget* parent)
     m_sendInput->setObjectName("sendInput");
     m_sendInput->setPlaceholderText(tr("输入要发送的数据..."));
 
-    // 发送历史自动补全（复用同一个 QStringListModel，避免每次 new 造成内存泄漏）
-    m_sendCompleterModel = new QStringListModel(m_sendHistory->recentTexts(), this);
-    m_sendCompleter = new QCompleter(m_sendCompleterModel, this);
-    m_sendCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    m_sendCompleter->setCompletionMode(QCompleter::PopupCompletion);
-    m_sendInput->setCompleter(m_sendCompleter);
-
-    // 智能自动补全（频率排序前缀匹配，QCompleter 作为备选保留）
-    m_smartComplete = new SmartAutoComplete(parent);
-    m_smartComplete->setObjectName("smartAutoComplete");
-
-    // 从发送历史聚合构建补全条目（按文本去重，累加频率，保留最近时间戳）
-    QMap<QString, AutoCompleteEntry> agg;
-    for (const auto& e : m_sendHistory->entries()) {
-        auto& item = agg[e.text];
-        item.text = e.text;
-        item.frequency++;
-        const qint64 ts = e.time.toMSecsSinceEpoch();
-        if (ts > item.lastUsed) item.lastUsed = ts;
-    }
-    m_smartComplete->setEntries(agg.values());
-
-    m_sendInput->installEventFilter(this);
+    // 委托 SendHistoryManager 绑定自动补全（QCompleter + SmartAutoComplete + 信号链路）
+    m_historyManager->setupAutoComplete(m_sendInput, parent);
 
     // 发送按钮
     m_sendBtn = new AnimatedButton(tr("发送"));
@@ -113,41 +90,6 @@ QWidget* SendController::createSendBar(QWidget* parent)
     // 发送按钮 / 回车触发发送
     connect(m_sendBtn, &QPushButton::clicked, this, &SendController::onSendData);
     connect(m_sendInput, &QLineEdit::returnPressed, this, &SendController::onSendData);
-
-    // 发送历史变化时更新自动补全数据源
-    connect(m_sendHistory, &SendHistory::historyChanged, this, [this]() {
-        m_sendCompleterModel->setStringList(m_sendHistory->recentTexts());
-        // 同步更新智能补全条目
-        if (m_smartComplete) {
-            QMap<QString, AutoCompleteEntry> agg;
-            for (const auto& e : m_sendHistory->entries()) {
-                auto& item = agg[e.text];
-                item.text = e.text;
-                item.frequency++;
-                const qint64 ts = e.time.toMSecsSinceEpoch();
-                if (ts > item.lastUsed) item.lastUsed = ts;
-            }
-            m_smartComplete->setEntries(agg.values());
-        }
-    });
-
-    // 输入变化 → 触发智能补全
-    connect(m_sendInput, &QLineEdit::textChanged, this, [this](const QString& text) {
-        if (text.isEmpty()) {
-            m_smartComplete->hideComplete();
-            return;
-        }
-        const QPoint pos = m_sendInput->mapToGlobal(QPoint(0, m_sendInput->height()));
-        m_smartComplete->showForPrefix(text, pos);
-    });
-
-    // 用户选择补全项 → 填入输入框
-    connect(m_smartComplete, &SmartAutoComplete::entrySelected, this, [this](const QString& text) {
-        m_smartComplete->hideComplete();
-        m_sendInput->blockSignals(true);
-        m_sendInput->setText(text);
-        m_sendInput->blockSignals(false);
-    });
 
     // 定时发送器的数据通过 sendAndRecord 发出
     connect(m_timedSender, &TimedSender::sendData, this, [this](const QByteArray& data) {
@@ -270,7 +212,7 @@ bool SendController::sendAndRecord(const QByteArray& data)
  *   3. HEX 解析失败时设置输入框错误样式（红色边框）并通过 statusMessage 提示
  *   4. 文本模式下追加换行符（\r\n/\n/\r）
  *   5. 调用 sendAndRecord() 写入数据
- *   6. 成功后记录历史、清空输入框、清除错误状态
+ *   6. 成功后通过 SendHistoryManager 记录历史、清空输入框、清除错误状态
  *
  * HEX 模式支持的格式示例: "AA 55 01 00 FE", "AA,55,01,00,FE", "AA550100FE", "0xAA 0x55"
  */
@@ -312,8 +254,8 @@ void SendController::onSendData()
     }
 
     if (sendAndRecord(data)) {
-        // 发送成功: 记录到历史 → 清空输入框 → 清除错误状态
-        m_sendHistory->addEntry(text, isHex);
+        // 发送成功: 通过历史管理器记录 → 清空输入框 → 清除错误状态
+        m_historyManager->recordHistory(text, isHex);
         m_sendInput->clear();
         m_sendInput->setProperty("hasError", false);
         m_sendInput->style()->unpolish(m_sendInput);
@@ -328,47 +270,4 @@ void SendController::onSendData()
 void SendController::onQuickCommand(const QByteArray& data)
 {
     sendAndRecord(data);
-}
-
-/**
- * @brief 事件过滤器 — 拦截输入框键盘事件用于智能补全导航
- *
- * 按键处理:
- *   Up/Down: 智能补全列表导航(仅当补全可见时)
- *   Enter/Return: 确认选择(仅当有选中项时); 否则传递给 onSendData
- *   Escape: 关闭补全列表
- */
-bool SendController::eventFilter(QObject* watched, QEvent* event)
-{
-    if (watched == m_sendInput && event->type() == QEvent::KeyPress && m_smartComplete) {
-        auto* keyEvent = static_cast<QKeyEvent*>(event);
-        switch (keyEvent->key()) {
-        case Qt::Key_Up:
-        case Qt::Key_Down:
-            if (m_smartComplete->isVisible()) {
-                m_smartComplete->handleKeyEvent(keyEvent);
-                return true;
-            }
-            break;
-        case Qt::Key_Return:
-        case Qt::Key_Enter:
-            if (m_smartComplete->hasSelection()) {
-                m_smartComplete->hideComplete();
-                m_sendInput->blockSignals(true);
-                m_sendInput->setText(m_smartComplete->selectedText());
-                m_sendInput->blockSignals(false);
-                return true;
-            }
-            break;
-        case Qt::Key_Escape:
-            if (m_smartComplete->isVisible()) {
-                m_smartComplete->hideComplete();
-                return true;
-            }
-            break;
-        default:
-            break;
-        }
-    }
-    return QObject::eventFilter(watched, event);
 }

@@ -42,6 +42,7 @@ set(SOURCES
     src/core/navigation/NavigationControllerAnimations.cpp
     src/core/navigation/IconNavBar.cpp
     src/core/send/SendController.cpp
+    src/core/send/SendHistoryManager.cpp
     src/core/settings/SettingsController.cpp
     src/core/toolbar/ToolbarController.cpp
     src/core/terminal/TerminalController.cpp
@@ -282,6 +283,7 @@ set(HEADERS
     src/core/navigation/NavigationController.h
     src/core/navigation/IconNavBar.h
     src/core/send/SendController.h
+    src/core/send/SendHistoryManager.h
     src/core/settings/SettingsController.h
     src/core/toolbar/ToolbarController.h
     src/core/terminal/TerminalController.h
