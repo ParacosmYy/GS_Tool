@@ -46,6 +46,9 @@ set(SOURCES
     src/core/event/EventBus.cpp
     src/core/widgets/AppDialog.cpp
     src/core/widgets/DragDropHelper.cpp
+    src/serial/detector/SerialDetector.cpp
+    src/chart/waterfall/WaterfallWidget.cpp
+    src/chart/heatmap/HeatmapWidget.cpp
     src/core/settings/SettingsController.cpp
     src/core/toolbar/ToolbarController.cpp
     src/core/terminal/TerminalController.cpp
@@ -317,6 +320,9 @@ set(HEADERS
     src/core/widgets/ToastWidget.h
     src/core/widgets/AppDialog.h
     src/core/widgets/DragDropHelper.h
+    src/serial/detector/SerialDetector.h
+    src/chart/waterfall/WaterfallWidget.h
+    src/chart/heatmap/HeatmapWidget.h
     src/core/widgets/CommandPalette.h
     src/core/widgets/ScriptRecorder.h
     src/core/widgets/DataDiffWidget.h
