@@ -111,4 +111,6 @@
 | 120 | feat: MainWindow集成ResponsiveLayout三断点自适应 + ShortcutManager全局快捷键(Ctrl+F/P/Shift+R) + PanelManager紧凑模式 + UsbLibraryLoader getDevice/getDeviceDescriptor扩展 + ChartExporter ChartModel CSV导出 + FrameVisualEditor实时预览刷新 | 120 |
 | 121 | feat: DashboardModel/PluginApi/PluginManager/TriggerAction/ProtocolEngine/OtaManager/ChartModel统计增强+战略文档 | 121 |
 | 122 | refactor(send): 提取SendHistoryManager，SendController.h从199行降至108行+接口层提取+兼容头文件 | 122 |
+| 123 | docs: 评分追踪补全#121-#122 + 目标更新至1000分 | 123 |
+| 124 | feat: PortWatcher/RecordingController/TerminalModel/TerminalSearchManager统计增强 | 124 |
 | ... | 目标: 1000分 | 1000 |
