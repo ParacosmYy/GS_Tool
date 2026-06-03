@@ -76,7 +76,10 @@ public:
     /** @brief 获取定时发送调度次数（每次 start() 调用 +1） */
     quint64 scheduleCount() const;
 
-    /** @brief 重置所有统计计数器（sendCount/totalBytesSent/scheduleCount） */
+    /** @brief 获取定时器触发发送的总次数 */
+    quint64 totalTimedSends() const;
+
+    /** @brief 重置所有统计计数器（sendCount/totalBytesSent/scheduleCount/totalTimedSends） */
     void resetStatistics();
 
 signals:
@@ -106,6 +109,7 @@ private:
     int m_sendCount = 0;            ///< 已发送次数计数（受 m_mutex 保护）
     quint64 m_totalBytesSent = 0;   ///< 累计发送总字节数（受 m_mutex 保护）
     quint64 m_scheduleCount = 0;    ///< 定时发送调度次数（受 m_mutex 保护）
+    quint64 m_totalTimedSends = 0;  ///< 定时器触发发送的总次数（受 m_mutex 保护）
 };
 
 #endif // TIMEDSENDER_H

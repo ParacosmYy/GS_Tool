@@ -151,10 +151,11 @@ void BookmarkWidget::onClearClicked()
     }
 }
 
-/** @brief 处理列表项双击 */
+/** @brief 处理列表项双击 — 累计导航统计 */
 void BookmarkWidget::onItemDoubleClicked(QListWidgetItem* item)
 {
     if (!item) return;
+    ++m_totalBookmarksNavigated;
     const int index = item->data(Qt::UserRole).toInt();
     emit bookmarkDoubleClicked(index);
 }
@@ -178,11 +179,14 @@ quint64 BookmarkWidget::totalBookmarksAdded() const { return m_totalBookmarksAdd
 quint64 BookmarkWidget::totalBookmarksRemoved() const { return m_totalBookmarksRemoved; }
 /** @brief 获取累计刷新次数 @return 刷新总次数 */
 quint64 BookmarkWidget::totalRefreshes() const { return m_totalRefreshes; }
+/** @brief 获取累计导航（双击跳转）次数 @return 导航总次数 */
+quint64 BookmarkWidget::totalBookmarksNavigated() const { return m_totalBookmarksNavigated; }
 
-/** @brief 重置统计计数器(添加/删除/刷新次数归零) */
+/** @brief 重置统计计数器(添加/删除/刷新/导航次数归零) */
 void BookmarkWidget::resetBookmarkStats()
 {
     m_totalBookmarksAdded = 0;
     m_totalBookmarksRemoved = 0;
     m_totalRefreshes = 0;
+    m_totalBookmarksNavigated = 0;
 }

@@ -9,6 +9,7 @@
 #include "dashboard/ProgressBarWidget.h"
 
 #include <QPainter>
+#include "core/theme/ThemeManager.h"
 #include <QtMath>
 
 /**
@@ -99,7 +100,8 @@ void ProgressBarWidget::paintEvent(QPaintEvent *event)
 
     /* --- 1. 背景圆角矩形 --- */
     painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(60, 60, 60));
+    auto& theme = ThemeManager::instance();
+    painter.setBrush(theme.color(ThemeManager::SemanticColor::BgTertiary));
     painter.drawRoundedRect(barRect, barRadius, barRadius);
 
     /* --- 2. 填充区域 --- */
@@ -114,7 +116,7 @@ void ProgressBarWidget::paintEvent(QPaintEvent *event)
     if (fillWidth > 0) {
         QRectF fillRect(barRect.left(), barRect.top(),
                         fillWidth, barRect.height());
-        painter.setBrush(QColor(70, 160, 70));
+        painter.setBrush(theme.color(ThemeManager::SemanticColor::Success));
         painter.drawRoundedRect(fillRect, barRadius, barRadius);
     }
 
@@ -123,7 +125,7 @@ void ProgressBarWidget::paintEvent(QPaintEvent *event)
     valueFont.setPointSize(qMax(9, barHeight / 3));
     valueFont.setBold(true);
     painter.setFont(valueFont);
-    painter.setPen(Qt::white);
+    painter.setPen(theme.color(ThemeManager::SemanticColor::TextPrimary));
 
     QString valueText = QString::number(m_value, 'f', 1);
     painter.drawText(barRect, Qt::AlignCenter, valueText);
@@ -133,7 +135,7 @@ void ProgressBarWidget::paintEvent(QPaintEvent *event)
         QFont labelFont = font();
         labelFont.setPointSize(qMax(8, barHeight / 4));
         painter.setFont(labelFont);
-        painter.setPen(Qt::white);
+        painter.setPen(theme.color(ThemeManager::SemanticColor::TextPrimary));
         QRectF labelRect(margin, margin, width() - 2 * margin, labelHeight);
         painter.drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, m_label);
     }

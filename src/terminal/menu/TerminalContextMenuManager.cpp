@@ -30,12 +30,14 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
         tr("复制") + QString("\t") + QKeySequence(QKeySequence::Copy).toString());
     connect(m_copyAction, &QAction::triggered, this, [this]() {
         ++m_totalCopyActions;
+        ++m_totalActionsTriggered;
         emit copyRequested();
     });
 
     m_pasteAction = m_contextMenu->addAction(
         tr("粘贴") + QString("\t") + QKeySequence(QKeySequence::Paste).toString());
     connect(m_pasteAction, &QAction::triggered, this, [this]() {
+        ++m_totalActionsTriggered;
         QString text = QApplication::clipboard()->text();
         if (!text.isEmpty()) emit pasteRequested(text);
     });
@@ -44,12 +46,14 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
 
     m_clearAction = m_contextMenu->addAction(tr("清空"));
     connect(m_clearAction, &QAction::triggered, this, [this]() {
+        ++m_totalActionsTriggered;
         emit clearRequested();
     });
 
     m_selectAllAction = m_contextMenu->addAction(
         tr("全选") + QString("\t") + QKeySequence(QKeySequence::SelectAll).toString());
     connect(m_selectAllAction, &QAction::triggered, this, [this]() {
+        ++m_totalActionsTriggered;
         emit selectAllRequested();
     });
 
@@ -59,6 +63,7 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
         tr("搜索") + QString("\t") + QKeySequence(QKeySequence::Find).toString());
     connect(m_searchAction, &QAction::triggered, this, [this]() {
         ++m_totalSearchActions;
+        ++m_totalActionsTriggered;
         emit searchRequested();
     });
 }
@@ -93,10 +98,17 @@ quint64 TerminalContextMenuManager::totalSearchActions() const
     return m_totalSearchActions;
 }
 
+/** @brief 获取菜单项总触发次数 @return 所有菜单项被点击的累计次数 */
+quint64 TerminalContextMenuManager::totalActionsTriggered() const
+{
+    return m_totalActionsTriggered;
+}
+
 /** @brief 重置所有统计计数器为零 */
 void TerminalContextMenuManager::resetStats()
 {
     m_totalMenuShows = 0;
     m_totalCopyActions = 0;
     m_totalSearchActions = 0;
+    m_totalActionsTriggered = 0;
 }

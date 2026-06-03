@@ -62,6 +62,12 @@ public:
     /** @brief 获取合并总次数 */
     quint64 totalMerges() const { return m_totalMerges; }
 
+    /**
+     * @brief 获取分割条拖拽调整总次数
+     * @return 用户拖拽调整分栏大小的累计次数
+     */
+    quint64 totalSplitResized() const { return m_totalSplitResized; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -85,8 +91,9 @@ private:
     QSplitter *m_splitter;      ///< 内部分栏控件
     int m_sectionCount = 0;     ///< 当前分栏计数
 
-    quint64 m_totalSplits = 0;  ///< 分屏总次数
-    quint64 m_totalMerges = 0;  ///< 合并总次数
+    quint64 m_totalSplits = 0;      ///< 分屏总次数
+    quint64 m_totalMerges = 0;      ///< 合并总次数
+    quint64 m_totalSplitResized = 0; ///< 分割条拖拽调整总次数
 };
 
 #endif // TERMINAL_SPLITTER_H

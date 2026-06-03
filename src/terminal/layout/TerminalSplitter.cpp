@@ -25,6 +25,7 @@ TerminalSplitter::TerminalSplitter(QWidget *parent)
     , m_sectionCount(0)
     , m_totalSplits(0)
     , m_totalMerges(0)
+    , m_totalSplitResized(0)
 {
     setObjectName(QStringLiteral("TerminalSplitter"));
     setupUI();
@@ -52,6 +53,11 @@ void TerminalSplitter::setupUI()
     m_splitter = new QSplitter(this);
     m_splitter->setObjectName(QStringLiteral("terminalSplitter"));
     m_splitter->setOrientation(Qt::Horizontal);
+
+    /* 分割条拖拽时递增调整计数 */
+    connect(m_splitter, &QSplitter::splitterMoved, this, [this]() {
+        ++m_totalSplitResized;
+    });
 
     mainLayout->addWidget(m_splitter);
     setLayout(mainLayout);
@@ -140,4 +146,5 @@ void TerminalSplitter::resetStatistics()
 {
     m_totalSplits = 0;
     m_totalMerges = 0;
+    m_totalSplitResized = 0;
 }

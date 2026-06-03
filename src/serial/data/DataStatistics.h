@@ -98,6 +98,9 @@ public:
     /** @brief 获取定时器刷新总周期数 @return onRefreshTimer()调用总次数 */
     quint64 totalRefreshCycles() const { return m_totalRefreshCycles; }
 
+    /** @brief 获取update()中的速率计算总次数 @return 累计计算次数 */
+    quint64 totalCalculations() const { return m_totalCalculations; }
+
     /** @brief 重置数据统计计数器(不影响面板显示) */
     void resetDataStatistics();
 
@@ -162,6 +165,7 @@ private:
     quint64 m_totalErrorUpdates = 0; ///< updateErrors()调用总次数
     quint64 m_totalHealthUpdates = 0; ///< updateConnectionHealth()调用总次数
     quint64 m_totalRefreshCycles = 0; ///< onRefreshTimer()定时器刷新总周期数
+    quint64 m_totalCalculations = 0;  ///< update()中的速率计算总次数
 };
 
 #endif // DATASTATISTICS_H

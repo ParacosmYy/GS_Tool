@@ -55,6 +55,8 @@ public:
     quint64 totalBookmarksRemoved() const;
     /** @brief 获取累计刷新次数 */
     quint64 totalRefreshes() const;
+    /** @brief 获取累计导航（双击跳转）次数 */
+    quint64 totalBookmarksNavigated() const;
     /** @brief 重置统计计数器 */
     void resetBookmarkStats();
 
@@ -94,9 +96,10 @@ private:
     QPushButton* m_removeBtn = nullptr;  ///< 删除选中书签按钮
     QPushButton* m_clearBtn = nullptr;   ///< 清空所有书签按钮
 
-    quint64 m_totalBookmarksAdded = 0;   ///< 累计添加次数
-    quint64 m_totalBookmarksRemoved = 0; ///< 累计删除次数
-    quint64 m_totalRefreshes = 0;        ///< 累计刷新次数
+    quint64 m_totalBookmarksAdded = 0;      ///< 累计添加次数
+    quint64 m_totalBookmarksRemoved = 0;   ///< 累计删除次数
+    quint64 m_totalRefreshes = 0;          ///< 累计刷新次数
+    quint64 m_totalBookmarksNavigated = 0; ///< 累计导航（双击跳转）次数
 };
 
 #endif // BOOKMARKWIDGET_H

@@ -118,6 +118,7 @@ void DataStatistics::update(quint64 rxBytes, quint64 txBytes)
     // 统计计数器递增
     ++m_totalUpdates;  ///< 统计: update()调用次数
     m_totalBytesCounted += static_cast<quint64>(rxDelta) + static_cast<quint64>(txDelta);  ///< 统计: 累计字节数
+    ++m_totalCalculations;  ///< 统计: 速率计算次数
 }
 
 /** @brief 重置所有统计值和UI显示，重启计时器 */
@@ -142,6 +143,7 @@ void DataStatistics::reset()
     m_totalErrorUpdates = 0;
     m_totalHealthUpdates = 0;
     m_totalRefreshCycles = 0;
+    m_totalCalculations = 0;
 
     // 重置错误计数
     m_framingErrors = 0;
@@ -363,6 +365,7 @@ void DataStatistics::resetDataStatistics()
     m_totalErrorUpdates = 0;
     m_totalHealthUpdates = 0;
     m_totalRefreshCycles = 0;
+    m_totalCalculations = 0;
 }
 
 /** @brief 获取峰值速率更新总次数 @return 峰值更新次数 */

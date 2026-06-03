@@ -87,6 +87,10 @@ quint64 PortWatcher::totalRemovals() const { return m_totalRemovals; }
 quint64 PortWatcher::totalPolls() const { return m_totalPolls; }
 /** @brief 获取累计检测到变化的次数(新增+移除事件合计) @return 变化总次数 */
 quint64 PortWatcher::totalChanges() const { return m_totalChanges; }
+/** @brief 获取累计端口扫描次数 @return 扫描总次数 */
+quint64 PortWatcher::totalPortScans() const { return m_totalPortScans; }
+/** @brief 获取累计热插拔事件次数 @return 热插拔事件总次数 */
+quint64 PortWatcher::totalHotplugEvents() const { return m_totalHotplugEvents; }
 
 /** @brief 重置所有统计计数器 */
 void PortWatcher::resetWatcherStatistics()
@@ -95,6 +99,8 @@ void PortWatcher::resetWatcherStatistics()
     m_totalRemovals = 0;
     m_totalPolls = 0;
     m_totalChanges = 0;
+    m_totalPortScans = 0;
+    m_totalHotplugEvents = 0;
 }
 
 /**
@@ -110,6 +116,7 @@ void PortWatcher::onTimeout()
 {
     const QStringList newPorts = queryAvailablePorts();
     ++m_totalPolls;
+    ++m_totalPortScans;
     bool changed = false;
 
     // ---- 处理新增候选: 在 newPorts 中但不在 m_currentPorts 中 ----
@@ -122,6 +129,7 @@ void PortWatcher::onTimeout()
                 confirmedAdds.append(port);
                 m_addedCandidateCount.remove(port);
                 ++m_totalArrivals;
+                ++m_totalHotplugEvents;
                 changed = true;
             }
         } else {
@@ -139,6 +147,7 @@ void PortWatcher::onTimeout()
                 confirmedRemoves.append(port);
                 m_removedCandidateCount.remove(port);
                 ++m_totalRemovals;
+                ++m_totalHotplugEvents;
                 changed = true;
             }
         } else {

@@ -99,6 +99,9 @@ public:
     /** @brief 获取历史记录移除总次数 @return 累计移除次数(含淘汰) */
     quint64 totalEntriesRemoved() const;
 
+    /** @brief 获取历史记录条目总数（当前记录数） @return 当前记录数 */
+    quint64 totalHistoryEntries() const;
+
     /** @brief 重置历史记录统计计数器(不影响记录数据本身) */
     void resetHistoryStatistics();
 
@@ -109,6 +112,7 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalEntriesAdded = 0;       ///< 历史记录添加总次数
     quint64 m_totalEntriesRemoved = 0;     ///< 历史记录移除总次数(含淘汰)
+    quint64 m_totalHistoryEntries = 0;     ///< 历史记录条目总数（每次addRecord递增）
 };
 
 #endif // OTAHISTORYMODEL_H

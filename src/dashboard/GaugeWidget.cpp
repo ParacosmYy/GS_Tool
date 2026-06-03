@@ -11,6 +11,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QtMath>
+#include "core/theme/ThemeManager.h"
 
 /**
  * @brief 构造函数
@@ -101,11 +102,12 @@ void GaugeWidget::paintEvent(QPaintEvent *event)
     qreal radius = side / 2.0;
 
     /* --- 颜色定义 --- */
-    QPen arcPen(Qt::gray, 2.0);
-    QPen tickPen(Qt::white, 1.5);
-    QPen minorTickPen(Qt::gray, 1.0);
-    QPen needlePen(Qt::red, 2.0);
-    QPen textPen(Qt::white);
+    auto& theme = ThemeManager::instance();
+    QPen arcPen(theme.color(ThemeManager::SemanticColor::Border), 2.0);
+    QPen tickPen(theme.color(ThemeManager::SemanticColor::TextPrimary), 1.5);
+    QPen minorTickPen(theme.color(ThemeManager::SemanticColor::Border), 1.0);
+    QPen needlePen(theme.color(ThemeManager::SemanticColor::Error), 2.0);
+    QPen textPen(theme.color(ThemeManager::SemanticColor::TextPrimary));
 
     /* --- 1. 外圆弧 (135° → 405°, Qt 角度 = 1/16°) --- */
     QRectF arcRect(center.x() - radius, center.y() - radius,
@@ -187,11 +189,11 @@ void GaugeWidget::paintEvent(QPaintEvent *event)
     needlePath.closeSubpath();
 
     painter.setPen(needlePen);
-    painter.setBrush(Qt::red);
+    painter.setBrush(theme.color(ThemeManager::SemanticColor::Error));
     painter.drawPath(needlePath);
 
     /* 中心圆点 */
-    painter.setBrush(Qt::white);
+    painter.setBrush(theme.color(ThemeManager::SemanticColor::TextPrimary));
     painter.setPen(Qt::NoPen);
     painter.drawEllipse(center, 4.0, 4.0);
 

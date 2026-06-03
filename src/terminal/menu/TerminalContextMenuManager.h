@@ -64,6 +64,12 @@ public:
     /** @brief 获取搜索操作总触发次数 @return 用户点击"搜索"菜单项的累计次数 */
     quint64 totalSearchActions() const;
 
+    /**
+     * @brief 获取菜单项总触发次数
+     * @return 所有菜单项(复制/粘贴/清屏/全选/搜索)被点击的累计次数
+     */
+    quint64 totalActionsTriggered() const;
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -79,6 +85,7 @@ private:
     quint64 m_totalMenuShows = 0;       ///< 菜单总弹出次数
     quint64 m_totalCopyActions = 0;     ///< 复制操作总触发次数
     quint64 m_totalSearchActions = 0;   ///< 搜索操作总触发次数
+    quint64 m_totalActionsTriggered = 0; ///< 菜单项总触发次数(含所有操作)
 };
 
 #endif // TERMINALCONTEXTMENUMANAGER_H

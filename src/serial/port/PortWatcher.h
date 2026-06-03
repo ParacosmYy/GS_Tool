@@ -84,6 +84,10 @@ public:
     quint64 totalPolls() const;
     /** @brief 获取累计检测到变化的次数（新增+移除事件合计） */
     quint64 totalChanges() const;
+    /** @brief 获取累计端口扫描次数（与轮询次数一致） */
+    quint64 totalPortScans() const;
+    /** @brief 获取累计热插拔事件次数（新增+移除事件合计，与totalChanges一致） */
+    quint64 totalHotplugEvents() const;
     /** @brief 重置所有统计计数器 */
     void resetWatcherStatistics();
 
@@ -110,6 +114,8 @@ private:
     quint64 m_totalRemovals = 0;    ///< 累计端口移除次数
     quint64 m_totalPolls = 0;       ///< 累计轮询次数
     quint64 m_totalChanges = 0;     ///< 累计检测到变化的次数
+    quint64 m_totalPortScans = 0;   ///< 累计端口扫描次数
+    quint64 m_totalHotplugEvents = 0; ///< 累计热插拔事件次数
 
     /**
      * @name 防抖机制成员

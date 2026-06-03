@@ -47,7 +47,10 @@ void TerminalSelectionManager::onMouseMove(double y, int scrollOffset, int lineH
 {
     if (m_isSelecting && lineHeight > 0) {
         int line = scrollOffset + static_cast<int>(y) / lineHeight;
-        m_selectionEndLine = line;
+        if (m_selectionEndLine != line) {
+            m_selectionEndLine = line;
+            ++m_totalSelectionsChanged;
+        }
     }
 }
 
@@ -175,6 +178,7 @@ void TerminalSelectionManager::setSelection(int startLine, int endLine)
 
     // 程序化设置选区时更新选择统计
     ++m_totalSelections;
+    ++m_totalSelectionsChanged;
 }
 
 /** @brief 通知复制操作已完成，递增复制计数并更新字符数统计 @param charCount 本次复制的字符数 */
@@ -212,6 +216,12 @@ quint64 TerminalSelectionManager::maxSelectionLength() const
     return m_maxSelectionLength;
 }
 
+/** @brief 获取选区变更总次数 @return 选区范围发生变化的累计次数 */
+quint64 TerminalSelectionManager::totalSelectionsChanged() const
+{
+    return m_totalSelectionsChanged;
+}
+
 /** @brief 重置所有统计计数器为零(选区状态不受影响) */
 void TerminalSelectionManager::resetStats()
 {
@@ -219,4 +229,5 @@ void TerminalSelectionManager::resetStats()
     m_totalCopies = 0;
     m_totalSelectionChars = 0;
     m_maxSelectionLength = 0;
+    m_totalSelectionsChanged = 0;
 }

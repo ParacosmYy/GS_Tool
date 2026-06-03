@@ -45,6 +45,9 @@ public:
     /** @brief 获取历史最高TX速率（字节/秒） */
     double peakTxRate() const;
 
+    /** @brief 获取累计监控数据源绑定次数 */
+    quint64 totalMonitorUpdates() const;
+
     /** @brief 重置所有统计计数器归零 */
     void resetTrafficWidgetStatistics();
 
@@ -68,6 +71,7 @@ private:
     quint64 m_totalRateUpdates = 0;        ///< 累计速率更新次数
     double m_peakRxRate = 0.0;             ///< 历史最高RX速率（字节/秒）
     double m_peakTxRate = 0.0;             ///< 历史最高TX速率（字节/秒）
+    quint64 m_totalMonitorUpdates = 0;     ///< 累计监控数据源绑定次数
 };
 
 #endif // TRAFFICMONITORWIDGET_H

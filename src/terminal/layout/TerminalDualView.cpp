@@ -29,6 +29,7 @@ TerminalDualView::TerminalDualView(QWidget *parent)
     , m_splitter(nullptr)
     , m_totalViewSwitches(0)
     , m_totalSyncs(0)
+    , m_totalSplitsChanged(0)
 {
     setObjectName(QStringLiteral("TerminalDualView"));
     setupUI();
@@ -77,6 +78,11 @@ void TerminalDualView::setupUI()
     m_splitter->addWidget(m_hexView);
     m_splitter->setSizes(QList<int>() << 400 << 400);
 
+    /* 分割条拖拽时递增变更计数 */
+    connect(m_splitter, &QSplitter::splitterMoved, this, [this]() {
+        ++m_totalSplitsChanged;
+    });
+
     mainLayout->addWidget(m_splitter);
     setLayout(mainLayout);
 }
@@ -88,4 +94,5 @@ void TerminalDualView::resetStatistics()
 {
     m_totalViewSwitches = 0;
     m_totalSyncs = 0;
+    m_totalSplitsChanged = 0;
 }

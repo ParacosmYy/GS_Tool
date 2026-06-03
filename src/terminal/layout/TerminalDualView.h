@@ -40,6 +40,12 @@ public:
     /** @brief 获取同步滚动总次数 */
     quint64 totalSyncs() const { return m_totalSyncs; }
 
+    /**
+     * @brief 获取分割比例变更总次数
+     * @return 用户拖拽分割条改变左右视图比例的累计次数
+     */
+    quint64 totalSplitsChanged() const { return m_totalSplitsChanged; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -53,6 +59,7 @@ private:
 
     quint64 m_totalViewSwitches = 0; ///< 视图切换总次数(HEX/ASCII)
     quint64 m_totalSyncs = 0;        ///< 同步滚动总次数
+    quint64 m_totalSplitsChanged = 0; ///< 分割比例变更总次数
 };
 
 #endif // TERMINAL_DUAL_VIEW_H

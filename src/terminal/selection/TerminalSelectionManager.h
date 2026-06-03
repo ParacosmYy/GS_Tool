@@ -92,6 +92,12 @@ public:
     /** @brief 获取最大单次选区长度(字符数) @return 历史最大选区的字符数 */
     quint64 maxSelectionLength() const;
 
+    /**
+     * @brief 获取选区变更总次数
+     * @return 选区范围发生变化的累计次数(包含鼠标拖拽和程序化设置)
+     */
+    quint64 totalSelectionsChanged() const;
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -110,6 +116,7 @@ private:
     quint64 m_totalCopies = 0;          ///< 总复制次数(每次复制操作递增)
     quint64 m_totalSelectionChars = 0;  ///< 总选择字符数(所有选区字符数累加)
     quint64 m_maxSelectionLength = 0;   ///< 最大单次选区长度(字符数)
+    quint64 m_totalSelectionsChanged = 0; ///< 选区变更总次数(拖拽/程序化)
 };
 
 #endif // TERMINALSELECTIONMANAGER_H

@@ -38,6 +38,7 @@ TrafficMonitorWidget::TrafficMonitorWidget(QWidget* parent)
     , m_totalRateUpdates(0)
     , m_peakRxRate(0.0)
     , m_peakTxRate(0.0)
+    , m_totalMonitorUpdates(0)
 {
     setObjectName(QStringLiteral("trafficMonitorWidget"));
     setupUI();
@@ -52,6 +53,7 @@ TrafficMonitorWidget::TrafficMonitorWidget(QWidget* parent)
  */
 void TrafficMonitorWidget::setMonitor(TrafficMonitor* monitor)
 {
+    ++m_totalMonitorUpdates;
     if (m_monitor) {
         disconnect(m_monitor, &TrafficMonitor::rateUpdated,
                    this, &TrafficMonitorWidget::onRateUpdated);
@@ -124,10 +126,17 @@ double TrafficMonitorWidget::peakTxRate() const
     return m_peakTxRate;
 }
 
+/** @brief 获取累计监控数据源绑定次数 @return 绑定总次数 */
+quint64 TrafficMonitorWidget::totalMonitorUpdates() const
+{
+    return m_totalMonitorUpdates;
+}
+
 /** @brief 重置所有统计计数器归零 */
 void TrafficMonitorWidget::resetTrafficWidgetStatistics()
 {
     m_totalRateUpdates = 0;
     m_peakRxRate = 0.0;
     m_peakTxRate = 0.0;
+    m_totalMonitorUpdates = 0;
 }

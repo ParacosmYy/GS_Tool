@@ -63,6 +63,7 @@ void SendHistory::addEntry(const QString& text, bool isHex)
 /** @brief 获取最近count条发送文本(从新到旧) @param count 请求数量 @return 文本列表 */
 QStringList SendHistory::recentTexts(int count) const
 {
+    ++m_totalHistoryAccesses;
     QStringList result;
 
     // 从最新的记录往前取，最多取count条
@@ -77,6 +78,7 @@ QStringList SendHistory::recentTexts(int count) const
 /** @brief 返回所有发送记录 @return 条目列表 */
 QList<SendEntry> SendHistory::entries() const
 {
+    ++m_totalHistoryAccesses;
     return m_entries;
 }
 
@@ -85,6 +87,7 @@ QList<SendEntry> SendHistory::search(const QString& keyword) const
 {
     QList<SendEntry> result;
     ++m_totalSearches;
+    ++m_totalHistoryAccesses;
 
     if (keyword.isEmpty()) {
         // 关键词为空时返回所有记录
@@ -228,9 +231,18 @@ quint64 SendHistory::totalClears() const
 }
 
 /**
+ * @brief 获取历史记录访问总次数（recentTexts/entries/search调用合计）
+ * @return 累计访问次数
+ */
+quint64 SendHistory::totalHistoryAccesses() const
+{
+    return m_totalHistoryAccesses;
+}
+
+/**
  * @brief 重置所有统计计数器
  *
- * 将 totalRecords、totalDuplicateSkips、totalSendCount 全部归零，
+ * 将 totalRecords、totalDuplicateSkips、totalSendCount、totalHistoryAccesses 全部归零，
  * 同时清空频率表和历史列表。
  */
 void SendHistory::resetStatistics()
@@ -240,6 +252,7 @@ void SendHistory::resetStatistics()
     m_totalSendCount = 0;
     m_totalSearches = 0;
     m_totalClears = 0;
+    m_totalHistoryAccesses = 0;
     m_freqMap.clear();
     m_entries.clear();
     emit historyChanged();

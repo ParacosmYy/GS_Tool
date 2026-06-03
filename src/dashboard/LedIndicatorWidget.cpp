@@ -11,6 +11,7 @@
 
 #include <QPainter>
 #include <QRadialGradient>
+#include "core/theme/ThemeManager.h"
 
 /**
  * @brief 构造函数
@@ -88,7 +89,8 @@ void LedIndicatorWidget::paintEvent(QPaintEvent *event)
     qreal radius = side / 2.0;
 
     /* --- 1. 外圈边框 --- */
-    QPen borderPen(QColor(100, 100, 100), 2.0);
+    auto& theme = ThemeManager::instance();
+    QPen borderPen(theme.color(ThemeManager::SemanticColor::Border), 2.0);
     painter.setPen(borderPen);
     painter.setBrush(Qt::NoBrush);
     painter.drawEllipse(center, radius, radius);
@@ -107,7 +109,7 @@ void LedIndicatorWidget::paintEvent(QPaintEvent *event)
         painter.setBrush(gradient);
     } else {
         /* 灭状态：深灰色 */
-        painter.setBrush(QColor(50, 50, 50));
+        painter.setBrush(theme.color(ThemeManager::SemanticColor::BgTertiary));
     }
 
     painter.setPen(Qt::NoPen);
@@ -119,8 +121,9 @@ void LedIndicatorWidget::paintEvent(QPaintEvent *event)
                           center.y() - radius * 0.3);
         qreal hlRadius = radius * 0.25;
         QRadialGradient hlGrad(highlight, hlRadius);
-        hlGrad.setColorAt(0.0, QColor(255, 255, 255, 100));
-        hlGrad.setColorAt(1.0, QColor(255, 255, 255, 0));
+        QColor hlColor = theme.color(ThemeManager::SemanticColor::TextPrimary);
+        hlGrad.setColorAt(0.0, QColor(hlColor.red(), hlColor.green(), hlColor.blue(), 100));
+        hlGrad.setColorAt(1.0, QColor(hlColor.red(), hlColor.green(), hlColor.blue(), 0));
         painter.setBrush(hlGrad);
         painter.drawEllipse(highlight, hlRadius, hlRadius);
     }

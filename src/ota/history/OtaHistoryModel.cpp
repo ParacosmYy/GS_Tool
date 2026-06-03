@@ -136,6 +136,7 @@ void OtaHistoryModel::addRecord(const OtaRecord& record)
     m_records.prepend(record);
     endInsertRows();
     ++m_totalEntriesAdded;  ///< 统计: 记录添加次数递增
+    ++m_totalHistoryEntries;  ///< 统计: 历史条目总数递增
     saveToSettings();
 }
 
@@ -337,4 +338,11 @@ void OtaHistoryModel::resetHistoryStatistics()
 {
     m_totalEntriesAdded = 0;
     m_totalEntriesRemoved = 0;
+    m_totalHistoryEntries = 0;
+}
+
+/** @brief 获取历史记录条目总数（当前记录数） @return 当前记录数 */
+quint64 OtaHistoryModel::totalHistoryEntries() const
+{
+    return m_totalHistoryEntries;
 }

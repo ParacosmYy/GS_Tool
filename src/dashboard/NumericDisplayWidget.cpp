@@ -8,6 +8,7 @@
 
 #include "dashboard/NumericDisplayWidget.h"
 
+#include "core/theme/ThemeManager.h"
 #include <QPainter>
 
 /**
@@ -92,7 +93,8 @@ void NumericDisplayWidget::paintEvent(QPaintEvent *event)
 
     /* --- 1. 背景 --- */
     painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(30, 30, 40));
+    auto& theme = ThemeManager::instance();
+    painter.setBrush(theme.color(ThemeManager::SemanticColor::BgSecondary));
     painter.drawRoundedRect(widgetRect, 8.0, 8.0);
 
     /* --- 2. 标签（顶部） --- */
@@ -102,7 +104,7 @@ void NumericDisplayWidget::paintEvent(QPaintEvent *event)
     QFont labelFont = font();
     labelFont.setPointSize(qMax(8, static_cast<int>(widgetRect.height() / 8)));
     painter.setFont(labelFont);
-    painter.setPen(QColor(160, 160, 160));
+    painter.setPen(theme.color(ThemeManager::SemanticColor::TextSecondary));
 
     QRectF labelRect(widgetRect.left() + 6, widgetRect.top() + 2,
                      widgetRect.width() - 12, labelHeight);
@@ -123,7 +125,7 @@ void NumericDisplayWidget::paintEvent(QPaintEvent *event)
     valueFont.setPointSize(fontSize);
     valueFont.setBold(true);
     painter.setFont(valueFont);
-    painter.setPen(QColor(0, 220, 220));
+    painter.setPen(theme.color(ThemeManager::SemanticColor::Accent));
 
     QString valueText = QString::number(m_value, 'f', m_precision);
     painter.drawText(valueRect, Qt::AlignCenter, valueText);
@@ -133,7 +135,7 @@ void NumericDisplayWidget::paintEvent(QPaintEvent *event)
         QFont unitFont = font();
         unitFont.setPointSize(qMax(9, fontSize / 2));
         painter.setFont(unitFont);
-        painter.setPen(QColor(180, 180, 180));
+        painter.setPen(theme.color(ThemeManager::SemanticColor::TextMuted));
 
         /* 计算数值文本宽度，在其右侧绘制单位 */
         QFontMetrics fm(valueFont);

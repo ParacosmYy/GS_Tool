@@ -144,6 +144,10 @@ int TimedSender::sendCount() const
  */
 void TimedSender::onTimeout()
 {
+    {
+        QMutexLocker locker(&m_mutex);
+        ++m_totalTimedSends;
+    }
     // 使用 QMetaObject::invokeMethod 确保在主线程执行发送
     // 如果已经在主线程则同步执行，否则异步调度
     QMetaObject::invokeMethod(this, &TimedSender::doSend,
@@ -212,9 +216,21 @@ quint64 TimedSender::scheduleCount() const
 }
 
 /**
+ * @brief 获取定时器触发发送的总次数
+ * @return 触发总次数
+ *
+ * 线程安全：加锁读取 m_totalTimedSends。
+ */
+quint64 TimedSender::totalTimedSends() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_totalTimedSends;
+}
+
+/**
  * @brief 重置所有统计计数器
  *
- * 将 sendCount、totalBytesSent、scheduleCount 全部归零。
+ * 将 sendCount、totalBytesSent、scheduleCount、totalTimedSends 全部归零。
  * 线程安全：内部加锁保护。
  */
 void TimedSender::resetStatistics()
@@ -223,4 +239,5 @@ void TimedSender::resetStatistics()
     m_sendCount = 0;
     m_totalBytesSent = 0;
     m_scheduleCount = 0;
+    m_totalTimedSends = 0;
 }
