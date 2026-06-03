@@ -189,8 +189,137 @@ qint64 ChartModel::currentFrameIndex() const
 }
 
 // ============================================================================
+// 统计接口
+// ============================================================================
+
+/** @brief 返回跨所有通道添加的数据点总数 @return 数据点总数 */
+quint64 ChartModel::totalDataPoints() const
+{
+    return m_totalDataPoints;
+}
+
+/** @brief 返回历史创建的通道总数（累计） @return 通道创建计数 */
+quint64 ChartModel::channelsCreated() const
+{
+    return m_channelsCreated;
+}
+
+/** @brief 返回历史移除的通道总数（累计） @return 通道移除计数 */
+quint64 ChartModel::channelsRemoved() const
+{
+    return m_channelsRemoved;
+}
+
+/** @brief 返回峰值数据速率（数据点/秒） @return 峰值速率 */
+double ChartModel::peakDataRate() const
+{
+    return m_peakDataRate;
+}
+
+/** @brief 重置所有图表统计计数器为初始值
+ *
+ * 将 m_totalDataPoints、m_channelsCreated、m_channelsRemoved、m_peakDataRate
+ * 全部清零，并重置速率计算时间戳和窗口计数。不影响通道数据、配置和帧索引。
+ */
+void ChartModel::resetChartStatistics()
+{
+    m_totalDataPoints = 0;
+    m_channelsCreated = 0;
+    m_channelsRemoved = 0;
+    m_peakDataRate = 0.0;
+    m_dataRateTimestamp = 0;
+    m_dataRatePointCount = 0;
+}
+
+// ============================================================================
 // 操作接口
 // ============================================================================
+
+/** @brief 添加单个通道到配置集并更新统计计数器 @param config 通道配置
+ *
+ * 向 ChannelConfigSet 追加通道配置，为该通道创建内部缓冲区，
+ * 并递增 m_channelsCreated 累计计数器。添加后发射 channelsChanged 信号。
+ */
+void ChartModel::addChannel(const ChannelConfig& config)
+{
+    // 如果该通道已存在，先从缓冲区中移除旧数据（不计数为 removed）
+    if (m_buffers.contains(config.displayName)) {
+        m_buffers.remove(config.displayName);
+    }
+
+    // 追加到配置集
+    m_configSet.addChannel(config);
+
+    // 为新通道创建缓冲区
+    ChannelBuffer buf;
+    buf.sampleCounter = 0;
+    buf.points.reserve(m_windowSize);
+    m_buffers.insert(config.displayName, buf);
+
+    // 递增通道创建计数器
+    m_channelsCreated++;
+
+    emit channelsChanged();
+}
+
+/** @brief 移除指定通道并更新统计计数器 @param displayName 通道显示名称
+ *
+ * 从 ChannelConfigSet 和内部缓冲区中移除通道，
+ * 并递增 m_channelsRemoved 累计计数器。移除后发射 channelsChanged 信号。
+ */
+void ChartModel::removeChannel(const QString& displayName)
+{
+    // 从配置集中移除
+    m_configSet.removeChannel(displayName);
+
+    // 从缓冲区中移除
+    m_buffers.remove(displayName);
+
+    // 递增通道移除计数器
+    m_channelsRemoved++;
+
+    // 从待刷新列表中也清除（如果有挂起的更新）
+    m_pendingUpdates.removeAll(displayName);
+
+    emit channelsChanged();
+}
+
+/** @brief 向指定通道添加一个数据点（公开接口，含统计更新） @param displayName 通道显示名称 @param value 数据值
+ *
+ * 递增 m_totalDataPoints，计算并更新峰值数据速率 m_peakDataRate，
+ * 然后委托内部 appendPoint() 完成降采样和滑动窗口裁剪。
+ * 速率计算方式: 以秒为单位的时间窗口内统计点数，取峰值。
+ */
+void ChartModel::addDataPoint(const QString& displayName, double value)
+{
+    // 递增跨通道数据点总数
+    m_totalDataPoints++;
+
+    // 更新峰值数据速率
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (m_dataRateTimestamp == 0) {
+        // 首次调用，初始化时间戳
+        m_dataRateTimestamp = now;
+        m_dataRatePointCount = 1;
+    } else {
+        m_dataRatePointCount++;
+        qint64 elapsedMs = now - m_dataRateTimestamp;
+        // 每隔至少500ms计算一次速率，取峰值
+        if (elapsedMs >= 500) {
+            double rate = static_cast<double>(m_dataRatePointCount) / (elapsedMs / 1000.0);
+            if (rate > m_peakDataRate) {
+                m_peakDataRate = rate;
+            }
+            // 重置速率计算窗口
+            m_dataRateTimestamp = now;
+            m_dataRatePointCount = 0;
+        }
+    }
+
+    // 委托内部方法完成降采样和滑动窗口裁剪
+    // sampleDivisor 默认为1（不降采样），因为公开接口不指定降采样参数
+    appendPoint(displayName, value, 1);
+}
 
 /** @brief 清除所有通道数据、帧索引和待刷新队列，发射dataCleared */
 void ChartModel::clear()

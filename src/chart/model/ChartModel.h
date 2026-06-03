@@ -17,6 +17,7 @@
 #include <QTimer>
 #include <QStringList>
 #include <QPair>
+#include <QDateTime>
 
 #include "chart/model/ChannelConfig.h"
 
@@ -85,7 +86,69 @@ public:
     qint64 totalPointsReceived() const;    // 总共接收的数据点数（qint64防溢出）
     qint64 currentFrameIndex() const;      // 当前帧索引（X轴计数器）
 
+    // ---- 统计信息 ----
+
+    /**
+     * @brief 获取跨所有通道添加的数据点总数
+     * @return 数据点总数（跨所有通道累计）
+     */
+    quint64 totalDataPoints() const;
+
+    /**
+     * @brief 获取历史创建的通道总数
+     * @return 通道创建计数（累计，包含已移除的）
+     */
+    quint64 channelsCreated() const;
+
+    /**
+     * @brief 获取历史移除的通道总数
+     * @return 通道移除计数（累计）
+     */
+    quint64 channelsRemoved() const;
+
+    /**
+     * @brief 获取峰值数据速率（数据点/秒）
+     * @return 峰值速率（双精度浮点，单位: 点/秒）
+     */
+    double peakDataRate() const;
+
+    /**
+     * @brief 重置所有图表统计计数器为初始值
+     *
+     * 将 totalDataPoints、channelsCreated、channelsRemoved、peakDataRate
+     * 全部清零，并重置速率计算时间戳。不影响通道数据和配置。
+     */
+    void resetChartStatistics();
+
     // ---- 操作 ----
+
+    /**
+     * @brief 添加单个通道到配置集并更新统计计数器
+     * @param config 通道配置
+     *
+     * 向 ChannelConfigSet 追加通道、创建对应缓冲区，
+     * 并递增 m_channelsCreated 计数器。
+     */
+    void addChannel(const ChannelConfig& config);
+
+    /**
+     * @brief 移除指定通道并更新统计计数器
+     * @param displayName 通道显示名称
+     *
+     * 从 ChannelConfigSet 和内部缓冲区中移除通道，
+     * 并递增 m_channelsRemoved 计数器。
+     */
+    void removeChannel(const QString& displayName);
+
+    /**
+     * @brief 向指定通道添加一个数据点（公开接口，含统计更新）
+     * @param displayName 通道显示名称
+     * @param value 数据值
+     *
+     * 递增 m_totalDataPoints，更新峰值数据速率，
+     * 并委托内部 appendPoint() 完成降采样和滑动窗口裁剪。
+     */
+    void addDataPoint(const QString& displayName, double value);
 
     // 清除所有通道数据
     void clear();
@@ -130,6 +193,14 @@ private:
     int m_windowSize = 200;
     qint64 m_frameIndex = 0;                      ///< 全局帧计数器（X轴），qint64 防止长时间运行后溢出
     qint64 m_totalPoints = 0;                        ///< 总数据点计数（qint64防溢出）
+
+    // 统计计数器
+    quint64 m_totalDataPoints = 0;               ///< 跨所有通道添加的数据点总数
+    quint64 m_channelsCreated = 0;               ///< 历史创建的通道总数（累计）
+    quint64 m_channelsRemoved = 0;               ///< 历史移除的通道总数（累计）
+    double m_peakDataRate = 0.0;                 ///< 峰值数据速率（数据点/秒）
+    qint64 m_dataRateTimestamp = 0;              ///< 速率计算用的上次时间戳（毫秒纪元）
+    quint64 m_dataRatePointCount = 0;            ///< 速率计算窗口内的数据点累计
 
     // 刷新合并
     QTimer* m_refreshTimer;

@@ -72,6 +72,15 @@ public:
     /** @brief 获取已添加通道数量 */
     int channelCount() const;
 
+    /** @brief 获取已发送数据次数 */
+    quint64 sendDataCount() const;
+
+    /** @brief 获取已发送字节总数 */
+    qint64 totalBytesSent() const;
+
+    /** @brief 重置发送统计 */
+    void resetSendStatistics();
+
 signals:
     /** @brief 接收到数据信号（插件订阅后触发） */
     void dataReceived(const QByteArray& data);
@@ -101,6 +110,11 @@ private:
     QList<QWidget*> m_panels;       ///< 已注册的面板列表
     QStringList m_channels;         ///< 已添加的通道名称列表
     bool m_subscribed = false;      ///< 是否已订阅数据接收
+
+    /** @brief 已发送数据次数 */
+    quint64 m_sendCount = 0;
+    /** @brief 已发送字节总数 */
+    qint64 m_sendBytes = 0;
 };
 
 #endif // PLUGINAPI_H

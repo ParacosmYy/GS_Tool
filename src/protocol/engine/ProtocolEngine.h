@@ -69,6 +69,38 @@ public:
      */
     int parseErrors() const;
 
+    /**
+     * @brief 获取已成功解析的帧数（64位）
+     * @return 成功解析帧计数
+     */
+    quint64 framesParsedCount() const;
+
+    /**
+     * @brief 获取因验证失败而被拒绝的帧数
+     * @return 被拒绝帧计数
+     */
+    quint64 framesRejected() const;
+
+    /**
+     * @brief 获取引擎处理的总字节数
+     * @return 累计处理的字节总数
+     */
+    quint64 totalBytesProcessed() const;
+
+    /**
+     * @brief 获取最后一次成功解析的时间戳
+     * @return 毫秒级时间戳（自Unix纪元起），尚未解析过时返回0
+     */
+    qint64 lastParseTimestamp() const;
+
+    /**
+     * @brief 重置所有解析统计计数器
+     *
+     * 将帧计数、拒绝计数、字节总数和时间戳全部归零。
+     * 不影响当前 schema 设置和缓冲区内容。
+     */
+    void resetParseStatistics();
+
 signals:
     /**
      * @brief 帧解析完成信号
@@ -84,10 +116,14 @@ signals:
     void parseError(const QString &error);
 
 private:
-    ProtocolSchema *m_schema = nullptr; ///< 当前协议定义
-    QByteArray m_buffer;                ///< 内部接收缓冲区
-    int m_framesParsed = 0;             ///< 成功解析帧计数
-    int m_parseErrors = 0;              ///< 解析错误计数
+    ProtocolSchema *m_schema = nullptr;     ///< 当前协议定义
+    QByteArray m_buffer;                    ///< 内部接收缓冲区
+    int m_parseErrors = 0;                  ///< 解析错误计数（兼容旧接口）
+
+    quint64 m_framesParsed = 0;             ///< 成功解析帧计数
+    quint64 m_framesRejected = 0;           ///< 因校验/验证失败被拒绝的帧计数
+    quint64 m_totalBytesProcessed = 0;      ///< 引擎累计处理的总字节数
+    qint64 m_lastParseTimestamp = 0;        ///< 最后一次成功解析的时间戳（ms since epoch）
 
     /**
      * @brief 尝试从缓冲区解析一帧

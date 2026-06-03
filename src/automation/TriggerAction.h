@@ -15,6 +15,7 @@
 
 #include <QObject>
 #include <QByteArray>
+#include <QMap>
 #include <functional>
 #include "automation/TriggerRule.h"
 
@@ -44,6 +45,30 @@ public:
      */
     void setSendCallback(std::function<void(QByteArray)> callback);
 
+    /**
+     * @brief 获取累计执行动作次数
+     * @return 所有类型的动作执行总次数
+     */
+    quint64 totalExecCount() const;
+
+    /**
+     * @brief 获取指定类型动作的执行次数
+     * @param actionType 动作类型
+     * @return 该类型动作的执行次数
+     */
+    quint64 execCountByType(int actionType) const;
+
+    /**
+     * @brief 获取累计发送数据字节数（仅 SendData 类型）
+     * @return 已发送字节总数
+     */
+    quint64 totalSendBytes() const;
+
+    /**
+     * @brief 重置执行统计
+     */
+    void resetExecStatistics();
+
 signals:
     /** @brief 请求数据发送信号 */
     void sendDataRequested(const QByteArray& data);
@@ -62,6 +87,13 @@ signals:
 
 private:
     std::function<void(QByteArray)> m_sendCallback;  ///< 数据发送回调函数
+
+    /** @brief 累计执行动作总次数 */
+    quint64 m_totalExecCount = 0;
+    /** @brief 各类型动作执行次数 */
+    QMap<int, quint64> m_execCountByType;
+    /** @brief SendData 动作累计发送字节总数 */
+    quint64 m_totalSendBytes = 0;
 };
 
 #endif // TRIGGERACTION_H

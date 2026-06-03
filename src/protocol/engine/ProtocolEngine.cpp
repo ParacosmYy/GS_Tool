@@ -17,6 +17,7 @@
 #include "protocol/schema/ProtocolSchema.h"
 
 #include <QDataStream>
+#include <QDateTime>
 #include <QtMath>
 
 /** @brief 缓冲区最大容量 64KB，防止内存膨胀 */
@@ -29,8 +30,11 @@ static constexpr int MAX_BUFFER_SIZE = 65536;
 ProtocolEngine::ProtocolEngine(QObject *parent)
     : QObject(parent)
     , m_schema(nullptr)
-    , m_framesParsed(0)
     , m_parseErrors(0)
+    , m_framesParsed(0)
+    , m_framesRejected(0)
+    , m_totalBytesProcessed(0)
+    , m_lastParseTimestamp(0)
 {
 }
 
@@ -70,6 +74,7 @@ void ProtocolEngine::feedData(const QByteArray &data)
 {
     /* 追加数据到缓冲区 */
     m_buffer.append(data);
+    m_totalBytesProcessed += static_cast<quint64>(data.size());
 
     /* 无 schema 或 schema 无效时直接返回 */
     if (!m_schema || !m_schema->isValid()) {
@@ -103,6 +108,9 @@ void ProtocolEngine::reset()
     m_buffer.clear();
     m_framesParsed = 0;
     m_parseErrors = 0;
+    m_framesRejected = 0;
+    m_totalBytesProcessed = 0;
+    m_lastParseTimestamp = 0;
 }
 
 /**
@@ -120,7 +128,7 @@ ProtocolSchema *ProtocolEngine::currentSchema() const
  */
 int ProtocolEngine::framesParsed() const
 {
-    return m_framesParsed;
+    return static_cast<int>(m_framesParsed);
 }
 
 /**
@@ -130,6 +138,57 @@ int ProtocolEngine::framesParsed() const
 int ProtocolEngine::parseErrors() const
 {
     return m_parseErrors;
+}
+
+/**
+ * @brief 获取已成功解析的帧数（64位）
+ * @return 成功解析帧计数
+ */
+quint64 ProtocolEngine::framesParsedCount() const
+{
+    return m_framesParsed;
+}
+
+/**
+ * @brief 获取因验证失败而被拒绝的帧数
+ * @return 被拒绝帧计数
+ */
+quint64 ProtocolEngine::framesRejected() const
+{
+    return m_framesRejected;
+}
+
+/**
+ * @brief 获取引擎处理的总字节数
+ * @return 累计处理的字节总数
+ */
+quint64 ProtocolEngine::totalBytesProcessed() const
+{
+    return m_totalBytesProcessed;
+}
+
+/**
+ * @brief 获取最后一次成功解析的时间戳
+ * @return 毫秒级时间戳（自Unix纪元起），尚未解析过时返回0
+ */
+qint64 ProtocolEngine::lastParseTimestamp() const
+{
+    return m_lastParseTimestamp;
+}
+
+/**
+ * @brief 重置所有解析统计计数器
+ *
+ * 将帧计数、拒绝计数、字节总数和时间戳全部归零。
+ * 不影响当前 schema 设置和缓冲区内容。
+ */
+void ProtocolEngine::resetParseStatistics()
+{
+    m_framesParsed = 0;
+    m_parseErrors = 0;
+    m_framesRejected = 0;
+    m_totalBytesProcessed = 0;
+    m_lastParseTimestamp = 0;
 }
 
 /* ============================================================================
@@ -181,6 +240,7 @@ bool ProtocolEngine::tryParseOneFrame()
     if (frameLength <= 0) {
         emit parseError(tr("帧长度无效: %1").arg(frameLength));
         ++m_parseErrors;
+        ++m_framesRejected;
         /* 跳过当前帧头的第一个字节，重新搜索 */
         m_buffer.remove(0, 1);
         return true; /* 继续尝试解析下一帧 */
@@ -202,6 +262,7 @@ bool ProtocolEngine::tryParseOneFrame()
         if (!checksumValid) {
             emit parseError(tr("帧校验失败"));
             ++m_parseErrors;
+            ++m_framesRejected;
             return true;
         }
     }
@@ -215,6 +276,7 @@ bool ProtocolEngine::tryParseOneFrame()
 
     /* ---- 步骤8：发射信号 ---- */
     ++m_framesParsed;
+    m_lastParseTimestamp = QDateTime::currentMSecsSinceEpoch();
     emit frameParsed(fields, rawFrame);
 
     return true;

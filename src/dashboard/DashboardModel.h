@@ -101,6 +101,38 @@ public:
      */
     double value(const QString &name) const;
 
+    /**
+     * @brief 获取指定通道的最小值
+     * @param name 通道名称
+     * @return 最小值，通道不存在时返回 0.0
+     */
+    double channelMin(const QString &name) const;
+
+    /**
+     * @brief 获取指定通道的最大值
+     * @param name 通道名称
+     * @return 最大值，通道不存在时返回 0.0
+     */
+    double channelMax(const QString &name) const;
+
+    /**
+     * @brief 获取指定通道的值变更次数
+     * @param name 通道名称
+     * @return 变更次数
+     */
+    quint64 channelChangeCount(const QString &name) const;
+
+    /**
+     * @brief 获取总更新次数（所有通道累计）
+     * @return 累计更新次数
+     */
+    quint64 totalUpdateCount() const;
+
+    /**
+     * @brief 重置所有通道统计（min/max/changeCount/totalUpdateCount）
+     */
+    void resetChannelStatistics();
+
 signals:
     /// 配置发生变更时发射
     void configChanged();
@@ -114,6 +146,15 @@ signals:
 private:
     QList<QVariantMap> m_configs;            ///< 组件配置列表
     QMap<QString, double> m_channels;        ///< 数据通道 <名称, 当前值>
+
+    /** @brief 每个通道的最小值 */
+    QMap<QString, double> m_channelMin;
+    /** @brief 每个通道的最大值 */
+    QMap<QString, double> m_channelMax;
+    /** @brief 每个通道的值变更次数 */
+    QMap<QString, quint64> m_channelChangeCount;
+    /** @brief 所有通道累计更新次数 */
+    quint64 m_totalUpdateCount = 0;
 };
 
 #endif // DASHBOARD_MODEL_H

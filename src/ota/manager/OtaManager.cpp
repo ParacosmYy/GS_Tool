@@ -83,6 +83,8 @@ void OtaManager::connectTransferSignals(BaseTransfer* transfer)
             this, [this]() {
                 setOtaState(OtaState::Complete);
                 ++m_transferCount;
+                ++m_successfulTransfers;
+                m_totalBytesTransferred += static_cast<quint64>(m_currentFileSize);
                 m_lastTransferSuccess = true;
                 emit transferComplete();
             });
@@ -90,6 +92,7 @@ void OtaManager::connectTransferSignals(BaseTransfer* transfer)
             this, [this](const QString& reason) {
                 setOtaState(OtaState::Error);
                 ++m_transferCount;
+                ++m_failedTransfers;
                 m_lastTransferSuccess = false;
                 // 增强错误消息: 追加协议名称上下文
                 QString enriched = reason;
@@ -214,10 +217,13 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
         return false;
     }
 
-    // ---- 步骤2: 进入文件选择验证阶段 ----
+    // ---- 步骤2: 递增传输尝试计数器 ----
+    ++m_totalTransfers;
+
+    // ---- 步骤3: 进入文件选择验证阶段 ----
     setOtaState(OtaState::Selecting);
 
-    // ---- 步骤3: 验证文件路径 ----
+    // ---- 步骤4: 验证文件路径 ----
     QString errorMsg;
     if (!validateFilePath(filePath, errorMsg)) {
         setOtaState(OtaState::Error);
@@ -225,7 +231,7 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
         return false;
     }
 
-    // ---- 步骤4: 检测文件类型并处理 ----
+    // ---- 步骤5: 检测文件类型并处理 ----
     FirmwareType type = detectFirmwareType(filePath);
     QString effectivePath = filePath;
 
@@ -243,16 +249,17 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
         qDebug() << "OtaManager: Unknown firmware type, treating as binary:" << filePath;
     }
 
-    // ---- 步骤5: 记录当前文件名和协议（用于错误消息上下文） ----
+    // ---- 步骤6: 记录当前文件名和协议（用于错误消息上下文） ----
     // 注意: 始终使用用户选择的原始文件名，而非HEX转换后的临时BIN文件名
     // 避免在错误消息和Toast通知中显示类似 "EmbedDebug_XXXXXX.bin" 的临时文件名
     m_currentFileName = QFileInfo(filePath).fileName();
     m_currentProtocol = protocol;
+    m_currentFileSize = QFileInfo(effectivePath).size();
 
-    // ---- 步骤6: 切换到传输状态 ----
+    // ---- 步骤7: 切换到传输状态 ----
     setOtaState(OtaState::Transferring);
 
-    // ---- 步骤7: 根据协议选择传输实例 ----
+    // ---- 步骤8: 根据协议选择传输实例 ----
     if (protocol == "ymodem") {
         m_ymodem->setFilePath(effectivePath);
         return m_ymodem->start();
@@ -442,4 +449,46 @@ QString OtaManager::protocolDisplayName(const QString& protocol) const
     if (protocol == "ymodem")          return tr("YMODEM");
     if (protocol == "zmodem")          return tr("ZMODEM");
     return protocol.toUpper();
+}
+
+// ============================================================================
+// 传输统计
+// ============================================================================
+
+/** @brief 获取传输尝试总次数(包含成功和失败) @return 总尝试次数 */
+quint64 OtaManager::totalTransfers() const
+{
+    return m_totalTransfers;
+}
+
+/** @brief 获取成功完成的传输次数 @return 成功次数 */
+quint64 OtaManager::successfulTransfers() const
+{
+    return m_successfulTransfers;
+}
+
+/** @brief 获取失败的传输次数 @return 失败次数 */
+quint64 OtaManager::failedTransfers() const
+{
+    return m_failedTransfers;
+}
+
+/** @brief 获取所有会话累计传输的字节数 @return 累计字节数 */
+quint64 OtaManager::totalBytesTransferred() const
+{
+    return m_totalBytesTransferred;
+}
+
+/**
+ * @brief 重置传输统计计数器
+ *
+ * 将 totalTransfers/successfulTransfers/failedTransfers/totalBytesTransferred 全部清零。
+ * 不影响 m_transferCount 和 m_lastTransferSuccess 等历史记录。
+ */
+void OtaManager::resetTransferStatistics()
+{
+    m_totalTransfers = 0;
+    m_successfulTransfers = 0;
+    m_failedTransfers = 0;
+    m_totalBytesTransferred = 0;
 }

@@ -65,6 +65,8 @@ bool PluginApi::sendData(const QByteArray& data)
     if (data.isEmpty()) {
         return false;
     }
+    ++m_sendCount;
+    m_sendBytes += data.size();
     emit dataSendRequested(data);
     return true;
 }
@@ -134,4 +136,29 @@ int PluginApi::panelCount() const
 int PluginApi::channelCount() const
 {
     return m_channels.count();
+}
+
+/**
+ * @brief 获取已发送数据次数
+ */
+quint64 PluginApi::sendDataCount() const
+{
+    return m_sendCount;
+}
+
+/**
+ * @brief 获取已发送字节总数
+ */
+qint64 PluginApi::totalBytesSent() const
+{
+    return m_sendBytes;
+}
+
+/**
+ * @brief 重置发送统计
+ */
+void PluginApi::resetSendStatistics()
+{
+    m_sendCount = 0;
+    m_sendBytes = 0;
 }

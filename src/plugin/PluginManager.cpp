@@ -103,6 +103,7 @@ bool PluginManager::loadPlugin(const QString& filePath)
     QLibrary* lib = new QLibrary(filePath, this);
     if (!lib->load()) {
         const QString err = lib->errorString();
+        ++m_failCount;
         emit pluginError(filePath, tr("无法加载库: %1").arg(err));
         delete lib;
         return false;
@@ -111,6 +112,7 @@ bool PluginManager::loadPlugin(const QString& filePath)
     auto createFn = reinterpret_cast<CreatePluginFunc>(
         lib->resolve("createPlugin"));
     if (!createFn) {
+        ++m_failCount;
         emit pluginError(filePath, tr("未找到 createPlugin 导出符号"));
         lib->unload();
         delete lib;
@@ -120,6 +122,7 @@ bool PluginManager::loadPlugin(const QString& filePath)
     /* 调用工厂函数创建插件实例 */
     IEmbedDebugPlugin* pluginInstance = createFn();
     if (!pluginInstance) {
+        ++m_failCount;
         emit pluginError(filePath, tr("createPlugin 返回空指针"));
         lib->unload();
         delete lib;
@@ -128,6 +131,7 @@ bool PluginManager::loadPlugin(const QString& filePath)
 
     /* 初始化插件（注入 API） */
     if (!pluginInstance->initialize(m_api)) {
+        ++m_failCount;
         emit pluginError(filePath, tr("插件初始化失败: %1")
                               .arg(pluginInstance->name()));
         pluginInstance->shutdown();
@@ -149,6 +153,7 @@ bool PluginManager::loadPlugin(const QString& filePath)
     lib->setProperty("_embedPluginName", plugName);
 
     emit pluginLoaded(plugName);
+    ++m_loadCount;
     return true;
 }
 
@@ -183,6 +188,7 @@ void PluginManager::unloadPlugin(const QString& name)
     }
 
     emit pluginUnloaded(name);
+    ++m_unloadCount;
 }
 
 /**
@@ -280,4 +286,38 @@ QVariantList PluginManager::pluginMetadataList() const
         result.append(meta);
     }
     return result;
+}
+
+/**
+ * @brief 获取累计加载成功次数
+ */
+quint64 PluginManager::totalLoadCount() const
+{
+    return m_loadCount;
+}
+
+/**
+ * @brief 获取累计加载失败次数
+ */
+quint64 PluginManager::totalFailCount() const
+{
+    return m_failCount;
+}
+
+/**
+ * @brief 获取累计卸载次数
+ */
+quint64 PluginManager::totalUnloadCount() const
+{
+    return m_unloadCount;
+}
+
+/**
+ * @brief 重置加载统计
+ */
+void PluginManager::resetLoadStatistics()
+{
+    m_loadCount = 0;
+    m_failCount = 0;
+    m_unloadCount = 0;
 }

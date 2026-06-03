@@ -183,8 +183,18 @@ void DashboardModel::updateValue(const QString &name, double value)
         return;
     }
 
+    /* 更新值范围统计 */
+    if (!m_channelMin.contains(name) || value < m_channelMin[name]) {
+        m_channelMin[name] = value;
+    }
+    if (!m_channelMax.contains(name) || value > m_channelMax[name]) {
+        m_channelMax[name] = value;
+    }
+
     if (!qFuzzyCompare(it.value(), value)) {
         it.value() = value;
+        ++m_channelChangeCount[name];
+        ++m_totalUpdateCount;
         emit valueChanged(name, value);
     }
 }
@@ -206,4 +216,54 @@ QStringList DashboardModel::channelNames() const
 double DashboardModel::value(const QString &name) const
 {
     return m_channels.value(name, 0.0);
+}
+
+/**
+ * @brief 获取指定通道的最小值
+ * @param name 通道名称
+ * @return 最小值，通道不存在时返回 0.0
+ */
+double DashboardModel::channelMin(const QString &name) const
+{
+    return m_channelMin.value(name, 0.0);
+}
+
+/**
+ * @brief 获取指定通道的最大值
+ * @param name 通道名称
+ * @return 最大值，通道不存在时返回 0.0
+ */
+double DashboardModel::channelMax(const QString &name) const
+{
+    return m_channelMax.value(name, 0.0);
+}
+
+/**
+ * @brief 获取指定通道的值变更次数
+ * @param name 通道名称
+ * @return 变更次数
+ */
+quint64 DashboardModel::channelChangeCount(const QString &name) const
+{
+    return m_channelChangeCount.value(name, 0);
+}
+
+/**
+ * @brief 获取总更新次数（所有通道累计）
+ * @return 累计更新次数
+ */
+quint64 DashboardModel::totalUpdateCount() const
+{
+    return m_totalUpdateCount;
+}
+
+/**
+ * @brief 重置所有通道统计（min/max/changeCount/totalUpdateCount）
+ */
+void DashboardModel::resetChannelStatistics()
+{
+    m_channelMin.clear();
+    m_channelMax.clear();
+    m_channelChangeCount.clear();
+    m_totalUpdateCount = 0;
 }

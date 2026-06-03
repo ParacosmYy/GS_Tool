@@ -106,6 +106,26 @@ public:
     /** @brief 获取当前协议名称 */
     QString currentProtocolName() const;
 
+    /** @brief 获取传输尝试总次数 */
+    quint64 totalTransfers() const;
+
+    /** @brief 获取成功完成的传输次数 */
+    quint64 successfulTransfers() const;
+
+    /** @brief 获取失败的传输次数 */
+    quint64 failedTransfers() const;
+
+    /** @brief 获取所有会话累计传输的字节数 */
+    quint64 totalBytesTransferred() const;
+
+    /**
+     * @brief 重置传输统计计数器
+     *
+     * 将 totalTransfers/successfulTransfers/failedTransfers/totalBytesTransferred 全部清零。
+     * 不影响 m_transferCount 和 m_lastTransferSuccess 等历史记录。
+     */
+    void resetTransferStatistics();
+
     /**
      * @brief 验证固件文件路径
      * @param filePath 文件路径
@@ -184,6 +204,12 @@ private:
     QString m_currentProtocol;               ///< 当前传输协议名称（用于错误信息上下文）
     int m_transferCount = 0;                  ///< 历史传输总次数
     bool m_lastTransferSuccess = false;       ///< 上次传输是否成功
+
+    quint64 m_totalTransfers = 0;             ///< 传输尝试总次数(包含成功和失败)
+    quint64 m_successfulTransfers = 0;        ///< 成功完成的传输次数
+    quint64 m_failedTransfers = 0;            ///< 失败的传输次数
+    quint64 m_totalBytesTransferred = 0;      ///< 所有会话累计传输的字节数
+    qint64 m_currentFileSize = 0;             ///< 当前传输文件的字节大小(用于成功后累加到totalBytesTransferred)
 };
 
 #endif // OTAMANAGER_H

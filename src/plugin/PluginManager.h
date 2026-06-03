@@ -103,6 +103,18 @@ public:
      */
     QVariantList pluginMetadataList() const;
 
+    /** @brief 获取累计加载成功次数 */
+    quint64 totalLoadCount() const;
+
+    /** @brief 获取累计加载失败次数 */
+    quint64 totalFailCount() const;
+
+    /** @brief 获取累计卸载次数 */
+    quint64 totalUnloadCount() const;
+
+    /** @brief 重置加载统计 */
+    void resetLoadStatistics();
+
 signals:
     /** @brief 插件加载成功信号 */
     void pluginLoaded(const QString& name);
@@ -120,6 +132,13 @@ signals:
 private:
     QMap<QString, IEmbedDebugPlugin*> m_plugins;  ///< 插件名称→接口映射
     PluginApi* m_api = nullptr;                     ///< 宿主 API 实例
+
+    /** @brief 累计加载成功次数 */
+    quint64 m_loadCount = 0;
+    /** @brief 累计加载失败次数 */
+    quint64 m_failCount = 0;
+    /** @brief 累计卸载次数 */
+    quint64 m_unloadCount = 0;
 };
 
 #endif // PLUGINMANAGER_H
