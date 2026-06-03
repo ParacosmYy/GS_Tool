@@ -7,6 +7,7 @@
  */
 
 #include "utils/export/ChartExporter.h"
+#include "chart/model/ChartModel.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -28,23 +29,55 @@ ChartExporter::ChartExporter(QObject* parent)
 }
 
 // ---------------------------------------------------------------------------
-// CSV 导出（ChartModel 版本，保留骨架）
+// CSV 导出（ChartModel 版本）
 // ---------------------------------------------------------------------------
 
 /**
- * @brief 导出 ChartModel 数据为 CSV
+ * @brief 导出 ChartModel 数据为 CSV 文件
  *
- * 当前版本尚未集成 ChartModel，返回 false 并发出失败信号。
- * 后续迭代将从 model 中提取通道名和采样数据，
- * 委托给 exportToCsv(filePath, channelNames, data) 重载。
+ * 从 ChartModel 提取所有通道名称和数据点，
+ * 委托给 exportToCsv(filePath, channelNames, data) 重载执行实际写入。
+ * X轴使用帧索引作为时间戳。
+ *
+ * @param filePath 目标文件路径
+ * @param model    图表数据模型指针
+ * @return true 导出成功
  */
 bool ChartExporter::exportToCsv(const QString& filePath, ChartModel* model)
 {
-    Q_UNUSED(model)
+    if (!model) {
+        emit exportFailed(tr("图表模型指针为空，无法导出 CSV"));
+        return false;
+    }
 
-    emit exportFailed(tr("ChartModel 导出尚未实现，请使用多通道数据接口"));
-    Q_UNUSED(filePath)
-    return false;
+    const QStringList names = model->channelNames();
+    if (names.isEmpty()) {
+        emit exportFailed(tr("图表模型中无通道数据"));
+        return false;
+    }
+
+    /* 收集各通道数据，转为 QList<QList<double>> 格式 */
+    QList<QList<double>> channelData;
+    channelData.reserve(names.size());
+
+    int maxRows = 0;
+    for (const QString& chName : names) {
+        const QVector<QPointF> points = model->channelData(chName);
+        QList<double> values;
+        values.reserve(points.size());
+        for (const QPointF& pt : points) {
+            values.append(pt.y());
+        }
+        maxRows = qMax(maxRows, values.size());
+        channelData.append(std::move(values));
+    }
+
+    if (maxRows == 0) {
+        emit exportFailed(tr("图表模型中无采样数据"));
+        return false;
+    }
+
+    return exportToCsv(filePath, names, channelData);
 }
 
 // ---------------------------------------------------------------------------

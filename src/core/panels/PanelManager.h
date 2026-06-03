@@ -131,9 +131,24 @@ public:
     BasePanel* wrapper(QWidget* rawPanel) const;  ///< 获取面板的BasePanel包装器
     void wrapPanels();                            ///< 创建所有BasePanel包装器
 
+    // ==================== 响应式布局 ====================
+
+    /**
+     * @brief 设置紧凑模式(小窗口时隐藏非关键面板的扩展区域)
+     * @param compact true=紧凑模式, false=正常模式
+     *
+     * 紧凑模式下: 隐藏BasePanel折叠按钮、缩小面板标题栏高度、
+     * 隐藏DataStatistics图表区、隐藏ProtocolView详情面板。
+     */
+    void setCompactMode(bool compact);
+
+    /** @brief 是否处于紧凑模式 */
+    bool isCompactMode() const;
+
 private:
     // --- BasePanel包装器 ---
     QMap<QWidget*, BasePanel*> m_wrappers;  ///< 原始面板→BasePanel包装器映射
+    bool m_compactMode = false;             ///< 紧凑模式标志
 };
 
 #endif // PANEL_MANAGER_H

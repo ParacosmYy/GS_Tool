@@ -50,6 +50,8 @@
 #include "core/navigation/IconNavBar.h"
 #include "core/widgets/CommandPalette.h"
 #include "core/widgets/ScriptRecorder.h"
+#include "core/layout/ResponsiveLayout.h"
+#include "core/managers/ShortcutManager.h"
 
 /**
  * @brief 主窗口 - EmbedDebug 应用的顶层窗口
@@ -166,6 +168,10 @@ private:
     // ---- 图标导航栏(feature flag) ----
     IconNavBar* m_iconNavBar = nullptr;        ///< 图标导航栏(三栏布局, 默认关闭)
     bool m_useIconNavBar = false;              ///< 功能开关: "ui/iconNavBar" 配置项
+    // ---- 响应式布局 ----
+    ResponsiveLayout* m_responsiveLayout = nullptr; ///< 响应式布局(断点系统)
+    // ---- 快捷键管理 ----
+    ShortcutManager* m_shortcutManager = nullptr;   ///< 全局快捷键管理器(统一注册/绑定)
 };
 
 #endif // MAINWINDOW_H

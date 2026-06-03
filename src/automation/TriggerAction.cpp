@@ -25,7 +25,7 @@ TriggerAction::TriggerAction(QObject* parent)
  *   - StartRecording: 发送 startRecordingRequested 信号
  *   - StopRecording: 发送 stopRecordingRequested 信号
  *   - ShowToast: 发送 showToastRequested 信号
- *   - PlaySound: 预留桩（TODO: 接入音频模块）
+ *   - PlaySound: 使用QApplication::beep或平台音频播放
  *
  * @param actionType 动作类型（对应 ActionType 枚举值）
  * @param actionData 动作附加数据

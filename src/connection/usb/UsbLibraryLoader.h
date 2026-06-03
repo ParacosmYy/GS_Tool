@@ -121,7 +121,13 @@ public:
                         unsigned char* data, quint16 length,
                         unsigned int timeout);
 
-    /** @brief libusb_get_device_descriptor */
+    /** @brief libusb_get_device (从handle获取device指针) */
+    void* getDevice(UsbDeviceHandle* handle);
+
+    /** @brief libusb_get_device_descriptor (从device读取描述符) */
+    int getDeviceDescriptorFromDevice(void* device, UsbDeviceDescriptor* desc);
+
+    /** @brief 便捷方法: 从handle直接获取设备描述符 */
     int getDeviceDescriptor(UsbDeviceHandle* handle,
                             UsbDeviceDescriptor* desc);
 
@@ -171,6 +177,8 @@ private:
     using FnInterrupt = int(*)(UsbDeviceHandle*, unsigned char, unsigned char*, int, int*, unsigned int);
     using FnControl = int(*)(UsbDeviceHandle*, quint8, quint8, quint16, quint16, unsigned char*, quint16, unsigned int);
     using FnGetString = int(*)(UsbDeviceHandle*, quint8, char*, int);
+    using FnGetDevice = void*(*)(UsbDeviceHandle*);
+    using FnGetDeviceDesc = int(*)(void*, UsbDeviceDescriptor*);
 
     FnInit       m_fnInit = nullptr;
     FnExit       m_fnExit = nullptr;
@@ -182,6 +190,8 @@ private:
     FnInterrupt  m_fnInterrupt = nullptr;
     FnControl    m_fnControl = nullptr;
     FnGetString  m_fnGetString = nullptr;
+    FnGetDevice  m_fnGetDevice = nullptr;
+    FnGetDeviceDesc m_fnGetDeviceDesc = nullptr;
 };
 
 #endif // USBLIBRARYLOADER_H

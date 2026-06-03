@@ -167,6 +167,67 @@ MainWindow::MainWindow(QWidget* parent)
     setWindowTitle(App::APP_NAME);
     resize(1200, 800);
     setMinimumSize(900, 600);
+
+    // ---- 响应式布局: 监听窗口宽度变化，自动切换断点 ----
+    m_responsiveLayout = new ResponsiveLayout(this);
+    m_responsiveLayout->watchWindow(this);
+    connect(m_responsiveLayout, &ResponsiveLayout::breakpointChanged,
+            this, [this](ResponsiveLayout::Breakpoint bp) {
+        /* 断点切换时，Compact模式自动折叠导航树 */
+        if (bp == ResponsiveLayout::Breakpoint::Compact) {
+            /* 紧凑模式: 折叠导航树，隐藏图标栏 */
+            if (m_mainSplitter && m_mainSplitter->sizes().at(0) > 0) {
+                m_mainSplitter->setSizes({0, width()});
+            }
+            if (m_iconNavBar) {
+                m_iconNavBar->hide();
+            }
+            /* 紧凑模式下隐藏非关键面板区域 */
+            statusBar()->showMessage(tr("已切换到紧凑布局"), 2000);
+            m_panelManager->setCompactMode(true);
+        } else if (bp == ResponsiveLayout::Breakpoint::Desktop) {
+            /* 桌面模式: 恢复导航树全宽 */
+            if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
+                int navWidth = SettingsManager::instance()
+                    .get("layout/navTreeWidth").toInt();
+                if (navWidth <= 0) navWidth = 200;
+                m_mainSplitter->setSizes({navWidth, width() - navWidth});
+            }
+            if (m_iconNavBar && m_useIconNavBar) {
+                m_iconNavBar->show();
+            }
+            statusBar()->showMessage(tr("已切换到桌面布局"), 2000);
+            m_panelManager->setCompactMode(false);
+        } else {
+            /* 中等模式: 恢复导航树但较窄 */
+            if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
+                m_mainSplitter->setSizes({180, width() - 180});
+            }
+            if (m_iconNavBar && m_useIconNavBar) {
+                m_iconNavBar->show();
+            }
+        }
+    });
+
+    // ---- 快捷键管理器: 统一注册全局快捷键 ----
+    m_shortcutManager = &ShortcutManager::instance();
+    m_shortcutManager->registerShortcut(
+        "search.find", QKeySequence("Ctrl+F"),
+        this, [this]() { m_panelManager->searchBar()->activate(); },
+        tr("搜索"));
+    m_shortcutManager->registerShortcut(
+        "nav.commandPalette", QKeySequence("Ctrl+P"),
+        this, [this]() { m_commandPalette->showPalette(); },
+        tr("命令面板"));
+    m_shortcutManager->registerShortcut(
+        "script.recordToggle", QKeySequence("Ctrl+Shift+R"),
+        this, [this]() {
+            if (m_scriptRecorder->isRecording()) {
+                m_scriptRecorder->stopRecording();
+            } else {
+                m_scriptRecorder->startRecording();
+            }
+        }, tr("录制脚本"));
 }
 
 /** @brief 从磁盘恢复用户偏好（语言、主题、面板索引）并启动统计定时器 */
@@ -239,6 +300,21 @@ void MainWindow::setupUI()
     // Ctrl+F 快捷键激活搜索栏
     auto* searchShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
     connect(searchShortcut, &QShortcut::activated, m_panelManager->searchBar(), &TerminalSearchBar::activate);
+
+    // 导航树宽度持久化: 分割器拖动后自动保存
+    connect(m_mainSplitter, &QSplitter::splitterMoved,
+            this, [this]() {
+        auto sizes = m_mainSplitter->sizes();
+        if (sizes.size() > 0) {
+            SettingsManager::instance().set("layout/navTreeWidth", sizes.at(0));
+        }
+    });
+
+    // 恢复上次的导航树宽度
+    int savedNavWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
+    if (savedNavWidth > 0) {
+        m_mainSplitter->setSizes({savedNavWidth, width() - savedNavWidth});
+    }
 }
 
 /** @brief 创建左侧导航树区域(导航树+选中滑动指示器) */
@@ -432,6 +508,20 @@ void MainWindow::closeEvent(QCloseEvent* event)
         int currentIdx = m_navController->currentPanelIndex();
         if (currentIdx >= 0) {
             m_settingsController->saveLastPanel(currentIdx);
+        }
+    }
+
+    // 保存当前断点模式(下次启动时立即应用正确的布局)
+    if (m_responsiveLayout) {
+        SettingsManager::instance().set("layout/lastBreakpoint",
+            static_cast<int>(m_responsiveLayout->currentBreakpoint()));
+    }
+
+    // 保存导航树宽度(Compact模式时保存上次展开宽度)
+    if (m_mainSplitter) {
+        auto sizes = m_mainSplitter->sizes();
+        if (sizes.size() > 0 && sizes.at(0) > 0) {
+            SettingsManager::instance().set("layout/navTreeWidth", sizes.at(0));
         }
     }
 

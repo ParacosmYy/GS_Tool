@@ -426,3 +426,51 @@ void PanelManager::wrapPanels()
     wrap(m_projectWelcomeDialog, tr("项目管理"));
     wrap(m_deviceProfilePanel, tr("设备档案"));
 }
+
+/**
+ * @brief 设置紧凑模式
+ *
+ * 紧凑模式下隐藏所有BasePanel的折叠按钮和标题栏图标，
+ * 缩小面板间距，使小窗口下内容区最大化。
+ *
+ * @param compact true=紧凑模式, false=正常模式
+ */
+void PanelManager::setCompactMode(bool compact)
+{
+    if (m_compactMode == compact) { return; }
+    m_compactMode = compact;
+
+    /* 更新所有BasePanel包装器的紧凑模式状态 */
+    for (auto it = m_wrappers.constBegin(); it != m_wrappers.constEnd(); ++it) {
+        BasePanel* panel = it.value();
+        if (panel) {
+            panel->setProperty("compactMode", compact);
+            /* 紧凑模式下折叠所有非活跃面板 */
+            if (compact && !panel->isVisible()) {
+                panel->setCollapsed(true);
+            }
+            /* 强制刷新样式 */
+            panel->style()->unpolish(panel);
+            panel->style()->polish(panel);
+        }
+    }
+
+    /* 紧凑模式下隐藏非核心面板以释放空间 */
+    if (compact) {
+        /* 隐藏图表扩展面板 */
+        if (m_fftWidget && m_fftWidget->parentWidget()) {
+            m_fftWidget->parentWidget()->setProperty("compactHidden", true);
+        }
+        if (m_scatterWidget && m_scatterWidget->parentWidget()) {
+            m_scatterWidget->parentWidget()->setProperty("compactHidden", true);
+        }
+        if (m_histogramWidget && m_histogramWidget->parentWidget()) {
+            m_histogramWidget->parentWidget()->setProperty("compactHidden", true);
+        }
+    }
+}
+
+bool PanelManager::isCompactMode() const
+{
+    return m_compactMode;
+}

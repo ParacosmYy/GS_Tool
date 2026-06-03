@@ -225,8 +225,28 @@ void FrameVisualEditor::setupConnections()
     connect(m_addFieldBtn, &QPushButton::clicked, this, &FrameVisualEditor::onAddField);
     connect(m_removeFieldBtn, &QPushButton::clicked, this, &FrameVisualEditor::onRemoveField);
     connect(m_fieldTable, &QTableWidget::cellChanged, this, &FrameVisualEditor::onFieldChanged);
-    // 实时预览: 表格变化时更新
-    connect(m_fieldTable, &QTableWidget::cellChanged, this, [this]() {
-        if (!m_updating) updateBinaryPreview();
-    });
+
+    /* 帧头/帧尾实时预览 */
+    connect(m_headerEdit, &QLineEdit::textChanged,
+            this, &FrameVisualEditor::onHeaderChanged);
+    connect(m_footerEdit, &QLineEdit::textChanged,
+            this, &FrameVisualEditor::onFooterChanged);
+
+    /* 长度字段配置变更 → 实时预览 */
+    connect(m_lengthOffsetSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &FrameVisualEditor::onLengthConfigChanged);
+    connect(m_lengthSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &FrameVisualEditor::onLengthConfigChanged);
+    connect(m_lengthBEndianCheck, &QCheckBox::checkStateChanged,
+            this, &FrameVisualEditor::onLengthConfigChanged);
+    connect(m_lengthAdjustSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &FrameVisualEditor::onLengthConfigChanged);
+
+    /* 校验配置变更 → 实时预览 */
+    connect(m_checksumTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &FrameVisualEditor::onChecksumConfigChanged);
+    connect(m_checksumOffsetSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &FrameVisualEditor::onChecksumConfigChanged);
+    connect(m_checksumStartSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &FrameVisualEditor::onChecksumConfigChanged);
 }

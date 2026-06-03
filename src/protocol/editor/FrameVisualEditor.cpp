@@ -85,15 +85,31 @@ void FrameVisualEditor::onMoveFieldDown()
 
 // setupPreviewGroup() 和 setupConnections() 见 FrameVisualEditorUI.cpp
 
-// ---- 空实现(预留) ----
-/** @brief 帧头变更回调(预留) */
-void FrameVisualEditor::onHeaderChanged() {}
-/** @brief 帧尾变更回调(预留) */
-void FrameVisualEditor::onFooterChanged() {}
-/** @brief 长度字段配置变更回调(预留) */
-void FrameVisualEditor::onLengthConfigChanged() {}
-/** @brief 校验配置变更回调(预留) */
-void FrameVisualEditor::onChecksumConfigChanged() {}
+// ---- 配置变更回调（触发实时预览刷新） ----
+
+/** @brief 帧头变更回调 — 实时更新二进制布局预览 */
+void FrameVisualEditor::onHeaderChanged()
+{
+    if (!m_updating) { updateBinaryPreview(); }
+}
+
+/** @brief 帧尾变更回调 — 实时更新二进制布局预览 */
+void FrameVisualEditor::onFooterChanged()
+{
+    if (!m_updating) { updateBinaryPreview(); }
+}
+
+/** @brief 长度字段配置变更回调 — 实时更新二进制布局预览 */
+void FrameVisualEditor::onLengthConfigChanged()
+{
+    if (!m_updating) { updateBinaryPreview(); }
+}
+
+/** @brief 校验配置变更回调 — 实时更新二进制布局预览 */
+void FrameVisualEditor::onChecksumConfigChanged()
+{
+    if (!m_updating) { updateBinaryPreview(); }
+}
 
 // ---- 数据读写 ----
 
@@ -183,7 +199,9 @@ void FrameVisualEditor::onRemoveField()
 /** @brief 字段表格单元格变更回调 @param row 行号 @param col 列号 */
 void FrameVisualEditor::onFieldChanged(int row, int col)
 {
-    Q_UNUSED(row); Q_UNUSED(col);
+    Q_UNUSED(row)
+    Q_UNUSED(col)
+    if (!m_updating) { updateBinaryPreview(); }
 }
 
 // ---- 内部更新 ----

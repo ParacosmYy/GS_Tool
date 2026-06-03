@@ -89,6 +89,8 @@ void UsbLibraryLoader::unload()
     m_fnInterrupt = nullptr;
     m_fnControl = nullptr;
     m_fnGetString = nullptr;
+    m_fnGetDevice = nullptr;
+    m_fnGetDeviceDesc = nullptr;
     emit loadStateChanged(false);
 }
 
@@ -105,9 +107,7 @@ QString UsbLibraryLoader::lastError() const
 QString UsbLibraryLoader::versionString() const
 {
     if (!m_loaded) { return tr("libusb未加载"); }
-    /* libusb 1.0版本号通过libusb_get_version获取,
-     * 但简化实现中直接返回已知信息 */
-    return QStringLiteral("libusb-1.0 (dynamic)");
+    return QStringLiteral("libusb-1.0 (loaded)");
 }
 
 /* ---- 函数指针包装器 ---- */
@@ -181,12 +181,32 @@ int UsbLibraryLoader::controlTransfer(UsbDeviceHandle* handle,
 int UsbLibraryLoader::getDeviceDescriptor(UsbDeviceHandle* handle,
                                            UsbDeviceDescriptor* desc)
 {
-    /* 简化实现: libusb_get_device_descriptor需要libusb_device,
-     * 而非libusb_device_handle。需要先通过handle获取device。
-     * 这里提供一个基础版本, 后续可扩展。 */
+    /* 完整实现: 先通过handle获取libusb_device，再读取描述符 */
     if (!m_loaded || !handle || !desc) { return -1; }
-    /* 标记为未完全实现 — 需要额外的libusb_device获取步骤 */
-    return -1;
+
+    void* device = getDevice(handle);
+    if (!device) { return -1; }
+
+    return getDeviceDescriptorFromDevice(device, desc);
+}
+
+void* UsbLibraryLoader::getDevice(UsbDeviceHandle* handle)
+{
+    if (!m_fnGetDevice) {
+        setError(tr("libusb_get_device未解析"));
+        return nullptr;
+    }
+    return m_fnGetDevice(handle);
+}
+
+int UsbLibraryLoader::getDeviceDescriptorFromDevice(void* device,
+                                                     UsbDeviceDescriptor* desc)
+{
+    if (!m_fnGetDeviceDesc) {
+        setError(tr("libusb_get_device_descriptor未解析"));
+        return -1;
+    }
+    return m_fnGetDeviceDesc(device, desc);
 }
 
 int UsbLibraryLoader::getStringDescriptorAscii(UsbDeviceHandle* handle,
@@ -233,6 +253,10 @@ bool UsbLibraryLoader::resolveFunctions()
         m_library->resolve("libusb_control_transfer"));
     m_fnGetString = reinterpret_cast<FnGetString>(
         m_library->resolve("libusb_get_string_descriptor_ascii"));
+    m_fnGetDevice = reinterpret_cast<FnGetDevice>(
+        m_library->resolve("libusb_get_device"));
+    m_fnGetDeviceDesc = reinterpret_cast<FnGetDeviceDesc>(
+        m_library->resolve("libusb_get_device_descriptor"));
 
     /* 核心函数必须全部解析成功 */
     if (!m_fnInit || !m_fnExit || !m_fnOpen || !m_fnClose) {
