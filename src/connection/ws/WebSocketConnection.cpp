@@ -114,7 +114,7 @@ void WebSocketConnection::configure(const QVariantMap& params)
  */
 bool WebSocketConnection::connectToUrl(const QString& url)
 {
-    /* 无论当前状态，先清理旧连接 */
+    // 无论当前状态，先清理旧连接
     if (m_socket) {
         close();
     }
@@ -154,6 +154,7 @@ bool WebSocketConnection::connectToUrl(const QString& url)
     connect(m_socket, &QTcpSocket::errorOccurred,
             this, [this](QAbstractSocket::SocketError err) {
         Q_UNUSED(err)
+        ++m_errorCount;
         emit errorOccurred(m_socket->errorString());
         updateState(ConnectionState::Error);
     });
@@ -239,6 +240,7 @@ bool WebSocketConnection::parseHandshakeResponse()
     QString header = QString::fromUtf8(m_buffer.left(headerEnd));
 
     if (!header.contains("101")) {
+        ++m_errorCount;
         emit errorOccurred(tr("WebSocket握手失败: %1").arg(header.left(64)));
         updateState(ConnectionState::Error);
         return false;
@@ -257,7 +259,6 @@ void WebSocketConnection::parseFrames()
     while (m_buffer.size() >= 2) {
         quint8 byte1 = static_cast<quint8>(m_buffer[0]);
         quint8 byte2 = static_cast<quint8>(m_buffer[1]);
-        // int fin = (byte1 >> 7) & 1;
         int opcode = byte1 & 0x0F;
         bool masked = (byte2 & 0x80) != 0;
         quint64 payloadLen = byte2 & 0x7F;
@@ -279,7 +280,7 @@ void WebSocketConnection::parseFrames()
         }
 
         int maskSize = masked ? 4 : 0;
-        /* 防御超大帧导致int溢出 */
+        // 防御超大帧导致int溢出
         if (payloadLen > static_cast<quint64>(INT_MAX) - headerSize - maskSize) {
             m_buffer.clear();
             return;
@@ -302,13 +303,17 @@ void WebSocketConnection::parseFrames()
 
         m_buffer.remove(0, totalFrameSize);
 
-        // 按opcode分发
+        // 按opcode分发 — 统计消息接收和字节数
         switch (opcode) {
         case 0x01: // 文本帧
+            ++m_totalMessagesReceived;
+            m_totalBytesReceived += static_cast<quint64>(payload.size());
             emit textMessageReceived(QString::fromUtf8(payload));
             emit dataReceived(payload);
             break;
         case 0x02: // 二进制帧
+            ++m_totalMessagesReceived;
+            m_totalBytesReceived += static_cast<quint64>(payload.size());
             emit binaryMessageReceived(payload);
             emit dataReceived(payload);
             break;
@@ -336,7 +341,12 @@ qint64 WebSocketConnection::sendTextMessage(const QString& message)
 {
     if (!m_socket || !m_handshakeDone) { return -1; }
     QByteArray frame = buildFrame(0x01, message.toUtf8());
-    return m_socket->write(frame);
+    qint64 written = m_socket->write(frame);
+    if (written > 0) {
+        ++m_totalMessagesSent;
+        m_totalBytesSent += static_cast<quint64>(written);
+    }
+    return written;
 }
 
 /**
@@ -346,7 +356,12 @@ qint64 WebSocketConnection::sendBinaryMessage(const QByteArray& data)
 {
     if (!m_socket || !m_handshakeDone) { return -1; }
     QByteArray frame = buildFrame(0x02, data);
-    return m_socket->write(frame);
+    qint64 written = m_socket->write(frame);
+    if (written > 0) {
+        ++m_totalMessagesSent;
+        m_totalBytesSent += static_cast<quint64>(written);
+    }
+    return written;
 }
 
 /**
@@ -411,4 +426,31 @@ void WebSocketConnection::updateState(ConnectionState newState)
         m_state = newState;
         emit stateChanged(newState);
     }
+}
+
+// ---- 统计接口实现 ----
+
+/** @brief 获取已发送消息总数(文本+二进制) */
+quint64 WebSocketConnection::totalMessagesSent() const { return m_totalMessagesSent; }
+
+/** @brief 获取已接收消息总数(文本+二进制) */
+quint64 WebSocketConnection::totalMessagesReceived() const { return m_totalMessagesReceived; }
+
+/** @brief 获取已发送字节总数(帧级别) */
+quint64 WebSocketConnection::totalBytesSent() const { return m_totalBytesSent; }
+
+/** @brief 获取已接收字节总数(帧级别) */
+quint64 WebSocketConnection::totalBytesReceived() const { return m_totalBytesReceived; }
+
+/** @brief 获取错误计数 */
+quint64 WebSocketConnection::errorCount() const { return m_errorCount; }
+
+/** @brief 重置所有统计数据为零 */
+void WebSocketConnection::resetStats()
+{
+    m_totalMessagesSent = 0;
+    m_totalMessagesReceived = 0;
+    m_totalBytesSent = 0;
+    m_totalBytesReceived = 0;
+    m_errorCount = 0;
 }

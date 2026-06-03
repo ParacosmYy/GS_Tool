@@ -160,7 +160,7 @@ void ModbusMaster::parseResponse(const QByteArray& data) {
 
     ModbusFrame frame = bytesToFrame(data);
     if (frame.exception) {
-        ++m_errorCount;
+        ++m_totalErrors;
         if (!frame.data.isEmpty()) {
             emit error(static_cast<ModbusError>(
                 static_cast<quint8>(frame.data[0])));
@@ -171,53 +171,73 @@ void ModbusMaster::parseResponse(const QByteArray& data) {
     }
 }
 
-/**
- * @brief 获取已发送请求计数
- */
+// ============================================================================
+// 统计接口（新命名）
+// ============================================================================
+
+/** @brief 获取累计发送的请求总数 @return 请求数 */
+quint64 ModbusMaster::totalRequests() const
+{
+    return m_totalRequests;
+}
+
+/** @brief 获取累计接收的有效响应总数 @return 响应数 */
+quint64 ModbusMaster::totalResponses() const
+{
+    return m_totalResponses;
+}
+
+/** @brief 获取累计超时次数 @return 超时次数 */
+quint64 ModbusMaster::totalTimeouts() const
+{
+    return m_totalTimeouts;
+}
+
+/** @brief 获取累计Modbus异常响应总数 @return 错误数 */
+quint64 ModbusMaster::totalErrors() const
+{
+    return m_totalErrors;
+}
+
+/** @brief 重置所有统计计数器 */
+void ModbusMaster::resetStats()
+{
+    m_totalRequests = 0;
+    m_totalResponses = 0;
+    m_totalTimeouts = 0;
+    m_totalErrors = 0;
+}
+
+// ============================================================================
+// 兼容旧接口
+// ============================================================================
+
+/** @brief 兼容旧接口: requestCount -> totalRequests */
 quint64 ModbusMaster::requestCount() const
 {
     return m_totalRequests;
 }
 
-/**
- * @brief 获取已接收响应计数
- */
+/** @brief 兼容旧接口: responseCount -> totalResponses */
 quint64 ModbusMaster::responseCount() const
 {
     return m_totalResponses;
 }
 
-/**
- * @brief 获取超时次数
- */
+/** @brief 兼容旧接口: timeoutCount -> totalTimeouts */
 quint64 ModbusMaster::timeoutCount() const
 {
     return m_totalTimeouts;
 }
 
-/**
- * @brief 获取Modbus异常响应计数
- */
+/** @brief 兼容旧接口: errorCount -> totalErrors */
 quint64 ModbusMaster::errorCount() const
 {
-    return m_errorCount;
+    return m_totalErrors;
 }
 
-/**
- * @brief 重置统计数据
- */
+/** @brief 兼容旧接口: resetStatistics -> resetStats */
 void ModbusMaster::resetStatistics()
 {
-    m_totalRequests = 0;
-    m_totalResponses = 0;
-    m_totalTimeouts = 0;
-    m_errorCount = 0;
-}
-
-/**
- * @brief 重置统计数据(等同于resetStatistics)
- */
-void ModbusMaster::resetStats()
-{
-    resetStatistics();
+    resetStats();
 }
