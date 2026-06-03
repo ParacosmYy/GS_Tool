@@ -82,9 +82,7 @@ public:
      */
     const QList<TriggerRuleConfig>& rules() const;
 
-    /**
-     * @brief 清空所有规则
-     */
+    /** @brief 清空所有规则 */
     void clearRules();
 
     /**
@@ -111,6 +109,23 @@ public:
      */
     int ruleMatchCount(int index) const;
 
+    // ---- 扩展统计 getter ----
+
+    /** @brief 获取总评估次数（每次调用evaluateData/evaluateValue计为一次） */
+    quint64 totalEvaluations() const;
+
+    /** @brief 获取总匹配成功次数（quint64精度，跨所有规则累计） */
+    quint64 totalMatches() const;
+
+    /** @brief 获取总动作执行次数 */
+    quint64 totalActionsExecuted() const;
+
+    /** @brief 获取总错误次数（正则编译失败等） */
+    quint64 totalErrors() const;
+
+    /** @brief 重置所有扩展统计计数器为初始值 */
+    void resetStats();
+
 signals:
     /**
      * @brief 触发器命中信号
@@ -127,12 +142,18 @@ signals:
     void actionRequired(int actionType, const QByteArray& actionData);
 
 private:
-    QList<TriggerRuleConfig> m_rules;   ///< 规则列表
-    QVector<int> m_ruleMatchCounts;     ///< 每条规则的命中次数
-    bool m_enabled = true;              ///< 全局启用标志
-    int m_matchCount = 0;               ///< 累计匹配计数
-    QElapsedTimer m_lastMatchTimer;     ///< 上次匹配时间计时器
-    bool m_hasMatched = false;          ///< 是否有过匹配
+    QList<TriggerRuleConfig> m_rules;       ///< 规则列表
+    QVector<int> m_ruleMatchCounts;         ///< 每条规则的命中次数
+    bool m_enabled = true;                  ///< 全局启用标志
+    int m_matchCount = 0;                   ///< 累计匹配计数
+    QElapsedTimer m_lastMatchTimer;         ///< 上次匹配时间计时器
+    bool m_hasMatched = false;              ///< 是否有过匹配
+
+    // 扩展统计计数器
+    quint64 m_totalEvaluations = 0;     ///< 总评估调用次数
+    quint64 m_totalMatches = 0;         ///< 总匹配成功次数（quint64精度）
+    quint64 m_totalActionsExecuted = 0; ///< 总动作执行次数
+    quint64 m_totalErrors = 0;          ///< 总错误次数
 };
 
 #endif // TRIGGERENGINE_H

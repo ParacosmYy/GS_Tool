@@ -188,3 +188,37 @@ QString SendHistory::statisticsSummary() const
 
     return summary.trimmed();
 }
+
+/**
+ * @brief 获取历史记录总条目数（累计添加，含去重跳过）
+ * @return 累计添加的记录总数
+ */
+quint64 SendHistory::totalRecords() const
+{
+    return m_totalRecords;
+}
+
+/**
+ * @brief 获取因连续重复而被跳过的去重次数
+ * @return 去重跳过次数
+ */
+quint64 SendHistory::totalDuplicateSkips() const
+{
+    return m_totalDuplicateSkips;
+}
+
+/**
+ * @brief 重置所有统计计数器
+ *
+ * 将 totalRecords、totalDuplicateSkips、totalSendCount 全部归零，
+ * 同时清空频率表和历史列表。
+ */
+void SendHistory::resetStatistics()
+{
+    m_totalRecords = 0;
+    m_totalDuplicateSkips = 0;
+    m_totalSendCount = 0;
+    m_freqMap.clear();
+    m_entries.clear();
+    emit historyChanged();
+}

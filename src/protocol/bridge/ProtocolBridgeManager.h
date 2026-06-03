@@ -8,6 +8,7 @@
  *   3. 转发当前活动源的 frameParsed 信号，下游无需知道数据来自哪个协议
  *   4. 提供桥接器状态查询（解析状态、累计帧数、错误统计）
  *   5. 支持运行时动态切换活跃桥接器（不中断数据流）
+ *   6. 统计总桥接数、解析帧数、解析错误数、处理字节数
  *
  * 设计模式: 策略模式(Strategy) -- 不同协议源是可互换的策略，Manager 是 Context
  * 业务层: 不依赖任何表现层类
@@ -102,6 +103,20 @@ public:
     /** @brief 获取当前活动桥接器的累计校验错误次数（仅 FrameParser 模式） */
     quint64 checksumErrors() const;
 
+    // ---- 管理器级统计接口 ----
+
+    /** @brief 获取累计创建/移除的桥接器切换总次数 */
+    quint64 totalBridges() const;
+
+    /** @brief 获取所有协议源累计解析的总帧数（含所有模式） */
+    quint64 totalFramesParsedAll() const;
+
+    /** @brief 获取所有协议源累计解析错误总数（含所有模式） */
+    quint64 totalParseErrors() const;
+
+    /** @brief 获取累计处理的字节总数 */
+    quint64 totalBytesProcessed() const;
+
     // ---- 运行时动态切换 ----
 
     /**
@@ -147,6 +162,11 @@ private:
     quint64 m_totalFramesParsed = 0;    ///< 累计成功解析帧数
     quint64 m_totalErrors = 0;          ///< 累计解析错误次数
     quint64 m_checksumErrors = 0;       ///< 累计校验错误次数
+
+    quint64 m_totalBridges = 0;         ///< 累计桥接器切换次数
+    quint64 m_totalFramesParsedAll = 0; ///< 所有模式累计解析帧数
+    quint64 m_totalParseErrors = 0;     ///< 所有模式累计解析错误数
+    quint64 m_totalBytesProcessed = 0;  ///< 累计处理的字节总数
 };
 
 #endif // PROTOCOLBRIDGEMANAGER_H

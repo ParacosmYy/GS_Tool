@@ -37,6 +37,9 @@ void TriggerEngine::evaluateData(const QByteArray& data)
         return;
     }
 
+    /* 每次调用计为一次评估 */
+    ++m_totalEvaluations;
+
     for (int i = 0; i < m_rules.size(); ++i) {
         const TriggerRuleConfig& rule = m_rules.at(i);
         if (!rule.enabled) {
@@ -57,6 +60,9 @@ void TriggerEngine::evaluateData(const QByteArray& data)
             if (re.isValid()) {
                 QString text = QString::fromUtf8(data);
                 matched = re.match(text).hasMatch();
+            } else {
+                /* 正则编译失败，计入错误 */
+                ++m_totalErrors;
             }
             break;
         }
@@ -76,6 +82,8 @@ void TriggerEngine::evaluateData(const QByteArray& data)
 
         if (matched) {
             ++m_matchCount;
+            ++m_totalMatches;
+            ++m_totalActionsExecuted;
             if (i < m_ruleMatchCounts.size()) {
                 ++m_ruleMatchCounts[i];
             }
@@ -103,6 +111,9 @@ void TriggerEngine::evaluateValue(const QString& name, double value)
         return;
     }
 
+    /* 每次调用计为一次评估 */
+    ++m_totalEvaluations;
+
     for (int i = 0; i < m_rules.size(); ++i) {
         const TriggerRuleConfig& rule = m_rules.at(i);
         if (!rule.enabled || rule.matchMode != MatchMode::ValueRange) {
@@ -111,6 +122,8 @@ void TriggerEngine::evaluateValue(const QString& name, double value)
 
         if (value >= rule.valueMin && value <= rule.valueMax) {
             ++m_matchCount;
+            ++m_totalMatches;
+            ++m_totalActionsExecuted;
             if (i < m_ruleMatchCounts.size()) {
                 ++m_ruleMatchCounts[i];
             }
@@ -229,4 +242,46 @@ int TriggerEngine::ruleMatchCount(int index) const
         return m_ruleMatchCounts.at(index);
     }
     return 0;
+}
+
+// ---- 扩展统计 getter ----
+
+/** @brief 获取总评估次数 @return 总评估次数 */
+quint64 TriggerEngine::totalEvaluations() const
+{
+    return m_totalEvaluations;
+}
+
+/** @brief 获取总匹配成功次数（quint64精度） @return 总匹配次数 */
+quint64 TriggerEngine::totalMatches() const
+{
+    return m_totalMatches;
+}
+
+/** @brief 获取总动作执行次数 @return 总动作执行次数 */
+quint64 TriggerEngine::totalActionsExecuted() const
+{
+    return m_totalActionsExecuted;
+}
+
+/** @brief 获取总错误次数 @return 总错误次数 */
+quint64 TriggerEngine::totalErrors() const
+{
+    return m_totalErrors;
+}
+
+/**
+ * @brief 重置所有扩展统计计数器为初始值
+ *
+ * 将 m_totalEvaluations、m_totalMatches、m_totalActionsExecuted、m_totalErrors
+ * 以及原有统计计数器（m_matchCount、m_ruleMatchCounts）全部清零。
+ * 不影响规则列表和启用状态。
+ */
+void TriggerEngine::resetStats()
+{
+    m_totalEvaluations = 0;
+    m_totalMatches = 0;
+    m_totalActionsExecuted = 0;
+    m_totalErrors = 0;
+    resetStatistics();
 }

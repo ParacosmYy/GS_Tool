@@ -95,20 +95,25 @@ public:
      */
     void addBookmark(const QString& label, const QString& streamId = QString());
 
-    /**
-     * @brief 获取所有书签（按添加顺序）
-     * @return 书签列表的只读引用
-     */
+    /** @brief 获取所有书签（按添加顺序） @return 书签列表 */
     QVector<DataBookmark> bookmarks() const;
 
-    /**
-     * @brief 删除指定索引的书签
-     * @param index 书签索引，越界时忽略
-     */
+    /** @brief 删除指定索引的书签 @param index 书签索引 */
     void removeBookmark(int index);
 
     /** @brief 清除所有书签 */
     void clearBookmarks();
+
+    // ---- 会话统计 ----
+
+    /** @brief 获取累计写入的日志记录总数 @return 记录条数 */
+    quint64 totalLogsWritten() const;
+
+    /** @brief 获取累计添加的书签总数(含已删除) @return 书签总数 */
+    quint64 totalBookmarks() const;
+
+    /** @brief 重置所有会话统计计数器(不影响录制/回放状态) */
+    void resetStats();
 
 signals:
     /** @brief 录制已启动 */
@@ -123,14 +128,9 @@ signals:
     void playbackFinished();
     /** @brief 错误发生 @param reason 错误原因描述 */
     void error(const QString& reason);
-
     /** @brief 书签列表变化信号（增/删/清空时发射） */
     void bookmarksChanged();
-
-    /**
-     * @brief seek操作完成信号
-     * @param timestamp 实际跳转到的原始时间戳（可能不等于请求值，取最近匹配）
-     */
+    /** @brief seek操作完成信号 @param timestamp 实际跳转到的原始时间戳 */
     void seekCompleted(qint64 timestamp);
 
 private slots:
@@ -153,21 +153,13 @@ private:
     void writeRecord(quint64 timestamp, Direction dir, const QByteArray& data);
     bool readNextRecord(RecordHeader& header, QByteArray& data);
 
-    /**
-     * @brief 从文件头开始扫描，定位到目标时间戳最近的记录
-     *
-     * 遍历所有记录，找到 timestamp <= targetTimestamp 的最后一条。
-     * 调用后文件指针位于该条记录之后，m_nextRecordTime 指向其下一条。
-     *
-     * @param targetTimestamp 目标时间戳（毫秒）
-     * @return 实际定位到的时间戳；-1 表示无记录或文件错误
-     */
+    /** @brief 线性扫描录制文件到目标时间戳 @param targetTimestamp 目标时间戳(ms) @return 实际偏移量 */
     qint64 scanToTimestamp(qint64 targetTimestamp);
 
     // 录制相关
     QFile* m_recordFile = nullptr;
     QElapsedTimer m_recordTimer;
-    qint64 m_pauseOffset = 0;       // 暂停期间的时间偏移
+    qint64 m_pauseOffset = 0;
     qint64 m_pauseStartTime = 0;
     int m_recordCount = 0;
     bool m_recording = false;
@@ -177,21 +169,24 @@ private:
     QFile* m_playbackFile = nullptr;
     QTimer* m_playbackTimer = nullptr;
     QElapsedTimer m_playbackElapsed;
-    qint64 m_playbackBaseTime = 0;  ///< 回放基准时间(累计已回放的原始时间)
-    qint64 m_nextRecordTime = 0;    ///< 下一条记录的时间戳
-    qint64 m_playbackOffset = 0;    ///< seek操作导致的时间偏移量（原始时间轴上的当前位置）
+    qint64 m_playbackBaseTime = 0;
+    qint64 m_nextRecordTime = 0;
+    qint64 m_playbackOffset = 0;
     int m_totalRecords = 0;
     int m_playedRecords = 0;
     qreal m_playbackSpeed = 1.0;
     bool m_playing = false;
     bool m_playbackPaused = false;
 
-    /** @brief 线程安全互斥锁，保护 seek/录制/回放操作的原子性 */
+    /** @brief 线程安全互斥锁 */
     QMutex m_mutex;
 
     // 书签相关
-    /** @brief 书签集合，按添加顺序存储 */
     QVector<DataBookmark> m_bookmarks;
+
+    // 会话统计
+    quint64 m_totalLogsWritten = 0;   ///< 累计写入的日志记录总数
+    quint64 m_totalBookmarks = 0;     ///< 累计添加的书签总数(含已删除)
 };
 
 #endif // DATALOGGER_H
