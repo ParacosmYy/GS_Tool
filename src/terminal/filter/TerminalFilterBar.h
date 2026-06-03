@@ -11,6 +11,7 @@
 #define TERMINALFILTERBAR_H
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
@@ -43,13 +44,23 @@ public:
      */
     bool isCaseSensitive() const;
 
+    /**
+     * @brief 是否启用反转过滤
+     * @return true 反转匹配（排除匹配行）
+     */
+    bool isInverted() const;
+
 signals:
     /**
      * @brief 用户请求应用过滤
      * @param pattern 正则表达式
      * @param caseSensitive 是否区分大小写
+     * @param inverted 是否反转过滤
      */
-    void filterRequested(const QString &pattern, bool caseSensitive);
+    void filterRequested(const QString &pattern, bool caseSensitive, bool inverted);
+
+    /** @brief 用户请求清除过滤 */
+    void filterCleared();
 
 private slots:
     /**
@@ -59,8 +70,11 @@ private slots:
 
 private:
     QLineEdit *m_patternEdit;       ///< 正则表达式输入框
+    QComboBox *m_historyCombo;      ///< 过滤历史下拉框
     QCheckBox *m_caseCheck;         ///< 大小写敏感复选框
+    QCheckBox *m_invertCheck;       ///< 反转过滤复选框
     QPushButton *m_applyBtn;        ///< 应用过滤按钮
+    QPushButton *m_clearBtn;        ///< 清除过滤按钮
 };
 
 #endif // TERMINALFILTERBAR_H

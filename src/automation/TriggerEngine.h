@@ -16,6 +16,7 @@
 #include <QObject>
 #include <QList>
 #include <QByteArray>
+#include <QElapsedTimer>
 #include "automation/TriggerRule.h"
 
 /**
@@ -92,6 +93,24 @@ public:
      */
     int matchCount() const;
 
+    /**
+     * @brief 获取上次匹配距现在的毫秒数
+     * @return 距上次匹配的毫秒数，无匹配返回 -1
+     */
+    qint64 msSinceLastMatch() const;
+
+    /**
+     * @brief 重置统计计数（不重置规则）
+     */
+    void resetStatistics();
+
+    /**
+     * @brief 获取指定规则的匹配次数
+     * @param index 规则索引
+     * @return 该规则命中次数
+     */
+    int ruleMatchCount(int index) const;
+
 signals:
     /**
      * @brief 触发器命中信号
@@ -109,8 +128,11 @@ signals:
 
 private:
     QList<TriggerRuleConfig> m_rules;   ///< 规则列表
+    QVector<int> m_ruleMatchCounts;     ///< 每条规则的命中次数
     bool m_enabled = true;              ///< 全局启用标志
     int m_matchCount = 0;               ///< 累计匹配计数
+    QElapsedTimer m_lastMatchTimer;     ///< 上次匹配时间计时器
+    bool m_hasMatched = false;          ///< 是否有过匹配
 };
 
 #endif // TRIGGERENGINE_H

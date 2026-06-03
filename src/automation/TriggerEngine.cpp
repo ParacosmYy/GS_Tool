@@ -16,6 +16,7 @@ TriggerEngine::TriggerEngine(QObject* parent)
     : QObject(parent)
     , m_enabled(true)
     , m_matchCount(0)
+    , m_hasMatched(false)
 {
 }
 
@@ -75,6 +76,11 @@ void TriggerEngine::evaluateData(const QByteArray& data)
 
         if (matched) {
             ++m_matchCount;
+            if (i < m_ruleMatchCounts.size()) {
+                ++m_ruleMatchCounts[i];
+            }
+            m_lastMatchTimer.start();
+            m_hasMatched = true;
             emit triggered(i, rule.name);
             emit actionRequired(static_cast<int>(rule.actionType), rule.actionData);
         }
@@ -105,6 +111,11 @@ void TriggerEngine::evaluateValue(const QString& name, double value)
 
         if (value >= rule.valueMin && value <= rule.valueMax) {
             ++m_matchCount;
+            if (i < m_ruleMatchCounts.size()) {
+                ++m_ruleMatchCounts[i];
+            }
+            m_lastMatchTimer.start();
+            m_hasMatched = true;
             emit triggered(i, rule.name);
             emit actionRequired(static_cast<int>(rule.actionType), rule.actionData);
         }
@@ -118,6 +129,7 @@ void TriggerEngine::evaluateValue(const QString& name, double value)
 void TriggerEngine::addRule(const TriggerRuleConfig& rule)
 {
     m_rules.append(rule);
+    m_ruleMatchCounts.append(0);
 }
 
 /**
@@ -128,6 +140,9 @@ void TriggerEngine::removeRule(int index)
 {
     if (index >= 0 && index < m_rules.size()) {
         m_rules.removeAt(index);
+        if (index < m_ruleMatchCounts.size()) {
+            m_ruleMatchCounts.removeAt(index);
+        }
     }
 }
 
@@ -169,6 +184,7 @@ const QList<TriggerRuleConfig>& TriggerEngine::rules() const
 void TriggerEngine::clearRules()
 {
     m_rules.clear();
+    m_ruleMatchCounts.clear();
 }
 
 /**
@@ -178,4 +194,39 @@ void TriggerEngine::clearRules()
 int TriggerEngine::matchCount() const
 {
     return m_matchCount;
+}
+
+/**
+ * @brief 获取上次匹配距现在的毫秒数
+ * @return 距上次匹配的毫秒数，无匹配返回 -1
+ */
+qint64 TriggerEngine::msSinceLastMatch() const
+{
+    if (!m_hasMatched) {
+        return -1;
+    }
+    return m_lastMatchTimer.elapsed();
+}
+
+/**
+ * @brief 重置统计计数（不重置规则）
+ */
+void TriggerEngine::resetStatistics()
+{
+    m_matchCount = 0;
+    m_hasMatched = false;
+    m_ruleMatchCounts.fill(0);
+}
+
+/**
+ * @brief 获取指定规则的匹配次数
+ * @param index 规则索引
+ * @return 该规则命中次数，无效索引返回 0
+ */
+int TriggerEngine::ruleMatchCount(int index) const
+{
+    if (index >= 0 && index < m_ruleMatchCounts.size()) {
+        return m_ruleMatchCounts.at(index);
+    }
+    return 0;
 }

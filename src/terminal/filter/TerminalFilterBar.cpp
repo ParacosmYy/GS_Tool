@@ -13,8 +13,11 @@
 TerminalFilterBar::TerminalFilterBar(QWidget *parent)
     : QWidget(parent)
     , m_patternEdit(new QLineEdit(this))
+    , m_historyCombo(new QComboBox(this))
     , m_caseCheck(new QCheckBox(tr("区分大小写"), this))
+    , m_invertCheck(new QCheckBox(tr("反转"), this))
     , m_applyBtn(new QPushButton(tr("应用过滤"), this))
+    , m_clearBtn(new QPushButton(tr("清除"), this))
 {
     setObjectName(QStringLiteral("TerminalFilterBar"));
 
@@ -24,11 +27,20 @@ TerminalFilterBar::TerminalFilterBar(QWidget *parent)
     m_patternEdit->setPlaceholderText(tr("输入正则表达式..."));
     m_patternEdit->setClearButtonEnabled(true);
 
+    m_historyCombo->setObjectName("filterHistoryCombo");
+    m_historyCombo->setFixedWidth(150);
+    m_historyCombo->setEditable(false);
+    m_historyCombo->setToolTip(tr("过滤历史"));
+
     m_applyBtn->setFixedWidth(100);
+    m_clearBtn->setFixedWidth(60);
 
     layout->addWidget(m_patternEdit);
+    layout->addWidget(m_historyCombo);
     layout->addWidget(m_caseCheck);
+    layout->addWidget(m_invertCheck);
     layout->addWidget(m_applyBtn);
+    layout->addWidget(m_clearBtn);
 
     // 连接信号
     connect(m_applyBtn, &QPushButton::clicked,
@@ -36,6 +48,18 @@ TerminalFilterBar::TerminalFilterBar(QWidget *parent)
 
     connect(m_patternEdit, &QLineEdit::returnPressed,
             this, &TerminalFilterBar::onApplyClicked);
+
+    connect(m_clearBtn, &QPushButton::clicked, this, [this]() {
+        m_patternEdit->clear();
+        emit filterCleared();
+    });
+
+    connect(m_historyCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int index) {
+        if (index >= 0) {
+            m_patternEdit->setText(m_historyCombo->itemText(index));
+        }
+    });
 }
 
 /**
@@ -55,9 +79,31 @@ bool TerminalFilterBar::isCaseSensitive() const
 }
 
 /**
- * @brief 处理应用按钮点击，发射过滤请求信号
+ * @brief 返回反转过滤复选框状态
  */
+bool TerminalFilterBar::isInverted() const
+{
+    return m_invertCheck->isChecked();
+}
+
 void TerminalFilterBar::onApplyClicked()
 {
-    emit filterRequested(m_patternEdit->text(), m_caseCheck->isChecked());
+    const QString pattern = m_patternEdit->text();
+    emit filterRequested(pattern, m_caseCheck->isChecked(),
+                         m_invertCheck->isChecked());
+
+    /* 添加到历史（去重，最多20条） */
+    if (!pattern.isEmpty()) {
+        int idx = m_historyCombo->findText(pattern);
+        if (idx >= 0) {
+            m_historyCombo->removeItem(idx);
+        }
+        m_historyCombo->insertItem(0, pattern);
+        m_historyCombo->setCurrentIndex(0);
+        while (m_historyCombo->count() > 20) {
+            m_historyCombo->removeItem(m_historyCombo->count() - 1);
+        }
+    }
 }
+
+

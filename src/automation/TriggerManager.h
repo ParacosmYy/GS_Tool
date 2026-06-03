@@ -75,6 +75,36 @@ public:
      */
     void setRuleEnabled(int index, bool enabled);
 
+    /**
+     * @brief 更新指定索引的规则配置
+     * @param index 规则索引
+     * @param rule 新的规则配置
+     */
+    void updateRule(int index, const TriggerRuleConfig& rule);
+
+    /**
+     * @brief 获取累计匹配次数
+     * @return 所有规则的总命中次数
+     */
+    int matchCount() const;
+
+    /**
+     * @brief 获取上次匹配距现在的毫秒数
+     * @return 距上次匹配的毫秒数，无匹配返回 -1
+     */
+    qint64 msSinceLastMatch() const;
+
+    /**
+     * @brief 重置引擎统计计数
+     */
+    void resetStatistics();
+
+    /**
+     * @brief 更新规则列表UI
+     * @param panel 触发器列表面板指针
+     */
+    void syncListPanel(class TriggerListPanel* panel);
+
 signals:
     /** @brief 规则列表变更信号 */
     void rulesChanged();

@@ -18,6 +18,10 @@ TriggerListPanel::TriggerListPanel(QWidget* parent)
     , m_ruleList(nullptr)
     , m_addBtn(nullptr)
     , m_removeBtn(nullptr)
+    , m_editBtn(nullptr)
+    , m_moveUpBtn(nullptr)
+    , m_moveDownBtn(nullptr)
+    , m_countLabel(nullptr)
 {
     setObjectName(QStringLiteral("TriggerListPanel"));
     setupUI();
@@ -52,7 +56,18 @@ void TriggerListPanel::setRules(const QList<TriggerRuleConfig>& rules)
 
         auto* item = new QListWidgetItem(display, m_ruleList);
         item->setData(Qt::UserRole, rule.name);
+        item->setCheckState(rule.enabled ? Qt::Checked : Qt::Unchecked);
     }
+}
+
+/**
+ * @brief 更新规则计数标签
+ * @param total 总规则数
+ * @param enabled 启用的规则数
+ */
+void TriggerListPanel::updateRuleCount(int total, int enabled)
+{
+    m_countLabel->setText(tr("规则: %1/%2 启用").arg(enabled).arg(total));
 }
 
 /**
@@ -77,6 +92,11 @@ void TriggerListPanel::setupUI()
     m_ruleList->setObjectName(QStringLiteral("ruleList"));
     mainLayout->addWidget(m_ruleList);
 
+    /* 计数标签 */
+    m_countLabel = new QLabel(tr("规则: 0/0 启用"), this);
+    m_countLabel->setObjectName(QStringLiteral("ruleCountLabel"));
+    mainLayout->addWidget(m_countLabel);
+
     /* 按钮栏 */
     auto* btnLayout = new QHBoxLayout();
     btnLayout->setSpacing(4);
@@ -89,8 +109,23 @@ void TriggerListPanel::setupUI()
     m_removeBtn->setObjectName(QStringLiteral("removeRuleBtn"));
     m_removeBtn->setToolTip(tr("移除选中规则"));
 
+    m_editBtn = new QPushButton(tr("✏️"), this);
+    m_editBtn->setObjectName(QStringLiteral("editRuleBtn"));
+    m_editBtn->setToolTip(tr("编辑选中规则"));
+
+    m_moveUpBtn = new QPushButton(tr("⬆"), this);
+    m_moveUpBtn->setObjectName(QStringLiteral("moveUpRuleBtn"));
+    m_moveUpBtn->setToolTip(tr("上移选中规则"));
+
+    m_moveDownBtn = new QPushButton(tr("⬇"), this);
+    m_moveDownBtn->setObjectName(QStringLiteral("moveDownRuleBtn"));
+    m_moveDownBtn->setToolTip(tr("下移选中规则"));
+
     btnLayout->addWidget(m_addBtn);
     btnLayout->addWidget(m_removeBtn);
+    btnLayout->addWidget(m_editBtn);
+    btnLayout->addWidget(m_moveUpBtn);
+    btnLayout->addWidget(m_moveDownBtn);
     btnLayout->addStretch();
 
     mainLayout->addLayout(btnLayout);
@@ -103,5 +138,34 @@ void TriggerListPanel::setupUI()
         if (row >= 0) {
             emit removeRuleRequested(row);
         }
+    });
+
+    connect(m_editBtn, &QPushButton::clicked, this, [this]() {
+        const int row = m_ruleList->currentRow();
+        if (row >= 0) {
+            emit editRuleRequested(row);
+        }
+    });
+
+    connect(m_moveUpBtn, &QPushButton::clicked, this, [this]() {
+        const int row = m_ruleList->currentRow();
+        if (row > 0) {
+            emit moveUpRequested(row);
+        }
+    });
+
+    connect(m_moveDownBtn, &QPushButton::clicked, this, [this]() {
+        const int row = m_ruleList->currentRow();
+        if (row >= 0 && row < m_ruleList->count() - 1) {
+            emit moveDownRequested(row);
+        }
+    });
+
+    /* 双击切换启用状态 */
+    connect(m_ruleList, &QListWidget::itemDoubleClicked, this, [this](QListWidgetItem* item) {
+        const int row = m_ruleList->row(item);
+        const bool newState = item->checkState() != Qt::Checked;
+        item->setCheckState(newState ? Qt::Checked : Qt::Unchecked);
+        emit ruleEnabledChanged(row, newState);
     });
 }
