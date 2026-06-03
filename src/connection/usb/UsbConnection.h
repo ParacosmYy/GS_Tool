@@ -88,7 +88,10 @@ private:
     quint16 m_pid       = 0;    ///< 产品ID
     int     m_interface = 0;    ///< 当前接口编号
     ConnectionState m_state = ConnectionState::Disconnected; ///< 连接状态
-    void*   m_devHandle = nullptr; ///< libusb设备句柄 (不透明指针)
+    void*   m_devHandle = nullptr;      ///< libusb设备句柄 (不透明指针)
+    void*   m_usbContext = nullptr;     ///< libusb上下文 (不透明指针)
+    bool    m_interfaceClaimed = false; ///< 接口是否已声明
+    unsigned int m_timeout = 5000;      ///< USB传输超时(ms)
 };
 
 #endif // USB_CONNECTION_H

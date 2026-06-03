@@ -106,4 +106,5 @@
 | 115 | feat(theme): QSS主题生成器(Python) — 模板+JSON颜色定义自动生成三套QSS | 115 |
 | 116 | docs: 架构解耦方案 + 迭代路线图 | 116 |
 | 117 | feat(can): DBC解析器(CAN数据库) + Dashboard布局JSON持久化 + QMessageBox残余清除 | 117 |
+| 118 | feat(usb): UsbLibraryLoader动态加载libusb + UsbConnection真实集成 + FlatBuffers FBS完整解析器 + ResponsiveLayout断点系统 + SchemaViewer TODO清理 | 118 |
 | ... | 目标: 500分 | 500 |

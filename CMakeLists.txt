@@ -126,6 +126,7 @@ set(SOURCES
     src/protocol/parser/FrameDefinition.cpp
     src/core/settings/SessionManager.cpp
     src/core/managers/ShortcutManager.cpp
+    src/core/layout/ResponsiveLayout.cpp
 
     # ── F1: 数据录制回放 ──
     src/core/recording/RecordingTimeline.cpp
@@ -244,6 +245,7 @@ set(SOURCES
     src/connection/usb/UsbDeviceDetector.cpp
     src/connection/usb/UsbDescriptorViewer.cpp
     src/connection/usb/UsbConfigPanel.cpp
+    src/connection/usb/UsbLibraryLoader.cpp
 
     # ── F21: 正则终端过滤器 ──
     src/terminal/filter/TerminalFilter.cpp
@@ -310,6 +312,7 @@ set(HEADERS
     src/core/theme/TimerConstants.h
     src/core/settings/SessionManager.h
     src/core/managers/ShortcutManager.h
+    src/core/layout/ResponsiveLayout.h
     src/connection/interface/IConnection.h
     src/connection/serial_port/SerialConnection.h
     src/connection/network/TcpConnection.h
@@ -490,6 +493,7 @@ set(HEADERS
     src/connection/usb/UsbDeviceDetector.h
     src/connection/usb/UsbDescriptorViewer.h
     src/connection/usb/UsbConfigPanel.h
+    src/connection/usb/UsbLibraryLoader.h
 
     # ── F21: 正则终端过滤器 ──
     src/terminal/filter/TerminalFilter.h

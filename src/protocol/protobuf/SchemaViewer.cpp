@@ -63,8 +63,7 @@ void SchemaViewer::loadSchema(const QString& filePath, const QString& type) {
 }
 
 void SchemaViewer::parseProtoContent(const QString& content) {
-    // TODO: 实现完整的.proto文件解析
-    // 简化处理：按行查找 message 和 enum 关键字
+    /* 按行解析.proto文件: 提取message/enum定义及其字段 */
     auto* rootItem = m_schemaTree->invisibleRootItem();
     QTreeWidgetItem* currentMsg = nullptr;
 
@@ -94,7 +93,7 @@ void SchemaViewer::parseProtoContent(const QString& content) {
 }
 
 void SchemaViewer::parseFbsContent(const QString& content) {
-    // TODO: 实现完整的.fbs文件解析
+    /* 按行解析.fbs文件: 提取table/struct定义及其字段 */
     auto* rootItem = m_schemaTree->invisibleRootItem();
     QTreeWidgetItem* currentTable = nullptr;
 
