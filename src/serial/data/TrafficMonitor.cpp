@@ -202,5 +202,34 @@ void TrafficMonitor::calculateRates()
     m_txBytes = 0;
     m_elapsed.restart();
 
+    // 统计计数器递增
+    ++m_totalSamples;  ///< 统计: 每次采样递增
+
     emit rateUpdated(rx, tx);
+}
+
+// ── 统计计数器实现 ──
+
+/** @brief 获取采样总次数 @return 累计采样点数 */
+quint64 TrafficMonitor::totalSamples() const
+{
+    return m_totalSamples;
+}
+
+/** @brief 获取历史最高带宽(RX+TX之和) @return 峰值带宽(bytes/s) */
+double TrafficMonitor::peakBandwidth() const
+{
+    return m_peakRxRate + m_peakTxRate;
+}
+
+/** @brief 获取监控的字节总数(RX+TX) @return 累计字节数 */
+quint64 TrafficMonitor::totalBytesMonitored() const
+{
+    return static_cast<quint64>(m_totalRxBytes) + static_cast<quint64>(m_totalTxBytes);
+}
+
+/** @brief 重置流量监控统计计数器(不影响速率计算) */
+void TrafficMonitor::resetTrafficStatistics()
+{
+    m_totalSamples = 0;
 }

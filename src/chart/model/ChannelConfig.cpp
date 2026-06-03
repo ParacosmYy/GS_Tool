@@ -159,6 +159,10 @@ ChannelConfig ChannelConfig::fromJson(const QJsonObject& obj)
 void ChannelConfigSet::addChannel(const ChannelConfig& config)
 {
     m_channels.append(config);
+    ++m_totalConfigChanges;
+    if (config.color.isValid()) {
+        ++m_totalColorChanges;
+    }
 }
 
 /** @brief 按displayName移除通道 @param displayName 通道显示名 */
@@ -167,6 +171,7 @@ void ChannelConfigSet::removeChannel(const QString& displayName)
     for (int i = 0; i < m_channels.size(); ++i) {
         if (m_channels[i].displayName == displayName) {
             m_channels.removeAt(i);
+            ++m_totalConfigChanges;
             return;
         }
     }
@@ -272,6 +277,7 @@ ChannelConfigSet ChannelConfigSet::generateDefaults(const QVector<FieldDef>& fie
         cfg.displayName = field.name;
         cfg.color = ChartColors::defaultColors()[colorIndex % ChartColors::defaultColors().size()];
         cfg.enabled = true;
+
         cfg.unit = field.unit;
         cfg.sampleDivisor = 1;
 
@@ -280,4 +286,27 @@ ChannelConfigSet ChannelConfigSet::generateDefaults(const QVector<FieldDef>& fie
     }
 
     return set;
+}
+
+// ============================================================
+// 统计计数器接口
+// ============================================================
+
+/** @brief 返回配置变更总次数 */
+quint64 ChannelConfigSet::totalConfigChanges() const
+{
+    return m_totalConfigChanges;
+}
+
+/** @brief 返回颜色变更总次数 */
+quint64 ChannelConfigSet::totalColorChanges() const
+{
+    return m_totalColorChanges;
+}
+
+/** @brief 重置所有配置统计计数器为初始值 */
+void ChannelConfigSet::resetConfigStatistics()
+{
+    m_totalConfigChanges = 0;
+    m_totalColorChanges = 0;
 }

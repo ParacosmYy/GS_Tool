@@ -91,9 +91,24 @@ public:
     /** @brief 生成统计摘要文本 */
     QString statisticsSummary() const;
 
+    // ── 统计计数器 Getter ──
+
+    /** @brief 获取历史记录添加总次数 @return 累计添加次数 */
+    quint64 totalEntriesAdded() const;
+
+    /** @brief 获取历史记录移除总次数 @return 累计移除次数(含淘汰) */
+    quint64 totalEntriesRemoved() const;
+
+    /** @brief 重置历史记录统计计数器(不影响记录数据本身) */
+    void resetHistoryStatistics();
+
 private:
     QVector<OtaRecord> m_records;          ///< 历史记录列表
     static constexpr int kMaxRecords = 200; ///< 最大保留记录数
+
+    // ── 统计计数器 ──
+    quint64 m_totalEntriesAdded = 0;       ///< 历史记录添加总次数
+    quint64 m_totalEntriesRemoved = 0;     ///< 历史记录移除总次数(含淘汰)
 };
 
 #endif // OTAHISTORYMODEL_H

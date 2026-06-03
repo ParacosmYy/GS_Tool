@@ -70,6 +70,7 @@ void ZoomController::resetZoom()
 
     m_zoomStack.clear();
     m_zoomLevel = 1.0;
+    ++m_totalResets;
     emit viewChanged();
     emit zoomReset();
 }
@@ -234,6 +235,7 @@ void ZoomController::zoomAt(int centerPixelX, double factor)
 
     ax->setRange(newMin, newMax);
     m_zoomLevel *= factor;
+    ++m_totalZooms;
     emit viewChanged();
 }
 
@@ -359,10 +361,12 @@ void ZoomController::handleMouseRelease(QMouseEvent* event)
                 if (curRange > 0) m_zoomLevel = origRange / curRange;
             }
 
+            ++m_totalZooms;
             emit viewChanged();
         }
     } else if (m_panning && event->button() == Qt::MiddleButton) {
         m_panning = false;
+        ++m_totalPans;
     }
 }
 
@@ -398,4 +402,34 @@ QValueAxis* ZoomController::yAxis() const
         if (auto* va = qobject_cast<QValueAxis*>(axis)) return va;
     }
     return nullptr;
+}
+
+// ============================================================
+// 统计计数器接口
+// ============================================================
+
+/** @brief 返回缩放操作总次数 */
+quint64 ZoomController::totalZooms() const
+{
+    return m_totalZooms;
+}
+
+/** @brief 返回平移操作总次数 */
+quint64 ZoomController::totalPans() const
+{
+    return m_totalPans;
+}
+
+/** @brief 返回缩放重置总次数 */
+quint64 ZoomController::totalResets() const
+{
+    return m_totalResets;
+}
+
+/** @brief 重置所有缩放统计计数器为初始值 */
+void ZoomController::resetZoomStatistics()
+{
+    m_totalZooms = 0;
+    m_totalPans = 0;
+    m_totalResets = 0;
 }

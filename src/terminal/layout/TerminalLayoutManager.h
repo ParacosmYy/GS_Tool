@@ -100,6 +100,15 @@ public:
     /** @brief 获取历史最大可见行数 @return 最大可见行数 */
     quint64 maxVisibleLines() const;
 
+    /** @brief 获取分栏创建总次数 @return 累计分栏次数 */
+    quint64 totalSplits() const;
+
+    /** @brief 获取Tab切换总次数 @return 累计切换次数 */
+    quint64 totalTabSwitches() const;
+
+    /** @brief 获取布局变更总次数 @return 累计变更次数 */
+    quint64 totalLayoutChanges() const;
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -161,6 +170,9 @@ private:
     quint64 m_totalSwitches = 0;         ///< 布局切换总次数
     quint64 m_totalLinesCleared = 0;     ///< 清除行数累计
     quint64 m_maxVisibleLines = 0;       ///< 历史最大可见行数
+    quint64 m_totalSplits = 0;           ///< 分栏创建总次数
+    quint64 m_totalTabSwitches = 0;      ///< Tab切换总次数
+    quint64 m_totalLayoutChanges = 0;    ///< 布局变更总次数
 };
 
 #endif // TERMINALLAYOUTMANAGER_H

@@ -129,17 +129,22 @@ void OtaHistoryModel::addRecord(const OtaRecord& record)
         beginRemoveRows(QModelIndex(), last, last);
         m_records.removeLast();
         endRemoveRows();
+        ++m_totalEntriesRemoved;  ///< 统计: 淘汰旧记录时递增
     }
 
     beginInsertRows(QModelIndex(), 0, 0);
     m_records.prepend(record);
     endInsertRows();
+    ++m_totalEntriesAdded;  ///< 统计: 记录添加次数递增
     saveToSettings();
 }
 
 /** @brief 清空所有历史记录并持久化 */
 void OtaHistoryModel::clearHistory()
 {
+    if (!m_records.isEmpty()) {
+        m_totalEntriesRemoved += static_cast<quint64>(m_records.size());  ///< 统计: 清空时累加移除数
+    }
     beginResetModel();
     m_records.clear();
     endResetModel();
@@ -311,4 +316,25 @@ QString OtaHistoryModel::statisticsSummary() const
     }
 
     return summary.trimmed();
+}
+
+// ── 统计计数器实现 ──
+
+/** @brief 获取历史记录添加总次数 @return 累计添加次数 */
+quint64 OtaHistoryModel::totalEntriesAdded() const
+{
+    return m_totalEntriesAdded;
+}
+
+/** @brief 获取历史记录移除总次数(含淘汰) @return 累计移除次数 */
+quint64 OtaHistoryModel::totalEntriesRemoved() const
+{
+    return m_totalEntriesRemoved;
+}
+
+/** @brief 重置历史记录统计计数器(不影响记录数据本身) */
+void OtaHistoryModel::resetHistoryStatistics()
+{
+    m_totalEntriesAdded = 0;
+    m_totalEntriesRemoved = 0;
 }

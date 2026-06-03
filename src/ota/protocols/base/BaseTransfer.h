@@ -47,6 +47,23 @@ public:
     /** @brief 查询是否正在运行 @return true=传输中 */
     virtual bool isRunning() const;
 
+    // ── 统计计数器 Getter ──
+
+    /** @brief 获取已发送数据包总数 @return 累计发送包数 */
+    quint64 totalPacketsSent() const;
+
+    /** @brief 获取已接收数据包总数 @return 累计接收包数 */
+    quint64 totalPacketsReceived() const;
+
+    /** @brief 获取重试总次数 @return 累计重试次数 */
+    quint64 totalRetries() const;
+
+    /** @brief 获取传输错误总次数 @return 累计错误次数 */
+    quint64 totalErrors() const;
+
+    /** @brief 重置传输统计计数器(不影响传输状态) */
+    void resetTransferStatistics();
+
 signals:
     /** @brief 进度更新 @param percent 百分比 @param sent 已发送 @param total 总字节 */
     void progress(int percent, qint64 bytesSent, qint64 totalBytes);
@@ -103,6 +120,12 @@ private slots:
 private:
     TransferState m_transferState = TransferState::Idle; ///< 基类传输状态
     void setTransferState(TransferState state);           ///< 内部状态设置
+
+    // ── 统计计数器 ──
+    quint64 m_totalPacketsSent = 0;     ///< 已发送数据包总数
+    quint64 m_totalPacketsReceived = 0; ///< 已接收数据包总数
+    quint64 m_totalRetries = 0;         ///< 重试总次数
+    quint64 m_totalErrors = 0;          ///< 传输错误总次数
 };
 
 #endif // BASE_TRANSFER_H

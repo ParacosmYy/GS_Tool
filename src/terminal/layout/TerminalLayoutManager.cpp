@@ -119,6 +119,9 @@ void TerminalLayoutManager::resetStats()
     m_totalSwitches = 0;
     m_totalLinesCleared = 0;
     m_maxVisibleLines = 0;
+    m_totalSplits = 0;
+    m_totalTabSwitches = 0;
+    m_totalLayoutChanges = 0;
 }
 
 /** @brief 通知行清除事件，累加清除行数 @param lines 本次清除的行数 */
@@ -133,6 +136,24 @@ void TerminalLayoutManager::updateMaxVisibleLines(quint64 currentVisible)
     if (currentVisible > m_maxVisibleLines) {
         m_maxVisibleLines = currentVisible;
     }
+}
+
+/** @brief 获取分栏创建总次数 @return 累计分栏次数 */
+quint64 TerminalLayoutManager::totalSplits() const
+{
+    return m_totalSplits;
+}
+
+/** @brief 获取Tab切换总次数 @return 累计切换次数 */
+quint64 TerminalLayoutManager::totalTabSwitches() const
+{
+    return m_totalTabSwitches;
+}
+
+/** @brief 获取布局变更总次数 @return 累计变更次数 */
+quint64 TerminalLayoutManager::totalLayoutChanges() const
+{
+    return m_totalLayoutChanges;
 }
 
 /** @brief 通过下拉框索引设置布局模式(0=混合, 1=水平分栏, 2=垂直分栏) @param layoutIndex 下拉框索引 */
@@ -202,6 +223,7 @@ void TerminalLayoutManager::applyLayout()
     } else {
         applySplitLayout();
     }
+    ++m_totalLayoutChanges;  ///< 统计: 每次应用布局递增
 }
 
 /** @brief 应用混合布局: 销毁分栏终端，恢复主终端无过滤状态 */
@@ -263,6 +285,7 @@ void TerminalLayoutManager::applySplitLayout()
     m_rxTerminal = createSplitTerminal(DataDirection::Rx,
         tr("RX (接收)"));
     m_splitter->addWidget(m_rxTerminal);
+    ++m_totalSplits;  ///< 统计: 每次创建分栏递增
 
     // TX终端: 右侧(左右分栏) 或 下方(上下分栏)
     m_txTerminal = createSplitTerminal(DataDirection::Tx,

@@ -37,6 +37,8 @@ ProtocolEngine::ProtocolEngine(QObject *parent)
     , m_totalValidations(0)
     , m_totalParseErrors(0)
     , m_lastParseTimestamp(0)
+    , m_totalCrcErrors(0)
+    , m_totalBytesParsed(0)
 {
 }
 
@@ -116,6 +118,8 @@ void ProtocolEngine::reset()
     m_totalValidations = 0;
     m_totalParseErrors = 0;
     m_lastParseTimestamp = 0;
+    m_totalCrcErrors = 0;
+    m_totalBytesParsed = 0;
 }
 
 /**
@@ -200,6 +204,33 @@ qint64 ProtocolEngine::lastParseTimestamp() const
 }
 
 /**
+ * @brief 获取已处理的数据包总数（含成功和失败）
+ * @return 成功解析帧数 + 被拒绝帧数
+ */
+quint64 ProtocolEngine::totalPacketsProcessed() const
+{
+    return m_framesParsed + m_framesRejected;
+}
+
+/**
+ * @brief 获取已解析的字节总数（仅成功解析的帧内字节）
+ * @return 字节总数
+ */
+quint64 ProtocolEngine::totalBytesParsed() const
+{
+    return m_totalBytesParsed;
+}
+
+/**
+ * @brief 获取CRC校验错误次数
+ * @return CRC错误计数
+ */
+quint64 ProtocolEngine::totalCrcErrors() const
+{
+    return m_totalCrcErrors;
+}
+
+/**
  * @brief 重置所有解析统计计数器
  *
  * 将帧计数、拒绝计数、字节总数和时间戳全部归零。
@@ -214,14 +245,24 @@ void ProtocolEngine::resetParseStatistics()
     m_totalValidations = 0;
     m_totalParseErrors = 0;
     m_lastParseTimestamp = 0;
+    m_totalCrcErrors = 0;
+    m_totalBytesParsed = 0;
 }
 
 /**
- * @brief 重置所有统计计数器(等同于resetParseStatistics)
+ * @brief 重置所有引擎统计计数器(等同于resetParseStatistics)
+ */
+void ProtocolEngine::resetEngineStatistics()
+{
+    resetParseStatistics();
+}
+
+/**
+ * @brief 重置所有统计计数器(别名，调用resetEngineStatistics)
  */
 void ProtocolEngine::resetStats()
 {
-    resetParseStatistics();
+    resetEngineStatistics();
 }
 
 /* ============================================================================
@@ -298,6 +339,7 @@ bool ProtocolEngine::tryParseOneFrame()
             emit parseError(tr("帧校验失败"));
             ++m_parseErrors;
             ++m_totalParseErrors;
+            ++m_totalCrcErrors;
             ++m_framesRejected;
             return true;
         }
@@ -312,6 +354,7 @@ bool ProtocolEngine::tryParseOneFrame()
 
     /* ---- 步骤8：发射信号 ---- */
     ++m_framesParsed;
+    m_totalBytesParsed += static_cast<quint64>(rawFrame.size());
     m_lastParseTimestamp = QDateTime::currentMSecsSinceEpoch();
     emit frameParsed(fields, rawFrame);
 

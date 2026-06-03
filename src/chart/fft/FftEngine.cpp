@@ -79,6 +79,7 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
 {
     /* 无数据时返回空频谱 */
     if (timeData.isEmpty() || sampleRate <= 0.0) {
+        ++m_errorCount;
         return {};
     }
 
@@ -281,10 +282,23 @@ quint64 FftEngine::maxSampleSize() const
     return m_maxSampleSize;
 }
 
+/** @brief 获取FFT计算中发生的错误次数 */
+quint64 FftEngine::errorCount() const
+{
+    return m_errorCount;
+}
+
 /** @brief 重置所有统计计数器为初始值 */
-void FftEngine::resetStats()
+void FftEngine::resetFftStatistics()
 {
     m_totalTransforms = 0;
     m_totalSamplesProcessed = 0;
     m_maxSampleSize = 0;
+    m_errorCount = 0;
+}
+
+/** @brief 重置所有统计计数器（别名接口） */
+void FftEngine::resetStats()
+{
+    resetFftStatistics();
 }

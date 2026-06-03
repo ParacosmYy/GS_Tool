@@ -112,6 +112,10 @@ void DataStatistics::update(quint64 rxBytes, quint64 txBytes)
     // 累加数据包计数（每次调用视为一次数据包到达）
     if (rxDelta > 0) ++m_rxPackets;
     if (txDelta > 0) ++m_txPackets;
+
+    // 统计计数器递增
+    ++m_totalUpdates;  ///< 统计: update()调用次数
+    m_totalBytesCounted += static_cast<quint64>(rxDelta) + static_cast<quint64>(txDelta);  ///< 统计: 累计字节数
 }
 
 /** @brief 重置所有统计值和UI显示，重启计时器 */
@@ -128,6 +132,10 @@ void DataStatistics::reset()
     m_avgTxRate = 0.0;
     m_rxPackets = 0;
     m_txPackets = 0;
+
+    // 重置统计计数器
+    m_totalUpdates = 0;
+    m_totalBytesCounted = 0;
 
     // 重置错误计数
     m_framingErrors = 0;
@@ -315,4 +323,31 @@ quint64 DataStatistics::totalRxBytes() const
 quint64 DataStatistics::totalTxBytes() const
 {
     return m_lastTxBytes;
+}
+
+// ── 统计计数器实现 ──
+
+/** @brief 获取update()调用总次数 @return 累计更新次数 */
+quint64 DataStatistics::totalUpdates() const
+{
+    return m_totalUpdates;
+}
+
+/** @brief 获取历史峰值速率(RX/TX中较大者) @return 峰值速率(bytes/s) */
+double DataStatistics::peakRate() const
+{
+    return qMax(m_peakRxRate, m_peakTxRate);
+}
+
+/** @brief 获取所有update()调用传入的字节总数(RX+TX) @return 累计字节数 */
+quint64 DataStatistics::totalBytesCounted() const
+{
+    return m_totalBytesCounted;
+}
+
+/** @brief 重置数据统计计数器(不影响面板显示) */
+void DataStatistics::resetDataStatistics()
+{
+    m_totalUpdates = 0;
+    m_totalBytesCounted = 0;
 }

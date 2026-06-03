@@ -82,14 +82,17 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     m_lastError.clear();
 
     /* ---- 1. 解析 JSON 文档 ---- */
+    ++m_totalValidations;
     QJsonParseError parseError;
     const QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
     if (doc.isNull()) {
         m_lastError = QStringLiteral("JSON 解析失败: %1").arg(parseError.errorString());
+        ++m_validationErrors;
         return false;
     }
     if (!doc.isObject()) {
         m_lastError = QStringLiteral("JSON 根元素必须是对象");
+        ++m_validationErrors;
         return false;
     }
 
@@ -98,10 +101,12 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     /* ---- 2. 校验并读取协议名称 ---- */
     if (!root.contains(QStringLiteral("name"))) {
         m_lastError = QStringLiteral("缺少必填字段: name");
+        ++m_validationErrors;
         return false;
     }
     if (!root.value(QStringLiteral("name")).isString()) {
         m_lastError = QStringLiteral("字段 name 必须为字符串类型");
+        ++m_validationErrors;
         return false;
     }
     m_name = root.value(QStringLiteral("name")).toString();
@@ -109,10 +114,12 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     /* ---- 3. 校验并解析 framing 对象 ---- */
     if (!root.contains(QStringLiteral("framing"))) {
         m_lastError = QStringLiteral("缺少必填字段: framing");
+        ++m_validationErrors;
         return false;
     }
     if (!root.value(QStringLiteral("framing")).isObject()) {
         m_lastError = QStringLiteral("字段 framing 必须为对象类型");
+        ++m_validationErrors;
         return false;
     }
 
@@ -121,6 +128,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     /* 帧类型标识 */
     if (!framingObj.contains(QStringLiteral("type"))) {
         m_lastError = QStringLiteral("framing 中缺少必填字段: type");
+        ++m_validationErrors;
         return false;
     }
     m_framing.type = framingObj.value(QStringLiteral("type")).toString();
@@ -161,6 +169,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     if (root.contains(QStringLiteral("fields"))) {
         if (!root.value(QStringLiteral("fields")).isArray()) {
             m_lastError = QStringLiteral("字段 fields 必须为数组类型");
+            ++m_validationErrors;
             return false;
         }
 
@@ -168,6 +177,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
         for (int i = 0; i < fieldsArr.size(); ++i) {
             if (!fieldsArr.at(i).isObject()) {
                 m_lastError = QStringLiteral("fields[%1] 必须为对象类型").arg(i);
+                ++m_validationErrors;
                 return false;
             }
 
@@ -181,10 +191,12 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
             /* 校验必要字段 */
             if (field.name.isEmpty()) {
                 m_lastError = QStringLiteral("fields[%1] 缺少有效的 name 字段").arg(i);
+                ++m_validationErrors;
                 return false;
             }
             if (field.size <= 0) {
                 m_lastError = QStringLiteral("fields[%1] 的 size 必须大于 0").arg(i);
+                ++m_validationErrors;
                 return false;
             }
 
@@ -400,10 +412,30 @@ quint64 ProtocolSchema::maxSchemaSize() const
     return m_maxSchemaSize;
 }
 
-/** @brief 重置所有统计计数器(加载数/字段数/最大大小) */
-void ProtocolSchema::resetStats()
+/** @brief 获取协议定义校验执行总次数 @return 校验总次数 */
+quint64 ProtocolSchema::totalValidations() const
+{
+    return m_totalValidations;
+}
+
+/** @brief 获取协议定义校验失败次数 @return 校验错误计数 */
+quint64 ProtocolSchema::validationErrors() const
+{
+    return m_validationErrors;
+}
+
+/** @brief 重置所有Schema统计计数器(加载数/字段数/最大大小/校验) */
+void ProtocolSchema::resetSchemaStatistics()
 {
     m_totalSchemas = 0;
     m_totalFieldCount = 0;
     m_maxSchemaSize = 0;
+    m_totalValidations = 0;
+    m_validationErrors = 0;
+}
+
+/** @brief 重置所有统计计数器（别名，调用resetSchemaStatistics） */
+void ProtocolSchema::resetStats()
+{
+    resetSchemaStatistics();
 }

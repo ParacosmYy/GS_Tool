@@ -74,6 +74,17 @@ public:
      */
     void setZoomController(ZoomController* zoom);
 
+    // ---- 统计计数器接口 ----
+
+    /** @brief 获取游标移动总次数（含放置和拖拽） */
+    quint64 totalCursorMoves() const;
+
+    /** @brief 获取测量显示总次数（双游标差值面板绘制） */
+    quint64 totalMeasurements() const;
+
+    /** @brief 重置所有游标统计计数器为初始值 */
+    void resetCursorStatistics();
+
 protected:
     /** @brief 绘制游标线和差值信息面板 */
     void paintEvent(QPaintEvent* event) override;
@@ -155,6 +166,10 @@ private:
     QColor m_panelBgColor;          ///< 差值面板背景色
 
     ZoomController* m_zoomController = nullptr; ///< 关联的缩放控制器(绘制框选用)
+
+    // 统计计数器
+    quint64 m_totalCursorMoves = 0;     ///< 游标移动总次数（含放置和拖拽）
+    quint64 m_totalMeasurements = 0;    ///< 测量显示总次数（双游标差值面板绘制）
 
 private slots:
     /**

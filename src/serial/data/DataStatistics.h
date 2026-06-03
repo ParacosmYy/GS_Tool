@@ -75,6 +75,20 @@ public:
     /** @brief 获取TX累计总字节数 */
     quint64 totalTxBytes() const;
 
+    // ── 统计计数器 Getter ──
+
+    /** @brief 获取update()调用总次数 @return 累计更新次数 */
+    quint64 totalUpdates() const;
+
+    /** @brief 获取历史峰值速率(RX/TX中较大者) @return 峰值速率(bytes/s) */
+    double peakRate() const;
+
+    /** @brief 获取所有update()调用传入的字节总数(RX+TX) @return 累计字节数 */
+    quint64 totalBytesCounted() const;
+
+    /** @brief 重置数据统计计数器(不影响面板显示) */
+    void resetDataStatistics();
+
 private slots:
     /** @brief 定时器回调：每秒刷新速率、峰值和持续时间 */
     void onRefreshTimer();
@@ -127,6 +141,10 @@ private:
     int m_framingErrors = 0;       ///< 帧错误累计
     int m_parityErrors = 0;        ///< 校验错误累计
     int m_overrunErrors = 0;       ///< 溢出错误累计
+
+    // ── 统计计数器 ──
+    quint64 m_totalUpdates = 0;    ///< update()调用总次数
+    quint64 m_totalBytesCounted = 0; ///< 所有update()传入的字节总数(RX+TX)
 };
 
 #endif // DATASTATISTICS_H

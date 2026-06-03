@@ -51,6 +51,7 @@ bool BaseTransfer::start()
 
     // 初始化成功，激活传输状态
     setTransferState(TransferState::Active);
+    ++m_totalPacketsSent;  ///< 统计: 每次启动传输视为一次发送
     return true;
 }
 
@@ -92,11 +93,13 @@ void BaseTransfer::onConnectionReadyRead(const QByteArray& data)
                    << "exceeds max:" << kMaxReceiveBufferSize;
         sendCancelBytes();
         markError();
+        ++m_totalErrors;  ///< 统计: 缓冲区溢出错误递增
         emit transferError(tr("接收缓冲区溢出: 连接可能异常"));
         return;
     }
 
     m_receiveBuffer.append(data);
+    ++m_totalPacketsReceived;  ///< 统计: 每次收到数据递增
     processReceivedData();
 }
 
@@ -108,9 +111,11 @@ void BaseTransfer::onTimeout()
     /* 注意: m_retryCount仅作为全局安全阀，子类handleTimeout()
      * 负责在成功处理后将m_retryCount重置，避免跨块累积 */
     m_retryCount++;
+    ++m_totalRetries;  ///< 统计: 每次超时重试递增
     if (m_retryCount > m_maxRetries) {
         sendCancelBytes();
         markError();
+        ++m_totalErrors;  ///< 统计: 重试耗尽错误递增
         emit transferError(tr("传输超时: 全局重试次数耗尽 (%1次)").arg(m_maxRetries));
         return;
     }
@@ -140,4 +145,39 @@ void BaseTransfer::markDone()
 void BaseTransfer::markError()
 {
     setTransferState(TransferState::Error);
+}
+
+// ── 统计计数器实现 ──
+
+/** @brief 获取已发送数据包总数 @return 累计发送包数 */
+quint64 BaseTransfer::totalPacketsSent() const
+{
+    return m_totalPacketsSent;
+}
+
+/** @brief 获取已接收数据包总数 @return 累计接收包数 */
+quint64 BaseTransfer::totalPacketsReceived() const
+{
+    return m_totalPacketsReceived;
+}
+
+/** @brief 获取重试总次数 @return 累计重试次数 */
+quint64 BaseTransfer::totalRetries() const
+{
+    return m_totalRetries;
+}
+
+/** @brief 获取传输错误总次数 @return 累计错误次数 */
+quint64 BaseTransfer::totalErrors() const
+{
+    return m_totalErrors;
+}
+
+/** @brief 重置传输统计计数器(不影响传输状态) */
+void BaseTransfer::resetTransferStatistics()
+{
+    m_totalPacketsSent = 0;
+    m_totalPacketsReceived = 0;
+    m_totalRetries = 0;
+    m_totalErrors = 0;
 }

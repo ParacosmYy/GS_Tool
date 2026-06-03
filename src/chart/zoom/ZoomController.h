@@ -59,6 +59,20 @@ public:
     /** @brief 获取当前框选矩形(像素坐标，相对于chartView) */
     QRectF rubberBandRect() const;
 
+    // ---- 统计计数器接口 ----
+
+    /** @brief 获取缩放操作总次数（含滚轮/框选/按钮） */
+    quint64 totalZooms() const;
+
+    /** @brief 获取平移操作总次数 */
+    quint64 totalPans() const;
+
+    /** @brief 获取缩放重置总次数 */
+    quint64 totalResets() const;
+
+    /** @brief 重置所有缩放统计计数器为初始值 */
+    void resetZoomStatistics();
+
 signals:
     /** @brief 缩放/平移发生变化，接收方应刷新叠加层 */
     void viewChanged();
@@ -144,6 +158,11 @@ private:
 
     static constexpr double kZoomFactor = 1.5;   ///< 每步缩放倍率
     static constexpr int kMinZoomLevel = 32;      ///< 最小可见采样点数
+
+    // 统计计数器
+    quint64 m_totalZooms = 0;           ///< 缩放操作总次数（含滚轮/框选/按钮）
+    quint64 m_totalPans = 0;            ///< 平移操作总次数
+    quint64 m_totalResets = 0;          ///< 缩放重置总次数
 };
 
 #endif // CHART_ZOOMCONTROLLER_H

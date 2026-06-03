@@ -142,8 +142,23 @@ public:
     // displayName默认等于字段名，颜色使用kDefaultColors自动分配
     static ChannelConfigSet generateDefaults(const QVector<FieldDef>& fields);
 
+    // ---- 统计计数器接口 ----
+
+    /** @brief 获取配置变更总次数（包括增删通道、属性修改） */
+    quint64 totalConfigChanges() const;
+
+    /** @brief 获取颜色变更总次数 */
+    quint64 totalColorChanges() const;
+
+    /** @brief 重置所有配置统计计数器为初始值 */
+    void resetConfigStatistics();
+
 private:
     QVector<ChannelConfig> m_channels;
+
+    // 统计计数器
+    quint64 m_totalConfigChanges = 0;   ///< 配置变更总次数
+    quint64 m_totalColorChanges = 0;    ///< 颜色变更总次数
 };
 
 #endif // CHANNELCONFIG_H

@@ -70,6 +70,20 @@ public:
     /** @brief 获取速率历史点数 */
     int historySize() const;
 
+    // ── 统计计数器 Getter ──
+
+    /** @brief 获取采样总次数 @return 累计采样点数 */
+    quint64 totalSamples() const;
+
+    /** @brief 获取历史最高带宽(RX+TX之和) @return 峰值带宽(bytes/s) */
+    double peakBandwidth() const;
+
+    /** @brief 获取监控的字节总数(RX+TX) @return 累计字节数 */
+    quint64 totalBytesMonitored() const;
+
+    /** @brief 重置流量监控统计计数器(不影响速率计算) */
+    void resetTrafficStatistics();
+
 signals:
     /**
      * @brief 速率更新信号（周期性发出）
@@ -93,6 +107,9 @@ private:
     QVector<QPointF> m_txHistory;      ///< TX 速率历史（x=时间戳, y=速率）
     QTimer* m_calcTimer = nullptr;     ///< 速率计算定时器
     QElapsedTimer m_elapsed;           ///< 经过时间计时器
+
+    // ── 统计计数器 ──
+    quint64 m_totalSamples = 0;        ///< 采样总次数(calculateRates调用次数)
 };
 
 #endif // TRAFFICMONITOR_H

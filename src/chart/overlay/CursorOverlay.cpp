@@ -85,6 +85,7 @@ void CursorOverlay::setCursorA(double x)
 {
     m_cursorAX = x;
     m_hasCursorA = true;
+    ++m_totalCursorMoves;
     update();
 }
 
@@ -93,6 +94,7 @@ void CursorOverlay::setCursorB(double x)
 {
     m_cursorBX = x;
     m_hasCursorB = true;
+    ++m_totalCursorMoves;
     update();
 }
 
@@ -223,6 +225,7 @@ bool CursorOverlay::eventFilter(QObject* watched, QEvent* event)
             } else {
                 m_cursorBX = pixelToDataX(px);
             }
+            ++m_totalCursorMoves;
             update();
             return true;  // 消费：拖拽中
         }
@@ -414,6 +417,7 @@ void CursorOverlay::paintEvent(QPaintEvent* /*event*/)
 
     // 双游标模式: 绘制差值面板
     if (m_hasCursorA && m_hasCursorB) {
+        ++m_totalMeasurements;
         drawDeltaPanel(painter);
     }
 
@@ -443,4 +447,27 @@ void CursorOverlay::onThemeChanged()
     m_textColor = ThemeManager::instance().color(ThemeManager::SemanticColor::TextPrimary);
     m_panelBgColor = ThemeManager::instance().color(ThemeManager::SemanticColor::BgSecondary);
     update();
+}
+
+// ============================================================
+// 统计计数器接口
+// ============================================================
+
+/** @brief 返回游标移动总次数（含放置和拖拽） */
+quint64 CursorOverlay::totalCursorMoves() const
+{
+    return m_totalCursorMoves;
+}
+
+/** @brief 返回测量显示总次数（双游标差值面板绘制） */
+quint64 CursorOverlay::totalMeasurements() const
+{
+    return m_totalMeasurements;
+}
+
+/** @brief 重置所有游标统计计数器为初始值 */
+void CursorOverlay::resetCursorStatistics()
+{
+    m_totalCursorMoves = 0;
+    m_totalMeasurements = 0;
 }

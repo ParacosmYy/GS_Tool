@@ -98,7 +98,13 @@ public:
     /** @brief 获取单次变换处理过的最大采样点数（峰值） */
     quint64 maxSampleSize() const;
 
+    /** @brief 获取FFT计算中发生的错误次数（空数据/无效参数等） */
+    quint64 errorCount() const;
+
     /** @brief 重置所有统计计数器为初始值 */
+    void resetFftStatistics();
+
+    /** @brief 重置所有统计计数器（别名，调用resetFftStatistics） */
     void resetStats();
 
 signals:
@@ -151,6 +157,7 @@ private:
     quint64 m_totalTransforms = 0;        ///< 总FFT变换执行次数
     quint64 m_totalSamplesProcessed = 0;  ///< 总处理的采样点数（累计）
     quint64 m_maxSampleSize = 0;          ///< 单次变换处理过的最大采样点数（峰值）
+    quint64 m_errorCount = 0;             ///< FFT计算中发生的错误次数
 };
 
 #endif // FFTENGINE_H

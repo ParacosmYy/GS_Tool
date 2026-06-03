@@ -72,10 +72,22 @@ public:
     /** @brief 获取最后一次成功解析的时间戳 @return 毫秒级时间戳，未解析过返回0 */
     qint64 lastParseTimestamp() const;
 
+    /** @brief 获取已处理的数据包总数（含成功和失败） @return 数据包总数 */
+    quint64 totalPacketsProcessed() const;
+
+    /** @brief 获取已解析的字节总数（仅成功解析的帧内字节） @return 字节总数 */
+    quint64 totalBytesParsed() const;
+
+    /** @brief 获取CRC校验错误次数 @return CRC错误计数 */
+    quint64 totalCrcErrors() const;
+
     /** @brief 重置所有解析统计计数器(帧数/错误/字节/时间戳) */
     void resetParseStatistics();
 
     /** @brief 重置所有统计计数器(等同于resetParseStatistics) */
+    void resetEngineStatistics();
+
+    /** @brief 重置所有统计计数器(别名，调用resetEngineStatistics) */
     void resetStats();
 
 signals:
@@ -96,6 +108,8 @@ private:
     quint64 m_totalValidations = 0;         ///< 校验验证执行总次数
     quint64 m_totalParseErrors = 0;         ///< 解析错误总数(64位)
     qint64 m_lastParseTimestamp = 0;        ///< 最后一次成功解析的时间戳(ms)
+    quint64 m_totalCrcErrors = 0;           ///< CRC校验错误次数
+    quint64 m_totalBytesParsed = 0;         ///< 已解析的字节总数（仅成功解析的帧内字节）
 
     bool tryParseOneFrame();
     int findHeader(const QByteArray &buffer, const QVector<int> &header) const;

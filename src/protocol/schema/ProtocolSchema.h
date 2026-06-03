@@ -156,7 +156,16 @@ public:
     /** @brief 获取历史最大协议定义大小(字节数) */
     quint64 maxSchemaSize() const;
 
+    /** @brief 获取协议定义校验执行总次数 */
+    quint64 totalValidations() const;
+
+    /** @brief 获取协议定义校验失败次数 */
+    quint64 validationErrors() const;
+
     /** @brief 重置所有统计计数器 */
+    void resetSchemaStatistics();
+
+    /** @brief 重置所有统计计数器（别名，调用resetSchemaStatistics） */
     void resetStats();
 
 private:
@@ -169,6 +178,8 @@ private:
     quint64 m_totalSchemas = 0;         ///< 已加载的协议定义总数
     quint64 m_totalFieldCount = 0;      ///< 所有已加载协议的字段总数
     quint64 m_maxSchemaSize = 0;        ///< 历史最大协议定义大小(字节)
+    quint64 m_totalValidations = 0;     ///< 协议定义校验执行总次数
+    quint64 m_validationErrors = 0;     ///< 协议定义校验失败次数
 
     /**
      * @brief 将校验类型枚举转换为字符串
