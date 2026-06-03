@@ -63,6 +63,18 @@ public:
      */
     QByteArray processRequest(const QByteArray& requestData);
 
+    /** @brief 获取已处理请求总数 */
+    quint64 requestCount() const;
+
+    /** @brief 获取异常响应计数 */
+    quint64 exceptionCount() const;
+
+    /** @brief 获取各功能码调用次数统计 */
+    QMap<int, int> functionCodeStats() const;
+
+    /** @brief 重置统计数据 */
+    void resetStatistics();
+
 private:
     /** @brief 构造读寄存器响应 */
     QByteArray buildReadRegistersResponse(const ModbusFrame& req);
@@ -91,6 +103,13 @@ private:
     QMap<int, quint16> m_registers;   ///< 保持寄存器映射 (地址→值)
     QMap<int, bool>    m_coils;        ///< 线圈映射 (地址→状态)
     quint8             m_slaveAddress = 1; ///< 从站地址
+
+    /** @brief 已处理请求计数 */
+    quint64 m_requestCount = 0;
+    /** @brief 异常响应计数 */
+    quint64 m_exceptionCount = 0;
+    /** @brief 各功能码调用次数 */
+    QMap<int, int> m_fcStats;
 };
 
 #endif // MODBUS_SLAVE_H

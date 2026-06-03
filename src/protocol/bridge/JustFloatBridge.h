@@ -59,6 +59,18 @@ public:
     /** @brief 获取当前通道数量(自动检测后生效) @return 通道数 */
     int channelCount() const;
 
+    /** @brief 获取已解析的帧计数 */
+    quint64 frameCount() const;
+
+    /** @brief 获取解析错误计数 */
+    quint64 errorCount() const;
+
+    /** @brief 获取已处理的字节总数 */
+    qint64 totalBytesProcessed() const;
+
+    /** @brief 重置统计数据（帧计数/错误/字节，不影响通道配置） */
+    void resetStatistics();
+
 private:
     /**
      * @brief 尝试从缓冲区中解析完整的帧
@@ -81,6 +93,13 @@ private:
     QByteArray m_buffer;            ///< 累积的原始字节缓冲区
     int m_channelCount;             ///< 通道数量(0=尚未检测)
     bool m_channelsDetected;        ///< 是否已完成通道检测
+
+    /** @brief 成功解析帧计数 */
+    quint64 m_frameCount = 0;
+    /** @brief 错误帧计数 */
+    quint64 m_errorCount = 0;
+    /** @brief 已处理字节总数 */
+    qint64 m_totalBytes = 0;
 
     static constexpr unsigned char kTailMarker[4] = {0x00, 0x00, 0x80, 0x7F}; ///< 尾部标记
     static constexpr int kTailSize = 4;             ///< 尾部标记长度

@@ -72,6 +72,21 @@ public:
      */
     bool sendCustomFrame(const ModbusFrame& frame);
 
+    /** @brief 获取已发送请求计数 */
+    quint64 requestCount() const;
+
+    /** @brief 获取已接收响应计数 */
+    quint64 responseCount() const;
+
+    /** @brief 获取超时次数 */
+    quint64 timeoutCount() const;
+
+    /** @brief 获取Modbus异常响应计数 */
+    quint64 errorCount() const;
+
+    /** @brief 重置统计数据 */
+    void resetStatistics();
+
 signals:
     /** @brief 收到有效响应 */
     void responseReceived(const ModbusFrame& frame);
@@ -101,6 +116,15 @@ private:
     quint8       m_lastSlave   = 1;       ///< 上次请求的从站地址
     QTimer*      m_timer       = nullptr; ///< 响应超时定时器
     QByteArray   m_rxBuffer;              ///< 接收缓冲区
+
+    /** @brief 已发送请求计数 */
+    quint64 m_requestCount = 0;
+    /** @brief 已接收响应计数 */
+    quint64 m_responseCount = 0;
+    /** @brief 超时次数 */
+    quint64 m_timeoutCount = 0;
+    /** @brief Modbus异常响应计数 */
+    quint64 m_errorCount = 0;
 };
 
 #endif // MODBUS_MASTER_H

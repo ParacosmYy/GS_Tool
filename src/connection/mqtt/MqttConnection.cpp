@@ -143,6 +143,7 @@ bool MqttConnection::publish(const QString& topic, const QByteArray& payload, in
     if (qos == 1) packet[0] |= 0x02;
     else if (qos == 2) packet[0] |= 0x04;
 
+    ++m_publishCount;
     return m_socket->write(packet) == packet.size();
 }
 
@@ -165,12 +166,16 @@ bool MqttConnection::subscribe(const QString& topic, int qos)
 
     QByteArray packet = buildMqttPacket(SUBSCRIBE, payload);
     packet[0] |= 0x02;  // SUBSCRIBE固定头保留位
+    if (!m_subscriptions.contains(topic)) {
+        m_subscriptions.append(topic);
+    }
     return m_socket->write(packet) == packet.size();
 }
 
 void MqttConnection::unsubscribe(const QString& topic)
 {
     if (m_state != ConnectionState::Connected) return;
+    m_subscriptions.removeAll(topic);
 
     QByteArray payload;
     m_packetId = (m_packetId % 65535) + 1;  // 保证范围[1, 65535]
@@ -387,6 +392,7 @@ void MqttConnection::handlePublish(const QByteArray& data, quint8 flags)
     }
 
     QByteArray payload = data.mid(offset);
+    ++m_receivedCount;
     emit messageReceived(topic, payload);
     emit dataReceived(payload);
 }
@@ -401,4 +407,37 @@ QString MqttConnection::generateClientId()
 {
     return QStringLiteral("EmbedDebug_%1")
         .arg(QRandomGenerator::global()->bounded(100000, 999999));
+}
+
+/**
+ * @brief 获取已发布消息计数
+ */
+quint64 MqttConnection::publishCount() const
+{
+    return m_publishCount;
+}
+
+/**
+ * @brief 获取已接收消息计数
+ */
+quint64 MqttConnection::receivedCount() const
+{
+    return m_receivedCount;
+}
+
+/**
+ * @brief 获取已订阅主题数量
+ */
+int MqttConnection::subscriptionCount() const
+{
+    return m_subscriptions.size();
+}
+
+/**
+ * @brief 重置消息计数统计
+ */
+void MqttConnection::resetStatistics()
+{
+    m_publishCount = 0;
+    m_receivedCount = 0;
 }

@@ -33,6 +33,7 @@ void FireWaterBridge::feed(const QByteArray& data)
 
     // 追加到缓冲区
     m_buffer.append(data);
+    m_totalBytes += data.size();
 
     // 缓冲区溢出保护: 超过最大限制时丢弃最旧的数据
     if (m_buffer.size() > kMaxBufferSize) {
@@ -104,6 +105,7 @@ void FireWaterBridge::parseLines()
 
         // 行长度保护: 超长行可能是垃圾数据
         if (lineData.size() > kMaxLineSize) {
+            ++m_errorCount;
             continue;
         }
 
@@ -172,6 +174,7 @@ void FireWaterBridge::processLine(const QString& line)
     QByteArray rawFrame = (line + QStringLiteral("\n")).toUtf8();
 
     // 发射与FrameParser::frameParsed完全兼容的信号
+    ++m_frameCount;
     emit frameParsed(fields, rawFrame);
 }
 
@@ -203,4 +206,38 @@ QVariantMap FireWaterBridge::parseValueLine(const QString& line) const
     }
 
     return fields;
+}
+
+/**
+ * @brief 获取已解析的帧计数
+ */
+quint64 FireWaterBridge::frameCount() const
+{
+    return m_frameCount;
+}
+
+/**
+ * @brief 获取解析错误计数
+ */
+quint64 FireWaterBridge::errorCount() const
+{
+    return m_errorCount;
+}
+
+/**
+ * @brief 获取已处理的字节总数
+ */
+qint64 FireWaterBridge::totalBytesProcessed() const
+{
+    return m_totalBytes;
+}
+
+/**
+ * @brief 重置统计数据
+ */
+void FireWaterBridge::resetStatistics()
+{
+    m_frameCount = 0;
+    m_errorCount = 0;
+    m_totalBytes = 0;
 }

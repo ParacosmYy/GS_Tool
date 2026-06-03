@@ -38,6 +38,7 @@ void JustFloatBridge::feed(const QByteArray& data)
 
     // 追加到缓冲区
     m_buffer.append(data);
+    m_totalBytes += data.size();
 
     // 缓冲区溢出保护: 超过最大限制时丢弃最旧的数据
     if (m_buffer.size() > kMaxBufferSize) {
@@ -118,6 +119,7 @@ int JustFloatBridge::tryParseFrame()
         // float数据必须是4字节的整数倍
         if (floatPayloadSize % kFloatSize != 0 || floatPayloadSize == 0) {
             // 帧数据不合法（不是4字节对齐或无数据），跳过这个假尾部
+            ++m_errorCount;
             continue;
         }
 
@@ -125,6 +127,7 @@ int JustFloatBridge::tryParseFrame()
 
         // 通道数上限保护
         if (detectedChannels > kMaxChannels) {
+            ++m_errorCount;
             continue;
         }
 
@@ -170,6 +173,7 @@ void JustFloatBridge::parseAndEmit(int frameSize)
     QByteArray rawFrame = m_buffer.left(frameSize);
 
     // 发射与FrameParser::frameParsed完全兼容的信号
+    ++m_frameCount;
     emit frameParsed(fields, rawFrame);
 }
 
@@ -178,4 +182,38 @@ void JustFloatBridge::autoDetectChannels(int floatPayloadSize)
 {
     m_channelCount = floatPayloadSize / kFloatSize;
     m_channelsDetected = true;
+}
+
+/**
+ * @brief 获取已解析的帧计数
+ */
+quint64 JustFloatBridge::frameCount() const
+{
+    return m_frameCount;
+}
+
+/**
+ * @brief 获取解析错误计数
+ */
+quint64 JustFloatBridge::errorCount() const
+{
+    return m_errorCount;
+}
+
+/**
+ * @brief 获取已处理的字节总数
+ */
+qint64 JustFloatBridge::totalBytesProcessed() const
+{
+    return m_totalBytes;
+}
+
+/**
+ * @brief 重置统计数据（不影响通道配置）
+ */
+void JustFloatBridge::resetStatistics()
+{
+    m_frameCount = 0;
+    m_errorCount = 0;
+    m_totalBytes = 0;
 }

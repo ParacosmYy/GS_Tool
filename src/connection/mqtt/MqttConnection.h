@@ -11,6 +11,7 @@
 #include "connection/interface/IConnection.h"
 #include <QTcpSocket>
 #include <QTimer>
+#include <QStringList>
 
 /**
  * @brief MQTT客户端连接实现
@@ -95,6 +96,18 @@ public:
      * @param topic 要取消的主题
      */
     void unsubscribe(const QString& topic);
+
+    /** @brief 获取已发布消息计数 */
+    quint64 publishCount() const;
+
+    /** @brief 获取已接收消息计数 */
+    quint64 receivedCount() const;
+
+    /** @brief 获取已订阅主题数量 */
+    int subscriptionCount() const;
+
+    /** @brief 重置消息计数统计 */
+    void resetStatistics();
 
 signals:
     /**
@@ -191,6 +204,13 @@ private:
 
     /** @brief 期望的剩余长度(解析中间状态) */
     int m_expectedLength = -1;
+
+    /** @brief 已发布消息计数 */
+    quint64 m_publishCount = 0;
+    /** @brief 已接收消息计数 */
+    quint64 m_receivedCount = 0;
+    /** @brief 已订阅主题集合 */
+    QStringList m_subscriptions;
 };
 
 #endif // MQTTCONNECTION_H

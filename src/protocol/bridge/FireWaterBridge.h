@@ -56,6 +56,18 @@ public:
     /** @brief 获取当前通道名称列表(头部检测后生效) @return 通道名列表 */
     QStringList channelNames() const;
 
+    /** @brief 获取已解析的帧计数 */
+    quint64 frameCount() const;
+
+    /** @brief 获取解析错误计数（格式错误/超长行等） */
+    quint64 errorCount() const;
+
+    /** @brief 获取已处理的字节总数 */
+    qint64 totalBytesProcessed() const;
+
+    /** @brief 重置统计数据（帧计数/错误/字节） */
+    void resetStatistics();
+
 private:
     /** @brief 从缓冲区中提取并解析所有完整的行 */
     void parseLines();
@@ -78,6 +90,13 @@ private:
     bool m_headerReceived;          ///< 是否已接收到头部行
     bool m_firstLineIsData;         ///< 第一行是否为数据行(无头部)
     QString m_delimiter;            ///< CSV分隔符(默认逗号)
+
+    /** @brief 成功解析帧计数 */
+    quint64 m_frameCount = 0;
+    /** @brief 错误帧计数 */
+    quint64 m_errorCount = 0;
+    /** @brief 已处理字节总数 */
+    qint64 m_totalBytes = 0;
 
     static constexpr int kMaxBufferSize = 8192;  ///< 最大缓冲区保护
     static constexpr int kMaxLineSize = 2048;    ///< 单行最大长度

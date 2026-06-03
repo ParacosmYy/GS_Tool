@@ -42,6 +42,8 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
         return QByteArray();
     }
 
+    ++m_requestCount;
+
     // CRC16校验
     QByteArray payload = requestData.left(requestData.size() - 2);
     quint16 recvCrc = static_cast<quint8>(requestData[requestData.size() - 2]) |
@@ -60,6 +62,7 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
 
     // 根据功能码分派处理
     QByteArray responsePayload;
+    ++m_fcStats[static_cast<int>(req.function)];
     switch (req.function) {
     case ModbusFunction::ReadHoldingRegisters:
     case ModbusFunction::ReadInputRegisters:
@@ -82,6 +85,7 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
         responsePayload = buildWriteMultipleRegistersResponse(req);
         break;
     default:
+        ++m_exceptionCount;
         responsePayload = buildExceptionResponse(
             req, ModbusError::IllegalFunction);
         break;
@@ -259,4 +263,38 @@ QByteArray ModbusSlave::buildExceptionResponse(const ModbusFrame& req,
 
 quint16 ModbusSlave::calculateCrc16(const QByteArray& data) const {
     return crc16(data);
+}
+
+/**
+ * @brief 获取已处理请求总数
+ */
+quint64 ModbusSlave::requestCount() const
+{
+    return m_requestCount;
+}
+
+/**
+ * @brief 获取异常响应计数
+ */
+quint64 ModbusSlave::exceptionCount() const
+{
+    return m_exceptionCount;
+}
+
+/**
+ * @brief 获取各功能码调用次数统计
+ */
+QMap<int, int> ModbusSlave::functionCodeStats() const
+{
+    return m_fcStats;
+}
+
+/**
+ * @brief 重置统计数据
+ */
+void ModbusSlave::resetStatistics()
+{
+    m_requestCount = 0;
+    m_exceptionCount = 0;
+    m_fcStats.clear();
 }
