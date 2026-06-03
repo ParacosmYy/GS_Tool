@@ -125,4 +125,5 @@
 | 149 | feat(quality): 硬编码颜色替换ThemeManager语义色+objectName补全30+处+BluetoothAtConsole预设指令槽实现+MqttConnection SUBACK解析实现+ProtocolEngine Doxygen补全+清除linter残留文件 | 149 |
 | 150-156 | feat(Doxygen+cleanup): AnimationUtility/DragDropHelper/ConnectionPool/UsbLibraryLoader/QssThemeGenerator/MqttConnection/NotificationManager/FontManager/ClipboardManager/DataPipeline/SvgIconProvider Doxygen补全+DashboardSerializer/RecordingController/ChartExporter Doxygen+清除伪造文件(linter自动提交) | 156 |
 | 157 | feat(Doxygen): UsbLibraryLoader/ConnectionPool/BleGattModel/CanFrameParser/TcpMultiConnectionManager/HeatmapWidget/WidgetFactory/ProtobufDecoder/FlatBuffersDecoder/SchemaViewer/TerminalLayoutManager/TerminalSearchRenderer/MainWindowPanelConnect/PanelManagerCreation Doxygen全量补全+清除linter伪造文件 | 157 |
+| 158 | feat(Doxygen): BleConnection/SendHistoryManager/ByteFormat/QssThemeGenerator/CanConnection/MqttSubscriptionPanel/MqttTopicModel/UsbConnection/SvgIconProvider/IconNavBar/DataPipeline/DataStatistics/TimedSender/SignalLineMonitor/PerformanceOverlay/TerminalWidgetPaint Doxygen补全+MqttConfigPanel弃用修复+清除伪造文件 | 158 |
 | ... | 目标: 1000分 | 1000 |
