@@ -114,7 +114,7 @@ void BluetoothAtConsole::sendCommand(const QString& command)
         return;
     }
 
-    m_output->append(QStringLiteral(">>> ") + command);
+    m_output->append(tr(">>> %1").arg(command));
     const QByteArray data = (command + "\r\n").toUtf8();
     const qint64 written = m_connection->write(data);
     if (written < 0) {

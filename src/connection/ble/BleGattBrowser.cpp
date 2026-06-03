@@ -201,7 +201,7 @@ void BleGattBrowser::populateTree(const QStringList& services)
             charItem->setText(1, svcUuid.left(8)
                 + QString("-%1").arg(i, 4, 16, QChar('0')));
             const QStringList props = {tr("读取"), tr("读取|写入"), tr("读取|通知")};
-            charItem->setText(2, props.value(i, "READ"));
+            charItem->setText(2, props.value(i, tr("读取")));
         }
     }
 }

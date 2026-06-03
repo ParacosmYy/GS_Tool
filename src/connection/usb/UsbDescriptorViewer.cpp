@@ -15,6 +15,7 @@ UsbDescriptorViewer::UsbDescriptorViewer(QWidget* parent)
     setObjectName("UsbDescriptorViewer");
 
     auto* splitter = new QSplitter(Qt::Horizontal, this);
+    splitter->setObjectName("usbDescSplitter");
 
     m_descriptorTree = new QTreeWidget(this);
     m_descriptorTree->setObjectName("descriptorTree");

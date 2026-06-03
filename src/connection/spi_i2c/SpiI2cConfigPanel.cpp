@@ -124,10 +124,10 @@ void SpiI2cConfigPanel::setupUi()
     /// 总线模式选择
     auto* modeLayout = new QHBoxLayout();
     auto* modeLabel = new QLabel(tr("总线模式:"), this);
-    modeLabel->setObjectName("busModeLabel");
+    modeLabel->setObjectName("spiI2cBusModeLabel");
 
     m_busModeCombo = new QComboBox(this);
-    m_busModeCombo->setObjectName("busModeCombo");
+    m_busModeCombo->setObjectName("spiI2cBusModeCombo");
     m_busModeCombo->addItem(tr("SPI"));
     m_busModeCombo->addItem(tr("I2C"));
 
@@ -138,10 +138,10 @@ void SpiI2cConfigPanel::setupUi()
     /// 适配器选择
     auto* adapterLayout = new QHBoxLayout();
     auto* adapterLabel = new QLabel(tr("适配器:"), this);
-    adapterLabel->setObjectName("adapterLabel");
+    adapterLabel->setObjectName("spiI2cAdapterLabel");
 
     m_adapterCombo = new QComboBox(this);
-    m_adapterCombo->setObjectName("adapterCombo");
+    m_adapterCombo->setObjectName("spiI2cAdapterCombo");
     m_adapterCombo->addItem(tr("FT232H"));
     m_adapterCombo->addItem(tr("CH347"));
     m_adapterCombo->addItem(tr("CP2130"));
@@ -153,10 +153,10 @@ void SpiI2cConfigPanel::setupUi()
     /// 时钟频率
     auto* clockLayout = new QHBoxLayout();
     auto* clockLabel = new QLabel(tr("时钟频率:"), this);
-    clockLabel->setObjectName("clockLabel");
+    clockLabel->setObjectName("spiI2cClockLabel");
 
     m_clockSpin = new QSpinBox(this);
-    m_clockSpin->setObjectName("clockSpin");
+    m_clockSpin->setObjectName("spiI2cClockSpin");
     m_clockSpin->setRange(1, 50000000);
     m_clockSpin->setValue(1000000);
     m_clockSpin->setSuffix(tr(" Hz"));
@@ -172,7 +172,7 @@ void SpiI2cConfigPanel::setupUi()
     auto* spiLayout = new QFormLayout(m_spiGroup);
 
     m_spiModeCombo = new QComboBox(this);
-    m_spiModeCombo->setObjectName("spiModeCombo");
+    m_spiModeCombo->setObjectName("spiI2cSpiModeCombo");
     m_spiModeCombo->addItem(tr("Mode 0 (CPOL=0, CPHA=0)"));
     m_spiModeCombo->addItem(tr("Mode 1 (CPOL=0, CPHA=1)"));
     m_spiModeCombo->addItem(tr("Mode 2 (CPOL=1, CPHA=0)"));
@@ -180,7 +180,7 @@ void SpiI2cConfigPanel::setupUi()
     spiLayout->addRow(tr("SPI模式:"), m_spiModeCombo);
 
     m_csPinSpin = new QSpinBox(this);
-    m_csPinSpin->setObjectName("csPinSpin");
+    m_csPinSpin->setObjectName("spiI2cCsPinSpin");
     m_csPinSpin->setRange(0, 15);
     m_csPinSpin->setValue(0);
     spiLayout->addRow(tr("片选引脚:"), m_csPinSpin);
@@ -193,7 +193,7 @@ void SpiI2cConfigPanel::setupUi()
     auto* i2cLayout = new QFormLayout(m_i2cGroup);
 
     m_deviceAddrSpin = new QSpinBox(this);
-    m_deviceAddrSpin->setObjectName("deviceAddrSpin");
+    m_deviceAddrSpin->setObjectName("spiI2cDeviceAddrSpin");
     m_deviceAddrSpin->setRange(0x00, 0x7F);
     m_deviceAddrSpin->setValue(0x00);
     m_deviceAddrSpin->setDisplayIntegerBase(16);
@@ -204,12 +204,12 @@ void SpiI2cConfigPanel::setupUi()
 
     /// 连接按钮
     m_connectBtn = new QPushButton(tr("连接"), this);
-    m_connectBtn->setObjectName("connectBtn");
+    m_connectBtn->setObjectName("spiI2cConnectBtn");
     mainLayout->addWidget(m_connectBtn);
 
     /// 状态标签
     m_statusLabel = new QLabel(tr("未连接"), this);
-    m_statusLabel->setObjectName("statusLabel");
+    m_statusLabel->setObjectName("spiI2cStatusLabel");
     mainLayout->addWidget(m_statusLabel);
 }
 

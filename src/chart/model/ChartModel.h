@@ -37,6 +37,7 @@ class ChartModel : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造图表数据模型 @param parent 父对象 */
     explicit ChartModel(QObject* parent = nullptr);
 
     // ---- 配置 ----
@@ -150,13 +151,22 @@ private:
         int sampleCounter = 0;      ///< 降采样计数器
     };
 
+    /** @brief 根据当前配置集重建所有通道缓冲区（通道增删或配置变更时调用） */
     void rebuildBuffers();
+
+    /** @brief 向指定通道缓冲区追加一个数据点（含降采样判断）
+     * @param displayName 通道显示名称
+     * @param value 数据值
+     * @param sampleDivisor 降采样比率（每N帧取1点）
+     */
     void appendPoint(const QString& displayName, double value, int sampleDivisor);
+
+    /** @brief 将待刷新通道列表中的通道名打包发射dataUpdated信号并清空列表 */
     void flushPendingUpdates();
 
-    ChannelConfigSet m_configSet;
-    QMap<QString, ChannelBuffer> m_buffers;     ///< displayName -> buffer
-    int m_windowSize = 200;
+    ChannelConfigSet m_configSet;               ///< 当前通道配置集合
+    QMap<QString, ChannelBuffer> m_buffers;     ///< 通道名 → 数据缓冲区映射
+    int m_windowSize = 200;                     ///< 滑动窗口大小（最大可见数据点数）
     qint64 m_frameIndex = 0;                    ///< 全局帧计数器（X轴）
     qint64 m_totalPoints = 0;                   ///< 总数据点计数（qint64防溢出）
 
@@ -171,9 +181,9 @@ private:
     quint64 m_dataRatePointCount = 0;       ///< 速率计算窗口内的数据点累计
 
     // 刷新合并
-    QTimer* m_refreshTimer;
-    int m_refreshInterval = 0;              ///< 0=立即刷新
-    QStringList m_pendingUpdates;           ///< 待刷新的通道名
+    QTimer* m_refreshTimer;                     ///< 定时刷新定时器（合并高频更新）
+    int m_refreshInterval = 0;                  ///< 刷新间隔（毫秒），0=立即刷新
+    QStringList m_pendingUpdates;               ///< 待刷新的通道名列表
 };
 
 #endif // CHARTMODEL_H

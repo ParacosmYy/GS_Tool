@@ -20,6 +20,10 @@ class UsbDeviceDetector : public QObject {
     Q_OBJECT
 
 public:
+    /**
+     * @brief 构造USB设备检测器
+     * @param parent 父对象
+     */
     explicit UsbDeviceDetector(QObject* parent = nullptr);
 
     /**

@@ -63,6 +63,21 @@ void TerminalSelectionManager::onMouseRelease()
 }
 
 /**
+ * @brief 更新选区字符数统计(累计字符数 + 最大选区长度)
+ *
+ * 在选区文本确定后调用，将本次选区的字符数累加到 m_totalSelectionChars，
+ * 并更新历史最大选区长度 m_maxSelectionLength。
+ * @param charCount 本次选区的字符数量
+ */
+void TerminalSelectionManager::updateSelectionStats(quint64 charCount)
+{
+    m_totalSelectionChars += charCount;
+    if (charCount > m_maxSelectionLength) {
+        m_maxSelectionLength = charCount;
+    }
+}
+
+/**
  * @brief 提取选区范围内的文本内容，支持方向过滤模式和普通模式
  * @param cachedLines 终端缓存行数据
  * @param directionFilter 方向过滤器指针，为nullptr时使用普通模式
@@ -162,10 +177,13 @@ void TerminalSelectionManager::setSelection(int startLine, int endLine)
     ++m_totalSelections;
 }
 
-/** @brief 通知复制操作已完成，递增复制计数 */
-void TerminalSelectionManager::notifyCopyPerformed()
+/** @brief 通知复制操作已完成，递增复制计数并更新字符数统计 @param charCount 本次复制的字符数 */
+void TerminalSelectionManager::notifyCopyPerformed(quint64 charCount)
 {
     ++m_totalCopies;
+    if (charCount > 0) {
+        updateSelectionStats(charCount);
+    }
 }
 
 // ── 统计计数器 Getter 实现 ──

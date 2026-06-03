@@ -151,7 +151,10 @@ private:
 
     /// 缩放栈：记录每次缩放前的axis范围
     struct ZoomState {
-        double minX, maxX, minY, maxY;
+        double minX;   ///< X轴最小值
+        double maxX;   ///< X轴最大值
+        double minY;   ///< Y轴最小值
+        double maxY;   ///< Y轴最大值
     };
     QStack<ZoomState> m_zoomStack;     ///< 缩放历史栈(用于undo)
     ZoomState m_originalRange;         ///< 原始数据范围(用于reset)

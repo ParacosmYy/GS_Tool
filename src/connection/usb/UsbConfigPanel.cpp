@@ -73,6 +73,10 @@ UsbConfigPanel::UsbConfigPanel(QWidget* parent)
             this, [this]() { ++m_totalConfigChanges; });
 }
 
+/**
+ * @brief 设置设备检测器实例
+ * @param detector 检测器对象指针
+ */
 void UsbConfigPanel::setDetector(UsbDeviceDetector* detector) {
     m_detector = detector;
     if (m_detector) {
@@ -94,7 +98,7 @@ void UsbConfigPanel::onScanClicked() {
 
     for (const QVariant& var : devices) {
         QVariantMap dev = var.toMap();
-        QString label = QString("%1 (VID_%2 PID_%3)")
+        QString label = tr("%1 (VID_%2 PID_%3)")
                             .arg(dev["name"].toString(),
                                  dev["vidHex"].toString(),
                                  dev["pidHex"].toString());
@@ -138,6 +142,10 @@ void UsbConfigPanel::onConnectClicked() {
     }
 }
 
+/**
+ * @brief 设置连接状态(由外部连接管理器调用)
+ * @param connected true=已连接
+ */
 void UsbConfigPanel::setConnected(bool connected) {
     m_connected = connected;
     m_connectBtn->setText(connected ? tr("断开") : tr("连接"));

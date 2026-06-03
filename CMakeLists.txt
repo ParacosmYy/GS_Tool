@@ -317,6 +317,12 @@ set(HEADERS
     src/core/widgets/ToastWidget.h
     src/core/widgets/AppDialog.h
     src/core/widgets/DragDropHelper.h
+    src/core/notification/NotificationManager.h
+    src/core/pipeline/DataPipeline.h
+    src/connection/pool/ConnectionPool.h
+    src/core/icons/SvgIconProvider.h
+    src/core/fonts/FontManager.h
+    src/core/clipboard/ClipboardManager.h
     src/core/widgets/CommandPalette.h
     src/core/widgets/ScriptRecorder.h
     src/core/widgets/DataDiffWidget.h

@@ -47,6 +47,7 @@ void TerminalModel::appendSent(const QByteArray& data)
         line.direction = DataDirection::Tx;
         line.timestamp = QDateTime::currentDateTime();
         m_txBytes += data.size();
+        m_totalBytesSent += static_cast<quint64>(data.size());  // 累计发送字节数统计
 
         appendLine(std::move(line));
         newLineIndex = m_count - 1;
@@ -246,6 +247,9 @@ quint64 TerminalModel::totalLinesAdded() const { return m_totalLinesAdded; }
 /** @brief 获取累计接收字节数 @return 字节数 */
 quint64 TerminalModel::totalBytesReceived() const { return m_totalBytesReceived; }
 
+/** @brief 获取累计发送字节数 @return 字节数 */
+quint64 TerminalModel::totalBytesSent() const { return m_totalBytesSent; }
+
 /** @brief 获取历史最长行长度(字节数) @return 最大行长度 */
 quint64 TerminalModel::maxLineLength() const { return m_maxLineLength; }
 
@@ -257,6 +261,7 @@ void TerminalModel::resetStats()
 {
     m_totalLinesAdded = 0;
     m_totalBytesReceived = 0;
+    m_totalBytesSent = 0;
     m_maxLineLength = 0;
     m_filterBlockCount = 0;
 }

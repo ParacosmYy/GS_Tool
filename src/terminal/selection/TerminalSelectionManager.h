@@ -75,8 +75,8 @@ public:
     /** @brief 程序化设置选区范围（用于全选操作） @param startLine 起始行号 @param endLine 结束行号 */
     void setSelection(int startLine, int endLine);
 
-    /** @brief 通知复制操作已完成，递增复制计数 */
-    void notifyCopyPerformed();
+    /** @brief 通知复制操作已完成，递增复制计数并更新字符数统计 @param charCount 本次复制的字符数 */
+    void notifyCopyPerformed(quint64 charCount = 0);
 
     // ── 统计计数器 Getter ──
 
@@ -96,6 +96,9 @@ public:
     void resetStats();
 
 private:
+    /** @brief 更新选区字符数统计(累计+最大选区) @param charCount 本次选区字符数 */
+    void updateSelectionStats(quint64 charCount);
+
     int m_selectionStartLine = -1;  ///< 选区起始行号(可能是拖拽起点或终点)
     int m_selectionEndLine = -1;    ///< 选区结束行号(可能是拖拽起点或终点)
     bool m_isSelecting = false;     ///< 是否正在拖拽选择中

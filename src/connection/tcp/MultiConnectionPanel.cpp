@@ -57,11 +57,11 @@ void MultiConnectionPanel::onAddClicked()
     auto* layout = new QFormLayout(&dialog);
 
     auto* hostEdit = new QLineEdit("127.0.0.1", &dialog);
-    hostEdit->setObjectName("hostEdit");
+    hostEdit->setObjectName("tcpMultiHostEdit");
     hostEdit->setPlaceholderText(tr("输入主机地址"));
 
     auto* portSpin = new QSpinBox(&dialog);
-    portSpin->setObjectName("portSpin");
+    portSpin->setObjectName("tcpMultiPortSpin");
     portSpin->setRange(1, 65535);
     portSpin->setValue(8080);
 
@@ -162,15 +162,15 @@ void MultiConnectionPanel::setupUi()
 
     /// 连接列表
     m_connectionList = new QListWidget(this);
-    m_connectionList->setObjectName("connectionList");
+    m_connectionList->setObjectName("tcpMultiConnectionList");
 
     /// 按钮行：添加 / 移除
     auto* btnLayout = new QHBoxLayout();
     m_addBtn = new QPushButton(tr("添加连接"), this);
-    m_addBtn->setObjectName("addBtn");
+    m_addBtn->setObjectName("tcpMultiAddBtn");
 
     m_removeBtn = new QPushButton(tr("移除连接"), this);
-    m_removeBtn->setObjectName("removeBtn");
+    m_removeBtn->setObjectName("tcpMultiRemoveBtn");
 
     btnLayout->addWidget(m_addBtn);
     btnLayout->addWidget(m_removeBtn);
@@ -178,18 +178,18 @@ void MultiConnectionPanel::setupUi()
     /// 广播消息输入和发送
     auto* sendLayout = new QHBoxLayout();
     m_broadcastEdit = new QLineEdit(this);
-    m_broadcastEdit->setObjectName("broadcastEdit");
+    m_broadcastEdit->setObjectName("tcpMultiBroadcastEdit");
     m_broadcastEdit->setPlaceholderText(tr("输入广播消息..."));
 
     m_sendAllBtn = new QPushButton(tr("发送全部"), this);
-    m_sendAllBtn->setObjectName("sendAllBtn");
+    m_sendAllBtn->setObjectName("tcpMultiSendAllBtn");
 
     sendLayout->addWidget(m_broadcastEdit);
     sendLayout->addWidget(m_sendAllBtn);
 
     /// 状态标签
     m_statusLabel = new QLabel(tr("连接数: 0"), this);
-    m_statusLabel->setObjectName("statusLabel");
+    m_statusLabel->setObjectName("tcpMultiStatusLabel");
 
     layout->addWidget(m_connectionList);
     layout->addLayout(btnLayout);

@@ -19,6 +19,10 @@ class UsbDescriptorViewer : public QWidget {
     Q_OBJECT
 
 public:
+    /**
+     * @brief 构造USB描述符查看器
+     * @param parent 父控件
+     */
     explicit UsbDescriptorViewer(QWidget* parent = nullptr);
 
     /**

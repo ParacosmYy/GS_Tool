@@ -170,19 +170,19 @@ void RegisterEditor::setupUi()
     auto* addrLayout = new QHBoxLayout();
 
     auto* addrLabel = new QLabel(tr("地址:"), this);
-    addrLabel->setObjectName("addrLabel");
+    addrLabel->setObjectName("regAddrLabel");
 
     m_addrSpin = new QSpinBox(this);
-    m_addrSpin->setObjectName("addrSpin");
+    m_addrSpin->setObjectName("regAddrSpin");
     m_addrSpin->setRange(0x00, 0xFF);
     m_addrSpin->setDisplayIntegerBase(16);
     m_addrSpin->setPrefix("0x");
 
     auto* lenLabel = new QLabel(tr("长度:"), this);
-    lenLabel->setObjectName("lenLabel");
+    lenLabel->setObjectName("regLenLabel");
 
     m_lengthSpin = new QSpinBox(this);
-    m_lengthSpin->setObjectName("lengthSpin");
+    m_lengthSpin->setObjectName("regLengthSpin");
     m_lengthSpin->setRange(1, 256);
     m_lengthSpin->setValue(m_readLength);
 
@@ -193,19 +193,19 @@ void RegisterEditor::setupUi()
 
     /// 数据输入
     m_dataEdit = new QLineEdit(this);
-    m_dataEdit->setObjectName("dataEdit");
+    m_dataEdit->setObjectName("regDataEdit");
     m_dataEdit->setPlaceholderText(tr("十六进制数据 (如: AA BB CC)"));
 
     /// 按钮行
     auto* btnLayout = new QHBoxLayout();
     m_readBtn = new QPushButton(tr("读取"), this);
-    m_readBtn->setObjectName("readBtn");
+    m_readBtn->setObjectName("regReadBtn");
 
     m_writeBtn = new QPushButton(tr("写入"), this);
-    m_writeBtn->setObjectName("writeBtn");
+    m_writeBtn->setObjectName("regWriteBtn");
 
     m_clearLogBtn = new QPushButton(tr("清空日志"), this);
-    m_clearLogBtn->setObjectName("clearLogBtn");
+    m_clearLogBtn->setObjectName("regClearLogBtn");
 
     btnLayout->addWidget(m_readBtn);
     btnLayout->addWidget(m_writeBtn);
@@ -213,7 +213,7 @@ void RegisterEditor::setupUi()
 
     /// 日志
     m_log = new QTextEdit(this);
-    m_log->setObjectName("regLog");
+    m_log->setObjectName("regLogText");
     m_log->setReadOnly(true);
     m_log->setMaximumHeight(150);
 
