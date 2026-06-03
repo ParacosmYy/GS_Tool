@@ -391,6 +391,7 @@ void ChartWidget::onThemeChanged()
 /** @brief 应用当前主题颜色到图表背景/坐标轴/series */
 void ChartWidget::applyThemeColors()
 {
+    ++m_totalRedraws;
     auto& theme = ThemeManager::instance();
 
     // 判断当前是否为暗色主题（与 onChannelsChanged 一致：同时检查系统暗色模式和主题名称）
@@ -438,6 +439,7 @@ void ChartWidget::applyThemeColors()
 /** @brief 窗口大小变化时同步游标叠加层尺寸 @param event 调整大小事件 */
 void ChartWidget::resizeEvent(QResizeEvent* event)
 {
+    ++m_totalRedraws;
     QWidget::resizeEvent(event);
     if (m_cursorOverlay && m_chartView) {
         m_cursorOverlay->setGeometry(m_chartView->rect());
@@ -493,10 +495,11 @@ void ChartWidget::removeSeries(const QString& name)
 // 统计计数器
 // ============================================================================
 
-/** @brief 重置波形图统计计数器(数据更新/渲染/交互) */
+/** @brief 重置波形图统计计数器(数据更新/渲染/重绘/交互) */
 void ChartWidget::resetChartWidgetStatistics()
 {
     m_totalDataUpdates = 0;
     m_totalRenders = 0;
+    m_totalRedraws = 0;
     m_totalInteractions = 0;
 }

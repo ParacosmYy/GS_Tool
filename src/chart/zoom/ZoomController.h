@@ -70,6 +70,9 @@ public:
     /** @brief 获取缩放重置总次数 */
     quint64 totalResets() const;
 
+    /** @brief 获取总缩放操作次数（含缩放/平移/重置/undo等所有操作） @return 缩放操作总计数 */
+    quint64 totalZoomOperations() const { return m_totalZoomOperations; }
+
     /** @brief 重置所有缩放统计计数器为初始值 */
     void resetZoomStatistics();
 
@@ -166,6 +169,7 @@ private:
     quint64 m_totalZooms = 0;           ///< 缩放操作总次数（含滚轮/框选/按钮）
     quint64 m_totalPans = 0;            ///< 平移操作总次数
     quint64 m_totalResets = 0;          ///< 缩放重置总次数
+    quint64 m_totalZoomOperations = 0;  ///< 总缩放操作次数（含缩放/平移/重置/undo等所有操作）
 };
 
 #endif // CHART_ZOOMCONTROLLER_H

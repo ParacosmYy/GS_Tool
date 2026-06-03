@@ -125,6 +125,7 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalDataUpdates = 0;    ///< 总数据更新次数
     quint64 m_totalRenders = 0;        ///< 总渲染次数
+    quint64 m_totalRedraws = 0;        ///< 总重绘次数(含主题切换/窗口尺寸变化等触发的重绘)
     quint64 m_totalInteractions = 0;   ///< 总交互次数(暂停/清除等)
 
 public:
@@ -132,6 +133,8 @@ public:
     quint64 totalDataUpdates() const { return m_totalDataUpdates; }
     /** @brief 获取总渲染次数 @return 渲染计数 */
     quint64 totalRenders() const { return m_totalRenders; }
+    /** @brief 获取总重绘次数(含主题切换/窗口尺寸变化等) @return 重绘计数 */
+    quint64 totalRedraws() const { return m_totalRedraws; }
     /** @brief 获取总交互次数 @return 交互计数 */
     quint64 totalInteractions() const { return m_totalInteractions; }
     /** @brief 重置波形图统计计数器 */

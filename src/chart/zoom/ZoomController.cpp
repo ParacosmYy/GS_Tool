@@ -71,11 +71,15 @@ void ZoomController::resetZoom()
     m_zoomStack.clear();
     m_zoomLevel = 1.0;
     ++m_totalResets;
+    ++m_totalZoomOperations;
     emit viewChanged();
     emit zoomReset();
 }
 
+/** @brief 获取当前缩放倍率 @return 缩放倍率(1.0=原始) */
 double ZoomController::zoomLevel() const { return m_zoomLevel; }
+
+/** @brief 查询是否处于框选缩放模式 @return true=正在框选 */
 bool ZoomController::isRubberBandActive() const { return m_rubberBandActive; }
 
 /** @brief 获取当前框选矩形(像素坐标) @return 框选区域，非框选时返回空矩形 */
@@ -236,6 +240,7 @@ void ZoomController::zoomAt(int centerPixelX, double factor)
     ax->setRange(newMin, newMax);
     m_zoomLevel *= factor;
     ++m_totalZooms;
+    ++m_totalZoomOperations;
     emit viewChanged();
 }
 
@@ -362,11 +367,13 @@ void ZoomController::handleMouseRelease(QMouseEvent* event)
             }
 
             ++m_totalZooms;
+            ++m_totalZoomOperations;
             emit viewChanged();
         }
     } else if (m_panning && event->button() == Qt::MiddleButton) {
         m_panning = false;
         ++m_totalPans;
+        ++m_totalZoomOperations;
     }
 }
 
@@ -432,4 +439,5 @@ void ZoomController::resetZoomStatistics()
     m_totalZooms = 0;
     m_totalPans = 0;
     m_totalResets = 0;
+    m_totalZoomOperations = 0;
 }

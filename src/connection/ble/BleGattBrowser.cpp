@@ -23,6 +23,12 @@ static const QMap<QString, const char*> SVC_KEYS = {
     {"6e400001", QT_TRANSLATE_NOOP("BleGattBrowser", "Nordic UART")}
 };
 
+/**
+ * @brief 构造函数 - 初始化GATT浏览器UI
+ * @param parent 父控件
+ *
+ * 创建三栏布局: 左侧GATT服务树、右侧十六进制值显示、底部读写操作栏。
+ */
 BleGattBrowser::BleGattBrowser(QWidget* parent)
     : QWidget(parent)
     , m_serviceTree(new QTreeWidget(this))
@@ -88,6 +94,12 @@ BleGattBrowser::BleGattBrowser(QWidget* parent)
             this, &BleGattBrowser::onWriteClicked);
 }
 
+/**
+ * @brief 设置BLE连接实例
+ * @param connection BleConnection对象指针
+ *
+ * 连接servicesDiscovered信号，若已连接则立即刷新服务列表。
+ */
 void BleGattBrowser::setConnection(BleConnection* connection)
 {
     m_connection = connection;
@@ -103,6 +115,7 @@ void BleGattBrowser::setConnection(BleConnection* connection)
     }
 }
 
+/** @brief 树控件选中项变更回调 — 更新当前选中UUID和标签 */
 void BleGattBrowser::onTreeItemChanged()
 {
     QTreeWidgetItem* item = m_serviceTree->currentItem();
@@ -116,6 +129,7 @@ void BleGattBrowser::onTreeItemChanged()
     m_selectedLabel->setText(tr("已选择: %1").arg(name));
 }
 
+/** @brief 读取按钮点击 — 读取选中特征的值并显示十六进制转储 */
 void BleGattBrowser::onReadClicked()
 {
     if (m_selectedUuid.isEmpty()) {
@@ -142,6 +156,7 @@ void BleGattBrowser::onReadClicked()
     ++m_totalCharacteristicReads;
 }
 
+/** @brief 写入按钮点击 — 将十六进制输入写入选中特征 */
 void BleGattBrowser::onWriteClicked()
 {
     const QString hexStr = m_writeInput->text().trimmed();
@@ -172,11 +187,18 @@ void BleGattBrowser::onWriteClicked()
     }
 }
 
+/** @brief 服务发现完成回调 — 刷新服务树 */
 void BleGattBrowser::onServicesDiscovered(const QStringList& services)
 {
     populateTree(services);
 }
 
+/**
+ * @brief 填充GATT服务树
+ * @param services 已发现的服务UUID列表
+ *
+ * 根据短UUID查找预设服务名称，每个服务下添加模拟特征。
+ */
 void BleGattBrowser::populateTree(const QStringList& services)
 {
     m_serviceTree->clear();
@@ -206,6 +228,11 @@ void BleGattBrowser::populateTree(const QStringList& services)
     }
 }
 
+/**
+ * @brief 将字节数组格式化为十六进制转储文本
+ * @param data 原始字节数据
+ * @return 格式化后的十六进制转储字符串(偏移量+HEX+ASCII)
+ */
 QString BleGattBrowser::formatHexDump(const QByteArray& data) const
 {
     QString result;

@@ -84,6 +84,10 @@ bool TcpConnection::open()
             // 转发底层写入完成信号，供上层OTA进度追踪和发送统计
             connect(m_socket, &QTcpSocket::bytesWritten,
                     this, &TcpConnection::bytesWritten);
+        } else if (m_socket->state() != QAbstractSocket::UnconnectedState) {
+            // 已有socket且非断开状态 — 视为重连尝试
+            ++m_totalReconnectAttempts;
+            m_socket->abort();  // 中断当前连接，准备重连
         }
 
         updateState(ConnectionState::Connecting);
@@ -344,4 +348,5 @@ void TcpConnection::resetStats()
     m_errorCount = 0;
     m_totalOpenAttempts = 0;
     m_totalWrites = 0;
+    m_totalReconnectAttempts = 0;
 }

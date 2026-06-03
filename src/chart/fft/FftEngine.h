@@ -92,6 +92,9 @@ public:
     /** @brief 获取总FFT变换执行次数 */
     quint64 totalTransforms() const;
 
+    /** @brief 获取成功执行的FFT变换次数（不含错误） @return 成功执行计数 */
+    quint64 totalTransformsExecuted() const { return m_totalTransformsExecuted; }
+
     /** @brief 获取总处理的采样点数（累计，跨所有变换） */
     quint64 totalSamplesProcessed() const;
 
@@ -155,6 +158,7 @@ private:
 
     // 统计计数器
     quint64 m_totalTransforms = 0;        ///< 总FFT变换执行次数
+    quint64 m_totalTransformsExecuted = 0;///< 成功执行的FFT变换次数（不含错误）
     quint64 m_totalSamplesProcessed = 0;  ///< 总处理的采样点数（累计）
     quint64 m_maxSampleSize = 0;          ///< 单次变换处理过的最大采样点数（峰值）
     quint64 m_errorCount = 0;             ///< FFT计算中发生的错误次数

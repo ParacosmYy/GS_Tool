@@ -108,6 +108,9 @@ public:
     /** @brief 获取累计write()调用次数 @return 写入调用总次数 */
     quint64 totalWrites() const { return m_totalWrites; }
 
+    /** @brief 获取累计重连尝试次数(Client模式下已连接/连接中时再次调用open) @return 重连尝试次数 */
+    quint64 totalReconnectAttempts() const { return m_totalReconnectAttempts; }
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -159,6 +162,7 @@ private:
     quint64 m_errorCount = 0;            ///< 累计错误次数
     quint64 m_totalOpenAttempts = 0;     ///< 累计open()调用次数
     quint64 m_totalWrites = 0;           ///< 累计write()调用次数
+    quint64 m_totalReconnectAttempts = 0;///< 累计重连尝试次数
 };
 
 #endif // TCPCONNECTION_H

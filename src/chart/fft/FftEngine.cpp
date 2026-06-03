@@ -119,6 +119,7 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
 
     /* 更新统计计数器 */
     ++m_totalTransforms;
+    ++m_totalTransformsExecuted;
     m_totalSamplesProcessed += static_cast<quint64>(timeData.size());
     quint64 nSample = static_cast<quint64>(timeData.size());
     if (nSample > m_maxSampleSize) {
@@ -292,6 +293,7 @@ quint64 FftEngine::errorCount() const
 void FftEngine::resetFftStatistics()
 {
     m_totalTransforms = 0;
+    m_totalTransformsExecuted = 0;
     m_totalSamplesProcessed = 0;
     m_maxSampleSize = 0;
     m_errorCount = 0;
