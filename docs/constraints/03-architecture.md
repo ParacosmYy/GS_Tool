@@ -53,7 +53,169 @@
 
 ---
 
+## 三-A、模块依赖规则（DAG）
+
+> 基于 src/ 顶层模块的依赖方向图，所有 `#include` 必须遵守。
+
+### 依赖层级
+
+```
+允许的依赖方向（自上而下）:
+Layer 0: interfaces/    — 零出站依赖，纯虚接口
+Layer 1: shared/        — 仅依赖 interfaces/，常量+枚举
+Layer 2: utils/         — 依赖 shared/
+Layer 3: serial/, protocol/  — 依赖 utils, shared, interfaces
+Layer 4: connection/, terminal/, chart/, rtt/  — 依赖 Layer 3 + shared + interfaces
+Layer 5: ota/, automation/, dashboard/  — 依赖 Layer 4 + shared + interfaces
+Layer 6: plugin/        — 仅依赖 interfaces/ + shared/
+Layer 7: core/          — 依赖所有模块（但仅通过 interfaces/ 指针）
+```
+
+### 禁止规则
+
+| 规则 | 说明 | 示例 |
+|------|------|------|
+| **禁止反向依赖** | 低层模块不得 `#include` 高层模块头文件 | `utils/` 不能 include `core/` |
+| **禁止同层横向依赖** | 同层模块之间不得直接 include | `chart/` 不能直接 include `terminal/` |
+| **禁止跨层依赖** | 除 core 外，不得跳层 include | `ota/` 不能直接 include `utils/`（应通过 shared） |
+| **唯一例外: core/** | core/ 可直接依赖所有模块，但推荐通过接口指针 | `core/` 可 include `connection/IConnection.h` |
+
+### 违规检测
+
+每次架构审查（每5次commit）需检查:
+- [ ] 无反向依赖（grep低层include高层）
+- [ ] 无同层横向依赖（grep同层互相include）
+- [ ] core/ 外无跨层跳级
+
+---
+
+## 三-B、接口契约
+
+> 规划中的纯虚接口，定义在 `src/interfaces/`。详见 `docs/architecture/DECOUPLING_PROPOSAL.md`。
+
+### IConnection — 连接抽象
+
+| 项 | 说明 |
+|-----|------|
+| **用途** | 统一13种连接方式（串口/TCP/UDP/BLE/CAN/MQTT/WebSocket等）的操作接口 |
+| **实现模块** | `connection/` 下各具体连接类（SerialConnection, TcpConnection等） |
+| **消费模块** | `core/`（ConnectionController）, `ota/`, `rtt/` |
+
+```cpp
+class IConnection {
+public:
+    virtual ~IConnection() = default;
+    virtual bool open() = 0;
+    virtual void close() = 0;
+    virtual qint64 send(const QByteArray& data) = 0;
+    virtual ConnectionState state() const = 0;
+    virtual QString errorString() const = 0;
+};
+```
+
+### IPanelProvider — 面板提供者
+
+| 项 | 说明 |
+|-----|------|
+| **用途** | 模块向 PanelManager 注册面板的标准接口，支持自注册模式 |
+| **实现模块** | 各拥有配置面板的模块（serial/, connection/, protocol/等） |
+| **消费模块** | `core/`（PanelManager） |
+
+```cpp
+class IPanelProvider {
+public:
+    virtual ~IPanelProvider() = default;
+    virtual QWidget* createPanel(QWidget* parent) = 0;
+    virtual QString panelId() const = 0;
+    virtual QString panelIcon() const = 0;
+    virtual QString panelTitle() const = 0;
+};
+```
+
+### IDataSink — 数据接收者
+
+| 项 | 说明 |
+|-----|------|
+| **用途** | 数据流分发目标接口，协议解析后的数据通过此接口路由到终端/图表/录制 |
+| **实现模块** | `terminal/`（TerminalModel）, `chart/`（ChartModel）, `utils/`（DataLogger） |
+| **消费模块** | `protocol/`（ProtocolEngine）, `connection/`（数据分发） |
+
+```cpp
+class IDataSink {
+public:
+    virtual ~IDataSink() = default;
+    virtual void onRawData(const QByteArray& data) = 0;
+    virtual void onParsedData(const QJsonObject& frame) = 0;
+    virtual void clear() = 0;
+};
+```
+
+### IProtocolParser — 协议解析器
+
+| 项 | 说明 |
+|-----|------|
+| **用途** | 可插拔的协议解析接口，支持动态注册自定义协议 |
+| **实现模块** | `protocol/` 下各协议引擎（ModbusEngine, FrameParser, JustFloatBridge等） |
+| **消费模块** | `core/`（ProtocolEngine编排）, `automation/`（触发器匹配） |
+
+```cpp
+class IProtocolParser {
+public:
+    virtual ~IProtocolParser() = default;
+    virtual bool parse(const QByteArray& raw, QJsonObject& out) = 0;
+    virtual QString protocolName() const = 0;
+    virtual QByteArray frameHeader() const = 0;
+};
+```
+
+### IDevice — 设备描述
+
+| 项 | 说明 |
+|-----|------|
+| **用途** | 统一设备档案接口，描述连接的嵌入式设备属性 |
+| **实现模块** | `core/`（DeviceProfile） |
+| **消费模块** | `ota/`（固件校验）, `rtt/`（RTT通道配置）, `protocol/`（协议自适应） |
+
+```cpp
+class IDevice {
+public:
+    virtual ~IDevice() = default;
+    virtual QString deviceName() const = 0;
+    virtual QString firmwareVersion() const = 0;
+    virtual QString mcuFamily() const = 0;
+    virtual QMap<QString, QVariant> capabilities() const = 0;
+};
+```
+
+---
+
+## 三-C、解耦指南
+
+> 完整方案详见 `docs/architecture/DECOUPLING_PROPOSAL.md`（待创建）。
+
+### 解耦检查清单
+
+每次新增跨模块调用时，必须逐条确认:
+
+- [ ] **模块间通信通过接口指针** — 不直接 include 具体实现类的头文件
+- [ ] **模块注册通过自注册模式** — 使用 IPanelProvider 等接口自动注册，不在 core/ 硬编码
+- [ ] **常量从 shared/ 引入** — 颜色/布局/字体等常量统一由 shared/ 域头文件提供
+- [ ] **跨模块事件通过事件总线** — 不直接 connect 不同模块的信号，通过中间事件总线路由
+
+### 解耦优先级
+
+| 阶段 | 目标 | 涉及模块 |
+|------|------|---------|
+| Phase 1 | 抽取 interfaces/ 纯虚接口 | IConnection, IProtocolParser, IDataSink |
+| Phase 2 | 抽取 shared/ 常量+枚举 | ColorConstants, LayoutConstants 等6个域头文件 |
+| Phase 3 | 模块自注册机制 | IPanelProvider, 插件式面板加载 |
+| Phase 4 | 事件总线 | 跨模块数据分发，替代直接信号连接 |
+
+---
+
 ## 三、公共组件清单（只写一次，全局复用）
+
+### 核心基础组件
 
 | 组件 | 文件 | 用途 |
 |------|------|------|
@@ -63,22 +225,67 @@
 | `SettingsManager` | `utils/settings/SettingsManager.h/cpp` | 单例，配置持久化 |
 | `ThemeManager` | `core/theme/ThemeManager.h/cpp` | 单例，主题切换 |
 | `DataLogger` | `utils/log/DataLogger.h/cpp` | 日志记录/回放 |
+
+### 连接与协议组件
+
+| 组件 | 文件 | 用途 |
+|------|------|------|
 | `IConnection` | `connection/interface/IConnection.h` | 连接抽象接口 |
-| `TerminalModel` | `terminal/model/TerminalModel.h/cpp` | 终端数据模型 |
-| `TerminalWidget` | `terminal/widget/TerminalWidget.h/cpp` | 自绘制终端控件 |
-| `TerminalSearchBar` | `terminal/search/TerminalSearchBar.h/cpp` | 终端搜索栏 |
-| `Constants` | `core/theme/Constants.h` | 全局枚举和常量 |
-| `ChannelConfig` | `chart/model/ChannelConfig.h/cpp` | 通道配置 |
-| `ChartModel` | `chart/model/ChartModel.h/cpp` | 图表数据模型 |
-| `SendController` | `core/send/SendController.h/cpp` | 发送控制器 |
-| `NavigationController` | `core/navigation/NavigationController.h/cpp` | 导航控制器 |
-| `RecordingController` | `core/recording/RecordingController.h/cpp` | 录制控制器 |
-| `ConnectionController` | `core/connect/ConnectionController.h/cpp` | 连接控制器 |
 | `IProtocolBridge` | `protocol/bridge/IProtocolBridge.h` | 协议桥抽象接口 |
 | `JustFloatBridge` | `protocol/bridge/JustFloatBridge.h/cpp` | JustFloat协议桥 |
 | `FireWaterBridge` | `protocol/bridge/FireWaterBridge.h/cpp` | FireWater协议桥 |
 
-**规则**: 任何新功能需要上述能力时，直接复用，不得重写。
+### 终端组件
+
+| 组件 | 文件 | 用途 |
+|------|------|------|
+| `TerminalModel` | `terminal/model/TerminalModel.h/cpp` | 终端数据模型 |
+| `TerminalWidget` | `terminal/widget/TerminalWidget.h/cpp` | 自绘制终端控件 |
+| `TerminalSearchBar` | `terminal/search/TerminalSearchBar.h/cpp` | 终端搜索栏 |
+
+### 图表组件
+
+| 组件 | 文件 | 用途 |
+|------|------|------|
+| `ChannelConfig` | `chart/model/ChannelConfig.h/cpp` | 通道配置 |
+| `ChartModel` | `chart/model/ChartModel.h/cpp` | 图表数据模型 |
+
+### 控制器组件
+
+| 组件 | 文件 | 用途 |
+|------|------|------|
+| `SendController` | `core/send/SendController.h/cpp` | 发送控制器 |
+| `NavigationController` | `core/navigation/NavigationController.h/cpp` | 导航控制器 |
+| `RecordingController` | `core/recording/RecordingController.h/cpp` | 录制控制器 |
+| `ConnectionController` | `core/connect/ConnectionController.h/cpp` | 连接控制器 |
+
+### UI基础组件（新增）
+
+| 组件 | 文件 | 用途 |
+|------|------|------|
+| `BasePanel` | `core/widgets/BasePanel.h/cpp` | 面板统一包装容器（标题栏/折叠/动画） |
+| `EmptyStateWidget` | `core/widgets/EmptyStateWidget.h/cpp` | 空状态提示组件（图标+文字+操作按钮） |
+| `LoadingSpinner` | `core/widgets/LoadingSpinner.h/cpp` | 加载旋转指示器 |
+| `SkeletonWidget` | `core/widgets/SkeletonWidget.h/cpp` | 骨架屏占位组件 |
+| `CommandPalette` | `core/widgets/CommandPalette.h/cpp` | Ctrl+P全局命令面板（模糊搜索） |
+| `SmartAutoComplete` | `core/widgets/SmartAutoComplete.h/cpp` | 智能补全弹窗（前缀匹配，最多8条） |
+| `ScriptRecorder` | `core/widgets/ScriptRecorder.h/cpp` | 脚本录制回放控件 |
+| `DataDiffWidget` | `core/widgets/DataDiffWidget.h/cpp` | 双列数据对比（Myers算法） |
+| `IconNavBar` | `core/widgets/IconNavBar.h/cpp` | 图标导航栏（三栏布局左侧） |
+| `IconManager` | `core/widgets/IconManager.h/cpp` | SVG图标管理器（Lucide集 + 着色管线） |
+
+### 常量域头文件（新增，规划迁移至 shared/）
+
+| 组件 | 文件 | 用途 |
+|------|------|------|
+| `ColorConstants` | `core/theme/Constants.h` 内分区 | 颜色常量（主题色/语义色/状态色） |
+| `LayoutConstants` | `core/theme/Constants.h` 内分区 | 布局常量（间距/圆角/边距） |
+| `FontConstants` | `core/theme/Constants.h` 内分区 | 字体常量（字号/字重/行高） |
+| `AnimationConstants` | `core/theme/Constants.h` 内分区 | 动画常量（时长/曲线/延迟） |
+| `IconConstants` | `core/theme/Constants.h` 内分区 | 图标常量（尺寸/默认色/名称映射） |
+| `ComponentConstants` | `core/theme/Constants.h` 内分区 | 组件常量（控件尺寸/阈值/限制） |
+
+**规则**: 任何新功能需要上述能力时，直接复用，不得重写。新增公共组件必须在此清单中登记。
 
 ---
 

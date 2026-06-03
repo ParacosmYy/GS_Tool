@@ -68,4 +68,35 @@
 | 77 | UI动画: OTA进度条完成动画(QPropertyAnimation 400ms OutCubic accent->success)+FrameParser拆分(488->180+330)+DataExporterStreamed修复 | 77 |
 | 78 | 文件拆分: ZModemTransfer(440->350)+ConnectionController(495->278)+新增ConnectionControllerHandlers(249)+YModem进度动画增强 | 78 |
 | 79 | 文件拆分: XModemTransfer(474->306)+新增XModemTransferHandlers(178)+移除未使用include | 79 |
-| ... | 目标: 1000分 | 1000 |
+| 80 | Bug审计冲刺: 呼吸动画QSequentialAnimationGroup+Toast向上飘出+teardownConnection提取+Toast防抖连接+QSS全局字体+YModem/ZModem Doxygen+Bug审计25项+新特性评审 | 80 |
+| 81 | 呼吸动画QPropertyAnimation重构+面板切换动画+Toast防抖+OTA吐司连接+YModem Doxygen注释 | 81 |
+| 82 | NavIndicatorWidget+ToastWidget集成: 连接状态吐司通知+OTA传输吐司+NavIndicator主题联动+QSS三主题吐司样式+OTA错误消息中文化+XModem Doxygen注释 | 82 |
+| 83 | Bug审计冲刺: TerminalWidget键盘导航+右键菜单+AnimatedProgressBar修复+连接按钮错误态+QSS一致性+NavIndicatorWidget+ToastWidget | 83 |
+| 84 | P1 Bug修复+终端右键菜单+连接状态指示器+TimedSender线程安全+OTA安全断开+AnimatedProgressBar+FrameParser容错+ProtocolBridge统计 | 84 |
+| 85 | Bug修复冲刺+QSS一致性+ChartWidget主题集成+OTA增强+FrameParser超时定时器+SessionManager集成 | 85 |
+| 86 | FrameParser状态机拆分+DataExporter多格式导出+ByteFormat工具+ZModem框架+图表QSS+UI微调 | 86 |
+| 87 | MainWindow瘦身+TerminalController提取+SessionManager+OTA增强+PortWatcher集成+ThemeManager动画 | 87 |
+| 88 | 终端拆分+协议增强+串口热插拔+快速命令持久化+QSS完善 | 88 |
+| 89 | 架构审查#5+流式导出+右键菜单JSON导出+方向缓存+连接类型图标+文件体积约束 | 89 |
+| 90 | 代码审查修复: sendAndRecord统一+completer泄漏+QStackedWidget降级+lineAt线程安全+objectName审计+DataLogger回放修复 | 90 |
+| 91 | 架构审查+TerminalModel环形缓冲区+导航面板重构+FrameEditor/OtaWidget中文化+light对比度修复+新特性准入机制 | 91 |
+| 92 | 搭建11个未来特性骨架框架(F1-F11)+Phase 4 直方图/散点图+路线图PRD | 92 |
+| 93 | feat(chart): FFT频谱分析引擎+频谱显示控件 | 93 |
+| 94 | feat(chart): 多Y轴支持+EmbedDebug.bat自动部署Qt依赖 | 94 |
+| 95 | refactor(architecture): 全面拆解模块为深层嵌套子目录结构 | 95 |
+| 96 | R28 全局边缘用例修复—31个文件136行 | 96 |
+| 97 | R27 P1修复: 析构函数静默关闭(4类连接+DataLogger)+ThemeManager动画泄漏 | 97 |
+| 98 | 代码质量: Layout常量扩展(22个)+魔术数替换(28处)+空析构=default(8处)+OtaWidget/NavigationController拆分 | 98 |
+| 99 | R26 Bug修复(6项)+tr()合规+防御性null检查+代码质量 | 99 |
+| 100 | feat(recording): 实现F1数据录制回放完整业务逻辑 | 100 |
+| 101 | feat(protocol): 实现F2自定义协议引擎完整业务逻辑 | 101 |
+| 102 | feat: 实现F3数据导出+F4终端增强+F5仪表盘完整业务逻辑 | 102 |
+| 103 | feat: 实现F6 J-Link RTT+F7自动化触发器+F8项目管理 | 103 |
+| 104 | feat: 实现F9串口高级调试+F10性能监控+F11插件系统+大规模扩展路线图 | 104 |
+| 105 | feat(expansion): F12-F26大规模扩展骨架-15个新特性100个文件 | 105 |
+| 106 | feat(expansion): F12-F26完整实现-15个新特性全部填充真实逻辑 | 106 |
+| 107 | fix(connection): 全面修复F12-F26协议层和连接层bug | 107 |
+| 108 | fix: 全模块Bug修复第二轮—除零保护、协议修正、objectName补全 | 108 |
+| 109 | feat(panel): 全局面板注册系统重构-44个面板数据驱动导航树 | 109 |
+| 110 | ui: 全面现代化UI基础设施—9个新组件+BasePanel包装器+三主题QSS+常量拆分 | 110 |
+| ... | 目标: 500分 | 500 |

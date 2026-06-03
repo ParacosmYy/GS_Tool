@@ -116,6 +116,64 @@
 
 ---
 
+## 八、完成定义（Done Criteria）
+
+> 每个功能/PRD 只有满足以下全部条件才算"完成"。
+
+| # | 条件 | 验证方式 |
+|---|------|---------|
+| 1 | **编译通过** — 零错误、零警告（-Werror级别） | `cmake --build build` 无错误输出 |
+| 2 | **LSP诊断清洁** — 无error级别诊断 | `lsp_diagnostics` 所有changed文件无error |
+| 3 | **约束合规** — 符合所有约束文档铁律 | 文件体积(.h≤200, .cpp≤500)、命名规范、分层合规 |
+| 4 | **PRD需求满足** — 所有PRD中标注的功能点已实现 | 逐条对照PRD检查 |
+| 5 | **运行验证** — EmbedDebug.bat正常启动，无崩溃 | 双击启动或命令行运行 |
+| 6 | **代码审查通过** — 无设计模式违规、无重复代码 | 自审查清单确认 |
+
+**未满足任意一条 = 未完成，不允许commit。**
+
+---
+
+## 九、UI现代化进度（PRD_061~069）
+
+> 以下功能已完成PRD编写和基础架构设计，状态持续更新。
+
+| PRD | 功能 | 状态 | 实现说明 |
+|-----|------|------|---------|
+| PRD-061 | BasePanel容器组件 | ✅ DONE | 统一标题栏/折叠/动画，PanelManager已集成 |
+| PRD-062 | IconManager SVG图标系统 | ✅ DONE | Lucide图标集 + SVG着色管线 |
+| PRD-063 | EmptyStateWidget/LoadingSpinner/SkeletonWidget | ✅ DONE | 空状态/加载/骨架屏通用组件 |
+| PRD-064 | CommandPalette命令面板 | ✅ DONE | Ctrl+P全局模糊搜索 |
+| PRD-065 | IconNavBar三栏布局 | ✅ DONE | IconNavBar + Sidebar + Content |
+| PRD-066 | QSS主题生成器 | ✅ DONE | JSON定义 + 模板自动生成QSS |
+| PRD-067 | SmartAutoComplete智能补全 | ✅ DONE | 发送栏前缀匹配历史命令 |
+| PRD-068 | ScriptRecorder脚本录制回放 | ✅ DONE | 操作录制为JSON + 变速回放 |
+| PRD-069 | DataDiffWidget数据对比 | ✅ DONE | Pin数据 + 双列diff（Myers算法） |
+
+---
+
+## 十、模块归属表
+
+> 明确每个模块的责任人/角色。表格持续更新。
+
+| 模块 | 路径 | 负责角色 | 备用角色 | 当前状态 |
+|------|------|---------|---------|---------|
+| `core` | `src/core/` | 核心开发 | 系统架构师 | 活跃 |
+| `connection` | `src/connection/` | 协议开发 | 核心开发 | 活跃 |
+| `protocol` | `src/protocol/` | 协议开发 | — | 活跃 |
+| `terminal` | `src/terminal/` | UI开发 | 核心开发 | 活跃 |
+| `serial` | `src/serial/` | UI开发 | 核心开发 | 活跃 |
+| `chart` | `src/chart/` | UI开发 | 核心开发 | 活跃 |
+| `ota` | `src/ota/` | 核心开发 | — | 活跃 |
+| `rtt` | `src/rtt/` | 协议开发 | — | 规划中 |
+| `automation` | `src/automation/` | 核心开发 | — | 规划中 |
+| `dashboard` | `src/dashboard/` | UI开发 | — | 规划中 |
+| `plugin` | `src/plugin/` | 系统架构师 | — | 规划中 |
+| `utils` | `src/utils/` | 核心开发 | — | 活跃 |
+| `interfaces` | `src/interfaces/` | 系统架构师 | — | 🔄 规划中 |
+| `shared` | `src/shared/` | 系统架构师 | — | 🔄 规划中 |
+
+---
+
 ## 七、新特性候选池
 
 | 优先级 | 特性名称 | 参考标杆 | 复杂度 |
