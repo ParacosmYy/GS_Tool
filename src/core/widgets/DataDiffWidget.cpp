@@ -46,6 +46,7 @@ DataDiffWidget::DataDiffWidget(QWidget* parent)
 
     // 左列
     auto* leftWidget = new QWidget(this);
+    leftWidget->setObjectName("diffLeftPanel");
     auto* leftLayout = new QVBoxLayout(leftWidget);
     leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setSpacing(2);
@@ -61,6 +62,7 @@ DataDiffWidget::DataDiffWidget(QWidget* parent)
 
     // 右列
     auto* rightWidget = new QWidget(this);
+    rightWidget->setObjectName("diffRightPanel");
     auto* rightLayout = new QVBoxLayout(rightWidget);
     rightLayout->setContentsMargins(0, 0, 0, 0);
     rightLayout->setSpacing(2);

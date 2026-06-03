@@ -34,6 +34,13 @@ BleGattBrowser::BleGattBrowser(QWidget* parent)
 {
     setObjectName("BleGattBrowser");
 
+    m_serviceTree->setObjectName("gattServiceTree");
+    m_valueDisplay->setObjectName("gattValueDisplay");
+    m_selectedLabel->setObjectName("gattSelectedLabel");
+    m_writeInput->setObjectName("gattWriteInput");
+    m_readBtn->setObjectName("gattReadBtn");
+    m_writeBtn->setObjectName("gattWriteBtn");
+
     // 树控件配置
     m_serviceTree->setHeaderLabels({tr("名称"), tr("UUID"), tr("属性")});
     m_serviceTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);

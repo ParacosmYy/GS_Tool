@@ -24,6 +24,7 @@ TerminalFilterBar::TerminalFilterBar(QWidget *parent)
     auto *layout = new QHBoxLayout(this);
     layout->setContentsMargins(4, 2, 4, 2);
 
+    m_patternEdit->setObjectName("filterPatternEdit");
     m_patternEdit->setPlaceholderText(tr("输入正则表达式..."));
     m_patternEdit->setClearButtonEnabled(true);
 
@@ -32,7 +33,11 @@ TerminalFilterBar::TerminalFilterBar(QWidget *parent)
     m_historyCombo->setEditable(false);
     m_historyCombo->setToolTip(tr("过滤历史"));
 
+    m_caseCheck->setObjectName("filterCaseCheck");
+    m_invertCheck->setObjectName("filterInvertCheck");
+    m_applyBtn->setObjectName("filterApplyBtn");
     m_applyBtn->setFixedWidth(100);
+    m_clearBtn->setObjectName("filterClearBtn");
     m_clearBtn->setFixedWidth(60);
 
     layout->addWidget(m_patternEdit);

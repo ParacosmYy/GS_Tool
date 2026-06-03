@@ -357,7 +357,43 @@ void MqttConnection::handlePublish(const QByteArray& data, quint8 flags)
     emit dataReceived(payload);
 }
 
-void MqttConnection::handleSuback(const QByteArray& data) { Q_UNUSED(data) }
+/**
+ * @brief 处理SUBACK响应
+ *
+ * SUBACK报文格式: [PacketID(2)][ReturnCode(1+)]
+ * 每个ReturnCode对应一个订阅主题的授予QoS:
+ *   0x00=QoS0成功, 0x01=QoS1成功, 0x02=QoS2成功,
+ *   0x80=订阅失败(被Broker拒绝)。
+ *
+ * @param data SUBACK可变头部+负载数据
+ */
+void MqttConnection::handleSuback(const QByteArray& data)
+{
+    /* SUBACK至少包含2字节PacketID + 1字节ReturnCode */
+    if (data.size() < 3) {
+        ++m_errorCount;
+        emit errorOccurred(tr("SUBACK报文长度异常: %1字节").arg(data.size()));
+        return;
+    }
+
+    /* 提取PacketID */
+    const quint16 packetId = (static_cast<quint8>(data.at(0)) << 8)
+                           | static_cast<quint8>(data.at(1));
+
+    /* 逐个检查ReturnCode */
+    for (int i = 2; i < data.size(); ++i) {
+        const quint8 returnCode = static_cast<quint8>(data.at(i));
+        if (returnCode == 0x80) {
+            /* 订阅被拒绝 */
+            ++m_errorCount;
+            emit errorOccurred(
+                tr("MQTT订阅被拒绝(PacketID=%1, 第%2个主题)")
+                    .arg(packetId)
+                    .arg(i - 1));
+        }
+        /* QoS 0/1/2 成功 — 无需额外处理，已记录在 m_subscriptions */
+    }
+}
 
 QString MqttConnection::generateClientId()
 {

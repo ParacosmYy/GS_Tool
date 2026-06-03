@@ -36,7 +36,9 @@ ConverterPanel::ConverterPanel(QWidget *parent)
 
     // 格式选择行
     auto *formatLayout = new QHBoxLayout();
-    formatLayout->addWidget(new QLabel(tr("源格式："), this));
+    auto* srcFormatLabel = new QLabel(tr("源格式："), this);
+    srcFormatLabel->setObjectName("converterSrcFormatLabel");
+    formatLayout->addWidget(srcFormatLabel);
 
     const auto formats = {
         DataConverter::Hex, DataConverter::Ascii, DataConverter::Base64,
@@ -49,6 +51,11 @@ ConverterPanel::ConverterPanel(QWidget *parent)
         m_toCombo->addItem(name, static_cast<int>(fmt));
     }
 
+    m_fromCombo->setObjectName("converterFromCombo");
+    m_toCombo->setObjectName("converterToCombo");
+    m_inputEdit->setObjectName("converterInputEdit");
+    m_outputEdit->setObjectName("converterOutputEdit");
+
     formatLayout->addWidget(m_fromCombo);
 
     // 交换按钮
@@ -57,7 +64,9 @@ ConverterPanel::ConverterPanel(QWidget *parent)
     m_swapBtn->setFixedWidth(40);
     formatLayout->addWidget(m_swapBtn);
 
-    formatLayout->addWidget(new QLabel(tr("目标格式："), this));
+    auto* dstFormatLabel = new QLabel(tr("目标格式："), this);
+    dstFormatLabel->setObjectName("converterDstFormatLabel");
+    formatLayout->addWidget(dstFormatLabel);
     formatLayout->addWidget(m_toCombo);
 
     // 转换按钮（箭头图标）
@@ -78,7 +87,9 @@ ConverterPanel::ConverterPanel(QWidget *parent)
 
     // 复制按钮行
     auto *outputHeader = new QHBoxLayout();
-    outputHeader->addWidget(new QLabel(tr("输出："), this));
+    auto* outputLabel = new QLabel(tr("输出："), this);
+    outputLabel->setObjectName("converterOutputLabel");
+    outputHeader->addWidget(outputLabel);
     outputHeader->addStretch();
     m_copyBtn->setObjectName("copyOutputBtn");
     m_copyBtn->setEnabled(false);

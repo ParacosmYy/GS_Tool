@@ -152,12 +152,25 @@ void BluetoothAtConsole::onSendClicked()
 }
 
 /**
- * @brief 预设指令点击处理(由各按钮lambda直接调用sendCommand)
+ * @brief 预设指令按钮点击的统一处理槽
+ *
+ * 从sender()获取触发按钮，提取关联的AT指令并发送。
+ * 同时支持从构造函数中的lambda直接调用sendCommand的兼容路径。
  */
 void BluetoothAtConsole::onPresetClicked()
 {
-    // 预设指令通过构造函数中的lambda直接调用sendCommand
-    // 此slot保留用于信号路由兼容
+    auto* btn = qobject_cast<QPushButton*>(sender());
+    if (!btn) {
+        return;
+    }
+
+    /* 从按钮的toolTip中获取完整的AT指令文本 */
+    const QString cmd = btn->toolTip().trimmed();
+    if (!cmd.isEmpty()) {
+        m_cmdInput->setText(cmd);
+        sendCommand(cmd);
+        m_cmdInput->clear();
+    }
 }
 
 /** @brief 获取累计发送AT命令次数 */

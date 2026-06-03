@@ -21,6 +21,13 @@ DeviceProfilePanel::DeviceProfilePanel(QWidget *parent)
 {
     setObjectName(QStringLiteral("DeviceProfilePanel"));
 
+    m_profileList->setObjectName("deviceProfileList");
+    m_newBtn->setObjectName("deviceNewBtn");
+    m_editBtn->setObjectName("deviceEditBtn");
+    m_deleteBtn->setObjectName("deviceDeleteBtn");
+    m_importBtn->setObjectName("deviceImportBtn");
+    m_exportBtn->setObjectName("deviceExportBtn");
+
     auto *mainLayout = new QVBoxLayout(this);
 
     // 按钮行1：CRUD操作

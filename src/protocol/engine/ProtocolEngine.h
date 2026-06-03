@@ -111,18 +111,29 @@ private:
     quint64 m_totalCrcErrors = 0;           ///< CRC校验错误次数
     quint64 m_totalBytesParsed = 0;         ///< 已解析的字节总数（仅成功解析的帧内字节）
 
+    /** @brief 尝试从缓冲区中解析一帧 @return 成功解析返回true */
     bool tryParseOneFrame();
+    /** @brief 在缓冲区中搜索帧头位置 @param buffer 数据缓冲区 @param header 帧头字节序列 @return 帧头起始位置，未找到返回-1 */
     int findHeader(const QByteArray &buffer, const QVector<int> &header) const;
+    /** @brief 清除缓冲区中不完整帧头之前的数据 @param header 帧头字节序列 */
     void trimBufferBeforePartialHeader(const QVector<int> &header);
+    /** @brief 读取长度字段值 @param buffer 数据缓冲区 @param offset 长度字段偏移 @param size 长度字段字节数 @return 解析得到的长度值 */
     int readLengthField(const QByteArray &buffer, int offset, int size) const;
+    /** @brief 从帧数据中提取单个字段值 @param frame 完整帧数据 @param field 字段定义 @return 字段值 */
     QVariant extractField(const QByteArray &frame,
                            const ProtocolSchema::FieldDefinition &field) const;
+    /** @brief 验证帧校验和 @param frame 完整帧数据 @param framing 帧定界规则 @return 校验通过返回true */
     bool validateChecksum(const QByteArray &frame,
                           const ProtocolSchema::FramingRule &framing) const;
+    /** @brief 计算CRC-8校验值 @param data 待计算数据 @param polynomial 生成多项式，默认0x07 @return CRC-8校验值 */
     static quint8 computeCrc8(const QByteArray &data, quint8 polynomial = 0x07);
+    /** @brief 计算CRC-16 CCITT校验值 @param data 待计算数据 @return CRC-16校验值 */
     static quint16 computeCrc16Ccitt(const QByteArray &data);
+    /** @brief 计算CRC-16 Modbus校验值 @param data 待计算数据 @return CRC-16 Modbus校验值 */
     static quint16 computeCrc16Modbus(const QByteArray &data);
+    /** @brief 计算CRC-32校验值 @param data 待计算数据 @return CRC-32校验值 */
     static quint32 computeCrc32(const QByteArray &data);
+    /** @brief 计算异或校验值 @param data 待计算数据 @return 异或校验值 */
     static quint8 computeXor(const QByteArray &data);
 };
 

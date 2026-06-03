@@ -28,6 +28,17 @@ PacketBuilderPanel::PacketBuilderPanel(QWidget *parent)
 {
     setObjectName(QStringLiteral("PacketBuilderPanel"));
 
+    m_fieldTable->setObjectName("packetFieldTable");
+    m_addFieldBtn->setObjectName("packetAddFieldBtn");
+    m_removeFieldBtn->setObjectName("packetRemoveFieldBtn");
+    m_buildBtn->setObjectName("packetBuildBtn");
+    m_loadBtn->setObjectName("packetLoadBtn");
+    m_saveBtn->setObjectName("packetSaveBtn");
+    m_clearAllBtn->setObjectName("packetClearAllBtn");
+    m_moveUpBtn->setObjectName("packetMoveUpBtn");
+    m_moveDownBtn->setObjectName("packetMoveDownBtn");
+    m_hexPreview->setObjectName("packetHexPreview");
+
     auto *mainLayout = new QVBoxLayout(this);
 
     // 按钮行1：字段操作

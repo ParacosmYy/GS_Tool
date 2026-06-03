@@ -4,6 +4,7 @@
  */
 
 #include "core/widgets/DragDropHelper.h"
+#include "core/theme/ThemeManager.h"
 
 #include <QWidget>
 #include <QDragEnterEvent>
@@ -160,9 +161,9 @@ bool DragDropHelper::handleDragEnter(QDragEnterEvent* event)
     if (accepted) {
         event->acceptProposedAction();
         ++s_totalDragEnters;
-        // 应用高亮
+        // 应用高亮 — 默认使用主题强调色
         QString color = m_target->property("_dropHighlightColor").toString();
-        if (color.isEmpty()) color = "#4a9eff";
+        if (color.isEmpty()) color = ThemeManager::instance().color(ThemeManager::SemanticColor::Accent).name();
         int bw = m_target->property("_dropHighlightWidth").toInt();
         if (bw <= 0) bw = 2;
 

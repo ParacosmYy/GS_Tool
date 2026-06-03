@@ -6,13 +6,14 @@
  */
 
 #include "terminal/filter/TerminalHighlighter.h"
+#include "core/theme/ThemeManager.h"
 
 /**
  * @brief 构造函数，初始化默认高亮格式
  */
 TerminalHighlighter::TerminalHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
-    , m_color(QStringLiteral("#FF6B35"))
+    , m_color(ThemeManager::instance().color(ThemeManager::SemanticColor::TermSearchHighlight))
 {
     m_format.setForeground(m_color);
     m_format.setFontWeight(QFont::Bold);

@@ -6,6 +6,7 @@
  */
 
 #include "terminal/filter/TerminalFilter.h"
+#include "core/theme/ThemeManager.h"
 
 /**
  * @brief 构造函数，初始化默认正则（大小写不敏感）
@@ -92,7 +93,7 @@ void TerminalFilter::setCaseSensitive(bool sensitive)
  */
 QString TerminalFilter::highlightColor() const
 {
-    return QStringLiteral("#FF6B35");
+    return ThemeManager::instance().color(ThemeManager::SemanticColor::TermSearchHighlight).name();
 }
 
 /**

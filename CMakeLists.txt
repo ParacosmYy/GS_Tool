@@ -46,9 +46,6 @@ set(SOURCES
     src/core/event/EventBus.cpp
     src/core/widgets/AppDialog.cpp
     src/core/widgets/DragDropHelper.cpp
-    src/core/icons/SvgIconProvider.cpp
-    src/core/fonts/FontManager.cpp
-    src/core/clipboard/ClipboardManager.cpp
     src/core/settings/SettingsController.cpp
     src/core/toolbar/ToolbarController.cpp
     src/core/terminal/TerminalController.cpp

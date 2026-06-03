@@ -5,6 +5,7 @@
 
 #include "core/widgets/AppDialog.h"
 #include "core/theme/IconManager.h"
+#include "core/theme/ThemeManager.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -179,67 +180,79 @@ void AppDialog::setupUI()
 
 void AppDialog::applyStyle()
 {
-    // QSS 样式 - 颜色使用语义化变量名
-    setStyleSheet(R"(
+    /* 从 ThemeManager 获取语义色，确保对话框跟随主题切换 */
+    auto& theme = ThemeManager::instance();
+    const QString bgSecondary = theme.color(ThemeManager::SemanticColor::BgSecondary).name();
+    const QString borderClr = theme.color(ThemeManager::SemanticColor::Border).name();
+    const QString textPrimary = theme.color(ThemeManager::SemanticColor::TextPrimary).name();
+    const QString textSecondary = theme.color(ThemeManager::SemanticColor::TextSecondary).name();
+    const QString bgHover = theme.color(ThemeManager::SemanticColor::BgHover).name();
+    const QString accent = theme.color(ThemeManager::SemanticColor::Accent).name();
+    const QString accentHover = theme.color(ThemeManager::SemanticColor::AccentHover).name();
+
+    setStyleSheet(QString(R"(
         #appDialog {
-            background-color: #2a2d35;
-            border: 1px solid #3a3d45;
+            background-color: %1;
+            border: 1px solid %2;
             border-radius: 12px;
         }
         #dialogTitle {
-            color: #e0e0e0;
+            color: %3;
             font-size: 16px;
             font-weight: bold;
         }
         #dialogMessage {
-            color: #b0b0b0;
+            color: %4;
             font-size: 14px;
             line-height: 1.5;
         }
         #dialogCancelBtn {
-            background-color: #3a3d45;
-            color: #b0b0b0;
-            border: 1px solid #4a4d55;
+            background-color: %2;
+            color: %4;
+            border: 1px solid %5;
             border-radius: 6px;
             padding: 0 16px;
         }
         #dialogCancelBtn:hover {
-            background-color: #4a4d55;
-            color: #e0e0e0;
+            background-color: %5;
+            color: %3;
         }
         #dialogConfirmBtn {
-            background-color: #4a9eff;
+            background-color: %6;
             color: #ffffff;
             border: none;
             border-radius: 6px;
             padding: 0 16px;
         }
         #dialogConfirmBtn:hover {
-            background-color: #5aaeff;
+            background-color: %7;
         }
-    )");
+    )").arg(bgSecondary, borderClr, textPrimary, textSecondary, bgHover, accent, accentHover));
 
     // 根据类型调整确认按钮颜色
+    const QString warningClr = theme.color(ThemeManager::SemanticColor::Warning).name();
+    const QString errorClr = theme.color(ThemeManager::SemanticColor::Error).name();
+
     switch (m_type) {
     case Type::Confirm:
         m_confirmBtn->setStyleSheet(
-            "background-color: #4a9eff; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
-            "hover { background-color: #5aaeff; }");
+            QString("background-color: %1; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
+                    "#dialogConfirmBtn:hover { background-color: %2; }").arg(accent, accentHover));
         break;
     case Type::Warning:
         m_confirmBtn->setStyleSheet(
-            "background-color: #f0a030; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
-            "hover { background-color: #f0b040; }");
+            QString("background-color: %1; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
+                    "#dialogConfirmBtn:hover { background-color: %1; }").arg(warningClr));
         break;
     case Type::Error:
         m_confirmBtn->setStyleSheet(
-            "background-color: #e04040; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
-            "hover { background-color: #e05050; }");
+            QString("background-color: %1; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
+                    "#dialogConfirmBtn:hover { background-color: %1; }").arg(errorClr));
         break;
     case Type::Information:
         m_confirmBtn->setStyleSheet(
-            "background-color: #40a0e0; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
-            "hover { background-color: #50b0f0; }");
+            QString("background-color: %1; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
+                    "#dialogConfirmBtn:hover { background-color: %2; }").arg(accent, accentHover));
         break;
     }
 }
