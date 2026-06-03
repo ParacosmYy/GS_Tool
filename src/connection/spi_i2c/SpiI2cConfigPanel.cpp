@@ -98,7 +98,8 @@ void SpiI2cConfigPanel::onConnectClicked()
         }
         emit disconnectRequested();
     } else {
-        /// 发起连接
+        /// 发起连接(传输)
+        ++m_totalTransfers;
         emit connectRequested(config());
     }
 }
@@ -221,6 +222,12 @@ void SpiI2cConfigPanel::setupConnections()
             this, &SpiI2cConfigPanel::onConnectClicked);
     connect(m_busModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &SpiI2cConfigPanel::onModeChanged);
+    connect(m_busModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_adapterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_clockSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_totalConfigChanges; });
 }
 
 /**
@@ -283,4 +290,13 @@ void SpiI2cConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("spi_i2c/csPin"), 0).toInt());
     m_deviceAddrSpin->setValue(
         settings.value(QStringLiteral("spi_i2c/deviceAddr"), 0).toInt());
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void SpiI2cConfigPanel::resetStatistics()
+{
+    m_totalTransfers = 0;
+    m_totalConfigChanges = 0;
 }

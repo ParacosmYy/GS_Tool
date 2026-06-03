@@ -106,6 +106,7 @@ TimestampPanel::TimestampPanel(QWidget *parent)
  */
 void TimestampPanel::onConvert()
 {
+    ++m_totalConversions;
     QString text = m_timestampEdit->text().trimmed();
     if (text.isEmpty()) {
         m_resultLabel->setText(tr("结果：无输入"));
@@ -214,6 +215,7 @@ void TimestampPanel::onNow()
  */
 void TimestampPanel::onCopy()
 {
+    ++m_totalCopyActions;
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(m_resultLabel->text());
 }

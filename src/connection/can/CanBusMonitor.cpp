@@ -61,7 +61,13 @@ void CanBusMonitor::addFrame(const CanFrame& frame)
     const int row = m_frameTable->rowCount();
     m_frameTable->insertRow(row);
     ++m_frameCount;
+    ++m_totalFramesMonitored;
     m_idFrequency[frame.id]++;
+
+    /* RTR帧视为错误/异常帧，累计错误计数 */
+    if (frame.rtr) {
+        ++m_totalErrors;
+    }
 
     /* 时间 */
     auto* timeItem = new QTableWidgetItem(QTime::currentTime().toString("HH:mm:ss.zzz"));
@@ -178,4 +184,23 @@ QString CanBusMonitor::statisticsSummary() const
 void CanBusMonitor::setFrameIdFilter(const QString& filterText)
 {
     m_frameIdFilter = filterText.trimmed();
+}
+
+/** @brief 获取累计监控帧总数 */
+quint64 CanBusMonitor::totalFramesMonitored() const
+{
+    return m_totalFramesMonitored;
+}
+
+/** @brief 获取累计错误次数 */
+quint64 CanBusMonitor::totalErrors() const
+{
+    return m_totalErrors;
+}
+
+/** @brief 重置所有统计计数器 */
+void CanBusMonitor::resetStatistics()
+{
+    m_totalFramesMonitored = 0;
+    m_totalErrors = 0;
 }

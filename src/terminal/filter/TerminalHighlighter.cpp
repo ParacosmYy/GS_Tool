@@ -25,6 +25,7 @@ void TerminalHighlighter::setPattern(const QString &pattern)
 {
     m_pattern = pattern;
     m_regex.setPattern(pattern);
+    ++m_totalRuleChanges;
     rehighlight();
 }
 
@@ -35,6 +36,7 @@ void TerminalHighlighter::setHighlightColor(const QColor &color)
 {
     m_color = color;
     m_format.setForeground(m_color);
+    ++m_totalRuleChanges;
     rehighlight();
 }
 
@@ -51,5 +53,15 @@ void TerminalHighlighter::highlightBlock(const QString &text)
     while (it.hasNext()) {
         QRegularExpressionMatch match = it.next();
         setFormat(match.capturedStart(), match.capturedLength(), m_format);
+        ++m_totalHighlights;
     }
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void TerminalHighlighter::resetStatistics()
+{
+    m_totalHighlights = 0;
+    m_totalRuleChanges = 0;
 }

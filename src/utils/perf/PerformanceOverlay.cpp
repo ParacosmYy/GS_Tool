@@ -59,10 +59,13 @@ void PerformanceOverlay::onStatsUpdated(double fps, double avgFrameMs, qint64 me
  */
 void PerformanceOverlay::updateStats(double fps, double avgFrameMs, qint64 memBytes)
 {
+    ++m_totalUpdates;
+
     /* FPS历史跟踪 */
     m_currentFps = fps;
     m_lastMemBytes = memBytes;
     if (fps > 0) {
+        if (fps < m_fpsWarningThreshold) ++m_totalLowFpsWarnings;
         if (fps < m_minFps) m_minFps = fps;
         if (fps > m_maxFps) m_maxFps = fps;
         m_fpsHistory.append(fps);

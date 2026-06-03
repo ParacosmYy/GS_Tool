@@ -40,6 +40,15 @@ public:
      */
     QVariantMap config() const;
 
+    /** @brief 获取累计连接尝试次数 */
+    quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
+
+    /** @brief 获取累计断开连接次数 */
+    quint64 totalDisconnections() const { return m_totalDisconnections; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
     /**
      * @brief 设置连接状态(更新按钮文本和状态标签)
      * @param connected true=已连接
@@ -85,6 +94,10 @@ private:
 
     // ---- 状态 ----
     bool m_connected = false;            ///< 当前连接状态
+
+    // ---- 统计计数器 ----
+    quint64 m_totalConnectAttempts = 0;  ///< 累计连接尝试次数
+    quint64 m_totalDisconnections = 0;   ///< 累计断开连接次数
 };
 
 #endif // WSCONFIGPANEL_H

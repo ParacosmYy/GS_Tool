@@ -83,6 +83,15 @@ public:
     /** @brief 导出操作日志为文本 */
     QString exportLog() const;
 
+    /** @brief 获取累计寄存器读取次数(quint64) */
+    quint64 totalRegisterReads() const;
+
+    /** @brief 获取累计寄存器写入次数(quint64) */
+    quint64 totalRegisterWrites() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 signals:
     /** @brief 寄存器读取完成信号
      * @param address 寄存器地址
@@ -136,6 +145,10 @@ private:
     QPushButton* m_writeBtn = nullptr;              ///< 写入按钮
     QPushButton* m_clearLogBtn = nullptr;           ///< 清空日志按钮
     QTextEdit* m_log = nullptr;                     ///< 操作日志
+
+    // ---- 统计计数器 ----
+    quint64 m_totalRegisterReads = 0;               ///< 累计寄存器读取次数
+    quint64 m_totalRegisterWrites = 0;              ///< 累计寄存器写入次数
 };
 
 #endif // REGISTEREDITOR_H

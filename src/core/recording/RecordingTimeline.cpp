@@ -37,6 +37,7 @@ void RecordingTimeline::startRecording()
     m_elapsedMs = 0;
     m_recording = true;
     m_events.clear();
+    ++m_totalRecordingStarts;
     emit recordingStarted();
 }
 
@@ -54,6 +55,7 @@ void RecordingTimeline::stopRecording()
     }
     m_elapsedMs = QDateTime::currentMSecsSinceEpoch() - m_startTimeMs;
     m_recording = false;
+    ++m_totalRecordingStops;
 
     // 自动记录停止时刻作为事件
     m_events.append(m_elapsedMs);
@@ -100,6 +102,7 @@ void RecordingTimeline::seekTo(qint64 timeMs)
     }
 
     m_seekPositionMs = timeMs;
+    ++m_totalSeeks;
     emit timeUpdated(m_seekPositionMs);
 }
 
@@ -135,6 +138,7 @@ void RecordingTimeline::recordEvent(qint64 timestampMs)
     }
 
     m_events.append(timestampMs);
+    ++m_totalEventsRecorded;
 }
 
 /**

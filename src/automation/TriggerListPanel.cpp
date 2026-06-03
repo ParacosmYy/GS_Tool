@@ -143,6 +143,7 @@ void TriggerListPanel::setupUI()
     connect(m_editBtn, &QPushButton::clicked, this, [this]() {
         const int row = m_ruleList->currentRow();
         if (row >= 0) {
+            ++m_totalRuleEdits;
             emit editRuleRequested(row);
         }
     });
@@ -150,6 +151,7 @@ void TriggerListPanel::setupUI()
     connect(m_moveUpBtn, &QPushButton::clicked, this, [this]() {
         const int row = m_ruleList->currentRow();
         if (row > 0) {
+            ++m_totalRuleReorders;
             emit moveUpRequested(row);
         }
     });
@@ -157,6 +159,7 @@ void TriggerListPanel::setupUI()
     connect(m_moveDownBtn, &QPushButton::clicked, this, [this]() {
         const int row = m_ruleList->currentRow();
         if (row >= 0 && row < m_ruleList->count() - 1) {
+            ++m_totalRuleReorders;
             emit moveDownRequested(row);
         }
     });
@@ -166,6 +169,7 @@ void TriggerListPanel::setupUI()
         const int row = m_ruleList->row(item);
         const bool newState = item->checkState() != Qt::Checked;
         item->setCheckState(newState ? Qt::Checked : Qt::Unchecked);
+        ++m_totalRuleToggles;
         emit ruleEnabledChanged(row, newState);
     });
 }

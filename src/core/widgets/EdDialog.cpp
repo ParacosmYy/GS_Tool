@@ -166,6 +166,7 @@ void EdDialog::paintEvent(QPaintEvent*)
 void EdDialog::showEvent(QShowEvent* event)
 {
     QDialog::showEvent(event);
+    ++s_totalDialogOpens;
 
     /* 缩放动画: 95% → 100% */
     auto* scaleAnim = new QPropertyAnimation(this, "geometry");
@@ -262,6 +263,7 @@ void EdDialog::closeWithAnimation()
     group->addAnimation(scaleAnim);
     group->addAnimation(fadeAnim);
     connect(group, &QAbstractAnimation::finished, this, [this]() {
+        ++s_totalDialogCloses;
         QDialog::done(m_resultCode);
     });
     group->start(QAbstractAnimation::DeleteWhenStopped);

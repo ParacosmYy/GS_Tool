@@ -47,6 +47,7 @@ void BackgroundWidget::setBackgroundImage(const QString& resourcePath)
     m_currentImagePath = resourcePath;
     m_blurredImage = generateBlurred(m_originalImage, m_blurRadius);
     regenerateScaledBackground();
+    ++m_totalImageLoads;
     update();
 }
 
@@ -61,6 +62,7 @@ void BackgroundWidget::setBlurRadius(qreal radius)
     m_blurRadius = qBound(0.0, radius, 30.0);
     m_blurredImage = generateBlurred(m_originalImage, m_blurRadius);
     regenerateScaledBackground();
+    ++m_totalEffectChanges;
     emit blurChanged(m_blurRadius);
     update();
 }
@@ -79,6 +81,7 @@ void BackgroundWidget::setBgOpacity(qreal opacity)
 {
     if (qFuzzyCompare(m_bgOpacity, opacity)) return;
     m_bgOpacity = qBound(0.0, opacity, 1.0);
+    ++m_totalEffectChanges;
     emit opacityChanged(m_bgOpacity);
     update();
 }
@@ -97,6 +100,7 @@ qreal BackgroundWidget::bgOpacity() const
 void BackgroundWidget::setRippleEnabled(bool enabled)
 {
     m_rippleEnabled = enabled;
+    ++m_totalEffectChanges;
     if (!enabled) {
         m_ripples.clear();
         m_rippleTimer->stop();
@@ -158,6 +162,7 @@ void BackgroundWidget::setBlurIterations(int iterations)
     m_blurIterations = qBound(2, iterations, 10);
     m_blurredImage = generateBlurred(m_originalImage, m_blurRadius);
     regenerateScaledBackground();
+    ++m_totalEffectChanges;
     update();
 }
 
@@ -373,4 +378,14 @@ void BackgroundWidget::updateThemeColors()
     m_overlayColor = tm.color(ThemeManager::SemanticColor::BgPrimary);
     m_rippleColor = tm.color(ThemeManager::SemanticColor::Accent);
     update();
+}
+
+// ============================================================================
+// 统计重置
+// ============================================================================
+
+void BackgroundWidget::resetBackgroundStatistics()
+{
+    m_totalImageLoads = 0;
+    m_totalEffectChanges = 0;
 }

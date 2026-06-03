@@ -45,6 +45,15 @@ public:
      */
     QString output() const;
 
+    /** @brief 获取累计转换操作次数 */
+    quint64 totalConversions() const { return m_totalConversions; }
+
+    /** @brief 获取累计复制操作次数 */
+    quint64 totalCopyActions() const { return m_totalCopyActions; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 private slots:
     /**
      * @brief 执行格式转换
@@ -82,6 +91,10 @@ private:
     QPushButton *m_clearHistoryBtn;    ///< 清除历史按钮
     QListWidget *m_historyList;        ///< 转换历史列表
     DataConverter m_converter;         ///< 转换引擎
+
+    // ---- 统计计数器 ----
+    quint64 m_totalConversions = 0;    ///< 累计转换操作次数
+    quint64 m_totalCopyActions = 0;    ///< 累计复制操作次数
 };
 
 #endif // CONVERTERPANEL_H

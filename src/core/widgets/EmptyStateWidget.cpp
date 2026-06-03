@@ -40,6 +40,7 @@ void EmptyStateWidget::setIconName(const QString& name)
     if (m_iconLabel) {
         // 占位: 显示首字符，后续接入IconManager替换
         m_iconLabel->setText(name.isEmpty() ? QString() : QString(name.at(0)));
+        ++m_totalIconChanges;
     }
 }
 
@@ -47,6 +48,7 @@ void EmptyStateWidget::setTitle(const QString& title)
 {
     if (m_titleLabel) {
         m_titleLabel->setText(title);
+        ++m_totalStateChanges;
     }
 }
 
@@ -55,6 +57,7 @@ void EmptyStateWidget::setDescription(const QString& description)
     if (m_descLabel) {
         m_descLabel->setText(description);
         m_descLabel->setVisible(!description.isEmpty());
+        ++m_totalStateChanges;
     }
 }
 
@@ -133,4 +136,14 @@ void EmptyStateWidget::setupUI(const QString& title, const QString& description)
     m_actionBtn->setMaximumWidth(320);
     m_actionBtn->hide(); // 默认隐藏，setActionButton后显示
     m_mainLayout->addWidget(m_actionBtn, 0, Qt::AlignCenter);
+}
+
+// ============================================================================
+// 统计重置
+// ============================================================================
+
+void EmptyStateWidget::resetEmptyStateStatistics()
+{
+    m_totalStateChanges = 0;
+    m_totalIconChanges = 0;
 }

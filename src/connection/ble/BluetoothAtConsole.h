@@ -46,6 +46,15 @@ public:
      */
     void setConnection(IConnection* connection);
 
+    /** @brief 获取累计发送AT命令次数 */
+    quint64 totalCommandsSent() const;
+
+    /** @brief 获取累计接收响应次数 */
+    quint64 totalResponsesReceived() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 private slots:
     /** @brief 发送按钮点击处理 */
     void onSendClicked();
@@ -68,6 +77,10 @@ private:
 
     /** @brief 预设AT指令按钮列表 */
     QList<QPushButton*> m_presetButtons;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalCommandsSent = 0;            ///< 累计发送AT命令次数
+    quint64 m_totalResponsesReceived = 0;       ///< 累计接收响应次数
 };
 
 #endif // BLUETOOTHATCONSOLE_H

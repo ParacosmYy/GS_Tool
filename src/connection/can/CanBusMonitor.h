@@ -65,6 +65,15 @@ public:
      */
     void setFrameIdFilter(const QString& filterText);
 
+    /** @brief 获取累计监控帧总数 */
+    quint64 totalFramesMonitored() const;
+
+    /** @brief 获取累计错误次数 */
+    quint64 totalErrors() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 private:
     /**
      * @brief 根据帧类型获取行背景色
@@ -96,6 +105,10 @@ private:
 
     /** @brief 当前帧ID过滤文本 */
     QString m_frameIdFilter;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalFramesMonitored = 0;         ///< 累计监控帧总数
+    quint64 m_totalErrors = 0;                  ///< 累计错误次数
 };
 
 #endif // CANBUSMONITOR_H

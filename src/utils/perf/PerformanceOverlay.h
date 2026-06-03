@@ -107,6 +107,14 @@ private:
     double m_currentFps = 0.0;   ///< 当前FPS
     qint64 m_lastMemBytes = 0;   ///< 最近一次内存值
     double m_fpsWarningThreshold = 30.0; ///< FPS警告阈值
+
+    // ---- 统计计数器 ----
+    quint64 m_totalUpdates = 0;      ///< 累计统计更新次数
+    quint64 m_totalLowFpsWarnings = 0;///< 累计低FPS警告次数
+public:
+    quint64 totalUpdates() const { return m_totalUpdates; }
+    quint64 totalLowFpsWarnings() const { return m_totalLowFpsWarnings; }
+    void resetOverlayStatistics() { m_totalUpdates = 0; m_totalLowFpsWarnings = 0; }
 };
 
 #endif // PERFORMANCE_OVERLAY_H

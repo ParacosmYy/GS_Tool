@@ -33,6 +33,7 @@ UsbDescriptorViewer::UsbDescriptorViewer(QWidget* parent)
 }
 
 void UsbDescriptorViewer::setDevice(quint16 vid, quint16 pid) {
+    ++m_totalDevicesViewed;
     loadDescriptors(vid, pid);
 }
 
@@ -43,6 +44,7 @@ void UsbDescriptorViewer::setDevice(quint16 vid, quint16 pid) {
 void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
     m_descriptorTree->clear();
     m_rawView->clear();
+    ++m_totalDescriptorRefreshes;
 
     auto addField = [&](QTreeWidgetItem* parent, const QString& name,
                         const QString& val, const QString& desc) {
@@ -194,4 +196,23 @@ void UsbDescriptorViewer::addDeviceDescriptor(QTreeWidgetItem* parent,
     addField("bcdDevice",
              QString("0x%1").arg(bcdDevice, 4, 16, QChar('0')),
              tr("设备版本"));
+}
+
+/** @brief 获取累计描述符刷新次数 */
+quint64 UsbDescriptorViewer::totalDescriptorRefreshes() const
+{
+    return m_totalDescriptorRefreshes;
+}
+
+/** @brief 获取累计查看设备次数 */
+quint64 UsbDescriptorViewer::totalDevicesViewed() const
+{
+    return m_totalDevicesViewed;
+}
+
+/** @brief 重置所有统计计数器 */
+void UsbDescriptorViewer::resetStatistics()
+{
+    m_totalDescriptorRefreshes = 0;
+    m_totalDevicesViewed = 0;
 }

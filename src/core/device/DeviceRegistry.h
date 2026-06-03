@@ -90,6 +90,18 @@ signals:
 
 private:
     QList<DeviceProfile> m_profiles;    ///< 设备配置列表
+
+    // ---- 统计计数器 ----
+    mutable quint64 m_totalAdds = 0;            ///< 累计添加次数
+    mutable quint64 m_totalRemoves = 0;         ///< 累计移除次数
+    mutable quint64 m_totalSaves = 0;           ///< 累计保存次数
+    mutable quint64 m_totalLoads = 0;           ///< 累计加载次数
+public:
+    quint64 totalAdds() const { return m_totalAdds; }
+    quint64 totalRemoves() const { return m_totalRemoves; }
+    quint64 totalSaves() const { return m_totalSaves; }
+    quint64 totalLoads() const { return m_totalLoads; }
+    void resetRegistryStatistics() { m_totalAdds = 0; m_totalRemoves = 0; m_totalSaves = 0; m_totalLoads = 0; }
 };
 
 #endif // DEVICEREGISTRY_H

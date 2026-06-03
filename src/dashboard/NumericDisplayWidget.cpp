@@ -27,6 +27,7 @@ NumericDisplayWidget::NumericDisplayWidget(QWidget *parent)
 void NumericDisplayWidget::setValue(double value)
 {
     m_value = value;
+    ++m_totalValueUpdates;
     update();
 }
 
@@ -47,6 +48,7 @@ void NumericDisplayWidget::setUnit(const QString &unit)
 void NumericDisplayWidget::setPrecision(int precision)
 {
     m_precision = precision;
+    ++m_totalFormatChanges;
     update();
 }
 
@@ -145,4 +147,13 @@ void NumericDisplayWidget::paintEvent(QPaintEvent *event)
     }
 
     painter.end();
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void NumericDisplayWidget::resetStatistics()
+{
+    m_totalValueUpdates = 0;
+    m_totalFormatChanges = 0;
 }

@@ -37,6 +37,7 @@ SkeletonWidget::SkeletonWidget(int width, int height, int borderRadius,
         m_shimmerOffset += 4;
         if (m_shimmerOffset > 2 * this->width()) {
             m_shimmerOffset = 0;
+            ++m_totalAnimations;
         }
         update();
     });
@@ -68,4 +69,14 @@ void SkeletonWidget::paintEvent(QPaintEvent* event)
     shimmer.setColorAt(1.0, Qt::transparent);
     p.setBrush(shimmer);
     p.drawRoundedRect(rect(), m_borderRadius, m_borderRadius);
+}
+
+// ============================================================================
+// 统计重置
+// ============================================================================
+
+void SkeletonWidget::resetSkeletonStatistics()
+{
+    m_totalAnimations = 0;
+    m_totalLayoutChanges = 0;
 }

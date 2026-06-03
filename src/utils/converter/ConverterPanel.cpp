@@ -152,6 +152,7 @@ void ConverterPanel::onConvert()
     QByteArray result = m_converter.convert(input, from, to);
     m_outputEdit->setPlainText(QString::fromUtf8(result));
     m_copyBtn->setEnabled(true);
+    ++m_totalConversions;
 
     /* 添加到历史记录 */
     QString fromName = DataConverter::formatName(from);
@@ -190,6 +191,7 @@ void ConverterPanel::onSwap()
  */
 void ConverterPanel::onCopy()
 {
+    ++m_totalCopyActions;
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(m_outputEdit->toPlainText());
 }
@@ -212,4 +214,13 @@ void ConverterPanel::onHistorySelected()
         return;
     }
     /* 历史只记录了摘要，不做恢复操作 */
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void ConverterPanel::resetStatistics()
+{
+    m_totalConversions = 0;
+    m_totalCopyActions = 0;
 }

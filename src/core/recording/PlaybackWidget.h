@@ -85,6 +85,16 @@ private:
     QComboBox*   m_speedCombo;  ///< 倍速选择下拉框
     QLabel*      m_timeLabel;   ///< 时间显示标签
     qint64       m_durationMs = 0;  ///< 回放总时长（毫秒）
+
+    // ---- 统计计数器 ----
+    quint64 m_totalPlays = 0;       ///< 累计播放请求次数
+    quint64 m_totalSeeks = 0;       ///< 累计定位请求次数
+    quint64 m_totalSpeedChanges = 0;///< 累计变速请求次数
+public:
+    quint64 totalPlays() const { return m_totalPlays; }
+    quint64 totalSeeks() const { return m_totalSeeks; }
+    quint64 totalSpeedChanges() const { return m_totalSpeedChanges; }
+    void resetPlaybackWidgetStatistics() { m_totalPlays = 0; m_totalSeeks = 0; m_totalSpeedChanges = 0; }
 };
 
 #endif // PLAYBACK_WIDGET_H

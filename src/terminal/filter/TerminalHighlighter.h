@@ -11,6 +11,7 @@
 #define TERMINALHIGHLIGHTER_H
 
 #include <QColor>
+#include <QtGlobal>
 #include <QObject>
 #include <QRegularExpression>
 #include <QString>
@@ -45,6 +46,15 @@ public:
      */
     void setHighlightColor(const QColor &color);
 
+    /** @brief 获取高亮匹配总次数 */
+    quint64 totalHighlights() const { return m_totalHighlights; }
+
+    /** @brief 获取规则变更总次数 */
+    quint64 totalRuleChanges() const { return m_totalRuleChanges; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 protected:
     /**
      * @brief 高亮匹配文本块
@@ -57,6 +67,9 @@ private:
     QColor m_color;             ///< 高亮颜色
     QRegularExpression m_regex; ///< 编译后正则对象
     QTextCharFormat m_format;   ///< 高亮文本格式
+
+    quint64 m_totalHighlights = 0;  ///< 高亮匹配总次数
+    quint64 m_totalRuleChanges = 0; ///< 规则变更总次数
 };
 
 #endif // TERMINALHIGHLIGHTER_H

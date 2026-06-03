@@ -107,6 +107,18 @@ private:
     qint64 m_seekPositionMs;///< 回放定位位置（毫秒，仅seekTo更新）
     bool   m_recording;     ///< 当前是否正在录制
     QList<qint64> m_events; ///< 已记录的事件时间戳列表（毫秒）
+
+    // ---- 统计计数器 ----
+    quint64 m_totalRecordingStarts = 0;///< 累计录制启动次数
+    quint64 m_totalRecordingStops = 0; ///< 累计录制停止次数
+    quint64 m_totalSeeks = 0;          ///< 累计定位次数
+    quint64 m_totalEventsRecorded = 0; ///< 累计记录的事件数
+public:
+    quint64 totalRecordingStarts() const { return m_totalRecordingStarts; }
+    quint64 totalRecordingStops() const { return m_totalRecordingStops; }
+    quint64 totalSeeks() const { return m_totalSeeks; }
+    quint64 totalEventsRecorded() const { return m_totalEventsRecorded; }
+    void resetTimelineStatistics() { m_totalRecordingStarts = 0; m_totalRecordingStops = 0; m_totalSeeks = 0; m_totalEventsRecorded = 0; }
 };
 
 #endif // RECORDING_TIMELINE_H

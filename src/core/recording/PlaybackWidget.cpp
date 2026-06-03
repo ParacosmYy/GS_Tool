@@ -195,6 +195,7 @@ void PlaybackWidget::setupUI()
         if (checked) {
             m_playBtn->setText(tr("\u23F8"));  // ⏸ 暂停图标
             m_playBtn->setToolTip(tr("暂停"));
+            ++m_totalPlays;
             emit playRequested();
         } else {
             m_playBtn->setText(tr("\u25B6"));  // ▶ 播放图标
@@ -214,6 +215,7 @@ void PlaybackWidget::setupUI()
         if (m_durationMs > 0) {
             const qint64 timeMs = static_cast<qint64>(
                 (position / 10000.0) * m_durationMs);
+            ++m_totalSeeks;
             emit seekRequested(timeMs);
         }
     });
@@ -226,6 +228,7 @@ void PlaybackWidget::setupUI()
         const QString numPart = text.chopped(1);  // 去掉末尾 'x'
         const qreal speed = numPart.toDouble(&ok);
         if (ok && speed > 0.0) {
+            ++m_totalSpeedChanges;
             emit speedChangeRequested(speed);
         }
     });

@@ -22,6 +22,9 @@
 TerminalTabManager::TerminalTabManager(QWidget *parent)
     : QWidget(parent)
     , m_tabWidget(nullptr)
+    , m_totalTabAdds(0)
+    , m_totalTabRemoves(0)
+    , m_totalTabSwitches(0)
 {
     setObjectName(QStringLiteral("TerminalTabManager"));
     setupUI();
@@ -54,9 +57,13 @@ void TerminalTabManager::setupUI()
     connect(m_tabWidget, &QTabWidget::tabCloseRequested,
             this, &TerminalTabManager::removeTab);
 
-    /* 当前标签页切换时转发信号 */
-    connect(m_tabWidget, &QTabWidget::currentChanged,
-            this, &TerminalTabManager::currentTabChanged);
+    /* 当前标签页切换时转发信号并计数 */
+    connect(m_tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
+        if (index >= 0) {
+            ++m_totalTabSwitches;
+        }
+        emit currentTabChanged(index);
+    });
 
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
@@ -79,6 +86,7 @@ int TerminalTabManager::addTab(const QString &title)
     placeholder->setPlaceholderText(tr("终端内容"));
 
     const int index = m_tabWidget->addTab(placeholder, title);
+    ++m_totalTabAdds;
     emit tabAdded(index);
     return index;
 }
@@ -105,6 +113,7 @@ void TerminalTabManager::removeTab(int index)
     m_tabWidget->removeTab(index);
     delete page;
 
+    ++m_totalTabRemoves;
     emit tabRemoved(index);
 }
 
@@ -124,4 +133,14 @@ int TerminalTabManager::tabCount() const
 int TerminalTabManager::currentTabIndex() const
 {
     return m_tabWidget ? m_tabWidget->currentIndex() : -1;
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void TerminalTabManager::resetStatistics()
+{
+    m_totalTabAdds = 0;
+    m_totalTabRemoves = 0;
+    m_totalTabSwitches = 0;
 }

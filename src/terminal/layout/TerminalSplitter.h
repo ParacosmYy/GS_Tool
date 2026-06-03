@@ -9,6 +9,7 @@
 #ifndef TERMINAL_SPLITTER_H
 #define TERMINAL_SPLITTER_H
 
+#include <QtGlobal>
 #include <QWidget>
 
 class QSplitter;
@@ -55,6 +56,15 @@ public:
      */
     int sectionCount() const;
 
+    /** @brief 获取分屏总次数 */
+    quint64 totalSplits() const { return m_totalSplits; }
+
+    /** @brief 获取合并总次数 */
+    quint64 totalMerges() const { return m_totalMerges; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 signals:
     /**
      * @brief 分栏被添加信号
@@ -74,6 +84,9 @@ private:
 
     QSplitter *m_splitter;      ///< 内部分栏控件
     int m_sectionCount = 0;     ///< 当前分栏计数
+
+    quint64 m_totalSplits = 0;  ///< 分屏总次数
+    quint64 m_totalMerges = 0;  ///< 合并总次数
 };
 
 #endif // TERMINAL_SPLITTER_H

@@ -1,21 +1,9 @@
 /**
  * @file NavIndicatorWidget.h
- * @brief 导航树选中滑动指示器 -- 左侧 accent 色竖线的平滑滑动动画
+ * @brief 导航树选中滑动指示器 -- 左侧 accent 色竖线的平滑滑动动画(250ms OutCubic)
  *
- * 当用户点击导航树中不同项目时，左侧的 accent 色指示线会从旧位置
- * 平滑滑动到新位置（250ms OutCubic），产生类似 Arc Browser 侧边栏
- * 的精致滑动效果。
- *
- * 设计思路:
- *   - 作为 navTree 的子控件，覆盖在其上方（transparent 背景）
- *   - 通过 QPropertyAnimation 驱动 indicatorY 属性实现滑动
- *   - 颜色从 ThemeManager::SemanticColor::Accent 获取，无硬编码色值
- *   - 主题切换时自动刷新指示线颜色
- *
- * 协作关系:
- *   - QTreeView (navTree): 父控件，提供选中项的几何位置
- *   - ThemeManager: 提供 Accent 颜色
- *   - MainWindow: 创建实例并连接导航树点击信号
+ * 设计: navTree子控件覆盖层, QPropertyAnimation驱动indicatorY, ThemeManager取色
+ * 协作: QTreeView(父控件) / ThemeManager(Accent色) / MainWindow(信号连接)
  */
 
 #ifndef NAV_INDICATOR_WIDGET_H
@@ -108,6 +96,8 @@ public:
         m_slideAnim->setStartValue(startY);
         m_slideAnim->setEndValue(targetY);
         m_slideAnim->start();
+        ++m_totalAnimations;
+        ++m_totalPositionChanges;
     }
 
     /** @brief 无动画跳转到指定索引位置（用于初始化和恢复会话） */
@@ -118,11 +108,21 @@ public:
 
         m_indicatorHeight = visualRect.height();
         m_indicatorY = visualRect.y();
+        ++m_totalPositionChanges;
         update();
     }
 
     /** @brief 指示线 Y 坐标（QPropertyAnimation 读访问器） */
     qreal indicatorY() const { return m_indicatorY; }
+
+    // ── 统计计数器 ──
+
+    /** @brief 获取动画启动总次数 */
+    quint64 totalAnimations() const { return m_totalAnimations; }
+    /** @brief 获取位置变更总次数 */
+    quint64 totalPositionChanges() const { return m_totalPositionChanges; }
+    /** @brief 重置所有统计计数器 */
+    void resetIndicatorStatistics() { m_totalAnimations = 0; m_totalPositionChanges = 0; }
 
     /** @brief 设置指示线 Y 坐标（QPropertyAnimation 写访问器） */
     void setIndicatorY(qreal y)
@@ -186,6 +186,10 @@ private:
     QPropertyAnimation* m_slideAnim;   ///< 滑动动画（250ms OutCubic）
     qreal m_indicatorY;                ///< 指示线顶部 Y 坐标
     int m_indicatorHeight;             ///< 指示线高度（跟随选中项行高）
+
+    // ── 统计计数器 ──
+    quint64 m_totalAnimations = 0;     ///< 动画启动次数
+    quint64 m_totalPositionChanges = 0;///< 位置变更次数
 };
 
 #endif // NAV_INDICATOR_WIDGET_H

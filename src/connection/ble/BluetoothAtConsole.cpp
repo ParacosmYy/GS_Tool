@@ -120,6 +120,7 @@ void BluetoothAtConsole::sendCommand(const QString& command)
     if (written < 0) {
         m_output->append(tr("[发送失败] 连接不可用"));
     }
+    ++m_totalCommandsSent;
 }
 
 void BluetoothAtConsole::setConnection(IConnection* connection)
@@ -136,6 +137,7 @@ void BluetoothAtConsole::setConnection(IConnection* connection)
                 this, [this](const QByteArray& data) {
                     const QString text = QString::fromUtf8(data);
                     m_output->append(text);
+                    ++m_totalResponsesReceived;
                 });
     }
 }
@@ -156,4 +158,23 @@ void BluetoothAtConsole::onPresetClicked()
 {
     // 预设指令通过构造函数中的lambda直接调用sendCommand
     // 此slot保留用于信号路由兼容
+}
+
+/** @brief 获取累计发送AT命令次数 */
+quint64 BluetoothAtConsole::totalCommandsSent() const
+{
+    return m_totalCommandsSent;
+}
+
+/** @brief 获取累计接收响应次数 */
+quint64 BluetoothAtConsole::totalResponsesReceived() const
+{
+    return m_totalResponsesReceived;
+}
+
+/** @brief 重置所有统计计数器 */
+void BluetoothAtConsole::resetStatistics()
+{
+    m_totalCommandsSent = 0;
+    m_totalResponsesReceived = 0;
 }

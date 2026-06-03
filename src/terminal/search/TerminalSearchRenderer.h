@@ -20,6 +20,7 @@
 
 #include <QPainter>
 #include <QFontMetrics>
+#include <QtGlobal>
 #include "terminal/types/TerminalTypes.h"
 
 class TerminalSearchManager;
@@ -62,6 +63,19 @@ public:
                                int y,
                                int lineHeight,
                                bool showDirectionPrefix);
+
+    /** @brief 获取渲染总调用次数 */
+    static quint64 totalRenders() { return s_totalRenders; }
+
+    /** @brief 获取高亮匹配总次数 */
+    static quint64 totalHighlights() { return s_totalHighlights; }
+
+    /** @brief 重置所有统计计数器 */
+    static void resetStatistics();
+
+private:
+    static quint64 s_totalRenders;    ///< 渲染总调用次数
+    static quint64 s_totalHighlights; ///< 高亮匹配总次数
 };
 
 #endif // TERMINALSEARCHRENDERER_H

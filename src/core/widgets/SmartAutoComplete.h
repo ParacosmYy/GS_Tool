@@ -53,6 +53,15 @@ public:
     /** @brief 处理键盘导航(上/下/Enter/Escape) */
     bool handleKeyEvent(QKeyEvent* event);
 
+    // ── 统计计数器 ──
+
+    /** @brief 获取建议列表显示总次数 */
+    quint64 totalSuggestions() const { return m_totalSuggestions; }
+    /** @brief 获取用户选择补全项总次数 */
+    quint64 totalSelections() const { return m_totalSelections; }
+    /** @brief 重置所有统计计数器 */
+    void resetAutoCompleteStatistics();
+
 signals:
     /** @brief 用户选择了某个补全项 */
     void entrySelected(const QString& text);
@@ -67,6 +76,10 @@ private:
     QListWidget* m_listWidget = nullptr;  ///< objectName="autoCompleteList"
     QVector<AutoCompleteEntry> m_entries; ///< 全部历史条目
     QString m_currentPrefix;              ///< 当前过滤前缀
+
+    // ── 统计计数器 ──
+    quint64 m_totalSuggestions = 0;       ///< 建议列表显示次数
+    quint64 m_totalSelections = 0;        ///< 用户选择补全项次数
 };
 
 #endif // SMART_AUTO_COMPLETE_H

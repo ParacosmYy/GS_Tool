@@ -81,6 +81,7 @@ void RegisterEditor::readAddress(int address)
     }
 
     ++m_readCount;
+    ++m_totalRegisterReads;
     emit registerReadComplete(address, data);
 }
 
@@ -125,6 +126,7 @@ void RegisterEditor::writeAddress(int address, const QByteArray& data)
 
     emit registerWriteComplete(address, success);
     ++m_writeCount;
+    ++m_totalRegisterWrites;
 }
 
 /**
@@ -289,4 +291,23 @@ QString RegisterEditor::exportLog() const
 {
     if (!m_log) return QString();
     return m_log->toPlainText();
+}
+
+/** @brief 获取累计寄存器读取次数(quint64) */
+quint64 RegisterEditor::totalRegisterReads() const
+{
+    return m_totalRegisterReads;
+}
+
+/** @brief 获取累计寄存器写入次数(quint64) */
+quint64 RegisterEditor::totalRegisterWrites() const
+{
+    return m_totalRegisterWrites;
+}
+
+/** @brief 重置所有统计计数器 */
+void RegisterEditor::resetStatistics()
+{
+    m_totalRegisterReads = 0;
+    m_totalRegisterWrites = 0;
 }

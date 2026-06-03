@@ -34,6 +34,22 @@ public:
     /** @brief 设置线条宽度 */
     void setLineWidth(int width);
 
+    /** @brief 启动旋转动画 */
+    void start();
+    /** @brief 停止旋转动画 */
+    void stop();
+    /** @brief 动画是否正在运行 */
+    bool isSpinning() const;
+
+    // ── 统计计数器 ──
+
+    /** @brief 获取动画启动总次数 */
+    quint64 totalStarts() const { return m_totalStarts; }
+    /** @brief 获取动画停止总次数 */
+    quint64 totalStops() const { return m_totalStops; }
+    /** @brief 重置所有统计计数器 */
+    void resetSpinnerStatistics();
+
 protected:
     /** @brief 绘制旋转圆弧 */
     void paintEvent(QPaintEvent* event) override;
@@ -44,6 +60,10 @@ private:
 
     /** @brief 旋转定时器 */
     class QTimer* m_timer = nullptr;
+
+    // ── 统计计数器 ──
+    quint64 m_totalStarts = 0;   ///< 动画启动次数
+    quint64 m_totalStops = 0;    ///< 动画停止次数
 };
 
 #endif // LOADING_SPINNER_H

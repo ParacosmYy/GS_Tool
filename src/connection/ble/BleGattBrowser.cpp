@@ -131,6 +131,8 @@ void BleGattBrowser::onReadClicked()
     m_valueDisplay->append(
         tr("\n[读取完成] %1 (%2 bytes)")
             .arg(m_selectedUuid, QString::number(mockData.size())));
+
+    ++m_totalCharacteristicReads;
 }
 
 void BleGattBrowser::onWriteClicked()
@@ -159,6 +161,7 @@ void BleGattBrowser::onWriteClicked()
                 .arg(hexStr, m_selectedUuid,
                      QString::number(written),
                      QString::number(writeData.size())));
+        ++m_totalCharacteristicWrites;
     }
 }
 
@@ -170,6 +173,7 @@ void BleGattBrowser::onServicesDiscovered(const QStringList& services)
 void BleGattBrowser::populateTree(const QStringList& services)
 {
     m_serviceTree->clear();
+    ++m_totalServiceDiscoveries;
 
     for (const QString& svcUuid : services) {
         // 提取短UUID用于名称查找
@@ -221,4 +225,30 @@ QString BleGattBrowser::formatHexDump(const QByteArray& data) const
         result += "|\n";
     }
     return result;
+}
+
+/** @brief 获取累计服务发现次数 */
+quint64 BleGattBrowser::totalServiceDiscoveries() const
+{
+    return m_totalServiceDiscoveries;
+}
+
+/** @brief 获取累计特征读取次数 */
+quint64 BleGattBrowser::totalCharacteristicReads() const
+{
+    return m_totalCharacteristicReads;
+}
+
+/** @brief 获取累计特征写入次数 */
+quint64 BleGattBrowser::totalCharacteristicWrites() const
+{
+    return m_totalCharacteristicWrites;
+}
+
+/** @brief 重置所有统计计数器 */
+void BleGattBrowser::resetStatistics()
+{
+    m_totalServiceDiscoveries = 0;
+    m_totalCharacteristicReads = 0;
+    m_totalCharacteristicWrites = 0;
 }

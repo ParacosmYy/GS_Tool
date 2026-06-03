@@ -48,6 +48,15 @@ public:
     /** @brief 获取固定宽度(56px) */
     int navBarWidth() const { return 56; }
 
+    // ── 统计计数器 ──
+
+    /** @brief 获取分类切换总次数 */
+    quint64 totalCategorySwitches() const { return m_totalCategorySwitches; }
+    /** @brief 获取按钮点击总次数 */
+    quint64 totalButtonClicks() const { return m_totalButtonClicks; }
+    /** @brief 重置所有统计计数器 */
+    void resetNavStatistics();
+
 signals:
     /** @brief 分类被点击 */
     void categoryClicked(const QString& id);
@@ -65,6 +74,10 @@ private:
     QMap<QString, QPushButton*> m_buttons;   ///< 分类ID→按钮映射
     QString m_activeCategory;                 ///< 当前激活分类ID
     int m_activeIndex = -1;                   ///< 当前激活索引(用于指示线)
+
+    // ── 统计计数器 ──
+    quint64 m_totalCategorySwitches = 0;      ///< 分类切换次数
+    quint64 m_totalButtonClicks = 0;          ///< 按钮点击次数
 };
 
 #endif // ICON_NAV_BAR_H

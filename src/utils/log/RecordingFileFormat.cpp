@@ -189,6 +189,7 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
 
     file.close();
     m_filePath = filePath;
+    ++m_totalSaves;
     return true;
 }
 
@@ -370,5 +371,6 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
     emit loadProgress(1.0);
     emit loadCompleted(m_metadata);
 
+    ++m_totalLoads;
     return true;
 }

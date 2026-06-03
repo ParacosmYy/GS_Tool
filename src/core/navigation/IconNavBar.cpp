@@ -62,6 +62,7 @@ void IconNavBar::setActiveCategory(const QString& id)
     if (m_activeCategory == id) return;
 
     m_activeCategory = id;
+    ++m_totalCategorySwitches;
 
     // 更新按钮选中态和激活索引
     int index = 0;
@@ -92,6 +93,7 @@ QPushButton* IconNavBar::createCategoryButton(const NavCategory& category)
     }
 
     connect(btn, &QPushButton::clicked, this, [this, id = category.id]() {
+        ++m_totalButtonClicks;
         setActiveCategory(id);
         emit categoryClicked(id);
     });
@@ -139,4 +141,12 @@ void IconNavBar::paintEvent(QPaintEvent* event)
     painter.setPen(Qt::NoPen);
     painter.setBrush(accentColor);
     painter.drawRoundedRect(indicatorRect, kRadius, kRadius);
+}
+
+// ─── 统计重置 ────────────────────────────────────────────
+
+void IconNavBar::resetNavStatistics()
+{
+    m_totalCategorySwitches = 0;
+    m_totalButtonClicks = 0;
 }

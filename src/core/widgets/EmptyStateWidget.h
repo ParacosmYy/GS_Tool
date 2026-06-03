@@ -47,6 +47,15 @@ public:
     /** @brief 设置操作按钮文字和回调，空字符串则隐藏按钮 */
     void setActionButton(const QString& text, std::function<void()> callback = nullptr);
 
+    // ── 统计计数器 ──
+
+    /** @brief 获取状态内容变更总次数(标题/描述) */
+    quint64 totalStateChanges() const { return m_totalStateChanges; }
+    /** @brief 获取图标变更总次数 */
+    quint64 totalIconChanges() const { return m_totalIconChanges; }
+    /** @brief 重置所有统计计数器 */
+    void resetEmptyStateStatistics();
+
 private:
     void setupUI(const QString& title, const QString& description);
 
@@ -55,6 +64,10 @@ private:
     QLabel* m_descLabel = nullptr;       ///< objectName="emptyStateDescription"
     QPushButton* m_actionBtn = nullptr;  ///< objectName="emptyStateAction"
     QVBoxLayout* m_mainLayout = nullptr; ///< 主布局
+
+    // ── 统计计数器 ──
+    quint64 m_totalStateChanges = 0;     ///< 状态内容变更次数(标题/描述)
+    quint64 m_totalIconChanges = 0;      ///< 图标变更次数
 };
 
 #endif // EMPTY_STATE_WIDGET_H

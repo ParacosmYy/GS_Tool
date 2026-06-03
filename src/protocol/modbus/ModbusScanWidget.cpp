@@ -85,6 +85,7 @@ void ModbusScanWidget::startScan(int from, int to) {
     m_scanTo      = to;
     m_currentAddr = from;
     m_scanning    = true;
+    ++m_totalScansInitiated;
 
     m_resultList->clear();
     m_progressBar->setRange(from, to);
@@ -149,6 +150,7 @@ void ModbusScanWidget::scanNext() {
     // 发送探测请求（读1个保持寄存器）
     if (m_master) {
         m_master->readRegisters(m_currentAddr, 0, 1);
+        ++m_totalRegistersRead;
     }
     m_currentAddr++;
 }
@@ -160,4 +162,23 @@ void ModbusScanWidget::updateScanButtonState(bool scanning) {
         m_scanBtn->setText(tr("开始扫描"));
     }
     m_scanBtn->setEnabled(true);
+}
+
+/** @brief 获取累计发起扫描次数 */
+quint64 ModbusScanWidget::totalScansInitiated() const
+{
+    return m_totalScansInitiated;
+}
+
+/** @brief 获取累计读取寄存器次数 */
+quint64 ModbusScanWidget::totalRegistersRead() const
+{
+    return m_totalRegistersRead;
+}
+
+/** @brief 重置所有统计计数器 */
+void ModbusScanWidget::resetStatistics()
+{
+    m_totalScansInitiated = 0;
+    m_totalRegistersRead = 0;
 }

@@ -60,6 +60,7 @@ QStringList ProtocolTemplateLibrary::builtinTemplateNames() const
  */
 ProtocolSchema *ProtocolTemplateLibrary::loadTemplate(const QString &name)
 {
+    ++m_totalLoads;
     return m_templates.value(name, nullptr);
 }
 
@@ -85,6 +86,7 @@ bool ProtocolTemplateLibrary::importTemplate(const QString &filePath)
         old->deleteLater();
     }
     m_templates[key] = schema;
+    ++m_totalImports;
     return true;
 }
 
@@ -111,6 +113,7 @@ bool ProtocolTemplateLibrary::exportTemplate(const QString &name,
     }
     file.write(doc.toJson(QJsonDocument::Indented));
     file.close();
+    ++m_totalExports;
     return true;
 }
 

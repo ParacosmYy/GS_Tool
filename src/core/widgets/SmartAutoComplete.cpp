@@ -33,7 +33,10 @@ SmartAutoComplete::SmartAutoComplete(QWidget* parent)
 
     connect(m_listWidget, &QListWidget::itemClicked,
             this, [this](QListWidgetItem* item) {
-        if (item) emit entrySelected(item->text());
+        if (item) {
+            ++m_totalSelections;
+            emit entrySelected(item->text());
+        }
         hideComplete();
     });
 }
@@ -68,6 +71,7 @@ void SmartAutoComplete::showForPrefix(const QString& prefix, const QPoint& posit
 
     move(position);
     show();
+    ++m_totalSuggestions;
 
     if (m_listWidget->count() > 0) {
         m_listWidget->setCurrentRow(0);
@@ -115,6 +119,7 @@ bool SmartAutoComplete::handleKeyEvent(QKeyEvent* event)
     case Qt::Key_Return:
     case Qt::Key_Enter:
         if (hasSelection()) {
+            ++m_totalSelections;
             emit entrySelected(selectedText());
             hideComplete();
         }
@@ -159,4 +164,12 @@ void SmartAutoComplete::sortEntries(QVector<int>& indices) const
         // 频率相同 → 时间降序
         return m_entries[a].lastUsed > m_entries[b].lastUsed;
     });
+}
+
+// ──────────────────────── 统计重置 ────────────────────────
+
+void SmartAutoComplete::resetAutoCompleteStatistics()
+{
+    m_totalSuggestions = 0;
+    m_totalSelections = 0;
 }

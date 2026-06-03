@@ -40,6 +40,15 @@ public:
      */
     void syncFromWidget();
 
+    // ── 统计计数器 ──
+
+    /** @brief 获取弹出面板打开总次数 */
+    quint64 totalOpens() const { return m_totalOpens; }
+    /** @brief 获取设置变更总次数(滑块/开关/选图) */
+    quint64 totalSettingChanges() const { return m_totalSettingChanges; }
+    /** @brief 重置所有统计计数器 */
+    void resetPopupStatistics();
+
 signals:
     /** @brief 面板隐藏信号，通知 MainWindow 更新按钮状态 */
     void hidden();
@@ -60,6 +69,13 @@ protected:
      * @param event 隐藏事件
      */
     void hideEvent(QHideEvent* event) override;
+
+    /**
+     * @brief 显示事件处理
+     * 递增打开计数器
+     * @param event 显示事件
+     */
+    void showEvent(QShowEvent* event) override;
 
 private:
     /**
@@ -91,6 +107,10 @@ private:
 
     /** @brief 恢复默认背景图按钮 */
     QPushButton* m_resetBtn;
+
+    // ── 统计计数器 ──
+    quint64 m_totalOpens = 0;          ///< 弹出面板打开次数
+    quint64 m_totalSettingChanges = 0; ///< 设置变更次数
 };
 
 #endif // BACKGROUNDSETTINGSPOPUP_H

@@ -28,6 +28,7 @@ ProgressBarWidget::ProgressBarWidget(QWidget *parent)
 void ProgressBarWidget::setValue(double value)
 {
     m_value = value;
+    ++m_totalValueUpdates;
     update();
 }
 
@@ -40,6 +41,7 @@ void ProgressBarWidget::setRange(double min, double max)
 {
     m_min = min;
     m_max = max;
+    ++m_totalRangeChanges;
     update();
 }
 
@@ -137,4 +139,13 @@ void ProgressBarWidget::paintEvent(QPaintEvent *event)
     }
 
     painter.end();
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void ProgressBarWidget::resetStatistics()
+{
+    m_totalValueUpdates = 0;
+    m_totalRangeChanges = 0;
 }

@@ -38,6 +38,15 @@ public:
      */
     QVariantMap config() const;
 
+    /** @brief 获取累计配置变更次数 */
+    quint64 totalConfigChanges() const { return m_totalConfigChanges; }
+
+    /** @brief 获取累计总线重置次数 */
+    quint64 totalBusResets() const { return m_totalBusResets; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
     /**
      * @brief 设置连接状态(更新按钮文本和状态标签)
      * @param connected true=已连接
@@ -79,6 +88,10 @@ private:
 
     /** @brief 当前是否已连接 */
     bool m_connected = false;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalConfigChanges = 0;  ///< 累计配置变更次数
+    quint64 m_totalBusResets = 0;      ///< 累计总线重置次数
 };
 
 #endif // CANCONFIGPANEL_H

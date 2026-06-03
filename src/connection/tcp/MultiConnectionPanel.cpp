@@ -131,6 +131,7 @@ void MultiConnectionPanel::onConnectionAdded(int id, const QString& host, int po
     if (m_statusLabel) {
         m_statusLabel->setText(tr("连接数: %1").arg(m_connectionList->count()));
     }
+    ++m_totalConnections;
 }
 
 /**
@@ -149,6 +150,7 @@ void MultiConnectionPanel::onConnectionRemoved(int id)
     if (m_statusLabel) {
         m_statusLabel->setText(tr("连接数: %1").arg(m_connectionList->count()));
     }
+    ++m_totalDisconnections;
 }
 
 /**
@@ -206,4 +208,23 @@ void MultiConnectionPanel::setupConnections()
             this, &MultiConnectionPanel::onRemoveClicked);
     connect(m_sendAllBtn, &QPushButton::clicked,
             this, &MultiConnectionPanel::onSendAllClicked);
+}
+
+/** @brief 获取累计连接次数 */
+quint64 MultiConnectionPanel::totalConnections() const
+{
+    return m_totalConnections;
+}
+
+/** @brief 获取累计断开次数 */
+quint64 MultiConnectionPanel::totalDisconnections() const
+{
+    return m_totalDisconnections;
+}
+
+/** @brief 重置所有统计计数器 */
+void MultiConnectionPanel::resetStatistics()
+{
+    m_totalConnections = 0;
+    m_totalDisconnections = 0;
 }

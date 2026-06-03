@@ -17,6 +17,7 @@
 #include <QCheckBox>
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QShowEvent>
 
 /**
  * @brief 构造背景设置弹出面板
@@ -54,6 +55,7 @@ BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWi
         m_bgWidget->resetToDefault();
         SettingsManager::instance().remove("background/customImagePath");
         SettingsManager::instance().sync();
+        ++m_totalSettingChanges;
         emit resetToDefaultRequested();
     });
 }
@@ -74,6 +76,7 @@ void BackgroundSettingsPopup::createControls(QVBoxLayout* mainLayout)
     mainLayout->addLayout(blurLayout);
     connect(m_blurSlider, &QSlider::valueChanged, this, [this](int val) {
         m_bgWidget->setBlurRadius(val); m_blurValueLbl->setText(QString::number(val));
+        ++m_totalSettingChanges;
     });
 
     // ---- 背景透明度滑块 ----
@@ -89,12 +92,16 @@ void BackgroundSettingsPopup::createControls(QVBoxLayout* mainLayout)
     mainLayout->addLayout(opacityLayout);
     connect(m_opacitySlider, &QSlider::valueChanged, this, [this](int val) {
         m_bgWidget->setBgOpacity(val / 100.0); m_opacityValueLbl->setText(QString::number(val) + "%");
+        ++m_totalSettingChanges;
     });
 
     // ---- 涟漪特效开关 ----
     auto* rippleCheck = new QCheckBox(tr("点击涟漪特效"), this);
     rippleCheck->setObjectName("bgRippleCheck"); rippleCheck->setChecked(m_bgWidget->rippleEnabled());
     mainLayout->addWidget(rippleCheck);
+    connect(rippleCheck, &QCheckBox::toggled, this, [this](bool) {
+        ++m_totalSettingChanges;
+    });
     connect(rippleCheck, &QCheckBox::toggled, m_bgWidget, &BackgroundWidget::setRippleEnabled);
 
     // ---- 分隔线 ----
@@ -131,6 +138,7 @@ void BackgroundSettingsPopup::onSelectBackground()
 
     // 设置背景图
     m_bgWidget->setBackgroundImage(filePath);
+    ++m_totalSettingChanges;
 
     // 保存用户选择的图片路径到设置，下次启动自动加载
     SettingsManager::instance().set("background/customImagePath", filePath);
@@ -159,4 +167,24 @@ void BackgroundSettingsPopup::hideEvent(QHideEvent* event)
 {
     emit hidden();
     QWidget::hideEvent(event);
+}
+
+/**
+ * @brief 显示事件处理
+ * 递增打开计数器
+ */
+void BackgroundSettingsPopup::showEvent(QShowEvent* event)
+{
+    QWidget::showEvent(event);
+    ++m_totalOpens;
+}
+
+// ============================================================================
+// 统计重置
+// ============================================================================
+
+void BackgroundSettingsPopup::resetPopupStatistics()
+{
+    m_totalOpens = 0;
+    m_totalSettingChanges = 0;
 }

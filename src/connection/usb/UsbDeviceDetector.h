@@ -42,6 +42,21 @@ public:
     /** @brief 停止监听 */
     void stopMonitoring();
 
+    /** @brief 获取累计检测周期次数 */
+    quint64 totalDetectionCycles() const;
+
+    /** @brief 获取累计检测到设备次数 */
+    quint64 totalDevicesDetected() const;
+
+    /** @brief 获取累计设备插入事件次数 */
+    quint64 totalAttachEvents() const;
+
+    /** @brief 获取累计设备拔出事件次数 */
+    quint64 totalDetachEvents() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 signals:
     /** @brief 检测到新设备插入 */
     void deviceInserted(const QVariantMap& deviceInfo);
@@ -59,6 +74,12 @@ private:
 
     QVariantList m_devices;       ///< 当前设备列表
     QTimer*      m_pollTimer;     ///< 轮询定时器
+
+    // ---- 统计计数器 ----
+    quint64 m_totalDetectionCycles = 0;        ///< 累计检测周期次数
+    quint64 m_totalDevicesDetected = 0;        ///< 累计检测到设备次数
+    quint64 m_totalAttachEvents = 0;           ///< 累计设备插入事件次数
+    quint64 m_totalDetachEvents = 0;           ///< 累计设备拔出事件次数
 };
 
 #endif // USB_DEVICE_DETECTOR_H

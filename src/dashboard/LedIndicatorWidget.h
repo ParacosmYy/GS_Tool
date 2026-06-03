@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QPaintEvent>
 #include <QColor>
+#include <QtGlobal>
 
 /**
  * @class LedIndicatorWidget
@@ -42,6 +43,15 @@ public:
     /// 获取通道名
     QString channelName() const { return m_channelName; }
 
+    /** @brief 获取状态切换总次数 */
+    quint64 totalStateChanges() const { return m_totalStateChanges; }
+
+    /** @brief 获取闪烁总次数 */
+    quint64 totalBlinks() const { return m_totalBlinks; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 protected:
     /// 绘制事件 —— 绘制圆形 LED
     void paintEvent(QPaintEvent *event) override;
@@ -53,6 +63,9 @@ private:
     bool    m_on    = false;        ///< 开关状态
     QColor  m_color;                ///< LED 颜色
     QString m_channelName;          ///< 绑定的数据通道名称
+
+    quint64 m_totalStateChanges = 0;       ///< 状态切换总次数
+    mutable quint64 m_totalBlinks = 0;     ///< 闪烁总次数(paintEvent中递增)
 };
 
 #endif // LED_INDICATOR_WIDGET_H

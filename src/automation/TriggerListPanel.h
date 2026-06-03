@@ -91,6 +91,16 @@ private:
     QPushButton* m_moveUpBtn;       ///< 上移规则按钮
     QPushButton* m_moveDownBtn;     ///< 下移规则按钮
     QLabel* m_countLabel;           ///< 规则计数标签
+
+    // ---- 统计计数器 ----
+    quint64 m_totalRuleEdits = 0;   ///< 累计规则编辑次数
+    quint64 m_totalRuleToggles = 0; ///< 累计规则启停切换次数
+    quint64 m_totalRuleReorders = 0;///< 累计规则重排次数
+public:
+    quint64 totalRuleEdits() const { return m_totalRuleEdits; }
+    quint64 totalRuleToggles() const { return m_totalRuleToggles; }
+    quint64 totalRuleReorders() const { return m_totalRuleReorders; }
+    void resetTriggerListStatistics() { m_totalRuleEdits = 0; m_totalRuleToggles = 0; m_totalRuleReorders = 0; }
 };
 
 #endif // TRIGGERLISTPANEL_H

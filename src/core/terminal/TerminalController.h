@@ -162,6 +162,18 @@ private:
 
     /** @brief 标记 statsTimer 的 timeout 信号是否已连接，防止重复 connect */
     bool m_statsSignalConnected = false;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalDisplayModeChanges = 0; ///< 累计显示模式切换次数
+    quint64 m_totalClears = 0;             ///< 累计清屏次数
+    quint64 m_totalSearches = 0;           ///< 累计搜索次数
+    quint64 m_totalExports = 0;            ///< 累计导出次数
+public:
+    quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; }
+    quint64 totalClears() const { return m_totalClears; }
+    quint64 totalSearches() const { return m_totalSearches; }
+    quint64 totalExports() const { return m_totalExports; }
+    void resetTerminalControllerStatistics() { m_totalDisplayModeChanges = 0; m_totalClears = 0; m_totalSearches = 0; m_totalExports = 0; }
 };
 
 #endif // TERMINALCONTROLLER_H

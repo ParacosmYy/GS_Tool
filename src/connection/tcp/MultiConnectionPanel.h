@@ -46,6 +46,15 @@ public:
      */
     void setManager(TcpMultiConnectionManager* manager);
 
+    /** @brief 获取累计连接次数 */
+    quint64 totalConnections() const;
+
+    /** @brief 获取累计断开次数 */
+    quint64 totalDisconnections() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 private slots:
     /** @brief 添加连接按钮点击 */
     void onAddClicked();
@@ -78,6 +87,10 @@ private:
     QLineEdit* m_broadcastEdit = nullptr;             ///< 广播消息输入框
     QPushButton* m_sendAllBtn = nullptr;              ///< 广播发送按钮
     QLabel* m_statusLabel = nullptr;                  ///< 状态信息标签
+
+    // ---- 统计计数器 ----
+    quint64 m_totalConnections = 0;                   ///< 累计连接次数
+    quint64 m_totalDisconnections = 0;                ///< 累计断开次数
 };
 
 #endif // MULTICONNECTIONPANEL_H

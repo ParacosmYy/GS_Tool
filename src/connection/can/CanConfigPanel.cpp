@@ -56,11 +56,20 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
     /* 按钮点击 → 根据当前状态发送不同信号 */
     connect(m_connectBtn, &QPushButton::clicked, this, [this]() {
         if (m_connected) {
+            ++m_totalBusResets;
             emit disconnectRequested();
         } else {
             emit connectRequested();
         }
     });
+
+    /* 配置变更计数: 适配器/波特率/_CAN-FD切换 */
+    connect(m_adapterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_bitrateCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_canFdCheck, &QCheckBox::stateChanged,
+            this, [this]() { ++m_totalConfigChanges; });
 }
 
 QVariantMap CanConfigPanel::config() const
@@ -113,4 +122,13 @@ void CanConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("can/bitrateIndex"), 2).toInt());
     m_canFdCheck->setChecked(
         settings.value(QStringLiteral("can/canFd"), false).toBool());
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void CanConfigPanel::resetStatistics()
+{
+    m_totalConfigChanges = 0;
+    m_totalBusResets = 0;
 }

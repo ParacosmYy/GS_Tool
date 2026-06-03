@@ -171,6 +171,18 @@ private:
 
     /** @brief 背景设置按钮 */
     QAction* m_bgAction;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalDisplayModeChanges = 0; ///< 累计显示模式切换次数
+    quint64 m_totalThemeChanges = 0;       ///< 累计主题切换次数
+    quint64 m_totalExports = 0;            ///< 累计导出按钮点击次数
+    quint64 m_totalClears = 0;             ///< 累计清屏次数
+public:
+    quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; }
+    quint64 totalThemeChanges() const { return m_totalThemeChanges; }
+    quint64 totalExports() const { return m_totalExports; }
+    quint64 totalClears() const { return m_totalClears; }
+    void resetToolbarStatistics() { m_totalDisplayModeChanges = 0; m_totalThemeChanges = 0; m_totalExports = 0; m_totalClears = 0; }
 };
 
 #endif // TOOLBARCONTROLLER_H

@@ -78,9 +78,28 @@ public:
         update();
     }
 
+    /** @brief 重写setValue，增加值更新统计计数 */
+    void setValue(int value) {
+        ++m_totalValueUpdates;
+        QProgressBar::setValue(value);
+    }
+
+    /** @brief 获取动画播放总次数 */
+    quint64 totalAnimations() const { return m_totalAnimations; }
+
+    /** @brief 获取值更新总次数 */
+    quint64 totalValueUpdates() const { return m_totalValueUpdates; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics() {
+        m_totalAnimations = 0;
+        m_totalValueUpdates = 0;
+    }
+
     /** @brief 启动shimmer流动动画(2000ms循环) — 安全停止旧动画后创建新动画 */
     void startShimmer() {
         stopShimmer();
+        ++m_totalAnimations;
         m_shimmerAnim = new QPropertyAnimation(this, "shimmerOffset");
         m_shimmerAnim->setStartValue(0.0);
         m_shimmerAnim->setEndValue(1.0);
@@ -173,6 +192,9 @@ private:
     QPropertyAnimation* m_shimmerAnim;  ///< shimmer动画实例
     QColor m_chunkColor;                ///< 自定义chunk颜色（传输完成变色动画）
     bool m_customChunkColor;            ///< 是否使用自定义chunk颜色（false时使用QSS默认色）
+
+    mutable quint64 m_totalAnimations = 0;  ///< 动画播放总次数
+    mutable quint64 m_totalValueUpdates = 0; ///< 值更新总次数
 };
 
 #endif // ANIMATEDPROGRESSBAR_H

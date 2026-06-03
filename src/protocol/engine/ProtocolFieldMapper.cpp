@@ -51,6 +51,7 @@ void ProtocolFieldMapper::addMapping(const QString &fieldName,
         return;
     }
     m_mappings[fieldName] = channelName;
+    ++m_totalMappingsAdded;
 }
 
 /**
@@ -63,6 +64,7 @@ void ProtocolFieldMapper::addMapping(const QString &fieldName,
 void ProtocolFieldMapper::removeMapping(const QString &fieldName)
 {
     m_mappings.remove(fieldName);
+    ++m_totalMappingsRemoved;
 }
 
 /**
@@ -124,6 +126,8 @@ void ProtocolFieldMapper::applyMappings(const QVariantMap &parsedFields,
     if (parsedFields.isEmpty()) {
         return;
     }
+
+    ++m_totalApplications;
 
     // 遍历所有映射规则：字段名 → 通道名
     for (auto it = m_mappings.constBegin(); it != m_mappings.constEnd(); ++it) {

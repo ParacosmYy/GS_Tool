@@ -61,9 +61,9 @@ QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
     m_toolbar->addSeparator();
     createConnectionGroup(m_toolbar);
 
-    // ---- 连接内部信号转发 ----
+    // ---- 连接内部信号转发（带统计计数） ----
     connect(m_displayModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &ToolbarController::displayModeChanged);
+            this, [this](int index) { ++m_totalDisplayModeChanges; emit displayModeChanged(index); });
     connect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &ToolbarController::terminalLayoutChanged);
     connect(m_timestampAction, &QAction::toggled,
@@ -71,13 +71,13 @@ QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
     connect(m_dirPrefixAction, &QAction::toggled,
             this, &ToolbarController::dirPrefixToggled);
     connect(m_clearAction, &QAction::triggered,
-            this, &ToolbarController::clearRequested);
+            this, [this]() { ++m_totalClears; emit clearRequested(); });
     connect(m_exportAction, &QAction::triggered,
-            this, &ToolbarController::exportRequested);
+            this, [this]() { ++m_totalExports; emit exportRequested(); });
     connect(m_bgAction, &QAction::triggered,
             this, &ToolbarController::bgSettingsRequested);
     connect(m_themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &ToolbarController::themeChanged);
+            this, [this](int index) { ++m_totalThemeChanges; emit themeChanged(index); });
     connect(m_langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &ToolbarController::languageChanged);
 

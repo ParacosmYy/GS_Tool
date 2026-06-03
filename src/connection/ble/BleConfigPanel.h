@@ -40,6 +40,15 @@ public:
      */
     QVariantMap config() const;
 
+    /** @brief 获取累计发起扫描次数 */
+    quint64 totalScansInitiated() const { return m_totalScansInitiated; }
+
+    /** @brief 获取累计设备选择次数 */
+    quint64 totalDeviceSelections() const { return m_totalDeviceSelections; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
     /**
      * @brief 设置扫描器实例
      * @param scanner BLE扫描器对象
@@ -96,6 +105,10 @@ private:
 
     /** @brief 扫描器实例 */
     BleScanner* m_scanner = nullptr;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalScansInitiated = 0;    ///< 累计发起扫描次数
+    quint64 m_totalDeviceSelections = 0;  ///< 累计设备选择次数
 };
 
 #endif // BLECONFIGPANEL_H

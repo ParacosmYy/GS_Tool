@@ -27,6 +27,8 @@ TerminalDualView::TerminalDualView(QWidget *parent)
     , m_textView(nullptr)
     , m_hexView(nullptr)
     , m_splitter(nullptr)
+    , m_totalViewSwitches(0)
+    , m_totalSyncs(0)
 {
     setObjectName(QStringLiteral("TerminalDualView"));
     setupUI();
@@ -77,4 +79,13 @@ void TerminalDualView::setupUI()
 
     mainLayout->addWidget(m_splitter);
     setLayout(mainLayout);
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void TerminalDualView::resetStatistics()
+{
+    m_totalViewSwitches = 0;
+    m_totalSyncs = 0;
 }

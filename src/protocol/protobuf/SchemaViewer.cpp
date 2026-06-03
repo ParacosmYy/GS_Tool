@@ -36,10 +36,13 @@ SchemaViewer::SchemaViewer(QWidget* parent)
     connect(m_schemaTree, &QTreeWidget::itemClicked,
             this, [this](QTreeWidgetItem* item) {
         m_detailView->setPlainText(item->data(0, Qt::UserRole).toString());
+        ++m_totalFieldExpansions;
     });
 }
 
 void SchemaViewer::loadSchema(const QString& filePath, const QString& type) {
+    ++m_totalSchemasLoaded;
+
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         m_detailView->setPlainText(
@@ -119,4 +122,23 @@ void SchemaViewer::parseFbsContent(const QString& content) {
             }
         }
     }
+}
+
+/** @brief 获取累计加载Schema次数 */
+quint64 SchemaViewer::totalSchemasLoaded() const
+{
+    return m_totalSchemasLoaded;
+}
+
+/** @brief 获取累计字段展开次数 */
+quint64 SchemaViewer::totalFieldExpansions() const
+{
+    return m_totalFieldExpansions;
+}
+
+/** @brief 重置所有统计计数器 */
+void SchemaViewer::resetStatistics()
+{
+    m_totalSchemasLoaded = 0;
+    m_totalFieldExpansions = 0;
 }

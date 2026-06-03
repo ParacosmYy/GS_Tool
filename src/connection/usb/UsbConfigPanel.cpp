@@ -65,6 +65,12 @@ UsbConfigPanel::UsbConfigPanel(QWidget* parent)
             this, &UsbConfigPanel::onDeviceChanged);
     connect(m_connectBtn, &QPushButton::clicked,
             this, &UsbConfigPanel::onConnectClicked);
+    connect(m_vidSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_pidSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_interfaceSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_totalConfigChanges; });
 }
 
 void UsbConfigPanel::setDetector(UsbDeviceDetector* detector) {
@@ -78,6 +84,7 @@ void UsbConfigPanel::setDetector(UsbDeviceDetector* detector) {
  * @brief 扫描USB设备并填充下拉框
  */
 void UsbConfigPanel::onScanClicked() {
+    ++m_totalDeviceRefreshes;
     m_deviceCombo->clear();
 
     QVariantList devices;
@@ -161,4 +168,13 @@ void UsbConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("usb/pid"), 0).toInt());
     m_interfaceSpin->setValue(
         settings.value(QStringLiteral("usb/interface"), 0).toInt());
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void UsbConfigPanel::resetStatistics()
+{
+    m_totalDeviceRefreshes = 0;
+    m_totalConfigChanges = 0;
 }

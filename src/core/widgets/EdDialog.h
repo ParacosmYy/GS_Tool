@@ -83,6 +83,15 @@ public:
     static void error(QWidget* parent, const QString& title,
                       const QString& description);
 
+    // ── 统计计数器 ──
+
+    /** @brief 获取对话框总打开次数 */
+    static quint64 totalDialogOpens() { return s_totalDialogOpens; }
+    /** @brief 获取对话框总关闭次数 */
+    static quint64 totalDialogCloses() { return s_totalDialogCloses; }
+    /** @brief 重置所有统计计数器 */
+    static void resetDialogStatistics() { s_totalDialogOpens = 0; s_totalDialogCloses = 0; }
+
 protected:
     /** @brief 自绘: 背景圆角 + 左侧强调色边框 + 图标 */
     void paintEvent(QPaintEvent* event) override;
@@ -116,6 +125,10 @@ private:
     static constexpr int kButtonSpacing = 8;  ///< 按钮间距
     static constexpr int kIconSize = 18;      ///< 图标字号
     static constexpr int kIconArea = 28;      ///< 图标区域宽度
+
+    // ── 统计计数器(static inline，因为静态工厂模式创建临时实例) ──
+    static inline quint64 s_totalDialogOpens = 0;   ///< 对话框总打开次数
+    static inline quint64 s_totalDialogCloses = 0;  ///< 对话框总关闭次数
 };
 
 #endif // EDDIALOG_H

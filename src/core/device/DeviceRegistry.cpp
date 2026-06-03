@@ -25,6 +25,7 @@ DeviceRegistry::DeviceRegistry(QObject *parent)
 void DeviceRegistry::addProfile(const DeviceProfile &profile)
 {
     m_profiles.append(profile);
+    ++m_totalAdds;
     emit profileAdded(profile.name);
     emit profilesChanged();
 }
@@ -37,6 +38,7 @@ void DeviceRegistry::removeProfile(const QString &name)
     for (int i = 0; i < m_profiles.size(); ++i) {
         if (m_profiles[i].name == name) {
             m_profiles.removeAt(i);
+            ++m_totalRemoves;
             emit profileRemoved(name);
             emit profilesChanged();
             return;
@@ -83,6 +85,7 @@ bool DeviceRegistry::saveToFile(const QString &filePath) const
     QJsonDocument doc(arr);
     file.write(doc.toJson(QJsonDocument::Indented));
     file.close();
+    ++m_totalSaves;
     return true;
 }
 
@@ -110,5 +113,6 @@ bool DeviceRegistry::loadFromFile(const QString &filePath)
     }
 
     emit profilesChanged();
+    ++m_totalLoads;
     return true;
 }

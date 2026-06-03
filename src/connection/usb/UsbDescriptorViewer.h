@@ -28,6 +28,15 @@ public:
      */
     void setDevice(quint16 vid, quint16 pid);
 
+    /** @brief 获取累计描述符刷新次数 */
+    quint64 totalDescriptorRefreshes() const;
+
+    /** @brief 获取累计查看设备次数 */
+    quint64 totalDevicesViewed() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 private:
     /**
      * @brief 加载设备描述符并填充树
@@ -46,6 +55,10 @@ private:
 
     QTreeWidget* m_descriptorTree = nullptr; ///< 描述符结构树
     QTextEdit*   m_rawView       = nullptr; ///< 原始数据视图
+
+    // ---- 统计计数器 ----
+    quint64 m_totalDescriptorRefreshes = 0;  ///< 累计描述符刷新次数
+    quint64 m_totalDevicesViewed = 0;        ///< 累计查看设备次数
 };
 
 #endif // USB_DESCRIPTOR_VIEWER_H

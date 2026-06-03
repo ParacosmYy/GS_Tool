@@ -77,9 +77,20 @@ MqttConfigPanel::MqttConfigPanel(QWidget* parent)
         if (m_connected) {
             emit disconnectRequested();
         } else {
+            ++m_totalConnectAttempts;
             emit connectRequested();
         }
     });
+
+    /* 配置变更计数: 主机/端口/KeepAlive/Clean Session切换 */
+    connect(m_hostEdit, &QLineEdit::editingFinished,
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_portSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_keepAliveSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_cleanSessionCheck, &QCheckBox::stateChanged,
+            this, [this]() { ++m_totalConfigChanges; });
 }
 
 QVariantMap MqttConfigPanel::config() const
@@ -146,4 +157,13 @@ void MqttConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("mqtt/keepAlive"), 60).toInt());
     m_cleanSessionCheck->setChecked(
         settings.value(QStringLiteral("mqtt/cleanSession"), true).toBool());
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void MqttConfigPanel::resetStatistics()
+{
+    m_totalConnectAttempts = 0;
+    m_totalConfigChanges = 0;
 }

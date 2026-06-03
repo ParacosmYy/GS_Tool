@@ -78,6 +78,14 @@ private:
     QPushButton *m_clearHistoryBtn; ///< 清除历史按钮
     QListWidget *m_historyList;     ///< 转换历史列表
     TimestampAnalyzer m_analyzer;   ///< 转换引擎
+
+    // ---- 统计计数器 ----
+    quint64 m_totalConversions = 0; ///< 累计转换次数
+    quint64 m_totalCopyActions = 0; ///< 累计复制操作次数
+public:
+    quint64 totalConversions() const { return m_totalConversions; }
+    quint64 totalCopyActions() const { return m_totalCopyActions; }
+    void resetTimestampPanelStatistics() { m_totalConversions = 0; m_totalCopyActions = 0; }
 };
 
 #endif // TIMESTAMPPANEL_H

@@ -62,6 +62,14 @@ private:
     QComboBox*   m_formatCombo;  ///< 导出格式选择下拉框
     QLineEdit*   m_pathEdit;     ///< 文件路径输入框
     QPushButton* m_exportBtn;    ///< 导出按钮
+
+    // ---- 统计计数器 ----
+    quint64 m_totalExports = 0;  ///< 累计导出确认次数
+    quint64 m_totalFormatChanges = 0; ///< 累计格式切换次数
+public:
+    quint64 totalExports() const { return m_totalExports; }
+    quint64 totalFormatChanges() const { return m_totalFormatChanges; }
+    void resetExportDialogStatistics() { m_totalExports = 0; m_totalFormatChanges = 0; }
 };
 
 #endif // EXPORT_DIALOG_H

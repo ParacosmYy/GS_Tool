@@ -72,6 +72,16 @@ private:
     QTextEdit* m_detailDescEdit;        ///< 详情-描述信息
     QLabel* m_detailStatusLabel;        ///< 详情-加载状态
     PluginManager* m_manager = nullptr; ///< 插件管理器（不拥有）
+
+    // ---- 统计计数器 ----
+    quint64 m_totalPluginLoads = 0;    ///< 累计加载按钮点击次数
+    quint64 m_totalPluginUnloads = 0;  ///< 累计卸载按钮点击次数
+    quint64 m_totalScans = 0;          ///< 累计扫描次数
+public:
+    quint64 totalPluginLoads() const { return m_totalPluginLoads; }
+    quint64 totalPluginUnloads() const { return m_totalPluginUnloads; }
+    quint64 totalScans() const { return m_totalScans; }
+    void resetPluginPanelStatistics() { m_totalPluginLoads = 0; m_totalPluginUnloads = 0; m_totalScans = 0; }
 };
 
 #endif // PLUGINCONFIGPANEL_H

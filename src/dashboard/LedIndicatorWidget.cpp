@@ -30,6 +30,7 @@ LedIndicatorWidget::LedIndicatorWidget(QWidget *parent)
 void LedIndicatorWidget::setOn(bool on)
 {
     m_on = on;
+    ++m_totalStateChanges;
     update();
 }
 
@@ -98,6 +99,7 @@ void LedIndicatorWidget::paintEvent(QPaintEvent *event)
 
     if (m_on) {
         /* 亮状态：使用径向渐变模拟发光 */
+        ++m_totalBlinks;
         QRadialGradient gradient(center, radius);
         gradient.setColorAt(0.0, m_color.lighter(150));
         gradient.setColorAt(0.7, m_color);
@@ -124,4 +126,13 @@ void LedIndicatorWidget::paintEvent(QPaintEvent *event)
     }
 
     painter.end();
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void LedIndicatorWidget::resetStatistics()
+{
+    m_totalStateChanges = 0;
+    m_totalBlinks = 0;
 }

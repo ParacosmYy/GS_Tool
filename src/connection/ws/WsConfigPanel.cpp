@@ -46,9 +46,11 @@ void WsConfigPanel::onConnectClicked()
             m_statusLabel->setText(tr("请输入服务器地址"));
             return;
         }
+        ++m_totalConnectAttempts;
         m_statusLabel->setText(tr("正在连接..."));
         emit connectRequested(config());
     } else {
+        ++m_totalDisconnections;
         m_connected = false;
         m_statusLabel->setText(tr("已断开"));
         m_connectBtn->setText(tr("连接"));
@@ -145,4 +147,13 @@ void WsConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("ws/url")).toString());
     m_protocolEdit->setText(
         settings.value(QStringLiteral("ws/protocol")).toString());
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void WsConfigPanel::resetStatistics()
+{
+    m_totalConnectAttempts = 0;
+    m_totalDisconnections = 0;
 }

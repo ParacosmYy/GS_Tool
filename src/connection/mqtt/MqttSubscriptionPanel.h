@@ -46,6 +46,15 @@ public:
      */
     QVariantList subscriptions() const;
 
+    /** @brief 获取累计订阅操作次数 */
+    quint64 totalSubscriptions() const { return m_totalSubscriptions; }
+
+    /** @brief 获取累计取消订阅操作次数 */
+    quint64 totalUnsubscriptions() const { return m_totalUnsubscriptions; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 signals:
     /** @brief 用户请求订阅主题 */
     void subscribeRequested(const QString& topic, int qos);
@@ -84,6 +93,10 @@ private:
 
     /** @brief 取消订阅动作 */
     QAction* m_unsubAction;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSubscriptions = 0;     ///< 累计订阅操作次数
+    quint64 m_totalUnsubscriptions = 0;   ///< 累计取消订阅操作次数
 };
 
 #endif // MQTTSUBSCRIPTIONPANEL_H

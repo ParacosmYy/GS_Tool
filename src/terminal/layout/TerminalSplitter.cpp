@@ -23,6 +23,8 @@ TerminalSplitter::TerminalSplitter(QWidget *parent)
     : QWidget(parent)
     , m_splitter(nullptr)
     , m_sectionCount(0)
+    , m_totalSplits(0)
+    , m_totalMerges(0)
 {
     setObjectName(QStringLiteral("TerminalSplitter"));
     setupUI();
@@ -89,6 +91,7 @@ int TerminalSplitter::addSection()
     m_splitter->addWidget(placeholder);
     const int index = m_sectionCount;
     ++m_sectionCount;
+    ++m_totalSplits;
 
     emit sectionAdded(index);
     return index;
@@ -117,6 +120,7 @@ void TerminalSplitter::removeSection(int index)
     delete widget;
 
     --m_sectionCount;
+    ++m_totalMerges;
     emit sectionRemoved(index);
 }
 
@@ -127,4 +131,13 @@ void TerminalSplitter::removeSection(int index)
 int TerminalSplitter::sectionCount() const
 {
     return m_sectionCount;
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void TerminalSplitter::resetStatistics()
+{
+    m_totalSplits = 0;
+    m_totalMerges = 0;
 }

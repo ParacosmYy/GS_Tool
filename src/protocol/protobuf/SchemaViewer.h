@@ -28,6 +28,15 @@ public:
      */
     void loadSchema(const QString& filePath, const QString& type);
 
+    /** @brief 获取累计加载Schema次数 */
+    quint64 totalSchemasLoaded() const;
+
+    /** @brief 获取累计字段展开次数 */
+    quint64 totalFieldExpansions() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 private:
     /**
      * @brief 解析.proto文件内容并填充树
@@ -43,6 +52,10 @@ private:
 
     QTreeWidget* m_schemaTree  = nullptr; ///< 模式结构树
     QTextEdit*   m_detailView  = nullptr; ///< 详细内容视图
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSchemasLoaded = 0;      ///< 累计加载Schema次数
+    quint64 m_totalFieldExpansions = 0;    ///< 累计字段展开次数
 };
 
 #endif // SCHEMA_VIEWER_H

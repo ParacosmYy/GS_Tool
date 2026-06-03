@@ -40,6 +40,18 @@ public:
      */
     void setConnection(BleConnection* connection);
 
+    /** @brief 获取累计服务发现次数 */
+    quint64 totalServiceDiscoveries() const;
+
+    /** @brief 获取累计特征读取次数 */
+    quint64 totalCharacteristicReads() const;
+
+    /** @brief 获取累计特征写入次数 */
+    quint64 totalCharacteristicWrites() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 private slots:
     /** @brief 树控件选中项变化处理 */
     void onTreeItemChanged();
@@ -90,6 +102,11 @@ private:
 
     /** @brief 当前选中特征UUID */
     QString m_selectedUuid;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalServiceDiscoveries = 0;      ///< 累计服务发现次数
+    quint64 m_totalCharacteristicReads = 0;     ///< 累计特征读取次数
+    quint64 m_totalCharacteristicWrites = 0;    ///< 累计特征写入次数
 };
 
 #endif // BLEGATTBROWSER_H

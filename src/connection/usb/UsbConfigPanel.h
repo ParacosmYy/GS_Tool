@@ -33,6 +33,15 @@ public:
      */
     void setDetector(UsbDeviceDetector* detector);
 
+    /** @brief 获取累计设备刷新次数 */
+    quint64 totalDeviceRefreshes() const { return m_totalDeviceRefreshes; }
+
+    /** @brief 获取累计配置变更次数 */
+    quint64 totalConfigChanges() const { return m_totalConfigChanges; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
     /**
      * @brief 设置连接状态(更新按钮文本和状态标签)
      * @param connected true=已连接
@@ -78,6 +87,10 @@ private:
     QLabel*     m_statusLabel    = nullptr; ///< 状态标签
     UsbDeviceDetector* m_detector = nullptr; ///< 设备检测器
     bool m_connected = false;                ///< 当前连接状态
+
+    // ---- 统计计数器 ----
+    quint64 m_totalDeviceRefreshes = 0;  ///< 累计设备刷新次数
+    quint64 m_totalConfigChanges = 0;    ///< 累计配置变更次数
 };
 
 #endif // USB_CONFIG_PANEL_H

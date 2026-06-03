@@ -8,6 +8,7 @@
 #ifndef TERMINAL_TAB_MANAGER_H
 #define TERMINAL_TAB_MANAGER_H
 
+#include <QtGlobal>
 #include <QWidget>
 
 class QTabWidget;
@@ -55,6 +56,18 @@ public:
      */
     int currentTabIndex() const;
 
+    /** @brief 获取标签页添加总次数 */
+    quint64 totalTabAdds() const { return m_totalTabAdds; }
+
+    /** @brief 获取标签页移除总次数 */
+    quint64 totalTabRemoves() const { return m_totalTabRemoves; }
+
+    /** @brief 获取标签页切换总次数 */
+    quint64 totalTabSwitches() const { return m_totalTabSwitches; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 signals:
     /**
      * @brief 标签页被添加信号
@@ -79,6 +92,10 @@ private:
     void setupUI();
 
     QTabWidget *m_tabWidget; ///< 内部标签页控件
+
+    quint64 m_totalTabAdds = 0;     ///< 标签页添加总次数
+    quint64 m_totalTabRemoves = 0;  ///< 标签页移除总次数
+    quint64 m_totalTabSwitches = 0; ///< 标签页切换总次数
 };
 
 #endif // TERMINAL_TAB_MANAGER_H

@@ -9,6 +9,7 @@
 #ifndef TERMINAL_DUAL_VIEW_H
 #define TERMINAL_DUAL_VIEW_H
 
+#include <QtGlobal>
 #include <QWidget>
 
 class QSplitter;
@@ -33,6 +34,15 @@ public:
     /** @brief 析构函数 */
     ~TerminalDualView() override;
 
+    /** @brief 获取视图切换总次数 */
+    quint64 totalViewSwitches() const { return m_totalViewSwitches; }
+
+    /** @brief 获取同步滚动总次数 */
+    quint64 totalSyncs() const { return m_totalSyncs; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 private:
     /** @brief 初始化界面布局 */
     void setupUI();
@@ -40,6 +50,9 @@ private:
     QTextEdit *m_textView; ///< 文本视图占位控件
     QTextEdit *m_hexView;  ///< 十六进制视图占位控件
     QSplitter *m_splitter; ///< 水平分割条
+
+    quint64 m_totalViewSwitches = 0; ///< 视图切换总次数(HEX/ASCII)
+    quint64 m_totalSyncs = 0;        ///< 同步滚动总次数
 };
 
 #endif // TERMINAL_DUAL_VIEW_H

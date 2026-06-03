@@ -50,6 +50,15 @@ public:
      */
     QVariantMap config() const;
 
+    /** @brief 获取累计传输操作次数 */
+    quint64 totalTransfers() const { return m_totalTransfers; }
+
+    /** @brief 获取累计配置变更次数 */
+    quint64 totalConfigChanges() const { return m_totalConfigChanges; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
     /**
      * @brief 设置当前模式(SPI或I2C)
      * @param mode "spi" 或 "i2c"
@@ -117,6 +126,10 @@ private:
     // ---- 状态 ----
     QString m_currentMode = "spi";                   ///< 当前模式("spi"/"i2c")
     bool m_connected = false;                        ///< 当前连接状态
+
+    // ---- 统计计数器 ----
+    quint64 m_totalTransfers = 0;       ///< 累计传输操作次数
+    quint64 m_totalConfigChanges = 0;   ///< 累计配置变更次数
 };
 
 #endif // SPII2CCONFIGPANEL_H

@@ -108,6 +108,16 @@ private:
     QString     m_filePath;  ///< 当前关联的文件路径
     QByteArray  m_rawData;   ///< 原始录制数据 (EDL记录格式)
     QString     m_lastError; ///< 最近一次操作的错误描述
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSaves = 0;       ///< 累计保存次数
+    quint64 m_totalLoads = 0;       ///< 累计加载次数
+    quint64 m_totalErrors = 0;      ///< 累计错误次数
+public:
+    quint64 totalSaves() const { return m_totalSaves; }
+    quint64 totalLoads() const { return m_totalLoads; }
+    quint64 totalErrors() const { return m_totalErrors; }
+    void resetFileFormatStatistics() { m_totalSaves = 0; m_totalLoads = 0; m_totalErrors = 0; }
 };
 
 #endif // RECORDING_FILE_FORMAT_H

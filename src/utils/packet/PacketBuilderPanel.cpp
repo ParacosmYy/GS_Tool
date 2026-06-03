@@ -132,6 +132,7 @@ void PacketBuilderPanel::onBuild()
 {
     if (!m_builder) { return; }
 
+    ++m_totalPacketsBuilt;
     QByteArray packet = m_builder->buildPacket();
     m_hexPreview->setPlainText(formatHexDump(packet));
 }
@@ -277,4 +278,13 @@ void PacketBuilderPanel::onMoveDown()
 
     refreshTable();
     m_fieldTable->selectRow(row + 1);
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void PacketBuilderPanel::resetStatistics()
+{
+    m_totalPacketsBuilt = 0;
+    m_totalSends = 0;
 }

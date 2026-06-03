@@ -73,6 +73,16 @@ private:
     void initBuiltinTemplates();
 
     QMap<QString, ProtocolSchema *> m_templates; ///< 模板名称 → 协议定义映射
+
+    // ---- 统计计数器 ----
+    quint64 m_totalLoads = 0;       ///< 累计模板加载次数
+    quint64 m_totalImports = 0;     ///< 累计模板导入次数
+    quint64 m_totalExports = 0;     ///< 累计模板导出次数
+public:
+    quint64 totalLoads() const { return m_totalLoads; }
+    quint64 totalImports() const { return m_totalImports; }
+    quint64 totalExports() const { return m_totalExports; }
+    void resetTemplateLibraryStatistics() { m_totalLoads = 0; m_totalImports = 0; m_totalExports = 0; }
 };
 
 #endif // PROTOCOL_TEMPLATE_LIBRARY_H

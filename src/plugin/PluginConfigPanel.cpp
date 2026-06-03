@@ -160,6 +160,7 @@ void PluginConfigPanel::setupUI()
         const QString path = QFileDialog::getOpenFileName(
             this, tr("Select Plugin"), QString(), filter);
         if (!path.isEmpty()) {
+            ++m_totalPluginLoads;
             emit loadPluginRequested(path);
         }
     });
@@ -171,6 +172,7 @@ void PluginConfigPanel::setupUI()
             return;
         }
         const QString name = item->text();
+        ++m_totalPluginUnloads;
         emit unloadPluginRequested(name);
     });
 
@@ -179,6 +181,7 @@ void PluginConfigPanel::setupUI()
         if (!m_manager) {
             return;
         }
+        ++m_totalScans;
 #ifdef Q_OS_WIN
         const QString defaultDir = QApplication::applicationDirPath()
                                    + QStringLiteral("/plugins");

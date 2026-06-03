@@ -10,6 +10,7 @@
 
 #include <QWidget>
 #include <QPaintEvent>
+#include <QtGlobal>
 
 /**
  * @class NumericDisplayWidget
@@ -47,6 +48,15 @@ public:
     /// 获取通道名
     QString channelName() const { return m_channelName; }
 
+    /** @brief 获取值更新总次数 */
+    quint64 totalValueUpdates() const { return m_totalValueUpdates; }
+
+    /** @brief 获取格式变更总次数 */
+    quint64 totalFormatChanges() const { return m_totalFormatChanges; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 protected:
     /// 绘制事件 —— 绘制大号数值、单位与标签
     void paintEvent(QPaintEvent *event) override;
@@ -59,6 +69,9 @@ private:
     QString m_unit;             ///< 显示单位
     int     m_precision = 2;    ///< 小数位数
     QString m_channelName;      ///< 绑定的数据通道名称
+
+    quint64 m_totalValueUpdates = 0;  ///< 值更新总次数
+    quint64 m_totalFormatChanges = 0; ///< 格式变更总次数
 };
 
 #endif // NUMERIC_DISPLAY_WIDGET_H

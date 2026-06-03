@@ -10,6 +10,7 @@
 
 #include <QWidget>
 #include <QPaintEvent>
+#include <QtGlobal>
 
 /**
  * @class ProgressBarWidget
@@ -44,6 +45,15 @@ public:
     /// 获取通道名
     QString channelName() const { return m_channelName; }
 
+    /** @brief 获取值更新总次数 */
+    quint64 totalValueUpdates() const { return m_totalValueUpdates; }
+
+    /** @brief 获取范围变更总次数 */
+    quint64 totalRangeChanges() const { return m_totalRangeChanges; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 protected:
     /// 绘制事件 —— 绘制圆角进度条与数值文本
     void paintEvent(QPaintEvent *event) override;
@@ -57,6 +67,9 @@ private:
     double  m_max   = 100.0;  ///< 最大值
     QString m_label;          ///< 标签文本
     QString m_channelName;    ///< 绑定的数据通道名称
+
+    quint64 m_totalValueUpdates = 0; ///< 值更新总次数
+    quint64 m_totalRangeChanges = 0; ///< 范围变更总次数
 };
 
 #endif // PROGRESS_BAR_WIDGET_H

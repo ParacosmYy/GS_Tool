@@ -91,6 +91,16 @@ signals:
 
 private:
     QMap<QString, QString> m_mappings; ///< 字段名 → 图表通道名映射表
+
+    // ---- 统计计数器 ----
+    quint64 m_totalMappingsAdded = 0;  ///< 累计映射添加次数
+    quint64 m_totalMappingsRemoved = 0;///< 累计映射移除次数
+    quint64 m_totalApplications = 0;   ///< 累计映射应用次数
+public:
+    quint64 totalMappingsAdded() const { return m_totalMappingsAdded; }
+    quint64 totalMappingsRemoved() const { return m_totalMappingsRemoved; }
+    quint64 totalApplications() const { return m_totalApplications; }
+    void resetMapperStatistics() { m_totalMappingsAdded = 0; m_totalMappingsRemoved = 0; m_totalApplications = 0; }
 };
 
 #endif // PROTOCOL_FIELD_MAPPER_H

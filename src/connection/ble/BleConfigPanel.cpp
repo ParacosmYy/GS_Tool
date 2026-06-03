@@ -60,8 +60,10 @@ BleConfigPanel::BleConfigPanel(QWidget* parent)
     form->addRow(tr("状态:"), m_statusLabel);
 
     // 信号连接
-    connect(m_scanBtn, &QPushButton::clicked,
-            this, &BleConfigPanel::scanRequested);
+    connect(m_scanBtn, &QPushButton::clicked, this, [this]() {
+        ++m_totalScansInitiated;
+        emit scanRequested();
+    });
     connect(m_connectBtn, &QPushButton::clicked,
             this, &BleConfigPanel::connectRequested);
     connect(m_deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -137,6 +139,7 @@ void BleConfigPanel::onScanFinished()
 void BleConfigPanel::onDeviceSelected(int index)
 {
     if (index >= 0 && index < m_deviceList.size()) {
+        ++m_totalDeviceSelections;
         const QVariantMap dev = m_deviceList.at(index).toMap();
         m_addressEdit->setText(dev.value("address").toString());
     }
@@ -163,4 +166,13 @@ void BleConfigPanel::loadSettings(QSettings& settings)
     if (!addr.isEmpty()) {
         m_addressEdit->setText(addr);
     }
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void BleConfigPanel::resetStatistics()
+{
+    m_totalScansInitiated = 0;
+    m_totalDeviceSelections = 0;
 }

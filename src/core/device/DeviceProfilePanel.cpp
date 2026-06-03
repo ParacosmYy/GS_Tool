@@ -105,6 +105,7 @@ void DeviceProfilePanel::onSelectionChanged()
     m_deleteBtn->setEnabled(hasSelection);
 
     if (hasSelection) {
+        ++m_totalSelections;
         emit profileSelected(selectedProfile());
     }
 }
@@ -153,6 +154,7 @@ void DeviceProfilePanel::onEditProfile()
     m_registry->removeProfile(oldName);
     profile.name = newName;
     m_registry->addProfile(profile);
+    ++m_totalProfileEdits;
 }
 
 /**
@@ -181,6 +183,7 @@ void DeviceProfilePanel::onImportProfiles()
     if (path.isEmpty()) { return; }
 
     m_registry->loadFromFile(path);
+    ++m_totalImports;
 }
 
 /**
@@ -196,6 +199,7 @@ void DeviceProfilePanel::onExportProfiles()
     if (path.isEmpty()) { return; }
 
     m_registry->saveToFile(path);
+    ++m_totalExports;
 }
 
 /**

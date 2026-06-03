@@ -35,6 +35,14 @@ ModbusConfigPanel::ModbusConfigPanel(QWidget* parent)
     m_timeoutSpin->setValue(1000);
     m_timeoutSpin->setSuffix(tr(" ms"));
     layout->addRow(tr("响应超时:"), m_timeoutSpin);
+
+    // 配置变更统计: 模式/从站地址/超时时间变化时计数
+    connect(m_modeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalConfigChanges; ++m_totalScanRequests; });
+    connect(m_slaveSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_totalConfigChanges; });
+    connect(m_timeoutSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_totalConfigChanges; });
 }
 
 QVariantMap ModbusConfigPanel::config() const {
@@ -71,4 +79,13 @@ void ModbusConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("modbus/slaveAddress"), 1).toInt());
     m_timeoutSpin->setValue(
         settings.value(QStringLiteral("modbus/timeout"), 1000).toInt());
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void ModbusConfigPanel::resetStatistics()
+{
+    m_totalConfigChanges = 0;
+    m_totalScanRequests = 0;
 }

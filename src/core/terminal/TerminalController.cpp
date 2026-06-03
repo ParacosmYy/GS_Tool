@@ -93,6 +93,7 @@ void TerminalController::stopStatsTimer()
  */
 void TerminalController::onDisplayModeChanged(int index)
 {
+    ++m_totalDisplayModeChanges;
     if (!m_layoutManager) return;
     if (index < 0 || index > 3) return;  // 防御: ComboBox index 越界保护
 
@@ -134,6 +135,7 @@ void TerminalController::onDirPrefixToggled(bool checked)
 /** @brief 清空终端内容、重置数据统计面板、刷新状态栏字节数显示 */
 void TerminalController::onClearTerminal()
 {
+    ++m_totalClears;
     m_terminalModel->clear();
     if (m_dataStats) m_dataStats->reset();
     updateStatusBar();
@@ -147,6 +149,7 @@ void TerminalController::onClearTerminal()
  */
 void TerminalController::onSearchRequested(const QString& pattern, bool regex, bool hex)
 {
+    ++m_totalSearches;
     if (!m_mainTerminal) return;
     // 搜索只作用于主终端（混合模式终端或分栏模式的RX终端）
     auto* terminal = qobject_cast<TerminalWidget*>(m_mainTerminal);
@@ -201,6 +204,7 @@ void TerminalController::updateStatusBar()
  */
 void TerminalController::onExportData(QWidget* parent)
 {
+    ++m_totalExports;
     if (m_terminalModel->lineCount() == 0) {
         EdDialog::error(parent, tr("导出"), tr("没有数据可导出"));
         return;

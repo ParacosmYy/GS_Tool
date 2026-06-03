@@ -104,6 +104,18 @@ private:
     QPushButton *m_importBtn;           ///< 导入按钮
     QPushButton *m_exportBtn;           ///< 导出按钮
     DeviceRegistry *m_registry = nullptr; ///< 关联的注册表
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSelections = 0;       ///< 累计设备选择次数
+    quint64 m_totalProfileEdits = 0;     ///< 累计配置编辑次数
+    quint64 m_totalImports = 0;          ///< 累计导入次数
+    quint64 m_totalExports = 0;          ///< 累计导出次数
+public:
+    quint64 totalSelections() const { return m_totalSelections; }
+    quint64 totalProfileEdits() const { return m_totalProfileEdits; }
+    quint64 totalImports() const { return m_totalImports; }
+    quint64 totalExports() const { return m_totalExports; }
+    void resetProfilePanelStatistics() { m_totalSelections = 0; m_totalProfileEdits = 0; m_totalImports = 0; m_totalExports = 0; }
 };
 
 #endif // DEVICEPROFILEPANEL_H

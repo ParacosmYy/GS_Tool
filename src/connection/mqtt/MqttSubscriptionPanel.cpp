@@ -63,6 +63,7 @@ MqttSubscriptionPanel::MqttSubscriptionPanel(QWidget* parent)
     connect(m_unsubAction, &QAction::triggered, this, [this]() {
         auto selected = m_subTree->selectedItems();
         for (auto* item : selected) {
+            ++m_totalUnsubscriptions;
             const QString topic = item->text(0);
             emit unsubscribeRequested(topic);
             delete item;
@@ -105,6 +106,7 @@ void MqttSubscriptionPanel::onSubscribeClicked()
     const QString topic = m_topicEdit->text().trimmed();
     if (topic.isEmpty()) return;
     const int qos = m_qosCombo->currentData().toInt();
+    ++m_totalSubscriptions;
     addSubscription(topic, qos);
     emit subscribeRequested(topic, qos);
     m_topicEdit->clear();
@@ -114,6 +116,7 @@ void MqttSubscriptionPanel::onUnsubscribeClicked()
 {
     auto selected = m_subTree->selectedItems();
     for (auto* item : selected) {
+        ++m_totalUnsubscriptions;
         const QString topic = item->text(0);
         emit unsubscribeRequested(topic);
         delete item;
@@ -127,4 +130,13 @@ void MqttSubscriptionPanel::onCustomContextMenu(const QPoint& pos)
 
     m_subTree->setCurrentItem(item);
     m_contextMenu->exec(m_subTree->viewport()->mapToGlobal(pos));
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void MqttSubscriptionPanel::resetStatistics()
+{
+    m_totalSubscriptions = 0;
+    m_totalUnsubscriptions = 0;
 }

@@ -76,6 +76,15 @@ public:
     void resetToDefault();                          ///< 恢复默认背景图
     QString currentImagePath() const;               ///< 当前背景图路径
 
+    // ── 统计计数器 ──
+
+    /** @brief 获取图片加载总次数 */
+    quint64 totalImageLoads() const { return m_totalImageLoads; }
+    /** @brief 获取效果变更总次数(模糊/透明度/涟漪等) */
+    quint64 totalEffectChanges() const { return m_totalEffectChanges; }
+    /** @brief 重置所有统计计数器 */
+    void resetBackgroundStatistics();
+
 signals:
     void blurChanged(qreal radius);                 ///< 模糊半径变化
     void opacityChanged(qreal opacity);             ///< 透明度变化
@@ -117,6 +126,10 @@ private:
 
     QVector<Ripple> m_ripples;          ///< 活跃涟漪列表
     QTimer* m_rippleTimer;              ///< 涟漪动画定时器（~60fps）
+
+    // ── 统计计数器 ──
+    quint64 m_totalImageLoads = 0;      ///< 图片加载次数
+    quint64 m_totalEffectChanges = 0;   ///< 效果变更次数(模糊/透明度/涟漪等)
 };
 
 #endif // BACKGROUNDWIDGET_H

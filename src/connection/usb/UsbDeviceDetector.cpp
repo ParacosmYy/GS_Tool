@@ -107,6 +107,7 @@ QVariantList UsbDeviceDetector::scanDevices() {
     }
 
     m_devices = devices;
+    m_totalDevicesDetected += static_cast<quint64>(devices.size());
     return devices;
 }
 
@@ -134,6 +135,7 @@ void UsbDeviceDetector::stopMonitoring() {
 }
 
 void UsbDeviceDetector::onPollTimeout() {
+    ++m_totalDetectionCycles;
     QVariantList newDevices = scanDevices();
     detectChanges(newDevices);
 }
@@ -151,6 +153,7 @@ void UsbDeviceDetector::detectChanges(const QVariantList& newList) {
             }
         }
         if (!found) {
+            ++m_totalAttachEvents;
             emit deviceInserted(dev);
         }
     }
@@ -167,9 +170,43 @@ void UsbDeviceDetector::detectChanges(const QVariantList& newList) {
             }
         }
         if (!found) {
+            ++m_totalDetachEvents;
             emit deviceRemoved(dev);
         }
     }
 
     m_devices = newList;
+}
+
+/** @brief 获取累计检测周期次数 */
+quint64 UsbDeviceDetector::totalDetectionCycles() const
+{
+    return m_totalDetectionCycles;
+}
+
+/** @brief 获取累计检测到设备次数 */
+quint64 UsbDeviceDetector::totalDevicesDetected() const
+{
+    return m_totalDevicesDetected;
+}
+
+/** @brief 获取累计设备插入事件次数 */
+quint64 UsbDeviceDetector::totalAttachEvents() const
+{
+    return m_totalAttachEvents;
+}
+
+/** @brief 获取累计设备拔出事件次数 */
+quint64 UsbDeviceDetector::totalDetachEvents() const
+{
+    return m_totalDetachEvents;
+}
+
+/** @brief 重置所有统计计数器 */
+void UsbDeviceDetector::resetStatistics()
+{
+    m_totalDetectionCycles = 0;
+    m_totalDevicesDetected = 0;
+    m_totalAttachEvents = 0;
+    m_totalDetachEvents = 0;
 }

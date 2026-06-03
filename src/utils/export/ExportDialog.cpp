@@ -173,6 +173,7 @@ void ExportDialog::setupUI()
 
     // 导出按钮：关闭对话框并发出 exportRequested 信号
     connect(m_exportBtn, &QPushButton::clicked, this, [this]() {
+        ++m_totalExports;
         emit exportRequested(m_pathEdit->text(), m_formatCombo->currentIndex());
         accept();
     });
@@ -183,6 +184,7 @@ void ExportDialog::setupUI()
     // 格式切换：更新路径中的文件扩展名
     connect(m_formatCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int index) {
+        ++m_totalFormatChanges;
         QString path = m_pathEdit->text();
         if (path.isEmpty()) {
             return;

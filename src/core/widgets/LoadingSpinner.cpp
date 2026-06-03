@@ -35,6 +35,7 @@ LoadingSpinner::LoadingSpinner(int size, QWidget* parent)
         update();
     });
     m_timer->start(100);
+    ++m_totalStarts;
 }
 
 // ============================================================================
@@ -50,6 +51,41 @@ void LoadingSpinner::setLineWidth(int width)
 {
     m_lineWidth = qMax(1, width);
     update();
+}
+
+// ============================================================================
+// 动画控制
+// ============================================================================
+
+void LoadingSpinner::start()
+{
+    if (!m_timer->isActive()) {
+        m_timer->start(100);
+        ++m_totalStarts;
+    }
+}
+
+void LoadingSpinner::stop()
+{
+    if (m_timer->isActive()) {
+        m_timer->stop();
+        ++m_totalStops;
+    }
+}
+
+bool LoadingSpinner::isSpinning() const
+{
+    return m_timer && m_timer->isActive();
+}
+
+// ============================================================================
+// 统计重置
+// ============================================================================
+
+void LoadingSpinner::resetSpinnerStatistics()
+{
+    m_totalStarts = 0;
+    m_totalStops = 0;
 }
 
 // ============================================================================

@@ -45,6 +45,7 @@ set(SOURCES
     src/core/send/SendHistoryManager.cpp
     src/core/event/EventBus.cpp
     src/core/widgets/AppDialog.cpp
+    src/core/widgets/DragDropHelper.cpp
     src/core/settings/SettingsController.cpp
     src/core/toolbar/ToolbarController.cpp
     src/core/terminal/TerminalController.cpp
@@ -315,6 +316,7 @@ set(HEADERS
     src/core/widgets/SmartAutoComplete.h
     src/core/widgets/ToastWidget.h
     src/core/widgets/AppDialog.h
+    src/core/widgets/DragDropHelper.h
     src/core/widgets/CommandPalette.h
     src/core/widgets/ScriptRecorder.h
     src/core/widgets/DataDiffWidget.h

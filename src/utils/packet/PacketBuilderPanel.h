@@ -39,6 +39,15 @@ public:
      */
     void setBuilder(PacketBuilder *builder);
 
+    /** @brief 获取累计构建数据包次数 */
+    quint64 totalPacketsBuilt() const { return m_totalPacketsBuilt; }
+
+    /** @brief 获取累计发送数据包次数 */
+    quint64 totalSends() const { return m_totalSends; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 private slots:
     /**
      * @brief 添加新字段
@@ -104,6 +113,10 @@ private:
     QPushButton *m_moveDownBtn;         ///< 下移字段按钮
     QTextEdit *m_hexPreview;            ///< 十六进制预览区
     PacketBuilder *m_builder = nullptr; ///< 关联的构建器
+
+    // ---- 统计计数器 ----
+    quint64 m_totalPacketsBuilt = 0;   ///< 累计构建数据包次数
+    quint64 m_totalSends = 0;          ///< 累计发送数据包次数
 };
 
 #endif // PACKETBUILDERPANEL_H

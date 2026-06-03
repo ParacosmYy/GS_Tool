@@ -44,6 +44,15 @@ public:
      */
     QList<int> foundSlaves() const;
 
+    /** @brief 获取累计发起扫描次数 */
+    quint64 totalScansInitiated() const;
+
+    /** @brief 获取累计读取寄存器次数 */
+    quint64 totalRegistersRead() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStatistics();
+
 signals:
     /** @brief 发现新的从站设备 */
     void slaveFound(int address, QString description);
@@ -79,6 +88,10 @@ private:
     int  m_scanTo       = 247;  ///< 扫描结束地址
     int  m_currentAddr  = 1;    ///< 当前扫描地址
     bool m_scanning     = false; ///< 是否正在扫描
+
+    // ---- 统计计数器 ----
+    quint64 m_totalScansInitiated = 0;          ///< 累计发起扫描次数
+    quint64 m_totalRegistersRead = 0;           ///< 累计读取寄存器次数
 };
 
 #endif // MODBUS_SCAN_WIDGET_H
