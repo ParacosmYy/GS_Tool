@@ -29,10 +29,7 @@ class AnimatedProgressBar : public QProgressBar {
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
 
 public:
-    /**
-     * @brief 构造函数
-     * @param parent 父控件
-     */
+    /** @brief 构造函数，初始化进度条控件并设置objectName @param parent 父控件 */
     explicit AnimatedProgressBar(QWidget* parent = nullptr)
         : QProgressBar(parent), m_shimmerOffset(0.0), m_shimmerAnim(nullptr)
         , m_customChunkColor(false)
@@ -40,10 +37,10 @@ public:
         setObjectName("animatedProgressBar");
     }
 
-    /** @brief 当前shimmer偏移量，范围 [0.0, 1.0] */
+    /** @brief 获取当前shimmer偏移量 @return 偏移量，范围 [0.0, 1.0] */
     qreal shimmerOffset() const { return m_shimmerOffset; }
 
-    /** @brief 设置shimmer偏移量（由QPropertyAnimation驱动） */
+    /** @brief 设置shimmer偏移量，由QPropertyAnimation驱动 @param offset 目标偏移量 [0.0, 1.0] */
     void setShimmerOffset(qreal offset) {
         if (!qFuzzyCompare(m_shimmerOffset, offset)) {
             m_shimmerOffset = offset;
@@ -59,12 +56,10 @@ signals:
     void chunkColorChanged();
 
 public:
-    /** @brief 获取当前chunk自定义颜色(未设置时返回无效QColor) */
+    /** @brief 获取当前chunk自定义颜色 @return 颜色值，未设置时返回无效QColor */
     QColor chunkColor() const { return m_chunkColor; }
 
-    /** @brief 设置chunk区域自定义颜色(由QPropertyAnimation驱动，用于传输完成变色动画)
-     *  @param color 目标颜色，动画框架逐帧插值调用此方法实现平滑渐变
-     */
+    /** @brief 设置chunk区域自定义颜色，由QPropertyAnimation驱动传输完成变色动画 @param color 目标颜色，动画框架逐帧插值调用此方法实现平滑渐变 */
     void setChunkColor(const QColor& color) {
         m_chunkColor = color;
         m_customChunkColor = true;
@@ -80,25 +75,25 @@ public:
         update();
     }
 
-    /** @brief 重写setValue，增加值更新统计计数 */
+    /** @brief 重写setValue，增加统计计数 @param value 新的进度值 */
     void setValue(int value) {
         ++m_totalValueUpdates;
         QProgressBar::setValue(value);
     }
 
-    /** @brief 获取动画播放总次数 */
+    /** @brief 获取动画播放总次数 @return 累计动画播放次数 */
     quint64 totalAnimations() const { return m_totalAnimations; }
 
-    /** @brief 获取值更新总次数 */
+    /** @brief 获取值更新总次数 @return 累计值更新次数 */
     quint64 totalValueUpdates() const { return m_totalValueUpdates; }
 
-    /** @brief 重置所有统计计数器 */
+    /** @brief 重置所有统计计数器为零 */
     void resetStatistics() {
         m_totalAnimations = 0;
         m_totalValueUpdates = 0;
     }
 
-    /** @brief 启动shimmer流动动画(2000ms循环) — 安全停止旧动画后创建新动画 */
+    /** @brief 启动shimmer流动动画(2000ms循环)，安全停止旧动画后创建新动画 */
     void startShimmer() {
         stopShimmer();
         ++m_totalAnimations;
@@ -111,7 +106,7 @@ public:
         m_shimmerAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
-    /** @brief 停止shimmer动画 — 立即置nullptr防止DeleteWhenStopped异步删除导致悬空指针 */
+    /** @brief 停止shimmer动画，立即置nullptr防止DeleteWhenStopped异步删除导致悬空指针 */
     void stopShimmer() {
         if (m_shimmerAnim) {
             m_shimmerAnim->stop();
@@ -122,8 +117,7 @@ public:
     }
 
 protected:
-    /**
-     * @brief 重绘进度条，在chunk上叠加自定义颜色和shimmer渐变
+    /** @brief 重绘进度条，在chunk上叠加自定义颜色和shimmer渐变 @param event 绘制事件
      *
      * 绘制流程:
      *   1. 先调用基类paintEvent绘制默认进度条（含QSS样式）

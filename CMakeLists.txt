@@ -73,6 +73,7 @@ set(SOURCES
     src/core/connect/ConnectionFactory.cpp
     src/core/theme/ThemeManager.cpp
     src/core/theme/QssThemeGenerator.cpp
+    src/core/theme/QssThemeGeneratorColors.cpp
     src/core/animation/AnimationUtility.cpp
     src/core/theme/IconManager.cpp
     src/connection/serial_port/SerialConnection.cpp

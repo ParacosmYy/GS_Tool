@@ -16,10 +16,7 @@
 #include <QRandomGenerator>
 #include <QtMath>
 
-/**
- * @brief 构造背景控件
- * 初始化涟漪动画定时器（16ms 间隔 ≈ 60fps）并加载默认背景图
- */
+/** @brief 构造背景控件，初始化涟漪动画定时器(16ms间隔约60fps)并加载默认背景图 @param parent 父控件 */
 BackgroundWidget::BackgroundWidget(QWidget* parent)
     : QWidget(parent)
     , m_rippleTimer(new QTimer(this))
@@ -38,11 +35,7 @@ BackgroundWidget::BackgroundWidget(QWidget* parent)
     setBackgroundImage(":/backgrounds/default_bg.png");
 }
 
-/**
- * @brief 设置背景图片
- * 加载原始图 → 生成模糊版 → 缓存缩放版 → 触发重绘
- * @param resourcePath Qt 资源路径或本地文件系统路径
- */
+/** @brief 设置背景图片，加载原始图并生成模糊版和缩放缓存后触发重绘 @param resourcePath Qt资源路径或本地文件系统路径 */
 void BackgroundWidget::setBackgroundImage(const QString& resourcePath)
 {
     m_originalImage.load(resourcePath);
@@ -53,11 +46,7 @@ void BackgroundWidget::setBackgroundImage(const QString& resourcePath)
     update();
 }
 
-/**
- * @brief 设置磨砂玻璃模糊半径
- * 值变化时重新生成模糊图和缩放缓存
- * @param radius 模糊半径 (0~30)
- */
+/** @brief 设置磨砂玻璃模糊半径，值变化时重新生成模糊图和缩放缓存 @param radius 模糊半径(0~30) */
 void BackgroundWidget::setBlurRadius(qreal radius)
 {
     if (qFuzzyCompare(m_blurRadius, radius)) return;
@@ -69,16 +58,13 @@ void BackgroundWidget::setBlurRadius(qreal radius)
     update();
 }
 
-/** @brief 获取当前模糊半径 */
+/** @brief 获取当前模糊半径 @return 模糊半径值 */
 qreal BackgroundWidget::blurRadius() const
 {
     return m_blurRadius;
 }
 
-/**
- * @brief 设置背景透明度
- * @param opacity 透明度 (0~1)
- */
+/** @brief 设置背景透明度 @param opacity 透明度(0~1) */
 void BackgroundWidget::setBgOpacity(qreal opacity)
 {
     if (qFuzzyCompare(m_bgOpacity, opacity)) return;
@@ -88,17 +74,13 @@ void BackgroundWidget::setBgOpacity(qreal opacity)
     update();
 }
 
-/** @brief 获取当前背景透明度 */
+/** @brief 获取当前背景透明度 @return 透明度值 */
 qreal BackgroundWidget::bgOpacity() const
 {
     return m_bgOpacity;
 }
 
-/**
- * @brief 设置涟漪特效开关
- * 禁用时清除所有活跃涟漪并停止定时器
- * @param enabled true=启用, false=禁用
- */
+/** @brief 设置涟漪特效开关，禁用时清除所有活跃涟漪并停止定时器 @param enabled true=启用, false=禁用 */
 void BackgroundWidget::setRippleEnabled(bool enabled)
 {
     m_rippleEnabled = enabled;
@@ -110,55 +92,51 @@ void BackgroundWidget::setRippleEnabled(bool enabled)
     }
 }
 
-/** @brief 获取涟漪特效是否启用 */
+/** @brief 获取涟漪特效是否启用 @return true=启用 */
 bool BackgroundWidget::rippleEnabled() const
 {
     return m_rippleEnabled;
 }
 
-/** @brief 设置涟漪颜色（用于主题适配） */
+/** @brief 设置涟漪颜色，用于主题适配 @param color 涟漪颜色 */
 void BackgroundWidget::setRippleColor(const QColor& color)
 {
     m_rippleColor = color;
 }
 
-/** @brief 获取当前涟漪颜色 */
+/** @brief 获取当前涟漪颜色 @return 涟漪颜色 */
 QColor BackgroundWidget::rippleColor() const
 {
     return m_rippleColor;
 }
 
-/** @brief 设置半透明遮罩颜色 */
+/** @brief 设置半透明遮罩颜色 @param color 遮罩颜色 */
 void BackgroundWidget::setOverlayColor(const QColor& color)
 {
     m_overlayColor = color;
     update();
 }
 
-/** @brief 获取当前遮罩颜色 */
+/** @brief 获取当前遮罩颜色 @return 遮罩颜色 */
 QColor BackgroundWidget::overlayColor() const
 {
     return m_overlayColor;
 }
 
-/** @brief 设置遮罩透明度 */
+/** @brief 设置遮罩透明度 @param opacity 遮罩透明度(0~1) */
 void BackgroundWidget::setOverlayOpacity(qreal opacity)
 {
     m_overlayOpacity = qBound(0.0, opacity, 1.0);
     update();
 }
 
-/** @brief 获取当前遮罩透明度 */
+/** @brief 获取当前遮罩透明度 @return 遮罩透明度值 */
 qreal BackgroundWidget::overlayOpacity() const
 {
     return m_overlayOpacity;
 }
 
-/**
- * @brief 设置模糊迭代次数
- * 次数越多磨砂效果越自然，但生成耗时也越长
- * @param iterations 迭代次数 (2~10)
- */
+/** @brief 设置模糊迭代次数，次数越多磨砂效果越自然但耗时越长 @param iterations 迭代次数(2~10) */
 void BackgroundWidget::setBlurIterations(int iterations)
 {
     m_blurIterations = qBound(2, iterations, 10);
@@ -168,7 +146,7 @@ void BackgroundWidget::setBlurIterations(int iterations)
     update();
 }
 
-/** @brief 获取当前模糊迭代次数 */
+/** @brief 获取当前模糊迭代次数 @return 迭代次数 */
 int BackgroundWidget::blurIterations() const
 {
     return m_blurIterations;
@@ -181,20 +159,13 @@ void BackgroundWidget::resetToDefault()
     emit backgroundImageChanged(m_currentImagePath);
 }
 
-/** @brief 获取当前背景图片路径 */
+/** @brief 获取当前背景图片路径 @return 图片路径字符串 */
 QString BackgroundWidget::currentImagePath() const
 {
     return m_currentImagePath;
 }
 
-/**
- * @brief 自绘事件 - 按四层渲染背景
- *
- * 第1层: 纯黑底色（兜底，防止透明区域）
- * 第2层: 模糊背景图（Cover 模式居中裁剪覆盖，使用预缓存避免每帧缩放）
- * 第3层: 半透明遮罩（暗色遮罩提升文字可读性）
- * 第4层: 涟漪特效（跟随主题 accent 色的径向渐变圆环）
- */
+/** @brief 自绘事件，按四层渲染背景(黑底→模糊图→遮罩→涟漪) @param event 绘制事件 */
 void BackgroundWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event)
@@ -239,10 +210,7 @@ void BackgroundWidget::paintEvent(QPaintEvent* event)
     }
 }
 
-/**
- * @brief 鼠标按下事件 - 创建涟漪动画
- * 在点击位置生成一个新的涟漪（随机最大半径 120~180px），启动动画定时器
- */
+/** @brief 鼠标按下事件，在点击位置生成涟漪动画并启动定时器 @param event 鼠标事件 */
 void BackgroundWidget::mousePressEvent(QMouseEvent* event)
 {
     if (!m_rippleEnabled) {
@@ -267,10 +235,7 @@ void BackgroundWidget::mousePressEvent(QMouseEvent* event)
     update();
 }
 
-/**
- * @brief 窗口尺寸变化事件
- * 重新缓存缩放后的背景图，保证 paintEvent 不做缩放
- */
+/** @brief 窗口尺寸变化事件，重新缓存缩放后的背景图 @param event 尺寸变化事件 */
 void BackgroundWidget::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
@@ -278,16 +243,7 @@ void BackgroundWidget::resizeEvent(QResizeEvent* event)
     regenerateScaledBackground();
 }
 
-/**
- * @brief 从原始图片生成模糊版本（缩放法快速近似高斯模糊）
- *
- * 算法: 多次缩放（缩小→逐步放大→最终恢复原尺寸），
- * 利用 Qt::SmoothTransformation 的双线性插值近似高斯模糊。
- * 迭代次数由 m_blurIterations 控制（2~10），次数越多效果越自然。
- * @param src 原始像素图
- * @param radius 模糊半径
- * @return 模糊后的像素图
- */
+/** @brief 从原始图片生成模糊版本，使用缩放法快速近似高斯模糊 @param src 原始像素图 @param radius 模糊半径 @return 模糊后的像素图 */
 QPixmap BackgroundWidget::generateBlurred(const QPixmap& src, qreal radius) const
 {
     if (src.isNull() || radius <= 0) return src;
@@ -310,12 +266,7 @@ QPixmap BackgroundWidget::generateBlurred(const QPixmap& src, qreal radius) cons
     return result;
 }
 
-/**
- * @brief 缓存当前窗口尺寸下的缩放背景图
- *
- * Cover 模式: 等比缩放填满整个 widget，裁剪多余部分。
- * 在 resize/blur/image 变化时调用，避免 paintEvent 每帧都做缩放。
- */
+/** @brief 缓存当前窗口尺寸下的缩放背景图，Cover模式等比缩放填满整个widget */
 void BackgroundWidget::regenerateScaledBackground()
 {
     if (m_blurredImage.isNull()) {
@@ -346,11 +297,7 @@ void BackgroundWidget::regenerateScaledBackground()
         scaledSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 }
 
-/**
- * @brief 涟漪动画帧更新
- * 每帧: 扩大半径(+4px) + 降低透明度(-0.025)，到达最大半径或透明度归零时移除
- * 所有涟漪完成后自动停止定时器以节省 CPU
- */
+/** @brief 涟漪动画帧更新，每帧扩大半径(+4px)并降低透明度(-0.025)，完成后移除并停止定时器 */
 void BackgroundWidget::advanceRipples()
 {
     // 逆序遍历，安全删除已完成涟漪
@@ -372,11 +319,7 @@ void BackgroundWidget::advanceRipples()
     update();
 }
 
-/**
- * @brief 从 ThemeManager 更新主题色并触发重绘
- * 遮罩颜色使用 BgPrimary（深色背景），涟漪颜色使用 Accent（强调色）
- * 主题切换时自动调用，无需手动更新
- */
+/** @brief 从ThemeManager更新主题色(遮罩色用BgPrimary，涟漪色用Accent)并触发重绘 */
 void BackgroundWidget::updateThemeColors()
 {
     ++m_totalThemeUpdates;
@@ -390,6 +333,7 @@ void BackgroundWidget::updateThemeColors()
 // 统计重置
 // ============================================================================
 
+/** @brief 重置所有背景统计计数器为零 */
 void BackgroundWidget::resetBackgroundStatistics()
 {
     m_totalImageLoads = 0;

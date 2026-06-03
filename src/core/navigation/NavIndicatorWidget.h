@@ -33,11 +33,7 @@ class NavIndicatorWidget : public QWidget {
     Q_PROPERTY(qreal indicatorY READ indicatorY WRITE setIndicatorY NOTIFY indicatorYChanged)
 
 public:
-    /**
-     * @brief 构造指示器，作为 navTree 的子控件覆盖在其上方
-     * @param navTree 关联的导航树控件（指示器会成为其子控件）
-     * @param parent 父控件（通常为 nullptr，因为实际父级设为 navTree）
-     */
+    /** @brief 构造指示器，作为navTree的子控件覆盖在其上方，初始化滑动动画和事件过滤 @param navTree 关联的导航树控件(指示器成为其子控件) @param parent 父控件(通常为nullptr，因为实际父级设为navTree) */
     explicit NavIndicatorWidget(QTreeView* navTree, QWidget* parent = nullptr)
         : QWidget(navTree)
         , m_navTree(navTree)
@@ -65,16 +61,10 @@ public:
                 this, &NavIndicatorWidget::updateThemeColor);
     }
 
-    /**
-     * @brief 动画滑动到指定索引（moveToIndex 的语义别名，便于信号/槽连接）
-     * @param index 目标模型索引
-     */
+    /** @brief 动画滑动到指定索引(moveToIndex的语义别名，便于信号/槽连接) @param index 目标模型索引 */
     void animateTo(const QModelIndex& index) { moveToIndex(index); }
 
-    /**
-     * @brief 动画滑动到指定索引位置（250ms OutCubic）
-     * @param index 目标模型索引
-     */
+    /** @brief 动画滑动到指定索引位置(250ms OutCubic)，若动画运行中从当前位置衔接 @param index 目标模型索引 */
     void moveToIndex(const QModelIndex& index)
     {
         QRect visualRect = m_navTree->visualRect(index);
@@ -100,7 +90,7 @@ public:
         ++m_totalPositionChanges;
     }
 
-    /** @brief 无动画跳转到指定索引位置（用于初始化和恢复会话） */
+    /** @brief 无动画跳转到指定索引位置，用于初始化和恢复会话 @param index 目标模型索引 */
     void jumpToIndex(const QModelIndex& index)
     {
         QRect visualRect = m_navTree->visualRect(index);
@@ -112,19 +102,19 @@ public:
         update();
     }
 
-    /** @brief 指示线 Y 坐标（QPropertyAnimation 读访问器） */
+    /** @brief 获取指示线Y坐标(QPropertyAnimation读访问器) @return 当前指示线顶部Y坐标 */
     qreal indicatorY() const { return m_indicatorY; }
 
     // ── 统计计数器 ──
 
-    /** @brief 获取动画启动总次数 */
+    /** @brief 获取动画启动总次数 @return 累计动画启动次数 */
     quint64 totalAnimations() const { return m_totalAnimations; }
-    /** @brief 获取位置变更总次数 */
+    /** @brief 获取位置变更总次数 @return 累计位置变更次数 */
     quint64 totalPositionChanges() const { return m_totalPositionChanges; }
-    /** @brief 重置所有统计计数器 */
+    /** @brief 重置所有统计计数器为零 */
     void resetIndicatorStatistics() { m_totalAnimations = 0; m_totalPositionChanges = 0; }
 
-    /** @brief 设置指示线 Y 坐标（QPropertyAnimation 写访问器） */
+    /** @brief 设置指示线Y坐标(QPropertyAnimation写访问器)，值变化时触发重绘 @param y 目标Y坐标 */
     void setIndicatorY(qreal y)
     {
         if (qFuzzyCompare(m_indicatorY, y)) return;
@@ -134,15 +124,15 @@ public:
     }
 
 signals:
-    /** @brief 指示线 Y 坐标变化信号 */
+    /** @brief 指示线Y坐标变化信号 @param y 新的Y坐标值 */
     void indicatorYChanged(qreal y);
 
 public slots:
-    /** @brief 主题切换时刷新指示线颜色（触发 paintEvent 从 ThemeManager 重新取色） */
+    /** @brief 主题切换时刷新指示线颜色，触发paintEvent从ThemeManager重新取色 */
     void updateThemeColor() { update(); }
 
 protected:
-    /** @brief 绘制指示线 -- 左侧 3px 宽 accent 色竖线，上下圆角 */
+    /** @brief 绘制指示线，左侧3px宽accent色竖线，上下圆角 @param event 绘制事件(未使用) */
     void paintEvent(QPaintEvent* event) override
     {
         Q_UNUSED(event)
@@ -171,7 +161,7 @@ protected:
         painter.drawRoundedRect(indicatorRect, kRadius, kRadius);
     }
 
-    /** @brief 事件过滤器 -- 监听 navTree 的 resize 事件，同步调整自身大小 */
+    /** @brief 事件过滤器，监听navTree的resize事件同步调整自身大小 @param watched 被监听的对象 @param event 事件对象 @return 是否消费事件 */
     bool eventFilter(QObject* watched, QEvent* event) override
     {
         if (watched == m_navTree && event->type() == QEvent::Resize) {

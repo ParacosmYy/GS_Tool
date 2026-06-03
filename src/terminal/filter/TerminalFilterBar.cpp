@@ -7,9 +7,7 @@
 
 #include "terminal/filter/TerminalFilterBar.h"
 
-/**
- * @brief 构造函数，初始化过滤栏 UI 布局
- */
+/** @brief 构造函数，初始化过滤栏UI布局并连接信号槽 @param parent 父控件 */
 TerminalFilterBar::TerminalFilterBar(QWidget *parent)
     : QWidget(parent)
     , m_patternEdit(new QLineEdit(this))
@@ -67,30 +65,25 @@ TerminalFilterBar::TerminalFilterBar(QWidget *parent)
     });
 }
 
-/**
- * @brief 返回当前输入的正则表达式
- */
+/** @brief 返回当前输入的正则表达式文本 @return 正则表达式字符串 */
 QString TerminalFilterBar::currentPattern() const
 {
     return m_patternEdit->text();
 }
 
-/**
- * @brief 返回大小写敏感复选框状态
- */
+/** @brief 返回大小写敏感复选框状态 @return true=区分大小写 */
 bool TerminalFilterBar::isCaseSensitive() const
 {
     return m_caseCheck->isChecked();
 }
 
-/**
- * @brief 返回反转过滤复选框状态
- */
+/** @brief 返回反转过滤复选框状态 @return true=反转过滤 */
 bool TerminalFilterBar::isInverted() const
 {
     return m_invertCheck->isChecked();
 }
 
+/** @brief 应用过滤按钮点击处理，发射filterRequested信号并将正则添加到历史记录(去重，最多20条) */
 void TerminalFilterBar::onApplyClicked()
 {
     const QString pattern = m_patternEdit->text();
@@ -113,25 +106,25 @@ void TerminalFilterBar::onApplyClicked()
     }
 }
 
-/** @brief 获取累计过滤变更次数 */
+/** @brief 获取累计过滤变更次数 @return 过滤变更次数 */
 quint64 TerminalFilterBar::totalFilterChanges() const
 {
     return m_totalFilterChanges;
 }
 
-/** @brief 获取累计高亮切换次数 */
+/** @brief 获取累计高亮切换次数 @return 高亮切换次数 */
 quint64 TerminalFilterBar::totalHighlightToggles() const
 {
     return m_totalHighlightToggles;
 }
 
-/** @brief 获取累计方向变更次数 */
+/** @brief 获取累计方向变更次数 @return 方向变更次数 */
 quint64 TerminalFilterBar::totalDirectionChanges() const
 {
     return m_totalDirectionChanges;
 }
 
-/** @brief 重置所有过滤统计计数器 */
+/** @brief 重置所有过滤统计计数器为零 */
 void TerminalFilterBar::resetFilterStatistics()
 {
     m_totalFilterChanges = 0;

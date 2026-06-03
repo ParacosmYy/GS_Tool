@@ -19,12 +19,7 @@
 #include "core/widgets/EdDialog.h"
 #include <QLabel>
 
-/**
- * @brief 构造终端控制器
- * @param model 终端数据模型，用于读取 RX/TX 字节数和行数据
- * @param exporter 数据导出器，用于将终端数据导出为文件
- * @param parent 父对象
- */
+/** @brief 构造终端控制器，初始化模型/导出器/定时器等成员 @param model 终端数据模型，用于读取RX/TX字节数和行数据 @param exporter 数据导出器，用于将终端数据导出为文件 @param parent 父对象 */
 TerminalController::TerminalController(TerminalModel* model, DataExporter* exporter,
                                        QObject* parent)
     : QObject(parent)
@@ -39,36 +34,32 @@ TerminalController::TerminalController(TerminalModel* model, DataExporter* expor
 {
 }
 
-/** @brief 注入终端布局管理器引用 */
+/** @brief 注入终端布局管理器引用 @param manager 布局管理器指针 */
 void TerminalController::setLayoutManager(TerminalLayoutManager* manager)
 {
     m_layoutManager = manager;
 }
 
-/** @brief 注入数据统计面板引用 */
+/** @brief 注入数据统计面板引用 @param stats 数据统计面板指针 */
 void TerminalController::setDataStatistics(DataStatistics* stats)
 {
     m_dataStats = stats;
 }
 
-/**
- * @brief 注入状态栏字节标签引用
- * @param rxLabel 接收字节计数标签
- * @param txLabel 发送字节计数标签
- */
+/** @brief 注入状态栏字节标签引用 @param rxLabel 接收字节计数标签 @param txLabel 发送字节计数标签 */
 void TerminalController::setStatusBarLabels(QLabel* rxLabel, QLabel* txLabel)
 {
     m_rxBytesLbl = rxLabel;
     m_txBytesLbl = txLabel;
 }
 
-/** @brief 注入主终端 widget 引用（搜索只作用于主终端） */
+/** @brief 注入主终端widget引用(搜索只作用于主终端) @param terminal 主终端控件指针 */
 void TerminalController::setMainTerminal(QWidget* terminal)
 {
     m_mainTerminal = terminal;
 }
 
-/** @brief 启动统计刷新定时器（每 500ms 触发一次） */
+/** @brief 启动统计刷新定时器(每500ms触发一次) */
 void TerminalController::startStatsTimer()
 {
     m_statsTimer->setInterval(Timers::kStatsRefreshMs);
@@ -87,10 +78,7 @@ void TerminalController::stopStatsTimer()
     m_statsTimer->stop();
 }
 
-/**
- * @brief 终端显示模式切换
- * @param index 下拉框索引: 0=文本, 1=HEX, 2=混合, 3=十进制
- */
+/** @brief 终端显示模式切换，同步到所有活动的终端widget @param index 下拉框索引: 0=文本, 1=HEX, 2=混合, 3=十进制 */
 void TerminalController::onDisplayModeChanged(int index)
 {
     ++m_totalDisplayModeChanges;
@@ -104,10 +92,7 @@ void TerminalController::onDisplayModeChanged(int index)
     }
 }
 
-/**
- * @brief 时间戳显示开关
- * @param checked true=在每行终端数据前显示时间戳
- */
+/** @brief 时间戳显示开关，同步到所有活动的终端widget @param checked true=在每行终端数据前显示时间戳 */
 void TerminalController::onTimestampToggled(bool checked)
 {
     if (!m_layoutManager) return;
@@ -118,10 +103,7 @@ void TerminalController::onTimestampToggled(bool checked)
     }
 }
 
-/**
- * @brief 收发方向前缀开关
- * @param checked true=显示 [TX]/[RX] 方向前缀
- */
+/** @brief 收发方向前缀开关，同步到所有活动的终端widget @param checked true=显示[TX]/[RX]方向前缀 */
 void TerminalController::onDirPrefixToggled(bool checked)
 {
     if (!m_layoutManager) return;
@@ -141,12 +123,7 @@ void TerminalController::onClearTerminal()
     updateStatusBar();
 }
 
-/**
- * @brief 终端搜索请求处理
- * @param pattern 搜索模式字符串
- * @param regex true=使用正则表达式匹配
- * @param hex true=按 HEX 字节搜索
- */
+/** @brief 终端搜索请求处理，搜索只作用于主终端 @param pattern 搜索模式字符串 @param regex true=使用正则表达式匹配 @param hex true=按HEX字节搜索 */
 void TerminalController::onSearchRequested(const QString& pattern, bool regex, bool hex)
 {
     ++m_totalSearches;
@@ -168,20 +145,14 @@ void TerminalController::onSearchCleared()
     }
 }
 
-/**
- * @brief 终端布局模式切换
- * @param index 下拉框索引: 0=混合, 1=左右分栏, 2=上下分栏
- */
+/** @brief 终端布局模式切换 @param index 下拉框索引: 0=混合, 1=左右分栏, 2=上下分栏 */
 void TerminalController::onTerminalLayoutChanged(int index)
 {
     if (!m_layoutManager) return;
     m_layoutManager->setLayout(index);
 }
 
-/**
- * @brief 刷新状态栏中的 RX/TX 字节数显示
- * 自动格式化为 B/KB/MB 单位
- */
+/** @brief 刷新状态栏中的RX/TX字节数显示，自动格式化为B/KB/MB单位 */
 void TerminalController::updateStatusBar()
 {
     if (!m_terminalModel) return;
@@ -194,14 +165,7 @@ void TerminalController::updateStatusBar()
     m_txBytesLbl->setText(tr("发送: ") + ByteFormat::formatSize(tx));
 }
 
-/**
- * @brief 导出终端数据到文件
- *
- * 支持三种格式: .txt(纯文本), .csv(表格), .bin(原始二进制)
- * 使用批量流式导出，分批从 TerminalModel 拉取数据，避免一次性深拷贝全部行。
- *
- * @param parent 用于定位文件对话框的父窗口
- */
+/** @brief 导出终端数据到文件(支持txt/csv/bin格式)，使用批量流式导出避免深拷贝 @param parent 用于定位文件对话框的父窗口 */
 void TerminalController::onExportData(QWidget* parent)
 {
     ++m_totalExports;
@@ -235,7 +199,7 @@ void TerminalController::onExportData(QWidget* parent)
     }
 }
 
-/** @brief 定时刷新数据统计面板（由 m_statsTimer 每 500ms 触发） */
+/** @brief 定时刷新数据统计面板(由m_statsTimer每500ms触发) */
 void TerminalController::updateDataStatistics()
 {
     if (m_terminalModel && m_dataStats) {

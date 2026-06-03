@@ -32,12 +32,7 @@
 // 构造
 // ============================================================
 
-/**
- * @brief 构造游标叠加层
- * @param chartView 关联的图表视图(用于坐标映射)
- * @param model 数据模型(用于读取Y值)
- * @param parent 父控件
- */
+/** @brief 构造游标叠加层 @param chartView 关联的图表视图(用于坐标映射) @param model 数据模型(用于读取Y值) @param parent 父控件 */
 CursorOverlay::CursorOverlay(QChartView* chartView, ChartModel* model,
                              QWidget* parent)
     : QWidget(parent)
@@ -108,9 +103,16 @@ void CursorOverlay::clearCursors()
     update();
 }
 
+/** @brief 查询游标A是否已放置 @return true=已放置 */
 bool CursorOverlay::hasCursorA() const { return m_hasCursorA; }
+
+/** @brief 查询游标B是否已放置 @return true=已放置 */
 bool CursorOverlay::hasCursorB() const { return m_hasCursorB; }
+
+/** @brief 获取游标A的X轴坐标值(数据空间) @return 游标A的X值 */
 double CursorOverlay::cursorAX() const { return m_cursorAX; }
+
+/** @brief 获取游标B的X轴坐标值(数据空间) @return 游标B的X值 */
 double CursorOverlay::cursorBX() const { return m_cursorBX; }
 
 /** @brief 设置关联的缩放控制器(用于绘制框选矩形) @param zoom 缩放控制器指针 */
@@ -123,11 +125,7 @@ void CursorOverlay::setZoomController(ZoomController* zoom)
 // 坐标映射
 // ============================================================
 
-/**
- * @brief 从像素X坐标转换为数据空间X值
- * @param pixelX 像素坐标(相对于QChartView)
- * @return 数据空间X值
- */
+/** @brief 从像素X坐标转换为数据空间X值 @param pixelX 像素坐标(相对于QChartView) @return 数据空间X值 */
 double CursorOverlay::pixelToDataX(int pixelX) const
 {
     if (!m_chartView || !m_chartView->chart()) return 0.0;
@@ -136,11 +134,7 @@ double CursorOverlay::pixelToDataX(int pixelX) const
     return dataPt.x();
 }
 
-/**
- * @brief 从数据空间X值转换为像素X坐标
- * @param dataX 数据空间X值
- * @return 像素坐标(相对于QChartView)
- */
+/** @brief 从数据空间X值转换为像素X坐标 @param dataX 数据空间X值 @return 像素坐标(相对于QChartView) */
 double CursorOverlay::dataToPixelX(double dataX) const
 {
     if (!m_chartView || !m_chartView->chart()) return 0.0;
@@ -153,11 +147,7 @@ double CursorOverlay::dataToPixelX(double dataX) const
 // 命中检测
 // ============================================================
 
-/**
- * @brief 判断点击位置是否在游标附近(可拖拽)
- * @param pixelX 点击像素X
- * @return 0=无, 1=游标A, 2=游标B
- */
+/** @brief 判断点击位置是否在游标附近(可拖拽) @param pixelX 点击像素X @return 0=无, 1=游标A, 2=游标B */
 int CursorOverlay::hitTestCursor(int pixelX) const
 {
     if (m_hasCursorA) {
@@ -177,6 +167,8 @@ int CursorOverlay::hitTestCursor(int pixelX) const
 
 /**
  * @brief 事件过滤器主入口
+ * @param watched 被观察的对象
+ * @param event 事件对象
  * @return true=事件已消费(命中游标)，false=放行给ZoomController
  *
  * 处理规则:
@@ -252,13 +244,7 @@ bool CursorOverlay::eventFilter(QObject* watched, QEvent* event)
 // 绘制
 // ============================================================
 
-/**
- * @brief 绘制单条游标竖线
- * @param painter 画笔
- * @param pixelX 游标像素X位置
- * @param color 游标颜色
- * @param label 游标标签(A/B)
- */
+/** @brief 绘制单条游标竖线 @param painter 画笔 @param pixelX 游标像素X位置 @param color 游标颜色 @param label 游标标签(A/B) */
 void CursorOverlay::drawCursorLine(QPainter& painter, double pixelX,
                                    const QColor& color, const QString& label)
 {
@@ -276,12 +262,7 @@ void CursorOverlay::drawCursorLine(QPainter& painter, double pixelX,
     painter.drawText(textRect, Qt::AlignLeft | Qt::AlignTop, label);
 }
 
-/**
- * @brief 绘制游标间的高亮区域
- * @param painter 画笔
- * @param pixelAX 游标A像素X
- * @param pixelBX 游标B像素X
- */
+/** @brief 绘制游标间的高亮区域 @param painter 画笔 @param pixelAX 游标A像素X @param pixelBX 游标B像素X */
 void CursorOverlay::drawHighlightRegion(QPainter& painter, double pixelAX,
                                         double pixelBX)
 {
@@ -331,9 +312,9 @@ void CursorOverlay::drawHighlightRegion(QPainter& painter, double pixelAX,
  * @param painter 画笔
  *
  * 在图表右上角绘制一个半透明面板，显示:
- *   ΔX (采样点差)
- *   1/ΔX (频率估算)
- *   各通道的 ΔY (值差)
+ *   deltaX (采样点差)
+ *   1/deltaX (频率估算)
+ *   各通道的 deltaY (值差)
  */
 void CursorOverlay::drawDeltaPanel(QPainter& painter)
 {
@@ -388,6 +369,7 @@ void CursorOverlay::drawDeltaPanel(QPainter& painter)
 
 /**
  * @brief 绘制游标线和差值信息面板
+ * @param event 绘制事件(未使用)
  *
  * 绘制顺序: 高亮区域 → 游标A线 → 游标B线 → 差值面板
  */
@@ -455,13 +437,13 @@ void CursorOverlay::onThemeChanged()
 // 统计计数器接口
 // ============================================================
 
-/** @brief 返回游标移动总次数（含放置和拖拽） */
+/** @brief 返回游标移动总次数（含放置和拖拽） @return 移动总次数 */
 quint64 CursorOverlay::totalCursorMoves() const
 {
     return m_totalCursorMoves;
 }
 
-/** @brief 返回测量显示总次数（双游标差值面板绘制） */
+/** @brief 返回测量显示总次数（双游标差值面板绘制） @return 测量总次数 */
 quint64 CursorOverlay::totalMeasurements() const
 {
     return m_totalMeasurements;

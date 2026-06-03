@@ -1,6 +1,6 @@
 /**
  * @file TerminalModel.cpp
- * @brief 终端数据模型实现 — 管理终端显示数据的环形缓冲区
+ * @brief 终端数据模型实现 -- 管理终端显示数据的环形缓冲区
  *
  * 维护固定大小的环形缓冲区存储终端行数据，支持追加接收/发送数据、
  * 行数统计、方向过滤和内容搜索。线程安全设计。
@@ -85,15 +85,7 @@ QVector<TerminalLine> TerminalModel::lines(int start, int count) const
     return result;
 }
 
-/**
- * @brief 获取指定索引行的拷贝
- * @param index 行索引，范围 [0, lineCount())
- * @return 行数据拷贝；索引越界时返回空的 TerminalLine
- *
- * 运行时安全检查: 如果 index 越界，返回默认构造的 TerminalLine（空数据），
- * 并记录警告日志。Release 模式下 Q_ASSERT 会被编译器移除，
- * 因此使用实际的运行时检查替代断言。
- */
+/** @brief 获取指定索引行的拷贝，越界时返回空TerminalLine并记录警告 @param index 行索引，范围 [0, lineCount()) @return 行数据拷贝 */
 TerminalLine TerminalModel::lineAt(int index) const
 {
     QMutexLocker locker(&m_mutex);
@@ -142,16 +134,10 @@ void TerminalModel::clear()
     emit dataCleared();
 }
 
-/**
- * @brief 设置最大行数并重新分配缓冲区
- *
- * 保留最新数据（如果新容量小于当前数据量则丢弃最旧数据）。
- * 包含重入保护：防止dataCleared信号的槽函数回调导致并发resize。
- * @param max 新的最大行数
- */
+/** @brief 设置最大行数并重新分配缓冲区，保留最新数据(含重入保护) @param max 新的最大行数 */
 void TerminalModel::setMaxLines(int max)
 {
-    // 防御性校验: maxLines必须≥1，否则physicalIndex()中%m_buffer.size()会除零崩溃
+    // 防御性校验: maxLines必须>=1，否则physicalIndex()中%m_buffer.size()会除零崩溃
     if (max < 1) max = 1;
 
     // 重入保护: 若 dataCleared 信号的槽函数回调 setMaxLines，
@@ -208,13 +194,7 @@ int TerminalModel::physicalIndex(int logicalIndex) const
     return (m_head + logicalIndex) % m_buffer.size();
 }
 
-/**
- * @brief 内部追加一行到环形缓冲区(必须已持有m_mutex)
- *
- * 缓冲区未满时顺序写入，已满时覆盖最旧数据(head位置)。
- * 不在此处emit信号，由调用者在释放锁后负责emit，避免持锁发信号导致死锁。
- * @param line 行数据(右值引用，避免拷贝)
- */
+/** @brief 内部追加一行到环形缓冲区(必须已持有m_mutex)，缓冲区满时覆盖最旧数据 @param line 行数据(右值引用，避免拷贝) */
 void TerminalModel::appendLine(TerminalLine&& line)
 {
     // 必须在已持有 m_mutex 的情况下调用
