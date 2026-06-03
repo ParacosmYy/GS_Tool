@@ -68,6 +68,18 @@ public:
      */
     void setPeerVerify(bool verify);
 
+    /** @brief 获取已发送字节数 */
+    qint64 totalBytesSent() const;
+
+    /** @brief 获取已接收字节数 */
+    qint64 totalBytesReceived() const;
+
+    /** @brief 获取SSL握手次数 */
+    quint64 handshakeCount() const;
+
+    /** @brief 重置统计数据 */
+    void resetStatistics();
+
 private slots:
     /** @brief SSL加密通道建立完成回调 */
     void onEncrypted();
@@ -96,6 +108,13 @@ private:
 
     // ---- 网络资源 ----
     QSslSocket* m_socket = nullptr;                 ///< SSL加密socket
+
+    /** @brief 累计发送字节数 */
+    qint64 m_txBytes = 0;
+    /** @brief 累计接收字节数 */
+    qint64 m_rxBytes = 0;
+    /** @brief SSL握手次数 */
+    quint64 m_handshakeCount = 0;
 };
 
 #endif // TLSCONNECTION_H

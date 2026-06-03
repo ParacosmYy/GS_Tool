@@ -67,6 +67,21 @@ public:
      */
     void setMulticastInterface(const QString& interfaceName);
 
+    /** @brief 获取已发送数据报计数 */
+    quint64 datagramsSent() const;
+
+    /** @brief 获取已接收数据报计数 */
+    quint64 datagramsReceived() const;
+
+    /** @brief 获取累计发送字节数 */
+    qint64 totalBytesSent() const;
+
+    /** @brief 获取累计接收字节数 */
+    qint64 totalBytesReceived() const;
+
+    /** @brief 重置统计数据 */
+    void resetStatistics();
+
 private slots:
     /** @brief 数据到达回调 */
     void onReadyRead();
@@ -91,6 +106,15 @@ private:
 
     // ---- 网络资源 ----
     QUdpSocket* m_socket = nullptr;                  ///< UDP socket
+
+    /** @brief 已发送数据报计数 */
+    quint64 m_dgramsSent = 0;
+    /** @brief 已接收数据报计数 */
+    quint64 m_dgramsRecv = 0;
+    /** @brief 累计发送字节数 */
+    qint64 m_txBytes = 0;
+    /** @brief 累计接收字节数 */
+    qint64 m_rxBytes = 0;
 };
 
 #endif // UDPMULTICASTCONNECTION_H

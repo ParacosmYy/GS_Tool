@@ -185,11 +185,15 @@ int TcpServerConnection::broadcastToClients(const QByteArray& data)
         if (socket && socket->state() == QAbstractSocket::ConnectedState) {
             qint64 written = socket->write(data);
             if (written > 0) {
+                m_totalTxBytes += written;
                 socket->flush();
                 emit bytesWritten(written);
                 count++;
             }
         }
+    }
+    if (count > 0) {
+        ++m_broadcastCount;
     }
     return count;
 }
@@ -223,6 +227,7 @@ void TcpServerConnection::onNewConnection()
                 });
 
         QString info = clientInfo(client);
+        ++m_totalClientCount;
         emit clientConnected(info);
     }
 }
@@ -264,6 +269,8 @@ void TcpServerConnection::onClientReadyRead()
     QByteArray data = socket->readAll();
     if (data.isEmpty()) return;
 
+    m_totalRxBytes += data.size();
+
     QString info = clientInfo(socket);
     emit clientData(info, data);
     /// 同时发射IConnection标准信号，便于上层统一接收
@@ -291,4 +298,47 @@ QString TcpServerConnection::clientInfo(QTcpSocket* socket)
 {
     if (!socket) return QString();
     return QString("%1:%2").arg(socket->peerAddress().toString()).arg(socket->peerPort());
+}
+
+/**
+ * @brief 获取历史累计连接客户端总数
+ */
+quint64 TcpServerConnection::totalClientCount() const
+{
+    return m_totalClientCount;
+}
+
+/**
+ * @brief 获取已广播数据包总数
+ */
+quint64 TcpServerConnection::broadcastCount() const
+{
+    return m_broadcastCount;
+}
+
+/**
+ * @brief 获取累计接收字节数
+ */
+qint64 TcpServerConnection::totalBytesReceived() const
+{
+    return m_totalRxBytes;
+}
+
+/**
+ * @brief 获取累计发送字节数
+ */
+qint64 TcpServerConnection::totalBytesSent() const
+{
+    return m_totalTxBytes;
+}
+
+/**
+ * @brief 重置统计数据
+ */
+void TcpServerConnection::resetStatistics()
+{
+    m_totalClientCount = 0;
+    m_broadcastCount = 0;
+    m_totalRxBytes = 0;
+    m_totalTxBytes = 0;
 }

@@ -63,6 +63,15 @@ public:
      */
     QString highlightColor() const;
 
+    /** @brief 获取匹配次数 */
+    quint64 matchCount() const;
+
+    /** @brief 获取最近一次匹配的文本 */
+    QString lastMatchText() const;
+
+    /** @brief 重置匹配统计 */
+    void resetStatistics();
+
 signals:
     /**
      * @brief 正则表达式错误信号
@@ -74,6 +83,11 @@ private:
     QString m_pattern;              ///< 正则表达式字符串
     bool m_caseSensitive = false;   ///< 大小写敏感标志
     QRegularExpression m_regex;     ///< 编译后的正则对象
+
+    /** @brief 累计匹配次数 */
+    mutable quint64 m_matchCount = 0;
+    /** @brief 最近一次匹配的文本 */
+    mutable QString m_lastMatch;
 };
 
 #endif // TERMINALFILTER_H

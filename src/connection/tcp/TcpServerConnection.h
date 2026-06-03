@@ -73,6 +73,21 @@ public:
      */
     int broadcastToClients(const QByteArray& data);
 
+    /** @brief 获取历史累计连接客户端总数 */
+    quint64 totalClientCount() const;
+
+    /** @brief 获取已广播数据包总数 */
+    quint64 broadcastCount() const;
+
+    /** @brief 获取累计接收字节数 */
+    qint64 totalBytesReceived() const;
+
+    /** @brief 获取累计发送字节数 */
+    qint64 totalBytesSent() const;
+
+    /** @brief 重置统计数据 */
+    void resetStatistics();
+
 signals:
     /** @brief 新客户端连接时发出
      * @param clientInfo 客户端地址:端口信息
@@ -116,6 +131,15 @@ private:
     QTcpServer* m_server = nullptr;                  ///< TCP服务器
     QMap<qintptr, QTcpSocket*> m_clients;            ///< 客户端socket映射(socket描述符→socket)
     bool m_listening = false;                        ///< 是否正在监听
+
+    /** @brief 累计连接客户端总数 */
+    quint64 m_totalClientCount = 0;
+    /** @brief 广播数据包计数 */
+    quint64 m_broadcastCount = 0;
+    /** @brief 累计接收字节数 */
+    qint64 m_totalRxBytes = 0;
+    /** @brief 累计发送字节数 */
+    qint64 m_totalTxBytes = 0;
 };
 
 #endif // TCPSERVERCONNECTION_H

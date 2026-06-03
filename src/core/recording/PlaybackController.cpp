@@ -139,6 +139,7 @@ void PlaybackController::setSpeed(qreal speed)
     }
 
     m_speed = speed;
+    m_speedSum += speed;
     emit speedChanged(m_speed);
 }
 
@@ -252,10 +253,49 @@ void PlaybackController::onTick()
         m_playing = false;
         m_timer->stop();
         m_currentTimeMs = m_durationMs;
+        ++m_playCount;
+        m_totalPlayTimeMs += m_durationMs;
 
         emit playbackFinished();
         emit playbackStopped();
     } else {
         emit timeUpdated(elapsed);
     }
+}
+
+/**
+ * @brief 获取已完成回放次数
+ */
+int PlaybackController::playCount() const
+{
+    return m_playCount;
+}
+
+/**
+ * @brief 获取累计回放时长
+ */
+qint64 PlaybackController::totalPlayTimeMs() const
+{
+    return m_totalPlayTimeMs;
+}
+
+/**
+ * @brief 获取平均回放倍速
+ */
+qreal PlaybackController::averageSpeed() const
+{
+    if (m_playCount == 0) {
+        return 0.0;
+    }
+    return m_speedSum / static_cast<qreal>(m_playCount);
+}
+
+/**
+ * @brief 重置统计数据
+ */
+void PlaybackController::resetStatistics()
+{
+    m_playCount = 0;
+    m_totalPlayTimeMs = 0;
+    m_speedSum = 0.0;
 }

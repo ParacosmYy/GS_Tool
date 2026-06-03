@@ -172,6 +172,7 @@ qint64 TlsConnection::write(const QByteArray& data)
     }
     qint64 written = m_socket->write(data);
     if (written > 0) {
+        m_txBytes += written;
         m_socket->flush();
         emit bytesWritten(written);
     }
@@ -234,6 +235,7 @@ void TlsConnection::setPeerVerify(bool verify)
  */
 void TlsConnection::onEncrypted()
 {
+    ++m_handshakeCount;
     updateState(ConnectionState::Connected);
 }
 
@@ -266,6 +268,7 @@ void TlsConnection::onReadyRead()
 
     QByteArray data = m_socket->readAll();
     if (!data.isEmpty()) {
+        m_rxBytes += data.size();
         emit dataReceived(data);
     }
 }
@@ -290,4 +293,38 @@ void TlsConnection::updateState(ConnectionState newState)
         m_state = newState;
         emit stateChanged(newState);
     }
+}
+
+/**
+ * @brief 获取已发送字节数
+ */
+qint64 TlsConnection::totalBytesSent() const
+{
+    return m_txBytes;
+}
+
+/**
+ * @brief 获取已接收字节数
+ */
+qint64 TlsConnection::totalBytesReceived() const
+{
+    return m_rxBytes;
+}
+
+/**
+ * @brief 获取SSL握手次数
+ */
+quint64 TlsConnection::handshakeCount() const
+{
+    return m_handshakeCount;
+}
+
+/**
+ * @brief 重置统计数据
+ */
+void TlsConnection::resetStatistics()
+{
+    m_txBytes = 0;
+    m_rxBytes = 0;
+    m_handshakeCount = 0;
 }

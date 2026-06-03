@@ -127,6 +127,8 @@ qint64 UdpMulticastConnection::write(const QByteArray& data)
     quint16 destPort = m_remotePort > 0 ? m_remotePort : m_localPort;
     qint64 written = m_socket->writeDatagram(data, m_groupAddress, destPort);
     if (written > 0) {
+        ++m_dgramsSent;
+        m_txBytes += written;
         emit bytesWritten(written);
     }
     return written;
@@ -218,6 +220,8 @@ void UdpMulticastConnection::onReadyRead()
         qint64 size = m_socket->readDatagram(buffer.data(), buffer.size(),
                                               &sender, &senderPort);
         if (size > 0) {
+            ++m_dgramsRecv;
+            m_rxBytes += size;
             buffer.resize(static_cast<int>(size));
             emit dataReceived(buffer);
         }
@@ -244,4 +248,47 @@ void UdpMulticastConnection::updateState(ConnectionState newState)
         m_state = newState;
         emit stateChanged(newState);
     }
+}
+
+/**
+ * @brief 获取已发送数据报计数
+ */
+quint64 UdpMulticastConnection::datagramsSent() const
+{
+    return m_dgramsSent;
+}
+
+/**
+ * @brief 获取已接收数据报计数
+ */
+quint64 UdpMulticastConnection::datagramsReceived() const
+{
+    return m_dgramsRecv;
+}
+
+/**
+ * @brief 获取累计发送字节数
+ */
+qint64 UdpMulticastConnection::totalBytesSent() const
+{
+    return m_txBytes;
+}
+
+/**
+ * @brief 获取累计接收字节数
+ */
+qint64 UdpMulticastConnection::totalBytesReceived() const
+{
+    return m_rxBytes;
+}
+
+/**
+ * @brief 重置统计数据
+ */
+void UdpMulticastConnection::resetStatistics()
+{
+    m_dgramsSent = 0;
+    m_dgramsRecv = 0;
+    m_txBytes = 0;
+    m_rxBytes = 0;
 }

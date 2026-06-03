@@ -94,6 +94,18 @@ public:
      */
     qint64 durationMs() const;
 
+    /** @brief 获取已完成回放次数 */
+    int playCount() const;
+
+    /** @brief 获取累计回放时长（毫秒） */
+    qint64 totalPlayTimeMs() const;
+
+    /** @brief 获取平均回放倍速 */
+    qreal averageSpeed() const;
+
+    /** @brief 重置统计数据 */
+    void resetStatistics();
+
 signals:
     /**
      * @brief 回放已启动信号
@@ -139,6 +151,13 @@ private:
     qint64   m_durationMs = 0; ///< 回放总时长（毫秒）
     qint64   m_currentTimeMs = 0; ///< 当前已累积的回放位置（毫秒）
     QElapsedTimer m_elapsed;   ///< 精确计时器，测量两次累积点之间的真实经过时间
+
+    /** @brief 已完成回放次数 */
+    int m_playCount = 0;
+    /** @brief 累计回放时长（毫秒） */
+    qint64 m_totalPlayTimeMs = 0;
+    /** @brief 倍速累计（用于计算平均倍速） */
+    qreal m_speedSum = 0.0;
 };
 
 #endif // PLAYBACK_CONTROLLER_H

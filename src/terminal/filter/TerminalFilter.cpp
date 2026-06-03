@@ -48,7 +48,12 @@ bool TerminalFilter::match(const QString &text) const
     if (!m_regex.isValid()) {
         return false;
     }
-    return m_regex.match(text).hasMatch();
+    bool result = m_regex.match(text).hasMatch();
+    if (result) {
+        ++m_matchCount;
+        m_lastMatch = text;
+    }
+    return result;
 }
 
 /**
@@ -88,4 +93,29 @@ void TerminalFilter::setCaseSensitive(bool sensitive)
 QString TerminalFilter::highlightColor() const
 {
     return QStringLiteral("#FF6B35");
+}
+
+/**
+ * @brief 获取匹配次数
+ */
+quint64 TerminalFilter::matchCount() const
+{
+    return m_matchCount;
+}
+
+/**
+ * @brief 获取最近一次匹配的文本
+ */
+QString TerminalFilter::lastMatchText() const
+{
+    return m_lastMatch;
+}
+
+/**
+ * @brief 重置匹配统计
+ */
+void TerminalFilter::resetStatistics()
+{
+    m_matchCount = 0;
+    m_lastMatch.clear();
 }
