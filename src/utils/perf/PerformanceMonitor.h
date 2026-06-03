@@ -107,6 +107,23 @@ public:
      */
     void clearAllLatency();
 
+    // ---- 统计计数器接口 ----
+
+    /** @brief 获取累计采样帧数 @return 帧数 */
+    quint64 totalSamples() const;
+
+    /** @brief 获取历史最高FPS @return 最大FPS值 */
+    quint64 maxFps() const;
+
+    /** @brief 获取历史最低FPS(至少采样一帧后有效) @return 最小FPS值 */
+    quint64 minFps() const;
+
+    /** @brief 获取累计延迟测量次数 @return 测量次数 */
+    quint64 totalMeasurements() const;
+
+    /** @brief 重置所有统计计数器(采样/FPS/测量次数) */
+    void resetPerformanceStatistics();
+
 signals:
     /// 统计数据更新
     void statsUpdated(double fps, double avgFrameMs, qint64 memBytes);
@@ -117,6 +134,12 @@ private:
     double        m_avgFrameMs = 0.0;              ///< 平均帧耗时（EMA）
     qint64        m_frameCount = 0;                ///< 帧计数
     QMap<QString, QList<quint64>> m_latencyMap;    ///< 模块延迟记录（每个标签保留最近100条）
+
+    // 统计计数器
+    quint64 m_totalSamples = 0;       ///< 累计采样帧数
+    quint64 m_maxFps = 0;             ///< 历史最高FPS
+    quint64 m_minFps = 0;             ///< 历史最低FPS
+    quint64 m_totalMeasurements = 0;  ///< 累计延迟测量次数
 };
 
 #endif // PERFORMANCE_MONITOR_H

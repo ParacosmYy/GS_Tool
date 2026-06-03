@@ -34,6 +34,7 @@ int EventBus::subscribe(const QString& eventName, QObject* subscriber, Callback 
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
+    ++m_totalSubscriptions;  // 累计订阅计数
     const int id = m_nextId++;
     Subscription sub{id, eventName, subscriber, std::move(callback)};
     m_subscriptions.insert(id, sub);
@@ -107,6 +108,7 @@ void EventBus::publish(const QString& eventName, const QVariant& data)
     QList<Callback> callbacks;
     {
         std::lock_guard<std::mutex> lock(m_mutex);
+        ++m_totalPublished;  // 累计发布计数
         auto range = m_eventSubscriptions.equal_range(eventName);
         for (auto it = range.first; it != range.second; ++it) {
             auto subIt = m_subscriptions.find(*it);
@@ -119,6 +121,7 @@ void EventBus::publish(const QString& eventName, const QVariant& data)
     // 执行所有回调（锁外执行，避免死锁）
     for (const auto& cb : callbacks) {
         cb(data);
+        ++m_totalHandlersCalled;  // 累计回调调用计数
     }
 }
 
@@ -160,4 +163,36 @@ QMap<QString, int> EventBus::statistics() const
         stats[it.key()]++;
     }
     return stats;
+}
+
+// ---- 统计计数器接口 ----
+
+/** @brief 获取累计发布的事件总数(同步+异步) @return 事件数 */
+quint64 EventBus::totalPublished() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_totalPublished;
+}
+
+/** @brief 获取累计订阅操作总数 @return 订阅数 */
+quint64 EventBus::totalSubscriptions() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_totalSubscriptions;
+}
+
+/** @brief 获取累计调用的回调处理器总数 @return 调用次数 */
+quint64 EventBus::totalHandlersCalled() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_totalHandlersCalled;
+}
+
+/** @brief 重置所有统计计数器(发布/订阅/回调次数) */
+void EventBus::resetEventStatistics()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_totalPublished = 0;
+    m_totalSubscriptions = 0;
+    m_totalHandlersCalled = 0;
 }

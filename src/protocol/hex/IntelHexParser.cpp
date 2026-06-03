@@ -324,4 +324,43 @@ bool parseWithStats(const QString& filePath, QByteArray& outBinary,
     return mergeRecords(records, outBinary, startAddress);
 }
 
+// ── ParserStatsTracker 实现 ──
+
+/** @brief 获取累计解析的HEX记录总数 @return 记录总数 */
+quint64 ParserStatsTracker::totalRecordsParsed() const
+{
+    return m_totalRecordsParsed;
+}
+
+/** @brief 获取累计解析的数据字节总数 @return 字节总数 */
+quint64 ParserStatsTracker::totalBytesParsed() const
+{
+    return m_totalBytesParsed;
+}
+
+/** @brief 获取累计解析错误次数 @return 错误次数 */
+quint64 ParserStatsTracker::errorCount() const
+{
+    return m_errorCount;
+}
+
+/** @brief 重置所有累积统计计数器 */
+void ParserStatsTracker::resetParserStatistics()
+{
+    m_totalRecordsParsed = 0;
+    m_totalBytesParsed = 0;
+    m_errorCount = 0;
+}
+
+/**
+ * @brief 从一次解析结果中累加统计
+ * @param stats 单次解析的统计快照
+ */
+void ParserStatsTracker::accumulate(const ParseStats& stats)
+{
+    m_totalRecordsParsed += static_cast<quint64>(stats.totalLines);
+    m_totalBytesParsed += static_cast<quint64>(stats.totalDataBytes);
+    m_errorCount += static_cast<quint64>(stats.checksumErrors);
+}
+
 } // namespace IntelHex

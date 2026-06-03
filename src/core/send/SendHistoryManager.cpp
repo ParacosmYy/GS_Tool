@@ -75,12 +75,14 @@ void SendHistoryManager::setupAutoComplete(QLineEdit* input, QWidget* parentWidg
         m_input->blockSignals(true);
         m_input->setText(text);
         m_input->blockSignals(false);
+        ++m_totalRecalls;  // 累计召回(补全选中)计数
     });
 }
 
 void SendHistoryManager::recordHistory(const QString& text, bool isHex)
 {
     m_sendHistory->addEntry(text, isHex);
+    ++m_totalAdds;  // 累计添加计数
 }
 
 SmartAutoComplete* SendHistoryManager::smartComplete() const
@@ -107,6 +109,7 @@ bool SendHistoryManager::eventFilter(QObject* watched, QEvent* event)
                 m_input->blockSignals(true);
                 m_input->setText(m_smartComplete->selectedText());
                 m_input->blockSignals(false);
+                ++m_totalRecalls;  // 累计召回(键盘选中补全)计数
                 return true;
             }
             break;
@@ -131,4 +134,32 @@ void SendHistoryManager::refreshCompletions()
     if (m_smartComplete) {
         m_smartComplete->setEntries(buildAggregatedEntries(m_sendHistory));
     }
+}
+
+// ---- 统计计数器接口 ----
+
+/** @brief 获取累计添加的历史记录数 @return 添加次数 */
+quint64 SendHistoryManager::totalAdds() const
+{
+    return m_totalAdds;
+}
+
+/** @brief 获取累计清空历史的次数 @return 清空次数 */
+quint64 SendHistoryManager::totalClears() const
+{
+    return m_totalClears;
+}
+
+/** @brief 获取累计召回(补全选中)的次数 @return 召回次数 */
+quint64 SendHistoryManager::totalRecalls() const
+{
+    return m_totalRecalls;
+}
+
+/** @brief 重置所有统计计数器(添加/清空/召回) */
+void SendHistoryManager::resetHistoryStatistics()
+{
+    m_totalAdds = 0;
+    m_totalClears = 0;
+    m_totalRecalls = 0;
 }

@@ -1,14 +1,9 @@
 /**
  * @file ToastWidget.h
  * @brief 通知吐司组件 — 在父窗口右下角显示临时通知
- *
  * 支持三种语义类型: Success(绿)/Error(红)/Info(强调色)
  * 动画: 弹出 300ms OutBack, 消失 250ms InCubic (CLAUDE.md §6.5)
  * 颜色全部从 ThemeManager 获取, 无硬编码
- *
- * 使用:
- *   ToastWidget::show(this, tr("连接成功"), ToastWidget::ToastType::Success);
- *   ToastWidget::showDebounced(this, tr("连接错误"), ToastType::Error); // 防抖
  */
 
 #ifndef TOASTWIDGET_H
@@ -26,6 +21,7 @@
 #include <QHash>
 #include <QList>
 #include <QElapsedTimer>
+#include <QtGlobal>
 #include "core/theme/ThemeManager.h"
 #include "core/theme/Constants.h"
 
@@ -41,8 +37,9 @@ public:
     {
         if (!parent) return;
         auto* toast = new ToastWidget(parent, msg, type);
+        ++s_totalShows;
+        if (type == ToastType::Error) ++s_totalErrors;
         activeToasts(parent).append(toast);
-        // 仅首次连接destroyed信号，避免重复toasts时累积冗余连接
         if (!parent->property("_toastDestroyConnected").toBool()) {
             connect(parent, &QObject::destroyed, parent, [parent]() { activeToastsMap().remove(parent); });
             parent->setProperty("_toastDestroyConnected", true);
@@ -56,28 +53,23 @@ public:
         QPoint target(parent->width() - kMargin - toast->width(), bottomY);
         toast->move(target.x(), target.y() + 30);
         toast->QWidget::show();
-
         auto* slide = new QPropertyAnimation(toast, "pos");
-        slide->setEndValue(target); slide->setDuration(Animations::kToastPopMs);
-        slide->setEasingCurve(QEasingCurve::OutBack);
+        slide->setEndValue(target); slide->setDuration(Animations::kToastPopMs); slide->setEasingCurve(QEasingCurve::OutBack);
         auto* fade = new QPropertyAnimation(toast->m_opacityEffect, "opacity");
-        fade->setEndValue(1.0); fade->setDuration(Animations::kToastPopMs);
-        fade->setEasingCurve(QEasingCurve::OutBack);
+        fade->setEndValue(1.0); fade->setDuration(Animations::kToastPopMs); fade->setEasingCurve(QEasingCurve::OutBack);
         connect(slide, &QAbstractAnimation::finished, toast, [toast, ms]() {
             QTimer::singleShot(ms, toast, [toast]() { toast->dismiss(); });
         });
         slide->start(QAbstractAnimation::DeleteWhenStopped);
         fade->start(QAbstractAnimation::DeleteWhenStopped);
     }
-    /** @brief 防抖吐司 — 同一消息+类型在冷却期内静默跳过
-     *  @param parent 父窗口 @param msg 消息 @param type 类型 @param cooldownMs 冷却间隔 */
+    /** @brief 防抖吐司 @param parent 父窗口 @param msg 消息 @param type 类型 @param cooldownMs 冷却间隔 */
     static void showDebounced(QWidget* parent, const QString& msg,
                               ToastType type = ToastType::Info, int cooldownMs = 2000)
     {
         QString key = QString::number(static_cast<int>(type)) + "|" + msg;
         auto& map = debounceMap();
-        if (map.contains(key) && map[key].elapsed() < cooldownMs)
-            return;  /* 冷却期未过，静默跳过 */
+        if (map.contains(key) && map[key].elapsed() < cooldownMs) return;
         map[key].start();
         show(parent, msg, type);
     }
@@ -145,6 +137,7 @@ private:
 
     /** @brief 消失动画: InCubic，向上飘出30px + 淡出（并行） */
     void dismiss() {
+        ++s_totalDismisses;
         auto* group = new QParallelAnimationGroup(this);
         auto* fadeOut = new QPropertyAnimation(m_opacityEffect, "opacity");
         fadeOut->setEndValue(0.0); fadeOut->setDuration(Animations::kToastDismissMs);
@@ -164,12 +157,9 @@ private:
 
     static QList<ToastWidget*>& activeToasts(QWidget* parent) { return activeToastsMap()[parent]; }
     static QMap<QWidget*, QList<ToastWidget*>>& activeToastsMap() {
-        static QMap<QWidget*, QList<ToastWidget*>> map; return map;
-    }
-    /** @brief 防抖计时器映射 — key=类型编号+"|"+消息, value=上次显示时刻 */
-    static QHash<QString, QElapsedTimer>& debounceMap() {
-        static QHash<QString, QElapsedTimer> map; return map;
-    }
+        static QMap<QWidget*, QList<ToastWidget*>> map; return map; }
+    static QHash<QString, QElapsedTimer>& debounceMap() {  ///< 防抖计时器映射
+        static QHash<QString, QElapsedTimer> map; return map; }
 
     static void repositionToasts(QWidget* parent) {          ///< 消失后重排位置
         if (!parent) return;
@@ -192,8 +182,19 @@ private:
     QString m_message;                                 ///< 消息文本
     QGraphicsOpacityEffect* m_opacityEffect = nullptr; ///< 淡入淡出特效
 
-    static constexpr int kWidth = 320, kMinHeight = 48;   ///< 宽度 / 最小高度
-    static constexpr int kMargin = 16, kRadius = 8, kGap = 8; ///< 边距 / 圆角 / 间距
+    // ---- 统计计数器(静态，跨所有实例累积) ----
+    static inline quint64 s_totalShows = 0;          ///< 总显示次数
+    static inline quint64 s_totalDismisses = 0;      ///< 总消失次数
+    static inline quint64 s_totalErrors = 0;         ///< 总错误通知次数
+public:
+    static quint64 totalShows() { return s_totalShows; }       ///< 总显示次数
+    static quint64 totalDismisses() { return s_totalDismisses; } ///< 总消失次数
+    static quint64 totalErrors() { return s_totalErrors; }     ///< 总错误通知次数
+    /** @brief 重置吐司统计计数器 */
+    static void resetToastStatistics() { s_totalShows = 0; s_totalDismisses = 0; s_totalErrors = 0; }
+private:
+    static constexpr int kWidth = 320, kMinHeight = 48;
+    static constexpr int kMargin = 16, kRadius = 8, kGap = 8;
     static constexpr int kLeftBorder = 4, kPad = 12, kIconArea = 24, kIconSize = 14;
 };
 

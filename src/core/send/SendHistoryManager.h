@@ -68,6 +68,20 @@ public:
     /** @brief 获取智能补全实例（供外部查询状态） */
     SmartAutoComplete* smartComplete() const;
 
+    // ---- 统计计数器接口 ----
+
+    /** @brief 获取累计添加的历史记录数 @return 添加次数 */
+    quint64 totalAdds() const;
+
+    /** @brief 获取累计清空历史的次数 @return 清空次数 */
+    quint64 totalClears() const;
+
+    /** @brief 获取累计召回(补全选中)的次数 @return 召回次数 */
+    quint64 totalRecalls() const;
+
+    /** @brief 重置所有统计计数器(添加/清空/召回) */
+    void resetHistoryStatistics();
+
 protected:
     /** @brief 事件过滤器 — 拦截输入框键盘事件用于补全列表导航 */
     bool eventFilter(QObject* watched, QEvent* event) override;
@@ -81,6 +95,11 @@ private:
     QCompleter* m_completer = nullptr;      ///< 输入框基本补全器
     SmartAutoComplete* m_smartComplete = nullptr; ///< 智能补全弹出列表
     QLineEdit* m_input = nullptr;           ///< 绑定的输入框
+
+    // 统计计数器
+    quint64 m_totalAdds = 0;       ///< 累计添加的历史记录数
+    quint64 m_totalClears = 0;     ///< 累计清空历史的次数
+    quint64 m_totalRecalls = 0;    ///< 累计召回(补全选中)的次数
 };
 
 #endif // SENDHISTORYMANAGER_H

@@ -36,6 +36,7 @@ void FrameParser::processByte(unsigned char byte)
         QByteArray discarded = m_buffer;
         m_errorCount++;
         ++m_totalOverflows;
+        ++m_totalParseErrors;  // 溢出也是解析错误
         resetIntermediateState();
 
         emit frameError(
@@ -157,6 +158,7 @@ void FrameParser::handleLengthReceiving(unsigned char byte)
 
     if (m_expectedPayload < 0 || m_expectedPayload > effectiveMax) {
         m_errorCount++;
+        ++m_totalParseErrors;  // 无效帧长度
         emit frameError(
             tr("无效帧长度: %1 (最大允许: %2)")
                 .arg(m_expectedPayload).arg(effectiveMax),
@@ -182,6 +184,7 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
 
         if (expectedTotal > effectiveMax) {
             m_errorCount++;
+            ++m_totalParseErrors;  // 期望总长超出限制
             emit frameError(
                 tr("期望总帧长度 (%1) 超过最大值 (%2)")
                     .arg(expectedTotal).arg(effectiveMax),
@@ -201,6 +204,7 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
         if (m_buffer.size() > effectiveMax) {
             m_errorCount++;
             ++m_totalOverflows;
+            ++m_totalParseErrors;  // 帧尾搜索溢出
             emit frameError(
                 tr("帧缓冲区 (%1) 超过最大值 (%2)，搜索帧尾时溢出")
                     .arg(m_buffer.size()).arg(effectiveMax),
@@ -268,6 +272,7 @@ bool FrameParser::handleCrcValidation()
         if (!verifyChecksum(m_buffer)) {
             m_errorCount++;
             m_totalChecksumErrors++;
+            ++m_totalParseErrors;  // CRC校验失败
             emit frameError(tr("校验和不匹配"), m_buffer);
             resetIntermediateState();
             return false;
@@ -297,6 +302,7 @@ void FrameParser::handleChecksumVerifying(unsigned char byte)
     } else {
         m_errorCount++;
         m_totalChecksumErrors++;
+        ++m_totalParseErrors;  // 校验和不匹配
         emit frameError(tr("校验和不匹配"), m_buffer);
         resetIntermediateState();
     }
@@ -328,11 +334,13 @@ void FrameParser::handleFooterMatching(unsigned char byte)
         } else {
             m_errorCount++;
             m_totalChecksumErrors++;
+            ++m_totalParseErrors;  // 帧尾校验失败
             emit frameError(tr("校验和不匹配"), m_buffer);
             resetIntermediateState();
         }
     } else {
         m_errorCount++;
+        ++m_totalParseErrors;  // 帧尾不匹配
         emit frameError(tr("帧尾不匹配"), m_buffer);
         resetIntermediateState();
     }

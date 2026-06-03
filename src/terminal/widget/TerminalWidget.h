@@ -113,6 +113,21 @@ private:
     TerminalContextMenuManager* m_contextMenuManager;
     mutable QVector<CachedLine> m_cachedLines;
     mutable int m_cachedLineCount = 0;
+
+    // ---- 统计计数器 ----
+    mutable quint64 m_totalLinesRendered = 0;     ///< 总渲染行数
+    quint64 m_totalKeyPresses = 0;                ///< 总按键次数
+    quint64 m_totalContextMenuActions = 0;        ///< 总右键菜单操作次数
+
+public:
+    /** @brief 获取总渲染行数 @return 渲染行计数 */
+    quint64 totalLinesRendered() const { return m_totalLinesRendered; }
+    /** @brief 获取总按键次数 @return 按键计数 */
+    quint64 totalKeyPresses() const { return m_totalKeyPresses; }
+    /** @brief 获取总右键菜单操作次数 @return 菜单操作计数 */
+    quint64 totalContextMenuActions() const { return m_totalContextMenuActions; }
+    /** @brief 重置终端统计计数器 */
+    void resetTerminalWidgetStatistics();
 };
 
 #endif // TERMINALWIDGET_H

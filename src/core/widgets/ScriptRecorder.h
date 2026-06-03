@@ -43,5 +43,20 @@ private:
     QVector<ScriptAction> m_actions;
     bool m_recording = false; bool m_playing = false; int m_playbackIndex = 0;
     QElapsedTimer m_recordTimer; class QTimer* m_playbackTimer = nullptr;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalRecords = 0;     ///< 总录制动作数
+    quint64 m_totalPlaybacks = 0;   ///< 总回放次数
+    quint64 m_totalSends = 0;       ///< 总发送次数(录制+回放)
+
+public:
+    /** @brief 获取总录制动作数 @return 录制计数 */
+    quint64 totalRecords() const { return m_totalRecords; }
+    /** @brief 获取总回放次数 @return 回放计数 */
+    quint64 totalPlaybacks() const { return m_totalPlaybacks; }
+    /** @brief 获取总发送次数 @return 发送计数 */
+    quint64 totalSends() const { return m_totalSends; }
+    /** @brief 重置脚本统计计数器 */
+    void resetScriptStatistics();
 };
 #endif

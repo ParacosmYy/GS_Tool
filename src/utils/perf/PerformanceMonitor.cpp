@@ -37,6 +37,7 @@ void PerformanceMonitor::beginFrame()
 void PerformanceMonitor::endFrame()
 {
     m_frameCount++;
+    ++m_totalSamples;  // 累计采样计数
 
     const qint64 elapsed = m_frameTimer.elapsed(); ///< 本次帧耗时（ms）
     if (elapsed <= 0) {
@@ -48,6 +49,11 @@ void PerformanceMonitor::endFrame()
 
     // 由平均帧耗时计算 FPS
     m_fps = 1000.0 / m_avgFrameMs;
+
+    // 更新FPS极值
+    quint64 currentFps = static_cast<quint64>(m_fps);
+    if (currentFps > m_maxFps) m_maxFps = currentFps;
+    if (m_minFps == 0 || currentFps < m_minFps) m_minFps = currentFps;
 
     // 每 30 帧发射一次统计信号，避免过于频繁
     if (m_frameCount % 30 == 0) {
@@ -103,6 +109,7 @@ qint64 PerformanceMonitor::memoryUsageBytes() const
  */
 void PerformanceMonitor::recordLatency(const QString &tag, quint64 microseconds)
 {
+    ++m_totalMeasurements;  // 累计延迟测量计数
     QList<quint64> &list = m_latencyMap[tag];
     list.append(microseconds);
 
@@ -206,4 +213,41 @@ void PerformanceMonitor::clearLatency(const QString& tag)
 void PerformanceMonitor::clearAllLatency()
 {
     m_latencyMap.clear();
+}
+
+// ============================================================================
+// 统计计数器接口
+// ============================================================================
+
+/** @brief 获取累计采样帧数 @return 帧数 */
+quint64 PerformanceMonitor::totalSamples() const
+{
+    return m_totalSamples;
+}
+
+/** @brief 获取历史最高FPS @return 最大FPS值 */
+quint64 PerformanceMonitor::maxFps() const
+{
+    return m_maxFps;
+}
+
+/** @brief 获取历史最低FPS(至少采样一帧后有效) @return 最小FPS值 */
+quint64 PerformanceMonitor::minFps() const
+{
+    return m_minFps;
+}
+
+/** @brief 获取累计延迟测量次数 @return 测量次数 */
+quint64 PerformanceMonitor::totalMeasurements() const
+{
+    return m_totalMeasurements;
+}
+
+/** @brief 重置所有统计计数器(采样/FPS/测量次数) */
+void PerformanceMonitor::resetPerformanceStatistics()
+{
+    m_totalSamples = 0;
+    m_maxFps = 0;
+    m_minFps = 0;
+    m_totalMeasurements = 0;
 }

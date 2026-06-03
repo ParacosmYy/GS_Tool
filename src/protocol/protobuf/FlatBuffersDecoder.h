@@ -107,66 +107,43 @@ public:
      */
     QVariantMap decodeMessage(const QByteArray& data);
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计解码的消息总数 */
+    quint64 totalDecoded() const;
+    /** @brief 获取累计解码的字节总数 */
+    quint64 totalBytesDecoded() const;
+    /** @brief 获取累计解码错误次数 */
+    quint64 errorCount() const;
+    /** @brief 重置所有统计计数器 */
+    void resetDecoderStatistics();
+
 private:
-    /**
-     * @brief 解析表（Table）结构
-     * @param data 原始数据
-     * @param tableOffset 表偏移量
-     * @param rootTableName 根表类型名（空则用匿名模式）
-     * @return 字段映射
-     */
+    /** @brief 解析Table结构 @param data 原始数据 @param tableOffset 表偏移量 @param rootTableName 根表类型名 @return 字段映射 */
     QVariantMap parseTable(const QByteArray& data, int tableOffset,
                            const QString& rootTableName = QString()) const;
 
-    /**
-     * @brief 解析内联Struct字段
-     * @param data 原始数据
-     * @param basePos struct起始位置
-     * @param structDef struct定义
-     * @return 字段映射
-     */
+    /** @brief 解析内联Struct字段 @param data 原始数据 @param basePos struct起始位置 @param structDef struct定义 @return 字段映射 */
     QVariantMap parseStruct(const QByteArray& data, int basePos,
                             const FbsStructDef& structDef) const;
 
-    /** @brief 读取指定偏移处的32位小端无符号整数 */
+    /** @brief 读取32位小端无符号整数 */
     quint32 readOffset(const QByteArray& data, int offset) const;
-
     /** @brief 读取16位小端无符号整数 */
     quint16 readUint16(const QByteArray& data, int offset) const;
 
-    /**
-     * @brief 将类型名字符串解析为FbsBasicType
-     * @param typeName 类型名
-     * @return 对应的基本类型枚举
-     */
+    /** @brief 将类型名字符串解析为FbsBasicType @param typeName 类型名 @return 基本类型枚举 */
     FbsBasicType parseBasicType(const QString& typeName) const;
 
-    /**
-     * @brief 根据标量类型读取值
-     * @param data 原始数据
-     * @param pos 数据位置
-     * @param type 标量类型
-     * @return 解析后的值
-     */
+    /** @brief 根据标量类型读取值 @param data 原始数据 @param pos 数据位置 @param type 标量类型 @return 解析后的值 */
     QVariant readScalarValue(const QByteArray& data, int pos,
                              FbsBasicType type) const;
 
-    /**
-     * @brief 根据完整类型信息读取字段值（含嵌套table/struct/string/enum）
-     * @param data 原始数据
-     * @param pos 字段数据位置
-     * @param type 字段类型
-     * @param typeName 自定义类型名（struct/table/enum引用时使用）
-     * @return 解析后的值
-     */
+    /** @brief 根据完整类型信息读取字段值（含嵌套table/struct/string/enum） */
     QVariant readTypedValue(const QByteArray& data, int pos,
                             FbsBasicType type, const QString& typeName) const;
 
-    /**
-     * @brief 查找指定名称的根表定义
-     * 优先查找root_type声明，否则返回第一个table
-     * @return 根表定义指针，无则nullptr
-     */
+    /** @brief 查找根表定义（优先root_type声明，否则第一个table） @return 根表定义指针 */
     const FbsTableDef* findRootTable() const;
 
     // ── FBS文本解析辅助方法 ──
@@ -183,6 +160,10 @@ private:
     QMap<QString, FbsStructDef> m_structs;  ///< 已解析的结构体定义
     QMap<QString, FbsEnumDef>   m_enums;    ///< 已解析的枚举定义
     QString m_rootTypeName;                 ///< root_type声明的主表名
+
+    quint64 m_totalDecoded = 0;     ///< 累计解码消息总数
+    quint64 m_totalBytesDecoded = 0;///< 累计解码字节总数
+    quint64 m_errorCount = 0;       ///< 累计解码错误次数
 };
 
 #endif // FLATBUFFERS_DECODER_H

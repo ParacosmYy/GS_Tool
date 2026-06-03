@@ -229,6 +229,7 @@ void ChartWidget::setAutoYRange(bool enabled)
 void ChartWidget::onFrameParsed(const QVariantMap& fields, const QByteArray& rawFrame)
 {
     if (m_paused) return;
+    ++m_totalDataUpdates;
     m_model->onFrameParsed(fields, rawFrame);
 }
 
@@ -240,6 +241,8 @@ void ChartWidget::onFrameParsed(const QVariantMap& fields, const QByteArray& raw
 void ChartWidget::updateChart(const QStringList& updatedChannels)
 {
     if (m_paused) return;
+
+    ++m_totalRenders;
 
     // 刷新每个更新通道的series数据
     for (const QString& name : updatedChannels) {
@@ -367,6 +370,7 @@ void ChartWidget::onDataCleared()
 /** @brief 暂停/继续按钮切换回调 @param paused true=暂停 */
 void ChartWidget::onPauseToggled(bool paused)
 {
+    ++m_totalInteractions;
     m_paused = paused;
     m_pauseBtn->setText(paused ? tr("继续") : tr("暂停"));
 }
@@ -374,6 +378,7 @@ void ChartWidget::onPauseToggled(bool paused)
 /** @brief 清除按钮回调：清空波形数据和series */
 void ChartWidget::onClearClicked()
 {
+    ++m_totalInteractions;
     clear();
 }
 
@@ -486,4 +491,16 @@ void ChartWidget::removeSeries(const QString& name)
     m_chart->removeSeries(it.value());
     it.value()->deleteLater();
     m_seriesMap.erase(it);
+}
+
+// ============================================================================
+// 统计计数器
+// ============================================================================
+
+/** @brief 重置波形图统计计数器(数据更新/渲染/交互) */
+void ChartWidget::resetChartWidgetStatistics()
+{
+    m_totalDataUpdates = 0;
+    m_totalRenders = 0;
+    m_totalInteractions = 0;
 }

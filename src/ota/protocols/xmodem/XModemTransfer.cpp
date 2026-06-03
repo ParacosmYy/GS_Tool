@@ -302,6 +302,18 @@ void XModemTransfer::updateTransferStats()
     m_lastStatsBytes = m_bytesSent;
 }
 
+quint64 XModemTransfer::totalBlocksSent() const { return m_totalBlocksSent; }
+quint64 XModemTransfer::totalRetries() const { return m_totalRetries; }
+quint64 XModemTransfer::totalModeSwitches() const { return m_totalModeSwitches; }
+quint64 XModemTransfer::xmodemErrorCount() const { return m_xmodemErrorCount; }
+
+void XModemTransfer::resetXmodemStatistics()
+{
+    m_totalBlocksSent = 0;
+    m_totalRetries = 0;
+    m_totalModeSwitches = 0;
+    m_xmodemErrorCount = 0;
+}
 /** @brief 设置XMODEM状态机状态
  *  @param newState 目标状态 */
 void XModemTransfer::setState(State newState)

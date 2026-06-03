@@ -69,6 +69,13 @@ public:
     /** @brief 获取ETA(秒)，无法估算时返回-1 */
     double etaSeconds() const;
 
+    // ---- 统计接口 ----
+    quint64 totalBlocksSent() const;         ///< 累计发送块总数
+    quint64 totalRetries() const;            ///< 累计重试次数
+    quint64 totalModeSwitches() const;       ///< 累计模式降级次数
+    quint64 xmodemErrorCount() const;        ///< 累计错误次数
+    void resetXmodemStatistics();            ///< 重置统计计数器
+
 signals:
     /** @brief 传输速率和ETA更新信号 @param rateBytesPerSec 速率 @param etaSec ETA秒数，-1无法估算 */
     void transferStats(double rateBytesPerSec, double etaSec);
@@ -164,6 +171,12 @@ private:
     QElapsedTimer m_transferTimer;   ///< 传输耗时计时器
     qint64 m_lastStatsBytes = 0;     ///< 上次统计时的已发送字节数
     double m_currentRate = 0.0;      ///< 当前传输速率(字节/秒)
+
+    // ---- 统计计数器 ----
+    quint64 m_totalBlocksSent = 0;       ///< 累计发送块总数
+    quint64 m_totalRetries = 0;          ///< 累计重试次数
+    quint64 m_totalModeSwitches = 0;     ///< 累计模式降级次数
+    quint64 m_xmodemErrorCount = 0;      ///< 累计错误次数
 };
 
 #endif // XMODEMTRANSFER_H

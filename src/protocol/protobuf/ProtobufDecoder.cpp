@@ -31,9 +31,12 @@ bool ProtobufDecoder::isLoaded() const {
 QVariantMap ProtobufDecoder::decodeMessage(const QByteArray& data) {
     QVariantMap result;
     if (data.isEmpty()) {
+        ++m_errorCount;
         emit decodeError(tr("数据为空"));
         return result;
     }
+
+    m_totalBytesDecoded += static_cast<quint64>(data.size());
 
     int offset = 0;
     while (offset < data.size()) {
@@ -45,6 +48,7 @@ QVariantMap ProtobufDecoder::decodeMessage(const QByteArray& data) {
         result[QString::number(fieldNum)] = fieldInfo;
     }
 
+    ++m_totalDecoded;
     emit decoded(result);
     return result;
 }
@@ -204,4 +208,32 @@ QPair<QVariantMap, int> ProtobufDecoder::decodeField(const QByteArray& data,
     }
 
     return {field, offset + consumed};
+}
+
+// ── 统计接口实现 ──
+
+/** @brief 获取累计解码的消息总数 @return 解码总数 */
+quint64 ProtobufDecoder::totalDecoded() const
+{
+    return m_totalDecoded;
+}
+
+/** @brief 获取累计解码的字节总数 @return 字节总数 */
+quint64 ProtobufDecoder::totalBytesDecoded() const
+{
+    return m_totalBytesDecoded;
+}
+
+/** @brief 获取累计解码错误次数 @return 错误次数 */
+quint64 ProtobufDecoder::errorCount() const
+{
+    return m_errorCount;
+}
+
+/** @brief 重置所有统计计数器 */
+void ProtobufDecoder::resetDecoderStatistics()
+{
+    m_totalDecoded = 0;
+    m_totalBytesDecoded = 0;
+    m_errorCount = 0;
 }

@@ -106,26 +106,13 @@ public:
 
     // ---- 会话统计 ----
 
-    /** @brief 获取累计写入的日志记录总数 @return 记录条数 */
-    quint64 totalLogsWritten() const;
-
-    /** @brief 获取累计添加的书签总数(含已删除) @return 书签总数 */
-    quint64 totalBookmarks() const;
-
-    /** @brief 获取累计录制的记录条数 @return 记录条数 */
-    quint64 totalRecords() const;
-
-    /** @brief 获取累计录制的字节总数 @return 字节数 */
-    quint64 totalBytesRecorded() const;
-
-    /** @brief 获取累计回放启动次数 @return 回放次数 */
-    quint64 totalPlaybacks() const;
-
-    /** @brief 获取累计发生的错误次数 @return 错误次数 */
-    quint64 totalErrors() const;
-
-    /** @brief 重置所有会话统计计数器(不影响录制/回放状态) */
-    void resetStats();
+    quint64 totalLogsWritten() const;     ///< 获取累计写入的日志记录总数
+    quint64 totalBookmarks() const;       ///< 获取累计添加的书签总数(含已删除)
+    quint64 totalRecords() const;         ///< 获取累计录制的记录条数
+    quint64 totalBytesRecorded() const;   ///< 获取累计录制的字节总数
+    quint64 totalPlaybacks() const;       ///< 获取累计回放启动次数
+    quint64 totalErrors() const;          ///< 获取累计发生的错误次数
+    void resetStats();                    ///< 重置所有会话统计计数器
 
 signals:
     /** @brief 录制已启动 */

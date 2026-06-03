@@ -52,6 +52,23 @@ public:
     /** @brief 获取定时发送器实例，供外部配置界面使用 */
     TimedSender* timedSender() const;
 
+    // ---- 统计计数器接口 ----
+
+    /** @brief 获取累计发送操作总次数 @return 发送次数 */
+    quint64 totalSends() const;
+
+    /** @brief 获取累计发送的字节总数 @return 字节数 */
+    quint64 totalBytesSent() const;
+
+    /** @brief 获取累计HEX模式发送次数 @return HEX发送次数 */
+    quint64 totalHexSends() const;
+
+    /** @brief 获取累计发送错误次数 @return 错误次数 */
+    quint64 totalErrors() const;
+
+    /** @brief 重置所有统计计数器(发送/字节/HEX/错误) */
+    void resetSendStatistics();
+
 signals:
     /** @brief 数据成功发送信号 @param bytes 成功写入的字节数 */
     void dataSent(qint64 bytes);
@@ -102,6 +119,12 @@ private:
 
     /** @brief 自动追加换行符选择: 0=无, 1=\r\n, 2=\n, 3=\r */
     QComboBox* m_newlineCombo = nullptr;
+
+    // 统计计数器
+    quint64 m_totalSends = 0;       ///< 累计发送操作总次数
+    quint64 m_totalBytesSent = 0;   ///< 累计发送的字节总数
+    quint64 m_totalHexSends = 0;    ///< 累计HEX模式发送次数
+    quint64 m_totalErrors = 0;      ///< 累计发送错误次数
 };
 
 #endif // SENDCONTROLLER_H

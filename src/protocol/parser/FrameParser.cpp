@@ -141,7 +141,13 @@ quint64 FrameParser::totalChecksumErrors() const { return m_totalChecksumErrors;
 /** @brief 获取累计溢出次数（帧超过最大长度被丢弃） @return 溢出次数 */
 quint64 FrameParser::totalOverflows() const { return m_totalOverflows; }
 
-/** @brief 重置所有统计计数器(帧数/字节/校验错误/溢出) */
+/** @brief 获取累计解析错误次数(含格式错/长度错/帧尾不匹配/超时) @return 错误次数 */
+quint64 FrameParser::totalParseErrors() const { return m_totalParseErrors; }
+
+/** @brief 获取成功解析帧中的有效数据字节总数 @return 字节数 */
+quint64 FrameParser::totalBytesParsed() const { return m_totalBytesParsed; }
+
+/** @brief 重置所有统计计数器(帧数/字节/校验错误/溢出/解析错误/已解析字节) */
 void FrameParser::resetStats()
 {
     m_frameCount = 0;
@@ -150,6 +156,8 @@ void FrameParser::resetStats()
     m_totalBytesInput = 0;
     m_totalChecksumErrors = 0;
     m_totalOverflows = 0;
+    m_totalParseErrors = 0;
+    m_totalBytesParsed = 0;
 }
 
 // ============================================================================
@@ -168,6 +176,7 @@ bool FrameParser::checkTimeout()
         quint64 discardedSize = static_cast<quint64>(m_buffer.size());
         resetIntermediateState();
         m_errorCount++;
+        ++m_totalParseErrors;  // 帧超时
 
         emit frameError(
             tr("帧超时: 已接收 %1 字节 (%2ms)，不完整帧已丢弃")
@@ -204,6 +213,7 @@ void FrameParser::completeFrame()
     QVariantMap fields = extractFields(m_buffer);
     m_frameCount++;
     m_totalFramesParsed++;
+    m_totalBytesParsed += static_cast<quint64>(m_buffer.size());  // 累计已解析字节
     emit frameParsed(fields, m_buffer);
     reset();
 }

@@ -120,6 +120,7 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
             if (modelLine < 0 || modelLine >= m_cachedLines.size()) break;
             y = paintLine(painter, m_cachedLines[modelLine], y, i);
         }
+        m_totalLinesRendered += static_cast<quint64>(endLine - m_scrollOffset);
         return;
     }
 
@@ -142,4 +143,5 @@ void TerminalWidget::paintEvent(QPaintEvent* event)
     int y = 0;
     for (int i = m_scrollOffset; i < endLine; ++i)
         y = paintLine(painter, m_cachedLines[i], y, i);
+    m_totalLinesRendered += static_cast<quint64>(endLine - m_scrollOffset);
 }

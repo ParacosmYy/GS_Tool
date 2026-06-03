@@ -154,11 +154,17 @@ bool FlatBuffersDecoder::loadFbsFile(const QString& filePath) {
 bool FlatBuffersDecoder::isLoaded() const { return m_loaded; }
 
 QVariantMap FlatBuffersDecoder::decodeMessage(const QByteArray& data) {
-    if (data.size() < 8) { return {}; }
+    if (data.size() < 8) {
+        ++m_errorCount;
+        return {};
+    }
+    m_totalBytesDecoded += static_cast<quint64>(data.size());
     quint32 rootOff = readOffset(data, 0);
     const FbsTableDef* root = findRootTable();
-    return parseTable(data, static_cast<int>(rootOff),
+    QVariantMap result = parseTable(data, static_cast<int>(rootOff),
                       root ? root->name : QString());
+    ++m_totalDecoded;
+    return result;
 }
 
 // ───────────────────── FBS文本解析 ─────────────────────
@@ -388,4 +394,32 @@ const FbsTableDef* FlatBuffersDecoder::findRootTable() const {
     }
     if (!m_tables.isEmpty()) return &m_tables.constBegin().value();
     return nullptr;
+}
+
+// ── 统计接口实现 ──
+
+/** @brief 获取累计解码的消息总数 @return 解码总数 */
+quint64 FlatBuffersDecoder::totalDecoded() const
+{
+    return m_totalDecoded;
+}
+
+/** @brief 获取累计解码的字节总数 @return 字节总数 */
+quint64 FlatBuffersDecoder::totalBytesDecoded() const
+{
+    return m_totalBytesDecoded;
+}
+
+/** @brief 获取累计解码错误次数 @return 错误次数 */
+quint64 FlatBuffersDecoder::errorCount() const
+{
+    return m_errorCount;
+}
+
+/** @brief 重置所有统计计数器 */
+void FlatBuffersDecoder::resetDecoderStatistics()
+{
+    m_totalDecoded = 0;
+    m_totalBytesDecoded = 0;
+    m_errorCount = 0;
 }

@@ -195,6 +195,21 @@ private:
     // ---- 波形交互组件 ----
     CursorOverlay* m_cursorOverlay;   ///< 游标测量叠加层
     ZoomController* m_zoomController; ///< 缩放/平移控制器
+
+    // ---- 统计计数器 ----
+    quint64 m_totalDataUpdates = 0;    ///< 总数据更新次数
+    quint64 m_totalRenders = 0;        ///< 总渲染次数
+    quint64 m_totalInteractions = 0;   ///< 总交互次数(暂停/清除等)
+
+public:
+    /** @brief 获取总数据更新次数 @return 数据更新计数 */
+    quint64 totalDataUpdates() const { return m_totalDataUpdates; }
+    /** @brief 获取总渲染次数 @return 渲染计数 */
+    quint64 totalRenders() const { return m_totalRenders; }
+    /** @brief 获取总交互次数 @return 交互计数 */
+    quint64 totalInteractions() const { return m_totalInteractions; }
+    /** @brief 重置波形图统计计数器 */
+    void resetChartWidgetStatistics();
 };
 
 #endif // CHARTWIDGET_H

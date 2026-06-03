@@ -48,6 +48,20 @@ public:
      */
     QByteArray encodeMessage(const QVariantMap& fields);
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计解码的消息总数 */
+    quint64 totalDecoded() const;
+
+    /** @brief 获取累计解码的字节总数 */
+    quint64 totalBytesDecoded() const;
+
+    /** @brief 获取累计解码错误次数 */
+    quint64 errorCount() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetDecoderStatistics();
+
 signals:
     /** @brief 消息解码完成 */
     void decoded(const QVariantMap& result);
@@ -79,6 +93,10 @@ private:
 
     QString m_protoFilePath;  ///< .proto文件路径
     bool    m_loaded = false; ///< 是否已加载模式
+
+    quint64 m_totalDecoded = 0;     ///< 累计解码消息总数
+    quint64 m_totalBytesDecoded = 0;///< 累计解码字节总数
+    quint64 m_errorCount = 0;       ///< 累计解码错误次数
 };
 
 #endif // PROTOBUF_DECODER_H

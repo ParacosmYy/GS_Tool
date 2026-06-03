@@ -112,6 +112,20 @@ public:
     /** @brief 获取事件总线的统计信息 (用于调试) */
     QMap<QString, int> statistics() const;
 
+    // ---- 统计计数器接口 ----
+
+    /** @brief 获取累计发布的事件总数(同步+异步) @return 事件数 */
+    quint64 totalPublished() const;
+
+    /** @brief 获取累计订阅操作总数 @return 订阅数 */
+    quint64 totalSubscriptions() const;
+
+    /** @brief 获取累计调用的回调处理器总数 @return 调用次数 */
+    quint64 totalHandlersCalled() const;
+
+    /** @brief 重置所有统计计数器(发布/订阅/回调次数) */
+    void resetEventStatistics();
+
 signals:
     /**
      * @brief 事件发布信号 (内部使用，支持跨线程异步发布)
@@ -136,6 +150,11 @@ private:
     QMap<int, Subscription> m_subscriptions;       ///< 订阅 ID → 订阅记录
     QMultiMap<QString, int> m_eventSubscriptions;  ///< 事件名称 → 订阅 ID 列表
     mutable std::mutex m_mutex;                     ///< 线程安全互斥锁
+
+    // 统计计数器
+    quint64 m_totalPublished = 0;       ///< 累计发布的事件总数(同步+异步)
+    quint64 m_totalSubscriptions = 0;   ///< 累计订阅操作总数
+    quint64 m_totalHandlersCalled = 0;  ///< 累计调用的回调处理器总数
 
     /** @brief 处理异步事件发布 */
     void handleAsyncEvent(const QString& eventName, const QVariant& data);

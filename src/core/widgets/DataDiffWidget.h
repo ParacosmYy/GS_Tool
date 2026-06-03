@@ -76,6 +76,21 @@ private:
     int m_added = 0;
     int m_removed = 0;
     int m_modified = 0;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalComparisons = 0;     ///< 总对比次数
+    quint64 m_totalDiffs = 0;           ///< 总差异数(新增+删除+修改累计)
+    quint64 m_totalBytesCompared = 0;   ///< 总对比字节数
+
+public:
+    /** @brief 获取总对比次数 @return 对比计数 */
+    quint64 totalComparisons() const { return m_totalComparisons; }
+    /** @brief 获取总差异数 @return 差异计数 */
+    quint64 totalDiffs() const { return m_totalDiffs; }
+    /** @brief 获取总对比字节数 @return 字节计数 */
+    quint64 totalBytesCompared() const { return m_totalBytesCompared; }
+    /** @brief 重置对比统计计数器 */
+    void resetDiffStatistics();
 };
 
 #endif // DATA_DIFF_WIDGET_H

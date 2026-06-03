@@ -95,6 +95,9 @@ void DataDiffWidget::setData(const QString& leftData, const QString& rightData)
     const QStringList leftLines = leftData.split('\n');
     const QStringList rightLines = rightData.split('\n');
 
+    ++m_totalComparisons;
+    m_totalBytesCompared += static_cast<quint64>(leftData.size() + rightData.size());
+
     m_diffResult = computeDiff(leftLines, rightLines);
     refreshDisplay();
 }
@@ -215,6 +218,7 @@ void DataDiffWidget::refreshDisplay()
     m_statsLabel->setText(
         tr("差异统计: +%1 新增  -%2 删除  ~%3 修改")
             .arg(m_added).arg(m_removed).arg(m_modified));
+    m_totalDiffs += static_cast<quint64>(m_added + m_removed + m_modified);
 }
 
 // ============================================================================

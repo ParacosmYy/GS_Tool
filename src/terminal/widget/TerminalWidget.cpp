@@ -301,6 +301,8 @@ void TerminalWidget::mouseReleaseEvent(QMouseEvent* event)
 /** @brief 键盘事件：Ctrl+C复制、Ctrl+F搜索、F3/Shift+F3导航匹配、Ctrl+A全选 @param event 键盘事件 */
 void TerminalWidget::keyPressEvent(QKeyEvent* event)
 {
+    ++m_totalKeyPresses;
+
     // Ctrl+C 复制选中内容 — 精确匹配 Ctrl 修饰键，避免 Ctrl+Shift+C 被误拦截
     if (event->key() == Qt::Key_C && event->modifiers() == Qt::ControlModifier) {
         QString text = selectedText();
@@ -396,6 +398,7 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
 /** @brief 右键菜单事件：弹出复制/全选/清屏/搜索菜单 @param event 右键菜单事件 */
 void TerminalWidget::contextMenuEvent(QContextMenuEvent* event)
 {
+    ++m_totalContextMenuActions;
     m_contextMenuManager->showContextMenu(event, !selectedText().isEmpty());
 }
 
@@ -409,4 +412,13 @@ void TerminalWidget::selectAll()
         m_selectionManager->setSelection(0, totalLines - 1);
         update();
     }
+}
+
+// ---- 统计计数器 ----
+/** @brief 重置终端统计计数器(渲染行数/按键/右键菜单操作) */
+void TerminalWidget::resetTerminalWidgetStatistics()
+{
+    m_totalLinesRendered = 0;
+    m_totalKeyPresses = 0;
+    m_totalContextMenuActions = 0;
 }

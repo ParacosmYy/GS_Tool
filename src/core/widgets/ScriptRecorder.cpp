@@ -75,6 +75,7 @@ void ScriptRecorder::stopRecording() {
 }
 void ScriptRecorder::recordSendAction(const QString& data, bool isHex) {
     if(!m_recording) return;
+    ++m_totalRecords; ++m_totalSends;
     qint64 el=m_recordTimer.elapsed();
     if(!m_actions.isEmpty()&&el>50) m_actions.append({ScriptActionType::Delay,QString::number(el),false,0});
     m_actions.append({ScriptActionType::SendData,data,isHex,el});
@@ -84,6 +85,7 @@ void ScriptRecorder::recordSendAction(const QString& data, bool isHex) {
 
 void ScriptRecorder::startPlayback() {
     if(m_actions.isEmpty()){m_statusLabel->setText(tr("无动作可回放"));return;}
+    ++m_totalPlaybacks;
     m_playing=true; m_playbackIndex=0; m_recordBtn->setEnabled(false);
     m_playBtn->setEnabled(false); m_stopBtn->setEnabled(true);
     m_statusLabel->setText(tr("回放中...")); emit playbackChanged(true); executeNextAction();
@@ -99,6 +101,7 @@ void ScriptRecorder::executeNextAction() {
     emit playbackProgress(m_playbackIndex+1,m_actions.size());
     const auto& a=m_actions[m_playbackIndex]; int spd=m_speedSlider->value();
     if(a.type==ScriptActionType::SendData){
+        ++m_totalSends;
         emit playbackSendRequested(a.data,a.isHex); m_playbackIndex++; m_playbackTimer->start(10);
     }else if(a.type==ScriptActionType::Delay){
         m_playbackIndex++; m_playbackTimer->start(qMax(1,a.data.toInt()/spd));
@@ -143,4 +146,12 @@ void ScriptRecorder::loadFromFile(const QString& path) {
             o["data"].toString(),o["isHex"].toBool(),o["timestamp"].toInteger()});
     }
     refreshList(); m_statusLabel->setText(tr("已加载(%1条)").arg(m_actions.size()));
+}
+
+/** @brief 重置脚本统计计数器(录制/回放/发送) */
+void ScriptRecorder::resetScriptStatistics()
+{
+    m_totalRecords = 0;
+    m_totalPlaybacks = 0;
+    m_totalSends = 0;
 }

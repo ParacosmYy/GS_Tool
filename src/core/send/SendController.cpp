@@ -140,6 +140,7 @@ bool SendController::sendAndRecord(const QByteArray& data)
 {
     // 前置检查1: 连接是否存在
     if (!m_currentConn) {
+        ++m_totalErrors;  // 未连接发送错误
         emit statusMessage(tr("发送失败: 未建立连接，请先连接串口"));
         return false;
     }
@@ -163,6 +164,7 @@ bool SendController::sendAndRecord(const QByteArray& data)
             break;
         }
         emit statusMessage(tr("发送失败: 连接状态为 %1，无法发送数据").arg(stateText));
+        ++m_totalErrors;  // 连接状态异常错误
         return false;
     }
 
@@ -177,6 +179,7 @@ bool SendController::sendAndRecord(const QByteArray& data)
         qint64 written = m_currentConn->write(data.mid(static_cast<int>(totalWritten), remaining));
         if (written <= 0) {
             // 写入返回 0 或负值: 连接可能已断开，立即终止
+            ++m_totalErrors;  // 写入失败错误
             emit statusMessage(tr("发送失败: 写入返回 %1，已发送 %2/%3 字节")
                                    .arg(written).arg(totalWritten).arg(data.size()));
             return false;
@@ -197,6 +200,8 @@ bool SendController::sendAndRecord(const QByteArray& data)
     QByteArray sentData = data.left(static_cast<int>(totalWritten));
     m_terminalModel->appendSent(sentData);
     m_dataLogger->logData(sentData, DataLogger::Direction::Sent);
+    ++m_totalSends;  // 累计发送次数
+    m_totalBytesSent += static_cast<quint64>(totalWritten);  // 累计发送字节数
     emit dataSent(totalWritten);
     return true;
 }
@@ -255,6 +260,7 @@ void SendController::onSendData()
 
     if (sendAndRecord(data)) {
         // 发送成功: 通过历史管理器记录 → 清空输入框 → 清除错误状态
+        if (isHex) ++m_totalHexSends;  // 累计HEX模式发送计数
         m_historyManager->recordHistory(text, isHex);
         m_sendInput->clear();
         m_sendInput->setProperty("hasError", false);
@@ -270,4 +276,39 @@ void SendController::onSendData()
 void SendController::onQuickCommand(const QByteArray& data)
 {
     sendAndRecord(data);
+}
+
+// ---- 统计计数器接口 ----
+
+/** @brief 获取累计发送操作总次数 @return 发送次数 */
+quint64 SendController::totalSends() const
+{
+    return m_totalSends;
+}
+
+/** @brief 获取累计发送的字节总数 @return 字节数 */
+quint64 SendController::totalBytesSent() const
+{
+    return m_totalBytesSent;
+}
+
+/** @brief 获取累计HEX模式发送次数 @return HEX发送次数 */
+quint64 SendController::totalHexSends() const
+{
+    return m_totalHexSends;
+}
+
+/** @brief 获取累计发送错误次数 @return 错误次数 */
+quint64 SendController::totalErrors() const
+{
+    return m_totalErrors;
+}
+
+/** @brief 重置所有统计计数器(发送/字节/HEX/错误) */
+void SendController::resetSendStatistics()
+{
+    m_totalSends = 0;
+    m_totalBytesSent = 0;
+    m_totalHexSends = 0;
+    m_totalErrors = 0;
 }

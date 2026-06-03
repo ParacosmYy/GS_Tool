@@ -133,6 +133,40 @@ bool parseWithStats(const QString& filePath, QByteArray& outBinary,
  */
 void computeStats(const QVector<Record>& records, ParseStats& stats);
 
+// ---- 累积统计类 ----
+
+/**
+ * @brief Intel HEX解析器累积统计追踪器
+ *
+ * 跨多次parse调用的累积统计，追踪总解析记录数、总解析字节数和错误次数。
+ * 与ParseStats（单次解析操作的快照统计）互补。
+ */
+class ParserStatsTracker {
+public:
+    /** @brief 获取累计解析的HEX记录总数 */
+    quint64 totalRecordsParsed() const;
+
+    /** @brief 获取累计解析的数据字节总数 */
+    quint64 totalBytesParsed() const;
+
+    /** @brief 获取累计解析错误次数 */
+    quint64 errorCount() const;
+
+    /** @brief 重置所有累积统计计数器 */
+    void resetParserStatistics();
+
+    /**
+     * @brief 从一次解析结果中累加统计
+     * @param stats 单次解析的统计快照
+     */
+    void accumulate(const ParseStats& stats);
+
+private:
+    quint64 m_totalRecordsParsed = 0; ///< 累计解析记录总数
+    quint64 m_totalBytesParsed = 0;   ///< 累计解析数据字节总数
+    quint64 m_errorCount = 0;         ///< 累计解析错误次数
+};
+
 } // namespace IntelHex
 
 #endif // INTELHEXPARSER_H
