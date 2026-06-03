@@ -51,6 +51,7 @@ bool DbcParser::loadFromFile(const QString& filePath)
 bool DbcParser::parseFromText(const QString& content)
 {
     clear();
+    ++m_totalParses;
 
     const QStringList lines = content.split('\n');
     uint32_t currentMsgId = 0;
@@ -167,6 +168,7 @@ QMap<QString, double> DbcParser::decodeFrame(uint32_t msgId,
         const double physical = static_cast<double>(raw) * sig.factor + sig.offset;
         result[sig.name] = physical;
     }
+    m_totalSignalsDecoded += static_cast<quint64>(msg.signalList.size());
 
     return result;
 }
@@ -283,6 +285,7 @@ bool DbcParser::parseMessageLine(const QString& line)
 
     m_messages[msg.id] = msg;
     m_nameToId[msg.name] = msg.id;
+    ++m_totalMessagesParsed;
     return true;
 }
 
@@ -516,4 +519,17 @@ uint64_t DbcParser::extractBits(const QByteArray& data, int startBit,
     }
 
     return result;
+}
+
+quint64 DbcParser::totalParses() const { return m_totalParses; }
+quint64 DbcParser::totalMessagesParsed() const { return m_totalMessagesParsed; }
+quint64 DbcParser::totalSignalsDecoded() const { return m_totalSignalsDecoded; }
+quint64 DbcParser::totalParseErrors() const { return m_totalParseErrors; }
+
+void DbcParser::resetDbcStatistics()
+{
+    m_totalParses = 0;
+    m_totalMessagesParsed = 0;
+    m_totalSignalsDecoded = 0;
+    m_totalParseErrors = 0;
 }

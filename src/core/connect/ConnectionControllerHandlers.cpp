@@ -71,6 +71,7 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
         // 错误状态: 发送 Toast 错误通知（区分 Error 和普通 Disconnected）
         if (state == ConnectionState::Error) {
             emit connectionError(connName, tr("连接发生错误"));
+            ++m_errorCount;
         }
 
         // 自动重连: 仅在非用户主动断开且已启用时触发

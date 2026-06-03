@@ -115,4 +115,6 @@
 | 124 | feat: PortWatcher/RecordingController/TerminalModel/TerminalSearchManager统计增强 | 124 |
 | 125-140 | UdpConnection/TlsConnection/WebSocketConnection/ModbusMaster/FrameParser/ProtocolSchema/TimestampAnalyzer/PacketBuilder/DataExporter/接口层/统计增强+接口层占位+WebSocketConnection/ModbusMaster/EventBus/I2cConnection/UsbConnection/RecordingMarker/RecordingMarker扩展+AppDialog统一弹窗+MQTT修复+多模块重构 | 140 |
 | 141 | fix(mqtt): MqttConnection统计增强+ToastNotification组件+评分追踪补全#125-#140 | 141 |
+| 142 | feat(stats): NavigationController/SettingsManager/SessionManager/IconManager/ShortcutManager/BleScanner/DashboardSerializer统计增强 | 142 |
+| 143 | feat(stats): ChartModel/FftEngine/ZoomController/CursorOverlay/ProtocolEngine/ProtocolSchema/OtaHistoryModel/BaseTransfer/DataStatistics/TrafficMonitor/TerminalLayoutManager统计增强 | 143 |
 | ... | 目标: 1000分 | 1000 |

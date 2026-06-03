@@ -125,6 +125,7 @@ void BleGattModel::setServices(const QVariantList& services)
     for (const QVariant& svcVar : services) {
         const QVariantMap svcMap = svcVar.toMap();
         buildNode(svcMap, m_rootNode);
+        ++m_totalServicesDiscovered;
     }
 
     endResetModel();
@@ -164,6 +165,15 @@ void BleGattModel::buildNode(const QVariantMap& itemMap, GattNode* parentNode)
     } else {
         for (const QVariant& childVar : children) {
             buildNode(childVar.toMap(), node);
+            ++m_totalCharacteristicsRead;
         }
     }
+}
+
+void BleGattModel::resetGattStatistics()
+{
+    m_totalServicesDiscovered = 0;
+    m_totalCharacteristicsRead = 0;
+    m_totalWrites = 0;
+    m_errorCount = 0;
 }

@@ -165,6 +165,7 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
 
     // 通知 Toast: 串口连接成功
     emit connectionSucceeded(m_connectedPortName);
+    ++m_totalConnections;
 }
 
 /** @brief 关闭当前连接, 设置用户主动断开标记防止自动重连 */
@@ -180,6 +181,7 @@ void ConnectionController::disconnectCurrent()
         teardownConnection(tr("用户主动断开"));
         // 通知 Toast: 用户主动断开连接
         emit connectionDisconnected(portName);
+        ++m_totalDisconnections;
     }
 }
 
@@ -277,6 +279,7 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
 
     // 通知 Toast: 网络连接成功
     emit connectionSucceeded(m_currentConn ? m_currentConn->name() : tr("网络"));
+    ++m_totalConnections;
 }
 
 /** @brief 返回当前活动连接指针 @return IConnection指针，无连接时为nullptr */
@@ -298,3 +301,24 @@ PortWatcher* ConnectionController::portWatcher() const { return m_portWatcher; }
 
 // onAutoReconnect() → ConnectionControllerReconnect.cpp
 // calcBackoffInterval() → ConnectionControllerReconnect.cpp
+
+/** @brief 获取累计成功连接次数 @return 连接总次数 */
+quint64 ConnectionController::totalConnections() const { return m_totalConnections; }
+
+/** @brief 获取累计断开连接次数 @return 断开总次数 */
+quint64 ConnectionController::totalDisconnections() const { return m_totalDisconnections; }
+
+/** @brief 获取累计自动重连次数 @return 重连总次数 */
+quint64 ConnectionController::totalReconnects() const { return m_totalReconnects; }
+
+/** @brief 获取累计连接错误次数 @return 错误总次数 */
+quint64 ConnectionController::errorCount() const { return m_errorCount; }
+
+/** @brief 重置连接统计计数器为初始值 */
+void ConnectionController::resetConnectionStatistics()
+{
+    m_totalConnections = 0;
+    m_totalDisconnections = 0;
+    m_totalReconnects = 0;
+    m_errorCount = 0;
+}

@@ -85,6 +85,7 @@ bool JLinkRttConnection::open()
     // 步骤 1: 确保 SDK 已加载
     if (!m_sdkLoader->isLoaded()) {
         if (!m_sdkLoader->load()) {
+            ++m_errorCount;
             emit errorOccurred(tr("J-Link SDK 加载失败，请检查 JLinkARM.dll 是否可用"));
             return false;
         }
@@ -97,6 +98,7 @@ bool JLinkRttConnection::open()
         ifValue = 0;
     }
     if (!m_sdkLoader->selectInterface(ifValue)) {
+        ++m_errorCount;
         emit errorOccurred(tr("选择调试接口失败（JTAG/SWD）"));
         return false;
     }
@@ -110,6 +112,7 @@ bool JLinkRttConnection::open()
     // 步骤 4: 连接到目标设备
     const QString deviceId = m_config.value(QStringLiteral("deviceId")).toString();
     if (!m_sdkLoader->connectToDevice(deviceId)) {
+        ++m_errorCount;
         emit errorOccurred(tr("连接目标设备失败: %1").arg(deviceId.isEmpty() ? tr("未指定设备") : deviceId));
         return false;
     }
@@ -117,6 +120,7 @@ bool JLinkRttConnection::open()
     // 步骤 5: 启动 RTT 通信
     const int rttResult = m_sdkLoader->rttStart();
     if (rttResult != 0) {
+        ++m_errorCount;
         emit errorOccurred(tr("启动 RTT 通信失败，错误码: %1").arg(rttResult));
         m_sdkLoader->disconnect();
         return false;
@@ -163,12 +167,15 @@ qint64 JLinkRttConnection::write(const QByteArray& data)
         return -1;
     }
 
+    ++m_totalWrites;
     const int written = m_sdkLoader->rttWrite(m_channel, data.constData(), data.size());
     if (written < 0) {
+        ++m_errorCount;
         emit errorOccurred(tr("RTT 通道 %1 写入失败").arg(m_channel));
         return -1;
     }
 
+    m_totalBytesWritten += static_cast<quint64>(written);
     emit bytesWritten(written);
     return written;
 }
@@ -212,4 +219,29 @@ void JLinkRttConnection::setChannel(int ch)
 int JLinkRttConnection::channel() const
 {
     return m_channel;
+}
+
+/** @brief 获取累计读操作次数 @return 读操作总次数 */
+quint64 JLinkRttConnection::totalReads() const { return m_totalReads; }
+
+/** @brief 获取累计写操作次数 @return 写操作总次数 */
+quint64 JLinkRttConnection::totalWrites() const { return m_totalWrites; }
+
+/** @brief 获取累计读取字节总数 @return 读取字节总数 */
+quint64 JLinkRttConnection::totalBytesRead() const { return m_totalBytesRead; }
+
+/** @brief 获取累计写入字节总数 @return 写入字节总数 */
+quint64 JLinkRttConnection::totalBytesWritten() const { return m_totalBytesWritten; }
+
+/** @brief 获取累计错误次数 @return 错误总次数 */
+quint64 JLinkRttConnection::rttErrorCount() const { return m_errorCount; }
+
+/** @brief 重置 RTT 统计计数器为初始值 */
+void JLinkRttConnection::resetRttStatistics()
+{
+    m_totalReads = 0;
+    m_totalWrites = 0;
+    m_totalBytesRead = 0;
+    m_totalBytesWritten = 0;
+    m_errorCount = 0;
 }

@@ -18,6 +18,7 @@
 #ifndef CONNECTION_FACTORY_H
 #define CONNECTION_FACTORY_H
 
+#include <QMap>
 #include "core/theme/Constants.h"
 
 class QObject;
@@ -50,6 +51,29 @@ public:
      * @return IConnection* 创建成功的连接实例，nullptr表示该类型尚未实现
      */
     static IConnection* create(ConnectionType type, QObject* parent = nullptr);
+
+    // ---- 工厂统计 getter ----
+
+    /** @brief 获取累计创建连接总次数 */
+    static quint64 totalCreated();
+
+    /**
+     * @brief 获取指定连接类型的创建次数
+     * @param type 连接类型
+     * @return 该类型累计创建次数
+     */
+    static quint64 totalByType(ConnectionType type);
+
+    /** @brief 获取累计创建失败次数（类型未实现等） */
+    static quint64 factoryErrorCount();
+
+    /** @brief 重置工厂统计计数器为初始值 */
+    static void resetFactoryStatistics();
+
+private:
+    static quint64 s_totalCreated;                                ///< 累计创建连接总次数
+    static QMap<ConnectionType, quint64> s_totalByType;           ///< 各类型创建次数
+    static quint64 s_errorCount;                                  ///< 累计创建失败次数
 };
 
 #endif // CONNECTION_FACTORY_H

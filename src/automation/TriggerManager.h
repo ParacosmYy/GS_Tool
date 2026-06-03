@@ -99,6 +99,20 @@ public:
      */
     void resetStatistics();
 
+    // ---- 管理器统计 getter ----
+
+    /** @brief 获取累计添加规则次数 */
+    quint64 totalRulesAdded() const;
+
+    /** @brief 获取累计移除规则次数 */
+    quint64 totalRulesRemoved() const;
+
+    /** @brief 获取累计更新规则次数 */
+    quint64 totalRuleUpdates() const;
+
+    /** @brief 重置管理器统计计数器为初始值 */
+    void resetManagerStatistics();
+
     /**
      * @brief 更新规则列表UI
      * @param panel 触发器列表面板指针
@@ -112,6 +126,11 @@ signals:
 private:
     TriggerEngine* m_engine = nullptr;   ///< 触发器引擎实例
     TriggerAction* m_action = nullptr;   ///< 动作执行器实例
+
+    // 管理器统计计数器
+    quint64 m_totalRulesAdded = 0;       ///< 累计添加规则次数
+    quint64 m_totalRulesRemoved = 0;     ///< 累计移除规则次数
+    quint64 m_totalRuleUpdates = 0;      ///< 累计更新规则次数
 };
 
 #endif // TRIGGERMANAGER_H

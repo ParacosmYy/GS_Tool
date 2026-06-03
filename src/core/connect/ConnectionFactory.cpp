@@ -35,37 +35,81 @@
 #include "connection/usb/UsbConnection.h"
 #include "rtt/JLinkRttConnection.h"
 
+/* 静态成员初始化 */
+quint64 ConnectionFactory::s_totalCreated = 0;
+QMap<ConnectionType, quint64> ConnectionFactory::s_totalByType;
+quint64 ConnectionFactory::s_errorCount = 0;
+
 IConnection* ConnectionFactory::create(ConnectionType type, QObject* parent)
 {
+    IConnection* conn = nullptr;
+
     switch (type) {
     case ConnectionType::Serial:
-        return new SerialConnection(parent);
+        conn = new SerialConnection(parent);
+        break;
     case ConnectionType::TcpClient:
-        return new TcpConnection(parent);
+        conn = new TcpConnection(parent);
+        break;
     case ConnectionType::TcpServer:
-        return new TcpServerConnection(parent);
+        conn = new TcpServerConnection(parent);
+        break;
     case ConnectionType::Udp:
-        return new UdpConnection(parent);
+        conn = new UdpConnection(parent);
+        break;
     case ConnectionType::Rtt:
-        return new JLinkRttConnection(parent);
+        conn = new JLinkRttConnection(parent);
+        break;
     case ConnectionType::WebSocket:
-        return new WebSocketConnection(parent);
+        conn = new WebSocketConnection(parent);
+        break;
     case ConnectionType::Mqtt:
-        return new MqttConnection(parent);
+        conn = new MqttConnection(parent);
+        break;
     case ConnectionType::Tls:
-        return new TlsConnection(parent);
+        conn = new TlsConnection(parent);
+        break;
     case ConnectionType::Ble:
-        return new BleConnection(parent);
+        conn = new BleConnection(parent);
+        break;
     case ConnectionType::Can:
-        return new CanConnection(parent);
+        conn = new CanConnection(parent);
+        break;
     case ConnectionType::Spi:
-        return new SpiConnection(parent);
+        conn = new SpiConnection(parent);
+        break;
     case ConnectionType::I2c:
-        return new I2cConnection(parent);
+        conn = new I2cConnection(parent);
+        break;
     case ConnectionType::Usb:
-        return new UsbConnection(parent);
+        conn = new UsbConnection(parent);
+        break;
     default:
         qWarning() << "ConnectionFactory: unknown connection type" << static_cast<int>(type);
+        ++s_errorCount;
         return nullptr;
     }
+
+    /* 更新统计计数器 */
+    ++s_totalCreated;
+    ++s_totalByType[type];
+
+    return conn;
+}
+
+/** @brief 获取累计创建连接总次数 @return 创建总次数 */
+quint64 ConnectionFactory::totalCreated() { return s_totalCreated; }
+
+/** @brief 获取指定连接类型的创建次数 @param type 连接类型 @return 该类型累计创建次数 */
+quint64 ConnectionFactory::totalByType(ConnectionType type) { return s_totalByType.value(type, 0); }
+
+/** @brief 获取累计创建失败次数 @return 失败总次数 */
+quint64 ConnectionFactory::factoryErrorCount() { return s_errorCount; }
+
+/** @brief 重置工厂统计计数器为初始值 */
+void ConnectionFactory::resetFactoryStatistics()
+{
+    s_totalCreated = 0;
+    s_totalByType.clear();
+    s_errorCount = 0;
 }

@@ -105,6 +105,23 @@ public:
      */
     GattNode* nodeFromIndex(const QModelIndex& index) const;
 
+    // ---- 统计信息接口 ----
+
+    /** @brief 获取总发现服务数 */
+    quint64 totalServicesDiscovered() const { return m_totalServicesDiscovered; }
+
+    /** @brief 获取总特征读取次数 */
+    quint64 totalCharacteristicsRead() const { return m_totalCharacteristicsRead; }
+
+    /** @brief 获取总写入次数 */
+    quint64 totalWrites() const { return m_totalWrites; }
+
+    /** @brief 获取错误计数 */
+    quint64 errorCount() const { return m_errorCount; }
+
+    /** @brief 重置所有GATT统计计数器 */
+    void resetGattStatistics();
+
 private:
     /**
      * @brief 从QVariantMap构建子树
@@ -115,6 +132,12 @@ private:
 
     /** @brief 根节点（虚拟根，不显示） */
     GattNode* m_rootNode;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalServicesDiscovered = 0;      ///< 总发现服务数
+    quint64 m_totalCharacteristicsRead = 0;     ///< 总特征读取次数
+    quint64 m_totalWrites = 0;                  ///< 总写入次数
+    quint64 m_errorCount = 0;                   ///< 错误计数
 };
 
 #endif // BLEGATTMODEL_H

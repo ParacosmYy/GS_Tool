@@ -110,6 +110,13 @@ public:
     /** @brief 清除解析数据 */
     void clear();
 
+    // ---- 统计接口 ----
+    quint64 totalParses() const;            ///< 累计解析次数
+    quint64 totalMessagesParsed() const;    ///< 累计解析消息总数
+    quint64 totalSignalsDecoded() const;    ///< 累计解码信号总数
+    quint64 totalParseErrors() const;       ///< 累计解析错误次数
+    void resetDbcStatistics();              ///< 重置统计计数器
+
 signals:
     /** @brief 解析完成信号 */
     void parseCompleted(int messageCount);
@@ -129,6 +136,12 @@ private:
     QMap<QString, uint32_t> m_nameToId;      ///< 消息名→ID映射
     QStringList m_nodes;                      ///< 节点列表
     QString m_lastError;                      ///< 最后错误信息
+
+    // ---- 统计计数器 ----
+    quint64 m_totalParses = 0;               ///< 累计解析次数
+    quint64 m_totalMessagesParsed = 0;       ///< 累计解析消息总数
+    mutable quint64 m_totalSignalsDecoded = 0; ///< 累计解码信号总数(const方法中递增)
+    quint64 m_totalParseErrors = 0;          ///< 累计解析错误次数
 };
 
 #endif // DBCPARSER_H

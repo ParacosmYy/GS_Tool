@@ -51,8 +51,10 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
         return false;
     }
     if (ok) {
-        for (const auto& line : filtered)
+        for (const auto& line : filtered) {
             m_totalBytesExported += static_cast<quint64>(line.data.size());
+        }
+        m_totalRowsExported += static_cast<quint64>(filtered.size());
     } else {
         ++m_totalErrors;
     }
@@ -328,16 +330,23 @@ quint64 DataExporter::totalBytesExported() const
     return m_totalBytesExported;
 }
 
+/** @brief 获取累计导出的数据行总数 @return 行数 */
+quint64 DataExporter::totalRowsExported() const
+{
+    return m_totalRowsExported;
+}
+
 /** @brief 获取累计导出失败次数 @return 失败次数 */
 quint64 DataExporter::totalErrors() const
 {
     return m_totalErrors;
 }
 
-/** @brief 重置所有会话统计计数器 */
+/** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数) */
 void DataExporter::resetStats()
 {
     m_totalExports = 0;
     m_totalBytesExported = 0;
+    m_totalRowsExported = 0;
     m_totalErrors = 0;
 }

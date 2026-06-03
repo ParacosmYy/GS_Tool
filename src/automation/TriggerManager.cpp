@@ -124,6 +124,7 @@ QList<TriggerRuleConfig> TriggerManager::rules() const
 void TriggerManager::addRule(const TriggerRuleConfig& rule)
 {
     m_engine->addRule(rule);
+    ++m_totalRulesAdded;
     emit rulesChanged();
 }
 
@@ -134,6 +135,7 @@ void TriggerManager::addRule(const TriggerRuleConfig& rule)
 void TriggerManager::removeRule(int index)
 {
     m_engine->removeRule(index);
+    ++m_totalRulesRemoved;
     emit rulesChanged();
 }
 
@@ -157,6 +159,7 @@ void TriggerManager::updateRule(int index, const TriggerRuleConfig& rule)
     if (index >= 0 && index < m_engine->rules().size()) {
         m_engine->removeRule(index);
         m_engine->addRule(rule);
+        ++m_totalRuleUpdates;
         emit rulesChanged();
     }
 }
@@ -203,4 +206,21 @@ void TriggerManager::syncListPanel(TriggerListPanel* panel)
         if (r.enabled) ++enabled;
     }
     panel->updateRuleCount(ruleList.size(), enabled);
+}
+
+/** @brief 获取累计添加规则次数 @return 添加总次数 */
+quint64 TriggerManager::totalRulesAdded() const { return m_totalRulesAdded; }
+
+/** @brief 获取累计移除规则次数 @return 移除总次数 */
+quint64 TriggerManager::totalRulesRemoved() const { return m_totalRulesRemoved; }
+
+/** @brief 获取累计更新规则次数 @return 更新总次数 */
+quint64 TriggerManager::totalRuleUpdates() const { return m_totalRuleUpdates; }
+
+/** @brief 重置管理器统计计数器为初始值 */
+void TriggerManager::resetManagerStatistics()
+{
+    m_totalRulesAdded = 0;
+    m_totalRulesRemoved = 0;
+    m_totalRuleUpdates = 0;
 }

@@ -57,6 +57,13 @@ public:
     bool isAutoReconnectEnabled() const;                 ///< 查询自动重连状态
     PortWatcher* portWatcher() const;                    ///< 获取 PortWatcher 实例
 
+    // ---- 连接统计 getter ----
+    quint64 totalConnections() const;     ///< 获取累计成功连接次数
+    quint64 totalDisconnections() const;   ///< 获取累计断开连接次数
+    quint64 totalReconnects() const;       ///< 获取累计自动重连次数
+    quint64 errorCount() const;            ///< 获取累计连接错误次数
+    void resetConnectionStatistics();      ///< 重置连接统计计数器为初始值
+
 signals:
     /** @brief 连接状态变化通知 @param state 新状态 @param connName 连接名称 */
     void connectionStateChanged(ConnectionState state, const QString& connName);
@@ -177,6 +184,12 @@ private:
 
     QTimer m_healthTimer;                          ///< 连接健康检测定时器(5秒间隔)
     qint64 m_lastDataTimestamp = 0;                ///< 上次收到数据时的epoch毫秒时间戳(0=从未收到)
+
+    // 连接统计计数器
+    quint64 m_totalConnections = 0;                ///< 累计成功连接次数
+    quint64 m_totalDisconnections = 0;             ///< 累计断开连接次数
+    quint64 m_totalReconnects = 0;                 ///< 累计自动重连次数
+    quint64 m_errorCount = 0;                      ///< 累计连接错误次数
 };
 
 #endif // CONNECTIONCONTROLLER_H

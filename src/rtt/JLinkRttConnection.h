@@ -77,11 +77,38 @@ public:
     /** @brief 获取当前 RTT 通道号 */
     int channel() const;
 
+    // ---- RTT 统计 getter ----
+
+    /** @brief 获取累计读操作次数 */
+    quint64 totalReads() const;
+
+    /** @brief 获取累计写操作次数 */
+    quint64 totalWrites() const;
+
+    /** @brief 获取累计读取字节总数 */
+    quint64 totalBytesRead() const;
+
+    /** @brief 获取累计写入字节总数 */
+    quint64 totalBytesWritten() const;
+
+    /** @brief 获取累计错误次数 */
+    quint64 rttErrorCount() const;
+
+    /** @brief 重置 RTT 统计计数器为初始值 */
+    void resetRttStatistics();
+
 private:
     int m_channel = 0;                                      ///< RTT 通道号
     ConnectionState m_state = ConnectionState::Disconnected; ///< 连接状态
     QVariantMap m_config;                                   ///< 当前配置参数
     JLinkSdkLoader* m_sdkLoader = nullptr;                  ///< SDK 加载器单例引用
+
+    // RTT 统计计数器
+    quint64 m_totalReads = 0;           ///< 累计读操作次数
+    quint64 m_totalWrites = 0;          ///< 累计写操作次数
+    quint64 m_totalBytesRead = 0;       ///< 累计读取字节总数
+    quint64 m_totalBytesWritten = 0;    ///< 累计写入字节总数
+    quint64 m_errorCount = 0;           ///< 累计错误次数
 };
 
 #endif // JLINKRTTCONNECTION_H

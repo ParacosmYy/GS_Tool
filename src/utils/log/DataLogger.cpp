@@ -58,6 +58,7 @@ bool DataLogger::startRecording(const QString& filePath)
 
     m_recordFile = new QFile(filePath, this);
     if (!m_recordFile->open(QIODevice::WriteOnly)) {
+        ++m_totalErrors;  // 文件创建失败
         emit error(tr("无法创建日志文件: %1").arg(filePath));
         delete m_recordFile;
         m_recordFile = nullptr;
@@ -138,13 +139,10 @@ void DataLogger::logData(const QByteArray& data, Direction dir)
     writeRecord(timestamp, dir, data);
     m_recordCount++;
     ++m_totalLogsWritten;  // 累计写入计数
+    ++m_totalRecords;      // 累计录制记录计数
+    m_totalBytesRecorded += static_cast<quint64>(data.size());  // 累计录制字节计数
 }
-/** @brief 获取已录制的记录数 @return 记录条数 */
-int DataLogger::recordCount() const
-{
-    return m_recordCount;
-}
-/** @brief 获取录制持续时间(毫秒) @return 毫秒数 */
+int DataLogger::recordCount() const { return m_recordCount; }
 qint64 DataLogger::recordingDuration() const
 {
     if (!m_recording) return 0;
@@ -160,6 +158,7 @@ bool DataLogger::startPlayback(const QString& filePath)
 
     m_playbackFile = new QFile(filePath, this);
     if (!m_playbackFile->open(QIODevice::ReadOnly)) {
+        ++m_totalErrors;  // 文件打开失败
         emit error(tr("无法打开日志文件: %1").arg(filePath));
         delete m_playbackFile;
         m_playbackFile = nullptr;
@@ -169,6 +168,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     // 验证文件头
     QByteArray magic = m_playbackFile->read(3);
     if (magic != kMagic) {
+        ++m_totalErrors;  // 格式验证失败
         emit error(tr("无效的日志文件格式"));
         m_playbackFile->close();
         delete m_playbackFile;
@@ -183,6 +183,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     quint8 version = 0;
     headerStream >> version;
     if (version != kVersion) {
+        ++m_totalErrors;  // 版本不匹配
         emit error(tr("不支持的日志版本: %1").arg(version));
         m_playbackFile->close();
         delete m_playbackFile;
@@ -196,6 +197,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     m_totalRecords = static_cast<int>(count);
 
     if (m_totalRecords == 0) {
+        ++m_totalErrors;  // 空文件
         emit error(tr("日志文件为空"));
         m_playbackFile->close();
         delete m_playbackFile;
@@ -209,6 +211,7 @@ bool DataLogger::startPlayback(const QString& filePath)
     m_nextRecordTime = 0;
     m_playbackPaused = false;
     m_playing = true;
+    ++m_totalPlaybacks;  // 累计回放启动计数
 
     // 读取第一条记录的时间戳作为基准
     RecordHeader hdr;
@@ -478,21 +481,19 @@ void DataLogger::clearBookmarks()
 
 // ---- 会话统计 ----
 
-/** @brief 获取累计写入的日志记录总数 @return 记录条数 */
-quint64 DataLogger::totalLogsWritten() const
-{
-    return m_totalLogsWritten;
-}
+quint64 DataLogger::totalLogsWritten() const { return m_totalLogsWritten; }
+quint64 DataLogger::totalBookmarks() const { return m_totalBookmarks; }
+quint64 DataLogger::totalRecords() const { return m_totalRecords; }
+quint64 DataLogger::totalBytesRecorded() const { return m_totalBytesRecorded; }
+quint64 DataLogger::totalPlaybacks() const { return m_totalPlaybacks; }
+quint64 DataLogger::totalErrors() const { return m_totalErrors; }
 
-/** @brief 获取累计添加的书签总数(含已删除) @return 书签总数 */
-quint64 DataLogger::totalBookmarks() const
-{
-    return m_totalBookmarks;
-}
-
-/** @brief 重置所有会话统计计数器(不影响录制/回放状态) */
 void DataLogger::resetStats()
 {
     m_totalLogsWritten = 0;
     m_totalBookmarks = 0;
+    m_totalRecords = 0;
+    m_totalBytesRecorded = 0;
+    m_totalPlaybacks = 0;
+    m_totalErrors = 0;
 }

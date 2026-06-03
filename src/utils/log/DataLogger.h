@@ -112,6 +112,18 @@ public:
     /** @brief 获取累计添加的书签总数(含已删除) @return 书签总数 */
     quint64 totalBookmarks() const;
 
+    /** @brief 获取累计录制的记录条数 @return 记录条数 */
+    quint64 totalRecords() const;
+
+    /** @brief 获取累计录制的字节总数 @return 字节数 */
+    quint64 totalBytesRecorded() const;
+
+    /** @brief 获取累计回放启动次数 @return 回放次数 */
+    quint64 totalPlaybacks() const;
+
+    /** @brief 获取累计发生的错误次数 @return 错误次数 */
+    quint64 totalErrors() const;
+
     /** @brief 重置所有会话统计计数器(不影响录制/回放状态) */
     void resetStats();
 
@@ -172,7 +184,6 @@ private:
     qint64 m_playbackBaseTime = 0;
     qint64 m_nextRecordTime = 0;
     qint64 m_playbackOffset = 0;
-    int m_totalRecords = 0;
     int m_playedRecords = 0;
     qreal m_playbackSpeed = 1.0;
     bool m_playing = false;
@@ -187,6 +198,10 @@ private:
     // 会话统计
     quint64 m_totalLogsWritten = 0;   ///< 累计写入的日志记录总数
     quint64 m_totalBookmarks = 0;     ///< 累计添加的书签总数(含已删除)
+    quint64 m_totalRecords = 0;       ///< 累计录制的记录条数
+    quint64 m_totalBytesRecorded = 0; ///< 累计录制的字节总数
+    quint64 m_totalPlaybacks = 0;     ///< 累计回放启动次数
+    quint64 m_totalErrors = 0;        ///< 累计发生的错误次数
 };
 
 #endif // DATALOGGER_H

@@ -89,6 +89,20 @@ public:
      */
     static QString frameToString(const CanFrame& frame);
 
+    // ---- 统计信息接口 ----
+
+    /** @brief 获取总解析帧数 */
+    quint64 totalFramesParsed() const { return m_totalFramesParsed; }
+
+    /** @brief 获取总解析错误数 */
+    quint64 totalParseErrors() const { return m_totalParseErrors; }
+
+    /** @brief 获取总处理字节数 */
+    quint64 totalBytesProcessed() const { return m_totalBytesProcessed; }
+
+    /** @brief 重置所有解析统计计数器 */
+    void resetParserStatistics();
+
 private:
     /**
      * @brief 从十六进制ASCII字符解析单个字节
@@ -105,6 +119,11 @@ private:
 
     /** @brief DBC报文ID→报文名映射 (用于帧ID匹配) */
     QMap<quint32, QString> m_messageNames;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalFramesParsed = 0;            ///< 总解析帧数
+    quint64 m_totalParseErrors = 0;             ///< 总解析错误数
+    quint64 m_totalBytesProcessed = 0;          ///< 总处理字节数
 };
 
 #endif // CANFRAMEPARSER_H

@@ -95,10 +95,13 @@ public:
     /** @brief 获取累计导出的字节总数 @return 字节数 */
     quint64 totalBytesExported() const;
 
+    /** @brief 获取累计导出的数据行总数 @return 行数 */
+    quint64 totalRowsExported() const;
+
     /** @brief 获取累计导出失败次数 @return 失败次数 */
     quint64 totalErrors() const;
 
-    /** @brief 重置所有会话统计计数器 */
+    /** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数) */
     void resetStats();
 
 signals:
@@ -188,6 +191,7 @@ private:
     // 会话统计
     quint64 m_totalExports = 0;       ///< 累计导出操作总次数
     quint64 m_totalBytesExported = 0;  ///< 累计导出的字节总数
+    quint64 m_totalRowsExported = 0;   ///< 累计导出的数据行总数
     quint64 m_totalErrors = 0;         ///< 累计导出失败次数
 };
 
