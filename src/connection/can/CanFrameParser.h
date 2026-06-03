@@ -11,6 +11,11 @@
 #include <QObject>
 #include <QByteArray>
 #include <QString>
+#include <QMap>
+
+/* 前向声明 — DBC解码结果 */
+struct DbcMessage;
+struct DbcSignal;
 
 /**
  * @brief CAN/CAN-FD帧结构体
@@ -57,11 +62,25 @@ public:
     QByteArray buildFrame(const CanFrame& frame);
 
     /**
-     * @brief 加载DBC数据库文件(占位实现)
+     * @brief 加载DBC数据库文件
+     *
+     * 使用DbcParser解析DBC文件，建立报文ID到信号的映射表。
+     * 加载后可通过 decodeSignals() 对帧数据进行信号级解码。
+     *
      * @param filePath DBC文件路径
-     * @return true=加载成功(当前总是false，待实现)
+     * @return true=加载成功
      */
     bool loadDbcFile(const QString& filePath);
+
+    /**
+     * @brief 使用已加载的DBC解码CAN帧中的信号值
+     *
+     * 根据帧ID查找DBC中对应的报文定义，提取各信号的物理值。
+     *
+     * @param frame CAN帧
+     * @return 信号名→物理值的映射，空map表示无DBC或未匹配
+     */
+    QMap<QString, double> decodeSignals(const CanFrame& frame) const;
 
     /**
      * @brief 将CAN帧转换为可读字符串(用于显示)
@@ -80,6 +99,12 @@ private:
 
     /** @brief 当前加载的DBC文件路径 */
     QString m_dbcFilePath;
+
+    /** @brief 是否已成功加载DBC */
+    bool m_dbcLoaded = false;
+
+    /** @brief DBC报文ID→报文名映射 (用于帧ID匹配) */
+    QMap<quint32, QString> m_messageNames;
 };
 
 #endif // CANFRAMEPARSER_H

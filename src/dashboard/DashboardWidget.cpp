@@ -109,22 +109,79 @@ void DashboardWidget::removeComponent(int index)
 }
 
 /**
- * @brief 从 QVariantMap 恢复布局（存根）
+ * @brief 从 QVariantMap 恢复布局
+ *
+ * 布局格式:
+ * {
+ *   "components": [
+ *     {"type": "gauge", "channel": "电压"},
+ *     {"type": "numeric", "channel": "温度"},
+ *     ...
+ *   ]
+ * }
+ *
+ * 清除所有现有子控件，然后按列表顺序重建。
+ *
  * @param layout 布局描述
  */
 void DashboardWidget::loadLayout(const QVariantMap &layout)
 {
-    Q_UNUSED(layout)
-    /* TODO: 解析 layout 并重建子控件 */
+    /* 清除现有组件 */
+    while (!m_components.isEmpty()) {
+        removeComponent(m_components.size() - 1);
+    }
+
+    /* 从布局数据重建 */
+    const QVariantList comps = layout.value("components").toList();
+    for (const QVariant& cv : comps) {
+        const QVariantMap cm = cv.toMap();
+        const QString type = cm.value("type").toString();
+        const QString channel = cm.value("channel").toString();
+        if (!type.isEmpty()) {
+            addComponent(type, channel);
+        }
+    }
 }
 
 /**
- * @brief 导出当前布局（存根）
- * @return 空的 QVariantMap
+ * @brief 将当前布局导出为 QVariantMap
+ *
+ * 序列化每个子组件的类型和绑定通道名。
+ * DashboardSerializer 使用此方法进行 JSON 持久化。
+ *
+ * @return 布局描述，格式同 loadLayout
  */
 QVariantMap DashboardWidget::saveLayout() const
 {
-    return QVariantMap();
+    QVariantMap result;
+    QVariantList comps;
+
+    for (int i = 0; i < m_components.size(); ++i) {
+        QWidget* w = m_components.at(i);
+        QVariantMap cm;
+
+        /* 根据控件类型名推断组件类型 */
+        QString className = w->metaObject()->className();
+        if (className.contains("Gauge")) {
+            cm["type"] = "gauge";
+        } else if (className.contains("ProgressBar")) {
+            cm["type"] = "progress";
+        } else if (className.contains("LedIndicator")) {
+            cm["type"] = "led";
+        } else if (className.contains("NumericDisplay")) {
+            cm["type"] = "numeric";
+        } else {
+            cm["type"] = "unknown";
+        }
+
+        /* 读取绑定的通道名 (通过 property) */
+        cm["channel"] = w->property("channel").toString();
+
+        comps.append(cm);
+    }
+
+    result["components"] = comps;
+    return result;
 }
 
 /**

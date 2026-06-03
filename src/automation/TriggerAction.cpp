@@ -5,6 +5,9 @@
 
 #include "automation/TriggerAction.h"
 
+#include <QProcess>
+#include <QApplication>
+
 /**
  * @brief 构造函数
  * @param parent 父对象
@@ -54,7 +57,24 @@ void TriggerAction::execute(int actionType, const QByteArray& actionData)
         break;
     }
     case ActionType::PlaySound: {
-        /* TODO: 接入音频播放模块 */
+        /* 播放系统提示音 — 使用平台原生音频接口 */
+        QString soundFile = QString::fromUtf8(actionData);
+        if (soundFile.isEmpty()) {
+            /* 默认系统提示音 */
+            QApplication::beep();
+        } else {
+#ifdef Q_OS_WIN
+            /* Windows: 使用 PowerShell 播放音频文件 */
+            QProcess::startDetached(
+                "powershell",
+                QStringList() << "-NoProfile" << "-Command"
+                << QString("(New-Object Media.SoundPlayer '%1').PlaySync()")
+                   .arg(soundFile));
+#else
+            /* Linux: 使用 aplay 或 paplay */
+            QProcess::startDetached("aplay", QStringList() << soundFile);
+#endif
+        }
         break;
     }
     }

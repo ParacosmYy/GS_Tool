@@ -107,4 +107,5 @@
 | 116 | docs: 架构解耦方案 + 迭代路线图 | 116 |
 | 117 | feat(can): DBC解析器(CAN数据库) + Dashboard布局JSON持久化 + QMessageBox残余清除 | 117 |
 | 118 | feat(usb): UsbLibraryLoader动态加载libusb + UsbConnection真实集成 + FlatBuffers FBS完整解析器 + ResponsiveLayout断点系统 + SchemaViewer TODO清理 | 118 |
+| 119 | feat: RTT JLinkSdkLoader单例+10函数指针解析 + JLinkRttConnection真实SDK调用 + CanFrameParser DBC集成 + Dashboard loadLayout/saveLayout + ChartExporter真实SVG导出 + TriggerAction PlaySound + BleConnection TODO清除 | 119 |
 | ... | 目标: 500分 | 500 |

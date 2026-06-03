@@ -1,17 +1,18 @@
 /**
  * @file JLinkRttConnection.cpp
- * @brief J-Link RTT 连接实现 — IConnection 接口的 RTT 连接桩实现
+ * @brief J-Link RTT 连接实现 — IConnection 接口的 RTT 真实实现
  *
- * 提供 RTT 连接的状态管理、通道配置和桩级别的数据读写。
- * 实际 J-Link SDK 调用将在后续迭代中集成。
+ * 通过 JLinkSdkLoader 单例调用 J-Link SDK 函数实现 RTT 通信。
+ * 支持 SWD/JTAG 接口选择、速度配置和多通道数据读写。
  */
 
 #include "rtt/JLinkRttConnection.h"
+#include "rtt/JLinkSdkLoader.h"
 
 /**
  * @brief 构造函数
  *
- * 初始化 RTT 连接状态，设置对象名称用于 QSS 样式匹配。
+ * 初始化 RTT 连接状态，获取 SDK 加载器单例引用。
  *
  * @param parent 父对象
  */
@@ -19,6 +20,7 @@ JLinkRttConnection::JLinkRttConnection(QObject* parent)
     : IConnection(parent)
     , m_channel(0)
     , m_state(ConnectionState::Disconnected)
+    , m_sdkLoader(JLinkSdkLoader::instance())
 {
     setObjectName(QStringLiteral("JLinkRttConnection"));
 }
@@ -63,10 +65,16 @@ ConnectionState JLinkRttConnection::state() const
 /**
  * @brief 打开 RTT 连接
  *
- * 桩实现：设置状态为 Connected 并发出状态变更信号。
- * 实际 J-Link SDK 连接逻辑将在后续迭代中实现。
+ * 完整连接流程:
+ * 1. 确认 SDK 已加载（未加载则尝试自动加载）
+ * 2. 根据配置选择调试接口（SWD/JTAG）
+ * 3. 设置连接速度
+ * 4. 连接到目标设备
+ * 5. 启动 RTT 通信
  *
- * @return true（桩实现始终成功）
+ * 任何步骤失败都会发出 errorOccurred 信号并返回 false。
+ *
+ * @return true 连接成功，false 连接失败
  */
 bool JLinkRttConnection::open()
 {
@@ -74,8 +82,45 @@ bool JLinkRttConnection::open()
         return true;
     }
 
-    // TODO: 调用 JLinkSdkLoader 加载 SDK
-    // TODO: 连接 J-Link 调试器并启动 RTT 通信
+    // 步骤 1: 确保 SDK 已加载
+    if (!m_sdkLoader->isLoaded()) {
+        if (!m_sdkLoader->load()) {
+            emit errorOccurred(tr("J-Link SDK 加载失败，请检查 JLinkARM.dll 是否可用"));
+            return false;
+        }
+    }
+
+    // 步骤 2: 选择调试接口类型
+    const QString ifType = m_config.value(QStringLiteral("interface")).toString();
+    int ifValue = 1;  // 默认 SWD
+    if (ifType.compare(QStringLiteral("JTAG"), Qt::CaseInsensitive) == 0) {
+        ifValue = 0;
+    }
+    if (!m_sdkLoader->selectInterface(ifValue)) {
+        emit errorOccurred(tr("选择调试接口失败（JTAG/SWD）"));
+        return false;
+    }
+
+    // 步骤 3: 设置连接速度
+    const int speed = m_config.value(QStringLiteral("speed")).toInt();
+    if (speed > 0) {
+        m_sdkLoader->setSpeed(speed);
+    }
+
+    // 步骤 4: 连接到目标设备
+    const QString deviceId = m_config.value(QStringLiteral("deviceId")).toString();
+    if (!m_sdkLoader->connectToDevice(deviceId)) {
+        emit errorOccurred(tr("连接目标设备失败: %1").arg(deviceId.isEmpty() ? tr("未指定设备") : deviceId));
+        return false;
+    }
+
+    // 步骤 5: 启动 RTT 通信
+    const int rttResult = m_sdkLoader->rttStart();
+    if (rttResult != 0) {
+        emit errorOccurred(tr("启动 RTT 通信失败，错误码: %1").arg(rttResult));
+        m_sdkLoader->disconnect();
+        return false;
+    }
 
     m_state = ConnectionState::Connected;
     emit stateChanged(m_state);
@@ -85,8 +130,7 @@ bool JLinkRttConnection::open()
 /**
  * @brief 关闭 RTT 连接
  *
- * 设置状态为 Disconnected 并发出状态变更信号。
- * 实际 J-Link SDK 断开逻辑将在后续迭代中实现。
+ * 依次停止 RTT 通信、断开设备连接，并将状态置为 Disconnected。
  */
 void JLinkRttConnection::close()
 {
@@ -94,7 +138,11 @@ void JLinkRttConnection::close()
         return;
     }
 
-    // TODO: 调用 J-Link SDK 停止 RTT 并断开连接
+    // 停止 RTT 通信
+    m_sdkLoader->rttStop();
+
+    // 断开设备连接
+    m_sdkLoader->disconnect();
 
     m_state = ConnectionState::Disconnected;
     emit stateChanged(m_state);
@@ -103,10 +151,11 @@ void JLinkRttConnection::close()
 /**
  * @brief 向 RTT 通道写入数据
  *
- * 桩实现：返回数据大小，表示所有数据已被"发送"。
+ * 调用 JLinkSdkLoader::rttWrite() 向指定 RTT 通道写入数据。
+ * 返回 SDK 报告的实际写入字节数。
  *
  * @param data 要发送的字节数据
- * @return 实际写入字节数（桩实现返回 data.size()）
+ * @return 实际写入字节数，-1 表示失败
  */
 qint64 JLinkRttConnection::write(const QByteArray& data)
 {
@@ -114,8 +163,12 @@ qint64 JLinkRttConnection::write(const QByteArray& data)
         return -1;
     }
 
-    // TODO: 调用 J-Link SDK 写入 RTT 缓冲区
-    qint64 written = data.size();
+    const int written = m_sdkLoader->rttWrite(m_channel, data.constData(), data.size());
+    if (written < 0) {
+        emit errorOccurred(tr("RTT 通道 %1 写入失败").arg(m_channel));
+        return -1;
+    }
+
     emit bytesWritten(written);
     return written;
 }

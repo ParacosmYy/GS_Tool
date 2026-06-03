@@ -16,6 +16,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QWidget>
+#include <QSvgGenerator>
 
 // ---------------------------------------------------------------------------
 // 构造函数
@@ -154,28 +155,37 @@ bool ChartExporter::exportToPng(const QString& filePath, QWidget* widget)
 /**
  * @brief 将控件渲染为 SVG 矢量图
  *
- * 使用 QWidget::grab() 截图并保存为 PNG 格式（SVG 需要 QtSvg 模块，暂用 PNG 替代）。
+ * 使用 QSvgGenerator 生成真正的 SVG 矢量文件，
+ * 而非降级为 PNG 位图。保留控件的所有绘制细节。
  *
- * @param filePath 目标文件路径
+ * @param filePath 目标文件路径（应以 .svg 结尾）
  * @param widget   待渲染的控件
  * @return true 渲染成功
  */
 bool ChartExporter::exportToSvg(const QString& filePath, QWidget* widget)
 {
     if (!widget) {
-        emit exportFailed(tr("控件指针为空，无法导出"));
+        emit exportFailed(tr("控件指针为空，无法导出 SVG"));
         return false;
     }
 
-    // TODO: SVG导出需要 QtSvg 模块，当前使用 PNG 作为降级方案
-    QPixmap pixmap = widget->grab();
-    if (pixmap.save(filePath, "PNG")) {
-        emit exportCompleted(filePath);
-        return true;
-    }
+    /* 配置 SVG 生成器 */
+    QSvgGenerator generator;
+    generator.setFileName(filePath);
+    generator.setSize(widget->size());
+    generator.setViewBox(QRect(0, 0, widget->width(), widget->height()));
+    generator.setTitle(tr("EmbedDebug 图表导出"));
+    generator.setDescription(tr("由 EmbedDebug 自动生成的 SVG 矢量图"));
 
-    emit exportFailed(tr("导出失败: %1").arg(filePath));
-    return false;
+    /* 使用 QPainter 渲染到 SVG */
+    QPainter painter(&generator);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    widget->render(&painter);
+    painter.end();
+
+    emit exportCompleted(filePath);
+    return true;
 }
 
 // ---------------------------------------------------------------------------

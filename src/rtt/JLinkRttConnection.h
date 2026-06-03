@@ -15,6 +15,8 @@
 
 #include "connection/interface/IConnection.h"
 
+class JLinkSdkLoader;
+
 /**
  * @brief J-Link RTT 连接类
  *
@@ -79,6 +81,7 @@ private:
     int m_channel = 0;                                      ///< RTT 通道号
     ConnectionState m_state = ConnectionState::Disconnected; ///< 连接状态
     QVariantMap m_config;                                   ///< 当前配置参数
+    JLinkSdkLoader* m_sdkLoader = nullptr;                  ///< SDK 加载器单例引用
 };
 
 #endif // JLINKRTTCONNECTION_H
