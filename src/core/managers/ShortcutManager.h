@@ -1,16 +1,9 @@
 /**
  * @file ShortcutManager.h
- * @brief 统一键盘快捷键管理器 -- 集中注册和管理所有全局快捷键
+ * @brief 统一键盘快捷键管理器 -- 集中注册、上下文感知、冲突检测、持久化
  *
- * 支持功能:
- * - 集中注册所有全局快捷键
- * - 快捷键冲突检测
- * - 上下文感知(全局/终端/发送区)
- * - 快捷键可配置(为SettingsManager集成预留接口)
- *
- * 使用:
- *   auto& sm = ShortcutManager::instance();
- *   sm.registerShortcut("search", QKeySequence("Ctrl+F"), this, []() { ... });
+ * 功能: 上下文感知激活 / 冲突检测与自动解决 / 使用统计 / QSettings持久化 / 全局事件过滤
+ * 用法: ShortcutManager::instance().registerShortcut("id", QKeySequence("Ctrl+F"), this, [](){...});
  */
 
 #ifndef SHORTCUTMANAGER_H
@@ -22,35 +15,36 @@
 #include <QMap>
 #include <QList>
 #include <QHash>
+#include <QSet>
 #include <functional>
 
 class QWidget;
+class QEvent;
 
-/**
- * @brief 快捷键上下文枚举
- */
+/// @brief 快捷键上下文枚举
 enum class ShortcutContext {
     Global,      ///< 全局(任何时刻有效)
     Terminal,    ///< 终端聚焦时有效
     SendArea     ///< 发送区聚焦时有效
 };
 
-/**
- * @brief 快捷键信息结构
- */
+/// @brief 快捷键信息结构
 struct ShortcutInfo {
-    QString id;                          ///< 唯一标识符(如 "search", "command_palette")
-    QKeySequence keySequence;            ///< 按键序列
+    QString id;                          ///< 唯一标识符(如 "search.find")
+    QKeySequence keySequence;            ///< 当前按键序列
+    QKeySequence defaultKeySequence;     ///< 默认按键序列(用于重置)
     QString description;                 ///< 中文描述
     ShortcutContext context;             ///< 上下文
     QShortcut* shortcut = nullptr;       ///< Qt快捷键对象
+    std::function<void()> callback;      ///< 激活回调函数
+    quint64 triggerCount = 0;            ///< 该快捷键被触发的次数
 };
 
 /**
- * @brief 统一键盘快捷键管理器
+ * @brief 统一键盘快捷键管理器(单例)
  *
- * 单例模式。集中管理所有快捷键的注册、冲突检测、上下文控制。
- * 所有快捷键通过ID注册，支持运行时修改按键序列。
+ * 集中管理所有快捷键的注册、冲突检测、上下文控制和持久化。
+ * 通过全局事件过滤器实现上下文感知的快捷键路由。
  */
 class ShortcutManager : public QObject {
     Q_OBJECT
@@ -59,67 +53,77 @@ public:
     /** @brief 获取单例实例 */
     static ShortcutManager& instance();
 
-    /**
-     * @brief 注册快捷键
-     * @param id 唯一标识符
-     * @param key 按键序列
-     * @param parent 父Widget(用于创建QShortcut)
-     * @param callback 回调函数
-     * @param description 中文描述
-     * @param context 快捷键上下文
-     * @return true=注册成功, false=ID冲突或按键冲突
-     */
+    /// @brief 注册快捷键 @return true=成功, false=ID或按键冲突
     bool registerShortcut(const QString& id, const QKeySequence& key,
                           QWidget* parent, std::function<void()> callback,
                           const QString& description,
                           ShortcutContext context = ShortcutContext::Global);
-
-    /**
-     * @brief 注销快捷键
-     * @param id 快捷键标识符
-     */
+    /// @brief 注销快捷键
     void unregisterShortcut(const QString& id);
-
-    /**
-     * @brief 修改快捷键绑定
-     * @param id 快捷键标识符
-     * @param newKey 新的按键序列
-     * @return true=修改成功, false=ID不存在或新按键已被占用
-     */
+    /// @brief 修改快捷键绑定(同时持久化) @return true=成功
     bool rebind(const QString& id, const QKeySequence& newKey);
-
-    /** @brief 获取所有已注册快捷键信息 */
+    /// @brief 获取所有已注册快捷键
     QList<ShortcutInfo> allShortcuts() const;
+    /// @brief 按上下文获取快捷键列表
+    QList<ShortcutInfo> shortcutsByContext(ShortcutContext context) const;
 
-    // ---- 统计计数器 ----
+    // ---- 上下文感知 ----
+    /// @brief 设置当前激活的上下文(焦点变化时调用)
+    void setCurrentContext(ShortcutContext context);
+    /// @brief 获取当前上下文
+    ShortcutContext currentContext() const;
+    /// @brief 注册Widget到上下文的映射(焦点进入时自动切换上下文)
+    void registerContextWidget(QWidget* widget, ShortcutContext context);
+    /// @brief 移除上下文映射
+    void unregisterContextWidget(QWidget* widget);
 
-    /** @brief 获取快捷键注册总次数（含成功和失败） @return 注册操作总次数 */
+    // ---- 冲突检测与解决 ----
+    /// @brief 检查按键是否已被占用 @param excludeId 排除自身ID
+    bool isKeyOccupied(const QKeySequence& key, const QString& excludeId = QString()) const;
+    /// @brief 查找占用指定按键的所有快捷键ID
+    QStringList findConflicts(const QKeySequence& key, const QString& excludeId = QString()) const;
+    /// @brief 自动解决冲突: 将冲突方重绑定到替代序列 @return 成功解决的冲突数
+    int resolveConflicts(const QString& preferredId, const QStringList& conflictIds);
+
+    // ---- 使用统计 ----
+    /// @brief 获取指定快捷键触发次数
+    quint64 shortcutTriggerCount(const QString& id) const;
+    /// @brief 注册总次数(含失败)
     quint64 totalRegistrations() const;
-
-    /** @brief 获取快捷键触发总次数 @return 触发总次数 */
+    /// @brief 触发总次数
     quint64 totalTriggers() const;
-
-    /** @brief 重置所有快捷键管理统计计数器为零 */
+    /// @brief 重置所有统计计数器
     void resetShortcutStatistics();
 
-    /**
-     * @brief 根据ID获取快捷键描述+按键文本(用于Tooltip)
-     * @param id 快捷键标识符
-     * @return 格式如 "打开搜索栏 (Ctrl+F)"，ID不存在返回空字符串
-     */
-    QString shortcutTooltip(const QString& id) const;
+    // ---- 持久化 ----
+    /// @brief 保存自定义绑定到QSettings
+    void saveCustomBindings();
+    /// @brief 从QSettings加载自定义绑定
+    void loadCustomBindings();
+    /// @brief 恢复指定快捷键为默认绑定
+    void resetToDefault(const QString& id);
+    /// @brief 恢复所有快捷键为默认绑定
+    void resetAllToDefaults();
 
-    /**
-     * @brief 检查按键序列是否已被占用
-     * @param key 要检查的按键序列
-     * @param excludeId 排除的快捷键ID(用于rebind时排除自身)
-     * @return true=已被占用
-     */
-    bool isKeyOccupied(const QKeySequence& key, const QString& excludeId = QString()) const;
+    // ---- 工具方法 ----
+    /// @brief 获取Tooltip文本(格式: "描述 (Ctrl+F)")
+    QString shortcutTooltip(const QString& id) const;
+    /// @brief 获取指定快捷键的当前按键序列
+    QKeySequence shortcutKey(const QString& id) const;
+    /// @brief 注册EmbedDebug默认快捷键集合(Ctrl+F/P/S/O/N/W/L/Ctrl+Shift+R/Ctrl+Enter)
+    void registerDefaults(QWidget* mainWindow);
 
 signals:
-    /** @brief 快捷键绑定变更信号 */
+    /// @brief 快捷键绑定变更
     void shortcutChanged(const QString& id, const QKeySequence& newKey);
+    /// @brief 检测到冲突
+    void conflictDetected(const QString& id1, const QString& id2);
+    /// @brief 快捷键被触发
+    void shortcutTriggered(const QString& id);
+
+protected:
+    /// @brief 全局事件过滤器 - 焦点变化时自动切换上下文
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
     explicit ShortcutManager(QObject* parent = nullptr);
@@ -127,11 +131,20 @@ private:
     ShortcutManager(const ShortcutManager&) = delete;
     ShortcutManager& operator=(const ShortcutManager&) = delete;
 
-    QMap<QString, ShortcutInfo> m_shortcuts;  ///< ID -> 快捷键信息
+    /// @brief 检查快捷键在当前上下文中是否激活
+    bool isShortcutActiveInContext(const ShortcutInfo& info) const;
+    /// @brief 根据当前上下文更新所有QShortcut启用状态
+    void updateShortcutStates();
 
-    // ---- 统计计数器 ----
-    quint64 m_totalRegistrations = 0;  ///< 快捷键注册总次数
-    quint64 m_totalTriggers = 0;       ///< 快捷键触发总次数
+    QMap<QString, ShortcutInfo> m_shortcuts;        ///< ID -> 快捷键信息
+    QHash<QWidget*, ShortcutContext> m_contextMap;  ///< Widget -> 上下文映射
+    QSet<QString> m_customizedIds;                  ///< 用户自定义过的ID集合
+    ShortcutContext m_currentContext = ShortcutContext::Global; ///< 当前上下文
+
+    quint64 m_totalRegistrations = 0;  ///< 注册总次数
+    quint64 m_totalTriggers = 0;       ///< 触发总次数
+
+    static constexpr const char* kSettingsGroup = "shortcuts"; ///< QSettings分组名
 };
 
 #endif // SHORTCUTMANAGER_H

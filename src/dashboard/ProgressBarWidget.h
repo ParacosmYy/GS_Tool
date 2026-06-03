@@ -39,6 +39,12 @@ public:
     /// 获取当前值
     double value() const { return m_value; }
 
+    /// 获取量程最小值
+    double min() const { return m_min; }
+
+    /// 获取量程最大值
+    double max() const { return m_max; }
+
     /// 获取标签
     QString label() const { return m_label; }
 

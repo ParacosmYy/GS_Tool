@@ -31,6 +31,7 @@ ProtocolEngine::ProtocolEngine(QObject *parent)
     : QObject(parent)
     , m_schema(nullptr)
     , m_parseErrors(0)
+    , m_checksumAlgorithm(ChecksumAlgorithm::Auto)
     , m_framesParsed(0)
     , m_framesRejected(0)
     , m_totalBytesProcessed(0)
@@ -39,6 +40,8 @@ ProtocolEngine::ProtocolEngine(QObject *parent)
     , m_lastParseTimestamp(0)
     , m_totalCrcErrors(0)
     , m_totalBytesParsed(0)
+    , m_crcPassCount(0)
+    , m_crcFailCount(0)
 {
 }
 
@@ -81,7 +84,7 @@ void ProtocolEngine::feedData(const QByteArray &data)
     }
 }
 
-/** @brief 重置解析状态(清空缓冲区+重置计数器，不清除schema) */
+/** @brief 重置解析状态(清空缓冲区+重置计数器，不清除schema和算法配置) */
 void ProtocolEngine::reset()
 {
     m_buffer.clear();
@@ -94,6 +97,8 @@ void ProtocolEngine::reset()
     m_lastParseTimestamp = 0;
     m_totalCrcErrors = 0;
     m_totalBytesParsed = 0;
+    m_crcPassCount = 0;
+    m_crcFailCount = 0;
 }
 
 /** @brief 获取当前使用的协议定义 @return 协议定义指针，未设置时为 nullptr */
@@ -158,17 +163,27 @@ bool ProtocolEngine::tryParseOneFrame()
     m_buffer.remove(0, frameLength);
 
     /* ---- 步骤6：校验和/CRC验证 ---- */
-    if (framing.checksumType != ProtocolSchema::ChecksumType::None) {
-        bool checksumValid = validateChecksum(rawFrame, framing);
+    ChecksumAlgorithm effectiveAlgo = resolveEffectiveAlgorithm(framing);
+    if (effectiveAlgo != ChecksumAlgorithm::None) {
+        quint64 expectedVal = 0;
+        quint64 actualVal = 0;
+        bool checksumValid = validateChecksum(rawFrame, framing, &expectedVal, &actualVal);
         ++m_totalValidations;
         if (!checksumValid) {
-            emit parseError(tr("帧校验失败"));
+            ++m_crcFailCount;
+            ++m_totalCrcErrors;
+            QString algoName = checksumAlgorithmToString(effectiveAlgo);
+            emit parseError(tr("帧校验失败(%1): 期望=0x%2, 实际=0x%3")
+                                .arg(algoName)
+                                .arg(expectedVal, 0, 16)
+                                .arg(actualVal, 0, 16));
+            emit checksumFailed(expectedVal, actualVal, algoName);
             ++m_parseErrors;
             ++m_totalParseErrors;
-            ++m_totalCrcErrors;
             ++m_framesRejected;
             return true;
         }
+        ++m_crcPassCount;
     }
 
     /* ---- 步骤7：解析字段 ---- */

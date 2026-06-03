@@ -3,67 +3,64 @@
  * @brief ProtocolEngine 校验和计算与验证实现
  *
  * 从 ProtocolEngine.cpp 拆分而来，包含帧校验和验证逻辑
- * 以及 CRC-8/CRC-16-CCITT/CRC-16-Modbus/CRC-32/XOR 校验算法。
+ * 以及 CRC-8/CRC-16-CCITT/CRC-16-Modbus/CRC-32/XOR/Sum 校验算法。
+ *
+ * 验证流程支持两种模式:
+ * 1. Auto模式: 使用 schema 的 FramingRule 中定义的校验类型
+ * 2. 手动覆盖: 通过 setChecksumAlgorithm() 设置后，强制使用指定算法
  */
 
 #include "protocol/engine/ProtocolEngine.h"
 #include "protocol/schema/ProtocolSchema.h"
 
-/** @brief 验证帧的校验和/CRC @param frame 完整帧数据(含校验字段) @param framing 帧格式定义 @return true=校验通过，false=校验失败 */
+/** @brief 验证帧的校验和/CRC(支持算法覆盖，可回填期望值与实际值) @param frame 完整帧数据(含校验字段) @param framing 帧格式定义 @param expectedVal 回填期望校验值(可nullptr) @param actualVal 回填实际校验值(可nullptr) @return true=校验通过，false=校验失败 */
 bool ProtocolEngine::validateChecksum(const QByteArray &frame,
-                                       const ProtocolSchema::FramingRule &framing) const
+                                       const ProtocolSchema::FramingRule &framing,
+                                       quint64 *expectedVal,
+                                       quint64 *actualVal) const
 {
     if (frame.isEmpty()) { return false; }
 
-    /* 校验字段大小: CRC8/XOR=1, CRC16=2, CRC32=4 */
-    int checksumSize = 0;
-    switch (framing.checksumType) {
-    case ProtocolSchema::ChecksumType::None:       return true;
-    case ProtocolSchema::ChecksumType::Crc8:       checksumSize = 1; break;
-    case ProtocolSchema::ChecksumType::Xor:        checksumSize = 1; break;
-    case ProtocolSchema::ChecksumType::Crc16Ccitt: checksumSize = 2; break;
-    case ProtocolSchema::ChecksumType::Crc16Modbus: checksumSize = 2; break;
-    case ProtocolSchema::ChecksumType::Crc32:      checksumSize = 4; break;
-    default: return true;
-    }
+    /* 确定实际使用的校验算法 */
+    ChecksumAlgorithm effectiveAlgo = resolveEffectiveAlgorithm(framing);
+    if (effectiveAlgo == ChecksumAlgorithm::None) { return true; }
+
+    /* 校验字段大小 */
+    int csSize = checksumSize(effectiveAlgo);
+    if (csSize <= 0) { return true; }
 
     /* 帧必须至少包含校验字段 */
-    if (frame.size() < checksumSize) { return false; }
+    if (frame.size() < csSize) { return false; }
 
     /* 分离: 数据部分(不含校验) 和 校验字段 */
-    QByteArray payload = frame.left(frame.size() - checksumSize);
-    QByteArray checksumBytes = frame.right(checksumSize);
+    QByteArray payload = frame.left(frame.size() - csSize);
+    QByteArray csBytes = frame.right(csSize);
 
-    switch (framing.checksumType) {
-    case ProtocolSchema::ChecksumType::Crc8: {
-        quint8 expected = static_cast<quint8>(checksumBytes.at(0));
-        return computeCrc8(payload) == expected;
+    /* 使用统一接口计算校验值 */
+    quint64 computed = computeChecksumForAlgorithm(payload, effectiveAlgo);
+
+    /* 从帧尾部提取期望的校验值(小端序) */
+    quint64 expected = 0;
+    for (int i = 0; i < csSize; ++i) {
+        expected |= static_cast<quint64>(static_cast<quint8>(csBytes.at(i))) << (8 * i);
     }
-    case ProtocolSchema::ChecksumType::Xor: {
-        quint8 expected = static_cast<quint8>(checksumBytes.at(0));
-        return computeXor(payload) == expected;
+
+    /* 比较时只取有效位宽 */
+    quint64 mask = 0;
+    switch (csSize) {
+    case 1: mask = 0xFF; break;
+    case 2: mask = 0xFFFF; break;
+    case 4: mask = 0xFFFFFFFF; break;
+    default: mask = 0xFFFFFFFFFFFFFFFF; break;
     }
-    case ProtocolSchema::ChecksumType::Crc16Ccitt: {
-        quint16 expected = static_cast<quint16>(
-            (static_cast<quint8>(checksumBytes.at(0))) |
-            (static_cast<quint16>(static_cast<quint8>(checksumBytes.at(1))) << 8));
-        return computeCrc16Ccitt(payload) == expected;
-    }
-    case ProtocolSchema::ChecksumType::Crc16Modbus: {
-        quint16 expected = static_cast<quint16>(
-            (static_cast<quint8>(checksumBytes.at(0))) |
-            (static_cast<quint16>(static_cast<quint8>(checksumBytes.at(1))) << 8));
-        return computeCrc16Modbus(payload) == expected;
-    }
-    case ProtocolSchema::ChecksumType::Crc32: {
-        quint32 expected = 0;
-        for (int i = 0; i < 4; ++i) {
-            expected |= static_cast<quint32>(static_cast<quint8>(checksumBytes.at(i))) << (8 * i);
-        }
-        return computeCrc32(payload) == expected;
-    }
-    default: return true;
-    }
+
+    bool passed = (computed & mask) == (expected & mask);
+
+    /* 回填期望值和实际值(用于信号上报) */
+    if (expectedVal) { *expectedVal = expected & mask; }
+    if (actualVal)   { *actualVal = computed & mask; }
+
+    return passed;
 }
 
 /** @brief 计算CRC-8校验值(多项式0x07) @param data 待校验数据 @param polynomial CRC多项式 @return CRC-8校验值 */
@@ -142,4 +139,14 @@ quint8 ProtocolEngine::computeXor(const QByteArray &data)
         result ^= static_cast<quint8>(data.at(i));
     }
     return result;
+}
+
+/** @brief 计算累加和校验值(所有字节求和取低8位) @param data 待校验数据 @return 累加和低8位 */
+quint8 ProtocolEngine::computeSum(const QByteArray &data)
+{
+    quint32 sum = 0;
+    for (int i = 0; i < data.size(); ++i) {
+        sum += static_cast<quint8>(data.at(i));
+    }
+    return static_cast<quint8>(sum & 0xFF);
 }

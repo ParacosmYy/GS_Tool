@@ -74,6 +74,28 @@ quint64 ProtocolEngine::totalCrcErrors() const
     return m_totalCrcErrors;
 }
 
+/** @brief 获取CRC校验通过次数 @return 校验通过计数 */
+quint64 ProtocolEngine::crcPassCount() const
+{
+    return m_crcPassCount;
+}
+
+/** @brief 获取CRC校验失败次数 @return 校验失败计数 */
+quint64 ProtocolEngine::crcFailCount() const
+{
+    return m_crcFailCount;
+}
+
+/** @brief 获取CRC校验通过率 @return 通过率(0.0~1.0)，总次数为0时返回0.0 */
+double ProtocolEngine::crcPassRate() const
+{
+    quint64 total = m_crcPassCount + m_crcFailCount;
+    if (total == 0) {
+        return 0.0;
+    }
+    return static_cast<double>(m_crcPassCount) / static_cast<double>(total);
+}
+
 /** @brief 重置所有解析统计计数器(不影响schema和缓冲区) */
 void ProtocolEngine::resetParseStatistics()
 {
@@ -86,6 +108,8 @@ void ProtocolEngine::resetParseStatistics()
     m_lastParseTimestamp = 0;
     m_totalCrcErrors = 0;
     m_totalBytesParsed = 0;
+    m_crcPassCount = 0;
+    m_crcFailCount = 0;
 }
 
 /** @brief 重置所有引擎统计计数器(等同于resetParseStatistics) */

@@ -172,6 +172,7 @@ set(SOURCES
     src/protocol/engine/ProtocolEngine.cpp
     src/protocol/engine/ProtocolEngineStats.cpp
     src/protocol/engine/ProtocolEngineChecksum.cpp
+    src/protocol/engine/ProtocolEngineAlgorithm.cpp
     src/protocol/schema/ProtocolTemplateLibrary.cpp
     src/protocol/editor/ProtocolSchemaEditor.cpp
     src/protocol/engine/ProtocolFieldMapper.cpp

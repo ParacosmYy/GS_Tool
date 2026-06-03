@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget* parent)
     // 初始面板状态: 终端为默认可见面板（不触发动画）
     m_navController->setCurrentPanel(m_panelManager->terminal());
 
-    // 命令面板 (Ctrl+P 快速导航)
+    // 命令面板 (Ctrl+P 快速导航 -- 已迁移到ShortcutManager统一注册)
     m_commandPalette = new CommandPalette(this);
     {
         QVector<CommandEntry> cmds;
@@ -114,8 +114,6 @@ MainWindow::MainWindow(QWidget* parent)
         }
         m_commandPalette->registerCommands(cmds);
     }
-    auto* cmdShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
-    connect(cmdShortcut, &QShortcut::activated, m_commandPalette, &CommandPalette::showPalette);
 
     // 脚本录制器 — 从 PanelManager 获取已创建的面板实例
     m_scriptRecorder = m_panelManager->scriptRecorder();
@@ -185,11 +183,11 @@ MainWindow::MainWindow(QWidget* parent)
     m_shortcutManager->registerShortcut(
         "search.find", QKeySequence("Ctrl+F"),
         this, [this]() { m_panelManager->searchBar()->activate(); },
-        tr("搜索"));
+        tr("搜索"), ShortcutContext::Global);
     m_shortcutManager->registerShortcut(
         "nav.commandPalette", QKeySequence("Ctrl+P"),
         this, [this]() { m_commandPalette->showPalette(); },
-        tr("命令面板"));
+        tr("命令面板"), ShortcutContext::Global);
     m_shortcutManager->registerShortcut(
         "script.recordToggle", QKeySequence("Ctrl+Shift+R"),
         this, [this]() {
@@ -198,7 +196,38 @@ MainWindow::MainWindow(QWidget* parent)
             } else {
                 m_scriptRecorder->startRecording();
             }
-        }, tr("录制脚本"));
+        }, tr("录制脚本"), ShortcutContext::Global);
+    m_shortcutManager->registerShortcut(
+        "terminal.clear", QKeySequence("Ctrl+L"),
+        this, [this]() { m_terminalController->onClearTerminal(); },
+        tr("清空终端"), ShortcutContext::Terminal);
+    m_shortcutManager->registerShortcut(
+        "send.execute", QKeySequence("Ctrl+Enter"),
+        this, [this]() { m_sendController->onQuickCommand(QByteArray()); },
+        tr("发送数据"), ShortcutContext::SendArea);
+    m_shortcutManager->registerShortcut(
+        "project.save", QKeySequence("Ctrl+S"),
+        this, [this]() { m_sessionManager->saveSession(); },
+        tr("保存工程"), ShortcutContext::Global);
+    // 以下快捷键已注册但回调为空，待后续模块实现后绑定
+    m_shortcutManager->registerShortcut(
+        "project.open", QKeySequence("Ctrl+O"),
+        this, nullptr, tr("打开工程"), ShortcutContext::Global);
+    m_shortcutManager->registerShortcut(
+        "connection.new", QKeySequence("Ctrl+N"),
+        this, nullptr, tr("新建连接"), ShortcutContext::Global);
+    m_shortcutManager->registerShortcut(
+        "tab.close", QKeySequence("Ctrl+W"),
+        this, nullptr, tr("关闭标签页"), ShortcutContext::Global);
+
+    // 加载用户自定义快捷键绑定(覆盖默认值)
+    m_shortcutManager->loadCustomBindings();
+
+    // 注册终端/发送区控件的上下文映射(焦点变化时自动切换快捷键上下文)
+    if (m_panelManager->terminal()) {
+        m_shortcutManager->registerContextWidget(
+            m_panelManager->terminal(), ShortcutContext::Terminal);
+    }
 }
 
 /** @brief 从磁盘恢复用户偏好（语言、主题、面板索引）并启动统计定时器 */
