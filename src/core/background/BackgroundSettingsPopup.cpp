@@ -19,12 +19,7 @@
 #include <QStandardPaths>
 #include <QShowEvent>
 
-/**
- * @brief 构造背景设置弹出面板
- * 创建所有 UI 控件并连接到 BackgroundWidget 的属性方法
- * @param bgWidget 被控的背景控件实例
- * @param parent 父 widget
- */
+/** @brief 构造背景设置弹出面板，创建所有UI控件并连接到BackgroundWidget的属性方法 @param bgWidget 被控的背景控件实例 @param parent 父widget */
 BackgroundSettingsPopup::BackgroundSettingsPopup(BackgroundWidget* bgWidget, QWidget* parent)
     : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)  // Popup: 点击外部关闭, Frameless: 无标题栏
     , m_bgWidget(bgWidget)
@@ -111,10 +106,7 @@ void BackgroundSettingsPopup::createControls(QVBoxLayout* mainLayout)
     mainLayout->addWidget(separator);
 }
 
-/**
- * @brief 打开文件对话框选择背景图
- * 记住上次打开的目录，选择后保存路径到 SettingsManager 以便下次启动自动加载
- */
+/** @brief 打开文件对话框选择背景图，记住上次打开的目录，选择后保存路径到SettingsManager以便下次启动自动加载 */
 void BackgroundSettingsPopup::onSelectBackground()
 {
     // 从设置恢复上次打开的目录，默认为系统图片目录
@@ -147,10 +139,7 @@ void BackgroundSettingsPopup::onSelectBackground()
     emit backgroundImageSelected(filePath);
 }
 
-/**
- * @brief 从 BackgroundWidget 同步当前值到 UI 控件
- * 每次显示弹出面板前调用，确保滑块位置与实际值一致
- */
+/** @brief 从BackgroundWidget同步当前值到UI控件，每次显示弹出面板前调用确保滑块位置与实际值一致 */
 void BackgroundSettingsPopup::syncFromWidget()
 {
     m_blurSlider->setValue(int(m_bgWidget->blurRadius()));
@@ -159,20 +148,14 @@ void BackgroundSettingsPopup::syncFromWidget()
     m_opacityValueLbl->setText(QString::number(int(m_bgWidget->bgOpacity() * 100)) + "%");
 }
 
-/**
- * @brief 隐藏事件处理
- * 在面板隐藏时发出 hidden() 信号，通知 MainWindow 更新工具栏按钮状态
- */
+/** @brief 隐藏事件处理，在面板隐藏时发出hidden()信号通知MainWindow更新工具栏按钮状态 @param event 隐藏事件对象 */
 void BackgroundSettingsPopup::hideEvent(QHideEvent* event)
 {
     emit hidden();
     QWidget::hideEvent(event);
 }
 
-/**
- * @brief 显示事件处理
- * 递增打开计数器
- */
+/** @brief 显示事件处理，递增打开计数器 @param event 显示事件对象 */
 void BackgroundSettingsPopup::showEvent(QShowEvent* event)
 {
     QWidget::showEvent(event);
@@ -183,6 +166,7 @@ void BackgroundSettingsPopup::showEvent(QShowEvent* event)
 // 统计重置
 // ============================================================================
 
+/** @brief 重置弹出面板统计计数器(打开次数和设置变更次数) */
 void BackgroundSettingsPopup::resetPopupStatistics()
 {
     m_totalOpens = 0;

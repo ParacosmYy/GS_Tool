@@ -9,10 +9,7 @@
 #include <QSslSocket>
 #include <QUrl>
 
-/**
- * @brief 构造函数
- * @param parent 父对象
- */
+/** @brief 构造WebSocket连接，初始化心跳定时器 @param parent 父对象 */
 WebSocketConnection::WebSocketConnection(QObject* parent)
     : IConnection(parent)
     , m_pingTimer(new QTimer(this))
@@ -22,25 +19,19 @@ WebSocketConnection::WebSocketConnection(QObject* parent)
             this, &WebSocketConnection::onPingTimeout);
 }
 
-/**
- * @brief 析构函数
- */
+/** @brief 析构函数，关闭连接并释放资源 */
 WebSocketConnection::~WebSocketConnection()
 {
     close();
 }
 
-/**
- * @brief 获取连接类型
- */
+/** @brief 获取连接类型 @return ConnectionType::WebSocket */
 ConnectionType WebSocketConnection::type() const
 {
     return ConnectionType::WebSocket;
 }
 
-/**
- * @brief 获取连接显示名称
- */
+/** @brief 获取连接显示名称 @return 连接URL或默认字符串 */
 QString WebSocketConnection::name() const
 {
     if (m_state == ConnectionState::Connected && !m_url.isEmpty()) {
@@ -49,17 +40,13 @@ QString WebSocketConnection::name() const
     return tr("WebSocket (未连接)");
 }
 
-/**
- * @brief 获取当前状态
- */
+/** @brief 获取当前连接状态 @return 连接状态枚举 */
 ConnectionState WebSocketConnection::state() const
 {
     return m_state;
 }
 
-/**
- * @brief 打开连接
- */
+/** @brief 打开连接(使用当前URL发起WebSocket连接) @return true=连接已发起 */
 bool WebSocketConnection::open()
 {
     return connectToUrl(m_url);
@@ -88,17 +75,13 @@ void WebSocketConnection::close()
     updateState(ConnectionState::Disconnected);
 }
 
-/**
- * @brief 发送二进制数据
- */
+/** @brief 发送二进制数据(委托给sendBinaryMessage) @param data 待发送数据 @return 发送字节数 */
 qint64 WebSocketConnection::write(const QByteArray& data)
 {
     return sendBinaryMessage(data);
 }
 
-/**
- * @brief 配置WebSocket参数
- */
+/** @brief 配置WebSocket参数(URL和子协议) @param params 配置键值对 */
 void WebSocketConnection::configure(const QVariantMap& params)
 {
     if (params.contains("url")) {
@@ -208,9 +191,7 @@ QByteArray WebSocketConnection::buildFrame(quint8 opcode,
     return frame;
 }
 
-/**
- * @brief 发送HTTP Upgrade握手请求
- */
+/** @brief 发送HTTP Upgrade握手请求 */
 void WebSocketConnection::sendHandshake()
 {
     QString req = QString("GET %1 HTTP/1.1\r\n"
@@ -228,9 +209,7 @@ void WebSocketConnection::sendHandshake()
     m_socket->waitForBytesWritten(3000);
 }
 
-/**
- * @brief 检查握手响应是否完整
- */
+/** @brief 检查握手响应是否完整并解析HTTP 101状态码 @return true=握手成功 */
 bool WebSocketConnection::parseHandshakeResponse()
 {
     if (!m_buffer.contains("\r\n\r\n")) {
@@ -252,9 +231,7 @@ bool WebSocketConnection::parseHandshakeResponse()
     return true;
 }
 
-/**
- * @brief 解析缓冲区中的WebSocket帧
- */
+/** @brief 解析接收缓冲区中的WebSocket帧，按opcode分发处理 */
 void WebSocketConnection::parseFrames()
 {
     while (m_buffer.size() >= 2) {
@@ -335,9 +312,7 @@ void WebSocketConnection::parseFrames()
     }
 }
 
-/**
- * @brief 发送文本消息
- */
+/** @brief 发送文本消息(构建0x01文本帧并发送) @param message 文本内容 @return 发送字节数 */
 qint64 WebSocketConnection::sendTextMessage(const QString& message)
 {
     if (!m_socket || !m_handshakeDone) { return -1; }
@@ -350,9 +325,7 @@ qint64 WebSocketConnection::sendTextMessage(const QString& message)
     return written;
 }
 
-/**
- * @brief 发送二进制消息
- */
+/** @brief 发送二进制消息(构建0x02二进制帧并发送) @param data 二进制数据 @return 发送字节数 */
 qint64 WebSocketConnection::sendBinaryMessage(const QByteArray& data)
 {
     if (!m_socket || !m_handshakeDone) { return -1; }
@@ -365,9 +338,7 @@ qint64 WebSocketConnection::sendBinaryMessage(const QByteArray& data)
     return written;
 }
 
-/**
- * @brief 发送ping帧
- */
+/** @brief 发送ping帧(心跳检测) @param payload ping载荷数据 @return true=发送成功 */
 bool WebSocketConnection::ping(const QByteArray& payload)
 {
     if (!m_socket || !m_handshakeDone) { return false; }
@@ -375,17 +346,13 @@ bool WebSocketConnection::ping(const QByteArray& payload)
     return m_socket->write(frame) == frame.size();
 }
 
-/**
- * @brief TCP连接成功 — 发送握手
- */
+/** @brief TCP连接成功回调，发送HTTP Upgrade握手 */
 void WebSocketConnection::onTcpConnected()
 {
     sendHandshake();
 }
 
-/**
- * @brief TCP断开
- */
+/** @brief TCP断开回调，停止心跳并更新连接状态 */
 void WebSocketConnection::onTcpDisconnected()
 {
     m_pingTimer->stop();
@@ -393,9 +360,7 @@ void WebSocketConnection::onTcpDisconnected()
     updateState(ConnectionState::Disconnected);
 }
 
-/**
- * @brief TCP数据就绪 — 先完成握手，再解析帧
- */
+/** @brief TCP数据就绪回调，先完成握手再解析WebSocket帧 */
 void WebSocketConnection::onTcpReadyRead()
 {
     if (!m_socket) { return; }
@@ -410,17 +375,13 @@ void WebSocketConnection::onTcpReadyRead()
     parseFrames();
 }
 
-/**
- * @brief 心跳定时器触发
- */
+/** @brief 心跳定时器触发，发送ping帧保持连接活跃 */
 void WebSocketConnection::onPingTimeout()
 {
     ping();
 }
 
-/**
- * @brief 更新连接状态
- */
+/** @brief 更新连接状态并发射stateChanged信号 @param newState 新的连接状态 */
 void WebSocketConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {

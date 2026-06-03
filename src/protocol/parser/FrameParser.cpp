@@ -79,13 +79,7 @@ void FrameParser::reset()
     m_frameTimer.invalidate();
 }
 
-/**
- * @brief 完整重置所有中间缓冲区和匹配进度（超时恢复用）
- *
- * 比 reset() 更彻底，额外调用 squeeze() 释放内存，
- * 确保下一帧从完全干净的状态开始解析。
- */
-/** @brief 重置解析器中间状态(不清零统计计数器) */
+/** @brief 完整重置所有中间缓冲区和匹配进度(超时恢复用) */
 void FrameParser::resetIntermediateState()
 {
     m_state = State::Idle;

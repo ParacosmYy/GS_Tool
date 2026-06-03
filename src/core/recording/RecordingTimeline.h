@@ -114,10 +114,15 @@ private:
     quint64 m_totalSeeks = 0;          ///< 累计定位次数
     quint64 m_totalEventsRecorded = 0; ///< 累计记录的事件数
 public:
+    /** @brief 获取累计录制启动次数 @return 启动次数 */
     quint64 totalRecordingStarts() const { return m_totalRecordingStarts; }
+    /** @brief 获取累计录制停止次数 @return 停止次数 */
     quint64 totalRecordingStops() const { return m_totalRecordingStops; }
+    /** @brief 获取累计定位操作次数 @return 定位次数 */
     quint64 totalSeeks() const { return m_totalSeeks; }
+    /** @brief 获取累计记录事件数 @return 事件总数 */
     quint64 totalEventsRecorded() const { return m_totalEventsRecorded; }
+    /** @brief 重置所有时间线统计计数器为零 */
     void resetTimelineStatistics() { m_totalRecordingStarts = 0; m_totalRecordingStops = 0; m_totalSeeks = 0; m_totalEventsRecorded = 0; }
 };
 

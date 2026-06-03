@@ -19,11 +19,7 @@
 // 辅助函数
 // ============================================================================
 
-/**
- * @brief 将毫秒时间转换为 "MM:SS.d" 格式字符串
- * @param ms 时间值（毫秒）
- * @return 格式化后的时间字符串
- */
+/** @brief 将毫秒时间转换为"MM:SS.d"格式字符串 @param ms 时间值(毫秒) @return 格式化后的时间字符串 */
 static QString formatTime(qint64 ms)
 {
     if (ms < 0) {
@@ -43,10 +39,7 @@ static QString formatTime(qint64 ms)
 // 构造 / 析构
 // ============================================================================
 
-/**
- * @brief 构造函数，初始化控件并构建 UI
- * @param parent 父控件指针
- */
+/** @brief 构造回放控制面板，初始化控件并构建UI @param parent 父控件指针 */
 PlaybackWidget::PlaybackWidget(QWidget* parent)
     : QWidget(parent)
     , m_playBtn(nullptr)
@@ -63,14 +56,7 @@ PlaybackWidget::PlaybackWidget(QWidget* parent)
 // 公开方法
 // ============================================================================
 
-/**
- * @brief 设置回放总时长
- *
- * 更新内部时长存储、滑块启用状态和时间标签。
- * 当时长为 0 时禁用滑块，防止用户拖拽。
- *
- * @param durationMs 总时长（毫秒）
- */
+/** @brief 设置回放总时长，更新内部时长存储、滑块启用状态和时间标签，时长为0时禁用滑块防止用户拖拽 @param durationMs 总时长(毫秒) */
 void PlaybackWidget::setDuration(qint64 durationMs)
 {
     m_durationMs = durationMs;
@@ -83,14 +69,7 @@ void PlaybackWidget::setDuration(qint64 durationMs)
         formatTime(0) + tr(" / ") + formatTime(m_durationMs));
 }
 
-/**
- * @brief 设置当前回放时间
- *
- * 根据当前时间与总时长的比例更新滑块位置（阻塞信号防止反馈循环），
- * 同时更新时间标签显示。
- *
- * @param timeMs 当前时间（毫秒）
- */
+/** @brief 设置当前回放时间，根据当前时间与总时长的比例更新滑块位置(阻塞信号防止反馈循环)，同时更新时间标签显示 @param timeMs 当前时间(毫秒) */
 void PlaybackWidget::setCurrentTime(qint64 timeMs)
 {
     if (!m_slider) {
@@ -118,14 +97,7 @@ void PlaybackWidget::setCurrentTime(qint64 timeMs)
 // UI 构建
 // ============================================================================
 
-/**
- * @brief 构建完整的回放控制面板 UI
- *
- * 布局：[播放/暂停] [停止] [进度滑块---] [倍速选择] [时间显示]
- *
- * 滑块范围 0-10000，用于提高拖拽精度，实际时间通过比例换算。
- * 倍速选项：0.25x, 0.5x, 1x, 2x, 4x, 8x，默认 1x。
- */
+/** @brief 构建完整的回放控制面板UI，布局为[播放/暂停][停止][进度滑块][倍速选择][时间显示]，滑块范围0-10000提高拖拽精度，倍速选项0.25x~8x默认1x */
 void PlaybackWidget::setupUI()
 {
     auto* layout = new QHBoxLayout(this);

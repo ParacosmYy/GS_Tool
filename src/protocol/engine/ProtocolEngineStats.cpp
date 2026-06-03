@@ -62,30 +62,19 @@ quint64 ProtocolEngine::totalPacketsProcessed() const
     return m_framesParsed + m_framesRejected;
 }
 
-/**
- * @brief 获取已解析的字节总数（仅成功解析的帧内字节）
- * @return 字节总数
- */
+/** @brief 获取已解析的字节总数(仅成功解析的帧内字节) @return 字节总数 */
 quint64 ProtocolEngine::totalBytesParsed() const
 {
     return m_totalBytesParsed;
 }
 
-/**
- * @brief 获取CRC校验错误次数
- * @return CRC错误计数
- */
+/** @brief 获取CRC校验错误次数 @return CRC错误计数 */
 quint64 ProtocolEngine::totalCrcErrors() const
 {
     return m_totalCrcErrors;
 }
 
-/**
- * @brief 重置所有解析统计计数器
- *
- * 将帧计数、拒绝计数、字节总数和时间戳全部归零。
- * 不影响当前 schema 设置和缓冲区内容。
- */
+/** @brief 重置所有解析统计计数器(不影响schema和缓冲区) */
 void ProtocolEngine::resetParseStatistics()
 {
     m_framesParsed = 0;

@@ -25,19 +25,7 @@
 #include "ota/widget/OtaWidget.h"
 #include "connection/serial_port/SerialConnection.h"
 
-/**
- * @brief 连接所有模块间的信号/槽（调用 8 个子方法按功能分组）
- *
- * 子方法调用顺序:
- *   connectSerialSignals()           - 串口连接/断开/重连
- *   connectSerialSendSignals()       - 快捷指令/发送控制器
- *   connectToolbarSignals()          - 工具栏/录制状态消息
- *   connectSearchAndProtocolSignals() - 搜索/协议桥/帧编辑/导航
- *   connectPortWatchSignals()        - 热插拔通知
- *   connectThemeSignals()            - 主题切换 + Toast
- *   connectOtaSignals()              - OTA传输通知
- *   connectBookmarkSignals()         - 书签面板
- */
+/** @brief 连接所有模块间信号/槽（内部调用8个子方法按功能分组） */
 void MainWindow::connectSignals()
 {
     connectSerialSignals();
@@ -51,12 +39,7 @@ void MainWindow::connectSignals()
     connectBookmarkSignals();
 }
 
-/**
- * @brief 串口连接/断开/重连相关信号连接
- *
- * 包含: SerialConfigPanel → ConnectionController 的连接/断开/DTR/RTS 控制，
- *       ConnectionController → MainWindow 的状态更新/数据接收/失败通知/自动重连。
- */
+/** @brief 串口连接/断开/DTR/RTS/波特率/数据/错误信号路由 */
 void MainWindow::connectSerialSignals()
 {
     // ---- 串口连接/断开: 委托 ConnectionController 处理 ----
@@ -145,12 +128,7 @@ void MainWindow::connectSerialDataFlow()
     });
 }
 
-/**
- * @brief 自动重连状态指示信号连接
- *
- * 包含: 重连尝试次数 → 状态栏文本更新，
- *       重连成功/失败 → Toast 通知。
- */
+/** @brief 自动重连状态指示信号路由（尝试/成功/失败→状态栏+Toast） */
 void MainWindow::connectReconnectSignals()
 {
     // 重连尝试中: 更新状态栏显示当前尝试次数
@@ -195,13 +173,7 @@ void MainWindow::connectReconnectSignals()
     });
 }
 
-/**
- * @brief 快捷指令和发送控制器信号连接
- *
- * 包含: QuickCommandBar → SendController 快捷指令发送，
- *       SendController → TerminalController 状态栏更新，
- *       SendController → ToastWidget 防抖吐司通知。
- */
+/** @brief 快捷指令/发送控制器信号路由（发送→状态栏+防抖Toast） */
 void MainWindow::connectSerialSendSignals()
 {
     // 快捷指令 → 发送控制器
@@ -222,11 +194,7 @@ void MainWindow::connectSerialSendSignals()
             });
 }
 
-/**
- * @brief 串口热插拔状态栏通知连接
- *
- * 检测串口设备的物理接入/拔出事件，在状态栏显示提示信息。
- */
+/** @brief 串口热插拔状态栏通知（新端口接入/端口拔出→状态栏提示） */
 void MainWindow::connectPortWatchSignals()
 {
     // ---- 串口热插拔状态栏通知 ----
@@ -244,12 +212,7 @@ void MainWindow::connectPortWatchSignals()
     });
 }
 
-/**
- * @brief 主题切换信号连接
- *
- * 包含: ThemeManager → NavIndicatorWidget 颜色刷新，
- *       连接成功/断开/错误 → Toast 通知（含防抖策略说明）。
- */
+/** @brief 主题切换信号连接 + 连接成功/断开/错误→Toast通知(含防抖策略) */
 void MainWindow::connectThemeSignals()
 {
     // ---- NavIndicatorWidget 主题刷新已在构造函数中连接，此处无需重复 ----
@@ -300,11 +263,7 @@ void MainWindow::connectThemeSignals()
     ///@}
 }
 
-/**
- * @brief OTA 传输状态信号连接
- *
- * 包含: OtaWidget 传输开始/完成/失败 → Toast 通知（含防抖策略）。
- */
+/** @brief OTA传输状态信号连接(开始/完成/失败→Toast通知，含防抖策略) */
 void MainWindow::connectOtaSignals()
 {
     // ---- OTA 传输状态 → 吐司通知 ----
@@ -339,13 +298,7 @@ void MainWindow::connectOtaSignals()
     ///@}
 }
 
-/**
- * @brief 书签面板信号路由
- *
- * 包含: RecordingController → DataLogger 的书签添加路由 + Toast 反馈，
- *       DataLogger::bookmarksChanged → 状态栏消息，
- *       BookmarkWidget ↔ DataLogger 的书签 CRUD 操作。
- */
+/** @brief 书签面板信号路由(添加/删除/清空/跳转→DataLogger+Toast+状态栏) */
 void MainWindow::connectBookmarkSignals()
 {
     /**

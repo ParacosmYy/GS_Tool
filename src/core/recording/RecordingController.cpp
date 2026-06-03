@@ -8,10 +8,7 @@
 #include <QToolBar>
 #include <QFileDialog>
 
-/**
- * @brief 构造录制控制器
- * 连接 DataLogger 的信号到内部槽，建立录制/回放数据流管道
- */
+/** @brief 构造录制控制器，连接DataLogger信号到内部槽建立数据流管道 @param logger 数据日志记录器 @param parent 父对象 */
 RecordingController::RecordingController(DataLogger* logger, QObject* parent)
     : QObject(parent)
     , m_logger(logger)
@@ -68,9 +65,13 @@ void RecordingController::setConnected(bool connected)
     m_connected = connected;
 }
 
+/** @brief 获取累计录制次数 @return 录制总数 */
 quint64 RecordingController::totalRecordings() const { return m_totalRecordings; }
+/** @brief 获取累计回放次数 @return 回放总数 */
 quint64 RecordingController::totalPlaybacks() const { return m_totalPlaybacks; }
+/** @brief 获取累计回放字节数 @return 回放字节总数 */
 quint64 RecordingController::totalBytesPlayed() const { return m_totalBytesPlayed; }
+/** @brief 获取累计错误次数 @return 错误总数 */
 quint64 RecordingController::totalErrors() const { return m_totalErrors; }
 
 /** @brief 重置所有统计计数器 */
@@ -82,10 +83,7 @@ void RecordingController::resetRecordingStatistics()
     m_totalErrors = 0;
 }
 
-/**
- * @brief 录制按钮切换处理
- * 三种状态: 未录制→开始 | 录制中→暂停 | 已暂停→继续
- */
+/** @brief 录制按钮切换处理(未录制→开始 | 录制中→暂停 | 已暂停→继续) */
 void RecordingController::onToggleRecording()
 {
     if (!m_logger) {

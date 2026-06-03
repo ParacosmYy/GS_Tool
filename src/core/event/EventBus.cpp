@@ -11,12 +11,14 @@
 
 // ---- 单例实现 ----
 
+/** @brief 获取EventBus单例实例 @return 单例引用 */
 EventBus& EventBus::instance()
 {
     static EventBus bus;
     return bus;
 }
 
+/** @brief 构造事件总线，连接内部异步发布信号 @param parent 父对象指针 */
 EventBus::EventBus(QObject* parent)
     : QObject(parent)
 {
@@ -26,10 +28,18 @@ EventBus::EventBus(QObject* parent)
             Qt::QueuedConnection);
 }
 
+/** @brief 析构函数，使用默认实现 */
 EventBus::~EventBus() = default;
 
 // ---- 订阅管理 ----
 
+/**
+ * @brief 订阅指定事件，注册回调处理器
+ * @param eventName 事件名称
+ * @param subscriber 订阅者对象指针，销毁时自动取消订阅
+ * @param callback 事件触发时的回调函数
+ * @return 订阅ID，用于后续取消订阅
+ */
 int EventBus::subscribe(const QString& eventName, QObject* subscriber, Callback callback)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -50,6 +60,10 @@ int EventBus::subscribe(const QString& eventName, QObject* subscriber, Callback 
     return id;
 }
 
+/**
+ * @brief 取消指定ID的订阅
+ * @param subscriptionId 要取消的订阅ID
+ */
 void EventBus::unsubscribe(int subscriptionId)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -70,6 +84,10 @@ void EventBus::unsubscribe(int subscriptionId)
     }
 }
 
+/**
+ * @brief 取消指定订阅者的所有订阅
+ * @param subscriber 要清除订阅的对象指针
+ */
 void EventBus::unsubscribeAll(QObject* subscriber)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -102,6 +120,11 @@ void EventBus::unsubscribeAll(QObject* subscriber)
 
 // ---- 事件发布 ----
 
+/**
+ * @brief 同步发布事件，立即执行所有订阅者回调
+ * @param eventName 事件名称
+ * @param data 事件携带的数据
+ */
 void EventBus::publish(const QString& eventName, const QVariant& data)
 {
     // 收集回调（在锁内复制，锁外执行）
@@ -125,11 +148,21 @@ void EventBus::publish(const QString& eventName, const QVariant& data)
     }
 }
 
+/**
+ * @brief 异步发布事件，通过信号队列在事件循环中执行
+ * @param eventName 事件名称
+ * @param data 事件携带的数据
+ */
 void EventBus::publishAsync(const QString& eventName, const QVariant& data)
 {
     emit eventPublished(eventName, data);
 }
 
+/**
+ * @brief 异步事件内部处理槽，委托给同步publish执行
+ * @param eventName 事件名称
+ * @param data 事件携带的数据
+ */
 void EventBus::handleAsyncEvent(const QString& eventName, const QVariant& data)
 {
     publish(eventName, data);
@@ -137,12 +170,18 @@ void EventBus::handleAsyncEvent(const QString& eventName, const QVariant& data)
 
 // ---- 统计与调试 ----
 
+/**
+ * @brief 获取指定事件的订阅者数量
+ * @param eventName 事件名称
+ * @return 订阅者数量
+ */
 int EventBus::subscriberCount(const QString& eventName) const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_eventSubscriptions.count(eventName);
 }
 
+/** @brief 获取所有已注册的事件名称列表(去重) @return 事件名称字符串列表 */
 QStringList EventBus::eventNames() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -155,6 +194,7 @@ QStringList EventBus::eventNames() const
     return names;
 }
 
+/** @brief 获取各事件的订阅者数量统计映射 @return 事件名称到订阅者数量的映射 */
 QMap<QString, int> EventBus::statistics() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);

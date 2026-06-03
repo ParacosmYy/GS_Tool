@@ -14,21 +14,7 @@
 #include <QShortcut>
 #include <QKeySequence>
 
-/**
- * @brief 构建 UI 布局
- *
- * 布局层次:
- * BackgroundWidget (中央部件)
- *   └── QVBoxLayout
- *       └── QSplitter (水平分割)
- *           ├── QTreeView (左侧导航树, 180~280px)
- *           └── QWidget (右侧面板容器)
- *               └── m_rightPanel → serialPanel (面板栈)
- *                   ├── SerialConfigPanel / DataStatistics / ProtocolView / FrameVisualEditor / ChartWidget / OtaWidget
- *                   ├── terminalContainer (搜索栏 + 终端)
- *                   ├── QuickCommandBar (快捷指令)
- *                   └── SendBar (发送栏, 由 SendController 创建)
- */
+/** @brief 构建完整的UI布局（背景层→分割器→导航树→面板栈→发送栏） */
 void MainWindow::setupUI()
 {
     // ---- 背景: 磨砂玻璃背景层作为中央部件 ----
@@ -156,11 +142,7 @@ QWidget* MainWindow::createContentArea()
     return rightWidget;
 }
 
-/**
- * @brief 构建状态栏
- *
- * 左侧显示连接状态，右侧显示 RX/TX 字节计数
- */
+/** @brief 构建状态栏（左侧连接状态、右侧RX/TX字节计数） */
 void MainWindow::setupStatusBar()
 {
     m_connStatusLbl = new QLabel(tr("未连接"));

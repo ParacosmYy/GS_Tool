@@ -15,33 +15,19 @@ ProtobufDecoder::ProtobufDecoder(QObject* parent)
 {
 }
 
-/**
- * @brief 加载.proto文件以提供模式信息
- * @param filePath .proto文件路径
- * @return 加载成功返回true，否则返回false
- */
+/** @brief 加载.proto文件以提供模式信息 @param filePath .proto文件路径 @return 加载成功返回true，否则返回false */
 bool ProtobufDecoder::loadProtoFile(const QString& filePath) {
     m_protoFilePath = filePath;
     m_loaded = true;
     return true;
 }
 
-/**
- * @brief 检查是否已加载.proto文件
- * @return 已加载返回true，否则返回false
- */
+/** @brief 检查是否已加载.proto文件 @return 已加载返回true，否则返回false */
 bool ProtobufDecoder::isLoaded() const {
     return m_loaded;
 }
 
-/**
- * @brief 解码Protobuf二进制消息
- *
- * 遍历所有字段tag，按wire type分别解析，解析完成后发射decoded信号。
- *
- * @param data 待解码的Protobuf二进制数据
- * @return 解析结果Map，key为字段编号字符串，value为字段信息Map
- */
+/** @brief 解码Protobuf二进制消息(遍历字段tag按wire type解析) @param data 待解码的Protobuf二进制数据 @return 解析结果Map */
 QVariantMap ProtobufDecoder::decodeMessage(const QByteArray& data) {
     QVariantMap result;
     if (data.isEmpty()) {
@@ -67,15 +53,7 @@ QVariantMap ProtobufDecoder::decodeMessage(const QByteArray& data) {
     return result;
 }
 
-/**
- * @brief 编码为Protobuf二进制消息
- *
- * fields格式: {"1": {value: ..., wireType: ...}, "2": {value: ..., wireType: ...}}
- * wireType: 0=Varint, 1=64-bit, 2=Length-delimited, 5=32-bit
- *
- * @param fields 字段映射表，key为字段编号，value含value和wireType
- * @return 编码后的Protobuf二进制数据
- */
+/** @brief 编码为Protobuf二进制消息 @param fields 字段映射表 @return 编码后的Protobuf二进制数据 */
 QByteArray ProtobufDecoder::encodeMessage(const QVariantMap& fields) {
     QByteArray data;
     QBuffer buf(&data);
@@ -134,11 +112,7 @@ QByteArray ProtobufDecoder::encodeMessage(const QVariantMap& fields) {
     return data;
 }
 
-/**
- * @brief 将varint编码写入缓冲区
- * @param buf 目标缓冲区
- * @param value 待写入的64位无符号整数
- */
+/** @brief 将varint编码写入缓冲区 @param buf 目标缓冲区 @param value 待写入的64位无符号整数 */
 void ProtobufDecoder::writeVarint(QBuffer& buf, quint64 value) const {
     while (value > 0x7F) {
         buf.putChar(static_cast<char>((value & 0x7F) | 0x80));
@@ -147,12 +121,7 @@ void ProtobufDecoder::writeVarint(QBuffer& buf, quint64 value) const {
     buf.putChar(static_cast<char>(value & 0x7F));
 }
 
-/**
- * @brief 从数据中解析一个varint值
- * @param data 源二进制数据
- * @param offset 起始偏移量
- * @return QPair<解析后的值, 消耗的字节数>
- */
+/** @brief 从数据中解析一个varint值 @param data 源二进制数据 @param offset 起始偏移量 @return QPair<解析后的值,消耗的字节数> */
 QPair<quint64, int> ProtobufDecoder::parseVarint(const QByteArray& data,
                                                   int offset) const {
     quint64 value = 0;
@@ -169,16 +138,7 @@ QPair<quint64, int> ProtobufDecoder::parseVarint(const QByteArray& data,
     return {value, pos - offset};
 }
 
-/**
- * @brief 从二进制数据中解码单个Protobuf字段
- *
- * 解析tag获取fieldNumber和wireType，然后按wireType提取字段值。
- * wireType: 0=Varint, 1=64-bit, 2=Length-delimited, 5=32-bit
- *
- * @param data 源二进制数据
- * @param offset 起始偏移量
- * @return QPair<字段信息Map, 新的偏移量>
- */
+/** @brief 从二进制数据中解码单个Protobuf字段(tag→fieldNumber+wireType→值提取) @param data 源二进制数据 @param offset 起始偏移量 @return QPair<字段信息Map,新偏移量> */
 QPair<QVariantMap, int> ProtobufDecoder::decodeField(const QByteArray& data,
                                                       int offset) const {
     QVariantMap field;

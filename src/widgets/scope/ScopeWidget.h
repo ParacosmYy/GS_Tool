@@ -1,41 +1,140 @@
+/**
+ * @file ScopeWidget.h
+ * @brief 示波器组件 - 多通道实时波形显示
+ *
+ * 职责:
+ *   1. 管理多通道采样数据缓冲区
+ *   2. 以网格背景绘制示波器风格波形
+ *   3. 支持时基/电压刻度调节和触发条件设置
+ *   4. 支持单通道和批量采样数据输入
+ */
+
 #pragma once
 #include <QWidget>
 #include <QVector>
 #include <QTimer>
 #include <QPair>
 
+/**
+ * @brief 示波器波形显示组件
+ *
+ * 提供类似硬件示波器的多通道波形实时渲染。
+ * 支持可配置的时基（ms/div）、电压刻度（V/div）、
+ * 触发通道和触发电平，网格分为10个水平分度。
+ */
 class ScopeWidget : public QWidget {
     Q_OBJECT
 public:
+    /**
+     * @brief 构造示波器组件
+     * @param parent 父widget
+     */
     explicit ScopeWidget(QWidget *parent = nullptr);
+
+    /** @brief 析构函数 */
     ~ScopeWidget() override;
+
+    /**
+     * @brief 设置通道数量
+     * @param count 通道数
+     */
     void setChannelCount(int count);
+
+    /**
+     * @brief 设置每个通道的采样缓冲区大小
+     * @param size 缓冲区长度（采样点数）
+     */
     void setSampleBuffer(int size);
+
+    /**
+     * @brief 向指定通道添加单个采样值
+     * @param channel 通道索引
+     * @param value 采样值
+     */
     void addSample(int channel, double value);
+
+    /**
+     * @brief 向指定通道批量添加采样值
+     * @param channel 通道索引
+     * @param values 采样值数组
+     */
     void addSamples(int channel, const QVector<double> &values);
+
+    /**
+     * @brief 设置时基刻度
+     * @param msPerDiv 每分度对应的毫秒数，默认1.0
+     */
     void setTimeScale(double msPerDiv);
+
+    /**
+     * @brief 设置电压刻度
+     * @param voltsPerDiv 每分度对应的电压值，默认1.0
+     */
     void setVoltageScale(double voltsPerDiv);
+
+    /**
+     * @brief 设置触发通道
+     * @param ch 触发源通道索引，默认0
+     */
     void setTriggerChannel(int ch);
+
+    /**
+     * @brief 设置触发电平
+     * @param level 触发电平阈值，默认0.0
+     */
     void setTriggerLevel(double level);
+
+    /**
+     * @brief 设置是否持续运行
+     * @param on true运行，false停止
+     */
     void setRunning(bool on);
+
+    /** @brief 清空所有通道数据 */
     void clearData();
+
+    /**
+     * @brief 获取当前通道数量
+     * @return 通道数
+     */
     int channelCount() const;
+
+    /**
+     * @brief 查询是否正在运行
+     * @return true表示运行中
+     */
     bool isRunning() const;
+
 signals:
+    /** @brief 触发条件被满足时发射 */
     void triggerFired();
+
+    /** @brief 采样缓冲区溢出时发射 */
     void dataOverflow();
+
 protected:
+    /** @brief 绘制波形和网格 */
     void paintEvent(QPaintEvent *event) override;
+
+    /** @brief 窗口大小变更时触发重绘 */
     void resizeEvent(QResizeEvent *event) override;
+
 private:
+    /**
+     * @brief 绘制背景网格线
+     * @param p 画笔
+     * @param w 绘制区域宽度
+     * @param h 绘制区域高度
+     */
     void drawGrid(QPainter &p, int w, int h);
-    QVector<QVector<double>> m_channels;
-    int m_bufferSize = 1024;
-    double m_timeScale = 1.0;
-    double m_voltScale = 1.0;
-    int m_triggerCh = 0;
-    double m_triggerLevel = 0.0;
-    bool m_running = true;
-    int m_writePos = 0;
-    static constexpr int kDivisions = 10;
+
+    QVector<QVector<double>> m_channels; ///< 多通道采样数据缓冲区
+    int m_bufferSize = 1024;             ///< 每通道缓冲区长度
+    double m_timeScale = 1.0;            ///< 时基刻度（ms/div）
+    double m_voltScale = 1.0;            ///< 电压刻度（V/div）
+    int m_triggerCh = 0;                 ///< 触发源通道索引
+    double m_triggerLevel = 0.0;         ///< 触发电平阈值
+    bool m_running = true;               ///< 运行状态标志
+    int m_writePos = 0;                  ///< 环形缓冲区写入位置
+    static constexpr int kDivisions = 10; ///< 水平分度数
 };

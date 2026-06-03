@@ -34,11 +34,7 @@ ThemeManager& ThemeManager::instance()
     return inst;
 }
 
-/**
- * @brief 构造函数 - 注册内置主题并加载默认色板
- *
- * 不执行任何QSS加载，首次主题加载由 loadSavedTheme() 或 loadTheme() 触发。
- */
+/** @brief 构造函数 - 注册内置主题并加载默认色板(不执行QSS加载) @param parent 父对象 */
 ThemeManager::ThemeManager(QObject* parent)
     : QObject(parent)
     , m_transitionWidget(nullptr)
@@ -53,12 +49,7 @@ ThemeManager::ThemeManager(QObject* parent)
     loadDefaultColors();
 }
 
-/**
- * @brief 加载默认色板（Catppuccin Mocha）
- *
- * 当QSS文件中未定义对应变量时，使用这些兜底颜色。
- * 这保证了即使QSS解析失败，自绘控件也有合理的颜色。
- */
+/** @brief 加载默认色板(Catppuccin Mocha)，QSS解析失败时作为兜底颜色 */
 void ThemeManager::loadDefaultColors()
 {
     // ---- Catppuccin Mocha 色板（dark_terminal 默认值）----
@@ -91,14 +82,7 @@ void ThemeManager::loadDefaultColors()
     m_colorMap[SemanticColor::TermCurrentMatch]    = QColor(249, 226, 175, 180); // #f9e2af 高不透明度
 }
 
-/**
- * @brief 加载指定内置主题
- *
- * 流程: 查找主题QSS文件 -> 读取内容 -> 带动画应用样式表 -> 解析语义色板
- *
- * @param themeName 主题名称
- * @return true 加载成功
- */
+/** @brief 加载指定内置主题(查找QSS→读取→带动画应用→解析语义色板) @param themeName 主题名称 @return true加载成功 */
 bool ThemeManager::loadTheme(const QString& themeName)
 {
     if (!m_themes.contains(themeName)) {
@@ -133,11 +117,7 @@ bool ThemeManager::loadTheme(const QString& themeName)
     return true;
 }
 
-/**
- * @brief 从外部QSS文件加载自定义主题
- * @param filePath QSS文件路径
- * @return true 加载成功
- */
+/** @brief 从外部QSS文件加载自定义主题 @param filePath QSS文件路径 @return true加载成功 */
 bool ThemeManager::loadThemeFromFile(const QString& filePath)
 {
     QFile file(filePath);
@@ -196,16 +176,7 @@ QColor ThemeManager::color(SemanticColor color) const
     return QColor(128, 128, 128);
 }
 
-/**
- * @brief 检测 Windows 系统当前是否为暗色模式
- *
- * 读取注册表 AppsUseLightTheme 键值:
- *   - 值为 0: 暗色模式
- *   - 值为 1: 亮色模式
- *   - 读取失败: 默认返回 false（亮色）
- *
- * @return true 系统为暗色模式
- */
+/** @brief 检测Windows系统当前是否为暗色模式(读取注册表AppsUseLightTheme) @return true系统为暗色模式 */
 bool ThemeManager::isSystemDarkMode() const
 {
 #ifdef Q_OS_WIN
@@ -222,14 +193,7 @@ bool ThemeManager::isSystemDarkMode() const
 #endif
 }
 
-/**
- * @brief 根据系统主题自动选择并加载对应主题
- *
- * 暗色模式 -> dark_terminal
- * 亮色模式 -> light
- *
- * @return 实际加载的主题名称
- */
+/** @brief 根据系统主题自动选择并加载对应主题(暗色→dark_terminal/亮色→light) @return 实际加载的主题名称 */
 QString ThemeManager::loadSystemTheme()
 {
     QString themeName = isSystemDarkMode() ? "dark_terminal" : "light";
@@ -237,12 +201,7 @@ QString ThemeManager::loadSystemTheme()
     return themeName;
 }
 
-/**
- * @brief 持久化当前主题到 SettingsManager
- *
- * 将主题名称写入 "theme/name" 配置项。
- * 由 SettingsController 在主题切换和窗口关闭时调用。
- */
+/** @brief 持久化当前主题到SettingsManager(写入theme/name配置项) */
 void ThemeManager::saveTheme() const
 {
     if (!m_currentTheme.isEmpty()) {

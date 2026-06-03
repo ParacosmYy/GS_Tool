@@ -63,18 +63,7 @@ OtaManager::~OtaManager()
 // 信号连接
 // ============================================================================
 
-/**
- * @brief 统一绑定BaseTransfer的三个基础信号到OtaManager的转发
- * @param transfer 传输协议实例
- *
- * 三个协议共享相同的progress/transferComplete/transferError信号定义，
- * 统一转发到OtaManager的同名信号，OtaWidget只需连接OtaManager。
- *
- * 错误消息增强:
- *   - 超时错误: 包含文件名
- *   - CRC校验失败: 包含块号（由协议层提供）
- *   - 连接中断: 包含已传输字节数（由协议层提供）
- */
+/** @brief 统一绑定BaseTransfer基础信号到OtaManager转发 @param transfer 传输协议实例 */
 void OtaManager::connectTransferSignals(BaseTransfer* transfer)
 {
     connect(transfer, &BaseTransfer::progress,
@@ -172,15 +161,7 @@ QString OtaManager::currentProtocolName() const
 // 连接和传输控制
 // ============================================================================
 
-/**
- * @brief 设置数据连接，同步到三个协议实例
- * @param conn 新的数据连接（串口/TCP/UDP），可为 nullptr
- *
- * 安全机制:
- *   1. 如果当前有活跃传输（非Idle状态），先调用 cancelTransfer() 停止传输
- *   2. 切换期间记录警告日志，提醒开发者注意连接切换时机
- *   3. OtaWidget 在调用此方法前应先检查 OtaManager::isTransferring()
- */
+/** @brief 设置数据连接(同步到三个协议实例，活跃传输期间自动取消) @param conn 新的数据连接 */
 void OtaManager::setConnection(IConnection* conn)
 {
     // 活跃传输期间切换连接: 先取消当前传输，避免协议实例持有失效的连接
@@ -196,18 +177,7 @@ void OtaManager::setConnection(IConnection* conn)
     m_zmodem->setConnection(conn);
 }
 
-/**
- * @brief 开始OTA传输
- * @param filePath 固件文件路径
- * @param protocol 传输协议名称
- * @return true=成功启动，false=验证失败
- *
- * 完整流程:
- *   1. 验证文件路径(存在/可读/大小限制)
- *   2. 检测文件类型(BIN/HEX)
- *   3. HEX文件自动转BIN(IntelHexParser)
- *   4. 根据协议名选择传输实例并启动
- */
+/** @brief 开始OTA传输(验证文件→检测类型→HEX转BIN→选择协议→启动) @param filePath 固件文件路径 @param protocol 传输协议名称 @return true=成功启动，false=验证失败 */
 bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
 {
     // ---- 步骤1: 连接检查 ----
@@ -308,19 +278,7 @@ bool OtaManager::isTransferring() const
 // 文件验证
 // ============================================================================
 
-/**
- * @brief 验证固件文件路径
- * @param filePath 文件路径
- * @param errorMsg 错误信息输出
- * @return true=文件有效
- *
- * 验证项:
- *   1. 路径非空
- *   2. 文件存在
- *   3. 文件可读
- *   4. 文件大小 > 0
- *   5. 文件大小 <= 64MB(防止误传超大文件)
- */
+/** @brief 验证固件文件路径(非空/存在/可读/大小>0/<=64MB) @param filePath 文件路径 @param errorMsg 错误信息输出 @return true=文件有效 */
 bool OtaManager::validateFilePath(const QString& filePath, QString& errorMsg) const
 {
     if (filePath.isEmpty()) {
@@ -354,13 +312,7 @@ bool OtaManager::validateFilePath(const QString& filePath, QString& errorMsg) co
     return true;
 }
 
-/**
- * @brief 检测固件文件类型
- * @param filePath 文件路径
- * @return 文件类型枚举
- *
- * 通过文件扩展名判断: .bin→Binary, .hex→IntelHex, 其他→Unknown
- */
+/** @brief 检测固件文件类型(.bin→Binary/.hex→IntelHex/其他→Unknown) @param filePath 文件路径 @return 文件类型枚举 */
 OtaManager::FirmwareType OtaManager::detectFirmwareType(const QString& filePath) const
 {
     QString suffix = QFileInfo(filePath).suffix().toLower();
@@ -373,15 +325,7 @@ OtaManager::FirmwareType OtaManager::detectFirmwareType(const QString& filePath)
     return FirmwareType::Unknown;
 }
 
-/**
- * @brief 将HEX文件转换为BIN临时文件
- * @param hexPath HEX文件路径
- * @param outBinPath 输出的BIN文件路径
- * @return true=转换成功
- *
- * 使用IntelHexParser解析HEX文件，将合并后的二进制数据写入临时文件。
- * 临时文件在OtaManager析构时自动清理。
- */
+/** @brief 将HEX文件转换为BIN临时文件(析构时自动清理) @param hexPath HEX文件路径 @param outBinPath 输出的BIN文件路径 @return true=转换成功 */
 bool OtaManager::convertHexToBin(const QString& hexPath, QString& outBinPath)
 {
     QByteArray binary;
@@ -433,14 +377,7 @@ bool OtaManager::convertHexToBin(const QString& hexPath, QString& outBinPath)
     return true;
 }
 
-/**
- * @brief 获取协议的可读显示名称
- * @param protocol 协议标识字符串
- * @return 人类可读的协议名称
- *
- * 将内部协议标识(如"xmodem-crc")转换为错误消息中的可读名称(如"XMODEM-CRC")。
- * 未知协议原样返回，保证不会丢失上下文信息。
- */
+/** @brief 获取协议的可读显示名称 @param protocol 协议标识字符串 @return 人类可读的协议名称 */
 QString OtaManager::protocolDisplayName(const QString& protocol) const
 {
     if (protocol == "xmodem-crc")      return tr("XMODEM-CRC");
@@ -479,12 +416,7 @@ quint64 OtaManager::totalBytesTransferred() const
     return m_totalBytesTransferred;
 }
 
-/**
- * @brief 重置传输统计计数器
- *
- * 将 totalTransfers/successfulTransfers/failedTransfers/totalBytesTransferred 全部清零。
- * 不影响 m_transferCount 和 m_lastTransferSuccess 等历史记录。
- */
+/** @brief 重置传输统计计数器(不影响transferCount和lastTransferSuccess等历史记录) */
 void OtaManager::resetTransferStatistics()
 {
     m_totalTransfers = 0;

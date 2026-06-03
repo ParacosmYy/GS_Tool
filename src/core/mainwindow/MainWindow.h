@@ -46,7 +46,7 @@
 #include "chart/widget/ChartWidget.h"
 #include "ota/manager/OtaManager.h"
 #include "ota/widget/OtaWidget.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 #include "core/navigation/IconNavBar.h"
 #include "core/widgets/CommandPalette.h"
 #include "core/widgets/ScriptRecorder.h"
@@ -91,23 +91,36 @@ private:
     /** @brief 构建完整的 UI 布局（背景层→分割器→导航树→面板栈→发送栏） */
     void setupUI();
 
-    QWidget* createNavigationArea();  ///< 创建左侧导航树区域(导航树+选中滑动指示器)
-    QWidget* createContentArea();     ///< 创建右侧面板内容区域(面板栈+终端+快捷指令+发送栏)
+    /** @brief 创建左侧导航树区域(导航树+选中滑动指示器) @return 导航树区域widget */
+    QWidget* createNavigationArea();
+    /** @brief 创建右侧面板内容区域(面板栈+终端+快捷指令+发送栏) @return 内容区域widget */
+    QWidget* createContentArea();
 
     /** @brief 创建并初始化状态栏（连接状态、RX/TX 字节数） */
     void setupStatusBar();
 
-    void connectSignals();                 ///< 连接所有模块间信号/槽
-    void connectSerialSignals();           ///< 串口连接/断开信号路由
-    void connectSerialDataFlow();          ///< 串口数据流+状态/错误信号路由
-    void connectSerialSendSignals();       ///< 快捷指令/发送控制器信号路由
-    void connectReconnectSignals();        ///< 自动重连状态指示信号路由
-    void connectToolbarSignals();          ///< 工具栏/录制状态消息信号路由
-    void connectSearchAndProtocolSignals();///< 搜索/协议桥/帧编辑/导航信号路由
-    void connectPortWatchSignals();        ///< 热插拔状态栏通知
-    void connectThemeSignals();        ///< 主题切换 + Toast通知
-    void connectOtaSignals();          ///< OTA传输Toast通知
-    void connectBookmarkSignals();     ///< 书签面板信号路由
+    /** @brief 连接所有模块间信号/槽，内部调用8个子方法按功能分组 */
+    void connectSignals();
+    /** @brief 串口连接/断开/DTR/RTS/波特率信号路由 */
+    void connectSerialSignals();
+    /** @brief 串口数据流+状态/错误信号路由 */
+    void connectSerialDataFlow();
+    /** @brief 快捷指令/发送控制器信号路由 */
+    void connectSerialSendSignals();
+    /** @brief 自动重连状态指示信号路由 */
+    void connectReconnectSignals();
+    /** @brief 工具栏/录制状态消息信号路由 */
+    void connectToolbarSignals();
+    /** @brief 搜索/协议桥/帧编辑/导航信号路由 */
+    void connectSearchAndProtocolSignals();
+    /** @brief 串口热插拔状态栏通知 */
+    void connectPortWatchSignals();
+    /** @brief 主题切换 + Toast通知信号路由 */
+    void connectThemeSignals();
+    /** @brief OTA传输Toast通知信号路由 */
+    void connectOtaSignals();
+    /** @brief 书签面板CRUD信号路由 */
+    void connectBookmarkSignals();
 
     /**
      * @brief 处理连接状态变更（更新状态栏、配置面板按钮、呼吸动画）

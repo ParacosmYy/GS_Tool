@@ -40,6 +40,7 @@ quint64 ConnectionFactory::s_totalCreated = 0;
 QMap<ConnectionType, quint64> ConnectionFactory::s_totalByType;
 quint64 ConnectionFactory::s_errorCount = 0;
 
+/** @brief 根据连接类型枚举创建对应的IConnection子类实例 @param type 连接类型枚举 @param parent 父对象指针 @return 新创建的连接实例，未知类型返回nullptr */
 IConnection* ConnectionFactory::create(ConnectionType type, QObject* parent)
 {
     IConnection* conn = nullptr;

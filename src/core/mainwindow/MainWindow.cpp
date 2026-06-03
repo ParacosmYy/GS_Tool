@@ -20,18 +20,7 @@
 #include <QKeySequence>
 #include <QDir>
 
-/**
- * @brief 构造函数 - 初始化所有子模块并组装主窗口
- *
- * 初始化顺序:
- * 1. 创建所有 Controller/Manager（通过构造函数依赖注入）
- * 2. 注入跨控制器依赖关系
- * 3. 构建 UI 布局和状态栏
- * 4. 连接所有信号/槽
- * 5. 构建导航树和面板映射
- * 6. 加载持久化设置
- * 7. 启动统计刷新定时器
- */
+/** @brief 构造函数 - 初始化所有子模块并组装主窗口 @param parent 父窗口 */
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_connManager(new ConnectionManager(this))
@@ -229,18 +218,7 @@ void MainWindow::restoreUserSession(int lastPanel)
     m_terminalController->startStatsTimer();
 }
 
-/**
- * @brief 处理连接状态变更
- *
- * 根据连接状态更新:
- *   - 状态栏文本和动态属性（驱动 QSS 状态样式）
- *   - 串口配置面板的连接/断开按钮状态
- *   - 呼吸动画（连接中时启动脉冲闪烁）
- *   - 自动切换到终端面板（连接成功后）
- *
- * @param state 连接状态枚举
- * @param connName 连接名称
- */
+/** @brief 处理连接状态变更(更新状态栏/配置面板/呼吸动画/自动切面板) @param state 连接状态枚举 @param connName 连接名称 */
 void MainWindow::handleConnectionState(ConnectionState state, const QString& connName)
 {
     const char* stateStr = "";
@@ -279,10 +257,7 @@ void MainWindow::handleConnectionState(ConnectionState state, const QString& con
     m_connStatusLbl->style()->polish(m_connStatusLbl);
 }
 
-/**
- * @brief 切换背景设置弹出面板的显示/隐藏
- * 面板定位在工具栏右下角，使用 Qt::Popup 属性实现点击外部自动关闭
- */
+/** @brief 切换背景设置弹出面板的显示/隐藏，面板定位在工具栏右下角 */
 void MainWindow::onBgSettingsToggled()
 {
     if (m_bgSettingsPopup->isVisible()) {
@@ -296,11 +271,7 @@ void MainWindow::onBgSettingsToggled()
     }
 }
 
-/**
- * @brief 窗口关闭事件处理
- * 按顺序执行清理: 停止动画 → 停止录制/回放 → 停止统计定时器 → 保存设置 → 关闭连接
- * @param event 关闭事件
- */
+/** @brief 窗口关闭事件处理(停止动画→停止录制→保存设置→关闭连接) @param event 关闭事件 */
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     // 停止连接状态的呼吸动画

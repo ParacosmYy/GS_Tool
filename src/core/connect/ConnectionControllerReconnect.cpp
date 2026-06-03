@@ -27,17 +27,7 @@ void ConnectionController::enableAutoReconnect(bool enabled, int intervalMs, int
 /** @brief 返回自动重连是否启用 @return true=已启用 */
 bool ConnectionController::isAutoReconnectEnabled() const { return m_autoReconnectEnabled; }
 
-/**
- * @brief 自动重连定时器触发（支持指数退避）
- *
- * 检查是否仍在断开状态且未由用户主动断开，若是则尝试重新连接。
- * 支持最大重连次数限制: 达到上限后停止重连并发出失败通知。
- *
- * 指数退避策略:
- *   actualInterval = baseInterval * 2^min(attempt, 4)，上限30秒
- *   例如: base=3s → 3s → 6s → 12s → 24s → 30s → 30s...
- * 每次尝试前通过 reconnectProgress 信号通知UI当前进度和下次等待时间。
- */
+/** @brief 自动重连定时器触发(支持指数退避)，检查是否仍在断开状态且未由用户主动断开则尝试重新连接，支持最大重连次数限制达到上限后停止并发出失败通知，指数退避策略: actualInterval=baseInterval*2^min(attempt,4)上限30秒 */
 void ConnectionController::onAutoReconnect()
 {
     // 如果已经连接或用户主动断开，停止重连

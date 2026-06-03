@@ -1,3 +1,7 @@
+/**
+ * @file WorkspaceManager.h
+ * @brief 工作区管理器，管理面板布局的保存、加载和导入导出
+ */
 // Copyright 2024 EmbedDebug Project
 // SPDX-License-Identifier: MIT
 #pragma once
@@ -7,38 +11,60 @@
 #include <QStringList>
 #include <QVariantMap>
 
+/**
+ * @brief 工作区布局数据结构，保存面板状态和窗口几何信息
+ */
 struct WorkspaceLayout {
-    QString name;
-    QVariantMap panelStates;
-    QStringList visiblePanels;
-    QString mainWindowState;
-    QString geometry;
+    QString name;                 ///< 工作区名称
+    QVariantMap panelStates;      ///< 各面板的状态信息
+    QStringList visiblePanels;    ///< 可见面板列表
+    QString mainWindowState;      ///< 主窗口状态数据
+    QString geometry;             ///< 窗口几何信息
 };
 
+/**
+ * @class WorkspaceManager
+ * @brief 工作区管理器，支持多工作区的保存/加载/删除和文件导入导出
+ */
 class WorkspaceManager : public QObject {
     Q_OBJECT
 public:
+    /** @brief 构造函数 @param parent 父对象指针 */
     explicit WorkspaceManager(QObject *parent = nullptr);
+    /** @brief 析构函数 */
     ~WorkspaceManager() override;
 
+    /** @brief 保存工作区布局 @param layout 布局数据 */
     void saveWorkspace(const WorkspaceLayout &layout);
+    /** @brief 加载指定名称的工作区 @param name 工作区名称 @return 布局数据 */
     WorkspaceLayout loadWorkspace(const QString &name) const;
+    /** @brief 删除指定工作区 @param name 工作区名称 */
     void deleteWorkspace(const QString &name);
+    /** @brief 获取所有工作区名称 @return 名称列表 */
     QStringList workspaceNames() const;
+    /** @brief 查询工作区是否存在 @param name 工作区名称 @return 是否存在 */
     bool exists(const QString &name) const;
+    /** @brief 设置当前激活的工作区 @param name 工作区名称 */
     void setActiveWorkspace(const QString &name);
+    /** @brief 获取当前激活的工作区名称 @return 工作区名称 */
     QString activeWorkspace() const;
 
+    /** @brief 将工作区导出到文件 @param name 工作区名称 @param filePath 目标文件路径 */
     void exportToFile(const QString &name, const QString &filePath) const;
+    /** @brief 从文件导入工作区 @param filePath 源文件路径 @return 是否导入成功 */
     bool importFromFile(const QString &filePath);
 
 signals:
+    /** @brief 工作区保存完成时发射 @param name 工作区名称 */
     void workspaceSaved(const QString &name);
+    /** @brief 工作区加载完成时发射 @param name 工作区名称 */
     void workspaceLoaded(const QString &name);
+    /** @brief 工作区被删除时发射 @param name 工作区名称 */
     void workspaceDeleted(const QString &name);
+    /** @brief 当前激活工作区切换时发射 @param name 新激活的工作区名称 */
     void activeWorkspaceChanged(const QString &name);
 
 private:
-    QMap<QString, WorkspaceLayout> m_workspaces;
-    QString m_activeWorkspace;
+    QMap<QString, WorkspaceLayout> m_workspaces;  ///< 工作区名称到布局的映射
+    QString m_activeWorkspace;                      ///< 当前激活的工作区名称
 };

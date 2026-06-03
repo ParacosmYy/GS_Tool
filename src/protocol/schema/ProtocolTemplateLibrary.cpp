@@ -14,65 +14,32 @@
 
 /* ──────────────────────── 构造 / 析构 ──────────────────────── */
 
-/**
- * @brief 构造函数
- *
- * 初始化所有内置协议模板，存入 m_templates 映射表。
- *
- * @param parent 父对象指针
- */
+/** @brief 构造函数(初始化内置协议模板) @param parent 父对象指针 */
 ProtocolTemplateLibrary::ProtocolTemplateLibrary(QObject *parent)
     : QObject(parent)
 {
     initBuiltinTemplates();
 }
 
-/**
- * @brief 析构函数
- *
- * m_templates 中的 ProtocolSchema 均以 this 为父对象，
- * Qt 对象树自动释放。
- */
+/** @brief 析构函数，Qt对象树自动释放模板 */
 ProtocolTemplateLibrary::~ProtocolTemplateLibrary() = default;
 
 /* ──────────────────────── 公开接口 ──────────────────────── */
 
-/**
- * @brief 获取所有已加载模板名称
- *
- * 包含内置模板和用户通过 importTemplate() 导入的模板。
- *
- * @return 模板名称列表
- */
+/** @brief 获取所有已加载模板名称 @return 模板名称列表 */
 QStringList ProtocolTemplateLibrary::builtinTemplateNames() const
 {
     return m_templates.keys();
 }
 
-/**
- * @brief 按名称加载模板
- *
- * 从 m_templates 映射表中查找指定名称的 ProtocolSchema，
- * 返回已存在的指针（不创建新实例）。
- *
- * @param name 模板名称
- * @return 找到返回 ProtocolSchema 指针，否则返回 nullptr
- */
+/** @brief 按名称加载模板(返回已存在指针) @param name 模板名称 @return 找到返回ProtocolSchema指针，否则nullptr */
 ProtocolSchema *ProtocolTemplateLibrary::loadTemplate(const QString &name)
 {
     ++m_totalLoads;
     return m_templates.value(name, nullptr);
 }
 
-/**
- * @brief 从 JSON 文件导入用户模板
- *
- * 创建新的 ProtocolSchema 并调用 loadFromJson() 解析文件，
- * 解析成功后以 schema->name() 为键存入模板库。
- *
- * @param filePath JSON 模板文件路径
- * @return 导入成功返回 true，文件不存在或解析失败返回 false
- */
+/** @brief 从JSON文件导入用户模板 @param filePath JSON模板文件路径 @return 导入成功返回true */
 bool ProtocolTemplateLibrary::importTemplate(const QString &filePath)
 {
     auto *schema = new ProtocolSchema(this);
@@ -90,15 +57,7 @@ bool ProtocolTemplateLibrary::importTemplate(const QString &filePath)
     return true;
 }
 
-/**
- * @brief 将指定模板导出为 JSON 文件
- *
- * 查找模板后调用 toJson() 序列化为 JSON 文档并写入文件。
- *
- * @param name  模板名称
- * @param filePath 导出文件路径
- * @return 导出成功返回 true，模板不存在或写入失败返回 false
- */
+/** @brief 将指定模板导出为JSON文件 @param name 模板名称 @param filePath 导出文件路径 @return 导出成功返回true */
 bool ProtocolTemplateLibrary::exportTemplate(const QString &name,
                                              const QString &filePath)
 {
@@ -117,10 +76,7 @@ bool ProtocolTemplateLibrary::exportTemplate(const QString &name,
     return true;
 }
 
-/**
- * @brief 获取已加载模板数量
- * @return 内置 + 用户导入的模板总数
- */
+/** @brief 获取已加载模板数量 @return 内置+用户导入的模板总数 */
 int ProtocolTemplateLibrary::templateCount() const
 {
     return m_templates.size();
@@ -128,16 +84,7 @@ int ProtocolTemplateLibrary::templateCount() const
 
 /* ──────────────────── 内置模板初始化 ──────────────────── */
 
-/**
- * @brief 初始化内置协议模板
- *
- * 以编程方式构造 5 种常用协议的 ProtocolSchema：
- *   - JustFloat: 固定帧头 "JUST"，4 个 float 通道
- *   - FireWater: 换行分隔文本协议
- *   - Modbus RTU: 长度字段 + CRC16 校验
- *   - COBS: 零字节分隔
- *   - SLIP: 0xC0 分隔
- */
+/** @brief 初始化内置协议模板(JustFloat/FireWater/ModbusRTU/COBS/SLIP) */
 void ProtocolTemplateLibrary::initBuiltinTemplates()
 {
     /* ── JustFloat ── */

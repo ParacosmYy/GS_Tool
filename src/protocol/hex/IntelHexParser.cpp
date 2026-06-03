@@ -15,17 +15,7 @@ namespace IntelHex {
 
 // ---- 内部辅助函数 ----
 
-/**
- * @brief 根据记录类型更新基地址
- *
- * 处理 ExtendedLinearAddr(04) 和 ExtendedSegmentAddr(02) 两种基地址记录，
- * 提取记录数据中的地址高16位并返回更新后的基地址。
- * 其他记录类型不修改基地址，原样返回。
- *
- * @param rec HEX记录
- * @param currentBase 当前基地址
- * @return 更新后的基地址
- */
+/** @brief 根据记录类型更新基地址(ExtendedLinearAddr/ExtendedSegmentAddr) @param rec HEX记录 @param currentBase 当前基地址 @return 更新后的基地址 */
 static quint32 updateBaseAddress(const Record& rec, quint32 currentBase)
 {
     switch (rec.type) {
@@ -359,10 +349,7 @@ void ParserStatsTracker::resetParserStatistics()
     m_errorCount = 0;
 }
 
-/**
- * @brief 从一次解析结果中累加统计
- * @param stats 单次解析的统计快照
- */
+/** @brief 从一次解析结果中累加统计 @param stats 单次解析的统计快照 */
 void ParserStatsTracker::accumulate(const ParseStats& stats)
 {
     m_totalRecordsParsed += static_cast<quint64>(stats.totalLines);

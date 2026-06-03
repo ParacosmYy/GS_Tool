@@ -5,6 +5,10 @@
 #include "plugin/loader/PluginLoader.h"
 #include <QDir>
 #include <QFileInfo>
+#include <QJsonObject>
+#include <QJsonArray>
+
+using PluginInfo = PluginLoader::PluginInfo;
 
 /** @brief 构造函数 @param parent 父对象 */
 PluginLoader::PluginLoader(QObject *parent) : QObject(parent) {}
@@ -27,35 +31,39 @@ bool PluginLoader::loadPlugin(const QString &filePath)
 {
     QFileInfo fi(filePath);
     if (!fi.exists()) {
-        emit pluginError(fi.fileName(), tr("File not found: %1").arg(filePath));
+        emit loadError(fi.fileName(), tr("File not found: %1").arg(filePath));
         return false;
     }
     auto *loader = new QPluginLoader(filePath, this);
+    QJsonObject meta = loader->metaData();
     auto *instance = loader->instance();
     if (!instance) {
         QString err = loader->errorString();
         delete loader;
-        emit pluginError(fi.fileName(), err);
+        emit loadError(fi.fileName(), err);
         return false;
     }
-    PluginEntry entry;
-    entry.name = fi.baseName();
-    entry.filePath = filePath;
-    entry.loader = loader;
-    entry.instance = instance;
-    m_plugins[entry.name] = entry;
-    emit pluginLoaded(entry.name, filePath);
+    PluginInfo info;
+    info.name = meta.value("Keys").toArray().first().toString(fi.baseName());
+    info.version = meta.value("Version").toString();
+    info.description = meta.value("Description").toString();
+    info.filePath = filePath;
+    info.loaded = true;
+    m_loaders[info.name] = loader;
+    m_plugins[info.name] = info;
+    emit pluginLoaded(info.name);
     return true;
 }
 
 /** @brief 卸载指定插件 @param name 插件名称 */
 void PluginLoader::unloadPlugin(const QString &name)
 {
-    auto it = m_plugins.find(name);
-    if (it != m_plugins.end()) {
-        it->loader->unload();
-        delete it->loader;
-        m_plugins.erase(it);
+    auto it = m_loaders.find(name);
+    if (it != m_loaders.end()) {
+        it.value()->unload();
+        delete it.value();
+        m_loaders.erase(it);
+        m_plugins.remove(name);
         emit pluginUnloaded(name);
     }
 }
@@ -63,33 +71,48 @@ void PluginLoader::unloadPlugin(const QString &name)
 /** @brief 卸载所有已加载插件 */
 void PluginLoader::unloadAll()
 {
-    for (auto it = m_plugins.begin(); it != m_plugins.end(); ++it) {
-        it->loader->unload();
-        delete it->loader;
+    for (auto it = m_loaders.begin(); it != m_loaders.end(); ++it) {
+        it.value()->unload();
+        delete it.value();
         emit pluginUnloaded(it.key());
     }
+    m_loaders.clear();
     m_plugins.clear();
 }
 
 /** @brief 获取插件实例对象 @param name 插件名称 @return QObject指针，不存在返回nullptr */
 QObject* PluginLoader::pluginInstance(const QString &name) const
 {
-    auto it = m_plugins.constFind(name);
-    return (it != m_plugins.constEnd()) ? it->instance : nullptr;
+    auto it = m_loaders.constFind(name);
+    return (it != m_loaders.constEnd()) ? it.value()->instance() : nullptr;
 }
 
-/** @brief 获取所有已加载插件名称 @return 名称列表 */
-QStringList PluginLoader::loadedPlugins() const { return m_plugins.keys(); }
-/** @brief 检查插件是否已加载 @param name 插件名称 @return 已加载返回true */
-bool PluginLoader::isLoaded(const QString &name) const { return m_plugins.contains(name); }
-
-/** @brief 扫描目录下的所有插件文件并尝试加载 @param path 目录路径 */
-void PluginLoader::scanDirectory(const QString &path)
+/** @brief 获取所有已加载插件的信息 @return 插件信息列表 */
+QList<PluginLoader::PluginInfo> PluginLoader::loadedPlugins() const
 {
-    QDir dir(path);
-    const auto entries = dir.entryInfoList(QStringList() << "*.dll" << "*.so" << "*.dylib",
-        QDir::Files);
-    for (const auto &fi : entries) {
-        loadPlugin(fi.absoluteFilePath());
+    QList<PluginInfo> result;
+    for (auto it = m_plugins.constBegin(); it != m_plugins.constEnd(); ++it) {
+        if (it.value().loaded) result.append(it.value());
     }
+    return result;
+}
+
+/** @brief 扫描所有搜索路径中的插件 @return 发现的插件信息列表 */
+QList<PluginLoader::PluginInfo> PluginLoader::scanPlugins()
+{
+    QList<PluginInfo> found;
+    for (const QString& searchPath : m_searchPaths) {
+        QDir dir(searchPath);
+        const auto entries = dir.entryInfoList(
+            QStringList() << "*.dll" << "*.so" << "*.dylib", QDir::Files);
+        for (const auto& fi : entries) {
+            PluginInfo info;
+            info.name = fi.baseName();
+            info.filePath = fi.absoluteFilePath();
+            info.loaded = m_plugins.contains(info.name);
+            found.append(info);
+            emit pluginFound(info);
+        }
+    }
+    return found;
 }

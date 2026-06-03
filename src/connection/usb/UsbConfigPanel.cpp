@@ -7,6 +7,7 @@
 
 #include <QFormLayout>
 
+/** @brief 构造USB配置面板，初始化设备选择/VID/PID/接口/连接按钮等UI控件 @param parent 父控件 */
 UsbConfigPanel::UsbConfigPanel(QWidget* parent)
     : QWidget(parent)
     , m_connected(false)

@@ -58,6 +58,7 @@ set(SOURCES
     src/core/terminal/TerminalController.cpp
     src/core/panels/PanelManager.cpp
     src/core/panels/PanelManagerCreation.cpp
+    src/core/panels/PanelManagerGetters.cpp
     src/core/background/BackgroundWidget.cpp
     src/core/background/BackgroundSettingsPopup.cpp
     src/core/widgets/BasePanel.cpp

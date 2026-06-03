@@ -1,19 +1,4 @@
-/**
- * @file UsbLibraryLoader.h
- * @brief USB库动态加载器 — 运行时加载libusb DLL/SO
- *
- * 使用QLibrary在运行时动态加载libusb共享库，
- * 解析并缓存所有需要的函数指针。
- * 优势: 编译时不依赖libusb，仅在运行时需要时加载。
- *
- * 使用:
- *   auto& loader = UsbLibraryLoader::instance();
- *   if (loader.load()) {
- *       loader.init();
- *       auto* handle = loader.open_device_with_vid_pid(ctx, vid, pid);
- *   }
- */
-
+/** @file UsbLibraryLoader.h @brief USB库动态加载器(单例) — 运行时加载libusb DLL/SO，解析函数指针 */
 #ifndef USBLIBRARYLOADER_H
 #define USBLIBRARYLOADER_H
 
@@ -24,149 +9,75 @@
 #include <QMap>
 #include <QMutex>
 
-/**
- * @brief libusb上下文不透明指针类型
- */
-using UsbContext = void;
+using UsbContext = void;       ///< libusb上下文不透明指针
+using UsbDeviceHandle = void;  ///< libusb设备句柄不透明指针
 
-/**
- * @brief libusb设备句柄不透明指针类型
- */
-using UsbDeviceHandle = void;
-
-/**
- * @brief libusb设备描述符结构体(简化版)
- */
+/** @brief libusb设备描述符(简化版) */
 struct UsbDeviceDescriptor {
-    quint16 bcdUSB;           ///< USB规范版本
-    quint8  bDeviceClass;     ///< 设备类
-    quint8  bDeviceSubClass;  ///< 设备子类
-    quint8  bDeviceProtocol;  ///< 设备协议
-    quint16 idVendor;         ///< 厂商ID
-    quint16 idProduct;        ///< 产品ID
-    quint16 bcdDevice;        ///< 设备版本
-    quint8  iManufacturer;    ///< 制造商字符串索引
-    quint8  iProduct;         ///< 产品字符串索引
-    quint8  iSerialNumber;    ///< 序列号索引
+    quint16 bcdUSB;            ///< USB规范版本
+    quint8  bDeviceClass;      ///< 设备类
+    quint8  bDeviceSubClass;   ///< 设备子类
+    quint8  bDeviceProtocol;   ///< 设备协议
+    quint16 idVendor;          ///< 厂商ID
+    quint16 idProduct;         ///< 产品ID
+    quint16 bcdDevice;         ///< 设备版本
+    quint8  iManufacturer;     ///< 制造商字符串索引
+    quint8  iProduct;          ///< 产品字符串索引
+    quint8  iSerialNumber;     ///< 序列号索引
     quint8  bNumConfigurations; ///< 配置数量
 };
 
-/**
- * @brief USB库动态加载器
- *
- * 单例模式。在运行时动态加载libusb共享库并解析函数指针。
- * 支持Windows(libusb-1.0.dll)和Linux(libusb-1.0.so)。
- *
- * 当libusb不可用时，所有函数返回安全默认值(0/nullptr/false)，
- * 并设置错误信息，不会导致程序崩溃。
- */
+/** @brief USB库动态加载器(单例)，libusb不可用时安全降级 */
 class UsbLibraryLoader : public QObject {
     Q_OBJECT
 
 public:
-    /** @brief 获取单例实例 */
-    static UsbLibraryLoader& instance();
+    static UsbLibraryLoader& instance(); ///< 获取单例
+    bool load(const QString& libraryPath = QString()); ///< 加载libusb
+    void unload();      ///< 卸载libusb
+    bool isLoaded() const; ///< 是否已加载
+    QString lastError() const;  ///< 最后错误
+    QString versionString() const; ///< libusb版本
 
-    /** @brief 加载libusb共享库
-     *  @param libraryPath 手动指定路径(空则自动搜索)
-     *  @return true=加载成功
-     */
-    bool load(const QString& libraryPath = QString());
-
-    /** @brief 卸载libusb共享库 */
-    void unload();
-
-    /** @brief 是否已加载 */
-    bool isLoaded() const;
-
-    /** @brief 获取最后错误信息 */
-    QString lastError() const;
-
-    /** @brief 获取libusb版本字符串 */
-    QString versionString() const;
-
-    // ---- libusb函数指针包装器 ----
-
-    /** @brief libusb_init */
+    // libusb函数包装器
     int init(UsbContext** ctx = nullptr);
-
-    /** @brief libusb_exit */
     void exit(UsbContext* ctx = nullptr);
-
-    /** @brief libusb_open_device_with_vid_pid */
     UsbDeviceHandle* openDeviceWithVidPid(UsbContext* ctx, quint16 vid, quint16 pid);
-
-    /** @brief libusb_close */
     void close(UsbDeviceHandle* handle);
-
-    /** @brief libusb_claim_interface */
     int claimInterface(UsbDeviceHandle* handle, int interfaceNum);
-
-    /** @brief libusb_release_interface */
     int releaseInterface(UsbDeviceHandle* handle, int interfaceNum);
-
-    /** @brief libusb_bulk_transfer */
     int bulkTransfer(UsbDeviceHandle* handle, unsigned char endpoint,
-                     unsigned char* data, int length, int* transferred,
-                     unsigned int timeout);
-
-    /** @brief libusb_interrupt_transfer */
+                     unsigned char* data, int length, int* transferred, unsigned int timeout);
     int interruptTransfer(UsbDeviceHandle* handle, unsigned char endpoint,
-                          unsigned char* data, int length, int* transferred,
-                          unsigned int timeout);
-
-    /** @brief libusb_control_transfer */
+                          unsigned char* data, int length, int* transferred, unsigned int timeout);
     int controlTransfer(UsbDeviceHandle* handle, quint8 requestType,
                         quint8 request, quint16 value, quint16 index,
-                        unsigned char* data, quint16 length,
-                        unsigned int timeout);
-
-    /** @brief libusb_get_device (从handle获取device指针) */
+                        unsigned char* data, quint16 length, unsigned int timeout);
     void* getDevice(UsbDeviceHandle* handle);
-
-    /** @brief libusb_get_device_descriptor (从device读取描述符) */
     int getDeviceDescriptorFromDevice(void* device, UsbDeviceDescriptor* desc);
-
-    /** @brief 便捷方法: 从handle直接获取设备描述符 */
-    int getDeviceDescriptor(UsbDeviceHandle* handle,
-                            UsbDeviceDescriptor* desc);
-
-    /** @brief libusb_get_string_descriptor_ascii */
-    int getStringDescriptorAscii(UsbDeviceHandle* handle,
-                                 quint8 descIndex,
+    int getDeviceDescriptor(UsbDeviceHandle* handle, UsbDeviceDescriptor* desc);
+    int getStringDescriptorAscii(UsbDeviceHandle* handle, quint8 descIndex,
                                  char* buffer, int bufferSize);
-
-    /** @brief libusb_kernel_driver_active */
     int kernelDriverActive(UsbDeviceHandle* handle, int interfaceNum);
-
-    /** @brief libusb_detach_kernel_driver */
     int detachKernelDriver(UsbDeviceHandle* handle, int interfaceNum);
 
 signals:
-    /** @brief 库加载状态变更信号 */
-    void loadStateChanged(bool loaded);
+    void loadStateChanged(bool loaded); ///< 库加载状态变更
 
 private:
     explicit UsbLibraryLoader(QObject* parent = nullptr);
     ~UsbLibraryLoader() override;
-    UsbLibraryLoader(const UsbLibraryLoader&) = delete;
-    UsbLibraryLoader& operator=(const UsbLibraryLoader&) = delete;
+    Q_DISABLE_COPY(UsbLibraryLoader)
+    bool resolveFunctions();    ///< 解析所有函数指针
+    QStringList searchPaths() const; ///< 搜索libusb路径
+    bool setError(const QString& error); ///< 设置错误并返回false
 
-    /** @brief 解析所有函数指针 */
-    bool resolveFunctions();
+    QLibrary* m_library = nullptr;
+    bool m_loaded = false;
+    QString m_lastError;
+    mutable QMutex m_mutex;
 
-    /** @brief 搜索libusb共享库路径 */
-    QStringList searchPaths() const;
-
-    /** @brief 安全设置错误并返回false */
-    bool setError(const QString& error);
-
-    QLibrary* m_library = nullptr;       ///< 动态库句柄
-    bool m_loaded = false;                ///< 是否已加载
-    QString m_lastError;                  ///< 最后错误信息
-    mutable QMutex m_mutex;               ///< 线程安全互斥
-
-    // ---- libusb函数指针(解析后缓存) ----
+    // 函数指针类型
     using FnInit = int(*)(UsbContext**);
     using FnExit = void(*)(UsbContext*);
     using FnOpen = UsbDeviceHandle*(*)(UsbContext*, quint16, quint16);
@@ -180,23 +91,16 @@ private:
     using FnGetDevice = void*(*)(UsbDeviceHandle*);
     using FnGetDeviceDesc = int(*)(void*, UsbDeviceDescriptor*);
 
-    FnInit       m_fnInit = nullptr;
-    FnExit       m_fnExit = nullptr;
-    FnOpen       m_fnOpen = nullptr;
-    FnClose      m_fnClose = nullptr;
-    FnClaim      m_fnClaim = nullptr;
-    FnRelease    m_fnRelease = nullptr;
-    FnBulk       m_fnBulk = nullptr;
-    FnInterrupt  m_fnInterrupt = nullptr;
-    FnControl    m_fnControl = nullptr;
-    FnGetString  m_fnGetString = nullptr;
-    FnGetDevice  m_fnGetDevice = nullptr;
-    FnGetDeviceDesc m_fnGetDeviceDesc = nullptr;
+    FnInit m_fnInit = nullptr;       FnExit m_fnExit = nullptr;
+    FnOpen m_fnOpen = nullptr;       FnClose m_fnClose = nullptr;
+    FnClaim m_fnClaim = nullptr;     FnRelease m_fnRelease = nullptr;
+    FnBulk m_fnBulk = nullptr;       FnInterrupt m_fnInterrupt = nullptr;
+    FnControl m_fnControl = nullptr; FnGetString m_fnGetString = nullptr;
+    FnGetDevice m_fnGetDevice = nullptr; FnGetDeviceDesc m_fnGetDeviceDesc = nullptr;
 
-    // ---- 统计计数器 ----
-    quint64 m_totalLoadAttempts = 0;    ///< 累计加载尝试次数
-    quint64 m_totalSuccessfulLoads = 0; ///< 累计成功加载次数
-    quint64 m_totalErrors = 0;          ///< 累计错误次数
+    quint64 m_totalLoadAttempts = 0;    ///< 累计加载尝试
+    quint64 m_totalSuccessfulLoads = 0; ///< 累计成功加载
+    quint64 m_totalErrors = 0;          ///< 累计错误
 public:
     quint64 totalLoadAttempts() const { return m_totalLoadAttempts; }
     quint64 totalSuccessfulLoads() const { return m_totalSuccessfulLoads; }

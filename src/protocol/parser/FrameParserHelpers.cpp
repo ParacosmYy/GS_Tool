@@ -23,14 +23,7 @@
 // 字段提取与校验计算
 // ============================================================================
 
-/**
- * @brief 提取帧内各字段值
- * @param frameData 完整帧数据
- * @return 字段名->值的映射
- *
- * 提取 payload 区域后，逐字段调用 FieldDef::extractValue。
- * 元数据字段: _rawPayload, _rawFrame(HEX), _frameTime
- */
+/** @brief 提取帧内各字段值(payload区域→逐字段extractValue+元数据) @param frameData 完整帧数据 @return 字段名→值的映射 */
 QVariantMap FrameParser::extractFields(const QByteArray& frameData) const
 {
     QVariantMap result;
@@ -62,14 +55,7 @@ QVariantMap FrameParser::extractFields(const QByteArray& frameData) const
     return result;
 }
 
-/**
- * @brief 计算并验证校验值
- * @param frameData 完整帧数据
- * @return true=校验通过，false=校验失败
- *
- * 从 checksumStart 到 checksumEnd 区域计算校验值，
- * 与帧内 checksumOffset 处的校验字段比较。
- */
+/** @brief 计算并验证校验值 @param frameData 完整帧数据 @return true=校验通过，false=校验失败 */
 bool FrameParser::verifyChecksum(const QByteArray& frameData) const
 {
     if (m_def.checksumType == ChecksumType::None || m_def.checksumOffset < 0) {
@@ -90,13 +76,7 @@ bool FrameParser::verifyChecksum(const QByteArray& frameData) const
     return (computed == actual);
 }
 
-/**
- * @brief 计算校验值
- * @param data 需要计算校验的数据区域
- * @return 校验结果字节数组
- *
- * 根据 checksumType 选择对应的校验算法。
- */
+/** @brief 计算校验值 @param data 需要计算校验的数据区域 @return 校验结果字节数组 */
 QByteArray FrameParser::computeChecksum(const QByteArray& data) const
 {
     QByteArray result;
@@ -137,14 +117,7 @@ QByteArray FrameParser::computeChecksum(const QByteArray& data) const
     return result;
 }
 
-/**
- * @brief 解析长度字段值
- * @param frameData 包含长度字段的帧数据
- * @return 解析出的长度值，-1 表示解析失败
- *
- * 支持 1 字节和 2 字节长度字段，大小端由 lengthBigEndian 决定。
- * 返回值 = 原始长度值 - lengthAdjust
- */
+/** @brief 解析长度字段值(支持1/2字节，大小端可配) @param frameData 包含长度字段的帧数据 @return 解析出的长度值(已减lengthAdjust)，-1=解析失败 */
 int FrameParser::parseLengthField(const QByteArray& frameData) const
 {
     if (m_def.lengthFieldOffset < 0) return -1;

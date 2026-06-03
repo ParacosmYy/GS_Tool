@@ -14,11 +14,7 @@
 #include <QAction>
 #include <QLabel>
 
-/**
- * @brief 构造工具栏控制器
- * @param recordingController 录制控制器，用于在工具栏中添加录制/回放按钮
- * @param parent 父对象
- */
+/** @brief 构造工具栏控制器 @param recordingController 录制控制器 @param parent 父对象 */
 ToolbarController::ToolbarController(RecordingController* recordingController, QObject* parent)
     : QObject(parent)
     , m_recordingController(recordingController)
@@ -41,15 +37,7 @@ QToolBar* ToolbarController::toolbar() const
     return m_toolbar;
 }
 
-/**
- * @brief 创建并返回工具栏，添加到主窗口
- *
- * 控件布局:
- * [显示模式] [终端布局] 时间戳 [TX/RX] 清屏 | 导出 背景 | 录制 停止录制 回放日志 停止回放 | 主题: [下拉] 语言: [下拉]
- *
- * @param parent 主窗口实例
- * @return 创建的工具栏指针
- */
+/** @brief 创建并返回工具栏，添加到主窗口 @param parent 主窗口实例 @return 创建的工具栏指针 */
 QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
 {
     m_toolbar = parent->addToolBar(tr("主工具栏"));
@@ -87,14 +75,7 @@ QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
     return m_toolbar;
 }
 
-/**
- * @brief 创建显示模式相关控件组
- *
- * 包含: 显示模式下拉框(文本/HEX/混合/十进制)、终端布局下拉框(混合/左右分栏/上下分栏)、
- * 时间戳开关、方向前缀[TX/RX]开关、清屏按钮
- *
- * @param toolbar 目标工具栏
- */
+/** @brief 创建显示模式相关控件组(显示模式/终端布局/时间戳/方向前缀/清屏) @param toolbar 目标工具栏 */
 void ToolbarController::createDisplayModeGroup(QToolBar* toolbar)
 {
     // 显示模式下拉框: 文本/HEX/混合/十进制
@@ -130,14 +111,7 @@ void ToolbarController::createDisplayModeGroup(QToolBar* toolbar)
     m_clearAction->setObjectName("clearAction");
 }
 
-/**
- * @brief 创建连接相关控制组
- *
- * 包含: 导出按钮、背景设置按钮、录制/回放(委托RecordingController)、
- * 主题切换下拉框、语言切换下拉框
- *
- * @param toolbar 目标工具栏
- */
+/** @brief 创建连接相关控制组(导出/背景/录制回放/主题/语言) @param toolbar 目标工具栏 */
 void ToolbarController::createConnectionGroup(QToolBar* toolbar)
 {
     // 导出按钮
@@ -179,12 +153,7 @@ void ToolbarController::createConnectionGroup(QToolBar* toolbar)
     toolbar->addWidget(m_langCombo);
 }
 
-/**
- * @brief 设置可用主题列表
- * 将内部名称（如 dark_terminal）转换为友好显示名称（如 Dark Terminal）
- * 使用 blockSignals 防止填充过程中触发 themeChanged 信号
- * @param themes 主题名称列表
- */
+/** @brief 设置可用主题列表(内部名转友好名，blockSignals防误触) @param themes 主题名称列表 */
 void ToolbarController::setAvailableThemes(const QStringList& themes)
 {
     if (!m_themeCombo) return;
@@ -208,11 +177,7 @@ void ToolbarController::setAvailableThemes(const QStringList& themes)
     m_themeCombo->blockSignals(false);
 }
 
-/**
- * @brief 设置当前选中的主题
- * 通过 itemData 中存储的原始主题名称匹配
- * @param themeName 主题名称
- */
+/** @brief 设置当前选中的主题(通过itemData匹配原始主题名) @param themeName 主题名称 */
 void ToolbarController::setCurrentTheme(const QString& themeName)
 {
     if (!m_themeCombo) return;
@@ -225,21 +190,14 @@ void ToolbarController::setCurrentTheme(const QString& themeName)
     }
 }
 
-/**
- * @brief 根据索引获取主题名称
- * @param index 下拉框索引
- * @return 主题原始名称，索引无效时返回空字符串
- */
+/** @brief 根据索引获取主题名称 @param index 下拉框索引 @return 主题原始名称，索引无效时返回空字符串 */
 QString ToolbarController::themeNameAt(int index) const
 {
     if (!m_themeCombo || index < 0 || index >= m_themeCombo->count()) return {};
     return m_themeCombo->itemData(index).toString();
 }
 
-/**
- * @brief 设置当前选中的语言
- * @param langCode 语言代码
- */
+/** @brief 设置当前选中的语言(通过itemData匹配语言代码) @param langCode 语言代码 */
 void ToolbarController::setCurrentLanguage(const QString& langCode)
 {
     if (!m_langCombo) return;
@@ -252,11 +210,7 @@ void ToolbarController::setCurrentLanguage(const QString& langCode)
     }
 }
 
-/**
- * @brief 根据索引获取语言代码
- * @param index 下拉框索引
- * @return 语言代码，索引无效时返回空字符串
- */
+/** @brief 根据索引获取语言代码 @param index 下拉框索引 @return 语言代码，索引无效时返回空字符串 */
 QString ToolbarController::languageCodeAt(int index) const
 {
     if (!m_langCombo || index < 0 || index >= m_langCombo->count()) return {};

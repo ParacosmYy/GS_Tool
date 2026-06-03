@@ -9,6 +9,7 @@
 #include <QSplitter>
 #include <QHeaderView>
 
+/** @brief 构造USB描述符查看器，初始化树形控件和原始数据视图 @param parent 父控件 */
 UsbDescriptorViewer::UsbDescriptorViewer(QWidget* parent)
     : QWidget(parent)
 {
@@ -33,6 +34,7 @@ UsbDescriptorViewer::UsbDescriptorViewer(QWidget* parent)
     splitter->setStretchFactor(1, 2);
 }
 
+/** @brief 设置要查看的USB设备并加载描述符数据 @param vid 厂商ID @param pid 产品ID */
 void UsbDescriptorViewer::setDevice(quint16 vid, quint16 pid) {
     ++m_totalDevicesViewed;
     loadDescriptors(vid, pid);

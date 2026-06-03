@@ -27,13 +27,7 @@
 #include "utils/log/DataLogger.h"
 #include "terminal/model/TerminalModel.h"
 
-/**
- * @brief 连接状态变化内部处理
- *
- * 在断开/错误状态下:
- *   - 清除下游控制器的连接引用
- *   - 如果启用了自动重连且非用户主动断开，启动重连定时器
- */
+/** @brief 连接状态变化内部处理，在断开/错误状态下清除下游控制器连接引用，如果启用了自动重连且非用户主动断开则启动重连定时器 @param state 新的连接状态 */
 void ConnectionController::onConnectionStateChanged(ConnectionState state)
 {
     // 先缓存连接名称
@@ -92,12 +86,7 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
     emit connectionStateChanged(state, connName);
 }
 
-/**
- * @brief 接收数据内部处理
- *
- * 转发数据到 MainWindow 并请求状态栏刷新，
- * 同时更新最近收到数据的时间戳（用于连接健康检测）。
- */
+/** @brief 接收数据内部处理，转发数据到上层并请求状态栏刷新，同时更新最近收到数据的时间戳用于连接健康检测 @param data 接收到的原始字节数据 */
 void ConnectionController::onDataReceived(const QByteArray& data)
 {
     m_lastDataTimestamp = QDateTime::currentMSecsSinceEpoch();
@@ -107,12 +96,7 @@ void ConnectionController::onDataReceived(const QByteArray& data)
     emit statusBarUpdateRequested();
 }
 
-/**
- * @brief 连接超时处理
- *
- * 当 open() 后超过 kConnectionTimeoutMs 仍未变为 Connected 时触发。
- * 中断当前连接并通知用户。
- */
+/** @brief 连接超时处理，当open()后超过kConnectionTimeoutMs仍未变为Connected时触发，中断当前连接并通知用户 */
 void ConnectionController::onConnectionTimeout()
 {
     // 标记为非用户主动断开但禁止自动重连（超时重连毫无意义）
@@ -164,10 +148,7 @@ void ConnectionController::onPortRemoved(const QString& portName)
 /** @brief 端口接入: 转发信号到上层, 不自动连接 @param portName 端口名 */
 void ConnectionController::onPortAdded(const QString& portName) { emit portAdded(portName); }
 
-/**
- * @brief 连接 IConnection 的信号到内部槽
- * @param conn 需要连接信号的 IConnection 实例
- */
+/** @brief 连接IConnection的信号到内部槽 @param conn 需要连接信号的IConnection实例 */
 void ConnectionController::connectSignals(IConnection* conn)
 {
     connect(conn, &IConnection::dataReceived,
@@ -196,18 +177,7 @@ void ConnectionController::connectSignals(IConnection* conn)
     });
 }
 
-/**
- * @brief 统一的连接断开清理流程
- *
- * 从 disconnectCurrent()、onConnectionTimeout()、onPortRemoved() 提取的公共逻辑:
- *   1. 停止超时定时器
- *   2. 缓存并清空 m_currentConn / m_connectedPortName
- *   3. 断开信号连接（防止 close() 触发 onConnectionStateChanged 回调）
- *   4. 从 ConnectionManager 移除并销毁连接实例
- *   5. 清除下游控制器的连接引用
- *
- * @param reason 断开原因描述，用于日志输出
- */
+/** @brief 统一的连接断开清理流程，停止超时定时器、缓存并清空当前连接、断开信号连接、从ConnectionManager移除并销毁连接实例、清除下游控制器连接引用 @param reason 断开原因描述，用于日志输出 */
 void ConnectionController::teardownConnection(const QString& reason)
 {
     stopConnectionTimeout();
@@ -233,11 +203,7 @@ void ConnectionController::teardownConnection(const QString& reason)
     clearDownstreamConnections();
 }
 
-/**
- * @brief 清除所有下游控制器的连接引用
- *
- * 在连接断开或发生错误时调用，防止下游控制器持有悬空指针。
- */
+/** @brief 清除所有下游控制器的连接引用，在连接断开或发生错误时调用防止下游控制器持有悬空指针 */
 void ConnectionController::clearDownstreamConnections()
 {
     if (m_sendController) {

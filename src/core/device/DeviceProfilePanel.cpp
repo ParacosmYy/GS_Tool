@@ -7,9 +7,7 @@
 
 #include "core/device/DeviceProfilePanel.h"
 
-/**
- * @brief 构造函数，初始化设备选择面板布局
- */
+/** @brief 构造设备配置选择面板，初始化所有UI控件和信号连接 @param parent 父控件指针 */
 DeviceProfilePanel::DeviceProfilePanel(QWidget *parent)
     : QWidget(parent)
     , m_profileList(new QListWidget(this))
@@ -76,7 +74,8 @@ DeviceProfilePanel::DeviceProfilePanel(QWidget *parent)
 }
 
 /**
- * @brief 设置关联的注册表并刷新列表
+ * @brief 设置关联的设备注册表并刷新列表
+ * @param registry 设备注册表指针
  */
 void DeviceProfilePanel::setRegistry(DeviceRegistry *registry)
 {
@@ -89,9 +88,7 @@ void DeviceProfilePanel::setRegistry(DeviceRegistry *registry)
     }
 }
 
-/**
- * @brief 获取当前选中的设备配置
- */
+/** @brief 获取当前选中的设备配置 @return 选中的设备配置，无选中时返回空配置 */
 DeviceProfile DeviceProfilePanel::selectedProfile() const
 {
     if (!m_registry) { return {}; }
@@ -102,9 +99,7 @@ DeviceProfile DeviceProfilePanel::selectedProfile() const
     return m_registry->findProfile(items.first()->text());
 }
 
-/**
- * @brief 处理列表选择变更
- */
+/** @brief 处理列表选择变更，更新按钮启用状态并发射profileSelected信号 */
 void DeviceProfilePanel::onSelectionChanged()
 {
     bool hasSelection = !m_profileList->selectedItems().isEmpty();
@@ -117,9 +112,7 @@ void DeviceProfilePanel::onSelectionChanged()
     }
 }
 
-/**
- * @brief 新建设备配置 — 通过输入对话框获取名称
- */
+/** @brief 新建设备配置，通过输入对话框获取名称后添加到注册表 */
 void DeviceProfilePanel::onNewProfile()
 {
     if (!m_registry) { return; }
@@ -138,9 +131,7 @@ void DeviceProfilePanel::onNewProfile()
     m_registry->addProfile(profile);
 }
 
-/**
- * @brief 编辑选中的配置 — 修改名称
- */
+/** @brief 编辑选中的配置名称，先删除旧配置再添加重命名后的配置 */
 void DeviceProfilePanel::onEditProfile()
 {
     if (!m_registry) { return; }
@@ -164,9 +155,7 @@ void DeviceProfilePanel::onEditProfile()
     ++m_totalProfileEdits;
 }
 
-/**
- * @brief 删除选中的配置
- */
+/** @brief 删除当前选中的设备配置 */
 void DeviceProfilePanel::onDeleteProfile()
 {
     if (!m_registry) { return; }
@@ -177,9 +166,7 @@ void DeviceProfilePanel::onDeleteProfile()
     }
 }
 
-/**
- * @brief 从文件导入配置
- */
+/** @brief 从JSON文件导入设备配置，通过文件对话框选择文件 */
 void DeviceProfilePanel::onImportProfiles()
 {
     if (!m_registry) { return; }
@@ -193,9 +180,7 @@ void DeviceProfilePanel::onImportProfiles()
     ++m_totalImports;
 }
 
-/**
- * @brief 导出配置到文件
- */
+/** @brief 将设备配置导出到JSON文件，通过文件对话框选择保存路径 */
 void DeviceProfilePanel::onExportProfiles()
 {
     if (!m_registry) { return; }
@@ -209,9 +194,7 @@ void DeviceProfilePanel::onExportProfiles()
     ++m_totalExports;
 }
 
-/**
- * @brief 刷新设备列表
- */
+/** @brief 从注册表重新加载并刷新设备列表 */
 void DeviceProfilePanel::refreshList()
 {
     m_profileList->clear();

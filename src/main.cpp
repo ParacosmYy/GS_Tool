@@ -13,7 +13,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include "core/mainwindow/MainWindow.h"
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 #include "utils/settings/SettingsManager.h"
 
 int main(int argc, char* argv[])

@@ -10,12 +10,7 @@
 #include <QSplitter>
 #include <QHeaderView>
 
-/**
- * @brief 构造函数 - 初始化模式查看器UI
- * @param parent 父控件
- *
- * 创建水平分割器：左侧为模式结构树，右侧为详细内容视图。
- */
+/** @brief 构造函数，初始化模式查看器UI(左树+右详情) @param parent 父控件 */
 SchemaViewer::SchemaViewer(QWidget* parent)
     : QWidget(parent)
 {
@@ -47,12 +42,7 @@ SchemaViewer::SchemaViewer(QWidget* parent)
     });
 }
 
-/**
- * @brief 加载并解析Schema文件
- * @param filePath 文件路径(.proto或.fbs)
- *
- * 读取文件内容，根据类型调用对应解析器填充模式树。
- */
+/** @brief 加载并解析Schema文件(.proto/.fbs) @param filePath 文件路径 @param type 文件类型("proto"/"fbs") */
 void SchemaViewer::loadSchema(const QString& filePath, const QString& type) {
     ++m_totalSchemasLoaded;
 
@@ -78,12 +68,7 @@ void SchemaViewer::loadSchema(const QString& filePath, const QString& type) {
     m_detailView->setPlainText(content);
 }
 
-/**
- * @brief 解析.proto文件内容为模式树结构
- * @param content 文件文本内容
- *
- * 提取message/enum定义及其字段，填充到QTreeWidget。
- */
+/** @brief 解析.proto文件内容为模式树结构(message/enum+字段) @param content 文件文本内容 */
 void SchemaViewer::parseProtoContent(const QString& content) {
     /* 按行解析.proto文件: 提取message/enum定义及其字段 */
     auto* rootItem = m_schemaTree->invisibleRootItem();
@@ -114,12 +99,7 @@ void SchemaViewer::parseProtoContent(const QString& content) {
     }
 }
 
-/**
- * @brief 解析.fbs文件内容为模式树结构
- * @param content 文件文本内容
- *
- * 提取table/struct定义及其字段，填充到QTreeWidget。
- */
+/** @brief 解析.fbs文件内容为模式树结构(table/struct+字段) @param content 文件文本内容 */
 void SchemaViewer::parseFbsContent(const QString& content) {
     /* 按行解析.fbs文件: 提取table/struct定义及其字段 */
     auto* rootItem = m_schemaTree->invisibleRootItem();

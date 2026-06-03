@@ -13,30 +13,17 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-/**
- * @brief 构造函数
- * @param parent 父对象指针
- */
+/** @brief 构造函数 @param parent 父对象指针 */
 ProtocolSchema::ProtocolSchema(QObject *parent)
     : QObject(parent)
     , m_valid(false)
 {
 }
 
-/**
- * @brief 析构函数
- */
+/** @brief 析构函数 */
 ProtocolSchema::~ProtocolSchema() = default;
 
-/**
- * @brief 从 JSON 文件加载协议定义
- *
- * 读取指定路径的 JSON 文件并解析为协议帧结构定义。
- * 成功后 isValid() 返回 true，失败时可通过 lastError() 获取错误信息。
- *
- * @param filePath JSON 文件的完整路径
- * @return 加载并解析成功返回 true，否则返回 false
- */
+/** @brief 从JSON文件加载协议定义 @param filePath JSON文件的完整路径 @return 加载成功返回true，否则返回false */
 bool ProtocolSchema::loadFromJson(const QString &filePath)
 {
     QFile file(filePath);
@@ -58,24 +45,7 @@ bool ProtocolSchema::loadFromJson(const QString &filePath)
     return loadFromJsonData(data);
 }
 
-/**
- * @brief 从 JSON 字节数据加载协议定义
- *
- * 将给定的 JSON 格式字节数组解析为协议帧结构定义。
- * 成功后 isValid() 返回 true。
- *
- * JSON 结构要求:
- * - "name": 协议名称字符串
- * - "framing": 帧定界规则对象
- *   - "type": 帧类型标识
- *   - "header": 帧头字节数组
- *   - "length_field": { "offset": int, "size": int }
- *   - "checksum": { "type": string }
- * - "fields": 字段定义数组，每项含 name/offset/size/type
- *
- * @param jsonData JSON 格式的字节数组
- * @return 解析成功返回 true，否则返回 false
- */
+/** @brief 从JSON字节数据加载协议定义 @param jsonData JSON格式的字节数组 @return 解析成功返回true，否则返回false */
 bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
 {
     m_valid = false;
@@ -217,14 +187,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     return true;
 }
 
-/**
- * @brief 将当前协议定义序列化为 JSON 对象
- *
- * 输出格式与 loadFromJsonData() 输入格式一致，
- * 可用于持久化存储或调试输出。
- *
- * @return 包含完整协议定义的 QJsonObject，未加载时返回空对象
- */
+/** @brief 将当前协议定义序列化为JSON对象 @return 包含完整协议定义的QJsonObject */
 QJsonObject ProtocolSchema::toJson() const
 {
     QJsonObject root;
@@ -271,46 +234,31 @@ QJsonObject ProtocolSchema::toJson() const
     return root;
 }
 
-/**
- * @brief 获取协议名称
- * @return 协议名称字符串，未加载时为空
- */
+/** @brief 获取协议名称 @return 协议名称字符串 */
 QString ProtocolSchema::name() const
 {
     return m_name;
 }
 
-/**
- * @brief 获取帧定界规则
- * @return 当前帧定界规则
- */
+/** @brief 获取帧定界规则 @return 当前帧定界规则 */
 ProtocolSchema::FramingRule ProtocolSchema::framing() const
 {
     return m_framing;
 }
 
-/**
- * @brief 获取所有字段定义列表
- * @return 字段定义列表，未加载时为空
- */
+/** @brief 获取所有字段定义列表 @return 字段定义列表 */
 QList<ProtocolSchema::FieldDefinition> ProtocolSchema::fields() const
 {
     return m_fields;
 }
 
-/**
- * @brief 检查当前协议定义是否有效
- * @return 协议定义有效返回 true，否则返回 false
- */
+/** @brief 检查当前协议定义是否有效 @return 有效返回true，否则返回false */
 bool ProtocolSchema::isValid() const
 {
     return m_valid;
 }
 
-/**
- * @brief 获取最近一次解析错误的描述信息
- * @return 错误描述字符串，无错误时为空
- */
+/** @brief 获取最近一次解析错误描述 @return 错误描述字符串 */
 QString ProtocolSchema::lastError() const
 {
     return m_lastError;
@@ -318,47 +266,31 @@ QString ProtocolSchema::lastError() const
 
 /* ──────────────── 可编程构造用 setter ──────────────── */
 
-/**
- * @brief 设置协议名称
- * @param name 协议名称
- */
+/** @brief 设置协议名称 @param name 协议名称 */
 void ProtocolSchema::setName(const QString &name)
 {
     m_name = name;
 }
 
-/**
- * @brief 设置帧定界规则
- * @param rule 帧定界规则
- */
+/** @brief 设置帧定界规则 @param rule 帧定界规则 */
 void ProtocolSchema::setFraming(const FramingRule &rule)
 {
     m_framing = rule;
 }
 
-/**
- * @brief 追加一个字段定义
- * @param field 字段定义
- */
+/** @brief 追加一个字段定义 @param field 字段定义 */
 void ProtocolSchema::addField(const FieldDefinition &field)
 {
     m_fields.append(field);
 }
 
-/**
- * @brief 设置协议定义是否有效
- * @param valid 有效标志
- */
+/** @brief 设置协议定义是否有效 @param valid 有效标志 */
 void ProtocolSchema::setValid(bool valid)
 {
     m_valid = valid;
 }
 
-/**
- * @brief 将校验类型枚举值转换为字符串标识
- * @param type 校验算法枚举值
- * @return 对应的字符串标识，未知类型返回 "none"
- */
+/** @brief 将校验类型枚举值转换为字符串标识 @param type 校验算法枚举值 @return 对应的字符串标识 */
 QString ProtocolSchema::checksumTypeToString(ChecksumType type) const
 {
     switch (type) {
@@ -373,11 +305,7 @@ QString ProtocolSchema::checksumTypeToString(ChecksumType type) const
     }
 }
 
-/**
- * @brief 将字符串标识转换为校验类型枚举值
- * @param str 校验算法字符串标识
- * @return 对应的枚举值，无法识别时返回 None
- */
+/** @brief 将字符串标识转换为校验类型枚举值 @param str 校验算法字符串标识 @return 对应的枚举值 */
 ProtocolSchema::ChecksumType ProtocolSchema::checksumTypeFromString(const QString &str) const
 {
     if (str == QStringLiteral("none"))        return ChecksumType::None;

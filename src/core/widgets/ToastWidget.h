@@ -1,11 +1,4 @@
-/**
- * @file ToastWidget.h
- * @brief 通知吐司组件 -- 在父窗口右下角显示临时通知
- * 支持三种语义类型: Success(绿)/Error(红)/Info(强调色)
- * 动画: 弹出 300ms OutBack, 消失 250ms InCubic (CLAUDE.md §6.5)
- * 颜色全部从 ThemeManager 获取, 无硬编码
- */
-
+/** @file ToastWidget.h @brief 通知吐司组件 -- 右下角临时通知，Success(绿)/Error(红)/Info(强调色)，弹出300ms OutBack/消失250ms InCubic */
 #ifndef TOASTWIDGET_H
 #define TOASTWIDGET_H
 
@@ -32,7 +25,7 @@ class ToastWidget : public QWidget {
 public:
     enum class ToastType { Success, Error, Info }; ///< 通知类型
 
-    /** @brief 显示吐司通知，弹出动画后自动定时消失 @param parent 父窗口 @param msg 消息文本 @param type 通知类型(Success/Error/Info) @param ms 自动消失延迟(毫秒) */
+    /** @brief 显示吐司通知，弹出动画后自动定时消失 */
     static void show(QWidget* parent, const QString& msg,
                      ToastType type = ToastType::Info, int ms = 3000)
     {
@@ -65,7 +58,7 @@ public:
         fade->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
-    /** @brief 防抖吐司，在冷却期内重复调用同一消息将被忽略 @param parent 父窗口 @param msg 消息文本 @param type 通知类型(Success/Error/Info) @param cooldownMs 冷却间隔(毫秒) */
+    /** @brief 防抖吐司，冷却期内重复调用同一消息将被忽略 */
     static void showDebounced(QWidget* parent, const QString& msg,
                               ToastType type = ToastType::Info, int cooldownMs = 2000)
     {
@@ -77,7 +70,7 @@ public:
     }
 
 protected:
-    /** @brief 自绘事件，绘制圆角背景、左侧语义色条、图标和消息文本 @param event 绘制事件(未使用) */
+    /** @brief 自绘事件：圆角背景+左侧语义色条+图标+消息文本 */
     void paintEvent(QPaintEvent*) override
     {
         QPainter p(this); p.setRenderHint(QPainter::Antialiasing);
@@ -103,7 +96,7 @@ protected:
     }
 
 private:
-    /** @brief 私有构造函数，初始化吐司控件的外观和尺寸 @param parent 父窗口 @param message 消息文本 @param type 通知类型 */
+    /** @brief 私有构造函数，初始化吐司外观和尺寸 */
     explicit ToastWidget(QWidget* parent, const QString& message, ToastType type)
         : QWidget(parent), m_type(type), m_message(message)
     {
@@ -120,7 +113,7 @@ private:
         m_opacityEffect->setOpacity(0.0); setGraphicsEffect(m_opacityEffect);
     }
 
-    /** @brief 获取当前通知类型对应的语义颜色(ThemeManager) @return 语义颜色值 */
+    /** @brief 获取当前通知类型的语义颜色 */
     QColor semanticColor() const {
         using SC = ThemeManager::SemanticColor;
         switch (m_type) {
@@ -131,7 +124,7 @@ private:
         return ThemeManager::instance().color(SC::Accent);
     }
 
-    /** @brief 获取当前通知类型对应的图标Unicode字符 @return 图标字符字符串 */
+    /** @brief 获取通知类型对应的图标Unicode字符 */
     QString iconChar() const {
         switch (m_type) {
         case ToastType::Success: return tr("✓");
@@ -141,7 +134,7 @@ private:
         return tr("ℹ");
     }
 
-    /** @brief 消失动画，InCubic缓动，向上飘出30px并淡出(并行动画组) */
+    /** @brief 消失动画：InCubic缓动，向上飘出30px并淡出 */
     void dismiss() {
         ++s_totalDismisses;
         auto* group = new QParallelAnimationGroup(this);
@@ -160,19 +153,15 @@ private:
         });
         group->start(QAbstractAnimation::DeleteWhenStopped);
     }
-
-    /** @brief 获取指定父窗口的活跃吐司列表引用 @param parent 父窗口 @return 活跃吐司列表的引用 */
+    /** @brief 获取指定父窗口的活跃吐司列表引用 */
     static QList<ToastWidget*>& activeToasts(QWidget* parent) { return activeToastsMap()[parent]; }
-
-    /** @brief 获取全局父窗口-吐司列表映射表(单例) @return 映射表引用 */
+    /** @brief 获取全局父窗口-吐司列表映射表(单例) */
     static QMap<QWidget*, QList<ToastWidget*>>& activeToastsMap() {
         static QMap<QWidget*, QList<ToastWidget*>> map; return map; }
-
-    /** @brief 获取全局防抖计时器映射表(单例) @return 防抖计时器映射引用 */
+    /** @brief 获取全局防抖计时器映射表(单例) */
     static QHash<QString, QElapsedTimer>& debounceMap() {
         static QHash<QString, QElapsedTimer> map; return map; }
-
-    /** @brief 吐司消失后重新排列剩余活跃吐司的垂直位置 @param parent 父窗口 */
+    /** @brief 吐司消失后重新排列剩余活跃吐司的垂直位置 */
     static void repositionToasts(QWidget* parent) {
         if (!parent) return;
         auto& list = activeToasts(parent);
@@ -189,7 +178,6 @@ private:
             bottomY = y - kGap;
         }
     }
-
     ToastType m_type;                                  ///< 通知类型
     QString m_message;                                 ///< 消息文本
     QGraphicsOpacityEffect* m_opacityEffect = nullptr; ///< 淡入淡出特效
@@ -199,13 +187,9 @@ private:
     static inline quint64 s_totalDismisses = 0;      ///< 总消失次数
     static inline quint64 s_totalErrors = 0;         ///< 总错误通知次数
 public:
-    /** @brief 获取吐司总显示次数 @return 累计显示次数 */
-    static quint64 totalShows() { return s_totalShows; }
-    /** @brief 获取吐司总消失次数 @return 累计消失次数 */
-    static quint64 totalDismisses() { return s_totalDismisses; }
-    /** @brief 获取错误通知总次数 @return 累计错误通知次数 */
-    static quint64 totalErrors() { return s_totalErrors; }
-    /** @brief 重置吐司统计计数器 */
+    static quint64 totalShows() { return s_totalShows; }           ///< 总显示次数
+    static quint64 totalDismisses() { return s_totalDismisses; }   ///< 总消失次数
+    static quint64 totalErrors() { return s_totalErrors; }         ///< 总错误通知次数
     static void resetToastStatistics() { s_totalShows = 0; s_totalDismisses = 0; s_totalErrors = 0; }
 private:
     static constexpr int kWidth = 320, kMinHeight = 48;

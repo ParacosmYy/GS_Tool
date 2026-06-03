@@ -11,7 +11,7 @@
 #include <QObject>
 #include <QByteArray>
 #include <QVariant>
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 
 /**
  * @brief 串口信号线状态结构体
