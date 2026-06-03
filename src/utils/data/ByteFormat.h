@@ -263,6 +263,17 @@ inline QString formatDurationPrecise(qint64 ms)
         .arg(millis, 3, 10, QChar('0'));
 }
 
+/**
+ * @brief 格式化预计剩余时间(ETA)
+ *
+ * 根据已完成量、总数量和已用时间推算剩余时间，输出人类可读的中文文本。
+ * 返回格式根据剩余时长自动选择："即将完成"、"X秒"、"X分钟"、"X小时"。
+ *
+ * @param completed 已完成的数量
+ * @param total 总数量
+ * @param elapsedMs 已用时间（毫秒）
+ * @return 预计剩余时间字符串，如 "预计剩余 3分钟"、"即将完成"、"--"
+ */
 inline QString formatEta(qint64 completed, qint64 total, qint64 elapsedMs)
 {
     if (completed <= 0 || total <= 0 || elapsedMs <= 0 || completed >= total) {

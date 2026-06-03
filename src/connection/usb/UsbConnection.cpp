@@ -9,28 +9,34 @@
 #include "connection/usb/UsbConnection.h"
 #include "connection/usb/UsbLibraryLoader.h"
 
+/** @brief 构造函数，初始化USB连接基类 @param parent 父对象指针 */
 UsbConnection::UsbConnection(QObject* parent)
     : IConnection(parent)
 {
 }
 
+/** @brief 析构函数，关闭连接并释放USB资源 */
 UsbConnection::~UsbConnection() {
     close();
 }
 
+/** @brief 获取连接类型 @return 固定返回ConnectionType::Usb */
 ConnectionType UsbConnection::type() const {
     return ConnectionType::Usb;
 }
 
+/** @brief 获取连接显示名称，格式为USB:VID:PID @return 十六进制格式的VID:PID字符串 */
 QString UsbConnection::name() const {
     return tr("USB:%1:%2").arg(m_vid, 4, 16, QChar('0'))
                        .arg(m_pid, 4, 16, QChar('0'));
 }
 
+/** @brief 获取当前连接状态 @return 当前连接状态枚举值 */
 ConnectionState UsbConnection::state() const {
     return m_state;
 }
 
+/** @brief 打开USB连接，加载libusb并声明指定接口 @return 成功返回true */
 bool UsbConnection::open() {
     if (m_vid == 0 || m_pid == 0) {
         emit errorOccurred(tr("未设置USB设备VID/PID"));
@@ -85,6 +91,7 @@ bool UsbConnection::open() {
     return true;
 }
 
+/** @brief 关闭USB连接，释放接口、关闭设备、释放libusb上下文 */
 void UsbConnection::close() {
     if (m_state == ConnectionState::Connected) {
         auto& loader = UsbLibraryLoader::instance();
@@ -112,6 +119,7 @@ void UsbConnection::close() {
     }
 }
 
+/** @brief 通过默认bulk OUT端点写入数据 @param data 待发送的字节数据 @return 实际传输字节数，失败返回-1 */
 qint64 UsbConnection::write(const QByteArray& data) {
     if (m_state != ConnectionState::Connected) { return -1; }
     if (!m_devHandle) { return -1; }
@@ -139,6 +147,7 @@ qint64 UsbConnection::write(const QByteArray& data) {
     return transferred;
 }
 
+/** @brief 通过参数映射配置USB连接属性(VID/PID/接口/超时) @param params 配置参数键值对 */
 void UsbConnection::configure(const QVariantMap& params) {
     if (params.contains("vid")) {
         m_vid = static_cast<quint16>(params["vid"].toUInt());
@@ -154,6 +163,7 @@ void UsbConnection::configure(const QVariantMap& params) {
     }
 }
 
+/** @brief 设置目标USB设备的VID和PID，并探测设备是否存在 @param vid 厂商ID @param pid 产品ID @return 设备存在且libusb可用返回true */
 bool UsbConnection::setDevice(quint16 vid, quint16 pid) {
     m_vid = vid;
     m_pid = pid;
@@ -181,6 +191,7 @@ bool UsbConnection::setDevice(quint16 vid, quint16 pid) {
     return found;
 }
 
+/** @brief 声明指定USB接口以便独占使用 @param interface 接口号 @return 声明成功返回true */
 bool UsbConnection::claimInterface(int interface) {
     m_interface = interface;
 
@@ -201,6 +212,7 @@ bool UsbConnection::claimInterface(int interface) {
     return false;
 }
 
+/** @brief 释放已声明的USB接口 @param interface 接口号 */
 void UsbConnection::releaseInterface(int interface) {
     if (!m_interfaceClaimed || !m_devHandle) { return; }
 
@@ -209,6 +221,7 @@ void UsbConnection::releaseInterface(int interface) {
     m_interfaceClaimed = false;
 }
 
+/** @brief 执行USB Bulk传输，根据端点方向自动判断收发 @param endpoint 端点地址(bit7决定方向) @param data 发送数据或接收缓冲区大小 @return 实际传输的数据，失败返回空QByteArray */
 QByteArray UsbConnection::bulkTransfer(int endpoint,
                                         const QByteArray& data) {
     if (!m_devHandle) {
@@ -264,6 +277,7 @@ QByteArray UsbConnection::bulkTransfer(int endpoint,
     }
 }
 
+/** @brief 执行USB Interrupt传输，根据端点方向自动判断收发 @param endpoint 端点地址(bit7决定方向) @param data 发送数据或接收缓冲区大小 @return 实际传输的数据，失败返回空QByteArray */
 QByteArray UsbConnection::interruptTransfer(int endpoint,
                                              const QByteArray& data) {
     if (!m_devHandle) {
@@ -316,6 +330,7 @@ QByteArray UsbConnection::interruptTransfer(int endpoint,
     }
 }
 
+/** @brief 执行USB Control传输，根据requestType方向自动判断收发 @param requestType 请求类型字节(bit7决定方向) @param request 请求码 @param value wValue字段 @param index wIndex字段 @param data 发送数据或接收缓冲区 @return 实际传输的数据，失败返回空QByteArray */
 QByteArray UsbConnection::controlTransfer(quint8 requestType,
                                            quint8 request,
                                            quint16 value,
@@ -369,9 +384,7 @@ QByteArray UsbConnection::controlTransfer(quint8 requestType,
     }
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器 */
 void UsbConnection::resetStats()
 {
     m_totalTransfers = 0;

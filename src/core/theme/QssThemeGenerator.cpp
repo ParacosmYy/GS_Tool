@@ -11,6 +11,7 @@
 // 暗色主题语义色
 // ============================================================
 
+/** @brief 返回暗色主题的语义色映射表 @return 暗色主题语义色键值对 */
 QssThemeGenerator::ColorMap QssThemeGenerator::darkColors()
 {
     return {
@@ -67,6 +68,7 @@ QssThemeGenerator::ColorMap QssThemeGenerator::darkColors()
 // 亮色主题语义色
 // ============================================================
 
+/** @brief 返回亮色主题的语义色映射表 @return 亮色主题语义色键值对 */
 QssThemeGenerator::ColorMap QssThemeGenerator::lightColors()
 {
     return {
@@ -115,6 +117,7 @@ QssThemeGenerator::ColorMap QssThemeGenerator::lightColors()
 // 高对比度主题语义色
 // ============================================================
 
+/** @brief 返回高对比度主题的语义色映射表 @return 高对比度主题语义色键值对 */
 QssThemeGenerator::ColorMap QssThemeGenerator::highContrastColors()
 {
     return {
@@ -163,6 +166,7 @@ QssThemeGenerator::ColorMap QssThemeGenerator::highContrastColors()
 // 生成方法
 // ============================================================
 
+/** @brief 根据主题类型返回对应的语义色映射表 @param type 主题类型枚举 @return 语义色键值对映射 */
 QssThemeGenerator::ColorMap QssThemeGenerator::semanticColors(ThemeType type)
 {
     switch (type) {
@@ -173,6 +177,7 @@ QssThemeGenerator::ColorMap QssThemeGenerator::semanticColors(ThemeType type)
     return darkColors();
 }
 
+/** @brief 根据主题类型生成完整QSS样式表 @param type 主题类型枚举 @return 完整QSS样式字符串 */
 QString QssThemeGenerator::generate(ThemeType type)
 {
     auto colors = semanticColors(type);
@@ -193,6 +198,7 @@ QString QssThemeGenerator::generate(ThemeType type)
 // 基础控件样式
 // ============================================================
 
+/** @brief 生成基础控件QSS(按钮/输入框/复选框/滑块/进度条/滚动条/标签/提示) @param c 语义色映射表 @return 基础控件QSS字符串 */
 QString QssThemeGenerator::generateBaseWidgets(const ColorMap& c)
 {
     return QString(
@@ -316,6 +322,7 @@ QString QssThemeGenerator::generateBaseWidgets(const ColorMap& c)
 // 面板/容器样式
 // ============================================================
 
+/** @brief 生成面板和容器QSS(分组框/选项卡/分割器/BasePanel) @param c 语义色映射表 @return 面板容器QSS字符串 */
 QString QssThemeGenerator::generatePanels(const ColorMap& c)
 {
     return QString(
@@ -381,6 +388,7 @@ QString QssThemeGenerator::generatePanels(const ColorMap& c)
 // 导航栏样式
 // ============================================================
 
+/** @brief 生成侧边导航栏QSS(导航按钮/选中状态/指示器) @param c 语义色映射表 @return 导航栏QSS字符串 */
 QString QssThemeGenerator::generateNavigation(const ColorMap& c)
 {
     return QString(
@@ -412,6 +420,7 @@ QString QssThemeGenerator::generateNavigation(const ColorMap& c)
 // 终端样式
 // ============================================================
 
+/** @brief 生成终端控件QSS(终端背景/搜索栏/过滤栏) @param c 语义色映射表 @return 终端QSS字符串 */
 QString QssThemeGenerator::generateTerminal(const ColorMap& c)
 {
     return QString(
@@ -436,6 +445,7 @@ QString QssThemeGenerator::generateTerminal(const ColorMap& c)
 // 图表样式
 // ============================================================
 
+/** @brief 生成图表控件QSS(图表背景/网格/轴线) @param c 语义色映射表 @return 图表QSS字符串 */
 QString QssThemeGenerator::generateCharts(const ColorMap& c)
 {
     return QString(
@@ -454,6 +464,7 @@ QString QssThemeGenerator::generateCharts(const ColorMap& c)
 // 对话框样式
 // ============================================================
 
+/** @brief 生成对话框QSS(对话框背景/标题/消息/确认按钮/取消按钮) @param c 语义色映射表 @return 对话框QSS字符串 */
 QString QssThemeGenerator::generateDialogs(const ColorMap& c)
 {
     return QString(
@@ -492,6 +503,7 @@ QString QssThemeGenerator::generateDialogs(const ColorMap& c)
 // 工具栏样式
 // ============================================================
 
+/** @brief 生成工具栏QSS(主工具栏/工具按钮/快捷命令栏) @param c 语义色映射表 @return 工具栏QSS字符串 */
 QString QssThemeGenerator::generateToolbar(const ColorMap& c)
 {
     return QString(
@@ -526,6 +538,7 @@ QString QssThemeGenerator::generateToolbar(const ColorMap& c)
 // 工具方法
 // ============================================================
 
+/** @brief 将QColor转换为十六进制字符串(如 #ff0000) @param color Qt颜色对象 @return 十六进制颜色字符串 */
 QString QssThemeGenerator::toHex(const QColor& color)
 {
     return color.name(QColor::HexRgb);

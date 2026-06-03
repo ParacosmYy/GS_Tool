@@ -5,13 +5,7 @@
 
 #include "serial/signals/SignalLineMonitor.h"
 
-/**
- * @brief 构造函数
- *
- * 创建轮询定时器（200ms 间隔），但不自动启动。
- *
- * @param parent 父对象
- */
+/** @brief 构造函数，创建200ms间隔轮询定时器(不自动启动) @param parent 父对象 */
 SignalLineMonitor::SignalLineMonitor(QObject* parent)
     : QObject(parent)
     , m_pollTimer(new QTimer(this))
@@ -27,14 +21,7 @@ SignalLineMonitor::~SignalLineMonitor()
     stopPolling();
 }
 
-/**
- * @brief 开始轮询指定连接的信号线状态
- *
- * 保存连接指针，连接定时器超时信号到 onTick 槽，启动定时器。
- * 如果已经在轮询另一个连接，先停止之前的轮询。
- *
- * @param connection 要监控的连接对象（非空）
- */
+/** @brief 开始轮询指定连接的信号线状态，已在轮询则先停止再重启 @param connection 要监控的连接对象（非空） */
 void SignalLineMonitor::startPolling(IConnection* connection)
 {
     if (!connection) {
@@ -58,11 +45,7 @@ void SignalLineMonitor::startPolling(IConnection* connection)
     m_pollTimer->start();
 }
 
-/**
- * @brief 停止轮询
- *
- * 停止定时器，断开信号连接，清除连接引用。
- */
+/** @brief 停止轮询，断开信号连接，清除连接引用 */
 void SignalLineMonitor::stopPolling()
 {
     if (m_pollTimer) {
@@ -73,30 +56,19 @@ void SignalLineMonitor::stopPolling()
     m_connection = nullptr;
 }
 
-/**
- * @brief 获取当前信号线状态快照
- * @return 信号线状态结构体
- */
+/** @brief 获取当前信号线状态快照 @return 信号线状态结构体 */
 PinoutSignals SignalLineMonitor::currentSignals() const
 {
     return m_current;
 }
 
-/**
- * @brief 查询是否正在轮询
- * @return true 正在轮询，false 未轮询
- */
+/** @brief 查询是否正在轮询 @return true 正在轮询，false 未轮询 */
 bool SignalLineMonitor::isPolling() const
 {
     return m_pollTimer != nullptr && m_pollTimer->isActive();
 }
 
-/**
- * @brief 定时器超时处理
- *
- * 从连接读取最新信号线状态，与缓存状态比较。
- * 如果发生变化，更新缓存并发出 signalsChanged 信号。
- */
+/** @brief 定时器超时处理，读取最新信号线状态并与缓存比较，变化时发射signalsChanged信号 */
 void SignalLineMonitor::onTick()
 {
     if (!m_connection) {
@@ -123,46 +95,32 @@ void SignalLineMonitor::onTick()
     }
 }
 
-/**
- * @brief 获取信号线变化次数
- * @return 状态变化的总次数
- */
+/** @brief 获取信号线变化次数 @return 状态变化的总次数 */
 quint64 SignalLineMonitor::changeCount() const
 {
     return m_changeCount;
 }
 
-/**
- * @brief 获取轮询已运行时长
- * @return 运行时长（秒）
- */
+/** @brief 获取轮询已运行时长 @return 运行时长（秒） */
 qint64 SignalLineMonitor::pollingDuration() const
 {
     if (!isPolling()) return 0;
     return m_durationTimer.elapsed() / 1000;
 }
 
-/**
- * @brief 获取累计轮询次数
- * @return 轮询总次数
- */
+/** @brief 获取累计轮询次数 @return 轮询总次数 */
 quint64 SignalLineMonitor::totalPolls() const
 {
     return m_totalPolls;
 }
 
-/**
- * @brief 获取累计无变化轮询次数
- * @return 无变化轮询次数
- */
+/** @brief 获取累计无变化轮询次数 @return 无变化轮询次数 */
 quint64 SignalLineMonitor::totalIdlePolls() const
 {
     return m_totalIdlePolls;
 }
 
-/**
- * @brief 重置统计计数
- */
+/** @brief 重置统计计数(changeCount/totalPolls/totalIdlePolls归零，重启计时器) */
 void SignalLineMonitor::resetStatistics()
 {
     m_changeCount = 0;

@@ -89,7 +89,7 @@ MqttConfigPanel::MqttConfigPanel(QWidget* parent)
             this, [this]() { ++m_totalConfigChanges; });
     connect(m_keepAliveSpin, QOverload<int>::of(&QSpinBox::valueChanged),
             this, [this]() { ++m_totalConfigChanges; });
-    connect(m_cleanSessionCheck, &QCheckBox::stateChanged,
+    connect(m_cleanSessionCheck, &QCheckBox::checkStateChanged,
             this, [this]() { ++m_totalConfigChanges; });
 }
 

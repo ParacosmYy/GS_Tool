@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 
+/** @brief 构造函数，初始化订阅面板UI及信号连接 @param parent 父控件指针 */
 MqttSubscriptionPanel::MqttSubscriptionPanel(QWidget* parent)
     : QWidget(parent)
     , m_subTree(new QTreeWidget(this))
@@ -75,6 +76,7 @@ MqttSubscriptionPanel::MqttSubscriptionPanel(QWidget* parent)
             this, &MqttSubscriptionPanel::onSubscribeClicked);
 }
 
+/** @brief 添加订阅项到列表(去重) @param topic MQTT主题过滤器 @param qos 服务质量等级(0/1/2) */
 void MqttSubscriptionPanel::addSubscription(const QString& topic, int qos)
 {
     /* 避免重复 */
@@ -88,6 +90,7 @@ void MqttSubscriptionPanel::addSubscription(const QString& topic, int qos)
     m_subTree->addTopLevelItem(item);
 }
 
+/** @brief 获取当前所有订阅信息 @return QVariant列表，每项包含topic和qos字段 */
 QVariantList MqttSubscriptionPanel::subscriptions() const
 {
     QVariantList result;
@@ -101,6 +104,7 @@ QVariantList MqttSubscriptionPanel::subscriptions() const
     return result;
 }
 
+/** @brief 订阅按钮点击槽函数，读取输入框内容并发起订阅请求 */
 void MqttSubscriptionPanel::onSubscribeClicked()
 {
     const QString topic = m_topicEdit->text().trimmed();
@@ -112,6 +116,7 @@ void MqttSubscriptionPanel::onSubscribeClicked()
     m_topicEdit->clear();
 }
 
+/** @brief 取消订阅按钮点击槽函数，删除选中项并发射取消请求信号 */
 void MqttSubscriptionPanel::onUnsubscribeClicked()
 {
     auto selected = m_subTree->selectedItems();
@@ -123,6 +128,7 @@ void MqttSubscriptionPanel::onUnsubscribeClicked()
     }
 }
 
+/** @brief 右键菜单请求槽函数，在选中项上弹出上下文菜单 @param pos 鼠标在控件中的相对位置 */
 void MqttSubscriptionPanel::onCustomContextMenu(const QPoint& pos)
 {
     QTreeWidgetItem* item = m_subTree->itemAt(pos);
@@ -132,9 +138,7 @@ void MqttSubscriptionPanel::onCustomContextMenu(const QPoint& pos)
     m_contextMenu->exec(m_subTree->viewport()->mapToGlobal(pos));
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器 */
 void MqttSubscriptionPanel::resetStatistics()
 {
     m_totalSubscriptions = 0;

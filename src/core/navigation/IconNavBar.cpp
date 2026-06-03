@@ -17,6 +17,7 @@
 
 // ─── 构造/析构 ───────────────────────────────────────────
 
+/** @brief 构造函数，初始化导航栏布局、按钮组和固定宽度 @param parent 父控件指针 */
 IconNavBar::IconNavBar(QWidget* parent)
     : QWidget(parent)
 {
@@ -36,6 +37,7 @@ IconNavBar::IconNavBar(QWidget* parent)
 
 // ─── 分类管理 ────────────────────────────────────────────
 
+/** @brief 设置导航栏分类列表，清除已有按钮并重建 @param categories 分类信息向量(NavCategory) */
 void IconNavBar::setCategories(const QVector<NavCategory>& categories)
 {
     // 清除已有按钮
@@ -57,6 +59,7 @@ void IconNavBar::setCategories(const QVector<NavCategory>& categories)
 
 // ─── 激活状态 ────────────────────────────────────────────
 
+/** @brief 设置当前激活的分类，更新按钮选中态并触发重绘 @param id 分类标识符 */
 void IconNavBar::setActiveCategory(const QString& id)
 {
     if (m_activeCategory == id) return;
@@ -79,6 +82,7 @@ void IconNavBar::setActiveCategory(const QString& id)
 
 // ─── 按钮工厂 ────────────────────────────────────────────
 
+/** @brief 创建分类导航按钮，设置固定尺寸和点击信号 @param category 分类信息 @return 新创建的QPushButton指针 */
 QPushButton* IconNavBar::createCategoryButton(const NavCategory& category)
 {
     auto* btn = new QPushButton(this);
@@ -103,6 +107,7 @@ QPushButton* IconNavBar::createCategoryButton(const NavCategory& category)
 
 // ─── 绘制 ────────────────────────────────────────────────
 
+/** @brief 绘制事件处理，在激活按钮左侧绘制3px圆角accent色指示线 @param event 绘制事件(未使用) */
 void IconNavBar::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event)
@@ -145,6 +150,7 @@ void IconNavBar::paintEvent(QPaintEvent* event)
 
 // ─── 统计重置 ────────────────────────────────────────────
 
+/** @brief 重置导航栏所有统计计数器 */
 void IconNavBar::resetNavStatistics()
 {
     m_totalCategorySwitches = 0;

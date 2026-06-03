@@ -12,25 +12,14 @@
 
 #include "serial/commands/TimedSender.h"
 
-/**
- * @brief 构造定时发送器
- * @param parent 父对象
- *
- * 初始化定时器并连接超时信号。初始状态为停止，间隔 1000ms。
- */
+/** @brief 构造定时发送器，初始化定时器并连接超时信号，初始状态停止，间隔1000ms @param parent 父对象 */
 TimedSender::TimedSender(QObject* parent)
     : QObject(parent)
 {
     connect(&m_timer, &QTimer::timeout, this, &TimedSender::onTimeout);
 }
 
-/**
- * @brief 设置发送间隔（毫秒）
- * @param ms 间隔时间，必须 > 0
- *
- * 线程安全：加锁保护 m_interval。
- * 如果定时器正在运行，立即应用新间隔值。
- */
+/** @brief 设置发送间隔（毫秒），线程安全，运行时立即生效 @param ms 间隔时间，必须 > 0 */
 void TimedSender::setInterval(int ms)
 {
     QMutexLocker locker(&m_mutex);
@@ -42,24 +31,14 @@ void TimedSender::setInterval(int ms)
     }
 }
 
-/**
- * @brief 获取当前发送间隔（毫秒）
- * @return 间隔时间
- *
- * 线程安全：加锁读取 m_interval。
- */
+/** @brief 获取当前发送间隔（毫秒），线程安全 @return 间隔时间 */
 int TimedSender::interval() const
 {
     QMutexLocker locker(&m_mutex);
     return m_interval;
 }
 
-/**
- * @brief 设置要循环发送的单组数据
- * @param data 待发送的数据
- *
- * 重置队列索引为 0。
- */
+/** @brief 设置要循环发送的单组数据，重置队列索引 @param data 待发送的数据 */
 void TimedSender::setData(const QByteArray& data)
 {
     QMutexLocker locker(&m_mutex);
@@ -67,12 +46,7 @@ void TimedSender::setData(const QByteArray& data)
     m_queueIndex = 0;
 }
 
-/**
- * @brief 设置多组数据队列（按顺序循环发送）
- * @param queue 数据队列列表
- *
- * 重置队列索引为 0。
- */
+/** @brief 设置多组数据队列（按顺序循环发送），重置队列索引 @param queue 数据队列列表 */
 void TimedSender::setDataQueue(const QList<QByteArray>& queue)
 {
     QMutexLocker locker(&m_mutex);
@@ -80,12 +54,7 @@ void TimedSender::setDataQueue(const QList<QByteArray>& queue)
     m_queueIndex = 0;
 }
 
-/**
- * @brief 启动定时发送
- *
- * 线程安全：可在定时器回调中安全调用。
- * 如果队列为空则不启动，避免无意义的定时触发。
- */
+/** @brief 启动定时发送，线程安全，空队列不启动 */
 void TimedSender::start()
 {
     QMutexLocker locker(&m_mutex);
@@ -101,11 +70,7 @@ void TimedSender::start()
     m_timer.start(m_interval);
 }
 
-/**
- * @brief 停止定时发送
- *
- * 线程安全：可在定时器回调中安全调用。
- */
+/** @brief 停止定时发送，线程安全 */
 void TimedSender::stop()
 {
     QMutexLocker locker(&m_mutex);
@@ -113,35 +78,21 @@ void TimedSender::stop()
     m_timer.stop();
 }
 
-/**
- * @brief 查询定时发送是否正在运行
- * @return true=正在运行，false=已停止
- *
- * 线程安全：加锁读取 m_isRunning。
- */
+/** @brief 查询定时发送是否正在运行，线程安全 @return true=正在运行，false=已停止 */
 bool TimedSender::isRunning() const
 {
     QMutexLocker locker(&m_mutex);
     return m_isRunning;
 }
 
-/**
- * @brief 获取已发送次数
- * @return 定时发送已触发的次数
- */
+/** @brief 获取已发送次数，线程安全 @return 定时发送已触发的次数 */
 int TimedSender::sendCount() const
 {
     QMutexLocker locker(&m_mutex);
     return m_sendCount;
 }
 
-/**
- * @brief 定时器超时处理槽
- *
- * 使用 QMetaObject::invokeMethod 将 doSend() 调度到主线程执行，
- * 确保 sendData 信号在主线程中发射，下游可安全操作串口和 UI。
- * 如果当前不在主线程，使用 QueuedConnection 异步调度。
- */
+/** @brief 定时器超时处理槽，通过QMetaObject::invokeMethod调度doSend到主线程执行 */
 void TimedSender::onTimeout()
 {
     {
@@ -154,14 +105,7 @@ void TimedSender::onTimeout()
                               Qt::QueuedConnection);
 }
 
-/**
- * @brief 执行实际的发送动作（在主线程中调用）
- *
- * 1. 检查队列是否为空，空则停止定时器
- * 2. 检查连接有效性（通过 m_isRunning 标志判断）
- * 3. 从队列中取出当前数据并发射 sendData 信号
- * 4. 推进队列索引到下一个位置（循环）
- */
+/** @brief 执行实际发送动作(主线程)，从队列取数据并发射sendData信号，空队列自动停止 */
 void TimedSender::doSend()
 {
     QByteArray dataToSend;
@@ -191,48 +135,28 @@ void TimedSender::doSend()
     emit sendData(dataToSend);
 }
 
-/**
- * @brief 获取累计发送的总字节数
- * @return 总字节数
- *
- * 线程安全：加锁读取 m_totalBytesSent。
- */
+/** @brief 获取累计发送的总字节数，线程安全 @return 总字节数 */
 quint64 TimedSender::totalBytesSent() const
 {
     QMutexLocker locker(&m_mutex);
     return m_totalBytesSent;
 }
 
-/**
- * @brief 获取定时发送调度次数（每次 start() 调用 +1）
- * @return 调度次数
- *
- * 线程安全：加锁读取 m_scheduleCount。
- */
+/** @brief 获取定时发送调度次数（每次start()调用+1），线程安全 @return 调度次数 */
 quint64 TimedSender::scheduleCount() const
 {
     QMutexLocker locker(&m_mutex);
     return m_scheduleCount;
 }
 
-/**
- * @brief 获取定时器触发发送的总次数
- * @return 触发总次数
- *
- * 线程安全：加锁读取 m_totalTimedSends。
- */
+/** @brief 获取定时器触发发送的总次数，线程安全 @return 触发总次数 */
 quint64 TimedSender::totalTimedSends() const
 {
     QMutexLocker locker(&m_mutex);
     return m_totalTimedSends;
 }
 
-/**
- * @brief 重置所有统计计数器
- *
- * 将 sendCount、totalBytesSent、scheduleCount、totalTimedSends 全部归零。
- * 线程安全：内部加锁保护。
- */
+/** @brief 重置所有统计计数器(sendCount/totalBytesSent/scheduleCount/totalTimedSends归零)，线程安全 */
 void TimedSender::resetStatistics()
 {
     QMutexLocker locker(&m_mutex);

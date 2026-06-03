@@ -11,10 +11,7 @@
 #include <QVBoxLayout>
 #include <QFont>
 
-/**
- * @brief 构造函数
- * @param parent 父控件
- */
+/** @brief 构造函数，初始化悬浮性能面板UI @param parent 父控件 */
 PerformanceOverlay::PerformanceOverlay(QWidget *parent)
     : QWidget(parent)
 {
@@ -25,12 +22,7 @@ PerformanceOverlay::PerformanceOverlay(QWidget *parent)
 /** @brief 析构函数 */
 PerformanceOverlay::~PerformanceOverlay() = default;
 
-/**
- * @brief 设置性能监视器数据源
- * @param monitor 监视器实例
- *
- * 连接 statsUpdated 信号到 onStatsUpdated 槽。
- */
+/** @brief 设置性能监视器数据源，连接statsUpdated信号到onStatsUpdated槽 @param monitor 监视器实例 */
 void PerformanceOverlay::setMonitor(PerformanceMonitor *monitor)
 {
     m_monitor = monitor;
@@ -40,23 +32,13 @@ void PerformanceOverlay::setMonitor(PerformanceMonitor *monitor)
     }
 }
 
-/**
- * @brief 统计数据更新回调（由信号触发）
- * @param fps       帧率
- * @param avgFrameMs 平均帧耗时
- * @param memBytes  内存占用
- */
+/** @brief 统计数据更新回调（由信号触发），委托给updateStats @param fps 帧率 @param avgFrameMs 平均帧耗时 @param memBytes 内存占用 */
 void PerformanceOverlay::onStatsUpdated(double fps, double avgFrameMs, qint64 memBytes)
 {
     updateStats(fps, avgFrameMs, memBytes);
 }
 
-/**
- * @brief 手动更新统计数据显示
- * @param fps        帧率
- * @param avgFrameMs 平均帧耗时（ms）
- * @param memBytes   内存占用（字节）
- */
+/** @brief 手动更新统计数据显示(FPS/帧耗时/内存)，同时跟踪FPS历史和极值 @param fps 帧率 @param avgFrameMs 平均帧耗时（ms） @param memBytes 内存占用（字节） */
 void PerformanceOverlay::updateStats(double fps, double avgFrameMs, qint64 memBytes)
 {
     ++m_totalUpdates;
@@ -96,7 +78,7 @@ void PerformanceOverlay::updateStats(double fps, double avgFrameMs, qint64 memBy
     m_memLabel->setText(tr("MEM: %1").arg(memFormatted));
 }
 
-/** @brief 初始化 UI */
+/** @brief 初始化悬浮面板UI(FPS标签+内存标签，鼠标穿透，固定宽度150px) */
 void PerformanceOverlay::setupUI()
 {
     // 右对齐的垂直布局
@@ -128,9 +110,7 @@ void PerformanceOverlay::setupUI()
     setFixedWidth(150);
 }
 
-/**
- * @brief 获取FPS统计数据
- */
+/** @brief 获取FPS统计数据(当前/最小/最大/平均/采样数) @return FpsStats结构体 */
 FpsStats PerformanceOverlay::fpsStats() const
 {
     FpsStats stats;
@@ -149,25 +129,19 @@ FpsStats PerformanceOverlay::fpsStats() const
     return stats;
 }
 
-/**
- * @brief 设置FPS警告阈值
- */
+/** @brief 设置FPS警告阈值 @param threshold 警告阈值(FPS) */
 void PerformanceOverlay::setFpsWarningThreshold(double threshold)
 {
     m_fpsWarningThreshold = threshold;
 }
 
-/**
- * @brief 查询当前是否低于FPS警告阈值
- */
+/** @brief 查询当前是否低于FPS警告阈值 @return true=当前FPS低于阈值，false=正常或无数据 */
 bool PerformanceOverlay::isBelowFpsThreshold() const
 {
     return m_currentFps > 0 && m_currentFps < m_fpsWarningThreshold;
 }
 
-/**
- * @brief 生成性能摘要文本
- */
+/** @brief 生成性能摘要文本(FPS极值+均值+内存) @return 格式化的性能摘要字符串 */
 QString PerformanceOverlay::performanceSummary() const
 {
     const FpsStats fps = fpsStats();
@@ -181,9 +155,7 @@ QString PerformanceOverlay::performanceSummary() const
         .arg(mb, 0, 'f', 1);
 }
 
-/**
- * @brief 重置统计数据
- */
+/** @brief 重置统计数据(清空FPS历史、极值归位、内存归零) */
 void PerformanceOverlay::resetStats()
 {
     m_fpsHistory.clear();

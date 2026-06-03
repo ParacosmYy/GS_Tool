@@ -19,6 +19,7 @@ static const QStringList MOCK_SERVICES = {
     "6e400001-b5a3-f393-e0a9-e50e24dcca9e"   // Nordic UART Service
 };
 
+/** @brief 构造BLE连接对象，初始化连接定时器和模拟服务列表 @param parent 父对象 */
 BleConnection::BleConnection(QObject* parent)
     : IConnection(parent)
     , m_connectTimer(new QTimer(this))
@@ -29,26 +30,31 @@ BleConnection::BleConnection(QObject* parent)
     initMockServices();
 }
 
+/** @brief 析构BLE连接对象，关闭连接释放资源 */
 BleConnection::~BleConnection()
 {
     close();
 }
 
+/** @brief 获取连接类型 @return 固定返回ConnectionType::Ble */
 ConnectionType BleConnection::type() const
 {
     return ConnectionType::Ble;
 }
 
+/** @brief 获取连接显示名称 @return 已连接时返回设备地址，否则返回"未连接" */
 QString BleConnection::name() const
 {
     return m_deviceAddress.isEmpty() ? tr("未连接") : m_deviceAddress;
 }
 
+/** @brief 获取当前BLE连接状态 @return 当前连接状态枚举值 */
 ConnectionState BleConnection::state() const
 {
     return m_state;
 }
 
+/** @brief 打开BLE连接，启动模拟连接延迟定时器 @return true=成功发起连接，false=地址未设置或已连接 */
 bool BleConnection::open()
 {
     if (m_deviceAddress.isEmpty()) {
@@ -67,6 +73,7 @@ bool BleConnection::open()
     return true;
 }
 
+/** @brief 关闭BLE连接，停止连接定时器并重置状态为Disconnected */
 void BleConnection::close()
 {
     m_connectTimer->stop();
@@ -76,6 +83,7 @@ void BleConnection::close()
     }
 }
 
+/** @brief 向BLE设备写入数据，模拟回环将写入数据作为接收数据回传 @param data 待写入的数据 @return 实际写入字节数，未连接返回-1 */
 qint64 BleConnection::write(const QByteArray& data)
 {
     if (m_state != ConnectionState::Connected) {
@@ -106,6 +114,7 @@ qint64 BleConnection::write(const QByteArray& data)
     return written;
 }
 
+/** @brief 配置BLE连接参数 @param params 参数映射，支持address(设备地址)和deviceName(设备名称) */
 void BleConnection::configure(const QVariantMap& params)
 {
     if (params.contains("address")) {
@@ -116,17 +125,20 @@ void BleConnection::configure(const QVariantMap& params)
     }
 }
 
+/** @brief 连接到指定地址的BLE设备 @param address BLE设备MAC地址 */
 void BleConnection::connectToDevice(const QString& address)
 {
     m_deviceAddress = address;
     open();
 }
 
+/** @brief 断开BLE设备连接，等同于close() */
 void BleConnection::disconnectDevice()
 {
     close();
 }
 
+/** @brief 发现BLE设备的GATT服务列表 @return 当前预设的服务UUID列表，未连接时返回空列表 */
 QStringList BleConnection::discoverServices()
 {
     if (m_state != ConnectionState::Connected) {
@@ -141,11 +153,13 @@ QStringList BleConnection::discoverServices()
     return m_services;
 }
 
+/** @brief 获取BLE设备名称 @return 设备名称字符串 */
 QString BleConnection::deviceName() const
 {
     return m_deviceName;
 }
 
+/** @brief 连接定时器超时回调，将状态从Connecting切换为Connected */
 void BleConnection::onConnectTimeout()
 {
     if (m_state == ConnectionState::Connecting) {
@@ -154,6 +168,7 @@ void BleConnection::onConnectTimeout()
     }
 }
 
+/** @brief 初始化模拟GATT服务UUID列表 */
 void BleConnection::initMockServices()
 {
     m_services = MOCK_SERVICES;

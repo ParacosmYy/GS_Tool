@@ -48,10 +48,7 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
 /** @brief 返回上次exportRange调用实际导出的行数 @return 导出行数 */
 int DataExporter::lastExportRangeCount() const { return m_lastExportRangeCount; }
 
-/**
- * @brief 从EDL二进制文件中读取指定时间范围的记录
- * EDL记录(BigEndian): timestamp(8B) + direction(1B) + length(4B) + data(length B)
- */
+/** @brief 从EDL二进制文件中读取指定时间范围的记录，EDL记录(BigEndian): timestamp(8B) + direction(1B) + length(4B) + data(length B) @param edlPath EDL日志文件路径 @param fromMs 起始时间戳(ms)，-1表示不限制 @param toMs 结束时间戳(ms)，-1表示不限制 @return 符合时间范围的TerminalLine列表 */
 QVector<TerminalLine> DataExporter::readEdlRange(const QString& edlPath,
                                                   qint64 fromMs, qint64 toMs)
 {

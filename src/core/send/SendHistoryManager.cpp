@@ -14,7 +14,7 @@
 #include <QMap>
 
 namespace {
-/** @brief 从发送历史聚合构建补全条目（按文本去重，累加频率，保留最近时间戳） */
+/** @brief 从发送历史聚合构建补全条目（按文本去重，累加频率，保留最近时间戳） @param history 发送历史数据源 @return 聚合后的补全条目列表 */
 QVector<AutoCompleteEntry> buildAggregatedEntries(SendHistory* history)
 {
     QMap<QString, AutoCompleteEntry> agg;
@@ -29,12 +29,14 @@ QVector<AutoCompleteEntry> buildAggregatedEntries(SendHistory* history)
 }
 } // anonymous namespace
 
+/** @brief 构造发送历史管理器 @param history 发送历史数据源 @param parent 父对象 */
 SendHistoryManager::SendHistoryManager(SendHistory* history, QObject* parent)
     : QObject(parent)
     , m_sendHistory(history)
 {
 }
 
+/** @brief 为输入框设置自动补全功能（含QCompleter和SmartAutoComplete双引擎） @param input 目标输入框 @param parentWidget 智能补全弹出列表的父控件 */
 void SendHistoryManager::setupAutoComplete(QLineEdit* input, QWidget* parentWidget)
 {
     m_input = input;
@@ -79,17 +81,20 @@ void SendHistoryManager::setupAutoComplete(QLineEdit* input, QWidget* parentWidg
     });
 }
 
+/** @brief 记录一条发送历史（自动添加到历史列表并递增统计） @param text 发送文本内容 @param isHex 是否为十六进制格式 */
 void SendHistoryManager::recordHistory(const QString& text, bool isHex)
 {
     m_sendHistory->addEntry(text, isHex);
     ++m_totalAdds;  // 累计添加计数
 }
 
+/** @brief 获取智能补全弹出列表控件 @return SmartAutoComplete指针 */
 SmartAutoComplete* SendHistoryManager::smartComplete() const
 {
     return m_smartComplete;
 }
 
+/** @brief 事件过滤器：拦截输入框的键盘导航（Up/Down/Enter/Escape） @param watched 被监听的对象 @param event 事件对象 @return true表示事件已处理不再传递，false继续传递 */
 bool SendHistoryManager::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched == m_input && event->type() == QEvent::KeyPress && m_smartComplete) {
@@ -126,6 +131,7 @@ bool SendHistoryManager::eventFilter(QObject* watched, QEvent* event)
     return QObject::eventFilter(watched, event);
 }
 
+/** @brief 刷新QCompleter和SmartAutoComplete的补全数据源 */
 void SendHistoryManager::refreshCompletions()
 {
     if (m_completerModel) {

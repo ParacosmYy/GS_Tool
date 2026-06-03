@@ -68,8 +68,7 @@ bool DataExporter::exportStreamedPlain(const QString& path, LineProvider provide
     return flushAndCheck(file, out, path);
 }
 
-/** @brief 流式HexDump - 维护全局地址偏移和跨批次残余缓冲区 */
-/** @brief 流式导出HEX转储格式 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
+/** @brief 流式导出HEX转储格式，维护全局地址偏移和跨批次残余缓冲区 @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamedHexDump(const QString& path, LineProvider provider,
                                           int totalLines, int batchSize)
 {
@@ -181,7 +180,7 @@ bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
 }
 
 /**
- * @brief 流式JSON导出 - 分批构建JSON数组，适合大数据量场景
+ * @brief 流式导出JSON格式(结构化数组) - 分批构建JSON数组，适合大数据量场景
  *
  * 与exportJson输出格式相同，但通过LineProvider分批拉取数据，
  * 避免一次性将所有行加载到内存中。
@@ -192,7 +191,6 @@ bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
  * @param batchSize 每批行数
  * @return true 成功，false 失败
  */
-/** @brief 流式导出JSON格式(结构化数组) @param path 文件路径 @param provider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamedJson(const QString& path, LineProvider provider,
                                        int totalLines, int batchSize)
 {
