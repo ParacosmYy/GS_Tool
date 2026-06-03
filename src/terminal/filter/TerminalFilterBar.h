@@ -50,6 +50,16 @@ public:
      */
     bool isInverted() const;
 
+    // ---- 统计计数接口 ----
+    /** @brief 获取累计过滤变更次数 */
+    quint64 totalFilterChanges() const;
+    /** @brief 获取累计高亮切换次数 */
+    quint64 totalHighlightToggles() const;
+    /** @brief 获取累计方向变更次数 */
+    quint64 totalDirectionChanges() const;
+    /** @brief 重置所有过滤统计计数器 */
+    void resetFilterStatistics();
+
 signals:
     /**
      * @brief 用户请求应用过滤
@@ -75,6 +85,11 @@ private:
     QCheckBox *m_invertCheck;       ///< 反转过滤复选框
     QPushButton *m_applyBtn;        ///< 应用过滤按钮
     QPushButton *m_clearBtn;        ///< 清除过滤按钮
+
+    // ---- 统计计数器 ----
+    quint64 m_totalFilterChanges = 0;       ///< 累计过滤变更次数
+    quint64 m_totalHighlightToggles = 0;    ///< 累计高亮切换次数
+    quint64 m_totalDirectionChanges = 0;    ///< 累计方向变更次数
 };
 
 #endif // TERMINALFILTERBAR_H

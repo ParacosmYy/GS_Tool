@@ -44,6 +44,14 @@ public:
     /// 获取通道名
     QString channelName() const { return m_channelName; }
 
+    // ---- 统计计数接口 ----
+    /** @brief 获取累计值更新次数 */
+    quint64 totalValueUpdates() const;
+    /** @brief 获取累计量程变更次数 */
+    quint64 totalRangeChanges() const;
+    /** @brief 重置所有量表统计计数器 */
+    void resetGaugeStatistics();
+
 protected:
     /// 绘制事件 —— 绘制圆形仪表盘、刻度与指针
     void paintEvent(QPaintEvent *event) override;
@@ -57,6 +65,10 @@ private:
     double  m_max         = 100.0;    ///< 最大值
     QString m_label;                  ///< 标签文本
     QString m_channelName;            ///< 绑定的数据通道名称
+
+    // ---- 统计计数器 ----
+    quint64 m_totalValueUpdates = 0;  ///< 累计值更新次数
+    quint64 m_totalRangeChanges = 0;  ///< 累计量程变更次数
 };
 
 #endif // GAUGE_WIDGET_H

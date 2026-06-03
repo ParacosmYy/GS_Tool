@@ -170,6 +170,24 @@ private:
     // ---- 进度条动画 ----
     QPropertyAnimation* m_progressAnim; ///< 进度条值动画（平滑填充）
     QPropertyAnimation* m_colorAnim;    ///< 进度条完成变色动画（accent -> success）
+
+    // ---- 统计计数器 ----
+    quint64 m_totalTransfersStarted = 0;    ///< 已启动传输总次数
+    quint64 m_totalTransfersCompleted = 0;  ///< 已完成传输总次数
+    quint64 m_totalTransfersFailed = 0;     ///< 已失败传输总次数
+    quint64 m_totalBytesTransferred = 0;    ///< 累计传输字节数
+
+public:
+    /** @brief 获取已启动传输总次数 @return 传输启动计数 */
+    quint64 totalTransfersStarted() const { return m_totalTransfersStarted; }
+    /** @brief 获取已完成传输总次数 @return 传输完成计数 */
+    quint64 totalTransfersCompleted() const { return m_totalTransfersCompleted; }
+    /** @brief 获取已失败传输总次数 @return 传输失败计数 */
+    quint64 totalTransfersFailed() const { return m_totalTransfersFailed; }
+    /** @brief 获取累计传输字节数 @return 字节总数 */
+    quint64 totalBytesTransferred() const { return m_totalBytesTransferred; }
+    /** @brief 重置OTA面板统计计数器(不影响历史记录) */
+    void resetOtaWidgetStatistics();
 };
 
 #endif // OTAWIDGET_H

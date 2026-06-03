@@ -140,6 +140,21 @@ private:
     FrameDefinition m_def;          ///< 当前帧格式定义
     bool m_updating = false;        ///< 防止循环更新标志
 
+    // ---- 统计计数器 ----
+    quint64 m_totalFramesBuilt = 0; ///< 帧构建总次数
+    quint64 m_totalSends = 0;       ///< 帧发送总次数
+    quint64 m_totalEdits = 0;       ///< 编辑操作总次数
+
+public:
+    /** @brief 获取帧构建总次数 @return 构建计数 */
+    quint64 totalFramesBuilt() const { return m_totalFramesBuilt; }
+    /** @brief 获取帧发送总次数 @return 发送计数 */
+    quint64 totalSends() const { return m_totalSends; }
+    /** @brief 获取编辑操作总次数 @return 编辑计数 */
+    quint64 totalEdits() const { return m_totalEdits; }
+    /** @brief 重置帧编辑器统计计数器 */
+    void resetEditorStatistics();
+
     /**
      * @brief 扩展字段类型列表(与ComboBox项对应)
      *

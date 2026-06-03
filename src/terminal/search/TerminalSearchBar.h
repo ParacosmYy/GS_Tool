@@ -108,6 +108,21 @@ private:
     QCheckBox* m_hexCheck;          ///< HEX模式复选框（objectName: searchBarHexCheck）
     QLabel* m_resultLabel;          ///< 结果标签（objectName: searchBarResult），如 "3/15 matches"
     QPropertyAnimation* m_activeAnim = nullptr; ///< 当前活跃的展开/收起动画，防止快速切换时冲突
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSearches = 0;        ///< 搜索触发总次数
+    quint64 m_totalMatches = 0;         ///< 匹配结果总次数
+    quint64 m_totalReplacements = 0;    ///< 替换操作总次数
+
+public:
+    /** @brief 获取搜索触发总次数 @return 搜索计数 */
+    quint64 totalSearches() const { return m_totalSearches; }
+    /** @brief 获取匹配结果总次数 @return 匹配计数 */
+    quint64 totalMatches() const { return m_totalMatches; }
+    /** @brief 获取替换操作总次数 @return 替换计数 */
+    quint64 totalReplacements() const { return m_totalReplacements; }
+    /** @brief 重置搜索栏统计计数器 */
+    void resetSearchBarStatistics();
 };
 
 #endif // TERMINALSEARCHBAR_H

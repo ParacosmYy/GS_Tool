@@ -128,6 +128,21 @@ private:
     // --- 动画 ---
     QPointer<QGraphicsOpacityEffect> m_opacityEffect; ///< 透明度特效
     qreal m_panelOpacity = 1.0;   ///< 动画用透明度属性
+
+    // ---- 统计计数器 ----
+    quint64 m_totalToggles = 0;    ///< 总折叠切换次数
+    quint64 m_totalExpansions = 0; ///< 总展开次数
+    quint64 m_totalCollapses = 0;  ///< 总折叠次数
+
+public:
+    /** @brief 获取总折叠切换次数 @return 切换计数 */
+    quint64 totalToggles() const { return m_totalToggles; }
+    /** @brief 获取总展开次数 @return 展开计数 */
+    quint64 totalExpansions() const { return m_totalExpansions; }
+    /** @brief 获取总折叠次数 @return 折叠计数 */
+    quint64 totalCollapses() const { return m_totalCollapses; }
+    /** @brief 重置面板统计计数器 */
+    void resetPanelStatistics();
 };
 
 #endif // BASE_PANEL_H

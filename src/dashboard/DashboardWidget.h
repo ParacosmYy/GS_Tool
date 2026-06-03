@@ -67,6 +67,16 @@ public:
      */
     int componentCount() const;
 
+    // ---- 统计计数接口 ----
+    /** @brief 获取累计布局变更次数 */
+    quint64 totalLayoutChanges() const;
+    /** @brief 获取累计添加组件次数 */
+    quint64 totalWidgetsAdded() const;
+    /** @brief 获取累计移除组件次数 */
+    quint64 totalWidgetsRemoved() const;
+    /** @brief 重置所有仪表盘容器统计计数器 */
+    void resetDashboardWidgetStatistics();
+
 signals:
     /// 布局发生变更时发射
     void layoutChanged();
@@ -78,6 +88,11 @@ private:
     QGridLayout    *m_grid;        ///< 网格布局
     QList<QWidget*> m_components;  ///< 子组件列表
     static const int kColumns = 3; ///< 网格列数
+
+    // ---- 统计计数器 ----
+    quint64 m_totalLayoutChanges = 0;   ///< 累计布局变更次数
+    quint64 m_totalWidgetsAdded = 0;    ///< 累计添加组件次数
+    quint64 m_totalWidgetsRemoved = 0;  ///< 累计移除组件次数
 };
 
 #endif // DASHBOARD_WIDGET_H

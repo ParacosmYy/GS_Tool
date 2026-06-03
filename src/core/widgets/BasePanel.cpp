@@ -98,6 +98,8 @@ void BasePanel::setCollapsed(bool collapsed)
     if (collapsed == m_collapsed) return;
     m_collapsed = collapsed;
 
+    if (collapsed) ++m_totalCollapses; else ++m_totalExpansions;
+
     if (m_contentArea) {
         m_contentArea->setVisible(!collapsed);
     }
@@ -372,5 +374,18 @@ void BasePanel::updateCollapseIcon()
 
 void BasePanel::toggleCollapsed()
 {
+    ++m_totalToggles;
     setCollapsed(!m_collapsed);
+}
+
+// ============================================================================
+// 统计计数器
+// ============================================================================
+
+/** @brief 重置面板统计计数器(切换/展开/折叠) */
+void BasePanel::resetPanelStatistics()
+{
+    m_totalToggles = 0;
+    m_totalExpansions = 0;
+    m_totalCollapses = 0;
 }

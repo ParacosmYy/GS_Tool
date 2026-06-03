@@ -104,6 +104,7 @@ void CommandPalette::hidePalette()
 bool CommandPalette::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::KeyPress) {
+        ++m_totalKeyEvents;
         auto* keyEvent = static_cast<QKeyEvent*>(event);
         if (keyEvent->key() == Qt::Key_Escape) {
             hidePalette();
@@ -155,6 +156,7 @@ void CommandPalette::paintEvent(QPaintEvent* /*event*/)
 
 void CommandPalette::onSearchChanged(const QString& text)
 {
+    ++m_totalSearches;
     refreshList(text);
 }
 
@@ -167,8 +169,10 @@ void CommandPalette::onItemActivated(QListWidgetItem* item)
     int idx = item->data(Qt::UserRole).toInt();
     if (idx >= 0 && idx < m_commands.size()) {
         const auto& cmd = m_commands[idx];
-        if (cmd.action)
+        if (cmd.action) {
+            ++m_totalExecutions;
             cmd.action();
+        }
         emit commandExecuted(cmd.id);
     }
     hidePalette();
@@ -217,4 +221,16 @@ bool CommandPalette::fuzzyMatch(const QString& filter, const QString& target) co
             ++fi;
     }
     return fi == f.length();
+}
+
+// ============================================================================
+// 统计计数器
+// ============================================================================
+
+/** @brief 重置命令面板统计计数器(搜索/执行/键盘事件) */
+void CommandPalette::resetPaletteStatistics()
+{
+    m_totalSearches = 0;
+    m_totalExecutions = 0;
+    m_totalKeyEvents = 0;
 }

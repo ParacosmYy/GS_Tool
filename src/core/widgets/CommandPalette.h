@@ -73,6 +73,21 @@ private:
 
     QVector<CommandEntry> m_commands;       ///< 全部注册命令
     QVector<int> m_filteredIndices;         ///< 当前过滤后的索引
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSearches = 0;            ///< 总搜索次数
+    quint64 m_totalExecutions = 0;          ///< 总命令执行次数
+    quint64 m_totalKeyEvents = 0;           ///< 总键盘事件次数
+
+public:
+    /** @brief 获取总搜索次数 @return 搜索计数 */
+    quint64 totalSearches() const { return m_totalSearches; }
+    /** @brief 获取总命令执行次数 @return 执行计数 */
+    quint64 totalExecutions() const { return m_totalExecutions; }
+    /** @brief 获取总键盘事件次数 @return 键盘事件计数 */
+    quint64 totalKeyEvents() const { return m_totalKeyEvents; }
+    /** @brief 重置命令面板统计计数器 */
+    void resetPaletteStatistics();
 };
 
 #endif // COMMAND_PALETTE_H

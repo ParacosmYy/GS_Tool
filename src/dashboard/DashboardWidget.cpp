@@ -77,6 +77,8 @@ int DashboardWidget::addComponent(const QString &type, const QString &channel)
     m_grid->addWidget(widget, row, col);
     m_components.append(widget);
 
+    ++m_totalWidgetsAdded;
+    ++m_totalLayoutChanges;
     emit layoutChanged();
     return index;
 }
@@ -94,6 +96,9 @@ void DashboardWidget::removeComponent(int index)
     QWidget *w = m_components.takeAt(index);
     m_grid->removeWidget(w);
     delete w;
+
+    ++m_totalWidgetsRemoved;
+    ++m_totalLayoutChanges;
 
     /* 重新排列网格：清除剩余，重新添加 */
     for (int i = 0; i < m_components.size(); ++i) {
@@ -228,4 +233,30 @@ void DashboardWidget::setupUI()
     addComponent("led",     tr("状态"));
     addComponent("numeric", tr("温度"));
     addComponent("numeric", tr("转速"));
+}
+
+/** @brief 获取累计布局变更次数 */
+quint64 DashboardWidget::totalLayoutChanges() const
+{
+    return m_totalLayoutChanges;
+}
+
+/** @brief 获取累计添加组件次数 */
+quint64 DashboardWidget::totalWidgetsAdded() const
+{
+    return m_totalWidgetsAdded;
+}
+
+/** @brief 获取累计移除组件次数 */
+quint64 DashboardWidget::totalWidgetsRemoved() const
+{
+    return m_totalWidgetsRemoved;
+}
+
+/** @brief 重置所有仪表盘容器统计计数器 */
+void DashboardWidget::resetDashboardWidgetStatistics()
+{
+    m_totalLayoutChanges = 0;
+    m_totalWidgetsAdded = 0;
+    m_totalWidgetsRemoved = 0;
 }

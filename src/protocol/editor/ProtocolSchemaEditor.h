@@ -82,6 +82,21 @@ private:
     QPushButton *m_validateBtn;   ///< 验证按钮
     QLabel *m_statusLabel;        ///< 状态提示标签
     ProtocolSchema *m_schema;     ///< 当前编辑的协议定义
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSchemasLoaded = 0;  ///< 加载协议总次数
+    quint64 m_totalSchemasSaved = 0;   ///< 保存协议总次数
+    quint64 m_totalValidations = 0;    ///< 验证操作总次数
+
+public:
+    /** @brief 获取加载协议总次数 @return 加载计数 */
+    quint64 totalSchemasLoaded() const { return m_totalSchemasLoaded; }
+    /** @brief 获取保存协议总次数 @return 保存计数 */
+    quint64 totalSchemasSaved() const { return m_totalSchemasSaved; }
+    /** @brief 获取验证操作总次数 @return 验证计数 */
+    quint64 totalValidations() const { return m_totalValidations; }
+    /** @brief 重置协议编辑器统计计数器 */
+    void resetSchemaEditorStatistics();
 };
 
 #endif // PROTOCOL_SCHEMA_EDITOR_H

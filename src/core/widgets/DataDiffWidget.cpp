@@ -239,3 +239,15 @@ QColor DataDiffWidget::diffColor(DiffLineType type) const
         return QColor(0, 0, 0, 0); // 透明(使用默认背景)
     }
 }
+
+// ============================================================================
+// 统计计数器
+// ============================================================================
+
+/** @brief 重置对比统计计数器(对比次数/差异数/对比字节数) */
+void DataDiffWidget::resetDiffStatistics()
+{
+    m_totalComparisons = 0;
+    m_totalDiffs = 0;
+    m_totalBytesCompared = 0;
+}

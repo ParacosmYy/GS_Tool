@@ -126,6 +126,24 @@ private:
     qint64 m_bytesSent = 0;            ///< 已发送字节
     qint64 m_fileOffset = 0;           ///< 当前偏移(断点续传)
     quint32 m_senderCrc32 = 0;         ///< CRC32累积值
+
+    // ---- 统计计数器 ----
+    quint64 m_totalBlocksSent = 0;     ///< 已发送数据块总数
+    quint64 m_totalRetries = 0;        ///< 重传总次数
+    quint64 m_totalCrcErrors = 0;      ///< CRC校验错误总次数
+    quint64 m_errorCount = 0;          ///< 协议错误总次数
+
+public:
+    /** @brief 获取已发送数据块总数 @return 数据块计数 */
+    quint64 totalBlocksSent() const { return m_totalBlocksSent; }
+    /** @brief 获取重传总次数 @return 重传计数 */
+    quint64 totalRetries() const { return m_totalRetries; }
+    /** @brief 获取CRC校验错误总次数 @return CRC错误计数 */
+    quint64 totalCrcErrors() const { return m_totalCrcErrors; }
+    /** @brief 获取协议错误总次数 @return 错误计数 */
+    quint64 errorCount() const { return m_errorCount; }
+    /** @brief 重置ZModem统计计数器(不影响传输状态) */
+    void resetZmodemStatistics();
 };
 
 #endif // ZMODEMTRANSFER_H

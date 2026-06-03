@@ -45,6 +45,7 @@ bool ZModemTransfer::writeChecked(const QByteArray& data)
     if (!m_conn) {
         m_zmodemState = State::Error;
         markError();
+        ++m_errorCount;  ///< 统计: 连接错误
         emit transferError(tr("连接中断: 连接对象无效"));
         return false;
     }
@@ -52,6 +53,7 @@ bool ZModemTransfer::writeChecked(const QByteArray& data)
     if (written < 0) {
         m_zmodemState = State::Error;
         markError();
+        ++m_errorCount;  ///< 统计: 写入错误
         emit transferError(
             tr("连接中断: 写入失败, 已传输 %1/%2 字节")
                 .arg(m_bytesSent)
@@ -124,11 +126,13 @@ void ZModemTransfer::handleTimeout()
     switch (m_zmodemState) {
     case State::WaitingRinit:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZRQINIT, attempt" << m_retryCount;
+        ++m_totalRetries;  ///< 统计: ZRQINIT重试
         sendZRQINIT();
         m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::SendingFile:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZFILE, attempt" << m_retryCount;
+        ++m_totalRetries;  ///< 统计: ZFILE重试
         sendZFILE();
         m_timeoutTimer->start(m_timeoutMs);
         break;
@@ -138,15 +142,18 @@ void ZModemTransfer::handleTimeout()
         break;
     case State::SendingFin:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZFIN, attempt" << m_retryCount;
+        ++m_totalRetries;  ///< 统计: ZFIN重试
         sendZFIN();
         m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::SendingData:
         qWarning() << "ZModem: timeout in" << curState << "- offset:" << m_fileOffset << "bytes:" << m_bytesSent;
+        ++m_totalRetries;  ///< 统计: 数据重发
         sendDataSubpackets();  // 重发数据子包（内部已启动定时器）
         break;
     case State::SendingEof:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZEOF";
+        ++m_totalRetries;  ///< 统计: ZEOF重试
         sendZEOF();
         m_timeoutTimer->start(m_timeoutMs);  // 重启定时器等待ZRINIT响应
         break;
@@ -256,6 +263,7 @@ bool ZModemTransfer::parseHexFrame(const QByteArray& data, int& type, QByteArray
     quint16 receivedCrc = static_cast<quint16>((crcHi << 8) | crcLo);
     quint16 calculatedCrc = CRC::crc16Ccitt(crcInput);
     if (receivedCrc != calculatedCrc) {
+        ++m_totalCrcErrors;  ///< 统计: CRC校验失败
         qWarning() << "ZModem: CRC16 mismatch frame" << type
                    << "rx:" << Qt::hex << receivedCrc << "calc:" << calculatedCrc
                    << "state:" << stateToString(m_zmodemState);
@@ -322,6 +330,7 @@ void ZModemTransfer::sendDataSubpackets()
             lastPct = pct;
         }
         sent++;
+        ++m_totalBlocksSent;  ///< 统计: 每发送一个数据块
     }
     m_fileOffset = offset;
     m_bytesSent = offset;
@@ -351,3 +360,12 @@ void ZModemTransfer::sendZFIN() { if (m_conn) writeChecked(buildHexHeader(ZFIN))
 /** @brief 设置ZMODEM状态机状态
  *  @param s 目标状态 */
 void ZModemTransfer::setState(State s) { m_zmodemState = s; }
+
+/** @brief 重置ZModem统计计数器(不影响传输状态) */
+void ZModemTransfer::resetZmodemStatistics()
+{
+    m_totalBlocksSent = 0;
+    m_totalRetries = 0;
+    m_totalCrcErrors = 0;
+    m_errorCount = 0;
+}

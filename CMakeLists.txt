@@ -65,6 +65,7 @@ set(SOURCES
     src/core/connect/ConnectionManager.cpp
     src/core/connect/ConnectionFactory.cpp
     src/core/theme/ThemeManager.cpp
+    src/core/theme/QssThemeGenerator.cpp
     src/core/theme/IconManager.cpp
     src/connection/serial_port/SerialConnection.cpp
     src/connection/serial_port/SerialConnectionError.cpp
@@ -303,6 +304,7 @@ set(HEADERS
     src/core/connect/ConnectionManager.h
     src/core/connect/ConnectionFactory.h
     src/core/theme/ThemeManager.h
+    src/core/theme/QssThemeGenerator.h
     src/core/theme/IconManager.h
     src/core/widgets/BasePanel.h
     src/core/widgets/EmptyStateWidget.h

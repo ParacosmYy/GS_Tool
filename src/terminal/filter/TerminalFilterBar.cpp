@@ -92,6 +92,8 @@ void TerminalFilterBar::onApplyClicked()
     emit filterRequested(pattern, m_caseCheck->isChecked(),
                          m_invertCheck->isChecked());
 
+    ++m_totalFilterChanges;
+
     /* 添加到历史（去重，最多20条） */
     if (!pattern.isEmpty()) {
         int idx = m_historyCombo->findText(pattern);
@@ -106,4 +108,28 @@ void TerminalFilterBar::onApplyClicked()
     }
 }
 
+/** @brief 获取累计过滤变更次数 */
+quint64 TerminalFilterBar::totalFilterChanges() const
+{
+    return m_totalFilterChanges;
+}
 
+/** @brief 获取累计高亮切换次数 */
+quint64 TerminalFilterBar::totalHighlightToggles() const
+{
+    return m_totalHighlightToggles;
+}
+
+/** @brief 获取累计方向变更次数 */
+quint64 TerminalFilterBar::totalDirectionChanges() const
+{
+    return m_totalDirectionChanges;
+}
+
+/** @brief 重置所有过滤统计计数器 */
+void TerminalFilterBar::resetFilterStatistics()
+{
+    m_totalFilterChanges = 0;
+    m_totalHighlightToggles = 0;
+    m_totalDirectionChanges = 0;
+}
