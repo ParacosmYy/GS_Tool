@@ -10,7 +10,7 @@
 #include "terminal/widget/TerminalWidget.h"
 #include "utils/crypto/HexConverter.h"
 #include "core/theme/ThemeManager.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 #include <QScrollBar>
 #include <QApplication>
 #include <QClipboard>
@@ -424,3 +424,4 @@ void TerminalWidget::resetTerminalWidgetStatistics()
     m_totalKeyPresses = 0;
     m_totalContextMenuActions = 0;
 }
+

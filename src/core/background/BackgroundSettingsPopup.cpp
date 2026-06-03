@@ -9,8 +9,8 @@
 #include "core/background/BackgroundSettingsPopup.h"
 #include "core/widgets/AnimatedButton.h"
 #include "core/background/BackgroundWidget.h"
-#include "core/theme/Constants.h"
 #include "utils/settings/SettingsManager.h"
+#include "shared/LayoutConstants.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>

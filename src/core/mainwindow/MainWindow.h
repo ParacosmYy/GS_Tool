@@ -46,7 +46,6 @@
 #include "chart/widget/ChartWidget.h"
 #include "ota/manager/OtaManager.h"
 #include "ota/widget/OtaWidget.h"
-#include "shared/Constants.h"
 #include "core/navigation/IconNavBar.h"
 #include "core/widgets/CommandPalette.h"
 #include "core/widgets/ScriptRecorder.h"

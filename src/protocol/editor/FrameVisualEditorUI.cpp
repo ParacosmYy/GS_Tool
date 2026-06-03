@@ -13,7 +13,7 @@
  */
 #include "protocol/editor/FrameVisualEditor.h"
 #include "core/widgets/AnimatedButton.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>
@@ -225,3 +225,4 @@ void FrameVisualEditor::setupConnections()
     connect(m_checksumStartSpin, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &FrameVisualEditor::onChecksumConfigChanged);
 }
+

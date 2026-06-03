@@ -12,7 +12,7 @@
 #include "terminal/selection/TerminalSelectionManager.h"
 #include "terminal/search/TerminalSearchManager.h"
 #include "terminal/search/TerminalSearchRenderer.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 #include "terminal/types/TerminalTypes.h"
 
 class QContextMenuEvent;
@@ -131,3 +131,4 @@ public:
 };
 
 #endif // TERMINALWIDGET_H
+

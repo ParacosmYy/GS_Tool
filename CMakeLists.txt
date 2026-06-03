@@ -105,6 +105,7 @@ set(SOURCES
     src/protocol/parser/FrameParserHelpers.cpp
     src/protocol/parser/FrameParserStateHandlers.cpp
     src/protocol/view/ProtocolView.cpp
+    src/protocol/view/ProtocolViewMenu.cpp
     src/protocol/editor/FrameVisualEditor.cpp
     src/protocol/editor/FrameVisualEditorUI.cpp
     src/protocol/hex/IntelHexParser.cpp
@@ -125,6 +126,7 @@ set(SOURCES
     src/chart/fft/FftWidgetSetup.cpp
     src/chart/stats/HistogramWidget.cpp
     src/chart/stats/ScatterWidget.cpp
+    src/chart/stats/ScatterWidgetStats.cpp
     src/ota/manager/OtaManager.cpp
     src/ota/widget/OtaWidget.cpp
     src/ota/widget/OtaWidgetSlots.cpp
@@ -137,6 +139,7 @@ set(SOURCES
     src/ota/protocols/zmodem/ZModemTransfer.cpp
     src/ota/protocols/zmodem/ZModemTransferHandlers.cpp
     src/utils/settings/SettingsManager.cpp
+    src/utils/settings/SettingsManagerConvenience.cpp
     src/utils/export/DataExporter.cpp
     src/utils/export/DataExporterStreamed.cpp
     src/utils/export/DataExporterEdl.cpp

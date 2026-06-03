@@ -8,6 +8,7 @@
  */
 
 #include "core/mainwindow/MainWindow.h"
+#include "shared/LayoutConstants.h"
 
 #include <QVBoxLayout>
 #include <QSplitter>

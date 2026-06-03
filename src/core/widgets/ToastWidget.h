@@ -16,7 +16,7 @@
 #include <QElapsedTimer>
 #include <QtGlobal>
 #include "core/theme/ThemeManager.h"
-#include "core/theme/Constants.h"
+#include "shared/AnimationConstants.h"
 
 /** @brief 通知吐司 -- 临时弹出通知, 自动消失, 多条自动垂直堆叠 */
 class ToastWidget : public QWidget {

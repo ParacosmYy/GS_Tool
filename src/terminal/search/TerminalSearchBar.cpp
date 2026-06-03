@@ -8,7 +8,7 @@
  */
 
 #include "terminal/search/TerminalSearchBar.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 #include "utils/crypto/HexConverter.h"
 
 #include <QHBoxLayout>
@@ -245,3 +245,4 @@ void TerminalSearchBar::resetSearchBarStatistics()
     m_totalMatches = 0;
     m_totalReplacements = 0;
 }
+

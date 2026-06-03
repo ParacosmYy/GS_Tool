@@ -9,7 +9,7 @@
 
 #include "utils/export/DataExporter.h"
 #include "utils/crypto/HexConverter.h"
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -218,3 +218,4 @@ bool DataExporter::exportStreamedJson(const QString& path, LineProvider provider
     file.close();
     return true;
 }
+

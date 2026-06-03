@@ -20,6 +20,7 @@
 #include "chart/model/ChartModel.h"
 #include "serial/port/PortWatcher.h"
 #include "core/widgets/ToastWidget.h"
+#include "shared/AppConstants.h"
 #include "core/theme/ThemeManager.h"
 #include "serial/data/BookmarkWidget.h"
 #include "ota/widget/OtaWidget.h"

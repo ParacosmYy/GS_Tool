@@ -17,7 +17,7 @@
 #include <QTreeView>
 
 #include "core/theme/ThemeManager.h"
-#include "core/theme/Constants.h"
+#include "shared/AnimationConstants.h"
 
 /**
  * @brief 导航树选中滑动指示器

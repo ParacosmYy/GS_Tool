@@ -12,7 +12,7 @@
 
 #include "core/theme/ThemeManager.h"
 #include "utils/settings/SettingsManager.h"
-#include "core/theme/Constants.h"
+#include "shared/AnimationConstants.h"
 
 #include <QApplication>
 #include <QFile>

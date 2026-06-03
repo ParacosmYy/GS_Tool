@@ -7,7 +7,7 @@
  */
 
 #include "utils/export/DataExporter.h"
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 
 #include <QFile>
 #include <QDataStream>
@@ -97,3 +97,4 @@ QVector<TerminalLine> DataExporter::readEdlRange(const QString& edlPath,
     }
     return result;
 }
+

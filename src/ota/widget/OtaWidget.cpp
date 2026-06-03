@@ -11,7 +11,7 @@
 
 #include "ota/widget/OtaWidget.h"
 #include "core/widgets/AnimatedButton.h"
-#include "core/theme/Constants.h"
+#include "shared/LayoutConstants.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -329,3 +329,4 @@ void OtaWidget::resetOtaWidgetStatistics()
     m_totalTransfersFailed = 0;
     m_totalBytesTransferred = 0;
 }
+

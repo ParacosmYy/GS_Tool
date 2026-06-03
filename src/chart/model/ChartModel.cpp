@@ -308,3 +308,5 @@ void ChartModel::flushPendingUpdates()
     m_pendingUpdates.clear();
     emit dataUpdated(updates);
 }
+
+// 数据查询接口见 ChartModelStats.cpp

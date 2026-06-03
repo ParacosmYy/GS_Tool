@@ -23,10 +23,10 @@
 #include <QParallelAnimationGroup>
 
 #include "core/theme/ThemeManager.h"
-#include "core/theme/Constants.h"
 #include "core/widgets/EmptyStateWidget.h"
 #include "core/widgets/LoadingSpinner.h"
 #include "core/widgets/SkeletonWidget.h"
+#include "shared/AnimationConstants.h"
 
 // ============================================================================
 // 构造/析构

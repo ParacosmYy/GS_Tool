@@ -23,7 +23,7 @@
 #include <QLineEdit>
 
 #include "core/widgets/AnimatedButton.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 
 // ---- UI布局 ----
 
@@ -256,3 +256,4 @@ QHBoxLayout* SerialConfigPanel::createAutoReconnectLayout()
     });
     return lay;
 }
+

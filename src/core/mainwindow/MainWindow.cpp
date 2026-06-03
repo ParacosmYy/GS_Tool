@@ -11,6 +11,7 @@
 #include "core/mainwindow/MainWindow.h"
 #include "serial/data/BookmarkWidget.h"
 #include "serial/commands/TimedSender.h"
+#include "shared/AppConstants.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QCloseEvent>

@@ -9,7 +9,7 @@
  */
 
 #include "connection/network/UdpConnection.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 #include <QVariant>
 
 /** @brief 构造UDP连接，初始化内部socket为空 @param parent 父对象 */
@@ -233,3 +233,4 @@ void UdpConnection::resetStats()
     m_totalBytesReceived = 0;
     m_errorCount = 0;
 }
+

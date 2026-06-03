@@ -9,7 +9,7 @@
  */
 
 #include "connection/network/TcpConnection.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 #include <QNetworkInterface>
 
 /** @brief 构造TCP连接，初始化内部socket/server/timer为空 @param parent 父对象 */
@@ -350,3 +350,4 @@ void TcpConnection::resetStats()
     m_totalWrites = 0;
     m_totalReconnectAttempts = 0;
 }
+

@@ -7,7 +7,7 @@
  */
 
 #include "utils/log/DataLogger.h"
-#include "core/theme/Constants.h"
+#include "shared/TimerConstants.h"
 #include <QDataStream>
 #include <QFileInfo>
 #include <QDateTime>
@@ -133,3 +133,4 @@ qint64 DataLogger::recordingDuration() const
     if (!m_recording) return 0;
     return m_recordTimer.elapsed() - m_pauseOffset;
 }
+

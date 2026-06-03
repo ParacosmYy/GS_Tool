@@ -12,7 +12,7 @@
  */
 
 #include "ota/widget/OtaWidget.h"
-#include "core/theme/Constants.h"
+#include "shared/TimerConstants.h"
 
 #include "core/theme/ThemeManager.h"
 #include "utils/data/ByteFormat.h"
@@ -157,3 +157,4 @@ void OtaWidget::startCompletionAnimation()
     m_colorAnim->setEasingCurve(QEasingCurve::OutCubic);
     m_colorAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
+

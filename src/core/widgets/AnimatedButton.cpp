@@ -7,7 +7,7 @@
  */
 
 #include "core/widgets/AnimatedButton.h"
-#include "core/theme/Constants.h"
+#include "shared/AnimationConstants.h"
 
 #include <QPropertyAnimation>
 #include <QEasingCurve>

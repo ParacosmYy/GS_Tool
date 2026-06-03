@@ -16,7 +16,7 @@
 #include <QObject>
 #include <QSplitter>
 #include <QLabel>
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 
 class TerminalWidget;
 class TerminalModel;
@@ -176,3 +176,4 @@ private:
 };
 
 #endif // TERMINALLAYOUTMANAGER_H
+

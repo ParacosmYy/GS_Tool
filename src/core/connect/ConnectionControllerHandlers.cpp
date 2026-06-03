@@ -19,7 +19,7 @@
 #include <QTimer>
 #include <QDateTime>
 
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 #include "core/send/SendController.h"
 #include "ota/manager/OtaManager.h"
 #include "core/recording/RecordingController.h"
@@ -224,3 +224,4 @@ void ConnectionController::stopConnectionTimeout()
         m_connectionTimer.stop();
     }
 }
+

@@ -7,7 +7,6 @@
  */
 
 #include "utils/log/DataLogger.h"
-#include "core/theme/Constants.h"
 #include <QDataStream>
 #include <QDateTime>
 #include <algorithm>
@@ -301,3 +300,4 @@ void DataLogger::resetStats()
     m_totalPlaybacks = 0;
     m_totalErrors = 0;
 }
+

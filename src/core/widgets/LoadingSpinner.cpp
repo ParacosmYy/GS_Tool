@@ -16,7 +16,6 @@
 #include <QConicalGradient>
 
 #include "core/theme/ThemeManager.h"
-#include "core/theme/Constants.h"
 
 // ============================================================================
 // 构造

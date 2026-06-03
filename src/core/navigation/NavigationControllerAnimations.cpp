@@ -17,7 +17,7 @@
  */
 
 #include "core/navigation/NavigationController.h"
-#include "core/theme/Constants.h"
+#include "shared/AnimationConstants.h"
 #include <QWidget>
 #include <QLabel>
 #include <QTreeView>

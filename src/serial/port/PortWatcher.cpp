@@ -12,7 +12,7 @@
  */
 
 #include "serial/port/PortWatcher.h"
-#include "core/theme/Constants.h"
+#include "shared/TimerConstants.h"
 #include <QSerialPortInfo>
 #include <algorithm>
 
@@ -191,3 +191,4 @@ QStringList PortWatcher::queryAvailablePorts()
     portNames.sort();
     return portNames;
 }
+

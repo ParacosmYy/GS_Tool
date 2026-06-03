@@ -16,7 +16,7 @@
 #include <QTimer>
 #include <QDateTime>
 
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 #include "core/send/SendController.h"
 #include "ota/manager/OtaManager.h"
 #include "core/recording/RecordingController.h"
@@ -325,3 +325,4 @@ void ConnectionController::resetConnectionStatistics()
     m_totalDataSent = 0;
     m_totalDataReceived = 0;
 }
+

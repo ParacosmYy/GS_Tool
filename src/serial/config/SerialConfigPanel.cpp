@@ -9,7 +9,7 @@
  */
 
 #include "serial/config/SerialConfigPanel.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -307,3 +307,4 @@ void SerialConfigPanel::resetStats()
     m_totalRefreshPorts = 0;
     m_totalConnectAttempts = 0;
 }
+

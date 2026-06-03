@@ -12,7 +12,7 @@
 
 #include "utils/export/DataExporter.h"
 #include "utils/crypto/HexConverter.h"
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -360,3 +360,4 @@ void DataExporter::resetStats()
     m_totalJsonExports = 0;
     m_totalBinExports = 0;
 }
+

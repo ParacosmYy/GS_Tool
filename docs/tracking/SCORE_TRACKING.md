@@ -21,6 +21,8 @@
 | 121-140 | 统计增强、接口层扩展、弹窗统一、MQTT 修复 | 140 |
 | 141-160 | 主题生成器、RTT/USB/CAN/Dashboard 扩展、Doxygen 收尾 | 160 |
 | 161-170 | 文件体积约束修复(.h≤200/.cpp≤500)、PluginLoader编译修复、PanelManager拆分 | 170 |
+| 161-170 | 文件体积持续拆分(DataLogger/ChartModel/PacketBuilder/CursorOverlay/FftWidget/MqttConnection) | 170 |
+| 171-172 | SettingsManager/ScatterWidget/ProtocolView拆分+linter常量迁移修复 | 172 |
 
 ---
 
@@ -36,6 +38,7 @@
 | 140 | 工程化与可维护性增强 | 统计、接口层、弹窗和主题链路持续补强 |
 | 160 | 扩展能力和文档收尾 | 主题生成、设备协议、RTT/USB/CAN 相关骨架推进 |
 | 170 | 全量文件体积约束达标 | .h≤200/.cpp≤500全部清零，PluginLoader接口对齐 |
+| 172 | 大文件预防性拆分 | SettingsManager/ScatterWidget/ProtocolView拆分至安全范围 |
 
 ---
 

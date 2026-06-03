@@ -6,7 +6,7 @@
  * 实时统计显示。使用ByteFormat进行字节格式化。
  */
 #include "serial/data/DataStatistics.h"
-#include "core/theme/Constants.h"
+#include "shared/TimerConstants.h"
 #include "utils/data/ByteFormat.h"
 
 #include <QFormLayout>
@@ -373,3 +373,4 @@ quint64 DataStatistics::totalPeakUpdates() const
 {
     return m_totalPeakUpdates;
 }
+

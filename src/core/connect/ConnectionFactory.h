@@ -19,7 +19,7 @@
 #define CONNECTION_FACTORY_H
 
 #include <QMap>
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 
 class QObject;
 class IConnection;
@@ -77,3 +77,4 @@ private:
 };
 
 #endif // CONNECTION_FACTORY_H
+

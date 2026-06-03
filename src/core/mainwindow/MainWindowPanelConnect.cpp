@@ -18,6 +18,7 @@
 #include "core/mainwindow/MainWindow.h"
 #include "chart/model/ChartModel.h"
 #include "core/widgets/ToastWidget.h"
+#include "shared/AppConstants.h"
 
 /** @brief 工具栏和录制状态消息信号连接，包含ToolbarController到TerminalController/SettingsController的工具栏事件路由、状态消息到状态栏/吐司通知、回放数据写入终端 */
 void MainWindow::connectToolbarSignals()

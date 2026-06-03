@@ -8,7 +8,7 @@
 
 #include "core/background/BackgroundWidget.h"
 #include "core/theme/ThemeManager.h"
-#include "core/theme/Constants.h"
+#include "shared/TimerConstants.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMouseEvent>

@@ -14,7 +14,7 @@
 #include <QObject>
 #include <QVector>
 #include <functional>
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 #include "terminal/types/TerminalTypes.h"
 
 /**
@@ -93,3 +93,4 @@ private:
 };
 
 #endif // DIRECTIONFILTER_H
+

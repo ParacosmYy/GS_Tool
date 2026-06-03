@@ -6,7 +6,8 @@
 #include "core/toolbar/ToolbarController.h"
 #include "core/recording/RecordingController.h"
 #include "core/theme/ThemeManager.h"
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
+#include "shared/LayoutConstants.h"
 
 #include <QMainWindow>
 #include <QToolBar>

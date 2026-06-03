@@ -11,7 +11,7 @@
 #include "serial/commands/TimedSender.h"
 #include "connection/interface/IConnection.h"
 #include "utils/crypto/HexConverter.h"
-#include "core/theme/Constants.h"
+#include "shared/Constants.h"
 #include "core/widgets/AnimatedButton.h"
 
 #include <QLineEdit>
@@ -312,3 +312,4 @@ void SendController::resetSendStatistics()
     m_totalHexSends = 0;
     m_totalErrors = 0;
 }
+

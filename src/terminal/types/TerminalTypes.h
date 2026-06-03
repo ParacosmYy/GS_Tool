@@ -11,7 +11,7 @@
 #include <QByteArray>
 #include <QDateTime>
 #include <QString>
-#include "core/theme/Constants.h"
+#include "shared/AppConstants.h"
 
 // 共享终端数据类型 - 供 TerminalModel、DataExporter、TerminalWidget 共同使用
 // 避免基础设施层(DataExporter)反向依赖表现层(TerminalModel)
@@ -37,3 +37,4 @@ struct CachedLine {
 };
 
 #endif // TERMINALTYPES_H
+
