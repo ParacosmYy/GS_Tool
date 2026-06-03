@@ -11,23 +11,35 @@
         <file>icons/lucide/activity.svg</file>
         <file>icons/lucide/alert-circle.svg</file>
         <file>icons/lucide/alert-triangle.svg</file>
+        <file>icons/lucide/arrow-down.svg</file>
+        <file>icons/lucide/arrow-left.svg</file>
+        <file>icons/lucide/arrow-right.svg</file>
+        <file>icons/lucide/arrow-up.svg</file>
         <file>icons/lucide/arrow-up-down.svg</file>
         <file>icons/lucide/bar-chart-2.svg</file>
+        <file>icons/lucide/bell.svg</file>
         <file>icons/lucide/binary.svg</file>
         <file>icons/lucide/bluetooth-searching.svg</file>
         <file>icons/lucide/bluetooth.svg</file>
+        <file>icons/lucide/bookmark.svg</file>
         <file>icons/lucide/book-marked.svg</file>
         <file>icons/lucide/bug.svg</file>
         <file>icons/lucide/cable.svg</file>
+        <file>icons/lucide/calendar.svg</file>
+        <file>icons/lucide/camera.svg</file>
+        <file>icons/lucide/chart-line.svg</file>
+        <file>icons/lucide/chart-pie.svg</file>
         <file>icons/lucide/check.svg</file>
+        <file>icons/lucide/check-circle.svg</file>
         <file>icons/lucide/chevron-down.svg</file>
         <file>icons/lucide/chevron-right.svg</file>
+        <file>icons/lucide/circle.svg</file>
         <file>icons/lucide/circle-check.svg</file>
         <file>icons/lucide/circle-x.svg</file>
-        <file>icons/lucide/circle.svg</file>
         <file>icons/lucide/circuit-board.svg</file>
         <file>icons/lucide/clipboard.svg</file>
         <file>icons/lucide/clock.svg</file>
+        <file>icons/lucide/cloud.svg</file>
         <file>icons/lucide/code-2.svg</file>
         <file>icons/lucide/code.svg</file>
         <file>icons/lucide/columns-2.svg</file>
@@ -35,59 +47,101 @@
         <file>icons/lucide/copy.svg</file>
         <file>icons/lucide/corner-down-left.svg</file>
         <file>icons/lucide/cpu.svg</file>
+        <file>icons/lucide/crosshair.svg</file>
+        <file>icons/lucide/cut.svg</file>
+        <file>icons/lucide/database.svg</file>
         <file>icons/lucide/download.svg</file>
+        <file>icons/lucide/ethernet.svg</file>
+        <file>icons/lucide/export.svg</file>
+        <file>icons/lucide/eye.svg</file>
+        <file>icons/lucide/eye-off.svg</file>
+        <file>icons/lucide/file.svg</file>
         <file>icons/lucide/file-text.svg</file>
         <file>icons/lucide/filter.svg</file>
+        <file>icons/lucide/folder.svg</file>
         <file>icons/lucide/folder-open.svg</file>
+        <file>icons/lucide/fullscreen.svg</file>
+        <file>icons/lucide/gauge.svg</file>
         <file>icons/lucide/git-commit.svg</file>
         <file>icons/lucide/globe.svg</file>
+        <file>icons/lucide/grid.svg</file>
         <file>icons/lucide/hard-drive.svg</file>
         <file>icons/lucide/hash.svg</file>
+        <file>icons/lucide/home.svg</file>
+        <file>icons/lucide/image.svg</file>
+        <file>icons/lucide/import.svg</file>
         <file>icons/lucide/inbox.svg</file>
         <file>icons/lucide/info.svg</file>
         <file>icons/lucide/key.svg</file>
         <file>icons/lucide/layers.svg</file>
         <file>icons/lucide/layout-dashboard.svg</file>
         <file>icons/lucide/link.svg</file>
+        <file>icons/lucide/list.svg</file>
         <file>icons/lucide/loader.svg</file>
+        <file>icons/lucide/loading.svg</file>
+        <file>icons/lucide/lock.svg</file>
+        <file>icons/lucide/mail.svg</file>
+        <file>icons/lucide/map-pin.svg</file>
         <file>icons/lucide/maximize-2.svg</file>
+        <file>icons/lucide/message-circle.svg</file>
         <file>icons/lucide/minimize-2.svg</file>
+        <file>icons/lucide/minus.svg</file>
         <file>icons/lucide/moon.svg</file>
+        <file>icons/lucide/network.svg</file>
         <file>icons/lucide/package.svg</file>
         <file>icons/lucide/palette.svg</file>
         <file>icons/lucide/panel-bottom.svg</file>
         <file>icons/lucide/panel-left.svg</file>
         <file>icons/lucide/panel-right.svg</file>
+        <file>icons/lucide/paste.svg</file>
+        <file>icons/lucide/pause.svg</file>
+        <file>icons/lucide/phone.svg</file>
         <file>icons/lucide/play.svg</file>
         <file>icons/lucide/plug-zap.svg</file>
         <file>icons/lucide/plug.svg</file>
+        <file>icons/lucide/plus.svg</file>
+        <file>icons/lucide/power.svg</file>
         <file>icons/lucide/puzzle.svg</file>
         <file>icons/lucide/radio-tower.svg</file>
         <file>icons/lucide/radio.svg</file>
+        <file>icons/lucide/redo.svg</file>
         <file>icons/lucide/refresh-cw.svg</file>
         <file>icons/lucide/repeat.svg</file>
+        <file>icons/lucide/replace.svg</file>
         <file>icons/lucide/rows-2.svg</file>
         <file>icons/lucide/save.svg</file>
         <file>icons/lucide/scan.svg</file>
         <file>icons/lucide/scroll-text.svg</file>
         <file>icons/lucide/search.svg</file>
         <file>icons/lucide/send.svg</file>
+        <file>icons/lucide/serial.svg</file>
         <file>icons/lucide/settings.svg</file>
         <file>icons/lucide/shield-check.svg</file>
         <file>icons/lucide/sidebar.svg</file>
         <file>icons/lucide/signal.svg</file>
+        <file>icons/lucide/skip-back.svg</file>
+        <file>icons/lucide/skip-forward.svg</file>
+        <file>icons/lucide/sort.svg</file>
         <file>icons/lucide/square.svg</file>
+        <file>icons/lucide/star.svg</file>
+        <file>icons/lucide/stop-circle.svg</file>
         <file>icons/lucide/sun.svg</file>
         <file>icons/lucide/table-2.svg</file>
+        <file>icons/lucide/target.svg</file>
         <file>icons/lucide/terminal-square.svg</file>
         <file>icons/lucide/terminal.svg</file>
+        <file>icons/lucide/timer.svg</file>
         <file>icons/lucide/trash-2.svg</file>
         <file>icons/lucide/trending-up.svg</file>
+        <file>icons/lucide/undo.svg</file>
         <file>icons/lucide/unlink.svg</file>
+        <file>icons/lucide/unlock.svg</file>
         <file>icons/lucide/upload.svg</file>
+        <file>icons/lucide/usb.svg</file>
         <file>icons/lucide/wifi.svg</file>
         <file>icons/lucide/wrench.svg</file>
         <file>icons/lucide/x.svg</file>
+        <file>icons/lucide/x-circle.svg</file>
         <file>icons/lucide/zap.svg</file>
     </qresource>
 </RCC>

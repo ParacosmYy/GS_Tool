@@ -1,10 +1,19 @@
 /**
  * @file DataExporter.cpp
- * @brief 数据导出器实现 - Plain/HexDump/CSV/Timestamped/Bin/Json 五种格式
+ * @brief 数据导出器实现 - Plain/HexDump/CSV/Timestamped/Bin/Json 六种格式
  *
  * HexDump 格式将所有行数据拼接后按经典16字节/行输出。
  * 时间范围过滤仅在 exportToFile 模式下支持。
  * 所有写入操作均检查 QFile 错误状态，失败时发射 exportError 信号。
+ *
+ * CSV增强:
+ * - 可配置列分隔符(setCsvDelimiter)，默认逗号
+ * - 可配置BOM头(setCsvBomEnabled)，默认启用，确保Excel中文兼容
+ *
+ * 统计增强:
+ * - 每次导出记录耗时(totalExportDurationMs/lastExportDurationMs)
+ * - 每次导出记录行数和字节数(lastExportRowCount/lastExportByteCount)
+ * - 成功后发射exportCompleted信号携带完整统计摘要
  *
  * 流式导出方法见 DataExporterStreamed.cpp
  * EDL范围导出方法见 DataExporterEdl.cpp
@@ -24,9 +33,31 @@
 /** @brief 构造数据导出器 @param parent 父对象 */
 DataExporter::DataExporter(QObject* parent) : QObject(parent) {}
 
+// ---- CSV配置 ----
+
+/** @brief 设置CSV列分隔符 @param delim 分隔符字符 */
+void DataExporter::setCsvDelimiter(QChar delim) {
+    m_csvDelimiter = delim;
+}
+
+/** @brief 获取当前CSV列分隔符 @return 分隔符字符 */
+QChar DataExporter::csvDelimiter() const {
+    return m_csvDelimiter;
+}
+
+/** @brief 设置CSV是否写入UTF-8 BOM头 @param enable true=写入BOM */
+void DataExporter::setCsvBomEnabled(bool enable) {
+    m_csvBomEnabled = enable;
+}
+
+/** @brief 获取CSV是否写入BOM头 @return true=启用BOM */
+bool DataExporter::isCsvBomEnabled() const {
+    return m_csvBomEnabled;
+}
+
 // ---- 公共入口 ----
 
-/** @brief 导出数据到文件(批量模式) @param filePath 目标文件路径 @param format 导出格式 @param lines 终端行数据 @param from 起始时间过滤 @param to 结束时间过滤 @return 是否成功 */
+/** @brief 导出数据到文件(批量模式)，记录耗时和统计 @param filePath 目标文件路径 @param format 导出格式 @param lines 终端行数据 @param from 起始时间过滤 @param to 结束时间过滤 @return 是否成功 */
 bool DataExporter::exportToFile(const QString& filePath, Format format,
                                  const QVector<TerminalLine>& lines,
                                  const QDateTime& from, const QDateTime& to)
@@ -36,6 +67,9 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
     ++m_totalExports;
     QVector<TerminalLine> filtered = filterByTime(lines, from, to);
     if (filtered.isEmpty()) return false;
+
+    // 开始计时
+    m_exportTimer.start();
 
     bool ok = false;
     switch (format) {
@@ -50,13 +84,27 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
         emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
         return false;
     }
+
+    // 计算耗时
+    qint64 durationMs = m_exportTimer.elapsed();
+    m_lastExportDurationMs = durationMs;
+    m_totalExportDurationMs += durationMs;
+
     if (ok) {
+        quint64 byteCount = 0;
         for (const auto& line : filtered) {
-            m_totalBytesExported += static_cast<quint64>(line.data.size());
+            byteCount += static_cast<quint64>(line.data.size());
         }
+        m_totalBytesExported += byteCount;
         m_totalRowsExported += static_cast<quint64>(filtered.size());
+        m_lastExportRowCount = static_cast<quint64>(filtered.size());
+        m_lastExportByteCount = byteCount;
+        emit exportCompleted(filePath, format,
+                             m_lastExportRowCount, byteCount, durationMs);
     } else {
         ++m_totalErrors;
+        m_lastExportRowCount = 0;
+        m_lastExportByteCount = 0;
     }
     return ok;
 }
@@ -106,6 +154,24 @@ QVector<TerminalLine> DataExporter::filterByTime(
     return result;
 }
 
+/** @brief 写入CSV BOM头(如果启用) @param file 已打开的文件对象 @param path 文件路径(用于错误报告) @return true=BOM写入成功或不需要BOM */
+bool DataExporter::writeCsvBom(QFile& file, const QString& path)
+{
+    if (!m_csvBomEnabled) return true;
+    if (file.write("\xEF\xBB\xBF") != 3) {
+        emit exportError(path, tr("写入BOM失败"));
+        return false;
+    }
+    return true;
+}
+
+/** @brief 生成CSV表头行(使用当前配置的分隔符) @return 表头字符串(不含尾随换行) */
+QString DataExporter::csvHeader() const
+{
+    return QString("timestamp%1direction%2data_hex%3data_ascii")
+        .arg(m_csvDelimiter, m_csvDelimiter, m_csvDelimiter);
+}
+
 // ---- 全量导出方法 ----
 
 /** @brief 导出纯文本格式 @param path 文件路径 @param lines 行数据 @return 是否成功 */
@@ -146,29 +212,29 @@ bool DataExporter::exportHexDump(const QString& path, const QVector<TerminalLine
     return flushAndCheck(file, out, path);
 }
 
-/** @brief 导出CSV格式(时间戳,方向,数据) @param path 文件路径 @param lines 行数据 @return 是否成功 */
+/** @brief 导出CSV格式(BOM头+可配置分隔符+时间戳+方向+数据) @param path 文件路径 @param lines 行数据 @return 是否成功 */
 bool DataExporter::exportCsv(const QString& path, const QVector<TerminalLine>& lines)
 {
     QFile file(path);
     QTextStream out;
     if (!openTextFile(file, out, path)) return false;
 
-    // UTF-8 BOM: 确保Excel中文环境下正确识别编码
-    if (file.write("\xEF\xBB\xBF") != 3) {
-        emit exportError(path, tr("写入BOM失败"));
+    // UTF-8 BOM: 确保Excel中文环境下正确识别编码(可通过setCsvBomEnabled关闭)
+    if (!writeCsvBom(file, path)) {
         file.close();
         return false;
     }
 
-    out << "timestamp,direction,data_hex,data_ascii\n";
+    out << csvHeader() << '\n';
     for (const TerminalLine& line : lines) {
-        out << line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz") << ','
-            << ((line.direction == DataDirection::Rx) ? "RX" : "TX") << ','
-            << HexConverter::toHexString(line.data) << ','
+        out << line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz") << m_csvDelimiter
+            << ((line.direction == DataDirection::Rx) ? "RX" : "TX") << m_csvDelimiter
+            << HexConverter::toHexString(line.data) << m_csvDelimiter
             << escapeCsvField(toAsciiString(line.data)) << '\n';
     }
     return flushAndCheck(file, out, path);
 }
+
 /** @brief 导出带时间戳格式(ISO时间 [方向] 数据) @param path 文件路径 @param lines 行数据 @return 是否成功 */
 bool DataExporter::exportTimestamped(const QString& path, const QVector<TerminalLine>& lines)
 {
@@ -252,13 +318,16 @@ QString DataExporter::toAsciiString(const QByteArray& data)
     return result;
 }
 
-/** @brief 转义CSV字段中的特殊字符(逗号、引号、换行) @param field 原始字段 @return 转义后的字段 */
+/** @brief 转义CSV字段中的特殊字符(逗号/自定义分隔符、引号、换行) @param field 原始字段 @return 转义后的字段 */
 QString DataExporter::escapeCsvField(const QString& field)
 {
-    // RFC 4180: 字段含逗号、双引号或换行时，用双引号包裹，内部双引号翻倍
+    // RFC 4180: 字段含分隔符、双引号或换行时，用双引号包裹，内部双引号翻倍
+    // 注意: 始终检查逗号(RFC标准)和当前配置的分隔符
     if (!field.contains(QLatin1Char(',')) &&
         !field.contains(QLatin1Char('"')) &&
-        !field.contains(QLatin1Char('\n'))) {
+        !field.contains(QLatin1Char('\n')) &&
+        !field.contains(QLatin1Char('\r')) &&
+        !field.contains(QLatin1Char('\t'))) {
         return field;
     }
     QString escaped = field;
@@ -301,54 +370,42 @@ QString DataExporter::formatHexDumpLine(const QByteArray& data, quint64 address)
 // ---- 会话统计 ----
 
 /** @brief 获取累计导出操作总次数 @return 导出次数 */
-quint64 DataExporter::totalExports() const
-{
-    return m_totalExports;
-}
+quint64 DataExporter::totalExports() const { return m_totalExports; }
 
 /** @brief 获取累计导出的字节总数 @return 字节数 */
-quint64 DataExporter::totalBytesExported() const
-{
-    return m_totalBytesExported;
-}
+quint64 DataExporter::totalBytesExported() const { return m_totalBytesExported; }
 
 /** @brief 获取累计导出的数据行总数 @return 行数 */
-quint64 DataExporter::totalRowsExported() const
-{
-    return m_totalRowsExported;
-}
+quint64 DataExporter::totalRowsExported() const { return m_totalRowsExported; }
 
 /** @brief 获取累计导出失败次数 @return 失败次数 */
-quint64 DataExporter::totalErrors() const
-{
-    return m_totalErrors;
-}
+quint64 DataExporter::totalErrors() const { return m_totalErrors; }
 
 /** @brief 获取累计CSV格式导出次数 @return CSV导出次数 */
-quint64 DataExporter::totalCsvExports() const
-{
-    return m_totalCsvExports;
-}
+quint64 DataExporter::totalCsvExports() const { return m_totalCsvExports; }
 
 /** @brief 获取累计HexDump格式导出次数 @return HexDump导出次数 */
-quint64 DataExporter::totalHexDumpExports() const
-{
-    return m_totalHexDumpExports;
-}
+quint64 DataExporter::totalHexDumpExports() const { return m_totalHexDumpExports; }
 
 /** @brief 获取累计JSON格式导出次数 @return JSON导出次数 */
-quint64 DataExporter::totalJsonExports() const
-{
-    return m_totalJsonExports;
-}
+quint64 DataExporter::totalJsonExports() const { return m_totalJsonExports; }
 
 /** @brief 获取累计二进制格式导出次数 @return 二进制导出次数 */
-quint64 DataExporter::totalBinExports() const
-{
-    return m_totalBinExports;
-}
+quint64 DataExporter::totalBinExports() const { return m_totalBinExports; }
 
-/** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数/各格式次数) */
+/** @brief 获取累计导出总耗时(毫秒) @return 总耗时毫秒数 */
+qint64 DataExporter::totalExportDurationMs() const { return m_totalExportDurationMs; }
+
+/** @brief 获取最近一次导出操作的耗时(毫秒) @return 最近一次导出耗时 */
+qint64 DataExporter::lastExportDurationMs() const { return m_lastExportDurationMs; }
+
+/** @brief 获取最近一次导出的记录数量 @return 最近一次导出的行数 */
+quint64 DataExporter::lastExportRowCount() const { return m_lastExportRowCount; }
+
+/** @brief 获取最近一次导出的字节总数 @return 最近一次导出的字节数 */
+quint64 DataExporter::lastExportByteCount() const { return m_lastExportByteCount; }
+
+/** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数/各格式次数/耗时) */
 void DataExporter::resetStats()
 {
     m_totalExports = 0;
@@ -359,5 +416,8 @@ void DataExporter::resetStats()
     m_totalHexDumpExports = 0;
     m_totalJsonExports = 0;
     m_totalBinExports = 0;
+    m_totalExportDurationMs = 0;
+    m_lastExportDurationMs = 0;
+    m_lastExportRowCount = 0;
+    m_lastExportByteCount = 0;
 }
-

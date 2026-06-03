@@ -4,6 +4,8 @@
  *
  * 从EDL二进制日志文件中按时间范围读取记录并导出为指定格式。
  * EDL记录格式(BigEndian): timestamp(8B) + direction(1B) + length(4B) + data(length B)。
+ *
+ * EDL范围导出同样记录耗时统计，并在成功后发射exportCompleted信号。
  */
 
 #include "utils/export/DataExporter.h"
@@ -16,7 +18,7 @@
 
 // ---- EDL范围导出 ----
 
-/** @brief 从EDL日志文件导出指定时间范围的数据 @param edlPath 日志文件路径 @param format 导出格式 @param outPath 输出文件路径 @param fromMs 起始时间(ms) @param toMs 结束时间(ms) @return 是否成功 */
+/** @brief 从EDL日志文件导出指定时间范围的数据，记录耗时和统计 @param edlPath 日志文件路径 @param format 导出格式 @param outPath 输出文件路径 @param fromMs 起始时间(ms) @param toMs 结束时间(ms) @return 是否成功 */
 bool DataExporter::exportRange(const QString& edlPath, Format format,
                                 const QString& outPath,
                                 qint64 fromMs, qint64 toMs)
@@ -26,23 +28,49 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
     ++m_totalExports;
     if (fromMs >= 0 && toMs >= 0 && fromMs > toMs) return false;
 
+    // 开始计时
+    m_exportTimer.start();
+
     QVector<TerminalLine> lines = readEdlRange(edlPath, fromMs, toMs);
     m_lastExportRangeCount = lines.size();
     if (lines.isEmpty()) return false;
 
+    bool ok = false;
     switch (format) {
-    case Plain:       return exportPlain(outPath, lines);
-    case HexDump:     ++m_totalHexDumpExports; return exportHexDump(outPath, lines);
-    case Csv:         ++m_totalCsvExports; return exportCsv(outPath, lines);
-    case Timestamped: return exportTimestamped(outPath, lines);
-    case Bin:         ++m_totalBinExports; return exportBin(outPath, lines);
-    case Json:        ++m_totalJsonExports; return exportJson(outPath, lines);
+    case Plain:       ok = exportPlain(outPath, lines); break;
+    case HexDump:     ok = exportHexDump(outPath, lines); ++m_totalHexDumpExports; break;
+    case Csv:         ok = exportCsv(outPath, lines); ++m_totalCsvExports; break;
+    case Timestamped: ok = exportTimestamped(outPath, lines); break;
+    case Bin:         ok = exportBin(outPath, lines); ++m_totalBinExports; break;
+    case Json:        ok = exportJson(outPath, lines); ++m_totalJsonExports; break;
     default:
         ++m_totalErrors;
         emit exportError(outPath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
         return false;
     }
-    return false;
+
+    // 计算耗时
+    qint64 durationMs = m_exportTimer.elapsed();
+    m_lastExportDurationMs = durationMs;
+    m_totalExportDurationMs += durationMs;
+
+    if (ok) {
+        quint64 byteCount = 0;
+        for (const auto& line : lines) {
+            byteCount += static_cast<quint64>(line.data.size());
+        }
+        m_totalBytesExported += byteCount;
+        m_totalRowsExported += static_cast<quint64>(lines.size());
+        m_lastExportRowCount = static_cast<quint64>(lines.size());
+        m_lastExportByteCount = byteCount;
+        emit exportCompleted(outPath, format,
+                             m_lastExportRowCount, byteCount, durationMs);
+    } else {
+        ++m_totalErrors;
+        m_lastExportRowCount = 0;
+        m_lastExportByteCount = 0;
+    }
+    return ok;
 }
 
 /** @brief 返回上次exportRange调用实际导出的行数 @return 导出行数 */
@@ -97,4 +125,3 @@ QVector<TerminalLine> DataExporter::readEdlRange(const QString& edlPath,
     }
     return result;
 }
-

@@ -25,6 +25,7 @@
 | 171-172 | SettingsManager/ScatterWidget/ProtocolView拆分+linter常量迁移修复 | 172 |
 | 173-176 | BasePanelStates/WebSocketFrame/TerminalWidgetSlots/OtaManagerProgress拆分 | 176 |
 | 177-190 | Tier3核心功能实现(BLE GATT/MQTT TopicModel/CAN DBC/USB) + Doxygen全量达标 + 持续文件拆分 | 190 |
+| 191-200 | ProtocolEngine CRC验证+Dashboard持久化+BLE Scanner增强+ShortcutManager键盘系统+Lucide图标扩展 | 200 |
 
 ---
 
@@ -42,6 +43,8 @@
 | 170 | 全量文件体积约束达标 | .h≤200/.cpp≤500全部清零，PluginLoader接口对齐 |
 | 172 | 大文件预防性拆分 | SettingsManager/ScatterWidget/ProtocolView拆分至安全范围 |
 | 176 | 第二轮大文件拆分完成 | BasePanel/WebSocket/TerminalWidget/OtaManager全量拆分 |
+| 190 | Tier3核心功能实现 | BLE GATT/MQTT TopicModel/CAN DBC/USB全部从空方法变为功能实现 |
+| 200 | 功能增强里程碑 | CRC验证/仪表盘持久化/快捷键系统/图标扩展等第二优先级完成 |
 
 ---
 

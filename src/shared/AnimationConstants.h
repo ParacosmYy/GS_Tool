@@ -21,6 +21,7 @@ namespace Animations {
     constexpr int kNavIndicatorMs = 250;
     constexpr int kButtonHoverMs = 200;
     constexpr int kButtonPressMs = 100;
+    constexpr int kBreakpointTransitionMs = 250; ///< 断点切换过渡动画时长
 }
 
 #endif // SHARED_ANIMATION_CONSTANTS_H

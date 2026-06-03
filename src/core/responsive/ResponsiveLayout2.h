@@ -1,21 +1,37 @@
 /**
  * @file ResponsiveLayout2.h
- * @brief 响应式布局管理器，根据容器宽度自动切换断点和列数
+ * @brief 响应式网格布局管理器 - 根据容器宽度自动切换断点和列数
+ *
+ * 四断点体系（与 ResponsiveLayout 对齐）:
+ *   - Mobile  (< 768px):   1 列
+ *   - Tablet  (768~1023px): 2 列
+ *   - Desktop (1024~1439px): 3 列
+ *   - Wide    (>= 1440px):  4 列
+ *
+ * 职责:
+ *   1. 根据容器宽度自动切换列数
+ *   2. 均匀分配子项矩形区域
+ *   3. 支持自定义各断点列数配置
+ *   4. 支持 QSettings 持久化列数配置
+ *   5. 统计断点切换次数
  */
 #pragma once
+
 #include <QLayout>
 #include <QRect>
 #include <QList>
 #include <QWidgetItem>
+#include <QMap>
 
 /**
  * @class ResponsiveLayout
- * @brief 响应式布局，根据容器宽度在Mobile/Tablet/Desktop/Wide断点间自动切换列数和布局策略
+ * @brief 响应式网格布局，根据容器宽度在 Mobile/Tablet/Desktop/Wide 断点间自动切换列数
  */
 class ResponsiveLayout : public QLayout {
     Q_OBJECT
+
 public:
-    /** @brief 响应式断点枚举 */
+    /** @brief 响应式断点枚举（与 core/layout/ResponsiveLayout.h 对齐） */
     enum Breakpoint { Mobile, Tablet, Desktop, Wide };
     Q_ENUM(Breakpoint)
 
@@ -38,12 +54,12 @@ public:
     QSize minimumSize() const override;
     /** @brief 设置布局几何区域并执行排列 @param rect 布局矩形 */
     void setGeometry(const QRect &rect) override;
-    /** @brief 设置布局边距 @param left 左边距 @param top 上边距 @param right 右边距 @param bottom 下边距 */
+
+    /** @brief 设置布局边距 @param left 左 @param top 上 @param right 右 @param bottom 下 */
     void setMargins(int left, int top, int right, int bottom);
     /** @brief 设置项间距 @param space 间距像素值 */
     void setSpacing(int space);
-    /** @brief 设置断点像素阈值 @param mobile 移动端阈值 @param tablet 平板阈值 @param desktop 桌面阈值 */
-    void setBreakpoints(int mobile, int tablet, int desktop);
+
     /** @brief 获取当前生效的断点 @return 当前断点 */
     Breakpoint currentBreakpoint() const;
     /** @brief 获取当前断点对应的列数 @return 列数 */
@@ -51,10 +67,26 @@ public:
     /** @brief 设置指定断点的列数 @param bp 断点 @param cols 列数 */
     void setColumnCount(Breakpoint bp, int cols);
 
+    /** @brief 保存列数配置到 QSettings */
+    void saveColumnConfig() const;
+    /** @brief 从 QSettings 加载列数配置 */
+    void loadColumnConfig();
+
+    // ---- 统计 ----
+    /** @brief 获取断点切换总次数 @return 切换次数 */
+    quint64 breakpointChangeCount() const { return m_bpChangeCount; }
+    /** @brief 重置统计计数器 */
+    void resetStats() { m_bpChangeCount = 0; }
+
 private:
+    /** @brief 根据宽度计算断点（纯计算） @param w 宽度 @return 断点 */
+    static Breakpoint calcBreakpoint(int w);
+
     QList<QLayoutItem *> m_items;        ///< 布局项列表
-    int m_mobileBreak = 600;             ///< 移动端断点阈值(像素)
-    int m_tabletBreak = 900;             ///< 平板断点阈值(像素)
-    int m_desktopBreak = 1200;           ///< 桌面断点阈值(像素)
+    int m_mobileBreak = 768;             ///< 移动端断点阈值(像素)
+    int m_tabletBreak = 1024;            ///< 平板断点阈值(像素)
+    int m_desktopBreak = 1440;           ///< 桌面断点阈值(像素)
     QMap<Breakpoint, int> m_columns;     ///< 各断点对应的列数配置
+    Breakpoint m_lastBp = Mobile;        ///< 上次断点（用于检测变化）
+    quint64 m_bpChangeCount = 0;         ///< 断点切换次数统计
 };

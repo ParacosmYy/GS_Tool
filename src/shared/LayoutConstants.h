@@ -34,6 +34,22 @@ namespace Layout {
     constexpr int kQuickCmdBtnMaxWidth = 160;
 }
 
+/**
+ * @brief 响应式断点阈值常量
+ *
+ * 定义四个断点的像素边界:
+ *   Mobile   (< 768px):   移动端/极小窗口
+ *   Tablet   (768~1023px): 平板/小桌面
+ *   Desktop  (1024~1439px): 标准桌面
+ *   Wide     (>= 1440px):  宽屏桌面
+ */
+namespace Breakpoints {
+    constexpr int kMobile  = 768;    ///< Mobile/Tablet 分界线
+    constexpr int kTablet  = 1024;   ///< Tablet/Desktop 分界线
+    constexpr int kDesktop = 1440;   ///< Desktop/Wide 分界线
+    constexpr int kNavCollapse = 900; ///< 导航树自动折叠阈值
+}
+
 namespace OtaLayout {
     constexpr int kHistoryColTime = 150;
     constexpr int kHistoryColFileName = 160;

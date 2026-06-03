@@ -147,6 +147,7 @@ set(SOURCES
     src/utils/export/DataExporter.cpp
     src/utils/export/DataExporterStreamed.cpp
     src/utils/export/DataExporterEdl.cpp
+    src/utils/aggregator/DataAggregator.cpp
     src/utils/log/DataLogger.cpp
     src/utils/log/DataLoggerEdl.cpp
     src/utils/log/DataLoggerPlayback.cpp
@@ -420,6 +421,7 @@ set(HEADERS
     src/ota/protocols/zmodem/ZModemTransfer.h
     src/utils/settings/SettingsManager.h
     src/utils/export/DataExporter.h
+    src/utils/aggregator/DataAggregator.h
     src/utils/log/DataLogger.h
     src/utils/data/DataBookmark.h
     src/utils/data/ByteFormat.h

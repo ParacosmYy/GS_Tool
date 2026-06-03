@@ -153,14 +153,15 @@ MainWindow::MainWindow(QWidget* parent)
     m_responsiveLayout = new ResponsiveLayout(this);
     m_responsiveLayout->watchWindow(this);
     connect(m_responsiveLayout, &ResponsiveLayout::breakpointChanged,
-            this, [this](ResponsiveLayout::Breakpoint bp) {
-        if (bp == ResponsiveLayout::Breakpoint::Compact) {
-            if (m_mainSplitter && m_mainSplitter->sizes().at(0) > 0) {
-                m_mainSplitter->setSizes({0, width()});
-            }
+            this, [this](ResponsiveLayout::Breakpoint bp, ResponsiveLayout::Breakpoint /*oldBp*/) {
+        if (bp == ResponsiveLayout::Breakpoint::Mobile) {
             if (m_iconNavBar) { m_iconNavBar->hide(); }
-            statusBar()->showMessage(tr("已切换到紧凑布局"), 2000);
+            statusBar()->showMessage(tr("已切换到移动端布局"), 2000);
             m_panelManager->setCompactMode(true);
+        } else if (bp == ResponsiveLayout::Breakpoint::Tablet) {
+            if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
+            statusBar()->showMessage(tr("已切换到平板布局"), 2000);
+            m_panelManager->setCompactMode(false);
         } else if (bp == ResponsiveLayout::Breakpoint::Desktop) {
             if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
                 int navWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
@@ -170,12 +171,24 @@ MainWindow::MainWindow(QWidget* parent)
             if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
             statusBar()->showMessage(tr("已切换到桌面布局"), 2000);
             m_panelManager->setCompactMode(false);
-        } else {
+        } else if (bp == ResponsiveLayout::Breakpoint::Wide) {
             if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
-                m_mainSplitter->setSizes({180, width() - 180});
+                int navWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
+                if (navWidth <= 0) navWidth = 240;
+                m_mainSplitter->setSizes({navWidth, width() - navWidth});
             }
             if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
+            statusBar()->showMessage(tr("已切换到宽屏布局"), 2000);
+            m_panelManager->setCompactMode(false);
         }
+    });
+
+    // ---- 响应式布局: 导航树自动折叠（< 900px） ----
+    connect(m_responsiveLayout, &ResponsiveLayout::navTreeAutoCollapse,
+            this, [this](bool collapsed) {
+        int navWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
+        if (navWidth <= 0) navWidth = 200;
+        m_navController->onBreakpointNavCollapse(collapsed, m_mainSplitter, navWidth);
     });
 
     // ---- 快捷键管理器: 统一注册全局快捷键 ----
@@ -331,6 +344,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
     if (m_responsiveLayout) {
         SettingsManager::instance().set("layout/lastBreakpoint",
             static_cast<int>(m_responsiveLayout->currentBreakpoint()));
+        m_responsiveLayout->saveLayoutConfig();
     }
 
     // 保存导航树宽度(Compact模式时保存上次展开宽度)

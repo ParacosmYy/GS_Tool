@@ -17,6 +17,7 @@
 class QTreeView;
 class QLabel;
 class QWidget;
+class QSplitter;
 
 /**
  * @brief 导航树 -> 面板映射条目
@@ -128,6 +129,11 @@ public:
     /** @brief 通过索引恢复面板（启动/会话恢复用，无动画） @return true成功 false越界/空 */
     bool restorePanelByIndex(int index);
 
+    // ---- 响应式布局集成 ----
+
+    /** @brief 响应断点变化调整导航树（折叠/展开分割器） @param collapsed 是否折叠 @param splitter 主分割器 @param savedWidth 上次展开宽度 */
+    void onBreakpointNavCollapse(bool collapsed, QSplitter* splitter, int savedWidth);
+
     // ---- 统计计数器 ----
 
     /** @brief 获取导航切换总次数（含所有switchToPanel调用） @return 切换总次数 */
@@ -146,12 +152,7 @@ public:
     void resetNavigationStatistics();
 
 private slots:
-    /**
-     * @brief 主题切换时刷新导航树圆点图标颜色
-     *
-     * buildNavTree()中的圆点图标在构建时读取ThemeManager颜色，
-     * 主题切换后需要重新着色以匹配新主题。
-     */
+    /** @brief 主题切换时刷新导航树圆点图标颜色 */
     void onThemeChanged();
 
 private:

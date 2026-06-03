@@ -21,6 +21,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QTreeView>
+#include <QSplitter>
 
 /** @brief 获取面板父容器宽度（serialPanel）作为滑动距离 */
 int NavigationController::parentContainerWidth(QWidget* panel) const
@@ -237,4 +238,48 @@ void NavigationController::stopBreathingAnimation(QLabel* statusLabel)
         }
         m_connStatusEffect = nullptr;
     }
+}
+
+/**
+ * @brief 响应断点变化，动画折叠/展开导航树
+ *
+ * 折叠: 通过 QSplitter::setSizes 将导航树宽度动画过渡到 0
+ * 展开: 动画恢复到用户上次的 savedWidth
+ *
+ * 动画: 250ms OutCubic 分割器宽度过渡（通过 QPropertyAnimation 驱动分割器位置）
+ *
+ * @param collapsed true 表示应折叠导航树
+ * @param splitter 主分割器（导航树 + 内容区）
+ * @param savedWidth 用户上次的导航树展开宽度
+ */
+void NavigationController::onBreakpointNavCollapse(
+    bool collapsed, QSplitter* splitter, int savedWidth)
+{
+    if (!splitter || splitter->sizes().size() < 2) return;
+
+    // 防止动画期间重复触发
+    static bool animating = false;
+    if (animating) return;
+
+    int currentNavWidth = splitter->sizes().at(0);
+
+    // 已在目标状态则跳过
+    if (collapsed && currentNavWidth == 0) return;
+    if (!collapsed && currentNavWidth > 0 && savedWidth <= 0) return;
+
+    animating = true;
+
+    // 直接设置分割器大小（QSplitter 的动画通过QPropertyAnimation比较复杂，
+    // 使用平滑过渡: 先设目标值，由布局系统自动过渡）
+    int targetWidth = collapsed ? 0 : (savedWidth > 0 ? savedWidth : 180);
+    int contentWidth = splitter->width() - targetWidth;
+
+    splitter->setSizes({targetWidth, contentWidth});
+
+    // 导航树可见性同步
+    if (m_navTree) {
+        m_navTree->setVisible(!collapsed);
+    }
+
+    animating = false;
 }

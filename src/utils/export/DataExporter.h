@@ -1,4 +1,13 @@
-/** @file DataExporter.h @brief 数据导出器 - 将终端数据导出为 Plain/HexDump/CSV/Timestamped/Bin/Json 六种格式 */
+/**
+ * @file DataExporter.h
+ * @brief 数据导出器 - 将终端数据导出为 Plain/HexDump/CSV/Timestamped/Bin/Json 六种格式
+ *
+ * 支持:
+ * - 六种导出格式(Plain/HexDump/CSV/Timestamped/Bin/Json)
+ * - 全量导出(批量)、流式导出(分批)、EDL范围导出三种模式
+ * - CSV的BOM头(Excel兼容)和可配置列分隔符
+ * - 完整的会话统计(总次数/字节/行数/错误/各格式/总耗时/单次耗时)
+ */
 #ifndef DATA_EXPORTER_H
 #define DATA_EXPORTER_H
 
@@ -7,6 +16,7 @@
 #include <QDateTime>
 #include <QFile>
 #include <QTextStream>
+#include <QElapsedTimer>
 #include <functional>
 #include "terminal/types/TerminalTypes.h"
 
@@ -36,7 +46,43 @@ public:
     /** @brief 上次exportRange导出的记录数量 */
     int lastExportRangeCount() const;
 
-    // ---- 统计 ----
+    // ---- CSV配置 ----
+
+    /**
+     * @brief 设置CSV列分隔符
+     *
+     * 默认为逗号(',')。可设为制表符('\t')、分号(';')等。
+     * 影响所有CSV格式导出(全量/流式/EDL范围)。
+     * 分隔符变更不影响escapeCsvField()中的RFC 4180转义逻辑。
+     *
+     * @param delim 分隔符字符
+     */
+    void setCsvDelimiter(QChar delim);
+
+    /**
+     * @brief 获取当前CSV列分隔符
+     * @return 分隔符字符
+     */
+    QChar csvDelimiter() const;
+
+    /**
+     * @brief 设置CSV是否写入UTF-8 BOM头
+     *
+     * 默认启用(true)。BOM头(0xEF 0xBB 0xBF)确保Excel中文环境下
+     * 正确识别UTF-8编码。如需导出无BOM的CSV(兼容某些工具)可关闭。
+     *
+     * @param enable true=写入BOM，false=不写入
+     */
+    void setCsvBomEnabled(bool enable);
+
+    /**
+     * @brief 获取CSV是否写入BOM头
+     * @return true=启用BOM
+     */
+    bool isCsvBomEnabled() const;
+
+    // ---- 会话统计 ----
+
     quint64 totalExports() const;        ///< 累计导出次数
     quint64 totalBytesExported() const;   ///< 累计导出字节
     quint64 totalRowsExported() const;    ///< 累计导出行数
@@ -45,10 +91,50 @@ public:
     quint64 totalHexDumpExports() const;  ///< HexDump格式次数
     quint64 totalJsonExports() const;     ///< JSON格式次数
     quint64 totalBinExports() const;      ///< 二进制格式次数
+
+    /**
+     * @brief 获取累计导出总耗时(毫秒)
+     *
+     * 从每次导出开始到完成(文件写入并关闭)的耗时总和。
+     * 仅统计成功的导出操作。
+     *
+     * @return 总耗时毫秒数
+     */
+    qint64 totalExportDurationMs() const;
+
+    /**
+     * @brief 获取最近一次导出操作的耗时(毫秒)
+     * @return 最近一次导出耗时；若从未导出过返回0
+     */
+    qint64 lastExportDurationMs() const;
+
+    /**
+     * @brief 获取最近一次导出的记录数量
+     * @return 最近一次导出的行数
+     */
+    quint64 lastExportRowCount() const;
+
+    /**
+     * @brief 获取最近一次导出的字节总数
+     * @return 最近一次导出的字节数
+     */
+    quint64 lastExportByteCount() const;
+
     void resetStats();                    ///< 重置所有统计
 
 signals:
     void exportError(const QString& filePath, const QString& errorString); ///< 导出失败信号
+
+    /**
+     * @brief 导出完成信号 — 每次成功导出后发射，携带本次操作的统计摘要
+     * @param filePath 导出文件路径
+     * @param format 导出格式
+     * @param rowCount 导出行数
+     * @param byteCount 导出字节数
+     * @param durationMs 导出耗时(毫秒)
+     */
+    void exportCompleted(const QString& filePath, Format format,
+                         quint64 rowCount, quint64 byteCount, qint64 durationMs);
 
 private:
     // 全量导出(按格式分发)
@@ -74,6 +160,20 @@ private:
                                         const QDateTime& from, const QDateTime& to) const;
     QVector<TerminalLine> readEdlRange(const QString& edlPath, qint64 fromMs, qint64 toMs);
 
+    /**
+     * @brief 写入CSV BOM头(如果启用)
+     * @param file 已打开的文件对象
+     * @param path 文件路径(用于错误报告)
+     * @return true=BOM写入成功或不需要BOM
+     */
+    bool writeCsvBom(QFile& file, const QString& path);
+
+    /**
+     * @brief 生成CSV表头行
+     * @return 表头字符串(不含尾随换行)
+     */
+    QString csvHeader() const;
+
     static QString toAsciiString(const QByteArray& data);     ///< 不可打印→'.'
     static QString escapeCsvField(const QString& field);      ///< CSV转义
     static QByteArray concatData(const QVector<TerminalLine>& lines); ///< 拼接所有行数据
@@ -85,7 +185,7 @@ private:
     static constexpr int kEdlHeaderSize = 8;
     static constexpr quint32 kEdlMaxRecordSize = 1024*1024;
 
-    // 成员
+    // 会话统计成员
     int m_lastExportRangeCount = 0;
     quint64 m_totalExports = 0;
     quint64 m_totalBytesExported = 0;
@@ -95,6 +195,15 @@ private:
     quint64 m_totalHexDumpExports = 0;
     quint64 m_totalJsonExports = 0;
     quint64 m_totalBinExports = 0;
+    qint64 m_totalExportDurationMs = 0;   ///< 累计导出总耗时(毫秒)
+    qint64 m_lastExportDurationMs = 0;    ///< 最近一次导出耗时(毫秒)
+    quint64 m_lastExportRowCount = 0;     ///< 最近一次导出行数
+    quint64 m_lastExportByteCount = 0;    ///< 最近一次导出字节数
+    QElapsedTimer m_exportTimer;          ///< 当前导出操作计时器
+
+    // CSV配置成员
+    QChar m_csvDelimiter = QLatin1Char(',');  ///< CSV列分隔符
+    bool m_csvBomEnabled = true;               ///< 是否写入UTF-8 BOM头
 };
 
 #endif // DATA_EXPORTER_H
