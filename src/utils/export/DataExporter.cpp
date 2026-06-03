@@ -40,11 +40,11 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
     bool ok = false;
     switch (format) {
     case Plain:       ok = exportPlain(filePath, filtered); break;
-    case HexDump:     ok = exportHexDump(filePath, filtered); break;
-    case Csv:         ok = exportCsv(filePath, filtered); break;
+    case HexDump:     ok = exportHexDump(filePath, filtered); ++m_totalHexDumpExports; break;
+    case Csv:         ok = exportCsv(filePath, filtered); ++m_totalCsvExports; break;
     case Timestamped: ok = exportTimestamped(filePath, filtered); break;
-    case Bin:         ok = exportBin(filePath, filtered); break;
-    case Json:        ok = exportJson(filePath, filtered); break;
+    case Bin:         ok = exportBin(filePath, filtered); ++m_totalBinExports; break;
+    case Json:        ok = exportJson(filePath, filtered); ++m_totalJsonExports; break;
     default:
         ++m_totalErrors;
         emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
@@ -342,11 +342,39 @@ quint64 DataExporter::totalErrors() const
     return m_totalErrors;
 }
 
-/** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数) */
+/** @brief 获取累计CSV格式导出次数 @return CSV导出次数 */
+quint64 DataExporter::totalCsvExports() const
+{
+    return m_totalCsvExports;
+}
+
+/** @brief 获取累计HexDump格式导出次数 @return HexDump导出次数 */
+quint64 DataExporter::totalHexDumpExports() const
+{
+    return m_totalHexDumpExports;
+}
+
+/** @brief 获取累计JSON格式导出次数 @return JSON导出次数 */
+quint64 DataExporter::totalJsonExports() const
+{
+    return m_totalJsonExports;
+}
+
+/** @brief 获取累计二进制格式导出次数 @return 二进制导出次数 */
+quint64 DataExporter::totalBinExports() const
+{
+    return m_totalBinExports;
+}
+
+/** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数/各格式次数) */
 void DataExporter::resetStats()
 {
     m_totalExports = 0;
     m_totalBytesExported = 0;
     m_totalRowsExported = 0;
     m_totalErrors = 0;
+    m_totalCsvExports = 0;
+    m_totalHexDumpExports = 0;
+    m_totalJsonExports = 0;
+    m_totalBinExports = 0;
 }

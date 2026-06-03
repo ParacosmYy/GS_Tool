@@ -248,6 +248,7 @@ bool WebSocketConnection::parseHandshakeResponse()
 
     m_buffer.remove(0, headerEnd + 4);
     m_handshakeDone = true;
+    ++m_totalConnections;  // WebSocket握手成功计为一次连接
     return true;
 }
 
@@ -430,6 +431,9 @@ void WebSocketConnection::updateState(ConnectionState newState)
 
 // ---- 统计接口实现 ----
 
+/** @brief 获取累计WebSocket连接成功次数 */
+quint64 WebSocketConnection::totalConnections() const { return m_totalConnections; }
+
 /** @brief 获取已发送消息总数(文本+二进制) */
 quint64 WebSocketConnection::totalMessagesSent() const { return m_totalMessagesSent; }
 
@@ -448,6 +452,7 @@ quint64 WebSocketConnection::errorCount() const { return m_errorCount; }
 /** @brief 重置所有统计数据为零 */
 void WebSocketConnection::resetStats()
 {
+    m_totalConnections = 0;
     m_totalMessagesSent = 0;
     m_totalMessagesReceived = 0;
     m_totalBytesSent = 0;

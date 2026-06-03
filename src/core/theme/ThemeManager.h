@@ -118,6 +118,12 @@ public:
     /** @brief 获取累计自定义主题加载次数 */
     quint64 totalCustomThemesLoaded() const;
 
+    /** @brief 获取累计语义色查询次数 */
+    quint64 totalColorQueries() const;
+
+    /** @brief 获取累计样式表应用次数 */
+    quint64 totalStyleApplications() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -153,6 +159,8 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalThemeSwitches = 0;       ///< 累计主题切换次数
     quint64 m_totalCustomThemesLoaded = 0;  ///< 累计自定义主题加载次数
+    mutable quint64 m_totalColorQueries = 0;        ///< 累计语义色查询次数
+    quint64 m_totalStyleApplications = 0;   ///< 累计样式表应用次数
 };
 
 #endif // THEMEMANAGER_H

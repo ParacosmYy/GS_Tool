@@ -113,6 +113,7 @@ bool TcpServerConnection::listen(const QHostAddress& address, int port)
             this, &TcpServerConnection::onNewConnection);
 
     if (!m_server->listen(address, static_cast<quint16>(port))) {
+        ++m_totalAcceptErrors;  // 监听失败计为accept错误
         emit errorOccurred(tr("监听失败: %1").arg(m_server->errorString()));
         m_server->deleteLater();
         m_server = nullptr;
@@ -221,6 +222,7 @@ void TcpServerConnection::onNewConnection()
                     Q_UNUSED(err)
                     auto* socket = qobject_cast<QTcpSocket*>(sender());
                     if (socket) {
+                        ++m_totalAcceptErrors;  // 客户端socket错误计数
                         emit errorOccurred(tr("客户端错误: %1")
                             .arg(socket->errorString()));
                     }
@@ -254,6 +256,7 @@ void TcpServerConnection::onClientDisconnected()
     if (sd >= 0) {
         m_clients.remove(sd);
     }
+    ++m_totalClientDisconnections;  // 客户端断开计数
     emit clientDisconnected(info);
     socket->deleteLater();
 }
@@ -309,6 +312,14 @@ quint64 TcpServerConnection::totalClientCount() const
 }
 
 /**
+ * @brief 获取历史累计断开客户端总数
+ */
+quint64 TcpServerConnection::totalClientDisconnections() const
+{
+    return m_totalClientDisconnections;
+}
+
+/**
  * @brief 获取已广播数据包总数
  */
 quint64 TcpServerConnection::broadcastCount() const
@@ -319,7 +330,7 @@ quint64 TcpServerConnection::broadcastCount() const
 /**
  * @brief 获取累计接收字节数
  */
-qint64 TcpServerConnection::totalBytesReceived() const
+quint64 TcpServerConnection::totalBytesReceived() const
 {
     return m_totalRxBytes;
 }
@@ -327,18 +338,28 @@ qint64 TcpServerConnection::totalBytesReceived() const
 /**
  * @brief 获取累计发送字节数
  */
-qint64 TcpServerConnection::totalBytesSent() const
+quint64 TcpServerConnection::totalBytesSent() const
 {
     return m_totalTxBytes;
 }
 
 /**
- * @brief 重置统计数据
+ * @brief 获取累计accept错误次数
+ */
+quint64 TcpServerConnection::totalAcceptErrors() const
+{
+    return m_totalAcceptErrors;
+}
+
+/**
+ * @brief 重置所有统计计数器为零
  */
 void TcpServerConnection::resetStatistics()
 {
     m_totalClientCount = 0;
+    m_totalClientDisconnections = 0;
     m_broadcastCount = 0;
     m_totalRxBytes = 0;
     m_totalTxBytes = 0;
+    m_totalAcceptErrors = 0;
 }

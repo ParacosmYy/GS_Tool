@@ -79,6 +79,23 @@ public:
                       const QStringList& channelNames,
                       const QList<QList<double>>& data);
 
+    // ---- 统计计数接口 ----
+
+    /** @brief 获取累计导出操作总次数 @return 导出次数 */
+    quint64 totalExports() const;
+
+    /** @brief 获取累计图表图片导出次数(PNG+SVG) @return 图片导出次数 */
+    quint64 totalChartImages() const;
+
+    /** @brief 获取累计CSV导出的数据行总数 @return CSV行数 */
+    quint64 totalCsvRows() const;
+
+    /** @brief 获取累计导出失败次数 @return 失败次数 */
+    quint64 totalErrors() const;
+
+    /** @brief 重置所有导出统计计数器(导出次数/图片次数/CSV行数/错误次数) */
+    void resetExportStatistics();
+
 signals:
     /**
      * @brief 导出完成信号
@@ -91,6 +108,12 @@ signals:
      * @param error 失败原因描述
      */
     void exportFailed(const QString& error);
+
+private:
+    quint64 m_totalExports = 0;       ///< 累计导出操作总次数
+    quint64 m_totalChartImages = 0;   ///< 累计图表图片导出次数(PNG+SVG)
+    quint64 m_totalCsvRows = 0;       ///< 累计CSV导出的数据行总数
+    quint64 m_totalErrors = 0;        ///< 累计导出失败次数
 };
 
 #endif // CHART_EXPORTER_H

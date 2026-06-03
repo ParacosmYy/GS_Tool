@@ -101,12 +101,14 @@ bool ChartExporter::exportToCsv(const QString& filePath,
                                 const QList<QList<double>>& data)
 {
     if (channelNames.isEmpty() || data.isEmpty()) {
+        ++m_totalErrors;
         emit exportFailed(tr("导出数据为空"));
         return false;
     }
 
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        ++m_totalErrors;
         emit exportFailed(tr("无法打开文件: %1").arg(filePath));
         return false;
     }
@@ -142,6 +144,8 @@ bool ChartExporter::exportToCsv(const QString& filePath,
     }
 
     file.close();
+    ++m_totalExports;
+    m_totalCsvRows += static_cast<quint64>(maxRows);
     emit exportCompleted(filePath);
     return true;
 }
@@ -162,21 +166,26 @@ bool ChartExporter::exportToCsv(const QString& filePath,
 bool ChartExporter::exportToPng(const QString& filePath, QWidget* widget)
 {
     if (!widget) {
+        ++m_totalErrors;
         emit exportFailed(tr("控件指针为空，无法导出 PNG"));
         return false;
     }
 
     QPixmap pixmap = widget->grab();
     if (pixmap.isNull()) {
+        ++m_totalErrors;
         emit exportFailed(tr("截图失败: 控件为空"));
         return false;
     }
 
     if (!pixmap.save(filePath, "PNG")) {
+        ++m_totalErrors;
         emit exportFailed(tr("PNG 保存失败: %1").arg(filePath));
         return false;
     }
 
+    ++m_totalExports;
+    ++m_totalChartImages;
     emit exportCompleted(filePath);
     return true;
 }
@@ -198,6 +207,7 @@ bool ChartExporter::exportToPng(const QString& filePath, QWidget* widget)
 bool ChartExporter::exportToSvg(const QString& filePath, QWidget* widget)
 {
     if (!widget) {
+        ++m_totalErrors;
         emit exportFailed(tr("控件指针为空，无法导出 SVG"));
         return false;
     }
@@ -217,6 +227,8 @@ bool ChartExporter::exportToSvg(const QString& filePath, QWidget* widget)
     widget->render(&painter);
     painter.end();
 
+    ++m_totalExports;
+    ++m_totalChartImages;
     emit exportCompleted(filePath);
     return true;
 }
@@ -241,6 +253,7 @@ bool ChartExporter::exportToJson(const QString& filePath,
                                  const QList<QList<double>>& data)
 {
     if (channelNames.isEmpty() || data.isEmpty()) {
+        ++m_totalErrors;
         emit exportFailed(tr("导出数据为空"));
         return false;
     }
@@ -271,6 +284,7 @@ bool ChartExporter::exportToJson(const QString& filePath,
     QJsonDocument doc(rootArray);
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        ++m_totalErrors;
         emit exportFailed(tr("无法打开文件: %1").arg(filePath));
         return false;
     }
@@ -278,6 +292,45 @@ bool ChartExporter::exportToJson(const QString& filePath,
     file.write(doc.toJson(QJsonDocument::Indented));
     file.close();
 
+    ++m_totalExports;
+    m_totalCsvRows += static_cast<quint64>(maxRows);
     emit exportCompleted(filePath);
     return true;
+}
+
+// ---------------------------------------------------------------------------
+// 统计计数
+// ---------------------------------------------------------------------------
+
+/** @brief 获取累计导出操作总次数 @return 导出次数 */
+quint64 ChartExporter::totalExports() const
+{
+    return m_totalExports;
+}
+
+/** @brief 获取累计图表图片导出次数(PNG+SVG) @return 图片导出次数 */
+quint64 ChartExporter::totalChartImages() const
+{
+    return m_totalChartImages;
+}
+
+/** @brief 获取累计CSV导出的数据行总数 @return CSV行数 */
+quint64 ChartExporter::totalCsvRows() const
+{
+    return m_totalCsvRows;
+}
+
+/** @brief 获取累计导出失败次数 @return 失败次数 */
+quint64 ChartExporter::totalErrors() const
+{
+    return m_totalErrors;
+}
+
+/** @brief 重置所有导出统计计数器(导出次数/图片次数/CSV行数/错误次数) */
+void ChartExporter::resetExportStatistics()
+{
+    m_totalExports = 0;
+    m_totalChartImages = 0;
+    m_totalCsvRows = 0;
+    m_totalErrors = 0;
 }

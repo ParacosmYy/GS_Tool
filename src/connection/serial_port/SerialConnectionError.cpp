@@ -45,14 +45,17 @@ void SerialConnection::queryPlatformErrors()
     if (ClearCommError(hComm, &errors, &comStat)) {
         if (errors & CE_FRAME) {
             m_errorCounters.framingErrors++;
+            ++m_totalFramingErrors;  // 累计帧错误统计
             qWarning() << "Serial framing error detected on" << m_portName;
         }
         if (errors & CE_RXPARITY) {
             m_errorCounters.parityErrors++;
+            ++m_totalParityErrors;  // 累计校验错误统计
             qWarning() << "Serial parity error detected on" << m_portName;
         }
         if (errors & CE_OVERRUN || errors & CE_RXOVER) {
             m_errorCounters.overrunErrors++;
+            ++m_totalOverrunErrors;  // 累计溢出错误统计
             qWarning() << "Serial overrun error detected on" << m_portName;
         }
     }
@@ -83,6 +86,7 @@ void SerialConnection::onError(QSerialPort::SerialPortError error)
 
     // 统计: 每次实际错误都计入总错误次数
     m_errorCount++;
+    ++m_totalErrorsTracked;  // 累计已跟踪错误统计
 
     // 翻译错误为详细的中文描述
     QString errorMsg = translateError(error);
@@ -259,4 +263,19 @@ PinoutSignals SerialConnection::pinoutSignals() const
     result.dtr = qtSignals & QSerialPort::DataTerminalReadySignal;
     result.rts = qtSignals & QSerialPort::RequestToSendSignal;
     return result;
+}
+
+/**
+ * @brief 重置所有错误分类统计计数器
+ *
+ * 将 totalErrorsTracked/totalFramingErrors/totalParityErrors/totalOverrunErrors 归零。
+ * 不影响 SerialErrorCounters(会话级错误计数)，
+ * 那些由 resetErrorCounters() 单独管理。
+ */
+void SerialConnection::resetErrorClassificationStats()
+{
+    m_totalErrorsTracked = 0;
+    m_totalFramingErrors = 0;
+    m_totalParityErrors = 0;
+    m_totalOverrunErrors = 0;
 }

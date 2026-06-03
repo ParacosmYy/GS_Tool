@@ -101,7 +101,19 @@ public:
     /** @brief 获取累计导出失败次数 @return 失败次数 */
     quint64 totalErrors() const;
 
-    /** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数) */
+    /** @brief 获取累计CSV格式导出次数 @return CSV导出次数 */
+    quint64 totalCsvExports() const;
+
+    /** @brief 获取累计HexDump格式导出次数 @return HexDump导出次数 */
+    quint64 totalHexDumpExports() const;
+
+    /** @brief 获取累计JSON格式导出次数 @return JSON导出次数 */
+    quint64 totalJsonExports() const;
+
+    /** @brief 获取累计二进制格式导出次数 @return 二进制导出次数 */
+    quint64 totalBinExports() const;
+
+    /** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数/各格式次数) */
     void resetStats();
 
 signals:
@@ -193,6 +205,10 @@ private:
     quint64 m_totalBytesExported = 0;  ///< 累计导出的字节总数
     quint64 m_totalRowsExported = 0;   ///< 累计导出的数据行总数
     quint64 m_totalErrors = 0;         ///< 累计导出失败次数
+    quint64 m_totalCsvExports = 0;     ///< 累计CSV格式导出次数
+    quint64 m_totalHexDumpExports = 0; ///< 累计HexDump格式导出次数
+    quint64 m_totalJsonExports = 0;    ///< 累计JSON格式导出次数
+    quint64 m_totalBinExports = 0;     ///< 累计二进制格式导出次数
 };
 
 #endif // DATA_EXPORTER_H

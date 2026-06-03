@@ -188,6 +188,7 @@ void ChecksumPanel::onCalculate()
         return;
     }
 
+    ++m_totalCalculations;
     auto alg = selectedAlgorithm();
     m_result = m_calculator.calculate(data, alg);
     QString name = ChecksumCalculator::algorithmName(alg);
@@ -224,6 +225,7 @@ void ChecksumPanel::onCalculate()
  */
 void ChecksumPanel::onCopyResult()
 {
+    ++m_totalCopyActions;
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(QString::number(m_result, 16).toUpper());
 }
@@ -336,4 +338,31 @@ void ChecksumPanel::dropEvent(QDropEvent* event)
     }
     m_inputEdit->setPlainText(filePath);
     event->acceptProposedAction();
+}
+
+// ---- 统计计数 ----
+
+/**
+ * @brief 获取累计计算次数（面板层面）
+ */
+quint64 ChecksumPanel::totalCalculations() const
+{
+    return m_totalCalculations;
+}
+
+/**
+ * @brief 获取累计复制到剪贴板次数
+ */
+quint64 ChecksumPanel::totalCopyActions() const
+{
+    return m_totalCopyActions;
+}
+
+/**
+ * @brief 重置所有面板统计计数器(计算次数/复制次数)
+ */
+void ChecksumPanel::resetPanelStatistics()
+{
+    m_totalCalculations = 0;
+    m_totalCopyActions = 0;
 }

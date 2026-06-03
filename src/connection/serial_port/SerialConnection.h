@@ -85,6 +85,23 @@ public:
     /** @brief 重置错误计数器 */
     void resetErrorCounters();
 
+    // ---- 错误分类统计(累计) ----
+
+    /** @brief 获取累计已跟踪的错误总次数 @return 自上次重置以来的已跟踪错误总次数 */
+    quint64 totalErrorsTracked() const { return m_totalErrorsTracked; }
+
+    /** @brief 获取累计帧错误次数 @return 自上次重置以来的帧错误总次数 */
+    quint64 totalFramingErrors() const { return m_totalFramingErrors; }
+
+    /** @brief 获取累计校验错误次数 @return 自上次重置以来的校验错误总次数 */
+    quint64 totalParityErrors() const { return m_totalParityErrors; }
+
+    /** @brief 获取累计溢出错误次数 @return 自上次重置以来的溢出错误总次数 */
+    quint64 totalOverrunErrors() const { return m_totalOverrunErrors; }
+
+    /** @brief 重置所有错误分类统计计数器(totalErrorsTracked/totalFramingErrors/totalParityErrors/totalOverrunErrors归零) */
+    void resetErrorClassificationStats();
+
     // ---- 操作统计 ----
 
     /** @brief 获取累计打开次数 @return 自上次重置以来的串口打开总次数 */
@@ -93,10 +110,16 @@ public:
     /** @brief 获取累计关闭次数 @return 自上次重置以来的串口关闭总次数 */
     quint64 totalCloses() const { return m_totalCloses; }
 
+    /** @brief 获取累计写入字节数 @return 自上次重置以来的串口写入字节总数 */
+    quint64 totalBytesWritten() const { return m_totalBytesWritten; }
+
+    /** @brief 获取累计读取字节数 @return 自上次重置以来的串口读取字节总数 */
+    quint64 totalBytesRead() const { return m_totalBytesRead; }
+
     /** @brief 获取累计错误次数 @return 自上次重置以来的错误总次数(含致命+可恢复) */
     quint64 errorCount() const { return m_errorCount; }
 
-    /** @brief 重置所有操作统计计数器(totalOpens/totalCloses/errorCount归零) */
+    /** @brief 重置所有操作统计计数器(totalOpens/totalCloses/totalBytesWritten/totalBytesRead/errorCount归零) */
     void resetStats();
 
 private slots:
@@ -118,10 +141,18 @@ private:
     ConnectionState m_state = ConnectionState::Disconnected; ///< 当前连接状态
     SerialErrorCounters m_errorCounters;      ///< 串口错误统计计数器
 
+    // ---- 错误分类统计计数器(累计) ----
+    quint64 m_totalErrorsTracked = 0;     ///< 累计已跟踪的错误总次数
+    quint64 m_totalFramingErrors = 0;     ///< 累计帧错误总次数
+    quint64 m_totalParityErrors = 0;      ///< 累计校验错误总次数
+    quint64 m_totalOverrunErrors = 0;     ///< 累计溢出错误总次数
+
     // ---- 操作统计计数器 ----
-    quint64 m_totalOpens = 0;   ///< 累计串口打开次数(含成功与失败)
-    quint64 m_totalCloses = 0;  ///< 累计串口关闭次数
-    quint64 m_errorCount = 0;   ///< 累计错误总次数(致命错误+可恢复错误)
+    quint64 m_totalOpens = 0;        ///< 累计串口打开次数(含成功与失败)
+    quint64 m_totalCloses = 0;       ///< 累计串口关闭次数
+    quint64 m_totalBytesWritten = 0; ///< 累计串口写入字节总数
+    quint64 m_totalBytesRead = 0;    ///< 累计串口读取字节总数
+    quint64 m_errorCount = 0;        ///< 累计错误总次数(致命错误+可恢复错误)
 };
 
 #endif // SERIALCONNECTION_H

@@ -314,6 +314,12 @@ quint64 ConnectionController::totalReconnects() const { return m_totalReconnects
 /** @brief 获取累计连接错误次数 @return 错误总次数 */
 quint64 ConnectionController::errorCount() const { return m_errorCount; }
 
+/** @brief 获取累计发送数据字节数 @return 发送总字节数 */
+quint64 ConnectionController::totalDataSent() const { return m_totalDataSent; }
+
+/** @brief 获取累计接收数据字节数 @return 接收总字节数 */
+quint64 ConnectionController::totalDataReceived() const { return m_totalDataReceived; }
+
 /** @brief 重置连接统计计数器为初始值 */
 void ConnectionController::resetConnectionStatistics()
 {
@@ -321,4 +327,6 @@ void ConnectionController::resetConnectionStatistics()
     m_totalDisconnections = 0;
     m_totalReconnects = 0;
     m_errorCount = 0;
+    m_totalDataSent = 0;
+    m_totalDataReceived = 0;
 }

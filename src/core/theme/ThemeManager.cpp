@@ -184,6 +184,9 @@ QString ThemeManager::currentTheme() const
 /** @brief 按语义色枚举获取对应QColor(未映射时返回灰色并警告) @param color 语义色枚举 @return QColor */
 QColor ThemeManager::color(SemanticColor color) const
 {
+    // 统计：累计语义色查询计数
+    ++m_totalColorQueries;
+
     auto it = m_colorMap.constFind(color);
     if (it != m_colorMap.constEnd()) {
         return it.value();
@@ -329,6 +332,8 @@ void ThemeManager::applyStylesheetWithAnimation(const QString& qss)
     // 淡出完成后: 应用新样式表并启动淡入
     connect(fadeOut, &QPropertyAnimation::finished, this, [this, qss, fadeIn]() {
         qApp->setStyleSheet(qss);
+        // 统计：累计样式表应用计数（带动画）
+        ++m_totalStyleApplications;
         fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
     });
 
@@ -342,6 +347,8 @@ void ThemeManager::applyStylesheetWithAnimation(const QString& qss)
 void ThemeManager::applyStylesheetDirect(const QString& qss)
 {
     qApp->setStyleSheet(qss);
+    // 统计：累计样式表应用计数（直接应用）
+    ++m_totalStyleApplications;
 }
 
 /**
@@ -420,6 +427,18 @@ quint64 ThemeManager::totalCustomThemesLoaded() const
     return m_totalCustomThemesLoaded;
 }
 
+/** @brief 获取累计语义色查询次数 */
+quint64 ThemeManager::totalColorQueries() const
+{
+    return m_totalColorQueries;
+}
+
+/** @brief 获取累计样式表应用次数 */
+quint64 ThemeManager::totalStyleApplications() const
+{
+    return m_totalStyleApplications;
+}
+
 /**
  * @brief 重置所有统计计数器为零
  */
@@ -427,4 +446,6 @@ void ThemeManager::resetStats()
 {
     m_totalThemeSwitches = 0;
     m_totalCustomThemesLoaded = 0;
+    m_totalColorQueries = 0;
+    m_totalStyleApplications = 0;
 }

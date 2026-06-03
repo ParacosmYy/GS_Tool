@@ -24,7 +24,8 @@ quint64 ChecksumCalculator::calculate(const QByteArray &data, Algorithm alg) con
         return 0;
     }
 
-    ++m_calcCount;
+    ++m_totalCalculations;
+    m_totalBytesProcessed += static_cast<quint64>(data.size());
 
     switch (alg) {
     case CRC8: {
@@ -277,15 +278,24 @@ QMap<QString, quint64> ChecksumCalculator::calculateAll(const QByteArray& data) 
 /**
  * @brief 获取累计计算次数
  */
-qint64 ChecksumCalculator::calculationCount() const
+quint64 ChecksumCalculator::totalCalculations() const
 {
-    return m_calcCount;
+    return m_totalCalculations;
 }
 
 /**
- * @brief 重置计算计数
+ * @brief 获取累计处理字节数
  */
-void ChecksumCalculator::resetCount()
+quint64 ChecksumCalculator::totalBytesProcessed() const
 {
-    m_calcCount = 0;
+    return m_totalBytesProcessed;
+}
+
+/**
+ * @brief 重置所有校验和统计计数器
+ */
+void ChecksumCalculator::resetChecksumStatistics()
+{
+    m_totalCalculations = 0;
+    m_totalBytesProcessed = 0;
 }

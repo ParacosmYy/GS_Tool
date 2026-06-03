@@ -94,15 +94,19 @@ public:
      */
     QMap<QString, quint64> calculateAll(const QByteArray& data) const;
 
+    // ---- 统计计数接口 ----
     /** @brief 获取累计计算次数 */
-    qint64 calculationCount() const;
-
-    /** @brief 重置计算计数 */
-    void resetCount();
+    quint64 totalCalculations() const;
+    /** @brief 获取累计处理字节数 */
+    quint64 totalBytesProcessed() const;
+    /** @brief 重置所有校验和统计计数器 */
+    void resetChecksumStatistics();
 
 private:
     /** @brief 累计计算次数（calculate调用计数） */
-    mutable qint64 m_calcCount = 0;
+    mutable quint64 m_totalCalculations = 0;
+    /** @brief 累计处理字节数 */
+    mutable quint64 m_totalBytesProcessed = 0;
 };
 
 #endif // CHECKSUMCALCULATOR_H

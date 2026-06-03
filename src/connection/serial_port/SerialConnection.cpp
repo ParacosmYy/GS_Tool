@@ -160,6 +160,8 @@ qint64 SerialConnection::write(const QByteArray& data)
         QString errorMsg = translateError(m_serial.error());
         emit errorOccurred(tr("串口 %1 写入失败: %2").arg(m_portName, errorMsg));
     } else {
+        // 累计写入字节统计
+        m_totalBytesWritten += static_cast<quint64>(written);
         // 刷新缓冲区确保数据立即发出，避免 OTA 等时序敏感场景延迟
         m_serial.flush();
     }
@@ -347,6 +349,7 @@ void SerialConnection::onReadyRead()
 {
     QByteArray data = m_serial.readAll();
     if (!data.isEmpty()) {
+        m_totalBytesRead += static_cast<quint64>(data.size());  // 累计读取字节统计
         emit dataReceived(data);
     }
 }
@@ -354,7 +357,7 @@ void SerialConnection::onReadyRead()
 /**
  * @brief 重置所有操作统计计数器
  *
- * 将 totalOpens/totalCloses/errorCount 归零。
+ * 将 totalOpens/totalCloses/totalBytesWritten/totalBytesRead/errorCount 归零。
  * 不影响 SerialErrorCounters (帧错误/校验错误等)，
  * 那些由 resetErrorCounters() 单独管理。
  */
@@ -362,5 +365,7 @@ void SerialConnection::resetStats()
 {
     m_totalOpens = 0;
     m_totalCloses = 0;
+    m_totalBytesWritten = 0;
+    m_totalBytesRead = 0;
     m_errorCount = 0;
 }

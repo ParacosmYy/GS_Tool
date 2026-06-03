@@ -32,11 +32,11 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
 
     switch (format) {
     case Plain:       return exportPlain(outPath, lines);
-    case HexDump:     return exportHexDump(outPath, lines);
-    case Csv:         return exportCsv(outPath, lines);
+    case HexDump:     ++m_totalHexDumpExports; return exportHexDump(outPath, lines);
+    case Csv:         ++m_totalCsvExports; return exportCsv(outPath, lines);
     case Timestamped: return exportTimestamped(outPath, lines);
-    case Bin:         return exportBin(outPath, lines);
-    case Json:        return exportJson(outPath, lines);
+    case Bin:         ++m_totalBinExports; return exportBin(outPath, lines);
+    case Json:        ++m_totalJsonExports; return exportJson(outPath, lines);
     default:
         ++m_totalErrors;
         emit exportError(outPath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));

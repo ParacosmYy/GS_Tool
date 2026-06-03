@@ -80,6 +80,9 @@ public:
 
     // ---- 统计接口 ----
 
+    /** @brief 获取累计WebSocket连接成功次数 */
+    quint64 totalConnections() const;
+
     /** @brief 获取已发送消息总数(文本+二进制) */
     quint64 totalMessagesSent() const;
 
@@ -164,11 +167,12 @@ private:
     bool m_handshakeDone = false;       ///< 握手是否完成
 
     // ---- 统计计数器 ----
-    quint64 m_totalMessagesSent = 0;    ///< 已发送消息总数(文本+二进制)
-    quint64 m_totalMessagesReceived = 0;///< 已接收消息总数(文本+二进制)
-    quint64 m_totalBytesSent = 0;       ///< 已发送字节总数(帧级别)
-    quint64 m_totalBytesReceived = 0;   ///< 已接收字节总数(帧级别)
-    quint64 m_errorCount = 0;           ///< 错误发生次数
+    quint64 m_totalConnections = 0;         ///< 累计WebSocket连接成功次数
+    quint64 m_totalMessagesSent = 0;        ///< 已发送消息总数(文本+二进制)
+    quint64 m_totalMessagesReceived = 0;    ///< 已接收消息总数(文本+二进制)
+    quint64 m_totalBytesSent = 0;           ///< 已发送字节总数(帧级别)
+    quint64 m_totalBytesReceived = 0;       ///< 已接收字节总数(帧级别)
+    quint64 m_errorCount = 0;               ///< 错误发生次数
 };
 
 #endif // WEBSOCKETCONNECTION_H

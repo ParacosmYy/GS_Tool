@@ -31,11 +31,11 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
 
     switch (format) {
     case Plain:       return exportStreamedPlain(filePath, lineProvider, totalLines, batchSize);
-    case HexDump:     return exportStreamedHexDump(filePath, lineProvider, totalLines, batchSize);
-    case Csv:         return exportStreamedCsv(filePath, lineProvider, totalLines, batchSize);
+    case HexDump:     ++m_totalHexDumpExports; return exportStreamedHexDump(filePath, lineProvider, totalLines, batchSize);
+    case Csv:         ++m_totalCsvExports; return exportStreamedCsv(filePath, lineProvider, totalLines, batchSize);
     case Timestamped: return exportStreamedTimestamped(filePath, lineProvider, totalLines, batchSize);
-    case Bin:         return exportStreamedBin(filePath, lineProvider, totalLines, batchSize);
-    case Json:        return exportStreamedJson(filePath, lineProvider, totalLines, batchSize);
+    case Bin:         ++m_totalBinExports; return exportStreamedBin(filePath, lineProvider, totalLines, batchSize);
+    case Json:        ++m_totalJsonExports; return exportStreamedJson(filePath, lineProvider, totalLines, batchSize);
     default:
         ++m_totalErrors;
         emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));

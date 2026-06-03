@@ -29,6 +29,14 @@ TriggerManager::TriggerManager(QObject* parent)
     /* 引擎匹配命中后，转发到动作执行器 */
     connect(m_engine, &TriggerEngine::actionRequired,
             m_action, &TriggerAction::execute);
+
+    /* 引擎命中时递增管理器级触发器计数 */
+    connect(m_engine, &TriggerEngine::triggered,
+            this, [this]() { ++m_totalTriggersFired; });
+
+    /* 动作执行时递增管理器级动作计数 */
+    connect(m_engine, &TriggerEngine::actionRequired,
+            this, [this]() { ++m_totalActionsExecuted; });
 }
 
 /** @brief 析构函数 */
@@ -217,10 +225,22 @@ quint64 TriggerManager::totalRulesRemoved() const { return m_totalRulesRemoved; 
 /** @brief 获取累计更新规则次数 @return 更新总次数 */
 quint64 TriggerManager::totalRuleUpdates() const { return m_totalRuleUpdates; }
 
+/** @brief 获取累计触发器命中次数 @return 命中总次数 */
+quint64 TriggerManager::totalTriggersFired() const { return m_totalTriggersFired; }
+
+/** @brief 获取累计动作执行次数 @return 执行总次数 */
+quint64 TriggerManager::totalActionsExecuted() const { return m_totalActionsExecuted; }
+
+/** @brief 获取累计错误次数（委托引擎） @return 错误总次数 */
+quint64 TriggerManager::totalErrors() const { return m_engine ? m_engine->totalErrors() : 0; }
+
 /** @brief 重置管理器统计计数器为初始值 */
 void TriggerManager::resetManagerStatistics()
 {
     m_totalRulesAdded = 0;
     m_totalRulesRemoved = 0;
     m_totalRuleUpdates = 0;
+    m_totalTriggersFired = 0;
+    m_totalActionsExecuted = 0;
+    /* m_totalErrors 由 TriggerEngine::resetStats() 管理 */
 }

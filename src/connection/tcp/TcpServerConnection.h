@@ -76,16 +76,22 @@ public:
     /** @brief 获取历史累计连接客户端总数 */
     quint64 totalClientCount() const;
 
+    /** @brief 获取历史累计断开客户端总数 */
+    quint64 totalClientDisconnections() const;
+
     /** @brief 获取已广播数据包总数 */
     quint64 broadcastCount() const;
 
     /** @brief 获取累计接收字节数 */
-    qint64 totalBytesReceived() const;
+    quint64 totalBytesReceived() const;
 
     /** @brief 获取累计发送字节数 */
-    qint64 totalBytesSent() const;
+    quint64 totalBytesSent() const;
 
-    /** @brief 重置统计数据 */
+    /** @brief 获取累计accept错误次数 */
+    quint64 totalAcceptErrors() const;
+
+    /** @brief 重置所有统计计数器为零 */
     void resetStatistics();
 
 signals:
@@ -132,14 +138,13 @@ private:
     QMap<qintptr, QTcpSocket*> m_clients;            ///< 客户端socket映射(socket描述符→socket)
     bool m_listening = false;                        ///< 是否正在监听
 
-    /** @brief 累计连接客户端总数 */
-    quint64 m_totalClientCount = 0;
-    /** @brief 广播数据包计数 */
-    quint64 m_broadcastCount = 0;
-    /** @brief 累计接收字节数 */
-    qint64 m_totalRxBytes = 0;
-    /** @brief 累计发送字节数 */
-    qint64 m_totalTxBytes = 0;
+    // ---- 统计计数器 ----
+    quint64 m_totalClientCount = 0;           ///< 累计连接客户端总数
+    quint64 m_totalClientDisconnections = 0;  ///< 累计断开客户端总数
+    quint64 m_broadcastCount = 0;             ///< 广播数据包计数
+    quint64 m_totalRxBytes = 0;               ///< 累计接收字节数
+    quint64 m_totalTxBytes = 0;               ///< 累计发送字节数
+    quint64 m_totalAcceptErrors = 0;          ///< 累计accept错误次数
 };
 
 #endif // TCPSERVERCONNECTION_H

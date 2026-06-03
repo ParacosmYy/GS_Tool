@@ -26,7 +26,11 @@ QByteArray DataConverter::convert(const QByteArray &input, Format from, Format t
         return input;
     }
     ++m_convCount;
+    m_totalBytesConverted += static_cast<quint64>(input.size());
     QByteArray raw = decodeToRaw(input, from);
+    if (raw.isEmpty() && !input.isEmpty()) {
+        ++m_totalErrors;
+    }
     return encodeFromRaw(raw, to);
 }
 
@@ -255,15 +259,33 @@ QMap<QString, QByteArray> DataConverter::convertToAll(const QByteArray& input, F
 /**
  * @brief 获取累计转换次数
  */
-qint64 DataConverter::conversionCount() const
+quint64 DataConverter::conversionCount() const
 {
     return m_convCount;
 }
 
 /**
- * @brief 重置转换计数
+ * @brief 获取累计转换的字节总数
  */
-void DataConverter::resetCount()
+quint64 DataConverter::totalBytesConverted() const
+{
+    return m_totalBytesConverted;
+}
+
+/**
+ * @brief 获取累计转换失败次数
+ */
+quint64 DataConverter::totalErrors() const
+{
+    return m_totalErrors;
+}
+
+/**
+ * @brief 重置所有转换统计计数器(转换次数/字节数/错误次数)
+ */
+void DataConverter::resetStatistics()
 {
     m_convCount = 0;
+    m_totalBytesConverted = 0;
+    m_totalErrors = 0;
 }

@@ -16,6 +16,11 @@
 /// 全部是静态方法，不需要实例化
 namespace CRC {
 
+// ---- 统计计数 ----
+
+static inline quint64 s_totalComputations = 0;  ///< 累计CRC计算总次数
+static inline quint64 s_totalBytesProcessed = 0; ///< 累计处理的字节总数
+
 // ---- CRC8 ----
 
 /**
@@ -26,6 +31,8 @@ namespace CRC {
  */
 inline uint8_t crc8(const uint8_t* data, int length)
 {
+    ++s_totalComputations;
+    s_totalBytesProcessed += static_cast<quint64>(length);
     uint8_t crc = 0x00;
     for (int i = 0; i < length; ++i) {
         crc ^= data[i];
@@ -52,6 +59,8 @@ inline uint8_t crc8(const QByteArray& ba)
  *  @param data 数据指针 @param length 数据长度 @return CRC16校验值 */
 inline uint16_t crc16Ccitt(const uint8_t* data, int length)
 {
+    ++s_totalComputations;
+    s_totalBytesProcessed += static_cast<quint64>(length);
     uint16_t crc = 0x0000;
     for (int i = 0; i < length; ++i) {
         crc ^= static_cast<uint16_t>(data[i]) << 8;
@@ -93,6 +102,8 @@ inline uint16_t crc16Xmodem(const QByteArray& ba)
  *  @param data 数据指针 @param length 数据长度 @return CRC16校验值 */
 inline uint16_t crc16Modbus(const uint8_t* data, int length)
 {
+    ++s_totalComputations;
+    s_totalBytesProcessed += static_cast<quint64>(length);
     uint16_t crc = 0xFFFF;
     for (int i = 0; i < length; ++i) {
         crc ^= static_cast<uint16_t>(data[i]);
@@ -119,6 +130,8 @@ inline uint16_t crc16Modbus(const QByteArray& ba)
  *  @param data 数据指针 @param length 数据长度 @return CRC32校验值 */
 inline uint32_t crc32(const uint8_t* data, int length)
 {
+    ++s_totalComputations;
+    s_totalBytesProcessed += static_cast<quint64>(length);
     uint32_t crc = 0xFFFFFFFF;
     for (int i = 0; i < length; ++i) {
         crc ^= data[i];
@@ -145,6 +158,8 @@ inline uint32_t crc32(const QByteArray& ba)
  *  @param data 数据指针 @param length 数据长度 @return 校验和 */
 inline uint8_t checksum(const uint8_t* data, int length)
 {
+    ++s_totalComputations;
+    s_totalBytesProcessed += static_cast<quint64>(length);
     uint8_t sum = 0;
     for (int i = 0; i < length; ++i) {
         sum += data[i];

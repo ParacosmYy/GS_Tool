@@ -54,6 +54,17 @@ public:
      */
     quint64 result() const;
 
+    // ---- 统计计数接口 ----
+
+    /** @brief 获取累计计算次数（面板层面，不含内部自动调用） @return 计算次数 */
+    quint64 totalCalculations() const;
+
+    /** @brief 获取累计复制到剪贴板次数 @return 复制次数 */
+    quint64 totalCopyActions() const;
+
+    /** @brief 重置所有面板统计计数器(计算次数/复制次数) */
+    void resetPanelStatistics();
+
 signals:
     /**
      * @brief 计算完成信号
@@ -103,6 +114,10 @@ private:
     QListWidget *m_historyList;         ///< 计算历史列表
     ChecksumCalculator m_calculator;    ///< 计算引擎
     quint64 m_result = 0;               ///< 最近计算结果
+
+    // 面板统计
+    quint64 m_totalCalculations = 0;    ///< 累计计算次数
+    quint64 m_totalCopyActions = 0;     ///< 累计复制到剪贴板次数
 
 protected:
     /**

@@ -101,6 +101,8 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
 void ConnectionController::onDataReceived(const QByteArray& data)
 {
     m_lastDataTimestamp = QDateTime::currentMSecsSinceEpoch();
+    // 统计：累计接收数据字节数
+    m_totalDataReceived += static_cast<quint64>(data.size());
     emit dataReceived(data);
     emit statusBarUpdateRequested();
 }
@@ -172,6 +174,10 @@ void ConnectionController::connectSignals(IConnection* conn)
             this, &ConnectionController::onDataReceived);
     connect(conn, &IConnection::stateChanged,
             this, &ConnectionController::onConnectionStateChanged);
+    // 统计：累计发送数据字节数（通过 bytesWritten 信号追踪实际写入的字节数）
+    connect(conn, &IConnection::bytesWritten, this, [this](qint64 bytes) {
+        m_totalDataSent += static_cast<quint64>(bytes);
+    });
     // 连接错误信号，转发详细错误信息到UI，同时发送 Toast 错误通知
     connect(conn, &IConnection::errorOccurred,
             this, [this](const QString& msg) {

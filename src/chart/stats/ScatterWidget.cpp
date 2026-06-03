@@ -208,6 +208,7 @@ void ScatterWidget::refreshPlot()
     if (xName.isEmpty() || yName.isEmpty()) {
         m_series->replace({});
         m_correlationLabel->setText(tr("数据不足"));
+        ++m_totalClears;
         return;
     }
 
@@ -219,6 +220,7 @@ void ScatterWidget::refreshPlot()
     if (n == 0) {
         m_series->replace({});
         m_correlationLabel->setText(tr("数据不足"));
+        ++m_totalClears;
         return;
     }
 
@@ -239,6 +241,7 @@ void ScatterWidget::refreshPlot()
     }
 
     m_series->replace(points);
+    m_totalPointsPlotted += n;
 
     // 自动调整坐标轴范围（留5%余量）
     double xPad = qMax((xMax - xMin) * 0.05, 0.001);
@@ -455,4 +458,23 @@ void ScatterWidget::applyThemeColors()
     // 绘图区背景
     m_chart->setPlotAreaBackgroundBrush(QBrush(bgColor));
     m_chart->setPlotAreaBackgroundVisible(true);
+}
+
+/** @brief 获取累计绘制点数 */
+quint64 ScatterWidget::totalPointsPlotted() const
+{
+    return m_totalPointsPlotted;
+}
+
+/** @brief 获取累计清除次数 */
+quint64 ScatterWidget::totalClears() const
+{
+    return m_totalClears;
+}
+
+/** @brief 重置所有散点图统计计数器 */
+void ScatterWidget::resetScatterStatistics()
+{
+    m_totalPointsPlotted = 0;
+    m_totalClears = 0;
 }

@@ -90,10 +90,16 @@ public:
     QMap<QString, QByteArray> convertToAll(const QByteArray& input, Format from) const;
 
     /** @brief 获取累计转换次数 */
-    qint64 conversionCount() const;
+    quint64 conversionCount() const;
 
-    /** @brief 重置转换计数 */
-    void resetCount();
+    /** @brief 获取累计转换的字节总数 */
+    quint64 totalBytesConverted() const;
+
+    /** @brief 获取累计转换失败次数 */
+    quint64 totalErrors() const;
+
+    /** @brief 重置所有转换统计计数器(转换次数/字节数/错误次数) */
+    void resetStatistics();
 
 private:
     /**
@@ -107,7 +113,11 @@ private:
     QByteArray encodeFromRaw(const QByteArray &raw, Format to) const;
 
     /** @brief 累计转换次数 */
-    mutable qint64 m_convCount = 0;
+    mutable quint64 m_convCount = 0;
+    /** @brief 累计转换的字节总数 */
+    mutable quint64 m_totalBytesConverted = 0;
+    /** @brief 累计转换失败次数 */
+    mutable quint64 m_totalErrors = 0;
 };
 
 #endif // DATACONVERTER_H

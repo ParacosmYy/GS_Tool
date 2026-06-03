@@ -62,6 +62,8 @@ public:
     quint64 totalDisconnections() const;   ///< 获取累计断开连接次数
     quint64 totalReconnects() const;       ///< 获取累计自动重连次数
     quint64 errorCount() const;            ///< 获取累计连接错误次数
+    quint64 totalDataSent() const;         ///< 获取累计发送数据字节数
+    quint64 totalDataReceived() const;     ///< 获取累计接收数据字节数
     void resetConnectionStatistics();      ///< 重置连接统计计数器为初始值
 
 signals:
@@ -190,6 +192,8 @@ private:
     quint64 m_totalDisconnections = 0;             ///< 累计断开连接次数
     quint64 m_totalReconnects = 0;                 ///< 累计自动重连次数
     quint64 m_errorCount = 0;                      ///< 累计连接错误次数
+    quint64 m_totalDataSent = 0;                   ///< 累计发送数据字节数
+    quint64 m_totalDataReceived = 0;               ///< 累计接收数据字节数
 };
 
 #endif // CONNECTIONCONTROLLER_H

@@ -117,4 +117,8 @@
 | 141 | fix(mqtt): MqttConnection统计增强+ToastNotification组件+评分追踪补全#125-#140 | 141 |
 | 142 | feat(stats): NavigationController/SettingsManager/SessionManager/IconManager/ShortcutManager/BleScanner/DashboardSerializer统计增强 | 142 |
 | 143 | feat(stats): ChartModel/FftEngine/ZoomController/CursorOverlay/ProtocolEngine/ProtocolSchema/OtaHistoryModel/BaseTransfer/DataStatistics/TrafficMonitor/TerminalLayoutManager统计增强 | 143 |
+| 144 | feat(stats): TriggerManager/ConnectionController/ConnectionFactory/JLinkRttConnection/BleGattModel/CanFrameParser/DbcParser/DataExporter/DataLogger统计增强+评分追踪更新 | 144 |
+| 145 | feat(stats): XModem/ChartWidget/TerminalWidget/ToastWidget/ScriptRecorder/DataDiffWidget/BasePanel/CommandPalette/EventBus/SendController/SendHistoryManager/FrameParser/PerformanceMonitor/ProtobufDecoder/FlatBuffersDecoder/IntelHexParser统计增强 | 145 |
+| 146 | feat(theme): QssThemeGenerator主题生成器 + 多模块统计增强 + AppDialog编译修复 | 146 |
+| 147 | feat(stats): FftWidget/YAxisManager/HistogramWidget/ScatterWidget/GaugeWidget/OtaWidget/ProtocolView/TerminalSearchBar统计增强+AnimationUtility动画工具 | 147 |
 | ... | 目标: 1000分 | 1000 |
