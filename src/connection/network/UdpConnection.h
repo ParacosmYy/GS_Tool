@@ -80,6 +80,26 @@ public:
      */
     void configure(const QVariantMap& params) override;
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取已发送数据报总数 */
+    quint64 totalDatagramsSent() const;
+
+    /** @brief 获取已接收数据报总数 */
+    quint64 totalDatagramsReceived() const;
+
+    /** @brief 获取已发送字节总数 */
+    quint64 totalBytesSent() const;
+
+    /** @brief 获取已接收字节总数 */
+    quint64 totalBytesReceived() const;
+
+    /** @brief 获取错误计数 */
+    quint64 errorCount() const;
+
+    /** @brief 重置所有统计数据为零 */
+    void resetStats();
+
 private slots:
     /** @brief 数据到达回调，读取所有待处理的数据报 */
     void onReadyRead();
@@ -108,6 +128,13 @@ private:
 
     // ---- 网络资源 ----
     QUdpSocket* m_socket = nullptr;      ///< UDP通信socket
+
+    // ---- 统计计数器 ----
+    quint64 m_totalDatagramsSent = 0;    ///< 已发送数据报总数
+    quint64 m_totalDatagramsReceived = 0;///< 已接收数据报总数
+    quint64 m_totalBytesSent = 0;        ///< 已发送字节总数
+    quint64 m_totalBytesReceived = 0;    ///< 已接收字节总数
+    quint64 m_errorCount = 0;            ///< 错误发生次数
 };
 
 #endif // UDPCONNECTION_H

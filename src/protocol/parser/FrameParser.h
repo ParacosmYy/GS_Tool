@@ -85,7 +85,10 @@ public:
     /** @brief 获取校验和错误次数(CRC/Sum/异或不匹配) */
     quint64 totalChecksumErrors() const;
 
-    /** @brief 重置所有统计计数器（帧数/字节/校验错误） */
+    /** @brief 获取累计溢出次数（帧超过最大长度被丢弃） */
+    quint64 totalOverflows() const;
+
+    /** @brief 重置所有统计计数器（帧数/字节/校验错误/溢出） */
     void resetStats();
 
 signals:
@@ -142,6 +145,7 @@ private:
     quint64 m_totalFramesParsed = 0;        ///< 成功解析帧总数
     quint64 m_totalBytesInput = 0;          ///< 累计输入字节总数
     quint64 m_totalChecksumErrors = 0;      ///< 校验和错误总数
+    quint64 m_totalOverflows = 0;           ///< 累计溢出次数
 
     int m_maxFrameLength = kDefaultMaxFrameLength; ///< 帧长度上限（默认1024字节）
     int m_frameTimeoutMs = 500;             ///< 帧超时阈值（毫秒），0=禁用

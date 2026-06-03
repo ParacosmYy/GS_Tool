@@ -21,10 +21,7 @@ class SerialConnection : public IConnection {
     Q_OBJECT
 
 public:
-    /**
-     * @brief 构造串口连接
-     * @param parent 父对象（通常为 nullptr，由 ConnectionManager 管理生命周期）
-     */
+    /** @brief 构造串口连接 @param parent 父对象(通常nullptr，由ConnectionManager管理生命周期) */
     explicit SerialConnection(QObject* parent = nullptr);
 
     /** @brief 析构函数，自动关闭串口 */
@@ -32,20 +29,13 @@ public:
 
     // ---- IConnection 接口实现 ----
 
-    /** @brief 返回连接类型为 Serial */
-    ConnectionType type() const override { return ConnectionType::Serial; }
-
-    /** @brief 返回端口名称（如 "COM3"） */
-    QString name() const override;
-
-    /** @brief 返回当前连接状态 */
-    ConnectionState state() const override;
+    ConnectionType type() const override { return ConnectionType::Serial; } ///< 返回连接类型为 Serial
+    QString name() const override;           ///< 返回端口名称(如 "COM3")
+    ConnectionState state() const override;  ///< 返回当前连接状态
 
     /**
      * @brief 打开串口连接
-     *
-     * 失败时会根据错误类型发出详细的中文错误描述:
-     * 端口名为空/端口不存在/被占用/权限不足/系统错误
+     * 失败时发出详细的中文错误描述: 端口名为空/不存在/被占用/权限不足
      * @return true=打开成功, false=打开失败
      */
     bool open() override;
@@ -53,82 +43,38 @@ public:
     /** @brief 关闭串口连接并重置状态为 Disconnected */
     void close() override;
 
-    /**
-     * @brief 写入数据到串口
-     * @param data 待发送的原始字节数据
-     * @return 实际写入的字节数，-1表示失败
-     */
+    /** @brief 写入数据到串口 @param data 待发送的原始字节数据 @return 实际写入字节数，-1表示失败 */
     qint64 write(const QByteArray& data) override;
 
     /**
      * @brief 通过 QVariantMap 配置串口参数
-     *
-     * 支持的 key: portName, baudRate, dataBits, parity, stopBits,
-     * flowControl, dtr, rts。未识别的 key 会被安全忽略。
+     * 支持的 key: portName, baudRate, dataBits, parity, stopBits, flowControl, dtr, rts
      * @param params 参数映射表
      */
     void configure(const QVariantMap& params) override;
 
     // ---- 串口参数配置接口 ----
 
-    /** @brief 设置端口名（如 "COM3"），仅在未打开时生效 */
-    void setPortName(const QString& portName);
+    void setPortName(const QString& portName);           ///< 设置端口名(如"COM3")，仅在未打开时生效
+    QString portName() const;                            ///< 获取当前端口名
+    void setBaudRate(qint32 baud);                       ///< 设置波特率(如115200)
+    qint32 baudRate() const;                             ///< 获取当前波特率
+    void setDataBits(QSerialPort::DataBits bits);        ///< 设置数据位(5/6/7/8)
+    QSerialPort::DataBits dataBits() const;              ///< 获取当前数据位
+    void setParity(QSerialPort::Parity parity);          ///< 设置校验模式
+    QSerialPort::Parity parity() const;                  ///< 获取当前校验模式
+    void setStopBits(QSerialPort::StopBits bits);        ///< 设置停止位
+    QSerialPort::StopBits stopBits() const;              ///< 获取当前停止位
+    void setFlowControl(QSerialPort::FlowControl control);///< 设置流控模式
+    QSerialPort::FlowControl flowControl() const;        ///< 获取当前流控模式
+    void setDtr(bool enabled) override;                  ///< 设置DTR信号电平
+    void setRts(bool enabled) override;                  ///< 设置RTS信号电平
+    bool isDtr() const override;                         ///< 查询DTR信号当前状态
+    bool isRts() const override;                         ///< 查询RTS信号当前状态
+    void sendBreak(int duration = 100) override;         ///< 发送Break信号
+    PinoutSignals pinoutSignals() const override;        ///< 查询串口信号线电平状态
 
-    /** @brief 获取当前端口名 */
-    QString portName() const;
-
-    /** @brief 设置波特率（如 115200） */
-    void setBaudRate(qint32 baud);
-
-    /** @brief 获取当前波特率 */
-    qint32 baudRate() const;
-
-    /** @brief 设置数据位（5/6/7/8） */
-    void setDataBits(QSerialPort::DataBits bits);
-
-    /** @brief 获取当前数据位 */
-    QSerialPort::DataBits dataBits() const;
-
-    /** @brief 设置校验模式 */
-    void setParity(QSerialPort::Parity parity);
-
-    /** @brief 获取当前校验模式 */
-    QSerialPort::Parity parity() const;
-
-    /** @brief 设置停止位 */
-    void setStopBits(QSerialPort::StopBits bits);
-
-    /** @brief 获取当前停止位 */
-    QSerialPort::StopBits stopBits() const;
-
-    /** @brief 设置流控模式 */
-    void setFlowControl(QSerialPort::FlowControl control);
-
-    /** @brief 获取当前流控模式 */
-    QSerialPort::FlowControl flowControl() const;
-
-    /** @brief 设置 DTR 信号电平（重写 IConnection 虚方法） */
-    void setDtr(bool enabled) override;
-
-    /** @brief 设置 RTS 信号电平（重写 IConnection 虚方法） */
-    void setRts(bool enabled) override;
-
-    /** @brief 查询 DTR 信号当前状态（重写 IConnection 虚方法） */
-    bool isDtr() const override;
-
-    /** @brief 查询 RTS 信号当前状态（重写 IConnection 虚方法） */
-    bool isRts() const override;
-
-    /** @brief 发送Break信号（重写 IConnection 虚方法） */
-    void sendBreak(int duration = 100) override;
-
-    /** @brief 查询串口信号线电平状态，通过QSerialPort::pinoutSignals()获取 */
-    PinoutSignals pinoutSignals() const override;
-
-    /**
-     * @brief 获取系统中所有可用的串口列表
-     * @return QSerialPortInfo 列表，包含端口名、描述、制造商等信息
-     */
+    /** @brief 获取系统中所有可用的串口列表 @return QSerialPortInfo列表 */
     static QList<QSerialPortInfo> availablePorts();
 
     // ---- 串口错误统计 ----
@@ -154,51 +100,23 @@ public:
     void resetStats();
 
 private slots:
-    /** @brief QSerialPort::readyRead 信号处理，读取所有可用数据并转发 */
-    void onReadyRead();
-
-    /**
-     * @brief QSerialPort::errorOccurred 信号处理
-     * 翻译错误码为中文描述，更新状态为Error，统计错误类型。
-     * @param error QSerialPort 的错误码
-     */
-    void onError(QSerialPort::SerialPortError error);
-
-    /** @brief QSerialPort::bytesWritten 信号处理 */
-    void onBytesWritten(qint64 bytes);
+    void onReadyRead();                                  ///< QSerialPort::readyRead 信号处理
+    void onError(QSerialPort::SerialPortError error);    ///< QSerialPort::errorOccurred 信号处理
+    void onBytesWritten(qint64 bytes);                   ///< QSerialPort::bytesWritten 信号处理
 
 private:
-    /**
-     * @brief 将 QSerialPort 错误码翻译为中文错误描述
-     * 针对每种错误给出具体诊断: 端口不存在/被占用/权限不足/意外断开等
-     * @param error QSerialPort 错误码
-     * @return 人类可读的中文错误描述
-     */
+    /** @brief 将QSerialPort错误码翻译为中文错误描述 @param error 错误码 @return 中文错误描述 */
     QString translateError(QSerialPort::SerialPortError error);
 
-    /**
-     * @brief 通过平台API获取底层串口通信错误统计
-     *
-     * Windows平台使用ClearCommError()读取COMSTAT结构中的错误标志:
-     *   - TX FIFO满导致发送停滞
-     *   - 帧错误(起始位/停止位不匹配)
-     *   - 硬件奇偶校验错误
-     *   - 接收缓冲区溢出
-     * 非Windows平台为空实现(未来可扩展TIOCGICOUNT)。
-     */
+    /** @brief 通过平台API获取底层串口通信错误统计
+     *  Windows使用ClearCommError()读取COMSTAT错误标志(帧错误/校验错误/溢出)
+     *  非Windows为空实现(未来可扩展TIOCGICOUNT) */
     void queryPlatformErrors();
 
-    /** @brief Qt 串口对象，提供底层串口操作能力 */
-    QSerialPort m_serial;
-
-    /** @brief 端口名称，如 "COM3" */
-    QString m_portName;
-
-    /** @brief 当前连接状态 */
-    ConnectionState m_state = ConnectionState::Disconnected;
-
-    /** @brief 串口错误统计计数器 */
-    SerialErrorCounters m_errorCounters;
+    QSerialPort m_serial;                     ///< Qt 串口对象
+    QString m_portName;                       ///< 端口名称，如"COM3"
+    ConnectionState m_state = ConnectionState::Disconnected; ///< 当前连接状态
+    SerialErrorCounters m_errorCounters;      ///< 串口错误统计计数器
 
     // ---- 操作统计计数器 ----
     quint64 m_totalOpens = 0;   ///< 累计串口打开次数(含成功与失败)

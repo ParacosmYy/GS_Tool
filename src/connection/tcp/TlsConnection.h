@@ -68,17 +68,22 @@ public:
      */
     void setPeerVerify(bool verify);
 
-    /** @brief 获取已发送字节数 */
-    qint64 totalBytesSent() const;
+    // ---- 统计接口 ----
 
-    /** @brief 获取已接收字节数 */
-    qint64 totalBytesReceived() const;
+    /** @brief 获取SSL握手完成次数 */
+    quint64 totalHandshakes() const;
 
-    /** @brief 获取SSL握手次数 */
-    quint64 handshakeCount() const;
+    /** @brief 获取已发送字节总数 */
+    quint64 totalBytesSent() const;
 
-    /** @brief 重置统计数据 */
-    void resetStatistics();
+    /** @brief 获取已接收字节总数 */
+    quint64 totalBytesReceived() const;
+
+    /** @brief 获取错误计数 */
+    quint64 errorCount() const;
+
+    /** @brief 重置所有统计数据为零 */
+    void resetStats();
 
 private slots:
     /** @brief SSL加密通道建立完成回调 */
@@ -109,12 +114,11 @@ private:
     // ---- 网络资源 ----
     QSslSocket* m_socket = nullptr;                 ///< SSL加密socket
 
-    /** @brief 累计发送字节数 */
-    qint64 m_txBytes = 0;
-    /** @brief 累计接收字节数 */
-    qint64 m_rxBytes = 0;
-    /** @brief SSL握手次数 */
-    quint64 m_handshakeCount = 0;
+    // ---- 统计计数器 ----
+    quint64 m_totalHandshakes = 0;                  ///< SSL握手完成次数
+    quint64 m_totalBytesSent = 0;                   ///< 累计发送字节数
+    quint64 m_totalBytesReceived = 0;               ///< 累计接收字节数
+    quint64 m_errorCount = 0;                       ///< 错误发生次数
 };
 
 #endif // TLSCONNECTION_H

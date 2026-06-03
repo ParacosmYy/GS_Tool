@@ -193,6 +193,15 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     }
 
     m_valid = true;
+
+    /* 统计计数器更新 */
+    ++m_totalSchemas;
+    m_totalFieldCount += static_cast<quint64>(m_fields.size());
+    quint64 schemaSize = static_cast<quint64>(jsonData.size());
+    if (schemaSize > m_maxSchemaSize) {
+        m_maxSchemaSize = schemaSize;
+    }
+
     return true;
 }
 
@@ -367,4 +376,34 @@ ProtocolSchema::ChecksumType ProtocolSchema::checksumTypeFromString(const QStrin
     if (str == QStringLiteral("xor"))         return ChecksumType::Xor;
     if (str == QStringLiteral("sum"))         return ChecksumType::Sum;
     return ChecksumType::None;
+}
+
+// ============================================================================
+// 统计计数器接口
+// ============================================================================
+
+/** @brief 获取已加载的协议定义总数 @return 累计加载次数 */
+quint64 ProtocolSchema::totalSchemas() const
+{
+    return m_totalSchemas;
+}
+
+/** @brief 获取所有已加载协议的字段总数 @return 累计字段数 */
+quint64 ProtocolSchema::totalFieldCount() const
+{
+    return m_totalFieldCount;
+}
+
+/** @brief 获取历史最大协议定义大小(字节) @return 最大JSON字节数 */
+quint64 ProtocolSchema::maxSchemaSize() const
+{
+    return m_maxSchemaSize;
+}
+
+/** @brief 重置所有统计计数器(加载数/字段数/最大大小) */
+void ProtocolSchema::resetStats()
+{
+    m_totalSchemas = 0;
+    m_totalFieldCount = 0;
+    m_maxSchemaSize = 0;
 }

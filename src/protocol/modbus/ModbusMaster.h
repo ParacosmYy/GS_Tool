@@ -87,6 +87,9 @@ public:
     /** @brief 重置统计数据 */
     void resetStatistics();
 
+    /** @brief 重置统计数据(等同于resetStatistics) */
+    void resetStats();
+
 signals:
     /** @brief 收到有效响应 */
     void responseReceived(const ModbusFrame& frame);

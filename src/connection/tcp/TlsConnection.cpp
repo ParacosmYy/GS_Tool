@@ -137,6 +137,7 @@ bool TlsConnection::open()
     connect(m_socket, &QAbstractSocket::errorOccurred,
             this, [this](QAbstractSocket::SocketError err) {
                 Q_UNUSED(err)
+                ++m_errorCount;
                 emit errorOccurred(m_socket->errorString());
                 updateState(ConnectionState::Error);
             });
@@ -172,9 +173,11 @@ qint64 TlsConnection::write(const QByteArray& data)
     }
     qint64 written = m_socket->write(data);
     if (written > 0) {
-        m_txBytes += written;
+        m_totalBytesSent += static_cast<quint64>(written);
         m_socket->flush();
         emit bytesWritten(written);
+    } else if (written < 0) {
+        ++m_errorCount;
     }
     return written;
 }
@@ -235,7 +238,7 @@ void TlsConnection::setPeerVerify(bool verify)
  */
 void TlsConnection::onEncrypted()
 {
-    ++m_handshakeCount;
+    ++m_totalHandshakes;
     updateState(ConnectionState::Connected);
 }
 
@@ -252,6 +255,7 @@ void TlsConnection::onSslErrors(const QList<QSslError>& errors)
     }
 
     /// 验证模式下报告错误
+    ++m_errorCount;
     QStringList errorStrs;
     for (const QSslError& e : errors) {
         errorStrs.append(e.errorString());
@@ -268,7 +272,7 @@ void TlsConnection::onReadyRead()
 
     QByteArray data = m_socket->readAll();
     if (!data.isEmpty()) {
-        m_rxBytes += data.size();
+        m_totalBytesReceived += static_cast<quint64>(data.size());
         emit dataReceived(data);
     }
 }
@@ -295,36 +299,25 @@ void TlsConnection::updateState(ConnectionState newState)
     }
 }
 
-/**
- * @brief 获取已发送字节数
- */
-qint64 TlsConnection::totalBytesSent() const
-{
-    return m_txBytes;
-}
+// ---- 统计接口实现 ----
 
-/**
- * @brief 获取已接收字节数
- */
-qint64 TlsConnection::totalBytesReceived() const
-{
-    return m_rxBytes;
-}
+/** @brief 获取SSL握手完成次数 */
+quint64 TlsConnection::totalHandshakes() const { return m_totalHandshakes; }
 
-/**
- * @brief 获取SSL握手次数
- */
-quint64 TlsConnection::handshakeCount() const
-{
-    return m_handshakeCount;
-}
+/** @brief 获取已发送字节总数 */
+quint64 TlsConnection::totalBytesSent() const { return m_totalBytesSent; }
 
-/**
- * @brief 重置统计数据
- */
-void TlsConnection::resetStatistics()
+/** @brief 获取已接收字节总数 */
+quint64 TlsConnection::totalBytesReceived() const { return m_totalBytesReceived; }
+
+/** @brief 获取错误计数 */
+quint64 TlsConnection::errorCount() const { return m_errorCount; }
+
+/** @brief 重置所有统计数据为零 */
+void TlsConnection::resetStats()
 {
-    m_txBytes = 0;
-    m_rxBytes = 0;
-    m_handshakeCount = 0;
+    m_totalHandshakes = 0;
+    m_totalBytesSent = 0;
+    m_totalBytesReceived = 0;
+    m_errorCount = 0;
 }

@@ -90,6 +90,7 @@ bool UdpConnection::open()
     // 绑定本地端口（0=自动选择）
     QHostAddress bindAddr = m_broadcast ? QHostAddress::AnyIPv4 : QHostAddress::Any;
     if (!m_socket->bind(bindAddr, m_localPort)) {
+        ++m_errorCount;  // 绑定失败计为错误
         emit errorOccurred(tr("UDP绑定端口失败: %1").arg(m_socket->errorString()));
         updateState(ConnectionState::Error);
         return false;
@@ -130,8 +131,11 @@ qint64 UdpConnection::write(const QByteArray& data)
     }
 
     if (written > 0) {
+        ++m_totalDatagramsSent;
+        m_totalBytesSent += static_cast<quint64>(written);
         emit bytesWritten(written);
     } else if (written < 0) {
+        ++m_errorCount;
         emit errorOccurred(tr("UDP发送失败: %1").arg(m_socket->errorString()));
     }
     return written;
@@ -147,9 +151,12 @@ void UdpConnection::onReadyRead()
         buffer.resize(static_cast<int>(m_socket->pendingDatagramSize()));
         QHostAddress senderAddr;
         quint16 senderPort;
-        qint64 bytesRead = m_socket->readDatagram(buffer.data(), buffer.size(), &senderAddr, &senderPort);
+        qint64 bytesRead = m_socket->readDatagram(buffer.data(), buffer.size(),
+                                                   &senderAddr, &senderPort);
         if (bytesRead < 0) continue;
         buffer.resize(static_cast<int>(bytesRead));
+        ++m_totalDatagramsReceived;
+        m_totalBytesReceived += static_cast<quint64>(bytesRead);
         if (!buffer.isEmpty()) {
             emit dataReceived(buffer);
         }
@@ -162,6 +169,7 @@ void UdpConnection::onReadyRead()
  */
 void UdpConnection::onError(QAbstractSocket::SocketError error)
 {
+    ++m_errorCount;
     QString systemError = m_socket ? m_socket->errorString() : QString();
     emit errorOccurred(translateNetworkError(error, systemError));
     updateState(ConnectionState::Error);
@@ -218,4 +226,31 @@ void UdpConnection::updateState(ConnectionState newState)
         m_state = newState;
         emit stateChanged(newState);
     }
+}
+
+// ---- 统计接口实现 ----
+
+/** @brief 获取已发送数据报总数 */
+quint64 UdpConnection::totalDatagramsSent() const { return m_totalDatagramsSent; }
+
+/** @brief 获取已接收数据报总数 */
+quint64 UdpConnection::totalDatagramsReceived() const { return m_totalDatagramsReceived; }
+
+/** @brief 获取已发送字节总数 */
+quint64 UdpConnection::totalBytesSent() const { return m_totalBytesSent; }
+
+/** @brief 获取已接收字节总数 */
+quint64 UdpConnection::totalBytesReceived() const { return m_totalBytesReceived; }
+
+/** @brief 获取错误计数 */
+quint64 UdpConnection::errorCount() const { return m_errorCount; }
+
+/** @brief 重置所有统计数据为零 */
+void UdpConnection::resetStats()
+{
+    m_totalDatagramsSent = 0;
+    m_totalDatagramsReceived = 0;
+    m_totalBytesSent = 0;
+    m_totalBytesReceived = 0;
+    m_errorCount = 0;
 }

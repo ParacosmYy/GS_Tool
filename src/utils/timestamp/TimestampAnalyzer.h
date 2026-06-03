@@ -1,10 +1,9 @@
 /**
  * @file TimestampAnalyzer.h
- * @brief 时间戳转换分析器
- * @author Serial Tool Team
- * @date 2026-06-02
+ * @brief 时间戳转换分析器 - 提供Unix时间戳与日期时间的相互转换
  *
- * 提供 Unix 时间戳与日期时间之间的相互转换。
+ * 支持秒级/毫秒级时间戳转换、相对时间格式化、时间差计算。
+ * 纯计算工具类，无外部状态依赖。
  */
 
 #ifndef TIMESTAMPANALYZER_H
@@ -15,64 +14,47 @@
 #include <QString>
 
 /**
- * @class TimestampAnalyzer
- * @brief 时间戳转换引擎，纯计算无状态
+ * @brief 时间戳转换引擎
+ *
+ * 提供时间戳解析、转换和格式化功能。
+ * 跟踪累计转换次数供统计面板使用。
  */
 class TimestampAnalyzer : public QObject
 {
     Q_OBJECT
 
 public:
-    /**
-     * @brief 构造函数
-     * @param parent 父对象
-     */
+    /** @brief 构造函数 */
     explicit TimestampAnalyzer(QObject *parent = nullptr);
 
-    /**
-     * @brief Unix 时间戳转日期时间
-     * @param timestamp Unix 时间戳（秒或毫秒）
-     * @param isMillis 是否为毫秒级时间戳
-     * @return 对应的日期时间
-     */
+    /** @brief Unix时间戳转日期时间 */
     QDateTime unixToDatetime(qint64 timestamp, bool isMillis = false) const;
 
-    /**
-     * @brief 日期时间转 Unix 时间戳
-     * @param datetime 日期时间
-     * @param asMillis 是否输出毫秒级时间戳
-     * @return Unix 时间戳
-     */
+    /** @brief 日期时间转Unix时间戳 */
     qint64 datetimeToUnix(const QDateTime &datetime, bool asMillis = false) const;
 
-    /**
-     * @brief 获取当前 Unix 时间戳
-     * @param millis 是否返回毫秒级
-     * @return 当前时间戳
-     */
+    /** @brief 获取当前Unix时间戳 */
     static qint64 currentUnix(bool millis = false);
 
-    /**
-     * @brief 解析时间戳字符串
-     * @param text 时间戳文本（秒/毫秒/ISO日期）
-     * @return 解析后的日期时间
-     */
+    /** @brief 解析时间戳字符串 */
     QDateTime parseTimestamp(const QString &text) const;
 
-    /**
-     * @brief 格式化相对时间（如"3分钟前"、"2小时前"）
-     * @param datetime 目标日期时间
-     * @return 相对时间描述字符串
-     */
+    /** @brief 格式化相对时间（如"3分钟前"） */
     static QString formatRelativeTime(const QDateTime& datetime);
 
-    /**
-     * @brief 计算两个时间点之间的差异
-     * @param from 起始时间
-     * @param to 结束时间
-     * @return 格式化的差异字符串（如"2天3小时15分钟"）
-     */
+    /** @brief 计算两个时间点之间的差异 */
     static QString formatDifference(const QDateTime& from, const QDateTime& to);
+
+    /** @brief 获取累计转换次数 */
+    quint64 totalConversions() const;
+    /** @brief 获取累计解析次数 */
+    quint64 totalParses() const;
+    /** @brief 重置统计计数器 */
+    void resetStats();
+
+private:
+    mutable quint64 m_totalConversions = 0; ///< 累计转换次数
+    mutable quint64 m_totalParses = 0;      ///< 累计解析次数
 };
 
 #endif // TIMESTAMPANALYZER_H

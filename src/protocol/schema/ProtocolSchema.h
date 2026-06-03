@@ -145,12 +145,30 @@ public:
      */
     void setValid(bool valid);
 
+    /* —— 统计计数器接口 —— */
+
+    /** @brief 获取已加载的协议定义总数 */
+    quint64 totalSchemas() const;
+
+    /** @brief 获取所有已加载协议的字段总数 */
+    quint64 totalFieldCount() const;
+
+    /** @brief 获取历史最大协议定义大小(字节数) */
+    quint64 maxSchemaSize() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
 private:
     QString m_name;                     ///< 协议名称
     FramingRule m_framing;              ///< 帧定界规则
     QList<FieldDefinition> m_fields;    ///< 字段定义列表
     bool m_valid = false;               ///< 协议是否有效
     QString m_lastError;                ///< 最近一次解析错误信息
+
+    quint64 m_totalSchemas = 0;         ///< 已加载的协议定义总数
+    quint64 m_totalFieldCount = 0;      ///< 所有已加载协议的字段总数
+    quint64 m_maxSchemaSize = 0;        ///< 历史最大协议定义大小(字节)
 
     /**
      * @brief 将校验类型枚举转换为字符串

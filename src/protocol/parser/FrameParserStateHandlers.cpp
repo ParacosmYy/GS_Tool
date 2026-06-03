@@ -35,6 +35,7 @@ void FrameParser::processByte(unsigned char byte)
     if (m_buffer.size() >= effectiveMax) {
         QByteArray discarded = m_buffer;
         m_errorCount++;
+        ++m_totalOverflows;
         resetIntermediateState();
 
         emit frameError(
@@ -199,6 +200,7 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
     if (!m_def.footer.isEmpty()) {
         if (m_buffer.size() > effectiveMax) {
             m_errorCount++;
+            ++m_totalOverflows;
             emit frameError(
                 tr("帧缓冲区 (%1) 超过最大值 (%2)，搜索帧尾时溢出")
                     .arg(m_buffer.size()).arg(effectiveMax),

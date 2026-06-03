@@ -113,6 +113,8 @@ void ProtocolEngine::reset()
     m_parseErrors = 0;
     m_framesRejected = 0;
     m_totalBytesProcessed = 0;
+    m_totalValidations = 0;
+    m_totalParseErrors = 0;
     m_lastParseTimestamp = 0;
 }
 
@@ -171,6 +173,24 @@ quint64 ProtocolEngine::totalBytesProcessed() const
 }
 
 /**
+ * @brief 获取校验验证执行总次数(含通过和失败)
+ * @return 验证总次数
+ */
+quint64 ProtocolEngine::totalValidations() const
+{
+    return m_totalValidations;
+}
+
+/**
+ * @brief 获取解析错误总数(64位，含校验失败/格式错/溢出)
+ * @return 错误总数
+ */
+quint64 ProtocolEngine::totalParseErrors() const
+{
+    return m_totalParseErrors;
+}
+
+/**
  * @brief 获取最后一次成功解析的时间戳
  * @return 毫秒级时间戳（自Unix纪元起），尚未解析过时返回0
  */
@@ -191,7 +211,17 @@ void ProtocolEngine::resetParseStatistics()
     m_parseErrors = 0;
     m_framesRejected = 0;
     m_totalBytesProcessed = 0;
+    m_totalValidations = 0;
+    m_totalParseErrors = 0;
     m_lastParseTimestamp = 0;
+}
+
+/**
+ * @brief 重置所有统计计数器(等同于resetParseStatistics)
+ */
+void ProtocolEngine::resetStats()
+{
+    resetParseStatistics();
 }
 
 /* ============================================================================
@@ -243,6 +273,7 @@ bool ProtocolEngine::tryParseOneFrame()
     if (frameLength <= 0) {
         emit parseError(tr("帧长度无效: %1").arg(frameLength));
         ++m_parseErrors;
+        ++m_totalParseErrors;
         ++m_framesRejected;
         /* 跳过当前帧头的第一个字节，重新搜索 */
         m_buffer.remove(0, 1);
@@ -262,9 +293,11 @@ bool ProtocolEngine::tryParseOneFrame()
     /* ---- 步骤6：校验和/CRC验证 ---- */
     if (framing.checksumType != ProtocolSchema::ChecksumType::None) {
         bool checksumValid = validateChecksum(rawFrame, framing);
+        ++m_totalValidations;
         if (!checksumValid) {
             emit parseError(tr("帧校验失败"));
             ++m_parseErrors;
+            ++m_totalParseErrors;
             ++m_framesRejected;
             return true;
         }

@@ -33,21 +33,30 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
 {
     if (lines.isEmpty() || filePath.isEmpty()) return false;
 
+    ++m_totalExports;
     QVector<TerminalLine> filtered = filterByTime(lines, from, to);
     if (filtered.isEmpty()) return false;
 
+    bool ok = false;
     switch (format) {
-    case Plain:       return exportPlain(filePath, filtered);
-    case HexDump:     return exportHexDump(filePath, filtered);
-    case Csv:         return exportCsv(filePath, filtered);
-    case Timestamped: return exportTimestamped(filePath, filtered);
-    case Bin:         return exportBin(filePath, filtered);
-    case Json:        return exportJson(filePath, filtered);
+    case Plain:       ok = exportPlain(filePath, filtered); break;
+    case HexDump:     ok = exportHexDump(filePath, filtered); break;
+    case Csv:         ok = exportCsv(filePath, filtered); break;
+    case Timestamped: ok = exportTimestamped(filePath, filtered); break;
+    case Bin:         ok = exportBin(filePath, filtered); break;
+    case Json:        ok = exportJson(filePath, filtered); break;
     default:
+        ++m_totalErrors;
         emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
         return false;
     }
-    return false;
+    if (ok) {
+        for (const auto& line : filtered)
+            m_totalBytesExported += static_cast<quint64>(line.data.size());
+    } else {
+        ++m_totalErrors;
+    }
+    return ok;
 }
 
 // ---- 辅助方法 ----
@@ -303,4 +312,32 @@ QString DataExporter::formatHexDumpLine(const QByteArray& data, quint64 address)
         }
     }
     return QString("%1 | %2 | %3").arg(addrStr, hexPart, toAsciiString(data));
+}
+
+// ---- 会话统计 ----
+
+/** @brief 获取累计导出操作总次数 @return 导出次数 */
+quint64 DataExporter::totalExports() const
+{
+    return m_totalExports;
+}
+
+/** @brief 获取累计导出的字节总数 @return 字节数 */
+quint64 DataExporter::totalBytesExported() const
+{
+    return m_totalBytesExported;
+}
+
+/** @brief 获取累计导出失败次数 @return 失败次数 */
+quint64 DataExporter::totalErrors() const
+{
+    return m_totalErrors;
+}
+
+/** @brief 重置所有会话统计计数器 */
+void DataExporter::resetStats()
+{
+    m_totalExports = 0;
+    m_totalBytesExported = 0;
+    m_totalErrors = 0;
 }

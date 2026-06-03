@@ -82,8 +82,9 @@ void ProtocolBridgeManager::setProtocolMode(ChartProtocolMode mode)
         m_frameParser->reset();
     }
 
-    // 切换模式
+    // 切换模式并累加桥接器切换计数
     m_mode = mode;
+    ++m_totalBridges;
 
     // 重新连接信号
     switchSource();
@@ -119,6 +120,9 @@ void ProtocolBridgeManager::feedData(const QByteArray& data)
     if (data.isEmpty()) {
         return;
     }
+
+    // 累加处理字节统计
+    m_totalBytesProcessed += static_cast<quint64>(data.size());
 
     switch (m_mode) {
     case ChartProtocolMode::FrameParser:
@@ -289,8 +293,9 @@ void ProtocolBridgeManager::switchActiveBridge(ChartProtocolMode mode)
     // 注意: 不重置旧源状态，保留中间数据
     // 这允许快速来回切换而不丢失正在解析的帧
 
-    // 切换模式
+    // 切换模式并累加桥接器切换计数
     m_mode = mode;
+    ++m_totalBridges;
 
     // 重新连接信号
     switchSource();
@@ -303,6 +308,7 @@ void ProtocolBridgeManager::switchActiveBridge(ChartProtocolMode mode)
  * @brief 重置所有桥接器的错误和帧计数统计
  *
  * 将所有桥接器的累计计数器归零。不影响当前运行状态。
+ * 同时重置管理器级统计（桥接器切换、总帧数、总错误数、处理字节数）。
  * FrameParser 自身的计数器也一并重置。
  */
 void ProtocolBridgeManager::resetStats()
@@ -311,11 +317,44 @@ void ProtocolBridgeManager::resetStats()
     m_totalErrors = 0;
     m_checksumErrors = 0;
 
+    // 重置管理器级统计
+    m_totalBridges = 0;
+    m_totalFramesParsedAll = 0;
+    m_totalParseErrors = 0;
+    m_totalBytesProcessed = 0;
+
     // 重置 FrameParser 的内部计数器
     if (m_frameParser) {
-        // FrameParser::reset() 不清零计数器，
-        // 这里无法直接重置，统计仍以 FrameParser 自身为准
+        m_frameParser->resetStats();
     }
+}
+
+// ============================================================================
+// 管理器级统计接口
+// ============================================================================
+
+/** @brief 获取累计桥接器切换次数 @return 切换次数 */
+quint64 ProtocolBridgeManager::totalBridges() const
+{
+    return m_totalBridges;
+}
+
+/** @brief 获取所有协议源累计解析的总帧数（含所有模式） @return 总帧数 */
+quint64 ProtocolBridgeManager::totalFramesParsedAll() const
+{
+    return m_totalFramesParsedAll;
+}
+
+/** @brief 获取所有协议源累计解析错误总数（含所有模式） @return 总错误数 */
+quint64 ProtocolBridgeManager::totalParseErrors() const
+{
+    return m_totalParseErrors;
+}
+
+/** @brief 获取累计处理的字节总数 @return 字节数 */
+quint64 ProtocolBridgeManager::totalBytesProcessed() const
+{
+    return m_totalBytesProcessed;
 }
 
 // ============================================================================
@@ -327,12 +366,12 @@ void ProtocolBridgeManager::resetStats()
  * @param fields 字段映射
  * @param rawFrame 原始帧数据
  *
- * 转发 frameParsed 信号给下游消费者。
- * FrameParser 的帧计数由其内部管理，此处不再重复累加。
+ * 累加总帧数统计后转发 frameParsed 信号给下游消费者。
  */
 void ProtocolBridgeManager::onFrameParserParsed(
     const QVariantMap& fields, const QByteArray& rawFrame)
 {
+    ++m_totalFramesParsedAll;
     emit frameParsed(fields, rawFrame);
 }
 

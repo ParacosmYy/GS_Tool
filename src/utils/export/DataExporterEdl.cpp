@@ -22,6 +22,8 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
                                 qint64 fromMs, qint64 toMs)
 {
     if (edlPath.isEmpty() || outPath.isEmpty()) return false;
+
+    ++m_totalExports;
     if (fromMs >= 0 && toMs >= 0 && fromMs > toMs) return false;
 
     QVector<TerminalLine> lines = readEdlRange(edlPath, fromMs, toMs);
@@ -36,6 +38,7 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
     case Bin:         return exportBin(outPath, lines);
     case Json:        return exportJson(outPath, lines);
     default:
+        ++m_totalErrors;
         emit exportError(outPath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
         return false;
     }
