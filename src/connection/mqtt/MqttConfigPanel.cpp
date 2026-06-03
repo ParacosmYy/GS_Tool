@@ -110,3 +110,40 @@ void MqttConfigPanel::setConnected(bool connected)
     m_keepAliveSpin->setEnabled(!connected);
     m_cleanSessionCheck->setEnabled(!connected);
 }
+
+/**
+ * @brief 保存MQTT配置到QSettings
+ * @param settings QSettings对象
+ */
+void MqttConfigPanel::saveSettings(QSettings& settings) const
+{
+    settings.setValue(QStringLiteral("mqtt/host"), m_hostEdit->text());
+    settings.setValue(QStringLiteral("mqtt/port"), m_portSpin->value());
+    settings.setValue(QStringLiteral("mqtt/clientId"), m_clientIdEdit->text());
+    settings.setValue(QStringLiteral("mqtt/username"), m_usernameEdit->text());
+    settings.setValue(QStringLiteral("mqtt/keepAlive"), m_keepAliveSpin->value());
+    settings.setValue(QStringLiteral("mqtt/cleanSession"),
+                      m_cleanSessionCheck->isChecked());
+    /* 不保存密码到明文设置 — 安全考虑 */
+}
+
+/**
+ * @brief 从QSettings加载MQTT配置
+ * @param settings QSettings对象
+ */
+void MqttConfigPanel::loadSettings(QSettings& settings)
+{
+    m_hostEdit->setText(
+        settings.value(QStringLiteral("mqtt/host"),
+                       QStringLiteral("broker.emqx.io")).toString());
+    m_portSpin->setValue(
+        settings.value(QStringLiteral("mqtt/port"), 1883).toInt());
+    m_clientIdEdit->setText(
+        settings.value(QStringLiteral("mqtt/clientId")).toString());
+    m_usernameEdit->setText(
+        settings.value(QStringLiteral("mqtt/username")).toString());
+    m_keepAliveSpin->setValue(
+        settings.value(QStringLiteral("mqtt/keepAlive"), 60).toInt());
+    m_cleanSessionCheck->setChecked(
+        settings.value(QStringLiteral("mqtt/cleanSession"), true).toBool());
+}

@@ -121,3 +121,28 @@ void WsConfigPanel::setupConnections()
             tr("例如: 192.168.1.100:8080/ws (%1)").arg(scheme));
     });
 }
+
+/**
+ * @brief 保存WebSocket配置到QSettings
+ * @param settings QSettings对象
+ */
+void WsConfigPanel::saveSettings(QSettings& settings) const
+{
+    settings.setValue(QStringLiteral("ws/type"), m_typeCombo->currentIndex());
+    settings.setValue(QStringLiteral("ws/url"), m_urlEdit->text());
+    settings.setValue(QStringLiteral("ws/protocol"), m_protocolEdit->text());
+}
+
+/**
+ * @brief 从QSettings加载WebSocket配置
+ * @param settings QSettings对象
+ */
+void WsConfigPanel::loadSettings(QSettings& settings)
+{
+    m_typeCombo->setCurrentIndex(
+        settings.value(QStringLiteral("ws/type"), 0).toInt());
+    m_urlEdit->setText(
+        settings.value(QStringLiteral("ws/url")).toString());
+    m_protocolEdit->setText(
+        settings.value(QStringLiteral("ws/protocol")).toString());
+}

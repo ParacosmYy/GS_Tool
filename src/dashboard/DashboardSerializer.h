@@ -11,6 +11,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QList>
 #include <QMap>
 #include <QVariant>
@@ -85,6 +86,39 @@ public:
 
     /** @brief 获取当前文件版本号 */
     static int currentVersion();
+
+    /**
+     * @brief 验证布局配置的有效性
+     * @param items 面板配置列表
+     * @param columns 网格列数
+     * @return 错误信息列表，空列表表示验证通过
+     */
+    QStringList validateLayout(const QList<DashboardItemConfig>& items,
+                               int columns) const;
+
+    /**
+     * @brief 列出目录中所有布局文件
+     * @param dirPath 目录路径
+     * @return 文件路径列表
+     */
+    QStringList listLayoutFiles(const QString& dirPath) const;
+
+    /**
+     * @brief 删除指定布局文件（创建备份后删除）
+     * @param filePath 布局文件路径
+     * @return true 删除成功
+     */
+    bool deleteLayout(const QString& filePath);
+
+signals:
+    /** @brief 布局保存完成信号 */
+    void layoutSaved(const QString& filePath);
+
+    /** @brief 布局加载完成信号 */
+    void layoutLoaded(const QString& name, int itemCount);
+
+    /** @brief 布局验证失败信号 */
+    void validationFailed(const QStringList& errors);
 
 private:
     QString m_lastError;

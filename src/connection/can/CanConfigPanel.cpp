@@ -80,3 +80,37 @@ void CanConfigPanel::setConnected(bool connected)
     m_adapterCombo->setEnabled(!connected);
     m_bitrateCombo->setEnabled(!connected);
 }
+
+/**
+ * @brief 保存CAN配置到QSettings
+ * @param settings QSettings对象
+ */
+void CanConfigPanel::saveSettings(QSettings& settings) const
+{
+    settings.setValue(QStringLiteral("can/adapter"),
+                     m_adapterCombo->currentData().toString());
+    settings.setValue(QStringLiteral("can/bitrateIndex"),
+                     m_bitrateCombo->currentIndex());
+    settings.setValue(QStringLiteral("can/canFd"),
+                     m_canFdCheck->isChecked());
+}
+
+/**
+ * @brief 从QSettings加载CAN配置
+ * @param settings QSettings对象
+ */
+void CanConfigPanel::loadSettings(QSettings& settings)
+{
+    const QString adapter = settings.value(
+        QStringLiteral("can/adapter")).toString();
+    if (!adapter.isEmpty()) {
+        const int idx = m_adapterCombo->findData(adapter);
+        if (idx >= 0) {
+            m_adapterCombo->setCurrentIndex(idx);
+        }
+    }
+    m_bitrateCombo->setCurrentIndex(
+        settings.value(QStringLiteral("can/bitrateIndex"), 2).toInt());
+    m_canFdCheck->setChecked(
+        settings.value(QStringLiteral("can/canFd"), false).toBool());
+}

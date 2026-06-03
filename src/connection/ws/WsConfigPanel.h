@@ -16,6 +16,7 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QPushButton>
+#include <QSettings>
 #include <QVBoxLayout>
 #include <QVariant>
 
@@ -44,6 +45,18 @@ public:
      * @param connected true=已连接
      */
     void setConnected(bool connected);
+
+    /**
+     * @brief 保存配置到QSettings
+     * @param settings QSettings对象（调用方管理生命周期）
+     */
+    void saveSettings(QSettings& settings) const;
+
+    /**
+     * @brief 从QSettings加载配置
+     * @param settings QSettings对象
+     */
+    void loadSettings(QSettings& settings);
 
 signals:
     /** @brief 用户请求连接 */
