@@ -72,15 +72,7 @@
 #include "core/device/DeviceProfilePanel.h"
 #include "utils/perf/PerformanceOverlay.h"
 
-/**
- * @brief 创建所有面板 widget（调用一次，在 MainWindow::setupUI 中）
- *
- * @param otaManager     OTA 管理器指针，OtaWidget 构造时注入
- * @param terminalModel  终端数据模型指针，TerminalWidget 需要设置此模型
- *
- * 所有面板初始状态为隐藏（setVisible(false)），由 NavigationController 按需显示。
- * 终端面板（m_terminal）为默认可见面板，不隐藏。
- */
+/** @brief 创建所有面板widget，在MainWindow::setupUI中调用一次，所有面板初始状态为隐藏由NavigationController按需显示 @param otaManager OTA管理器指针，OtaWidget构造时注入 @param terminalModel 终端数据模型指针，TerminalWidget需要设置此模型 */
 void PanelManager::createPanels(OtaManager* otaManager, TerminalModel* terminalModel)
 {
     QWidget* widgetParent = qobject_cast<QWidget*>(parent());

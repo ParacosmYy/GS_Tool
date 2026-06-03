@@ -19,13 +19,7 @@
 #include "chart/model/ChartModel.h"
 #include "core/widgets/ToastWidget.h"
 
-/**
- * @brief 工具栏和录制状态消息信号连接
- *
- * 包含: ToolbarController → TerminalController/SettingsController 的工具栏事件，
- *       TerminalController/RecordingController 状态消息 → 状态栏/吐司，
- *       录制回放数据写入终端。
- */
+/** @brief 工具栏和录制状态消息信号连接，包含ToolbarController到TerminalController/SettingsController的工具栏事件路由、状态消息到状态栏/吐司通知、回放数据写入终端 */
 void MainWindow::connectToolbarSignals()
 {
     // ---- 工具栏信号 → 委托给 TerminalController ----
@@ -77,14 +71,7 @@ void MainWindow::connectToolbarSignals()
             });
 }
 
-/**
- * @brief 搜索栏、协议桥、帧编辑器和导航树信号连接
- *
- * 包含: TerminalSearchBar → TerminalController 搜索处理，
- *       ProtocolBridgeManager → ProtocolView/ChartModel 协议数据分发，
- *       FrameVisualEditor → FrameParser 帧定义更新，
- *       导航树点击 → 面板切换。
- */
+/** @brief 搜索栏、协议桥、帧编辑器和导航树信号连接，包含搜索请求路由、协议数据分发、帧定义更新和面板切换动画 */
 void MainWindow::connectSearchAndProtocolSignals()
 {
     // 搜索栏 → TerminalController 搜索处理

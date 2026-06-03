@@ -13,16 +13,7 @@
 quint64 TerminalSearchRenderer::s_totalRenders = 0;
 quint64 TerminalSearchRenderer::s_totalHighlights = 0;
 
-/** @brief 在终端绘制搜索高亮矩形(遍历匹配位置→计算字符偏移→填充高亮色)
- * @param painter QPainter引用
- * @param fontMetrics 字体度量(计算字符宽度)
- * @param searchManager 搜索管理器(提供匹配索引)
- * @param cached 当前行缓存(字符偏移列表)
- * @param displayLine 显示行号
- * @param textXOffset 文本X偏移
- * @param y 当前行Y坐标
- * @param lineHeight 行高
- */
+/** @brief 在终端绘制搜索高亮矩形，遍历匹配位置并计算字符偏移后填充高亮色 @param painter QPainter引用，用于绘制高亮矩形 @param fontMetrics 字体度量，用于计算字符宽度 @param searchManager 搜索管理器，提供匹配索引列表 @param cached 当前行缓存，包含字符偏移列表 @param displayLine 当前绘制行的显示行号 @param textXOffset 文本区域X偏移量 @param y 当前行Y坐标 @param lineHeight 行高 @param showDirectionPrefix 是否显示方向前缀[TX:]/[RX:] */
 void TerminalSearchRenderer::drawHighlights(
     QPainter& painter,
     const QFontMetrics& fontMetrics,
@@ -81,9 +72,7 @@ void TerminalSearchRenderer::drawHighlights(
     s_totalHighlights += highlightCount;
 }
 
-/**
- * @brief 重置所有静态统计计数器为零
- */
+/** @brief 重置所有静态统计计数器为零 */
 void TerminalSearchRenderer::resetStatistics()
 {
     s_totalRenders = 0;

@@ -50,7 +50,6 @@ SchemaViewer::SchemaViewer(QWidget* parent)
 /**
  * @brief 加载并解析Schema文件
  * @param filePath 文件路径(.proto或.fbs)
- * @param type 文件类型("proto"或"fbs")
  *
  * 读取文件内容，根据类型调用对应解析器填充模式树。
  */
@@ -150,13 +149,13 @@ void SchemaViewer::parseFbsContent(const QString& content) {
     }
 }
 
-/** @brief 获取累计加载Schema次数 */
+/** @brief 获取累计加载Schema次数 @return 加载次数 */
 quint64 SchemaViewer::totalSchemasLoaded() const
 {
     return m_totalSchemasLoaded;
 }
 
-/** @brief 获取累计字段展开次数 */
+/** @brief 获取累计字段展开次数 @return 展开次数 */
 quint64 SchemaViewer::totalFieldExpansions() const
 {
     return m_totalFieldExpansions;

@@ -15,7 +15,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-/** @brief 构造终端布局管理器 @param parent 父对象 */
+/** @brief 构造终端布局管理器，创建容器Widget并初始化默认混合布局 @param parent 父对象(通常为MainWindow) */
 TerminalLayoutManager::TerminalLayoutManager(QObject* parent)
     : QObject(parent)
     , m_mainTerminal(nullptr)
@@ -56,25 +56,25 @@ void TerminalLayoutManager::initialize(TerminalWidget* mainTerminal, TerminalSea
     applyLayout();
 }
 
-/** @brief 设置共享的数据模型(分栏终端与主终端共用) @param model TerminalModel指针 */
+/** @brief 设置共享的数据模型，分栏终端与主终端共用同一个TerminalModel @param model TerminalModel指针 */
 void TerminalLayoutManager::setTerminalModel(TerminalModel* model)
 {
     m_model = model;
 }
 
-/** @brief 返回终端容器Widget @return 容器Widget指针 */
+/** @brief 返回终端容器Widget @return 容器Widget指针，所有终端组件的父容器 */
 QWidget* TerminalLayoutManager::container() const
 {
     return m_container;
 }
 
-/** @brief 返回当前布局模式 @return TerminalLayout枚举值 */
+/** @brief 返回当前布局模式 @return TerminalLayout枚举值(Mixed/SplitHorizontal/SplitVertical) */
 TerminalLayout TerminalLayoutManager::layout() const
 {
     return m_layout;
 }
 
-/** @brief 返回当前布局下的所有终端控件列表 @return 终端控件指针列表(混合模式返回主终端，分栏模式返回RX/TX终端) */
+/** @brief 返回当前布局下的所有终端控件列表，混合模式返回主终端，分栏模式返回RX/TX终端 @return 终端控件指针列表 */
 QList<TerminalWidget*> TerminalLayoutManager::terminalWidgets() const
 {
     if (m_layout == TerminalLayout::Mixed) {
@@ -84,7 +84,7 @@ QList<TerminalWidget*> TerminalLayoutManager::terminalWidgets() const
     }
 }
 
-/** @brief 返回主要终端控件(混合模式返回主终端，分栏模式返回RX终端) @return 主终端控件指针 */
+/** @brief 返回主要终端控件，混合模式返回主终端，分栏模式返回RX终端 @return 主终端控件指针 */
 TerminalWidget* TerminalLayoutManager::primaryTerminal() const
 {
     if (m_layout == TerminalLayout::Mixed) {
@@ -95,7 +95,7 @@ TerminalWidget* TerminalLayoutManager::primaryTerminal() const
 
 // ---- 统计计数器实现 ----
 
-/** @brief 获取布局切换总次数 @return 切换总次数 */
+/** @brief 获取布局切换总次数 @return 累计切换总次数 */
 quint64 TerminalLayoutManager::totalSwitches() const
 {
     return m_totalSwitches;
@@ -107,7 +107,7 @@ quint64 TerminalLayoutManager::totalLinesCleared() const
     return m_totalLinesCleared;
 }
 
-/** @brief 获取历史最大可见行数 @return 最大可见行数 */
+/** @brief 获取历史最大可见行数 @return 最大可见行数峰值 */
 quint64 TerminalLayoutManager::maxVisibleLines() const
 {
     return m_maxVisibleLines;
@@ -124,13 +124,13 @@ void TerminalLayoutManager::resetStats()
     m_totalLayoutChanges = 0;
 }
 
-/** @brief 通知行清除事件，累加清除行数 @param lines 本次清除的行数 */
+/** @brief 通知行清除事件，累加清除行数到统计计数器 @param lines 本次清除的行数 */
 void TerminalLayoutManager::notifyLinesCleared(quint64 lines)
 {
     m_totalLinesCleared += lines;
 }
 
-/** @brief 更新最大可见行数记录 @param currentVisible 当前可见行数 */
+/** @brief 更新最大可见行数记录，仅当当前值超过历史峰值时更新 @param currentVisible 当前可见行数 */
 void TerminalLayoutManager::updateMaxVisibleLines(quint64 currentVisible)
 {
     if (currentVisible > m_maxVisibleLines) {
@@ -144,19 +144,19 @@ quint64 TerminalLayoutManager::totalSplits() const
     return m_totalSplits;
 }
 
-/** @brief 获取Tab切换总次数 @return 累计切换次数 */
+/** @brief 获取Tab切换总次数 @return 累计Tab切换次数 */
 quint64 TerminalLayoutManager::totalTabSwitches() const
 {
     return m_totalTabSwitches;
 }
 
-/** @brief 获取布局变更总次数 @return 累计变更次数 */
+/** @brief 获取布局变更总次数 @return 累计布局变更次数 */
 quint64 TerminalLayoutManager::totalLayoutChanges() const
 {
     return m_totalLayoutChanges;
 }
 
-/** @brief 通过下拉框索引设置布局模式(0=混合, 1=水平分栏, 2=垂直分栏) @param layoutIndex 下拉框索引 */
+/** @brief 通过下拉框索引设置布局模式，0=混合，1=水平分栏，2=垂直分栏 @param layoutIndex 下拉框索引 */
 void TerminalLayoutManager::setLayout(int layoutIndex)
 {
     // 下拉框索引映射: 0=Mixed, 1=SplitHorizontal, 2=SplitVertical
@@ -170,7 +170,7 @@ void TerminalLayoutManager::setLayout(int layoutIndex)
     }
 }
 
-/** @brief 设置布局模式并重新应用布局 @param layout 目标布局模式 */
+/** @brief 设置布局模式并重新应用布局，相同布局时跳过 @param layout 目标布局模式 */
 void TerminalLayoutManager::setLayout(TerminalLayout layout)
 {
     if (m_layout == layout) return;
@@ -180,7 +180,7 @@ void TerminalLayoutManager::setLayout(TerminalLayout layout)
     emit layoutChanged(m_layout);
 }
 
-/** @brief 应用当前布局模式(清空容器 -> 销毁旧分割器 -> 重建搜索栏和终端区域) */
+/** @brief 应用当前布局模式，清空容器、销毁旧分割器、重建搜索栏和终端区域 */
 void TerminalLayoutManager::applyLayout()
 {
     // 清空容器中的所有子widget
@@ -226,7 +226,7 @@ void TerminalLayoutManager::applyLayout()
     ++m_totalLayoutChanges;  ///< 统计: 每次应用布局递增
 }
 
-/** @brief 应用混合布局: 销毁分栏终端，恢复主终端无过滤状态 */
+/** @brief 应用混合布局，销毁分栏终端并恢复主终端无过滤状态 */
 void TerminalLayoutManager::applyMixedLayout()
 {
     auto* containerLayout = qobject_cast<QBoxLayout*>(m_container->layout());
@@ -252,7 +252,7 @@ void TerminalLayoutManager::applyMixedLayout()
     }
 }
 
-/** @brief 应用分栏布局: 创建RX/TX终端，用QSplitter分割 */
+/** @brief 应用分栏布局，创建RX/TX终端并用QSplitter分割 */
 void TerminalLayoutManager::applySplitLayout()
 {
     auto* containerLayout = qobject_cast<QBoxLayout*>(m_container->layout());
@@ -298,7 +298,7 @@ void TerminalLayoutManager::applySplitLayout()
     containerLayout->addWidget(m_splitter, 1);
 }
 
-/** @brief 创建分栏终端控件(设置共享模型、方向过滤、同步显示设置) @param direction 数据方向(RX/TX) @param label 终端标签 @return 新创建的终端控件指针 */
+/** @brief 创建分栏终端控件，设置共享模型、方向过滤和同步显示设置 @param direction 数据方向(RX/TX) @param label 终端标签 @return 新创建的终端控件指针 */
 TerminalWidget* TerminalLayoutManager::createSplitTerminal(DataDirection direction, const QString& label)
 {
     Q_UNUSED(label);
@@ -324,7 +324,7 @@ TerminalWidget* TerminalLayoutManager::createSplitTerminal(DataDirection directi
     return terminal;
 }
 
-/** @brief 将主终端的显示设置同步到目标终端(显示模式、时间戳、方向前缀、自动滚动) @param target 目标终端控件指针 */
+/** @brief 将主终端的显示设置同步到目标终端，包括显示模式、时间戳、方向前缀和自动滚动 @param target 目标终端控件指针 */
 void TerminalLayoutManager::syncDisplaySettings(TerminalWidget* target) const
 {
     if (!target) return;

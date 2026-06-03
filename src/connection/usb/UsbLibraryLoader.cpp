@@ -14,17 +14,20 @@
 
 /* ---- 单例 ---- */
 
+/** @brief 获取UsbLibraryLoader的单例引用 @return 全局唯一实例的引用 */
 UsbLibraryLoader& UsbLibraryLoader::instance()
 {
     static UsbLibraryLoader loader;
     return loader;
 }
 
+/** @brief 构造UsbLibraryLoader @param parent 父QObject指针 */
 UsbLibraryLoader::UsbLibraryLoader(QObject* parent)
     : QObject(parent)
 {
 }
 
+/** @brief 析构时卸载已加载的USB库 */
 UsbLibraryLoader::~UsbLibraryLoader()
 {
     unload();
@@ -32,6 +35,7 @@ UsbLibraryLoader::~UsbLibraryLoader()
 
 /* ---- 加载/卸载 ---- */
 
+/** @brief 动态加载libusb库并解析函数指针 @param libraryPath 库文件路径，为空时自动搜索 @return 加载成功返回true */
 bool UsbLibraryLoader::load(const QString& libraryPath)
 {
     QMutexLocker locker(&m_mutex);
@@ -72,6 +76,7 @@ bool UsbLibraryLoader::load(const QString& libraryPath)
     return setError(tr("未找到libusb共享库"));
 }
 
+/** @brief 卸载已加载的USB库，清空所有函数指针 */
 void UsbLibraryLoader::unload()
 {
     QMutexLocker locker(&m_mutex);
@@ -96,16 +101,19 @@ void UsbLibraryLoader::unload()
     emit loadStateChanged(false);
 }
 
+/** @brief 检查USB库是否已成功加载 @return 已加载返回true */
 bool UsbLibraryLoader::isLoaded() const
 {
     return m_loaded;
 }
 
+/** @brief 获取最后一次错误信息 @return 错误描述字符串 */
 QString UsbLibraryLoader::lastError() const
 {
     return m_lastError;
 }
 
+/** @brief 获取已加载库的版本描述字符串 @return 版本信息 */
 QString UsbLibraryLoader::versionString() const
 {
     if (!m_loaded) { return tr("libusb未加载"); }
@@ -114,18 +122,21 @@ QString UsbLibraryLoader::versionString() const
 
 /* ---- 函数指针包装器 ---- */
 
+/** @brief 初始化libusb上下文 @param ctx 输出的libusb上下文指针 @return 0表示成功 */
 int UsbLibraryLoader::init(UsbContext** ctx)
 {
     if (!m_fnInit) { setError(tr("libusb_init未解析")); return -1; }
     return m_fnInit(ctx);
 }
 
+/** @brief 释放libusb上下文 @param ctx 要释放的libusb上下文指针 */
 void UsbLibraryLoader::exit(UsbContext* ctx)
 {
     if (!m_fnExit) { return; }
     m_fnExit(ctx);
 }
 
+/** @brief 通过VID/PID打开USB设备 @param ctx libusb上下文 @param vid 厂商ID @param pid 产品ID @return 设备句柄指针 */
 UsbDeviceHandle* UsbLibraryLoader::openDeviceWithVidPid(
     UsbContext* ctx, quint16 vid, quint16 pid)
 {
@@ -133,24 +144,28 @@ UsbDeviceHandle* UsbLibraryLoader::openDeviceWithVidPid(
     return m_fnOpen(ctx, vid, pid);
 }
 
+/** @brief 关闭USB设备句柄 @param handle 要关闭的设备句柄 */
 void UsbLibraryLoader::close(UsbDeviceHandle* handle)
 {
     if (!m_fnClose) { return; }
     m_fnClose(handle);
 }
 
+/** @brief 声明USB接口 @param handle 设备句柄 @param interfaceNum 接口编号 @return 0表示成功 */
 int UsbLibraryLoader::claimInterface(UsbDeviceHandle* handle, int interfaceNum)
 {
     if (!m_fnClaim) { setError(tr("libusb_claim_interface未解析")); return -1; }
     return m_fnClaim(handle, interfaceNum);
 }
 
+/** @brief 释放USB接口 @param handle 设备句柄 @param interfaceNum 接口编号 @return 0表示成功 */
 int UsbLibraryLoader::releaseInterface(UsbDeviceHandle* handle, int interfaceNum)
 {
     if (!m_fnRelease) { setError(tr("libusb_release_interface未解析")); return -1; }
     return m_fnRelease(handle, interfaceNum);
 }
 
+/** @brief 执行USB批量传输 @param handle 设备句柄 @param endpoint 端点地址 @param data 数据缓冲区 @param length 缓冲区长度 @param transferred 输出实际传输字节数 @param timeout 超时(ms) @return 0表示成功 */
 int UsbLibraryLoader::bulkTransfer(UsbDeviceHandle* handle,
                                     unsigned char endpoint,
                                     unsigned char* data, int length,
@@ -160,6 +175,7 @@ int UsbLibraryLoader::bulkTransfer(UsbDeviceHandle* handle,
     return m_fnBulk(handle, endpoint, data, length, transferred, timeout);
 }
 
+/** @brief 执行USB中断传输 @param handle 设备句柄 @param endpoint 端点地址 @param data 数据缓冲区 @param length 缓冲区长度 @param transferred 输出实际传输字节数 @param timeout 超时(ms) @return 0表示成功 */
 int UsbLibraryLoader::interruptTransfer(UsbDeviceHandle* handle,
                                          unsigned char endpoint,
                                          unsigned char* data, int length,
@@ -169,6 +185,7 @@ int UsbLibraryLoader::interruptTransfer(UsbDeviceHandle* handle,
     return m_fnInterrupt(handle, endpoint, data, length, transferred, timeout);
 }
 
+/** @brief 执行USB控制传输 @param handle 设备句柄 @param requestType 请求类型 @param request 请求代码 @param value 值字段 @param index 索引字段 @param data 数据缓冲区 @param length 数据长度 @param timeout 超时(ms) @return 实际传输字节数 */
 int UsbLibraryLoader::controlTransfer(UsbDeviceHandle* handle,
                                        quint8 requestType, quint8 request,
                                        quint16 value, quint16 index,
@@ -180,6 +197,7 @@ int UsbLibraryLoader::controlTransfer(UsbDeviceHandle* handle,
                        data, length, timeout);
 }
 
+/** @brief 通过设备句柄获取设备描述符 @param handle 设备句柄 @param desc 输出的设备描述符 @return 0表示成功 */
 int UsbLibraryLoader::getDeviceDescriptor(UsbDeviceHandle* handle,
                                            UsbDeviceDescriptor* desc)
 {
@@ -192,6 +210,7 @@ int UsbLibraryLoader::getDeviceDescriptor(UsbDeviceHandle* handle,
     return getDeviceDescriptorFromDevice(device, desc);
 }
 
+/** @brief 从设备句柄获取底层libusb_device指针 @param handle 设备句柄 @return libusb_device指针 */
 void* UsbLibraryLoader::getDevice(UsbDeviceHandle* handle)
 {
     if (!m_fnGetDevice) {
@@ -201,6 +220,7 @@ void* UsbLibraryLoader::getDevice(UsbDeviceHandle* handle)
     return m_fnGetDevice(handle);
 }
 
+/** @brief 从libusb_device指针获取设备描述符 @param device 设备指针 @param desc 输出的设备描述符 @return 0表示成功 */
 int UsbLibraryLoader::getDeviceDescriptorFromDevice(void* device,
                                                      UsbDeviceDescriptor* desc)
 {
@@ -211,6 +231,7 @@ int UsbLibraryLoader::getDeviceDescriptorFromDevice(void* device,
     return m_fnGetDeviceDesc(device, desc);
 }
 
+/** @brief 获取USB字符串描述符(ASCII编码) @param handle 设备句柄 @param descIndex 描述符索引 @param buffer 输出缓冲区 @param bufferSize 缓冲区大小 @return 实际写入字节数 */
 int UsbLibraryLoader::getStringDescriptorAscii(UsbDeviceHandle* handle,
                                                 quint8 descIndex,
                                                 char* buffer, int bufferSize)
@@ -219,6 +240,7 @@ int UsbLibraryLoader::getStringDescriptorAscii(UsbDeviceHandle* handle,
     return m_fnGetString(handle, descIndex, buffer, bufferSize);
 }
 
+/** @brief 检查内核驱动是否占用了指定接口(Linux专用) @param handle 设备句柄 @param interfaceNum 接口编号 @return Windows上始终返回0 */
 int UsbLibraryLoader::kernelDriverActive(UsbDeviceHandle* handle,
                                           int interfaceNum)
 {
@@ -226,6 +248,7 @@ int UsbLibraryLoader::kernelDriverActive(UsbDeviceHandle* handle,
     return 0;
 }
 
+/** @brief 从接口上分离内核驱动(Linux专用) @param handle 设备句柄 @param interfaceNum 接口编号 @return Windows上始终返回0 */
 int UsbLibraryLoader::detachKernelDriver(UsbDeviceHandle* handle,
                                           int interfaceNum)
 {

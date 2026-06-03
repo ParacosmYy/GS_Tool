@@ -52,13 +52,21 @@ static const QMap<QString, FbsBasicType> kTypeNameMap = {
     {QStringLiteral("string"),  FbsBasicType::String}
 };
 
-/** 解析类型名字符串为FbsBasicType */
+/**
+ * @brief 解析类型名字符串为FbsBasicType枚举值
+ * @param typeName 类型名称字符串
+ * @return 对应的FbsBasicType枚举值，无法识别时返回Invalid
+ */
 FbsBasicType resolveBasicType(const QString& typeName) {
     return kTypeNameMap.value(typeName.toLower().trimmed(),
                               FbsBasicType::Invalid);
 }
 
-/** 解析字段行: name:type [= default] */
+/**
+ * @brief 解析字段行文本为FbsFieldDef结构
+ * @param line 字段行文本，格式为 "name:type [= default]"
+ * @return 解析后的字段定义结构
+ */
 FbsFieldDef parseFieldLine(const QString& line) {
     FbsFieldDef field;
     int colonPos = line.indexOf(QLatin1Char(':'));
@@ -86,7 +94,11 @@ FbsFieldDef parseFieldLine(const QString& line) {
     return field;
 }
 
-/** 提取花括号内body内容，按分号分割并解析字段 */
+/**
+ * @brief 从花括号块中提取字段定义列表
+ * @param block 包含花括号的文本块
+ * @return 解析出的字段定义列表
+ */
 QList<FbsFieldDef> extractFields(const QString& block) {
     QList<FbsFieldDef> fields;
     int bStart = block.indexOf(QLatin1Char('{'));
@@ -104,7 +116,11 @@ QList<FbsFieldDef> extractFields(const QString& block) {
     return fields;
 }
 
-/** 解析enum块（内部辅助） */
+/**
+ * @brief 解析enum块为FbsEnumDef结构
+ * @param block 包含enum定义的文本块
+ * @return 解析后的枚举定义结构
+ */
 FbsEnumDef parseEnumDef(const QString& block) {
     FbsEnumDef def;
     QRegularExpression re(R"(enum\s+(\w+)\s*:\s*(\w+)\s*\{)");
@@ -136,8 +152,21 @@ FbsEnumDef parseEnumDef(const QString& block) {
 
 // ───────────────────── 公开接口 ─────────────────────
 
+/**
+ * @brief 构造函数 - 初始化FlatBuffers解码器
+ * @param parent 父对象指针
+ */
 FlatBuffersDecoder::FlatBuffersDecoder(QObject* parent) : QObject(parent) {}
 
+/**
+ * @brief 加载并解析.fbs Schema文件
+ *
+ * 读取指定路径的.fbs文件，解析其中的table/struct/enum定义，
+ * 提取root_type声明以确定根表名称。
+ *
+ * @param filePath .fbs文件的完整路径
+ * @return 解析成功且至少包含一个table定义时返回true，否则返回false
+ */
 bool FlatBuffersDecoder::loadFbsFile(const QString& filePath) {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) { return false; }
@@ -151,8 +180,21 @@ bool FlatBuffersDecoder::loadFbsFile(const QString& filePath) {
     return m_loaded;
 }
 
+/**
+ * @brief 检查是否已成功加载.fbs文件
+ * @return 已加载返回true，否则返回false
+ */
 bool FlatBuffersDecoder::isLoaded() const { return m_loaded; }
 
+/**
+ * @brief 解码FlatBuffers二进制消息
+ *
+ * 读取根偏移量定位根表，根据已加载的Schema定义解析各字段。
+ * 数据不足8字节时返回空Map并递增错误计数。
+ *
+ * @param data FlatBuffers格式的二进制数据
+ * @return 解析结果Map，key为字段名，value为字段值
+ */
 QVariantMap FlatBuffersDecoder::decodeMessage(const QByteArray& data) {
     if (data.size() < 8) {
         ++m_errorCount;
@@ -169,6 +211,14 @@ QVariantMap FlatBuffersDecoder::decodeMessage(const QByteArray& data) {
 
 // ───────────────────── FBS文本解析 ─────────────────────
 
+/**
+ * @brief 解析.fbs文件文本内容为内存模式定义
+ *
+ * 移除注释后，提取root_type声明，然后按正则匹配table/struct/enum块，
+ * 分别解析为FbsTableDef/FbsStructDef/FbsEnumDef并存入内部容器。
+ *
+ * @param content .fbs文件的完整文本内容
+ */
 void FlatBuffersDecoder::parseFbsContent(const QString& content) {
     // 移除注释
     QString cleaned = content;
@@ -212,6 +262,17 @@ void FlatBuffersDecoder::parseFbsContent(const QString& content) {
 
 // ───────────────────── 二进制解码 ─────────────────────
 
+/**
+ * @brief 解析FlatBuffers二进制数据中的table结构
+ *
+ * 通过vtable反向引用获取字段偏移表，按偏移逐一读取字段值。
+ * 若存在Schema定义，则使用字段名和类型信息进行类型化解析。
+ *
+ * @param data 完整的二进制数据
+ * @param tableOffset table在数据中的起始偏移量
+ * @param rootTableName 对应的table类型名称（用于查找Schema）
+ * @return 解析结果Map，key为字段名，value为字段值
+ */
 QVariantMap FlatBuffersDecoder::parseTable(const QByteArray& data,
                                             int tableOffset,
                                             const QString& rootTableName) const {
@@ -248,6 +309,16 @@ QVariantMap FlatBuffersDecoder::parseTable(const QByteArray& data,
     return result;
 }
 
+/**
+ * @brief 解析FlatBuffers二进制数据中的inline struct结构
+ *
+ * 按字段顺序依次读取固定大小的标量值，支持嵌套struct递归解析。
+ *
+ * @param data 完整的二进制数据
+ * @param basePos struct在数据中的起始偏移量
+ * @param sdef struct的Schema定义（含字段列表和字节大小）
+ * @return 解析结果Map，key为字段名，value为字段值
+ */
 QVariantMap FlatBuffersDecoder::parseStruct(const QByteArray& data,
                                              int basePos,
                                              const FbsStructDef& sdef) const {
@@ -271,6 +342,12 @@ QVariantMap FlatBuffersDecoder::parseStruct(const QByteArray& data,
 
 // ───────────────────── 工具方法 ─────────────────────
 
+/**
+ * @brief 从二进制数据中读取一个32位无符号整数（小端序偏移量）
+ * @param data 源二进制数据
+ * @param off 读取偏移量
+ * @return 读取到的32位无符号偏移值，越界时返回0
+ */
 quint32 FlatBuffersDecoder::readOffset(const QByteArray& data, int off) const {
     if (off < 0 || off + 4 > data.size()) { return 0; }
     return static_cast<quint32>(
@@ -280,6 +357,12 @@ quint32 FlatBuffersDecoder::readOffset(const QByteArray& data, int off) const {
         (static_cast<quint8>(data[off + 3]) << 24));
 }
 
+/**
+ * @brief 从二进制数据中读取一个16位无符号整数（小端序）
+ * @param data 源二进制数据
+ * @param off 读取偏移量
+ * @return 读取到的16位无符号整数值，越界时返回0
+ */
 quint16 FlatBuffersDecoder::readUint16(const QByteArray& data, int off) const {
     if (off < 0 || off + 2 > data.size()) { return 0; }
     return static_cast<quint16>(
@@ -287,10 +370,26 @@ quint16 FlatBuffersDecoder::readUint16(const QByteArray& data, int off) const {
         (static_cast<quint8>(data[off + 1]) << 8));
 }
 
+/**
+ * @brief 将类型名字符串解析为FbsBasicType枚举值
+ * @param tn 类型名称字符串
+ * @return 对应的FbsBasicType枚举值
+ */
 FbsBasicType FlatBuffersDecoder::parseBasicType(const QString& tn) const {
     return resolveBasicType(tn);
 }
 
+/**
+ * @brief 从二进制数据中读取指定类型的标量值
+ *
+ * 支持读取Int8/UInt8/Bool/Int16/UInt16/Int32/UInt32/Float32等基本类型，
+ * 自动处理边界检查和字节序转换。
+ *
+ * @param data 源二进制数据
+ * @param pos 读取位置
+ * @param type 目标标量类型
+ * @return 包装为QVariant的标量值，越界或类型不匹配时返回无效QVariant
+ */
 QVariant FlatBuffersDecoder::readScalarValue(const QByteArray& data,
                                               int pos, FbsBasicType type) const {
     if (pos >= data.size()) { return {}; }
@@ -325,6 +424,19 @@ QVariant FlatBuffersDecoder::readScalarValue(const QByteArray& data,
     return {};
 }
 
+/**
+ * @brief 根据字段类型从二进制数据中读取类型化值
+ *
+ * 分发到不同的读取逻辑：标量类型委托给readScalarValue，
+ * Int64/UInt64/Float64直接读取8字节，String读取长度前缀+UTF-8内容，
+ * Struct/Table递归解析，枚举类型查表转换。
+ *
+ * @param data 源二进制数据
+ * @param pos 读取位置
+ * @param type 字段类型枚举值
+ * @param typeName 自定义类型名称（用于查找table/struct/enum定义）
+ * @return 包装为QVariant的字段值
+ */
 QVariant FlatBuffersDecoder::readTypedValue(const QByteArray& data,
                                              int pos, FbsBasicType type,
                                              const QString& typeName) const {
@@ -387,6 +499,13 @@ QVariant FlatBuffersDecoder::readTypedValue(const QByteArray& data,
     }
 }
 
+/**
+ * @brief 查找FlatBuffers根表定义
+ *
+ * 优先使用root_type声明的表名查找，若未声明则返回第一个已解析的table。
+ *
+ * @return 根表定义的指针，无可用表时返回nullptr
+ */
 const FbsTableDef* FlatBuffersDecoder::findRootTable() const {
     if (!m_rootTypeName.isEmpty()) {
         auto it = m_tables.constFind(m_rootTypeName);
