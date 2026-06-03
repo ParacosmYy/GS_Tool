@@ -54,6 +54,24 @@ public:
     /** @brief 订阅接收数据事件 */
     void subscribeReceivedData();
 
+    /** @brief 取消订阅接收数据事件 */
+    void unsubscribeReceivedData();
+
+    /** @brief 是否已订阅数据接收 */
+    bool isSubscribed() const;
+
+    /** @brief 获取所有已注册的面板列表 */
+    QList<QWidget*> registeredPanels() const;
+
+    /** @brief 获取所有已添加的通道名称列表 */
+    QStringList channels() const;
+
+    /** @brief 获取已注册面板数量 */
+    int panelCount() const;
+
+    /** @brief 获取已添加通道数量 */
+    int channelCount() const;
+
 signals:
     /** @brief 接收到数据信号（插件订阅后触发） */
     void dataReceived(const QByteArray& data);
@@ -82,6 +100,7 @@ signals:
 private:
     QList<QWidget*> m_panels;       ///< 已注册的面板列表
     QStringList m_channels;         ///< 已添加的通道名称列表
+    bool m_subscribed = false;      ///< 是否已订阅数据接收
 };
 
 #endif // PLUGINAPI_H

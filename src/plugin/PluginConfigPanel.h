@@ -15,6 +15,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QLabel>
+#include <QTextEdit>
 #include <QString>
 
 class PluginManager;
@@ -58,11 +59,18 @@ private:
     /** @brief 从 PluginManager 刷新插件列表显示 */
     void refreshList();
 
+    /** @brief 更新右侧详情面板 */
+    void updateDetailPanel(const QString& pluginName);
+
     QLabel* m_titleLabel;               ///< 标题标签
     QListWidget* m_pluginList;          ///< 插件列表控件
     QPushButton* m_loadBtn;             ///< 加载插件按钮
     QPushButton* m_unloadBtn;           ///< 卸载插件按钮
     QPushButton* m_scanBtn;             ///< 扫描插件按钮
+    QLabel* m_detailNameLabel;          ///< 详情-插件名称
+    QLabel* m_detailVersionLabel;       ///< 详情-版本号
+    QTextEdit* m_detailDescEdit;        ///< 详情-描述信息
+    QLabel* m_detailStatusLabel;        ///< 详情-加载状态
     PluginManager* m_manager = nullptr; ///< 插件管理器（不拥有）
 };
 

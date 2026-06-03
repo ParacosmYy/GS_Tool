@@ -2,7 +2,8 @@
  * @file DashboardModel.cpp
  * @brief 仪表盘配置模型实现
  *
- * 管理组件配置的增删查，使用 QJsonDocument 实现文件持久化。
+ * 管理组件配置的增删查、数据通道的实时值更新，
+ * 使用 QJsonDocument 实现文件持久化。
  */
 
 #include "dashboard/DashboardModel.h"
@@ -134,4 +135,75 @@ bool DashboardModel::loadFromFile(const QString &filePath)
 
     emit configChanged();
     return true;
+}
+
+/**
+ * @brief 添加数据通道
+ *
+ * 创建新的数据通道，若名称已存在则更新其初始值。
+ * 通道增减后发射 channelsChanged 信号。
+ *
+ * @param name 通道名称
+ * @param initialValue 初始值，默认 0.0
+ */
+void DashboardModel::addChannel(const QString &name, double initialValue)
+{
+    m_channels.insert(name, initialValue);
+    emit channelsChanged();
+}
+
+/**
+ * @brief 移除数据通道
+ *
+ * 删除指定名称的通道，通道不存在时无操作。
+ * 通道增减后发射 channelsChanged 信号。
+ *
+ * @param name 通道名称
+ */
+void DashboardModel::removeChannel(const QString &name)
+{
+    if (m_channels.remove(name) > 0) {
+        emit channelsChanged();
+    }
+}
+
+/**
+ * @brief 更新通道值并通知视图
+ *
+ * 更新指定通道的当前值，若值发生变化则发射 valueChanged 信号。
+ * 通道不存在时不做任何操作。
+ *
+ * @param name 通道名称
+ * @param value 新值
+ */
+void DashboardModel::updateValue(const QString &name, double value)
+{
+    auto it = m_channels.find(name);
+    if (it == m_channels.end()) {
+        return;
+    }
+
+    if (!qFuzzyCompare(it.value(), value)) {
+        it.value() = value;
+        emit valueChanged(name, value);
+    }
+}
+
+/**
+ * @brief 获取所有通道名称
+ * @return 通道名称列表 (按插入顺序)
+ */
+QStringList DashboardModel::channelNames() const
+{
+    return m_channels.keys();
+}
+
+/**
+ * @brief 获取指定通道的当前值
+ * @param name 通道名称
+ * @return 通道值，通道不存在时返回 0.0
+ */
+double DashboardModel::value(const QString &name) const
+{
+    return m_channels.value(name, 0.0);
 }

@@ -20,6 +20,7 @@
  *
  * 管理录制文件的读写操作，包括元数据存取、
  * 数据帧的序列化/反序列化和加载进度上报。
+ * 支持详细的错误信息追踪和文件完整性校验。
  */
 class RecordingFileFormat : public QObject
 {
@@ -32,6 +33,10 @@ public:
     static constexpr quint8 kVersion = 1;
     /** @brief 文件头固定长度: magic(3) + version(1) + metaSize(4) + reserved(4) */
     static constexpr int kHeaderSize = 12;
+    /** @brief EOF标记: "EDBE" (4字节) */
+    static constexpr const char* kEofMarker = "EDBE";
+    /** @brief EOF标记长度 */
+    static constexpr int kEofMarkerSize = 4;
 
     /**
      * @brief 构造函数
@@ -79,6 +84,12 @@ public:
      */
     bool hasData() const;
 
+    /**
+     * @brief 获取最近一次操作的错误描述
+     * @return 错误信息字符串，无错误时返回空串
+     */
+    QString lastError() const;
+
 signals:
     /**
      * @brief 加载进度更新信号
@@ -96,6 +107,7 @@ private:
     QVariantMap m_metadata;  ///< 文件元数据
     QString     m_filePath;  ///< 当前关联的文件路径
     QByteArray  m_rawData;   ///< 原始录制数据 (EDL记录格式)
+    QString     m_lastError; ///< 最近一次操作的错误描述
 };
 
 #endif // RECORDING_FILE_FORMAT_H

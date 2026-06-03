@@ -16,6 +16,7 @@
 #include <QObject>
 #include <QMap>
 #include <QStringList>
+#include <QVariantList>
 #include "plugin/IEmbedDebugPlugin.h"
 
 class PluginApi;
@@ -68,6 +69,39 @@ public:
      * @return 插件接口指针，未找到返回 nullptr
      */
     IEmbedDebugPlugin* plugin(const QString& name) const;
+
+    /**
+     * @brief 获取指定插件的版本号
+     * @param name 插件名称
+     * @return 版本字符串，未找到返回空字符串
+     */
+    QString pluginVersion(const QString& name) const;
+
+    /**
+     * @brief 获取指定插件的描述
+     * @param name 插件名称
+     * @return 描述字符串，未找到返回空字符串
+     */
+    QString pluginDescription(const QString& name) const;
+
+    /**
+     * @brief 获取已加载插件数量
+     * @return 插件数量
+     */
+    int pluginCount() const;
+
+    /**
+     * @brief 检查指定插件是否已加载
+     * @param name 插件名称
+     * @return true 已加载，false 未加载
+     */
+    bool isPluginLoaded(const QString& name) const;
+
+    /**
+     * @brief 获取所有插件的综合信息列表
+     * @return QVariantList，每项包含 name/version/description
+     */
+    QVariantList pluginMetadataList() const;
 
 signals:
     /** @brief 插件加载成功信号 */

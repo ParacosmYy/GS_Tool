@@ -4,7 +4,8 @@
  * @author Serial Tool Team
  * @date 2026-06-02
  *
- * 根据字段定义构建二进制数据包，支持模板保存/加载。
+ * 根据字段定义构建二进制数据包，支持模板保存/加载到SettingsManager、
+ * 字段校验、十六进制格式化输出与解析。
  */
 
 #ifndef PACKETBUILDER_H
@@ -12,14 +13,19 @@
 
 #include <QByteArray>
 #include <QList>
+#include <QMap>
 #include <QObject>
 #include <QString>
+#include <QVariantMap>
 
 #include "utils/packet/PacketField.h"
 
 /**
  * @class PacketBuilder
  * @brief 数据包构建引擎，管理字段列表并生成二进制包
+ *
+ * 提供完整的字段管理、模板持久化(基于SettingsManager)、
+ * 字段合法性校验和十六进制字符串互转能力。
  */
 class PacketBuilder : public QObject
 {
@@ -75,6 +81,40 @@ public:
      * @return 是否保存成功
      */
     bool saveTemplate(const QString &filePath) const;
+
+    /**
+     * @brief 从 SettingsManager 加载命名模板
+     * @param name 模板名称
+     * @return 是否加载成功
+     */
+    bool loadTemplate(const QString &name, const QVariantMap &options);
+
+    /**
+     * @brief 保存命名模板到 SettingsManager
+     * @param name 模板名称
+     * @param fields 字段映射 (可选，为空则使用当前字段)
+     * @return 是否保存成功
+     */
+    bool saveTemplate(const QString &name, const QVariantMap &fields);
+
+    /**
+     * @brief 校验所有字段的偏移和长度是否合法
+     * @return true 所有字段合法
+     */
+    bool validate() const;
+
+    /**
+     * @brief 将构建的数据包格式化为十六进制字符串
+     * @return 格式化后的十六进制字符串 (如 "AA BB CC DD")
+     */
+    QString toHexString() const;
+
+    /**
+     * @brief 从十六进制字符串解析字段值
+     * @param hex 十六进制字符串 (支持空格分隔或连续)
+     * @return 解析后的字段列表
+     */
+    static QList<PacketField> fromHexString(const QString &hex);
 
 signals:
     /**

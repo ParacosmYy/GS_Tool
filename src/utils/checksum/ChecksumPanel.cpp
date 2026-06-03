@@ -11,9 +11,12 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFileDialog>
 #include <QFile>
 #include <QHBoxLayout>
+#include <QMimeData>
 #include <QVBoxLayout>
 
 /**
@@ -27,8 +30,11 @@ ChecksumPanel::ChecksumPanel(QWidget *parent)
     , m_resultLabel(new QLabel(tr("结果：-"), this))
     , m_calcBtn(new QPushButton(tr("计算"), this))
     , m_copyBtn(new QPushButton(tr("复制结果"), this))
+    , m_clearHistoryBtn(new QPushButton(tr("清除历史"), this))
+    , m_historyList(new QListWidget(this))
 {
     setObjectName(QStringLiteral("ChecksumPanel"));
+    setAcceptDrops(true);
 
     auto *mainLayout = new QVBoxLayout(this);
 
@@ -84,18 +90,41 @@ ChecksumPanel::ChecksumPanel(QWidget *parent)
     resultLayout->addStretch();
     m_copyBtn->setObjectName("copyResultBtn");
     m_copyBtn->setEnabled(false);
+    resultLayout->addWidget(m_resultLabel);
+    resultLayout->addStretch();
     resultLayout->addWidget(m_copyBtn);
+
+    // 历史记录区
+    auto* historyLabel = new QLabel(tr("计算历史："), this);
+    historyLabel->setObjectName("checksumHistoryLabel");
+
+    m_historyList->setObjectName("checksumHistoryList");
+    m_historyList->setMaximumHeight(120);
+    m_historyList->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    m_clearHistoryBtn->setObjectName("clearHistoryBtn");
+
+    auto* historyHeaderLayout = new QHBoxLayout();
+    historyHeaderLayout->addWidget(historyLabel);
+    historyHeaderLayout->addStretch();
+    historyHeaderLayout->addWidget(m_clearHistoryBtn);
 
     mainLayout->addLayout(algoLayout);
     mainLayout->addLayout(modeLayout);
     mainLayout->addWidget(m_inputEdit);
     mainLayout->addLayout(resultLayout);
+    mainLayout->addLayout(historyHeaderLayout);
+    mainLayout->addWidget(m_historyList, 1);
 
     // 连接信号
     connect(m_calcBtn, &QPushButton::clicked,
             this, &ChecksumPanel::onCalculate);
     connect(m_copyBtn, &QPushButton::clicked,
             this, &ChecksumPanel::onCopyResult);
+    connect(m_clearHistoryBtn, &QPushButton::clicked,
+            this, &ChecksumPanel::onClearHistory);
+    connect(m_historyList, &QListWidget::itemClicked,
+            this, &ChecksumPanel::onHistoryItemSelected);
 }
 
 /**
@@ -181,6 +210,13 @@ void ChecksumPanel::onCalculate()
 
     m_copyBtn->setEnabled(true);
     emit calculated(m_result, name);
+
+    /* 添加到历史记录 */
+    QString inputHex = data.toHex(' ').toUpper();
+    if (inputHex.length() > 32) {
+        inputHex = inputHex.left(32) + QStringLiteral("...");
+    }
+    addHistoryEntry(m_result, name, inputHex);
 }
 
 /**
@@ -190,4 +226,114 @@ void ChecksumPanel::onCopyResult()
 {
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(QString::number(m_result, 16).toUpper());
+}
+
+/**
+ * @brief 清除计算历史列表
+ */
+void ChecksumPanel::onClearHistory()
+{
+    m_historyList->clear();
+}
+
+/**
+ * @brief 从历史记录中选择并恢复显示结果
+ *
+ * 点击历史条目时，解析其中存储的结果值并更新显示。
+ */
+void ChecksumPanel::onHistoryItemSelected()
+{
+    QListWidgetItem* item = m_historyList->currentItem();
+    if (!item) {
+        return;
+    }
+    /* 从 item data 中恢复结果值 */
+    bool ok = false;
+    quint64 value = item->data(Qt::UserRole).toULongLong(&ok);
+    if (ok) {
+        m_result = value;
+        m_resultLabel->setText(item->text());
+        m_copyBtn->setEnabled(true);
+    }
+}
+
+/**
+ * @brief 添加计算结果到历史记录列表
+ *
+ * @param value 校验和值
+ * @param algoName 算法名称
+ * @param inputHex 输入数据十六进制（截断显示）
+ */
+void ChecksumPanel::addHistoryEntry(quint64 value, const QString& algoName,
+                                    const QString& inputHex)
+{
+    /* 根据结果位宽选择格式 */
+    QString hexResult;
+    if (value <= 0xFF) {
+        hexResult = QStringLiteral("%1").arg(value, 2, 16, QLatin1Char('0'));
+    } else if (value <= 0xFFFF) {
+        hexResult = QStringLiteral("%1").arg(value, 4, 16, QLatin1Char('0'));
+    } else {
+        hexResult = QStringLiteral("%1").arg(value, 8, 16, QLatin1Char('0'));
+    }
+    hexResult = hexResult.toUpper();
+
+    QString displayText = tr("[%1] %2 ← 0x%3")
+                              .arg(algoName)
+                              .arg(hexResult)
+                              .arg(inputHex);
+
+    auto* historyItem = new QListWidgetItem(displayText, m_historyList);
+    historyItem->setData(Qt::UserRole, value);
+
+    /* 限制历史记录最多50条 */
+    while (m_historyList->count() > 50) {
+        delete m_historyList->takeItem(0);
+    }
+}
+
+/**
+ * @brief 拖拽进入事件 — 接受文件拖入
+ */
+void ChecksumPanel::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
+}
+
+/**
+ * @brief 拖拽移动事件
+ */
+void ChecksumPanel::dragMoveEvent(QDragMoveEvent* event)
+{
+    if (event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
+}
+
+/**
+ * @brief 放下事件 — 将拖入文件路径填入输入框并切换为文件模式
+ */
+void ChecksumPanel::dropEvent(QDropEvent* event)
+{
+    const QList<QUrl> urls = event->mimeData()->urls();
+    if (urls.isEmpty()) {
+        return;
+    }
+
+    const QString filePath = urls.first().toLocalFile();
+    if (filePath.isEmpty()) {
+        return;
+    }
+
+    /* 切换到文件模式并填入路径 */
+    for (int i = 0; i < m_inputModeCombo->count(); ++i) {
+        if (m_inputModeCombo->itemData(i).toInt() == 2) {
+            m_inputModeCombo->setCurrentIndex(i);
+            break;
+        }
+    }
+    m_inputEdit->setPlainText(filePath);
+    event->acceptProposedAction();
 }

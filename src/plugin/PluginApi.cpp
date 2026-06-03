@@ -74,10 +74,64 @@ bool PluginApi::sendData(const QByteArray& data)
  *
  * 插件调用此方法表示希望接收数据通知。
  * 后续宿主收到串口数据时，将通过 dataReceived 信号转发。
- *
- * 当前版本为标记式实现：上层连接 dataReceived 即可。
  */
 void PluginApi::subscribeReceivedData()
 {
-    /* 标记式调用 — 宿主层通过连接 dataReceived 信号提供数据 */
+    m_subscribed = true;
+}
+
+/**
+ * @brief 取消订阅接收数据事件
+ *
+ * 插件调用此方法停止接收数据通知。
+ * 取消订阅后宿主不再通过 dataReceived 信号转发数据。
+ */
+void PluginApi::unsubscribeReceivedData()
+{
+    m_subscribed = false;
+}
+
+/**
+ * @brief 查询是否已订阅数据接收
+ * @return true 已订阅，false 未订阅
+ */
+bool PluginApi::isSubscribed() const
+{
+    return m_subscribed;
+}
+
+/**
+ * @brief 获取所有已注册的面板列表
+ * @return 面板控件指针列表
+ */
+QList<QWidget*> PluginApi::registeredPanels() const
+{
+    return m_panels;
+}
+
+/**
+ * @brief 获取所有已添加的通道名称列表
+ * @return 通道名称列表
+ */
+QStringList PluginApi::channels() const
+{
+    return m_channels;
+}
+
+/**
+ * @brief 获取已注册面板数量
+ * @return 面板数量
+ */
+int PluginApi::panelCount() const
+{
+    return m_panels.count();
+}
+
+/**
+ * @brief 获取已添加通道数量
+ * @return 通道数量
+ */
+int PluginApi::channelCount() const
+{
+    return m_channels.count();
 }

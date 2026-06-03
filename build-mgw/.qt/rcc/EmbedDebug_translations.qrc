@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/i18n">
+    <file alias="translations/embeddebug_en.qm">E:/Embedded/Tool/Serial_tool/User_Serial/build-mgw/translations/embeddebug_en.qm</file>
+  </qresource>
+</RCC>
+

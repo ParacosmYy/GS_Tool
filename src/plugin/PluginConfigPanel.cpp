@@ -29,6 +29,10 @@ PluginConfigPanel::PluginConfigPanel(QWidget* parent)
     , m_loadBtn(nullptr)
     , m_unloadBtn(nullptr)
     , m_scanBtn(nullptr)
+    , m_detailNameLabel(nullptr)
+    , m_detailVersionLabel(nullptr)
+    , m_detailDescEdit(nullptr)
+    , m_detailStatusLabel(nullptr)
     , m_manager(nullptr)
 {
     setObjectName(QStringLiteral("PluginConfigPanel"));
@@ -94,6 +98,35 @@ void PluginConfigPanel::setupUI()
     m_pluginList = new QListWidget(this);
     m_pluginList->setObjectName(QStringLiteral("pluginList"));
     mainLayout->addWidget(m_pluginList, 1);
+
+    /* 详情面板 */
+    auto* detailGroup = new QWidget(this);
+    detailGroup->setObjectName(QStringLiteral("pluginDetailGroup"));
+    auto* detailLayout = new QVBoxLayout(detailGroup);
+    detailLayout->setContentsMargins(4, 4, 4, 4);
+    detailLayout->setSpacing(4);
+
+    m_detailNameLabel = new QLabel(tr("名称：-"), detailGroup);
+    m_detailNameLabel->setObjectName(QStringLiteral("pluginDetailName"));
+
+    m_detailVersionLabel = new QLabel(tr("版本：-"), detailGroup);
+    m_detailVersionLabel->setObjectName(QStringLiteral("pluginDetailVersion"));
+
+    m_detailStatusLabel = new QLabel(tr("状态：-"), detailGroup);
+    m_detailStatusLabel->setObjectName(QStringLiteral("pluginDetailStatus"));
+
+    m_detailDescEdit = new QTextEdit(detailGroup);
+    m_detailDescEdit->setObjectName(QStringLiteral("pluginDetailDesc"));
+    m_detailDescEdit->setReadOnly(true);
+    m_detailDescEdit->setMaximumHeight(80);
+    m_detailDescEdit->setPlaceholderText(tr("插件描述信息"));
+
+    detailLayout->addWidget(m_detailNameLabel);
+    detailLayout->addWidget(m_detailVersionLabel);
+    detailLayout->addWidget(m_detailStatusLabel);
+    detailLayout->addWidget(m_detailDescEdit);
+
+    mainLayout->addWidget(detailGroup);
 
     /* 按钮行 */
     auto* btnLayout = new QHBoxLayout();
@@ -174,6 +207,29 @@ void PluginConfigPanel::setupUI()
             }
         }
     });
+
+    /* 列表选择变化: 更新详情面板 */
+    connect(m_pluginList, &QListWidget::currentItemChanged, this,
+            [this](QListWidgetItem* current, QListWidgetItem* /*previous*/) {
+                if (!current || !m_manager) {
+                    m_detailNameLabel->setText(tr("名称：-"));
+                    m_detailVersionLabel->setText(tr("版本：-"));
+                    m_detailStatusLabel->setText(tr("状态：-"));
+                    m_detailDescEdit->clear();
+                    return;
+                }
+                const QString name = current->data(Qt::UserRole).toString();
+                if (m_manager->isPluginLoaded(name)) {
+                    updateDetailPanel(name);
+                } else {
+                    /* 扫描到的未加载插件 */
+                    m_detailNameLabel->setText(tr("名称：%1").arg(
+                        QFileInfo(name).fileName()));
+                    m_detailVersionLabel->setText(tr("版本：未知"));
+                    m_detailStatusLabel->setText(tr("状态：未加载"));
+                    m_detailDescEdit->clear();
+                }
+            });
 }
 
 /**
@@ -194,4 +250,31 @@ void PluginConfigPanel::refreshList()
             name + tr(" (loaded)"), m_pluginList);
         item->setData(Qt::UserRole, name);
     }
+
+    /* 重置详情面板 */
+    m_detailNameLabel->setText(tr("名称：-"));
+    m_detailVersionLabel->setText(tr("版本：-"));
+    m_detailStatusLabel->setText(tr("状态：-"));
+    m_detailDescEdit->clear();
+}
+
+/**
+ * @brief 更新详情面板显示指定插件的元数据
+ *
+ * 从 PluginManager 获取插件名称、版本、描述并刷新右侧详情区域。
+ *
+ * @param pluginName 已加载插件的名称
+ */
+void PluginConfigPanel::updateDetailPanel(const QString& pluginName)
+{
+    if (!m_manager) {
+        return;
+    }
+
+    m_detailNameLabel->setText(tr("名称：%1").arg(pluginName));
+    m_detailVersionLabel->setText(
+        tr("版本：%1").arg(m_manager->pluginVersion(pluginName)));
+    m_detailStatusLabel->setText(tr("状态：已加载"));
+    m_detailDescEdit->setPlainText(
+        m_manager->pluginDescription(pluginName));
 }
