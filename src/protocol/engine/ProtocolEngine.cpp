@@ -34,6 +34,8 @@ ProtocolEngine::ProtocolEngine(QObject *parent)
     , m_framesParsed(0)
     , m_framesRejected(0)
     , m_totalBytesProcessed(0)
+    , m_totalValidations(0)
+    , m_totalParseErrors(0)
     , m_lastParseTimestamp(0)
 {
 }
@@ -87,6 +89,7 @@ void ProtocolEngine::feedData(const QByteArray &data)
         m_buffer.remove(0, discardBytes);
         emit parseError(tr("缓冲区溢出，已丢弃前 %1 字节").arg(discardBytes));
         ++m_parseErrors;
+        ++m_totalParseErrors;
     }
 
     /* 循环提取完整帧 */

@@ -75,12 +75,6 @@ public:
 
     /**
      * @brief 计算大于等于n的最小2的幂
-     *
-     * 用于确定FFT运算长度。例如:
-     *   nextPowerOf2(100) = 128
-     *   nextPowerOf2(256) = 256
-     *   nextPowerOf2(0)   = 1
-     *
      * @param n 输入值
      * @return >= n 的最小2的幂
      */
@@ -92,6 +86,20 @@ public:
      * @return 窗函数名称（英文）
      */
     static QString windowTypeName(WindowType window);
+
+    // ---- 统计 getter ----
+
+    /** @brief 获取总FFT变换执行次数 */
+    quint64 totalTransforms() const;
+
+    /** @brief 获取总处理的采样点数（累计，跨所有变换） */
+    quint64 totalSamplesProcessed() const;
+
+    /** @brief 获取单次变换处理过的最大采样点数（峰值） */
+    quint64 maxSampleSize() const;
+
+    /** @brief 重置所有统计计数器为初始值 */
+    void resetStats();
 
 signals:
     /**
@@ -111,21 +119,12 @@ private:
 
     /**
      * @brief 执行 Cooley-Tukey radix-2 DIT FFT（原地计算）
-     *
-     * 算法步骤:
-     *   1. 位反转置换（bit-reversal permutation）
-     *   2. 蝶形运算，逐级合并
-     *
      * @param data 输入/输出复数序列（长度必须为2的幂）
      */
     void fftRadix2(QVector<std::complex<double>>& data);
 
     /**
      * @brief 计算单边幅度谱
-     *
-     * 从FFT结果中提取前N/2个点，乘以2（除直流分量外），
-     * 除以N进行归一化。
-     *
      * @param fftResult FFT输出复数序列
      * @param sampleRate 采样率（Hz）
      * @return 频率-幅度点集
@@ -147,6 +146,11 @@ private:
      * @return log2(n)
      */
     static int log2Int(int n);
+
+    // 统计计数器
+    quint64 m_totalTransforms = 0;        ///< 总FFT变换执行次数
+    quint64 m_totalSamplesProcessed = 0;  ///< 总处理的采样点数（累计）
+    quint64 m_maxSampleSize = 0;          ///< 单次变换处理过的最大采样点数（峰值）
 };
 
 #endif // FFTENGINE_H

@@ -139,6 +139,20 @@ public:
     /** @brief 重置错误计数器 */
     void resetErrorCounters();
 
+    // ---- 操作统计 ----
+
+    /** @brief 获取累计打开次数 @return 自上次重置以来的串口打开总次数 */
+    quint64 totalOpens() const { return m_totalOpens; }
+
+    /** @brief 获取累计关闭次数 @return 自上次重置以来的串口关闭总次数 */
+    quint64 totalCloses() const { return m_totalCloses; }
+
+    /** @brief 获取累计错误次数 @return 自上次重置以来的错误总次数(含致命+可恢复) */
+    quint64 errorCount() const { return m_errorCount; }
+
+    /** @brief 重置所有操作统计计数器(totalOpens/totalCloses/errorCount归零) */
+    void resetStats();
+
 private slots:
     /** @brief QSerialPort::readyRead 信号处理，读取所有可用数据并转发 */
     void onReadyRead();
@@ -185,6 +199,11 @@ private:
 
     /** @brief 串口错误统计计数器 */
     SerialErrorCounters m_errorCounters;
+
+    // ---- 操作统计计数器 ----
+    quint64 m_totalOpens = 0;   ///< 累计串口打开次数(含成功与失败)
+    quint64 m_totalCloses = 0;  ///< 累计串口关闭次数
+    quint64 m_errorCount = 0;   ///< 累计错误总次数(致命错误+可恢复错误)
 };
 
 #endif // SERIALCONNECTION_H

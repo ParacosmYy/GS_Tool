@@ -5,7 +5,7 @@
  * 职责:
  *   1. 检测常见USB转串口芯片的驱动是否已安装(CH340/CP2102/FT232/PL2303)
  *   2. 提供驱动状态摘要，用于启动时的用户提示
- *   3. 纯静态方法，无状态，可随时调用
+ *   3. 纯静态方法+静态统计计数器，可随时调用
  *
  * 检测方式: 遍历QSerialPortInfo::availablePorts()，匹配设备描述符中的芯片关键词
  *
@@ -19,6 +19,7 @@
 
 #include <QStringList>
 #include <QVector>
+#include <QtGlobal>
 
 /**
  * @brief 单个驱动的检测结果
@@ -30,13 +31,16 @@ struct DriverInfo {
 };
 
 /**
- * @brief 串口驱动检测器 - 纯静态工具类
+ * @brief 串口驱动检测器 - 纯静态工具类(含扫描统计)
  *
  * 使用示例:
  * @code
  *   if (!SerialDriverDetector::hasAnyDriverInstalled()) {
  *       qWarning() << SerialDriverDetector::driverStatusSummary();
  *   }
+ *   // 查看扫描统计
+ *   qDebug() << "scans:" << SerialDriverDetector::totalScans()
+ *            << "drivers found:" << SerialDriverDetector::totalDriversFound();
  * @endcode
  */
 class SerialDriverDetector {
@@ -66,9 +70,24 @@ public:
      */
     static QString driverStatusSummary();
 
+    // ---- 扫描统计 ----
+
+    /** @brief 获取累计扫描次数 @return 自上次重置以来的驱动扫描总次数 */
+    static quint64 totalScans() { return m_totalScans; }
+
+    /** @brief 获取累计检测到的驱动数(所有扫描中发现的已安装驱动总数) @return 累计已安装驱动计数 */
+    static quint64 totalDriversFound() { return m_totalDriversFound; }
+
+    /** @brief 重置扫描统计计数器(totalScans/totalDriversFound归零) */
+    static void resetStats();
+
 private:
     /** @brief 已知USB转串口驱动芯片的关键词列表，用于匹配设备描述符 */
     static const QStringList kKnownDrivers;
+
+    // ---- 扫描统计计数器 ----
+    static quint64 m_totalScans;       ///< 累计驱动扫描次数(每次调用detectDrivers递增)
+    static quint64 m_totalDriversFound;///< 累计检测到的已安装驱动总数
 };
 
 #endif // SERIALDRIVERDETECTOR_H

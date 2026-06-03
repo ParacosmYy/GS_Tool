@@ -66,6 +66,9 @@ ConnectionState SerialConnection::state() const
  */
 bool SerialConnection::open()
 {
+    // 统计: 每次调用 open() 都计入打开次数
+    m_totalOpens++;
+
     // 步骤1: 检查端口名
     if (m_portName.isEmpty()) {
         QString msg = tr("串口打开失败: 端口名为空，请先选择一个串口");
@@ -123,6 +126,8 @@ bool SerialConnection::open()
 void SerialConnection::close()
 {
     if (m_serial.isOpen()) {
+        // 统计: 仅在端口确实打开时计入关闭次数
+        m_totalCloses++;
         m_serial.close();
         m_state = ConnectionState::Disconnected;
         emit stateChanged(m_state);
@@ -346,3 +351,16 @@ void SerialConnection::onReadyRead()
     }
 }
 
+/**
+ * @brief 重置所有操作统计计数器
+ *
+ * 将 totalOpens/totalCloses/errorCount 归零。
+ * 不影响 SerialErrorCounters (帧错误/校验错误等)，
+ * 那些由 resetErrorCounters() 单独管理。
+ */
+void SerialConnection::resetStats()
+{
+    m_totalOpens = 0;
+    m_totalCloses = 0;
+    m_errorCount = 0;
+}

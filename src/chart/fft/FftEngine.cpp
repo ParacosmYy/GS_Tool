@@ -26,11 +26,9 @@ int FftEngine::nextPowerOf2(int n)
     if (n <= 0) {
         return 1;
     }
-    // 如果已经是2的幂则直接返回
     if ((n & (n - 1)) == 0) {
         return n;
     }
-    // 否则取最高位并左移一位
     int highest = 0;
     while (n > 0) {
         n >>= 1;
@@ -79,37 +77,36 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
                                     WindowType window,
                                     int fftSize)
 {
-    // 无数据时返回空频谱
+    /* 无数据时返回空频谱 */
     if (timeData.isEmpty() || sampleRate <= 0.0) {
         return {};
     }
 
-    // 确定FFT长度: 用户指定 or 自动取nextPowerOf2
+    /* 确定FFT长度: 用户指定 or 自动取nextPowerOf2 */
     const int N = (fftSize > 0) ? nextPowerOf2(fftSize)
                                 : nextPowerOf2(timeData.size());
 
-    // 构造复数序列，从时域数据的Y值提取
+    /* 构造复数序列，从时域数据的Y值提取 */
     QVector<std::complex<double>> data;
     data.reserve(N);
     for (int i = 0; i < N; ++i) {
         if (i < timeData.size()) {
             data.append(std::complex<double>(timeData[i].y(), 0.0));
         } else {
-            // 零填充
             data.append(std::complex<double>(0.0, 0.0));
         }
     }
 
-    // 1. 应用窗函数
+    /* 1. 应用窗函数 */
     applyWindow(data, window);
 
-    // 2. 执行FFT（原地）
+    /* 2. 执行FFT（原地） */
     fftRadix2(data);
 
-    // 3. 计算单边幅度谱
+    /* 3. 计算单边幅度谱 */
     QVector<QPointF> spectrum = magnitudeSpectrum(data, sampleRate);
 
-    // 4. 查找基频（幅度最大处对应的频率）
+    /* 4. 查找基频（幅度最大处对应的频率） */
     double fundamentalFreq = 0.0;
     double maxMag = 0.0;
     for (const auto& pt : spectrum) {
@@ -117,6 +114,14 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
             maxMag = pt.y();
             fundamentalFreq = pt.x();
         }
+    }
+
+    /* 更新统计计数器 */
+    ++m_totalTransforms;
+    m_totalSamplesProcessed += static_cast<quint64>(timeData.size());
+    quint64 nSample = static_cast<quint64>(timeData.size());
+    if (nSample > m_maxSampleSize) {
+        m_maxSampleSize = nSample;
     }
 
     emit spectrumComputed(spectrum, fundamentalFreq);
@@ -131,17 +136,14 @@ void FftEngine::applyWindow(QVector<std::complex<double>>& data, WindowType wind
 {
     const int N = data.size();
     if (N <= 1) {
-        /* N=1时 (N-1)=0 导致除零; N=0无需处理 */
         return;
     }
 
     switch (window) {
     case WindowType::Rectangular:
-        // 矩形窗: 不做任何处理（等效于全1）
         break;
 
     case WindowType::Hanning:
-        // 汉宁窗: w(n) = 0.5 * (1 - cos(2πn/(N-1)))
         for (int n = 0; n < N; ++n) {
             double w = 0.5 * (1.0 - qCos(2.0 * M_PI * n / (N - 1)));
             data[n] *= w;
@@ -149,7 +151,6 @@ void FftEngine::applyWindow(QVector<std::complex<double>>& data, WindowType wind
         break;
 
     case WindowType::Hamming:
-        // 海明窗: w(n) = 0.54 - 0.46 * cos(2πn/(N-1))
         for (int n = 0; n < N; ++n) {
             double w = 0.54 - 0.46 * qCos(2.0 * M_PI * n / (N - 1));
             data[n] *= w;
@@ -157,7 +158,6 @@ void FftEngine::applyWindow(QVector<std::complex<double>>& data, WindowType wind
         break;
 
     case WindowType::Blackman:
-        // 布莱克曼窗: w(n) = 0.42 - 0.5*cos(2πn/(N-1)) + 0.08*cos(4πn/(N-1))
         for (int n = 0; n < N; ++n) {
             double w = 0.42
                      - 0.50 * qCos(2.0 * M_PI * n / (N - 1))
@@ -181,8 +181,7 @@ void FftEngine::fftRadix2(QVector<std::complex<double>>& data)
 
     const int stages = log2Int(N);
 
-    // 步骤1: 位反转置换
-    // 将输入数据按照位反转顺序重排，这是DIT算法的前置步骤
+    /* 步骤1: 位反转置换 */
     for (int i = 0; i < N; ++i) {
         int j = bitReverse(i, stages);
         if (j > i) {
@@ -190,30 +189,23 @@ void FftEngine::fftRadix2(QVector<std::complex<double>>& data)
         }
     }
 
-    // 步骤2: 蝶形运算
-    // 逐级（stage）合并子序列，每级的蝶形跨度（span）翻倍
+    /* 步骤2: 蝶形运算 */
     for (int stage = 1; stage <= stages; ++stage) {
-        int span = (1 << stage);        // 当前级的蝶形跨度: 2^stage
-        int halfSpan = span >> 1;       // 跨度的一半
+        int span = (1 << stage);
+        int halfSpan = span >> 1;
 
-        // 旋转因子步进角: e^(-j*2π/span)
-        // 利用欧拉公式展开: cos(θ) - j*sin(θ)
         double angleStep = -2.0 * M_PI / span;
         double wReal = qCos(angleStep);
         double wImag = qSin(angleStep);
 
-        // 遍历所有蝶形组
         for (int base = 0; base < N; base += span) {
-            double curReal = 1.0;   // 旋转因子实部，初始 W^0 = 1
-            double curImag = 0.0;   // 旋转因子虚部，初始 W^0 = 0
+            double curReal = 1.0;
+            double curImag = 0.0;
 
             for (int k = 0; k < halfSpan; ++k) {
                 int top = base + k;
                 int bot = top + halfSpan;
 
-                // 蝶形运算:
-                // X[bot] = data[top] - W * data[bot]
-                // data[top] = data[top] + W * data[bot]
                 double tReal = curReal * data[bot].real() - curImag * data[bot].imag();
                 double tImag = curReal * data[bot].imag() + curImag * data[bot].real();
 
@@ -224,7 +216,6 @@ void FftEngine::fftRadix2(QVector<std::complex<double>>& data)
                     data[top].real() + tReal,
                     data[top].imag() + tImag);
 
-                // 更新旋转因子: W *= w（复数乘法）
                 double newReal = curReal * wReal - curImag * wImag;
                 double newImag = curReal * wImag + curImag * wReal;
                 curReal = newReal;
@@ -256,7 +247,6 @@ QVector<QPointF> FftEngine::magnitudeSpectrum(
     for (int k = 0; k < halfN; ++k) {
         double magnitude = std::abs(fftResult[k]);
 
-        // 归一化: 直流分量(k=0)和奈奎斯特分量(k=N/2)不乘2，其余乘2
         if (k > 0 && k < halfN) {
             magnitude *= 2.0;
         }
@@ -267,4 +257,34 @@ QVector<QPointF> FftEngine::magnitudeSpectrum(
     }
 
     return spectrum;
+}
+
+// ============================================================
+// 统计接口
+// ============================================================
+
+/** @brief 获取总FFT变换执行次数 */
+quint64 FftEngine::totalTransforms() const
+{
+    return m_totalTransforms;
+}
+
+/** @brief 获取总处理的采样点数（累计） */
+quint64 FftEngine::totalSamplesProcessed() const
+{
+    return m_totalSamplesProcessed;
+}
+
+/** @brief 获取单次变换处理过的最大采样点数（峰值） */
+quint64 FftEngine::maxSampleSize() const
+{
+    return m_maxSampleSize;
+}
+
+/** @brief 重置所有统计计数器为初始值 */
+void FftEngine::resetStats()
+{
+    m_totalTransforms = 0;
+    m_totalSamplesProcessed = 0;
+    m_maxSampleSize = 0;
 }

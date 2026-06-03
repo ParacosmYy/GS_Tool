@@ -97,6 +97,7 @@ bool TcpConnection::open()
             connect(m_connectTimer, &QTimer::timeout, this, [this]() {
                 if (m_socket && m_socket->state() == QAbstractSocket::ConnectingState) {
                     m_socket->abort();
+                    ++m_errorCount;  // 连接超时计为错误
                     emit errorOccurred(tr("连接超时，请检查目标主机是否可达"));
                     updateState(ConnectionState::Error);
                 }
@@ -115,12 +116,14 @@ bool TcpConnection::open()
         }
 
         if (!m_server->listen(QHostAddress::Any, m_port)) {
+            ++m_errorCount;  // 监听失败计为错误
             emit errorOccurred(tr("TCP服务器监听失败: %1").arg(m_server->errorString()));
             updateState(ConnectionState::Error);
             return false;
         }
 
         updateState(ConnectionState::Connected);
+        ++m_totalConnections;  // 服务端监听成功计为一次连接
         return true;
     }
 }
@@ -130,6 +133,9 @@ void TcpConnection::close()
 {
     // 停止连接超时定时器
     if (m_connectTimer) m_connectTimer->stop();
+
+    // 统计断开次数: 仅在已连接状态下关闭时计数
+    bool wasConnected = (m_state == ConnectionState::Connected);
 
     if (m_socket) {
         disconnect(m_socket, nullptr, this, nullptr);  // 防止信号在 deleteLater 之前到达
@@ -147,6 +153,10 @@ void TcpConnection::close()
         m_server->close();
         m_server->deleteLater();
         m_server = nullptr;
+    }
+
+    if (wasConnected) {
+        ++m_totalDisconnections;  // 从已连接状态断开时计数
     }
     updateState(ConnectionState::Disconnected);
 }
@@ -167,7 +177,10 @@ qint64 TcpConnection::write(const QByteArray& data)
 
     qint64 written = target->write(data);
     if (written < 0) {
+        ++m_errorCount;  // 写入失败计为错误
         emit errorOccurred(tr("TCP写入失败: %1").arg(target->errorString()));
+    } else {
+        m_totalBytesSent += static_cast<quint64>(written);  // 累计发送字节
     }
     return written;
 }
@@ -177,12 +190,14 @@ void TcpConnection::onSocketConnected()
 {
     // 连接成功，取消超时定时器
     if (m_connectTimer) m_connectTimer->stop();
+    ++m_totalConnections;  // 客户端连接成功计数
     updateState(ConnectionState::Connected);
 }
 
 /** @brief 客户端模式：socket断开回调，更新状态为Disconnected */
 void TcpConnection::onSocketDisconnected()
 {
+    ++m_totalDisconnections;  // 对端断开计数
     updateState(ConnectionState::Disconnected);
 }
 
@@ -194,6 +209,7 @@ void TcpConnection::onSocketReadyRead()
 
     QByteArray data = senderSock->readAll();
     if (!data.isEmpty()) {
+        m_totalBytesReceived += static_cast<quint64>(data.size());  // 累计接收字节
         emit dataReceived(data);
     }
 }
@@ -201,6 +217,7 @@ void TcpConnection::onSocketReadyRead()
 /** @brief socket错误回调，翻译错误码并发射errorOccurred信号 @param error Qt网络错误枚举 */
 void TcpConnection::onSocketError(QAbstractSocket::SocketError error)
 {
+    ++m_errorCount;  // 网络错误计数
     QTcpSocket* sock = qobject_cast<QTcpSocket*>(sender());
     if (!sock) {
         emit errorOccurred(translateNetworkError(error, QString()));
@@ -265,10 +282,12 @@ void TcpConnection::onNewConnection()
         disconnect(m_clientSocket, nullptr, this, nullptr);
         m_clientSocket->disconnectFromHost();
         m_clientSocket->deleteLater();
+        ++m_totalDisconnections;  // 旧客户端被替换计为断开
     }
 
     m_clientSocket = m_server->nextPendingConnection();
     if (m_clientSocket) {
+        ++m_totalConnections;  // 服务端接受新连接计数
         QTcpSocket* sock = m_clientSocket;  // 捕获当前 socket 指针，防止 lambda 通过 m_clientSocket 访问到新 socket
         connect(sock, &QTcpSocket::readyRead,
                 this, &TcpConnection::onSocketReadyRead);
@@ -279,6 +298,7 @@ void TcpConnection::onNewConnection()
                         m_clientSocket->deleteLater();
                         m_clientSocket = nullptr;
                     }
+                    ++m_totalDisconnections;  // 客户端主动断开计数
                 });
         connect(sock, &QTcpSocket::errorOccurred,
                 this, &TcpConnection::onSocketError);
@@ -293,4 +313,31 @@ void TcpConnection::updateState(ConnectionState newState)
         m_state = newState;
         emit stateChanged(newState);
     }
+}
+
+// ---- 统计计数器实现 ----
+
+/** @brief 获取累计连接成功次数 @return 连接成功次数 */
+quint64 TcpConnection::totalConnections() const { return m_totalConnections; }
+
+/** @brief 获取累计断开连接次数 @return 断开次数 */
+quint64 TcpConnection::totalDisconnections() const { return m_totalDisconnections; }
+
+/** @brief 获取累计发送字节数 @return 发送字节数 */
+quint64 TcpConnection::totalBytesSent() const { return m_totalBytesSent; }
+
+/** @brief 获取累计接收字节数 @return 接收字节数 */
+quint64 TcpConnection::totalBytesReceived() const { return m_totalBytesReceived; }
+
+/** @brief 获取累计错误次数 @return 错误次数 */
+quint64 TcpConnection::errorCount() const { return m_errorCount; }
+
+/** @brief 重置所有统计计数器为零 */
+void TcpConnection::resetStats()
+{
+    m_totalConnections = 0;
+    m_totalDisconnections = 0;
+    m_totalBytesSent = 0;
+    m_totalBytesReceived = 0;
+    m_errorCount = 0;
 }

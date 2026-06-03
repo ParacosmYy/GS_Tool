@@ -81,6 +81,9 @@ void SerialConnection::onError(QSerialPort::SerialPortError error)
         return;
     }
 
+    // 统计: 每次实际错误都计入总错误次数
+    m_errorCount++;
+
     // 翻译错误为详细的中文描述
     QString errorMsg = translateError(error);
     qWarning() << "Serial error on" << m_portName << ":" << error << errorMsg;

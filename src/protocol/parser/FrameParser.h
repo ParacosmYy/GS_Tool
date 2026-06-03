@@ -74,6 +74,20 @@ public:
     /** @brief 获取当前超时阈值（毫秒），0 表示禁用 */
     int frameTimeout() const;
 
+    /* —— 统计计数器接口 —— */
+
+    /** @brief 获取成功解析的帧总数 */
+    quint64 totalFramesParsed() const;
+
+    /** @brief 获取累计输入的字节总数 */
+    quint64 totalBytesInput() const;
+
+    /** @brief 获取校验和错误次数(CRC/Sum/异或不匹配) */
+    quint64 totalChecksumErrors() const;
+
+    /** @brief 重置所有统计计数器（帧数/字节/校验错误） */
+    void resetStats();
+
 signals:
     /** @brief 帧解析成功，fields 为各字段名->值映射 */
     void frameParsed(const QVariantMap& fields, const QByteArray& rawFrame);
@@ -122,8 +136,12 @@ private:
     int m_headerMatchPos = 0;               ///< 帧头匹配进度
     int m_footerMatchPos = 0;               ///< 帧尾匹配进度
     int m_expectedPayload = 0;              ///< 期望的有效数据长度
-    quint64 m_frameCount = 0;               ///< 成功解析帧计数
-    quint64 m_errorCount = 0;               ///< 错误帧计数
+    quint64 m_frameCount = 0;               ///< 成功解析帧计数(兼容旧接口)
+    quint64 m_errorCount = 0;               ///< 错误帧计数(兼容旧接口)
+
+    quint64 m_totalFramesParsed = 0;        ///< 成功解析帧总数
+    quint64 m_totalBytesInput = 0;          ///< 累计输入字节总数
+    quint64 m_totalChecksumErrors = 0;      ///< 校验和错误总数
 
     int m_maxFrameLength = kDefaultMaxFrameLength; ///< 帧长度上限（默认1024字节）
     int m_frameTimeoutMs = 500;             ///< 帧超时阈值（毫秒），0=禁用

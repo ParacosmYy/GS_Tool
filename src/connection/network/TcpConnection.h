@@ -85,6 +85,26 @@ public:
      */
     void configure(const QVariantMap& params) override;
 
+    // ---- 统计计数器接口 ----
+
+    /** @brief 获取累计连接成功次数 @return 连接成功次数 */
+    quint64 totalConnections() const;
+
+    /** @brief 获取累计断开连接次数 @return 断开次数 */
+    quint64 totalDisconnections() const;
+
+    /** @brief 获取累计发送字节数 @return 发送字节数 */
+    quint64 totalBytesSent() const;
+
+    /** @brief 获取累计接收字节数 @return 接收字节数 */
+    quint64 totalBytesReceived() const;
+
+    /** @brief 获取累计错误次数 @return 错误次数 */
+    quint64 errorCount() const;
+
+    /** @brief 重置所有统计计数器为零 */
+    void resetStats();
+
 private slots:
     /** @brief Client模式: 连接成功回调 */
     void onSocketConnected();
@@ -124,6 +144,13 @@ private:
     QTcpServer* m_server = nullptr;      ///< Server模式: 本地监听服务器
     QTcpSocket* m_clientSocket = nullptr; ///< Server模式: 已接受的客户端连接
     QTimer* m_connectTimer = nullptr;    ///< Client模式连接超时定时器(10秒)
+
+    // ---- 统计计数器 ----
+    quint64 m_totalConnections = 0;      ///< 累计连接成功次数
+    quint64 m_totalDisconnections = 0;   ///< 累计断开连接次数
+    quint64 m_totalBytesSent = 0;        ///< 累计发送字节数
+    quint64 m_totalBytesReceived = 0;    ///< 累计接收字节数
+    quint64 m_errorCount = 0;            ///< 累计错误次数
 };
 
 #endif // TCPCONNECTION_H

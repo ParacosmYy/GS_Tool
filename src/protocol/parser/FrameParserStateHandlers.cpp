@@ -259,12 +259,13 @@ void FrameParser::processCompletePayload()
     }
 }
 
-/** @brief CRC校验验证，通过返回true，失败则emit错误并重置 */
+/** @brief CRC校验验证，通过返回true，失败则递增校验错误计数并重置 */
 bool FrameParser::handleCrcValidation()
 {
     if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
         if (!verifyChecksum(m_buffer)) {
             m_errorCount++;
+            m_totalChecksumErrors++;
             emit frameError(tr("校验和不匹配"), m_buffer);
             resetIntermediateState();
             return false;
@@ -293,6 +294,7 @@ void FrameParser::handleChecksumVerifying(unsigned char byte)
         }
     } else {
         m_errorCount++;
+        m_totalChecksumErrors++;
         emit frameError(tr("校验和不匹配"), m_buffer);
         resetIntermediateState();
     }
@@ -323,6 +325,7 @@ void FrameParser::handleFooterMatching(unsigned char byte)
             completeFrame();
         } else {
             m_errorCount++;
+            m_totalChecksumErrors++;
             emit frameError(tr("校验和不匹配"), m_buffer);
             resetIntermediateState();
         }

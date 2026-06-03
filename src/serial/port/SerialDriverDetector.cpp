@@ -31,9 +31,16 @@ const QStringList SerialDriverDetector::kKnownDrivers = {
     QStringLiteral("WCH"),
 };
 
+// ---- 静态统计计数器初始化 ----
+quint64 SerialDriverDetector::m_totalScans = 0;       ///< 累计扫描次数
+quint64 SerialDriverDetector::m_totalDriversFound = 0; ///< 累计检测到的已安装驱动数
+
 /** @brief 检测系统中所有已知USB串口驱动的安装状态(CH340/CP2102/FT232/PL2303/WCH等) @return DriverInfo列表 */
 QVector<DriverInfo> SerialDriverDetector::detectDrivers()
 {
+    // 统计: 每次调用计入扫描次数
+    m_totalScans++;
+
     QVector<DriverInfo> result;
 
     // 为每个已知驱动创建条目，默认未安装
@@ -57,6 +64,8 @@ QVector<DriverInfo> SerialDriverDetector::detectDrivers()
         for (int i = 0; i < result.size(); ++i) {
             if (!result[i].installed && combined.contains(result[i].driverName.toUpper())) {
                 result[i].installed = true;
+                // 统计: 检测到一个已安装的驱动
+                m_totalDriversFound++;
                 // 保存更详细的描述信息
                 if (!desc.isEmpty()) {
                     result[i].description = desc;
@@ -127,4 +136,16 @@ QString SerialDriverDetector::driverStatusSummary()
                        "可用端口: %1\n"
                        "端口仍可能正常使用（原生COM口或未识别的适配器）。")
         .arg(portNames.join(QStringLiteral(", ")));
+}
+
+/**
+ * @brief 重置扫描统计计数器
+ *
+ * 将 totalScans/totalDriversFound 归零。
+ * 适用于会话切换或统计面板刷新场景。
+ */
+void SerialDriverDetector::resetStats()
+{
+    m_totalScans = 0;
+    m_totalDriversFound = 0;
 }

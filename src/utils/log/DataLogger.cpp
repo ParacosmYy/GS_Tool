@@ -97,7 +97,6 @@ void DataLogger::stopRecording()
         emit recordingStopped(path, m_recordCount, duration);
     }
 }
-
 /** @brief 暂停录制，记录暂停起始时间 */
 void DataLogger::pauseRecording()
 {
@@ -120,7 +119,6 @@ bool DataLogger::isRecording() const
 {
     return m_recording;
 }
-
 /** @brief 查询录制是否暂停 @return true=已暂停 */
 bool DataLogger::isPaused() const
 {
@@ -139,14 +137,13 @@ void DataLogger::logData(const QByteArray& data, Direction dir)
     quint64 timestamp = static_cast<quint64>(m_recordTimer.elapsed() - m_pauseOffset);
     writeRecord(timestamp, dir, data);
     m_recordCount++;
+    ++m_totalLogsWritten;  // 累计写入计数
 }
-
 /** @brief 获取已录制的记录数 @return 记录条数 */
 int DataLogger::recordCount() const
 {
     return m_recordCount;
 }
-
 /** @brief 获取录制持续时间(毫秒) @return 毫秒数 */
 qint64 DataLogger::recordingDuration() const
 {
@@ -227,7 +224,6 @@ bool DataLogger::startPlayback(const QString& filePath)
     m_playbackTimer->start();
     return true;
 }
-
 /** @brief 停止回放，关闭文件，发射playbackStopped信号 */
 void DataLogger::stopPlayback()
 {
@@ -244,7 +240,6 @@ void DataLogger::stopPlayback()
 
     emit playbackFinished();
 }
-
 /** @brief 暂停回放 */
 void DataLogger::pausePlayback()
 {
@@ -265,7 +260,6 @@ void DataLogger::resumePlayback()
     m_playbackElapsed.restart();
     m_playbackTimer->start();
 }
-
 /** @brief 设置回放速率 @param speed 速率倍数(1.0=正常) */
 void DataLogger::setPlaybackSpeed(qreal speed)
 {
@@ -279,7 +273,6 @@ void DataLogger::setPlaybackSpeed(qreal speed)
 
     m_playbackSpeed = newSpeed;
 }
-
 /** @brief 查询是否正在回放 @return true=回放中 */
 bool DataLogger::isPlaying() const
 {
@@ -458,6 +451,7 @@ void DataLogger::addBookmark(const QString& label, const QString& streamId)
         ts = QDateTime::currentDateTime().toMSecsSinceEpoch();
     }
     m_bookmarks.append(DataBookmark(ts, label, streamId));
+    ++m_totalBookmarks;  // 累计书签计数
     std::sort(m_bookmarks.begin(), m_bookmarks.end());
     emit bookmarksChanged();
 }
@@ -467,7 +461,6 @@ QVector<DataBookmark> DataLogger::bookmarks() const
 {
     return m_bookmarks;
 }
-
 /** @brief 删除指定索引的书签 @param index 书签索引 */
 void DataLogger::removeBookmark(int index)
 {
@@ -475,11 +468,31 @@ void DataLogger::removeBookmark(int index)
     m_bookmarks.removeAt(index);
     emit bookmarksChanged();
 }
-
 /** @brief 清空所有书签 */
 void DataLogger::clearBookmarks()
 {
     if (m_bookmarks.isEmpty()) return;
     m_bookmarks.clear();
     emit bookmarksChanged();
+}
+
+// ---- 会话统计 ----
+
+/** @brief 获取累计写入的日志记录总数 @return 记录条数 */
+quint64 DataLogger::totalLogsWritten() const
+{
+    return m_totalLogsWritten;
+}
+
+/** @brief 获取累计添加的书签总数(含已删除) @return 书签总数 */
+quint64 DataLogger::totalBookmarks() const
+{
+    return m_totalBookmarks;
+}
+
+/** @brief 重置所有会话统计计数器(不影响录制/回放状态) */
+void DataLogger::resetStats()
+{
+    m_totalLogsWritten = 0;
+    m_totalBookmarks = 0;
 }

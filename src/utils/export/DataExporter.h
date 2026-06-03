@@ -87,6 +87,20 @@ public:
      */
     int lastExportRangeCount() const;
 
+    // ---- 会话统计 ----
+
+    /** @brief 获取累计导出操作总次数 @return 导出次数 */
+    quint64 totalExports() const;
+
+    /** @brief 获取累计导出的字节总数 @return 字节数 */
+    quint64 totalBytesExported() const;
+
+    /** @brief 获取累计导出失败次数 @return 失败次数 */
+    quint64 totalErrors() const;
+
+    /** @brief 重置所有会话统计计数器 */
+    void resetStats();
+
 signals:
     /** @brief 导出失败信号 @param filePath 文件路径 @param errorString 错误描述 */
     void exportError(const QString& filePath, const QString& errorString);
@@ -170,6 +184,11 @@ private:
     // ---- 成员变量 ----
 
     int m_lastExportRangeCount = 0;  ///< 上次exportRange导出的记录数量
+
+    // 会话统计
+    quint64 m_totalExports = 0;       ///< 累计导出操作总次数
+    quint64 m_totalBytesExported = 0;  ///< 累计导出的字节总数
+    quint64 m_totalErrors = 0;         ///< 累计导出失败次数
 };
 
 #endif // DATA_EXPORTER_H

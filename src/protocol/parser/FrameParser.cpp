@@ -60,6 +60,9 @@ void FrameParser::feed(const QByteArray& data)
         return;
     }
 
+    /* 累计输入字节统计 */
+    m_totalBytesInput += static_cast<quint64>(data.size());
+
     for (int i = 0; i < data.size(); ++i) {
         processByte(static_cast<unsigned char>(data[i]));
     }
@@ -123,6 +126,29 @@ void FrameParser::setFrameTimeout(int timeoutMs)
 int FrameParser::frameTimeout() const { return m_frameTimeoutMs; }
 
 // ============================================================================
+// 统计计数器接口
+// ============================================================================
+
+/** @brief 获取成功解析的帧总数 @return 累计帧数 */
+quint64 FrameParser::totalFramesParsed() const { return m_totalFramesParsed; }
+
+/** @brief 获取累计输入的字节总数 @return 字节数 */
+quint64 FrameParser::totalBytesInput() const { return m_totalBytesInput; }
+
+/** @brief 获取校验和错误次数(CRC/Sum/异或不匹配) @return 错误次数 */
+quint64 FrameParser::totalChecksumErrors() const { return m_totalChecksumErrors; }
+
+/** @brief 重置所有统计计数器(帧数/字节/校验错误) */
+void FrameParser::resetStats()
+{
+    m_frameCount = 0;
+    m_errorCount = 0;
+    m_totalFramesParsed = 0;
+    m_totalBytesInput = 0;
+    m_totalChecksumErrors = 0;
+}
+
+// ============================================================================
 // 状态机基础设施
 // ============================================================================
 
@@ -168,11 +194,12 @@ void FrameParser::startTimeoutTimer()
     }
 }
 
-/** @brief 帧接收完成：提取字段、发射frameParsed信号、重置状态 */
+/** @brief 帧接收完成：提取字段、发射frameParsed信号、更新统计、重置状态 */
 void FrameParser::completeFrame()
 {
     QVariantMap fields = extractFields(m_buffer);
     m_frameCount++;
+    m_totalFramesParsed++;
     emit frameParsed(fields, m_buffer);
     reset();
 }
