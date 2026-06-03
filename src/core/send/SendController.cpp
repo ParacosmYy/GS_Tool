@@ -12,6 +12,7 @@
 #include "utils/crypto/HexConverter.h"
 #include "core/theme/Constants.h"
 #include "core/widgets/AnimatedButton.h"
+#include "core/widgets/SmartAutoComplete.h"
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -19,6 +20,8 @@
 #include <QHBoxLayout>
 #include <QFrame>
 #include <QStyle>
+#include <QKeyEvent>
+#include <QMap>
 
 /**
  * @brief 构造发送控制器
@@ -71,6 +74,23 @@ QWidget* SendController::createSendBar(QWidget* parent)
     m_sendCompleter->setCompletionMode(QCompleter::PopupCompletion);
     m_sendInput->setCompleter(m_sendCompleter);
 
+    // 智能自动补全（频率排序前缀匹配，QCompleter 作为备选保留）
+    m_smartComplete = new SmartAutoComplete(parent);
+    m_smartComplete->setObjectName("smartAutoComplete");
+
+    // 从发送历史聚合构建补全条目（按文本去重，累加频率，保留最近时间戳）
+    QMap<QString, AutoCompleteEntry> agg;
+    for (const auto& e : m_sendHistory->entries()) {
+        auto& item = agg[e.text];
+        item.text = e.text;
+        item.frequency++;
+        const qint64 ts = e.time.toMSecsSinceEpoch();
+        if (ts > item.lastUsed) item.lastUsed = ts;
+    }
+    m_smartComplete->setEntries(agg.values());
+
+    m_sendInput->installEventFilter(this);
+
     // 发送按钮
     m_sendBtn = new AnimatedButton(tr("发送"));
     m_sendBtn->setObjectName("sendButton");
@@ -97,6 +117,36 @@ QWidget* SendController::createSendBar(QWidget* parent)
     // 发送历史变化时更新自动补全数据源
     connect(m_sendHistory, &SendHistory::historyChanged, this, [this]() {
         m_sendCompleterModel->setStringList(m_sendHistory->recentTexts());
+        // 同步更新智能补全条目
+        if (m_smartComplete) {
+            QMap<QString, AutoCompleteEntry> agg;
+            for (const auto& e : m_sendHistory->entries()) {
+                auto& item = agg[e.text];
+                item.text = e.text;
+                item.frequency++;
+                const qint64 ts = e.time.toMSecsSinceEpoch();
+                if (ts > item.lastUsed) item.lastUsed = ts;
+            }
+            m_smartComplete->setEntries(agg.values());
+        }
+    });
+
+    // 输入变化 → 触发智能补全
+    connect(m_sendInput, &QLineEdit::textChanged, this, [this](const QString& text) {
+        if (text.isEmpty()) {
+            m_smartComplete->hideComplete();
+            return;
+        }
+        const QPoint pos = m_sendInput->mapToGlobal(QPoint(0, m_sendInput->height()));
+        m_smartComplete->showForPrefix(text, pos);
+    });
+
+    // 用户选择补全项 → 填入输入框
+    connect(m_smartComplete, &SmartAutoComplete::entrySelected, this, [this](const QString& text) {
+        m_smartComplete->hideComplete();
+        m_sendInput->blockSignals(true);
+        m_sendInput->setText(text);
+        m_sendInput->blockSignals(false);
     });
 
     // 定时发送器的数据通过 sendAndRecord 发出
@@ -278,4 +328,47 @@ void SendController::onSendData()
 void SendController::onQuickCommand(const QByteArray& data)
 {
     sendAndRecord(data);
+}
+
+/**
+ * @brief 事件过滤器 — 拦截输入框键盘事件用于智能补全导航
+ *
+ * 按键处理:
+ *   Up/Down: 智能补全列表导航(仅当补全可见时)
+ *   Enter/Return: 确认选择(仅当有选中项时); 否则传递给 onSendData
+ *   Escape: 关闭补全列表
+ */
+bool SendController::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == m_sendInput && event->type() == QEvent::KeyPress && m_smartComplete) {
+        auto* keyEvent = static_cast<QKeyEvent*>(event);
+        switch (keyEvent->key()) {
+        case Qt::Key_Up:
+        case Qt::Key_Down:
+            if (m_smartComplete->isVisible()) {
+                m_smartComplete->handleKeyEvent(keyEvent);
+                return true;
+            }
+            break;
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+            if (m_smartComplete->hasSelection()) {
+                m_smartComplete->hideComplete();
+                m_sendInput->blockSignals(true);
+                m_sendInput->setText(m_smartComplete->selectedText());
+                m_sendInput->blockSignals(false);
+                return true;
+            }
+            break;
+        case Qt::Key_Escape:
+            if (m_smartComplete->isVisible()) {
+                m_smartComplete->hideComplete();
+                return true;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    return QObject::eventFilter(watched, event);
 }

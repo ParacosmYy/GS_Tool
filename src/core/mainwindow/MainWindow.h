@@ -47,6 +47,9 @@
 #include "ota/manager/OtaManager.h"
 #include "ota/widget/OtaWidget.h"
 #include "core/theme/Constants.h"
+#include "core/navigation/IconNavBar.h"
+#include "core/widgets/CommandPalette.h"
+#include "core/widgets/ScriptRecorder.h"
 
 /**
  * @brief 主窗口 - EmbedDebug 应用的顶层窗口
@@ -156,6 +159,13 @@ private:
     BackgroundSettingsPopup* m_bgSettingsPopup; ///< 背景设置弹出面板
     // ---- 会话管理 ----
     SessionManager* m_sessionManager;          ///< 会话管理器(窗口/配置保存恢复)
+    // ---- 命令面板 ----
+    CommandPalette* m_commandPalette = nullptr; ///< 命令面板(Ctrl+P快速导航)
+    // ---- 脚本录制 ----
+    ScriptRecorder* m_scriptRecorder = nullptr; ///< 脚本录制器(录制/回放发送序列)
+    // ---- 图标导航栏(feature flag) ----
+    IconNavBar* m_iconNavBar = nullptr;        ///< 图标导航栏(三栏布局, 默认关闭)
+    bool m_useIconNavBar = false;              ///< 功能开关: "ui/iconNavBar" 配置项
 };
 
 #endif // MAINWINDOW_H

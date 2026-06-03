@@ -8,5 +8,15 @@
         <file>icons/dropdown_arrow_disabled.svg</file>
         <file>icons/dropdown_arrow_light.svg</file>
         <file>icons/dropdown_arrow_light_disabled.svg</file>
+        <file>icons/lucide/cable.svg</file>
+        <file>icons/lucide/bluetooth.svg</file>
+        <file>icons/lucide/wifi.svg</file>
+        <file>icons/lucide/terminal.svg</file>
+        <file>icons/lucide/bar-chart-2.svg</file>
+        <file>icons/lucide/code.svg</file>
+        <file>icons/lucide/wrench.svg</file>
+        <file>icons/lucide/bug.svg</file>
+        <file>icons/lucide/settings.svg</file>
+        <file>icons/lucide/search.svg</file>
     </qresource>
 </RCC>

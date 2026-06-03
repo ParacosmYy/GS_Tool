@@ -39,6 +39,7 @@ class SendHistory;
 class TimedSender;
 class IConnection;
 class AnimatedButton;
+class SmartAutoComplete;
 
 /**
  * @brief 发送控制器 - 管理数据发送的完整生命周期
@@ -188,6 +189,11 @@ private:
 
     /** @brief 输入框自动补全器，弹出匹配的历史发送记录 */
     QCompleter* m_sendCompleter = nullptr;
+
+    /** @brief 智能自动补全弹出列表(频率排序前缀匹配) */
+    SmartAutoComplete* m_smartComplete = nullptr;
+
+    bool eventFilter(QObject* watched, QEvent* event) override; ///< 输入框键盘事件拦截
 };
 
 #endif // SENDCONTROLLER_H

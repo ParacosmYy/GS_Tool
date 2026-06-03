@@ -85,8 +85,65 @@ MainWindow::MainWindow(QWidget* parent)
     // 构建导航树模型: 通过 PanelManager 获取面板映射表
     m_navController->buildNavTree(m_navTree, m_panelManager->panelMappings());
 
+    // 填充图标导航栏分类(从面板映射表提取去重分类)
+    if (m_useIconNavBar && m_iconNavBar) {
+        QVector<NavCategory> categories;
+        const auto& mappings = m_panelManager->panelMappings();
+        QMap<QString, NavCategory> seen;
+        for (const auto& m : mappings) {
+            if (!seen.contains(m.category)) {
+                NavCategory cat;
+                cat.id = QString::fromUtf8(m.category);
+                cat.label = tr(m.category);
+                cat.panelIds.append(QString::fromUtf8(m.name));
+                seen.insert(m.category, cat);
+            } else {
+                seen[m.category].panelIds.append(QString::fromUtf8(m.name));
+            }
+        }
+        categories = seen.values().toVector();
+        m_iconNavBar->setCategories(categories);
+        connect(m_iconNavBar, &IconNavBar::categoryClicked, this,
+                [this](const QString& id) {
+            Q_UNUSED(id);
+            // 后续: 展开导航树对应分类并高亮第一个面板
+        });
+    }
+
     // 初始面板状态: 终端为默认可见面板（不触发动画）
     m_navController->setCurrentPanel(m_panelManager->terminal());
+
+    // 命令面板 (Ctrl+P 快速导航)
+    m_commandPalette = new CommandPalette(this);
+    {
+        QVector<CommandEntry> cmds;
+        for (const auto& m : m_panelManager->panelMappings()) {
+            CommandEntry e;
+            e.id = "nav." + QString(m.name);
+            e.category = tr("导航");
+            e.label = tr(m.name);
+            e.action = [this, m]() { m_navController->switchToPanel(m.widget); };
+            cmds.append(e);
+        }
+        m_commandPalette->registerCommands(cmds);
+    }
+    auto* cmdShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
+    connect(cmdShortcut, &QShortcut::activated, m_commandPalette, &CommandPalette::showPalette);
+
+    // 脚本录制器 — 从 PanelManager 获取已创建的面板实例
+    m_scriptRecorder = m_panelManager->scriptRecorder();
+    m_scriptRecorder->setObjectName("scriptRecorder");
+    // 回放发送请求 → SendController（lambda 桥接 QString→QByteArray）
+    connect(m_scriptRecorder, &ScriptRecorder::playbackSendRequested,
+            this, [this](const QString& data, bool isHex) {
+        Q_UNUSED(isHex);
+        m_sendController->onQuickCommand(data.toUtf8());
+    });
+    // 录制状态变化 → 状态栏提示
+    connect(m_scriptRecorder, &ScriptRecorder::recordingChanged,
+            this, [this](bool recording) {
+        statusBar()->showMessage(recording ? tr("脚本录制中...") : tr("录制已停止"), 3000);
+    });
 
     // 设置 ThemeManager 主题切换淡入淡出动画目标（中央背景层）
     ThemeManager::instance().setTransitionWidget(m_backgroundWidget);
@@ -168,6 +225,15 @@ void MainWindow::setupUI()
     m_mainSplitter->setStretchFactor(0, 0);
     m_mainSplitter->setStretchFactor(1, 1);
 
+    // 图标导航栏功能开关(默认关闭, 通过 SettingsManager "ui/iconNavBar" 开启)
+    m_useIconNavBar = SettingsManager::instance().get("ui/iconNavBar").toBool();
+    if (m_useIconNavBar) {
+        m_iconNavBar = new IconNavBar(m_backgroundWidget);
+        m_iconNavBar->setObjectName("iconNavBar");
+        m_mainSplitter->insertWidget(0, m_iconNavBar);
+        m_mainSplitter->setSizes({56, 200, 1000});
+    }
+
     bgLayout->addWidget(m_mainSplitter, 1);
 
     // Ctrl+F 快捷键激活搜索栏
@@ -221,6 +287,7 @@ QWidget* MainWindow::createContentArea()
 
     // 通过 PanelManager 统一创建所有面板
     m_panelManager->createPanels(m_otaManager, m_terminalModel);
+    m_panelManager->wrapPanels();  // 将可切换面板包装在 BasePanel 容器中
 
     // 将所有面板添加到面板栈布局（数据驱动，遍历 PanelManager.allPanels()）
     for (auto* panel : m_panelManager->allPanels()) {

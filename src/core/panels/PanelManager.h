@@ -11,8 +11,11 @@
 
 #include <QObject>
 #include <QVector>
+#include <QMap>
 #include "core/navigation/NavigationController.h"
 #include "core/panels/PanelManagerPanels.h"
+#include "core/widgets/BasePanel.h"
+#include "core/widgets/ScriptRecorder.h"
 
 class OtaManager;
 class TerminalModel;
@@ -34,7 +37,7 @@ class TerminalModel;
  *   - MainWindow: 调用 createPanels() 创建面板，通过 Getter 获取面板指针用于布局和信号连接
  *   - NavigationController: 使用 panelMappings() 构建导航树，使用 allPanels() 切换面板
  */
-class PanelManager : public QObject {
+class PanelManager : public QObject, private PanelManagerMembers {
     Q_OBJECT
 
 public:
@@ -73,6 +76,9 @@ public:
     // --- 终端增强 ---
     TerminalFilterBar* terminalFilterBar() const;
 
+    // --- 脚本录制 ---
+    ScriptRecorder* scriptRecorder() const;
+
     // --- 连接层 ---
     BleConfigPanel* bleConfigPanel() const;
     BleGattBrowser* bleGattBrowser() const;
@@ -109,6 +115,7 @@ public:
     ConverterPanel* converterPanel() const;
     TimestampPanel* timestampPanel() const;
     PacketBuilderPanel* packetBuilderPanel() const;
+    DataDiffWidget* dataDiffPanel() const;
 
     // --- 系统层 ---
     PluginConfigPanel* pluginConfigPanel() const;
@@ -120,70 +127,13 @@ public:
     QVector<NavPanelMapping> panelMappings() const;
     QVector<QWidget*> allPanels() const;
 
+    // ==================== BasePanel包装器 ====================
+    BasePanel* wrapper(QWidget* rawPanel) const;  ///< 获取面板的BasePanel包装器
+    void wrapPanels();                            ///< 创建所有BasePanel包装器
+
 private:
-    // --- 核心面板指针 ---
-    SerialConfigPanel* m_serialConfig = nullptr;
-    DataStatistics* m_dataStats = nullptr;
-    ProtocolView* m_protocolView = nullptr;
-    FrameVisualEditor* m_frameEditor = nullptr;
-    ChartWidget* m_chartWidget = nullptr;
-    OtaWidget* m_otaWidget = nullptr;
-    TerminalWidget* m_terminal = nullptr;
-    TerminalSearchBar* m_searchBar = nullptr;
-    QuickCommandBar* m_quickCmdBar = nullptr;
-    BookmarkWidget* m_bookmarkWidget = nullptr;
-
-    // --- 录制回放 ---
-    PlaybackWidget* m_playbackWidget = nullptr;
-
-    // --- 仪表盘 ---
-    DashboardWidget* m_dashboardWidget = nullptr;
-
-    // --- 终端增强 ---
-    TerminalFilterBar* m_terminalFilterBar = nullptr;
-
-    // --- 连接层 ---
-    BleConfigPanel* m_bleConfigPanel = nullptr;
-    BleGattBrowser* m_bleGattBrowser = nullptr;
-    CanConfigPanel* m_canConfigPanel = nullptr;
-    CanBusMonitor* m_canBusMonitor = nullptr;
-    MqttConfigPanel* m_mqttConfigPanel = nullptr;
-    MqttSubscriptionPanel* m_mqttSubscriptionPanel = nullptr;
-    MultiConnectionPanel* m_multiConnectionPanel = nullptr;
-    SpiI2cConfigPanel* m_spiI2cConfigPanel = nullptr;
-    WsConfigPanel* m_wsConfigPanel = nullptr;
-    UsbConfigPanel* m_usbConfigPanel = nullptr;
-    UsbDescriptorViewer* m_usbDescriptorViewer = nullptr;
-
-    // --- 协议层 ---
-    ProtocolSchemaEditor* m_protocolSchemaEditor = nullptr;
-    ModbusConfigPanel* m_modbusConfigPanel = nullptr;
-    ModbusScanWidget* m_modbusScanWidget = nullptr;
-    SchemaViewer* m_schemaViewer = nullptr;
-
-    // --- 调试层 ---
-    RttConfigPanel* m_rttConfigPanel = nullptr;
-    RegisterEditor* m_registerEditor = nullptr;
-    SignalLineWidget* m_signalLineWidget = nullptr;
-    TrafficMonitorWidget* m_trafficMonitorWidget = nullptr;
-    TriggerListPanel* m_triggerListPanel = nullptr;
-
-    // --- 图表扩展 ---
-    FftWidget* m_fftWidget = nullptr;
-    ScatterWidget* m_scatterWidget = nullptr;
-    HistogramWidget* m_histogramWidget = nullptr;
-
-    // --- 工具层 ---
-    ChecksumPanel* m_checksumPanel = nullptr;
-    ConverterPanel* m_converterPanel = nullptr;
-    TimestampPanel* m_timestampPanel = nullptr;
-    PacketBuilderPanel* m_packetBuilderPanel = nullptr;
-
-    // --- 系统层 ---
-    PluginConfigPanel* m_pluginConfigPanel = nullptr;
-    ProjectWelcomeDialog* m_projectWelcomeDialog = nullptr;
-    DeviceProfilePanel* m_deviceProfilePanel = nullptr;
-    PerformanceOverlay* m_performanceOverlay = nullptr;
+    // --- BasePanel包装器 ---
+    QMap<QWidget*, BasePanel*> m_wrappers;  ///< 原始面板→BasePanel包装器映射
 };
 
 #endif // PANEL_MANAGER_H

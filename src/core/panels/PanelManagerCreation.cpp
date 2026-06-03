@@ -26,6 +26,7 @@
 #include "core/recording/PlaybackWidget.h"
 #include "dashboard/DashboardWidget.h"
 #include "terminal/filter/TerminalFilterBar.h"
+#include "core/widgets/ScriptRecorder.h"
 
 // ---- 连接层 ----
 #include "connection/ble/BleConfigPanel.h"
@@ -63,6 +64,7 @@
 #include "utils/converter/ConverterPanel.h"
 #include "utils/timestamp/TimestampPanel.h"
 #include "utils/packet/PacketBuilderPanel.h"
+#include "core/widgets/DataDiffWidget.h"
 
 // ---- 系统层 ----
 #include "plugin/PluginConfigPanel.h"
@@ -155,6 +157,14 @@ void PanelManager::createPanels(OtaManager* otaManager, TerminalModel* terminalM
     m_terminalFilterBar = new TerminalFilterBar(widgetParent);      // F21 终端过滤
     m_terminalFilterBar->setObjectName("terminalFilterBarPanel");
     m_terminalFilterBar->setVisible(false);
+
+    // ============================================================
+    //  脚本录制 (Script Recorder)
+    // ============================================================
+
+    m_scriptRecorder = new ScriptRecorder(widgetParent);            // 脚本录制器
+    m_scriptRecorder->setObjectName("scriptRecorderPanel");
+    m_scriptRecorder->setVisible(false);
 
     // ============================================================
     //  连接层 (Connection) — BLE/CAN/MQTT/TCP/SPI/I2C/WS/USB
@@ -285,6 +295,10 @@ void PanelManager::createPanels(OtaManager* otaManager, TerminalModel* terminalM
     m_packetBuilderPanel = new PacketBuilderPanel(widgetParent);    // F25 数据包构建
     m_packetBuilderPanel->setObjectName("packetBuilderPanel");
     m_packetBuilderPanel->setVisible(false);
+
+    m_dataDiffPanel = new DataDiffWidget(widgetParent);             // 数据对比
+    m_dataDiffPanel->setObjectName("dataDiffPanel");
+    m_dataDiffPanel->setVisible(false);
 
     // ============================================================
     //  系统层 (System)

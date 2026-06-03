@@ -22,6 +22,7 @@ find_package(Qt6 REQUIRED COMPONENTS
     Core
     Gui
     Widgets
+    Svg
     SerialPort
     Charts
     Network
@@ -39,6 +40,7 @@ set(SOURCES
     src/core/recording/RecordingController.cpp
     src/core/navigation/NavigationController.cpp
     src/core/navigation/NavigationControllerAnimations.cpp
+    src/core/navigation/IconNavBar.cpp
     src/core/send/SendController.cpp
     src/core/settings/SettingsController.cpp
     src/core/toolbar/ToolbarController.cpp
@@ -47,10 +49,19 @@ set(SOURCES
     src/core/panels/PanelManagerCreation.cpp
     src/core/background/BackgroundWidget.cpp
     src/core/background/BackgroundSettingsPopup.cpp
+    src/core/widgets/BasePanel.cpp
     src/core/widgets/AnimatedButton.cpp
+    src/core/widgets/EmptyStateWidget.cpp
+    src/core/widgets/LoadingSpinner.cpp
+    src/core/widgets/SkeletonWidget.cpp
+    src/core/widgets/SmartAutoComplete.cpp
+    src/core/widgets/CommandPalette.cpp
+    src/core/widgets/ScriptRecorder.cpp
+    src/core/widgets/DataDiffWidget.cpp
     src/core/connect/ConnectionManager.cpp
     src/core/connect/ConnectionFactory.cpp
     src/core/theme/ThemeManager.cpp
+    src/core/theme/IconManager.cpp
     src/connection/serial_port/SerialConnection.cpp
     src/connection/serial_port/SerialConnectionError.cpp
     src/connection/network/TcpConnection.cpp
@@ -263,6 +274,7 @@ set(HEADERS
     src/core/widgets/AnimatedButton.h
     src/core/recording/RecordingController.h
     src/core/navigation/NavigationController.h
+    src/core/navigation/IconNavBar.h
     src/core/send/SendController.h
     src/core/settings/SettingsController.h
     src/core/toolbar/ToolbarController.h
@@ -274,9 +286,23 @@ set(HEADERS
     src/core/connect/ConnectionManager.h
     src/core/connect/ConnectionFactory.h
     src/core/theme/ThemeManager.h
+    src/core/theme/IconManager.h
+    src/core/widgets/BasePanel.h
+    src/core/widgets/EmptyStateWidget.h
+    src/core/widgets/LoadingSpinner.h
+    src/core/widgets/SkeletonWidget.h
+    src/core/widgets/SmartAutoComplete.h
     src/core/widgets/ToastWidget.h
+    src/core/widgets/CommandPalette.h
+    src/core/widgets/ScriptRecorder.h
+    src/core/widgets/DataDiffWidget.h
     src/core/navigation/NavIndicatorWidget.h
     src/core/theme/Constants.h
+    src/core/theme/AppConstants.h
+    src/core/theme/AnimationConstants.h
+    src/core/theme/LayoutConstants.h
+    src/core/theme/ConnectionConstants.h
+    src/core/theme/TimerConstants.h
     src/core/settings/SessionManager.h
     src/connection/interface/IConnection.h
     src/connection/serial_port/SerialConnection.h
@@ -504,6 +530,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
+    Qt6::Svg
     Qt6::SerialPort
     Qt6::Charts
     Qt6::Network
