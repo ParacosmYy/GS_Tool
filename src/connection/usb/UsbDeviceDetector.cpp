@@ -10,6 +10,7 @@
 #include <QProcess>
 #include <QRegularExpression>
 
+/** @brief 构造USB设备检测器，初始化轮询定时器 @param parent 父QObject指针 */
 UsbDeviceDetector::UsbDeviceDetector(QObject* parent)
     : QObject(parent)
     , m_pollTimer(new QTimer(this))
@@ -111,6 +112,7 @@ QVariantList UsbDeviceDetector::scanDevices() {
     return devices;
 }
 
+/** @brief 获取指定VID/PID的USB设备详细信息 @param vid 厂商ID @param pid 产品ID @return 设备详情映射表 */
 QVariantMap UsbDeviceDetector::deviceDetails(quint16 vid,
                                               quint16 pid) const {
     for (const QVariant& var : m_devices) {
@@ -125,21 +127,25 @@ QVariantMap UsbDeviceDetector::deviceDetails(quint16 vid,
     return details;
 }
 
+/** @brief 启动设备变化监控轮询 @param intervalMs 轮询间隔(毫秒) */
 void UsbDeviceDetector::startMonitoring(int intervalMs) {
     m_devices = scanDevices();
     m_pollTimer->start(intervalMs);
 }
 
+/** @brief 停止设备变化监控轮询 */
 void UsbDeviceDetector::stopMonitoring() {
     m_pollTimer->stop();
 }
 
+/** @brief 轮询定时器超时回调，执行一次扫描并检测设备变化 */
 void UsbDeviceDetector::onPollTimeout() {
     ++m_totalDetectionCycles;
     QVariantList newDevices = scanDevices();
     detectChanges(newDevices);
 }
 
+/** @brief 对比新旧设备列表，检测插入和移除事件 @param newList 最新扫描到的设备列表 */
 void UsbDeviceDetector::detectChanges(const QVariantList& newList) {
     // 检测插入的设备
     for (const QVariant& var : newList) {

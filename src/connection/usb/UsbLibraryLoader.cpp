@@ -235,6 +235,7 @@ int UsbLibraryLoader::detachKernelDriver(UsbDeviceHandle* handle,
 
 /* ---- 内部方法 ---- */
 
+/** @brief 解析libusb库中所有函数指针 @return 核心函数全部解析成功返回true */
 bool UsbLibraryLoader::resolveFunctions()
 {
     if (!m_library || !m_library->isLoaded()) { return false; }
@@ -268,6 +269,7 @@ bool UsbLibraryLoader::resolveFunctions()
     return true;
 }
 
+/** @brief 生成libusb共享库搜索路径列表 @return 按优先级排列的候选路径 */
 QStringList UsbLibraryLoader::searchPaths() const
 {
     QStringList paths;
@@ -298,6 +300,7 @@ QStringList UsbLibraryLoader::searchPaths() const
     return paths;
 }
 
+/** @brief 设置错误信息并递增错误计数 @param error 错误描述 @return 始终返回false */
 bool UsbLibraryLoader::setError(const QString& error)
 {
     m_lastError = error;

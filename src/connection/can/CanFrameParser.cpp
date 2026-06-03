@@ -8,11 +8,13 @@
 #include <QFile>
 #include <QIODevice>
 
+/** @brief 构造CAN帧解析器 @param parent 父QObject指针 */
 CanFrameParser::CanFrameParser(QObject* parent)
     : QObject(parent)
 {
 }
 
+/** @brief 解析原始SLCAN/LAWICEL格式数据为CanFrame结构 @param rawData 原始帧数据(以t/T/r/R开头) @return 解析后的CanFrame，解析失败返回空帧 */
 CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
 {
     CanFrame frame;
@@ -89,6 +91,7 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
     return frame;
 }
 
+/** @brief 将CanFrame结构编码为SLCAN/LAWICEL格式字节流 @param frame 要编码的CAN帧 @return 编码后的字节流 */
 QByteArray CanFrameParser::buildFrame(const CanFrame& frame)
 {
     QByteArray result;
@@ -127,6 +130,7 @@ QByteArray CanFrameParser::buildFrame(const CanFrame& frame)
     return result;
 }
 
+/** @brief 加载DBC数据库文件，解析报文定义 @param filePath DBC文件路径 @return 加载成功返回true */
 bool CanFrameParser::loadDbcFile(const QString& filePath)
 {
     m_dbcFilePath = filePath;
@@ -164,6 +168,7 @@ bool CanFrameParser::loadDbcFile(const QString& filePath)
     return m_dbcLoaded;
 }
 
+/** @brief 根据已加载的DBC信息解码CAN帧中的信号值 @param frame 要解码的CAN帧 @return 信号名到值的映射表 */
 QMap<QString, double> CanFrameParser::decodeSignals(const CanFrame& frame) const
 {
     QMap<QString, double> result;
@@ -194,6 +199,7 @@ QMap<QString, double> CanFrameParser::decodeSignals(const CanFrame& frame) const
     return result;
 }
 
+/** @brief 将CanFrame转换为可读的字符串描述 @param frame 要格式化的CAN帧 @return 格式化后的字符串 */
 QString CanFrameParser::frameToString(const CanFrame& frame)
 {
     QString typeStr;
@@ -212,6 +218,7 @@ QString CanFrameParser::frameToString(const CanFrame& frame)
         .arg(frame.data.toHex(' ').toUpper());
 }
 
+/** @brief 解析两个十六进制字符为一个字节 @param hex 指向两个十六进制字符的指针 @return 解析后的字节值 */
 quint8 CanFrameParser::parseHexByte(const char* hex)
 {
     auto hexVal = [](char c) -> quint8 {
@@ -226,6 +233,7 @@ quint8 CanFrameParser::parseHexByte(const char* hex)
     return static_cast<quint8>((hexVal(hex[0]) << 4) | hexVal(hex[1]));
 }
 
+/** @brief 重置所有解析器统计计数器 */
 void CanFrameParser::resetParserStatistics()
 {
     m_totalFramesParsed = 0;
