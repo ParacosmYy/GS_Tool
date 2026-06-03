@@ -189,6 +189,27 @@ QWidget* NavigationController::lookupPanel(const QString& translatedName) const
     return nullptr;
 }
 
+// ---- 统计计数器实现 ----
+
+/** @brief 获取导航切换总次数 @return 切换总次数 */
+quint64 NavigationController::totalNavigations() const
+{
+    return m_totalNavigations;
+}
+
+/** @brief 获取面板切换总次数 @return 面板切换总次数 */
+quint64 NavigationController::panelChangeCount() const
+{
+    return m_panelChangeCount;
+}
+
+/** @brief 重置所有统计计数器为零 */
+void NavigationController::resetStats()
+{
+    m_totalNavigations = 0;
+    m_panelChangeCount = 0;
+}
+
 /**
  * @brief 主题切换时刷新导航树圆点图标颜色
  *

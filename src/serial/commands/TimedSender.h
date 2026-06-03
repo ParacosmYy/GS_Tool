@@ -46,63 +46,38 @@ public:
      */
     explicit TimedSender(QObject* parent = nullptr);
 
-    /**
-     * @brief 设置发送间隔（毫秒）
-     * @param ms 间隔时间，必须 > 0
-     *
-     * 线程安全：内部加锁保护 m_interval。
-     * 如果定时器正在运行，会立即应用新的间隔值。
-     */
+    /** @brief 设置发送间隔（毫秒），线程安全 */
     void setInterval(int ms);
 
-    /**
-     * @brief 获取当前发送间隔（毫秒）
-     * @return 间隔时间
-     *
-     * 线程安全：内部加锁读取 m_interval。
-     */
+    /** @brief 获取当前发送间隔（毫秒），线程安全 */
     int interval() const;
 
-    /**
-     * @brief 设置要循环发送的单组数据
-     * @param data 待发送的数据
-     */
+    /** @brief 设置要循环发送的单组数据 */
     void setData(const QByteArray& data);
 
-    /**
-     * @brief 设置多组数据队列（按顺序循环发送）
-     * @param queue 数据队列列表
-     */
+    /** @brief 设置多组数据队列（按顺序循环发送） */
     void setDataQueue(const QList<QByteArray>& queue);
 
-    /**
-     * @brief 启动定时发送
-     *
-     * 线程安全：可在定时器回调中安全调用。
-     * 如果队列为空则不启动。
-     */
+    /** @brief 启动定时发送，队列为空则不启动 */
     void start();
 
-    /**
-     * @brief 停止定时发送
-     *
-     * 线程安全：可在定时器回调中安全调用。
-     */
+    /** @brief 停止定时发送 */
     void stop();
 
-    /**
-     * @brief 查询定时发送是否正在运行
-     * @return true=正在运行，false=已停止
-     *
-     * 线程安全：内部加锁读取 m_isRunning。
-     */
+    /** @brief 查询定时发送是否正在运行，线程安全 */
     bool isRunning() const;
 
-    /**
-     * @brief 获取已发送次数
-     * @return 定时发送已触发的次数
-     */
+    /** @brief 获取已发送次数 */
     int sendCount() const;
+
+    /** @brief 获取累计发送的总字节数 */
+    quint64 totalBytesSent() const;
+
+    /** @brief 获取定时发送调度次数（每次 start() 调用 +1） */
+    quint64 scheduleCount() const;
+
+    /** @brief 重置所有统计计数器（sendCount/totalBytesSent/scheduleCount） */
+    void resetStatistics();
 
 signals:
     /**
@@ -114,31 +89,23 @@ signals:
     void sendData(const QByteArray& data);
 
 private slots:
-    /**
-     * @brief 定时器超时处理槽
-     *
-     * 使用 QMetaObject::invokeMethod 将实际发送逻辑调度到主线程。
-     * 在发送前检查队列有效性和连接状态。
-     */
+    /** @brief 定时器超时处理槽，调度到主线程执行 */
     void onTimeout();
 
 private:
-    /**
-     * @brief 执行实际的发送动作（在主线程中调用）
-     *
-     * 从队列中取出当前数据，发射 sendData 信号，
-     * 然后推进队列索引到下一个位置。
-     */
+    /** @brief 执行实际发送动作（在主线程中调用） */
     void doSend();
 
     QTimer m_timer;                 ///< 定时器
     QList<QByteArray> m_queue;      ///< 数据队列
     int m_queueIndex = 0;           ///< 当前队列位置
 
-    mutable QMutex m_mutex;         ///< 保护所有状态的互斥锁（m_isRunning / m_interval / m_queue / m_queueIndex）
+    mutable QMutex m_mutex;         ///< 保护所有状态的互斥锁
     bool m_isRunning = false;       ///< 定时发送运行状态（受 m_mutex 保护）
     int m_interval = 1000;          ///< 发送间隔（毫秒，受 m_mutex 保护）
     int m_sendCount = 0;            ///< 已发送次数计数（受 m_mutex 保护）
+    quint64 m_totalBytesSent = 0;   ///< 累计发送总字节数（受 m_mutex 保护）
+    quint64 m_scheduleCount = 0;    ///< 定时发送调度次数（受 m_mutex 保护）
 };
 
 #endif // TIMEDSENDER_H

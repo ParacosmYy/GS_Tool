@@ -117,6 +117,9 @@ void NavigationController::switchToPanel(QWidget* newPanel)
     if (m_panelSwitching) return;           ///< 防重入: 动画进行中忽略
     if (m_currentPanel == newPanel) return; ///< 目标与当前相同，无需切换
 
+    ++m_totalNavigations;                   ///< 统计: 导航切换总次数递增
+    ++m_panelChangeCount;                   ///< 统计: 面板实际变更次数递增
+
     QWidget* oldPanel = m_currentPanel;
     m_currentPanel = newPanel;
 

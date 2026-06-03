@@ -1,6 +1,5 @@
 # Build directories
-build/
-build2/
+build*/
 cmake-build-*/
 x64/
 Debug/
@@ -48,5 +47,13 @@ Desktop.ini
 
 # Settings (local)
 embeddebug_settings.json
-build-test/
 test_output_*.txt
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Dependencies
+node_modules/

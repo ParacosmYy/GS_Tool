@@ -87,6 +87,27 @@ QString ResponsiveLayout::breakpointName() const
     return QStringLiteral("desktop");
 }
 
+// ---- 统计计数器实现 ----
+
+/** @brief 获取布局变更总次数(含resize触发) @return 布局变更总次数 */
+quint64 ResponsiveLayout::totalLayoutChanges() const
+{
+    return m_totalLayoutChanges;
+}
+
+/** @brief 获取断点切换总次数 @return 断点切换总次数 */
+quint64 ResponsiveLayout::breakpointChangeCount() const
+{
+    return m_breakpointChangeCount;
+}
+
+/** @brief 重置所有统计计数器为零 */
+void ResponsiveLayout::resetStats()
+{
+    m_totalLayoutChanges = 0;
+    m_breakpointChangeCount = 0;
+}
+
 /**
  * @brief 事件过滤器 - 拦截被监听窗口的 Resize 事件
  *
@@ -122,6 +143,8 @@ bool ResponsiveLayout::eventFilter(QObject* watched, QEvent* event)
  */
 void ResponsiveLayout::updateBreakpoint(int width)
 {
+    ++m_totalLayoutChanges;  ///< 统计: 每次resize触发布局变更计数递增
+
     // 判定新断点
     Breakpoint newBreakpoint;
     if (width < BREAKPOINT_COMPACT) {
@@ -134,6 +157,7 @@ void ResponsiveLayout::updateBreakpoint(int width)
 
     // 断点变化时发射信号
     if (newBreakpoint != m_currentBreakpoint) {
+        ++m_breakpointChangeCount;  ///< 统计: 断点实际切换次数递增
         Breakpoint oldBreakpoint = m_currentBreakpoint;
         m_currentBreakpoint = newBreakpoint;
 

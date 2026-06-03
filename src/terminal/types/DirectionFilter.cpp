@@ -6,6 +6,7 @@
  *   1. 环形缓冲区回绕检测: 模型行数减少 -> 旧数据被驱逐 -> 全量重建索引表
  *   2. 增量追加: 只处理 [m_trackedLineCount, modelLineCount) 范围的新行
  *   3. 方向匹配: 新行的方向 == m_direction 时，将其模型行号追加到索引表
+ *   4. 统计更新: 每行根据方向递增通过计数(RX/TX)或阻塞计数
  */
 
 #include "terminal/types/DirectionFilter.h"
@@ -41,7 +42,16 @@ bool DirectionFilter::isFiltered() const
     return m_filtered;
 }
 
-/** @brief 模型数据追加回调：增量构建过滤索引表(回绕检测+方向匹配) @param modelLineCount 当前模型总行数 @param lineAt 按索引取TerminalLine的回调 */
+/**
+ * @brief 模型数据追加回调：增量构建过滤索引表并更新统计计数器
+ *
+ * 对每行数据进行方向匹配判断:
+ *   - 匹配当前过滤方向 → 追加到索引表，递增对应方向(RX/TX)的通过计数
+ *   - 不匹配当前过滤方向 → 递增阻塞计数
+ *
+ * @param modelLineCount 当前模型总行数
+ * @param lineAt 按索引取TerminalLine的回调
+ */
 void DirectionFilter::onDataAppended(int modelLineCount,
                                      const std::function<TerminalLine(int)>& lineAt)
 {
@@ -56,9 +66,17 @@ void DirectionFilter::onDataAppended(int modelLineCount,
     // 增量构建: 只处理新增的模型行
     for (int i = m_trackedLineCount; i < modelLineCount; ++i) {
         TerminalLine line = lineAt(i);
-        // 只将匹配过滤方向的行号加入索引表
+        // 方向匹配 → 加入索引表，递增通过计数
         if (line.direction == m_direction) {
             m_filteredIndices.append(i);
+            if (m_direction == DataDirection::Rx) {
+                ++m_totalRxPassed;
+            } else {
+                ++m_totalTxPassed;
+            }
+        } else {
+            // 方向不匹配 → 递增阻塞计数
+            ++m_totalBlocked;
         }
     }
     m_trackedLineCount = modelLineCount;
@@ -80,9 +98,37 @@ int DirectionFilter::modelIndex(int filteredIndex) const
     return m_filteredIndices[filteredIndex];
 }
 
-/** @brief 重置过滤状态(清空索引表和跟踪计数) */
+/** @brief 重置过滤状态(清空索引表和跟踪计数)，统计计数器不受影响 */
 void DirectionFilter::reset()
 {
     m_trackedLineCount = 0;
     m_filteredIndices.clear();
+}
+
+// ── 统计计数器 Getter 实现 ──
+
+/** @brief 获取RX方向通过过滤的总行数 @return 匹配RX方向并加入索引表的累计行数 */
+quint64 DirectionFilter::totalRxPassed() const
+{
+    return m_totalRxPassed;
+}
+
+/** @brief 获取TX方向通过过滤的总行数 @return 匹配TX方向并加入索引表的累计行数 */
+quint64 DirectionFilter::totalTxPassed() const
+{
+    return m_totalTxPassed;
+}
+
+/** @brief 获取被方向过滤器阻塞的总行数 @return 不匹配当前过滤方向的累计行数 */
+quint64 DirectionFilter::totalBlocked() const
+{
+    return m_totalBlocked;
+}
+
+/** @brief 重置所有统计计数器为零(过滤状态和索引表不受影响) */
+void DirectionFilter::resetStats()
+{
+    m_totalRxPassed = 0;
+    m_totalTxPassed = 0;
+    m_totalBlocked = 0;
 }

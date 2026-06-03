@@ -39,9 +39,7 @@ struct SendEntry {
 class SendHistory : public QObject {
     Q_OBJECT
 public:
-    /** @brief 构造发送历史管理器
-     * @param parent 父对象
-     */
+    /** @brief 构造发送历史管理器 @param parent 父对象 */
     explicit SendHistory(QObject* parent = nullptr);
 
     /**
@@ -88,15 +86,26 @@ public:
     /** @brief 获取发送统计摘要文本 */
     QString statisticsSummary() const;
 
+    /** @brief 获取历史记录总条目数（累计添加，含去重跳过） */
+    quint64 totalRecords() const;
+
+    /** @brief 获取因连续重复而被跳过的去重次数 */
+    quint64 totalDuplicateSkips() const;
+
+    /** @brief 重置所有统计计数器（totalRecords/totalDuplicateSkips/totalSendCount） */
+    void resetStatistics();
+
 signals:
     /** @brief 历史记录发生变更时发出（添加/清空） */
     void historyChanged();
 
 private:
-    QList<SendEntry> m_entries;     ///< 历史记录列表，按时间顺序排列
-    QMap<QString, int> m_freqMap;   ///< 命令频率统计 text -> count
-    int m_totalSendCount = 0;       ///< 总发送次数（含去重）
-    int m_maxEntries = 50;          ///< 最大记录条数
+    QList<SendEntry> m_entries;             ///< 历史记录列表，按时间顺序排列
+    QMap<QString, int> m_freqMap;           ///< 命令频率统计 text -> count
+    int m_totalSendCount = 0;               ///< 总发送次数（含去重）
+    int m_maxEntries = 50;                  ///< 最大记录条数
+    quint64 m_totalRecords = 0;             ///< 历史记录总条目数（累计添加）
+    quint64 m_totalDuplicateSkips = 0;      ///< 因连续重复而被跳过的去重次数
 };
 
 #endif // SENDHISTORY_H

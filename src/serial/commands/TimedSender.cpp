@@ -95,6 +95,8 @@ void TimedSender::start()
 
     m_queueIndex = 0;
     m_sendCount = 0;
+    m_totalBytesSent = 0;
+    ++m_scheduleCount;
     m_isRunning = true;
     m_timer.start(m_interval);
 }
@@ -178,8 +180,47 @@ void TimedSender::doSend()
         dataToSend = m_queue[m_queueIndex];
         m_queueIndex = (m_queueIndex + 1) % m_queue.size();
         ++m_sendCount;
+        m_totalBytesSent += static_cast<quint64>(dataToSend.size());
     }
 
     // 释放锁后发射信号，避免下游回调死锁
     emit sendData(dataToSend);
+}
+
+/**
+ * @brief 获取累计发送的总字节数
+ * @return 总字节数
+ *
+ * 线程安全：加锁读取 m_totalBytesSent。
+ */
+quint64 TimedSender::totalBytesSent() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_totalBytesSent;
+}
+
+/**
+ * @brief 获取定时发送调度次数（每次 start() 调用 +1）
+ * @return 调度次数
+ *
+ * 线程安全：加锁读取 m_scheduleCount。
+ */
+quint64 TimedSender::scheduleCount() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_scheduleCount;
+}
+
+/**
+ * @brief 重置所有统计计数器
+ *
+ * 将 sendCount、totalBytesSent、scheduleCount 全部归零。
+ * 线程安全：内部加锁保护。
+ */
+void TimedSender::resetStatistics()
+{
+    QMutexLocker locker(&m_mutex);
+    m_sendCount = 0;
+    m_totalBytesSent = 0;
+    m_scheduleCount = 0;
 }

@@ -82,6 +82,17 @@ public:
      */
     QString breakpointName() const;
 
+    // ---- 统计计数器 ----
+
+    /** @brief 获取布局变更总次数(含resize触发) @return 布局变更总次数 */
+    quint64 totalLayoutChanges() const;
+
+    /** @brief 获取断点切换总次数 @return 断点切换总次数 */
+    quint64 breakpointChangeCount() const;
+
+    /** @brief 重置所有统计计数器为零 */
+    void resetStats();
+
 signals:
     /**
      * @brief 断点变化信号
@@ -115,6 +126,10 @@ private:
 
     Breakpoint m_currentBreakpoint = Breakpoint::Desktop;  ///< 当前激活断点
     QMainWindow* m_window = nullptr;                        ///< 被监听的主窗口
+
+    // ---- 统计计数器 ----
+    quint64 m_totalLayoutChanges = 0;     ///< 布局变更总次数(每次resize触发updateBreakpoint)
+    quint64 m_breakpointChangeCount = 0;  ///< 断点切换总次数(断点实际发生变化)
 };
 
 #endif // RESPONSIVELAYOUT_H

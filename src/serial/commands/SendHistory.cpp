@@ -34,6 +34,7 @@ void SendHistory::addEntry(const QString& text, bool isHex)
     if (!m_entries.isEmpty()) {
         const SendEntry& last = m_entries.last();
         if (last.text == text && last.isHex == isHex) {
+            ++m_totalDuplicateSkips;
             return;
         }
     }
@@ -46,9 +47,10 @@ void SendHistory::addEntry(const QString& text, bool isHex)
 
     m_entries.append(entry);
 
-    // 更新频率统计
+    // 更新频率统计和累计记录数
     m_freqMap[text]++;
     m_totalSendCount++;
+    ++m_totalRecords;
 
     // 超过最大记录数时，从头部删除最旧的条目
     while (m_entries.size() > m_maxEntries) {
@@ -98,12 +100,14 @@ QList<SendEntry> SendHistory::search(const QString& keyword) const
     return result;
 }
 
-/** @brief 清空所有发送记录，发射historyChanged信号 */
+/** @brief 清空所有发送记录和统计计数器，发射historyChanged信号 */
 void SendHistory::clear()
 {
     m_entries.clear();
     m_freqMap.clear();
     m_totalSendCount = 0;
+    m_totalRecords = 0;
+    m_totalDuplicateSkips = 0;
     emit historyChanged();
 }
 

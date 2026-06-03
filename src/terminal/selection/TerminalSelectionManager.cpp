@@ -4,6 +4,7 @@
  *
  * 处理鼠标按下/移动/释放事件来维护选区状态，
  * 并根据缓存行数据和方向过滤索引提取选中文本。
+ * 选区操作统计在选区创建和复制时自动更新。
  */
 
 #include "terminal/selection/TerminalSelectionManager.h"
@@ -50,9 +51,14 @@ void TerminalSelectionManager::onMouseMove(double y, int scrollOffset, int lineH
     }
 }
 
-/** @brief 处理鼠标释放事件，结束选区操作 */
+/** @brief 处理鼠标释放事件，结束选区操作并更新选区统计计数器 */
 void TerminalSelectionManager::onMouseRelease()
 {
+    if (m_isSelecting && m_selectionStartLine >= 0 && m_selectionEndLine >= 0
+        && m_selectionStartLine != m_selectionEndLine) {
+        // 只在有效拖拽选区（起始行不等于结束行）时递增选择计数
+        ++m_totalSelections;
+    }
     m_isSelecting = false;
 }
 
@@ -132,10 +138,7 @@ QColor TerminalSelectionManager::selectionBgColor() const
     return m_selectionBg;
 }
 
-/**
- * @brief 设置选区背景色
- * @param color 新的选区高亮背景颜色
- */
+/** @brief 设置选区背景色 @param color 新的选区高亮背景颜色 */
 void TerminalSelectionManager::setSelectionBgColor(const QColor& color)
 {
     m_selectionBg = color;
@@ -143,6 +146,9 @@ void TerminalSelectionManager::setSelectionBgColor(const QColor& color)
 
 /**
  * @brief 程序化设置选区范围，直接指定起始和结束行号
+ *
+ * 同时更新选区统计计数器(选择次数)。
+ *
  * @param startLine 选区起始行号
  * @param endLine 选区结束行号
  */
@@ -151,4 +157,48 @@ void TerminalSelectionManager::setSelection(int startLine, int endLine)
     m_selectionStartLine = startLine;
     m_selectionEndLine = endLine;
     m_isSelecting = false;
+
+    // 程序化设置选区时更新选择统计
+    ++m_totalSelections;
+}
+
+/** @brief 通知复制操作已完成，递增复制计数 */
+void TerminalSelectionManager::notifyCopyPerformed()
+{
+    ++m_totalCopies;
+}
+
+// ── 统计计数器 Getter 实现 ──
+
+/** @brief 获取总选择次数 @return 用户完成选区的总次数 */
+quint64 TerminalSelectionManager::totalSelections() const
+{
+    return m_totalSelections;
+}
+
+/** @brief 获取总复制次数 @return 用户执行复制操作的总次数 */
+quint64 TerminalSelectionManager::totalCopies() const
+{
+    return m_totalCopies;
+}
+
+/** @brief 获取总选择字符数 @return 历史所有选区字符数之和 */
+quint64 TerminalSelectionManager::totalSelectionChars() const
+{
+    return m_totalSelectionChars;
+}
+
+/** @brief 获取最大单次选区长度(字符数) @return 历史最大选区的字符数 */
+quint64 TerminalSelectionManager::maxSelectionLength() const
+{
+    return m_maxSelectionLength;
+}
+
+/** @brief 重置所有统计计数器为零(选区状态不受影响) */
+void TerminalSelectionManager::resetStats()
+{
+    m_totalSelections = 0;
+    m_totalCopies = 0;
+    m_totalSelectionChars = 0;
+    m_maxSelectionLength = 0;
 }

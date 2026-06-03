@@ -128,6 +128,17 @@ public:
     /** @brief 通过索引恢复面板（启动/会话恢复用，无动画） @return true成功 false越界/空 */
     bool restorePanelByIndex(int index);
 
+    // ---- 统计计数器 ----
+
+    /** @brief 获取导航切换总次数 @return 切换总次数 */
+    quint64 totalNavigations() const;
+
+    /** @brief 获取面板切换总次数 @return 面板切换总次数 */
+    quint64 panelChangeCount() const;
+
+    /** @brief 重置所有统计计数器为零 */
+    void resetStats();
+
 private slots:
     /**
      * @brief 主题切换时刷新导航树圆点图标颜色
@@ -167,6 +178,10 @@ private:
 
     /** @brief 连接状态标签的透明度效果实例 */
     QPointer<QGraphicsOpacityEffect> m_connStatusEffect;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalNavigations = 0;      ///< 导航切换总次数(含switchToPanel调用)
+    quint64 m_panelChangeCount = 0;      ///< 面板实际变更次数(目标面板与当前不同时)
 };
 
 #endif // NAVIGATION_CONTROLLER_H

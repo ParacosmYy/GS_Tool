@@ -93,6 +93,48 @@ TerminalWidget* TerminalLayoutManager::primaryTerminal() const
     return m_rxTerminal;
 }
 
+// ---- 统计计数器实现 ----
+
+/** @brief 获取布局切换总次数 @return 切换总次数 */
+quint64 TerminalLayoutManager::totalSwitches() const
+{
+    return m_totalSwitches;
+}
+
+/** @brief 获取清除行数累计 @return 清除行总数 */
+quint64 TerminalLayoutManager::totalLinesCleared() const
+{
+    return m_totalLinesCleared;
+}
+
+/** @brief 获取历史最大可见行数 @return 最大可见行数 */
+quint64 TerminalLayoutManager::maxVisibleLines() const
+{
+    return m_maxVisibleLines;
+}
+
+/** @brief 重置所有统计计数器为零 */
+void TerminalLayoutManager::resetStats()
+{
+    m_totalSwitches = 0;
+    m_totalLinesCleared = 0;
+    m_maxVisibleLines = 0;
+}
+
+/** @brief 通知行清除事件，累加清除行数 @param lines 本次清除的行数 */
+void TerminalLayoutManager::notifyLinesCleared(quint64 lines)
+{
+    m_totalLinesCleared += lines;
+}
+
+/** @brief 更新最大可见行数记录 @param currentVisible 当前可见行数 */
+void TerminalLayoutManager::updateMaxVisibleLines(quint64 currentVisible)
+{
+    if (currentVisible > m_maxVisibleLines) {
+        m_maxVisibleLines = currentVisible;
+    }
+}
+
 /** @brief 通过下拉框索引设置布局模式(0=混合, 1=水平分栏, 2=垂直分栏) @param layoutIndex 下拉框索引 */
 void TerminalLayoutManager::setLayout(int layoutIndex)
 {
@@ -111,12 +153,13 @@ void TerminalLayoutManager::setLayout(int layoutIndex)
 void TerminalLayoutManager::setLayout(TerminalLayout layout)
 {
     if (m_layout == layout) return;
+    ++m_totalSwitches;  ///< 统计: 布局切换次数递增
     m_layout = layout;
     applyLayout();
     emit layoutChanged(m_layout);
 }
 
-/** @brief 应用当前布局模式(清空容器→销毁旧分割器→重建搜索栏和终端区域) */
+/** @brief 应用当前布局模式(清空容器 -> 销毁旧分割器 -> 重建搜索栏和终端区域) */
 void TerminalLayoutManager::applyLayout()
 {
     // 清空容器中的所有子widget

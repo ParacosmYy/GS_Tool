@@ -95,6 +95,11 @@ void QuickCommandBar::clearCommands()
  *   - HEX 模式: 使用 HexConverter::fromHexString 转换后发射
  *   - 文本模式: 使用 toUtf8() 转换后发射
  *   - 数据为空时不发射信号
+ *
+ * 点击时更新统计计数器:
+ *   - m_totalCommandsSent: 每次有效发送 +1
+ *   - m_totalQuickSends: 累加发送字节数
+ *   - m_maxCommandLength: 跟踪最大单条指令长度
  */
 void QuickCommandBar::rebuildButtons()
 {
@@ -120,7 +125,7 @@ void QuickCommandBar::rebuildButtons()
         // 工具提示: 数据非空时显示原始数据，否则显示名称
         btn->setToolTip(cmd.data.isEmpty() ? cmd.name : cmd.data);
 
-        // 点击按钮时发送数据（lambda 捕获 cmd 副本）
+        // 点击按钮时发送数据并更新统计计数器
         connect(btn, &QPushButton::clicked, this, [this, cmd]() {
             QByteArray data;
             if (cmd.isHex) {
@@ -137,6 +142,11 @@ void QuickCommandBar::rebuildButtons()
                 data = cmd.data.toUtf8();
             }
             if (!data.isEmpty()) {
+                // 更新统计: 发送次数 +1，累计字节数，最大指令长度
+                ++m_totalCommandsSent;
+                m_totalQuickSends += static_cast<quint64>(data.size());
+                m_maxCommandLength = qMax(m_maxCommandLength,
+                                          static_cast<quint64>(data.size()));
                 emit commandTriggered(data);
             }
         });
@@ -330,4 +340,30 @@ void QuickCommandBar::loadCommands()
 
     // 替换当前指令列表并重建按钮
     setCommands(loadedCommands);
+}
+
+/** @brief 获取快捷栏已发送的指令总次数 @return 发送次数 */
+quint64 QuickCommandBar::totalCommandsSent() const
+{
+    return m_totalCommandsSent;
+}
+
+/** @brief 获取快捷发送累计发送的总字节数 @return 累计字节数 */
+quint64 QuickCommandBar::totalQuickSends() const
+{
+    return m_totalQuickSends;
+}
+
+/** @brief 获取历史最大单条指令长度（字节数） @return 最大指令长度 */
+quint64 QuickCommandBar::maxCommandLength() const
+{
+    return m_maxCommandLength;
+}
+
+/** @brief 重置所有统计计数器为零 */
+void QuickCommandBar::resetStatistics()
+{
+    m_totalCommandsSent = 0;
+    m_totalQuickSends = 0;
+    m_maxCommandLength = 0;
 }

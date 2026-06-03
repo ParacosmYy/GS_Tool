@@ -89,6 +89,26 @@ public:
      */
     TerminalWidget* primaryTerminal() const;
 
+    // ---- 统计计数器 ----
+
+    /** @brief 获取布局切换总次数 @return 切换总次数 */
+    quint64 totalSwitches() const;
+
+    /** @brief 获取清除行数累计 @return 清除行总数 */
+    quint64 totalLinesCleared() const;
+
+    /** @brief 获取历史最大可见行数 @return 最大可见行数 */
+    quint64 maxVisibleLines() const;
+
+    /** @brief 重置所有统计计数器为零 */
+    void resetStats();
+
+    /** @brief 通知行清除事件，累加清除行数 @param lines 本次清除的行数 */
+    void notifyLinesCleared(quint64 lines);
+
+    /** @brief 更新最大可见行数记录 @param currentVisible 当前可见行数 */
+    void updateMaxVisibleLines(quint64 currentVisible);
+
 signals:
     /** @brief 布局模式变化信号 @param newLayout 新的布局模式 */
     void layoutChanged(TerminalLayout newLayout);
@@ -136,6 +156,11 @@ private:
     DisplayMode m_displayMode;           ///< 显示模式缓存
     bool m_showTimestamp;                ///< 时间戳显示开关缓存
     bool m_showDirectionPrefix;          ///< 方向前缀显示开关缓存
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSwitches = 0;         ///< 布局切换总次数
+    quint64 m_totalLinesCleared = 0;     ///< 清除行数累计
+    quint64 m_maxVisibleLines = 0;       ///< 历史最大可见行数
 };
 
 #endif // TERMINALLAYOUTMANAGER_H
