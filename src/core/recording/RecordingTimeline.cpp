@@ -101,14 +101,7 @@ void RecordingTimeline::clearEvents()
     m_events.clear();
 }
 
-/**
- * @brief 获取录制总时长
- *
- * 未录制时返回上次录制结束的累计时长；录制中返回当前已过时长。
- * 与 currentTimeMs() 语义一致，但命名更清晰地表达"总时长"意图。
- *
- * @return 录制总时长（毫秒）
- */
+/** @brief 获取录制总时长(录制中返回当前已过时长，未录制返回累计时长) @return 录制总时长(毫秒) */
 qint64 RecordingTimeline::totalDurationMs() const
 {
     return currentTimeMs();

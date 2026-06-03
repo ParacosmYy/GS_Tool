@@ -46,12 +46,7 @@ QString IconManager::cacheKey(const QString& name, int size,
     return QStringLiteral("%1_%2_%3").arg(name).arg(size).arg(colorKey);
 }
 
-/**
- * @brief 加载SVG文件并将 currentColor 替换为实际颜色
- * @param name 图标名称(不含扩展名)
- * @param color 目标颜色
- * @return 着色后的SVG字节数据，失败返回空
- */
+/** @brief 加载SVG文件并将currentColor替换为实际颜色 @param name 图标名称(不含扩展名) @param color 目标颜色 @return 着色后的SVG字节数据，失败返回空 */
 QByteArray IconManager::loadAndColorSvg(const QString& name,
                                          const QColor& color) const
 {
@@ -67,11 +62,7 @@ QByteArray IconManager::loadAndColorSvg(const QString& name,
     return svg.toUtf8();
 }
 
-/**
- * @brief 获取QIcon(多尺寸)，首次调用时加载+着色+缓存
- * @param name 图标名称
- * @return QIcon实例，图标不存在时返回空QIcon
- */
+/** @brief 获取QIcon(多尺寸)，首次调用时加载+着色+缓存 @param name 图标名称 @return QIcon实例，图标不存在时返回空QIcon */
 QIcon IconManager::icon(const QString& name) const
 {
     if (m_iconCache.contains(name)) {
