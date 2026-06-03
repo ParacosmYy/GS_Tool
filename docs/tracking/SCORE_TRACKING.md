@@ -113,4 +113,6 @@
 | 122 | refactor(send): 提取SendHistoryManager，SendController.h从199行降至108行+接口层提取+兼容头文件 | 122 |
 | 123 | docs: 评分追踪补全#121-#122 + 目标更新至1000分 | 123 |
 | 124 | feat: PortWatcher/RecordingController/TerminalModel/TerminalSearchManager统计增强 | 124 |
+| 125-140 | UdpConnection/TlsConnection/WebSocketConnection/ModbusMaster/FrameParser/ProtocolSchema/TimestampAnalyzer/PacketBuilder/DataExporter/接口层/统计增强+接口层占位+WebSocketConnection/ModbusMaster/EventBus/I2cConnection/UsbConnection/RecordingMarker/RecordingMarker扩展+AppDialog统一弹窗+MQTT修复+多模块重构 | 140 |
+| 141 | fix(mqtt): MqttConnection统计增强+ToastNotification组件+评分追踪补全#125-#140 | 141 |
 | ... | 目标: 1000分 | 1000 |

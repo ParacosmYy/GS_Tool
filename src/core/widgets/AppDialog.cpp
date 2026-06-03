@@ -83,7 +83,7 @@ AppDialog::DialogPromise AppDialog::show(Type type, const QString& title,
         if (promise.m_onRejected) promise.m_onRejected();
     });
 
-    dialog->show();
+    dialog->open();
     return promise;
 }
 
