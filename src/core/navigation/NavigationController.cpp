@@ -18,12 +18,7 @@
 #include <QStringList>
 #include <QMap>
 
-/**
- * @brief 创建导航树连接类型指示圆点图标
- * 8x8 透明底 + 抗锯齿彩色圆点，用于区分不同连接类型
- * @param color 圆点颜色
- * @return 图标实例
- */
+/** @brief 创建导航树连接类型指示圆点图标(8x8透明底+抗锯齿彩色圆点) @param color 圆点颜色 @return 图标实例 */
 static QIcon createDotIcon(const QColor& color)
 {
     QPixmap dot(8, 8);
@@ -36,7 +31,7 @@ static QIcon createDotIcon(const QColor& color)
     return QIcon(dot);
 }
 
-/** @brief 构造导航控制器 */
+/** @brief 构造导航控制器，连接ThemeManager::themeChanged信号用于刷新图标颜色 @param parent 父对象 */
 NavigationController::NavigationController(QObject* parent)
     : QObject(parent)
 {
@@ -45,10 +40,7 @@ NavigationController::NavigationController(QObject* parent)
             this, &NavigationController::onThemeChanged);
 }
 
-/**
- * @brief 析构导航控制器
- * 清理呼吸动画和进行中的切换动画，防止资源泄漏
- */
+/** @brief 析构导航控制器，清理呼吸动画和进行中的切换动画防止资源泄漏 */
 NavigationController::~NavigationController()
 {
     // 清理进行中的面板切换动画
@@ -62,18 +54,7 @@ NavigationController::~NavigationController()
     stopBreathingAnimation(nullptr);
 }
 
-/**
- * @brief 构建导航树模型并展开全部节点（数据驱动）
- *
- * 从 NavPanelMapping 映射表自动构建导航树:
- *   - 按 category 字段自动分组
- *   - 每个 category 分组使用 ThemeManager Accent 色圆点图标
- *   - 面板名称作为叶子节点
- *   - 自动展开所有分组
- *
- * @param navTree 导航树视图控件
- * @param mappings 面板映射表（必须包含 category 字段）
- */
+/** @brief 构建导航树模型并展开全部节点，按category字段自动分组并使用Accent色圆点图标 @param navTree 导航树视图控件 @param mappings 面板映射表(必须包含category字段) */
 void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPanelMapping>& mappings)
 {
     m_navTree = navTree;
@@ -120,7 +101,7 @@ void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPan
     ++m_totalTreeExpansions;  ///< 统计: 导航树展开操作递增
 }
 
-/** @brief 收集所有可切换面板 widget（从映射表中提取所有非空 widget） */
+/** @brief 收集所有可切换面板widget(从映射表中提取所有非空widget) @return 面板widget向量 */
 QVector<QWidget*> NavigationController::allSwitchablePanels() const
 {
     QVector<QWidget*> panels;
@@ -133,7 +114,7 @@ QVector<QWidget*> NavigationController::allSwitchablePanels() const
     return panels;
 }
 
-/** @brief 获取当前面板在映射表中的索引，用于持久化保存 @return 0~N-1, 未找到返回-1 */
+/** @brief 获取当前面板在映射表中的索引(用于持久化保存) @return 0~N-1索引值，未找到返回-1 */
 int NavigationController::currentPanelIndex() const
 {
     if (!m_currentPanel) return -1;
@@ -146,7 +127,7 @@ int NavigationController::currentPanelIndex() const
     return -1;
 }
 
-/** @brief 通过索引恢复面板（启动时使用，不触发动画） @return true成功 false越界/空 */
+/** @brief 通过索引恢复面板(启动时使用，不触发动画)，隐藏其他面板并显示目标面板 @param index 面板索引 @return true成功 false越界或widget为空 */
 bool NavigationController::restorePanelByIndex(int index)
 {
     if (index < 0 || index >= m_navPanelMappings.size()) {
@@ -173,13 +154,13 @@ bool NavigationController::restorePanelByIndex(int index)
     return true;
 }
 
-/** @brief 设置当前面板（初始化用，不触发动画） */
+/** @brief 设置当前面板(初始化用，不触发动画) @param panel 目标面板widget */
 void NavigationController::setCurrentPanel(QWidget* panel)
 {
     m_currentPanel = panel;
 }
 
-/** @brief 通过翻译后的名称查找对应的 panel widget，未找到返回 nullptr */
+/** @brief 通过翻译后的名称查找对应的panel widget @param translatedName 翻译后的面板名称 @return 对应的widget指针，未找到返回nullptr */
 QWidget* NavigationController::lookupPanel(const QString& translatedName) const
 {
     for (const auto& mapping : m_navPanelMappings) {
@@ -216,7 +197,7 @@ quint64 NavigationController::totalSearches() const
     return m_totalSearches;
 }
 
-/** @brief 重置所有导航统计计数器为零 */
+/** @brief 重置所有导航统计计数器(切换/面板变更/展开/搜索)为零 */
 void NavigationController::resetNavigationStatistics()
 {
     m_totalNavigations = 0;
@@ -225,12 +206,7 @@ void NavigationController::resetNavigationStatistics()
     m_totalSearches = 0;
 }
 
-/**
- * @brief 主题切换时刷新导航树圆点图标颜色
- *
- * 数据驱动方式: 遍历树模型根节点的所有子节点(category分组)，
- * 统一刷新为当前ThemeManager Accent色。
- */
+/** @brief 主题切换时刷新导航树圆点图标颜色，遍历树模型根节点的所有category分组统一刷新为Accent色 */
 void NavigationController::onThemeChanged()
 {
     if (!m_navTree) return;

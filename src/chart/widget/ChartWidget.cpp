@@ -17,7 +17,7 @@
 // 构造函数
 // ============================================================================
 
-/** @brief 构造波形图控件(创建ChartModel+初始化UI+连接信号) */
+/** @brief 构造波形图控件，创建ChartModel、初始化UI并连接信号 @param parent 父控件 */
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
     , m_model(new ChartModel(this))
@@ -46,7 +46,8 @@ ChartWidget::ChartWidget(QWidget* parent)
 // ============================================================================
 // UI 初始化
 // ============================================================================
-/** @brief 初始化波形图UI(QChartView+工具栏+游标叠加层+缩放控制器) */
+
+/** @brief 初始化波形图UI，包含QChartView、工具栏、游标叠加层和缩放控制器 */
 void ChartWidget::setupUI()
 {
     auto* layout = new QVBoxLayout(this);
@@ -97,10 +98,7 @@ void ChartWidget::setupUI()
             m_cursorOverlay, qOverload<>(&QWidget::update));
 }
 
-/**
- * @brief 创建顶部工具栏
- * @return 工具栏Widget(包含暂停/清除/游标/窗口大小/状态标签)
- */
+/** @brief 创建顶部工具栏，包含暂停/清除/游标/窗口大小/状态标签 @return 工具栏Widget指针 */
 QWidget* ChartWidget::createToolbar()
 {
     auto* toolbar = new QWidget;
@@ -173,7 +171,7 @@ ChartModel* ChartWidget::model() const
     return m_model;
 }
 
-/** @brief 从帧定义配置波形图(自动创建通道映射) @param def 帧定义 */
+/** @brief 从帧定义配置波形图，自动创建通道映射 @param def 帧定义 */
 void ChartWidget::configureFromFrameDefinition(const FrameDefinition& def)
 {
     // 从帧定义的字段列表自动生成通道配置
@@ -201,7 +199,7 @@ QStringList ChartWidget::channels() const
     return m_model->channelNames();
 }
 
-/** @brief 设置Y轴固定范围(禁用自动Y轴) @param min 最小值 @param max 最大值 */
+/** @brief 设置Y轴固定范围，禁用自动Y轴 @param min 最小值 @param max 最大值 */
 void ChartWidget::setYRange(double min, double max)
 {
     m_autoYRange = false;
@@ -221,7 +219,7 @@ void ChartWidget::setAutoYRange(bool enabled)
 // 槽函数 -- 帧数据接收（兼容旧接口，委托给ChartModel）
 // ============================================================================
 
-/** @brief 帧解析回调：转发到ChartModel @param fields 字段映射 @param rawFrame 原始帧 */
+/** @brief 帧解析回调，转发到ChartModel @param fields 字段映射 @param rawFrame 原始帧 */
 void ChartWidget::onFrameParsed(const QVariantMap& fields, const QByteArray& rawFrame)
 {
     if (m_paused) return;
@@ -233,7 +231,7 @@ void ChartWidget::onFrameParsed(const QVariantMap& fields, const QByteArray& raw
 // 槽函数 -- ChartModel 信号驱动的渲染更新
 // ============================================================================
 
-/** @brief 图表数据更新回调：刷新可见通道的series数据和坐标轴范围 @param updatedChannels 更新的通道名称列表 */
+/** @brief 图表数据更新回调，刷新可见通道的series数据和坐标轴范围 @param updatedChannels 更新的通道名称列表 */
 void ChartWidget::updateChart(const QStringList& updatedChannels)
 {
     if (m_paused) return;
@@ -274,7 +272,7 @@ void ChartWidget::updateChart(const QStringList& updatedChannels)
         .arg(m_model->currentFrameIndex()));
 }
 
-/** @brief 通道配置变化回调：同步series(新增/删除通道对应的QLineSeries) */
+/** @brief 通道配置变化回调，同步series新增/删除通道对应的QLineSeries */
 void ChartWidget::onChannelsChanged()
 {
     // 清除旧的series
@@ -345,7 +343,7 @@ void ChartWidget::onChannelsChanged()
     m_statusLabel->setText(tr("通道: %1").arg(m_seriesMap.size()));
 }
 
-/** @brief 数据清空回调：清除所有series数据点 */
+/** @brief 数据清空回调，清除所有series数据点 */
 void ChartWidget::onDataCleared()
 {
     // 清除所有series的数据点
@@ -371,7 +369,7 @@ void ChartWidget::onPauseToggled(bool paused)
     m_pauseBtn->setText(paused ? tr("继续") : tr("暂停"));
 }
 
-/** @brief 清除按钮回调：清空波形数据和series */
+/** @brief 清除按钮回调，清空波形数据和series */
 void ChartWidget::onClearClicked()
 {
     ++m_totalInteractions;
@@ -382,13 +380,13 @@ void ChartWidget::onClearClicked()
 // 主题切换 -- 响应 ThemeManager::themeChanged 信号
 // ============================================================================
 
-/** @brief 主题切换回调：重绘所有图表视觉元素 */
+/** @brief 主题切换回调，重绘所有图表视觉元素 */
 void ChartWidget::onThemeChanged()
 {
     applyThemeColors();
 }
 
-/** @brief 应用当前主题颜色到图表背景/坐标轴/series */
+/** @brief 应用当前主题颜色到图表背景、坐标轴和series */
 void ChartWidget::applyThemeColors()
 {
     ++m_totalRedraws;

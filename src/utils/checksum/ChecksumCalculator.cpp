@@ -7,17 +7,13 @@
 
 #include "utils/checksum/ChecksumCalculator.h"
 
-/**
- * @brief 构造函数
- */
+/** @brief 构造函数 @param parent 父对象 */
 ChecksumCalculator::ChecksumCalculator(QObject *parent)
     : QObject(parent)
 {
 }
 
-/**
- * @brief 计算校验和（根据算法分派）
- */
+/** @brief 计算校验和(根据算法分派到CRC8/CRC16/CRC32/Xor/Sum等具体实现)，空数据返回0 @param data 待计算的字节数据 @param alg 校验和算法枚举 @return 校验和结果 */
 quint64 ChecksumCalculator::calculate(const QByteArray &data, Algorithm alg) const
 {
     if (data.isEmpty()) {
@@ -170,9 +166,7 @@ quint64 ChecksumCalculator::calculate(const QByteArray &data, Algorithm alg) con
     return 0;
 }
 
-/**
- * @brief 自定义 CRC 多项式计算
- */
+/** @brief 自定义CRC多项式计算，支持8/16/32位宽度 @param data 待计算的字节数据 @param polynomial CRC多项式 @param width 位宽(8/16/32) @return CRC校验结果 */
 quint64 ChecksumCalculator::calculateCustom(const QByteArray &data, quint64 polynomial, int width) const
 {
     if (data.isEmpty() || polynomial == 0) {
@@ -196,9 +190,7 @@ quint64 ChecksumCalculator::calculateCustom(const QByteArray &data, quint64 poly
     return crc;
 }
 
-/**
- * @brief 获取算法名称
- */
+/** @brief 获取算法的标准名称字符串 @param alg 校验和算法枚举 @return 算法名称(如"CRC-8"/"CRC-16/Modbus"/"SUM-32"等) */
 QString ChecksumCalculator::algorithmName(Algorithm alg)
 {
     switch (alg) {
@@ -217,9 +209,7 @@ QString ChecksumCalculator::algorithmName(Algorithm alg)
     return QStringLiteral("Unknown");
 }
 
-/**
- * @brief 获取算法的位宽
- */
+/** @brief 获取算法的位宽 @param alg 校验和算法枚举 @return 位宽(8/16/32)，CustomCrc返回0(由用户指定) */
 int ChecksumCalculator::algorithmBitWidth(Algorithm alg)
 {
     switch (alg) {
@@ -238,9 +228,7 @@ int ChecksumCalculator::algorithmBitWidth(Algorithm alg)
     return 0;
 }
 
-/**
- * @brief 获取算法的人类可读描述
- */
+/** @brief 获取算法的人类可读中文描述 @param alg 校验和算法枚举 @return 包含多项式和用途的中文描述 */
 QString ChecksumCalculator::algorithmDescription(Algorithm alg)
 {
     switch (alg) {
@@ -259,9 +247,7 @@ QString ChecksumCalculator::algorithmDescription(Algorithm alg)
     return QString();
 }
 
-/**
- * @brief 使用所有内置算法计算同一份数据的校验和
- */
+/** @brief 使用所有内置算法计算同一份数据的校验和 @param data 待计算的字节数据 @return 算法名称到校验结果的映射表 */
 QMap<QString, quint64> ChecksumCalculator::calculateAll(const QByteArray& data) const
 {
     QMap<QString, quint64> results;
@@ -275,25 +261,19 @@ QMap<QString, quint64> ChecksumCalculator::calculateAll(const QByteArray& data) 
     return results;
 }
 
-/**
- * @brief 获取累计计算次数
- */
+/** @brief 获取累计计算次数 @return 计算总次数 */
 quint64 ChecksumCalculator::totalCalculations() const
 {
     return m_totalCalculations;
 }
 
-/**
- * @brief 获取累计处理字节数
- */
+/** @brief 获取累计处理字节数 @return 处理字节总数 */
 quint64 ChecksumCalculator::totalBytesProcessed() const
 {
     return m_totalBytesProcessed;
 }
 
-/**
- * @brief 重置所有校验和统计计数器
- */
+/** @brief 重置所有校验和统计计数器(计算次数和处理字节数归零) */
 void ChecksumCalculator::resetChecksumStatistics()
 {
     m_totalCalculations = 0;

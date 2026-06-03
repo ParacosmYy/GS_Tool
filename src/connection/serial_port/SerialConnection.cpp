@@ -8,15 +8,7 @@
 #include <QTimer>
 #include <QVariant>
 
-/**
- * @brief 构造串口连接
- *
- * 在构造时立即连接 QSerialPort 的两个关键信号:
- *   - readyRead: 有数据到达时触发 onReadyRead() 读取并转发
- *   - errorOccurred: 发生错误时触发 onError() 翻译错误并通知上层
- *
- * @param parent 父对象
- */
+/** @brief 构造串口连接，连接QSerialPort的readyRead/errorOccurred/bytesWritten信号 @param parent 父对象 */
 SerialConnection::SerialConnection(QObject* parent)
     : IConnection(parent)
 {
@@ -40,30 +32,19 @@ SerialConnection::~SerialConnection()
     }
 }
 
-/** @brief 返回端口名称 */
+/** @brief 返回端口名称 @return 当前串口端口名称字符串 */
 QString SerialConnection::name() const
 {
     return m_portName;
 }
 
-/** @brief 返回当前连接状态 */
+/** @brief 返回当前连接状态 @return ConnectionState枚举值 */
 ConnectionState SerialConnection::state() const
 {
     return m_state;
 }
 
-/**
- * @brief 打开串口连接
- *
- * 完整的打开流程:
- *   1. 检查端口名是否为空
- *   2. 检查端口是否存在于系统可用端口列表中
- *   3. 设置端口名并尝试以 ReadWrite 模式打开
- *   4. 打开失败时根据错误类型给出具体的中文诊断信息
- *   5. 打开成功后更新状态为 Connected
- *
- * @return true=打开成功, false=打开失败
- */
+/** @brief 打开串口连接，包含端口名空检查、端口存在性检查、ReadWrite模式打开、错误翻译 @return true=打开成功, false=打开失败 */
 bool SerialConnection::open()
 {
     // 统计: 每次调用 open() 都计入打开次数
@@ -117,12 +98,7 @@ bool SerialConnection::open()
     return true;
 }
 
-/**
- * @brief 关闭串口连接
- *
- * 仅在串口处于打开状态时执行关闭操作，避免重复关闭。
- * 关闭后将状态重置为 Disconnected 并通知上层。
- */
+/** @brief 关闭串口连接，仅在端口处于打开状态时执行关闭，关闭后状态重置为Disconnected并通知上层 */
 void SerialConnection::close()
 {
     if (m_serial.isOpen()) {
@@ -138,15 +114,7 @@ void SerialConnection::close()
 // 错误处理方法(queryPlatformErrors/onError/translateError/onBytesWritten/
 // sendBreak/resetErrorCounters/pinoutSignals)已拆分至 SerialConnectionError.cpp
 
-/**
- * @brief 写入数据到串口
- *
- * 前置检查: 串口必须处于打开状态。
- * 写入失败时通过 errorOccurred 信号通知上层。
- *
- * @param data 待发送的原始字节数据
- * @return 实际写入的字节数，-1表示串口未打开或写入失败
- */
+/** @brief 写入数据到串口，串口必须处于打开状态，失败时通过errorOccurred信号通知上层 @param data 待发送的原始字节数据 @return 实际写入的字节数，-1表示串口未打开或写入失败 */
 qint64 SerialConnection::write(const QByteArray& data)
 {
     ++m_totalWrites;
@@ -169,19 +137,19 @@ qint64 SerialConnection::write(const QByteArray& data)
     return written;
 }
 
-/** @brief 设置端口名 */
+/** @brief 设置端口名 @param portName 串口端口名称(如COM3、/dev/ttyUSB0) */
 void SerialConnection::setPortName(const QString& portName)
 {
     m_portName = portName;
 }
 
-/** @brief 获取当前端口名 */
+/** @brief 获取当前端口名 @return 串口端口名称字符串 */
 QString SerialConnection::portName() const
 {
     return m_portName;
 }
 
-/** @brief 设置波特率 — 检查返回值，失败时输出警告 */
+/** @brief 设置波特率，失败时输出警告日志 @param baud 波特率值(如9600、115200) */
 void SerialConnection::setBaudRate(qint32 baud)
 {
     if (!m_serial.setBaudRate(baud)) {
@@ -189,13 +157,13 @@ void SerialConnection::setBaudRate(qint32 baud)
     }
 }
 
-/** @brief 获取当前波特率 */
+/** @brief 获取当前波特率 @return 波特率数值 */
 qint32 SerialConnection::baudRate() const
 {
     return m_serial.baudRate();
 }
 
-/** @brief 设置数据位 — 检查返回值，失败时输出警告 */
+/** @brief 设置数据位，失败时输出警告日志 @param bits 数据位枚举值(Data5~Data8) */
 void SerialConnection::setDataBits(QSerialPort::DataBits bits)
 {
     if (!m_serial.setDataBits(bits)) {
@@ -203,13 +171,13 @@ void SerialConnection::setDataBits(QSerialPort::DataBits bits)
     }
 }
 
-/** @brief 获取当前数据位 */
+/** @brief 获取当前数据位 @return 数据位枚举值 */
 QSerialPort::DataBits SerialConnection::dataBits() const
 {
     return m_serial.dataBits();
 }
 
-/** @brief 设置校验模式 — 检查返回值，失败时输出警告 */
+/** @brief 设置校验模式，失败时输出警告日志 @param parity 校验枚举值(NoParity/EvenParity/OddParity等) */
 void SerialConnection::setParity(QSerialPort::Parity parity)
 {
     if (!m_serial.setParity(parity)) {
@@ -217,13 +185,13 @@ void SerialConnection::setParity(QSerialPort::Parity parity)
     }
 }
 
-/** @brief 获取当前校验模式 */
+/** @brief 获取当前校验模式 @return 校验枚举值 */
 QSerialPort::Parity SerialConnection::parity() const
 {
     return m_serial.parity();
 }
 
-/** @brief 设置停止位 — 检查返回值，失败时输出警告 */
+/** @brief 设置停止位，失败时输出警告日志 @param bits 停止位枚举值(OneStop/OneAndHalfStop/TwoStop) */
 void SerialConnection::setStopBits(QSerialPort::StopBits bits)
 {
     if (!m_serial.setStopBits(bits)) {
@@ -231,13 +199,13 @@ void SerialConnection::setStopBits(QSerialPort::StopBits bits)
     }
 }
 
-/** @brief 获取当前停止位 */
+/** @brief 获取当前停止位 @return 停止位枚举值 */
 QSerialPort::StopBits SerialConnection::stopBits() const
 {
     return m_serial.stopBits();
 }
 
-/** @brief 设置流控模式 — 检查返回值，失败时输出警告 */
+/** @brief 设置流控模式，失败时输出警告日志 @param control 流控枚举值(NoFlowControl/HardwareControl/SoftwareControl) */
 void SerialConnection::setFlowControl(QSerialPort::FlowControl control)
 {
     if (!m_serial.setFlowControl(control)) {
@@ -245,47 +213,39 @@ void SerialConnection::setFlowControl(QSerialPort::FlowControl control)
     }
 }
 
-/** @brief 获取当前流控模式 */
+/** @brief 获取当前流控模式 @return 流控枚举值 */
 QSerialPort::FlowControl SerialConnection::flowControl() const
 {
     return m_serial.flowControl();
 }
 
-/** @brief 设置 DTR 信号电平 */
+/** @brief 设置DTR信号电平 @param enabled true=高电平，false=低电平 */
 void SerialConnection::setDtr(bool enabled)
 {
     m_serial.setDataTerminalReady(enabled);
 }
 
-/** @brief 设置 RTS 信号电平 */
+/** @brief 设置RTS信号电平 @param enabled true=高电平，false=低电平 */
 void SerialConnection::setRts(bool enabled)
 {
     m_serial.setRequestToSend(enabled);
 }
 
-/** @brief 查询 DTR 信号当前状态 */
+/** @brief 查询DTR信号当前状态 @return true=DTR高电平，false=DTR低电平 */
 bool SerialConnection::isDtr() const
 {
     // QSerialPort::isDataTerminalReady() 非 const，需要 const_cast
     return const_cast<QSerialPort&>(m_serial).isDataTerminalReady();
 }
 
-/** @brief 查询 RTS 信号当前状态 */
+/** @brief 查询RTS信号当前状态 @return true=RTS高电平，false=RTS低电平 */
 bool SerialConnection::isRts() const
 {
     // QSerialPort::isRequestToSend() 非 const，需要 const_cast
     return const_cast<QSerialPort&>(m_serial).isRequestToSend();
 }
 
-/**
- * @brief 通过参数映射配置串口（工厂模式下的统一配置入口）
- *
- * 逐项检查 params 中的 key 并设置对应的串口参数。
- * 未识别的 key 会被安全忽略，不会报错。
- * 所有数值型参数都做了范围检查，超出范围的值会被跳过。
- *
- * @param params 参数映射表，支持的 key 见头文件 configure() 文档
- */
+/** @brief 通过参数映射配置串口(工厂模式下的统一配置入口)，未识别的key安全忽略，数值型参数有范围检查 @param params 参数映射表，支持portName/baudRate/dataBits/parity/stopBits/flowControl/dtr/rts */
 void SerialConnection::configure(const QVariantMap& params)
 {
     if (params.contains("portName"))
@@ -331,21 +291,13 @@ void SerialConnection::configure(const QVariantMap& params)
         setRts(params["rts"].toBool());
 }
 
-/**
- * @brief 获取系统中所有可用的串口列表
- * @return QSerialPortInfo 列表
- */
+/** @brief 获取系统中所有可用的串口列表 @return QSerialPortInfo列表 */
 QList<QSerialPortInfo> SerialConnection::availablePorts()
 {
     return QSerialPortInfo::availablePorts();
 }
 
-/**
- * @brief QSerialPort::readyRead 信号处理
- *
- * 读取串口缓冲区中的所有可用数据，并通过 IConnection::dataReceived 信号转发给上层。
- * 空数据不会触发信号，避免无意义的处理。
- */
+/** @brief QSerialPort::readyRead信号处理，读取全部缓冲区数据并转发dataReceived信号，空数据不触发信号 */
 void SerialConnection::onReadyRead()
 {
     QByteArray data = m_serial.readAll();
@@ -355,13 +307,7 @@ void SerialConnection::onReadyRead()
     }
 }
 
-/**
- * @brief 重置所有操作统计计数器
- *
- * 将 totalOpens/totalCloses/totalBytesWritten/totalBytesRead/errorCount 归零。
- * 不影响 SerialErrorCounters (帧错误/校验错误等)，
- * 那些由 resetErrorCounters() 单独管理。
- */
+/** @brief 重置所有操作统计计数器(totalOpens/totalCloses/totalBytesWritten/totalBytesRead/errorCount归零)，不影响SerialErrorCounters */
 void SerialConnection::resetStats()
 {
     m_totalOpens = 0;

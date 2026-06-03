@@ -12,13 +12,13 @@
 #include "core/theme/Constants.h"
 #include <QVariant>
 
-/** @brief 构造UDP连接(初始化QUdpSocket) @param parent 父对象 */
+/** @brief 构造UDP连接，初始化内部socket为空 @param parent 父对象 */
 UdpConnection::UdpConnection(QObject* parent)
     : IConnection(parent)
 {
 }
 
-/** @brief 析构函数，静默关闭(不发射stateChanged信号) */
+/** @brief 析构函数，静默关闭socket(不发射stateChanged信号，避免析构期间回调) */
 UdpConnection::~UdpConnection()
 {
     // 析构时仅释放资源，不发射信号(避免析构期间回调)
@@ -35,7 +35,7 @@ ConnectionType UdpConnection::type() const
     return ConnectionType::Udp;
 }
 
-/** @brief 返回连接名称(格式: UDP:localPort→remoteHost:remotePort 或 UDP:port:broadcast) @return 连接名称 */
+/** @brief 返回连接名称(格式: UDP:localPort→remoteHost:remotePort 或 UDP:port:broadcast) @return 连接名称字符串 */
 QString UdpConnection::name() const
 {
     if (m_broadcast) {
@@ -47,16 +47,13 @@ QString UdpConnection::name() const
         .arg(m_remotePort);
 }
 
-/** @brief 返回当前连接状态 */
+/** @brief 返回当前连接状态 @return ConnectionState枚举值 */
 ConnectionState UdpConnection::state() const
 {
     return m_state;
 }
 
-/**
- * @brief 通过参数映射配置UDP连接参数
- * @param params 参数映射: localPort(本地端口)/remoteHost(远程主机)/remotePort(远程端口)/broadcast(广播模式)
- */
+/** @brief 通过参数映射配置UDP连接参数 @param params 参数映射: localPort(本地端口)/remoteHost(远程主机)/remotePort(远程端口)/broadcast(广播模式) */
 void UdpConnection::configure(const QVariantMap& params)
 {
     m_localPort = static_cast<quint16>(params.value("localPort", QVariant(0)).toInt());
@@ -65,13 +62,7 @@ void UdpConnection::configure(const QVariantMap& params)
     m_broadcast = params.value("broadcast", QVariant(false)).toBool();
 }
 
-/**
- * @brief 打开UDP连接
- *
- * 创建QUdpSocket并绑定到本地端口。已连接时先关闭旧socket防止重复绑定。
- * 广播模式绑定到AnyIPv4，点对点模式绑定到Any。
- * @return true=绑定成功, false=绑定失败
- */
+/** @brief 打开UDP连接，创建QUdpSocket并绑定到本地端口，广播模式绑定AnyIPv4，点对点绑定Any @return true=绑定成功, false=绑定失败 */
 bool UdpConnection::open()
 {
     // 已连接时先关闭旧socket，防止重复绑定导致 bind 失败
@@ -100,7 +91,7 @@ bool UdpConnection::open()
     return true;
 }
 
-/** @brief 关闭UDP连接，释放socket资源并重置状态 */
+/** @brief 关闭UDP连接，释放socket资源并重置状态为Disconnected */
 void UdpConnection::close()
 {
     if (m_socket) {
@@ -111,11 +102,7 @@ void UdpConnection::close()
     updateState(ConnectionState::Disconnected);
 }
 
-/**
- * @brief 发送数据报到远程主机或广播地址
- * @param data 待发送的字节数据
- * @return 实际发送的字节数，-1表示未连接或发送失败
- */
+/** @brief 发送数据报到远程主机或广播地址 @param data 待发送的字节数据 @return 实际发送的字节数，-1表示未连接或发送失败 */
 qint64 UdpConnection::write(const QByteArray& data)
 {
     if (!m_socket || m_state != ConnectionState::Connected) {
@@ -141,7 +128,7 @@ qint64 UdpConnection::write(const QByteArray& data)
     return written;
 }
 
-/** @brief readyRead信号处理: 读取所有到达的数据报并转发给上层 */
+/** @brief readyRead信号处理，读取所有到达的数据报并转发给上层，同时累计接收字节和数据报统计 */
 void UdpConnection::onReadyRead()
 {
     if (!m_socket) return;
@@ -163,10 +150,7 @@ void UdpConnection::onReadyRead()
     }
 }
 
-/**
- * @brief socket错误处理
- * @param error Qt网络错误码，翻译为中文描述后通知上层
- */
+/** @brief socket错误处理，递增错误计数并翻译错误码为中文描述后通知上层 @param error Qt网络错误码 */
 void UdpConnection::onError(QAbstractSocket::SocketError error)
 {
     ++m_errorCount;
@@ -175,12 +159,7 @@ void UdpConnection::onError(QAbstractSocket::SocketError error)
     updateState(ConnectionState::Error);
 }
 
-/**
- * @brief 将网络错误码翻译为中文描述
- * @param error Qt网络错误枚举
- * @param systemError 系统级错误描述字符串
- * @return 人类可读的中文错误描述
- */
+/** @brief 将网络错误码翻译为中文描述 @param error Qt网络错误枚举 @param systemError 系统级错误描述字符串 @return 人类可读的中文错误描述 */
 QString UdpConnection::translateNetworkError(QAbstractSocket::SocketError error,
                                               const QString& systemError)
 {
@@ -219,7 +198,7 @@ QString UdpConnection::translateNetworkError(QAbstractSocket::SocketError error,
     return UdpConnection::tr("UDP错误: %1").arg(systemError);
 }
 
-/** @brief 更新连接状态（仅当状态变化时发射信号） */
+/** @brief 更新连接状态(仅当状态变化时发射stateChanged信号) @param newState 新的连接状态 */
 void UdpConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {
@@ -230,22 +209,22 @@ void UdpConnection::updateState(ConnectionState newState)
 
 // ---- 统计接口实现 ----
 
-/** @brief 获取已发送数据报总数 */
+/** @brief 获取已发送数据报总数 @return 数据报发送总数 */
 quint64 UdpConnection::totalDatagramsSent() const { return m_totalDatagramsSent; }
 
-/** @brief 获取已接收数据报总数 */
+/** @brief 获取已接收数据报总数 @return 数据报接收总数 */
 quint64 UdpConnection::totalDatagramsReceived() const { return m_totalDatagramsReceived; }
 
-/** @brief 获取已发送字节总数 */
+/** @brief 获取已发送字节总数 @return 发送字节总数 */
 quint64 UdpConnection::totalBytesSent() const { return m_totalBytesSent; }
 
-/** @brief 获取已接收字节总数 */
+/** @brief 获取已接收字节总数 @return 接收字节总数 */
 quint64 UdpConnection::totalBytesReceived() const { return m_totalBytesReceived; }
 
-/** @brief 获取错误计数 */
+/** @brief 获取错误计数 @return 累计错误次数 */
 quint64 UdpConnection::errorCount() const { return m_errorCount; }
 
-/** @brief 重置所有统计数据为零 */
+/** @brief 重置所有统计数据(数据报/字节/错误计数)为零 */
 void UdpConnection::resetStats()
 {
     m_totalDatagramsSent = 0;

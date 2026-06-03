@@ -21,13 +21,7 @@
 // 构造
 // ============================================================
 
-/**
- * @brief 构造缩放控制器
- * @param chartView 关联的图表视图
- * @param parent 父对象
- *
- * 缓存QChart指针和初始axis范围，用于后续resetZoom恢复。
- */
+/** @brief 构造缩放控制器，缓存QChart指针和初始axis范围用于后续resetZoom恢复 @param chartView 关联的图表视图 @param parent 父对象 */
 ZoomController::ZoomController(QChartView* chartView, QObject* parent)
     : QObject(parent)
     , m_chartView(chartView)
@@ -89,7 +83,7 @@ QRectF ZoomController::rubberBandRect() const
     return QRectF(m_rubberBandStart, m_rubberBandEnd).normalized();
 }
 
-/** @brief 放大 — 以图表中心为缩放中心 */
+/** @brief 放大，以图表中心为缩放中心 */
 void ZoomController::zoomIn()
 {
     if (!m_chartView) return;
@@ -97,7 +91,7 @@ void ZoomController::zoomIn()
     zoomAt(center, kZoomFactor);
 }
 
-/** @brief 缩小 — 以图表中心为缩放中心 */
+/** @brief 缩小，以图表中心为缩放中心 */
 void ZoomController::zoomOut()
 {
     if (!m_chartView) return;
@@ -109,17 +103,7 @@ void ZoomController::zoomOut()
 // 事件过滤
 // ============================================================
 
-/**
- * @brief 事件过滤器主入口
- * @return true=事件已处理，不再传递
- *
- * 事件分发:
- * - WheelEvent → handleWheel (滚轮缩放)
- * - MouseButtonPress → handleMousePress (框选/平移)
- * - MouseMove → handleMouseMove (框选绘制)
- * - MouseButtonRelease → handleMouseRelease (完成框选)
- * - MouseButtonDblClick → handleMouseDoubleClick (重置)
- */
+/** @brief 事件过滤器主入口，分发WheelEvent/Press/Move/Release/DblClick事件 @param watched 被观察的对象 @param event 事件对象 @return true=事件已处理不再传递 */
 bool ZoomController::eventFilter(QObject* watched, QEvent* event)
 {
     Q_UNUSED(watched)
@@ -201,13 +185,7 @@ bool ZoomController::popZoomState()
     return true;
 }
 
-/**
- * @brief 以指定像素点为中心缩放
- * @param centerPixelX 中心像素X坐标
- * @param factor 缩放因子(>1=放大)
- *
- * 保持centerPixelX对应的数据点不动，左右范围按factor缩放。
- */
+/** @brief 以指定像素点为中心缩放，保持centerPixelX对应的数据点不动，左右范围按factor缩放 @param centerPixelX 中心像素X坐标 @param factor 缩放因子(>1=放大) */
 void ZoomController::zoomAt(int centerPixelX, double factor)
 {
     auto ax = xAxis();
@@ -248,12 +226,7 @@ void ZoomController::zoomAt(int centerPixelX, double factor)
 // 事件处理器
 // ============================================================
 
-/**
- * @brief 处理滚轮缩放
- *
- * angleDelta().y() > 0 → 放大，< 0 → 缩小。
- * 以鼠标位置为缩放中心。
- */
+/** @brief 处理滚轮缩放，angleDelta().y()>0放大，<0缩小，以鼠标位置为缩放中心 @param event 滚轮事件 */
 void ZoomController::handleWheel(QWheelEvent* event)
 {
     double factor = event->angleDelta().y() > 0 ? kZoomFactor
@@ -262,12 +235,7 @@ void ZoomController::handleWheel(QWheelEvent* event)
     event->accept();
 }
 
-/**
- * @brief 处理鼠标按下
- *
- * - Ctrl+左键 → 框选缩放(记录起点)
- * - 中键 → 平移(记录起点和初始axis范围)
- */
+/** @brief 处理鼠标按下，Ctrl+左键启动框选缩放，中键启动平移 @param event 鼠标事件 */
 void ZoomController::handleMousePress(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton &&
@@ -291,12 +259,7 @@ void ZoomController::handleMousePress(QMouseEvent* event)
     }
 }
 
-/**
- * @brief 处理鼠标移动
- *
- * 框选模式: 更新终点(绘制由ChartWidget负责)
- * 平移模式: 根据偏移量调整axis范围
- */
+/** @brief 处理鼠标移动，框选模式更新终点，平移模式根据偏移量调整axis范围 @param event 鼠标事件 */
 void ZoomController::handleMouseMove(QMouseEvent* event)
 {
     if (m_rubberBandActive) {
@@ -325,12 +288,7 @@ void ZoomController::handleMouseMove(QMouseEvent* event)
     }
 }
 
-/**
- * @brief 处理鼠标释放 — 完成框选缩放
- *
- * 如果框选区域太小(<5像素)，忽略此次操作。
- * 否则将框选区域映射到数据坐标并设置为新的axis范围。
- */
+/** @brief 处理鼠标释放，完成框选缩放，框选区域<5像素时忽略 @param event 鼠标事件 */
 void ZoomController::handleMouseRelease(QMouseEvent* event)
 {
     if (m_rubberBandActive && event->button() == Qt::LeftButton) {
@@ -377,9 +335,7 @@ void ZoomController::handleMouseRelease(QMouseEvent* event)
     }
 }
 
-/**
- * @brief 处理鼠标双击 — 重置缩放到原始范围
- */
+/** @brief 处理鼠标双击，重置缩放到原始范围 @param event 鼠标事件 */
 void ZoomController::handleMouseDoubleClick(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
@@ -391,7 +347,7 @@ void ZoomController::handleMouseDoubleClick(QMouseEvent* event)
 // 辅助
 // ============================================================
 
-/** @brief 获取X轴对象(第一个QValueAxis) */
+/** @brief 获取X轴对象(第一个QValueAxis) @return X轴指针，不存在返回nullptr */
 QValueAxis* ZoomController::xAxis() const
 {
     if (!m_chart) return nullptr;
@@ -401,7 +357,7 @@ QValueAxis* ZoomController::xAxis() const
     return nullptr;
 }
 
-/** @brief 获取Y轴对象(第一个QValueAxis) */
+/** @brief 获取Y轴对象(第一个QValueAxis) @return Y轴指针，不存在返回nullptr */
 QValueAxis* ZoomController::yAxis() const
 {
     if (!m_chart) return nullptr;
@@ -415,19 +371,19 @@ QValueAxis* ZoomController::yAxis() const
 // 统计计数器接口
 // ============================================================
 
-/** @brief 返回缩放操作总次数 */
+/** @brief 返回缩放操作总次数 @return 缩放次数 */
 quint64 ZoomController::totalZooms() const
 {
     return m_totalZooms;
 }
 
-/** @brief 返回平移操作总次数 */
+/** @brief 返回平移操作总次数 @return 平移次数 */
 quint64 ZoomController::totalPans() const
 {
     return m_totalPans;
 }
 
-/** @brief 返回缩放重置总次数 */
+/** @brief 返回缩放重置总次数 @return 重置次数 */
 quint64 ZoomController::totalResets() const
 {
     return m_totalResets;

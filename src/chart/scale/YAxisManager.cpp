@@ -19,20 +19,14 @@
 // 构造 / 析构
 // ============================================================================
 
-/**
- * @brief 构造Y轴管理器
- * @param chart 关联的QChart对象，轴将添加到此图表
- * @param parent 父对象
- */
+/** @brief 构造Y轴管理器 @param chart 关联的QChart对象，轴将添加到此图表 @param parent 父对象 */
 YAxisManager::YAxisManager(QChart* chart, QObject* parent)
     : QObject(parent)
     , m_chart(chart)
 {
 }
 
-/**
- * @brief 析构时从图表移除并删除所有轴
- */
+/** @brief 析构时从图表移除并删除所有轴 */
 YAxisManager::~YAxisManager()
 {
     clearAll();
@@ -42,17 +36,7 @@ YAxisManager::~YAxisManager()
 // 轴的创建和删除
 // ============================================================================
 
-/**
- * @brief 为通道创建独立Y轴
- *
- * 如果通道已存在轴则跳过。轴颜色设为通道颜色，
- * 标题显示单位文本，网格线默认隐藏（避免多轴时网格重叠）。
- *
- * @param channel 通道名称
- * @param color 通道颜色
- * @param side 左/右侧放置
- * @param unit 单位文本（作为轴标题）
- */
+/** @brief 为通道创建独立Y轴，如果通道已存在轴则跳过，轴颜色设为通道颜色，标题显示单位文本，网格线默认隐藏 @param channel 通道名称 @param color 通道颜色 @param side 左/右侧放置 @param unit 单位文本（作为轴标题） */
 void YAxisManager::createAxis(const QString& channel, const QColor& color,
                                YAxisSide side, const QString& unit)
 {
@@ -95,10 +79,7 @@ void YAxisManager::createAxis(const QString& channel, const QColor& color,
     emit axesChanged();
 }
 
-/**
- * @brief 移除通道对应的Y轴
- * @param channel 通道名称
- */
+/** @brief 移除通道对应的Y轴 @param channel 通道名称 */
 void YAxisManager::removeAxis(const QString& channel)
 {
     auto it = m_axes.find(channel);
@@ -114,9 +95,7 @@ void YAxisManager::removeAxis(const QString& channel)
     emit axesChanged();
 }
 
-/**
- * @brief 清除所有Y轴（通道变化时全量重建）
- */
+/** @brief 清除所有Y轴（通道变化时全量重建） */
 void YAxisManager::clearAll()
 {
     for (auto it = m_axes.begin(); it != m_axes.end(); ++it) {
@@ -130,12 +109,7 @@ void YAxisManager::clearAll()
 // 轴范围和关联
 // ============================================================================
 
-/**
- * @brief 更新通道Y轴的范围
- * @param channel 通道名称
- * @param min 最小值
- * @param max 最大值
- */
+/** @brief 更新通道Y轴的范围 @param channel 通道名称 @param min 最小值 @param max 最大值 */
 void YAxisManager::updateRange(const QString& channel, double min, double max)
 {
     auto it = m_axes.find(channel);
@@ -145,11 +119,7 @@ void YAxisManager::updateRange(const QString& channel, double min, double max)
     }
 }
 
-/**
- * @brief 获取通道对应的QValueAxis
- * @param channel 通道名称
- * @return 轴指针，不存在时返回 nullptr
- */
+/** @brief 获取通道对应的QValueAxis @param channel 通道名称 @return 轴指针，不存在时返回nullptr */
 QValueAxis* YAxisManager::axisForChannel(const QString& channel) const
 {
     auto it = m_axes.constFind(channel);
@@ -159,15 +129,7 @@ QValueAxis* YAxisManager::axisForChannel(const QString& channel) const
     return nullptr;
 }
 
-/**
- * @brief 将 series 附加到通道对应的Y轴
- *
- * QLineSeries 需要附加到正确的Y轴才能正确显示刻度。
- * 同时附加到X轴由调用方负责。
- *
- * @param channel 通道名称
- * @param series 要附加的 QLineSeries
- */
+/** @brief 将series附加到通道对应的Y轴，QLineSeries需附加到正确的Y轴才能正确显示刻度 @param channel 通道名称 @param series 要附加的QLineSeries */
 void YAxisManager::attachSeries(const QString& channel, QLineSeries* series)
 {
     auto* axis = axisForChannel(channel);
@@ -180,17 +142,7 @@ void YAxisManager::attachSeries(const QString& channel, QLineSeries* series)
 // 自动分配策略
 // ============================================================================
 
-/**
- * @brief 根据通道列表自动分配Y轴左右侧
- *
- * 策略:
- *   - <= 4通道: 交替分配（偶数索引→左，奇数索引→右）
- *   - > 4通道: 按单位分组，左2右2
- *
- * @param channelNames 通道名称列表
- * @param units 对应的单位列表（与 channelNames 等长）
- * @return 每个通道对应的 YAxisSide
- */
+/** @brief 根据通道列表自动分配Y轴左右侧，<=4通道交替分配，>4通道按单位分组左2右2 @param channelNames 通道名称列表 @param units 对应的单位列表（与channelNames等长） @return 每个通道对应的YAxisSide */
 QVector<YAxisSide> YAxisManager::autoAssignSides(
     const QStringList& channelNames, const QStringList& units)
 {
@@ -241,15 +193,7 @@ QVector<YAxisSide> YAxisManager::autoAssignSides(
 // 主题颜色
 // ============================================================================
 
-/**
- * @brief 应用当前主题颜色到所有Y轴
- *
- * 更新轴标签颜色（保持通道颜色以标识性）和网格线颜色。
- * 轴标题颜色恢复为通道颜色。
- *
- * @param gridColor 网格线颜色（来自 ThemeManager::Border）
- * @param labelColor 标签文字颜色（来自 ThemeManager::TextSecondary）
- */
+/** @brief 应用当前主题颜色到所有Y轴，更新轴标签颜色、网格线颜色和轴线条颜色 @param gridColor 网格线颜色（来自ThemeManager::Border） @param labelColor 标签文字颜色（来自ThemeManager::TextSecondary） */
 void YAxisManager::applyThemeColors(const QColor& gridColor, const QColor& labelColor)
 {
     for (auto it = m_axes.begin(); it != m_axes.end(); ++it) {
@@ -277,11 +221,7 @@ void YAxisManager::applyThemeColors(const QColor& gridColor, const QColor& label
 // 内部辅助
 // ============================================================================
 
-/**
- * @brief 获取指定侧已使用的轴数量
- * @param side 左/右侧
- * @return 该侧已有的轴数量
- */
+/** @brief 获取指定侧已使用的轴数量 @param side 左/右侧 @return 该侧已有的轴数量 */
 int YAxisManager::countAxesOnSide(YAxisSide side) const
 {
     int count = 0;
@@ -293,13 +233,13 @@ int YAxisManager::countAxesOnSide(YAxisSide side) const
     return count;
 }
 
-/** @brief 获取累计缩放重算次数 */
+/** @brief 获取累计缩放重算次数 @return 重算次数 */
 quint64 YAxisManager::totalRescales() const
 {
     return m_totalRescales;
 }
 
-/** @brief 获取累计自动缩放事件次数 */
+/** @brief 获取累计自动缩放事件次数 @return 自动缩放事件次数 */
 quint64 YAxisManager::totalAutoScaleEvents() const
 {
     return m_totalAutoScaleEvents;

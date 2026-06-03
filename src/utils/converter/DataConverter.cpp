@@ -9,17 +9,13 @@
 
 #include <QUrl>
 
-/**
- * @brief 构造函数
- */
+/** @brief 构造函数 @param parent 父对象 */
 DataConverter::DataConverter(QObject *parent)
     : QObject(parent)
 {
 }
 
-/**
- * @brief 格式转换：先解码为原始字节，再编码为目标格式
- */
+/** @brief 格式转换，先解码为原始字节再编码为目标格式，同格式直接返回 @param input 输入数据 @param from 源格式 @param to 目标格式 @return 转换后的字节数据 */
 QByteArray DataConverter::convert(const QByteArray &input, Format from, Format to) const
 {
     if (from == to) {
@@ -34,9 +30,7 @@ QByteArray DataConverter::convert(const QByteArray &input, Format from, Format t
     return encodeFromRaw(raw, to);
 }
 
-/**
- * @brief 自动检测数据格式（启发式）
- */
+/** @brief 自动检测数据格式(启发式)，依次尝试Binary/Hex/Octal/Base64/UrlEncode，最终回退到Ascii @param data 待检测的数据 @return 检测到的格式枚举 */
 DataConverter::Format DataConverter::detectFormat(const QByteArray &data) const
 {
     if (data.isEmpty()) {
@@ -99,9 +93,7 @@ DataConverter::Format DataConverter::detectFormat(const QByteArray &data) const
     return Ascii;
 }
 
-/**
- * @brief 获取格式名称
- */
+/** @brief 获取格式的标准名称字符串 @param format 格式枚举 @return 格式名称(如"Hex"/"ASCII"/"Base64"等) */
 QString DataConverter::formatName(Format format)
 {
     switch (format) {
@@ -116,9 +108,7 @@ QString DataConverter::formatName(Format format)
     return QStringLiteral("Unknown");
 }
 
-/**
- * @brief 从指定格式解码为原始字节
- */
+/** @brief 从指定格式解码为原始字节，根据格式调用QByteArray::fromHex/fromBase64/QUrl::fromPercentEncoding或手动解析 @param input 输入数据 @param from 源格式 @return 解码后的原始字节数据 */
 QByteArray DataConverter::decodeToRaw(const QByteArray &input, Format from) const
 {
     switch (from) {
@@ -176,9 +166,7 @@ QByteArray DataConverter::decodeToRaw(const QByteArray &input, Format from) cons
     return input;
 }
 
-/**
- * @brief 将原始字节编码为指定格式
- */
+/** @brief 将原始字节编码为指定格式，根据格式调用toHex/toBase64/QUrl::toPercentEncoding或手动格式化 @param raw 原始字节数据 @param to 目标格式 @return 编码后的字节数据 */
 QByteArray DataConverter::encodeFromRaw(const QByteArray &raw, Format to) const
 {
     switch (to) {
@@ -215,9 +203,7 @@ QByteArray DataConverter::encodeFromRaw(const QByteArray &raw, Format to) const
     return raw;
 }
 
-/**
- * @brief 获取格式的人类可读描述
- */
+/** @brief 获取格式的人类可读中文描述 @param format 格式枚举 @return 包含格式特点和用途的中文描述 */
 QString DataConverter::formatDescription(Format format)
 {
     switch (format) {
@@ -232,17 +218,13 @@ QString DataConverter::formatDescription(Format format)
     return QString();
 }
 
-/**
- * @brief 获取所有支持的格式列表
- */
+/** @brief 获取所有支持的格式列表 @return 格式枚举列表(Hex/Ascii/Base64/UrlEncode/Binary/Decimal/Octal) */
 QList<DataConverter::Format> DataConverter::supportedFormats()
 {
     return { Hex, Ascii, Base64, UrlEncode, Binary, Decimal, Octal };
 }
 
-/**
- * @brief 将输入数据转换到所有其他格式
- */
+/** @brief 将输入数据转换到所有其他格式(排除源格式) @param input 输入数据 @param from 源格式 @return 格式名称到转换结果的映射表 */
 QMap<QString, QByteArray> DataConverter::convertToAll(const QByteArray& input, Format from) const
 {
     QMap<QString, QByteArray> results;
@@ -256,33 +238,25 @@ QMap<QString, QByteArray> DataConverter::convertToAll(const QByteArray& input, F
     return results;
 }
 
-/**
- * @brief 获取累计转换次数
- */
+/** @brief 获取累计转换次数 @return 转换总次数 */
 quint64 DataConverter::conversionCount() const
 {
     return m_convCount;
 }
 
-/**
- * @brief 获取累计转换的字节总数
- */
+/** @brief 获取累计转换的字节总数 @return 转换字节总数 */
 quint64 DataConverter::totalBytesConverted() const
 {
     return m_totalBytesConverted;
 }
 
-/**
- * @brief 获取累计转换失败次数
- */
+/** @brief 获取累计转换失败次数 @return 错误总次数 */
 quint64 DataConverter::totalErrors() const
 {
     return m_totalErrors;
 }
 
-/**
- * @brief 重置所有转换统计计数器(转换次数/字节数/错误次数)
- */
+/** @brief 重置所有转换统计计数器(转换次数/字节数/错误次数归零) */
 void DataConverter::resetStatistics()
 {
     m_convCount = 0;

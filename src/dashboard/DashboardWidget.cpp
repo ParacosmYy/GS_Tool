@@ -3,7 +3,7 @@
  * @brief 仪表盘主容器控件实现
  *
  * 以 QGridLayout(3列) 管理仪表盘子组件。
- * 构造时添加 6 个示例控件（2×Gauge、1×ProgressBar、1×LED、2×NumericDisplay），
+ * 构造时添加 6 个示例控件（2xGauge、1xProgressBar、1xLED、2xNumericDisplay），
  * 支持动态增删与布局的序列化存根。
  */
 
@@ -13,10 +13,7 @@
 #include "dashboard/LedIndicatorWidget.h"
 #include "dashboard/NumericDisplayWidget.h"
 
-/**
- * @brief 构造函数，初始化 UI 与示例控件
- * @param parent 父控件
- */
+/** @brief 构造函数，初始化UI与示例控件 @param parent 父控件 */
 DashboardWidget::DashboardWidget(QWidget *parent)
     : QWidget(parent)
     , m_grid(nullptr)
@@ -25,15 +22,10 @@ DashboardWidget::DashboardWidget(QWidget *parent)
     setupUI();
 }
 
-/** @brief 析构函数 —— 子控件由 Qt 父子树自动销毁 */
+/** @brief 析构函数，子控件由Qt父子树自动销毁 */
 DashboardWidget::~DashboardWidget() = default;
 
-/**
- * @brief 添加一个仪表盘子组件
- * @param type    组件类型: "gauge" / "progress" / "led" / "numeric"
- * @param channel 绑定数据通道
- * @return 组件索引，失败返回 -1
- */
+/** @brief 添加一个仪表盘子组件 @param type 组件类型: "gauge"/"progress"/"led"/"numeric" @param channel 绑定数据通道 @return 组件索引，失败返回-1 */
 int DashboardWidget::addComponent(const QString &type, const QString &channel)
 {
     QWidget *widget = nullptr;
@@ -83,10 +75,7 @@ int DashboardWidget::addComponent(const QString &type, const QString &channel)
     return index;
 }
 
-/**
- * @brief 移除指定索引的组件
- * @param index 组件索引
- */
+/** @brief 移除指定索引的组件并重新排列网格 @param index 组件索引 */
 void DashboardWidget::removeComponent(int index)
 {
     if (index < 0 || index >= m_components.size()) {
@@ -113,22 +102,7 @@ void DashboardWidget::removeComponent(int index)
     emit layoutChanged();
 }
 
-/**
- * @brief 从 QVariantMap 恢复布局
- *
- * 布局格式:
- * {
- *   "components": [
- *     {"type": "gauge", "channel": "电压"},
- *     {"type": "numeric", "channel": "温度"},
- *     ...
- *   ]
- * }
- *
- * 清除所有现有子控件，然后按列表顺序重建。
- *
- * @param layout 布局描述
- */
+/** @brief 从QVariantMap恢复布局，清除现有子控件后按列表顺序重建 @param layout 布局描述，格式为{"components":[{"type":"gauge","channel":"电压"},...]} */
 void DashboardWidget::loadLayout(const QVariantMap &layout)
 {
     /* 清除现有组件 */
@@ -148,14 +122,7 @@ void DashboardWidget::loadLayout(const QVariantMap &layout)
     }
 }
 
-/**
- * @brief 将当前布局导出为 QVariantMap
- *
- * 序列化每个子组件的类型和绑定通道名。
- * DashboardSerializer 使用此方法进行 JSON 持久化。
- *
- * @return 布局描述，格式同 loadLayout
- */
+/** @brief 将当前布局导出为QVariantMap，序列化每个子组件的类型和绑定通道名 @return 布局描述，格式同loadLayout */
 QVariantMap DashboardWidget::saveLayout() const
 {
     QVariantMap result;
@@ -189,11 +156,7 @@ QVariantMap DashboardWidget::saveLayout() const
     return result;
 }
 
-/**
- * @brief 获取指定索引的子组件
- * @param index 索引
- * @return 子控件指针，越界返回 nullptr
- */
+/** @brief 获取指定索引的子组件 @param index 索引 @return 子控件指针，越界返回nullptr */
 QWidget *DashboardWidget::componentAt(int index) const
 {
     if (index < 0 || index >= m_components.size()) {
@@ -202,22 +165,13 @@ QWidget *DashboardWidget::componentAt(int index) const
     return m_components.at(index);
 }
 
-/**
- * @brief 获取子组件总数
- * @return 数量
- */
+/** @brief 获取子组件总数 @return 数量 */
 int DashboardWidget::componentCount() const
 {
     return m_components.size();
 }
 
-/**
- * @brief 初始化 UI：创建网格布局并添加 6 个示例控件
- *
- * 示例布局（3列×2行）：
- * - Row 0: Gauge "电压" | Gauge "电流" | ProgressBar "功率"
- * - Row 1: LED "状态"   | Numeric "温度" | Numeric "转速"
- */
+/** @brief 初始化UI，创建网格布局并添加6个示例控件（3列x2行: Gauge电压/Gauge电流/ProgressBar功率, LED状态/Numeric温度/Numeric转速） */
 void DashboardWidget::setupUI()
 {
     m_grid = new QGridLayout(this);
@@ -235,19 +189,19 @@ void DashboardWidget::setupUI()
     addComponent("numeric", tr("转速"));
 }
 
-/** @brief 获取累计布局变更次数 */
+/** @brief 获取累计布局变更次数 @return 变更次数 */
 quint64 DashboardWidget::totalLayoutChanges() const
 {
     return m_totalLayoutChanges;
 }
 
-/** @brief 获取累计添加组件次数 */
+/** @brief 获取累计添加组件次数 @return 添加次数 */
 quint64 DashboardWidget::totalWidgetsAdded() const
 {
     return m_totalWidgetsAdded;
 }
 
-/** @brief 获取累计移除组件次数 */
+/** @brief 获取累计移除组件次数 @return 移除次数 */
 quint64 DashboardWidget::totalWidgetsRemoved() const
 {
     return m_totalWidgetsRemoved;

@@ -12,13 +12,13 @@
 #include "core/theme/Constants.h"
 #include <QNetworkInterface>
 
-/** @brief 构造TCP连接(初始化QTcpSocket) @param parent 父对象 */
+/** @brief 构造TCP连接，初始化内部socket/server/timer为空 @param parent 父对象 */
 TcpConnection::TcpConnection(QObject* parent)
     : IConnection(parent)
 {
 }
 
-/** @brief 析构函数，静默关闭(不发射stateChanged信号) */
+/** @brief 析构函数，静默关闭socket/server/timer(不发射stateChanged信号，避免析构期间回调) */
 TcpConnection::~TcpConnection()
 {
     // 析构时仅释放资源，不发射信号(避免析构期间回调)
@@ -37,13 +37,13 @@ TcpConnection::~TcpConnection()
     m_state = ConnectionState::Disconnected;
 }
 
-/** @brief 返回连接类型(TCP客户端或TCP服务端) @return ConnectionType枚举 */
+/** @brief 返回连接类型(TCP客户端或TCP服务端) @return ConnectionType枚举值 */
 ConnectionType TcpConnection::type() const
 {
     return (m_mode == Server) ? ConnectionType::TcpServer : ConnectionType::TcpClient;
 }
 
-/** @brief 返回连接名称(格式: TCP:host:port 或 TCP:server:port) @return 连接名称 */
+/** @brief 返回连接名称(格式: TCP:host:port 或 TCP Server:port) @return 连接名称字符串 */
 QString TcpConnection::name() const
 {
     if (m_mode == Client) {
@@ -52,13 +52,13 @@ QString TcpConnection::name() const
     return QString("TCP Server:%1").arg(m_port);
 }
 
-/** @brief 返回当前连接状态 @return ConnectionState枚举 */
+/** @brief 返回当前连接状态 @return ConnectionState枚举值 */
 ConnectionState TcpConnection::state() const
 {
     return m_state;
 }
 
-/** @brief 从参数映射配置连接(host/port/mode) @param params 参数映射，支持"host"/"port"/"mode"键 */
+/** @brief 从参数映射配置连接参数 @param params 参数映射，支持"host"/"port"/"mode"键 */
 void TcpConnection::configure(const QVariantMap& params)
 {
     m_host = params.value("host", ConnectionDefaults::kDefaultHost).toString();
@@ -66,7 +66,7 @@ void TcpConnection::configure(const QVariantMap& params)
     m_mode = params.value("mode", "client").toString() == "server" ? Server : Client;
 }
 
-/** @brief 打开TCP连接(客户端模式连接远端，服务端模式监听端口) @return true表示成功发起连接或开始监听 */
+/** @brief 打开TCP连接，客户端模式连接远端并启动10秒超时定时器，服务端模式监听端口 @return true表示成功发起连接或开始监听 */
 bool TcpConnection::open()
 {
     ++m_totalOpenAttempts;
@@ -133,7 +133,7 @@ bool TcpConnection::open()
     }
 }
 
-/** @brief 关闭TCP连接(释放socket/server/timer资源) */
+/** @brief 关闭TCP连接，停止超时定时器，断开信号连接并释放socket/server资源，仅已连接状态下计数 */
 void TcpConnection::close()
 {
     // 停止连接超时定时器
@@ -166,7 +166,7 @@ void TcpConnection::close()
     updateState(ConnectionState::Disconnected);
 }
 
-/** @brief 写入数据到TCP连接(客户端写m_socket，服务端写m_clientSocket) @param data 待发送数据 @return 实际写入字节数，-1表示失败 */
+/** @brief 写入数据到TCP连接(客户端写m_socket，服务端写m_clientSocket) @param data 待发送的字节数据 @return 实际写入字节数，-1表示失败 */
 qint64 TcpConnection::write(const QByteArray& data)
 {
     ++m_totalWrites;
@@ -191,7 +191,7 @@ qint64 TcpConnection::write(const QByteArray& data)
     return written;
 }
 
-/** @brief 客户端模式：socket连接成功回调，停止超时定时器并更新状态 */
+/** @brief 客户端模式socket连接成功回调，停止超时定时器并更新状态为Connected */
 void TcpConnection::onSocketConnected()
 {
     // 连接成功，取消超时定时器
@@ -200,14 +200,14 @@ void TcpConnection::onSocketConnected()
     updateState(ConnectionState::Connected);
 }
 
-/** @brief 客户端模式：socket断开回调，更新状态为Disconnected */
+/** @brief 客户端模式socket断开回调，更新状态为Disconnected并递增断开计数 */
 void TcpConnection::onSocketDisconnected()
 {
     ++m_totalDisconnections;  // 对端断开计数
     updateState(ConnectionState::Disconnected);
 }
 
-/** @brief socket可读回调，读取全部数据并发射dataReceived信号 */
+/** @brief socket可读回调，读取全部数据并发射dataReceived信号，同时累计接收字节统计 */
 void TcpConnection::onSocketReadyRead()
 {
     QTcpSocket* senderSock = qobject_cast<QTcpSocket*>(sender());
@@ -220,7 +220,7 @@ void TcpConnection::onSocketReadyRead()
     }
 }
 
-/** @brief socket错误回调，翻译错误码并发射errorOccurred信号 @param error Qt网络错误枚举 */
+/** @brief socket错误回调，翻译错误码为中文诊断信息并发射errorOccurred信号 @param error Qt网络错误枚举 */
 void TcpConnection::onSocketError(QAbstractSocket::SocketError error)
 {
     ++m_errorCount;  // 网络错误计数
@@ -280,7 +280,7 @@ QString TcpConnection::translateNetworkError(QAbstractSocket::SocketError error,
     return TcpConnection::tr("TCP错误: %1").arg(systemError);
 }
 
-/** @brief 服务端模式：新客户端连接回调，替换旧客户端并连接信号 */
+/** @brief 服务端模式新客户端连接回调，替换旧客户端socket并连接readyRead/disconnected/errorOccurred信号 */
 void TcpConnection::onNewConnection()
 {
     if (m_clientSocket) {
@@ -312,7 +312,7 @@ void TcpConnection::onNewConnection()
     }
 }
 
-/** @brief 更新连接状态并发射stateChanged信号(仅当状态真正变化时) @param newState 新状态 */
+/** @brief 更新连接状态并发射stateChanged信号(仅当状态真正变化时才发射) @param newState 新的连接状态 */
 void TcpConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {
@@ -323,22 +323,22 @@ void TcpConnection::updateState(ConnectionState newState)
 
 // ---- 统计计数器实现 ----
 
-/** @brief 获取累计连接成功次数 @return 连接成功次数 */
+/** @brief 获取累计连接成功次数 @return 连接成功总次数 */
 quint64 TcpConnection::totalConnections() const { return m_totalConnections; }
 
-/** @brief 获取累计断开连接次数 @return 断开次数 */
+/** @brief 获取累计断开连接次数 @return 断开连接总次数 */
 quint64 TcpConnection::totalDisconnections() const { return m_totalDisconnections; }
 
-/** @brief 获取累计发送字节数 @return 发送字节数 */
+/** @brief 获取累计发送字节数 @return 发送字节总数 */
 quint64 TcpConnection::totalBytesSent() const { return m_totalBytesSent; }
 
-/** @brief 获取累计接收字节数 @return 接收字节数 */
+/** @brief 获取累计接收字节数 @return 接收字节总数 */
 quint64 TcpConnection::totalBytesReceived() const { return m_totalBytesReceived; }
 
-/** @brief 获取累计错误次数 @return 错误次数 */
+/** @brief 获取累计错误次数 @return 错误总次数 */
 quint64 TcpConnection::errorCount() const { return m_errorCount; }
 
-/** @brief 重置所有统计计数器为零 */
+/** @brief 重置所有统计计数器(连接/断开/字节/错误/打开尝试/写入/重连)为零 */
 void TcpConnection::resetStats()
 {
     m_totalConnections = 0;

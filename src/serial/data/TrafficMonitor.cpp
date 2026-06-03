@@ -8,13 +8,7 @@
 /** @brief 速率历史最大保留点数 */
 static constexpr int MAX_HISTORY_POINTS = 300;
 
-/**
- * @brief 构造函数
- *
- * 创建速率计算定时器（1000ms 间隔），启动经过时间计时器。
- *
- * @param parent 父对象
- */
+/** @brief 构造函数，创建1000ms间隔的速率计算定时器并启动经过时间计时器 @param parent 父对象 */
 TrafficMonitor::TrafficMonitor(QObject* parent)
     : QObject(parent)
     , m_rxBytes(0)
@@ -31,39 +25,27 @@ TrafficMonitor::TrafficMonitor(QObject* parent)
     m_calcTimer->start();
 }
 
-/** @brief 析构函数 */
+/** @brief 析构函数，QTimer由QObject父子树管理自动销毁 */
 TrafficMonitor::~TrafficMonitor()
 {
     // QTimer 由 QObject 父子树管理
 }
 
-/**
- * @brief 记录已发送字节数
- *
- * 累加到 m_txBytes，下次计算周期会反映在速率中。
- *
- * @param bytes 本次发送的字节数
- */
+/** @brief 记录已发送字节数，累加到m_txBytes和m_totalTxBytes，下次计算周期反映在速率中 @param bytes 本次发送的字节数 */
 void TrafficMonitor::recordTxBytes(qint64 bytes)
 {
     m_txBytes += bytes;
     m_totalTxBytes += bytes;
 }
 
-/**
- * @brief 记录已接收字节数
- * @param bytes 本次接收的字节数
- */
+/** @brief 记录已接收字节数，累加到m_rxBytes和m_totalRxBytes @param bytes 本次接收的字节数 */
 void TrafficMonitor::recordRxBytes(qint64 bytes)
 {
     m_rxBytes += bytes;
     m_totalRxBytes += bytes;
 }
 
-/**
- * @brief 获取当前 RX 速率
- * @return 接收速率（字节/秒）
- */
+/** @brief 获取当前RX速率 @return 接收速率(字节/秒)，无历史数据时返回0.0 */
 double TrafficMonitor::rxRate() const
 {
     if (m_rxHistory.isEmpty()) {
@@ -72,10 +54,7 @@ double TrafficMonitor::rxRate() const
     return m_rxHistory.last().y();
 }
 
-/**
- * @brief 获取当前 TX 速率
- * @return 发送速率（字节/秒）
- */
+/** @brief 获取当前TX速率 @return 发送速率(字节/秒)，无历史数据时返回0.0 */
 double TrafficMonitor::txRate() const
 {
     if (m_txHistory.isEmpty()) {
@@ -84,29 +63,19 @@ double TrafficMonitor::txRate() const
     return m_txHistory.last().y();
 }
 
-/**
- * @brief 获取 RX 速率历史数据
- * @return 数据点向量（x=秒, y=字节/秒）
- */
+/** @brief 获取RX速率历史数据 @return 数据点向量(x=秒, y=字节/秒) */
 QVector<QPointF> TrafficMonitor::rxRateHistory() const
 {
     return m_rxHistory;
 }
 
-/**
- * @brief 获取 TX 速率历史数据
- * @return 数据点向量（x=秒, y=字节/秒）
- */
+/** @brief 获取TX速率历史数据 @return 数据点向量(x=秒, y=字节/秒) */
 QVector<QPointF> TrafficMonitor::txRateHistory() const
 {
     return m_txHistory;
 }
 
-/**
- * @brief 重置所有统计数据
- *
- * 清零累计字节数和速率历史，重启计时器。
- */
+/** @brief 重置所有统计数据(累计字节/速率历史/峰值/计时器)，清零后重新开始监控 */
 void TrafficMonitor::reset()
 {
     m_rxBytes = 0;
@@ -120,53 +89,37 @@ void TrafficMonitor::reset()
     m_elapsed.restart();
 }
 
-/**
- * @brief 获取会话累计RX总字节
- */
+/** @brief 获取会话累计RX总字节 @return 接收字节总数 */
 qint64 TrafficMonitor::totalRxBytes() const
 {
     return m_totalRxBytes;
 }
 
-/**
- * @brief 获取会话累计TX总字节
- */
+/** @brief 获取会话累计TX总字节 @return 发送字节总数 */
 qint64 TrafficMonitor::totalTxBytes() const
 {
     return m_totalTxBytes;
 }
 
-/**
- * @brief 获取历史最高RX速率
- */
+/** @brief 获取历史最高RX速率 @return 峰值接收速率(字节/秒) */
 double TrafficMonitor::peakRxRate() const
 {
     return m_peakRxRate;
 }
 
-/**
- * @brief 获取历史最高TX速率
- */
+/** @brief 获取历史最高TX速率 @return 峰值发送速率(字节/秒) */
 double TrafficMonitor::peakTxRate() const
 {
     return m_peakTxRate;
 }
 
-/**
- * @brief 获取速率历史点数
- */
+/** @brief 获取速率历史点数 @return 当前历史队列中的数据点数量 */
 int TrafficMonitor::historySize() const
 {
     return m_rxHistory.size();
 }
 
-/**
- * @brief 定时器超时处理 — 计算瞬时速率
- *
- * 根据累计字节数和经过时间计算平均速率，
- * 追加到历史队列（保留最近 300 个点），
- * 重置计数器并发出 rateUpdated 信号。
- */
+/** @brief 定时器超时处理，根据累计字节数和经过时间计算瞬时速率，追加到历史队列(保留最近300个点)，更新峰值并发射rateUpdated信号 */
 void TrafficMonitor::calculateRates()
 {
     double elapsed = m_elapsed.elapsed() / 1000.0;  // 转为秒
@@ -203,7 +156,7 @@ void TrafficMonitor::calculateRates()
     m_elapsed.restart();
 
     // 统计计数器递增
-    ++m_totalSamples;  ///< 统计: 每次采样递增
+    ++m_totalSamples;
 
     emit rateUpdated(rx, tx);
 }
@@ -228,7 +181,7 @@ quint64 TrafficMonitor::totalBytesMonitored() const
     return static_cast<quint64>(m_totalRxBytes) + static_cast<quint64>(m_totalTxBytes);
 }
 
-/** @brief 重置流量监控统计计数器(不影响速率计算) */
+/** @brief 重置流量监控统计计数器(仅影响m_totalSamples，不影响速率计算) */
 void TrafficMonitor::resetTrafficStatistics()
 {
     m_totalSamples = 0;

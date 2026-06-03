@@ -253,6 +253,7 @@ set(SOURCES
     # ── F19: Protobuf/FlatBuffers 解码 ──
     src/protocol/protobuf/ProtobufDecoder.cpp
     src/protocol/protobuf/FlatBuffersDecoder.cpp
+    src/protocol/protobuf/FlatBuffersDecoderSchema.cpp
     src/protocol/protobuf/SchemaViewer.cpp
 
     # ── F20: USB 调试 ──

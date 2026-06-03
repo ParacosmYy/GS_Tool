@@ -24,12 +24,7 @@
 // 构造 / 初始化
 // ============================================================
 
-/**
- * @brief 构造散点图控件
- *
- * 初始化UI、连接ChartModel和ThemeManager信号、应用初始主题。
- * 遵循FftWidget的构造模式。
- */
+/** @brief 构造散点图控件，初始化UI、连接ChartModel和ThemeManager信号、应用初始主题 @param model 数据模型指针 @param parent 父控件 */
 ScatterWidget::ScatterWidget(ChartModel* model, QWidget* parent)
     : QWidget(parent)
     , m_model(model)
@@ -94,7 +89,7 @@ void ScatterWidget::setupUI()
     setLayout(mainLayout);
 }
 
-/** @brief 创建顶部工具栏 — X/Y通道选择、刷新按钮、自动刷新 */
+/** @brief 创建顶部工具栏 — X/Y通道选择、刷新按钮、自动刷新 @return 工具栏Widget指针 */
 QWidget* ScatterWidget::createToolbar()
 {
     auto* toolbar = new QWidget(this);
@@ -189,13 +184,7 @@ void ScatterWidget::setupChart()
 // 散点绘制与相关系数计算
 // ============================================================
 
-/**
- * @brief 刷新散点图显示
- *
- * 从ChartModel读取X/Y通道数据，取两者最小长度，
- * 以X通道值为横坐标、Y通道值为纵坐标绘制散点。
- * 同时计算Pearson相关系数并更新标签。
- */
+/** @brief 刷新散点图显示，从ChartModel读取X/Y通道数据绘制散点并计算Pearson相关系数 */
 void ScatterWidget::refreshPlot()
 {
     if (!m_model || !m_series) {
@@ -265,16 +254,7 @@ void ScatterWidget::refreshPlot()
     }
 }
 
-/**
- * @brief 计算Pearson相关系数
- *
- * 标准公式: r = Σ((x_i - x̄)(y_i - ȳ)) / sqrt(Σ(x_i-x̄)² × Σ(y_i-ȳ)²)
- * 取两组数据的最小长度进行配对计算。
- *
- * @param xData X轴数据（取QPointF的y分量作为值）
- * @param yData Y轴数据（取QPointF的y分量作为值）
- * @return Pearson r，数据不足或零方差时返回NaN
- */
+/** @brief 计算Pearson相关系数，标准公式r=Σ((x_i-x̄)(y_i-ȳ))/sqrt(Σ(x_i-x̄)²×Σ(y_i-ȳ)²) @param xData X轴数据（取QPointF的y分量作为值） @param yData Y轴数据（取QPointF的y分量作为值） @return Pearson r，数据不足或零方差时返回NaN */
 double ScatterWidget::computePearsonCorrelation(
     const QVector<QPointF>& xData, const QVector<QPointF>& yData)
 {
@@ -314,7 +294,7 @@ double ScatterWidget::computePearsonCorrelation(
 // 槽函数
 // ============================================================
 
-/** @brief X轴通道变更时自动刷新 */
+/** @brief X轴通道变更时自动刷新 @param index 下拉框索引（未使用） */
 void ScatterWidget::onXChannelChanged(int /*index*/)
 {
     if (m_autoRefresh) {
@@ -322,7 +302,7 @@ void ScatterWidget::onXChannelChanged(int /*index*/)
     }
 }
 
-/** @brief Y轴通道变更时自动刷新 */
+/** @brief Y轴通道变更时自动刷新 @param index 下拉框索引（未使用） */
 void ScatterWidget::onYChannelChanged(int /*index*/)
 {
     if (m_autoRefresh) {
@@ -330,17 +310,13 @@ void ScatterWidget::onYChannelChanged(int /*index*/)
     }
 }
 
-/** @brief 自动刷新开关切换 */
+/** @brief 自动刷新开关切换 @param checked 是否开启自动刷新 */
 void ScatterWidget::onAutoRefreshToggled(bool checked)
 {
     m_autoRefresh = checked;
 }
 
-/**
- * @brief ChartModel数据更新回调
- *
- * 仅在自动刷新模式下，且当前X或Y通道有数据更新时触发重绘。
- */
+/** @brief ChartModel数据更新回调，仅在自动刷新模式下且当前X或Y通道有数据更新时触发重绘 @param updatedChannels 更新的通道名称列表 */
 void ScatterWidget::onDataUpdated(const QStringList& updatedChannels)
 {
     if (!m_autoRefresh) {
@@ -354,11 +330,7 @@ void ScatterWidget::onDataUpdated(const QStringList& updatedChannels)
     }
 }
 
-/**
- * @brief 通道列表变更时重建X/Y下拉框
- *
- * 保存之前的选择，重建列表后尽量恢复。
- */
+/** @brief 通道列表变更时重建X/Y下拉框，保存之前的选择并尽量恢复 */
 void ScatterWidget::onChannelsChanged()
 {
     if (!m_model) {
@@ -415,15 +387,7 @@ void ScatterWidget::onThemeChanged()
 // 主题样式
 // ============================================================
 
-/**
- * @brief 应用当前主题颜色到图表
- *
- * 更新内容:
- *   - 图表背景色 (BgPrimary)
- *   - 网格线颜色 (Border)
- *   - 坐标轴标签颜色 (TextSecondary)
- *   - 散点颜色 (ChartColors调色板第一色)
- */
+/** @brief 应用当前主题颜色到图表背景、网格线、坐标轴标签和散点颜色 */
 void ScatterWidget::applyThemeColors()
 {
     auto& theme = ThemeManager::instance();
@@ -460,13 +424,13 @@ void ScatterWidget::applyThemeColors()
     m_chart->setPlotAreaBackgroundVisible(true);
 }
 
-/** @brief 获取累计绘制点数 */
+/** @brief 获取累计绘制点数 @return 绘制点数 */
 quint64 ScatterWidget::totalPointsPlotted() const
 {
     return m_totalPointsPlotted;
 }
 
-/** @brief 获取累计清除次数 */
+/** @brief 获取累计清除次数 @return 清除次数 */
 quint64 ScatterWidget::totalClears() const
 {
     return m_totalClears;

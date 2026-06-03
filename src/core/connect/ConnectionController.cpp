@@ -24,15 +24,7 @@
 #include "utils/log/DataLogger.h"
 #include "terminal/model/TerminalModel.h"
 
-/**
- * @brief 构造连接控制器
- *
- * 初始化超时定时器、自动重连定时器和 PortWatcher，
- * 连接各自的信号到槽。PortWatcher 在构造时即启动轮询。
- *
- * @param connMgr 连接管理器（工厂），负责创建和销毁 IConnection 实例
- * @param parent 父对象
- */
+/** @brief 构造连接控制器，初始化超时定时器、自动重连定时器、健康检测定时器和PortWatcher @param connMgr 连接管理器(工厂)，负责创建和销毁IConnection实例 @param parent 父对象 */
 ConnectionController::ConnectionController(ConnectionManager* connMgr, QObject* parent)
     : QObject(parent)
     , m_connManager(connMgr)
@@ -87,7 +79,7 @@ ConnectionController::ConnectionController(ConnectionManager* connMgr, QObject* 
     });
 }
 
-/** @brief 析构函数，停止所有定时器和 PortWatcher */
+/** @brief 析构函数，停止所有定时器(连接超时/重连/健康检测/信号线轮询)和PortWatcher */
 ConnectionController::~ConnectionController()
 {
     stopConnectionTimeout();
@@ -99,12 +91,14 @@ ConnectionController::~ConnectionController()
 
 /** @brief 注入SendController依赖(用于发送数据时的字节数追踪) @param ctrl SendController指针 */
 void ConnectionController::setSendController(SendController* ctrl) { m_sendController = ctrl; }
+
 /** @brief 注入OtaManager依赖(用于OTA传输时的连接注入) @param mgr OtaManager指针 */
 void ConnectionController::setOtaManager(OtaManager* mgr) { m_otaManager = mgr; }
+
 /** @brief 注入RecordingController依赖(用于录制数据转发) @param ctrl RecordingController指针 */
 void ConnectionController::setRecordingController(RecordingController* ctrl) { m_recordingController = ctrl; }
 
-/** @brief 创建并打开串口连接 @param serialParams 串口参数 */
+/** @brief 创建并打开串口连接，完整流程: 关闭旧连接->提取DTR/RTS->工厂创建->配置->连接信号->超时保护->打开->注入下游 @param serialParams 串口参数映射(含portName/baudRate/dtr/rts等) */
 void ConnectionController::connectSerial(const QVariantMap& serialParams)
 {
     // 步骤1: 关闭已有连接
@@ -168,7 +162,7 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
     ++m_totalConnections;
 }
 
-/** @brief 关闭当前连接, 设置用户主动断开标记防止自动重连 */
+/** @brief 关闭当前连接，设置用户主动断开标记防止自动重连，停止重连定时器并递增断开计数 */
 void ConnectionController::disconnectCurrent()
 {
     m_userInitiatedDisconnect = true;
@@ -185,7 +179,7 @@ void ConnectionController::disconnectCurrent()
     }
 }
 
-/** @brief 创建网络连接 @param type 连接类型 */
+/** @brief 创建网络连接(使用默认参数)，根据连接类型构建不同的默认host/port参数 @param type 连接类型枚举 */
 void ConnectionController::connectNetwork(ConnectionType type)
 {
     // 构建默认网络参数(首次连接使用)
@@ -227,11 +221,7 @@ void ConnectionController::connectNetwork(ConnectionType type)
     connectNetwork(type, params);
 }
 
-/**
- * @brief 创建网络连接(带参数，用于自动重连)
- * @param type 连接类型
- * @param params 网络连接参数(host/port等)
- */
+/** @brief 创建网络连接(带参数，用于手动连接和自动重连)，完整流程: 关闭旧连接->工厂创建->配置->连接信号->超时保护->打开->注入下游 @param type 连接类型枚举 @param params 网络连接参数(host/port等) */
 void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap& params)
 {
     // 关闭已有连接
@@ -284,13 +274,18 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
 
 /** @brief 返回当前活动连接指针 @return IConnection指针，无连接时为nullptr */
 IConnection* ConnectionController::currentConnection() const { return m_currentConn; }
+
 /** @brief 设置DTR信号电平 @param enabled true=高电平 */
 void ConnectionController::setDtr(bool enabled) { if (m_currentConn) m_currentConn->setDtr(enabled); }
+
 /** @brief 设置RTS信号电平 @param enabled true=高电平 */
 void ConnectionController::setRts(bool enabled) { if (m_currentConn) m_currentConn->setRts(enabled); }
+
 /** @brief 发送Break信号(用于STM32/ESP32进入Bootloader) @param duration Break持续时间(毫秒) */
 void ConnectionController::sendBreak(int duration) { if (m_currentConn) m_currentConn->sendBreak(duration); }
+
 // enableAutoReconnect() / isAutoReconnectEnabled() → ConnectionControllerReconnect.cpp
+
 /** @brief 返回端口监听器 @return PortWatcher指针 */
 PortWatcher* ConnectionController::portWatcher() const { return m_portWatcher; }
 
@@ -320,7 +315,7 @@ quint64 ConnectionController::totalDataSent() const { return m_totalDataSent; }
 /** @brief 获取累计接收数据字节数 @return 接收总字节数 */
 quint64 ConnectionController::totalDataReceived() const { return m_totalDataReceived; }
 
-/** @brief 重置连接统计计数器为初始值 */
+/** @brief 重置连接统计计数器(连接/断开/重连/错误/发送字节/接收字节)为初始值 */
 void ConnectionController::resetConnectionStatistics()
 {
     m_totalConnections = 0;
