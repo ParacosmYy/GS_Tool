@@ -1,99 +1,61 @@
-/**
- * @file ConnectionPool.cpp
- * @brief 连接池实现
- * @since score-132
- */
 #include "connection/pool/ConnectionPool.h"
-#include "connection/interface/IConnection.h"
 #include <QDateTime>
-#include <QMutexLocker>
 
-ConnectionPool::ConnectionPool(QObject *parent) : QObject(parent) {
-    m_cleanupTimer.setInterval(10000);
-    connect(&m_cleanupTimer, &QTimer::timeout, this, &ConnectionPool::cleanupIdle);
+ConnectionPool::ConnectionPool(QObject *parent) : QObject(parent), m_reconnectTimer(new QTimer(this)) {
+    connect(m_reconnectTimer, &QTimer::timeout, this, &ConnectionPool::onReconnectTimer);
 }
-ConnectionPool::~ConnectionPool() { shutdown(); }
-ConnectionPool &ConnectionPool::instance() { static ConnectionPool inst; return inst; }
-void ConnectionPool::initialize() { m_cleanupTimer.start(); }
+ConnectionPool::~ConnectionPool() { disconnectAll(); }
 
-std::shared_ptr<IConnection> ConnectionPool::acquire(const QString &connectionType, const QString &config) {
-    QMutexLocker locker(&m_mutex);
-    ++m_totalAcquires;
-    // Try to reuse idle connection of same type
+QString ConnectionPool::createConnection(const QString &type, const QString &addr) {
+    if (m_pool.size() >= m_maxConnections) { emit poolFull(); return {}; }
+    QString id = QString("conn_%1").arg(++m_counter);
+    PoolEntry e; e.id = id; e.type = type; e.address = addr;
+    e.created = QDateTime::currentMSecsSinceEpoch(); e.lastActivity = e.created;
+    m_pool[id] = e;
+    emit connectionCreated(id);
+    return id;
+}
+
+void ConnectionPool::removeConnection(const QString &id) {
+    if (m_pool.remove(id)) emit connectionRemoved(id);
+}
+
+void ConnectionPool::connectAll() {
     for (auto it = m_pool.begin(); it != m_pool.end(); ++it) {
-        if (!it->inUse && it->connection) {
-            it->inUse = true;
-            it->lastUsedMs = QDateTime::currentMSecsSinceEpoch();
-            ++m_totalReused;
-            emit connectionAcquired(it->connectionId);
-            return it->connection;
-        }
-    }
-    // Create new
-    ++m_totalCreated;
-    auto conn = std::make_shared<IConnection>();
-    PoolEntry entry;
-    entry.connection = conn;
-    entry.inUse = true;
-    entry.lastUsedMs = QDateTime::currentMSecsSinceEpoch();
-    entry.connectionId = generateId();
-    m_pool[entry.connectionId] = entry;
-    emit connectionAcquired(entry.connectionId);
-    return conn;
-}
-
-void ConnectionPool::release(const QString &connectionId) {
-    QMutexLocker locker(&m_mutex);
-    auto it = m_pool.find(connectionId);
-    if (it != m_pool.end()) {
-        it->inUse = false;
-        it->lastUsedMs = QDateTime::currentMSecsSinceEpoch();
-        ++m_totalReleases;
-        emit connectionReleased(connectionId);
+        if (!it->connected) { it->connected = true; emit connectionStateChanged(it->id, true); }
     }
 }
 
-void ConnectionPool::releaseAll() {
-    QMutexLocker locker(&m_mutex);
+void ConnectionPool::disconnectAll() {
     for (auto it = m_pool.begin(); it != m_pool.end(); ++it) {
-        if (it->inUse) { it->inUse = false; it->lastUsedMs = QDateTime::currentMSecsSinceEpoch(); ++m_totalReleases; }
+        if (it->connected) { it->connected = false; emit connectionStateChanged(it->id, false); }
     }
 }
 
-void ConnectionPool::shutdown() {
-    QMutexLocker locker(&m_mutex);
-    m_cleanupTimer.stop();
-    m_pool.clear();
-    emit poolCleared();
+ConnectionPool::PoolEntry ConnectionPool::connection(const QString &id) const { return m_pool.value(id); }
+QList<ConnectionPool::PoolEntry> ConnectionPool::allConnections() const { return m_pool.values(); }
+
+QList<ConnectionPool::PoolEntry> ConnectionPool::connectionsByType(const QString &type) const {
+    QList<PoolEntry> r; for (const auto &e : m_pool) if (e.type == type) r.append(e); return r;
 }
 
-int ConnectionPool::activeCount() const { QMutexLocker locker(&m_mutex); int c = 0; for (const auto &e : m_pool) if (e.inUse) ++c; return c; }
-int ConnectionPool::idleCount() const { QMutexLocker locker(&m_mutex); int c = 0; for (const auto &e : m_pool) if (!e.inUse) ++c; return c; }
-int ConnectionPool::totalCount() const { QMutexLocker locker(&m_mutex); return m_pool.size(); }
-void ConnectionPool::setMaxIdlePerType(int maxIdle) { m_maxIdlePerType = qMax(1, maxIdle); }
-int ConnectionPool::maxIdlePerType() const { return m_maxIdlePerType; }
-void ConnectionPool::setIdleTimeoutMs(qint64 ms) { m_idleTimeoutMs = qMax(1000, ms); }
-qint64 ConnectionPool::idleTimeoutMs() const { return m_idleTimeoutMs; }
+int ConnectionPool::connectedCount() const { int c=0; for (const auto &e:m_pool) if (e.connected) c++; return c; }
+int ConnectionPool::totalCount() const { return m_pool.size(); }
+void ConnectionPool::setMaxConnections(int m) { m_maxConnections = m; }
 
-quint64 ConnectionPool::totalAcquires() const { return m_totalAcquires; }
-quint64 ConnectionPool::totalReleases() const { return m_totalReleases; }
-quint64 ConnectionPool::totalCreated() const { return m_totalCreated; }
-quint64 ConnectionPool::totalReused() const { return m_totalReused; }
-quint64 ConnectionPool::totalExpired() const { return m_totalExpired; }
-double ConnectionPool::reuseRate() const { return m_totalAcquires == 0 ? 0.0 : static_cast<double>(m_totalReused) / static_cast<double>(m_totalAcquires); }
-void ConnectionPool::resetStatistics() { m_totalAcquires = 0; m_totalReleases = 0; m_totalCreated = 0; m_totalReused = 0; m_totalExpired = 0; }
+void ConnectionPool::setAutoReconnect(bool enable, int interval) {
+    m_autoReconnect = enable;
+    if (enable) m_reconnectTimer->start(interval); else m_reconnectTimer->stop();
+}
 
-void ConnectionPool::cleanupIdle() {
-    QMutexLocker locker(&m_mutex);
-    qint64 now = QDateTime::currentMSecsSinceEpoch();
-    auto it = m_pool.begin();
-    while (it != m_pool.end()) {
-        if (!it->inUse && (now - it->lastUsedMs) > m_idleTimeoutMs) {
-            ++m_totalExpired;
-            emit connectionExpired(it->connectionId);
-            it = m_pool.erase(it);
-        } else { ++it; }
+void ConnectionPool::updateActivity(const QString &id) {
+    auto it = m_pool.find(id);
+    if (it != m_pool.end()) it->lastActivity = QDateTime::currentMSecsSinceEpoch();
+}
+
+void ConnectionPool::onReconnectTimer() {
+    if (!m_autoReconnect) return;
+    for (auto it = m_pool.begin(); it != m_pool.end(); ++it) {
+        if (!it->connected) { it->connected = true; emit connectionStateChanged(it->id, true); }
     }
 }
-
-QString ConnectionPool::generateId() const { return QStringLiteral("cpool_%1").arg(++m_idCounter); }

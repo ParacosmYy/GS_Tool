@@ -13,6 +13,7 @@ enum MqttPacketType {
     PINGRESP = 13, DISCONNECT = 14
 };
 
+/** @brief 构造函数，初始化MQTT客户端 @param parent 父对象 */
 MqttConnection::MqttConnection(QObject* parent)
     : IConnection(parent)
     , m_socket(new QTcpSocket(this))
@@ -40,18 +41,23 @@ MqttConnection::MqttConnection(QObject* parent)
     });
 }
 
+/** @brief 析构函数，关闭连接并释放资源 */
 MqttConnection::~MqttConnection() { close(); }
 
+/** @brief 获取连接类型 @return Mqtt类型 */
 ConnectionType MqttConnection::type() const { return ConnectionType::Mqtt; }
 
+/** @brief 获取连接显示名称 @return "主机:端口" 或 "未配置" */
 QString MqttConnection::name() const
 {
     return m_host.isEmpty() ? tr("未配置")
          : QStringLiteral("%1:%2").arg(m_host).arg(m_port);
 }
 
+/** @brief 获取当前连接状态 @return 连接状态枚举 */
 ConnectionState MqttConnection::state() const { return m_state; }
 
+/** @brief 打开MQTT连接，发起TCP握手 @return true=成功发起连接 */
 bool MqttConnection::open()
 {
     if (m_host.isEmpty()) {
@@ -64,6 +70,7 @@ bool MqttConnection::open()
     return true;
 }
 
+/** @brief 关闭MQTT连接，发送DISCONNECT报文后断开TCP */
 void MqttConnection::close()
 {
     m_keepAlive->stop();
@@ -86,11 +93,13 @@ void MqttConnection::close()
     m_expectedLength = -1;
 }
 
+/** @brief 向默认主题写入数据(QoS0发布) @param data 待发送数据 @return 成功返回数据大小，失败返回-1 */
 qint64 MqttConnection::write(const QByteArray& data)
 {
     return publish("embeddebug/out", data, 0) ? data.size() : -1;
 }
 
+/** @brief 配置MQTT连接参数 @param params 参数映射(支持host/port/clientId/username/password/keepAlive/cleanSession) */
 void MqttConnection::configure(const QVariantMap& params)
 {
     if (params.contains("host"))          m_host = params.value("host").toString();
@@ -105,6 +114,7 @@ void MqttConnection::configure(const QVariantMap& params)
     if (params.contains("cleanSession"))  m_cleanSession = params.value("cleanSession").toBool();
 }
 
+/** @brief 连接到指定MQTT服务器 @param host 服务器地址 @param port 端口号 */
 void MqttConnection::connectToHost(const QString& host, int port)
 {
     m_host = host;
@@ -112,8 +122,10 @@ void MqttConnection::connectToHost(const QString& host, int port)
     open();
 }
 
+/** @brief 断开MQTT连接 */
 void MqttConnection::disconnectFromHost() { close(); }
 
+/** @brief 向指定主题发布消息 @param topic 主题名 @param payload 消息负载 @param qos 服务质量等级(0/1/2) @return true=发布成功 */
 bool MqttConnection::publish(const QString& topic, const QByteArray& payload, int qos)
 {
     if (m_state != ConnectionState::Connected) return false;
@@ -141,6 +153,7 @@ bool MqttConnection::publish(const QString& topic, const QByteArray& payload, in
     return false;
 }
 
+/** @brief 订阅指定MQTT主题 @param topic 主题过滤器 @param qos 请求的服务质量等级(0/1/2) @return true=订阅报文发送成功 */
 bool MqttConnection::subscribe(const QString& topic, int qos)
 {
     if (m_state != ConnectionState::Connected) return false;
@@ -167,6 +180,7 @@ bool MqttConnection::subscribe(const QString& topic, int qos)
     return false;
 }
 
+/** @brief 取消订阅指定MQTT主题 @param topic 要取消的主题过滤器 */
 void MqttConnection::unsubscribe(const QString& topic)
 {
     if (m_state != ConnectionState::Connected) return;
@@ -186,8 +200,10 @@ void MqttConnection::unsubscribe(const QString& topic)
     m_subscriptions.removeAll(topic);
 }
 
+/** @brief TCP连接建立成功回调，发送MQTT CONNECT报文 */
 void MqttConnection::onSocketConnected() { sendConnect(); }
 
+/** @brief TCP连接断开回调，更新状态并停止心跳 */
 void MqttConnection::onSocketDisconnected()
 {
     m_keepAlive->stop();
@@ -196,6 +212,7 @@ void MqttConnection::onSocketDisconnected()
     emit disconnected();
 }
 
+/** @brief 底层TCP数据到达回调，追加到接收缓冲区并解析 */
 void MqttConnection::onSocketReadyRead()
 {
     QByteArray newData = m_socket->readAll();
@@ -204,6 +221,7 @@ void MqttConnection::onSocketReadyRead()
     parseIncomingPacket();
 }
 
+/** @brief 心跳定时器回调，发送PINGREQ保活报文 */
 void MqttConnection::onKeepAlive()
 {
     if (m_state == ConnectionState::Connected) {
@@ -213,6 +231,7 @@ void MqttConnection::onKeepAlive()
     }
 }
 
+/** @brief 构建并发送MQTT CONNECT报文，包含客户端ID和认证信息 */
 void MqttConnection::sendConnect()
 {
     QByteArray payload;
@@ -247,6 +266,7 @@ void MqttConnection::sendConnect()
     if (written == packet.size()) m_totalBytesSent += static_cast<quint64>(written);
 }
 
+/** @brief 构建MQTT协议报文 @param packetType 报文类型 @param payload 负载数据 @return 完整的MQTT报文 */
 QByteArray MqttConnection::buildMqttPacket(quint8 packetType, const QByteArray& payload)
 {
     QByteArray header;
@@ -255,6 +275,7 @@ QByteArray MqttConnection::buildMqttPacket(quint8 packetType, const QByteArray& 
     return header + payload;
 }
 
+/** @brief 编码MQTT剩余长度字段(可变长度编码) @param length 剩余长度值 @return 编码后的字节序列 */
 QByteArray MqttConnection::encodeRemainingLength(int length)
 {
     QByteArray result;
@@ -267,6 +288,7 @@ QByteArray MqttConnection::encodeRemainingLength(int length)
     return result;
 }
 
+/** @brief 从接收缓冲区解析完整的MQTT报文并分发到对应处理函数 */
 void MqttConnection::parseIncomingPacket()
 {
     while (m_rxBuffer.size() >= 2) {
@@ -307,6 +329,7 @@ void MqttConnection::parseIncomingPacket()
     }
 }
 
+/** @brief 处理CONNACK响应，根据返回码设置连接状态 @param data CONNACK负载数据 */
 void MqttConnection::handleConnack(const QByteArray& data)
 {
     if (data.size() < 2) return;
@@ -324,6 +347,7 @@ void MqttConnection::handleConnack(const QByteArray& data)
     }
 }
 
+/** @brief 处理收到的PUBLISH报文，提取主题和负载并回复ACK @param data 可变头部+负载数据 @param flags 报文标志位 */
 void MqttConnection::handlePublish(const QByteArray& data, quint8 flags)
 {
     if (data.size() < 2) return;
@@ -395,19 +419,27 @@ void MqttConnection::handleSuback(const QByteArray& data)
     }
 }
 
+/** @brief 生成随机客户端ID @return "EmbedDebug_XXXXXX" 格式的客户端标识 */
 QString MqttConnection::generateClientId()
 {
     return QStringLiteral("EmbedDebug_%1").arg(QRandomGenerator::global()->bounded(100000, 999999));
 }
 
+/** @brief 获取当前订阅数量 @return 订阅主题数 */
 int MqttConnection::subscriptionCount() const { return m_subscriptions.size(); }
 
+/** @brief 获取累计发布消息数 @return 发布计数 */
 quint64 MqttConnection::totalPublishes() const { return m_totalPublishes; }
+/** @brief 获取累计订阅次数 @return 订阅计数 */
 quint64 MqttConnection::totalSubscriptions() const { return m_totalSubscriptions; }
+/** @brief 获取累计发送字节数 @return 发送字节数 */
 quint64 MqttConnection::totalBytesSent() const { return m_totalBytesSent; }
+/** @brief 获取累计接收字节数 @return 接收字节数 */
 quint64 MqttConnection::totalBytesReceived() const { return m_totalBytesReceived; }
+/** @brief 获取累计错误次数 @return 错误计数 */
 quint64 MqttConnection::errorCount() const { return m_errorCount; }
 
+/** @brief 重置所有统计计数器 */
 void MqttConnection::resetStats()
 {
     m_totalPublishes = 0;
