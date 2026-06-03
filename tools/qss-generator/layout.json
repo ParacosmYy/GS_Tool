@@ -1,0 +1,17 @@
+{
+  "navTreeMinWidth": "180",
+  "navTreeMaxWidth": "280",
+  "navTreeIndent": "16",
+  "panelHeaderHeight": "36",
+  "panelIconSize": "16",
+  "panelCollapseBtnSize": "24",
+  "panelContentPadding": "12 8 12 12",
+  "borderRadius": "6",
+  "borderRadiusSmall": "4",
+  "scrollbarWidth": "8",
+  "toolbarHeight": "36",
+  "sendBarHeight": "44",
+  "statusBarHeight": "24",
+  "toastMaxWidth": "320",
+  "commandPaletteWidth": "480"
+}

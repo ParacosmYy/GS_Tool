@@ -1,0 +1,1630 @@
+/* EmbedDebug - {{description}} */
+
+/* 全局UI字体 - 确保所有控件使用统一字体 */
+* {
+    font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+}
+
+{{SEMANTIC_BLOCK}}
+
+
+/* 全局背景 */
+QMainWindow {
+    background-color: {{color.BgPrimary}};
+}
+
+/* 背景组件 - 透明背景让面板覆盖层可见 */
+BackgroundWidget {
+    background-color: transparent;
+}
+
+/* 面板半透明背景 - 让磨砂玻璃效果和背景图透出来 */
+QWidget#serialPanel {
+    background-color: {{color.PanelRgba}};
+    border-radius: {{layout.borderRadius}}px;
+}
+
+QWidget#rightWidget {
+    background-color: {{color.WidgetRgba}};
+}
+
+QWidget#rightPanel {
+    background-color: transparent;
+}
+
+/* 左侧导航树 - 半透明让磨砂玻璃透出 */
+QTreeView {
+    background-color: {{color.TreeBg}};
+    color: {{color.TextSecondary}};
+    border: none;
+    outline: none;
+    font-size: 13px;
+}
+
+QTreeView::item {
+    padding: 4px 8px;
+    border: none;
+}
+
+QTreeView::item:selected {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+}
+
+QTreeView::item:hover {
+    background-color: {{color.TreeItemHover}};
+}
+
+/* 工具栏 */
+QToolBar {
+    background-color: {{color.BgPrimary}};
+    border: none;
+    border-bottom: 1px solid {{color.Border}};
+    spacing: 4px;
+    padding: 4px;
+    min-height: 36px;
+    max-height: 40px;
+}
+
+QToolButton {
+    background-color: transparent;
+    color: {{color.TextSecondary}};
+    border: 1px solid transparent;
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    font-size: 13px;
+}
+
+QToolButton:hover {
+    background-color: {{color.BgSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+}
+
+QToolButton:pressed {
+    background-color: {{color.ControlBorder}};
+}
+
+QToolButton:disabled {
+    background-color: transparent;
+    color: {{color.TextMuted}};
+    border: 1px solid transparent;
+}
+
+QToolButton:checked {
+    background-color: {{color.BgSecondary}};
+    border: 1px solid {{color.Accent}};
+    color: {{color.Accent}};
+}
+
+/* 发送区域 */
+QLineEdit {
+    background-color: {{color.BgInput}};
+    color: {{color.InputTextColor}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 6px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 13px;
+}
+
+QLineEdit:focus {
+    border: 1px solid {{color.BorderFocus}};
+}
+
+QLineEdit:disabled {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextMuted}};
+    border-color: {{color.Border}};
+}
+
+QLineEdit[hasError="true"] {
+    border: 2px solid {{color.Error}};
+    background-color: {{color.ErrorHintRgba}};
+}
+
+QPushButton {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 6px 16px;
+    font-size: 13px;
+}
+
+QPushButton:hover {
+    background-color: {{color.ControlBorder}};
+}
+
+QPushButton:pressed {
+    background-color: {{color.PressedBg}};
+}
+
+QPushButton:disabled {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextMuted}};
+    border-color: {{color.Border}};
+}
+
+/* 发送按钮 - accent高亮 */
+QPushButton#sendButton {
+    background-color: {{color.Accent}};
+    color: {{color.BgPrimary}};
+    border: none;
+    border-radius: {{layout.borderRadius}}px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: bold;
+}
+QPushButton#sendButton:hover { background-color: {{color.AccentHover}}; }
+QPushButton#sendButton:pressed { background-color: {{color.AccentPressed}}; }
+QPushButton#sendButton:disabled { background-color: {{color.ControlBorder}}; color: {{color.TextMuted}}; }
+
+/* 应用定义按钮 - accent高亮 */
+QPushButton#applyDefBtn {
+    background-color: {{color.Accent}};
+    color: {{color.BgPrimary}};
+    border: none;
+    border-radius: {{layout.borderRadius}}px;
+    font-weight: bold;
+}
+QPushButton#applyDefBtn:hover { background-color: {{color.AccentHover}}; }
+QPushButton#applyDefBtn:pressed { background-color: {{color.AccentPressed}}; }
+QPushButton#applyDefBtn:disabled { background-color: {{color.ControlBorder}}; color: {{color.TextMuted}}; }
+
+/* 状态栏 */
+QStatusBar {
+    background-color: {{color.BgDeep}};
+    color: {{color.TextSecondary}};
+    border-top: 1px solid {{color.Border}};
+    font-size: 12px;
+}
+
+QLabel#rxBytesLabel {
+    color: {{color.Success}};
+    font-size: 12px;
+}
+QLabel#txBytesLabel {
+    color: {{color.TxBytesColor}};
+    font-size: 12px;
+}
+QLabel#connStatusLbl {
+    font-size: 12px;
+    padding: 0 4px;
+}
+
+/* 分隔器 */
+QSplitter::handle {
+    background-color: {{color.Border}};
+    width: 1px;
+}
+
+/* 快捷指令栏 */
+QFrame#quickCommandBar,
+QWidget#quickCommandBar {
+    background-color: {{color.BgPrimary}};
+    border-top: 1px solid {{color.Border}};
+}
+
+/* 快捷指令按钮 - 统一样式 */
+QPushButton#quickCmdEditBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#quickCmdEditBtn:hover { background-color: {{color.ControlBorder}}; }
+QPushButton#quickCmdEditBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#quickCmdEditBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+QPushButton#quickCmdAddBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    font-size: 16px;
+    font-weight: bold;
+}
+QPushButton#quickCmdAddBtn:hover { background-color: {{color.ControlBorder}}; color: {{color.AccentHover}}; }
+QPushButton#quickCmdAddBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#quickCmdAddBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+/* 快捷指令按钮 - 动态命令按钮 (匹配 quickCmdBtn_序号) */
+QPushButton[quickCmdBtn="true"] {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton[quickCmdBtn="true"]:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Accent}}; color: {{color.Accent}}; }
+QPushButton[quickCmdBtn="true"]:pressed { background-color: {{color.PressedBg}}; }
+QPushButton[quickCmdBtn="true"]:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+/* ComboBox */
+QComboBox {
+    background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    font-size: 13px;
+}
+
+QComboBox:hover {
+    border: 1px solid {{color.Accent}};
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 24px;
+    border: none;
+    border-left: 1px solid {{color.ControlBorder}};
+}
+
+QComboBox::down-arrow {
+    width: 14px;
+    height: 14px;
+    image: {{color.DropdownIcon}};
+}
+
+QComboBox::down-arrow:disabled {
+    image: {{color.DropdownIconDisabled}};
+}
+
+QComboBox:disabled {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextMuted}};
+    border: 1px solid {{color.Border}};
+}
+
+QComboBox QAbstractItemView {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextSecondary}};
+    selection-background-color: {{color.BgTertiary}};
+    selection-color: {{color.Accent}};
+    outline: none;
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+}
+
+/* 可编辑ComboBox内部QLineEdit使用等宽字体(波特率等数字输入) */
+QComboBox QLineEdit {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+/* SpinBox */
+QSpinBox {
+    background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px;
+    font-size: 13px;
+}
+
+QSpinBox:hover {
+    border: 1px solid {{color.Accent}};
+}
+
+QSpinBox:focus {
+    border: 1px solid {{color.Accent}};
+}
+
+QSpinBox:disabled {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextMuted}};
+    border: 1px solid {{color.Border}};
+}
+
+/* CheckBox - 统一自定义指示器样式 */
+QCheckBox {
+    color: {{color.TextSecondary}};
+    font-size: 13px;
+    spacing: 8px;
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    background-color: {{color.BgInput}};
+}
+
+QCheckBox::indicator:checked {
+    background-color: {{color.Accent}};
+    border: 1px solid {{color.Accent}};
+}
+
+QCheckBox::indicator:hover {
+    border-color: {{color.Accent}};
+}
+
+QCheckBox::indicator:disabled {
+    background-color: {{color.BgSecondary}};
+    border-color: {{color.Border}};
+}
+
+/* 配置面板标签 */
+QLabel {
+    color: {{color.LabelText}};
+    font-size: 13px;
+}
+
+/* QGroupBox - 统一标题样式（字体大小、颜色、间距） */
+QGroupBox {
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    margin-top: 14px;
+    padding-top: 18px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 12px;
+    padding: 0 8px;
+    color: {{color.TextSecondary}};
+}
+
+/* === OTA Widget === */
+QPushButton#otaStartBtn {
+    background-color: {{color.Accent}};
+    color: {{color.BgPrimary}};
+    border: none;
+    border-radius: {{layout.borderRadius}}px;
+    font-weight: bold;
+}
+QPushButton#otaStartBtn:hover { background-color: {{color.AccentHover}}; }
+QPushButton#otaStartBtn:pressed { background-color: {{color.AccentPressed}}; }
+QPushButton#otaStartBtn:disabled { background-color: {{color.ControlBorder}}; color: {{color.TextMuted}}; }
+
+QPushButton#otaCancelBtn {
+    background-color: transparent;
+    color: {{color.Error}};
+    border: 1px solid {{color.Error}};
+    border-radius: {{layout.borderRadius}}px;
+}
+QPushButton#otaCancelBtn:hover { background-color: {{color.ErrorHoverRgba}}; }
+QPushButton#otaCancelBtn:pressed { background-color: {{color.ErrorPressedRgba}}; }
+QPushButton#otaCancelBtn:disabled { color: {{color.ControlBorder}}; border-color: {{color.ControlBorder}}; }
+
+QProgressBar#otaProgress {
+    background-color: {{color.BgSecondary}};
+    border: none;
+    border-radius: {{layout.borderRadius}}px;
+    text-align: center;
+    color: {{color.TextSecondary}};
+}
+QProgressBar#otaProgress::chunk {
+    background-color: {{color.Accent}};
+    border-radius: {{layout.borderRadius}}px;
+}
+
+QTextEdit#otaLogView {
+    background-color: {{color.BgPrimary}};
+    color: {{color.TextMuted}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadiusSmall}}px;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 12px;
+}
+
+QTreeView#otaHistoryView {
+    background-color: {{color.BgPrimary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadiusSmall}}px;
+    font-size: 12px;
+}
+QTreeView#otaHistoryView::alternate-background-color {
+    background-color: {{color.BgInput}};
+}
+
+QPushButton#otaBrowseBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+QPushButton#otaBrowseBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Accent}}; }
+QPushButton#otaBrowseBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#otaBrowseBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+QLabel#otaFileInfo {
+    color: {{color.TextMuted}};
+    font-size: 11px;
+}
+
+QLabel#otaStatusLbl {
+    color: {{color.TextSecondary}};
+    font-size: 13px;
+}
+QLabel#otaSpeedLbl {
+    color: {{color.TextSecondary}};
+    font-size: 12px;
+    font-family: monospace;
+}
+QLabel#otaEtaLbl {
+    color: {{color.TextMuted}};
+    font-size: 12px;
+    font-family: monospace;
+}
+
+QPushButton#otaClearHistory {
+    background-color: transparent;
+    color: {{color.TextMuted}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 2px 8px;
+}
+QPushButton#otaClearHistory:hover { color: {{color.Error}}; border-color: {{color.Error}}; }
+QPushButton#otaClearHistory:pressed { background-color: {{color.ErrorHoverRgba}}; }
+QPushButton#otaClearHistory:disabled { color: {{color.ControlBorder}}; border-color: {{color.ControlBorder}}; }
+
+/* === SerialConfigPanel 连接按钮 === */
+QPushButton#connectBtn {
+    background-color: {{color.Success}};
+    color: {{color.BgPrimary}};
+    border: none;
+    border-radius: {{layout.borderRadius}}px;
+    font-weight: bold;
+    font-size: 14px;
+}
+QPushButton#connectBtn:hover { background-color: {{color.SuccessHover}}; }
+QPushButton#connectBtn:pressed { background-color: {{color.SuccessPressed}}; }
+QPushButton#connectBtn:disabled { background-color: {{color.ControlBorder}}; color: {{color.TextMuted}}; }
+QPushButton#connectBtn[state="connected"] {
+    background-color: {{color.Error}};
+    color: {{color.BgPrimary}};
+}
+QPushButton#connectBtn[state="connected"]:hover { background-color: {{color.ConnectedHover}}; }
+QPushButton#connectBtn[state="connected"]:pressed { background-color: {{color.ConnectedPressed}}; }
+QPushButton#connectBtn[state="connected"]:disabled { background-color: {{color.ControlBorder}}; color: {{color.TextMuted}}; }
+QPushButton#connectBtn[state="connecting"] {
+    background-color: {{color.Warning}};
+    color: {{color.BgPrimary}};
+}
+QPushButton#connectBtn[state="error"] {
+    background-color: {{color.Error}};
+    color: {{color.BgPrimary}};
+}
+QPushButton#connectBtn[state="error"]:hover { background-color: {{color.ConnectedHover}}; }
+QPushButton#connectBtn[state="error"]:pressed { background-color: {{color.ConnectedPressed}}; }
+
+/* Break信号按钮 — 警告色调标识特殊操作 */
+QPushButton#breakBtn {
+    background-color: transparent;
+    border: 1px solid {{color.BreakBtnColor}};
+    border-radius: {{layout.borderRadius}}px;
+    color: {{color.BreakBtnColor}};
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+QPushButton#breakBtn:hover {
+    background-color: {{color.BreakHoverRgba}};
+    border-color: {{color.BreakBtnColor}};
+}
+QPushButton#breakBtn:pressed {
+    background-color: {{color.BreakPressedRgba}};
+}
+QPushButton#breakBtn:disabled {
+    background-color: transparent;
+    border-color: {{color.BgSecondary}};
+    color: {{color.ControlBorder}};
+}
+
+QLabel#driverInfoLbl {
+    font-size: 11px;
+    color: {{color.TextMuted}};
+    padding: 4px 8px;
+    background-color: transparent;
+}
+
+QPushButton#refreshBtn {
+    background-color: transparent;
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    color: {{color.TextMuted}};
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#refreshBtn:hover {
+    background-color: {{color.BgSecondary}};
+    border-color: {{color.Accent}};
+    color: {{color.TextSecondary}};
+}
+QPushButton#refreshBtn:pressed {
+    background-color: {{color.ControlBorder}};
+}
+QPushButton#refreshBtn:disabled {
+    background-color: transparent;
+    border-color: {{color.BgPrimary}};
+    color: {{color.ControlBorder}};
+}
+
+/* === SerialConfigPanel 控件 === */
+/* DTR/RTS 信号切换按钮 - 绿色=HIGH, 灰色=LOW */
+QPushButton#dtrBtn, QPushButton#rtsBtn {
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 80px;
+}
+/* HIGH 状态 - accent 色(绿) */
+QPushButton#dtrBtn[signalState="high"], QPushButton#rtsBtn[signalState="high"] {
+    background-color: {{color.Success}};
+    color: {{color.BgPrimary}};
+    border-color: {{color.Success}};
+}
+QPushButton#dtrBtn[signalState="high"]:hover, QPushButton#rtsBtn[signalState="high"]:hover {
+    background-color: {{color.SignalHighHover}};
+    border-color: {{color.SignalHighHover}};
+}
+QPushButton#dtrBtn[signalState="high"]:pressed, QPushButton#rtsBtn[signalState="high"]:pressed {
+    background-color: {{color.SignalHighPressed}};
+    border-color: {{color.SignalHighPressed}};
+}
+/* LOW 状态 - bg-tertiary 色(灰) */
+QPushButton#dtrBtn[signalState="low"], QPushButton#rtsBtn[signalState="low"] {
+    background-color: {{color.BgTertiary}};
+    color: {{color.TextSecondary}};
+    border-color: {{color.BgTertiary}};
+}
+QPushButton#dtrBtn[signalState="low"]:hover, QPushButton#rtsBtn[signalState="low"]:hover {
+    background-color: {{color.SignalLowHover}};
+    border-color: {{color.SignalLowHover}};
+}
+QPushButton#dtrBtn[signalState="low"]:pressed, QPushButton#rtsBtn[signalState="low"]:pressed {
+    background-color: {{color.SignalLowPressed}};
+    border-color: {{color.SignalLowPressed}};
+}
+/* 禁用状态 - 未连接时 */
+QPushButton#dtrBtn:disabled, QPushButton#rtsBtn:disabled {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextMuted}};
+    border-color: {{color.Border}};
+}
+
+/* === SerialConfigPanel 信号线状态LED === */
+QLabel#signalLed {
+    color: {{color.TextMuted}};
+    background-color: {{color.BgSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+}
+QLabel#signalLed[active="true"] {
+    color: {{color.BgPrimary}};
+    background-color: {{color.Success}};
+    border-color: {{color.Success}};
+}
+QLabel#signalLed[active="false"] {
+    color: {{color.TextMuted}};
+    background-color: {{color.BgSecondary}};
+    border-color: {{color.ControlBorder}};
+}
+
+/* === 发送栏控件 === */
+QFrame#sendBarFrame {
+    background-color: {{color.SendBarRgba}};
+    border-top: 1px solid {{color.Border}};
+}
+QComboBox#sendModeCombo, QComboBox#newlineCombo {
+    background-color: {{color.BgInput}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    color: {{color.TextPrimary}};
+    font-size: 12px;
+}
+QComboBox#sendModeCombo:hover, QComboBox#newlineCombo:hover {
+    border-color: {{color.Accent}};
+}
+QComboBox#sendModeCombo:disabled, QComboBox#newlineCombo:disabled {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextMuted}};
+    border-color: {{color.Border}};
+}
+QComboBox#sendModeCombo::drop-down, QComboBox#newlineCombo::drop-down {
+    border: none;
+    width: 20px;
+}
+
+/* === 工具栏显示模式下拉 === */
+QComboBox#displayModeCombo {
+    background-color: {{color.BgInput}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    color: {{color.TextPrimary}};
+    font-size: 12px;
+}
+QComboBox#displayModeCombo:hover { border-color: {{color.Accent}}; }
+QComboBox#displayModeCombo:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+/* === 连接状态标签 === */
+QLabel#connStatus { font-size: 12px; }
+QLabel#connStatus[state="connected"] { color: {{color.ConnStatusConnected}}; }
+QLabel#connStatus[state="disconnected"] { color: {{color.ConnStatusDisconnected}}; }
+QLabel#connStatus[state="connecting"] { color: {{color.ConnStatusConnecting}}; }
+QLabel#connStatus[state="error"] { color: {{color.ConnStatusError}}; }
+
+/* === 数据统计面板 === */
+QFrame#statsFrame {
+    background-color: {{color.BgPrimary}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 6px;
+}
+QLabel#rxTotalLabel { color: {{color.Success}}; font-size: 13px; font-weight: bold; }
+QLabel#rxRateLabel { color: {{color.Success}}; font-size: 11px; }
+QLabel#txTotalLabel { color: {{color.TxBytesColor}}; font-size: 13px; font-weight: bold; }
+QLabel#txRateLabel { color: {{color.TxBytesColor}}; font-size: 11px; }
+QLabel#peakRateLabel { color: {{color.Accent}}; font-size: 12px; font-weight: bold; }
+QLabel#elapsedLabel { color: {{color.TextSecondary}}; font-size: 13px; font-family: monospace; }
+QLabel#errorLabel {
+    color: {{color.TxBytesColor}};
+    font-size: 12px;
+    background-color: {{color.ErrorLabelBgRgba}};
+    border: 1px solid {{color.ErrorLabelBorderRgba}};
+    border-radius: {{layout.borderRadiusSmall}}px;
+    padding: 6px 8px;
+}
+QLabel#healthStatusLabel {
+    color: {{color.HealthStatusColor}};
+    font-size: 11px;
+    background-color: {{color.WarningLabelBgRgba}};
+    border: 1px solid {{color.WarningLabelBorderRgba}};
+    border-radius: {{layout.borderRadiusSmall}}px;
+    padding: 4px 8px;
+}
+
+/* === DataStatistics 统计面板框架 === */
+QFrame#statsRxFrame {
+    background-color: {{color.RxFrameBgRgba}};
+    border: 1px solid {{color.RxFrameBorderRgba}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 8px;
+}
+QFrame#statsTxFrame {
+    background-color: {{color.TxFrameBgRgba}};
+    border: 1px solid {{color.TxFrameBorderRgba}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 8px;
+}
+QFrame#statsPeakFrame {
+    background-color: {{color.PeakFrameBgRgba}};
+    border: 1px solid {{color.PeakFrameBorderRgba}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 8px;
+}
+QFrame#statsAvgFrame {
+    background-color: {{color.AvgFrameBgRgba}};
+    border: 1px solid {{color.AvgFrameBorderRgba}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 8px;
+}
+QLabel#avgRateLabel {
+    color: {{color.PurpleAccent}};
+    font-size: 12px;
+    font-weight: bold;
+}
+QFrame#statsTimeFrame {
+    background-color: {{color.TimeFrameBgRgba}};
+    border: 1px solid {{color.TimeFrameBorderRgba}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 8px;
+}
+
+/* === 终端搜索栏 === */
+QWidget#terminalSearchBar { background: {{color.BgSecondary}}; }
+
+QLineEdit#searchBarInput {
+    background: {{color.BgTertiary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.BgTertiary}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    selection-background-color: {{color.Accent}};
+}
+QLineEdit#searchBarInput:focus { border: 1px solid {{color.Accent}}; }
+QLineEdit#searchBarInput[hasError="true"] {
+    background: {{color.BgTertiary}};
+    color: {{color.TextSecondary}};
+    border: 2px solid {{color.Error}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+}
+
+QCheckBox#searchBarRegexCheck,
+QCheckBox#searchBarHexCheck {
+    color: {{color.TextSecondary}};
+    spacing: 4px;
+}
+QCheckBox#searchBarRegexCheck::indicator,
+QCheckBox#searchBarHexCheck::indicator {
+    width: 14px; height: 14px;
+}
+QCheckBox#searchBarRegexCheck::indicator:checked,
+QCheckBox#searchBarHexCheck::indicator:checked {
+    background: {{color.Accent}}; border-radius: 2px;
+}
+QCheckBox#searchBarRegexCheck::indicator:unchecked,
+QCheckBox#searchBarHexCheck::indicator:unchecked {
+    background: {{color.BgTertiary}}; border: 1px solid {{color.BgTertiary}}; border-radius: 2px;
+}
+
+QLabel#searchBarResult { color: {{color.TextMuted}}; padding: 0 4px; }
+QLabel#searchBarResult[hasError="true"] { color: {{color.Error}}; padding: 0 4px; }
+
+QPushButton#searchBarCloseBtn {
+    background: {{color.BgTertiary}}; color: {{color.TextSecondary}};
+    border: none; border-radius: {{layout.borderRadius}}px; font-weight: bold;
+}
+QPushButton#searchBarCloseBtn:hover { background: {{color.Accent}}; }
+QPushButton#searchBarCloseBtn:pressed { background: {{color.Accent}}; }
+QPushButton#searchBarCloseBtn:disabled { background: {{color.BgTertiary}}; color: {{color.TextMuted}}; }
+
+/* === 发送输入框错误状态 === */
+QLineEdit#sendInput[hasError="true"] { border: 2px solid {{color.Error}}; }
+
+/* === ProtocolView 协议解析面板 === */
+QWidget#protocolView { background-color: {{color.BgPrimary}}; }
+QWidget#protocolToolbar {
+    background-color: {{color.BgPrimary}};
+    border-bottom: 1px solid {{color.Border}};
+}
+QLabel#protocolStatusLabel {
+    color: {{color.TextMuted}};
+    font-size: 12px;
+}
+QPushButton#protocolClearBtn,
+QPushButton#protocolExportBtn {
+    background-color: transparent;
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#protocolClearBtn:hover,
+QPushButton#protocolExportBtn:hover { background-color: {{color.BgSecondary}}; border-color: {{color.Accent}}; color: {{color.Accent}}; }
+QPushButton#protocolClearBtn:pressed,
+QPushButton#protocolExportBtn:pressed { background-color: {{color.ControlBorder}}; }
+QPushButton#protocolClearBtn:disabled,
+QPushButton#protocolExportBtn:disabled { background-color: transparent; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+QTableView#protocolTable {
+    background-color: {{color.BgPrimary}};
+    alternate-background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: none;
+    gridline-color: {{color.Border}};
+    font-size: 12px;
+    selection-background-color: {{color.BgSecondary}};
+    selection-color: {{color.Accent}};
+}
+QTableView#protocolTable::item {
+    padding: 4px 8px;
+}
+
+/* ProtocolView 右键上下文菜单 */
+QMenu#protocolContextMenu {
+    background-color: {{color.BgPrimary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 0px;
+}
+QMenu#protocolContextMenu::item {
+    padding: 6px 24px;
+    border-radius: {{layout.borderRadiusSmall}}px;
+    margin: 1px 4px;
+}
+QMenu#protocolContextMenu::item:selected {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+}
+QMenu#protocolContextMenu::item:disabled {
+    color: {{color.TextMuted}};
+}
+QMenu#protocolContextMenu::separator {
+    height: 1px;
+    background-color: {{color.Border}};
+    margin: 4px 8px;
+}
+
+/* === FrameVisualEditor 帧编辑器 === */
+QGroupBox#frameHeaderGroup,
+QGroupBox#frameLengthGroup,
+QGroupBox#frameChecksumGroup,
+QGroupBox#frameFieldGroup {
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    margin-top: 12px;
+    padding-top: 16px;
+    font-weight: bold;
+}
+
+QTableWidget#frameFieldTable {
+    background-color: {{color.BgPrimary}};
+    alternate-background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.Border}};
+    gridline-color: {{color.Border}};
+    font-size: 12px;
+    selection-background-color: {{color.BgSecondary}};
+}
+QTableWidget#frameFieldTable::item {
+    padding: 4px 6px;
+}
+QHeaderView::section {
+    background-color: {{color.BgDeep}};
+    color: {{color.TextMuted}};
+    border: 1px solid {{color.Border}};
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+QPushButton#frameAddFieldBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#frameAddFieldBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Accent}}; }
+QPushButton#frameAddFieldBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#frameAddFieldBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+QPushButton#frameRemoveFieldBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Error}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#frameRemoveFieldBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Error}}; }
+QPushButton#frameRemoveFieldBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#frameRemoveFieldBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+QPushButton#frameMoveUpBtn,
+QPushButton#frameMoveDownBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#frameMoveUpBtn:hover,
+QPushButton#frameMoveDownBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Accent}}; color: {{color.Accent}}; }
+QPushButton#frameMoveUpBtn:pressed,
+QPushButton#frameMoveDownBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#frameMoveUpBtn:disabled,
+QPushButton#frameMoveDownBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+QGroupBox#framePreviewGroup {
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    margin-top: 12px;
+    padding-top: 16px;
+    font-weight: bold;
+}
+
+QLabel#framePreviewLabel {
+    color: {{color.TextSecondary}};
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    background-color: {{color.BgInput}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadiusSmall}}px;
+    padding: 8px;
+}
+
+/* === PanelManager 面板容器 - 透明背景让面板内容自主控制 === */
+QWidget#serialConfigPanel,
+QWidget#dataStatsPanel,
+QWidget#protocolViewPanel,
+QWidget#frameEditorPanel,
+QWidget#chartWidgetPanel,
+QWidget#otaWidgetPanel,
+QWidget#terminalPanel,
+QWidget#searchBarPanel,
+QWidget#bookmarkWidgetPanel {
+    background-color: transparent;
+}
+
+/* === 背景设置弹出面板 === */
+QWidget#bgSettingsPopup {
+    background-color: {{color.BgPrimary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+}
+QSlider#bgBlurSlider, QSlider#bgOpacitySlider {
+    background: transparent;
+    min-height: 20px;
+}
+QSlider#bgBlurSlider::groove:horizontal, QSlider#bgOpacitySlider::groove:horizontal {
+    height: 4px;
+    background: {{color.ControlBorder}};
+    border-radius: 2px;
+}
+QSlider#bgBlurSlider::handle:horizontal, QSlider#bgOpacitySlider::handle:horizontal {
+    width: 14px;
+    height: 14px;
+    margin: -5px 0;
+    background: {{color.Accent}};
+    border-radius: 7px;
+}
+QSlider#bgBlurSlider::handle:horizontal:hover, QSlider#bgOpacitySlider::handle:horizontal:hover {
+    background: {{color.AccentHover}};
+}
+
+QSlider#bgBlurSlider::handle:horizontal:disabled, QSlider#bgOpacitySlider::handle:horizontal:disabled {
+    background: {{color.BgTertiary}};
+}
+
+QPushButton#bgSelectImageBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+QPushButton#bgSelectImageBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Accent}}; }
+QPushButton#bgSelectImageBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#bgSelectImageBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+QPushButton#bgResetBtn {
+    background-color: transparent;
+    color: {{color.TextMuted}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+QPushButton#bgResetBtn:hover { color: {{color.Error}}; border-color: {{color.Error}}; }
+QPushButton#bgResetBtn:pressed { background-color: {{color.ErrorHoverRgba}}; }
+QPushButton#bgResetBtn:disabled { color: {{color.ControlBorder}}; border-color: {{color.ControlBorder}}; }
+
+/* === QScrollBar 滚动条 - 现代极细圆角风格 === */
+
+/* 垂直滚动条 */
+QScrollBar:vertical {
+    background: transparent;
+    width: {{layout.scrollbarWidth}}px;
+    margin: 0;
+}
+QScrollBar::handle:vertical {
+    background: {{color.Scrollbar}};
+    min-height: 30px;
+    border-radius: {{layout.borderRadius}}px;
+}
+QScrollBar::handle:vertical:hover {
+    background: {{color.ScrollbarHover}};
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* 水平滚动条 */
+QScrollBar:horizontal {
+    background: transparent;
+    height: {{layout.scrollbarWidth}}px;
+    margin: 0;
+}
+QScrollBar::handle:horizontal {
+    background: {{color.Scrollbar}};
+    min-width: 30px;
+    border-radius: {{layout.borderRadius}}px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: {{color.ScrollbarHover}};
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/* === QToolTip 工具提示 === */
+QToolTip {
+    background-color: {{color.BgPrimary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadiusSmall}}px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* === QMenu 通用菜单样式 - 所有菜单统一风格 === */
+QMenu {
+    background-color: {{color.BgPrimary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 0px;
+}
+QMenu::item {
+    padding: 6px 24px;
+    border-radius: {{layout.borderRadiusSmall}}px;
+    margin: 1px 4px;
+}
+QMenu::item:selected {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+}
+QMenu::item:disabled {
+    color: {{color.TextMuted}};
+}
+QMenu::separator {
+    height: 1px;
+    background-color: {{color.Border}};
+    margin: 4px 8px;
+}
+QMenu::indicator {
+    width: 14px;
+    height: 14px;
+    margin-left: 6px;
+}
+
+/* === TerminalWidget 右键菜单 === */
+QMenu#terminalContextMenu {
+    background-color: {{color.BgPrimary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 0px;
+}
+QMenu#terminalContextMenu::item {
+    padding: 6px 24px;
+    border-radius: {{layout.borderRadiusSmall}}px;
+    margin: 1px 4px;
+}
+QMenu#terminalContextMenu::item:selected {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+}
+QMenu#terminalContextMenu::item:disabled {
+    color: {{color.TextMuted}};
+}
+QMenu#terminalContextMenu::separator {
+    height: 1px;
+    background-color: {{color.Border}};
+    margin: 4px 8px;
+}
+
+/* === SerialConfigPanel 连接状态指示器(彩色圆点) === */
+QLabel#statusIndicator {
+    background-color: {{color.TextMuted}};
+    border: none;
+    border-radius: 4px;
+}
+QLabel#statusIndicator[state="connected"] {
+    background-color: {{color.Success}};
+}
+QLabel#statusIndicator[state="connecting"] {
+    background-color: {{color.Warning}};
+}
+QLabel#statusIndicator[state="disconnected"] {
+    background-color: {{color.TextMuted}};
+}
+QLabel#statusIndicator[state="error"] {
+    background-color: {{color.Error}};
+}
+
+/* === 工具栏下拉框 - 布局/主题/语言选择 === */
+QComboBox#layoutCombo,
+QComboBox#themeCombo,
+QComboBox#langCombo {
+    background-color: {{color.BgSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    color: {{color.TextSecondary}};
+    font-size: 12px;
+    min-width: 80px;
+}
+QComboBox#layoutCombo:hover,
+QComboBox#themeCombo:hover,
+QComboBox#langCombo:hover {
+    border-color: {{color.Accent}};
+}
+QComboBox#layoutCombo:disabled,
+QComboBox#themeCombo:disabled,
+QComboBox#langCombo:disabled {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextMuted}};
+    border-color: {{color.Border}};
+}
+
+/* === 波形图 (ChartWidget) === */
+
+/* 图表控制栏背景 */
+QWidget#chartToolbar {
+    background-color: {{color.BgAlt}};
+    border-bottom: 1px solid {{color.Border}};
+}
+
+/* 图表区域背景 - 与面板底色协调 */
+QChartView {
+    background-color: {{color.BgPrimary}};
+}
+
+/* 暂停按钮 - checked 时显示 accent 色表示"暂停中" */
+QPushButton#chartPauseBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 3px 10px;
+    font-size: 12px;
+}
+QPushButton#chartPauseBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Accent}}; }
+QPushButton#chartPauseBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#chartPauseBtn:checked {
+    background-color: {{color.Accent}};
+    color: {{color.BgPrimary}};
+    border-color: {{color.Accent}};
+    font-weight: bold;
+}
+QPushButton#chartPauseBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+/* 清除按钮 */
+QPushButton#chartClearBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 3px 10px;
+    font-size: 12px;
+}
+QPushButton#chartClearBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Error}}; color: {{color.Error}}; }
+QPushButton#chartClearBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#chartClearBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+/* 窗口大小下拉框 */
+QComboBox#chartWindowCombo {
+    background-color: {{color.BgInput}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 3px 8px;
+    color: {{color.TextSecondary}};
+    font-size: 12px;
+}
+QComboBox#chartWindowCombo:hover { border-color: {{color.Accent}}; }
+QComboBox#chartWindowCombo::drop-down { border: none; width: 20px; }
+QComboBox#chartWindowCombo:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+/* 状态标签 */
+QLabel#chartStatusLabel {
+    color: {{color.TextMuted}};
+    font-size: 11px;
+}
+
+/* === QuickCommandBar 编辑对话框 === */
+QDialog#quickCmdEditDlg {
+    background-color: {{color.BgPrimary}};
+}
+
+QTableWidget#quickCmdEditTable {
+    background-color: {{color.BgDeep}};
+    alternate-background-color: {{color.BgPrimary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.Border}};
+    gridline-color: {{color.Border}};
+    font-size: 12px;
+    selection-background-color: {{color.BgSecondary}};
+    selection-color: {{color.Accent}};
+}
+QTableWidget#quickCmdEditTable::item {
+    padding: 4px 6px;
+}
+
+QPushButton#quickCmdAddRowBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#quickCmdAddRowBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Accent}}; }
+QPushButton#quickCmdAddRowBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#quickCmdAddRowBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+QPushButton#quickCmdDelRowBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Error}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#quickCmdDelRowBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Error}}; }
+QPushButton#quickCmdDelRowBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#quickCmdDelRowBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+/* === BookmarkWidget 书签管理面板 === */
+QWidget#bookmarkWidget {
+    background-color: transparent;
+}
+
+/* 标题标签 */
+QLabel#bookmarkTitleLabel {
+    color: {{color.TextSecondary}};
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 0px;
+}
+
+/* 书签列表 */
+QListWidget#bookmarkList {
+    background-color: {{color.BgInput}};
+    color: {{color.LabelText}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadiusSmall}}px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 12px;
+    outline: none;
+}
+QListWidget#bookmarkList::item {
+    padding: 6px 8px;
+    border-bottom: 1px solid {{color.BgPrimary}};
+}
+QListWidget#bookmarkList::item:selected {
+    background-color: {{color.BgSecondary}};
+    color: {{color.Accent}};
+}
+QListWidget#bookmarkList::item:hover {
+    background-color: {{color.TreeItemHover}};
+}
+
+/* 添加书签按钮 - accent 主操作 */
+QPushButton#bookmarkAddBtn {
+    background-color: {{color.Accent}};
+    color: {{color.BgPrimary}};
+    border: none;
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+QPushButton#bookmarkAddBtn:hover { background-color: {{color.AccentHover}}; }
+QPushButton#bookmarkAddBtn:pressed { background-color: {{color.AccentPressed}}; }
+QPushButton#bookmarkAddBtn:disabled { background-color: {{color.ControlBorder}}; color: {{color.TextMuted}}; }
+
+/* 删除选中书签按钮 - 次要操作 */
+QPushButton#bookmarkRemoveBtn {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#bookmarkRemoveBtn:hover { background-color: {{color.ControlBorder}}; border-color: {{color.Error}}; color: {{color.Error}}; }
+QPushButton#bookmarkRemoveBtn:pressed { background-color: {{color.PressedBg}}; }
+QPushButton#bookmarkRemoveBtn:disabled { background-color: {{color.BgSecondary}}; color: {{color.TextMuted}}; border-color: {{color.Border}}; }
+
+/* 清空所有书签按钮 - 危险操作 */
+QPushButton#bookmarkClearBtn {
+    background-color: transparent;
+    color: {{color.TextMuted}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 12px;
+    font-size: 12px;
+}
+QPushButton#bookmarkClearBtn:hover { color: {{color.Error}}; border-color: {{color.Error}}; }
+QPushButton#bookmarkClearBtn:pressed { background-color: {{color.ErrorHoverRgba}}; }
+QPushButton#bookmarkClearBtn:disabled { color: {{color.ControlBorder}}; border-color: {{color.ControlBorder}}; }
+
+/* 添加书签对话框 */
+QDialog#bookmarkAddDlg {
+    background-color: {{color.BgPrimary}};
+}
+QLabel#bookmarkDlgHint {
+    color: {{color.TextSecondary}};
+    font-size: 12px;
+}
+QLineEdit#bookmarkLabelInput {
+    background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 6px;
+    font-size: 13px;
+}
+QLineEdit#bookmarkLabelInput:focus {
+    border: 1px solid {{color.Accent}};
+}
+
+/* === NavIndicatorWidget 导航树滑动指示器 === */
+/* 控件使用 QPainter 自绘，WA_TranslucentBackground 已在代码中设置 */
+/* QSS 仅确保透明背景，不干扰自绘内容 */
+QWidget#navIndicator {
+    background-color: transparent;
+}
+
+/* === ToastWidget 通知吐司 === */
+/* 控件使用 QPainter 自绘全部内容（背景、左边框、图标、文字） */
+/* WA_TranslucentBackground 已在代码中设置，QSS 提供透明基底 */
+/* 语义色由 ThemeManager::SemanticColor 提供:
+ *   Success -> {{color.Success}} (绿), Error -> {{color.Error}} (红), Accent -> {{color.Accent}} (蓝)
+ * 若未来改为子控件布局，以下 QSS 规则提供后备样式 */
+QWidget#toastWidget {
+    background-color: transparent;
+}
+QWidget#toastWidget[type="success"] {
+    background-color: transparent;
+}
+QWidget#toastWidget[type="error"] {
+    background-color: transparent;
+}
+QWidget#toastWidget[type="info"] {
+    background-color: transparent;
+}
+/* 后备: 若 ToastWidget 改用 QLabel 子控件 */
+QLabel#toastLabel {
+    color: {{color.TextPrimary}};
+    font-size: 13px;
+}
+/* 后备: 若 ToastWidget 改用 QPushButton 关闭按钮 */
+QPushButton#toastCloseBtn {
+    background-color: transparent;
+    color: {{color.TextSecondary}};
+    border: none;
+    border-radius: {{layout.borderRadius}}px;
+    padding: 2px 6px;
+    font-size: 14px;
+    font-weight: bold;
+}
+QPushButton#toastCloseBtn:hover {
+    background-color: {{color.ControlBorder}};
+    color: {{color.TextPrimary}};
+}
+QPushButton#toastCloseBtn:pressed {
+    background-color: {{color.PressedBg}};
+}
+
+/* === NavIndicatorWidget 导航树滑动指示器动画过渡 === */
+/* QPropertyAnimation 驱动 indicatorY 属性, 250ms OutCubic */
+/* 指示线颜色从 ThemeManager::Accent 获取, 主题切换时 updateThemeColor() 刷新 */
+/* 切换动画: m_slideAnim->setDuration(250); setEasingCurve(OutCubic) */
+
+/* === TerminalSearchBar 搜索栏展开/收起动画过渡 === */
+/* 展开动画: maximumHeight 0->36, 200ms, OutCubic */
+/* 收起动画: maximumHeight 36->0, 150ms, InCubic */
+/* 代码使用 QPropertyAnimation 驱动, QSS 无需额外属性 */
+
+/* === PanelManager 面板切换淡入/淡出过渡 === */
+/* 淡入: QGraphicsOpacityEffect opacity 0->1, 250ms, OutCubic */
+/* 淡出: QGraphicsOpacityEffect opacity 1->0, 200ms, InCubic */
+/* 代码使用 QPropertyAnimation + QGraphicsOpacityEffect 驱动 */
+
+/* === 主窗口导航树 (objectName 钩子) === */
+QTreeView#navTree {
+    background-color: {{color.TreeBg}};
+    color: {{color.TextSecondary}};
+    border: none;
+    outline: none;
+    font-size: 13px;
+}
+
+/* === 主窗口分割器 === */
+QSplitter#mainSplitter::handle {
+    background-color: {{color.Border}};
+    width: 1px;
+}
+
+/* === 终端容器和分割器 === */
+QWidget#terminalContainer {
+    background-color: transparent;
+}
+QSplitter#terminalSplitter::handle {
+    background-color: {{color.Border}};
+    width: 1px;
+}
+
+/* === 图表区域 QChartView === */
+QWidget#chartView {
+    background-color: {{color.BgPrimary}};
+}
+QLabel#chartWindowLabel {
+    color: {{color.TextMuted}};
+    font-size: 12px;
+}
+
+/* === 工具栏 (objectName 钩子) === */
+QToolBar#mainToolbar {
+    background-color: {{color.BgPrimary}};
+    border: none;
+    border-bottom: 1px solid {{color.Border}};
+    spacing: 4px;
+    padding: 4px;
+    min-height: 36px;
+    max-height: 40px;
+}
+
+/* === 背景设置弹出面板子控件 === */
+QLabel#bgBlurLabel, QLabel#bgOpacityLabel {
+    color: {{color.TextSecondary}};
+    font-size: 12px;
+}
+QLabel#bgBlurValueLabel, QLabel#bgOpacityValueLabel {
+    color: {{color.TextMuted}};
+    font-size: 11px;
+    font-family: Consolas, monospace;
+}
+QCheckBox#bgRippleCheck {
+    color: {{color.TextSecondary}};
+    spacing: 6px;
+}
+QFrame#bgSeparator {
+    background-color: {{color.Border}};
+    max-height: 1px;
+    border: none;
+}
+
+/* === OTA 分组框 === */
+QGroupBox#otaFileGroup,
+QGroupBox#otaConfigGroup,
+QGroupBox#otaProgressGroup,
+QGroupBox#otaLogGroup,
+QGroupBox#otaHistoryGroup {
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    margin-top: 14px;
+    padding-top: 18px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+/* === OTA 子控件 === */
+QLineEdit#otaFileLabel {
+    background-color: {{color.BgPrimary}};
+    color: {{color.TextMuted}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+QComboBox#otaProtocolCombo {
+    background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+QComboBox#otaProtocolCombo:hover { border-color: {{color.Accent}}; }
+QComboBox#otaProtocolCombo:disabled {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextMuted}};
+    border-color: {{color.Border}};
+}
+
+/* === 帧编辑器子控件 === */
+QLineEdit#frameHeaderEdit,
+QLineEdit#frameFooterEdit {
+    background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+}
+QLineEdit#frameHeaderEdit:focus,
+QLineEdit#frameFooterEdit:focus {
+    border: 1px solid {{color.Accent}};
+}
+QSpinBox#frameLengthOffsetSpin,
+QSpinBox#frameChecksumOffsetSpin,
+QSpinBox#frameChecksumStartSpin,
+QSpinBox#frameLengthAdjustSpin {
+    background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 2px 4px;
+    font-size: 12px;
+}
+QComboBox#frameLengthSizeCombo,
+QComboBox#frameChecksumTypeCombo {
+    background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+QComboBox#frameLengthSizeCombo:hover,
+QComboBox#frameChecksumTypeCombo:hover { border-color: {{color.Accent}}; }
+QCheckBox#frameLengthEndianCheck {
+    color: {{color.TextSecondary}};
+    spacing: 6px;
+}
+QComboBox#fieldTypeCombo,
+QComboBox#fieldEndianCombo {
+    background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 2px 4px;
+    font-size: 12px;
+}
+
+/* === 串口配置面板分组 === */
+QGroupBox#portGroup,
+QGroupBox#paramGroup,
+QGroupBox#signalGroup {
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.Border}};
+    border-radius: {{layout.borderRadius}}px;
+    margin-top: 14px;
+    padding-top: 18px;
+    font-weight: bold;
+    font-size: 13px;
+}
+QComboBox#portCombo,
+QComboBox#baudCombo,
+QComboBox#dataBitsCombo,
+QComboBox#parityCombo,
+QComboBox#stopBitsCombo,
+QComboBox#flowControlCombo {
+    background-color: {{color.BgInput}};
+    color: {{color.TextSecondary}};
+    border: 1px solid {{color.ControlBorder}};
+    border-radius: {{layout.borderRadius}}px;
+    padding: 4px 8px;
+    font-size: 13px;
+}
+QComboBox#portCombo:hover,
+QComboBox#baudCombo:hover,
+QComboBox#dataBitsCombo:hover,
+QComboBox#parityCombo:hover,
+QComboBox#stopBitsCombo:hover,
+QComboBox#flowControlCombo:hover { border-color: {{color.Accent}}; }
+QComboBox#portCombo:disabled,
+QComboBox#baudCombo:disabled,
+QComboBox#dataBitsCombo:disabled,
+QComboBox#parityCombo:disabled,
+QComboBox#stopBitsCombo:disabled,
+QComboBox#flowControlCombo:disabled {
+    background-color: {{color.BgSecondary}};
+    color: {{color.TextMuted}};
+    border-color: {{color.Border}};
+}
+
+/* === 对话框按钮容器 === */
+QDialogButtonBox#quickCmdDlgButtons,
+QDialogButtonBox#bookmarkDlgButtons {
+    background-color: transparent;
+}
