@@ -39,6 +39,7 @@ public:
     /** @brief 行数据提供回调: 从 offset 开始返回 count 条记录，调用者负责线程安全 */
     using LineProvider = std::function<QVector<TerminalLine>(int offset, int count)>;
 
+    /** @brief 构造数据导出器 @param parent 父对象指针 */
     explicit DataExporter(QObject* parent = nullptr);
 
     /**

@@ -39,6 +39,7 @@ class FrameParser : public QObject {
 public:
     /** @brief 构造帧解析器，默认帧上限1024字节 */
     explicit FrameParser(QObject* parent = nullptr);
+    /** @brief 析构函数，释放超时定时器等资源 */
     ~FrameParser() override;
 
     /** @brief 设置帧格式定义，设置后自动 reset() */
@@ -116,26 +117,46 @@ private:
     };
 
     // ---- 状态处理方法 ----
+
+    /** @brief 逐字节状态机处理入口 @param byte 输入字节 */
     void processByte(unsigned char byte);
+    /** @brief 帧头匹配状态处理 @param byte 输入字节 */
     void handleHeaderMatching(unsigned char byte);
+    /** @brief 长度字段接收状态处理 @param byte 输入字节 */
     void handleLengthReceiving(unsigned char byte);
+    /** @brief 有效载荷接收状态处理 @param byte 输入字节 */
     void handlePayloadReceiving(unsigned char byte);
-    void processCompletePayload();   ///< 长度字段模式下帧完成处理(校验→帧尾→完成)
-    bool handleCrcValidation();      ///< CRC校验验证，通过返回true
+    /** @brief 长度字段模式下帧完成处理(校验→帧尾→完成) */
+    void processCompletePayload();
+    /** @brief CRC校验验证，通过返回true */
+    bool handleCrcValidation();
+    /** @brief 校验字段接收状态处理 @param byte 输入字节 */
     void handleChecksumVerifying(unsigned char byte);
+    /** @brief 帧尾匹配状态处理 @param byte 输入字节 */
     void handleFooterMatching(unsigned char byte);
 
     // ---- 辅助方法（实现在 FrameParserHelpers.cpp） ----
+
+    /** @brief 从完整帧数据中按字段定义提取各字段值 @param frameData 完整帧数据 @return 字段名->值映射 */
     QVariantMap extractFields(const QByteArray& frameData) const;
+    /** @brief 验证帧数据的校验和 @param frameData 完整帧数据 @return 校验通过返回true */
     bool verifyChecksum(const QByteArray& frameData) const;
+    /** @brief 从帧数据中解析长度字段值 @param frameData 完整帧数据 @return 长度字段值 */
     int parseLengthField(const QByteArray& frameData) const;
+    /** @brief 计算给定数据的校验和 @param data 待计算数据 @return 校验和字节数组 */
     QByteArray computeChecksum(const QByteArray& data) const;
 
     // ---- 状态机基础设施 ----
+
+    /** @brief 检查帧接收是否超时 @return 超时返回true */
     bool checkTimeout();
+    /** @brief 完成一帧解析，提取字段并发射frameParsed信号 */
     void completeFrame();
+    /** @brief 停止超时检查定时器 */
     void stopTimeoutTimer();
+    /** @brief 启动超时检查定时器 */
     void startTimeoutTimer();
+    /** @brief 重置中间状态(缓冲区/匹配进度/期望长度)，回到Idle */
     void resetIntermediateState();
 
     // ---- 成员变量 ----

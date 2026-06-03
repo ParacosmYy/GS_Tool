@@ -43,6 +43,7 @@ class FrameVisualEditor : public QWidget {
     Q_OBJECT
 
 public:
+    /** @brief 构造帧格式可视化编辑器 @param parent 父控件指针 */
     explicit FrameVisualEditor(QWidget* parent = nullptr);
 
     /** @brief 获取当前编辑的帧格式定义 */

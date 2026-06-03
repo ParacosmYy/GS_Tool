@@ -121,4 +121,5 @@
 | 145 | feat(stats): XModem/ChartWidget/TerminalWidget/ToastWidget/ScriptRecorder/DataDiffWidget/BasePanel/CommandPalette/EventBus/SendController/SendHistoryManager/FrameParser/PerformanceMonitor/ProtobufDecoder/FlatBuffersDecoder/IntelHexParser统计增强 | 145 |
 | 146 | feat(theme): QssThemeGenerator主题生成器 + 多模块统计增强 + AppDialog编译修复 | 146 |
 | 147 | feat(stats): FftWidget/YAxisManager/HistogramWidget/ScatterWidget/GaugeWidget/OtaWidget/ProtocolView/TerminalSearchBar统计增强+AnimationUtility动画工具 | 147 |
+| 148 | feat(stats+tr()+Doxygen): AnimatedButton/AppDialog/DragDropHelper统计增强+BackgroundWidget/DataStatistics/SerialConfigPanel/TcpConnection/TcpServer/SerialConnection统计补充+tr()合规修复27处+Doxygen注释补全+AppDialog标题消息bug修复+DeviceProfile::tr()编译修复 | 148 |
 | ... | 目标: 1000分 | 1000 |

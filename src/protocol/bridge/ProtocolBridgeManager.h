@@ -62,7 +62,9 @@ public:
     /** @brief 析构，QObject 父子树自动销毁持有的桥对象 */
     ~ProtocolBridgeManager() override = default;
 
+    /** @brief 禁止拷贝构造 */
     ProtocolBridgeManager(const ProtocolBridgeManager&) = delete;
+    /** @brief 禁止拷贝赋值 */
     ProtocolBridgeManager& operator=(const ProtocolBridgeManager&) = delete;
 
     /** @brief 设置协议模式（切换时自动重置旧源、激活新源、通知 UI） */
