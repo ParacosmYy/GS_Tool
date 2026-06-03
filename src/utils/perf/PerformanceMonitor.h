@@ -12,6 +12,7 @@
 #include <QElapsedTimer>
 #include <QMap>
 #include <QList>
+#include <QStringList>
 
 /**
  * @class PerformanceMonitor
@@ -67,6 +68,44 @@ public:
      * @return 自创建以来的总帧计数
      */
     qint64 totalFrames() const;
+
+    /**
+     * @brief 获取指定模块的平均延迟
+     * @param tag 模块标签
+     * @return 平均延迟（微秒），无数据返回 0
+     */
+    double avgLatency(const QString& tag) const;
+
+    /**
+     * @brief 获取指定模块的最大延迟
+     * @param tag 模块标签
+     * @return 最大延迟（微秒），无数据返回 0
+     */
+    quint64 maxLatency(const QString& tag) const;
+
+    /**
+     * @brief 获取指定模块的最小延迟
+     * @param tag 模块标签
+     * @return 最小延迟（微秒），无数据返回 0
+     */
+    quint64 minLatency(const QString& tag) const;
+
+    /**
+     * @brief 获取所有已记录延迟的模块标签
+     * @return 标签列表
+     */
+    QStringList latencyTags() const;
+
+    /**
+     * @brief 清除指定模块的延迟记录
+     * @param tag 模块标签
+     */
+    void clearLatency(const QString& tag);
+
+    /**
+     * @brief 清除所有延迟记录
+     */
+    void clearAllLatency();
 
 signals:
     /// 统计数据更新

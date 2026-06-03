@@ -44,3 +44,31 @@ QVariantMap ModbusConfigPanel::config() const {
     cfg["timeout"]      = m_timeoutSpin->value();
     return cfg;
 }
+
+/**
+ * @brief 保存Modbus配置到QSettings
+ * @param settings QSettings对象
+ */
+void ModbusConfigPanel::saveSettings(QSettings& settings) const
+{
+    settings.setValue(QStringLiteral("modbus/mode"),
+                     m_modeCombo->currentIndex());
+    settings.setValue(QStringLiteral("modbus/slaveAddress"),
+                     m_slaveSpin->value());
+    settings.setValue(QStringLiteral("modbus/timeout"),
+                     m_timeoutSpin->value());
+}
+
+/**
+ * @brief 从QSettings加载Modbus配置
+ * @param settings QSettings对象
+ */
+void ModbusConfigPanel::loadSettings(QSettings& settings)
+{
+    m_modeCombo->setCurrentIndex(
+        settings.value(QStringLiteral("modbus/mode"), 0).toInt());
+    m_slaveSpin->setValue(
+        settings.value(QStringLiteral("modbus/slaveAddress"), 1).toInt());
+    m_timeoutSpin->setValue(
+        settings.value(QStringLiteral("modbus/timeout"), 1000).toInt());
+}

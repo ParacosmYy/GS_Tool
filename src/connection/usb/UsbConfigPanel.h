@@ -13,6 +13,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QSettings>
 
 class UsbDeviceDetector;
 
@@ -37,6 +38,18 @@ public:
      * @param connected true=已连接
      */
     void setConnected(bool connected);
+
+    /**
+     * @brief 保存配置到QSettings
+     * @param settings QSettings对象
+     */
+    void saveSettings(QSettings& settings) const;
+
+    /**
+     * @brief 从QSettings加载配置
+     * @param settings QSettings对象
+     */
+    void loadSettings(QSettings& settings);
 
 signals:
     /** @brief 用户请求连接 */

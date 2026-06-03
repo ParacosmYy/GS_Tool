@@ -21,6 +21,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QSettings>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QGroupBox>
@@ -60,6 +61,18 @@ public:
      * @param connected true=已连接
      */
     void setConnected(bool connected);
+
+    /**
+     * @brief 保存配置到QSettings
+     * @param settings QSettings对象
+     */
+    void saveSettings(QSettings& settings) const;
+
+    /**
+     * @brief 从QSettings加载配置
+     * @param settings QSettings对象
+     */
+    void loadSettings(QSettings& settings);
 
 signals:
     /** @brief 请求连接信号，携带配置参数 */

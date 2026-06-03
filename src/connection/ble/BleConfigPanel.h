@@ -13,6 +13,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
+#include <QSettings>
 #include <QVariantMap>
 
 class BleScanner;
@@ -44,6 +45,18 @@ public:
      * @param scanner BLE扫描器对象
      */
     void setScanner(BleScanner* scanner);
+
+    /**
+     * @brief 保存配置到QSettings
+     * @param settings QSettings对象
+     */
+    void saveSettings(QSettings& settings) const;
+
+    /**
+     * @brief 从QSettings加载配置
+     * @param settings QSettings对象
+     */
+    void loadSettings(QSettings& settings);
 
 signals:
     /** @brief 用户点击扫描按钮 */

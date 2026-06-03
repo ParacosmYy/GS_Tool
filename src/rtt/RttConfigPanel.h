@@ -15,6 +15,7 @@
 #include <QWidget>
 #include <QComboBox>
 #include <QSpinBox>
+#include <QSettings>
 #include <QVariantMap>
 
 /**
@@ -33,6 +34,18 @@ public:
 
     /** @brief 获取当前配置参数 */
     QVariantMap config() const;
+
+    /**
+     * @brief 保存配置到QSettings
+     * @param settings QSettings对象
+     */
+    void saveSettings(QSettings& settings) const;
+
+    /**
+     * @brief 从QSettings加载配置
+     * @param settings QSettings对象
+     */
+    void loadSettings(QSettings& settings);
 
 signals:
     /** @brief 配置参数变更信号 */

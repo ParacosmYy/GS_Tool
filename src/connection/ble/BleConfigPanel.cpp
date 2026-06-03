@@ -141,3 +141,26 @@ void BleConfigPanel::onDeviceSelected(int index)
         m_addressEdit->setText(dev.value("address").toString());
     }
 }
+
+/**
+ * @brief 保存BLE配置到QSettings
+ * @param settings QSettings对象
+ */
+void BleConfigPanel::saveSettings(QSettings& settings) const
+{
+    settings.setValue(QStringLiteral("ble/address"),
+                     m_addressEdit->text().trimmed());
+}
+
+/**
+ * @brief 从QSettings加载BLE配置
+ * @param settings QSettings对象
+ */
+void BleConfigPanel::loadSettings(QSettings& settings)
+{
+    const QString addr = settings.value(
+        QStringLiteral("ble/address")).toString();
+    if (!addr.isEmpty()) {
+        m_addressEdit->setText(addr);
+    }
+}

@@ -152,3 +152,50 @@ void RttConfigPanel::onFormValueChanged()
 {
     emit configChanged(config());
 }
+
+/**
+ * @brief 保存RTT配置到QSettings
+ * @param settings QSettings对象
+ */
+void RttConfigPanel::saveSettings(QSettings& settings) const
+{
+    settings.setValue(QStringLiteral("rtt/device"),
+                     m_deviceCombo->currentText());
+    settings.setValue(QStringLiteral("rtt/interface"),
+                     m_interfaceCombo->currentText());
+    settings.setValue(QStringLiteral("rtt/speed"),
+                     m_speedSpin->value());
+    settings.setValue(QStringLiteral("rtt/channel"),
+                     m_channelSpin->value());
+}
+
+/**
+ * @brief 从QSettings加载RTT配置
+ * @param settings QSettings对象
+ */
+void RttConfigPanel::loadSettings(QSettings& settings)
+{
+    const QString device = settings.value(
+        QStringLiteral("rtt/device")).toString();
+    if (!device.isEmpty()) {
+        const int idx = m_deviceCombo->findText(device);
+        if (idx >= 0) {
+            m_deviceCombo->setCurrentIndex(idx);
+        } else {
+            m_deviceCombo->setCurrentText(device);
+        }
+    }
+
+    const QString iface = settings.value(
+        QStringLiteral("rtt/interface"),
+        QStringLiteral("SWD")).toString();
+    const int ifaceIdx = m_interfaceCombo->findText(iface);
+    if (ifaceIdx >= 0) {
+        m_interfaceCombo->setCurrentIndex(ifaceIdx);
+    }
+
+    m_speedSpin->setValue(
+        settings.value(QStringLiteral("rtt/speed"), 4000).toInt());
+    m_channelSpin->setValue(
+        settings.value(QStringLiteral("rtt/channel"), 0).toInt());
+}

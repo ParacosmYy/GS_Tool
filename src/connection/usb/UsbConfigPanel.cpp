@@ -136,3 +136,29 @@ void UsbConfigPanel::setConnected(bool connected) {
     m_connectBtn->setText(connected ? tr("断开") : tr("连接"));
     m_statusLabel->setText(connected ? tr("已连接") : tr("未连接"));
 }
+
+/**
+ * @brief 保存USB配置到QSettings
+ * @param settings QSettings对象
+ */
+void UsbConfigPanel::saveSettings(QSettings& settings) const
+{
+    settings.setValue(QStringLiteral("usb/vid"), m_vidSpin->value());
+    settings.setValue(QStringLiteral("usb/pid"), m_pidSpin->value());
+    settings.setValue(QStringLiteral("usb/interface"),
+                      m_interfaceSpin->value());
+}
+
+/**
+ * @brief 从QSettings加载USB配置
+ * @param settings QSettings对象
+ */
+void UsbConfigPanel::loadSettings(QSettings& settings)
+{
+    m_vidSpin->setValue(
+        settings.value(QStringLiteral("usb/vid"), 0).toInt());
+    m_pidSpin->setValue(
+        settings.value(QStringLiteral("usb/pid"), 0).toInt());
+    m_interfaceSpin->setValue(
+        settings.value(QStringLiteral("usb/interface"), 0).toInt());
+}

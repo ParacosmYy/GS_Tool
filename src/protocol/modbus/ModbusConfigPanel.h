@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QComboBox>
 #include <QSpinBox>
+#include <QSettings>
 #include <QVariantMap>
 
 /**
@@ -27,6 +28,18 @@ public:
      * @return 包含 mode, slaveAddress, timeout 的参数映射
      */
     QVariantMap config() const;
+
+    /**
+     * @brief 保存配置到QSettings
+     * @param settings QSettings对象
+     */
+    void saveSettings(QSettings& settings) const;
+
+    /**
+     * @brief 从QSettings加载配置
+     * @param settings QSettings对象
+     */
+    void loadSettings(QSettings& settings);
 
 private:
     QComboBox* m_modeCombo    = nullptr; ///< 模式选择 (RTU/ASCII/TCP)
