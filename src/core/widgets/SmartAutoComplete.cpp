@@ -12,6 +12,7 @@
 
 // ──────────────────────── 构造 ────────────────────────
 
+/** @brief 构造智能自动补全弹出列表控件 @param parent 父控件指针 */
 SmartAutoComplete::SmartAutoComplete(QWidget* parent)
     : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
 {
@@ -43,11 +44,13 @@ SmartAutoComplete::SmartAutoComplete(QWidget* parent)
 
 // ──────────────────────── 公开接口 ────────────────────────
 
+/** @brief 设置补全候选词条目列表 @param entries 包含文字/频率/最后使用时间的候选条目集合 */
 void SmartAutoComplete::setEntries(const QVector<AutoCompleteEntry>& entries)
 {
     m_entries = entries;
 }
 
+/** @brief 根据前缀过滤并显示补全弹出列表 @param prefix 当前输入前缀 @param position 弹出列表的屏幕坐标位置 */
 void SmartAutoComplete::showForPrefix(const QString& prefix, const QPoint& position)
 {
     m_currentPrefix = prefix;
@@ -78,6 +81,7 @@ void SmartAutoComplete::showForPrefix(const QString& prefix, const QPoint& posit
     }
 }
 
+/** @brief 隐藏补全弹出列表并清空当前前缀状态 */
 void SmartAutoComplete::hideComplete()
 {
     hide();
@@ -85,17 +89,20 @@ void SmartAutoComplete::hideComplete()
     m_currentPrefix.clear();
 }
 
+/** @brief 查询列表中是否有选中项 @return true表示当前有选中行 */
 bool SmartAutoComplete::hasSelection() const
 {
     return m_listWidget->currentRow() >= 0;
 }
 
+/** @brief 获取当前选中项的文字内容 @return 选中项文字，无选中时返回空字符串 */
 QString SmartAutoComplete::selectedText() const
 {
     auto* item = m_listWidget->currentItem();
     return item ? item->text() : QString();
 }
 
+/** @brief 处理键盘事件(上下导航/回车选择/ESC关闭) @param event 键盘事件指针 @return true表示事件已处理，false表示未处理 */
 bool SmartAutoComplete::handleKeyEvent(QKeyEvent* event)
 {
     if (!isVisible()) return false;
@@ -136,6 +143,7 @@ bool SmartAutoComplete::handleKeyEvent(QKeyEvent* event)
 
 // ──────────────────────── 私有方法 ────────────────────────
 
+/** @brief 根据前缀过滤候选条目，返回匹配的索引列表 @param prefix 过滤前缀，为空时返回全部 @return 匹配条目的索引向量 */
 QVector<int> SmartAutoComplete::filterEntries(const QString& prefix) const
 {
     QVector<int> result;
@@ -155,6 +163,7 @@ QVector<int> SmartAutoComplete::filterEntries(const QString& prefix) const
     return result;
 }
 
+/** @brief 按频率降序和时间降序对索引列表进行排序 @param indices 待排序的索引向量引用 */
 void SmartAutoComplete::sortEntries(QVector<int>& indices) const
 {
     std::sort(indices.begin(), indices.end(), [this](int a, int b) {
@@ -168,6 +177,7 @@ void SmartAutoComplete::sortEntries(QVector<int>& indices) const
 
 // ──────────────────────── 统计重置 ────────────────────────
 
+/** @brief 重置自动补全统计计数器(建议次数和选择次数) */
 void SmartAutoComplete::resetAutoCompleteStatistics()
 {
     m_totalSuggestions = 0;

@@ -21,6 +21,7 @@
 
 // ─── 构造 ───────────────────────────────────────────────
 
+/** @brief 构造命令面板控件，初始化搜索框和命令列表 @param parent 父控件指针 */
 CommandPalette::CommandPalette(QWidget* parent)
     : QWidget(parent)
 {
@@ -66,11 +67,13 @@ CommandPalette::CommandPalette(QWidget* parent)
 
 // ─── 命令注册 ───────────────────────────────────────────
 
+/** @brief 注册单个命令条目到面板 @param entry 命令条目(含id/label/category/shortcut/action) */
 void CommandPalette::registerCommand(const CommandEntry& entry)
 {
     m_commands.append(entry);
 }
 
+/** @brief 批量注册多个命令条目到面板 @param entries 命令条目向量 */
 void CommandPalette::registerCommands(const QVector<CommandEntry>& entries)
 {
     m_commands.append(entries);
@@ -78,6 +81,7 @@ void CommandPalette::registerCommands(const QVector<CommandEntry>& entries)
 
 // ─── 显示/隐藏 ─────────────────────────────────────────
 
+/** @brief 显示命令面板，居中于父窗口并偏上100px，自动清空搜索框并聚焦 */
 void CommandPalette::showPalette()
 {
     // 居中于父窗口(偏上100px)
@@ -94,6 +98,7 @@ void CommandPalette::showPalette()
     raise();
 }
 
+/** @brief 隐藏命令面板 */
 void CommandPalette::hidePalette()
 {
     hide();
@@ -101,6 +106,7 @@ void CommandPalette::hidePalette()
 
 // ─── 事件过滤(ESC关闭) ─────────────────────────────────
 
+/** @brief 事件过滤器，处理ESC关闭/上下键导航列表 @param obj 事件目标对象 @param event 事件指针 @return true表示事件已拦截处理 */
 bool CommandPalette::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::KeyPress) {
@@ -130,6 +136,7 @@ bool CommandPalette::eventFilter(QObject* obj, QEvent* event)
 
 // ─── 绘制半透明遮罩 ─────────────────────────────────────
 
+/** @brief 自绘事件，绘制半透明背景遮罩和圆角面板边框 @param event 绘制事件(未使用) */
 void CommandPalette::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter p(this);
@@ -154,6 +161,7 @@ void CommandPalette::paintEvent(QPaintEvent* /*event*/)
 
 // ─── 搜索过滤 ───────────────────────────────────────────
 
+/** @brief 搜索框文字变更时触发，重新过滤并刷新命令列表 @param text 当前搜索文本 */
 void CommandPalette::onSearchChanged(const QString& text)
 {
     ++m_totalSearches;
@@ -162,6 +170,7 @@ void CommandPalette::onSearchChanged(const QString& text)
 
 // ─── 执行命令 ───────────────────────────────────────────
 
+/** @brief 命令列表项激活时触发，执行对应命令并隐藏面板 @param item 激活的列表项指针 */
 void CommandPalette::onItemActivated(QListWidgetItem* item)
 {
     if (!item) return;
@@ -180,6 +189,7 @@ void CommandPalette::onItemActivated(QListWidgetItem* item)
 
 // ─── 刷新命令列表 ───────────────────────────────────────
 
+/** @brief 根据过滤文本刷新命令列表，使用模糊子序列匹配 @param filter 过滤文本，为空时显示全部命令 */
 void CommandPalette::refreshList(const QString& filter)
 {
     m_listWidget->clear();
@@ -208,6 +218,7 @@ void CommandPalette::refreshList(const QString& filter)
 
 // ─── 模糊子序列匹配 ─────────────────────────────────────
 
+/** @brief 模糊子序列匹配算法，判断filter是否为target的子序列 @param filter 搜索过滤器文本 @param target 目标匹配文本 @return true表示匹配成功 */
 bool CommandPalette::fuzzyMatch(const QString& filter, const QString& target) const
 {
     if (filter.isEmpty()) return true;

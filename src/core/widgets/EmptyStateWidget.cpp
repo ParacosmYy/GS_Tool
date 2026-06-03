@@ -22,6 +22,7 @@
 // 构造
 // ============================================================================
 
+/** @brief 构造空状态组件 @param title 标题文字 @param description 描述文字 @param parent 父控件指针 */
 EmptyStateWidget::EmptyStateWidget(const QString& title,
                                      const QString& description,
                                      QWidget* parent)
@@ -35,6 +36,7 @@ EmptyStateWidget::EmptyStateWidget(const QString& title,
 // 公开接口
 // ============================================================================
 
+/** @brief 设置图标名称，显示首字符作为占位 @param name 图标名称字符串 */
 void EmptyStateWidget::setIconName(const QString& name)
 {
     if (m_iconLabel) {
@@ -44,6 +46,7 @@ void EmptyStateWidget::setIconName(const QString& name)
     }
 }
 
+/** @brief 设置标题文字 @param title 新的标题文字 */
 void EmptyStateWidget::setTitle(const QString& title)
 {
     if (m_titleLabel) {
@@ -52,6 +55,7 @@ void EmptyStateWidget::setTitle(const QString& title)
     }
 }
 
+/** @brief 设置描述文字，为空时自动隐藏 @param description 描述文字内容 */
 void EmptyStateWidget::setDescription(const QString& description)
 {
     if (m_descLabel) {
@@ -61,6 +65,7 @@ void EmptyStateWidget::setDescription(const QString& description)
     }
 }
 
+/** @brief 设置操作按钮的文字与回调，文字为空时隐藏按钮 @param text 按钮文字 @param callback 点击回调函数 */
 void EmptyStateWidget::setActionButton(const QString& text,
                                          std::function<void()> callback)
 {
@@ -87,6 +92,7 @@ void EmptyStateWidget::setActionButton(const QString& text,
 // 私有方法
 // ============================================================================
 
+/** @brief 初始化UI布局，创建图标/标题/描述/按钮控件 @param title 标题文字 @param description 描述文字 */
 void EmptyStateWidget::setupUI(const QString& title, const QString& description)
 {
     m_mainLayout = new QVBoxLayout(this);
@@ -142,6 +148,7 @@ void EmptyStateWidget::setupUI(const QString& title, const QString& description)
 // 统计重置
 // ============================================================================
 
+/** @brief 重置空状态组件的统计计数器(状态变更次数和图标变更次数) */
 void EmptyStateWidget::resetEmptyStateStatistics()
 {
     m_totalStateChanges = 0;

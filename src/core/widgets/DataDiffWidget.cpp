@@ -25,6 +25,7 @@
 // 构造
 // ============================================================================
 
+/** @brief 构造数据对比视图，初始化左右分栏和同步滚动 @param parent 父控件指针 */
 DataDiffWidget::DataDiffWidget(QWidget* parent)
     : QWidget(parent)
 {
@@ -92,6 +93,7 @@ DataDiffWidget::DataDiffWidget(QWidget* parent)
 // 公开接口
 // ============================================================================
 
+/** @brief 设置左右两侧数据并执行LCS差异比较 @param leftData 原始数据(左侧) @param rightData 当前数据(右侧) */
 void DataDiffWidget::setData(const QString& leftData, const QString& rightData)
 {
     const QStringList leftLines = leftData.split('\n');
@@ -104,6 +106,7 @@ void DataDiffWidget::setData(const QString& leftData, const QString& rightData)
     refreshDisplay();
 }
 
+/** @brief 设置左列标题标签文字 @param label 左列标题 */
 void DataDiffWidget::setLeftLabel(const QString& label)
 {
     if (m_leftLabel) {
@@ -111,6 +114,7 @@ void DataDiffWidget::setLeftLabel(const QString& label)
     }
 }
 
+/** @brief 设置右列标题标签文字 @param label 右列标题 */
 void DataDiffWidget::setRightLabel(const QString& label)
 {
     if (m_rightLabel) {
@@ -118,6 +122,7 @@ void DataDiffWidget::setRightLabel(const QString& label)
     }
 }
 
+/** @brief 清空所有差异结果和显示内容 */
 void DataDiffWidget::clear()
 {
     m_diffResult.clear();
@@ -134,6 +139,7 @@ void DataDiffWidget::clear()
 // LCS diff算法
 // ============================================================================
 
+/** @brief 使用LCS(最长公共子序列)算法计算行级差异 @param left 左侧行列表 @param right 右侧行列表 @return 差异行向量，包含每行的类型和内容 */
 QVector<DiffLine> DataDiffWidget::computeDiff(const QStringList& left,
                                                const QStringList& right) const
 {
@@ -176,6 +182,7 @@ QVector<DiffLine> DataDiffWidget::computeDiff(const QStringList& left,
 // 显示刷新
 // ============================================================================
 
+/** @brief 根据差异结果刷新左右两侧HTML显示，并更新统计标签 */
 void DataDiffWidget::refreshDisplay()
 {
     m_added = 0;
@@ -227,6 +234,7 @@ void DataDiffWidget::refreshDisplay()
 // 颜色映射
 // ============================================================================
 
+/** @brief 根据差异行类型获取对应的高亮颜色 @param type 差异行类型(Added/Removed/Modified/Unchanged) @return 对应的QColor颜色 */
 QColor DataDiffWidget::diffColor(DiffLineType type) const
 {
     auto& theme = ThemeManager::instance();

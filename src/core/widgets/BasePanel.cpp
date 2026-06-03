@@ -32,6 +32,7 @@
 // 构造/析构
 // ============================================================================
 
+/** @brief 构造BasePanel容器面板 @param content 内容区域控件指针(不转移所有权) @param title 标题栏文字 @param parent 父控件指针 */
 BasePanel::BasePanel(QWidget* content, const QString& title, QWidget* parent)
     : QWidget(parent)
     , m_content(content)
@@ -50,11 +51,13 @@ BasePanel::BasePanel(QWidget* content, const QString& title, QWidget* parent)
 // 公开接口
 // ============================================================================
 
+/** @brief 获取面板内容区域控件指针 @return 内容控件指针，可能为nullptr */
 QWidget* BasePanel::contentWidget() const
 {
     return m_content;
 }
 
+/** @brief 设置标题栏文字 @param title 新的标题文字 */
 void BasePanel::setTitle(const QString& title)
 {
     if (m_titleLabel) {
@@ -62,11 +65,13 @@ void BasePanel::setTitle(const QString& title)
     }
 }
 
+/** @brief 获取当前标题栏文字 @return 标题文字，标签未创建时返回空字符串 */
 QString BasePanel::title() const
 {
     return m_titleLabel ? m_titleLabel->text() : QString();
 }
 
+/** @brief 设置标题栏图标名称，显示首字符作为占位 @param name 图标名称 */
 void BasePanel::setIconName(const QString& name)
 {
     m_iconName = name;
@@ -76,6 +81,7 @@ void BasePanel::setIconName(const QString& name)
     }
 }
 
+/** @brief 设置面板是否可折叠 @param enabled true允许折叠，false禁止折叠 */
 void BasePanel::setCollapsible(bool enabled)
 {
     m_collapsible = enabled;
@@ -88,11 +94,13 @@ void BasePanel::setCollapsible(bool enabled)
     }
 }
 
+/** @brief 查询面板是否可折叠 @return true表示允许折叠 */
 bool BasePanel::isCollapsible() const
 {
     return m_collapsible;
 }
 
+/** @brief 设置面板折叠状态 @param collapsed true折叠内容区域，false展开内容区域 */
 void BasePanel::setCollapsed(bool collapsed)
 {
     if (collapsed == m_collapsed) return;
@@ -107,16 +115,19 @@ void BasePanel::setCollapsed(bool collapsed)
     emit collapsedChanged(collapsed);
 }
 
+/** @brief 查询面板当前是否处于折叠状态 @return true表示已折叠 */
 bool BasePanel::isCollapsed() const
 {
     return m_collapsed;
 }
 
+/** @brief 获取面板透明度 @return 透明度值(0.0~1.0) */
 qreal BasePanel::panelOpacity() const
 {
     return m_panelOpacity;
 }
 
+/** @brief 设置面板透明度 @param opacity 透明度值(0.0完全透明~1.0完全不透明) */
 void BasePanel::setPanelOpacity(qreal opacity)
 {
     m_panelOpacity = opacity;
@@ -129,6 +140,7 @@ void BasePanel::setPanelOpacity(qreal opacity)
 // 空状态 / 加载状态
 // ============================================================================
 
+/** @brief 显示空状态提示，隐藏内容/加载/骨架屏 @param title 空状态标题 @param description 空状态描述 */
 void BasePanel::showEmptyState(const QString& title, const QString& description)
 {
     if (m_emptyState) {
@@ -141,12 +153,14 @@ void BasePanel::showEmptyState(const QString& title, const QString& description)
     if (m_skeleton) m_skeleton->setVisible(false);
 }
 
+/** @brief 隐藏空状态提示，恢复内容区域显示 */
 void BasePanel::hideEmptyState()
 {
     if (m_emptyState) m_emptyState->setVisible(false);
     if (m_content) m_content->setVisible(true);
 }
 
+/** @brief 显示加载旋转指示器，隐藏内容/空状态/骨架屏 */
 void BasePanel::showLoading()
 {
     if (m_loadingSpinner) m_loadingSpinner->setVisible(true);
@@ -155,12 +169,14 @@ void BasePanel::showLoading()
     if (m_skeleton) m_skeleton->setVisible(false);
 }
 
+/** @brief 隐藏加载旋转指示器，恢复内容区域显示 */
 void BasePanel::hideLoading()
 {
     if (m_loadingSpinner) m_loadingSpinner->setVisible(false);
     if (m_content) m_content->setVisible(true);
 }
 
+/** @brief 显示骨架屏占位动画，隐藏内容/空状态/加载指示器 */
 void BasePanel::showSkeleton()
 {
     if (m_skeleton) m_skeleton->setVisible(true);
@@ -169,6 +185,7 @@ void BasePanel::showSkeleton()
     if (m_loadingSpinner) m_loadingSpinner->setVisible(false);
 }
 
+/** @brief 隐藏骨架屏占位动画，恢复内容区域显示 */
 void BasePanel::hideSkeleton()
 {
     if (m_skeleton) m_skeleton->setVisible(false);
@@ -179,6 +196,7 @@ void BasePanel::hideSkeleton()
 // 动画槽
 // ============================================================================
 
+/** @brief 播放面板淡入+滑入显示动画(250ms OutCubic) */
 void BasePanel::animateShow()
 {
     show();
@@ -206,6 +224,7 @@ void BasePanel::animateShow()
     group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+/** @brief 播放面板淡出+滑出隐藏动画(200ms InCubic)，动画结束后隐藏控件 */
 void BasePanel::animateHide()
 {
     auto* group = new QParallelAnimationGroup(this);
@@ -235,6 +254,7 @@ void BasePanel::animateHide()
 // 自绘: 微阴影
 // ============================================================================
 
+/** @brief 自绘事件，在面板底部和右侧绘制微阴影渐变效果 @param event 绘制事件 */
 void BasePanel::paintEvent(QPaintEvent* event)
 {
     QWidget::paintEvent(event);
@@ -271,6 +291,7 @@ void BasePanel::paintEvent(QPaintEvent* event)
 // 私有方法
 // ============================================================================
 
+/** @brief 初始化面板内部布局：标题栏(图标+标题+折叠按钮) + 内容区域(含空状态/加载/骨架屏) */
 void BasePanel::setupInternalLayout()
 {
     auto* mainLayout = new QVBoxLayout(this);
@@ -364,6 +385,7 @@ void BasePanel::setupInternalLayout()
     mainLayout->addWidget(m_contentArea, 1);
 }
 
+/** @brief 根据当前折叠状态更新折叠按钮图标(▸折叠/▾展开) */
 void BasePanel::updateCollapseIcon()
 {
     if (!m_collapseBtn) return;
@@ -372,6 +394,7 @@ void BasePanel::updateCollapseIcon()
                                        : tr("▾"));
 }
 
+/** @brief 切换面板折叠/展开状态 */
 void BasePanel::toggleCollapsed()
 {
     ++m_totalToggles;

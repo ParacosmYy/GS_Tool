@@ -20,6 +20,10 @@ Q_LOGGING_CATEGORY(lcDashboardSerializer, "dashboard.serializer")
 
 // ─── DashboardItemConfig ────────────────────────────────────────────
 
+/**
+ * @brief 将面板配置项序列化为JSON对象
+ * @return 包含类型/标题/位置/属性的QJsonObject
+ */
 QJsonObject DashboardItemConfig::toJson() const
 {
     QJsonObject obj;
@@ -40,6 +44,11 @@ QJsonObject DashboardItemConfig::toJson() const
     return obj;
 }
 
+/**
+ * @brief 从JSON对象反序列化构建面板配置项
+ * @param obj JSON对象
+ * @return 解析后的DashboardItemConfig
+ */
 DashboardItemConfig DashboardItemConfig::fromJson(const QJsonObject& obj)
 {
     DashboardItemConfig cfg;
@@ -61,11 +70,23 @@ DashboardItemConfig DashboardItemConfig::fromJson(const QJsonObject& obj)
 
 // ─── DashboardSerializer ────────────────────────────────────────────
 
+/**
+ * @brief 构造函数
+ * @param parent 父对象
+ */
 DashboardSerializer::DashboardSerializer(QObject* parent)
     : QObject(parent)
 {
 }
 
+/**
+ * @brief 将仪表盘布局保存到JSON文件
+ * @param filePath 目标文件路径
+ * @param name 布局名称
+ * @param columns 网格列数
+ * @param items 面板配置列表
+ * @return true保存成功，false保存失败（调用lastError()获取原因）
+ */
 bool DashboardSerializer::saveToFile(const QString& filePath,
                                      const QString& name,
                                      int columns,
@@ -97,6 +118,14 @@ bool DashboardSerializer::saveToFile(const QString& filePath,
     return true;
 }
 
+/**
+ * @brief 从JSON文件加载仪表盘布局
+ * @param filePath 源文件路径
+ * @param name 输出布局名称
+ * @param columns 输出网格列数
+ * @param items 输出面板配置列表
+ * @return true加载成功，false加载失败（调用lastError()获取原因）
+ */
 bool DashboardSerializer::loadFromFile(const QString& filePath,
                                        QString& name,
                                        int& columns,
@@ -119,6 +148,14 @@ bool DashboardSerializer::loadFromFile(const QString& filePath,
     return loadFromJson(data, name, columns, items);
 }
 
+/**
+ * @brief 从JSON字节数组解析仪表盘布局
+ * @param jsonData JSON字节数组
+ * @param name 输出布局名称
+ * @param columns 输出网格列数
+ * @param items 输出面板配置列表
+ * @return true解析成功，false解析失败（调用lastError()获取原因）
+ */
 bool DashboardSerializer::loadFromJson(const QByteArray& jsonData,
                                        QString& name,
                                        int& columns,
@@ -162,6 +199,13 @@ bool DashboardSerializer::loadFromJson(const QByteArray& jsonData,
     return true;
 }
 
+/**
+ * @brief 将仪表盘布局序列化为JSON字节数组
+ * @param name 布局名称
+ * @param columns 网格列数
+ * @param items 面板配置列表
+ * @return 格式化后的JSON字节数组
+ */
 QByteArray DashboardSerializer::toJson(const QString& name,
                                        int columns,
                                        const QList<DashboardItemConfig>& items)
@@ -181,11 +225,19 @@ QByteArray DashboardSerializer::toJson(const QString& name,
     return doc.toJson(QJsonDocument::Indented);
 }
 
+/**
+ * @brief 获取最近一次操作的错误信息
+ * @return 错误描述文本，无错误时为空
+ */
 QString DashboardSerializer::lastError() const
 {
     return m_lastError;
 }
 
+/**
+ * @brief 获取当前序列化格式版本号
+ * @return 版本号常量
+ */
 int DashboardSerializer::currentVersion()
 {
     return kVersion;
@@ -197,7 +249,7 @@ int DashboardSerializer::currentVersion()
  * 检查项:
  *   1. 面板类型是否合法
  *   2. 网格坐标是否为非负值
- *   3. 跨度是否 ≥ 1
+ *   3. 跨度是否 >= 1
  *   4. 面板是否超出网格边界
  *   5. 面板之间是否有重叠
  *
@@ -237,11 +289,11 @@ QStringList DashboardSerializer::validateLayout(
 
         /* 跨度检查 */
         if (item.rowSpan < 1) {
-            errors.append(tr("面板 #%1 '%2': 行跨度必须 ≥ 1")
+            errors.append(tr("面板 #%1 '%2': 行跨度必须 >= 1")
                               .arg(i + 1).arg(item.title));
         }
         if (item.columnSpan < 1) {
-            errors.append(tr("面板 #%1 '%2': 列跨度必须 ≥ 1")
+            errors.append(tr("面板 #%1 '%2': 列跨度必须 >= 1")
                               .arg(i + 1).arg(item.title));
         }
 
@@ -344,11 +396,33 @@ bool DashboardSerializer::deleteLayout(const QString& filePath)
     return true;
 }
 
+/**
+ * @brief 获取累计保存操作次数
+ * @return 保存次数
+ */
 quint64 DashboardSerializer::totalSaves() const { return m_totalSaves; }
+
+/**
+ * @brief 获取累计加载操作次数
+ * @return 加载次数
+ */
 quint64 DashboardSerializer::totalLoads() const { return m_totalLoads; }
+
+/**
+ * @brief 获取累计验证操作次数
+ * @return 验证次数
+ */
 quint64 DashboardSerializer::totalValidations() const { return m_totalValidations; }
+
+/**
+ * @brief 获取累计删除操作次数
+ * @return 删除次数
+ */
 quint64 DashboardSerializer::totalDeletes() const { return m_totalDeletes; }
 
+/**
+ * @brief 重置所有序列化器统计计数器为零
+ */
 void DashboardSerializer::resetSerializerStatistics()
 {
     m_totalSaves = 0;

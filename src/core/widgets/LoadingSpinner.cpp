@@ -22,6 +22,7 @@
 // 构造
 // ============================================================================
 
+/** @brief 构造加载旋转指示器 @param size 控件固定尺寸(宽高相等) @param parent 父控件指针 */
 LoadingSpinner::LoadingSpinner(int size, QWidget* parent)
     : QWidget(parent)
 {
@@ -42,11 +43,13 @@ LoadingSpinner::LoadingSpinner(int size, QWidget* parent)
 // 公开接口
 // ============================================================================
 
+/** @brief 获取当前线条宽度 @return 线条宽度(像素) */
 int LoadingSpinner::lineWidth() const
 {
     return m_lineWidth;
 }
 
+/** @brief 设置线条宽度，最小值为1 @param width 线条宽度(像素) */
 void LoadingSpinner::setLineWidth(int width)
 {
     m_lineWidth = qMax(1, width);
@@ -57,6 +60,7 @@ void LoadingSpinner::setLineWidth(int width)
 // 动画控制
 // ============================================================================
 
+/** @brief 启动旋转动画，若已在运行则不重复启动 */
 void LoadingSpinner::start()
 {
     if (!m_timer->isActive()) {
@@ -65,6 +69,7 @@ void LoadingSpinner::start()
     }
 }
 
+/** @brief 停止旋转动画，若未运行则不执行操作 */
 void LoadingSpinner::stop()
 {
     if (m_timer->isActive()) {
@@ -73,6 +78,7 @@ void LoadingSpinner::stop()
     }
 }
 
+/** @brief 查询旋转动画是否正在运行 @return true表示正在旋转，false表示已停止 */
 bool LoadingSpinner::isSpinning() const
 {
     return m_timer && m_timer->isActive();
@@ -82,6 +88,7 @@ bool LoadingSpinner::isSpinning() const
 // 统计重置
 // ============================================================================
 
+/** @brief 重置旋转指示器的统计计数器(启动次数和停止次数) */
 void LoadingSpinner::resetSpinnerStatistics()
 {
     m_totalStarts = 0;
@@ -92,6 +99,7 @@ void LoadingSpinner::resetSpinnerStatistics()
 // 自绘: 旋转圆弧
 // ============================================================================
 
+/** @brief 自绘事件，绘制背景圆和270°锥形渐变旋转圆弧 @param event 绘制事件(未使用) */
 void LoadingSpinner::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);

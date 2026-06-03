@@ -23,6 +23,7 @@
 // 构造
 // ============================================================================
 
+/** @brief 构造骨架屏占位组件 @param width 固定宽度(0表示自适应) @param height 固定高度 @param borderRadius 圆角半径 @param parent 父控件指针 */
 SkeletonWidget::SkeletonWidget(int width, int height, int borderRadius,
                                  QWidget* parent)
     : QWidget(parent)
@@ -48,6 +49,7 @@ SkeletonWidget::SkeletonWidget(int width, int height, int borderRadius,
 // 自绘: 骨架块 + 微光
 // ============================================================================
 
+/** @brief 自绘事件，绘制圆角底色矩形和微光扫描渐变叠加层 @param event 绘制事件(未使用) */
 void SkeletonWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
@@ -75,6 +77,7 @@ void SkeletonWidget::paintEvent(QPaintEvent* event)
 // 统计重置
 // ============================================================================
 
+/** @brief 重置骨架屏组件的统计计数器(动画循环次数和布局变更次数) */
 void SkeletonWidget::resetSkeletonStatistics()
 {
     m_totalAnimations = 0;
