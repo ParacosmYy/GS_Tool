@@ -42,11 +42,7 @@ void HeatmapWidget::setData(const QVector<QVector<double>> &data)
     update();
 }
 
-/**
- * @brief 手动设置颜色映射的值域范围，同时关闭自动缩放
- * @param min 值域下界
- * @param max 值域上界
- */
+/** @brief 手动设置颜色映射的值域范围，同时关闭自动缩放 @param min 值域下界 @param max 值域上界 */
 void HeatmapWidget::setColorRange(double min, double max)
 {
     m_minValue = min;
@@ -56,10 +52,7 @@ void HeatmapWidget::setColorRange(double min, double max)
     update();
 }
 
-/**
- * @brief 设置每个单元格的像素边长，最小值为4像素
- * @param size 单元格边长（像素）
- */
+/** @brief 设置每个单元格的像素边长，最小值为4像素 @param size 单元格边长(像素) */
 void HeatmapWidget::setCellSize(int size)
 {
     m_cellSize = qMax(4, size);
@@ -67,10 +60,7 @@ void HeatmapWidget::setCellSize(int size)
     update();
 }
 
-/**
- * @brief 设置是否在单元格内显示数值文字（单元格>=20px时生效）
- * @param show true表示显示数值，false表示隐藏
- */
+/** @brief 设置是否在单元格内显示数值文字(单元格>=20px时生效) @param show true=显示数值 */
 void HeatmapWidget::setShowValues(bool show)
 {
     m_showValues = show;
@@ -78,10 +68,7 @@ void HeatmapWidget::setShowValues(bool show)
     update();
 }
 
-/**
- * @brief 设置是否启用自动缩放，启用后setData会自动重新计算值域
- * @param enabled true表示启用自动缩放
- */
+/** @brief 设置是否启用自动缩放，启用后setData会自动重新计算值域 @param enabled true=启用自动缩放 */
 void HeatmapWidget::setAutoScale(bool enabled)
 {
     m_autoScale = enabled;
@@ -89,10 +76,7 @@ void HeatmapWidget::setAutoScale(bool enabled)
     update();
 }
 
-/**
- * @brief 返回控件的推荐尺寸，基于数据行列数和单元格大小计算
- * @return 推荐的控件尺寸，空数据时返回200x200
- */
+/** @brief 返回控件的推荐尺寸，基于数据行列数和单元格大小计算 @return 推荐的控件尺寸，空数据时返回200x200 */
 QSize HeatmapWidget::sizeHint() const
 {
     if (m_data.isEmpty()) return QSize(200, 200);
@@ -102,10 +86,7 @@ QSize HeatmapWidget::sizeHint() const
 /** @brief 返回控件的最小尺寸提示 @return 固定返回100x100像素 */
 QSize HeatmapWidget::minimumSizeHint() const { return QSize(100, 100); }
 
-/**
- * @brief 绘制事件处理，将缓存像素图绘制到控件上并叠加悬停高亮框
- * @param event 绘制事件参数（未使用）
- */
+/** @brief 绘制事件处理，将缓存像素图绘制到控件上并叠加悬停高亮框 @param event 绘制事件参数(未使用) */
 void HeatmapWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
@@ -121,20 +102,14 @@ void HeatmapWidget::paintEvent(QPaintEvent *event)
     }
 }
 
-/**
- * @brief 窗口大小变更事件处理，标记缓存为脏以触发重绘
- * @param event 大小变更事件参数
- */
+/** @brief 窗口大小变更事件处理，标记缓存为脏以触发重绘 @param event 大小变更事件参数 */
 void HeatmapWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     m_dirty = true;
 }
 
-/**
- * @brief 鼠标移动事件处理，计算悬停单元格并发出cellHovered信号和工具提示
- * @param event 鼠标事件参数，包含鼠标位置信息
- */
+/** @brief 鼠标移动事件处理，计算悬停单元格并发出cellHovered信号和工具提示 @param event 鼠标事件参数 */
 void HeatmapWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int col = event->pos().x() / m_cellSize;
@@ -151,10 +126,7 @@ void HeatmapWidget::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-/**
- * @brief 鼠标按下事件处理，计算点击的单元格并发出cellClicked信号
- * @param event 鼠标事件参数，包含点击位置信息
- */
+/** @brief 鼠标按下事件处理，计算点击的单元格并发出cellClicked信号 @param event 鼠标事件参数 */
 void HeatmapWidget::mousePressEvent(QMouseEvent *event)
 {
     int col = event->pos().x() / m_cellSize;
@@ -188,11 +160,7 @@ void HeatmapWidget::updatePixmap()
     m_dirty = false;
 }
 
-/**
- * @brief 将数值映射为颜色，使用蓝->绿->红的三段线性渐变
- * @param value 待映射的数值
- * @return 对应的QColor颜色
- */
+/** @brief 将数值映射为颜色，使用蓝->绿->红的三段线性渐变 @param value 待映射的数值 @return 对应的QColor颜色 */
 QColor HeatmapWidget::valueToColor(double value) const
 {
     double t = (value - m_minValue) / (m_maxValue - m_minValue);
@@ -203,11 +171,7 @@ QColor HeatmapWidget::valueToColor(double value) const
     return QColor(r, g, b);
 }
 
-/**
- * @brief 格式化数值为显示字符串，根据量级选择精度
- * @param value 待格式化的数值
- * @return 格式化后的字符串，接近0显示"0"，>=1000取整，其余保留2位小数
- */
+/** @brief 格式化数值为显示字符串，根据量级选择精度 @param value 待格式化的数值 @return 格式化后的字符串 */
 QString HeatmapWidget::formatValue(double value) const
 {
     if (qAbs(value) < 0.01) return "0";
