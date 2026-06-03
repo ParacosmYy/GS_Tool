@@ -1,6 +1,6 @@
 /**
  * @file DragDropHelper.cpp
- * @brief 拖放辅助工具实现
+ * @brief 拖放辅助工具实现 — 文件/文本/URL拖放支持+高亮反馈
  */
 
 #include "core/widgets/DragDropHelper.h"
@@ -13,10 +13,9 @@
 #include <QUrl>
 #include <QDebug>
 
-// ============================================================
-// DragDropHelper 私有构造
-// ============================================================
+// ─── 构造/析构 ───────────────────────────────────────────
 
+/** @brief 构造函数 - 安装事件过滤器到目标控件 @param parent 目标控件 */
 DragDropHelper::DragDropHelper(QWidget* parent)
     : QObject(parent)
     , m_target(parent)
@@ -25,6 +24,7 @@ DragDropHelper::DragDropHelper(QWidget* parent)
     m_target->installEventFilter(this);
 }
 
+/** @brief 析构函数 - 移除事件过滤器 */
 DragDropHelper::~DragDropHelper()
 {
     if (m_target) {
@@ -32,10 +32,9 @@ DragDropHelper::~DragDropHelper()
     }
 }
 
-// ============================================================
-// 静态工厂方法
-// ============================================================
+// ─── 静态工厂方法 ────────────────────────────────────────
 
+/** @brief 为控件启用文件拖放 @param widget 目标控件 @param extensions 允许的扩展名(分号分隔) @param callback 文件回调 */
 void DragDropHelper::acceptFileDrop(QWidget* widget,
                                        const QString& extensions,
                                        FileCallback callback)
@@ -48,11 +47,11 @@ void DragDropHelper::acceptFileDrop(QWidget* widget,
     helper->m_fileCallback = std::move(callback);
     ++s_totalTargetsInstalled;
 
-    // 设置控件属性用于标识
     widget->setProperty("_dropType", "files");
     widget->setProperty("_dropExtensions", extensions);
 }
 
+/** @brief 为控件启用文本拖放 @param widget 目标控件 @param callback 文本回调 */
 void DragDropHelper::acceptTextDrop(QWidget* widget, TextCallback callback)
 {
     if (!widget || !callback) return;
@@ -65,6 +64,7 @@ void DragDropHelper::acceptTextDrop(QWidget* widget, TextCallback callback)
     widget->setProperty("_dropType", "text");
 }
 
+/** @brief 为控件启用URL拖放 @param widget 目标控件 @param callback URL回调 */
 void DragDropHelper::acceptUrlDrop(QWidget* widget, UrlCallback callback)
 {
     if (!widget || !callback) return;
@@ -77,10 +77,10 @@ void DragDropHelper::acceptUrlDrop(QWidget* widget, UrlCallback callback)
     widget->setProperty("_dropType", "urls");
 }
 
+/** @brief 移除控件的拖放支持 @param widget 目标控件 */
 void DragDropHelper::removeDropTarget(QWidget* widget)
 {
     if (!widget) return;
-    // 查找并删除helper
     auto children = widget->children();
     for (auto* child : children) {
         auto* helper = qobject_cast<DragDropHelper*>(child);
@@ -92,6 +92,7 @@ void DragDropHelper::removeDropTarget(QWidget* widget)
     widget->setAcceptDrops(false);
 }
 
+/** @brief 设置拖放高亮样式 @param widget 目标控件 @param highlightColor 高亮颜色 @param borderWidth 边框宽度 */
 void DragDropHelper::setDropHighlight(QWidget* widget,
                                         const QString& highlightColor,
                                         int borderWidth)
@@ -101,10 +102,9 @@ void DragDropHelper::setDropHighlight(QWidget* widget,
     widget->setProperty("_dropHighlightWidth", borderWidth);
 }
 
-// ============================================================
-// 事件过滤器
-// ============================================================
+// ─── 事件过滤器 ──────────────────────────────────────────
 
+/** @brief 事件过滤器 - 处理拖放事件 @param watched 监听对象 @param event 事件 @return 是否拦截 */
 bool DragDropHelper::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched != m_target) return false;
@@ -115,7 +115,6 @@ bool DragDropHelper::eventFilter(QObject* watched, QEvent* event)
     case QEvent::Drop:
         return handleDrop(static_cast<QDropEvent*>(event));
     case QEvent::DragLeave: {
-        // 恢复原始样式
         if (!m_originalStyle.isEmpty()) {
             m_target->setStyleSheet(m_originalStyle);
         }
@@ -126,6 +125,7 @@ bool DragDropHelper::eventFilter(QObject* watched, QEvent* event)
     }
 }
 
+/** @brief 处理拖入事件 — 验证MIME类型并显示高亮 @param event 拖入事件 @return 是否接受 */
 bool DragDropHelper::handleDragEnter(QDragEnterEvent* event)
 {
     const auto* mime = event->mimeData();
@@ -179,6 +179,7 @@ bool DragDropHelper::handleDragEnter(QDragEnterEvent* event)
     return accepted;
 }
 
+/** @brief 处理放下事件 — 执行回调并恢复样式 @param event 放下事件 @return 是否处理 */
 bool DragDropHelper::handleDrop(QDropEvent* event)
 {
     const auto* mime = event->mimeData();
@@ -236,6 +237,7 @@ bool DragDropHelper::handleDrop(QDropEvent* event)
     return false;
 }
 
+/** @brief 检查文件路径是否匹配允许的扩展名 @param filePath 文件路径 @return 是否匹配 */
 bool DragDropHelper::matchesExtension(const QString& filePath) const
 {
     if (m_extensions.isEmpty()) return true;

@@ -1,6 +1,6 @@
 /**
  * @file AnimationUtility.cpp
- * @brief 动画工具集实现
+ * @brief 动画工具集实现 — 淡入淡出/滑动/缩放/弹跳/抖动
  */
 
 #include "core/animation/AnimationUtility.h"
@@ -11,6 +11,7 @@
 #include <QSequentialAnimationGroup>
 #include <QParallelAnimationGroup>
 
+/** @brief 确保控件有透明度特效 @param widget 目标控件 @return 透明度特效指针 */
 QGraphicsOpacityEffect* AnimationUtility::ensureOpacityEffect(QWidget* widget)
 {
     if (!widget) return nullptr;
@@ -22,6 +23,7 @@ QGraphicsOpacityEffect* AnimationUtility::ensureOpacityEffect(QWidget* widget)
     return effect;
 }
 
+/** @brief 淡入动画 @param widget 目标控件 @param durationMs 持续时间 @param curve 缓动曲线 @return 动画指针 */
 QPropertyAnimation* AnimationUtility::fadeIn(QWidget* widget,
                                                int durationMs,
                                                QEasingCurve curve)
@@ -39,6 +41,7 @@ QPropertyAnimation* AnimationUtility::fadeIn(QWidget* widget,
     return anim;
 }
 
+/** @brief 淡出动画 @param widget 目标控件 @param durationMs 持续时间 @param curve 缓动曲线 @param onFinished 完成回调 @return 动画指针 */
 QPropertyAnimation* AnimationUtility::fadeOut(QWidget* widget,
                                                 int durationMs,
                                                 QEasingCurve curve,
@@ -60,6 +63,7 @@ QPropertyAnimation* AnimationUtility::fadeOut(QWidget* widget,
     return anim;
 }
 
+/** @brief 计算滑动偏移量 @param direction 滑动方向 @param widget 目标控件 @return 偏移坐标 */
 QPoint AnimationUtility::slideOffset(SlideDirection direction,
                                        const QWidget* widget)
 {
@@ -74,6 +78,7 @@ QPoint AnimationUtility::slideOffset(SlideDirection direction,
     return QPoint(0, 0);
 }
 
+/** @brief 滑入动画 @param widget 目标控件 @param direction 滑动方向 @param durationMs 持续时间 @param curve 缓动曲线 @return 动画指针 */
 QPropertyAnimation* AnimationUtility::slideIn(QWidget* widget,
                                                 SlideDirection direction,
                                                 int durationMs,
@@ -94,6 +99,7 @@ QPropertyAnimation* AnimationUtility::slideIn(QWidget* widget,
     return anim;
 }
 
+/** @brief 滑出动画 @param widget 目标控件 @param direction 滑动方向 @param durationMs 持续时间 @param curve 缓动曲线 @param onFinished 完成回调 @return 动画指针 */
 QPropertyAnimation* AnimationUtility::slideOut(QWidget* widget,
                                                  SlideDirection direction,
                                                  int durationMs,
@@ -118,6 +124,7 @@ QPropertyAnimation* AnimationUtility::slideOut(QWidget* widget,
     return anim;
 }
 
+/** @brief 缩放进入动画(几何+透明度并行) @param widget 目标控件 @param durationMs 持续时间 */
 void AnimationUtility::scaleIn(QWidget* widget, int durationMs)
 {
     if (!widget) return;
@@ -153,6 +160,7 @@ void AnimationUtility::scaleIn(QWidget* widget, int durationMs)
     group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+/** @brief 弹跳进入动画 @param widget 目标控件 @param direction 滑动方向 @param durationMs 持续时间 @return 动画指针 */
 QPropertyAnimation* AnimationUtility::bounceIn(QWidget* widget,
                                                   SlideDirection direction,
                                                   int durationMs)
@@ -172,6 +180,7 @@ QPropertyAnimation* AnimationUtility::bounceIn(QWidget* widget,
     return anim;
 }
 
+/** @brief 抖动动画(水平往返) @param widget 目标控件 @param amplitude 振幅像素 @param count 往返次数 */
 void AnimationUtility::shake(QWidget* widget, int amplitude, int count)
 {
     if (!widget) return;
