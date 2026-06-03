@@ -344,56 +344,5 @@ void ZoomController::handleMouseDoubleClick(QMouseEvent* event)
 }
 
 // ============================================================
-// 辅助
+// 辅助方法 / 统计计数器 — 已拆分至 ZoomControllerStats.cpp
 // ============================================================
-
-/** @brief 获取X轴对象(第一个QValueAxis) @return X轴指针，不存在返回nullptr */
-QValueAxis* ZoomController::xAxis() const
-{
-    if (!m_chart) return nullptr;
-    for (auto* axis : m_chart->axes(Qt::Horizontal)) {
-        if (auto* va = qobject_cast<QValueAxis*>(axis)) return va;
-    }
-    return nullptr;
-}
-
-/** @brief 获取Y轴对象(第一个QValueAxis) @return Y轴指针，不存在返回nullptr */
-QValueAxis* ZoomController::yAxis() const
-{
-    if (!m_chart) return nullptr;
-    for (auto* axis : m_chart->axes(Qt::Vertical)) {
-        if (auto* va = qobject_cast<QValueAxis*>(axis)) return va;
-    }
-    return nullptr;
-}
-
-// ============================================================
-// 统计计数器接口
-// ============================================================
-
-/** @brief 返回缩放操作总次数 @return 缩放次数 */
-quint64 ZoomController::totalZooms() const
-{
-    return m_totalZooms;
-}
-
-/** @brief 返回平移操作总次数 @return 平移次数 */
-quint64 ZoomController::totalPans() const
-{
-    return m_totalPans;
-}
-
-/** @brief 返回缩放重置总次数 @return 重置次数 */
-quint64 ZoomController::totalResets() const
-{
-    return m_totalResets;
-}
-
-/** @brief 重置所有缩放统计计数器为初始值 */
-void ZoomController::resetZoomStatistics()
-{
-    m_totalZooms = 0;
-    m_totalPans = 0;
-    m_totalResets = 0;
-    m_totalZoomOperations = 0;
-}

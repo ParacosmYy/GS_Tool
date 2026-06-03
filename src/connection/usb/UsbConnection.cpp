@@ -1,10 +1,13 @@
 /**
  * @file UsbConnection.cpp
- * @brief USB连接实现 — 通过UsbLibraryLoader动态调用libusb
+ * @brief USB连接核心生命周期 — 打开/关闭/配置/探测/描述符读取
  *
- * 使用UsbLibraryLoader单例在运行时动态加载libusb共享库，
- * 替代编译时链接。所有libusb调用通过函数指针转发。
- * 当libusb不可用时，操作返回安全默认值并发出错误信号。
+ * 通过UsbLibraryLoader单例动态加载libusb，实现USB设备的连接管理。
+ * 支持内核驱动自动分离(Linux)、设备描述符和字符串描述符读取。
+ *
+ * 传输方法(Bulk/Interrupt/Control)实现在 UsbConnectionTransfer.cpp 中。
+ *
+ * @see UsbConnectionTransfer.cpp — 传输方法实现
  */
 #include "connection/usb/UsbConnection.h"
 #include "connection/usb/UsbLibraryLoader.h"
@@ -36,7 +39,7 @@ ConnectionState UsbConnection::state() const {
     return m_state;
 }
 
-/** @brief 打开USB连接，加载libusb并声明指定接口 @return 成功返回true */
+/** @brief 打开USB连接，加载libusb、分离内核驱动、声明接口 @return 成功返回true */
 bool UsbConnection::open() {
     if (m_vid == 0 || m_pid == 0) {
         emit errorOccurred(tr("未设置USB设备VID/PID"));
@@ -74,6 +77,9 @@ bool UsbConnection::open() {
         return false;
     }
 
+    /* 自动分离内核驱动(Linux有效，Windows无操作) */
+    detachKernelDriverIfNeeded(m_interface);
+
     /* 声明接口 */
     if (loader.claimInterface(m_devHandle, m_interface) != 0) {
         emit errorOccurred(tr("无法声明USB接口 %1").arg(m_interface));
@@ -91,7 +97,7 @@ bool UsbConnection::open() {
     return true;
 }
 
-/** @brief 关闭USB连接，释放接口、关闭设备、释放libusb上下文 */
+/** @brief 关闭USB连接，释放接口、恢复内核驱动、关闭设备、释放libusb上下文 */
 void UsbConnection::close() {
     if (m_state == ConnectionState::Connected) {
         auto& loader = UsbLibraryLoader::instance();
@@ -101,6 +107,9 @@ void UsbConnection::close() {
             loader.releaseInterface(m_devHandle, m_interface);
             m_interfaceClaimed = false;
         }
+
+        /* 内核驱动在releaseInterface后会自动重新绑定 */
+        m_kernelDriverDetached = false;
 
         /* 关闭设备 */
         if (m_devHandle) {
@@ -143,7 +152,9 @@ qint64 UsbConnection::write(const QByteArray& data) {
     }
 
     ++m_totalTransfers;
+    ++m_bulkTransferCount;
     m_totalBytesSent += static_cast<quint64>(transferred);
+    emit bytesWritten(transferred);
     return transferred;
 }
 
@@ -191,13 +202,16 @@ bool UsbConnection::setDevice(quint16 vid, quint16 pid) {
     return found;
 }
 
-/** @brief 声明指定USB接口以便独占使用 @param interface 接口号 @return 声明成功返回true */
+/** @brief 声明指定USB接口以便独占使用，自动处理内核驱动分离 @param interface 接口号 @return 声明成功返回true */
 bool UsbConnection::claimInterface(int interface) {
     m_interface = interface;
 
     if (m_state != ConnectionState::Connected || !m_devHandle) {
         return false;
     }
+
+    /* 先尝试分离内核驱动 */
+    detachKernelDriverIfNeeded(interface);
 
     auto& loader = UsbLibraryLoader::instance();
     int result = loader.claimInterface(m_devHandle, interface);
@@ -221,174 +235,114 @@ void UsbConnection::releaseInterface(int interface) {
     m_interfaceClaimed = false;
 }
 
-/** @brief 执行USB Bulk传输，根据端点方向自动判断收发 @param endpoint 端点地址(bit7决定方向) @param data 发送数据或接收缓冲区大小 @return 实际传输的数据，失败返回空QByteArray */
-QByteArray UsbConnection::bulkTransfer(int endpoint,
-                                        const QByteArray& data) {
+/**
+ * @brief 读取USB设备描述符
+ * 通过UsbLibraryLoader读取18字节标准设备描述符
+ * @return 设备描述符结构体，未连接或读取失败时bNumConfigurations为0
+ */
+UsbDeviceDescriptor UsbConnection::readDeviceDescriptor() {
+    UsbDeviceDescriptor desc{};
+    desc.bNumConfigurations = 0; /* 标记为无效 */
+
     if (!m_devHandle) {
         ++m_errorCount;
-        return QByteArray();
+        return desc;
     }
 
     auto& loader = UsbLibraryLoader::instance();
-
-    /* 根据端点方向决定发送或接收 */
-    bool isOut = (endpoint & 0x80) == 0;
-    int transferred = 0;
-
-    if (isOut) {
-        /* 发送数据 */
-        int result = loader.bulkTransfer(
-            m_devHandle,
-            static_cast<unsigned char>(endpoint),
-            reinterpret_cast<unsigned char*>(const_cast<char*>(data.constData())),
-            data.size(),
-            &transferred,
-            m_timeout);
-
-        if (result != 0) {
-            emit errorOccurred(tr("USB Bulk传输失败: 错误码 %1").arg(result));
-            ++m_errorCount;
-            return QByteArray();
-        }
-
-        ++m_totalTransfers;
-        m_totalBytesSent += static_cast<quint64>(transferred);
-        return data.left(transferred);
-    } else {
-        /* 接收数据 */
-        QByteArray buffer(data.size() > 0 ? data.size() : 4096, '\0');
-        int result = loader.bulkTransfer(
-            m_devHandle,
-            static_cast<unsigned char>(endpoint),
-            reinterpret_cast<unsigned char*>(buffer.data()),
-            buffer.size(),
-            &transferred,
-            m_timeout);
-
-        if (result != 0) {
-            emit errorOccurred(tr("USB Bulk接收失败: 错误码 %1").arg(result));
-            ++m_errorCount;
-            return QByteArray();
-        }
-
-        ++m_totalTransfers;
-        m_totalBytesReceived += static_cast<quint64>(transferred);
-        return buffer.left(transferred);
+    if (loader.getDeviceDescriptor(m_devHandle, &desc) != 0) {
+        emit errorOccurred(tr("读取USB设备描述符失败"));
+        ++m_errorCount;
+        return desc;
     }
+
+    return desc;
 }
 
-/** @brief 执行USB Interrupt传输，根据端点方向自动判断收发 @param endpoint 端点地址(bit7决定方向) @param data 发送数据或接收缓冲区大小 @return 实际传输的数据，失败返回空QByteArray */
-QByteArray UsbConnection::interruptTransfer(int endpoint,
-                                             const QByteArray& data) {
+/**
+ * @brief 读取USB字符串描述符
+ * 通过libusb_get_string_descriptor_ascii读取人类可读的字符串
+ * @param descIndex 字符串描述符索引(来自设备描述符的iManufacturer/iProduct/iSerialNumber)
+ * @return 解码后的字符串，失败返回空
+ */
+QString UsbConnection::readStringDescriptor(quint8 descIndex) {
     if (!m_devHandle) {
         ++m_errorCount;
-        return QByteArray();
+        return QString();
+    }
+
+    if (descIndex == 0) {
+        return QString(); /* 索引0无字符串 */
     }
 
     auto& loader = UsbLibraryLoader::instance();
-    bool isOut = (endpoint & 0x80) == 0;
-
-    if (isOut) {
-        int transferred = 0;
-        int result = loader.interruptTransfer(
-            m_devHandle,
-            static_cast<unsigned char>(endpoint),
-            reinterpret_cast<unsigned char*>(const_cast<char*>(data.constData())),
-            data.size(),
-            &transferred,
-            m_timeout);
-
-        if (result != 0) {
-            emit errorOccurred(tr("USB Interrupt传输失败: 错误码 %1").arg(result));
-            ++m_errorCount;
-            return QByteArray();
-        }
-
-        ++m_totalTransfers;
-        m_totalBytesSent += static_cast<quint64>(transferred);
-        return data.left(transferred);
-    } else {
-        QByteArray buffer(data.size() > 0 ? data.size() : 64, '\0');
-        int transferred = 0;
-        int result = loader.interruptTransfer(
-            m_devHandle,
-            static_cast<unsigned char>(endpoint),
-            reinterpret_cast<unsigned char*>(buffer.data()),
-            buffer.size(),
-            &transferred,
-            m_timeout);
-
-        if (result != 0) {
-            emit errorOccurred(tr("USB Interrupt接收失败: 错误码 %1").arg(result));
-            ++m_errorCount;
-            return QByteArray();
-        }
-
-        ++m_totalTransfers;
-        m_totalBytesReceived += static_cast<quint64>(transferred);
-        return buffer.left(transferred);
+    char buffer[256] = {0};
+    int result = loader.getStringDescriptorAscii(m_devHandle, descIndex,
+                                                  buffer, sizeof(buffer));
+    if (result <= 0) {
+        return QString();
     }
+
+    return QString::fromLocal8Bit(buffer, result);
 }
 
-/** @brief 执行USB Control传输，根据requestType方向自动判断收发 @param requestType 请求类型字节(bit7决定方向) @param request 请求码 @param value wValue字段 @param index wIndex字段 @param data 发送数据或接收缓冲区 @return 实际传输的数据，失败返回空QByteArray */
-QByteArray UsbConnection::controlTransfer(quint8 requestType,
-                                           quint8 request,
-                                           quint16 value,
-                                           quint16 index,
-                                           const QByteArray& data) {
-    if (!m_devHandle) {
-        ++m_errorCount;
-        return QByteArray();
+/**
+ * @brief 获取设备描述符的摘要信息
+ * 读取描述符和字符串描述符，返回完整的设备信息映射
+ * @return 描述符摘要映射 {bcdUSB, deviceClass, vid, pid, manufacturer, product, serial...}
+ */
+QVariantMap UsbConnection::deviceDescriptorSummary() {
+    QVariantMap summary;
+
+    UsbDeviceDescriptor desc = readDeviceDescriptor();
+    if (desc.bNumConfigurations == 0) {
+        /* 读取失败 */
+        return summary;
     }
 
+    summary["bcdUSB"] = desc.bcdUSB;
+    summary["deviceClass"] = desc.bDeviceClass;
+    summary["deviceSubClass"] = desc.bDeviceSubClass;
+    summary["deviceProtocol"] = desc.bDeviceProtocol;
+    summary["vid"] = desc.idVendor;
+    summary["pid"] = desc.idProduct;
+    summary["bcdDevice"] = desc.bcdDevice;
+    summary["numConfigurations"] = desc.bNumConfigurations;
+
+    /* 读取字符串描述符(制造商/产品名/序列号) */
+    summary["manufacturer"] = readStringDescriptor(desc.iManufacturer);
+    summary["product"] = readStringDescriptor(desc.iProduct);
+    summary["serial"] = readStringDescriptor(desc.iSerialNumber);
+
+    return summary;
+}
+
+/**
+ * @brief 检查并分离内核驱动(Linux专用)
+ * Windows上kernelDriverActive始终返回0，此函数为无操作。
+ * Linux上如果内核驱动(如usbserial/cdc_acm)占用接口，
+ * 需要先分离才能claimInterface成功。
+ * @param interfaceNum 接口编号
+ * @return 成功分离或无需分离返回true
+ */
+bool UsbConnection::detachKernelDriverIfNeeded(int interfaceNum) {
     auto& loader = UsbLibraryLoader::instance();
+    if (!m_devHandle) { return false; }
 
-    /* Control传输方向由requestType的bit7决定 */
-    bool isOut = (requestType & 0x80) == 0;
-
-    if (isOut) {
-        /* 发送Control请求 */
-        int result = loader.controlTransfer(
-            m_devHandle, requestType, request, value, index,
-            reinterpret_cast<unsigned char*>(const_cast<char*>(data.constData())),
-            static_cast<quint16>(data.size()),
-            m_timeout);
-
-        if (result < 0) {
-            emit errorOccurred(tr("USB Control传输失败: 错误码 %1").arg(result));
-            ++m_errorCount;
-            return QByteArray();
+    /* 检查内核驱动是否活跃 */
+    int active = loader.kernelDriverActive(m_devHandle, interfaceNum);
+    if (active == 1) {
+        /* 内核驱动活跃，尝试分离 */
+        int result = loader.detachKernelDriver(m_devHandle, interfaceNum);
+        if (result == 0) {
+            m_kernelDriverDetached = true;
+            ++m_kernelDetachCount;
+            return true;
         }
-
-        ++m_totalTransfers;
-        m_totalBytesSent += static_cast<quint64>(result);
-        return data.left(result);
-    } else {
-        /* 接收Control响应 */
-        QByteArray buffer(256, '\0');
-        int result = loader.controlTransfer(
-            m_devHandle, requestType, request, value, index,
-            reinterpret_cast<unsigned char*>(buffer.data()),
-            static_cast<quint16>(buffer.size()),
-            m_timeout);
-
-        if (result < 0) {
-            emit errorOccurred(tr("USB Control接收失败: 错误码 %1").arg(result));
-            ++m_errorCount;
-            return QByteArray();
-        }
-
-        ++m_totalTransfers;
-        m_totalBytesReceived += static_cast<quint64>(result);
-        return buffer.left(result);
+        /* 分离失败 */
+        return false;
     }
-}
 
-/** @brief 重置所有统计计数器 */
-void UsbConnection::resetStats()
-{
-    m_totalTransfers = 0;
-    m_totalBytesSent = 0;
-    m_totalBytesReceived = 0;
-    m_errorCount = 0;
+    /* 内核驱动不活跃(Windows或Linux无驱动占用) */
+    return true;
 }

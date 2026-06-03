@@ -123,6 +123,7 @@ set(SOURCES
     src/chart/overlay/CursorOverlay.cpp
     src/chart/overlay/CursorOverlayPaint.cpp
     src/chart/zoom/ZoomController.cpp
+    src/chart/zoom/ZoomControllerStats.cpp
     src/chart/fft/FftEngine.cpp
     src/chart/fft/FftWidget.cpp
     src/chart/fft/FftWidgetSetup.cpp
@@ -160,6 +161,7 @@ set(SOURCES
     src/core/recording/PlaybackWidget.cpp
     src/core/recording/RecordingMarker.cpp
     src/utils/log/RecordingFileFormat.cpp
+    src/utils/log/RecordingFileIndex.cpp
 
     # ── F3: 多通道数据导出 ──
     src/utils/export/ChartExporter.cpp
@@ -274,6 +276,7 @@ set(SOURCES
 
     # ── F20: USB 调试 ──
     src/connection/usb/UsbConnection.cpp
+    src/connection/usb/UsbConnectionTransfer.cpp
     src/connection/usb/UsbDeviceDetector.cpp
     src/connection/usb/UsbDescriptorViewer.cpp
     src/connection/usb/UsbConfigPanel.cpp

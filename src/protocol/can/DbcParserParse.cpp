@@ -104,15 +104,27 @@ bool DbcParser::parseSignalLine(const QString& line, uint32_t currentMsgId)
 
 /**
  * @brief 解析VAL_值表行
- * @param line 行内容 "VAL_ <id> <signalName> <val> "<desc>" ... ;"
+ * @param line 行内容
  * @return true=解析成功
+ *
+ * DBC值表格式:
+ *   VAL_ <msgId> <signalName> <value1> "<desc1>" <value2> "<desc2>" ... ;
+ *   VAL_ <globalTableName> <value1> "<desc1>" ... ;  (全局值表，暂不处理)
  */
 bool DbcParser::parseValueTableLine(const QString& line)
 {
-    /* VAL_ 1234 SignalName 0 "Off" 1 "On" ; */
-    static const QRegularExpression re("^VAL_\\s+(\\d+)\\s+(\\w+)\\s+(.+);");
-    const auto match = re.match(line);
+    /* VAL_ 1234 SignalName 0 "Off" 1 "On" ; — 信号关联值表 */
+    static const QRegularExpression sigValRe("^VAL_\\s+(\\d+)\\s+(\\w+)\\s+(.+);");
+    const auto match = sigValRe.match(line);
     if (!match.hasMatch()) {
+        /**
+         * 全局值表格式: VAL_ <tableName> <val> "<desc>" ... ;
+         * 当前版本不处理全局值表(无消息ID关联)，直接跳过不报错
+         */
+        static const QRegularExpression globalValRe("^VAL_\\s+(\\w+)\\s+.+;");
+        if (globalValRe.match(line).hasMatch()) {
+            return true;  ///< 全局值表，合法但暂不处理
+        }
         return false;
     }
 
@@ -137,27 +149,34 @@ bool DbcParser::parseValueTableLine(const QString& line)
         return false;
     }
 
-    /* 解析 "值 描述" 对 */
-    static const QRegularExpression pairRe("(\\d+)\\s+\"([^\"]*)\"");
+    /* 解析 "值 描述" 对: 匹配所有 <integer> "string" 模式 */
+    static const QRegularExpression pairRe("(-?\\d+)\\s+\"([^\"]*)\"");
     auto it = pairRe.globalMatch(pairs);
+    bool foundAny = false;
     while (it.hasNext()) {
         const auto m = it.next();
         const int val = m.captured(1).toInt();
         const QString desc = m.captured(2);
         target->valueTable[val] = desc;
+        foundAny = true;
     }
 
-    return true;
+    return foundAny;
 }
 
 /**
  * @brief 解析CM_注释行
  * @param line 行内容
  * @return true=解析成功
+ *
+ * DBC注释格式:
+ *   CM_ BO_ <msgId> "<注释>";         — 消息注释
+ *   CM_ SG_ <msgId> <sigName> "<注释>"; — 信号注释
+ *   CM_ "<注释>";                      — 全局注释(跳过)
  */
 bool DbcParser::parseCommentLine(const QString& line)
 {
-    /* CM_ BO_ 1234 "注释内容"; */
+    /* CM_ BO_ 1234 "注释内容"; — 消息级注释 */
     static const QRegularExpression msgCommentRe(
         "^CM_\\s+BO_\\s+(\\d+)\\s+\"([^\"]*)\"\\s*;");
     auto match = msgCommentRe.match(line);
@@ -169,39 +188,73 @@ bool DbcParser::parseCommentLine(const QString& line)
         return true;
     }
 
-    /* CM_ SG_ 1234 SignalName "注释内容"; */
+    /* CM_ SG_ 1234 SignalName "注释内容"; — 信号级注释 */
     static const QRegularExpression sigCommentRe(
         "^CM_\\s+SG_\\s+(\\d+)\\s+(\\w+)\\s+\"([^\"]*)\"\\s*;");
     match = sigCommentRe.match(line);
-    Q_UNUSED(match)
+    if (match.hasMatch()) {
+        const uint32_t msgId = match.captured(1).toUInt();
+        const QString sigName = match.captured(2);
+        const QString comment = match.captured(3);
 
+        if (m_messages.contains(msgId)) {
+            DbcMessage& msg = m_messages[msgId];
+            for (DbcSignal& sig : msg.signalList) {
+                if (sig.name == sigName) {
+                    sig.comment = comment;
+                    break;
+                }
+            }
+        }
+        return true;
+    }
+
+    /* CM_ BU_ NodeName "注释"; — 节点注释或其他格式，合法但暂不处理 */
     return false;
 }
 
 /**
  * @brief 解析BA_属性行
- * @param line 行内容 "BA_ "<attrName>" BO_ <id> <value>;"
+ * @param line 行内容
  * @return true=解析成功
+ *
+ * DBC属性定义格式:
+ *   BA_ "<attrName>" BO_ <msgId> <value>;     — 消息属性(整数或浮点)
+ *   BA_ "<attrName>" SG_ <msgId> <sigName> <value>; — 信号属性
+ *   BA_ "<attrName>" "<stringValue>";          — 全局默认属性
  */
 bool DbcParser::parseAttributeLine(const QString& line)
 {
-    /* BA_ "GenMsgCycleTime" BO_ 1234 100; */
-    static const QRegularExpression re(
-        "^BA_\\s+\"([^\"]+)\"\\s+BO_\\s+(\\d+)\\s+(\\w+)\\s*;");
-    const auto match = re.match(line);
-    if (!match.hasMatch()) {
-        return false;
+    /* BA_ "GenMsgCycleTime" BO_ 1234 100; — 消息级属性 */
+    static const QRegularExpression msgAttrRe(
+        "^BA_\\s+\"([^\"]+)\"\\s+BO_\\s+(\\d+)\\s+([^;]+)\\s*;");
+    auto match = msgAttrRe.match(line);
+    if (match.hasMatch()) {
+        const QString attrName = match.captured(1);
+        const uint32_t msgId = match.captured(2).toUInt();
+        const QString attrValue = match.captured(3).trimmed();
+
+        if (m_messages.contains(msgId)) {
+            m_messages[msgId].attributes[attrName] = attrValue;
+        }
+        return true;
     }
 
-    const QString attrName = match.captured(1);
-    const uint32_t msgId = match.captured(2).toUInt();
-    const QString attrValue = match.captured(3);
-
-    if (m_messages.contains(msgId)) {
-        m_messages[msgId].attributes[attrName] = attrValue;
+    /* BA_ "GenSigStartValue" SG_ 1234 SigName 0; — 信号级属性(暂跳过) */
+    static const QRegularExpression sigAttrRe(
+        "^BA_\\s+\"([^\"]+)\"\\s+SG_\\s+\\d+\\s+\\w+\\s+[^;]+;");
+    if (sigAttrRe.match(line).hasMatch()) {
+        return true;  ///< 合法格式，暂不存储信号级属性
     }
 
-    return true;
+    /* BA_ "attrName" "stringValue"; — 全局默认属性(暂跳过) */
+    static const QRegularExpression globalAttrRe(
+        "^BA_\\s+\"([^\"]+)\"\\s+\"([^\"]+)\"\\s*;");
+    if (globalAttrRe.match(line).hasMatch()) {
+        return true;  ///< 合法格式，暂不处理全局属性
+    }
+
+    return false;
 }
 
 /**

@@ -29,6 +29,7 @@ struct DbcSignal {
     double maximum = 1.0;   ///< 最大值
     QString unit;           ///< 单位
     QString receiver;       ///< 接收节点
+    QString comment;        ///< 信号注释(CM_ SG_ ...)
     QMap<int, QString> valueTable; ///< 值表(原始值→描述)
 };
 

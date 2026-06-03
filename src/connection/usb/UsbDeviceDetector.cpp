@@ -2,29 +2,157 @@
  * @file UsbDeviceDetector.cpp
  * @brief USB设备检测器实现
  *
- * 通过Windows WMIC命令枚举USB设备，定时轮询检测设备变化。
- * TODO: 未来可替换为libusb_hotplug回调或Windows SetupAPI。
+ * 双通道设备扫描:
+ * 1. libusb方式 — 通过UsbLibraryLoader动态加载libusb，读取设备描述符
+ *    和字符串描述符(制造商/产品/序列号)，信息最完整
+ * 2. WMIC方式 — 通过Windows WMIC命令枚举USB设备，不依赖libusb，
+ *    可获取设备名和制造商，但无法获取序列号
+ * 优先使用libusb，不可用时自动回退到WMIC。
  */
 #include "connection/usb/UsbDeviceDetector.h"
+#include "connection/usb/UsbLibraryLoader.h"
 
 #include <QProcess>
 #include <QRegularExpression>
 
-/** @brief 构造USB设备检测器，初始化轮询定时器 @param parent 父QObject指针 */
+/** @brief 构造USB设备检测器，初始化轮询定时器并检测libusb可用性 @param parent 父QObject指针 */
 UsbDeviceDetector::UsbDeviceDetector(QObject* parent)
     : QObject(parent)
     , m_pollTimer(new QTimer(this))
 {
     connect(m_pollTimer, &QTimer::timeout,
             this, &UsbDeviceDetector::onPollTimeout);
+
+    /* 检测libusb是否可用(不强制加载) */
+    auto& loader = UsbLibraryLoader::instance();
+    m_libusbAvailable = loader.isLoaded();
+    if (!m_libusbAvailable) {
+        m_libusbAvailable = loader.load();
+    }
 }
 
 /**
- * @brief 扫描当前所有USB设备 — 通过WMIC枚举
- * 解析Win32_USBControllerDevice获取设备VID/PID和描述
+ * @brief 扫描当前所有USB设备
+ * 优先使用libusb扫描(信息更丰富)，不可用时回退到WMIC
+ * @return 设备信息列表
  */
 QVariantList UsbDeviceDetector::scanDevices() {
     QVariantList devices;
+
+    /* 优先尝试libusb扫描 */
+    if (m_libusbAvailable) {
+        devices = scanDevicesViaLibusb();
+        if (!devices.isEmpty()) {
+            m_devices = devices;
+            m_totalDevicesDetected += static_cast<quint64>(devices.size());
+            emit scanCompleted(devices, QStringLiteral("libusb"));
+            return devices;
+        }
+    }
+
+    /* libusb不可用或未发现设备时回退到WMIC */
+    devices = scanDevicesViaWmic();
+    m_devices = devices;
+    m_totalDevicesDetected += static_cast<quint64>(devices.size());
+    emit scanCompleted(devices, QStringLiteral("wmic"));
+    return devices;
+}
+
+/**
+ * @brief 使用libusb扫描USB设备并读取完整描述符信息
+ * 初始化临时libusb上下文，遍历设备列表，读取设备描述符和字符串描述符
+ * @return 设备信息列表
+ */
+QVariantList UsbDeviceDetector::scanDevicesViaLibusb() {
+    QVariantList devices;
+    ++m_totalLibusbScans;
+
+    auto& loader = UsbLibraryLoader::instance();
+    if (!loader.isLoaded()) {
+        return devices;
+    }
+
+    /* 初始化临时上下文 */
+    UsbContext* ctx = nullptr;
+    if (loader.init(&ctx) != 0) {
+        return devices;
+    }
+
+    /* 通过已知VID/PID范围尝试探测常见设备 */
+    /* 使用getDeviceDescriptor逐个尝试打开已知设备，收集信息 */
+    /* 由于libusb未提供直接枚举所有设备的包装器，
+     * 这里采用辅助策略: 先用WMIC获取VID/PID列表，
+     * 再用libusb打开每个设备获取详细描述符 */
+
+    /* 如果WMIC可用，先用它获取原始VID/PID列表 */
+    QVariantList wmicList = scanDevicesViaWmic();
+
+    for (const QVariant& var : wmicList) {
+        QVariantMap wmicDev = var.toMap();
+        quint16 vid = static_cast<quint16>(wmicDev["vid"].toUInt());
+        quint16 pid = static_cast<quint16>(wmicDev["pid"].toUInt());
+
+        /* 尝试用libusb打开设备获取详细信息 */
+        auto* handle = loader.openDeviceWithVidPid(ctx, vid, pid);
+        if (!handle) {
+            /* libusb无法打开(权限/驱动占用)，保留WMIC信息 */
+            devices.append(wmicDev);
+            continue;
+        }
+
+        /* 读取设备描述符 */
+        UsbDeviceDescriptor desc;
+        QByteArray descBytes(reinterpret_cast<const char*>(&desc), sizeof(desc));
+
+        if (loader.getDeviceDescriptor(handle, &desc) != 0) {
+            /* 描述符读取失败，使用WMIC数据 */
+            loader.close(handle);
+            devices.append(wmicDev);
+            continue;
+        }
+
+        /* 读取字符串描述符 */
+        char strBuf[256] = {0};
+        QString manufacturer;
+        if (desc.iManufacturer > 0 &&
+            loader.getStringDescriptorAscii(handle, desc.iManufacturer,
+                                           strBuf, sizeof(strBuf)) > 0) {
+            manufacturer = QString::fromLocal8Bit(strBuf);
+        }
+
+        QString product;
+        if (desc.iProduct > 0 &&
+            loader.getStringDescriptorAscii(handle, desc.iProduct,
+                                           strBuf, sizeof(strBuf)) > 0) {
+            product = QString::fromLocal8Bit(strBuf);
+        }
+
+        QString serial;
+        if (desc.iSerialNumber > 0 &&
+            loader.getStringDescriptorAscii(handle, desc.iSerialNumber,
+                                           strBuf, sizeof(strBuf)) > 0) {
+            serial = QString::fromLocal8Bit(strBuf);
+        }
+
+        QVariantMap devMap = descriptorToMap(vid, pid, desc,
+                                             manufacturer, product, serial);
+        devices.append(devMap);
+        loader.close(handle);
+    }
+
+    loader.exit(ctx);
+    return devices;
+}
+
+/**
+ * @brief 使用WMIC命令枚举USB设备(不依赖libusb)
+ * 解析Win32_USBControllerDevice获取设备VID/PID，
+ * 再查询Win32_PnPEntity获取设备名和制造商
+ * @return 设备信息列表
+ */
+QVariantList UsbDeviceDetector::scanDevicesViaWmic() {
+    QVariantList devices;
+    ++m_totalWmicScans;
 
     QProcess process;
     process.start("wmic", {"path", "Win32_USBControllerDevice",
@@ -32,9 +160,8 @@ QVariantList UsbDeviceDetector::scanDevices() {
     process.waitForFinished(5000);
     QString output = QString::fromLocal8Bit(process.readAllStandardOutput());
 
-    // 解析设备ID行，提取VID/PID
+    /* 解析设备ID行，提取VID/PID */
     QRegularExpression vidPidRe("VID_([0-9A-Fa-f]{4})&PID_([0-9A-Fa-f]{4})");
-    QRegularExpression descRe("Description=([^\r\n]+)");
 
     QStringList lines = output.split("\n", Qt::SkipEmptyParts);
     for (const QString& line : lines) {
@@ -48,7 +175,7 @@ QVariantList UsbDeviceDetector::scanDevices() {
         quint16 pid = static_cast<quint16>(pidStr.toUInt(&okP, 16));
         if (!okV || !okP) { continue; }
 
-        // 检查是否已存在（去重）
+        /* 去重: 同一个VID/PID只保留一个 */
         bool dup = false;
         for (const QVariant& var : devices) {
             QVariantMap d = var.toMap();
@@ -68,10 +195,12 @@ QVariantList UsbDeviceDetector::scanDevices() {
                              .arg(vidStr, pidStr);
         device["manufacturer"] = QString();
         device["serial"] = QString();
+        device["bcdUSB"] = 0;
+        device["deviceClass"] = 0;
         devices.append(device);
     }
 
-    // 尝试获取更详细的信息
+    /* 尝试获取更详细的名称和制造商 */
     QProcess detailProc;
     detailProc.start("wmic", {"path", "Win32_PnPEntity", "get",
                                "DeviceID,Name,Manufacturer",
@@ -80,7 +209,6 @@ QVariantList UsbDeviceDetector::scanDevices() {
     QString detailOutput = QString::fromLocal8Bit(
         detailProc.readAllStandardOutput());
 
-    // 匹配设备名和制造商
     for (int i = 0; i < devices.size(); ++i) {
         QVariantMap dev = devices[i].toMap();
         QString vidHex = dev["vidHex"].toString();
@@ -107,9 +235,114 @@ QVariantList UsbDeviceDetector::scanDevices() {
         devices[i] = dev;
     }
 
-    m_devices = devices;
-    m_totalDevicesDetected += static_cast<quint64>(devices.size());
     return devices;
+}
+
+/**
+ * @brief 通过libusb获取指定设备的字符串描述符
+ * 打开设备，读取iManufacturer/iProduct/iSerialNumber字符串
+ * @param vid 厂商ID
+ * @param pid 产品ID
+ * @return 包含manufacturer/product/serial字段的映射
+ */
+QVariantMap UsbDeviceDetector::fetchStringDescriptors(quint16 vid,
+                                                       quint16 pid) {
+    QVariantMap result;
+    result["manufacturer"] = QString();
+    result["product"] = QString();
+    result["serial"] = QString();
+
+    auto& loader = UsbLibraryLoader::instance();
+    if (!loader.isLoaded()) {
+        if (!loader.load()) {
+            return result;
+        }
+    }
+
+    UsbContext* ctx = nullptr;
+    if (loader.init(&ctx) != 0) {
+        return result;
+    }
+
+    auto* handle = loader.openDeviceWithVidPid(ctx, vid, pid);
+    if (!handle) {
+        loader.exit(ctx);
+        return result;
+    }
+
+    /* 先读取设备描述符获取字符串索引 */
+    UsbDeviceDescriptor desc;
+    if (loader.getDeviceDescriptor(handle, &desc) != 0) {
+        loader.close(handle);
+        loader.exit(ctx);
+        return result;
+    }
+
+    char strBuf[256] = {0};
+
+    if (desc.iManufacturer > 0 &&
+        loader.getStringDescriptorAscii(handle, desc.iManufacturer,
+                                       strBuf, sizeof(strBuf)) > 0) {
+        result["manufacturer"] = QString::fromLocal8Bit(strBuf);
+    }
+
+    if (desc.iProduct > 0 &&
+        loader.getStringDescriptorAscii(handle, desc.iProduct,
+                                       strBuf, sizeof(strBuf)) > 0) {
+        result["product"] = QString::fromLocal8Bit(strBuf);
+    }
+
+    if (desc.iSerialNumber > 0 &&
+        loader.getStringDescriptorAscii(handle, desc.iSerialNumber,
+                                       strBuf, sizeof(strBuf)) > 0) {
+        result["serial"] = QString::fromLocal8Bit(strBuf);
+    }
+
+    loader.close(handle);
+    loader.exit(ctx);
+    return result;
+}
+
+/**
+ * @brief 将设备描述符转换为QVariantMap
+ * @param vid 厂商ID
+ * @param pid 产品ID
+ * @param desc 设备描述符结构体
+ * @param manufacturer 制造商字符串
+ * @param product 产品字符串
+ * @param serial 序列号字符串
+ * @return 包含完整设备信息的映射
+ */
+QVariantMap UsbDeviceDetector::descriptorToMap(
+    quint16 vid, quint16 pid,
+    const UsbDeviceDescriptor& desc,
+    const QString& manufacturer,
+    const QString& product,
+    const QString& serial)
+{
+    QVariantMap dev;
+    dev["vid"] = vid;
+    dev["pid"] = pid;
+    dev["vidHex"] = QString("%1").arg(vid, 4, 16, QChar('0')).toUpper();
+    dev["pidHex"] = QString("%1").arg(pid, 4, 16, QChar('0')).toUpper();
+    dev["bcdUSB"] = desc.bcdUSB;
+    dev["deviceClass"] = desc.bDeviceClass;
+    dev["deviceSubClass"] = desc.bDeviceSubClass;
+    dev["deviceProtocol"] = desc.bDeviceProtocol;
+    dev["bcdDevice"] = desc.bcdDevice;
+    dev["numConfigurations"] = desc.bNumConfigurations;
+
+    /* 名称优先使用libusb读取的产品字符串 */
+    if (!product.isEmpty()) {
+        dev["name"] = product;
+    } else {
+        dev["name"] = tr("USB设备 VID_%1 PID_%2")
+                          .arg(dev["vidHex"].toString(),
+                               dev["pidHex"].toString());
+    }
+    dev["manufacturer"] = manufacturer;
+    dev["serial"] = serial;
+    return dev;
 }
 
 /** @brief 获取指定VID/PID的USB设备详细信息 @param vid 厂商ID @param pid 产品ID @return 设备详情映射表 */
@@ -138,6 +371,11 @@ void UsbDeviceDetector::stopMonitoring() {
     m_pollTimer->stop();
 }
 
+/** @brief 检查libusb是否可用 @return libusb已加载返回true */
+bool UsbDeviceDetector::isLibusbAvailable() const {
+    return m_libusbAvailable;
+}
+
 /** @brief 轮询定时器超时回调，执行一次扫描并检测设备变化 */
 void UsbDeviceDetector::onPollTimeout() {
     ++m_totalDetectionCycles;
@@ -147,7 +385,7 @@ void UsbDeviceDetector::onPollTimeout() {
 
 /** @brief 对比新旧设备列表，检测插入和移除事件 @param newList 最新扫描到的设备列表 */
 void UsbDeviceDetector::detectChanges(const QVariantList& newList) {
-    // 检测插入的设备
+    /* 检测插入的设备 */
     for (const QVariant& var : newList) {
         QVariantMap dev = var.toMap();
         bool found = false;
@@ -164,7 +402,7 @@ void UsbDeviceDetector::detectChanges(const QVariantList& newList) {
         }
     }
 
-    // 检测移除的设备
+    /* 检测移除的设备 */
     for (const QVariant& var : m_devices) {
         QVariantMap dev = var.toMap();
         bool found = false;
@@ -208,6 +446,18 @@ quint64 UsbDeviceDetector::totalDetachEvents() const
     return m_totalDetachEvents;
 }
 
+/** @brief 获取libusb扫描调用次数 */
+quint64 UsbDeviceDetector::totalLibusbScans() const
+{
+    return m_totalLibusbScans;
+}
+
+/** @brief 获取WMIC扫描调用次数 */
+quint64 UsbDeviceDetector::totalWmicScans() const
+{
+    return m_totalWmicScans;
+}
+
 /** @brief 重置所有统计计数器 */
 void UsbDeviceDetector::resetStatistics()
 {
@@ -215,4 +465,6 @@ void UsbDeviceDetector::resetStatistics()
     m_totalDevicesDetected = 0;
     m_totalAttachEvents = 0;
     m_totalDetachEvents = 0;
+    m_totalLibusbScans = 0;
+    m_totalWmicScans = 0;
 }
