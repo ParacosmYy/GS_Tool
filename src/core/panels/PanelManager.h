@@ -145,10 +145,29 @@ public:
     /** @brief 是否处于紧凑模式 */
     bool isCompactMode() const;
 
+    // ==================== 面板统计 ====================
+
+    /** @brief 通知面板切换发生（由 NavigationController 调用） */
+    void onPanelSwitched(int visibleCount);
+
+    /** @brief 获取累计面板切换次数 */
+    quint64 totalPanelSwitches() const;
+    /** @brief 获取累计创建面板总数 */
+    quint64 totalPanelsCreated() const;
+    /** @brief 获取历史最大并发面板数 */
+    quint64 maxConcurrentPanels() const;
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
 private:
     // --- BasePanel包装器 ---
     QMap<QWidget*, BasePanel*> m_wrappers;  ///< 原始面板→BasePanel包装器映射
     bool m_compactMode = false;             ///< 紧凑模式标志
+
+    // --- 统计计数器 ---
+    quint64 m_totalPanelSwitches = 0;       ///< 累计面板切换次数
+    quint64 m_totalPanelsCreated = 0;       ///< 累计创建面板总数
+    quint64 m_maxConcurrentPanels = 0;      ///< 历史最大并发面板数
 };
 
 #endif // PANEL_MANAGER_H

@@ -104,27 +104,15 @@ TerminalSearchBar*   PanelManager::searchBar()          const { return m_searchB
 QuickCommandBar*     PanelManager::quickCmdBar()        const { return m_quickCmdBar; }
 /** @brief 书签面板 */
 BookmarkWidget*      PanelManager::bookmarkWidget()     const { return m_bookmarkWidget; }
-
-// ==================== 录制回放 ====================
-
+// ==================== 录制回放 / 仪表盘 / 终端增强 / 脚本录制 ====================
 /** @brief 录制回放面板 */
 PlaybackWidget*      PanelManager::playbackWidget()     const { return m_playbackWidget; }
-
-// ==================== 仪表盘 ====================
-
 /** @brief 仪表盘面板 */
 DashboardWidget*     PanelManager::dashboardWidget()    const { return m_dashboardWidget; }
-
-// ==================== 终端增强 ====================
-
 /** @brief 终端过滤栏 */
 TerminalFilterBar*   PanelManager::terminalFilterBar()  const { return m_terminalFilterBar; }
-
-// ==================== 脚本录制 ====================
-
 /** @brief 脚本录制器面板 */
 ScriptRecorder*      PanelManager::scriptRecorder()     const { return m_scriptRecorder; }
-
 // ==================== 连接层 Getter ====================
 
 /** @brief BLE配置面板 */
@@ -149,7 +137,6 @@ WsConfigPanel*           PanelManager::wsConfigPanel()           const { return 
 UsbConfigPanel*          PanelManager::usbConfigPanel()          const { return m_usbConfigPanel; }
 /** @brief USB描述符查看器 */
 UsbDescriptorViewer*     PanelManager::usbDescriptorViewer()     const { return m_usbDescriptorViewer; }
-
 // ==================== 协议层 Getter ====================
 
 /** @brief 自定义协议编辑器 */
@@ -369,19 +356,11 @@ void PanelManager::wrapPanels()
     wrap(m_chartWidget, tr("波形图"));
     wrap(m_otaWidget, tr("OTA升级"));
     wrap(m_bookmarkWidget, tr("书签"));
-
-    // ---- 录制回放 ----
+    // ---- 录制回放 / 仪表盘 / 终端增强 / 脚本录制 ----
     wrap(m_playbackWidget, tr("录制回放"));
-
-    // ---- 仪表盘 ----
     wrap(m_dashboardWidget, tr("仪表盘"));
-
-    // ---- 终端增强 ----
     wrap(m_terminalFilterBar, tr("终端过滤"));
-
-    // ---- 脚本录制 ----
     wrap(m_scriptRecorder, tr("脚本录制"));
-
     // ---- 连接层 ----
     wrap(m_bleConfigPanel, tr("BLE配置"));
     wrap(m_bleGattBrowser, tr("BLE浏览"));
@@ -394,13 +373,11 @@ void PanelManager::wrapPanels()
     wrap(m_wsConfigPanel, tr("WebSocket"));
     wrap(m_usbConfigPanel, tr("USB配置"));
     wrap(m_usbDescriptorViewer, tr("USB描述符"));
-
     // ---- 协议层 ----
     wrap(m_protocolSchemaEditor, tr("自定义协议"));
     wrap(m_modbusConfigPanel, tr("Modbus配置"));
     wrap(m_modbusScanWidget, tr("Modbus扫描"));
     wrap(m_schemaViewer, tr("Protobuf查看"));
-
     // ---- 调试层 ----
     wrap(m_rttConfigPanel, tr("RTT配置"));
     wrap(m_registerEditor, tr("寄存器编辑"));
@@ -408,19 +385,16 @@ void PanelManager::wrapPanels()
     wrap(m_trafficMonitorWidget, tr("流量监控"));
     wrap(m_triggerListPanel, tr("触发器"));
     wrap(m_performanceOverlay, tr("性能监控"));
-
     // ---- 图表扩展 ----
     wrap(m_fftWidget, tr("FFT频谱"));
     wrap(m_scatterWidget, tr("散点图"));
     wrap(m_histogramWidget, tr("直方图"));
-
     // ---- 工具层 ----
     wrap(m_checksumPanel, tr("校验计算"));
     wrap(m_converterPanel, tr("数据转换"));
     wrap(m_timestampPanel, tr("时间戳"));
     wrap(m_packetBuilderPanel, tr("数据包构建"));
     wrap(m_dataDiffPanel, tr("数据对比"));
-
     // ---- 系统层 ----
     wrap(m_pluginConfigPanel, tr("插件系统"));
     wrap(m_projectWelcomeDialog, tr("项目管理"));
@@ -473,4 +447,54 @@ void PanelManager::setCompactMode(bool compact)
 bool PanelManager::isCompactMode() const
 {
     return m_compactMode;
+}
+
+// ==================== 面板切换通知 ====================
+
+/**
+ * @brief 通知面板切换发生（由 NavigationController 调用）
+ *
+ * 更新面板切换计数和最大并发面板数。
+ *
+ * @param visibleCount 当前可见面板数量
+ */
+void PanelManager::onPanelSwitched(int visibleCount)
+{
+    // 统计：累计面板切换计数
+    ++m_totalPanelSwitches;
+
+    // 统计：更新最大并发面板数
+    if (static_cast<quint64>(visibleCount) > m_maxConcurrentPanels) {
+        m_maxConcurrentPanels = static_cast<quint64>(visibleCount);
+    }
+}
+
+// ==================== 统计接口 ====================
+
+/** @brief 获取累计面板切换次数 */
+quint64 PanelManager::totalPanelSwitches() const
+{
+    return m_totalPanelSwitches;
+}
+
+/** @brief 获取累计创建面板总数 */
+quint64 PanelManager::totalPanelsCreated() const
+{
+    return m_totalPanelsCreated;
+}
+
+/** @brief 获取历史最大并发面板数 */
+quint64 PanelManager::maxConcurrentPanels() const
+{
+    return m_maxConcurrentPanels;
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void PanelManager::resetStats()
+{
+    m_totalPanelSwitches = 0;
+    m_totalPanelsCreated = 0;
+    m_maxConcurrentPanels = 0;
 }

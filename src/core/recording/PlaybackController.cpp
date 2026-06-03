@@ -72,6 +72,9 @@ void PlaybackController::play()
     m_elapsed.start();
     m_timer->start(16);
 
+    // 统计：累计回放启动计数
+    ++m_totalPlaybacks;
+
     emit playbackStarted();
 }
 
@@ -99,6 +102,10 @@ void PlaybackController::pause()
     }
 
     m_timer->stop();
+
+    // 统计：累计暂停计数
+    ++m_totalPauses;
+
     emit playbackPaused();
 }
 
@@ -161,6 +168,9 @@ void PlaybackController::seekTo(qint64 timeMs)
     if (m_playing) {
         m_elapsed.restart();
     }
+
+    // 统计：累计定位计数
+    ++m_totalSeeks;
 
     emit timeUpdated(m_currentTimeMs);
 }
@@ -298,4 +308,41 @@ void PlaybackController::resetStatistics()
     m_playCount = 0;
     m_totalPlayTimeMs = 0;
     m_speedSum = 0.0;
+}
+
+/* ============================================================
+ * 统计接口
+ * ============================================================ */
+
+/** @brief 获取累计回放启动次数 */
+quint64 PlaybackController::totalPlaybacks() const
+{
+    return m_totalPlaybacks;
+}
+
+/** @brief 获取累计暂停次数 */
+quint64 PlaybackController::totalPauses() const
+{
+    return m_totalPauses;
+}
+
+/** @brief 获取累计定位次数 */
+quint64 PlaybackController::totalSeeks() const
+{
+    return m_totalSeeks;
+}
+
+/**
+ * @brief 重置所有统计计数器（含基础统计和扩展统计）
+ */
+void PlaybackController::resetStats()
+{
+    // 基础统计
+    m_playCount = 0;
+    m_totalPlayTimeMs = 0;
+    m_speedSum = 0.0;
+    // 扩展统计
+    m_totalPlaybacks = 0;
+    m_totalPauses = 0;
+    m_totalSeeks = 0;
 }

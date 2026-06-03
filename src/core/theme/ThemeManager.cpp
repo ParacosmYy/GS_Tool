@@ -125,6 +125,9 @@ bool ThemeManager::loadTheme(const QString& themeName)
     // 从QSS中解析语义色板覆盖默认值
     parseColorsFromQss(qss);
 
+    // 统计：累计主题切换计数
+    ++m_totalThemeSwitches;
+
     emit themeChanged();
     qDebug() << "Theme loaded:" << themeName;
     return true;
@@ -155,6 +158,11 @@ bool ThemeManager::loadThemeFromFile(const QString& filePath)
     }
 
     parseColorsFromQss(qss);
+
+    // 统计：累计自定义主题加载计数
+    ++m_totalCustomThemesLoaded;
+    // 统计：累计主题切换计数（自定义加载也算一次切换）
+    ++m_totalThemeSwitches;
 
     emit themeChanged();
     qDebug() << "Theme loaded from file:" << filePath;
@@ -396,4 +404,27 @@ void ThemeManager::parseColorsFromQss(const QString& qssContent)
             }
         }
     }
+}
+
+// ==================== 统计接口 ====================
+
+/** @brief 获取累计主题切换次数 */
+quint64 ThemeManager::totalThemeSwitches() const
+{
+    return m_totalThemeSwitches;
+}
+
+/** @brief 获取累计自定义主题加载次数 */
+quint64 ThemeManager::totalCustomThemesLoaded() const
+{
+    return m_totalCustomThemesLoaded;
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void ThemeManager::resetStats()
+{
+    m_totalThemeSwitches = 0;
+    m_totalCustomThemesLoaded = 0;
 }

@@ -80,8 +80,41 @@ public:
     /** @brief 获取当前活跃连接数量 */
     int count() const;
 
+    /**
+     * @brief 切换活跃连接到指定实例
+     *
+     * 将 m_activeConnection 指向目标连接，用于多连接场景下的快速切换。
+     * 目标连接必须已存在于活跃列表中，否则不做任何操作。
+     *
+     * @param conn 目标连接指针
+     */
+    void switchActiveConnection(IConnection* conn);
+
+    /** @brief 获取当前活跃连接（最近创建或切换到的连接） */
+    IConnection* activeConnection() const;
+
+    // ==================== 统计接口 ====================
+
+    /** @brief 获取累计创建连接总数 */
+    quint64 totalConnectionsCreated() const;
+
+    /** @brief 获取累计销毁连接总数 */
+    quint64 totalConnectionsDestroyed() const;
+
+    /** @brief 获取累计切换连接次数 */
+    quint64 totalSwitches() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
 private:
-    QList<IConnection*> m_connections;  ///< 活跃连接列表
+    QList<IConnection*> m_connections;      ///< 活跃连接列表
+    IConnection* m_activeConnection = nullptr; ///< 当前活跃连接
+
+    // ---- 统计计数器 ----
+    quint64 m_totalConnectionsCreated = 0;    ///< 累计创建连接数
+    quint64 m_totalConnectionsDestroyed = 0;  ///< 累计销毁连接数
+    quint64 m_totalSwitches = 0;              ///< 累计切换次数
 };
 
 #endif // CONNECTIONMANAGER_H

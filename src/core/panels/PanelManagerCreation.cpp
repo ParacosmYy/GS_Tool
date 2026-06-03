@@ -319,4 +319,7 @@ void PanelManager::createPanels(OtaManager* otaManager, TerminalModel* terminalM
     m_performanceOverlay = new PerformanceOverlay(widgetParent);    // F10 性能监控
     m_performanceOverlay->setObjectName("performanceOverlay");
     m_performanceOverlay->setVisible(false);
+
+    // 统计：累计创建面板计数（allPanels().size() 给出实际面板总数）
+    m_totalPanelsCreated = static_cast<quint64>(allPanels().size());
 }

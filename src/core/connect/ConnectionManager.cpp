@@ -46,6 +46,10 @@ IConnection* ConnectionManager::createConnection(ConnectionType type)
     auto* conn = ConnectionFactory::create(type, nullptr);
     if (conn) {
         m_connections.append(conn);
+        m_activeConnection = conn;
+
+        // 统计：累计创建连接计数
+        ++m_totalConnectionsCreated;
     }
     return conn;
 }
@@ -70,6 +74,15 @@ IConnection* ConnectionManager::createSerialConnection()
 void ConnectionManager::removeConnection(IConnection* conn)
 {
     if (m_connections.removeOne(conn)) {
+        // 统计：累计销毁连接计数
+        ++m_totalConnectionsDestroyed;
+
+        // 如果删除的是活跃连接，自动切换到列表中最后一个
+        if (m_activeConnection == conn) {
+            m_activeConnection = m_connections.isEmpty()
+                ? nullptr
+                : m_connections.last();
+        }
         conn->close();
         conn->deleteLater();
     }
@@ -98,4 +111,60 @@ IConnection* ConnectionManager::connection(int index) const
 int ConnectionManager::count() const
 {
     return m_connections.size();
+}
+
+/**
+ * @brief 切换活跃连接到指定实例
+ *
+ * 目标连接必须已存在于活跃列表中，否则不做任何操作。
+ *
+ * @param conn 目标连接指针
+ */
+void ConnectionManager::switchActiveConnection(IConnection* conn)
+{
+    if (!conn || !m_connections.contains(conn)) {
+        return;
+    }
+    if (m_activeConnection == conn) {
+        return;
+    }
+
+    m_activeConnection = conn;
+
+    // 统计：累计切换计数
+    ++m_totalSwitches;
+}
+
+/** @brief 获取当前活跃连接 */
+IConnection* ConnectionManager::activeConnection() const
+{
+    return m_activeConnection;
+}
+
+// ==================== 统计接口 ====================
+
+/** @brief 获取累计创建连接总数 */
+quint64 ConnectionManager::totalConnectionsCreated() const
+{
+    return m_totalConnectionsCreated;
+}
+
+/** @brief 获取累计销毁连接总数 */
+quint64 ConnectionManager::totalConnectionsDestroyed() const
+{
+    return m_totalConnectionsDestroyed;
+}
+
+/** @brief 获取累计切换连接次数 */
+quint64 ConnectionManager::totalSwitches() const
+{
+    return m_totalSwitches;
+}
+
+/** @brief 重置所有统计计数器为零 */
+void ConnectionManager::resetStats()
+{
+    m_totalConnectionsCreated = 0;
+    m_totalConnectionsDestroyed = 0;
+    m_totalSwitches = 0;
 }

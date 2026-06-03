@@ -74,10 +74,6 @@ public:
 
     /**
      * @brief 加载指定内置主题
-     *
-     * 从Qt资源文件加载QSS，解析语义色板，应用切换动画。
-     * 动画期间窗口先淡出（300ms）再淡入（300ms），避免闪烁。
-     *
      * @param themeName 主题名称（如 "dark_terminal"）
      * @return true 加载成功，false 主题不存在或文件无法读取
      */
@@ -96,60 +92,34 @@ public:
     /** @brief 获取当前主题名称 */
     QString currentTheme() const;
 
-    /**
-     * @brief 查询语义色板中的颜色值
-     * @param color 语义色枚举
-     * @return 对应的QColor（若主题未定义该色则返回深灰色兜底）
-     */
+    /** @brief 查询语义色板中的颜色值 */
     QColor color(SemanticColor color) const;
 
-    /**
-     * @brief 检测 Windows 系统当前是否为暗色模式
-     *
-     * 通过读取 Windows 注册表
-     * HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize
-     * 下的 AppsUseLightTheme 键值判断系统主题。
-     *
-     * @return true 系统为暗色模式，false 亮色模式或检测失败
-     */
+    /** @brief 检测 Windows 系统当前是否为暗色模式 */
     bool isSystemDarkMode() const;
 
-    /**
-     * @brief 根据系统主题自动选择并加载对应主题
-     *
-     * 暗色模式加载 dark_terminal，亮色模式加载 light。
-     * 仅在用户未手动选择过主题时调用（首次启动）。
-     *
-     * @return 实际加载的主题名称
-     */
+    /** @brief 根据系统主题自动选择并加载对应主题 */
     QString loadSystemTheme();
 
-    /**
-     * @brief 持久化当前主题到 SettingsManager
-     *
-     * 将当前 m_currentTheme 写入 "theme/name" 配置项。
-     * 应在主题切换时和窗口关闭时调用。
-     */
+    /** @brief 持久化当前主题到 SettingsManager */
     void saveTheme() const;
 
-    /**
-     * @brief 从 SettingsManager 加载上次保存的主题
-     *
-     * 若配置中无记录则回退到系统主题检测。
-     *
-     * @return true 成功加载已保存主题，false 无保存记录
-     */
+    /** @brief 从 SettingsManager 加载上次保存的主题 */
     bool loadSavedTheme();
 
-    /**
-     * @brief 设置需要执行淡入淡出动画的目标 widget
-     *
-     * ThemeManager 不拥有该 widget，仅用于切换动画。
-     * 通常传入 MainWindow 的 centralWidget。
-     *
-     * @param widget 目标 widget 指针
-     */
+    /** @brief 设置需要执行淡入淡出动画的目标 widget */
     void setTransitionWidget(QWidget* widget);
+
+    // ==================== 统计接口 ====================
+
+    /** @brief 获取累计主题切换次数 */
+    quint64 totalThemeSwitches() const;
+
+    /** @brief 获取累计自定义主题加载次数 */
+    quint64 totalCustomThemesLoaded() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
 
 signals:
     /** @brief 主题切换后发射，自绘控件应监听此信号并重绘 */
@@ -164,14 +134,7 @@ private:
     /** @brief 加载默认色板（dark_terminal主题的色值），作为兜底 */
     void loadDefaultColors();
 
-    /**
-     * @brief 应用QSS样式表到全局 qApp
-     *
-     * 若设置了 m_transitionWidget，则先执行淡出动画，
-     * 然后应用新样式，最后执行淡入动画。
-     *
-     * @param qss QSS样式表内容
-     */
+    /** @brief 带动画应用QSS样式表到全局 qApp */
     void applyStylesheetWithAnimation(const QString& qss);
 
     /** @brief 不带动画直接应用样式表（用于首次加载） */
@@ -181,13 +144,15 @@ private:
     QMap<QString, QString> m_themes;        ///< 主题名 -> QSS文件路径
     QMap<SemanticColor, QColor> m_colorMap; ///< 语义色 -> 当前颜色值
 
-    /** @brief 主题切换动画目标 widget（通常为 MainWindow 中央部件）
-     *  使用QPointer: widget销毁时自动置nullptr，防止悬空指针 */
+    /** @brief 主题切换动画目标 widget */
     QPointer<QWidget> m_transitionWidget;
 
-    /** @brief 透明度特效，用于主题切换淡入淡出动画
-     *  使用QPointer: effect随widget销毁时自动置nullptr，防止applyStylesheetWithAnimation访问已释放内存 */
+    /** @brief 透明度特效，用于主题切换淡入淡出动画 */
     QPointer<QGraphicsOpacityEffect> m_opacityEffect;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalThemeSwitches = 0;       ///< 累计主题切换次数
+    quint64 m_totalCustomThemesLoaded = 0;  ///< 累计自定义主题加载次数
 };
 
 #endif // THEMEMANAGER_H
