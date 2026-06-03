@@ -17,6 +17,7 @@
 | UI执行标准 | [docs/constraints/05-ui-standard.md](docs/constraints/05-ui-standard.md) | 涉及UI改动 |
 | Git + Commit规则 | [docs/constraints/06-git-commit.md](docs/constraints/06-git-commit.md) | 每次提交 |
 | 目录结构 | [docs/constraints/07-directory-structure.md](docs/constraints/07-directory-structure.md) | 涉及文件创建/移动 |
+| 图标标准 | [docs/constraints/08-icon-standard.md](docs/constraints/08-icon-standard.md) | 涉及图标/SVG使用 |
 
 ---
 
@@ -34,24 +35,25 @@
 7. **禁止在MainWindow中写业务逻辑** — 委托给Controller/Manager
 8. **MainWindow.cpp ≤ 500行** — 超过必须拆分
 9. **公共组件只写一次** — CRC/HexConverter/RingBuffer/SettingsManager等已验证组件不得重写
+10. **模块间依赖必须遵循 [03-architecture.md](docs/constraints/03-architecture.md) 的依赖方向规则** — 禁止反向依赖、禁止同层横向依赖、禁止跨层跳级
 
 ### 编码铁律
-10. **C++17标准** — 头文件引用: Qt→STL→项目，使用相对src路径
-11. **Qt信号/槽用新式connect语法** — 禁止SIGNAL/SLOT宏
-12. **详细中文注释** — Doxygen格式，每个公开方法/成员变量必须有注释
-13. **禁止裸new不配对delete** — QObject父子树或智能指针
+11. **C++17标准** — 头文件引用: Qt→STL→项目，使用相对src路径
+12. **Qt信号/槽用新式connect语法** — 禁止SIGNAL/SLOT宏
+13. **详细中文注释** — Doxygen格式，每个公开方法/成员变量必须有注释
+14. **禁止裸new不配对delete** — QObject父子树或智能指针
 
 ### UI铁律
-14. **禁止C++中硬编码颜色到setStyleSheet()** — 颜色从QSS主题获取
-15. **所有QWidget必须设置objectName** — QSS依赖
-16. **按钮必须有hover/pressed/disabled三种状态**
-17. **面板切换必须有过渡动画** — 禁止突然出现/消失
-18. **所有用户可见文字必须用tr()包裹**
+15. **禁止C++中硬编码颜色到setStyleSheet()** — 颜色从QSS主题获取
+16. **所有QWidget必须设置objectName** — QSS依赖
+17. **按钮必须有hover/pressed/disabled三种状态**
+18. **面板切换必须有过渡动画** — 禁止突然出现/消失
+19. **所有用户可见文字必须用tr()包裹**
 
 ### 文件体积铁律
-19. **.cpp ≤ 500行** — 超过说明职责过多
-20. **.h ≤ 200行** — 超过说明成员/方法过多
-21. **单个方法 ≤ 80行** — 超过说明逻辑过于复杂
+20. **.cpp ≤ 500行** — 超过说明职责过多
+21. **.h ≤ 200行** — 超过说明成员/方法过多
+22. **单个方法 ≤ 80行** — 超过说明逻辑过于复杂
 
 ---
 

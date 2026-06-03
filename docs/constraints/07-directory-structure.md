@@ -29,225 +29,143 @@ User_Serial/
 
 ---
 
-## 二、src/ 目录结构（与实际代码同步）
+## 二、src/ 模块级目录结构
+
+> 详细文件清单见本文档历史版本。此处仅展示模块级组织。
+> 状态标记: ✅ 已有代码 | 🔄 规划中
 
 ```
 src/
-├── main.cpp
+├── interfaces/        🔄 [规划中] 纯虚接口
+│   ├── IConnection.h
+│   ├── IPanelProvider.h
+│   ├── IDataSink.h
+│   ├── IProtocolParser.h
+│   └── IDevice.h
 │
-├── core/                              # 应用核心层
-│   ├── mainwindow/                    #   主窗口组装
-│   │   ├── MainWindow.h
-│   │   ├── MainWindow.cpp
-│   │   ├── MainWindowSignalConnect.cpp
-│   │   └── MainWindowPanelConnect.cpp
-│   ├── background/                    #   背景外观 (F4)
-│   │   ├── BackgroundWidget.h/cpp
-│   │   └── BackgroundSettingsPopup.h/cpp
-│   ├── navigation/                    #   导航控制
-│   │   ├── NavigationController.h/cpp
-│   │   ├── NavigationControllerAnimations.cpp
-│   │   └── NavIndicatorWidget.h
-│   ├── connect/                       #   连接编排（应用层）
-│   │   ├── ConnectionController.h/cpp
-│   │   ├── ConnectionControllerHandlers.cpp
-│   │   ├── ConnectionControllerReconnect.cpp
-│   │   ├── ConnectionManager.h/cpp
-│   │   └── ConnectionFactory.h/cpp
-│   ├── send/                          #   发送逻辑编排
-│   │   └── SendController.h/cpp
-│   ├── toolbar/                       #   工具栏编排
-│   │   └── ToolbarController.h/cpp
-│   ├── recording/                     #   录制编排
-│   │   └── RecordingController.h/cpp
-│   ├── settings/                      #   设置编排
-│   │   ├── SettingsController.h/cpp
-│   │   └── SessionManager.h/cpp
-│   ├── terminal/                      #   终端编排
-│   │   └── TerminalController.h/cpp
-│   ├── panels/                        #   面板管理
-│   │   ├── PanelManager.h/cpp
-│   │   ├── PanelManagerCreation.cpp
-│   │   └── PanelManagerPanels.h
-│   ├── theme/                         #   外观系统
-│   │   ├── ThemeManager.h/cpp
-│   │   └── Constants.h
-│   ├── device/                        #   设备档案 (F26)
-│   │   └── DeviceProfile.h/cpp
-│   └── widgets/                       #   共享自定义组件
-│       ├── BasePanel.h/cpp            #     面板包装容器
-│       ├── AnimatedButton.h/cpp       #     动画按钮
-│       ├── EmptyStateWidget.h/cpp     #     空状态组件
-│       ├── LoadingSpinner.h/cpp       #     加载旋转指示器
-│       ├── SkeletonWidget.h/cpp       #     骨架屏组件
-│       ├── ToastWidget.h/cpp          #     Toast通知
-│       └── IconManager.h/cpp          #     图标管理器
+├── shared/            🔄 [规划中] 共享常量+枚举
+│   ├── ColorConstants.h
+│   ├── LayoutConstants.h
+│   ├── FontConstants.h
+│   ├── AnimationConstants.h
+│   ├── IconConstants.h
+│   └── ComponentConstants.h
 │
-├── connection/                        # 基础设施层: 连接抽象
-│   ├── interface/                     #   连接接口
-│   │   └── IConnection.h
-│   ├── serial_port/                   #   串口连接
-│   │   ├── SerialConnection.h/cpp
-│   │   └── SerialConnectionError.cpp
-│   ├── network/                       #   网络连接
-│   │   ├── TcpConnection.h/cpp
-│   │   └── UdpConnection.h/cpp
-│   ├── ble/                           #   蓝牙BLE (F12)
-│   │   └── BleConnection.h/cpp
-│   ├── can/                           #   CAN总线 (F13)
-│   │   └── CanConnection.h/cpp
-│   ├── mqtt/                          #   MQTT (F14)
-│   │   └── MqttConnection.h/cpp
-│   ├── tcp/                           #   TCP增强 (F15)
-│   │   └── TcpConnectionEx.h/cpp
-│   ├── spi_i2c/                       #   SPI/I2C (F16)
-│   │   └── SpiI2cConnection.h/cpp
-│   ├── ws/                            #   WebSocket (F17)
-│   │   └── WebSocketConnection.h/cpp
-│   └── usb/                           #   USB (F20)
-│       └── UsbConnection.h/cpp
+├── core/              ✅ 核心编排（MainWindow, PanelManager, ThemeManager...）
+│   ├── mainwindow/    MainWindow + 信号连接 + 面板连接
+│   ├── panels/        PanelManager（面板创建/注册/映射）
+│   ├── widgets/       BasePanel, EmptyStateWidget, LoadingSpinner, SkeletonWidget,
+│   │                  CommandPalette, SmartAutoComplete, ScriptRecorder,
+│   │                  DataDiffWidget, IconNavBar, IconManager, AnimatedButton, ToastWidget
+│   ├── send/          SendController
+│   ├── theme/         ThemeManager, Constants（6个常量域）
+│   ├── navigation/    NavigationController + 动画 + 指示器
+│   ├── recording/     RecordingController
+│   ├── toolbar/       ToolbarController
+│   ├── settings/      SettingsController, SessionManager
+│   ├── connect/       ConnectionController, ConnectionManager, ConnectionFactory
+│   ├── terminal/      TerminalController
+│   └── device/        DeviceProfile
 │
-├── terminal/                          # 表现层: 终端显示
-│   ├── widget/                        #   终端控件核心
-│   │   ├── TerminalWidget.h/cpp
-│   │   └── TerminalWidgetPaint.cpp
-│   ├── model/                         #   终端数据模型
-│   │   └── TerminalModel.h/cpp
-│   ├── search/                        #   搜索功能
-│   │   ├── TerminalSearchBar.h/cpp
-│   │   ├── TerminalSearchManager.h/cpp
-│   │   └── TerminalSearchRenderer.h/cpp
-│   ├── selection/                     #   文本选择
-│   │   └── TerminalSelectionManager.h/cpp
-│   ├── layout/                        #   布局管理
-│   │   └── TerminalLayoutManager.h/cpp
-│   ├── menu/                          #   右键菜单
-│   │   └── TerminalContextMenuManager.h/cpp
-│   ├── filter/                        #   终端过滤 (F21)
-│   │   └── TerminalFilter.h/cpp
-│   └── types/                         #   类型定义
-│       ├── TerminalTypes.h
-│       └── DirectionFilter.h/cpp
+├── serial/            ✅ 串口功能
+│   ├── config/        SerialConfigPanel
+│   ├── commands/      QuickCommandBar, TimedSender, SendHistory
+│   ├── data/          DataStatistics, BookmarkWidget
+│   ├── signals/       SignalMonitor
+│   └── port/          PortWatcher, SerialDriverDetector
 │
-├── serial/                            # 表现层: 串口功能UI
-│   ├── config/                        #   配置面板
-│   │   ├── SerialConfigPanel.h/cpp
-│   │   └── SerialConfigPanelUI.cpp
-│   ├── commands/                      #   快捷指令和定时发送
-│   │   ├── QuickCommandBar.h/cpp
-│   │   ├── TimedSender.h/cpp
-│   │   └── SendHistory.h/cpp
-│   ├── data/                          #   数据显示控件
-│   │   ├── DataStatistics.h/cpp
-│   │   └── BookmarkWidget.h/cpp
-│   ├── signals/                       #   信号线监控
-│   │   └── SignalMonitor.h/cpp
-│   └── port/                          #   端口监控
-│       ├── PortWatcher.h/cpp
-│       └── SerialDriverDetector.h/cpp
+├── connection/        ✅ 连接管理（13种连接方式）
+│   ├── interface/     IConnection
+│   ├── serial_port/   SerialConnection
+│   ├── network/       TcpConnection, UdpConnection
+│   ├── ble/           BleConnection (规划中)
+│   ├── can/           CanConnection (规划中)
+│   ├── mqtt/          MqttConnection (规划中)
+│   ├── tcp/           TcpConnectionEx (规划中)
+│   ├── spi_i2c/       SpiI2cConnection (规划中)
+│   ├── ws/            WebSocketConnection (规划中)
+│   └── usb/           UsbConnection (规划中)
 │
-├── protocol/                          # 业务层: 协议解析
-│   ├── parser/                        #   帧解析引擎
-│   │   ├── FrameDefinition.h/cpp
-│   │   ├── FrameParser.h/cpp
-│   │   ├── FrameParserStateHandlers.cpp
-│   │   └── FrameParserHelpers.cpp
-│   ├── editor/                        #   可视化帧编辑器
-│   │   ├── FrameVisualEditor.h/cpp
-│   │   └── FrameVisualEditorUI.cpp
-│   ├── bridge/                        #   协议桥系统
-│   │   ├── IProtocolBridge.h
-│   │   ├── JustFloatBridge.h/cpp
-│   │   ├── FireWaterBridge.h/cpp
-│   │   └── ProtocolBridgeManager.h/cpp
-│   ├── view/                          #   协议结果显示
-│   │   └── ProtocolView.h/cpp
-│   ├── modbus/                        #   Modbus协议 (F18)
-│   │   └── ModbusEngine.h/cpp
-│   ├── protobuf/                      #   Protobuf协议 (F19)
-│   │   └── ProtobufEngine.h/cpp
-│   └── hex/                           #   Intel HEX解析
-│       └── IntelHexParser.h/cpp
+├── protocol/          ✅ 协议解析（Modbus, DLT645, Custom...）
+│   ├── parser/        FrameDefinition, FrameParser
+│   ├── editor/        FrameVisualEditor
+│   ├── bridge/        IProtocolBridge, JustFloatBridge, FireWaterBridge
+│   ├── view/          ProtocolView
+│   ├── modbus/        ModbusEngine (规划中)
+│   ├── protobuf/      ProtobufEngine (规划中)
+│   └── hex/           IntelHexParser
 │
-├── chart/                             # 表现层: 波形显示
-│   ├── widget/                        #   波形控件
-│   │   ├── ChartWidget.h/cpp
-│   │   └── ChartColors.h
-│   ├── model/                         #   数据模型
-│   │   ├── ChartModel.h/cpp
-│   │   └── ChannelConfig.h/cpp
-│   ├── overlay/                       #   游标叠加层
-│   │   └── CursorOverlay.h/cpp
-│   ├── zoom/                          #   缩放控制
-│   │   └── ZoomController.h/cpp
-│   ├── fft/                           #   FFT频谱分析
-│   │   └── FftAnalyzer.h/cpp
-│   └── stats/                         #   散点/直方图统计
-│       ├── ScatterPlot.h/cpp
-│       └── HistogramWidget.h/cpp
+├── terminal/          ✅ 终端显示
+│   ├── widget/        TerminalWidget（自绘制）
+│   ├── model/         TerminalModel
+│   ├── search/        TerminalSearchBar, SearchManager, SearchRenderer
+│   ├── selection/     SelectionManager
+│   ├── layout/        LayoutManager
+│   ├── menu/          ContextMenuManager
+│   ├── filter/        TerminalFilter (规划中)
+│   └── types/         TerminalTypes, DirectionFilter
 │
-├── dashboard/                         # 表现层: 仪表盘 (F5)
-│   └── DashboardWidget.h/cpp
+├── chart/             ✅ 数据图表
+│   ├── widget/        ChartWidget, ChartColors
+│   ├── model/         ChartModel, ChannelConfig
+│   ├── overlay/       CursorOverlay
+│   ├── zoom/          ZoomController
+│   ├── fft/           FftAnalyzer (规划中)
+│   └── stats/         ScatterPlot, HistogramWidget (规划中)
 │
-├── rtt/                               # 基础设施层: RTT连接 (F6)
+├── ota/               ✅ 固件升级
+│   ├── manager/       OtaManager
+│   ├── widget/        OtaWidget, AnimatedProgressBar
+│   ├── history/       OtaHistoryModel
+│   └── protocols/     BaseTransfer, XModem, YModem, ZModem
+│
+├── rtt/               🔄 SEGGER RTT（目录已创建，代码待实现）
 │   └── RttConnection.h/cpp
 │
-├── automation/                        # 业务层: 自动化触发 (F7)
+├── automation/        🔄 脚本自动化（目录已创建，代码待实现）
 │   └── TriggerEngine.h/cpp
 │
-├── plugin/                            # 业务层: 插件系统 (F11)
+├── dashboard/         🔄 仪表盘（目录已创建，代码待实现）
+│   └── DashboardWidget.h/cpp
+│
+├── plugin/            🔄 插件系统（目录已创建，代码待实现）
 │   └── PluginManager.h/cpp
 │
-├── ota/                               # 业务层: OTA升级
-│   ├── manager/                       #   OTA调度管理器
-│   │   └── OtaManager.h/cpp
-│   ├── widget/                        #   OTA操作面板
-│   │   ├── OtaWidget.h/cpp
-│   │   ├── OtaWidgetSlots.cpp
-│   │   └── AnimatedProgressBar.h
-│   ├── history/                       #   OTA历史记录
-│   │   └── OtaHistoryModel.h/cpp
-│   └── protocols/                     #   传输协议
-│       ├── base/                      #     模板方法基类
-│       │   └── BaseTransfer.h/cpp
-│       ├── xmodem/                    #     XMODEM
-│       │   ├── XModemTransfer.h/cpp
-│       │   └── XModemTransferHandlers.cpp
-│       ├── ymodem/                    #     YMODEM
-│       │   ├── YModemTransfer.h/cpp
-│       │   └── YModemTransferHandlers.cpp
-│       └── zmodem/                    #     ZMODEM
-│           ├── ZModemTransfer.h/cpp
-│           └── ZModemTransferHandlers.cpp
-│
-└── utils/                             # 基础设施层: 公共工具
-    ├── crypto/                        #   校验工具
-    │   ├── CRC.h
-    │   └── HexConverter.h
-    ├── data/                          #   数据格式工具
-    │   ├── RingBuffer.h
-    │   ├── ByteFormat.h
-    │   └── DataBookmark.h
-    ├── export/                        #   数据导出子系统
-    │   ├── DataExporter.h/cpp
-    │   ├── DataExporterStreamed.cpp
-    │   └── DataExporterEdl.cpp
-    ├── log/                           #   数据日志子系统
-    │   ├── DataLogger.h/cpp
-    │   └── DataLoggerEdl.cpp
-    ├── settings/                      #   配置持久化
-    │   └── SettingsManager.h/cpp
-    ├── checksum/                      #   校验计算 (F22)
-    │   └── ChecksumCalculator.h/cpp
-    ├── converter/                     #   数据转换 (F23)
-    │   └── DataConverter.h/cpp
-    ├── timestamp/                     #   时间戳处理 (F24)
-    │   └── TimestampFormatter.h/cpp
-    ├── packet/                        #   数据包处理 (F25)
-    │   └── PacketAnalyzer.h/cpp
-    └── perf/                          #   性能监控 (F10)
-        └── PerfMonitor.h/cpp
+└── utils/             ✅ 工具函数
+    ├── crypto/        CRC, HexConverter
+    ├── data/          RingBuffer, ByteFormat, DataBookmark
+    ├── export/        DataExporter（含流式/EDL格式）
+    ├── log/           DataLogger（含EDL格式）
+    ├── settings/      SettingsManager
+    ├── checksum/      ChecksumCalculator (规划中)
+    ├── converter/     DataConverter (规划中)
+    ├── timestamp/     TimestampFormatter (规划中)
+    ├── packet/        PacketAnalyzer (规划中)
+    └── perf/          PerfMonitor (规划中)
 ```
+
+---
+
+## 二-B、模块归属
+
+> 各模块的负责人、代码状态和规模概览。
+
+| 模块 | 路径 | 负责角色 | 状态 | 预估行数 | 说明 |
+|------|------|---------|------|---------|------|
+| `core` | `src/core/` | 核心开发 | ✅ 活跃 | ~3000+ | 最大的模块，含所有Controller和共享Widget |
+| `connection` | `src/connection/` | 协议开发 | ✅ 活跃 | ~800 | IConnection + 3种已实现连接 + 7种规划中 |
+| `protocol` | `src/protocol/` | 协议开发 | ✅ 活跃 | ~1500 | 帧解析引擎 + 协议桥 |
+| `terminal` | `src/terminal/` | UI开发 | ✅ 活跃 | ~2000 | 自绘制终端控件 |
+| `serial` | `src/serial/` | UI开发 | ✅ 活跃 | ~1000 | 串口配置/指令/数据面板 |
+| `chart` | `src/chart/` | UI开发 | ✅ 活跃 | ~800 | 基础波形图 |
+| `ota` | `src/ota/` | 核心开发 | ✅ 活跃 | ~1200 | OTA管理 + 3种传输协议 |
+| `utils` | `src/utils/` | 核心开发 | ✅ 活跃 | ~800 | 公共工具库 |
+| `rtt` | `src/rtt/` | 协议开发 | 🔄 规划中 | 0 | J-Link RTT，待实现 |
+| `automation` | `src/automation/` | 核心开发 | 🔄 规划中 | 0 | 触发器引擎，待实现 |
+| `dashboard` | `src/dashboard/` | UI开发 | 🔄 规划中 | 0 | 仪表盘，待实现 |
+| `plugin` | `src/plugin/` | 系统架构师 | 🔄 规划中 | 0 | 插件系统，待实现 |
+| `interfaces` | `src/interfaces/` | 系统架构师 | 🔄 规划中 | 0 | 纯虚接口，解耦Phase 1 |
+| `shared` | `src/shared/` | 系统架构师 | 🔄 规划中 | 0 | 共享常量，解耦Phase 2 |
 
 ---
 
