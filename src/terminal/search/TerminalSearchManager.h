@@ -116,6 +116,13 @@ public:
     /** @brief 设置搜索高亮配色 */
     void setSearchColors(const QColor& highlight, const QColor& current);
 
+    // ---- 统计计数接口 ----
+    quint64 totalSearches() const;      ///< 获取累计搜索次数
+    quint64 totalMatches() const;       ///< 获取累计匹配结果总数
+    quint64 totalReplacements() const;  ///< 获取累计替换操作次数
+    quint64 searchErrorCount() const;   ///< 获取搜索错误次数
+    void resetStats();                  ///< 重置所有统计计数器
+
 signals:
     /**
      * @brief 搜索匹配结果变化时发射
@@ -161,6 +168,12 @@ private:
      */
     bool buildHexSearch(const QString& pattern,
                         const std::function<bool(int*, QString*)>& lineProvider);
+
+    // ---- 统计计数 ----
+    quint64 m_totalSearches = 0;       ///< 累计搜索执行次数
+    quint64 m_totalMatches = 0;        ///< 累计匹配结果总数
+    quint64 m_totalReplacements = 0;   ///< 累计替换操作次数
+    quint64 m_searchErrorCount = 0;    ///< 累计搜索错误次数
 };
 
 #endif // TERMINALSEARCHMANAGER_H

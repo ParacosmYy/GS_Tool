@@ -49,9 +49,12 @@ int TerminalSearchManager::setSearchHighlight(
     m_searchMatches.clear();
 
     if (pattern.isEmpty() || cachedLines.isEmpty()) {
+        ++m_searchErrorCount;  // 搜索参数无效，累计错误计数
         emit searchMatchesChanged(0, -1);
         return 0;
     }
+
+    ++m_totalSearches;  // 每次有效搜索执行，累计搜索次数
 
     // 构建行遍历回调: 每次调用填入 (displayIdx, text)，返回false表示遍历结束
     // 方向过滤模式从过滤映射获取行，普通模式直接遍历缓存
@@ -103,6 +106,7 @@ int TerminalSearchManager::setSearchHighlight(
     }
 
     if (!valid) {
+        ++m_searchErrorCount;  // 搜索模式无效(正则/HEX解析失败)，累计错误计数
         emit searchMatchesChanged(0, -1);
         return 0;
     }
@@ -111,6 +115,7 @@ int TerminalSearchManager::setSearchHighlight(
         m_currentMatchIndex = 0;
     }
 
+    m_totalMatches += static_cast<quint64>(m_searchMatches.size());  // 累计本次搜索的匹配数
     emit searchMatchesChanged(m_searchMatches.size(), m_currentMatchIndex);
     return m_searchMatches.size();
 }
@@ -274,4 +279,27 @@ void TerminalSearchManager::setSearchColors(const QColor& highlight, const QColo
 {
     m_searchHighlightColor = highlight;
     m_currentMatchColor = current;
+}
+
+// ---- 统计计数实现 ----
+
+/** @brief 获取累计搜索执行次数 @return 搜索总数 */
+quint64 TerminalSearchManager::totalSearches() const { return m_totalSearches; }
+
+/** @brief 获取累计匹配结果总数(跨多次搜索) @return 匹配总数 */
+quint64 TerminalSearchManager::totalMatches() const { return m_totalMatches; }
+
+/** @brief 获取累计替换操作次数 @return 替换总数 */
+quint64 TerminalSearchManager::totalReplacements() const { return m_totalReplacements; }
+
+/** @brief 获取搜索错误次数(参数无效/正则错误/HEX解析失败) @return 错误总数 */
+quint64 TerminalSearchManager::searchErrorCount() const { return m_searchErrorCount; }
+
+/** @brief 重置所有统计计数器为零 */
+void TerminalSearchManager::resetStats()
+{
+    m_totalSearches = 0;
+    m_totalMatches = 0;
+    m_totalReplacements = 0;
+    m_searchErrorCount = 0;
 }

@@ -64,6 +64,13 @@ public:
     // 获取最大行数限制
     int maxLines() const;
 
+    // ---- 统计计数接口 ----
+    quint64 totalLinesAdded() const;   ///< 获取累计追加行数
+    quint64 totalBytesReceived() const;///< 获取累计接收字节数
+    quint64 maxLineLength() const;     ///< 获取历史最长行长度(字节)
+    quint64 filterBlockCount() const;  ///< 获取被过滤丢弃的行数
+    void resetStats();                 ///< 重置所有统计计数器(保留rxBytes/txBytes)
+
 signals:
     /** @brief 新数据到达通知 @param firstNewLine 新数据起始行号 @param count 新增行数 */
     void dataAppended(int firstNewLine, int count);
@@ -86,6 +93,12 @@ private:
     bool m_settingMaxLines = false;    ///< 重入保护标志，防止 dataCleared 信号回调 setMaxLines
     quint64 m_rxBytes = 0;             ///< 接收总字节数
     quint64 m_txBytes = 0;             ///< 发送总字节数
+
+    // ---- 统计计数 ----
+    quint64 m_totalLinesAdded = 0;     ///< 累计追加行数(含被环形缓冲区覆盖的)
+    quint64 m_totalBytesReceived = 0;  ///< 累计接收字节数(独立于m_rxBytes)
+    quint64 m_maxLineLength = 0;       ///< 历史最长行长度(字节数)
+    quint64 m_filterBlockCount = 0;    ///< 被过滤丢弃的行数
 };
 
 #endif // TERMINALMODEL_H

@@ -27,6 +27,7 @@ void TerminalModel::appendReceived(const QByteArray& data)
         line.direction = DataDirection::Rx;
         line.timestamp = QDateTime::currentDateTime();
         m_rxBytes += data.size();
+        m_totalBytesReceived += static_cast<quint64>(data.size());  // 累计接收字节数统计
 
         appendLine(std::move(line));
         newLineIndex = m_count - 1;
@@ -218,6 +219,14 @@ void TerminalModel::appendLine(TerminalLine&& line)
     // 必须在已持有 m_mutex 的情况下调用
     // 注意: 不在此处 emit 信号，由调用者在释放锁后负责 emit，避免持锁发信号导致死锁
 
+    ++m_totalLinesAdded;  // 每次追加行，累计行数统计
+
+    // 跟踪最长行长度
+    const quint64 lineLen = static_cast<quint64>(line.data.size());
+    if (lineLen > m_maxLineLength) {
+        m_maxLineLength = lineLen;
+    }
+
     if (m_count < m_buffer.size()) {
         // 缓冲区未满，直接顺序写入
         m_buffer[m_count] = std::move(line);
@@ -227,4 +236,27 @@ void TerminalModel::appendLine(TerminalLine&& line)
         m_buffer[m_head] = std::move(line);
         m_head = (m_head + 1) % m_buffer.size();
     }
+}
+
+// ---- 统计计数实现 ----
+
+/** @brief 获取累计追加行数(含被环形缓冲区覆盖的) @return 行数 */
+quint64 TerminalModel::totalLinesAdded() const { return m_totalLinesAdded; }
+
+/** @brief 获取累计接收字节数 @return 字节数 */
+quint64 TerminalModel::totalBytesReceived() const { return m_totalBytesReceived; }
+
+/** @brief 获取历史最长行长度(字节数) @return 最大行长度 */
+quint64 TerminalModel::maxLineLength() const { return m_maxLineLength; }
+
+/** @brief 获取被过滤丢弃的行数 @return 过滤丢弃行数 */
+quint64 TerminalModel::filterBlockCount() const { return m_filterBlockCount; }
+
+/** @brief 重置所有统计计数器为零 */
+void TerminalModel::resetStats()
+{
+    m_totalLinesAdded = 0;
+    m_totalBytesReceived = 0;
+    m_maxLineLength = 0;
+    m_filterBlockCount = 0;
 }

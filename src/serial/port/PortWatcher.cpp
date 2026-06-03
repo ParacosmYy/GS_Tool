@@ -27,76 +27,45 @@ PortWatcher::PortWatcher(QObject* parent)
     , m_timer(new QTimer(this))
 {
     m_timer->setInterval(Timers::kPortPollMs);
-
-    // 连接定时器超时到轮询处理函数
     connect(m_timer, &QTimer::timeout, this, &PortWatcher::onTimeout);
 }
 
-/**
- * @brief 析构函数
- *
- * 停止定时器。m_timer 作为子对象会被 Qt 对象树自动删除。
- */
+/** @brief 析构函数 — 停止定时器，m_timer 作为子对象自动销毁 */
 PortWatcher::~PortWatcher()
 {
     m_timer->stop();
 }
 
-/**
- * @brief 启动热插拔检测
- *
- * 立即查询一次当前端口列表作为基准快照，然后启动定时轮询。
- * 如果已经在运行，直接返回，避免重复启动。
- */
+/** @brief 启动热插拔检测 — 建立基准快照并启动定时轮询 */
 void PortWatcher::start()
 {
     if (m_timer->isActive()) {
-        return;  // 已经在运行，不重复启动
+        return;
     }
-
-    // 建立基准快照
     m_currentPorts = queryAvailablePorts();
-
-    // 启动定时轮询
     m_timer->start();
 }
 
-/**
- * @brief 停止热插拔检测
- *
- * 停止定时器并清空端口快照，下次 start() 时会重新建立基准。
- */
+/** @brief 停止热插拔检测 — 停止定时器并清空端口快照 */
 void PortWatcher::stop()
 {
     m_timer->stop();
     m_currentPorts.clear();
 }
 
-/**
- * @brief 检测是否正在运行
- *
- * @return true 如果定时器处于活跃状态
- */
+/** @brief 检测是否正在运行 */
 bool PortWatcher::isRunning() const
 {
     return m_timer->isActive();
 }
 
-/**
- * @brief 获取轮询间隔
- *
- * @return 当前轮询间隔（毫秒）
- */
+/** @brief 获取轮询间隔（毫秒） */
 int PortWatcher::interval() const
 {
     return m_timer->interval();
 }
 
-/**
- * @brief 设置轮询间隔
- *
- * @param msec 新的轮询间隔（毫秒），必须 > 0
- */
+/** @brief 设置轮询间隔（毫秒），必须 > 0 */
 void PortWatcher::setInterval(int msec)
 {
     if (msec > 0) {
@@ -104,46 +73,54 @@ void PortWatcher::setInterval(int msec)
     }
 }
 
-/**
- * @brief 获取当前已知的端口名称列表
- *
- * @return 最近一次快照中的端口名称列表
- */
+/** @brief 获取当前已知的端口名称列表 */
 QStringList PortWatcher::currentPorts() const
 {
     return m_currentPorts;
+}
+
+quint64 PortWatcher::totalArrivals() const { return m_totalArrivals; }
+quint64 PortWatcher::totalRemovals() const { return m_totalRemovals; }
+quint64 PortWatcher::totalPolls() const { return m_totalPolls; }
+quint64 PortWatcher::totalChanges() const { return m_totalChanges; }
+
+/** @brief 重置所有统计计数器 */
+void PortWatcher::resetWatcherStatistics()
+{
+    m_totalArrivals = 0;
+    m_totalRemovals = 0;
+    m_totalPolls = 0;
+    m_totalChanges = 0;
 }
 
 /**
  * @brief 定时轮询回调（带防抖）
  *
  * 查询当前系统可用端口，与上次快照比较:
- *   - 新增候选: 在 newPorts 中但不在 m_currentPorts 中 → 累计计数，
- *     达到 kDebounceThreshold 后发射 portAdded 并更新快照
- *   - 移除候选: 在 m_currentPorts 中但不在 newPorts 中 → 累计计数，
- *     达到 kDebounceThreshold 后发射 portRemoved 并更新快照
+ *   - 新增候选: 累计计数达到 kDebounceThreshold 后发射 portAdded
+ *   - 移除候选: 累计计数达到 kDebounceThreshold 后发射 portRemoved
  *   - 候选端口恢复原状态 → 清零对应计数器（防抖消除闪烁）
  *   - 确认变化后发射 portsChanged 总信号
  */
 void PortWatcher::onTimeout()
 {
     const QStringList newPorts = queryAvailablePorts();
+    ++m_totalPolls;
     bool changed = false;
 
     // ---- 处理新增候选: 在 newPorts 中但不在 m_currentPorts 中 ----
     QStringList confirmedAdds;
     for (const QString& port : newPorts) {
         if (!m_currentPorts.contains(port)) {
-            // 端口是新出现的，累加新增确认计数
             ++m_addedCandidateCount[port];
             if (m_addedCandidateCount[port] >= kDebounceThreshold) {
                 emit portAdded(port);
                 confirmedAdds.append(port);
                 m_addedCandidateCount.remove(port);
+                ++m_totalArrivals;
                 changed = true;
             }
         } else {
-            // 端口依然存在，清除残留的新增候选计数（状态未变，无需操作）
             m_addedCandidateCount.remove(port);
         }
     }
@@ -152,31 +129,29 @@ void PortWatcher::onTimeout()
     QStringList confirmedRemoves;
     for (const QString& port : m_currentPorts) {
         if (!newPorts.contains(port)) {
-            // 端口消失了，累加移除确认计数
             ++m_removedCandidateCount[port];
             if (m_removedCandidateCount[port] >= kDebounceThreshold) {
                 emit portRemoved(port);
                 confirmedRemoves.append(port);
                 m_removedCandidateCount.remove(port);
+                ++m_totalRemovals;
                 changed = true;
             }
         } else {
-            // 端口依然存在，清除残留的移除候选计数（端口回来了，闪烁消除）
             m_removedCandidateCount.remove(port);
         }
     }
 
     // ---- 清理过期候选: 已恢复原状态的候选计数器 ----
-    // 新增候选中出现但实际已存在的端口 → 状态恢复，清零
     for (const QString& port : m_addedCandidateCount.keys()) {
         if (m_currentPorts.contains(port)) {
             m_addedCandidateCount.remove(port);
         }
     }
-    // 移除候选中消失但实际已不存在的端口 → 无需清理（上面已处理）
 
-    // ---- 更新快照: 仅追加/移除已确认的端口，保留未确认候选的debounce计数 ----
+    // ---- 更新快照: 仅追加/移除已确认的端口 ----
     if (changed) {
+        ++m_totalChanges;
         for (const QString& port : confirmedAdds) {
             m_currentPorts.append(port);
         }
@@ -189,10 +164,7 @@ void PortWatcher::onTimeout()
 
 /**
  * @brief 查询系统中所有可用串口名称
- *
  * 使用 QSerialPortInfo 枚举所有串口，提取端口名称并排序。
- * 排序确保每次查询结果顺序一致，避免因顺序差异导致误检测。
- *
  * @return 排序后的端口名称列表
  */
 QStringList PortWatcher::queryAvailablePorts()
@@ -200,13 +172,9 @@ QStringList PortWatcher::queryAvailablePorts()
     QStringList portNames;
     const auto ports = QSerialPortInfo::availablePorts();
     portNames.reserve(ports.size());
-
     for (const QSerialPortInfo& info : ports) {
         portNames.append(info.portName());
     }
-
-    // 按字母排序，确保比较结果稳定
     portNames.sort();
-
     return portNames;
 }
