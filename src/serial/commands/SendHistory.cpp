@@ -181,7 +181,7 @@ QString SendHistory::statisticsSummary() const
         summary += tr("\n最常用命令:\n");
         const auto top = mostFrequent(5);
         for (int i = 0; i < top.size(); ++i) {
-            summary += QStringLiteral("  %1. %2 (%3次)\n")
+            summary += tr("  %1. %2 (%3次)\n")
                           .arg(i + 1)
                           .arg(top[i].first.left(30))
                           .arg(top[i].second);

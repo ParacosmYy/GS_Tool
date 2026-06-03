@@ -149,6 +149,7 @@ void SerialConnection::close()
  */
 qint64 SerialConnection::write(const QByteArray& data)
 {
+    ++m_totalWrites;
     if (!m_serial.isOpen()) {
         emit errorOccurred(tr("发送失败: 串口 %1 未打开").arg(m_portName));
         return -1;
@@ -367,5 +368,6 @@ void SerialConnection::resetStats()
     m_totalCloses = 0;
     m_totalBytesWritten = 0;
     m_totalBytesRead = 0;
+    m_totalWrites = 0;
     m_errorCount = 0;
 }

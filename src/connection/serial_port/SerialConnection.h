@@ -116,10 +116,13 @@ public:
     /** @brief 获取累计读取字节数 @return 自上次重置以来的串口读取字节总数 */
     quint64 totalBytesRead() const { return m_totalBytesRead; }
 
+    /** @brief 获取累计write()调用次数 @return 自上次重置以来的写入调用总次数 */
+    quint64 totalWrites() const { return m_totalWrites; }
+
     /** @brief 获取累计错误次数 @return 自上次重置以来的错误总次数(含致命+可恢复) */
     quint64 errorCount() const { return m_errorCount; }
 
-    /** @brief 重置所有操作统计计数器(totalOpens/totalCloses/totalBytesWritten/totalBytesRead/errorCount归零) */
+    /** @brief 重置所有操作统计计数器(totalOpens/totalCloses/totalBytesWritten/totalBytesRead/totalWrites/errorCount归零) */
     void resetStats();
 
 private slots:
@@ -152,6 +155,7 @@ private:
     quint64 m_totalCloses = 0;       ///< 累计串口关闭次数
     quint64 m_totalBytesWritten = 0; ///< 累计串口写入字节总数
     quint64 m_totalBytesRead = 0;    ///< 累计串口读取字节总数
+    quint64 m_totalWrites = 0;       ///< 累计write()调用次数
     quint64 m_errorCount = 0;        ///< 累计错误总次数(致命错误+可恢复错误)
 };
 

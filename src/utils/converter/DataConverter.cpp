@@ -221,13 +221,13 @@ QByteArray DataConverter::encodeFromRaw(const QByteArray &raw, Format to) const
 QString DataConverter::formatDescription(Format format)
 {
     switch (format) {
-    case Hex:       return QStringLiteral("十六进制表示，每字节用两个字符表示，空格分隔");
-    case Ascii:     return QStringLiteral("ASCII纯文本，可读字符串");
-    case Base64:    return QStringLiteral("Base64编码，适用于二进制数据的文本传输");
-    case UrlEncode: return QStringLiteral("URL百分号编码，适用于网络传输中的特殊字符");
-    case Binary:    return QStringLiteral("二进制表示，每字节8位，空格分隔");
-    case Decimal:   return QStringLiteral("十进制表示，每字节0-255，空格分隔");
-    case Octal:     return QStringLiteral("八进制表示，每字节0-377，空格分隔");
+    case Hex:       return tr("十六进制表示，每字节用两个字符表示，空格分隔");
+    case Ascii:     return tr("ASCII纯文本，可读字符串");
+    case Base64:    return tr("Base64编码，适用于二进制数据的文本传输");
+    case UrlEncode: return tr("URL百分号编码，适用于网络传输中的特殊字符");
+    case Binary:    return tr("二进制表示，每字节8位，空格分隔");
+    case Decimal:   return tr("十进制表示，每字节0-255，空格分隔");
+    case Octal:     return tr("八进制表示，每字节0-377，空格分隔");
     }
     return QString();
 }

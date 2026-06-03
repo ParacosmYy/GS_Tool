@@ -89,6 +89,15 @@ public:
     /** @brief 获取峰值速率更新总次数 @return 峰值更新次数 */
     quint64 totalPeakUpdates() const;
 
+    /** @brief 获取updateErrors()调用总次数 @return 错误更新调用次数 */
+    quint64 totalErrorUpdates() const { return m_totalErrorUpdates; }
+
+    /** @brief 获取updateConnectionHealth()调用总次数 @return 健康检查调用次数 */
+    quint64 totalHealthUpdates() const { return m_totalHealthUpdates; }
+
+    /** @brief 获取定时器刷新总周期数 @return onRefreshTimer()调用总次数 */
+    quint64 totalRefreshCycles() const { return m_totalRefreshCycles; }
+
     /** @brief 重置数据统计计数器(不影响面板显示) */
     void resetDataStatistics();
 
@@ -97,6 +106,7 @@ private slots:
     void onRefreshTimer();
 
 private:
+    /** @brief 初始化UI布局: 创建所有统计框架(RX/TX/速率/峰值/时间/错误/健康)并排列 */
     void setupUI();
 
     /** @brief 创建统计数据框架(RX/TX/峰值/时间 统一格式)
@@ -149,6 +159,9 @@ private:
     quint64 m_totalUpdates = 0;    ///< update()调用总次数
     quint64 m_totalBytesCounted = 0; ///< 所有update()传入的字节总数(RX+TX)
     quint64 m_totalPeakUpdates = 0;  ///< 峰值速率更新总次数
+    quint64 m_totalErrorUpdates = 0; ///< updateErrors()调用总次数
+    quint64 m_totalHealthUpdates = 0; ///< updateConnectionHealth()调用总次数
+    quint64 m_totalRefreshCycles = 0; ///< onRefreshTimer()定时器刷新总周期数
 };
 
 #endif // DATASTATISTICS_H

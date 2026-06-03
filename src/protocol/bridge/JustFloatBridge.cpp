@@ -165,7 +165,7 @@ void JustFloatBridge::parseAndEmit(int frameSize)
         std::memcpy(&value, ptr, sizeof(float));
 
         // 通道命名: CH1, CH2, ..., CHn
-        QString channelName = QStringLiteral("CH%1").arg(ch + 1);
+        QString channelName = tr("CH%1").arg(ch + 1);
         fields[channelName] = static_cast<double>(value);
     }
 

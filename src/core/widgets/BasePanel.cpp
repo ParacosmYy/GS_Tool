@@ -303,7 +303,7 @@ void BasePanel::setupInternalLayout()
     m_collapseBtn = new QPushButton(m_headerBar);
     m_collapseBtn->setObjectName("collapseButton");
     m_collapseBtn->setFixedSize(24, 24);
-    m_collapseBtn->setText(QStringLiteral("▾")); // 占位，后续用IconManager
+    m_collapseBtn->setText(tr("▾")); // 占位，后续用IconManager
     connect(m_collapseBtn, &QPushButton::clicked,
             this, &BasePanel::toggleCollapsed);
     headerLayout->addWidget(m_collapseBtn);
@@ -368,8 +368,8 @@ void BasePanel::updateCollapseIcon()
 {
     if (!m_collapseBtn) return;
     // 折叠: ▸ 展开: ▾
-    m_collapseBtn->setText(m_collapsed ? QStringLiteral("▸")
-                                       : QStringLiteral("▾"));
+    m_collapseBtn->setText(m_collapsed ? tr("▸")
+                                       : tr("▾"));
 }
 
 void BasePanel::toggleCollapsed()

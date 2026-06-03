@@ -69,6 +69,7 @@ void TcpConnection::configure(const QVariantMap& params)
 /** @brief 打开TCP连接(客户端模式连接远端，服务端模式监听端口) @return true表示成功发起连接或开始监听 */
 bool TcpConnection::open()
 {
+    ++m_totalOpenAttempts;
     if (m_mode == Client) {
         if (!m_socket) {
             m_socket = new QTcpSocket(this);
@@ -164,6 +165,7 @@ void TcpConnection::close()
 /** @brief 写入数据到TCP连接(客户端写m_socket，服务端写m_clientSocket) @param data 待发送数据 @return 实际写入字节数，-1表示失败 */
 qint64 TcpConnection::write(const QByteArray& data)
 {
+    ++m_totalWrites;
     QTcpSocket* target = nullptr;
     if (m_mode == Client) {
         target = m_socket;
@@ -340,4 +342,6 @@ void TcpConnection::resetStats()
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
     m_errorCount = 0;
+    m_totalOpenAttempts = 0;
+    m_totalWrites = 0;
 }

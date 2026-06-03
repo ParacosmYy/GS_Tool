@@ -143,7 +143,7 @@ void FireWaterBridge::processLine(const QString& line)
                 count = kMaxChannels;
             }
             for (int i = 0; i < count; ++i) {
-                m_channelNames.append(QStringLiteral("CH%1").arg(i + 1));
+                m_channelNames.append(tr("CH%1").arg(i + 1));
             }
         } else {
             // 第一行是头部行 -- 使用token作为通道名称

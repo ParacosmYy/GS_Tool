@@ -244,17 +244,17 @@ int ChecksumCalculator::algorithmBitWidth(Algorithm alg)
 QString ChecksumCalculator::algorithmDescription(Algorithm alg)
 {
     switch (alg) {
-    case CRC8:       return QStringLiteral("CRC-8 标准校验，多项式 0x07");
-    case CRC16Ccitt: return QStringLiteral("CRC-16/CCITT，多项式 0x1021，常用于通信协议");
-    case CRC16Modbus:return QStringLiteral("CRC-16/Modbus，多项式 0xA001，工业标准");
-    case CRC16Kermit:return QStringLiteral("CRC-16/Kermit，多项式 0x8408，又名CRC-CCITT");
-    case CRC32:      return QStringLiteral("CRC-32，多项式 0xEDB88320，以太网/ZIP标准");
-    case CRC32C:     return QStringLiteral("CRC-32C Castagnoli，多项式 0x82F63B78，iSCSI标准");
-    case Xor8:       return QStringLiteral("8位异或校验，简单快速");
-    case Sum8:       return QStringLiteral("8位累加和，取低8位");
-    case Sum16:      return QStringLiteral("16位累加和，大端序双字节累加");
-    case Sum32:      return QStringLiteral("32位累加和，大端序四字节累加");
-    case CustomCrc:  return QStringLiteral("自定义CRC多项式和位宽");
+    case CRC8:       return tr("CRC-8 标准校验，多项式 0x07");
+    case CRC16Ccitt: return tr("CRC-16/CCITT，多项式 0x1021，常用于通信协议");
+    case CRC16Modbus:return tr("CRC-16/Modbus，多项式 0xA001，工业标准");
+    case CRC16Kermit:return tr("CRC-16/Kermit，多项式 0x8408，又名CRC-CCITT");
+    case CRC32:      return tr("CRC-32，多项式 0xEDB88320，以太网/ZIP标准");
+    case CRC32C:     return tr("CRC-32C Castagnoli，多项式 0x82F63B78，iSCSI标准");
+    case Xor8:       return tr("8位异或校验，简单快速");
+    case Sum8:       return tr("8位累加和，取低8位");
+    case Sum16:      return tr("16位累加和，大端序双字节累加");
+    case Sum32:      return tr("32位累加和，大端序四字节累加");
+    case CustomCrc:  return tr("自定义CRC多项式和位宽");
     }
     return QString();
 }

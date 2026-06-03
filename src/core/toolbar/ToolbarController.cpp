@@ -173,8 +173,8 @@ void ToolbarController::createConnectionGroup(QToolBar* toolbar)
 
     m_langCombo = new QComboBox(toolbar->parentWidget());
     m_langCombo->setObjectName("langCombo");
-    m_langCombo->addItem(QStringLiteral("中文"), Language::CHINESE);
-    m_langCombo->addItem(QStringLiteral("English"), Language::ENGLISH);
+    m_langCombo->addItem(tr("中文"), Language::CHINESE);
+    m_langCombo->addItem(tr("English"), Language::ENGLISH);
     m_langCombo->setFixedWidth(Layout::kComboFixedWidth);
     toolbar->addWidget(m_langCombo);
 }

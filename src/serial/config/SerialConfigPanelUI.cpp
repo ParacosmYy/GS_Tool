@@ -155,6 +155,7 @@ void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
         if (m_connected) {
             emit disconnectRequested();
         } else {
+            ++m_totalConnectAttempts;
             m_connecting = true;
             m_connectBtn->setEnabled(false);
             m_connectBtn->setText(tr("连接中..."));

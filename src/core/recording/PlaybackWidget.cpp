@@ -80,7 +80,7 @@ void PlaybackWidget::setDuration(qint64 durationMs)
 
     // 重置当前位置并更新时间显示
     m_timeLabel->setText(
-        formatTime(0) + QStringLiteral(" / ") + formatTime(m_durationMs));
+        formatTime(0) + tr(" / ") + formatTime(m_durationMs));
 }
 
 /**
@@ -111,7 +111,7 @@ void PlaybackWidget::setCurrentTime(qint64 timeMs)
 
     // 更新时间标签："当前时间 / 总时长"
     m_timeLabel->setText(
-        formatTime(timeMs) + QStringLiteral(" / ") + formatTime(m_durationMs));
+        formatTime(timeMs) + tr(" / ") + formatTime(m_durationMs));
 }
 
 // ============================================================================
@@ -161,19 +161,19 @@ void PlaybackWidget::setupUI()
 
     // 倍速选项列表
     const QStringList speeds = {
-        QStringLiteral("0.25x"),
-        QStringLiteral("0.5x"),
-        QStringLiteral("1x"),
-        QStringLiteral("2x"),
-        QStringLiteral("4x"),
-        QStringLiteral("8x")
+        tr("0.25x"),
+        tr("0.5x"),
+        tr("1x"),
+        tr("2x"),
+        tr("4x"),
+        tr("8x")
     };
     m_speedCombo->addItems(speeds);
     m_speedCombo->setCurrentIndex(2);  // 默认 1x
 
     // ---- 时间标签 ----
     m_timeLabel = new QLabel(
-        formatTime(0) + QStringLiteral(" / ") + formatTime(0), this);
+        formatTime(0) + tr(" / ") + formatTime(0), this);
     m_timeLabel->setObjectName("timeLabel");
     m_timeLabel->setFixedWidth(140);
     m_timeLabel->setAlignment(Qt::AlignCenter);

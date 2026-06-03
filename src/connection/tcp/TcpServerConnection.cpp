@@ -77,6 +77,7 @@ void TcpServerConnection::close()
  */
 qint64 TcpServerConnection::write(const QByteArray& data)
 {
+    ++m_totalWrites;
     return broadcastToClients(data);
 }
 
@@ -104,6 +105,7 @@ void TcpServerConnection::configure(const QVariantMap& params)
  */
 bool TcpServerConnection::listen(const QHostAddress& address, int port)
 {
+    ++m_totalListenAttempts;
     if (m_listening) {
         return true;  ///< 已在监听，直接返回成功
     }
@@ -362,4 +364,6 @@ void TcpServerConnection::resetStatistics()
     m_totalRxBytes = 0;
     m_totalTxBytes = 0;
     m_totalAcceptErrors = 0;
+    m_totalListenAttempts = 0;
+    m_totalWrites = 0;
 }

@@ -128,11 +128,11 @@ private:
 
     QString iconChar() const {                               ///< 图标Unicode字符
         switch (m_type) {
-        case ToastType::Success: return QStringLiteral("✓");
-        case ToastType::Error:   return QStringLiteral("✕");
-        case ToastType::Info:    return QStringLiteral("ℹ");
+        case ToastType::Success: return tr("✓");
+        case ToastType::Error:   return tr("✕");
+        case ToastType::Info:    return tr("ℹ");
         }
-        return QStringLiteral("ℹ");
+        return tr("ℹ");
     }
 
     /** @brief 消失动画: InCubic，向上飘出30px + 淡出（并行） */

@@ -44,20 +44,33 @@ class SerialConfigPanel : public QWidget {
     Q_OBJECT
 
 public:
+    /** @brief 构造串口配置面板 @param parent 父窗口 */
     explicit SerialConfigPanel(QWidget* parent = nullptr);
 
-    void refreshPorts();                     ///< 刷新可用端口列表
-    QString currentPortData() const;         ///< 获取端口系统名(如COM3)
-    int currentBaudRate() const;             ///< 获取波特率
-    int currentDataBitsIndex() const;        ///< 数据位索引(0=5,3=8)
-    int currentParityIndex() const;          ///< 校验位索引
-    int currentStopBitsIndex() const;        ///< 停止位索引
-    int currentFlowControlIndex() const;     ///< 流控索引
-    bool dtrEnabled() const;                 ///< DTR是否为HIGH
-    bool rtsEnabled() const;                 ///< RTS是否为HIGH
-    void setConnected(bool connected);       ///< 设置连接状态
-    bool isConnected() const;                ///< 当前是否已连接
-    void restoreConfig(const QVariantMap& config); ///< 恢复配置
+    /** @brief 刷新可用端口列表，枚举系统所有串口设备 */
+    void refreshPorts();
+    /** @brief 获取当前选中的端口系统名 @return 端口名称（如"COM3"） */
+    QString currentPortData() const;
+    /** @brief 获取当前选中的波特率 @return 波特率值 */
+    int currentBaudRate() const;
+    /** @brief 获取当前数据位索引 @return 索引（0=5位, 1=6位, 2=7位, 3=8位） */
+    int currentDataBitsIndex() const;
+    /** @brief 获取当前校验位索引 @return 索引（0=无校验, 1=偶校验, 2=奇校验） */
+    int currentParityIndex() const;
+    /** @brief 获取当前停止位索引 @return 索引（0=1位, 1=1.5位, 2=2位） */
+    int currentStopBitsIndex() const;
+    /** @brief 获取当前流控模式索引 @return 索引（0=无流控, 1=硬件流控, 2=软件流控） */
+    int currentFlowControlIndex() const;
+    /** @brief 查询DTR信号状态 @return true=HIGH, false=LOW */
+    bool dtrEnabled() const;
+    /** @brief 查询RTS信号状态 @return true=HIGH, false=LOW */
+    bool rtsEnabled() const;
+    /** @brief 设置连接状态，更新按钮文字和状态指示器 @param connected 是否已连接 */
+    void setConnected(bool connected);
+    /** @brief 查询当前连接状态 @return true=已连接, false=已断开 */
+    bool isConnected() const;
+    /** @brief 从持久化配置恢复所有串口参数 @param config 配置键值对 */
+    void restoreConfig(const QVariantMap& config);
 
     /**
      * @brief 设置连接错误状态
@@ -71,13 +84,19 @@ public:
 
     // ---- Operation statistics ----
 
-    /** @brief Get cumulative config change count @return Total config changes since last reset */
+    /** @brief 获取累计配置变更次数(波特率/数据位/校验/停止位/流控) @return 变更总次数 */
     quint64 totalConfigChanges() const { return m_totalConfigChanges; }
 
-    /** @brief Get cumulative port switch count @return Total port switches since last reset */
+    /** @brief 获取累计端口切换次数 @return 端口切换总次数 */
     quint64 totalPortSwitches() const { return m_totalPortSwitches; }
 
-    /** @brief Reset all operation statistics counters to zero */
+    /** @brief 获取累计端口刷新次数(refreshPorts调用) @return 端口刷新总次数 */
+    quint64 totalRefreshPorts() const { return m_totalRefreshPorts; }
+
+    /** @brief 获取累计连接尝试次数(用户点击连接按钮) @return 连接尝试总次数 */
+    quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
+
+    /** @brief 重置所有操作统计计数器(配置变更/端口切换/端口刷新/连接尝试) */
     void resetStats();
 
 public slots:
@@ -109,9 +128,11 @@ signals:
     void autoReconnectToggled(bool enabled, int intervalMs);
 
 private slots:
-    void onPortComboChanged();    ///< 端口变化时更新按钮状态
+    /** @brief 端口下拉框选择变化时更新连接按钮可用状态和驱动信息 */
+    void onPortComboChanged();
 
 private:
+    /** @brief 初始化UI布局: 端口选择区+参数区+控制信号区+连接按钮 */
     void setupUI();
     /** @brief 创建端口选择区域(端口下拉框+刷新按钮) */
     QGroupBox* createPortGroup();
@@ -121,7 +142,9 @@ private:
     void setupSignalAndConnectControls(QVBoxLayout* mainLayout);
     /** @brief 创建DTR/RTS控制信号分组(含按钮+信号连接) */
     QGroupBox* createControlSignalsGroup();
+    /** @brief 根据选中端口更新驱动检测信息标签（VID/PID/制造商） */
     void updateDriverInfo();
+    /** @brief 根据当前状态更新连接按钮的文字、样式和可用性 */
     void updateConnectButtonState();
     /** @brief 更新状态指示器的颜色状态property并刷新样式 */
     void updateStatusIndicator(const QString& state);
@@ -164,6 +187,8 @@ private:
     // ---- 操作统计计数器 ----
     quint64 m_totalConfigChanges = 0;  ///< 累计配置变更次数(波特率/数据位/校验/停止位/流控)
     quint64 m_totalPortSwitches = 0;    ///< 累计端口切换次数
+    quint64 m_totalRefreshPorts = 0;    ///< 累计端口刷新次数
+    quint64 m_totalConnectAttempts = 0; ///< 累计连接尝试次数
 
     // ---- 呼吸动画 ----
     QAbstractAnimation* m_breathAnim = nullptr;  ///< 连接中状态的呼吸动画(0.3↔1.0循环)

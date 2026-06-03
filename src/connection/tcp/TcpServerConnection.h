@@ -91,6 +91,12 @@ public:
     /** @brief 获取累计accept错误次数 */
     quint64 totalAcceptErrors() const;
 
+    /** @brief 获取累计监听尝试次数(listen()调用) @return 监听尝试次数 */
+    quint64 totalListenAttempts() const { return m_totalListenAttempts; }
+
+    /** @brief 获取累计write()/broadcastToClients()调用次数 @return 写入调用次数 */
+    quint64 totalWrites() const { return m_totalWrites; }
+
     /** @brief 重置所有统计计数器为零 */
     void resetStatistics();
 
@@ -145,6 +151,8 @@ private:
     quint64 m_totalRxBytes = 0;               ///< 累计接收字节数
     quint64 m_totalTxBytes = 0;               ///< 累计发送字节数
     quint64 m_totalAcceptErrors = 0;          ///< 累计accept错误次数
+    quint64 m_totalListenAttempts = 0;        ///< 累计监听尝试次数
+    quint64 m_totalWrites = 0;                ///< 累计write()调用次数
 };
 
 #endif // TCPSERVERCONNECTION_H

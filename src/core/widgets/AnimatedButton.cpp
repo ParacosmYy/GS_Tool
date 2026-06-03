@@ -44,6 +44,7 @@ void AnimatedButton::setAnimOpacity(qreal opacity)
 void AnimatedButton::enterEvent(QEnterEvent* event)
 {
     QPushButton::enterEvent(event);
+    ++s_totalHoverEnters;
     startOpacityAnim(1.0, Animations::kButtonHoverMs, QEasingCurve::OutCubic);
 }
 
@@ -58,6 +59,7 @@ void AnimatedButton::leaveEvent(QEvent* event)
 void AnimatedButton::mousePressEvent(QMouseEvent* event)
 {
     QPushButton::mousePressEvent(event);
+    ++s_totalClicks;
     startOpacityAnim(0.75, Animations::kButtonPressMs, QEasingCurve::Linear);
 }
 
@@ -92,6 +94,7 @@ void AnimatedButton::startOpacityAnim(qreal targetOpacity, int durationMs, QEasi
         m_activeAnim = nullptr;
     }
     m_activeAnim = new QPropertyAnimation(this, "animOpacity");
+    ++s_totalAnimationsStarted;
     m_activeAnim->setStartValue(m_animOpacity);
     m_activeAnim->setEndValue(targetOpacity);
     m_activeAnim->setDuration(durationMs);

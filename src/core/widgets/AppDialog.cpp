@@ -77,13 +77,16 @@ AppDialog::DialogPromise AppDialog::show(Type type, const QString& title,
 
     // 连接信号
     QObject::connect(dialog, &QDialog::accepted, dialog, [promise]() {
+        ++s_totalAccepted;
         if (promise.m_onAccepted) promise.m_onAccepted();
     });
     QObject::connect(dialog, &QDialog::rejected, dialog, [promise]() {
+        ++s_totalRejected;
         if (promise.m_onRejected) promise.m_onRejected();
     });
 
     dialog->open();
+    ++s_totalShows;
     return promise;
 }
 
@@ -96,6 +99,8 @@ AppDialog::AppDialog(Type type, const QString& title, const QString& message,
     , m_type(type)
     , m_confirmText(confirmText)
     , m_cancelText(cancelText)
+    , m_title(title)
+    , m_message(message)
 {
     setObjectName("appDialog");
     setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
@@ -167,18 +172,9 @@ void AppDialog::setupUI()
 
     mainLayout->addLayout(buttonLayout);
 
-    // 设置标题和消息内容
-    switch (m_type) {
-    case Type::Confirm:
-        m_titleLabel->setText(m_titleLabel->text().isEmpty() ? QString() : QString());
-        break;
-    default:
-        break;
-    }
-
-    // 从构造参数获取标题/消息
-    // (标题已在构造时通过参数传入, 这里需要保存)
-    Q_UNUSED(0)
+    /* 设置标题和消息内容 */
+    m_titleLabel->setText(m_title);
+    m_messageLabel->setText(m_message);
 }
 
 void AppDialog::applyStyle()

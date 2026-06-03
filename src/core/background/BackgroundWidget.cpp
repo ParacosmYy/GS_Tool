@@ -24,6 +24,8 @@ BackgroundWidget::BackgroundWidget(QWidget* parent)
     : QWidget(parent)
     , m_rippleTimer(new QTimer(this))
 {
+    setObjectName("backgroundWidget");
+
     m_rippleTimer->setInterval(Timers::kRippleFrameMs); // ~60fps
     connect(m_rippleTimer, &QTimer::timeout, this, &BackgroundWidget::advanceRipples);
 
@@ -196,6 +198,7 @@ QString BackgroundWidget::currentImagePath() const
 void BackgroundWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event)
+    ++m_totalPaints;
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -254,6 +257,7 @@ void BackgroundWidget::mousePressEvent(QMouseEvent* event)
     ripple.maxRadius = 120.0 + QRandomGenerator::global()->bounded(60);
     ripple.opacity = 0.6;
     m_ripples.append(ripple);
+    ++m_totalRipples;
 
     // 如果定时器未运行则启动（涟漪结束后自动停止）
     if (!m_rippleTimer->isActive()) {
@@ -270,6 +274,7 @@ void BackgroundWidget::mousePressEvent(QMouseEvent* event)
 void BackgroundWidget::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
+    ++m_totalResizes;
     regenerateScaledBackground();
 }
 
@@ -374,6 +379,7 @@ void BackgroundWidget::advanceRipples()
  */
 void BackgroundWidget::updateThemeColors()
 {
+    ++m_totalThemeUpdates;
     auto& tm = ThemeManager::instance();
     m_overlayColor = tm.color(ThemeManager::SemanticColor::BgPrimary);
     m_rippleColor = tm.color(ThemeManager::SemanticColor::Accent);
@@ -388,4 +394,8 @@ void BackgroundWidget::resetBackgroundStatistics()
 {
     m_totalImageLoads = 0;
     m_totalEffectChanges = 0;
+    m_totalRipples = 0;
+    m_totalThemeUpdates = 0;
+    m_totalPaints = 0;
+    m_totalResizes = 0;
 }

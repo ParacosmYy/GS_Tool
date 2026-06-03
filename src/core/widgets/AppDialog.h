@@ -135,6 +135,22 @@ private:
     QPushButton* m_cancelBtn = nullptr;
     QString m_confirmText;
     QString m_cancelText;
+    QString m_title;                               ///< 对话框标题
+    QString m_message;                             ///< 对话框消息内容
+
+    // ---- 统计计数器(静态，跨所有实例累积) ----
+    static inline quint64 s_totalShows = 0;           ///< 累计弹窗显示次数
+    static inline quint64 s_totalAccepted = 0;        ///< 累计确认次数
+    static inline quint64 s_totalRejected = 0;        ///< 累计取消次数
+public:
+    /** @brief 获取累计弹窗显示次数 */
+    static quint64 totalDialogShows() { return s_totalShows; }
+    /** @brief 获取累计确认次数 */
+    static quint64 totalDialogAccepted() { return s_totalAccepted; }
+    /** @brief 获取累计取消次数 */
+    static quint64 totalDialogRejected() { return s_totalRejected; }
+    /** @brief 重置弹窗统计计数器 */
+    static void resetDialogStatistics() { s_totalShows = 0; s_totalAccepted = 0; s_totalRejected = 0; }
 };
 
 #endif // APPDIALOG_H

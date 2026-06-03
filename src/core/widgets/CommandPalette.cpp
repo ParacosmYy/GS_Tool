@@ -192,9 +192,9 @@ void CommandPalette::refreshList(const QString& filter)
                      || fuzzyMatch(filter, cmd.category);
         if (!match) continue;
 
-        QString text = QStringLiteral("%1  %2").arg(cmd.category, cmd.label);
+        QString text = tr("%1  %2").arg(cmd.category, cmd.label);
         if (!cmd.shortcut.isEmpty())
-            text += QStringLiteral("  [%1]").arg(cmd.shortcut);
+            text += tr("  [%1]").arg(cmd.shortcut);
 
         auto* item = new QListWidgetItem(text);
         item->setData(Qt::UserRole, i);

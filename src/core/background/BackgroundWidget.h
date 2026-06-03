@@ -73,15 +73,25 @@ public:
     void setBlurIterations(int iterations);
     int blurIterations() const;                     ///< 当前模糊迭代次数
 
-    void resetToDefault();                          ///< 恢复默认背景图
-    QString currentImagePath() const;               ///< 当前背景图路径
+    /** @brief 恢复默认背景图，清除自定义图片设置 */
+    void resetToDefault();
+    /** @brief 获取当前背景图文件路径 @return 图片路径字符串 */
+    QString currentImagePath() const;
 
     // ── 统计计数器 ──
 
-    /** @brief 获取图片加载总次数 */
+    /** @brief 获取图片加载总次数 @return 累计图片加载次数 */
     quint64 totalImageLoads() const { return m_totalImageLoads; }
-    /** @brief 获取效果变更总次数(模糊/透明度/涟漪等) */
+    /** @brief 获取效果变更总次数(模糊/透明度/涟漪等) @return 累计效果变更次数 */
     quint64 totalEffectChanges() const { return m_totalEffectChanges; }
+    /** @brief 获取涟漪创建总次数 @return 累计涟漪动画创建次数 */
+    quint64 totalRipples() const { return m_totalRipples; }
+    /** @brief 获取主题更新总次数 @return 累计主题色变更次数 */
+    quint64 totalThemeUpdates() const { return m_totalThemeUpdates; }
+    /** @brief 获取重绘总次数 @return 累计paintEvent调用次数 */
+    quint64 totalPaints() const { return m_totalPaints; }
+    /** @brief 获取窗口尺寸变更总次数 @return 累计resizeEvent调用次数 */
+    quint64 totalResizes() const { return m_totalResizes; }
     /** @brief 重置所有统计计数器 */
     void resetBackgroundStatistics();
 
@@ -98,9 +108,12 @@ protected:
 private:
     /** @brief 缩放法快速近似高斯模糊（缩小→放大利用双线性插值平滑） */
     QPixmap generateBlurred(const QPixmap& src, qreal radius) const;
-    void regenerateScaledBackground();  ///< 缓存当前窗口尺寸的缩放背景图
-    void advanceRipples();              ///< 涟漪动画帧更新（扩散+衰减）
-    void updateThemeColors();           ///< 从 ThemeManager 加载主题色并重绘
+    /** @brief 缓存当前窗口尺寸的缩放背景图，避免 paintEvent 中重复缩放 */
+    void regenerateScaledBackground();
+    /** @brief 涟漪动画帧更新（扩散半径递增 + 不透明度衰减） */
+    void advanceRipples();
+    /** @brief 从 ThemeManager 加载主题色（涟漪色/遮罩色）并触发重绘 */
+    void updateThemeColors();
 
     QPixmap m_originalImage;            ///< 原始背景图（未模糊）
     QPixmap m_blurredImage;             ///< 模糊后的背景图（原始尺寸）
@@ -130,6 +143,10 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalImageLoads = 0;      ///< 图片加载次数
     quint64 m_totalEffectChanges = 0;   ///< 效果变更次数(模糊/透明度/涟漪等)
+    quint64 m_totalRipples = 0;         ///< 涟漪创建次数
+    quint64 m_totalThemeUpdates = 0;    ///< 主题色更新次数
+    mutable quint64 m_totalPaints = 0;  ///< 重绘次数(paintEvent中递增，需mutable)
+    quint64 m_totalResizes = 0;         ///< 窗口尺寸变更次数
 };
 
 #endif // BACKGROUNDWIDGET_H

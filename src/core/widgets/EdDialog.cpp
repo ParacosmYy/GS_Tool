@@ -228,11 +228,11 @@ QColor EdDialog::accentColor() const
 QString EdDialog::iconChar() const
 {
     switch (m_type) {
-    case DialogType::Confirm:  return QStringLiteral("✓");
-    case DialogType::Warning:  return QStringLiteral("⚠");
-    case DialogType::Error:    return QStringLiteral("✕");
+    case DialogType::Confirm:  return tr("✓");
+    case DialogType::Warning:  return tr("⚠");
+    case DialogType::Error:    return tr("✕");
     }
-    return QStringLiteral("✓");
+    return tr("✓");
 }
 
 /**

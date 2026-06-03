@@ -79,6 +79,20 @@ private:
     qreal m_animOpacity = 1.0;                ///< 当前动画opacity(0.75~1.0)
     QGraphicsOpacityEffect* m_opacityEffect = nullptr;  ///< opacity特效(由this拥有)
     QPropertyAnimation* m_activeAnim = nullptr;         ///< 当前活跃的动画(防止并发冲突)
+
+    // ---- 统计计数器(静态，跨所有实例累积) ----
+    static inline quint64 s_totalHoverEnters = 0;     ///< 累计鼠标进入次数
+    static inline quint64 s_totalClicks = 0;          ///< 累计点击次数
+    static inline quint64 s_totalAnimationsStarted = 0; ///< 累计动画启动次数
+public:
+    /** @brief 获取累计鼠标进入次数 */
+    static quint64 totalHoverEnters() { return s_totalHoverEnters; }
+    /** @brief 获取累计点击次数 */
+    static quint64 totalButtonClicks() { return s_totalClicks; }
+    /** @brief 获取累计动画启动次数 */
+    static quint64 totalAnimationsStarted() { return s_totalAnimationsStarted; }
+    /** @brief 重置按钮统计计数器 */
+    static void resetButtonStatistics() { s_totalHoverEnters = 0; s_totalClicks = 0; s_totalAnimationsStarted = 0; }
 };
 
 #endif // ANIMATEDBUTTON_H

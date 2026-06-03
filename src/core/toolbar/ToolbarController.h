@@ -178,10 +178,15 @@ private:
     quint64 m_totalExports = 0;            ///< 累计导出按钮点击次数
     quint64 m_totalClears = 0;             ///< 累计清屏次数
 public:
+    /** @brief 获取累计显示模式切换次数 @return 切换总次数 */
     quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; }
+    /** @brief 获取累计主题切换次数 @return 切换总次数 */
     quint64 totalThemeChanges() const { return m_totalThemeChanges; }
+    /** @brief 获取累计导出按钮点击次数 @return 导出总次数 */
     quint64 totalExports() const { return m_totalExports; }
+    /** @brief 获取累计清屏次数 @return 清屏总次数 */
     quint64 totalClears() const { return m_totalClears; }
+    /** @brief 重置所有工具栏统计计数器(显示模式/主题/导出/清屏) */
     void resetToolbarStatistics() { m_totalDisplayModeChanges = 0; m_totalThemeChanges = 0; m_totalExports = 0; m_totalClears = 0; }
 };
 

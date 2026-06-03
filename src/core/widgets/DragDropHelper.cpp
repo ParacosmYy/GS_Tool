@@ -45,6 +45,7 @@ void DragDropHelper::acceptFileDrop(QWidget* widget,
     helper->m_type = DropType::Files;
     helper->m_extensions = extensions.toLower();
     helper->m_fileCallback = std::move(callback);
+    ++s_totalTargetsInstalled;
 
     // 设置控件属性用于标识
     widget->setProperty("_dropType", "files");
@@ -58,6 +59,7 @@ void DragDropHelper::acceptTextDrop(QWidget* widget, TextCallback callback)
     auto* helper = new DragDropHelper(widget);
     helper->m_type = DropType::Text;
     helper->m_textCallback = std::move(callback);
+    ++s_totalTargetsInstalled;
 
     widget->setProperty("_dropType", "text");
 }
@@ -69,6 +71,7 @@ void DragDropHelper::acceptUrlDrop(QWidget* widget, UrlCallback callback)
     auto* helper = new DragDropHelper(widget);
     helper->m_type = DropType::Urls;
     helper->m_urlCallback = std::move(callback);
+    ++s_totalTargetsInstalled;
 
     widget->setProperty("_dropType", "urls");
 }
@@ -156,6 +159,7 @@ bool DragDropHelper::handleDragEnter(QDragEnterEvent* event)
 
     if (accepted) {
         event->acceptProposedAction();
+        ++s_totalDragEnters;
         // 应用高亮
         QString color = m_target->property("_dropHighlightColor").toString();
         if (color.isEmpty()) color = "#4a9eff";
@@ -195,6 +199,7 @@ bool DragDropHelper::handleDrop(QDropEvent* event)
         }
         if (!files.isEmpty() && m_fileCallback) {
             m_fileCallback(files);
+            ++s_totalDrops;
             event->acceptProposedAction();
             return true;
         }
@@ -204,6 +209,7 @@ bool DragDropHelper::handleDrop(QDropEvent* event)
         QString text = mime->text();
         if (!text.isEmpty() && m_textCallback) {
             m_textCallback(text);
+            ++s_totalDrops;
             event->acceptProposedAction();
             return true;
         }
@@ -216,6 +222,7 @@ bool DragDropHelper::handleDrop(QDropEvent* event)
         }
         if (!urls.isEmpty() && m_urlCallback) {
             m_urlCallback(urls);
+            ++s_totalDrops;
             event->acceptProposedAction();
             return true;
         }

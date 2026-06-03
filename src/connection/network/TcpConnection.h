@@ -102,6 +102,12 @@ public:
     /** @brief 获取累计错误次数 @return 错误次数 */
     quint64 errorCount() const;
 
+    /** @brief 获取累计open()调用次数 @return 连接尝试总次数 */
+    quint64 totalOpenAttempts() const { return m_totalOpenAttempts; }
+
+    /** @brief 获取累计write()调用次数 @return 写入调用总次数 */
+    quint64 totalWrites() const { return m_totalWrites; }
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -151,6 +157,8 @@ private:
     quint64 m_totalBytesSent = 0;        ///< 累计发送字节数
     quint64 m_totalBytesReceived = 0;    ///< 累计接收字节数
     quint64 m_errorCount = 0;            ///< 累计错误次数
+    quint64 m_totalOpenAttempts = 0;     ///< 累计open()调用次数
+    quint64 m_totalWrites = 0;           ///< 累计write()调用次数
 };
 
 #endif // TCPCONNECTION_H

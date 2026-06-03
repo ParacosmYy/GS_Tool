@@ -130,7 +130,7 @@ QString ShortcutManager::shortcutTooltip(const QString& id) const
     }
 
     // 格式: "描述 (Ctrl+F)"
-    return QStringLiteral("%1 (%2)")
+    return tr("%1 (%2)")
         .arg(it->description,
              it->keySequence.toString(QKeySequence::NativeText));
 }

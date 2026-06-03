@@ -18,6 +18,8 @@
 DataStatistics::DataStatistics(QWidget* parent)
     : QWidget(parent)
 {
+    setObjectName("dataStatistics");
+
     setupUI();
 
     // 启动1秒定时器，用于刷新速率显示和持续时间
@@ -137,6 +139,9 @@ void DataStatistics::reset()
     m_totalUpdates = 0;
     m_totalBytesCounted = 0;
     m_totalPeakUpdates = 0;
+    m_totalErrorUpdates = 0;
+    m_totalHealthUpdates = 0;
+    m_totalRefreshCycles = 0;
 
     // 重置错误计数
     m_framingErrors = 0;
@@ -173,6 +178,7 @@ double DataStatistics::txRate() const
 /** @brief 1秒定时器回调：刷新持续时间、速率(含衰减)、峰值、均值显示 */
 void DataStatistics::onRefreshTimer()
 {
+    ++m_totalRefreshCycles;
     // 更新持续时间显示
     qint64 elapsedSec = m_stopwatch.elapsed() / 1000;
     int hours   = static_cast<int>(elapsedSec / 3600);
@@ -214,6 +220,7 @@ void DataStatistics::onRefreshTimer()
 /** @brief 更新串口通信错误计数(帧/校验/溢出)，有错误时显示面板 @param framingErrors 帧错误数 @param parityErrors 校验错误数 @param overrunErrors 溢出错误数 */
 void DataStatistics::updateErrors(int framingErrors, int parityErrors, int overrunErrors)
 {
+    ++m_totalErrorUpdates;
     // 更新内部计数器
     m_framingErrors = framingErrors;
     m_parityErrors = parityErrors;
@@ -257,6 +264,7 @@ QString DataStatistics::formatRate(double bytesPerSec) const
 /** @brief 更新连接健康状态(空闲超10秒显示警告) @param alive 连接是否存活 @param lastDataAgeMs 距上次收到数据的毫秒数 */
 void DataStatistics::updateConnectionHealth(bool alive, qint64 lastDataAgeMs)
 {
+    ++m_totalHealthUpdates;
     // 连接不存活时直接隐藏健康标签（由连接状态UI负责显示断开信息）
     if (!alive) {
         m_healthLabel->hide();
@@ -352,6 +360,9 @@ void DataStatistics::resetDataStatistics()
     m_totalUpdates = 0;
     m_totalBytesCounted = 0;
     m_totalPeakUpdates = 0;
+    m_totalErrorUpdates = 0;
+    m_totalHealthUpdates = 0;
+    m_totalRefreshCycles = 0;
 }
 
 /** @brief 获取峰值速率更新总次数 @return 峰值更新次数 */

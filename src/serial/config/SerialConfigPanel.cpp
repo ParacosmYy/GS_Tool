@@ -30,6 +30,8 @@
 SerialConfigPanel::SerialConfigPanel(QWidget* parent)
     : QWidget(parent)
 {
+    setObjectName("serialConfigPanel");
+
     setupUI();
     refreshPorts();
     updateDriverInfo();
@@ -155,6 +157,7 @@ void SerialConfigPanel::stopBreathAnimation()
 /** @brief 刷新串口端口列表(枚举系统可用端口，含VID/PID/描述/制造商信息) */
 void SerialConfigPanel::refreshPorts()
 {
+    ++m_totalRefreshPorts;
     QString cur = m_portCombo->currentData().toString();
     m_portCombo->clear();
     for (const auto& p : QSerialPortInfo::availablePorts()) {
@@ -306,4 +309,6 @@ void SerialConfigPanel::resetStats()
 {
     m_totalConfigChanges = 0;
     m_totalPortSwitches = 0;
+    m_totalRefreshPorts = 0;
+    m_totalConnectAttempts = 0;
 }
