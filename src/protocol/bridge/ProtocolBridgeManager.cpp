@@ -276,13 +276,7 @@ quint64 ProtocolBridgeManager::totalBytesProcessed() const
 // 内部信号处理槽
 // ============================================================================
 
-/**
- * @brief 处理 FrameParser 的帧解析成功
- * @param fields 字段映射
- * @param rawFrame 原始帧数据
- *
- * 累加总帧数统计后转发 frameParsed 信号给下游消费者。
- */
+/** @brief 处理FrameParser帧解析成功(累加统计后转发frameParsed信号) @param fields 字段映射 @param rawFrame 原始帧数据 */
 void ProtocolBridgeManager::onFrameParserParsed(
     const QVariantMap& fields, const QByteArray& rawFrame)
 {
@@ -290,14 +284,7 @@ void ProtocolBridgeManager::onFrameParserParsed(
     emit frameParsed(fields, rawFrame);
 }
 
-/**
- * @brief 处理 FrameParser 的帧解析错误
- * @param reason 错误原因
- * @param rawFrame 原始帧数据
- *
- * 累加校验错误计数（当错误原因为 "Checksum mismatch" 时），
- * 然后转发 frameError 信号给下游消费者。
- */
+/** @brief 处理FrameParser帧解析错误(检测校验错误+累加统计+转发信号) @param reason 错误原因 @param rawFrame 原始帧数据 */
 void ProtocolBridgeManager::onFrameParserError(
     const QString& reason, const QByteArray& rawFrame)
 {
@@ -311,13 +298,7 @@ void ProtocolBridgeManager::onFrameParserError(
     emit frameError(reason, rawFrame);
 }
 
-/**
- * @brief 处理桥接器的帧解析成功（用于 JustFloat/FireWater）
- * @param fields 字段映射
- * @param rawFrame 原始帧数据
- *
- * 累加帧计数后转发 frameParsed 信号。
- */
+/** @brief 处理桥接器帧解析成功(累加帧计数后转发frameParsed信号) @param fields 字段映射 @param rawFrame 原始帧数据 */
 void ProtocolBridgeManager::onBridgeParsed(
     const QVariantMap& fields, const QByteArray& rawFrame)
 {
@@ -330,20 +311,7 @@ void ProtocolBridgeManager::onBridgeParsed(
 // 信号连接切换
 // ============================================================================
 
-/**
- * @brief 切换数据源连接
- *
- * 根据当前 m_mode，断开所有源到本 Manager 的信号连接，
- * 然后仅连接活动源的信号。
- *
- * FrameParser 模式: 连接 onFrameParserParsed + onFrameParserError（内部槽）
- * JustFloat 模式: 连接 onBridgeParsed（内部槽）
- * FireWater 模式: 连接 onBridgeParsed（内部槽）
- *
- * 使用内部槽函数拦截信号，用于统计帧数和错误数。
- * 断开操作使用 disconnect(sender, signal, this, slot) 精确匹配，
- * 不会影响其他对象的信号连接。
- */
+/** @brief 切换数据源连接(断开所有源→根据模式重连活动源→内部槽拦截统计) */
 void ProtocolBridgeManager::switchSource()
 {
     // ---- 先断开所有源到本manager转发的连接 ----

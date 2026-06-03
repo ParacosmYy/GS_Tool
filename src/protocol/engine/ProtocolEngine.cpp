@@ -26,10 +26,7 @@
 /** @brief 缓冲区最大容量 64KB，防止内存膨胀 */
 static constexpr int MAX_BUFFER_SIZE = 65536;
 
-/**
- * @brief 构造函数
- * @param parent 父对象指针
- */
+/** @brief 构造函数 @param parent 父对象指针 */
 ProtocolEngine::ProtocolEngine(QObject *parent)
     : QObject(parent)
     , m_schema(nullptr)
@@ -48,33 +45,14 @@ ProtocolEngine::ProtocolEngine(QObject *parent)
 /** @brief 析构函数 */
 ProtocolEngine::~ProtocolEngine() = default;
 
-/**
- * @brief 设置协议帧结构定义
- *
- * 将引擎绑定到指定的 ProtocolSchema，后续 feedData() 调用
- * 将根据该定义进行帧解析。传入 nullptr 可清除当前定义。
- * 设置后会自动调用 reset() 清空缓冲区和计数器。
- *
- * @param schema 协议定义对象指针
- */
+/** @brief 设置协议帧结构定义(绑定schema→自动reset) @param schema 协议定义对象指针 */
 void ProtocolEngine::setSchema(ProtocolSchema *schema)
 {
     m_schema = schema;
     reset();
 }
 
-/**
- * @brief 向引擎喂入新的串口数据
- *
- * 将数据追加到内部缓冲区，然后尝试按当前 schema
- * 定义的帧格式进行帧同步与解析。解析成功后发射
- * frameParsed() 信号，失败时发射 parseError()。
- *
- * 支持连续解析：一次喂入的数据中可能包含多个完整帧，
- * 本方法会循环提取直到缓冲区中不再有完整帧。
- *
- * @param data 新接收到的原始字节流
- */
+/** @brief 向引擎喂入新的串口数据(追加缓冲→溢出保护→循环解析) @param data 新接收到的原始字节流 */
 void ProtocolEngine::feedData(const QByteArray &data)
 {
     /* 追加数据到缓冲区 */
@@ -103,12 +81,7 @@ void ProtocolEngine::feedData(const QByteArray &data)
     }
 }
 
-/**
- * @brief 重置解析状态
- *
- * 清空内部接收缓冲区，重置解析统计计数器。
- * 不会清除当前 schema 设置。
- */
+/** @brief 重置解析状态(清空缓冲区+重置计数器，不清除schema) */
 void ProtocolEngine::reset()
 {
     m_buffer.clear();
@@ -133,18 +106,7 @@ ProtocolSchema *ProtocolEngine::currentSchema() const
  * 帧解析核心逻辑
  * ============================================================================ */
 
-/**
- * @brief 尝试从缓冲区中解析一帧
- *
- * 按以下步骤处理：
- * 1. 在缓冲区中查找帧头
- * 2. 检查长度字段是否已接收完整
- * 3. 读取帧长度，检查整帧数据是否完整
- * 4. 提取帧数据，解析各字段
- * 5. 发射信号，从缓冲区移除已处理字节
- *
- * @return true 成功提取一帧，false 缓冲区数据不足以构成完整帧
- */
+/** @brief 尝试从缓冲区中解析一帧(搜索帧头→读取长度→校验→字段提取) @return true成功提取一帧，false缓冲区数据不足 */
 bool ProtocolEngine::tryParseOneFrame()
 {
     const auto framing = m_schema->framing();
@@ -225,15 +187,7 @@ bool ProtocolEngine::tryParseOneFrame()
     return true;
 }
 
-/**
- * @brief 在缓冲区中查找帧头字节序列
- *
- * 逐字节扫描缓冲区，匹配帧头的完整字节序列。
- *
- * @param buffer 待搜索的缓冲区
- * @param header 帧头字节序列
- * @return 帧头起始位置，未找到返回 -1
- */
+/** @brief 在缓冲区中查找帧头字节序列 @param buffer 待搜索的缓冲区 @param header 帧头字节序列 @return 帧头起始位置，未找到返回-1 */
 int ProtocolEngine::findHeader(const QByteArray &buffer,
                                 const QVector<int> &header) const
 {
@@ -258,14 +212,7 @@ int ProtocolEngine::findHeader(const QByteArray &buffer,
     return -1;
 }
 
-/**
- * @brief 修剪缓冲区，丢弃不可能是帧头前缀的垃圾数据
- *
- * 当未找到完整帧头时，保留缓冲区末尾可能构成部分帧头的字节。
- * 其余字节全部丢弃。
- *
- * @param header 帧头字节序列
- */
+/** @brief 修剪缓冲区，保留末尾可能构成部分帧头的字节 @param header 帧头字节序列 */
 void ProtocolEngine::trimBufferBeforePartialHeader(const QVector<int> &header)
 {
     if (header.isEmpty() || m_buffer.isEmpty()) {
@@ -305,17 +252,7 @@ void ProtocolEngine::trimBufferBeforePartialHeader(const QVector<int> &header)
     }
 }
 
-/**
- * @brief 从帧数据中读取长度字段（小端序）
- *
- * 按指定偏移和字节数从缓冲区中提取小端序整数。
- * 支持 1/2/4 字节长度字段。
- *
- * @param buffer 帧数据缓冲区
- * @param offset 长度字段偏移
- * @param size 长度字段字节数
- * @return 解析得到的长度值
- */
+/** @brief 从帧数据中读取长度字段(小端序，支持1/2/4字节) @param buffer 帧数据缓冲区 @param offset 长度字段偏移 @param size 长度字段字节数 @return 解析得到的长度值 */
 int ProtocolEngine::readLengthField(const QByteArray &buffer,
                                      int offset, int size) const
 {
@@ -330,16 +267,7 @@ int ProtocolEngine::readLengthField(const QByteArray &buffer,
     return static_cast<int>(value);
 }
 
-/**
- * @brief 从帧数据中提取单个字段值
- *
- * 根据字段定义的偏移、大小和类型，从原始帧数据中提取
- * 对应的字节并转换为 QVariant。支持多种整数、浮点类型。
- *
- * @param frame 完整的原始帧数据
- * @param field 字段定义
- * @return 提取到的字段值，越界或类型未知时返回空 QByteArray
- */
+/** @brief 从帧数据中提取单个字段值(支持uint8/uint16/int16/uint32/int32/float/double) @param frame 完整的原始帧数据 @param field 字段定义 @return 提取到的字段值，越界时返回空QByteArray */
 QVariant ProtocolEngine::extractField(const QByteArray &frame,
                                        const ProtocolSchema::FieldDefinition &field) const
 {

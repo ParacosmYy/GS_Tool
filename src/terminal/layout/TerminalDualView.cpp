@@ -29,22 +29,10 @@ TerminalDualView::TerminalDualView(QWidget *parent)
     setupUI();
 }
 
-/**
- * @brief 析构函数
- *
- * QObject 父子树自动回收子控件，无需手动释放。
- */
+/** @brief 析构函数，QObject父子树自动回收子控件 */
 TerminalDualView::~TerminalDualView() = default;
 
-/**
- * @brief 初始化界面布局
- *
- * 创建水平 QSplitter，左侧放置文本视图 QTextEdit，
- * 右侧放置十六进制视图 QTextEdit。初始比例为 1:1 (400:400)。
- *
- * - textView: 只读，带占位文本 "Text View"
- * - hexView:  只读，使用 Courier New 9pt 等宽字体，占位文本 "Hex View"
- */
+/** @brief 初始化界面布局(水平QSplitter: 左文本视图+右十六进制视图) */
 void TerminalDualView::setupUI()
 {
     auto *mainLayout = new QVBoxLayout(this);
@@ -81,9 +69,7 @@ void TerminalDualView::setupUI()
     setLayout(mainLayout);
 }
 
-/**
- * @brief 重置所有统计计数器为零
- */
+/** @brief 重置所有统计计数器为零 */
 void TerminalDualView::resetStatistics()
 {
     m_totalViewSwitches = 0;

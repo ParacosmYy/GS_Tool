@@ -94,19 +94,13 @@ bool TriggerManager::saveRules(const QString& filePath)
     return true;
 }
 
-/**
- * @brief 获取所有规则
- * @return 规则配置列表
- */
+/** @brief 获取所有规则 @return 规则配置列表 */
 QList<TriggerRuleConfig> TriggerManager::rules() const
 {
     return m_engine->rules();
 }
 
-/**
- * @brief 添加一条规则
- * @param rule 规则配置
- */
+/** @brief 添加一条规则 @param rule 规则配置 */
 void TriggerManager::addRule(const TriggerRuleConfig& rule)
 {
     m_engine->addRule(rule);
@@ -114,10 +108,7 @@ void TriggerManager::addRule(const TriggerRuleConfig& rule)
     emit rulesChanged();
 }
 
-/**
- * @brief 移除指定索引的规则
- * @param index 规则索引
- */
+/** @brief 移除指定索引的规则 @param index 规则索引 */
 void TriggerManager::removeRule(int index)
 {
     m_engine->removeRule(index);
@@ -125,11 +116,7 @@ void TriggerManager::removeRule(int index)
     emit rulesChanged();
 }
 
-/**
- * @brief 设置指定规则的启用/禁用状态
- * @param index 规则索引
- * @param enabled true 启用，false 禁用
- */
+/** @brief 设置指定规则的启用/禁用状态 @param index 规则索引 @param enabled true=启用，false=禁用 */
 void TriggerManager::setRuleEnabled(int index, bool enabled)
 {
     m_engine->setRuleEnabled(index, enabled);

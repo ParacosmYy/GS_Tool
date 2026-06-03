@@ -111,6 +111,7 @@ set(SOURCES
     src/protocol/bridge/FireWaterBridge.cpp
     src/protocol/bridge/ProtocolBridgeManager.cpp
     src/chart/widget/ChartWidget.cpp
+    src/chart/widget/ChartWidgetTheme.cpp
     src/chart/model/ChannelConfig.cpp
     src/chart/model/ChartModel.cpp
     src/chart/scale/YAxisManager.cpp

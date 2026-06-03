@@ -7,36 +7,25 @@
 #include <QSslConfiguration>
 #include <QFile>
 
-/**
- * @brief 构造函数
- * @param parent 父对象
- */
+/** @brief 构造TLS连接对象 @param parent 父QObject指针 */
 TlsConnection::TlsConnection(QObject* parent)
     : IConnection(parent)
 {
 }
 
-/**
- * @brief 析构函数 - 关闭连接
- */
+/** @brief 析构TLS连接，关闭并释放SSL socket资源 */
 TlsConnection::~TlsConnection()
 {
     close();
 }
 
-/**
- * @brief 获取连接类型
- * @return TCP客户端类型(通过TLS封装)
- */
+/** @brief 获取连接类型 @return ConnectionType::Tls */
 ConnectionType TlsConnection::type() const
 {
     return ConnectionType::Tls;
 }
 
-/**
- * @brief 获取连接显示名称
- * @return "TLS://主机:端口" 格式
- */
+/** @brief 获取连接显示名称 @return 已连接时返回"TLS://主机:端口"格式，否则返回"未连接" */
 QString TlsConnection::name() const
 {
     if (m_state == ConnectionState::Connected) {
@@ -45,18 +34,13 @@ QString TlsConnection::name() const
     return tr("TLS (未连接)");
 }
 
-/**
- * @brief 获取当前状态
- */
+/** @brief 获取当前连接状态 @return 连接状态枚举值 */
 ConnectionState TlsConnection::state() const
 {
     return m_state;
 }
 
-/**
- * @brief 打开TLS连接 - 发起加密握手
- * @return true=握手已启动
- */
+/** @brief 打开TLS连接，加载证书/私钥/CA并发起加密握手 @return true=握手已启动，false=配置错误 */
 bool TlsConnection::open()
 {
     if (m_state == ConnectionState::Connected) {
@@ -147,9 +131,7 @@ bool TlsConnection::open()
     return true;
 }
 
-/**
- * @brief 关闭TLS连接
- */
+/** @brief 关闭TLS连接，断开信号并释放SSL socket */
 void TlsConnection::close()
 {
     if (m_socket) {
@@ -161,11 +143,7 @@ void TlsConnection::close()
     updateState(ConnectionState::Disconnected);
 }
 
-/**
- * @brief 发送加密数据
- * @param data 待发送数据
- * @return 发送字节数
- */
+/** @brief 发送加密数据 @param data 待发送数据 @return 发送字节数，未连接返回-1 */
 qint64 TlsConnection::write(const QByteArray& data)
 {
     if (!m_socket || m_state != ConnectionState::Connected) {
@@ -182,10 +160,7 @@ qint64 TlsConnection::write(const QByteArray& data)
     return written;
 }
 
-/**
- * @brief 配置TLS连接参数
- * @param params 参数映射
- */
+/** @brief 配置TLS连接参数(host/port/certPath/keyPath/caPath/peerVerify) @param params 参数映射 */
 void TlsConnection::configure(const QVariantMap& params)
 {
     if (params.contains("host")) {
@@ -208,44 +183,33 @@ void TlsConnection::configure(const QVariantMap& params)
     }
 }
 
-/**
- * @brief 设置本地证书和私钥
- */
+/** @brief 设置本地证书和私钥文件路径 @param certPath 证书文件路径(PEM格式) @param keyPath 私钥文件路径(PEM格式) */
 void TlsConnection::setCertificate(const QString& certPath, const QString& keyPath)
 {
     m_certPath = certPath;
     m_keyPath = keyPath;
 }
 
-/**
- * @brief 设置CA证书
- */
+/** @brief 设置CA证书文件路径用于验证对端 @param caPath CA证书文件路径 */
 void TlsConnection::setCaCertificate(const QString& caPath)
 {
     m_caPath = caPath;
 }
 
-/**
- * @brief 设置是否验证对端证书
- */
+/** @brief 设置是否验证对端证书 @param verify true=验证对端，false=不验证 */
 void TlsConnection::setPeerVerify(bool verify)
 {
     m_peerVerify = verify;
 }
 
-/**
- * @brief SSL加密通道建立完成
- */
+/** @brief SSL加密通道建立完成回调，更新状态为Connected */
 void TlsConnection::onEncrypted()
 {
     ++m_totalHandshakes;
     updateState(ConnectionState::Connected);
 }
 
-/**
- * @brief SSL错误处理
- * @param errors SSL错误列表
- */
+/** @brief SSL错误处理，不验证对端时忽略错误，否则累计错误计数 @param errors SSL错误列表 */
 void TlsConnection::onSslErrors(const QList<QSslError>& errors)
 {
     if (!m_peerVerify) {
@@ -263,9 +227,7 @@ void TlsConnection::onSslErrors(const QList<QSslError>& errors)
     emit errorOccurred(tr("TLS证书验证失败: %1").arg(errorStrs.join("; ")));
 }
 
-/**
- * @brief 数据到达回调
- */
+/** @brief 数据到达回调，累计接收字节数并发射dataReceived信号 */
 void TlsConnection::onReadyRead()
 {
     if (!m_socket) return;
@@ -277,10 +239,7 @@ void TlsConnection::onReadyRead()
     }
 }
 
-/**
- * @brief socket连接状态变化回调
- * @param socketState 当前socket状态
- */
+/** @brief socket连接状态变化回调，UnconnectedState时更新为Disconnected @param socketState 当前socket状态 */
 void TlsConnection::onStateChanged(QAbstractSocket::SocketState socketState)
 {
     if (socketState == QAbstractSocket::UnconnectedState) {
@@ -288,9 +247,7 @@ void TlsConnection::onStateChanged(QAbstractSocket::SocketState socketState)
     }
 }
 
-/**
- * @brief 更新连接状态
- */
+/** @brief 更新连接状态，状态变化时发射stateChanged信号 @param newState 新状态 */
 void TlsConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {
@@ -299,21 +256,19 @@ void TlsConnection::updateState(ConnectionState newState)
     }
 }
 
-// ---- 统计接口实现 ----
-
-/** @brief 获取SSL握手完成次数 */
+/** @brief 获取SSL握手完成次数 @return 握手成功总数 */
 quint64 TlsConnection::totalHandshakes() const { return m_totalHandshakes; }
 
-/** @brief 获取已发送字节总数 */
+/** @brief 获取已发送字节总数 @return 发送字节总量 */
 quint64 TlsConnection::totalBytesSent() const { return m_totalBytesSent; }
 
-/** @brief 获取已接收字节总数 */
+/** @brief 获取已接收字节总数 @return 接收字节总量 */
 quint64 TlsConnection::totalBytesReceived() const { return m_totalBytesReceived; }
 
-/** @brief 获取错误计数 */
+/** @brief 获取错误计数 @return 错误总数 */
 quint64 TlsConnection::errorCount() const { return m_errorCount; }
 
-/** @brief 重置所有统计数据为零 */
+/** @brief 重置所有TLS统计数据(握手/字节/错误计数)为零 */
 void TlsConnection::resetStats()
 {
     m_totalHandshakes = 0;

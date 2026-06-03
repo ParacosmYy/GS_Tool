@@ -9,16 +9,7 @@
 #include "protocol/engine/ProtocolEngine.h"
 #include "protocol/schema/ProtocolSchema.h"
 
-/**
- * @brief 验证帧的校验和/CRC
- *
- * 根据framing中指定的校验类型，从帧数据中提取校验字段
- * 并与计算值比较。校验字段位于帧末尾，长度取决于校验类型。
- *
- * @param frame 完整帧数据(含校验字段)
- * @param framing 帧格式定义(含校验类型和校验字段偏移)
- * @return true=校验通过, false=校验失败
- */
+/** @brief 验证帧的校验和/CRC @param frame 完整帧数据(含校验字段) @param framing 帧格式定义 @return true=校验通过，false=校验失败 */
 bool ProtocolEngine::validateChecksum(const QByteArray &frame,
                                        const ProtocolSchema::FramingRule &framing) const
 {
@@ -75,16 +66,7 @@ bool ProtocolEngine::validateChecksum(const QByteArray &frame,
     }
 }
 
-/**
- * @brief 计算CRC-8校验值
- *
- * 使用多项式0x07 (CRC-8/ITU标准)。
- * 初始值0x00，无输入/输出反转。
- *
- * @param data 待校验数据
- * @param polynomial CRC多项式(默认0x07)
- * @return CRC-8校验值
- */
+/** @brief 计算CRC-8校验值(多项式0x07) @param data 待校验数据 @param polynomial CRC多项式 @return CRC-8校验值 */
 quint8 ProtocolEngine::computeCrc8(const QByteArray &data, quint8 polynomial)
 {
     quint8 crc = 0x00;
@@ -101,15 +83,7 @@ quint8 ProtocolEngine::computeCrc8(const QByteArray &data, quint8 polynomial)
     return crc;
 }
 
-/**
- * @brief 计算CRC-16 CCITT校验值
- *
- * 多项式0x1021，初始值0xFFFF，无输入/输出反转。
- * 常用于XMODEM/CRC-CCITT协议。
- *
- * @param data 待校验数据
- * @return CRC-16 CCITT校验值
- */
+/** @brief 计算CRC-16 CCITT校验值(多项式0x1021) @param data 待校验数据 @return CRC-16校验值 */
 quint16 ProtocolEngine::computeCrc16Ccitt(const QByteArray &data)
 {
     quint16 crc = 0xFFFF;
@@ -126,15 +100,7 @@ quint16 ProtocolEngine::computeCrc16Ccitt(const QByteArray &data)
     return crc;
 }
 
-/**
- * @brief 计算CRC-16 Modbus校验值
- *
- * 多项式0x8005，初始值0xFFFF，输入反转+输出反转。
- * Modbus RTU协议标准校验算法。
- *
- * @param data 待校验数据
- * @return CRC-16 Modbus校验值(小端序存储: 低字节在前)
- */
+/** @brief 计算CRC-16 Modbus校验值(多项式0x8005，小端序) @param data 待校验数据 @return CRC-16校验值 */
 quint16 ProtocolEngine::computeCrc16Modbus(const QByteArray &data)
 {
     quint16 crc = 0xFFFF;
@@ -151,16 +117,7 @@ quint16 ProtocolEngine::computeCrc16Modbus(const QByteArray &data)
     return crc;
 }
 
-/**
- * @brief 计算CRC-32校验值
- *
- * 使用标准CRC-32多项式0xEDB88320(反转形式)。
- * 初始值0xFFFFFFFF，输出异或0xFFFFFFFF。
- * 兼容ZIP/PNG等标准的CRC-32。
- *
- * @param data 待校验数据
- * @return CRC-32校验值
- */
+/** @brief 计算CRC-32校验值(多项式0xEDB88320，兼容ZIP/PNG) @param data 待校验数据 @return CRC-32校验值 */
 quint32 ProtocolEngine::computeCrc32(const QByteArray &data)
 {
     quint32 crc = 0xFFFFFFFF;
@@ -177,14 +134,7 @@ quint32 ProtocolEngine::computeCrc32(const QByteArray &data)
     return crc ^ 0xFFFFFFFF;
 }
 
-/**
- * @brief 计算异或校验值
- *
- * 对所有字节逐个异或，结果为单字节校验值。
- *
- * @param data 待校验数据
- * @return 异或校验结果
- */
+/** @brief 计算异或校验值(所有字节逐个XOR) @param data 待校验数据 @return 异或校验结果 */
 quint8 ProtocolEngine::computeXor(const QByteArray &data)
 {
     quint8 result = 0x00;

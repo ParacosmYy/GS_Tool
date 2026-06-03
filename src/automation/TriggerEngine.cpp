@@ -8,10 +8,7 @@
 #include <QRegularExpression>
 #include <QString>
 
-/**
- * @brief 构造函数
- * @param parent 父对象
- */
+/** @brief 构造函数 @param parent 父对象 */
 TriggerEngine::TriggerEngine(QObject* parent)
     : QObject(parent)
     , m_enabled(true)
@@ -118,20 +115,14 @@ void TriggerEngine::evaluateValue(const QString& name, double value)
     }
 }
 
-/**
- * @brief 添加一条触发器规则
- * @param rule 规则配置
- */
+/** @brief 添加一条触发器规则 @param rule 规则配置 */
 void TriggerEngine::addRule(const TriggerRuleConfig& rule)
 {
     m_rules.append(rule);
     m_ruleMatchCounts.append(0);
 }
 
-/**
- * @brief 移除指定索引的规则
- * @param index 规则索引
- */
+/** @brief 移除指定索引的规则 @param index 规则索引 */
 void TriggerEngine::removeRule(int index)
 {
     if (index >= 0 && index < m_rules.size()) {
@@ -142,20 +133,13 @@ void TriggerEngine::removeRule(int index)
     }
 }
 
-/**
- * @brief 设置所有规则的启用/禁用状态
- * @param enabled true 启用，false 禁用
- */
+/** @brief 设置所有规则的启用/禁用状态 @param enabled true=启用，false=禁用 */
 void TriggerEngine::setRulesEnabled(bool enabled)
 {
     m_enabled = enabled;
 }
 
-/**
- * @brief 设置指定规则的启用/禁用状态
- * @param index 规则索引
- * @param enabled true 启用，false 禁用
- */
+/** @brief 设置指定规则的启用/禁用状态 @param index 规则索引 @param enabled true=启用，false=禁用 */
 void TriggerEngine::setRuleEnabled(int index, bool enabled)
 {
     if (index >= 0 && index < m_rules.size()) {
@@ -163,10 +147,7 @@ void TriggerEngine::setRuleEnabled(int index, bool enabled)
     }
 }
 
-/**
- * @brief 获取所有规则列表
- * @return 规则配置列表的常引用
- */
+/** @brief 获取所有规则列表 @return 规则配置列表的常引用 */
 const QList<TriggerRuleConfig>& TriggerEngine::rules() const
 {
     return m_rules;
@@ -179,19 +160,13 @@ void TriggerEngine::clearRules()
     m_ruleMatchCounts.clear();
 }
 
-/**
- * @brief 获取累计成功匹配次数
- * @return 匹配次数
- */
+/** @brief 获取累计成功匹配次数 @return 匹配次数 */
 int TriggerEngine::matchCount() const
 {
     return m_matchCount;
 }
 
-/**
- * @brief 获取上次匹配距现在的毫秒数
- * @return 距上次匹配的毫秒数，无匹配返回 -1
- */
+/** @brief 获取上次匹配距现在的毫秒数 @return 距上次匹配的毫秒数，无匹配返回-1 */
 qint64 TriggerEngine::msSinceLastMatch() const
 {
     if (!m_hasMatched) {
@@ -200,9 +175,7 @@ qint64 TriggerEngine::msSinceLastMatch() const
     return m_lastMatchTimer.elapsed();
 }
 
-/**
- * @brief 重置统计计数（不重置规则）
- */
+/** @brief 重置统计计数(不重置规则) */
 void TriggerEngine::resetStatistics()
 {
     m_matchCount = 0;
@@ -210,11 +183,7 @@ void TriggerEngine::resetStatistics()
     m_ruleMatchCounts.fill(0);
 }
 
-/**
- * @brief 获取指定规则的匹配次数
- * @param index 规则索引
- * @return 该规则命中次数，无效索引返回 0
- */
+/** @brief 获取指定规则的匹配次数 @param index 规则索引 @return 该规则命中次数，无效索引返回0 */
 int TriggerEngine::ruleMatchCount(int index) const
 {
     if (index >= 0 && index < m_ruleMatchCounts.size()) {

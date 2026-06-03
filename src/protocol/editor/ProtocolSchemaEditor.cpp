@@ -18,13 +18,7 @@
 #include <QJsonDocument>
 #include <QStyle>
 
-/**
- * @brief 构造函数
- *
- * 初始化界面布局：标题标签、JSON 编辑区、操作按钮行和状态标签。
- *
- * @param parent 父控件指针
- */
+/** @brief 构造函数(初始化标题+编辑区+按钮+状态标签) @param parent 父控件指针 */
 ProtocolSchemaEditor::ProtocolSchemaEditor(QWidget *parent)
     : QWidget(parent)
     , m_jsonEditor(nullptr)
@@ -41,15 +35,7 @@ ProtocolSchemaEditor::ProtocolSchemaEditor(QWidget *parent)
  */
 ProtocolSchemaEditor::~ProtocolSchemaEditor() = default;
 
-/**
- * @brief 初始化界面布局
- *
- * 创建并排列所有 UI 元素：
- * - 标题标签（"Protocol Schema Editor"）
- * - JSON 文本编辑区（等宽字体）
- * - 操作按钮行（验证、保存）
- * - 状态提示标签（自动换行）
- */
+/** @brief 初始化界面布局(标题+JSON编辑区+按钮行+状态标签) */
 void ProtocolSchemaEditor::setupUI()
 {
     auto *mainLayout = new QVBoxLayout(this);
@@ -106,14 +92,7 @@ void ProtocolSchemaEditor::setupUI()
     });
 }
 
-/**
- * @brief 加载协议定义到编辑器
- *
- * 将 ProtocolSchema 序列化为格式化 JSON 文本并填入编辑区。
- * 如果 schema 无效则显示错误提示。
- *
- * @param schema 指向要编辑的 ProtocolSchema 对象
- */
+/** @brief 加载协议定义到编辑器(序列化为JSON填入编辑区) @param schema 指向要编辑的ProtocolSchema对象 */
 void ProtocolSchemaEditor::loadSchema(ProtocolSchema *schema)
 {
     m_schema = schema;
@@ -137,21 +116,13 @@ void ProtocolSchemaEditor::loadSchema(ProtocolSchema *schema)
     }
 }
 
-/**
- * @brief 获取当前编辑的协议定义
- * @return 当前 ProtocolSchema 指针，未加载时为 nullptr
- */
+/** @brief 获取当前编辑的协议定义 @return 当前ProtocolSchema指针，未加载时为nullptr */
 ProtocolSchema *ProtocolSchemaEditor::currentSchema() const
 {
     return m_schema;
 }
 
-/**
- * @brief 验证当前 JSON 文本是否为合法协议定义
- *
- * 创建临时 ProtocolSchema 对象，尝试从编辑区文本解析。
- * 成功时显示协议名称（绿色），失败时显示错误信息（红色）。
- */
+/** @brief 验证当前JSON文本是否为合法协议定义(临时ProtocolSchema解析) */
 void ProtocolSchemaEditor::validateJson()
 {
     ++m_totalValidations;  ///< 统计: 验证操作
@@ -179,19 +150,13 @@ void ProtocolSchemaEditor::validateJson()
     delete tmpSchema;
 }
 
-/**
- * @brief 设置 JSON 编辑器文本内容
- * @param json 要显示的 JSON 文本
- */
+/** @brief 设置JSON编辑器文本内容 @param json 要显示的JSON文本 */
 void ProtocolSchemaEditor::setJsonText(const QString &json)
 {
     m_jsonEditor->setPlainText(json);
 }
 
-/**
- * @brief 获取 JSON 编辑器当前文本内容
- * @return 编辑器中的 JSON 文本
- */
+/** @brief 获取JSON编辑器当前文本内容 @return 编辑器中的JSON文本 */
 QString ProtocolSchemaEditor::jsonText() const
 {
     return m_jsonEditor->toPlainText();

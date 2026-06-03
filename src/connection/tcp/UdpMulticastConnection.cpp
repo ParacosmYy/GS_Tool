@@ -6,36 +6,25 @@
 #include "connection/tcp/UdpMulticastConnection.h"
 #include <QNetworkInterface>
 
-/**
- * @brief 构造函数
- * @param parent 父对象
- */
+/** @brief 构造UDP组播连接对象 @param parent 父QObject指针 */
 UdpMulticastConnection::UdpMulticastConnection(QObject* parent)
     : IConnection(parent)
 {
 }
 
-/**
- * @brief 析构函数 - 关闭连接
- */
+/** @brief 析构UDP组播连接，离开组播组并关闭socket */
 UdpMulticastConnection::~UdpMulticastConnection()
 {
     close();
 }
 
-/**
- * @brief 获取连接类型
- * @return UDP类型
- */
+/** @brief 获取连接类型 @return ConnectionType::Udp */
 ConnectionType UdpMulticastConnection::type() const
 {
     return ConnectionType::Udp;
 }
 
-/**
- * @brief 获取连接显示名称
- * @return "Multicast:组地址:端口" 格式
- */
+/** @brief 获取连接显示名称 @return 已连接时返回"组播:地址:端口"格式，否则返回"未连接" */
 QString UdpMulticastConnection::name() const
 {
     if (m_state == ConnectionState::Connected) {
@@ -44,17 +33,13 @@ QString UdpMulticastConnection::name() const
     return tr("UDP Multicast (未连接)");
 }
 
-/**
- * @brief 获取当前状态
- */
+/** @brief 获取当前连接状态 @return 连接状态枚举值 */
 ConnectionState UdpMulticastConnection::state() const
 {
     return m_state;
 }
 
-/**
- * @brief 初始化socket(懒创建)
- */
+/** @brief 懒创建QUdpSocket并连接readyRead/errorOccurred信号 */
 void UdpMulticastConnection::ensureSocket()
 {
     if (m_socket) return;
@@ -66,10 +51,7 @@ void UdpMulticastConnection::ensureSocket()
             this, &UdpMulticastConnection::onError);
 }
 
-/**
- * @brief 打开连接 - 绑定本地端口并加入组播组
- * @return true=成功
- */
+/** @brief 打开连接，绑定本地端口并加入组播组 @return true=绑定成功 */
 bool UdpMulticastConnection::open()
 {
     ensureSocket();
@@ -96,9 +78,7 @@ bool UdpMulticastConnection::open()
     return true;
 }
 
-/**
- * @brief 关闭连接 - 离开组播组并释放socket
- */
+/** @brief 关闭连接，离开组播组并释放socket */
 void UdpMulticastConnection::close()
 {
     if (m_socket) {
@@ -113,11 +93,7 @@ void UdpMulticastConnection::close()
     updateState(ConnectionState::Disconnected);
 }
 
-/**
- * @brief 发送组播数据
- * @param data 待发送数据
- * @return 发送字节数
- */
+/** @brief 发送组播数据到组播组 @param data 待发送数据 @return 发送字节数，未连接返回-1 */
 qint64 UdpMulticastConnection::write(const QByteArray& data)
 {
     if (!m_socket || m_state != ConnectionState::Connected) {
@@ -134,13 +110,7 @@ qint64 UdpMulticastConnection::write(const QByteArray& data)
     return written;
 }
 
-/**
- * @brief 配置连接参数
- * @param params 参数映射:
- *   - "groupAddress": QString (组播地址)
- *   - "localPort": int
- *   - "remotePort": int
- */
+/** @brief 配置UDP组播参数(groupAddress/localPort/remotePort) @param params 参数映射 */
 void UdpMulticastConnection::configure(const QVariantMap& params)
 {
     if (params.contains("groupAddress")) {
@@ -154,10 +124,7 @@ void UdpMulticastConnection::configure(const QVariantMap& params)
     }
 }
 
-/**
- * @brief 加入组播组
- * @param groupAddress 组播地址
- */
+/** @brief 加入指定组播组 @param groupAddress 组播地址 */
 void UdpMulticastConnection::joinGroup(const QHostAddress& groupAddress)
 {
     if (!m_socket) return;
@@ -174,10 +141,7 @@ void UdpMulticastConnection::joinGroup(const QHostAddress& groupAddress)
     }
 }
 
-/**
- * @brief 离开组播组
- * @param groupAddress 组播地址
- */
+/** @brief 离开指定组播组 @param groupAddress 组播地址 */
 void UdpMulticastConnection::leaveGroup(const QHostAddress& groupAddress)
 {
     if (!m_socket) return;
@@ -190,10 +154,7 @@ void UdpMulticastConnection::leaveGroup(const QHostAddress& groupAddress)
     }
 }
 
-/**
- * @brief 设置组播网络接口
- * @param interfaceName 网络接口名称
- */
+/** @brief 设置组播数据发送使用的网络接口 @param interfaceName 网络接口名称 */
 void UdpMulticastConnection::setMulticastInterface(const QString& interfaceName)
 {
     for (const QNetworkInterface& iface : QNetworkInterface::allInterfaces()) {
@@ -206,9 +167,7 @@ void UdpMulticastConnection::setMulticastInterface(const QString& interfaceName)
     m_usingCustomInterface = false;
 }
 
-/**
- * @brief 数据到达回调
- */
+/** @brief 数据到达回调，读取所有待处理数据报并发射dataReceived信号 */
 void UdpMulticastConnection::onReadyRead()
 {
     if (!m_socket) return;
@@ -230,9 +189,7 @@ void UdpMulticastConnection::onReadyRead()
     }
 }
 
-/**
- * @brief 网络错误回调
- */
+/** @brief 网络错误回调，发射errorOccurred信号 @param error socket错误类型 */
 void UdpMulticastConnection::onError(QAbstractSocket::SocketError error)
 {
     Q_UNUSED(error)
@@ -241,9 +198,7 @@ void UdpMulticastConnection::onError(QAbstractSocket::SocketError error)
     }
 }
 
-/**
- * @brief 更新连接状态
- */
+/** @brief 更新连接状态，状态变化时发射stateChanged信号 @param newState 新状态 */
 void UdpMulticastConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {
@@ -252,41 +207,31 @@ void UdpMulticastConnection::updateState(ConnectionState newState)
     }
 }
 
-/**
- * @brief 获取已发送数据报计数
- */
+/** @brief 获取已发送数据报计数 @return 发送数据报总数 */
 quint64 UdpMulticastConnection::datagramsSent() const
 {
     return m_dgramsSent;
 }
 
-/**
- * @brief 获取已接收数据报计数
- */
+/** @brief 获取已接收数据报计数 @return 接收数据报总数 */
 quint64 UdpMulticastConnection::datagramsReceived() const
 {
     return m_dgramsRecv;
 }
 
-/**
- * @brief 获取累计发送字节数
- */
+/** @brief 获取累计发送字节数 @return 发送字节总量 */
 qint64 UdpMulticastConnection::totalBytesSent() const
 {
     return m_txBytes;
 }
 
-/**
- * @brief 获取累计接收字节数
- */
+/** @brief 获取累计接收字节数 @return 接收字节总量 */
 qint64 UdpMulticastConnection::totalBytesReceived() const
 {
     return m_rxBytes;
 }
 
-/**
- * @brief 重置统计数据
- */
+/** @brief 重置统计数据(数据报/字节/加入离开次数)为零 */
 void UdpMulticastConnection::resetStatistics()
 {
     m_dgramsSent = 0;
@@ -297,17 +242,13 @@ void UdpMulticastConnection::resetStatistics()
     m_totalLeaves = 0;
 }
 
-/**
- * @brief 获取组播组加入总次数
- */
+/** @brief 获取组播组加入总次数 @return 加入组播组总次数 */
 quint64 UdpMulticastConnection::totalJoins() const
 {
     return m_totalJoins;
 }
 
-/**
- * @brief 获取组播组离开总次数
- */
+/** @brief 获取组播组离开总次数 @return 离开组播组总次数 */
 quint64 UdpMulticastConnection::totalLeaves() const
 {
     return m_totalLeaves;

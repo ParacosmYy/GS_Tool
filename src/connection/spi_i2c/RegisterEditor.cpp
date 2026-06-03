@@ -9,10 +9,7 @@
 #include "connection/spi_i2c/SpiConnection.h"
 #include <QHBoxLayout>
 
-/**
- * @brief 构造函数 - 初始化UI
- * @param parent 父控件
- */
+/** @brief 构造寄存器编辑器UI，初始化地址/数据输入和操作日志 @param parent 父控件 */
 RegisterEditor::RegisterEditor(QWidget* parent)
     : QWidget(parent)
 {
@@ -21,19 +18,13 @@ RegisterEditor::RegisterEditor(QWidget* parent)
     setupConnections();
 }
 
-/**
- * @brief 设置底层连接
- * @param connection IConnection实例
- */
+/** @brief 设置底层I2C/SPI连接实例 @param connection IConnection实例 */
 void RegisterEditor::setConnection(IConnection* connection)
 {
     m_connection = connection;
 }
 
-/**
- * @brief 设置默认读取长度
- * @param length 读取字节数
- */
+/** @brief 设置默认读取长度 @param length 读取字节数 */
 void RegisterEditor::setReadLength(int length)
 {
     m_readLength = qMax(1, length);
@@ -42,13 +33,7 @@ void RegisterEditor::setReadLength(int length)
     }
 }
 
-/**
- * @brief 读取指定地址的寄存器
- * @param address 寄存器地址
- *
- * 根据连接类型调用I2C或SPI的读方法。
- * 日志格式: "R ADDR: 0x42 → DATA: 0x1A 0x2B"
- */
+/** @brief 读取指定地址的寄存器，根据连接类型分派I2C/SPI读操作 @param address 寄存器地址 */
 void RegisterEditor::readAddress(int address)
 {
     if (!m_connection) {
@@ -85,13 +70,7 @@ void RegisterEditor::readAddress(int address)
     emit registerReadComplete(address, data);
 }
 
-/**
- * @brief 向指定地址写入数据
- * @param address 寄存器地址
- * @param data 待写入数据
- *
- * 日志格式: "W ADDR: 0x42 ← DATA: 0x1A 0x2B"
- */
+/** @brief 向指定地址写入数据，根据连接类型分派I2C/SPI写操作 @param address 寄存器地址 @param data 待写入数据 */
 void RegisterEditor::writeAddress(int address, const QByteArray& data)
 {
     if (!m_connection) {
@@ -129,18 +108,14 @@ void RegisterEditor::writeAddress(int address, const QByteArray& data)
     ++m_totalRegisterWrites;
 }
 
-/**
- * @brief 读取按钮点击
- */
+/** @brief 读取按钮点击处理，从地址输入框读取并执行读操作 */
 void RegisterEditor::onReadClicked()
 {
     if (!m_addrSpin) return;
     readAddress(m_addrSpin->value());
 }
 
-/**
- * @brief 写入按钮点击
- */
+/** @brief 写入按钮点击处理，从地址和数据输入框读取并执行写操作 */
 void RegisterEditor::onWriteClicked()
 {
     if (!m_addrSpin || !m_dataEdit) return;
@@ -149,9 +124,7 @@ void RegisterEditor::onWriteClicked()
     writeAddress(addr, data);
 }
 
-/**
- * @brief 清空日志按钮点击
- */
+/** @brief 清空日志按钮点击处理 */
 void RegisterEditor::onClearLogClicked()
 {
     if (m_log) {
@@ -159,9 +132,7 @@ void RegisterEditor::onClearLogClicked()
     }
 }
 
-/**
- * @brief 初始化UI布局
- */
+/** @brief 初始化UI布局: 地址/长度输入行、数据输入、读/写/清空按钮、操作日志 */
 void RegisterEditor::setupUi()
 {
     auto* layout = new QVBoxLayout(this);
@@ -223,9 +194,7 @@ void RegisterEditor::setupUi()
     layout->addWidget(m_log);
 }
 
-/**
- * @brief 初始化信号连接
- */
+/** @brief 初始化信号连接: 读/写/清空日志按钮 */
 void RegisterEditor::setupConnections()
 {
     connect(m_readBtn, &QPushButton::clicked,
@@ -236,11 +205,7 @@ void RegisterEditor::setupConnections()
             this, &RegisterEditor::onClearLogClicked);
 }
 
-/**
- * @brief 追加日志
- * @param msg 日志消息
- * @param isTx true=发送(蓝色)，false=接收(绿色)
- */
+/** @brief 追加带颜色编码的日志消息(TX蓝色/RX绿色) @param msg 日志消息 @param isTx true=发送(TX)，false=接收(RX) */
 void RegisterEditor::appendLog(const QString& msg, bool isTx)
 {
     if (!m_log) return;
@@ -250,11 +215,7 @@ void RegisterEditor::appendLog(const QString& msg, bool isTx)
     m_log->append(QString("<span style='color:%1'>%2</span>").arg(color, msg));
 }
 
-/**
- * @brief 格式化字节数组为十六进制字符串
- * @param data 字节数组
- * @return "0x1A 0x2B" 格式字符串
- */
+/** @brief 格式化字节数组为十六进制字符串 @param data 字节数组 @return "0x1A 0x2B"格式字符串 */
 QString RegisterEditor::formatHex(const QByteArray& data)
 {
     QStringList hexParts;
@@ -265,41 +226,32 @@ QString RegisterEditor::formatHex(const QByteArray& data)
     return hexParts.join(" ");
 }
 
-/**
- * @brief 获取读操作次数
- * @return 累计读操作计数
- */
+/** @brief 获取会话级读操作次数 @return 累计读操作计数 */
 int RegisterEditor::readCount() const
 {
     return m_readCount;
 }
 
-/**
- * @brief 获取写操作次数
- * @return 累计写操作计数
- */
+/** @brief 获取会话级写操作次数 @return 累计写操作计数 */
 int RegisterEditor::writeCount() const
 {
     return m_writeCount;
 }
 
-/**
- * @brief 导出操作日志为文本
- * @return 日志文本内容
- */
+/** @brief 导出操作日志为纯文本 @return 日志文本内容 */
 QString RegisterEditor::exportLog() const
 {
     if (!m_log) return QString();
     return m_log->toPlainText();
 }
 
-/** @brief 获取累计寄存器读取次数(quint64) */
+/** @brief 获取累计寄存器读取次数 @return 读取总数 */
 quint64 RegisterEditor::totalRegisterReads() const
 {
     return m_totalRegisterReads;
 }
 
-/** @brief 获取累计寄存器写入次数(quint64) */
+/** @brief 获取累计寄存器写入次数 @return 写入总数 */
 quint64 RegisterEditor::totalRegisterWrites() const
 {
     return m_totalRegisterWrites;

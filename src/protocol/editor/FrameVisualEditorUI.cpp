@@ -23,15 +23,7 @@
 // UI构建方法
 // ============================================================
 
-/**
- * @brief 初始化UI控件和布局
- *
- * 结构:
- *   上半部分(水平): 帧头帧尾 | 长度字段 | 校验
- *   下半部分(垂直): 字段表格(可伸展) | 预览 | 应用按钮
- *
- * 三个配置组水平排列，节省垂直空间，避免控件挤到一起。
- */
+/** @brief 初始化UI控件和布局(上半三配置组水平排列+下半字段表格和预览) */
 void FrameVisualEditor::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
@@ -59,10 +51,7 @@ void FrameVisualEditor::setupUI()
     setupConnections();
 }
 
-/**
- * @brief 创建帧头/帧尾配置分组
- * @return 帧头/帧尾GroupBox(包含帧头和帧尾HEX输入框)
- */
+/** @brief 创建帧头/帧尾配置分组 @return 帧头/帧尾GroupBox */
 QGroupBox* FrameVisualEditor::setupHeaderGroup()
 {
     auto* group = new QGroupBox(tr("帧头/帧尾配置"));
@@ -81,10 +70,7 @@ QGroupBox* FrameVisualEditor::setupHeaderGroup()
     return group;
 }
 
-/**
- * @brief 创建长度字段配置分组
- * @return 长度字段GroupBox(包含偏移/大小/字节序/调整值)
- */
+/** @brief 创建长度字段配置分组 @return 长度字段GroupBox */
 QGroupBox* FrameVisualEditor::setupLengthGroup()
 {
     auto* group = new QGroupBox(tr("长度字段"));
@@ -112,10 +98,7 @@ QGroupBox* FrameVisualEditor::setupLengthGroup()
     return group;
 }
 
-/**
- * @brief 创建校验配置分组
- * @return 校验GroupBox(包含类型/偏移/起始偏移)
- */
+/** @brief 创建校验配置分组 @return 校验GroupBox */
 QGroupBox* FrameVisualEditor::setupChecksumGroup()
 {
     auto* group = new QGroupBox(tr("校验配置"));
@@ -139,10 +122,7 @@ QGroupBox* FrameVisualEditor::setupChecksumGroup()
     return group;
 }
 
-/**
- * @brief 创建数据字段表格分组(含拖拽排序和上移/下移按钮)
- * @return 字段GroupBox(包含6列表格: 名称/类型/偏移/大小/字节序/缩放)
- */
+/** @brief 创建数据字段表格分组(含拖拽排序和上移/下移按钮) @return 字段GroupBox */
 QGroupBox* FrameVisualEditor::setupFieldsGroup()
 {
     auto* group = new QGroupBox(tr("数据字段"));
@@ -196,10 +176,7 @@ QGroupBox* FrameVisualEditor::setupFieldsGroup()
     return group;
 }
 
-/**
- * @brief 创建二进制布局预览分组
- * @return 预览GroupBox(包含Consolas字体的预览标签)
- */
+/** @brief 创建二进制布局预览分组 @return 预览GroupBox */
 QGroupBox* FrameVisualEditor::setupPreviewGroup()
 {
     auto* group = new QGroupBox(tr("二进制布局预览"));
@@ -216,9 +193,7 @@ QGroupBox* FrameVisualEditor::setupPreviewGroup()
     return group;
 }
 
-/**
- * @brief 连接所有信号/槽(应用/添加/删除/字段变更/实时预览)
- */
+/** @brief 连接所有信号/槽(应用/添加/删除/字段变更/实时预览) */
 void FrameVisualEditor::setupConnections()
 {
     connect(m_applyBtn, &QPushButton::clicked, this, &FrameVisualEditor::onApply);

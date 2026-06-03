@@ -12,10 +12,7 @@
 #include "core/widgets/EdDialog.h"
 #include <QSpinBox>
 
-/**
- * @brief 构造函数 - 初始化UI
- * @param parent 父控件
- */
+/** @brief 构造多连接管理面板UI @param parent 父控件 */
 MultiConnectionPanel::MultiConnectionPanel(QWidget* parent)
     : QWidget(parent)
 {
@@ -24,10 +21,7 @@ MultiConnectionPanel::MultiConnectionPanel(QWidget* parent)
     setupConnections();
 }
 
-/**
- * @brief 设置后端管理器
- * @param manager TCP多连接管理器
- */
+/** @brief 设置后端TCP多连接管理器，连接connectionAdded/Removed信号 @param manager TCP多连接管理器 */
 void MultiConnectionPanel::setManager(TcpMultiConnectionManager* manager)
 {
     if (m_manager) {
@@ -42,9 +36,7 @@ void MultiConnectionPanel::setManager(TcpMultiConnectionManager* manager)
     }
 }
 
-/**
- * @brief 添加连接按钮点击 - 弹出对话框输入主机和端口
- */
+/** @brief 添加连接按钮点击，弹出对话框输入主机地址和端口号 */
 void MultiConnectionPanel::onAddClicked()
 {
     if (!m_manager) return;
@@ -86,9 +78,7 @@ void MultiConnectionPanel::onAddClicked()
     }
 }
 
-/**
- * @brief 移除连接按钮点击
- */
+/** @brief 移除连接按钮点击，移除列表中当前选中的连接 */
 void MultiConnectionPanel::onRemoveClicked()
 {
     if (!m_connectionList || !m_connectionList->currentItem() || !m_manager) {
@@ -98,9 +88,7 @@ void MultiConnectionPanel::onRemoveClicked()
     m_manager->removeConnection(id);
 }
 
-/**
- * @brief 广播发送按钮点击
- */
+/** @brief 广播发送按钮点击，将输入框文本发送到所有已连接的TCP客户端 */
 void MultiConnectionPanel::onSendAllClicked()
 {
     if (!m_manager || !m_broadcastEdit) return;
@@ -115,12 +103,7 @@ void MultiConnectionPanel::onSendAllClicked()
     }
 }
 
-/**
- * @brief 新连接添加回调
- * @param id 连接ID
- * @param host 主机地址
- * @param port 端口号
- */
+/** @brief 新连接添加回调，在列表中创建对应条目 @param id 连接ID @param host 主机地址 @param port 端口号 */
 void MultiConnectionPanel::onConnectionAdded(int id, const QString& host, int port)
 {
     if (!m_connectionList) return;
@@ -134,10 +117,7 @@ void MultiConnectionPanel::onConnectionAdded(int id, const QString& host, int po
     ++m_totalConnections;
 }
 
-/**
- * @brief 连接移除回调
- * @param id 连接ID
- */
+/** @brief 连接移除回调，从列表中删除对应条目 @param id 连接ID */
 void MultiConnectionPanel::onConnectionRemoved(int id)
 {
     if (!m_connectionList) return;
@@ -153,9 +133,7 @@ void MultiConnectionPanel::onConnectionRemoved(int id)
     ++m_totalDisconnections;
 }
 
-/**
- * @brief 初始化UI布局
- */
+/** @brief 初始化UI布局: 连接列表/添加移除按钮/广播输入/状态标签 */
 void MultiConnectionPanel::setupUi()
 {
     auto* layout = new QVBoxLayout(this);
@@ -197,9 +175,7 @@ void MultiConnectionPanel::setupUi()
     layout->addWidget(m_statusLabel);
 }
 
-/**
- * @brief 初始化信号连接
- */
+/** @brief 初始化信号连接: 添加/移除/广播发送按钮 */
 void MultiConnectionPanel::setupConnections()
 {
     connect(m_addBtn, &QPushButton::clicked,
@@ -210,13 +186,13 @@ void MultiConnectionPanel::setupConnections()
             this, &MultiConnectionPanel::onSendAllClicked);
 }
 
-/** @brief 获取累计连接次数 */
+/** @brief 获取累计连接次数 @return 历史连接总数 */
 quint64 MultiConnectionPanel::totalConnections() const
 {
     return m_totalConnections;
 }
 
-/** @brief 获取累计断开次数 */
+/** @brief 获取累计断开次数 @return 历史断开总数 */
 quint64 MultiConnectionPanel::totalDisconnections() const
 {
     return m_totalDisconnections;

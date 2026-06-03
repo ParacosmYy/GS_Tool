@@ -6,36 +6,25 @@
 #include "connection/tcp/TcpServerConnection.h"
 #include <QMap>
 
-/**
- * @brief 构造函数 - 初始化TCP服务器
- * @param parent 父对象
- */
+/** @brief 构造TCP服务器连接 @param parent 父QObject指针 */
 TcpServerConnection::TcpServerConnection(QObject* parent)
     : IConnection(parent)
 {
 }
 
-/**
- * @brief 析构函数 - 关闭连接释放资源
- */
+/** @brief 析构TCP服务器连接，停止监听并释放所有客户端资源 */
 TcpServerConnection::~TcpServerConnection()
 {
     close();
 }
 
-/**
- * @brief 获取连接类型
- * @return TcpServer类型
- */
+/** @brief 获取连接类型 @return ConnectionType::TcpServer */
 ConnectionType TcpServerConnection::type() const
 {
     return ConnectionType::TcpServer;
 }
 
-/**
- * @brief 获取连接显示名称
- * @return "TCP Server:端口" 格式字符串
- */
+/** @brief 获取连接显示名称 @return 已监听时返回"TCP服务器:端口"格式，否则返回"未监听" */
 QString TcpServerConnection::name() const
 {
     if (m_listening) {
@@ -44,49 +33,32 @@ QString TcpServerConnection::name() const
     return tr("TCP Server (未监听)");
 }
 
-/**
- * @brief 获取当前连接状态
- * @return 连接状态枚举
- */
+/** @brief 获取当前连接状态 @return 连接状态枚举值 */
 ConnectionState TcpServerConnection::state() const
 {
     return m_state;
 }
 
-/**
- * @brief 打开连接 - 开始监听
- * @return true=监听成功，false=失败
- */
+/** @brief 打开连接即开始监听 @return true=监听成功 */
 bool TcpServerConnection::open()
 {
     return listen(m_listenAddress, m_listenPort);
 }
 
-/**
- * @brief 关闭连接 - 停止监听并断开所有客户端
- */
+/** @brief 关闭连接即停止监听并断开所有客户端 */
 void TcpServerConnection::close()
 {
     stopListening();
 }
 
-/**
- * @brief 发送数据 - 广播到所有已连接客户端
- * @param data 待发送的字节数据
- * @return 成功发送的客户端数量
- */
+/** @brief 广播发送数据到所有已连接客户端 @param data 待发送的字节数据 @return 成功发送的客户端数量 */
 qint64 TcpServerConnection::write(const QByteArray& data)
 {
     ++m_totalWrites;
     return broadcastToClients(data);
 }
 
-/**
- * @brief 配置TCP服务器参数
- * @param params 参数映射:
- *   - "listenAddress": QString (监听地址)
- *   - "port": int (监听端口号)
- */
+/** @brief 配置TCP服务器参数(listenAddress/port) @param params 参数映射 */
 void TcpServerConnection::configure(const QVariantMap& params)
 {
     if (params.contains("listenAddress")) {
@@ -97,12 +69,7 @@ void TcpServerConnection::configure(const QVariantMap& params)
     }
 }
 
-/**
- * @brief 开始监听指定地址和端口
- * @param address 监听地址
- * @param port 监听端口号
- * @return true=监听成功
- */
+/** @brief 开始监听指定地址和端口 @param address 监听地址 @param port 监听端口号 @return true=监听成功 */
 bool TcpServerConnection::listen(const QHostAddress& address, int port)
 {
     ++m_totalListenAttempts;
@@ -130,9 +97,7 @@ bool TcpServerConnection::listen(const QHostAddress& address, int port)
     return true;
 }
 
-/**
- * @brief 停止监听 - 断开所有客户端并关闭服务器
- */
+/** @brief 停止监听，断开所有客户端并关闭服务器 */
 void TcpServerConnection::stopListening()
 {
     /// 断开所有客户端
@@ -159,10 +124,7 @@ void TcpServerConnection::stopListening()
     updateState(ConnectionState::Disconnected);
 }
 
-/**
- * @brief 获取已连接的客户端列表
- * @return 客户端地址:端口字符串列表
- */
+/** @brief 获取已连接的客户端列表 @return 客户端"地址:端口"字符串列表 */
 QStringList TcpServerConnection::connectedClients() const
 {
     QStringList result;
@@ -175,11 +137,7 @@ QStringList TcpServerConnection::connectedClients() const
     return result;
 }
 
-/**
- * @brief 向所有已连接客户端广播数据
- * @param data 待广播的字节数据
- * @return 成功发送的客户端数量
- */
+/** @brief 向所有已连接客户端广播数据 @param data 待广播的字节数据 @return 成功发送的客户端数量 */
 int TcpServerConnection::broadcastToClients(const QByteArray& data)
 {
     int count = 0;
@@ -201,9 +159,7 @@ int TcpServerConnection::broadcastToClients(const QByteArray& data)
     return count;
 }
 
-/**
- * @brief 新客户端连接回调
- */
+/** @brief 新客户端连接回调，注册socket并连接断开/数据到达/错误信号 */
 void TcpServerConnection::onNewConnection()
 {
     if (!m_server) return;
@@ -236,9 +192,7 @@ void TcpServerConnection::onNewConnection()
     }
 }
 
-/**
- * @brief 客户端断开回调
- */
+/** @brief 客户端断开回调，从映射表中移除并释放socket */
 void TcpServerConnection::onClientDisconnected()
 {
     auto* socket = qobject_cast<QTcpSocket*>(sender());
@@ -263,9 +217,7 @@ void TcpServerConnection::onClientDisconnected()
     socket->deleteLater();
 }
 
-/**
- * @brief 客户端数据到达回调
- */
+/** @brief 客户端数据到达回调，发射clientData和dataReceived信号 */
 void TcpServerConnection::onClientReadyRead()
 {
     auto* socket = qobject_cast<QTcpSocket*>(sender());
@@ -282,10 +234,7 @@ void TcpServerConnection::onClientReadyRead()
     emit dataReceived(data);
 }
 
-/**
- * @brief 更新连接状态
- * @param newState 新状态
- */
+/** @brief 更新连接状态，状态变化时发射stateChanged信号 @param newState 新状态 */
 void TcpServerConnection::updateState(ConnectionState newState)
 {
     if (m_state != newState) {
@@ -294,68 +243,50 @@ void TcpServerConnection::updateState(ConnectionState newState)
     }
 }
 
-/**
- * @brief 获取socket对应的客户端标识
- * @param socket 客户端socket
- * @return "地址:端口" 格式字符串
- */
+/** @brief 获取socket对应的客户端"地址:端口"标识 @param socket 客户端socket @return "地址:端口"格式字符串 */
 QString TcpServerConnection::clientInfo(QTcpSocket* socket)
 {
     if (!socket) return QString();
     return QString("%1:%2").arg(socket->peerAddress().toString()).arg(socket->peerPort());
 }
 
-/**
- * @brief 获取历史累计连接客户端总数
- */
+/** @brief 获取历史累计连接客户端总数 @return 客户端连接总数 */
 quint64 TcpServerConnection::totalClientCount() const
 {
     return m_totalClientCount;
 }
 
-/**
- * @brief 获取历史累计断开客户端总数
- */
+/** @brief 获取历史累计断开客户端总数 @return 客户端断开总数 */
 quint64 TcpServerConnection::totalClientDisconnections() const
 {
     return m_totalClientDisconnections;
 }
 
-/**
- * @brief 获取已广播数据包总数
- */
+/** @brief 获取已广播数据包总数 @return 广播次数 */
 quint64 TcpServerConnection::broadcastCount() const
 {
     return m_broadcastCount;
 }
 
-/**
- * @brief 获取累计接收字节数
- */
+/** @brief 获取累计接收字节数 @return 接收字节总量 */
 quint64 TcpServerConnection::totalBytesReceived() const
 {
     return m_totalRxBytes;
 }
 
-/**
- * @brief 获取累计发送字节数
- */
+/** @brief 获取累计发送字节数 @return 发送字节总量 */
 quint64 TcpServerConnection::totalBytesSent() const
 {
     return m_totalTxBytes;
 }
 
-/**
- * @brief 获取累计accept错误次数
- */
+/** @brief 获取累计accept错误次数 @return accept错误总数 */
 quint64 TcpServerConnection::totalAcceptErrors() const
 {
     return m_totalAcceptErrors;
 }
 
-/**
- * @brief 重置所有统计计数器为零
- */
+/** @brief 重置所有统计计数器为零 */
 void TcpServerConnection::resetStatistics()
 {
     m_totalClientCount = 0;
