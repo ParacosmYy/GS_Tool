@@ -98,6 +98,12 @@ public:
      */
     bool isRunning() const;
 
+    /**
+     * @brief 获取已发送次数
+     * @return 定时发送已触发的次数
+     */
+    int sendCount() const;
+
 signals:
     /**
      * @brief 定时触发的发送信号
@@ -132,6 +138,7 @@ private:
     mutable QMutex m_mutex;         ///< 保护所有状态的互斥锁（m_isRunning / m_interval / m_queue / m_queueIndex）
     bool m_isRunning = false;       ///< 定时发送运行状态（受 m_mutex 保护）
     int m_interval = 1000;          ///< 发送间隔（毫秒，受 m_mutex 保护）
+    int m_sendCount = 0;            ///< 已发送次数计数（受 m_mutex 保护）
 };
 
 #endif // TIMEDSENDER_H

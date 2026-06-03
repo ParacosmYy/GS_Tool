@@ -14,6 +14,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QElapsedTimer>
 #include "connection/interface/IConnection.h"
 
 /**
@@ -47,6 +48,15 @@ public:
     /** @brief 查询是否正在轮询 */
     bool isPolling() const;
 
+    /** @brief 获取信号线变化次数 */
+    int changeCount() const;
+
+    /** @brief 获取轮询已运行时长（秒） */
+    qint64 pollingDuration() const;
+
+    /** @brief 重置统计计数 */
+    void resetStatistics();
+
 signals:
     /**
      * @brief 信号线状态变化通知
@@ -62,6 +72,8 @@ private:
     QTimer* m_pollTimer = nullptr;      ///< 轮询定时器
     PinoutSignals m_current;            ///< 当前缓存的信号线状态
     IConnection* m_connection = nullptr; ///< 被监控的连接对象（不拥有）
+    QElapsedTimer m_durationTimer;      ///< 轮询持续时间计时器
+    int m_changeCount = 0;              ///< 信号线变化次数
 };
 
 #endif // SIGNALLINEMONITOR_H

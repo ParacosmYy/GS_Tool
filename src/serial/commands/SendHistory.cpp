@@ -7,6 +7,8 @@
  */
 #include "serial/commands/SendHistory.h"
 
+#include <algorithm>
+
 /** @brief 构造函数 @param parent 父对象 */
 SendHistory::SendHistory(QObject* parent)
     : QObject(parent)
@@ -43,6 +45,10 @@ void SendHistory::addEntry(const QString& text, bool isHex)
     entry.time = QDateTime::currentDateTime();
 
     m_entries.append(entry);
+
+    // 更新频率统计
+    m_freqMap[text]++;
+    m_totalSendCount++;
 
     // 超过最大记录数时，从头部删除最旧的条目
     while (m_entries.size() > m_maxEntries) {
@@ -96,6 +102,8 @@ QList<SendEntry> SendHistory::search(const QString& keyword) const
 void SendHistory::clear()
 {
     m_entries.clear();
+    m_freqMap.clear();
+    m_totalSendCount = 0;
     emit historyChanged();
 }
 
@@ -114,4 +122,65 @@ void SendHistory::setMaxEntries(int max)
     while (m_entries.size() > m_maxEntries) {
         m_entries.removeFirst();
     }
+}
+
+/**
+ * @brief 获取历史总发送次数
+ * @return 总发送次数（含去重）
+ */
+int SendHistory::totalSendCount() const
+{
+    return m_totalSendCount;
+}
+
+/**
+ * @brief 获取最常发送的命令
+ * @param topN 返回前N条，默认10
+ * @return 命令和频率的列表，按频率降序
+ */
+QList<QPair<QString, int>> SendHistory::mostFrequent(int topN) const
+{
+    /* 将频率表转为列表并排序 */
+    QList<QPair<QString, int>> freqList;
+    for (auto it = m_freqMap.constBegin(); it != m_freqMap.constEnd(); ++it) {
+        freqList.append(qMakePair(it.key(), it.value()));
+    }
+
+    /* 按频率降序排序 */
+    std::sort(freqList.begin(), freqList.end(),
+              [](const QPair<QString, int>& a, const QPair<QString, int>& b) {
+        return a.second > b.second;
+    });
+
+    /* 取前 topN 条 */
+    if (freqList.size() > topN) {
+        freqList = freqList.mid(0, topN);
+    }
+
+    return freqList;
+}
+
+/**
+ * @brief 获取发送统计摘要文本
+ * @return 格式化的统计信息字符串
+ */
+QString SendHistory::statisticsSummary() const
+{
+    QString summary;
+    summary += tr("总发送次数: %1\n").arg(m_totalSendCount);
+    summary += tr("不同命令数: %1\n").arg(m_freqMap.size());
+    summary += tr("历史记录数: %1/%2\n").arg(m_entries.size()).arg(m_maxEntries);
+
+    if (!m_freqMap.isEmpty()) {
+        summary += tr("\n最常用命令:\n");
+        const auto top = mostFrequent(5);
+        for (int i = 0; i < top.size(); ++i) {
+            summary += QStringLiteral("  %1. %2 (%3次)\n")
+                          .arg(i + 1)
+                          .arg(top[i].first.left(30))
+                          .arg(top[i].second);
+        }
+    }
+
+    return summary.trimmed();
 }

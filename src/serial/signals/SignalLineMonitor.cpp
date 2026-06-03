@@ -54,6 +54,7 @@ void SignalLineMonitor::startPolling(IConnection* connection)
     connect(m_pollTimer, &QTimer::timeout,
             this, &SignalLineMonitor::onTick);
 
+    m_durationTimer.start();
     m_pollTimer->start();
 }
 
@@ -113,6 +114,35 @@ void SignalLineMonitor::onTick()
         latest.rts != m_current.rts)
     {
         m_current = latest;
+        ++m_changeCount;
         emit signalsChanged(m_current);
     }
+}
+
+/**
+ * @brief 获取信号线变化次数
+ * @return 状态变化的总次数
+ */
+int SignalLineMonitor::changeCount() const
+{
+    return m_changeCount;
+}
+
+/**
+ * @brief 获取轮询已运行时长
+ * @return 运行时长（秒）
+ */
+qint64 SignalLineMonitor::pollingDuration() const
+{
+    if (!isPolling()) return 0;
+    return m_durationTimer.elapsed() / 1000;
+}
+
+/**
+ * @brief 重置统计计数
+ */
+void SignalLineMonitor::resetStatistics()
+{
+    m_changeCount = 0;
+    m_durationTimer.restart();
 }

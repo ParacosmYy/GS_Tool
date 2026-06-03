@@ -94,6 +94,7 @@ void TimedSender::start()
     }
 
     m_queueIndex = 0;
+    m_sendCount = 0;
     m_isRunning = true;
     m_timer.start(m_interval);
 }
@@ -120,6 +121,16 @@ bool TimedSender::isRunning() const
 {
     QMutexLocker locker(&m_mutex);
     return m_isRunning;
+}
+
+/**
+ * @brief 获取已发送次数
+ * @return 定时发送已触发的次数
+ */
+int TimedSender::sendCount() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_sendCount;
 }
 
 /**
@@ -166,6 +177,7 @@ void TimedSender::doSend()
         // 在锁内拷贝数据，避免 emit 时持锁导致信号回调死锁
         dataToSend = m_queue[m_queueIndex];
         m_queueIndex = (m_queueIndex + 1) % m_queue.size();
+        ++m_sendCount;
     }
 
     // 释放锁后发射信号，避免下游回调死锁

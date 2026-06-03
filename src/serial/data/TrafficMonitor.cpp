@@ -47,6 +47,7 @@ TrafficMonitor::~TrafficMonitor()
 void TrafficMonitor::recordTxBytes(qint64 bytes)
 {
     m_txBytes += bytes;
+    m_totalTxBytes += bytes;
 }
 
 /**
@@ -56,6 +57,7 @@ void TrafficMonitor::recordTxBytes(qint64 bytes)
 void TrafficMonitor::recordRxBytes(qint64 bytes)
 {
     m_rxBytes += bytes;
+    m_totalRxBytes += bytes;
 }
 
 /**
@@ -109,9 +111,53 @@ void TrafficMonitor::reset()
 {
     m_rxBytes = 0;
     m_txBytes = 0;
+    m_totalRxBytes = 0;
+    m_totalTxBytes = 0;
+    m_peakRxRate = 0.0;
+    m_peakTxRate = 0.0;
     m_rxHistory.clear();
     m_txHistory.clear();
     m_elapsed.restart();
+}
+
+/**
+ * @brief 获取会话累计RX总字节
+ */
+qint64 TrafficMonitor::totalRxBytes() const
+{
+    return m_totalRxBytes;
+}
+
+/**
+ * @brief 获取会话累计TX总字节
+ */
+qint64 TrafficMonitor::totalTxBytes() const
+{
+    return m_totalTxBytes;
+}
+
+/**
+ * @brief 获取历史最高RX速率
+ */
+double TrafficMonitor::peakRxRate() const
+{
+    return m_peakRxRate;
+}
+
+/**
+ * @brief 获取历史最高TX速率
+ */
+double TrafficMonitor::peakTxRate() const
+{
+    return m_peakTxRate;
+}
+
+/**
+ * @brief 获取速率历史点数
+ */
+int TrafficMonitor::historySize() const
+{
+    return m_rxHistory.size();
 }
 
 /**
@@ -138,6 +184,10 @@ void TrafficMonitor::calculateRates()
     // 追加到历史队列
     m_rxHistory.append(QPointF(timestamp, rx));
     m_txHistory.append(QPointF(timestamp, tx));
+
+    // 更新峰值
+    if (rx > m_peakRxRate) m_peakRxRate = rx;
+    if (tx > m_peakTxRate) m_peakTxRate = tx;
 
     // 裁剪历史到最大长度
     while (m_rxHistory.size() > MAX_HISTORY_POINTS) {

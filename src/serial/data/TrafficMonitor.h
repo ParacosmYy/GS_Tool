@@ -55,6 +55,21 @@ public:
     /** @brief 重置所有统计数据 */
     void reset();
 
+    /** @brief 获取累计RX总字节数（重置前） */
+    qint64 totalRxBytes() const;
+
+    /** @brief 获取累计TX总字节数（重置前） */
+    qint64 totalTxBytes() const;
+
+    /** @brief 获取历史最高RX速率（字节/秒） */
+    double peakRxRate() const;
+
+    /** @brief 获取历史最高TX速率（字节/秒） */
+    double peakTxRate() const;
+
+    /** @brief 获取速率历史点数 */
+    int historySize() const;
+
 signals:
     /**
      * @brief 速率更新信号（周期性发出）
@@ -70,6 +85,10 @@ private slots:
 private:
     qint64 m_rxBytes = 0;              ///< 累计接收字节数
     qint64 m_txBytes = 0;              ///< 累计发送字节数
+    qint64 m_totalRxBytes = 0;         ///< 会话累计RX总字节
+    qint64 m_totalTxBytes = 0;         ///< 会话累计TX总字节
+    double m_peakRxRate = 0.0;         ///< 历史最高RX速率
+    double m_peakTxRate = 0.0;         ///< 历史最高TX速率
     QVector<QPointF> m_rxHistory;      ///< RX 速率历史（x=时间戳, y=速率）
     QVector<QPointF> m_txHistory;      ///< TX 速率历史（x=时间戳, y=速率）
     QTimer* m_calcTimer = nullptr;     ///< 速率计算定时器
