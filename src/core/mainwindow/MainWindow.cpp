@@ -1,13 +1,11 @@
 /**
  * @file MainWindow.cpp
- * @brief 主窗口实现 - 应用顶层窗口的 UI 构建、信号连接和生命周期管理
+ * @brief 主窗口实现 - 构造函数、状态处理和生命周期管理
  *
- * 本文件实现 MainWindow 的所有方法，遵循"嵌入式 main 哲学":
- * MainWindow 自身不包含业务逻辑，仅负责:
- *   1. 初始化所有子对象
- *   2. 组装 UI 布局
- *   3. 连接信号/槽
- * 所有业务逻辑委托给各 Controller 处理。
+ * 本文件遵循"嵌入式 main 哲学": MainWindow 不含业务逻辑。
+ * UI布局构建见 MainWindowSetupUI.cpp
+ * 信号/槽连接见 MainWindowSignalConnect.cpp
+ * 面板连接见 MainWindowPanelConnect.cpp
  */
 
 #include "core/mainwindow/MainWindow.h"
@@ -106,7 +104,6 @@ MainWindow::MainWindow(QWidget* parent)
         connect(m_iconNavBar, &IconNavBar::categoryClicked, this,
                 [this](const QString& id) {
             Q_UNUSED(id);
-            // 后续: 展开导航树对应分类并高亮第一个面板
         });
     }
 
@@ -133,13 +130,11 @@ MainWindow::MainWindow(QWidget* parent)
     // 脚本录制器 — 从 PanelManager 获取已创建的面板实例
     m_scriptRecorder = m_panelManager->scriptRecorder();
     m_scriptRecorder->setObjectName("scriptRecorder");
-    // 回放发送请求 → SendController（lambda 桥接 QString→QByteArray）
     connect(m_scriptRecorder, &ScriptRecorder::playbackSendRequested,
             this, [this](const QString& data, bool isHex) {
         Q_UNUSED(isHex);
         m_sendController->onQuickCommand(data.toUtf8());
     });
-    // 录制状态变化 → 状态栏提示
     connect(m_scriptRecorder, &ScriptRecorder::recordingChanged,
             this, [this](bool recording) {
         statusBar()->showMessage(recording ? tr("脚本录制中...") : tr("录制已停止"), 3000);
@@ -148,7 +143,7 @@ MainWindow::MainWindow(QWidget* parent)
     // 设置 ThemeManager 主题切换淡入淡出动画目标（中央背景层）
     ThemeManager::instance().setTransitionWidget(m_backgroundWidget);
 
-    // 注入 UI 引用到 SettingsController，用于同步主题/语言下拉框和串口配置面板
+    // 注入 UI 引用到 SettingsController
     m_settingsController->setToolbarController(m_toolbarController);
     m_settingsController->setSerialConfigPanel(m_panelManager->serialConfig());
 
@@ -157,10 +152,8 @@ MainWindow::MainWindow(QWidget* parent)
     m_sessionManager->setSettingsController(m_settingsController);
     m_sessionManager->setSerialConfigPanel(m_panelManager->serialConfig());
 
-    // 从磁盘恢复上次保存的完整工作区（窗口几何、串口配置、面板索引）
+    // 从磁盘恢复上次保存的完整工作区
     int lastPanel = m_sessionManager->loadSession();
-
-    // 恢复语言/主题/面板/统计定时器
     restoreUserSession(lastPanel);
 
     // 设置窗口属性
@@ -173,39 +166,27 @@ MainWindow::MainWindow(QWidget* parent)
     m_responsiveLayout->watchWindow(this);
     connect(m_responsiveLayout, &ResponsiveLayout::breakpointChanged,
             this, [this](ResponsiveLayout::Breakpoint bp) {
-        /* 断点切换时，Compact模式自动折叠导航树 */
         if (bp == ResponsiveLayout::Breakpoint::Compact) {
-            /* 紧凑模式: 折叠导航树，隐藏图标栏 */
             if (m_mainSplitter && m_mainSplitter->sizes().at(0) > 0) {
                 m_mainSplitter->setSizes({0, width()});
             }
-            if (m_iconNavBar) {
-                m_iconNavBar->hide();
-            }
-            /* 紧凑模式下隐藏非关键面板区域 */
+            if (m_iconNavBar) { m_iconNavBar->hide(); }
             statusBar()->showMessage(tr("已切换到紧凑布局"), 2000);
             m_panelManager->setCompactMode(true);
         } else if (bp == ResponsiveLayout::Breakpoint::Desktop) {
-            /* 桌面模式: 恢复导航树全宽 */
             if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
-                int navWidth = SettingsManager::instance()
-                    .get("layout/navTreeWidth").toInt();
+                int navWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
                 if (navWidth <= 0) navWidth = 200;
                 m_mainSplitter->setSizes({navWidth, width() - navWidth});
             }
-            if (m_iconNavBar && m_useIconNavBar) {
-                m_iconNavBar->show();
-            }
+            if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
             statusBar()->showMessage(tr("已切换到桌面布局"), 2000);
             m_panelManager->setCompactMode(false);
         } else {
-            /* 中等模式: 恢复导航树但较窄 */
             if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
                 m_mainSplitter->setSizes({180, width() - 180});
             }
-            if (m_iconNavBar && m_useIconNavBar) {
-                m_iconNavBar->show();
-            }
+            if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
         }
     });
 
@@ -233,185 +214,19 @@ MainWindow::MainWindow(QWidget* parent)
 /** @brief 从磁盘恢复用户偏好（语言、主题、面板索引）并启动统计定时器 */
 void MainWindow::restoreUserSession(int lastPanel)
 {
-    // 恢复语言选择到工具栏下拉框
     if (m_toolbarController) {
         QString savedLang = SettingsManager::instance().loadLanguage();
         m_toolbarController->setCurrentLanguage(savedLang);
     }
 
-    // 恢复主题: 加载主题文件 + 同步工具栏下拉框选中项
     QString savedTheme = SettingsManager::instance().loadTheme();
     if (ThemeManager::instance().loadTheme(savedTheme)) {
         if (m_toolbarController) m_toolbarController->setCurrentTheme(savedTheme);
     }
 
-    // 恢复上次活跃面板（如果有保存记录）
     if (lastPanel >= 0) m_navController->restorePanelByIndex(lastPanel);
 
-    // 启动统计刷新定时器（每 500ms 触发一次）
     m_terminalController->startStatsTimer();
-}
-
-/**
- * @brief 构建 UI 布局
- *
- * 布局层次:
- * BackgroundWidget (中央部件)
- *   └── QVBoxLayout
- *       └── QSplitter (水平分割)
- *           ├── QTreeView (左侧导航树, 180~280px)
- *           └── QWidget (右侧面板容器)
- *               └── m_rightPanel → serialPanel (面板栈)
- *                   ├── SerialConfigPanel / DataStatistics / ProtocolView / FrameVisualEditor / ChartWidget / OtaWidget
- *                   ├── terminalContainer (搜索栏 + 终端)
- *                   ├── QuickCommandBar (快捷指令)
- *                   └── SendBar (发送栏, 由 SendController 创建)
- */
-void MainWindow::setupUI()
-{
-    // ---- 背景: 磨砂玻璃背景层作为中央部件 ----
-    m_backgroundWidget = new BackgroundWidget(this);
-    m_backgroundWidget->setObjectName("backgroundWidget");  // QSS 选择器需要
-    setCentralWidget(m_backgroundWidget);
-    auto* bgLayout = new QVBoxLayout(m_backgroundWidget);
-    bgLayout->setContentsMargins(0, 0, 0, 0);
-    bgLayout->setSpacing(0);
-
-    m_mainSplitter = new QSplitter(Qt::Horizontal, m_backgroundWidget);
-    m_mainSplitter->setObjectName("mainSplitter");  // QSS 选择器需要
-
-    m_mainSplitter->addWidget(createNavigationArea());
-    m_mainSplitter->addWidget(createContentArea());
-    m_mainSplitter->setSizes({200, 1000});
-    m_mainSplitter->setStretchFactor(0, 0);
-    m_mainSplitter->setStretchFactor(1, 1);
-
-    // 图标导航栏功能开关(默认关闭, 通过 SettingsManager "ui/iconNavBar" 开启)
-    m_useIconNavBar = SettingsManager::instance().get("ui/iconNavBar").toBool();
-    if (m_useIconNavBar) {
-        m_iconNavBar = new IconNavBar(m_backgroundWidget);
-        m_iconNavBar->setObjectName("iconNavBar");
-        m_mainSplitter->insertWidget(0, m_iconNavBar);
-        m_mainSplitter->setSizes({56, 200, 1000});
-    }
-
-    bgLayout->addWidget(m_mainSplitter, 1);
-
-    // Ctrl+F 快捷键激活搜索栏
-    auto* searchShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
-    connect(searchShortcut, &QShortcut::activated, m_panelManager->searchBar(), &TerminalSearchBar::activate);
-
-    // 导航树宽度持久化: 分割器拖动后自动保存
-    connect(m_mainSplitter, &QSplitter::splitterMoved,
-            this, [this]() {
-        auto sizes = m_mainSplitter->sizes();
-        if (sizes.size() > 0) {
-            SettingsManager::instance().set("layout/navTreeWidth", sizes.at(0));
-        }
-    });
-
-    // 恢复上次的导航树宽度
-    int savedNavWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
-    if (savedNavWidth > 0) {
-        m_mainSplitter->setSizes({savedNavWidth, width() - savedNavWidth});
-    }
-}
-
-/** @brief 创建左侧导航树区域(导航树+选中滑动指示器) */
-QWidget* MainWindow::createNavigationArea()
-{
-    // ---- 左侧导航树（数据模型由 NavigationController.buildNavTree() 构建） ----
-    m_navTree = new QTreeView;
-    m_navTree->setObjectName("navTree");
-    m_navTree->setHeaderHidden(true);
-    m_navTree->setMinimumWidth(Layout::kNavTreeMinWidth);
-    m_navTree->setMaximumWidth(Layout::kNavTreeMaxWidth);
-    m_navTree->setIndentation(16);
-
-    // 导航树选中滑动指示器（覆盖在 navTree 上方，透明背景，accent 色竖线动画）
-    m_navIndicator = new NavIndicatorWidget(m_navTree);
-
-    return m_navTree;
-}
-
-/** @brief 创建右侧面板内容区域(面板栈+终端+快捷指令+发送栏) */
-QWidget* MainWindow::createContentArea()
-{
-    // ---- 右侧内容面板 ----
-    auto* rightWidget = new QWidget;
-    rightWidget->setObjectName("rightWidget");
-    rightWidget->setAttribute(Qt::WA_StyledBackground, true);
-    auto* rightLayout = new QVBoxLayout(rightWidget);
-    rightLayout->setContentsMargins(0, 0, 0, 0);
-    rightLayout->setSpacing(0);
-
-    m_rightPanel = new QWidget;
-    m_rightPanel->setObjectName("rightPanel");
-    m_rightPanel->setAttribute(Qt::WA_StyledBackground, true);
-    auto* rightPanelLayout = new QVBoxLayout(m_rightPanel);
-    rightPanelLayout->setContentsMargins(0, 0, 0, 0);
-    rightPanelLayout->setSpacing(0);
-    rightLayout->addWidget(m_rightPanel, 1);
-
-    // 面板栈: 所有面板共用同一位置，通过 NavigationController 切换显示
-    auto* serialPanel = new QWidget;
-    serialPanel->setObjectName("serialPanel");
-    serialPanel->setAttribute(Qt::WA_StyledBackground, true);
-    auto* serialLayout = new QVBoxLayout(serialPanel);
-    serialLayout->setContentsMargins(0, 0, 0, 0);
-    serialLayout->setSpacing(0);
-
-    // 通过 PanelManager 统一创建所有面板
-    m_panelManager->createPanels(m_otaManager, m_terminalModel);
-    m_panelManager->wrapPanels();  // 将可切换面板包装在 BasePanel 容器中
-
-    // 将所有面板添加到面板栈布局（数据驱动，遍历 PanelManager.allPanels()）
-    for (auto* panel : m_panelManager->allPanels()) {
-        if (panel) {
-            serialLayout->addWidget(panel);
-        }
-    }
-
-    // 终端布局管理器
-    m_layoutManager = new TerminalLayoutManager(this);
-    m_layoutManager->initialize(m_panelManager->terminal(), m_panelManager->searchBar());
-    m_layoutManager->setTerminalModel(m_terminalModel);
-
-    serialLayout->addWidget(m_layoutManager->container(), 1);
-
-    // 快捷指令栏
-    serialLayout->addWidget(m_panelManager->quickCmdBar());
-
-    // 发送区域: 由 SendController 创建和管理
-    QWidget* sendBar = m_sendController->createSendBar(this);
-    serialLayout->addWidget(sendBar);
-
-    rightPanelLayout->addWidget(serialPanel);
-    return rightWidget;
-}
-
-/**
- * @brief 创建并初始化状态栏
- * 左侧显示连接状态，右侧显示 RX/TX 字节计数
- */
-void MainWindow::setupStatusBar()
-{
-    m_connStatusLbl = new QLabel(tr("未连接"));
-    m_connStatusLbl->setObjectName("connStatus");
-    m_connStatusLbl->setProperty("state", "disconnected");
-    auto* rxLbl = new QLabel(tr("RX: 0 B"));
-    rxLbl->setObjectName("rxBytesLabel");
-    auto* txLbl = new QLabel(tr("TX: 0 B"));
-    txLbl->setObjectName("txBytesLabel");
-
-    statusBar()->addWidget(m_connStatusLbl, 1);
-    statusBar()->addPermanentWidget(rxLbl);
-    statusBar()->addPermanentWidget(txLbl);
-
-    // 将字节标签注入 TerminalController（此处创建后直接注入，避免 findChild 查找）
-    if (m_terminalController) {
-        m_terminalController->setStatusBarLabels(rxLbl, txLbl);
-    }
 }
 
 /**
