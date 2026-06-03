@@ -139,6 +139,7 @@ set(SOURCES
     src/utils/export/DataExporterEdl.cpp
     src/utils/log/DataLogger.cpp
     src/utils/log/DataLoggerEdl.cpp
+    src/utils/log/DataLoggerPlayback.cpp
     src/protocol/parser/FrameDefinition.cpp
     src/core/settings/SessionManager.cpp
     src/core/managers/ShortcutManager.cpp

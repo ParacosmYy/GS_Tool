@@ -74,10 +74,7 @@ UsbConfigPanel::UsbConfigPanel(QWidget* parent)
             this, [this]() { ++m_totalConfigChanges; });
 }
 
-/**
- * @brief 设置设备检测器实例
- * @param detector 检测器对象指针
- */
+/** @brief 设置设备检测器实例 @param detector 检测器对象指针 */
 void UsbConfigPanel::setDetector(UsbDeviceDetector* detector) {
     m_detector = detector;
     if (m_detector) {
@@ -85,9 +82,7 @@ void UsbConfigPanel::setDetector(UsbDeviceDetector* detector) {
     }
 }
 
-/**
- * @brief 扫描USB设备并填充下拉框
- */
+/** @brief 扫描USB设备并填充下拉框 */
 void UsbConfigPanel::onScanClicked() {
     ++m_totalDeviceRefreshes;
     m_deviceCombo->clear();
@@ -113,9 +108,7 @@ void UsbConfigPanel::onScanClicked() {
     }
 }
 
-/**
- * @brief 设备选择变更时更新VID/PID
- */
+/** @brief 设备选择变更时更新VID/PID */
 void UsbConfigPanel::onDeviceChanged(int index) {
     if (index < 0) { return; }
     QVariantMap dev = m_deviceCombo->itemData(index).toMap();
@@ -125,9 +118,7 @@ void UsbConfigPanel::onDeviceChanged(int index) {
     }
 }
 
-/**
- * @brief 连接/断开按钮
- */
+/** @brief 连接/断开按钮点击处理 */
 void UsbConfigPanel::onConnectClicked() {
     if (!m_connected) {
         quint16 vid = static_cast<quint16>(m_vidSpin->value());
@@ -143,20 +134,14 @@ void UsbConfigPanel::onConnectClicked() {
     }
 }
 
-/**
- * @brief 设置连接状态(由外部连接管理器调用)
- * @param connected true=已连接
- */
+/** @brief 设置连接状态(由外部连接管理器调用) @param connected true=已连接 */
 void UsbConfigPanel::setConnected(bool connected) {
     m_connected = connected;
     m_connectBtn->setText(connected ? tr("断开") : tr("连接"));
     m_statusLabel->setText(connected ? tr("已连接") : tr("未连接"));
 }
 
-/**
- * @brief 保存USB配置到QSettings
- * @param settings QSettings对象
- */
+/** @brief 保存USB配置到QSettings @param settings QSettings对象 */
 void UsbConfigPanel::saveSettings(QSettings& settings) const
 {
     settings.setValue(QStringLiteral("usb/vid"), m_vidSpin->value());
@@ -165,10 +150,7 @@ void UsbConfigPanel::saveSettings(QSettings& settings) const
                       m_interfaceSpin->value());
 }
 
-/**
- * @brief 从QSettings加载USB配置
- * @param settings QSettings对象
- */
+/** @brief 从QSettings加载USB配置 @param settings QSettings对象 */
 void UsbConfigPanel::loadSettings(QSettings& settings)
 {
     m_vidSpin->setValue(
@@ -179,9 +161,7 @@ void UsbConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("usb/interface"), 0).toInt());
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器 */
 void UsbConfigPanel::resetStatistics()
 {
     m_totalDeviceRefreshes = 0;
