@@ -28,7 +28,12 @@ ProtocolView::ProtocolView(QWidget* parent) : QWidget(parent)
     setupContextMenu();
 }
 
-/** @brief 初始化UI: 工具栏 + 表格 + 信号连接 */
+/**
+ * @brief 初始化UI布局
+ *
+ * 创建工具栏(状态标签+清除/导出按钮)和数据表格，
+ * 连接清除按钮到clear()，导出按钮弹出文件对话框写CSV。
+ */
 void ProtocolView::setupUI()
 {
     setObjectName("protocolView");
@@ -109,7 +114,12 @@ void ProtocolView::setupUI()
     });
 }
 
-/** @brief 初始化右键菜单 */
+/**
+ * @brief 初始化右键菜单
+ *
+ * 创建包含"复制行"、"复制原始数据"、分隔线、"导出JSON"、分隔线、"清除"的上下文菜单，
+ * 并连接表格的customContextMenuRequested信号。
+ */
 void ProtocolView::setupContextMenu()
 {
     m_contextMenu = new QMenu(this);
@@ -140,7 +150,7 @@ void ProtocolView::setupContextMenu()
 // 右键菜单
 // ============================================================
 
-/** @brief 右键菜单弹出回调 @param pos 点击位置 */
+/** @brief 右键菜单弹出回调，根据选中状态启用/禁用菜单项 @param pos 点击位置 */
 void ProtocolView::onCustomContextMenu(const QPoint& pos)
 {
     if (!m_table->selectionModel()) return;
@@ -152,7 +162,11 @@ void ProtocolView::onCustomContextMenu(const QPoint& pos)
     m_contextMenu->popup(m_table->viewport()->mapToGlobal(pos));
 }
 
-/** @brief 复制选中行文本(制表符分隔) */
+/**
+ * @brief 复制选中行文本到剪贴板
+ *
+ * 以制表符分隔各列值，写入系统剪贴板。
+ */
 void ProtocolView::copyRow()
 {
     if (!m_table->selectionModel()) return;
@@ -169,7 +183,11 @@ void ProtocolView::copyRow()
     m_statusLabel->setText(tr("已复制行"));
 }
 
-/** @brief 复制选中帧的原始HEX数据 */
+/**
+ * @brief 复制选中帧的原始HEX数据到剪贴板
+ *
+ * 优先使用RawData字段，无RawData时拼接所有字段值。
+ */
 void ProtocolView::copyRaw()
 {
     if (!m_table->selectionModel()) return;
@@ -188,7 +206,12 @@ void ProtocolView::copyRaw()
     m_statusLabel->setText(tr("已复制原始数据"));
 }
 
-/** @brief 导出所有帧为JSON */
+/**
+ * @brief 导出所有帧为JSON文件
+ *
+ * 弹出文件保存对话框，将所有帧数据序列化为格式化JSON写入文件，
+ * JSON包含frames数组、导出时间、总帧数和总错误数。
+ */
 void ProtocolView::exportJson()
 {
     if (m_frames.isEmpty()) {
@@ -239,10 +262,13 @@ void ProtocolView::exportJson()
 // ============================================================
 
 /**
- * @brief 添加一帧解析结果
- * 流程: 更新列头 -> 创建着色单元格 -> 保存帧 -> 超限移除 -> 自动调整列宽
+ * @brief 添加帧数据到表格
+ *
+ * 流程: 更新列头 -> 创建着色单元格 -> 保存帧 -> 超限移除 -> 自动调整列宽。
+ * 自动提取字段名创建新列，每50帧或前3帧触发列宽自适应。
+ *
+ * @param fields 解析后的字段映射，可含"_frameTime"特殊字段
  */
-/** @brief 添加帧数据到表格(自动提取字段名创建列) @param fields 解析后的字段映射 */
 void ProtocolView::addFrame(const QVariantMap& fields)
 {
     updateColumnHeaders(fields);
@@ -277,7 +303,9 @@ void ProtocolView::addFrame(const QVariantMap& fields)
     ++m_totalFramesDisplayed;  ///< 统计: 帧展示计数
 }
 
-/** @brief 清除表格所有行 */
+/**
+ * @brief 清除表格所有行并重置帧计数器
+ */
 void ProtocolView::clear()
 {
     m_model->removeRows(0, m_model->rowCount());
@@ -289,18 +317,31 @@ void ProtocolView::clear()
 
 /** @brief 设置最大显示行数 @param max 行数上限 */
 void ProtocolView::setMaxRows(int max) { m_maxRows = max; }
-/** @brief 返回当前行数 @return 行数 */
+
+/** @brief 返回当前表格行数 @return 行数 */
 int ProtocolView::rowCount() const { return m_model->rowCount(); }
+
 /** @brief 获取所有已解析帧的原始数据列表 @return QVariantMap列表 */
 QList<QVariantMap> ProtocolView::allFrames() const { return m_frames; }
 
-/** @brief 设置字段颜色范围(值越界时单元格变色) @param fieldName 字段名 @param range 颜色范围配置 */
+/**
+ * @brief 设置字段颜色范围配置
+ *
+ * 配置后，对应字段的数值将按范围着色：正常区间默认色、警告区间黄色、错误区间红色。
+ *
+ * @param fieldName 目标字段名
+ * @param range 颜色范围配置（含normalLow/normalHigh/warnLow/warnHigh）
+ */
 void ProtocolView::setFieldColorRange(const QString& fieldName, const FieldColorRange& range)
 {
     m_colorRanges[fieldName] = range;
 }
 
-/** @brief 帧解析成功回调：添加到表格 @param fields 字段映射 @param rawFrame 原始帧 */
+/**
+ * @brief 帧解析成功回调：添加到表格
+ * @param fields 解析后的字段映射
+ * @param rawFrame 原始帧数据（当前未使用）
+ */
 void ProtocolView::onFrameParsed(const QVariantMap& fields, const QByteArray& rawFrame)
 {
     Q_UNUSED(rawFrame);
@@ -308,10 +349,13 @@ void ProtocolView::onFrameParsed(const QVariantMap& fields, const QByteArray& ra
 }
 
 /**
- * @brief 帧解析错误: 整行以Error色高亮
- * 新增Error/RawData列(如不存在)，错误行用ThemeManager::Error色标红
+ * @brief 帧解析错误回调：添加错误行(红色高亮)
+ *
+ * 动态添加Error/RawData列（如不存在），错误行整行使用ThemeManager::Error色标红。
+ *
+ * @param reason 错误原因描述
+ * @param rawFrame 导致错误的原始帧数据
  */
-/** @brief 帧解析错误回调：添加错误行(红色高亮) @param reason 错误原因 @param rawFrame 原始帧 */
 void ProtocolView::onFrameError(const QString& reason, const QByteArray& rawFrame)
 {
     m_totalErrors++;
@@ -371,7 +415,14 @@ void ProtocolView::resetViewStatistics()
 // 动态列管理
 // ============================================================
 
-/** @brief 动态更新列头(新增字段自动创建列) */
+/**
+ * @brief 动态更新列头
+ *
+ * 遍历fields中的字段，遇到新字段名时自动追加列并设置100px初始宽度。
+ * 忽略以下划线开头的内部字段。
+ *
+ * @param fields 当前帧的字段映射
+ */
 void ProtocolView::updateColumnHeaders(const QVariantMap& fields)
 {
     for (auto it = fields.constBegin(); it != fields.constEnd(); ++it) {
@@ -391,7 +442,14 @@ void ProtocolView::updateColumnHeaders(const QVariantMap& fields)
 
 /**
  * @brief 根据字段值创建着色的QStandardItem
- * 着色规则: normalLow~normalHigh=默认, 超出=警告或错误色
+ *
+ * 着色规则: normalLow~normalHigh为默认前景色，
+ * 超出正常但仍在warnLow~warnHigh范围内为警告色，
+ * 超出警告范围为错误色。非数值字段不着色。
+ *
+ * @param fieldName 字段名，用于查找颜色范围配置
+ * @param value 字段值的字符串表示
+ * @return 带有前景色设置的QStandardItem
  */
 QStandardItem* ProtocolView::createColoredItem(const QString& fieldName,
                                                 const QString& value)
@@ -420,10 +478,10 @@ QStandardItem* ProtocolView::createColoredItem(const QString& fieldName,
 }
 
 /**
- * @brief 自动调整列宽
- * 序号50px, 时间100px, 数据列按内容自适应(60~200px)
+ * @brief 自动调整所有列宽以适应内容
+ *
+ * 序号列固定50px，时间列固定100px，数据列按内容自适应(60~200px)。
  */
-/** @brief 自动调整所有列宽以适应内容 */
 void ProtocolView::autoResizeColumns()
 {
     m_table->setColumnWidth(0, 50);
