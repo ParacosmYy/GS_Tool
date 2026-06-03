@@ -73,9 +73,9 @@ void RegisterEditor::readAddress(int address)
     /// 记录日志
     QString addrStr = QString("0x%1").arg(address, 2, 16, QChar('0')).toUpper();
     if (data.isEmpty()) {
-        appendLog(QString("R ADDR: %1 → (无数据)").arg(addrStr), false);
+        appendLog(tr("R 地址: %1 -> (无数据)").arg(addrStr), false);
     } else {
-        appendLog(QString("R ADDR: %1 → DATA: %2")
+        appendLog(tr("R 地址: %1 -> 数据: %2")
             .arg(addrStr)
             .arg(formatHex(data)), false);
     }
@@ -113,11 +113,11 @@ void RegisterEditor::writeAddress(int address, const QByteArray& data)
 
     QString addrStr = QString("0x%1").arg(address, 2, 16, QChar('0')).toUpper();
     if (success) {
-        appendLog(QString("W ADDR: %1 ← DATA: %2 [OK]")
+        appendLog(tr("W 地址: %1 <- 数据: %2 [成功]")
             .arg(addrStr)
             .arg(formatHex(data)), true);
     } else {
-        appendLog(QString("W ADDR: %1 ← DATA: %2 [FAIL]")
+        appendLog(tr("W 地址: %1 <- 数据: %2 [失败]")
             .arg(addrStr)
             .arg(formatHex(data)), true);
     }

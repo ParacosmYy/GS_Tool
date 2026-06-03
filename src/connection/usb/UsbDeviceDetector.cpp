@@ -63,7 +63,7 @@ QVariantList UsbDeviceDetector::scanDevices() {
         device["pid"] = pid;
         device["vidHex"] = vidStr;
         device["pidHex"] = pidStr;
-        device["name"] = QString("USB Device VID_%1 PID_%2")
+        device["name"] = tr("USB设备 VID_%1 PID_%2")
                              .arg(vidStr, pidStr);
         device["manufacturer"] = QString();
         device["serial"] = QString();

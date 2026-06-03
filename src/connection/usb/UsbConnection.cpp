@@ -21,8 +21,8 @@ ConnectionType UsbConnection::type() const {
 }
 
 QString UsbConnection::name() const {
-    return QString("USB:%1:%2").arg(m_vid, 4, 16, QChar('0'))
-                               .arg(m_pid, 4, 16, QChar('0'));
+    return tr("USB:%1:%2").arg(m_vid, 4, 16, QChar('0'))
+                       .arg(m_pid, 4, 16, QChar('0'));
 }
 
 ConnectionState UsbConnection::state() const {

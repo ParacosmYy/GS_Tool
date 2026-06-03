@@ -74,12 +74,12 @@ void SchemaViewer::parseProtoContent(const QString& content) {
             QString name = trimmed.mid(8).split('{').first().trimmed();
             currentMsg = new QTreeWidgetItem(rootItem);
             currentMsg->setText(0, name);
-            currentMsg->setText(1, "message");
+            currentMsg->setText(1, tr("消息(message)"));
         } else if (trimmed.startsWith("enum ")) {
             QString name = trimmed.mid(5).split('{').first().trimmed();
             auto* enumItem = new QTreeWidgetItem(rootItem);
             enumItem->setText(0, name);
-            enumItem->setText(1, "enum");
+            enumItem->setText(1, tr("枚举(enum)"));
         } else if (currentMsg && trimmed.contains('=')
                    && !trimmed.startsWith("//")) {
             auto* fieldItem = new QTreeWidgetItem(currentMsg);
@@ -104,12 +104,12 @@ void SchemaViewer::parseFbsContent(const QString& content) {
             QString name = trimmed.mid(6).split('{').first().trimmed();
             currentTable = new QTreeWidgetItem(rootItem);
             currentTable->setText(0, name);
-            currentTable->setText(1, "table");
+            currentTable->setText(1, tr("表(table)"));
         } else if (trimmed.startsWith("struct ")) {
             QString name = trimmed.mid(7).split('{').first().trimmed();
             auto* structItem = new QTreeWidgetItem(rootItem);
             structItem->setText(0, name);
-            structItem->setText(1, "struct");
+            structItem->setText(1, tr("结构体(struct)"));
         } else if (currentTable && trimmed.contains(':')
                    && !trimmed.startsWith("//")) {
             auto* fieldItem = new QTreeWidgetItem(currentTable);

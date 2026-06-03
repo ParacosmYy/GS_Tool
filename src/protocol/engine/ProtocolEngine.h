@@ -126,6 +126,51 @@ private:
      */
     QVariant extractField(const QByteArray &frame,
                            const ProtocolSchema::FieldDefinition &field) const;
+
+    /**
+     * @brief 验证帧校验和/CRC
+     * @param frame 完整帧数据(含帧头到校验字段)
+     * @param framing 帧格式定义
+     * @return true=校验通过, false=校验失败
+     */
+    bool validateChecksum(const QByteArray &frame,
+                          const ProtocolSchema::FramingRule &framing) const;
+
+    /**
+     * @brief 计算CRC-8校验值
+     * @param data 待校验数据
+     * @param polynomial 多项式(默认0x07)
+     * @return CRC-8值
+     */
+    static quint8 computeCrc8(const QByteArray &data, quint8 polynomial = 0x07);
+
+    /**
+     * @brief 计算CRC-16 CCITT校验值
+     * @param data 待校验数据
+     * @return CRC-16 CCITT值
+     */
+    static quint16 computeCrc16Ccitt(const QByteArray &data);
+
+    /**
+     * @brief 计算CRC-16 Modbus校验值
+     * @param data 待校验数据
+     * @return CRC-16 Modbus值
+     */
+    static quint16 computeCrc16Modbus(const QByteArray &data);
+
+    /**
+     * @brief 计算CRC-32校验值
+     * @param data 待校验数据
+     * @return CRC-32值
+     */
+    static quint32 computeCrc32(const QByteArray &data);
+
+    /**
+     * @brief 计算异或校验值
+     * @param data 待校验数据
+     * @return 异或结果
+     */
+    static quint8 computeXor(const QByteArray &data);
 };
 
 #endif // PROTOCOL_ENGINE_H

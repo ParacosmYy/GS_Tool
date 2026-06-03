@@ -15,12 +15,12 @@
 #include <QTreeWidgetItem>
 
 /// 模拟服务名称映射
-static const QMap<QString, QString> SVC_NAMES = {
-    {"00001800", "Generic Access"},
-    {"00001801", "Generic Attribute"},
-    {"0000180a", "Device Information"},
-    {"0000ffe0", "Custom Service"},
-    {"6e400001", "Nordic UART"}
+static const QMap<QString, const char*> SVC_KEYS = {
+    {"00001800", QT_TRANSLATE_NOOP("BleGattBrowser", "通用访问")},
+    {"00001801", QT_TRANSLATE_NOOP("BleGattBrowser", "通用属性")},
+    {"0000180a", QT_TRANSLATE_NOOP("BleGattBrowser", "设备信息")},
+    {"0000ffe0", QT_TRANSLATE_NOOP("BleGattBrowser", "自定义服务")},
+    {"6e400001", QT_TRANSLATE_NOOP("BleGattBrowser", "Nordic UART")}
 };
 
 BleGattBrowser::BleGattBrowser(QWidget* parent)
@@ -174,8 +174,7 @@ void BleGattBrowser::populateTree(const QStringList& services)
     for (const QString& svcUuid : services) {
         // 提取短UUID用于名称查找
         const QString shortUuid = svcUuid.left(8).toLower();
-        const QString svcName = SVC_NAMES.value(
-            shortUuid, tr("未知服务"));
+        const QString svcName = tr(SVC_KEYS.value(shortUuid, QT_TRANSLATE_NOOP("BleGattBrowser", "未知服务")));
 
         auto* svcItem = new QTreeWidgetItem(m_serviceTree);
         svcItem->setText(0, svcName);
@@ -190,7 +189,7 @@ void BleGattBrowser::populateTree(const QStringList& services)
             charItem->setText(0, tr("特征 %1").arg(i + 1));
             charItem->setText(1, svcUuid.left(8)
                 + QString("-%1").arg(i, 4, 16, QChar('0')));
-            const QStringList props = {"READ", "READ|WRITE", "READ|NOTIFY"};
+            const QStringList props = {tr("读取"), tr("读取|写入"), tr("读取|通知")};
             charItem->setText(2, props.value(i, "READ"));
         }
     }

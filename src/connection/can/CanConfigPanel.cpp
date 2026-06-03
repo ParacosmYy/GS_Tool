@@ -30,8 +30,8 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
     m_bitrateCombo->setObjectName("canBitrateCombo");
     struct BitrateEntry { QString label; int value; };
     const BitrateEntry bitrates[] = {
-        {"125 kbps", 125000}, {"250 kbps", 250000},
-        {"500 kbps", 500000}, {"1 Mbps", 1000000}
+        {tr("125 kbps"), 125000}, {tr("250 kbps"), 250000},
+        {tr("500 kbps"), 500000}, {tr("1 Mbps"), 1000000}
     };
     for (const auto& e : bitrates) {
         m_bitrateCombo->addItem(e.label, e.value);

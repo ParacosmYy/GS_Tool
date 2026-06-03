@@ -40,7 +40,7 @@ ConnectionType TlsConnection::type() const
 QString TlsConnection::name() const
 {
     if (m_state == ConnectionState::Connected) {
-        return QString("TLS://%1:%2").arg(m_host).arg(m_port);
+        return tr("TLS://%1:%2").arg(m_host).arg(m_port);
     }
     return tr("TLS (未连接)");
 }

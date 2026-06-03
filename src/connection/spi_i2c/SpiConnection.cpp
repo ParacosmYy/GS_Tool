@@ -38,7 +38,7 @@ ConnectionType SpiConnection::type() const
 QString SpiConnection::name() const
 {
     if (m_state == ConnectionState::Connected) {
-        return QString("SPI:%1").arg(m_adapterDevice);
+        return tr("SPI:%1").arg(m_adapterDevice);
     }
     return tr("SPI (未连接)");
 }

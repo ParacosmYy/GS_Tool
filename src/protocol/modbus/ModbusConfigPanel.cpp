@@ -16,9 +16,9 @@ ModbusConfigPanel::ModbusConfigPanel(QWidget* parent)
     // 模式选择
     m_modeCombo = new QComboBox(this);
     m_modeCombo->setObjectName("modeCombo");
-    m_modeCombo->addItem("RTU");
-    m_modeCombo->addItem("ASCII");
-    m_modeCombo->addItem("TCP");
+    m_modeCombo->addItem(tr("RTU"));
+    m_modeCombo->addItem(tr("ASCII"));
+    m_modeCombo->addItem(tr("TCP"));
     layout->addRow(tr("传输模式:"), m_modeCombo);
 
     // 从站地址
@@ -33,7 +33,7 @@ ModbusConfigPanel::ModbusConfigPanel(QWidget* parent)
     m_timeoutSpin->setObjectName("timeoutSpin");
     m_timeoutSpin->setRange(100, 30000);
     m_timeoutSpin->setValue(1000);
-    m_timeoutSpin->setSuffix(" ms");
+    m_timeoutSpin->setSuffix(tr(" ms"));
     layout->addRow(tr("响应超时:"), m_timeoutSpin);
 }
 

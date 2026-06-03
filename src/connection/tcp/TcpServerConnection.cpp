@@ -39,7 +39,7 @@ ConnectionType TcpServerConnection::type() const
 QString TcpServerConnection::name() const
 {
     if (m_listening) {
-        return QString("TCP Server:%1").arg(m_listenPort);
+        return tr("TCP服务器:%1").arg(m_listenPort);
     }
     return tr("TCP Server (未监听)");
 }

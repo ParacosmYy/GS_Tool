@@ -39,7 +39,7 @@ ConnectionType UdpMulticastConnection::type() const
 QString UdpMulticastConnection::name() const
 {
     if (m_state == ConnectionState::Connected) {
-        return QString("Multicast:%1:%2").arg(m_groupAddress.toString()).arg(m_localPort);
+        return tr("组播:%1:%2").arg(m_groupAddress.toString()).arg(m_localPort);
     }
     return tr("UDP Multicast (未连接)");
 }

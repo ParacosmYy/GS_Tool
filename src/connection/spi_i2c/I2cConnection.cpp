@@ -38,7 +38,7 @@ ConnectionType I2cConnection::type() const
 QString I2cConnection::name() const
 {
     if (m_state == ConnectionState::Connected) {
-        return QString("I2C:%1@0x%2")
+        return tr("I2C:%1@0x%2")
             .arg(m_adapterDevice)
             .arg(m_deviceAddress, 2, 16, QChar('0'));
     }
