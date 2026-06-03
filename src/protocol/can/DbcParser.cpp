@@ -58,6 +58,8 @@ bool DbcParser::parseFromText(const QString& content)
 
     const QStringList lines = content.split('\n');
     uint32_t currentMsgId = 0;
+    int errorCount = 0;       ///< 本次解析累计错误数
+    int firstErrorLine = -1;  ///< 第一个错误出现的行号(用于错误信息)
 
     for (int i = 0; i < lines.size(); ++i) {
         const QString line = lines[i].trimmed();
@@ -67,34 +69,55 @@ bool DbcParser::parseFromText(const QString& content)
             continue;
         }
 
+        bool ok = true;
+
         /* BO_: 消息定义 */
         if (line.startsWith(QLatin1String("BO_ "))) {
-            if (parseMessageLine(line)) {
+            ok = parseMessageLine(line);
+            if (ok) {
+                /* 从已解析成功的消息中获取ID，避免重复正则匹配 */
                 static const QRegularExpression re("^BO_\\s+(\\d+)\\s+");
                 const auto match = re.match(line);
                 if (match.hasMatch()) {
                     currentMsgId = match.captured(1).toUInt();
                 }
+            } else {
+                currentMsgId = 0;  ///< 解析失败时重置上下文，防止信号归属错误
             }
-            continue;
         }
-
         /* SG_: 信号定义 */
-        if (line.startsWith(QLatin1String("SG_ "))) {
-            parseSignalLine(line, currentMsgId);
-            continue;
+        else if (line.startsWith(QLatin1String("SG_ "))) {
+            ok = parseSignalLine(line, currentMsgId);
         }
-
         /* VAL_: 值表 */
-        if (line.startsWith(QLatin1String("VAL_ "))) {
-            parseValueTableLine(line);
+        else if (line.startsWith(QLatin1String("VAL_ "))) {
+            ok = parseValueTableLine(line);
+        }
+        /* CM_: BA_, BU_ */
+        else if (line.startsWith(QLatin1String("CM_ "))) {
+            ok = parseCommentLine(line);
+        } else if (line.startsWith(QLatin1String("BA_ "))) {
+            ok = parseAttributeLine(line);
+        } else if (line.startsWith(QLatin1String("BU_:"))) {
+            ok = parseNodeLine(line);
+        } else {
+            /* 未识别的关键字行，不计入错误(如VERSION、NS_、BS_、SIG_GROUP_等) */
             continue;
         }
 
-        /* CM_, BA_, BU_ */
-        if (line.startsWith(QLatin1String("CM_ "))) { parseCommentLine(line); continue; }
-        if (line.startsWith(QLatin1String("BA_ "))) { parseAttributeLine(line); continue; }
-        if (line.startsWith(QLatin1String("BU_:"))) { parseNodeLine(line); continue; }
+        if (!ok) {
+            ++errorCount;
+            ++m_totalParseErrors;
+            if (firstErrorLine < 0) {
+                firstErrorLine = i + 1;  ///< 行号从1开始，便于用户定位
+            }
+        }
+    }
+
+    /* 如果存在解析错误，记录第一条错误位置(不阻断解析) */
+    if (errorCount > 0) {
+        m_lastError = tr("DBC解析完成，共 %1 个错误，首个错误在第 %2 行")
+                          .arg(errorCount).arg(firstErrorLine);
     }
 
     emit parseCompleted(m_messages.size());
