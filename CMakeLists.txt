@@ -62,6 +62,7 @@ set(SOURCES
     src/core/background/BackgroundWidget.cpp
     src/core/background/BackgroundSettingsPopup.cpp
     src/core/widgets/BasePanel.cpp
+    src/core/widgets/BasePanelStates.cpp
     src/core/widgets/AnimatedButton.cpp
     src/core/widgets/EmptyStateWidget.cpp
     src/core/widgets/LoadingSpinner.cpp
@@ -83,6 +84,7 @@ set(SOURCES
     src/connection/network/TcpConnection.cpp
     src/connection/network/UdpConnection.cpp
     src/terminal/widget/TerminalWidget.cpp
+    src/terminal/widget/TerminalWidgetSlots.cpp
     src/terminal/widget/TerminalWidgetPaint.cpp
     src/terminal/model/TerminalModel.cpp
     src/terminal/search/TerminalSearchBar.cpp
@@ -128,6 +130,7 @@ set(SOURCES
     src/chart/stats/ScatterWidget.cpp
     src/chart/stats/ScatterWidgetStats.cpp
     src/ota/manager/OtaManager.cpp
+    src/ota/manager/OtaManagerProgress.cpp
     src/ota/widget/OtaWidget.cpp
     src/ota/widget/OtaWidgetSlots.cpp
     src/ota/history/OtaHistoryModel.cpp
@@ -254,6 +257,7 @@ set(SOURCES
 
     # ── F17: WebSocket 客户端 ──
     src/connection/ws/WebSocketConnection.cpp
+    src/connection/ws/WebSocketFrame.cpp
     src/connection/ws/WsConfigPanel.cpp
 
     # ── F18: Modbus 主站/从站 ──
