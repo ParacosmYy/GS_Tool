@@ -74,6 +74,15 @@ public:
      */
     void setReadLength(int length);
 
+    /** @brief 获取读操作次数 */
+    int readCount() const;
+
+    /** @brief 获取写操作次数 */
+    int writeCount() const;
+
+    /** @brief 导出操作日志为文本 */
+    QString exportLog() const;
+
 signals:
     /** @brief 寄存器读取完成信号
      * @param address 寄存器地址
@@ -116,6 +125,8 @@ private:
     IConnection* m_connection = nullptr;            ///< 底层连接实例
     int m_readLength = 1;                            ///< 默认读取长度
     int m_deviceAddress = 0x00;                      ///< I2C设备7位地址
+    int m_readCount = 0;                             ///< 读操作计数
+    int m_writeCount = 0;                            ///< 写操作计数
 
     // ---- UI控件 ----
     QSpinBox* m_addrSpin = nullptr;                 ///< 寄存器地址输入

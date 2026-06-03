@@ -82,11 +82,15 @@ void OtaManager::connectTransferSignals(BaseTransfer* transfer)
     connect(transfer, &BaseTransfer::transferComplete,
             this, [this]() {
                 setOtaState(OtaState::Complete);
+                ++m_transferCount;
+                m_lastTransferSuccess = true;
                 emit transferComplete();
             });
     connect(transfer, &BaseTransfer::transferError,
             this, [this](const QString& reason) {
                 setOtaState(OtaState::Error);
+                ++m_transferCount;
+                m_lastTransferSuccess = false;
                 // 增强错误消息: 追加协议名称上下文
                 QString enriched = reason;
                 if (!m_currentProtocol.isEmpty()) {
@@ -135,6 +139,30 @@ void OtaManager::setOtaState(OtaState state)
 OtaManager::OtaState OtaManager::otaState() const
 {
     return m_otaState;
+}
+
+/** @brief 获取历史传输总次数 */
+int OtaManager::transferCount() const
+{
+    return m_transferCount;
+}
+
+/** @brief 获取上次传输是否成功 */
+bool OtaManager::lastTransferSuccess() const
+{
+    return m_lastTransferSuccess;
+}
+
+/** @brief 获取上次传输的文件名 */
+QString OtaManager::lastFileName() const
+{
+    return m_currentFileName;
+}
+
+/** @brief 获取当前协议名称 */
+QString OtaManager::currentProtocolName() const
+{
+    return m_currentProtocol;
 }
 
 // ============================================================================

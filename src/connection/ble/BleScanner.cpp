@@ -76,6 +76,7 @@ bool BleScanner::isScanning() const
 void BleScanner::onScanTimeout()
 {
     m_discoveryTimer->stop();
+    ++m_scanCount;
     emit scanFinished();
 }
 
@@ -83,12 +84,20 @@ void BleScanner::onSimulateDiscovery()
 {
     if (m_simIndex >= m_simQueue.size()) {
         m_discoveryTimer->stop();
+        ++m_scanCount;
         emit scanFinished();
         return;
     }
 
     const QVariantMap device = m_simQueue.at(m_simIndex).toMap();
     m_devices.append(device);
+
+    /* 去重统计 */
+    const QString addr = device.value("address").toString();
+    if (!m_seenAddresses.contains(addr)) {
+        m_seenAddresses.append(addr);
+    }
+
     m_simIndex++;
 
     emit deviceFound(device);
@@ -107,4 +116,31 @@ void BleScanner::generateSimulatedDevices()
         dev["type"] = QStringLiteral("BLE");
         m_simQueue.append(dev);
     }
+}
+
+/**
+ * @brief 获取已完成的扫描次数
+ * @return 累计扫描完成计数
+ */
+int BleScanner::scanCount() const
+{
+    return m_scanCount;
+}
+
+/**
+ * @brief 获取累计发现的设备总数（去重后）
+ * @return 不同设备地址的数量
+ */
+int BleScanner::totalDevicesFound() const
+{
+    return m_seenAddresses.size();
+}
+
+/**
+ * @brief 清空扫描历史记录
+ */
+void BleScanner::clearHistory()
+{
+    m_scanCount = 0;
+    m_seenAddresses.clear();
 }

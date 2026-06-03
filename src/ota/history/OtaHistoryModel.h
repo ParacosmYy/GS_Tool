@@ -78,6 +78,19 @@ public:
     /** @brief 从SettingsManager加载历史记录 */
     void loadFromSettings();
 
+    /** @brief 获取成功传输次数 */
+    int successCount() const;
+    /** @brief 获取失败传输次数 */
+    int failureCount() const;
+    /** @brief 获取成功率（0.0~1.0） */
+    double successRate() const;
+    /** @brief 获取累计传输总字节数 */
+    qint64 totalBytesTransferred() const;
+    /** @brief 获取平均传输耗时（毫秒） */
+    qint64 averageDurationMs() const;
+    /** @brief 生成统计摘要文本 */
+    QString statisticsSummary() const;
+
 private:
     QVector<OtaRecord> m_records;          ///< 历史记录列表
     static constexpr int kMaxRecords = 200; ///< 最大保留记录数

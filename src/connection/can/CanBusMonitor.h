@@ -13,6 +13,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QMap>
 #include "connection/can/CanFrameParser.h"
 
 /**
@@ -46,6 +47,24 @@ public:
      */
     int frameCount() const;
 
+    /**
+     * @brief 获取唯一帧ID数量
+     * @return 不同帧ID的数量
+     */
+    int uniqueFrameIdCount() const;
+
+    /**
+     * @brief 获取统计摘要文本
+     * @return 帧统计信息的格式化字符串
+     */
+    QString statisticsSummary() const;
+
+    /**
+     * @brief 设置帧ID过滤器（只显示匹配的帧）
+     * @param filterText 帧ID过滤文本（如 "0x123"），空字符串清除过滤
+     */
+    void setFrameIdFilter(const QString& filterText);
+
 private:
     /**
      * @brief 根据帧类型获取行背景色
@@ -71,6 +90,12 @@ private:
 
     /** @brief 最大显示行数 */
     static constexpr int kMaxRows = 10000;
+
+    /** @brief 帧ID频率统计 */
+    QMap<quint32, int> m_idFrequency;
+
+    /** @brief 当前帧ID过滤文本 */
+    QString m_frameIdFilter;
 };
 
 #endif // CANBUSMONITOR_H

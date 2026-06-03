@@ -12,6 +12,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QVariantList>
+#include <QStringList>
 
 /**
  * @brief BLE设备扫描器
@@ -51,6 +52,15 @@ public:
      */
     bool isScanning() const;
 
+    /** @brief 获取已完成的扫描次数 */
+    int scanCount() const;
+
+    /** @brief 获取累计发现的设备总数（去重后） */
+    int totalDevicesFound() const;
+
+    /** @brief 清空扫描历史记录 */
+    void clearHistory();
+
 signals:
     /**
      * @brief 发现新设备时发出
@@ -86,6 +96,12 @@ private:
 
     /** @brief 当前扫描索引 */
     int m_simIndex = 0;
+
+    /** @brief 已完成扫描次数 */
+    int m_scanCount = 0;
+
+    /** @brief 累计发现的设备地址集合（去重） */
+    QStringList m_seenAddresses;
 };
 
 #endif // BLESCANNER_H

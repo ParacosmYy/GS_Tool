@@ -94,6 +94,18 @@ public:
     /** @brief 获取当前OTA状态 */
     OtaState otaState() const;
 
+    /** @brief 获取历史传输总次数 */
+    int transferCount() const;
+
+    /** @brief 获取上次传输是否成功 */
+    bool lastTransferSuccess() const;
+
+    /** @brief 获取上次传输的文件名 */
+    QString lastFileName() const;
+
+    /** @brief 获取当前协议名称 */
+    QString currentProtocolName() const;
+
     /**
      * @brief 验证固件文件路径
      * @param filePath 文件路径
@@ -170,6 +182,8 @@ private:
     QString m_tempBinPath;                   ///< HEX转BIN的临时文件路径
     QString m_currentFileName;               ///< 当前传输的文件名（用于错误信息上下文）
     QString m_currentProtocol;               ///< 当前传输协议名称（用于错误信息上下文）
+    int m_transferCount = 0;                  ///< 历史传输总次数
+    bool m_lastTransferSuccess = false;       ///< 上次传输是否成功
 };
 
 #endif // OTAMANAGER_H

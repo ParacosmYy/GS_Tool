@@ -80,6 +80,7 @@ void RegisterEditor::readAddress(int address)
             .arg(formatHex(data)), false);
     }
 
+    ++m_readCount;
     emit registerReadComplete(address, data);
 }
 
@@ -123,6 +124,7 @@ void RegisterEditor::writeAddress(int address, const QByteArray& data)
     }
 
     emit registerWriteComplete(address, success);
+    ++m_writeCount;
 }
 
 /**
@@ -259,4 +261,32 @@ QString RegisterEditor::formatHex(const QByteArray& data)
             static_cast<quint8>(byte), 2, 16, QChar('0')).toUpper());
     }
     return hexParts.join(" ");
+}
+
+/**
+ * @brief 获取读操作次数
+ * @return 累计读操作计数
+ */
+int RegisterEditor::readCount() const
+{
+    return m_readCount;
+}
+
+/**
+ * @brief 获取写操作次数
+ * @return 累计写操作计数
+ */
+int RegisterEditor::writeCount() const
+{
+    return m_writeCount;
+}
+
+/**
+ * @brief 导出操作日志为文本
+ * @return 日志文本内容
+ */
+QString RegisterEditor::exportLog() const
+{
+    if (!m_log) return QString();
+    return m_log->toPlainText();
 }
