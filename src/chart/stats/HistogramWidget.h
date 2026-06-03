@@ -85,6 +85,14 @@ public slots:
     /** @brief 刷新直方图显示 -- 从ChartModel读取数据并重新计算 */
     void refreshHistogram();
 
+    // ---- 统计计数接口 ----
+    /** @brief 获取累计刷新更新次数 */
+    quint64 totalUpdates() const;
+    /** @brief 获取累计分桶数变更次数 */
+    quint64 totalBinChanges() const;
+    /** @brief 重置所有直方图统计计数器 */
+    void resetHistogramStatistics();
+
 private slots:
     void onChannelChanged(int index);           ///< 通道选择变更
     void onBinsChanged(int value);              ///< 分桶数变更
@@ -115,6 +123,10 @@ private:
     QLabel* m_statsLabel;             ///< 统计摘要标签
 
     bool m_autoRefresh = false;       ///< 是否自动刷新
+
+    // ---- 统计计数器 ----
+    quint64 m_totalUpdates = 0;       ///< 累计刷新更新次数
+    quint64 m_totalBinChanges = 0;    ///< 累计分桶数变更次数
 };
 
 #endif // HISTOGRAMWIDGET_H

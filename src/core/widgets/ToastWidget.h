@@ -160,7 +160,6 @@ private:
         static QMap<QWidget*, QList<ToastWidget*>> map; return map; }
     static QHash<QString, QElapsedTimer>& debounceMap() {  ///< 防抖计时器映射
         static QHash<QString, QElapsedTimer> map; return map; }
-
     static void repositionToasts(QWidget* parent) {          ///< 消失后重排位置
         if (!parent) return;
         auto& list = activeToasts(parent);

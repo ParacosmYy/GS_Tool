@@ -1,12 +1,7 @@
 /**
  * @file ChartWidget.cpp
  * @brief 实时波形图控件实现
- *
- * 实现要点:
- *   1. 构造时连接 ChartModel 信号 + ThemeManager::themeChanged 信号
- *   2. 主题切换时通过 ThemeManager::color() 更新图表背景/网格/轴标签/图例
- *   3. 主题切换时通过 ChartColors::colorsForTheme() 更新数据线颜色
- *   4. 数据线颜色随主题变化，确保在暗色/亮色背景下均清晰可读
+ * 实现要点: 构造连接信号 / 主题切换更新视觉 / ChartColors主题调色板 / 数据线颜色随主题变化
  */
 
 #include "chart/widget/ChartWidget.h"
@@ -22,7 +17,7 @@
 // 构造函数
 // ============================================================================
 
-/** @brief 构造波形图控件(创建ChartModel+初始化UI+连接信号) @param parent 父控件 */
+/** @brief 构造波形图控件(创建ChartModel+初始化UI+连接信号) */
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
     , m_model(new ChartModel(this))
@@ -49,7 +44,6 @@ ChartWidget::ChartWidget(QWidget* parent)
 // ============================================================================
 // UI 初始化
 // ============================================================================
-
 /** @brief 初始化波形图UI(QChartView+工具栏+游标叠加层+缩放控制器) */
 void ChartWidget::setupUI()
 {

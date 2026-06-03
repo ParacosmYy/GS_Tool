@@ -105,6 +105,7 @@ void ProtocolView::setupUI()
         }
         file.close();
         m_statusLabel->setText(tr("已导出 %1 帧").arg(m_frames.size()));
+        ++m_totalExports;  ///< 统计: CSV导出
     });
 }
 
@@ -147,6 +148,7 @@ void ProtocolView::onCustomContextMenu(const QPoint& pos)
     m_copyRowAction->setEnabled(hasSelection);
     m_copyRawAction->setEnabled(hasSelection);
     m_exportJsonAction->setEnabled(!m_frames.isEmpty());
+    ++m_totalContextMenuActions;  ///< 统计: 右键菜单弹出
     m_contextMenu->popup(m_table->viewport()->mapToGlobal(pos));
 }
 
@@ -229,6 +231,7 @@ void ProtocolView::exportJson()
     }
     file.close();
     m_statusLabel->setText(tr("已导出 %1 帧到JSON").arg(m_frames.size()));
+    ++m_totalExports;  ///< 统计: JSON导出
 }
 
 // ============================================================
@@ -271,6 +274,7 @@ void ProtocolView::addFrame(const QVariantMap& fields)
     // 自动调整列宽(每50帧或前3帧)
     if (m_totalFrames % 50 == 0 || m_totalFrames <= 3) autoResizeColumns();
     m_statusLabel->setText(tr("帧数: %1 | 错误: %2").arg(m_totalFrames).arg(m_totalErrors));
+    ++m_totalFramesDisplayed;  ///< 统计: 帧展示计数
 }
 
 /** @brief 清除表格所有行 */
@@ -353,6 +357,14 @@ void ProtocolView::onFrameError(const QString& reason, const QByteArray& rawFram
     }
     m_table->scrollToBottom();
     m_statusLabel->setText(tr("帧数: %1 | 错误: %2").arg(m_totalFrames).arg(m_totalErrors));
+}
+
+/** @brief 重置协议视图统计计数器 */
+void ProtocolView::resetViewStatistics()
+{
+    m_totalFramesDisplayed = 0;
+    m_totalExports = 0;
+    m_totalContextMenuActions = 0;
 }
 
 // ============================================================

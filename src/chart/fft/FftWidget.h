@@ -74,6 +74,16 @@ public:
     /** @brief 获取当前采样率 */
     double sampleRate() const;
 
+    // ---- 统计计数接口 ----
+    /** @brief 获取累计FFT变换次数 */
+    quint64 totalTransforms() const;
+    /** @brief 获取累计窗函数变更次数 */
+    quint64 totalWindowChanges() const;
+    /** @brief 获取累计FFT大小变更次数 */
+    quint64 totalSizeChanges() const;
+    /** @brief 重置所有FFT控件统计计数器 */
+    void resetFftWidgetStatistics();
+
 public slots:
     /**
      * @brief 刷新频谱显示
@@ -152,6 +162,11 @@ private:
     double m_sampleRate = 1000.0;     ///< 采样率（Hz）
     bool m_autoRefresh = false;       ///< 是否自动刷新
     double m_fundamentalFreq = 0.0;   ///< 最近一次计算的基频
+
+    // ---- 统计计数器 ----
+    quint64 m_totalTransforms = 0;    ///< 累计FFT变换次数
+    quint64 m_totalWindowChanges = 0; ///< 累计窗函数变更次数
+    quint64 m_totalSizeChanges = 0;   ///< 累计FFT大小变更次数
 };
 
 #endif // FFTWIDGET_H

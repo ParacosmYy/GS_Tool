@@ -129,6 +129,14 @@ public:
      */
     void applyThemeColors(const QColor& gridColor, const QColor& labelColor);
 
+    // ---- 统计计数接口 ----
+    /** @brief 获取累计缩放重算次数 */
+    quint64 totalRescales() const;
+    /** @brief 获取累计自动缩放事件次数 */
+    quint64 totalAutoScaleEvents() const;
+    /** @brief 重置所有Y轴统计计数器 */
+    void resetYAxisStatistics();
+
 signals:
     /** @brief Y轴布局变化信号（增删轴后通知 ChartWidget 刷新） */
     void axesChanged();
@@ -151,6 +159,10 @@ private:
 
     QChart* m_chart;                               ///< 关联的图表对象
     QMap<QString, AxisInfo> m_axes;                ///< 通道名 → 轴信息映射
+
+    // ---- 统计计数器 ----
+    quint64 m_totalRescales = 0;                   ///< 累计缩放重算次数
+    quint64 m_totalAutoScaleEvents = 0;            ///< 累计自动缩放事件次数
 };
 
 #endif // YAXISMANAGER_H

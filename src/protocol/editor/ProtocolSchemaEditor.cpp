@@ -101,6 +101,7 @@ void ProtocolSchemaEditor::setupUI()
             this, &ProtocolSchemaEditor::validateJson);
 
     connect(saveBtn, &QPushButton::clicked, this, [this]() {
+        ++m_totalSchemasSaved;  ///< 统计: 保存协议
         emit saveRequested(m_jsonEditor->toPlainText());
     });
 }
@@ -116,6 +117,7 @@ void ProtocolSchemaEditor::setupUI()
 void ProtocolSchemaEditor::loadSchema(ProtocolSchema *schema)
 {
     m_schema = schema;
+    ++m_totalSchemasLoaded;  ///< 统计: 加载协议
 
     if (!m_schema) {
         m_statusLabel->setText(tr("Invalid schema"));
@@ -152,6 +154,7 @@ ProtocolSchema *ProtocolSchemaEditor::currentSchema() const
  */
 void ProtocolSchemaEditor::validateJson()
 {
+    ++m_totalValidations;  ///< 统计: 验证操作
     auto *tmpSchema = new ProtocolSchema(this);
 
     const bool ok = tmpSchema->loadFromJsonData(
@@ -192,4 +195,12 @@ void ProtocolSchemaEditor::setJsonText(const QString &json)
 QString ProtocolSchemaEditor::jsonText() const
 {
     return m_jsonEditor->toPlainText();
+}
+
+/** @brief 重置协议编辑器统计计数器 */
+void ProtocolSchemaEditor::resetSchemaEditorStatistics()
+{
+    m_totalSchemasLoaded = 0;
+    m_totalSchemasSaved = 0;
+    m_totalValidations = 0;
 }

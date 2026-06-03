@@ -268,6 +268,7 @@ void OtaWidget::onStartTransfer()
     m_transferTimer.start();
     m_lastBytesSent = 0;
     setTransferring(true);
+    ++m_totalTransfersStarted;  ///< 统计: 传输启动
 
     // 发射传输开始信号，供Toast通知使用
     emit transferStarted(m_currentFileName);
@@ -275,6 +276,7 @@ void OtaWidget::onStartTransfer()
     if (!m_manager->startTransfer(filePath, protocol)) {
         setTransferring(false);
         appendLog(tr("传输启动失败"));
+        ++m_totalTransfersFailed;  ///< 统计: 传输启动失败
         // 启动失败也通知Toast
         emit transferFailed(m_currentFileName, tr("传输启动失败"));
     }
@@ -315,4 +317,13 @@ void OtaWidget::setTransferring(bool transferring)
     } else {
         m_progressBar->stopShimmer();
     }
+}
+
+/** @brief 重置OTA面板统计计数器(不影响历史记录) */
+void OtaWidget::resetOtaWidgetStatistics()
+{
+    m_totalTransfersStarted = 0;
+    m_totalTransfersCompleted = 0;
+    m_totalTransfersFailed = 0;
+    m_totalBytesTransferred = 0;
 }

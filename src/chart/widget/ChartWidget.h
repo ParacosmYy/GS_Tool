@@ -78,50 +78,20 @@ private slots:
     /** @brief 清除按钮点击 */
     void onClearClicked();
 
-    /**
-     * @brief 主题切换响应 -- 更新图表所有视觉元素
-     *
-     * 更新内容:
-     *   - 图表背景色 (BgPrimary)
-     *   - 网格线颜色 (Border)
-     *   - 坐标轴标签颜色 (TextSecondary)
-     *   - 图例文字颜色 (TextSecondary)
-     *   - 数据线颜色 (ChartColors 主题调色板)
-     */
+    /** @brief 主题切换响应(更新背景/网格/轴标签/图例/数据线颜色) */
     void onThemeChanged();
 
 private:
     /** @brief 初始化UI布局和控件 */
     void setupUI();
 
-    /**
-     * @brief 创建顶部工具栏(暂停/清除/游标/窗口大小/状态标签)
-     * @return 工具栏Widget指针
-     */
+    /** @brief 创建顶部工具栏 @return 工具栏Widget指针 */
     QWidget* createToolbar();
-
-    /**
-     * @brief 为指定通道创建 QLineSeries 并添加到图表
-     * @param name 通道名称
-     * @param color 通道颜色（无效时使用调色板默认色）
-     */
+    /** @brief 为指定通道创建QLineSeries @param name 通道名称 @param color 线条颜色 */
     void createSeries(const QString& name, const QColor& color);
-
-    /**
-     * @brief 移除指定通道的 QLineSeries
-     * @param name 通道名称
-     */
+    /** @brief 移除指定通道的QLineSeries @param name 通道名称 */
     void removeSeries(const QString& name);
-
-    /**
-     * @brief 应用当前主题颜色到图表所有视觉元素
-     *
-     * 从 ThemeManager 获取语义色值并应用到:
-     *   - QChart 背景
-     *   - 坐标轴网格线和标签
-     *   - 图例文字
-     * 同时从 ChartColors 获取主题调色板并更新所有已有数据线颜色
-     */
+    /** @brief 应用当前主题颜色到图表所有视觉元素 */
     void applyThemeColors();
 
     /** @brief 窗口大小变化时同步游标叠加层尺寸 */

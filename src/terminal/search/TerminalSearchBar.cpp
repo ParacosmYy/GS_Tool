@@ -251,6 +251,7 @@ void TerminalSearchBar::onSearchTextChanged(const QString& text)
         emit searchCleared();
     } else {
         // 文本非空时发出搜索请求
+        ++m_totalSearches;  ///< 统计: 搜索触发
         emit searchRequested(text, m_regexCheck->isChecked(), m_hexCheck->isChecked());
     }
 }
@@ -280,4 +281,12 @@ bool TerminalSearchBar::isValidHex(const QString& text) const
 void TerminalSearchBar::setResultText(const QString& text)
 {
     m_resultLabel->setText(text);
+}
+
+/** @brief 重置搜索栏统计计数器 */
+void TerminalSearchBar::resetSearchBarStatistics()
+{
+    m_totalSearches = 0;
+    m_totalMatches = 0;
+    m_totalReplacements = 0;
 }

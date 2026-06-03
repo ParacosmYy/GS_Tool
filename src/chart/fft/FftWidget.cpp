@@ -269,6 +269,7 @@ void FftWidget::refreshSpectrum()
 
     // 更新频谱曲线
     m_spectrumSeries->replace(spectrum);
+    ++m_totalTransforms;
 
     // 自动调整坐标轴范围
     double maxFreq = spectrum.last().x();
@@ -304,6 +305,7 @@ void FftWidget::onChannelChanged(int /*index*/)
 
 void FftWidget::onWindowChanged(int /*index*/)
 {
+    ++m_totalWindowChanges;
     if (m_autoRefresh) {
         refreshSpectrum();
     }
@@ -311,6 +313,7 @@ void FftWidget::onWindowChanged(int /*index*/)
 
 void FftWidget::onFftSizeChanged(int /*value*/)
 {
+    ++m_totalSizeChanges;
     if (m_autoRefresh) {
         refreshSpectrum();
     }
@@ -409,4 +412,30 @@ void FftWidget::applyThemeColors()
     QBrush plotAreaBrush(bgColor);
     m_chart->setPlotAreaBackgroundBrush(plotAreaBrush);
     m_chart->setPlotAreaBackgroundVisible(true);
+}
+
+/** @brief 获取累计FFT变换次数 */
+quint64 FftWidget::totalTransforms() const
+{
+    return m_totalTransforms;
+}
+
+/** @brief 获取累计窗函数变更次数 */
+quint64 FftWidget::totalWindowChanges() const
+{
+    return m_totalWindowChanges;
+}
+
+/** @brief 获取累计FFT大小变更次数 */
+quint64 FftWidget::totalSizeChanges() const
+{
+    return m_totalSizeChanges;
+}
+
+/** @brief 重置所有FFT控件统计计数器 */
+void FftWidget::resetFftWidgetStatistics()
+{
+    m_totalTransforms = 0;
+    m_totalWindowChanges = 0;
+    m_totalSizeChanges = 0;
 }

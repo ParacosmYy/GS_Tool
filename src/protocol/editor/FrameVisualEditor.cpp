@@ -90,25 +90,25 @@ void FrameVisualEditor::onMoveFieldDown()
 /** @brief 帧头变更回调 — 实时更新二进制布局预览 */
 void FrameVisualEditor::onHeaderChanged()
 {
-    if (!m_updating) { updateBinaryPreview(); }
+    if (!m_updating) { ++m_totalEdits; updateBinaryPreview(); }
 }
 
 /** @brief 帧尾变更回调 — 实时更新二进制布局预览 */
 void FrameVisualEditor::onFooterChanged()
 {
-    if (!m_updating) { updateBinaryPreview(); }
+    if (!m_updating) { ++m_totalEdits; updateBinaryPreview(); }
 }
 
 /** @brief 长度字段配置变更回调 — 实时更新二进制布局预览 */
 void FrameVisualEditor::onLengthConfigChanged()
 {
-    if (!m_updating) { updateBinaryPreview(); }
+    if (!m_updating) { ++m_totalEdits; updateBinaryPreview(); }
 }
 
 /** @brief 校验配置变更回调 — 实时更新二进制布局预览 */
 void FrameVisualEditor::onChecksumConfigChanged()
 {
-    if (!m_updating) { updateBinaryPreview(); }
+    if (!m_updating) { ++m_totalEdits; updateBinaryPreview(); }
 }
 
 // ---- 数据读写 ----
@@ -140,6 +140,8 @@ void FrameVisualEditor::onApply()
 {
     rebuildDefinition();
     updateBinaryPreview();
+    ++m_totalFramesBuilt;  ///< 统计: 帧构建
+    ++m_totalSends;        ///< 统计: 应用=发送
     emit definitionChanged(m_def);
 }
 
@@ -201,7 +203,7 @@ void FrameVisualEditor::onFieldChanged(int row, int col)
 {
     Q_UNUSED(row)
     Q_UNUSED(col)
-    if (!m_updating) { updateBinaryPreview(); }
+    if (!m_updating) { ++m_totalEdits; updateBinaryPreview(); }
 }
 
 // ---- 内部更新 ----
@@ -331,3 +333,11 @@ void FrameVisualEditor::updateBinaryPreview()
 
 /** @brief 预览定时器回调，触发二进制预览刷新 */
 void FrameVisualEditor::onPreviewTimerTick() { updateBinaryPreview(); }
+
+/** @brief 重置帧编辑器统计计数器 */
+void FrameVisualEditor::resetEditorStatistics()
+{
+    m_totalFramesBuilt = 0;
+    m_totalSends = 0;
+    m_totalEdits = 0;
+}

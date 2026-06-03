@@ -29,6 +29,7 @@ GaugeWidget::GaugeWidget(QWidget *parent)
 void GaugeWidget::setValue(double value)
 {
     m_value = value;
+    ++m_totalValueUpdates;
     update();
 }
 
@@ -41,6 +42,7 @@ void GaugeWidget::setRange(double min, double max)
 {
     m_min = min;
     m_max = max;
+    ++m_totalRangeChanges;
     update();
 }
 
@@ -215,4 +217,23 @@ void GaugeWidget::paintEvent(QPaintEvent *event)
     }
 
     painter.end();
+}
+
+/** @brief 获取累计值更新次数 */
+quint64 GaugeWidget::totalValueUpdates() const
+{
+    return m_totalValueUpdates;
+}
+
+/** @brief 获取累计量程变更次数 */
+quint64 GaugeWidget::totalRangeChanges() const
+{
+    return m_totalRangeChanges;
+}
+
+/** @brief 重置所有量表统计计数器 */
+void GaugeWidget::resetGaugeStatistics()
+{
+    m_totalValueUpdates = 0;
+    m_totalRangeChanges = 0;
 }

@@ -68,6 +68,14 @@ public slots:
      */
     void refreshPlot();
 
+    // ---- 统计计数接口 ----
+    /** @brief 获取累计绘制点数 */
+    quint64 totalPointsPlotted() const;
+    /** @brief 获取累计清除次数 */
+    quint64 totalClears() const;
+    /** @brief 重置所有散点图统计计数器 */
+    void resetScatterStatistics();
+
 private slots:
     /** @brief X轴通道选择变更 */
     void onXChannelChanged(int index);
@@ -131,6 +139,10 @@ private:
 
     // ---- 状态 ----
     bool m_autoRefresh = false;      ///< 是否自动刷新
+
+    // ---- 统计计数器 ----
+    quint64 m_totalPointsPlotted = 0; ///< 累计绘制点数
+    quint64 m_totalClears = 0;       ///< 累计清除次数
 };
 
 #endif // SCATTERWIDGET_H

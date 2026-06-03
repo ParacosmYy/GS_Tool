@@ -260,6 +260,7 @@ void HistogramWidget::refreshHistogram()
             .arg(s.min, 0, 'f', 3)
             .arg(s.max, 0, 'f', 3)
             .arg(s.count));
+    ++m_totalUpdates;
 }
 
 void HistogramWidget::onChannelChanged(int /*index*/)
@@ -269,6 +270,7 @@ void HistogramWidget::onChannelChanged(int /*index*/)
 
 void HistogramWidget::onBinsChanged(int /*value*/)
 {
+    ++m_totalBinChanges;
     if (m_autoRefresh) { refreshHistogram(); }
 }
 
@@ -342,4 +344,23 @@ void HistogramWidget::applyThemeColors()
     // 绘图区背景
     m_chart->setPlotAreaBackgroundBrush(QBrush(bgColor));
     m_chart->setPlotAreaBackgroundVisible(true);
+}
+
+/** @brief 获取累计刷新更新次数 */
+quint64 HistogramWidget::totalUpdates() const
+{
+    return m_totalUpdates;
+}
+
+/** @brief 获取累计分桶数变更次数 */
+quint64 HistogramWidget::totalBinChanges() const
+{
+    return m_totalBinChanges;
+}
+
+/** @brief 重置所有直方图统计计数器 */
+void HistogramWidget::resetHistogramStatistics()
+{
+    m_totalUpdates = 0;
+    m_totalBinChanges = 0;
 }

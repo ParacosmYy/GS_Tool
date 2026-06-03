@@ -91,6 +91,7 @@ void YAxisManager::createAxis(const QString& channel, const QColor& color,
     // 记录轴信息
     m_axes[channel] = {axis, side, color, unit};
 
+    ++m_totalAutoScaleEvents;
     emit axesChanged();
 }
 
@@ -140,6 +141,7 @@ void YAxisManager::updateRange(const QString& channel, double min, double max)
     auto it = m_axes.find(channel);
     if (it != m_axes.end()) {
         it->axis->setRange(min, max);
+        ++m_totalRescales;
     }
 }
 
@@ -289,4 +291,23 @@ int YAxisManager::countAxesOnSide(YAxisSide side) const
         }
     }
     return count;
+}
+
+/** @brief 获取累计缩放重算次数 */
+quint64 YAxisManager::totalRescales() const
+{
+    return m_totalRescales;
+}
+
+/** @brief 获取累计自动缩放事件次数 */
+quint64 YAxisManager::totalAutoScaleEvents() const
+{
+    return m_totalAutoScaleEvents;
+}
+
+/** @brief 重置所有Y轴统计计数器 */
+void YAxisManager::resetYAxisStatistics()
+{
+    m_totalRescales = 0;
+    m_totalAutoScaleEvents = 0;
 }
