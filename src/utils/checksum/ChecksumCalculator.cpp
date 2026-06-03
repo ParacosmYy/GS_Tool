@@ -24,6 +24,8 @@ quint64 ChecksumCalculator::calculate(const QByteArray &data, Algorithm alg) con
         return 0;
     }
 
+    ++m_calcCount;
+
     switch (alg) {
     case CRC8: {
         quint8 crc = 0x00;
@@ -212,4 +214,78 @@ QString ChecksumCalculator::algorithmName(Algorithm alg)
     case CustomCrc:  return QStringLiteral("Custom CRC");
     }
     return QStringLiteral("Unknown");
+}
+
+/**
+ * @brief 获取算法的位宽
+ */
+int ChecksumCalculator::algorithmBitWidth(Algorithm alg)
+{
+    switch (alg) {
+    case CRC8:       return 8;
+    case CRC16Ccitt:
+    case CRC16Modbus:
+    case CRC16Kermit:
+    case Sum16:      return 16;
+    case CRC32:
+    case CRC32C:
+    case Sum32:      return 32;
+    case Xor8:
+    case Sum8:       return 8;
+    case CustomCrc:  return 0;  // 由用户指定
+    }
+    return 0;
+}
+
+/**
+ * @brief 获取算法的人类可读描述
+ */
+QString ChecksumCalculator::algorithmDescription(Algorithm alg)
+{
+    switch (alg) {
+    case CRC8:       return QStringLiteral("CRC-8 标准校验，多项式 0x07");
+    case CRC16Ccitt: return QStringLiteral("CRC-16/CCITT，多项式 0x1021，常用于通信协议");
+    case CRC16Modbus:return QStringLiteral("CRC-16/Modbus，多项式 0xA001，工业标准");
+    case CRC16Kermit:return QStringLiteral("CRC-16/Kermit，多项式 0x8408，又名CRC-CCITT");
+    case CRC32:      return QStringLiteral("CRC-32，多项式 0xEDB88320，以太网/ZIP标准");
+    case CRC32C:     return QStringLiteral("CRC-32C Castagnoli，多项式 0x82F63B78，iSCSI标准");
+    case Xor8:       return QStringLiteral("8位异或校验，简单快速");
+    case Sum8:       return QStringLiteral("8位累加和，取低8位");
+    case Sum16:      return QStringLiteral("16位累加和，大端序双字节累加");
+    case Sum32:      return QStringLiteral("32位累加和，大端序四字节累加");
+    case CustomCrc:  return QStringLiteral("自定义CRC多项式和位宽");
+    }
+    return QString();
+}
+
+/**
+ * @brief 使用所有内置算法计算同一份数据的校验和
+ */
+QMap<QString, quint64> ChecksumCalculator::calculateAll(const QByteArray& data) const
+{
+    QMap<QString, quint64> results;
+    const QList<Algorithm> algorithms = {
+        CRC8, CRC16Ccitt, CRC16Modbus, CRC16Kermit,
+        CRC32, CRC32C, Xor8, Sum8, Sum16, Sum32
+    };
+    for (Algorithm alg : algorithms) {
+        results[algorithmName(alg)] = calculate(data, alg);
+    }
+    return results;
+}
+
+/**
+ * @brief 获取累计计算次数
+ */
+qint64 ChecksumCalculator::calculationCount() const
+{
+    return m_calcCount;
+}
+
+/**
+ * @brief 重置计算计数
+ */
+void ChecksumCalculator::resetCount()
+{
+    m_calcCount = 0;
 }

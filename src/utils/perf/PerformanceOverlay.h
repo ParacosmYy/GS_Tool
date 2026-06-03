@@ -10,8 +10,20 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <QVector>
 
 class PerformanceMonitor;
+
+/**
+ * @brief FPS统计快照
+ */
+struct FpsStats {
+    double minFps = 0.0;       ///< 最低FPS
+    double maxFps = 0.0;       ///< 最高FPS
+    double avgFps = 0.0;       ///< 平均FPS
+    double currentFps = 0.0;   ///< 当前FPS
+    int sampleCount = 0;       ///< 采样数
+};
 
 /**
  * @class PerformanceOverlay
@@ -42,6 +54,33 @@ public:
      */
     void updateStats(double fps, double avgFrameMs, qint64 memBytes);
 
+    /**
+     * @brief 获取FPS统计数据（min/max/avg/current）
+     * @return FPS统计快照
+     */
+    FpsStats fpsStats() const;
+
+    /**
+     * @brief 设置FPS警告阈值
+     * @param threshold 低于此值视为低帧率（默认30.0）
+     */
+    void setFpsWarningThreshold(double threshold);
+
+    /**
+     * @brief 查询当前是否低于FPS警告阈值
+     * @return true=当前FPS低于阈值
+     */
+    bool isBelowFpsThreshold() const;
+
+    /**
+     * @brief 生成性能摘要文本
+     * @return 格式化的性能摘要（FPS min/max/avg + 内存）
+     */
+    QString performanceSummary() const;
+
+    /** @brief 重置统计数据 */
+    void resetStats();
+
 private slots:
     /**
      * @brief 统计数据更新回调
@@ -58,6 +97,16 @@ private:
     PerformanceMonitor *m_monitor  = nullptr;  ///< 性能监视器
     QLabel             *m_fpsLabel = nullptr;  ///< FPS 标签
     QLabel             *m_memLabel = nullptr;  ///< 内存标签
+
+    /** @brief FPS历史采样（滑动窗口，最近120个采样） */
+    QVector<double> m_fpsHistory;
+    static constexpr int kFpsHistorySize = 120; ///< FPS历史窗口大小
+
+    double m_minFps = 999.0;     ///< 最低FPS
+    double m_maxFps = 0.0;       ///< 最高FPS
+    double m_currentFps = 0.0;   ///< 当前FPS
+    qint64 m_lastMemBytes = 0;   ///< 最近一次内存值
+    double m_fpsWarningThreshold = 30.0; ///< FPS警告阈值
 };
 
 #endif // PERFORMANCE_OVERLAY_H

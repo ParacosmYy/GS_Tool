@@ -11,6 +11,8 @@
 #define DATACONVERTER_H
 
 #include <QByteArray>
+#include <QList>
+#include <QMap>
 #include <QObject>
 #include <QString>
 
@@ -66,6 +68,33 @@ public:
      */
     static QString formatName(Format format);
 
+    /**
+     * @brief 获取格式的人类可读描述
+     * @param format 格式枚举值
+     * @return 描述字符串，适合作为UI工具提示
+     */
+    static QString formatDescription(Format format);
+
+    /**
+     * @brief 获取所有支持的格式列表
+     * @return 格式枚举列表
+     */
+    static QList<Format> supportedFormats();
+
+    /**
+     * @brief 将输入数据转换到所有其他格式（对比视图）
+     * @param input 输入数据
+     * @param from 源格式
+     * @return QMap<格式名, 转换结果>
+     */
+    QMap<QString, QByteArray> convertToAll(const QByteArray& input, Format from) const;
+
+    /** @brief 获取累计转换次数 */
+    qint64 conversionCount() const;
+
+    /** @brief 重置转换计数 */
+    void resetCount();
+
 private:
     /**
      * @brief 将数据从指定格式解码为原始字节
@@ -76,6 +105,9 @@ private:
      * @brief 将原始字节编码为指定格式
      */
     QByteArray encodeFromRaw(const QByteArray &raw, Format to) const;
+
+    /** @brief 累计转换次数 */
+    mutable qint64 m_convCount = 0;
 };
 
 #endif // DATACONVERTER_H

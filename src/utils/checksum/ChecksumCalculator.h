@@ -11,6 +11,7 @@
 #define CHECKSUMCALCULATOR_H
 
 #include <QByteArray>
+#include <QMap>
 #include <QObject>
 #include <QString>
 #include <QtGlobal>
@@ -71,6 +72,37 @@ public:
      * @return 算法名称字符串
      */
     static QString algorithmName(Algorithm alg);
+
+    /**
+     * @brief 获取算法的位宽（8/16/32）
+     * @param alg 算法枚举值
+     * @return 算法输出位宽
+     */
+    static int algorithmBitWidth(Algorithm alg);
+
+    /**
+     * @brief 获取算法的人类可读描述
+     * @param alg 算法枚举值
+     * @return 描述字符串，适合作为UI工具提示
+     */
+    static QString algorithmDescription(Algorithm alg);
+
+    /**
+     * @brief 使用所有内置算法计算同一份数据的校验和（对比视图）
+     * @param data 输入数据
+     * @return QMap<算法名, 校验和值>，不包含CustomCrc
+     */
+    QMap<QString, quint64> calculateAll(const QByteArray& data) const;
+
+    /** @brief 获取累计计算次数 */
+    qint64 calculationCount() const;
+
+    /** @brief 重置计算计数 */
+    void resetCount();
+
+private:
+    /** @brief 累计计算次数（calculate调用计数） */
+    mutable qint64 m_calcCount = 0;
 };
 
 #endif // CHECKSUMCALCULATOR_H

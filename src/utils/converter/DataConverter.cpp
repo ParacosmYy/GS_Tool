@@ -25,6 +25,7 @@ QByteArray DataConverter::convert(const QByteArray &input, Format from, Format t
     if (from == to) {
         return input;
     }
+    ++m_convCount;
     QByteArray raw = decodeToRaw(input, from);
     return encodeFromRaw(raw, to);
 }
@@ -208,4 +209,61 @@ QByteArray DataConverter::encodeFromRaw(const QByteArray &raw, Format to) const
     }
     }
     return raw;
+}
+
+/**
+ * @brief 获取格式的人类可读描述
+ */
+QString DataConverter::formatDescription(Format format)
+{
+    switch (format) {
+    case Hex:       return QStringLiteral("十六进制表示，每字节用两个字符表示，空格分隔");
+    case Ascii:     return QStringLiteral("ASCII纯文本，可读字符串");
+    case Base64:    return QStringLiteral("Base64编码，适用于二进制数据的文本传输");
+    case UrlEncode: return QStringLiteral("URL百分号编码，适用于网络传输中的特殊字符");
+    case Binary:    return QStringLiteral("二进制表示，每字节8位，空格分隔");
+    case Decimal:   return QStringLiteral("十进制表示，每字节0-255，空格分隔");
+    case Octal:     return QStringLiteral("八进制表示，每字节0-377，空格分隔");
+    }
+    return QString();
+}
+
+/**
+ * @brief 获取所有支持的格式列表
+ */
+QList<DataConverter::Format> DataConverter::supportedFormats()
+{
+    return { Hex, Ascii, Base64, UrlEncode, Binary, Decimal, Octal };
+}
+
+/**
+ * @brief 将输入数据转换到所有其他格式
+ */
+QMap<QString, QByteArray> DataConverter::convertToAll(const QByteArray& input, Format from) const
+{
+    QMap<QString, QByteArray> results;
+    const QList<Format> formats = supportedFormats();
+    for (Format fmt : formats) {
+        if (fmt == from) {
+            continue;
+        }
+        results[formatName(fmt)] = convert(input, from, fmt);
+    }
+    return results;
+}
+
+/**
+ * @brief 获取累计转换次数
+ */
+qint64 DataConverter::conversionCount() const
+{
+    return m_convCount;
+}
+
+/**
+ * @brief 重置转换计数
+ */
+void DataConverter::resetCount()
+{
+    m_convCount = 0;
 }

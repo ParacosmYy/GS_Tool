@@ -59,6 +59,18 @@ void PerformanceOverlay::onStatsUpdated(double fps, double avgFrameMs, qint64 me
  */
 void PerformanceOverlay::updateStats(double fps, double avgFrameMs, qint64 memBytes)
 {
+    /* FPS历史跟踪 */
+    m_currentFps = fps;
+    m_lastMemBytes = memBytes;
+    if (fps > 0) {
+        if (fps < m_minFps) m_minFps = fps;
+        if (fps > m_maxFps) m_maxFps = fps;
+        m_fpsHistory.append(fps);
+        if (m_fpsHistory.size() > kFpsHistorySize) {
+            m_fpsHistory.removeFirst();
+        }
+    }
+
     // FPS 与帧耗时
     m_fpsLabel->setText(tr("FPS: %1 | %2ms")
                             .arg(fps, 0, 'f', 1)
@@ -111,4 +123,69 @@ void PerformanceOverlay::setupUI()
     // 叠加层属性：鼠标穿透、固定宽度
     setAttribute(Qt::WA_TransparentForMouseEvents);
     setFixedWidth(150);
+}
+
+/**
+ * @brief 获取FPS统计数据
+ */
+FpsStats PerformanceOverlay::fpsStats() const
+{
+    FpsStats stats;
+    stats.currentFps = m_currentFps;
+    stats.minFps = m_minFps;
+    stats.maxFps = m_maxFps;
+    stats.sampleCount = m_fpsHistory.size();
+
+    if (!m_fpsHistory.isEmpty()) {
+        double sum = 0.0;
+        for (double v : m_fpsHistory) {
+            sum += v;
+        }
+        stats.avgFps = sum / m_fpsHistory.size();
+    }
+    return stats;
+}
+
+/**
+ * @brief 设置FPS警告阈值
+ */
+void PerformanceOverlay::setFpsWarningThreshold(double threshold)
+{
+    m_fpsWarningThreshold = threshold;
+}
+
+/**
+ * @brief 查询当前是否低于FPS警告阈值
+ */
+bool PerformanceOverlay::isBelowFpsThreshold() const
+{
+    return m_currentFps > 0 && m_currentFps < m_fpsWarningThreshold;
+}
+
+/**
+ * @brief 生成性能摘要文本
+ */
+QString PerformanceOverlay::performanceSummary() const
+{
+    const FpsStats fps = fpsStats();
+    const double mb = static_cast<double>(m_lastMemBytes) / (1024.0 * 1024.0);
+
+    return tr("FPS: %1 (min: %2, max: %3, avg: %4) | MEM: %5 MB")
+        .arg(fps.currentFps, 0, 'f', 1)
+        .arg(fps.minFps, 0, 'f', 1)
+        .arg(fps.maxFps, 0, 'f', 1)
+        .arg(fps.avgFps, 0, 'f', 1)
+        .arg(mb, 0, 'f', 1);
+}
+
+/**
+ * @brief 重置统计数据
+ */
+void PerformanceOverlay::resetStats()
+{
+    m_fpsHistory.clear();
+    m_minFps = 999.0;
+    m_maxFps = 0.0;
+    m_currentFps = 0.0;
+    m_lastMemBytes = 0;
 }
