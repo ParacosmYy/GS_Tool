@@ -23,10 +23,7 @@ HeatmapWidget::HeatmapWidget(QWidget *parent)
 /** @brief 析构函数，使用默认实现 */
 HeatmapWidget::~HeatmapWidget() = default;
 
-/**
- * @brief 设置热力图的二维数据矩阵，自动模式下会重新计算值域范围
- * @param data 二维浮点数矩阵，外层为行(纵轴)，内层为列(横轴)
- */
+/** @brief 设置热力图的二维数据矩阵，自动模式下会重新计算值域范围 @param data 二维浮点数矩阵，外层为行(纵轴)，内层为列(横轴) */
 void HeatmapWidget::setData(const QVector<QVector<double>> &data)
 {
     m_data = data;

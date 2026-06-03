@@ -122,11 +122,7 @@ void TriggerManager::setRuleEnabled(int index, bool enabled)
     m_engine->setRuleEnabled(index, enabled);
 }
 
-/**
- * @brief 更新指定索引的规则配置
- * @param index 规则索引
- * @param rule 新的规则配置
- */
+/** @brief 更新指定索引的规则配置 @param index 规则索引 @param rule 新的规则配置 */
 void TriggerManager::updateRule(int index, const TriggerRuleConfig& rule)
 {
     if (index >= 0 && index < m_engine->rules().size()) {
@@ -137,36 +133,25 @@ void TriggerManager::updateRule(int index, const TriggerRuleConfig& rule)
     }
 }
 
-/**
- * @brief 获取累计匹配次数
- * @return 所有规则的总命中次数
- */
+/** @brief 获取累计匹配次数 @return 所有规则的总命中次数 */
 int TriggerManager::matchCount() const
 {
     return m_engine->matchCount();
 }
 
-/**
- * @brief 获取上次匹配距现在的毫秒数
- * @return 距上次匹配的毫秒数，无匹配返回 -1
- */
+/** @brief 获取上次匹配距现在的毫秒数 @return 距上次匹配的毫秒数，无匹配返回-1 */
 qint64 TriggerManager::msSinceLastMatch() const
 {
     return m_engine->msSinceLastMatch();
 }
 
-/**
- * @brief 重置引擎统计计数
- */
+/** @brief 重置引擎统计计数 */
 void TriggerManager::resetStatistics()
 {
     m_engine->resetStatistics();
 }
 
-/**
- * @brief 同步规则列表到UI面板
- * @param panel 触发器列表面板指针
- */
+/** @brief 同步规则列表到UI面板 @param panel 触发器列表面板指针 */
 void TriggerManager::syncListPanel(TriggerListPanel* panel)
 {
     if (!panel) return;

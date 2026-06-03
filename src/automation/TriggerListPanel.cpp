@@ -9,10 +9,7 @@
 #include <QHBoxLayout>
 #include <QListWidgetItem>
 
-/**
- * @brief 构造函数
- * @param parent 父控件
- */
+/** @brief 构造函数 @param parent 父控件 */
 TriggerListPanel::TriggerListPanel(QWidget* parent)
     : QWidget(parent)
     , m_ruleList(nullptr)
@@ -53,11 +50,7 @@ void TriggerListPanel::setRules(const QList<TriggerRuleConfig>& rules)
     }
 }
 
-/**
- * @brief 更新规则计数标签
- * @param total 总规则数
- * @param enabled 启用的规则数
- */
+/** @brief 更新规则计数标签 @param total 总规则数 @param enabled 启用的规则数 */
 void TriggerListPanel::updateRuleCount(int total, int enabled)
 {
     m_countLabel->setText(tr("规则: %1/%2 启用").arg(enabled).arg(total));
