@@ -9,13 +9,7 @@
 #include "core/recording/RecordingTimeline.h"
 #include <QDateTime>
 
-/**
- * @brief 构造函数
- *
- * 初始化所有时间成员为零，录制状态为 false。
- *
- * @param parent 父对象指针，用于 Qt 对象树管理
- */
+/** @brief 构造函数，初始化所有时间成员为零，录制状态为false @param parent 父对象指针 */
 RecordingTimeline::RecordingTimeline(QObject* parent)
     : QObject(parent)
     , m_startTimeMs(0)
@@ -25,12 +19,7 @@ RecordingTimeline::RecordingTimeline(QObject* parent)
 {
 }
 
-/**
- * @brief 开始录制
- *
- * 重置时间基准为当前绝对时间，清空上次录制时长和事件列表，
- * 进入录制状态并发出 recordingStarted() 信号。
- */
+/** @brief 开始录制，重置时间基准并进入录制状态 */
 void RecordingTimeline::startRecording()
 {
     m_startTimeMs = QDateTime::currentMSecsSinceEpoch();
@@ -41,13 +30,7 @@ void RecordingTimeline::startRecording()
     emit recordingStarted();
 }
 
-/**
- * @brief 停止录制
- *
- * 计算本次录制的总时长并缓存到 m_elapsedMs，退出录制状态。
- * 自动将停止时刻记录为一个事件时间戳，然后发出 recordingStopped() 信号。
- * 若当前未在录制则直接返回。
- */
+/** @brief 停止录制，计算总时长并自动记录停止时刻为事件 */
 void RecordingTimeline::stopRecording()
 {
     if (!m_recording) {
@@ -63,14 +46,7 @@ void RecordingTimeline::stopRecording()
     emit recordingStopped(m_elapsedMs);
 }
 
-/**
- * @brief 获取当前已录制时长
- *
- * 录制中时返回从 m_startTimeMs 到当前时刻的实时差值（毫秒），
- * 未录制时返回上次录制的累计时长 m_elapsedMs。
- *
- * @return 当前时间点（毫秒）
- */
+/** @brief 获取当前已录制时长(录制中返回实时差值，未录制返回回放定位位置) @return 当前时间点(毫秒) */
 qint64 RecordingTimeline::currentTimeMs() const
 {
     if (m_recording) {
@@ -79,15 +55,7 @@ qint64 RecordingTimeline::currentTimeMs() const
     return m_seekPositionMs;
 }
 
-/**
- * @brief 定位到指定时间点
- *
- * 仅在非录制状态下有效。将内部时间指针移动到目标位置，
- * 目标值会被钳制在 [0, m_elapsedMs] 范围内。
- * 定位完成后发出 timeUpdated() 信号。
- *
- * @param timeMs 目标时间点（毫秒），负值会被钳制为 0
- */
+/** @brief 定位到指定时间点(非录制状态下有效，自动钳制到有效范围) @param timeMs 目标时间点(毫秒)，负值会被钳制为0 */
 void RecordingTimeline::seekTo(qint64 timeMs)
 {
     if (m_recording) {
@@ -106,27 +74,13 @@ void RecordingTimeline::seekTo(qint64 timeMs)
     emit timeUpdated(m_seekPositionMs);
 }
 
-/**
- * @brief 获取所有事件时间戳
- *
- * 返回录制过程中通过 recordEvent() 和 stopRecording() 记录的
- * 所有事件时间点，按记录顺序排列。
- *
- * @return 事件时间戳列表（毫秒）
- */
+/** @brief 获取所有事件时间戳(按记录顺序排列) @return 事件时间戳列表(毫秒) */
 QList<qint64> RecordingTimeline::eventTimestamps() const
 {
     return m_events;
 }
 
-/**
- * @brief 记录一个事件时间戳
- *
- * 将指定时间戳追加到事件列表末尾。仅当时间戳非负且不超过
- * 当前已录制时长时才会被接受。
- *
- * @param timestampMs 事件发生的时间点（毫秒）
- */
+/** @brief 记录一个事件时间戳(非负且不超过当前录制时长才接受) @param timestampMs 事件发生的时间点(毫秒) */
 void RecordingTimeline::recordEvent(qint64 timestampMs)
 {
     // 校验：时间戳非负且不超过当前录制时长
@@ -141,11 +95,7 @@ void RecordingTimeline::recordEvent(qint64 timestampMs)
     ++m_totalEventsRecorded;
 }
 
-/**
- * @brief 清除所有已记录的事件时间戳
- *
- * 清空事件列表，不影响录制状态和时间计数。
- */
+/** @brief 清除所有已记录的事件时间戳(不影响录制状态和时间计数) */
 void RecordingTimeline::clearEvents()
 {
     m_events.clear();

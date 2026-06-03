@@ -209,13 +209,7 @@ void ThemeManager::saveTheme() const
     }
 }
 
-/**
- * @brief 从 SettingsManager 加载上次保存的主题
- *
- * 若无保存记录，回退到系统主题检测。
- *
- * @return true 成功加载已保存的主题
- */
+/** @brief 从SettingsManager加载上次保存的主题(无记录时回退到系统主题) @return true成功加载已保存的主题 */
 bool ThemeManager::loadSavedTheme()
 {
     auto& settings = SettingsManager::instance();
@@ -232,11 +226,7 @@ bool ThemeManager::loadSavedTheme()
     return false;
 }
 
-/**
- * @brief 设置主题切换动画目标 widget
- *
- * @param widget 通常是 MainWindow 的 centralWidget
- */
+/** @brief 设置主题切换动画目标widget(通常是centralWidget) @param widget 目标widget */
 void ThemeManager::setTransitionWidget(QWidget* widget)
 {
     m_transitionWidget = widget;
@@ -248,16 +238,7 @@ void ThemeManager::setTransitionWidget(QWidget* widget)
     }
 }
 
-/**
- * @brief 带淡入淡出动画应用样式表
- *
- * 动画流程:
- *   1. 淡出（opacity 1.0 -> 0.0, 300ms, InOutCubic）
- *   2. 在淡出完成时应用新QSS
- *   3. 淡入（opacity 0.0 -> 1.0, 300ms, InOutCubic）
- *
- * @param qss 新的QSS样式表内容
- */
+/** @brief 带淡入淡出动画应用样式表(300ms InOutCubic) @param qss 新的QSS样式表内容 */
 void ThemeManager::applyStylesheetWithAnimation(const QString& qss)
 {
     if (!m_transitionWidget || !m_opacityEffect) {
@@ -299,10 +280,7 @@ void ThemeManager::applyStylesheetWithAnimation(const QString& qss)
     fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-/**
- * @brief 不带动画直接应用样式表（首次加载使用）
- * @param qss QSS样式表内容
- */
+/** @brief 不带动画直接应用样式表(首次加载使用) @param qss QSS样式表内容 */
 void ThemeManager::applyStylesheetDirect(const QString& qss)
 {
     qApp->setStyleSheet(qss);
@@ -310,15 +288,7 @@ void ThemeManager::applyStylesheetDirect(const QString& qss)
     ++m_totalStyleApplications;
 }
 
-/**
- * @brief 从QSS内容中解析语义色板
- *
- * 解析格式: --semantic-<枚举名>: <颜色值>;
- * 例如: --semantic-BgPrimary: #1e1e2e;
- * 解析结果覆盖 loadDefaultColors() 中的默认值。
- *
- * @param qssContent QSS文件内容
- */
+/** @brief 从QSS内容中解析语义色板(--semantic-XXX格式覆盖默认值) @param qssContent QSS文件内容 */
 void ThemeManager::parseColorsFromQss(const QString& qssContent)
 {
     static const QRegularExpression regex(
@@ -398,9 +368,7 @@ quint64 ThemeManager::totalStyleApplications() const
     return m_totalStyleApplications;
 }
 
-/**
- * @brief 重置所有统计计数器为零
- */
+/** @brief 重置所有统计计数器为零 */
 void ThemeManager::resetStats()
 {
     m_totalThemeSwitches = 0;

@@ -15,10 +15,7 @@
 // 构造 / 析构
 // ============================================================================
 
-/**
- * @brief 构造函数
- * @param parent 父对象指针
- */
+/** @brief 构造函数 @param parent 父对象指针 */
 RecordingMarker::RecordingMarker(QObject* parent)
     : QObject(parent)
 {
@@ -28,15 +25,7 @@ RecordingMarker::RecordingMarker(QObject* parent)
 // 标记增删
 // ============================================================================
 
-/**
- * @brief 添加标记（按时间戳升序插入）
- *
- * 使用 std::lower_bound 在有序列表中找到第一个时间戳 >= timestampMs 的位置，
- * 将新标记插入该位置以保持列表有序。
- *
- * @param label       标记标签
- * @param timestampMs 标记时间戳（毫秒）
- */
+/** @brief 添加标记(按时间戳升序插入，使用std::lower_bound保持有序) @param label 标记标签 @param timestampMs 标记时间戳(毫秒) */
 void RecordingMarker::addMarker(const QString& label, qint64 timestampMs)
 {
     // 构造新条目
@@ -61,13 +50,7 @@ void RecordingMarker::addMarker(const QString& label, qint64 timestampMs)
     emit markerAdded(index, label);
 }
 
-/**
- * @brief 移除指定索引的标记
- *
- * 索引越界时静默返回，不抛异常。
- *
- * @param index 标记索引
- */
+/** @brief 移除指定索引的标记(越界时静默返回) @param index 标记索引 */
 void RecordingMarker::removeMarker(int index)
 {
     if (index < 0 || index >= m_markers.size()) {
@@ -94,23 +77,13 @@ QList<MarkerEntry> RecordingMarker::markers() const
     return m_markers;
 }
 
-/**
- * @brief 获取标记数量
- * @return 当前标记总数
- */
+/** @brief 获取标记数量 @return 当前标记总数 */
 int RecordingMarker::count() const
 {
     return m_markers.size();
 }
 
-/**
- * @brief 获取指定索引的标记
- *
- * 索引越界时返回默认构造的 MarkerEntry（空标签，时间戳为 0）。
- *
- * @param index 标记索引
- * @return 对应的标记条目
- */
+/** @brief 获取指定索引的标记(越界返回默认MarkerEntry) @param index 标记索引 @return 对应的标记条目 */
 MarkerEntry RecordingMarker::marker(int index) const
 {
     if (index < 0 || index >= m_markers.size()) {
@@ -119,12 +92,7 @@ MarkerEntry RecordingMarker::marker(int index) const
     return m_markers.at(index);
 }
 
-/**
- * @brief 清除所有标记
- *
- * 逐个发射 markerRemoved 信号（从后往前移除以保持索引稳定），
- * 最后清空列表。监听方可通过信号感知每个标记的移除。
- */
+/** @brief 清除所有标记(从后往前移除，逐个发射markerRemoved信号) */
 void RecordingMarker::clear()
 {
     // 从后往前移除，保持发射的索引与实际位置一致
@@ -136,15 +104,7 @@ void RecordingMarker::clear()
     }
 }
 
-/**
- * @brief 查找距离给定时间戳最近的标记
- *
- * 利用列表有序特性，通过线性扫描找到距离目标最近的标记。
- * 列表为空时返回 -1。
- *
- * @param timestampMs 目标时间戳（毫秒）
- * @return 最近标记的索引，空列表返回 -1
- */
+/** @brief 查找距离给定时间戳最近的标记(利用有序特性) @param timestampMs 目标时间戳(毫秒) @return 最近标记的索引，空列表返回-1 */
 int RecordingMarker::findNearest(qint64 timestampMs) const
 {
     if (m_markers.isEmpty()) {
@@ -181,16 +141,7 @@ int RecordingMarker::findNearest(qint64 timestampMs) const
     return (lowerDiff <= upperDiff) ? (upperIdx - 1) : upperIdx;
 }
 
-/**
- * @brief 查找指定时间范围内的所有标记
- *
- * 利用列表有序特性，从第一个 >= fromMs 的位置开始扫描，
- * 直到超出 toMs 为止。fromMs > toMs 时返回空列表。
- *
- * @param fromMs 起始时间戳（毫秒，含）
- * @param toMs   结束时间戳（毫秒，含）
- * @return 范围内标记的索引列表（按时间升序）
- */
+/** @brief 查找指定时间范围内的所有标记(利用有序特性) @param fromMs 起始时间戳(毫秒，含) @param toMs 结束时间戳(毫秒，含) @return 范围内标记的索引列表(按时间升序) */
 QList<int> RecordingMarker::findInRange(qint64 fromMs, qint64 toMs) const
 {
     QList<int> result;
