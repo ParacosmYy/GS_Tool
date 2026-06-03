@@ -48,6 +48,20 @@ public:
      */
     void setRtsControllable(bool controllable);
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计信号线状态更新次数 */
+    quint64 totalSignalUpdates() const;
+
+    /** @brief 获取累计DTR切换请求次数 */
+    quint64 totalDtrToggles() const;
+
+    /** @brief 获取累计RTS切换请求次数 */
+    quint64 totalRtsToggles() const;
+
+    /** @brief 重置所有统计计数器归零 */
+    void resetSignalWidgetStatistics();
+
 signals:
     /**
      * @brief 用户请求切换 DTR 信号线
@@ -73,6 +87,11 @@ private:
     QLabel* m_riLabel;      ///< RI 信号线状态标签
     QPushButton* m_dtrBtn;  ///< DTR 切换按钮
     QPushButton* m_rtsBtn;  ///< RTS 切换按钮
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSignalUpdates = 0;   ///< 累计信号线状态更新次数
+    quint64 m_totalDtrToggles = 0;      ///< 累计DTR切换请求次数
+    quint64 m_totalRtsToggles = 0;      ///< 累计RTS切换请求次数
 };
 
 #endif // SIGNALLINEWIDGET_H

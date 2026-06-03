@@ -34,6 +34,20 @@ public:
      */
     void setMonitor(TrafficMonitor* monitor);
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计速率更新次数 */
+    quint64 totalRateUpdates() const;
+
+    /** @brief 获取历史最高RX速率（字节/秒） */
+    double peakRxRate() const;
+
+    /** @brief 获取历史最高TX速率（字节/秒） */
+    double peakTxRate() const;
+
+    /** @brief 重置所有统计计数器归零 */
+    void resetTrafficWidgetStatistics();
+
 private slots:
     /**
      * @brief 速率更新槽函数
@@ -49,6 +63,11 @@ private:
     TrafficMonitor* m_monitor = nullptr;   ///< 数据源（不拥有）
     QLabel* m_rxRateLabel;                 ///< RX 速率显示标签
     QLabel* m_txRateLabel;                 ///< TX 速率显示标签
+
+    // ---- 统计计数器 ----
+    quint64 m_totalRateUpdates = 0;        ///< 累计速率更新次数
+    double m_peakRxRate = 0.0;             ///< 历史最高RX速率（字节/秒）
+    double m_peakTxRate = 0.0;             ///< 历史最高TX速率（字节/秒）
 };
 
 #endif // TRAFFICMONITORWIDGET_H

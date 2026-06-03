@@ -35,6 +35,9 @@ TrafficMonitorWidget::TrafficMonitorWidget(QWidget* parent)
     , m_monitor(nullptr)
     , m_rxRateLabel(nullptr)
     , m_txRateLabel(nullptr)
+    , m_totalRateUpdates(0)
+    , m_peakRxRate(0.0)
+    , m_peakTxRate(0.0)
 {
     setObjectName(QStringLiteral("TrafficMonitorWidget"));
     setupUI();
@@ -72,6 +75,9 @@ void TrafficMonitorWidget::setMonitor(TrafficMonitor* monitor)
  */
 void TrafficMonitorWidget::onRateUpdated(double rxRate, double txRate)
 {
+    ++m_totalRateUpdates;
+    if (rxRate > m_peakRxRate) m_peakRxRate = rxRate;
+    if (txRate > m_peakTxRate) m_peakTxRate = txRate;
     m_rxRateLabel->setText(tr("RX: %1").arg(formatRate(rxRate)));
     m_txRateLabel->setText(tr("TX: %1").arg(formatRate(txRate)));
 }
@@ -96,4 +102,28 @@ void TrafficMonitorWidget::setupUI()
     layout->addWidget(m_txRateLabel);
 
     layout->addStretch();
+}
+
+// ---- 统计接口 ----
+
+quint64 TrafficMonitorWidget::totalRateUpdates() const
+{
+    return m_totalRateUpdates;
+}
+
+double TrafficMonitorWidget::peakRxRate() const
+{
+    return m_peakRxRate;
+}
+
+double TrafficMonitorWidget::peakTxRate() const
+{
+    return m_peakTxRate;
+}
+
+void TrafficMonitorWidget::resetTrafficWidgetStatistics()
+{
+    m_totalRateUpdates = 0;
+    m_peakRxRate = 0.0;
+    m_peakTxRate = 0.0;
 }

@@ -42,7 +42,7 @@ bool ProtocolSchema::loadFromJson(const QString &filePath)
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
         m_valid = false;
-        m_lastError = QStringLiteral("无法打开文件: %1").arg(filePath);
+        m_lastError = tr("无法打开文件: %1").arg(filePath);
         return false;
     }
 
@@ -51,7 +51,7 @@ bool ProtocolSchema::loadFromJson(const QString &filePath)
 
     if (data.isEmpty()) {
         m_valid = false;
-        m_lastError = QStringLiteral("文件内容为空: %1").arg(filePath);
+        m_lastError = tr("文件内容为空: %1").arg(filePath);
         return false;
     }
 
@@ -86,12 +86,12 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     QJsonParseError parseError;
     const QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
     if (doc.isNull()) {
-        m_lastError = QStringLiteral("JSON 解析失败: %1").arg(parseError.errorString());
+        m_lastError = tr("JSON 解析失败: %1").arg(parseError.errorString());
         ++m_validationErrors;
         return false;
     }
     if (!doc.isObject()) {
-        m_lastError = QStringLiteral("JSON 根元素必须是对象");
+        m_lastError = tr("JSON 根元素必须是对象");
         ++m_validationErrors;
         return false;
     }
@@ -100,12 +100,12 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
 
     /* ---- 2. 校验并读取协议名称 ---- */
     if (!root.contains(QStringLiteral("name"))) {
-        m_lastError = QStringLiteral("缺少必填字段: name");
+        m_lastError = tr("缺少必填字段: name");
         ++m_validationErrors;
         return false;
     }
     if (!root.value(QStringLiteral("name")).isString()) {
-        m_lastError = QStringLiteral("字段 name 必须为字符串类型");
+        m_lastError = tr("字段 name 必须为字符串类型");
         ++m_validationErrors;
         return false;
     }
@@ -113,12 +113,12 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
 
     /* ---- 3. 校验并解析 framing 对象 ---- */
     if (!root.contains(QStringLiteral("framing"))) {
-        m_lastError = QStringLiteral("缺少必填字段: framing");
+        m_lastError = tr("缺少必填字段: framing");
         ++m_validationErrors;
         return false;
     }
     if (!root.value(QStringLiteral("framing")).isObject()) {
-        m_lastError = QStringLiteral("字段 framing 必须为对象类型");
+        m_lastError = tr("字段 framing 必须为对象类型");
         ++m_validationErrors;
         return false;
     }
@@ -127,7 +127,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
 
     /* 帧类型标识 */
     if (!framingObj.contains(QStringLiteral("type"))) {
-        m_lastError = QStringLiteral("framing 中缺少必填字段: type");
+        m_lastError = tr("framing 中缺少必填字段: type");
         ++m_validationErrors;
         return false;
     }
@@ -168,7 +168,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     m_fields.clear();
     if (root.contains(QStringLiteral("fields"))) {
         if (!root.value(QStringLiteral("fields")).isArray()) {
-            m_lastError = QStringLiteral("字段 fields 必须为数组类型");
+            m_lastError = tr("字段 fields 必须为数组类型");
             ++m_validationErrors;
             return false;
         }
@@ -176,7 +176,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
         const QJsonArray fieldsArr = root.value(QStringLiteral("fields")).toArray();
         for (int i = 0; i < fieldsArr.size(); ++i) {
             if (!fieldsArr.at(i).isObject()) {
-                m_lastError = QStringLiteral("fields[%1] 必须为对象类型").arg(i);
+                m_lastError = tr("fields[%1] 必须为对象类型").arg(i);
                 ++m_validationErrors;
                 return false;
             }
@@ -190,12 +190,12 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
 
             /* 校验必要字段 */
             if (field.name.isEmpty()) {
-                m_lastError = QStringLiteral("fields[%1] 缺少有效的 name 字段").arg(i);
+                m_lastError = tr("fields[%1] 缺少有效的 name 字段").arg(i);
                 ++m_validationErrors;
                 return false;
             }
             if (field.size <= 0) {
-                m_lastError = QStringLiteral("fields[%1] 的 size 必须大于 0").arg(i);
+                m_lastError = tr("fields[%1] 的 size 必须大于 0").arg(i);
                 ++m_validationErrors;
                 return false;
             }

@@ -90,6 +90,20 @@ public:
      */
     QStringList topics() const;
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计添加的主题总数 */
+    quint64 totalTopicsAdded() const;
+
+    /** @brief 获取累计移除的主题总数 */
+    quint64 totalTopicsRemoved() const;
+
+    /** @brief 获取累计重复添加被忽略的次数 */
+    quint64 totalDuplicateSkips() const;
+
+    /** @brief 重置所有统计计数器归零 */
+    void resetTopicStatistics();
+
 private:
     /**
      * @brief 根据模型索引获取节点
@@ -119,6 +133,11 @@ private:
 
     /** @brief 扁平主题列表(用于快速查找) */
     QStringList m_topics;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalTopicsAdded = 0;     ///< 累计添加的主题总数
+    quint64 m_totalTopicsRemoved = 0;   ///< 累计移除的主题总数
+    quint64 m_totalDuplicateSkips = 0;  ///< 累计重复添加被忽略的次数
 };
 
 #endif // MQTTTOPICMODEL_H

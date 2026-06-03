@@ -44,6 +44,8 @@ CursorOverlay::CursorOverlay(QChartView* chartView, ChartModel* model,
     , m_chartView(chartView)
     , m_model(model)
 {
+    setObjectName("cursorOverlay");
+
     // 设置为透明背景，鼠标事件穿透到QChartView
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TranslucentBackground);

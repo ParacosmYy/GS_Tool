@@ -57,6 +57,8 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     , m_searchManager(new TerminalSearchManager(this))
     , m_contextMenuManager(new TerminalContextMenuManager(this))
 {
+    setObjectName("terminalWidget");
+
     m_font = QFont(TerminalDefaults::kFontFamily, TerminalDefaults::kFontSize);
     m_font.setStyleHint(QFont::Monospace);
     m_fontMetrics = QFontMetrics(m_font);

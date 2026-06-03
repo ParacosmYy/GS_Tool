@@ -132,6 +132,14 @@ void RttConfigPanel::setupUI()
     connect(disconnectBtn, &QPushButton::clicked,
             this, &RttConfigPanel::disconnectRequested);
 
+    // 统计: 连接/断开请求计数
+    connect(connectBtn, &QPushButton::clicked, this, [this]() {
+        ++m_totalConnectRequests;
+    });
+    connect(disconnectBtn, &QPushButton::clicked, this, [this]() {
+        ++m_totalDisconnectRequests;
+    });
+
     // 表单值变化 → 聚合发出 configChanged
     connect(m_deviceCombo, &QComboBox::currentTextChanged,
             this, &RttConfigPanel::onFormValueChanged);
@@ -150,6 +158,7 @@ void RttConfigPanel::setupUI()
  */
 void RttConfigPanel::onFormValueChanged()
 {
+    ++m_totalConfigChanges;
     emit configChanged(config());
 }
 
@@ -198,4 +207,28 @@ void RttConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("rtt/speed"), 4000).toInt());
     m_channelSpin->setValue(
         settings.value(QStringLiteral("rtt/channel"), 0).toInt());
+}
+
+// ---- 统计接口 ----
+
+quint64 RttConfigPanel::totalConfigChanges() const
+{
+    return m_totalConfigChanges;
+}
+
+quint64 RttConfigPanel::totalConnectRequests() const
+{
+    return m_totalConnectRequests;
+}
+
+quint64 RttConfigPanel::totalDisconnectRequests() const
+{
+    return m_totalDisconnectRequests;
+}
+
+void RttConfigPanel::resetConfigStatistics()
+{
+    m_totalConfigChanges = 0;
+    m_totalConnectRequests = 0;
+    m_totalDisconnectRequests = 0;
 }

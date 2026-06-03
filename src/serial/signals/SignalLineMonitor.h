@@ -49,10 +49,16 @@ public:
     bool isPolling() const;
 
     /** @brief 获取信号线变化次数 */
-    int changeCount() const;
+    quint64 changeCount() const;
 
     /** @brief 获取轮询已运行时长（秒） */
     qint64 pollingDuration() const;
+
+    /** @brief 获取累计轮询次数 */
+    quint64 totalPolls() const;
+
+    /** @brief 获取累计无变化轮询次数 */
+    quint64 totalIdlePolls() const;
 
     /** @brief 重置统计计数 */
     void resetStatistics();
@@ -73,7 +79,11 @@ private:
     PinoutSignals m_current;            ///< 当前缓存的信号线状态
     IConnection* m_connection = nullptr; ///< 被监控的连接对象（不拥有）
     QElapsedTimer m_durationTimer;      ///< 轮询持续时间计时器
-    int m_changeCount = 0;              ///< 信号线变化次数
+
+    // ---- 统计计数器 ----
+    quint64 m_changeCount = 0;          ///< 信号线变化次数
+    quint64 m_totalPolls = 0;           ///< 累计轮询次数
+    quint64 m_totalIdlePolls = 0;       ///< 累计无变化轮询次数
 };
 
 #endif // SIGNALLINEMONITOR_H

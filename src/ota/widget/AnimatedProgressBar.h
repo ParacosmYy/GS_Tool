@@ -36,7 +36,9 @@ public:
     explicit AnimatedProgressBar(QWidget* parent = nullptr)
         : QProgressBar(parent), m_shimmerOffset(0.0), m_shimmerAnim(nullptr)
         , m_customChunkColor(false)
-    {}
+    {
+        setObjectName("animatedProgressBar");
+    }
 
     /** @brief 当前shimmer偏移量，范围 [0.0, 1.0] */
     qreal shimmerOffset() const { return m_shimmerOffset; }

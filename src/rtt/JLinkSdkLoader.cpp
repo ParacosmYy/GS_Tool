@@ -78,6 +78,8 @@ bool JLinkSdkLoader::load(const QString& path)
 {
     QMutexLocker locker(&s_mutex);
 
+    ++m_totalLoadAttempts;
+
     if (m_loaded) {
         unload();
     }
@@ -106,6 +108,7 @@ bool JLinkSdkLoader::load(const QString& path)
     }
 
     m_loaded = true;
+    ++m_totalLoadSuccesses;
     emit sdkLoaded();
     return true;
 }
@@ -240,6 +243,8 @@ bool JLinkSdkLoader::connectToDevice(const QString& deviceId)
         return false;
     }
 
+    ++m_totalConnectAttempts;
+
     // 先打开 J-Link 句柄
     const int openResult = m_fnOpen();
     if (openResult != 0) {
@@ -290,6 +295,7 @@ int JLinkSdkLoader::rttStart()
     }
 
     // cmd=0: RTT_START
+    ++m_totalRttStarts;
     return m_fnRttControl(0, nullptr);
 }
 
@@ -380,4 +386,34 @@ void JLinkSdkLoader::setSpeed(int kHz)
     if (m_fnSetSpeed) {
         m_fnSetSpeed(kHz);
     }
+}
+
+// ---- 统计接口 ----
+
+quint64 JLinkSdkLoader::totalLoadAttempts() const
+{
+    return m_totalLoadAttempts;
+}
+
+quint64 JLinkSdkLoader::totalLoadSuccesses() const
+{
+    return m_totalLoadSuccesses;
+}
+
+quint64 JLinkSdkLoader::totalConnectAttempts() const
+{
+    return m_totalConnectAttempts;
+}
+
+quint64 JLinkSdkLoader::totalRttStarts() const
+{
+    return m_totalRttStarts;
+}
+
+void JLinkSdkLoader::resetSdkStatistics()
+{
+    m_totalLoadAttempts = 0;
+    m_totalLoadSuccesses = 0;
+    m_totalConnectAttempts = 0;
+    m_totalRttStarts = 0;
 }

@@ -86,7 +86,12 @@ QModelIndex MqttTopicModel::parent(const QModelIndex& child) const
 
 void MqttTopicModel::addTopic(const QString& topic, int qos)
 {
-    if (topic.isEmpty() || m_topics.contains(topic)) return;
+    if (topic.isEmpty() || m_topics.contains(topic)) {
+        if (m_topics.contains(topic)) {
+            ++m_totalDuplicateSkips;
+        }
+        return;
+    }
 
     beginResetModel();
     m_topics.append(topic);
@@ -106,6 +111,7 @@ void MqttTopicModel::addTopic(const QString& topic, int qos)
         }
     }
     endResetModel();
+    ++m_totalTopicsAdded;
 }
 
 void MqttTopicModel::removeTopic(const QString& topic)
@@ -137,6 +143,7 @@ void MqttTopicModel::removeTopic(const QString& topic)
         addTopic(t, qosMap.value(t, 0));
     }
     endResetModel();
+    ++m_totalTopicsRemoved;
 }
 
 TopicNode* MqttTopicModel::findLeafNode(TopicNode* root, const QString& fullPath) const
@@ -180,4 +187,28 @@ TopicNode* MqttTopicModel::findOrCreateChild(TopicNode* parentNode,
     newNode->parent = parentNode;
     parentNode->children.append(newNode);
     return newNode;
+}
+
+// ---- 统计接口 ----
+
+quint64 MqttTopicModel::totalTopicsAdded() const
+{
+    return m_totalTopicsAdded;
+}
+
+quint64 MqttTopicModel::totalTopicsRemoved() const
+{
+    return m_totalTopicsRemoved;
+}
+
+quint64 MqttTopicModel::totalDuplicateSkips() const
+{
+    return m_totalDuplicateSkips;
+}
+
+void MqttTopicModel::resetTopicStatistics()
+{
+    m_totalTopicsAdded = 0;
+    m_totalTopicsRemoved = 0;
+    m_totalDuplicateSkips = 0;
 }

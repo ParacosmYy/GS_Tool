@@ -140,6 +140,23 @@ public:
      */
     void setSpeed(int kHz);
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计SDK加载尝试次数 */
+    quint64 totalLoadAttempts() const;
+
+    /** @brief 获取累计成功加载次数 */
+    quint64 totalLoadSuccesses() const;
+
+    /** @brief 获取累计设备连接尝试次数 */
+    quint64 totalConnectAttempts() const;
+
+    /** @brief 获取累计RTT启动次数 */
+    quint64 totalRttStarts() const;
+
+    /** @brief 重置所有统计计数器归零 */
+    void resetSdkStatistics();
+
 signals:
     /** @brief SDK 加载成功信号 */
     void sdkLoaded();
@@ -195,6 +212,12 @@ private:
     FnJLINK_RTTERMINAL_Write m_fnRttWrite = nullptr;       ///< RTT Write
 
     static QMutex s_mutex;  ///< 单例访问互斥锁
+
+    // ---- 统计计数器 ----
+    quint64 m_totalLoadAttempts = 0;    ///< 累计SDK加载尝试次数
+    quint64 m_totalLoadSuccesses = 0;   ///< 累计成功加载次数
+    quint64 m_totalConnectAttempts = 0; ///< 累计设备连接尝试次数
+    quint64 m_totalRttStarts = 0;       ///< 累计RTT启动次数
 };
 
 #endif // JLINKSDKLOADER_H

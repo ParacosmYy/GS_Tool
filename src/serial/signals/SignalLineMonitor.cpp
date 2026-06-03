@@ -103,6 +103,8 @@ void SignalLineMonitor::onTick()
         return;
     }
 
+    ++m_totalPolls;
+
     PinoutSignals latest = m_connection->pinoutSignals();
 
     // 比较新旧状态 — 逐字段比较避免结构体填充字节干扰
@@ -116,6 +118,8 @@ void SignalLineMonitor::onTick()
         m_current = latest;
         ++m_changeCount;
         emit signalsChanged(m_current);
+    } else {
+        ++m_totalIdlePolls;
     }
 }
 
@@ -123,7 +127,7 @@ void SignalLineMonitor::onTick()
  * @brief 获取信号线变化次数
  * @return 状态变化的总次数
  */
-int SignalLineMonitor::changeCount() const
+quint64 SignalLineMonitor::changeCount() const
 {
     return m_changeCount;
 }
@@ -139,10 +143,30 @@ qint64 SignalLineMonitor::pollingDuration() const
 }
 
 /**
+ * @brief 获取累计轮询次数
+ * @return 轮询总次数
+ */
+quint64 SignalLineMonitor::totalPolls() const
+{
+    return m_totalPolls;
+}
+
+/**
+ * @brief 获取累计无变化轮询次数
+ * @return 无变化轮询次数
+ */
+quint64 SignalLineMonitor::totalIdlePolls() const
+{
+    return m_totalIdlePolls;
+}
+
+/**
  * @brief 重置统计计数
  */
 void SignalLineMonitor::resetStatistics()
 {
     m_changeCount = 0;
+    m_totalPolls = 0;
+    m_totalIdlePolls = 0;
     m_durationTimer.restart();
 }

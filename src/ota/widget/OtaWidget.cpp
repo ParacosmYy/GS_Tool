@@ -31,6 +31,8 @@
 OtaWidget::OtaWidget(OtaManager* manager, QWidget* parent)
     : QWidget(parent), m_manager(manager), m_progressAnim(nullptr), m_colorAnim(nullptr)
 {
+    setObjectName("otaWidget");
+
     setupUI();
     connect(m_manager, &OtaManager::progress, this, &OtaWidget::onProgress);
     connect(m_manager, &OtaManager::transferComplete, this, &OtaWidget::onTransferComplete);

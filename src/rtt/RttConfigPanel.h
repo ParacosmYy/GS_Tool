@@ -57,6 +57,21 @@ signals:
     /** @brief 用户点击断开按钮信号 */
     void disconnectRequested();
 
+public:
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计配置变更次数 */
+    quint64 totalConfigChanges() const;
+
+    /** @brief 获取累计连接请求次数 */
+    quint64 totalConnectRequests() const;
+
+    /** @brief 获取累计断开请求次数 */
+    quint64 totalDisconnectRequests() const;
+
+    /** @brief 重置所有统计计数器归零 */
+    void resetConfigStatistics();
+
 private:
     /** @brief 初始化 UI 布局和控件 */
     void setupUI();
@@ -68,6 +83,11 @@ private:
     QComboBox* m_interfaceCombo;  ///< 调试接口选择（JTAG/SWD/cJTAG）
     QSpinBox* m_speedSpin;        ///< 连接速度 (kHz)
     QSpinBox* m_channelSpin;      ///< RTT 通道号
+
+    // ---- 统计计数器 ----
+    quint64 m_totalConfigChanges = 0;       ///< 累计配置变更次数
+    quint64 m_totalConnectRequests = 0;     ///< 累计连接请求次数
+    quint64 m_totalDisconnectRequests = 0;  ///< 累计断开请求次数
 };
 
 #endif // RTTCONFIGPANEL_H

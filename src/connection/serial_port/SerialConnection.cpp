@@ -184,7 +184,7 @@ QString SerialConnection::portName() const
 void SerialConnection::setBaudRate(qint32 baud)
 {
     if (!m_serial.setBaudRate(baud)) {
-        qWarning() << "设置波特率失败, baud=" << baud;
+        qWarning() << tr("设置波特率失败, baud=%1").arg(baud);
     }
 }
 
@@ -198,7 +198,7 @@ qint32 SerialConnection::baudRate() const
 void SerialConnection::setDataBits(QSerialPort::DataBits bits)
 {
     if (!m_serial.setDataBits(bits)) {
-        qWarning() << "设置数据位失败, bits=" << bits;
+        qWarning() << tr("设置数据位失败, bits=%1").arg(bits);
     }
 }
 
@@ -212,7 +212,7 @@ QSerialPort::DataBits SerialConnection::dataBits() const
 void SerialConnection::setParity(QSerialPort::Parity parity)
 {
     if (!m_serial.setParity(parity)) {
-        qWarning() << "设置校验模式失败, parity=" << parity;
+        qWarning() << tr("设置校验模式失败, parity=%1").arg(parity);
     }
 }
 
@@ -226,7 +226,7 @@ QSerialPort::Parity SerialConnection::parity() const
 void SerialConnection::setStopBits(QSerialPort::StopBits bits)
 {
     if (!m_serial.setStopBits(bits)) {
-        qWarning() << "设置停止位失败, bits=" << bits;
+        qWarning() << tr("设置停止位失败, bits=%1").arg(bits);
     }
 }
 
@@ -240,7 +240,7 @@ QSerialPort::StopBits SerialConnection::stopBits() const
 void SerialConnection::setFlowControl(QSerialPort::FlowControl control)
 {
     if (!m_serial.setFlowControl(control)) {
-        qWarning() << "设置流控模式失败, control=" << control;
+        qWarning() << tr("设置流控模式失败, control=%1").arg(control);
     }
 }
 

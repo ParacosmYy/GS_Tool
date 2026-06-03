@@ -22,6 +22,8 @@ ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
     , m_model(new ChartModel(this))
 {
+    setObjectName("chartWidget");
+
     setupUI();
 
     // ---- 连接 ChartModel 信号到渲染槽 ----

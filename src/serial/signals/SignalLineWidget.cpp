@@ -21,6 +21,9 @@ SignalLineWidget::SignalLineWidget(QWidget* parent)
     , m_riLabel(nullptr)
     , m_dtrBtn(nullptr)
     , m_rtsBtn(nullptr)
+    , m_totalSignalUpdates(0)
+    , m_totalDtrToggles(0)
+    , m_totalRtsToggles(0)
 {
     setObjectName(QStringLiteral("SignalLineWidget"));
     setupUI();
@@ -36,6 +39,8 @@ SignalLineWidget::SignalLineWidget(QWidget* parent)
  */
 void SignalLineWidget::updateSignals(const PinoutSignals& newSignals)
 {
+    ++m_totalSignalUpdates;
+
     // 更新输入信号线标签（只读显示）
     m_ctsLabel->setText(newSignals.cts ? tr("HIGH") : tr("LOW"));
     m_dsrLabel->setText(newSignals.dsr ? tr("HIGH") : tr("LOW"));
@@ -173,4 +178,36 @@ void SignalLineWidget::setupUI()
             this, &SignalLineWidget::dtrToggleRequested);
     connect(m_rtsBtn, &QPushButton::toggled,
             this, &SignalLineWidget::rtsToggleRequested);
+
+    // 统计: DTR/RTS 切换计数
+    connect(m_dtrBtn, &QPushButton::toggled, this, [this]() {
+        ++m_totalDtrToggles;
+    });
+    connect(m_rtsBtn, &QPushButton::toggled, this, [this]() {
+        ++m_totalRtsToggles;
+    });
+}
+
+// ---- 统计接口 ----
+
+quint64 SignalLineWidget::totalSignalUpdates() const
+{
+    return m_totalSignalUpdates;
+}
+
+quint64 SignalLineWidget::totalDtrToggles() const
+{
+    return m_totalDtrToggles;
+}
+
+quint64 SignalLineWidget::totalRtsToggles() const
+{
+    return m_totalRtsToggles;
+}
+
+void SignalLineWidget::resetSignalWidgetStatistics()
+{
+    m_totalSignalUpdates = 0;
+    m_totalDtrToggles = 0;
+    m_totalRtsToggles = 0;
 }
