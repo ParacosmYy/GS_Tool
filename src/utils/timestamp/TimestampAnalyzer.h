@@ -58,6 +58,21 @@ public:
      * @return 解析后的日期时间
      */
     QDateTime parseTimestamp(const QString &text) const;
+
+    /**
+     * @brief 格式化相对时间（如"3分钟前"、"2小时前"）
+     * @param datetime 目标日期时间
+     * @return 相对时间描述字符串
+     */
+    static QString formatRelativeTime(const QDateTime& datetime);
+
+    /**
+     * @brief 计算两个时间点之间的差异
+     * @param from 起始时间
+     * @param to 结束时间
+     * @return 格式化的差异字符串（如"2天3小时15分钟"）
+     */
+    static QString formatDifference(const QDateTime& from, const QDateTime& to);
 };
 
 #endif // TIMESTAMPANALYZER_H

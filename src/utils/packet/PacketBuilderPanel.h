@@ -65,6 +65,21 @@ private slots:
      */
     void onSaveTemplate();
 
+    /**
+     * @brief 清除所有字段
+     */
+    void onClearAll();
+
+    /**
+     * @brief 上移选中字段
+     */
+    void onMoveUp();
+
+    /**
+     * @brief 下移选中字段
+     */
+    void onMoveDown();
+
 private:
     /**
      * @brief 刷新表格内容
@@ -84,6 +99,9 @@ private:
     QPushButton *m_buildBtn;            ///< 构建按钮
     QPushButton *m_loadBtn;             ///< 加载模板按钮
     QPushButton *m_saveBtn;             ///< 保存模板按钮
+    QPushButton *m_clearAllBtn;         ///< 清除所有字段按钮
+    QPushButton *m_moveUpBtn;           ///< 上移字段按钮
+    QPushButton *m_moveDownBtn;         ///< 下移字段按钮
     QTextEdit *m_hexPreview;            ///< 十六进制预览区
     PacketBuilder *m_builder = nullptr; ///< 关联的构建器
 };

@@ -21,6 +21,9 @@ PacketBuilderPanel::PacketBuilderPanel(QWidget *parent)
     , m_buildBtn(new QPushButton(tr("构建数据包"), this))
     , m_loadBtn(new QPushButton(tr("加载模板"), this))
     , m_saveBtn(new QPushButton(tr("保存模板"), this))
+    , m_clearAllBtn(new QPushButton(tr("清除全部"), this))
+    , m_moveUpBtn(new QPushButton(tr("上移"), this))
+    , m_moveDownBtn(new QPushButton(tr("下移"), this))
     , m_hexPreview(new QTextEdit(this))
 {
     setObjectName(QStringLiteral("PacketBuilderPanel"));
@@ -34,11 +37,14 @@ PacketBuilderPanel::PacketBuilderPanel(QWidget *parent)
     fieldBtnLayout->addStretch();
     fieldBtnLayout->addWidget(m_buildBtn);
 
-    // 按钮行2：模板操作
+    // 按钮行2：模板操作 + 排序 + 清除
     auto *tmplBtnLayout = new QHBoxLayout();
     tmplBtnLayout->addWidget(m_loadBtn);
     tmplBtnLayout->addWidget(m_saveBtn);
     tmplBtnLayout->addStretch();
+    tmplBtnLayout->addWidget(m_moveUpBtn);
+    tmplBtnLayout->addWidget(m_moveDownBtn);
+    tmplBtnLayout->addWidget(m_clearAllBtn);
 
     // 字段表格
     m_fieldTable->setColumnCount(5);
@@ -70,6 +76,12 @@ PacketBuilderPanel::PacketBuilderPanel(QWidget *parent)
             this, &PacketBuilderPanel::onLoadTemplate);
     connect(m_saveBtn, &QPushButton::clicked,
             this, &PacketBuilderPanel::onSaveTemplate);
+    connect(m_clearAllBtn, &QPushButton::clicked,
+            this, &PacketBuilderPanel::onClearAll);
+    connect(m_moveUpBtn, &QPushButton::clicked,
+            this, &PacketBuilderPanel::onMoveUp);
+    connect(m_moveDownBtn, &QPushButton::clicked,
+            this, &PacketBuilderPanel::onMoveDown);
 }
 
 /**
@@ -200,4 +212,69 @@ QString PacketBuilderPanel::formatHexDump(const QByteArray &data) const
 
     result += QString("\n\n%1 bytes").arg(data.size());
     return result;
+}
+
+/**
+ * @brief 清除所有字段
+ */
+void PacketBuilderPanel::onClearAll()
+{
+    if (!m_builder) { return; }
+
+    auto fields = m_builder->fields();
+    for (int i = fields.size() - 1; i >= 0; --i) {
+        m_builder->removeField(i);
+    }
+    refreshTable();
+    m_hexPreview->clear();
+}
+
+/**
+ * @brief 上移选中字段
+ */
+void PacketBuilderPanel::onMoveUp()
+{
+    if (!m_builder) { return; }
+
+    int row = m_fieldTable->currentRow();
+    if (row <= 0) { return; }
+
+    auto fields = m_builder->fields();
+    std::swap(fields[row], fields[row - 1]);
+
+    /* 重建字段列表 */
+    for (int i = fields.size() - 1; i >= 0; --i) {
+        m_builder->removeField(i);
+    }
+    for (auto& f : fields) {
+        m_builder->addField(f);
+    }
+
+    refreshTable();
+    m_fieldTable->selectRow(row - 1);
+}
+
+/**
+ * @brief 下移选中字段
+ */
+void PacketBuilderPanel::onMoveDown()
+{
+    if (!m_builder) { return; }
+
+    int row = m_fieldTable->currentRow();
+    auto fields = m_builder->fields();
+    if (row < 0 || row >= fields.size() - 1) { return; }
+
+    std::swap(fields[row], fields[row + 1]);
+
+    /* 重建字段列表 */
+    for (int i = fields.size() - 1; i >= 0; --i) {
+        m_builder->removeField(i);
+    }
+    for (auto& f : fields) {
+        m_builder->addField(f);
+    }
+
+    refreshTable();
+    m_fieldTable->selectRow(row + 1);
 }

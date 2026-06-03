@@ -25,6 +25,8 @@ TimestampPanel::TimestampPanel(QWidget *parent)
     , m_convertBtn(new QPushButton(tr("转换"), this))
     , m_nowBtn(new QPushButton(tr("当前时间"), this))
     , m_copyBtn(new QPushButton(tr("复制"), this))
+    , m_clearHistoryBtn(new QPushButton(tr("清除历史"), this))
+    , m_historyList(new QListWidget(this))
 {
     setObjectName(QStringLiteral("TimestampPanel"));
 
@@ -67,6 +69,21 @@ TimestampPanel::TimestampPanel(QWidget *parent)
 
     mainLayout->addLayout(inputLayout);
     mainLayout->addLayout(resultLayout);
+
+    // 历史记录区
+    auto* historyHeader = new QHBoxLayout();
+    auto* historyLabel = new QLabel(tr("转换历史："), this);
+    historyLabel->setObjectName("timestampHistoryLabel");
+    m_clearHistoryBtn->setObjectName("clearTimestampHistoryBtn");
+    m_historyList->setObjectName("timestampHistoryList");
+    m_historyList->setMaximumHeight(100);
+    m_historyList->setSelectionMode(QAbstractItemView::SingleSelection);
+    historyHeader->addWidget(historyLabel);
+    historyHeader->addStretch();
+    historyHeader->addWidget(m_clearHistoryBtn);
+
+    mainLayout->addLayout(historyHeader);
+    mainLayout->addWidget(m_historyList, 1);
     mainLayout->addStretch();
 
     // 连接信号
@@ -78,6 +95,10 @@ TimestampPanel::TimestampPanel(QWidget *parent)
             this, &TimestampPanel::onConvert);
     connect(m_copyBtn, &QPushButton::clicked,
             this, &TimestampPanel::onCopy);
+    connect(m_clearHistoryBtn, &QPushButton::clicked,
+            this, &TimestampPanel::onClearHistory);
+    connect(m_historyList, &QListWidget::itemClicked,
+            this, &TimestampPanel::onHistorySelected);
 }
 
 /**
@@ -167,6 +188,15 @@ void TimestampPanel::convertByFormat(const QString &text, int formatIndex)
 
     m_resultLabel->setText(result);
     m_copyBtn->setEnabled(true);
+
+    /* 添加到历史记录 */
+    auto* histItem = new QListWidgetItem(
+        tr("%1 → %2").arg(text, dt.toString(QStringLiteral("yyyy-MM-dd HH:mm:ss"))),
+        m_historyList);
+    histItem->setData(Qt::UserRole, text);
+    while (m_historyList->count() > 30) {
+        delete m_historyList->takeItem(0);
+    }
 }
 
 /**
@@ -186,4 +216,26 @@ void TimestampPanel::onCopy()
 {
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(m_resultLabel->text());
+}
+
+/**
+ * @brief 清除转换历史列表
+ */
+void TimestampPanel::onClearHistory()
+{
+    m_historyList->clear();
+}
+
+/**
+ * @brief 从历史记录选择恢复输入
+ */
+void TimestampPanel::onHistorySelected()
+{
+    QListWidgetItem* item = m_historyList->currentItem();
+    if (!item) {
+        return;
+    }
+    const QString text = item->data(Qt::UserRole).toString();
+    m_timestampEdit->setText(text);
+    onConvert();
 }

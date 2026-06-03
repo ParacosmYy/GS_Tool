@@ -27,6 +27,8 @@ ConverterPanel::ConverterPanel(QWidget *parent)
     , m_swapBtn(new QPushButton(tr("\xe2\x87\x84"), this))    // ⇄
     , m_copyBtn(new QPushButton(tr("复制结果"), this))
     , m_outputEdit(new QTextEdit(this))
+    , m_clearHistoryBtn(new QPushButton(tr("清除历史"), this))
+    , m_historyList(new QListWidget(this))
 {
     setObjectName(QStringLiteral("ConverterPanel"));
 
@@ -87,6 +89,20 @@ ConverterPanel::ConverterPanel(QWidget *parent)
     mainLayout->addLayout(outputHeader);
     mainLayout->addWidget(m_outputEdit);
 
+    // 历史记录区
+    auto* historyHeader = new QHBoxLayout();
+    auto* historyLabel = new QLabel(tr("转换历史："), this);
+    historyLabel->setObjectName("converterHistoryLabel");
+    m_clearHistoryBtn->setObjectName("clearConverterHistoryBtn");
+    m_historyList->setObjectName("converterHistoryList");
+    m_historyList->setMaximumHeight(80);
+    m_historyList->setSelectionMode(QAbstractItemView::SingleSelection);
+    historyHeader->addWidget(historyLabel);
+    historyHeader->addStretch();
+    historyHeader->addWidget(m_clearHistoryBtn);
+    mainLayout->addLayout(historyHeader);
+    mainLayout->addWidget(m_historyList, 1);
+
     // 连接信号
     connect(m_convertBtn, &QPushButton::clicked,
             this, &ConverterPanel::onConvert);
@@ -94,6 +110,10 @@ ConverterPanel::ConverterPanel(QWidget *parent)
             this, &ConverterPanel::onSwap);
     connect(m_copyBtn, &QPushButton::clicked,
             this, &ConverterPanel::onCopy);
+    connect(m_clearHistoryBtn, &QPushButton::clicked,
+            this, &ConverterPanel::onClearHistory);
+    connect(m_historyList, &QListWidget::itemClicked,
+            this, &ConverterPanel::onHistorySelected);
 }
 
 /**
@@ -132,6 +152,19 @@ void ConverterPanel::onConvert()
     QByteArray result = m_converter.convert(input, from, to);
     m_outputEdit->setPlainText(QString::fromUtf8(result));
     m_copyBtn->setEnabled(true);
+
+    /* 添加到历史记录 */
+    QString fromName = DataConverter::formatName(from);
+    QString toName = DataConverter::formatName(to);
+    QString preview = m_inputEdit->toPlainText();
+    if (preview.length() > 30) {
+        preview = preview.left(30) + QStringLiteral("...");
+    }
+    auto* histItem = new QListWidgetItem(
+        tr("%1 → %2: %3").arg(fromName, toName, preview), m_historyList);
+    while (m_historyList->count() > 30) {
+        delete m_historyList->takeItem(0);
+    }
 }
 
 /**
@@ -159,4 +192,24 @@ void ConverterPanel::onCopy()
 {
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(m_outputEdit->toPlainText());
+}
+
+/**
+ * @brief 清除转换历史列表
+ */
+void ConverterPanel::onClearHistory()
+{
+    m_historyList->clear();
+}
+
+/**
+ * @brief 从历史记录选择恢复输入
+ */
+void ConverterPanel::onHistorySelected()
+{
+    QListWidgetItem* item = m_historyList->currentItem();
+    if (!item) {
+        return;
+    }
+    /* 历史只记录了摘要，不做恢复操作 */
 }

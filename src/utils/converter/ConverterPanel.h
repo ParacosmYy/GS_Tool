@@ -11,6 +11,7 @@
 #define CONVERTERPANEL_H
 
 #include <QComboBox>
+#include <QListWidget>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QWidget>
@@ -60,6 +61,16 @@ private slots:
      */
     void onCopy();
 
+    /**
+     * @brief 清除转换历史
+     */
+    void onClearHistory();
+
+    /**
+     * @brief 从历史选择恢复
+     */
+    void onHistorySelected();
+
 private:
     QTextEdit *m_inputEdit;            ///< 输入区
     QComboBox *m_fromCombo;            ///< 源格式选择
@@ -68,6 +79,8 @@ private:
     QPushButton *m_swapBtn;            ///< 交换按钮
     QPushButton *m_copyBtn;            ///< 复制按钮
     QTextEdit *m_outputEdit;           ///< 输出区
+    QPushButton *m_clearHistoryBtn;    ///< 清除历史按钮
+    QListWidget *m_historyList;        ///< 转换历史列表
     DataConverter m_converter;         ///< 转换引擎
 };
 

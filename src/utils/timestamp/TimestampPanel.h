@@ -14,6 +14,7 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QPushButton>
 #include <QWidget>
 
@@ -50,6 +51,16 @@ private slots:
      */
     void onCopy();
 
+    /**
+     * @brief 清除转换历史
+     */
+    void onClearHistory();
+
+    /**
+     * @brief 从历史记录选择恢复
+     */
+    void onHistorySelected();
+
 private:
     /**
      * @brief 根据格式选择执行指定转换
@@ -64,6 +75,8 @@ private:
     QPushButton *m_convertBtn;      ///< 转换按钮
     QPushButton *m_nowBtn;          ///< 当前时间按钮
     QPushButton *m_copyBtn;         ///< 复制结果按钮
+    QPushButton *m_clearHistoryBtn; ///< 清除历史按钮
+    QListWidget *m_historyList;     ///< 转换历史列表
     TimestampAnalyzer m_analyzer;   ///< 转换引擎
 };
 
