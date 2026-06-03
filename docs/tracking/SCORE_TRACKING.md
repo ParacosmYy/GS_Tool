@@ -100,5 +100,5 @@
 | 109 | feat(panel): 全局面板注册系统重构-44个面板数据驱动导航树 | 109 |
 | 110 | ui: 全面现代化UI基础设施—9个新组件+BasePanel包装器+三主题QSS+常量拆分 | 110 |
 | 111 | docs: 评分追踪补全#80-#110 + CLAUDE.md审计表二次校正(8项已完成) + 约束文档更新 | 111 |
-| 112 | feat(icons): Lucide SVG图标从10个扩展到81个 + app.qrc注册 + tr()审计(30处违规) | 112 |
-| ... | 目标: 500分 | 500 |
+| 113 | fix(i18n): tr()合规修复12文件30处 + ProtocolEngine CRC校验实现(CRC8/16/32/XOR) | 113 |
+| 114 | feat(ui): EdDialog自定义弹窗系统 + ShortcutManager快捷键管理 + QMessageBox替换 | 114 |

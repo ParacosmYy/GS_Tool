@@ -58,6 +58,7 @@ set(SOURCES
     src/core/widgets/CommandPalette.cpp
     src/core/widgets/ScriptRecorder.cpp
     src/core/widgets/DataDiffWidget.cpp
+    src/core/widgets/EdDialog.cpp
     src/core/connect/ConnectionManager.cpp
     src/core/connect/ConnectionFactory.cpp
     src/core/theme/ThemeManager.cpp
@@ -124,6 +125,7 @@ set(SOURCES
     src/utils/log/DataLoggerEdl.cpp
     src/protocol/parser/FrameDefinition.cpp
     src/core/settings/SessionManager.cpp
+    src/core/managers/ShortcutManager.cpp
 
     # ── F1: 数据录制回放 ──
     src/core/recording/RecordingTimeline.cpp
@@ -296,6 +298,7 @@ set(HEADERS
     src/core/widgets/CommandPalette.h
     src/core/widgets/ScriptRecorder.h
     src/core/widgets/DataDiffWidget.h
+    src/core/widgets/EdDialog.h
     src/core/navigation/NavIndicatorWidget.h
     src/core/theme/Constants.h
     src/core/theme/AppConstants.h
@@ -304,6 +307,7 @@ set(HEADERS
     src/core/theme/ConnectionConstants.h
     src/core/theme/TimerConstants.h
     src/core/settings/SessionManager.h
+    src/core/managers/ShortcutManager.h
     src/connection/interface/IConnection.h
     src/connection/serial_port/SerialConnection.h
     src/connection/network/TcpConnection.h

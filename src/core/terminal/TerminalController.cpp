@@ -16,7 +16,7 @@
 #include "core/theme/Constants.h"
 
 #include <QFileDialog>
-#include <QMessageBox>
+#include "core/widgets/EdDialog.h"
 #include <QLabel>
 
 /**
@@ -202,7 +202,7 @@ void TerminalController::updateStatusBar()
 void TerminalController::onExportData(QWidget* parent)
 {
     if (m_terminalModel->lineCount() == 0) {
-        QMessageBox::information(parent, tr("导出"), tr("没有数据可导出"));
+        EdDialog::error(parent, tr("导出"), tr("没有数据可导出"));
         return;
     }
 
@@ -227,7 +227,7 @@ void TerminalController::onExportData(QWidget* parent)
     if (m_dataExporter->exportStreamed(filePath, format, lineProvider, totalLines)) {
         emit statusMessage(tr("已导出至 %1").arg(filePath), 3000);
     } else {
-        QMessageBox::warning(parent, tr("导出失败"), tr("无法写入文件"));
+        EdDialog::error(parent, tr("导出失败"), tr("无法写入文件"));
     }
 }
 

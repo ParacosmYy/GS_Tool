@@ -6,7 +6,7 @@
 #include "serial/data/BookmarkWidget.h"
 #include "core/widgets/AnimatedButton.h"
 
-#include <QMessageBox>
+#include "core/widgets/EdDialog.h"
 
 /**
  * @brief 构造书签管理面板
@@ -222,14 +222,7 @@ void BookmarkWidget::onClearClicked()
     }
 
     // 确认对话框，防止误触清空
-    const int ret = QMessageBox::question(
-        this,
-        tr("清空书签"),
-        tr("确定要清空所有书签吗？此操作不可撤销。"),
-        QMessageBox::Yes | QMessageBox::No,
-        QMessageBox::No);
-
-    if (ret == QMessageBox::Yes) {
+    if (EdDialog::confirm(this, tr("清空书签"), tr("确定要清空所有书签吗？此操作不可撤销。"))) {
         emit clearBookmarksRequested();
     }
 }

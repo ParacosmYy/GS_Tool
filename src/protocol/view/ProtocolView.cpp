@@ -13,7 +13,7 @@
 #include "core/theme/Constants.h"
 #include "core/theme/ThemeManager.h"
 #include <QFileDialog>
-#include <QMessageBox>
+#include "core/widgets/EdDialog.h"
 #include <QFile>
 #include <QTextStream>
 
@@ -75,7 +75,7 @@ void ProtocolView::setupUI()
     connect(m_clearBtn, &QPushButton::clicked, this, &ProtocolView::clear);
     connect(m_exportBtn, &QPushButton::clicked, this, [this]() {
         if (m_frames.isEmpty()) {
-            QMessageBox::information(this, tr("导出"), tr("无数据可导出"));
+            EdDialog::error(this, tr("导出"), tr("无数据可导出"));
             return;
         }
         QString filePath = QFileDialog::getSaveFileName(
@@ -83,7 +83,7 @@ void ProtocolView::setupUI()
         if (filePath.isEmpty()) return;
         QFile file(filePath);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QMessageBox::warning(this, tr("导出"), tr("无法写入文件"));
+            EdDialog::error(this, tr("导出"), tr("无法写入文件"));
             return;
         }
         QTextStream stream(&file);
@@ -99,7 +99,7 @@ void ProtocolView::setupUI()
         }
         stream.flush();
         if (file.error() != QFile::NoError) {
-            QMessageBox::warning(this, tr("导出"), tr("写入文件失败: %1").arg(file.errorString()));
+            EdDialog::error(this, tr("导出"), tr("写入文件失败: %1").arg(file.errorString()));
             file.close();
             return;
         }
@@ -190,7 +190,7 @@ void ProtocolView::copyRaw()
 void ProtocolView::exportJson()
 {
     if (m_frames.isEmpty()) {
-        QMessageBox::information(this, tr("导出JSON"), tr("无数据可导出"));
+        EdDialog::error(this, tr("导出JSON"), tr("无数据可导出"));
         return;
     }
     QString filePath = QFileDialog::getSaveFileName(
@@ -219,12 +219,12 @@ void ProtocolView::exportJson()
 
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, tr("导出JSON"), tr("无法写入文件"));
+        EdDialog::error(this, tr("导出JSON"), tr("无法写入文件"));
         return;
     }
     QByteArray json = QJsonDocument(root).toJson(QJsonDocument::Indented);
     if (file.write(json) != json.size()) {
-        QMessageBox::warning(this, tr("导出JSON"), tr("写入文件失败，磁盘可能已满"));
+        EdDialog::error(this, tr("导出JSON"), tr("写入文件失败，磁盘可能已满"));
         return;
     }
     file.close();

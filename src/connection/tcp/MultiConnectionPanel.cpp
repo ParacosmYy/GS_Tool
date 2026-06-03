@@ -9,7 +9,7 @@
 #include <QDialog>
 #include <QFormLayout>
 #include <QDialogButtonBox>
-#include <QMessageBox>
+#include "core/widgets/EdDialog.h"
 #include <QSpinBox>
 
 /**
@@ -79,7 +79,7 @@ void MultiConnectionPanel::onAddClicked()
         QString host = hostEdit->text().trimmed();
         int port = portSpin->value();
         if (host.isEmpty()) {
-            QMessageBox::warning(this, tr("输入错误"), tr("主机地址不能为空"));
+            EdDialog::warning(this, tr("输入错误"), tr("主机地址不能为空"));
             return;
         }
         m_manager->addConnection(host, port);
