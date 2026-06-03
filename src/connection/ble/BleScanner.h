@@ -61,6 +61,13 @@ public:
     /** @brief 清空扫描历史记录 */
     void clearHistory();
 
+    /** @brief 获取累计启动扫描次数 */
+    quint64 totalScanStarts() const;
+    /** @brief 获取累计发现设备事件次数(不去重) */
+    quint64 totalDiscoveryEvents() const;
+    /** @brief 重置扫描统计计数器 */
+    void resetScannerStatistics();
+
 signals:
     /**
      * @brief 发现新设备时发出
@@ -102,6 +109,10 @@ private:
 
     /** @brief 累计发现的设备地址集合（去重） */
     QStringList m_seenAddresses;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalScanStarts = 0;      ///< 累计启动扫描次数
+    quint64 m_totalDiscoveryEvents = 0; ///< 累计发现设备事件次数
 };
 
 #endif // BLESCANNER_H

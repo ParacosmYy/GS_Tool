@@ -47,6 +47,7 @@ void BleScanner::startScan()
 {
     m_devices.clear();
     m_simIndex = 0;
+    ++m_totalScanStarts;
     generateSimulatedDevices();
 
     m_scanTimer->start(SCAN_TIMEOUT_MS);
@@ -91,6 +92,7 @@ void BleScanner::onSimulateDiscovery()
 
     const QVariantMap device = m_simQueue.at(m_simIndex).toMap();
     m_devices.append(device);
+    ++m_totalDiscoveryEvents;
 
     /* 去重统计 */
     const QString addr = device.value("address").toString();
@@ -141,6 +143,17 @@ int BleScanner::totalDevicesFound() const
  */
 void BleScanner::clearHistory()
 {
+    m_scanCount = 0;
+    m_seenAddresses.clear();
+}
+
+quint64 BleScanner::totalScanStarts() const { return m_totalScanStarts; }
+quint64 BleScanner::totalDiscoveryEvents() const { return m_totalDiscoveryEvents; }
+
+void BleScanner::resetScannerStatistics()
+{
+    m_totalScanStarts = 0;
+    m_totalDiscoveryEvents = 0;
     m_scanCount = 0;
     m_seenAddresses.clear();
 }

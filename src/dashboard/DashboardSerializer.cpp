@@ -92,6 +92,7 @@ bool DashboardSerializer::saveToFile(const QString& filePath,
     }
 
     qCInfo(lcDashboardSerializer) << "布局已保存至:" << filePath;
+    ++m_totalSaves;
     emit layoutSaved(filePath);
     return true;
 }
@@ -156,6 +157,7 @@ bool DashboardSerializer::loadFromJson(const QByteArray& jsonData,
 
     qCInfo(lcDashboardSerializer) << "已加载布局:" << name
                                   << "面板数:" << items.size();
+    ++m_totalLoads;
     emit layoutLoaded(name, items.size());
     return true;
 }
@@ -206,6 +208,7 @@ int DashboardSerializer::currentVersion()
 QStringList DashboardSerializer::validateLayout(
     const QList<DashboardItemConfig>& items, int columns) const
 {
+    ++m_totalValidations;
     QStringList errors;
     const QStringList validTypes = {
         QStringLiteral("gauge"), QStringLiteral("numeric"),
@@ -337,5 +340,19 @@ bool DashboardSerializer::deleteLayout(const QString& filePath)
     }
 
     qCInfo(lcDashboardSerializer) << "已删除布局:" << filePath;
+    ++m_totalDeletes;
     return true;
+}
+
+quint64 DashboardSerializer::totalSaves() const { return m_totalSaves; }
+quint64 DashboardSerializer::totalLoads() const { return m_totalLoads; }
+quint64 DashboardSerializer::totalValidations() const { return m_totalValidations; }
+quint64 DashboardSerializer::totalDeletes() const { return m_totalDeletes; }
+
+void DashboardSerializer::resetSerializerStatistics()
+{
+    m_totalSaves = 0;
+    m_totalLoads = 0;
+    m_totalValidations = 0;
+    m_totalDeletes = 0;
 }

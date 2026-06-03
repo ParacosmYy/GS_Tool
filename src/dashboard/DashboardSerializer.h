@@ -110,6 +110,13 @@ public:
      */
     bool deleteLayout(const QString& filePath);
 
+    // ---- 统计接口 ----
+    quint64 totalSaves() const;        ///< 累计保存次数
+    quint64 totalLoads() const;        ///< 累计加载次数
+    quint64 totalValidations() const;  ///< 累计验证次数
+    quint64 totalDeletes() const;      ///< 累计删除次数
+    void resetSerializerStatistics();  ///< 重置统计计数器
+
 signals:
     /** @brief 布局保存完成信号 */
     void layoutSaved(const QString& filePath);
@@ -123,6 +130,12 @@ signals:
 private:
     QString m_lastError;
     static constexpr int kVersion = 1;
+
+    // ---- 统计计数器 ----
+    mutable quint64 m_totalSaves = 0;          ///< 累计保存次数
+    mutable quint64 m_totalLoads = 0;          ///< 累计加载次数
+    mutable quint64 m_totalValidations = 0;    ///< 累计验证次数
+    mutable quint64 m_totalDeletes = 0;        ///< 累计删除次数
 };
 
 #endif // DASHBOARDSERIALIZER_H

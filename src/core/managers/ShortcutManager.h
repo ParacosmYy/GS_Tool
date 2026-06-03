@@ -91,6 +91,17 @@ public:
     /** @brief 获取所有已注册快捷键信息 */
     QList<ShortcutInfo> allShortcuts() const;
 
+    // ---- 统计计数器 ----
+
+    /** @brief 获取快捷键注册总次数（含成功和失败） @return 注册操作总次数 */
+    quint64 totalRegistrations() const;
+
+    /** @brief 获取快捷键触发总次数 @return 触发总次数 */
+    quint64 totalTriggers() const;
+
+    /** @brief 重置所有快捷键管理统计计数器为零 */
+    void resetShortcutStatistics();
+
     /**
      * @brief 根据ID获取快捷键描述+按键文本(用于Tooltip)
      * @param id 快捷键标识符
@@ -117,6 +128,10 @@ private:
     ShortcutManager& operator=(const ShortcutManager&) = delete;
 
     QMap<QString, ShortcutInfo> m_shortcuts;  ///< ID -> 快捷键信息
+
+    // ---- 统计计数器 ----
+    quint64 m_totalRegistrations = 0;  ///< 快捷键注册总次数
+    quint64 m_totalTriggers = 0;       ///< 快捷键触发总次数
 };
 
 #endif // SHORTCUTMANAGER_H

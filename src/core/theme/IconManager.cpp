@@ -74,8 +74,13 @@ QByteArray IconManager::loadAndColorSvg(const QString& name,
  */
 QIcon IconManager::icon(const QString& name) const
 {
-    if (m_iconCache.contains(name))
+    if (m_iconCache.contains(name)) {
+        ++m_totalCacheHits;   ///< 统计: QIcon缓存命中递增
         return m_iconCache.value(name);
+    }
+
+    ++m_totalCacheMisses;     ///< 统计: QIcon缓存未命中递增
+    ++m_totalLoads;           ///< 统计: 图标加载递增
 
     QColor clr = ThemeManager::instance().color(
         ThemeManager::SemanticColor::TextSecondary);
@@ -111,8 +116,13 @@ QPixmap IconManager::pixmap(const QString& name, int size,
                              const QString& colorKey) const
 {
     QString key = cacheKey(name, size, colorKey);
-    if (m_pixmapCache.contains(key))
+    if (m_pixmapCache.contains(key)) {
+        ++m_totalCacheHits;   ///< 统计: QPixmap缓存命中递增
         return m_pixmapCache.value(key);
+    }
+
+    ++m_totalCacheMisses;     ///< 统计: QPixmap缓存未命中递增
+    ++m_totalLoads;           ///< 统计: 图标加载递增
 
     /* 当前仅支持 TextSecondary，后续可按 colorKey 映射更多语义色 */
     QColor clr = ThemeManager::instance().color(
@@ -139,4 +149,38 @@ void IconManager::clearCache()
 {
     m_iconCache.clear();
     m_pixmapCache.clear();
+}
+
+// ---- 统计计数器实现 ----
+
+/** @brief 获取图标加载总次数 @return 加载操作总次数 */
+quint64 IconManager::totalLoads() const
+{
+    return m_totalLoads;
+}
+
+/** @brief 获取缓存命中总次数 @return 命中次数 */
+quint64 IconManager::totalCacheHits() const
+{
+    return m_totalCacheHits;
+}
+
+/** @brief 获取缓存未命中总次数 @return 未命中次数 */
+quint64 IconManager::totalCacheMisses() const
+{
+    return m_totalCacheMisses;
+}
+
+/** @brief 获取当前缓存条目数量 @return 缓存大小 */
+quint64 IconManager::cacheSize() const
+{
+    return static_cast<quint64>(m_iconCache.size() + m_pixmapCache.size());
+}
+
+/** @brief 重置所有图标管理统计计数器为零 */
+void IconManager::resetIconStatistics()
+{
+    m_totalLoads = 0;
+    m_totalCacheHits = 0;
+    m_totalCacheMisses = 0;
 }

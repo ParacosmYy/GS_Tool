@@ -38,6 +38,8 @@ bool ShortcutManager::registerShortcut(const QString& id,
                                         const QString& description,
                                         ShortcutContext context)
 {
+    ++m_totalRegistrations;  ///< 统计: 快捷键注册尝试次数递增
+
     // ID 冲突检查
     if (m_shortcuts.contains(id)) {
         return false;
@@ -53,7 +55,8 @@ bool ShortcutManager::registerShortcut(const QString& id,
     shortcut->setContext(Qt::ApplicationShortcut);
 
     // 连接回调
-    QObject::connect(shortcut, &QShortcut::activated, this, [callback]() {
+    QObject::connect(shortcut, &QShortcut::activated, this, [this, callback]() {
+        ++m_totalTriggers;  ///< 统计: 快捷键触发次数递增
         if (callback) {
             callback();
         }
@@ -144,4 +147,25 @@ bool ShortcutManager::isKeyOccupied(const QKeySequence& key,
         }
     }
     return false;
+}
+
+// ---- 统计计数器实现 ----
+
+/** @brief 获取快捷键注册总次数 @return 注册操作总次数 */
+quint64 ShortcutManager::totalRegistrations() const
+{
+    return m_totalRegistrations;
+}
+
+/** @brief 获取快捷键触发总次数 @return 触发总次数 */
+quint64 ShortcutManager::totalTriggers() const
+{
+    return m_totalTriggers;
+}
+
+/** @brief 重置所有快捷键管理统计计数器为零 */
+void ShortcutManager::resetShortcutStatistics()
+{
+    m_totalRegistrations = 0;
+    m_totalTriggers = 0;
 }

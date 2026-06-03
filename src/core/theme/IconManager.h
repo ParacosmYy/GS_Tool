@@ -56,6 +56,23 @@ public:
     /** @brief 获取图标是否存在于资源中 */
     bool hasIcon(const QString& name) const;
 
+    // ---- 统计计数器 ----
+
+    /** @brief 获取图标加载总次数（含缓存未命中） @return 加载操作总次数 */
+    quint64 totalLoads() const;
+
+    /** @brief 获取缓存命中总次数 @return 命中次数 */
+    quint64 totalCacheHits() const;
+
+    /** @brief 获取缓存未命中总次数 @return 未命中次数 */
+    quint64 totalCacheMisses() const;
+
+    /** @brief 获取当前缓存条目数量 @return 缓存大小 */
+    quint64 cacheSize() const;
+
+    /** @brief 重置所有图标管理统计计数器为零 */
+    void resetIconStatistics();
+
 private:
     explicit IconManager(QObject* parent = nullptr);
     ~IconManager() override;
@@ -73,6 +90,11 @@ private:
 
     mutable QMap<QString, QIcon> m_iconCache;      ///< QIcon缓存(按name)
     mutable QMap<QString, QPixmap> m_pixmapCache;   ///< QPixmap缓存(按name+size+color)
+
+    // ---- 统计计数器 ----
+    mutable quint64 m_totalLoads = 0;       ///< 图标加载总次数(含缓存未命中时的实际加载)
+    mutable quint64 m_totalCacheHits = 0;   ///< 缓存命中总次数
+    mutable quint64 m_totalCacheMisses = 0; ///< 缓存未命中总次数
 };
 
 #endif // ICON_MANAGER_H

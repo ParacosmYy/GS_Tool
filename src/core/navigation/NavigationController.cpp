@@ -117,6 +117,7 @@ void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPan
 
     navTree->setModel(treeModel);
     navTree->expandAll();  // 默认展开所有分组
+    ++m_totalTreeExpansions;  ///< 统计: 导航树展开操作递增
 }
 
 /** @brief 收集所有可切换面板 widget（从映射表中提取所有非空 widget） */
@@ -197,17 +198,31 @@ quint64 NavigationController::totalNavigations() const
     return m_totalNavigations;
 }
 
-/** @brief 获取面板切换总次数 @return 面板切换总次数 */
-quint64 NavigationController::panelChangeCount() const
+/** @brief 获取面板实际变更总次数 @return 面板变更次数 */
+quint64 NavigationController::totalPanelSwitches() const
 {
-    return m_panelChangeCount;
+    return m_totalPanelSwitches;
 }
 
-/** @brief 重置所有统计计数器为零 */
-void NavigationController::resetStats()
+/** @brief 获取导航树展开/折叠操作总次数 @return 展开/折叠操作次数 */
+quint64 NavigationController::totalTreeExpansions() const
+{
+    return m_totalTreeExpansions;
+}
+
+/** @brief 获取导航搜索总次数 @return 搜索次数 */
+quint64 NavigationController::totalSearches() const
+{
+    return m_totalSearches;
+}
+
+/** @brief 重置所有导航统计计数器为零 */
+void NavigationController::resetNavigationStatistics()
 {
     m_totalNavigations = 0;
-    m_panelChangeCount = 0;
+    m_totalPanelSwitches = 0;
+    m_totalTreeExpansions = 0;
+    m_totalSearches = 0;
 }
 
 /**

@@ -130,14 +130,20 @@ public:
 
     // ---- 统计计数器 ----
 
-    /** @brief 获取导航切换总次数 @return 切换总次数 */
+    /** @brief 获取导航切换总次数（含所有switchToPanel调用） @return 切换总次数 */
     quint64 totalNavigations() const;
 
-    /** @brief 获取面板切换总次数 @return 面板切换总次数 */
-    quint64 panelChangeCount() const;
+    /** @brief 获取面板实际变更总次数（目标面板与当前不同时） @return 面板变更次数 */
+    quint64 totalPanelSwitches() const;
 
-    /** @brief 重置所有统计计数器为零 */
-    void resetStats();
+    /** @brief 获取导航树展开/折叠操作总次数 @return 展开/折叠操作次数 */
+    quint64 totalTreeExpansions() const;
+
+    /** @brief 获取导航搜索总次数 @return 搜索次数 */
+    quint64 totalSearches() const;
+
+    /** @brief 重置所有导航统计计数器为零 */
+    void resetNavigationStatistics();
 
 private slots:
     /**
@@ -180,8 +186,10 @@ private:
     QPointer<QGraphicsOpacityEffect> m_connStatusEffect;
 
     // ---- 统计计数器 ----
-    quint64 m_totalNavigations = 0;      ///< 导航切换总次数(含switchToPanel调用)
-    quint64 m_panelChangeCount = 0;      ///< 面板实际变更次数(目标面板与当前不同时)
+    quint64 m_totalNavigations = 0;      ///< 导航切换总次数(含所有switchToPanel调用)
+    quint64 m_totalPanelSwitches = 0;    ///< 面板实际变更次数(目标面板与当前不同时)
+    quint64 m_totalTreeExpansions = 0;   ///< 导航树展开/折叠操作总次数
+    quint64 m_totalSearches = 0;         ///< 导航搜索总次数
 };
 
 #endif // NAVIGATION_CONTROLLER_H
