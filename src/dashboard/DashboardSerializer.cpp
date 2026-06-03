@@ -73,21 +73,23 @@ bool DashboardSerializer::saveToFile(const QString& filePath,
                                      const QList<DashboardItemConfig>& items)
 {
     const QByteArray data = toJson(name, columns, items);
-    if (data.isEmpty() && !items.isEmpty()) { ++m_totalErrors; return false; }
+    if (data.isEmpty() && !items.isEmpty()) { ++m_totalErrors; ++m_serializationErrors; return false; }
 
     QSaveFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         m_lastError = tr("无法打开文件写入: %1").arg(file.errorString());
-        ++m_totalErrors; return false;
+        ++m_totalErrors; ++m_serializationErrors; return false;
     }
     file.write(data);
     if (!file.commit()) {
         m_lastError = tr("写入文件失败: %1").arg(file.errorString());
-        ++m_totalErrors; return false;
+        ++m_totalErrors; ++m_serializationErrors; return false;
     }
 
     qCInfo(lcDashboardSerializer) << "布局已保存至:" << filePath;
     ++m_totalSaves; ++m_totalExports;
+    m_totalBytesSerialized += static_cast<quint64>(data.size());
+    m_maxProfileVersionSaved = qMax(m_maxProfileVersionSaved, kVersion);
     emit layoutSaved(filePath);
     return true;
 }
@@ -100,14 +102,15 @@ bool DashboardSerializer::loadFromFile(const QString& filePath,
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
         m_lastError = tr("无法打开文件读取: %1").arg(file.errorString());
-        ++m_totalErrors; return false;
+        ++m_totalErrors; ++m_deserializationErrors; return false;
     }
     const QByteArray data = file.readAll();
     if (data.isEmpty()) {
         m_lastError = tr("文件为空: %1").arg(filePath);
-        ++m_totalErrors; return false;
+        ++m_totalErrors; ++m_deserializationErrors; return false;
     }
     ++m_totalImports;
+    m_totalBytesDeserialized += static_cast<quint64>(data.size());
     return loadFromJson(data, name, columns, items);
 }
 
@@ -120,7 +123,7 @@ bool DashboardSerializer::loadFromJson(const QByteArray& jsonData,
     const QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
     if (doc.isNull()) {
         m_lastError = tr("JSON解析失败: %1").arg(parseError.errorString());
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -128,8 +131,16 @@ bool DashboardSerializer::loadFromJson(const QByteArray& jsonData,
     const int version = root[QStringLiteral("version")].toInt(0);
     if (version != kVersion) {
         m_lastError = tr("不支持的布局版本: %1 (当前版本: %2)").arg(version).arg(kVersion);
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
+    }
+
+    /* 统计：跟踪已加载配置的版本范围 */
+    if (!m_hasLoadedVersion) {
+        m_minProfileVersionLoaded = version;
+        m_hasLoadedVersion = true;
+    } else {
+        m_minProfileVersionLoaded = qMin(m_minProfileVersionLoaded, version);
     }
     name    = root[QStringLiteral("name")].toString(tr("未命名布局"));
     columns = root[QStringLiteral("columns")].toInt(4);
@@ -235,7 +246,7 @@ bool DashboardSerializer::deleteLayout(const QString& filePath)
     QFile file(filePath);
     if (!file.exists()) {
         m_lastError = tr("文件不存在: %1").arg(filePath);
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -254,231 +265,7 @@ bool DashboardSerializer::deleteLayout(const QString& filePath)
     return true;
 }
 
-// ─── QSettings命名配置文件系统 ──────────────────────────────────────
-
-/** @brief 保存布局到QSettings命名配置文件 @return true=成功 */
-bool DashboardSerializer::saveToProfile(const QString& profileName,
-                                        const QString& name, int columns,
-                                        const QList<DashboardItemConfig>& items)
-{
-    if (profileName.isEmpty()) {
-        m_lastError = tr("配置文件名称不能为空");
-        ++m_totalErrors; return false;
-    }
-
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-
-    /* 序列化面板配置为JSON数组 */
-    QJsonArray itemsArray;
-    for (const DashboardItemConfig& item : items)
-        itemsArray.append(item.toJson());
-    const QByteArray itemsJson = QJsonDocument(itemsArray).toJson(QJsonDocument::Compact);
-
-    /* 写入配置文件数据 */
-    settings.beginGroup(profileName);
-    settings.setValue(kNameKey, name);
-    settings.setValue(kColumnsKey, columns);
-    settings.setValue(kItemsKey, QString::fromUtf8(itemsJson));
-    settings.endGroup();
-    settings.endGroup();
-
-    ensureProfileListContains(profileName);
-
-    qCInfo(lcDashboardSerializer) << "配置文件已保存:" << profileName
-                                  << "面板数:" << items.size();
-    ++m_totalSaves; ++m_totalProfileSaves;
-    emit profileSaved(profileName);
-    return true;
-}
-
-/** @brief 从QSettings命名配置文件加载布局 @return true=成功 */
-bool DashboardSerializer::loadFromProfile(const QString& profileName,
-                                          QString& name, int& columns,
-                                          QList<DashboardItemConfig>& items)
-{
-    if (profileName.isEmpty()) {
-        m_lastError = tr("配置文件名称不能为空");
-        ++m_totalErrors; return false;
-    }
-
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-
-    if (!settings.childGroups().contains(profileName)) {
-        m_lastError = tr("配置文件 '%1' 不存在").arg(profileName);
-        settings.endGroup();
-        ++m_totalErrors;
-        return false;
-    }
-
-    settings.beginGroup(profileName);
-    name    = settings.value(kNameKey, tr("未命名布局")).toString();
-    columns = settings.value(kColumnsKey, 4).toInt();
-    const QString itemsJson = settings.value(kItemsKey).toString();
-    settings.endGroup();
-    settings.endGroup();
-
-    /* 解析JSON面板配置 */
-    items.clear();
-    if (!itemsJson.isEmpty()) {
-        QJsonParseError parseError;
-        const QJsonDocument doc = QJsonDocument::fromJson(itemsJson.toUtf8(), &parseError);
-        if (doc.isNull()) {
-            m_lastError = tr("配置文件 '%1' 数据损坏: %2")
-                              .arg(profileName).arg(parseError.errorString());
-            ++m_totalErrors;
-            return false;
-        }
-        const QJsonArray arr = doc.array();
-        items.reserve(arr.size());
-        for (const QJsonValue& val : arr)
-            items.append(DashboardItemConfig::fromJson(val.toObject()));
-    }
-
-    qCInfo(lcDashboardSerializer) << "已加载配置文件:" << profileName
-                                  << "面板数:" << items.size();
-    ++m_totalLoads; ++m_totalProfileLoads;
-    emit profileLoaded(profileName, items.size());
-    return true;
-}
-
-/** @brief 删除命名配置文件 @return true=成功 */
-bool DashboardSerializer::deleteProfile(const QString& profileName)
-{
-    if (profileName.isEmpty()) {
-        m_lastError = tr("配置文件名称不能为空");
-        ++m_totalErrors;
-        return false;
-    }
-
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-
-    if (!settings.childGroups().contains(profileName)) {
-        m_lastError = tr("配置文件 '%1' 不存在").arg(profileName);
-        settings.endGroup();
-        ++m_totalErrors;
-        return false;
-    }
-
-    settings.beginGroup(profileName);
-    settings.remove(QString());
-    settings.endGroup();
-    settings.endGroup();
-
-    removeProfileListEntry(profileName);
-    if (currentProfile() == profileName)
-        setCurrentProfile(QString());
-
-    qCInfo(lcDashboardSerializer) << "已删除配置文件:" << profileName;
-    ++m_totalDeletes;
-    emit profileDeleted(profileName);
-    return true;
-}
-
-/** @brief 重命名配置文件 @return true=成功 */
-bool DashboardSerializer::renameProfile(const QString& oldName, const QString& newName)
-{
-    if (oldName.isEmpty() || newName.isEmpty()) {
-        m_lastError = tr("配置文件名称不能为空");
-        ++m_totalErrors;
-        return false;
-    }
-
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-
-    if (!settings.childGroups().contains(oldName)) {
-        m_lastError = tr("配置文件 '%1' 不存在").arg(oldName);
-        settings.endGroup();
-        ++m_totalErrors;
-        return false;
-    }
-
-    /* 读取旧配置 → 写入新配置 → 删除旧配置 */
-    settings.beginGroup(oldName);
-    const QString layoutName = settings.value(kNameKey).toString();
-    const int columns = settings.value(kColumnsKey).toInt();
-    const QString itemsJson = settings.value(kItemsKey).toString();
-    settings.endGroup();
-
-    settings.beginGroup(newName);
-    settings.setValue(kNameKey, layoutName);
-    settings.setValue(kColumnsKey, columns);
-    settings.setValue(kItemsKey, itemsJson);
-    settings.endGroup();
-
-    settings.beginGroup(oldName);
-    settings.remove(QString());
-    settings.endGroup();
-    settings.endGroup();
-
-    removeProfileListEntry(oldName);
-    ensureProfileListContains(newName);
-    if (currentProfile() == oldName) setCurrentProfile(newName);
-
-    qCInfo(lcDashboardSerializer) << "已重命名:" << oldName << "->" << newName;
-    return true;
-}
-
-QStringList DashboardSerializer::listProfiles() const
-{
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-    const QStringList names = settings.value(kProfilesKey).toStringList();
-    settings.endGroup();
-    return names;
-}
-
-void DashboardSerializer::setCurrentProfile(const QString& profileName)
-{
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-    settings.setValue(kCurrentKey, profileName);
-    settings.endGroup();
-    emit currentProfileChanged(profileName);
-}
-
-QString DashboardSerializer::currentProfile() const
-{
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-    const QString name = settings.value(kCurrentKey).toString();
-    settings.endGroup();
-    return name;
-}
-
-bool DashboardSerializer::hasProfile(const QString& profileName) const
-{
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-    const bool exists = settings.childGroups().contains(profileName);
-    settings.endGroup();
-    return exists;
-}
-
-void DashboardSerializer::ensureProfileListContains(const QString& profileName)
-{
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-    QStringList names = settings.value(kProfilesKey).toStringList();
-    if (!names.contains(profileName)) {
-        names.append(profileName);
-        settings.setValue(kProfilesKey, names);
-    }
-    settings.endGroup();
-}
-
-void DashboardSerializer::removeProfileListEntry(const QString& profileName)
-{
-    QSettings settings;
-    settings.beginGroup(kSettingsGroup);
-    QStringList names = settings.value(kProfilesKey).toStringList();
-    names.removeAll(profileName);
-    settings.setValue(kProfilesKey, names);
-    settings.endGroup();
-}
+// ─── QSettings配置文件管理见 DashboardSerializerProfile.cpp ───────
 
 // ─── 统计接口 ───────────────────────────────────────────────────────
 
@@ -492,9 +279,31 @@ quint64 DashboardSerializer::totalProfileLoads() const { return m_totalProfileLo
 quint64 DashboardSerializer::totalExports() const      { return m_totalExports; }
 quint64 DashboardSerializer::totalImports() const      { return m_totalImports; }
 
+/** @brief 获取已保存配置文件的最高版本号 @return 最高版本号 */
+int DashboardSerializer::maxProfileVersionSaved() const { return m_maxProfileVersionSaved; }
+
+/** @brief 获取已加载配置文件的最低版本号 @return 最低版本号 */
+int DashboardSerializer::minProfileVersionLoaded() const { return m_minProfileVersionLoaded; }
+
+/** @brief 获取累计序列化输出字节数 @return 字节总数 */
+quint64 DashboardSerializer::totalBytesSerialized() const { return m_totalBytesSerialized; }
+
+/** @brief 获取累计反序列化输入字节数 @return 字节总数 */
+quint64 DashboardSerializer::totalBytesDeserialized() const { return m_totalBytesDeserialized; }
+
+/** @brief 获取累计序列化错误次数 @return 错误次数 */
+quint64 DashboardSerializer::serializationErrors() const { return m_serializationErrors; }
+
+/** @brief 获取累计反序列化错误次数 @return 错误次数 */
+quint64 DashboardSerializer::deserializationErrors() const { return m_deserializationErrors; }
+
 void DashboardSerializer::resetSerializerStatistics()
 {
     m_totalSaves = 0; m_totalLoads = 0; m_totalValidations = 0;
     m_totalDeletes = 0; m_totalErrors = 0; m_totalProfileSaves = 0;
     m_totalProfileLoads = 0; m_totalExports = 0; m_totalImports = 0;
+    m_maxProfileVersionSaved = 0; m_minProfileVersionLoaded = 0;
+    m_hasLoadedVersion = false;
+    m_totalBytesSerialized = 0; m_totalBytesDeserialized = 0;
+    m_serializationErrors = 0; m_deserializationErrors = 0;
 }

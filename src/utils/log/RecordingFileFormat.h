@@ -113,6 +113,14 @@ private:
     quint64 m_totalSaves = 0;       ///< 累计保存次数
     quint64 m_totalLoads = 0;       ///< 累计加载次数
     quint64 m_totalErrors = 0;      ///< 累计错误次数
+
+    // ---- 扩展统计计数器 ----
+    quint64 m_totalBytesWritten = 0;       ///< 累计写入字节总数(不含头部和EOF)
+    quint64 m_totalBytesRead = 0;          ///< 累计读取字节总数(不含头部和EOF)
+    quint64 m_serializationErrors = 0;     ///< 累计序列化(保存)错误次数
+    quint64 m_deserializationErrors = 0;   ///< 累计反序列化(加载)错误次数
+    quint64 m_lookupsPerformed = 0;        ///< 累计索引查找次数(元数据查询)
+    quint64 m_cacheHits = 0;              ///< 累计缓存命中次数(重复加载相同文件)
 public:
     /** @brief 获取累计保存次数 @return 保存次数 */
     quint64 totalSaves() const { return m_totalSaves; }
@@ -120,8 +128,22 @@ public:
     quint64 totalLoads() const { return m_totalLoads; }
     /** @brief 获取累计错误次数 @return 错误次数 */
     quint64 totalErrors() const { return m_totalErrors; }
-    /** @brief 重置文件格式统计计数器(保存次数/加载次数/错误次数) */
-    void resetFileFormatStatistics() { m_totalSaves = 0; m_totalLoads = 0; m_totalErrors = 0; }
+
+    /** @brief 获取累计写入字节总数 @return 字节数 */
+    quint64 totalBytesWritten() const { return m_totalBytesWritten; }
+    /** @brief 获取累计读取字节总数 @return 字节数 */
+    quint64 totalBytesRead() const { return m_totalBytesRead; }
+    /** @brief 获取累计序列化(保存)错误次数 @return 错误次数 */
+    quint64 serializationErrors() const { return m_serializationErrors; }
+    /** @brief 获取累计反序列化(加载)错误次数 @return 错误次数 */
+    quint64 deserializationErrors() const { return m_deserializationErrors; }
+    /** @brief 获取累计索引查找次数(元数据查询) @return 查找次数 */
+    quint64 lookupsPerformed() const { return m_lookupsPerformed; }
+    /** @brief 获取累计缓存命中次数(重复加载相同文件) @return 命中次数 */
+    quint64 cacheHits() const { return m_cacheHits; }
+
+    /** @brief 重置文件格式统计计数器(包含所有统计) */
+    void resetFileFormatStatistics();
 };
 
 #endif // RECORDING_FILE_FORMAT_H

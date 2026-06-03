@@ -30,7 +30,9 @@ WaterfallWidget::~WaterfallWidget() = default;
 /** @brief 添加一帧频谱数据到历史记录并绘制新行 @param spectrum 频谱幅度值向量 */
 void WaterfallWidget::addSpectrum(const QVector<double> &spectrum)
 {
-    if (m_paused) return;
+    if (m_paused) { m_totalSpectrumsDropped++; return; }
+    m_totalSpectrumsAdded++;
+    if (spectrum.size() > m_peakSpectrumWidth) m_peakSpectrumWidth = spectrum.size();
     m_history.append(spectrum);
     if (m_history.size() > m_maxLines) {
         m_history.removeFirst();
@@ -98,6 +100,7 @@ void WaterfallWidget::resume() { m_paused = false; m_scrollTimer.start(); }
 void WaterfallWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
+    m_totalRepaints++;
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing, false);
     if (m_waterfall.isNull()) {
@@ -124,6 +127,7 @@ void WaterfallWidget::mouseMoveEvent(QMouseEvent *event)
     int col = x * (m_history.isEmpty() ? 1 : m_history[0].size()) / width();
     int row = y * m_maxLines / height();
     if (row >= 0 && row < m_history.size() && col >= 0 && col < m_history[row].size()) {
+        m_totalCursorQueries++;
         emit valueAtCursor(col, m_history[row][col]);
     }
 }
@@ -151,4 +155,14 @@ QColor WaterfallWidget::valueToColor(double value) const
         r = 255; g = static_cast<int>((1.0 - t) * 4 * 255); b = 0;
     }
     return QColor(r, g, b);
+}
+
+/** @brief 重置所有统计计数器 */
+void WaterfallWidget::resetStats()
+{
+    m_totalSpectrumsAdded = 0;
+    m_totalSpectrumsDropped = 0;
+    m_peakSpectrumWidth = 0;
+    m_totalCursorQueries = 0;
+    m_totalRepaints = 0;
 }

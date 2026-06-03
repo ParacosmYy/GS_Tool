@@ -28,7 +28,8 @@ void HeatmapWidget::setData(const QVector<QVector<double>> &data)
 {
     m_data = data;
     m_dirty = true;
-    if (m_autoScale) {
+    m_totalDataUpdates++;
+    if (m_autoScale) { m_totalAutoScales++;
         m_minValue = std::numeric_limits<double>::max();
         m_maxValue = std::numeric_limits<double>::lowest();
         for (const auto &row : m_data) {
@@ -118,6 +119,7 @@ void HeatmapWidget::mouseMoveEvent(QMouseEvent *event)
         m_hoverRow = row;
         m_hoverCol = col;
         if (row >= 0 && row < m_data.size() && col >= 0 && col < m_data[row].size()) {
+            m_totalCellHovers++;
             emit cellHovered(row, col, m_data[row][col]);
             QToolTip::showText(event->globalPosition().toPoint(),
                 formatValue(m_data[row][col]));
@@ -132,6 +134,7 @@ void HeatmapWidget::mousePressEvent(QMouseEvent *event)
     int col = event->pos().x() / m_cellSize;
     int row = event->pos().y() / m_cellSize;
     if (row >= 0 && row < m_data.size() && col >= 0 && col < m_data[row].size()) {
+        m_totalCellClicks++;
         emit cellClicked(row, col, m_data[row][col]);
     }
 }
@@ -177,4 +180,13 @@ QString HeatmapWidget::formatValue(double value) const
     if (qAbs(value) < 0.01) return "0";
     if (qAbs(value) >= 1000) return QString::number(value, 'f', 0);
     return QString::number(value, 'f', 2);
+}
+
+/** @brief 重置所有统计计数器 */
+void HeatmapWidget::resetHeatmapStats()
+{
+    m_totalDataUpdates = 0;
+    m_totalCellClicks = 0;
+    m_totalCellHovers = 0;
+    m_totalAutoScales = 0;
 }

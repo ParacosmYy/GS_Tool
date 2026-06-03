@@ -74,6 +74,21 @@ quint64 RecordingController::totalBytesPlayed() const { return m_totalBytesPlaye
 /** @brief 获取累计错误次数 @return 错误总数 */
 quint64 RecordingController::totalErrors() const { return m_totalErrors; }
 
+/** @brief 获取累计录制总时长(毫秒) @return 时长总和 */
+qint64 RecordingController::totalRecordedMs() const { return m_totalRecordedMs; }
+
+/** @brief 获取单次最长录制时长(毫秒) @return 最长时长 */
+qint64 RecordingController::longestRecordingMs() const { return m_longestRecordingMs; }
+
+/** @brief 获取累计录制数据帧总数 @return 帧总数 */
+quint64 RecordingController::totalFramesRecorded() const { return m_totalFramesRecorded; }
+
+/** @brief 获取累计创建的标记总数 @return 标记创建数 */
+quint64 RecordingController::markersCreated() const { return m_markersCreated; }
+
+/** @brief 获取累计导航(跳转)的标记总数 @return 标记导航数 */
+quint64 RecordingController::markersNavigated() const { return m_markersNavigated; }
+
 /** @brief 重置所有统计计数器 */
 void RecordingController::resetRecordingStatistics()
 {
@@ -81,6 +96,11 @@ void RecordingController::resetRecordingStatistics()
     m_totalPlaybacks = 0;
     m_totalBytesPlayed = 0;
     m_totalErrors = 0;
+    m_totalRecordedMs = 0;
+    m_longestRecordingMs = 0;
+    m_totalFramesRecorded = 0;
+    m_markersCreated = 0;
+    m_markersNavigated = 0;
 }
 
 /** @brief 录制按钮切换处理(未录制→开始 | 录制中→暂停 | 已暂停→继续) */
@@ -175,9 +195,14 @@ void RecordingController::onPlaybackProgress(qreal percent)
     emit statusMessage(tr("回放进度: %1%").arg(static_cast<int>(percent * 100)));
 }
 
-/** @brief 录制停止通知 */
+/** @brief 录制停止通知 — 更新时长/帧数统计 */
 void RecordingController::onRecordingStopped(const QString& filePath, int count, qint64 durationMs)
 {
+    /* 统计：更新录制时长和帧数 */
+    m_totalRecordedMs += durationMs;
+    m_longestRecordingMs = qMax(m_longestRecordingMs, durationMs);
+    m_totalFramesRecorded += static_cast<quint64>(count);
+
     emit statusMessage(
         tr("录制已保存: %1 (%2 条记录, %3秒)")
             .arg(filePath)

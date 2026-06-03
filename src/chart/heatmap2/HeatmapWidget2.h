@@ -36,6 +36,26 @@ public:
     /** @brief 获取指定位置的数值 @param row 行索引 @param col 列索引 @return 单元格值 */
     double valueAt(int row, int col) const;
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计数据更新次数(setData调用) */
+    quint64 totalDataUpdates() const { return m_totalDataUpdates; }
+
+    /** @brief 获取累计单元格点击次数 */
+    quint64 totalCellClicks() const { return m_totalCellClicks; }
+
+    /** @brief 获取累计悬停事件次数 */
+    quint64 totalCellHovers() const { return m_totalCellHovers; }
+
+    /** @brief 获取累计重绘次数 */
+    quint64 totalRepaints() const { return m_totalRepaints; }
+
+    /** @brief 获取数据矩阵总单元格数 */
+    int totalCells() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
 signals:
     /** @brief 单元格被点击时发射 @param row 行索引 @param col 列索引 @param value 单元格值 */
     void cellClicked(int row, int col, double value);
@@ -66,4 +86,10 @@ private:
     bool m_gridVisible = true;         ///< 网格线是否可见
     QStringList m_rowLabels;           ///< 行标签列表
     QStringList m_colLabels;           ///< 列标签列表
+
+    // 统计计数器
+    quint64 m_totalDataUpdates = 0;    ///< 累计数据更新次数
+    quint64 m_totalCellClicks = 0;     ///< 累计单元格点击次数
+    quint64 m_totalCellHovers = 0;     ///< 累计悬停事件次数
+    quint64 m_totalRepaints = 0;       ///< 累计重绘次数
 };

@@ -82,6 +82,25 @@ public:
     quint64 totalProfileLoads() const; ///< 累计配置文件加载次数
     quint64 totalExports() const;      ///< 累计导出JSON次数
     quint64 totalImports() const;      ///< 累计导入JSON次数
+
+    /** @brief 获取已保存配置文件的最高版本号 @return 最高版本号，无记录时返回0 */
+    int maxProfileVersionSaved() const;
+
+    /** @brief 获取已加载配置文件的最低版本号 @return 最低版本号，无记录时返回0 */
+    int minProfileVersionLoaded() const;
+
+    /** @brief 获取累计序列化输出字节数(所有saveToFile的JSON字节数之和) @return 字节总数 */
+    quint64 totalBytesSerialized() const;
+
+    /** @brief 获取累计反序列化输入字节数(所有loadFromJson的原始字节数之和) @return 字节总数 */
+    quint64 totalBytesDeserialized() const;
+
+    /** @brief 获取累计序列化错误次数(saveToFile失败) @return 错误次数 */
+    quint64 serializationErrors() const;
+
+    /** @brief 获取累计反序列化错误次数(loadFromJson/loadFromFile失败) @return 错误次数 */
+    quint64 deserializationErrors() const;
+
     void resetSerializerStatistics();  ///< 重置统计计数器
 
 signals:
@@ -110,6 +129,15 @@ private:
     mutable quint64 m_totalProfileLoads = 0;
     mutable quint64 m_totalExports = 0;
     mutable quint64 m_totalImports = 0;
+
+    // ---- 扩展统计计数器 ----
+    int m_maxProfileVersionSaved = 0;          ///< 已保存配置的最高版本号
+    int m_minProfileVersionLoaded = 0;         ///< 已加载配置的最低版本号
+    bool m_hasLoadedVersion = false;           ///< 是否已加载过配置版本（用于初始化最小值）
+    mutable quint64 m_totalBytesSerialized = 0;      ///< 累计序列化输出字节数
+    mutable quint64 m_totalBytesDeserialized = 0;    ///< 累计反序列化输入字节数
+    mutable quint64 m_serializationErrors = 0;       ///< 累计序列化错误次数
+    mutable quint64 m_deserializationErrors = 0;     ///< 累计反序列化错误次数
 };
 
 #endif // DASHBOARDSERIALIZER_H

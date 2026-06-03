@@ -81,8 +81,18 @@ public:
     quint64 totalTopicsRemoved() const;   ///< 累计移除次数
     quint64 totalDuplicateSkips() const;  ///< 累计去重跳过次数
     quint64 totalQosUpdates() const;      ///< 累计QoS更新次数
+    quint64 totalMessagesRouted() const;  ///< 累计消息路由次数
     int totalNodeCount() const;           ///< 树节点总数(含非叶节点)
     void resetTopicStatistics();          ///< 重置统计计数器
+
+    // ---- 消息路由接口 ----
+    /**
+     * @brief 将收到的消息路由到匹配的主题节点，更新统计
+     * @param topic 消息主题
+     * @param payload 消息负载(用于更新节点数据)
+     * @return true=匹配到至少一个主题
+     */
+    bool routeMessage(const QString& topic, const QByteArray& payload);
 
 signals:
     void topicAdded(const QString& topic, int qos);          ///< 主题添加信号
@@ -95,6 +105,8 @@ private:
     TopicNode* findOrCreateChild(TopicNode* parentNode, const QString& name); ///< 查找/创建子节点
     TopicNode* findLeafNode(TopicNode* root, const QString& fullPath) const;  ///< 递归查找叶节点
     int countNodes(const TopicNode* node) const;             ///< 递归统计节点数
+    /** @brief MQTT通配符匹配(支持+和#) @param topicParts 消息主题段 @param subParts 订阅模式段 @return 是否匹配 */
+    bool topicMatchesSubscription(const QStringList& topicParts, const QStringList& subParts) const;
 
     TopicNode* m_rootNode;                ///< 根节点(虚拟，不显示)
     QStringList m_topics;                 ///< 扁平主题列表(快速查找)
@@ -103,6 +115,7 @@ private:
     quint64 m_totalTopicsRemoved = 0;     ///< 累计移除
     quint64 m_totalDuplicateSkips = 0;    ///< 累计去重
     quint64 m_totalQosUpdates = 0;        ///< 累计QoS更新
+    quint64 m_totalMessagesRouted = 0;    ///< 累计消息路由次数
 };
 
 #endif // MQTTTOPICMODEL_H

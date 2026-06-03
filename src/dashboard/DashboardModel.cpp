@@ -22,18 +22,26 @@ DashboardModel::DashboardModel(QObject *parent)
 /** @brief 析构函数 */
 DashboardModel::~DashboardModel() = default;
 
-/** @brief 添加组件配置 @param config 组件配置 */
+/** @brief 添加组件配置，更新组件类型计数和布局变更计数 @param config 组件配置 */
 void DashboardModel::addComponentConfig(const QVariantMap &config)
 {
     m_configs.append(config);
+    ++m_totalWidgetsCreated;
+    ++m_layoutChanges;
+    const QString type = config.value(QStringLiteral("type")).toString();
+    if (!type.isEmpty()) {
+        ++m_widgetsCreatedByType[type];
+    }
     emit configChanged();
 }
 
-/** @brief 移除指定索引的组件配置 @param index 配置索引 */
+/** @brief 移除指定索引的组件配置，更新删除计数和布局变更计数 @param index 配置索引 */
 void DashboardModel::removeComponentConfig(int index)
 {
     if (index >= 0 && index < m_configs.size()) {
         m_configs.removeAt(index);
+        ++m_totalWidgetsRemoved;
+        ++m_layoutChanges;
         emit configChanged();
     }
 }
@@ -71,6 +79,9 @@ bool DashboardModel::saveToFile(const QString &filePath) const
 
     file.write(doc.toJson(QJsonDocument::Indented));
     file.close();
+
+    /* 统计：配置文件保存计数（const方法中修改mutable计数器） */
+    ++m_profileSaves;
     return true;
 }
 
@@ -105,6 +116,9 @@ bool DashboardModel::loadFromFile(const QString &filePath)
             m_configs.append(item.toObject().toVariantMap());
         }
     }
+
+    /* 统计：配置文件加载计数 */
+    ++m_profileLoads;
 
     emit configChanged();
     return true;
@@ -192,4 +206,56 @@ void DashboardModel::resetChannelStatistics()
     m_channelMax.clear();
     m_channelChangeCount.clear();
     m_totalUpdateCount = 0;
+}
+
+// ==================== 组件类型统计 ====================
+
+/** @brief 获取累计创建的组件总数(含已删除) @return 创建总数 */
+quint64 DashboardModel::totalWidgetsCreated() const { return m_totalWidgetsCreated; }
+
+/** @brief 获取累计删除的组件总数 @return 删除总数 */
+quint64 DashboardModel::totalWidgetsRemoved() const { return m_totalWidgetsRemoved; }
+
+/** @brief 获取当前活跃组件数量 @return 当前配置数 */
+quint64 DashboardModel::activeWidgetCount() const { return static_cast<quint64>(m_configs.size()); }
+
+/** @brief 获取指定类型的累计创建计数 @param type 组件类型 @return 该类型创建总数 */
+quint64 DashboardModel::widgetsCreatedByType(const QString &type) const
+{
+    return m_widgetsCreatedByType.value(type, 0);
+}
+
+// ==================== 布局变更跟踪 ====================
+
+/** @brief 获取累计布局变更次数 @return 变更总数 */
+quint64 DashboardModel::layoutChanges() const { return m_layoutChanges; }
+
+// ==================== 配置文件管理统计 ====================
+
+/** @brief 获取累计配置保存次数 @return 保存总数 */
+quint64 DashboardModel::profileSaves() const { return m_profileSaves; }
+
+/** @brief 获取累计配置加载次数 @return 加载总数 */
+quint64 DashboardModel::profileLoads() const { return m_profileLoads; }
+
+/** @brief 获取累计配置删除次数 @return 删除总数 */
+quint64 DashboardModel::profileDeletes() const { return m_profileDeletes; }
+
+/** @brief 重置所有统计计数器(通道统计+组件统计+布局统计+配置文件统计) */
+void DashboardModel::resetAllStatistics()
+{
+    /* 通道统计 */
+    m_channelMin.clear();
+    m_channelMax.clear();
+    m_channelChangeCount.clear();
+    m_totalUpdateCount = 0;
+    /* 组件统计 */
+    m_totalWidgetsCreated = 0;
+    m_totalWidgetsRemoved = 0;
+    m_widgetsCreatedByType.clear();
+    m_layoutChanges = 0;
+    /* 配置文件统计 */
+    m_profileSaves = 0;
+    m_profileLoads = 0;
+    m_profileDeletes = 0;
 }

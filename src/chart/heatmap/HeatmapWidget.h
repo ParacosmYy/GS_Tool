@@ -4,6 +4,8 @@
  */
 // Copyright 2024 EmbedDebug Project
 // SPDX-License-Identifier: MIT
+#ifndef HEATMAPWIDGET_H
+#define HEATMAPWIDGET_H
 #pragma once
 #include <QWidget>
 #include <QVector>
@@ -36,6 +38,23 @@ public:
     void setShowValues(bool show);
     /** @brief 设置是否根据数据自动缩放颜色范围 @param enabled 是否启用 */
     void setAutoScale(bool enabled);
+
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计数据更新次数 */
+    quint64 totalDataUpdates() const { return m_totalDataUpdates; }
+
+    /** @brief 获取累计单元格点击次数 */
+    quint64 totalCellClicks() const { return m_totalCellClicks; }
+
+    /** @brief 获取累计悬停事件次数 */
+    quint64 totalCellHovers() const { return m_totalCellHovers; }
+
+    /** @brief 获取累计自动缩放次数 */
+    quint64 totalAutoScales() const { return m_totalAutoScales; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetHeatmapStats();
 
     /** @brief 返回控件推荐大小 @return 推荐尺寸 */
     QSize sizeHint() const override;
@@ -76,4 +95,12 @@ private:
     int m_hoverCol = -1;               ///< 当前悬停列索引
     QPixmap m_cache;                   ///< 离屏渲染缓存
     bool m_dirty = true;               ///< 缓存脏标记，需要重绘
+
+    // 统计计数器
+    quint64 m_totalDataUpdates = 0;    ///< 累计数据更新次数
+    quint64 m_totalCellClicks = 0;     ///< 累计单元格点击次数
+    quint64 m_totalCellHovers = 0;     ///< 累计悬停事件次数
+    quint64 m_totalAutoScales = 0;     ///< 累计自动缩放次数
 };
+
+#endif // HEATMAPWIDGET_H

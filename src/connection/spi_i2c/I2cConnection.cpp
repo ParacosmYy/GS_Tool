@@ -1,6 +1,11 @@
 /**
  * @file I2cConnection.cpp
- * @brief I2C总线连接实现 - 通过串口桥接协议
+ * @brief I2C总线连接实现 - 核心连接生命周期管理
+ *
+ * 包含I2C连接的打开/关闭/配置/状态管理以及基本读写操作。
+ * 总线扫描和突发读写方法见 I2cConnectionScan.cpp。
+ *
+ * @see I2cConnectionScan.cpp — 总线扫描/突发读写及统计管理
  */
 
 #include "connection/spi_i2c/I2cConnection.h"
@@ -70,7 +75,7 @@ bool I2cConnection::open()
         return false;
     }
 
-    /// 发送I2C配置命令
+    /// 发送I2C配置命令(设备地址+时钟频率)
     QByteArray configPayload;
     configPayload.append(static_cast<char>(m_deviceAddress));
     /// 时钟频率4字节小端
@@ -123,36 +128,6 @@ void I2cConnection::configure(const QVariantMap& params)
     }
 }
 
-/** @brief 扫描I2C总线，遍历标准地址范围0x03~0x77发现设备 @return 发现的设备地址列表 */
-QList<int> I2cConnection::scanBus()
-{
-    QList<int> found;
-    if (m_state != ConnectionState::Connected || !m_serial) {
-        return found;
-    }
-
-    /// 发送扫描命令
-    QByteArray scanPayload;
-    scanPayload.append(static_cast<char>(0x03));  ///< 起始地址
-    scanPayload.append(static_cast<char>(0x77));  ///< 结束地址
-    sendCommand(CMD_I2C_SCAN, scanPayload);
-
-    /// 解析响应中的ACK地址列表
-    if (m_responseBuffer.size() >= 3) {
-        /// 响应格式: [CMD][LEN][addr1, addr2, ...]
-        quint16 len = static_cast<quint8>(m_responseBuffer[1]) |
-                      (static_cast<quint8>(m_responseBuffer[2]) << 8);
-        int dataStart = 3;
-        for (int i = 0; i < len && (dataStart + i) < m_responseBuffer.size(); ++i) {
-            int addr = static_cast<quint8>(m_responseBuffer[dataStart + i]);
-            found.append(addr);
-            emit deviceFound(addr);
-        }
-    }
-
-    return found;
-}
-
 /** @brief 从指定设备的寄存器读取数据(I2C读时序) @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param length 读取长度 @return 读取到的数据 */
 QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
 {
@@ -170,14 +145,9 @@ QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
     m_serial->write(frame);
 
     /// 解析响应数据
-    if (m_responseBuffer.size() >= 3) {
-        quint16 len = static_cast<quint8>(m_responseBuffer[1]) |
-                      (static_cast<quint8>(m_responseBuffer[2]) << 8);
-        int dataStart = 3;
-        int avail = qMin(static_cast<int>(len), m_responseBuffer.size() - dataStart);
-        if (avail > 0) {
-            data = m_responseBuffer.mid(dataStart, avail);
-        }
+    QByteArray payload = parseResponsePayload();
+    if (!payload.isEmpty()) {
+        data = payload;
     }
 
     /// 更新统计: 读操作
@@ -265,11 +235,58 @@ QByteArray I2cConnection::buildWriteFrame(int deviceAddr, int regAddr, const QBy
                        .append(payload);
 }
 
-/** @brief 重置所有I2C统计计数器(传输次数/字节数/错误计数) */
+/** @brief 构建I2C突发读命令帧[CMD][LEN][deviceAddr+startReg+count(2字节小端)] @param deviceAddr 设备7位地址 @param startReg 起始寄存器地址 @param count 读取字节数 @return 完整协议帧 */
+QByteArray I2cConnection::buildBurstReadFrame(int deviceAddr, int startReg, int count)
+{
+    QByteArray payload;
+    payload.append(static_cast<char>(deviceAddr & 0x7F));
+    payload.append(static_cast<char>(startReg));
+    /// 突发长度用2字节小端表示(支持大于255字节)
+    payload.append(static_cast<char>(count & 0xFF));
+    payload.append(static_cast<char>((count >> 8) & 0xFF));
+    return QByteArray().append(static_cast<char>(CMD_I2C_BURST_RD))
+                       .append(static_cast<char>(payload.size() & 0xFF))
+                       .append(static_cast<char>((payload.size() >> 8) & 0xFF))
+                       .append(payload);
+}
+
+/** @brief 构建I2C突发写命令帧[CMD][LEN][deviceAddr+startReg+data] @param deviceAddr 设备7位地址 @param startReg 起始寄存器地址 @param data 待写入的连续数据 @return 完整协议帧 */
+QByteArray I2cConnection::buildBurstWriteFrame(int deviceAddr, int startReg, const QByteArray& data)
+{
+    QByteArray payload;
+    payload.append(static_cast<char>(deviceAddr & 0x7F));
+    payload.append(static_cast<char>(startReg));
+    payload.append(data);
+    return QByteArray().append(static_cast<char>(CMD_I2C_BURST_WR))
+                       .append(static_cast<char>(payload.size() & 0xFF))
+                       .append(static_cast<char>((payload.size() >> 8) & 0xFF))
+                       .append(payload);
+}
+
+/** @brief 从响应缓冲区解析协议帧的负载数据(跳过CMD+LEN=3字节帧头) @return 负载数据，无效帧返回空 */
+QByteArray I2cConnection::parseResponsePayload()
+{
+    if (m_responseBuffer.size() < 3) {
+        return QByteArray();
+    }
+    quint16 len = static_cast<quint8>(m_responseBuffer[1]) |
+                  (static_cast<quint8>(m_responseBuffer[2]) << 8);
+    int dataStart = 3;
+    int avail = qMin(static_cast<int>(len), m_responseBuffer.size() - dataStart);
+    if (avail <= 0) {
+        return QByteArray();
+    }
+    return m_responseBuffer.mid(dataStart, avail);
+}
+
+/** @brief 重置所有I2C统计计数器(传输次数/字节数/错误/NACK/设备发现) */
 void I2cConnection::resetStats()
 {
     m_totalTransactions = 0;
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
     m_errorCount = 0;
+    m_nackCount = 0;
+    m_devicesFound = 0;
+    m_lastScanResults.clear();
 }

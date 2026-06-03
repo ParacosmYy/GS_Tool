@@ -15,7 +15,7 @@ HeatmapWidget::HeatmapWidget(QWidget *parent) : QWidget(parent) { setObjectName(
 HeatmapWidget::~HeatmapWidget() = default;
 
 /** @brief 设置二维数据矩阵并触发重绘 @param m 二维浮点数矩阵 */
-void HeatmapWidget::setData(const QVector<QVector<double>> &m) { m_data = m; update(); }
+void HeatmapWidget::setData(const QVector<QVector<double>> &m) { m_data = m; m_totalDataUpdates++; update(); }
 
 /** @brief 设置单元格的宽高像素值 @param w 单元格宽度(像素) @param h 单元格高度(像素) */
 void HeatmapWidget::setCellSize(int w, int h) { m_cellW = w; m_cellH = h; update(); }
@@ -40,6 +40,7 @@ double HeatmapWidget::valueAt(int r, int c) const { return (r>=0 && r<m_data.siz
 
 /** @brief 绘制事件处理，遍历数据矩阵填充颜色并绘制网格线 @param event 绘制事件参数(未使用) */
 void HeatmapWidget::paintEvent(QPaintEvent *) {
+    m_totalRepaints++;
     QPainter p(this); p.setRenderHint(QPainter::Antialiasing, false);
     if (m_data.isEmpty()) return;
     for (int r = 0; r < m_data.size(); ++r) {
@@ -55,13 +56,13 @@ void HeatmapWidget::paintEvent(QPaintEvent *) {
 /** @brief 鼠标按下事件处理，计算点击单元格并发出cellClicked信号 @param e 鼠标事件参数 */
 void HeatmapWidget::mousePressEvent(QMouseEvent *e) {
     auto cell = posToCell(e->pos());
-    if (cell.first >= 0) emit cellClicked(cell.first, cell.second, valueAt(cell.first, cell.second));
+    if (cell.first >= 0) { m_totalCellClicks++; emit cellClicked(cell.first, cell.second, valueAt(cell.first, cell.second)); }
 }
 
 /** @brief 鼠标移动事件处理，计算悬停单元格并发出cellHovered信号 @param e 鼠标事件参数 */
 void HeatmapWidget::mouseMoveEvent(QMouseEvent *e) {
     auto cell = posToCell(e->pos());
-    if (cell.first >= 0) emit cellHovered(cell.first, cell.second, valueAt(cell.first, cell.second));
+    if (cell.first >= 0) { m_totalCellHovers++; emit cellHovered(cell.first, cell.second, valueAt(cell.first, cell.second)); }
 }
 
 /** @brief 窗口大小变更事件处理 @param e 大小变更事件参数 */
@@ -84,4 +85,19 @@ QPair<int,int> HeatmapWidget::posToCell(const QPoint &pos) const {
     int c = pos.x() / m_cellW, r = pos.y() / m_cellH;
     if (r >= 0 && r < m_data.size() && c >= 0 && c < m_data[r].size()) return {r,c};
     return {-1,-1};
+}
+
+/** @brief 获取数据矩阵总单元格数 @return 所有行的列数之和 */
+int HeatmapWidget::totalCells() const {
+    int total = 0;
+    for (const auto& row : m_data) total += row.size();
+    return total;
+}
+
+/** @brief 重置所有统计计数器 */
+void HeatmapWidget::resetStats() {
+    m_totalDataUpdates = 0;
+    m_totalCellClicks = 0;
+    m_totalCellHovers = 0;
+    m_totalRepaints = 0;
 }

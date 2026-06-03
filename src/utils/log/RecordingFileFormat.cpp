@@ -125,7 +125,7 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
     if (m_rawData.isEmpty()) {
         m_lastError = tr("无录制数据可保存，请先设置数据");
         qWarning() << "[RecordingFileFormat] saveToFile:" << m_lastError;
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_serializationErrors;
         return false;
     }
 
@@ -138,7 +138,7 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
         m_lastError = tr("元数据过大(%1字节)，超过格式上限")
                           .arg(jsonBytes.size());
         qWarning() << "[RecordingFileFormat] saveToFile:" << m_lastError;
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_serializationErrors;
         return false;
     }
 
@@ -147,7 +147,7 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
         m_lastError = tr("无法打开文件写入: %1 (%2)")
                           .arg(filePath, file.errorString());
         qWarning() << "[RecordingFileFormat] saveToFile:" << m_lastError;
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_serializationErrors;
         return false;
     }
 
@@ -172,7 +172,7 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
         m_lastError = tr("写入元数据失败: %1").arg(file.errorString());
         qWarning() << "[RecordingFileFormat] saveToFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_serializationErrors;
         return false;
     }
 
@@ -181,7 +181,7 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
         m_lastError = tr("写入录制数据失败: %1").arg(file.errorString());
         qWarning() << "[RecordingFileFormat] saveToFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_serializationErrors;
         return false;
     }
 
@@ -190,13 +190,14 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
         m_lastError = tr("写入EOF标记失败: %1").arg(file.errorString());
         qWarning() << "[RecordingFileFormat] saveToFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_serializationErrors;
         return false;
     }
 
     file.close();
     m_filePath = filePath;
     ++m_totalSaves;
+    m_totalBytesWritten += static_cast<quint64>(jsonBytes.size() + m_rawData.size());
     return true;
 }
 

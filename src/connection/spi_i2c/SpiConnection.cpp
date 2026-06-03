@@ -1,6 +1,11 @@
 /**
  * @file SpiConnection.cpp
- * @brief SPI总线连接实现 - 通过串口桥接协议
+ * @brief SPI总线连接实现 - 核心连接生命周期管理
+ *
+ * 包含SPI连接的打开/关闭/配置/状态管理以及片选控制。
+ * 传输相关方法见 SpiConnectionTransfer.cpp。
+ *
+ * @see SpiConnectionTransfer.cpp — SPI传输方法及统计管理
  */
 
 #include "connection/spi_i2c/SpiConnection.h"
@@ -51,7 +56,7 @@ void SpiConnection::setTransport(IConnection* serial)
     }
 }
 
-/** @brief 打开SPI连接，通过串口桥接器发送模式/时钟配置 @return true=成功，false=通道未设置或串口打开失败 */
+/** @brief 打开SPI连接，通过串口桥接器发送完整配置 @return true=成功，false=通道未设置或串口打开失败 */
 bool SpiConnection::open()
 {
     if (!m_serial) {
@@ -68,16 +73,9 @@ bool SpiConnection::open()
         return false;
     }
 
-    /// 发送SPI配置命令
-    QByteArray configPayload;
-    configPayload.append(static_cast<char>(m_mode));
-    /// 时钟频率4字节小端
-    configPayload.append(static_cast<char>(m_clockSpeed & 0xFF));
-    configPayload.append(static_cast<char>((m_clockSpeed >> 8) & 0xFF));
-    configPayload.append(static_cast<char>((m_clockSpeed >> 16) & 0xFF));
-    configPayload.append(static_cast<char>((m_clockSpeed >> 24) & 0xFF));
-
-    sendCommand(CMD_SPI_CONFIG, configPayload);
+    /// 发送完整SPI配置命令(含模式/时钟/位序/字长/CS极性)
+    QByteArray configFrame = buildConfigFrame();
+    sendCommand(CMD_SPI_CONFIG, configFrame);
     updateState(ConnectionState::Connected);
     return true;
 }
@@ -86,8 +84,9 @@ bool SpiConnection::open()
 void SpiConnection::close()
 {
     if (m_serial && m_state == ConnectionState::Connected) {
-        /// 释放片选
-        setChipSelect(m_csPin, false);
+        /// 根据CS极性释放片选
+        bool releaseLevel = !m_csActiveLow;
+        setChipSelect(m_csPin, releaseLevel);
     }
     updateState(ConnectionState::Disconnected);
 }
@@ -100,20 +99,27 @@ qint64 SpiConnection::write(const QByteArray& data)
         return -1;
     }
 
-    setChipSelect(m_csPin, true);
+    /// 根据CS极性决定选中电平
+    bool selectLevel = m_csActiveLow;
+    setChipSelect(m_csPin, selectLevel);
     qint64 written = sendCommand(CMD_SPI_WRITE, data);
-    setChipSelect(m_csPin, false);
+    bool releaseLevel = !m_csActiveLow;
+    setChipSelect(m_csPin, releaseLevel);
 
     if (written > 0) {
-        ++m_totalTransactions;
+        ++m_totalTransfers;
         m_totalBytesSent += static_cast<quint64>(written);
+        /// 按当前SPI模式累计
+        if (m_mode >= 0 && m_mode < 4) {
+            ++m_transferByMode[m_mode];
+        }
     } else {
         ++m_errorCount;
     }
     return written;
 }
 
-/** @brief 配置SPI参数(mode/clockSpeed/csPin/adapter) @param params 参数映射 */
+/** @brief 配置SPI参数(mode/clockSpeed/csPin/adapter/bitOrder/wordSize/csPolarity) @param params 参数映射 */
 void SpiConnection::configure(const QVariantMap& params)
 {
     if (params.contains("mode")) {
@@ -127,6 +133,19 @@ void SpiConnection::configure(const QVariantMap& params)
     }
     if (params.contains("adapter")) {
         m_adapterDevice = params["adapter"].toString();
+    }
+    if (params.contains("bitOrder")) {
+        int order = params["bitOrder"].toInt();
+        m_bitOrder = (order == 1) ? SpiBitOrder::LSB : SpiBitOrder::MSB;
+    }
+    if (params.contains("wordSize")) {
+        int ws = params["wordSize"].toInt();
+        if (ws == 16) m_wordSize = SpiWordSize::Bit16;
+        else if (ws == 32) m_wordSize = SpiWordSize::Bit32;
+        else m_wordSize = SpiWordSize::Bit8;
+    }
+    if (params.contains("csActiveLow")) {
+        m_csActiveLow = params["csActiveLow"].toBool();
     }
 }
 
@@ -142,36 +161,25 @@ void SpiConnection::setClockSpeed(int speedHz)
     m_clockSpeed = speedHz;
 }
 
-/** @brief SPI全双工传输，同时发送和接收数据 @param txData 发送数据 @return 接收到的MISO数据 */
-QByteArray SpiConnection::transfer(const QByteArray& txData)
+/** @brief 设置位序 @param order MSB或LSB位序 */
+void SpiConnection::setBitOrder(SpiBitOrder order)
 {
-    if (m_state != ConnectionState::Connected || !m_serial) {
-        ++m_errorCount;
-        return QByteArray();
-    }
-
-    m_responseBuffer.clear();
-
-    /// 构建transfer帧并写入
-    QByteArray frame = buildTransferFrame(txData);
-    m_serial->write(frame);
-
-    /// 同步等待响应(简化实现，实际应异步)
-    QByteArray rxData;
-    if (!m_responseBuffer.isEmpty()) {
-        rxData = m_responseBuffer;
-    }
-
-    /// 更新统计: 全双工同时计发送和接收
-    ++m_totalTransactions;
-    m_totalBytesSent += static_cast<quint64>(txData.size());
-    m_totalBytesReceived += static_cast<quint64>(rxData.size());
-
-    emit dataReceived(rxData);
-    return rxData;
+    m_bitOrder = order;
 }
 
-/** @brief 控制片选引脚电平 @param csPin 片选引脚编号 @param active true=拉低(选中)，false=拉高(释放) */
+/** @brief 设置字长 @param wordSize 8/16/32位字长 */
+void SpiConnection::setWordSize(SpiWordSize wordSize)
+{
+    m_wordSize = wordSize;
+}
+
+/** @brief 设置CS极性 @param activeLow true=低电平有效，false=高电平有效 */
+void SpiConnection::setCsPolarity(bool activeLow)
+{
+    m_csActiveLow = activeLow;
+}
+
+/** @brief 控制片选引脚电平 @param csPin 片选引脚编号 @param active true=选中，false=释放 */
 void SpiConnection::setChipSelect(int csPin, bool active)
 {
     if (!m_serial || m_state != ConnectionState::Connected) return;
@@ -225,11 +233,42 @@ QByteArray SpiConnection::buildTransferFrame(const QByteArray& txData)
     return frame;
 }
 
-/** @brief 重置所有SPI统计计数器(传输次数/字节数/错误计数) */
+/** @brief 组装完整SPI配置命令帧(模式+时钟+位序+字长+CS极性) @return 配置负载数据 */
+QByteArray SpiConnection::buildConfigFrame()
+{
+    QByteArray configPayload;
+    configPayload.append(static_cast<char>(m_mode));
+    /// 时钟频率4字节小端
+    configPayload.append(static_cast<char>(m_clockSpeed & 0xFF));
+    configPayload.append(static_cast<char>((m_clockSpeed >> 8) & 0xFF));
+    configPayload.append(static_cast<char>((m_clockSpeed >> 16) & 0xFF));
+    configPayload.append(static_cast<char>((m_clockSpeed >> 24) & 0xFF));
+    /// 位序: 0=MSB, 1=LSB
+    configPayload.append(static_cast<char>(
+        (m_bitOrder == SpiBitOrder::LSB) ? 1 : 0));
+    /// 字长: 8/16/32
+    configPayload.append(static_cast<char>(
+        static_cast<int>(m_wordSize)));
+    /// CS极性: 0=高有效, 1=低有效
+    configPayload.append(static_cast<char>(m_csActiveLow ? 1 : 0));
+    return configPayload;
+}
+
+/** @brief 获取指定SPI模式的传输次数 @param mode SPI模式(0-3) @return 该模式累计传输次数 */
+quint64 SpiConnection::transferByMode(int mode) const
+{
+    if (mode < 0 || mode >= 4) return 0;
+    return m_transferByMode[mode];
+}
+
+/** @brief 重置所有SPI统计计数器(传输次数/字节数/错误计数/模式统计) */
 void SpiConnection::resetStats()
 {
-    m_totalTransactions = 0;
+    m_totalTransfers = 0;
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
     m_errorCount = 0;
+    for (int i = 0; i < 4; ++i) {
+        m_transferByMode[i] = 0;
+    }
 }

@@ -56,6 +56,26 @@ public:
     quint64 totalBytesPlayed() const;
     /** @brief 获取累计错误次数（录制/回放启动失败等） */
     quint64 totalErrors() const;
+
+    // ==================== 录制时长与帧统计 ====================
+
+    /** @brief 获取累计录制总时长(毫秒) @return 时长总和 */
+    qint64 totalRecordedMs() const;
+
+    /** @brief 获取单次最长录制时长(毫秒) @return 最长时长 */
+    qint64 longestRecordingMs() const;
+
+    /** @brief 获取累计录制数据帧总数 @return 帧总数 */
+    quint64 totalFramesRecorded() const;
+
+    // ==================== 标记统计 ====================
+
+    /** @brief 获取累计创建的标记总数 @return 标记创建数 */
+    quint64 markersCreated() const;
+
+    /** @brief 获取累计导航(跳转)的标记总数 @return 标记导航数 */
+    quint64 markersNavigated() const;
+
     /** @brief 重置所有统计计数器 */
     void resetRecordingStatistics();
 
@@ -100,6 +120,15 @@ private:
     quint64 m_totalPlaybacks = 0;          ///< 累计回放次数
     quint64 m_totalBytesPlayed = 0;        ///< 累计回放字节数
     quint64 m_totalErrors = 0;             ///< 累计错误次数
+
+    // ---- 录制时长与帧统计计数器 ----
+    qint64 m_totalRecordedMs = 0;          ///< 累计录制总时长(毫秒)
+    qint64 m_longestRecordingMs = 0;       ///< 单次最长录制时长(毫秒)
+    quint64 m_totalFramesRecorded = 0;     ///< 累计录制数据帧总数
+
+    // ---- 标记统计计数器 ----
+    quint64 m_markersCreated = 0;          ///< 累计创建的标记总数
+    quint64 m_markersNavigated = 0;        ///< 累计导航(跳转)的标记总数
 };
 
 #endif // RECORDINGCONTROLLER_H

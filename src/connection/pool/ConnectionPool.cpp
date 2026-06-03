@@ -16,7 +16,8 @@ ConnectionPool::~ConnectionPool() { disconnectAll(); }
 
 /** @brief 创建新连接条目 @param type 连接类型 @param addr 地址 @return 连接ID，池满返回空 */
 QString ConnectionPool::createConnection(const QString &type, const QString &addr) {
-    if (m_pool.size() >= m_maxConnections) { emit poolFull(); return {}; }
+    if (m_pool.size() >= m_maxConnections) { m_totalPoolFullEvents++; emit poolFull(); return {}; }
+    m_totalCreated++;
     QString id = QString("conn_%1").arg(++m_counter);
     PoolEntry e; e.id = id; e.type = type; e.address = addr;
     e.created = QDateTime::currentMSecsSinceEpoch(); e.lastActivity = e.created;
@@ -27,7 +28,7 @@ QString ConnectionPool::createConnection(const QString &type, const QString &add
 
 /** @brief 移除连接 @param id 连接ID */
 void ConnectionPool::removeConnection(const QString &id) {
-    if (m_pool.remove(id)) emit connectionRemoved(id);
+    if (m_pool.remove(id)) { m_totalRemoved++; emit connectionRemoved(id); }
 }
 
 /** @brief 连接池中所有未连接条目 */
@@ -73,13 +74,22 @@ void ConnectionPool::setAutoReconnect(bool enable, int interval) {
 /** @brief 更新连接活动时间 @param id 连接ID */
 void ConnectionPool::updateActivity(const QString &id) {
     auto it = m_pool.find(id);
-    if (it != m_pool.end()) it->lastActivity = QDateTime::currentMSecsSinceEpoch();
+    if (it != m_pool.end()) { m_totalActivityUpdates++; it->lastActivity = QDateTime::currentMSecsSinceEpoch(); }
 }
 
 /** @brief 自动重连定时器回调 — 重新连接所有断开的条目 */
 void ConnectionPool::onReconnectTimer() {
     if (!m_autoReconnect) return;
     for (auto it = m_pool.begin(); it != m_pool.end(); ++it) {
-        if (!it->connected) { it->connected = true; emit connectionStateChanged(it->id, true); }
+        if (!it->connected) { m_totalReconnectAttempts++; it->connected = true; emit connectionStateChanged(it->id, true); }
     }
+}
+
+/** @brief 重置所有统计计数器 */
+void ConnectionPool::resetPoolStatistics() {
+    m_totalCreated = 0;
+    m_totalRemoved = 0;
+    m_totalReconnectAttempts = 0;
+    m_totalActivityUpdates = 0;
+    m_totalPoolFullEvents = 0;
 }

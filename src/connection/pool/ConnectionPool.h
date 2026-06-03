@@ -58,6 +58,26 @@ public:
     /** @brief 刷新指定连接的活动时间 @param id 连接ID */
     void updateActivity(const QString &id);
 
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计创建连接次数 */
+    quint64 totalCreated() const { return m_totalCreated; }
+
+    /** @brief 获取累计移除连接次数 */
+    quint64 totalRemoved() const { return m_totalRemoved; }
+
+    /** @brief 获取累计自动重连触发次数 */
+    quint64 totalReconnectAttempts() const { return m_totalReconnectAttempts; }
+
+    /** @brief 获取累计活动刷新次数 */
+    quint64 totalActivityUpdates() const { return m_totalActivityUpdates; }
+
+    /** @brief 获取连接池满拒绝次数 */
+    quint64 totalPoolFullEvents() const { return m_totalPoolFullEvents; }
+
+    /** @brief 重置所有统计计数器 */
+    void resetPoolStatistics();
+
 signals:
     /** @brief 新连接创建时发射 @param id 连接ID */
     void connectionCreated(const QString &id);
@@ -77,4 +97,11 @@ private:
     bool m_autoReconnect = false;        ///< 是否启用自动重连
     QTimer *m_reconnectTimer = nullptr;  ///< 自动重连定时器
     int m_counter = 0;                   ///< 连接ID自增计数器
+
+    // 统计计数器
+    quint64 m_totalCreated = 0;          ///< 累计创建连接次数
+    quint64 m_totalRemoved = 0;          ///< 累计移除连接次数
+    quint64 m_totalReconnectAttempts = 0;///< 累计自动重连触发次数
+    quint64 m_totalActivityUpdates = 0;  ///< 累计活动刷新次数
+    quint64 m_totalPoolFullEvents = 0;   ///< 连接池满拒绝次数
 };

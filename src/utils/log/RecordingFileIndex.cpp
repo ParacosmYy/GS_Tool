@@ -52,7 +52,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
         m_lastError = tr("无法打开文件读取: %1 (%2)")
                           .arg(filePath, file.errorString());
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -65,7 +65,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                           .arg(fileSize).arg(minFileSize);
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -76,7 +76,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                           .arg(kHeaderSize).arg(header.size());
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -85,7 +85,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
         m_lastError = tr("文件魔数不匹配: 期望\"%1\"").arg(QString::fromLatin1(kMagic));
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -96,7 +96,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                           .arg(fileVersion).arg(kVersion);
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -112,7 +112,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
         m_lastError = tr("文件头保留字节非零，文件可能已损坏");
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -122,6 +122,9 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                      | (static_cast<quint32>(static_cast<quint8>(header[6])) << 16)
                      | (static_cast<quint32>(static_cast<quint8>(header[7])) << 24);
 
+    // --- 统计：元数据查询视为一次索引查找 ---
+    ++m_lookupsPerformed;
+
     // --- 校验元数据区域不超出文件范围 ---
     const qint64 dataStart = kHeaderSize + static_cast<qint64>(metaSize);
     if (dataStart > fileSize - kEofMarkerSize) {
@@ -129,7 +132,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                           .arg(dataStart).arg(fileSize - kEofMarkerSize);
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -142,7 +145,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                               .arg(metaSize).arg(jsonBytes.size());
             qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
             file.close();
-            ++m_totalErrors;
+            ++m_totalErrors; ++m_deserializationErrors;
             return false;
         }
 
@@ -151,7 +154,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
             m_lastError = tr("元数据JSON解析失败，文件可能已损坏");
             qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
             file.close();
-            ++m_totalErrors;
+            ++m_totalErrors; ++m_deserializationErrors;
             return false;
         }
         m_metadata = jsonDoc.toVariant().toMap();
@@ -168,7 +171,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
         m_lastError = tr("文件数据区域大小异常: 无效的数据长度");
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
@@ -187,7 +190,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                                   .arg(totalRead + chunk.size()).arg(rawBytesRemaining);
                 qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
                 file.close();
-                ++m_totalErrors;
+                ++m_totalErrors; ++m_deserializationErrors;
                 return false;
             }
 
@@ -208,12 +211,20 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                           .arg(QString::fromLatin1(kEofMarker));
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors;
+        ++m_totalErrors; ++m_deserializationErrors;
         return false;
     }
 
     file.close();
+
+    // --- 统计：缓存命中检测（同一文件路径重复加载） ---
+    if (m_filePath == filePath) {
+        ++m_cacheHits;
+    }
     m_filePath = filePath;
+
+    // --- 统计：累计读取字节数(不含头部和EOF) ---
+    m_totalBytesRead += static_cast<quint64>(jsonBytes.size() + rawBytesRemaining);
 
     // --- 发射完成信号 ---
     emit loadProgress(1.0);
@@ -221,4 +232,22 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
 
     ++m_totalLoads;
     return true;
+}
+
+// ============================================================================
+// 统计重置
+// ============================================================================
+
+/** @brief 重置文件格式统计计数器(包含所有统计) */
+void RecordingFileFormat::resetFileFormatStatistics()
+{
+    m_totalSaves = 0;
+    m_totalLoads = 0;
+    m_totalErrors = 0;
+    m_totalBytesWritten = 0;
+    m_totalBytesRead = 0;
+    m_serializationErrors = 0;
+    m_deserializationErrors = 0;
+    m_lookupsPerformed = 0;
+    m_cacheHits = 0;
 }

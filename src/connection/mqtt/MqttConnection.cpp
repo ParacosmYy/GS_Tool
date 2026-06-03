@@ -67,6 +67,8 @@ bool MqttConnection::open()
     }
     m_state = ConnectionState::Connecting;
     emit stateChanged(m_state);
+    ++m_connectionAttempts;
+    m_lastConnectTime = QDateTime::currentDateTime();
     m_socket->connectToHost(m_host, m_port);
     return true;
 }
@@ -147,6 +149,10 @@ bool MqttConnection::publish(const QString& topic, const QByteArray& payload, in
     qint64 written = m_socket->write(packet);
     if (written == packet.size()) {
         ++m_totalPublishes;
+        /* 按QoS级别统计 */
+        if (qos == 0) ++m_qos0Count;
+        else if (qos == 1) ++m_qos1Count;
+        else if (qos == 2) ++m_qos2Count;
         m_totalBytesSent += static_cast<quint64>(written);
         return true;
     }
@@ -202,7 +208,7 @@ void MqttConnection::unsubscribe(const QString& topic)
 }
 
 /** @brief TCP连接建立成功回调，发送MQTT CONNECT报文 */
-void MqttConnection::onSocketConnected() { sendConnect(); }
+void MqttConnection::onSocketConnected() { sendConnect(); flushPendingQueue(); }
 
 /** @brief TCP连接断开回调，更新状态并停止心跳 */
 void MqttConnection::onSocketDisconnected()
@@ -222,17 +228,20 @@ void MqttConnection::onSocketReadyRead()
     parseIncomingPacket();
 }
 
-/** @brief 心跳定时器回调，发送PINGREQ保活报文 */
+/** @brief 心跳定时器回调，发送PINGREQ保活报文并统计 */
 void MqttConnection::onKeepAlive()
 {
     if (m_state == ConnectionState::Connected) {
         QByteArray packet = buildMqttPacket(PINGREQ, {});
         qint64 written = m_socket->write(packet);
-        if (written == packet.size()) m_totalBytesSent += static_cast<quint64>(written);
+        if (written == packet.size()) {
+            m_totalBytesSent += static_cast<quint64>(written);
+            ++m_keepAliveSent;
+        }
     }
 }
 
-/** @brief 构建并发送MQTT CONNECT报文，包含客户端ID和认证信息 */
+/** @brief 构建并发送MQTT CONNECT报文，包含客户端ID、认证信息和LWT遗嘱 */
 void MqttConnection::sendConnect()
 {
     QByteArray payload;
@@ -240,9 +249,18 @@ void MqttConnection::sendConnect()
     payload.append(static_cast<char>(4));
     payload.append("MQTT");
     payload.append(static_cast<char>(4));
-    quint8 flags = 0x02;
+    quint8 flags = 0x02; /* Clean Session */
     if (!m_username.isEmpty()) flags |= 0x80;
     if (!m_password.isEmpty()) flags |= 0x40;
+
+    /* LWT遗嘱消息标志位 */
+    if (!m_will.topic.isEmpty()) {
+        flags |= 0x04; /* Will Flag */
+        if (m_will.qos == 1) flags |= 0x08;
+        else if (m_will.qos == 2) flags |= 0x10;
+        if (m_will.retain) flags |= 0x20;
+    }
+
     payload.append(static_cast<char>(flags));
     payload.append(static_cast<char>((m_keepAliveInterval >> 8) & 0xFF));
     payload.append(static_cast<char>(m_keepAliveInterval & 0xFF));
@@ -250,6 +268,18 @@ void MqttConnection::sendConnect()
     payload.append(static_cast<char>((clientIdUtf8.size() >> 8) & 0xFF));
     payload.append(static_cast<char>(clientIdUtf8.size() & 0xFF));
     payload.append(clientIdUtf8);
+
+    /* LWT遗嘱消息主题和负载 */
+    if (!m_will.topic.isEmpty()) {
+        const QByteArray willTopicUtf8 = m_will.topic.toUtf8();
+        payload.append(static_cast<char>((willTopicUtf8.size() >> 8) & 0xFF));
+        payload.append(static_cast<char>(willTopicUtf8.size() & 0xFF));
+        payload.append(willTopicUtf8);
+        payload.append(static_cast<char>((m_will.payload.size() >> 8) & 0xFF));
+        payload.append(static_cast<char>(m_will.payload.size() & 0xFF));
+        payload.append(m_will.payload);
+    }
+
     if (!m_username.isEmpty()) {
         const QByteArray userUtf8 = m_username.toUtf8();
         payload.append(static_cast<char>((userUtf8.size() >> 8) & 0xFF));
@@ -269,11 +299,87 @@ void MqttConnection::sendConnect()
 
 // 报文构建/解析/处理见 MqttConnectionProtocol.cpp
 
+// ============================================================
+// LWT遗嘱消息接口
+// ============================================================
+
+/** @brief 配置遗嘱消息，下次连接时生效 @param will 遗嘱配置 */
+void MqttConnection::setWill(const MqttWillConfig& will)
+{
+    m_will = will;
+}
+
+/** @brief 清除遗嘱消息配置 */
+void MqttConnection::clearWill()
+{
+    m_will = MqttWillConfig();
+}
+
+/** @brief 获取当前遗嘱配置 @return 只读遗嘱配置引用 */
+const MqttWillConfig& MqttConnection::willConfig() const
+{
+    return m_will;
+}
+
+// ============================================================
+// 消息队列接口
+// ============================================================
+
+/** @brief 入队消息(断线时缓存，连接后自动发送) @param topic 目标主题 @param payload 负载 @param qos QoS等级 @return true=入队成功 */
+bool MqttConnection::enqueueMessage(const QString& topic, const QByteArray& payload, int qos)
+{
+    if (topic.isEmpty()) return false;
+
+    /* 队列溢出时丢弃最旧的消息 */
+    if (m_pendingQueue.size() >= m_queueLimit) {
+        int dropped = 0;
+        while (m_pendingQueue.size() >= m_queueLimit) {
+            m_pendingQueue.dequeue();
+            ++dropped;
+        }
+        emit queueOverflow(dropped);
+    }
+
+    MqttPendingMessage msg;
+    msg.topic = topic;
+    msg.payload = payload;
+    msg.qos = qos;
+    m_pendingQueue.enqueue(msg);
+    return true;
+}
+
+/** @brief 获取当前队列大小 @return 待发送消息数 */
+int MqttConnection::queueSize() const { return m_pendingQueue.size(); }
+
+/** @brief 设置队列最大容量 @param maxSize 最大消息数 */
+void MqttConnection::setQueueLimit(int maxSize)
+{
+    m_queueLimit = (maxSize > 0) ? maxSize : 100;
+}
+
+/** @brief 获取队列最大容量 @return 最大消息数 */
+int MqttConnection::queueLimit() const { return m_queueLimit; }
+
+/** @brief 发送队列中缓存的所有待发消息 */
+void MqttConnection::flushPendingQueue()
+{
+    while (!m_pendingQueue.isEmpty() && m_state == ConnectionState::Connected) {
+        const auto& msg = m_pendingQueue.head();
+        if (publish(msg.topic, msg.payload, msg.qos)) {
+            m_pendingQueue.dequeue();
+        } else {
+            break;
+        }
+    }
+}
+
 /** @brief 获取当前订阅数量 @return 订阅主题数 */
 int MqttConnection::subscriptionCount() const { return m_subscriptions.size(); }
 
 /** @brief 获取累计发布消息数 @return 发布计数 */
 quint64 MqttConnection::totalPublishes() const { return m_totalPublishes; }
+/** @brief 获取累计接收消息数 @return 接收计数 */
+quint64 MqttConnection::totalReceived() const { return m_totalReceived; }
 /** @brief 获取累计订阅次数 @return 订阅计数 */
 quint64 MqttConnection::totalSubscriptions() const { return m_totalSubscriptions; }
 /** @brief 获取累计发送字节数 @return 发送字节数 */
@@ -282,13 +388,34 @@ quint64 MqttConnection::totalBytesSent() const { return m_totalBytesSent; }
 quint64 MqttConnection::totalBytesReceived() const { return m_totalBytesReceived; }
 /** @brief 获取累计错误次数 @return 错误计数 */
 quint64 MqttConnection::errorCount() const { return m_errorCount; }
+/** @brief 获取累计连接尝试次数 @return 连接尝试计数 */
+quint64 MqttConnection::connectionAttempts() const { return m_connectionAttempts; }
+/** @brief 获取QoS0发布消息数 @return QoS0计数 */
+quint64 MqttConnection::qos0Count() const { return m_qos0Count; }
+/** @brief 获取QoS1发布消息数 @return QoS1计数 */
+quint64 MqttConnection::qos1Count() const { return m_qos1Count; }
+/** @brief 获取QoS2发布消息数 @return QoS2计数 */
+quint64 MqttConnection::qos2Count() const { return m_qos2Count; }
+/** @brief 获取累计PINGREQ发送次数 @return 心跳计数 */
+quint64 MqttConnection::keepAliveSent() const { return m_keepAliveSent; }
+/** @brief 获取最后一次连接发起时间 @return 时间戳 */
+QDateTime MqttConnection::lastConnectTime() const { return m_lastConnectTime; }
+/** @brief 获取待发送队列大小 @return 队列中的消息数 */
+int MqttConnection::pendingQueueSize() const { return m_pendingQueue.size(); }
 
 /** @brief 重置所有统计计数器 */
 void MqttConnection::resetStats()
 {
     m_totalPublishes = 0;
+    m_totalReceived = 0;
     m_totalSubscriptions = 0;
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
     m_errorCount = 0;
+    m_connectionAttempts = 0;
+    m_qos0Count = 0;
+    m_qos1Count = 0;
+    m_qos2Count = 0;
+    m_keepAliveSent = 0;
+    m_lastConnectTime = QDateTime();
 }

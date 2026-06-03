@@ -101,6 +101,7 @@ set(SOURCES
     src/serial/commands/TimedSender.cpp
     src/serial/commands/SendHistory.cpp
     src/serial/data/DataStatistics.cpp
+    src/serial/data/DataStatisticsRolling.cpp
     src/serial/port/SerialDriverDetector.cpp
     src/serial/port/PortWatcher.cpp
     src/protocol/parser/FrameParser.cpp
@@ -192,6 +193,7 @@ set(SOURCES
     src/dashboard/NumericDisplayWidget.cpp
     src/dashboard/DashboardModel.cpp
     src/dashboard/DashboardSerializer.cpp
+    src/dashboard/DashboardSerializerProfile.cpp
 
     # ── F6: J-Link RTT ──
     src/rtt/JLinkRttConnection.cpp
@@ -244,8 +246,10 @@ set(SOURCES
     src/connection/mqtt/MqttConnection.cpp
     src/connection/mqtt/MqttConnectionProtocol.cpp
     src/connection/mqtt/MqttTopicModel.cpp
+    src/connection/mqtt/MqttTopicModelHelpers.cpp
     src/connection/mqtt/MqttSubscriptionPanel.cpp
     src/connection/mqtt/MqttConfigPanel.cpp
+    src/connection/mqtt/MqttWidget.cpp
 
     # ── F15: TCP/UDP 增强 ──
     src/connection/tcp/TcpServerConnection.cpp
@@ -256,7 +260,10 @@ set(SOURCES
 
     # ── F16: SPI/I2C 桥接 ──
     src/connection/spi_i2c/SpiConnection.cpp
+    src/connection/spi_i2c/SpiConnectionTransfer.cpp
     src/connection/spi_i2c/I2cConnection.cpp
+    src/connection/spi_i2c/I2cConnectionScan.cpp
+    src/connection/spi_i2c/SpiI2cBridgeManager.cpp
     src/connection/spi_i2c/SpiI2cConfigPanel.cpp
     src/connection/spi_i2c/RegisterEditor.cpp
 
@@ -517,6 +524,7 @@ set(HEADERS
     src/connection/mqtt/MqttTopicModel.h
     src/connection/mqtt/MqttSubscriptionPanel.h
     src/connection/mqtt/MqttConfigPanel.h
+    src/connection/mqtt/MqttWidget.h
 
     # ── F15: TCP/UDP 增强 ──
     src/connection/tcp/TcpServerConnection.h
@@ -528,6 +536,7 @@ set(HEADERS
     # ── F16: SPI/I2C 桥接 ──
     src/connection/spi_i2c/SpiConnection.h
     src/connection/spi_i2c/I2cConnection.h
+    src/connection/spi_i2c/SpiI2cBridgeManager.h
     src/connection/spi_i2c/SpiI2cConfigPanel.h
     src/connection/spi_i2c/RegisterEditor.h
 
