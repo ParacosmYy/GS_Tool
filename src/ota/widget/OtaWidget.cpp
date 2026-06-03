@@ -3,10 +3,12 @@
  * @brief OTA升级操作面板实现
  *
  * 实现要点:
- *   1. 进度条填充使用 QPropertyAnimation（平滑过渡，避免跳变）
- *   2. 传输完成时进度条从 accent 色变为 success 色（400ms OutCubic）
+ *   1. 进度条填充使用 QPropertyAnimation(平滑过渡，避免跳变)
+ *   2. 传输完成时进度条从 accent 色变为 success 色(400ms OutCubic)
  *   3. 所有控件设置 objectName，便于 QSS 选择器精准匹配
  *   4. 所有用户可见文字使用 tr() 包裹，支持国际化
+ *   5. 支持文件拖放(.bin/.hex文件直接拖入面板)
+ *   6. 传输完成后显示CRC32校验和
  */
 
 #include "ota/widget/OtaWidget.h"
@@ -20,18 +22,23 @@
 #include <QTime>
 #include <QFileInfo>
 #include <QDateTime>
+#include <QMimeData>
+#include <QUrl>
 
 #include "utils/data/ByteFormat.h"
+#include "utils/crypto/CRC.h"
 
 // ============================================================================
 // 构造 / 公开接口
 // ============================================================================
 
-/** @brief 构造OTA升级面板(文件选择+协议选择+进度条+日志) @param manager OtaManager指针 @param parent 父控件 */
+/** @brief 构造OTA升级面板(文件选择+拖放+协议选择+进度条+校验和+日志) @param manager OtaManager指针 @param parent 父控件 */
 OtaWidget::OtaWidget(OtaManager* manager, QWidget* parent)
     : QWidget(parent), m_manager(manager), m_progressAnim(nullptr), m_colorAnim(nullptr)
 {
     setObjectName("otaWidget");
+    // 启用拖放支持
+    setAcceptDrops(true);
 
     setupUI();
     connect(m_manager, &OtaManager::progress, this, &OtaWidget::onProgress);
@@ -42,19 +49,97 @@ OtaWidget::OtaWidget(OtaManager* manager, QWidget* parent)
 }
 
 /**
- * @brief 设置数据连接，转发到 OtaManager
- * @param conn 新的数据连接
+ * @brief 注入当前连接(OTA传输需要IConnection写入数据)
+ * @param conn 连接指针
  *
  * 安全机制: 如果当前有活跃传输，先警告用户并自动取消，
  * 避免传输协议持有已失效的连接导致数据损坏
  */
-/** @brief 注入当前连接(OTA传输需要IConnection写入数据) @param conn 连接指针 */
 void OtaWidget::setConnection(IConnection* conn)
 {
     if (m_manager->isTransferring()) {
         appendLog(tr("警告: 活跃传输期间切换连接，已自动取消当前传输"));
     }
     m_manager->setConnection(conn);
+}
+
+// ============================================================================
+// 拖放事件处理
+// ============================================================================
+
+/** @brief 拖入事件: 检查MIME类型是否包含文件URL，且文件后缀为.bin/.hex @param event 拖入事件 */
+void OtaWidget::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->mimeData()->hasUrls()) {
+        const QList<QUrl> urls = event->mimeData()->urls();
+        if (!urls.isEmpty()) {
+            QString suffix = QFileInfo(urls.first().toLocalFile()).suffix().toLower();
+            if (suffix == "bin" || suffix == "hex" || suffix == "ihex" || suffix == "fw") {
+                event->acceptProposedAction();
+                m_dragHovering = true;
+                // 视觉反馈: 显示拖放提示标签高亮
+                if (m_dropHintLbl) {
+                    m_dropHintLbl->setText(tr("释放以选择此固件文件"));
+                }
+                return;
+            }
+        }
+    }
+    event->ignore();
+}
+
+/** @brief 拖动事件: 持续接受有效拖放 @param event 拖动事件 */
+void OtaWidget::dragMoveEvent(QDragMoveEvent* event)
+{
+    if (m_dragHovering) {
+        event->acceptProposedAction();
+    } else {
+        event->ignore();
+    }
+}
+
+/** @brief 放下事件: 提取第一个文件路径并加载 @param event 放下事件 */
+void OtaWidget::dropEvent(QDropEvent* event)
+{
+    m_dragHovering = false;
+    if (m_dropHintLbl) {
+        m_dropHintLbl->setText(tr("拖放固件文件到此处"));
+    }
+
+    const QList<QUrl> urls = event->mimeData()->urls();
+    if (urls.isEmpty()) return;
+
+    QString filePath = urls.first().toLocalFile();
+    if (!filePath.isEmpty()) {
+        handleDroppedFile(filePath);
+    }
+    event->acceptProposedAction();
+}
+
+/** @brief 拖离事件: 恢复拖放提示标签文字 @param event 拖离事件 */
+void OtaWidget::dragLeaveEvent(QDragLeaveEvent* event)
+{
+    Q_UNUSED(event)
+    m_dragHovering = false;
+    if (m_dropHintLbl) {
+        m_dropHintLbl->setText(tr("拖放固件文件到此处"));
+    }
+}
+
+/** @brief 处理拖入的固件文件: 更新路径输入框、文件信息标签并记录日志 @param filePath 拖入的文件路径 */
+void OtaWidget::handleDroppedFile(const QString& filePath)
+{
+    // 传输中不允许切换文件
+    if (m_manager->isTransferring()) {
+        appendLog(tr("警告: 传输进行中，无法更换文件"));
+        return;
+    }
+
+    m_filePathEdit->setText(filePath);
+    QFileInfo info(filePath);
+    QString sizeStr = ByteFormat::formatSize(info.size());
+    m_fileInfoLbl->setText(tr("类型: %1 | 大小: %2").arg(info.suffix().toUpper(), sizeStr));
+    appendLog(tr("已拖入文件: %1 (%2)").arg(filePath, sizeStr));
 }
 
 // ============================================================================
@@ -78,7 +163,7 @@ void OtaWidget::setupUI()
 
 /**
  * @brief 创建文件选择分组
- * @return 文件选择GroupBox(包含路径输入框、浏览按钮、文件信息标签)
+ * @return 文件选择GroupBox(包含路径输入框、浏览按钮、文件信息标签、拖放提示)
  */
 QGroupBox* OtaWidget::setupFileGroup()
 {
@@ -102,6 +187,12 @@ QGroupBox* OtaWidget::setupFileGroup()
     m_fileInfoLbl = new QLabel(tr("未选择文件"));
     m_fileInfoLbl->setObjectName("otaFileInfo");
     outer->addWidget(m_fileInfoLbl);
+
+    // 拖放提示标签
+    m_dropHintLbl = new QLabel(tr("拖放固件文件到此处"));
+    m_dropHintLbl->setObjectName("otaDropHint");
+    m_dropHintLbl->setAlignment(Qt::AlignCenter);
+    outer->addWidget(m_dropHintLbl);
     return group;
 }
 
@@ -143,9 +234,9 @@ QGroupBox* OtaWidget::setupConfigGroup()
 
 /**
  * @brief 创建进度显示分组
- * @return 进度GroupBox(包含进度条、状态/速率/ETA标签)
+ * @return 进度GroupBox(包含进度条、状态/速率/ETA/校验和标签)
  */
-    QGroupBox* OtaWidget::setupProgressGroup()
+QGroupBox* OtaWidget::setupProgressGroup()
 {
     auto* group = new QGroupBox(tr("传输进度"));
     group->setObjectName("otaProgressGroup");
@@ -160,6 +251,7 @@ QGroupBox* OtaWidget::setupConfigGroup()
     m_progressBar->setFixedHeight(OtaLayout::kProgressBarHeight);
     layout->addWidget(m_progressBar);
 
+    // 第一行: 状态 + 速率 + ETA
     auto* statsLayout = new QHBoxLayout;
     m_statusLbl = new QLabel(tr("就绪"));
     m_statusLbl->setObjectName("otaStatusLbl");
@@ -171,6 +263,11 @@ QGroupBox* OtaWidget::setupConfigGroup()
     statsLayout->addWidget(m_speedLbl, 1);
     statsLayout->addWidget(m_etaLbl, 1);
     layout->addLayout(statsLayout);
+
+    // 第二行: 校验和显示
+    m_checksumLbl = new QLabel("");
+    m_checksumLbl->setObjectName("otaChecksumLbl");
+    layout->addWidget(m_checksumLbl);
     return group;
 }
 
@@ -195,7 +292,7 @@ QGroupBox* OtaWidget::setupLogGroup()
  * @brief 创建OTA历史记录分组
  * @return 历史记录GroupBox(包含树形视图和清除历史按钮)
  */
-    QGroupBox* OtaWidget::setupHistoryGroup()
+QGroupBox* OtaWidget::setupHistoryGroup()
 {
     auto* group = new QGroupBox(tr("OTA历史记录"));
     group->setObjectName("otaHistoryGroup");
@@ -231,7 +328,7 @@ QGroupBox* OtaWidget::setupLogGroup()
 // 槽函数 -- 文件浏览 / 传输控制
 // ============================================================================
 
-/** @brief 浏览文件按钮回调：打开文件对话框选择固件文件(.bin/.hex/.fw) */
+/** @brief 浏览文件按钮回调: 打开文件对话框选择固件文件(.bin/.hex/.fw) */
 void OtaWidget::onBrowseFile()
 {
     QString filter = tr("固件文件 (*.bin *.hex);;二进制文件 (*.bin);;Intel HEX (*.hex);;所有文件 (*.*)");
@@ -244,7 +341,7 @@ void OtaWidget::onBrowseFile()
     appendLog(tr("已选择文件: %1 (%2)").arg(path, sizeStr));
 }
 
-/** @brief 开始传输按钮回调：校验文件路径后调用OtaManager启动传输 */
+/** @brief 开始传输按钮回调: 校验文件路径后调用OtaManager启动传输 */
 void OtaWidget::onStartTransfer()
 {
     QString filePath = m_filePathEdit->text().trimmed();
@@ -272,6 +369,9 @@ void OtaWidget::onStartTransfer()
     setTransferring(true);
     ++m_totalTransfersStarted;  ///< 统计: 传输启动
 
+    // 清除上次校验和显示
+    m_checksumLbl->setText("");
+
     // 发射传输开始信号，供Toast通知使用
     emit transferStarted(m_currentFileName);
 
@@ -284,7 +384,7 @@ void OtaWidget::onStartTransfer()
     }
 }
 
-/** @brief 取消传输按钮回调：中止当前OTA传输并恢复UI状态 */
+/** @brief 取消传输按钮回调: 中止当前OTA传输并恢复UI状态 */
 void OtaWidget::onCancelTransfer()
 {
     m_manager->cancelTransfer();
@@ -302,7 +402,7 @@ void OtaWidget::appendLog(const QString& msg)
     m_logView->append(QString("[%1] %2").arg(QTime::currentTime().toString("HH:mm:ss"), msg));
 }
 
-/** @brief 切换传输状态（启用/禁用相关控件） */
+/** @brief 切换传输状态(启用/禁用相关控件) */
 void OtaWidget::setTransferring(bool transferring)
 {
     m_startBtn->setEnabled(!transferring);
@@ -316,6 +416,7 @@ void OtaWidget::setTransferring(bool transferring)
         m_progressBar->startShimmer();
         m_speedLbl->setText("");
         m_etaLbl->setText("");
+        m_checksumLbl->setText("");
     } else {
         m_progressBar->stopShimmer();
     }
@@ -329,4 +430,3 @@ void OtaWidget::resetOtaWidgetStatistics()
     m_totalTransfersFailed = 0;
     m_totalBytesTransferred = 0;
 }
-

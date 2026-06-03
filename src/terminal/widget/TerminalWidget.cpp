@@ -199,13 +199,14 @@ QString TerminalWidget::selectedText() const
 QSize TerminalWidget::sizeHint() const { return QSize(800, 600); }
 
 // ---- 搜索功能 - 委托给 TerminalSearchManager ----
-/** @brief 设置搜索高亮(支持正则/HEX/普通文本) @param pattern 搜索模式 @param regex 是否正则 @param hex 是否HEX模式 */
-void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool hex)
+/** @brief 设置搜索高亮(支持正则/HEX/普通文本/大小写敏感/全词匹配) @param pattern 搜索模式 @param regex 是否正则 @param hex 是否HEX模式 @param caseSensitive 是否区分大小写 @param wholeWord 是否全词匹配 */
+void TerminalWidget::setSearchHighlight(const QString& pattern, bool regex, bool hex,
+                                        bool caseSensitive, bool wholeWord)
 {
     auto lineAtFn = [this](int idx) -> QByteArray {
         return m_model ? m_model->lineAt(idx).data : QByteArray();
     };
-    m_searchManager->setSearchHighlight(pattern, regex, hex,
+    m_searchManager->setSearchHighlight(pattern, regex, hex, caseSensitive, wholeWord,
                                          m_cachedLines, m_directionFilter,
                                          m_cachedLineCount, lineAtFn);
     update();
@@ -217,6 +218,8 @@ void TerminalWidget::clearSearchHighlight() { m_searchManager->clearSearchHighli
 int TerminalWidget::searchMatchCount() const { return m_searchManager->searchMatchCount(); }
 /** @brief 返回当前高亮的匹配索引 @return 当前索引 */
 int TerminalWidget::currentMatchIndex() const { return m_searchManager->currentMatchIndex(); }
+/** @brief 返回搜索管理器指针(用于外部连接搜索历史信号) @return 搜索管理器 */
+TerminalSearchManager* TerminalWidget::searchManager() const { return m_searchManager; }
 
 /** @brief 跳转到下一个搜索匹配项 */
 void TerminalWidget::gotoNextMatch()
@@ -248,9 +251,9 @@ void TerminalWidget::refreshSearchAfterCacheUpdate()
     if (m_searchManager->searchPattern().isEmpty()) return;
     QString pat = m_searchManager->searchPattern();
     bool rx = m_searchManager->searchRegex(), hx = m_searchManager->searchHex();
-    // setSearchHighlight内部会先清除旧匹配(line 37)，无需额外调用clearSearchHighlight
-    // 移除clearSearchHighlight()避免中间态信号导致搜索计数闪烁
-    setSearchHighlight(pat, rx, hx);
+    bool cs = m_searchManager->searchCaseSensitive(), ww = m_searchManager->searchWholeWord();
+    // setSearchHighlight内部会先清除旧匹配，无需额外调用clearSearchHighlight
+    setSearchHighlight(pat, rx, hx, cs, ww);
 }
 
 // ---- 事件处理/槽函数/右键菜单/统计计数 → 已拆分至 TerminalWidgetSlots.cpp ----

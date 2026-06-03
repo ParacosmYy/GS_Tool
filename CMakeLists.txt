@@ -114,6 +114,7 @@ set(SOURCES
     src/protocol/bridge/JustFloatBridge.cpp
     src/protocol/bridge/FireWaterBridge.cpp
     src/protocol/bridge/ProtocolBridgeManager.cpp
+    src/protocol/bridge/ProtocolBridgeManagerHelpers.cpp
     src/chart/widget/ChartWidget.cpp
     src/chart/widget/ChartWidgetTheme.cpp
     src/chart/model/ChannelConfig.cpp
@@ -272,6 +273,7 @@ set(SOURCES
 
     # ── F19: Protobuf/FlatBuffers 解码 ──
     src/protocol/protobuf/ProtobufDecoder.cpp
+    src/protocol/protobuf/ProtobufDecoderHelpers.cpp
     src/protocol/protobuf/FlatBuffersDecoder.cpp
     src/protocol/protobuf/FlatBuffersDecoderSchema.cpp
     src/protocol/protobuf/SchemaViewer.cpp

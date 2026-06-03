@@ -5,6 +5,8 @@
  * 展开/收起动画使用 QPropertyAnimation 驱动 maximumHeight 属性:
  *   - 展开: 0 -> 36, 200ms, QEasingCurve::OutCubic
  *   - 收起: 36 -> 0, 150ms, QEasingCurve::InCubic
+ *
+ * 搜索历史通过 QCompleter 提供自动补全下拉列表。
  */
 
 #include "terminal/search/TerminalSearchBar.h"
@@ -17,33 +19,38 @@
 #include <QGraphicsOpacityEffect>
 #include <QRegularExpression>
 #include <QStyle>
+#include <QCompleter>
+#include <QStringListModel>
 
-/** @brief 构造函数 - 初始化界面并隐藏搜索栏(Ctrl+F激活) @param parent 父控件 */
+/** @brief 构造函数 - 初始化界面(含搜索历史补全器)并隐藏搜索栏(Ctrl+F激活) @param parent 父控件 */
 TerminalSearchBar::TerminalSearchBar(QWidget* parent)
     : QWidget(parent)
     , m_searchInput(nullptr)
     , m_closeBtn(nullptr)
     , m_regexCheck(nullptr)
     , m_hexCheck(nullptr)
+    , m_caseCheck(nullptr)
+    , m_wordCheck(nullptr)
     , m_resultLabel(nullptr)
+    , m_completer(nullptr)
 {
     setupUI();
     // 初始隐藏, 等待 Ctrl+F 激活
     hide();
 }
 
-/** @brief 构建界面布局和样式(水平布局:输入框|正则|HEX|结果|弹簧|关闭) */
+/** @brief 构建界面布局和样式(水平布局:输入框|正则|HEX|大小写|全词|结果|弹簧|关闭) */
 void TerminalSearchBar::setupUI()
 {
     setObjectName("terminalSearchBar");
 
-    // 水平布局: 输入框 + 正则复选框 + HEX复选框 + 结果标签 + 弹簧 + 关闭按钮
+    // 水平布局: 输入框 + 正则 + HEX + 大小写 + 全词 + 结果标签 + 弹簧 + 关闭按钮
     auto* layout = new QHBoxLayout(this);
     layout->setContentsMargins(Layout::kToolbarPadding, Layout::kToolbarSpacing,
                                Layout::kToolbarPadding, Layout::kToolbarSpacing);
     layout->setSpacing(Layout::kControlSpacing);
 
-    // ---- 搜索输入框 ----
+    // ---- 搜索输入框(带历史补全) ----
     m_searchInput = new QLineEdit(this);
     m_searchInput->setObjectName("searchBarInput");
     m_searchInput->setPlaceholderText(tr("搜索... (支持正则表达式)"));
@@ -51,15 +58,38 @@ void TerminalSearchBar::setupUI()
     m_searchInput->setClearButtonEnabled(true);
     layout->addWidget(m_searchInput);
 
+    // 搜索历史补全器: 大小写不敏感，弹出列表最多10条
+    m_completer = new QCompleter(this);
+    m_completer->setCaseSensitivity(Qt::CaseInsensitive);
+    m_completer->setCompletionMode(QCompleter::PopupCompletion);
+    m_completer->setMaxVisibleItems(10);
+    auto* historyModel = new QStringListModel(this);
+    m_completer->setModel(historyModel);
+    m_searchInput->setCompleter(m_completer);
+
     // ---- 正则模式复选框 ----
     m_regexCheck = new QCheckBox(tr("正则"), this);
     m_regexCheck->setObjectName("searchBarRegexCheck");
+    m_regexCheck->setToolTip(tr("使用正则表达式模式搜索"));
     layout->addWidget(m_regexCheck);
 
     // ---- HEX模式复选框 ----
     m_hexCheck = new QCheckBox(tr("HEX"), this);
     m_hexCheck->setObjectName("searchBarHexCheck");
+    m_hexCheck->setToolTip(tr("使用十六进制模式搜索 (如: AA 55)"));
     layout->addWidget(m_hexCheck);
+
+    // ---- 大小写敏感复选框 ----
+    m_caseCheck = new QCheckBox(tr("Aa"), this);
+    m_caseCheck->setObjectName("searchBarCaseCheck");
+    m_caseCheck->setToolTip(tr("区分大小写"));
+    layout->addWidget(m_caseCheck);
+
+    // ---- 全词匹配复选框 ----
+    m_wordCheck = new QCheckBox(tr("全词"), this);
+    m_wordCheck->setObjectName("searchBarWordCheck");
+    m_wordCheck->setToolTip(tr("全词匹配 (仅纯文本模式)"));
+    layout->addWidget(m_wordCheck);
 
     // ---- 结果标签 ----
     m_resultLabel = new QLabel(this);
@@ -86,15 +116,30 @@ void TerminalSearchBar::setupUI()
     connect(m_searchInput, &QLineEdit::textChanged,
             this, &TerminalSearchBar::onSearchTextChanged);
 
-    // 正则/HEX复选框变化时也重新触发搜索
-    connect(m_regexCheck, &QCheckBox::toggled,
-            this, [this]() {
-                onSearchTextChanged(m_searchInput->text());
-            });
-    connect(m_hexCheck, &QCheckBox::toggled,
-            this, [this]() {
-                onSearchTextChanged(m_searchInput->text());
-            });
+    // 正则/HEX/大小写/全词复选框变化时重新触发搜索
+    auto retrigger = [this]() { triggerSearch(); };
+    connect(m_regexCheck, &QCheckBox::toggled, this, retrigger);
+    connect(m_hexCheck, &QCheckBox::toggled, this, retrigger);
+    connect(m_caseCheck, &QCheckBox::toggled, this, retrigger);
+    connect(m_wordCheck, &QCheckBox::toggled, this, retrigger);
+
+    // HEX模式与全词/大小写互斥: HEX启用时禁用全词和大小写
+    connect(m_hexCheck, &QCheckBox::toggled, this, [this](bool checked) {
+        m_caseCheck->setEnabled(!checked);
+        m_wordCheck->setEnabled(!checked);
+        if (checked) {
+            m_caseCheck->setChecked(false);
+            m_wordCheck->setChecked(false);
+        }
+    });
+
+    // 正则模式与全词互斥: 正则启用时禁用全词
+    connect(m_regexCheck, &QCheckBox::toggled, this, [this](bool checked) {
+        m_wordCheck->setEnabled(!checked && !m_hexCheck->isChecked());
+        if (checked) {
+            m_wordCheck->setChecked(false);
+        }
+    });
 
     // 关闭按钮
     connect(m_closeBtn, &QPushButton::clicked,
@@ -119,6 +164,18 @@ bool TerminalSearchBar::isHexMode() const
     return m_hexCheck->isChecked();
 }
 
+/** @brief 返回大小写敏感复选框是否选中 */
+bool TerminalSearchBar::isCaseSensitive() const
+{
+    return m_caseCheck->isChecked();
+}
+
+/** @brief 返回全词匹配复选框是否选中 */
+bool TerminalSearchBar::isWholeWord() const
+{
+    return m_wordCheck->isChecked();
+}
+
 /** @brief 激活搜索栏并聚焦输入框(已可见仅聚焦，不可见播放展开动画200ms OutCubic) */
 void TerminalSearchBar::activate()
 {
@@ -130,7 +187,6 @@ void TerminalSearchBar::activate()
     }
 
     // 展开动画: maximumHeight 从 0 到 36, 200ms, OutCubic 缓动
-    // 先设为0高度并显示，然后动画展开
     setMaximumHeight(0);
     show();
 
@@ -162,8 +218,6 @@ void TerminalSearchBar::deactivate()
     m_resultLabel->clear();
 
     // 收起动画: maximumHeight 从 36 到 0, 150ms, InCubic 缓动
-    // 完成后隐藏并恢复状态
-    // 停止可能残留的展开动画（快速 Ctrl+F -> Esc 场景）
     if (m_activeAnim) {
         m_activeAnim->stop();
         m_activeAnim = nullptr;
@@ -176,14 +230,19 @@ void TerminalSearchBar::deactivate()
     m_activeAnim->setEasingCurve(QEasingCurve::InCubic);
     connect(m_activeAnim, &QPropertyAnimation::finished, this, [this]() {
         hide();
-        // 恢复固定高度，为下次展开做准备
         setFixedHeight(Layout::kSearchBarHeight);
         emit closed();
     });
     m_activeAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-/** @brief 搜索文本变化时触发搜索或清除(HEX模式验证合法性+错误样式) @param text 当前搜索框文本 */
+/**
+ * @brief 搜索文本变化时验证HEX合法性并触发搜索
+ * @param text 当前搜索框文本
+ *
+ * HEX模式下验证输入合法性，非法时显示错误样式。
+ * 合法或非HEX模式时委托给 triggerSearch() 统一处理。
+ */
 void TerminalSearchBar::onSearchTextChanged(const QString& text)
 {
     // HEX模式下验证输入合法性
@@ -209,14 +268,25 @@ void TerminalSearchBar::onSearchTextChanged(const QString& text)
     m_resultLabel->style()->unpolish(m_resultLabel);
     m_resultLabel->style()->polish(m_resultLabel);
 
+    triggerSearch();
+}
+
+/**
+ * @brief 统一的搜索触发入口
+ *
+ * 根据当前搜索框内容和选项状态发射 searchRequested 或 searchCleared 信号。
+ * 被文本变化和选项变化两种场景共用。
+ */
+void TerminalSearchBar::triggerSearch()
+{
+    const QString text = m_searchInput->text();
     if (text.isEmpty()) {
-        // 文本为空时清除搜索
         m_resultLabel->clear();
         emit searchCleared();
     } else {
-        // 文本非空时发出搜索请求
-        ++m_totalSearches;  ///< 统计: 搜索触发
-        emit searchRequested(text, m_regexCheck->isChecked(), m_hexCheck->isChecked());
+        ++m_totalSearches;
+        emit searchRequested(text, m_regexCheck->isChecked(), m_hexCheck->isChecked(),
+                             m_caseCheck->isChecked(), m_wordCheck->isChecked());
     }
 }
 
@@ -238,6 +308,21 @@ void TerminalSearchBar::setResultText(const QString& text)
     m_resultLabel->setText(text);
 }
 
+/**
+ * @brief 更新搜索历史补全列表
+ * @param history 最新的搜索历史列表
+ *
+ * 将历史列表设置到 QCompleter 的 QStringListModel 中，
+ * 补全器会自动根据当前输入过滤匹配项。
+ */
+void TerminalSearchBar::updateSearchHistory(const QStringList& history)
+{
+    auto* model = qobject_cast<QStringListModel*>(m_completer->model());
+    if (model) {
+        model->setStringList(history);
+    }
+}
+
 /** @brief 重置搜索栏统计计数器 */
 void TerminalSearchBar::resetSearchBarStatistics()
 {
@@ -245,4 +330,3 @@ void TerminalSearchBar::resetSearchBarStatistics()
     m_totalMatches = 0;
     m_totalReplacements = 0;
 }
-

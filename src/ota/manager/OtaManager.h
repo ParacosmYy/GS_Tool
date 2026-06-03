@@ -1,9 +1,11 @@
-/** @file OtaManager.h @brief OTA升级管理器 - 协调传输协议(XModem/YModem/ZModem)、文件验证和HEX转BIN */
+/** @file OtaManager.h @brief OTA升级管理器 - 协调传输协议(XModem/YModem/ZModem)、文件验证、校验和验证和HEX转BIN */
 #ifndef OTAMANAGER_H
 #define OTAMANAGER_H
 
 #include <QObject>
 #include <QTemporaryFile>
+#include <QElapsedTimer>
+#include <QVector>
 #include "ota/protocols/base/BaseTransfer.h"
 #include "ota/protocols/xmodem/XModemTransfer.h"
 #include "ota/protocols/ymodem/YModemTransfer.h"
@@ -21,6 +23,15 @@ public:
 
     /** @brief 固件文件类型 */
     enum class FirmwareType { Binary, IntelHex, Unknown };
+
+    /** @brief 校验和验证结果 */
+    enum class VerifyResult {
+        Ok,             ///< 校验通过
+        FileNotFound,   ///< 文件不存在
+        ReadError,      ///< 读取失败
+        ChecksumEmpty,  ///< 校验和文件为空
+        Mismatch        ///< 校验和不匹配
+    };
 
     static constexpr qint64 kMaxFirmwareSize = 64 * 1024 * 1024; ///< 最大固件64MB
 
@@ -44,12 +55,27 @@ public:
     quint64 successfulTransfers() const;    ///< 成功次数
     quint64 failedTransfers() const;        ///< 失败次数
     quint64 totalBytesTransferred() const;  ///< 累计传输字节
+    double averageSpeed() const;            ///< 历史平均传输速率(字节/秒)
     void resetTransferStatistics();         ///< 重置统计(不影响历史记录)
 
     /** @brief 验证固件文件(存在/可读/大小限制) */
     bool validateFilePath(const QString& filePath, QString& errorMsg) const;
     /** @brief 检测文件类型(.bin→Binary, .hex→IntelHex) */
     FirmwareType detectFirmwareType(const QString& filePath) const;
+
+    /**
+     * @brief 传输后校验和验证
+     * @param filePath 固件文件路径
+     * @param expectedChecksum 预期的校验和(hex字符串，如CRC32/MD5前8位)
+     * @param outError 错误描述输出
+     * @return VerifyResult 校验结果
+     *
+     * 传输完成后可调用此方法对固件文件进行CRC32校验，
+     * 确保本地文件与传输前一致。支持CRC32十六进制字符串比对。
+     */
+    VerifyResult verifyChecksum(const QString& filePath,
+                                const QString& expectedChecksum,
+                                QString& outError);
 
 signals:
     void progress(int percent, qint64 bytesSent, qint64 totalBytes); ///< 传输进度
@@ -68,6 +94,8 @@ private:
     bool convertHexToBin(const QString& hexPath, QString& outBinPath);
     /** @brief 协议可读名称(用于错误消息) */
     QString protocolDisplayName(const QString& protocol) const;
+    /** @brief 计算文件的CRC32校验和 @param filePath 文件路径 @return CRC32十六进制字符串，失败返回空 */
+    QString computeFileCrc32(const QString& filePath);
 
     IConnection* m_conn = nullptr;
     XModemTransfer* m_xmodem = nullptr;
@@ -87,6 +115,11 @@ private:
     quint64 m_failedTransfers = 0;
     quint64 m_totalBytesTransferred = 0;
     qint64 m_currentFileSize = 0;
+
+    // ---- 速率跟踪 ----
+    QElapsedTimer m_transferTimer;          ///< 当前传输耗时计时器
+    QVector<double> m_speedHistory;         ///< 历史传输速率记录(字节/秒)
+    static constexpr int kMaxSpeedHistory = 100; ///< 速率历史最大保留条数
 };
 
 #endif // OTAMANAGER_H

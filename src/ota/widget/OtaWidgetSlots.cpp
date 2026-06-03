@@ -1,14 +1,14 @@
 /**
  * @file OtaWidgetSlots.cpp
- * @brief OTA升级面板 -- 槽函数实现（进度/速率/状态/完成/错误）
+ * @brief OTA升级面板 -- 槽函数实现(进度/速率/状态/完成/错误/校验和)
  *
  * 本文件从 OtaWidget.cpp 拆分而来，包含所有响应 OtaManager 信号的槽函数:
- *   - onProgress:         进度条平滑动画填充
+ *   - onProgress:         进度条平滑动画填充 + 字节计数显示
  *   - onTransferStats:    速率和ETA实时更新
  *   - onOtaStateChanged:  OTA状态变化日志记录
- *   - onTransferComplete: 传输完成处理（变色动画 + 历史记录）
- *   - onTransferError:    传输错误处理（状态重置 + 失败历史）
- *   - startCompletionAnimation: 进度条完成变色动画（accent -> success）
+ *   - onTransferComplete: 传输完成处理(变色动画 + 校验和 + 历史记录)
+ *   - onTransferError:    传输错误处理(状态重置 + 失败历史)
+ *   - startCompletionAnimation: 进度条完成变色动画(accent -> success)
  */
 
 #include "ota/widget/OtaWidget.h"
@@ -21,12 +21,9 @@
 // 槽函数 -- 进度 / 速率 / 状态
 // ============================================================================
 
-/** @brief 进度更新 -- 使用 QPropertyAnimation 实现平滑填充，避免跳变 */
+/** @brief 进度更新 -- 使用 QPropertyAnimation 实现平滑填充，避免跳变; 同时更新字节计数显示 */
 void OtaWidget::onProgress(int percent, qint64 bytesSent, qint64 totalBytes)
 {
-    Q_UNUSED(bytesSent)
-    Q_UNUSED(totalBytes)
-
     if (m_progressAnim && m_progressAnim->state() == QAbstractAnimation::Running) m_progressAnim->stop();
     // stop()触发DeleteWhenStopped自动deleteLater，断开旧动画的destroyed信号避免nullify新动画
     m_progressAnim = nullptr;
@@ -40,7 +37,13 @@ void OtaWidget::onProgress(int percent, qint64 bytesSent, qint64 totalBytes)
         m_progressAnim->setEasingCurve(QEasingCurve::OutCubic);
         m_progressAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
-    m_statusLbl->setText(tr("传输中: %1%").arg(percent));
+
+    // 增强状态显示: 百分比 + 已发送/总字节
+    QString sentStr = ByteFormat::formatSize(bytesSent);
+    QString totalStr = ByteFormat::formatSize(totalBytes);
+    m_statusLbl->setText(tr("传输中: %1% (%2 / %3)")
+                             .arg(percent)
+                             .arg(sentStr, totalStr));
 }
 
 /** @brief 速率和ETA更新 -- 由 OtaManager::transferStats 信号驱动 */
@@ -72,7 +75,7 @@ void OtaWidget::onOtaStateChanged(OtaManager::OtaState state)
 // 槽函数 -- 传输完成 / 错误
 // ============================================================================
 
-/** @brief 传输完成 -- 进度条100% + accent->success变色动画 + 记录成功历史 */
+/** @brief 传输完成 -- 进度条100% + accent->success变色动画 + 校验和显示 + 记录成功历史 */
 void OtaWidget::onTransferComplete()
 {
     setTransferring(false);
@@ -85,6 +88,21 @@ void OtaWidget::onTransferComplete()
 
     qint64 elapsed = m_transferTimer.elapsed();
     appendLog(tr("传输完成，耗时 %1").arg(ByteFormat::formatDuration(elapsed)));
+
+    // 计算并显示CRC32校验和(对原始文件计算，非HEX转换后的临时BIN)
+    QString filePath = m_filePathEdit->text().trimmed();
+    if (!filePath.isEmpty()) {
+        QFile file(filePath);
+        if (file.open(QIODevice::ReadOnly)) {
+            QByteArray data = file.readAll();
+            file.close();
+            quint32 crc = CRC::crc32(data);
+            QString crcStr = QString("%1").arg(crc, 8, 16, QChar('0')).toUpper();
+            m_checksumLbl->setText(tr("CRC32: %1").arg(crcStr));
+            appendLog(tr("文件校验和 CRC32: %1").arg(crcStr));
+        }
+    }
+
     startCompletionAnimation();
 
     // 发射传输完成信号，供Toast通知使用
@@ -129,11 +147,11 @@ void OtaWidget::onTransferError(const QString& reason)
 // ============================================================================
 
 /**
- * @brief 启动进度条完成变色动画（accent -> success，400ms OutCubic）
+ * @brief 启动进度条完成变色动画(accent -> success，400ms OutCubic)
  *
  * 使用 QPropertyAnimation 对 AnimatedProgressBar 的 chunkColor 属性做颜色插值，
  * 从 ThemeManager 获取 accent 和 success 语义色，实现平滑渐变过渡。
- * 符合 CLAUDE.md §6.5 规范: 400ms OutCubic 缓动曲线。
+ * 符合 CLAUDE.md 6.5 规范: 400ms OutCubic 缓动曲线。
  */
 void OtaWidget::startCompletionAnimation()
 {
@@ -141,7 +159,7 @@ void OtaWidget::startCompletionAnimation()
     QColor accent = theme.color(ThemeManager::SemanticColor::Accent);
     QColor success = theme.color(ThemeManager::SemanticColor::Success);
 
-    // 停止并清理旧的变色动画（防止重复触发）
+    // 停止并清理旧的变色动画(防止重复触发)
     if (m_colorAnim && m_colorAnim->state() == QAbstractAnimation::Running) {
         m_colorAnim->stop();
     }
@@ -157,4 +175,3 @@ void OtaWidget::startCompletionAnimation()
     m_colorAnim->setEasingCurve(QEasingCurve::OutCubic);
     m_colorAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
-

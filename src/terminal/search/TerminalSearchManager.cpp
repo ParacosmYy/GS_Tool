@@ -1,9 +1,10 @@
 /**
  * @file TerminalSearchManager.cpp
- * @brief 终端搜索管理器实现 - 文本搜索、匹配存储和导航
+ * @brief 终端搜索管理器实现 - 文本搜索、匹配存储、导航和搜索历史
  *
  * 支持纯文本/正则/HEX三种搜索模式，在普通模式和方向过滤模式下
  * 均可工作。匹配结果以 SearchMatch 向量存储，支持循环导航。
+ * 纯文本模式额外支持大小写敏感和全词匹配选项。
  */
 
 #include "terminal/search/TerminalSearchManager.h"
@@ -29,6 +30,8 @@ TerminalSearchManager::TerminalSearchManager(QObject* parent)
  * @param pattern 搜索关键字或正则表达式
  * @param regex 是否启用正则模式
  * @param hex 是否启用HEX模式
+ * @param caseSensitive 是否区分大小写(纯文本和正则模式生效)
+ * @param wholeWord 是否全词匹配(仅纯文本模式生效)
  * @param cachedLines 终端缓存行数据
  * @param directionFilter 方向过滤器指针，为nullptr时使用普通模式
  * @param modelLineCount 模型总行数
@@ -37,6 +40,7 @@ TerminalSearchManager::TerminalSearchManager(QObject* parent)
  */
 int TerminalSearchManager::setSearchHighlight(
     const QString& pattern, bool regex, bool hex,
+    bool caseSensitive, bool wholeWord,
     const QVector<CachedLine>& cachedLines,
     const DirectionFilter* directionFilter,
     int modelLineCount,
@@ -45,6 +49,8 @@ int TerminalSearchManager::setSearchHighlight(
     m_searchPattern = pattern;
     m_searchRegex = regex;
     m_searchHex = hex;
+    m_searchCaseSensitive = caseSensitive;
+    m_searchWholeWord = wholeWord;
     m_currentMatchIndex = -1;
     m_searchMatches.clear();
 
@@ -55,9 +61,9 @@ int TerminalSearchManager::setSearchHighlight(
     }
 
     ++m_totalSearches;  // 每次有效搜索执行，累计搜索次数
+    addToHistory(pattern);  // 添加到搜索历史
 
     // 构建行遍历回调: 每次调用填入 (displayIdx, text)，返回false表示遍历结束
-    // 方向过滤模式从过滤映射获取行，普通模式直接遍历缓存
     int cursor = 0;
     const int totalCount = (directionFilter && directionFilter->isFiltered())
                                ? directionFilter->filteredLineCount()
@@ -100,9 +106,9 @@ int TerminalSearchManager::setSearchHighlight(
     if (hex) {
         valid = buildHexSearch(pattern, lineProvider);
     } else if (regex) {
-        valid = buildRegexSearch(pattern, lineProvider);
+        valid = buildRegexSearch(pattern, caseSensitive, lineProvider);
     } else {
-        buildPlainSearch(pattern, lineProvider);
+        buildPlainSearch(pattern, caseSensitive, wholeWord, lineProvider);
     }
 
     if (!valid) {
@@ -115,27 +121,59 @@ int TerminalSearchManager::setSearchHighlight(
         m_currentMatchIndex = 0;
     }
 
-    m_totalMatches += static_cast<quint64>(m_searchMatches.size());  // 累计本次搜索的匹配数
+    m_totalMatches += static_cast<quint64>(m_searchMatches.size());
     emit searchMatchesChanged(m_searchMatches.size(), m_currentMatchIndex);
     return m_searchMatches.size();
 }
 
 /**
  * @brief 构建纯文本搜索匹配结果，遍历所有可见行查找关键字出现位置
+ *
+ * 支持大小写敏感和全词匹配选项:
+ *   - 大小写敏感: 使用 Qt::CaseSensitive 进行字符串匹配
+ *   - 全词匹配: 使用正则 \b 边界包裹关键字匹配独立单词
+ *
  * @param pattern 搜索关键字
+ * @param caseSensitive 是否区分大小写
+ * @param wholeWord 是否全词匹配
  * @param lineProvider 行数据提供回调，返回显示索引和文本内容
  */
 void TerminalSearchManager::buildPlainSearch(
     const QString& pattern,
+    bool caseSensitive, bool wholeWord,
     const std::function<bool(int*, QString*)>& lineProvider)
 {
     int displayIdx;
     QString text;
-    while (lineProvider(&displayIdx, &text)) {
-        int pos = 0;
-        while ((pos = text.indexOf(pattern, pos)) >= 0) {
-            m_searchMatches.append({displayIdx, pos, static_cast<int>(pattern.length())});
-            pos += static_cast<int>(pattern.length());
+
+    if (wholeWord) {
+        // 全词匹配: 使用 \b 边界构建正则表达式
+        // 对关键字中的特殊正则字符进行转义，确保安全匹配
+        QString escaped = QRegularExpression::escape(pattern);
+        QRegularExpression::PatternOptions opts = QRegularExpression::NoPatternOption;
+        if (!caseSensitive) {
+            opts |= QRegularExpression::CaseInsensitiveOption;
+        }
+        QRegularExpression re(QStringLiteral("\\b%1\\b").arg(escaped), opts);
+        if (!re.isValid()) return;
+
+        while (lineProvider(&displayIdx, &text)) {
+            QRegularExpressionMatchIterator it = re.globalMatch(text);
+            while (it.hasNext()) {
+                auto match = it.next();
+                m_searchMatches.append({displayIdx, static_cast<int>(match.capturedStart()),
+                                        static_cast<int>(match.capturedLength())});
+            }
+        }
+    } else {
+        // 普通文本搜索: 使用 QString::indexOf 进行直接匹配
+        Qt::CaseSensitivity cs = caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
+        while (lineProvider(&displayIdx, &text)) {
+            int pos = 0;
+            while ((pos = text.indexOf(pattern, pos, cs)) >= 0) {
+                m_searchMatches.append({displayIdx, pos, static_cast<int>(pattern.length())});
+                pos += static_cast<int>(pattern.length());
+            }
         }
     }
 }
@@ -143,14 +181,19 @@ void TerminalSearchManager::buildPlainSearch(
 /**
  * @brief 构建正则表达式搜索匹配结果，使用QRegularExpression全局匹配
  * @param pattern 正则表达式字符串
+ * @param caseSensitive 是否区分大小写
  * @param lineProvider 行数据提供回调，返回显示索引和文本内容
  * @return 正则表达式有效返回true，无效返回false
  */
 bool TerminalSearchManager::buildRegexSearch(
-    const QString& pattern,
+    const QString& pattern, bool caseSensitive,
     const std::function<bool(int*, QString*)>& lineProvider)
 {
-    QRegularExpression re(pattern);
+    QRegularExpression::PatternOptions opts = QRegularExpression::NoPatternOption;
+    if (!caseSensitive) {
+        opts |= QRegularExpression::CaseInsensitiveOption;
+    }
+    QRegularExpression re(pattern, opts);
     if (!re.isValid()) return false;
 
     int displayIdx;
@@ -180,7 +223,6 @@ bool TerminalSearchManager::buildHexSearch(
     if (bytes.isEmpty()) return false;
 
     // 将用户输入规范化为空格分隔的大写HEX字符串，与HexConverter::toHexString()输出格式一致
-    // 例如: "AA55" → "AA 55", "aa 55" → "AA 55"
     QString normalized = HexConverter::toHexString(bytes);
 
     int displayIdx;
@@ -193,6 +235,31 @@ bool TerminalSearchManager::buildHexSearch(
         }
     }
     return true;
+}
+
+/**
+ * @brief 将搜索关键字添加到历史记录
+ *
+ * 去重逻辑: 如果关键字已存在则移到最前，保持最近搜索在前。
+ * 历史列表上限 kMaxSearchHistory 条，超出时移除最旧的条目。
+ * @param pattern 搜索关键字
+ */
+void TerminalSearchManager::addToHistory(const QString& pattern)
+{
+    if (pattern.isEmpty()) return;
+
+    // 如果已存在则移除旧位置(后续添加到最前)
+    m_searchHistory.removeAll(pattern);
+
+    // 添加到最前面
+    m_searchHistory.prepend(pattern);
+
+    // 超出上限时移除最旧的条目
+    while (m_searchHistory.size() > kMaxSearchHistory) {
+        m_searchHistory.removeLast();
+    }
+
+    emit searchHistoryChanged(m_searchHistory);
 }
 
 /** @brief 清除搜索高亮，重置搜索模式、匹配结果和当前匹配索引，并发射搜索变化信号 */
@@ -252,6 +319,18 @@ bool TerminalSearchManager::searchHex() const
     return m_searchHex;
 }
 
+/** @brief 查询当前是否为大小写敏感模式 @return 大小写敏感返回true */
+bool TerminalSearchManager::searchCaseSensitive() const
+{
+    return m_searchCaseSensitive;
+}
+
+/** @brief 查询当前是否为全词匹配模式 @return 全词匹配返回true */
+bool TerminalSearchManager::searchWholeWord() const
+{
+    return m_searchWholeWord;
+}
+
 /** @brief 获取所有搜索匹配结果的只读引用 @return SearchMatch向量的const引用 */
 const QVector<SearchMatch>& TerminalSearchManager::searchMatches() const
 {
@@ -279,6 +358,19 @@ void TerminalSearchManager::setSearchColors(const QColor& highlight, const QColo
 {
     m_searchHighlightColor = highlight;
     m_currentMatchColor = current;
+}
+
+/** @brief 获取搜索历史列表(最近的在前) @return 搜索历史字符串列表 */
+QStringList TerminalSearchManager::searchHistory() const
+{
+    return m_searchHistory;
+}
+
+/** @brief 清除搜索历史并发射历史变化信号 */
+void TerminalSearchManager::clearSearchHistory()
+{
+    m_searchHistory.clear();
+    emit searchHistoryChanged(m_searchHistory);
 }
 
 // ---- 统计计数实现 ----

@@ -94,8 +94,11 @@ public slots:
      * @param pattern 搜索模式字符串
      * @param regex true=使用正则表达式匹配
      * @param hex true=按 HEX 字节搜索
+     * @param caseSensitive true=区分大小写
+     * @param wholeWord true=全词匹配
      */
-    void onSearchRequested(const QString& pattern, bool regex, bool hex);
+    void onSearchRequested(const QString& pattern, bool regex, bool hex,
+                           bool caseSensitive, bool wholeWord);
 
     /** @brief 清除主终端的搜索高亮 */
     void onSearchCleared();

@@ -123,15 +123,16 @@ void TerminalController::onClearTerminal()
     updateStatusBar();
 }
 
-/** @brief 终端搜索请求处理，搜索只作用于主终端 @param pattern 搜索模式字符串 @param regex true=使用正则表达式匹配 @param hex true=按HEX字节搜索 */
-void TerminalController::onSearchRequested(const QString& pattern, bool regex, bool hex)
+/** @brief 终端搜索请求处理，搜索只作用于主终端 @param pattern 搜索模式字符串 @param regex true=使用正则表达式匹配 @param hex true=按HEX字节搜索 @param caseSensitive true=区分大小写 @param wholeWord true=全词匹配 */
+void TerminalController::onSearchRequested(const QString& pattern, bool regex, bool hex,
+                                           bool caseSensitive, bool wholeWord)
 {
     ++m_totalSearches;
     if (!m_mainTerminal) return;
     // 搜索只作用于主终端（混合模式终端或分栏模式的RX终端）
     auto* terminal = qobject_cast<TerminalWidget*>(m_mainTerminal);
     if (terminal) {
-        terminal->setSearchHighlight(pattern, regex, hex);
+        terminal->setSearchHighlight(pattern, regex, hex, caseSensitive, wholeWord);
     }
 }
 

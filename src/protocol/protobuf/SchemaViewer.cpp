@@ -3,14 +3,21 @@
  * @brief 模式查看器实现
  *
  * 加载.proto/.fbs文件并以树形结构展示消息定义。
+ * 提供解码消息/字段统计、解析错误跟踪和桥接吞吐量计算。
  */
+
 #include "protocol/protobuf/SchemaViewer.h"
+
 #include <QFile>
 #include <QTextStream>
 #include <QSplitter>
 #include <QHeaderView>
 
-/** @brief 构造函数，初始化模式查看器UI(左树+右详情) @param parent 父控件 */
+// ============================================================================
+// 构造
+// ============================================================================
+
+/** @brief 构造函数，初始化模式查看器UI(左树+右详情)和吞吐量计时器 @param parent 父控件 */
 SchemaViewer::SchemaViewer(QWidget* parent)
     : QWidget(parent)
 {
@@ -40,7 +47,14 @@ SchemaViewer::SchemaViewer(QWidget* parent)
         m_detailView->setPlainText(item->data(0, Qt::UserRole).toString());
         ++m_totalFieldExpansions;
     });
+
+    // 启动吞吐量基准计时器
+    m_throughputTimer.start();
 }
+
+// ============================================================================
+// Schema加载
+// ============================================================================
 
 /** @brief 加载并解析Schema文件(.proto/.fbs) @param filePath 文件路径 @param type 文件类型("proto"/"fbs") */
 void SchemaViewer::loadSchema(const QString& filePath, const QString& type) {
@@ -50,6 +64,7 @@ void SchemaViewer::loadSchema(const QString& filePath, const QString& type) {
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         m_detailView->setPlainText(
             tr("无法打开文件: %1").arg(filePath));
+        ++m_parseErrors;
         return;
     }
 
@@ -67,6 +82,10 @@ void SchemaViewer::loadSchema(const QString& filePath, const QString& type) {
 
     m_detailView->setPlainText(content);
 }
+
+// ============================================================================
+// Schema解析
+// ============================================================================
 
 /** @brief 解析.proto文件内容为模式树结构(message/enum+字段) @param content 文件文本内容 */
 void SchemaViewer::parseProtoContent(const QString& content) {
@@ -129,6 +148,10 @@ void SchemaViewer::parseFbsContent(const QString& content) {
     }
 }
 
+// ============================================================================
+// Schema统计接口
+// ============================================================================
+
 /** @brief 获取累计加载Schema次数 @return 加载次数 */
 quint64 SchemaViewer::totalSchemasLoaded() const
 {
@@ -141,9 +164,88 @@ quint64 SchemaViewer::totalFieldExpansions() const
     return m_totalFieldExpansions;
 }
 
+// ============================================================================
+// 解码统计接口
+// ============================================================================
+
+/** @brief 记录一次解码消息(更新吞吐量窗口) @param fieldCount 本消息的字段数 */
+void SchemaViewer::recordDecodedMessage(int fieldCount)
+{
+    ++m_decodedMessages;
+    m_decodedFields += static_cast<quint64>(qMax(fieldCount, 0));
+
+    // 更新吞吐量滑动窗口
+    ++m_throughputMsgCount;
+    m_throughputFieldCount += static_cast<quint64>(qMax(fieldCount, 0));
+
+    // 每隔5秒重置窗口避免速率失真
+    if (m_throughputTimer.elapsed() > 5000) {
+        m_throughputMsgCount = 0;
+        m_throughputFieldCount = 0;
+        m_throughputTimer.restart();
+    }
+}
+
+/** @brief 记录一次解析错误 */
+void SchemaViewer::recordParseError()
+{
+    ++m_parseErrors;
+}
+
+/** @brief 获取桥接吞吐量快照 @return BridgeThroughput统计 */
+SchemaViewer::BridgeThroughput SchemaViewer::bridgeThroughput() const
+{
+    qint64 elapsedMs = m_throughputTimer.elapsed();
+    if (elapsedMs <= 0) {
+        return m_cachedThroughput;
+    }
+
+    double elapsedSec = static_cast<double>(elapsedMs) / 1000.0;
+    if (elapsedSec < 0.5) {
+        return m_cachedThroughput;
+    }
+
+    m_cachedThroughput.decodedMessages = m_decodedMessages;
+    m_cachedThroughput.decodedFields = m_decodedFields;
+    m_cachedThroughput.parseErrors = m_parseErrors;
+    m_cachedThroughput.messagesPerSec =
+        static_cast<double>(m_throughputMsgCount) / elapsedSec;
+    m_cachedThroughput.fieldsPerSec =
+        static_cast<double>(m_throughputFieldCount) / elapsedSec;
+
+    return m_cachedThroughput;
+}
+
+/** @brief 获取累计解码消息总数 @return 消息数 */
+quint64 SchemaViewer::totalDecodedMessages() const
+{
+    return m_decodedMessages;
+}
+
+/** @brief 获取累计解码字段总数 @return 字段数 */
+quint64 SchemaViewer::totalDecodedFields() const
+{
+    return m_decodedFields;
+}
+
+/** @brief 获取累计解析错误总数 @return 错误数 */
+quint64 SchemaViewer::totalParseErrors() const
+{
+    return m_parseErrors;
+}
+
 /** @brief 重置所有统计计数器 */
 void SchemaViewer::resetStatistics()
 {
     m_totalSchemasLoaded = 0;
     m_totalFieldExpansions = 0;
+
+    m_decodedMessages = 0;
+    m_decodedFields = 0;
+    m_parseErrors = 0;
+
+    m_throughputMsgCount = 0;
+    m_throughputFieldCount = 0;
+    m_throughputTimer.restart();
+    m_cachedThroughput = BridgeThroughput();
 }

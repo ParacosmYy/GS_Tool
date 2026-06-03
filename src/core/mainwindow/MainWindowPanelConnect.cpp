@@ -91,6 +91,12 @@ void MainWindow::connectSearchAndProtocolSignals()
                     tr("%1/%2").arg(current + 1).arg(total));
             });
 
+    // 搜索历史变化 → 搜索栏更新补全列表
+    connect(m_panelManager->terminal()->searchManager(),
+            &TerminalSearchManager::searchHistoryChanged,
+            m_panelManager->searchBar(),
+            &TerminalSearchBar::updateSearchHistory);
+
     // 协议桥 → 协议视图 + 波形图
     connect(m_protocolBridgeMgr, &ProtocolBridgeManager::frameParsed,
             m_panelManager->protocolView(), &ProtocolView::onFrameParsed);

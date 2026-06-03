@@ -1,22 +1,10 @@
 /**
  * @file OtaWidget.h
- * @brief OTA升级操作面板 -- 文件选择、协议选择、进度显示、速率/ETA、日志输出
+ * @brief OTA升级操作面板 -- 文件选择、拖放、协议选择、进度显示、速率/ETA、校验和、日志
  *
- * 设计要点:
- *   1. 提供文件选择（.bin/.hex）、协议选择（XMODEM/YMODEM/ZMODEM）、传输控制
- *   2. 进度条填充使用 QPropertyAnimation 实现平滑过渡
- *   3. 传输完成时进度条颜色从 Accent 变为 Success（400ms OutCubic 动画）
- *   4. 传输速率和ETA使用 ByteFormat 工具格式化
- *   5. 传输日志和OTA历史记录展示
- *
- * 协作关系:
- *   - OtaManager: 业务逻辑层，负责实际OTA传输和协议处理
- *   - OtaHistoryModel: 历史记录数据模型
- *   - ByteFormat: 字节格式化工具（速率/大小/时间）
- *   - ThemeManager: 通过 QSS 获取进度条颜色
- *
- * 设计模式:
- *   - 观察者模式: 监听 OtaManager 的 progress/transferStats/transferComplete/transferError 信号
+ * 设计: 文件拖放+浏览(.bin/.hex) | 协议选择(XMODEM/YMODEM/ZMODEM) | QPropertyAnimation进度条
+ *       ByteFormat速率/ETA | CRC32校验和 | accent->success变色(400ms OutCubic) | 历史记录
+ * 协作: OtaManager(业务逻辑) OtaHistoryModel(历史) ByteFormat(格式化) ThemeManager(QSS颜色)
  */
 
 #ifndef OTAWIDGET_H
@@ -32,162 +20,113 @@
 #include <QTreeView>
 #include <QElapsedTimer>
 #include <QPropertyAnimation>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QDragLeaveEvent>
 #include "ota/manager/OtaManager.h"
 #include "ota/history/OtaHistoryModel.h"
 #include "ota/widget/AnimatedProgressBar.h"
 
-/**
- * @brief OTA升级操作面板
- *
- * 职责: 文件选择、协议选择(XMODEM/YMODEM/ZMODEM)、进度显示(平滑动画)、
- * 速率/ETA实时显示、完成/失败状态反馈(变色动画)、日志输出、历史记录
- */
+/** @brief OTA升级面板: 文件拖放/选择+协议选择+进度动画+速率/ETA+校验和+日志+历史 */
 class OtaWidget : public QWidget {
     Q_OBJECT
 
 public:
-    /**
-     * @brief 构造OTA面板
-     * @param manager OTA管理器实例（业务逻辑层）
-     * @param parent 父窗口
-     */
+    /** @brief 构造OTA面板 @param manager OTA管理器 @param parent 父窗口 */
     explicit OtaWidget(OtaManager* manager, QWidget* parent = nullptr);
-
-    /**
-     * @brief 设置关联的连接（切换连接时调用）
-     * @param conn 连接接口指针
-     */
+    /** @brief 设置数据连接 @param conn 连接指针 */
     void setConnection(IConnection* conn);
 
+    // ---- 统计访问器 ----
+    quint64 totalTransfersStarted() const { return m_totalTransfersStarted; }   ///< 传输启动计数
+    quint64 totalTransfersCompleted() const { return m_totalTransfersCompleted; } ///< 传输完成计数
+    quint64 totalTransfersFailed() const { return m_totalTransfersFailed; }     ///< 传输失败计数
+    quint64 totalBytesTransferred() const { return m_totalBytesTransferred; }   ///< 累计字节
+    void resetOtaWidgetStatistics(); ///< 重置面板统计(不影响历史记录)
+
 signals:
-    /**
-     * @brief 传输开始信号 -- MainWindow可连接到ToastWidget显示通知
-     * @param filename 固件文件名（不含路径）
-     */
-    void transferStarted(const QString& filename);
-
-    /** @brief 传输完成信号 @param filename 文件名 @param elapsed 耗时(ms) @param size 文件大小(字节) */
-    void transferCompleted(const QString& filename, qint64 elapsed, qint64 size);
-
-    /** @brief 传输失败信号 @param filename 文件名 @param error 错误原因 */
-    void transferFailed(const QString& filename, const QString& error);
+    void transferStarted(const QString& filename);    ///< 传输开始 @param filename 文件名
+    void transferCompleted(const QString& filename, qint64 elapsed, qint64 size); ///< 传输完成
+    void transferFailed(const QString& filename, const QString& error);           ///< 传输失败
 
 private slots:
-    /** @brief 浏览固件文件按钮点击 */
-    void onBrowseFile();
-
-    /** @brief 开始传输按钮点击 */
-    void onStartTransfer();
-
-    /** @brief 取消传输按钮点击 */
-    void onCancelTransfer();
-
-    /** @brief 传输进度更新 @param percent 百分比(0-100) @param bytesSent 已发送 @param totalBytes 总字节 */
-    void onProgress(int percent, qint64 bytesSent, qint64 totalBytes);
-
-    /** @brief 传输完成处理 -- 设置进度条100%、触发变色动画 */
-    void onTransferComplete();
-
-    /**
-     * @brief 传输错误处理
-     * @param reason 错误原因描述
-     */
-    void onTransferError(const QString& reason);
-
-    /** @brief 速率和ETA更新 @param rateBytesPerSec 速率(字节/秒) @param etaSec 剩余时间(秒) */
-    void onTransferStats(double rateBytesPerSec, double etaSec);
-
-    /** @brief OTA状态变化 @param state 新状态 */
-    void onOtaStateChanged(OtaManager::OtaState state);
+    void onBrowseFile();     ///< 浏览固件文件
+    void onStartTransfer();  ///< 开始传输
+    void onCancelTransfer(); ///< 取消传输
+    void onProgress(int percent, qint64 bytesSent, qint64 totalBytes); ///< 进度更新
+    void onTransferComplete();          ///< 传输完成(100%+变色+校验和)
+    void onTransferError(const QString& reason); ///< 传输错误
+    void onTransferStats(double rateBytesPerSec, double etaSec); ///< 速率/ETA
+    void onOtaStateChanged(OtaManager::OtaState state);          ///< OTA状态变化
 
 private:
-    /** @brief 初始化UI布局和所有子控件 */
-    void setupUI();
-    /** @brief 创建文件选择分组(路径输入框+浏览按钮+文件信息) */
-    QGroupBox* setupFileGroup();
-    /** @brief 创建传输配置分组(协议选择+开始/取消按钮) */
-    QGroupBox* setupConfigGroup();
-    /** @brief 创建进度显示分组(进度条+状态/速率/ETA标签) */
-    QGroupBox* setupProgressGroup();
-    /** @brief 创建日志输出分组 */
-    QGroupBox* setupLogGroup();
-    /** @brief 创建OTA历史记录分组(树形视图+清除按钮) */
-    QGroupBox* setupHistoryGroup();
+    void setupUI();           ///< 初始化UI
+    QGroupBox* setupFileGroup();     ///< 文件选择组(输入框+浏览+拖放提示)
+    QGroupBox* setupConfigGroup();   ///< 传输配置组(协议+按钮)
+    QGroupBox* setupProgressGroup(); ///< 进度显示组(进度条+速率+ETA+校验和)
+    QGroupBox* setupLogGroup();      ///< 日志输出组
+    QGroupBox* setupHistoryGroup();  ///< OTA历史记录组(树视图+清除)
+    void appendLog(const QString& msg);             ///< 追加时间戳日志
+    void setTransferring(bool transferring);         ///< 切换传输UI状态
+    void startCompletionAnimation();                 ///< accent->success变色
+    void handleDroppedFile(const QString& filePath); ///< 处理拖入文件
 
-    /**
-     * @brief 追加带时间戳的日志消息
-     * @param msg 日志内容
-     */
-    void appendLog(const QString& msg);
+    // ---- 拖放事件重写 ----
+    void dragEnterEvent(QDragEnterEvent* event) override;  ///< 拖入: 校验文件后缀
+    void dragMoveEvent(QDragMoveEvent* event) override;    ///< 拖动: 持续接受
+    void dropEvent(QDropEvent* event) override;            ///< 放下: 提取路径
+    void dragLeaveEvent(QDragLeaveEvent* event) override;  ///< 拖离: 恢复样式
 
-    /**
-     * @brief 切换传输状态（启用/禁用相关控件）
-     * @param transferring true 为传输中，false 为空闲
-     */
-    void setTransferring(bool transferring);
-
-    /** @brief 启动进度条完成变色动画(accent->success, 400ms OutCubic) */
-    void startCompletionAnimation();
-
-    OtaManager* m_manager;              ///< OTA管理器（业务逻辑层）
+    OtaManager* m_manager;              ///< OTA管理器(业务逻辑层)
 
     // ---- 文件选择组 ----
-    QLineEdit* m_filePathEdit;          ///< 固件文件路径输入框
+    QLineEdit* m_filePathEdit;          ///< 文件路径输入框
     QPushButton* m_browseBtn;           ///< 浏览按钮
-
-    // ---- 协议选择组 ----
-    QComboBox* m_protocolCombo;         ///< 协议选择下拉框
+    QLabel* m_dropHintLbl;              ///< 拖放提示标签
 
     // ---- 传输控制组 ----
-    QPushButton* m_startBtn;            ///< 开始传输按钮
-    QPushButton* m_cancelBtn;           ///< 取消传输按钮
+    QComboBox* m_protocolCombo;         ///< 协议下拉框
+    QPushButton* m_startBtn;            ///< 开始按钮
+    QPushButton* m_cancelBtn;           ///< 取消按钮
 
     // ---- 进度显示组 ----
-    AnimatedProgressBar* m_progressBar; ///< 传输进度条（带shimmer流动效果）
-    QLabel* m_statusLbl;                ///< 状态文字标签
-    QLabel* m_speedLbl;                 ///< 传输速率标签
-    QLabel* m_etaLbl;                   ///< 预计剩余时间标签
-    QLabel* m_fileInfoLbl;              ///< 文件信息标签(类型+大小)
+    AnimatedProgressBar* m_progressBar; ///< 进度条(shimmer流动)
+    QLabel* m_statusLbl;                ///< 状态标签
+    QLabel* m_speedLbl;                 ///< 速率标签
+    QLabel* m_etaLbl;                   ///< ETA标签
+    QLabel* m_fileInfoLbl;              ///< 文件信息标签
+    QLabel* m_checksumLbl;              ///< CRC32校验和标签
 
     // ---- 日志输出组 ----
-    QTextEdit* m_logView;               ///< 传输日志文本框
+    QTextEdit* m_logView;               ///< 日志文本框
 
     // ---- 历史记录组 ----
-    OtaHistoryModel* m_historyModel;    ///< OTA历史数据模型
-    QTreeView* m_historyView;           ///< 历史记录树形视图
+    OtaHistoryModel* m_historyModel;    ///< 历史数据模型
+    QTreeView* m_historyView;           ///< 历史树视图
     QPushButton* m_clearHistoryBtn;     ///< 清除历史按钮
 
     // ---- 传输计时 ----
-    QElapsedTimer m_transferTimer;      ///< 传输耗时计时器
-    qint64 m_lastBytesSent = 0;         ///< 上次速率计算的已发送字节数
+    QElapsedTimer m_transferTimer;      ///< 传输计时器
+    qint64 m_lastBytesSent = 0;         ///< 上次速率计算的字节数
 
-    // ---- 当前传输信息（用于记录历史） ----
-    QString m_currentFileName;          ///< 当前传输文件名
-    QString m_currentProtocol;          ///< 当前传输协议
-    qint64 m_currentFileSize = 0;       ///< 当前文件大小（字节）
+    // ---- 当前传输信息 ----
+    QString m_currentFileName;          ///< 当前文件名
+    QString m_currentProtocol;          ///< 当前协议
+    qint64 m_currentFileSize = 0;       ///< 当前文件大小
     QDateTime m_transferStartTime;      ///< 传输开始时间
 
-    // ---- 进度条动画 ----
-    QPropertyAnimation* m_progressAnim; ///< 进度条值动画（平滑填充）
-    QPropertyAnimation* m_colorAnim;    ///< 进度条完成变色动画（accent -> success）
+    // ---- 动画 ----
+    QPropertyAnimation* m_progressAnim; ///< 进度值动画
+    QPropertyAnimation* m_colorAnim;    ///< 完成变色动画
+
+    // ---- 拖放状态 ----
+    bool m_dragHovering = false;        ///< 文件悬停标志
 
     // ---- 统计计数器 ----
-    quint64 m_totalTransfersStarted = 0;    ///< 已启动传输总次数
-    quint64 m_totalTransfersCompleted = 0;  ///< 已完成传输总次数
-    quint64 m_totalTransfersFailed = 0;     ///< 已失败传输总次数
-    quint64 m_totalBytesTransferred = 0;    ///< 累计传输字节数
-
-public:
-    /** @brief 获取已启动传输总次数 @return 传输启动计数 */
-    quint64 totalTransfersStarted() const { return m_totalTransfersStarted; }
-    /** @brief 获取已完成传输总次数 @return 传输完成计数 */
-    quint64 totalTransfersCompleted() const { return m_totalTransfersCompleted; }
-    /** @brief 获取已失败传输总次数 @return 传输失败计数 */
-    quint64 totalTransfersFailed() const { return m_totalTransfersFailed; }
-    /** @brief 获取累计传输字节数 @return 字节总数 */
-    quint64 totalBytesTransferred() const { return m_totalBytesTransferred; }
-    /** @brief 重置OTA面板统计计数器(不影响历史记录) */
-    void resetOtaWidgetStatistics();
+    quint64 m_totalTransfersStarted = 0;    ///< 启动总次数
+    quint64 m_totalTransfersCompleted = 0;  ///< 完成总次数
+    quint64 m_totalTransfersFailed = 0;     ///< 失败总次数
+    quint64 m_totalBytesTransferred = 0;    ///< 累计字节数
 };
 
 #endif // OTAWIDGET_H

@@ -1,6 +1,9 @@
 /**
  * @file TerminalSearchBar.h
  * @brief 终端搜索栏 - 嵌入终端顶部的搜索控件，支持文本/正则/HEX搜索
+ *
+ * 支持: 文本搜索、正则搜索、HEX搜索、大小写敏感、全词匹配、搜索历史
+ * 快捷键: Ctrl+F 打开, Esc 关闭, F3/Shift+F3 导航匹配
  */
 
 #ifndef TERMINALSEARCHBAR_H
@@ -12,11 +15,12 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QLabel>
+#include <QStringList>
 
 /**
  * @brief 终端搜索栏 - 嵌入终端顶部的搜索控件
  *
- * 支持: 文本搜索、正则搜索、HEX搜索
+ * 支持: 文本搜索、正则搜索、HEX搜索、大小写敏感、全词匹配
  * 快捷键: Ctrl+F 打开, Esc 关闭
  *
  * 展开/收起动画实现:
@@ -24,8 +28,14 @@
  *   - 收起: maximumHeight 从 36 到 0, 150ms, InCubic 缓动
  *   - 使用 QPropertyAnimation 驱动，动画结束后恢复 setFixedHeight(36)
  *
+ * 搜索历史:
+ *   - 搜索输入框支持 QCompleter 自动补全
+ *   - 每次搜索成功后关键字自动加入历史
+ *   - 历史列表由 TerminalSearchManager 维护
+ *
  * 协作关系:
  *   - TerminalWidget: 监听 searchRequested/searchCleared 信号执行搜索
+ *   - TerminalSearchManager: 提供搜索历史数据
  */
 class TerminalSearchBar : public QWidget {
     Q_OBJECT
@@ -40,6 +50,12 @@ public:
 
     /** @brief 是否启用HEX模式 */
     bool isHexMode() const;
+
+    /** @brief 是否启用大小写敏感 */
+    bool isCaseSensitive() const;
+
+    /** @brief 是否启用全词匹配 */
+    bool isWholeWord() const;
 
 public slots:
     /**
@@ -64,14 +80,23 @@ public slots:
      */
     void setResultText(const QString& text);
 
+    /**
+     * @brief 更新搜索历史补全列表
+     * @param history 最新的搜索历史列表
+     */
+    void updateSearchHistory(const QStringList& history);
+
 signals:
     /**
      * @brief 搜索触发信号
      * @param pattern 搜索内容
      * @param regex 是否为正则模式
      * @param hex 是否为HEX模式
+     * @param caseSensitive 是否区分大小写
+     * @param wholeWord 是否全词匹配
      */
-    void searchRequested(const QString& pattern, bool regex, bool hex);
+    void searchRequested(const QString& pattern, bool regex, bool hex,
+                         bool caseSensitive, bool wholeWord);
 
     /** @brief 搜索清除信号（搜索框为空时发射） */
     void searchCleared();
@@ -102,12 +127,23 @@ private:
      */
     bool isValidHex(const QString& text) const;
 
+    /**
+     * @brief 触发当前搜索框内容的搜索请求
+     *
+     * 检查文本非空且HEX模式合法后发射 searchRequested 信号，
+     * 否则发射 searchCleared 信号。
+     */
+    void triggerSearch();
+
     QLineEdit* m_searchInput;       ///< 搜索输入框（objectName: searchBarInput）
     QPushButton* m_closeBtn;        ///< 关闭按钮（objectName: searchBarCloseBtn）
     QCheckBox* m_regexCheck;        ///< 正则模式复选框（objectName: searchBarRegexCheck）
     QCheckBox* m_hexCheck;          ///< HEX模式复选框（objectName: searchBarHexCheck）
+    QCheckBox* m_caseCheck;         ///< 大小写敏感复选框（objectName: searchBarCaseCheck）
+    QCheckBox* m_wordCheck;         ///< 全词匹配复选框（objectName: searchBarWordCheck）
     QLabel* m_resultLabel;          ///< 结果标签（objectName: searchBarResult），如 "3/15 matches"
     QPropertyAnimation* m_activeAnim = nullptr; ///< 当前活跃的展开/收起动画，防止快速切换时冲突
+    QCompleter* m_completer;        ///< 搜索历史自动补全器
 
     // ---- 统计计数器 ----
     quint64 m_totalSearches = 0;        ///< 搜索触发总次数

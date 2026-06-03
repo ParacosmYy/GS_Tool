@@ -61,10 +61,12 @@ public:
     bool autoScroll() const;
     void clear();
     QString selectedText() const;
-    void setSearchHighlight(const QString& pattern, bool regex, bool hex);
+    void setSearchHighlight(const QString& pattern, bool regex, bool hex,
+                            bool caseSensitive = false, bool wholeWord = false);
     void clearSearchHighlight();
     int searchMatchCount() const;
     int currentMatchIndex() const;
+    TerminalSearchManager* searchManager() const;
     void gotoNextMatch();
     void gotoPrevMatch();
     void selectAll();

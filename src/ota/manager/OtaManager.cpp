@@ -1,6 +1,6 @@
 /**
  * @file OtaManager.cpp
- * @brief OTA升级管理器实现 - 文件验证、HEX转换、状态管理、信号转发
+ * @brief OTA升级管理器实现 - 文件验证、HEX转换、状态管理、校验和验证、信号转发
  *
  * 核心流程:
  *   startTransfer()
@@ -9,11 +9,15 @@
  *     3. 检测文件类型(BIN/HEX)
  *     4. HEX文件自动转BIN(IntelHexParser)
  *     5. 设置状态为 Transferring
- *     6. 调用对应协议的start()
+ *     6. 启动传输计时器
+ *     7. 调用对应协议的start()
+ *
+ *   传输完成时记录速率到历史记录，用于计算平均速率
  */
 
 #include "ota/manager/OtaManager.h"
 #include "protocol/hex/IntelHexParser.h"
+#include "utils/crypto/CRC.h"
 
 #include <QFileInfo>
 #include <QFile>
@@ -75,6 +79,20 @@ void OtaManager::connectTransferSignals(BaseTransfer* transfer)
                 ++m_successfulTransfers;
                 m_totalBytesTransferred += static_cast<quint64>(m_currentFileSize);
                 m_lastTransferSuccess = true;
+
+                // 记录本次传输速率到历史记录
+                if (m_transferTimer.elapsed() > 0) {
+                    double elapsedSec = static_cast<double>(m_transferTimer.elapsed()) / 1000.0;
+                    if (elapsedSec > 0.0 && m_currentFileSize > 0) {
+                        double speed = static_cast<double>(m_currentFileSize) / elapsedSec;
+                        m_speedHistory.append(speed);
+                        // 限制历史记录长度，防止内存无限增长
+                        if (m_speedHistory.size() > kMaxSpeedHistory) {
+                            m_speedHistory.removeFirst();
+                        }
+                    }
+                }
+
                 emit transferComplete();
             });
     connect(transfer, &BaseTransfer::transferError,
@@ -177,7 +195,7 @@ void OtaManager::setConnection(IConnection* conn)
     m_zmodem->setConnection(conn);
 }
 
-/** @brief 开始OTA传输(验证文件→检测类型→HEX转BIN→选择协议→启动) @param filePath 固件文件路径 @param protocol 传输协议名称 @return true=成功启动，false=验证失败 */
+/** @brief 开始OTA传输(验证文件→检测类型→HEX转BIN→启动计时→选择协议→启动) @param filePath 固件文件路径 @param protocol 传输协议名称 @return true=成功启动，false=验证失败 */
 bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
 {
     // ---- 步骤1: 连接检查 ----
@@ -226,10 +244,13 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
     m_currentProtocol = protocol;
     m_currentFileSize = QFileInfo(effectivePath).size();
 
-    // ---- 步骤7: 切换到传输状态 ----
+    // ---- 步骤7: 启动传输计时器(用于计算本次传输速率) ----
+    m_transferTimer.start();
+
+    // ---- 步骤8: 切换到传输状态 ----
     setOtaState(OtaState::Transferring);
 
-    // ---- 步骤8: 根据协议选择传输实例 ----
+    // ---- 步骤9: 根据协议选择传输实例 ----
     if (protocol == "ymodem") {
         m_ymodem->setFilePath(effectivePath);
         return m_ymodem->start();
@@ -377,4 +398,63 @@ bool OtaManager::convertHexToBin(const QString& hexPath, QString& outBinPath)
     return true;
 }
 
-// ---- 协议显示名称 / 传输统计 → 已拆分至 OtaManagerProgress.cpp ----
+// ============================================================================
+// 校验和验证
+// ============================================================================
+
+/** @brief 计算文件的CRC32校验和 @param filePath 文件路径 @return CRC32十六进制字符串(8位大写)，失败返回空字符串 */
+QString OtaManager::computeFileCrc32(const QString& filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return {};
+    }
+
+    // 使用CRC工具计算CRC32
+    QByteArray data = file.readAll();
+    file.close();
+
+    if (data.isEmpty()) {
+        return {};
+    }
+
+    quint32 crc = CRC::crc32(data);
+    return QString("%1").arg(crc, 8, 16, QChar('0')).toUpper();
+}
+
+/** @brief 传输后校验和验证，对比固件文件CRC32与预期值 @param filePath 固件文件路径 @param expectedChecksum 预期CRC32(十六进制字符串) @param outError 错误描述输出 @return VerifyResult校验结果 */
+OtaManager::VerifyResult OtaManager::verifyChecksum(const QString& filePath,
+                                                     const QString& expectedChecksum,
+                                                     QString& outError)
+{
+    // 检查文件是否存在
+    QFileInfo info(filePath);
+    if (!info.exists()) {
+        outError = tr("校验文件不存在: %1").arg(filePath);
+        return VerifyResult::FileNotFound;
+    }
+
+    // 检查预期校验和是否为空
+    if (expectedChecksum.trimmed().isEmpty()) {
+        outError = tr("预期校验和为空");
+        return VerifyResult::ChecksumEmpty;
+    }
+
+    // 计算文件CRC32
+    QString actual = computeFileCrc32(filePath);
+    if (actual.isEmpty()) {
+        outError = tr("无法读取文件计算校验和: %1").arg(filePath);
+        return VerifyResult::ReadError;
+    }
+
+    // 比对校验和(不区分大小写)
+    if (actual.compare(expectedChecksum.trimmed(), Qt::CaseInsensitive) != 0) {
+        outError = tr("校验和不匹配: 预期 %1, 实际 %2")
+                       .arg(expectedChecksum.trimmed().toUpper(), actual);
+        return VerifyResult::Mismatch;
+    }
+
+    return VerifyResult::Ok;
+}
+
+// ---- 协议显示名称 / 传输统计 / 平均速率 → 已拆分至 OtaManagerProgress.cpp ----
