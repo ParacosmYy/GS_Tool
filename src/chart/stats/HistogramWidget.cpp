@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cmath>
 
+/** @brief 构造直方图控件 @param model 数据模型指针 @param parent 父控件 */
 HistogramWidget::HistogramWidget(ChartModel* model, QWidget* parent)
     : QWidget(parent)
     , m_model(model)
@@ -48,6 +49,7 @@ HistogramWidget::HistogramWidget(ChartModel* model, QWidget* parent)
     onChannelsChanged();
 }
 
+/** @brief 初始化整体布局 — 工具栏+图表+统计摘要标签 */
 void HistogramWidget::setupUI()
 {
     auto* mainLayout = new QVBoxLayout(this);
@@ -67,6 +69,7 @@ void HistogramWidget::setupUI()
     setLayout(mainLayout);
 }
 
+/** @brief 创建顶部工具栏 — 通道选择、分桶数、刷新按钮、自动刷新开关 @return 工具栏Widget指针 */
 QWidget* HistogramWidget::createToolbar()
 {
     auto* toolbar = new QWidget(this);
@@ -113,6 +116,7 @@ QWidget* HistogramWidget::createToolbar()
     return toolbar;
 }
 
+/** @brief 创建QChartView + QBarSeries + QBarCategoryAxis/QValueAxis双轴 */
 void HistogramWidget::setupChart()
 {
     m_chart = new QChart();
@@ -149,6 +153,12 @@ void HistogramWidget::setupChart()
     m_chartView->setRenderHint(QPainter::Antialiasing);
 }
 
+/**
+ * @brief 计算直方图分桶数据
+ * @param data 输入数据点集(取QPointF的y分量作为值)
+ * @param bins 分桶数量
+ * @return 每个桶的中心值和计数的有序列表
+ */
 QVector<QPair<double, int>> HistogramWidget::computeHistogram(
     const QVector<QPointF>& data, int bins)
 {
@@ -184,6 +194,11 @@ QVector<QPair<double, int>> HistogramWidget::computeHistogram(
     return result;
 }
 
+/**
+ * @brief 计算数据统计摘要(均值/标准差/最小/最大/计数)
+ * @param data 输入数据点集(取QPointF的y分量作为值)
+ * @return 包含count/min/max/mean/stddev的Stats结构体
+ */
 HistogramWidget::Stats HistogramWidget::computeStats(
     const QVector<QPointF>& data)
 {
@@ -213,6 +228,7 @@ HistogramWidget::Stats HistogramWidget::computeStats(
     return s;
 }
 
+/** @brief 刷新直方图显示 — 从模型读取数据、计算分桶、更新柱状图和统计标签 */
 void HistogramWidget::refreshHistogram()
 {
     if (!m_model || !m_barSet) {
@@ -263,22 +279,26 @@ void HistogramWidget::refreshHistogram()
     ++m_totalUpdates;
 }
 
+/** @brief 通道选择变更回调 @param index 下拉框当前索引 */
 void HistogramWidget::onChannelChanged(int /*index*/)
 {
     if (m_autoRefresh) { refreshHistogram(); }
 }
 
+/** @brief 分桶数变更回调 @param value 新的分桶数值 */
 void HistogramWidget::onBinsChanged(int /*value*/)
 {
     ++m_totalBinChanges;
     if (m_autoRefresh) { refreshHistogram(); }
 }
 
+/** @brief 自动刷新开关切换回调 @param checked true=启用自动刷新 */
 void HistogramWidget::onAutoRefreshToggled(bool checked)
 {
     m_autoRefresh = checked;
 }
 
+/** @brief ChartModel数据更新回调 — 仅在自动刷新且当前通道有更新时重绘 @param updatedChannels 本次更新的通道名称列表 */
 void HistogramWidget::onDataUpdated(const QStringList& updatedChannels)
 {
     if (!m_autoRefresh) { return; }
@@ -287,6 +307,7 @@ void HistogramWidget::onDataUpdated(const QStringList& updatedChannels)
     }
 }
 
+/** @brief 通道列表变更回调 — 重建下拉框并尽量恢复之前的选择 */
 void HistogramWidget::onChannelsChanged()
 {
     if (!m_model) { return; }
@@ -311,8 +332,10 @@ void HistogramWidget::onChannelsChanged()
     }
 }
 
+/** @brief 主题切换回调 — 重新应用主题颜色 */
 void HistogramWidget::onThemeChanged() { applyThemeColors(); }
 
+/** @brief 应用当前主题颜色到图表背景/网格线/坐标轴标签/柱体颜色 */
 void HistogramWidget::applyThemeColors()
 {
     auto& theme = ThemeManager::instance();
@@ -346,13 +369,13 @@ void HistogramWidget::applyThemeColors()
     m_chart->setPlotAreaBackgroundVisible(true);
 }
 
-/** @brief 获取累计刷新更新次数 */
+/** @brief 获取累计刷新更新次数 @return 更新次数 */
 quint64 HistogramWidget::totalUpdates() const
 {
     return m_totalUpdates;
 }
 
-/** @brief 获取累计分桶数变更次数 */
+/** @brief 获取累计分桶数变更次数 @return 变更次数 */
 quint64 HistogramWidget::totalBinChanges() const
 {
     return m_totalBinChanges;

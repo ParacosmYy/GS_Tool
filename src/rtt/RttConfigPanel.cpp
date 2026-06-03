@@ -13,13 +13,7 @@
 #include <QLabel>
 #include <QPushButton>
 
-/**
- * @brief 构造函数
- *
- * 初始化面板，设置对象名称并构建 UI 布局。
- *
- * @param parent 父控件
- */
+/** @brief 构造函数，初始化面板并构建UI布局 @param parent 父控件 */
 RttConfigPanel::RttConfigPanel(QWidget* parent)
     : QWidget(parent)
     , m_deviceCombo(nullptr)
@@ -31,13 +25,7 @@ RttConfigPanel::RttConfigPanel(QWidget* parent)
     setupUI();
 }
 
-/**
- * @brief 获取当前配置参数
- *
- * 从各个控件读取当前值，构建参数映射。
- *
- * @return 包含设备/接口/速度/通道等参数的 QVariantMap
- */
+/** @brief 获取当前配置参数(从各控件读取当前值构建映射) @return 包含设备/接口/速度/通道等参数的QVariantMap */
 QVariantMap RttConfigPanel::config() const
 {
     QVariantMap cfg;
@@ -48,18 +36,7 @@ QVariantMap RttConfigPanel::config() const
     return cfg;
 }
 
-/**
- * @brief 初始化 UI 布局和控件
- *
- * 创建 QFormLayout，包含：
- *   - 设备选择下拉框（含常用 MCU 型号）
- *   - 调试接口下拉框（JTAG/SWD/cJTAG）
- *   - 连接速度微调框（1000-50000 kHz，默认 4000）
- *   - RTT 通道号微调框（0-15，默认 0）
- *   - 连接/断开按钮
- *
- * 所有控件均设置 objectName 供 QSS 样式匹配。
- */
+/** @brief 初始化UI布局和控件，创建设备选择/调试接口/速度/通道/连接按钮，所有控件设置objectName供QSS匹配 */
 void RttConfigPanel::setupUI()
 {
     auto* mainLayout = new QFormLayout(this);
@@ -151,21 +128,14 @@ void RttConfigPanel::setupUI()
             this, &RttConfigPanel::onFormValueChanged);
 }
 
-/**
- * @brief 表单值变化时的统一处理
- *
- * 任意配置项变化时，收集当前值并发出 configChanged 信号。
- */
+/** @brief 表单值变化时的统一处理，收集当前值并发出configChanged信号 */
 void RttConfigPanel::onFormValueChanged()
 {
     ++m_totalConfigChanges;
     emit configChanged(config());
 }
 
-/**
- * @brief 保存RTT配置到QSettings
- * @param settings QSettings对象
- */
+/** @brief 保存RTT配置到QSettings @param settings QSettings对象 */
 void RttConfigPanel::saveSettings(QSettings& settings) const
 {
     settings.setValue(QStringLiteral("rtt/device"),
@@ -178,10 +148,7 @@ void RttConfigPanel::saveSettings(QSettings& settings) const
                      m_channelSpin->value());
 }
 
-/**
- * @brief 从QSettings加载RTT配置
- * @param settings QSettings对象
- */
+/** @brief 从QSettings加载RTT配置并更新各控件 @param settings QSettings对象 */
 void RttConfigPanel::loadSettings(QSettings& settings)
 {
     const QString device = settings.value(
@@ -211,21 +178,25 @@ void RttConfigPanel::loadSettings(QSettings& settings)
 
 // ---- 统计接口 ----
 
+/** @brief 获取配置变更总次数 @return 累计配置变更次数 */
 quint64 RttConfigPanel::totalConfigChanges() const
 {
     return m_totalConfigChanges;
 }
 
+/** @brief 获取连接请求总次数 @return 累计连接请求次数 */
 quint64 RttConfigPanel::totalConnectRequests() const
 {
     return m_totalConnectRequests;
 }
 
+/** @brief 获取断开请求总次数 @return 累计断开请求次数 */
 quint64 RttConfigPanel::totalDisconnectRequests() const
 {
     return m_totalDisconnectRequests;
 }
 
+/** @brief 重置配置面板统计计数器为初始值 */
 void RttConfigPanel::resetConfigStatistics()
 {
     m_totalConfigChanges = 0;

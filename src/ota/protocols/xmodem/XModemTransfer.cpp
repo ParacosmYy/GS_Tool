@@ -16,43 +16,38 @@
 #include <QFile>
 #include <QFileInfo>
 
-/** @brief 构造函数，初始化XMODEM传输器基类 */
+/** @brief 构造函数，初始化XMODEM传输器基类 @param parent 父对象 */
 XModemTransfer::XModemTransfer(QObject* parent)
     : BaseTransfer(parent)
 {
 }
 
-/** @brief 设置XMODEM传输模式
- *  @param mode 传输模式: Checksum/CRC/OneK */
+/** @brief 设置XMODEM传输模式 @param mode 传输模式: Checksum/CRC/OneK */
 void XModemTransfer::setMode(Mode mode)
 {
     m_mode = mode;
 }
 
-/** @brief 设置传输文件路径
- *  @param path 文件绝对路径 */
+/** @brief 设置传输文件路径 @param path 文件绝对路径 */
 void XModemTransfer::setFilePath(const QString& path)
 {
     m_filePath = path;
 }
 
-/** @brief 直接设置传输数据，优先于文件路径
- *  @param data 待传输的原始字节数据 */
+/** @brief 直接设置传输数据，优先于文件路径 @param data 待传输的原始字节数据 */
 void XModemTransfer::setData(const QByteArray& data)
 {
     m_data = data;
     m_filePath.clear();
 }
 
-/** @brief 获取当前传输速率
- *  @return 传输速率，单位: 字节/秒 */
+/** @brief 获取当前传输速率 @return 传输速率，单位: 字节/秒 */
 double XModemTransfer::transferRate() const
 {
     return m_currentRate;
 }
 
-/** @brief 计算剩余传输时间
- *  @return 预计剩余秒数，无法计算时返回-1 */
+/** @brief 计算剩余传输时间 @return 预计剩余秒数，无法计算时返回-1 */
 double XModemTransfer::etaSeconds() const
 {
     if (m_currentRate <= 0.0 || m_data.isEmpty()) {
@@ -67,8 +62,7 @@ double XModemTransfer::etaSeconds() const
 
 // ---- BaseTransfer钩子实现 ----
 
-/** @brief 传输启动初始化，加载文件数据并等待接收方启动信号
- *  @return 初始化成功返回true，文件/连接错误返回false */
+/** @brief 传输启动初始化，加载文件数据并等待接收方启动信号 @return 初始化成功返回true，文件/连接错误返回false */
 bool XModemTransfer::onStartInit()
 {
     // 加载文件数据
@@ -131,8 +125,7 @@ void XModemTransfer::sendCancelBytes()
     }
 }
 
-/** @brief 处理接收缓冲区数据，按字节逐个分发给对应状态处理方法
- *  状态处理方法实现见 XModemTransferHandlers.cpp */
+/** @brief 处理接收缓冲区数据，按字节逐个分发给对应状态处理方法 @note 状态处理方法实现见 XModemTransferHandlers.cpp */
 void XModemTransfer::processReceivedData()
 {
     int readIdx = 0;
@@ -240,10 +233,7 @@ void XModemTransfer::sendEOT()
     }
 }
 
-/** @brief 构建完整数据块包(帧头+块号+数据+校验)
- *  @param blockNum 块编号(1-255循环)
- *  @param blockData 块数据载荷
- *  @return 完整的数据包字节数组 */
+/** @brief 构建完整数据块包(帧头+块号+数据+校验) @param blockNum 块编号(1-255循环) @param blockData 块数据载荷 @return 完整的数据包字节数组 */
 QByteArray XModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
 {
     QByteArray packet;
@@ -271,9 +261,7 @@ QByteArray XModemTransfer::buildBlock(int blockNum, const QByteArray& blockData)
     return packet;
 }
 
-/** @brief 计算XMODEM CRC16校验值
- *  @param data 待校验数据
- *  @return CRC16校验值 */
+/** @brief 计算XMODEM CRC16校验值 @param data 待校验数据 @return CRC16校验值 */
 quint16 XModemTransfer::xmodemCrc(const QByteArray& data)
 {
     return CRC::crc16Xmodem(data);
@@ -302,11 +290,19 @@ void XModemTransfer::updateTransferStats()
     m_lastStatsBytes = m_bytesSent;
 }
 
+/** @brief 获取累计发送的数据块总数 @return 块数 */
 quint64 XModemTransfer::totalBlocksSent() const { return m_totalBlocksSent; }
+
+/** @brief 获取累计重试次数 @return 重试次数 */
 quint64 XModemTransfer::totalRetries() const { return m_totalRetries; }
+
+/** @brief 获取累计模式切换次数 @return 模式切换次数 */
 quint64 XModemTransfer::totalModeSwitches() const { return m_totalModeSwitches; }
+
+/** @brief 获取累计XMODEM协议错误次数 @return 错误次数 */
 quint64 XModemTransfer::xmodemErrorCount() const { return m_xmodemErrorCount; }
 
+/** @brief 重置所有XMODEM传输统计计数器(块数/重试/模式切换/错误) */
 void XModemTransfer::resetXmodemStatistics()
 {
     m_totalBlocksSent = 0;
@@ -314,8 +310,8 @@ void XModemTransfer::resetXmodemStatistics()
     m_totalModeSwitches = 0;
     m_xmodemErrorCount = 0;
 }
-/** @brief 设置XMODEM状态机状态
- *  @param newState 目标状态 */
+
+/** @brief 设置XMODEM状态机状态 @param newState 目标状态 */
 void XModemTransfer::setState(State newState)
 {
     m_xmodemState = newState;

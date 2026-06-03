@@ -49,6 +49,7 @@ static quint32 updateBaseAddress(const Record& rec, quint32 currentBase)
     return currentBase;
 }
 
+/** @brief 解析单行HEX文本为Record结构体 @param line HEX文本行(以':'开头) @param outRecord 输出的解析结果 @return 解析成功返回true，格式错误或校验和失败返回false */
 bool parseLine(const QString& line, Record& outRecord)
 {
     QString trimmed = line.trimmed();
@@ -105,6 +106,7 @@ bool parseLine(const QString& line, Record& outRecord)
     return verifyChecksum(outRecord);
 }
 
+/** @brief 验证HEX记录的校验和是否正确 @param record 待验证的HEX记录 @return 校验和正确返回true，错误返回false */
 bool verifyChecksum(const Record& record)
 {
     quint8 sum = record.byteCount;
@@ -119,6 +121,7 @@ bool verifyChecksum(const Record& record)
     return (sum == 0);
 }
 
+/** @brief 从HEX文件解析所有记录到向量 @param filePath HEX文件路径 @param outRecords 输出的记录向量 @return 解析成功且非空返回true，文件无法打开或无有效记录返回false */
 bool parseRecords(const QString& filePath, QVector<Record>& outRecords)
 {
     QFile file(filePath);
@@ -150,6 +153,7 @@ bool parseRecords(const QString& filePath, QVector<Record>& outRecords)
     return !outRecords.isEmpty();
 }
 
+/** @brief 将HEX记录合并为连续二进制数据块 @param records 已解析的HEX记录向量 @param outBinary 输出的二进制数据(0xFF填充) @param startAddress 输出的起始地址 @return 合并成功返回true，无数据记录或数据过大返回false */
 bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary,
                   quint32& startAddress)
 {
@@ -202,6 +206,7 @@ bool mergeRecords(const QVector<Record>& records, QByteArray& outBinary,
     return true;
 }
 
+/** @brief 一步完成HEX文件解析与二进制合并 @param filePath HEX文件路径 @param outBinary 输出的二进制数据 @param startAddress 输出的起始地址 @return 解析并合并成功返回true，失败返回false */
 bool parse(const QString& filePath, QByteArray& outBinary,
            quint32& startAddress)
 {
@@ -214,6 +219,7 @@ bool parse(const QString& filePath, QByteArray& outBinary,
 
 // ---- 统计信息 ----
 
+/** @brief 从已解析记录中计算统计信息(记录数/数据量/地址范围/执行入口) @param records 已解析的HEX记录向量 @param stats 输出的统计结果 */
 void computeStats(const QVector<Record>& records, ParseStats& stats)
 {
     stats = ParseStats();
@@ -271,6 +277,7 @@ void computeStats(const QVector<Record>& records, ParseStats& stats)
     }
 }
 
+/** @brief 解析HEX文件并同时计算详细统计信息(含校验和错误计数) @param filePath HEX文件路径 @param outBinary 输出的二进制数据 @param startAddress 输出的起始地址 @param stats 输出的解析统计信息 @return 解析成功返回true，失败返回false */
 bool parseWithStats(const QString& filePath, QByteArray& outBinary,
                     quint32& startAddress, ParseStats& stats)
 {

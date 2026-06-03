@@ -13,14 +13,7 @@
 // ---- 静态成员初始化 ----
 QMutex JLinkSdkLoader::s_mutex;
 
-/**
- * @brief 获取单例实例
- *
- * 使用 QMutexLocker 保证线程安全的双重检查锁定模式。
- * 实例在首次调用时创建，由 QCoreApplication 退出时自动销毁。
- *
- * @return 单例指针
- */
+/** @brief 获取单例实例(线程安全双重检查锁定) @return 单例指针 */
 JLinkSdkLoader* JLinkSdkLoader::instance()
 {
     static JLinkSdkLoader* s_instance = nullptr;
@@ -32,10 +25,7 @@ JLinkSdkLoader* JLinkSdkLoader::instance()
     return s_instance;
 }
 
-/**
- * @brief 私有构造函数（单例模式）
- * @param parent 父对象
- */
+/** @brief 私有构造函数(单例模式)，初始化所有SDK函数指针为nullptr @param parent 父对象 */
 JLinkSdkLoader::JLinkSdkLoader(QObject* parent)
     : QObject(parent)
     , m_library(nullptr)
@@ -54,26 +44,13 @@ JLinkSdkLoader::JLinkSdkLoader(QObject* parent)
 {
 }
 
-/**
- * @brief 析构函数
- *
- * 析构时自动卸载已加载的 SDK 动态库。
- */
+/** @brief 析构函数，析构时自动卸载已加载的SDK动态库 */
 JLinkSdkLoader::~JLinkSdkLoader()
 {
     unload();
 }
 
-/**
- * @brief 加载 J-Link SDK 动态库
- *
- * 创建 QLibrary 实例并加载指定路径的动态库文件。
- * 加载后调用 resolveFunctions() 解析全部 SDK 符号。
- * JLINK_Open 为必需符号，缺失则视为无效库。
- *
- * @param path DLL 文件路径，为空则使用系统默认搜索路径
- * @return true 加载并解析成功，false 加载失败或符号缺失
- */
+/** @brief 加载J-Link SDK动态库，解析全部SDK符号，JLINK_Open为必需符号 @param path DLL文件路径，为空则使用系统默认搜索路径 @return true=加载并解析成功，false=加载失败或符号缺失 */
 bool JLinkSdkLoader::load(const QString& path)
 {
     QMutexLocker locker(&s_mutex);
@@ -113,15 +90,7 @@ bool JLinkSdkLoader::load(const QString& path)
     return true;
 }
 
-/**
- * @brief 解析所有 SDK 函数符号
- *
- * 从已加载的 QLibrary 中逐一 resolve 所有函数指针。
- * JLINK_Open 为必需符号，解析失败返回 false。
- * 其余符号为可选，缺失时指针保持 nullptr（调用时跳过）。
- *
- * @return true 必需符号全部解析成功，false JLINK_Open 缺失
- */
+/** @brief 解析所有SDK函数符号，JLINK_Open为必需，其余为可选 @return true=必需符号全部解析成功，false=JLINK_Open缺失 */
 bool JLinkSdkLoader::resolveFunctions()
 {
     if (!m_library || !m_library->isLoaded()) {
@@ -152,12 +121,7 @@ bool JLinkSdkLoader::resolveFunctions()
     return true;
 }
 
-/**
- * @brief 卸载 J-Link SDK
- *
- * 卸载动态库并释放 QLibrary 实例。
- * 重置所有 SDK 函数指针和加载状态。
- */
+/** @brief 卸载J-Link SDK，释放QLibrary实例并重置所有函数指针 */
 void JLinkSdkLoader::unload()
 {
     if (m_library) {
@@ -182,26 +146,13 @@ void JLinkSdkLoader::unload()
     m_fnRttWrite = nullptr;
 }
 
-/**
- * @brief 查询 SDK 是否已加载
- * @return true 已加载，false 未加载
- */
+/** @brief 查询SDK是否已加载 @return true=已加载，false=未加载 */
 bool JLinkSdkLoader::isLoaded() const
 {
     return m_loaded;
 }
 
-/**
- * @brief 获取 SDK 版本字符串
- *
- * 调用 JLINK_GetDLLVersion() 获取整数版本号。
- * 版本编码: major = version / 10000,
- *           minor = (version / 100) % 100,
- *           patch = version % 100 → 映射为字母 a-z。
- * 格式: "V<major>.<minor><patch>"（如 "V7.88b"）。
- *
- * @return 版本号字符串，未加载时返回空字符串
- */
+/** @brief 获取SDK版本号字符串，格式"V<major>.<minor><patch>"(如V7.88b)，未加载返回空 @return 版本号字符串 */
 QString JLinkSdkLoader::sdkVersion() const
 {
     if (!m_loaded || !m_fnGetDLLVersion) {
@@ -227,14 +178,7 @@ QString JLinkSdkLoader::sdkVersion() const
         .arg(patchLetter);
 }
 
-/**
- * @brief 连接到目标设备
- *
- * 依次调用 JLINK_Open → JLINK_Connect 连接 J-Link 调试器。
- *
- * @param deviceId 设备标识（如 "Cortex-M4"）
- * @return true 连接成功，false SDK 未加载或连接失败
- */
+/** @brief 连接到目标设备(JLINK_Open→JLINK_Connect) @param deviceId 设备标识(如"Cortex-M4") @return true=连接成功，false=SDK未加载或连接失败 */
 bool JLinkSdkLoader::connectToDevice(const QString& deviceId)
 {
     QMutexLocker locker(&s_mutex);
@@ -257,11 +201,7 @@ bool JLinkSdkLoader::connectToDevice(const QString& deviceId)
     return (connectResult == 0);
 }
 
-/**
- * @brief 断开与目标设备的连接
- *
- * 依次调用 JLINK_Disconnect → JLINK_Close。
- */
+/** @brief 断开与目标设备的连接(JLINK_Disconnect→JLINK_Close) */
 void JLinkSdkLoader::disconnect()
 {
     QMutexLocker locker(&s_mutex);
@@ -278,14 +218,7 @@ void JLinkSdkLoader::disconnect()
     }
 }
 
-/**
- * @brief 启动 RTT 通信
- *
- * 调用 JLINK_RTTERMINAL_Control(cmd=0, buf=nullptr) 启动 RTT 会话。
- * cmd=0 对应 SEGGER RTT 的 START 命令。
- *
- * @return 0 成功，非零为 SDK 错误码，-1 表示 SDK 未加载
- */
+/** @brief 启动RTT通信(cmd=0对应RTT_START) @return 0=成功，非零=SDK错误码，-1=SDK未加载 */
 int JLinkSdkLoader::rttStart()
 {
     QMutexLocker locker(&s_mutex);
@@ -299,14 +232,7 @@ int JLinkSdkLoader::rttStart()
     return m_fnRttControl(0, nullptr);
 }
 
-/**
- * @brief 停止 RTT 通信
- *
- * 调用 JLINK_RTTERMINAL_Control(cmd=1, buf=nullptr) 停止 RTT 会话。
- * cmd=1 对应 SEGGER RTT 的 STOP 命令。
- *
- * @return 0 成功，非零为 SDK 错误码，-1 表示 SDK 未加载
- */
+/** @brief 停止RTT通信(cmd=1对应RTT_STOP) @return 0=成功，非零=SDK错误码，-1=SDK未加载 */
 int JLinkSdkLoader::rttStop()
 {
     QMutexLocker locker(&s_mutex);
@@ -319,14 +245,7 @@ int JLinkSdkLoader::rttStop()
     return m_fnRttControl(1, nullptr);
 }
 
-/**
- * @brief 从 RTT 通道读取数据
- *
- * @param channel RTT 通道号（0-15）
- * @param buf 接收缓冲区
- * @param size 缓冲区大小
- * @return 实际读取字节数，-1 表示失败或 SDK 未加载
- */
+/** @brief 从RTT通道读取数据 @param channel RTT通道号(0-15) @param buf 接收缓冲区 @param size 缓冲区大小 @return 实际读取字节数，-1=失败或SDK未加载 */
 int JLinkSdkLoader::rttRead(int channel, char* buf, int size)
 {
     QMutexLocker locker(&s_mutex);
@@ -338,14 +257,7 @@ int JLinkSdkLoader::rttRead(int channel, char* buf, int size)
     return m_fnRttRead(channel, buf, size);
 }
 
-/**
- * @brief 向 RTT 通道写入数据
- *
- * @param channel RTT 通道号（0-15）
- * @param buf 待写入数据
- * @param numBytes 待写入字节数
- * @return 实际写入字节数，-1 表示失败或 SDK 未加载
- */
+/** @brief 向RTT通道写入数据 @param channel RTT通道号(0-15) @param buf 待写入数据 @param numBytes 待写入字节数 @return 实际写入字节数，-1=失败或SDK未加载 */
 int JLinkSdkLoader::rttWrite(int channel, const char* buf, int numBytes)
 {
     QMutexLocker locker(&s_mutex);
@@ -357,12 +269,7 @@ int JLinkSdkLoader::rttWrite(int channel, const char* buf, int numBytes)
     return m_fnRttWrite(channel, buf, numBytes);
 }
 
-/**
- * @brief 选择调试接口类型
- *
- * @param ifType 接口类型：0=JTAG, 1=SWD
- * @return true 设置成功，false 失败或 SDK 未加载
- */
+/** @brief 选择调试接口类型 @param ifType 接口类型: 0=JTAG, 1=SWD @return true=设置成功，false=失败或SDK未加载 */
 bool JLinkSdkLoader::selectInterface(int ifType)
 {
     QMutexLocker locker(&s_mutex);
@@ -375,10 +282,7 @@ bool JLinkSdkLoader::selectInterface(int ifType)
     return (result == 0);
 }
 
-/**
- * @brief 设置 J-Link 连接速度
- * @param kHz 速度值（单位 kHz），如 4000 表示 4MHz
- */
+/** @brief 设置J-Link连接速度 @param kHz 速度值(单位kHz)，如4000表示4MHz */
 void JLinkSdkLoader::setSpeed(int kHz)
 {
     QMutexLocker locker(&s_mutex);
@@ -390,26 +294,31 @@ void JLinkSdkLoader::setSpeed(int kHz)
 
 // ---- 统计接口 ----
 
+/** @brief 获取SDK加载尝试总次数 @return 累计加载尝试次数 */
 quint64 JLinkSdkLoader::totalLoadAttempts() const
 {
     return m_totalLoadAttempts;
 }
 
+/** @brief 获取SDK加载成功总次数 @return 累计加载成功次数 */
 quint64 JLinkSdkLoader::totalLoadSuccesses() const
 {
     return m_totalLoadSuccesses;
 }
 
+/** @brief 获取设备连接尝试总次数 @return 累计连接尝试次数 */
 quint64 JLinkSdkLoader::totalConnectAttempts() const
 {
     return m_totalConnectAttempts;
 }
 
+/** @brief 获取RTT启动总次数 @return 累计RTT启动次数 */
 quint64 JLinkSdkLoader::totalRttStarts() const
 {
     return m_totalRttStarts;
 }
 
+/** @brief 重置SDK统计计数器为初始值 */
 void JLinkSdkLoader::resetSdkStatistics()
 {
     m_totalLoadAttempts = 0;

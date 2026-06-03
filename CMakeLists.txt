@@ -154,6 +154,8 @@ set(SOURCES
     # ── F2: 自定义协议引擎 ──
     src/protocol/schema/ProtocolSchema.cpp
     src/protocol/engine/ProtocolEngine.cpp
+    src/protocol/engine/ProtocolEngineStats.cpp
+    src/protocol/engine/ProtocolEngineChecksum.cpp
     src/protocol/schema/ProtocolTemplateLibrary.cpp
     src/protocol/editor/ProtocolSchemaEditor.cpp
     src/protocol/engine/ProtocolFieldMapper.cpp
