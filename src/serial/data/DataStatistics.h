@@ -86,6 +86,9 @@ public:
     /** @brief 获取所有update()调用传入的字节总数(RX+TX) @return 累计字节数 */
     quint64 totalBytesCounted() const;
 
+    /** @brief 获取峰值速率更新总次数 @return 峰值更新次数 */
+    quint64 totalPeakUpdates() const;
+
     /** @brief 重置数据统计计数器(不影响面板显示) */
     void resetDataStatistics();
 
@@ -145,6 +148,7 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalUpdates = 0;    ///< update()调用总次数
     quint64 m_totalBytesCounted = 0; ///< 所有update()传入的字节总数(RX+TX)
+    quint64 m_totalPeakUpdates = 0;  ///< 峰值速率更新总次数
 };
 
 #endif // DATASTATISTICS_H

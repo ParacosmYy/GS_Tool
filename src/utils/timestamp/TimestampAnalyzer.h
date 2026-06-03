@@ -49,12 +49,15 @@ public:
     quint64 totalConversions() const;
     /** @brief 获取累计解析次数 */
     quint64 totalParses() const;
+    /** @brief 获取累计分析字节数(输入字符串长度总和) */
+    quint64 totalBytesAnalyzed() const;
     /** @brief 重置统计计数器 */
     void resetStats();
 
 private:
     mutable quint64 m_totalConversions = 0; ///< 累计转换次数
     mutable quint64 m_totalParses = 0;      ///< 累计解析次数
+    mutable quint64 m_totalBytesAnalyzed = 0; ///< 累计分析字节数
 };
 
 #endif // TIMESTAMPANALYZER_H

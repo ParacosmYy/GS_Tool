@@ -35,6 +35,7 @@ UsbLibraryLoader::~UsbLibraryLoader()
 bool UsbLibraryLoader::load(const QString& libraryPath)
 {
     QMutexLocker locker(&m_mutex);
+    ++m_totalLoadAttempts;
 
     if (m_loaded) { return true; }
 
@@ -51,6 +52,7 @@ bool UsbLibraryLoader::load(const QString& libraryPath)
         m_library = new QLibrary(path, this);
         if (m_library->load()) {
             m_loaded = true;
+            ++m_totalSuccessfulLoads;
             if (resolveFunctions()) {
                 m_lastError.clear();
                 emit loadStateChanged(true);
@@ -299,5 +301,6 @@ QStringList UsbLibraryLoader::searchPaths() const
 bool UsbLibraryLoader::setError(const QString& error)
 {
     m_lastError = error;
+    ++m_totalErrors;
     return false;
 }

@@ -32,6 +32,7 @@ RecordingController::RecordingController(DataLogger* logger, QObject* parent)
         emit statusMessage(tr("回放完成"), 3000);
     });
     connect(m_logger, &DataLogger::error, this, [this](const QString& msg) {
+        ++m_totalErrors;
         emit statusMessage(msg, 5000);
     });
 }
@@ -70,6 +71,7 @@ void RecordingController::setConnected(bool connected)
 quint64 RecordingController::totalRecordings() const { return m_totalRecordings; }
 quint64 RecordingController::totalPlaybacks() const { return m_totalPlaybacks; }
 quint64 RecordingController::totalBytesPlayed() const { return m_totalBytesPlayed; }
+quint64 RecordingController::totalErrors() const { return m_totalErrors; }
 
 /** @brief 重置所有统计计数器 */
 void RecordingController::resetRecordingStatistics()
@@ -77,6 +79,7 @@ void RecordingController::resetRecordingStatistics()
     m_totalRecordings = 0;
     m_totalPlaybacks = 0;
     m_totalBytesPlayed = 0;
+    m_totalErrors = 0;
 }
 
 /**
@@ -113,6 +116,7 @@ void RecordingController::onToggleRecording()
             m_recordAction->blockSignals(true);
             m_recordAction->setChecked(false);
             m_recordAction->blockSignals(false);
+            ++m_totalErrors;
             emit statusMessage(tr("录制启动失败，请检查文件路径和权限"), 5000);
             return;
         }
@@ -142,6 +146,7 @@ void RecordingController::onOpenPlayback()
     if (path.isEmpty()) return;
 
     if (!m_logger->startPlayback(path)) {
+        ++m_totalErrors;
         emit statusMessage(tr("回放启动失败，请检查文件格式"), 5000);
         return;
     }

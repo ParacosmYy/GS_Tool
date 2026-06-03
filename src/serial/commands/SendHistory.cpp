@@ -84,6 +84,7 @@ QList<SendEntry> SendHistory::entries() const
 QList<SendEntry> SendHistory::search(const QString& keyword) const
 {
     QList<SendEntry> result;
+    ++m_totalSearches;
 
     if (keyword.isEmpty()) {
         // 关键词为空时返回所有记录
@@ -108,6 +109,7 @@ void SendHistory::clear()
     m_totalSendCount = 0;
     m_totalRecords = 0;
     m_totalDuplicateSkips = 0;
+    ++m_totalClears;
     emit historyChanged();
 }
 
@@ -208,6 +210,24 @@ quint64 SendHistory::totalDuplicateSkips() const
 }
 
 /**
+ * @brief 获取搜索调用总次数
+ * @return 累计搜索次数
+ */
+quint64 SendHistory::totalSearches() const
+{
+    return m_totalSearches;
+}
+
+/**
+ * @brief 获取清空操作总次数
+ * @return 累计清空次数
+ */
+quint64 SendHistory::totalClears() const
+{
+    return m_totalClears;
+}
+
+/**
  * @brief 重置所有统计计数器
  *
  * 将 totalRecords、totalDuplicateSkips、totalSendCount 全部归零，
@@ -218,6 +238,8 @@ void SendHistory::resetStatistics()
     m_totalRecords = 0;
     m_totalDuplicateSkips = 0;
     m_totalSendCount = 0;
+    m_totalSearches = 0;
+    m_totalClears = 0;
     m_freqMap.clear();
     m_entries.clear();
     emit historyChanged();

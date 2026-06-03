@@ -61,6 +61,20 @@ public:
     /** @brief 预计剩余时间(秒)。速率<=0或总量<=0时返回-1。ETA=剩余字节/当前速率 */
     double etaSeconds() const;
 
+    // ── 统计计数器 Getter ──
+
+    /** @brief 获取已发送数据块总数(Block0+数据块) @return 累计块数 */
+    quint64 totalBlocksSent() const;
+
+    /** @brief 获取传输重试总次数(超时/NAK触发的重发) @return 累计重试次数 */
+    quint64 totalRetries() const;
+
+    /** @brief 获取传输错误总次数(CAN取消/写入失败等) @return 累计错误次数 */
+    quint64 totalErrorCount() const;
+
+    /** @brief 重置YMODEM传输统计计数器(不影响传输状态) */
+    void resetYmodemStatistics();
+
 signals:
     /** @brief 速率和ETA更新。每次收到ACK后发射。
      *  @param rateBytesPerSec 速率 @param etaSec ETA(-1=无法估算)
@@ -168,6 +182,11 @@ private:
     int m_blockRetryCount = 0;        ///< 当前阶段重试次数(上限10)
     QElapsedTimer m_transferTimer;    ///< 传输计时器
     double m_currentRate = 0.0;       ///< 当前速率(字节/秒)
+
+    // ── 统计计数器 ──
+    quint64 m_totalBlocksSent = 0;    ///< 已发送数据块总数(Block0+数据块)
+    quint64 m_totalRetries = 0;       ///< 传输重试总次数(超时/NAK触发)
+    quint64 m_totalErrorCount = 0;    ///< 传输错误总次数(CAN/写入失败)
 };
 
 #endif // YMODEMTRANSFER_H

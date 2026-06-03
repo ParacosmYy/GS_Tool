@@ -79,6 +79,12 @@ public:
     /** @brief 获取累计接收字节数 */
     qint64 totalBytesReceived() const;
 
+    /** @brief 获取组播组加入总次数 */
+    quint64 totalJoins() const;
+
+    /** @brief 获取组播组离开总次数 */
+    quint64 totalLeaves() const;
+
     /** @brief 重置统计数据 */
     void resetStatistics();
 
@@ -115,6 +121,10 @@ private:
     qint64 m_txBytes = 0;
     /** @brief 累计接收字节数 */
     qint64 m_rxBytes = 0;
+    /** @brief 组播组加入总次数 */
+    quint64 m_totalJoins = 0;
+    /** @brief 组播组离开总次数 */
+    quint64 m_totalLeaves = 0;
 };
 
 #endif // UDPMULTICASTCONNECTION_H

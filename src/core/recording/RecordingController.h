@@ -54,6 +54,8 @@ public:
     quint64 totalPlaybacks() const;
     /** @brief 获取累计回放字节数 */
     quint64 totalBytesPlayed() const;
+    /** @brief 获取累计错误次数（录制/回放启动失败等） */
+    quint64 totalErrors() const;
     /** @brief 重置所有统计计数器 */
     void resetRecordingStatistics();
 
@@ -97,6 +99,7 @@ private:
     quint64 m_totalRecordings = 0;         ///< 累计录制次数
     quint64 m_totalPlaybacks = 0;          ///< 累计回放次数
     quint64 m_totalBytesPlayed = 0;        ///< 累计回放字节数
+    quint64 m_totalErrors = 0;             ///< 累计错误次数
 };
 
 #endif // RECORDINGCONTROLLER_H

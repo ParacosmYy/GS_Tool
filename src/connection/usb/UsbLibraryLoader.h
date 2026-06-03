@@ -192,6 +192,16 @@ private:
     FnGetString  m_fnGetString = nullptr;
     FnGetDevice  m_fnGetDevice = nullptr;
     FnGetDeviceDesc m_fnGetDeviceDesc = nullptr;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalLoadAttempts = 0;    ///< 累计加载尝试次数
+    quint64 m_totalSuccessfulLoads = 0; ///< 累计成功加载次数
+    quint64 m_totalErrors = 0;          ///< 累计错误次数
+public:
+    quint64 totalLoadAttempts() const { return m_totalLoadAttempts; }
+    quint64 totalSuccessfulLoads() const { return m_totalSuccessfulLoads; }
+    quint64 totalErrors() const { return m_totalErrors; }
+    void resetLoaderStatistics() { m_totalLoadAttempts = 0; m_totalSuccessfulLoads = 0; m_totalErrors = 0; }
 };
 
 #endif // USBLIBRARYLOADER_H

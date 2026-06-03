@@ -92,7 +92,13 @@ public:
     /** @brief 获取因连续重复而被跳过的去重次数 */
     quint64 totalDuplicateSkips() const;
 
-    /** @brief 重置所有统计计数器（totalRecords/totalDuplicateSkips/totalSendCount） */
+    /** @brief 获取搜索调用总次数 */
+    quint64 totalSearches() const;
+
+    /** @brief 获取清空操作总次数 */
+    quint64 totalClears() const;
+
+    /** @brief 重置所有统计计数器（totalRecords/totalDuplicateSkips/totalSendCount/totalSearches/totalClears） */
     void resetStatistics();
 
 signals:
@@ -106,6 +112,8 @@ private:
     int m_maxEntries = 50;                  ///< 最大记录条数
     quint64 m_totalRecords = 0;             ///< 历史记录总条目数（累计添加）
     quint64 m_totalDuplicateSkips = 0;      ///< 因连续重复而被跳过的去重次数
+    mutable quint64 m_totalSearches = 0;    ///< 搜索调用总次数（mutable: const方法中递增）
+    quint64 m_totalClears = 0;              ///< 清空操作总次数
 };
 
 #endif // SENDHISTORY_H

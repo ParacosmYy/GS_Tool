@@ -136,6 +136,7 @@ void DataStatistics::reset()
     // 重置统计计数器
     m_totalUpdates = 0;
     m_totalBytesCounted = 0;
+    m_totalPeakUpdates = 0;
 
     // 重置错误计数
     m_framingErrors = 0;
@@ -197,8 +198,8 @@ void DataStatistics::onRefreshTimer()
     m_txRateLabel->setText(formatRate(m_txRate));
 
     // 更新峰值速率（取历史最大值）
-    if (m_rxRate > m_peakRxRate) m_peakRxRate = m_rxRate;
-    if (m_txRate > m_peakTxRate) m_peakTxRate = m_txRate;
+    if (m_rxRate > m_peakRxRate) { m_peakRxRate = m_rxRate; ++m_totalPeakUpdates; }
+    if (m_txRate > m_peakTxRate) { m_peakTxRate = m_txRate; ++m_totalPeakUpdates; }
     double peakRate = qMax(m_peakRxRate, m_peakTxRate);
     m_peakRateLabel->setText(formatRate(peakRate));
 
@@ -350,4 +351,11 @@ void DataStatistics::resetDataStatistics()
 {
     m_totalUpdates = 0;
     m_totalBytesCounted = 0;
+    m_totalPeakUpdates = 0;
+}
+
+/** @brief 获取峰值速率更新总次数 @return 峰值更新次数 */
+quint64 DataStatistics::totalPeakUpdates() const
+{
+    return m_totalPeakUpdates;
 }

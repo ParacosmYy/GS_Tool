@@ -162,6 +162,7 @@ void UdpMulticastConnection::joinGroup(const QHostAddress& groupAddress)
 {
     if (!m_socket) return;
 
+    ++m_totalJoins;
     if (m_usingCustomInterface && m_multicastInterface.isValid()) {
         if (!m_socket->joinMulticastGroup(groupAddress, m_multicastInterface)) {
             emit errorOccurred(tr("加入组播组失败: %1").arg(m_socket->errorString()));
@@ -181,6 +182,7 @@ void UdpMulticastConnection::leaveGroup(const QHostAddress& groupAddress)
 {
     if (!m_socket) return;
 
+    ++m_totalLeaves;
     if (m_usingCustomInterface && m_multicastInterface.isValid()) {
         m_socket->leaveMulticastGroup(groupAddress, m_multicastInterface);
     } else {
@@ -291,4 +293,22 @@ void UdpMulticastConnection::resetStatistics()
     m_dgramsRecv = 0;
     m_txBytes = 0;
     m_rxBytes = 0;
+    m_totalJoins = 0;
+    m_totalLeaves = 0;
+}
+
+/**
+ * @brief 获取组播组加入总次数
+ */
+quint64 UdpMulticastConnection::totalJoins() const
+{
+    return m_totalJoins;
+}
+
+/**
+ * @brief 获取组播组离开总次数
+ */
+quint64 UdpMulticastConnection::totalLeaves() const
+{
+    return m_totalLeaves;
 }

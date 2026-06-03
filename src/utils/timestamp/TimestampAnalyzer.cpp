@@ -32,10 +32,11 @@ qint64 TimestampAnalyzer::currentUnix(bool millis)
     return millis ? (secs * 1000) : secs;
 }
 
-/** @brief 解析时间戳字符串 — 累计解析计数 */
+/** @brief 解析时间戳字符串 — 累计解析计数和字节数 */
 QDateTime TimestampAnalyzer::parseTimestamp(const QString &text) const
 {
     ++m_totalParses;
+    m_totalBytesAnalyzed += static_cast<quint64>(text.toUtf8().size());
     if (text.isEmpty()) return {};
 
     bool ok = false;
@@ -107,4 +108,5 @@ QString TimestampAnalyzer::formatDifference(const QDateTime& from, const QDateTi
 
 quint64 TimestampAnalyzer::totalConversions() const { return m_totalConversions; }
 quint64 TimestampAnalyzer::totalParses() const { return m_totalParses; }
-void TimestampAnalyzer::resetStats() { m_totalConversions = 0; m_totalParses = 0; }
+quint64 TimestampAnalyzer::totalBytesAnalyzed() const { return m_totalBytesAnalyzed; }
+void TimestampAnalyzer::resetStats() { m_totalConversions = 0; m_totalParses = 0; m_totalBytesAnalyzed = 0; }

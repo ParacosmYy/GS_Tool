@@ -10,6 +10,25 @@
 /** @brief 构造函数，初始化YMODEM传输器基类 */
 YModemTransfer::YModemTransfer(QObject* parent) : BaseTransfer(parent) {}
 
+// ── 统计计数器 Getter/Reset ──
+
+/** @brief 获取已发送数据块总数(Block0+数据块) @return 累计块数 */
+quint64 YModemTransfer::totalBlocksSent() const { return m_totalBlocksSent; }
+
+/** @brief 获取传输重试总次数(超时/NAK触发的重发) @return 累计重试次数 */
+quint64 YModemTransfer::totalRetries() const { return m_totalRetries; }
+
+/** @brief 获取传输错误总次数(CAN取消/写入失败等) @return 累计错误次数 */
+quint64 YModemTransfer::totalErrorCount() const { return m_totalErrorCount; }
+
+/** @brief 重置YMODEM传输统计计数器(不影响传输状态) */
+void YModemTransfer::resetYmodemStatistics()
+{
+    m_totalBlocksSent = 0;
+    m_totalRetries = 0;
+    m_totalErrorCount = 0;
+}
+
 /** @brief 设置单个文件路径用于传输
  *  @param path 文件绝对路径 */
 void YModemTransfer::setFilePath(const QString& path) { m_filePaths = QStringList{path}; }
@@ -81,6 +100,7 @@ bool YModemTransfer::writeChecked(const QByteArray& data)
     if (!m_conn) {
         m_ymodemState = State::Error;
         markError();
+        ++m_totalErrorCount;
         emit transferError(tr("连接中断: 连接对象无效"));
         return false;
     }
@@ -88,6 +108,7 @@ bool YModemTransfer::writeChecked(const QByteArray& data)
     if (written < 0) {
         m_ymodemState = State::Error;
         markError();
+        ++m_totalErrorCount;
         emit transferError(
             tr("连接中断: 写入失败, 已传输 %1/%2 字节")
                 .arg(m_totalBytesSent)
@@ -123,10 +144,12 @@ void YModemTransfer::handleTimeout()
 
     // 有重试上限的状态统一处理
     m_blockRetryCount++;
+    ++m_totalRetries;
     if (m_blockRetryCount > kMaxBlockRetries) {
         sendCancelBytes();
         m_ymodemState = State::Error;
         markError();
+        ++m_totalErrorCount;
         emit transferError(tr("超时: 重试次数耗尽 (10次)"));
         return;
     }
@@ -214,6 +237,7 @@ void YModemTransfer::sendBlock0()
     QByteArray packet = buildBlock(0, block0);
     if (m_conn) {
         writeChecked(packet);
+        ++m_totalBlocksSent;
     }
 }
 
@@ -238,6 +262,7 @@ void YModemTransfer::sendBlock()
     QByteArray packet = buildBlock(m_blockNumber, blockData);
     if (m_conn) {
         writeChecked(packet);
+        ++m_totalBlocksSent;
     }
     /* 仅在首次发送该块时更新进度(NAK重传时不重复推进)
      * m_bytesSent指向当前块起始偏移，首次发送时sent > m_bytesSent
