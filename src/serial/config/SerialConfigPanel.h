@@ -161,6 +161,10 @@ private:
     bool m_dtrState = true;         ///< DTR信号状态(true=HIGH, 默认HIGH)
     bool m_rtsState = true;         ///< RTS信号状态(true=HIGH, 默认HIGH)
 
+    // ---- 操作统计计数器 ----
+    quint64 m_totalConfigChanges = 0;  ///< 累计配置变更次数(波特率/数据位/校验/停止位/流控)
+    quint64 m_totalPortSwitches = 0;    ///< 累计端口切换次数
+
     // ---- 呼吸动画 ----
     QAbstractAnimation* m_breathAnim = nullptr;  ///< 连接中状态的呼吸动画(0.3↔1.0循环)
 };

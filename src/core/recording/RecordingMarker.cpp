@@ -55,6 +55,9 @@ void RecordingMarker::addMarker(const QString& label, qint64 timestampMs)
     int index = static_cast<int>(std::distance(m_markers.begin(), it));
     m_markers.insert(index, entry);
 
+    // 统计：累计添加标记计数
+    ++m_totalMarkersAdded;
+
     emit markerAdded(index, label);
 }
 
@@ -71,6 +74,10 @@ void RecordingMarker::removeMarker(int index)
         return;
     }
     m_markers.removeAt(index);
+
+    // 统计：累计移除标记计数
+    ++m_totalMarkersRemoved;
+
     emit markerRemoved(index);
 }
 
@@ -124,6 +131,7 @@ void RecordingMarker::clear()
     while (!m_markers.isEmpty()) {
         int lastIdx = m_markers.size() - 1;
         m_markers.removeAt(lastIdx);
+        ++m_totalMarkersRemoved;
         emit markerRemoved(lastIdx);
     }
 }
@@ -217,4 +225,62 @@ QList<int> RecordingMarker::findInRange(qint64 fromMs, qint64 toMs) const
     }
 
     return result;
+}
+
+// ============================================================================
+// 跳转
+// ============================================================================
+
+/**
+ * @brief 跳转到指定索引的标记
+ *
+ * 索引越界时返回 -1 且不发射信号。
+ *
+ * @param index 目标标记索引
+ * @return 对应标记的时间戳，越界返回 -1
+ */
+qint64 RecordingMarker::jumpToMarker(int index)
+{
+    if (index < 0 || index >= m_markers.size()) {
+        return -1;
+    }
+
+    // 统计：累计跳转事件计数
+    ++m_totalJumpEvents;
+
+    qint64 ts = m_markers[index].timestampMs;
+    emit markerJumped(index, ts);
+    return ts;
+}
+
+// ============================================================================
+// 统计接口
+// ============================================================================
+
+/** @brief 获取累计添加标记总数 */
+quint64 RecordingMarker::totalMarkersAdded() const
+{
+    return m_totalMarkersAdded;
+}
+
+/** @brief 获取累计移除标记总数 */
+quint64 RecordingMarker::totalMarkersRemoved() const
+{
+    return m_totalMarkersRemoved;
+}
+
+/** @brief 获取累计跳转事件总数 */
+quint64 RecordingMarker::totalJumpEvents() const
+{
+    return m_totalJumpEvents;
+}
+
+/**
+ * @brief 重置所有统计计数器为零
+ */
+void RecordingMarker::resetStats()
+{
+    m_totalMarkersAdded = 0;
+    m_totalMarkersRemoved = 0;
+    m_totalJumpEvents = 0;
 }

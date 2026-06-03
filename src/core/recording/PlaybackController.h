@@ -106,6 +106,20 @@ public:
     /** @brief 重置统计数据 */
     void resetStatistics();
 
+    // ==================== 统计接口 ====================
+
+    /** @brief 获取累计回放启动次数 */
+    quint64 totalPlaybacks() const;
+
+    /** @brief 获取累计暂停次数 */
+    quint64 totalPauses() const;
+
+    /** @brief 获取累计定位次数 */
+    quint64 totalSeeks() const;
+
+    /** @brief 重置所有统计计数器（含基础统计） */
+    void resetStats();
+
 signals:
     /**
      * @brief 回放已启动信号
@@ -158,6 +172,11 @@ private:
     qint64 m_totalPlayTimeMs = 0;
     /** @brief 倍速累计（用于计算平均倍速） */
     qreal m_speedSum = 0.0;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalPlaybacks = 0;  ///< 累计回放启动次数
+    quint64 m_totalPauses = 0;     ///< 累计暂停次数
+    quint64 m_totalSeeks = 0;      ///< 累计定位次数
 };
 
 #endif // PLAYBACK_CONTROLLER_H

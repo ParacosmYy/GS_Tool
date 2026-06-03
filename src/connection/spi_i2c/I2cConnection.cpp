@@ -77,12 +77,14 @@ bool I2cConnection::open()
 {
     if (!m_serial) {
         emit errorOccurred(tr("未设置串口传输通道"));
+        ++m_errorCount;
         updateState(ConnectionState::Error);
         return false;
     }
 
     if (!m_serial->open()) {
         emit errorOccurred(tr("串口打开失败"));
+        ++m_errorCount;
         updateState(ConnectionState::Error);
         return false;
     }
@@ -116,8 +118,20 @@ void I2cConnection::close()
  */
 qint64 I2cConnection::write(const QByteArray& data)
 {
-    if (m_state != ConnectionState::Connected) return -1;
-    return sendCommand(CMD_I2C_WRITE, data);
+    if (m_state != ConnectionState::Connected) {
+        ++m_errorCount;
+        return -1;
+    }
+
+    qint64 written = sendCommand(CMD_I2C_WRITE, data);
+
+    if (written > 0) {
+        ++m_totalTransactions;
+        m_totalBytesSent += static_cast<quint64>(written);
+    } else {
+        ++m_errorCount;
+    }
+    return written;
 }
 
 /**
@@ -186,6 +200,7 @@ QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
 {
     QByteArray data;
     if (m_state != ConnectionState::Connected || !m_serial) {
+        ++m_errorCount;
         emit registerRead(regAddr, data);
         return data;
     }
@@ -207,6 +222,11 @@ QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
         }
     }
 
+    /// 更新统计: 读操作
+    ++m_totalTransactions;
+    m_totalBytesSent += static_cast<quint64>(frame.size());
+    m_totalBytesReceived += static_cast<quint64>(data.size());
+
     emit registerRead(regAddr, data);
     return data;
 }
@@ -223,11 +243,19 @@ QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
 bool I2cConnection::writeRegister(int deviceAddr, int regAddr, const QByteArray& data)
 {
     if (m_state != ConnectionState::Connected || !m_serial) {
+        ++m_errorCount;
         return false;
     }
 
     QByteArray frame = buildWriteFrame(deviceAddr, regAddr, data);
     qint64 written = m_serial->write(frame);
+
+    if (written > 0) {
+        ++m_totalTransactions;
+        m_totalBytesSent += static_cast<quint64>(written);
+    } else {
+        ++m_errorCount;
+    }
     return written > 0;
 }
 
@@ -307,4 +335,15 @@ QByteArray I2cConnection::buildWriteFrame(int deviceAddr, int regAddr, const QBy
                        .append(static_cast<char>(payload.size() & 0xFF))
                        .append(static_cast<char>((payload.size() >> 8) & 0xFF))
                        .append(payload);
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void I2cConnection::resetStats()
+{
+    m_totalTransactions = 0;
+    m_totalBytesSent = 0;
+    m_totalBytesReceived = 0;
+    m_errorCount = 0;
 }

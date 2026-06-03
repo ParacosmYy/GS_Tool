@@ -92,7 +92,28 @@ public:
      */
     QList<int> findInRange(qint64 fromMs, qint64 toMs) const;
 
- signals:
+    /**
+     * @brief 跳转到指定索引的标记（用于回放定位）
+     * @param index 目标标记索引
+     * @return 对应标记的时间戳，越界时返回 -1
+     */
+    qint64 jumpToMarker(int index);
+
+    // ==================== 统计接口 ====================
+
+    /** @brief 获取累计添加标记总数 */
+    quint64 totalMarkersAdded() const;
+
+    /** @brief 获取累计移除标记总数 */
+    quint64 totalMarkersRemoved() const;
+
+    /** @brief 获取累计跳转事件总数 */
+    quint64 totalJumpEvents() const;
+
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
+
+signals:
     /**
      * @brief 标记已添加信号
      * @param index 新标记的索引
@@ -106,8 +127,20 @@ public:
      */
     void markerRemoved(int index);
 
+    /**
+     * @brief 标记跳转信号
+     * @param index 跳转目标标记索引
+     * @param timestampMs 跳转目标时间戳
+     */
+    void markerJumped(int index, qint64 timestampMs);
+
 private:
     QList<MarkerEntry> m_markers;  ///< 标记列表
+
+    // ---- 统计计数器 ----
+    quint64 m_totalMarkersAdded = 0;    ///< 累计添加标记数
+    quint64 m_totalMarkersRemoved = 0;  ///< 累计移除标记数
+    quint64 m_totalJumpEvents = 0;      ///< 累计跳转事件数
 };
 
 #endif // RECORDING_MARKER_H

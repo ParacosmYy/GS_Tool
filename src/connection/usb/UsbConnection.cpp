@@ -34,6 +34,7 @@ ConnectionState UsbConnection::state() const {
 bool UsbConnection::open() {
     if (m_vid == 0 || m_pid == 0) {
         emit errorOccurred(tr("未设置USB设备VID/PID"));
+        ++m_errorCount;
         return false;
     }
 
@@ -43,6 +44,7 @@ bool UsbConnection::open() {
     if (!loader.isLoaded()) {
         if (!loader.load()) {
             emit errorOccurred(tr("无法加载libusb: %1").arg(loader.lastError()));
+            ++m_errorCount;
             return false;
         }
     }
@@ -50,6 +52,7 @@ bool UsbConnection::open() {
     /* 初始化libusb上下文 */
     if (loader.init(&m_usbContext) != 0) {
         emit errorOccurred(tr("libusb初始化失败"));
+        ++m_errorCount;
         return false;
     }
 
@@ -59,6 +62,7 @@ bool UsbConnection::open() {
         emit errorOccurred(tr("未找到USB设备 %1:%2")
                            .arg(m_vid, 4, 16, QChar('0'))
                            .arg(m_pid, 4, 16, QChar('0')));
+        ++m_errorCount;
         loader.exit(m_usbContext);
         m_usbContext = nullptr;
         return false;
@@ -67,6 +71,7 @@ bool UsbConnection::open() {
     /* 声明接口 */
     if (loader.claimInterface(m_devHandle, m_interface) != 0) {
         emit errorOccurred(tr("无法声明USB接口 %1").arg(m_interface));
+        ++m_errorCount;
         loader.close(m_devHandle);
         m_devHandle = nullptr;
         loader.exit(m_usbContext);
@@ -125,9 +130,12 @@ qint64 UsbConnection::write(const QByteArray& data) {
 
     if (result != 0) {
         emit errorOccurred(tr("USB写入失败: 错误码 %1").arg(result));
+        ++m_errorCount;
         return -1;
     }
 
+    ++m_totalTransfers;
+    m_totalBytesSent += static_cast<quint64>(transferred);
     return transferred;
 }
 
@@ -189,6 +197,7 @@ bool UsbConnection::claimInterface(int interface) {
 
     emit errorOccurred(tr("声明USB接口 %1 失败: 错误码 %2")
                        .arg(interface).arg(result));
+    ++m_errorCount;
     return false;
 }
 
@@ -202,7 +211,10 @@ void UsbConnection::releaseInterface(int interface) {
 
 QByteArray UsbConnection::bulkTransfer(int endpoint,
                                         const QByteArray& data) {
-    if (!m_devHandle) { return QByteArray(); }
+    if (!m_devHandle) {
+        ++m_errorCount;
+        return QByteArray();
+    }
 
     auto& loader = UsbLibraryLoader::instance();
 
@@ -222,8 +234,12 @@ QByteArray UsbConnection::bulkTransfer(int endpoint,
 
         if (result != 0) {
             emit errorOccurred(tr("USB Bulk传输失败: 错误码 %1").arg(result));
+            ++m_errorCount;
             return QByteArray();
         }
+
+        ++m_totalTransfers;
+        m_totalBytesSent += static_cast<quint64>(transferred);
         return data.left(transferred);
     } else {
         /* 接收数据 */
@@ -238,15 +254,22 @@ QByteArray UsbConnection::bulkTransfer(int endpoint,
 
         if (result != 0) {
             emit errorOccurred(tr("USB Bulk接收失败: 错误码 %1").arg(result));
+            ++m_errorCount;
             return QByteArray();
         }
+
+        ++m_totalTransfers;
+        m_totalBytesReceived += static_cast<quint64>(transferred);
         return buffer.left(transferred);
     }
 }
 
 QByteArray UsbConnection::interruptTransfer(int endpoint,
                                              const QByteArray& data) {
-    if (!m_devHandle) { return QByteArray(); }
+    if (!m_devHandle) {
+        ++m_errorCount;
+        return QByteArray();
+    }
 
     auto& loader = UsbLibraryLoader::instance();
     bool isOut = (endpoint & 0x80) == 0;
@@ -263,8 +286,12 @@ QByteArray UsbConnection::interruptTransfer(int endpoint,
 
         if (result != 0) {
             emit errorOccurred(tr("USB Interrupt传输失败: 错误码 %1").arg(result));
+            ++m_errorCount;
             return QByteArray();
         }
+
+        ++m_totalTransfers;
+        m_totalBytesSent += static_cast<quint64>(transferred);
         return data.left(transferred);
     } else {
         QByteArray buffer(data.size() > 0 ? data.size() : 64, '\0');
@@ -279,8 +306,12 @@ QByteArray UsbConnection::interruptTransfer(int endpoint,
 
         if (result != 0) {
             emit errorOccurred(tr("USB Interrupt接收失败: 错误码 %1").arg(result));
+            ++m_errorCount;
             return QByteArray();
         }
+
+        ++m_totalTransfers;
+        m_totalBytesReceived += static_cast<quint64>(transferred);
         return buffer.left(transferred);
     }
 }
@@ -290,7 +321,10 @@ QByteArray UsbConnection::controlTransfer(quint8 requestType,
                                            quint16 value,
                                            quint16 index,
                                            const QByteArray& data) {
-    if (!m_devHandle) { return QByteArray(); }
+    if (!m_devHandle) {
+        ++m_errorCount;
+        return QByteArray();
+    }
 
     auto& loader = UsbLibraryLoader::instance();
 
@@ -307,8 +341,12 @@ QByteArray UsbConnection::controlTransfer(quint8 requestType,
 
         if (result < 0) {
             emit errorOccurred(tr("USB Control传输失败: 错误码 %1").arg(result));
+            ++m_errorCount;
             return QByteArray();
         }
+
+        ++m_totalTransfers;
+        m_totalBytesSent += static_cast<quint64>(result);
         return data.left(result);
     } else {
         /* 接收Control响应 */
@@ -321,8 +359,23 @@ QByteArray UsbConnection::controlTransfer(quint8 requestType,
 
         if (result < 0) {
             emit errorOccurred(tr("USB Control接收失败: 错误码 %1").arg(result));
+            ++m_errorCount;
             return QByteArray();
         }
+
+        ++m_totalTransfers;
+        m_totalBytesReceived += static_cast<quint64>(result);
         return buffer.left(result);
     }
+}
+
+/**
+ * @brief 重置所有统计计数器
+ */
+void UsbConnection::resetStats()
+{
+    m_totalTransfers = 0;
+    m_totalBytesSent = 0;
+    m_totalBytesReceived = 0;
+    m_errorCount = 0;
 }

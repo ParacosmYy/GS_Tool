@@ -43,6 +43,7 @@ set(SOURCES
     src/core/navigation/IconNavBar.cpp
     src/core/send/SendController.cpp
     src/core/send/SendHistoryManager.cpp
+    src/core/event/EventBus.cpp
     src/core/settings/SettingsController.cpp
     src/core/toolbar/ToolbarController.cpp
     src/core/terminal/TerminalController.cpp
@@ -280,6 +281,7 @@ set(HEADERS
     src/interfaces/IDataSink.h
     src/interfaces/IProtocolParser.h
     src/interfaces/IDevice.h
+    src/core/event/EventBus.h
 
     src/core/mainwindow/MainWindow.h
     src/core/connect/ConnectionController.h
