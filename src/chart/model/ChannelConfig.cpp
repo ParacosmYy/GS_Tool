@@ -154,13 +154,14 @@ ChannelConfig ChannelConfig::fromJson(const QJsonObject& obj)
 // ChannelConfigSet 实现
 // ============================================================
 
-/** @brief 按displayName移除通道 @param displayName 通道显示名 */
+/** @brief 按displayName移除通道，更新移除计数和配置变更计数 @param displayName 通道显示名 */
 void ChannelConfigSet::removeChannel(const QString& displayName)
 {
     for (int i = 0; i < m_channels.size(); ++i) {
         if (m_channels[i].displayName == displayName) {
             m_channels.removeAt(i);
             ++m_totalConfigChanges;
+            ++m_totalChannelRemoves;
             return;
         }
     }

@@ -12,11 +12,12 @@
 // ChannelConfigSet 集合操作
 // ============================================================
 
-/** @brief 添加通道配置到集合 @param config 通道配置 */
+/** @brief 添加通道配置到集合，更新添加计数和配置变更计数 @param config 通道配置 */
 void ChannelConfigSet::addChannel(const ChannelConfig& config)
 {
     m_channels.append(config);
     ++m_totalConfigChanges;
+    ++m_totalChannelAdds;
     if (config.color.isValid()) {
         ++m_totalColorChanges;
     }
@@ -72,4 +73,6 @@ void ChannelConfigSet::resetConfigStatistics()
 {
     m_totalConfigChanges = 0;
     m_totalColorChanges = 0;
+    m_totalChannelAdds = 0;
+    m_totalChannelRemoves = 0;
 }

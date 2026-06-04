@@ -1,9 +1,14 @@
 /**
  * @file QssThemeGeneratorWidgets.cpp
- * @brief QSS主题生成器 - 各控件样式生成方法
+ * @brief QSS主题生成器 - 基础控件/面板/导航栏样式生成方法
  *
- * 从 QssThemeGenerator.cpp 拆分而来，包含基础控件/面板/导航栏/
- * 终端/图表/对话框/工具栏的QSS样式生成方法。
+ * 从 QssThemeGenerator.cpp 拆分而来，包含:
+ *   - generateBaseWidgets(): 基础控件QSS(按钮/输入框/复选框/滑块/进度条/滚动条/标签/提示)
+ *   - generatePanels(): 面板容器QSS(分组框/选项卡/分割器/BasePanel)
+ *   - generateNavigation(): 侧边导航栏QSS(导航按钮/选中状态/指示器)
+ *
+ * 终端样式见QssThemeGeneratorTerminal.cpp。
+ * 图表/对话框/工具栏样式见QssThemeGeneratorPanels.cpp。
  */
 
 #include "core/theme/QssThemeGenerator.h"
@@ -229,31 +234,3 @@ QString QssThemeGenerator::generateNavigation(const ColorMap& c)
         c["accent_primary"]   // %5
     );
 }
-
-// ============================================================
-// 终端样式
-// ============================================================
-
-/** @brief 生成终端控件QSS(终端背景/搜索栏/过滤栏) @param c 语义色映射表 @return 终端QSS字符串 */
-QString QssThemeGenerator::generateTerminal(const ColorMap& c)
-{
-    return QString(
-        "#terminalWidget { background: %1; color: %2; }\n"
-        "#terminalSearchBar {"
-        "  background: %3;"
-        "  border: 1px solid %4;"
-        "  border-radius: 4px;"
-        "  padding: 4px 8px;"
-        "}\n"
-        "#terminalFilterBar { background: %3; }\n\n"
-
-    ).arg(
-        c["terminal_bg"],
-        c["terminal_fg"],
-        c["bg_elevated"],
-        c["border_default"]
-    );
-}
-
-// ---- 图表/对话框/工具栏样式已拆分至 QssThemeGeneratorPanels.cpp ----
-// generateCharts() / generateDialogs() / generateToolbar()

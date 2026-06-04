@@ -39,13 +39,13 @@ public:
     ~UdpMulticastConnection() override;
 
     // ---- IConnection接口实现 ----
-    ConnectionType type() const override;
-    QString name() const override;
-    ConnectionState state() const override;
-    bool open() override;
-    void close() override;
-    qint64 write(const QByteArray& data) override;
-    void configure(const QVariantMap& params) override;
+    ConnectionType type() const override;              ///< 返回连接类型(UdpMulticast)
+    QString name() const override;                     ///< 返回连接显示名称
+    ConnectionState state() const override;            ///< 返回当前连接状态
+    bool open() override;                              ///< 绑定本地端口并加入组播组
+    void close() override;                             ///< 离开组播组并关闭socket
+    qint64 write(const QByteArray& data) override;     ///< 发送组播数据报
+    void configure(const QVariantMap& params) override; ///< 配置组播参数(groupAddress/port等)
 
     // ---- UDP组播特有接口 ----
 

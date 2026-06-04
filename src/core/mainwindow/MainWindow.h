@@ -79,6 +79,8 @@ private:
     void handleConnectionState(ConnectionState state, const QString& connName); ///< 处理连接状态变更
     void restoreUserSession(int lastPanel);  ///< 从磁盘恢复用户偏好
     void openQuickConnectionDialog();        ///< Ctrl+N 新建连接入口，弹出快速连接对话框
+    void registerShortcuts();                ///< 注册全局快捷键管理器(搜索/命令面板/录制/清屏/发送/保存)
+    void setupResponsiveLayout();            ///< 初始化响应式布局(断点系统+导航树自动折叠)
 
     // ---- 核心组件 ----
     ConnectionManager* m_connManager;          ///< 连接管理器(IConnection生命周期)

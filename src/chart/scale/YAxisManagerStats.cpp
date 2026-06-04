@@ -58,4 +58,6 @@ void YAxisManager::resetYAxisStatistics()
 {
     m_totalRescales = 0;
     m_totalAutoScaleEvents = 0;
+    m_totalAxisAdds = 0;
+    m_totalAxisRemoves = 0;
 }

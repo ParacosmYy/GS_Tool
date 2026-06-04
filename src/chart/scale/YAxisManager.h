@@ -47,6 +47,8 @@ public:
     // ---- 统计计数接口 ----
     quint64 totalRescales() const;       ///< 累计缩放重算次数
     quint64 totalAutoScaleEvents() const; ///< 累计自动缩放事件次数
+    quint64 totalAxisAdds() const { return m_totalAxisAdds; } ///< 累计轴添加次数
+    quint64 totalAxisRemoves() const { return m_totalAxisRemoves; } ///< 累计轴移除次数
     void resetYAxisStatistics();         ///< 重置所有Y轴统计计数器
 
 signals:
@@ -69,6 +71,8 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalRescales = 0;                   ///< 累计缩放重算次数
     quint64 m_totalAutoScaleEvents = 0;            ///< 累计自动缩放事件次数
+    quint64 m_totalAxisAdds = 0;                   ///< 累计轴添加次数
+    quint64 m_totalAxisRemoves = 0;                ///< 累计轴移除次数
 };
 
 #endif // YAXISMANAGER_H

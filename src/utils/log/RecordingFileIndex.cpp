@@ -234,20 +234,4 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
     return true;
 }
 
-// ============================================================================
-// 统计重置
-// ============================================================================
-
-/** @brief 重置文件格式统计计数器(包含所有统计) */
-void RecordingFileFormat::resetFileFormatStatistics()
-{
-    m_totalSaves = 0;
-    m_totalLoads = 0;
-    m_totalErrors = 0;
-    m_totalBytesWritten = 0;
-    m_totalBytesRead = 0;
-    m_serializationErrors = 0;
-    m_deserializationErrors = 0;
-    m_lookupsPerformed = 0;
-    m_cacheHits = 0;
-}
+// 统计重置见 RecordingFileIndexStats.cpp

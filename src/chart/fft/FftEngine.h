@@ -61,6 +61,12 @@ public:
     /** @brief 获取FFT计算中发生的错误次数（空数据/无效参数等） */
     quint64 errorCount() const;
 
+    /** @brief 获取窗函数类型变更总次数 @return 变更次数 */
+    quint64 totalWindowTypeChanges() const { return m_totalWindowTypeChanges; }
+
+    /** @brief 获取检测到的峰值频率总次数（基频检测命中） @return 峰值频率次数 */
+    quint64 totalPeakFrequenciesDetected() const { return m_totalPeakFrequenciesDetected; }
+
     /** @brief 重置所有统计计数器为初始值 */
     void resetFftStatistics();
 
@@ -94,6 +100,8 @@ private:
     quint64 m_totalSamplesProcessed = 0;  ///< 总处理的采样点数（累计）
     quint64 m_maxSampleSize = 0;          ///< 单次变换处理过的最大采样点数（峰值）
     quint64 m_errorCount = 0;             ///< FFT计算中发生的错误次数
+    quint64 m_totalWindowTypeChanges = 0; ///< 窗函数类型变更总次数
+    quint64 m_totalPeakFrequenciesDetected = 0; ///< 峰值频率检测总次数
 };
 
 #endif // FFTENGINE_H

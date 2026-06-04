@@ -125,6 +125,8 @@ void FftEngine::resetFftStatistics()
     m_totalSamplesProcessed = 0;
     m_maxSampleSize = 0;
     m_errorCount = 0;
+    m_totalWindowTypeChanges = 0;
+    m_totalPeakFrequenciesDetected = 0;
 }
 
 /** @brief 重置所有统计计数器（别名接口） */

@@ -35,8 +35,10 @@ class CanConnection : public IConnection {
     Q_OBJECT
 
 public:
-    explicit CanConnection(QObject* parent = nullptr); ///< 构造CAN连接
-    ~CanConnection() override; ///< 析构函数，自动关闭连接释放DBC解析器
+    /** @brief 构造CAN连接 @param parent 父对象 */
+    explicit CanConnection(QObject* parent = nullptr);
+    /** @brief 析构函数，自动关闭连接释放DBC解析器 */
+    ~CanConnection() override;
 
     // ---- IConnection 接口实现 ----
     ConnectionType type() const override;     ///< 固定返回ConnectionType::Can

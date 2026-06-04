@@ -76,6 +76,7 @@ void YAxisManager::createAxis(const QString& channel, const QColor& color,
     m_axes[channel] = {axis, side, color, unit};
 
     ++m_totalAutoScaleEvents;
+    ++m_totalAxisAdds;
     emit axesChanged();
 }
 
@@ -91,6 +92,8 @@ void YAxisManager::removeAxis(const QString& channel)
     m_chart->removeAxis(it->axis);
     it->axis->deleteLater();
     m_axes.erase(it);
+
+    ++m_totalAxisRemoves;
 
     emit axesChanged();
 }

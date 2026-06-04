@@ -51,11 +51,16 @@ public:
     void resetStats();                                                ///< 重置所有统计计数器
 
 signals:
-    void deviceFound(int address);                        ///< 扫描发现设备
-    void scanComplete(const QList<int>& devices);         ///< 扫描完成
-    void registerRead(int addr, const QByteArray& data);  ///< 寄存器读取完成
-    void burstReadComplete(int startReg, const QByteArray& data); ///< 突发读取完成
-    void nackReceived(int deviceAddr);                    ///< NACK: 设备未响应
+    /** @brief 扫描发现设备 @param address 设备7位地址 */
+    void deviceFound(int address);
+    /** @brief 扫描完成 @param devices 发现的设备地址列表 */
+    void scanComplete(const QList<int>& devices);
+    /** @brief 寄存器读取完成 @param addr 寄存器地址 @param data 读取到的数据 */
+    void registerRead(int addr, const QByteArray& data);
+    /** @brief 突发读取完成 @param startReg 起始寄存器 @param data 读取到的数据 */
+    void burstReadComplete(int startReg, const QByteArray& data);
+    /** @brief NACK: 设备未响应 @param deviceAddr 目标设备地址 */
+    void nackReceived(int deviceAddr);
 
 private slots:
     void onTransportData(const QByteArray& data); ///< 底层串口数据到达回调

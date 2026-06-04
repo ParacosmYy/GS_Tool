@@ -69,6 +69,7 @@ public:
 signals:
     /** @brief 用户点击连接按钮 */
     void connectRequested();
+    /** @brief 用户点击断开按钮 */
     void disconnectRequested();
 
 private:

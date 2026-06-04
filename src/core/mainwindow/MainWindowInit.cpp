@@ -9,13 +9,15 @@
  *   3. 构建 UI 布局和状态栏
  *   4. 连接所有信号/槽
  *   5. 构建导航树和面板映射
- *   6. 创建命令面板/脚本录制器/响应式布局/快捷键管理器
+ *   6. 创建命令面板/脚本录制器
  *   7. 加载持久化设置
+ *   8. 注册快捷键和响应式布局
  *
  * UI布局构建见 MainWindowSetupUI.cpp
  * 信号/槽连接见 MainWindowSignalConnect.cpp
  * 面板连接见 MainWindowPanelConnect.cpp
  * 生命周期与事件处理见 MainWindowLifecycle.cpp
+ * 快捷键与响应式布局见 MainWindowInitShortcuts.cpp
  */
 
 #include "core/mainwindow/MainWindow.h"
@@ -52,7 +54,7 @@ MainWindow::MainWindow(QWidget* parent)
     m_connController->setOtaManager(m_otaManager);
     m_connController->setRecordingController(m_recordingController);
 
-    // 构建 UI 布局（背景层→分割器→导航树→面板栈→发送栏）
+    // 构建 UI 布局（背景层->分割器->导航树->面板栈->发送栏）
     setupUI();
     // 创建工具栏控件并添加到主窗口
     m_toolbarController->createToolbar(this);
@@ -121,7 +123,7 @@ MainWindow::MainWindow(QWidget* parent)
         m_commandPalette->registerCommands(cmds);
     }
 
-    // 脚本录制器 — 从 PanelManager 获取已创建的面板实例
+    // 脚本录制器 -- 从 PanelManager 获取已创建的面板实例
     m_scriptRecorder = m_panelManager->scriptRecorder();
     m_scriptRecorder->setObjectName("scriptRecorder");
     connect(m_scriptRecorder, &ScriptRecorder::playbackSendRequested,
@@ -155,97 +157,9 @@ MainWindow::MainWindow(QWidget* parent)
     resize(1200, 800);
     setMinimumSize(900, 600);
 
-    // ---- 响应式布局: 监听窗口宽度变化，自动切换断点 ----
-    m_responsiveLayout = new ResponsiveLayout(this);
-    m_responsiveLayout->watchWindow(this);
-    connect(m_responsiveLayout, &ResponsiveLayout::breakpointChanged,
-            this, [this](ResponsiveLayout::Breakpoint bp, ResponsiveLayout::Breakpoint /*oldBp*/) {
-        if (bp == ResponsiveLayout::Breakpoint::Mobile) {
-            if (m_iconNavBar) { m_iconNavBar->hide(); }
-            statusBar()->showMessage(tr("已切换到移动端布局"), 2000);
-            m_panelManager->setCompactMode(true);
-        } else if (bp == ResponsiveLayout::Breakpoint::Tablet) {
-            if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
-            statusBar()->showMessage(tr("已切换到平板布局"), 2000);
-            m_panelManager->setCompactMode(false);
-        } else if (bp == ResponsiveLayout::Breakpoint::Desktop) {
-            if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
-                int navWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
-                if (navWidth <= 0) navWidth = 200;
-                m_mainSplitter->setSizes({navWidth, width() - navWidth});
-            }
-            if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
-            statusBar()->showMessage(tr("已切换到桌面布局"), 2000);
-            m_panelManager->setCompactMode(false);
-        } else if (bp == ResponsiveLayout::Breakpoint::Wide) {
-            if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
-                int navWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
-                if (navWidth <= 0) navWidth = 240;
-                m_mainSplitter->setSizes({navWidth, width() - navWidth});
-            }
-            if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
-            statusBar()->showMessage(tr("已切换到宽屏布局"), 2000);
-            m_panelManager->setCompactMode(false);
-        }
-    });
+    // 注册全局快捷键管理器(Ctrl+F/Ctrl+P/Ctrl+Shift+R等)
+    registerShortcuts();
 
-    // ---- 响应式布局: 导航树自动折叠（< 900px） ----
-    connect(m_responsiveLayout, &ResponsiveLayout::navTreeAutoCollapse,
-            this, [this](bool collapsed) {
-        int navWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
-        if (navWidth <= 0) navWidth = 200;
-        m_navController->onBreakpointNavCollapse(collapsed, m_mainSplitter, navWidth);
-    });
-
-    // ---- 快捷键管理器: 统一注册全局快捷键 ----
-    m_shortcutManager = &ShortcutManager::instance();
-    m_shortcutManager->registerShortcut(
-        "search.find", QKeySequence("Ctrl+F"),
-        this, [this]() { m_panelManager->searchBar()->activate(); },
-        tr("搜索"), ShortcutContext::Global);
-    m_shortcutManager->registerShortcut(
-        "nav.commandPalette", QKeySequence("Ctrl+P"),
-        this, [this]() { m_commandPalette->showPalette(); },
-        tr("命令面板"), ShortcutContext::Global);
-    m_shortcutManager->registerShortcut(
-        "script.recordToggle", QKeySequence("Ctrl+Shift+R"),
-        this, [this]() {
-            if (m_scriptRecorder->isRecording()) {
-                m_scriptRecorder->stopRecording();
-            } else {
-                m_scriptRecorder->startRecording();
-            }
-        }, tr("录制脚本"), ShortcutContext::Global);
-    m_shortcutManager->registerShortcut(
-        "terminal.clear", QKeySequence("Ctrl+L"),
-        this, [this]() { m_terminalController->onClearTerminal(); },
-        tr("清空终端"), ShortcutContext::Terminal);
-    m_shortcutManager->registerShortcut(
-        "send.execute", QKeySequence("Ctrl+Enter"),
-        this, [this]() { m_sendController->onQuickCommand(QByteArray()); },
-        tr("发送数据"), ShortcutContext::SendArea);
-    m_shortcutManager->registerShortcut(
-        "project.save", QKeySequence("Ctrl+S"),
-        this, [this]() { m_sessionManager->saveSession(); },
-        tr("保存工程"), ShortcutContext::Global);
-    // 以下快捷键已注册但回调为空，待后续模块实现后绑定
-    m_shortcutManager->registerShortcut(
-        "project.open", QKeySequence("Ctrl+O"),
-        this, nullptr, tr("打开工程"), ShortcutContext::Global);
-    m_shortcutManager->registerShortcut(
-        "connection.new", QKeySequence("Ctrl+N"),
-        this, [this]() { openQuickConnectionDialog(); },
-        tr("新建连接"), ShortcutContext::Global);
-    m_shortcutManager->registerShortcut(
-        "tab.close", QKeySequence("Ctrl+W"),
-        this, nullptr, tr("关闭标签页"), ShortcutContext::Global);
-
-    // 加载用户自定义快捷键绑定(覆盖默认值)
-    m_shortcutManager->loadCustomBindings();
-
-    // 注册终端/发送区控件的上下文映射(焦点变化时自动切换快捷键上下文)
-    if (m_panelManager->terminal()) {
-        m_shortcutManager->registerContextWidget(
-            m_panelManager->terminal(), ShortcutContext::Terminal);
-    }
+    // 初始化响应式布局(断点系统+导航树自动折叠)
+    setupResponsiveLayout();
 }

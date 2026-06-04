@@ -38,6 +38,8 @@ set(SOURCES
     src/core/mainwindow/MainWindowSignalConnect.cpp
     src/core/mainwindow/MainWindowSignalConnectUI.cpp
     src/core/mainwindow/MainWindowPanelConnect.cpp
+    src/core/mainwindow/MainWindowPanelConnectOta.cpp
+    src/core/mainwindow/MainWindowInitShortcuts.cpp
     src/core/mainwindow/MainWindowLifecycle.cpp
     src/core/connect/ConnectionController.cpp
     src/core/connect/ConnectionControllerLifecycle.cpp
@@ -82,6 +84,7 @@ set(SOURCES
     src/core/panels/PanelManagerFactory.cpp
     src/core/panels/PanelManagerGetters.cpp
     src/core/panels/PanelManagerQuery.cpp
+    src/core/panels/PanelManagerWrap.cpp
     src/core/background/BackgroundWidget.cpp
     src/core/background/BackgroundWidgetPaint.cpp
     src/core/background/BackgroundSettingsPopup.cpp
@@ -107,6 +110,7 @@ set(SOURCES
     src/core/theme/ThemeManagerColor.cpp
     src/core/theme/QssThemeGenerator.cpp
     src/core/theme/QssThemeGeneratorWidgets.cpp
+    src/core/theme/QssThemeGeneratorTerminal.cpp
     src/core/theme/QssThemeGeneratorPanels.cpp
     src/core/theme/QssThemeGeneratorColors.cpp
     src/core/animation/AnimationUtility.cpp
@@ -139,6 +143,8 @@ set(SOURCES
     src/terminal/selection/TerminalSelectionManagerStats.cpp
     src/terminal/search/TerminalSearchManager.cpp
     src/terminal/search/TerminalSearchBuilders.cpp
+    src/terminal/search/TerminalSearchBuild.cpp
+    src/terminal/search/TerminalSearchBuild.cpp
     src/terminal/search/TerminalSearchRenderer.cpp
     src/terminal/menu/TerminalContextMenuManager.cpp
     src/serial/config/SerialConfigPanel.cpp
@@ -241,6 +247,8 @@ set(SOURCES
     src/ota/protocols/ymodem/YModemTransferProtocol.cpp
     src/ota/protocols/zmodem/ZModemTransfer.cpp
     src/ota/protocols/zmodem/ZModemTransferHandlers.cpp
+    src/ota/protocols/zmodem/ZModemTransferFrames.cpp
+    src/ota/protocols/zmodem/ZModemTransferFrames.cpp
     src/ota/protocols/zmodem/ZModemTransferProtocol.cpp
     src/utils/settings/SettingsManager.cpp
     src/utils/settings/SettingsManagerConvenience.cpp
@@ -319,6 +327,8 @@ set(SOURCES
     src/dashboard/DashboardSerializer.cpp
     src/dashboard/DashboardSerializerExport.cpp
     src/dashboard/DashboardSerializerProfile.cpp
+    src/dashboard/DashboardSerializerProfileCrud.cpp
+    src/dashboard/DashboardSerializerProfileCrud.cpp
     src/dashboard/DashboardSerializerStats.cpp
 
     # ── F6: J-Link RTT ──

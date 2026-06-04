@@ -89,6 +89,13 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
         return {};
     }
 
+    /* 跟踪窗函数类型变更 */
+    static WindowType lastWindow = WindowType::Hanning;
+    if (window != lastWindow) {
+        ++m_totalWindowTypeChanges;
+        lastWindow = window;
+    }
+
     /* 确定FFT长度: 用户指定 or 自动取nextPowerOf2 */
     const int N = (fftSize > 0) ? nextPowerOf2(fftSize)
                                 : nextPowerOf2(timeData.size());
@@ -130,6 +137,9 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
     quint64 nSample = static_cast<quint64>(timeData.size());
     if (nSample > m_maxSampleSize) {
         m_maxSampleSize = nSample;
+    }
+    if (maxMag > 0.0) {
+        ++m_totalPeakFrequenciesDetected;
     }
 
     emit spectrumComputed(spectrum, fundamentalFreq);

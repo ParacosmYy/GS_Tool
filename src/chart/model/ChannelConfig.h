@@ -94,6 +94,12 @@ public:
     /** @brief 获取颜色变更总次数 */
     quint64 totalColorChanges() const;
 
+    /** @brief 获取通道添加总次数 */
+    quint64 totalChannelAdds() const { return m_totalChannelAdds; }
+
+    /** @brief 获取通道移除总次数 */
+    quint64 totalChannelRemoves() const { return m_totalChannelRemoves; }
+
     /** @brief 重置所有配置统计计数器为初始值 */
     void resetConfigStatistics();
 
@@ -103,6 +109,8 @@ private:
     // 统计计数器
     quint64 m_totalConfigChanges = 0;   ///< 配置变更总次数
     quint64 m_totalColorChanges = 0;    ///< 颜色变更总次数
+    quint64 m_totalChannelAdds = 0;     ///< 通道添加总次数
+    quint64 m_totalChannelRemoves = 0;  ///< 通道移除总次数
 };
 
 #endif // CHANNELCONFIG_H

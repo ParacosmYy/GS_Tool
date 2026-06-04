@@ -39,13 +39,13 @@ public:
     ~TlsConnection() override;
 
     // ---- IConnection接口实现 ----
-    ConnectionType type() const override;
-    QString name() const override;
-    ConnectionState state() const override;
-    bool open() override;
-    void close() override;
-    qint64 write(const QByteArray& data) override;
-    void configure(const QVariantMap& params) override;
+    ConnectionType type() const override;              ///< 返回连接类型(TLS)
+    QString name() const override;                     ///< 返回连接显示名称
+    ConnectionState state() const override;            ///< 返回当前连接状态
+    bool open() override;                              ///< 发起SSL/TLS连接
+    void close() override;                             ///< 关闭SSL/TLS连接
+    qint64 write(const QByteArray& data) override;     ///< 通过加密通道发送数据
+    void configure(const QVariantMap& params) override; ///< 配置TLS参数(host/port/cert/key/ca)
 
     // ---- TLS特有接口 ----
 
