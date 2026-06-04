@@ -18,6 +18,7 @@
 #include "dashboard/ProgressBarWidget.h"
 #include "dashboard/LedIndicatorWidget.h"
 #include "dashboard/NumericDisplayWidget.h"
+#include "dashboard/MiniChartWidget.h"
 #include "core/theme/ThemeManager.h"
 
 /** @brief 构造函数，初始化UI、序列化器与示例控件 @param parent 父控件 */
@@ -75,6 +76,19 @@ int DashboardWidget::addComponent(const QString &type, const QString &channel)
         ++m_stats.totalUpdates;
         ++m_stats.totalValueChanged;
         widget = n;
+    } else if (type == QLatin1String("minichart")) {
+        auto *mc = new MiniChartWidget(this);
+        mc->setLabel(channel.isEmpty() ? tr("趋势图") : channel);
+        mc->bindChannel(channel);
+        mc->setUnit(tr("V"));
+        mc->setAutoRange(true);
+        /* 填充示例数据：正弦波趋势 */
+        for (int i = 0; i < 30; ++i) {
+            mc->setValue(50.0 + 30.0 * qSin(i * 0.3));
+        }
+        ++m_stats.totalUpdates;
+        ++m_stats.totalValueChanged;
+        widget = mc;
     }
 
     if (!widget) {

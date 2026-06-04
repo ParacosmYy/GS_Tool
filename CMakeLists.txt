@@ -55,6 +55,7 @@ set(SOURCES
     src/core/navigation/NavigationControllerAnimations.cpp
     src/core/navigation/NavigationControllerStatus.cpp
     src/core/navigation/IconNavBar.cpp
+    src/core/navigation/NavIndicatorWidget.cpp
     src/core/send/SendController.cpp
     src/core/send/SendControllerSend.cpp
     src/core/send/SendControllerStats.cpp
@@ -106,6 +107,7 @@ set(SOURCES
     src/core/widgets/ScriptRecorder.cpp
     src/core/widgets/DataDiffWidget.cpp
     src/core/widgets/DataDiffWidgetDiff.cpp
+    src/core/widgets/ToastWidget.cpp
     src/core/widgets/EdDialog.cpp
     src/core/widgets/EdDialogPaint.cpp
     src/core/widgets/EdDialogTabs.cpp
@@ -364,6 +366,8 @@ set(SOURCES
     src/dashboard/LedIndicatorWidget.cpp
     src/dashboard/NumericDisplayWidget.cpp
     src/dashboard/NumericDisplayWidgetPaint.cpp
+    src/dashboard/MiniChartWidget.cpp
+    src/dashboard/MiniChartWidgetPaint.cpp
     src/dashboard/DashboardModel.cpp
     src/dashboard/DashboardModelItems.cpp
     src/dashboard/DashboardSerializer.cpp
@@ -742,6 +746,7 @@ set(HEADERS
     src/dashboard/ProgressBarWidget.h
     src/dashboard/LedIndicatorWidget.h
     src/dashboard/NumericDisplayWidget.h
+    src/dashboard/MiniChartWidget.h
     src/dashboard/DashboardModel.h
     src/dashboard/DashboardSerializer.h
 

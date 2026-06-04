@@ -8,7 +8,7 @@
  *   3. saveToItems: 将当前布局导出为DashboardItemConfig列表
  *   4. loadFromItems: 从DashboardItemConfig列表恢复布局
  *
- * 支持gauge/progressbar/led/numeric四种面板类型的完整属性持久化。
+ * 支持gauge/progressbar/led/numeric/minichart五种面板类型的完整属性持久化。
  */
 
 #include "dashboard/DashboardWidget.h"
@@ -16,6 +16,7 @@
 #include "dashboard/ProgressBarWidget.h"
 #include "dashboard/LedIndicatorWidget.h"
 #include "dashboard/NumericDisplayWidget.h"
+#include "dashboard/MiniChartWidget.h"
 
 #include <QColor>
 #include <QLatin1String>
@@ -60,6 +61,16 @@ DashboardItemConfig DashboardWidget::extractWidgetConfig(QWidget *widget, int in
         config.properties[QStringLiteral("value")] = n->value();
         config.properties[QStringLiteral("unit")] = n->unit();
         config.properties[QStringLiteral("precision")] = n->precision();
+    } else if (className.contains("MiniChart")) {
+        auto *mc = qobject_cast<MiniChartWidget*>(widget);
+        config.widgetType = QStringLiteral("minichart");
+        config.title = mc->label();
+        config.properties[QStringLiteral("channel")] = mc->channelName();
+        config.properties[QStringLiteral("value")] = mc->value();
+        config.properties[QStringLiteral("unit")] = mc->unit();
+        config.properties[QStringLiteral("min")] = mc->min();
+        config.properties[QStringLiteral("max")] = mc->max();
+        config.properties[QStringLiteral("autoRange")] = mc->autoRange();
     } else {
         config.widgetType = QStringLiteral("unknown");
     }
@@ -111,6 +122,18 @@ QWidget* DashboardWidget::createWidgetFromConfig(const DashboardItemConfig &conf
         n->setPrecision(props.value("precision", 2).toInt());
         n->setValue(props.value("value", 0.0).toDouble());
         return n;
+    }
+
+    if (type == QLatin1String("minichart")) {
+        auto *mc = new MiniChartWidget(this);
+        mc->setLabel(config.title);
+        mc->bindChannel(props.value("channel").toString());
+        mc->setUnit(props.value("unit").toString());
+        mc->setRange(props.value("min", 0.0).toDouble(),
+                     props.value("max", 100.0).toDouble());
+        mc->setAutoRange(props.value("autoRange", true).toBool());
+        mc->setValue(props.value("value", 0.0).toDouble());
+        return mc;
     }
 
     return nullptr;

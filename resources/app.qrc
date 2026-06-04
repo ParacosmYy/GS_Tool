@@ -143,5 +143,16 @@
         <file>icons/lucide/x.svg</file>
         <file>icons/lucide/x-circle.svg</file>
         <file>icons/lucide/zap.svg</file>
+        <file>icons/lucide/memory-stick.svg</file>
+        <file>icons/lucide/flash.svg</file>
+        <file>icons/lucide/firmware.svg</file>
+        <file>icons/lucide/hexagon.svg</file>
+        <file>icons/lucide/git-branch.svg</file>
+        <file>icons/lucide/server.svg</file>
+        <file>icons/lucide/antenna.svg</file>
+        <file>icons/lucide/thermometer.svg</file>
+        <file>icons/lucide/move.svg</file>
+        <file>icons/lucide/maximize.svg</file>
+        <file>icons/lucide/minimize.svg</file>
     </qresource>
 </RCC>
