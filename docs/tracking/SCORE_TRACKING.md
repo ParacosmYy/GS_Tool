@@ -61,6 +61,9 @@
 | 213 | TriggerEngine+ThemeManager+SendController+SessionManager统计增强 | 触发器评估/执行/错误+主题缓存命中/未命中+发送宏执行+会话创建/删除 |
 | 214 | ZModemTransferProtocol/DataStatisticsDisplay拆分 | ZModem协议独立+数据统计显示独立 |
 | 215 | ModbusMaster+ModbusSlave+CanConnection+ProtocolSchema统计增强 | Modbus主站请求/响应/超时/异常+从站处理/响应/错误+CAN帧错误+模式加载/验证/错误 |
+| 216 | ThemeManagerColor/ProtocolSchema拆分+linter增强 | 主题管理颜色查询独立文件+模式定义拆分 |
+| 217 | ChecksumPanel+PacketBuilderPanel+TimestampPanel统计增强 | 校验面板计算/算法/剪贴板+包构建器构建/发送/字段+时间戳分析/格式 |
+| 218 | ChecksumPanelAlgo拆分+ConverterPanel/DragDropHelper/TimestampPanel统计增强 | 校验算法独立+转换器格式切换+拖放拒绝计数+时间戳解析统计 |
 
 ---
 
