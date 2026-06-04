@@ -29,7 +29,7 @@ void CommandPalette::removeCommand(const QString &name) { m_commands.remove(name
 /** @brief 设置搜索过滤器文本 @param text 过滤文本 */
 void CommandPalette::setFilter(const QString &text) { m_search->setText(text); onTextChanged(text); }
 /** @brief 显示命令面板并聚焦搜索框 */
-void CommandPalette::showPalette() { m_search->clear(); m_list->clear(); onTextChanged(""); show(); m_search->setFocus(); emit paletteShown(); }
+void CommandPalette::showPalette() { ++m_totalPaletteShows; m_search->clear(); m_list->clear(); onTextChanged(""); show(); m_search->setFocus(); emit paletteShown(); }
 /** @brief 隐藏命令面板 */
 void CommandPalette::hidePalette() { hide(); emit paletteHidden(); }
 /** @brief 获取已注册命令数量 @return 命令数 */
@@ -42,12 +42,13 @@ void CommandPalette::onReturnPressed() {
     auto *item = m_list->currentItem(); if (!item) return;
     QString name = item->text().split("\t").first();
     auto it = m_commands.find(name);
-    if (it != m_commands.end() && it->action) { it->action(); emit commandExecuted(name); }
+    if (it != m_commands.end() && it->action) { ++m_totalCommandsExecuted; it->action(); emit commandExecuted(name); }
     hidePalette();
 }
 
 /** @brief 搜索文本变化时过滤命令列表 @param text 搜索文本 */
 void CommandPalette::onTextChanged(const QString &text) {
+    ++m_totalFilterChanges;
     m_list->clear();
     for (auto it = m_commands.constBegin(); it != m_commands.constEnd(); ++it) {
         if (text.isEmpty() || it.key().contains(text, Qt::CaseInsensitive)) {

@@ -31,8 +31,10 @@ void FrequencyCounter::setupUi() {
 
 /** @brief 输入单个采样值，检测上升沿并计数 @param value 采样值 */
 void FrequencyCounter::feedSample(double value) {
+    ++m_totalSamples;
     bool above = value >= m_triggerLevel;
     if (above && !m_lastAbove) {
+        ++m_totalEdgeDetections;
         m_pulseCount++;
         m_countLabel->setText(tr("Pulses: %1").arg(m_pulseCount));
         emit pulseCounted(m_pulseCount);
@@ -75,6 +77,7 @@ int FrequencyCounter::pulseCount() const { return m_pulseCount; }
 
 /** @brief 门控超时回调 — 计算频率并更新显示 */
 void FrequencyCounter::onGateTimeout() {
+    ++m_totalGateCycles;
     m_gateTimer->stop();
     double elapsed = static_cast<double>(QDateTime::currentMSecsSinceEpoch() - m_gateStart) / 1000.0;
     if (elapsed > 0 && m_pulseCount > 0) {

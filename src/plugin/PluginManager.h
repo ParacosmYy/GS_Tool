@@ -115,6 +115,11 @@ public:
     /** @brief 重置加载统计 */
     void resetLoadStatistics();
 
+    /** @brief 获取累计扫描次数 @return 扫描次数 */
+    quint64 totalScanCount() const { return m_scanCount; }
+    /** @brief 获取累计发现插件文件数 @return 发现文件数 */
+    quint64 totalDiscoveredFiles() const { return m_discoveredFiles; }
+
 signals:
     /** @brief 插件加载成功信号 */
     void pluginLoaded(const QString& name);
@@ -139,6 +144,10 @@ private:
     quint64 m_failCount = 0;
     /** @brief 累计卸载次数 */
     quint64 m_unloadCount = 0;
+    /** @brief 累计扫描目录次数 */
+    quint64 m_scanCount = 0;
+    /** @brief 累计发现插件文件数 */
+    quint64 m_discoveredFiles = 0;
 };
 
 #endif // PLUGINMANAGER_H

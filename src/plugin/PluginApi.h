@@ -81,6 +81,13 @@ public:
     /** @brief 重置发送统计 */
     void resetSendStatistics();
 
+    /** @brief 获取累计面板注册次数 @return 注册次数 */
+    quint64 totalPanelRegistrations() const { return m_totalPanelRegistrations; }
+    /** @brief 获取累计通道添加次数 @return 添加次数 */
+    quint64 totalChannelAdditions() const { return m_totalChannelAdditions; }
+    /** @brief 获取累计订阅切换次数 @return 切换次数 */
+    quint64 totalSubscribeToggles() const { return m_totalSubscribeToggles; }
+
 signals:
     /** @brief 接收到数据信号（插件订阅后触发） */
     void dataReceived(const QByteArray& data);
@@ -115,6 +122,11 @@ private:
     quint64 m_sendCount = 0;
     /** @brief 已发送字节总数 */
     qint64 m_sendBytes = 0;
+
+    // ---- 统计计数器 ----
+    quint64 m_totalPanelRegistrations = 0;    ///< 累计面板注册次数
+    quint64 m_totalChannelAdditions = 0;      ///< 累计通道添加次数
+    quint64 m_totalSubscribeToggles = 0;      ///< 累计订阅切换次数
 };
 
 #endif // PLUGINAPI_H

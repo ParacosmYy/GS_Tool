@@ -102,4 +102,19 @@ private:
     bool m_lastAbove = false;           ///< 上一个采样点是否高于触发电平
     QTimer *m_gateTimer = nullptr;      ///< 门控定时器
     qint64 m_gateStart = 0;             ///< 当前门控窗口起始时间戳
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSamples = 0;          ///< 总输入采样点数
+    quint64 m_totalEdgeDetections = 0;   ///< 总边沿检测次数
+    quint64 m_totalGateCycles = 0;       ///< 总门控周期次数
+
+public:
+    /** @brief 获取总输入采样点数 @return 累计采样点 */
+    quint64 totalSamples() const { return m_totalSamples; }
+    /** @brief 获取总边沿检测次数 @return 累计边沿检测 */
+    quint64 totalEdgeDetections() const { return m_totalEdgeDetections; }
+    /** @brief 获取总门控周期次数 @return 累计门控周期 */
+    quint64 totalGateCycles() const { return m_totalGateCycles; }
+    /** @brief 重置频率计数器统计 */
+    void resetFreqStatistics() { m_totalSamples = 0; m_totalEdgeDetections = 0; m_totalGateCycles = 0; }
 };

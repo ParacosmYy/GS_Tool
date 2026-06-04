@@ -124,13 +124,17 @@ QString DataStatistics::sessionSummary() const
 
 // ---- 统计值查询getter ----
 
-/** @brief 返回接收累计字节数 */
+/** @brief 获取RX累计总字节数 @return 接收字节总数 */
 quint64 DataStatistics::totalRxBytes() const { return m_lastRxBytes; }
 
-/** @brief 返回发送累计字节数 */
+/** @brief 获取TX累计总字节数 @return 发送字节总数 */
 quint64 DataStatistics::totalTxBytes() const { return m_lastTxBytes; }
 
+/** @brief 获取update()调用总次数 @return 更新总次数 */
 quint64 DataStatistics::totalUpdates() const { return m_totalUpdates; }
+/** @brief 获取历史峰值速率(RX/TX中较大者) @return 峰值速率(bytes/s) */
 double DataStatistics::peakRate() const { return qMax(m_peakRxRate, m_peakTxRate); }
+/** @brief 获取所有update()调用传入的字节总数(RX+TX) @return 累计字节数 */
 quint64 DataStatistics::totalBytesCounted() const { return m_totalBytesCounted; }
+/** @brief 获取峰值速率更新总次数 @return 峰值刷新次数 */
 quint64 DataStatistics::totalPeakUpdates() const { return m_totalPeakUpdates; }

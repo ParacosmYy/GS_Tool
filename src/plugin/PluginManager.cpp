@@ -61,6 +61,8 @@ QStringList PluginManager::scanPlugins(const QString& pluginDir)
         return candidates;
     }
 
+    ++m_scanCount;
+
     /* 平台扩展名过滤 */
 #ifdef Q_OS_WIN
     const QString filter = QStringLiteral("*.dll");
@@ -86,6 +88,7 @@ QStringList PluginManager::scanPlugins(const QString& pluginDir)
         }
     }
 
+    m_discoveredFiles += candidates.size();
     return candidates;
 }
 

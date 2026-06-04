@@ -34,6 +34,7 @@ int AudioSpectrum::fftSize() const { return m_fftSize; }
 /** @brief 输入PCM原始数据，累积到内部缓冲区，达到FFT大小时执行频谱分析 @param pcmData PCM原始字节数据 */
 void AudioSpectrum::feedData(const QByteArray &pcmData) {
     m_buffer.append(pcmData);
+    m_totalPcmBytes += pcmData.size();
     if (m_buffer.size() >= m_fftSize * 2) {
         processFft();
         m_buffer.remove(0, m_fftSize);
@@ -42,6 +43,7 @@ void AudioSpectrum::feedData(const QByteArray &pcmData) {
 
 /** @brief 执行FFT频谱分析 — 计算各频段能量、平滑处理、发射频谱更新信号 */
 void AudioSpectrum::processFft() {
+    ++m_totalFftRuns;
     int binsPerBar = m_fftSize / 2 / m_barCount;
     for (int i = 0; i < m_barCount; ++i) {
         double mag = 0;
@@ -69,6 +71,7 @@ void AudioSpectrum::processFft() {
 
 /** @brief 绘制频谱柱状图 — HSV渐变色柱状图 */
 void AudioSpectrum::paintEvent(QPaintEvent *) {
+    ++m_totalRepaints;
     QPainter p(this); p.setRenderHint(QPainter::Antialiasing);
     int w = width(), h = height();
     p.fillRect(rect(), Qt::transparent);

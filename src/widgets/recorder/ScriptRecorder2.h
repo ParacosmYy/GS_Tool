@@ -117,4 +117,19 @@ private:
     double m_speed = 1.0;           ///< 回放速度倍率
     QTimer *m_timer = nullptr;      ///< 回放定时器
     int m_playIndex = 0;            ///< 当前回放位置索引
+
+    // ---- 统计计数器 ----
+    quint64 m_totalRecords = 0;      ///< 总录制条目数
+    quint64 m_totalPlaybacks = 0;    ///< 总回放次数
+    quint64 m_totalPlaybackActions = 0; ///< 总回放动作数
+
+public:
+    /** @brief 获取总录制条目数 @return 累计录制条目 */
+    quint64 totalRecords() const { return m_totalRecords; }
+    /** @brief 获取总回放次数 @return 累计回放 */
+    quint64 totalPlaybacks() const { return m_totalPlaybacks; }
+    /** @brief 获取总回放动作数 @return 累计回放动作 */
+    quint64 totalPlaybackActions() const { return m_totalPlaybackActions; }
+    /** @brief 重置录制器统计 */
+    void resetRecorderStatistics() { m_totalRecords = 0; m_totalPlaybacks = 0; m_totalPlaybackActions = 0; }
 };

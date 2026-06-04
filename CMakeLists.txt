@@ -80,6 +80,7 @@ set(SOURCES
     src/core/theme/ThemeManager.cpp
     src/core/theme/ThemeManagerColor.cpp
     src/core/theme/QssThemeGenerator.cpp
+    src/core/theme/QssThemeGeneratorWidgets.cpp
     src/core/theme/QssThemeGeneratorColors.cpp
     src/core/animation/AnimationUtility.cpp
     src/core/theme/IconManager.cpp
@@ -322,6 +323,7 @@ set(SOURCES
     src/connection/usb/UsbConnectionTransfer.cpp
     src/connection/usb/UsbDeviceDetector.cpp
     src/connection/usb/UsbDeviceDetectorWmic.cpp
+    src/connection/usb/UsbDeviceDetectorStats.cpp
     src/connection/usb/UsbDescriptorViewer.cpp
     src/connection/usb/UsbConfigPanel.cpp
     src/connection/usb/UsbLibraryLoader.cpp

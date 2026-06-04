@@ -9,7 +9,7 @@
 #include <QCheckBox>
 
 /** @brief 构造函数 @param parent 父Widget */
-EdDialog::EdDialog(QWidget *parent) : QDialog(parent) { setObjectName("EdDialog2"); setupUi(); }
+EdDialog::EdDialog(QWidget *parent) : QDialog(parent) { setObjectName("EdDialog2"); ++s_totalOpens; setupUi(); }
 /** @brief 析构函数 */
 EdDialog::~EdDialog() = default;
 /** @brief 初始化UI布局 */
@@ -21,7 +21,7 @@ void EdDialog::setMessage(const QString &m) { auto *l = qobject_cast<QVBoxLayout
 /** @brief 添加标准按钮 @param b 标准按钮类型 */
 void EdDialog::addButton(StandardButton b) { Q_UNUSED(b); }
 /** @brief 添加自定义按钮 @param label 按钮文本 @param role 按钮角色 */
-void EdDialog::addCustomButton(const QString &label, int role) { Q_UNUSED(label); Q_UNUSED(role); }
+void EdDialog::addCustomButton(const QString &label, int role) { Q_UNUSED(label); Q_UNUSED(role); ++s_totalButtonPresses; }
 /** @brief 设置对话框图标 @param name 图标名称 */
 void EdDialog::setIcon(const QString &name) { Q_UNUSED(name); }
 /** @brief 设置自定义内容Widget @param w 内容Widget */
@@ -29,6 +29,6 @@ void EdDialog::setContentWidget(QWidget *w) { auto *l = layout(); if (l) l->addW
 /** @brief 获取对话框结果角色 @return 角色值 */
 int EdDialog::resultRole() const { return m_resultRole; }
 /** @brief 设置"记住选择"选项 @param key 选项键 @param label 显示文本 */
-void EdDialog::setRememberOption(const QString &key, const QString &label) { m_remember[key] = {key, label, false}; }
+void EdDialog::setRememberOption(const QString &key, const QString &label) { m_remember[key] = {key, label, false}; ++s_totalRememberSets; }
 /** @brief 检查"记住选择"是否被勾选 @param key 选项键 @return 已勾选返回true */
 bool EdDialog::isRememberChecked(const QString &key) const { return m_remember.value(key).checked; }

@@ -137,4 +137,22 @@ private:
     bool m_running = true;               ///< 运行状态标志
     int m_writePos = 0;                  ///< 环形缓冲区写入位置
     static constexpr int kDivisions = 10; ///< 水平分度数
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSamples = 0;           ///< 总采样点数
+    quint64 m_totalRepaints = 0;          ///< 总重绘次数
+    quint64 m_totalTriggers = 0;          ///< 总触发次数
+    quint64 m_totalOverflows = 0;         ///< 总溢出次数
+
+public:
+    /** @brief 获取总采样点数 @return 累计采样点 */
+    quint64 totalSamples() const { return m_totalSamples; }
+    /** @brief 获取总重绘次数 @return 累计重绘 */
+    quint64 totalRepaints() const { return m_totalRepaints; }
+    /** @brief 获取总触发次数 @return 累计触发 */
+    quint64 totalTriggers() const { return m_totalTriggers; }
+    /** @brief 获取总溢出次数 @return 累计溢出 */
+    quint64 totalOverflows() const { return m_totalOverflows; }
+    /** @brief 重置示波器统计计数器 */
+    void resetScopeStatistics() { m_totalSamples = 0; m_totalRepaints = 0; m_totalTriggers = 0; m_totalOverflows = 0; }
 };

@@ -59,7 +59,7 @@ public:
     /** @brief 获取累计计算次数（面板层面，不含内部自动调用） @return 计算次数 */
     quint64 totalCalculations() const;
 
-    /** @brief 获取累计复制到剪贴板次数 @return 复制次数 */
+    /** @brief 获取累计复制结果次数 @return 复制次数 */
     quint64 totalCopyActions() const;
 
     /** @brief 获取累计算法切换次数 @return 切换次数 */

@@ -17,7 +17,7 @@ void ScopeWidget::setChannelCount(int c) { m_channels.resize(c); for (auto &ch :
 /** @brief 设置采样缓冲区大小 @param s 缓冲区采样数 */
 void ScopeWidget::setSampleBuffer(int s) { m_bufferSize = s; for (auto &ch : m_channels) ch.resize(s); m_writePos = 0; }
 /** @brief 添加单个采样值 @param ch 通道索引 @param v 采样值 */
-void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.size()) { m_channels[ch][m_writePos % m_bufferSize] = v; if (ch == 0) { m_writePos++; if (m_writePos >= m_bufferSize) { m_writePos = 0; emit dataOverflow(); } } } }
+void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.size()) { m_channels[ch][m_writePos % m_bufferSize] = v; ++m_totalSamples; if (ch == 0) { m_writePos++; if (m_writePos >= m_bufferSize) { m_writePos = 0; ++m_totalOverflows; emit dataOverflow(); } } } }
 /** @brief 批量添加采样值 @param ch 通道索引 @param vals 采样值向量 */
 void ScopeWidget::addSamples(int ch, const QVector<double> &vals) { for (auto v : vals) addSample(ch, v); }
 /** @brief 设置时间轴缩放 @param ms 时间刻度(毫秒) */
@@ -39,6 +39,7 @@ bool ScopeWidget::isRunning() const { return m_running; }
 
 /** @brief 绘制示波器波形 — 暗色背景+网格+多通道波形路径 */
 void ScopeWidget::paintEvent(QPaintEvent *) {
+    ++m_totalRepaints;
     QPainter p(this); p.setRenderHint(QPainter::Antialiasing);
     int w = width(), h = height();
     p.fillRect(rect(), QColor(20, 20, 30));

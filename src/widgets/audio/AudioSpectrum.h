@@ -107,4 +107,19 @@ private:
     QVector<double> m_magnitudes;  ///< FFT原始幅度值
     QVector<double> m_smoothed;    ///< 平滑后的幅度值
     QByteArray m_buffer;           ///< PCM数据缓冲区
+
+    // ---- 统计计数器 ----
+    quint64 m_totalFftRuns = 0;           ///< 总FFT运算次数
+    quint64 m_totalPcmBytes = 0;          ///< 总输入PCM字节数
+    quint64 m_totalRepaints = 0;          ///< 总重绘次数
+
+public:
+    /** @brief 获取总FFT运算次数 @return 累计FFT次数 */
+    quint64 totalFftRuns() const { return m_totalFftRuns; }
+    /** @brief 获取总输入PCM字节数 @return 累计PCM字节 */
+    quint64 totalPcmBytes() const { return m_totalPcmBytes; }
+    /** @brief 获取总重绘次数 @return 累计重绘 */
+    quint64 totalRepaints() const { return m_totalRepaints; }
+    /** @brief 重置频谱统计计数器 */
+    void resetSpectrumStatistics() { m_totalFftRuns = 0; m_totalPcmBytes = 0; m_totalRepaints = 0; }
 };

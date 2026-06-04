@@ -39,10 +39,10 @@ public:
      */
     void setBuilder(PacketBuilder *builder);
 
-    /** @brief 获取累计构建数据包次数 */
+    /** @brief 获取累计构建数据包次数 @return 构建次数 */
     quint64 totalPacketsBuilt() const { return m_totalPacketsBuilt; }
 
-    /** @brief 获取累计发送数据包次数 */
+    /** @brief 获取累计发送数据包次数 @return 发送次数 */
     quint64 totalSends() const { return m_totalSends; }
 
     /** @brief 获取累计字段编辑次数 @return 编辑次数 */

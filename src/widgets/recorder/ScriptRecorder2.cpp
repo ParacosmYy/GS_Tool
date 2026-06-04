@@ -16,7 +16,7 @@ void ScriptRecorder::stopRecording() { m_recording = false; emit recordingStoppe
 /** @brief 查询是否正在录制 @return 录制中返回true */
 bool ScriptRecorder::isRecording() const { return m_recording; }
 /** @brief 录制一个操作条目 @param action 操作名称 @param data 操作数据 */
-void ScriptRecorder::recordAction(const QString &action, const QByteArray &data) { if (m_recording) { m_entries.append({QDateTime::currentMSecsSinceEpoch(), action, data}); emit actionRecorded(action); } }
+void ScriptRecorder::recordAction(const QString &action, const QByteArray &data) { if (m_recording) { ++m_totalRecords; m_entries.append({QDateTime::currentMSecsSinceEpoch(), action, data}); emit actionRecorded(action); } }
 /** @brief 开始回放录制的操作序列 */
 void ScriptRecorder::playback() { if (m_entries.isEmpty()) return; m_playing = true; m_playIndex = 0; emit playbackStarted(); m_timer->start(10); }
 /** @brief 清空所有录制条目 */

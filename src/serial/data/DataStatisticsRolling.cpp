@@ -127,25 +127,39 @@ QVector<ThroughputSample> DataStatistics::throughputHistory(int maxCount) const
 
 // ---- 统计计数器 ----
 
+/** @brief 获取updateErrors()调用总次数 @return 错误更新次数 */
 quint64 DataStatistics::totalErrorUpdates() const { return m_totalErrorUpdates; }
+/** @brief 获取updateConnectionHealth()调用总次数 @return 健康检查次数 */
 quint64 DataStatistics::totalHealthUpdates() const { return m_totalHealthUpdates; }
+/** @brief 获取定时器刷新总周期数 @return 刷新周期数 */
 quint64 DataStatistics::totalRefreshCycles() const { return m_totalRefreshCycles; }
+/** @brief 获取update()中的速率计算总次数 @return 计算次数 */
 quint64 DataStatistics::totalCalculations() const { return m_totalCalculations; }
+/** @brief 获取直方图更新总次数 @return 直方图更新次数 */
 quint64 DataStatistics::totalHistogramUpdates() const { return m_totalHistogramUpdates; }
+/** @brief 获取滑动窗口重置总次数 @return 窗口淘汰次数 */
 quint64 DataStatistics::totalSlidingWindowResets() const { return m_totalSlidingWindowResets; }
+/** @brief 获取吞吐量快照记录总次数 @return 采样点追加次数 */
 quint64 DataStatistics::totalThroughputSnapshots() const { return m_totalThroughputSnapshots; }
 
 // ---- 滚动吞吐量查询 ----
 
+/** @brief 获取滚动窗口RX平均速率 @return RX平均速率(bytes/s) */
 double DataStatistics::rollingRxBytesPerSec() const { return m_rollingRxBytesPerSec; }
+/** @brief 获取滚动窗口TX平均速率 @return TX平均速率(bytes/s) */
 double DataStatistics::rollingTxBytesPerSec() const { return m_rollingTxBytesPerSec; }
+/** @brief 获取滚动窗口RX包速率 @return RX包速率(packets/s) */
 double DataStatistics::rollingRxPacketsPerSec() const { return m_rollingRxPacketsPerSec; }
+/** @brief 获取滚动窗口TX包速率 @return TX包速率(packets/s) */
 double DataStatistics::rollingTxPacketsPerSec() const { return m_rollingTxPacketsPerSec; }
+/** @brief 获取滚动窗口大小 @return 窗口秒数 */
 int DataStatistics::rollingWindowSize() const { return kRollingWindowSeconds; }
 
 // ---- 直方图查询 ----
 
+/** @brief 获取吞吐量直方图数据 @return 直方图桶列表 */
 QVector<HistogramBucket> DataStatistics::throughputHistogram() const { return m_histogramBuckets; }
+/** @brief 获取直方图总采样次数 @return 采样总数 */
 int DataStatistics::histogramTotalSamples() const { return m_histogramTotalSamples; }
 
 /** @brief 重置数据统计计数器(不影响面板显示) */

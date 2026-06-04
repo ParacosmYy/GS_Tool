@@ -32,6 +32,7 @@ void PluginApi::registerPanel(const QString& name, QWidget* panel)
         return;
     }
     m_panels.append(panel);
+    ++m_totalPanelRegistrations;
     emit panelRegistered(name, panel);
 }
 
@@ -49,6 +50,7 @@ void PluginApi::addChannel(const QString& name)
         return;
     }
     m_channels.append(name);
+    ++m_totalChannelAdditions;
     emit channelAdded(name);
 }
 
@@ -80,6 +82,7 @@ bool PluginApi::sendData(const QByteArray& data)
 void PluginApi::subscribeReceivedData()
 {
     m_subscribed = true;
+    ++m_totalSubscribeToggles;
 }
 
 /**
@@ -91,6 +94,7 @@ void PluginApi::subscribeReceivedData()
 void PluginApi::unsubscribeReceivedData()
 {
     m_subscribed = false;
+    ++m_totalSubscribeToggles;
 }
 
 /**

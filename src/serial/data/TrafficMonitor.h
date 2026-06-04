@@ -34,10 +34,10 @@ public:
     /** @brief 析构函数 */
     ~TrafficMonitor() override;
 
-    /** @brief 记录已发送字节数 */
+    /** @brief 记录已发送字节数 @param bytes 本次发送的字节数 */
     void recordTxBytes(qint64 bytes);
 
-    /** @brief 记录已接收字节数 */
+    /** @brief 记录已接收字节数 @param bytes 本次接收的字节数 */
     void recordRxBytes(qint64 bytes);
 
     /** @brief 获取当前 RX 速率（字节/秒） */

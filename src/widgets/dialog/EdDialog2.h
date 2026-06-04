@@ -111,4 +111,19 @@ private:
 
     QMap<QString, RememberEntry> m_remember; ///< 记住选择条目表（按键名索引）
     int m_resultRole = 0;                    ///< 对话框结果角色值
+
+    // ---- 统计计数器(static inline，跨实例累积) ----
+    static inline quint64 s_totalOpens = 0;        ///< 对话框总打开次数
+    static inline quint64 s_totalButtonPresses = 0; ///< 总按钮点击次数
+    static inline quint64 s_totalRememberSets = 0;  ///< 总记住选择设置次数
+
+public:
+    /** @brief 获取对话框总打开次数 @return 累计打开次数 */
+    static quint64 totalOpens() { return s_totalOpens; }
+    /** @brief 获取总按钮点击次数 @return 累计按钮点击次数 */
+    static quint64 totalButtonPresses() { return s_totalButtonPresses; }
+    /** @brief 获取总记住选择设置次数 @return 累计设置次数 */
+    static quint64 totalRememberSets() { return s_totalRememberSets; }
+    /** @brief 重置对话框统计计数器 */
+    static void resetDialog2Statistics() { s_totalOpens = 0; s_totalButtonPresses = 0; s_totalRememberSets = 0; }
 };
