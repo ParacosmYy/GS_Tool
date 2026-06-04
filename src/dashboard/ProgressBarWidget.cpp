@@ -9,8 +9,9 @@
 #include "dashboard/ProgressBarWidget.h"
 
 #include <QPainter>
-#include "core/theme/ThemeManager.h"
 #include <QtMath>
+
+#include "core/theme/ThemeManager.h"
 
 /**
  * @brief 构造函数

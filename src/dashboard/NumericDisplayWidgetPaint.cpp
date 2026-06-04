@@ -8,8 +8,9 @@
 
 #include "dashboard/NumericDisplayWidget.h"
 
-#include "core/theme/ThemeManager.h"
 #include <QPainter>
+
+#include "core/theme/ThemeManager.h"
 
 /**
  * @brief 绘制数值显示区域

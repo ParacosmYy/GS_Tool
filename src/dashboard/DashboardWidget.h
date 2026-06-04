@@ -81,11 +81,16 @@ public:
         qint64  lastUpdateTimeMs = 0;      ///< 上次更新时间戳(毫秒)
     };
 
-    quint64 totalLayoutChanges() const;    ///< 累计布局变更次数
-    quint64 totalWidgetsAdded() const;     ///< 累计添加组件次数
-    quint64 totalWidgetsRemoved() const;   ///< 累计移除组件次数
-    quint64 totalFullSaves() const;        ///< 累计完整序列化保存次数
-    quint64 totalFullLoads() const;        ///< 累计完整序列化加载次数
+    /** @brief 获取累计布局变更次数 @return 变更计数 */
+    quint64 totalLayoutChanges() const;
+    /** @brief 获取累计添加组件次数 @return 添加计数 */
+    quint64 totalWidgetsAdded() const;
+    /** @brief 获取累计移除组件次数 @return 移除计数 */
+    quint64 totalWidgetsRemoved() const;
+    /** @brief 获取累计完整序列化保存次数 @return 保存计数 */
+    quint64 totalFullSaves() const;
+    /** @brief 获取累计完整序列化加载次数 @return 加载计数 */
+    quint64 totalFullLoads() const;
 
     /** @brief 获取累计组件更新次数(setValue/bindChannel触发) @return 更新总数 */
     quint64 totalUpdates() const;
@@ -102,25 +107,32 @@ public:
     /** @brief 获取统计数据的只读引用 @return Stats常量引用 */
     const Stats& stats() const { return m_stats; }
 
-    void resetDashboardWidgetStatistics(); ///< 重置所有统计计数器
+    /** @brief 重置所有统计计数器 */
+    void resetDashboardWidgetStatistics();
 
 signals:
-    void layoutChanged();                               ///< 布局发生变更
-    void savedToFile(const QString &filePath);          ///< 保存到文件完成
-    void loadedFromFile(const QString &filePath);       ///< 从文件加载完成
-    void savedToProfile(const QString &profileName);    ///< 保存到配置文件完成
-    void loadedFromProfile(const QString &profileName); ///< 从配置文件加载完成
+    /** @brief 布局发生变更 */
+    void layoutChanged();
+    /** @brief 保存到文件完成 @param filePath 文件路径 */
+    void savedToFile(const QString &filePath);
+    /** @brief 从文件加载完成 @param filePath 文件路径 */
+    void loadedFromFile(const QString &filePath);
+    /** @brief 保存到配置文件完成 @param profileName 配置名称 */
+    void savedToProfile(const QString &profileName);
+    /** @brief 从配置文件加载完成 @param profileName 配置名称 */
+    void loadedFromProfile(const QString &profileName);
 
 protected:
     /** @brief 重绘事件，累计重绘计数 @param event 绘制事件 */
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    void setupUI();  ///< 初始化UI与示例控件
+    /** @brief 初始化UI与示例控件 */
+    void setupUI();
 
-    /// @brief 从QWidget提取完整属性到DashboardItemConfig
+    /** @brief 从QWidget提取完整属性到DashboardItemConfig @param widget 目标控件 @param index 组件索引 @return 配置项 */
     DashboardItemConfig extractWidgetConfig(QWidget *widget, int index) const;
-    /// @brief 根据DashboardItemConfig创建并配置单个组件
+    /** @brief 根据DashboardItemConfig创建并配置单个组件 @param config 配置项 @return 创建的控件指针 */
     QWidget* createWidgetFromConfig(const DashboardItemConfig &config);
 
     QGridLayout    *m_grid;        ///< 网格布局

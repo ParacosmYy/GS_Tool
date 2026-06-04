@@ -14,11 +14,12 @@
 
 #include "dashboard/MiniChartWidget.h"
 
-#include "core/theme/ThemeManager.h"
 #include <QPainter>
 #include <QPainterPath>
 #include <QLinearGradient>
 #include <QtMath>
+
+#include "core/theme/ThemeManager.h"
 
 /**
  * @brief 绘制迷你折线图

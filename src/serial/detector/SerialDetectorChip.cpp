@@ -57,9 +57,13 @@ const QVector<UsbVendorEntry> SerialDetector::kKnownVendors = {
  *
  * 遍历已知芯片数据库，匹配VID返回对应的厂商名称和常见芯片型号。
  * 多个条目匹配同一VID时返回第一个(最常见芯片)。
+ * VID为0时直接返回空条目，避免无效遍历。
  */
 UsbVendorEntry SerialDetector::lookupVendor(quint16 vid)
 {
+    if (vid == 0) {
+        return { 0, QString(), QString() };
+    }
     for (const auto &entry : kKnownVendors) {
         if (entry.vid == vid) return entry;
     }

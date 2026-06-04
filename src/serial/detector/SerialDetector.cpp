@@ -104,7 +104,7 @@ int SerialDetector::knownVendorCount()
 
 // ---- 内部方法 ----
 
-/** @brief 刷新端口列表，检测插入/移除事件并发射对应信号 */
+/** @brief 刷新端口列表，检测插入/移除事件并发射对应信号。包含空端口名过滤 */
 void SerialDetector::refreshPorts()
 {
     ++m_totalScans;
@@ -112,6 +112,10 @@ void SerialDetector::refreshPorts()
     const auto ports = QSerialPortInfo::availablePorts();
     for (const auto &pi : ports) {
         SerialPortInfo info = fromQtInfo(pi);
+        /* 跳过无效端口: 端口名为空(如某些虚拟总线设备) */
+        if (info.portName.isEmpty()) {
+            continue;
+        }
         info.isAvailable = true;
         current[info.portName] = info;
     }
@@ -141,20 +145,32 @@ void SerialDetector::refreshPorts()
 /**
  * @brief 将QSerialPortInfo转换为增强版SerialPortInfo
  *
- * 自动填充: 友好名称、驱动类型、芯片型号、VID/PID十六进制字符串
+ * 自动填充: 友好名称、驱动类型、芯片型号、VID/PID十六进制字符串。
+ * 包含端口名称空值检查和VID/PID边界验证。
  * @param info Qt串口信息对象 @return 增强版内部SerialPortInfo结构
  */
 SerialPortInfo SerialDetector::fromQtInfo(const QSerialPortInfo &info) const
 {
     SerialPortInfo spi;
-    // 基础字段
-    spi.portName = info.portName();
+    // 基础字段 — 空字符串防护
+    spi.portName = info.portName().trimmed();
+    if (spi.portName.isEmpty()) {
+        /* 端口名为空时使用系统路径作为回退标识，避免空键插入m_knownPorts */
+        spi.portName = info.systemLocation().isEmpty()
+            ? tr("未知端口") : info.systemLocation();
+    }
     spi.description = info.description();
     spi.manufacturer = info.manufacturer();
     spi.serialNumber = info.serialNumber();
     spi.systemLocation = info.systemLocation();
+
+    // VID/PID安全提取，确保hasVendorIdentifier/hasProductIdentifier前置检查
     spi.vendorId = info.hasVendorIdentifier() ? info.vendorIdentifier() : 0;
     spi.productId = info.hasProductIdentifier() ? info.productIdentifier() : 0;
+
+    // VID/PID边界验证: 确保不超过quint16范围(0x0000~0xFFFF)
+    spi.vendorId = spi.vendorId & 0xFFFF;
+    spi.productId = spi.productId & 0xFFFF;
 
     // 增强字段: VID/PID十六进制
     if (spi.vendorId != 0)
@@ -162,7 +178,7 @@ SerialPortInfo SerialDetector::fromQtInfo(const QSerialPortInfo &info) const
     if (spi.productId != 0)
         spi.pidHex = QString("%1").arg(spi.productId, 4, 16, QLatin1Char('0')).toUpper();
 
-    // 芯片识别
+    // 芯片识别 — null-safe: identifyChip内部使用QHash::value，VID/PID为0时返回"Unknown"
     spi.chipModel = identifyChip(spi.vendorId, spi.productId);
     spi.driverType = identifyDriverType(spi.description, spi.manufacturer);
 

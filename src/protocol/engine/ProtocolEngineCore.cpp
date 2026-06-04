@@ -21,6 +21,9 @@
 /** @brief 缓冲区最大容量 64KB，防止内存膨胀(与ProtocolEngine.cpp中的定义保持一致) */
 static constexpr int MAX_BUFFER_SIZE = 65536;
 
+/** @brief 单帧最大长度限制 16KB，超过此值的帧被视为畸形帧 */
+static constexpr int MAX_FRAME_LENGTH = 16384;
+
 /** @brief 向引擎喂入新的串口数据(追加缓冲→溢出保护→循环解析) @param data 新接收到的原始字节流 */
 void ProtocolEngine::feedData(const QByteArray &data)
 {
@@ -95,6 +98,17 @@ bool ProtocolEngine::tryParseOneFrame()
         return true; /* 继续尝试解析下一帧 */
     }
 
+    /* 帧长度上限检查: 防止畸形帧消耗过多内存 */
+    if (frameLength > MAX_FRAME_LENGTH) {
+        emit parseError(tr("帧长度超出限制: %1 > %2").arg(frameLength).arg(MAX_FRAME_LENGTH));
+        ++m_parseErrors;
+        ++m_totalParseErrors;
+        ++m_framesRejected;
+        /* 丢弃整个帧头后重新搜索 */
+        m_buffer.remove(0, headerBytes.size());
+        return true;
+    }
+
     /* ---- 步骤4：检查整帧数据是否完整 ---- */
     if (m_buffer.size() < frameLength) {
         /* 帧数据尚未完整接收 */
@@ -118,25 +132,33 @@ bool ProtocolEngine::tryParseOneFrame()
             ++m_totalValidationFailures;
             ++m_totalCrcChecks;
             QString algoName = checksumAlgorithmToString(effectiveAlgo);
-            emit parseError(tr("帧校验失败(%1): 期望=0x%2, 实际=0x%3")
+            /* CRC校验失败: 记录帧长度和前8字节十六进制用于诊断 */
+            QString frameHex = rawFrame.left(8).toHex(' ').toUpper();
+            emit parseError(tr("CRC校验失败(%1): 期望=0x%2, 实际=0x%3, 帧长=%4, 头部=[%5]")
                                 .arg(algoName)
                                 .arg(expectedVal, 0, 16)
-                                .arg(actualVal, 0, 16));
+                                .arg(actualVal, 0, 16)
+                                .arg(rawFrame.size())
+                                .arg(frameHex));
             emit checksumFailed(expectedVal, actualVal, algoName);
             ++m_parseErrors;
             ++m_totalParseErrors;
             ++m_framesRejected;
-            return true;
+            return true; /* 跳过畸形帧，继续解析后续数据 */
         }
         ++m_crcPassCount;
         ++m_totalValidationPasses;
         ++m_totalCrcChecks;
     }
 
-    /* ---- 步骤7：解析字段 ---- */
+    /* ---- 步骤7：解析字段(带越界保护) ---- */
     QVariantMap fields;
     const auto fieldDefs = m_schema->fields();
     for (const auto &field : fieldDefs) {
+        /* 跳过偏移超出帧范围的字段定义，避免越界访问 */
+        if (field.offset < 0 || field.offset >= rawFrame.size()) {
+            continue;
+        }
         fields[field.name] = extractField(rawFrame, field);
     }
 

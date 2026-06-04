@@ -9,51 +9,67 @@
 #include "serial/detector/SerialDetector.h"
 #include <QSet>
 
-/** @brief 按USB厂商ID(VID)查找端口 @param vid USB厂商ID @return 匹配的SerialPortInfo列表 */
+/** @brief 按USB厂商ID(VID)查找端口。VID为0时返回空列表 @param vid USB厂商ID @return 匹配的SerialPortInfo列表 */
 QList<SerialPortInfo> SerialDetector::findByVendorId(quint16 vid) const
 {
     ++m_totalVidLookups;
     QList<SerialPortInfo> result;
+    if (vid == 0) {
+        /* VID为0表示无法识别的设备，跳过遍历 */
+        return result;
+    }
     for (const auto &info : m_knownPorts) {
         if (info.vendorId == vid) result.append(info);
     }
     return result;
 }
 
-/** @brief 按设备描述关键词查找端口(大小写不敏感) @param keyword 搜索关键词 @return 匹配的SerialPortInfo列表 */
+/** @brief 按设备描述关键词查找端口(大小写不敏感)。空关键词返回空列表 @param keyword 搜索关键词 @return 匹配的SerialPortInfo列表 */
 QList<SerialPortInfo> SerialDetector::findByDescription(const QString &keyword) const
 {
     ++m_totalFilterQueries;
     QList<SerialPortInfo> result;
+    if (keyword.trimmed().isEmpty()) {
+        return result;
+    }
     for (const auto &info : m_knownPorts) {
         if (info.description.contains(keyword, Qt::CaseInsensitive)) result.append(info);
     }
     return result;
 }
 
-/** @brief 按端口名称精确查找端口信息 @param name 端口名称(如"COM3") @return 匹配的SerialPortInfo，未找到返回空对象 */
+/** @brief 按端口名称精确查找端口信息。空名称返回默认空对象 @param name 端口名称(如"COM3") @return 匹配的SerialPortInfo，未找到返回空对象 */
 SerialPortInfo SerialDetector::findByPortName(const QString &name) const
 {
     ++m_totalFilterQueries;
+    if (name.trimmed().isEmpty()) {
+        return SerialPortInfo();
+    }
     return m_knownPorts.value(name);
 }
 
-/** @brief 按制造商关键词查找端口(大小写不敏感) @param keyword 制造商关键词 @return 匹配的SerialPortInfo列表 */
+/** @brief 按制造商关键词查找端口(大小写不敏感)。空关键词返回空列表 @param keyword 制造商关键词 @return 匹配的SerialPortInfo列表 */
 QList<SerialPortInfo> SerialDetector::findByManufacturer(const QString &keyword) const
 {
     ++m_totalFilterQueries;
     QList<SerialPortInfo> result;
+    if (keyword.trimmed().isEmpty()) {
+        return result;
+    }
     for (const auto &info : m_knownPorts) {
         if (info.manufacturer.contains(keyword, Qt::CaseInsensitive)) result.append(info);
     }
     return result;
 }
 
-/** @brief 按驱动类型查找端口(精确匹配driverType字段) @param driverType 驱动类型 @return 匹配的SerialPortInfo列表 */
+/** @brief 按驱动类型查找端口(精确匹配driverType字段)。空驱动类型返回空列表 @param driverType 驱动类型 @return 匹配的SerialPortInfo列表 */
 QList<SerialPortInfo> SerialDetector::findByDriverType(const QString &driverType) const
 {
     ++m_totalFilterQueries;
     QList<SerialPortInfo> result;
+    if (driverType.trimmed().isEmpty()) {
+        return result;
+    }
     for (const auto &info : m_knownPorts) {
         if (info.driverType == driverType) result.append(info);
     }
