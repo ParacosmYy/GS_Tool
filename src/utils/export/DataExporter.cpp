@@ -293,3 +293,6 @@ void DataExporter::resetStats()
     m_lastExportRowCount = 0;
     m_lastExportByteCount = 0;
 }
+
+// exportPlain/exportHexDump/exportCsv/exportTimestamped/exportBin/exportJson
+// 见 DataExporterFormats.cpp

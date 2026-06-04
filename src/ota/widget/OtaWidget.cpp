@@ -20,6 +20,7 @@
 #include <QFormLayout>
 #include <QTime>
 #include <QFileInfo>
+#include <QFileDialog>
 #include <QMimeData>
 #include <QUrl>
 
@@ -361,3 +362,5 @@ void OtaWidget::resetOtaWidgetStatistics()
     m_totalTransfersFailed = 0;
     m_totalBytesTransferred = 0;
 }
+
+// onBrowseFile/onStartTransfer/onCancelTransfer 见 OtaWidgetSlots2.cpp

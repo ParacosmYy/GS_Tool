@@ -310,3 +310,6 @@ void BleGattBrowser::resetStatistics()
     m_totalBytesRead = m_totalBytesWritten = 0;
     m_lastDiscoveryDurationMs = 0;
 }
+
+// onRefreshClicked/onConnectionStateChanged/onServicesDiscovered/onTreeItemChanged/populateTree
+// 见 BleGattBrowserServices.cpp

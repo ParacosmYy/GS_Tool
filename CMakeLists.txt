@@ -160,6 +160,7 @@ set(SOURCES
     src/protocol/parser/FrameDefinition.cpp
     src/core/settings/SessionManager.cpp
     src/core/managers/ShortcutManager.cpp
+    src/core/managers/ShortcutManagerActions.cpp
     src/core/layout/ResponsiveLayout.cpp
 
     # ── F1: 数据录制回放 ──
@@ -233,6 +234,7 @@ set(SOURCES
 
     # ── F12: Bluetooth/BLE 调试 ──
     src/connection/ble/BleScanner.cpp
+    src/connection/ble/BleScannerDiscovery.cpp
     src/connection/ble/BleConnection.cpp
     src/connection/ble/BleGattModel.cpp
     src/connection/ble/BleGattBrowser.cpp
