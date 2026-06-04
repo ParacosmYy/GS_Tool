@@ -45,6 +45,7 @@ set(SOURCES
     src/core/connect/ConnectionControllerHandlers.cpp
     src/core/recording/RecordingController.cpp
     src/core/navigation/NavigationController.cpp
+    src/core/navigation/NavigationControllerQuery.cpp
     src/core/navigation/NavigationControllerAnimations.cpp
     src/core/navigation/NavigationControllerStatus.cpp
     src/core/navigation/IconNavBar.cpp
@@ -105,6 +106,7 @@ set(SOURCES
     src/core/theme/IconManager.cpp
     src/connection/serial_port/SerialConnection.cpp
     src/connection/serial_port/SerialConnectionError.cpp
+    src/connection/serial_port/SerialConnectionUtility.cpp
     src/connection/serial_port/SerialConnectionStats.cpp
     src/connection/network/TcpConnection.cpp
     src/connection/network/TcpConnectionStats.cpp
@@ -161,6 +163,7 @@ set(SOURCES
     src/protocol/editor/FrameVisualEditorFields.cpp
     src/protocol/editor/FrameVisualEditorUI.cpp
     src/protocol/hex/IntelHexParser.cpp
+    src/protocol/hex/IntelHexParserStats.cpp
     src/protocol/hex/IntelHexParserRecord.cpp
     src/protocol/bridge/JustFloatBridge.cpp
     src/protocol/bridge/JustFloatBridgeStats.cpp
@@ -405,6 +408,7 @@ set(SOURCES
 
     # ── F17: WebSocket 客户端 ──
     src/connection/ws/WebSocketConnection.cpp
+    src/connection/ws/WebSocketConnectionHandshake.cpp
     src/connection/ws/WebSocketFrame.cpp
     src/connection/ws/WebSocketFrameStats.cpp
     src/connection/ws/WsConfigPanel.cpp
