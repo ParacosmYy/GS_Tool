@@ -136,6 +136,12 @@ public:
     /** @brief 获取桥接错误数 */
     quint64 bridgeErrors() const { return m_bridgeErrors; }
 
+    /** @brief 获取模式切换次数 @return 累计切换次数 */
+    quint64 totalModeSwitches() const { return m_totalModeSwitches; }
+
+    /** @brief 获取队列排空次数 @return 累计排空次数 */
+    quint64 totalQueueDrains() const { return m_totalQueueDrains; }
+
     /** @brief 重置所有桥接统计计数器 */
     void resetStats();
 
@@ -181,6 +187,8 @@ private:
     quint64 m_spiTransactions = 0;                  ///< SPI事务数
     quint64 m_i2cTransactions = 0;                  ///< I2C事务数
     quint64 m_bridgeErrors = 0;                     ///< 桥接错误数
+    quint64 m_totalModeSwitches = 0;                ///< 模式切换次数
+    quint64 m_totalQueueDrains = 0;                 ///< 队列排空次数
 };
 
 #endif // SPII2CBRIDGEMANAGER_H

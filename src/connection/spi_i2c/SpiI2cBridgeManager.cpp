@@ -62,6 +62,7 @@ bool SpiI2cBridgeManager::switchMode(BridgeMode mode)
     }
 
     m_currentMode = mode;
+    ++m_totalModeSwitches;
     emit modeSwitched(mode);
     return true;
 }
@@ -113,6 +114,7 @@ void SpiI2cBridgeManager::processNextTransaction()
 {
     if (m_queue.isEmpty()) {
         m_processing = false;
+        ++m_totalQueueDrains;
         emit queueDrained();
         return;
     }
@@ -139,6 +141,7 @@ void SpiI2cBridgeManager::processNextTransaction()
         m_queueTimer->start();
     } else {
         m_processing = false;
+        ++m_totalQueueDrains;
         emit queueDrained();
     }
 }
@@ -232,4 +235,6 @@ void SpiI2cBridgeManager::resetStats()
     m_spiTransactions = 0;
     m_i2cTransactions = 0;
     m_bridgeErrors = 0;
+    m_totalModeSwitches = 0;
+    m_totalQueueDrains = 0;
 }

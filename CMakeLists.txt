@@ -123,6 +123,7 @@ set(SOURCES
     src/protocol/editor/FrameVisualEditor.cpp
     src/protocol/editor/FrameVisualEditorUI.cpp
     src/protocol/hex/IntelHexParser.cpp
+    src/protocol/hex/IntelHexParserRecord.cpp
     src/protocol/bridge/JustFloatBridge.cpp
     src/protocol/bridge/FireWaterBridge.cpp
     src/protocol/bridge/ProtocolBridgeManager.cpp
@@ -151,6 +152,7 @@ set(SOURCES
     src/ota/manager/OtaManager.cpp
     src/ota/manager/OtaManagerFileOps.cpp
     src/ota/manager/OtaManagerProgress.cpp
+    src/ota/manager/OtaManagerVerify.cpp
     src/ota/widget/OtaWidget.cpp
     src/ota/widget/OtaWidgetDisplay.cpp
     src/ota/widget/OtaWidgetSlots.cpp

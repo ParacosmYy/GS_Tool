@@ -18,6 +18,7 @@ void PluginLoader::removeSearchPath(const QString &p) { m_searchPaths.removeAll(
 
 /** @brief 扫描所有搜索路径中的插件(读取元数据，不加载) @return 插件信息列表 */
 QList<PluginLoader::PluginInfo> PluginLoader::scanPlugins() {
+    ++m_totalScanRuns;
     QList<PluginInfo> result;
     for (const auto &dir : m_searchPaths) {
         QDir d(dir);
@@ -40,12 +41,14 @@ QList<PluginLoader::PluginInfo> PluginLoader::scanPlugins() {
 
 /** @brief 加载指定路径的插件 @param fp 插件文件路径 @return 加载成功返回true */
 bool PluginLoader::loadPlugin(const QString &fp) {
+    ++m_totalLoadAttempts;
     auto *loader = new QPluginLoader(fp, this);
     if (!loader->load()) {
         emit loadError(fp, loader->errorString());
         delete loader;
         return false;
     }
+    ++m_totalLoadSuccesses;
     PluginInfo info;
     info.filePath = fp;
     auto meta = loader->metaData();
@@ -61,7 +64,7 @@ bool PluginLoader::loadPlugin(const QString &fp) {
 /** @brief 卸载指定插件 @param name 插件名称 */
 void PluginLoader::unloadPlugin(const QString &name) {
     auto it = m_loaders.find(name);
-    if (it != m_loaders.end()) { it.value()->unload(); delete it.value(); m_loaders.erase(it); m_plugins.remove(name); emit pluginUnloaded(name); }
+    if (it != m_loaders.end()) { ++m_totalUnloads; it.value()->unload(); delete it.value(); m_loaders.erase(it); m_plugins.remove(name); emit pluginUnloaded(name); }
 }
 
 /** @brief 获取插件实例对象 @param name 插件名称 @return QObject指针，不存在返回nullptr */

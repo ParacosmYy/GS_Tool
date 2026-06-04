@@ -37,7 +37,7 @@ public:
     /** @brief 卸载所有已加载插件 */
     void unloadAll();
 
-    /** @brief 获取已加载插件的实例对象 @param name 插件名称 @return 插件实例指针 */
+    /** @brief 获取已加载插件的实例对象 @param name 插件名称 @return 插件实例指针，未找到返回nullptr */
     QObject* pluginInstance(const QString &name) const;
     /** @brief 获取所有已加载插件名称列表 @return 名称列表 */
     QStringList loadedPlugins() const;
@@ -68,4 +68,22 @@ private:
 
     QMap<QString, PluginEntry> m_plugins;  ///< 插件名称到条目的映射
     QStringList m_searchPaths;              ///< 插件搜索路径列表
+
+    // ---- 统计计数器 ----
+    quint64 m_totalLoadAttempts = 0;        ///< 总加载尝试次数
+    quint64 m_totalLoadSuccesses = 0;       ///< 总加载成功次数
+    quint64 m_totalUnloads = 0;             ///< 总卸载次数
+    quint64 m_totalScanRuns = 0;            ///< 总扫描次数
+
+public:
+    /** @brief 获取总加载尝试次数 @return 累计尝试次数 */
+    quint64 totalLoadAttempts() const { return m_totalLoadAttempts; }
+    /** @brief 获取总加载成功次数 @return 累计成功次数 */
+    quint64 totalLoadSuccesses() const { return m_totalLoadSuccesses; }
+    /** @brief 获取总卸载次数 @return 累计卸载次数 */
+    quint64 totalUnloads() const { return m_totalUnloads; }
+    /** @brief 获取总扫描次数 @return 累计扫描次数 */
+    quint64 totalScanRuns() const { return m_totalScanRuns; }
+    /** @brief 重置加载器统计 */
+    void resetLoaderStatistics() { m_totalLoadAttempts = 0; m_totalLoadSuccesses = 0; m_totalUnloads = 0; m_totalScanRuns = 0; }
 };
