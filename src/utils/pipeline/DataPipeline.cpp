@@ -42,6 +42,8 @@ void DataPipeline::moveStage(int from, int to) {
 
 /** @brief 依次通过所有启用的阶段处理输入数据，每个阶段发射stageProcessed信号 @param input 原始输入数据 @return 处理后的数据 */
 QByteArray DataPipeline::process(const QByteArray &input) {
+    ++m_totalProcessCalls;
+    m_totalBytesProcessed += static_cast<quint64>(input.size());
     QByteArray data = input;
     for (const auto &stage : m_stages) {
         if (!stage.enabled) continue;
@@ -50,6 +52,7 @@ QByteArray DataPipeline::process(const QByteArray &input) {
             data = stage.fn(data);
             emit stageProcessed(stage.name, inSize, data.size());
         } catch (...) {
+            ++m_totalStageErrors;
             emit stageError(stage.name, tr("Processing failed"));
         }
     }

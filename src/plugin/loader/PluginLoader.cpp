@@ -75,11 +75,13 @@ void PluginLoader::unloadPlugin(const QString &name)
 /** @brief 卸载所有已加载插件 */
 void PluginLoader::unloadAll()
 {
+    int n = m_loaders.size();
     for (auto it = m_loaders.begin(); it != m_loaders.end(); ++it) {
         it.value()->unload();
         delete it.value();
         emit pluginUnloaded(it.key());
     }
+    m_totalUnloads += static_cast<quint64>(n);
     m_loaders.clear();
     m_plugins.clear();
 }
@@ -104,6 +106,7 @@ QList<PluginLoader::PluginInfo> PluginLoader::loadedPlugins() const
 /** @brief 扫描所有搜索路径中的插件 @return 发现的插件信息列表 */
 QList<PluginLoader::PluginInfo> PluginLoader::scanPlugins()
 {
+    ++m_totalScans;
     QList<PluginInfo> found;
     for (const QString& searchPath : m_searchPaths) {
         QDir dir(searchPath);

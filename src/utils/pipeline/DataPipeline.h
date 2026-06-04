@@ -41,6 +41,17 @@ public:
     int stageCount() const;
     /** @brief 清空所有处理阶段 */
     void clearStages();
+
+    // ---- 统计计数器 ----
+    /** @brief 获取累计管道处理总次数 @return 处理次数 */
+    quint64 totalProcessCalls() const { return m_totalProcessCalls; }
+    /** @brief 获取累计处理的输入字节总数 @return 字节数 */
+    quint64 totalBytesProcessed() const { return m_totalBytesProcessed; }
+    /** @brief 获取累计阶段错误次数 @return 错误次数 */
+    quint64 totalStageErrors() const { return m_totalStageErrors; }
+    /** @brief 重置所有统计计数器 */
+    void resetPipelineStatistics() { m_totalProcessCalls = 0; m_totalBytesProcessed = 0; m_totalStageErrors = 0; }
+
 signals:
     /** @brief 单个阶段处理完成信号 @param name 阶段名称 @param inputSize 输入数据大小 @param outputSize 输出数据大小 */
     void stageProcessed(const QString &name, int inputSize, int outputSize);
@@ -50,4 +61,9 @@ signals:
     void stageError(const QString &name, const QString &error);
 private:
     QList<Stage> m_stages; ///< 处理阶段列表
+
+    // ---- 统计 ----
+    quint64 m_totalProcessCalls = 0;       ///< 统计: 累计管道处理总次数
+    quint64 m_totalBytesProcessed = 0;     ///< 统计: 累计处理的输入字节总数
+    quint64 m_totalStageErrors = 0;        ///< 统计: 累计阶段处理错误次数
 };
