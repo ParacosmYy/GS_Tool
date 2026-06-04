@@ -624,6 +624,7 @@ set(SOURCES
 
     # ── F29: 报文模板库 ──
     src/utils/packet_lib/PacketTemplateLib.cpp
+    src/utils/packet_lib/PacketTemplateLibBuiltins.cpp
     src/utils/packet_lib/PacketTemplateLibStats.cpp
 
     # ── F30: 数据掩码编辑器 ──
@@ -646,6 +647,18 @@ set(SOURCES
     # ── 波形模式检测 ──
     src/core/analysis/WaveformPatternDetector.cpp
     src/core/analysis/WaveformPatternDetectorStats.cpp
+
+    # ── F29: 协议定时分析器 ──
+    src/utils/protocol_timer/ProtocolTimerWidget.cpp
+    src/utils/protocol_timer/ProtocolTimerWidgetStats.cpp
+
+    # ── F33: 设备配置档案管理 ──
+    src/core/settings/ConfigProfileManager.cpp
+    src/core/settings/ConfigProfileManagerStats.cpp
+
+    # ── 数据流过滤器 ──
+    src/core/filter/DataStreamFilter.cpp
+    src/core/filter/DataStreamFilterStats.cpp
 )
 
 set(HEADERS
@@ -948,6 +961,15 @@ set(HEADERS
 
     # ── F32: 十六进制内存编辑器 ──
     src/utils/hex_editor/MemoryHexEditor.h
+
+    # ── F29: 协议定时分析器 ──
+    src/utils/protocol_timer/ProtocolTimerWidget.h
+
+    # ── F33: 设备配置档案管理 ──
+    src/core/settings/ConfigProfileManager.h
+
+    # ── 数据流过滤器 ──
+    src/core/filter/DataStreamFilter.h
 )
 
 set(RESOURCES
