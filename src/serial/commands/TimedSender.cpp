@@ -114,6 +114,7 @@ void TimedSender::doSend()
 
         // 检查队列有效性
         if (m_queue.isEmpty()) {
+            ++m_totalTimedErrors;
             m_isRunning = false;
             m_timer.stop();
             return;
@@ -129,6 +130,7 @@ void TimedSender::doSend()
         m_queueIndex = (m_queueIndex + 1) % m_queue.size();
         ++m_sendCount;
         m_totalBytesSent += static_cast<quint64>(dataToSend.size());
+        m_totalTimedBytesSent += static_cast<quint64>(dataToSend.size());
     }
 
     // 释放锁后发射信号，避免下游回调死锁
@@ -156,7 +158,21 @@ quint64 TimedSender::totalTimedSends() const
     return m_totalTimedSends;
 }
 
-/** @brief 重置所有统计计数器(sendCount/totalBytesSent/scheduleCount/totalTimedSends归零)，线程安全 */
+/** @brief 获取定时发送累计字节数，线程安全 @return 定时发送写入的总字节数 */
+quint64 TimedSender::totalTimedBytesSent() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_totalTimedBytesSent;
+}
+
+/** @brief 获取定时发送累计错误次数，线程安全 @return 发送失败/队列为空等错误次数 */
+quint64 TimedSender::totalTimedErrors() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_totalTimedErrors;
+}
+
+/** @brief 重置所有统计计数器(sendCount/totalBytesSent/scheduleCount/totalTimedSends/totalTimedBytesSent/totalTimedErrors归零)，线程安全 */
 void TimedSender::resetStatistics()
 {
     QMutexLocker locker(&m_mutex);
@@ -164,4 +180,6 @@ void TimedSender::resetStatistics()
     m_totalBytesSent = 0;
     m_scheduleCount = 0;
     m_totalTimedSends = 0;
+    m_totalTimedBytesSent = 0;
+    m_totalTimedErrors = 0;
 }

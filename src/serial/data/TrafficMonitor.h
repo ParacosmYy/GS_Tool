@@ -122,8 +122,8 @@ private:
 
     // ── 统计计数器 ──
     quint64 m_totalSamples = 0;                ///< 采样总次数(calculateRates调用次数)
-    mutable quint64 m_totalBytesIn = 0;        ///< 累计接收字节记录次数(recordRxBytes调用次数)
-    mutable quint64 m_totalBytesOut = 0;       ///< 累计发送字节记录次数(recordTxBytes调用次数)
+    quint64 m_totalBytesIn = 0;                ///< 累计接收字节记录次数(recordRxBytes调用次数)
+    quint64 m_totalBytesOut = 0;               ///< 累计发送字节记录次数(recordTxBytes调用次数)
     quint64 m_totalRateSamples = 0;            ///< 累计速率采样次数(历史点追加次数)
     quint64 m_totalPeakRateExceededEvents = 0; ///< 累计峰值速率被刷新的事件次数
 };
