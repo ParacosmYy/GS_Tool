@@ -43,7 +43,11 @@ bool DbcParser::loadFromFile(const QString& filePath)
     const QString content = in.readAll();
     file.close();
 
-    return parseFromText(content);
+    const bool ok = parseFromText(content);
+    if (ok) {
+        ++m_totalFilesParsed;
+    }
+    return ok;
 }
 
 /**
@@ -232,8 +236,10 @@ void DbcParser::clear()
 
 // ── 统计接口 ──
 
-/** @brief 获取累计解析次数 @return 解析次数 */
+/** @brief 获取累计解析次数(文件+文本) @return 解析次数 */
 quint64 DbcParser::totalParses() const { return m_totalParses; }
+/** @brief 获取累计从文件加载解析次数 @return 文件解析次数 */
+quint64 DbcParser::totalFilesParsed() const { return m_totalFilesParsed; }
 /** @brief 获取累计解析的消息总数 @return 消息数 */
 quint64 DbcParser::totalMessagesParsed() const { return m_totalMessagesParsed; }
 /** @brief 获取累计解码的信号总数 @return 信号数 */
@@ -241,10 +247,11 @@ quint64 DbcParser::totalSignalsDecoded() const { return m_totalSignalsDecoded; }
 /** @brief 获取累计解析错误次数 @return 错误次数 */
 quint64 DbcParser::totalParseErrors() const { return m_totalParseErrors; }
 
-/** @brief 重置所有DBC统计计数器(解析数/消息数/信号数/错误数) */
+/** @brief 重置所有DBC统计计数器(解析数/文件数/消息数/信号数/错误数) */
 void DbcParser::resetDbcStatistics()
 {
     m_totalParses = 0;
+    m_totalFilesParsed = 0;
     m_totalMessagesParsed = 0;
     m_totalSignalsDecoded = 0;
     m_totalParseErrors = 0;

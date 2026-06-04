@@ -159,6 +159,7 @@ set(SOURCES
     src/ota/widget/OtaWidgetSlots.cpp
     src/ota/widget/OtaWidgetSlots2.cpp
     src/ota/history/OtaHistoryModel.cpp
+    src/ota/history/OtaHistoryModelIndex.cpp
     src/ota/protocols/base/BaseTransfer.cpp
     src/ota/protocols/xmodem/XModemTransfer.cpp
     src/ota/protocols/xmodem/XModemTransferHandlers.cpp

@@ -104,6 +104,10 @@ QVariant ProtobufDecoder::tryDecodeNested(
     // 必须完整消费所有字节且至少解析出一个字段
     if (offset == data.size() && fieldCount > 0) {
         success = true;
+        ++m_stats.totalNestedMessages;
+        if (static_cast<quint64>(depth) > m_stats.maxNestingDepth) {
+            m_stats.maxNestingDepth = static_cast<quint64>(depth);
+        }
         return QVariant::fromValue(nestedResult);
     }
 

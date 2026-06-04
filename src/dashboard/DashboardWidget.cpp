@@ -19,7 +19,6 @@
 #include "dashboard/LedIndicatorWidget.h"
 #include "dashboard/NumericDisplayWidget.h"
 
-
 /** @brief 构造函数，初始化UI、序列化器与示例控件 @param parent 父控件 */
 DashboardWidget::DashboardWidget(QWidget *parent)
     : QWidget(parent)

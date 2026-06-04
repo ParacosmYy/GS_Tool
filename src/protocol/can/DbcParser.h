@@ -112,7 +112,8 @@ public:
     void clear();
 
     // ---- 统计接口 ----
-    quint64 totalParses() const;            ///< 累计解析次数
+    quint64 totalParses() const;            ///< 累计解析次数(文件+文本)
+    quint64 totalFilesParsed() const;       ///< 累计从文件加载解析次数
     quint64 totalMessagesParsed() const;    ///< 累计解析消息总数
     quint64 totalSignalsDecoded() const;    ///< 累计解码信号总数
     quint64 totalParseErrors() const;       ///< 累计解析错误次数
@@ -139,7 +140,8 @@ private:
     QString m_lastError;                      ///< 最后错误信息
 
     // ---- 统计计数器 ----
-    quint64 m_totalParses = 0;               ///< 累计解析次数
+    quint64 m_totalParses = 0;               ///< 累计解析次数(文件+文本)
+    quint64 m_totalFilesParsed = 0;          ///< 累计从文件加载解析次数
     quint64 m_totalMessagesParsed = 0;       ///< 累计解析消息总数
     mutable quint64 m_totalSignalsDecoded = 0; ///< 累计解码信号总数(const方法中递增)
     quint64 m_totalParseErrors = 0;          ///< 累计解析错误次数

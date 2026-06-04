@@ -56,6 +56,10 @@ public:
     quint64 totalBytesPlayed() const;
     /** @brief 获取累计错误次数（录制/回放启动失败等） */
     quint64 totalErrors() const;
+    /** @brief 获取累计书签创建数 */
+    quint64 totalBookmarks() const;
+    /** @brief 获取累计录制错误数(仅录制启动/写入失败) */
+    quint64 totalRecordingErrors() const;
 
     // ==================== 录制时长与帧统计 ====================
 
@@ -120,6 +124,8 @@ private:
     quint64 m_totalPlaybacks = 0;          ///< 累计回放次数
     quint64 m_totalBytesPlayed = 0;        ///< 累计回放字节数
     quint64 m_totalErrors = 0;             ///< 累计错误次数
+    quint64 m_totalBookmarks = 0;          ///< 累计书签创建数
+    quint64 m_totalRecordingErrors = 0;    ///< 累计录制错误数
 
     // ---- 录制时长与帧统计计数器 ----
     qint64 m_totalRecordedMs = 0;          ///< 累计录制总时长(毫秒)

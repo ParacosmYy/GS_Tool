@@ -32,6 +32,9 @@ RecordingController::RecordingController(DataLogger* logger, QObject* parent)
         ++m_totalErrors;
         emit statusMessage(msg, 5000);
     });
+    // 统计: 书签创建计数(信号被外部转发触发)
+    connect(this, &RecordingController::addBookmarkRequested,
+            this, [this]() { ++m_totalBookmarks; });
 }
 
 /** @brief 将录制/回放按钮添加到工具栏 */
@@ -73,6 +76,10 @@ quint64 RecordingController::totalPlaybacks() const { return m_totalPlaybacks; }
 quint64 RecordingController::totalBytesPlayed() const { return m_totalBytesPlayed; }
 /** @brief 获取累计错误次数 @return 错误总数 */
 quint64 RecordingController::totalErrors() const { return m_totalErrors; }
+/** @brief 获取累计书签创建数 @return 书签总数 */
+quint64 RecordingController::totalBookmarks() const { return m_totalBookmarks; }
+/** @brief 获取累计录制错误数 @return 录制错误总数 */
+quint64 RecordingController::totalRecordingErrors() const { return m_totalRecordingErrors; }
 
 /** @brief 获取累计录制总时长(毫秒) @return 时长总和 */
 qint64 RecordingController::totalRecordedMs() const { return m_totalRecordedMs; }
@@ -96,6 +103,8 @@ void RecordingController::resetRecordingStatistics()
     m_totalPlaybacks = 0;
     m_totalBytesPlayed = 0;
     m_totalErrors = 0;
+    m_totalBookmarks = 0;
+    m_totalRecordingErrors = 0;
     m_totalRecordedMs = 0;
     m_longestRecordingMs = 0;
     m_totalFramesRecorded = 0;
@@ -135,6 +144,7 @@ void RecordingController::onToggleRecording()
             m_recordAction->setChecked(false);
             m_recordAction->blockSignals(false);
             ++m_totalErrors;
+            ++m_totalRecordingErrors;
             emit statusMessage(tr("录制启动失败，请检查文件路径和权限"), 5000);
             return;
         }

@@ -120,6 +120,9 @@ public:
     /** @brief 获取累计定位次数 */
     quint64 totalSeeks() const;
 
+    /** @brief 获取累计倍速变更次数 */
+    quint64 totalSpeedChanges() const;
+
     /** @brief 获取平均回放倍速(同averageSpeed) */
     qreal averagePlaybackSpeed() const;
 
