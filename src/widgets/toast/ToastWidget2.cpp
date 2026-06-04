@@ -65,5 +65,19 @@ void ToastWidget::paintEvent(QPaintEvent *) {
     p.drawRoundedRect(rect(), 8, 8);
 }
 
+/** @brief 根据消息级别更新标签样式 — 按类型设置QSS类名 */
+void ToastWidget::updateStyle() {
+    QString styleClass;
+    switch (m_type) {
+    case Success: styleClass = "toast-success"; break;
+    case Warning: styleClass = "toast-warning"; break;
+    case Error:   styleClass = "toast-error";   break;
+    case Info: default: styleClass = "toast-info"; break;
+    }
+    m_label->setProperty("class", styleClass);
+    style()->unpolish(m_label);
+    style()->polish(m_label);
+}
+
 /** @brief 鼠标点击关闭Toast @param event 鼠标事件(未使用) */
 void ToastWidget::mousePressEvent(QMouseEvent *) { dismiss(); }

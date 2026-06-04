@@ -64,6 +64,7 @@ set(SOURCES
     src/core/panels/PanelManagerGetters.cpp
     src/core/panels/PanelManagerQuery.cpp
     src/core/background/BackgroundWidget.cpp
+    src/core/background/BackgroundWidgetPaint.cpp
     src/core/background/BackgroundSettingsPopup.cpp
     src/core/widgets/BasePanel.cpp
     src/core/widgets/BasePanelStates.cpp
@@ -125,6 +126,7 @@ set(SOURCES
     src/protocol/view/ProtocolView.cpp
     src/protocol/view/ProtocolViewMenu.cpp
     src/protocol/editor/FrameVisualEditor.cpp
+    src/protocol/editor/FrameVisualEditorFields.cpp
     src/protocol/editor/FrameVisualEditorUI.cpp
     src/protocol/hex/IntelHexParser.cpp
     src/protocol/hex/IntelHexParserRecord.cpp

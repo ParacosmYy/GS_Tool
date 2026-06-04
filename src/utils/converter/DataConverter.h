@@ -98,7 +98,10 @@ public:
     /** @brief 获取累计转换失败次数 */
     quint64 totalErrors() const;
 
-    /** @brief 重置所有转换统计计数器(转换次数/字节数/错误次数) */
+    /** @brief 获取累计格式切换次数(源/目标格式变更) */
+    quint64 totalFormatSwitches() const { return m_totalFormatSwitches; }
+
+    /** @brief 重置所有转换统计计数器(转换次数/字节数/错误次数/格式切换次数) */
     void resetStatistics();
 
 private:
@@ -118,6 +121,8 @@ private:
     mutable quint64 m_totalBytesConverted = 0;
     /** @brief 累计转换失败次数 */
     mutable quint64 m_totalErrors = 0;
+    /** @brief 累计格式切换次数 */
+    mutable quint64 m_totalFormatSwitches = 0;
 };
 
 #endif // DATACONVERTER_H

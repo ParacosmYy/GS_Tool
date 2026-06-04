@@ -18,6 +18,7 @@
 /** @brief 从JSON文件加载模板 @param filePath JSON文件路径 @return true加载成功 */
 bool PacketBuilder::loadTemplate(const QString &filePath)
 {
+    ++m_totalTemplateLoads;
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) return false;
 
@@ -67,6 +68,7 @@ bool PacketBuilder::saveTemplate(const QString &filePath) const
 /** @brief 从SettingsManager加载命名模板 @param name 模板名称 @param options 预留参数 @return true加载成功 */
 bool PacketBuilder::loadTemplate(const QString &name, const QVariantMap &options)
 {
+    ++m_totalTemplateLoads;
     Q_UNUSED(options)
 
     const QString group = QStringLiteral("packetTemplates/") + name;

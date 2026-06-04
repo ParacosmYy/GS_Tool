@@ -51,13 +51,22 @@ public:
     quint64 totalParses() const;
     /** @brief 获取累计分析字节数(输入字符串长度总和) */
     quint64 totalBytesAnalyzed() const;
+    /** @brief 获取累计分析次数(每次调用parseTimestamp计数) */
+    quint64 totalAnalyses() const { return m_totalAnalyses; }
+    /** @brief 获取累计格式变更次数 */
+    quint64 totalFormatChanges() const { return m_totalFormatChanges; }
+    /** @brief 获取累计解析失败次数 */
+    quint64 totalParseErrors() const { return m_totalParseErrors; }
     /** @brief 重置统计计数器 */
     void resetStats();
 
 private:
-    mutable quint64 m_totalConversions = 0; ///< 累计转换次数
-    mutable quint64 m_totalParses = 0;      ///< 累计解析次数
+    mutable quint64 m_totalConversions = 0;   ///< 累计转换次数
+    mutable quint64 m_totalParses = 0;        ///< 累计解析次数
     mutable quint64 m_totalBytesAnalyzed = 0; ///< 累计分析字节数
+    mutable quint64 m_totalAnalyses = 0;      ///< 累计分析次数
+    mutable quint64 m_totalFormatChanges = 0; ///< 累计格式变更次数
+    mutable quint64 m_totalParseErrors = 0;   ///< 累计解析失败次数
 };
 
 #endif // TIMESTAMPANALYZER_H

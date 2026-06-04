@@ -68,7 +68,7 @@ public:
 
     /**
      * @brief 获取信号周期
-     * @return 周期值（毫秒）
+     * @return 周期值（秒），频率为0时返回0.0
      */
     double period() const;
 

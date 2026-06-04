@@ -76,6 +76,10 @@ public:
     quint64 totalBytesBuilt() const;
     /** @brief 获取累计模板加载次数 @return 加载总次数 */
     quint64 totalTemplateLoads() const;
+    /** @brief 获取累计添加字段次数 @return 字段添加总次数 */
+    quint64 totalFieldAdds() const { return m_totalFieldAdds; }
+    /** @brief 获取累计发送数据包次数 @return 发送总次数 */
+    quint64 totalSends() const { return m_totalSends; }
     /** @brief 重置统计计数器 */
     void resetStats();
 
@@ -92,6 +96,8 @@ private:
     mutable quint64 m_totalBuilds = 0;       ///< 累计构建次数
     mutable quint64 m_totalBytesBuilt = 0;   ///< 累计构建字节数
     quint64 m_totalTemplateLoads = 0;        ///< 累计模板加载次数
+    mutable quint64 m_totalFieldAdds = 0;    ///< 累计添加字段次数
+    mutable quint64 m_totalSends = 0;        ///< 累计发送数据包次数
 };
 
 #endif // PACKETBUILDER_H

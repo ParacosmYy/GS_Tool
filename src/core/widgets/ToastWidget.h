@@ -153,16 +153,12 @@ private:
         });
         group->start(QAbstractAnimation::DeleteWhenStopped);
     }
-    /** @brief 获取指定父窗口的活跃吐司列表引用 */
-    static QList<ToastWidget*>& activeToasts(QWidget* parent) { return activeToastsMap()[parent]; }
-    /** @brief 获取全局父窗口-吐司列表映射表(单例) */
-    static QMap<QWidget*, QList<ToastWidget*>>& activeToastsMap() {
+    static QList<ToastWidget*>& activeToasts(QWidget* parent) { return activeToastsMap()[parent]; } ///< 获取指定父窗口的活跃吐司列表
+    static QMap<QWidget*, QList<ToastWidget*>>& activeToastsMap() { ///< 全局父窗口-吐司列表映射(单例)
         static QMap<QWidget*, QList<ToastWidget*>> map; return map; }
-    /** @brief 获取全局防抖计时器映射表(单例) */
-    static QHash<QString, QElapsedTimer>& debounceMap() {
+    static QHash<QString, QElapsedTimer>& debounceMap() { ///< 全局防抖计时器映射(单例)
         static QHash<QString, QElapsedTimer> map; return map; }
-    /** @brief 吐司消失后重新排列剩余活跃吐司的垂直位置 */
-    static void repositionToasts(QWidget* parent) {
+    static void repositionToasts(QWidget* parent) { ///< 吐司消失后重排剩余活跃吐司
         if (!parent) return;
         auto& list = activeToasts(parent);
         int bottomY = parent->height() - kMargin;

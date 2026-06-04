@@ -85,6 +85,8 @@ private:
     quint64 m_totalAnalyses = 0;    ///< 累计时间戳分析次数
     quint64 m_totalFormatChanges = 0; ///< 累计格式切换次数
     quint64 m_totalTimestampParses = 0; ///< 累计时间戳解析次数
+    quint64 m_totalFormatsSelected = 0; ///< 累计格式选中次数(下拉框选择)
+    quint64 m_totalCopies = 0;       ///< 累计复制结果到剪贴板次数
 public:
     /** @brief 获取累计转换次数 @return 转换次数 */
     quint64 totalConversions() const { return m_totalConversions; }
@@ -96,6 +98,10 @@ public:
     quint64 totalFormatChanges() const { return m_totalFormatChanges; }
     /** @brief 获取累计时间戳解析次数 @return 解析次数 */
     quint64 totalTimestampParses() const { return m_totalTimestampParses; }
+    /** @brief 获取累计格式选中次数 @return 格式选中次数 */
+    quint64 totalFormatsSelected() const { return m_totalFormatsSelected; }
+    /** @brief 获取累计复制结果次数 @return 复制次数 */
+    quint64 totalCopies() const { return m_totalCopies; }
     /** @brief 重置时间戳面板统计计数器(转换次数/复制次数/分析次数/格式切换/解析次数) */
     void resetTimestampPanelStatistics();
 };

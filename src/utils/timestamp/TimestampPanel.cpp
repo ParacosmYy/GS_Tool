@@ -100,7 +100,7 @@ TimestampPanel::TimestampPanel(QWidget *parent)
     connect(m_historyList, &QListWidget::itemClicked,
             this, &TimestampPanel::onHistorySelected);
     connect(m_formatCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, [this]() { ++m_totalFormatChanges; });
+            this, [this]() { ++m_totalFormatChanges; ++m_totalFormatsSelected; });
 }
 
 /**
@@ -221,6 +221,7 @@ void TimestampPanel::onNow()
 void TimestampPanel::onCopy()
 {
     ++m_totalCopyActions;
+    ++m_totalCopies;
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(m_resultLabel->text());
 }
@@ -257,4 +258,6 @@ void TimestampPanel::resetTimestampPanelStatistics()
     m_totalAnalyses = 0;
     m_totalFormatChanges = 0;
     m_totalTimestampParses = 0;
+    m_totalFormatsSelected = 0;
+    m_totalCopies = 0;
 }

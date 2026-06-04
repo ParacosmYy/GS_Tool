@@ -22,6 +22,7 @@ QByteArray DataConverter::convert(const QByteArray &input, Format from, Format t
         return input;
     }
     ++m_convCount;
+    ++m_totalFormatSwitches;
     m_totalBytesConverted += static_cast<quint64>(input.size());
     QByteArray raw = decodeToRaw(input, from);
     if (raw.isEmpty() && !input.isEmpty()) {
@@ -256,10 +257,11 @@ quint64 DataConverter::totalErrors() const
     return m_totalErrors;
 }
 
-/** @brief 重置所有转换统计计数器(转换次数/字节数/错误次数归零) */
+/** @brief 重置所有转换统计计数器(转换次数/字节数/错误次数/格式切换归零) */
 void DataConverter::resetStatistics()
 {
     m_convCount = 0;
     m_totalBytesConverted = 0;
     m_totalErrors = 0;
+    m_totalFormatSwitches = 0;
 }

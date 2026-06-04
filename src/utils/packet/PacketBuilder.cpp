@@ -26,6 +26,7 @@ PacketBuilder::PacketBuilder(QObject *parent)
  */
 void PacketBuilder::addField(const PacketField &field)
 {
+    ++m_totalFieldAdds;
     m_fields.append(field);
     emit fieldUpdated(m_fields.size() - 1);
 }
@@ -161,6 +162,7 @@ static quint16 crc16Modbus(const QByteArray &data)
  */
 QByteArray PacketBuilder::buildPacket() const
 {
+    ++m_totalBuilds;
     if (m_fields.isEmpty()) {
         return {};
     }
@@ -188,6 +190,7 @@ QByteArray PacketBuilder::buildPacket() const
         packet.append(static_cast<char>((crc >> 8) & 0xFF));
     }
 
+    m_totalBytesBuilt += static_cast<quint64>(packet.size());
     return packet;
 }
 
@@ -198,5 +201,14 @@ void PacketBuilder::setChecksumSuffix(bool enabled)
 {
     m_checksumEnabled = enabled;
 }
+
+/** @brief 获取累计构建次数 @return 构建总次数 */
+quint64 PacketBuilder::totalBuilds() const { return m_totalBuilds; }
+/** @brief 获取累计构建字节数 @return 字节总数 */
+quint64 PacketBuilder::totalBytesBuilt() const { return m_totalBytesBuilt; }
+/** @brief 获取累计模板加载次数 @return 加载总次数 */
+quint64 PacketBuilder::totalTemplateLoads() const { return m_totalTemplateLoads; }
+/** @brief 重置统计计数器(构建/字节/模板加载/字段添加/发送归零) */
+void PacketBuilder::resetStats() { m_totalBuilds = 0; m_totalBytesBuilt = 0; m_totalTemplateLoads = 0; m_totalFieldAdds = 0; m_totalSends = 0; }
 
 // 模板I/O/校验/Hex转换见 PacketBuilderTemplate.cpp

@@ -38,8 +38,9 @@ qint64 TimestampAnalyzer::currentUnix(bool millis)
 QDateTime TimestampAnalyzer::parseTimestamp(const QString &text) const
 {
     ++m_totalParses;
+    ++m_totalAnalyses;
     m_totalBytesAnalyzed += static_cast<quint64>(text.toUtf8().size());
-    if (text.isEmpty()) return {};
+    if (text.isEmpty()) { ++m_totalParseErrors; return {}; }
 
     bool ok = false;
     qint64 value = text.toLongLong(&ok);
@@ -51,6 +52,9 @@ QDateTime TimestampAnalyzer::parseTimestamp(const QString &text) const
         return unixToDatetime(value, false);
     }
 
+    /* 数字解析失败，切换到日期格式尝试 — 累计格式变更 */
+    ++m_totalFormatChanges;
+
     QDateTime dt = QDateTime::fromString(text, Qt::ISODate);
     if (dt.isValid()) return dt;
 
@@ -60,6 +64,8 @@ QDateTime TimestampAnalyzer::parseTimestamp(const QString &text) const
     dt = QDateTime::fromString(text, QStringLiteral("yyyy/MM/dd HH:mm:ss"));
     if (dt.isValid()) return dt;
 
+    /* 所有格式尝试均失败 — 累计解析错误 */
+    ++m_totalParseErrors;
     return {};
 }
 
@@ -116,5 +122,5 @@ quint64 TimestampAnalyzer::totalConversions() const { return m_totalConversions;
 quint64 TimestampAnalyzer::totalParses() const { return m_totalParses; }
 /** @brief 获取累计解析的字节总数 @return 字节总数 */
 quint64 TimestampAnalyzer::totalBytesAnalyzed() const { return m_totalBytesAnalyzed; }
-/** @brief 重置所有统计计数器(转换次数/解析次数/字节数归零) */
-void TimestampAnalyzer::resetStats() { m_totalConversions = 0; m_totalParses = 0; m_totalBytesAnalyzed = 0; }
+/** @brief 重置所有统计计数器(转换次数/解析次数/字节数/分析次数/格式变更/解析错误归零) */
+void TimestampAnalyzer::resetStats() { m_totalConversions = 0; m_totalParses = 0; m_totalBytesAnalyzed = 0; m_totalAnalyses = 0; m_totalFormatChanges = 0; m_totalParseErrors = 0; }
