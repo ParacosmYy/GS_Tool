@@ -122,6 +122,8 @@ void TerminalLayoutManager::resetStats()
     m_totalSplits = 0;
     m_totalTabSwitches = 0;
     m_totalLayoutChanges = 0;
+    m_totalTabAdds = 0;
+    m_totalTabRemoves = 0;
 }
 
 /** @brief 通知行清除事件，累加清除行数到统计计数器 @param lines 本次清除的行数 */
@@ -154,6 +156,18 @@ quint64 TerminalLayoutManager::totalTabSwitches() const
 quint64 TerminalLayoutManager::totalLayoutChanges() const
 {
     return m_totalLayoutChanges;
+}
+
+/** @brief 获取Tab添加总次数 @return 累计添加次数 */
+quint64 TerminalLayoutManager::totalTabAdds() const
+{
+    return m_totalTabAdds;
+}
+
+/** @brief 获取Tab移除总次数 @return 累计移除次数 */
+quint64 TerminalLayoutManager::totalTabRemoves() const
+{
+    return m_totalTabRemoves;
 }
 
 /** @brief 通过下拉框索引设置布局模式，0=混合，1=水平分栏，2=垂直分栏 @param layoutIndex 下拉框索引 */
@@ -237,10 +251,12 @@ void TerminalLayoutManager::applyMixedLayout()
     if (m_rxTerminal) {
         m_rxTerminal->deleteLater();
         m_rxTerminal = nullptr;
+        ++m_totalTabRemoves; ///< 统计: RX终端Tab移除
     }
     if (m_txTerminal) {
         m_txTerminal->deleteLater();
         m_txTerminal = nullptr;
+        ++m_totalTabRemoves; ///< 统计: TX终端Tab移除
     }
 
     // 恢复主终端的无过滤状态
@@ -276,9 +292,11 @@ void TerminalLayoutManager::applySplitLayout()
     // 创建/重建分栏终端
     if (m_rxTerminal) {
         m_rxTerminal->deleteLater();
+        ++m_totalTabRemoves; ///< 统计: 旧RX终端Tab移除
     }
     if (m_txTerminal) {
         m_txTerminal->deleteLater();
+        ++m_totalTabRemoves; ///< 统计: 旧TX终端Tab移除
     }
 
     // RX终端: 左侧(左右分栏) 或 上方(上下分栏)
@@ -286,11 +304,13 @@ void TerminalLayoutManager::applySplitLayout()
         tr("RX (接收)"));
     m_splitter->addWidget(m_rxTerminal);
     ++m_totalSplits;  ///< 统计: 每次创建分栏递增
+    ++m_totalTabAdds; ///< 统计: RX终端Tab添加
 
     // TX终端: 右侧(左右分栏) 或 下方(上下分栏)
     m_txTerminal = createSplitTerminal(DataDirection::Tx,
         tr("TX (发送)"));
     m_splitter->addWidget(m_txTerminal);
+    ++m_totalTabAdds; ///< 统计: TX终端Tab添加
 
     // 均分分割器空间
     m_splitter->setSizes({1, 1});

@@ -183,7 +183,7 @@ private:
     DecodeOptions m_decodeOptions = AllOptions; ///< 当前解码选项
     int m_maxNestingDepth = 8;       ///< 最大递归嵌套深度
 
-    DecodeStatistics m_stats;        ///< 累计统计快照
+    mutable DecodeStatistics m_stats;    ///< 累计统计快照(const方法中递增)
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ProtobufDecoder::DecodeOptions)

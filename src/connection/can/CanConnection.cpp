@@ -213,6 +213,7 @@ bool CanConnection::sendFrame(int id, const QByteArray& data, bool extended)
     /* 数据长度检查: 经典CAN最多8字节 */
     if (data.size() > 8) {
         ++m_totalErrors;
+        ++m_totalFrameErrors;  ///< 帧构建失败(数据过长)
         return false;
     }
 
@@ -228,6 +229,7 @@ bool CanConnection::sendFrame(int id, const QByteArray& data, bool extended)
     QByteArray raw = parser.buildFrame(frame);
     if (raw.isEmpty()) {
         ++m_totalErrors;
+        ++m_totalFrameErrors;  ///< 帧构建失败(序列化错误)
         return false;
     }
 
@@ -256,6 +258,7 @@ bool CanConnection::sendFdFrame(int id, const QByteArray& data, bool extended)
     }
     if (data.size() > 64) {
         ++m_totalErrors;
+        ++m_totalFrameErrors;  ///< 帧构建失败(FD数据过长)
         return false;
     }
 
@@ -271,6 +274,7 @@ bool CanConnection::sendFdFrame(int id, const QByteArray& data, bool extended)
     QByteArray raw = parser.buildFrame(frame);
     if (raw.isEmpty()) {
         ++m_totalErrors;
+        ++m_totalFrameErrors;  ///< 帧构建失败(FD序列化错误)
         return false;
     }
 

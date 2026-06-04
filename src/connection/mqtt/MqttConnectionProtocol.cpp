@@ -123,6 +123,7 @@ void MqttConnection::handlePublish(const QByteArray& data, quint8 flags)
     QByteArray payload = data.mid(offset);
     ++m_totalBytesReceived;
     ++m_totalReceived;
+    ++m_totalMessageReceived;  ///< 累计接收PUBLISH消息数
     emit dataReceived(payload);
     emit messageReceived(topic, payload);
 }
@@ -234,7 +235,10 @@ void MqttConnection::unsubscribe(const QString& topic)
     QByteArray packet = buildMqttPacket(UNSUBSCRIBE, hdr + payload);
     packet[0] |= 0x02;
     qint64 written = m_socket->write(packet);
-    if (written == packet.size()) m_totalBytesSent += static_cast<quint64>(written);
+    if (written == packet.size()) {
+        m_totalBytesSent += static_cast<quint64>(written);
+        ++m_totalUnsubscriptions;  ///< 累计退订次数
+    }
     m_subscriptions.removeAll(topic);
 }
 

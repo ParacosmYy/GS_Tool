@@ -149,6 +149,7 @@ private:
     quint64 m_totalSearches = 0;        ///< 搜索触发总次数
     quint64 m_totalMatches = 0;         ///< 匹配结果总次数
     quint64 m_totalReplacements = 0;    ///< 替换操作总次数
+    quint64 m_totalRegexSearches = 0;   ///< 正则搜索触发总次数
 
 public:
     /** @brief 获取搜索触发总次数 @return 搜索计数 */
@@ -157,7 +158,9 @@ public:
     quint64 totalMatches() const { return m_totalMatches; }
     /** @brief 获取替换操作总次数 @return 替换计数 */
     quint64 totalReplacements() const { return m_totalReplacements; }
-    /** @brief 重置搜索栏统计计数器 */
+    /** @brief 获取正则搜索触发总次数 @return 正则搜索计数 */
+    quint64 totalRegexSearches() const { return m_totalRegexSearches; }
+    /** @brief 重置搜索栏统计计数器(含正则搜索计数) */
     void resetSearchBarStatistics();
 };
 

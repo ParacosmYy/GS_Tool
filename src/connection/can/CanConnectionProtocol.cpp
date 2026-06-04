@@ -85,6 +85,7 @@ void CanConnection::parseBuffer()
         CanFrameParser parser;
         CanFrame frame = parser.parseFrame(line);
         if (frame.dlc > 0 || frame.rtr) {
+
             /* 帧过滤检查 */
             if (!acceptsFilter(frame.id, frame.extended)) {
                 ++m_totalFramesFiltered;
@@ -113,6 +114,8 @@ void CanConnection::parseBuffer()
                                    frame.data, frame.extended, frame.rtr);
             }
             emit dataReceived(line);  // 也向上层转发原始数据
+        } else if (!line.isEmpty()) {
+            ++m_totalFrameErrors;  ///< 帧解析失败(无法识别的帧格式)
         }
     }
 }
@@ -142,6 +145,7 @@ void CanConnection::resetStats()
     m_totalExtendedFrames = 0;
     m_totalRtrFrames = 0;
     m_totalErrorFrames = 0;
+    m_totalFrameErrors = 0;
     m_totalFramesFiltered = 0;
     m_totalSignalsDecoded = 0;
     m_totalBusOffEvents = 0;

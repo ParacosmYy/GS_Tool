@@ -100,6 +100,7 @@ int TerminalFilter::addRule(const QString& pattern, bool caseSensitive, bool ena
 
     m_rules.append(rule);
     int index = m_rules.size() - 1;
+    ++m_totalFilters; ///< 统计: 规则添加计数
     emit filterRulesChanged();
     return index;
 }

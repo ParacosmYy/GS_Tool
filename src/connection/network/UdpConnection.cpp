@@ -161,6 +161,7 @@ void UdpConnection::onReadyRead()
 void UdpConnection::onError(QAbstractSocket::SocketError error)
 {
     ++m_errorCount;
+    ++m_totalSocketErrors;  ///< 累计Socket错误次数
     QString systemError = m_socket ? m_socket->errorString() : QString();
     emit errorOccurred(translateNetworkError(error, systemError));
     updateState(ConnectionState::Error);
@@ -231,7 +232,7 @@ quint64 UdpConnection::totalBytesReceived() const { return m_totalBytesReceived;
 /** @brief 获取错误计数 @return 累计错误次数 */
 quint64 UdpConnection::errorCount() const { return m_errorCount; }
 
-/** @brief 重置所有统计数据(数据报/字节/错误/广播计数)为零 */
+/** @brief 重置所有统计数据(数据报/字节/错误/广播/Socket错误计数)为零 */
 void UdpConnection::resetStats()
 {
     m_totalDatagramsSent = 0;
@@ -241,5 +242,6 @@ void UdpConnection::resetStats()
     m_errorCount = 0;
     m_totalDatagramErrors = 0;
     m_totalBroadcastsSent = 0;
+    m_totalSocketErrors = 0;
 }
 

@@ -122,6 +122,7 @@ void PlaybackController::setSpeed(qreal speed)
 
     m_speed = speed;
     m_speedSum += speed;
+    ++m_totalSpeedChanges;
     emit speedChanged(m_speed);
 }
 
@@ -273,6 +274,12 @@ quint64 PlaybackController::totalSeeks() const
     return m_totalSeeks;
 }
 
+/** @brief 获取累计倍速变更次数 @return 倍速变更总次数 */
+quint64 PlaybackController::totalSpeedChanges() const
+{
+    return m_totalSpeedChanges;
+}
+
 /** @brief 获取平均回放倍速 @return 平均倍速值，无回放记录时返回0.0 */
 qreal PlaybackController::averagePlaybackSpeed() const
 {
@@ -297,4 +304,5 @@ void PlaybackController::resetStats()
     m_totalPauses = 0;
     m_totalStops = 0;
     m_totalSeeks = 0;
+    m_totalSpeedChanges = 0;
 }

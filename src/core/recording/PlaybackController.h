@@ -190,6 +190,7 @@ private:
     quint64 m_totalPauses = 0;     ///< 累计暂停次数
     quint64 m_totalStops = 0;      ///< 累计停止次数
     quint64 m_totalSeeks = 0;      ///< 累计定位次数
+    quint64 m_totalSpeedChanges = 0; ///< 累计倍速变更次数
 };
 
 #endif // PLAYBACK_CONTROLLER_H

@@ -111,6 +111,8 @@ public:
     quint64 totalRtrFrames() const { return m_totalRtrFrames; }
     /** @brief 获取错误帧计数 */
     quint64 totalErrorFrames() const { return m_totalErrorFrames; }
+    /** @brief 获取累计帧错误次数(解析/构建失败) @return 帧错误总数 */
+    quint64 totalFrameErrors() const { return m_totalFrameErrors; }
     /** @brief 获取被过滤器丢弃的帧数 */
     quint64 totalFramesFiltered() const { return m_totalFramesFiltered; }
     /** @brief 获取已解码的信号值总数 */
@@ -161,6 +163,7 @@ private:
     quint64 m_totalExtendedFrames = 0;      ///< 扩展帧计数
     quint64 m_totalRtrFrames = 0;           ///< RTR帧计数
     quint64 m_totalErrorFrames = 0;         ///< 错误帧计数
+    quint64 m_totalFrameErrors = 0;         ///< 帧解析/构建失败计数
     quint64 m_totalFramesFiltered = 0;      ///< 被过滤器丢弃的帧数
     mutable quint64 m_totalSignalsDecoded = 0; ///< 已解码的信号值总数
     mutable quint64 m_totalBusOffEvents = 0; ///< 累计总线关闭事件次数

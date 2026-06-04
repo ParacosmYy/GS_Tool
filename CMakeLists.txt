@@ -142,6 +142,7 @@ set(SOURCES
     src/chart/overlay/CursorOverlay.cpp
     src/chart/overlay/CursorOverlayPaint.cpp
     src/chart/zoom/ZoomController.cpp
+    src/chart/zoom/ZoomControllerQuery.cpp
     src/chart/zoom/ZoomControllerStats.cpp
     src/chart/fft/FftEngine.cpp
     src/chart/fft/FftWidget.cpp
@@ -330,6 +331,7 @@ set(SOURCES
     # ── F20: USB 调试 ──
     src/connection/usb/UsbConnection.cpp
     src/connection/usb/UsbConnectionTransfer.cpp
+    src/connection/usb/UsbConnectionDescriptors.cpp
     src/connection/usb/UsbDeviceDetector.cpp
     src/connection/usb/UsbDeviceDetectorWmic.cpp
     src/connection/usb/UsbDeviceDetectorStats.cpp

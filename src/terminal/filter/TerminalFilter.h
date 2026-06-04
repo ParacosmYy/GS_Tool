@@ -80,6 +80,7 @@ public:
     QString lastMatchText() const;                  ///< 最近匹配文本
     quint64 filterPassCount() const;                ///< 过滤通过总行数
     quint64 filterBlockCount() const;               ///< 过滤阻塞总行数
+    quint64 totalFilters() const;                   ///< 累计添加过滤规则总数
     void resetStatistics();                         ///< 重置所有统计
 
 signals:
@@ -105,6 +106,7 @@ private:
     mutable QString m_lastMatch;                    ///< 最近匹配文本
     quint64 m_filterPassCount = 0;                  ///< 过滤通过行数
     quint64 m_filterBlockCount = 0;                 ///< 过滤阻塞行数
+    quint64 m_totalFilters = 0;                     ///< 累计添加过滤规则总数
 };
 
 #endif // TERMINALFILTER_H

@@ -285,6 +285,9 @@ void TerminalSearchBar::triggerSearch()
         emit searchCleared();
     } else {
         ++m_totalSearches;
+        if (m_regexCheck->isChecked()) {
+            ++m_totalRegexSearches;
+        }
         emit searchRequested(text, m_regexCheck->isChecked(), m_hexCheck->isChecked(),
                              m_caseCheck->isChecked(), m_wordCheck->isChecked());
     }
@@ -329,4 +332,5 @@ void TerminalSearchBar::resetSearchBarStatistics()
     m_totalSearches = 0;
     m_totalMatches = 0;
     m_totalReplacements = 0;
+    m_totalRegexSearches = 0;
 }

@@ -47,57 +47,8 @@ ZoomController::ZoomController(QChartView* chartView, QObject* parent)
 }
 
 // ============================================================
-// 公开接口
+// 公开接口 — 状态查询/快捷缩放/resetZoom 已拆分至 ZoomControllerQuery.cpp
 // ============================================================
-
-/** @brief 重置缩放至原始数据范围，清空zoom栈 */
-void ZoomController::resetZoom()
-{
-    if (!m_chart) return;
-
-    if (auto ax = xAxis()) {
-        ax->setRange(m_originalRange.minX, m_originalRange.maxX);
-    }
-    if (auto ay = yAxis()) {
-        ay->setRange(m_originalRange.minY, m_originalRange.maxY);
-    }
-
-    m_zoomStack.clear();
-    m_zoomLevel = 1.0;
-    ++m_totalResets;
-    ++m_totalZoomOperations;
-    emit viewChanged();
-    emit zoomReset();
-}
-
-/** @brief 获取当前缩放倍率 @return 缩放倍率(1.0=原始) */
-double ZoomController::zoomLevel() const { return m_zoomLevel; }
-
-/** @brief 查询是否处于框选缩放模式 @return true=正在框选 */
-bool ZoomController::isRubberBandActive() const { return m_rubberBandActive; }
-
-/** @brief 获取当前框选矩形(像素坐标) @return 框选区域，非框选时返回空矩形 */
-QRectF ZoomController::rubberBandRect() const
-{
-    if (!m_rubberBandActive) return QRectF();
-    return QRectF(m_rubberBandStart, m_rubberBandEnd).normalized();
-}
-
-/** @brief 放大，以图表中心为缩放中心 */
-void ZoomController::zoomIn()
-{
-    if (!m_chartView) return;
-    int center = m_chartView->width() / 2;
-    zoomAt(center, kZoomFactor);
-}
-
-/** @brief 缩小，以图表中心为缩放中心 */
-void ZoomController::zoomOut()
-{
-    if (!m_chartView) return;
-    int center = m_chartView->width() / 2;
-    zoomAt(center, 1.0 / kZoomFactor);
-}
 
 // ============================================================
 // 事件过滤
@@ -345,4 +296,5 @@ void ZoomController::handleMouseDoubleClick(QMouseEvent* event)
 
 // ============================================================
 // 辅助方法 / 统计计数器 — 已拆分至 ZoomControllerStats.cpp
+// 状态查询 / 快捷缩放 — 已拆分至 ZoomControllerQuery.cpp
 // ============================================================

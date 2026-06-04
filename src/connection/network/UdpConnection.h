@@ -106,6 +106,12 @@ public:
     /** @brief 获取累计广播数据报发送次数 @return 广播发送总次数 */
     quint64 totalBroadcastsSent() const { return m_totalBroadcastsSent; }
 
+    /** @brief 获取累计广播数据报发送次数(别名) @return 广播发送总次数 */
+    quint64 totalBroadcasts() const { return m_totalBroadcastsSent; }
+
+    /** @brief 获取累计Socket错误次数 @return Socket错误总次数 */
+    quint64 totalSocketErrors() const { return m_totalSocketErrors; }
+
     /** @brief 重置所有统计数据为零 */
     void resetStats();
 
@@ -146,6 +152,7 @@ private:
     quint64 m_errorCount = 0;            ///< 错误发生次数
     quint64 m_totalDatagramErrors = 0;   ///< 数据报发送/接收失败次数
     quint64 m_totalBroadcastsSent = 0;   ///< 广播数据报发送次数
+    quint64 m_totalSocketErrors = 0;     ///< Socket级别错误次数
 };
 
 #endif // UDPCONNECTION_H

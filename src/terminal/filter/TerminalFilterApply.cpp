@@ -174,6 +174,12 @@ quint64 TerminalFilter::filterBlockCount() const
     return m_filterBlockCount;
 }
 
+/** @brief 获取累计添加过滤规则总数 @return 规则添加计数 */
+quint64 TerminalFilter::totalFilters() const
+{
+    return m_totalFilters;
+}
+
 /** @brief 重置所有统计计数器为零 */
 void TerminalFilter::resetStatistics()
 {
@@ -181,6 +187,7 @@ void TerminalFilter::resetStatistics()
     m_lastMatch.clear();
     m_filterPassCount = 0;
     m_filterBlockCount = 0;
+    m_totalFilters = 0;
 }
 
 // ---- 私有方法 ----

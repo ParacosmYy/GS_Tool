@@ -107,6 +107,12 @@ public:
     /** @brief 获取总读取次数 */
     quint64 totalReads() const { return m_totalReads; }
 
+    /** @brief 获取总特征值写入次数 */
+    quint64 totalCharacteristicWrites() const { return m_totalCharacteristicWrites; }
+
+    /** @brief 获取总特征值读取次数 */
+    quint64 totalCharacteristicReads() const { return m_totalCharacteristicReads; }
+
     /** @brief 获取总发送字节数 */
     quint64 totalBytesSent() const { return m_totalBytesWritten; }
 
@@ -171,6 +177,8 @@ private:
     quint64 m_totalCharacteristicsRead = 0;     ///< 总特征读取次数
     quint64 m_totalWrites = 0;                  ///< 总写入次数
     quint64 m_totalReads = 0;                   ///< 总读取次数
+    quint64 m_totalCharacteristicWrites = 0;    ///< 总特征值写入次数
+    quint64 m_totalCharacteristicReads = 0;     ///< 总特征值读取次数
     quint64 m_totalBytesWritten = 0;            ///< 总写入字节数
     quint64 m_totalBytesRead = 0;               ///< 总读取字节数
     quint64 m_errorCount = 0;                   ///< 错误计数

@@ -240,6 +240,8 @@ void MqttConnection::resetStats()
     m_totalPublishes = 0;
     m_totalReceived = 0;
     m_totalSubscriptions = 0;
+    m_totalUnsubscriptions = 0;
+    m_totalMessageReceived = 0;
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
     m_errorCount = 0;
