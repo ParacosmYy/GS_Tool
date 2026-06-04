@@ -115,6 +115,7 @@ set(SOURCES
     src/terminal/search/TerminalSearchBarHistory.cpp
     src/terminal/types/DirectionFilter.cpp
     src/terminal/layout/TerminalLayoutManager.cpp
+    src/terminal/layout/TerminalLayoutManagerStats.cpp
     src/terminal/layout/TerminalLayoutSplit.cpp
     src/terminal/selection/TerminalSelectionManager.cpp
     src/terminal/search/TerminalSearchManager.cpp
@@ -168,6 +169,7 @@ set(SOURCES
     src/chart/model/ChartModelStats.cpp
     src/chart/scale/YAxisManager.cpp
     src/chart/overlay/CursorOverlay.cpp
+    src/chart/overlay/CursorOverlayEvent.cpp
     src/chart/overlay/CursorOverlayPaint.cpp
     src/chart/overlay/CursorOverlayInteraction.cpp
     src/chart/zoom/ZoomController.cpp
@@ -221,6 +223,7 @@ set(SOURCES
     src/protocol/parser/FrameDefinition.cpp
     src/core/settings/SessionManager.cpp
     src/core/managers/ShortcutManager.cpp
+    src/core/managers/ShortcutManagerPersist.cpp
     src/core/managers/ShortcutManagerActions.cpp
     src/core/managers/ShortcutManagerQuery.cpp
     src/core/layout/ResponsiveLayout.cpp
@@ -396,6 +399,7 @@ set(SOURCES
 
     # ── F20: USB 调试 ──
     src/connection/usb/UsbConnection.cpp
+    src/connection/usb/UsbConnectionInterface.cpp
     src/connection/usb/UsbConnectionTransfer.cpp
     src/connection/usb/UsbConnectionDescriptors.cpp
     src/connection/usb/UsbDeviceDetector.cpp

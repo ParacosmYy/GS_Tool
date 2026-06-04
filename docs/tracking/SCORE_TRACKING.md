@@ -96,6 +96,7 @@
 | 261 | UdpConnectionStats拆分 | 多播组管理/统计getter/resetStats独立(275→219行) |
 | 262 | TlsConnectionStats/SpiConnectionStats/CanBusMonitorStats/NavigationControllerStatus拆分 | TLS统计独立(278→259行)+SPI统计独立(279→260行)+CAN监控统计独立(281→207行)+导航状态动画独立(285→160行) |
 | 263 | DataStatisticsRefresh/ResponsiveLayoutTransition/DbcParserDecode/UsbDeviceDetectorDescriptor拆分 | 刷新定时器独立(279→208行)+布局过渡动画独立(276→190行)+DBC位域解码独立(272→144行)+USB描述符获取独立(272→145行) |
+| 264 | TerminalLayoutManagerStats/ShortcutManagerPersist/UsbConnectionInterface/CursorOverlayEvent拆分 | 终端统计getter独立(271→197行)+快捷键持久化独立(269→201行)+USB接口管理独立(272→207行)+游标事件过滤独立(271→167行) |
 
 ---
 
