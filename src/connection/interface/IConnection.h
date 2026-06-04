@@ -13,10 +13,7 @@
 #include <QVariant>
 #include "shared/AppConstants.h"
 
-/**
- * @brief 串口信号线状态结构体
- * 包含6个标准信号线的当前电平状态(true=HIGH, false=LOW)
- */
+/** @brief 串口信号线状态结构体，包含6个标准信号线的当前电平状态(true=HIGH, false=LOW) */
 struct PinoutSignals {
     bool cts = false;  ///< Clear To Send (输入)
     bool dsr = false;  ///< Data Set Ready (输入)
@@ -26,10 +23,7 @@ struct PinoutSignals {
     bool rts = false;  ///< Request To Send (输出)
 };
 
-/**
- * @brief 串口通信错误计数器结构体
- * 记录各类通信错误的累计次数，用于诊断连接质量
- */
+/** @brief 串口通信错误计数器结构体，记录各类通信错误的累计次数用于诊断连接质量 */
 struct SerialErrorCounters {
     int framingErrors = 0;  ///< 帧错误计数（起始位/停止位不匹配）
     int parityErrors = 0;   ///< 校验错误计数（奇偶校验失败）
@@ -61,110 +55,32 @@ public:
 
     virtual ~IConnection() = default;
 
-    /** @brief 获取连接类型 */
-    virtual ConnectionType type() const = 0;
+    virtual ConnectionType type() const = 0;      ///< 获取连接类型
+    virtual QString name() const = 0;             ///< 获取连接名称 (如 "COM3" / "TCP:192.168.1.100:8080")
+    virtual ConnectionState state() const = 0;    ///< 获取当前连接状态
+    virtual bool open() = 0;                      ///< 打开连接，返回是否成功
+    virtual void close() = 0;                     ///< 关闭连接
+    virtual qint64 write(const QByteArray& data) = 0; ///< 发送数据，返回实际发送字节数，-1表示失败
 
-    /** @brief 获取连接名称 (如 "COM3" / "TCP:192.168.1.100:8080") */
-    virtual QString name() const = 0;
-
-    /** @brief 获取当前连接状态 */
-    virtual ConnectionState state() const = 0;
-
-    /** @brief 打开连接，返回是否成功 */
-    virtual bool open() = 0;
-
-    /** @brief 关闭连接 */
-    virtual void close() = 0;
-
-    /**
-     * @brief 发送数据
-     * @param data 要发送的字节数据
-     * @return 实际发送的字节数，-1表示失败
-     */
-    virtual qint64 write(const QByteArray& data) = 0;
-
-    /**
-     * @brief 通过参数映射配置连接
-     *
-     * 子类自行解析自己需要的参数，忽略不认识的key:
-     * - 串口: portName, baudRate, dataBits, parity, stopBits, flowControl, dtr, rts
-     * - TCP: host, port, mode
-     * - UDP: localPort, remoteHost, remotePort
-     *
-     * @param params 参数键值对
-     */
+    /** @brief 通过参数映射配置连接。子类自行解析自己需要的参数，忽略不认识的key */
     virtual void configure(const QVariantMap& params) = 0;
 
     // ---- 线路信号控制（仅串口连接有效，其他类型为空实现） ----
 
-    /**
-     * @brief 控制数据终端就绪 (DTR) 信号线
-     * 默认空实现，仅 SerialConnection 重写
-     * @param enabled true=拉高 DTR, false=拉低 DTR
-     */
-    virtual void setDtr(bool enabled) { Q_UNUSED(enabled); }
-
-    /**
-     * @brief 控制请求发送 (RTS) 信号线
-     * 默认空实现，仅 SerialConnection 重写
-     * @param enabled true=拉高 RTS, false=拉低 RTS
-     */
-    virtual void setRts(bool enabled) { Q_UNUSED(enabled); }
-
-    /**
-     * @brief 查询 DTR 信号线当前状态
-     * @return true=DTR 已拉高, false=DTR 已拉低; 非串口连接始终返回 false
-     */
-    virtual bool isDtr() const { return false; }
-
-    /**
-     * @brief 查询 RTS 信号线当前状态
-     * @return true=RTS 已拉高, false=RTS 已拉低; 非串口连接始终返回 false
-     */
-    virtual bool isRts() const { return false; }
-
-    /**
-     * @brief 发送Break信号(部分bootloader需要)
-     * @param duration Break持续时间(毫秒)，默认100ms
-     */
-    virtual void sendBreak(int duration = 100) { Q_UNUSED(duration); }
-
-    /** @brief 查询当前信号线电平状态(CTS/DSR/DCD/RI/DTR/RTS)
-     *  默认返回全false(无信号); SerialConnection覆盖实现
-     */
-    virtual PinoutSignals pinoutSignals() const { return {}; }
-
-    /**
-     * @brief 查询通信错误计数器
-     * 默认返回全零; SerialConnection覆盖实现
-     * @return 各类错误的累计计数
-     */
-    virtual SerialErrorCounters errorCounters() const { return {}; }
+    virtual void setDtr(bool enabled) { Q_UNUSED(enabled); } ///< 控制DTR信号线，默认空实现
+    virtual void setRts(bool enabled) { Q_UNUSED(enabled); } ///< 控制RTS信号线，默认空实现
+    virtual bool isDtr() const { return false; }  ///< 查询DTR信号线状态，非串口始终返回false
+    virtual bool isRts() const { return false; }  ///< 查询RTS信号线状态，非串口始终返回false
+    virtual void sendBreak(int duration = 100) { Q_UNUSED(duration); } ///< 发送Break信号(部分bootloader需要)
+    virtual PinoutSignals pinoutSignals() const { return {}; } ///< 查询当前信号线电平状态，默认返回全false
+    virtual SerialErrorCounters errorCounters() const { return {}; } ///< 查询通信错误计数器，默认返回全零
 
 signals:
-    /** @brief 收到数据时发出 */
-    void dataReceived(const QByteArray& data);
-
-    /** @brief 连接状态变化时发出 */
-    void stateChanged(ConnectionState newState);
-
-    /** @brief 发生错误时发出 */
-    void errorOccurred(const QString& errorMsg);
-
-    /**
-     * @brief 数据已写入底层传输通道信号
-     * @param bytes 实际写入的字节数
-     */
-    void bytesWritten(qint64 bytes);
-
-    /**
-     * @brief 错误计数器更新信号
-     *
-     * 每次错误分类完成后发出，携带最新的错误统计数据。
-     * 上层模块(如DataStatistics)可连接此信号实时刷新显示。
-     * @param counters 最新错误统计
-     */
-    void errorCountersUpdated(const SerialErrorCounters& counters);
+    void dataReceived(const QByteArray& data);        ///< 收到数据时发出
+    void stateChanged(ConnectionState newState);      ///< 连接状态变化时发出
+    void errorOccurred(const QString& errorMsg);      ///< 发生错误时发出
+    void bytesWritten(qint64 bytes);                  ///< 数据已写入底层传输通道信号
+    void errorCountersUpdated(const SerialErrorCounters& counters); ///< 错误计数器更新信号
 };
 
 Q_DECLARE_METATYPE(PinoutSignals)

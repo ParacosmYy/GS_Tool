@@ -37,6 +37,7 @@ void TrafficMonitor::recordTxBytes(qint64 bytes)
     m_txBytes += bytes;
     m_totalTxBytes += bytes;
     ++m_totalBytesOut;
+    ++m_totalPacketsOut;
 }
 
 /** @brief 记录已接收字节数，累加到m_rxBytes和m_totalRxBytes @param bytes 本次接收的字节数 */
@@ -45,6 +46,7 @@ void TrafficMonitor::recordRxBytes(qint64 bytes)
     m_rxBytes += bytes;
     m_totalRxBytes += bytes;
     ++m_totalBytesIn;
+    ++m_totalPacketsIn;
 }
 
 /** @brief 获取当前RX速率 @return 接收速率(字节/秒)，无历史数据时返回0.0 */

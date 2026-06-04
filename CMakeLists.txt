@@ -119,6 +119,7 @@ set(SOURCES
     src/terminal/menu/TerminalContextMenuManager.cpp
     src/serial/config/SerialConfigPanel.cpp
     src/serial/config/SerialConfigPanelUI.cpp
+    src/serial/config/SerialConfigPanelConfig.cpp
     src/serial/commands/QuickCommandBar.cpp
     src/serial/commands/QuickCommandBarActions.cpp
     src/serial/data/BookmarkWidget.cpp
@@ -203,6 +204,7 @@ set(SOURCES
     src/utils/settings/SettingsManagerGroups.cpp
     src/utils/export/DataExporter.cpp
     src/utils/export/DataExporterFormats.cpp
+    src/utils/export/DataExporterStats.cpp
     src/utils/export/DataExporterStreamed.cpp
     src/utils/export/DataExporterEdl.cpp
     src/utils/aggregator/DataAggregator.cpp
@@ -274,6 +276,7 @@ set(SOURCES
 
     # ── F7: 自动化触发 ──
     src/automation/TriggerEngine.cpp
+    src/automation/TriggerEngineStats.cpp
     src/automation/TriggerAction.cpp
     src/automation/TriggerManager.cpp
     src/automation/TriggerListPanel.cpp

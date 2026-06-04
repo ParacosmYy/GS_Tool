@@ -86,6 +86,10 @@
 | 242 | ConnectionControllerQuery/ProtocolViewDisplay/ScatterWidgetCompute拆分+Doxygen增强 | 连接控制器查询独立+协议视图显示独立+散点图计算独立 |
 | 243 | BleGattBrowserDisplay/PluginManagerScan拆分+Doxygen全量达标 | BLE浏览器显示独立+插件管理器扫描独立 |
 | 244-245 | 全模块tr()国际化合规审计+SerialConnectionStats/SendControllerStats/EdDialogTabs拆分 | TCP/UDP/Serial/CAN/MQTT/BLE/Modbus/Protobuf/Terminal/Widget等tr()合规+统计计数器独立文件 |
+| 246 | resetStats()审计修复+XModemTransferProtocol/FftEngineWindow拆分 | CRC/PluginManager/PluginApi/FrequencyCounter缺失重置方法补全 |
+| 247-250 | Stats A/B批量增强+Linter大规模文件拆分 | TCP/UDP/WebSocket/TCP Server/TerminalHighlighter/FrameVisualEditor/DataStatistics/ThemeManager统计增强+ChannelConfigSetMethods/ProtocolBridgeManagerConfig/I2cConnectionTransfer/ZoomControllerViewport等20+文件拆分 |
+| 251-256 | 持续文件拆分(PacketBuilderPanelFields/HistogramWidgetUI/TcpConnectionHandlers/ThemeManagerApply/ShortcutManagerQuery/MqttWidgetSubs/DataAggregatorCompute/DashboardModelItems/FlatBuffersDecoderFields/ConnectionControllerLifecycle/TerminalWidgetEvents等) | 所有.cpp控制在300行以内+统计计数器独立+事件处理独立 |
+| 257 | SerialConfigPanelConfig/TriggerEngineStats/DataExporterStats拆分+多模块统计增强+头文件压缩 | 配置读取/统计getter独立文件+SignalLineMonitor/TrafficMonitor/PerformanceMonitor/CanConnectionProtocol统计增强+14个.h压缩至<180行 |
 
 ---
 

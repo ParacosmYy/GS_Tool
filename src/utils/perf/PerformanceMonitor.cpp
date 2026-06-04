@@ -55,8 +55,14 @@ void PerformanceMonitor::endFrame()
     if (currentFps > m_maxFps) m_maxFps = currentFps;
     if (m_minFps == 0 || currentFps < m_minFps) m_minFps = currentFps;
 
+    // 慢帧检测: 帧耗时超过100ms视为慢帧
+    if (elapsed > 100) {
+        ++m_totalSlowFrames;
+    }
+
     // 每 30 帧发射一次统计信号，避免过于频繁
     if (m_frameCount % 30 == 0) {
+        ++m_totalReports;  ///< 累计统计报告次数
         emit statsUpdated(m_fps, m_avgFrameMs, memoryUsageBytes());
     }
 }
@@ -124,6 +130,12 @@ void PerformanceMonitor::recordFrame()
 {
     beginFrame();
     endFrame();
+}
+
+/** @brief 通知发生一次GC暂停事件 */
+void PerformanceMonitor::notifyGcPause()
+{
+    ++m_totalGcPauses;
 }
 
 /**
@@ -250,4 +262,7 @@ void PerformanceMonitor::resetPerformanceStatistics()
     m_maxFps = 0;
     m_minFps = 0;
     m_totalMeasurements = 0;
+    m_totalReports = 0;
+    m_totalGcPauses = 0;
+    m_totalSlowFrames = 0;
 }

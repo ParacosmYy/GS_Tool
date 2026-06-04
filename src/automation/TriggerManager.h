@@ -110,6 +110,9 @@ public:
     /** @brief 获取累计更新规则次数 */
     quint64 totalRuleUpdates() const;
 
+    /** @brief 获取累计修改规则次数(同totalRuleUpdates) */
+    quint64 totalRulesModified() const { return m_totalRuleUpdates; }
+
     /** @brief 获取累计触发器命中次数 */
     quint64 totalTriggersFired() const;
 
@@ -118,6 +121,12 @@ public:
 
     /** @brief 获取累计错误次数（正则编译失败等） */
     quint64 totalErrors() const;
+
+    /** @brief 获取累计规则导入次数 */
+    quint64 totalRuleImports() const { return m_totalRuleImports; }
+
+    /** @brief 获取累计规则导出次数 */
+    quint64 totalRuleExports() const { return m_totalRuleExports; }
 
     /** @brief 重置管理器统计计数器为初始值 */
     void resetManagerStatistics();
@@ -142,6 +151,8 @@ private:
     quint64 m_totalRuleUpdates = 0;      ///< 累计更新规则次数
     quint64 m_totalTriggersFired = 0;    ///< 累计触发器命中次数
     quint64 m_totalActionsExecuted = 0;  ///< 累计动作执行次数
+    quint64 m_totalRuleImports = 0;      ///< 累计规则导入次数
+    quint64 m_totalRuleExports = 0;      ///< 累计规则导出次数
     /* totalErrors() 委托给 TriggerEngine::totalErrors()，无需独立成员 */
 };
 

@@ -106,11 +106,12 @@ qint64 BleConnection::write(const QByteArray& data)
     ++m_totalCharacteristicWrites;  ///< 累计特征值写入次数
     m_totalBytesWritten += static_cast<quint64>(written);
 
-    // 模拟BLE回环: 将写入数据作为接收数据回传
+    // 模拟BLE回环: 将写入数据作为接收数据回传(模拟通知)
     QTimer::singleShot(50, this, [this, data]() {
-        /// 更新统计: 回环读取
+        /// 更新统计: 回环读取+通知
         ++m_totalReads;
         ++m_totalCharacteristicReads;  ///< 累计特征值读取次数
+        ++m_totalNotifications;        ///< 累计BLE通知接收次数
         m_totalBytesRead += static_cast<quint64>(data.size());
         emit dataReceived(data);
     });
@@ -193,7 +194,7 @@ void BleConnection::resetStats()
     m_totalReads = 0;
     m_totalCharacteristicWrites = 0;
     m_totalCharacteristicReads = 0;
+    m_totalNotifications = 0;
     m_totalBytesWritten = 0;
-    m_totalBytesRead = 0;
     m_errorCount = 0;
 }

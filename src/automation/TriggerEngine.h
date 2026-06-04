@@ -42,6 +42,8 @@ public:
     quint64 totalTriggersFired() const;      ///< 总触发器命中次数
     quint64 totalTriggersDisabled() const;   ///< 总跳过禁用规则次数
     quint64 totalActionErrors() const;       ///< 总动作执行错误次数
+    quint64 totalRulesActive() const;        ///< 累计规则激活(从禁用切到启用)次数
+    int peakRulesActive() const;             ///< 历史同时启用规则数峰值
     void resetStats();                        ///< 重置所有扩展统计计数器
 
 signals:
@@ -61,6 +63,8 @@ private:
     quint64 m_totalEvaluations = 0, m_totalMatches = 0, m_totalActionsExecuted = 0;
     quint64 m_totalErrors = 0, m_totalTriggersEvaluated = 0, m_totalTriggersFired = 0;
     quint64 m_totalTriggersDisabled = 0, m_totalActionErrors = 0;
+    quint64 m_totalRulesActive = 0;         ///< 累计规则激活次数
+    int m_peakRulesActive = 0;              ///< 同时启用规则数峰值
 };
 
 #endif // TRIGGERENGINE_H

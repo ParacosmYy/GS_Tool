@@ -69,6 +69,21 @@ public:
     /** @brief 获取累计错误事件次数 @return 轮询失败/连接异常等错误累计 */
     quint64 totalErrorEvents() const;
 
+    /** @brief 获取累计DTR信号线变化次数 */
+    quint64 totalDtrChanges() const { return m_totalDtrChanges; }
+    /** @brief 获取累计RTS信号线变化次数 */
+    quint64 totalRtsChanges() const { return m_totalRtsChanges; }
+    /** @brief 获取累计CTS信号线变化次数 */
+    quint64 totalCtsChanges() const { return m_totalCtsChanges; }
+    /** @brief 获取累计DSR信号线变化次数 */
+    quint64 totalDsrChanges() const { return m_totalDsrChanges; }
+    /** @brief 获取累计DCD信号线变化次数 */
+    quint64 totalDcdChanges() const { return m_totalDcdChanges; }
+    /** @brief 获取累计RI信号线变化次数 */
+    quint64 totalRiChanges() const { return m_totalRiChanges; }
+    /** @brief 获取峰值信号变化率(次/秒) */
+    quint64 peakChangeRate() const { return m_peakChangeRate; }
+
     /** @brief 重置统计计数 */
     void resetStatistics();
 
@@ -96,6 +111,15 @@ private:
     quint64 m_totalSignalChanges = 0;   ///< 累计信号线变化事件次数(每条线变化+1)
     quint64 m_totalLineMonitored = 0;   ///< 累计被监控的信号线总条数(每次轮询×线数)
     quint64 m_totalErrorEvents = 0;     ///< 累计错误事件(轮询失败/连接断开等)
+    quint64 m_totalDtrChanges = 0;      ///< 累计DTR信号线变化次数
+    quint64 m_totalRtsChanges = 0;      ///< 累计RTS信号线变化次数
+    quint64 m_totalCtsChanges = 0;      ///< 累计CTS信号线变化次数
+    quint64 m_totalDsrChanges = 0;      ///< 累计DSR信号线变化次数
+    quint64 m_totalDcdChanges = 0;      ///< 累计DCD信号线变化次数
+    quint64 m_totalRiChanges = 0;       ///< 累计RI信号线变化次数
+    quint64 m_peakChangeRate = 0;       ///< 峰值信号变化率(次/秒)
+    quint64 m_lastSecChanges = 0;       ///< 当前秒内变化次数(用于计算peakChangeRate)
+    qint64 m_lastPeakRateSec = 0;       ///< 上一次采样秒数(用于判断秒边界)
 };
 
 #endif // SIGNALLINEMONITOR_H

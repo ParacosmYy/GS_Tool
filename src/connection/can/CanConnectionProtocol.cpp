@@ -106,6 +106,17 @@ void CanConnection::parseBuffer()
             ++m_totalFramesReceived;
             m_totalBytesReceived += static_cast<quint64>(frame.data.size());
 
+            /// 计算peakFramesPerSec: 每秒边界检查
+            ++m_lastSecFrameCount;
+            qint64 currentSec = m_peakFpsTimer.elapsed() / 1000;
+            if (currentSec > m_lastPeakSec) {
+                if (m_lastSecFrameCount > m_peakFramesPerSec) {
+                    m_peakFramesPerSec = m_lastSecFrameCount;
+                }
+                m_lastSecFrameCount = 0;
+                m_lastPeakSec = currentSec;
+            }
+
             if (frame.fd) {
                 emit fdFrameReceived(static_cast<int>(frame.id),
                                      frame.data, frame.extended);
@@ -116,6 +127,7 @@ void CanConnection::parseBuffer()
             emit dataReceived(line);  // 也向上层转发原始数据
         } else if (!line.isEmpty()) {
             ++m_totalFrameErrors;  ///< 帧解析失败(无法识别的帧格式)
+            ++m_totalDroppedFrames; ///< 累计丢帧数(解析失败)
         }
     }
 }
@@ -150,4 +162,9 @@ void CanConnection::resetStats()
     m_totalSignalsDecoded = 0;
     m_totalBusOffEvents = 0;
     m_totalFiltersActive = 0;
+    m_totalDroppedFrames = 0;
+    m_peakFramesPerSec = 0;
+    m_lastSecFrameCount = 0;
+    m_lastPeakSec = 0;
+    m_peakFpsTimer.restart();
 }

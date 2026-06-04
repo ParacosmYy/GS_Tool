@@ -129,11 +129,21 @@ void TriggerEngine::evaluateValue(const QString& name, double value)
     }
 }
 
-/** @brief 添加一条触发器规则 @param rule 规则配置 */
+/** @brief 添加一条触发器规则并更新峰值活跃计数 @param rule 规则配置 */
 void TriggerEngine::addRule(const TriggerRuleConfig& rule)
 {
     m_rules.append(rule);
     m_ruleMatchCounts.append(0);
+    /* 更新同时启用规则数峰值 */
+    if (rule.enabled) {
+        int activeCount = 0;
+        for (const auto& r : m_rules) {
+            if (r.enabled) ++activeCount;
+        }
+        if (activeCount > m_peakRulesActive) {
+            m_peakRulesActive = activeCount;
+        }
+    }
 }
 
 /** @brief 移除指定索引的规则 @param index 规则索引 */
@@ -153,11 +163,23 @@ void TriggerEngine::setRulesEnabled(bool enabled)
     m_enabled = enabled;
 }
 
-/** @brief 设置指定规则的启用/禁用状态 @param index 规则索引 @param enabled true=启用，false=禁用 */
+/** @brief 设置指定规则的启用/禁用状态，启用时递增totalRulesActive并更新峰值 @param index 规则索引 @param enabled true=启用，false=禁用 */
 void TriggerEngine::setRuleEnabled(int index, bool enabled)
 {
     if (index >= 0 && index < m_rules.size()) {
+        /* 仅当从禁用切换到启用时计数 */
+        if (enabled && !m_rules[index].enabled) {
+            ++m_totalRulesActive;
+        }
         m_rules[index].enabled = enabled;
+        /* 更新同时启用规则数峰值 */
+        int activeCount = 0;
+        for (const auto& r : m_rules) {
+            if (r.enabled) ++activeCount;
+        }
+        if (activeCount > m_peakRulesActive) {
+            m_peakRulesActive = activeCount;
+        }
     }
 }
 
@@ -174,98 +196,4 @@ void TriggerEngine::clearRules()
     m_ruleMatchCounts.clear();
 }
 
-/** @brief 获取累计成功匹配次数 @return 匹配次数 */
-int TriggerEngine::matchCount() const
-{
-    return m_matchCount;
-}
-
-/** @brief 获取上次匹配距现在的毫秒数 @return 距上次匹配的毫秒数，无匹配返回-1 */
-qint64 TriggerEngine::msSinceLastMatch() const
-{
-    if (!m_hasMatched) {
-        return -1;
-    }
-    return m_lastMatchTimer.elapsed();
-}
-
-/** @brief 重置统计计数(不重置规则) */
-void TriggerEngine::resetStatistics()
-{
-    m_matchCount = 0;
-    m_hasMatched = false;
-    m_ruleMatchCounts.fill(0);
-}
-
-/** @brief 获取指定规则的匹配次数 @param index 规则索引 @return 该规则命中次数，无效索引返回0 */
-int TriggerEngine::ruleMatchCount(int index) const
-{
-    if (index >= 0 && index < m_ruleMatchCounts.size()) {
-        return m_ruleMatchCounts.at(index);
-    }
-    return 0;
-}
-
-// ---- 扩展统计 getter ----
-
-/** @brief 获取总评估次数 @return 总评估次数 */
-quint64 TriggerEngine::totalEvaluations() const
-{
-    return m_totalEvaluations;
-}
-
-/** @brief 获取总匹配成功次数（quint64精度） @return 总匹配次数 */
-quint64 TriggerEngine::totalMatches() const
-{
-    return m_totalMatches;
-}
-
-/** @brief 获取总动作执行次数 @return 总动作执行次数 */
-quint64 TriggerEngine::totalActionsExecuted() const
-{
-    return m_totalActionsExecuted;
-}
-
-/** @brief 获取总错误次数 @return 总错误次数 */
-quint64 TriggerEngine::totalErrors() const
-{
-    return m_totalErrors;
-}
-
-/** @brief 获取总规则评估次数 @return 规则评估总次数 */
-quint64 TriggerEngine::totalTriggersEvaluated() const
-{
-    return m_totalTriggersEvaluated;
-}
-
-/** @brief 获取总触发器命中次数 @return 触发器命中总次数 */
-quint64 TriggerEngine::totalTriggersFired() const
-{
-    return m_totalTriggersFired;
-}
-
-/** @brief 获取总跳过禁用规则的次数 @return 跳过禁用规则总次数 */
-quint64 TriggerEngine::totalTriggersDisabled() const
-{
-    return m_totalTriggersDisabled;
-}
-
-/** @brief 获取总动作执行错误次数 @return 动作执行错误总次数 */
-quint64 TriggerEngine::totalActionErrors() const
-{
-    return m_totalActionErrors;
-}
-
-/** @brief 重置所有扩展统计计数器为初始值(不影响规则列表和启用状态) */
-void TriggerEngine::resetStats()
-{
-    m_totalEvaluations = 0;
-    m_totalMatches = 0;
-    m_totalActionsExecuted = 0;
-    m_totalErrors = 0;
-    m_totalTriggersEvaluated = 0;
-    m_totalTriggersFired = 0;
-    m_totalTriggersDisabled = 0;
-    m_totalActionErrors = 0;
-    resetStatistics();
-}
+// 统计查询和重置方法见 TriggerEngineStats.cpp

@@ -58,8 +58,11 @@ void PlaybackController::play()
     m_elapsed.start();
     m_timer->start(16);
 
-    // 统计：累计回放启动计数
+    // 统计：累计回放启动计数，若从暂停恢复则额外计数
     ++m_totalPlaybacks;
+    if (m_currentTimeMs > 0) {
+        ++m_totalPlaybackResumes;
+    }
 
     emit playbackStarted();
 }

@@ -15,6 +15,7 @@
 CanConnection::CanConnection(QObject* parent)
     : IConnection(parent)
 {
+    m_peakFpsTimer.start();
 }
 
 /** @brief 析构函数，关闭连接释放DBC解析器 */

@@ -161,6 +161,12 @@ quint64 PlaybackController::totalSpeedChanges() const
     return m_totalSpeedChanges;
 }
 
+/** @brief 获取累计恢复播放次数(从暂停恢复) @return 恢复总次数 */
+quint64 PlaybackController::totalPlaybackResumes() const
+{
+    return m_totalPlaybackResumes;
+}
+
 /** @brief 获取平均回放倍速 @return 平均倍速值，无回放记录时返回0.0 */
 qreal PlaybackController::averagePlaybackSpeed() const
 {
@@ -186,4 +192,5 @@ void PlaybackController::resetStats()
     m_totalStops = 0;
     m_totalSeeks = 0;
     m_totalSpeedChanges = 0;
+    m_totalPlaybackResumes = 0;
 }

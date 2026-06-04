@@ -63,6 +63,9 @@ public:
     /** @brief 便捷方法：标记完整一帧（beginFrame + endFrame） */
     void recordFrame();
 
+    /** @brief 通知发生一次GC暂停事件，递增totalGcPauses计数器 */
+    void notifyGcPause();
+
     /**
      * @brief 获取总帧数
      * @return 自创建以来的总帧计数
@@ -121,6 +124,15 @@ public:
     /** @brief 获取累计延迟测量次数 @return 测量次数 */
     quint64 totalMeasurements() const;
 
+    /** @brief 获取累计统计报告次数(每30帧一次) */
+    quint64 totalReports() const { return m_totalReports; }
+    /** @brief 获取历史最高FPS(别名) @return 最大FPS值 */
+    quint64 peakFps() const { return m_maxFps; }
+    /** @brief 获取累计GC暂停次数 */
+    quint64 totalGcPauses() const { return m_totalGcPauses; }
+    /** @brief 获取累计慢帧数(帧耗时>100ms) */
+    quint64 totalSlowFrames() const { return m_totalSlowFrames; }
+
     /** @brief 重置所有统计计数器(采样/FPS/测量次数) */
     void resetPerformanceStatistics();
 
@@ -140,6 +152,9 @@ private:
     quint64 m_maxFps = 0;             ///< 历史最高FPS
     quint64 m_minFps = 0;             ///< 历史最低FPS
     quint64 m_totalMeasurements = 0;  ///< 累计延迟测量次数
+    quint64 m_totalReports = 0;       ///< 累计统计报告次数(每30帧一次)
+    quint64 m_totalGcPauses = 0;      ///< 累计GC暂停次数
+    quint64 m_totalSlowFrames = 0;    ///< 累计慢帧数(帧耗时>100ms)
 };
 
 #endif // PERFORMANCE_MONITOR_H

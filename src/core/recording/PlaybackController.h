@@ -37,6 +37,7 @@ public:
     quint64 totalStops() const;               ///< 累计停止次数
     quint64 totalSeeks() const;               ///< 累计定位次数
     quint64 totalSpeedChanges() const;        ///< 累计倍速变更次数
+    quint64 totalPlaybackResumes() const;     ///< 累计恢复播放(从暂停恢复)次数
     qreal averagePlaybackSpeed() const;       ///< 平均回放倍速(同averageSpeed)
     qint64 totalPlaybackDurationMs() const;   ///< 累计回放总时长(ms, 同totalPlayTimeMs)
     void resetStats();                        ///< 重置所有统计计数器
@@ -69,6 +70,7 @@ private:
     quint64 m_totalStops = 0;           ///< 累计停止次数
     quint64 m_totalSeeks = 0;           ///< 累计定位次数
     quint64 m_totalSpeedChanges = 0;    ///< 累计倍速变更次数
+    quint64 m_totalPlaybackResumes = 0; ///< 累计恢复播放次数
 };
 
 #endif // PLAYBACK_CONTROLLER_H

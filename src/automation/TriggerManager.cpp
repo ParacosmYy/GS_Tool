@@ -70,6 +70,7 @@ bool TriggerManager::loadRules(const QString& filePath)
         }
     }
 
+    ++m_totalRuleImports;
     emit rulesChanged();
     return true;
 }
@@ -91,6 +92,7 @@ bool TriggerManager::saveRules(const QString& filePath)
 
     file.write(doc.toJson(QJsonDocument::Indented));
     file.close();
+    ++m_totalRuleExports;
     return true;
 }
 
@@ -192,5 +194,7 @@ void TriggerManager::resetManagerStatistics()
     m_totalRuleUpdates = 0;
     m_totalTriggersFired = 0;
     m_totalActionsExecuted = 0;
+    m_totalRuleImports = 0;
+    m_totalRuleExports = 0;
     /* m_totalErrors 由 TriggerEngine::resetStats() 管理 */
 }

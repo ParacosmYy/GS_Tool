@@ -36,6 +36,8 @@ public:
     quint64 totalReads() const { return m_totalReads; } ///< 总读取次数
     quint64 totalCharacteristicWrites() const { return m_totalCharacteristicWrites; } ///< 总特征值写入次数
     quint64 totalCharacteristicReads() const { return m_totalCharacteristicReads; } ///< 总特征值读取次数
+    quint64 totalNotifications() const { return m_totalNotifications; } ///< 总BLE通知接收次数
+    quint64 totalErrors() const { return m_errorCount; } ///< 总错误次数(别名)
     quint64 totalBytesSent() const { return m_totalBytesWritten; } ///< 总发送字节数
     quint64 totalBytesReceived() const { return m_totalBytesRead; } ///< 总接收字节数
     quint64 totalBytesWritten() const { return m_totalBytesWritten; } ///< 总写入字节数(旧接口)
@@ -69,6 +71,7 @@ private:
     quint64 m_totalReads = 0;                   ///< 总读取次数
     quint64 m_totalCharacteristicWrites = 0;    ///< 总特征值写入次数
     quint64 m_totalCharacteristicReads = 0;     ///< 总特征值读取次数
+    quint64 m_totalNotifications = 0;           ///< 总BLE通知接收次数
     quint64 m_totalBytesWritten = 0;            ///< 总写入字节数
     quint64 m_totalBytesRead = 0;               ///< 总读取字节数
     quint64 m_errorCount = 0;                   ///< 错误计数

@@ -21,11 +21,9 @@
 class DataAggregator : public QObject {
     Q_OBJECT
 public:
-    /** @brief 滑动窗口聚合函数类型枚举 */
-    enum AggregateFunc { Sum, Average, Min, Max, Count, First, Last };
+    enum AggregateFunc { Sum, Average, Min, Max, Count, First, Last }; ///< 滑动窗口聚合函数类型枚举
     Q_ENUM(AggregateFunc)
 
-    /** @brief 时间窗口聚合间隔枚举 */
     enum TimeInterval {
         Interval_1s   = 1,   ///< 1秒
         Interval_5s   = 5,   ///< 5秒
@@ -46,84 +44,51 @@ public:
         qint64 windowEndMs   = 0;///< 窗口结束时间(Epoch毫秒)
     };
 
-    /** @brief 构造数据聚合器 @param parent 父对象 */
-    explicit DataAggregator(QObject *parent = nullptr);
-    /** @brief 析构函数 */
-    ~DataAggregator() override;
+    explicit DataAggregator(QObject *parent = nullptr); ///< 构造数据聚合器
+    ~DataAggregator() override; ///< 析构函数
 
     // ---- 滑动窗口聚合(原有接口) ----
 
-    /** @brief 添加数据源并指定聚合函数和窗口大小 @param name 数据源名称 @param func 聚合函数类型 @param windowSize 滑动窗口大小 */
-    void addSource(const QString &name, AggregateFunc func, int windowSize = 100);
-    /** @brief 移除指定名称的数据源(滑动窗口+时间窗口一并移除) @param name 数据源名称 */
-    void removeSource(const QString &name);
-    /** @brief 向指定数据源输入一个新值，触发聚合计算并发射结果 @param source 数据源名称 @param value 新数据值 */
-    void feedValue(const QString &source, double value);
-    /** @brief 获取指定数据源的聚合结果 @param source 数据源名称 @return 聚合结果值，不存在返回0.0 */
-    double aggregateResult(const QString &source) const;
-    /** @brief 获取所有数据源的聚合结果 @return 数据源名称到聚合结果的映射 */
-    QMap<QString, double> allResults() const;
-    /** @brief 获取所有数据源名称列表 @return 数据源名称列表 */
-    QStringList sources() const;
-    /** @brief 设置指定数据源的滑动窗口大小 @param source 数据源名称 @param size 新窗口大小 */
-    void setWindowSize(const QString &source, int size);
-    /** @brief 设置指定数据源的聚合函数 @param source 数据源名称 @param func 聚合函数类型 */
-    void setAggregateFunc(const QString &source, AggregateFunc func);
-    /** @brief 重置指定数据源的缓冲区和结果(滑动窗口+时间窗口一并重置) @param source 数据源名称 */
-    void resetSource(const QString &source);
-    /** @brief 重置所有数据源的缓冲区和结果 */
-    void resetAll();
+    void addSource(const QString &name, AggregateFunc func, int windowSize = 100); ///< 添加数据源并指定聚合函数和窗口大小
+    void removeSource(const QString &name); ///< 移除指定名称的数据源(滑动窗口+时间窗口一并移除)
+    void feedValue(const QString &source, double value); ///< 向指定数据源输入一个新值，触发聚合计算并发射结果
+    double aggregateResult(const QString &source) const; ///< 获取指定数据源的聚合结果，不存在返回0.0
+    QMap<QString, double> allResults() const; ///< 获取所有数据源的聚合结果
+    QStringList sources() const;              ///< 获取所有数据源名称列表
+    void setWindowSize(const QString &source, int size); ///< 设置指定数据源的滑动窗口大小
+    void setAggregateFunc(const QString &source, AggregateFunc func); ///< 设置指定数据源的聚合函数
+    void resetSource(const QString &source);  ///< 重置指定数据源的缓冲区和结果(滑动窗口+时间窗口一并重置)
+    void resetAll();                          ///< 重置所有数据源的缓冲区和结果
 
     // ---- 时间窗口聚合 ----
 
-    /** @brief 为数据源启用时间窗口聚合，窗口按自然时间对齐 @param name 数据源名称(必须已addSource) @param intervalSec 窗口间隔(秒)，推荐TimeInterval枚举值 */
-    void enableTimeWindow(const QString &name, int intervalSec);
-    /** @brief 禁用指定数据源的时间窗口聚合 @param name 数据源名称 */
-    void disableTimeWindow(const QString &name);
-    /** @brief 获取最近一个已完成时间窗口的统计结果 @param name 数据源名称 @return 统计结果；不存在返回count=0的结构体 */
-    WindowStats lastWindowStats(const QString &name) const;
-    /** @brief 获取所有已完成时间窗口统计结果(时间升序) @param name 数据源名称 @return 统计结果列表 */
-    QList<WindowStats> windowStatsHistory(const QString &name) const;
-    /** @brief 获取当前进行中的时间窗口实时统计 @param name 数据源名称 @return 实时统计；不存在返回count=0的结构体 */
-    WindowStats currentWindowStats(const QString &name) const;
-    /** @brief 设置时间窗口历史记录最大保留数量 @param max 最大数量(默认100) */
-    void setMaxHistoryWindows(int max);
-    /** @brief 获取时间窗口历史记录最大保留数量 @return 最大保留数量 */
-    int maxHistoryWindows() const;
+    void enableTimeWindow(const QString &name, int intervalSec); ///< 为数据源启用时间窗口聚合，窗口按自然时间对齐
+    void disableTimeWindow(const QString &name); ///< 禁用指定数据源的时间窗口聚合
+    WindowStats lastWindowStats(const QString &name) const; ///< 获取最近一个已完成时间窗口的统计结果
+    QList<WindowStats> windowStatsHistory(const QString &name) const; ///< 获取所有已完成时间窗口统计结果(时间升序)
+    WindowStats currentWindowStats(const QString &name) const; ///< 获取当前进行中的时间窗口实时统计
+    void setMaxHistoryWindows(int max); ///< 设置时间窗口历史记录最大保留数量(默认100)
+    int maxHistoryWindows() const;      ///< 获取时间窗口历史记录最大保留数量
 
     // ---- 实时滚动聚合 ----
 
-    /** @brief 启用实时滚动聚合定时器，定期发射rollingAggregation信号 @param rollIntervalMs 滚动间隔(毫秒)，默认1000ms */
-    void enableRollingAggregation(int rollIntervalMs = 1000);
-    /** @brief 禁用实时滚动聚合定时器 */
-    void disableRollingAggregation();
-    /** @brief 查询实时滚动聚合是否已启用 @return true表示已启用 */
-    bool isRollingEnabled() const;
+    void enableRollingAggregation(int rollIntervalMs = 1000); ///< 启用实时滚动聚合定时器，定期发射rollingAggregation信号
+    void disableRollingAggregation();  ///< 禁用实时滚动聚合定时器
+    bool isRollingEnabled() const;     ///< 查询实时滚动聚合是否已启用
 
 signals:
-    /** @brief 数据源聚合完成信号(滑动窗口) @param source 数据源名称 @param result 聚合结果 */
-    void valueAggregated(const QString &source, double result);
-    /** @brief 数据源添加信号 @param name 数据源名称 */
-    void sourceAdded(const QString &name);
-    /** @brief 数据源移除信号 @param name 数据源名称 */
-    void sourceRemoved(const QString &name);
-
-    /** @brief 时间窗口关闭信号 — 当一个时间窗口结束并产生统计结果时发射 @param source 数据源名称 @param stats 窗口统计结果 */
-    void windowClosed(const QString &source, const WindowStats &stats);
-    /** @brief 实时滚动聚合信号 — 每隔rollIntervalMs毫秒发射一次，携带所有数据源的当前状态 @param results 数据源名称到当前滑动窗口聚合结果的映射 */
-    void rollingAggregation(const QMap<QString, double> &results);
+    void valueAggregated(const QString &source, double result); ///< 数据源聚合完成信号(滑动窗口)
+    void sourceAdded(const QString &name);    ///< 数据源添加信号
+    void sourceRemoved(const QString &name);  ///< 数据源移除信号
+    void windowClosed(const QString &source, const WindowStats &stats); ///< 时间窗口关闭信号
+    void rollingAggregation(const QMap<QString, double> &results); ///< 实时滚动聚合信号
 
 private:
-    /** @brief 对指定数据源执行滑动窗口聚合计算 @param source 数据源名称 */
-    void computeAggregate(const QString &source);
-    /** @brief 将一个新值纳入指定数据源的时间窗口统计 @param source 数据源名称 @param value 新数据值 @param timestampMs 当前时间戳(Epoch毫秒) */
-    void processTimeWindow(const QString &source, double value, qint64 timestampMs);
-    /** @brief 计算指定列表值的完整统计 @param values 值列表 @return 统计结果 */
-    static WindowStats computeStats(const QList<double> &values);
-    /** @brief 计算指定时间戳所属的时间窗口起始时间 @param timestampMs 时间戳(Epoch毫秒) @param intervalSec 窗口间隔(秒) @return 窗口起始时间(Epoch毫秒) */
-    static qint64 alignToWindow(qint64 timestampMs, int intervalSec);
-    /** @brief 定时触发滚动聚合 */
-    void onRollingTimeout();
+    void computeAggregate(const QString &source); ///< 对指定数据源执行滑动窗口聚合计算
+    void processTimeWindow(const QString &source, double value, qint64 timestampMs); ///< 将新值纳入时间窗口统计
+    static WindowStats computeStats(const QList<double> &values); ///< 计算指定列表值的完整统计
+    static qint64 alignToWindow(qint64 timestampMs, int intervalSec); ///< 计算指定时间戳所属的时间窗口起始时间
+    void onRollingTimeout(); ///< 定时触发滚动聚合
 
     /** @brief 滑动窗口数据源配置结构 */
     struct SourceConfig {
@@ -156,16 +121,10 @@ private:
     quint64 m_totalSourceRemoves = 0;      ///< 累计数据源移除次数
 
 public:
-    /** @brief 获取累计输入值总数 @return 计数 */
-    quint64 totalValuesFed() const { return m_totalValuesFed; }
-    /** @brief 获取累计完成的时间窗口数 @return 计数 */
-    quint64 totalWindowsCompleted() const { return m_totalWindowsCompleted; }
-    /** @brief 获取累计滚动聚合发射次数 @return 计数 */
-    quint64 totalRollingEmits() const { return m_totalRollingEmits; }
-    /** @brief 获取累计数据源添加次数 @return 计数 */
-    quint64 totalSourceAdds() const { return m_totalSourceAdds; }
-    /** @brief 获取累计数据源移除次数 @return 计数 */
-    quint64 totalSourceRemoves() const { return m_totalSourceRemoves; }
-    /** @brief 重置聚合器统计计数器 */
-    void resetAggregatorStatistics();
+    quint64 totalValuesFed() const { return m_totalValuesFed; }         ///< 累计输入值总数
+    quint64 totalWindowsCompleted() const { return m_totalWindowsCompleted; } ///< 累计完成的时间窗口数
+    quint64 totalRollingEmits() const { return m_totalRollingEmits; }   ///< 累计滚动聚合发射次数
+    quint64 totalSourceAdds() const { return m_totalSourceAdds; }       ///< 累计数据源添加次数
+    quint64 totalSourceRemoves() const { return m_totalSourceRemoves; } ///< 累计数据源移除次数
+    void resetAggregatorStatistics(); ///< 重置聚合器统计计数器
 };

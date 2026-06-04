@@ -83,19 +83,26 @@ void SignalLineMonitor::onTick()
     PinoutSignals latest = m_connection->pinoutSignals();
 
     // 比较新旧状态 — 逐字段比较避免结构体填充字节干扰
-    if (latest.cts != m_current.cts) ++m_totalSignalChanges;
-    if (latest.dsr != m_current.dsr) ++m_totalSignalChanges;
-    if (latest.dcd != m_current.dcd) ++m_totalSignalChanges;
-    if (latest.ri  != m_current.ri)  ++m_totalSignalChanges;
-    if (latest.dtr != m_current.dtr) ++m_totalSignalChanges;
-    if (latest.rts != m_current.rts) ++m_totalSignalChanges;
+    quint64 changesThisTick = 0;
+    if (latest.cts != m_current.cts) { ++m_totalSignalChanges; ++m_totalCtsChanges; ++changesThisTick; }
+    if (latest.dsr != m_current.dsr) { ++m_totalSignalChanges; ++m_totalDsrChanges; ++changesThisTick; }
+    if (latest.dcd != m_current.dcd) { ++m_totalSignalChanges; ++m_totalDcdChanges; ++changesThisTick; }
+    if (latest.ri  != m_current.ri)  { ++m_totalSignalChanges; ++m_totalRiChanges;  ++changesThisTick; }
+    if (latest.dtr != m_current.dtr) { ++m_totalSignalChanges; ++m_totalDtrChanges; ++changesThisTick; }
+    if (latest.rts != m_current.rts) { ++m_totalSignalChanges; ++m_totalRtsChanges; ++changesThisTick; }
 
-    if (latest.cts != m_current.cts ||
-        latest.dsr != m_current.dsr ||
-        latest.dcd != m_current.dcd ||
-        latest.ri  != m_current.ri  ||
-        latest.dtr != m_current.dtr ||
-        latest.rts != m_current.rts)
+    // 计算peakChangeRate: 累计当前秒内的变化次数，秒边界时更新峰值
+    m_lastSecChanges += changesThisTick;
+    qint64 currentSec = m_durationTimer.elapsed() / 1000;
+    if (currentSec > m_lastPeakRateSec) {
+        if (m_lastSecChanges > m_peakChangeRate) {
+            m_peakChangeRate = m_lastSecChanges;
+        }
+        m_lastSecChanges = 0;
+        m_lastPeakRateSec = currentSec;
+    }
+
+    if (changesThisTick > 0)
     {
         m_current = latest;
         ++m_changeCount;
@@ -157,5 +164,14 @@ void SignalLineMonitor::resetStatistics()
     m_totalSignalChanges = 0;
     m_totalLineMonitored = 0;
     m_totalErrorEvents = 0;
+    m_totalDtrChanges = 0;
+    m_totalRtsChanges = 0;
+    m_totalCtsChanges = 0;
+    m_totalDsrChanges = 0;
+    m_totalDcdChanges = 0;
+    m_totalRiChanges = 0;
+    m_peakChangeRate = 0;
+    m_lastSecChanges = 0;
+    m_lastPeakRateSec = 0;
     m_durationTimer.restart();
 }
