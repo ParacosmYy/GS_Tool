@@ -18,9 +18,9 @@
 #include <QByteArray>
 #include <QMap>
 #include <QVariantMap>
-#include <QJSValue>
 
 class QJSEngine;
+class QJSValue;
 
 /**
  * @brief JavaScript 可脚本化协议引擎
