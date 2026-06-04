@@ -1,7 +1,6 @@
 /** @file ToastWidget.h @brief 通知吐司组件 -- 右下角临时通知，Success(绿)/Error(红)/Info(强调色)，弹出300ms OutBack/消失250ms InCubic */
 #ifndef TOASTWIDGET_H
 #define TOASTWIDGET_H
-
 #include <QWidget>
 #include <QPainter>
 #include <QPainterPath>
@@ -21,10 +20,8 @@
 /** @brief 通知吐司 -- 临时弹出通知, 自动消失, 多条自动垂直堆叠 */
 class ToastWidget : public QWidget {
     Q_OBJECT
-
 public:
     enum class ToastType { Success, Error, Info }; ///< 通知类型
-
     /** @brief 显示吐司通知，弹出动画后自动定时消失 */
     static void show(QWidget* parent, const QString& msg,
                      ToastType type = ToastType::Info, int ms = 3000)
@@ -40,10 +37,7 @@ public:
         }
         const auto& list = activeToasts(parent);
         int bottomY = parent->height() - kMargin;
-        for (auto* t : list) {
-            bottomY -= t->height();
-            if (t != toast) bottomY -= kGap;
-        }
+        for (auto* t : list) { bottomY -= t->height(); if (t != toast) bottomY -= kGap; }
         QPoint target(parent->width() - kMargin - toast->width(), bottomY);
         toast->move(target.x(), target.y() + 30);
         toast->QWidget::show();
@@ -57,7 +51,6 @@ public:
         slide->start(QAbstractAnimation::DeleteWhenStopped);
         fade->start(QAbstractAnimation::DeleteWhenStopped);
     }
-
     /** @brief 防抖吐司，冷却期内重复调用同一消息将被忽略 */
     static void showDebounced(QWidget* parent, const QString& msg,
                               ToastType type = ToastType::Info, int cooldownMs = 2000)
@@ -68,7 +61,6 @@ public:
         map[key].start();
         show(parent, msg, type);
     }
-
 protected:
     /** @brief 自绘事件：圆角背景+左侧语义色条+图标+消息文本 */
     void paintEvent(QPaintEvent*) override
@@ -94,7 +86,6 @@ protected:
         p.drawText(QRect(textX, kPad, width() - textX - kPad, height() - kPad * 2),
                    Qt::AlignVCenter | Qt::AlignLeft | Qt::TextWordWrap, m_message);
     }
-
 private:
     /** @brief 私有构造函数，初始化吐司外观和尺寸 */
     explicit ToastWidget(QWidget* parent, const QString& message, ToastType type)
@@ -112,7 +103,6 @@ private:
         m_opacityEffect = new QGraphicsOpacityEffect(this);
         m_opacityEffect->setOpacity(0.0); setGraphicsEffect(m_opacityEffect);
     }
-
     /** @brief 获取当前通知类型的语义颜色 */
     QColor semanticColor() const {
         using SC = ThemeManager::SemanticColor;
@@ -123,7 +113,6 @@ private:
         }
         return ThemeManager::instance().color(SC::Accent);
     }
-
     /** @brief 获取通知类型对应的图标Unicode字符 */
     QString iconChar() const {
         switch (m_type) {
@@ -133,7 +122,6 @@ private:
         }
         return tr("ℹ");
     }
-
     /** @brief 消失动画：InCubic缓动，向上飘出30px并淡出 */
     void dismiss() {
         ++s_totalDismisses;
@@ -153,12 +141,12 @@ private:
         });
         group->start(QAbstractAnimation::DeleteWhenStopped);
     }
-    static QList<ToastWidget*>& activeToasts(QWidget* parent) { return activeToastsMap()[parent]; } ///< 获取指定父窗口的活跃吐司列表
-    static QMap<QWidget*, QList<ToastWidget*>>& activeToastsMap() { ///< 全局父窗口-吐司列表映射(单例)
+    static QList<ToastWidget*>& activeToasts(QWidget* parent) { return activeToastsMap()[parent]; }
+    static QMap<QWidget*, QList<ToastWidget*>>& activeToastsMap() {
         static QMap<QWidget*, QList<ToastWidget*>> map; return map; }
-    static QHash<QString, QElapsedTimer>& debounceMap() { ///< 全局防抖计时器映射(单例)
+    static QHash<QString, QElapsedTimer>& debounceMap() {
         static QHash<QString, QElapsedTimer> map; return map; }
-    static void repositionToasts(QWidget* parent) { ///< 吐司消失后重排剩余活跃吐司
+    static void repositionToasts(QWidget* parent) {
         if (!parent) return;
         auto& list = activeToasts(parent);
         int bottomY = parent->height() - kMargin;
@@ -177,7 +165,6 @@ private:
     ToastType m_type;                                  ///< 通知类型
     QString m_message;                                 ///< 消息文本
     QGraphicsOpacityEffect* m_opacityEffect = nullptr; ///< 淡入淡出特效
-
     // ---- 统计计数器(静态，跨所有实例累积) ----
     static inline quint64 s_totalShows = 0;     ///< 总显示次数
     static inline quint64 s_totalDismisses = 0; ///< 总消失次数
@@ -192,5 +179,4 @@ private:
     static constexpr int kMargin = 16, kRadius = 8, kGap = 8;
     static constexpr int kLeftBorder = 4, kPad = 12, kIconArea = 24, kIconSize = 14;
 };
-
 #endif // TOASTWIDGET_H

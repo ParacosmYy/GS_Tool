@@ -1,11 +1,4 @@
-/**
- * @file ProtocolEngine.h
- * @brief 自定义协议解析引擎
- *
- * 接收原始串口字节流，根据 ProtocolSchema 定义的帧格式
- * 自动完成帧同步、长度解析、校验及字段提取。
- * 支持多种CRC校验算法，可通过 setChecksumAlgorithm() 运行时切换。
- */
+/** @file ProtocolEngine.h @brief 自定义协议解析引擎。接收原始串口字节流，根据ProtocolSchema定义的帧格式自动完成帧同步、长度解析、校验及字段提取 */
 
 #ifndef PROTOCOL_ENGINE_H
 #define PROTOCOL_ENGINE_H
@@ -17,15 +10,7 @@
 
 #include "protocol/schema/ProtocolSchema.h"
 
-/**
- * @class ProtocolEngine
- * @brief 协议帧解析引擎
- *
- * 持续接收串口数据，按当前 ProtocolSchema 完成帧检测，
- * 解析成功后发射 frameParsed 信号，失败时发射 parseError。
- * CRC校验: 帧接收完成后自动触发，通过crcPassCount统计，
- * 失败计入crcFailCount并发射parseError和checksumFailed信号。
- */
+/** @brief 协议帧解析引擎。持续接收串口数据按ProtocolSchema完成帧检测，CRC校验自动触发 */
 class ProtocolEngine : public QObject
 {
     Q_OBJECT
@@ -44,87 +29,46 @@ public:
     };
     Q_ENUM(ChecksumAlgorithm)
 
-    /** @brief 构造函数 @param parent 父对象指针 */
-    explicit ProtocolEngine(QObject *parent = nullptr);
-    /** @brief 析构函数 */
-    ~ProtocolEngine() override;
-    /** @brief 设置协议帧结构定义 @param schema 已加载的 ProtocolSchema 指针 */
-    void setSchema(ProtocolSchema *schema);
-    /** @brief 向引擎喂入新的串口数据 @param data 原始字节流 */
-    void feedData(const QByteArray &data);
-    /** @brief 重置解析状态，清空内部缓冲区 */
-    void reset();
-    /** @brief 获取当前协议定义 @return 协议定义指针，未设置时为 nullptr */
-    ProtocolSchema *currentSchema() const;
+    explicit ProtocolEngine(QObject *parent = nullptr); ///< 构造
+    ~ProtocolEngine() override;              ///< 析构
+    void setSchema(ProtocolSchema *schema);  ///< 设置协议帧结构定义
+    void feedData(const QByteArray &data);   ///< 喂入新的串口数据
+    void reset();                            ///< 重置解析状态，清空缓冲区
+    ProtocolSchema *currentSchema() const;   ///< 获取当前协议定义
 
-    /* —— 校验算法配置接口 —— */
+    /* -- 校验算法配置 -- */
+    void setChecksumAlgorithm(const QString &algo); ///< 设置校验算法(覆盖schema)
+    QString checksumAlgorithm() const;       ///< 获取当前校验算法名称
+    ChecksumAlgorithm activeChecksumAlgorithm() const; ///< 获取当前生效的算法(考虑Auto回退)
+    bool verifyChecksum(const QByteArray &data) const; ///< 独立校验接口(统计不计入内部计数)
 
-    /** @brief 设置校验算法(覆盖schema定义) @param algo 算法名称: crc8/crc16_modbus/crc16_ccitt/crc32/xor/sum/none/auto */
-    void setChecksumAlgorithm(const QString &algo);
-    /** @brief 获取当前配置的校验算法名称 @return 算法名称字符串 */
-    QString checksumAlgorithm() const;
-    /** @brief 获取当前生效的校验算法枚举值(考虑Auto回退和schema设置) @return ChecksumAlgorithm 枚举值 */
-    ChecksumAlgorithm activeChecksumAlgorithm() const;
-    /**
-     * @brief 独立校验接口：验证给定数据的校验和
-     * @param data 包含 payload + checksum 的完整字节数据
-     * @return 校验通过返回 true，校验失败或算法无效返回 false
-     * @note 使用当前配置的算法进行验证，Auto时默认CRC-16 Modbus，统计不计入引擎内部计数
-     */
-    bool verifyChecksum(const QByteArray &data) const;
-
-    /* —— 统计计数器接口 —— */
-
-    /** @brief 获取已成功解析的帧数(兼容int) @return 成功解析帧计数 */
-    int framesParsed() const;
-    /** @brief 获取解析错误次数(兼容int) @return 解析错误计数 */
-    int parseErrors() const;
-    /** @brief 获取已成功解析的帧数(64位) @return 成功解析帧计数 */
-    quint64 framesParsedCount() const;
-    /** @brief 获取因校验/验证失败被拒绝的帧数 @return 被拒绝帧计数 */
-    quint64 framesRejected() const;
-    /** @brief 获取引擎累计处理的字节总数 @return 字节总数 */
-    quint64 totalBytesProcessed() const;
-    /** @brief 获取校验验证执行总次数(含通过和失败) @return 验证总次数 */
-    quint64 totalValidations() const;
-    /** @brief 获取校验验证通过次数 @return 通过次数 */
-    quint64 totalValidationPasses() const;
-    /** @brief 获取校验验证失败次数 @return 失败次数 */
-    quint64 totalValidationFailures() const;
-    /** @brief 获取CRC校验执行总次数(含通过和失败) @return CRC校验总次数 */
-    quint64 totalCrcChecks() const;
-    /** @brief 获取解析错误总数(64位) @return 错误总数 */
-    quint64 totalParseErrors() const;
-    /** @brief 获取最后一次成功解析的时间戳 @return 毫秒级时间戳，未解析过返回0 */
-    qint64 lastParseTimestamp() const;
-    /** @brief 获取已处理的数据包总数（含成功和失败） @return 数据包总数 */
-    quint64 totalPacketsProcessed() const;
-    /** @brief 获取已解析的字节总数（仅成功解析的帧内字节） @return 字节总数 */
-    quint64 totalBytesParsed() const;
-    /** @brief 获取CRC校验错误次数 @return CRC错误计数 */
-    quint64 totalCrcErrors() const;
-    /** @brief 获取CRC校验通过次数 @return 校验通过计数 */
-    quint64 crcPassCount() const;
-    /** @brief 获取CRC校验失败次数 @return 校验失败计数 */
-    quint64 crcFailCount() const;
-    /** @brief 获取CRC校验通过率(0.0~1.0) @return 通过率，总验证次数为0时返回0.0 */
-    double crcPassRate() const;
-    /** @brief 重置所有解析统计计数器(帧数/错误/字节/时间戳/CRC统计) */
-    void resetParseStatistics();
-    /** @brief 重置所有统计计数器(等同于resetParseStatistics) */
-    void resetEngineStatistics();
-    /** @brief 重置所有统计计数器(别名，调用resetEngineStatistics) */
-    void resetStats();
+    /* -- 统计计数器 -- */
+    int framesParsed() const;                ///< 成功解析帧数(兼容int)
+    int parseErrors() const;                 ///< 解析错误次数(兼容int)
+    quint64 framesParsedCount() const;       ///< 成功解析帧数(64位)
+    quint64 framesRejected() const;          ///< 被拒绝帧数(校验/验证失败)
+    quint64 totalBytesProcessed() const;     ///< 累计处理字节总数
+    quint64 totalValidations() const;        ///< 校验验证执行总次数
+    quint64 totalValidationPasses() const;   ///< 校验验证通过次数
+    quint64 totalValidationFailures() const; ///< 校验验证失败次数
+    quint64 totalCrcChecks() const;          ///< CRC校验执行总次数
+    quint64 totalParseErrors() const;        ///< 解析错误总数(64位)
+    qint64 lastParseTimestamp() const;       ///< 最后一次成功解析时间戳(ms)
+    quint64 totalPacketsProcessed() const;   ///< 已处理数据包总数
+    quint64 totalBytesParsed() const;        ///< 已解析字节总数(仅成功帧)
+    quint64 totalCrcErrors() const;          ///< CRC校验错误次数
+    quint64 crcPassCount() const;            ///< CRC校验通过次数
+    quint64 crcFailCount() const;            ///< CRC校验失败次数
+    double crcPassRate() const;              ///< CRC校验通过率(0.0~1.0)
+    void resetParseStatistics();             ///< 重置解析统计
+    void resetEngineStatistics();            ///< 重置所有统计(等同resetParseStatistics)
+    void resetStats();                       ///< 别名(调用resetEngineStatistics)
 
 signals:
-    /** @brief 帧解析完成信号 @param fields 字段名->字段值映射 @param rawData 原始帧字节 */
-    void frameParsed(const QVariantMap &fields, const QByteArray &rawData);
-    /** @brief 解析错误信号 @param error 错误描述 */
-    void parseError(const QString &error);
-    /** @brief CRC校验失败信号 @param expected 期望校验值 @param actual 实际校验值 @param algorithm 算法名称 */
-    void checksumFailed(quint64 expected, quint64 actual, const QString &algorithm);
-    /** @brief 校验算法变更信号 @param newAlgorithm 新的算法名称 */
-    void checksumAlgorithmChanged(const QString &newAlgorithm);
+    void frameParsed(const QVariantMap &fields, const QByteArray &rawData); ///< 帧解析完成
+    void parseError(const QString &error);   ///< 解析错误
+    void checksumFailed(quint64 expected, quint64 actual, const QString &algorithm); ///< CRC校验失败
+    void checksumAlgorithmChanged(const QString &newAlgorithm); ///< 校验算法变更
 
 private:
     ProtocolSchema *m_schema = nullptr;                 ///< 当前协议定义

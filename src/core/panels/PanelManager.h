@@ -1,10 +1,4 @@
-/**
- * @file PanelManager.h
- * @brief 面板管理器 - 管理所有面板的创建、缓存和切换
- *
- * 面板的前向声明和成员指针定义在 PanelManagerPanels.h 中，
- * 以控制本文件行数在 200 行以内。
- */
+/** @file PanelManager.h @brief 面板管理器 - 管理所有面板的创建、缓存和切换。面板前向声明和成员指针在PanelManagerPanels.h中 */
 
 #ifndef PANEL_MANAGER_H
 #define PANEL_MANAGER_H
@@ -20,38 +14,16 @@
 class OtaManager;
 class TerminalModel;
 
-/**
- * @brief 面板管理器 - 统一创建和管理所有功能面板 widget
- *
- * 职责:
- *   1. 集中创建所有功能面板（串口配置、终端、数据统计、协议解析、波形图、OTA等）
- *   2. 提供统一的 Getter 接口供 MainWindow 和各 Controller 获取面板指针
- *   3. 生成面板映射表供 NavigationController 构建导航树
- *   4. 生成可切换面板列表供 NavigationController 执行面板隐藏/显示
- *
- * 设计目的:
- *   从 MainWindow 中提取面板创建逻辑，使 MainWindow 只负责 UI 布局组装和信号连接，
- *   不再直接持有和创建具体的面板 widget，降低 MainWindow 的代码量和职责。
- *
- * 协作关系:
- *   - MainWindow: 调用 createPanels() 创建面板，通过 Getter 获取面板指针用于布局和信号连接
- *   - NavigationController: 使用 panelMappings() 构建导航树，使用 allPanels() 切换面板
- */
+/** @brief 面板管理器 - 统一创建和管理所有功能面板widget。从MainWindow提取面板创建逻辑，提供Getter/映射表/可切换面板列表 */
 class PanelManager : public QObject, private PanelManagerMembers {
     Q_OBJECT
 
 public:
-    /** @brief 构造面板管理器 @param parent 父对象 */
-    explicit PanelManager(QObject* parent = nullptr);
-    /** @brief 析构函数，QObject父子树自动回收面板widget */
-    ~PanelManager() override = default;
-    /** @brief 禁止拷贝构造 */
-    PanelManager(const PanelManager&) = delete;
-    /** @brief 禁止赋值操作 */
-    PanelManager& operator=(const PanelManager&) = delete;
-
-    /** @brief 创建所有面板widget(调用一次，在MainWindow::setupUI中) @param otaManager OTA管理器 @param terminalModel 终端数据模型 */
-    void createPanels(OtaManager* otaManager, TerminalModel* terminalModel);
+    explicit PanelManager(QObject* parent = nullptr); ///< 构造
+    ~PanelManager() override = default;     ///< 析构(QObject父子树自动回收)
+    PanelManager(const PanelManager&) = delete; ///< 禁止拷贝
+    PanelManager& operator=(const PanelManager&) = delete; ///< 禁止赋值
+    void createPanels(OtaManager* otaManager, TerminalModel* terminalModel); ///< 创建所有面板(调用一次)
 
     // ==================== 面板 Getter ====================
 
@@ -135,39 +107,18 @@ public:
 
     // ==================== 响应式布局 ====================
 
-    /**
-     * @brief 设置紧凑模式(小窗口时隐藏非关键面板的扩展区域)
-     * @param compact true=紧凑模式, false=正常模式
-     *
-     * 紧凑模式下: 隐藏BasePanel折叠按钮、缩小面板标题栏高度、
-     * 隐藏DataStatistics图表区、隐藏ProtocolView详情面板。
-     */
-    void setCompactMode(bool compact);
-
-    /** @brief 是否处于紧凑模式 */
-    bool isCompactMode() const;
+    void setCompactMode(bool compact);       ///< 设置紧凑模式(小窗口隐藏非关键面板扩展区域)
+    bool isCompactMode() const;              ///< 是否处于紧凑模式
 
     // ==================== 面板统计 ====================
-
-    /** @brief 通知面板切换发生（由 NavigationController 调用） */
-    void onPanelSwitched(int visibleCount);
-
-    /** @brief 获取累计面板切换次数 */
-    quint64 totalPanelSwitches() const;
-    /** @brief 获取累计创建面板总数 */
-    quint64 totalPanelsCreated() const;
-    /** @brief 获取历史最大并发面板数 */
-    quint64 maxConcurrentPanels() const;
-
-    /** @brief 获取累计面板创建次数(createPanels/wrapPanels触发) @return 创建次数 */
-    quint64 totalPanelCreations() const;
-    /** @brief 获取累计面板删除次数(析构时统计) @return 删除次数 */
-    quint64 totalPanelDeletions() const;
-    /** @brief 获取累计活跃面板追踪次数(onPanelSwitched累计) @return 追踪总数 */
-    quint64 totalActivePanelsTracked() const;
-
-    /** @brief 重置所有统计计数器 */
-    void resetStats();
+    void onPanelSwitched(int visibleCount);  ///< 通知面板切换(由NavigationController调用)
+    quint64 totalPanelSwitches() const;      ///< 累计面板切换次数
+    quint64 totalPanelsCreated() const;      ///< 累计创建面板总数
+    quint64 maxConcurrentPanels() const;     ///< 历史最大并发面板数
+    quint64 totalPanelCreations() const;     ///< 累计面板创建次数(wrapPanels逐个创建)
+    quint64 totalPanelDeletions() const;     ///< 累计面板删除次数
+    quint64 totalActivePanelsTracked() const; ///< 累计活跃面板追踪次数
+    void resetStats();                       ///< 重置所有统计计数器
 
 private:
     // --- BasePanel包装器 ---

@@ -38,90 +38,44 @@ struct SerialPortInfo {
 class SerialDetector : public QObject {
     Q_OBJECT
 public:
-    /** @brief 构造串口检测器 @param parent 父对象 */
-    explicit SerialDetector(QObject *parent = nullptr);
-    /** @brief 析构函数 */
-    ~SerialDetector() override;
-
+    explicit SerialDetector(QObject *parent = nullptr); ///< 构造
+    ~SerialDetector() override;              ///< 析构
     // ---- 监控控制 ----
-
-    /** @brief 启动串口热插拔监控(最小间隔100ms) @param intervalMs 轮询间隔(毫秒) */
-    void startMonitoring(int intervalMs = 1000);
-    /** @brief 停止串口热插拔监控 */
-    void stopMonitoring();
-    /** @brief 获取当前所有已知可用端口信息列表 @return SerialPortInfo列表 */
-    QList<SerialPortInfo> availablePorts() const;
-    /** @brief 获取所有已知端口名称列表 @return 端口名称列表 */
-    QStringList portNames() const;
-    /** @brief 查询是否正在监控 @return true=监控中 */
-    bool isMonitoring() const;
-
+    void startMonitoring(int intervalMs = 1000); ///< 启动热插拔监控(最小100ms)
+    void stopMonitoring();                   ///< 停止监控
+    QList<SerialPortInfo> availablePorts() const; ///< 所有已知可用端口
+    QStringList portNames() const;           ///< 所有已知端口名称
+    bool isMonitoring() const;               ///< 是否正在监控
     // ---- 查询接口 ----
-
-    /** @brief 按USB厂商ID(VID)查找端口 @param vid USB厂商ID @return 匹配的SerialPortInfo列表 */
-    QList<SerialPortInfo> findByVendorId(quint16 vid) const;
-    /** @brief 按设备描述关键词查找端口(大小写不敏感) @param keyword 搜索关键词 @return 匹配的SerialPortInfo列表 */
-    QList<SerialPortInfo> findByDescription(const QString &keyword) const;
-    /** @brief 按端口名称精确查找端口信息 @param name 端口名称(如"COM3") @return 匹配的SerialPortInfo，未找到返回空对象 */
-    SerialPortInfo findByPortName(const QString &name) const;
-    /** @brief 按制造商关键词查找端口(大小写不敏感) @param keyword 制造商关键词 @return 匹配的SerialPortInfo列表 */
-    QList<SerialPortInfo> findByManufacturer(const QString &keyword) const;
-    /** @brief 按驱动类型查找端口(精确匹配driverType字段) @param driverType 驱动类型 @return 匹配的SerialPortInfo列表 */
-    QList<SerialPortInfo> findByDriverType(const QString &driverType) const;
-
+    QList<SerialPortInfo> findByVendorId(quint16 vid) const; ///< 按VID查找
+    QList<SerialPortInfo> findByDescription(const QString &keyword) const; ///< 按描述关键词查找(大小写不敏感)
+    SerialPortInfo findByPortName(const QString &name) const; ///< 按端口名称精确查找
+    QList<SerialPortInfo> findByManufacturer(const QString &keyword) const; ///< 按制造商关键词查找
+    QList<SerialPortInfo> findByDriverType(const QString &driverType) const; ///< 按驱动类型查找
     // ---- 芯片识别 ----
-
-    /**
-     * @brief 根据VID查找已知芯片厂商信息
-     * @param vid USB厂商ID
-     * @return 厂商信息，未匹配返回空vendorName
-     */
-    static UsbVendorEntry lookupVendor(quint16 vid);
-
-    /**
-     * @brief 根据VID/PID组合识别芯片型号
-     * @param vid USB厂商ID
-     * @param pid USB产品ID
-     * @return 芯片型号字符串，未匹配返回"Unknown"
-     */
-    static QString identifyChip(quint16 vid, quint16 pid);
+    static UsbVendorEntry lookupVendor(quint16 vid); ///< 按VID查找芯片厂商
+    static QString identifyChip(quint16 vid, quint16 pid); ///< 按VID/PID识别芯片型号
 
     // ---- 统计计数器 ----
-
-    /** @brief 获取累计端口扫描次数 @return 扫描总次数 */
-    quint64 totalScans() const { return m_totalScans; }
-    /** @brief 获取累计端口插入事件次数 @return 插入总次数 */
-    quint64 totalInsertions() const { return m_totalInsertions; }
-    /** @brief 获取累计端口移除事件次数 @return 移除总次数 */
-    quint64 totalRemovals() const { return m_totalRemovals; }
-    /** @brief 获取累计VID查询次数 @return VID查询总次数 */
-    quint64 totalVidLookups() const { return m_totalVidLookups; }
-    /** @brief 获取累计检测到的不同VID数量 @return 不同VID计数 */
-    int uniqueVidCount() const;
-    /** @brief 获取已知芯片厂商数据库条目数 @return 数据库大小 */
-    static int knownVendorCount();
-    /** @brief 重置所有统计计数器 */
-    void resetStatistics();
+    quint64 totalScans() const { return m_totalScans; } ///< 累计端口扫描次数
+    quint64 totalInsertions() const { return m_totalInsertions; } ///< 累计端口插入次数
+    quint64 totalRemovals() const { return m_totalRemovals; } ///< 累计端口移除次数
+    quint64 totalVidLookups() const { return m_totalVidLookups; } ///< 累计VID查询次数
+    int uniqueVidCount() const;             ///< 累计检测到的不同VID数量
+    static int knownVendorCount();          ///< 已知芯片厂商数据库条目数
+    void resetStatistics();                 ///< 重置所有统计计数器
 
 signals:
-    /** @brief 端口插入信号 @param info 新插入端口详细信息 */
-    void portInserted(const SerialPortInfo &info);
-    /** @brief 端口移除信号 @param info 被移除端口详细信息 */
-    void portRemoved(const SerialPortInfo &info);
-    /** @brief 端口列表变更信号 @param current 当前所有端口信息列表 */
-    void portsChanged(const QList<SerialPortInfo> &current);
-    /** @brief 监控状态变更信号 @param active true=已启动 false=已停止 */
-    void monitoringChanged(bool active);
+    void portInserted(const SerialPortInfo &info); ///< 端口插入信号
+    void portRemoved(const SerialPortInfo &info); ///< 端口移除信号
+    void portsChanged(const QList<SerialPortInfo> &current); ///< 端口列表变更信号
+    void monitoringChanged(bool active);     ///< 监控状态变更信号
 
 private:
-    /** @brief 刷新端口列表，检测插入/移除事件并发射对应信号 */
-    void refreshPorts();
-    /** @brief 将QSerialPortInfo转换为项目内部SerialPortInfo结构(含增强信息) @param info Qt串口信息对象 @return 内部SerialPortInfo结构 */
-    SerialPortInfo fromQtInfo(const QSerialPortInfo &info) const;
-    /** @brief 自动生成友好名称(芯片型号+端口名) @param info 端口信息 @return 友好名称字符串 */
-    static QString generateFriendlyName(const SerialPortInfo &info);
-    /** @brief 识别驱动类型(CH340/CP2102等) @param description 设备描述 @param manufacturer 制造商 @return 驱动类型字符串 */
-    static QString identifyDriverType(const QString &description, const QString &manufacturer);
+    void refreshPorts();                     ///< 刷新端口列表(检测插入/移除事件)
+    SerialPortInfo fromQtInfo(const QSerialPortInfo &info) const; ///< QSerialPortInfo->内部SerialPortInfo
+    static QString generateFriendlyName(const SerialPortInfo &info); ///< 自动生成友好名称
+    static QString identifyDriverType(const QString &description, const QString &manufacturer); ///< 识别驱动类型
 
     QTimer m_timer;                         ///< 轮询定时器
     QMap<QString, SerialPortInfo> m_knownPorts; ///< 已知端口映射(端口名→信息)
