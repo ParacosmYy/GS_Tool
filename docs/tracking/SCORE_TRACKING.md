@@ -109,6 +109,7 @@
 | 273 | GaugeWidgetPaint/JLinkRttConnectionStats/CommandPaletteFilter/MainWindowSignalConnectUI拆分 | 量表绘制独立(GaugeWidget 241→100行)+RTT配置统计独立(JLinkRttConnection 247→189行)+命令面板过滤独立(CommandPalette 247→161行)+信号连接UI独立(MainWindowSignalConnect 265→131行) |
 | 274 | WebSocketConnectionHandshake/IntelHexParserStats/NavigationControllerQuery/SerialConnectionUtility拆分 | WebSocket握手独立(WebSocketConnection 238→93行)+HEX解析统计独立(IntelHexParser 237→145行)+导航查询独立(NavigationController 227→173行)+串口辅助方法独立(SerialConnectionError 223→127行) |
 | 275 | FrameDefinitionSerialization/ConverterPanelSlots/BasePanelConfig/YAxisManagerStats拆分 | 帧定义序列化独立(FrameDefinition 254→160行)+转换面板槽函数独立(ConverterPanel 246→145行)+基础面板配置独立(BasePanel 277→149行)+Y轴统计独立(YAxisManager 253→193行) |
+| 276 | TrafficMonitorStats/TerminalModelQuery/JLinkSdkLoaderRtt/ProtocolSchemaConfig拆分 | 流量统计getter独立(TrafficMonitor 221→169行)+终端行查询独立(TerminalModel 222→157行)+RTT操作独立(JLinkSdkLoader 230→157行)+协议setter独立(ProtocolSchema 229→205行) |
 
 ---
 

@@ -121,6 +121,7 @@ set(SOURCES
     src/terminal/widget/TerminalWidgetSearch.cpp
     src/terminal/widget/TerminalWidgetPaint.cpp
     src/terminal/model/TerminalModel.cpp
+    src/terminal/model/TerminalModelQuery.cpp
     src/terminal/model/TerminalModelStats.cpp
     src/terminal/search/TerminalSearchBar.cpp
     src/terminal/search/TerminalSearchBarHistory.cpp
@@ -273,6 +274,7 @@ set(SOURCES
 
     # ── F2: 自定义协议引擎 ──
     src/protocol/schema/ProtocolSchema.cpp
+    src/protocol/schema/ProtocolSchemaConfig.cpp
     src/protocol/schema/ProtocolSchemaFields.cpp
     src/protocol/engine/ProtocolEngine.cpp
     src/protocol/engine/ProtocolEngineStats.cpp
@@ -309,6 +311,7 @@ set(SOURCES
     src/rtt/JLinkRttConnectionStats.cpp
     src/rtt/JLinkSdkLoader.cpp
     src/rtt/JLinkSdkLoaderQuery.cpp
+    src/rtt/JLinkSdkLoaderRtt.cpp
     src/rtt/RttConfigPanel.cpp
     src/rtt/RttChannelManager.cpp
 
@@ -327,6 +330,7 @@ set(SOURCES
     src/serial/signals/SignalLineMonitor.cpp
     src/serial/signals/SignalLineWidget.cpp
     src/serial/data/TrafficMonitor.cpp
+    src/serial/data/TrafficMonitorStats.cpp
     src/serial/data/TrafficMonitorWidget.cpp
 
     # ── F10: 性能监控 ──
