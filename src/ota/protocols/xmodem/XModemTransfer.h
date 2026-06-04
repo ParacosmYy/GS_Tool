@@ -24,6 +24,20 @@ public:
     /** @brief XMODEM传输模式 */
     enum Mode { Checksum, CRC, OneK }; ///< Checksum=Sum8, CRC=CRC16, OneK=1024B+CRC16
 
+    // ── 统计 ──
+    /** @brief XMODEM传输统计结构体 */
+    struct Stats {
+        quint64 blocksSent = 0;        ///< 累计发送块总数
+        quint64 retries = 0;           ///< 累计重试次数
+        quint64 modeSwitches = 0;      ///< 累计模式降级次数
+        quint64 errors = 0;            ///< 累计错误次数
+        quint64 crcErrors = 0;         ///< 累计CRC校验被拒次数(接收方NAK触发)
+        quint64 timeouts = 0;          ///< 累计超时事件次数
+        quint64 nakReceived = 0;       ///< 累计接收NAK次数
+        quint64 canReceived = 0;       ///< 累计接收CAN次数
+        quint64 acksReceived = 0;      ///< 累计接收ACK次数
+    };
+
     /** @brief 构造XModemTransfer，默认CRC模式 @param parent 父对象 */
     explicit XModemTransfer(QObject* parent = nullptr);
     /** @brief 设置传输模式(须在start()前调用，NAK自动回退Checksum) @param mode 传输模式 */
@@ -36,37 +50,24 @@ public:
     double transferRate() const;
     /** @brief 获取预计剩余时间 @return 秒数，无法估算返回-1 */
     double etaSeconds() const;
-    // ---- 统计接口 ----
 
-    /** @brief 获取累计发送块总数 @return 数据块计数 */
-    quint64 totalBlocksSent() const;
-
-    /** @brief 获取累计重试次数 @return 重试计数 */
-    quint64 totalRetries() const;
-
-    /** @brief 获取累计模式降级次数 @return 降级计数 */
-    quint64 totalModeSwitches() const;
-
-    /** @brief 获取累计错误次数 @return 错误计数 */
-    quint64 xmodemErrorCount() const;
-
-    /** @brief 获取累计CRC校验被拒次数(NAK触发) @return CRC错误计数 */
-    quint64 totalCrcErrors() const { return m_totalCrcErrors; }
-
-    /** @brief 获取累计超时事件次数 @return 超时计数 */
-    quint64 totalTimeouts() const { return m_totalTimeouts; }
-
-    /** @brief 获取累计接收NAK次数 @return NAK计数 */
-    quint64 totalNakReceived() const { return m_totalNakReceived; }
-
-    /** @brief 获取累计接收CAN次数 @return CAN计数 */
-    quint64 totalCanReceived() const { return m_totalCanReceived; }
-
-    /** @brief 获取累计接收ACK次数 @return ACK计数 */
-    quint64 totalAcksReceived() const { return m_totalAcksReceived; }
+    /** @brief 获取统计数据的只读引用 @return Stats常引用 */
+    const Stats& stats() const { return m_stats; }
 
     /** @brief 重置XModem统计计数器 */
-    void resetXmodemStatistics();
+    void resetStats() { m_stats = Stats{}; }
+
+    // ── 向后兼容的便捷 Getter ──
+    quint64 totalBlocksSent() const { return m_stats.blocksSent; }      ///< 获取累计发送块总数
+    quint64 totalRetries() const { return m_stats.retries; }            ///< 获取累计重试次数
+    quint64 totalModeSwitches() const { return m_stats.modeSwitches; }  ///< 获取累计模式降级次数
+    quint64 xmodemErrorCount() const { return m_stats.errors; }         ///< 获取累计错误次数
+    quint64 totalCrcErrors() const { return m_stats.crcErrors; }        ///< 获取累计CRC校验被拒次数
+    quint64 totalTimeouts() const { return m_stats.timeouts; }          ///< 获取累计超时事件次数
+    quint64 totalNakReceived() const { return m_stats.nakReceived; }    ///< 获取累计接收NAK次数
+    quint64 totalCanReceived() const { return m_stats.canReceived; }    ///< 获取累计接收CAN次数
+    quint64 totalAcksReceived() const { return m_stats.acksReceived; }  ///< 获取累计接收ACK次数
+    void resetXmodemStatistics() { resetStats(); }                       ///< 向后兼容别名
 
 signals:
     /** @brief 传输速率和ETA更新 @param rateBytesPerSec 当前速率(字节/秒) @param etaSec 预计剩余时间(秒) */
@@ -113,16 +114,8 @@ private:
     QElapsedTimer m_transferTimer;   ///< 传输耗时计时器
     qint64 m_lastStatsBytes = 0;     ///< 上次统计时的已发送字节数
     double m_currentRate = 0.0;      ///< 当前传输速率(字节/秒)
-    // ---- 统计计数器 ----
-    quint64 m_totalBlocksSent = 0;       ///< 累计发送块总数
-    quint64 m_totalRetries = 0;          ///< 累计重试次数
-    quint64 m_totalModeSwitches = 0;     ///< 累计模式降级次数
-    quint64 m_xmodemErrorCount = 0;      ///< 累计错误次数
-    quint64 m_totalCrcErrors = 0;        ///< 累计CRC校验被拒次数(接收方NAK触发)
-    quint64 m_totalTimeouts = 0;         ///< 累计超时事件次数
-    quint64 m_totalNakReceived = 0;      ///< 累计接收NAK次数
-    quint64 m_totalCanReceived = 0;      ///< 累计接收CAN次数
-    quint64 m_totalAcksReceived = 0;     ///< 累计接收ACK次数
+
+    Stats m_stats;                  ///< XMODEM统计实例
 };
 
 #endif // XMODEMTRANSFER_H

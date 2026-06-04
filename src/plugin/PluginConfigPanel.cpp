@@ -53,6 +53,7 @@ void PluginConfigPanel::setPluginManager(PluginManager* manager)
     }
 
     m_manager = manager;
+    ++m_stats.totalConfigChanges;
 
     if (m_manager) {
         connect(m_manager, &PluginManager::pluginLoaded,

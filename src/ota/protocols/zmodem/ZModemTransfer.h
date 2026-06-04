@@ -36,21 +36,21 @@ public:
     void setFilePath(const QString& path); ///< 设置文件路径(绝对路径,start()前调用)
 
     /** @brief 获取统计数据的只读引用 @return Stats常引用 */
-    const Stats& stats() const { return m_zstats; }
+    const Stats& stats() const { return m_stats; }
 
     /** @brief 重置ZModem统计计数器 */
-    void resetStats() { m_zstats = Stats{}; }
+    void resetStats() { m_stats = Stats{}; }
 
     // ── 向后兼容的便捷 Getter ──
-    quint64 totalBlocksSent() const { return m_zstats.blocksSent; }      ///< 获取已发送数据块总数
-    quint64 totalRetries() const { return m_zstats.retries; }            ///< 获取重传总次数
-    quint64 totalCrcErrors() const { return m_zstats.crcErrors; }        ///< 获取CRC校验错误总次数
-    quint64 zmodemErrorCount() const { return m_zstats.errors; }         ///< 获取协议错误总次数
-    quint64 totalTimeouts() const { return m_zstats.timeouts; }          ///< 获取累计超时事件次数
-    quint64 totalZrposReceived() const { return m_zstats.zrposReceived; } ///< 获取累计ZRPOS次数
-    quint64 totalZdataFrames() const { return m_zstats.zdataFrames; }    ///< 获取累计ZDATA帧次数
-    quint64 totalZfileSent() const { return m_zstats.zfileSent; }        ///< 获取累计ZFILE帧次数
-    quint64 totalZfinSent() const { return m_zstats.zfinSent; }          ///< 获取累计ZFIN帧次数
+    quint64 totalBlocksSent() const { return m_stats.blocksSent; }      ///< 获取已发送数据块总数
+    quint64 totalRetries() const { return m_stats.retries; }            ///< 获取重传总次数
+    quint64 totalCrcErrors() const { return m_stats.crcErrors; }        ///< 获取CRC校验错误总次数
+    quint64 zmodemErrorCount() const { return m_stats.errors; }         ///< 获取协议错误总次数
+    quint64 totalTimeouts() const { return m_stats.timeouts; }          ///< 获取累计超时事件次数
+    quint64 totalZrposReceived() const { return m_stats.zrposReceived; } ///< 获取累计ZRPOS次数
+    quint64 totalZdataFrames() const { return m_stats.zdataFrames; }    ///< 获取累计ZDATA帧次数
+    quint64 totalZfileSent() const { return m_stats.zfileSent; }        ///< 获取累计ZFILE帧次数
+    quint64 totalZfinSent() const { return m_stats.zfinSent; }          ///< 获取累计ZFIN帧次数
     void resetZmodemStatistics() { resetStats(); }                       ///< 向后兼容别名
 
 protected:
@@ -113,7 +113,7 @@ private:
     qint64 m_fileOffset = 0;           ///< 当前偏移(断点续传)
     quint32 m_senderCrc32 = 0;         ///< CRC32累积值
 
-    Stats m_zstats;                    ///< ZMODEM统计实例
+    Stats m_stats;                    ///< ZMODEM统计实例
 };
 
 #endif // ZMODEMTRANSFER_H

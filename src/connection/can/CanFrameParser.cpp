@@ -36,13 +36,13 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
     switch (type) {
     case 't': {
         /* 标准帧: tiiildd... → t + 3位hexID + 1位DLC + N*2位hex数据 */
-        if (rawData.size() < 5) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 5) { ++m_totalParseErrors; ++m_totalCrcErrors; return frame; }
         bool ok = false;
         frame.id = QByteArray(d, 3).toUInt(&ok, 16);
         if (!ok) { ++m_totalParseErrors; return frame; }
         frame.dlc = static_cast<quint8>(QByteArray(d + 3, 1).toUInt(&ok, 16));
         if (!ok || frame.dlc > 8) { ++m_totalParseErrors; return frame; }
-        if (rawData.size() < 4 + frame.dlc * 2) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 4 + frame.dlc * 2) { ++m_totalParseErrors; ++m_totalCrcErrors; return frame; }
         frame.extended = false;
         frame.data = parseHexData(d + 4, frame.dlc);
         ++m_totalStandardFrames;
@@ -50,13 +50,13 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
     }
     case 'T': {
         /* 扩展帧: TIIIIIIIIldd... → T + 8位hexID + 1位DLC + N*2位hex数据 */
-        if (rawData.size() < 10) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 10) { ++m_totalParseErrors; ++m_totalCrcErrors; return frame; }
         bool ok = false;
         frame.id = QByteArray(d, 8).toUInt(&ok, 16);
         if (!ok) { ++m_totalParseErrors; return frame; }
         frame.dlc = static_cast<quint8>(QByteArray(d + 8, 1).toUInt(&ok, 16));
         if (!ok || frame.dlc > 8) { ++m_totalParseErrors; return frame; }
-        if (rawData.size() < 9 + frame.dlc * 2) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 9 + frame.dlc * 2) { ++m_totalParseErrors; ++m_totalCrcErrors; return frame; }
         frame.extended = true;
         frame.data = parseHexData(d + 9, frame.dlc);
         ++m_totalExtendedFrames;
@@ -93,14 +93,14 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
     case 'd': {
         /* 标准CAN-FD帧: diiildd... → d + 3位hexID + 1位DLC + N*2位hex数据
          * DLC使用CAN-FD非线性映射，数据最多64字节 */
-        if (rawData.size() < 5) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 5) { ++m_totalParseErrors; ++m_totalCrcErrors; return frame; }
         bool ok = false;
         frame.id = QByteArray(d, 3).toUInt(&ok, 16);
         if (!ok) { ++m_totalParseErrors; return frame; }
         const int rawDlc = QByteArray(d + 3, 1).toUInt(&ok, 16);
         if (!ok || rawDlc > 15) { ++m_totalParseErrors; return frame; }
         const int byteCount = CanFrame::dlcToBytes(rawDlc);
-        if (rawData.size() < 4 + byteCount * 2) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 4 + byteCount * 2) { ++m_totalParseErrors; ++m_totalCrcErrors; return frame; }
         frame.dlc = static_cast<quint8>(rawDlc);
         frame.extended = false;
         frame.fd = true;
@@ -111,14 +111,14 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
     }
     case 'D': {
         /* 扩展CAN-FD帧: DIIIIIIIIlldd... → D + 8位hexID + 1位DLC + N*2位hex数据 */
-        if (rawData.size() < 10) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 10) { ++m_totalParseErrors; ++m_totalCrcErrors; return frame; }
         bool ok = false;
         frame.id = QByteArray(d, 8).toUInt(&ok, 16);
         if (!ok) { ++m_totalParseErrors; return frame; }
         const int rawDlc = QByteArray(d + 8, 1).toUInt(&ok, 16);
         if (!ok || rawDlc > 15) { ++m_totalParseErrors; return frame; }
         const int byteCount = CanFrame::dlcToBytes(rawDlc);
-        if (rawData.size() < 9 + byteCount * 2) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 9 + byteCount * 2) { ++m_totalParseErrors; ++m_totalCrcErrors; return frame; }
         frame.dlc = static_cast<quint8>(rawDlc);
         frame.extended = true;
         frame.fd = true;

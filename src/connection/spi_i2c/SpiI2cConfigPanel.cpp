@@ -94,6 +94,7 @@ void SpiI2cConfigPanel::onConnectClicked()
 void SpiI2cConfigPanel::onModeChanged(int index)
 {
     m_currentMode = (index == 1) ? "i2c" : "spi";
+    ++m_totalModeChanges;
     updateModeVisibility();
 }
 

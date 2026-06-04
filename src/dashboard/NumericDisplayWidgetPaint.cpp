@@ -96,7 +96,5 @@ void NumericDisplayWidget::paintEvent(QPaintEvent *event)
  */
 void NumericDisplayWidget::resetStatistics()
 {
-    m_totalValueUpdates = 0;
-    m_totalFormatChanges = 0;
-    m_peakValue = 0.0;
+    m_stats = Stats{};
 }

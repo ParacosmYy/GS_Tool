@@ -94,6 +94,8 @@ public:
     quint64 totalFdFrames() const { return m_totalFdFrames; }
     /** @brief 获取RTR帧计数 */
     quint64 totalRtrFrames() const { return m_totalRtrFrames; }
+    /** @brief 获取累计CRC校验错误数 */
+    quint64 totalCrcErrors() const { return m_totalCrcErrors; }
     /** @brief 重置所有解析器统计计数器 */
     void resetParserStatistics();
 
@@ -114,6 +116,7 @@ private:
     quint64 m_totalExtendedFrames = 0;      ///< 扩展帧计数
     quint64 m_totalFdFrames = 0;            ///< CAN-FD帧计数
     quint64 m_totalRtrFrames = 0;           ///< RTR帧计数
+    quint64 m_totalCrcErrors = 0;           ///< CRC校验错误计数
 };
 
 #endif // CANFRAMEPARSER_H

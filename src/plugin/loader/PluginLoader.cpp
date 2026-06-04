@@ -81,7 +81,7 @@ void PluginLoader::unloadAll()
         delete it.value();
         emit pluginUnloaded(it.key());
     }
-    m_totalUnloads += static_cast<quint64>(n);
+    m_stats.totalUnloads += static_cast<quint64>(n);
     m_loaders.clear();
     m_plugins.clear();
 }
@@ -106,13 +106,15 @@ QList<PluginLoader::PluginInfo> PluginLoader::loadedPlugins() const
 /** @brief 扫描所有搜索路径中的插件 @return 发现的插件信息列表 */
 QList<PluginLoader::PluginInfo> PluginLoader::scanPlugins()
 {
-    ++m_totalScans;
+    ++m_stats.totalScans;
     QList<PluginInfo> found;
     for (const QString& searchPath : m_searchPaths) {
+        ++m_stats.totalDirectoriesScanned;
         QDir dir(searchPath);
         const auto entries = dir.entryInfoList(
             QStringList() << "*.dll" << "*.so" << "*.dylib", QDir::Files);
         for (const auto& fi : entries) {
+            ++m_stats.totalPluginsDiscovered;
             PluginInfo info;
             info.name = fi.baseName();
             info.filePath = fi.absoluteFilePath();

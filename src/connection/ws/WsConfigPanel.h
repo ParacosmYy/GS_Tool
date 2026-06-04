@@ -46,6 +46,15 @@ public:
     /** @brief 获取累计断开连接次数 @return 断开总次数 */
     quint64 totalDisconnections() const { return m_totalDisconnections; }
 
+    /** @brief 获取累计配置变更次数 @return 配置变更总次数 */
+    quint64 totalConfigChanges() const { return m_totalConfigChanges; }
+
+    /** @brief 获取累计URL变更次数 @return URL变更总次数 */
+    quint64 totalUrlChanges() const { return m_totalUrlChanges; }
+
+    /** @brief 获取累计子协议变更次数 @return 协议变更总次数 */
+    quint64 totalProtocolChanges() const { return m_totalProtocolChanges; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -98,6 +107,9 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalConnectAttempts = 0;  ///< 累计连接尝试次数
     quint64 m_totalDisconnections = 0;   ///< 累计断开连接次数
+    quint64 m_totalConfigChanges = 0;    ///< 累计配置变更次数
+    quint64 m_totalUrlChanges = 0;       ///< 累计URL变更次数
+    quint64 m_totalProtocolChanges = 0;  ///< 累计子协议变更次数
 };
 
 #endif // WSCONFIGPANEL_H

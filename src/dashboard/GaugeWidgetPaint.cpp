@@ -23,7 +23,7 @@
 void GaugeWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
-    ++m_totalRenders;
+    ++m_stats.totalRenders;
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);

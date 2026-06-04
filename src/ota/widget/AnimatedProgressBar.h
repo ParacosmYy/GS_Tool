@@ -21,9 +21,36 @@ class AnimatedProgressBar : public QProgressBar {
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
 
 public:
+    // ── 统计 ──
+    /** @brief 进度条动画统计结构体 */
+    struct Stats {
+        quint64 animations = 0;         ///< 动画播放总次数
+        quint64 valueUpdates = 0;       ///< 值更新总次数
+        quint64 colorResets = 0;        ///< chunk颜色重置总次数
+        quint64 shimmersStarted = 0;    ///< shimmer动画启动总次数
+        quint64 shimmersStopped = 0;    ///< shimmer动画停止总次数
+        quint64 chunkColorChanges = 0;  ///< chunk颜色变更总次数
+    };
+
     explicit AnimatedProgressBar(QWidget* parent = nullptr)
         : QProgressBar(parent), m_shimmerOffset(0.0), m_shimmerAnim(nullptr), m_customChunkColor(false)
     { setObjectName("animatedProgressBar"); }
+
+    // ── 统计访问器 ──
+    /** @brief 获取统计数据的只读引用 @return Stats常引用 */
+    const Stats& stats() const { return m_stats; }
+    /** @brief 重置统计计数器 */
+    void resetStats() { m_stats = Stats{}; }
+
+    // ── 向后兼容的便捷 Getter ──
+    quint64 totalAnimations() const { return m_stats.animations; }             ///< 获取动画播放总次数
+    quint64 totalValueUpdates() const { return m_stats.valueUpdates; }         ///< 获取值更新总次数
+    quint64 totalColorResets() const { return m_stats.colorResets; }           ///< 获取chunk颜色重置总次数
+    quint64 totalShimmersStarted() const { return m_stats.shimmersStarted; }   ///< 获取shimmer动画启动总次数
+    quint64 totalShimmersStopped() const { return m_stats.shimmersStopped; }   ///< 获取shimmer动画停止总次数
+    quint64 totalChunkColorChanges() const { return m_stats.chunkColorChanges; } ///< 获取chunk颜色变更总次数
+    void resetStatistics() { resetStats(); }                                   ///< 向后兼容别名
+
     qreal shimmerOffset() const { return m_shimmerOffset; } ///< 获取shimmer偏移量[0.0, 1.0]
     /** @brief 设置shimmer偏移量，由QPropertyAnimation驱动 @param offset 目标偏移量[0.0, 1.0] */
     void setShimmerOffset(qreal offset) {
@@ -37,25 +64,21 @@ signals:
 public:
     QColor chunkColor() const { return m_chunkColor; } ///< 获取chunk自定义颜色
     /** @brief 设置chunk自定义颜色，由QPropertyAnimation驱动 @param color 目标颜色 */
-    void setChunkColor(const QColor& color) { ++m_totalChunkColorChanges; m_chunkColor = color; m_customChunkColor = true; emit chunkColorChanged(); update(); }
-    void resetChunkColor() { m_customChunkColor = false; m_chunkColor = QColor(); ++m_totalColorResets; emit chunkColorChanged(); update(); } ///< 恢复QSS主题默认chunk颜色
-    void setValue(int value) { ++m_totalValueUpdates; QProgressBar::setValue(value); } ///< 重写setValue，增加统计计数
-    quint64 totalAnimations() const { return m_totalAnimations; }     ///< 获取动画播放总次数
-    quint64 totalValueUpdates() const { return m_totalValueUpdates; } ///< 获取值更新总次数
-    quint64 totalColorResets() const { return m_totalColorResets; }   ///< 获取chunk颜色重置总次数
-    quint64 totalShimmersStarted() const { return m_totalShimmersStarted; } ///< 获取shimmer动画启动总次数
-    quint64 totalShimmersStopped() const { return m_totalShimmersStopped; } ///< 获取shimmer动画停止总次数
-    quint64 totalChunkColorChanges() const { return m_totalChunkColorChanges; } ///< 获取chunk颜色变更总次数
-    void resetStatistics() { m_totalAnimations = 0; m_totalValueUpdates = 0; m_totalColorResets = 0; m_totalShimmersStarted = 0; m_totalShimmersStopped = 0; m_totalChunkColorChanges = 0; } ///< 重置统计计数器
+    void setChunkColor(const QColor& color) { ++m_stats.chunkColorChanges; m_chunkColor = color; m_customChunkColor = true; emit chunkColorChanged(); update(); }
+    /** @brief 恢复QSS主题默认chunk颜色 */
+    void resetChunkColor() { m_customChunkColor = false; m_chunkColor = QColor(); ++m_stats.colorResets; emit chunkColorChanged(); update(); }
+    /** @brief 重写setValue，增加统计计数 */
+    void setValue(int value) { ++m_stats.valueUpdates; QProgressBar::setValue(value); }
     /** @brief 启动shimmer流动动画(2000ms循环) */
     void startShimmer() {
-        stopShimmer(); ++m_totalAnimations; ++m_totalShimmersStarted;
+        stopShimmer(); ++m_stats.animations; ++m_stats.shimmersStarted;
         m_shimmerAnim = new QPropertyAnimation(this, "shimmerOffset");
         m_shimmerAnim->setStartValue(0.0); m_shimmerAnim->setEndValue(1.0); m_shimmerAnim->setDuration(2000);
         m_shimmerAnim->setEasingCurve(QEasingCurve::Linear); m_shimmerAnim->setLoopCount(-1);
         m_shimmerAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
-    void stopShimmer() { if (m_shimmerAnim) { m_shimmerAnim->stop(); m_shimmerAnim = nullptr; ++m_totalShimmersStopped; } m_shimmerOffset = 0.0; update(); } ///< 停止shimmer动画
+    /** @brief 停止shimmer动画 */
+    void stopShimmer() { if (m_shimmerAnim) { m_shimmerAnim->stop(); m_shimmerAnim = nullptr; ++m_stats.shimmersStopped; } m_shimmerOffset = 0.0; update(); }
 
 protected:
     /** @brief 重绘进度条，在chunk上叠加自定义颜色和shimmer渐变 @param event 绘制事件 */
@@ -89,12 +112,7 @@ private:
     QPropertyAnimation* m_shimmerAnim;  ///< shimmer动画实例
     QColor m_chunkColor;                ///< 自定义chunk颜色（传输完成变色动画）
     bool m_customChunkColor;            ///< 是否使用自定义chunk颜色
-    mutable quint64 m_totalAnimations = 0;  ///< 动画播放总次数
-    mutable quint64 m_totalValueUpdates = 0; ///< 值更新总次数
-    mutable quint64 m_totalColorResets = 0; ///< chunk颜色重置总次数
-    mutable quint64 m_totalShimmersStarted = 0; ///< shimmer动画启动总次数
-    mutable quint64 m_totalShimmersStopped = 0; ///< shimmer动画停止总次数
-    mutable quint64 m_totalChunkColorChanges = 0; ///< chunk颜色变更总次数
+    mutable Stats m_stats;              ///< 进度条动画统计实例
 };
 
 #endif // ANIMATEDPROGRESSBAR_H

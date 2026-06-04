@@ -24,8 +24,8 @@ void OtaManager::connectTransferSignals(BaseTransfer* transfer)
             this, [this]() {
                 setOtaState(OtaState::Complete);
                 ++m_transferCount;
-                ++m_successfulTransfers;
-                m_totalBytesTransferred += static_cast<quint64>(m_currentFileSize);
+                ++m_stats.successfulTransfers;
+                m_stats.totalBytesTransferred += static_cast<quint64>(m_currentFileSize);
                 m_lastTransferSuccess = true;
 
                 // 记录本次传输速率到历史记录
@@ -57,7 +57,7 @@ void OtaManager::connectTransferSignals(BaseTransfer* transfer)
             this, [this](const QString& reason) {
                 setOtaState(OtaState::Error);
                 ++m_transferCount;
-                ++m_failedTransfers;
+                ++m_stats.failedTransfers;
                 m_lastTransferSuccess = false;
                 // 增强错误消息: 追加协议名称上下文
                 QString enriched = reason;
@@ -117,7 +117,7 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
     }
 
     // ---- 步骤2: 递增传输尝试计数器 ----
-    ++m_totalTransfers;
+    ++m_stats.totalTransfers;
 
     // ---- 步骤3: 进入文件选择验证阶段 ----
     setOtaState(OtaState::Selecting);
@@ -142,7 +142,7 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
             emit transferError(tr("HEX文件转换失败: %1").arg(filePath));
             return false;
         }
-        ++m_totalHexConversions;
+        ++m_stats.totalHexConversions;
         effectivePath = binPath;
     } else if (type == FirmwareType::Unknown) {
         // 未知类型按BIN处理，给出警告但不阻止
@@ -153,7 +153,7 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
     m_currentFileName = QFileInfo(filePath).fileName();
     // 统计: 协议切换检测(连续两次传输使用不同协议时递增)
     if (!m_currentProtocol.isEmpty() && m_currentProtocol != protocol) {
-        ++m_totalProtocolSwitches;
+        ++m_stats.totalProtocolSwitches;
     }
     m_currentProtocol = protocol;
     m_currentFileSize = QFileInfo(effectivePath).size();
@@ -202,7 +202,7 @@ void OtaManager::cancelTransfer()
         m_zmodem->cancel();
     }
     if (wasRunning) {
-        ++m_totalCancellations;
+        ++m_stats.totalCancellations;
     }
     setOtaState(OtaState::Idle);
 }

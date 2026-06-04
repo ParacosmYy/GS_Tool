@@ -31,18 +31,36 @@ class OtaWidget : public QWidget {
     Q_OBJECT
 
 public:
+    // ── 统计 ──
+    /** @brief OTA面板统计结构体 */
+    struct Stats {
+        quint64 transfersStarted = 0;    ///< 传输启动总次数
+        quint64 transfersCompleted = 0;  ///< 传输完成总次数
+        quint64 transfersFailed = 0;     ///< 传输失败总次数
+        quint64 bytesTransferred = 0;    ///< 累计传输字节数
+        quint64 browseClicks = 0;        ///< 浏览按钮点击总次数
+        quint64 cancelOps = 0;           ///< 取消操作总次数
+    };
+
     /** @brief 构造OTA面板 @param manager OTA管理器 @param parent 父窗口 */
     explicit OtaWidget(OtaManager* manager, QWidget* parent = nullptr);
     /** @brief 设置数据连接 @param conn 连接指针 */
     void setConnection(IConnection* conn);
-    // ---- 统计访问器 ----
-    quint64 totalTransfersStarted() const { return m_totalTransfersStarted; }   ///< 获取传输启动计数
-    quint64 totalTransfersCompleted() const { return m_totalTransfersCompleted; }///< 获取传输完成计数
-    quint64 totalTransfersFailed() const { return m_totalTransfersFailed; }     ///< 获取传输失败计数
-    quint64 totalBytesTransferred() const { return m_totalBytesTransferred; }   ///< 获取累计传输字节数
-    quint64 totalBrowseClicks() const { return m_totalBrowseClicks; }           ///< 获取浏览按钮点击计数
-    quint64 totalCancelOps() const { return m_totalCancelOps; }                 ///< 获取取消操作计数
-    void resetOtaWidgetStatistics(); ///< 重置面板统计(不影响历史记录)
+
+    /** @brief 获取统计数据的只读引用 @return Stats常引用 */
+    const Stats& stats() const { return m_stats; }
+
+    /** @brief 重置面板统计(不影响历史记录) */
+    void resetStats() { m_stats = Stats{}; }
+
+    // ── 向后兼容的便捷 Getter ──
+    quint64 totalTransfersStarted() const { return m_stats.transfersStarted; }     ///< 获取传输启动计数
+    quint64 totalTransfersCompleted() const { return m_stats.transfersCompleted; } ///< 获取传输完成计数
+    quint64 totalTransfersFailed() const { return m_stats.transfersFailed; }       ///< 获取传输失败计数
+    quint64 totalBytesTransferred() const { return m_stats.bytesTransferred; }     ///< 获取累计传输字节数
+    quint64 totalBrowseClicks() const { return m_stats.browseClicks; }             ///< 获取浏览按钮点击计数
+    quint64 totalCancelOps() const { return m_stats.cancelOps; }                   ///< 获取取消操作计数
+    void resetOtaWidgetStatistics() { resetStats(); }                              ///< 向后兼容别名
 
 signals:
     void transferStarted(const QString& filename);    ///< 传输开始 @param filename 文件名
@@ -123,13 +141,8 @@ private:
     QPropertyAnimation* m_colorAnim;    ///< 完成变色动画
     // ---- 拖放状态 ----
     bool m_dragHovering = false;        ///< 文件悬停标志
-    // ---- 统计计数器 ----
-    quint64 m_totalTransfersStarted = 0;    ///< 启动总次数
-    quint64 m_totalTransfersCompleted = 0;  ///< 完成总次数
-    quint64 m_totalTransfersFailed = 0;     ///< 失败总次数
-    quint64 m_totalBytesTransferred = 0;    ///< 累计字节数
-    quint64 m_totalBrowseClicks = 0;        ///< 浏览按钮点击总次数
-    quint64 m_totalCancelOps = 0;           ///< 取消操作总次数
+
+    Stats m_stats;                      ///< OTA面板统计实例
 };
 
 #endif // OTAWIDGET_H

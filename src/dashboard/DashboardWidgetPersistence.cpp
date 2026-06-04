@@ -21,7 +21,7 @@ bool DashboardWidget::saveToFile(const QString &filePath, const QString &name)
     const QList<DashboardItemConfig> items = saveToItems();
     const bool ok = m_serializer->saveToFile(filePath, name, kColumns, items);
     if (ok) {
-        ++m_totalFullSaves;
+        ++m_stats.totalFullSaves;
         emit savedToFile(filePath);
     }
     return ok;
@@ -51,7 +51,7 @@ bool DashboardWidget::saveToProfile(const QString &profileName)
     const QString name = tr("布局-%1").arg(profileName);
     const bool ok = m_serializer->saveToProfile(profileName, name, kColumns, items);
     if (ok) {
-        ++m_totalFullSaves;
+        ++m_stats.totalFullSaves;
         emit savedToProfile(profileName);
     }
     return ok;

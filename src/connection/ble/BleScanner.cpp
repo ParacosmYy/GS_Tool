@@ -75,6 +75,7 @@ void BleScanner::stopScan()
 void BleScanner::setFilter(const ScanFilter& filter)
 {
     m_filter = filter;
+    ++m_totalFilterChanges;
 }
 
 /** @brief 获取当前扫描过滤器 @return 当前过滤器配置 */

@@ -56,6 +56,15 @@ public:
     /** @brief 获取累计配置变更次数 @return 配置变更总次数 */
     quint64 totalConfigChanges() const { return m_totalConfigChanges; }
 
+    /** @brief 获取累计模式切换次数 @return 模式切换总次数 */
+    quint64 totalModeChanges() const { return m_totalModeChanges; }
+
+    /** @brief 获取累计时钟频率变更次数 @return 频率变更总次数 */
+    quint64 totalSpeedChanges() const { return m_totalSpeedChanges; }
+
+    /** @brief 获取累计传输错误次数 @return 传输错误总次数 */
+    quint64 totalTransferErrors() const { return m_totalTransferErrors; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -130,6 +139,9 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalTransfers = 0;       ///< 累计传输操作次数
     quint64 m_totalConfigChanges = 0;   ///< 累计配置变更次数
+    quint64 m_totalModeChanges = 0;     ///< 累计模式切换次数
+    quint64 m_totalSpeedChanges = 0;    ///< 累计时钟频率变更次数
+    quint64 m_totalTransferErrors = 0;  ///< 累计传输错误次数
 };
 
 #endif // SPII2CCONFIGPANEL_H

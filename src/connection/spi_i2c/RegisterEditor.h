@@ -24,6 +24,8 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QByteArray>
+#include <QSet>
+#include <QElapsedTimer>
 
 class IConnection;
 
@@ -89,6 +91,12 @@ public:
     /** @brief 获取累计寄存器写入次数(quint64) @return 写入总次数 */
     quint64 totalRegisterWrites() const;
 
+    /** @brief 获取已访问的不同寄存器地址数量 @return 地址计数 */
+    int registerCount() const { return static_cast<int>(m_accessedAddresses.size()); }
+
+    /** @brief 获取平均寄存器访问耗时(ms) @return 平均访问时间 */
+    double avgAccessTimeMs() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -151,6 +159,8 @@ private:
     quint64 m_totalRegisterWrites = 0;              ///< 累计寄存器写入次数
     quint64 m_totalLogClears = 0;                   ///< 累计日志清空次数
     quint64 m_totalErrors = 0;                      ///< 累计读写错误次数(未连接/失败)
+    QSet<int> m_accessedAddresses;                  ///< 已访问的不同寄存器地址集合
+    qint64  m_totalAccessTimeUs = 0;                ///< 累计访问总耗时(微秒)
 
 public:
     /** @brief 获取累计日志清空次数 @return 清空计数 */

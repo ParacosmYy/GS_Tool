@@ -59,6 +59,12 @@ public:
     /** @brief 获取累计适配器切换次数 @return 切换总次数 */
     quint64 totalAdapterSwitches() const { return m_totalAdapterSwitches; }
 
+    /** @brief 获取累计断开次数 @return 断开总次数 */
+    quint64 totalDisconnects() const { return m_totalDisconnects; }
+
+    /** @brief 获取累计过滤器变更次数 @return 过滤器变更总次数 */
+    quint64 totalFilterChanges() const { return m_totalFilterChanges; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -106,6 +112,8 @@ private:
     quint64 m_totalConnectAttempts = 0; ///< 累计连接尝试次数
     quint64 m_totalCanFdToggles = 0;    ///< 累计CAN-FD模式切换次数
     quint64 m_totalAdapterSwitches = 0; ///< 累计适配器切换次数
+    quint64 m_totalDisconnects = 0;     ///< 累计断开次数
+    quint64 m_totalFilterChanges = 0;   ///< 累计过滤器变更次数
 };
 
 #endif // CANCONFIGPANEL_H

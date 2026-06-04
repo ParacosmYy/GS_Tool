@@ -10,6 +10,7 @@
 
 #include <QCoreApplication>
 #include <QMutexLocker>
+#include <QElapsedTimer>
 
 /* ---- 单例 ---- */
 
@@ -42,6 +43,9 @@ bool UsbLibraryLoader::load(const QString& libraryPath)
 
     if (m_loaded) { return true; }
 
+    QElapsedTimer loadTimer;
+    loadTimer.start();
+
     /* 确定搜索路径列表 */
     QStringList paths;
     if (!libraryPath.isEmpty()) {
@@ -58,6 +62,7 @@ bool UsbLibraryLoader::load(const QString& libraryPath)
             ++m_totalSuccessfulLoads;
             if (resolveFunctions()) {
                 m_lastError.clear();
+                m_totalLoadTimeMs += static_cast<qint64>(loadTimer.elapsed());
                 emit loadStateChanged(true);
                 return true;
             }
@@ -185,4 +190,21 @@ bool UsbLibraryLoader::setError(const QString& error)
     m_lastError = error;
     ++m_totalErrors;
     return false;
+}
+
+/** @brief 获取平均加载耗时(ms) @return 平均加载时间 */
+double UsbLibraryLoader::avgLoadTimeMs() const
+{
+    if (m_totalSuccessfulLoads == 0) return 0.0;
+    return static_cast<double>(m_totalLoadTimeMs) / static_cast<double>(m_totalSuccessfulLoads);
+}
+
+/** @brief 重置加载器统计计数器 */
+void UsbLibraryLoader::resetLoaderStatistics()
+{
+    m_totalLoadAttempts = 0;
+    m_totalSuccessfulLoads = 0;
+    m_totalErrors = 0;
+    m_totalFunctionResolutions = 0;
+    m_totalLoadTimeMs = 0;
 }

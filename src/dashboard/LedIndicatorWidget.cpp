@@ -11,6 +11,7 @@
 
 #include <QPainter>
 #include <QRadialGradient>
+#include <QDateTime>
 #include "core/theme/ThemeManager.h"
 
 /** @brief 获取默认LED颜色(使用主题 Success 语义色) @return 默认绿色 */
@@ -36,8 +37,20 @@ LedIndicatorWidget::LedIndicatorWidget(QWidget *parent)
  */
 void LedIndicatorWidget::setOn(bool on)
 {
+    if (m_on != on) {
+        const qint64 nowMs = QDateTime::currentMSecsSinceEpoch();
+        if (m_stats.lastStateChangeMs > 0) {
+            const qint64 elapsed = nowMs - m_stats.lastStateChangeMs;
+            if (m_on) {
+                m_stats.totalOnDurationMs += elapsed;
+            } else {
+                m_stats.totalOffDurationMs += elapsed;
+            }
+        }
+        m_stats.lastStateChangeMs = nowMs;
+    }
     m_on = on;
-    ++m_totalStateChanges;
+    ++m_stats.totalStateChanges;
     update();
 }
 
@@ -48,7 +61,7 @@ void LedIndicatorWidget::setOn(bool on)
 void LedIndicatorWidget::setColor(const QColor &color)
 {
     m_color = color;
-    ++m_totalColorChanges;
+    ++m_stats.totalColorChanges;
     update();
 }
 
@@ -108,7 +121,7 @@ void LedIndicatorWidget::paintEvent(QPaintEvent *event)
 
     if (m_on) {
         /* 亮状态：使用径向渐变模拟发光 */
-        ++m_totalBlinks;
+        ++m_stats.totalBlinks;
         QRadialGradient gradient(center, radius);
         gradient.setColorAt(0.0, m_color.lighter(150));
         gradient.setColorAt(0.7, m_color);
@@ -143,7 +156,5 @@ void LedIndicatorWidget::paintEvent(QPaintEvent *event)
  */
 void LedIndicatorWidget::resetStatistics()
 {
-    m_totalStateChanges = 0;
-    m_totalBlinks = 0;
-    m_totalColorChanges = 0;
+    m_stats = Stats{};
 }

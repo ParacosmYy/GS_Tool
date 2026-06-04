@@ -103,6 +103,13 @@ quint64 UsbDeviceDetector::totalWmicScans() const
     return m_totalWmicScans;
 }
 
+/** @brief 获取平均扫描耗时(ms) @return 平均每次扫描耗时 */
+double UsbDeviceDetector::avgScanTimeMs() const
+{
+    if (m_totalScanCount == 0) return 0.0;
+    return static_cast<double>(m_totalScanTimeMs) / static_cast<double>(m_totalScanCount);
+}
+
 /** @brief 重置所有统计计数器 */
 void UsbDeviceDetector::resetStatistics()
 {
@@ -112,4 +119,6 @@ void UsbDeviceDetector::resetStatistics()
     m_totalDetachEvents = 0;
     m_totalLibusbScans = 0;
     m_totalWmicScans = 0;
+    m_totalScanTimeMs = 0;
+    m_totalScanCount = 0;
 }

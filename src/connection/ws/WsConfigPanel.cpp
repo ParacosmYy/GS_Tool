@@ -99,14 +99,23 @@ void WsConfigPanel::setupConnections()
     connect(m_connectBtn, &QPushButton::clicked,
             this, &WsConfigPanel::onConnectClicked);
 
-    // 协议类型变更时更新placeholder
+    // 协议类型变更时更新placeholder并统计
     connect(m_typeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this](int index) {
         Q_UNUSED(index)
         QString scheme = m_typeCombo->currentText().toLower();
         m_urlEdit->setPlaceholderText(
             tr("例如: 192.168.1.100:8080/ws (%1)").arg(scheme));
+        ++m_totalConfigChanges;
     });
+
+    // URL变更统计
+    connect(m_urlEdit, &QLineEdit::textChanged,
+            this, [this]() { ++m_totalUrlChanges; ++m_totalConfigChanges; });
+
+    // 子协议变更统计
+    connect(m_protocolEdit, &QLineEdit::textChanged,
+            this, [this]() { ++m_totalProtocolChanges; ++m_totalConfigChanges; });
 }
 
 /** @brief 保存WebSocket配置到QSettings @param settings QSettings对象 */
@@ -133,4 +142,7 @@ void WsConfigPanel::resetStatistics()
 {
     m_totalConnectAttempts = 0;
     m_totalDisconnections = 0;
+    m_totalConfigChanges = 0;
+    m_totalUrlChanges = 0;
+    m_totalProtocolChanges = 0;
 }

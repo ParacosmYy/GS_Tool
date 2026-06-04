@@ -36,6 +36,9 @@ void RegisterEditor::setReadLength(int length)
 /** @brief 读取指定地址的寄存器，根据连接类型分派I2C/SPI读操作 @param address 寄存器地址 */
 void RegisterEditor::readAddress(int address)
 {
+    QElapsedTimer accessTimer;
+    accessTimer.start();
+
     if (!m_connection) {
         appendLog(tr("R [0x%1] → 错误: 未连接").arg(address, 2, 16, QChar('0')), false);
         ++m_totalErrors;
@@ -66,6 +69,8 @@ void RegisterEditor::readAddress(int address)
             .arg(formatHex(data)), false);
     }
 
+    m_accessedAddresses.insert(address);
+    m_totalAccessTimeUs += static_cast<qint64>(accessTimer.nsecsElapsed() / 1000);
     ++m_readCount;
     ++m_totalRegisterReads;
     emit registerReadComplete(address, data);
@@ -74,6 +79,9 @@ void RegisterEditor::readAddress(int address)
 /** @brief 向指定地址写入数据，根据连接类型分派I2C/SPI写操作 @param address 寄存器地址 @param data 待写入数据 */
 void RegisterEditor::writeAddress(int address, const QByteArray& data)
 {
+    QElapsedTimer accessTimer;
+    accessTimer.start();
+
     if (!m_connection) {
         appendLog(tr("W [0x%1] ← 错误: 未连接").arg(address, 2, 16, QChar('0')), true);
         ++m_totalErrors;
@@ -105,6 +113,8 @@ void RegisterEditor::writeAddress(int address, const QByteArray& data)
             .arg(formatHex(data)), true);
     }
 
+    m_accessedAddresses.insert(address);
+    m_totalAccessTimeUs += static_cast<qint64>(accessTimer.nsecsElapsed() / 1000);
     emit registerWriteComplete(address, success);
     ++m_writeCount;
     ++m_totalRegisterWrites;

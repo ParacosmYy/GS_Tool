@@ -35,6 +35,19 @@ public:
 
     static constexpr qint64 kMaxFirmwareSize = 64 * 1024 * 1024; ///< 最大固件64MB
 
+    // ── 统计 ──
+    /** @brief OTA管理器统计结构体 */
+    struct Stats {
+        quint64 totalTransfers = 0;         ///< 传输尝试总次数
+        quint64 successfulTransfers = 0;    ///< 成功传输次数
+        quint64 failedTransfers = 0;        ///< 失败传输次数
+        quint64 totalBytesTransferred = 0;  ///< 累计传输字节数
+        quint64 totalCrcChecks = 0;         ///< 累计CRC校验次数
+        quint64 totalCancellations = 0;     ///< 累计传输取消次数
+        quint64 totalHexConversions = 0;    ///< 累计HEX转BIN次数
+        quint64 totalProtocolSwitches = 0;  ///< 累计协议切换次数
+    };
+
     /** @brief 构造OTA管理器 @param parent 父对象 */
     explicit OtaManager(QObject* parent = nullptr);
     /** @brief 析构，释放传输协议实例 */
@@ -60,30 +73,23 @@ public:
     /** @brief 获取当前协议名 @return 协议名 */
     QString currentProtocolName() const;
 
-    // ---- 统计 ----
-    /** @brief 获取传输尝试总次数 @return 总次数 */
-    quint64 totalTransfers() const;
-    /** @brief 获取成功传输次数 @return 成功次数 */
-    quint64 successfulTransfers() const;
-    /** @brief 获取失败传输次数 @return 失败次数 */
-    quint64 failedTransfers() const;
-    /** @brief 获取累计传输字节数 @return 字节总数 */
-    quint64 totalBytesTransferred() const;
-    /** @brief 获取累计CRC校验验证次数 @return 校验次数 */
-    quint64 totalCrcChecks() const;
-    /** @brief 获取历史平均传输速率 @return 速率(字节/秒) */
-    double averageSpeed() const;
+    /** @brief 获取统计数据的只读引用 @return Stats常引用 */
+    const Stats& stats() const { return m_stats; }
+
     /** @brief 重置统计(不影响历史记录) */
-    void resetTransferStatistics();
+    void resetStats() { m_stats = Stats{}; m_speedHistory.clear(); }
 
-    /** @brief 获取累计传输取消次数 @return 取消次数 */
-    quint64 totalCancellations() const;
-
-    /** @brief 获取累计HEX转BIN次数 @return 转换次数 */
-    quint64 totalHexConversions() const;
-
-    /** @brief 获取累计协议切换次数 @return 切换次数 */
-    quint64 totalProtocolSwitches() const;
+    // ── 向后兼容的便捷 Getter ──
+    quint64 totalTransfers() const { return m_stats.totalTransfers; }          ///< 获取传输尝试总次数
+    quint64 successfulTransfers() const { return m_stats.successfulTransfers; } ///< 获取成功传输次数
+    quint64 failedTransfers() const { return m_stats.failedTransfers; }         ///< 获取失败传输次数
+    quint64 totalBytesTransferred() const { return m_stats.totalBytesTransferred; } ///< 获取累计传输字节数
+    quint64 totalCrcChecks() const { return m_stats.totalCrcChecks; }           ///< 获取累计CRC校验验证次数
+    quint64 totalCancellations() const { return m_stats.totalCancellations; }   ///< 获取累计传输取消次数
+    quint64 totalHexConversions() const { return m_stats.totalHexConversions; } ///< 获取累计HEX转BIN次数
+    quint64 totalProtocolSwitches() const { return m_stats.totalProtocolSwitches; } ///< 获取累计协议切换次数
+    void resetTransferStatistics() { resetStats(); }                             ///< 向后兼容别名
+    double averageSpeed() const;                                                 ///< 获取历史平均传输速率
 
     /** @brief 验证固件文件(存在/可读/大小限制) @param filePath 文件路径 @param errorMsg 输出: 错误描述 @return true=有效 */
     bool validateFilePath(const QString& filePath, QString& errorMsg) const;
@@ -146,18 +152,9 @@ private:
     QString m_currentProtocol;                   ///< 当前传输协议名
     int m_transferCount = 0;                     ///< 历史传输次数
     bool m_lastTransferSuccess = false;          ///< 上次传输是否成功
-
-    quint64 m_totalTransfers = 0;                ///< 传输尝试总次数
-    quint64 m_successfulTransfers = 0;           ///< 成功传输次数
-    quint64 m_failedTransfers = 0;               ///< 失败传输次数
-    quint64 m_totalBytesTransferred = 0;         ///< 累计传输字节数
-    quint64 m_totalCrcChecks = 0;                ///< 累计CRC校验次数
     qint64 m_currentFileSize = 0;                ///< 当前文件大小(字节)
 
-    // ---- 新增统计计数器 ----
-    quint64 m_totalCancellations = 0;            ///< 累计传输取消次数
-    quint64 m_totalHexConversions = 0;           ///< 累计HEX转BIN次数
-    quint64 m_totalProtocolSwitches = 0;         ///< 累计协议切换次数(startTransfer时协议变化)
+    Stats m_stats;                               ///< OTA统计实例
 
     // ---- 速率跟踪 ----
     QElapsedTimer m_transferTimer;          ///< 当前传输耗时计时器

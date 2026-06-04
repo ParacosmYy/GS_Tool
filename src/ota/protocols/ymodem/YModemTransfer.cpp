@@ -67,7 +67,7 @@ bool YModemTransfer::writeChecked(const QByteArray& data)
     if (!m_conn) {
         m_ymodemState = State::Error;
         markError();
-        ++m_totalErrorCount;
+        ++m_stats.errors;
         emit transferError(tr("连接中断: 连接对象无效"));
         return false;
     }
@@ -75,7 +75,7 @@ bool YModemTransfer::writeChecked(const QByteArray& data)
     if (written < 0) {
         m_ymodemState = State::Error;
         markError();
-        ++m_totalErrorCount;
+        ++m_stats.errors;
         emit transferError(
             tr("连接中断: 写入失败, 已传输 %1/%2 字节")
                 .arg(m_totalBytesSent)
@@ -96,7 +96,7 @@ void YModemTransfer::sendCancelBytes()
 /** @brief 超时处理，根据当前状态重发数据，每个阶段独立重试最多10次 */
 void YModemTransfer::handleTimeout()
 {
-    ++m_totalTimeouts;  ///< 统计: 超时事件
+    ++m_stats.timeouts;  ///< 统计: 超时事件
 
     // 超时重发当前状态，每个阶段独立重试计数(最多10次)
     switch (m_ymodemState) {
@@ -113,12 +113,12 @@ void YModemTransfer::handleTimeout()
 
     // 有重试上限的状态统一处理
     m_blockRetryCount++;
-    ++m_totalRetries;
+    ++m_stats.retries;
     if (m_blockRetryCount > kMaxBlockRetries) {
         sendCancelBytes();
         m_ymodemState = State::Error;
         markError();
-        ++m_totalErrorCount;
+        ++m_stats.errors;
         emit transferError(tr("超时: 重试次数耗尽 (10次)"));
         return;
     }

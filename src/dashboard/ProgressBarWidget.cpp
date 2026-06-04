@@ -29,8 +29,9 @@ ProgressBarWidget::ProgressBarWidget(QWidget *parent)
 void ProgressBarWidget::setValue(double value)
 {
     m_value = value;
-    ++m_totalValueUpdates;
-    if (m_max > m_min && value >= m_max) ++m_totalCompleteEvents;
+    ++m_stats.totalValueUpdates;
+    m_stats.cumulativeValue += value;
+    if (m_max > m_min && value >= m_max) ++m_stats.totalCompleteEvents;
     update();
 }
 
@@ -43,7 +44,7 @@ void ProgressBarWidget::setRange(double min, double max)
 {
     m_min = min;
     m_max = max;
-    ++m_totalRangeChanges;
+    ++m_stats.totalRangeChanges;
     update();
 }
 
@@ -62,7 +63,7 @@ void ProgressBarWidget::setLabel(const QString &label)
  */
 void ProgressBarWidget::cancel()
 {
-    ++m_totalCancelledEvents;
+    ++m_stats.totalCancelledEvents;
     m_value = m_min;
     update();
 }
@@ -159,8 +160,12 @@ void ProgressBarWidget::paintEvent(QPaintEvent *event)
  */
 void ProgressBarWidget::resetStatistics()
 {
-    m_totalValueUpdates = 0;
-    m_totalRangeChanges = 0;
-    m_totalCompleteEvents = 0;
-    m_totalCancelledEvents = 0;
+    m_stats = Stats{};
+}
+
+/** @brief 获取历史平均值 @return 平均值，无更新时返回0.0 */
+double ProgressBarWidget::avgValue() const
+{
+    if (m_stats.totalValueUpdates == 0) return 0.0;
+    return m_stats.cumulativeValue / static_cast<double>(m_stats.totalValueUpdates);
 }

@@ -28,8 +28,12 @@ NumericDisplayWidget::NumericDisplayWidget(QWidget *parent)
 void NumericDisplayWidget::setValue(double value)
 {
     m_value = value;
-    ++m_totalValueUpdates;
-    if (value > m_peakValue) m_peakValue = value;
+    ++m_stats.totalValueUpdates;
+    if (value > m_stats.peakValue) m_stats.peakValue = value;
+    if (!m_stats.hasValue || value < m_stats.minValue) {
+        m_stats.minValue = value;
+        m_stats.hasValue = true;
+    }
     update();
 }
 
@@ -39,6 +43,9 @@ void NumericDisplayWidget::setValue(double value)
  */
 void NumericDisplayWidget::setUnit(const QString &unit)
 {
+    if (m_unit != unit) {
+        ++m_stats.totalUnitChanges;
+    }
     m_unit = unit;
     update();
 }
@@ -50,7 +57,7 @@ void NumericDisplayWidget::setUnit(const QString &unit)
 void NumericDisplayWidget::setPrecision(int precision)
 {
     m_precision = precision;
-    ++m_totalFormatChanges;
+    ++m_stats.totalFormatChanges;
     update();
 }
 

@@ -37,6 +37,7 @@ UsbDescriptorViewer::UsbDescriptorViewer(QWidget* parent)
 /** @brief 设置要查看的USB设备并加载描述符数据 @param vid 厂商ID @param pid 产品ID */
 void UsbDescriptorViewer::setDevice(quint16 vid, quint16 pid) {
     ++m_totalDevicesViewed;
+    ++m_totalTreeUpdates;
     loadDescriptors(vid, pid);
 }
 

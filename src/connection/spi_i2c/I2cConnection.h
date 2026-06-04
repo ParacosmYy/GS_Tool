@@ -86,6 +86,8 @@ private:
     bool probeAddress(int addr);
     /** @brief 解析响应帧负载数据 @return 负载字节数组 */
     QByteArray parseResponsePayload();
+    /** @brief 同步等待串口适配器响应 @param timeoutMs 超时时间(ms) @return true=收到响应 */
+    bool waitForResponse(int timeoutMs = 100);
     // ---- 协议命令定义 ----
     static constexpr quint8 CMD_I2C_WRITE = 0x20, CMD_I2C_READ = 0x21, CMD_I2C_SCAN = 0x22;
     static constexpr quint8 CMD_I2C_CONFIG = 0x30, CMD_I2C_BURST_RD = 0x23, CMD_I2C_BURST_WR = 0x24;

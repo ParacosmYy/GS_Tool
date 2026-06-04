@@ -51,14 +51,31 @@ public:
     QString channelName() const { return m_channelName; }
 
     // ---- 统计计数接口 ----
+
+    /** @brief 量表运行统计数据结构体，聚合全部运行期间计数器 */
+    struct Stats {
+        quint64 totalValueUpdates = 0;     ///< 累计值更新次数
+        quint64 totalRangeChanges = 0;     ///< 累计量程变更次数
+        quint64 totalThresholdExceeds = 0; ///< 累计阈值超限次数(值超出量程范围)
+        quint64 totalRenders = 0;          ///< 累计渲染次数(paintEvent触发)
+        double  cumulativeValue = 0.0;     ///< 累计值(用于计算平均值)
+        double  peakValue = 0.0;           ///< 历史峰值
+    };
+
     /** @brief 获取累计值更新次数 */
     quint64 totalValueUpdates() const;
     /** @brief 获取累计量程变更次数 */
     quint64 totalRangeChanges() const;
     /** @brief 获取累计阈值超限次数(值超出量程范围) */
-    quint64 totalThresholdExceeds() const { return m_totalThresholdExceeds; }
+    quint64 totalThresholdExceeds() const { return m_stats.totalThresholdExceeds; }
     /** @brief 获取累计渲染次数(paintEvent触发) */
-    quint64 totalRenders() const { return m_totalRenders; }
+    quint64 totalRenders() const { return m_stats.totalRenders; }
+    /** @brief 获取历史平均值 @return 平均值，无更新时返回0.0 */
+    double avgValue() const;
+    /** @brief 获取历史峰值 @return 峰值 */
+    double peakValue() const { return m_stats.peakValue; }
+    /** @brief 获取统计数据的只读引用 @return Stats常量引用 */
+    const Stats& stats() const { return m_stats; }
     /** @brief 重置所有量表统计计数器 */
     void resetGaugeStatistics();
 
@@ -77,10 +94,7 @@ private:
     QString m_channelName;            ///< 绑定的数据通道名称
 
     // ---- 统计计数器 ----
-    quint64 m_totalValueUpdates = 0;  ///< 累计值更新次数
-    quint64 m_totalRangeChanges = 0;  ///< 累计量程变更次数
-    quint64 m_totalThresholdExceeds = 0; ///< 累计阈值超限次数(值超出量程范围)
-    quint64 m_totalRenders = 0;       ///< 累计渲染次数(paintEvent触发)
+    mutable Stats m_stats;    ///< 聚合统计结构体(mutable因paintEvent为const)
 };
 
 #endif // GAUGE_WIDGET_H

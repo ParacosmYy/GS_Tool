@@ -34,24 +34,24 @@ bool DashboardSerializer::saveToFile(const QString& filePath,
                                      const QList<DashboardItemConfig>& items)
 {
     const QByteArray data = toJson(name, columns, items);
-    if (data.isEmpty() && !items.isEmpty()) { ++m_totalErrors; ++m_serializationErrors; ++m_totalSerializationErrors; return false; }
+    if (data.isEmpty() && !items.isEmpty()) { ++m_stats.totalErrors; ++m_stats.serializationErrors; ++m_stats.totalSerializationErrors; ++m_stats.totalSaveFailures; return false; }
 
     QSaveFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         m_lastError = tr("无法打开文件写入: %1").arg(file.errorString());
-        ++m_totalErrors; ++m_serializationErrors; ++m_totalSerializationErrors; return false;
+        ++m_stats.totalErrors; ++m_stats.serializationErrors; ++m_stats.totalSerializationErrors; ++m_stats.totalSaveFailures; return false;
     }
     file.write(data);
     if (!file.commit()) {
         m_lastError = tr("写入文件失败: %1").arg(file.errorString());
-        ++m_totalErrors; ++m_serializationErrors; ++m_totalSerializationErrors; return false;
+        ++m_stats.totalErrors; ++m_stats.serializationErrors; ++m_stats.totalSerializationErrors; ++m_stats.totalSaveFailures; return false;
     }
 
     qCInfo(lcDashboardSerializer) << "布局已保存至:" << filePath;
-    ++m_totalSaves; ++m_totalExports; ++m_totalSerializations;
-    m_totalBytesSerialized += static_cast<quint64>(data.size());
-    m_totalBytesWritten += static_cast<quint64>(data.size());
-    m_maxProfileVersionSaved = qMax(m_maxProfileVersionSaved, kVersion);
+    ++m_stats.totalSaves; ++m_stats.totalExports; ++m_stats.totalSerializations;
+    m_stats.totalBytesSerialized += static_cast<quint64>(data.size());
+    m_stats.totalBytesWritten += static_cast<quint64>(data.size());
+    m_stats.maxProfileVersionSaved = qMax(m_stats.maxProfileVersionSaved, kVersion);
     emit layoutSaved(filePath);
     return true;
 }
@@ -64,16 +64,16 @@ bool DashboardSerializer::loadFromFile(const QString& filePath,
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
         m_lastError = tr("无法打开文件读取: %1").arg(file.errorString());
-        ++m_totalErrors; ++m_deserializationErrors; return false;
+        ++m_stats.totalErrors; ++m_stats.deserializationErrors; ++m_stats.totalLoadFailures; return false;
     }
     const QByteArray data = file.readAll();
     if (data.isEmpty()) {
         m_lastError = tr("文件为空: %1").arg(filePath);
-        ++m_totalErrors; ++m_deserializationErrors; return false;
+        ++m_stats.totalErrors; ++m_stats.deserializationErrors; ++m_stats.totalLoadFailures; return false;
     }
-    ++m_totalImports;
-    m_totalBytesRead += static_cast<quint64>(data.size());
-    m_totalBytesDeserialized += static_cast<quint64>(data.size());
+    ++m_stats.totalImports;
+    m_stats.totalBytesRead += static_cast<quint64>(data.size());
+    m_stats.totalBytesDeserialized += static_cast<quint64>(data.size());
     return loadFromJson(data, name, columns, items);
 }
 
@@ -87,7 +87,7 @@ int DashboardSerializer::currentVersion() { return kVersion; }
 QStringList DashboardSerializer::validateLayout(
     const QList<DashboardItemConfig>& items, int columns) const
 {
-    ++m_totalValidations;
+    ++m_stats.totalValidations;
     QStringList errors;
     const QStringList validTypes = {
         QStringLiteral("gauge"), QStringLiteral("numeric"),
@@ -153,7 +153,7 @@ bool DashboardSerializer::deleteLayout(const QString& filePath)
     QFile file(filePath);
     if (!file.exists()) {
         m_lastError = tr("文件不存在: %1").arg(filePath);
-        ++m_totalErrors; ++m_deserializationErrors;
+        ++m_stats.totalErrors; ++m_stats.deserializationErrors;
         return false;
     }
 
@@ -164,11 +164,12 @@ bool DashboardSerializer::deleteLayout(const QString& filePath)
 
     if (!file.remove()) {
         m_lastError = tr("删除失败: %1").arg(file.errorString());
-        ++m_totalErrors;
+        ++m_stats.totalErrors;
         return false;
     }
 
-    ++m_totalDeletes;
+    ++m_stats.totalDeletes;
+    ++m_stats.profilesManaged;
     return true;
 }
 

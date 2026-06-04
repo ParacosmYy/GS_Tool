@@ -14,6 +14,7 @@
 #include <QVariantList>
 #include <QVariantMap>
 #include <QTimer>
+#include <QElapsedTimer>
 #include "connection/usb/UsbLibraryLoader.h"
 
 /**
@@ -95,6 +96,9 @@ public:
     /** @brief 获取WMIC扫描调用次数 @return WMIC扫描总次数 */
     quint64 totalWmicScans() const;
 
+    /** @brief 获取平均扫描耗时(ms) @return 平均每次扫描耗时 */
+    double avgScanTimeMs() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -143,6 +147,8 @@ private:
     quint64 m_totalDetachEvents = 0;           ///< 累计设备拔出事件次数
     quint64 m_totalLibusbScans = 0;            ///< libusb扫描调用次数
     quint64 m_totalWmicScans = 0;              ///< WMIC扫描调用次数
+    qint64  m_totalScanTimeMs = 0;             ///< 累计扫描总耗时(ms)
+    quint64 m_totalScanCount = 0;              ///< 累计扫描完成次数
 };
 
 #endif // USB_DEVICE_DETECTOR_H

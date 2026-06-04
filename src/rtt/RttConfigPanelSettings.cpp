@@ -18,7 +18,7 @@
 /** @brief 表单值变化时的统一处理，收集当前值并发出configChanged信号 */
 void RttConfigPanel::onFormValueChanged()
 {
-    ++m_totalConfigChanges;
+    ++m_stats.totalConfigChanges;
     emit configChanged(config());
 }
 
@@ -27,7 +27,7 @@ void RttConfigPanel::onFormValueChanged()
 /** @brief 保存RTT配置到QSettings @param settings QSettings对象 */
 void RttConfigPanel::saveSettings(QSettings& settings) const
 {
-    ++m_totalSettingsSaves; ///< 统计: 配置保存递增
+    ++m_stats.totalSettingsSaves; ///< 统计: 配置保存递增
     settings.setValue(QStringLiteral("rtt/device"),
                      m_deviceCombo->currentText());
     settings.setValue(QStringLiteral("rtt/interface"),
@@ -41,7 +41,7 @@ void RttConfigPanel::saveSettings(QSettings& settings) const
 /** @brief 从QSettings加载RTT配置并更新各控件 @param settings QSettings对象 */
 void RttConfigPanel::loadSettings(QSettings& settings)
 {
-    ++m_totalSettingsLoads; ///< 统计: 配置加载递增
+    ++m_stats.totalSettingsLoads; ///< 统计: 配置加载递增
     const QString device = settings.value(
         QStringLiteral("rtt/device")).toString();
     if (!device.isEmpty()) {
@@ -72,27 +72,23 @@ void RttConfigPanel::loadSettings(QSettings& settings)
 /** @brief 获取配置变更总次数 @return 累计配置变更次数 */
 quint64 RttConfigPanel::totalConfigChanges() const
 {
-    return m_totalConfigChanges;
+    return m_stats.totalConfigChanges;
 }
 
 /** @brief 获取连接请求总次数 @return 累计连接请求次数 */
 quint64 RttConfigPanel::totalConnectRequests() const
 {
-    return m_totalConnectRequests;
+    return m_stats.totalConnectRequests;
 }
 
 /** @brief 获取断开请求总次数 @return 累计断开请求次数 */
 quint64 RttConfigPanel::totalDisconnectRequests() const
 {
-    return m_totalDisconnectRequests;
+    return m_stats.totalDisconnectRequests;
 }
 
 /** @brief 重置配置面板统计计数器为初始值 */
 void RttConfigPanel::resetConfigStatistics()
 {
-    m_totalConfigChanges = 0;
-    m_totalConnectRequests = 0;
-    m_totalDisconnectRequests = 0;
-    m_totalSettingsSaves = 0;
-    m_totalSettingsLoads = 0;
+    m_stats = Stats{};
 }

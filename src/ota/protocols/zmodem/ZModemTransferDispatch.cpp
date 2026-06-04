@@ -73,7 +73,7 @@ bool ZModemTransfer::writeChecked(const QByteArray& data)
     if (!m_conn) {
         m_zmodemState = State::Error;
         markError();
-        ++m_errorCount;
+        ++m_stats.errors;
         emit transferError(tr("连接中断: 连接对象无效"));
         return false;
     }
@@ -81,7 +81,7 @@ bool ZModemTransfer::writeChecked(const QByteArray& data)
     if (written < 0) {
         m_zmodemState = State::Error;
         markError();
-        ++m_errorCount;
+        ++m_stats.errors;
         emit transferError(
             tr("连接中断: 写入失败, 已传输 %1/%2 字节")
                 .arg(m_bytesSent)
@@ -108,16 +108,4 @@ QString ZModemTransfer::stateToString(State s)
     return QStringLiteral("Unknown");
 }
 
-/** @brief 重置ZModem统计计数器(不影响传输状态) */
-void ZModemTransfer::resetZmodemStatistics()
-{
-    m_totalBlocksSent = 0;
-    m_totalRetries = 0;
-    m_totalCrcErrors = 0;
-    m_errorCount = 0;
-    m_totalTimeouts = 0;
-    m_totalZrposReceived = 0;
-    m_totalZdataFrames = 0;
-    m_totalZfileSent = 0;
-    m_totalZfinSent = 0;
-}
+// resetZmodemStatistics/resetStats已在.h中内联实现

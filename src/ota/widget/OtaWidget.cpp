@@ -106,16 +106,7 @@ void OtaWidget::setTransferring(bool transferring)
     }
 }
 
-/** @brief 重置OTA面板统计计数器(不影响历史记录) */
-void OtaWidget::resetOtaWidgetStatistics()
-{
-    m_totalTransfersStarted = 0;
-    m_totalTransfersCompleted = 0;
-    m_totalTransfersFailed = 0;
-    m_totalBytesTransferred = 0;
-    m_totalBrowseClicks = 0;
-    m_totalCancelOps = 0;
-}
+// resetOtaWidgetStatistics/resetStats已在.h中内联实现
 
 // 拖放事件处理(dragEnterEvent/dropEvent等)见 OtaWidgetDragDrop.cpp
 // onBrowseFile/onStartTransfer/onCancelTransfer 见 OtaWidgetSlots2.cpp

@@ -61,6 +61,9 @@ public:
     /** @brief 获取累计移除尝试次数 @return 移除尝试总次数 */
     quint64 totalRemoveAttempts() const { return m_totalRemoveAttempts; }
 
+    /** @brief 获取当前活跃连接数 @return 活跃连接数 */
+    int activeConnections() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 

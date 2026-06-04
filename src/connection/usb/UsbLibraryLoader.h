@@ -128,6 +128,8 @@ private:
     quint64 m_totalLoadAttempts = 0;    ///< 累计加载尝试
     quint64 m_totalSuccessfulLoads = 0; ///< 累计成功加载
     quint64 m_totalErrors = 0;          ///< 累计错误
+    quint64 m_totalFunctionResolutions = 0; ///< 累计函数符号解析次数
+    qint64  m_totalLoadTimeMs = 0;      ///< 累计加载总耗时(ms)
 public:
     /** @brief 获取累计加载尝试次数 @return 加载尝试总次数 */
     quint64 totalLoadAttempts() const { return m_totalLoadAttempts; }
@@ -135,8 +137,12 @@ public:
     quint64 totalSuccessfulLoads() const { return m_totalSuccessfulLoads; }
     /** @brief 获取累计错误次数 @return 错误总次数 */
     quint64 totalErrors() const { return m_totalErrors; }
+    /** @brief 获取累计函数符号解析次数 @return 解析总次数 */
+    quint64 totalFunctionResolutions() const { return m_totalFunctionResolutions; }
+    /** @brief 获取平均加载耗时(ms) @return 平均加载时间 */
+    double avgLoadTimeMs() const;
     /** @brief 重置加载器统计计数器 */
-    void resetLoaderStatistics() { m_totalLoadAttempts = 0; m_totalSuccessfulLoads = 0; m_totalErrors = 0; }
+    void resetLoaderStatistics();
 };
 
 #endif // USBLIBRARYLOADER_H

@@ -52,6 +52,12 @@ public:
     /** @brief 获取累计取消订阅操作次数 @return 取消订阅总次数 */
     quint64 totalUnsubscriptions() const { return m_totalUnsubscriptions; }
 
+    /** @brief 获取累计主题编辑次数(输入框回车等) @return 编辑总次数 */
+    quint64 totalTopicEdits() const { return m_totalTopicEdits; }
+
+    /** @brief 获取累计订阅失败次数(空主题等) @return 失败总次数 */
+    quint64 totalSubscriptionFailures() const { return m_totalSubscriptionFailures; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -84,6 +90,8 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalSubscriptions = 0;     ///< 累计订阅操作次数
     quint64 m_totalUnsubscriptions = 0;   ///< 累计取消订阅操作次数
+    quint64 m_totalTopicEdits = 0;        ///< 累计主题编辑次数
+    quint64 m_totalSubscriptionFailures = 0; ///< 累计订阅失败次数
 };
 
 #endif // MQTTSUBSCRIPTIONPANEL_H

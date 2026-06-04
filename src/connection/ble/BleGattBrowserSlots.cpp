@@ -132,4 +132,5 @@ void BleGattBrowser::resetStatistics()
     m_lastDiscoveryDurationMs = 0;
     m_totalServiceExpands = 0;
     m_totalDescriptorReads = 0;
+    m_totalConnectAttempts = 0;
 }

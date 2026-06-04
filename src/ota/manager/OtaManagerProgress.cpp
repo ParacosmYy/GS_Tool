@@ -32,38 +32,8 @@ QString OtaManager::protocolDisplayName(const QString& protocol) const
 }
 
 // ============================================================================
-// 传输统计
+// 传输统计 (便捷getter已在.h中内联实现)
 // ============================================================================
-
-/** @brief 获取传输尝试总次数(包含成功和失败) @return 总尝试次数 */
-quint64 OtaManager::totalTransfers() const
-{
-    return m_totalTransfers;
-}
-
-/** @brief 获取成功完成的传输次数 @return 成功次数 */
-quint64 OtaManager::successfulTransfers() const
-{
-    return m_successfulTransfers;
-}
-
-/** @brief 获取失败的传输次数 @return 失败次数 */
-quint64 OtaManager::failedTransfers() const
-{
-    return m_failedTransfers;
-}
-
-/** @brief 获取所有会话累计传输的字节数 @return 累计字节数 */
-quint64 OtaManager::totalBytesTransferred() const
-{
-    return m_totalBytesTransferred;
-}
-
-/** @brief 获取累计CRC校验验证次数 @return 校验次数 */
-quint64 OtaManager::totalCrcChecks() const
-{
-    return m_totalCrcChecks;
-}
 
 /**
  * @brief 计算历史平均传输速率
@@ -86,34 +56,4 @@ double OtaManager::averageSpeed() const
     return sum / static_cast<double>(m_speedHistory.size());
 }
 
-/** @brief 重置传输统计计数器和速率历史(不影响transferCount和lastTransferSuccess等历史记录) */
-void OtaManager::resetTransferStatistics()
-{
-    m_totalTransfers = 0;
-    m_successfulTransfers = 0;
-    m_failedTransfers = 0;
-    m_totalBytesTransferred = 0;
-    m_totalCrcChecks = 0;
-    m_speedHistory.clear();
-    m_totalCancellations = 0;
-    m_totalHexConversions = 0;
-    m_totalProtocolSwitches = 0;
-}
-
-/** @brief 获取累计传输取消次数 @return 取消次数 */
-quint64 OtaManager::totalCancellations() const
-{
-    return m_totalCancellations;
-}
-
-/** @brief 获取累计HEX转BIN次数 @return 转换次数 */
-quint64 OtaManager::totalHexConversions() const
-{
-    return m_totalHexConversions;
-}
-
-/** @brief 获取累计协议切换次数 @return 切换次数 */
-quint64 OtaManager::totalProtocolSwitches() const
-{
-    return m_totalProtocolSwitches;
-}
+// ── 统计getter/reset已在.h中内联实现(stats()/resetStats()/便捷getter) ──

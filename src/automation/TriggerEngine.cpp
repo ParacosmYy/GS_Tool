@@ -69,7 +69,13 @@ void TriggerEngine::evaluateData(const QByteArray& data)
             break;
         }
         case MatchMode::ValueRange: {
-            /* 数值范围匹配需要解析后的值，此处跳过 */
+            /* 尝试从原始字节数据中解析ASCII数值用于范围匹配 */
+            QString text = QString::fromUtf8(data).trimmed();
+            bool ok = false;
+            double numValue = text.toDouble(&ok);
+            if (ok && numValue >= rule.valueMin && numValue <= rule.valueMax) {
+                matched = true;
+            }
             break;
         }
         }

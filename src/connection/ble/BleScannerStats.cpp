@@ -80,6 +80,13 @@ double BleScanner::averageRssi() const
     return static_cast<double>(m_rssiSum) / static_cast<double>(m_rssiSampleCount);
 }
 
+/** @brief 获取平均扫描时长(ms) @return 平均每次扫描耗时 */
+double BleScanner::avgScanTimeMs() const
+{
+    if (m_totalScanCycles == 0) return 0.0;
+    return static_cast<double>(m_totalScanDurationMs) / static_cast<double>(m_totalScanCycles);
+}
+
 /** @brief 重置所有扫描器统计计数器 */
 void BleScanner::resetScannerStatistics()
 {
@@ -98,4 +105,5 @@ void BleScanner::resetScannerStatistics()
     m_rssiSampleCount = 0;
     m_rssiHistory.clear();
     m_deviceByAddr.clear();
+    m_totalFilterChanges = 0;
 }

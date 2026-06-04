@@ -55,6 +55,12 @@ public:
     /** @brief 获取累计地址手动编辑次数 @return 编辑总次数 */
     quint64 totalAddressEdits() const { return m_totalAddressEdits; }
 
+    /** @brief 获取累计断开次数 @return 断开总次数 */
+    quint64 totalDisconnects() const { return m_totalDisconnects; }
+
+    /** @brief 记录一次BLE断开事件(由外部连接管理器调用) */
+    void recordDisconnect();
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -121,6 +127,7 @@ private:
     quint64 m_totalConnectAttempts = 0;   ///< 累计连接尝试次数
     quint64 m_totalDevicesDiscovered = 0; ///< 累计发现的设备总数
     quint64 m_totalAddressEdits = 0;      ///< 累计地址手动编辑次数
+    quint64 m_totalDisconnects = 0;       ///< 累计断开次数
 };
 
 #endif // BLECONFIGPANEL_H

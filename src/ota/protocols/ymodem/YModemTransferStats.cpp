@@ -10,35 +10,11 @@
 #include <QFile>
 #include <QFileInfo>
 
-// ── 统计计数器 Getter/Reset ──
+// ── 统计getter/reset已在.h中内联实现(stats()/resetStats()/便捷getter) ──
 
-/** @brief 获取已发送数据块总数(Block0+数据块) @return 累计块数 */
-quint64 YModemTransfer::totalBlocksSent() const { return m_totalBlocksSent; }
-
-/** @brief 获取传输重试总次数(超时/NAK触发的重发) @return 累计重试次数 */
-quint64 YModemTransfer::totalRetries() const { return m_totalRetries; }
-
-/** @brief 获取传输错误总次数(CAN取消/写入失败等) @return 累计错误次数 */
-quint64 YModemTransfer::totalErrorCount() const { return m_totalErrorCount; }
-
-/** @brief 重置YMODEM传输统计计数器(不影响传输状态) */
-void YModemTransfer::resetYmodemStatistics()
-{
-    m_totalBlocksSent = 0;
-    m_totalRetries = 0;
-    m_totalErrorCount = 0;
-    m_totalTimeouts = 0;
-    m_totalCancels = 0;
-    m_totalFilesCompleted = 0;
-    m_totalBatchResends = 0;
-    m_totalAcksReceived = 0;
-}
-
-/** @brief 设置单个文件路径用于传输
- *  @param path 文件绝对路径 */
+/** @brief 设置单个文件路径用于传输 @param path 文件绝对路径 */
 void YModemTransfer::setFilePath(const QString& path) { m_filePaths = QStringList{path}; }
-/** @brief 设置多个文件路径用于批量传输
- *  @param paths 文件路径列表 */
+/** @brief 设置多个文件路径用于批量传输 @param paths 文件路径列表 */
 void YModemTransfer::setFilePaths(const QStringList& paths) { m_filePaths = paths; }
 /** @brief 获取当前传输速率
  *  @return 传输速率，单位: 字节/秒 */

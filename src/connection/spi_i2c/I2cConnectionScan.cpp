@@ -14,6 +14,22 @@
 
 #include "connection/spi_i2c/I2cConnection.h"
 
+#include <QEventLoop>
+#include <QTimer>
+
+/** @brief 同步等待串口适配器响应(最多timeoutMs毫秒) @param timeoutMs 超时时间 @return true=收到响应数据 */
+bool I2cConnection::waitForResponse(int timeoutMs)
+{
+    QEventLoop loop;
+    QTimer timeoutTimer;
+    timeoutTimer.setSingleShot(true);
+    connect(this, &IConnection::dataReceived, &loop, &QEventLoop::quit);
+    connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    timeoutTimer.start(timeoutMs);
+    loop.exec();
+    return !m_responseBuffer.isEmpty();
+}
+
 /** @brief 扫描I2C总线，逐地址探测0x03~0x77范围内的设备 @return 发现的设备地址列表(7位地址) */
 QList<int> I2cConnection::scanBus()
 {
@@ -59,6 +75,9 @@ bool I2cConnection::probeAddress(int addr)
 
     m_serial->write(probeFrame);
 
+    /// 同步等待适配器响应(最多50ms)
+    waitForResponse(50);
+
     /// 解析探测响应: 1字节状态(0x00=NACK, 0x01=ACK)
     if (m_responseBuffer.size() >= 4) {
         quint8 status = static_cast<quint8>(m_responseBuffer[3]);
@@ -99,6 +118,9 @@ QByteArray I2cConnection::burstRead(int deviceAddr, int startReg, int count)
     /// 构建并发送突发读命令帧
     QByteArray frame = buildBurstReadFrame(deviceAddr, startReg, count);
     m_serial->write(frame);
+
+    /// 同步等待适配器响应(最多100ms)
+    waitForResponse(100);
 
     /// 解析响应数据
     QByteArray payload = parseResponsePayload();

@@ -84,6 +84,8 @@ void BleGattModel::resetGattStatistics()
     m_totalCharacteristicsRead = 0;
     m_totalWrites = 0;
     m_errorCount = 0;
+    m_totalNotifications = 0;
+    m_totalModelResets = 0;
 }
 
 // ============================================================

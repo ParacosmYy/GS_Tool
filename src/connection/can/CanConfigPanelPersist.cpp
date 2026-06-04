@@ -68,7 +68,7 @@ void CanConfigPanel::loadSettings(QSettings& settings)
 // 统计重置
 // ============================================================
 
-/** @brief 重置所有统计计数器(配置变更/总线重置/波特率/连接/模式/适配器) */
+/** @brief 重置所有统计计数器(配置变更/总线重置/波特率/连接/模式/适配器/断开/过滤器) */
 void CanConfigPanel::resetStatistics()
 {
     m_totalConfigChanges = 0;
@@ -77,4 +77,6 @@ void CanConfigPanel::resetStatistics()
     m_totalConnectAttempts = 0;
     m_totalCanFdToggles = 0;
     m_totalAdapterSwitches = 0;
+    m_totalDisconnects = 0;
+    m_totalFilterChanges = 0;
 }

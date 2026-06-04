@@ -24,7 +24,7 @@ void YModemTransfer::sendBlock0()
     QByteArray packet = buildBlock(0, block0);
     if (m_conn) {
         writeChecked(packet);
-        ++m_totalBlocksSent;
+        ++m_stats.blocksSent;
     }
 }
 
@@ -49,7 +49,7 @@ void YModemTransfer::sendBlock()
     QByteArray packet = buildBlock(m_blockNumber, blockData);
     if (m_conn) {
         writeChecked(packet);
-        ++m_totalBlocksSent;
+        ++m_stats.blocksSent;
     }
     /* 仅在首次发送该块时更新进度(NAK重传时不重复推进)
      * m_bytesSent指向当前块起始偏移，首次发送时sent > m_bytesSent

@@ -112,7 +112,7 @@ void PluginConfigPanel::setupUI()
         const QString path = QFileDialog::getOpenFileName(
             this, tr("选择插件"), QString(), filter);
         if (!path.isEmpty()) {
-            ++m_totalPluginLoads;
+            ++m_stats.totalPluginLoads;
             emit loadPluginRequested(path);
         }
     });
@@ -124,7 +124,7 @@ void PluginConfigPanel::setupUI()
             return;
         }
         const QString name = item->text();
-        ++m_totalPluginUnloads;
+        ++m_stats.totalPluginUnloads;
         emit unloadPluginRequested(name);
     });
 
@@ -133,7 +133,7 @@ void PluginConfigPanel::setupUI()
         if (!m_manager) {
             return;
         }
-        ++m_totalScans;
+        ++m_stats.totalScans;
 #ifdef Q_OS_WIN
         const QString defaultDir = QApplication::applicationDirPath()
                                    + QStringLiteral("/plugins");
@@ -166,6 +166,7 @@ void PluginConfigPanel::setupUI()
     /* 列表选择变化: 更新详情面板 */
     connect(m_pluginList, &QListWidget::currentItemChanged, this,
             [this](QListWidgetItem* current, QListWidgetItem* /*previous*/) {
+                ++m_stats.pluginSelectionChanges;
                 if (!current || !m_manager) {
                     m_detailNameLabel->setText(tr("名称：-"));
                     m_detailVersionLabel->setText(tr("版本：-"));

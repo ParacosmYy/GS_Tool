@@ -122,7 +122,7 @@ private:
     static QMutex s_mutex;  ///< 单例访问互斥锁
 
     // ---- 统计计数器 ----
-    Stats m_stats;    ///< 聚合统计结构体
+    mutable Stats m_stats;    ///< 聚合统计结构体(mutable因const方法需修改)
 };
 
 #endif // JLINKSDKLOADER_H

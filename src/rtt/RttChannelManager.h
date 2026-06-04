@@ -41,6 +41,9 @@ public:
     /** @brief 路由数据到指定通道 @param channelId 目标通道编号 @param data 要路由的字节数据 */
     void routeData(int channelId, const QByteArray& data);
 
+    /** @brief 记录一次RTT写操作(数据写入目标设备) @param channelId 目标通道编号 @param data 写入的数据 */
+    void writeData(int channelId, const QByteArray& data);
+
     /** @brief 通道管理器运行统计数据结构体，聚合全部运行期间计数器 */
     struct Stats {
         quint64 totalChannelCreated = 0;   ///< 累计创建通道次数
@@ -88,15 +91,13 @@ signals:
     void terminalData(int channelId, const QByteArray& data);
     /** @brief 通道原始数据（供日志/协议解析使用） */
     void channelData(int channelId, const QByteArray& data);
+    /** @brief RTT数据写入完成 @param channelId 通道编号 @param bytes 写入字节数 */
+    void dataWritten(int channelId, qint64 bytes);
 
 private:
     QMap<int, QString> m_channels;  ///< 通道号->名称映射表
 
-    quint64 m_totalReads = 0;        ///< 累计读取次数
-    quint64 m_totalWrites = 0;       ///< 累计写入次数
-    quint64 m_totalBytesRead = 0;    ///< 累计读取字节数
-    quint64 m_totalBytesWritten = 0; ///< 累计写入字节数
-    quint64 m_errorCount = 0;        ///< 累计错误次数
+    mutable Stats m_stats;    ///< 聚合统计结构体(mutable因const方法需修改)
 };
 
 #endif // RTTCHANNELMANAGER_H

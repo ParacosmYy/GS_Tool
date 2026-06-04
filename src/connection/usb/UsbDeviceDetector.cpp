@@ -34,6 +34,9 @@ UsbDeviceDetector::UsbDeviceDetector(QObject* parent)
  * @return 设备信息列表
  */
 QVariantList UsbDeviceDetector::scanDevices() {
+    QElapsedTimer scanTimer;
+    scanTimer.start();
+
     QVariantList devices;
 
     /* 优先尝试libusb扫描 */
@@ -42,6 +45,8 @@ QVariantList UsbDeviceDetector::scanDevices() {
         if (!devices.isEmpty()) {
             m_devices = devices;
             m_totalDevicesDetected += static_cast<quint64>(devices.size());
+            m_totalScanTimeMs += static_cast<qint64>(scanTimer.elapsed());
+            ++m_totalScanCount;
             emit scanCompleted(devices, QStringLiteral("libusb"));
             return devices;
         }
@@ -51,6 +56,8 @@ QVariantList UsbDeviceDetector::scanDevices() {
     devices = scanDevicesViaWmic();
     m_devices = devices;
     m_totalDevicesDetected += static_cast<quint64>(devices.size());
+    m_totalScanTimeMs += static_cast<qint64>(scanTimer.elapsed());
+    ++m_totalScanCount;
     emit scanCompleted(devices, QStringLiteral("wmic"));
     return devices;
 }

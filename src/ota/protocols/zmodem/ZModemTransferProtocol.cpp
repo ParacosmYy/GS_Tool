@@ -59,7 +59,7 @@ bool ZModemTransfer::parseHexFrame(const QByteArray& data, int& type, QByteArray
     quint16 receivedCrc = static_cast<quint16>((crcHi << 8) | crcLo);
     quint16 calculatedCrc = CRC::crc16Ccitt(crcInput);
     if (receivedCrc != calculatedCrc) {
-        ++m_zstats.crcErrors;  ///< 统计: CRC校验失败
+        ++m_stats.crcErrors;  ///< 统计: CRC校验失败
         qWarning() << "ZModem: CRC16 mismatch frame" << type
                    << "rx:" << Qt::hex << receivedCrc << "calc:" << calculatedCrc
                    << "state:" << stateToString(m_zmodemState);
@@ -84,7 +84,7 @@ void ZModemTransfer::sendZRQINIT() { if (m_conn) writeChecked(buildHexHeader(ZRQ
 void ZModemTransfer::sendZFILE()
 {
     if (!m_conn) return;
-    ++m_zstats.zfileSent;
+    ++m_stats.zfileSent;
     if (!writeChecked(buildBinHeader(ZFILE))) return;
     QFileInfo info(m_filePath);
     QByteArray fi = QString("%1 %2 0").arg(info.fileName()).arg(info.size()).toUtf8();
@@ -95,7 +95,7 @@ void ZModemTransfer::sendZFILE()
 void ZModemTransfer::sendZDATA()
 {
     if (!m_conn) return;
-    ++m_totalZdataFrames;
+    ++m_stats.zdataFrames;
     QByteArray offsetData;
     offsetData.append(static_cast<char>(m_fileOffset & 0xFF));
     offsetData.append(static_cast<char>((m_fileOffset >> 8) & 0xFF));
@@ -129,7 +129,7 @@ void ZModemTransfer::sendDataSubpackets()
             lastPct = pct;
         }
         sent++;
-        ++m_totalBlocksSent;  ///< 统计: 每发送一个数据块
+        ++m_stats.blocksSent;  ///< 统计: 每发送一个数据块
     }
     m_fileOffset = offset;
     m_bytesSent = offset;
@@ -155,4 +155,4 @@ void ZModemTransfer::sendZEOF()
     writeChecked(buildHexHeader(ZEOF, offsetData));
 }
 /** @brief 发送ZFIN帧，结束ZMODEM会话 */
-void ZModemTransfer::sendZFIN() { if (m_conn) { ++m_totalZfinSent; writeChecked(buildHexHeader(ZFIN)); } }
+void ZModemTransfer::sendZFIN() { if (m_conn) { ++m_stats.zfinSent; writeChecked(buildHexHeader(ZFIN)); } }

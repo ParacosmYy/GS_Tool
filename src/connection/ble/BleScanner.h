@@ -85,6 +85,10 @@ public:
     int worstRssi() const;
     /** @brief 获取平均RSSI值 @return 平均RSSI(dBm) */
     double averageRssi() const;
+    /** @brief 获取平均扫描时长(ms) @return 平均每次扫描耗时 */
+    double avgScanTimeMs() const;
+    /** @brief 获取过滤器变更次数 @return 过滤器设置变更总次数 */
+    quint64 totalFilterChanges() const { return m_totalFilterChanges; }
     /** @brief 清空扫描历史 */
     void clearHistory();
     /** @brief 重置所有统计计数器 */
@@ -131,6 +135,7 @@ private:
     int     m_worstRssi = 0;               ///< 最差RSSI值
     qint64  m_rssiSum = 0;                 ///< RSSI累计总和
     int     m_rssiSampleCount = 0;         ///< RSSI采样点数
+    quint64 m_totalFilterChanges = 0;      ///< 过滤器变更次数
 };
 
 #endif // BLESCANNER_H

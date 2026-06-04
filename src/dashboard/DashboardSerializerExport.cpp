@@ -60,7 +60,7 @@ bool DashboardSerializer::loadFromJson(const QByteArray& jsonData,
     const QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
     if (doc.isNull()) {
         m_lastError = tr("JSON解析失败: %1").arg(parseError.errorString());
-        ++m_totalErrors; ++m_deserializationErrors;
+        ++m_stats.totalErrors; ++m_stats.deserializationErrors; ++m_stats.totalLoadFailures;
         return false;
     }
 
@@ -68,16 +68,16 @@ bool DashboardSerializer::loadFromJson(const QByteArray& jsonData,
     const int version = root[QStringLiteral("version")].toInt(0);
     if (version != kVersion) {
         m_lastError = tr("不支持的布局版本: %1 (当前版本: %2)").arg(version).arg(kVersion);
-        ++m_totalErrors; ++m_deserializationErrors;
+        ++m_stats.totalErrors; ++m_stats.deserializationErrors; ++m_stats.totalLoadFailures;
         return false;
     }
 
     /* 统计：跟踪已加载配置的版本范围 */
-    if (!m_hasLoadedVersion) {
-        m_minProfileVersionLoaded = version;
-        m_hasLoadedVersion = true;
+    if (!m_stats.hasLoadedVersion) {
+        m_stats.minProfileVersionLoaded = version;
+        m_stats.hasLoadedVersion = true;
     } else {
-        m_minProfileVersionLoaded = qMin(m_minProfileVersionLoaded, version);
+        m_stats.minProfileVersionLoaded = qMin(m_stats.minProfileVersionLoaded, version);
     }
     name    = root[QStringLiteral("name")].toString(tr("未命名布局"));
     columns = root[QStringLiteral("columns")].toInt(4);
@@ -87,7 +87,7 @@ bool DashboardSerializer::loadFromJson(const QByteArray& jsonData,
     for (const QJsonValue& val : itemsArray)
         items.append(DashboardItemConfig::fromJson(val.toObject()));
     qCInfo(lcDashboardSerializer) << "已加载布局:" << name << "面板数:" << items.size();
-    ++m_totalLoads; ++m_totalDeserializations;
+    ++m_stats.totalLoads; ++m_stats.totalDeserializations;
     emit layoutLoaded(name, items.size());
     return true;
 }
@@ -107,6 +107,6 @@ QByteArray DashboardSerializer::toJson(const QString& name, int columns,
     }
     root[QStringLiteral("items")] = itemsArray;
 
-    ++m_totalSerializations;
+    ++m_stats.totalSerializations;
     return QJsonDocument(root).toJson(QJsonDocument::Indented);
 }

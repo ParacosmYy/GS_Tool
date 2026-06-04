@@ -140,7 +140,7 @@ private:
     JLinkSdkLoader* m_sdkLoader = nullptr;                  ///< SDK 加载器单例引用
 
     // RTT 统计计数器
-    Stats m_stats;    ///< 聚合统计结构体
+    mutable Stats m_stats;    ///< 聚合统计结构体(mutable因const方法需修改)
 };
 
 #endif // JLINKRTTCONNECTION_H

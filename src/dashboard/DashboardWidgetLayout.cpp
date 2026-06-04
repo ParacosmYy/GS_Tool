@@ -28,7 +28,7 @@ void DashboardWidget::loadLayout(const QVariantMap &layout)
         m_grid->removeWidget(w);
         delete w;
     }
-    m_totalLayoutChanges = 0;
+    m_stats.totalLayoutChanges = 0;
 
     /* 从布局数据重建 */
     const QVariantList comps = layout.value("components").toList();

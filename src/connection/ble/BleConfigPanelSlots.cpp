@@ -71,7 +71,13 @@ void BleConfigPanel::loadSettings(QSettings& settings)
     }
 }
 
-/** @brief 重置所有统计计数器(扫描/设备选择/连接/发现设备/地址编辑) */
+/** @brief 记录一次BLE断开事件，递增断开计数器 */
+void BleConfigPanel::recordDisconnect()
+{
+    ++m_totalDisconnects;
+}
+
+/** @brief 重置所有统计计数器(扫描/设备选择/连接/发现设备/地址编辑/断开) */
 void BleConfigPanel::resetStatistics()
 {
     m_totalScansInitiated = 0;
@@ -79,4 +85,5 @@ void BleConfigPanel::resetStatistics()
     m_totalConnectAttempts = 0;
     m_totalDevicesDiscovered = 0;
     m_totalAddressEdits = 0;
+    m_totalDisconnects = 0;
 }

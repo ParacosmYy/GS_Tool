@@ -60,6 +60,14 @@ quint64 RegisterEditor::totalRegisterWrites() const
     return m_totalRegisterWrites;
 }
 
+/** @brief 获取平均寄存器访问耗时(ms) @return 平均访问时间 */
+double RegisterEditor::avgAccessTimeMs() const
+{
+    const quint64 totalOps = m_totalRegisterReads + m_totalRegisterWrites;
+    if (totalOps == 0) return 0.0;
+    return static_cast<double>(m_totalAccessTimeUs) / static_cast<double>(totalOps) / 1000.0;
+}
+
 /** @brief 重置所有统计计数器 */
 void RegisterEditor::resetStatistics()
 {
@@ -67,4 +75,6 @@ void RegisterEditor::resetStatistics()
     m_totalRegisterWrites = 0;
     m_totalLogClears = 0;
     m_totalErrors = 0;
+    m_accessedAddresses.clear();
+    m_totalAccessTimeUs = 0;
 }

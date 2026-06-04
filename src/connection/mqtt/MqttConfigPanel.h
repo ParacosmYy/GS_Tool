@@ -45,6 +45,12 @@ public:
     /** @brief 获取累计配置变更次数 @return 配置变更总次数 */
     quint64 totalConfigChanges() const { return m_totalConfigChanges; }
 
+    /** @brief 获取累计断开连接次数 @return 断开总次数 */
+    quint64 totalDisconnects() const { return m_totalDisconnects; }
+
+    /** @brief 获取累计broker地址变更次数 @return broker变更总次数 */
+    quint64 totalBrokerChanges() const { return m_totalBrokerChanges; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -87,6 +93,8 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalConnectAttempts = 0;  ///< 累计连接尝试次数
     quint64 m_totalConfigChanges = 0;    ///< 累计配置变更次数
+    quint64 m_totalDisconnects = 0;      ///< 累计断开连接次数
+    quint64 m_totalBrokerChanges = 0;    ///< 累计broker地址变更次数
 };
 
 #endif // MQTTCONFIGPANEL_H

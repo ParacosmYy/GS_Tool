@@ -123,6 +123,7 @@ void BluetoothAtConsole::sendCommand(const QString& command)
     if (written < 0) {
         m_output->append(tr("[发送失败] 连接不可用"));
         ++m_totalSendErrors;
+        ++m_totalTimeouts;
     } else {
         m_totalBytesSent += static_cast<quint64>(written);
     }

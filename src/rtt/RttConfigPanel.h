@@ -60,6 +60,17 @@ signals:
 public:
     // ---- 统计接口 ----
 
+    /** @brief RTT配置面板运行统计数据结构体，聚合全部运行期间计数器 */
+    struct Stats {
+        quint64 totalConfigChanges = 0;       ///< 累计配置变更次数
+        quint64 totalConnectRequests = 0;     ///< 累计连接请求次数
+        quint64 totalDisconnectRequests = 0;  ///< 累计断开请求次数
+        quint64 totalSettingsSaves = 0;       ///< 累计配置保存次数
+        quint64 totalSettingsLoads = 0;       ///< 累计配置加载次数
+        quint64 totalChannelCountChanges = 0; ///< 累计通道号变更次数
+        quint64 totalSpeedChanges = 0;        ///< 累计速度变更次数
+    };
+
     /** @brief 获取累计配置变更次数 */
     quint64 totalConfigChanges() const;
 
@@ -70,10 +81,19 @@ public:
     quint64 totalDisconnectRequests() const;
 
     /** @brief 获取累计配置保存次数 @return 保存次数 */
-    quint64 totalSettingsSaves() const { return m_totalSettingsSaves; }
+    quint64 totalSettingsSaves() const { return m_stats.totalSettingsSaves; }
 
     /** @brief 获取累计配置加载次数 @return 加载次数 */
-    quint64 totalSettingsLoads() const { return m_totalSettingsLoads; }
+    quint64 totalSettingsLoads() const { return m_stats.totalSettingsLoads; }
+
+    /** @brief 获取累计通道号变更次数 @return 变更总次数 */
+    quint64 totalChannelCountChanges() const { return m_stats.totalChannelCountChanges; }
+
+    /** @brief 获取累计速度变更次数 @return 变更总次数 */
+    quint64 totalSpeedChanges() const { return m_stats.totalSpeedChanges; }
+
+    /** @brief 获取统计数据的只读引用 @return Stats常量引用 */
+    const Stats& stats() const { return m_stats; }
 
     /** @brief 重置所有统计计数器归零 */
     void resetConfigStatistics();
@@ -91,11 +111,7 @@ private:
     QSpinBox* m_channelSpin;      ///< RTT 通道号
 
     // ---- 统计计数器 ----
-    quint64 m_totalConfigChanges = 0;       ///< 累计配置变更次数
-    quint64 m_totalConnectRequests = 0;     ///< 累计连接请求次数
-    quint64 m_totalDisconnectRequests = 0;  ///< 累计断开请求次数
-    mutable quint64 m_totalSettingsSaves = 0;  ///< 累计配置保存次数(saveSettings为const)
-    quint64 m_totalSettingsLoads = 0;          ///< 累计配置加载次数
+    mutable Stats m_stats;    ///< 聚合统计结构体(mutable因const方法需修改)
 };
 
 #endif // RTTCONFIGPANEL_H

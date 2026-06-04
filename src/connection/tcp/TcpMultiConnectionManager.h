@@ -45,6 +45,9 @@ public:
     /** @brief 获取当前连接数量 @return 活跃连接数 */
     int connectionCount() const;
 
+    /** @brief 获取当前活跃连接数(connectionCount的统计别名) @return 活跃连接数 */
+    int activeConnections() const { return connectionCount(); }
+
     /** @brief 向所有连接发送数据 @param data 待发送字节数据 @return 成功发送的连接数量 */
     int sendToAll(const QByteArray& data);
 

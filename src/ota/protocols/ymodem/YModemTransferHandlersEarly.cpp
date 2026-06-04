@@ -30,7 +30,7 @@ void YModemTransfer::handleStateSendingBlock0(char ch, int& readIdx)
 {
     if (ch == ACK) {
         // Block 0被接受 — 不要立即转换到SendingData
-        ++m_totalAcksReceived;
+        ++m_stats.acksReceived;
         // 标准YMODEM流程: ACK之后接收方还会发一个'C'表示准备接收数据
         // 等待'C'由下方的 CRC_CHAR分支处理(调用sendBlock并启动定时器)
         m_timeoutTimer->stop();
@@ -66,7 +66,7 @@ void YModemTransfer::handleStateSendingBlock0(char ch, int& readIdx)
         m_timeoutTimer->stop();
         m_ymodemState = State::Error;
         markError();
-        ++m_totalCancels;  ///< 统计: 接收方CAN取消
+        ++m_stats.cancels;  ///< 统计: 接收方CAN取消
         emit transferError(tr("接收方取消传输"));
         m_receiveBuffer.remove(0, readIdx);
         return;
@@ -79,7 +79,7 @@ void YModemTransfer::handleStateSendingBlock0(char ch, int& readIdx)
 void YModemTransfer::handleStateSendingData(char ch, int& readIdx)
 {
     if (ch == ACK) {
-        ++m_totalAcksReceived;
+        ++m_stats.acksReceived;
         m_timeoutTimer->stop();
         m_retryCount = 0;
         m_blockRetryCount = 0;
@@ -101,7 +101,7 @@ void YModemTransfer::handleStateSendingData(char ch, int& readIdx)
     } else if (ch == NAK) {
         m_timeoutTimer->stop();
         m_blockRetryCount++;
-        ++m_totalBatchResends;
+        ++m_stats.batchResends;
         if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_ymodemState = State::Error;
@@ -116,7 +116,7 @@ void YModemTransfer::handleStateSendingData(char ch, int& readIdx)
         m_timeoutTimer->stop();
         m_ymodemState = State::Error;
         markError();
-        ++m_totalCancels;  ///< 统计: 接收方CAN取消
+        ++m_stats.cancels;  ///< 统计: 接收方CAN取消
         emit transferError(tr("接收方取消传输"));
         m_receiveBuffer.remove(0, readIdx);
         return;
@@ -134,7 +134,7 @@ void YModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
         m_blockRetryCount = 0;
 
         // 发射单文件完成信号
-        ++m_totalFilesCompleted;
+        ++m_stats.filesCompleted;
         emit fileTransferComplete(m_currentFileName, m_fileIndex);
 
         m_fileIndex++;
@@ -164,7 +164,7 @@ void YModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
         m_timeoutTimer->stop();
         m_ymodemState = State::Error;
         markError();
-        ++m_totalCancels;  ///< 统计: EOT阶段接收方CAN取消
+        ++m_stats.cancels;  ///< 统计: EOT阶段接收方CAN取消
         emit transferError(tr("EOT阶段传输被取消"));
         m_receiveBuffer.remove(0, readIdx);
         return;

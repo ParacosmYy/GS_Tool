@@ -105,6 +105,7 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
     connect(m_connectBtn, &QPushButton::clicked, this, [this]() {
         if (m_connected) {
             ++m_totalBusResets;
+            ++m_totalDisconnects;
             emit disconnectRequested();
         } else {
             ++m_totalConnectAttempts;
@@ -123,8 +124,8 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
             this, countChange);
     connect(m_sjwSpin, QOverload<int>::of(&QSpinBox::valueChanged),
             this, countChange);
-    connect(m_filterIdEdit, &QLineEdit::textChanged, this, countChange);
-    connect(m_filterMaskEdit, &QLineEdit::textChanged, this, countChange);
+    connect(m_filterIdEdit, &QLineEdit::textChanged, this, [this]() { ++m_totalConfigChanges; ++m_totalFilterChanges; });
+    connect(m_filterMaskEdit, &QLineEdit::textChanged, this, [this]() { ++m_totalConfigChanges; ++m_totalFilterChanges; });
 }
 
 /** @brief 获取当前CAN配置参数 @return 包含adapter/bitrate/canFd/samplePoint/sjw/filterId/filterMask字段的QVariantMap */

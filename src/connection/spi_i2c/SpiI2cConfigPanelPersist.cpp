@@ -57,4 +57,7 @@ void SpiI2cConfigPanel::resetStatistics()
 {
     m_totalTransfers = 0;
     m_totalConfigChanges = 0;
+    m_totalModeChanges = 0;
+    m_totalSpeedChanges = 0;
+    m_totalTransferErrors = 0;
 }

@@ -33,6 +33,7 @@ BleGattModel::~BleGattModel()
 void BleGattModel::setServices(const QVariantList& services)
 {
     beginResetModel();
+    ++m_totalModelResets;
 
     // 清除旧数据
     qDeleteAll(m_rootNode->children);
@@ -52,6 +53,7 @@ void BleGattModel::setServices(const QVariantList& services)
 void BleGattModel::clear()
 {
     beginResetModel();
+    ++m_totalModelResets;
     qDeleteAll(m_rootNode->children);
     m_rootNode->children.clear();
     endResetModel();

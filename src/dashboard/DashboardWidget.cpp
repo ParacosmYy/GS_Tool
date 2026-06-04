@@ -43,28 +43,28 @@ int DashboardWidget::addComponent(const QString &type, const QString &channel)
         g->setLabel(channel.isEmpty() ? tr("未命名") : channel);
         g->bindChannel(channel);
         g->setRange(0.0, 100.0);
-        ++m_totalRangeChanges;
+        ++m_stats.totalRangeChanges;
         g->setValue(42.0);
-        ++m_totalUpdates;
-        ++m_totalValueChanged;
+        ++m_stats.totalUpdates;
+        ++m_stats.totalValueChanged;
         widget = g;
     } else if (type == QLatin1String("progress")) {
         auto *p = new ProgressBarWidget(this);
         p->setLabel(channel.isEmpty() ? tr("进度") : channel);
         p->bindChannel(channel);
         p->setRange(0.0, 100.0);
-        ++m_totalRangeChanges;
+        ++m_stats.totalRangeChanges;
         p->setValue(65.0);
-        ++m_totalUpdates;
-        ++m_totalValueChanged;
+        ++m_stats.totalUpdates;
+        ++m_stats.totalValueChanged;
         widget = p;
     } else if (type == QLatin1String("led")) {
         auto *led = new LedIndicatorWidget(this);
         led->setOn(true);
         led->setColor(ThemeManager::instance().color(ThemeManager::SemanticColor::Success));
         led->bindChannel(channel);
-        ++m_totalUpdates;
-        ++m_totalValueChanged;
+        ++m_stats.totalUpdates;
+        ++m_stats.totalValueChanged;
         widget = led;
     } else if (type == QLatin1String("numeric")) {
         auto *n = new NumericDisplayWidget(this);
@@ -72,8 +72,8 @@ int DashboardWidget::addComponent(const QString &type, const QString &channel)
         n->setUnit(tr("V"));
         n->setPrecision(2);
         n->setValue(3.30);
-        ++m_totalUpdates;
-        ++m_totalValueChanged;
+        ++m_stats.totalUpdates;
+        ++m_stats.totalValueChanged;
         widget = n;
     }
 
@@ -87,8 +87,8 @@ int DashboardWidget::addComponent(const QString &type, const QString &channel)
     m_grid->addWidget(widget, row, col);
     m_components.append(widget);
 
-    ++m_totalWidgetsAdded;
-    ++m_totalLayoutChanges;
+    ++m_stats.totalWidgetsAdded;
+    ++m_stats.totalLayoutChanges;
     emit layoutChanged();
     return index;
 }

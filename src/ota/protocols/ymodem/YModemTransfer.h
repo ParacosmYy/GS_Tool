@@ -18,6 +18,19 @@ class YModemTransfer : public BaseTransfer {
     Q_OBJECT
 
 public:
+    // ── 统计 ──
+    /** @brief YMODEM传输统计结构体 */
+    struct Stats {
+        quint64 blocksSent = 0;        ///< 已发送数据块总数(Block0+数据块)
+        quint64 retries = 0;           ///< 传输重试总次数(超时/NAK触发)
+        quint64 errors = 0;            ///< 传输错误总次数(CAN/写入失败)
+        quint64 timeouts = 0;          ///< 累计超时事件次数
+        quint64 cancels = 0;           ///< 累计接收方取消次数(CAN)
+        quint64 filesCompleted = 0;    ///< 累计单文件完成次数(批量模式下)
+        quint64 batchResends = 0;      ///< 累计批量重发次数(NAK触发的Block重传)
+        quint64 acksReceived = 0;      ///< 累计接收ACK次数
+    };
+
     /** @brief 构造YModemTransfer，默认超时5s, 最大重试10次 @param parent 父对象 */
     explicit YModemTransfer(QObject* parent = nullptr);
     /** @brief 设置单个文件路径(须在start()前) @param path 固件文件路径 */
@@ -29,25 +42,22 @@ public:
     /** @brief 获取预计剩余时间 @return 秒数，无法估算返回-1 */
     double etaSeconds() const;
 
-    // ── 统计计数器 ──
-    /** @brief 获取已发送数据块总数(Block0+数据块) @return 块总数 */
-    quint64 totalBlocksSent() const;
-    /** @brief 获取传输重试总次数 @return 重试次数 */
-    quint64 totalRetries() const;
-    /** @brief 获取传输错误总次数(CAN/写入失败) @return 错误次数 */
-    quint64 totalErrorCount() const;
-    /** @brief 获取累计超时事件次数 @return 超时次数 */
-    quint64 totalTimeouts() const { return m_totalTimeouts; }
-    /** @brief 获取累计接收方取消次数(CAN) @return 取消次数 */
-    quint64 totalCancels() const { return m_totalCancels; }
-    /** @brief 获取累计单文件完成次数(批量模式下) @return 文件完成计数 */
-    quint64 totalFilesCompleted() const { return m_totalFilesCompleted; }
-    /** @brief 获取累计批量重发次数(NAK触发的Block重传) @return 批量重发计数 */
-    quint64 totalBatchResends() const { return m_totalBatchResends; }
-    /** @brief 获取累计接收ACK次数 @return ACK计数 */
-    quint64 totalAcksReceived() const { return m_totalAcksReceived; }
-    /** @brief 重置统计计数器 */
-    void resetYmodemStatistics();
+    /** @brief 获取统计数据的只读引用 @return Stats常引用 */
+    const Stats& stats() const { return m_stats; }
+
+    /** @brief 重置YMODEM统计计数器 */
+    void resetStats() { m_stats = Stats{}; }
+
+    // ── 向后兼容的便捷 Getter ──
+    quint64 totalBlocksSent() const { return m_stats.blocksSent; }       ///< 获取已发送数据块总数
+    quint64 totalRetries() const { return m_stats.retries; }             ///< 获取传输重试总次数
+    quint64 totalErrorCount() const { return m_stats.errors; }           ///< 获取传输错误总次数
+    quint64 totalTimeouts() const { return m_stats.timeouts; }           ///< 获取累计超时事件次数
+    quint64 totalCancels() const { return m_stats.cancels; }             ///< 获取累计接收方取消次数
+    quint64 totalFilesCompleted() const { return m_stats.filesCompleted; } ///< 获取累计单文件完成次数
+    quint64 totalBatchResends() const { return m_stats.batchResends; }   ///< 获取累计批量重发次数
+    quint64 totalAcksReceived() const { return m_stats.acksReceived; }   ///< 获取累计接收ACK次数
+    void resetYmodemStatistics() { resetStats(); }                        ///< 向后兼容别名
 
 signals:
     /** @brief 速率/ETA更新(每次ACK后) @param rateBytesPerSec 速率(字节/秒) @param etaSec 预计剩余时间(秒) @param fileName 当前文件名 */
@@ -103,15 +113,7 @@ private:
     QElapsedTimer m_transferTimer;    ///< 传输计时器
     double m_currentRate = 0.0;       ///< 当前速率(字节/秒)
 
-    // ── 统计计数器 ──
-    quint64 m_totalBlocksSent = 0;    ///< 已发送数据块总数(Block0+数据块)
-    quint64 m_totalRetries = 0;       ///< 传输重试总次数(超时/NAK触发)
-    quint64 m_totalErrorCount = 0;    ///< 传输错误总次数(CAN/写入失败)
-    quint64 m_totalTimeouts = 0;      ///< 累计超时事件次数
-    quint64 m_totalCancels = 0;       ///< 累计接收方取消次数(CAN)
-    quint64 m_totalFilesCompleted = 0; ///< 累计单文件完成次数(批量模式下)
-    quint64 m_totalBatchResends = 0;  ///< 累计批量重发次数(NAK触发的Block重传)
-    quint64 m_totalAcksReceived = 0;  ///< 累计接收ACK次数
+    Stats m_stats;                   ///< YMODEM统计实例
 };
 
 #endif // YMODEMTRANSFER_H

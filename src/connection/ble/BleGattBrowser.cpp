@@ -127,6 +127,8 @@ void BleGattBrowser::setConnection(BleConnection* connection)
     m_connection = connection;
     if (!m_connection) { updateConnectionStatus(); return; }
 
+    ++m_totalConnectAttempts;
+
     connect(m_connection, &BleConnection::stateChanged, this, &BleGattBrowser::onConnectionStateChanged);
     connect(m_connection, &BleConnection::servicesDiscovered, this, &BleGattBrowser::onServicesDiscovered);
     connect(m_connection, &BleConnection::characteristicRead, this,

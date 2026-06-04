@@ -20,7 +20,7 @@ void XModemTransfer::handleStateWaitingForStart(char ch)
             QString fromName = (m_mode == OneK)
                 ? tr("XMODEM-1K") : tr("XMODEM-CRC");
             m_mode = Checksum;
-            ++m_totalModeSwitches;
+            ++m_stats.modeSwitches;
             qWarning() << "XModem: receiver sent NAK, degraded to Checksum mode";
             emit modeDegraded(fromName, tr("XMODEM-Checksum"));
         }
@@ -48,11 +48,11 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
 {
     if (ch == ACK) {
         // 块确认成功，重置重试计数
-        ++m_totalAcksReceived;
+        ++m_stats.acksReceived;
         m_timeoutTimer->stop();
         m_retryCount = 0;
         m_blockRetryCount = 0;
-        ++m_totalBlocksSent;
+        ++m_stats.blocksSent;
         m_blockNumber++;
         if (m_blockNumber > 255) m_blockNumber = 1;
 
@@ -79,11 +79,11 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
         }
     } else if (ch == NAK) {
         // 块被拒绝(CRC/校验和错误)，重发当前块
-        ++m_totalNakReceived;
+        ++m_stats.nakReceived;
         m_timeoutTimer->stop();
         m_blockRetryCount++;
-        ++m_totalRetries;
-        ++m_totalCrcErrors;  ///< 统计: CRC校验被拒
+        ++m_stats.retries;
+        ++m_stats.crcErrors;  ///< 统计: CRC校验被拒
         if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_xmodemState = State::Error;
@@ -100,7 +100,7 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
         m_timeoutTimer->start(m_timeoutMs);
     } else if (ch == CAN) {
         // 接收方取消传输
-        ++m_totalCanReceived;
+        ++m_stats.canReceived;
         m_timeoutTimer->stop();
         m_xmodemState = State::Error;
         markError();
@@ -120,13 +120,13 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
 void XModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
 {
     if (ch == ACK) {
-        ++m_totalAcksReceived;
+        ++m_stats.acksReceived;
         m_timeoutTimer->stop();
         emit progress(100, m_data.size(), m_data.size());
         m_xmodemState = State::Done;
         finishTransfer();
     } else if (ch == NAK) {
-        ++m_totalNakReceived;
+        ++m_stats.nakReceived;
         m_timeoutTimer->stop();
         m_blockRetryCount++;
         if (m_blockRetryCount > kMaxBlockRetries) {
@@ -140,7 +140,7 @@ void XModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
         sendEOT();
         m_timeoutTimer->start(m_timeoutMs);
     } else if (ch == CAN) {
-        ++m_totalCanReceived;
+        ++m_stats.canReceived;
         m_timeoutTimer->stop();
         m_xmodemState = State::Error;
         markError();
@@ -154,8 +154,8 @@ void XModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
 /** @brief 超时处理，根据当前状态重发数据块或EOT，单块最多重试10次 */
 void XModemTransfer::handleTimeout()
 {
-    ++m_totalRetries;
-    ++m_totalTimeouts;  ///< 统计: 超时事件
+    ++m_stats.retries;
+    ++m_stats.timeouts;  ///< 统计: 超时事件
     if (m_xmodemState == State::SendingBlock) {
         m_blockRetryCount++;
         if (m_blockRetryCount > kMaxBlockRetries) {

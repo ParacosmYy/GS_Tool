@@ -156,4 +156,5 @@ void CanFrameParser::resetParserStatistics()
     m_totalExtendedFrames = 0;
     m_totalFdFrames = 0;
     m_totalRtrFrames = 0;
+    m_totalCrcErrors = 0;
 }

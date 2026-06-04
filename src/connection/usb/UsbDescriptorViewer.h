@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QTreeWidget>
 #include <QTextEdit>
+#include <QElapsedTimer>
 
 /**
  * @brief USB描述符查看器控件
@@ -38,6 +39,12 @@ public:
     /** @brief 获取累计查看设备次数 @return 查看总次数 */
     quint64 totalDevicesViewed() const;
 
+    /** @brief 获取累计树更新次数 @return 树更新总次数 */
+    quint64 totalTreeUpdates() const { return m_totalTreeUpdates; }
+
+    /** @brief 获取平均描述符解析耗时(ms) @return 平均解析时间 */
+    double avgParseTimeMs() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -65,6 +72,8 @@ private:
     quint64 m_totalDevicesViewed = 0;        ///< 累计查看设备次数
     quint64 m_totalNodesAdded = 0;           ///< 累计添加的树节点总数(设备/配置/接口/端点)
     quint64 m_totalRawBytesViewed = 0;       ///< 累计查看的原始描述符字节数
+    quint64 m_totalTreeUpdates = 0;          ///< 累计树更新次数
+    qint64  m_totalParseTimeUs = 0;          ///< 累计解析总耗时(微秒)
 
 public:
     /** @brief 获取累计添加树节点总数 @return 节点计数 */

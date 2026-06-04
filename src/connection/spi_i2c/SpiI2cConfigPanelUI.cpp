@@ -123,7 +123,7 @@ void SpiI2cConfigPanel::setupConnections()
     connect(m_adapterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this]() { ++m_totalConfigChanges; });
     connect(m_clockSpin, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, [this]() { ++m_totalConfigChanges; });
+            this, [this]() { ++m_totalConfigChanges; ++m_totalSpeedChanges; });
 }
 
 /** @brief 根据当前模式(SPI/I2C)动态显示/隐藏对应参数分组 */

@@ -79,8 +79,8 @@ void OtaWidget::onOtaStateChanged(OtaManager::OtaState state)
 void OtaWidget::onTransferComplete()
 {
     setTransferring(false);
-    ++m_totalTransfersCompleted;  ///< 统计: 传输完成
-    m_totalBytesTransferred += static_cast<quint64>(m_currentFileSize);  ///< 统计: 累计字节
+    ++m_stats.transfersCompleted;  ///< 统计: 传输完成
+    m_stats.bytesTransferred += static_cast<quint64>(m_currentFileSize);  ///< 统计: 累计字节
     m_progressBar->setValue(100);
     m_statusLbl->setText(tr("传输完成"));
     m_speedLbl->setText("");
@@ -123,7 +123,7 @@ void OtaWidget::onTransferComplete()
 void OtaWidget::onTransferError(const QString& reason)
 {
     setTransferring(false);
-    ++m_totalTransfersFailed;  ///< 统计: 传输失败
+    ++m_stats.transfersFailed;  ///< 统计: 传输失败
     m_statusLbl->setText(tr("错误: %1").arg(reason));
     appendLog(tr("错误: %1").arg(reason));
 

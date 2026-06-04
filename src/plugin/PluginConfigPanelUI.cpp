@@ -24,6 +24,7 @@ void PluginConfigPanel::refreshList()
     if (!m_manager) {
         return;
     }
+    ++m_stats.totalDisplays;
 
     m_pluginList->clear();
     const QStringList names = m_manager->loadedPluginNames();

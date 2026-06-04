@@ -76,6 +76,7 @@ MqttConfigPanel::MqttConfigPanel(QWidget* parent)
     /* 按钮点击 → 根据当前状态发送不同信号 */
     connect(m_connectBtn, &QPushButton::clicked, this, [this]() {
         if (m_connected) {
+            ++m_totalDisconnects;
             emit disconnectRequested();
         } else {
             ++m_totalConnectAttempts;
@@ -85,7 +86,7 @@ MqttConfigPanel::MqttConfigPanel(QWidget* parent)
 
     /* 配置变更计数: 主机/端口/KeepAlive/Clean Session切换 */
     connect(m_hostEdit, &QLineEdit::editingFinished,
-            this, [this]() { ++m_totalConfigChanges; });
+            this, [this]() { ++m_totalConfigChanges; ++m_totalBrokerChanges; });
     connect(m_portSpin, QOverload<int>::of(&QSpinBox::valueChanged),
             this, [this]() { ++m_totalConfigChanges; });
     connect(m_keepAliveSpin, QOverload<int>::of(&QSpinBox::valueChanged),
@@ -161,4 +162,6 @@ void MqttConfigPanel::resetStatistics()
 {
     m_totalConnectAttempts = 0;
     m_totalConfigChanges = 0;
+    m_totalDisconnects = 0;
+    m_totalBrokerChanges = 0;
 }

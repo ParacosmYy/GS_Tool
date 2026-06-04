@@ -33,7 +33,7 @@ bool DashboardSerializer::saveToProfile(const QString& profileName,
 {
     if (profileName.isEmpty()) {
         m_lastError = tr("配置文件名称不能为空");
-        ++m_totalErrors; return false;
+        ++m_stats.totalErrors; ++m_stats.totalSaveFailures; return false;
     }
 
     QSettings settings;
@@ -44,7 +44,7 @@ bool DashboardSerializer::saveToProfile(const QString& profileName,
     for (const DashboardItemConfig& item : items)
         itemsArray.append(item.toJson());
     const QByteArray itemsJson = QJsonDocument(itemsArray).toJson(QJsonDocument::Compact);
-    m_totalBytesWritten += static_cast<quint64>(itemsJson.size());
+    m_stats.totalBytesWritten += static_cast<quint64>(itemsJson.size());
 
     /* 写入配置文件数据 */
     settings.beginGroup(profileName);
@@ -58,7 +58,8 @@ bool DashboardSerializer::saveToProfile(const QString& profileName,
 
     qCInfo(lcDashboardCrud) << "配置文件已保存:" << profileName
                            << "面板数:" << items.size();
-    ++m_totalSaves; ++m_totalProfileSaves; ++m_totalSerializations;
+    ++m_stats.totalSaves; ++m_stats.totalProfileSaves; ++m_stats.totalSerializations;
+    ++m_stats.profilesManaged;
     emit profileSaved(profileName);
     return true;
 }
@@ -70,7 +71,7 @@ bool DashboardSerializer::loadFromProfile(const QString& profileName,
 {
     if (profileName.isEmpty()) {
         m_lastError = tr("配置文件名称不能为空");
-        ++m_totalErrors; return false;
+        ++m_stats.totalErrors; ++m_stats.totalLoadFailures; return false;
     }
 
     QSettings settings;
@@ -79,7 +80,7 @@ bool DashboardSerializer::loadFromProfile(const QString& profileName,
     if (!settings.childGroups().contains(profileName)) {
         m_lastError = tr("配置文件 '%1' 不存在").arg(profileName);
         settings.endGroup();
-        ++m_totalErrors;
+        ++m_stats.totalErrors; ++m_stats.totalLoadFailures;
         return false;
     }
 
@@ -93,13 +94,13 @@ bool DashboardSerializer::loadFromProfile(const QString& profileName,
     /* 解析JSON面板配置 */
     items.clear();
     if (!itemsJson.isEmpty()) {
-        m_totalBytesRead += static_cast<quint64>(itemsJson.toUtf8().size());
+        m_stats.totalBytesRead += static_cast<quint64>(itemsJson.toUtf8().size());
         QJsonParseError parseError;
         const QJsonDocument doc = QJsonDocument::fromJson(itemsJson.toUtf8(), &parseError);
         if (doc.isNull()) {
             m_lastError = tr("配置文件 '%1' 数据损坏: %2")
                               .arg(profileName).arg(parseError.errorString());
-            ++m_totalErrors;
+            ++m_stats.totalErrors; ++m_stats.totalLoadFailures;
             return false;
         }
         const QJsonArray arr = doc.array();
@@ -110,7 +111,7 @@ bool DashboardSerializer::loadFromProfile(const QString& profileName,
 
     qCInfo(lcDashboardCrud) << "已加载配置文件:" << profileName
                            << "面板数:" << items.size();
-    ++m_totalLoads; ++m_totalProfileLoads; ++m_totalDeserializations;
+    ++m_stats.totalLoads; ++m_stats.totalProfileLoads; ++m_stats.totalDeserializations;
     emit profileLoaded(profileName, items.size());
     return true;
 }
@@ -120,7 +121,7 @@ bool DashboardSerializer::deleteProfile(const QString& profileName)
 {
     if (profileName.isEmpty()) {
         m_lastError = tr("配置文件名称不能为空");
-        ++m_totalErrors;
+        ++m_stats.totalErrors;
         return false;
     }
 
@@ -130,7 +131,7 @@ bool DashboardSerializer::deleteProfile(const QString& profileName)
     if (!settings.childGroups().contains(profileName)) {
         m_lastError = tr("配置文件 '%1' 不存在").arg(profileName);
         settings.endGroup();
-        ++m_totalErrors;
+        ++m_stats.totalErrors;
         return false;
     }
 
@@ -144,7 +145,8 @@ bool DashboardSerializer::deleteProfile(const QString& profileName)
         setCurrentProfile(QString());
 
     qCInfo(lcDashboardCrud) << "已删除配置文件:" << profileName;
-    ++m_totalDeletes;
+    ++m_stats.totalDeletes;
+    ++m_stats.profilesManaged;
     emit profileDeleted(profileName);
     return true;
 }
@@ -154,7 +156,7 @@ bool DashboardSerializer::renameProfile(const QString& oldName, const QString& n
 {
     if (oldName.isEmpty() || newName.isEmpty()) {
         m_lastError = tr("配置文件名称不能为空");
-        ++m_totalErrors;
+        ++m_stats.totalErrors;
         return false;
     }
 
@@ -164,7 +166,7 @@ bool DashboardSerializer::renameProfile(const QString& oldName, const QString& n
     if (!settings.childGroups().contains(oldName)) {
         m_lastError = tr("配置文件 '%1' 不存在").arg(oldName);
         settings.endGroup();
-        ++m_totalErrors;
+        ++m_stats.totalErrors;
         return false;
     }
 
@@ -191,5 +193,6 @@ bool DashboardSerializer::renameProfile(const QString& oldName, const QString& n
     if (currentProfile() == oldName) setCurrentProfile(newName);
 
     qCInfo(lcDashboardCrud) << "已重命名:" << oldName << "->" << newName;
+    ++m_stats.profilesManaged;
     return true;
 }

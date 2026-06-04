@@ -64,6 +64,23 @@ public:
     int gridColumns() const;
 
     // ---- 统计接口 ----
+
+    /** @brief 仪表盘容器运行统计数据结构体，聚合全部运行期间计数器 */
+    struct Stats {
+        quint64 totalLayoutChanges = 0;    ///< 累计布局变更次数
+        quint64 totalWidgetsAdded = 0;     ///< 累计添加组件次数
+        quint64 totalWidgetsRemoved = 0;   ///< 累计移除组件次数
+        quint64 totalFullSaves = 0;        ///< 累计完整序列化保存次数
+        quint64 totalFullLoads = 0;        ///< 累计完整序列化加载次数
+        quint64 totalUpdates = 0;          ///< 累计组件更新次数(setValue/bindChannel触发)
+        quint64 totalValueChanged = 0;     ///< 累计值变更通知次数(valueChanged信号触发)
+        quint64 totalRangeChanges = 0;     ///< 累计范围变更次数(setRange触发)
+        quint64 totalRepaints = 0;         ///< 累计重绘次数(paintEvent触发)
+        quint64 thresholdCrossings = 0;    ///< 累计阈值超限次数(子组件值超出范围)
+        qint64  totalUpdateIntervalMs = 0; ///< 累计更新间隔(毫秒，用于计算平均值)
+        qint64  lastUpdateTimeMs = 0;      ///< 上次更新时间戳(毫秒)
+    };
+
     quint64 totalLayoutChanges() const;    ///< 累计布局变更次数
     quint64 totalWidgetsAdded() const;     ///< 累计添加组件次数
     quint64 totalWidgetsRemoved() const;   ///< 累计移除组件次数
@@ -78,6 +95,12 @@ public:
     quint64 totalRangeChanges() const;
     /** @brief 获取累计重绘次数(paintEvent触发) @return 重绘总数 */
     quint64 totalRepaints() const;
+    /** @brief 获取累计阈值超限次数(子组件值超出范围) @return 超限总数 */
+    quint64 totalThresholdCrossings() const { return m_stats.thresholdCrossings; }
+    /** @brief 获取平均更新间隔(毫秒) @return 平均间隔，无更新时返回0.0 */
+    double avgUpdateIntervalMs() const;
+    /** @brief 获取统计数据的只读引用 @return Stats常量引用 */
+    const Stats& stats() const { return m_stats; }
 
     void resetDashboardWidgetStatistics(); ///< 重置所有统计计数器
 
@@ -107,15 +130,7 @@ private:
     DashboardSerializer *m_serializer; ///< 序列化器实例
 
     // ---- 统计计数器 ----
-    quint64 m_totalLayoutChanges = 0;
-    quint64 m_totalWidgetsAdded = 0;
-    quint64 m_totalWidgetsRemoved = 0;
-    quint64 m_totalFullSaves = 0;
-    quint64 m_totalFullLoads = 0;
-    quint64 m_totalUpdates = 0;            ///< 累计组件更新次数
-    quint64 m_totalValueChanged = 0;       ///< 累计值变更通知次数
-    quint64 m_totalRangeChanges = 0;       ///< 累计范围变更次数
-    quint64 m_totalRepaints = 0;           ///< 累计重绘次数
+    mutable Stats m_stats;    ///< 聚合统计结构体(mutable因paintEvent为const)
 };
 
 #endif // DASHBOARD_WIDGET_H

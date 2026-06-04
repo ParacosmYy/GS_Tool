@@ -108,7 +108,11 @@ QVariantList MqttSubscriptionPanel::subscriptions() const
 void MqttSubscriptionPanel::onSubscribeClicked()
 {
     const QString topic = m_topicEdit->text().trimmed();
-    if (topic.isEmpty()) return;
+    ++m_totalTopicEdits;
+    if (topic.isEmpty()) {
+        ++m_totalSubscriptionFailures;
+        return;
+    }
     const int qos = m_qosCombo->currentData().toInt();
     ++m_totalSubscriptions;
     addSubscription(topic, qos);
@@ -143,4 +147,6 @@ void MqttSubscriptionPanel::resetStatistics()
 {
     m_totalSubscriptions = 0;
     m_totalUnsubscriptions = 0;
+    m_totalTopicEdits = 0;
+    m_totalSubscriptionFailures = 0;
 }

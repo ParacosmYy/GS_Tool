@@ -111,11 +111,19 @@ void RttConfigPanel::setupUI()
 
     // 统计: 连接/断开请求计数
     connect(connectBtn, &QPushButton::clicked, this, [this]() {
-        ++m_totalConnectRequests;
+        ++m_stats.totalConnectRequests;
     });
     connect(disconnectBtn, &QPushButton::clicked, this, [this]() {
-        ++m_totalDisconnectRequests;
+        ++m_stats.totalDisconnectRequests;
     });
+
+    // 统计: 通道号变更计数
+    connect(m_channelSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_stats.totalChannelCountChanges; });
+
+    // 统计: 速度变更计数
+    connect(m_speedSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [this]() { ++m_stats.totalSpeedChanges; });
 
     // 表单值变化 → 聚合发出 configChanged
     connect(m_deviceCombo, &QComboBox::currentTextChanged,

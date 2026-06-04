@@ -50,6 +50,17 @@ public:
         ColCount         ///< 列总数(用于迭代)
     };
 
+    // ── 统计 ──
+    /** @brief OTA历史记录统计结构体 */
+    struct Stats {
+        quint64 entriesAdded = 0;      ///< 历史记录添加总次数
+        quint64 entriesRemoved = 0;    ///< 历史记录移除总次数(含淘汰)
+        quint64 historyEntries = 0;    ///< 历史记录条目总数（每次addRecord递增）
+        mutable quint64 queries = 0;   ///< 历史记录查询(访问)总次数
+        quint64 clears = 0;            ///< 历史记录清空操作总次数
+        quint64 saves = 0;             ///< 历史记录持久化保存总次数
+    };
+
     /** @brief 构造函数 @param parent 父对象 */
     explicit OtaHistoryModel(QObject* parent = nullptr);
 
@@ -91,40 +102,26 @@ public:
     /** @brief 生成统计摘要文本 @return 多行摘要字符串 */
     QString statisticsSummary() const;
 
-    // ── 统计计数器 Getter ──
-
-    /** @brief 获取历史记录添加总次数 @return 累计添加次数 */
-    quint64 totalEntriesAdded() const;
-
-    /** @brief 获取历史记录移除总次数 @return 累计移除次数(含淘汰) */
-    quint64 totalEntriesRemoved() const;
-
-    /** @brief 获取历史记录条目总数（当前记录数） @return 当前记录数 */
-    quint64 totalHistoryEntries() const;
+    /** @brief 获取统计数据的只读引用 @return Stats常引用 */
+    const Stats& stats() const { return m_stats; }
 
     /** @brief 重置历史记录统计计数器(不影响记录数据本身) */
-    void resetHistoryStatistics();
+    void resetStats() { m_stats = Stats{}; }
 
-    /** @brief 获取历史记录查询(访问)总次数 @return 查询次数 */
-    quint64 totalQueries() const;
-
-    /** @brief 获取历史记录清空操作总次数 @return 清空次数 */
-    quint64 totalClears() const;
-
-    /** @brief 获取历史记录持久化保存总次数 @return 保存次数 */
-    quint64 totalSaves() const;
+    // ── 向后兼容的便捷 Getter ──
+    quint64 totalEntriesAdded() const { return m_stats.entriesAdded; }      ///< 获取历史记录添加总次数
+    quint64 totalEntriesRemoved() const { return m_stats.entriesRemoved; }  ///< 获取历史记录移除总次数
+    quint64 totalHistoryEntries() const { return m_stats.historyEntries; }  ///< 获取历史记录条目总数
+    quint64 totalQueries() const { return m_stats.queries; }                ///< 获取查询总次数
+    quint64 totalClears() const { return m_stats.clears; }                  ///< 获取清空操作总次数
+    quint64 totalSaves() const { return m_stats.saves; }                    ///< 获取保存总次数
+    void resetHistoryStatistics() { resetStats(); }                         ///< 向后兼容别名
 
 private:
     QVector<OtaRecord> m_records;          ///< 历史记录列表
     static constexpr int kMaxRecords = 200; ///< 最大保留记录数
 
-    // ── 统计计数器 ──
-    quint64 m_totalEntriesAdded = 0;       ///< 历史记录添加总次数
-    quint64 m_totalEntriesRemoved = 0;     ///< 历史记录移除总次数(含淘汰)
-    quint64 m_totalHistoryEntries = 0;     ///< 历史记录条目总数（每次addRecord递增）
-    mutable quint64 m_totalQueries = 0;    ///< 历史记录查询(访问)总次数
-    quint64 m_totalClears = 0;             ///< 历史记录清空操作总次数
-    quint64 m_totalSaves = 0;              ///< 历史记录持久化保存总次数
+    Stats m_stats;                         ///< 历史记录统计实例
 };
 
 #endif // OTAHISTORYMODEL_H

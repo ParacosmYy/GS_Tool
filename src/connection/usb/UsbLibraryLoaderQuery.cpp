@@ -126,6 +126,9 @@ bool UsbLibraryLoader::resolveFunctions()
     m_fnGetDeviceDesc = reinterpret_cast<FnGetDeviceDesc>(
         m_library->resolve("libusb_get_device_descriptor"));
 
+    /* 累计函数符号解析次数(12个符号) */
+    m_totalFunctionResolutions += 12;
+
     /* 核心函数必须全部解析成功 */
     if (!m_fnInit || !m_fnExit || !m_fnOpen || !m_fnClose) {
         return false;

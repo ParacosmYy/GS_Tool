@@ -54,17 +54,32 @@ public:
     /** @brief 获取绑定的数据通道名 @return 通道名称 */
     QString channelName() const { return m_channelName; }
 
+    /** @brief 进度条运行统计数据结构体，聚合全部运行期间计数器 */
+    struct Stats {
+        quint64 totalValueUpdates = 0;    ///< 值更新总次数
+        quint64 totalRangeChanges = 0;    ///< 范围变更总次数
+        quint64 totalCompleteEvents = 0;  ///< 累计完成事件次数(值达到上限)
+        quint64 totalCancelledEvents = 0; ///< 累计取消事件次数
+        double  cumulativeValue = 0.0;    ///< 累计值(用于计算平均值)
+    };
+
     /** @brief 获取值更新总次数 */
-    quint64 totalValueUpdates() const { return m_totalValueUpdates; }
+    quint64 totalValueUpdates() const { return m_stats.totalValueUpdates; }
 
     /** @brief 获取范围变更总次数 */
-    quint64 totalRangeChanges() const { return m_totalRangeChanges; }
+    quint64 totalRangeChanges() const { return m_stats.totalRangeChanges; }
 
     /** @brief 获取累计完成事件次数(值达到上限) */
-    quint64 totalCompleteEvents() const { return m_totalCompleteEvents; }
+    quint64 totalCompleteEvents() const { return m_stats.totalCompleteEvents; }
 
     /** @brief 获取累计取消事件次数 */
-    quint64 totalCancelledEvents() const { return m_totalCancelledEvents; }
+    quint64 totalCancelledEvents() const { return m_stats.totalCancelledEvents; }
+
+    /** @brief 获取历史平均值 @return 平均值，无更新时返回0.0 */
+    double avgValue() const;
+
+    /** @brief 获取统计数据的只读引用 @return Stats常量引用 */
+    const Stats& stats() const { return m_stats; }
 
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
@@ -83,10 +98,7 @@ private:
     QString m_label;          ///< 标签文本
     QString m_channelName;    ///< 绑定的数据通道名称
 
-    quint64 m_totalValueUpdates = 0; ///< 值更新总次数
-    quint64 m_totalRangeChanges = 0; ///< 范围变更总次数
-    quint64 m_totalCompleteEvents = 0; ///< 累计完成事件次数(值达到上限)
-    quint64 m_totalCancelledEvents = 0; ///< 累计取消事件次数
+    mutable Stats m_stats;    ///< 聚合统计结构体
 };
 
 #endif // PROGRESS_BAR_WIDGET_H

@@ -150,6 +150,12 @@ quint64 MultiConnectionPanel::totalDisconnections() const
     return m_totalDisconnections;
 }
 
+/** @brief 获取当前活跃连接数 @return 列表中的连接条目数 */
+int MultiConnectionPanel::activeConnections() const
+{
+    return m_connectionList ? m_connectionList->count() : 0;
+}
+
 /** @brief 重置所有统计计数器(连接/断开/广播/添加/移除) */
 void MultiConnectionPanel::resetStatistics()
 {

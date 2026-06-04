@@ -43,14 +43,33 @@ public:
     /** @brief 获取绑定的数据通道名 @return 通道名称 */
     QString channelName() const { return m_channelName; }
 
+    /** @brief LED指示灯运行统计数据结构体，聚合全部运行期间计数器 */
+    struct Stats {
+        quint64 totalStateChanges = 0;       ///< 状态切换总次数
+        quint64 totalBlinks = 0;             ///< 闪烁总次数(paintEvent中递增)
+        quint64 totalColorChanges = 0;       ///< 颜色变更总次数
+        qint64  totalOnDurationMs = 0;       ///< 累计亮灯持续时间(毫秒)
+        qint64  totalOffDurationMs = 0;      ///< 累计灭灯持续时间(毫秒)
+        qint64  lastStateChangeMs = 0;       ///< 上次状态切换时间戳(毫秒)
+    };
+
     /** @brief 获取状态切换总次数 */
-    quint64 totalStateChanges() const { return m_totalStateChanges; }
+    quint64 totalStateChanges() const { return m_stats.totalStateChanges; }
 
     /** @brief 获取闪烁总次数 */
-    quint64 totalBlinks() const { return m_totalBlinks; }
+    quint64 totalBlinks() const { return m_stats.totalBlinks; }
 
     /** @brief 获取颜色变更总次数 */
-    quint64 totalColorChanges() const { return m_totalColorChanges; }
+    quint64 totalColorChanges() const { return m_stats.totalColorChanges; }
+
+    /** @brief 获取累计亮灯持续时间(毫秒) @return 持续时间 */
+    qint64 totalOnDurationMs() const { return m_stats.totalOnDurationMs; }
+
+    /** @brief 获取累计灭灯持续时间(毫秒) @return 持续时间 */
+    qint64 totalOffDurationMs() const { return m_stats.totalOffDurationMs; }
+
+    /** @brief 获取统计数据的只读引用 @return Stats常量引用 */
+    const Stats& stats() const { return m_stats; }
 
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
@@ -67,9 +86,7 @@ private:
     QColor  m_color;                ///< LED 颜色
     QString m_channelName;          ///< 绑定的数据通道名称
 
-    quint64 m_totalStateChanges = 0;       ///< 状态切换总次数
-    mutable quint64 m_totalBlinks = 0;     ///< 闪烁总次数(paintEvent中递增)
-    quint64 m_totalColorChanges = 0;       ///< 颜色变更总次数
+    mutable Stats m_stats;    ///< 聚合统计结构体(mutable因paintEvent为const)
 };
 
 #endif // LED_INDICATOR_WIDGET_H

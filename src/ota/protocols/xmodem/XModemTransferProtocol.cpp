@@ -107,6 +107,8 @@ void XModemTransfer::sendEOT()
     }
 }
 
+// ── 统计getter/reset已在.h中内联实现(stats()/resetStats()/便捷getter) ──
+
 // ---- 速率统计 ----
 
 /** @brief 更新传输速率统计并发射transferStats信号 */
@@ -128,32 +130,6 @@ void XModemTransfer::updateTransferStats()
     emit transferStats(m_currentRate, eta);
 
     m_lastStatsBytes = m_bytesSent;
-}
-
-/** @brief 获取累计发送的数据块总数 @return 块数 */
-quint64 XModemTransfer::totalBlocksSent() const { return m_totalBlocksSent; }
-
-/** @brief 获取累计重试次数 @return 重试次数 */
-quint64 XModemTransfer::totalRetries() const { return m_totalRetries; }
-
-/** @brief 获取累计模式切换次数 @return 模式切换次数 */
-quint64 XModemTransfer::totalModeSwitches() const { return m_totalModeSwitches; }
-
-/** @brief 获取累计XMODEM协议错误次数 @return 错误次数 */
-quint64 XModemTransfer::xmodemErrorCount() const { return m_xmodemErrorCount; }
-
-/** @brief 重置所有XMODEM传输统计计数器(块数/重试/模式切换/错误/CRC错误/超时) */
-void XModemTransfer::resetXmodemStatistics()
-{
-    m_totalBlocksSent = 0;
-    m_totalRetries = 0;
-    m_totalModeSwitches = 0;
-    m_xmodemErrorCount = 0;
-    m_totalCrcErrors = 0;
-    m_totalTimeouts = 0;
-    m_totalNakReceived = 0;
-    m_totalCanReceived = 0;
-    m_totalAcksReceived = 0;
 }
 
 /** @brief 设置XMODEM状态机状态 @param newState 目标状态 */

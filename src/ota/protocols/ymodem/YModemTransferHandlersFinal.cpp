@@ -69,7 +69,7 @@ void YModemTransfer::handleStateSendingFinalBlock0(char ch, int& readIdx)
         m_timeoutTimer->stop();
         m_ymodemState = State::Error;
         markError();
-        ++m_totalCancels;  ///< 统计: 最终握手阶段接收方CAN取消
+        ++m_stats.cancels;  ///< 统计: 最终握手阶段接收方CAN取消
         emit transferError(tr("最终握手阶段被取消"));
         m_receiveBuffer.remove(0, readIdx);
         return;

@@ -162,10 +162,10 @@ void DashboardWidget::loadFromItems(const QList<DashboardItemConfig> &items, int
                           config.rowSpan, config.columnSpan);
         m_components.append(widget);
 
-        ++m_totalWidgetsAdded;
+        ++m_stats.totalWidgetsAdded;
     }
 
-    ++m_totalLayoutChanges;
-    ++m_totalFullLoads;
+    ++m_stats.totalLayoutChanges;
+    ++m_stats.totalFullLoads;
     emit layoutChanged();
 }

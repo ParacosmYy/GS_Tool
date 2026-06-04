@@ -12,6 +12,9 @@
 
 /** @brief 加载设备描述符并填充树(使用占位数据构建标准描述符层次结构) @param vid 厂商ID @param pid 产品ID */
 void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
+    QElapsedTimer parseTimer;
+    parseTimer.start();
+
     m_descriptorTree->clear();
     m_rawView->clear();
     ++m_totalDescriptorRefreshes;
@@ -125,6 +128,9 @@ void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
     hexDump += tr("注: 原始数据为占位，需通过libusb获取真实描述符");
     m_rawView->setPlainText(hexDump);
     m_totalRawBytesViewed += 18;  ///< 累计查看的设备描述符字节数
+
+    /* 累计解析耗时(微秒) */
+    m_totalParseTimeUs += static_cast<qint64>(parseTimer.nsecsElapsed() / 1000);
 }
 
 /** @brief 解析18字节设备描述符 @param parent 父节点 @param raw 原始描述符数据 */
@@ -188,6 +194,13 @@ quint64 UsbDescriptorViewer::totalDevicesViewed() const
     return m_totalDevicesViewed;
 }
 
+/** @brief 获取平均描述符解析耗时(ms) @return 平均解析时间 */
+double UsbDescriptorViewer::avgParseTimeMs() const
+{
+    if (m_totalDescriptorRefreshes == 0) return 0.0;
+    return static_cast<double>(m_totalParseTimeUs) / static_cast<double>(m_totalDescriptorRefreshes) / 1000.0;
+}
+
 /** @brief 重置所有统计计数器 */
 void UsbDescriptorViewer::resetStatistics()
 {
@@ -195,4 +208,6 @@ void UsbDescriptorViewer::resetStatistics()
     m_totalDevicesViewed = 0;
     m_totalNodesAdded = 0;
     m_totalRawBytesViewed = 0;
+    m_totalTreeUpdates = 0;
+    m_totalParseTimeUs = 0;
 }
