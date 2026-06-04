@@ -138,6 +138,7 @@ set(SOURCES
     src/ota/manager/OtaManagerProgress.cpp
     src/ota/widget/OtaWidget.cpp
     src/ota/widget/OtaWidgetSlots.cpp
+    src/ota/widget/OtaWidgetSlots2.cpp
     src/ota/history/OtaHistoryModel.cpp
     src/ota/protocols/base/BaseTransfer.cpp
     src/ota/protocols/xmodem/XModemTransfer.cpp
@@ -149,6 +150,7 @@ set(SOURCES
     src/utils/settings/SettingsManager.cpp
     src/utils/settings/SettingsManagerConvenience.cpp
     src/utils/export/DataExporter.cpp
+    src/utils/export/DataExporterFormats.cpp
     src/utils/export/DataExporterStreamed.cpp
     src/utils/export/DataExporterEdl.cpp
     src/utils/aggregator/DataAggregator.cpp
@@ -234,6 +236,7 @@ set(SOURCES
     src/connection/ble/BleConnection.cpp
     src/connection/ble/BleGattModel.cpp
     src/connection/ble/BleGattBrowser.cpp
+    src/connection/ble/BleGattBrowserServices.cpp
     src/connection/ble/BleConfigPanel.cpp
     src/connection/ble/BluetoothAtConsole.cpp
 
