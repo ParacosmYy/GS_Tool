@@ -82,6 +82,7 @@ set(SOURCES
     src/core/theme/ThemeManagerColor.cpp
     src/core/theme/QssThemeGenerator.cpp
     src/core/theme/QssThemeGeneratorWidgets.cpp
+    src/core/theme/QssThemeGeneratorPanels.cpp
     src/core/theme/QssThemeGeneratorColors.cpp
     src/core/animation/AnimationUtility.cpp
     src/core/theme/IconManager.cpp
@@ -98,6 +99,7 @@ set(SOURCES
     src/terminal/search/TerminalSearchBar.cpp
     src/terminal/types/DirectionFilter.cpp
     src/terminal/layout/TerminalLayoutManager.cpp
+    src/terminal/layout/TerminalLayoutSplit.cpp
     src/terminal/selection/TerminalSelectionManager.cpp
     src/terminal/search/TerminalSearchManager.cpp
     src/terminal/search/TerminalSearchBuilders.cpp
