@@ -111,7 +111,10 @@
 | 275 | FrameDefinitionSerialization/ConverterPanelSlots/BasePanelConfig/YAxisManagerStats拆分 | 帧定义序列化独立(FrameDefinition 254→160行)+转换面板槽函数独立(ConverterPanel 246→145行)+基础面板配置独立(BasePanel 277→149行)+Y轴统计独立(YAxisManager 253→193行) |
 | 276 | TrafficMonitorStats/TerminalModelQuery/JLinkSdkLoaderRtt/ProtocolSchemaConfig拆分 | 流量统计getter独立(TrafficMonitor 221→169行)+终端行查询独立(TerminalModel 222→157行)+RTT操作独立(JLinkSdkLoader 230→157行)+协议setter独立(ProtocolSchema 229→205行) |
 | 277 | ToolbarControllerQuery/TerminalControllerDisplay/SignalLineMonitorStats/TimedSenderStats拆分 | 主题语言查询独立(ToolbarController 219→155行)+终端显示搜索导出独立(TerminalController 210→107行)+信号线统计独立(SignalLineMonitor 177→113行)+定时发送统计独立(TimedSender 185→138行) |
+| 278 | NumericDisplayWidgetPaint/HeatmapWidgetPaint/BookmarkWidgetStats/PerformanceOverlayStats拆分 | 数值绘制独立+热力图渲染独立+书签统计独立+性能叠加层统计独立 |
+| 279 | SignalLineWidgetStats/TriggerManagerStats/ProtocolTemplateLibraryBuiltins/UsbDescriptorViewerTree拆分 | 信号线控件统计独立+触发器管理器统计独立+协议模板内置构造独立+USB描述符树构建独立+SerialDetector静态成员修复 |
 | 278 | NumericDisplayWidgetPaint/HeatmapWidgetPaint/BookmarkWidgetStats/PerformanceOverlayStats拆分 | 数值绘制独立(NumericDisplayWidget 161→64行)+热力图渲染独立(HeatmapWidget 201→139行)+书签统计独立(BookmarkWidget 193→176行)+性能叠加层统计独立(PerformanceOverlay 183→119行) |
+| 279 | WebSocket/BLE/SerialConfig/SerialDetector/OtaManager/OtaWidget/XModem/YModem/ZModem统计增强+TriggerManagerStats/ChartWidgetSlots/UsbDescriptorViewerTree/ModbusSlaveStats/FlatBuffersDecoderRead拆分 | WebSocket握手统计+BLE resetStats修复+串口波特率/流控统计+芯片识别静态化+OTA CRC/浏览/取消+X/Y/ZModem超时/取消+编译修复 |
 
 ---
 
