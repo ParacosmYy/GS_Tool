@@ -85,6 +85,7 @@
 | 241 | IconManager/DashboardSerializer/DataLogger/ChartExporter统计增强 | 图标缓存命中+序列化计数+日志写入计数+图表导出计数 |
 | 242 | ConnectionControllerQuery/ProtocolViewDisplay/ScatterWidgetCompute拆分+Doxygen增强 | 连接控制器查询独立+协议视图显示独立+散点图计算独立 |
 | 243 | BleGattBrowserDisplay/PluginManagerScan拆分+Doxygen全量达标 | BLE浏览器显示独立+插件管理器扫描独立 |
+| 244-245 | 全模块tr()国际化合规审计+SerialConnectionStats/SendControllerStats/EdDialogTabs拆分 | TCP/UDP/Serial/CAN/MQTT/BLE/Modbus/Protobuf/Terminal/Widget等tr()合规+统计计数器独立文件 |
 
 ---
 
