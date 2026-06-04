@@ -82,6 +82,9 @@
 | 238 | BleConnection/SerialDetector头文件压缩 | BLE连接/串口检测器Doxygen压缩 |
 | 239 | CanConnectionFrame/DbcParserSignal/UsbLibraryLoaderQuery拆分+头文件压缩 | CAN帧独立+DBC信号独立+USB查询独立 |
 | 240 | DashboardSerializerExport/ModbusMasterStats/JLinkSdkLoaderQuery拆分+多模块压缩 | Dashboard导出独立+Modbus统计独立+JLink查询独立+23个头文件压缩至<180行 |
+| 241 | IconManager/DashboardSerializer/DataLogger/ChartExporter统计增强 | 图标缓存命中+序列化计数+日志写入计数+图表导出计数 |
+| 242 | ConnectionControllerQuery/ProtocolViewDisplay/ScatterWidgetCompute拆分+Doxygen增强 | 连接控制器查询独立+协议视图显示独立+散点图计算独立 |
+| 243 | BleGattBrowserDisplay/PluginManagerScan拆分+Doxygen全量达标 | BLE浏览器显示独立+插件管理器扫描独立 |
 
 ---
 
