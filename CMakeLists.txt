@@ -107,6 +107,7 @@ set(SOURCES
     src/serial/data/DataStatisticsRolling.cpp
     src/serial/port/SerialDriverDetector.cpp
     src/serial/port/PortWatcher.cpp
+    src/serial/port/PortWatcherStats.cpp
     src/protocol/parser/FrameParser.cpp
     src/protocol/parser/FrameParserHelpers.cpp
     src/protocol/parser/FrameParserStateHandlers.cpp
@@ -152,6 +153,7 @@ set(SOURCES
     src/ota/protocols/xmodem/XModemTransferHandlers.cpp
     src/ota/protocols/ymodem/YModemTransfer.cpp
     src/ota/protocols/ymodem/YModemTransferHandlers.cpp
+    src/ota/protocols/ymodem/YModemTransferProtocol.cpp
     src/ota/protocols/zmodem/ZModemTransfer.cpp
     src/ota/protocols/zmodem/ZModemTransferHandlers.cpp
     src/utils/settings/SettingsManager.cpp
