@@ -235,78 +235,9 @@ quint64 ProtocolBridgeManager::checksumErrors() const
     return m_checksumErrors;
 }
 
-// ============================================================================
-// 管理器级统计接口
-// ============================================================================
 
-/** @brief 获取累计桥接器切换次数 @return 切换次数 */
-quint64 ProtocolBridgeManager::totalBridges() const
-{
-    return m_totalBridges;
-}
+// ---- 管理器级统计/每协议统计/吞吐量接口 已拆分至 ProtocolBridgeManagerStats.cpp ----
 
-/** @brief 获取所有协议源累计解析的总帧数（含所有模式） @return 总帧数 */
-quint64 ProtocolBridgeManager::totalFramesParsedAll() const
-{
-    return m_totalFramesParsedAll;
-}
-
-/** @brief 获取所有协议源累计解析错误总数（含所有模式） @return 总错误数 */
-quint64 ProtocolBridgeManager::totalParseErrors() const
-{
-    return m_totalParseErrors;
-}
-
-/** @brief 获取累计处理的字节总数 @return 字节数 */
-quint64 ProtocolBridgeManager::totalBytesProcessed() const
-{
-    return m_totalBytesProcessed;
-}
-
-// ============================================================================
-// 每协议统计接口
-// ============================================================================
-
-/** @brief 获取指定协议的累计统计 @param mode 协议模式 @return 该协议的帧数/字节/错误 */
-ProtocolBridgeManager::ProtocolStats ProtocolBridgeManager::protocolStats(
-    ChartProtocolMode mode) const
-{
-    return m_protocolStats.value(mode, ProtocolStats{0, 0, 0});
-}
-
-/** @brief 获取所有协议的统计汇总 @return 模式→统计的Map */
-QMap<ProtocolBridgeManager::ChartProtocolMode, ProtocolBridgeManager::ProtocolStats>
-ProtocolBridgeManager::allProtocolStats() const
-{
-    return m_protocolStats;
-}
-
-// ============================================================================
-// 吞吐量接口
-// ============================================================================
-
-/** @brief 获取当前吞吐量快照(基于滑动窗口) @return 帧率和字节率 */
-ProtocolBridgeManager::ThroughputSnapshot ProtocolBridgeManager::throughput() const
-{
-    // 计算自上次重置以来经过的秒数
-    qint64 elapsedMs = m_throughputTimer.elapsed();
-    if (elapsedMs <= 0) {
-        return m_lastThroughput;
-    }
-
-    double elapsedSec = static_cast<double>(elapsedMs) / 1000.0;
-    // 避免时间窗口过短导致速率剧烈波动（至少0.5秒）
-    if (elapsedSec < 0.5) {
-        return m_lastThroughput;
-    }
-
-    m_lastThroughput.framesPerSec =
-        static_cast<double>(m_throughputFrameCount) / elapsedSec;
-    m_lastThroughput.bytesPerSec =
-        static_cast<double>(m_throughputByteCount) / elapsedSec;
-
-    return m_lastThroughput;
-}
 
 // ============================================================================
 // 运行时动态切换

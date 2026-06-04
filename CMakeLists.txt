@@ -116,6 +116,7 @@ set(SOURCES
     src/protocol/bridge/FireWaterBridge.cpp
     src/protocol/bridge/ProtocolBridgeManager.cpp
     src/protocol/bridge/ProtocolBridgeManagerHelpers.cpp
+    src/protocol/bridge/ProtocolBridgeManagerStats.cpp
     src/chart/widget/ChartWidget.cpp
     src/chart/widget/ChartWidgetTheme.cpp
     src/chart/model/ChannelConfig.cpp
@@ -133,6 +134,7 @@ set(SOURCES
     src/chart/stats/ScatterWidget.cpp
     src/chart/stats/ScatterWidgetStats.cpp
     src/ota/manager/OtaManager.cpp
+    src/ota/manager/OtaManagerFileOps.cpp
     src/ota/manager/OtaManagerProgress.cpp
     src/ota/widget/OtaWidget.cpp
     src/ota/widget/OtaWidgetSlots.cpp
@@ -187,6 +189,7 @@ set(SOURCES
 
     # ── F5: 仪表盘 ──
     src/dashboard/DashboardWidget.cpp
+    src/dashboard/DashboardWidgetSerialization.cpp
     src/dashboard/GaugeWidget.cpp
     src/dashboard/ProgressBarWidget.cpp
     src/dashboard/LedIndicatorWidget.cpp
@@ -236,6 +239,7 @@ set(SOURCES
 
     # ── F13: CAN/CAN-FD 总线 ──
     src/connection/can/CanConnection.cpp
+    src/connection/can/CanConnectionProtocol.cpp
     src/connection/can/CanFrameParser.cpp
     src/connection/can/CanBusMonitor.cpp
     src/connection/can/CanConfigPanel.cpp
@@ -289,6 +293,7 @@ set(SOURCES
     src/connection/usb/UsbConnection.cpp
     src/connection/usb/UsbConnectionTransfer.cpp
     src/connection/usb/UsbDeviceDetector.cpp
+    src/connection/usb/UsbDeviceDetectorWmic.cpp
     src/connection/usb/UsbDescriptorViewer.cpp
     src/connection/usb/UsbConfigPanel.cpp
     src/connection/usb/UsbLibraryLoader.cpp
