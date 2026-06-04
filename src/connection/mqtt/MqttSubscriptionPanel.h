@@ -73,26 +73,13 @@ private slots:
     void onCustomContextMenu(const QPoint& pos);
 
 private:
-    /** @brief 订阅列表树控件 */
-    QTreeWidget* m_subTree;
-
-    /** @brief 主题输入框 */
-    QLineEdit* m_topicEdit;
-
-    /** @brief QoS选择下拉框 */
-    QComboBox* m_qosCombo;
-
-    /** @brief 订阅按钮 */
-    QPushButton* m_subBtn;
-
-    /** @brief 取消订阅按钮 */
-    QPushButton* m_unsubBtn;
-
-    /** @brief 右键菜单 */
-    QMenu* m_contextMenu;
-
-    /** @brief 取消订阅动作 */
-    QAction* m_unsubAction;
+    QTreeWidget* m_subTree;                ///< 订阅列表树控件
+    QLineEdit* m_topicEdit;                ///< 主题输入框
+    QComboBox* m_qosCombo;                 ///< QoS选择下拉框
+    QPushButton* m_subBtn;                 ///< 订阅按钮
+    QPushButton* m_unsubBtn;               ///< 取消订阅按钮
+    QMenu* m_contextMenu;                  ///< 右键菜单
+    QAction* m_unsubAction;                ///< 取消订阅动作
 
     // ---- 统计计数器 ----
     quint64 m_totalSubscriptions = 0;     ///< 累计订阅操作次数

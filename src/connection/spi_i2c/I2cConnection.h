@@ -49,6 +49,8 @@ public:
     quint64 errorCount() const { return m_errorCount; }               ///< @return 错误计数
     quint64 nackCount() const { return m_nackCount; }                 ///< @return NACK计数(兼容别名)
     quint64 devicesFound() const { return m_devicesFound; }           ///< @return 扫描发现设备数
+    quint64 totalBusScans() const { return m_totalBusScans; }         ///< @return 累计总线扫描次数
+    quint64 totalOpenAttempts() const { return m_totalOpenAttempts; } ///< @return 累计open()调用次数
     QList<int> lastScanResults() const { return m_lastScanResults; }  ///< @return 上次扫描结果
     void resetStats();                                                ///< 重置所有统计计数器
 
@@ -103,6 +105,8 @@ private:
     quint64 m_errorCount = 0, m_nackCount = 0;
     mutable quint64 m_totalNacks = 0, m_totalBusErrors = 0;
     quint64 m_devicesFound = 0;
+    quint64 m_totalBusScans = 0;                    ///< 累计总线扫描次数
+    quint64 m_totalOpenAttempts = 0;                ///< 累计open()调用次数
     QList<int> m_lastScanResults;                   ///< 上次扫描结果缓存
 };
 

@@ -65,6 +65,8 @@ public:
     quint64 interruptTransferCount() const { return m_interruptTransferCount; } ///< @return Interrupt传输次数
     quint64 controlTransferCount() const { return m_controlTransferCount; } ///< @return Control传输次数
     quint64 kernelDetachCount() const { return m_kernelDetachCount; } ///< @return 内核驱动分离次数(Linux)
+    quint64 totalDeviceResets() const { return m_totalDeviceResets; } ///< @return USB设备重置次数
+    quint64 totalOpenAttempts() const { return m_totalOpenAttempts; } ///< @return 累计open()调用次数
     void resetStats(); ///< 重置所有统计计数器
 
 private:
@@ -87,6 +89,8 @@ private:
     quint64 m_interruptTransferCount = 0; ///< Interrupt传输次数
     quint64 m_controlTransferCount = 0; ///< Control传输次数
     quint64 m_kernelDetachCount = 0;    ///< 内核驱动分离次数
+    quint64 m_totalDeviceResets = 0;    ///< USB设备重置次数
+    quint64 m_totalOpenAttempts = 0;    ///< 累计open()调用次数
 };
 
 #endif // USB_CONNECTION_H

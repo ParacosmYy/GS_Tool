@@ -52,8 +52,12 @@ void DataAggregator::feedValue(const QString &source, double value) {
     auto it = m_sources.find(source);
     if (it == m_sources.end()) return;
     it->values.append(value);
-    if (it->values.size() > it->windowSize) it->values.removeFirst();
+    if (it->values.size() > it->windowSize) {
+        it->values.removeFirst();
+        ++m_totalWindowSlides;
+    }
     computeAggregate(source);
+    ++m_totalOutputEmissions;
     emit valueAggregated(source, it->result);
 
     // 时间窗口聚合(如果已启用)
@@ -163,4 +167,7 @@ void DataAggregator::resetAggregatorStatistics() {
     m_totalResets = 0;
     m_totalTimeWindowEnables = 0;
     m_totalTimeWindowDisables = 0;
+    m_totalWindowSlides = 0;
+    m_totalOutputEmissions = 0;
+    m_totalComputeCalls = 0;
 }

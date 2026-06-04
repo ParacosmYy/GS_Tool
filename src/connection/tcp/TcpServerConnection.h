@@ -106,6 +106,12 @@ public:
     /** @brief 获取累计客户端socket错误次数 @return 客户端错误总数 */
     quint64 totalErrors() const { return m_totalErrors; }
 
+    /** @brief 获取累计单播发送次数(write到单个客户端) @return 单播发送总次数 */
+    quint64 totalUnicastSends() const { return m_totalUnicastSends; }
+
+    /** @brief 获取累计发送失败次数(单播或广播中写入失败) @return 发送失败总次数 */
+    quint64 totalFailedSends() const { return m_totalFailedSends; }
+
     /** @brief 设置最大允许同时连接的客户端数(0=不限) @param max 最大客户端数 */
     void setMaxClients(int max) { m_maxClients = max; }
 
@@ -168,6 +174,8 @@ private:
     quint64 m_totalRejectedConnections = 0;   ///< 因达到最大连接数被拒绝的连接数
     quint64 m_peakConnectedClients = 0;       ///< 同时在线客户端峰值数量
     quint64 m_totalErrors = 0;                ///< 累计客户端socket错误次数
+    quint64 m_totalUnicastSends = 0;          ///< 累计单播发送次数
+    quint64 m_totalFailedSends = 0;           ///< 累计发送失败次数
     int m_maxClients = 0;                     ///< 最大允许同时连接的客户端数(0=不限)
 };
 

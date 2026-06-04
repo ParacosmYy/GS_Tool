@@ -90,6 +90,12 @@ public:
     /** @brief 获取累计CSV导出次数 @return CSV导出计数 */
     quint64 totalExportsCsv() const;
 
+    /** @brief 获取累计JSON导出次数 @return JSON导出计数 */
+    quint64 totalExportsJson() const;
+
+    /** @brief 获取累计SVG导出次数 @return SVG导出计数 */
+    quint64 totalExportsSvg() const;
+
     /** @brief 获取累计PDF导出次数(预留) @return PDF导出计数 */
     quint64 totalExportsPdf() const;
 
@@ -128,6 +134,8 @@ private:
     quint64 m_totalExports = 0;       ///< 累计导出操作总次数
     quint64 m_totalExportsPng = 0;    ///< 累计PNG导出次数
     quint64 m_totalExportsCsv = 0;    ///< 累计CSV导出次数
+    quint64 m_totalExportsJson = 0;   ///< 累计JSON导出次数
+    quint64 m_totalExportsSvg = 0;    ///< 累计SVG导出次数
     quint64 m_totalExportsPdf = 0;    ///< 累计PDF导出次数(预留)
     quint64 m_totalChartImages = 0;   ///< 累计图表图片导出次数(PNG+SVG)
     quint64 m_totalCsvRows = 0;       ///< 累计CSV导出的数据行总数

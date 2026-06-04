@@ -43,6 +43,10 @@ public:
     quint64 totalBytesInput() const;
     quint64 totalBytesOutput() const;
     quint64 totalPipelinesCreated() const;
+    quint64 totalPipelineRemovals() const { return m_totalPipelineRemovals; }
+    quint64 totalStageAdds() const { return m_totalStageAdds; }
+    quint64 totalStageRemoves() const { return m_totalStageRemoves; }
+    quint64 totalBypassedProcess() const { return m_totalBypassedProcess; }
     void resetStatistics();
 
 signals:
@@ -61,5 +65,9 @@ private:
     mutable quint64 m_totalBytesInput = 0;
     mutable quint64 m_totalBytesOutput = 0;
     quint64 m_totalPipelinesCreated = 0;
+    quint64 m_totalPipelineRemovals = 0;
+    quint64 m_totalStageAdds = 0;
+    quint64 m_totalStageRemoves = 0;
+    quint64 m_totalBypassedProcess = 0;
 };
 #endif // DATAPIPELINE_H

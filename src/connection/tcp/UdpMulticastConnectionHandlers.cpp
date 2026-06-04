@@ -25,6 +25,12 @@ void UdpMulticastConnection::onReadyRead()
             ++m_dgramsRecv;
             m_rxBytes += size;
             buffer.resize(static_cast<int>(size));
+            // 区分组播组来源和单播来源
+            if (sender == m_groupAddress) {
+                ++m_totalGroupDatagrams;
+            } else {
+                ++m_totalPeerDatagrams;
+            }
             emit dataReceived(buffer);
         }
     }

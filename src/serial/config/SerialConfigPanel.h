@@ -77,95 +77,47 @@ public:
     /** @brief 设置连接中状态(外部调用) */
     void setConnecting();
 
-    // ---- Operation statistics ----
-
-    /** @brief 获取累计配置变更次数 @return 变更次数 */
-    quint64 totalConfigChanges() const { return m_totalConfigChanges; }
-
-    /** @brief 获取累计波特率变更次数 @return 变更次数 */
-    quint64 totalBaudChanges() const { return m_totalBaudChanges; }
-
-    /** @brief 获取累计端口切换次数 @return 切换次数 */
-    quint64 totalPortSwitches() const { return m_totalPortSwitches; }
-
-    /** @brief 获取累计流控切换次数 @return 切换次数 */
-    quint64 totalFlowControlToggles() const { return m_totalFlowControlToggles; }
-
-    /** @brief 获取累计端口刷新次数 @return 刷新次数 */
-    quint64 totalRefreshPorts() const { return m_totalRefreshPorts; }
-
-    /** @brief 获取累计连接尝试次数 @return 尝试次数 */
-    quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
-
-    /** @brief 重置所有操作统计计数器 */
-    void resetStats();
+    // ---- 操作统计 ----
+    quint64 totalConfigChanges() const { return m_totalConfigChanges; }     ///< 累计配置变更次数
+    quint64 totalBaudChanges() const { return m_totalBaudChanges; }         ///< 累计波特率变更次数
+    quint64 totalPortSwitches() const { return m_totalPortSwitches; }       ///< 累计端口切换次数
+    quint64 totalFlowControlToggles() const { return m_totalFlowControlToggles; } ///< 累计流控切换次数
+    quint64 totalRefreshPorts() const { return m_totalRefreshPorts; }       ///< 累计端口刷新次数
+    quint64 totalConnectAttempts() const { return m_totalConnectAttempts; } ///< 累计连接尝试次数
+    void resetStats(); ///< 重置所有操作统计计数器
 
 public slots:
     /** @brief 更新信号线状态LED指示灯 @param pinSignals 最新信号线状态 */
     void updatePinoutLeds(const PinoutSignals& pinSignals);
 
 signals:
-    /** @brief 用户点击连接按钮 */
-    void connectRequested();
-
-    /** @brief 用户点击断开按钮 */
-    void disconnectRequested();
-
-    /** @brief DTR状态变化 @param enabled true=HIGH, false=LOW */
-    void dtrChanged(bool enabled);
-
-    /** @brief RTS状态变化 @param enabled true=HIGH, false=LOW */
-    void rtsChanged(bool enabled);
-
-    /** @brief 运行时波特率变化信号 @param baud 新波特率 */
-    void baudRateChanged(qint32 baud);
-
-    /** @brief Break信号请求(STM32/ESP32进Bootloader) @param duration 持续时间(毫秒，默认100) */
-    void breakRequested(int duration = 100);
-
-    /** @brief 自动重连开关切换 @param enabled 是否启用 @param intervalMs 重连间隔(毫秒) */
-    void autoReconnectToggled(bool enabled, int intervalMs);
+    void connectRequested();   ///< 用户点击连接按钮
+    void disconnectRequested(); ///< 用户点击断开按钮
+    void dtrChanged(bool enabled); ///< DTR状态变化 @param enabled true=HIGH
+    void rtsChanged(bool enabled); ///< RTS状态变化 @param enabled true=HIGH
+    void baudRateChanged(qint32 baud); ///< 运行时波特率变化 @param baud 新波特率
+    void breakRequested(int duration = 100); ///< Break信号(STM32/ESP32 Bootloader) @param duration 持续时间ms
+    void autoReconnectToggled(bool enabled, int intervalMs); ///< 自动重连开关 @param enabled 启用 @param intervalMs 间隔ms
 
 private slots:
-    /** @brief 端口下拉框选择变化时更新连接按钮状态 */
-    void onPortComboChanged();
+    void onPortComboChanged(); ///< 端口下拉框选择变化时更新连接按钮状态
 
 private:
-    /** @brief 初始化UI布局(端口+参数+控制信号+连接按钮) */
-    void setupUI();
-
-    /** @brief 创建端口选择区域 @return 端口分组QGroupBox */
-    QGroupBox* createPortGroup();
-
-    /** @brief 创建串口参数区域(波特率/数据位/校验/停止位/流控) @return 参数分组QGroupBox */
-    QGroupBox* createParamGroup();
-
-    /** @brief 控制信号+驱动检测+连接按钮 @param mainLayout 主布局 */
-    void setupSignalAndConnectControls(QVBoxLayout* mainLayout);
-
-    /** @brief 创建DTR/RTS控制信号分组 @return 控制信号QGroupBox */
-    QGroupBox* createControlSignalsGroup();
-
-    /** @brief 根据选中端口更新驱动检测信息(VID/PID/制造商) */
-    void updateDriverInfo();
-
-    /** @brief 根据当前状态更新连接按钮文字/样式/可用性 */
-    void updateConnectButtonState();
-
-    /** @brief 更新状态指示器颜色property @param state 状态名称("connected"/"connecting"/"disconnected"/"error") */
+    void setupUI(); ///< 初始化UI布局(端口+参数+控制信号+连接按钮)
+    QGroupBox* createPortGroup(); ///< 创建端口选择区域 @return 端口分组
+    QGroupBox* createParamGroup(); ///< 创建串口参数区域 @return 参数分组
+    void setupSignalAndConnectControls(QVBoxLayout* mainLayout); ///< 控制信号+驱动检测+连接按钮 @param mainLayout 主布局
+    QGroupBox* createControlSignalsGroup(); ///< 创建DTR/RTS控制信号分组 @return 控制信号QGroupBox
+    void updateDriverInfo(); ///< 根据选中端口更新驱动检测信息(VID/PID/制造商)
+    void updateConnectButtonState(); ///< 根据当前状态更新连接按钮文字/样式/可用性
+    /** @brief 更新状态指示器颜色 @param state 状态("connected"/"connecting"/"disconnected"/"error") */
     void updateStatusIndicator(const QString& state);
-
-    /** @brief 停止呼吸动画并重置透明度特效 */
-    void stopBreathAnimation();
-
+    void stopBreathAnimation(); ///< 停止呼吸动画并重置透明度特效
     /** @brief 刷新信号按钮视觉 @param btn 目标按钮 @param high true=HIGH(绿), false=LOW(灰) */
     void refreshSignalStyle(QPushButton* btn, bool high);
-
-    /** @brief 构建端口详情tooltip(VID/PID/制造商/序列号) @param info Qt端口信息 @return tooltip文本 */
+    /** @brief 构建端口详情tooltip @param info Qt端口信息 @return tooltip文本 */
     QString buildPortTooltip(const QSerialPortInfo& info) const;
-
-    /** @brief 创建自动重连控件布局 @return 水平布局指针 */
-    QHBoxLayout* createAutoReconnectLayout();
+    QHBoxLayout* createAutoReconnectLayout(); ///< 创建自动重连控件布局
 
     // ---- 控件指针 ----
     QComboBox* m_portCombo;        ///< 端口选择下拉框

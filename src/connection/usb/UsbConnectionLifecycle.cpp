@@ -15,6 +15,14 @@
 
 /** @brief 打开USB连接，加载libusb、分离内核驱动、声明接口 @return 成功返回true */
 bool UsbConnection::open() {
+    ++m_totalOpenAttempts;  // 累计open()调用次数
+
+    // 如果当前已连接，先关闭视为设备重置
+    if (m_state == ConnectionState::Connected) {
+        ++m_totalDeviceResets;  // 累计USB设备重置次数
+        close();
+    }
+
     if (m_vid == 0 || m_pid == 0) {
         emit errorOccurred(tr("未设置USB设备VID/PID"));
         ++m_errorCount;

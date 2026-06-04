@@ -108,6 +108,8 @@ qint64 UdpMulticastConnection::write(const QByteArray& data)
         ++m_dgramsSent;
         m_txBytes += written;
         emit bytesWritten(written);
+    } else {
+        ++m_totalWriteErrors;  // 累计写入失败次数
     }
     return written;
 }

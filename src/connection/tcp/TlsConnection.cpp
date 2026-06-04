@@ -82,6 +82,8 @@ bool TlsConnection::open()
         }
         m_socket->setPrivateKey(key);
         keyFile.close();
+
+        ++m_totalCertificateLoads;  // 累计加载本地证书次数
     }
 
     /// 加载CA证书
@@ -100,6 +102,8 @@ bool TlsConnection::open()
         sslConfig.addCaCertificate(caCert);
         m_socket->setSslConfiguration(sslConfig);
         caFile.close();
+
+        ++m_totalCertificateLoads;  // 累计加载CA证书次数
     }
 
     /// 设置对端验证模式
@@ -136,6 +140,9 @@ bool TlsConnection::open()
 void TlsConnection::close()
 {
     ++m_totalCloses;
+    if (m_socket && m_state == ConnectionState::Connected) {
+        ++m_totalDisconnections;  // 从已连接状态断开时计数
+    }
     if (m_socket) {
         disconnect(m_socket, nullptr, this, nullptr);  // 断开所有信号防止析构期间回调
         m_socket->disconnectFromHost();

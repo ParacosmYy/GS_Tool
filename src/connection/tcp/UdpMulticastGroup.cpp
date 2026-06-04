@@ -76,7 +76,7 @@ qint64 UdpMulticastConnection::totalBytesReceived() const
     return m_rxBytes;
 }
 
-/** @brief 重置统计数据(数据报/字节/加入离开次数/错误/打开次数)为零 */
+/** @brief 重置统计数据(数据报/字节/加入离开次数/错误/打开次数/写入错误/组播/单播数据报)为零 */
 void UdpMulticastConnection::resetStatistics()
 {
     m_dgramsSent = 0;
@@ -87,6 +87,9 @@ void UdpMulticastConnection::resetStatistics()
     m_totalLeaves = 0;
     m_totalNetworkErrors = 0;
     m_totalOpenAttempts = 0;
+    m_totalWriteErrors = 0;
+    m_totalGroupDatagrams = 0;
+    m_totalPeerDatagrams = 0;
 }
 
 /** @brief 获取组播组加入总次数 @return 加入组播组总次数 */

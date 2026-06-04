@@ -111,6 +111,12 @@ public:
     /** @brief 获取累计芯片识别次数 @return 识别次数 */
     static quint64 totalChipIdentifications() { return s_totalChipIdentifications; }
 
+    /** @brief 获取累计端口变化检测次数(插入+移除事件合计) @return 变化次数 */
+    quint64 totalPortChangesDetected() const { return m_totalPortChangesDetected; }
+
+    /** @brief 获取累计过滤查询次数(描述/制造商/端口名/驱动类型查找合计) @return 查询次数 */
+    quint64 totalFilterQueries() const { return m_totalFilterQueries; }
+
     /** @brief 获取累计检测到的不同VID数量 @return 不同VID的数量 */
     int uniqueVidCount() const;
 
@@ -156,6 +162,8 @@ private:
     quint64 m_totalRemovals = 0;    ///< 累计端口移除事件次数
     mutable quint64 m_totalVidLookups = 0; ///< 累计VID查询次数
     static inline quint64 s_totalChipIdentifications = 0; ///< 累计芯片识别次数(identifyChip调用)
+    quint64 m_totalPortChangesDetected = 0; ///< 累计端口变化检测次数(插入+移除事件合计)
+    mutable quint64 m_totalFilterQueries = 0; ///< 累计过滤查询次数(描述/制造商/端口名/驱动类型查找)
 
     // ---- 已知USB转串口芯片数据库 ----
     static const QVector<UsbVendorEntry> kKnownVendors; ///< 已知USB芯片厂商数据库

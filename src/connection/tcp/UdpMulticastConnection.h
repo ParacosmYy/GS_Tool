@@ -91,6 +91,15 @@ public:
     /** @brief 获取累计打开连接尝试次数 @return 打开尝试计数 */
     quint64 totalOpenAttempts() const { return m_totalOpenAttempts; }
 
+    /** @brief 获取累计写入失败次数(发送数据报失败) @return 写入错误总次数 */
+    quint64 totalWriteErrors() const { return m_totalWriteErrors; }
+
+    /** @brief 获取累计接收来自组播组地址的数据报数 @return 组播组数据报数 */
+    quint64 totalGroupDatagrams() const { return m_totalGroupDatagrams; }
+
+    /** @brief 获取累计接收来自非组播组的单播数据报数 @return 单播数据报数 */
+    quint64 totalPeerDatagrams() const { return m_totalPeerDatagrams; }
+
     /** @brief 重置统计数据 */
     void resetStatistics();
 
@@ -135,6 +144,12 @@ private:
     quint64 m_totalNetworkErrors = 0;
     /** @brief 累计打开连接尝试次数 */
     quint64 m_totalOpenAttempts = 0;
+    /** @brief 累计写入失败次数 */
+    quint64 m_totalWriteErrors = 0;
+    /** @brief 累计接收来自组播组地址的数据报数 */
+    quint64 m_totalGroupDatagrams = 0;
+    /** @brief 累计接收来自非组播组的单播数据报数 */
+    quint64 m_totalPeerDatagrams = 0;
 };
 
 #endif // UDPMULTICASTCONNECTION_H

@@ -34,8 +34,10 @@ struct MqttPendingMessage {
 class MqttConnection : public IConnection {
     Q_OBJECT
 public:
-    explicit MqttConnection(QObject* parent = nullptr);  ///< 构造MQTT客户端连接
-    ~MqttConnection() override;                          ///< 析构函数，关闭连接释放资源
+    /** @brief 构造MQTT客户端连接 @param parent 父对象 */
+    explicit MqttConnection(QObject* parent = nullptr);
+    /** @brief 析构函数，关闭连接释放资源 */
+    ~MqttConnection() override;
 
     // ---- IConnection 接口实现 ----
     ConnectionType type() const override;                ///< @return 固定返回ConnectionType::Mqtt
@@ -98,16 +100,24 @@ public:
     void resetStats();                                   ///< 重置所有统计计数器
 
 signals:
-    void messageReceived(const QString& topic, const QByteArray& payload);  ///< 收到MQTT消息
-    void connected();                                    ///< 连接成功建立
-    void disconnected();                                 ///< 连接断开
-    void queueOverflow(int count);                       ///< 队列溢出(丢弃旧消息) @param count 丢弃的消息数
+    /** @brief 收到MQTT消息 @param topic 消息主题 @param payload 消息负载 */
+    void messageReceived(const QString& topic, const QByteArray& payload);
+    /** @brief MQTT连接成功建立 */
+    void connected();
+    /** @brief MQTT连接断开 */
+    void disconnected();
+    /** @brief 消息队列溢出，已丢弃旧消息 @param count 丢弃的消息数 */
+    void queueOverflow(int count);
 
 private slots:
-    void onSocketReadyRead();                            ///< TCP socket数据就绪回调
-    void onSocketConnected();                            ///< TCP socket连接成功回调
-    void onSocketDisconnected();                         ///< TCP socket断开回调
-    void onKeepAlive();                                  ///< KeepAlive定时器回调，发送PINGREQ
+    /** @brief TCP socket数据就绪回调，触发MQTT报文解析 */
+    void onSocketReadyRead();
+    /** @brief TCP socket连接成功回调，发送MQTT CONNECT报文 */
+    void onSocketConnected();
+    /** @brief TCP socket断开回调，更新连接状态 */
+    void onSocketDisconnected();
+    /** @brief KeepAlive定时器回调，发送PINGREQ保活报文 */
+    void onKeepAlive();
 
 private:
     /** @brief 构建MQTT协议报文 @param packetType 报文类型 @param payload 报文负载 @return 编码后的完整报文 */

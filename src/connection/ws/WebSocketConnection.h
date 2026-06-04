@@ -91,6 +91,15 @@ public:
     void setMessageQueueLimit(int limit);
     /** @brief 获取因队列满而丢弃的消息数 */
     quint64 totalMessagesDropped() const;
+
+    /** @brief 获取累计重连次数(非首次连接的connectToUrl调用) @return 重连总次数 */
+    quint64 totalReconnects() const { return m_totalReconnects; }
+
+    /** @brief 获取累计接收文本帧总数(区别于发送帧) @return 接收文本帧总数 */
+    quint64 totalTextFramesReceived() const { return m_totalTextFramesReceived; }
+
+    /** @brief 获取累计接收二进制帧总数(区别于发送帧) @return 接收二进制帧总数 */
+    quint64 totalBinaryFramesReceived() const { return m_totalBinaryFramesReceived; }
     /** @brief 重置所有统计 */
     void resetStats();
 
@@ -171,6 +180,9 @@ private:
     quint64 m_totalHandshakeFailures = 0;   ///< 累计握手失败次数(非101响应)
     quint64 m_totalCloseFramesSent = 0;     ///< 累计发送close帧(0x08)次数
     quint64 m_totalCloseFramesReceived = 0; ///< 累计接收close帧(0x08)次数
+    quint64 m_totalReconnects = 0;          ///< 累计重连次数
+    quint64 m_totalTextFramesReceived = 0;  ///< 累计接收文本帧总数
+    quint64 m_totalBinaryFramesReceived = 0; ///< 累计接收二进制帧总数
 };
 
 #endif // WEBSOCKETCONNECTION_H

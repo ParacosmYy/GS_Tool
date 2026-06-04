@@ -94,6 +94,15 @@ public:
     /** @brief 获取累计SSL/TLS协议错误次数(证书验证失败等) */
     quint64 totalSslErrors() const { return m_totalSslErrors; }
 
+    /** @brief 获取累计断开连接次数 @return 断开连接总次数 */
+    quint64 totalDisconnections() const { return m_totalDisconnections; }
+
+    /** @brief 获取累计证书加载次数(本地证书+CA证书) @return 证书加载总次数 */
+    quint64 totalCertificateLoads() const { return m_totalCertificateLoads; }
+
+    /** @brief 获取累计连接超时次数 @return 连接超时总次数 */
+    quint64 totalConnectionTimeouts() const { return m_totalConnectionTimeouts; }
+
     /** @brief 重置所有统计数据为零 */
     void resetStats();
 
@@ -135,6 +144,9 @@ private:
     quint64 m_totalCloses = 0;                      ///< 累计close()调用次数
     quint64 m_totalWrites = 0;                      ///< 累计write()调用次数
     quint64 m_totalSslErrors = 0;                   ///< 累计SSL/TLS协议错误次数
+    quint64 m_totalDisconnections = 0;              ///< 累计断开连接次数
+    quint64 m_totalCertificateLoads = 0;            ///< 累计证书加载次数
+    quint64 m_totalConnectionTimeouts = 0;          ///< 累计连接超时次数
 };
 
 #endif // TLSCONNECTION_H

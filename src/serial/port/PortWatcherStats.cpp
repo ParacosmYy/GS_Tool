@@ -52,6 +52,9 @@ quint64 PortWatcher::totalHotplugEvents() const { return m_totalHotplugEvents; }
 /** @brief 获取累计端口扫描错误次数 @return 扫描错误总次数 */
 quint64 PortWatcher::totalScanErrors() const { return m_totalScanErrors; }
 
+/** @brief 获取累计防抖抑制次数(候选端口恢复原状态导致计数器清零) @return 抑制次数 */
+quint64 PortWatcher::totalDebounceSuppressions() const { return m_totalDebounceSuppressions; }
+
 /** @brief 获取最近一次端口变更距现在的毫秒数 @return 毫秒数，无事件返回-1 */
 qint64 PortWatcher::msSinceLastChange() const
 {
@@ -110,6 +113,7 @@ void PortWatcher::resetWatcherStatistics()
     m_totalPortScans = 0;
     m_totalHotplugEvents = 0;
     m_totalScanErrors = 0;
+    m_totalDebounceSuppressions = 0;
     m_eventLog.clear();
     m_hasLastChange = false;
 }

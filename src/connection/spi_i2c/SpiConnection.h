@@ -55,6 +55,9 @@ public:
     quint64 totalTransferErrors() const { return m_totalTransferErrors; } ///< @return 总传输错误次数
     quint64 totalCsToggles() const { return m_totalCsToggles; }   ///< @return 总CS片选切换次数
     quint64 errorCount() const { return m_errorCount; }           ///< @return 错误计数
+    quint64 totalModeChanges() const { return m_totalModeChanges; } ///< @return 累计SPI模式变更次数
+    quint64 totalFrequencyChanges() const { return m_totalFrequencyChanges; } ///< @return 累计时钟频率变更次数
+    quint64 totalOpenAttempts() const { return m_totalOpenAttempts; } ///< @return 累计open()调用次数
     /** @brief 获取指定SPI模式(0-3)的传输次数 @param mode SPI模式编号 @return 该模式的传输次数 */
     quint64 transferByMode(int mode) const;
     int spiMode() const { return m_mode; }   ///< @return 当前SPI模式
@@ -109,6 +112,9 @@ private:
     mutable quint64 m_totalTransferErrors = 0;      ///< 总传输错误次数
     mutable quint64 m_totalCsToggles = 0;           ///< 总CS片选切换次数
     quint64 m_transferByMode[4] = {0, 0, 0, 0};    ///< 按SPI模式统计传输次数
+    quint64 m_totalModeChanges = 0;                   ///< 累计SPI模式变更次数
+    quint64 m_totalFrequencyChanges = 0;              ///< 累计时钟频率变更次数
+    quint64 m_totalOpenAttempts = 0;                  ///< 累计open()调用次数
 };
 
 #endif // SPICONNECTION_H

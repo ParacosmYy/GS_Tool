@@ -154,7 +154,7 @@ QByteArray I2cConnection::parseResponsePayload()
     return m_responseBuffer.mid(dataStart, avail);
 }
 
-/** @brief 重置所有I2C统计计数器(传输次数/字节数/错误/NACK/总线错误/设备发现) */
+/** @brief 重置所有I2C统计计数器(传输次数/字节数/错误/NACK/总线错误/设备发现/扫描次数/打开次数) */
 void I2cConnection::resetStats()
 {
     m_totalTransactions = 0;
@@ -167,5 +167,7 @@ void I2cConnection::resetStats()
     m_totalNacks = 0;
     m_totalBusErrors = 0;
     m_devicesFound = 0;
+    m_totalBusScans = 0;
+    m_totalOpenAttempts = 0;
     m_lastScanResults.clear();
 }

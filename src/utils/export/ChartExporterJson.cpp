@@ -77,6 +77,7 @@ bool ChartExporter::exportToJson(const QString& filePath,
     file.close();
 
     ++m_totalExports;
+    ++m_totalExportsJson;
     m_totalCsvRows += static_cast<quint64>(maxRows);
     m_totalBytesExported += static_cast<quint64>(file.size());
     emit exportCompleted(filePath);

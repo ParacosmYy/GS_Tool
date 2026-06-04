@@ -65,19 +65,28 @@ public:
     void resetStatistics();
 
 signals:
-    void responseReceived(const ModbusFrame& frame); ///< 收到有效响应
-    void timeout(int slave, int function);    ///< 响应超时
-    void error(ModbusError errorCode);        ///< Modbus异常响应
+    /** @brief 收到有效响应 @param frame 响应帧数据 */
+    void responseReceived(const ModbusFrame& frame);
+    /** @brief 响应超时 @param slave 从站地址 @param function 功能码 */
+    void timeout(int slave, int function);
+    /** @brief Modbus异常响应 @param errorCode 异常码 */
+    void error(ModbusError errorCode);
 
 private slots:
-    void onRawDataReceived(const QByteArray& data); ///< 处理底层连接收到的数据
-    void onTimeout();                         ///< 响应超时处理
+    /** @brief 处理底层连接收到的原始数据 @param data 原始字节流 */
+    void onRawDataReceived(const QByteArray& data);
+    /** @brief 响应超时处理，累加超时计数并尝试恢复 */
+    void onTimeout();
 
 private:
-    bool sendFrame(const QByteArray& rawData); ///< 发送原始帧数据
-    void parseResponse(const QByteArray& data); ///< 解析响应帧
-    static bool isReadFunction(quint8 fc);     ///< 判断功能码是否为读操作
-    static bool isWriteFunction(quint8 fc);    ///< 判断功能码是否为写操作
+    /** @brief 发送原始帧数据到底层连接 @param rawData 完整帧字节(含CRC) @return true=发送成功 */
+    bool sendFrame(const QByteArray& rawData);
+    /** @brief 解析底层连接收到的响应帧 @param data 原始响应数据 */
+    void parseResponse(const QByteArray& data);
+    /** @brief 判断功能码是否为读操作 @param fc 功能码 @return true=读操作 */
+    static bool isReadFunction(quint8 fc);
+    /** @brief 判断功能码是否为写操作 @param fc 功能码 @return true=写操作 */
+    static bool isWriteFunction(quint8 fc);
 
     IConnection* m_connection = nullptr;  ///< 底层连接接口
     int          m_timeoutMs   = 1000;    ///< 超时时间（毫秒）

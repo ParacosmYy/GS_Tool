@@ -75,77 +75,38 @@ public:
     quint64 totalTxPackets() const { return m_txPackets; }
 
     // ---- 基础统计计数器 ----
-
-    /** @brief 获取update()调用总次数 @return 更新次数 */
-    quint64 totalUpdates() const;
-
-    /** @brief 获取历史峰值速率(RX/TX中较大者) @return 峰值速率(bytes/s) */
-    double peakRate() const;
-
-    /** @brief 获取所有update()调用传入的字节总数(RX+TX) @return 字节总数 */
-    quint64 totalBytesCounted() const;
-
-    /** @brief 获取峰值速率更新总次数 @return 更新次数 */
-    quint64 totalPeakUpdates() const;
-
-    /** @brief 获取updateErrors()调用总次数 @return 错误更新次数 */
-    quint64 totalErrorUpdates() const;
-
-    /** @brief 获取updateConnectionHealth()调用总次数 @return 健康更新次数 */
-    quint64 totalHealthUpdates() const;
-
-    /** @brief 获取定时器刷新总周期数 @return 刷新周期数 */
-    quint64 totalRefreshCycles() const;
-
-    /** @brief 获取update()中的速率计算总次数 @return 计算次数 */
-    quint64 totalCalculations() const;
-
-    /** @brief 获取直方图更新总次数 @return 更新次数 */
-    quint64 totalHistogramUpdates() const;
-
-    /** @brief 获取滑动窗口重置总次数 @return 重置次数 */
-    quint64 totalSlidingWindowResets() const;
-
-    /** @brief 获取吞吐量快照记录总次数 @return 快照次数 */
-    quint64 totalThroughputSnapshots() const;
-
-    /** @brief 获取reset()调用总次数 @return 重置次数 */
-    quint64 totalResets() const;
-
-    /** @brief 获取格式切换总次数(预留) @return 切换次数 */
-    quint64 totalFormatChanges() const;
+    quint64 totalUpdates() const;              ///< 获取update()调用总次数
+    double peakRate() const;                   ///< 获取历史峰值速率(RX/TX中较大者, bytes/s)
+    quint64 totalBytesCounted() const;         ///< 获取所有update()传入字节总数(RX+TX)
+    quint64 totalPeakUpdates() const;          ///< 获取峰值速率更新总次数
+    quint64 totalErrorUpdates() const;         ///< 获取updateErrors()调用总次数
+    quint64 totalHealthUpdates() const;        ///< 获取updateConnectionHealth()调用总次数
+    quint64 totalRefreshCycles() const;        ///< 获取定时器刷新总周期数
+    quint64 totalCalculations() const;         ///< 获取update()中的速率计算总次数
+    quint64 totalHistogramUpdates() const;     ///< 获取直方图更新总次数
+    quint64 totalSlidingWindowResets() const;  ///< 获取滑动窗口重置总次数
+    quint64 totalThroughputSnapshots() const;  ///< 获取吞吐量快照记录总次数
+    quint64 totalResets() const;               ///< 获取reset()调用总次数
+    quint64 totalFormatChanges() const;        ///< 获取格式切换总次数(预留)
 
     /** @brief 重置数据统计计数器(不影响面板显示) */
     void resetDataStatistics();
 
     // ---- 滚动吞吐量 ----
 
-    /** @brief 获取滚动窗口RX平均速率 @return 速率(bytes/s) */
-    double rollingRxBytesPerSec() const;
-
-    /** @brief 获取滚动窗口TX平均速率 @return 速率(bytes/s) */
-    double rollingTxBytesPerSec() const;
-
-    /** @brief 获取滚动窗口RX包速率 @return 包速率(packets/s) */
-    double rollingRxPacketsPerSec() const;
-
-    /** @brief 获取滚动窗口TX包速率 @return 包速率(packets/s) */
-    double rollingTxPacketsPerSec() const;
-
-    /** @brief 获取滚动窗口大小 @return 窗口大小(秒) */
-    int rollingWindowSize() const;
+    double rollingRxBytesPerSec() const;   ///< 获取滚动窗口RX平均速率(bytes/s)
+    double rollingTxBytesPerSec() const;   ///< 获取滚动窗口TX平均速率(bytes/s)
+    double rollingRxPacketsPerSec() const; ///< 获取滚动窗口RX包速率(packets/s)
+    double rollingTxPacketsPerSec() const; ///< 获取滚动窗口TX包速率(packets/s)
+    int rollingWindowSize() const;         ///< 获取滚动窗口大小(秒)
 
     /** @brief 获取吞吐量直方图数据(RX+TX合计) @return 直方图桶列表 */
     QVector<HistogramBucket> throughputHistogram() const;
-
-    /** @brief 获取直方图总采样次数 @return 采样次数 */
-    int histogramTotalSamples() const;
+    int histogramTotalSamples() const; ///< 获取直方图总采样次数
 
     /** @brief 获取最近N个吞吐量采样点 @param maxCount 最大条数，0=全部 @return 采样点向量 */
     QVector<ThroughputSample> throughputHistory(int maxCount = 0) const;
-
-    /** @brief 获取采样历史最大保留条数 @return 容量值 */
-    int throughputHistoryCapacity() const { return kMaxThroughputSamples; }
+    int throughputHistoryCapacity() const { return kMaxThroughputSamples; } ///< 获取采样历史最大保留条数
 
 signals:
     /** @brief 滚动吞吐量更新信号(每秒发射) @param rxBytesPerSec RX速率(bytes/s) @param txBytesPerSec TX速率(bytes/s) */
@@ -205,18 +166,18 @@ private:
     int m_overrunErrors = 0;       ///< 溢出错误累计
 
     // ---- 统计计数器 ----
-    quint64 m_totalUpdates = 0;           ///< update()调用总次数
-    quint64 m_totalBytesCounted = 0;      ///< 传入字节总数(RX+TX)
-    quint64 m_totalPeakUpdates = 0;       ///< 峰值速率刷新次数
-    quint64 m_totalErrorUpdates = 0;      ///< updateErrors()调用次数
-    quint64 m_totalHealthUpdates = 0;     ///< updateConnectionHealth()调用次数
-    quint64 m_totalRefreshCycles = 0;     ///< onRefreshTimer()周期数
-    quint64 m_totalCalculations = 0;      ///< 速率计算总次数
-    quint64 m_totalHistogramUpdates = 0;  ///< 直方图更新次数
-    quint64 m_totalSlidingWindowResets = 0; ///< 滑动窗口淘汰次数
-    quint64 m_totalThroughputSnapshots = 0; ///< 吞吐量快照次数
-    quint64 m_totalResets = 0;              ///< reset()调用总次数
-    quint64 m_totalFormatChanges = 0;       ///< 格式切换总次数(预留)
+    quint64 m_totalUpdates = 0;              ///< update()调用总次数
+    quint64 m_totalBytesCounted = 0;         ///< 传入字节总数(RX+TX)
+    quint64 m_totalPeakUpdates = 0;          ///< 峰值速率刷新次数
+    quint64 m_totalErrorUpdates = 0;         ///< updateErrors()调用次数
+    quint64 m_totalHealthUpdates = 0;        ///< updateConnectionHealth()调用次数
+    quint64 m_totalRefreshCycles = 0;        ///< onRefreshTimer()周期数
+    quint64 m_totalCalculations = 0;         ///< 速率计算总次数
+    quint64 m_totalHistogramUpdates = 0;     ///< 直方图更新次数
+    quint64 m_totalSlidingWindowResets = 0;  ///< 滑动窗口淘汰次数
+    quint64 m_totalThroughputSnapshots = 0;  ///< 吞吐量快照次数
+    quint64 m_totalResets = 0;               ///< reset()调用总次数
+    quint64 m_totalFormatChanges = 0;        ///< 格式切换总次数(预留)
 
     // ---- 滚动吞吐量(滑动窗口) ----
     static constexpr int kRollingWindowSeconds = 5; ///< 滚动窗口大小(5秒)

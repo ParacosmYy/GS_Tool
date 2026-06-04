@@ -12,10 +12,18 @@
 void SpiConnection::configure(const QVariantMap& params)
 {
     if (params.contains("mode")) {
-        m_mode = params["mode"].toInt();
+        int newMode = params["mode"].toInt();
+        if (m_mode != newMode) {
+            ++m_totalModeChanges;  // 累计SPI模式变更次数
+        }
+        m_mode = newMode;
     }
     if (params.contains("clockSpeed")) {
-        m_clockSpeed = params["clockSpeed"].toInt();
+        int newSpeed = params["clockSpeed"].toInt();
+        if (m_clockSpeed != newSpeed) {
+            ++m_totalFrequencyChanges;  // 累计时钟频率变更次数
+        }
+        m_clockSpeed = newSpeed;
     }
     if (params.contains("csPin")) {
         m_csPin = params["csPin"].toInt();
@@ -41,12 +49,18 @@ void SpiConnection::configure(const QVariantMap& params)
 /** @brief 设置SPI模式，限制范围0~3 @param mode SPI模式(0-3) */
 void SpiConnection::setSpiMode(int mode)
 {
+    if (m_mode != qBound(0, mode, 3)) {
+        ++m_totalModeChanges;  // 累计SPI模式变更次数
+    }
     m_mode = qBound(0, mode, 3);
 }
 
 /** @brief 设置时钟频率 @param speedHz 时钟频率(Hz) */
 void SpiConnection::setClockSpeed(int speedHz)
 {
+    if (m_clockSpeed != speedHz) {
+        ++m_totalFrequencyChanges;  // 累计时钟频率变更次数
+    }
     m_clockSpeed = speedHz;
 }
 

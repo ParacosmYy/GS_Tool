@@ -47,6 +47,8 @@ public:
     quint64 totalRestores() const { return m_totalRestores; }                 ///< 累计从历史恢复次数
     quint64 totalHistoryClears() const { return m_totalHistoryClears; }       ///< 累计清除历史次数
     quint64 totalBytesCopied() const { return m_totalBytesCopied; }           ///< 累计复制的字节总数
+    quint64 totalEscapeConversions() const { return m_totalEscapeConversions; } ///< 累计转义格式转换次数
+    quint64 totalHistoryDuplicates() const { return m_totalHistoryDuplicates; } ///< 累计历史去重合并次数
     void resetStatistics();
 signals:
     void historyEntryAdded(const ClipboardEntry &entry);
@@ -68,5 +70,7 @@ private:
     quint64 m_totalRestores = 0;                ///< 累计从历史恢复次数
     quint64 m_totalHistoryClears = 0;           ///< 累计清除历史次数
     quint64 m_totalBytesCopied = 0;             ///< 累计复制的字节总数
+    quint64 m_totalEscapeConversions = 0;       ///< 累计转义格式转换次数
+    quint64 m_totalHistoryDuplicates = 0;       ///< 累计历史去重合并次数
 };
 #endif // CLIPBOARDMANAGER_H

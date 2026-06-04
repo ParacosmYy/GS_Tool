@@ -65,6 +65,7 @@ void UdpConnection::configure(const QVariantMap& params)
 /** @brief 打开UDP连接，创建QUdpSocket并绑定到本地端口，广播模式绑定AnyIPv4，点对点绑定Any @return true=绑定成功, false=绑定失败 */
 bool UdpConnection::open()
 {
+    ++m_totalOpenAttempts;
     // 已连接时先关闭旧socket，防止重复绑定导致 bind 失败
     if (m_socket) {
         m_socket->close();
@@ -105,6 +106,7 @@ void UdpConnection::close()
 /** @brief 发送数据报到远程主机或广播地址 @param data 待发送的字节数据 @return 实际发送的字节数，-1表示未连接或发送失败 */
 qint64 UdpConnection::write(const QByteArray& data)
 {
+    ++m_totalWrites;  // 累计write()调用次数
     if (!m_socket || m_state != ConnectionState::Connected) {
         return -1;
     }

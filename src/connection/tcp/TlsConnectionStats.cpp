@@ -20,7 +20,7 @@ quint64 TlsConnection::totalBytesReceived() const { return m_totalBytesReceived;
 /** @brief 获取错误计数 @return 错误总数 */
 quint64 TlsConnection::errorCount() const { return m_errorCount; }
 
-/** @brief 重置所有TLS统计数据(握手/字节/错误计数)为零 */
+/** @brief 重置所有TLS统计数据(握手/字节/错误/断开/证书/超时计数)为零 */
 void TlsConnection::resetStats()
 {
     m_totalHandshakes = 0;
@@ -31,4 +31,7 @@ void TlsConnection::resetStats()
     m_totalCloses = 0;
     m_totalWrites = 0;
     m_totalSslErrors = 0;
+    m_totalDisconnections = 0;
+    m_totalCertificateLoads = 0;
+    m_totalConnectionTimeouts = 0;
 }

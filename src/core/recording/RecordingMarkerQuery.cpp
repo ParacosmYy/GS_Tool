@@ -36,6 +36,9 @@ MarkerEntry RecordingMarker::marker(int index) const
 /** @brief 清除所有标记(从后往前移除，逐个发射markerRemoved信号) */
 void RecordingMarker::clear()
 {
+    // 统计：累计清除操作计数
+    ++m_totalClearOps;
+
     // 从后往前移除，保持发射的索引与实际位置一致
     while (!m_markers.isEmpty()) {
         int lastIdx = m_markers.size() - 1;
@@ -48,6 +51,9 @@ void RecordingMarker::clear()
 /** @brief 查找距离给定时间戳最近的标记(利用有序特性) @param timestampMs 目标时间戳(毫秒) @return 最近标记的索引，空列表返回-1 */
 int RecordingMarker::findNearest(qint64 timestampMs) const
 {
+    // 统计：累计最近标记查询计数
+    ++m_totalNearestQueries;
+
     if (m_markers.isEmpty()) {
         return -1;
     }
@@ -85,6 +91,9 @@ int RecordingMarker::findNearest(qint64 timestampMs) const
 /** @brief 查找指定时间范围内的所有标记(利用有序特性) @param fromMs 起始时间戳(毫秒，含) @param toMs 结束时间戳(毫秒，含) @return 范围内标记的索引列表(按时间升序) */
 QList<int> RecordingMarker::findInRange(qint64 fromMs, qint64 toMs) const
 {
+    // 统计：累计范围查询计数
+    ++m_totalRangeQueries;
+
     QList<int> result;
 
     // 参数校验：范围无效
@@ -180,4 +189,7 @@ void RecordingMarker::resetStats()
     m_totalMarkersAdded = 0;
     m_totalMarkersRemoved = 0;
     m_totalJumpEvents = 0;
+    m_totalRangeQueries = 0;
+    m_totalNearestQueries = 0;
+    m_totalClearOps = 0;
 }

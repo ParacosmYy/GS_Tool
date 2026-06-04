@@ -71,6 +71,10 @@ void TlsConnection::onReadyRead()
 void TlsConnection::onStateChanged(QAbstractSocket::SocketState socketState)
 {
     if (socketState == QAbstractSocket::UnconnectedState) {
+        // 从Connecting状态变为Unconnected表示连接失败(含超时)
+        if (m_state == ConnectionState::Connecting) {
+            ++m_totalConnectionTimeouts;  // 累计连接失败次数
+        }
         updateState(ConnectionState::Disconnected);
     }
 }

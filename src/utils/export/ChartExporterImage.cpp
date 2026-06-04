@@ -106,6 +106,7 @@ bool ChartExporter::exportToSvg(const QString& filePath, QWidget* widget)
 
     ++m_totalExports;
     ++m_totalChartImages;
+    ++m_totalExportsSvg;
     QFileInfo svgFi(filePath);
     if (svgFi.exists()) {
         m_totalBytesExported += static_cast<quint64>(svgFi.size());

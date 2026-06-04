@@ -40,6 +40,8 @@ public:
     quint64 totalDnsErrors() const { return m_totalDnsErrors; }     ///< 累计DNS解析失败次数
     quint64 totalConnectionTimeouts() const { return m_totalConnectionTimeouts; } ///< 累计连接超时次数
     quint64 totalKeepAliveProbes() const { return m_totalKeepAliveProbes; } ///< 累计KeepAlive探测次数
+    quint64 totalConnectionRetries() const { return m_totalConnectionRetries; } ///< 累计连接重试次数(非重连，指open()重复调用)
+    quint64 totalSocketErrors() const { return m_totalSocketErrors; } ///< 累计Socket底层错误次数(含DNS/超时/连接重置)
     double averageLatencyMs() const;           ///< 连接建立平均延迟(ms)
     qint64 lastLatencyMs() const { return m_lastLatencyMs; }     ///< 最近一次连接延迟(ms)
     qint64 maxLatencyMs() const { return m_maxLatencyMs; }       ///< 最大连接延迟(ms)
@@ -90,6 +92,8 @@ private:
     quint64 m_totalDnsErrors = 0;        ///< 累计DNS解析失败次数
     quint64 m_totalConnectionTimeouts = 0;///< 累计连接超时次数
     quint64 m_totalKeepAliveProbes = 0;  ///< 累计KeepAlive探测次数
+    quint64 m_totalConnectionRetries = 0; ///< 累计连接重试次数
+    quint64 m_totalSocketErrors = 0;     ///< 累计Socket底层错误次数
 };
 
 #endif // TCPCONNECTION_H

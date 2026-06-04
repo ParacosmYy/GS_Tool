@@ -111,12 +111,14 @@ void WebSocketConnection::parseFrames()
             break;
         case 0x01: // 文本帧
             ++m_totalMessagesReceived;
+            ++m_totalTextFramesReceived;  // 累计接收文本帧计数
             m_totalBytesReceived += static_cast<quint64>(payload.size());
             emit textMessageReceived(QString::fromUtf8(payload));
             emit dataReceived(payload);
             break;
         case 0x02: // 二进制帧
             ++m_totalMessagesReceived;
+            ++m_totalBinaryFramesReceived;  // 累计接收二进制帧计数
             m_totalBytesReceived += static_cast<quint64>(payload.size());
             emit binaryMessageReceived(payload);
             emit dataReceived(payload);

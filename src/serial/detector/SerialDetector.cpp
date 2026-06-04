@@ -120,6 +120,7 @@ void SerialDetector::refreshPorts()
     for (const auto &name : current.keys()) {
         if (!m_knownPorts.contains(name)) {
             ++m_totalInsertions;
+            ++m_totalPortChangesDetected;
             emit portInserted(current[name]);
         }
     }
@@ -128,6 +129,7 @@ void SerialDetector::refreshPorts()
     for (const auto &name : m_knownPorts.keys()) {
         if (!current.contains(name)) {
             ++m_totalRemovals;
+            ++m_totalPortChangesDetected;
             emit portRemoved(m_knownPorts[name]);
         }
     }

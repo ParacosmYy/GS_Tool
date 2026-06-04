@@ -113,24 +113,17 @@ private:
     /** @brief 计算CRC16校验 */
     quint16 calculateCrc16(const QByteArray& data) const;
 
-    QMap<int, quint16> m_registers;   ///< 保持寄存器映射 (地址→值)
-    QMap<int, bool>    m_coils;        ///< 线圈映射 (地址→状态)
-    quint8             m_slaveAddress = 1; ///< 从站地址
+    QMap<int, quint16> m_registers;        ///< 保持寄存器映射 (地址→值)
+    QMap<int, bool>    m_coils;             ///< 线圈映射 (地址→状态)
+    quint8             m_slaveAddress = 1;  ///< 从站地址
 
-    /** @brief 已处理请求计数 */
-    quint64 m_requestCount = 0;
-    /** @brief 异常响应计数 */
-    quint64 m_exceptionCount = 0;
-    /** @brief 已成功处理的请求总数（地址匹配+CRC通过） */
-    quint64 m_totalRequestsHandled = 0;
-    /** @brief 已发送的响应帧总数（含正常+异常） */
-    quint64 m_totalResponsesSent = 0;
-    /** @brief 从站内部错误次数（CRC失败/帧过短等） */
-    quint64 m_totalSlaveErrors = 0;
-    /** @brief 异常响应发送总数（功能码最高位置1的响应） */
-    quint64 m_totalExceptionResponses = 0;
-    /** @brief 各功能码调用次数 */
-    QMap<int, int> m_fcStats;
+    quint64 m_requestCount = 0;             ///< 已处理请求计数
+    quint64 m_exceptionCount = 0;           ///< 异常响应计数
+    quint64 m_totalRequestsHandled = 0;     ///< 已成功处理的请求总数（地址匹配+CRC通过）
+    quint64 m_totalResponsesSent = 0;       ///< 已发送的响应帧总数（含正常+异常）
+    quint64 m_totalSlaveErrors = 0;         ///< 从站内部错误次数（CRC失败/帧过短等）
+    quint64 m_totalExceptionResponses = 0;  ///< 异常响应发送总数（功能码最高位置1的响应）
+    QMap<int, int> m_fcStats;               ///< 各功能码调用次数
 };
 
 #endif // MODBUS_SLAVE_H

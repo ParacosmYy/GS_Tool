@@ -33,6 +33,7 @@ QStringList TcpServerConnection::connectedClients() const
 int TcpServerConnection::broadcastToClients(const QByteArray& data)
 {
     int count = 0;
+    int failedCount = 0;
     for (auto it = m_clients.begin(); it != m_clients.end(); ++it) {
         QTcpSocket* socket = it.value();
         if (socket && socket->state() == QAbstractSocket::ConnectedState) {
@@ -42,12 +43,15 @@ int TcpServerConnection::broadcastToClients(const QByteArray& data)
                 socket->flush();
                 emit bytesWritten(written);
                 count++;
+            } else {
+                ++failedCount;
             }
         }
     }
     if (count > 0) {
         ++m_broadcastCount;
     }
+    m_totalFailedSends += static_cast<quint64>(failedCount);  // 累计发送失败次数
     return count;
 }
 
@@ -103,4 +107,6 @@ void TcpServerConnection::resetStatistics()
     m_totalRejectedConnections = 0;
     m_peakConnectedClients = 0;
     m_totalErrors = 0;
+    m_totalUnicastSends = 0;
+    m_totalFailedSends = 0;
 }

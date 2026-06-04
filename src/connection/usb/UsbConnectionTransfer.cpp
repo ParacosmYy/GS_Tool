@@ -190,7 +190,7 @@ QByteArray UsbConnection::controlTransfer(quint8 requestType,
     }
 }
 
-/** @brief 重置所有统计计数器，包括分类型传输计数和内核驱动分离计数 */
+/** @brief 重置所有统计计数器，包括分类型传输计数、内核驱动分离计数、设备重置和打开次数 */
 void UsbConnection::resetStats()
 {
     m_totalTransfers = 0;
@@ -201,4 +201,6 @@ void UsbConnection::resetStats()
     m_interruptTransferCount = 0;
     m_controlTransferCount = 0;
     m_kernelDetachCount = 0;
+    m_totalDeviceResets = 0;
+    m_totalOpenAttempts = 0;
 }

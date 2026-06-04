@@ -1,6 +1,6 @@
 /**
  * @file TerminalWidget.h
- * @brief auto-draw terminal widget - QPainter high-performance rendering
+ * @brief 自绘制终端控件 — QPainter高性能渲染, 支持文本/HEX/混合/十进制四种显示模式
  */
 #ifndef TERMINALWIDGET_H
 #define TERMINALWIDGET_H
@@ -22,35 +22,19 @@ class QContextMenuEvent;
  *
  * 自绘引擎实现文本/HEX/混合/十进制四种显示模式，支持搜索高亮、F3导航、
  * 方向前缀、时间戳、自动滚屏等特性。分栏模式下通过DirectionFilter过滤RX/TX数据行。
- *
- * 协作关系:
- *   - TerminalModel: 数据源，通过 dataAppended 信号驱动增量渲染
- *   - TerminalSearchManager: 搜索匹配和高亮导航
- *   - TerminalSelectionManager: 文本选择和复制
- *   - TerminalContextMenuManager: 右键菜单（复制/粘贴/清屏/搜索/导出）
- *   - DirectionFilter: 分栏模式下的RX/TX方向过滤
- *   - TerminalLayoutManager: 管理终端的布局切换
- *
  * 所属层级: 表现层（只负责渲染，不包含业务逻辑）
  */
 class TerminalWidget : public QWidget {
     Q_OBJECT
 
 signals:
-    /** @brief 搜索匹配数变化 @param total 匹配总数 @param current 当前高亮索引 */
-    void searchMatchesChanged(int total, int current);
-    /** @brief 用户触发搜索(Ctrl+F) */
-    void searchRequested();
-    /** @brief 右键菜单粘贴请求 @param text 待粘贴文本 */
-    void pasteRequested(const QString& text);
-    /** @brief 用户请求清屏 */
-    void clearRequested();
+    void searchMatchesChanged(int total, int current); ///< 搜索匹配数变化 @param total 匹配总数 @param current 当前高亮索引
+    void searchRequested();                             ///< 用户触发搜索(Ctrl+F)
+    void pasteRequested(const QString& text);           ///< 右键菜单粘贴请求 @param text 待粘贴文本
+    void clearRequested();                              ///< 用户请求清屏
 
 public:
-    /**
-     * @brief 构造终端控件
-     * @param parent 父Widget指针
-     */
+    /** @brief 构造终端控件 @param parent 父Widget指针 */
     explicit TerminalWidget(QWidget* parent = nullptr);
 
     /**
@@ -68,52 +52,28 @@ public:
     /** @brief 清除方向过滤器，恢复显示所有数据 */
     void clearDirectionFilter();
 
-    /**
-     * @brief 设置显示模式
-     * @param mode 显示模式(Text/Hex/Mixed/Decimal)
-     */
+    /** @brief 设置显示模式 @param mode 显示模式(Text/Hex/Mixed/Decimal) */
     void setDisplayMode(DisplayMode mode);
 
-    /**
-     * @brief 获取当前显示模式
-     * @return 当前DisplayMode枚举值
-     */
+    /** @brief 获取当前显示模式 @return 当前DisplayMode枚举值 */
     DisplayMode displayMode() const;
 
-    /**
-     * @brief 设置是否显示时间戳
-     * @param show true=显示时间戳
-     */
+    /** @brief 设置是否显示时间戳 @param show true=显示时间戳 */
     void setShowTimestamp(bool show);
 
-    /**
-     * @brief 查询时间戳显示状态
-     * @return true=时间戳已启用
-     */
+    /** @brief 查询时间戳显示状态 @return true=时间戳已启用 */
     bool showTimestamp() const;
 
-    /**
-     * @brief 设置是否显示方向前缀(RX/TX)
-     * @param show true=显示方向前缀
-     */
+    /** @brief 设置是否显示方向前缀(RX/TX) @param show true=显示方向前缀 */
     void setShowDirectionPrefix(bool show);
 
-    /**
-     * @brief 查询方向前缀显示状态
-     * @return true=方向前缀已启用
-     */
+    /** @brief 查询方向前缀显示状态 @return true=方向前缀已启用 */
     bool showDirectionPrefix() const;
 
-    /**
-     * @brief 设置自动滚屏
-     * @param autoScroll true=新数据自动滚动到底部
-     */
+    /** @brief 设置自动滚屏 @param autoScroll true=新数据自动滚动到底部 */
     void setAutoScroll(bool autoScroll);
 
-    /**
-     * @brief 查询自动滚屏状态
-     * @return true=自动滚屏已启用
-     */
+    /** @brief 查询自动滚屏状态 @return true=自动滚屏已启用 */
     bool autoScroll() const;
 
     /** @brief 清空终端内容 */
@@ -166,32 +126,29 @@ public:
     /** @brief 全选终端内容 */
     void selectAll();
 
-    /**
-     * @brief 返回控件推荐尺寸
-     * @return 推荐的QSize
-     */
+    /** @brief 返回控件推荐尺寸 @return 推荐的QSize */
     QSize sizeHint() const override;
 
 protected:
-    void paintEvent(QPaintEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
-    void wheelEvent(QWheelEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
-    void keyPressEvent(QKeyEvent* event) override;
-    void contextMenuEvent(QContextMenuEvent* event) override;
+    void paintEvent(QPaintEvent* event) override;       ///< 重绘事件
+    void resizeEvent(QResizeEvent* event) override;     ///< 尺寸变化事件
+    void wheelEvent(QWheelEvent* event) override;       ///< 滚轮事件
+    void mousePressEvent(QMouseEvent* event) override;  ///< 鼠标按下事件
+    void mouseMoveEvent(QMouseEvent* event) override;   ///< 鼠标移动事件
+    void mouseReleaseEvent(QMouseEvent* event) override;///< 鼠标释放事件
+    void keyPressEvent(QKeyEvent* event) override;      ///< 键盘按下事件
+    void contextMenuEvent(QContextMenuEvent* event) override; ///< 右键菜单事件
 
 private slots:
-    void onDataAppended(int firstNewLine, int count);
-    void onDataCleared();
+    void onDataAppended(int firstNewLine, int count); ///< 数据追加处理 @param firstNewLine 首行索引 @param count 新增行数
+    void onDataCleared(); ///< 数据清除处理
 
 private:
-    void updateVisibleRange();
-    void scrollToMatch(int line);
-    void refreshSearchAfterCacheUpdate();
-    CachedLine formatToCache(const TerminalLine& line) const;
-    int paintLine(QPainter& painter, const CachedLine& cached, int y, int displayLine);
+    void updateVisibleRange(); ///< 更新可见行范围
+    void scrollToMatch(int line); ///< 滚动到匹配行 @param line 目标行号
+    void refreshSearchAfterCacheUpdate(); ///< 缓存更新后刷新搜索高亮
+    CachedLine formatToCache(const TerminalLine& line) const; ///< 格式化行到缓存 @param line 终端行 @return 缓存行
+    int paintLine(QPainter& painter, const CachedLine& cached, int y, int displayLine); ///< 绘制单行 @param painter 画布 @param cached 缓存行 @param y Y坐标 @param displayLine 显示行号 @return 占用像素高度
 
     TerminalModel* m_model = nullptr;
     DisplayMode m_displayMode = DisplayMode::Text;
@@ -225,20 +182,13 @@ private:
     quint64 m_totalMatchNavigations = 0;          ///< 总搜索匹配导航次数(F3/Shift+F3)
 
 public:
-    /** @brief 获取总渲染行数 @return 渲染行计数 */
-    quint64 totalLinesRendered() const { return m_totalLinesRendered; }
-    /** @brief 获取总按键次数 @return 按键计数 */
-    quint64 totalKeyPresses() const { return m_totalKeyPresses; }
-    /** @brief 获取总右键菜单操作次数 @return 菜单操作计数 */
-    quint64 totalContextMenuActions() const { return m_totalContextMenuActions; }
-    /** @brief 获取总清屏次数 @return 清屏计数 */
-    quint64 totalClears() const { return m_totalClears; }
-    /** @brief 获取总显示模式切换次数 @return 模式切换计数 */
-    quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; }
-    /** @brief 获取总搜索匹配导航次数 @return 导航计数 */
-    quint64 totalMatchNavigations() const { return m_totalMatchNavigations; }
-    /** @brief 重置终端统计计数器 */
-    void resetTerminalWidgetStatistics();
+    quint64 totalLinesRendered() const { return m_totalLinesRendered; }         ///< 获取总渲染行数
+    quint64 totalKeyPresses() const { return m_totalKeyPresses; }               ///< 获取总按键次数
+    quint64 totalContextMenuActions() const { return m_totalContextMenuActions; }///< 获取总右键菜单操作次数
+    quint64 totalClears() const { return m_totalClears; }                       ///< 获取总清屏次数
+    quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; }///< 获取总显示模式切换次数
+    quint64 totalMatchNavigations() const { return m_totalMatchNavigations; }   ///< 获取总搜索匹配导航次数
+    void resetTerminalWidgetStatistics(); ///< 重置终端统计计数器
 };
 
 #endif // TERMINALWIDGET_H

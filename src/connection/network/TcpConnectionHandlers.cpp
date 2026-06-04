@@ -69,6 +69,7 @@ void TcpConnection::onSocketReadyRead()
 void TcpConnection::onSocketError(QAbstractSocket::SocketError error)
 {
     ++m_errorCount;  // 网络错误计数
+    ++m_totalSocketErrors;  // Socket底层错误计数
     if (error == QAbstractSocket::HostNotFoundError) {
         ++m_totalDnsErrors;  // DNS解析失败计数
     }

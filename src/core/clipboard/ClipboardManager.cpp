@@ -85,6 +85,7 @@ QString ClipboardManager::bytesToBase64(const QByteArray &data) { return QString
 QByteArray ClipboardManager::base64ToBytes(const QString &base64) { return QByteArray::fromBase64(base64.toUtf8()); }
 /** @brief 文本转转义字符串(不可见字符转\xHH) @param text 原始文本 @return 转义后字符串 */
 QString ClipboardManager::textToEscape(const QString &text) {
+    ++m_totalEscapeConversions;
     QByteArray data = text.toUtf8();
     QStringList parts; parts.reserve(data.size());
     for (unsigned char byte : data) {
@@ -132,11 +133,16 @@ void ClipboardManager::resetStatistics() {
     m_totalCopyOps = 0; m_totalPasteOps = 0; m_totalConversions = 0;
     m_totalHexConversions = 0; m_totalBase64Conversions = 0;
     m_totalRestores = 0; m_totalHistoryClears = 0; m_totalBytesCopied = 0;
+    m_totalEscapeConversions = 0; m_totalHistoryDuplicates = 0;
 }
 
 /** @brief 添加条目到历史记录(去重，限制容量) @param entry 剪贴板条目 */
 void ClipboardManager::addHistoryEntry(const ClipboardEntry &entry) {
-    if (!m_history.isEmpty() && m_history.first().text == entry.text) { m_history.first().timestampMs = entry.timestampMs; return; }
+    if (!m_history.isEmpty() && m_history.first().text == entry.text) {
+        ++m_totalHistoryDuplicates;
+        m_history.first().timestampMs = entry.timestampMs;
+        return;
+    }
     m_history.prepend(entry);
     while (m_history.size() > m_maxHistorySize) m_history.removeLast();
     emit historyEntryAdded(entry);

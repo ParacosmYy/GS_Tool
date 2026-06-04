@@ -118,6 +118,12 @@ public:
     /** @brief 获取累计离开多播组次数 @return 多播组离开总次数 */
     quint64 totalMulticastLeaves() const { return m_totalMulticastLeaves; }
 
+    /** @brief 获取累计open()调用次数 @return 打开连接总次数 */
+    quint64 totalOpenAttempts() const { return m_totalOpenAttempts; }
+
+    /** @brief 获取累计write()调用次数 @return 写入调用总次数 */
+    quint64 totalWrites() const { return m_totalWrites; }
+
     /** @brief 加入多播组 @param groupAddr 多播组地址(如"239.0.0.1") @return true=加入成功 */
     bool joinMulticastGroup(const QString& groupAddr);
 
@@ -167,6 +173,8 @@ private:
     quint64 m_totalSocketErrors = 0;     ///< Socket级别错误次数
     quint64 m_totalMulticastJoins = 0;   ///< 累计加入多播组次数
     quint64 m_totalMulticastLeaves = 0;  ///< 累计离开多播组次数
+    quint64 m_totalOpenAttempts = 0;     ///< 累计open()调用次数
+    quint64 m_totalWrites = 0;           ///< 累计write()调用次数
 };
 
 #endif // UDPCONNECTION_H

@@ -94,6 +94,7 @@ bool TcpConnection::open()
         } else if (m_socket->state() != QAbstractSocket::UnconnectedState) {
             // 已有socket且非断开状态 — 视为重连尝试
             ++m_totalReconnectAttempts;
+            ++m_totalConnectionRetries;  // 累计连接重试次数
             m_isReconnectAttempt = true;  // 标记为重连，onSocketConnected中用于计数
             m_socket->abort();  // 中断当前连接，准备重连
         }

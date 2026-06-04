@@ -27,7 +27,7 @@ quint64 TcpConnection::totalBytesReceived() const { return m_totalBytesReceived;
 /** @brief 获取累计错误次数 @return 错误总次数 */
 quint64 TcpConnection::errorCount() const { return m_errorCount; }
 
-/** @brief 重置所有统计计数器(连接/断开/字节/错误/打开尝试/写入/重连/延迟/DNS/超时/KeepAlive)为零 */
+/** @brief 重置所有统计计数器(连接/断开/字节/错误/打开尝试/写入/重连/延迟/DNS/超时/KeepAlive/重试/Socket错误)为零 */
 void TcpConnection::resetStats()
 {
     m_totalConnections = 0;
@@ -43,6 +43,8 @@ void TcpConnection::resetStats()
     m_totalDnsErrors = 0;
     m_totalConnectionTimeouts = 0;
     m_totalKeepAliveProbes = 0;
+    m_totalConnectionRetries = 0;
+    m_totalSocketErrors = 0;
     m_lastLatencyMs = 0;
     m_maxLatencyMs = 0;
     m_latencySampleCount = 0;

@@ -45,6 +45,9 @@ void PortWatcher::onTimeout()
                 changed = true;
             }
         } else {
+            if (m_addedCandidateCount.contains(port)) {
+                ++m_totalDebounceSuppressions;
+            }
             m_addedCandidateCount.remove(port);
             m_pendingAddDevices.remove(port);
         }
@@ -66,6 +69,9 @@ void PortWatcher::onTimeout()
                 changed = true;
             }
         } else {
+            if (m_removedCandidateCount.contains(port)) {
+                ++m_totalDebounceSuppressions;
+            }
             m_removedCandidateCount.remove(port);
         }
     }

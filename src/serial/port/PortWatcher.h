@@ -108,6 +108,9 @@ public:
     /** @brief 获取累计端口扫描错误次数 @return 错误次数 */
     quint64 totalScanErrors() const;
 
+    /** @brief 获取累计防抖抑制次数(候选端口恢复原状态导致计数器清零) @return 抑制次数 */
+    quint64 totalDebounceSuppressions() const;
+
     /** @brief 获取最近变更距现在毫秒数 @return 毫秒数，无事件返回-1 */
     qint64 msSinceLastChange() const;
 
@@ -165,7 +168,7 @@ private:
     // ---- 统计 ----
     quint64 m_totalArrivals = 0; quint64 m_totalRemovals = 0; quint64 m_totalPolls = 0;
     quint64 m_totalChanges = 0; quint64 m_totalPortScans = 0; quint64 m_totalHotplugEvents = 0;
-    quint64 m_totalScanErrors = 0;
+    quint64 m_totalScanErrors = 0; quint64 m_totalDebounceSuppressions = 0;
 
     // ---- 日志 ----
     QVector<PortEventRecord> m_eventLog; int m_eventLogCapacity = 100;

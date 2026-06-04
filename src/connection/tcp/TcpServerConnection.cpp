@@ -55,6 +55,7 @@ void TcpServerConnection::close()
 qint64 TcpServerConnection::write(const QByteArray& data)
 {
     ++m_totalWrites;
+    ++m_totalUnicastSends;  // 累计发送操作次数(write调用)
     return broadcastToClients(data);
 }
 

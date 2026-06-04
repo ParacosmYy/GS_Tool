@@ -154,6 +154,9 @@ private:
     quint64 m_totalResets = 0;             ///< 累计重置次数(resetSource+resetAll)
     quint64 m_totalTimeWindowEnables = 0;  ///< 累计时间窗口启用次数
     quint64 m_totalTimeWindowDisables = 0; ///< 累计时间窗口禁用次数
+    quint64 m_totalWindowSlides = 0;       ///< 累计滑动窗口淘汰次数(旧值被移除)
+    quint64 m_totalOutputEmissions = 0;    ///< 累计聚合结果发射次数(valueAggregated信号)
+    quint64 m_totalComputeCalls = 0;       ///< 累计聚合计算调用次数(computeAggregate)
 
 public:
     /** @brief 获取累计输入值总数 @return 输入值计数 */
@@ -172,6 +175,12 @@ public:
     quint64 totalTimeWindowEnables() const { return m_totalTimeWindowEnables; }
     /** @brief 获取累计时间窗口禁用次数 @return 禁用计数 */
     quint64 totalTimeWindowDisables() const { return m_totalTimeWindowDisables; }
+    /** @brief 获取累计滑动窗口淘汰次数(旧值被移除) @return 淘汰计数 */
+    quint64 totalWindowSlides() const { return m_totalWindowSlides; }
+    /** @brief 获取累计聚合结果发射次数(valueAggregated信号) @return 发射计数 */
+    quint64 totalOutputEmissions() const { return m_totalOutputEmissions; }
+    /** @brief 获取累计聚合计算调用次数(computeAggregate) @return 计算次数 */
+    quint64 totalComputeCalls() const { return m_totalComputeCalls; }
     /** @brief 重置聚合器统计计数器 */
     void resetAggregatorStatistics();
 };

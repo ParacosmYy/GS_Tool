@@ -17,6 +17,7 @@
 
 /** @brief 对指定数据源执行滑动窗口聚合计算 @param source 数据源名称 */
 void DataAggregator::computeAggregate(const QString &source) {
+    ++m_totalComputeCalls;
     auto it = m_sources.find(source);
     if (it == m_sources.end() || it->values.isEmpty()) return;
     const auto &vals = it->values;

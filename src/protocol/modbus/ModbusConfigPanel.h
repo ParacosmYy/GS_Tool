@@ -21,6 +21,7 @@ class ModbusConfigPanel : public QWidget {
     Q_OBJECT
 
 public:
+    /** @brief 构造Modbus配置面板 @param parent 父控件 */
     explicit ModbusConfigPanel(QWidget* parent = nullptr);
 
     /**

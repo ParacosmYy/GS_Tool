@@ -15,7 +15,7 @@ quint64 SpiConnection::transferByMode(int mode) const
     return m_transferByMode[mode];
 }
 
-/** @brief 重置所有SPI统计计数器(传输次数/字节数/错误计数/传输错误/CS切换/模式统计) */
+/** @brief 重置所有SPI统计计数器(传输次数/字节数/错误计数/传输错误/CS切换/模式统计/模式变更/频率变更/打开次数) */
 void SpiConnection::resetStats()
 {
     m_totalTransfers = 0;
@@ -27,4 +27,7 @@ void SpiConnection::resetStats()
     for (int i = 0; i < 4; ++i) {
         m_transferByMode[i] = 0;
     }
+    m_totalModeChanges = 0;
+    m_totalFrequencyChanges = 0;
+    m_totalOpenAttempts = 0;
 }

@@ -40,6 +40,18 @@ quint64 ChartExporter::totalExportsCsv() const
     return m_totalExportsCsv;
 }
 
+/** @brief 获取累计JSON导出次数 @return JSON导出计数 */
+quint64 ChartExporter::totalExportsJson() const
+{
+    return m_totalExportsJson;
+}
+
+/** @brief 获取累计SVG导出次数 @return SVG导出计数 */
+quint64 ChartExporter::totalExportsSvg() const
+{
+    return m_totalExportsSvg;
+}
+
 /** @brief 获取累计PDF导出次数(预留) @return PDF导出计数 */
 quint64 ChartExporter::totalExportsPdf() const
 {
@@ -82,6 +94,8 @@ void ChartExporter::resetExportStatistics()
     m_totalExports = 0;
     m_totalExportsPng = 0;
     m_totalExportsCsv = 0;
+    m_totalExportsJson = 0;
+    m_totalExportsSvg = 0;
     m_totalExportsPdf = 0;
     m_totalChartImages = 0;
     m_totalCsvRows = 0;

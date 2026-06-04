@@ -22,6 +22,7 @@ QList<int> I2cConnection::scanBus()
         return found;
     }
 
+    ++m_totalBusScans;  // 累计总线扫描次数
     m_lastScanResults.clear();
 
     /// 逐地址执行ACK探测

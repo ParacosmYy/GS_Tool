@@ -26,7 +26,10 @@ QString DataPipeline::createPipeline(const QString &name) {
 
 /** @brief 移除指定管线及其所有阶段 @param name 管线名称 */
 void DataPipeline::removePipeline(const QString &name) {
-    m_pipelines.remove(name);
+    if (m_pipelines.contains(name)) {
+        ++m_totalPipelineRemovals;
+        m_pipelines.remove(name);
+    }
     emit pipelineRemoved(name);
 }
 
@@ -38,13 +41,16 @@ void DataPipeline::addStage(const QString &pipelineName, const QString &stageNam
     if (!m_pipelines.contains(pipelineName)) createPipeline(pipelineName);
     PipelineStage stage; stage.name = stageName; stage.transform = transform; stage.enabled = true;
     m_pipelines[pipelineName].append(stage);
+    ++m_totalStageAdds;
 }
 
 /** @brief 从指定管线中移除命名阶段 @param pipelineName 管线名称 @param stageName 阶段名称 */
 void DataPipeline::removeStage(const QString &pipelineName, const QString &stageName) {
     if (!m_pipelines.contains(pipelineName)) return;
     auto &stages = m_pipelines[pipelineName];
+    int before = stages.size();
     stages.removeIf([&stageName](const PipelineStage &s) { return s.name == stageName; });
+    if (stages.size() < before) ++m_totalStageRemoves;
 }
 
 /** @brief 设置指定管线中某个阶段的启用状态 @param pipelineName 管线名称 @param stageName 阶段名称 @param enabled true启用，false禁用 */
@@ -64,7 +70,7 @@ QStringList DataPipeline::stageNames(const QString &pipelineName) const {
 QByteArray DataPipeline::process(const QString &pipelineName, const QByteArray &input) {
     ++m_totalProcessed;
     m_totalBytesInput += input.size();
-    if (!m_pipelines.contains(pipelineName)) { m_totalBytesOutput += input.size(); return input; }
+    if (!m_pipelines.contains(pipelineName)) { ++m_totalBypassedProcess; m_totalBytesOutput += input.size(); return input; }
     QByteArray data = input;
     for (const auto &stage : m_pipelines[pipelineName]) {
         if (stage.enabled && stage.transform) { data = stage.transform(data); }
@@ -102,4 +108,8 @@ quint64 DataPipeline::totalBytesOutput() const { return m_totalBytesOutput; }
 quint64 DataPipeline::totalPipelinesCreated() const { return m_totalPipelinesCreated; }
 
 /** @brief 重置所有统计计数器 */
-void DataPipeline::resetStatistics() { m_totalProcessed = 0; m_totalBytesInput = 0; m_totalBytesOutput = 0; m_totalPipelinesCreated = 0; }
+void DataPipeline::resetStatistics() {
+    m_totalProcessed = 0; m_totalBytesInput = 0; m_totalBytesOutput = 0;
+    m_totalPipelinesCreated = 0; m_totalPipelineRemovals = 0;
+    m_totalStageAdds = 0; m_totalStageRemoves = 0; m_totalBypassedProcess = 0;
+}

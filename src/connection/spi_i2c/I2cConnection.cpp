@@ -63,6 +63,7 @@ void I2cConnection::setTransport(IConnection* serial)
 /** @brief 打开I2C连接，通过串口桥接器发送配置命令 @return true=成功，false=通道未设置或串口打开失败 */
 bool I2cConnection::open()
 {
+    ++m_totalOpenAttempts;  // 累计open()调用次数
     if (!m_serial) {
         emit errorOccurred(tr("未设置串口传输通道"));
         ++m_errorCount;

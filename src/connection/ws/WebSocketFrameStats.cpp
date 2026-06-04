@@ -87,6 +87,9 @@ void WebSocketConnection::resetStats()
     m_totalHandshakeFailures = 0;
     m_totalCloseFramesSent = 0;
     m_totalCloseFramesReceived = 0;
+    m_totalReconnects = 0;
+    m_totalTextFramesReceived = 0;
+    m_totalBinaryFramesReceived = 0;
     m_lastLatencyMs = 0;
     m_maxLatencyMs = 0;
     m_latencySampleCount = 0;

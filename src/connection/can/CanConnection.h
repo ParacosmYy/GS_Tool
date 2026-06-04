@@ -102,12 +102,16 @@ public:
     void resetStats();
 
 signals:
-    void frameReceived(int id, const QByteArray& data, bool extended, bool rtr); ///< 收到CAN帧
-    void fdFrameReceived(int id, const QByteArray& data, bool extended); ///< 收到CAN-FD帧
-    void dbcLoaded(bool success, int messageCount); ///< DBC加载完成
+    /** @brief 收到CAN标准/扩展帧 @param id 帧ID @param data 帧数据 @param extended true=扩展帧 @param rtr true=远程帧 */
+    void frameReceived(int id, const QByteArray& data, bool extended, bool rtr);
+    /** @brief 收到CAN-FD帧 @param id 帧ID @param data 帧数据 @param extended true=扩展帧 */
+    void fdFrameReceived(int id, const QByteArray& data, bool extended);
+    /** @brief DBC数据库文件加载完成 @param success true=加载成功 @param messageCount 解析出的消息数量 */
+    void dbcLoaded(bool success, int messageCount);
 
 private slots:
-    void onSerialDataReceived(const QByteArray& data); ///< 底层串口数据接收槽函数
+    /** @brief 底层串口数据就绪回调，触发接收缓冲区解析 @param data 从串口读取的原始数据 */
+    void onSerialDataReceived(const QByteArray& data);
 
 private:
     /** @brief 向适配器发送LAWICEL原始命令 @param cmd LAWICEL命令字符串 @return 实际写入字节数 */

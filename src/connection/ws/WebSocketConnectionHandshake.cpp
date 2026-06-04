@@ -17,6 +17,7 @@ bool WebSocketConnection::connectToUrl(const QString& url)
 {
     // 无论当前状态，先清理旧连接
     if (m_socket) {
+        ++m_totalReconnects;  // 非首次连接视为重连
         close();
     }
 

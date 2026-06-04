@@ -116,6 +116,15 @@ public:
     /** @brief 获取累计跳转事件总数 */
     quint64 totalJumpEvents() const;
 
+    /** @brief 获取累计范围查询次数 @return findInRange调用次数 */
+    quint64 totalRangeQueries() const { return m_totalRangeQueries; }
+
+    /** @brief 获取累计最近标记查询次数 @return findNearest调用次数 */
+    quint64 totalNearestQueries() const { return m_totalNearestQueries; }
+
+    /** @brief 获取累计清除操作次数 @return clear()调用次数 */
+    quint64 totalClearOps() const { return m_totalClearOps; }
+
     /** @brief 获取当前不同标签类型的数量 */
     int markerTypesCount() const;
 
@@ -150,6 +159,9 @@ private:
     quint64 m_totalMarkersAdded = 0;    ///< 累计添加标记数
     quint64 m_totalMarkersRemoved = 0;  ///< 累计移除标记数
     quint64 m_totalJumpEvents = 0;      ///< 累计跳转事件数
+    mutable quint64 m_totalRangeQueries = 0;    ///< 累计范围查询次数
+    mutable quint64 m_totalNearestQueries = 0;  ///< 累计最近标记查询次数
+    quint64 m_totalClearOps = 0;                ///< 累计清除操作次数
 };
 
 #endif // RECORDING_MARKER_H

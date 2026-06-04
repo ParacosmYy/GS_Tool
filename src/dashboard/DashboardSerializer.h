@@ -127,49 +127,29 @@ public:
     quint64 deserializationErrors() const;
 
     // ---- 序列化生命周期统计 ----
-
-    /** @brief 获取累计序列化操作次数(toJson/saveToFile/saveToProfile成功) @return 序列化总数 */
-    quint64 totalSerializations() const;
-
-    /** @brief 获取累计反序列化操作次数(loadFromJson/loadFromFile/loadFromProfile成功) @return 反序列化总数 */
-    quint64 totalDeserializations() const;
-
-    /** @brief 获取累计序列化错误次数(所有保存操作失败) @return 错误次数 */
-    quint64 totalSerializationErrors() const;
-
-    /** @brief 获取累计写入文件字节数(file.write实际写入字节数) @return 字节总数 */
-    quint64 totalBytesWritten() const;
-
-    /** @brief 获取累计读取文件字节数(file.readAll读取字节数) @return 字节总数 */
-    quint64 totalBytesRead() const;
+    quint64 totalSerializations() const;   ///< 获取累计序列化操作次数
+    quint64 totalDeserializations() const; ///< 获取累计反序列化操作次数
+    quint64 totalSerializationErrors() const; ///< 获取累计序列化错误次数
+    quint64 totalBytesWritten() const;     ///< 获取累计写入文件字节数
+    quint64 totalBytesRead() const;        ///< 获取累计读取文件字节数
 
     /** @brief 重置所有统计计数器 */
     void resetSerializerStatistics();
 
 signals:
-    /** @brief 布局保存到文件完成 @param filePath 保存路径 */
-    void layoutSaved(const QString& filePath);
-    /** @brief 布局从文件加载完成 @param name 布局名称 @paramItemCount 加载的面板数量 */
-    void layoutLoaded(const QString& name, int itemCount);
-    /** @brief 布局验证失败 @param errors 错误信息列表 */
-    void validationFailed(const QStringList& errors);
-    /** @brief 配置文件保存完成 @param profileName 配置名称 */
-    void profileSaved(const QString& profileName);
-    /** @brief 配置文件加载完成 @param profileName 配置名称 @param itemCount 面板数量 */
-    void profileLoaded(const QString& profileName, int itemCount);
-    /** @brief 配置文件删除完成 @param profileName 配置名称 */
-    void profileDeleted(const QString& profileName);
-    /** @brief 当前激活配置变更 @param profileName 新配置名称 */
-    void currentProfileChanged(const QString& profileName);
+    void layoutSaved(const QString& filePath);    ///< 布局保存到文件完成 @param filePath 保存路径
+    void layoutLoaded(const QString& name, int itemCount); ///< 布局加载完成 @param name 名称 @param itemCount 面板数
+    void validationFailed(const QStringList& errors); ///< 布局验证失败 @param errors 错误列表
+    void profileSaved(const QString& profileName); ///< 配置文件保存完成 @param profileName 名称
+    void profileLoaded(const QString& profileName, int itemCount); ///< 配置文件加载完成
+    void profileDeleted(const QString& profileName); ///< 配置文件删除完成
+    void currentProfileChanged(const QString& profileName); ///< 当前配置变更
 
 private:
     QString m_lastError;
     static constexpr int kVersion = 1;
-
-    /** @brief 确保配置列表包含指定名称 @param profileName 配置名称 */
-    void ensureProfileListContains(const QString& profileName);
-    /** @brief 从配置列表中移除指定名称 @param profileName 配置名称 */
-    void removeProfileListEntry(const QString& profileName);
+    void ensureProfileListContains(const QString& profileName); ///< 确保配置列表包含指定名称
+    void removeProfileListEntry(const QString& profileName);   ///< 从配置列表中移除指定名称
 
     // ---- 统计计数器 ----
     mutable quint64 m_totalSaves = 0;
