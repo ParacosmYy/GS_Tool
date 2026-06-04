@@ -579,6 +579,8 @@ set(SOURCES
     src/utils/checksum/ChecksumPanel.cpp
     src/utils/checksum/ChecksumPanelAlgo.cpp
     src/utils/checksum/ChecksumPanelSlots.cpp
+    src/utils/checksum/DataChecksumVerifier.cpp
+    src/utils/checksum/DataChecksumVerifierStats.cpp
 
     # ── F23: ASCII/表格转换器 ──
     src/utils/converter/DataConverter.cpp
@@ -942,6 +944,7 @@ set(HEADERS
     # ── F22: 校验和计算器 ──
     src/utils/checksum/ChecksumCalculator.h
     src/utils/checksum/ChecksumPanel.h
+    src/utils/checksum/DataChecksumVerifier.h
 
     # ── F23: ASCII/表格转换器 ──
     src/utils/converter/DataConverter.h
