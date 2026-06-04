@@ -1,19 +1,17 @@
 /**
  * @file FrameParserStateHandlers.cpp
- * @brief 帧解析状态机 — 状态分发器与各状态处理方法
+ * @brief 帧解析状态机 — 状态分发器、帧头匹配与长度接收
  *
  * 从 FrameParser.cpp 中拆分出的状态机核心逻辑，职责:
  *   1. processByte           — 逐字节状态分发器
  *   2. handleHeaderMatching  — 帧头匹配阶段（含回溯重试）
  *   3. handleLengthReceiving — 长度字段接收与解析
- *   4. handlePayloadReceiving — 载荷接收（长度/帧尾/校验三条路径）
- *   5. processCompletePayload — 长度字段模式下的帧完成处理
- *   6. handleCrcValidation   — CRC校验验证
- *   7. handleChecksumVerifying — 校验和验证阶段
- *   8. handleFooterMatching  — 帧尾匹配阶段
  *
  * 这些方法都是 FrameParser 类的 private 方法，
  * 构成状态机的完整状态流转逻辑，与构造/配置/超时机制解耦。
+ *
+ * 载荷接收阶段(handlePayloadReceiving)见 FrameParserPayload.cpp
+ * 校验验证与帧尾匹配见 FrameParserStats.cpp
  */
 
 #include "protocol/parser/FrameParser.h"
@@ -170,89 +168,5 @@ void FrameParser::handleLengthReceiving(unsigned char byte)
     m_state = State::PayloadReceiving;
 }
 
-/** @brief 状态机:载荷接收阶段(逐字节填充payload缓冲区) @param byte 输入字节 */
-void FrameParser::handlePayloadReceiving(unsigned char byte)
-{
-    m_buffer.append(byte);
-    int effectiveMax = qMin(m_maxFrameLength, kMaxFrameSize);
-
-    // 路径A: 有长度字段 -> 精确总长接收
-    if (m_def.lengthFieldOffset >= 0) {
-        int expectedTotal = m_def.lengthFieldOffset + m_def.lengthFieldSize
-                            + m_expectedPayload + m_def.checksumSize
-                            + m_def.lengthAdjust;
-
-        if (expectedTotal > effectiveMax) {
-            m_errorCount++;
-            ++m_totalParseErrors;  // 期望总长超出限制
-            emit frameError(
-                tr("期望总帧长度 (%1) 超过最大值 (%2)")
-                    .arg(expectedTotal).arg(effectiveMax),
-                m_buffer);
-            resetIntermediateState();
-            return;
-        }
-
-        if (expectedTotal > 0 && m_buffer.size() >= expectedTotal) {
-            processCompletePayload();
-        }
-        return;
-    }
-
-    // 路径B: 无长度字段，有帧尾 -> 搜索帧尾
-    if (!m_def.footer.isEmpty()) {
-        if (m_buffer.size() > effectiveMax) {
-            m_errorCount++;
-            ++m_totalOverflows;
-            ++m_totalParseErrors;  // 帧尾搜索溢出
-            emit frameError(
-                tr("帧缓冲区 (%1) 超过最大值 (%2)，搜索帧尾时溢出")
-                    .arg(m_buffer.size()).arg(effectiveMax),
-                m_buffer);
-            resetIntermediateState();
-            return;
-        }
-
-        if (m_buffer.size() >= m_def.footer.size()) {
-            int footerStart = m_buffer.size() - m_def.footer.size();
-            bool footerMatch = true;
-            for (int i = 0; i < m_def.footer.size(); ++i) {
-                if (static_cast<unsigned char>(m_buffer.at(footerStart + i)) !=
-                    static_cast<unsigned char>(m_def.footer.at(i))) {
-                    footerMatch = false;
-                    break;
-                }
-            }
-            if (footerMatch) {
-                if (m_def.checksumType != ChecksumType::None && m_def.checksumOffset >= 0) {
-                    m_state = State::ChecksumVerifying;
-                } else {
-                    completeFrame();
-                }
-            }
-        }
-        return;
-    }
-
-    // 路径C: 最简帧(无长度无帧尾) -> 依赖校验偏移
-    if (m_def.checksumOffset >= 0) {
-        if (m_buffer.size() >= m_def.checksumOffset + m_def.checksumSize) {
-            m_state = State::ChecksumVerifying;
-        }
-        return;  // 有校验的帧走校验路径，不进入header-only逻辑
-    }
-
-    // 路径D: 纯header帧 — 检测下一个帧头出现作为当前帧结束标记
-    if (m_def.header.size() > 0 && m_buffer.size() > static_cast<int>(m_def.header.size())
-        && byte == static_cast<unsigned char>(m_def.header.at(0))) {
-        m_buffer.chop(1);  // 回退属于下一帧的字节
-        completeFrame();
-        m_buffer.append(static_cast<char>(byte));
-        m_headerMatchPos = 1;
-        m_state = State::HeaderMatching;
-        if (!m_frameTimer.isValid() && m_frameTimeoutMs > 0) m_frameTimer.start();
-    }
-}
-
-// ── 校验验证与帧尾匹配方法已拆分至 FrameParserStats.cpp ──
-// processCompletePayload / handleCrcValidation / handleChecksumVerifying / handleFooterMatching
+// ── 载荷接收阶段(handlePayloadReceiving)见 FrameParserPayload.cpp ──
+// ── 校验验证与帧尾匹配见 FrameParserStats.cpp ──

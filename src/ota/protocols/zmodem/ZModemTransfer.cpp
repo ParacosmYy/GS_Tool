@@ -122,6 +122,7 @@ void ZModemTransfer::sendCancelBytes()
 /** @brief 超时处理，根据当前状态重发对应帧(ZRQINIT/ZFILE/ZDATA/ZEOF/ZFIN) */
 void ZModemTransfer::handleTimeout()
 {
+    ++m_totalTimeouts;  ///< 统计: 超时事件
     QString curState = stateToString(m_zmodemState);
     switch (m_zmodemState) {
     case State::WaitingRinit:
@@ -228,4 +229,5 @@ void ZModemTransfer::resetZmodemStatistics()
     m_totalRetries = 0;
     m_totalCrcErrors = 0;
     m_errorCount = 0;
+    m_totalTimeouts = 0;
 }

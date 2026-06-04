@@ -59,6 +59,12 @@ quint64 OtaManager::totalBytesTransferred() const
     return m_totalBytesTransferred;
 }
 
+/** @brief 获取累计CRC校验验证次数 @return 校验次数 */
+quint64 OtaManager::totalCrcChecks() const
+{
+    return m_totalCrcChecks;
+}
+
 /**
  * @brief 计算历史平均传输速率
  * @return 平均速率(字节/秒)，无历史记录时返回0
@@ -87,5 +93,6 @@ void OtaManager::resetTransferStatistics()
     m_successfulTransfers = 0;
     m_failedTransfers = 0;
     m_totalBytesTransferred = 0;
+    m_totalCrcChecks = 0;
     m_speedHistory.clear();
 }

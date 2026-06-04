@@ -93,6 +93,8 @@ OtaManager::VerifyResult OtaManager::verifyChecksum(const QString& filePath,
                                                      const QString& expectedChecksum,
                                                      QString& outError)
 {
+    ++m_totalCrcChecks;  ///< 统计: CRC校验验证调用
+
     // 检查文件是否存在
     QFileInfo info(filePath);
     if (!info.exists()) {

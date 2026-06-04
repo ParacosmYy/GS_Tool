@@ -116,6 +116,7 @@ void WebSocketConnection::updateState(ConnectionState newState)
 /** @brief 发送HTTP Upgrade握手请求 */
 void WebSocketConnection::sendHandshake()
 {
+    ++m_totalHandshakeAttempts;  ///< 累计握手尝试次数
     QString req = QString("GET %1 HTTP/1.1\r\n"
                           "Host: %2\r\n"
                           "Upgrade: websocket\r\n"
@@ -142,6 +143,7 @@ bool WebSocketConnection::parseHandshakeResponse()
 
     if (!header.contains("101")) {
         ++m_errorCount;
+        ++m_totalHandshakeFailures;  ///< 握手失败(非101响应)计数
         emit errorOccurred(tr("WebSocket握手失败: %1").arg(header.left(64)));
         updateState(ConnectionState::Error);
         return false;

@@ -56,6 +56,7 @@ void WebSocketConnection::close()
     }
     if (m_socket && m_handshakeDone) {
         // 发送close帧
+        ++m_totalCloseFramesSent;  ///< 累计发送close帧次数
         m_socket->write(buildFrame(0x08, QByteArray()));
         m_socket->waitForBytesWritten(500);
     }

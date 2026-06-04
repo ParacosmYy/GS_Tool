@@ -42,6 +42,8 @@ public:
     quint64 totalTransfersCompleted() const { return m_totalTransfersCompleted; } ///< 传输完成计数
     quint64 totalTransfersFailed() const { return m_totalTransfersFailed; }     ///< 传输失败计数
     quint64 totalBytesTransferred() const { return m_totalBytesTransferred; }   ///< 累计字节
+    quint64 totalBrowseClicks() const { return m_totalBrowseClicks; }           ///< 浏览按钮点击计数
+    quint64 totalCancelOps() const { return m_totalCancelOps; }                 ///< 取消操作计数
     void resetOtaWidgetStatistics(); ///< 重置面板统计(不影响历史记录)
 
 signals:
@@ -127,6 +129,8 @@ private:
     quint64 m_totalTransfersCompleted = 0;  ///< 完成总次数
     quint64 m_totalTransfersFailed = 0;     ///< 失败总次数
     quint64 m_totalBytesTransferred = 0;    ///< 累计字节数
+    quint64 m_totalBrowseClicks = 0;        ///< 浏览按钮点击总次数
+    quint64 m_totalCancelOps = 0;           ///< 取消操作总次数
 };
 
 #endif // OTAWIDGET_H

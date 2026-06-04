@@ -234,11 +234,13 @@ void SerialConfigPanel::updateConnectButtonState()
 
 // buildPortTooltip见 SerialConfigPanelConfig.cpp
 
-/** @brief 重置所有操作统计计数器(配置变更/端口切换/刷新/连接尝试归零) */
+/** @brief 重置所有操作统计计数器(配置变更/波特率变更/端口切换/流控切换/刷新/连接尝试归零) */
 void SerialConfigPanel::resetStats()
 {
     m_totalConfigChanges = 0;
+    m_totalBaudChanges = 0;
     m_totalPortSwitches = 0;
+    m_totalFlowControlToggles = 0;
     m_totalRefreshPorts = 0;
     m_totalConnectAttempts = 0;
 }

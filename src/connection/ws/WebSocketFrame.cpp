@@ -122,6 +122,7 @@ void WebSocketConnection::parseFrames()
             emit dataReceived(payload);
             break;
         case 0x08: // close帧
+            ++m_totalCloseFramesReceived;  ///< 累计接收close帧次数
             close();
             return;
         case 0x09: // ping → pong

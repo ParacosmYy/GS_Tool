@@ -132,6 +132,7 @@ private:
     quint64 m_totalRetries = 0;        ///< 重传总次数
     quint64 m_totalCrcErrors = 0;      ///< CRC校验错误总次数
     quint64 m_errorCount = 0;          ///< 协议错误总次数
+    quint64 m_totalTimeouts = 0;       ///< 累计超时事件次数
 
 public:
     /** @brief 获取已发送数据块总数 @return 数据块计数 */
@@ -142,6 +143,8 @@ public:
     quint64 totalCrcErrors() const { return m_totalCrcErrors; }
     /** @brief 获取协议错误总次数 @return 错误计数 */
     quint64 errorCount() const { return m_errorCount; }
+    /** @brief 获取累计超时事件次数 @return 超时计数 */
+    quint64 totalTimeouts() const { return m_totalTimeouts; }
     /** @brief 重置ZModem统计计数器(不影响传输状态) */
     void resetZmodemStatistics();
 };

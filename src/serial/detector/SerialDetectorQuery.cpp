@@ -73,4 +73,5 @@ void SerialDetector::resetStatistics()
     m_totalInsertions = 0;
     m_totalRemovals = 0;
     m_totalVidLookups = 0;
+    s_totalChipIdentifications = 0;
 }

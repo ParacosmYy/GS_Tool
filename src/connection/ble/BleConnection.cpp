@@ -196,5 +196,6 @@ void BleConnection::resetStats()
     m_totalCharacteristicReads = 0;
     m_totalNotifications = 0;
     m_totalBytesWritten = 0;
+    m_totalBytesRead = 0;
     m_errorCount = 0;
 }

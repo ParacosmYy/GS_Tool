@@ -48,6 +48,10 @@ public:
     quint64 totalPingFrames() const;                            ///< 已发送ping帧总数
     quint64 totalPongFrames() const;                            ///< 已接收pong帧总数
     quint64 totalFragmentedMessages() const;                    ///< 已接收分片消息总数
+    quint64 totalHandshakeAttempts() const { return m_totalHandshakeAttempts; } ///< 累计握手尝试次数
+    quint64 totalHandshakeFailures() const { return m_totalHandshakeFailures; } ///< 累计握手失败次数
+    quint64 totalCloseFramesSent() const { return m_totalCloseFramesSent; }     ///< 累计发送close帧次数
+    quint64 totalCloseFramesReceived() const { return m_totalCloseFramesReceived; } ///< 累计接收close帧次数
     quint64 pingPongCount() const;                              ///< ping/pong交互总次数
     double averageLatencyMs() const;                            ///< ping/pong平均延迟(ms)
     qint64 maxLatencyMs() const;                                ///< ping/pong最大延迟(ms)
@@ -100,6 +104,10 @@ private:
     quint64 m_totalTextFrames = 0; quint64 m_totalBinaryFrames = 0;
     quint64 m_totalPingFrames = 0; quint64 m_totalPongFrames = 0;
     quint64 m_totalFragmentedMessages = 0;   ///< 已接收分片消息(continuation帧)总数
+    quint64 m_totalHandshakeAttempts = 0;   ///< 累计HTTP Upgrade握手尝试次数
+    quint64 m_totalHandshakeFailures = 0;   ///< 累计握手失败次数(非101响应)
+    quint64 m_totalCloseFramesSent = 0;     ///< 累计发送close帧(0x08)次数
+    quint64 m_totalCloseFramesReceived = 0; ///< 累计接收close帧(0x08)次数
 };
 
 #endif // WEBSOCKETCONNECTION_H

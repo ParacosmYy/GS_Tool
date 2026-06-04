@@ -1,8 +1,8 @@
 /**
  * @file ModbusSlaveResponse.cpp
- * @brief Modbus从站 — 响应构建与统计查询方法
+ * @brief Modbus从站 — 响应构建方法
  *
- * 从 ModbusSlave.cpp 中拆分出的响应构造与统计功能，职责:
+ * 从 ModbusSlave.cpp 中拆分出的响应构造功能，职责:
  *   1. buildReadRegistersResponse        — FC03/FC04 读寄存器响应
  *   2. buildReadCoilsResponse            — FC01/FC02 读线圈响应
  *   3. buildWriteSingleCoilResponse      — FC05 写单线圈响应
@@ -11,10 +11,8 @@
  *   6. buildWriteMultipleRegistersResponse — FC16 写多寄存器响应
  *   7. buildExceptionResponse            — 异常响应构造
  *   8. calculateCrc16                    — CRC16校验委托
- *   9. 统计查询方法与resetStatistics
  *
- * 这些方法都是 ModbusSlave 类的方法，
- * 负责根据功能码构造对应响应帧，以及提供运行时统计查询。
+ * 统计查询方法已拆分至 ModbusSlaveStats.cpp
  */
 
 #include "protocol/modbus/ModbusSlave.h"
@@ -194,60 +192,4 @@ quint16 ModbusSlave::calculateCrc16(const QByteArray& data) const {
     return crc16(data);
 }
 
-// ============================================================================
-// 统计查询方法
-// ============================================================================
-
-/** @brief 获取已处理请求总数 @return 请求数 */
-quint64 ModbusSlave::requestCount() const
-{
-    return m_requestCount;
-}
-
-/** @brief 获取异常响应计数 @return 异常数 */
-quint64 ModbusSlave::exceptionCount() const
-{
-    return m_exceptionCount;
-}
-
-/** @brief 获取已成功处理的请求总数 @return 已处理请求数 */
-quint64 ModbusSlave::totalRequestsHandled() const
-{
-    return m_totalRequestsHandled;
-}
-
-/** @brief 获取已发送的响应帧总数 @return 响应发送总数 */
-quint64 ModbusSlave::totalResponsesSent() const
-{
-    return m_totalResponsesSent;
-}
-
-/** @brief 获取从站内部错误次数 @return 内部错误计数 */
-quint64 ModbusSlave::totalSlaveErrors() const
-{
-    return m_totalSlaveErrors;
-}
-
-/** @brief 获取异常响应发送总数 @return 异常响应计数 */
-quint64 ModbusSlave::totalExceptionResponses() const
-{
-    return m_totalExceptionResponses;
-}
-
-/** @brief 获取各功能码调用次数统计 @return 功能码→调用次数映射 */
-QMap<int, int> ModbusSlave::functionCodeStats() const
-{
-    return m_fcStats;
-}
-
-/** @brief 重置所有统计计数器(请求数/异常数/功能码统计/已处理/已发送/内部错误/异常响应) */
-void ModbusSlave::resetStatistics()
-{
-    m_requestCount = 0;
-    m_exceptionCount = 0;
-    m_totalRequestsHandled = 0;
-    m_totalResponsesSent = 0;
-    m_totalSlaveErrors = 0;
-    m_totalExceptionResponses = 0;
-    m_fcStats.clear();
-}
+// ---- 统计查询方法见 ModbusSlaveStats.cpp ----

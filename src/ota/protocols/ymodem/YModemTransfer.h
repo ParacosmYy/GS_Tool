@@ -22,6 +22,8 @@ public:
     quint64 totalBlocksSent() const;         ///< 已发送数据块总数(Block0+数据块)
     quint64 totalRetries() const;            ///< 传输重试总次数
     quint64 totalErrorCount() const;         ///< 传输错误总次数(CAN/写入失败)
+    quint64 totalTimeouts() const { return m_totalTimeouts; }   ///< 累计超时事件次数
+    quint64 totalCancels() const { return m_totalCancels; }     ///< 累计接收方取消次数(CAN)
     void resetYmodemStatistics();            ///< 重置统计计数器
 
 signals:
@@ -79,6 +81,8 @@ private:
     quint64 m_totalBlocksSent = 0;    ///< 已发送数据块总数(Block0+数据块)
     quint64 m_totalRetries = 0;       ///< 传输重试总次数(超时/NAK触发)
     quint64 m_totalErrorCount = 0;    ///< 传输错误总次数(CAN/写入失败)
+    quint64 m_totalTimeouts = 0;      ///< 累计超时事件次数
+    quint64 m_totalCancels = 0;       ///< 累计接收方取消次数(CAN)
 };
 
 #endif // YMODEMTRANSFER_H

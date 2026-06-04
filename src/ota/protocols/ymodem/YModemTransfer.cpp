@@ -96,6 +96,8 @@ void YModemTransfer::sendCancelBytes()
 /** @brief 超时处理，根据当前状态重发数据，每个阶段独立重试最多10次 */
 void YModemTransfer::handleTimeout()
 {
+    ++m_totalTimeouts;  ///< 统计: 超时事件
+
     // 超时重发当前状态，每个阶段独立重试计数(最多10次)
     switch (m_ymodemState) {
     case State::WaitingStart:

@@ -81,6 +81,7 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
         m_timeoutTimer->stop();
         m_blockRetryCount++;
         ++m_totalRetries;
+        ++m_totalCrcErrors;  ///< 统计: CRC校验被拒
         if (m_blockRetryCount > kMaxBlockRetries) {
             sendCancelBytes();
             m_xmodemState = State::Error;
@@ -148,6 +149,7 @@ void XModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
 void XModemTransfer::handleTimeout()
 {
     ++m_totalRetries;
+    ++m_totalTimeouts;  ///< 统计: 超时事件
     if (m_xmodemState == State::SendingBlock) {
         m_blockRetryCount++;
         if (m_blockRetryCount > kMaxBlockRetries) {

@@ -83,6 +83,10 @@ void WebSocketConnection::resetStats()
     m_totalPingFrames = 0;
     m_totalPongFrames = 0;
     m_totalFragmentedMessages = 0;
+    m_totalHandshakeAttempts = 0;
+    m_totalHandshakeFailures = 0;
+    m_totalCloseFramesSent = 0;
+    m_totalCloseFramesReceived = 0;
     m_lastLatencyMs = 0;
     m_maxLatencyMs = 0;
     m_latencySampleCount = 0;

@@ -46,7 +46,9 @@ public:
 
     // ---- Operation statistics ----
     quint64 totalConfigChanges() const { return m_totalConfigChanges; } ///< 累计配置变更次数
+    quint64 totalBaudChanges() const { return m_totalBaudChanges; }     ///< 累计波特率变更次数
     quint64 totalPortSwitches() const { return m_totalPortSwitches; }   ///< 累计端口切换次数
+    quint64 totalFlowControlToggles() const { return m_totalFlowControlToggles; } ///< 累计流控切换次数
     quint64 totalRefreshPorts() const { return m_totalRefreshPorts; }   ///< 累计端口刷新次数
     quint64 totalConnectAttempts() const { return m_totalConnectAttempts; } ///< 累计连接尝试次数
     void resetStats();                        ///< 重置所有操作统计计数器
@@ -108,10 +110,12 @@ private:
     bool m_rtsState = true;         ///< RTS信号状态(true=HIGH, 默认HIGH)
 
     // ---- 操作统计计数器 ----
-    quint64 m_totalConfigChanges = 0;  ///< 累计配置变更次数(波特率/数据位/校验/停止位/流控)
-    quint64 m_totalPortSwitches = 0;    ///< 累计端口切换次数
-    quint64 m_totalRefreshPorts = 0;    ///< 累计端口刷新次数
-    quint64 m_totalConnectAttempts = 0; ///< 累计连接尝试次数
+    quint64 m_totalConfigChanges = 0;       ///< 累计配置变更次数(波特率/数据位/校验/停止位/流控)
+    quint64 m_totalBaudChanges = 0;         ///< 累计波特率变更次数
+    quint64 m_totalPortSwitches = 0;        ///< 累计端口切换次数
+    quint64 m_totalFlowControlToggles = 0;  ///< 累计流控模式切换次数
+    quint64 m_totalRefreshPorts = 0;        ///< 累计端口刷新次数
+    quint64 m_totalConnectAttempts = 0;     ///< 累计连接尝试次数
 
     // ---- 呼吸动画 ----
     QAbstractAnimation* m_breathAnim = nullptr;  ///< 连接中状态的呼吸动画(0.3↔1.0循环)

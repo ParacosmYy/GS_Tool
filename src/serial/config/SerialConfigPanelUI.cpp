@@ -1,28 +1,25 @@
 /**
  * @file SerialConfigPanelUI.cpp
- * @brief 串口配置面板UI构建方法 - 端口选择、参数配置、控制信号和连接按钮的布局创建
+ * @brief 串口配置面板UI构建方法 - 端口选择、参数配置、连接按钮的布局创建
  *
  * 从 SerialConfigPanel.cpp 拆分而来，包含所有UI构建相关方法:
  *   - setupUI(): 主布局入口
  *   - createPortGroup(): 端口选择区域
  *   - createParamGroup(): 参数配置区域(波特率/数据位/校验位/停止位/流控)
  *   - setupSignalAndConnectControls(): 控制信号+驱动检测+连接按钮区域
- *   - createControlSignalsGroup(): DTR/RTS/Break控制信号分组
- *   - createAutoReconnectLayout(): 自动重连控件布局
+ *
+ * 控制信号按钮和自动重连布局已拆分至 SerialConfigPanelUISignals.cpp
  */
 
 #include "serial/config/SerialConfigPanel.h"
 #include "shared/ConnectionConstants.h"
 #include "shared/LayoutConstants.h"
-#include "shared/TimerConstants.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QIntValidator>
-#include <QCheckBox>
-#include <QSpinBox>
 #include <QLineEdit>
 
 #include "core/widgets/AnimatedButton.h"
@@ -85,7 +82,8 @@ QGroupBox* SerialConfigPanel::createParamGroup()
             bool ok = false;
             qint32 baud = text.toInt(&ok);
             if (ok && baud > 0) {
-                m_totalConfigChanges++;  // Statistics: runtime baud rate change
+                ++m_totalConfigChanges;  ///< 统计: 运行时配置变更
+                ++m_totalBaudChanges;    ///< 统计: 波特率变更
                 emit baudRateChanged(baud);
             }
         }
@@ -115,6 +113,8 @@ QGroupBox* SerialConfigPanel::createParamGroup()
     m_flowControlCombo->setObjectName("flowControlCombo");
     m_flowControlCombo->setToolTip(tr("流量控制:\n无 - 不使用流控(最常用，短距离无需流控)\nRTS/CTS - 硬件流控(需额外2根信号线，高速通信推荐)\nXON/XOFF - 软件流控(XOFF=0x13暂停, XON=0x11恢复)"));
     m_flowControlCombo->addItems({tr("无"), tr("RTS/CTS"), tr("XON/XOFF")});
+    connect(m_flowControlCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this](int) { ++m_totalFlowControlToggles; });
     formLayout->addRow(tr("流控:"), m_flowControlCombo);
 
     return paramGroup;
@@ -168,94 +168,4 @@ void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
     mainLayout->addLayout(createAutoReconnectLayout());
 }
 
-/** @brief 创建DTR/RTS控制信号分组(含按钮、工具提示、信号连接和视觉刷新) */
-QGroupBox* SerialConfigPanel::createControlSignalsGroup()
-{
-    auto* signalGroup = new QGroupBox(tr("控制信号"));
-    signalGroup->setObjectName("signalGroup");
-    auto* signalLayout = new QHBoxLayout(signalGroup);
-
-    m_dtrBtn = new QPushButton(tr("DTR HIGH"));
-    m_dtrBtn->setObjectName("dtrBtn");
-    m_dtrBtn->setCheckable(true);
-    m_dtrBtn->setChecked(true);
-    m_dtrBtn->setEnabled(false);
-    m_dtrBtn->setToolTip(tr("数据终端就绪信号，点击切换 HIGH/LOW\n"
-                            "部分设备需要 DTR 拉低才能复位(如 ESP32)"));
-
-    m_rtsBtn = new QPushButton(tr("RTS HIGH"));
-    m_rtsBtn->setObjectName("rtsBtn");
-    m_rtsBtn->setCheckable(true);
-    m_rtsBtn->setChecked(true);
-    m_rtsBtn->setEnabled(false);
-    m_rtsBtn->setToolTip(tr("请求发送信号，点击切换 HIGH/LOW\n"
-                             "部分设备需要 RTS 拉低进入 bootloader(如 STM32)"));
-
-    m_breakBtn = new QPushButton(tr("BRK"));
-    m_breakBtn->setObjectName("breakBtn");
-    m_breakBtn->setToolTip(tr("发送Break信号(用于STM32/ESP32进入Bootloader)"));
-    m_breakBtn->setEnabled(false);
-    connect(m_breakBtn, &QPushButton::clicked, this, [this]() { emit breakRequested(Timers::kBreakDurationMs); });
-
-    signalLayout->addWidget(m_dtrBtn);
-    signalLayout->addWidget(m_rtsBtn);
-    signalLayout->addWidget(m_breakBtn);
-
-    // ---- 输入信号线状态LED ----
-    auto makeLed = [](const char* n) -> QLabel* {
-        auto* l = new QLabel(n); l->setObjectName("signalLed");
-        l->setAlignment(Qt::AlignCenter); l->setFixedSize(36, 20);
-        l->setProperty("active", false); return l;
-    };
-    m_ctsLed = makeLed("CTS"); m_dsrLed = makeLed("DSR");
-    m_dcdLed = makeLed("DCD"); m_riLed = makeLed("RI");
-    for (auto* w : {m_ctsLed, m_dsrLed, m_dcdLed, m_riLed}) signalLayout->addWidget(w);
-    signalLayout->addStretch();
-
-    connect(m_dtrBtn, &QPushButton::toggled, this, [this](bool checked) {
-        m_dtrState = checked;
-        m_dtrBtn->setText(checked ? tr("DTR HIGH") : tr("DTR LOW"));
-        refreshSignalStyle(m_dtrBtn, m_dtrState);
-        emit dtrChanged(checked);
-    });
-    connect(m_rtsBtn, &QPushButton::toggled, this, [this](bool checked) {
-        m_rtsState = checked;
-        m_rtsBtn->setText(checked ? tr("RTS HIGH") : tr("RTS LOW"));
-        refreshSignalStyle(m_rtsBtn, m_rtsState);
-        emit rtsChanged(checked);
-    });
-    // 初始化视觉状态为默认HIGH
-    refreshSignalStyle(m_dtrBtn, m_dtrState);
-    refreshSignalStyle(m_rtsBtn, m_rtsState);
-    return signalGroup;
-}
-
-/** @brief 创建自动重连控件布局(复选框+间隔微调框, 范围500~30000ms, 步进500ms, 默认3000ms) */
-QHBoxLayout* SerialConfigPanel::createAutoReconnectLayout()
-{
-    auto* lay = new QHBoxLayout;
-    m_autoReconnectCheck = new QCheckBox(tr("自动重连"));
-    m_autoReconnectCheck->setObjectName("autoReconnectCheck");
-    m_reconnectIntervalSpin = new QSpinBox;
-    m_reconnectIntervalSpin->setObjectName("reconnectIntervalSpin");
-    m_reconnectIntervalSpin->setRange(500, 30000);
-    m_reconnectIntervalSpin->setSingleStep(500);
-    m_reconnectIntervalSpin->setValue(3000);
-    m_reconnectIntervalSpin->setSuffix("ms");
-    m_reconnectIntervalSpin->setEnabled(false);
-    lay->addWidget(m_autoReconnectCheck);
-    QLabel* intervalLbl = new QLabel(tr("间隔"));
-    intervalLbl->setObjectName("reconnectIntervalLabel");
-    lay->addWidget(intervalLbl);
-    lay->addWidget(m_reconnectIntervalSpin);
-    connect(m_autoReconnectCheck, &QCheckBox::toggled, this, [this](bool on) {
-        m_reconnectIntervalSpin->setEnabled(on);
-        emit autoReconnectToggled(on, m_reconnectIntervalSpin->value());
-    });
-    connect(m_reconnectIntervalSpin, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, [this](int v) {
-        if (m_autoReconnectCheck->isChecked()) emit autoReconnectToggled(true, v);
-    });
-    return lay;
-}
-
+// ---- 控制信号按钮+自动重连布局见 SerialConfigPanelUISignals.cpp ----

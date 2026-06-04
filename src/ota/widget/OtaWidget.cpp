@@ -196,6 +196,8 @@ void OtaWidget::resetOtaWidgetStatistics()
     m_totalTransfersCompleted = 0;
     m_totalTransfersFailed = 0;
     m_totalBytesTransferred = 0;
+    m_totalBrowseClicks = 0;
+    m_totalCancelOps = 0;
 }
 
 // onBrowseFile/onStartTransfer/onCancelTransfer 见 OtaWidgetSlots2.cpp

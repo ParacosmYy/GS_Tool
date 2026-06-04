@@ -25,6 +25,7 @@
 /** @brief 浏览文件按钮回调: 打开文件对话框选择固件文件(.bin/.hex/.fw) */
 void OtaWidget::onBrowseFile()
 {
+    ++m_totalBrowseClicks;  ///< 统计: 浏览按钮点击
     QString filter = tr("固件文件 (*.bin *.hex);;二进制文件 (*.bin);;Intel HEX (*.hex);;所有文件 (*.*)");
     QString path = QFileDialog::getOpenFileName(this, tr("选择固件文件"), QString(), filter);
     if (path.isEmpty()) return;
@@ -81,6 +82,7 @@ void OtaWidget::onStartTransfer()
 /** @brief 取消传输按钮回调: 中止当前OTA传输并恢复UI状态 */
 void OtaWidget::onCancelTransfer()
 {
+    ++m_totalCancelOps;  ///< 统计: 取消操作
     m_manager->cancelTransfer();
     appendLog(tr("用户已取消传输"));
     setTransferring(false);

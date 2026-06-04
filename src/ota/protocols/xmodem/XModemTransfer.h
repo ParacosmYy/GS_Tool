@@ -32,6 +32,8 @@ public:
     quint64 totalRetries() const;         ///< 累计重试次数
     quint64 totalModeSwitches() const;    ///< 累计模式降级次数
     quint64 xmodemErrorCount() const;     ///< 累计错误次数
+    quint64 totalCrcErrors() const { return m_totalCrcErrors; } ///< 累计CRC校验被拒次数(NAK触发)
+    quint64 totalTimeouts() const { return m_totalTimeouts; }   ///< 累计超时事件次数
     void resetXmodemStatistics();         ///< 重置统计计数器
 
 signals:
@@ -80,6 +82,8 @@ private:
     quint64 m_totalRetries = 0;          ///< 累计重试次数
     quint64 m_totalModeSwitches = 0;     ///< 累计模式降级次数
     quint64 m_xmodemErrorCount = 0;      ///< 累计错误次数
+    quint64 m_totalCrcErrors = 0;        ///< 累计CRC校验被拒次数(接收方NAK触发)
+    quint64 m_totalTimeouts = 0;         ///< 累计超时事件次数
 };
 
 #endif // XMODEMTRANSFER_H

@@ -82,6 +82,7 @@ set(SOURCES
     src/core/panels/PanelManagerFactory.cpp
     src/core/panels/PanelManagerGetters.cpp
     src/core/panels/PanelManagerQuery.cpp
+    src/core/panels/PanelManagerWrap.cpp
     src/core/background/BackgroundWidget.cpp
     src/core/background/BackgroundWidgetPaint.cpp
     src/core/background/BackgroundSettingsPopup.cpp
@@ -143,6 +144,7 @@ set(SOURCES
     src/terminal/menu/TerminalContextMenuManager.cpp
     src/serial/config/SerialConfigPanel.cpp
     src/serial/config/SerialConfigPanelUI.cpp
+    src/serial/config/SerialConfigPanelUISignals.cpp
     src/serial/config/SerialConfigPanelConfig.cpp
     src/serial/commands/QuickCommandBar.cpp
     src/serial/commands/QuickCommandBarActions.cpp
@@ -164,6 +166,7 @@ set(SOURCES
     src/protocol/parser/FrameParser.cpp
     src/protocol/parser/FrameParserHelpers.cpp
     src/protocol/parser/FrameParserStateHandlers.cpp
+    src/protocol/parser/FrameParserPayload.cpp
     src/protocol/parser/FrameParserStats.cpp
     src/protocol/view/ProtocolView.cpp
     src/protocol/view/ProtocolViewData.cpp
@@ -186,6 +189,7 @@ set(SOURCES
     src/protocol/bridge/ProtocolBridgeManagerAutoDetect.cpp
     src/protocol/bridge/ProtocolBridgeManagerConfig.cpp
     src/chart/widget/ChartWidget.cpp
+    src/chart/widget/ChartWidgetSlots.cpp
     src/chart/widget/ChartWidgetTheme.cpp
     src/chart/widget/ChartWidgetExport.cpp
     src/chart/widget/ChartWidgetRender.cpp
@@ -290,6 +294,7 @@ set(SOURCES
     src/protocol/engine/ProtocolEngineChecksum.cpp
     src/protocol/engine/ProtocolEngineAlgorithm.cpp
     src/protocol/schema/ProtocolTemplateLibrary.cpp
+    src/protocol/schema/ProtocolTemplateLibraryBuiltins.cpp
     src/protocol/editor/ProtocolSchemaEditor.cpp
     src/protocol/engine/ProtocolFieldMapper.cpp
 
@@ -314,6 +319,7 @@ set(SOURCES
     src/dashboard/DashboardSerializer.cpp
     src/dashboard/DashboardSerializerExport.cpp
     src/dashboard/DashboardSerializerProfile.cpp
+    src/dashboard/DashboardSerializerStats.cpp
 
     # ── F6: J-Link RTT ──
     src/rtt/JLinkRttConnection.cpp
@@ -329,6 +335,7 @@ set(SOURCES
     src/automation/TriggerEngineStats.cpp
     src/automation/TriggerAction.cpp
     src/automation/TriggerManager.cpp
+    src/automation/TriggerManagerStats.cpp
     src/automation/TriggerListPanel.cpp
 
     # ── F8: 项目管理 ──
@@ -339,6 +346,7 @@ set(SOURCES
     src/serial/signals/SignalLineMonitor.cpp
     src/serial/signals/SignalLineMonitorStats.cpp
     src/serial/signals/SignalLineWidget.cpp
+    src/serial/signals/SignalLineWidgetStats.cpp
     src/serial/data/TrafficMonitor.cpp
     src/serial/data/TrafficMonitorStats.cpp
     src/serial/data/TrafficMonitorWidget.cpp
@@ -437,6 +445,7 @@ set(SOURCES
     src/protocol/modbus/ModbusMasterProtocol.cpp
     src/protocol/modbus/ModbusSlave.cpp
     src/protocol/modbus/ModbusSlaveResponse.cpp
+    src/protocol/modbus/ModbusSlaveStats.cpp
     src/protocol/modbus/ModbusScanWidget.cpp
     src/protocol/modbus/ModbusScanWidgetStats.cpp
     src/protocol/modbus/ModbusConfigPanel.cpp
@@ -448,6 +457,7 @@ set(SOURCES
     src/protocol/protobuf/ProtobufDecoderHelpers.cpp
     src/protocol/protobuf/FlatBuffersDecoder.cpp
     src/protocol/protobuf/FlatBuffersDecoderFields.cpp
+    src/protocol/protobuf/FlatBuffersDecoderRead.cpp
     src/protocol/protobuf/FlatBuffersDecoderSchema.cpp
     src/protocol/protobuf/SchemaViewer.cpp
     src/protocol/protobuf/SchemaViewerStats.cpp
@@ -462,6 +472,7 @@ set(SOURCES
     src/connection/usb/UsbDeviceDetectorWmic.cpp
     src/connection/usb/UsbDeviceDetectorStats.cpp
     src/connection/usb/UsbDescriptorViewer.cpp
+    src/connection/usb/UsbDescriptorViewerTree.cpp
     src/connection/usb/UsbConfigPanel.cpp
     src/connection/usb/UsbLibraryLoader.cpp
     src/connection/usb/UsbLibraryLoaderQuery.cpp

@@ -142,13 +142,15 @@ quint64 XModemTransfer::totalModeSwitches() const { return m_totalModeSwitches; 
 /** @brief 获取累计XMODEM协议错误次数 @return 错误次数 */
 quint64 XModemTransfer::xmodemErrorCount() const { return m_xmodemErrorCount; }
 
-/** @brief 重置所有XMODEM传输统计计数器(块数/重试/模式切换/错误) */
+/** @brief 重置所有XMODEM传输统计计数器(块数/重试/模式切换/错误/CRC错误/超时) */
 void XModemTransfer::resetXmodemStatistics()
 {
     m_totalBlocksSent = 0;
     m_totalRetries = 0;
     m_totalModeSwitches = 0;
     m_xmodemErrorCount = 0;
+    m_totalCrcErrors = 0;
+    m_totalTimeouts = 0;
 }
 
 /** @brief 设置XMODEM状态机状态 @param newState 目标状态 */

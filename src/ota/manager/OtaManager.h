@@ -55,6 +55,7 @@ public:
     quint64 successfulTransfers() const;    ///< 成功次数
     quint64 failedTransfers() const;        ///< 失败次数
     quint64 totalBytesTransferred() const;  ///< 累计传输字节
+    quint64 totalCrcChecks() const;         ///< 累计CRC校验验证次数
     double averageSpeed() const;            ///< 历史平均传输速率(字节/秒)
     void resetTransferStatistics();         ///< 重置统计(不影响历史记录)
 
@@ -114,6 +115,7 @@ private:
     quint64 m_successfulTransfers = 0;
     quint64 m_failedTransfers = 0;
     quint64 m_totalBytesTransferred = 0;
+    quint64 m_totalCrcChecks = 0;
     qint64 m_currentFileSize = 0;
 
     // ---- 速率跟踪 ----

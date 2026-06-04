@@ -61,6 +61,7 @@ public:
     quint64 totalInsertions() const { return m_totalInsertions; } ///< 累计端口插入次数
     quint64 totalRemovals() const { return m_totalRemovals; } ///< 累计端口移除次数
     quint64 totalVidLookups() const { return m_totalVidLookups; } ///< 累计VID查询次数
+    static quint64 totalChipIdentifications() { return s_totalChipIdentifications; } ///< 累计芯片识别次数
     int uniqueVidCount() const;             ///< 累计检测到的不同VID数量
     static int knownVendorCount();          ///< 已知芯片厂商数据库条目数
     void resetStatistics();                 ///< 重置所有统计计数器
@@ -86,6 +87,7 @@ private:
     quint64 m_totalInsertions = 0;  ///< 累计端口插入事件次数
     quint64 m_totalRemovals = 0;    ///< 累计端口移除事件次数
     mutable quint64 m_totalVidLookups = 0; ///< 累计VID查询次数
+    static inline quint64 s_totalChipIdentifications = 0; ///< 累计芯片识别次数(identifyChip调用)
 
     // ---- 已知USB转串口芯片数据库 ----
     static const QVector<UsbVendorEntry> kKnownVendors; ///< 已知USB芯片厂商数据库
