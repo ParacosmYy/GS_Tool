@@ -60,6 +60,7 @@ set(SOURCES
     src/core/factory/WidgetFactory.cpp
     src/serial/detector/SerialDetector.cpp
     src/serial/detector/SerialDetectorChip.cpp
+    src/serial/detector/SerialDetectorQuery.cpp
     src/chart/waterfall/WaterfallWidget.cpp
     src/chart/heatmap/HeatmapWidget.cpp
     src/core/settings/SettingsController.cpp
@@ -83,6 +84,7 @@ set(SOURCES
     src/core/widgets/CommandPalette.cpp
     src/core/widgets/ScriptRecorder.cpp
     src/core/widgets/DataDiffWidget.cpp
+    src/core/widgets/DataDiffWidgetDiff.cpp
     src/core/widgets/EdDialog.cpp
     src/core/widgets/EdDialogTabs.cpp
     src/core/connect/ConnectionManager.cpp
@@ -200,6 +202,7 @@ set(SOURCES
     src/ota/widget/OtaWidgetSlots.cpp
     src/ota/widget/OtaWidgetSlots2.cpp
     src/ota/history/OtaHistoryModel.cpp
+    src/ota/history/OtaHistoryModelStats.cpp
     src/ota/history/OtaHistoryModelIndex.cpp
     src/ota/protocols/base/BaseTransfer.cpp
     src/ota/protocols/xmodem/XModemTransfer.cpp
@@ -242,6 +245,7 @@ set(SOURCES
     src/core/recording/PlaybackControllerSpeed.cpp
     src/core/recording/PlaybackWidget.cpp
     src/core/recording/RecordingMarker.cpp
+    src/core/recording/RecordingMarkerQuery.cpp
     src/utils/log/RecordingFileFormat.cpp
     src/utils/log/RecordingFileIndex.cpp
 

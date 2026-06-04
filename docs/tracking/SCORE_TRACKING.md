@@ -101,6 +101,7 @@
 | 265 | PerformanceMonitorLatency/PortWatcherPoll/YModemTransferStats/SpiI2cConfigPanelPersist拆分 | 性能延迟查询独立(268→194行)+串口轮询防抖独立(268→112行)+YModem统计/文件独立(268→135行)+SPI/I2C持久化独立(271→222行) |
 | 266 | DataConverterCodec/ProtocolViewData/FftWidgetSlots/BleGattBrowserSlots拆分 + WidgetFactory mutable修复 | 编解码独立(DataConverter 175→80行)+协议帧数据独立(ProtocolView 158→63行)+FFT槽函数独立(FftWidget 175→80行)+BLE GATT操作槽独立(BleGattBrowser 147→47行) |
 | 267 | SendHistoryStats/MqttConnectionStats/TerminalSelectionManagerStats/SchemaViewerStats拆分 | 发送历史频率分析/统计独立(SendHistory 259→134行)+MQTT统计独立(MqttConnection 254→209行)+终端选区统计独立(TerminalSelection 253→197行)+Schema解码统计独立(SchemaViewer 251→149行) |
+| 268 | OtaHistoryModelStats/SerialDetectorQuery/DataDiffWidgetDiff/RecordingMarkerQuery拆分 | OTA统计摘要独立(OtaHistoryModel 260→143行)+串口多维度查询独立(SerialDetector 261→176行)+LCS差异算法独立(DataDiffWidget 263→137行)+标记查询导航独立(RecordingMarker 260→66行) |
 
 ---
 
