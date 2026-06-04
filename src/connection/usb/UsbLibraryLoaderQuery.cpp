@@ -30,11 +30,21 @@ QString UsbLibraryLoader::lastError() const
     return m_lastError;
 }
 
-/** @brief 获取已加载库的版本描述字符串 @return 版本信息 */
+/** @brief 获取已加载库的版本描述字符串 @return 版本信息(如"libusb 1.0.26.11574") */
 QString UsbLibraryLoader::versionString() const
 {
     if (!m_loaded) { return tr("libusb未加载"); }
-    return tr("libusb-1.0 (已加载)");
+    if (!m_fnGetVersion) { return tr("libusb (版本查询不可用)"); }
+
+    /* 通过libusb_get_version读取真实版本号 */
+    const UsbVersion* ver = m_fnGetVersion();
+    if (!ver) { return tr("libusb (版本信息为空)"); }
+
+    return tr("libusb %1.%2.%3.%4")
+        .arg(ver->major)
+        .arg(ver->minor)
+        .arg(ver->micro)
+        .arg(ver->nano);
 }
 
 /* ---- 设备描述符查询 ---- */
@@ -82,20 +92,26 @@ int UsbLibraryLoader::getStringDescriptorAscii(UsbDeviceHandle* handle,
     return m_fnGetString(handle, descIndex, buffer, bufferSize);
 }
 
-/** @brief 检查内核驱动是否占用了指定接口(Linux专用) @param handle 设备句柄 @param interfaceNum 接口编号 @return Windows上始终返回0 */
+/** @brief 检查内核驱动是否占用了指定接口 @param handle 设备句柄 @param interfaceNum 接口编号 @return 1=内核驱动活跃, 0=不活跃, 负数=错误 */
 int UsbLibraryLoader::kernelDriverActive(UsbDeviceHandle* handle,
                                           int interfaceNum)
 {
-    /* Linux专用 — Windows上始终返回0 */
-    return 0;
+    if (!m_fnKernelDriverActive) {
+        /* 函数指针未解析 — 平台不支持或库版本过旧 */
+        return 0;
+    }
+    return m_fnKernelDriverActive(handle, interfaceNum);
 }
 
-/** @brief 从接口上分离内核驱动(Linux专用) @param handle 设备句柄 @param interfaceNum 接口编号 @return Windows上始终返回0 */
+/** @brief 从接口上分离内核驱动 @param handle 设备句柄 @param interfaceNum 接口编号 @return 0=成功, 负数=错误 */
 int UsbLibraryLoader::detachKernelDriver(UsbDeviceHandle* handle,
                                           int interfaceNum)
 {
-    /* Linux专用 — Windows上无操作 */
-    return 0;
+    if (!m_fnDetachKernelDriver) {
+        /* 函数指针未解析 — 平台不支持或库版本过旧 */
+        return 0;
+    }
+    return m_fnDetachKernelDriver(handle, interfaceNum);
 }
 
 /* ---- 内部: 函数解析 ---- */
@@ -126,8 +142,16 @@ bool UsbLibraryLoader::resolveFunctions()
     m_fnGetDeviceDesc = reinterpret_cast<FnGetDeviceDesc>(
         m_library->resolve("libusb_get_device_descriptor"));
 
-    /* 累计函数符号解析次数(12个符号) */
-    m_totalFunctionResolutions += 12;
+    /* 解析扩展函数(可选，不影响核心加载) */
+    m_fnGetVersion = reinterpret_cast<FnGetVersion>(
+        m_library->resolve("libusb_get_version"));
+    m_fnKernelDriverActive = reinterpret_cast<FnKernelDriverActive>(
+        m_library->resolve("libusb_kernel_driver_active"));
+    m_fnDetachKernelDriver = reinterpret_cast<FnDetachKernelDriver>(
+        m_library->resolve("libusb_detach_kernel_driver"));
+
+    /* 累计函数符号解析次数(15个符号: 12核心 + 3扩展) */
+    m_totalFunctionResolutions += 15;
 
     /* 核心函数必须全部解析成功 */
     if (!m_fnInit || !m_fnExit || !m_fnOpen || !m_fnClose) {

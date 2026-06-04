@@ -12,6 +12,16 @@
 using UsbContext = void;       ///< libusb上下文不透明指针
 using UsbDeviceHandle = void;  ///< libusb设备句柄不透明指针
 
+/** @brief libusb版本信息结构体(对应libusb_version) */
+struct UsbVersion {
+    const quint16 major;    ///< 主版本号
+    const quint16 minor;    ///< 次版本号
+    const quint16 micro;    ///< 修订号
+    const quint16 nano;     ///< 构建号
+    const char* rc;         ///< 候选版本字符串
+    const char* describe;   ///< 完整版本描述字符串
+};
+
 /** @brief libusb设备描述符(简化版) */
 struct UsbDeviceDescriptor {
     quint16 bcdUSB;            ///< USB规范版本
@@ -117,6 +127,9 @@ private:
     using FnGetString = int(*)(UsbDeviceHandle*, quint8, char*, int);
     using FnGetDevice = void*(*)(UsbDeviceHandle*);
     using FnGetDeviceDesc = int(*)(void*, UsbDeviceDescriptor*);
+    using FnGetVersion = const UsbVersion*(*)();       ///< libusb_get_version函数指针类型
+    using FnKernelDriverActive = int(*)(UsbDeviceHandle*, int);  ///< libusb_kernel_driver_active函数指针类型
+    using FnDetachKernelDriver = int(*)(UsbDeviceHandle*, int);  ///< libusb_detach_kernel_driver函数指针类型
 
     FnInit m_fnInit = nullptr;       FnExit m_fnExit = nullptr;
     FnOpen m_fnOpen = nullptr;       FnClose m_fnClose = nullptr;
@@ -124,6 +137,9 @@ private:
     FnBulk m_fnBulk = nullptr;       FnInterrupt m_fnInterrupt = nullptr;
     FnControl m_fnControl = nullptr; FnGetString m_fnGetString = nullptr;
     FnGetDevice m_fnGetDevice = nullptr; FnGetDeviceDesc m_fnGetDeviceDesc = nullptr;
+    FnGetVersion m_fnGetVersion = nullptr; ///< libusb_get_version函数指针
+    FnKernelDriverActive m_fnKernelDriverActive = nullptr; ///< libusb_kernel_driver_active函数指针
+    FnDetachKernelDriver m_fnDetachKernelDriver = nullptr; ///< libusb_detach_kernel_driver函数指针
 
     quint64 m_totalLoadAttempts = 0;    ///< 累计加载尝试
     quint64 m_totalSuccessfulLoads = 0; ///< 累计成功加载

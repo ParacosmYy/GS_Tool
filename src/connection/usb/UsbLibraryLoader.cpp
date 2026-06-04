@@ -102,6 +102,9 @@ void UsbLibraryLoader::unload()
     m_fnGetString = nullptr;
     m_fnGetDevice = nullptr;
     m_fnGetDeviceDesc = nullptr;
+    m_fnGetVersion = nullptr;
+    m_fnKernelDriverActive = nullptr;
+    m_fnDetachKernelDriver = nullptr;
     emit loadStateChanged(false);
 }
 
