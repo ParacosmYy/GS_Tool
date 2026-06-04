@@ -136,6 +136,7 @@ set(SOURCES
     src/serial/data/DataStatisticsRolling.cpp
     src/serial/port/SerialDriverDetector.cpp
     src/serial/port/PortWatcher.cpp
+    src/serial/port/PortWatcherPoll.cpp
     src/serial/port/PortWatcherStats.cpp
     src/protocol/parser/FrameParser.cpp
     src/protocol/parser/FrameParserHelpers.cpp
@@ -201,6 +202,7 @@ set(SOURCES
     src/ota/protocols/xmodem/XModemTransferHandlers.cpp
     src/ota/protocols/xmodem/XModemTransferProtocol.cpp
     src/ota/protocols/ymodem/YModemTransfer.cpp
+    src/ota/protocols/ymodem/YModemTransferStats.cpp
     src/ota/protocols/ymodem/YModemTransferHandlers.cpp
     src/ota/protocols/ymodem/YModemTransferProtocol.cpp
     src/ota/protocols/zmodem/ZModemTransfer.cpp
@@ -303,6 +305,7 @@ set(SOURCES
 
     # ── F10: 性能监控 ──
     src/utils/perf/PerformanceMonitor.cpp
+    src/utils/perf/PerformanceMonitorLatency.cpp
     src/utils/perf/PerformanceOverlay.cpp
 
     # ── F11: 插件系统 ──
@@ -370,6 +373,7 @@ set(SOURCES
     src/connection/spi_i2c/I2cConnectionTransfer.cpp
     src/connection/spi_i2c/SpiI2cBridgeManager.cpp
     src/connection/spi_i2c/SpiI2cConfigPanel.cpp
+    src/connection/spi_i2c/SpiI2cConfigPanelPersist.cpp
     src/connection/spi_i2c/RegisterEditor.cpp
 
     # ── F17: WebSocket 客户端 ──
