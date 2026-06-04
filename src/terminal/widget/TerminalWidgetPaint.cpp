@@ -10,10 +10,12 @@
  */
 
 #include "terminal/widget/TerminalWidget.h"
-#include "core/theme/ThemeManager.h"
+
 #include <QPainter>
 #include <QPaintEvent>
 #include <QTimer>
+
+#include "core/theme/ThemeManager.h"
 
 // ---- 单行绘制 ----
 /** @brief 绘制单行终端内容(时间戳+方向前缀+HEX/ASCII数据+搜索高亮) @param painter 画笔 @param cached 缓存行数据 @param y 起始Y坐标 @param displayLine 显示行号 @return 绘制消耗的像素高度 */
@@ -40,6 +42,8 @@ int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y
     // 搜索高亮和实际文本内容都基于这个基线对齐，避免双倍偏移
     static const QString kTxPrefix = QStringLiteral("[TX:] ");
     static const QString kRxPrefix = QStringLiteral("[RX:] ");
+    // 注意: 绘制时使用 static const 匹配 formatToCache 中 tr() 生成的前缀
+    // 若翻译后前缀长度变化，此处 static const 仍需同步更新
     bool isTx = (cached.direction == DataDirection::Tx);
     QColor dataColor = isTx ? m_txColor : m_rxColor;
 

@@ -20,7 +20,105 @@
 
 // ---- 流式导出入口 ----
 
-/** @brief 导出数据到文件(流式模式)，记录耗时和统计 @param filePath 目标路径 @param format 格式 @param lineProvider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
+/** @brief 导出数据到文件(流式模式+进度回调)，记录耗时和统计 @param filePath 目标路径 @param format 格式 @param lineProvider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @param progress 进度回调(返回false取消) @return 是否成功 */
+bool DataExporter::exportStreamed(const QString& filePath, Format format,
+                                   LineProvider lineProvider,
+                                   int totalLines, int batchSize,
+                                   ProgressCallback progress)
+{
+    if (totalLines <= 0 || !lineProvider || filePath.isEmpty()) return false;
+
+    ++m_totalExports;
+    m_exportTimer.start();
+
+    bool ok = false;
+    int rowsExported = 0;
+    switch (format) {
+    case Plain: {
+        QFile file(filePath);
+        QTextStream out;
+        if (!openTextFile(file, out, filePath)) break;
+        int offset = 0;
+        while (offset < totalLines) {
+            QVector<TerminalLine> batch = lineProvider(offset, qMin(batchSize, totalLines - offset));
+            if (batch.isEmpty()) break;
+            for (const TerminalLine& line : batch) {
+                out << QString("[%1] [%2] %3 | %4\n")
+                        .arg(line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz"),
+                             (line.direction == DataDirection::Rx) ? "RX" : "TX",
+                             HexConverter::toHexString(line.data), toAsciiString(line.data));
+            }
+            offset += batch.size();
+            rowsExported = offset;
+            if (!reportProgress(progress, filePath, rowsExported, totalLines)) {
+                file.close();
+                ++m_totalCancelled;
+                emit exportCancelled(filePath);
+                return false;
+            }
+        }
+        ok = flushAndCheck(file, out, filePath);
+        ++m_totalPlainExports;
+        break;
+    }
+    case Csv: {
+        QFile file(filePath);
+        QTextStream out;
+        if (!openTextFile(file, out, filePath)) break;
+        if (!writeCsvBom(file, filePath)) { file.close(); break; }
+        out << csvHeader() << '\n';
+        int offset = 0;
+        while (offset < totalLines) {
+            QVector<TerminalLine> batch = lineProvider(offset, qMin(batchSize, totalLines - offset));
+            if (batch.isEmpty()) break;
+            for (const TerminalLine& line : batch) {
+                out << line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz") << m_csvDelimiter
+                    << ((line.direction == DataDirection::Rx) ? "RX" : "TX") << m_csvDelimiter
+                    << HexConverter::toHexString(line.data) << m_csvDelimiter
+                    << escapeCsvField(toAsciiString(line.data)) << '\n';
+            }
+            offset += batch.size();
+            rowsExported = offset;
+            if (!reportProgress(progress, filePath, rowsExported, totalLines)) {
+                file.close();
+                ++m_totalCancelled;
+                emit exportCancelled(filePath);
+                return false;
+            }
+        }
+        ok = flushAndCheck(file, out, filePath);
+        ++m_totalCsvExports;
+        break;
+    }
+    case HexDump:     ok = exportStreamedHexDump(filePath, lineProvider, totalLines, batchSize); ++m_totalHexDumpExports; break;
+    case Timestamped: ok = exportStreamedTimestamped(filePath, lineProvider, totalLines, batchSize); ++m_totalTimestampedExports; break;
+    case Bin:         ok = exportStreamedBin(filePath, lineProvider, totalLines, batchSize); ++m_totalBinExports; break;
+    case Json:        ok = exportStreamedJson(filePath, lineProvider, totalLines, batchSize); ++m_totalJsonExports; break;
+    default:
+        ++m_totalErrors;
+        emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
+        return false;
+    }
+
+    qint64 durationMs = m_exportTimer.elapsed();
+    m_lastExportDurationMs = durationMs;
+    m_totalExportDurationMs += durationMs;
+
+    if (ok) {
+        m_totalRowsExported += static_cast<quint64>(rowsExported > 0 ? rowsExported : totalLines);
+        m_lastExportRowCount = static_cast<quint64>(rowsExported > 0 ? rowsExported : totalLines);
+        m_lastExportByteCount = 0;
+        emit exportCompleted(filePath, format,
+                             m_lastExportRowCount, m_lastExportByteCount, durationMs);
+    } else {
+        ++m_totalErrors;
+        m_lastExportRowCount = 0;
+        m_lastExportByteCount = 0;
+    }
+    return ok;
+}
+
+/** @brief 导出数据到文件(流式模式，无进度回调)，记录耗时和统计 @param filePath 目标路径 @param format 格式 @param lineProvider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @return 是否成功 */
 bool DataExporter::exportStreamed(const QString& filePath, Format format,
                                    LineProvider lineProvider,
                                    int totalLines, int batchSize)

@@ -57,6 +57,150 @@ bool DataExporter::isCsvBomEnabled() const {
 
 // ---- 公共入口 ----
 
+/** @brief 导出数据到文件(批量模式+进度回调)，记录耗时和统计 @param filePath 目标文件路径 @param format 导出格式 @param lines 终端行数据 @param progress 进度回调(返回false取消) @param from 起始时间过滤 @param to 结束时间过滤 @return 是否成功 */
+bool DataExporter::exportToFile(const QString& filePath, Format format,
+                                 const QVector<TerminalLine>& lines,
+                                 ProgressCallback progress,
+                                 const QDateTime& from, const QDateTime& to)
+{
+    if (lines.isEmpty() || filePath.isEmpty()) return false;
+
+    ++m_totalExports;
+    QVector<TerminalLine> filtered = filterByTime(lines, from, to);
+    if (filtered.isEmpty()) {
+        ++m_totalEmptySkips;
+        return false;
+    }
+    m_totalFilteredRows += static_cast<quint64>(lines.size() - filtered.size());
+
+    m_exportTimer.start();
+
+    bool ok = false;
+    const int totalRows = filtered.size();
+    switch (format) {
+    case Plain: {
+        QFile file(filePath);
+        QTextStream out;
+        if (!openTextFile(file, out, filePath)) break;
+        for (int i = 0; i < totalRows; ++i) {
+            const TerminalLine& line = filtered[i];
+            out << QString("[%1] [%2] %3 | %4\n")
+                    .arg(line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz"),
+                         (line.direction == DataDirection::Rx) ? "RX" : "TX",
+                         HexConverter::toHexString(line.data), toAsciiString(line.data));
+            if (!reportProgress(progress, filePath, i + 1, totalRows)) {
+                file.close();
+                ++m_totalCancelled;
+                emit exportCancelled(filePath);
+                return false;
+            }
+        }
+        ok = flushAndCheck(file, out, filePath);
+        ++m_totalPlainExports;
+        break;
+    }
+    case Csv: {
+        QFile file(filePath);
+        QTextStream out;
+        if (!openTextFile(file, out, filePath)) break;
+        if (!writeCsvBom(file, filePath)) { file.close(); break; }
+        out << csvHeader() << '\n';
+        for (int i = 0; i < totalRows; ++i) {
+            const TerminalLine& line = filtered[i];
+            out << line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz") << m_csvDelimiter
+                << ((line.direction == DataDirection::Rx) ? "RX" : "TX") << m_csvDelimiter
+                << HexConverter::toHexString(line.data) << m_csvDelimiter
+                << escapeCsvField(toAsciiString(line.data)) << '\n';
+            if (!reportProgress(progress, filePath, i + 1, totalRows)) {
+                file.close();
+                ++m_totalCancelled;
+                emit exportCancelled(filePath);
+                return false;
+            }
+        }
+        ok = flushAndCheck(file, out, filePath);
+        ++m_totalCsvExports;
+        break;
+    }
+    case Json: {
+        QJsonObject root;
+        root["export_time"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+        root["total_lines"] = totalRows;
+        QJsonArray linesArray;
+        for (int i = 0; i < totalRows; ++i) {
+            const TerminalLine& line = filtered[i];
+            QJsonObject lineObj;
+            lineObj["timestamp"] = line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz");
+            lineObj["direction"] = (line.direction == DataDirection::Rx) ? "RX" : "TX";
+            lineObj["hex"] = HexConverter::toHexString(line.data);
+            lineObj["ascii"] = toAsciiString(line.data);
+            linesArray.append(lineObj);
+            if (!reportProgress(progress, filePath, i + 1, totalRows)) {
+                ++m_totalCancelled;
+                emit exportCancelled(filePath);
+                return false;
+            }
+        }
+        root["lines"] = linesArray;
+        QFile file(filePath);
+        if (!file.open(QIODevice::WriteOnly)) {
+            emit exportError(filePath, tr("无法打开文件: %1").arg(file.errorString()));
+            break;
+        }
+        QJsonDocument doc(root);
+        if (file.write(doc.toJson(QJsonDocument::Indented)) == -1) {
+            emit exportError(filePath, tr("写入文件失败: %1").arg(file.errorString()));
+            file.close(); break;
+        }
+        file.close();
+        ok = true;
+        ++m_totalJsonExports;
+        break;
+    }
+    case HexDump:     ok = exportHexDump(filePath, filtered); ++m_totalHexDumpExports; break;
+    case Timestamped: ok = exportTimestamped(filePath, filtered); ++m_totalTimestampedExports; break;
+    case Bin:         ok = exportBin(filePath, filtered); ++m_totalBinExports; break;
+    default:
+        ++m_totalErrors;
+        emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
+        return false;
+    }
+
+    qint64 durationMs = m_exportTimer.elapsed();
+    m_lastExportDurationMs = durationMs;
+    m_totalExportDurationMs += durationMs;
+
+    if (ok) {
+        quint64 byteCount = 0;
+        for (const auto& line : filtered) {
+            byteCount += static_cast<quint64>(line.data.size());
+        }
+        m_totalBytesExported += byteCount;
+        m_totalRowsExported += static_cast<quint64>(filtered.size());
+        m_lastExportRowCount = static_cast<quint64>(filtered.size());
+        m_lastExportByteCount = byteCount;
+        emit exportCompleted(filePath, format,
+                             m_lastExportRowCount, byteCount, durationMs);
+    } else {
+        ++m_totalErrors;
+        m_lastExportRowCount = 0;
+        m_lastExportByteCount = 0;
+    }
+    return ok;
+}
+
+/** @brief 报告导出进度并检查是否应取消 @param progress 进度回调(可空) @param filePath 文件路径 @param current 当前行索引 @param total 总行数 @return true=继续，false=用户取消 */
+bool DataExporter::reportProgress(ProgressCallback& progress, const QString& filePath, int current, int total)
+{
+    if (total <= 0) return true;
+    int percent = qMin(100, static_cast<int>(static_cast<qint64>(current) * 100 / total));
+    emit exportProgress(filePath, percent);
+    if (progress) {
+        return progress(percent);
+    }
+    return true;
+}
+
 /** @brief 导出数据到文件(批量模式)，记录耗时和统计 @param filePath 目标文件路径 @param format 导出格式 @param lines 终端行数据 @param from 起始时间过滤 @param to 结束时间过滤 @return 是否成功 */
 bool DataExporter::exportToFile(const QString& filePath, Format format,
                                  const QVector<TerminalLine>& lines,

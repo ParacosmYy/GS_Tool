@@ -70,6 +70,9 @@ public:
     /** @brief 获取累计格式切换次数(源/目标格式变更) */
     quint64 totalFormatSwitches() const { return m_totalFormatSwitches; }
 
+    /** @brief 获取最近一次输入验证失败的错误描述(中文) @return 错误描述，无错误返回空 */
+    QString lastValidationError() const;
+
     /** @brief 重置所有转换统计计数器(转换次数/字节数/错误次数/格式切换次数) */
     void resetStatistics();
 
@@ -84,6 +87,7 @@ private:
     mutable quint64 m_totalBytesConverted = 0;    ///< 累计转换的字节总数
     mutable quint64 m_totalErrors = 0;            ///< 累计转换失败次数
     mutable quint64 m_totalFormatSwitches = 0;    ///< 累计格式切换次数
+    mutable QString m_lastValidationError;        ///< 最近一次输入验证失败的错误描述
 };
 
 #endif // DATACONVERTER_H

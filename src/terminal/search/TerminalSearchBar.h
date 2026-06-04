@@ -20,6 +20,7 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QStringList>
+#include <QSettings>
 
 /** @brief 终端搜索栏 - 嵌入终端顶部的搜索控件，支持文本/正则/HEX搜索 */
 class TerminalSearchBar : public QWidget {
@@ -54,6 +55,8 @@ private:
     void setupUI();               ///< 构建界面布局和样式
     bool isValidHex(const QString& text) const; ///< 验证HEX输入是否合法
     void triggerSearch();         ///< 触发当前搜索框内容的搜索请求
+    void saveRecentSearch(const QString& pattern); ///< 保存搜索模式到QSettings历史(最多10条)
+    void loadRecentSearches();    ///< 从QSettings加载最近搜索历史到补全器
 
     QLineEdit* m_searchInput;       ///< 搜索输入框（objectName: searchBarInput）
     QPushButton* m_closeBtn;        ///< 关闭按钮（objectName: searchBarCloseBtn）
@@ -64,6 +67,7 @@ private:
     QLabel* m_resultLabel;          ///< 结果标签（objectName: searchBarResult），如 "3/15 matches"
     QPropertyAnimation* m_activeAnim = nullptr; ///< 当前活跃的展开/收起动画，防止快速切换时冲突
     QCompleter* m_completer;        ///< 搜索历史自动补全器
+    QStringList m_recentSearches;   ///< 最近搜索历史列表(最多10条，持久化到QSettings)
 
     // ---- 统计计数器 ----
     quint64 m_totalSearches = 0;        ///< 搜索触发总次数

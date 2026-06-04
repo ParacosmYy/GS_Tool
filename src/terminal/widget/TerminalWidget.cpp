@@ -60,12 +60,22 @@ TerminalWidget::TerminalWidget(QWidget* parent)
     , m_selectionManager(new TerminalSelectionManager(this))
     , m_searchManager(new TerminalSearchManager(this))
     , m_contextMenuManager(new TerminalContextMenuManager(this))
+    , m_scrollToBottomBtn(new QPushButton(this))
 {
     setObjectName("terminalWidget");
 
     m_font = QFont(TerminalDefaults::kFontFamily, TerminalDefaults::kFontSize);
     m_font.setStyleHint(QFont::Monospace);
     m_fontMetrics = QFontMetrics(m_font);
+
+    // "滚动到底部"浮动按钮: 自动滚动锁定时显示在右下角
+    m_scrollToBottomBtn->setObjectName("scrollToBottomBtn");
+    m_scrollToBottomBtn->setFixedSize(32, 32);
+    m_scrollToBottomBtn->setText(QChar(0x2193)); // 下箭头 Unicode
+    m_scrollToBottomBtn->setToolTip(tr("点击跳转到底部(恢复自动滚动)"));
+    m_scrollToBottomBtn->hide();
+    connect(m_scrollToBottomBtn, &QPushButton::clicked,
+            this, &TerminalWidget::onScrollToBottomClicked);
 
     // 从ThemeManager加载语义色板
     auto& theme = ThemeManager::instance();

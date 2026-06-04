@@ -26,7 +26,7 @@
 void TerminalWidget::resizeEvent(QResizeEvent* event) { QWidget::resizeEvent(event); updateVisibleRange(); }
 
 // ---- 鼠标事件 ----
-/** @brief 鼠标滚轮事件：Ctrl+滚轮缩放字号，普通滚轮上下滚动 @param event 滚轮事件 */
+/** @brief 鼠标滚轮事件：Ctrl+滚轮缩放字号，普通滚轮上下滚动，向上滚动锁定自动滚动 @param event 滚轮事件 */
 void TerminalWidget::wheelEvent(QWheelEvent* event)
 {
     int delta = event->angleDelta().y();
@@ -37,8 +37,21 @@ void TerminalWidget::wheelEvent(QWheelEvent* event)
         m_scrollOffset -= lines;
     }
     m_scrollOffset = qMax(0, qMin(m_scrollOffset, m_maxScrollOffset));
-    // 任何手动滚动只要不在底部就禁用自动滚动（修复向上滚动立即回弹问题）
-    if (m_scrollOffset < m_maxScrollOffset) m_autoScroll = false;
+    // 向上滚动时锁定自动滚动(仅首次从解锁状态切换时计数)
+    if (m_scrollOffset < m_maxScrollOffset) {
+        if (m_autoScroll) {
+            ++m_totalAutoScrollLocks;
+            m_autoScroll = false;
+            emit autoScrollLockedChanged(true);
+        }
+    }
+    // 滚动到底部时自动解锁
+    if (m_scrollOffset >= m_maxScrollOffset && !m_autoScroll) {
+        ++m_totalAutoScrollUnlocks;
+        m_autoScroll = true;
+        emit autoScrollLockedChanged(false);
+    }
+    updateScrollToBottomBtn();
     update();
     event->accept();
 }

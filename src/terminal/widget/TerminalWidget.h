@@ -6,6 +6,7 @@
 #define TERMINALWIDGET_H
 
 #include <QWidget>
+#include <QPushButton>
 #include "shared/AppConstants.h"
 #include "terminal/menu/TerminalContextMenuManager.h"
 #include "terminal/model/TerminalModel.h"
@@ -32,6 +33,7 @@ signals:
     void searchRequested();                             ///< 用户触发搜索(Ctrl+F)
     void pasteRequested(const QString& text);           ///< 右键菜单粘贴请求 @param text 待粘贴文本
     void clearRequested();                              ///< 用户请求清屏
+    void autoScrollLockedChanged(bool locked);          ///< 自动滚动锁定状态变化 @param locked true=已锁定(禁用自动滚动)
 
 public:
     /** @brief 构造终端控件 @param parent 父Widget指针 */
@@ -69,6 +71,8 @@ public:
     void gotoPrevMatch();                       ///< 跳转到上一个搜索匹配
     void selectAll();                           ///< 全选终端内容
     QSize sizeHint() const override;            ///< 返回控件推荐尺寸
+    /** @brief 判断用户是否在滚动区域底部(允许2行容差) @return true=在底部 */
+    bool isAtBottom() const;
 
 protected:
     void paintEvent(QPaintEvent* event) override;       ///< 重绘事件
@@ -83,9 +87,11 @@ protected:
 private slots:
     void onDataAppended(int firstNewLine, int count); ///< 数据追加处理 @param firstNewLine 首行索引 @param count 新增行数
     void onDataCleared();                              ///< 数据清除处理
+    void onScrollToBottomClicked();                    ///< "滚动到底部"按钮点击，解锁自动滚动并跳转到底部
 
 private:
     void updateVisibleRange();                         ///< 更新可见行范围
+    void updateScrollToBottomBtn();                    ///< 更新"滚动到底部"按钮可见性和位置
     void scrollToMatch(int line);                      ///< 滚动到匹配行
     void refreshSearchAfterCacheUpdate();              ///< 缓存更新后刷新搜索高亮
     CachedLine formatToCache(const TerminalLine& line) const; ///< 格式化行到缓存
@@ -112,6 +118,7 @@ private:
     TerminalSearchManager* m_searchManager;
     DirectionFilter* m_directionFilter;
     TerminalContextMenuManager* m_contextMenuManager;
+    QPushButton* m_scrollToBottomBtn;              ///< "滚动到底部"浮动按钮(自动滚动锁定时显示)
     mutable QVector<CachedLine> m_cachedLines;
     mutable int m_cachedLineCount = 0;
     // ---- 统计计数器 ----
@@ -121,6 +128,8 @@ private:
     quint64 m_totalClears = 0;                    ///< 总清屏次数
     quint64 m_totalDisplayModeChanges = 0;        ///< 总显示模式切换次数(文本/HEX/混合/十进制)
     quint64 m_totalMatchNavigations = 0;          ///< 总搜索匹配导航次数(F3/Shift+F3)
+    quint64 m_totalAutoScrollLocks = 0;           ///< 总自动滚动锁定次数(用户手动上滚)
+    quint64 m_totalAutoScrollUnlocks = 0;         ///< 总自动滚动解锁次数(点击按钮或滚到底部)
 
 public:
     quint64 totalLinesRendered() const { return m_totalLinesRendered; }         ///< 获取总渲染行数
@@ -129,6 +138,8 @@ public:
     quint64 totalClears() const { return m_totalClears; }                       ///< 获取总清屏次数
     quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; }///< 获取总显示模式切换次数
     quint64 totalMatchNavigations() const { return m_totalMatchNavigations; }   ///< 获取总搜索匹配导航次数
+    quint64 totalAutoScrollLocks() const { return m_totalAutoScrollLocks; }     ///< 获取总自动滚动锁定次数
+    quint64 totalAutoScrollUnlocks() const { return m_totalAutoScrollUnlocks; } ///< 获取总自动滚动解锁次数
     void resetTerminalWidgetStatistics(); ///< 重置终端统计计数器
 };
 

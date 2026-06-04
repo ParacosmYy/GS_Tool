@@ -164,6 +164,12 @@ quint64 DataConverter::totalErrors() const
     return m_totalErrors;
 }
 
+/** @brief 获取最近一次输入验证失败的错误描述(中文) @return 错误描述字符串，无错误时返回空 */
+QString DataConverter::lastValidationError() const
+{
+    return m_lastValidationError;
+}
+
 /** @brief 重置所有转换统计计数器(转换次数/字节数/错误次数/格式切换归零) */
 void DataConverter::resetStatistics()
 {
@@ -171,4 +177,5 @@ void DataConverter::resetStatistics()
     m_totalBytesConverted = 0;
     m_totalErrors = 0;
     m_totalFormatSwitches = 0;
+    m_lastValidationError.clear();
 }

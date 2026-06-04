@@ -111,8 +111,15 @@ bool TerminalWidget::showDirectionPrefix() const { return m_showDirectionPrefix;
 /** @brief 设置自动滚动到底部(新数据到来时自动滚动) @param autoScroll true=自动滚动 */
 void TerminalWidget::setAutoScroll(bool autoScroll)
 {
+    if (m_autoScroll == autoScroll) return;
     m_autoScroll = autoScroll;
-    if (m_autoScroll) { m_scrollOffset = m_maxScrollOffset; update(); }
+    if (m_autoScroll) {
+        ++m_totalAutoScrollUnlocks;
+        m_scrollOffset = m_maxScrollOffset;
+        emit autoScrollLockedChanged(false);
+    }
+    updateScrollToBottomBtn();
+    update();
 }
 /** @brief 返回自动滚动状态 @return true=自动滚动已开启 */
 bool TerminalWidget::autoScroll() const { return m_autoScroll; }
@@ -148,7 +155,7 @@ CachedLine TerminalWidget::formatToCache(const TerminalLine& line) const
     cached.direction = line.direction;
     cached.timestamp = line.timestamp.toMSecsSinceEpoch();
     QString prefix = m_showDirectionPrefix
-        ? ((line.direction == DataDirection::Tx) ? "[TX:] " : "[RX:] ") : QString();
+        ? ((line.direction == DataDirection::Tx) ? tr("[TX:] ") : tr("[RX:] ")) : QString();
 
     switch (m_displayMode) {
     case DisplayMode::Hex:

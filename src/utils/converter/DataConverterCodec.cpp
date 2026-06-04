@@ -4,18 +4,46 @@
  *
  * 从 DataConverter.cpp 拆分而来，包含各格式的解码(decodeToRaw)
  * 和编码(encodeFromRaw)核心转换逻辑。
+ *
+ * 输入验证增强:
+ * - Hex: 仅允许 0-9, A-F, a-f 和空格，非法字符返回空并递增错误计数
+ * - Decimal: 仅允许 0-9 和空格，非法字符返回空并递增错误计数
+ * - Binary: 仅允许 0-1 和空格，非法字符返回空并递增错误计数
  */
 
 #include "utils/converter/DataConverter.h"
 #include <QUrl>
 
-/** @brief 从指定格式解码为原始字节 @param input 输入数据 @param from 源格式 @return 解码后的原始字节数据 */
+namespace {
+/**
+ * @brief 验证字符串中每个字符是否都属于指定合法字符集
+ * @param text 待验证字符串
+ * @param validChars 合法字符集合(如"0123456789ABCDEFabcdef ")
+ * @return true=所有字符都合法
+ */
+bool isValidCharSet(const QString& text, const QString& validChars)
+{
+    for (const QChar& ch : text) {
+        if (!validChars.contains(ch)) return false;
+    }
+    return true;
+}
+} // anonymous namespace
+
+/** @brief 从指定格式解码为原始字节(含输入验证) @param input 输入数据 @param from 源格式 @return 解码后的原始字节数据，验证失败返回空 */
 QByteArray DataConverter::decodeToRaw(const QByteArray &input, Format from) const
 {
     switch (from) {
     case Hex: {
         QString hex = QString::fromUtf8(input).simplified();
         hex.remove(' ');
+        /* 验证十六进制输入: 仅允许 0-9, A-F, a-f */
+        if (!isValidCharSet(hex, QStringLiteral("0123456789ABCDEFabcdef"))) {
+            m_lastValidationError = tr("十六进制输入包含非法字符，仅允许 0-9, A-F, a-f");
+            ++m_totalErrors;
+            return QByteArray();
+        }
+        m_lastValidationError.clear();
         return QByteArray::fromHex(hex.toUtf8());
     }
     case Ascii:
@@ -25,8 +53,15 @@ QByteArray DataConverter::decodeToRaw(const QByteArray &input, Format from) cons
     case UrlEncode:
         return QUrl::fromPercentEncoding(input).toUtf8();
     case Binary: {
-        QByteArray result;
         QString text = QString::fromUtf8(input).simplified();
+        /* 验证二进制输入: 仅允许 0, 1 和空格(已simplified移除多余空格) */
+        if (!isValidCharSet(text, QStringLiteral("01 "))) {
+            m_lastValidationError = tr("二进制输入包含非法字符，仅允许 0 和 1");
+            ++m_totalErrors;
+            return QByteArray();
+        }
+        m_lastValidationError.clear();
+        QByteArray result;
         QStringList parts = text.split(' ', Qt::SkipEmptyParts);
         for (const auto &part : parts) {
             bool ok;
@@ -38,8 +73,15 @@ QByteArray DataConverter::decodeToRaw(const QByteArray &input, Format from) cons
         return result;
     }
     case Decimal: {
-        QByteArray result;
         QString text = QString::fromUtf8(input).simplified();
+        /* 验证十进制输入: 仅允许 0-9 和空格 */
+        if (!isValidCharSet(text, QStringLiteral("0123456789 "))) {
+            m_lastValidationError = tr("十进制输入包含非法字符，仅允许 0-9");
+            ++m_totalErrors;
+            return QByteArray();
+        }
+        m_lastValidationError.clear();
+        QByteArray result;
         QStringList parts = text.split(' ', Qt::SkipEmptyParts);
         for (const auto &part : parts) {
             bool ok;
@@ -51,8 +93,15 @@ QByteArray DataConverter::decodeToRaw(const QByteArray &input, Format from) cons
         return result;
     }
     case Octal: {
-        QByteArray result;
         QString text = QString::fromUtf8(input).simplified();
+        /* 验证八进制输入: 仅允许 0-7 和空格 */
+        if (!isValidCharSet(text, QStringLiteral("01234567 "))) {
+            m_lastValidationError = tr("八进制输入包含非法字符，仅允许 0-7");
+            ++m_totalErrors;
+            return QByteArray();
+        }
+        m_lastValidationError.clear();
+        QByteArray result;
         QStringList parts = text.split(' ', Qt::SkipEmptyParts);
         for (const auto &part : parts) {
             bool ok;

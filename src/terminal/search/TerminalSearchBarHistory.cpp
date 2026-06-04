@@ -21,12 +21,13 @@
 #include <QStringListModel>
 #include <QCompleter>
 #include <QStyle>
+#include <QSettings>
 
 /**
  * @brief 统一的搜索触发入口
  *
  * 根据当前搜索框内容和选项状态发射 searchRequested 或 searchCleared 信号。
- * 被文本变化和选项变化两种场景共用。
+ * 搜索时自动将有效模式串保存到QSettings历史(最多10条)。
  */
 void TerminalSearchBar::triggerSearch()
 {
@@ -42,6 +43,8 @@ void TerminalSearchBar::triggerSearch()
         if (m_hexCheck->isChecked()) {
             ++m_totalHexSearches;  ///< 统计: HEX模式搜索递增
         }
+        /* 保存搜索模式到QSettings历史 */
+        saveRecentSearch(text);
         emit searchRequested(text, m_regexCheck->isChecked(), m_hexCheck->isChecked(),
                              m_caseCheck->isChecked(), m_wordCheck->isChecked());
     }
@@ -117,4 +120,51 @@ void TerminalSearchBar::resetSearchBarStatistics()
     m_totalReplacements = 0;
     m_totalRegexSearches = 0;
     m_totalHexSearches = 0;
+}
+
+/** @brief 保存搜索模式到QSettings历史(最多10条，去重，最新在前) @param pattern 搜索模式串 */
+void TerminalSearchBar::saveRecentSearch(const QString& pattern)
+{
+    if (pattern.trimmed().isEmpty()) return;
+
+    /* 去重: 如果已存在则先移除旧位置 */
+    m_recentSearches.removeAll(pattern);
+    /* 插入到最前面 */
+    m_recentSearches.prepend(pattern);
+    /* 限制最多10条 */
+    while (m_recentSearches.size() > 10) {
+        m_recentSearches.removeLast();
+    }
+
+    /* 持久化到QSettings */
+    QSettings settings;
+    settings.beginGroup("TerminalSearch");
+    settings.setValue("recentSearches", m_recentSearches);
+    settings.endGroup();
+
+    /* 同步更新补全器模型 */
+    auto* model = qobject_cast<QStringListModel*>(m_completer->model());
+    if (model) {
+        model->setStringList(m_recentSearches);
+    }
+}
+
+/** @brief 从QSettings加载最近搜索历史到补全器 */
+void TerminalSearchBar::loadRecentSearches()
+{
+    QSettings settings;
+    settings.beginGroup("TerminalSearch");
+    m_recentSearches = settings.value("recentSearches").toStringList();
+    settings.endGroup();
+
+    /* 限制最多10条(防御性) */
+    while (m_recentSearches.size() > 10) {
+        m_recentSearches.removeLast();
+    }
+
+    /* 更新补全器模型 */
+    auto* model = qobject_cast<QStringListModel*>(m_completer->model());
+    if (model) {
+        model->setStringList(m_recentSearches);
+    }
 }

@@ -16,24 +16,32 @@
 #include <QContextMenuEvent>
 
 // ---- 模型数据回调 ----
-/** @brief 数据追加回调：更新缓存行计数，自动滚动到底部 @param firstNewLine 首行索引 @param count 新增行数 */
+/** @brief 数据追加回调：更新缓存行计数，自动滚动到底部(锁定时仅更新按钮状态) @param firstNewLine 首行索引 @param count 新增行数 */
 void TerminalWidget::onDataAppended(int firstNewLine, int count)
 {
     Q_UNUSED(firstNewLine); Q_UNUSED(count);
     if (m_directionFilter->isFiltered()) { update(); return; }
     if (m_model) {
         m_maxScrollOffset = qMax(0, m_model->lineCount() - m_visibleLines);
-        if (m_autoScroll) m_scrollOffset = m_maxScrollOffset;
+        if (m_autoScroll) {
+            m_scrollOffset = m_maxScrollOffset;
+        }
     }
+    updateScrollToBottomBtn();
     update();
 }
 
-/** @brief 数据清空回调：重置缓存和滚动位置 */
+/** @brief 数据清空回调：重置缓存和滚动位置，恢复自动滚动 */
 void TerminalWidget::onDataCleared()
 {
     m_cachedLines.clear(); m_cachedLineCount = 0;
     m_directionFilter->reset(); m_selectionManager->reset();
     m_scrollOffset = 0; m_maxScrollOffset = 0;
+    if (!m_autoScroll) {
+        m_autoScroll = true;
+        emit autoScrollLockedChanged(false);
+    }
+    m_scrollToBottomBtn->hide();
     update();
 }
 
@@ -47,6 +55,7 @@ void TerminalWidget::updateVisibleRange()
             : qMax(0, m_model->lineCount() - m_visibleLines);
         m_scrollOffset = qMin(m_scrollOffset, m_maxScrollOffset);
     }
+    updateScrollToBottomBtn();
 }
 
 // ---- 右键菜单 / 全选 ----
@@ -70,7 +79,7 @@ void TerminalWidget::selectAll()
 }
 
 // ---- 统计计数器 ----
-/** @brief 重置终端统计计数器(渲染行数/按键/右键菜单/清屏/显示模式切换/匹配导航) */
+/** @brief 重置终端统计计数器(渲染行数/按键/右键菜单/清屏/显示模式切换/匹配导航/自动滚动锁定) */
 void TerminalWidget::resetTerminalWidgetStatistics()
 {
     m_totalLinesRendered = 0;
@@ -79,4 +88,42 @@ void TerminalWidget::resetTerminalWidgetStatistics()
     m_totalClears = 0;
     m_totalDisplayModeChanges = 0;
     m_totalMatchNavigations = 0;
+    m_totalAutoScrollLocks = 0;
+    m_totalAutoScrollUnlocks = 0;
+}
+
+// ---- 自动滚动锁定管理 ----
+
+/** @brief 判断用户是否在滚动区域底部(允许2行容差) @return true=在底部附近 */
+bool TerminalWidget::isAtBottom() const
+{
+    return m_scrollOffset >= m_maxScrollOffset - 2;
+}
+
+/** @brief "滚动到底部"按钮点击槽: 解锁自动滚动并跳转到底部 */
+void TerminalWidget::onScrollToBottomClicked()
+{
+    if (!m_autoScroll) {
+        ++m_totalAutoScrollUnlocks;
+        m_autoScroll = true;
+        m_scrollOffset = m_maxScrollOffset;
+        emit autoScrollLockedChanged(false);
+    }
+    updateScrollToBottomBtn();
+    update();
+}
+
+/** @brief 更新"滚动到底部"浮动按钮的可见性和位置(右下角，距底部8px) */
+void TerminalWidget::updateScrollToBottomBtn()
+{
+    if (m_autoScroll || m_maxScrollOffset <= 0) {
+        m_scrollToBottomBtn->hide();
+    } else {
+        /* 定位到控件右下角，距底边距和右边距各8像素 */
+        int btnX = width() - m_scrollToBottomBtn->width() - 8;
+        int btnY = height() - m_scrollToBottomBtn->height() - 8;
+        m_scrollToBottomBtn->move(btnX, btnY);
+        m_scrollToBottomBtn->raise();
+        m_scrollToBottomBtn->show();
+    }
 }

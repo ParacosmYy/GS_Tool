@@ -34,6 +34,8 @@ TerminalSearchBar::TerminalSearchBar(QWidget* parent)
     , m_completer(nullptr)
 {
     setupUI();
+    /* 从QSettings加载最近搜索历史到补全器 */
+    loadRecentSearches();
     // 初始隐藏, 等待 Ctrl+F 激活
     hide();
 }
