@@ -247,6 +247,7 @@ set(SOURCES
     src/connection/can/CanConnectionProtocol.cpp
     src/connection/can/CanFrameParser.cpp
     src/connection/can/CanBusMonitor.cpp
+    src/connection/can/CanBusMonitorFrame.cpp
     src/connection/can/CanConfigPanel.cpp
     src/protocol/can/DbcParser.cpp
     src/protocol/can/DbcParserParse.cpp
@@ -256,6 +257,7 @@ set(SOURCES
     src/connection/mqtt/MqttConnectionProtocol.cpp
     src/connection/mqtt/MqttTopicModel.cpp
     src/connection/mqtt/MqttTopicModelHelpers.cpp
+    src/connection/mqtt/MqttTopicModelIndex.cpp
     src/connection/mqtt/MqttSubscriptionPanel.cpp
     src/connection/mqtt/MqttConfigPanel.cpp
     src/connection/mqtt/MqttWidget.cpp
@@ -306,6 +308,7 @@ set(SOURCES
 
     # ── F21: 正则终端过滤器 ──
     src/terminal/filter/TerminalFilter.cpp
+    src/terminal/filter/TerminalFilterApply.cpp
     src/terminal/filter/TerminalFilterBar.cpp
     src/terminal/filter/TerminalHighlighter.cpp
 
