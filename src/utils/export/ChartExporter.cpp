@@ -12,6 +12,7 @@
 // 构造函数
 // ---------------------------------------------------------------------------
 
+/** @brief 构造图表导出器 @param parent 父对象 */
 ChartExporter::ChartExporter(QObject* parent)
     : QObject(parent)
 {

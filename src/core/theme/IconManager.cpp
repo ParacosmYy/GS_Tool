@@ -11,6 +11,7 @@
 #include <QSvgRenderer>
 #include <QApplication>
 
+/** @brief 获取IconManager单例实例 @return 单例引用 */
 IconManager& IconManager::instance()
 {
     static IconManager inst(qApp);
@@ -25,6 +26,7 @@ IconManager::IconManager(QObject* parent)
             this, &IconManager::clearCache);
 }
 
+/** @brief 析构函数，使用默认实现 */
 IconManager::~IconManager() = default;
 
 /** @brief 拼接SVG资源路径 */

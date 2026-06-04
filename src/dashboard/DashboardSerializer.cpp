@@ -81,7 +81,10 @@ bool DashboardSerializer::loadFromFile(const QString& filePath,
     return loadFromJson(data, name, columns, items);
 }
 
+/** @brief 获取最近一次操作的错误描述 @return 错误信息字符串 */
 QString DashboardSerializer::lastError() const { return m_lastError; }
+
+/** @brief 获取当前序列化格式版本号 @return 版本号整数 */
 int DashboardSerializer::currentVersion() { return kVersion; }
 
 /** @brief 验证布局配置有效性 @return 错误信息列表（空=通过） */
@@ -177,14 +180,31 @@ bool DashboardSerializer::deleteLayout(const QString& filePath)
 
 // ─── 统计接口 ───────────────────────────────────────────────────────
 
+/** @brief 获取累计保存操作次数 @return 保存计数 */
 quint64 DashboardSerializer::totalSaves() const        { return m_totalSaves; }
+
+/** @brief 获取累计加载操作次数 @return 加载计数 */
 quint64 DashboardSerializer::totalLoads() const        { return m_totalLoads; }
+
+/** @brief 获取累计验证操作次数 @return 验证计数 */
 quint64 DashboardSerializer::totalValidations() const  { return m_totalValidations; }
+
+/** @brief 获取累计删除操作次数 @return 删除计数 */
 quint64 DashboardSerializer::totalDeletes() const      { return m_totalDeletes; }
+
+/** @brief 获取累计错误次数 @return 错误计数 */
 quint64 DashboardSerializer::totalErrors() const       { return m_totalErrors; }
+
+/** @brief 获取累计QSettings配置文件保存次数 @return 配置保存计数 */
 quint64 DashboardSerializer::totalProfileSaves() const { return m_totalProfileSaves; }
+
+/** @brief 获取累计QSettings配置文件加载次数 @return 配置加载计数 */
 quint64 DashboardSerializer::totalProfileLoads() const { return m_totalProfileLoads; }
+
+/** @brief 获取累计JSON导出次数 @return 导出计数 */
 quint64 DashboardSerializer::totalExports() const      { return m_totalExports; }
+
+/** @brief 获取累计JSON导入次数 @return 导入计数 */
 quint64 DashboardSerializer::totalImports() const      { return m_totalImports; }
 
 /** @brief 获取已保存配置文件的最高版本号 @return 最高版本号 */
@@ -220,6 +240,7 @@ quint64 DashboardSerializer::totalBytesWritten() const { return m_totalBytesWrit
 /** @brief 获取累计读取文件字节数 @return 字节总数 */
 quint64 DashboardSerializer::totalBytesRead() const { return m_totalBytesRead; }
 
+/** @brief 重置所有序列化器统计计数器(保存/加载/验证/删除/错误/导出/导入/字节/版本) */
 void DashboardSerializer::resetSerializerStatistics()
 {
     m_totalSaves = 0; m_totalLoads = 0; m_totalValidations = 0;

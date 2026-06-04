@@ -24,6 +24,7 @@ DataLogger::DataLogger(QObject* parent)
             this, &DataLogger::onPlaybackTick);
 }
 
+/** @brief 析构数据录制器，静默停止录制和回放(不发射信号) */
 DataLogger::~DataLogger()
 {
     // 析构时静默停止: 仅释放资源，不发射信号(避免析构期间回调访问半销毁对象)
@@ -109,7 +110,10 @@ void DataLogger::resumeRecording()
     m_pauseOffset += (m_recordTimer.elapsed() - m_pauseStartTime);
 }
 
+/** @brief 查询是否正在录制 @return true=录制中 */
 bool DataLogger::isRecording() const { return m_recording; }
+
+/** @brief 查询录制是否暂停 @return true=已暂停 */
 bool DataLogger::isPaused() const { return m_paused; }
 
 /** @brief 记录一条数据到日志文件 @param data 原始字节数据 @param dir 数据方向(RX/TX) */
@@ -125,6 +129,7 @@ void DataLogger::logData(const QByteArray& data, Direction dir)
     m_totalBytesRecorded += static_cast<quint64>(data.size());
 }
 
+/** @brief 获取当前录制会话的记录条数 @return 已记录的数据条数 */
 int DataLogger::recordCount() const { return m_recordCount; }
 
 /** @brief 获取当前录制会话的持续时间(毫秒，扣除暂停时间) */

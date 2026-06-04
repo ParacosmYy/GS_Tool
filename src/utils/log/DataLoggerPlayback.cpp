@@ -263,6 +263,7 @@ void DataLogger::addBookmark(const QString& label, const QString& streamId)
     emit bookmarksChanged();
 }
 
+/** @brief 获取所有书签列表 @return 书签向量 */
 QVector<DataBookmark> DataLogger::bookmarks() const { return m_bookmarks; }
 
 /** @brief 删除指定索引的书签 @param index 书签索引 */
@@ -283,11 +284,22 @@ void DataLogger::clearBookmarks()
 
 // ---- 会话统计 ----
 
+/** @brief 获取累计写入日志条数 @return 日志写入计数 */
 quint64 DataLogger::totalLogsWritten() const { return m_totalLogsWritten; }
+
+/** @brief 获取累计创建书签数量 @return 书签计数 */
 quint64 DataLogger::totalBookmarks() const { return m_totalBookmarks; }
+
+/** @brief 获取累计处理的记录总数 @return 记录计数 */
 quint64 DataLogger::totalRecords() const { return m_totalRecords; }
+
+/** @brief 获取累计录制的字节总数 @return 字节数 */
 quint64 DataLogger::totalBytesRecorded() const { return m_totalBytesRecorded; }
+
+/** @brief 获取累计回放操作次数 @return 回放计数 */
 quint64 DataLogger::totalPlaybacks() const { return m_totalPlaybacks; }
+
+/** @brief 获取累计错误次数 @return 错误计数 */
 quint64 DataLogger::totalErrors() const { return m_totalErrors; }
 
 /** @brief 重置所有统计计数器 */
