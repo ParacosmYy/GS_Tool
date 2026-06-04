@@ -56,6 +56,8 @@
 | 208 | ChartWidgetRender/ProtocolBridgeAutoDetect拆分+FFT/CursorOverlay/Scatter/Dashboard/PanelManager linter增强 | 波形渲染独立文件+协议桥自动检测独立+各模块统计增强 |
 | 209 | ChartExporterFormats/BleGattModelQuery拆分+PanelManager统计增强 | 图表导出格式独立+BLE GATT查询独立+面板管理器统计 |
 | 210 | YModemTransferProtocol/PortWatcherStats拆分 | YModem协议独立文件+端口监听统计独立 |
+| 211 | MainWindowLifecycle/ResponsiveLayoutQuery拆分+TrafficMonitor/SignalLine/PerformanceOverlay/TimedSender/DataStatistics linter增强 | 主窗口生命周期独立+响应式查询独立+流量/信号/性能/定时/数据统计增强 |
+| 212 | TimedSender统计增强+TrafficMonitor头文件修正 | 定时发送/字节/错误统计+流量监控getter修正 |
 
 ---
 

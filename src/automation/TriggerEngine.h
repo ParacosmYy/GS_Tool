@@ -123,6 +123,18 @@ public:
     /** @brief 获取总错误次数（正则编译失败等） */
     quint64 totalErrors() const;
 
+    /** @brief 获取总规则评估次数（每条规则每次评估计为一次） @return 规则评估总次数 */
+    quint64 totalTriggersEvaluated() const;
+
+    /** @brief 获取总触发器命中次数（规则匹配成功并发射信号） @return 触发器命中总次数 */
+    quint64 totalTriggersFired() const;
+
+    /** @brief 获取总跳过禁用规则的次数 @return 跳过禁用规则的总次数 */
+    quint64 totalTriggersDisabled() const;
+
+    /** @brief 获取总动作执行错误次数 @return 动作执行错误总次数 */
+    quint64 totalActionErrors() const;
+
     /** @brief 重置所有扩展统计计数器为初始值 */
     void resetStats();
 
@@ -154,6 +166,10 @@ private:
     quint64 m_totalMatches = 0;         ///< 总匹配成功次数（quint64精度）
     quint64 m_totalActionsExecuted = 0; ///< 总动作执行次数
     quint64 m_totalErrors = 0;          ///< 总错误次数
+    quint64 m_totalTriggersEvaluated = 0; ///< 总规则评估次数（每条规则每次评估计为一次）
+    quint64 m_totalTriggersFired = 0;     ///< 总触发器命中次数
+    quint64 m_totalTriggersDisabled = 0;  ///< 总跳过禁用规则的次数
+    quint64 m_totalActionErrors = 0;      ///< 总动作执行错误次数
 };
 
 #endif // TRIGGERENGINE_H
