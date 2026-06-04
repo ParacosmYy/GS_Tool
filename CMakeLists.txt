@@ -26,7 +26,6 @@ find_package(Qt6 REQUIRED COMPONENTS
     SerialPort
     Charts
     Network
-    Qml
 )
 
 # 源文件
@@ -581,6 +580,7 @@ set(SOURCES
     src/utils/checksum/ChecksumPanelAlgo.cpp
     src/utils/checksum/ChecksumPanelSlots.cpp
     src/utils/checksum/DataChecksumVerifier.cpp
+    src/utils/checksum/DataChecksumVerifierAlgo.cpp
     src/utils/checksum/DataChecksumVerifierStats.cpp
 
     # ── F23: ASCII/表格转换器 ──
@@ -640,6 +640,10 @@ set(SOURCES
     # ── F31: 数据包重组引擎 ──
     src/protocol/reassembly/PacketReassembler.cpp
     src/protocol/reassembly/PacketReassemblerStats.cpp
+
+    # ── F31: 字节模式搜索器 ──
+    src/utils/pattern/BytePatternAnalyzer.cpp
+    src/utils/pattern/BytePatternAnalyzerStats.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -706,7 +710,16 @@ set(SOURCES
 
     # ── 波形发生器 ──
     src/utils/waveform/WaveformGenerator.cpp
+    src/utils/waveform/WaveformGeneratorExport.cpp
     src/utils/waveform/WaveformGeneratorStats.cpp
+
+    # ── F35: 数据流分割器 ──
+    src/utils/splitter/DataStreamSplitter.cpp
+    src/utils/splitter/DataStreamSplitterStats.cpp
+
+    # ── F34: 数据速率计算器 ──
+    src/utils/rate/DataRateCalculator.cpp
+    src/utils/rate/DataRateCalculatorStats.cpp
 )
 
 set(HEADERS
@@ -1011,6 +1024,9 @@ set(HEADERS
     # ── F31: 数据包重组引擎 ──
     src/protocol/reassembly/PacketReassembler.h
 
+    # ── F31: 字节模式搜索器 ──
+    src/utils/pattern/BytePatternAnalyzer.h
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.h
 
@@ -1061,6 +1077,9 @@ set(HEADERS
 
     # ── 波形发生器 ──
     src/utils/waveform/WaveformGenerator.h
+
+    # ── F35: 数据流分割器 ──
+    src/utils/splitter/DataStreamSplitter.h
 )
 
 set(RESOURCES
@@ -1086,7 +1105,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::SerialPort
     Qt6::Charts
     Qt6::Network
-    Qt6::Qml
 )
 
 # Windows平台特殊设置
