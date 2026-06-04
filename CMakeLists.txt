@@ -84,6 +84,7 @@ set(SOURCES
     src/core/connect/ConnectionManager.cpp
     src/core/connect/ConnectionFactory.cpp
     src/core/theme/ThemeManager.cpp
+    src/core/theme/ThemeManagerApply.cpp
     src/core/theme/ThemeManagerColor.cpp
     src/core/theme/QssThemeGenerator.cpp
     src/core/theme/QssThemeGeneratorWidgets.cpp
@@ -141,14 +142,17 @@ set(SOURCES
     src/protocol/bridge/JustFloatBridge.cpp
     src/protocol/bridge/FireWaterBridge.cpp
     src/protocol/bridge/ProtocolBridgeManager.cpp
+    src/protocol/bridge/ProtocolBridgeManagerConfig.cpp
     src/protocol/bridge/ProtocolBridgeManagerHelpers.cpp
     src/protocol/bridge/ProtocolBridgeManagerStats.cpp
     src/protocol/bridge/ProtocolBridgeManagerAutoDetect.cpp
+    src/protocol/bridge/ProtocolBridgeManagerConfig.cpp
     src/chart/widget/ChartWidget.cpp
     src/chart/widget/ChartWidgetTheme.cpp
     src/chart/widget/ChartWidgetExport.cpp
     src/chart/widget/ChartWidgetRender.cpp
     src/chart/model/ChannelConfig.cpp
+    src/chart/model/ChannelConfigSetMethods.cpp
     src/chart/model/ChannelConfigStyle.cpp
     src/chart/model/ChartModel.cpp
     src/chart/model/ChartModelSlots.cpp
@@ -205,6 +209,7 @@ set(SOURCES
     src/core/settings/SessionManager.cpp
     src/core/managers/ShortcutManager.cpp
     src/core/managers/ShortcutManagerActions.cpp
+    src/core/managers/ShortcutManagerQuery.cpp
     src/core/layout/ResponsiveLayout.cpp
     src/core/layout/ResponsiveLayoutQuery.cpp
 
