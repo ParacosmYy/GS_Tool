@@ -70,6 +70,7 @@ class FlatBuffersDecoder : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造函数 */
     explicit FlatBuffersDecoder(QObject* parent = nullptr);
 
     bool loadFbsFile(const QString& filePath);  ///< 加载并解析.fbs模式文件

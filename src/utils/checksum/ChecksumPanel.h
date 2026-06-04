@@ -1,12 +1,4 @@
-/**
- * @file ChecksumPanel.h
- * @brief 校验和计算面板 UI
- * @author Serial Tool Team
- * @date 2026-06-02
- *
- * 提供数据输入（十六进制/ASCII/文件）、算法选择和结果显示的交互面板。
- */
-
+/** @file ChecksumPanel.h @brief 校验和计算面板 UI -- 数据输入(十六进制/ASCII/文件)、算法选择、结果显示 */
 #ifndef CHECKSUMPANEL_H
 #define CHECKSUMPANEL_H
 
@@ -21,141 +13,52 @@
 
 #include "utils/checksum/ChecksumCalculator.h"
 
-/**
- * @class ChecksumPanel
- * @brief 校验和计算器 UI 面板
- */
-class ChecksumPanel : public QWidget
-{
+/** @brief 校验和计算器 UI 面板 */
+class ChecksumPanel : public QWidget {
     Q_OBJECT
 
 public:
-    /**
-     * @brief 构造函数
-     * @param parent 父控件
-     */
     explicit ChecksumPanel(QWidget *parent = nullptr);
-
-    /**
-     * @brief 获取输入数据
-     * @return 根据当前输入模式解析后的字节数组
-     */
-    QByteArray inputData() const;
-
-    /**
-     * @brief 获取当前选中的算法
-     * @return 算法枚举值
-     */
-    ChecksumCalculator::Algorithm selectedAlgorithm() const;
-
-    /**
-     * @brief 获取计算结果
-     * @return 最近一次校验和结果
-     */
-    quint64 result() const;
+    QByteArray inputData() const;                              ///< 获取输入数据
+    ChecksumCalculator::Algorithm selectedAlgorithm() const;   ///< 获取当前算法
+    quint64 result() const;                                    ///< 获取计算结果
 
     // ---- 统计计数接口 ----
-
-    /** @brief 获取累计计算次数（面板层面，不含内部自动调用） @return 计算次数 */
-    quint64 totalCalculations() const;
-
-    /** @brief 获取累计复制结果次数 @return 复制次数 */
-    quint64 totalCopyActions() const;
-
-    /** @brief 获取累计算法切换次数 @return 切换次数 */
-    quint64 totalAlgorithmChanges() const;
-
-    /** @brief 获取累计复制结果到剪贴板操作次数 @return 剪贴板复制次数 */
-    quint64 totalCopyToClipboard() const;
-
-    /** @brief 获取累计输入内容更新次数 @return 更新次数 */
-    quint64 totalInputUpdates() const;
-
-    /** @brief 获取累计输入模式切换次数(十六进制/ASCII/文件) @return 模式切换次数 */
-    quint64 totalFormatChanges() const;
-
-    /** @brief 获取累计历史记录选择次数 @return 历史选择次数 */
-    quint64 totalHistorySelections() const;
-
-    /** @brief 重置所有面板统计计数器(计算次数/复制次数/算法切换/剪贴板复制/输入更新/模式切换/历史选择) */
-    void resetPanelStatistics();
+    quint64 totalCalculations() const;       ///< 累计计算次数
+    quint64 totalCopyActions() const;        ///< 累计复制结果次数
+    quint64 totalAlgorithmChanges() const;   ///< 累计算法切换次数
+    quint64 totalCopyToClipboard() const;    ///< 累计剪贴板复制次数
+    quint64 totalInputUpdates() const;       ///< 累计输入更新次数
+    quint64 totalFormatChanges() const;      ///< 累计输入模式切换次数
+    quint64 totalHistorySelections() const;  ///< 累计历史选择次数
+    void resetPanelStatistics();             ///< 重置所有面板统计
 
 signals:
-    /**
-     * @brief 计算完成信号
-     * @param value 校验和值
-     * @param algoName 算法名称
-     */
-    void calculated(quint64 value, const QString &algoName);
+    void calculated(quint64 value, const QString &algoName); ///< 计算完成信号
 
 private slots:
-    /**
-     * @brief 执行校验和计算
-     */
     void onCalculate();
-
-    /**
-     * @brief 复制结果到剪贴板
-     */
     void onCopyResult();
-
-    /**
-     * @brief 清除计算历史
-     */
     void onClearHistory();
-
-    /**
-     * @brief 从历史记录中选择并显示结果
-     */
     void onHistoryItemSelected();
 
 private:
-    /**
-     * @brief 添加一条计算结果到历史列表
-     * @param value 校验和值
-     * @param algoName 算法名称
-     * @param inputHex 输入数据十六进制表示（截断显示）
-     */
-    void addHistoryEntry(quint64 value, const QString& algoName,
-                         const QString& inputHex);
+    void addHistoryEntry(quint64 value, const QString& algoName, const QString& inputHex);
 
-    QTextEdit *m_inputEdit;             ///< 数据输入区
-    QComboBox *m_algoCombo;             ///< 算法选择下拉框
-    QComboBox *m_inputModeCombo;        ///< 输入模式（十六进制/ASCII/文件）
-    QLabel *m_resultLabel;              ///< 结果显示标签
-    QPushButton *m_calcBtn;             ///< 计算按钮
-    QPushButton *m_copyBtn;             ///< 复制结果按钮
-    QPushButton *m_clearHistoryBtn;     ///< 清除历史按钮
-    QListWidget *m_historyList;         ///< 计算历史列表
-    ChecksumCalculator m_calculator;    ///< 计算引擎
-    quint64 m_result = 0;               ///< 最近计算结果
-
-    // 面板统计
-    quint64 m_totalCalculations = 0;    ///< 累计计算次数
-    quint64 m_totalCopyActions = 0;     ///< 累计复制到剪贴板次数
-    quint64 m_totalAlgorithmChanges = 0; ///< 累计算法切换次数
-    quint64 m_totalCopyToClipboard = 0; ///< 累计复制结果到剪贴板操作次数
-    quint64 m_totalInputUpdates = 0;    ///< 累计输入内容更新次数
-    quint64 m_totalFormatChanges = 0;   ///< 累计输入模式切换次数(十六进制/ASCII/文件)
-    quint64 m_totalHistorySelections = 0; ///< 累计历史记录选择次数
+    QTextEdit *m_inputEdit;
+    QComboBox *m_algoCombo, *m_inputModeCombo;
+    QLabel *m_resultLabel;
+    QPushButton *m_calcBtn, *m_copyBtn, *m_clearHistoryBtn;
+    QListWidget *m_historyList;
+    ChecksumCalculator m_calculator;
+    quint64 m_result = 0;
+    quint64 m_totalCalculations = 0, m_totalCopyActions = 0, m_totalAlgorithmChanges = 0;
+    quint64 m_totalCopyToClipboard = 0, m_totalInputUpdates = 0, m_totalFormatChanges = 0;
+    quint64 m_totalHistorySelections = 0;
 
 protected:
-    /**
-     * @brief 拖拽进入事件
-     * @param event 拖拽事件
-     */
     void dragEnterEvent(QDragEnterEvent* event) override;
-
-    /**
-     * @brief 拖拽移动事件
-     * @param event 拖拽移动事件
-     */
     void dragMoveEvent(QDragMoveEvent* event) override;
-
-    /**
-     * @brief 放下事件
-     * @param event 放下事件
-     */
     void dropEvent(QDropEvent* event) override;
 };
 

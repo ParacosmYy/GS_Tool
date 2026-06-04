@@ -25,6 +25,7 @@
 class TerminalSearchBar : public QWidget {
     Q_OBJECT
 public:
+    /** @brief 构造函数 */
     explicit TerminalSearchBar(QWidget* parent = nullptr);
 
     QString searchPattern() const;  ///< 获取当前搜索模式串

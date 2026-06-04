@@ -28,40 +28,45 @@ class TerminalModel : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造函数 */
     explicit TerminalModel(QObject* parent = nullptr);
 
-    // 添加接收到的数据
+    /** @brief 添加接收到的数据 */
     void appendReceived(const QByteArray& data);
 
-    // 添加发送的数据
+    /** @brief 添加发送的数据 */
     void appendSent(const QByteArray& data);
 
-    // 获取所有行 (用于导出等场景，返回深拷贝)
+    /** @brief 获取所有行（用于导出等场景，返回深拷贝） */
     QVector<TerminalLine> lines() const;
 
-    // 获取指定范围的行 (用于导出，返回深拷贝)
+    /** @brief 获取指定范围的行（用于导出，返回深拷贝） */
     QVector<TerminalLine> lines(int start, int count) const;
 
-    // 获取单行的拷贝 (用于渲染)
-    // 返回值而非引用，避免QMutexLocker释放后引用悬空
-    // 拷贝成本可接受: QByteArray(隐式共享/COW) + QDateTime + enum
-    // 调用者必须保证 index 在 [0, lineCount()) 范围内
+    /** @brief 获取单行的拷贝（用于渲染）
+     *
+     * 返回值而非引用，避免QMutexLocker释放后引用悬空。
+     * 拷贝成本可接受: QByteArray(隐式共享/COW) + QDateTime + enum。
+     * 调用者必须保证 index 在 [0, lineCount()) 范围内。
+     */
     TerminalLine lineAt(int index) const;
 
-    // 获取总行数
+    /** @brief 获取总行数 */
     int lineCount() const;
 
-    // 获取接收/发送字节统计
+    /** @brief 获取接收字节统计 */
     quint64 rxBytes() const;
+
+    /** @brief 获取发送字节统计 */
     quint64 txBytes() const;
 
-    // 清空所有数据
+    /** @brief 清空所有数据 */
     void clear();
 
-    // 设置最大行数限制 (防止内存无限增长)
+    /** @brief 设置最大行数限制（防止内存无限增长） */
     void setMaxLines(int max);
 
-    // 获取最大行数限制
+    /** @brief 获取最大行数限制 */
     int maxLines() const;
 
     // ---- 统计计数接口 ----

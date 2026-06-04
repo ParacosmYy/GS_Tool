@@ -79,9 +79,13 @@ private:
     quint64 m_totalImports = 0;     ///< 累计模板导入次数
     quint64 m_totalExports = 0;     ///< 累计模板导出次数
 public:
+    /** @brief 获取累计模板加载次数 */
     quint64 totalLoads() const { return m_totalLoads; }
+    /** @brief 获取累计模板导入次数 */
     quint64 totalImports() const { return m_totalImports; }
+    /** @brief 获取累计模板导出次数 */
     quint64 totalExports() const { return m_totalExports; }
+    /** @brief 重置模板库统计计数器 */
     void resetTemplateLibraryStatistics() { m_totalLoads = 0; m_totalImports = 0; m_totalExports = 0; }
 };
 

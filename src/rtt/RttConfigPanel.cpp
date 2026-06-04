@@ -59,9 +59,9 @@ void RttConfigPanel::setupUI()
     // ── 调试接口 ──
     m_interfaceCombo = new QComboBox(this);
     m_interfaceCombo->setObjectName(QStringLiteral("rttInterfaceCombo"));
-    m_interfaceCombo->addItem(QStringLiteral("JTAG"));
-    m_interfaceCombo->addItem(QStringLiteral("SWD"));
-    m_interfaceCombo->addItem(QStringLiteral("cJTAG"));
+    m_interfaceCombo->addItem(tr("JTAG"));
+    m_interfaceCombo->addItem(tr("SWD"));
+    m_interfaceCombo->addItem(tr("cJTAG"));
     m_interfaceCombo->setCurrentText(QStringLiteral("SWD"));
     m_interfaceCombo->setToolTip(tr("调试接口类型"));
     mainLayout->addRow(tr("接口:"), m_interfaceCombo);

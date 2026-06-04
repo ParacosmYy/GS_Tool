@@ -43,6 +43,7 @@ class TerminalFilter : public QObject
     Q_OBJECT
 
 public:
+    /** @brief 构造函数 */
     explicit TerminalFilter(QObject *parent = nullptr);
 
     // ---- 单模式兼容接口 ----

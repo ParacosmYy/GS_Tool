@@ -61,6 +61,7 @@ class DbcParser : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造函数 */
     explicit DbcParser(QObject* parent = nullptr);
 
     /** @brief 从文件加载DBC

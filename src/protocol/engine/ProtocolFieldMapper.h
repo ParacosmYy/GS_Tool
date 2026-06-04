@@ -97,9 +97,13 @@ private:
     quint64 m_totalMappingsRemoved = 0;///< 累计映射移除次数
     quint64 m_totalApplications = 0;   ///< 累计映射应用次数
 public:
+    /** @brief 获取累计映射添加次数 */
     quint64 totalMappingsAdded() const { return m_totalMappingsAdded; }
+    /** @brief 获取累计映射移除次数 */
     quint64 totalMappingsRemoved() const { return m_totalMappingsRemoved; }
+    /** @brief 获取累计映射应用次数 */
     quint64 totalApplications() const { return m_totalApplications; }
+    /** @brief 重置映射器统计计数器 */
     void resetMapperStatistics() { m_totalMappingsAdded = 0; m_totalMappingsRemoved = 0; m_totalApplications = 0; }
 };
 

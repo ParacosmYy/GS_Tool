@@ -89,3 +89,16 @@ void ScopeWidget::drawGrid(QPainter &p, int w, int h) {
 
 /** @brief 窗口大小变更事件 @param e 重设事件 */
 void ScopeWidget::resizeEvent(QResizeEvent *e) { QWidget::resizeEvent(e); update(); }
+
+// ── 统计 Getter ──
+quint64 ScopeWidget::totalSamples() const { return m_totalSamples; }
+quint64 ScopeWidget::totalRepaints() const { return m_totalRepaints; }
+quint64 ScopeWidget::totalTriggers() const { return m_totalTriggers; }
+quint64 ScopeWidget::totalOverflows() const { return m_totalOverflows; }
+quint64 ScopeWidget::totalClears() const { return m_totalClears; }
+quint64 ScopeWidget::totalScaleChanges() const { return m_totalScaleChanges; }
+quint64 ScopeWidget::totalChannelChanges() const { return m_totalChannelChanges; }
+quint64 ScopeWidget::totalPauses() const { return m_totalPauses; }
+quint64 ScopeWidget::totalRestarts() const { return m_totalRestarts; }
+quint64 ScopeWidget::totalTriggerFires() const { return m_totalTriggerFires; }
+void ScopeWidget::resetScopeStatistics() { m_totalSamples = 0; m_totalRepaints = 0; m_totalTriggers = 0; m_totalOverflows = 0; m_totalClears = 0; m_totalScaleChanges = 0; m_totalChannelChanges = 0; m_totalPauses = 0; m_totalRestarts = 0; m_totalTriggerFires = 0; }

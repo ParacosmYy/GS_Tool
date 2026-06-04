@@ -93,7 +93,7 @@ QGroupBox* SerialConfigPanel::createParamGroup()
     m_dataBitsCombo = new QComboBox;
     m_dataBitsCombo->setObjectName("dataBitsCombo");
     m_dataBitsCombo->setToolTip(tr("每个数据帧的数据位数，绝大多数设备使用 8 位"));
-    m_dataBitsCombo->addItems({"5", "6", "7", "8"});
+    m_dataBitsCombo->addItems({tr("5"), tr("6"), tr("7"), tr("8")});
     m_dataBitsCombo->setCurrentIndex(3);
     formLayout->addRow(tr("数据位:"), m_dataBitsCombo);
 
@@ -106,7 +106,7 @@ QGroupBox* SerialConfigPanel::createParamGroup()
     m_stopBitsCombo = new QComboBox;
     m_stopBitsCombo->setObjectName("stopBitsCombo");
     m_stopBitsCombo->setToolTip(tr("停止位数:\n1位 - 标准设置(绝大多数设备)\n1.5位 - 极少见\n2位 - 调制解调器/低速通信"));
-    m_stopBitsCombo->addItems({"1", "1.5", "2"});
+    m_stopBitsCombo->addItems({tr("1"), tr("1.5"), tr("2")});
     formLayout->addRow(tr("停止位:"), m_stopBitsCombo);
 
     m_flowControlCombo = new QComboBox;

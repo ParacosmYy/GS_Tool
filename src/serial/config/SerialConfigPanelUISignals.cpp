@@ -53,13 +53,13 @@ QGroupBox* SerialConfigPanel::createControlSignalsGroup()
     signalLayout->addWidget(m_breakBtn);
 
     // ---- 输入信号线状态LED ----
-    auto makeLed = [](const char* n) -> QLabel* {
+    auto makeLed = [](const QString& n) -> QLabel* {
         auto* l = new QLabel(n); l->setObjectName("signalLed");
         l->setAlignment(Qt::AlignCenter); l->setFixedSize(36, 20);
         l->setProperty("active", false); return l;
     };
-    m_ctsLed = makeLed("CTS"); m_dsrLed = makeLed("DSR");
-    m_dcdLed = makeLed("DCD"); m_riLed = makeLed("RI");
+    m_ctsLed = makeLed(tr("CTS")); m_dsrLed = makeLed(tr("DSR"));
+    m_dcdLed = makeLed(tr("DCD")); m_riLed = makeLed(tr("RI"));
     for (auto* w : {m_ctsLed, m_dsrLed, m_dcdLed, m_riLed}) signalLayout->addWidget(w);
     signalLayout->addStretch();
 

@@ -37,6 +37,7 @@ class DirectionFilter : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造函数 */
     explicit DirectionFilter(QObject* parent = nullptr);
 
     /** @brief 设置过滤方向 @param direction 过滤方向(Rx=只显示接收, Tx=只显示发送) */

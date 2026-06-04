@@ -41,6 +41,7 @@ class TerminalSearchManager : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造函数 */
     explicit TerminalSearchManager(QObject* parent = nullptr);
 
     /** @brief 执行搜索并更新匹配列表 @return 匹配总数，0表示无效或无匹配 */

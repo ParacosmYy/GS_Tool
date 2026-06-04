@@ -39,6 +39,7 @@ class TerminalSelectionManager : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造函数 */
     explicit TerminalSelectionManager(QObject* parent = nullptr);
 
     /** @brief 处理鼠标按下事件 - 开始选择 @param y 鼠标Y坐标(像素) @param scrollOffset 当前滚动偏移(行数) @param lineHeight 每行像素高度 */
