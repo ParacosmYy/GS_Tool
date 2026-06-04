@@ -132,6 +132,7 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
             emit transferError(tr("HEX文件转换失败: %1").arg(filePath));
             return false;
         }
+        ++m_totalHexConversions;
         effectivePath = binPath;
     } else if (type == FirmwareType::Unknown) {
         // 未知类型按BIN处理，给出警告但不阻止
@@ -140,6 +141,10 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
 
     // ---- 步骤6: 记录当前文件名和协议（用于错误消息上下文） ----
     m_currentFileName = QFileInfo(filePath).fileName();
+    // 统计: 协议切换检测(连续两次传输使用不同协议时递增)
+    if (!m_currentProtocol.isEmpty() && m_currentProtocol != protocol) {
+        ++m_totalProtocolSwitches;
+    }
     m_currentProtocol = protocol;
     m_currentFileSize = QFileInfo(effectivePath).size();
 
@@ -176,6 +181,7 @@ bool OtaManager::startTransfer(const QString& filePath, const QString& protocol)
 /** @brief 取消正在进行的传输，委托给三个协议实例 */
 void OtaManager::cancelTransfer()
 {
+    bool wasRunning = isTransferring();
     if (m_xmodem->isRunning()) {
         m_xmodem->cancel();
     }
@@ -184,6 +190,9 @@ void OtaManager::cancelTransfer()
     }
     if (m_zmodem->isRunning()) {
         m_zmodem->cancel();
+    }
+    if (wasRunning) {
+        ++m_totalCancellations;
     }
     setOtaState(OtaState::Idle);
 }

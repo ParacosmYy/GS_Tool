@@ -40,6 +40,12 @@ public:
     quint64 totalTimeouts() const { return m_totalTimeouts; }
     /** @brief 获取累计接收方取消次数(CAN) @return 取消次数 */
     quint64 totalCancels() const { return m_totalCancels; }
+    /** @brief 获取累计单文件完成次数(批量模式下) @return 文件完成计数 */
+    quint64 totalFilesCompleted() const { return m_totalFilesCompleted; }
+    /** @brief 获取累计批量重发次数(NAK触发的Block重传) @return 批量重发计数 */
+    quint64 totalBatchResends() const { return m_totalBatchResends; }
+    /** @brief 获取累计接收ACK次数 @return ACK计数 */
+    quint64 totalAcksReceived() const { return m_totalAcksReceived; }
     /** @brief 重置统计计数器 */
     void resetYmodemStatistics();
 
@@ -103,6 +109,9 @@ private:
     quint64 m_totalErrorCount = 0;    ///< 传输错误总次数(CAN/写入失败)
     quint64 m_totalTimeouts = 0;      ///< 累计超时事件次数
     quint64 m_totalCancels = 0;       ///< 累计接收方取消次数(CAN)
+    quint64 m_totalFilesCompleted = 0; ///< 累计单文件完成次数(批量模式下)
+    quint64 m_totalBatchResends = 0;  ///< 累计批量重发次数(NAK触发的Block重传)
+    quint64 m_totalAcksReceived = 0;  ///< 累计接收ACK次数
 };
 
 #endif // YMODEMTRANSFER_H

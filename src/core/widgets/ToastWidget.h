@@ -21,9 +21,8 @@
 class ToastWidget : public QWidget {
     Q_OBJECT
 public:
-    /** @brief 通知类型枚举 */
-    enum class ToastType { Success, Error, Info };
-    /** @brief 显示吐司通知，弹出动画后自动定时消失 @param parent 父控件指针 @param msg 消息文本 @param type 通知类型(Success/Error/Info)，默认Info @param ms 自动消失时间(毫秒)，默认3000 */
+    enum class ToastType { Success, Error, Info }; ///< 通知类型枚举
+    /** @brief 显示吐司通知 @param parent 父控件 @param msg 消息文本 @param type 通知类型 @param ms 自动消失时间(毫秒) */
     static void show(QWidget* parent, const QString& msg,
                      ToastType type = ToastType::Info, int ms = 3000)
     {
@@ -51,7 +50,7 @@ public:
         slide->start(QAbstractAnimation::DeleteWhenStopped);
         fade->start(QAbstractAnimation::DeleteWhenStopped);
     }
-    /** @brief 防抖吐司，冷却期内重复调用同一消息将被忽略 @param parent 父控件指针 @param msg 消息文本 @param type 通知类型，默认Info @param cooldownMs 防抖冷却期(毫秒)，默认2000 */
+    /** @brief 防抖吐司 @param parent 父控件 @param msg 消息文本 @param type 通知类型 @param cooldownMs 防抖冷却期(毫秒) */
     static void showDebounced(QWidget* parent, const QString& msg,
                               ToastType type = ToastType::Info, int cooldownMs = 2000)
     {
@@ -102,8 +101,7 @@ private:
         setFixedHeight(qMax(kMinHeight, bound.height() + kPad * 2));
         m_opacityEffect = new QGraphicsOpacityEffect(this); m_opacityEffect->setOpacity(0.0); setGraphicsEffect(m_opacityEffect);
     }
-    /** @brief 获取当前通知类型的语义颜色 */
-    QColor semanticColor() const {
+    QColor semanticColor() const { ///< 获取当前通知类型的语义颜色
         using SC = ThemeManager::SemanticColor;
         switch (m_type) {
         case ToastType::Success: return ThemeManager::instance().color(SC::Success);
@@ -112,8 +110,7 @@ private:
         }
         return ThemeManager::instance().color(SC::Accent);
     }
-    /** @brief 获取通知类型对应的图标Unicode字符 */
-    QString iconChar() const {
+    QString iconChar() const { ///< 获取通知类型对应的图标Unicode字符
         switch (m_type) {
         case ToastType::Success: return tr("✓");
         case ToastType::Error:   return tr("✕");
@@ -121,8 +118,7 @@ private:
         }
         return tr("ℹ");
     }
-    /** @brief 消失动画：InCubic缓动，向上飘出30px并淡出 */
-    void dismiss() {
+    void dismiss() { ///< 消失动画：InCubic缓动，向上飘出30px并淡出
         ++s_totalDismisses;
         auto* group = new QParallelAnimationGroup(this);
         auto* fadeOut = new QPropertyAnimation(m_opacityEffect, "opacity");
@@ -164,19 +160,14 @@ private:
     ToastType m_type;                                  ///< 通知类型
     QString m_message;                                 ///< 消息文本
     QGraphicsOpacityEffect* m_opacityEffect = nullptr; ///< 淡入淡出特效
-    // ---- 统计计数器(静态，跨所有实例累积) ----
     static inline quint64 s_totalShows = 0;     ///< 总显示次数
     static inline quint64 s_totalDismisses = 0; ///< 总消失次数
     static inline quint64 s_totalErrors = 0;    ///< 总错误通知次数
 public:
-    /** @brief 获取总显示次数 @return 显示次数 */
-    static quint64 totalShows() { return s_totalShows; }
-    /** @brief 获取总消失次数 @return 消失次数 */
-    static quint64 totalDismisses() { return s_totalDismisses; }
-    /** @brief 获取总错误通知次数 @return 错误通知次数 */
-    static quint64 totalErrors() { return s_totalErrors; }
-    /** @brief 重置所有吐司统计计数器(显示/消失/错误) */
-    static void resetToastStatistics() { s_totalShows = 0; s_totalDismisses = 0; s_totalErrors = 0; }
+    static quint64 totalShows() { return s_totalShows; }         ///< 获取总显示次数
+    static quint64 totalDismisses() { return s_totalDismisses; } ///< 获取总消失次数
+    static quint64 totalErrors() { return s_totalErrors; }       ///< 获取总错误通知次数
+    static void resetToastStatistics() { s_totalShows = 0; s_totalDismisses = 0; s_totalErrors = 0; } ///< 重置统计
 private:
     static constexpr int kWidth = 320, kMinHeight = 48, kMargin = 16, kRadius = 8;
     static constexpr int kGap = 8, kLeftBorder = 4, kPad = 12, kIconArea = 24, kIconSize = 14;

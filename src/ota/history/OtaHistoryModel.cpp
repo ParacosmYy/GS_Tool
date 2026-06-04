@@ -58,6 +58,7 @@ void OtaHistoryModel::clearHistory()
     if (!m_records.isEmpty()) {
         m_totalEntriesRemoved += static_cast<quint64>(m_records.size());  ///< 统计: 清空时累加移除数
     }
+    ++m_totalClears;
     beginResetModel();
     m_records.clear();
     endResetModel();
@@ -71,6 +72,7 @@ void OtaHistoryModel::clearHistory()
  */
 const OtaRecord& OtaHistoryModel::record(int row) const
 {
+    ++m_totalQueries;
     if (row < 0 || row >= m_records.size()) {
         static const OtaRecord empty;
         return empty;
@@ -87,6 +89,7 @@ int OtaHistoryModel::count() const
 /** @brief 将所有记录序列化为 JSON 数组并写入 SettingsManager */
 void OtaHistoryModel::saveToSettings()
 {
+    ++m_totalSaves;
     QJsonArray arr;
     for (const OtaRecord& rec : m_records) {
         QJsonObject obj;

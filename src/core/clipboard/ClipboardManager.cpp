@@ -20,7 +20,7 @@ ClipboardManager &ClipboardManager::instance() { static ClipboardManager inst; r
 
 /** @brief 复制文本到剪贴板 @param text 文本内容 @param source 来源标识 */
 void ClipboardManager::copyText(const QString &text, const QString &source) {
-    if (text.isEmpty()) return;
+    if (text.isEmpty()) { ++m_totalEmptyCopySkips; return; }
     ++m_totalCopyOps;
     m_totalBytesCopied += static_cast<quint64>(text.toUtf8().size());
     QClipboard *clipboard = QGuiApplication::clipboard();
@@ -31,7 +31,7 @@ void ClipboardManager::copyText(const QString &text, const QString &source) {
 }
 /** @brief 复制十六进制数据到剪贴板 @param data 原始数据 @param source 来源标识 */
 void ClipboardManager::copyHex(const QByteArray &data, const QString &source) {
-    if (data.isEmpty()) return;
+    if (data.isEmpty()) { ++m_totalEmptyCopySkips; return; }
     ++m_totalCopyOps;
     ++m_totalConversions;
     ++m_totalHexConversions;
@@ -45,7 +45,7 @@ void ClipboardManager::copyHex(const QByteArray &data, const QString &source) {
 }
 /** @brief 复制Base64编码数据到剪贴板 @param data 原始数据 @param source 来源标识 */
 void ClipboardManager::copyBase64(const QByteArray &data, const QString &source) {
-    if (data.isEmpty()) return;
+    if (data.isEmpty()) { ++m_totalEmptyCopySkips; return; }
     ++m_totalCopyOps;
     ++m_totalConversions;
     ++m_totalBase64Conversions;
@@ -74,6 +74,7 @@ QString ClipboardManager::textToHex(const QString &text) {
 }
 /** @brief 十六进制字符串转字节数组 @param hexStr 十六进制字符串 @return 字节数组 */
 QByteArray ClipboardManager::hexToBytes(const QString &hexStr) {
+    ++m_totalHexPastes;
     QString cleaned = hexStr;
     cleaned.remove(QLatin1Char(' ')); cleaned.remove(QLatin1Char('\n')); cleaned.remove(QLatin1Char('\r'));
     if (cleaned.startsWith(QStringLiteral("0x"), Qt::CaseInsensitive)) cleaned = cleaned.mid(2);
@@ -82,7 +83,7 @@ QByteArray ClipboardManager::hexToBytes(const QString &hexStr) {
 /** @brief 字节数组转Base64字符串 @param data 原始数据 @return Base64编码字符串 */
 QString ClipboardManager::bytesToBase64(const QByteArray &data) { return QString::fromUtf8(data.toBase64()); }
 /** @brief Base64字符串转字节数组 @param base64 Base64编码字符串 @return 解码后字节数组 */
-QByteArray ClipboardManager::base64ToBytes(const QString &base64) { return QByteArray::fromBase64(base64.toUtf8()); }
+QByteArray ClipboardManager::base64ToBytes(const QString &base64) { ++m_totalBase64Pastes; return QByteArray::fromBase64(base64.toUtf8()); }
 /** @brief 文本转转义字符串(不可见字符转\xHH) @param text 原始文本 @return 转义后字符串 */
 QString ClipboardManager::textToEscape(const QString &text) {
     ++m_totalEscapeConversions;
@@ -134,6 +135,7 @@ void ClipboardManager::resetStatistics() {
     m_totalHexConversions = 0; m_totalBase64Conversions = 0;
     m_totalRestores = 0; m_totalHistoryClears = 0; m_totalBytesCopied = 0;
     m_totalEscapeConversions = 0; m_totalHistoryDuplicates = 0;
+    m_totalEmptyCopySkips = 0; m_totalHexPastes = 0; m_totalBase64Pastes = 0;
 }
 
 /** @brief 添加条目到历史记录(去重，限制容量) @param entry 剪贴板条目 */

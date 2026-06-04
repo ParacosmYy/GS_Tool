@@ -114,6 +114,7 @@ void SettingsController::saveSettings()
 
     // 同步写入磁盘
     settings.sync();
+    ++m_totalSyncs;  ///< 累计设置同步到磁盘次数
 }
 
 // saveSerialConfig/loadSerialConfig/saveWindowGeometry/loadWindowGeometry/saveTheme/loadTheme/saveLastPanel/loadLastPanel

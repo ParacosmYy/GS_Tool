@@ -20,6 +20,8 @@ QString NotificationManager::notify(const QString &title, const QString &msg, Pr
     ++m_totalNotifications;
     if (prio == Critical) ++m_totalCriticalNotifications;
     if (prio == High) ++m_totalHighNotifications;
+    if (prio == Normal) ++m_totalNormalNotifications;
+    if (prio == Low) ++m_totalLowNotifications;
     m_history.prepend(n);
     pruneHistory();
     emit notificationAdded(n);
@@ -69,4 +71,5 @@ void NotificationManager::resetNotificationStatistics() {
     m_totalNotifications = 0; m_totalAcknowledges = 0; m_totalDismisses = 0;
     m_totalClearAlls = 0; m_totalCriticalNotifications = 0;
     m_totalHighNotifications = 0; m_totalHistoryPrunes = 0;
+    m_totalLowNotifications = 0; m_totalNormalNotifications = 0;
 }

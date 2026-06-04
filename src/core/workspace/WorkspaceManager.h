@@ -81,6 +81,8 @@ private:
     quint64 m_activeWorkspaceTimeMs = 0;     ///< 当前激活工作区累计活跃时长(毫秒)
     mutable quint64 m_totalExportErrors = 0;  ///< 累计导出失败次数(在const方法中更新)
     quint64 m_totalImportErrors = 0;          ///< 累计导入失败次数
+    mutable quint64 m_totalLoadMisses = 0;    ///< 累计加载不存在工作区次数
+    quint64 m_totalOverwriteSaves = 0;        ///< 累计覆盖已存在工作区的保存次数
     QElapsedTimer m_activeTimer;             ///< 当前激活工作区计时器
 
 public:
@@ -108,6 +110,12 @@ public:
 
     /** @brief 获取累计导入失败次数(文件读取/解析错误) @return 导入错误总数 */
     quint64 totalImportErrors() const { return m_totalImportErrors; }
+
+    /** @brief 获取累计加载不存在工作区次数 @return 加载未命中次数 */
+    quint64 totalLoadMisses() const { return m_totalLoadMisses; }
+
+    /** @brief 获取累计覆盖已存在工作区的保存次数 @return 覆盖保存次数 */
+    quint64 totalOverwriteSaves() const { return m_totalOverwriteSaves; }
 
     /** @brief 重置工作区统计计数器(包含所有计数器归零) */
     void resetWorkspaceStatistics();

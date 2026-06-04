@@ -105,6 +105,15 @@ public:
     /** @brief 重置历史记录统计计数器(不影响记录数据本身) */
     void resetHistoryStatistics();
 
+    /** @brief 获取历史记录查询(访问)总次数 @return 查询次数 */
+    quint64 totalQueries() const;
+
+    /** @brief 获取历史记录清空操作总次数 @return 清空次数 */
+    quint64 totalClears() const;
+
+    /** @brief 获取历史记录持久化保存总次数 @return 保存次数 */
+    quint64 totalSaves() const;
+
 private:
     QVector<OtaRecord> m_records;          ///< 历史记录列表
     static constexpr int kMaxRecords = 200; ///< 最大保留记录数
@@ -113,6 +122,9 @@ private:
     quint64 m_totalEntriesAdded = 0;       ///< 历史记录添加总次数
     quint64 m_totalEntriesRemoved = 0;     ///< 历史记录移除总次数(含淘汰)
     quint64 m_totalHistoryEntries = 0;     ///< 历史记录条目总数（每次addRecord递增）
+    mutable quint64 m_totalQueries = 0;    ///< 历史记录查询(访问)总次数
+    quint64 m_totalClears = 0;             ///< 历史记录清空操作总次数
+    quint64 m_totalSaves = 0;              ///< 历史记录持久化保存总次数
 };
 
 #endif // OTAHISTORYMODEL_H

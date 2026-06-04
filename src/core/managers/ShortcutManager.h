@@ -96,6 +96,12 @@ public:
     quint64 totalUnregistrations() const { return m_totalUnregistrations; }
     /// @brief 冲突检测总次数(按键已被占用时触发)
     quint64 totalConflictsDetected() const { return m_totalConflictsDetected; }
+    /// @brief 获取重绑定总次数(成功修改按键序列)
+    quint64 totalRebinds() const { return m_totalRebinds; }
+    /// @brief 获取上下文切换总次数(焦点变化触发)
+    quint64 totalContextSwitches() const { return m_totalContextSwitches; }
+    /// @brief 获取注册失败总次数(ID冲突+按键冲突)
+    quint64 totalFailedRegistrations() const { return m_totalFailedRegistrations; }
     /// @brief 重置所有统计计数器
     void resetShortcutStatistics();
 
@@ -149,6 +155,9 @@ private:
     quint64 m_totalTriggers = 0;         ///< 触发总次数
     quint64 m_totalUnregistrations = 0;  ///< 注销总次数
     quint64 m_totalConflictsDetected = 0;///< 冲突检测总次数(按键已被占用)
+    quint64 m_totalRebinds = 0;          ///< 重绑定总次数(成功修改按键序列)
+    quint64 m_totalContextSwitches = 0;  ///< 上下文切换总次数(焦点变化触发)
+    quint64 m_totalFailedRegistrations = 0; ///< 注册失败总次数(ID冲突+按键冲突)
 
     static constexpr const char* kSettingsGroup = "shortcuts"; ///< QSettings分组名
 };

@@ -45,6 +45,7 @@ QString ThemeManager::currentTheme() const
 /** @brief 检测Windows系统当前是否为暗色模式(读取注册表AppsUseLightTheme) @return true系统为暗色模式 */
 bool ThemeManager::isSystemDarkMode() const
 {
+    ++m_totalSystemThemeChecks;  ///< 累计系统暗色模式检测次数
 #ifdef Q_OS_WIN
     QSettings registry(
         "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",

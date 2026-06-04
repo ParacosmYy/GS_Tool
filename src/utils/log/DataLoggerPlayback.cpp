@@ -123,6 +123,7 @@ void DataLogger::resumePlayback()
 /** @brief 设置回放速率 @param speed 速率倍数(1.0=正常) */
 void DataLogger::setPlaybackSpeed(qreal speed)
 {
+    ++m_totalSpeedChanges;  ///< 累计回放速度变更次数
     qreal newSpeed = qBound(0.1, speed, 100.0);
     if (m_playing && !m_playbackPaused) {
         m_playbackBaseTime += static_cast<qint64>(m_playbackElapsed.elapsed() * m_playbackSpeed);
@@ -148,6 +149,7 @@ void DataLogger::onPlaybackTick()
         RecordHeader hdr;
         QByteArray data;
         if (readNextRecord(hdr, data)) {
+            m_totalBytesPlayedBack += static_cast<quint64>(data.size());
             emit playbackData(data, hdr.direction);
             m_nextRecordTime = static_cast<qint64>(hdr.timestamp);
             m_playedRecords++;

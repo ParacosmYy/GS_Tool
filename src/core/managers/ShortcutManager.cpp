@@ -57,11 +57,13 @@ bool ShortcutManager::registerShortcut(const QString& id, const QKeySequence& ke
 
     // ID冲突检查
     if (m_shortcuts.contains(id)) {
+        ++m_totalFailedRegistrations;
         return false;
     }
     // 按键冲突检查
     if (isKeyOccupied(key)) {
         ++m_totalConflictsDetected;
+        ++m_totalFailedRegistrations;
         return false;
     }
 
@@ -129,6 +131,7 @@ bool ShortcutManager::rebind(const QString& id, const QKeySequence& newKey)
     it->keySequence = newKey;
     if (it->shortcut) it->shortcut->setKey(newKey);
 
+    ++m_totalRebinds;
     m_customizedIds.insert(id);
     saveCustomBindings();
     emit shortcutChanged(id, newKey);
@@ -143,6 +146,7 @@ bool ShortcutManager::rebind(const QString& id, const QKeySequence& newKey)
 void ShortcutManager::setCurrentContext(ShortcutContext context)
 {
     if (m_currentContext == context) return;
+    ++m_totalContextSwitches;
     m_currentContext = context;
     updateShortcutStates();
 }

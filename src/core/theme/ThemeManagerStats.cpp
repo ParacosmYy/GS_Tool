@@ -57,6 +57,18 @@ quint64 ThemeManager::totalCacheMisses() const
     return m_totalCacheMisses;
 }
 
+/** @brief 获取累计主题加载失败次数 @return 加载失败次数 */
+quint64 ThemeManager::totalThemeLoadFailures() const
+{
+    return m_totalThemeLoadFailures;
+}
+
+/** @brief 获取累计系统暗色模式检测次数 @return 检测次数 */
+quint64 ThemeManager::totalSystemThemeChecks() const
+{
+    return m_totalSystemThemeChecks;
+}
+
 /** @brief 重置所有统计计数器为零 */
 void ThemeManager::resetStats()
 {
@@ -67,4 +79,6 @@ void ThemeManager::resetStats()
     m_totalStyleApplications = 0;
     m_totalCacheHits = 0;
     m_totalCacheMisses = 0;
+    m_totalThemeLoadFailures = 0;
+    m_totalSystemThemeChecks = 0;
 }

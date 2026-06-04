@@ -54,6 +54,8 @@ public:
     quint64 totalStyleApplications() const; ///< 累计样式表应用次数
     quint64 totalCacheHits() const;        ///< 累计语义色缓存命中次数
     quint64 totalCacheMisses() const;      ///< 累计语义色缓存未命中次数
+    quint64 totalThemeLoadFailures() const; ///< 获取累计主题加载失败次数
+    quint64 totalSystemThemeChecks() const; ///< 获取累计系统暗色模式检测次数
     void resetStats();                     ///< 重置所有统计计数器
 
 signals:
@@ -74,6 +76,8 @@ private:
     quint64 m_totalThemeSwitches = 0, m_totalCustomThemesLoaded = 0, m_totalThemeReloads = 0;
     mutable quint64 m_totalColorQueries = 0, m_totalCacheHits = 0, m_totalCacheMisses = 0;
     quint64 m_totalStyleApplications = 0;
+    quint64 m_totalThemeLoadFailures = 0;       ///< 累计主题加载失败次数
+    mutable quint64 m_totalSystemThemeChecks = 0; ///< 累计系统暗色模式检测次数
 };
 
 #endif // THEMEMANAGER_H

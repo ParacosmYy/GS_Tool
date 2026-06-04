@@ -80,9 +80,11 @@ void RecordingController::onToggleRecording()
     if (m_logger->isRecording()) {
         if (m_logger->isPaused()) {
             m_logger->resumeRecording();
+            ++m_totalResumes;
             m_recordAction->setText(tr("暂停"));
         } else {
             m_logger->pauseRecording();
+            ++m_totalPauses;
             m_recordAction->setText(tr("继续"));
         }
     } else {
@@ -146,6 +148,7 @@ void RecordingController::onOpenPlayback()
 void RecordingController::onStopPlayback()
 {
     m_logger->stopPlayback();
+    ++m_totalPlaybackStops;
     m_stopPlaybackAction->setEnabled(false);
     m_playbackAction->setEnabled(true);
 }
@@ -154,6 +157,7 @@ void RecordingController::onStopPlayback()
 void RecordingController::onPlaybackData(const QByteArray& data, qint64 direction)
 {
     m_totalBytesPlayed += static_cast<quint64>(data.size());
+    ++m_totalSegmentWrites;
     emit playbackData(data, direction);
 }
 

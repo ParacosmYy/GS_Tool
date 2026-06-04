@@ -44,12 +44,14 @@ bool ThemeManager::loadTheme(const QString& themeName)
 {
     if (!m_themes.contains(themeName)) {
         qWarning() << "Theme not found:" << themeName;
+        ++m_totalThemeLoadFailures;
         return false;
     }
 
     QFile file(m_themes[themeName]);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "Cannot open theme file:" << m_themes[themeName];
+        ++m_totalThemeLoadFailures;
         return false;
     }
 
@@ -80,6 +82,7 @@ bool ThemeManager::loadThemeFromFile(const QString& filePath)
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "Cannot open theme file:" << filePath;
+        ++m_totalThemeLoadFailures;
         return false;
     }
 

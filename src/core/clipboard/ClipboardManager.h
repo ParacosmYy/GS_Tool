@@ -49,6 +49,9 @@ public:
     quint64 totalBytesCopied() const { return m_totalBytesCopied; }           ///< 累计复制的字节总数
     quint64 totalEscapeConversions() const { return m_totalEscapeConversions; } ///< 累计转义格式转换次数
     quint64 totalHistoryDuplicates() const { return m_totalHistoryDuplicates; } ///< 累计历史去重合并次数
+    quint64 totalEmptyCopySkips() const { return m_totalEmptyCopySkips; } ///< 获取因空内容跳过复制的次数
+    quint64 totalHexPastes() const { return m_totalHexPastes; } ///< 获取从十六进制字符串还原字节的次数
+    quint64 totalBase64Pastes() const { return m_totalBase64Pastes; } ///< 获取从Base64字符串还原字节的次数
     void resetStatistics();
 signals:
     void historyEntryAdded(const ClipboardEntry &entry);
@@ -72,5 +75,8 @@ private:
     quint64 m_totalBytesCopied = 0;             ///< 累计复制的字节总数
     quint64 m_totalEscapeConversions = 0;       ///< 累计转义格式转换次数
     quint64 m_totalHistoryDuplicates = 0;       ///< 累计历史去重合并次数
+    quint64 m_totalEmptyCopySkips = 0;          ///< 累计因空内容跳过复制的次数
+    quint64 m_totalHexPastes = 0;               ///< 累计从十六进制字符串还原字节的次数
+    quint64 m_totalBase64Pastes = 0;            ///< 累计从Base64字符串还原字节的次数
 };
 #endif // CLIPBOARDMANAGER_H

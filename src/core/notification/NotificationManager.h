@@ -81,6 +81,8 @@ private:
     quint64 m_totalCriticalNotifications = 0;///< 累计Critical级别通知数
     quint64 m_totalHighNotifications = 0;    ///< 累计High级别通知数
     quint64 m_totalHistoryPrunes = 0;        ///< 累计历史裁剪次数
+    quint64 m_totalLowNotifications = 0;     ///< 累计Low级别通知数
+    quint64 m_totalNormalNotifications = 0;  ///< 累计Normal级别通知数
 
 public:
     /** @brief 获取总通知创建次数 @return 累计创建次数 */
@@ -97,6 +99,10 @@ public:
     quint64 totalHighNotifications() const { return m_totalHighNotifications; }
     /** @brief 获取累计历史裁剪次数 @return 裁剪次数 */
     quint64 totalHistoryPrunes() const { return m_totalHistoryPrunes; }
+    /** @brief 获取累计Low级别通知数 @return Low通知次数 */
+    quint64 totalLowNotifications() const { return m_totalLowNotifications; }
+    /** @brief 获取累计Normal级别通知数 @return Normal通知次数 */
+    quint64 totalNormalNotifications() const { return m_totalNormalNotifications; }
     /** @brief 重置通知统计计数器 */
     void resetNotificationStatistics();
 };

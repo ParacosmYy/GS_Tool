@@ -104,4 +104,25 @@ void OtaHistoryModel::resetHistoryStatistics()
     m_totalEntriesAdded = 0;
     m_totalEntriesRemoved = 0;
     m_totalHistoryEntries = 0;
+    m_totalQueries = 0;
+    m_totalClears = 0;
+    m_totalSaves = 0;
+}
+
+/** @brief 获取历史记录查询(访问)总次数 @return 查询次数 */
+quint64 OtaHistoryModel::totalQueries() const
+{
+    return m_totalQueries;
+}
+
+/** @brief 获取历史记录清空操作总次数 @return 清空次数 */
+quint64 OtaHistoryModel::totalClears() const
+{
+    return m_totalClears;
+}
+
+/** @brief 获取历史记录持久化保存总次数 @return 保存次数 */
+quint64 OtaHistoryModel::totalSaves() const
+{
+    return m_totalSaves;
 }

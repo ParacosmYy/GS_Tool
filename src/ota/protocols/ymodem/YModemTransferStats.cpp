@@ -29,6 +29,9 @@ void YModemTransfer::resetYmodemStatistics()
     m_totalErrorCount = 0;
     m_totalTimeouts = 0;
     m_totalCancels = 0;
+    m_totalFilesCompleted = 0;
+    m_totalBatchResends = 0;
+    m_totalAcksReceived = 0;
 }
 
 /** @brief 设置单个文件路径用于传输

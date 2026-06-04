@@ -50,6 +50,18 @@ quint64 RecordingController::markersCreated() const { return m_markersCreated; }
 /** @brief 获取累计导航(跳转)的标记总数 @return 标记导航数 */
 quint64 RecordingController::markersNavigated() const { return m_markersNavigated; }
 
+/** @brief 获取累计录制暂停次数 @return 暂停次数 */
+quint64 RecordingController::totalPauses() const { return m_totalPauses; }
+
+/** @brief 获取累计录制恢复次数 @return 恢复次数 */
+quint64 RecordingController::totalResumes() const { return m_totalResumes; }
+
+/** @brief 获取累计数据段写入次数 @return 段写入次数 */
+quint64 RecordingController::totalSegmentWrites() const { return m_totalSegmentWrites; }
+
+/** @brief 获取累计回放手动停止次数 @return 回放停止次数 */
+quint64 RecordingController::totalPlaybackStops() const { return m_totalPlaybackStops; }
+
 // ============================================================
 // 统计重置
 // ============================================================
@@ -68,4 +80,8 @@ void RecordingController::resetRecordingStatistics()
     m_totalFramesRecorded = 0;
     m_markersCreated = 0;
     m_markersNavigated = 0;
+    m_totalPauses = 0;
+    m_totalResumes = 0;
+    m_totalSegmentWrites = 0;
+    m_totalPlaybackStops = 0;
 }

@@ -21,6 +21,7 @@ void SettingsController::saveSerialConfig()
 {
     if (!m_serialConfig) return;
 
+    ++m_totalSerialConfigSaves;  ///< 累计串口配置保存次数
     auto& settings = SettingsManager::instance();
     QVariantMap serialConfig;
     serialConfig["portName"]    = m_serialConfig->currentPortData();
@@ -40,6 +41,7 @@ void SettingsController::saveSerialConfig()
  */
 QVariantMap SettingsController::loadSerialConfig() const
 {
+    ++m_totalSerialConfigLoads;  ///< 累计串口配置加载次数
     return SettingsManager::instance().loadSerialConfig();
 }
 

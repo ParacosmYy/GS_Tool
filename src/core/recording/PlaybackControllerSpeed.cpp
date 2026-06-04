@@ -87,6 +87,7 @@ qint64 PlaybackController::durationMs() const
 void PlaybackController::setDuration(qint64 durationMs)
 {
     m_durationMs = durationMs;
+    ++m_totalDurationChanges;
 
     /* 未播放时重置进度 */
     if (!m_playing) {
@@ -179,6 +180,18 @@ qint64 PlaybackController::totalPlaybackDurationMs() const
     return m_totalPlayTimeMs;
 }
 
+/** @brief 获取累计回放完成(到达终点)次数 @return 完成次数 */
+quint64 PlaybackController::totalCompletions() const
+{
+    return m_totalCompletions;
+}
+
+/** @brief 获取累计回放总时长变更次数 @return 变更次数 */
+quint64 PlaybackController::totalDurationChanges() const
+{
+    return m_totalDurationChanges;
+}
+
 /** @brief 重置所有统计计数器(含基础统计和扩展统计) */
 void PlaybackController::resetStats()
 {
@@ -193,4 +206,6 @@ void PlaybackController::resetStats()
     m_totalSeeks = 0;
     m_totalSpeedChanges = 0;
     m_totalPlaybackResumes = 0;
+    m_totalCompletions = 0;
+    m_totalDurationChanges = 0;
 }

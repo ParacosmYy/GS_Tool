@@ -91,6 +91,12 @@ public:
     /** @brief 获取累计回放总时长(同totalPlayTimeMs) @return 累计毫秒数 */
     qint64 totalPlaybackDurationMs() const;
 
+    /** @brief 获取累计回放完成(到达终点)次数 @return 完成次数 */
+    quint64 totalCompletions() const;
+
+    /** @brief 获取累计回放总时长变更次数 @return 变更次数 */
+    quint64 totalDurationChanges() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -135,6 +141,8 @@ private:
     quint64 m_totalSeeks = 0;           ///< 累计定位次数
     quint64 m_totalSpeedChanges = 0;    ///< 累计倍速变更次数
     quint64 m_totalPlaybackResumes = 0; ///< 累计恢复播放次数
+    quint64 m_totalCompletions = 0;    ///< 累计回放完成(到达终点)次数
+    quint64 m_totalDurationChanges = 0; ///< 累计回放总时长变更次数
 };
 
 #endif // PLAYBACK_CONTROLLER_H

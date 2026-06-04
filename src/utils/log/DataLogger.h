@@ -71,6 +71,15 @@ public:
     /** @brief 获取累计seek跳转操作次数 @return seek操作总数 */
     quint64 totalSeeks() const { return m_totalSeeks; }
 
+    /** @brief 获取累计回放输出的字节总数 @return 回放字节总数 */
+    quint64 totalBytesPlayedBack() const { return m_totalBytesPlayedBack; }
+
+    /** @brief 获取累计回放速度变更次数 @return 速度变更次数 */
+    quint64 totalSpeedChanges() const { return m_totalSpeedChanges; }
+
+    /** @brief 获取累计录制启动次数 @return 录制启动次数 */
+    quint64 totalRecordStarts() const { return m_totalRecordStarts; }
+
     void resetStats();                   ///< 重置所有会话统计计数器
 
 signals:
@@ -124,6 +133,9 @@ private:
     quint64 m_totalPlaybackPauses = 0;   ///< 累计回放暂停次数
     quint64 m_totalPlaybackResumes = 0;  ///< 累计回放恢复次数
     quint64 m_totalSeeks = 0;            ///< 累计seek跳转操作次数
+    quint64 m_totalBytesPlayedBack = 0;  ///< 累计回放输出的字节总数
+    quint64 m_totalSpeedChanges = 0;     ///< 累计回放速度变更次数
+    quint64 m_totalRecordStarts = 0;     ///< 累计录制启动次数
 };
 
 #endif // DATALOGGER_H

@@ -56,6 +56,15 @@ public:
     /** @brief 获取累计超时事件次数 @return 超时计数 */
     quint64 totalTimeouts() const { return m_totalTimeouts; }
 
+    /** @brief 获取累计接收NAK次数 @return NAK计数 */
+    quint64 totalNakReceived() const { return m_totalNakReceived; }
+
+    /** @brief 获取累计接收CAN次数 @return CAN计数 */
+    quint64 totalCanReceived() const { return m_totalCanReceived; }
+
+    /** @brief 获取累计接收ACK次数 @return ACK计数 */
+    quint64 totalAcksReceived() const { return m_totalAcksReceived; }
+
     /** @brief 重置XModem统计计数器 */
     void resetXmodemStatistics();
 
@@ -111,6 +120,9 @@ private:
     quint64 m_xmodemErrorCount = 0;      ///< 累计错误次数
     quint64 m_totalCrcErrors = 0;        ///< 累计CRC校验被拒次数(接收方NAK触发)
     quint64 m_totalTimeouts = 0;         ///< 累计超时事件次数
+    quint64 m_totalNakReceived = 0;      ///< 累计接收NAK次数
+    quint64 m_totalCanReceived = 0;      ///< 累计接收CAN次数
+    quint64 m_totalAcksReceived = 0;     ///< 累计接收ACK次数
 };
 
 #endif // XMODEMTRANSFER_H

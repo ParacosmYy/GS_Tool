@@ -56,6 +56,11 @@ int EventBus::subscribe(const QString& eventName, QObject* subscriber, Callback 
         m_peakSubscribersPerEvent = currentCount;
     }
 
+    // 统计独立事件名称（仅首次订阅时递增）
+    if (currentCount == 0) {
+        ++m_totalUniqueEventNames;
+    }
+
     // 订阅者销毁时自动取消订阅
     if (subscriber) {
         QObject::connect(subscriber, &QObject::destroyed, this, [this, subscriber]() {
@@ -148,11 +153,19 @@ void EventBus::publish(const QString& eventName, const QVariant& data)
                 callbacks.append(subIt->callback);
             }
         }
+        // 统计: 发布时无订阅者的事件
+        if (callbacks.isEmpty()) {
+            ++m_totalPublishsWithNoSubscribers;
+        }
     }
 
     // 执行所有回调（锁外执行，避免死锁）
     for (const auto& cb : callbacks) {
-        cb(data);
+        try {
+            cb(data);
+        } catch (...) {
+            ++m_totalHandlerErrors;  // 累计回调处理器执行异常
+        }
         ++m_totalHandlersCalled;  // 累计回调调用计数
     }
 }

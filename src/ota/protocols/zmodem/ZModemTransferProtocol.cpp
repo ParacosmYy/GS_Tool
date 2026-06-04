@@ -84,6 +84,7 @@ void ZModemTransfer::sendZRQINIT() { if (m_conn) writeChecked(buildHexHeader(ZRQ
 void ZModemTransfer::sendZFILE()
 {
     if (!m_conn) return;
+    ++m_totalZfileSent;
     if (!writeChecked(buildBinHeader(ZFILE))) return;
     QFileInfo info(m_filePath);
     QByteArray fi = QString("%1 %2 0").arg(info.fileName()).arg(info.size()).toUtf8();
@@ -94,6 +95,7 @@ void ZModemTransfer::sendZFILE()
 void ZModemTransfer::sendZDATA()
 {
     if (!m_conn) return;
+    ++m_totalZdataFrames;
     QByteArray offsetData;
     offsetData.append(static_cast<char>(m_fileOffset & 0xFF));
     offsetData.append(static_cast<char>((m_fileOffset >> 8) & 0xFF));
@@ -153,4 +155,4 @@ void ZModemTransfer::sendZEOF()
     writeChecked(buildHexHeader(ZEOF, offsetData));
 }
 /** @brief 发送ZFIN帧，结束ZMODEM会话 */
-void ZModemTransfer::sendZFIN() { if (m_conn) writeChecked(buildHexHeader(ZFIN)); }
+void ZModemTransfer::sendZFIN() { if (m_conn) { ++m_totalZfinSent; writeChecked(buildHexHeader(ZFIN)); } }

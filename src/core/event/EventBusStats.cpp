@@ -81,7 +81,7 @@ quint64 EventBus::peakSubscribersPerEvent() const
     return m_peakSubscribersPerEvent;
 }
 
-/** @brief 重置所有统计计数器(发布/异步发布/订阅/取消订阅/回调/峰值) */
+/** @brief 重置所有统计计数器(发布/异步发布/订阅/取消订阅/回调/峰值/异常/无订阅者/独立事件) */
 void EventBus::resetEventStatistics()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -91,4 +91,7 @@ void EventBus::resetEventStatistics()
     m_totalUnsubscriptions = 0;
     m_totalHandlersCalled = 0;
     m_peakSubscribersPerEvent = 0;
+    m_totalHandlerErrors = 0;
+    m_totalPublishsWithNoSubscribers = 0;
+    m_totalUniqueEventNames = 0;
 }

@@ -48,6 +48,7 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
 {
     if (ch == ACK) {
         // 块确认成功，重置重试计数
+        ++m_totalAcksReceived;
         m_timeoutTimer->stop();
         m_retryCount = 0;
         m_blockRetryCount = 0;
@@ -78,6 +79,7 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
         }
     } else if (ch == NAK) {
         // 块被拒绝(CRC/校验和错误)，重发当前块
+        ++m_totalNakReceived;
         m_timeoutTimer->stop();
         m_blockRetryCount++;
         ++m_totalRetries;
@@ -98,6 +100,7 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
         m_timeoutTimer->start(m_timeoutMs);
     } else if (ch == CAN) {
         // 接收方取消传输
+        ++m_totalCanReceived;
         m_timeoutTimer->stop();
         m_xmodemState = State::Error;
         markError();
@@ -117,11 +120,13 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
 void XModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
 {
     if (ch == ACK) {
+        ++m_totalAcksReceived;
         m_timeoutTimer->stop();
         emit progress(100, m_data.size(), m_data.size());
         m_xmodemState = State::Done;
         finishTransfer();
     } else if (ch == NAK) {
+        ++m_totalNakReceived;
         m_timeoutTimer->stop();
         m_blockRetryCount++;
         if (m_blockRetryCount > kMaxBlockRetries) {
@@ -135,6 +140,7 @@ void XModemTransfer::handleStateSendingEOT(char ch, int& readIdx)
         sendEOT();
         m_timeoutTimer->start(m_timeoutMs);
     } else if (ch == CAN) {
+        ++m_totalCanReceived;
         m_timeoutTimer->stop();
         m_xmodemState = State::Error;
         markError();

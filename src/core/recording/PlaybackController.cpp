@@ -136,6 +136,7 @@ void PlaybackController::onTick()
         m_timer->stop();
         m_currentTimeMs = m_durationMs;
         ++m_playCount;
+        ++m_totalCompletions;
         m_totalPlayTimeMs += m_durationMs;
 
         emit playbackFinished();

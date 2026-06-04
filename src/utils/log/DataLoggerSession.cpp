@@ -153,7 +153,7 @@ quint64 DataLogger::totalPlaybacks() const { return m_totalPlaybacks; }
 /** @brief 获取累计错误次数 @return 错误计数 */
 quint64 DataLogger::totalErrors() const { return m_totalErrors; }
 
-/** @brief 重置所有统计计数器(写入/书签/记录/字节/回放/错误/暂停/恢复/seek归零) */
+/** @brief 重置所有统计计数器(写入/书签/记录/字节/回放/错误/暂停/恢复/seek/回放字节/速度变更/录制启动归零) */
 void DataLogger::resetStats()
 {
     m_totalLogsWritten = 0;
@@ -167,4 +167,7 @@ void DataLogger::resetStats()
     m_totalPlaybackPauses = 0;
     m_totalPlaybackResumes = 0;
     m_totalSeeks = 0;
+    m_totalBytesPlayedBack = 0;
+    m_totalSpeedChanges = 0;
+    m_totalRecordStarts = 0;
 }

@@ -70,6 +70,7 @@ bool DataLogger::startRecording(const QString& filePath)
     m_recordTimer.start();
 
     writeHeader();
+    ++m_totalRecordStarts;  ///< 累计录制启动次数
     emit recordingStarted();
     return true;
 }

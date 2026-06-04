@@ -19,9 +19,11 @@ WorkspaceManager::~WorkspaceManager() = default;
 /** @brief 保存工作区布局到内存映射，新建工作区时递增创建计数 @param layout 工作区布局配置 */
 void WorkspaceManager::saveWorkspace(const WorkspaceLayout &layout)
 {
-    // 首次保存(新建)时递增创建计数
+    // 首次保存(新建)时递增创建计数，否则递增覆盖保存计数
     if (!m_workspaces.contains(layout.name)) {
         ++m_totalWorkspacesCreated;
+    } else {
+        ++m_totalOverwriteSaves;
     }
     ++m_totalSaves;
     m_workspaces[layout.name] = layout;
@@ -32,6 +34,9 @@ void WorkspaceManager::saveWorkspace(const WorkspaceLayout &layout)
 WorkspaceLayout WorkspaceManager::loadWorkspace(const QString &name) const
 {
     ++m_totalLoads;
+    if (!m_workspaces.contains(name)) {
+        ++m_totalLoadMisses;  ///< 累计加载不存在工作区次数
+    }
     return m_workspaces.value(name);
 }
 
@@ -78,7 +83,7 @@ quint64 WorkspaceManager::activeWorkspaceTimeMs() const
     return total;
 }
 
-/** @brief 重置所有工作区统计计数器(保存/加载/删除/切换/新建/活跃时长/导出错误/导入错误) */
+/** @brief 重置所有工作区统计计数器(保存/加载/删除/切换/新建/活跃时长/导出错误/导入错误/加载未命中/覆盖保存) */
 void WorkspaceManager::resetWorkspaceStatistics()
 {
     m_totalSaves = 0;
@@ -92,6 +97,8 @@ void WorkspaceManager::resetWorkspaceStatistics()
     m_activeWorkspaceTimeMs = 0;
     m_totalExportErrors = 0;
     m_totalImportErrors = 0;
+    m_totalLoadMisses = 0;
+    m_totalOverwriteSaves = 0;
     m_activeTimer.restart();
 }
 

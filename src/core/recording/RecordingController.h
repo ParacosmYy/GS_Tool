@@ -80,6 +80,18 @@ public:
     /** @brief 获取累计导航(跳转)的标记总数 @return 标记导航数 */
     quint64 markersNavigated() const;
 
+    /** @brief 获取累计录制暂停次数 @return 暂停次数 */
+    quint64 totalPauses() const;
+
+    /** @brief 获取累计录制恢复次数 @return 恢复次数 */
+    quint64 totalResumes() const;
+
+    /** @brief 获取累计数据段写入次数 @return 段写入次数 */
+    quint64 totalSegmentWrites() const;
+
+    /** @brief 获取累计回放手动停止次数 @return 回放停止次数 */
+    quint64 totalPlaybackStops() const;
+
     /** @brief 重置所有统计计数器 */
     void resetRecordingStatistics();
 
@@ -141,6 +153,12 @@ private:
     // ---- 标记统计计数器 ----
     quint64 m_markersCreated = 0;          ///< 累计创建的标记总数
     quint64 m_markersNavigated = 0;        ///< 累计导航(跳转)的标记总数
+
+    // ---- 新增统计计数器 ----
+    quint64 m_totalPauses = 0;             ///< 累计录制暂停次数
+    quint64 m_totalResumes = 0;            ///< 累计录制恢复次数
+    quint64 m_totalSegmentWrites = 0;      ///< 累计数据段写入次数
+    quint64 m_totalPlaybackStops = 0;      ///< 累计回放手动停止次数
 };
 
 #endif // RECORDINGCONTROLLER_H

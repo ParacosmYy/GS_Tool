@@ -95,4 +95,25 @@ void OtaManager::resetTransferStatistics()
     m_totalBytesTransferred = 0;
     m_totalCrcChecks = 0;
     m_speedHistory.clear();
+    m_totalCancellations = 0;
+    m_totalHexConversions = 0;
+    m_totalProtocolSwitches = 0;
+}
+
+/** @brief 获取累计传输取消次数 @return 取消次数 */
+quint64 OtaManager::totalCancellations() const
+{
+    return m_totalCancellations;
+}
+
+/** @brief 获取累计HEX转BIN次数 @return 转换次数 */
+quint64 OtaManager::totalHexConversions() const
+{
+    return m_totalHexConversions;
+}
+
+/** @brief 获取累计协议切换次数 @return 切换次数 */
+quint64 OtaManager::totalProtocolSwitches() const
+{
+    return m_totalProtocolSwitches;
 }

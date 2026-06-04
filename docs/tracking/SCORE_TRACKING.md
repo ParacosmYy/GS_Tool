@@ -117,6 +117,9 @@
 | 279 | WebSocket/BLE/SerialConfig/SerialDetector/OtaManager/OtaWidget/XModem/YModem/ZModem统计增强+TriggerManagerStats/ChartWidgetSlots/UsbDescriptorViewerTree/ModbusSlaveStats/FlatBuffersDecoderRead拆分 | WebSocket握手统计+BLE resetStats修复+串口波特率/流控统计+芯片识别静态化+OTA CRC/浏览/取消+X/Y/ZModem超时/取消+编译修复 |
 | 280-284 | 持续统计增强+文件拆分+Doxygen审计+编译修复 | 多模块统计增强(ChecksumCalculator/ConverterPanel/RttConfigPanel/JLinkRttConnection/IconManager/PlaybackWidget/DataExporter/NavigationController等)+文件拆分(CursorOverlayPaintMain/ZModemTransferDispatch/TerminalSearchBarAnimation等) |
 | 285 | ClipboardManager/DataPipeline/ConnectionManager/NotificationManager/ShortcutManager/DataAggregator/SettingsManager/ResponsiveLayout统计增强+6文件拆分+Doxygen审计 | 8模块统计增强(hex/base64/restores/bytesCopied+pipeline stage/output+connection serial/network+notification critical/high+shortcut unregister/category+aggregator reset/timeWindow+settings sync/group)+FrameVisualEditorPreview/BleScannerFilter/ProtobufDecoderField/ProtocolEngineCore/TerminalHighlighterHighlight/PanelManagerFactorySystem拆分+11文件Doxygen补全 |
+| 286-291 | LedIndicatorWidget~ResponsiveLayout统计增强+6拆分+23文件Doxygen | 多模块统计增强+PlaybackWidgetSlots/RegisterEditorUI/FftEngineCompute/TerminalFilterCompat/DashboardWidgetLayout拆分+chart/dashboard/core/widgets Doxygen审计 |
+| 292 | TCP/TLS/UDP/WebSocket/USB/SPI/I2C/SerialDetector/PortWatcher/RecordingMarker/ChartExporter/DataAggregator统计增强+头文件压缩 | 9连接模块+5基础设施模块统计增强(22+20个新计数器)+TerminalWidget 244→194/DataStatistics 239→200/SerialConfigPanel 209→161/DashboardSerializer 202→182 |
+| 293 | ProtocolBridgeManager/FireWater/JustFloat/NavigationController/BasePanel/ScopeWidget/CursorOverlay/HistogramWidget统计增强+7文件Doxygen | 8模块31个新统计计数器+ToolbarController/TriggerEngine/TriggerManager/ToastWidget/ChecksumCalculator/DataConverter/TimestampPanel Doxygen审计(~55方法修复) |
 
 ---
 

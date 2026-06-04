@@ -30,6 +30,7 @@ void ZModemTransfer::handleStateWaitingRinit(int type)
 void ZModemTransfer::handleStateSendingFile(int type, const QByteArray& headerData){
     if (type == ZRPOS) {
         m_timeoutTimer->stop();
+        ++m_totalZrposReceived;
         m_retryCount = 0;
         if (headerData.size() >= 4) {
             m_fileOffset = 0;
@@ -71,6 +72,7 @@ void ZModemTransfer::handleStateSendingData(int type, const QByteArray& headerDa
 {
     if (type == ZRPOS) {
         m_timeoutTimer->stop();
+        ++m_totalZrposReceived;
         m_retryCount++;
         if (m_retryCount > m_maxRetries) {
             sendCancelBytes();

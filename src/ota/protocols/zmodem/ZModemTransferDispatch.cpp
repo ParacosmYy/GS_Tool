@@ -107,3 +107,17 @@ QString ZModemTransfer::stateToString(State s)
     }
     return QStringLiteral("Unknown");
 }
+
+/** @brief 重置ZModem统计计数器(不影响传输状态) */
+void ZModemTransfer::resetZmodemStatistics()
+{
+    m_totalBlocksSent = 0;
+    m_totalRetries = 0;
+    m_totalCrcErrors = 0;
+    m_errorCount = 0;
+    m_totalTimeouts = 0;
+    m_totalZrposReceived = 0;
+    m_totalZdataFrames = 0;
+    m_totalZfileSent = 0;
+    m_totalZfinSent = 0;
+}

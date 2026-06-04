@@ -151,6 +151,9 @@ void XModemTransfer::resetXmodemStatistics()
     m_xmodemErrorCount = 0;
     m_totalCrcErrors = 0;
     m_totalTimeouts = 0;
+    m_totalNakReceived = 0;
+    m_totalCanReceived = 0;
+    m_totalAcksReceived = 0;
 }
 
 /** @brief 设置XMODEM状态机状态 @param newState 目标状态 */

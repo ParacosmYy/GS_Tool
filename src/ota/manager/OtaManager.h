@@ -76,6 +76,15 @@ public:
     /** @brief 重置统计(不影响历史记录) */
     void resetTransferStatistics();
 
+    /** @brief 获取累计传输取消次数 @return 取消次数 */
+    quint64 totalCancellations() const;
+
+    /** @brief 获取累计HEX转BIN次数 @return 转换次数 */
+    quint64 totalHexConversions() const;
+
+    /** @brief 获取累计协议切换次数 @return 切换次数 */
+    quint64 totalProtocolSwitches() const;
+
     /** @brief 验证固件文件(存在/可读/大小限制) @param filePath 文件路径 @param errorMsg 输出: 错误描述 @return true=有效 */
     bool validateFilePath(const QString& filePath, QString& errorMsg) const;
     /** @brief 检测文件类型(.bin->Binary, .hex->IntelHex) @param filePath 文件路径 @return 文件类型枚举 */
@@ -144,6 +153,11 @@ private:
     quint64 m_totalBytesTransferred = 0;         ///< 累计传输字节数
     quint64 m_totalCrcChecks = 0;                ///< 累计CRC校验次数
     qint64 m_currentFileSize = 0;                ///< 当前文件大小(字节)
+
+    // ---- 新增统计计数器 ----
+    quint64 m_totalCancellations = 0;            ///< 累计传输取消次数
+    quint64 m_totalHexConversions = 0;           ///< 累计HEX转BIN次数
+    quint64 m_totalProtocolSwitches = 0;         ///< 累计协议切换次数(startTransfer时协议变化)
 
     // ---- 速率跟踪 ----
     QElapsedTimer m_transferTimer;          ///< 当前传输耗时计时器
