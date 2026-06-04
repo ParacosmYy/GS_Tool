@@ -1,20 +1,4 @@
-/**
- * @file SerialDetector.h
- * @brief 串口检测器 - 增强版设备检测，支持USB VID/PID详细信息、友好名称和驱动识别
- *
- * 职责:
- *   1. 定时轮询检测串口设备的插入/移除事件
- *   2. 提供丰富的设备信息(VID/PID/友好名称/驱动类型/芯片型号)
- *   3. 按VID、描述、端口名、制造商等多种维度查询
- *   4. 记录设备变更统计(扫描次数/插入次数/移除次数/VID匹配次数)
- *
- * 协作关系:
- *   - PortWatcher: 低层热插拔检测，可组合使用
- *   - SerialConfigPanel: 通过信号更新端口列表
- *   - MainWindow: 监听设备变更事件
- *
- * 所属层级: 数据层（检测系统硬件状态，不涉及UI）
- */
+/** @file SerialDetector.h @brief 串口检测器 - 增强版设备检测。支持USB VID/PID详细信息、友好名称和驱动识别。定时轮询检测插入/移除事件 */
 
 #ifndef SERIALDETECTOR_H
 #define SERIALDETECTOR_H
@@ -26,22 +10,10 @@
 #include <QHash>
 #include <QSerialPortInfo>
 
-/**
- * @brief 已知USB转串口芯片厂商定义
- *
- * 通过VID匹配常见芯片厂商，用于友好名称显示。
- */
-struct UsbVendorEntry {
-    quint16 vid;              ///< USB厂商ID
-    QString vendorName;       ///< 厂商名称(如"Winchiphead")
-    QString commonChip;       ///< 常见芯片型号(如"CH340")
-};
+/** @brief 已知USB转串口芯片厂商定义(通过VID匹配) */
+struct UsbVendorEntry { quint16 vid; QString vendorName; QString commonChip; };
 
-/**
- * @brief 串口端口信息结构 - 封装系统串口设备的关键属性
- *
- * 在QSerialPortInfo基础上扩展了友好名称、驱动类型和芯片识别信息。
- */
+/** @brief 串口端口信息结构 - 封装系统串口设备关键属性(扩展了友好名称/驱动类型/芯片识别) */
 struct SerialPortInfo {
     QString portName;       ///< 端口名称(如"COM3")
     QString description;    ///< 设备描述(QSerialPortInfo::description)
@@ -59,28 +31,10 @@ struct SerialPortInfo {
     QString vidHex;         ///< VID十六进制字符串(如"1A86")
     QString pidHex;         ///< PID十六进制字符串(如"7523")
 
-    /**
-     * @brief 生成设备详情摘要文本(用于tooltip/日志)
-     * @return 多行设备详情字符串
-     */
-    QString toSummary() const;
+    QString toSummary() const;              ///< 生成设备详情摘要文本(tooltip/日志)
 };
 
-/**
- * @brief 串口检测器 - 增强版设备检测
- *
- * 定时扫描系统可用串口，检测插入/移除事件并发射信号通知。
- * 支持按VID、描述、端口名称、制造商、驱动类型等维度查询。
- * 内置已知USB转串口芯片数据库，自动识别芯片型号。
- *
- * 使用方式:
- * @code
- *   auto* detector = new SerialDetector(this);
- *   connect(detector, &SerialDetector::portInserted,
- *           this, &MyClass::onPortInserted);
- *   detector->startMonitoring(1000);
- * @endcode
- */
+/** @brief 串口检测器 - 增强版设备检测。定时扫描串口，检测插入/移除事件。支持按VID/描述/端口名/制造商/驱动类型查询 */
 class SerialDetector : public QObject {
     Q_OBJECT
 public:
