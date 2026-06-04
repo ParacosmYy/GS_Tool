@@ -16,7 +16,6 @@
 #include <QJsonObject>
 
 /**
- * @class ProtocolSchema
  * @brief 协议帧结构描述
  *
  * 从 JSON 文件或字节数组加载帧定义，提供字段列表、帧定界规则与校验配置。
@@ -26,9 +25,7 @@ class ProtocolSchema : public QObject
     Q_OBJECT
 
 public:
-    /**
-     * @brief 校验算法类型
-     */
+    /** @brief 校验算法类型 */
     enum ChecksumType {
         None,        ///< 无校验
         Crc8,        ///< CRC-8
@@ -40,10 +37,7 @@ public:
     };
     Q_ENUM(ChecksumType)
 
-    /**
-     * @struct FieldDefinition
-     * @brief 单个字段描述
-     */
+    /** @brief 单个字段描述 */
     struct FieldDefinition {
         QString name;   ///< 字段名称
         int offset;     ///< 在帧中的字节偏移
@@ -51,10 +45,7 @@ public:
         QString type;   ///< 数据类型（uint8/uint16/int32/float 等）
     };
 
-    /**
-     * @struct FramingRule
-     * @brief 帧定界规则
-     */
+    /** @brief 帧定界规则 */
     struct FramingRule {
         QString type;            ///< 帧类型标识
         QVector<int> header;     ///< 帧头字节序列

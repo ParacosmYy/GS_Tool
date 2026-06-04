@@ -1,9 +1,10 @@
 /**
  * @file ProtocolSchema.cpp
- * @brief 自定义协议帧结构定义实现
+ * @brief 自定义协议帧结构定义实现 — 核心加载与构造
  *
- * 从 JSON 文件或字节数组加载协议帧结构定义，
- * 支持帧定界规则、校验配置与字段元数据的解析和序列化。
+ * 从 JSON 文件或字节数组加载协议帧结构定义。
+ * 字段访问、JSON 序列化、校验类型转换与统计计数器
+ * 已拆分至 ProtocolSchemaFields.cpp。
  */
 
 #include "protocol/schema/ProtocolSchema.h"
@@ -201,83 +202,6 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     return true;
 }
 
-/** @brief 将当前协议定义序列化为JSON对象 @return 包含完整协议定义的QJsonObject */
-QJsonObject ProtocolSchema::toJson() const
-{
-    QJsonObject root;
-
-    /* 协议名称 */
-    root[QStringLiteral("name")] = m_name;
-
-    /* 帧定界规则 */
-    QJsonObject framingObj;
-    framingObj[QStringLiteral("type")] = m_framing.type;
-
-    /* 帧头字节序列 */
-    QJsonArray headerArr;
-    for (int byte : m_framing.header) {
-        headerArr.append(byte);
-    }
-    framingObj[QStringLiteral("header")] = headerArr;
-
-    /* 长度字段 */
-    QJsonObject lfObj;
-    lfObj[QStringLiteral("offset")] = m_framing.lengthFieldOffset;
-    lfObj[QStringLiteral("size")]   = m_framing.lengthFieldSize;
-    framingObj[QStringLiteral("length_field")] = lfObj;
-
-    /* 校验配置 */
-    QJsonObject chkObj;
-    chkObj[QStringLiteral("type")] = checksumTypeToString(m_framing.checksumType);
-    framingObj[QStringLiteral("checksum")] = chkObj;
-
-    root[QStringLiteral("framing")] = framingObj;
-
-    /* 字段定义数组 */
-    QJsonArray fieldsArr;
-    for (const FieldDefinition &field : m_fields) {
-        QJsonObject fieldObj;
-        fieldObj[QStringLiteral("name")]   = field.name;
-        fieldObj[QStringLiteral("offset")] = field.offset;
-        fieldObj[QStringLiteral("size")]   = field.size;
-        fieldObj[QStringLiteral("type")]   = field.type;
-        fieldsArr.append(fieldObj);
-    }
-    root[QStringLiteral("fields")] = fieldsArr;
-
-    return root;
-}
-
-/** @brief 获取协议名称 @return 协议名称字符串 */
-QString ProtocolSchema::name() const
-{
-    return m_name;
-}
-
-/** @brief 获取帧定界规则 @return 当前帧定界规则 */
-ProtocolSchema::FramingRule ProtocolSchema::framing() const
-{
-    return m_framing;
-}
-
-/** @brief 获取所有字段定义列表 @return 字段定义列表 */
-QList<ProtocolSchema::FieldDefinition> ProtocolSchema::fields() const
-{
-    return m_fields;
-}
-
-/** @brief 检查当前协议定义是否有效 @return 有效返回true，否则返回false */
-bool ProtocolSchema::isValid() const
-{
-    return m_valid;
-}
-
-/** @brief 获取最近一次解析错误描述 @return 错误描述字符串 */
-QString ProtocolSchema::lastError() const
-{
-    return m_lastError;
-}
-
 /* ──────────────── 可编程构造用 setter ──────────────── */
 
 /** @brief 设置协议名称 @param name 协议名称 */
@@ -302,96 +226,4 @@ void ProtocolSchema::addField(const FieldDefinition &field)
 void ProtocolSchema::setValid(bool valid)
 {
     m_valid = valid;
-}
-
-/** @brief 将校验类型枚举值转换为字符串标识 @param type 校验算法枚举值 @return 对应的字符串标识 */
-QString ProtocolSchema::checksumTypeToString(ChecksumType type) const
-{
-    switch (type) {
-    case ChecksumType::None:        return QStringLiteral("none");
-    case ChecksumType::Crc8:        return QStringLiteral("crc8");
-    case ChecksumType::Crc16Ccitt:  return QStringLiteral("crc16_ccitt");
-    case ChecksumType::Crc16Modbus: return QStringLiteral("crc16_modbus");
-    case ChecksumType::Crc32:       return QStringLiteral("crc32");
-    case ChecksumType::Xor:         return QStringLiteral("xor");
-    case ChecksumType::Sum:         return QStringLiteral("sum");
-    default:                        return QStringLiteral("none");
-    }
-}
-
-/** @brief 将字符串标识转换为校验类型枚举值 @param str 校验算法字符串标识 @return 对应的枚举值 */
-ProtocolSchema::ChecksumType ProtocolSchema::checksumTypeFromString(const QString &str) const
-{
-    if (str == QStringLiteral("none"))        return ChecksumType::None;
-    if (str == QStringLiteral("crc8"))        return ChecksumType::Crc8;
-    if (str == QStringLiteral("crc16_ccitt")) return ChecksumType::Crc16Ccitt;
-    if (str == QStringLiteral("crc16_modbus"))return ChecksumType::Crc16Modbus;
-    if (str == QStringLiteral("crc32"))       return ChecksumType::Crc32;
-    if (str == QStringLiteral("xor"))         return ChecksumType::Xor;
-    if (str == QStringLiteral("sum"))         return ChecksumType::Sum;
-    return ChecksumType::None;
-}
-
-// ============================================================================
-// 统计计数器接口
-// ============================================================================
-
-/** @brief 获取已加载的协议定义总数 @return 累计加载次数 */
-quint64 ProtocolSchema::totalSchemas() const
-{
-    return m_totalSchemas;
-}
-
-/** @brief 获取所有已加载协议的字段总数 @return 累计字段数 */
-quint64 ProtocolSchema::totalFieldCount() const
-{
-    return m_totalFieldCount;
-}
-
-/** @brief 获取历史最大协议定义大小(字节) @return 最大JSON字节数 */
-quint64 ProtocolSchema::maxSchemaSize() const
-{
-    return m_maxSchemaSize;
-}
-
-/** @brief 获取协议定义校验执行总次数 @return 校验总次数 */
-quint64 ProtocolSchema::totalValidations() const
-{
-    return m_totalValidations;
-}
-
-/** @brief 获取协议定义校验失败次数 @return 校验错误计数 */
-quint64 ProtocolSchema::validationErrors() const
-{
-    return m_validationErrors;
-}
-
-/** @brief 获取协议定义加载失败次数 @return 加载失败计数 */
-quint64 ProtocolSchema::totalSchemaErrors() const
-{
-    return m_totalSchemaErrors;
-}
-
-/** @brief 获取当前活跃的协议定义数量 @return 活跃协议数 */
-quint64 ProtocolSchema::totalActiveSchemas() const
-{
-    return m_totalActiveSchemas;
-}
-
-/** @brief 重置所有Schema统计计数器(加载数/字段数/最大大小/校验/错误/活跃数) */
-void ProtocolSchema::resetSchemaStatistics()
-{
-    m_totalSchemas = 0;
-    m_totalFieldCount = 0;
-    m_maxSchemaSize = 0;
-    m_totalValidations = 0;
-    m_validationErrors = 0;
-    m_totalSchemaErrors = 0;
-    m_totalActiveSchemas = 0;
-}
-
-/** @brief 重置所有统计计数器（别名，调用resetSchemaStatistics） */
-void ProtocolSchema::resetStats()
-{
-    resetSchemaStatistics();
 }

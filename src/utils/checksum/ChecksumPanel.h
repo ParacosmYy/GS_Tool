@@ -62,7 +62,16 @@ public:
     /** @brief 获取累计复制到剪贴板次数 @return 复制次数 */
     quint64 totalCopyActions() const;
 
-    /** @brief 重置所有面板统计计数器(计算次数/复制次数) */
+    /** @brief 获取累计算法切换次数 @return 切换次数 */
+    quint64 totalAlgorithmChanges() const;
+
+    /** @brief 获取累计复制结果到剪贴板操作次数 @return 剪贴板复制次数 */
+    quint64 totalCopyToClipboard() const;
+
+    /** @brief 获取累计输入内容更新次数 @return 更新次数 */
+    quint64 totalInputUpdates() const;
+
+    /** @brief 重置所有面板统计计数器(计算次数/复制次数/算法切换/剪贴板复制/输入更新) */
     void resetPanelStatistics();
 
 signals:
@@ -118,6 +127,9 @@ private:
     // 面板统计
     quint64 m_totalCalculations = 0;    ///< 累计计算次数
     quint64 m_totalCopyActions = 0;     ///< 累计复制到剪贴板次数
+    quint64 m_totalAlgorithmChanges = 0; ///< 累计算法切换次数
+    quint64 m_totalCopyToClipboard = 0; ///< 累计复制结果到剪贴板操作次数
+    quint64 m_totalInputUpdates = 0;    ///< 累计输入内容更新次数
 
 protected:
     /**

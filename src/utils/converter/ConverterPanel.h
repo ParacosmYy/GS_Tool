@@ -51,7 +51,16 @@ public:
     /** @brief 获取累计复制操作次数 @return 复制次数 */
     quint64 totalCopyActions() const { return m_totalCopyActions; }
 
-    /** @brief 重置所有转换器统计计数器(转换次数/复制次数) */
+    /** @brief 获取累计格式交换次数 @return 交换次数 */
+    quint64 totalFormatSwaps() const { return m_totalFormatSwaps; }
+
+    /** @brief 获取累计输入内容变更次数 @return 输入变更次数 */
+    quint64 totalInputChanges() const { return m_totalInputChanges; }
+
+    /** @brief 获取累计转换错误次数 @return 错误次数 */
+    quint64 totalErrors() const { return m_totalErrors; }
+
+    /** @brief 重置所有转换器统计计数器(转换次数/复制次数/格式交换/输入变更/错误) */
     void resetStatistics();
 
 private slots:
@@ -95,6 +104,9 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalConversions = 0;    ///< 累计转换操作次数
     quint64 m_totalCopyActions = 0;    ///< 累计复制操作次数
+    quint64 m_totalFormatSwaps = 0;    ///< 累计格式交换次数
+    quint64 m_totalInputChanges = 0;   ///< 累计输入内容变更次数
+    quint64 m_totalErrors = 0;         ///< 累计转换错误次数
 };
 
 #endif // CONVERTERPANEL_H

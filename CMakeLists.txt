@@ -77,6 +77,7 @@ set(SOURCES
     src/core/connect/ConnectionManager.cpp
     src/core/connect/ConnectionFactory.cpp
     src/core/theme/ThemeManager.cpp
+    src/core/theme/ThemeManagerColor.cpp
     src/core/theme/QssThemeGenerator.cpp
     src/core/theme/QssThemeGeneratorColors.cpp
     src/core/animation/AnimationUtility.cpp
@@ -191,6 +192,7 @@ set(SOURCES
 
     # ── F2: 自定义协议引擎 ──
     src/protocol/schema/ProtocolSchema.cpp
+    src/protocol/schema/ProtocolSchemaFields.cpp
     src/protocol/engine/ProtocolEngine.cpp
     src/protocol/engine/ProtocolEngineStats.cpp
     src/protocol/engine/ProtocolEngineChecksum.cpp

@@ -132,6 +132,7 @@ ConverterPanel::ConverterPanel(QWidget *parent)
  */
 void ConverterPanel::setInput(const QString &text)
 {
+    ++m_totalInputChanges;
     m_inputEdit->setPlainText(text);
 }
 
@@ -161,6 +162,10 @@ void ConverterPanel::onConvert()
         m_toCombo->currentData().toInt());
 
     QByteArray result = m_converter.convert(input, from, to);
+    if (result.isEmpty() && !input.isEmpty()) {
+        /* 转换失败，输出为空但输入非空 */
+        ++m_totalErrors;
+    }
     m_outputEdit->setPlainText(QString::fromUtf8(result));
     m_copyBtn->setEnabled(true);
     ++m_totalConversions;
@@ -184,6 +189,7 @@ void ConverterPanel::onConvert()
  */
 void ConverterPanel::onSwap()
 {
+    ++m_totalFormatSwaps;
     int fromIdx = m_fromCombo->currentIndex();
     int toIdx = m_toCombo->currentIndex();
 
@@ -234,4 +240,7 @@ void ConverterPanel::resetStatistics()
 {
     m_totalConversions = 0;
     m_totalCopyActions = 0;
+    m_totalFormatSwaps = 0;
+    m_totalInputChanges = 0;
+    m_totalErrors = 0;
 }
