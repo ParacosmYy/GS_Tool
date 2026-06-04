@@ -1084,6 +1084,9 @@ set(HEADERS
 
     # ── F34: 数据速率计算器 ──
     src/utils/rate/DataRateCalculator.h
+
+    # ── F33: 数据编解码机 ──
+    src/utils/encoder/SerialDataEncoder.h
 )
 
 set(RESOURCES
