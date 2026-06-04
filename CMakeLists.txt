@@ -85,6 +85,7 @@ set(SOURCES
     src/core/panels/PanelManager.cpp
     src/core/panels/PanelManagerCreation.cpp
     src/core/panels/PanelManagerFactory.cpp
+    src/core/panels/PanelManagerFactorySystem.cpp
     src/core/panels/PanelManagerGetters.cpp
     src/core/panels/PanelManagerQuery.cpp
     src/core/panels/PanelManagerWrap.cpp
@@ -188,6 +189,7 @@ set(SOURCES
     src/protocol/editor/FrameVisualEditorFields.cpp
     src/protocol/editor/FrameVisualEditorUI.cpp
     src/protocol/editor/FrameVisualEditorUIConnect.cpp
+    src/protocol/editor/FrameVisualEditorPreview.cpp
     src/protocol/hex/IntelHexParser.cpp
     src/protocol/hex/IntelHexParserStats.cpp
     src/protocol/hex/IntelHexParserRecord.cpp
@@ -312,6 +314,7 @@ set(SOURCES
     src/protocol/schema/ProtocolSchemaFields.cpp
     src/protocol/engine/ProtocolEngine.cpp
     src/protocol/engine/ProtocolEngineStats.cpp
+    src/protocol/engine/ProtocolEngineCore.cpp
     src/protocol/engine/ProtocolEngineParsing.cpp
     src/protocol/engine/ProtocolEngineChecksum.cpp
     src/protocol/engine/ProtocolEngineAlgorithm.cpp
@@ -393,6 +396,7 @@ set(SOURCES
     # ── F12: Bluetooth/BLE 调试 ──
     src/connection/ble/BleScanner.cpp
     src/connection/ble/BleScannerDiscovery.cpp
+    src/connection/ble/BleScannerFilter.cpp
     src/connection/ble/BleConnection.cpp
     src/connection/ble/BleGattModel.cpp
     src/connection/ble/BleGattModelIndex.cpp
@@ -490,6 +494,7 @@ set(SOURCES
     src/protocol/protobuf/ProtobufDecoder.cpp
     src/protocol/protobuf/ProtobufDecoderEncoding.cpp
     src/protocol/protobuf/ProtobufDecoderVarint.cpp
+    src/protocol/protobuf/ProtobufDecoderField.cpp
     src/protocol/protobuf/ProtobufDecoderHelpers.cpp
     src/protocol/protobuf/FlatBuffersDecoder.cpp
     src/protocol/protobuf/FlatBuffersDecoderFields.cpp
@@ -518,6 +523,7 @@ set(SOURCES
     src/terminal/filter/TerminalFilterApply.cpp
     src/terminal/filter/TerminalFilterBar.cpp
     src/terminal/filter/TerminalHighlighter.cpp
+    src/terminal/filter/TerminalHighlighterHighlight.cpp
 
     # ── F22: 校验和计算器 ──
     src/utils/checksum/ChecksumCalculator.cpp

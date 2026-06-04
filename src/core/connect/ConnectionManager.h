@@ -104,6 +104,15 @@ public:
     /** @brief 获取累计切换连接次数 */
     quint64 totalSwitches() const;
 
+    /** @brief 获取累计串口连接创建次数 */
+    quint64 totalSerialCreated() const { return m_totalSerialCreated; }
+
+    /** @brief 获取累计网络连接创建次数(TCP/UDP/WS等) */
+    quint64 totalNetworkCreated() const { return m_totalNetworkCreated; }
+
+    /** @brief 获取历史峰值并发连接数 */
+    quint64 peakConcurrentConnections() const { return m_peakConcurrent; }
+
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -115,6 +124,9 @@ private:
     quint64 m_totalConnectionsCreated = 0;    ///< 累计创建连接数
     quint64 m_totalConnectionsDestroyed = 0;  ///< 累计销毁连接数
     quint64 m_totalSwitches = 0;              ///< 累计切换次数
+    quint64 m_totalSerialCreated = 0;         ///< 累计串口连接创建次数
+    quint64 m_totalNetworkCreated = 0;        ///< 累计网络连接创建次数
+    quint64 m_peakConcurrent = 0;             ///< 历史峰值并发连接数
 };
 
 #endif // CONNECTIONMANAGER_H

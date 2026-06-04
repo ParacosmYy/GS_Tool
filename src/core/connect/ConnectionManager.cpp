@@ -37,6 +37,10 @@ IConnection* ConnectionManager::createConnection(ConnectionType type)
 
         // 统计：累计创建连接计数
         ++m_totalConnectionsCreated;
+        if (type == ConnectionType::Serial) ++m_totalSerialCreated;
+        else ++m_totalNetworkCreated;
+        if (static_cast<quint64>(m_connections.size()) > m_peakConcurrent)
+            m_peakConcurrent = static_cast<quint64>(m_connections.size());
     }
     return conn;
 }
@@ -134,4 +138,7 @@ void ConnectionManager::resetStats()
     m_totalConnectionsCreated = 0;
     m_totalConnectionsDestroyed = 0;
     m_totalSwitches = 0;
+    m_totalSerialCreated = 0;
+    m_totalNetworkCreated = 0;
+    m_peakConcurrent = 0;
 }

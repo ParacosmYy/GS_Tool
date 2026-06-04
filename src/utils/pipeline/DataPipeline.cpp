@@ -15,22 +15,22 @@ DataPipeline::DataPipeline(QObject *parent) : QObject(parent) {}
 DataPipeline::~DataPipeline() = default;
 
 /** @brief 在管道末尾添加一个处理阶段(默认启用) @param name 阶段名称 @param fn 处理函数 */
-void DataPipeline::addStage(const QString &name, StageFunc fn) { m_stages.append({name, fn, true}); }
+void DataPipeline::addStage(const QString &name, StageFunc fn) { ++m_totalStageAdds; m_stages.append({name, fn, true}); }
 
 /** @brief 在指定位置插入一个处理阶段(默认启用) @param idx 插入位置索引 @param name 阶段名称 @param fn 处理函数 */
 void DataPipeline::insertStage(int idx, const QString &name, StageFunc fn) {
-    if (idx >= 0 && idx <= m_stages.size()) m_stages.insert(idx, {name, fn, true});
+    if (idx >= 0 && idx <= m_stages.size()) { ++m_totalStageAdds; m_stages.insert(idx, {name, fn, true}); }
 }
 
 /** @brief 按名称移除第一个匹配的处理阶段 @param name 阶段名称 */
 void DataPipeline::removeStage(const QString &name) {
     for (int i = 0; i < m_stages.size(); ++i)
-        if (m_stages[i].name == name) { m_stages.removeAt(i); return; }
+        if (m_stages[i].name == name) { ++m_totalStageRemoves; m_stages.removeAt(i); return; }
 }
 
 /** @brief 启用或禁用指定名称的处理阶段 @param name 阶段名称 @param enabled true=启用 false=禁用 */
 void DataPipeline::enableStage(const QString &name, bool enabled) {
-    for (auto &s : m_stages) if (s.name == name) { s.enabled = enabled; return; }
+    for (auto &s : m_stages) if (s.name == name) { ++m_totalStageToggles; s.enabled = enabled; return; }
 }
 
 /** @brief 移动处理阶段的位置 @param from 原始位置索引 @param to 目标位置索引 */
@@ -57,6 +57,7 @@ QByteArray DataPipeline::process(const QByteArray &input) {
         }
     }
     emit pipelineComplete(data);
+    m_totalOutputBytes += static_cast<quint64>(data.size());
     return data;
 }
 
@@ -68,3 +69,9 @@ int DataPipeline::stageCount() const { return m_stages.size(); }
 
 /** @brief 清空所有处理阶段 */
 void DataPipeline::clearStages() { m_stages.clear(); }
+
+/** @brief 重置所有统计计数器 */
+void DataPipeline::resetPipelineStatistics() {
+    m_totalProcessCalls = 0; m_totalBytesProcessed = 0; m_totalStageErrors = 0;
+    m_totalStageAdds = 0; m_totalStageRemoves = 0; m_totalStageToggles = 0; m_totalOutputBytes = 0;
+}

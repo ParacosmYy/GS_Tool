@@ -75,8 +75,16 @@ public:
     // ---- 统计 ----
     /** @brief 获取断点切换总次数 @return 切换次数 */
     quint64 breakpointChangeCount() const { return m_bpChangeCount; }
+    /** @brief 获取累计布局重排次数 @return 重排次数 */
+    quint64 totalLayoutUpdates() const { return m_totalLayoutUpdates; }
+    /** @brief 获取累计列数变更次数(手动setColumnCount调用) @return 变更次数 */
+    quint64 totalColumnChanges() const { return m_totalColumnChanges; }
+    /** @brief 获取累计配置保存次数 @return 保存次数 */
+    quint64 totalConfigSaves() const { return m_totalConfigSaves; }
+    /** @brief 获取累计配置加载次数 @return 加载次数 */
+    quint64 totalConfigLoads() const { return m_totalConfigLoads; }
     /** @brief 重置统计计数器 */
-    void resetStats() { m_bpChangeCount = 0; }
+    void resetStats();
 
 private:
     /** @brief 根据宽度计算断点（纯计算） @param w 宽度 @return 断点 */
@@ -89,4 +97,8 @@ private:
     QMap<Breakpoint, int> m_columns;     ///< 各断点对应的列数配置
     Breakpoint m_lastBp = Mobile;        ///< 上次断点（用于检测变化）
     quint64 m_bpChangeCount = 0;         ///< 断点切换次数统计
+    quint64 m_totalLayoutUpdates = 0;    ///< 累计布局重排次数(setGeometry调用)
+    quint64 m_totalColumnChanges = 0;    ///< 累计列数变更次数(setColumnCount调用)
+    mutable quint64 m_totalConfigSaves = 0;      ///< 累计配置保存次数(saveColumnConfig为const方法)
+    quint64 m_totalConfigLoads = 0;      ///< 累计配置加载次数
 };

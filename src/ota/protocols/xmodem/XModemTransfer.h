@@ -21,12 +21,18 @@ public:
     /** @brief XMODEM传输模式 */
     enum Mode { Checksum, CRC, OneK }; ///< Checksum=Sum8, CRC=CRC16, OneK=1024B+CRC16
 
-    explicit XModemTransfer(QObject* parent = nullptr); ///< 默认CRC模式
-    void setMode(Mode mode);           ///< 设置传输模式(须在start()前调用，NAK自动回退Checksum)
-    void setFilePath(const QString& path); ///< 设置文件路径(限制16MB，setData优先)
-    void setData(const QByteArray& data);  ///< 直接设置传输数据(清除filePath)
-    double transferRate() const;       ///< 当前传输速率(字节/秒)，未开始返回0
-    double etaSeconds() const;         ///< ETA(秒)，无法估算返回-1
+    /** @brief 构造XModemTransfer，默认CRC模式 @param parent 父对象 */
+    explicit XModemTransfer(QObject* parent = nullptr);
+    /** @brief 设置传输模式(须在start()前调用，NAK自动回退Checksum) @param mode 传输模式 */
+    void setMode(Mode mode);
+    /** @brief 设置文件路径(限制16MB，setData优先) @param path 固件文件路径 */
+    void setFilePath(const QString& path);
+    /** @brief 直接设置传输数据(清除filePath) @param data 待传输数据 */
+    void setData(const QByteArray& data);
+    /** @brief 获取当前传输速率 @return 速率(字节/秒)，未开始返回0 */
+    double transferRate() const;
+    /** @brief 获取预计剩余时间 @return 秒数，无法估算返回-1 */
+    double etaSeconds() const;
     // ---- 统计接口 ----
     quint64 totalBlocksSent() const;      ///< 累计发送块总数
     quint64 totalRetries() const;         ///< 累计重试次数

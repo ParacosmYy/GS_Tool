@@ -22,6 +22,7 @@ ClipboardManager &ClipboardManager::instance() { static ClipboardManager inst; r
 void ClipboardManager::copyText(const QString &text, const QString &source) {
     if (text.isEmpty()) return;
     ++m_totalCopyOps;
+    m_totalBytesCopied += static_cast<quint64>(text.toUtf8().size());
     QClipboard *clipboard = QGuiApplication::clipboard();
     if (clipboard) clipboard->setText(text);
     ClipboardEntry entry; entry.text = text; entry.format = QStringLiteral("text");
@@ -32,6 +33,9 @@ void ClipboardManager::copyText(const QString &text, const QString &source) {
 void ClipboardManager::copyHex(const QByteArray &data, const QString &source) {
     if (data.isEmpty()) return;
     ++m_totalCopyOps;
+    ++m_totalConversions;
+    ++m_totalHexConversions;
+    m_totalBytesCopied += static_cast<quint64>(data.size());
     QString hexStr = textToHex(QString::fromUtf8(data));
     QClipboard *clipboard = QGuiApplication::clipboard();
     if (clipboard) clipboard->setText(hexStr);
@@ -43,6 +47,9 @@ void ClipboardManager::copyHex(const QByteArray &data, const QString &source) {
 void ClipboardManager::copyBase64(const QByteArray &data, const QString &source) {
     if (data.isEmpty()) return;
     ++m_totalCopyOps;
+    ++m_totalConversions;
+    ++m_totalBase64Conversions;
+    m_totalBytesCopied += static_cast<quint64>(data.size());
     QString b64 = bytesToBase64(data);
     QClipboard *clipboard = QGuiApplication::clipboard();
     if (clipboard) clipboard->setText(b64);
@@ -95,7 +102,7 @@ QList<ClipboardEntry> ClipboardManager::recentHistory(int count) const {
     return m_history.mid(0, qMin(count, m_history.size()));
 }
 /** @brief 清除所有历史记录 */
-void ClipboardManager::clearHistory() { m_history.clear(); emit historyCleared(); }
+void ClipboardManager::clearHistory() { ++m_totalHistoryClears; m_history.clear(); emit historyCleared(); }
 /** @brief 获取历史记录数量 @return 历史条目数 */
 int ClipboardManager::historySize() const { return m_history.size(); }
 /** @brief 设置历史记录最大容量 @param maxSize 最大条目数 */
@@ -111,6 +118,7 @@ void ClipboardManager::restoreFromHistory(int index) {
     QClipboard *clipboard = QGuiApplication::clipboard();
     if (clipboard) clipboard->setText(m_history[index].text);
     ++m_totalCopyOps;
+    ++m_totalRestores;
 }
 
 /** @brief 获取累计复制操作次数 @return 复制次数 */
@@ -120,7 +128,11 @@ quint64 ClipboardManager::totalPasteOps() const { return m_totalPasteOps; }
 /** @brief 获取累计格式转换次数 @return 转换次数 */
 quint64 ClipboardManager::totalConversions() const { return m_totalConversions; }
 /** @brief 重置所有统计计数器 */
-void ClipboardManager::resetStatistics() { m_totalCopyOps = 0; m_totalPasteOps = 0; m_totalConversions = 0; }
+void ClipboardManager::resetStatistics() {
+    m_totalCopyOps = 0; m_totalPasteOps = 0; m_totalConversions = 0;
+    m_totalHexConversions = 0; m_totalBase64Conversions = 0;
+    m_totalRestores = 0; m_totalHistoryClears = 0; m_totalBytesCopied = 0;
+}
 
 /** @brief 添加条目到历史记录(去重，限制容量) @param entry 剪贴板条目 */
 void ClipboardManager::addHistoryEntry(const ClipboardEntry &entry) {

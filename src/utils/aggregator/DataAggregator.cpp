@@ -95,6 +95,7 @@ void DataAggregator::setAggregateFunc(const QString &src, AggregateFunc fn) {
 
 /** @brief 重置指定数据源的缓冲区和结果(滑动窗口+时间窗口一并重置) @param src 数据源名称 */
 void DataAggregator::resetSource(const QString &src) {
+    ++m_totalResets;
     auto it = m_sources.find(src);
     if (it != m_sources.end()) { it->values.clear(); it->result = 0.0; }
 
@@ -109,6 +110,7 @@ void DataAggregator::resetSource(const QString &src) {
 
 /** @brief 重置所有数据源的缓冲区和结果 */
 void DataAggregator::resetAll() {
+    ++m_totalResets;
     for (auto it = m_sources.begin(); it != m_sources.end(); ++it) {
         it->values.clear();
         it->result = 0.0;
@@ -126,6 +128,7 @@ void DataAggregator::resetAll() {
 /** @brief 为数据源启用时间窗口聚合，按自然时间对齐窗口边界 @param name 数据源名称(必须已通过addSource添加) @param intervalSec 时间窗口间隔(秒) */
 void DataAggregator::enableTimeWindow(const QString &name, int intervalSec) {
     if (!m_sources.contains(name) || intervalSec <= 0) return;
+    ++m_totalTimeWindowEnables;
     TimeWindowData twd;
     twd.intervalSec = intervalSec;
     twd.currentWindowStart = 0;
@@ -134,7 +137,10 @@ void DataAggregator::enableTimeWindow(const QString &name, int intervalSec) {
 
 /** @brief 禁用指定数据源的时间窗口聚合 @param name 数据源名称 */
 void DataAggregator::disableTimeWindow(const QString &name) {
-    m_timeWindows.remove(name);
+    if (m_timeWindows.contains(name)) {
+        ++m_totalTimeWindowDisables;
+        m_timeWindows.remove(name);
+    }
 }
 
 /** @brief 获取指定数据源最近一个已完成时间窗口的统计结果 @param name 数据源名称 @return 统计结果；若不存在或无已完成窗口，返回count=0的结构体 */
@@ -197,4 +203,7 @@ void DataAggregator::resetAggregatorStatistics() {
     m_totalRollingEmits = 0;
     m_totalSourceAdds = 0;
     m_totalSourceRemoves = 0;
+    m_totalResets = 0;
+    m_totalTimeWindowEnables = 0;
+    m_totalTimeWindowDisables = 0;
 }

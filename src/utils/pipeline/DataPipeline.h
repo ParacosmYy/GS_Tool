@@ -1,3 +1,10 @@
+/**
+ * @file DataPipeline.h
+ * @brief 数据管道 — 多阶段数据处理管线，支持添加/插入/移除/启用/禁用/排序处理阶段
+ *
+ * 数据依次通过所有启用的阶段进行变换处理。
+ * 常用于串口数据的预处理链(如协议解码、过滤、转换等)。
+ */
 #pragma once
 #include <QObject>
 #include <QList>
@@ -49,8 +56,16 @@ public:
     quint64 totalBytesProcessed() const { return m_totalBytesProcessed; }
     /** @brief 获取累计阶段错误次数 @return 错误次数 */
     quint64 totalStageErrors() const { return m_totalStageErrors; }
+    /** @brief 获取累计阶段添加次数 @return 添加次数 */
+    quint64 totalStageAdds() const { return m_totalStageAdds; }
+    /** @brief 获取累计阶段移除次数 @return 移除次数 */
+    quint64 totalStageRemoves() const { return m_totalStageRemoves; }
+    /** @brief 获取累计阶段启用/禁用切换次数 @return 切换次数 */
+    quint64 totalStageToggles() const { return m_totalStageToggles; }
+    /** @brief 获取累计输出字节总数 @return 输出字节数 */
+    quint64 totalOutputBytes() const { return m_totalOutputBytes; }
     /** @brief 重置所有统计计数器 */
-    void resetPipelineStatistics() { m_totalProcessCalls = 0; m_totalBytesProcessed = 0; m_totalStageErrors = 0; }
+    void resetPipelineStatistics();
 
 signals:
     /** @brief 单个阶段处理完成信号 @param name 阶段名称 @param inputSize 输入数据大小 @param outputSize 输出数据大小 */
@@ -66,4 +81,8 @@ private:
     quint64 m_totalProcessCalls = 0;       ///< 统计: 累计管道处理总次数
     quint64 m_totalBytesProcessed = 0;     ///< 统计: 累计处理的输入字节总数
     quint64 m_totalStageErrors = 0;        ///< 统计: 累计阶段处理错误次数
+    quint64 m_totalStageAdds = 0;          ///< 统计: 累计阶段添加次数(addStage+insertStage)
+    quint64 m_totalStageRemoves = 0;       ///< 统计: 累计阶段移除次数
+    quint64 m_totalStageToggles = 0;       ///< 统计: 累计阶段启用/禁用切换次数
+    quint64 m_totalOutputBytes = 0;        ///< 统计: 累计输出字节总数
 };

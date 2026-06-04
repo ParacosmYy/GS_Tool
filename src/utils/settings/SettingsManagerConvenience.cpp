@@ -113,4 +113,8 @@ void SettingsManager::resetSettingsStatistics()
     m_totalWrites = 0;
     m_totalRemoves = 0;
     m_errorCount = 0;
+    m_totalSyncs = 0;
+    m_totalGroupEnters = 0;
+    m_totalGroupExits = 0;
+    m_totalContainsChecks = 0;
 }

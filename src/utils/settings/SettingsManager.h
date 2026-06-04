@@ -68,6 +68,10 @@ public:
     quint64 totalWrites() const;   ///< 配置写入总次数
     quint64 totalRemoves() const;  ///< 配置删除总次数
     quint64 errorCount() const;    ///< 配置操作错误总次数
+    quint64 totalSyncs() const { return m_totalSyncs; } ///< 配置同步到磁盘总次数
+    quint64 totalGroupEnters() const { return m_totalGroupEnters; } ///< 累计进入分组次数
+    quint64 totalGroupExits() const { return m_totalGroupExits; } ///< 累计退出分组次数
+    quint64 totalContainsChecks() const { return m_totalContainsChecks; } ///< 累计contains检查次数
     void resetSettingsStatistics();///< 重置所有统计计数器
 
 private:
@@ -82,6 +86,10 @@ private:
     quint64 m_totalWrites = 0;            ///< 配置写入总次数
     quint64 m_totalRemoves = 0;           ///< 配置删除总次数
     quint64 m_errorCount = 0;             ///< 配置操作错误总次数
+    quint64 m_totalSyncs = 0;             ///< 配置同步到磁盘总次数
+    quint64 m_totalGroupEnters = 0;       ///< 累计进入分组次数
+    quint64 m_totalGroupExits = 0;        ///< 累计退出分组次数
+    mutable quint64 m_totalContainsChecks = 0; ///< 累计contains检查次数
 };
 
 #endif // SETTINGSMANAGER_H

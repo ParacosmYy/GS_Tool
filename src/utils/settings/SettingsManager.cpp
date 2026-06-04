@@ -115,6 +115,7 @@ void SettingsManager::remove(const QString& key)
  */
 bool SettingsManager::contains(const QString& key) const
 {
+    ++m_totalContainsChecks;
     return m_settings.contains(key);
 }
 
@@ -126,6 +127,7 @@ bool SettingsManager::contains(const QString& key) const
  */
 void SettingsManager::sync()
 {
+    ++m_totalSyncs;
     m_settings.sync();
 }
 

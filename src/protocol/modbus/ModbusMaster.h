@@ -13,45 +13,56 @@ class ModbusMaster : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造Modbus主站控制器 @param parent 父对象 */
     explicit ModbusMaster(QObject* parent = nullptr);
 
-    /** @brief 设置底层连接 */
+    /** @brief 设置底层连接 @param connection IConnection连接实例 */
     void setConnection(IConnection* connection);
 
-    /** @brief 设置响应超时时间（毫秒） */
+    /** @brief 设置响应超时时间 @param ms 超时毫秒数 */
     void setTimeout(int ms);
 
-    /** @brief 获取当前响应超时时间（毫秒） */
+    /** @brief 获取当前响应超时时间 @return 超时毫秒数 */
     int timeout() const;
 
-    bool readCoils(int slave, int start, int count); ///< 读线圈状态(FC01)
-    bool readHoldingRegisters(int slave, int start, int count); ///< 读保持寄存器(FC03)
-    bool readInputRegisters(int slave, int start, int count); ///< 读输入寄存器(FC04)
-    bool writeSingleRegister(int slave, int addr, quint16 value); ///< 写单个寄存器(FC06)
-    bool writeMultipleRegisters(int slave, int addr, const QList<quint16>& values); ///< 写多个寄存器(FC16)
-    bool sendCustomFrame(const ModbusFrame& frame); ///< 发送自定义Modbus帧
+    /** @brief 读线圈状态(FC01) @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=请求已发送 */
+    bool readCoils(int slave, int start, int count);
+    /** @brief 读保持寄存器(FC03) @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=请求已发送 */
+    bool readHoldingRegisters(int slave, int start, int count);
+    /** @brief 读输入寄存器(FC04) @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=请求已发送 */
+    bool readInputRegisters(int slave, int start, int count);
+    /** @brief 写单个寄存器(FC06) @param slave 从站地址 @param addr 寄存器地址 @param value 写入值 @return true=请求已发送 */
+    bool writeSingleRegister(int slave, int addr, quint16 value);
+    /** @brief 写多个寄存器(FC16) @param slave 从站地址 @param addr 起始地址 @param values 写入值列表 @return true=请求已发送 */
+    bool writeMultipleRegisters(int slave, int addr, const QList<quint16>& values);
+    /** @brief 发送自定义Modbus帧 @param frame Modbus帧结构 @return true=发送成功 */
+    bool sendCustomFrame(const ModbusFrame& frame);
 
     // ---- 统计接口 ----
-    quint64 totalRequests() const;            ///< 累计发送请求总数
-    quint64 totalResponses() const;           ///< 累计接收有效响应总数
-    quint64 totalTimeouts() const;            ///< 累计超时次数
-    quint64 totalErrors() const;              ///< 累计Modbus异常响应总数
-    quint64 successfulReads() const;          ///< 累计读操作成功次数
-    quint64 failedReads() const;              ///< 累计读操作失败次数(含超时+异常)
-    quint64 successfulWrites() const;         ///< 累计写操作成功次数
-    quint64 failedWrites() const;             ///< 累计写操作失败次数(含超时+异常)
-    quint64 functionCodeCount(int fc) const;  ///< 指定功能码的调用次数
-    quint64 totalExceptions() const;          ///< 累计Modbus异常响应次数(功能码最高位置1)
-    quint64 totalRetries() const;             ///< 累计重试发送次数
-    void resetStats();                        ///< 重置所有统计计数器
+    quint64 totalRequests() const;            ///< @brief 累计发送请求总数 @return 请求次数
+    quint64 totalResponses() const;           ///< @brief 累计接收有效响应总数 @return 响应次数
+    quint64 totalTimeouts() const;            ///< @brief 累计超时次数 @return 超时次数
+    quint64 totalErrors() const;              ///< @brief 累计Modbus异常响应总数 @return 异常次数
+    quint64 successfulReads() const;          ///< @brief 累计读操作成功次数 @return 成功次数
+    quint64 failedReads() const;              ///< @brief 累计读操作失败次数(含超时+异常) @return 失败次数
+    quint64 successfulWrites() const;         ///< @brief 累计写操作成功次数 @return 成功次数
+    quint64 failedWrites() const;             ///< @brief 累计写操作失败次数(含超时+异常) @return 失败次数
+    /** @brief 获取指定功能码的调用次数 @param fc 功能码 @return 调用次数 */
+    quint64 functionCodeCount(int fc) const;
+    quint64 totalExceptions() const;          ///< @brief 累计Modbus异常响应次数(功能码最高位置1) @return 异常次数
+    quint64 totalRetries() const;             ///< @brief 累计重试发送次数 @return 重试次数
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
 
     // ---- 兼容旧接口 ----
-    bool readRegisters(int slave, int start, int count); ///< 读寄存器(默认FC03, 兼容旧接口)
-    quint64 requestCount() const;             ///< 已发送请求计数(兼容旧接口, 等同totalRequests)
-    quint64 responseCount() const;            ///< 已接收响应计数(兼容旧接口, 等同totalResponses)
-    quint64 timeoutCount() const;             ///< 超时次数(兼容旧接口, 等同totalTimeouts)
-    quint64 errorCount() const;               ///< 异常响应计数(兼容旧接口, 等同totalErrors)
-    void resetStatistics();                   ///< 重置统计数据(兼容旧接口, 等同resetStats)
+    /** @brief 读寄存器(默认FC03, 兼容旧接口) @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=请求已发送 */
+    bool readRegisters(int slave, int start, int count);
+    quint64 requestCount() const;             ///< @brief 已发送请求计数(兼容旧接口) @return 请求次数
+    quint64 responseCount() const;            ///< @brief 已接收响应计数(兼容旧接口) @return 响应次数
+    quint64 timeoutCount() const;             ///< @brief 超时次数(兼容旧接口) @return 超时次数
+    quint64 errorCount() const;               ///< @brief 异常响应计数(兼容旧接口) @return 异常次数
+    /** @brief 重置统计数据(兼容旧接口, 等同resetStats) */
+    void resetStatistics();
 
 signals:
     void responseReceived(const ModbusFrame& frame); ///< 收到有效响应

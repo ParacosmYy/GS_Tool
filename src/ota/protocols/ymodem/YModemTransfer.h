@@ -12,19 +12,30 @@ class YModemTransfer : public BaseTransfer {
     Q_OBJECT
 
 public:
-    explicit YModemTransfer(QObject* parent = nullptr); ///< 构造(默认超时5s, 最大重试10次)
-    void setFilePath(const QString& path);   ///< 设置单个文件路径(须在start()前)
-    void setFilePaths(const QStringList& paths); ///< 设置多文件路径(批量模式)
-    double transferRate() const;             ///< 当前传输速率(字节/秒)
-    double etaSeconds() const;               ///< 预计剩余时间(秒, -1=无法估算)
+    /** @brief 构造YModemTransfer，默认超时5s, 最大重试10次 @param parent 父对象 */
+    explicit YModemTransfer(QObject* parent = nullptr);
+    /** @brief 设置单个文件路径(须在start()前) @param path 固件文件路径 */
+    void setFilePath(const QString& path);
+    /** @brief 设置多文件路径(批量模式) @param paths 文件路径列表 */
+    void setFilePaths(const QStringList& paths);
+    /** @brief 获取当前传输速率 @return 速率(字节/秒) */
+    double transferRate() const;
+    /** @brief 获取预计剩余时间 @return 秒数，无法估算返回-1 */
+    double etaSeconds() const;
 
     // ── 统计计数器 ──
-    quint64 totalBlocksSent() const;         ///< 已发送数据块总数(Block0+数据块)
-    quint64 totalRetries() const;            ///< 传输重试总次数
-    quint64 totalErrorCount() const;         ///< 传输错误总次数(CAN/写入失败)
-    quint64 totalTimeouts() const { return m_totalTimeouts; }   ///< 累计超时事件次数
-    quint64 totalCancels() const { return m_totalCancels; }     ///< 累计接收方取消次数(CAN)
-    void resetYmodemStatistics();            ///< 重置统计计数器
+    /** @brief 获取已发送数据块总数(Block0+数据块) @return 块总数 */
+    quint64 totalBlocksSent() const;
+    /** @brief 获取传输重试总次数 @return 重试次数 */
+    quint64 totalRetries() const;
+    /** @brief 获取传输错误总次数(CAN/写入失败) @return 错误次数 */
+    quint64 totalErrorCount() const;
+    /** @brief 获取累计超时事件次数 @return 超时次数 */
+    quint64 totalTimeouts() const { return m_totalTimeouts; }
+    /** @brief 获取累计接收方取消次数(CAN) @return 取消次数 */
+    quint64 totalCancels() const { return m_totalCancels; }
+    /** @brief 重置统计计数器 */
+    void resetYmodemStatistics();
 
 signals:
     void transferStats(double rateBytesPerSec, double etaSec, const QString& fileName); ///< 速率/ETA更新(每次ACK后)

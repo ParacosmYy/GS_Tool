@@ -50,37 +50,57 @@ class IConnection : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造连接基类 @param parent 父对象 */
     explicit IConnection(QObject* parent = nullptr)
         : QObject(parent) {}
 
+    /** @brief 析构函数 */
     virtual ~IConnection() = default;
 
-    virtual ConnectionType type() const = 0;      ///< 获取连接类型
-    virtual QString name() const = 0;             ///< 获取连接名称 (如 "COM3" / "TCP:192.168.1.100:8080")
-    virtual ConnectionState state() const = 0;    ///< 获取当前连接状态
-    virtual bool open() = 0;                      ///< 打开连接，返回是否成功
-    virtual void close() = 0;                     ///< 关闭连接
-    virtual qint64 write(const QByteArray& data) = 0; ///< 发送数据，返回实际发送字节数，-1表示失败
+    /** @brief 获取连接类型 @return ConnectionType枚举值 */
+    virtual ConnectionType type() const = 0;
+    /** @brief 获取连接显示名称 @return 名称字符串(如 "COM3" / "TCP:192.168.1.100:8080") */
+    virtual QString name() const = 0;
+    /** @brief 获取当前连接状态 @return ConnectionState枚举值 */
+    virtual ConnectionState state() const = 0;
+    /** @brief 打开连接 @return true=成功，false=失败 */
+    virtual bool open() = 0;
+    /** @brief 关闭连接 */
+    virtual void close() = 0;
+    /** @brief 发送数据 @param data 待发送字节数据 @return 实际发送字节数，-1表示失败 */
+    virtual qint64 write(const QByteArray& data) = 0;
 
     /** @brief 通过参数映射配置连接。子类自行解析自己需要的参数，忽略不认识的key */
     virtual void configure(const QVariantMap& params) = 0;
 
     // ---- 线路信号控制（仅串口连接有效，其他类型为空实现） ----
 
-    virtual void setDtr(bool enabled) { Q_UNUSED(enabled); } ///< 控制DTR信号线，默认空实现
-    virtual void setRts(bool enabled) { Q_UNUSED(enabled); } ///< 控制RTS信号线，默认空实现
-    virtual bool isDtr() const { return false; }  ///< 查询DTR信号线状态，非串口始终返回false
-    virtual bool isRts() const { return false; }  ///< 查询RTS信号线状态，非串口始终返回false
-    virtual void sendBreak(int duration = 100) { Q_UNUSED(duration); } ///< 发送Break信号(部分bootloader需要)
-    virtual PinoutSignals pinoutSignals() const { return {}; } ///< 查询当前信号线电平状态，默认返回全false
-    virtual SerialErrorCounters errorCounters() const { return {}; } ///< 查询通信错误计数器，默认返回全零
+    /** @brief 控制DTR信号线 @param enabled true=HIGH, false=LOW */
+    virtual void setDtr(bool enabled) { Q_UNUSED(enabled); }
+    /** @brief 控制RTS信号线 @param enabled true=HIGH, false=LOW */
+    virtual void setRts(bool enabled) { Q_UNUSED(enabled); }
+    /** @brief 查询DTR信号线状态 @return true=HIGH, 非串口始终返回false */
+    virtual bool isDtr() const { return false; }
+    /** @brief 查询RTS信号线状态 @return true=HIGH, 非串口始终返回false */
+    virtual bool isRts() const { return false; }
+    /** @brief 发送Break信号(部分bootloader需要) @param duration 持续时间(ms)，默认100 */
+    virtual void sendBreak(int duration = 100) { Q_UNUSED(duration); }
+    /** @brief 查询当前信号线电平状态 @return PinoutSignals结构体，默认返回全false */
+    virtual PinoutSignals pinoutSignals() const { return {}; }
+    /** @brief 查询通信错误计数器 @return SerialErrorCounters结构体，默认返回全零 */
+    virtual SerialErrorCounters errorCounters() const { return {}; }
 
 signals:
-    void dataReceived(const QByteArray& data);        ///< 收到数据时发出
-    void stateChanged(ConnectionState newState);      ///< 连接状态变化时发出
-    void errorOccurred(const QString& errorMsg);      ///< 发生错误时发出
-    void bytesWritten(qint64 bytes);                  ///< 数据已写入底层传输通道信号
-    void errorCountersUpdated(const SerialErrorCounters& counters); ///< 错误计数器更新信号
+    /** @brief 收到数据信号 @param data 接收到的字节数据 */
+    void dataReceived(const QByteArray& data);
+    /** @brief 连接状态变化信号 @param newState 新连接状态 */
+    void stateChanged(ConnectionState newState);
+    /** @brief 错误发生信号 @param errorMsg 错误描述(tr()已国际化) */
+    void errorOccurred(const QString& errorMsg);
+    /** @brief 数据已写入底层传输通道信号 @param bytes 已写入字节数 */
+    void bytesWritten(qint64 bytes);
+    /** @brief 错误计数器更新信号 @param counters 当前错误计数器 */
+    void errorCountersUpdated(const SerialErrorCounters& counters);
 };
 
 Q_DECLARE_METATYPE(PinoutSignals)

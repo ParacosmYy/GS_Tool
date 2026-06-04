@@ -18,6 +18,8 @@ QString NotificationManager::notify(const QString &title, const QString &msg, Pr
     n.timestamp = QDateTime::currentMSecsSinceEpoch(); n.acknowledged = false;
     m_active[id] = n;
     ++m_totalNotifications;
+    if (prio == Critical) ++m_totalCriticalNotifications;
+    if (prio == High) ++m_totalHighNotifications;
     m_history.prepend(n);
     pruneHistory();
     emit notificationAdded(n);
@@ -56,4 +58,15 @@ int NotificationManager::unreadCount() const {
 void NotificationManager::setMaxHistory(int m) { m_maxHistory = m; pruneHistory(); }
 
 /** @brief 裁剪历史记录到最大容量 */
-void NotificationManager::pruneHistory() { while (m_history.size() > m_maxHistory) m_history.removeLast(); }
+void NotificationManager::pruneHistory() {
+    bool pruned = false;
+    while (m_history.size() > m_maxHistory) { m_history.removeLast(); pruned = true; }
+    if (pruned) ++m_totalHistoryPrunes;
+}
+
+/** @brief 重置通知统计计数器 */
+void NotificationManager::resetNotificationStatistics() {
+    m_totalNotifications = 0; m_totalAcknowledges = 0; m_totalDismisses = 0;
+    m_totalClearAlls = 0; m_totalCriticalNotifications = 0;
+    m_totalHighNotifications = 0; m_totalHistoryPrunes = 0;
+}

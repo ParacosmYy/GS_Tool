@@ -36,22 +36,22 @@ public:
     /** @brief 析构，关闭并释放所有连接 */
     ~TcpMultiConnectionManager();
 
-    /** @brief 添加一个新的TCP连接 @return 新连接的唯一ID，-1表示失败 */
+    /** @brief 添加一个新的TCP连接 @param host 目标主机地址 @param port 目标端口号 @return 新连接的唯一ID，-1表示失败 */
     int addConnection(const QString& host, int port);
 
-    /** @brief 移除指定ID的连接 */
+    /** @brief 移除指定ID的连接 @param id 连接唯一ID */
     void removeConnection(int id);
 
-    /** @brief 获取当前连接数量 */
+    /** @brief 获取当前连接数量 @return 活跃连接数 */
     int connectionCount() const;
 
-    /** @brief 向所有连接发送数据 @return 成功发送的连接数量 */
+    /** @brief 向所有连接发送数据 @param data 待发送字节数据 @return 成功发送的连接数量 */
     int sendToAll(const QByteArray& data);
 
-    /** @brief 获取连接的主机地址 */
+    /** @brief 获取连接的主机地址 @param id 连接唯一ID @return 主机地址字符串 */
     QString connectionHost(int id) const;
 
-    /** @brief 获取连接的端口号 */
+    /** @brief 获取连接的端口号 @param id 连接唯一ID @return 端口号 */
     int connectionPort(int id) const;
 
     /** @brief 获取累计连接次数 */

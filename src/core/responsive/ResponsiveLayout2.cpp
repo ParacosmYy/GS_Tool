@@ -105,12 +105,14 @@ int ResponsiveLayout::columns() const
 /** @brief 设置指定断点的列数 @param bp 断点枚举 @param c 列数 */
 void ResponsiveLayout::setColumnCount(Breakpoint bp, int c)
 {
+    ++m_totalColumnChanges;
     m_columns[bp] = c;
 }
 
 /** @brief 保存列数配置到 QSettings */
 void ResponsiveLayout::saveColumnConfig() const
 {
+    ++m_totalConfigSaves;
     QSettings settings;
     settings.beginGroup("layout/responsiveGrid");
     settings.setValue("colsMobile",  m_columns.value(Mobile,  1));
@@ -123,6 +125,7 @@ void ResponsiveLayout::saveColumnConfig() const
 /** @brief 从 QSettings 加载列数配置 */
 void ResponsiveLayout::loadColumnConfig()
 {
+    ++m_totalConfigLoads;
     QSettings settings;
     settings.beginGroup("layout/responsiveGrid");
     if (settings.contains("colsMobile"))
@@ -147,6 +150,7 @@ void ResponsiveLayout::loadColumnConfig()
 void ResponsiveLayout::setGeometry(const QRect &rect)
 {
     QLayout::setGeometry(rect);
+    ++m_totalLayoutUpdates;
     if (m_items.isEmpty()) return;
 
     // 检测断点变化
@@ -170,4 +174,10 @@ void ResponsiveLayout::setGeometry(const QRect &rect)
         int y = area.y() + row * (cellH + spacing);
         m_items[i]->setGeometry(QRect(x, y, cellW, cellH));
     }
+}
+
+/** @brief 重置所有统计计数器 */
+void ResponsiveLayout::resetStats() {
+    m_bpChangeCount = 0; m_totalLayoutUpdates = 0; m_totalColumnChanges = 0;
+    m_totalConfigSaves = 0; m_totalConfigLoads = 0;
 }

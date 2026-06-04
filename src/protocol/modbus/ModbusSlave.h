@@ -20,12 +20,13 @@ class ModbusSlave : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造Modbus从站模拟器 @param parent 父对象 */
     explicit ModbusSlave(QObject* parent = nullptr);
 
-    /** @brief 设置从站地址 */
+    /** @brief 设置从站地址 @param address 从站地址(1-247) */
     void setSlaveAddress(int address);
 
-    /** @brief 获取当前从站地址 */
+    /** @brief 获取当前从站地址 @return 从站地址 */
     quint8 slaveAddress() const;
 
     /**

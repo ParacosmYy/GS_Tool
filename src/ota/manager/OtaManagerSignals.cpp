@@ -85,8 +85,8 @@ void OtaManager::setConnection(IConnection* conn)
 {
     // 活跃传输期间切换连接: 先取消当前传输，避免协议实例持有失效的连接
     if (m_otaState != OtaState::Idle) {
-        qWarning() << "OtaManager: 活跃传输期间切换连接，当前状态:"
-                   << static_cast<int>(m_otaState) << "，自动取消传输";
+        qWarning() << tr("OtaManager: 活跃传输期间切换连接，当前状态: %1，自动取消传输")
+                      .arg(static_cast<int>(m_otaState));
         cancelTransfer();
     }
 

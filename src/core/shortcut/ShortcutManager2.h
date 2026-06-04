@@ -131,8 +131,10 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalRegistrations = 0;     ///< 累计注册次数
     quint64 m_totalRebinds = 0;           ///< 累计重绑定次数
-    quint64 m_totalConflicts = 0;         ///< 累计冲突检测次数
+    mutable quint64 m_totalConflicts = 0; ///< 累计冲突检测次数(hasConflict为const方法)
     quint64 m_totalResets = 0;            ///< 累计重置次数
+    quint64 m_totalUnregistrations = 0;   ///< 累计注销次数
+    mutable quint64 m_totalCategoryQueries = 0; ///< 累计分类查询次数(shortcutsByCategory为const方法)
 
 public:
     /** @brief 获取累计注册次数 @return 计数 */
@@ -143,6 +145,10 @@ public:
     quint64 totalConflicts() const { return m_totalConflicts; }
     /** @brief 获取累计重置次数 @return 计数 */
     quint64 totalResets() const { return m_totalResets; }
+    /** @brief 获取累计注销次数 @return 注销次数 */
+    quint64 totalUnregistrations() const { return m_totalUnregistrations; }
+    /** @brief 获取累计分类查询次数 @return 查询次数 */
+    quint64 totalCategoryQueries() const { return m_totalCategoryQueries; }
     /** @brief 重置快捷键管理器统计计数器 */
     void resetShortcutStatistics();
 };

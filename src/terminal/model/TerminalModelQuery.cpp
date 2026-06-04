@@ -45,8 +45,8 @@ TerminalLine TerminalModel::lineAt(int index) const
 
     // 运行时边界检查: 替代 Q_ASSERT，在 Release 模式下仍然有效
     if (index < 0 || index >= m_count) {
-        qWarning() << "TerminalModel::lineAt: 索引越界，index=" << index
-                   << "，有效范围 [0," << m_count << ")";
+        qWarning() << tr("TerminalModel::lineAt: 索引越界，index=%1，有效范围 [0,%2)")
+                      .arg(index).arg(m_count);
         return TerminalLine{};
     }
 
