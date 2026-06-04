@@ -35,6 +35,7 @@ set(SOURCES
     src/core/mainwindow/MainWindowInit.cpp
     src/core/mainwindow/MainWindowSetupUI.cpp
     src/core/mainwindow/MainWindowSignalConnect.cpp
+    src/core/mainwindow/MainWindowSignalConnectUI.cpp
     src/core/mainwindow/MainWindowPanelConnect.cpp
     src/core/mainwindow/MainWindowLifecycle.cpp
     src/core/connect/ConnectionController.cpp
@@ -85,6 +86,7 @@ set(SOURCES
     src/core/widgets/SkeletonWidget.cpp
     src/core/widgets/SmartAutoComplete.cpp
     src/core/widgets/CommandPalette.cpp
+    src/core/widgets/CommandPaletteFilter.cpp
     src/core/widgets/ScriptRecorder.cpp
     src/core/widgets/DataDiffWidget.cpp
     src/core/widgets/DataDiffWidgetDiff.cpp
@@ -286,6 +288,7 @@ set(SOURCES
     src/dashboard/DashboardWidgetSlots.cpp
     src/dashboard/DashboardWidgetPersistence.cpp
     src/dashboard/GaugeWidget.cpp
+    src/dashboard/GaugeWidgetPaint.cpp
     src/dashboard/ProgressBarWidget.cpp
     src/dashboard/LedIndicatorWidget.cpp
     src/dashboard/NumericDisplayWidget.cpp
@@ -297,6 +300,7 @@ set(SOURCES
 
     # ── F6: J-Link RTT ──
     src/rtt/JLinkRttConnection.cpp
+    src/rtt/JLinkRttConnectionStats.cpp
     src/rtt/JLinkSdkLoader.cpp
     src/rtt/JLinkSdkLoaderQuery.cpp
     src/rtt/RttConfigPanel.cpp
