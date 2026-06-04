@@ -118,6 +118,18 @@ quint64 TerminalContextMenuManager::totalActionsTriggered() const
     return m_totalActionsTriggered;
 }
 
+/** @brief 获取自定义操作总触发次数 @return 外部注入的自定义菜单项累计触发次数 */
+quint64 TerminalContextMenuManager::totalCustomActions() const
+{
+    return m_totalCustomActions;
+}
+
+/** @brief 获取导出操作总触发次数 @return 导出相关菜单项累计触发次数 */
+quint64 TerminalContextMenuManager::totalExportActions() const
+{
+    return m_totalExportActions;
+}
+
 /** @brief 重置所有统计计数器为零 */
 void TerminalContextMenuManager::resetStats()
 {
@@ -127,4 +139,6 @@ void TerminalContextMenuManager::resetStats()
     m_totalClearActions = 0;
     m_totalSearchActions = 0;
     m_totalActionsTriggered = 0;
+    m_totalCustomActions = 0;
+    m_totalExportActions = 0;
 }

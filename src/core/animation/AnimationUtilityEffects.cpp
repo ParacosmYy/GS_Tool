@@ -53,6 +53,19 @@ QPropertyAnimation* AnimationUtility::slideIn(QWidget* widget,
     anim->setStartValue(start);
     anim->setEndValue(target);
     anim->setEasingCurve(curve);
+
+    /* 统计: 创建 + 完成 */
+    ++s_stats.totalAnimationsCreated;
+    if (curve != QEasingCurve::OutCubic) ++s_stats.totalEasingChanges;
+    QObject::connect(anim, &QAbstractAnimation::finished, anim, [dur = durationMs]() {
+        ++s_stats.totalAnimationsCompleted;
+        s_durationSumMs += dur;
+        ++s_durationCount;
+        s_stats.avgDurationMs = s_durationCount > 0
+            ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+            : 0.0;
+    });
+
     anim->start(QAbstractAnimation::DeleteWhenStopped);
     return anim;
 }
@@ -74,10 +87,23 @@ QPropertyAnimation* AnimationUtility::slideOut(QWidget* widget,
     anim->setStartValue(start);
     anim->setEndValue(end);
     anim->setEasingCurve(curve);
-    if (onFinished) {
-        QObject::connect(anim, &QAbstractAnimation::finished,
-                         anim, [onFinished]() { onFinished(); });
-    }
+
+    /* 统计: 创建 + 缓动变更 */
+    ++s_stats.totalAnimationsCreated;
+    if (curve != QEasingCurve::InCubic) ++s_stats.totalEasingChanges;
+
+    /* 连接 finished 信号: 先更新统计，再调用用户回调 */
+    QObject::connect(anim, &QAbstractAnimation::finished, anim,
+        [onFinished, durationMs]() {
+            ++s_stats.totalAnimationsCompleted;
+            s_durationSumMs += durationMs;
+            ++s_durationCount;
+            s_stats.avgDurationMs = s_durationCount > 0
+                ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+                : 0.0;
+            if (onFinished) onFinished();
+        });
+
     anim->start(QAbstractAnimation::DeleteWhenStopped);
     return anim;
 }
@@ -115,6 +141,20 @@ void AnimationUtility::scaleIn(QWidget* widget, int durationMs)
     auto* group = new QParallelAnimationGroup(widget);
     group->addAnimation(geoAnim);
     if (fadeAnim) group->addAnimation(fadeAnim);
+
+    /* 统计: 缩放动画视为创建+缓动变更(OutBack非默认) */
+    ++s_stats.totalAnimationsCreated;
+    ++s_stats.totalEasingChanges;
+
+    QObject::connect(group, &QAbstractAnimation::finished, group, [dur = durationMs]() {
+        ++s_stats.totalAnimationsCompleted;
+        s_durationSumMs += dur;
+        ++s_durationCount;
+        s_stats.avgDurationMs = s_durationCount > 0
+            ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+            : 0.0;
+    });
+
     group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
@@ -134,6 +174,19 @@ QPropertyAnimation* AnimationUtility::bounceIn(QWidget* widget,
     anim->setStartValue(start);
     anim->setEndValue(target);
     anim->setEasingCurve(QEasingCurve::OutBack);
+
+    /* 统计: 创建 + 缓动变更(OutBack非默认) + 完成 */
+    ++s_stats.totalAnimationsCreated;
+    ++s_stats.totalEasingChanges;
+    QObject::connect(anim, &QAbstractAnimation::finished, anim, [dur = durationMs]() {
+        ++s_stats.totalAnimationsCompleted;
+        s_durationSumMs += dur;
+        ++s_durationCount;
+        s_stats.avgDurationMs = s_durationCount > 0
+            ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+            : 0.0;
+    });
+
     anim->start(QAbstractAnimation::DeleteWhenStopped);
     return anim;
 }
@@ -162,6 +215,18 @@ void AnimationUtility::shake(QWidget* widget, int amplitude, int count)
     back->setDuration(50);
     back->setEndValue(origin);
     group->addAnimation(back);
+
+    /* 统计: 抖动视为一次动画创建 + 完成(总时长=count*2*50+50) */
+    ++s_stats.totalAnimationsCreated;
+    const int totalMs = count * 2 * 50 + 50;
+    QObject::connect(group, &QAbstractAnimation::finished, group, [totalMs]() {
+        ++s_stats.totalAnimationsCompleted;
+        s_durationSumMs += totalMs;
+        ++s_durationCount;
+        s_stats.avgDurationMs = s_durationCount > 0
+            ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+            : 0.0;
+    });
 
     group->start(QAbstractAnimation::DeleteWhenStopped);
 }

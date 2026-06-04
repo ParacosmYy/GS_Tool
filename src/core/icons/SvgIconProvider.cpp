@@ -33,14 +33,18 @@ void SvgIconProvider::initialize() {}
 QIcon SvgIconProvider::icon(const QString &name, const QSize &size, const QString &color) {
     QMutexLocker locker(&m_mutex);
     ++m_totalLookups;
+    ++m_stats.totalIconsRendered;
     const QString tint = color.isEmpty() ? m_defaultTint : color;
+    if (!color.isEmpty() && color != m_defaultTint) ++m_stats.totalColorChanges;
     const QString key = cacheKey(name, size, tint);
     auto it = m_cache.find(key);
     if (it != m_cache.end()) {
         ++m_totalCacheHits;
+        ++m_stats.totalCacheHits;
         it->lastAccessTick = ++m_accessTick;
         return it->icon;
     }
+    ++m_stats.totalCacheMisses;
     locker.unlock();
     QByteArray svgData = loadSvgData(name);
     locker.relock();
@@ -61,6 +65,7 @@ QIcon SvgIconProvider::icon(const QString &name, const QSize &size, const QStrin
     entry.lastAccessTick = ++m_accessTick;
     m_cache[key] = entry;
     ++m_totalLoads;
+    m_stats.cacheSizeBytes = cacheMemoryEstimate();
     return entry.icon;
 }
 
@@ -153,9 +158,19 @@ quint64 SvgIconProvider::totalLoads() const { QMutexLocker locker(&m_mutex); ret
 /** @brief 获取总着色操作次数 @return 累计SVG着色次数 */
 quint64 SvgIconProvider::totalTintOps() const { QMutexLocker locker(&m_mutex); return m_totalTintOps; }
 
+/** @brief 获取扩展统计计数器快照 @return 当前统计值副本 */
+SvgIconProvider::Stats SvgIconProvider::stats() const {
+    QMutexLocker locker(&m_mutex);
+    Stats snapshot = m_stats;
+    snapshot.cacheSizeBytes = cacheMemoryEstimate();
+    return snapshot;
+}
+
 /** @brief 重置所有统计计数器 */
 void SvgIconProvider::resetStatistics() {
-    QMutexLocker locker(&m_mutex); m_totalLookups = 0; m_totalCacheHits = 0; m_totalLoads = 0; m_totalTintOps = 0;
+    QMutexLocker locker(&m_mutex);
+    m_totalLookups = 0; m_totalCacheHits = 0; m_totalLoads = 0; m_totalTintOps = 0;
+    m_stats = Stats{};
 }
 
 // 私有实现方法(loadSvgData/applyTint/cacheKey/evictIfNeeded/resolveIconPath)

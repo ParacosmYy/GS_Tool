@@ -84,6 +84,9 @@ public:
     /** @brief 获取编辑对话框打开总次数 @return 编辑计数 */
     quint64 totalEditDialogOpens() const { return m_totalEditDialogOpens; }
 
+    /** @brief 获取宏指令运行总次数 @return 宏运行计数 */
+    quint64 totalMacrosRun() const { return m_totalMacrosRun; }
+
     /** @brief 重置所有统计计数器为零 */
     void resetStatistics();
 
@@ -120,6 +123,7 @@ private:
     quint64 m_maxCommandLength = 0;         ///< 历史最大单条指令长度（字节数）
     quint64 m_totalHexCommands = 0;         ///< HEX模式指令触发总次数
     quint64 m_totalEditDialogOpens = 0;     ///< 编辑对话框打开总次数
+    quint64 m_totalMacrosRun = 0;           ///< 宏指令运行总次数(多指令批量执行)
 };
 
 #endif // QUICKCOMMANDBAR_H

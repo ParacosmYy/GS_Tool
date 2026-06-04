@@ -86,6 +86,8 @@ void QuickCommandBar::onEditRequested()
                 newCmds.append(cmd);
             }
         }
+        /* 统计: 多条指令批量保存视为一次宏运行 */
+        if (newCmds.size() > 1) ++m_totalMacrosRun;
         setCommands(newCmds);
         saveCommands();
     }

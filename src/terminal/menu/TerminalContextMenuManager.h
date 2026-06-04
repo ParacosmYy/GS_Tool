@@ -76,6 +76,12 @@ public:
      */
     quint64 totalActionsTriggered() const;
 
+    /** @brief 获取自定义操作总触发次数 @return 外部注入的自定义菜单项累计触发次数 */
+    quint64 totalCustomActions() const;
+
+    /** @brief 获取导出操作总触发次数 @return 导出相关菜单项累计触发次数 */
+    quint64 totalExportActions() const;
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -94,6 +100,8 @@ private:
     quint64 m_totalClearActions = 0;    ///< 清屏操作总触发次数
     quint64 m_totalSearchActions = 0;   ///< 搜索操作总触发次数
     quint64 m_totalActionsTriggered = 0; ///< 菜单项总触发次数(含所有操作)
+    quint64 m_totalCustomActions = 0;   ///< 自定义操作总触发次数(外部注入菜单项)
+    quint64 m_totalExportActions = 0;   ///< 导出操作总触发次数
 };
 
 #endif // TERMINALCONTEXTMENUMANAGER_H

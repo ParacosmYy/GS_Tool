@@ -45,6 +45,26 @@ public:
     static constexpr int kFastDuration = 120;
 
     /**
+     * @brief 动画统计计数器
+     *
+     * 跟踪动画创建、完成、取消、缓动变更和平均时长等运行指标，
+     * 用于性能分析和调试。所有计数器在 resetStatistics() 调用时归零。
+     */
+    struct Stats {
+        quint64 totalAnimationsCreated = 0;    ///< 累计创建的动画总数量
+        quint64 totalAnimationsCompleted = 0;  ///< 累计正常完成的动画总数量
+        quint64 totalAnimationsCancelled = 0;  ///< 累计被停止/取消的动画总数量
+        quint64 totalEasingChanges = 0;        ///< 累计缓动曲线变更次数
+        double avgDurationMs = 0.0;            ///< 加权平均动画时长(毫秒)
+    };
+
+    /** @brief 获取统计计数器只读引用 @return 当前统计快照 */
+    static const Stats& stats();
+
+    /** @brief 重置所有统计计数器为零，avgDurationMs 归零 */
+    static void resetStatistics();
+
+    /**
      * @brief 淡入效果
      * @param widget 目标控件
      * @param durationMs 时长
@@ -132,6 +152,10 @@ public:
 private:
     /// 获取滑动偏移量
     static QPoint slideOffset(SlideDirection direction, const QWidget* widget);
+
+    static Stats s_stats;               ///< 全局统计实例(静态存储)
+    static quint64 s_durationSumMs;     ///< 累计动画时长总和(用于计算加权平均)
+    static quint64 s_durationCount;     ///< 累计已完成动画计数(用于计算加权平均)
 };
 
 #endif // ANIMATION_UTILITY_H

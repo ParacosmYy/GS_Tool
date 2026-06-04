@@ -64,6 +64,25 @@ public:
     /** @brief 估算当前缓存占用的内存大小（字节）
      *  @return 估算内存字节数 */
     qint64 cacheMemoryEstimate() const;
+
+    /**
+     * @brief 图标管理器统计计数器
+     *
+     * 跟踪图标渲染、缓存命中/未命中、着色/尺寸变更和缓存内存占用，
+     * 用于性能分析和缓存调优。resetStatistics() 将所有计数器归零。
+     */
+    struct Stats {
+        quint64 totalIconsRendered = 0;     ///< 累计图标渲染总次数(含缓存命中)
+        quint64 totalCacheHits = 0;         ///< 累计缓存命中次数
+        quint64 totalCacheMisses = 0;       ///< 累计缓存未命中次数
+        quint64 totalColorChanges = 0;      ///< 累计着色颜色变更次数
+        quint64 totalSizeChanges = 0;       ///< 累计尺寸变更次数
+        qint64  cacheSizeBytes = 0;         ///< 当前缓存占用内存估算(字节)
+    };
+
+    /** @brief 获取统计计数器只读引用 @return 当前统计快照 */
+    Stats stats() const;
+
     /** @brief 获取累计图标查找总次数 */
     quint64 totalLookups() const;
     /** @brief 获取累计缓存命中次数 */
@@ -109,6 +128,7 @@ private:
     mutable quint64 m_totalCacheHits = 0;
     mutable quint64 m_totalLoads = 0;
     mutable quint64 m_totalTintOps = 0;
+    mutable Stats m_stats;                  ///< 扩展统计计数器(渲染/缓存未命中/着色/尺寸)
     QString resolveIconPath(const QString &name) const;
 };
 #endif // SVGICONPROVIDER_H

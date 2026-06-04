@@ -165,4 +165,5 @@ void QuickCommandBar::resetStatistics()
     m_maxCommandLength = 0;
     m_totalHexCommands = 0;
     m_totalEditDialogOpens = 0;
+    m_totalMacrosRun = 0;
 }

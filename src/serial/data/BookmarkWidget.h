@@ -57,6 +57,10 @@ public:
     quint64 totalRefreshes() const;
     /** @brief 获取累计导航（双击跳转）次数 */
     quint64 totalBookmarksNavigated() const;
+    /** @brief 获取累计导入次数 @return 导入总次数 */
+    quint64 totalImports() const;
+    /** @brief 获取累计导出次数 @return 导出总次数 */
+    quint64 totalExports() const;
     /** @brief 重置统计计数器 */
     void resetBookmarkStats();
 
@@ -100,6 +104,8 @@ private:
     quint64 m_totalBookmarksRemoved = 0;   ///< 累计删除次数
     quint64 m_totalRefreshes = 0;          ///< 累计刷新次数
     quint64 m_totalBookmarksNavigated = 0; ///< 累计导航（双击跳转）次数
+    quint64 m_totalImports = 0;            ///< 累计导入次数
+    quint64 m_totalExports = 0;            ///< 累计导出次数
 };
 
 #endif // BOOKMARKWIDGET_H
