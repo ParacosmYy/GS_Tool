@@ -58,6 +58,7 @@ public:
         quint64 matchedResults = 0;     ///< 累计匹配结果数
     };
 
+    /** @brief 构造数据日志查看器 @param parent 父控件 */
     explicit DataLogViewer(QWidget* parent = nullptr);
 
     /** @brief 从文件加载日志 @param filePath 文件路径 @param format 日志格式 @return 是否成功 */

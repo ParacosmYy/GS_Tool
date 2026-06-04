@@ -94,6 +94,7 @@ public:
 
     /** @brief 获取统计 */
     const Stats& stats() const { return m_stats; }
+    /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
 signals:

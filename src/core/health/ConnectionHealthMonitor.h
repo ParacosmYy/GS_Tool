@@ -54,6 +54,7 @@ public:
         qint64  longestUptime = 0;       ///< 最长连接时间(ms)
     };
 
+    /** @brief 构造连接健康监控器 @param parent 父对象 */
     explicit ConnectionHealthMonitor(QObject* parent = nullptr);
 
     /** @brief 通知接收到数据 @param bytes 字节数 */
