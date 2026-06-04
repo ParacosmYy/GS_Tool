@@ -20,6 +20,11 @@ QVariantMap ConnectionPresetBuilder::build(ConnectionType type)
         params["localPort"] = 8888;
         params["remoteHost"] = "127.0.0.1";
         params["remotePort"] = 8080;
+    } else if (type == ConnectionType::UdpMulticast) {
+        params["groupAddress"] = "239.255.0.1";
+        params["localPort"] = 8888;
+        params["remotePort"] = 8888;
+        params["interfaceName"] = QString();
     } else if (type == ConnectionType::WebSocket) {
         params["url"] = "ws://127.0.0.1:8080";
     } else if (type == ConnectionType::Mqtt) {

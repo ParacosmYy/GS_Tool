@@ -143,6 +143,9 @@ protected:
     quint64 m_totalTitleClicks = 0;   ///< 总标题栏点击次数
     quint64 m_totalDragStarts = 0;    ///< 总拖拽开始次数(标题栏拖拽)
     quint64 m_totalSettingsOpens = 0; ///< 总设置面板打开次数
+    quint64 m_totalEmptyStateShows = 0; ///< 总空状态显示次数
+    quint64 m_totalLoadingShows = 0;    ///< 总加载指示器显示次数
+    quint64 m_totalSkeletonShows = 0;   ///< 总骨架屏显示次数
 
 public:
     /** @brief 获取总折叠切换次数 @return 切换计数 */
@@ -163,6 +166,12 @@ public:
     quint64 totalDragStarts() const { return m_totalDragStarts; }
     /** @brief 获取总设置面板打开次数 @return 设置打开计数 */
     quint64 totalSettingsOpens() const { return m_totalSettingsOpens; }
+    /** @brief 获取总空状态显示次数 @return 空状态显示计数 */
+    quint64 totalEmptyStateShows() const { return m_totalEmptyStateShows; }
+    /** @brief 获取总加载指示器显示次数 @return 加载显示计数 */
+    quint64 totalLoadingShows() const { return m_totalLoadingShows; }
+    /** @brief 获取总骨架屏显示次数 @return 骨架屏显示计数 */
+    quint64 totalSkeletonShows() const { return m_totalSkeletonShows; }
     /** @brief 递增设置面板打开计数(外部调用者触发设置时使用) */
     void notifySettingsOpened() { ++m_totalSettingsOpens; }
     /** @brief 重置面板统计计数器 */

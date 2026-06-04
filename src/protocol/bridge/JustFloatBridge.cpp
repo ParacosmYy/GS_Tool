@@ -44,6 +44,7 @@ void JustFloatBridge::feed(const QByteArray& data)
     if (m_buffer.size() > kMaxBufferSize) {
         int excess = m_buffer.size() - kMaxBufferSize;
         m_buffer.remove(0, excess);
+        ++m_totalBufferTrims;
     }
 
     // 循环尝试解析所有完整帧
@@ -98,6 +99,8 @@ int JustFloatBridge::tryParseFrame()
         return 0;
     }
 
+    ++m_totalTailSearches;
+
     // 在缓冲区中搜索尾部标记 00 00 80 7F
     // 使用简单的逐字节扫描，避免复杂的模式匹配
     const char* data = m_buffer.constData();
@@ -120,6 +123,7 @@ int JustFloatBridge::tryParseFrame()
         if (floatPayloadSize % kFloatSize != 0 || floatPayloadSize == 0) {
             // 帧数据不合法（不是4字节对齐或无数据），跳过这个假尾部
             ++m_errorCount;
+            ++m_totalAlignmentErrors;
             continue;
         }
 
@@ -139,6 +143,7 @@ int JustFloatBridge::tryParseFrame()
         // 通道数不匹配（后续帧的通道数必须与第一帧一致）
         if (detectedChannels != m_channelCount) {
             // 通道数变化，可能是残缺帧，跳过
+            ++m_totalChannelMismatches;
             continue;
         }
 

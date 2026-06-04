@@ -38,7 +38,31 @@ quint64 FireWaterBridge::fireWaterMatches() const
     return m_fireWaterMatches;
 }
 
-/** @brief 重置统计数据(帧计数/错误计数/字节数/通道解码数/协议匹配数) */
+/** @brief 获取累计解析行数(含头部行和数据行) @return 行解析总数 */
+quint64 FireWaterBridge::totalLinesParsed() const
+{
+    return m_totalLinesParsed;
+}
+
+/** @brief 获取累计头部行检测次数 @return 头部检测次数 */
+quint64 FireWaterBridge::totalHeadersDetected() const
+{
+    return m_totalHeadersDetected;
+}
+
+/** @brief 获取累计超长行丢弃次数 @return 超长行丢弃次数 */
+quint64 FireWaterBridge::totalOversizedLines() const
+{
+    return m_totalOversizedLines;
+}
+
+/** @brief 获取累计空行跳过次数 @return 空行跳过次数 */
+quint64 FireWaterBridge::totalEmptyLinesSkipped() const
+{
+    return m_totalEmptyLinesSkipped;
+}
+
+/** @brief 重置统计数据(帧计数/错误计数/字节数/通道解码数/协议匹配数/行解析数/头部检测数/超长行数/空行数) */
 void FireWaterBridge::resetStatistics()
 {
     m_frameCount = 0;
@@ -46,4 +70,8 @@ void FireWaterBridge::resetStatistics()
     m_totalBytes = 0;
     m_totalChannelsDecoded = 0;
     m_fireWaterMatches = 0;
+    m_totalLinesParsed = 0;
+    m_totalHeadersDetected = 0;
+    m_totalOversizedLines = 0;
+    m_totalEmptyLinesSkipped = 0;
 }

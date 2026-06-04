@@ -33,7 +33,8 @@ enum class ConnectionType {
     Can,        // CAN总线(LAWICEL)
     Spi,        // SPI主机
     I2c,        // I2C主机
-    Usb         // USB设备
+    Usb,        // USB设备
+    UdpMulticast // UDP组播
 };
 
 // 终端显示模式

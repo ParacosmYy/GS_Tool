@@ -91,6 +91,14 @@ public:
     quint64 totalParseErrors() const;
     /** @brief 获取累计处理字节总数 @return 总字节数 */
     quint64 totalBytesProcessed() const;
+    /** @brief 获取累计feedData调用次数 @return 调用计数 */
+    quint64 totalFeedDataCalls() const;
+    /** @brief 获取累计空数据跳过次数 @return 跳过计数 */
+    quint64 totalEmptyDataSkips() const;
+    /** @brief 获取累计自动检测尝试次数 @return 检测尝试计数 */
+    quint64 totalAutoDetectAttempts() const;
+    /** @brief 获取累计自动检测成功次数 @return 检测成功计数 */
+    quint64 totalAutoDetectSuccesses() const;
 
     // ---- 每协议统计 ----
     /** @brief 获取指定协议累计统计 @param mode 协议模式 @return 该协议的ProtocolStats */
@@ -145,6 +153,8 @@ private:
     quint64 m_totalFramesParsed = 0; quint64 m_totalErrors = 0; quint64 m_checksumErrors = 0;
     quint64 m_totalBridges = 0; quint64 m_totalFramesParsedAll = 0;
     quint64 m_totalParseErrors = 0; quint64 m_totalBytesProcessed = 0;
+    quint64 m_totalFeedDataCalls = 0; quint64 m_totalEmptyDataSkips = 0;
+    quint64 m_totalAutoDetectAttempts = 0; quint64 m_totalAutoDetectSuccesses = 0;
 
     // ---- 每协议统计/吞吐量/自动检测 ----
     QMap<ChartProtocolMode, ProtocolStats> m_protocolStats;     ///< 各协议独立统计

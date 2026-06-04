@@ -85,6 +85,13 @@ public:
     /** @brief 重置所有游标统计计数器为初始值 */
     void resetCursorStatistics();
 
+    /** @brief 获取游标可见性切换总次数(显示/隐藏) */
+    quint64 totalCursorToggles() const;
+    /** @brief 获取游标命中检测总次数(hitTestCursor调用) */
+    quint64 totalHitTests() const;
+    /** @brief 获取游标拖拽取消总次数(未命中时Release) */
+    quint64 totalDragCancels() const;
+
 protected:
     /** @brief 绘制游标线和差值信息面板 */
     void paintEvent(QPaintEvent* event) override;
@@ -143,6 +150,9 @@ private:
     quint64 m_totalDeltaMeasurements = 0;   ///< 差值测量总次数
     quint64 m_totalMeasurements = 0;        ///< 测量显示总次数（兼容旧接口）
     quint64 m_totalSnapToPeak = 0;          ///< 峰值吸附总次数
+    quint64 m_totalCursorToggles = 0;      ///< 游标可见性切换总次数
+    quint64 m_totalHitTests = 0;           ///< 游标命中检测总次数
+    quint64 m_totalDragCancels = 0;        ///< 游标拖拽取消总次数
     double m_sumDeltaX = 0.0;               ///< 累计ΔX值(用于计算averageDeltaX)
     double m_sumDeltaY = 0.0;               ///< 累计ΔY值(首个通道，用于计算averageDeltaY)
 

@@ -26,6 +26,7 @@
 /** @brief 显示空状态提示，隐藏内容/加载/骨架屏 @param title 空状态标题 @param description 空状态描述 */
 void BasePanel::showEmptyState(const QString& title, const QString& description)
 {
+    ++m_totalEmptyStateShows;
     if (m_emptyState) {
         m_emptyState->setTitle(title);
         m_emptyState->setDescription(description);
@@ -46,6 +47,7 @@ void BasePanel::hideEmptyState()
 /** @brief 显示加载旋转指示器，隐藏内容/空状态/骨架屏 */
 void BasePanel::showLoading()
 {
+    ++m_totalLoadingShows;
     if (m_loadingSpinner) m_loadingSpinner->setVisible(true);
     if (m_content) m_content->setVisible(false);
     if (m_emptyState) m_emptyState->setVisible(false);
@@ -62,6 +64,7 @@ void BasePanel::hideLoading()
 /** @brief 显示骨架屏占位动画，隐藏内容/空状态/加载指示器 */
 void BasePanel::showSkeleton()
 {
+    ++m_totalSkeletonShows;
     if (m_skeleton) m_skeleton->setVisible(true);
     if (m_content) m_content->setVisible(false);
     if (m_emptyState) m_emptyState->setVisible(false);
@@ -171,7 +174,7 @@ void BasePanel::paintEvent(QPaintEvent* event)
 // 统计计数器
 // ============================================================================
 
-/** @brief 重置面板统计计数器(切换/展开/折叠/显示/隐藏/标题变更/标题点击/拖拽/设置打开) */
+/** @brief 重置面板统计计数器(切换/展开/折叠/显示/隐藏/标题变更/标题点击/拖拽/设置打开/空状态/加载/骨架屏) */
 void BasePanel::resetPanelStatistics()
 {
     m_totalToggles = 0;
@@ -183,4 +186,7 @@ void BasePanel::resetPanelStatistics()
     m_totalTitleClicks = 0;
     m_totalDragStarts = 0;
     m_totalSettingsOpens = 0;
+    m_totalEmptyStateShows = 0;
+    m_totalLoadingShows = 0;
+    m_totalSkeletonShows = 0;
 }

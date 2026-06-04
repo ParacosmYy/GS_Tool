@@ -66,6 +66,24 @@ quint64 CursorOverlay::totalSnapToPeak() const
     return m_totalSnapToPeak;
 }
 
+/** @brief 返回游标可见性切换总次数 @return 切换次数 */
+quint64 CursorOverlay::totalCursorToggles() const
+{
+    return m_totalCursorToggles;
+}
+
+/** @brief 返回游标命中检测总次数 @return 命中检测次数 */
+quint64 CursorOverlay::totalHitTests() const
+{
+    return m_totalHitTests;
+}
+
+/** @brief 返回游标拖拽取消总次数 @return 拖拽取消次数 */
+quint64 CursorOverlay::totalDragCancels() const
+{
+    return m_totalDragCancels;
+}
+
 /** @brief 返回历次测量的平均ΔX值 @return 平均ΔX */
 double CursorOverlay::averageDeltaX() const
 {
@@ -90,6 +108,9 @@ void CursorOverlay::resetCursorStatistics()
     m_totalDeltaMeasurements = 0;
     m_totalMeasurements = 0;
     m_totalSnapToPeak = 0;
+    m_totalCursorToggles = 0;
+    m_totalHitTests = 0;
+    m_totalDragCancels = 0;
     m_sumDeltaX = 0.0;
     m_sumDeltaY = 0.0;
 }

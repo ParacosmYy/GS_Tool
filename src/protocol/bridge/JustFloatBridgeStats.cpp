@@ -38,7 +38,31 @@ quint64 JustFloatBridge::peakChannelsPerFrame() const
     return m_peakChannelsPerFrame;
 }
 
-/** @brief 重置统计数据(帧计数/错误计数/字节数/通道解码数/峰值通道数)，不影响通道配置 */
+/** @brief 获取累计尾部标记搜索次数 @return 搜索次数 */
+quint64 JustFloatBridge::totalTailSearches() const
+{
+    return m_totalTailSearches;
+}
+
+/** @brief 获取累计对齐错误次数 @return 对齐错误次数 */
+quint64 JustFloatBridge::totalAlignmentErrors() const
+{
+    return m_totalAlignmentErrors;
+}
+
+/** @brief 获取累计通道数不匹配次数 @return 不匹配次数 */
+quint64 JustFloatBridge::totalChannelMismatches() const
+{
+    return m_totalChannelMismatches;
+}
+
+/** @brief 获取累计缓冲区裁剪次数 @return 裁剪次数 */
+quint64 JustFloatBridge::totalBufferTrims() const
+{
+    return m_totalBufferTrims;
+}
+
+/** @brief 重置统计数据(帧计数/错误计数/字节数/通道解码数/峰值通道数/搜索数/对齐错误/通道不匹配/缓冲区裁剪)，不影响通道配置 */
 void JustFloatBridge::resetStatistics()
 {
     m_frameCount = 0;
@@ -46,4 +70,8 @@ void JustFloatBridge::resetStatistics()
     m_totalBytes = 0;
     m_totalChannelsDecoded = 0;
     m_peakChannelsPerFrame = 0;
+    m_totalTailSearches = 0;
+    m_totalAlignmentErrors = 0;
+    m_totalChannelMismatches = 0;
+    m_totalBufferTrims = 0;
 }

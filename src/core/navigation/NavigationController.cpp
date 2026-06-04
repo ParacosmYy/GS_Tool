@@ -99,6 +99,7 @@ void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPan
     navTree->setModel(treeModel);
     navTree->expandAll();  // 默认展开所有分组
     ++m_totalTreeExpansions;  ///< 统计: 导航树展开操作递增
+    ++m_totalNavTreeRebuilds; ///< 统计: 导航树重建次数递增
 }
 
 /** @brief 收集所有可切换面板widget(从映射表中提取所有非空widget) @return 面板widget向量 */
@@ -150,6 +151,7 @@ bool NavigationController::restorePanelByIndex(int index)
     target->move(0, 0);
     target->setVisible(true);
     m_currentPanel = target;
+    ++m_totalRestoresByIndex;  ///< 统计: 通过索引恢复面板次数递增
 
     return true;
 }

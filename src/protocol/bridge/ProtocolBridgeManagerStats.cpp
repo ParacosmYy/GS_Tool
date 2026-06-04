@@ -39,6 +39,30 @@ quint64 ProtocolBridgeManager::totalBytesProcessed() const
     return m_totalBytesProcessed;
 }
 
+/** @brief 获取累计feedData调用次数 @return 调用计数 */
+quint64 ProtocolBridgeManager::totalFeedDataCalls() const
+{
+    return m_totalFeedDataCalls;
+}
+
+/** @brief 获取累计空数据跳过次数 @return 跳过计数 */
+quint64 ProtocolBridgeManager::totalEmptyDataSkips() const
+{
+    return m_totalEmptyDataSkips;
+}
+
+/** @brief 获取累计自动检测尝试次数 @return 检测尝试计数 */
+quint64 ProtocolBridgeManager::totalAutoDetectAttempts() const
+{
+    return m_totalAutoDetectAttempts;
+}
+
+/** @brief 获取累计自动检测成功次数 @return 检测成功计数 */
+quint64 ProtocolBridgeManager::totalAutoDetectSuccesses() const
+{
+    return m_totalAutoDetectSuccesses;
+}
+
 // ============================================================================
 // 每协议统计接口
 // ============================================================================

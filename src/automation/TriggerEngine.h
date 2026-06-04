@@ -44,17 +44,28 @@ public:
     /** @brief 获取指定规则的匹配次数 @param index 规则索引 @return 该规则命中次数 */
     int ruleMatchCount(int index) const;
     // ---- 扩展统计 getter ----
-    quint64 totalEvaluations() const;      ///< 总评估次数(evaluateData/evaluateValue)
-    quint64 totalMatches() const;          ///< 总匹配成功次数(quint64精度)
-    quint64 totalActionsExecuted() const;  ///< 总动作执行次数
-    quint64 totalErrors() const;           ///< 总错误次数(正则编译失败等)
-    quint64 totalTriggersEvaluated() const;  ///< 总规则评估次数(每条每次)
-    quint64 totalTriggersFired() const;      ///< 总触发器命中次数
-    quint64 totalTriggersDisabled() const;   ///< 总跳过禁用规则次数
-    quint64 totalActionErrors() const;       ///< 总动作执行错误次数
-    quint64 totalRulesActive() const;        ///< 累计规则激活(从禁用切到启用)次数
-    int peakRulesActive() const;             ///< 历史同时启用规则数峰值
-    void resetStats();                        ///< 重置所有扩展统计计数器
+    /** @brief 获取总评估次数(evaluateData/evaluateValue) @return 评估总次数 */
+    quint64 totalEvaluations() const;
+    /** @brief 获取总匹配成功次数(quint64精度) @return 匹配总次数 */
+    quint64 totalMatches() const;
+    /** @brief 获取总动作执行次数 @return 动作执行总次数 */
+    quint64 totalActionsExecuted() const;
+    /** @brief 获取总错误次数(正则编译失败等) @return 错误总次数 */
+    quint64 totalErrors() const;
+    /** @brief 获取总规则评估次数(每条每次) @return 规则评估总次数 */
+    quint64 totalTriggersEvaluated() const;
+    /** @brief 获取总触发器命中次数 @return 触发器命中总次数 */
+    quint64 totalTriggersFired() const;
+    /** @brief 获取总跳过禁用规则次数 @return 跳过禁用规则总次数 */
+    quint64 totalTriggersDisabled() const;
+    /** @brief 获取总动作执行错误次数 @return 动作错误总次数 */
+    quint64 totalActionErrors() const;
+    /** @brief 获取累计规则激活(从禁用切到启用)次数 @return 激活总次数 */
+    quint64 totalRulesActive() const;
+    /** @brief 获取历史同时启用规则数峰值 @return 峰值规则数 */
+    int peakRulesActive() const;
+    /** @brief 重置所有扩展统计计数器 */
+    void resetStats();
 
 signals:
     /** @brief 触发器命中 @param ruleIndex 命中规则索引 @param ruleName 规则名称 */

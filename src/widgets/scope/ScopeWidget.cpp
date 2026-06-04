@@ -18,7 +18,7 @@ void ScopeWidget::setChannelCount(int c) { ++m_totalChannelChanges; m_channels.r
 /** @brief 设置采样缓冲区大小 @param s 缓冲区采样数 */
 void ScopeWidget::setSampleBuffer(int s) { m_bufferSize = s; for (auto &ch : m_channels) ch.resize(s); m_writePos = 0; }
 /** @brief 添加单个采样值 @param ch 通道索引 @param v 采样值 */
-void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.size()) { m_channels[ch][m_writePos % m_bufferSize] = v; ++m_totalSamples; if (ch == 0) { m_writePos++; if (m_writePos >= m_bufferSize) { m_writePos = 0; ++m_totalOverflows; emit dataOverflow(); } } } }
+void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.size()) { m_channels[ch][m_writePos % m_bufferSize] = v; ++m_totalSamples; if (ch == 0) { m_writePos++; if (m_writePos >= m_bufferSize) { m_writePos = 0; ++m_totalOverflows; emit dataOverflow(); } if (m_running && qAbs(v - m_triggerLevel) < 0.01 && ch == m_triggerCh) { ++m_totalTriggerFires; emit triggerFired(); } } } }
 /** @brief 批量添加采样值 @param ch 通道索引 @param vals 采样值向量 */
 void ScopeWidget::addSamples(int ch, const QVector<double> &vals) { for (auto v : vals) addSample(ch, v); }
 /** @brief 设置时间轴缩放 @param ms 时间刻度(毫秒) */
@@ -30,7 +30,7 @@ void ScopeWidget::setTriggerChannel(int c) { m_triggerCh = c; }
 /** @brief 设置触发电平 @param l 触发电平值 */
 void ScopeWidget::setTriggerLevel(double l) { m_triggerLevel = l; }
 /** @brief 启停采集 @param on true启动 */
-void ScopeWidget::setRunning(bool on) { m_running = on; }
+void ScopeWidget::setRunning(bool on) { if (m_running && !on) ++m_totalPauses; if (!m_running && on) ++m_totalRestarts; m_running = on; }
 /** @brief 清空所有通道数据 */
 void ScopeWidget::clearData() { ++m_totalClears; for (auto &ch : m_channels) ch.fill(0); m_writePos = 0; }
 /** @brief 获取通道数量 @return 通道数 */

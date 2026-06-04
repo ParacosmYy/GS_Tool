@@ -111,6 +111,7 @@ void HistogramWidget::refreshHistogram()
 /** @brief 通道选择变更回调 @param index 下拉框当前索引 */
 void HistogramWidget::onChannelChanged(int /*index*/)
 {
+    ++m_totalChannelSwitches;
     if (m_autoRefresh) { refreshHistogram(); }
 }
 
@@ -125,6 +126,7 @@ void HistogramWidget::onBinsChanged(int /*value*/)
 void HistogramWidget::onAutoRefreshToggled(bool checked)
 {
     m_autoRefresh = checked;
+    ++m_totalAutoRefreshToggles;
 }
 
 /** @brief ChartModel数据更新回调 — 仅在自动刷新且当前通道有更新时重绘 @param updatedChannels 本次更新的通道名称列表 */
@@ -162,4 +164,4 @@ void HistogramWidget::onChannelsChanged()
 }
 
 /** @brief 主题切换回调 — 重新应用主题颜色 */
-void HistogramWidget::onThemeChanged() { applyThemeColors(); }
+void HistogramWidget::onThemeChanged() { ++m_totalThemeChanges; applyThemeColors(); }

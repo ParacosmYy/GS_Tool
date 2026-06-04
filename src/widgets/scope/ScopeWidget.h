@@ -146,6 +146,9 @@ private:
     quint64 m_totalClears = 0;            ///< 总数据清空次数
     quint64 m_totalScaleChanges = 0;      ///< 总刻度变更次数
     quint64 m_totalChannelChanges = 0;    ///< 总通道数变更次数
+    quint64 m_totalPauses = 0;            ///< 总暂停次数(setRunning false)
+    quint64 m_totalRestarts = 0;          ///< 总重启次数(setRunning true)
+    quint64 m_totalTriggerFires = 0;      ///< 总触发信号发射次数
 
 public:
     /** @brief 获取总采样点数 @return 累计采样点 */
@@ -162,6 +165,12 @@ public:
     quint64 totalScaleChanges() const { return m_totalScaleChanges; }
     /** @brief 获取总通道数变更次数 @return 累计通道数变更次数 */
     quint64 totalChannelChanges() const { return m_totalChannelChanges; }
+    /** @brief 获取总暂停次数 @return 累计暂停次数 */
+    quint64 totalPauses() const { return m_totalPauses; }
+    /** @brief 获取总重启次数 @return 累计重启次数 */
+    quint64 totalRestarts() const { return m_totalRestarts; }
+    /** @brief 获取总触发信号发射次数 @return 累计触发发射次数 */
+    quint64 totalTriggerFires() const { return m_totalTriggerFires; }
     /** @brief 重置示波器统计计数器 */
-    void resetScopeStatistics() { m_totalSamples = 0; m_totalRepaints = 0; m_totalTriggers = 0; m_totalOverflows = 0; m_totalClears = 0; m_totalScaleChanges = 0; m_totalChannelChanges = 0; }
+    void resetScopeStatistics() { m_totalSamples = 0; m_totalRepaints = 0; m_totalTriggers = 0; m_totalOverflows = 0; m_totalClears = 0; m_totalScaleChanges = 0; m_totalChannelChanges = 0; m_totalPauses = 0; m_totalRestarts = 0; m_totalTriggerFires = 0; }
 };

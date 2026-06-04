@@ -25,9 +25,7 @@ class ChecksumCalculator : public QObject
     Q_OBJECT
 
 public:
-    /**
-     * @brief 校验和算法枚举
-     */
+    /** @brief 校验和算法枚举 */
     enum Algorithm {
         CRC8,           ///< CRC-8
         CRC16Ccitt,     ///< CRC-16 CCITT
@@ -43,55 +41,25 @@ public:
     };
     Q_ENUM(Algorithm)
 
-    /**
-     * @brief 构造函数
-     * @param parent 父对象
-     */
+    /** @brief 构造校验和计算器 @param parent 父对象 */
     explicit ChecksumCalculator(QObject *parent = nullptr);
 
-    /**
-     * @brief 计算校验和
-     * @param data 输入数据
-     * @param alg 算法类型
-     * @return 校验和结果
-     */
+    /** @brief 计算校验和 @param data 输入数据 @param alg 算法类型 @return 校验和结果 */
     quint64 calculate(const QByteArray &data, Algorithm alg) const;
 
-    /**
-     * @brief 使用自定义多项式计算 CRC
-     * @param data 输入数据
-     * @param polynomial CRC 多项式
-     * @param width CRC 位宽（8/16/32）
-     * @return CRC 结果
-     */
+    /** @brief 使用自定义多项式计算CRC @param data 输入数据 @param polynomial CRC多项式 @param width CRC位宽(8/16/32) @return CRC结果 */
     quint64 calculateCustom(const QByteArray &data, quint64 polynomial, int width) const;
 
-    /**
-     * @brief 获取算法名称
-     * @param alg 算法枚举值
-     * @return 算法名称字符串
-     */
+    /** @brief 获取算法名称 @param alg 算法枚举值 @return 算法名称字符串 */
     static QString algorithmName(Algorithm alg);
 
-    /**
-     * @brief 获取算法的位宽（8/16/32）
-     * @param alg 算法枚举值
-     * @return 算法输出位宽
-     */
+    /** @brief 获取算法的位宽(8/16/32) @param alg 算法枚举值 @return 算法输出位宽 */
     static int algorithmBitWidth(Algorithm alg);
 
-    /**
-     * @brief 获取算法的人类可读描述
-     * @param alg 算法枚举值
-     * @return 描述字符串，适合作为UI工具提示
-     */
+    /** @brief 获取算法的人类可读描述 @param alg 算法枚举值 @return 描述字符串，适合作为UI工具提示 */
     static QString algorithmDescription(Algorithm alg);
 
-    /**
-     * @brief 使用所有内置算法计算同一份数据的校验和（对比视图）
-     * @param data 输入数据
-     * @return QMap<算法名, 校验和值>，不包含CustomCrc
-     */
+    /** @brief 使用所有内置算法计算同一份数据的校验和(对比视图) @param data 输入数据 @return QMap<算法名,校验和值>，不包含CustomCrc */
     QMap<QString, quint64> calculateAll(const QByteArray& data) const;
 
     // ---- 统计计数接口 ----
@@ -109,16 +77,11 @@ public:
     void resetChecksumStatistics();
 
 private:
-    /** @brief 累计计算次数（calculate调用计数） */
-    mutable quint64 m_totalCalculations = 0;
-    /** @brief 累计处理字节数 */
-    mutable quint64 m_totalBytesProcessed = 0;
-    /** @brief 累计自定义CRC计算次数 */
-    mutable quint64 m_totalCustomCalculations = 0;
-    /** @brief 累计批量计算(calculateAll)调用次数 */
-    mutable quint64 m_totalCalculateAllCalls = 0;
-    /** @brief 按算法统计计算次数，索引为Algorithm枚举值 */
-    mutable QMap<int, quint64> m_algorithmCounts;
+    mutable quint64 m_totalCalculations = 0;      ///< 累计计算次数(calculate调用计数)
+    mutable quint64 m_totalBytesProcessed = 0;    ///< 累计处理字节数
+    mutable quint64 m_totalCustomCalculations = 0; ///< 累计自定义CRC计算次数
+    mutable quint64 m_totalCalculateAllCalls = 0; ///< 累计批量计算(calculateAll)调用次数
+    mutable QMap<int, quint64> m_algorithmCounts; ///< 按算法统计计算次数，索引为Algorithm枚举值
 };
 
 #endif // CHECKSUMCALCULATOR_H

@@ -16,6 +16,7 @@
  *   Spi       → SpiConnection
  *   I2c       → I2cConnection
  *   Usb       → UsbConnection
+ *   UdpMulticast → UdpMulticastConnection
  */
 
 #include "core/connect/ConnectionFactory.h"
@@ -84,6 +85,9 @@ IConnection* ConnectionFactory::create(ConnectionType type, QObject* parent)
         break;
     case ConnectionType::Usb:
         conn = new UsbConnection(parent);
+        break;
+    case ConnectionType::UdpMulticast:
+        conn = new UdpMulticastConnection(parent);
         break;
     default:
         qWarning() << "ConnectionFactory: unknown connection type" << static_cast<int>(type);

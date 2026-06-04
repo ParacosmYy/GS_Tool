@@ -21,8 +21,9 @@
 class ToastWidget : public QWidget {
     Q_OBJECT
 public:
-    enum class ToastType { Success, Error, Info }; ///< 通知类型
-    /** @brief 显示吐司通知，弹出动画后自动定时消失 */
+    /** @brief 通知类型枚举 */
+    enum class ToastType { Success, Error, Info };
+    /** @brief 显示吐司通知，弹出动画后自动定时消失 @param parent 父控件指针 @param msg 消息文本 @param type 通知类型(Success/Error/Info)，默认Info @param ms 自动消失时间(毫秒)，默认3000 */
     static void show(QWidget* parent, const QString& msg,
                      ToastType type = ToastType::Info, int ms = 3000)
     {
@@ -50,7 +51,7 @@ public:
         slide->start(QAbstractAnimation::DeleteWhenStopped);
         fade->start(QAbstractAnimation::DeleteWhenStopped);
     }
-    /** @brief 防抖吐司，冷却期内重复调用同一消息将被忽略 */
+    /** @brief 防抖吐司，冷却期内重复调用同一消息将被忽略 @param parent 父控件指针 @param msg 消息文本 @param type 通知类型，默认Info @param cooldownMs 防抖冷却期(毫秒)，默认2000 */
     static void showDebounced(QWidget* parent, const QString& msg,
                               ToastType type = ToastType::Info, int cooldownMs = 2000)
     {
@@ -168,9 +169,13 @@ private:
     static inline quint64 s_totalDismisses = 0; ///< 总消失次数
     static inline quint64 s_totalErrors = 0;    ///< 总错误通知次数
 public:
-    static quint64 totalShows() { return s_totalShows; }         ///< 总显示次数
-    static quint64 totalDismisses() { return s_totalDismisses; } ///< 总消失次数
-    static quint64 totalErrors() { return s_totalErrors; }       ///< 总错误通知次数
+    /** @brief 获取总显示次数 @return 显示次数 */
+    static quint64 totalShows() { return s_totalShows; }
+    /** @brief 获取总消失次数 @return 消失次数 */
+    static quint64 totalDismisses() { return s_totalDismisses; }
+    /** @brief 获取总错误通知次数 @return 错误通知次数 */
+    static quint64 totalErrors() { return s_totalErrors; }
+    /** @brief 重置所有吐司统计计数器(显示/消失/错误) */
     static void resetToastStatistics() { s_totalShows = 0; s_totalDismisses = 0; s_totalErrors = 0; }
 private:
     static constexpr int kWidth = 320, kMinHeight = 48, kMargin = 16, kRadius = 8;

@@ -41,14 +41,18 @@ void FireWaterBridge::parseLines()
         // 行长度保护: 超长行可能是垃圾数据
         if (lineData.size() > kMaxLineSize) {
             ++m_errorCount;
+            ++m_totalOversizedLines;
             continue;
         }
 
         // 转为QString处理
         QString line = QString::fromUtf8(lineData);
         if (line.isEmpty()) {
+            ++m_totalEmptyLinesSkipped;
             continue;
         }
+
+        ++m_totalLinesParsed;
 
         // 处理这一行
         processLine(line);
@@ -83,6 +87,7 @@ void FireWaterBridge::processLine(const QString& line)
         } else {
             // 第一行是头部行 -- 使用token作为通道名称
             m_headerReceived = true;
+            ++m_totalHeadersDetected;
             int count = tokens.size();
             if (count > kMaxChannels) {
                 count = kMaxChannels;

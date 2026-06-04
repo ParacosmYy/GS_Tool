@@ -105,6 +105,7 @@ void CursorOverlay::clearCursors()
 {
     if (m_hasCursorA || m_hasCursorB) {
         ++m_totalCursorDeletions;
+        ++m_totalCursorToggles;
     }
     m_hasCursorA = false;
     m_hasCursorB = false;

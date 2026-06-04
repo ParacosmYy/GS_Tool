@@ -36,6 +36,7 @@ bool CursorOverlay::eventFilter(QObject* watched, QEvent* event)
         auto* me = static_cast<QMouseEvent*>(event);
         if (me->button() == Qt::LeftButton) {
             setCursorA(pixelToDataX(static_cast<int>(me->position().x())));
+            ++m_totalCursorToggles;
             return true;
         }
         break;
@@ -44,10 +45,12 @@ bool CursorOverlay::eventFilter(QObject* watched, QEvent* event)
         auto* me = static_cast<QMouseEvent*>(event);
         if (me->button() == Qt::RightButton) {
             setCursorB(pixelToDataX(static_cast<int>(me->position().x())));
+            ++m_totalCursorToggles;
             return true;
         }
         if (me->button() == Qt::LeftButton) {
             int hit = hitTestCursor(static_cast<int>(me->position().x()));
+            ++m_totalHitTests;
             if (hit > 0) {
                 m_draggingCursor = hit;
                 return true;
@@ -73,6 +76,7 @@ bool CursorOverlay::eventFilter(QObject* watched, QEvent* event)
     }
     case QEvent::MouseButtonRelease: {
         if (m_draggingCursor > 0) {
+            ++m_totalDragCancels;
             m_draggingCursor = 0;
             return true;
         }

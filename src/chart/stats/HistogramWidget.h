@@ -107,6 +107,12 @@ public slots:
     quint64 totalAutoRanges() const { return m_totalAutoRanges; }
     /** @brief 获取累计导出次数(CSV导出调用，无论成功与否) */
     quint64 totalExports() const { return m_totalExports; }
+    /** @brief 获取累计通道切换次数(通道下拉框变更) */
+    quint64 totalChannelSwitches() const { return m_totalChannelSwitches; }
+    /** @brief 获取累计自动刷新开关切换次数 */
+    quint64 totalAutoRefreshToggles() const { return m_totalAutoRefreshToggles; }
+    /** @brief 获取累计主题颜色变更次数 */
+    quint64 totalThemeChanges() const { return m_totalThemeChanges; }
     /** @brief 重置所有直方图统计计数器 */
     void resetHistogramStatistics();
 
@@ -161,6 +167,9 @@ private:
     quint64 m_totalDistributionUpdates = 0;///< 累计分布更新次数(refreshHistogram成功执行)
     quint64 m_totalAutoRanges = 0;    ///< 累计Y轴自动范围调整次数
     quint64 m_totalExports = 0;       ///< 累计导出次数(CSV导出调用)
+    quint64 m_totalChannelSwitches = 0; ///< 累计通道切换次数
+    quint64 m_totalAutoRefreshToggles = 0; ///< 累计自动刷新开关切换次数
+    quint64 m_totalThemeChanges = 0;  ///< 累计主题颜色变更次数
 };
 
 #endif // HISTOGRAMWIDGET_H

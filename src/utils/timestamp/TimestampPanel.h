@@ -29,44 +29,27 @@ class TimestampPanel : public QWidget
     Q_OBJECT
 
 public:
-    /**
-     * @brief 构造函数
-     * @param parent 父控件
-     */
+    /** @brief 构造时间戳工具面板 @param parent 父控件 */
     explicit TimestampPanel(QWidget *parent = nullptr);
 
 private slots:
-    /**
-     * @brief 执行时间戳转换
-     */
+    /** @brief 执行时间戳转换 */
     void onConvert();
 
-    /**
-     * @brief 填入当前时间戳
-     */
+    /** @brief 填入当前时间戳 */
     void onNow();
 
-    /**
-     * @brief 复制结果到剪贴板
-     */
+    /** @brief 复制结果到剪贴板 */
     void onCopy();
 
-    /**
-     * @brief 清除转换历史
-     */
+    /** @brief 清除转换历史 */
     void onClearHistory();
 
-    /**
-     * @brief 从历史记录选择恢复
-     */
+    /** @brief 从历史记录选择恢复 */
     void onHistorySelected();
 
 private:
-    /**
-     * @brief 根据格式选择执行指定转换
-     * @param text 输入文本
-     * @param formatIndex 格式索引（0=自动,1=Unix秒,2=Unix毫秒,3=ISO日期）
-     */
+    /** @brief 根据格式选择执行指定转换 @param text 输入文本 @param formatIndex 格式索引(0=自动,1=Unix秒,2=Unix毫秒,3=ISO日期) */
     void convertByFormat(const QString &text, int formatIndex);
 
     QLineEdit *m_timestampEdit;     ///< 时间戳输入框

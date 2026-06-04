@@ -71,6 +71,15 @@ public:
     /** @brief 获取FireWater协议匹配(成功解析)的总帧数 */
     quint64 fireWaterMatches() const;
 
+    /** @brief 获取累计解析行数(含头部行和数据行) */
+    quint64 totalLinesParsed() const;
+    /** @brief 获取累计头部行检测次数 */
+    quint64 totalHeadersDetected() const;
+    /** @brief 获取累计超长行丢弃次数 */
+    quint64 totalOversizedLines() const;
+    /** @brief 获取累计空行跳过次数 */
+    quint64 totalEmptyLinesSkipped() const;
+
     /** @brief 重置统计数据（帧计数/错误/字节） */
     void resetStatistics();
 
@@ -107,6 +116,14 @@ private:
     quint64 m_totalChannelsDecoded = 0;
     /** @brief FireWater协议匹配(成功解析)的总帧数 */
     quint64 m_fireWaterMatches = 0;
+    /** @brief 累计解析行数(含头部行和数据行) */
+    quint64 m_totalLinesParsed = 0;
+    /** @brief 累计头部行检测次数 */
+    quint64 m_totalHeadersDetected = 0;
+    /** @brief 累计超长行丢弃次数 */
+    quint64 m_totalOversizedLines = 0;
+    /** @brief 累计空行跳过次数 */
+    quint64 m_totalEmptyLinesSkipped = 0;
 
     static constexpr int kMaxBufferSize = 8192;  ///< 最大缓冲区保护
     static constexpr int kMaxLineSize = 2048;    ///< 单行最大长度

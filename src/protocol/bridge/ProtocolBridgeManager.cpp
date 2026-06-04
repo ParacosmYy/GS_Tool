@@ -119,6 +119,10 @@ void ProtocolBridgeManager::resetStats()
     m_totalFramesParsedAll = 0;
     m_totalParseErrors = 0;
     m_totalBytesProcessed = 0;
+    m_totalFeedDataCalls = 0;
+    m_totalEmptyDataSkips = 0;
+    m_totalAutoDetectAttempts = 0;
+    m_totalAutoDetectSuccesses = 0;
 
     // 重置每协议统计
     for (auto it = m_protocolStats.begin(); it != m_protocolStats.end(); ++it) {

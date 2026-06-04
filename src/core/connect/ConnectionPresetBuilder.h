@@ -13,6 +13,7 @@
  * @brief 连接默认参数构造器
  *
  * 仅负责为不同连接类型生成默认参数映射，避免默认值散落在多个调用点。
+ * 网络类型包括普通 UDP、UDP 组播等共享参数入口。
  */
 class ConnectionPresetBuilder {
 public:

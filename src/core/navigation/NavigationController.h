@@ -51,6 +51,9 @@ public:
     quint64 totalSearches() const;           ///< 导航搜索总次数
     quint64 totalBreathingStarts() const;    ///< 呼吸动画启动总次数
     quint64 totalBreathingStops() const;     ///< 呼吸动画停止总次数
+    quint64 totalCategoryClicks() const;     ///< 分类节点点击总次数
+    quint64 totalRestoresByIndex() const;    ///< 通过索引恢复面板总次数(会话恢复)
+    quint64 totalNavTreeRebuilds() const;    ///< 导航树重建总次数(buildNavTree调用)
     void resetNavigationStatistics();        ///< 重置所有导航统计计数器
 
 private slots:
@@ -76,6 +79,9 @@ private:
     quint64 m_totalSearches = 0;         ///< 导航搜索总次数
     quint64 m_totalBreathingStarts = 0; ///< 呼吸动画启动总次数
     quint64 m_totalBreathingStops = 0;  ///< 呼吸动画停止总次数
+    quint64 m_totalCategoryClicks = 0;  ///< 分类节点点击总次数
+    quint64 m_totalRestoresByIndex = 0; ///< 通过索引恢复面板总次数(会话恢复)
+    quint64 m_totalNavTreeRebuilds = 0; ///< 导航树重建总次数(buildNavTree调用)
 };
 
 #endif // NAVIGATION_CONTROLLER_H

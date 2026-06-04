@@ -57,7 +57,9 @@ ProtocolBridgeManager::ChartProtocolMode ProtocolBridgeManager::protocolMode() c
 void ProtocolBridgeManager::feedData(const QByteArray& data)
 {
     // ---- 空数据保护 ----
+    ++m_totalFeedDataCalls;
     if (data.isEmpty()) {
+        ++m_totalEmptyDataSkips;
         return;
     }
 
@@ -75,10 +77,12 @@ void ProtocolBridgeManager::feedData(const QByteArray& data)
 
         // 采样数据足够时进行检测
         if (m_autoDetectBuffer.size() >= kAutoDetectMinBytes) {
+            ++m_totalAutoDetectAttempts;
             AutoDetectResult result = detectProtocol(m_autoDetectBuffer);
             m_lastDetectResult = result;
 
             if (result.detected && result.confidence >= 0.6) {
+                ++m_totalAutoDetectSuccesses;
                 // 置信度足够高，自动切换到检测到的模式
                 m_autoDetectEnabled = false;
                 m_mode = result.detectedMode;

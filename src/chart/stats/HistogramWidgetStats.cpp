@@ -165,4 +165,7 @@ void HistogramWidget::resetHistogramStatistics()
     m_totalDistributionUpdates = 0;
     m_totalAutoRanges = 0;
     m_totalExports = 0;
+    m_totalChannelSwitches = 0;
+    m_totalAutoRefreshToggles = 0;
+    m_totalThemeChanges = 0;
 }

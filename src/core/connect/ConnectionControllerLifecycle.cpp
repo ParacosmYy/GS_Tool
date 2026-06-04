@@ -14,6 +14,7 @@
 
 #include "core/send/SendController.h"
 #include "ota/manager/OtaManager.h"
+#include "connection/tcp/UdpMulticastConnection.h"
 
 /** @brief 创建并打开串口连接，完整流程: 关闭旧连接->提取DTR/RTS->工厂创建->配置->连接信号->超时保护->打开->注入下游 @param serialParams 串口参数映射(含portName/baudRate/dtr/rts等) */
 void ConnectionController::connectSerial(const QVariantMap& serialParams)
@@ -104,7 +105,8 @@ void ConnectionController::disconnectCurrent()
 /** @brief 创建网络连接(使用默认参数)，根据连接类型构建不同的默认host/port参数 @param type 连接类型枚举 */
 void ConnectionController::connectNetwork(ConnectionType type)
 {
-    connectNetwork(type, ConnectionPresetBuilder::build(type));
+    const QVariantMap preset = ConnectionPresetBuilder::build(type);
+    connectNetwork(type, preset);
 }
 
 /** @brief 创建网络连接(带参数，用于手动连接和自动重连)，完整流程: 关闭旧连接->工厂创建->配置->连接信号->超时保护->打开->注入下游 @param type 连接类型枚举 @param params 网络连接参数(host/port等) */
@@ -130,6 +132,12 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
     }
 
     m_currentConn->configure(params);
+
+    if (type == ConnectionType::UdpMulticast) {
+        if (auto* multicastConn = qobject_cast<UdpMulticastConnection*>(m_currentConn)) {
+            multicastConn->setMulticastInterface(params.value("interfaceName").toString());
+        }
+    }
 
     // 连接信号
     connectSignals(m_currentConn);

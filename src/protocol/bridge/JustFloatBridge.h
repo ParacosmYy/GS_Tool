@@ -74,6 +74,15 @@ public:
     /** @brief 获取单帧最大通道数峰值 */
     quint64 peakChannelsPerFrame() const;
 
+    /** @brief 获取累计尾部标记搜索次数(tryParseFrame调用次数) */
+    quint64 totalTailSearches() const;
+    /** @brief 获取累计对齐错误次数(float数据非4字节对齐) */
+    quint64 totalAlignmentErrors() const;
+    /** @brief 获取累计通道数不匹配次数(后续帧通道数与首帧不一致) */
+    quint64 totalChannelMismatches() const;
+    /** @brief 获取累计缓冲区裁剪次数(溢出保护触发) */
+    quint64 totalBufferTrims() const;
+
     /** @brief 重置统计数据（帧计数/错误/字节，不影响通道配置） */
     void resetStatistics();
 
@@ -110,6 +119,14 @@ private:
     quint64 m_totalChannelsDecoded = 0;
     /** @brief 单帧最大通道数峰值 */
     quint64 m_peakChannelsPerFrame = 0;
+    /** @brief 累计尾部标记搜索次数(tryParseFrame调用次数) */
+    quint64 m_totalTailSearches = 0;
+    /** @brief 累计对齐错误次数(float数据非4字节对齐) */
+    quint64 m_totalAlignmentErrors = 0;
+    /** @brief 累计通道数不匹配次数(后续帧通道数与首帧不一致) */
+    quint64 m_totalChannelMismatches = 0;
+    /** @brief 累计缓冲区裁剪次数(溢出保护触发) */
+    quint64 m_totalBufferTrims = 0;
 
     static constexpr unsigned char kTailMarker[4] = {0x00, 0x00, 0x80, 0x7F}; ///< 尾部标记
     static constexpr int kTailSize = 4;             ///< 尾部标记长度
