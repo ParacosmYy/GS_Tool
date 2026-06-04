@@ -10,6 +10,7 @@
  */
 
 #include "core/connect/ConnectionController.h"
+#include "core/connect/ConnectionPresetBuilder.h"
 
 #include "core/send/SendController.h"
 #include "ota/manager/OtaManager.h"
@@ -102,43 +103,7 @@ void ConnectionController::disconnectCurrent()
 /** @brief 创建网络连接(使用默认参数)，根据连接类型构建不同的默认host/port参数 @param type 连接类型枚举 */
 void ConnectionController::connectNetwork(ConnectionType type)
 {
-    // 构建默认网络参数(首次连接使用)
-    QVariantMap params;
-    if (type == ConnectionType::TcpClient) {
-        params["mode"] = "client";
-        params["host"] = "127.0.0.1";
-        params["port"] = 8080;
-    } else if (type == ConnectionType::TcpServer) {
-        params["mode"] = "server";
-        params["port"] = 8080;
-    } else if (type == ConnectionType::Udp) {
-        params["localPort"] = 8888;
-        params["remoteHost"] = "127.0.0.1";
-        params["remotePort"] = 8080;
-    } else if (type == ConnectionType::WebSocket) {
-        params["url"] = "ws://127.0.0.1:8080";
-    } else if (type == ConnectionType::Mqtt) {
-        params["host"] = "127.0.0.1";
-        params["port"] = 1883;
-    } else if (type == ConnectionType::Tls) {
-        params["host"] = "127.0.0.1";
-        params["port"] = 443;
-    } else if (type == ConnectionType::Ble) {
-        params["deviceName"] = "";
-    } else if (type == ConnectionType::Can) {
-        params["adapter"] = "can0";
-        params["bitrate"] = 500000;
-    } else if (type == ConnectionType::Spi) {
-        params["device"] = "/dev/spidev0.0";
-        params["speed"] = 1000000;
-    } else if (type == ConnectionType::I2c) {
-        params["device"] = "/dev/i2c-0";
-        params["address"] = 0x50;
-    } else if (type == ConnectionType::Usb) {
-        params["vid"] = 0;
-        params["pid"] = 0;
-    }
-    connectNetwork(type, params);
+    connectNetwork(type, ConnectionPresetBuilder::build(type));
 }
 
 /** @brief 创建网络连接(带参数，用于手动连接和自动重连)，完整流程: 关闭旧连接->工厂创建->配置->连接信号->超时保护->打开->注入下游 @param type 连接类型枚举 @param params 网络连接参数(host/port等) */

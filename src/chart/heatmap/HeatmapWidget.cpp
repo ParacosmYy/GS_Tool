@@ -48,6 +48,7 @@ void HeatmapWidget::setColorRange(double min, double max)
 {
     m_minValue = min;
     m_maxValue = max;
+    m_totalColorMapChanges++;
     m_autoScale = false;
     m_dirty = true;
     update();
@@ -91,6 +92,7 @@ QSize HeatmapWidget::minimumSizeHint() const { return QSize(100, 100); }
 void HeatmapWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
+    m_totalUpdates++;
     if (m_dirty) updatePixmap();
     QPainter p(this);
     p.drawPixmap(0, 0, m_cache);
@@ -148,10 +150,12 @@ void HeatmapWidget::updatePixmap()
     p.setRenderHint(QPainter::Antialiasing, false);
     double range = m_maxValue - m_minValue;
     if (range <= 0) range = 1.0;
+    quint64 cellsThisUpdate = 0;
     for (int r = 0; r < m_data.size(); ++r) {
         for (int c = 0; c < m_data[r].size(); ++c) {
             QColor color = valueToColor(m_data[r][c]);
             p.fillRect(c * m_cellSize, r * m_cellSize, m_cellSize, m_cellSize, color);
+            ++cellsThisUpdate;
             if (m_showValues && m_cellSize >= 20) {
                 p.setPen(color.lightnessF() > 0.5 ? Qt::black : Qt::white);
                 p.setFont(font());
@@ -160,6 +164,8 @@ void HeatmapWidget::updatePixmap()
             }
         }
     }
+    m_totalCellsRendered += cellsThisUpdate;
+    if (cellsThisUpdate > m_peakCellsPerUpdate) m_peakCellsPerUpdate = cellsThisUpdate;
     m_dirty = false;
 }
 

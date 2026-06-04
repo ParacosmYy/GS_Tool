@@ -129,6 +129,7 @@ void MainWindow::connectSearchAndProtocolSignals()
         if (text == tr("TCP客户端")) { m_connController->connectNetwork(ConnectionType::TcpClient); return; }
         if (text == tr("TCP服务端")) { m_connController->connectNetwork(ConnectionType::TcpServer); return; }
         if (text == tr("UDP")) { m_connController->connectNetwork(ConnectionType::Udp); return; }
+        if (text == tr("新建连接")) { openQuickConnectionDialog(); return; }
 
         QWidget* target = m_navController->lookupPanel(text);
         if (!target) return;

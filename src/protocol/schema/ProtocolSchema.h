@@ -100,6 +100,12 @@ public:
 
     /* —— 统计计数器接口 —— */
 
+    /** @brief 获取协议定义加载总次数(loadFromJson/loadFromJsonData调用) */
+    quint64 totalLoads() const;
+
+    /** @brief 获取协议定义序列化保存总次数(toJson调用) */
+    quint64 totalSaves() const;
+
     /** @brief 获取已加载的协议定义总数 */
     quint64 totalSchemas() const;
 
@@ -121,6 +127,9 @@ public:
     /** @brief 获取当前活跃的协议定义数量（已加载且有效） @return 活跃协议数 */
     quint64 totalActiveSchemas() const;
 
+    /** @brief 获取通过编程接口(addField/setFraming)构造协议的总次数 */
+    quint64 totalBuilds() const;
+
     /** @brief 重置所有统计计数器 */
     void resetSchemaStatistics();
 
@@ -134,6 +143,8 @@ private:
     bool m_valid = false;               ///< 协议是否有效
     QString m_lastError;                ///< 最近一次解析错误信息
 
+    quint64 m_totalLoads = 0;           ///< 协议定义加载总次数(loadFromJson/loadFromJsonData调用)
+    quint64 m_totalSaves = 0;           ///< 协议定义序列化保存总次数(toJson调用)
     quint64 m_totalSchemas = 0;         ///< 已加载的协议定义总数
     quint64 m_totalFieldCount = 0;      ///< 所有已加载协议的字段总数
     quint64 m_maxSchemaSize = 0;        ///< 历史最大协议定义大小(字节)
@@ -141,6 +152,7 @@ private:
     quint64 m_validationErrors = 0;     ///< 协议定义校验失败次数
     quint64 m_totalSchemaErrors = 0;    ///< 协议定义加载失败次数（文件读取/格式错误）
     quint64 m_totalActiveSchemas = 0;   ///< 当前活跃的协议定义数量（已加载且有效）
+    quint64 m_totalBuilds = 0;          ///< 通过编程接口(addField/setFraming)构造协议的总次数
 
     /** @brief 将校验类型枚举转换为字符串 @param type 校验算法枚举值 @return 字符串标识 */
     QString checksumTypeToString(ChecksumType type) const;

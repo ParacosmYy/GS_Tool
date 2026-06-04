@@ -66,6 +66,18 @@ public:
     /** @brief 获取累计重绘次数 */
     quint64 totalRepaints() const { return m_totalRepaints; }
 
+    /** @brief 获取累计数据更新次数(addSpectrum调用) */
+    quint64 totalUpdates() const { return m_totalUpdates; }
+
+    /** @brief 获取累计滚动刷新次数 */
+    quint64 totalScrolls() const { return m_totalScrolls; }
+
+    /** @brief 获取累计颜色映射范围变更次数 */
+    quint64 totalColorMapChanges() const { return m_totalColorMapChanges; }
+
+    /** @brief 获取峰值数据点数(单帧最大数据点) */
+    quint64 peakDataPoints() const { return m_peakDataPoints; }
+
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -105,4 +117,8 @@ private:
     int m_peakSpectrumWidth = 0;        ///< 峰值频谱宽度(单帧最大频率bin数)
     quint64 m_totalCursorQueries = 0;   ///< 累计鼠标游标查询次数
     quint64 m_totalRepaints = 0;        ///< 累计重绘次数
+    quint64 m_totalUpdates = 0;         ///< 累计数据更新次数(addSpectrum调用)
+    quint64 m_totalScrolls = 0;         ///< 累计滚动刷新次数
+    quint64 m_totalColorMapChanges = 0; ///< 累计颜色映射范围变更次数
+    quint64 m_peakDataPoints = 0;       ///< 峰值数据点数(单帧最大数据点)
 };

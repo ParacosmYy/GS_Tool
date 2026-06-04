@@ -33,6 +33,7 @@ set(SOURCES
     src/main.cpp
     src/core/mainwindow/MainWindow.cpp
     src/core/mainwindow/MainWindowInit.cpp
+    src/core/mainwindow/MainWindowConnectionEntry.cpp
     src/core/mainwindow/MainWindowSetupUI.cpp
     src/core/mainwindow/MainWindowSignalConnect.cpp
     src/core/mainwindow/MainWindowSignalConnectUI.cpp
@@ -43,6 +44,7 @@ set(SOURCES
     src/core/connect/ConnectionControllerQuery.cpp
     src/core/connect/ConnectionControllerReconnect.cpp
     src/core/connect/ConnectionControllerHandlers.cpp
+    src/core/connect/ConnectionPresetBuilder.cpp
     src/core/recording/RecordingController.cpp
     src/core/navigation/NavigationController.cpp
     src/core/navigation/NavigationControllerQuery.cpp
@@ -59,6 +61,7 @@ set(SOURCES
     src/core/widgets/AppDialogContent.cpp
     src/core/widgets/DragDropHelper.cpp
     src/core/widgets/DragDropHelperEvents.cpp
+    src/core/widgets/ConnectionQuickDialog.cpp
     src/plugin/loader/PluginLoader.cpp
     src/core/workspace/WorkspaceManager.cpp
     src/core/factory/WidgetFactory.cpp
@@ -70,7 +73,9 @@ set(SOURCES
     src/core/settings/SettingsController.cpp
     src/core/settings/SettingsControllerPersistence.cpp
     src/core/toolbar/ToolbarController.cpp
+    src/core/toolbar/ToolbarControllerQuery.cpp
     src/core/terminal/TerminalController.cpp
+    src/core/terminal/TerminalControllerDisplay.cpp
     src/core/panels/PanelManager.cpp
     src/core/panels/PanelManagerCreation.cpp
     src/core/panels/PanelManagerFactory.cpp
@@ -143,6 +148,7 @@ set(SOURCES
     src/serial/commands/QuickCommandBarDialog.cpp
     src/serial/data/BookmarkWidget.cpp
     src/serial/commands/TimedSender.cpp
+    src/serial/commands/TimedSenderStats.cpp
     src/serial/commands/SendHistory.cpp
     src/serial/commands/SendHistoryStats.cpp
     src/serial/data/DataStatistics.cpp
@@ -328,6 +334,7 @@ set(SOURCES
 
     # ── F9: 串口高级调试 ──
     src/serial/signals/SignalLineMonitor.cpp
+    src/serial/signals/SignalLineMonitorStats.cpp
     src/serial/signals/SignalLineWidget.cpp
     src/serial/data/TrafficMonitor.cpp
     src/serial/data/TrafficMonitorStats.cpp
@@ -500,6 +507,7 @@ set(HEADERS
 
     src/core/mainwindow/MainWindow.h
     src/core/connect/ConnectionController.h
+    src/core/connect/ConnectionPresetBuilder.h
 
     src/core/widgets/AnimatedButton.h
     src/core/recording/RecordingController.h
@@ -527,6 +535,7 @@ set(HEADERS
     src/core/widgets/SmartAutoComplete.h
     src/core/widgets/ToastWidget.h
     src/core/widgets/AppDialog.h
+    src/core/widgets/ConnectionQuickDialog.h
     src/core/widgets/DragDropHelper.h
     src/plugin/loader/PluginLoader.h
     src/core/workspace/WorkspaceManager.h

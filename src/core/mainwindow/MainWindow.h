@@ -78,6 +78,7 @@ private:
     void connectBookmarkSignals();           ///< 书签面板CRUD信号路由
     void handleConnectionState(ConnectionState state, const QString& connName); ///< 处理连接状态变更
     void restoreUserSession(int lastPanel);  ///< 从磁盘恢复用户偏好
+    void openQuickConnectionDialog();        ///< Ctrl+N 新建连接入口，弹出快速连接对话框
 
     // ---- 核心组件 ----
     ConnectionManager* m_connManager;          ///< 连接管理器(IConnection生命周期)

@@ -53,6 +53,18 @@ public:
     /** @brief 获取累计自动缩放次数 */
     quint64 totalAutoScales() const { return m_totalAutoScales; }
 
+    /** @brief 获取累计控件更新次数(paintEvent触发) */
+    quint64 totalUpdates() const { return m_totalUpdates; }
+
+    /** @brief 获取累计颜色映射范围变更次数 */
+    quint64 totalColorMapChanges() const { return m_totalColorMapChanges; }
+
+    /** @brief 获取累计渲染单元格总数 */
+    quint64 totalCellsRendered() const { return m_totalCellsRendered; }
+
+    /** @brief 获取单次更新峰值单元格数 */
+    quint64 peakCellsPerUpdate() const { return m_peakCellsPerUpdate; }
+
     /** @brief 重置所有统计计数器 */
     void resetHeatmapStats();
 
@@ -101,6 +113,10 @@ private:
     quint64 m_totalCellClicks = 0;     ///< 累计单元格点击次数
     quint64 m_totalCellHovers = 0;     ///< 累计悬停事件次数
     quint64 m_totalAutoScales = 0;     ///< 累计自动缩放次数
+    quint64 m_totalUpdates = 0;        ///< 累计控件更新次数(paintEvent触发)
+    quint64 m_totalColorMapChanges = 0;///< 累计颜色映射范围变更次数
+    quint64 m_totalCellsRendered = 0;  ///< 累计渲染单元格总数
+    quint64 m_peakCellsPerUpdate = 0;  ///< 单次更新峰值单元格数
 };
 
 #endif // HEATMAPWIDGET_H

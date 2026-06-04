@@ -32,6 +32,8 @@ void WaterfallWidget::addSpectrum(const QVector<double> &spectrum)
 {
     if (m_paused) { m_totalSpectrumsDropped++; return; }
     m_totalSpectrumsAdded++;
+    m_totalUpdates++;
+    if (static_cast<quint64>(spectrum.size()) > m_peakDataPoints) m_peakDataPoints = spectrum.size();
     if (spectrum.size() > m_peakSpectrumWidth) m_peakSpectrumWidth = spectrum.size();
     m_history.append(spectrum);
     if (m_history.size() > m_maxLines) {
@@ -72,6 +74,7 @@ void WaterfallWidget::setColorRange(double min, double max)
 {
     m_minValue = min;
     m_maxValue = max;
+    m_totalColorMapChanges++;
 }
 
 /** @brief 设置滚动刷新间隔 @param ms 间隔毫秒数(最小10ms) */
@@ -135,6 +138,7 @@ void WaterfallWidget::mouseMoveEvent(QMouseEvent *event)
 /** @brief 滚动定时器回调，触发控件重绘 */
 void WaterfallWidget::scrollImage()
 {
+    m_totalScrolls++;
     update();
 }
 
@@ -165,4 +169,8 @@ void WaterfallWidget::resetStats()
     m_peakSpectrumWidth = 0;
     m_totalCursorQueries = 0;
     m_totalRepaints = 0;
+    m_totalUpdates = 0;
+    m_totalScrolls = 0;
+    m_totalColorMapChanges = 0;
+    m_peakDataPoints = 0;
 }

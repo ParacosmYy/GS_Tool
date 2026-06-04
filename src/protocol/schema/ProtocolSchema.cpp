@@ -27,6 +27,7 @@ ProtocolSchema::~ProtocolSchema() = default;
 /** @brief 从JSON文件加载协议定义 @param filePath JSON文件的完整路径 @return 加载成功返回true，否则返回false */
 bool ProtocolSchema::loadFromJson(const QString &filePath)
 {
+    ++m_totalLoads;  // 累计加载计数(含成功和失败)
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
         m_valid = false;
@@ -51,6 +52,7 @@ bool ProtocolSchema::loadFromJson(const QString &filePath)
 /** @brief 从JSON字节数据加载协议定义 @param jsonData JSON格式的字节数组 @return 解析成功返回true，否则返回false */
 bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
 {
+    ++m_totalLoads;  // 累计加载计数(含成功和失败)
     m_valid = false;
     m_lastError.clear();
 

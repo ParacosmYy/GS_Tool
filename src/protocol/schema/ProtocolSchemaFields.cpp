@@ -55,6 +55,8 @@ QString ProtocolSchema::lastError() const
 /** @brief 将当前协议定义序列化为JSON对象 @return 包含完整协议定义的QJsonObject */
 QJsonObject ProtocolSchema::toJson() const
 {
+    ++m_totalSaves;  // 累计序列化保存计数
+
     QJsonObject root;
 
     /* 协议名称 */
@@ -135,6 +137,18 @@ ProtocolSchema::ChecksumType ProtocolSchema::checksumTypeFromString(const QStrin
 // 统计计数器接口
 // ============================================================================
 
+/** @brief 获取协议定义加载总次数(loadFromJson/loadFromJsonData调用) @return 加载总次数 */
+quint64 ProtocolSchema::totalLoads() const
+{
+    return m_totalLoads;
+}
+
+/** @brief 获取协议定义序列化保存总次数(toJson调用) @return 保存总次数 */
+quint64 ProtocolSchema::totalSaves() const
+{
+    return m_totalSaves;
+}
+
 /** @brief 获取已加载的协议定义总数 @return 累计加载次数 */
 quint64 ProtocolSchema::totalSchemas() const
 {
@@ -177,9 +191,17 @@ quint64 ProtocolSchema::totalActiveSchemas() const
     return m_totalActiveSchemas;
 }
 
-/** @brief 重置所有Schema统计计数器(加载数/字段数/最大大小/校验/错误/活跃数) */
+/** @brief 获取通过编程接口(addField/setFraming)构造协议的总次数 @return 构造次数 */
+quint64 ProtocolSchema::totalBuilds() const
+{
+    return m_totalBuilds;
+}
+
+/** @brief 重置所有Schema统计计数器(加载数/保存数/字段数/最大大小/校验/错误/活跃数/构造数) */
 void ProtocolSchema::resetSchemaStatistics()
 {
+    m_totalLoads = 0;
+    m_totalSaves = 0;
     m_totalSchemas = 0;
     m_totalFieldCount = 0;
     m_maxSchemaSize = 0;
@@ -187,6 +209,7 @@ void ProtocolSchema::resetSchemaStatistics()
     m_validationErrors = 0;
     m_totalSchemaErrors = 0;
     m_totalActiveSchemas = 0;
+    m_totalBuilds = 0;
 }
 
 /** @brief 重置所有统计计数器（别名，调用resetSchemaStatistics） */

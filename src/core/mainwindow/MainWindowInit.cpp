@@ -234,7 +234,8 @@ MainWindow::MainWindow(QWidget* parent)
         this, nullptr, tr("打开工程"), ShortcutContext::Global);
     m_shortcutManager->registerShortcut(
         "connection.new", QKeySequence("Ctrl+N"),
-        this, nullptr, tr("新建连接"), ShortcutContext::Global);
+        this, [this]() { openQuickConnectionDialog(); },
+        tr("新建连接"), ShortcutContext::Global);
     m_shortcutManager->registerShortcut(
         "tab.close", QKeySequence("Ctrl+W"),
         this, nullptr, tr("关闭标签页"), ShortcutContext::Global);
