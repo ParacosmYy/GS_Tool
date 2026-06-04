@@ -169,3 +169,12 @@ void HistogramWidget::resetHistogramStatistics()
     m_totalAutoRefreshToggles = 0;
     m_totalThemeChanges = 0;
 }
+
+// ── 内联统计 Getter(从.h移出) ──
+quint64 HistogramWidget::totalBinRecalculations() const { return m_totalBinRecalculations; }
+quint64 HistogramWidget::totalDistributionUpdates() const { return m_totalDistributionUpdates; }
+quint64 HistogramWidget::totalAutoRanges() const { return m_totalAutoRanges; }
+quint64 HistogramWidget::totalExports() const { return m_totalExports; }
+quint64 HistogramWidget::totalChannelSwitches() const { return m_totalChannelSwitches; }
+quint64 HistogramWidget::totalAutoRefreshToggles() const { return m_totalAutoRefreshToggles; }
+quint64 HistogramWidget::totalThemeChanges() const { return m_totalThemeChanges; }

@@ -21,13 +21,13 @@ void BleConfigPanel::onDeviceFound(const QVariantMap& device)
             /* 更新已有条目的RSSI和名称 */
             m_deviceList[i] = device;
             m_deviceCombo->setItemText(i,
-                QStringLiteral("%1 (%2) [%3 dBm]")
+                tr("%1 (%2) [%3 dBm]")
                     .arg(name, addr, QString::number(rssi)));
             return;
         }
     }
 
-    const QString display = QStringLiteral("%1 (%2) [%3 dBm]")
+    const QString display = tr("%1 (%2) [%3 dBm]")
         .arg(name, addr, QString::number(rssi));
 
     m_deviceCombo->addItem(display);

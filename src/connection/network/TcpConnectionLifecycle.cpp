@@ -53,9 +53,9 @@ ConnectionType TcpConnection::type() const
 QString TcpConnection::name() const
 {
     if (m_mode == Client) {
-        return QString("TCP:%1:%2").arg(m_host).arg(m_port);
+        return tr("TCP:%1:%2").arg(m_host).arg(m_port);
     }
-    return QString("TCP Server:%1").arg(m_port);
+    return tr("TCP Server:%1").arg(m_port);
 }
 
 /** @brief 返回当前连接状态 @return ConnectionState枚举值 */

@@ -66,8 +66,8 @@ void WsConfigPanel::setupUi()
     // 连接类型
     m_typeCombo = new QComboBox(this);
     m_typeCombo->setObjectName("wsTypeCombo");
-    m_typeCombo->addItem("WS");
-    m_typeCombo->addItem("WSS");
+    m_typeCombo->addItem(tr("WS"));
+    m_typeCombo->addItem(tr("WSS"));
     layout->addRow(tr("协议类型:"), m_typeCombo);
 
     // URL输入

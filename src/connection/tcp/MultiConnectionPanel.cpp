@@ -60,6 +60,7 @@ void MultiConnectionPanel::onAddClicked()
 
     auto* buttons = new QDialogButtonBox(
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+    buttons->setObjectName("tcpMultiDialogButtons");
 
     layout->addRow(tr("主机地址:"), hostEdit);
     layout->addRow(tr("端口号:"), portSpin);

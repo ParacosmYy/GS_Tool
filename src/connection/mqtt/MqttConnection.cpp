@@ -52,7 +52,7 @@ ConnectionType MqttConnection::type() const { return ConnectionType::Mqtt; }
 QString MqttConnection::name() const
 {
     return m_host.isEmpty() ? tr("未配置")
-         : QStringLiteral("%1:%2").arg(m_host).arg(m_port);
+         : tr("%1:%2").arg(m_host).arg(m_port);
 }
 
 /** @brief 获取当前连接状态 @return 连接状态枚举 */
