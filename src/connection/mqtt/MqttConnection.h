@@ -42,6 +42,13 @@ public:
     void close() override;                               ///< 发送DISCONNECT报文后断开TCP
     qint64 write(const QByteArray& data) override;       ///< QoS0发布
     void configure(const QVariantMap& params) override;  ///< 配置连接参数
+    // ---- 自动重连接口 ----
+    void setAutoReconnect(bool enabled);               ///< @brief 启用/禁用自动重连
+    bool autoReconnect() const;                        ///< @brief 查询自动重连状态
+    void setMaxRetries(int max);                       ///< @brief 设置最大重试次数(0=无限)
+    int maxRetries() const;                            ///< @brief 获取最大重试次数
+    int currentRetryCount() const;                     ///< @brief 获取当前已重试次数
+    quint64 totalRetryAttempts() const;                ///< @brief 获取累计重试次数
     // ---- MQTT专用接口 ----
     /** @brief 连接到指定MQTT服务器 @param host 服务器地址 @param port 服务器端口 */
     void connectToHost(const QString& host, int port);
@@ -80,6 +87,8 @@ public:
     int subscriptionCount() const;                       ///< 获取当前订阅主题数
     int pendingQueueSize() const;                        ///< 获取队列中的消息数
     void resetStats();                                   ///< 重置所有统计计数器
+    quint64 totalSuccessfulReconnects() const;           ///< @brief 累计成功重连次数
+    double avgRetryDelayMs() const;                      ///< @brief 平均重试延迟(ms)
 
 signals:
     void messageReceived(const QString& topic, const QByteArray& payload); ///< 收到MQTT消息
@@ -87,12 +96,15 @@ signals:
     void disconnected();                                  ///< MQTT连接断开
     /** @brief 消息队列溢出，已丢弃旧消息 @param count 丢弃的消息数 */
     void queueOverflow(int count);
+    /** @brief 自动重连状态变更通知 @param retryCount 当前重试次数 @param delayMs 下次重试延迟 */
+    void retryScheduled(int retryCount, qint64 delayMs);
 
 private slots:
     void onSocketReadyRead();    ///< TCP socket数据就绪回调，触发MQTT报文解析
     void onSocketConnected();    ///< TCP socket连接成功回调，发送MQTT CONNECT报文
     void onSocketDisconnected(); ///< TCP socket断开回调，更新连接状态
     void onKeepAlive();          ///< KeepAlive定时器回调，发送PINGREQ保活报文
+    void onRetryTimeout();       ///< @brief 重连定时器回调，执行指数退避重试
 
 private:
     /** @brief 构建MQTT协议报文 @param packetType 报文类型 @param payload 报文负载 @return 编码后的完整报文 */
@@ -107,6 +119,8 @@ private:
     void handleSuback(const QByteArray& data);   ///< 处理SUBACK响应报文
     QString generateClientId(); ///< 生成唯一客户端ID
     void flushPendingQueue();   ///< 发送队列中缓存的待发消息
+    qint64 computeBackoffDelay() const; ///< @brief 计算指数退避延迟(ms)
+    void scheduleRetry();               ///< @brief 安排下一次重连尝试
     // 配置参数
     QString m_host;                             ///< MQTT服务器地址
     int m_port = 1883;                          ///< MQTT服务器端口
@@ -140,6 +154,17 @@ private:
     quint64 m_qos2Count = 0;                    ///< QoS2发布计数
     quint64 m_keepAliveSent = 0;                ///< 累计PINGREQ发送次数
     QDateTime m_lastConnectTime;                ///< 最后连接发起时间
+    // 自动重连配置
+    QTimer* m_retryTimer;                       ///< 重连定时器(指数退避)
+    bool m_autoReconnect = false;               ///< 是否启用自动重连
+    int m_maxRetries = 0;                       ///< 最大重试次数(0=无限)
+    int m_currentRetryCount = 0;                ///< 当前已重试次数
+    qint64 m_currentRetryDelayMs = 1000;        ///< 当前重试延迟(ms)
+    static constexpr qint64 kMinRetryDelayMs = 1000;  ///< 最小重试延迟1秒
+    static constexpr qint64 kMaxRetryDelayMs = 30000; ///< 最大重试延迟30秒
+    quint64 m_totalRetryAttempts = 0;           ///< 累计重试次数
+    quint64 m_totalSuccessfulReconnects = 0;    ///< 累计成功重连次数
+    qint64 m_totalRetryDelayMs = 0;             ///< 累计重试延迟(ms)
 };
 
 #endif // MQTTCONNECTION_H

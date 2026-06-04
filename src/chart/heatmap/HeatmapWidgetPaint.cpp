@@ -8,10 +8,11 @@
 
 #include "chart/heatmap/HeatmapWidget.h"
 
-#include "core/theme/ThemeManager.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <cmath>
+
+#include "core/theme/ThemeManager.h"
 
 /** @brief 绘制事件处理，将缓存像素图绘制到控件上并叠加悬停高亮框 @param event 绘制事件参数(未使用) */
 void HeatmapWidget::paintEvent(QPaintEvent *event)

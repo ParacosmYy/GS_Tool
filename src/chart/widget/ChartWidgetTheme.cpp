@@ -97,6 +97,7 @@ void ChartWidget::createSeries(const QString& name, const QColor& color)
     }
 
     auto* series = new QLineSeries;
+    series->setObjectName(QStringLiteral("chartSeries_%1").arg(name));
     series->setName(name);
     series->setColor(chColor);
     series->setUseOpenGL(true);
@@ -122,4 +123,11 @@ void ChartWidget::removeSeries(const QString& name)
 // ============================================================================
 // 统计计数器
 // ============================================================================
+
+/** @brief 查询当前主题的网格线颜色，从ThemeManager获取Border语义色 @return 网格线QColor */
+QColor ChartWidget::gridColor() const
+{
+    return ThemeManager::instance().color(ThemeManager::SemanticColor::Border);
+}
+
 // resetChartWidgetStatistics() 定义在 ChartWidget.cpp 中（含完整字段重置）

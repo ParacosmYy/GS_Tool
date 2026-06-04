@@ -140,13 +140,27 @@ QString CanFrameParser::frameToString(const CanFrame& frame)
         ? QStringLiteral("%1").arg(frame.id, 8, 16, QLatin1Char('0')).toUpper()
         : QStringLiteral("%1").arg(frame.id, 3, 16, QLatin1Char('0')).toUpper();
 
-    return tr("[%1] ID:0x%2 DLC:%3 %4")
+    /* 错误帧追加错误类型描述 */
+    QString errorDetail;
+    if (frame.error) {
+        switch (frame.errorType) {
+        case CanFrame::BitError:   errorDetail = tr(" [位错误]"); break;
+        case CanFrame::StuffError: errorDetail = tr(" [填充错误]"); break;
+        case CanFrame::CrcError:   errorDetail = tr(" [CRC错误]"); break;
+        case CanFrame::FormError:  errorDetail = tr(" [格式错误]"); break;
+        case CanFrame::AckError:   errorDetail = tr(" [应答错误]"); break;
+        default: break;
+        }
+    }
+
+    return tr("[%1] ID:0x%2 DLC:%3 %4%5")
         .arg(typeStr, idStr)
         .arg(frame.dlc)
-        .arg(frame.data.toHex(' ').toUpper());
+        .arg(frame.data.toHex(' ').toUpper())
+        .arg(errorDetail);
 }
 
-/** @brief 重置所有解析器统计计数器 */
+/** @brief 重置所有解析器统计计数器(含错误帧分类计数) */
 void CanFrameParser::resetParserStatistics()
 {
     m_totalFramesParsed = 0;
@@ -157,4 +171,10 @@ void CanFrameParser::resetParserStatistics()
     m_totalFdFrames = 0;
     m_totalRtrFrames = 0;
     m_totalCrcErrors = 0;
+    m_totalErrorFrames = 0;
+    m_totalBitErrors = 0;
+    m_totalStuffErrors = 0;
+    m_totalCrcFrameErrors = 0;
+    m_totalFormErrors = 0;
+    m_totalAckErrors = 0;
 }

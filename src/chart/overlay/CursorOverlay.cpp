@@ -21,8 +21,6 @@
  */
 
 #include "chart/overlay/CursorOverlay.h"
-#include "chart/model/ChartModel.h"
-#include "core/theme/ThemeManager.h"
 
 #include <QMouseEvent>
 #include <QShowEvent>
@@ -30,6 +28,9 @@
 #include <QChartView>
 #include <QChart>
 #include <cmath>
+
+#include "chart/model/ChartModel.h"
+#include "core/theme/ThemeManager.h"
 
 // ============================================================
 // 构造

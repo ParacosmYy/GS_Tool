@@ -92,6 +92,12 @@ void MqttConnection::handleConnack(const QByteArray& data)
         emit stateChanged(m_state);
         emit connected();
         m_keepAlive->start();
+        /* 连接成功: 重置重试计数器并停止重连定时器 */
+        if (m_currentRetryCount > 0) {
+            ++m_totalSuccessfulReconnects;
+        }
+        m_currentRetryCount = 0;
+        m_retryTimer->stop();
     } else {
         ++m_errorCount;
         m_state = ConnectionState::Error;
@@ -168,13 +174,17 @@ QString MqttConnection::generateClientId()
 /** @brief TCP连接建立成功回调，发送MQTT CONNECT报文 */
 void MqttConnection::onSocketConnected() { sendConnect(); flushPendingQueue(); }
 
-/** @brief TCP连接断开回调，更新状态并停止心跳 */
+/** @brief TCP连接断开回调，更新状态并停止心跳，触发自动重连 */
 void MqttConnection::onSocketDisconnected()
 {
     m_keepAlive->stop();
     m_state = ConnectionState::Disconnected;
     emit stateChanged(m_state);
     emit disconnected();
+    /* 非主动关闭时触发自动重连 */
+    if (m_autoReconnect && !m_host.isEmpty()) {
+        scheduleRetry();
+    }
 }
 
 /** @brief 底层TCP数据到达回调，追加到接收缓冲区并解析 */

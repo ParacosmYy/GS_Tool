@@ -4,10 +4,12 @@
  */
 
 #include "chart/heatmap2/HeatmapWidget2.h"
-#include "core/theme/ThemeManager.h"
+
 #include <QPainter>
 #include <QMouseEvent>
 #include <QtMath>
+
+#include "core/theme/ThemeManager.h"
 
 /** @brief 构造函数，初始化热力图控件并设置objectName @param parent 父控件指针 */
 HeatmapWidget::HeatmapWidget(QWidget *parent) : QWidget(parent) { setObjectName("HeatmapWidget2"); }

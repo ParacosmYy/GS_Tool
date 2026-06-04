@@ -12,10 +12,11 @@
  */
 
 #include "chart/stats/ScatterWidget.h"
-#include "chart/model/ChartModel.h"
 
 #include <cmath>
 #include <algorithm>
+
+#include "chart/model/ChartModel.h"
 
 // ============================================================
 // 散点绘制与相关系数计算

@@ -9,6 +9,7 @@
  */
 
 #include "chart/stats/ScatterWidget.h"
+
 #include "chart/model/ChartModel.h"
 #include "core/theme/ThemeManager.h"
 

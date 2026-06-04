@@ -29,6 +29,17 @@ struct CanFrame {
     quint8 dlc = 0;         ///< 数据长度码(Data Length Code)
     bool error = false;     ///< true=错误帧
 
+    /** @brief CAN错误帧分类枚举 */
+    enum ErrorType : quint8 {
+        ErrorNone = 0,      ///< 无错误
+        BitError,           ///< 位错误: 发送的电平与监视的电平不一致
+        StuffError,         ///< 填充错误: 连续6个相同电平位(违反位填充规则)
+        CrcError,           ///< CRC错误: 接收端计算的CRC与收到的CRC不一致
+        FormError,          ///< 格式错误: 固定格式位域中出现非法位
+        AckError            ///< 应答错误: 发送端在ACK槽未检测到应答信号
+    };
+    ErrorType errorType = ErrorNone; ///< 错误帧分类(仅error=true时有效)
+
     /** @brief 根据CAN-FD DLC获取实际数据字节数 */
     static int dlcToBytes(int dlc) {
         switch (dlc) {
@@ -63,6 +74,10 @@ struct CanFrame {
 class CanFrameParser : public QObject {
     Q_OBJECT
 
+signals:
+    /** @brief CAN错误帧检测信号 @param frame 包含错误信息的CanFrame @param errorType 错误分类 */
+    void errorFrameDetected(const CanFrame& frame, CanFrame::ErrorType errorType);
+
 public:
     /** @brief 构造CAN帧解析器 @param parent 父QObject指针 */
     explicit CanFrameParser(QObject* parent = nullptr);
@@ -96,6 +111,18 @@ public:
     quint64 totalRtrFrames() const { return m_totalRtrFrames; }
     /** @brief 获取累计CRC校验错误数 */
     quint64 totalCrcErrors() const { return m_totalCrcErrors; }
+    /** @brief 获取累计CAN错误帧总数 */
+    quint64 totalErrorFrames() const { return m_totalErrorFrames; }
+    /** @brief 获取累计位错误数 */
+    quint64 totalBitErrors() const { return m_totalBitErrors; }
+    /** @brief 获取累计填充错误数 */
+    quint64 totalStuffErrors() const { return m_totalStuffErrors; }
+    /** @brief 获取累计CRC错误帧数 */
+    quint64 totalCrcFrameErrors() const { return m_totalCrcFrameErrors; }
+    /** @brief 获取累计格式错误数 */
+    quint64 totalFormErrors() const { return m_totalFormErrors; }
+    /** @brief 获取累计应答错误数 */
+    quint64 totalAckErrors() const { return m_totalAckErrors; }
     /** @brief 重置所有解析器统计计数器 */
     void resetParserStatistics();
 
@@ -104,6 +131,8 @@ private:
     static quint8 parseHexByte(const char* hex);
     /** @brief 解析数据区中所有十六进制字节 @param d 数据区指针 @param byteCount 要解析的字节数 @return 解析后的QByteArray */
     static QByteArray parseHexData(const char* d, int byteCount);
+    /** @brief 解析CAN错误帧数据，分类错误类型并发射信号 @param frame 接收到的错误帧引用 */
+    void parseErrorFrame(CanFrame& frame);
 
     DbcParser* m_dbcParser = nullptr;   ///< DBC解析器(延迟创建)
     QString m_dbcFilePath;              ///< DBC文件路径
@@ -117,6 +146,12 @@ private:
     quint64 m_totalFdFrames = 0;            ///< CAN-FD帧计数
     quint64 m_totalRtrFrames = 0;           ///< RTR帧计数
     quint64 m_totalCrcErrors = 0;           ///< CRC校验错误计数
+    quint64 m_totalErrorFrames = 0;         ///< CAN错误帧总数
+    quint64 m_totalBitErrors = 0;           ///< 位错误计数
+    quint64 m_totalStuffErrors = 0;         ///< 填充错误计数
+    quint64 m_totalCrcFrameErrors = 0;      ///< CRC错误帧计数(与协议层CRC校验错误区分)
+    quint64 m_totalFormErrors = 0;          ///< 格式错误计数
+    quint64 m_totalAckErrors = 0;           ///< 应答错误计数
 };
 
 #endif // CANFRAMEPARSER_H

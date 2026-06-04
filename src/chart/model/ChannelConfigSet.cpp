@@ -13,6 +13,7 @@
 #include "chart/model/ChannelConfig.h"
 
 #include <QJsonArray>
+
 #include <cmath>
 
 // ============================================================

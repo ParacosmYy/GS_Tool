@@ -10,12 +10,13 @@
  */
 
 #include "chart/stats/HistogramWidget.h"
-#include "chart/model/ChartModel.h"
 
 #include <QFile>
 #include <QTextStream>
 #include <algorithm>
 #include <cmath>
+
+#include "chart/model/ChartModel.h"
 
 /**
  * @brief 计算直方图分桶数据

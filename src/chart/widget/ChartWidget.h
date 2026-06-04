@@ -118,6 +118,8 @@ public:
     double renderFps() const { return m_renderFps; }
     /** @brief 导出图表为PNG截图 @param filePath 输出文件路径 @return 成功返回true */
     bool exportScreenshot(const QString& filePath);
+    /** @brief 查询当前主题的网格线颜色(通过ThemeManager SemanticColor::Border获取) @return 网格线QColor */
+    QColor gridColor() const;
     /** @brief 重置图表控件统计计数器 */
     void resetChartWidgetStatistics();
 };

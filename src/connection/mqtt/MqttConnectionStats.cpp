@@ -34,7 +34,7 @@ QDateTime MqttConnection::lastConnectTime() const { return m_lastConnectTime; }
 /** @brief 获取待发送队列大小 @return 队列中的消息数 */
 int MqttConnection::pendingQueueSize() const { return m_pendingQueue.size(); }
 
-/** @brief 重置所有统计计数器 */
+/** @brief 重置所有统计计数器(含重连统计) */
 void MqttConnection::resetStats()
 {
     m_totalPublishes = 0;
@@ -51,4 +51,7 @@ void MqttConnection::resetStats()
     m_qos2Count = 0;
     m_keepAliveSent = 0;
     m_lastConnectTime = QDateTime();
+    m_totalRetryAttempts = 0;
+    m_totalSuccessfulReconnects = 0;
+    m_totalRetryDelayMs = 0;
 }

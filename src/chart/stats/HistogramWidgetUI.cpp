@@ -10,8 +10,6 @@
  */
 
 #include "chart/stats/HistogramWidget.h"
-#include "chart/model/ChartModel.h"
-#include "core/theme/ThemeManager.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -21,6 +19,9 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QtCharts>
+
+#include "chart/model/ChartModel.h"
+#include "core/theme/ThemeManager.h"
 
 /** @brief 初始化整体布局 -- 工具栏+图表+统计摘要标签 */
 void HistogramWidget::setupUI()

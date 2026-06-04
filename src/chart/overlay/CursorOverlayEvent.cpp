@@ -7,9 +7,10 @@
  */
 
 #include "chart/overlay/CursorOverlay.h"
-#include "core/theme/ThemeManager.h"
 
 #include <QMouseEvent>
+
+#include "core/theme/ThemeManager.h"
 
 /**
  * @brief 事件过滤器主入口

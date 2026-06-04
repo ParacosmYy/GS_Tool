@@ -7,12 +7,14 @@
  */
 
 #include "chart/waterfall/WaterfallWidget.h"
-#include "core/theme/ThemeManager.h"
+
 #include <QPainter>
 #include <QPaintEvent>
 #include <QResizeEvent>
 #include <QMouseEvent>
 #include <QLinearGradient>
+
+#include "core/theme/ThemeManager.h"
 
 /** @brief 构造瀑布图控件，初始化鼠标追踪和滚动定时器 @param parent 父控件指针 */
 WaterfallWidget::WaterfallWidget(QWidget *parent)

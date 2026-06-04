@@ -24,6 +24,7 @@ ChartModel::ChartModel(QObject* parent)
     : QObject(parent)
     , m_refreshTimer(new QTimer(this))
 {
+    m_refreshTimer->setObjectName(QStringLiteral("chartModelRefreshTimer"));
     m_refreshTimer->setSingleShot(true);
     connect(m_refreshTimer, &QTimer::timeout,
             this, &ChartModel::onRefreshTick);

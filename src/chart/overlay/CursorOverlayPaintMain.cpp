@@ -11,14 +11,15 @@
  */
 
 #include "chart/overlay/CursorOverlay.h"
-#include "chart/model/ChartModel.h"
-#include "chart/zoom/ZoomController.h"
-#include "core/theme/ThemeManager.h"
 
 #include <QPainter>
 #include <QPaintEvent>
 #include <algorithm>
 #include <cmath>
+
+#include "chart/model/ChartModel.h"
+#include "chart/zoom/ZoomController.h"
+#include "core/theme/ThemeManager.h"
 
 // interpolateY 声明在 CursorOverlayPaint.cpp 的匿名命名空间中，
 // 此处重新定义供 drawDeltaPanel 使用。

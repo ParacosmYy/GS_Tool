@@ -14,13 +14,15 @@ enum MqttPacketType {
     PINGRESP = 13, DISCONNECT = 14
 };
 
-/** @brief 构造函数，初始化MQTT客户端 @param parent 父对象 */
+/** @brief 构造函数，初始化MQTT客户端(含重连定时器) @param parent 父对象 */
 MqttConnection::MqttConnection(QObject* parent)
     : IConnection(parent)
     , m_socket(new QTcpSocket(this))
     , m_keepAlive(new QTimer(this))
+    , m_retryTimer(new QTimer(this))
 {
     m_keepAlive->setInterval(m_keepAliveInterval * 1000);
+    m_retryTimer->setSingleShot(true); /* 单次触发，手动重启实现指数退避 */
     m_clientId = generateClientId();
 
     connect(m_socket, &QTcpSocket::readyRead,
@@ -31,6 +33,8 @@ MqttConnection::MqttConnection(QObject* parent)
             this, &MqttConnection::onSocketDisconnected);
     connect(m_keepAlive, &QTimer::timeout,
             this, &MqttConnection::onKeepAlive);
+    connect(m_retryTimer, &QTimer::timeout,
+            this, &MqttConnection::onRetryTimeout);
     connect(m_socket, &QTcpSocket::errorOccurred,
             this, [this](QAbstractSocket::SocketError err) {
         Q_UNUSED(err)
@@ -39,6 +43,8 @@ MqttConnection::MqttConnection(QObject* parent)
         m_state = ConnectionState::Error;
         emit stateChanged(m_state);
         emit errorOccurred(tr("MQTT连接失败: %1").arg(m_socket->errorString()));
+        /* 触发自动重连(如果启用) */
+        scheduleRetry();
     });
 }
 
@@ -73,10 +79,12 @@ bool MqttConnection::open()
     return true;
 }
 
-/** @brief 关闭MQTT连接，发送DISCONNECT报文后断开TCP */
+/** @brief 关闭MQTT连接，发送DISCONNECT报文后断开TCP，同时停止重连定时器 */
 void MqttConnection::close()
 {
     m_keepAlive->stop();
+    m_retryTimer->stop();         /* 停止可能正在等待的重连 */
+    m_currentRetryCount = 0;      /* 重置重试计数，close()是主动断开 */
     if (m_socket->state() == QAbstractSocket::ConnectedState) {
         if (m_state == ConnectionState::Connected) {
             qint64 w = m_socket->write(buildMqttPacket(DISCONNECT, {}));
@@ -127,6 +135,85 @@ void MqttConnection::connectToHost(const QString& host, int port)
 
 /** @brief 断开MQTT连接 */
 void MqttConnection::disconnectFromHost() { close(); }
+
+/** @brief 启用/禁用自动重连 @param enabled true=启用 */
+void MqttConnection::setAutoReconnect(bool enabled)
+{
+    m_autoReconnect = enabled;
+    if (!enabled) {
+        m_retryTimer->stop();
+        m_currentRetryCount = 0;
+    }
+}
+
+/** @brief 查询自动重连状态 @return true=已启用 */
+bool MqttConnection::autoReconnect() const { return m_autoReconnect; }
+
+/** @brief 设置最大重试次数 @param max 最大次数，0=无限重试 */
+void MqttConnection::setMaxRetries(int max) { m_maxRetries = qMax(0, max); }
+
+/** @brief 获取最大重试次数 @return 最大重试次数 */
+int MqttConnection::maxRetries() const { return m_maxRetries; }
+
+/** @brief 获取当前已重试次数 @return 重试计数 */
+int MqttConnection::currentRetryCount() const { return m_currentRetryCount; }
+
+/** @brief 获取累计重试次数 @return 累计重试计数 */
+quint64 MqttConnection::totalRetryAttempts() const { return m_totalRetryAttempts; }
+
+/** @brief 获取累计成功重连次数 @return 成功重连计数 */
+quint64 MqttConnection::totalSuccessfulReconnects() const { return m_totalSuccessfulReconnects; }
+
+/** @brief 获取平均重试延迟 @return 平均延迟(ms) */
+double MqttConnection::avgRetryDelayMs() const
+{
+    return m_totalRetryAttempts > 0
+        ? static_cast<double>(m_totalRetryDelayMs) / static_cast<double>(m_totalRetryAttempts)
+        : 0.0;
+}
+
+/** @brief 计算指数退避延迟(1s→2s→4s→8s→16s→30s→30s...) @return 延迟时间(ms) */
+qint64 MqttConnection::computeBackoffDelay() const
+{
+    /* 指数增长: delay = min(kMinRetryDelayMs * 2^retryCount, kMaxRetryDelayMs) */
+    qint64 delay = kMinRetryDelayMs;
+    for (int i = 0; i < m_currentRetryCount; ++i) {
+        delay *= 2;
+        if (delay >= kMaxRetryDelayMs) {
+            delay = kMaxRetryDelayMs;
+            break;
+        }
+    }
+    return delay;
+}
+
+/** @brief 安排下一次重连尝试(指数退避) */
+void MqttConnection::scheduleRetry()
+{
+    if (!m_autoReconnect || m_host.isEmpty()) {
+        return;
+    }
+    /* 检查是否超过最大重试次数 */
+    if (m_maxRetries > 0 && m_currentRetryCount >= m_maxRetries) {
+        emit errorOccurred(tr("MQTT重连失败: 已达到最大重试次数(%1)").arg(m_maxRetries));
+        return;
+    }
+    ++m_currentRetryCount;
+    m_currentRetryDelayMs = computeBackoffDelay();
+    m_totalRetryDelayMs += m_currentRetryDelayMs;
+    ++m_totalRetryAttempts;
+    m_retryTimer->start(static_cast<int>(m_currentRetryDelayMs));
+    emit retryScheduled(m_currentRetryCount, m_currentRetryDelayMs);
+}
+
+/** @brief 重连定时器回调，执行指数退避重连 */
+void MqttConnection::onRetryTimeout()
+{
+    if (!m_autoReconnect || m_host.isEmpty()) {
+        return;
+    }
+    open();
+}
 
 // publish/subscribe/unsubscribe/onSocket*/onKeepAlive/sendConnect 见 MqttConnectionProtocol.cpp
 // 队列/LWT方法见 MqttConnectionQueue.cpp

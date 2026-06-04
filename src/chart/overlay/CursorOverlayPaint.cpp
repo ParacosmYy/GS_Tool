@@ -15,9 +15,6 @@
  */
 
 #include "chart/overlay/CursorOverlay.h"
-#include "chart/model/ChartModel.h"
-#include "chart/zoom/ZoomController.h"
-#include "core/theme/ThemeManager.h"
 
 #include <QPainter>
 #include <QPaintEvent>
@@ -25,6 +22,10 @@
 #include <QChart>
 #include <algorithm>
 #include <cmath>
+
+#include "chart/model/ChartModel.h"
+#include "chart/zoom/ZoomController.h"
+#include "core/theme/ThemeManager.h"
 
 // ============================================================
 // 游标竖线绘制
