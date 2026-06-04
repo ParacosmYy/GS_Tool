@@ -72,4 +72,6 @@ void JLinkRttConnection::resetRttStatistics()
     m_totalBytesRead = 0;
     m_totalBytesWritten = 0;
     m_errorCount = 0;
+    m_totalConnectionAttempts = 0;
+    m_totalBufferOverflows = 0;
 }

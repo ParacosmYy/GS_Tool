@@ -99,6 +99,12 @@ public:
     quint64 totalCalculations() const;
     /** @brief 获取累计处理字节数 */
     quint64 totalBytesProcessed() const;
+    /** @brief 获取累计自定义CRC计算次数 @return 自定义CRC调用总次数 */
+    quint64 totalCustomCalculations() const { return m_totalCustomCalculations; }
+    /** @brief 获取累计批量计算(calculateAll)调用次数 @return 批量计算总次数 */
+    quint64 totalCalculateAllCalls() const { return m_totalCalculateAllCalls; }
+    /** @brief 获取指定算法的累计计算次数 @param alg 算法枚举 @return 该算法计算总次数 */
+    quint64 totalComputationsByAlgorithm(Algorithm alg) const;
     /** @brief 重置所有校验和统计计数器 */
     void resetChecksumStatistics();
 
@@ -107,6 +113,12 @@ private:
     mutable quint64 m_totalCalculations = 0;
     /** @brief 累计处理字节数 */
     mutable quint64 m_totalBytesProcessed = 0;
+    /** @brief 累计自定义CRC计算次数 */
+    mutable quint64 m_totalCustomCalculations = 0;
+    /** @brief 累计批量计算(calculateAll)调用次数 */
+    mutable quint64 m_totalCalculateAllCalls = 0;
+    /** @brief 按算法统计计算次数，索引为Algorithm枚举值 */
+    mutable QMap<int, quint64> m_algorithmCounts;
 };
 
 #endif // CHECKSUMCALCULATOR_H

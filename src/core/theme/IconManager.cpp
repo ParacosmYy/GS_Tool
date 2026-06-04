@@ -87,6 +87,7 @@ QIcon IconManager::icon(const QString& name) const
     QIcon ico;
     QSvgRenderer renderer(svgData);
     for (int sz : {16, 20, 24, 48}) {
+        ++m_totalSvgRenders; ///< 统计: SVG渲染递增
         QPixmap pm(sz, sz);
         pm.fill(Qt::transparent);
         QPainter p(&pm);
@@ -130,6 +131,7 @@ QPixmap IconManager::pixmap(const QString& name, int size,
     QPixmap pm(size, size);
     pm.fill(Qt::transparent);
     QSvgRenderer renderer(svgData);
+    ++m_totalSvgRenders; ///< 统计: SVG渲染递增
     QPainter p(&pm);
     renderer.render(&p);
 
@@ -140,6 +142,7 @@ QPixmap IconManager::pixmap(const QString& name, int size,
 /** @brief 清空全部缓存，主题切换时由信号触发 */
 void IconManager::clearCache()
 {
+    ++m_totalCacheClears; ///< 统计: 缓存清空递增
     m_iconCache.clear();
     m_pixmapCache.clear();
 }
@@ -176,4 +179,6 @@ void IconManager::resetIconStatistics()
     m_totalLoads = 0;
     m_totalCacheHits = 0;
     m_totalCacheMisses = 0;
+    m_totalSvgRenders = 0;
+    m_totalCacheClears = 0;
 }

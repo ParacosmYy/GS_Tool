@@ -94,6 +94,12 @@ public:
     /** @brief 获取累计错误次数 */
     quint64 rttErrorCount() const;
 
+    /** @brief 获取累计连接尝试次数 @return 连接尝试总次数 */
+    quint64 totalConnectionAttempts() const { return m_totalConnectionAttempts; }
+
+    /** @brief 获取累计缓冲区溢出次数(写入时通道缓冲满) @return 溢出总次数 */
+    quint64 totalBufferOverflows() const { return m_totalBufferOverflows; }
+
     /** @brief 重置 RTT 统计计数器为初始值 */
     void resetRttStatistics();
 
@@ -109,6 +115,8 @@ private:
     quint64 m_totalBytesRead = 0;       ///< 累计读取字节总数
     quint64 m_totalBytesWritten = 0;    ///< 累计写入字节总数
     quint64 m_errorCount = 0;           ///< 累计错误次数
+    quint64 m_totalConnectionAttempts = 0; ///< 累计连接尝试次数
+    quint64 m_totalBufferOverflows = 0;    ///< 累计缓冲区溢出次数
 };
 
 #endif // JLINKRTTCONNECTION_H

@@ -125,6 +125,12 @@ ConverterPanel::ConverterPanel(QWidget *parent)
             this, &ConverterPanel::onClearHistory);
     connect(m_historyList, &QListWidget::itemClicked,
             this, &ConverterPanel::onHistorySelected);
+
+    // 统计: 格式下拉框切换计数
+    connect(m_fromCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalFormatSwitches; });
+    connect(m_toCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalFormatSwitches; });
 }
 
 /**

@@ -22,6 +22,7 @@ quint64 ChecksumCalculator::calculate(const QByteArray &data, Algorithm alg) con
 
     ++m_totalCalculations;
     m_totalBytesProcessed += static_cast<quint64>(data.size());
+    ++m_algorithmCounts[static_cast<int>(alg)]; ///< 统计: 按算法计数递增
 
     switch (alg) {
     case CRC8: {
@@ -172,6 +173,11 @@ quint64 ChecksumCalculator::calculateCustom(const QByteArray &data, quint64 poly
     if (data.isEmpty() || polynomial == 0) {
         return 0;
     }
+
+    ++m_totalCustomCalculations; ///< 统计: 自定义CRC计算递增
+    ++m_totalCalculations;
+    m_totalBytesProcessed += static_cast<quint64>(data.size());
+    ++m_algorithmCounts[static_cast<int>(CustomCrc)];
 
     quint64 mask = (width == 8) ? 0xFF : (width == 16) ? 0xFFFF : 0xFFFFFFFF;
     quint64 crc = mask;

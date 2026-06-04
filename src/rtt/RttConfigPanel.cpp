@@ -138,6 +138,7 @@ void RttConfigPanel::onFormValueChanged()
 /** @brief 保存RTT配置到QSettings @param settings QSettings对象 */
 void RttConfigPanel::saveSettings(QSettings& settings) const
 {
+    ++m_totalSettingsSaves; ///< 统计: 配置保存递增
     settings.setValue(QStringLiteral("rtt/device"),
                      m_deviceCombo->currentText());
     settings.setValue(QStringLiteral("rtt/interface"),
@@ -151,6 +152,7 @@ void RttConfigPanel::saveSettings(QSettings& settings) const
 /** @brief 从QSettings加载RTT配置并更新各控件 @param settings QSettings对象 */
 void RttConfigPanel::loadSettings(QSettings& settings)
 {
+    ++m_totalSettingsLoads; ///< 统计: 配置加载递增
     const QString device = settings.value(
         QStringLiteral("rtt/device")).toString();
     if (!device.isEmpty()) {
@@ -202,4 +204,6 @@ void RttConfigPanel::resetConfigStatistics()
     m_totalConfigChanges = 0;
     m_totalConnectRequests = 0;
     m_totalDisconnectRequests = 0;
+    m_totalSettingsSaves = 0;
+    m_totalSettingsLoads = 0;
 }

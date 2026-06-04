@@ -69,6 +69,12 @@ public:
     /** @brief 获取累计断开请求次数 */
     quint64 totalDisconnectRequests() const;
 
+    /** @brief 获取累计配置保存次数 @return 保存次数 */
+    quint64 totalSettingsSaves() const { return m_totalSettingsSaves; }
+
+    /** @brief 获取累计配置加载次数 @return 加载次数 */
+    quint64 totalSettingsLoads() const { return m_totalSettingsLoads; }
+
     /** @brief 重置所有统计计数器归零 */
     void resetConfigStatistics();
 
@@ -88,6 +94,8 @@ private:
     quint64 m_totalConfigChanges = 0;       ///< 累计配置变更次数
     quint64 m_totalConnectRequests = 0;     ///< 累计连接请求次数
     quint64 m_totalDisconnectRequests = 0;  ///< 累计断开请求次数
+    mutable quint64 m_totalSettingsSaves = 0;  ///< 累计配置保存次数(saveSettings为const)
+    quint64 m_totalSettingsLoads = 0;          ///< 累计配置加载次数
 };
 
 #endif // RTTCONFIGPANEL_H

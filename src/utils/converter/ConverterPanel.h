@@ -60,7 +60,13 @@ public:
     /** @brief 获取累计转换错误次数 @return 错误次数 */
     quint64 totalErrors() const { return m_totalErrors; }
 
-    /** @brief 重置所有转换器统计计数器(转换次数/复制次数/格式交换/输入变更/错误) */
+    /** @brief 获取累计格式下拉框切换次数(源/目标格式变更) @return 格式切换总次数 */
+    quint64 totalFormatSwitches() const { return m_totalFormatSwitches; }
+
+    /** @brief 获取累计剪贴板操作次数(复制到剪贴板) @return 剪贴板操作总次数 */
+    quint64 totalClipboardOps() const { return m_totalClipboardOps; }
+
+    /** @brief 重置所有转换器统计计数器(转换次数/复制次数/格式交换/输入变更/错误/格式切换/剪贴板) */
     void resetStatistics();
 
 private slots:
@@ -107,6 +113,8 @@ private:
     quint64 m_totalFormatSwaps = 0;    ///< 累计格式交换次数
     quint64 m_totalInputChanges = 0;   ///< 累计输入内容变更次数
     quint64 m_totalErrors = 0;         ///< 累计转换错误次数
+    quint64 m_totalFormatSwitches = 0; ///< 累计格式下拉框切换次数
+    quint64 m_totalClipboardOps = 0;   ///< 累计剪贴板操作次数
 };
 
 #endif // CONVERTERPANEL_H

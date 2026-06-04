@@ -77,6 +77,7 @@ void ConverterPanel::onSwap()
 void ConverterPanel::onCopy()
 {
     ++m_totalCopyActions;
+    ++m_totalClipboardOps; ///< 统计: 剪贴板操作递增
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(m_outputEdit->toPlainText());
 }
@@ -111,4 +112,6 @@ void ConverterPanel::resetStatistics()
     m_totalFormatSwaps = 0;
     m_totalInputChanges = 0;
     m_totalErrors = 0;
+    m_totalFormatSwitches = 0;
+    m_totalClipboardOps = 0;
 }

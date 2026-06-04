@@ -82,6 +82,8 @@ bool JLinkRttConnection::open()
         return true;
     }
 
+    ++m_totalConnectionAttempts; ///< 统计: 连接尝试递增
+
     // 步骤 1: 确保 SDK 已加载
     if (!m_sdkLoader->isLoaded()) {
         if (!m_sdkLoader->load()) {
@@ -176,6 +178,9 @@ qint64 JLinkRttConnection::write(const QByteArray& data)
     }
 
     m_totalBytesWritten += static_cast<quint64>(written);
+    if (written < data.size()) {
+        ++m_totalBufferOverflows; ///< 统计: 写入不完整时缓冲区溢出递增
+    }
     emit bytesWritten(written);
     return written;
 }

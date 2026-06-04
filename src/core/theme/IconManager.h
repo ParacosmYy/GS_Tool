@@ -70,6 +70,12 @@ public:
     /** @brief 获取当前缓存条目数量 @return 缓存大小 */
     quint64 cacheSize() const;
 
+    /** @brief 获取累计SVG渲染次数(QSvgRenderer渲染调用) @return 渲染总次数 */
+    quint64 totalSvgRenders() const { return m_totalSvgRenders; }
+
+    /** @brief 获取累计缓存清空次数(主题切换触发) @return 清空总次数 */
+    quint64 totalCacheClears() const { return m_totalCacheClears; }
+
     /** @brief 重置所有图标管理统计计数器为零 */
     void resetIconStatistics();
 
@@ -95,6 +101,8 @@ private:
     mutable quint64 m_totalLoads = 0;       ///< 图标加载总次数(含缓存未命中时的实际加载)
     mutable quint64 m_totalCacheHits = 0;   ///< 缓存命中总次数
     mutable quint64 m_totalCacheMisses = 0; ///< 缓存未命中总次数
+    mutable quint64 m_totalSvgRenders = 0;  ///< SVG渲染总次数(QSvgRenderer.render调用)
+    mutable quint64 m_totalCacheClears = 0; ///< 缓存清空总次数(主题切换触发)
 };
 
 #endif // ICON_MANAGER_H

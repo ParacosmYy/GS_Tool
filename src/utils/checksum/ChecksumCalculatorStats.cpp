@@ -68,6 +68,7 @@ QString ChecksumCalculator::algorithmDescription(Algorithm alg)
 /** @brief 使用所有内置算法计算同一份数据的校验和 @param data 待计算的字节数据 @return 算法名称到校验结果的映射表 */
 QMap<QString, quint64> ChecksumCalculator::calculateAll(const QByteArray& data) const
 {
+    ++m_totalCalculateAllCalls; ///< 统计: 批量计算调用递增
     QMap<QString, quint64> results;
     const QList<Algorithm> algorithms = {
         CRC8, CRC16Ccitt, CRC16Modbus, CRC16Kermit,
@@ -91,9 +92,18 @@ quint64 ChecksumCalculator::totalBytesProcessed() const
     return m_totalBytesProcessed;
 }
 
-/** @brief 重置所有校验和统计计数器(计算次数和处理字节数归零) */
+/** @brief 获取指定算法的累计计算次数 @param alg 算法枚举 @return 该算法的计算总次数，未使用过返回0 */
+quint64 ChecksumCalculator::totalComputationsByAlgorithm(Algorithm alg) const
+{
+    return m_algorithmCounts.value(static_cast<int>(alg), 0);
+}
+
+/** @brief 重置所有校验和统计计数器(计算次数/字节数/自定义次数/批量次数/按算法计数归零) */
 void ChecksumCalculator::resetChecksumStatistics()
 {
     m_totalCalculations = 0;
     m_totalBytesProcessed = 0;
+    m_totalCustomCalculations = 0;
+    m_totalCalculateAllCalls = 0;
+    m_algorithmCounts.clear();
 }

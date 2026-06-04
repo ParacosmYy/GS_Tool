@@ -46,6 +46,7 @@ set(SOURCES
     src/core/connect/ConnectionControllerQuery.cpp
     src/core/connect/ConnectionControllerReconnect.cpp
     src/core/connect/ConnectionControllerHandlers.cpp
+    src/core/connect/ConnectionControllerTeardown.cpp
     src/core/connect/ConnectionPresetBuilder.cpp
     src/core/recording/RecordingController.cpp
     src/core/recording/RecordingControllerStats.cpp
@@ -139,6 +140,7 @@ set(SOURCES
     src/terminal/model/TerminalModelStats.cpp
     src/terminal/search/TerminalSearchBar.cpp
     src/terminal/search/TerminalSearchBarHistory.cpp
+    src/terminal/search/TerminalSearchBarAnimation.cpp
     src/terminal/types/DirectionFilter.cpp
     src/terminal/layout/TerminalLayoutManager.cpp
     src/terminal/layout/TerminalLayoutManagerStats.cpp
@@ -185,6 +187,7 @@ set(SOURCES
     src/protocol/editor/FrameVisualEditor.cpp
     src/protocol/editor/FrameVisualEditorFields.cpp
     src/protocol/editor/FrameVisualEditorUI.cpp
+    src/protocol/editor/FrameVisualEditorUIConnect.cpp
     src/protocol/hex/IntelHexParser.cpp
     src/protocol/hex/IntelHexParserStats.cpp
     src/protocol/hex/IntelHexParserRecord.cpp
@@ -216,6 +219,7 @@ set(SOURCES
     src/chart/overlay/CursorOverlay.cpp
     src/chart/overlay/CursorOverlayEvent.cpp
     src/chart/overlay/CursorOverlayPaint.cpp
+    src/chart/overlay/CursorOverlayPaintMain.cpp
     src/chart/overlay/CursorOverlayInteraction.cpp
     src/chart/zoom/ZoomController.cpp
     src/chart/zoom/ZoomControllerQuery.cpp
@@ -257,6 +261,7 @@ set(SOURCES
     src/ota/protocols/zmodem/ZModemTransferFrames.cpp
     src/ota/protocols/zmodem/ZModemTransferFrames.cpp
     src/ota/protocols/zmodem/ZModemTransferProtocol.cpp
+    src/ota/protocols/zmodem/ZModemTransferDispatch.cpp
     src/utils/settings/SettingsManager.cpp
     src/utils/settings/SettingsManagerConvenience.cpp
     src/utils/settings/SettingsManagerGroups.cpp
@@ -265,6 +270,7 @@ set(SOURCES
     src/utils/export/DataExporterUtils.cpp
     src/utils/export/DataExporterStats.cpp
     src/utils/export/DataExporterStreamed.cpp
+    src/utils/export/DataExporterStreamedFormats.cpp
     src/utils/export/DataExporterEdl.cpp
     src/utils/aggregator/DataAggregator.cpp
     src/utils/aggregator/DataAggregatorCompute.cpp
