@@ -159,6 +159,7 @@ set(SOURCES
     src/chart/stats/HistogramWidget.cpp
     src/chart/stats/HistogramWidgetStats.cpp
     src/chart/stats/ScatterWidget.cpp
+    src/chart/stats/ScatterWidgetCompute.cpp
     src/chart/stats/ScatterWidgetStats.cpp
     src/ota/manager/OtaManager.cpp
     src/ota/manager/OtaManagerFileOps.cpp
@@ -268,6 +269,7 @@ set(SOURCES
 
     # ── F11: 插件系统 ──
     src/plugin/PluginManager.cpp
+    src/plugin/PluginManagerScan.cpp
     src/plugin/PluginApi.cpp
     src/plugin/PluginConfigPanel.cpp
 
@@ -279,6 +281,7 @@ set(SOURCES
     src/connection/ble/BleGattModelQuery.cpp
     src/connection/ble/BleGattBrowser.cpp
     src/connection/ble/BleGattBrowserServices.cpp
+    src/connection/ble/BleGattBrowserDisplay.cpp
     src/connection/ble/BleConfigPanel.cpp
     src/connection/ble/BluetoothAtConsole.cpp
 
