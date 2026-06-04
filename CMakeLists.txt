@@ -726,6 +726,11 @@ set(HEADERS
     src/core/settings/SessionManager.h
     src/core/managers/ShortcutManager.h
     src/core/layout/ResponsiveLayout.h
+
+    # ── 数据历史环形缓冲区 ──
+    src/core/data/DataHistoryBuffer.h
+    src/core/data/DataHistoryBuffer.ipp
+
     src/connection/interface/IConnection.h
     src/connection/serial_port/SerialConnection.h
     src/connection/network/TcpConnection.h
@@ -969,11 +974,17 @@ set(HEADERS
     # ── F29: 协议定时分析器 ──
     src/utils/protocol_timer/ProtocolTimerWidget.h
 
+    # ── 波形模式检测 ──
+    src/core/analysis/WaveformPatternDetector.h
+
     # ── F33: 设备配置档案管理 ──
     src/core/settings/ConfigProfileManager.h
 
     # ── 数据流过滤器 ──
     src/core/filter/DataStreamFilter.h
+
+    # ── 连接配置档案 ──
+    src/core/profiles/ConnectionProfileManager.h
 
     # ── 协议响应模拟器 ──
     src/protocol/simulator/ProtocolSimulator.h
