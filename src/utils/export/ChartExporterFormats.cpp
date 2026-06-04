@@ -1,21 +1,17 @@
 /**
  * @file ChartExporterFormats.cpp
- * @brief 图表导出器 —— 数据格式导出方法实现
+ * @brief 图表导出器 —— CSV数据格式导出方法实现
  *
- * 包含 CSV / JSON 两种数据格式的具体导出逻辑。
- * PNG / SVG 图片导出已移至 ChartExporterImage.cpp。
- * 从 ChartExporter.cpp 拆分而来，便于按格式独立维护。
+ * 包含 CSV 格式的具体导出逻辑。
+ * JSON 导出见 ChartExporterJson.cpp。
+ * PNG / SVG 图片导出见 ChartExporterImage.cpp。
  */
 
 #include "utils/export/ChartExporter.h"
 #include "chart/model/ChartModel.h"
 
 #include <QFile>
-#include <QFileInfo>
 #include <QTextStream>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
 
 // ---------------------------------------------------------------------------
 // CSV 导出（ChartModel 版本）
@@ -143,70 +139,4 @@ bool ChartExporter::exportToCsv(const QString& filePath,
     return true;
 }
 
-// ---------------------------------------------------------------------------
-// JSON 导出
-// ---------------------------------------------------------------------------
-
-/**
- * @brief 导出多通道数据为 JSON 文件
- *
- * 输出格式为 JSON 数组，每个元素为对象：
- * {"timestamp": 0, "CH1": 1.23, "CH2": 4.56, ...}
- *
- * @param filePath     目标文件路径
- * @param channelNames 通道名称列表
- * @param data         各通道采样数据
- * @return true 写入成功
- */
-bool ChartExporter::exportToJson(const QString& filePath,
-                                 const QStringList& channelNames,
-                                 const QList<QList<double>>& data)
-{
-    if (channelNames.isEmpty() || data.isEmpty()) {
-        ++m_totalErrors;
-        ++m_totalExportErrors;
-        emit exportFailed(tr("导出数据为空"));
-        return false;
-    }
-
-    /* --- 确定最大行数 --- */
-    int maxRows = 0;
-    for (const auto& ch : data) {
-        maxRows = qMax(maxRows, ch.size());
-    }
-
-    /* --- 构建 JSON 数组 --- */
-    QJsonArray rootArray;
-    for (int row = 0; row < maxRows; ++row) {
-        QJsonObject rowObj;
-        rowObj["timestamp"] = row;
-
-        for (int ch = 0; ch < channelNames.size(); ++ch) {
-            if (row < data[ch].size()) {
-                rowObj[channelNames[ch]] = data[ch][row];
-            } else {
-                rowObj[channelNames[ch]] = QJsonValue::Null;
-            }
-        }
-        rootArray.append(rowObj);
-    }
-
-    /* --- 写文件 --- */
-    QJsonDocument doc(rootArray);
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        ++m_totalErrors;
-        ++m_totalExportErrors;
-        emit exportFailed(tr("无法打开文件: %1").arg(filePath));
-        return false;
-    }
-
-    file.write(doc.toJson(QJsonDocument::Indented));
-    file.close();
-
-    ++m_totalExports;
-    m_totalCsvRows += static_cast<quint64>(maxRows);
-    m_totalBytesExported += static_cast<quint64>(file.size());
-    emit exportCompleted(filePath);
-    return true;
-}
+// JSON 导出见 ChartExporterJson.cpp

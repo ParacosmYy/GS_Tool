@@ -88,8 +88,14 @@ public:
     static quint64 totalDialogOpens() { return s_totalDialogOpens; }
     /** @brief 获取对话框总关闭次数 */
     static quint64 totalDialogCloses() { return s_totalDialogCloses; }
+    /** @brief 获取确认对话框总调用次数 */
+    static quint64 totalConfirmCalls() { return s_totalConfirmCalls; }
+    /** @brief 获取警告对话框总调用次数 */
+    static quint64 totalWarningCalls() { return s_totalWarningCalls; }
+    /** @brief 获取错误对话框总调用次数 */
+    static quint64 totalErrorCalls() { return s_totalErrorCalls; }
     /** @brief 重置所有统计计数器 */
-    static void resetDialogStatistics() { s_totalDialogOpens = 0; s_totalDialogCloses = 0; }
+    static void resetDialogStatistics();
 
 protected:
     /** @brief 自绘: 背景圆角 + 左侧强调色边框 + 图标 */
@@ -128,6 +134,9 @@ private:
     // ── 统计计数器(static inline，因为静态工厂模式创建临时实例) ──
     static inline quint64 s_totalDialogOpens = 0;   ///< 对话框总打开次数
     static inline quint64 s_totalDialogCloses = 0;  ///< 对话框总关闭次数
+    static inline quint64 s_totalConfirmCalls = 0;  ///< 确认对话框总调用次数
+    static inline quint64 s_totalWarningCalls = 0;  ///< 警告对话框总调用次数
+    static inline quint64 s_totalErrorCalls = 0;    ///< 错误对话框总调用次数
 };
 
 #endif // EDDIALOG_H

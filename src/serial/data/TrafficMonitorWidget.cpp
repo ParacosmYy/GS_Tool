@@ -80,6 +80,9 @@ void TrafficMonitorWidget::onRateUpdated(double rxRate, double txRate)
     ++m_totalRateUpdates;
     if (rxRate > m_peakRxRate) m_peakRxRate = rxRate;
     if (txRate > m_peakTxRate) m_peakTxRate = txRate;
+    /* 累计字节估算: 速率(bytes/s) * 采样间隔(1s) */
+    m_totalBytesRx += static_cast<quint64>(rxRate);
+    m_totalBytesTx += static_cast<quint64>(txRate);
     m_rxRateLabel->setText(tr("RX: %1").arg(formatRate(rxRate)));
     m_txRateLabel->setText(tr("TX: %1").arg(formatRate(txRate)));
 }
@@ -139,4 +142,6 @@ void TrafficMonitorWidget::resetTrafficWidgetStatistics()
     m_peakRxRate = 0.0;
     m_peakTxRate = 0.0;
     m_totalMonitorUpdates = 0;
+    m_totalBytesRx = 0;
+    m_totalBytesTx = 0;
 }

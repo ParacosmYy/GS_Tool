@@ -8,6 +8,7 @@
 
 #include "chart/heatmap/HeatmapWidget.h"
 
+#include "core/theme/ThemeManager.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <cmath>
@@ -23,7 +24,7 @@ void HeatmapWidget::paintEvent(QPaintEvent *event)
     if (m_hoverRow >= 0 && m_hoverRow < m_data.size()) {
         auto &row = m_data[m_hoverRow];
         if (m_hoverCol >= 0 && m_hoverCol < row.size()) {
-            p.setPen(QPen(Qt::white, 2));
+            p.setPen(QPen(ThemeManager::instance().color(ThemeManager::SemanticColor::TextPrimary), 2));
             p.drawRect(m_hoverCol * m_cellSize, m_hoverRow * m_cellSize, m_cellSize, m_cellSize);
         }
     }
@@ -45,7 +46,9 @@ void HeatmapWidget::updatePixmap()
             p.fillRect(c * m_cellSize, r * m_cellSize, m_cellSize, m_cellSize, color);
             ++cellsThisUpdate;
             if (m_showValues && m_cellSize >= 20) {
-                p.setPen(color.lightnessF() > 0.5 ? Qt::black : Qt::white);
+                p.setPen(color.lightnessF() > 0.5
+                    ? ThemeManager::instance().color(ThemeManager::SemanticColor::BgPrimary)
+                    : ThemeManager::instance().color(ThemeManager::SemanticColor::TextPrimary));
                 p.setFont(font());
                 p.drawText(QRect(c * m_cellSize, r * m_cellSize, m_cellSize, m_cellSize),
                     Qt::AlignCenter, formatValue(m_data[r][c]));

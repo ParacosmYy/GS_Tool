@@ -99,6 +99,7 @@ void EdDialog::closeWithAnimation()
 bool EdDialog::confirm(QWidget* parent, const QString& title,
                        const QString& description)
 {
+    ++s_totalConfirmCalls;
     EdDialog dlg(parent, title, description, DialogType::Confirm);
     int result = dlg.exec();
     return result == QDialog::Accepted;
@@ -116,6 +117,7 @@ bool EdDialog::confirm(QWidget* parent, const QString& title,
 void EdDialog::warning(QWidget* parent, const QString& title,
                        const QString& description)
 {
+    ++s_totalWarningCalls;
     EdDialog dlg(parent, title, description, DialogType::Warning);
     dlg.exec();
 }
@@ -132,6 +134,17 @@ void EdDialog::warning(QWidget* parent, const QString& title,
 void EdDialog::error(QWidget* parent, const QString& title,
                      const QString& description)
 {
+    ++s_totalErrorCalls;
     EdDialog dlg(parent, title, description, DialogType::Error);
     dlg.exec();
+}
+
+/** @brief 重置所有对话框统计计数器为零 */
+void EdDialog::resetDialogStatistics()
+{
+    s_totalDialogOpens = 0;
+    s_totalDialogCloses = 0;
+    s_totalConfirmCalls = 0;
+    s_totalWarningCalls = 0;
+    s_totalErrorCalls = 0;
 }

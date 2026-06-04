@@ -7,6 +7,7 @@
  */
 
 #include "chart/waterfall/WaterfallWidget.h"
+#include "core/theme/ThemeManager.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QResizeEvent>
@@ -45,7 +46,7 @@ void WaterfallWidget::addSpectrum(const QVector<double> &spectrum)
     // Draw new line at bottom
     if (m_waterfall.isNull()) {
         m_waterfall = QPixmap(width(), m_maxLines);
-        m_waterfall.fill(Qt::black);
+        m_waterfall.fill(ThemeManager::instance().color(ThemeManager::SemanticColor::BgPrimary));
     }
     QPainter p(&m_waterfall);
     int y = m_currentLine % m_maxLines;
@@ -109,8 +110,8 @@ void WaterfallWidget::paintEvent(QPaintEvent *event)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing, false);
     if (m_waterfall.isNull()) {
-        p.fillRect(rect(), Qt::black);
-        p.setPen(Qt::gray);
+        p.fillRect(rect(), ThemeManager::instance().color(ThemeManager::SemanticColor::BgPrimary));
+        p.setPen(ThemeManager::instance().color(ThemeManager::SemanticColor::TextMuted));
         p.drawText(rect(), Qt::AlignCenter, tr("无数据"));
         return;
     }

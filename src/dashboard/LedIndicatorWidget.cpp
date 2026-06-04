@@ -13,13 +13,19 @@
 #include <QRadialGradient>
 #include "core/theme/ThemeManager.h"
 
+/** @brief 获取默认LED颜色(使用主题 Success 语义色) @return 默认绿色 */
+static QColor defaultLedColor()
+{
+    return ThemeManager::instance().color(ThemeManager::SemanticColor::Success);
+}
+
 /**
  * @brief 构造函数
  * @param parent 父控件
  */
 LedIndicatorWidget::LedIndicatorWidget(QWidget *parent)
     : QWidget(parent)
-    , m_color(Qt::green)
+    , m_color(defaultLedColor())
 {
     setObjectName("LedIndicatorWidget");
 }

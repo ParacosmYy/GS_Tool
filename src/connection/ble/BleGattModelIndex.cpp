@@ -15,6 +15,7 @@
  */
 
 #include "connection/ble/BleGattModel.h"
+#include "core/theme/ThemeManager.h"
 
 // ============================================================
 // QAbstractItemModel 核心接口实现
@@ -43,10 +44,10 @@ QVariant BleGattModel::data(const QModelIndex& index, int role) const
         }
     }
 
-    // 前景颜色角色: 值列有内容时用蓝色高亮
+    // 前景颜色角色: 值列有内容时使用主题 Accent 色高亮
     if (role == Qt::ForegroundRole && index.column() == ColValue) {
         if (!node->value.isEmpty()) {
-            return QColor(Qt::darkCyan);
+            return ThemeManager::instance().color(ThemeManager::SemanticColor::Accent);
         }
     }
 

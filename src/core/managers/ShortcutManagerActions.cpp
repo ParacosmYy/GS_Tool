@@ -94,6 +94,8 @@ void ShortcutManager::resetShortcutStatistics()
 {
     m_totalRegistrations = 0;
     m_totalTriggers = 0;
+    m_totalUnregistrations = 0;
+    m_totalConflictsDetected = 0;
     for (auto it = m_shortcuts.begin(); it != m_shortcuts.end(); ++it)
         it->triggerCount = 0;
 }

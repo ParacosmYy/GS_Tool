@@ -88,7 +88,7 @@ void ChartWidget::onChannelsChanged()
         || ThemeManager::instance().currentTheme().contains("dark");
     QVector<QColor> palette = ChartColors::colorsForTheme(isDark);
     if (palette.isEmpty()) {
-        palette = {Qt::cyan};  // 降级回退色，防止除零崩溃
+        palette = {ThemeManager::instance().color(ThemeManager::SemanticColor::Accent)};  // 降级回退色，防止除零崩溃
     }
 
     // ---- 降级路径: m_configSet 尚未配置时，直接从 model 获取通道名 ----

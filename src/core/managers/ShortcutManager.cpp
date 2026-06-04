@@ -61,6 +61,7 @@ bool ShortcutManager::registerShortcut(const QString& id, const QKeySequence& ke
     }
     // 按键冲突检查
     if (isKeyOccupied(key)) {
+        ++m_totalConflictsDetected;
         return false;
     }
 
@@ -107,6 +108,7 @@ void ShortcutManager::unregisterShortcut(const QString& id)
     if (it->shortcut) delete it->shortcut;
     m_shortcuts.erase(it);
     m_customizedIds.remove(id);
+    ++m_totalUnregistrations;
 }
 
 // ─── 修改绑定 ────────────────────────────────────────────

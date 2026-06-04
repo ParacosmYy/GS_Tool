@@ -92,6 +92,10 @@ public:
     quint64 totalRegistrations() const;
     /// @brief 触发总次数
     quint64 totalTriggers() const;
+    /// @brief 注销总次数
+    quint64 totalUnregistrations() const { return m_totalUnregistrations; }
+    /// @brief 冲突检测总次数(按键已被占用时触发)
+    quint64 totalConflictsDetected() const { return m_totalConflictsDetected; }
     /// @brief 重置所有统计计数器
     void resetShortcutStatistics();
 
@@ -141,8 +145,10 @@ private:
     QSet<QString> m_customizedIds;                  ///< 用户自定义过的ID集合
     ShortcutContext m_currentContext = ShortcutContext::Global; ///< 当前上下文
 
-    quint64 m_totalRegistrations = 0;  ///< 注册总次数
-    quint64 m_totalTriggers = 0;       ///< 触发总次数
+    quint64 m_totalRegistrations = 0;    ///< 注册总次数
+    quint64 m_totalTriggers = 0;         ///< 触发总次数
+    quint64 m_totalUnregistrations = 0;  ///< 注销总次数
+    quint64 m_totalConflictsDetected = 0;///< 冲突检测总次数(按键已被占用)
 
     static constexpr const char* kSettingsGroup = "shortcuts"; ///< QSettings分组名
 };

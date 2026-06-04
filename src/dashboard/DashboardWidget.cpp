@@ -18,6 +18,7 @@
 #include "dashboard/ProgressBarWidget.h"
 #include "dashboard/LedIndicatorWidget.h"
 #include "dashboard/NumericDisplayWidget.h"
+#include "core/theme/ThemeManager.h"
 
 /** @brief 构造函数，初始化UI、序列化器与示例控件 @param parent 父控件 */
 DashboardWidget::DashboardWidget(QWidget *parent)
@@ -60,7 +61,7 @@ int DashboardWidget::addComponent(const QString &type, const QString &channel)
     } else if (type == QLatin1String("led")) {
         auto *led = new LedIndicatorWidget(this);
         led->setOn(true);
-        led->setColor(Qt::green);
+        led->setColor(ThemeManager::instance().color(ThemeManager::SemanticColor::Success));
         led->bindChannel(channel);
         ++m_totalUpdates;
         ++m_totalValueChanged;

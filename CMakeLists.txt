@@ -106,14 +106,17 @@ set(SOURCES
     src/core/widgets/DataDiffWidget.cpp
     src/core/widgets/DataDiffWidgetDiff.cpp
     src/core/widgets/EdDialog.cpp
+    src/core/widgets/EdDialogPaint.cpp
     src/core/widgets/EdDialogTabs.cpp
     src/core/connect/ConnectionManager.cpp
     src/core/connect/ConnectionFactory.cpp
     src/core/theme/ThemeManager.cpp
     src/core/theme/ThemeManagerApply.cpp
+    src/core/theme/ThemeManagerStats.cpp
     src/core/theme/ThemeManagerColor.cpp
     src/core/theme/QssThemeGenerator.cpp
     src/core/theme/QssThemeGeneratorWidgets.cpp
+    src/core/theme/QssThemeGeneratorNav.cpp
     src/core/theme/QssThemeGeneratorTerminal.cpp
     src/core/theme/QssThemeGeneratorPanels.cpp
     src/core/theme/QssThemeGeneratorColors.cpp
@@ -232,11 +235,13 @@ set(SOURCES
     src/chart/zoom/ZoomControllerQuery.cpp
     src/chart/zoom/ZoomControllerStats.cpp
     src/chart/zoom/ZoomControllerViewport.cpp
+    src/chart/zoom/ZoomControllerHandlers.cpp
     src/chart/fft/FftEngine.cpp
     src/chart/fft/FftEngineWindow.cpp
     src/chart/fft/FftWidget.cpp
     src/chart/fft/FftWidgetSlots.cpp
     src/chart/fft/FftWidgetSetup.cpp
+    src/chart/fft/FftWidgetTheme.cpp
     src/chart/stats/HistogramWidget.cpp
     src/chart/stats/HistogramWidgetUI.cpp
     src/chart/stats/HistogramWidgetStats.cpp
@@ -313,6 +318,7 @@ set(SOURCES
     # ── F3: 多通道数据导出 ──
     src/utils/export/ChartExporter.cpp
     src/utils/export/ChartExporterFormats.cpp
+    src/utils/export/ChartExporterJson.cpp
     src/utils/export/ChartExporterImage.cpp
     src/utils/export/ExportDialog.cpp
     src/utils/export/ExportDialogSlots.cpp
@@ -535,6 +541,7 @@ set(SOURCES
     # ── F21: 正则终端过滤器 ──
     src/terminal/filter/TerminalFilter.cpp
     src/terminal/filter/TerminalFilterApply.cpp
+    src/terminal/filter/TerminalFilterStats.cpp
     src/terminal/filter/TerminalFilterBar.cpp
     src/terminal/filter/TerminalHighlighter.cpp
     src/terminal/filter/TerminalHighlighterHighlight.cpp

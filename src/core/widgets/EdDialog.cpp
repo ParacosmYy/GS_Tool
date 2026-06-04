@@ -1,16 +1,16 @@
 /**
  * @file EdDialog.cpp
- * @brief 自定义对话框组件实现 — 核心构造、绘制、动画、键盘事件
+ * @brief 自定义对话框组件实现 — 核心构造函数
  *
  * 通过 paintEvent 自绘背景/左侧边框/图标, 按钮通过 objectName 供 QSS 定位。
  * 动画: 200ms OutCubic 淡入+缩放(95%→100%), 关闭时反向。
  *
+ * 绘制/动画/键盘事件见 EdDialogPaint.cpp。
  * 辅助方法(颜色/图标查询、关闭动画、静态便捷入口)见 EdDialogTabs.cpp。
  */
 
 #include "core/widgets/EdDialog.h"
 
-#include <QKeyEvent>
 #include <QFontMetrics>
 
 /**
@@ -138,75 +138,5 @@ EdDialog::EdDialog(QWidget* parent, const QString& title,
     setFixedSize(qMax(textWidth, 360), qMax(contentHeight, 160));
 }
 
-/**
- * @brief 自绘事件 — 绘制圆角背景 + 左侧强调色边框
- */
-void EdDialog::paintEvent(QPaintEvent*)
-{
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    auto& theme = ThemeManager::instance();
-    QColor bg = theme.color(ThemeManager::SemanticColor::BgSecondary);
-    QColor accent = accentColor();
-
-    /* 圆角背景 */
-    QPainterPath path;
-    path.addRoundedRect(rect().adjusted(1, 1, -1, -1), kRadius, kRadius);
-    p.fillPath(path, bg);
-
-    /* 左侧强调色边框 */
-    p.save();
-    p.setClipPath(path);
-    p.fillRect(QRect(0, 0, kLeftBorder, height()), accent);
-    p.restore();
-}
-
-/**
- * @brief 显示事件 — 触发 200ms OutCubic 淡入+缩放动画
- */
-void EdDialog::showEvent(QShowEvent* event)
-{
-    QDialog::showEvent(event);
-    ++s_totalDialogOpens;
-
-    /* 缩放动画: 95% → 100% */
-    auto* scaleAnim = new QPropertyAnimation(this, "geometry");
-    QRect finalGeo = geometry();
-    QPoint center = finalGeo.center();
-    QRect startGeo = finalGeo;
-    startGeo.setWidth(static_cast<int>(finalGeo.width() * 0.95));
-    startGeo.setHeight(static_cast<int>(finalGeo.height() * 0.95));
-    startGeo.moveCenter(center);
-    setGeometry(startGeo);
-    scaleAnim->setStartValue(startGeo);
-    scaleAnim->setEndValue(finalGeo);
-    scaleAnim->setDuration(200);
-    scaleAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-    /* 淡入动画: 0.0 → 1.0 */
-    auto* fadeAnim = new QPropertyAnimation(m_opacityEffect, "opacity");
-    fadeAnim->setStartValue(0.0);
-    fadeAnim->setEndValue(1.0);
-    fadeAnim->setDuration(200);
-    fadeAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-    auto* group = new QParallelAnimationGroup(this);
-    group->addAnimation(scaleAnim);
-    group->addAnimation(fadeAnim);
-    group->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-/**
- * @brief 键盘事件 — Escape 键关闭对话框
- */
-void EdDialog::keyPressEvent(QKeyEvent* event)
-{
-    if (event->key() == Qt::Key_Escape) {
-        m_resultCode = QDialog::Rejected;
-        closeWithAnimation();
-        return;
-    }
-    QDialog::keyPressEvent(event);
-}
+// 绘制/动画/键盘事件见 EdDialogPaint.cpp
 

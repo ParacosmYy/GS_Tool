@@ -74,4 +74,5 @@ void ZoomController::resetZoomStatistics()
     m_totalPans = 0;
     m_totalResets = 0;
     m_totalZoomOperations = 0;
+    m_totalUndos = 0;
 }

@@ -52,6 +52,12 @@ public:
     /** @brief 获取累计接收响应次数 */
     quint64 totalResponsesReceived() const;
 
+    /** @brief 获取累计发送失败次数(连接不可用/写入失败) @return 错误计数 */
+    quint64 totalSendErrors() const { return m_totalSendErrors; }
+
+    /** @brief 获取累计发送字节总数(AT指令) @return 字节数 */
+    quint64 totalBytesSent() const { return m_totalBytesSent; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -81,6 +87,8 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalCommandsSent = 0;            ///< 累计发送AT命令次数
     quint64 m_totalResponsesReceived = 0;       ///< 累计接收响应次数
+    quint64 m_totalSendErrors = 0;              ///< 累计发送失败次数
+    quint64 m_totalBytesSent = 0;               ///< 累计发送字节总数
 };
 
 #endif // BLUETOOTHATCONSOLE_H

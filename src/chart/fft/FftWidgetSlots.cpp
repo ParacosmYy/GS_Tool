@@ -13,7 +13,9 @@
 /** @brief 通道选择变更槽函数，自动刷新模式下触发频谱重算 @param index 下拉框新索引(未使用) */
 void FftWidget::onChannelChanged(int /*index*/)
 {
+    ++m_totalChannelSwitches;
     if (m_autoRefresh) {
+        ++m_totalAutoRefreshes;
         refreshSpectrum();
     }
 }
@@ -51,6 +53,7 @@ void FftWidget::onDataUpdated(const QStringList& updatedChannels)
 
     QString currentChannel = m_channelCombo->currentText();
     if (updatedChannels.contains(currentChannel)) {
+        ++m_totalAutoRefreshes;
         refreshSpectrum();
     }
 }
@@ -125,4 +128,7 @@ void FftWidget::resetFftWidgetStatistics()
     m_totalPeakSearches = 0;
     m_totalWindowChanges = 0;
     m_totalSizeChanges = 0;
+    m_totalAutoRefreshes = 0;
+    m_totalChannelSwitches = 0;
+    m_totalRenderErrors = 0;
 }

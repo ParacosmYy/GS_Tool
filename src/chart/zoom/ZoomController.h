@@ -31,6 +31,7 @@ public:
     quint64 totalPans() const;                  ///< 平移操作总次数
     quint64 totalResets() const;                ///< 缩放重置总次数
     quint64 totalZoomOperations() const { return m_totalZoomOperations; } ///< 所有缩放操作(含缩放/平移/重置/undo)
+    quint64 totalUndos() const { return m_totalUndos; } ///< 累计撤销(popZoomState)次数
     void resetZoomStatistics();                 ///< 重置所有缩放统计计数器
 
 signals:
@@ -72,6 +73,7 @@ private:
     static constexpr int kMinZoomLevel = 32;    ///< 最小可见采样点数
     // 统计计数器
     quint64 m_totalZooms = 0, m_totalPans = 0, m_totalResets = 0, m_totalZoomOperations = 0;
+    quint64 m_totalUndos = 0; ///< 累计撤销(popZoomState成功恢复)次数
 };
 
 #endif // CHART_ZOOMCONTROLLER_H

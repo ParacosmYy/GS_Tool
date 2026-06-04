@@ -46,6 +46,7 @@ void QuickCommandBar::rebuildButtons()
                                       .arg(cmd.name, cmd.data));
                     return;
                 }
+                ++m_totalHexCommands;
             } else {
                 data = cmd.data.toUtf8();
             }
@@ -64,6 +65,7 @@ void QuickCommandBar::rebuildButtons()
 
 void QuickCommandBar::onEditRequested()
 {
+    ++m_totalEditDialogOpens;
     QDialog dlg(window());
     QTableWidget* table = nullptr;
     QDialogButtonBox* buttons = nullptr;

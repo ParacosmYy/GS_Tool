@@ -63,10 +63,12 @@ void SkeletonWidget::paintEvent(QPaintEvent* event)
     p.setBrush(baseColor);
     p.drawRoundedRect(rect(), m_borderRadius, m_borderRadius);
 
-    // 微光扫描渐变
+    // 微光扫描渐变: 使用主题 TextPrimary 色半透明叠加，随主题切换自动适配
     QLinearGradient shimmer(m_shimmerOffset - width(), 0, m_shimmerOffset, 0);
+    QColor shimmerCenter = ThemeManager::instance().color(ThemeManager::SemanticColor::TextPrimary);
+    shimmerCenter.setAlpha(30);
     shimmer.setColorAt(0.0, Qt::transparent);
-    shimmer.setColorAt(0.5, QColor(255, 255, 255, 30));
+    shimmer.setColorAt(0.5, shimmerCenter);
     shimmer.setColorAt(1.0, Qt::transparent);
     p.setBrush(shimmer);
     p.drawRoundedRect(rect(), m_borderRadius, m_borderRadius);

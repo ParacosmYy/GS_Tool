@@ -46,6 +46,12 @@ public:
     quint64 totalWindowChanges() const;
     /** @brief 获取FFT大小变更次数 @return FFT大小变更计数 */
     quint64 totalSizeChanges() const;
+    /** @brief 获取累计自动刷新触发次数 @return 自动刷新计数 */
+    quint64 totalAutoRefreshes() const { return m_totalAutoRefreshes; }
+    /** @brief 获取累计通道切换次数 @return 通道切换计数 */
+    quint64 totalChannelSwitches() const { return m_totalChannelSwitches; }
+    /** @brief 获取累计渲染错误次数(计算失败/空结果) @return 错误计数 */
+    quint64 totalRenderErrors() const { return m_totalRenderErrors; }
     /** @brief 重置统计计数器 */
     void resetFftWidgetStatistics();
 
@@ -91,6 +97,9 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalTransforms = 0, m_totalPeakSearches = 0;
     quint64 m_totalWindowChanges = 0, m_totalSizeChanges = 0;
+    quint64 m_totalAutoRefreshes = 0;      ///< 累计自动刷新触发次数
+    quint64 m_totalChannelSwitches = 0;    ///< 累计通道切换次数
+    quint64 m_totalRenderErrors = 0;       ///< 累计渲染错误次数(计算失败/空结果)
 };
 
 #endif // FFTWIDGET_H

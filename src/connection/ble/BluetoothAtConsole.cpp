@@ -110,6 +110,7 @@ void BluetoothAtConsole::sendCommand(const QString& command)
 {
     if (!m_connection) {
         m_output->append(tr("[错误] 未绑定连接"));
+        ++m_totalSendErrors;
         return;
     }
     if (command.isEmpty()) {
@@ -121,6 +122,9 @@ void BluetoothAtConsole::sendCommand(const QString& command)
     const qint64 written = m_connection->write(data);
     if (written < 0) {
         m_output->append(tr("[发送失败] 连接不可用"));
+        ++m_totalSendErrors;
+    } else {
+        m_totalBytesSent += static_cast<quint64>(written);
     }
     ++m_totalCommandsSent;
 }

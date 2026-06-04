@@ -85,6 +85,12 @@ public:
     /** @brief 获取组播组离开总次数 */
     quint64 totalLeaves() const;
 
+    /** @brief 获取累计网络错误次数(绑定/加入/发送失败) @return 错误计数 */
+    quint64 totalNetworkErrors() const { return m_totalNetworkErrors; }
+
+    /** @brief 获取累计打开连接尝试次数 @return 打开尝试计数 */
+    quint64 totalOpenAttempts() const { return m_totalOpenAttempts; }
+
     /** @brief 重置统计数据 */
     void resetStatistics();
 
@@ -125,6 +131,10 @@ private:
     quint64 m_totalJoins = 0;
     /** @brief 组播组离开总次数 */
     quint64 m_totalLeaves = 0;
+    /** @brief 累计网络错误次数(绑定/加入/发送失败) */
+    quint64 m_totalNetworkErrors = 0;
+    /** @brief 累计打开连接尝试次数 */
+    quint64 m_totalOpenAttempts = 0;
 };
 
 #endif // UDPMULTICASTCONNECTION_H

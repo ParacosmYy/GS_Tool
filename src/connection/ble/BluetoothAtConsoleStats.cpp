@@ -25,4 +25,6 @@ void BluetoothAtConsole::resetStatistics()
 {
     m_totalCommandsSent = 0;
     m_totalResponsesReceived = 0;
+    m_totalSendErrors = 0;
+    m_totalBytesSent = 0;
 }

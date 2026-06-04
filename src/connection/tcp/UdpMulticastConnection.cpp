@@ -54,6 +54,7 @@ void UdpMulticastConnection::ensureSocket()
 /** @brief 打开连接，绑定本地端口并加入组播组 @return true=绑定成功 */
 bool UdpMulticastConnection::open()
 {
+    ++m_totalOpenAttempts;
     ensureSocket();
 
     /// 绑定到本地端口(ShareAddress允许多个socket绑定同一端口)
@@ -61,6 +62,7 @@ bool UdpMulticastConnection::open()
                         QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint)) {
         emit errorOccurred(tr("UDP绑定失败: %1").arg(m_socket->errorString()));
         updateState(ConnectionState::Error);
+        ++m_totalNetworkErrors;
         return false;
     }
 

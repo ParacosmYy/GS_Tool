@@ -48,6 +48,12 @@ public:
     /** @brief 获取累计监控数据源绑定次数 */
     quint64 totalMonitorUpdates() const;
 
+    /** @brief 获取累计接收字节总数(通过速率估算) @return 累计RX字节 */
+    quint64 totalBytesRx() const { return m_totalBytesRx; }
+
+    /** @brief 获取累计发送字节总数(通过速率估算) @return 累计TX字节 */
+    quint64 totalBytesTx() const { return m_totalBytesTx; }
+
     /** @brief 重置所有统计计数器归零 */
     void resetTrafficWidgetStatistics();
 
@@ -72,6 +78,8 @@ private:
     double m_peakRxRate = 0.0;             ///< 历史最高RX速率（字节/秒）
     double m_peakTxRate = 0.0;             ///< 历史最高TX速率（字节/秒）
     quint64 m_totalMonitorUpdates = 0;     ///< 累计监控数据源绑定次数
+    quint64 m_totalBytesRx = 0;            ///< 累计接收字节总数(速率累计)
+    quint64 m_totalBytesTx = 0;            ///< 累计发送字节总数(速率累计)
 };
 
 #endif // TRAFFICMONITORWIDGET_H

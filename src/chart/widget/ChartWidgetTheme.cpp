@@ -92,7 +92,7 @@ void ChartWidget::createSeries(const QString& name, const QColor& color)
         if (!palette.isEmpty()) {
             chColor = palette[m_seriesMap.size() % palette.size()];
         } else {
-            chColor = Qt::cyan;
+            chColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Accent);
         }
     }
 

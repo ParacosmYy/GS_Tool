@@ -1,17 +1,15 @@
 /**
  * @file TerminalFilterApply.cpp
- * @brief 终端多模式过滤器 — 过滤判断、时间戳范围过滤、统计接口实现
+ * @brief 终端多模式过滤器 — 过滤判断与时间戳范围过滤
  *
  * 本文件拆分自 TerminalFilter.cpp，包含:
  *   - 多模式过滤判断 (filter)
  *   - 时间戳范围过滤 (setTimestampRange/clearTimestampRange/checkTimestampRange)
- *   - 统计接口 (matchCount/filterPassCount/filterBlockCount/resetStatistics)
- *   - 高亮颜色接口 (highlightColor)
- *   - 私有方法 (compileRegex/checkTimestampRange)
+ *
+ * 统计接口与辅助方法见 TerminalFilterStats.cpp。
  */
 
 #include "terminal/filter/TerminalFilter.h"
-#include "core/theme/ThemeManager.h"
 
 // ---- 多模式过滤判断 ----
 
@@ -140,86 +138,4 @@ QDateTime TerminalFilter::timestampTo() const
     return m_timestampTo;
 }
 
-// ---- 高亮颜色(兼容接口) ----
-
-/** @brief 返回高亮颜色名称 @return 颜色HEX字符串 */
-QString TerminalFilter::highlightColor() const
-{
-    return ThemeManager::instance().color(ThemeManager::SemanticColor::TermSearchHighlight).name();
-}
-
-// ---- 统计接口 ----
-
-/** @brief 获取累计匹配次数(单模式兼容) @return 匹配总次数 */
-quint64 TerminalFilter::matchCount() const
-{
-    return m_matchCount;
-}
-
-/** @brief 获取最近一次匹配的文本 @return 最后匹配的文本 */
-QString TerminalFilter::lastMatchText() const
-{
-    return m_lastMatch;
-}
-
-/** @brief 获取过滤通过的总行数 @return 通过计数 */
-quint64 TerminalFilter::filterPassCount() const
-{
-    return m_filterPassCount;
-}
-
-/** @brief 获取过滤阻塞的总行数 @return 阻塞计数 */
-quint64 TerminalFilter::filterBlockCount() const
-{
-    return m_filterBlockCount;
-}
-
-/** @brief 获取累计添加过滤规则总数 @return 规则添加计数 */
-quint64 TerminalFilter::totalFilters() const
-{
-    return m_totalFilters;
-}
-
-/** @brief 重置所有统计计数器为零 */
-void TerminalFilter::resetStatistics()
-{
-    m_matchCount = 0;
-    m_lastMatch.clear();
-    m_filterPassCount = 0;
-    m_filterBlockCount = 0;
-    m_totalFilters = 0;
-}
-
-// ---- 私有方法 ----
-
-/**
- * @brief 编译正则表达式并设置选项
- * @param pattern 正则字符串
- * @param caseSensitive 是否区分大小写
- * @return 编译后的QRegularExpression对象(可能无效)
- */
-QRegularExpression TerminalFilter::compileRegex(const QString& pattern, bool caseSensitive) const
-{
-    QRegularExpression::PatternOptions options = QRegularExpression::NoPatternOption;
-    if (!caseSensitive) {
-        options |= QRegularExpression::CaseInsensitiveOption;
-    }
-    QRegularExpression re(pattern, options);
-    return re;
-}
-
-/**
- * @brief 检查时间戳是否在指定范围内
- * @param timestamp epoch毫秒时间戳
- * @return true 在范围内或未设置范围
- */
-bool TerminalFilter::checkTimestampRange(qint64 timestamp) const
-{
-    if (m_timestampFromMs > 0 && timestamp < m_timestampFromMs) {
-        return false;
-    }
-    if (m_timestampToMs > 0 && timestamp > m_timestampToMs) {
-        return false;
-    }
-    return true;
-}
+// 统计接口与辅助方法见 TerminalFilterStats.cpp

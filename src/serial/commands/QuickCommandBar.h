@@ -78,6 +78,12 @@ public:
     /** @brief 获取历史最大单条指令长度（字节数） */
     quint64 maxCommandLength() const;
 
+    /** @brief 获取HEX模式指令触发总次数 @return HEX指令计数 */
+    quint64 totalHexCommands() const { return m_totalHexCommands; }
+
+    /** @brief 获取编辑对话框打开总次数 @return 编辑计数 */
+    quint64 totalEditDialogOpens() const { return m_totalEditDialogOpens; }
+
     /** @brief 重置所有统计计数器为零 */
     void resetStatistics();
 
@@ -112,6 +118,8 @@ private:
     quint64 m_totalCommandsSent = 0;        ///< 快捷栏已发送的指令总次数
     quint64 m_totalQuickSends = 0;          ///< 快捷发送累计发送的总字节数
     quint64 m_maxCommandLength = 0;         ///< 历史最大单条指令长度（字节数）
+    quint64 m_totalHexCommands = 0;         ///< HEX模式指令触发总次数
+    quint64 m_totalEditDialogOpens = 0;     ///< 编辑对话框打开总次数
 };
 
 #endif // QUICKCOMMANDBAR_H

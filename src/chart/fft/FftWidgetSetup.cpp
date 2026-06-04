@@ -1,13 +1,15 @@
 /**
  * @file FftWidgetSetup.cpp
- * @brief FFT频谱控件 -- UI搭建、工具栏创建、图表初始化与主题样式
+ * @brief FFT频谱控件 -- UI搭建、工具栏创建与图表初始化
  *
  * 本文件从FftWidget.cpp拆分而来，集中管理FftWidget的视觉层构建逻辑:
  *   - setupUI():        主布局编排（工具栏 + 图表区域）
  *   - createToolbar():  顶部配置栏（通道/窗函数/FFT大小/采样率/刷新按钮）
  *   - setupChart():     QChart频谱图表创建（曲线、X/Y坐标轴、视图）
  *   - populateFftSizes(): FFT大小下拉框选项填充
- *   - applyThemeColors(): 主题感知样式刷新（背景、网格、标签、线条颜色）
+ *
+ * 主题样式应用见 FftWidgetTheme.cpp。
+ * 槽函数与统计接口见 FftWidgetSlots.cpp。
  *
  * 所有方法均为FftWidget的private成员，声明见FftWidget.h。
  */
@@ -23,7 +25,6 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QCheckBox>
-#include <QtCharts>
 
 // ============================================================
 // UI布局搭建
@@ -185,43 +186,4 @@ void FftWidget::populateFftSizes()
     m_fftSizeCombo->addItem(QStringLiteral("4096"),  4096);
 }
 
-// ============================================================
-// 主题样式应用
-// ============================================================
-
-/** @brief 应用当前主题颜色到图表背景、网格线、坐标轴标签和频谱曲线 */
-void FftWidget::applyThemeColors()
-{
-    auto& theme = ThemeManager::instance();
-
-    // 图表背景
-    QColor bgColor = theme.color(ThemeManager::SemanticColor::BgPrimary);
-    m_chart->setBackgroundBrush(bgColor);
-
-    // 网格线和坐标轴颜色
-    QColor gridColor = theme.color(ThemeManager::SemanticColor::Border);
-    QColor labelColor = theme.color(ThemeManager::SemanticColor::TextSecondary);
-
-    // X轴样式
-    m_xAxis->setLinePen(QPen(gridColor, 1));
-    m_xAxis->setGridLinePen(QPen(gridColor, 1, Qt::DashLine));
-    m_xAxis->setLabelsBrush(labelColor);
-    m_xAxis->setTitleBrush(labelColor);
-
-    // Y轴样式
-    m_yAxis->setLinePen(QPen(gridColor, 1));
-    m_yAxis->setGridLinePen(QPen(gridColor, 1, Qt::DashLine));
-    m_yAxis->setLabelsBrush(labelColor);
-    m_yAxis->setTitleBrush(labelColor);
-
-    // 频谱线条颜色: 使用ChartColors调色板第一色（蓝色系）
-    bool isDark = (theme.currentTheme().startsWith(QStringLiteral("dark")));
-    const auto& colors = ChartColors::colorsForTheme(isDark);
-    QColor spectrumColor = colors.isEmpty() ? QColor("#89b4fa") : colors.first();
-    m_spectrumSeries->setPen(QPen(spectrumColor, 1.5));
-
-    // 图表绘图区背景（与整体背景保持一致）
-    QBrush plotAreaBrush(bgColor);
-    m_chart->setPlotAreaBackgroundBrush(plotAreaBrush);
-    m_chart->setPlotAreaBackgroundVisible(true);
-}
+// 主题样式应用见 FftWidgetTheme.cpp

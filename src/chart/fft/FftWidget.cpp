@@ -92,6 +92,7 @@ void FftWidget::refreshSpectrum()
     QString channel = m_channelCombo->currentText();
     if (channel.isEmpty()) {
         m_infoLabel->setText(tr("无通道数据"));
+        ++m_totalRenderErrors;
         return;
     }
 
@@ -99,6 +100,7 @@ void FftWidget::refreshSpectrum()
     if (timeData.isEmpty()) {
         m_spectrumSeries->replace({});
         m_infoLabel->setText(tr("无数据"));
+        ++m_totalRenderErrors;
         return;
     }
 
@@ -112,6 +114,7 @@ void FftWidget::refreshSpectrum()
     if (spectrum.isEmpty()) {
         m_spectrumSeries->replace({});
         m_infoLabel->setText(tr("计算失败"));
+        ++m_totalRenderErrors;
         return;
     }
 
