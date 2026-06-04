@@ -75,6 +75,8 @@ set(SOURCES
     src/serial/detector/SerialDetector.cpp
     src/serial/detector/SerialDetectorChip.cpp
     src/serial/detector/SerialDetectorQuery.cpp
+    src/chart/preview/WaveformPreviewWidget.cpp
+    src/chart/preview/WaveformPreviewWidgetStats.cpp
     src/chart/waterfall/WaterfallWidget.cpp
     src/chart/heatmap/HeatmapWidget.cpp
     src/chart/heatmap/HeatmapWidgetPaint.cpp
@@ -610,6 +612,39 @@ set(SOURCES
     # ── F27: 数据字节级对比 ──
     src/utils/compare/DataCompareWidget.cpp
     src/utils/compare/DataCompareWidgetStats.cpp
+
+    # ── 频率计数器 ──
+    src/utils/frequency/FrequencyCounterWidget.cpp
+    src/utils/frequency/FrequencyCounterWidgetStats.cpp
+
+    # ── F28: 数据流标注管理 ──
+    src/core/profiles/ConnectionProfileManager.cpp
+    src/utils/annotation/DataAnnotationWidget.cpp
+    src/utils/annotation/DataAnnotationWidgetStats.cpp
+
+    # ── F29: 报文模板库 ──
+    src/utils/packet_lib/PacketTemplateLib.cpp
+    src/utils/packet_lib/PacketTemplateLibStats.cpp
+
+    # ── F30: 数据掩码编辑器 ──
+    src/utils/bitmask/DataMaskEditor.cpp
+    src/utils/bitmask/DataMaskEditorStats.cpp
+
+    # ── F31: 数据包重组引擎 ──
+    src/protocol/reassembly/PacketReassembler.cpp
+    src/protocol/reassembly/PacketReassemblerStats.cpp
+
+    # ── 滚动折线图 ──
+    src/widgets/chart/ScrollChartWidget.cpp
+    src/widgets/chart/ScrollChartWidgetStats.cpp
+
+    # ── F32: 十六进制内存编辑器 ──
+    src/utils/hex_editor/MemoryHexEditor.cpp
+    src/utils/hex_editor/MemoryHexEditorStats.cpp
+
+    # ── 波形模式检测 ──
+    src/core/analysis/WaveformPatternDetector.cpp
+    src/core/analysis/WaveformPatternDetectorStats.cpp
 )
 
 set(HEADERS
@@ -656,6 +691,7 @@ set(HEADERS
     src/core/workspace/WorkspaceManager.h
     src/core/factory/WidgetFactory.h
     src/serial/detector/SerialDetector.h
+    src/chart/preview/WaveformPreviewWidget.h
     src/chart/waterfall/WaterfallWidget.h
     src/chart/heatmap/HeatmapWidget.h
     src/core/widgets/CommandPalette.h
@@ -890,6 +926,27 @@ set(HEADERS
 
     # ── 信号发生器 ──
     src/utils/signal_gen/SignalGeneratorWidget.h
+
+    # ── 频率计数器 ──
+    src/utils/frequency/FrequencyCounterWidget.h
+
+    # ── F28: 数据流标注管理 ──
+    src/utils/annotation/DataAnnotationWidget.h
+
+    # ── F29: 报文模板库 ──
+    src/utils/packet_lib/PacketTemplateLib.h
+
+    # ── F30: 数据掩码编辑器 ──
+    src/utils/bitmask/DataMaskEditor.h
+
+    # ── F31: 数据包重组引擎 ──
+    src/protocol/reassembly/PacketReassembler.h
+
+    # ── 滚动折线图 ──
+    src/widgets/chart/ScrollChartWidget.h
+
+    # ── F32: 十六进制内存编辑器 ──
+    src/utils/hex_editor/MemoryHexEditor.h
 )
 
 set(RESOURCES
