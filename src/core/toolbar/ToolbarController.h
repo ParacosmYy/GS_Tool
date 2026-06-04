@@ -60,12 +60,20 @@ private:
     quint64 m_totalThemeChanges = 0;         ///< 累计主题切换次数
     quint64 m_totalExports = 0;              ///< 累计导出按钮点击次数
     quint64 m_totalClears = 0;               ///< 累计清屏次数
+    quint64 m_totalButtonPresses = 0;        ///< 累计所有按钮点击次数
+    quint64 m_totalModeSwitches = 0;         ///< 累计模式切换次数(显示模式+终端布局)
+    quint64 m_totalPanelRefreshes = 0;       ///< 累计面板刷新次数
 public:
     quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; } ///< 累计显示模式切换次数
     quint64 totalThemeChanges() const { return m_totalThemeChanges; } ///< 累计主题切换次数
     quint64 totalExports() const { return m_totalExports; }           ///< 累计导出次数
     quint64 totalClears() const { return m_totalClears; }             ///< 累计清屏次数
+    quint64 totalButtonPresses() const { return m_totalButtonPresses; } ///< 累计所有按钮点击次数
+    quint64 totalModeSwitches() const { return m_totalModeSwitches; } ///< 累计模式切换次数
+    quint64 totalPanelRefreshes() const { return m_totalPanelRefreshes; } ///< 累计面板刷新次数
     void resetToolbarStatistics() { m_totalDisplayModeChanges = 0; m_totalThemeChanges = 0; m_totalExports = 0; m_totalClears = 0; }
+    /** @brief 重置所有工具栏统计计数器(含按钮点击/模式切换/面板刷新) */
+    void resetStats() { m_totalDisplayModeChanges = 0; m_totalThemeChanges = 0; m_totalExports = 0; m_totalClears = 0; m_totalButtonPresses = 0; m_totalModeSwitches = 0; m_totalPanelRefreshes = 0; }
 };
 
 #endif // TOOLBARCONTROLLER_H

@@ -40,6 +40,7 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
 
     // 步骤3: 通过工厂创建连接
     m_currentConn = m_connManager->createConnection(ConnectionType::Serial);
+    ++m_totalConnectAttempts;  ///< 统计: 每次连接尝试递增(含后续失败)
     if (!m_currentConn) {
         emit connectionFailed(tr("不支持"), tr("串口连接不可用"));
         return;
@@ -119,6 +120,8 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
         disconnectCurrent();
     }
     m_userInitiatedDisconnect = false;
+
+    ++m_totalConnectAttempts;  ///< 统计: 每次网络连接尝试递增(含后续失败)
 
     m_currentConn = m_connManager->createConnection(type);
     if (!m_currentConn) {

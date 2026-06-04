@@ -106,6 +106,9 @@ quint64 DashboardModel::totalLayoutSaves() const { return m_totalLayoutSaves; }
 /** @brief 获取累计布局加载次数 @return 加载总数 */
 quint64 DashboardModel::totalLayoutLoads() const { return m_totalLayoutLoads; }
 
+/** @brief 获取累计序列化次数(保存操作) @return 序列化总数 */
+quint64 DashboardModel::totalSerializations() const { return m_totalSerializations; }
+
 /** @brief 重置所有统计计数器(通道统计+组件统计+布局统计+配置文件统计+布局生命周期统计) */
 void DashboardModel::resetAllStatistics()
 {
@@ -129,4 +132,12 @@ void DashboardModel::resetAllStatistics()
     m_totalWidgetRemovals = 0;
     m_totalLayoutSaves = 0;
     m_totalLayoutLoads = 0;
+    /* 序列化统计 */
+    m_totalSerializations = 0;
+}
+
+/** @brief 重置所有仪表盘统计计数器(含序列化计数) */
+void DashboardModel::resetStats()
+{
+    resetAllStatistics();
 }

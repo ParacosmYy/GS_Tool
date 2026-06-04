@@ -67,6 +67,7 @@ void SendHistoryManager::setupAutoComplete(QLineEdit* input, QWidget* parentWidg
             m_smartComplete->hideComplete();
             return;
         }
+        ++m_totalSearches;  // 累计搜索/补全弹出计数
         const QPoint pos = m_input->mapToGlobal(QPoint(0, m_input->height()));
         m_smartComplete->showForPrefix(text, pos);
     });
@@ -78,6 +79,7 @@ void SendHistoryManager::setupAutoComplete(QLineEdit* input, QWidget* parentWidg
         m_input->setText(text);
         m_input->blockSignals(false);
         ++m_totalRecalls;  // 累计召回(补全选中)计数
+        ++m_totalSelects;  // 累计选中补全项计数
     });
 }
 
@@ -86,6 +88,12 @@ void SendHistoryManager::recordHistory(const QString& text, bool isHex)
 {
     m_sendHistory->addEntry(text, isHex);
     ++m_totalAdds;  // 累计添加计数
+
+    // 更新历史峰值大小
+    const quint64 currentSize = static_cast<quint64>(m_sendHistory->entries().size());
+    if (currentSize > m_peakHistorySize) {
+        m_peakHistorySize = currentSize;
+    }
 }
 
 /** @brief 获取智能补全弹出列表控件 @return SmartAutoComplete指针 */
@@ -115,6 +123,7 @@ bool SendHistoryManager::eventFilter(QObject* watched, QEvent* event)
                 m_input->setText(m_smartComplete->selectedText());
                 m_input->blockSignals(false);
                 ++m_totalRecalls;  // 累计召回(键盘选中补全)计数
+                ++m_totalSelects;  // 累计选中补全项计数
                 return true;
             }
             break;
@@ -162,10 +171,31 @@ quint64 SendHistoryManager::totalRecalls() const
     return m_totalRecalls;
 }
 
-/** @brief 重置所有统计计数器(添加/清空/召回) */
+/** @brief 获取累计搜索/补全弹出次数 @return 搜索次数 */
+quint64 SendHistoryManager::totalSearches() const
+{
+    return m_totalSearches;
+}
+
+/** @brief 获取累计选中补全项次数(鼠标点击+键盘Enter) @return 选中次数 */
+quint64 SendHistoryManager::totalSelects() const
+{
+    return m_totalSelects;
+}
+
+/** @brief 获取历史列表的峰值大小(条目数) @return 峰值大小 */
+quint64 SendHistoryManager::peakHistorySize() const
+{
+    return m_peakHistorySize;
+}
+
+/** @brief 重置所有统计计数器(添加/清空/召回/搜索/选中/峰值) */
 void SendHistoryManager::resetHistoryStatistics()
 {
     m_totalAdds = 0;
     m_totalClears = 0;
     m_totalRecalls = 0;
+    m_totalSearches = 0;
+    m_totalSelects = 0;
+    m_peakHistorySize = 0;
 }

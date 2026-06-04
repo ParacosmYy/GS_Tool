@@ -48,6 +48,12 @@ public slots:
     quint64 totalClears() const;         ///< 累计清除次数
     int pointDensityMax() const;         ///< 最近一次刷新的点密度网格最大值
     double averageValue() const;         ///< 最近一次刷新的所有散点Y值平均
+    /** @brief 获取累计散点数据更新次数(refreshPlot中有效数据绘制) */
+    quint64 totalPointUpdates() const { return m_totalPointUpdates; }
+    /** @brief 获取累计坐标轴自动缩放次数 */
+    quint64 totalAxisAutoScales() const { return m_totalAxisAutoScales; }
+    /** @brief 获取累计渲染次数(图表重绘) */
+    quint64 totalRenders() const { return m_totalRenders; }
     void resetScatterStatistics();       ///< 重置所有散点图统计计数器
 
 private slots:
@@ -96,6 +102,9 @@ private:
     quint64 m_totalClears = 0;         ///< 累计清除次数
     int m_pointDensityMax = 0;         ///< 最近一次刷新的点密度网格最大值
     double m_averageValue = 0.0;       ///< 最近一次刷新的所有散点Y值平均
+    quint64 m_totalPointUpdates = 0;   ///< 累计散点数据更新次数(refreshPlot中有效数据绘制)
+    quint64 m_totalAxisAutoScales = 0; ///< 累计坐标轴自动缩放次数
+    quint64 m_totalRenders = 0;        ///< 累计渲染次数(图表重绘)
 };
 
 #endif // SCATTERWIDGET_H

@@ -73,3 +73,10 @@ void ConnectionController::resetConnectionStatistics()
     m_totalDataReceived = 0;
     m_peakConcurrentConnections = 0;
 }
+
+/** @brief 重置所有连接统计计数器(含连接尝试计数)，调用resetConnectionStatistics()并额外清零连接尝试次数 */
+void ConnectionController::resetStats()
+{
+    resetConnectionStatistics();
+    m_totalConnectAttempts = 0;
+}

@@ -87,6 +87,12 @@ public:
     quint64 totalChannelAdditions() const { return m_totalChannelAdditions; }
     /** @brief 获取累计订阅切换次数 @return 切换次数 */
     quint64 totalSubscribeToggles() const { return m_totalSubscribeToggles; }
+    /** @brief 获取累计通道订阅次数 @return 订阅次数 */
+    quint64 totalChannelSubscriptions() const { return m_totalChannelSubscriptions; }
+    /** @brief 获取累计数据发布次数 @return 发布次数 */
+    quint64 totalDataPublishes() const { return m_totalDataPublishes; }
+    /** @brief 重置所有插件API统计(发送/面板注册/通道/订阅/数据发布) */
+    void resetStats();
 
 signals:
     /** @brief 接收到数据信号（插件订阅后触发） */
@@ -127,6 +133,8 @@ private:
     quint64 m_totalPanelRegistrations = 0;    ///< 累计面板注册次数
     quint64 m_totalChannelAdditions = 0;      ///< 累计通道添加次数
     quint64 m_totalSubscribeToggles = 0;      ///< 累计订阅切换次数
+    quint64 m_totalChannelSubscriptions = 0;  ///< 累计通道订阅次数
+    quint64 m_totalDataPublishes = 0;         ///< 累计数据发布次数
 };
 
 #endif // PLUGINAPI_H

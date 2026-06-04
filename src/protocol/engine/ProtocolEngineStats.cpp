@@ -114,6 +114,30 @@ double ProtocolEngine::crcPassRate() const
     return static_cast<double>(m_crcPassCount) / static_cast<double>(total);
 }
 
+/** @brief 获取帧解析尝试总次数(tryParseOneFrame调用) @return 解析尝试计数 */
+quint64 ProtocolEngine::totalParses() const
+{
+    return m_totalParses;
+}
+
+/** @brief 获取校验和计算验证总次数(validateChecksum调用) @return 校验验证计数 */
+quint64 ProtocolEngine::totalChecksums() const
+{
+    return m_totalChecksums;
+}
+
+/** @brief 获取帧头匹配成功总次数 @return 匹配成功计数 */
+quint64 ProtocolEngine::totalMatches() const
+{
+    return m_totalMatches;
+}
+
+/** @brief 获取数据注入总次数(feedData调用) @return 数据注入计数 */
+quint64 ProtocolEngine::totalBuilds() const
+{
+    return m_totalBuilds;
+}
+
 /** @brief 重置所有解析统计计数器(不影响schema和缓冲区) */
 void ProtocolEngine::resetParseStatistics()
 {
@@ -131,6 +155,10 @@ void ProtocolEngine::resetParseStatistics()
     m_totalValidationPasses = 0;
     m_totalValidationFailures = 0;
     m_totalCrcChecks = 0;
+    m_totalParses = 0;
+    m_totalChecksums = 0;
+    m_totalMatches = 0;
+    m_totalBuilds = 0;
 }
 
 /** @brief 重置所有引擎统计计数器(等同于resetParseStatistics) */

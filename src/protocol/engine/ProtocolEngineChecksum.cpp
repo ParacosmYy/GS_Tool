@@ -19,6 +19,8 @@ bool ProtocolEngine::validateChecksum(const QByteArray &frame,
                                        quint64 *expectedVal,
                                        quint64 *actualVal) const
 {
+    ++m_totalChecksums;  // 累计校验和计算验证计数
+
     if (frame.isEmpty()) { return false; }
 
     /* 确定实际使用的校验算法 */

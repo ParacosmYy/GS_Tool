@@ -87,6 +87,7 @@ bool DashboardModel::saveToFile(const QString &filePath) const
     /* 统计：配置文件保存计数（const方法中修改mutable计数器） */
     ++m_profileSaves;
     ++m_totalLayoutSaves;
+    ++m_totalSerializations;  ///< 统计: 每次序列化保存递增
     return true;
 }
 

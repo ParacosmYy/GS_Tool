@@ -119,6 +119,16 @@ public:
     quint64 totalScanCount() const { return m_scanCount; }
     /** @brief 获取累计发现插件文件数 @return 发现文件数 */
     quint64 totalDiscoveredFiles() const { return m_discoveredFiles; }
+    /** @brief 获取累计插件加载次数 @return 加载次数 */
+    quint64 totalPluginLoads() const { return m_loadCount; }
+    /** @brief 获取累计插件卸载次数 @return 卸载次数 */
+    quint64 totalPluginUnloads() const { return m_unloadCount; }
+    /** @brief 获取累计扫描尝试次数 @return 扫描尝试次数 */
+    quint64 totalScanAttempts() const { return m_scanCount; }
+    /** @brief 获取累计加载错误次数 @return 加载错误次数 */
+    quint64 totalLoadErrors() const { return m_failCount; }
+    /** @brief 重置所有插件管理统计(含加载/卸载/扫描/错误/发现文件) */
+    void resetStats();
 
 signals:
     /** @brief 插件加载成功信号 */

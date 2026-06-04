@@ -30,6 +30,7 @@ void ProgressBarWidget::setValue(double value)
 {
     m_value = value;
     ++m_totalValueUpdates;
+    if (m_max > m_min && value >= m_max) ++m_totalCompleteEvents;
     update();
 }
 
@@ -53,6 +54,16 @@ void ProgressBarWidget::setRange(double min, double max)
 void ProgressBarWidget::setLabel(const QString &label)
 {
     m_label = label;
+    update();
+}
+
+/**
+ * @brief 取消当前进度，值重置为起始值并递增取消计数
+ */
+void ProgressBarWidget::cancel()
+{
+    ++m_totalCancelledEvents;
+    m_value = m_min;
     update();
 }
 
@@ -150,4 +161,6 @@ void ProgressBarWidget::resetStatistics()
 {
     m_totalValueUpdates = 0;
     m_totalRangeChanges = 0;
+    m_totalCompleteEvents = 0;
+    m_totalCancelledEvents = 0;
 }

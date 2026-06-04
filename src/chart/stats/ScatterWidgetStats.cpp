@@ -182,4 +182,7 @@ void ScatterWidget::resetScatterStatistics()
     m_totalClears = 0;
     m_pointDensityMax = 0;
     m_averageValue = 0.0;
+    m_totalPointUpdates = 0;
+    m_totalAxisAutoScales = 0;
+    m_totalRenders = 0;
 }

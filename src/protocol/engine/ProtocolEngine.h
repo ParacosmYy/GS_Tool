@@ -60,6 +60,10 @@ public:
     quint64 crcPassCount() const;            ///< CRC校验通过次数
     quint64 crcFailCount() const;            ///< CRC校验失败次数
     double crcPassRate() const;              ///< CRC校验通过率(0.0~1.0)
+    quint64 totalParses() const;             ///< 帧解析尝试总次数(tryParseOneFrame调用)
+    quint64 totalChecksums() const;          ///< 校验和计算验证总次数(validateChecksum调用)
+    quint64 totalMatches() const;            ///< 帧头匹配成功总次数
+    quint64 totalBuilds() const;             ///< 数据注入总次数(feedData调用)
     void resetParseStatistics();             ///< 重置解析统计
     void resetEngineStatistics();            ///< 重置所有统计(等同resetParseStatistics)
     void resetStats();                       ///< 别名(调用resetEngineStatistics)
@@ -89,6 +93,10 @@ private:
     quint64 m_totalBytesParsed = 0;         ///< 已解析的字节总数（仅成功解析的帧内字节）
     quint64 m_crcPassCount = 0;             ///< CRC校验通过次数
     quint64 m_crcFailCount = 0;             ///< CRC校验失败次数
+    quint64 m_totalParses = 0;              ///< 帧解析尝试总次数(tryParseOneFrame调用)
+    mutable quint64 m_totalChecksums = 0;   ///< 校验和计算验证总次数(validateChecksum调用)
+    quint64 m_totalMatches = 0;             ///< 帧头匹配成功总次数
+    quint64 m_totalBuilds = 0;              ///< 数据注入总次数(feedData调用)
 
     /** @brief 尝试从缓冲区中解析一帧 @return 成功解析返回true */
     bool tryParseOneFrame();

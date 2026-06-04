@@ -68,6 +68,7 @@ bool PluginApi::sendData(const QByteArray& data)
         return false;
     }
     ++m_sendCount;
+    ++m_totalDataPublishes;  ///< 统计: 数据发布次数递增
     m_sendBytes += data.size();
     emit dataSendRequested(data);
     return true;
@@ -83,6 +84,7 @@ void PluginApi::subscribeReceivedData()
 {
     m_subscribed = true;
     ++m_totalSubscribeToggles;
+    ++m_totalChannelSubscriptions;  ///< 统计: 通道订阅次数递增
 }
 
 /**
@@ -95,6 +97,7 @@ void PluginApi::unsubscribeReceivedData()
 {
     m_subscribed = false;
     ++m_totalSubscribeToggles;
+    ++m_totalChannelSubscriptions;  ///< 统计: 通道取消订阅也计入订阅切换次数
 }
 
 /**
@@ -168,4 +171,12 @@ void PluginApi::resetSendStatistics()
     m_totalPanelRegistrations = 0;
     m_totalChannelAdditions = 0;
     m_totalSubscribeToggles = 0;
+}
+
+/** @brief 重置所有插件API统计(发送计数/字节数/面板注册/通道添加/订阅切换/通道订阅/数据发布) */
+void PluginApi::resetStats()
+{
+    resetSendStatistics();
+    m_totalChannelSubscriptions = 0;
+    m_totalDataPublishes = 0;
 }

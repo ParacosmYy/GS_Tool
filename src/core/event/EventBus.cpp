@@ -50,6 +50,12 @@ int EventBus::subscribe(const QString& eventName, QObject* subscriber, Callback 
     m_subscriptions.insert(id, sub);
     m_eventSubscriptions.insert(eventName, id);
 
+    // 更新单事件峰值订阅者数
+    quint64 currentCount = static_cast<quint64>(m_eventSubscriptions.count(eventName));
+    if (currentCount > m_peakSubscribersPerEvent) {
+        m_peakSubscribersPerEvent = currentCount;
+    }
+
     // 订阅者销毁时自动取消订阅
     if (subscriber) {
         QObject::connect(subscriber, &QObject::destroyed, this, [this, subscriber]() {
@@ -70,6 +76,8 @@ void EventBus::unsubscribe(int subscriptionId)
 
     auto it = m_subscriptions.find(subscriptionId);
     if (it == m_subscriptions.end()) return;
+
+    ++m_totalUnsubscriptions;  // 累计取消订阅计数
 
     const QString eventName = it->eventName;
     m_subscriptions.erase(it);
@@ -101,6 +109,7 @@ void EventBus::unsubscribeAll(QObject* subscriber)
     }
 
     // 批量移除
+    m_totalUnsubscriptions += static_cast<quint64>(ids.size());  // 累计取消订阅计数
     for (int id : ids) {
         auto it = m_subscriptions.find(id);
         if (it != m_subscriptions.end()) {

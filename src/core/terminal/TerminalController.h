@@ -74,12 +74,18 @@ private:
     quint64 m_totalClears = 0;              ///< 累计清屏次数
     quint64 m_totalSearches = 0;            ///< 累计搜索次数
     quint64 m_totalExports = 0;             ///< 累计导出次数
+    quint64 m_totalScrollToBottom = 0;      ///< 累计滚动到底部次数
+    quint64 m_totalBufferOverflows = 0;     ///< 累计缓冲区溢出次数
 public:
     quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; }
     quint64 totalClears() const { return m_totalClears; }
     quint64 totalSearches() const { return m_totalSearches; }
     quint64 totalExports() const { return m_totalExports; }
+    quint64 totalScrollToBottom() const { return m_totalScrollToBottom; } ///< 累计滚动到底部次数
+    quint64 totalBufferOverflows() const { return m_totalBufferOverflows; } ///< 累计缓冲区溢出次数
     void resetTerminalControllerStatistics() { m_totalDisplayModeChanges = 0; m_totalClears = 0; m_totalSearches = 0; m_totalExports = 0; }
+    /** @brief 重置所有终端控制器统计计数器(含滚动/缓冲区溢出) */
+    void resetStats() { m_totalDisplayModeChanges = 0; m_totalClears = 0; m_totalSearches = 0; m_totalExports = 0; m_totalScrollToBottom = 0; m_totalBufferOverflows = 0; }
 };
 
 #endif // TERMINALCONTROLLER_H

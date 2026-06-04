@@ -64,6 +64,7 @@ void ProtocolEngine::feedData(const QByteArray &data)
     /* 追加数据到缓冲区 */
     m_buffer.append(data);
     m_totalBytesProcessed += static_cast<quint64>(data.size());
+    ++m_totalBuilds;  // 累计数据注入计数
 
     /* 无 schema 或 schema 无效时直接返回 */
     if (!m_schema || !m_schema->isValid()) {
@@ -105,6 +106,10 @@ void ProtocolEngine::reset()
     m_totalValidationPasses = 0;
     m_totalValidationFailures = 0;
     m_totalCrcChecks = 0;
+    m_totalParses = 0;
+    m_totalChecksums = 0;
+    m_totalMatches = 0;
+    m_totalBuilds = 0;
 }
 
 /** @brief 获取当前使用的协议定义 @return 协议定义指针，未设置时为 nullptr */
@@ -120,6 +125,8 @@ ProtocolSchema *ProtocolEngine::currentSchema() const
 /** @brief 尝试从缓冲区中解析一帧(搜索帧头→读取长度→校验→字段提取) @return true成功提取一帧，false缓冲区数据不足 */
 bool ProtocolEngine::tryParseOneFrame()
 {
+    ++m_totalParses;  // 累计帧解析尝试计数
+
     const auto framing = m_schema->framing();
     const auto &headerBytes = framing.header;
 
@@ -135,6 +142,7 @@ bool ProtocolEngine::tryParseOneFrame()
     if (headerPos > 0) {
         m_buffer.remove(0, headerPos);
     }
+    ++m_totalMatches;  // 累计帧头匹配成功计数
 
     /* ---- 步骤2：检查长度字段是否已接收 ---- */
     int lengthFieldEnd = framing.lengthFieldOffset + framing.lengthFieldSize;

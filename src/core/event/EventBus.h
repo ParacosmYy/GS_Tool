@@ -117,14 +117,26 @@ public:
     /** @brief 获取累计发布的事件总数(同步+异步) @return 事件数 */
     quint64 totalPublished() const;
 
+    /** @brief 获取累计发布的事件总数(同步+异步)别名 @return 事件数 */
+    quint64 totalPublishes() const { return m_totalPublished; }
+
     /** @brief 获取累计订阅操作总数 @return 订阅数 */
     quint64 totalSubscriptions() const;
+
+    /** @brief 获取累计取消订阅操作总数 @return 取消订阅数 */
+    quint64 totalUnsubscriptions() const;
 
     /** @brief 获取累计调用的回调处理器总数 @return 调用次数 */
     quint64 totalHandlersCalled() const;
 
-    /** @brief 重置所有统计计数器(发布/订阅/回调次数) */
+    /** @brief 获取单个事件的历史峰值订阅者数 @return 峰值订阅者数 */
+    quint64 peakSubscribersPerEvent() const;
+
+    /** @brief 重置所有统计计数器(发布/订阅/取消订阅/回调/峰值) */
     void resetEventStatistics();
+
+    /** @brief 重置所有统计计数器(resetEventStatistics的简短别名) */
+    void resetStats() { resetEventStatistics(); }
 
 signals:
     /**
@@ -152,9 +164,11 @@ private:
     mutable std::mutex m_mutex;                     ///< 线程安全互斥锁
 
     // 统计计数器
-    quint64 m_totalPublished = 0;       ///< 累计发布的事件总数(同步+异步)
-    quint64 m_totalSubscriptions = 0;   ///< 累计订阅操作总数
-    quint64 m_totalHandlersCalled = 0;  ///< 累计调用的回调处理器总数
+    quint64 m_totalPublished = 0;               ///< 累计发布的事件总数(同步+异步)
+    quint64 m_totalSubscriptions = 0;           ///< 累计订阅操作总数
+    quint64 m_totalUnsubscriptions = 0;         ///< 累计取消订阅操作总数
+    quint64 m_totalHandlersCalled = 0;          ///< 累计调用的回调处理器总数
+    quint64 m_peakSubscribersPerEvent = 0;      ///< 单个事件的历史峰值订阅者数
 
     /** @brief 处理异步事件发布 */
     void handleAsyncEvent(const QString& eventName, const QVariant& data);

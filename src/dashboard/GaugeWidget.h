@@ -55,6 +55,10 @@ public:
     quint64 totalValueUpdates() const;
     /** @brief 获取累计量程变更次数 */
     quint64 totalRangeChanges() const;
+    /** @brief 获取累计阈值超限次数(值超出量程范围) */
+    quint64 totalThresholdExceeds() const { return m_totalThresholdExceeds; }
+    /** @brief 获取累计渲染次数(paintEvent触发) */
+    quint64 totalRenders() const { return m_totalRenders; }
     /** @brief 重置所有量表统计计数器 */
     void resetGaugeStatistics();
 
@@ -75,6 +79,8 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalValueUpdates = 0;  ///< 累计值更新次数
     quint64 m_totalRangeChanges = 0;  ///< 累计量程变更次数
+    quint64 m_totalThresholdExceeds = 0; ///< 累计阈值超限次数(值超出量程范围)
+    quint64 m_totalRenders = 0;       ///< 累计渲染次数(paintEvent触发)
 };
 
 #endif // GAUGE_WIDGET_H

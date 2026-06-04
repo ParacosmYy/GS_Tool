@@ -79,7 +79,16 @@ public:
     /** @brief 获取累计召回(补全选中)的次数 @return 召回次数 */
     quint64 totalRecalls() const;
 
-    /** @brief 重置所有统计计数器(添加/清空/召回) */
+    /** @brief 获取累计搜索/补全弹出次数 @return 搜索次数 */
+    quint64 totalSearches() const;
+
+    /** @brief 获取累计选中补全项次数(鼠标点击+键盘Enter) @return 选中次数 */
+    quint64 totalSelects() const;
+
+    /** @brief 获取历史列表的峰值大小(条目数) @return 峰值大小 */
+    quint64 peakHistorySize() const;
+
+    /** @brief 重置所有统计计数器(添加/清空/召回/搜索/选中/峰值) */
     void resetHistoryStatistics();
 
 protected:
@@ -97,9 +106,12 @@ private:
     QLineEdit* m_input = nullptr;           ///< 绑定的输入框
 
     // 统计计数器
-    quint64 m_totalAdds = 0;       ///< 累计添加的历史记录数
-    quint64 m_totalClears = 0;     ///< 累计清空历史的次数
-    quint64 m_totalRecalls = 0;    ///< 累计召回(补全选中)的次数
+    quint64 m_totalAdds = 0;           ///< 累计添加的历史记录数
+    quint64 m_totalClears = 0;         ///< 累计清空历史的次数
+    quint64 m_totalRecalls = 0;        ///< 累计召回(补全选中)的次数
+    quint64 m_totalSearches = 0;       ///< 累计搜索/补全弹出次数
+    quint64 m_totalSelects = 0;        ///< 累计选中补全项次数(鼠标点击+键盘Enter)
+    quint64 m_peakHistorySize = 0;     ///< 历史列表的峰值大小(条目数)
 };
 
 #endif // SENDHISTORYMANAGER_H

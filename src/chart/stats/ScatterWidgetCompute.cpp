@@ -79,6 +79,7 @@ void ScatterWidget::refreshPlot()
     m_totalPointsAdded += n;
     ++m_totalUpdates;
     ++m_totalSelections;
+    ++m_totalPointUpdates;
 
     // 计算Y值平均
     double ySum = 0.0;
@@ -109,10 +110,14 @@ void ScatterWidget::refreshPlot()
     m_xAxis->setRange(xMin - xPad, xMax + xPad);
     m_yAxis->setRange(yMin - yPad, yMax + yPad);
     ++m_totalAutoFits;
+    ++m_totalAxisAutoScales;
 
     // 更新轴标题
     m_xAxis->setTitleText(tr("X: %1").arg(xName));
     m_yAxis->setTitleText(tr("Y: %1").arg(yName));
+
+    // 累计渲染计数
+    ++m_totalRenders;
 
     // 计算Pearson相关系数
     double r = computePearsonCorrelation(xData, yData);

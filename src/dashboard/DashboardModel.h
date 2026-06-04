@@ -119,8 +119,14 @@ public:
     /** @brief 获取累计布局加载次数 @return 加载总数 */
     quint64 totalLayoutLoads() const;
 
+    /** @brief 获取累计序列化次数(保存操作) @return 序列化总数 */
+    quint64 totalSerializations() const;
+
     /** @brief 重置所有统计计数器(通道+组件+布局+配置文件+生命周期) */
     void resetAllStatistics();
+
+    /** @brief 重置所有仪表盘统计计数器(含序列化计数) */
+    void resetStats();
 
 signals:
     /** @brief 配置发生变更时发射 */
@@ -155,6 +161,7 @@ private:
     mutable quint64 m_totalWidgetRemovals = 0;               ///< 累计组件移除次数
     mutable quint64 m_totalLayoutSaves = 0;                  ///< 累计布局保存次数
     mutable quint64 m_totalLayoutLoads = 0;                  ///< 累计布局加载次数
+    mutable quint64 m_totalSerializations = 0;               ///< 累计序列化次数(保存操作)
 };
 
 #endif // DASHBOARD_MODEL_H

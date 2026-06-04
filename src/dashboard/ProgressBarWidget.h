@@ -33,6 +33,9 @@ public:
     /// 设置显示标签
     void setLabel(const QString &label);
 
+    /// 取消当前进度并重置为起始值
+    void cancel();
+
     /// 绑定数据通道
     void bindChannel(const QString &channelName);
 
@@ -57,6 +60,12 @@ public:
     /** @brief 获取范围变更总次数 */
     quint64 totalRangeChanges() const { return m_totalRangeChanges; }
 
+    /** @brief 获取累计完成事件次数(值达到上限) */
+    quint64 totalCompleteEvents() const { return m_totalCompleteEvents; }
+
+    /** @brief 获取累计取消事件次数 */
+    quint64 totalCancelledEvents() const { return m_totalCancelledEvents; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -76,6 +85,8 @@ private:
 
     quint64 m_totalValueUpdates = 0; ///< 值更新总次数
     quint64 m_totalRangeChanges = 0; ///< 范围变更总次数
+    quint64 m_totalCompleteEvents = 0; ///< 累计完成事件次数(值达到上限)
+    quint64 m_totalCancelledEvents = 0; ///< 累计取消事件次数
 };
 
 #endif // PROGRESS_BAR_WIDGET_H

@@ -15,6 +15,7 @@
 class QPaintEvent;
 class QResizeEvent;
 class QMouseEvent;
+class QWheelEvent;
 
 /**
  * @class HeatmapWidget
@@ -65,6 +66,12 @@ public:
     /** @brief 获取单次更新峰值单元格数 */
     quint64 peakCellsPerUpdate() const { return m_peakCellsPerUpdate; }
 
+    /** @brief 获取累计颜色刻度变更次数(setColorRange调用) */
+    quint64 totalColorScales() const { return m_totalColorScales; }
+
+    /** @brief 获取累计缩放事件次数(滚轮缩放) */
+    quint64 totalZoomEvents() const { return m_totalZoomEvents; }
+
     /** @brief 重置所有统计计数器 */
     void resetHeatmapStats();
 
@@ -88,6 +95,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     /** @brief 鼠标按下事件处理 */
     void mousePressEvent(QMouseEvent *event) override;
+    /** @brief 滚轮事件处理(缩放单元格大小) */
+    void wheelEvent(QWheelEvent *event) override;
 
 private:
     /** @brief 重建离屏缓存像素图 */
@@ -117,6 +126,8 @@ private:
     quint64 m_totalColorMapChanges = 0;///< 累计颜色映射范围变更次数
     quint64 m_totalCellsRendered = 0;  ///< 累计渲染单元格总数
     quint64 m_peakCellsPerUpdate = 0;  ///< 单次更新峰值单元格数
+    quint64 m_totalColorScales = 0;    ///< 累计颜色刻度变更次数(setColorRange调用)
+    quint64 m_totalZoomEvents = 0;     ///< 累计缩放事件次数(滚轮缩放)
 };
 
 #endif // HEATMAPWIDGET_H

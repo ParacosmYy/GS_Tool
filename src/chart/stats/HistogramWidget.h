@@ -99,6 +99,14 @@ public slots:
     int peakBinIndex() const;
     /** @brief 获取最大桶计数值(上次计算结果) @return 最大计数 */
     int maxBinCount() const;
+    /** @brief 获取累计分桶重计算次数(computeHistogram调用) */
+    quint64 totalBinRecalculations() const { return m_totalBinRecalculations; }
+    /** @brief 获取累计分布更新次数(refreshHistogram成功执行) */
+    quint64 totalDistributionUpdates() const { return m_totalDistributionUpdates; }
+    /** @brief 获取累计Y轴自动范围调整次数 */
+    quint64 totalAutoRanges() const { return m_totalAutoRanges; }
+    /** @brief 获取累计导出次数(CSV导出调用，无论成功与否) */
+    quint64 totalExports() const { return m_totalExports; }
     /** @brief 重置所有直方图统计计数器 */
     void resetHistogramStatistics();
 
@@ -139,6 +147,10 @@ private:
     quint64 m_totalBinsComputed = 0;  ///< 累计分桶计算次数
     int m_peakBinIndex = -1;          ///< 峰值所在桶索引(上次计算结果)
     int m_maxBinCount = 0;            ///< 最大桶计数值(上次计算结果)
+    quint64 m_totalBinRecalculations = 0;  ///< 累计分桶重计算次数(computeHistogram调用)
+    quint64 m_totalDistributionUpdates = 0;///< 累计分布更新次数(refreshHistogram成功执行)
+    quint64 m_totalAutoRanges = 0;    ///< 累计Y轴自动范围调整次数
+    quint64 m_totalExports = 0;       ///< 累计导出次数(CSV导出调用)
 };
 
 #endif // HISTOGRAMWIDGET_H

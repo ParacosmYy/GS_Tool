@@ -78,6 +78,15 @@ public:
     /** @brief 获取峰值数据点数(单帧最大数据点) */
     quint64 peakDataPoints() const { return m_peakDataPoints; }
 
+    /** @brief 获取累计帧更新次数(addSpectrum中实际绘制新行的次数) */
+    quint64 totalFrameUpdates() const { return m_totalFrameUpdates; }
+
+    /** @brief 获取累计滚动事件次数(定时器触发scrollImage的次数) */
+    quint64 totalScrollEvents() const { return m_totalScrollEvents; }
+
+    /** @brief 获取累计渲染次数(paintEvent中实际绘制帧的次数) */
+    quint64 totalRenders() const { return m_totalRenders; }
+
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -121,4 +130,7 @@ private:
     quint64 m_totalScrolls = 0;         ///< 累计滚动刷新次数
     quint64 m_totalColorMapChanges = 0; ///< 累计颜色映射范围变更次数
     quint64 m_peakDataPoints = 0;       ///< 峰值数据点数(单帧最大数据点)
+    quint64 m_totalFrameUpdates = 0;    ///< 累计帧更新次数(addSpectrum中实际绘制新行)
+    quint64 m_totalScrollEvents = 0;    ///< 累计滚动事件次数(定时器触发scrollImage)
+    quint64 m_totalRenders = 0;         ///< 累计渲染次数(paintEvent中实际绘制帧)
 };

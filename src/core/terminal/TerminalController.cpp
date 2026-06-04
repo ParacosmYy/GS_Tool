@@ -106,13 +106,18 @@ void TerminalController::updateStatusBar()
     // 使用公共 ByteFormat::formatSize 替代本地重复实现
     m_rxBytesLbl->setText(tr("接收: ") + ByteFormat::formatSize(rx));
     m_txBytesLbl->setText(tr("发送: ") + ByteFormat::formatSize(tx));
+    ++m_totalScrollToBottom;  ///< 统计: 每次状态栏刷新视为一次滚动到底部操作
 }
 
-/** @brief 定时刷新数据统计面板(由m_statsTimer每500ms触发) */
+/** @brief 定时刷新数据统计面板(由m_statsTimer每500ms触发)，同时检测缓冲区溢出 */
 void TerminalController::updateDataStatistics()
 {
     if (m_terminalModel && m_dataStats) {
         m_dataStats->update(m_terminalModel->rxBytes(), m_terminalModel->txBytes());
+        // 检测缓冲区溢出: 行数达到最大限制时视为溢出
+        if (m_terminalModel->lineCount() >= m_terminalModel->maxLines()) {
+            ++m_totalBufferOverflows;
+        }
     }
 }
 

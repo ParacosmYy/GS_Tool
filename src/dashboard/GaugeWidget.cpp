@@ -28,6 +28,7 @@ void GaugeWidget::setValue(double value)
 {
     m_value = value;
     ++m_totalValueUpdates;
+    if (value < m_min || value > m_max) ++m_totalThresholdExceeds;
     update();
 }
 
@@ -91,4 +92,6 @@ void GaugeWidget::resetGaugeStatistics()
 {
     m_totalValueUpdates = 0;
     m_totalRangeChanges = 0;
+    m_totalThresholdExceeds = 0;
+    m_totalRenders = 0;
 }

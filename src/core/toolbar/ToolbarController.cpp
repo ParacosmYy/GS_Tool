@@ -52,23 +52,23 @@ QToolBar* ToolbarController::createToolbar(QMainWindow* parent)
 
     // ---- 连接内部信号转发（带统计计数） ----
     connect(m_displayModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, [this](int index) { ++m_totalDisplayModeChanges; emit displayModeChanged(index); });
+            this, [this](int index) { ++m_totalDisplayModeChanges; ++m_totalModeSwitches; ++m_totalButtonPresses; emit displayModeChanged(index); });
     connect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &ToolbarController::terminalLayoutChanged);
+            this, [this](int index) { ++m_totalModeSwitches; emit terminalLayoutChanged(index); });
     connect(m_timestampAction, &QAction::toggled,
             this, &ToolbarController::timestampToggled);
     connect(m_dirPrefixAction, &QAction::toggled,
             this, &ToolbarController::dirPrefixToggled);
     connect(m_clearAction, &QAction::triggered,
-            this, [this]() { ++m_totalClears; emit clearRequested(); });
+            this, [this]() { ++m_totalClears; ++m_totalButtonPresses; emit clearRequested(); });
     connect(m_exportAction, &QAction::triggered,
-            this, [this]() { ++m_totalExports; emit exportRequested(); });
+            this, [this]() { ++m_totalExports; ++m_totalButtonPresses; emit exportRequested(); });
     connect(m_bgAction, &QAction::triggered,
-            this, &ToolbarController::bgSettingsRequested);
+            this, [this]() { ++m_totalButtonPresses; emit bgSettingsRequested(); });
     connect(m_themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, [this](int index) { ++m_totalThemeChanges; emit themeChanged(index); });
+            this, [this](int index) { ++m_totalThemeChanges; ++m_totalModeSwitches; ++m_totalButtonPresses; emit themeChanged(index); });
     connect(m_langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &ToolbarController::languageChanged);
+            this, [this](int index) { ++m_totalButtonPresses; emit languageChanged(index); });
 
     // 用 ThemeManager 当前可用主题初始化下拉框
     setAvailableThemes(ThemeManager::instance().availableThemes());

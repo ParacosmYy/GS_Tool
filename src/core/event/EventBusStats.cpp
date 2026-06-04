@@ -53,6 +53,13 @@ quint64 EventBus::totalSubscriptions() const
     return m_totalSubscriptions;
 }
 
+/** @brief 获取累计取消订阅操作总数 @return 取消订阅数 */
+quint64 EventBus::totalUnsubscriptions() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_totalUnsubscriptions;
+}
+
 /** @brief 获取累计调用的回调处理器总数 @return 调用次数 */
 quint64 EventBus::totalHandlersCalled() const
 {
@@ -60,11 +67,20 @@ quint64 EventBus::totalHandlersCalled() const
     return m_totalHandlersCalled;
 }
 
-/** @brief 重置所有统计计数器(发布/订阅/回调次数) */
+/** @brief 获取单个事件的历史峰值订阅者数 @return 峰值订阅者数 */
+quint64 EventBus::peakSubscribersPerEvent() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_peakSubscribersPerEvent;
+}
+
+/** @brief 重置所有统计计数器(发布/订阅/取消订阅/回调/峰值) */
 void EventBus::resetEventStatistics()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_totalPublished = 0;
     m_totalSubscriptions = 0;
+    m_totalUnsubscriptions = 0;
     m_totalHandlersCalled = 0;
+    m_peakSubscribersPerEvent = 0;
 }

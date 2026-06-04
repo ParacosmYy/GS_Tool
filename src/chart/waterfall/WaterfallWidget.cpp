@@ -33,6 +33,7 @@ void WaterfallWidget::addSpectrum(const QVector<double> &spectrum)
     if (m_paused) { m_totalSpectrumsDropped++; return; }
     m_totalSpectrumsAdded++;
     m_totalUpdates++;
+    ++m_totalFrameUpdates;
     if (static_cast<quint64>(spectrum.size()) > m_peakDataPoints) m_peakDataPoints = spectrum.size();
     if (spectrum.size() > m_peakSpectrumWidth) m_peakSpectrumWidth = spectrum.size();
     m_history.append(spectrum);
@@ -104,6 +105,7 @@ void WaterfallWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
     m_totalRepaints++;
+    ++m_totalRenders;
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing, false);
     if (m_waterfall.isNull()) {
@@ -139,6 +141,7 @@ void WaterfallWidget::mouseMoveEvent(QMouseEvent *event)
 void WaterfallWidget::scrollImage()
 {
     m_totalScrolls++;
+    ++m_totalScrollEvents;
     update();
 }
 
@@ -173,4 +176,7 @@ void WaterfallWidget::resetStats()
     m_totalScrolls = 0;
     m_totalColorMapChanges = 0;
     m_peakDataPoints = 0;
+    m_totalFrameUpdates = 0;
+    m_totalScrollEvents = 0;
+    m_totalRenders = 0;
 }

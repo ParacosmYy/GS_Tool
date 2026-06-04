@@ -194,3 +194,9 @@ void PluginManager::resetLoadStatistics()
     m_scanCount = 0;
     m_discoveredFiles = 0;
 }
+
+/** @brief 重置所有插件管理统计计数器(含加载/卸载/扫描/错误/发现文件) */
+void PluginManager::resetStats()
+{
+    resetLoadStatistics();
+}

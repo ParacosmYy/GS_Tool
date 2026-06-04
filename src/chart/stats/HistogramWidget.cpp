@@ -68,6 +68,7 @@ void HistogramWidget::refreshHistogram()
 
     int bins = m_binsSpin->value();
     auto histData = computeHistogram(data, bins);
+    ++m_totalBinRecalculations;
 
     // 更新柱体数据
     m_barSet->remove(0, m_barSet->count());
@@ -89,6 +90,7 @@ void HistogramWidget::refreshHistogram()
         }
     }
     m_yAxis->setRange(0, qMax(maxCount + 1, 1));
+    ++m_totalAutoRanges;
     m_peakBinIndex = peakIdx;
     m_maxBinCount = maxCount;
     ++m_totalBinsComputed;
@@ -103,6 +105,7 @@ void HistogramWidget::refreshHistogram()
             .arg(s.max, 0, 'f', 3)
             .arg(s.count));
     ++m_totalUpdates;
+    ++m_totalDistributionUpdates;
 }
 
 /** @brief 通道选择变更回调 @param index 下拉框当前索引 */

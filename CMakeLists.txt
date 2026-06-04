@@ -70,6 +70,7 @@ set(SOURCES
     src/serial/detector/SerialDetectorQuery.cpp
     src/chart/waterfall/WaterfallWidget.cpp
     src/chart/heatmap/HeatmapWidget.cpp
+    src/chart/heatmap/HeatmapWidgetPaint.cpp
     src/core/settings/SettingsController.cpp
     src/core/settings/SettingsControllerPersistence.cpp
     src/core/toolbar/ToolbarController.cpp
@@ -147,6 +148,7 @@ set(SOURCES
     src/serial/commands/QuickCommandBarActions.cpp
     src/serial/commands/QuickCommandBarDialog.cpp
     src/serial/data/BookmarkWidget.cpp
+    src/serial/data/BookmarkWidgetStats.cpp
     src/serial/commands/TimedSender.cpp
     src/serial/commands/TimedSenderStats.cpp
     src/serial/commands/SendHistory.cpp
@@ -306,6 +308,7 @@ set(SOURCES
     src/dashboard/ProgressBarWidget.cpp
     src/dashboard/LedIndicatorWidget.cpp
     src/dashboard/NumericDisplayWidget.cpp
+    src/dashboard/NumericDisplayWidgetPaint.cpp
     src/dashboard/DashboardModel.cpp
     src/dashboard/DashboardModelItems.cpp
     src/dashboard/DashboardSerializer.cpp
@@ -344,6 +347,7 @@ set(SOURCES
     src/utils/perf/PerformanceMonitor.cpp
     src/utils/perf/PerformanceMonitorLatency.cpp
     src/utils/perf/PerformanceOverlay.cpp
+    src/utils/perf/PerformanceOverlayStats.cpp
 
     # ── F11: 插件系统 ──
     src/plugin/PluginManager.cpp

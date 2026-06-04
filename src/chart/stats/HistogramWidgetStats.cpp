@@ -95,6 +95,7 @@ HistogramWidget::Stats HistogramWidget::computeStats(
 /** @brief 导出当前直方图数据到CSV文件 @param filePath 目标文件路径 @return true=导出成功 */
 bool HistogramWidget::exportToCsv(const QString& filePath)
 {
+    ++m_totalExports;
     if (!m_model || !m_barSet || m_barSet->count() == 0) {
         return false;
     }
@@ -160,4 +161,8 @@ void HistogramWidget::resetHistogramStatistics()
     m_totalBinsComputed = 0;
     m_peakBinIndex = -1;
     m_maxBinCount = 0;
+    m_totalBinRecalculations = 0;
+    m_totalDistributionUpdates = 0;
+    m_totalAutoRanges = 0;
+    m_totalExports = 0;
 }

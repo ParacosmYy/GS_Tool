@@ -54,6 +54,9 @@ public:
     /** @brief 获取格式变更总次数 */
     quint64 totalFormatChanges() const { return m_totalFormatChanges; }
 
+    /** @brief 获取历史峰值 */
+    double peakValue() const { return m_peakValue; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -72,6 +75,7 @@ private:
 
     quint64 m_totalValueUpdates = 0;  ///< 值更新总次数
     quint64 m_totalFormatChanges = 0; ///< 格式变更总次数
+    mutable double m_peakValue = 0.0; ///< 历史峰值
 };
 
 #endif // NUMERIC_DISPLAY_WIDGET_H
