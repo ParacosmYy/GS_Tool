@@ -164,6 +164,7 @@ set(SOURCES
     src/chart/zoom/ZoomController.cpp
     src/chart/zoom/ZoomControllerQuery.cpp
     src/chart/zoom/ZoomControllerStats.cpp
+    src/chart/zoom/ZoomControllerViewport.cpp
     src/chart/fft/FftEngine.cpp
     src/chart/fft/FftEngineWindow.cpp
     src/chart/fft/FftWidget.cpp
@@ -341,6 +342,7 @@ set(SOURCES
     src/connection/spi_i2c/SpiConnectionTransfer.cpp
     src/connection/spi_i2c/I2cConnection.cpp
     src/connection/spi_i2c/I2cConnectionScan.cpp
+    src/connection/spi_i2c/I2cConnectionTransfer.cpp
     src/connection/spi_i2c/SpiI2cBridgeManager.cpp
     src/connection/spi_i2c/SpiI2cConfigPanel.cpp
     src/connection/spi_i2c/RegisterEditor.cpp
