@@ -48,6 +48,7 @@ set(SOURCES
     src/core/connect/ConnectionControllerHandlers.cpp
     src/core/connect/ConnectionPresetBuilder.cpp
     src/core/recording/RecordingController.cpp
+    src/core/recording/RecordingControllerStats.cpp
     src/core/navigation/NavigationController.cpp
     src/core/navigation/NavigationControllerQuery.cpp
     src/core/navigation/NavigationControllerAnimations.cpp
@@ -64,6 +65,7 @@ set(SOURCES
     src/core/widgets/DragDropHelper.cpp
     src/core/widgets/DragDropHelperEvents.cpp
     src/core/widgets/ConnectionQuickDialog.cpp
+    src/core/widgets/ConnectionQuickDialogParams.cpp
     src/plugin/loader/PluginLoader.cpp
     src/core/workspace/WorkspaceManager.cpp
     src/core/factory/WidgetFactory.cpp
@@ -124,8 +126,10 @@ set(SOURCES
     src/connection/network/TcpConnectionHelpers.cpp
     src/connection/network/TcpConnectionHandlers.cpp
     src/connection/network/UdpConnection.cpp
+    src/connection/network/UdpConnectionHandlers.cpp
     src/connection/network/UdpConnectionStats.cpp
     src/terminal/widget/TerminalWidget.cpp
+    src/terminal/widget/TerminalWidgetConfig.cpp
     src/terminal/widget/TerminalWidgetEvents.cpp
     src/terminal/widget/TerminalWidgetSlots.cpp
     src/terminal/widget/TerminalWidgetSearch.cpp
@@ -148,6 +152,7 @@ set(SOURCES
     src/terminal/search/TerminalSearchRenderer.cpp
     src/terminal/menu/TerminalContextMenuManager.cpp
     src/serial/config/SerialConfigPanel.cpp
+    src/serial/config/SerialConfigPanelInternal.cpp
     src/serial/config/SerialConfigPanelUI.cpp
     src/serial/config/SerialConfigPanelUISignals.cpp
     src/serial/config/SerialConfigPanelConfig.cpp
@@ -186,6 +191,7 @@ set(SOURCES
     src/protocol/bridge/JustFloatBridge.cpp
     src/protocol/bridge/JustFloatBridgeStats.cpp
     src/protocol/bridge/FireWaterBridge.cpp
+    src/protocol/bridge/FireWaterBridgeParsing.cpp
     src/protocol/bridge/FireWaterBridgeStats.cpp
     src/protocol/bridge/ProtocolBridgeManager.cpp
     src/protocol/bridge/ProtocolBridgeManagerConfig.cpp
@@ -256,6 +262,7 @@ set(SOURCES
     src/utils/settings/SettingsManagerGroups.cpp
     src/utils/export/DataExporter.cpp
     src/utils/export/DataExporterFormats.cpp
+    src/utils/export/DataExporterUtils.cpp
     src/utils/export/DataExporterStats.cpp
     src/utils/export/DataExporterStreamed.cpp
     src/utils/export/DataExporterEdl.cpp
@@ -403,6 +410,7 @@ set(SOURCES
     src/connection/can/CanBusMonitorFrame.cpp
     src/connection/can/CanBusMonitorStats.cpp
     src/connection/can/CanConfigPanel.cpp
+    src/connection/can/CanConfigPanelPersist.cpp
     src/protocol/can/DbcParser.cpp
     src/protocol/can/DbcParserParse.cpp
     src/protocol/can/DbcParserSignal.cpp
@@ -448,6 +456,7 @@ set(SOURCES
     src/connection/spi_i2c/SpiI2cBridgeManager.cpp
     src/connection/spi_i2c/SpiI2cBridgeManagerQueue.cpp
     src/connection/spi_i2c/SpiI2cConfigPanel.cpp
+    src/connection/spi_i2c/SpiI2cConfigPanelUI.cpp
     src/connection/spi_i2c/SpiI2cConfigPanelPersist.cpp
     src/connection/spi_i2c/RegisterEditor.cpp
     src/connection/spi_i2c/RegisterEditorStats.cpp
@@ -467,6 +476,7 @@ set(SOURCES
     src/protocol/modbus/ModbusSlaveResponse.cpp
     src/protocol/modbus/ModbusSlaveStats.cpp
     src/protocol/modbus/ModbusScanWidget.cpp
+    src/protocol/modbus/ModbusScanWidgetScan.cpp
     src/protocol/modbus/ModbusScanWidgetStats.cpp
     src/protocol/modbus/ModbusConfigPanel.cpp
 
@@ -523,6 +533,7 @@ set(SOURCES
 
     # ── F25: 数据包构建器 ──
     src/utils/packet/PacketBuilder.cpp
+    src/utils/packet/PacketBuilderBuild.cpp
     src/utils/packet/PacketBuilderTemplate.cpp
     src/utils/packet/PacketBuilderPanel.cpp
     src/utils/packet/PacketBuilderPanelFields.cpp

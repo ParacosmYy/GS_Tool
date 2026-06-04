@@ -69,6 +69,7 @@ void NavigationController::startBreathingAnimation(QLabel* statusLabel)
     group->setLoopCount(-1);
     group->start(QAbstractAnimation::DeleteWhenStopped);
     m_breathingAnim = group;
+    ++m_totalBreathingStarts;  ///< 统计: 呼吸动画启动
 }
 
 /**
@@ -82,6 +83,7 @@ void NavigationController::startBreathingAnimation(QLabel* statusLabel)
 void NavigationController::stopBreathingAnimation(QLabel* statusLabel)
 {
     if (m_breathingAnim) {
+        ++m_totalBreathingStops;  ///< 统计: 呼吸动画停止
         m_breathingAnim->stop();
         m_breathingAnim = nullptr;
     }

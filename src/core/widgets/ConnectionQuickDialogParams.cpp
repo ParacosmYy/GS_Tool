@@ -19,6 +19,11 @@
 
 #include "core/connect/ConnectionPresetBuilder.h"
 
+#include <QComboBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QSpinBox>
+
 /** @brief 获取当前选中的连接类型 @return 连接类型 */
 ConnectionType ConnectionQuickDialog::selectedType() const
 {
@@ -103,37 +108,4 @@ void ConnectionQuickDialog::setRowVisible(QLabel* label, QWidget* field, bool vi
     }
 }
 
-/** @brief 根据当前类型刷新默认值和字段可见性 */
-void ConnectionQuickDialog::updateTypeUi()
-{
-    const ConnectionType type = selectedType();
-    applyDefaults(type);
-
-    const bool useHostPort = type == ConnectionType::TcpClient
-        || type == ConnectionType::TcpServer
-        || type == ConnectionType::Mqtt
-        || type == ConnectionType::Tls;
-    const bool useUrl = type == ConnectionType::WebSocket;
-    const bool useUdp = type == ConnectionType::Udp;
-
-    setRowVisible(m_hostLabel, m_hostEdit, useHostPort);
-    setRowVisible(m_portLabel, m_portSpin, useHostPort);
-    setRowVisible(m_urlLabel, m_urlEdit, useUrl);
-    setRowVisible(m_localPortLabel, m_localPortSpin, useUdp);
-    setRowVisible(m_remoteHostLabel, m_remoteHostEdit, useUdp);
-    setRowVisible(m_remotePortLabel, m_remotePortSpin, useUdp);
-
-    if (type == ConnectionType::TcpClient || type == ConnectionType::Mqtt || type == ConnectionType::Tls) {
-        m_hostLabel->setText(tr("主机:"));
-    } else if (type == ConnectionType::TcpServer) {
-        m_hostLabel->setText(tr("监听地址:"));
-    } else {
-        m_hostLabel->setText(tr("地址:"));
-    }
-
-    m_portLabel->setText(tr("端口:"));
-    m_urlLabel->setText(tr("URL:"));
-    m_localPortLabel->setText(tr("本地端口:"));
-    m_remoteHostLabel->setText(tr("远程主机:"));
-    m_remotePortLabel->setText(tr("远程端口:"));
-}
+// updateTypeUi()见 ConnectionQuickDialog.cpp

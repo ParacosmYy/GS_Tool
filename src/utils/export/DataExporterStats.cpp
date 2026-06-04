@@ -32,6 +32,12 @@ quint64 DataExporter::totalJsonExports() const { return m_totalJsonExports; }
 /** @brief 获取累计二进制格式导出次数 @return 二进制导出次数 */
 quint64 DataExporter::totalBinExports() const { return m_totalBinExports; }
 
+/** @brief 获取累计Plain格式导出次数 @return Plain导出次数 */
+quint64 DataExporter::totalPlainExports() const { return m_totalPlainExports; }
+
+/** @brief 获取累计Timestamped格式导出次数 @return Timestamped导出次数 */
+quint64 DataExporter::totalTimestampedExports() const { return m_totalTimestampedExports; }
+
 /** @brief 获取累计导出总耗时(毫秒) @return 总耗时毫秒数 */
 qint64 DataExporter::totalExportDurationMs() const { return m_totalExportDurationMs; }
 
@@ -55,6 +61,8 @@ void DataExporter::resetStats()
     m_totalHexDumpExports = 0;
     m_totalJsonExports = 0;
     m_totalBinExports = 0;
+    m_totalPlainExports = 0;
+    m_totalTimestampedExports = 0;
     m_totalExportDurationMs = 0;
     m_lastExportDurationMs = 0;
     m_lastExportRowCount = 0;

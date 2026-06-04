@@ -35,10 +35,10 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
 
     bool ok = false;
     switch (format) {
-    case Plain:       ok = exportStreamedPlain(filePath, lineProvider, totalLines, batchSize); break;
+    case Plain:       ok = exportStreamedPlain(filePath, lineProvider, totalLines, batchSize); ++m_totalPlainExports; break;
     case HexDump:     ok = exportStreamedHexDump(filePath, lineProvider, totalLines, batchSize); ++m_totalHexDumpExports; break;
     case Csv:         ok = exportStreamedCsv(filePath, lineProvider, totalLines, batchSize); ++m_totalCsvExports; break;
-    case Timestamped: ok = exportStreamedTimestamped(filePath, lineProvider, totalLines, batchSize); break;
+    case Timestamped: ok = exportStreamedTimestamped(filePath, lineProvider, totalLines, batchSize); ++m_totalTimestampedExports; break;
     case Bin:         ok = exportStreamedBin(filePath, lineProvider, totalLines, batchSize); ++m_totalBinExports; break;
     case Json:        ok = exportStreamedJson(filePath, lineProvider, totalLines, batchSize); ++m_totalJsonExports; break;
     default:

@@ -13,6 +13,10 @@
 
 #include "serial/config/SerialConfigPanel.h"
 #include "serial/port/SerialDriverDetector.h"
+#include "core/widgets/AnimatedButton.h"
+
+#include <QLabel>
+#include <QPushButton>
 
 // ---- 内部方法 ----
 

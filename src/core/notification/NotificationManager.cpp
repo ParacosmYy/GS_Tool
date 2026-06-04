@@ -37,7 +37,7 @@ void NotificationManager::dismiss(const QString &id) {
 }
 
 /** @brief 清除所有通知和历史 */
-void NotificationManager::clearAll() { m_active.clear(); m_history.clear(); emit unreadCountChanged(0); }
+void NotificationManager::clearAll() { ++m_totalClearAlls; m_active.clear(); m_history.clear(); emit unreadCountChanged(0); }
 
 /** @brief 获取活动通知列表 @return 通知列表 */
 QList<NotificationManager::Notification> NotificationManager::activeNotifications() const { return m_active.values(); }

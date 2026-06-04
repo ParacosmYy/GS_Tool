@@ -64,6 +64,18 @@ quint64 NavigationController::totalSearches() const
     return m_totalSearches;
 }
 
+/** @brief 获取呼吸动画启动总次数 @return 启动次数 */
+quint64 NavigationController::totalBreathingStarts() const
+{
+    return m_totalBreathingStarts;
+}
+
+/** @brief 获取呼吸动画停止总次数 @return 停止次数 */
+quint64 NavigationController::totalBreathingStops() const
+{
+    return m_totalBreathingStops;
+}
+
 /** @brief 重置所有导航统计计数器(切换/面板变更/展开/搜索)为零 */
 void NavigationController::resetNavigationStatistics()
 {
@@ -71,6 +83,8 @@ void NavigationController::resetNavigationStatistics()
     m_totalPanelSwitches = 0;
     m_totalTreeExpansions = 0;
     m_totalSearches = 0;
+    m_totalBreathingStarts = 0;
+    m_totalBreathingStops = 0;
 }
 
 /** @brief 主题切换时刷新导航树圆点图标颜色，遍历树模型根节点的所有category分组统一刷新为Accent色 */

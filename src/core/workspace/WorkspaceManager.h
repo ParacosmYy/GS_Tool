@@ -74,6 +74,8 @@ private:
     mutable quint64 m_totalLoads = 0;        ///< 总加载次数
     quint64 m_totalDeletions = 0;            ///< 总删除次数
     quint64 m_totalSwitches = 0;             ///< 总切换次数
+    mutable quint64 m_totalExportFiles = 0;  ///< 总导出文件次数
+    mutable quint64 m_totalImportFiles = 0;  ///< 总导入文件次数
     quint64 m_totalWorkspacesCreated = 0;    ///< 总新建工作区次数
     quint64 m_totalWorkspacesDeleted = 0;    ///< 总删除工作区次数
     quint64 m_activeWorkspaceTimeMs = 0;     ///< 当前激活工作区累计活跃时长(毫秒)
@@ -88,6 +90,10 @@ public:
     quint64 totalDeletions() const { return m_totalDeletions; }
     /** @brief 获取总切换次数 @return 累计切换次数 */
     quint64 totalSwitches() const { return m_totalSwitches; }
+    /** @brief 获取总导出文件次数 @return 累计导出次数 */
+    quint64 totalExportFiles() const { return m_totalExportFiles; }
+    /** @brief 获取总导入文件次数 @return 累计导入次数 */
+    quint64 totalImportFiles() const { return m_totalImportFiles; }
     /** @brief 获取总新建工作区次数 @return 累计新建次数 */
     quint64 totalWorkspacesCreated() const { return m_totalWorkspacesCreated; }
     /** @brief 获取总删除工作区次数 @return 累计删除次数 */

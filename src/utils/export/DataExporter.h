@@ -67,6 +67,8 @@ public:
     quint64 totalHexDumpExports() const;  ///< HexDump格式次数
     quint64 totalJsonExports() const;     ///< JSON格式次数
     quint64 totalBinExports() const;      ///< 二进制格式次数
+    quint64 totalPlainExports() const;    ///< Plain格式次数
+    quint64 totalTimestampedExports() const; ///< Timestamped格式次数
 
     /** @brief 获取累计导出总耗时(仅成功操作) @return 总耗时毫秒数 */
     qint64 totalExportDurationMs() const;
@@ -140,6 +142,8 @@ private:
     quint64 m_totalHexDumpExports = 0;
     quint64 m_totalJsonExports = 0;
     quint64 m_totalBinExports = 0;
+    quint64 m_totalPlainExports = 0;
+    quint64 m_totalTimestampedExports = 0;
     qint64 m_totalExportDurationMs = 0;   ///< 累计导出总耗时(毫秒)
     qint64 m_lastExportDurationMs = 0;    ///< 最近一次导出耗时(毫秒)
     quint64 m_lastExportRowCount = 0;     ///< 最近一次导出行数

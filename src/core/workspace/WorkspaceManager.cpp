@@ -85,6 +85,8 @@ void WorkspaceManager::resetWorkspaceStatistics()
     m_totalLoads = 0;
     m_totalDeletions = 0;
     m_totalSwitches = 0;
+    m_totalExportFiles = 0;
+    m_totalImportFiles = 0;
     m_totalWorkspacesCreated = 0;
     m_totalWorkspacesDeleted = 0;
     m_activeWorkspaceTimeMs = 0;
@@ -94,6 +96,7 @@ void WorkspaceManager::resetWorkspaceStatistics()
 /** @brief 将工作区布局导出为JSON文件 @param name 工作区名称 @param filePath 导出文件路径 */
 void WorkspaceManager::exportToFile(const QString &name, const QString &filePath) const
 {
+    ++m_totalExportFiles;
     auto it = m_workspaces.constFind(name);
     if (it == m_workspaces.constEnd()) return;
     const auto &layout = it.value();
@@ -117,6 +120,7 @@ bool WorkspaceManager::importFromFile(const QString &filePath)
 {
     QFile f(filePath);
     if (!f.open(QIODevice::ReadOnly)) return false;
+    ++m_totalImportFiles;
     auto doc = QJsonDocument::fromJson(f.readAll());
     if (!doc.isObject()) return false;
     auto obj = doc.object();

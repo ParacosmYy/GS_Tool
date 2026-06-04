@@ -49,6 +49,8 @@ public:
     quint64 totalPanelSwitches() const;      ///< 面板实际变更总次数(目标!=当前时)
     quint64 totalTreeExpansions() const;     ///< 导航树展开/折叠操作总次数
     quint64 totalSearches() const;           ///< 导航搜索总次数
+    quint64 totalBreathingStarts() const;    ///< 呼吸动画启动总次数
+    quint64 totalBreathingStops() const;     ///< 呼吸动画停止总次数
     void resetNavigationStatistics();        ///< 重置所有导航统计计数器
 
 private slots:
@@ -72,6 +74,8 @@ private:
     quint64 m_totalPanelSwitches = 0;    ///< 面板实际变更次数(目标面板与当前不同时)
     quint64 m_totalTreeExpansions = 0;   ///< 导航树展开/折叠操作总次数
     quint64 m_totalSearches = 0;         ///< 导航搜索总次数
+    quint64 m_totalBreathingStarts = 0; ///< 呼吸动画启动总次数
+    quint64 m_totalBreathingStops = 0;  ///< 呼吸动画停止总次数
 };
 
 #endif // NAVIGATION_CONTROLLER_H

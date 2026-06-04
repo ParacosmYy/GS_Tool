@@ -172,6 +172,7 @@ void PlaybackWidget::setupUI()
         } else {
             m_playBtn->setText(tr("\u25B6"));  // ▶ 播放图标
             m_playBtn->setToolTip(tr("播放"));
+            ++m_totalPauses;
             emit pauseRequested();
         }
     });
@@ -179,6 +180,7 @@ void PlaybackWidget::setupUI()
     // 停止按钮：重置播放状态并发出停止信号
     connect(stopBtn, &QPushButton::clicked, this, [this]() {
         m_playBtn->setChecked(false);  // 恢复为播放图标
+        ++m_totalStops;
         emit stopRequested();
     });
 

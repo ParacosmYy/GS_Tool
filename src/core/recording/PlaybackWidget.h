@@ -88,13 +88,17 @@ private:
 
     // ---- 统计计数器 ----
     quint64 m_totalPlays = 0;       ///< 累计播放请求次数
+    quint64 m_totalPauses = 0;      ///< 累计暂停请求次数
+    quint64 m_totalStops = 0;       ///< 累计停止请求次数
     quint64 m_totalSeeks = 0;       ///< 累计定位请求次数
     quint64 m_totalSpeedChanges = 0;///< 累计变速请求次数
 public:
     quint64 totalPlays() const { return m_totalPlays; }
+    quint64 totalPauses() const { return m_totalPauses; }
+    quint64 totalStops() const { return m_totalStops; }
     quint64 totalSeeks() const { return m_totalSeeks; }
     quint64 totalSpeedChanges() const { return m_totalSpeedChanges; }
-    void resetPlaybackWidgetStatistics() { m_totalPlays = 0; m_totalSeeks = 0; m_totalSpeedChanges = 0; }
+    void resetPlaybackWidgetStatistics() { m_totalPlays = 0; m_totalPauses = 0; m_totalStops = 0; m_totalSeeks = 0; m_totalSpeedChanges = 0; }
 };
 
 #endif // PLAYBACK_WIDGET_H
