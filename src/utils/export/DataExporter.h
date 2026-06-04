@@ -2,11 +2,8 @@
  * @file DataExporter.h
  * @brief 数据导出器 - 将终端数据导出为 Plain/HexDump/CSV/Timestamped/Bin/Json 六种格式
  *
- * 支持:
- * - 六种导出格式(Plain/HexDump/CSV/Timestamped/Bin/Json)
- * - 全量导出(批量)、流式导出(分批)、EDL范围导出三种模式
- * - CSV的BOM头(Excel兼容)和可配置列分隔符
- * - 完整的会话统计(总次数/字节/行数/错误/各格式/总耗时/单次耗时)
+ * 支持: 六种导出格式、全量导出(批量)/流式导出(分批)/EDL范围导出三种模式
+ * CSV的BOM头(Excel兼容)和可配置列分隔符、完整的会话统计(总次数/字节/行数/错误/各格式/总耗时)
  */
 #ifndef DATA_EXPORTER_H
 #define DATA_EXPORTER_H
@@ -20,7 +17,7 @@
 #include <functional>
 #include "terminal/types/TerminalTypes.h"
 
-/** @brief 数据导出器(策略模式) — 协作: TerminalModel(数据源) / RecordingController(调用方) */
+/// @brief 数据导出器(策略模式) — 协作: TerminalModel(数据源) / RecordingController(调用方)
 class DataExporter : public QObject {
     Q_OBJECT
 
@@ -48,13 +45,13 @@ public:
 
     // ---- CSV配置 ----
 
-    /** @brief 设置CSV列分隔符，默认逗号(',')，可设为制表符/分号等 @param delim 分隔符字符 */
+    /** @brief 设置CSV列分隔符，默认逗号(',') @param delim 分隔符字符 */
     void setCsvDelimiter(QChar delim);
 
     /** @brief 获取当前CSV列分隔符 @return 分隔符字符 */
     QChar csvDelimiter() const;
 
-    /** @brief 设置CSV是否写入UTF-8 BOM头(默认启用，确保Excel中文兼容) @param enable true=写入BOM */
+    /** @brief 设置CSV是否写入UTF-8 BOM头(默认启用) @param enable true=写入BOM */
     void setCsvBomEnabled(bool enable);
 
     /** @brief 获取CSV是否写入BOM头 @return true=启用BOM */
@@ -71,7 +68,7 @@ public:
     quint64 totalJsonExports() const;     ///< JSON格式次数
     quint64 totalBinExports() const;      ///< 二进制格式次数
 
-    /** @brief 获取累计导出总耗时(仅统计成功操作) @return 总耗时毫秒数 */
+    /** @brief 获取累计导出总耗时(仅成功操作) @return 总耗时毫秒数 */
     qint64 totalExportDurationMs() const;
 
     /** @brief 获取最近一次导出耗时 @return 最近导出耗时(ms)，未导出过返回0 */
@@ -88,14 +85,7 @@ public:
 signals:
     void exportError(const QString& filePath, const QString& errorString); ///< 导出失败信号
 
-    /**
-     * @brief 导出完成信号 — 每次成功导出后发射，携带本次操作的统计摘要
-     * @param filePath 导出文件路径
-     * @param format 导出格式
-     * @param rowCount 导出行数
-     * @param byteCount 导出字节数
-     * @param durationMs 导出耗时(毫秒)
-     */
+    /** @brief 导出完成信号 — 每次成功导出后发射，携带统计摘要 @param filePath 导出文件路径 @param format 导出格式 @param rowCount 导出行数 @param byteCount 导出字节数 @param durationMs 导出耗时(毫秒) */
     void exportCompleted(const QString& filePath, Format format,
                          quint64 rowCount, quint64 byteCount, qint64 durationMs);
 

@@ -175,6 +175,8 @@ void FireWaterBridge::processLine(const QString& line)
 
     // 发射与FrameParser::frameParsed完全兼容的信号
     ++m_frameCount;
+    ++m_fireWaterMatches;  ///< 统计: FireWater协议匹配次数递增
+    m_totalChannelsDecoded += fields.size();  ///< 统计: 累加解码通道数
     emit frameParsed(fields, rawFrame);
 }
 
@@ -226,10 +228,24 @@ qint64 FireWaterBridge::totalBytesProcessed() const
     return m_totalBytes;
 }
 
-/** @brief 重置统计数据(帧计数/错误计数/字节数) */
+/** @brief 获取已解码通道总数(跨所有帧累加) @return 通道解码总数 */
+quint64 FireWaterBridge::totalChannelsDecoded() const
+{
+    return m_totalChannelsDecoded;
+}
+
+/** @brief 获取FireWater协议匹配(成功解析)的总帧数 @return 匹配总帧数 */
+quint64 FireWaterBridge::fireWaterMatches() const
+{
+    return m_fireWaterMatches;
+}
+
+/** @brief 重置统计数据(帧计数/错误计数/字节数/通道解码数/协议匹配数) */
 void FireWaterBridge::resetStatistics()
 {
     m_frameCount = 0;
     m_errorCount = 0;
     m_totalBytes = 0;
+    m_totalChannelsDecoded = 0;
+    m_fireWaterMatches = 0;
 }

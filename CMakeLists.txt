@@ -143,6 +143,7 @@ set(SOURCES
     src/protocol/parser/FrameParserStateHandlers.cpp
     src/protocol/parser/FrameParserStats.cpp
     src/protocol/view/ProtocolView.cpp
+    src/protocol/view/ProtocolViewData.cpp
     src/protocol/view/ProtocolViewDisplay.cpp
     src/protocol/view/ProtocolViewMenu.cpp
     src/protocol/editor/FrameVisualEditor.cpp
@@ -180,6 +181,7 @@ set(SOURCES
     src/chart/fft/FftEngine.cpp
     src/chart/fft/FftEngineWindow.cpp
     src/chart/fft/FftWidget.cpp
+    src/chart/fft/FftWidgetSlots.cpp
     src/chart/fft/FftWidgetSetup.cpp
     src/chart/stats/HistogramWidget.cpp
     src/chart/stats/HistogramWidgetUI.cpp
@@ -322,6 +324,7 @@ set(SOURCES
     src/connection/ble/BleGattModel.cpp
     src/connection/ble/BleGattModelQuery.cpp
     src/connection/ble/BleGattBrowser.cpp
+    src/connection/ble/BleGattBrowserSlots.cpp
     src/connection/ble/BleGattBrowserServices.cpp
     src/connection/ble/BleGattBrowserDisplay.cpp
     src/connection/ble/BleConfigPanel.cpp
@@ -429,6 +432,7 @@ set(SOURCES
 
     # ── F23: ASCII/表格转换器 ──
     src/utils/converter/DataConverter.cpp
+    src/utils/converter/DataConverterCodec.cpp
     src/utils/converter/ConverterPanel.cpp
 
     # ── F24: 时间戳分析器 ──

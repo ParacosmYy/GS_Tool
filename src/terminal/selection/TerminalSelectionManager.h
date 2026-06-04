@@ -98,6 +98,12 @@ public:
      */
     quint64 totalSelectionsChanged() const;
 
+    /** @brief 获取总点击选择次数(单行点击) @return 点击选择计数 */
+    quint64 totalClickSelects() const;
+
+    /** @brief 获取总拖拽选择次数(多行拖拽) @return 拖拽选择计数 */
+    quint64 totalDragSelects() const;
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -117,6 +123,8 @@ private:
     quint64 m_totalSelectionChars = 0;  ///< 总选择字符数(所有选区字符数累加)
     quint64 m_maxSelectionLength = 0;   ///< 最大单次选区长度(字符数)
     quint64 m_totalSelectionsChanged = 0; ///< 选区变更总次数(拖拽/程序化)
+    quint64 m_totalClickSelects = 0;    ///< 总点击选择次数(单行点击选区)
+    quint64 m_totalDragSelects = 0;     ///< 总拖拽选择次数(多行拖拽选区)
 };
 
 #endif // TERMINALSELECTIONMANAGER_H

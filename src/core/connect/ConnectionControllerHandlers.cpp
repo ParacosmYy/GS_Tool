@@ -40,8 +40,13 @@ void ConnectionController::onConnectionStateChanged(ConnectionState state)
         m_reconnectTimer.stop();
         // 如果是重连成功，发出通知并重置计数
         if (m_reconnectAttemptCount > 0) {
+            ++m_totalReconnects;  ///< 统计: 重连成功次数递增
             emit reconnectSucceeded(connName);
             m_reconnectAttemptCount = 0;
+        }
+        // 统计: 更新峰值并发连接数(当前有连接即1，无连接为0)
+        if (m_peakConcurrentConnections < 1) {
+            m_peakConcurrentConnections = 1;
         }
         if (m_recordingController) {
             m_recordingController->setConnected(true);

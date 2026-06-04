@@ -52,6 +52,12 @@ public:
     /** @brief 获取Tab移除总次数 @return 累计移除次数 */
     quint64 totalTabRemoves() const;
 
+    /** @brief 获取分栏合并回混合模式总次数 @return 累计合并次数 */
+    quint64 totalMerges() const;
+
+    /** @brief 获取视图模式变更总次数(分栏/混合切换) @return 累计变更次数 */
+    quint64 totalViewModeChanges() const;
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -118,6 +124,8 @@ private:
     quint64 m_totalLayoutChanges = 0;    ///< 布局变更总次数
     quint64 m_totalTabAdds = 0;          ///< Tab添加总次数
     quint64 m_totalTabRemoves = 0;       ///< Tab移除总次数
+    quint64 m_totalMerges = 0;           ///< 分栏合并回混合模式总次数
+    quint64 m_totalViewModeChanges = 0;  ///< 视图模式变更总次数(分栏/混合切换)
 };
 
 #endif // TERMINALLAYOUTMANAGER_H

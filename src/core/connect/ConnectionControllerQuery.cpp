@@ -36,10 +36,19 @@ quint64 ConnectionController::totalConnections() const { return m_totalConnectio
 /** @brief 获取累计断开连接次数 @return 断开总次数 */
 quint64 ConnectionController::totalDisconnections() const { return m_totalDisconnections; }
 
-/** @brief 获取累计自动重连次数 @return 重连总次数 */
+/** @brief 获取累计自动重连成功次数 @return 重连成功总次数 */
 quint64 ConnectionController::totalReconnects() const { return m_totalReconnects; }
 
+/** @brief 获取累计自动重连尝试次数(含失败) @return 重连尝试总次数 */
+quint64 ConnectionController::totalReconnectAttempts() const { return m_totalReconnectAttempts; }
+
+/** @brief 获取累计协议/连接类型切换次数 @return 协议切换总次数 */
+quint64 ConnectionController::totalProtocolSwitches() const { return m_totalProtocolSwitches; }
+
 /** @brief 获取累计连接错误次数 @return 错误总次数 */
+quint64 ConnectionController::totalErrors() const { return m_errorCount; }
+
+/** @brief 获取累计连接错误次数(同totalErrors) @return 错误总次数 */
 quint64 ConnectionController::errorCount() const { return m_errorCount; }
 
 /** @brief 获取累计发送数据字节数 @return 发送总字节数 */
@@ -48,13 +57,19 @@ quint64 ConnectionController::totalDataSent() const { return m_totalDataSent; }
 /** @brief 获取累计接收数据字节数 @return 接收总字节数 */
 quint64 ConnectionController::totalDataReceived() const { return m_totalDataReceived; }
 
-/** @brief 重置连接统计计数器(连接/断开/重连/错误/发送字节/接收字节)为初始值 */
+/** @brief 获取历史峰值并发连接数 @return 峰值并发连接数 */
+quint64 ConnectionController::peakConcurrentConnections() const { return m_peakConcurrentConnections; }
+
+/** @brief 重置连接统计计数器(连接/断开/重连/重连尝试/协议切换/错误/发送字节/接收字节/峰值并发)为初始值 */
 void ConnectionController::resetConnectionStatistics()
 {
     m_totalConnections = 0;
     m_totalDisconnections = 0;
     m_totalReconnects = 0;
+    m_totalReconnectAttempts = 0;
+    m_totalProtocolSwitches = 0;
     m_errorCount = 0;
     m_totalDataSent = 0;
     m_totalDataReceived = 0;
+    m_peakConcurrentConnections = 0;
 }

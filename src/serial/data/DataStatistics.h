@@ -28,7 +28,7 @@ struct ThroughputSample {
     double txPacketsPerSec; ///< TX瞬时包速率(packets/s)
 };
 
-/** @brief 数据统计面板 — 收发统计/滚动吞吐量/直方图/错误监控 */
+/// @brief 数据统计面板 — 收发统计/滚动吞吐量/直方图/错误监控
 class DataStatistics : public QWidget {
     Q_OBJECT
 public:
@@ -99,9 +99,9 @@ private:
     void setupUI(); ///< 初始化UI布局
     QFrame* createStatsFrame(const QString& label, QLabel*& valueLabel, const QString& objectName, const QString& frameName = QString()); ///< 创建统计数据框架
     QString formatRate(double bytesPerSec) const; ///< 速率格式化(bytes/s->人类可读)
-    void updateRollingThroughput();  ///< 更新滚动窗口吞吐量(每次onRefreshTimer调用)
+    void updateRollingThroughput();  ///< 更新滚动窗口吞吐量
     void updateHistogram(double totalBytesPerSec); ///< 更新直方图数据
-    void initHistogramBuckets();     ///< 初始化直方图桶(定义速率分桶边界)
+    void initHistogramBuckets();     ///< 初始化直方图桶
 
     // ---- 控件指针 ----
     QLabel* m_rxTotalLabel;        ///< RX累计字节数显示

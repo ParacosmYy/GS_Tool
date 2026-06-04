@@ -55,7 +55,7 @@ void ConnectionController::onAutoReconnect()
     }
 
     m_reconnectAttemptCount++;
-    ++m_totalReconnects;
+    ++m_totalReconnectAttempts;  ///< 统计: 每次重连尝试递增(含成功和失败)
 
     // 指数退避: baseInterval * 2^min(attempt, 4)，上限30秒
     int actualInterval = calcBackoffInterval(m_reconnectAttemptCount);

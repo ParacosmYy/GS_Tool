@@ -174,6 +174,10 @@ void JustFloatBridge::parseAndEmit(int frameSize)
 
     // 发射与FrameParser::frameParsed完全兼容的信号
     ++m_frameCount;
+    m_totalChannelsDecoded += m_channelCount;  ///< 统计: 累加解码通道数
+    if (static_cast<quint64>(m_channelCount) > m_peakChannelsPerFrame) {
+        m_peakChannelsPerFrame = m_channelCount;  ///< 统计: 更新单帧峰值通道数
+    }
     emit frameParsed(fields, rawFrame);
 }
 
@@ -202,10 +206,24 @@ qint64 JustFloatBridge::totalBytesProcessed() const
     return m_totalBytes;
 }
 
-/** @brief 重置统计数据(帧计数/错误计数/字节数)，不影响通道配置 */
+/** @brief 获取已解码通道总数(跨所有帧累加) @return 通道解码总数 */
+quint64 JustFloatBridge::totalChannelsDecoded() const
+{
+    return m_totalChannelsDecoded;
+}
+
+/** @brief 获取单帧最大通道数峰值 @return 峰值通道数 */
+quint64 JustFloatBridge::peakChannelsPerFrame() const
+{
+    return m_peakChannelsPerFrame;
+}
+
+/** @brief 重置统计数据(帧计数/错误计数/字节数/通道解码数/峰值通道数)，不影响通道配置 */
 void JustFloatBridge::resetStatistics()
 {
     m_frameCount = 0;
     m_errorCount = 0;
     m_totalBytes = 0;
+    m_totalChannelsDecoded = 0;
+    m_peakChannelsPerFrame = 0;
 }

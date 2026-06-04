@@ -54,13 +54,19 @@ void TerminalSelectionManager::onMouseMove(double y, int scrollOffset, int lineH
     }
 }
 
-/** @brief 处理鼠标释放事件，结束选区操作并更新选区统计计数器 */
+/** @brief 处理鼠标释放事件，结束选区操作并更新选区统计计数器(区分点击和拖拽) */
 void TerminalSelectionManager::onMouseRelease()
 {
-    if (m_isSelecting && m_selectionStartLine >= 0 && m_selectionEndLine >= 0
-        && m_selectionStartLine != m_selectionEndLine) {
-        // 只在有效拖拽选区（起始行不等于结束行）时递增选择计数
-        ++m_totalSelections;
+    if (m_isSelecting && m_selectionStartLine >= 0 && m_selectionEndLine >= 0) {
+        if (m_selectionStartLine != m_selectionEndLine) {
+            // 多行拖拽选区
+            ++m_totalSelections;
+            ++m_totalDragSelects;
+        } else {
+            // 单行点击选区
+            ++m_totalSelections;
+            ++m_totalClickSelects;
+        }
     }
     m_isSelecting = false;
 }
@@ -222,6 +228,18 @@ quint64 TerminalSelectionManager::totalSelectionsChanged() const
     return m_totalSelectionsChanged;
 }
 
+/** @brief 获取总点击选择次数(单行点击) @return 点击选择计数 */
+quint64 TerminalSelectionManager::totalClickSelects() const
+{
+    return m_totalClickSelects;
+}
+
+/** @brief 获取总拖拽选择次数(多行拖拽) @return 拖拽选择计数 */
+quint64 TerminalSelectionManager::totalDragSelects() const
+{
+    return m_totalDragSelects;
+}
+
 /** @brief 重置所有统计计数器为零(选区状态不受影响) */
 void TerminalSelectionManager::resetStats()
 {
@@ -230,4 +248,6 @@ void TerminalSelectionManager::resetStats()
     m_totalSelectionChars = 0;
     m_maxSelectionLength = 0;
     m_totalSelectionsChanged = 0;
+    m_totalClickSelects = 0;
+    m_totalDragSelects = 0;
 }

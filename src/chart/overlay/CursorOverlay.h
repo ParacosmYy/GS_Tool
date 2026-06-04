@@ -2,17 +2,9 @@
  * @file CursorOverlay.h
  * @brief 波形游标测量叠加层 -- 在ChartWidget上绘制双游标线和差值信息
  *
- * 功能:
- *   - 游标A/B: 双击/右键放置竖线游标，高亮选中区域
- *   - 差值显示: ΔX(采样差)、各通道ΔY(值差)、1/ΔX(频率估算)
- *   - 交互: 鼠标拖拽移动游标位置
- *
- * 协作关系:
- *   - ChartWidget: 作为其子控件叠加显示
- *   - ChartModel: 读取通道数据和Y值范围
- *
- * 设计模式:
- *   - 观察者模式: 监听 ChartModel 数据变化自动重绘
+ * 功能: 游标A/B(双击/右键放置竖线游标，高亮选中区域)、差值显示(ΔX/各通道ΔY/1/ΔX)、交互(鼠标拖拽移动游标)
+ * 协作: ChartWidget(作为子控件叠加显示) / ChartModel(读取通道数据和Y值范围)
+ * 设计: 观察者模式 — 监听ChartModel数据变化自动重绘
  */
 
 #ifndef CURSOROVERLAY_H
@@ -28,12 +20,7 @@ class QChartView;
 class ChartModel;
 class ZoomController;
 
-/**
- * @brief 游标测量叠加层
- *
- * 叠加在 ChartView 上方，绘制两条竖线游标和差值信息面板。
- * 使用 QPainter 在 paintEvent 中直接绘制，不使用额外控件。
- */
+/// @brief 游标测量叠加层 — 叠加在ChartView上方，绘制两条竖线游标和差值信息面板，使用QPainter直接绘制
 class CursorOverlay : public QWidget {
     Q_OBJECT
 
@@ -149,13 +136,13 @@ private:
     ZoomController* m_zoomController = nullptr; ///< 关联的缩放控制器(绘制框选用)
 
     // 统计计数器
-    quint64 m_totalCursorCreations = 0;     ///< 游标创建总次数（双击/右键放置游标）
-    quint64 m_totalCursorDeletions = 0;     ///< 游标删除总次数（clearCursors调用次数）
-    quint64 m_totalCursorDrags = 0;         ///< 游标拖拽移动总次数（鼠标拖拽游标）
-    quint64 m_totalCursorMoves = 0;         ///< 游标移动总次数（含放置和拖拽）
-    quint64 m_totalDeltaMeasurements = 0;   ///< 差值测量总次数（双游标差值面板绘制）
-    quint64 m_totalMeasurements = 0;        ///< 测量显示总次数（双游标差值面板绘制，兼容旧接口）
-    quint64 m_totalSnapToPeak = 0;          ///< 峰值吸附总次数（游标自动吸附到最近峰值点）
+    quint64 m_totalCursorCreations = 0;     ///< 游标创建总次数
+    quint64 m_totalCursorDeletions = 0;     ///< 游标删除总次数
+    quint64 m_totalCursorDrags = 0;         ///< 游标拖拽移动总次数
+    quint64 m_totalCursorMoves = 0;         ///< 游标移动总次数
+    quint64 m_totalDeltaMeasurements = 0;   ///< 差值测量总次数
+    quint64 m_totalMeasurements = 0;        ///< 测量显示总次数（兼容旧接口）
+    quint64 m_totalSnapToPeak = 0;          ///< 峰值吸附总次数
     double m_sumDeltaX = 0.0;               ///< 累计ΔX值(用于计算averageDeltaX)
     double m_sumDeltaY = 0.0;               ///< 累计ΔY值(首个通道，用于计算averageDeltaY)
 

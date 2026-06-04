@@ -21,6 +21,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
+#include <QMouseEvent>
 
 #include "core/theme/ThemeManager.h"
 #include "core/widgets/EmptyStateWidget.h"
@@ -40,6 +41,11 @@ BasePanel::BasePanel(QWidget* content, const QString& title, QWidget* parent)
     setObjectName("basePanel");
     setupInternalLayout();
     setTitle(title);
+
+    // 安装标题栏事件过滤器，跟踪点击和拖拽
+    if (m_headerBar) {
+        m_headerBar->installEventFilter(this);
+    }
 
     // 透明度特效，供 animateShow/Hide 使用
     m_opacityEffect = new QGraphicsOpacityEffect(this);
@@ -251,6 +257,21 @@ void BasePanel::toggleCollapsed()
 {
     ++m_totalToggles;
     setCollapsed(!m_collapsed);
+}
+
+/** @brief 标题栏事件过滤器，跟踪标题栏点击和拖拽开始 @param watched 目标对象 @param event 事件 @return 不拦截，始终返回false */
+bool BasePanel::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == m_headerBar) {
+        if (event->type() == QEvent::MouseButtonPress) {
+            auto* me = static_cast<QMouseEvent*>(event);
+            if (me->button() == Qt::LeftButton) {
+                ++m_totalTitleClicks;
+                ++m_totalDragStarts;
+            }
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 // 统计见 BasePanelStates.cpp

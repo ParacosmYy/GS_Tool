@@ -107,6 +107,10 @@ private:
     void updateCollapseIcon();    ///< 更新折叠按钮图标方向
     void toggleCollapsed();       ///< 切换折叠状态
 
+protected:
+    /** @brief 标题栏事件过滤器，跟踪点击和拖拽 @param watched 目标对象 @param event 事件 @return 是否拦截事件 */
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
     // --- 内部控件 ---
     QWidget*     m_content;       ///< 被包裹的内容面板(不拥有，由PanelManager管理)
     QLabel*      m_iconLabel;     ///< objectName="panelIcon"
@@ -130,12 +134,15 @@ private:
     qreal m_panelOpacity = 1.0;   ///< 动画用透明度属性
 
     // ---- 统计计数器 ----
-    quint64 m_totalToggles = 0;    ///< 总折叠切换次数
-    quint64 m_totalExpansions = 0; ///< 总展开次数
-    quint64 m_totalCollapses = 0;  ///< 总折叠次数
-    quint64 m_totalShows = 0;      ///< 总显示次数(animateShow触发)
-    quint64 m_totalHides = 0;      ///< 总隐藏次数(animateHide触发)
-    quint64 m_totalTitleChanges = 0; ///< 总标题变更次数(setTitle触发)
+    quint64 m_totalToggles = 0;       ///< 总折叠切换次数
+    quint64 m_totalExpansions = 0;    ///< 总展开次数
+    quint64 m_totalCollapses = 0;     ///< 总折叠次数
+    quint64 m_totalShows = 0;         ///< 总显示次数(animateShow触发)
+    quint64 m_totalHides = 0;         ///< 总隐藏次数(animateHide触发)
+    quint64 m_totalTitleChanges = 0;  ///< 总标题变更次数(setTitle触发)
+    quint64 m_totalTitleClicks = 0;   ///< 总标题栏点击次数
+    quint64 m_totalDragStarts = 0;    ///< 总拖拽开始次数(标题栏拖拽)
+    quint64 m_totalSettingsOpens = 0; ///< 总设置面板打开次数
 
 public:
     /** @brief 获取总折叠切换次数 @return 切换计数 */
@@ -150,6 +157,14 @@ public:
     quint64 totalHides() const { return m_totalHides; }
     /** @brief 获取总标题变更次数 @return 标题变更计数 */
     quint64 totalTitleChanges() const { return m_totalTitleChanges; }
+    /** @brief 获取总标题栏点击次数 @return 点击计数 */
+    quint64 totalTitleClicks() const { return m_totalTitleClicks; }
+    /** @brief 获取总拖拽开始次数 @return 拖拽开始计数 */
+    quint64 totalDragStarts() const { return m_totalDragStarts; }
+    /** @brief 获取总设置面板打开次数 @return 设置打开计数 */
+    quint64 totalSettingsOpens() const { return m_totalSettingsOpens; }
+    /** @brief 递增设置面板打开计数(外部调用者触发设置时使用) */
+    void notifySettingsOpened() { ++m_totalSettingsOpens; }
     /** @brief 重置面板统计计数器 */
     void resetPanelStatistics();
 };

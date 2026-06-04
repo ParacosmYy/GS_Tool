@@ -45,8 +45,12 @@ public:
     quint64 totalCreations() const { return m_totalCreations; }
     /** @brief 获取累计创建失败次数(未注册类型) @return 失败次数 */
     quint64 totalCreationFailures() const { return m_totalCreationFailures; }
+    /** @brief 获取累计销毁控件次数 @return 销毁次数 */
+    quint64 totalWidgetsDestroyed() const { return m_totalWidgetsDestroyed; }
+    /** @brief 获取按类型名称分类的创建计数 @return 类型名称到创建次数的映射 */
+    QMap<QString, quint64> widgetsByType() const { return m_widgetsByType; }
     /** @brief 重置所有统计计数器 */
-    void resetFactoryStatistics() { m_totalRegistrations = 0; m_totalCreations = 0; m_totalCreationFailures = 0; }
+    void resetFactoryStatistics();
 
     /**
      * @brief 模板注册方法，自动生成创建函数
@@ -65,4 +69,6 @@ private:
     quint64 m_totalRegistrations = 0;      ///< 统计: 累计类型注册次数
     mutable quint64 m_totalCreations = 0;  ///< 统计: 累计控件创建成功次数
     mutable quint64 m_totalCreationFailures = 0; ///< 统计: 累计控件创建失败次数
+    mutable quint64 m_totalWidgetsDestroyed = 0;   ///< 统计: 累计控件销毁次数
+    mutable QMap<QString, quint64> m_widgetsByType; ///< 统计: 按类型名称分类的创建计数
 };

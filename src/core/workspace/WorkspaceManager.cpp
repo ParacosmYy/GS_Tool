@@ -9,13 +9,20 @@
 #include <QJsonArray>
 
 /** @brief 构造函数 @param parent 父对象 */
-WorkspaceManager::WorkspaceManager(QObject *parent) : QObject(parent) {}
+WorkspaceManager::WorkspaceManager(QObject *parent) : QObject(parent)
+{
+    m_activeTimer.start();
+}
 /** @brief 析构函数 */
 WorkspaceManager::~WorkspaceManager() = default;
 
-/** @brief 保存工作区布局到内存映射 @param layout 工作区布局配置 */
+/** @brief 保存工作区布局到内存映射，新建工作区时递增创建计数 @param layout 工作区布局配置 */
 void WorkspaceManager::saveWorkspace(const WorkspaceLayout &layout)
 {
+    // 首次保存(新建)时递增创建计数
+    if (!m_workspaces.contains(layout.name)) {
+        ++m_totalWorkspacesCreated;
+    }
     ++m_totalSaves;
     m_workspaces[layout.name] = layout;
     emit workspaceSaved(layout.name);
@@ -32,6 +39,7 @@ WorkspaceLayout WorkspaceManager::loadWorkspace(const QString &name) const
 void WorkspaceManager::deleteWorkspace(const QString &name)
 {
     ++m_totalDeletions;
+    ++m_totalWorkspacesDeleted;
     m_workspaces.remove(name);
     if (m_activeWorkspace == name) m_activeWorkspace.clear();
     emit workspaceDeleted(name);
@@ -42,18 +50,46 @@ QStringList WorkspaceManager::workspaceNames() const { return m_workspaces.keys(
 /** @brief 检查指定名称的工作区是否存在 @param name 工作区名称 @return 存在返回true */
 bool WorkspaceManager::exists(const QString &name) const { return m_workspaces.contains(name); }
 
-/** @brief 设置当前激活工作区 @param name 工作区名称 */
+/** @brief 设置当前激活工作区，切换时累计前一个工作区的活跃时长 @param name 工作区名称 */
 void WorkspaceManager::setActiveWorkspace(const QString &name)
 {
     if (m_activeWorkspace != name) {
+        // 累计前一个工作区的活跃时长
+        if (m_activeTimer.isValid()) {
+            m_activeWorkspaceTimeMs += static_cast<quint64>(m_activeTimer.elapsed());
+        }
         ++m_totalSwitches;
         m_activeWorkspace = name;
+        m_activeTimer.restart();
         emit activeWorkspaceChanged(name);
     }
 }
 
 /** @brief 获取当前激活的工作区名称 @return 工作区名称 */
 QString WorkspaceManager::activeWorkspace() const { return m_activeWorkspace; }
+
+/** @brief 获取当前激活工作区累计活跃时长(含正在进行的计时) @return 活跃时长毫秒数 */
+quint64 WorkspaceManager::activeWorkspaceTimeMs() const
+{
+    quint64 total = m_activeWorkspaceTimeMs;
+    if (m_activeTimer.isValid()) {
+        total += static_cast<quint64>(m_activeTimer.elapsed());
+    }
+    return total;
+}
+
+/** @brief 重置所有工作区统计计数器(保存/加载/删除/切换/新建/活跃时长) */
+void WorkspaceManager::resetWorkspaceStatistics()
+{
+    m_totalSaves = 0;
+    m_totalLoads = 0;
+    m_totalDeletions = 0;
+    m_totalSwitches = 0;
+    m_totalWorkspacesCreated = 0;
+    m_totalWorkspacesDeleted = 0;
+    m_activeWorkspaceTimeMs = 0;
+    m_activeTimer.restart();
+}
 
 /** @brief 将工作区布局导出为JSON文件 @param name 工作区名称 @param filePath 导出文件路径 */
 void WorkspaceManager::exportToFile(const QString &name, const QString &filePath) const

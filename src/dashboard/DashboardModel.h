@@ -1,9 +1,6 @@
 /**
  * @file DashboardModel.h
- * @brief 仪表盘配置模型
- *
- * 管理仪表盘组件的配置信息与数据通道，支持序列化到文件与从文件反序列化。
- * 数据通道提供实时值更新，配合波形/仪表组件使用。
+ * @brief 仪表盘配置模型 — 管理组件配置的增删查、数据通道管理与持久化
  */
 
 #ifndef DASHBOARD_MODEL_H
@@ -15,10 +12,7 @@
 #include <QVariantMap>
 #include <QList>
 
-/**
- * @class DashboardModel
- * @brief 仪表盘配置模型 —— 负责组件配置的增删查、数据通道管理与持久化
- */
+/// @brief 仪表盘配置模型 — 负责组件配置的增删查、数据通道管理与持久化
 class DashboardModel : public QObject
 {
     Q_OBJECT
@@ -125,7 +119,7 @@ public:
     /** @brief 获取累计布局加载次数 @return 加载总数 */
     quint64 totalLayoutLoads() const;
 
-    /** @brief 重置所有统计计数器(通道统计+组件统计+布局统计+配置文件统计+布局生命周期统计) */
+    /** @brief 重置所有统计计数器(通道+组件+布局+配置文件+生命周期) */
     void resetAllStatistics();
 
 signals:
@@ -156,11 +150,11 @@ private:
     mutable quint64 m_profileDeletes = 0;            ///< 累计配置删除次数
 
     // ---- 布局生命周期统计计数器 ----
-    mutable quint64 m_totalLayoutChanges = 0;                ///< 累计布局变更次数(增/删组件触发)
-    mutable quint64 m_totalWidgetAdditions = 0;              ///< 累计组件添加次数(addComponentConfig)
-    mutable quint64 m_totalWidgetRemovals = 0;               ///< 累计组件移除次数(removeComponentConfig)
-    mutable quint64 m_totalLayoutSaves = 0;                  ///< 累计布局保存次数(saveToFile成功)
-    mutable quint64 m_totalLayoutLoads = 0;                  ///< 累计布局加载次数(loadFromFile成功)
+    mutable quint64 m_totalLayoutChanges = 0;                ///< 累计布局变更次数
+    mutable quint64 m_totalWidgetAdditions = 0;              ///< 累计组件添加次数
+    mutable quint64 m_totalWidgetRemovals = 0;               ///< 累计组件移除次数
+    mutable quint64 m_totalLayoutSaves = 0;                  ///< 累计布局保存次数
+    mutable quint64 m_totalLayoutLoads = 0;                  ///< 累计布局加载次数
 };
 
 #endif // DASHBOARD_MODEL_H

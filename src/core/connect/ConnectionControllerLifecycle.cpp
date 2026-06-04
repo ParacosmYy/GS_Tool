@@ -19,6 +19,10 @@ void ConnectionController::connectSerial(const QVariantMap& serialParams)
 {
     // 步骤1: 关闭已有连接
     if (m_currentConn) {
+        // 统计: 如果上次连接类型不是串口，则为协议切换
+        if (m_lastConnectType != ConnectionType::Serial) {
+            ++m_totalProtocolSwitches;
+        }
         m_userInitiatedDisconnect = true;
         disconnectCurrent();
     }
@@ -142,6 +146,10 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
 {
     // 关闭已有连接
     if (m_currentConn) {
+        // 统计: 如果上次连接类型不同于当前类型，则为协议切换
+        if (m_lastConnectType != type) {
+            ++m_totalProtocolSwitches;
+        }
         m_userInitiatedDisconnect = true;
         disconnectCurrent();
     }

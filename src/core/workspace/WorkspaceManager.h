@@ -10,6 +10,7 @@
 #include <QString>
 #include <QStringList>
 #include <QVariantMap>
+#include <QElapsedTimer>
 
 /**
  * @brief 工作区布局数据结构，保存面板状态和窗口几何信息
@@ -69,10 +70,14 @@ private:
     QString m_activeWorkspace;                      ///< 当前激活的工作区名称
 
     // ---- 统计计数器 ----
-    quint64 m_totalSaves = 0;              ///< 总保存次数
-    mutable quint64 m_totalLoads = 0;      ///< 总加载次数
-    quint64 m_totalDeletions = 0;          ///< 总删除次数
-    quint64 m_totalSwitches = 0;           ///< 总切换次数
+    quint64 m_totalSaves = 0;                ///< 总保存次数
+    mutable quint64 m_totalLoads = 0;        ///< 总加载次数
+    quint64 m_totalDeletions = 0;            ///< 总删除次数
+    quint64 m_totalSwitches = 0;             ///< 总切换次数
+    quint64 m_totalWorkspacesCreated = 0;    ///< 总新建工作区次数
+    quint64 m_totalWorkspacesDeleted = 0;    ///< 总删除工作区次数
+    quint64 m_activeWorkspaceTimeMs = 0;     ///< 当前激活工作区累计活跃时长(毫秒)
+    QElapsedTimer m_activeTimer;             ///< 当前激活工作区计时器
 
 public:
     /** @brief 获取总保存次数 @return 累计保存次数 */
@@ -83,6 +88,12 @@ public:
     quint64 totalDeletions() const { return m_totalDeletions; }
     /** @brief 获取总切换次数 @return 累计切换次数 */
     quint64 totalSwitches() const { return m_totalSwitches; }
+    /** @brief 获取总新建工作区次数 @return 累计新建次数 */
+    quint64 totalWorkspacesCreated() const { return m_totalWorkspacesCreated; }
+    /** @brief 获取总删除工作区次数 @return 累计删除次数 */
+    quint64 totalWorkspacesDeleted() const { return m_totalWorkspacesDeleted; }
+    /** @brief 获取当前激活工作区累计活跃时长(毫秒) @return 活跃时长毫秒数 */
+    quint64 activeWorkspaceTimeMs() const;
     /** @brief 重置工作区统计计数器 */
-    void resetWorkspaceStatistics() { m_totalSaves = 0; m_totalLoads = 0; m_totalDeletions = 0; m_totalSwitches = 0; }
+    void resetWorkspaceStatistics();
 };

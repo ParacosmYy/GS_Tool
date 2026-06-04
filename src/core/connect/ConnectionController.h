@@ -39,10 +39,14 @@ public:
     // ---- 连接统计 ----
     quint64 totalConnections() const;        ///< 累计成功连接次数
     quint64 totalDisconnections() const;     ///< 累计断开连接次数
-    quint64 totalReconnects() const;         ///< 累计自动重连次数
-    quint64 errorCount() const;              ///< 累计连接错误次数
+    quint64 totalReconnects() const;         ///< 累计自动重连成功次数
+    quint64 totalReconnectAttempts() const;  ///< 累计自动重连尝试次数(含失败)
+    quint64 totalProtocolSwitches() const;   ///< 累计协议/连接类型切换次数
+    quint64 totalErrors() const;             ///< 累计连接错误次数
+    quint64 errorCount() const;              ///< 累计连接错误次数(同totalErrors)
     quint64 totalDataSent() const;           ///< 累计发送数据字节数
     quint64 totalDataReceived() const;       ///< 累计接收数据字节数
+    quint64 peakConcurrentConnections() const; ///< 历史峰值并发连接数
     void resetConnectionStatistics();        ///< 重置连接统计计数器
 
 signals:
@@ -106,10 +110,13 @@ private:
     // 连接统计计数器
     quint64 m_totalConnections = 0;                ///< 累计成功连接次数
     quint64 m_totalDisconnections = 0;             ///< 累计断开连接次数
-    quint64 m_totalReconnects = 0;                 ///< 累计自动重连次数
+    quint64 m_totalReconnects = 0;                 ///< 累计自动重连成功次数
+    quint64 m_totalReconnectAttempts = 0;          ///< 累计自动重连尝试次数(含失败)
+    quint64 m_totalProtocolSwitches = 0;           ///< 累计协议/连接类型切换次数
     quint64 m_errorCount = 0;                      ///< 累计连接错误次数
     quint64 m_totalDataSent = 0;                   ///< 累计发送数据字节数
     quint64 m_totalDataReceived = 0;               ///< 累计接收数据字节数
+    mutable quint64 m_peakConcurrentConnections = 0; ///< 历史峰值并发连接数
 };
 
 #endif // CONNECTIONCONTROLLER_H

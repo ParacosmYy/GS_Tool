@@ -32,11 +32,7 @@ struct DashboardItemConfig {
     static DashboardItemConfig fromJson(const QJsonObject& obj); ///< 从JSON构建
 };
 
-/**
- * @brief 仪表盘布局序列化器
- * @details JSON文件格式: {version, name, columns, items[]}
- * QSettings: DashboardProfiles/<name>/name|columns|items
- */
+/// @brief 仪表盘布局序列化器 — JSON文件格式: {version, name, columns, items[]}, QSettings: DashboardProfiles/<name>/name|columns|items
 class DashboardSerializer : public QObject {
     Q_OBJECT
 

@@ -27,6 +27,7 @@
 | 177-190 | Tier3核心功能实现(BLE GATT/MQTT TopicModel/CAN DBC/USB) + Doxygen全量达标 + 持续文件拆分 | 190 |
 | 191-200 | ProtocolEngine CRC验证+Dashboard持久化+BLE Scanner增强+ShortcutManager键盘系统+Lucide图标扩展 | 200 |
 | 201 | 终端搜索增强(大小写/全词/历史)+OTA CRC32校验+串口芯片识别21厂商+协议桥自动检测+Protobuf嵌套解码 | 201 |
+| 202-266 | 持续文件拆分+统计增强+Doxygen补全+WidgetFactory mutable修复 | 266 |
 
 ---
 
@@ -98,6 +99,7 @@
 | 263 | DataStatisticsRefresh/ResponsiveLayoutTransition/DbcParserDecode/UsbDeviceDetectorDescriptor拆分 | 刷新定时器独立(279→208行)+布局过渡动画独立(276→190行)+DBC位域解码独立(272→144行)+USB描述符获取独立(272→145行) |
 | 264 | TerminalLayoutManagerStats/ShortcutManagerPersist/UsbConnectionInterface/CursorOverlayEvent拆分 | 终端统计getter独立(271→197行)+快捷键持久化独立(269→201行)+USB接口管理独立(272→207行)+游标事件过滤独立(271→167行) |
 | 265 | PerformanceMonitorLatency/PortWatcherPoll/YModemTransferStats/SpiI2cConfigPanelPersist拆分 | 性能延迟查询独立(268→194行)+串口轮询防抖独立(268→112行)+YModem统计/文件独立(268→135行)+SPI/I2C持久化独立(271→222行) |
+| 266 | DataConverterCodec/ProtocolViewData/FftWidgetSlots/BleGattBrowserSlots拆分 + WidgetFactory mutable修复 | 编解码独立(DataConverter 175→80行)+协议帧数据独立(ProtocolView 158→63行)+FFT槽函数独立(FftWidget 175→80行)+BLE GATT操作槽独立(BleGattBrowser 147→47行) |
 
 ---
 

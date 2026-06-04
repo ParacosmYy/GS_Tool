@@ -68,6 +68,12 @@ public:
     /** @brief 获取已处理的字节总数 */
     qint64 totalBytesProcessed() const;
 
+    /** @brief 获取已解码通道总数(跨所有帧累加) */
+    quint64 totalChannelsDecoded() const;
+
+    /** @brief 获取单帧最大通道数峰值 */
+    quint64 peakChannelsPerFrame() const;
+
     /** @brief 重置统计数据（帧计数/错误/字节，不影响通道配置） */
     void resetStatistics();
 
@@ -100,6 +106,10 @@ private:
     quint64 m_errorCount = 0;
     /** @brief 已处理字节总数 */
     qint64 m_totalBytes = 0;
+    /** @brief 已解码通道总数(跨所有帧累加) */
+    quint64 m_totalChannelsDecoded = 0;
+    /** @brief 单帧最大通道数峰值 */
+    quint64 m_peakChannelsPerFrame = 0;
 
     static constexpr unsigned char kTailMarker[4] = {0x00, 0x00, 0x80, 0x7F}; ///< 尾部标记
     static constexpr int kTailSize = 4;             ///< 尾部标记长度

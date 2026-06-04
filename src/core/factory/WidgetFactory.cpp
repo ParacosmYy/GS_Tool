@@ -31,7 +31,15 @@ QWidget* WidgetFactory::create(const QString &typeName, QWidget *parent) const
     auto it = m_creators.constFind(typeName);
     if (it != m_creators.constEnd()) {
         ++m_totalCreations;
-        return it.value()(parent);
+        ++m_widgetsByType[typeName];
+        QWidget* widget = it.value()(parent);
+        // 监听控件销毁以追踪销毁计数
+        if (widget) {
+            connect(widget, &QObject::destroyed, this, [this]() {
+                ++m_totalWidgetsDestroyed;
+            });
+        }
+        return widget;
     }
     ++m_totalCreationFailures;
     return nullptr;
@@ -47,4 +55,14 @@ bool WidgetFactory::isRegistered(const QString &typeName) const
 QStringList WidgetFactory::registeredTypes() const
 {
     return m_creators.keys();
+}
+
+/** @brief 重置所有统计计数器(注册/创建/失败/销毁/类型分布) */
+void WidgetFactory::resetFactoryStatistics()
+{
+    m_totalRegistrations = 0;
+    m_totalCreations = 0;
+    m_totalCreationFailures = 0;
+    m_totalWidgetsDestroyed = 0;
+    m_widgetsByType.clear();
 }

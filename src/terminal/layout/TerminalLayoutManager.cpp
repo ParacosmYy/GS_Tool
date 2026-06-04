@@ -113,6 +113,7 @@ void TerminalLayoutManager::setLayout(TerminalLayout layout)
 {
     if (m_layout == layout) return;
     ++m_totalSwitches;  ///< 统计: 布局切换次数递增
+    ++m_totalViewModeChanges;  ///< 统计: 视图模式变更次数递增
     m_layout = layout;
     applyLayout();
     emit layoutChanged(m_layout);
@@ -171,6 +172,8 @@ void TerminalLayoutManager::applyMixedLayout()
     if (!containerLayout) return;
 
     // ---- 混合模式: 显示主终端（包含TX和RX所有数据） ----
+    // 统计: 如果之前存在分栏终端，则记录一次合并操作
+    const bool hadSplitTerminals = (m_rxTerminal != nullptr || m_txTerminal != nullptr);
     // 销毁分栏终端（如果存在）
     if (m_rxTerminal) {
         m_rxTerminal->deleteLater();
@@ -181,6 +184,9 @@ void TerminalLayoutManager::applyMixedLayout()
         m_txTerminal->deleteLater();
         m_txTerminal = nullptr;
         ++m_totalTabRemoves; ///< 统计: TX终端Tab移除
+    }
+    if (hadSplitTerminals) {
+        ++m_totalMerges; ///< 统计: 从分栏合并到混合模式递增
     }
 
     // 恢复主终端的无过滤状态

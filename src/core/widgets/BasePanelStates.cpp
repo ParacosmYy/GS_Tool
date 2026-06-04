@@ -171,7 +171,7 @@ void BasePanel::paintEvent(QPaintEvent* event)
 // 统计计数器
 // ============================================================================
 
-/** @brief 重置面板统计计数器(切换/展开/折叠/显示/隐藏/标题变更) */
+/** @brief 重置面板统计计数器(切换/展开/折叠/显示/隐藏/标题变更/标题点击/拖拽/设置打开) */
 void BasePanel::resetPanelStatistics()
 {
     m_totalToggles = 0;
@@ -180,4 +180,7 @@ void BasePanel::resetPanelStatistics()
     m_totalShows = 0;
     m_totalHides = 0;
     m_totalTitleChanges = 0;
+    m_totalTitleClicks = 0;
+    m_totalDragStarts = 0;
+    m_totalSettingsOpens = 0;
 }

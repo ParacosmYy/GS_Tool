@@ -65,6 +65,12 @@ public:
     /** @brief 获取已处理的字节总数 */
     qint64 totalBytesProcessed() const;
 
+    /** @brief 获取已解码通道总数(跨所有帧累加) */
+    quint64 totalChannelsDecoded() const;
+
+    /** @brief 获取FireWater协议匹配(成功解析)的总帧数 */
+    quint64 fireWaterMatches() const;
+
     /** @brief 重置统计数据（帧计数/错误/字节） */
     void resetStatistics();
 
@@ -97,6 +103,10 @@ private:
     quint64 m_errorCount = 0;
     /** @brief 已处理字节总数 */
     qint64 m_totalBytes = 0;
+    /** @brief 已解码通道总数(跨所有帧累加) */
+    quint64 m_totalChannelsDecoded = 0;
+    /** @brief FireWater协议匹配(成功解析)的总帧数 */
+    quint64 m_fireWaterMatches = 0;
 
     static constexpr int kMaxBufferSize = 8192;  ///< 最大缓冲区保护
     static constexpr int kMaxLineSize = 2048;    ///< 单行最大长度
