@@ -243,6 +243,7 @@ signals:
     void profileUpdated(int index);
 
 private:
+    friend struct ConfigProfileManagerHolder;
     /**
      * @brief 构造函数 (私有，单例模式)
      * @param parent 父对象
