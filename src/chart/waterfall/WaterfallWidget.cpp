@@ -31,6 +31,7 @@ WaterfallWidget::~WaterfallWidget() = default;
 /** @brief 添加一帧频谱数据到历史记录并绘制新行 @param spectrum 频谱幅度值向量 */
 void WaterfallWidget::addSpectrum(const QVector<double> &spectrum)
 {
+    if (spectrum.isEmpty()) return;
     if (m_paused) { m_totalSpectrumsDropped++; return; }
     m_totalSpectrumsAdded++;
     m_totalUpdates++;
@@ -52,12 +53,15 @@ void WaterfallWidget::addSpectrum(const QVector<double> &spectrum)
     int y = m_currentLine % m_maxLines;
     double range = m_maxValue - m_minValue;
     if (range <= 0) range = 1.0;
-    int binW = qMax(1, width() / spectrum.size());
+    int binW = qMax(1, width() / qMax(1, spectrum.size()));
+    p.fillRect(0, y, m_waterfall.width(), 1,
+               ThemeManager::instance().color(ThemeManager::SemanticColor::BgPrimary));
     for (int i = 0; i < spectrum.size(); ++i) {
         QColor c = valueToColor(spectrum[i]);
         p.setPen(c);
         p.drawLine(i * binW, y, (i + 1) * binW, y);
     }
+    p.end();
     emit spectrumAdded(m_history.size());
     update();
 }
@@ -131,8 +135,8 @@ void WaterfallWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int x = event->pos().x();
     int y = event->pos().y();
-    int col = x * (m_history.isEmpty() ? 1 : m_history[0].size()) / width();
-    int row = y * m_maxLines / height();
+    int col = (width() > 0) ? x * (m_history.isEmpty() ? 1 : m_history[0].size()) / width() : 0;
+    int row = (height() > 0) ? y * m_maxLines / height() : 0;
     if (row >= 0 && row < m_history.size() && col >= 0 && col < m_history[row].size()) {
         m_totalCursorQueries++;
         emit valueAtCursor(col, m_history[row][col]);
@@ -150,7 +154,8 @@ void WaterfallWidget::scrollImage()
 /** @brief 将数值映射为颜色，黑→蓝→青→绿→黄→红渐变 @param value 待映射的数值 @return 对应的QColor颜色 */
 QColor WaterfallWidget::valueToColor(double value) const
 {
-    double t = (value - m_minValue) / (m_maxValue - m_minValue);
+    double range = m_maxValue - m_minValue;
+    double t = (range > 0.0) ? (value - m_minValue) / range : 0.0;
     t = qBound(0.0, t, 1.0);
     // Cool-to-hot: black -> blue -> cyan -> green -> yellow -> red
     int r, g, b;

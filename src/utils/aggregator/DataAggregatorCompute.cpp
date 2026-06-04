@@ -23,7 +23,7 @@ void DataAggregator::computeAggregate(const QString &source) {
     const auto &vals = it->values;
     switch (it->func) {
     case Sum:     { double s=0; for (auto v:vals) s+=v; it->result=s; break; }
-    case Average: { double s=0; for (auto v:vals) s+=v; it->result=s/vals.size(); break; }
+    case Average: { double s=0; for (auto v:vals) s+=v; it->result=vals.isEmpty()?0.0:s/vals.size(); break; }
     case Min:     { double m=vals[0]; for (auto v:vals) if (v<m) m=v; it->result=m; break; }
     case Max:     { double m=vals[0]; for (auto v:vals) if (v>m) m=v; it->result=m; break; }
     case Count:   it->result=vals.size(); break;
@@ -89,6 +89,7 @@ DataAggregator::WindowStats DataAggregator::computeStats(const QList<double> &va
 
 /** @brief 计算指定时间戳所属的时间窗口起始时间(自然对齐) @param timestampMs 时间戳(Epoch毫秒) @param intervalSec 窗口间隔(秒) @return 窗口起始时间(Epoch毫秒) */
 qint64 DataAggregator::alignToWindow(qint64 timestampMs, int intervalSec) {
+    if (intervalSec <= 0) return timestampMs;
     qint64 intervalMs = static_cast<qint64>(intervalSec) * 1000;
     return (timestampMs / intervalMs) * intervalMs;
 }

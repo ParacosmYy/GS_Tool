@@ -125,6 +125,9 @@ private:
     /** @brief 判断点击位置是否在游标附近 @param pixelX 点击像素X @return 0=无, 1=游标A, 2=游标B */
     int hitTestCursor(int pixelX) const;
 
+    /** @brief 更新双游标测量统计(仅在游标移动时调用，非每帧重绘) */
+    void updateMeasurementStats();
+
     QChartView* m_chartView;        ///< 关联的图表视图
     ChartModel* m_model;            ///< 数据模型
 
@@ -144,6 +147,7 @@ private:
     QColor m_panelBgColor;          ///< 差值面板背景色
 
     ZoomController* m_zoomController = nullptr; ///< 关联的缩放控制器(绘制框选用)
+    bool m_measurementDirty = false;        ///< 测量统计脏标记(游标移动时置true)
 
     // 统计计数器
     quint64 m_totalCursorCreations = 0;     ///< 游标创建总次数

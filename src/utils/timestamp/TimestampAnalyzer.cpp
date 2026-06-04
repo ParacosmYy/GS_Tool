@@ -23,15 +23,13 @@ QDateTime TimestampAnalyzer::unixToDatetime(qint64 timestamp, bool isMillis) con
 qint64 TimestampAnalyzer::datetimeToUnix(const QDateTime &datetime, bool asMillis) const
 {
     ++m_totalConversions;
-    qint64 secs = datetime.toSecsSinceEpoch();
-    return asMillis ? (secs * 1000) : secs;
+    return asMillis ? datetime.toMSecsSinceEpoch() : datetime.toSecsSinceEpoch();
 }
 
 /** @brief 获取当前Unix时间戳 @param millis 是否返回毫秒精度 @return 当前时间戳 */
 qint64 TimestampAnalyzer::currentUnix(bool millis)
 {
-    qint64 secs = QDateTime::currentSecsSinceEpoch();
-    return millis ? (secs * 1000) : secs;
+    return millis ? QDateTime::currentMSecsSinceEpoch() : QDateTime::currentSecsSinceEpoch();
 }
 
 /** @brief 解析时间戳字符串(支持Unix秒/毫秒/ISO日期)，累计解析计数和字节数 @param text 时间戳文本 @return 解析后的QDateTime，失败返回无效对象 */

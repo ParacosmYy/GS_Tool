@@ -63,7 +63,8 @@ void HeatmapWidget::updatePixmap()
 /** @brief 将数值映射为颜色，使用蓝->绿->红的三段线性渐变 @param value 待映射的数值 @return 对应的QColor颜色 */
 QColor HeatmapWidget::valueToColor(double value) const
 {
-    double t = (value - m_minValue) / (m_maxValue - m_minValue);
+    double range = m_maxValue - m_minValue;
+    double t = (range > 0.0) ? (value - m_minValue) / range : 0.0;
     t = qBound(0.0, t, 1.0);
     int r = static_cast<int>(t < 0.5 ? 0 : (t - 0.5) * 2 * 255);
     int g = static_cast<int>(t < 0.5 ? t * 2 * 255 : (1.0 - t) * 2 * 255);

@@ -117,6 +117,7 @@ private:
     quint64 m_totalComputeTimeUs = 0;    ///< 累计FFT计算耗时(微秒)
     quint64 m_totalComputeCount = 0;     ///< 计算次数(用于平均值)
     int m_lastFftSize = 0;               ///< 上次FFT长度(检测尺寸变更)
+    WindowType m_lastWindowType = WindowType::Hanning; ///< 上次窗函数类型(实例级，避免static共享)
 };
 
 #endif // FFTENGINE_H

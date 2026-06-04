@@ -90,6 +90,7 @@ bool ModbusMaster::writeSingleRegister(int slave, int addr, quint16 value) {
 /** @brief 发送FC16写多个寄存器请求 @param slave 从站地址 @param addr 起始寄存器地址 @param values 写入值列表 @return true=发送成功 */
 bool ModbusMaster::writeMultipleRegisters(int slave, int addr,
                                           const QList<quint16>& values) {
+    if (values.isEmpty() || values.size() > 123) return false;
     ModbusFrame frame;
     frame.slaveAddress = static_cast<quint8>(slave);
     frame.function     = ModbusFunction::WriteMultipleRegisters;

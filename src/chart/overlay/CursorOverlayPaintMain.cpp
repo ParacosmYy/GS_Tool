@@ -64,6 +64,23 @@ void CursorOverlay::drawDeltaPanel(QPainter& painter)
 
     double deltaX = std::abs(m_cursorBX - m_cursorAX);
 
+    // 仅在游标实际移动时更新测量统计，避免每帧重绘递增
+    if (m_measurementDirty) {
+        m_measurementDirty = false;
+        ++m_totalMeasurements;
+        ++m_totalDeltaMeasurements;
+        m_sumDeltaX += deltaX;
+        if (!m_model->channelNames().isEmpty()) {
+            const QString& firstCh = m_model->channelNames().first();
+            const QVector<QPointF>& data = m_model->channelData(firstCh);
+            double valA = 0.0, valB = 0.0;
+            if (interpolateYForMain(data, m_cursorAX, valA) &&
+                interpolateYForMain(data, m_cursorBX, valB)) {
+                m_sumDeltaY += std::abs(valB - valA);
+            }
+        }
+    }
+
     // 构建差值文本(使用tr()包裹用户可见文字)
     QStringList lines;
     lines << tr("ΔX: %1 采样").arg(deltaX, 0, 'f', 1);
@@ -147,21 +164,7 @@ void CursorOverlay::paintEvent(QPaintEvent* /*event*/)
 
     // 双游标模式: 绘制差值面板
     if (m_hasCursorA && m_hasCursorB) {
-        ++m_totalMeasurements;
-        ++m_totalDeltaMeasurements;
-        // 累计ΔX/ΔY用于计算平均值
-        double deltaX = std::abs(m_cursorBX - m_cursorAX);
-        m_sumDeltaX += deltaX;
-        // 累计首个通道的ΔY
-        if (m_model && !m_model->channelNames().isEmpty()) {
-            const QString& firstCh = m_model->channelNames().first();
-            const QVector<QPointF>& data = m_model->channelData(firstCh);
-            double valA = 0.0, valB = 0.0;
-            if (interpolateYForMain(data, m_cursorAX, valA) &&
-                interpolateYForMain(data, m_cursorBX, valB)) {
-                m_sumDeltaY += std::abs(valB - valA);
-            }
-        }
+        // 累计ΔX/ΔY仅在实际测量时(非每帧重绘)，统计数据由setCursorA/setCursorB驱动
         drawDeltaPanel(painter);
     }
 

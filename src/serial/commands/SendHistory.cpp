@@ -52,8 +52,13 @@ void SendHistory::addEntry(const QString& text, bool isHex)
     m_totalSendCount++;
     ++m_totalRecords;
 
-    // 超过最大记录数时，从头部删除最旧的条目
+    // 超过最大记录数时，从头部删除最旧的条目并同步频率映射
     while (m_entries.size() > m_maxEntries) {
+        const QString oldText = m_entries.first().text;
+        if (m_freqMap.contains(oldText)) {
+            if (--m_freqMap[oldText] <= 0)
+                m_freqMap.remove(oldText);
+        }
         m_entries.removeFirst();
     }
 

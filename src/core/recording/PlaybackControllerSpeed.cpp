@@ -111,13 +111,13 @@ qint64 PlaybackController::totalPlayTimeMs() const
     return m_totalPlayTimeMs;
 }
 
-/** @brief 获取平均回放倍速 @return 平均倍速值，无回放记录时返回0.0 */
+/** @brief 获取平均回放倍速 @return 平均倍速值，无速度变更记录时返回0.0 */
 qreal PlaybackController::averageSpeed() const
 {
-    if (m_playCount == 0) {
+    if (m_totalSpeedChanges == 0) {
         return 0.0;
     }
-    return m_speedSum / static_cast<qreal>(m_playCount);
+    return m_speedSum / static_cast<qreal>(m_totalSpeedChanges);
 }
 
 /** @brief 重置基础统计数据(回放次数/累计时长/倍速总和) */

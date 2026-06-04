@@ -60,9 +60,9 @@ void TerminalModel::appendSent(const QByteArray& data)
 /** @brief 清空所有缓冲区数据和统计计数，发射dataCleared信号 */
 void TerminalModel::clear()
 {
-    ++m_totalClears;  ///< 统计: 数据清空次数递增
     {
         QMutexLocker locker(&m_mutex);
+        ++m_totalClears;  ///< 统计: 数据清空次数递增(在锁内)
         m_head = 0;
         m_count = 0;
         m_rxBytes = 0;

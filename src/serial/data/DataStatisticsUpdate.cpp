@@ -117,6 +117,7 @@ void DataStatistics::reset()
 
     // 重启计时器
     m_stopwatch.restart();
+    m_sampleTimer.restart();
 }
 
 /** @brief 返回当前接收速率(bytes/s) */

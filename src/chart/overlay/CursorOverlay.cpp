@@ -87,6 +87,7 @@ void CursorOverlay::setCursorA(double x)
     m_hasCursorA = true;
     ++m_totalCursorMoves;
     ++m_totalCursorCreations;
+    updateMeasurementStats();
     update();
 }
 
@@ -97,7 +98,14 @@ void CursorOverlay::setCursorB(double x)
     m_hasCursorB = true;
     ++m_totalCursorMoves;
     ++m_totalCursorCreations;
+    updateMeasurementStats();
     update();
+}
+
+/** @brief 更新双游标测量统计(仅在游标移动时调用，标记需要更新统计) */
+void CursorOverlay::updateMeasurementStats()
+{
+    m_measurementDirty = true;
 }
 
 /** @brief 清除所有游标 */

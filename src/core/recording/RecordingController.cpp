@@ -147,6 +147,7 @@ void RecordingController::onOpenPlayback()
 /** @brief 停止当前回放 */
 void RecordingController::onStopPlayback()
 {
+    if (!m_logger) return;
     m_logger->stopPlayback();
     ++m_totalPlaybackStops;
     m_stopPlaybackAction->setEnabled(false);

@@ -28,11 +28,10 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
         return {};
     }
 
-    /* 跟踪窗函数类型变更 */
-    static WindowType lastWindow = WindowType::Hanning;
-    if (window != lastWindow) {
+    /* 跟踪窗函数类型变更(使用成员变量避免多实例共享static变量) */
+    if (window != m_lastWindowType) {
         ++m_totalWindowTypeChanges;
-        lastWindow = window;
+        m_lastWindowType = window;
     }
 
     /* 确定FFT长度: 用户指定 or 自动取nextPowerOf2 */

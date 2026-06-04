@@ -40,6 +40,7 @@ void TerminalModel::notifySearchPerformed() { ++m_totalSearchesPerformed; }
 /** @brief 重置所有统计计数器为零 */
 void TerminalModel::resetStats()
 {
+    QMutexLocker locker(&m_mutex);
     m_totalLinesAdded = 0;
     m_totalBytesReceived = 0;
     m_totalBytesSent = 0;

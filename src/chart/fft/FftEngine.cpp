@@ -37,7 +37,7 @@ int FftEngine::nextPowerOf2(int n)
         n >>= 1;
         ++highest;
     }
-    return (1 << highest);
+    return (highest >= 31) ? (1 << 30) : (1 << highest);
 }
 
 /** @brief 计算以2为底的对数(整数部分) @param n 输入值(必须为2的幂) @return log2(n) */

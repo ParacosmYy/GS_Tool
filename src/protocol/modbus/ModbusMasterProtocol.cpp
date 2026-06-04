@@ -31,8 +31,8 @@ bool ModbusMaster::sendFrame(const QByteArray& rawData) {
 void ModbusMaster::onRawDataReceived(const QByteArray& data) {
     m_rxBuffer.append(data);
 
-    /* 防御: 缓冲区过大时截断(防止内存泄漏) */
-    if (m_rxBuffer.size() > 256) {
+    /* 防御: 缓冲区过大时截断(防止内存泄漏，512字节允许最大合法Modbus帧) */
+    if (m_rxBuffer.size() > 512) {
         m_rxBuffer.clear();
         return;
     }
