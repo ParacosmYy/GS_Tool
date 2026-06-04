@@ -121,6 +121,7 @@ set(SOURCES
     src/protocol/parser/FrameParser.cpp
     src/protocol/parser/FrameParserHelpers.cpp
     src/protocol/parser/FrameParserStateHandlers.cpp
+    src/protocol/parser/FrameParserStats.cpp
     src/protocol/view/ProtocolView.cpp
     src/protocol/view/ProtocolViewMenu.cpp
     src/protocol/editor/FrameVisualEditor.cpp
@@ -318,6 +319,7 @@ set(SOURCES
     # ── F18: Modbus 主站/从站 ──
     src/protocol/modbus/ModbusMaster.cpp
     src/protocol/modbus/ModbusSlave.cpp
+    src/protocol/modbus/ModbusSlaveResponse.cpp
     src/protocol/modbus/ModbusScanWidget.cpp
     src/protocol/modbus/ModbusScanWidgetStats.cpp
     src/protocol/modbus/ModbusConfigPanel.cpp
