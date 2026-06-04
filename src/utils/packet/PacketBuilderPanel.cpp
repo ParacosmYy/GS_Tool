@@ -1,6 +1,6 @@
 /**
  * @file PacketBuilderPanel.cpp
- * @brief 数据包构建面板 UI 实现
+ * @brief 数据包构建面板 UI 实现 — 面板构造、模板加载/保存、数据包构建
  * @author Serial Tool Team
  * @date 2026-06-02
  */
@@ -105,40 +105,6 @@ void PacketBuilderPanel::setBuilder(PacketBuilder *builder)
 }
 
 /**
- * @brief 添加新字段行
- */
-void PacketBuilderPanel::onAddField()
-{
-    if (!m_builder) { return; }
-
-    ++m_totalFieldEdits;
-    PacketField field;
-    field.name = tr("字段%1").arg(m_builder->fields().size() + 1);
-    field.offset = 0;
-    field.size = 1;
-    field.dataType = QStringLiteral("uint8");
-    field.value = 0;
-
-    m_builder->addField(field);
-    refreshTable();
-}
-
-/**
- * @brief 删除选中行对应的字段
- */
-void PacketBuilderPanel::onRemoveField()
-{
-    if (!m_builder) { return; }
-
-    int row = m_fieldTable->currentRow();
-    if (row >= 0) {
-        ++m_totalFieldEdits;
-        m_builder->removeField(row);
-        refreshTable();
-    }
-}
-
-/**
  * @brief 构建数据包并更新预览 — hex dump格式
  */
 void PacketBuilderPanel::onBuild()
@@ -184,123 +150,4 @@ void PacketBuilderPanel::onSaveTemplate()
     if (m_builder->saveTemplate(path)) {
         m_hexPreview->setPlainText(tr("模板已保存: %1").arg(path));
     }
-}
-
-/**
- * @brief 刷新表格以同步构建器字段
- */
-void PacketBuilderPanel::refreshTable()
-{
-    if (!m_builder) { return; }
-
-    auto fields = m_builder->fields();
-    m_fieldTable->setRowCount(fields.size());
-
-    for (int i = 0; i < fields.size(); ++i) {
-        const auto &f = fields[i];
-        m_fieldTable->setItem(i, 0, new QTableWidgetItem(f.name));
-        m_fieldTable->setItem(i, 1, new QTableWidgetItem(
-            QString::number(f.offset)));
-        m_fieldTable->setItem(i, 2, new QTableWidgetItem(
-            QString::number(f.size)));
-        m_fieldTable->setItem(i, 3, new QTableWidgetItem(f.dataType));
-        m_fieldTable->setItem(i, 4, new QTableWidgetItem(
-            f.value.toString()));
-    }
-}
-
-/**
- * @brief 格式化hex dump输出
- */
-QString PacketBuilderPanel::formatHexDump(const QByteArray &data) const
-{
-    if (data.isEmpty()) { return tr("(空数据包)"); }
-
-    QString result;
-    for (int i = 0; i < data.size(); ++i) {
-        if (i > 0) {
-            result += (i % 16 == 0) ? "\n" : " ";
-        }
-        result += QString("%1").arg(
-            static_cast<quint8>(data[i]), 2, 16, QChar('0')).toUpper();
-    }
-
-    result += tr("\n\n%1 字节").arg(data.size());
-    return result;
-}
-
-/**
- * @brief 清除所有字段
- */
-void PacketBuilderPanel::onClearAll()
-{
-    if (!m_builder) { return; }
-
-    auto fields = m_builder->fields();
-    for (int i = fields.size() - 1; i >= 0; --i) {
-        m_builder->removeField(i);
-    }
-    refreshTable();
-    m_hexPreview->clear();
-}
-
-/**
- * @brief 上移选中字段
- */
-void PacketBuilderPanel::onMoveUp()
-{
-    if (!m_builder) { return; }
-
-    int row = m_fieldTable->currentRow();
-    if (row <= 0) { return; }
-
-    auto fields = m_builder->fields();
-    std::swap(fields[row], fields[row - 1]);
-
-    /* 重建字段列表 */
-    for (int i = fields.size() - 1; i >= 0; --i) {
-        m_builder->removeField(i);
-    }
-    for (auto& f : fields) {
-        m_builder->addField(f);
-    }
-
-    refreshTable();
-    m_fieldTable->selectRow(row - 1);
-}
-
-/**
- * @brief 下移选中字段
- */
-void PacketBuilderPanel::onMoveDown()
-{
-    if (!m_builder) { return; }
-
-    int row = m_fieldTable->currentRow();
-    auto fields = m_builder->fields();
-    if (row < 0 || row >= fields.size() - 1) { return; }
-
-    std::swap(fields[row], fields[row + 1]);
-
-    /* 重建字段列表 */
-    for (int i = fields.size() - 1; i >= 0; --i) {
-        m_builder->removeField(i);
-    }
-    for (auto& f : fields) {
-        m_builder->addField(f);
-    }
-
-    refreshTable();
-    m_fieldTable->selectRow(row + 1);
-}
-
-/**
- * @brief 重置所有统计计数器
- */
-void PacketBuilderPanel::resetStatistics()
-{
-    m_totalPacketsBuilt = 0;
-    m_totalSends = 0;
-    m_totalFieldEdits = 0;
-    m_totalTemplateLoads = 0;
 }

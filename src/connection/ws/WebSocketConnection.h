@@ -47,6 +47,7 @@ public:
     quint64 totalBinaryFrames() const;                          ///< 已接收二进制帧总数
     quint64 totalPingFrames() const;                            ///< 已发送ping帧总数
     quint64 totalPongFrames() const;                            ///< 已接收pong帧总数
+    quint64 totalFragmentedMessages() const;                    ///< 已接收分片消息总数
     quint64 pingPongCount() const;                              ///< ping/pong交互总次数
     double averageLatencyMs() const;                            ///< ping/pong平均延迟(ms)
     qint64 maxLatencyMs() const;                                ///< ping/pong最大延迟(ms)
@@ -98,6 +99,7 @@ private:
     quint64 m_totalFramesSent = 0; quint64 m_totalFramesReceived = 0;
     quint64 m_totalTextFrames = 0; quint64 m_totalBinaryFrames = 0;
     quint64 m_totalPingFrames = 0; quint64 m_totalPongFrames = 0;
+    quint64 m_totalFragmentedMessages = 0;   ///< 已接收分片消息(continuation帧)总数
 };
 
 #endif // WEBSOCKETCONNECTION_H

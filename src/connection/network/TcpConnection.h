@@ -38,6 +38,7 @@ public:
     quint64 totalReconnects() const { return m_totalReconnects; }   ///< 累计重连成功次数
     quint64 totalDnsLookups() const { return m_totalDnsLookups; }   ///< 累计DNS查询次数
     quint64 totalDnsErrors() const { return m_totalDnsErrors; }     ///< 累计DNS解析失败次数
+    quint64 totalConnectionTimeouts() const { return m_totalConnectionTimeouts; } ///< 累计连接超时次数
     quint64 totalKeepAliveProbes() const { return m_totalKeepAliveProbes; } ///< 累计KeepAlive探测次数
     double averageLatencyMs() const;           ///< 连接建立平均延迟(ms)
     qint64 lastLatencyMs() const { return m_lastLatencyMs; }     ///< 最近一次连接延迟(ms)
@@ -87,6 +88,7 @@ private:
     quint64 m_totalReconnects = 0;       ///< 累计重连成功次数
     quint64 m_totalDnsLookups = 0;       ///< 累计DNS查询次数
     quint64 m_totalDnsErrors = 0;        ///< 累计DNS解析失败次数
+    quint64 m_totalConnectionTimeouts = 0;///< 累计连接超时次数
     quint64 m_totalKeepAliveProbes = 0;  ///< 累计KeepAlive探测次数
 };
 

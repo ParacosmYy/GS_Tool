@@ -104,6 +104,11 @@ void WebSocketConnection::parseFrames()
         ++m_totalFramesReceived;  // 累计接收帧总数
 
         switch (opcode) {
+        case 0x00: // continuation帧(分片消息的后续帧)
+            ++m_totalFragmentedMessages;  // 分片消息计数
+            m_totalBytesReceived += static_cast<quint64>(payload.size());
+            emit dataReceived(payload);
+            break;
         case 0x01: // 文本帧
             ++m_totalMessagesReceived;
             m_totalBytesReceived += static_cast<quint64>(payload.size());
@@ -221,6 +226,8 @@ quint64 WebSocketConnection::totalBinaryFrames() const { return m_totalBinaryFra
 quint64 WebSocketConnection::totalPingFrames() const { return m_totalPingFrames; }
 /** @brief 获取累计接收pong帧数 @return pong帧接收总数 */
 quint64 WebSocketConnection::totalPongFrames() const { return m_totalPongFrames; }
+/** @brief 获取累计分片消息数(continuation帧) @return 分片消息总数 */
+quint64 WebSocketConnection::totalFragmentedMessages() const { return m_totalFragmentedMessages; }
 
 /** @brief 获取ping/pong交互总次数 @return ping帧发送数+pong帧接收数 */
 quint64 WebSocketConnection::pingPongCount() const { return m_totalPingFrames + m_totalPongFrames; }
@@ -254,7 +261,7 @@ void WebSocketConnection::setMessageQueueLimit(int limit) { m_queueLimit = limit
 /** @brief 获取因队列满而丢弃的消息数 @return 丢弃消息总数 */
 quint64 WebSocketConnection::totalMessagesDropped() const { return m_totalMessagesDropped; }
 
-/** @brief 重置所有统计数据(含帧统计、延迟追踪和队列计数)为零 */
+/** @brief 重置所有统计数据(含帧统计、延迟追踪、队列计数和分片消息)为零 */
 void WebSocketConnection::resetStats()
 {
     m_totalConnections = 0;
@@ -269,6 +276,7 @@ void WebSocketConnection::resetStats()
     m_totalBinaryFrames = 0;
     m_totalPingFrames = 0;
     m_totalPongFrames = 0;
+    m_totalFragmentedMessages = 0;
     m_lastLatencyMs = 0;
     m_maxLatencyMs = 0;
     m_latencySampleCount = 0;

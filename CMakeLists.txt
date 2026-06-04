@@ -97,6 +97,7 @@ set(SOURCES
     src/connection/network/TcpConnection.cpp
     src/connection/network/TcpConnectionStats.cpp
     src/connection/network/TcpConnectionHelpers.cpp
+    src/connection/network/TcpConnectionHandlers.cpp
     src/connection/network/UdpConnection.cpp
     src/terminal/widget/TerminalWidget.cpp
     src/terminal/widget/TerminalWidgetSlots.cpp
@@ -164,6 +165,7 @@ set(SOURCES
     src/chart/fft/FftWidget.cpp
     src/chart/fft/FftWidgetSetup.cpp
     src/chart/stats/HistogramWidget.cpp
+    src/chart/stats/HistogramWidgetUI.cpp
     src/chart/stats/HistogramWidgetStats.cpp
     src/chart/stats/ScatterWidget.cpp
     src/chart/stats/ScatterWidgetCompute.cpp
@@ -395,6 +397,7 @@ set(SOURCES
     src/utils/packet/PacketBuilder.cpp
     src/utils/packet/PacketBuilderTemplate.cpp
     src/utils/packet/PacketBuilderPanel.cpp
+    src/utils/packet/PacketBuilderPanelFields.cpp
 
     # ── F26: 设备注册表 ──
     src/core/device/DeviceRegistry.cpp

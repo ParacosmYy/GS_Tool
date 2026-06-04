@@ -112,6 +112,18 @@ public:
     /** @brief 获取累计Socket错误次数 @return Socket错误总次数 */
     quint64 totalSocketErrors() const { return m_totalSocketErrors; }
 
+    /** @brief 获取累计加入多播组次数 @return 多播组加入总次数 */
+    quint64 totalMulticastJoins() const { return m_totalMulticastJoins; }
+
+    /** @brief 获取累计离开多播组次数 @return 多播组离开总次数 */
+    quint64 totalMulticastLeaves() const { return m_totalMulticastLeaves; }
+
+    /** @brief 加入多播组 @param groupAddr 多播组地址(如"239.0.0.1") @return true=加入成功 */
+    bool joinMulticastGroup(const QString& groupAddr);
+
+    /** @brief 离开多播组 @param groupAddr 多播组地址 @return true=离开成功 */
+    bool leaveMulticastGroup(const QString& groupAddr);
+
     /** @brief 重置所有统计数据为零 */
     void resetStats();
 
@@ -153,6 +165,8 @@ private:
     quint64 m_totalDatagramErrors = 0;   ///< 数据报发送/接收失败次数
     quint64 m_totalBroadcastsSent = 0;   ///< 广播数据报发送次数
     quint64 m_totalSocketErrors = 0;     ///< Socket级别错误次数
+    quint64 m_totalMulticastJoins = 0;   ///< 累计加入多播组次数
+    quint64 m_totalMulticastLeaves = 0;  ///< 累计离开多播组次数
 };
 
 #endif // UDPCONNECTION_H
