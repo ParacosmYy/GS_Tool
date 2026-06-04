@@ -234,11 +234,13 @@ set(SOURCES
     src/dashboard/NumericDisplayWidget.cpp
     src/dashboard/DashboardModel.cpp
     src/dashboard/DashboardSerializer.cpp
+    src/dashboard/DashboardSerializerExport.cpp
     src/dashboard/DashboardSerializerProfile.cpp
 
     # ── F6: J-Link RTT ──
     src/rtt/JLinkRttConnection.cpp
     src/rtt/JLinkSdkLoader.cpp
+    src/rtt/JLinkSdkLoaderQuery.cpp
     src/rtt/RttConfigPanel.cpp
     src/rtt/RttChannelManager.cpp
 
@@ -325,6 +327,7 @@ set(SOURCES
 
     # ── F18: Modbus 主站/从站 ──
     src/protocol/modbus/ModbusMaster.cpp
+    src/protocol/modbus/ModbusMasterStats.cpp
     src/protocol/modbus/ModbusSlave.cpp
     src/protocol/modbus/ModbusSlaveResponse.cpp
     src/protocol/modbus/ModbusScanWidget.cpp

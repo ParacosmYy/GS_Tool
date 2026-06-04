@@ -1,20 +1,11 @@
-/**
- * @file ModbusTypes.h
- * @brief Modbus协议基础类型定义 — 纯C++结构体，无Q_OBJECT
- *
- * 定义Modbus RTU/ASCII/TCP协议所需的功能码、异常码和帧结构。
- * 提供CRC16校验、帧序列化/反序列化的静态内联工具函数。
- */
+/** @file ModbusTypes.h @brief Modbus协议基础类型定义 -- 纯C++结构体，无Q_OBJECT。定义功能码、异常码和帧结构，提供CRC16/帧序列化/反序列化静态内联工具 */
 #ifndef MODBUS_TYPES_H
 #define MODBUS_TYPES_H
 
 #include <QByteArray>
 #include <QtGlobal>
 
-/**
- * @brief Modbus功能码枚举
- * 对应Modbus协议标准定义的功能码
- */
+/** @brief Modbus功能码枚举，对应协议标准定义 */
 enum class ModbusFunction : quint8 {
     ReadCoils              = 1,   ///< 读线圈 (FC01)
     ReadDiscreteInputs     = 2,   ///< 读离散输入 (FC02)
@@ -26,10 +17,7 @@ enum class ModbusFunction : quint8 {
     WriteMultipleRegisters = 16   ///< 写多个寄存器 (FC16)
 };
 
-/**
- * @brief Modbus异常码枚举
- * 对应Modbus协议标准定义的异常响应码
- */
+/** @brief Modbus异常码枚举，对应协议标准定义 */
 enum class ModbusError : quint8 {
     IllegalFunction = 1,  ///< 非法功能码
     IllegalAddress  = 2,  ///< 非法数据地址
@@ -41,10 +29,7 @@ enum class ModbusError : quint8 {
     GatewayTarget   = 11  ///< 网关目标设备无响应
 };
 
-/**
- * @brief Modbus数据帧结构体
- * 封装一次Modbus请求或响应的所有字段
- */
+/** @brief Modbus数据帧结构体，封装一次请求或响应的所有字段 */
 struct ModbusFrame {
     quint8          slaveAddress  = 0;       ///< 从站地址 (1-247)
     ModbusFunction  function      = ModbusFunction::ReadHoldingRegisters; ///< 功能码
@@ -54,36 +39,22 @@ struct ModbusFrame {
     bool            exception     = false;   ///< 是否为异常响应帧
 };
 
-/**
- * @brief 计算Modbus CRC16校验值（多项式0xA001）
- * @param data 待计算数据（不含CRC字段）
- * @return CRC16校验值，低字节在前
- */
+/** @brief 计算Modbus CRC16校验值(多项式0xA001) @param data 待计算数据 @return CRC16校验值，低字节在前 */
 inline quint16 crc16(const QByteArray& data) {
     quint16 crc = 0xFFFF;
     for (int i = 0; i < data.size(); ++i) {
         crc ^= static_cast<quint8>(data[i]);
-        for (int j = 0; j < 8; ++j) {
-            if (crc & 0x0001) {
-                crc = (crc >> 1) ^ 0xA001;
-            } else {
-                crc >>= 1;
-            }
-        }
+        for (int j = 0; j < 8; ++j)
+            crc = (crc & 0x0001) ? ((crc >> 1) ^ 0xA001) : (crc >> 1);
     }
     return crc;
 }
 
-/**
- * @brief 将Modbus帧序列化为完整RTU字节流（含CRC）
- * @param frame 待序列化的Modbus帧
- * @return 序列化后的字节数组（含2字节CRC尾）
- */
+/** @brief 将Modbus帧序列化为完整RTU字节流(含CRC) @param frame 待序列化帧 @return 字节数组(含2字节CRC尾) */
 inline QByteArray frameToBytes(const ModbusFrame& frame) {
     QByteArray bytes;
     bytes.append(static_cast<char>(frame.slaveAddress));
     bytes.append(static_cast<char>(frame.function));
-
     if (frame.exception) {
         bytes.append(frame.data.isEmpty() ? QByteArray(1, '\0') : frame.data);
     } else if (frame.function == ModbusFunction::WriteSingleCoil ||
@@ -107,75 +78,50 @@ inline QByteArray frameToBytes(const ModbusFrame& frame) {
         bytes.append(static_cast<char>((frame.quantity >> 8) & 0xFF));
         bytes.append(static_cast<char>(frame.quantity & 0xFF));
     }
-
-    // 追加CRC16校验（小端序: 低字节在前）
     quint16 crcVal = crc16(bytes);
     bytes.append(static_cast<char>(crcVal & 0xFF));
     bytes.append(static_cast<char>((crcVal >> 8) & 0xFF));
     return bytes;
 }
 
-/**
- * @brief 从字节流解析Modbus RTU帧（校验CRC）
- * @param bytes 待解析的字节数组（含CRC尾）
- * @return 解析得到的Modbus帧，CRC错误时字段可能无效
- */
+/** @brief 从字节流解析Modbus RTU帧(校验CRC) @param bytes 待解析字节数组(含CRC尾) @return 解析帧，CRC错误时字段可能无效 */
 inline ModbusFrame bytesToFrame(const QByteArray& bytes) {
     ModbusFrame frame;
-    // 最小帧: slave(1) + func(1) + CRC(2) = 4字节
-    if (bytes.size() < 4) { return frame; }
-
+    if (bytes.size() < 4) return frame; // 最小帧: slave(1) + func(1) + CRC(2)
     frame.slaveAddress = static_cast<quint8>(bytes[0]);
     quint8 funcCode    = static_cast<quint8>(bytes[1]);
-
-    // 去除CRC后的有效载荷
     QByteArray payload = bytes.left(bytes.size() - 2);
-
     // 异常响应判断（功能码最高位为1）
     if (funcCode & 0x80) {
         frame.exception = true;
         frame.function  = static_cast<ModbusFunction>(funcCode & 0x7F);
-        if (payload.size() >= 3) { frame.data = payload.mid(2); }
+        if (payload.size() >= 3) frame.data = payload.mid(2);
         return frame;
     }
-
     frame.function = static_cast<ModbusFunction>(funcCode);
-
-    // 根据功能码区分帧格式
     bool isReadFunc = (funcCode >= 0x01 && funcCode <= 0x04);
-
     if (isReadFunc) {
         if (payload.size() == 6) {
             // 请求帧: slave + func + 起始地址(2) + 数量(2)
-            frame.startAddress = (static_cast<quint8>(payload[2]) << 8) |
-                                  static_cast<quint8>(payload[3]);
-            frame.quantity = (static_cast<quint8>(payload[4]) << 8) |
-                              static_cast<quint8>(payload[5]);
+            frame.startAddress = (static_cast<quint8>(payload[2]) << 8) | static_cast<quint8>(payload[3]);
+            frame.quantity     = (static_cast<quint8>(payload[4]) << 8) | static_cast<quint8>(payload[5]);
         } else if (payload.size() >= 3) {
             // 响应帧: slave + func + 字节计数(1) + 数据(N)
             quint8 byteCount = static_cast<quint8>(payload[2]);
-            if (byteCount == payload.size() - 3) {
-                frame.data = payload.mid(3, byteCount);
-            }
+            if (byteCount == payload.size() - 3) frame.data = payload.mid(3, byteCount);
         }
     } else if (funcCode == 0x05 || funcCode == 0x06) {
-        // FC05/06: slave + func + 地址(2) + 值(2)
         if (payload.size() >= 6) {
-            frame.startAddress = (static_cast<quint8>(payload[2]) << 8) |
-                                  static_cast<quint8>(payload[3]);
+            frame.startAddress = (static_cast<quint8>(payload[2]) << 8) | static_cast<quint8>(payload[3]);
             frame.data = payload.mid(4);
         }
     } else if (funcCode == 0x0F || funcCode == 0x10) {
-        // FC15/16: slave + func + 起始地址(2) + 数量(2) [+ 字节计数+数据]
         if (payload.size() >= 6) {
-            frame.startAddress = (static_cast<quint8>(payload[2]) << 8) |
-                                  static_cast<quint8>(payload[3]);
-            frame.quantity = (static_cast<quint8>(payload[4]) << 8) |
-                              static_cast<quint8>(payload[5]);
-            if (payload.size() > 6) { frame.data = payload.mid(6); }
+            frame.startAddress = (static_cast<quint8>(payload[2]) << 8) | static_cast<quint8>(payload[3]);
+            frame.quantity     = (static_cast<quint8>(payload[4]) << 8) | static_cast<quint8>(payload[5]);
+            if (payload.size() > 6) frame.data = payload.mid(6);
         }
     }
-
     return frame;
 }
 

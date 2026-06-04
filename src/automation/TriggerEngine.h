@@ -1,15 +1,4 @@
-/**
- * @file TriggerEngine.h
- * @brief 触发器引擎 — 对接收数据进行规则匹配评估
- *
- * 负责将接收到的数据（原始字节或解析后的数值）与已注册的触发器规则
- * 进行匹配评估，命中时发出 triggered 信号。
- *
- * 协作关系:
- *   - TriggerManager: 管理规则集合和引擎生命周期
- *   - TriggerAction: 响应 triggered 信号执行动作
- *   - IConnection: 通过 dataReceived 信号输入待评估数据
- */
+/** @file TriggerEngine.h @brief 触发器引擎 -- 对接收数据进行规则匹配评估。维护规则列表，支持原始字节(ExactString/Regex/HexBytes)和解析后数值(ValueRange)匹配 */
 #ifndef TRIGGERENGINE_H
 #define TRIGGERENGINE_H
 
@@ -21,155 +10,57 @@
 
 /**
  * @brief 触发器引擎
- *
- * 维护规则列表，对外提供数据评估接口。
- * 支持对原始字节数据和解析后数值分别进行匹配。
+ * 维护规则列表，对外提供数据评估接口。命中时发出triggered信号。
+ * 协作: TriggerManager(管理规则集合) / TriggerAction(执行动作) / IConnection(数据输入)
  */
 class TriggerEngine : public QObject {
     Q_OBJECT
 
 public:
-    /** @brief 构造函数 */
     explicit TriggerEngine(QObject* parent = nullptr);
-
-    /**
-     * @brief 评估原始字节数据
-     *
-     * 将数据与所有已启用规则进行匹配（ExactString/Regex/HexBytes）。
-     *
-     * @param data 待评估的原始数据
-     */
+    /** @brief 评估原始字节数据(ExactString/Regex/HexBytes) @param data 待评估数据 */
     void evaluateData(const QByteArray& data);
-
-    /**
-     * @brief 评估解析后的数值
-     *
-     * 将数值与 ValueRange 类型的规则进行匹配。
-     *
-     * @param name 数据标识（如通道名/变量名）
-     * @param value 数值
-     */
+    /** @brief 评估解析后数值(ValueRange) @param name 数据标识 @param value 数值 */
     void evaluateValue(const QString& name, double value);
-
-    /**
-     * @brief 添加一条触发器规则
-     * @param rule 规则配置
-     */
-    void addRule(const TriggerRuleConfig& rule);
-
-    /**
-     * @brief 移除指定索引的规则
-     * @param index 规则索引
-     */
-    void removeRule(int index);
-
-    /**
-     * @brief 设置所有规则的启用/禁用状态
-     * @param enabled true 启用，false 禁用
-     */
-    void setRulesEnabled(bool enabled);
-
-    /**
-     * @brief 设置指定规则的启用/禁用状态
-     * @param index 规则索引
-     * @param enabled true 启用，false 禁用
-     */
+    void addRule(const TriggerRuleConfig& rule);       ///< 添加触发器规则
+    void removeRule(int index);                        ///< 移除指定索引规则
+    void setRulesEnabled(bool enabled);                ///< 设置所有规则启用/禁用
+    /** @brief 设置指定规则启用/禁用 @param index 规则索引 @param enabled 启用状态 */
     void setRuleEnabled(int index, bool enabled);
-
-    /**
-     * @brief 获取所有规则列表
-     * @return 规则配置列表的常引用
-     */
-    const QList<TriggerRuleConfig>& rules() const;
-
-    /** @brief 清空所有规则 */
-    void clearRules();
-
-    /**
-     * @brief 获取累计成功匹配次数
-     * @return 匹配次数
-     */
-    int matchCount() const;
-
-    /**
-     * @brief 获取上次匹配距现在的毫秒数
-     * @return 距上次匹配的毫秒数，无匹配返回 -1
-     */
-    qint64 msSinceLastMatch() const;
-
-    /**
-     * @brief 重置统计计数（不重置规则）
-     */
-    void resetStatistics();
-
-    /**
-     * @brief 获取指定规则的匹配次数
-     * @param index 规则索引
-     * @return 该规则命中次数
-     */
-    int ruleMatchCount(int index) const;
-
+    const QList<TriggerRuleConfig>& rules() const;     ///< 获取所有规则列表
+    void clearRules();                                 ///< 清空所有规则
+    int matchCount() const;                            ///< 累计成功匹配次数
+    qint64 msSinceLastMatch() const;                   ///< 上次匹配距现在的ms数(无匹配返回-1)
+    void resetStatistics();                            ///< 重置统计(不重置规则)
+    int ruleMatchCount(int index) const;               ///< 指定规则匹配次数
     // ---- 扩展统计 getter ----
-
-    /** @brief 获取总评估次数（每次调用evaluateData/evaluateValue计为一次） */
-    quint64 totalEvaluations() const;
-
-    /** @brief 获取总匹配成功次数（quint64精度，跨所有规则累计） */
-    quint64 totalMatches() const;
-
-    /** @brief 获取总动作执行次数 */
-    quint64 totalActionsExecuted() const;
-
-    /** @brief 获取总错误次数（正则编译失败等） */
-    quint64 totalErrors() const;
-
-    /** @brief 获取总规则评估次数（每条规则每次评估计为一次） @return 规则评估总次数 */
-    quint64 totalTriggersEvaluated() const;
-
-    /** @brief 获取总触发器命中次数（规则匹配成功并发射信号） @return 触发器命中总次数 */
-    quint64 totalTriggersFired() const;
-
-    /** @brief 获取总跳过禁用规则的次数 @return 跳过禁用规则的总次数 */
-    quint64 totalTriggersDisabled() const;
-
-    /** @brief 获取总动作执行错误次数 @return 动作执行错误总次数 */
-    quint64 totalActionErrors() const;
-
-    /** @brief 重置所有扩展统计计数器为初始值 */
-    void resetStats();
+    quint64 totalEvaluations() const;      ///< 总评估次数(evaluateData/evaluateValue)
+    quint64 totalMatches() const;          ///< 总匹配成功次数(quint64精度)
+    quint64 totalActionsExecuted() const;  ///< 总动作执行次数
+    quint64 totalErrors() const;           ///< 总错误次数(正则编译失败等)
+    quint64 totalTriggersEvaluated() const;  ///< 总规则评估次数(每条每次)
+    quint64 totalTriggersFired() const;      ///< 总触发器命中次数
+    quint64 totalTriggersDisabled() const;   ///< 总跳过禁用规则次数
+    quint64 totalActionErrors() const;       ///< 总动作执行错误次数
+    void resetStats();                        ///< 重置所有扩展统计计数器
 
 signals:
-    /**
-     * @brief 触发器命中信号
-     * @param ruleIndex 命中规则的索引
-     * @param ruleName 命中规则的名称
-     */
+    /** @brief 触发器命中 @param ruleIndex 命中规则索引 @param ruleName 规则名称 */
     void triggered(int ruleIndex, const QString& ruleName);
-
-    /**
-     * @brief 动作请求信号
-     * @param actionType 动作类型（对应 ActionType 枚举值）
-     * @param actionData 动作附加数据
-     */
+    /** @brief 动作请求 @param actionType 动作类型(ActionType枚举值) @param actionData 附加数据 */
     void actionRequired(int actionType, const QByteArray& actionData);
 
 private:
     QList<TriggerRuleConfig> m_rules;       ///< 规则列表
-    QVector<int> m_ruleMatchCounts;         ///< 每条规则的命中次数
+    QVector<int> m_ruleMatchCounts;         ///< 每条规则命中次数
     bool m_enabled = true;                  ///< 全局启用标志
     int m_matchCount = 0;                   ///< 累计匹配计数
-    QElapsedTimer m_lastMatchTimer;         ///< 上次匹配时间计时器
+    QElapsedTimer m_lastMatchTimer;         ///< 上次匹配时间
     bool m_hasMatched = false;              ///< 是否有过匹配
-
     // 扩展统计计数器
-    quint64 m_totalEvaluations = 0;     ///< 总评估调用次数
-    quint64 m_totalMatches = 0;         ///< 总匹配成功次数（quint64精度）
-    quint64 m_totalActionsExecuted = 0; ///< 总动作执行次数
-    quint64 m_totalErrors = 0;          ///< 总错误次数
-    quint64 m_totalTriggersEvaluated = 0; ///< 总规则评估次数（每条规则每次评估计为一次）
-    quint64 m_totalTriggersFired = 0;     ///< 总触发器命中次数
-    quint64 m_totalTriggersDisabled = 0;  ///< 总跳过禁用规则的次数
-    quint64 m_totalActionErrors = 0;      ///< 总动作执行错误次数
+    quint64 m_totalEvaluations = 0, m_totalMatches = 0, m_totalActionsExecuted = 0;
+    quint64 m_totalErrors = 0, m_totalTriggersEvaluated = 0, m_totalTriggersFired = 0;
+    quint64 m_totalTriggersDisabled = 0, m_totalActionErrors = 0;
 };
 
 #endif // TRIGGERENGINE_H

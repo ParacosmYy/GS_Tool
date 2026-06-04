@@ -39,8 +39,7 @@ public:
         int bottomY = parent->height() - kMargin;
         for (auto* t : list) { bottomY -= t->height(); if (t != toast) bottomY -= kGap; }
         QPoint target(parent->width() - kMargin - toast->width(), bottomY);
-        toast->move(target.x(), target.y() + 30);
-        toast->QWidget::show();
+        toast->move(target.x(), target.y() + 30); toast->QWidget::show();
         auto* slide = new QPropertyAnimation(toast, "pos");
         slide->setEndValue(target); slide->setDuration(Animations::kToastPopMs); slide->setEasingCurve(QEasingCurve::OutBack);
         auto* fade = new QPropertyAnimation(toast->m_opacityEffect, "opacity");
@@ -100,8 +99,7 @@ private:
         int textW = kWidth - kLeftBorder - kPad * 3 - kIconArea;
         QRect bound = fm.boundingRect(0, 0, textW, 0, Qt::TextWordWrap, message);
         setFixedHeight(qMax(kMinHeight, bound.height() + kPad * 2));
-        m_opacityEffect = new QGraphicsOpacityEffect(this);
-        m_opacityEffect->setOpacity(0.0); setGraphicsEffect(m_opacityEffect);
+        m_opacityEffect = new QGraphicsOpacityEffect(this); m_opacityEffect->setOpacity(0.0); setGraphicsEffect(m_opacityEffect);
     }
     /** @brief 获取当前通知类型的语义颜色 */
     QColor semanticColor() const {
@@ -152,10 +150,10 @@ private:
         int bottomY = parent->height() - kMargin;
         for (auto* t : list) {
             int y = bottomY - t->height();
-            QPoint target(parent->width() - kMargin - t->width(), y);
-            if (t->pos() != target) {
+            QPoint tgt(parent->width() - kMargin - t->width(), y);
+            if (t->pos() != tgt) {
                 auto* slide = new QPropertyAnimation(t, "pos");
-                slide->setEndValue(target); slide->setDuration(Animations::kNavIndicatorMs);
+                slide->setEndValue(tgt); slide->setDuration(Animations::kNavIndicatorMs);
                 slide->setEasingCurve(QEasingCurve::OutCubic);
                 slide->start(QAbstractAnimation::DeleteWhenStopped);
             }
@@ -170,13 +168,12 @@ private:
     static inline quint64 s_totalDismisses = 0; ///< 总消失次数
     static inline quint64 s_totalErrors = 0;    ///< 总错误通知次数
 public:
-    static quint64 totalShows() { return s_totalShows; }       ///< 总显示次数
+    static quint64 totalShows() { return s_totalShows; }         ///< 总显示次数
     static quint64 totalDismisses() { return s_totalDismisses; } ///< 总消失次数
-    static quint64 totalErrors() { return s_totalErrors; }     ///< 总错误通知次数
+    static quint64 totalErrors() { return s_totalErrors; }       ///< 总错误通知次数
     static void resetToastStatistics() { s_totalShows = 0; s_totalDismisses = 0; s_totalErrors = 0; }
 private:
-    static constexpr int kWidth = 320, kMinHeight = 48;
-    static constexpr int kMargin = 16, kRadius = 8, kGap = 8;
-    static constexpr int kLeftBorder = 4, kPad = 12, kIconArea = 24, kIconSize = 14;
+    static constexpr int kWidth = 320, kMinHeight = 48, kMargin = 16, kRadius = 8;
+    static constexpr int kGap = 8, kLeftBorder = 4, kPad = 12, kIconArea = 24, kIconSize = 14;
 };
 #endif // TOASTWIDGET_H

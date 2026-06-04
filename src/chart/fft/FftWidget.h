@@ -1,20 +1,4 @@
-/**
- * @file FftWidget.h
- * @brief FFT频谱显示控件 -- 主题感知的频谱分析面板
- *
- * 设计要点:
- *   1. 自包含QWidget，可直接作为标签页或停靠窗口添加
- *   2. 从ChartModel读取通道时域数据，经FftEngine计算后渲染频谱
- *   3. 支持通道选择、窗函数选择、FFT大小配置、手动/自动刷新
- *   4. 主题感知: 背景色、网格线、标签色跟随ThemeManager
- *
- * 协作关系:
- *   - ChartModel: 提供通道时域数据（channelData方法）
- *   - FftEngine: 执行FFT计算，返回频谱数据
- *   - ThemeManager: 监听themeChanged信号更新视觉样式
- *   - ChartColors: 频谱线条颜色使用主题调色板
- */
-
+/** @file FftWidget.h @brief FFT频谱显示控件 -- 主题感知的频谱分析面板。从ChartModel读时域数据经FftEngine计算后渲染频谱，支持通道选择/窗函数/FFT大小/手动自动刷新 */
 #ifndef FFTWIDGET_H
 #define FFTWIDGET_H
 
@@ -24,7 +8,6 @@
 #include <QPointF>
 #include <QMap>
 #include <QString>
-
 #include "chart/fft/FftEngine.h"
 #include "chart/widget/ChartColors.h"
 
@@ -41,135 +24,67 @@ class ChartModel;
 
 /**
  * @brief FFT频谱显示控件
- *
- * 独立面板控件，内含频谱图表和配置工具栏。
- * 从ChartModel读取指定通道的时域数据，计算FFT并显示频谱。
- *
- * 功能:
- *   - 通道选择: 下拉框选择要分析的通道
- *   - 窗函数选择: Rectangular/Hanning/Hamming/Blackman
- *   - FFT大小: 256/512/1024/2048/4096
- *   - 手动刷新按钮 + 自动刷新复选框
- *   - 采样率配置（用户输入或从数据推算）
+ * 独立面板: 通道选择/窗函数(Rectangular/Hanning/Hamming/Blackman)/FFT大小(256~4096)/手动+自动刷新/采样率配置
+ * 协作: ChartModel(数据) / FftEngine(计算) / ThemeManager(主题) / ChartColors(调色板)
  */
 class FftWidget : public QWidget {
     Q_OBJECT
 
 public:
-    /**
-     * @brief 构造FFT频谱控件
-     * @param model 数据模型指针（外部拥有，不负责销毁）
-     * @param parent 父控件
-     */
+    /** @brief 构造FFT频谱控件 @param model 数据模型(外部拥有) @param parent 父控件 */
     explicit FftWidget(ChartModel* model, QWidget* parent = nullptr);
-
-    /**
-     * @brief 设置采样率（Hz）
-     *
-     * 用于计算频率轴。若未设置则默认为1000Hz。
-     * @param rate 采样率（Hz）
-     */
+    /** @brief 设置采样率(Hz)，默认1000Hz @param rate 采样率 */
     void setSampleRate(double rate);
-
-    /** @brief 获取当前采样率 */
-    double sampleRate() const;
-
+    double sampleRate() const; ///< 当前采样率
     // ---- 统计计数接口 ----
-    /** @brief 获取累计FFT变换次数 */
-    quint64 totalTransforms() const;
-    /** @brief 获取累计峰值搜索次数(频谱最大幅度检测) */
-    quint64 totalPeakSearches() const;
-    /** @brief 获取累计窗函数变更次数 */
-    quint64 totalWindowChanges() const;
-    /** @brief 获取累计FFT大小变更次数 */
-    quint64 totalSizeChanges() const;
-    /** @brief 重置所有FFT控件统计计数器 */
-    void resetFftWidgetStatistics();
+    quint64 totalTransforms() const;      ///< 累计FFT变换次数
+    quint64 totalPeakSearches() const;    ///< 峰值搜索次数
+    quint64 totalWindowChanges() const;   ///< 窗函数变更次数
+    quint64 totalSizeChanges() const;     ///< FFT大小变更次数
+    void resetFftWidgetStatistics();      ///< 重置统计计数器
 
 public slots:
-    /**
-     * @brief 刷新频谱显示
-     *
-     * 从ChartModel读取当前选中通道的数据，
-     * 经FftEngine计算后更新频谱图表。
-     */
-    void refreshSpectrum();
+    void refreshSpectrum(); ///< 刷新频谱(从ChartModel读数据经FftEngine计算更新图表)
 
 private slots:
-    /** @brief 通道选择变更 */
-    void onChannelChanged(int index);
-
-    /** @brief 窗函数选择变更 */
-    void onWindowChanged(int index);
-
-    /** @brief FFT大小变更 */
-    void onFftSizeChanged(int value);
-
-    /** @brief 自动刷新开关切换 */
-    void onAutoRefreshToggled(bool checked);
-
-    /** @brief ChartModel数据更新时（自动刷新模式下触发重算） */
-    void onDataUpdated(const QStringList& updatedChannels);
-
-    /** @brief 通道列表变更时更新通道选择下拉框 */
-    void onChannelsChanged();
-
-    /** @brief 主题切换响应 -- 更新图表所有视觉元素 */
-    void onThemeChanged();
+    void onChannelChanged(int index);     ///< 通道选择变更
+    void onWindowChanged(int index);      ///< 窗函数选择变更
+    void onFftSizeChanged(int value);     ///< FFT大小变更
+    void onAutoRefreshToggled(bool checked); ///< 自动刷新开关
+    void onDataUpdated(const QStringList& updatedChannels); ///< 数据更新(自动刷新模式触发重算)
+    void onChannelsChanged();             ///< 通道列表变更更新下拉框
+    void onThemeChanged();                ///< 主题切换更新图表视觉元素
 
 private:
-    /** @brief 初始化UI布局 */
-    void setupUI();
-
-    /** @brief 创建顶部配置工具栏 */
-    QWidget* createToolbar();
-
-    /** @brief 创建频谱图表区域 */
-    void setupChart();
-
-    /**
-     * @brief 应用当前主题颜色到图表
-     *
-     * 更新内容:
-     *   - 图表背景色 (BgPrimary)
-     *   - 网格线颜色 (Border)
-     *   - 坐标轴标签颜色 (TextSecondary)
-     *   - 频谱线条颜色 (ChartColors调色板第一色)
-     */
+    void setupUI();               ///< 初始化UI布局
+    QWidget* createToolbar();     ///< 创建顶部配置工具栏
+    void setupChart();            ///< 创建频谱图表区域
+    /** @brief 应用当前主题颜色到图表(背景/网格/轴标签/频谱线) */
     void applyThemeColors();
-
-    /** @brief 填充FFT大小下拉框 */
-    void populateFftSizes();
-
-    ChartModel* m_model;              ///< 数据模型（外部拥有）
+    void populateFftSizes();      ///< 填充FFT大小下拉框
+    // ---- 数据与引擎 ----
+    ChartModel* m_model;              ///< 数据模型(外部拥有)
     FftEngine* m_engine;              ///< FFT计算引擎
-
     // ---- 图表组件 ----
     QChartView* m_chartView;          ///< 图表视图
-    QChart* m_chart;                  ///< Qt Charts 图表对象
+    QChart* m_chart;                  ///< Qt Charts图表对象
     QLineSeries* m_spectrumSeries;    ///< 频谱曲线
-    QValueAxis* m_xAxis;             ///< X轴（频率 Hz）
-    QValueAxis* m_yAxis;             ///< Y轴（幅度）
-
+    QValueAxis* m_xAxis, * m_yAxis;  ///< X轴(频率Hz)/Y轴(幅度)
     // ---- 工具栏控件 ----
-    QComboBox* m_channelCombo;        ///< 通道选择下拉框
-    QComboBox* m_windowCombo;         ///< 窗函数选择下拉框
-    QComboBox* m_fftSizeCombo;        ///< FFT大小下拉框
-    QSpinBox* m_sampleRateSpin;       ///< 采样率输入框
+    QComboBox* m_channelCombo;        ///< 通道选择
+    QComboBox* m_windowCombo;         ///< 窗函数选择
+    QComboBox* m_fftSizeCombo;        ///< FFT大小
+    QSpinBox* m_sampleRateSpin;       ///< 采样率输入
     QPushButton* m_refreshBtn;        ///< 手动刷新按钮
-    QCheckBox* m_autoRefreshCheck;    ///< 自动刷新复选框
-    QLabel* m_infoLabel;              ///< 信息标签（基频/点数等）
-
+    QCheckBox* m_autoRefreshCheck;    ///< 自动刷新
+    QLabel* m_infoLabel;              ///< 信息标签(基频/点数)
     // ---- 状态 ----
-    double m_sampleRate = 1000.0;     ///< 采样率（Hz）
+    double m_sampleRate = 1000.0;     ///< 采样率(Hz)
     bool m_autoRefresh = false;       ///< 是否自动刷新
-    double m_fundamentalFreq = 0.0;   ///< 最近一次计算的基频
-
+    double m_fundamentalFreq = 0.0;   ///< 最近基频
     // ---- 统计计数器 ----
-    quint64 m_totalTransforms = 0;    ///< 累计FFT变换次数
-    quint64 m_totalPeakSearches = 0;  ///< 累计峰值搜索次数(频谱最大幅度检测)
-    quint64 m_totalWindowChanges = 0; ///< 累计窗函数变更次数
-    quint64 m_totalSizeChanges = 0;   ///< 累计FFT大小变更次数
+    quint64 m_totalTransforms = 0, m_totalPeakSearches = 0;
+    quint64 m_totalWindowChanges = 0, m_totalSizeChanges = 0;
 };
 
 #endif // FFTWIDGET_H
