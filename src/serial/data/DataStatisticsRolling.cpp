@@ -45,6 +45,7 @@ void DataStatistics::updateRollingThroughput()
     m_rollingWindow.push_back(interval);
     while (static_cast<int>(m_rollingWindow.size()) > kRollingWindowSeconds) {
         m_rollingWindow.pop_front();
+        ++m_totalSlidingWindowResets;
     }
 
     // 计算窗口内平均速率
@@ -100,6 +101,7 @@ void DataStatistics::initHistogramBuckets()
 void DataStatistics::updateHistogram(double totalBytesPerSec)
 {
     ++m_histogramTotalSamples;
+    ++m_totalHistogramUpdates;
     for (auto& bucket : m_histogramBuckets) {
         if (totalBytesPerSec >= bucket.lowerBound && totalBytesPerSec < bucket.upperBound) {
             ++bucket.sampleCount;
@@ -129,6 +131,9 @@ quint64 DataStatistics::totalErrorUpdates() const { return m_totalErrorUpdates; 
 quint64 DataStatistics::totalHealthUpdates() const { return m_totalHealthUpdates; }
 quint64 DataStatistics::totalRefreshCycles() const { return m_totalRefreshCycles; }
 quint64 DataStatistics::totalCalculations() const { return m_totalCalculations; }
+quint64 DataStatistics::totalHistogramUpdates() const { return m_totalHistogramUpdates; }
+quint64 DataStatistics::totalSlidingWindowResets() const { return m_totalSlidingWindowResets; }
+quint64 DataStatistics::totalThroughputSnapshots() const { return m_totalThroughputSnapshots; }
 
 // ---- 滚动吞吐量查询 ----
 
@@ -153,4 +158,7 @@ void DataStatistics::resetDataStatistics()
     m_totalHealthUpdates = 0;
     m_totalRefreshCycles = 0;
     m_totalCalculations = 0;
+    m_totalHistogramUpdates = 0;
+    m_totalSlidingWindowResets = 0;
+    m_totalThroughputSnapshots = 0;
 }

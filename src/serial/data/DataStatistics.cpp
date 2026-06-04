@@ -153,6 +153,9 @@ void DataStatistics::reset()
     m_totalHealthUpdates = 0;
     m_totalRefreshCycles = 0;
     m_totalCalculations = 0;
+    m_totalHistogramUpdates = 0;
+    m_totalSlidingWindowResets = 0;
+    m_totalThroughputSnapshots = 0;
 
     // 重置错误计数
     m_framingErrors = 0;
@@ -246,6 +249,7 @@ void DataStatistics::onRefreshTimer()
     updateHistogram(m_rxRate + m_txRate);
 
     // 8. 记录吞吐量采样点
+    ++m_totalThroughputSnapshots;
     ThroughputSample sample;
     sample.timestampMs = m_stopwatch.elapsed();
     sample.rxBytesPerSec = m_rxRate;

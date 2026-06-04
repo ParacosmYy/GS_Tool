@@ -122,6 +122,12 @@ public:
     quint64 totalRefreshCycles() const;
     /** @brief 获取update()中的速率计算总次数 */
     quint64 totalCalculations() const;
+    /** @brief 获取直方图更新总次数 @return updateHistogram调用次数 */
+    quint64 totalHistogramUpdates() const;
+    /** @brief 获取滑动窗口重置总次数 @return 窗口淘汰次数 */
+    quint64 totalSlidingWindowResets() const;
+    /** @brief 获取吞吐量快照记录总次数 @return 采样点追加次数 */
+    quint64 totalThroughputSnapshots() const;
     /** @brief 重置数据统计计数器(不影响面板显示) */
     void resetDataStatistics();
 
@@ -234,6 +240,9 @@ private:
     quint64 m_totalHealthUpdates = 0; ///< updateConnectionHealth()调用总次数
     quint64 m_totalRefreshCycles = 0; ///< onRefreshTimer()定时器刷新总周期数
     quint64 m_totalCalculations = 0;  ///< update()中的速率计算总次数
+    quint64 m_totalHistogramUpdates = 0;     ///< 直方图更新总次数
+    quint64 m_totalSlidingWindowResets = 0;  ///< 滑动窗口重置总次数
+    quint64 m_totalThroughputSnapshots = 0;  ///< 吞吐量快照记录总次数
 
     // ---- 滚动吞吐量(滑动窗口) ----
     static constexpr int kRollingWindowSeconds = 5; ///< 滚动窗口大小(5秒)

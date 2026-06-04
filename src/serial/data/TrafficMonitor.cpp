@@ -36,6 +36,7 @@ void TrafficMonitor::recordTxBytes(qint64 bytes)
 {
     m_txBytes += bytes;
     m_totalTxBytes += bytes;
+    ++m_totalBytesOut;
 }
 
 /** @brief 记录已接收字节数，累加到m_rxBytes和m_totalRxBytes @param bytes 本次接收的字节数 */
@@ -43,6 +44,7 @@ void TrafficMonitor::recordRxBytes(qint64 bytes)
 {
     m_rxBytes += bytes;
     m_totalRxBytes += bytes;
+    ++m_totalBytesIn;
 }
 
 /** @brief 获取当前RX速率 @return 接收速率(字节/秒)，无历史数据时返回0.0 */
@@ -137,10 +139,11 @@ void TrafficMonitor::calculateRates()
     // 追加到历史队列
     m_rxHistory.append(QPointF(timestamp, rx));
     m_txHistory.append(QPointF(timestamp, tx));
+    ++m_totalRateSamples;
 
     // 更新峰值
-    if (rx > m_peakRxRate) m_peakRxRate = rx;
-    if (tx > m_peakTxRate) m_peakTxRate = tx;
+    if (rx > m_peakRxRate) { m_peakRxRate = rx; ++m_totalPeakRateExceededEvents; }
+    if (tx > m_peakTxRate) { m_peakTxRate = tx; ++m_totalPeakRateExceededEvents; }
 
     // 裁剪历史到最大长度
     while (m_rxHistory.size() > MAX_HISTORY_POINTS) {
@@ -181,8 +184,36 @@ quint64 TrafficMonitor::totalBytesMonitored() const
     return static_cast<quint64>(m_totalRxBytes) + static_cast<quint64>(m_totalTxBytes);
 }
 
-/** @brief 重置流量监控统计计数器(仅影响m_totalSamples，不影响速率计算) */
+/** @brief 获取累计接收字节记录次数 @return recordRxBytes调用次数 */
+quint64 TrafficMonitor::totalBytesIn() const
+{
+    return m_totalBytesIn;
+}
+
+/** @brief 获取累计发送字节记录次数 @return recordTxBytes调用次数 */
+quint64 TrafficMonitor::totalBytesOut() const
+{
+    return m_totalBytesOut;
+}
+
+/** @brief 获取累计速率采样次数 @return 历史点追加次数 */
+quint64 TrafficMonitor::totalRateSamples() const
+{
+    return m_totalRateSamples;
+}
+
+/** @brief 获取累计峰值速率刷新事件次数 @return 峰值被刷新的总次数 */
+quint64 TrafficMonitor::totalPeakRateExceededEvents() const
+{
+    return m_totalPeakRateExceededEvents;
+}
+
+/** @brief 重置流量监控统计计数器(仅影响计数器，不影响速率计算) */
 void TrafficMonitor::resetTrafficStatistics()
 {
     m_totalSamples = 0;
+    m_totalBytesIn = 0;
+    m_totalBytesOut = 0;
+    m_totalRateSamples = 0;
+    m_totalPeakRateExceededEvents = 0;
 }

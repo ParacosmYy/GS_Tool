@@ -81,6 +81,18 @@ public:
     /** @brief 获取监控的字节总数(RX+TX) @return 累计字节数 */
     quint64 totalBytesMonitored() const;
 
+    /** @brief 获取累计接收字节记录次数 @return recordRxBytes调用次数 */
+    quint64 totalBytesIn() const;
+
+    /** @brief 获取累计发送字节记录次数 @return recordTxBytes调用次数 */
+    quint64 totalBytesOut() const;
+
+    /** @brief 获取累计速率采样次数 @return 历史点追加次数 */
+    quint64 totalRateSamples() const;
+
+    /** @brief 获取累计峰值速率刷新事件次数 @return 峰值被刷新的总次数 */
+    quint64 totalPeakRateExceededEvents() const;
+
     /** @brief 重置流量监控统计计数器(不影响速率计算) */
     void resetTrafficStatistics();
 
@@ -109,7 +121,11 @@ private:
     QElapsedTimer m_elapsed;           ///< 经过时间计时器
 
     // ── 统计计数器 ──
-    quint64 m_totalSamples = 0;        ///< 采样总次数(calculateRates调用次数)
+    quint64 m_totalSamples = 0;                ///< 采样总次数(calculateRates调用次数)
+    mutable quint64 m_totalBytesIn = 0;        ///< 累计接收字节记录次数(recordRxBytes调用次数)
+    mutable quint64 m_totalBytesOut = 0;       ///< 累计发送字节记录次数(recordTxBytes调用次数)
+    quint64 m_totalRateSamples = 0;            ///< 累计速率采样次数(历史点追加次数)
+    quint64 m_totalPeakRateExceededEvents = 0; ///< 累计峰值速率被刷新的事件次数
 };
 
 #endif // TRAFFICMONITOR_H

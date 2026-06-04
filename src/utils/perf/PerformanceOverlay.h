@@ -109,15 +109,24 @@ private:
     double m_fpsWarningThreshold = 30.0; ///< FPS警告阈值
 
     // ---- 统计计数器 ----
-    quint64 m_totalUpdates = 0;      ///< 累计统计更新次数
-    quint64 m_totalLowFpsWarnings = 0;///< 累计低FPS警告次数
+    quint64 m_totalUpdates = 0;               ///< 累计统计更新次数
+    quint64 m_totalLowFpsWarnings = 0;        ///< 累计低FPS警告次数
+    quint64 m_totalFpsSamples = 0;            ///< 累计FPS有效采样次数(fps>0)
+    quint64 m_totalPipelineLatencySamples = 0;///< 累计管线延迟采样次数(avgFrameMs>0)
+    quint64 m_totalThroughputSamples = 0;     ///< 累计吞吐量采样次数(memBytes更新)
 public:
     /** @brief 获取累计统计更新次数 @return 更新次数 */
     quint64 totalUpdates() const { return m_totalUpdates; }
     /** @brief 获取累计低FPS警告次数 @return 警告次数 */
     quint64 totalLowFpsWarnings() const { return m_totalLowFpsWarnings; }
-    /** @brief 重置叠加层统计计数器(更新次数/低FPS警告次数) */
-    void resetOverlayStatistics() { m_totalUpdates = 0; m_totalLowFpsWarnings = 0; }
+    /** @brief 获取累计FPS有效采样次数 @return FPS>0的采样次数 */
+    quint64 totalFpsSamples() const { return m_totalFpsSamples; }
+    /** @brief 获取累计管线延迟采样次数 @return avgFrameMs>0的采样次数 */
+    quint64 totalPipelineLatencySamples() const { return m_totalPipelineLatencySamples; }
+    /** @brief 获取累计吞吐量采样次数 @return 内存更新采样次数 */
+    quint64 totalThroughputSamples() const { return m_totalThroughputSamples; }
+    /** @brief 重置叠加层统计计数器(更新次数/低FPS警告/FPS采样/管线延迟采样/吞吐量采样) */
+    void resetOverlayStatistics();
 };
 
 #endif // PERFORMANCE_OVERLAY_H

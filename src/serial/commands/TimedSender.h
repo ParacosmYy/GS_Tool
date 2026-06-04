@@ -79,7 +79,13 @@ public:
     /** @brief 获取定时器触发发送的总次数 */
     quint64 totalTimedSends() const;
 
-    /** @brief 重置所有统计计数器（sendCount/totalBytesSent/scheduleCount/totalTimedSends） */
+    /** @brief 获取定时发送累计字节数 @return 定时发送写入的总字节数 */
+    quint64 totalTimedBytesSent() const;
+
+    /** @brief 获取定时发送累计错误次数 @return 发送失败/队列为空等错误次数 */
+    quint64 totalTimedErrors() const;
+
+    /** @brief 重置所有统计计数器（sendCount/totalBytesSent/scheduleCount/totalTimedSends/totalTimedBytesSent/totalTimedErrors） */
     void resetStatistics();
 
 signals:
@@ -110,6 +116,8 @@ private:
     quint64 m_totalBytesSent = 0;   ///< 累计发送总字节数（受 m_mutex 保护）
     quint64 m_scheduleCount = 0;    ///< 定时发送调度次数（受 m_mutex 保护）
     quint64 m_totalTimedSends = 0;  ///< 定时器触发发送的总次数（受 m_mutex 保护）
+    quint64 m_totalTimedBytesSent = 0; ///< 定时发送累计字节数（受 m_mutex 保护）
+    quint64 m_totalTimedErrors = 0; ///< 定时发送累计错误次数（受 m_mutex 保护）
 };
 
 #endif // TIMEDSENDER_H

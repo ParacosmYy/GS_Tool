@@ -72,14 +72,24 @@ bool SignalLineMonitor::isPolling() const
 void SignalLineMonitor::onTick()
 {
     if (!m_connection) {
+        ++m_totalErrorEvents;
         return;
     }
 
     ++m_totalPolls;
+    // 每次轮询监控6条信号线(CTS/DSR/DCD/RI/DTR/RTS)
+    m_totalLineMonitored += 6;
 
     PinoutSignals latest = m_connection->pinoutSignals();
 
     // 比较新旧状态 — 逐字段比较避免结构体填充字节干扰
+    if (latest.cts != m_current.cts) ++m_totalSignalChanges;
+    if (latest.dsr != m_current.dsr) ++m_totalSignalChanges;
+    if (latest.dcd != m_current.dcd) ++m_totalSignalChanges;
+    if (latest.ri  != m_current.ri)  ++m_totalSignalChanges;
+    if (latest.dtr != m_current.dtr) ++m_totalSignalChanges;
+    if (latest.rts != m_current.rts) ++m_totalSignalChanges;
+
     if (latest.cts != m_current.cts ||
         latest.dsr != m_current.dsr ||
         latest.dcd != m_current.dcd ||
@@ -120,11 +130,32 @@ quint64 SignalLineMonitor::totalIdlePolls() const
     return m_totalIdlePolls;
 }
 
-/** @brief 重置统计计数(changeCount/totalPolls/totalIdlePolls归零，重启计时器) */
+/** @brief 获取累计信号线变化事件次数 @return 每条线变化+1的累计次数 */
+quint64 SignalLineMonitor::totalSignalChanges() const
+{
+    return m_totalSignalChanges;
+}
+
+/** @brief 获取累计被监控的信号线总条数 @return 轮询次数×线数的累计 */
+quint64 SignalLineMonitor::totalLineMonitored() const
+{
+    return m_totalLineMonitored;
+}
+
+/** @brief 获取累计错误事件次数 @return 轮询失败/连接异常等错误累计 */
+quint64 SignalLineMonitor::totalErrorEvents() const
+{
+    return m_totalErrorEvents;
+}
+
+/** @brief 重置统计计数(changeCount/totalPolls/totalIdlePolls/totalSignalChanges/totalLineMonitored/totalErrorEvents归零，重启计时器) */
 void SignalLineMonitor::resetStatistics()
 {
     m_changeCount = 0;
     m_totalPolls = 0;
     m_totalIdlePolls = 0;
+    m_totalSignalChanges = 0;
+    m_totalLineMonitored = 0;
+    m_totalErrorEvents = 0;
     m_durationTimer.restart();
 }

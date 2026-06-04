@@ -47,6 +47,7 @@ void PerformanceOverlay::updateStats(double fps, double avgFrameMs, qint64 memBy
     m_currentFps = fps;
     m_lastMemBytes = memBytes;
     if (fps > 0) {
+        ++m_totalFpsSamples;
         if (fps < m_fpsWarningThreshold) ++m_totalLowFpsWarnings;
         if (fps < m_minFps) m_minFps = fps;
         if (fps > m_maxFps) m_maxFps = fps;
@@ -54,6 +55,12 @@ void PerformanceOverlay::updateStats(double fps, double avgFrameMs, qint64 memBy
         if (m_fpsHistory.size() > kFpsHistorySize) {
             m_fpsHistory.removeFirst();
         }
+    }
+    if (avgFrameMs > 0.0) {
+        ++m_totalPipelineLatencySamples;
+    }
+    if (memBytes > 0) {
+        ++m_totalThroughputSamples;
     }
 
     // FPS 与帧耗时
@@ -163,4 +170,14 @@ void PerformanceOverlay::resetStats()
     m_maxFps = 0.0;
     m_currentFps = 0.0;
     m_lastMemBytes = 0;
+}
+
+/** @brief 重置叠加层统计计数器(更新次数/低FPS警告/FPS采样/管线延迟采样/吞吐量采样) */
+void PerformanceOverlay::resetOverlayStatistics()
+{
+    m_totalUpdates = 0;
+    m_totalLowFpsWarnings = 0;
+    m_totalFpsSamples = 0;
+    m_totalPipelineLatencySamples = 0;
+    m_totalThroughputSamples = 0;
 }

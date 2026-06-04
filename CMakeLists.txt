@@ -35,6 +35,7 @@ set(SOURCES
     src/core/mainwindow/MainWindowSetupUI.cpp
     src/core/mainwindow/MainWindowSignalConnect.cpp
     src/core/mainwindow/MainWindowPanelConnect.cpp
+    src/core/mainwindow/MainWindowLifecycle.cpp
     src/core/connect/ConnectionController.cpp
     src/core/connect/ConnectionControllerReconnect.cpp
     src/core/connect/ConnectionControllerHandlers.cpp
@@ -171,6 +172,7 @@ set(SOURCES
     src/core/managers/ShortcutManager.cpp
     src/core/managers/ShortcutManagerActions.cpp
     src/core/layout/ResponsiveLayout.cpp
+    src/core/layout/ResponsiveLayoutQuery.cpp
 
     # ── F1: 数据录制回放 ──
     src/core/recording/RecordingTimeline.cpp

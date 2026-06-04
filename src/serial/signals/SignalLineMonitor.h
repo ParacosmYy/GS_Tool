@@ -60,6 +60,15 @@ public:
     /** @brief 获取累计无变化轮询次数 */
     quint64 totalIdlePolls() const;
 
+    /** @brief 获取累计信号线变化事件次数 @return 每条线变化+1的累计次数 */
+    quint64 totalSignalChanges() const;
+
+    /** @brief 获取累计被监控的信号线总条数 @return 轮询次数×线数的累计 */
+    quint64 totalLineMonitored() const;
+
+    /** @brief 获取累计错误事件次数 @return 轮询失败/连接异常等错误累计 */
+    quint64 totalErrorEvents() const;
+
     /** @brief 重置统计计数 */
     void resetStatistics();
 
@@ -84,6 +93,9 @@ private:
     quint64 m_changeCount = 0;          ///< 信号线变化次数
     quint64 m_totalPolls = 0;           ///< 累计轮询次数
     quint64 m_totalIdlePolls = 0;       ///< 累计无变化轮询次数
+    quint64 m_totalSignalChanges = 0;   ///< 累计信号线变化事件次数(每条线变化+1)
+    quint64 m_totalLineMonitored = 0;   ///< 累计被监控的信号线总条数(每次轮询×线数)
+    quint64 m_totalErrorEvents = 0;     ///< 累计错误事件(轮询失败/连接断开等)
 };
 
 #endif // SIGNALLINEMONITOR_H
