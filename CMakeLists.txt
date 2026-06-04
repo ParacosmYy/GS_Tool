@@ -292,10 +292,12 @@ set(SOURCES
     src/protocol/modbus/ModbusMaster.cpp
     src/protocol/modbus/ModbusSlave.cpp
     src/protocol/modbus/ModbusScanWidget.cpp
+    src/protocol/modbus/ModbusScanWidgetStats.cpp
     src/protocol/modbus/ModbusConfigPanel.cpp
 
     # ── F19: Protobuf/FlatBuffers 解码 ──
     src/protocol/protobuf/ProtobufDecoder.cpp
+    src/protocol/protobuf/ProtobufDecoderEncoding.cpp
     src/protocol/protobuf/ProtobufDecoderHelpers.cpp
     src/protocol/protobuf/FlatBuffersDecoder.cpp
     src/protocol/protobuf/FlatBuffersDecoderSchema.cpp
