@@ -59,6 +59,7 @@ void FrameVisualEditor::onMoveFieldDown()
 /** @brief 添加新字段(默认UInt8, 偏移0, 大小1, LE, 缩放1.0) */
 void FrameVisualEditor::onAddField()
 {
+    ++m_totalFieldAdds; ///< 统计: 字段添加
     int row = m_fieldTable->rowCount();
     m_fieldTable->insertRow(row);
     m_fieldTable->setItem(row, 0, new QTableWidgetItem(tr("field_%1").arg(row)));
@@ -102,6 +103,7 @@ void FrameVisualEditor::onRemoveField()
 {
     int row = m_fieldTable->currentRow();
     if (row >= 0) {
+        ++m_totalFieldRemoves; ///< 统计: 字段删除
         m_fieldTable->removeRow(row);
         if (!m_updating) updateBinaryPreview();
     }

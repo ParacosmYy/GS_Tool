@@ -85,6 +85,7 @@ CanBusMonitor::CanBusMonitor(QWidget* parent)
 
     /* ── 使用分割器布局 ── */
     auto splitter = new QSplitter(Qt::Vertical);
+    splitter->setObjectName("canMonitorSplitter");
     splitter->addWidget(m_frameTable);
     splitter->addWidget(m_signalTable);
     splitter->setStretchFactor(0, 3);

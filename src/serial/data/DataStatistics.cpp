@@ -133,6 +133,9 @@ void DataStatistics::update(quint64 rxBytes, quint64 txBytes)
 /** @brief 重置所有统计值和UI显示，重启计时器，清空滚动窗口和直方图 */
 void DataStatistics::reset()
 {
+    // 统计: 累计重置次数(在其他计数器清零之前递增)
+    ++m_totalResets;
+
     // 重置累计值和速率
     m_lastRxBytes = 0;
     m_lastTxBytes = 0;
@@ -156,6 +159,8 @@ void DataStatistics::reset()
     m_totalHistogramUpdates = 0;
     m_totalSlidingWindowResets = 0;
     m_totalThroughputSnapshots = 0;
+    m_totalResets = 0;
+    m_totalFormatChanges = 0;
 
     // 重置错误计数
     m_framingErrors = 0;

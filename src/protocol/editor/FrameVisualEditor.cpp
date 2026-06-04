@@ -86,6 +86,7 @@ FrameDefinition FrameVisualEditor::currentDefinition() const { return m_def; }
 void FrameVisualEditor::setDefinition(const FrameDefinition& def)
 {
     m_updating = true;
+    ++m_totalProtocolLoads; ///< 统计: 协议加载
     m_def = def;
     m_headerEdit->setText(HexConverter::toHexString(def.header));
     m_footerEdit->setText(HexConverter::toHexString(def.footer));
@@ -108,6 +109,8 @@ void FrameVisualEditor::onApply()
     updateBinaryPreview();
     ++m_totalFramesBuilt;  ///< 统计: 帧构建
     ++m_totalSends;        ///< 统计: 应用=发送
+    ++m_totalFrameValidations; ///< 统计: 帧校验(应用时触发)
+    ++m_totalProtocolSaves;    ///< 统计: 协议保存(应用定义)
     emit definitionChanged(m_def);
 }
 
@@ -216,4 +219,10 @@ void FrameVisualEditor::resetEditorStatistics()
     m_totalFramesBuilt = 0;
     m_totalSends = 0;
     m_totalEdits = 0;
+    m_totalFieldAdds = 0;
+    m_totalFieldRemoves = 0;
+    m_totalFrameValidations = 0;
+    m_totalProtocolLoads = 0;
+    m_totalProtocolSaves = 0;
+    m_validationErrors = 0;
 }

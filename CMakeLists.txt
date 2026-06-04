@@ -148,7 +148,9 @@ set(SOURCES
     src/chart/widget/ChartWidgetExport.cpp
     src/chart/widget/ChartWidgetRender.cpp
     src/chart/model/ChannelConfig.cpp
+    src/chart/model/ChannelConfigStyle.cpp
     src/chart/model/ChartModel.cpp
+    src/chart/model/ChartModelSlots.cpp
     src/chart/model/ChartModelStats.cpp
     src/chart/scale/YAxisManager.cpp
     src/chart/overlay/CursorOverlay.cpp

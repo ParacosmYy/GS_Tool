@@ -100,6 +100,7 @@ BleGattBrowser::BleGattBrowser(QWidget* parent)
     splitter->setObjectName("gattSplitter");
     splitter->addWidget(m_serviceTree);
     auto* rightWidget = new QWidget(this);
+    rightWidget->setObjectName("gattRightPanel");
     rightWidget->setLayout(rightLayout);
     splitter->addWidget(rightWidget);
     splitter->setStretchFactor(0, 2);

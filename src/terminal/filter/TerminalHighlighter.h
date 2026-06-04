@@ -133,6 +133,11 @@ public:
     /** @brief 获取过滤阻塞的总行数(未匹配任何规则的行) */
     quint64 filterBlockCount() const { return m_filterBlockCount; }
 
+    quint64 totalRegexMatches() const { return m_totalRegexMatches; } ///< 正则匹配总次数
+    quint64 totalColorChanges() const { return m_totalColorChanges; } ///< 颜色变更总次数
+    quint64 totalRulesActive() const; ///< 当前活跃规则数
+    quint64 totalHighlightErrors() const { return m_highlightErrors; } ///< 高亮错误总次数
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -165,6 +170,9 @@ private:
     quint64 m_totalRuleChanges = 0; ///< 规则变更总次数
     quint64 m_filterPassCount = 0;  ///< 过滤通过行数(匹配到高亮)
     quint64 m_filterBlockCount = 0; ///< 过滤阻塞行数(未匹配高亮)
+    quint64 m_totalRegexMatches = 0; ///< 正则匹配总次数
+    quint64 m_totalColorChanges = 0; ///< 颜色变更总次数
+    quint64 m_highlightErrors = 0;   ///< 高亮错误总次数
 };
 
 #endif // TERMINALHIGHLIGHTER_H

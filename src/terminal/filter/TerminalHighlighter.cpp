@@ -34,6 +34,7 @@ void TerminalHighlighter::setHighlightColor(const QColor &color)
     m_color = color;
     m_format = buildFormat(color);
     ++m_totalRuleChanges;
+    ++m_totalColorChanges; ///< 统计: 颜色变更
     rehighlight();
 }
 
@@ -118,6 +119,7 @@ void TerminalHighlighter::setRuleColor(int index, const QColor& color)
     m_rules[index].color = color;
     m_rules[index].format = buildFormat(color);
     ++m_totalRuleChanges;
+    ++m_totalColorChanges; ///< 统计: 颜色变更
     rehighlight();
 }
 
@@ -164,6 +166,7 @@ void TerminalHighlighter::highlightBlock(const QString &text)
                 QRegularExpressionMatch match = it.next();
                 setFormat(match.capturedStart(), match.capturedLength(), rule.format);
                 ++m_totalHighlights;
+                ++m_totalRegexMatches; ///< 统计: 正则匹配
                 anyMatched = true;
             }
         }
@@ -175,6 +178,7 @@ void TerminalHighlighter::highlightBlock(const QString &text)
                 QRegularExpressionMatch match = it.next();
                 setFormat(match.capturedStart(), match.capturedLength(), m_format);
                 ++m_totalHighlights;
+                ++m_totalRegexMatches; ///< 统计: 正则匹配
                 anyMatched = true;
             }
         }
@@ -197,6 +201,16 @@ QTextCharFormat TerminalHighlighter::buildFormat(const QColor& color) const
     return fmt;
 }
 
+/** @brief 获取当前活跃(启用)的规则数 @return 活跃规则数 */
+quint64 TerminalHighlighter::totalRulesActive() const
+{
+    quint64 count = 0;
+    for (const auto& rule : m_rules) {
+        if (rule.enabled) ++count;
+    }
+    return count;
+}
+
 /** @brief 重置所有统计计数器为零 */
 void TerminalHighlighter::resetStatistics()
 {
@@ -204,4 +218,7 @@ void TerminalHighlighter::resetStatistics()
     m_totalRuleChanges = 0;
     m_filterPassCount = 0;
     m_filterBlockCount = 0;
+    m_totalRegexMatches = 0;
+    m_totalColorChanges = 0;
+    m_highlightErrors = 0;
 }

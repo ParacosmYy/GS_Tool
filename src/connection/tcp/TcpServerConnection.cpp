@@ -168,6 +168,14 @@ void TcpServerConnection::onNewConnection()
         QTcpSocket* client = m_server->nextPendingConnection();
         if (!client) continue;
 
+        // 检查是否达到最大客户端数限制
+        if (m_maxClients > 0 && m_clients.size() >= m_maxClients) {
+            ++m_totalRejectedConnections;  // 因达到最大连接数拒绝
+            client->abort();
+            client->deleteLater();
+            continue;
+        }
+
         qintptr sd = client->socketDescriptor();
         m_clients[sd] = client;
 
@@ -181,6 +189,7 @@ void TcpServerConnection::onNewConnection()
                     auto* socket = qobject_cast<QTcpSocket*>(sender());
                     if (socket) {
                         ++m_totalAcceptErrors;  // 客户端socket错误计数
+                        ++m_totalErrors;        // 累计客户端错误总数
                         emit errorOccurred(tr("客户端错误: %1")
                             .arg(socket->errorString()));
                     }
@@ -188,6 +197,11 @@ void TcpServerConnection::onNewConnection()
 
         QString info = clientInfo(client);
         ++m_totalClientCount;
+        // 更新同时在线客户端峰值
+        quint64 currentCount = static_cast<quint64>(m_clients.size());
+        if (currentCount > m_peakConnectedClients) {
+            m_peakConnectedClients = currentCount;
+        }
         emit clientConnected(info);
     }
 }
@@ -213,6 +227,11 @@ void TcpServerConnection::onClientDisconnected()
         m_clients.remove(sd);
     }
     ++m_totalClientDisconnections;  // 客户端断开计数
+    // 更新峰值(移除后当前在线数)
+    quint64 currentCount = static_cast<quint64>(m_clients.size());
+    if (currentCount > m_peakConnectedClients) {
+        m_peakConnectedClients = currentCount;
+    }
     emit clientDisconnected(info);
     socket->deleteLater();
 }
@@ -297,4 +316,7 @@ void TcpServerConnection::resetStatistics()
     m_totalAcceptErrors = 0;
     m_totalListenAttempts = 0;
     m_totalWrites = 0;
+    m_totalRejectedConnections = 0;
+    m_peakConnectedClients = 0;
+    m_totalErrors = 0;
 }

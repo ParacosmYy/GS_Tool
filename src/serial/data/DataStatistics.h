@@ -74,6 +74,8 @@ public:
     quint64 totalHistogramUpdates() const;     ///< 直方图更新总次数
     quint64 totalSlidingWindowResets() const;  ///< 滑动窗口重置总次数
     quint64 totalThroughputSnapshots() const;  ///< 吞吐量快照记录总次数
+    quint64 totalResets() const;               ///< reset()调用总次数
+    quint64 totalFormatChanges() const;        ///< 格式切换总次数(预留)
     void resetDataStatistics();                ///< 重置数据统计计数器(不影响面板显示)
 
     // ---- 滚动吞吐量 ----
@@ -142,6 +144,8 @@ private:
     quint64 m_totalHistogramUpdates = 0;  ///< 直方图更新次数
     quint64 m_totalSlidingWindowResets = 0; ///< 滑动窗口淘汰次数
     quint64 m_totalThroughputSnapshots = 0; ///< 吞吐量快照次数
+    quint64 m_totalResets = 0;              ///< reset()调用总次数
+    quint64 m_totalFormatChanges = 0;       ///< 格式切换总次数(预留)
 
     // ---- 滚动吞吐量(滑动窗口) ----
     static constexpr int kRollingWindowSeconds = 5; ///< 滚动窗口大小(5秒)

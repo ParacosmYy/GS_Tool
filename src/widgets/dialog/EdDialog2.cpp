@@ -17,7 +17,7 @@ void EdDialog::setupUi() { auto *l = new QVBoxLayout(this); l->setContentsMargin
 /** @brief 设置对话框标题 @param t 标题文本 */
 void EdDialog::setTitle(const QString &t) { setWindowTitle(t); }
 /** @brief 设置对话框消息内容 @param m 消息文本 */
-void EdDialog::setMessage(const QString &m) { auto *l = qobject_cast<QVBoxLayout*>(layout()); if (l) { auto *lbl = new QLabel(m, this); l->insertWidget(0, lbl); } }
+void EdDialog::setMessage(const QString &m) { auto *l = qobject_cast<QVBoxLayout*>(layout()); if (l) { auto *lbl = new QLabel(m, this); lbl->setObjectName("edDialogMessageLabel"); l->insertWidget(0, lbl); } }
 /** @brief 添加标准按钮 @param b 标准按钮类型 */
 void EdDialog::addButton(StandardButton b) { Q_UNUSED(b); }
 /** @brief 添加自定义按钮 @param label 按钮文本 @param role 按钮角色 */

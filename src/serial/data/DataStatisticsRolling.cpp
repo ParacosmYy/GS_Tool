@@ -141,6 +141,10 @@ quint64 DataStatistics::totalHistogramUpdates() const { return m_totalHistogramU
 quint64 DataStatistics::totalSlidingWindowResets() const { return m_totalSlidingWindowResets; }
 /** @brief 获取吞吐量快照记录总次数 @return 采样点追加次数 */
 quint64 DataStatistics::totalThroughputSnapshots() const { return m_totalThroughputSnapshots; }
+/** @brief 获取reset()调用总次数 @return 重置次数 */
+quint64 DataStatistics::totalResets() const { return m_totalResets; }
+/** @brief 获取格式切换总次数 @return 格式切换次数(预留) */
+quint64 DataStatistics::totalFormatChanges() const { return m_totalFormatChanges; }
 
 // ---- 滚动吞吐量查询 ----
 
@@ -175,4 +179,6 @@ void DataStatistics::resetDataStatistics()
     m_totalHistogramUpdates = 0;
     m_totalSlidingWindowResets = 0;
     m_totalThroughputSnapshots = 0;
+    m_totalResets = 0;
+    m_totalFormatChanges = 0;
 }

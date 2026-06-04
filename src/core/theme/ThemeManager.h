@@ -49,6 +49,7 @@ public:
     // ==================== 统计接口 ====================
     quint64 totalThemeSwitches() const;    ///< 累计主题切换次数
     quint64 totalCustomThemesLoaded() const; ///< 累计自定义主题加载次数
+    quint64 totalThemeReloads() const;     ///< 累计主题重新加载次数(系统/保存主题)
     quint64 totalColorQueries() const;     ///< 累计语义色查询次数
     quint64 totalStyleApplications() const; ///< 累计样式表应用次数
     quint64 totalCacheHits() const;        ///< 累计语义色缓存命中次数
@@ -70,7 +71,7 @@ private:
     QPointer<QWidget> m_transitionWidget;          ///< 主题切换动画目标
     QPointer<QGraphicsOpacityEffect> m_opacityEffect; ///< 透明度特效
     // ---- 统计计数器 ----
-    quint64 m_totalThemeSwitches = 0, m_totalCustomThemesLoaded = 0;
+    quint64 m_totalThemeSwitches = 0, m_totalCustomThemesLoaded = 0, m_totalThemeReloads = 0;
     mutable quint64 m_totalColorQueries = 0, m_totalCacheHits = 0, m_totalCacheMisses = 0;
     quint64 m_totalStyleApplications = 0;
 };

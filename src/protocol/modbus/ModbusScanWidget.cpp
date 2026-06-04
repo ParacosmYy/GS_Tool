@@ -25,7 +25,9 @@ ModbusScanWidget::ModbusScanWidget(QWidget* parent)
 
     // ---- 地址范围行 ----
     auto* rangeLayout = new QHBoxLayout();
-    rangeLayout->addWidget(new QLabel(tr("起始地址:"), this));
+    auto* fromLbl = new QLabel(tr("起始地址:"), this);
+    fromLbl->setObjectName("scanFromLabel");
+    rangeLayout->addWidget(fromLbl);
 
     m_fromSpin = new QSpinBox(this);
     m_fromSpin->setObjectName("fromSpin");
@@ -33,7 +35,9 @@ ModbusScanWidget::ModbusScanWidget(QWidget* parent)
     m_fromSpin->setValue(1);
     rangeLayout->addWidget(m_fromSpin);
 
-    rangeLayout->addWidget(new QLabel(tr("结束地址:"), this));
+    auto* toLbl = new QLabel(tr("结束地址:"), this);
+    toLbl->setObjectName("scanToLabel");
+    rangeLayout->addWidget(toLbl);
 
     m_toSpin = new QSpinBox(this);
     m_toSpin->setObjectName("toSpin");
@@ -42,7 +46,9 @@ ModbusScanWidget::ModbusScanWidget(QWidget* parent)
     rangeLayout->addWidget(m_toSpin);
 
     rangeLayout->addSpacing(16);
-    rangeLayout->addWidget(new QLabel(tr("探测方式:"), this));
+    auto* probeLbl = new QLabel(tr("探测方式:"), this);
+    probeLbl->setObjectName("scanProbeLabel");
+    rangeLayout->addWidget(probeLbl);
 
     m_probeFunc = new QComboBox(this);
     m_probeFunc->setObjectName("probeFuncCombo");

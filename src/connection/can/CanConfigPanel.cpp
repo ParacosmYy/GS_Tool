@@ -90,9 +90,13 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
     auto filterGroup = new QGroupBox(tr("帧过滤器"));
     filterGroup->setObjectName("canFilterGroup");
     auto filterLayout = new QHBoxLayout(filterGroup);
-    filterLayout->addWidget(new QLabel(tr("ID:")));
+    auto* idLbl = new QLabel(tr("ID:"));
+    idLbl->setObjectName("canFilterIdLabel");
+    filterLayout->addWidget(idLbl);
     filterLayout->addWidget(m_filterIdEdit);
-    filterLayout->addWidget(new QLabel(tr("掩码:")));
+    auto* maskLbl = new QLabel(tr("掩码:"));
+    maskLbl->setObjectName("canFilterMaskLabel");
+    filterLayout->addWidget(maskLbl);
     filterLayout->addWidget(m_filterMaskEdit);
     filterLayout->addWidget(m_filterExtCheck);
     form->addRow(filterGroup);

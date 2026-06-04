@@ -97,6 +97,18 @@ public:
     /** @brief 获取累计write()/broadcastToClients()调用次数 @return 写入调用次数 */
     quint64 totalWrites() const { return m_totalWrites; }
 
+    /** @brief 获取累计被拒绝的客户端连接数(达到最大连接数时拒绝) @return 被拒绝连接总数 */
+    quint64 totalRejectedConnections() const { return m_totalRejectedConnections; }
+
+    /** @brief 获取同时在线客户端峰值数量 @return 峰值客户端数量 */
+    quint64 peakConnectedClients() const { return m_peakConnectedClients; }
+
+    /** @brief 获取累计客户端socket错误次数 @return 客户端错误总数 */
+    quint64 totalErrors() const { return m_totalErrors; }
+
+    /** @brief 设置最大允许同时连接的客户端数(0=不限) @param max 最大客户端数 */
+    void setMaxClients(int max) { m_maxClients = max; }
+
     /** @brief 重置所有统计计数器为零 */
     void resetStatistics();
 
@@ -153,6 +165,10 @@ private:
     quint64 m_totalAcceptErrors = 0;          ///< 累计accept错误次数
     quint64 m_totalListenAttempts = 0;        ///< 累计监听尝试次数
     quint64 m_totalWrites = 0;                ///< 累计write()调用次数
+    quint64 m_totalRejectedConnections = 0;   ///< 因达到最大连接数被拒绝的连接数
+    quint64 m_peakConnectedClients = 0;       ///< 同时在线客户端峰值数量
+    quint64 m_totalErrors = 0;                ///< 累计客户端socket错误次数
+    int m_maxClients = 0;                     ///< 最大允许同时连接的客户端数(0=不限)
 };
 
 #endif // TCPSERVERCONNECTION_H

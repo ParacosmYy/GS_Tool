@@ -150,6 +150,7 @@ bool ThemeManager::isSystemDarkMode() const
 QString ThemeManager::loadSystemTheme()
 {
     QString themeName = isSystemDarkMode() ? "dark_terminal" : "light";
+    ++m_totalThemeReloads;  ///< 统计: 系统主题重新加载
     loadTheme(themeName);
     return themeName;
 }
@@ -167,6 +168,8 @@ bool ThemeManager::loadSavedTheme()
 {
     auto& settings = SettingsManager::instance();
     QString savedTheme = settings.loadTheme();
+
+    ++m_totalThemeReloads;  ///< 统计: 保存主题重新加载
 
     // loadTheme() 返回默认值 App::DEFAULT_THEME 表示无保存记录
     // 尝试用保存的主题名加载，若失败则回退到系统主题
@@ -255,6 +258,12 @@ quint64 ThemeManager::totalCustomThemesLoaded() const
     return m_totalCustomThemesLoaded;
 }
 
+/** @brief 获取累计主题重新加载次数(系统/保存主题) */
+quint64 ThemeManager::totalThemeReloads() const
+{
+    return m_totalThemeReloads;
+}
+
 /** @brief 获取累计语义色查询次数 */
 quint64 ThemeManager::totalColorQueries() const
 {
@@ -284,6 +293,7 @@ void ThemeManager::resetStats()
 {
     m_totalThemeSwitches = 0;
     m_totalCustomThemesLoaded = 0;
+    m_totalThemeReloads = 0;
     m_totalColorQueries = 0;
     m_totalStyleApplications = 0;
     m_totalCacheHits = 0;

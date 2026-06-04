@@ -145,16 +145,24 @@ private:
     quint64 m_totalFramesBuilt = 0; ///< 帧构建总次数
     quint64 m_totalSends = 0;       ///< 帧发送总次数
     quint64 m_totalEdits = 0;       ///< 编辑操作总次数
+    quint64 m_totalFieldAdds = 0;   ///< 字段添加总次数
+    quint64 m_totalFieldRemoves = 0; ///< 字段删除总次数
+    quint64 m_totalFrameValidations = 0; ///< 帧校验总次数
+    quint64 m_totalProtocolLoads = 0; ///< 协议加载总次数
+    quint64 m_totalProtocolSaves = 0; ///< 协议保存总次数
+    quint64 m_validationErrors = 0; ///< 校验错误总次数
 
 public:
-    /** @brief 获取帧构建总次数 @return 构建计数 */
-    quint64 totalFramesBuilt() const { return m_totalFramesBuilt; }
-    /** @brief 获取帧发送总次数 @return 发送计数 */
-    quint64 totalSends() const { return m_totalSends; }
-    /** @brief 获取编辑操作总次数 @return 编辑计数 */
-    quint64 totalEdits() const { return m_totalEdits; }
-    /** @brief 重置帧编辑器统计计数器 */
-    void resetEditorStatistics();
+    quint64 totalFramesBuilt() const { return m_totalFramesBuilt; } ///< 帧构建总次数
+    quint64 totalSends() const { return m_totalSends; }             ///< 帧发送总次数
+    quint64 totalEdits() const { return m_totalEdits; }             ///< 编辑操作总次数
+    quint64 totalFieldAdds() const { return m_totalFieldAdds; }     ///< 字段添加总次数
+    quint64 totalFieldRemoves() const { return m_totalFieldRemoves; } ///< 字段删除总次数
+    quint64 totalFrameValidations() const { return m_totalFrameValidations; } ///< 帧校验总次数
+    quint64 totalProtocolLoads() const { return m_totalProtocolLoads; } ///< 协议加载总次数
+    quint64 totalProtocolSaves() const { return m_totalProtocolSaves; } ///< 协议保存总次数
+    quint64 totalValidationErrors() const { return m_validationErrors; } ///< 校验错误总次数
+    void resetEditorStatistics(); ///< 重置帧编辑器统计计数器
 
     /**
      * @brief 扩展字段类型列表(与ComboBox项对应)
