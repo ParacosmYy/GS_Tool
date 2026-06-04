@@ -77,6 +77,9 @@
 | 229-231 | Linter自动拆分+多模块统计增强 | OtaHistoryModelIndex/ZoomControllerQuery/UsbConnectionDescriptors等拆分 |
 | 232 | BLE/CAN/MQTT/UDP/Terminal/Recording/Playback统计增强+文件拆分 | 连接模块帧错误/退订/队列+终端布局/搜索/过滤统计 |
 | 233 | ModbusSlaveResponse/FrameParserStats拆分+连接模块统计增强 | Modbus从站响应独立+帧解析器统计独立 |
+| 234-235 | BackgroundWidgetPaint/FrameVisualEditorFields拆分+PacketBuilder/Timestamp统计增强 | 背景绘制独立+帧编辑器字段独立+包构建/时间戳统计 |
+| 236-237 | CursorOverlayInteraction/MqttConnectionPublish/TerminalSearchBarHistory拆分+10个头文件压缩 | 游标交互独立+MQTT发布独立+搜索历史独立 |
+| 238 | BleConnection/SerialDetector头文件压缩 | BLE连接/串口检测器Doxygen压缩 |
 
 ---
 
