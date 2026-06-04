@@ -121,6 +121,7 @@ set(SOURCES
     src/protocol/bridge/ProtocolBridgeManagerStats.cpp
     src/chart/widget/ChartWidget.cpp
     src/chart/widget/ChartWidgetTheme.cpp
+    src/chart/widget/ChartWidgetExport.cpp
     src/chart/model/ChannelConfig.cpp
     src/chart/model/ChartModel.cpp
     src/chart/model/ChartModelStats.cpp
@@ -133,6 +134,7 @@ set(SOURCES
     src/chart/fft/FftWidget.cpp
     src/chart/fft/FftWidgetSetup.cpp
     src/chart/stats/HistogramWidget.cpp
+    src/chart/stats/HistogramWidgetStats.cpp
     src/chart/stats/ScatterWidget.cpp
     src/chart/stats/ScatterWidgetStats.cpp
     src/ota/manager/OtaManager.cpp

@@ -120,7 +120,6 @@ public:
 
 signals:
     /** @brief 收到CAN帧 @param id 帧ID @param data 帧数据 @param extended 扩展帧 @param rtr 远程帧 */
-    /** @brief 收到CAN帧 @param id 帧ID @param data 帧数据 @param extended 扩展帧 @param rtr 远程帧 */
     void frameReceived(int id, const QByteArray& data, bool extended, bool rtr);
     /** @brief 收到CAN-FD帧 @param id 帧ID @param data 帧数据(最长64字节) */
     void fdFrameReceived(int id, const QByteArray& data, bool extended);

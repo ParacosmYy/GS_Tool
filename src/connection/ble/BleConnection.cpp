@@ -69,6 +69,7 @@ bool BleConnection::open()
 
     m_state = ConnectionState::Connecting;
     emit stateChanged(m_state);
+    ++m_totalConnections;
     m_connectTimer->start(CONNECT_DELAY_MS);
     return true;
 }
@@ -78,6 +79,7 @@ void BleConnection::close()
 {
     m_connectTimer->stop();
     if (m_state != ConnectionState::Disconnected) {
+        ++m_totalDisconnections;
         m_state = ConnectionState::Disconnected;
         emit stateChanged(m_state);
     }
@@ -145,6 +147,9 @@ QStringList BleConnection::discoverServices()
         return {};
     }
 
+    // 统计: 累计服务发现次数
+    m_totalServicesDiscovered += static_cast<quint64>(m_services.size());
+
     // 模拟服务发现延迟后通知
     QTimer::singleShot(300, this, [this]() {
         emit servicesDiscovered(m_services);
@@ -177,6 +182,11 @@ void BleConnection::initMockServices()
 /** @brief 重置所有统计计数器 */
 void BleConnection::resetStats()
 {
+    m_totalScans = 0;
+    m_totalConnections = 0;
+    m_totalDisconnections = 0;
+    m_totalServicesDiscovered = 0;
+    m_totalCharacteristicsRead = 0;
     m_totalWrites = 0;
     m_totalReads = 0;
     m_totalBytesWritten = 0;

@@ -101,14 +101,23 @@ public:
 
     // ==================== 统计接口 ====================
 
+    /** @brief 获取累计创建标记总数(同totalMarkersAdded) */
+    quint64 totalMarkersCreated() const;
+
     /** @brief 获取累计添加标记总数 */
     quint64 totalMarkersAdded() const;
 
     /** @brief 获取累计移除标记总数 */
     quint64 totalMarkersRemoved() const;
 
+    /** @brief 获取累计导航到标记的次数(同totalJumpEvents) */
+    quint64 totalMarkersNavigated() const;
+
     /** @brief 获取累计跳转事件总数 */
     quint64 totalJumpEvents() const;
+
+    /** @brief 获取当前不同标签类型的数量 */
+    int markerTypesCount() const;
 
     /** @brief 重置所有统计计数器 */
     void resetStats();

@@ -73,6 +73,7 @@ bool TcpConnection::open()
     if (m_mode == Client) {
         if (!m_socket) {
             m_socket = new QTcpSocket(this);
+            m_isReconnectAttempt = false;  // 首次连接，清除重连标记
             connect(m_socket, &QTcpSocket::connected,
                     this, &TcpConnection::onSocketConnected);
             connect(m_socket, &QTcpSocket::disconnected,
@@ -87,10 +88,12 @@ bool TcpConnection::open()
         } else if (m_socket->state() != QAbstractSocket::UnconnectedState) {
             // 已有socket且非断开状态 — 视为重连尝试
             ++m_totalReconnectAttempts;
+            m_isReconnectAttempt = true;  // 标记为重连，onSocketConnected中用于计数
             m_socket->abort();  // 中断当前连接，准备重连
         }
 
         updateState(ConnectionState::Connecting);
+        m_connectStartTime.start();  // 记录连接发起时刻，用于延迟计算
         m_socket->connectToHost(m_host, m_port);
         // 启用TCP KeepAlive，长连接场景下可及时检测对端断开
         m_socket->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
@@ -191,12 +194,32 @@ qint64 TcpConnection::write(const QByteArray& data)
     return written;
 }
 
-/** @brief 客户端模式socket连接成功回调，停止超时定时器并更新状态为Connected */
+/** @brief 客户端模式socket连接成功回调，停止超时定时器，计算连接延迟并更新状态为Connected */
 void TcpConnection::onSocketConnected()
 {
     // 连接成功，取消超时定时器
     if (m_connectTimer) m_connectTimer->stop();
+
+    // 计算连接建立延迟(从connectToHost到connected回调)
+    if (m_connectStartTime.isValid()) {
+        qint64 latency = m_connectStartTime.elapsed();
+        m_lastLatencyMs = latency;
+        if (latency > m_maxLatencyMs) {
+            m_maxLatencyMs = latency;
+        }
+        m_latencySumMs += latency;
+        ++m_latencySampleCount;
+        m_connectStartTime.invalidate();
+    }
+
     ++m_totalConnections;  // 客户端连接成功计数
+
+    // 如果是重连尝试，额外计数重连成功次数
+    if (m_isReconnectAttempt) {
+        ++m_totalReconnects;
+        m_isReconnectAttempt = false;
+    }
+
     updateState(ConnectionState::Connected);
 }
 
@@ -338,7 +361,7 @@ quint64 TcpConnection::totalBytesReceived() const { return m_totalBytesReceived;
 /** @brief 获取累计错误次数 @return 错误总次数 */
 quint64 TcpConnection::errorCount() const { return m_errorCount; }
 
-/** @brief 重置所有统计计数器(连接/断开/字节/错误/打开尝试/写入/重连)为零 */
+/** @brief 重置所有统计计数器(连接/断开/字节/错误/打开尝试/写入/重连/延迟)为零 */
 void TcpConnection::resetStats()
 {
     m_totalConnections = 0;
@@ -349,5 +372,18 @@ void TcpConnection::resetStats()
     m_totalOpenAttempts = 0;
     m_totalWrites = 0;
     m_totalReconnectAttempts = 0;
+    m_totalReconnects = 0;
+    m_lastLatencyMs = 0;
+    m_maxLatencyMs = 0;
+    m_latencySampleCount = 0;
+    m_latencySumMs = 0;
+    m_isReconnectAttempt = false;
+}
+
+/** @brief 获取连接建立平均延迟(毫秒) @return 平均延迟，无采样数据时返回0 */
+double TcpConnection::averageLatencyMs() const
+{
+    if (m_latencySampleCount == 0) { return 0.0; }
+    return static_cast<double>(m_latencySumMs) / static_cast<double>(m_latencySampleCount);
 }
 

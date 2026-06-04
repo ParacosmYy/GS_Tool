@@ -9,7 +9,7 @@
 #include <QStringList>
 #include <QList>
 
-/// @brief 主题树节点 — 存储主题层级数据，每个节点对应路径的一级段
+/** @brief 主题树节点 — 存储主题层级数据，每个节点对应路径的一级段 */
 struct TopicNode {
     QString name;                    ///< 节点名称(单级路径段)
     QString fullPath;                ///< 完整路径(从根到此节点)

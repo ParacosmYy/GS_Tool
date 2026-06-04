@@ -118,6 +118,9 @@ public:
     /** @brief 获取已接收pong帧总数 @return pong帧接收总数 */
     quint64 totalPongFrames() const;
 
+    /** @brief 获取ping/pong交互总次数(ping发送+pong接收) @return ping/pong交互总数 */
+    quint64 pingPongCount() const;
+
     /** @brief 获取ping/pong平均延迟(毫秒) @return 平均延迟，无数据时返回0 */
     double averageLatencyMs() const;
 

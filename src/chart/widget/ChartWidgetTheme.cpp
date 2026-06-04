@@ -122,12 +122,4 @@ void ChartWidget::removeSeries(const QString& name)
 // ============================================================================
 // 统计计数器
 // ============================================================================
-
-/** @brief 重置波形图统计计数器(数据更新/渲染/重绘/交互) */
-void ChartWidget::resetChartWidgetStatistics()
-{
-    m_totalDataUpdates = 0;
-    m_totalRenders = 0;
-    m_totalRedraws = 0;
-    m_totalInteractions = 0;
-}
+// resetChartWidgetStatistics() 定义在 ChartWidget.cpp 中（含完整字段重置）

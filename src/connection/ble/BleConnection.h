@@ -86,16 +86,37 @@ public:
 
     // ---- 统计信息接口 ----
 
+    /** @brief 获取总扫描次数 */
+    quint64 totalScans() const { return m_totalScans; }
+
+    /** @brief 获取总连接次数 */
+    quint64 totalConnections() const { return m_totalConnections; }
+
+    /** @brief 获取总断开次数 */
+    quint64 totalDisconnections() const { return m_totalDisconnections; }
+
+    /** @brief 获取总发现GATT服务次数 */
+    quint64 totalServicesDiscovered() const { return m_totalServicesDiscovered; }
+
+    /** @brief 获取总特征读取次数 */
+    quint64 totalCharacteristicsRead() const { return m_totalCharacteristicsRead; }
+
     /** @brief 获取总写入次数 */
     quint64 totalWrites() const { return m_totalWrites; }
 
     /** @brief 获取总读取次数 */
     quint64 totalReads() const { return m_totalReads; }
 
-    /** @brief 获取总写入字节数 */
+    /** @brief 获取总发送字节数 */
+    quint64 totalBytesSent() const { return m_totalBytesWritten; }
+
+    /** @brief 获取总接收字节数 */
+    quint64 totalBytesReceived() const { return m_totalBytesRead; }
+
+    /** @brief 获取总写入字节数(旧接口兼容) */
     quint64 totalBytesWritten() const { return m_totalBytesWritten; }
 
-    /** @brief 获取总读取字节数 */
+    /** @brief 获取总读取字节数(旧接口兼容) */
     quint64 totalBytesRead() const { return m_totalBytesRead; }
 
     /** @brief 获取错误计数 */
@@ -143,6 +164,11 @@ private:
     qint64 m_bytesWritten = 0;
 
     // ---- 统计计数器 ----
+    quint64 m_totalScans = 0;                   ///< 总扫描次数
+    quint64 m_totalConnections = 0;             ///< 总连接次数
+    quint64 m_totalDisconnections = 0;          ///< 总断开次数
+    quint64 m_totalServicesDiscovered = 0;      ///< 总发现GATT服务次数
+    quint64 m_totalCharacteristicsRead = 0;     ///< 总特征读取次数
     quint64 m_totalWrites = 0;                  ///< 总写入次数
     quint64 m_totalReads = 0;                   ///< 总读取次数
     quint64 m_totalBytesWritten = 0;            ///< 总写入字节数

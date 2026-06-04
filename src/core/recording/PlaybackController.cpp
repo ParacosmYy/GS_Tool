@@ -96,6 +96,9 @@ void PlaybackController::stop()
     m_timer->stop();
     m_currentTimeMs = 0;
 
+    // 统计：累计停止计数
+    ++m_totalStops;
+
     emit playbackStopped();
 }
 
@@ -258,10 +261,28 @@ quint64 PlaybackController::totalPauses() const
     return m_totalPauses;
 }
 
+/** @brief 获取累计停止次数 @return 停止总次数 */
+quint64 PlaybackController::totalStops() const
+{
+    return m_totalStops;
+}
+
 /** @brief 获取累计定位次数 @return 定位总次数 */
 quint64 PlaybackController::totalSeeks() const
 {
     return m_totalSeeks;
+}
+
+/** @brief 获取平均回放倍速 @return 平均倍速值，无回放记录时返回0.0 */
+qreal PlaybackController::averagePlaybackSpeed() const
+{
+    return averageSpeed();
+}
+
+/** @brief 获取累计回放总时长(毫秒) @return 累计播放时长 */
+qint64 PlaybackController::totalPlaybackDurationMs() const
+{
+    return m_totalPlayTimeMs;
 }
 
 /** @brief 重置所有统计计数器(含基础统计和扩展统计) */
@@ -274,5 +295,6 @@ void PlaybackController::resetStats()
     // 扩展统计
     m_totalPlaybacks = 0;
     m_totalPauses = 0;
+    m_totalStops = 0;
     m_totalSeeks = 0;
 }

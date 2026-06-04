@@ -53,6 +53,8 @@ public:
     int totalDevicesFound() const;       ///< 累计发现设备总数(去重)
     quint64 filteredDeviceCount() const; ///< 被过滤器过滤掉的设备数
     quint64 totalScanStarts() const;     ///< 累计启动扫描次数
+    quint64 totalScanCycles() const;     ///< 累计扫描周期完成次数(含超时和队列耗尽)
+    quint64 uniqueDevicesSeen() const;   ///< 累计去重设备地址总数
     quint64 totalDiscoveryEvents() const;///< 累计发现事件次数(含RSSI更新)
     quint64 totalScanDurationMs() const; ///< 累计扫描总时长(ms)
     int bestRssi() const;                ///< 最佳RSSI值
@@ -92,6 +94,7 @@ private:
     QElapsedTimer  m_scanElapsed;          ///< 扫描经过时间计量器
 
     quint64 m_totalScanStarts = 0;         ///< 累计启动扫描次数
+    quint64 m_totalScanCycles = 0;         ///< 累计扫描周期完成次数
     quint64 m_totalDiscoveryEvents = 0;    ///< 累计发现事件次数
     quint64 m_filteredDeviceCount = 0;     ///< 被过滤设备数
     quint64 m_totalScanDurationMs = 0;     ///< 累计扫描总时长

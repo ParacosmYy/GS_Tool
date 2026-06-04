@@ -97,6 +97,9 @@ public:
     /** @brief 获取错误计数 */
     quint64 errorCount() const;
 
+    /** @brief 获取累计错误次数(errorCount的别名) @return 累计错误次数 */
+    quint64 totalErrors() const { return m_errorCount; }
+
     /** @brief 重置所有统计数据为零 */
     void resetStats();
 

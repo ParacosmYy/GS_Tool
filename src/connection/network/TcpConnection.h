@@ -22,6 +22,7 @@
 #include <QTcpSocket>
 #include <QTcpServer>
 #include <QTimer>
+#include <QElapsedTimer>
 
 /**
  * @brief TCP连接实现 - 支持Client/Server双模式
@@ -111,6 +112,18 @@ public:
     /** @brief 获取累计重连尝试次数(Client模式下已连接/连接中时再次调用open) @return 重连尝试次数 */
     quint64 totalReconnectAttempts() const { return m_totalReconnectAttempts; }
 
+    /** @brief 获取累计重连成功次数(重连后onSocketConnected回调触发时计数) @return 重连成功总次数 */
+    quint64 totalReconnects() const { return m_totalReconnects; }
+
+    /** @brief 获取连接建立平均延迟(毫秒，从发起connect到connected回调) @return 平均延迟，无数据时返回0 */
+    double averageLatencyMs() const;
+
+    /** @brief 获取最近一次连接建立延迟(毫秒) @return 最近延迟，无数据时返回0 */
+    qint64 lastLatencyMs() const { return m_lastLatencyMs; }
+
+    /** @brief 获取最大连接建立延迟(毫秒) @return 最大延迟，无数据时返回0 */
+    qint64 maxLatencyMs() const { return m_maxLatencyMs; }
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -154,6 +167,14 @@ private:
     QTcpSocket* m_clientSocket = nullptr; ///< Server模式: 已接受的客户端连接
     QTimer* m_connectTimer = nullptr;    ///< Client模式连接超时定时器(10秒)
 
+    // ---- 延迟追踪 ----
+    QElapsedTimer m_connectStartTime;    ///< 连接发起时刻，用于计算连接建立延迟
+    qint64 m_lastLatencyMs = 0;          ///< 最近一次连接建立延迟(ms)
+    qint64 m_maxLatencyMs = 0;           ///< 最大连接建立延迟(ms)
+    quint64 m_latencySampleCount = 0;    ///< 延迟采样次数
+    qint64 m_latencySumMs = 0;           ///< 延迟累计总和(ms)
+    bool m_isReconnectAttempt = false;   ///< 标记当前连接是否为重连尝试
+
     // ---- 统计计数器 ----
     quint64 m_totalConnections = 0;      ///< 累计连接成功次数
     quint64 m_totalDisconnections = 0;   ///< 累计断开连接次数
@@ -163,6 +184,7 @@ private:
     quint64 m_totalOpenAttempts = 0;     ///< 累计open()调用次数
     quint64 m_totalWrites = 0;           ///< 累计write()调用次数
     quint64 m_totalReconnectAttempts = 0;///< 累计重连尝试次数
+    quint64 m_totalReconnects = 0;       ///< 累计重连成功次数
 };
 
 #endif // TCPCONNECTION_H

@@ -210,6 +210,9 @@ quint64 WebSocketConnection::totalBinaryFrames() const { return m_totalBinaryFra
 quint64 WebSocketConnection::totalPingFrames() const { return m_totalPingFrames; }
 quint64 WebSocketConnection::totalPongFrames() const { return m_totalPongFrames; }
 
+/** @brief 获取ping/pong交互总次数 @return ping帧发送数+pong帧接收数 */
+quint64 WebSocketConnection::pingPongCount() const { return m_totalPingFrames + m_totalPongFrames; }
+
 /** @brief 获取ping/pong平均延迟(毫秒) @return 平均延迟，无采样数据时返回0 */
 double WebSocketConnection::averageLatencyMs() const
 {

@@ -114,8 +114,17 @@ public:
     /** @brief 获取累计暂停次数 */
     quint64 totalPauses() const;
 
+    /** @brief 获取累计停止次数 */
+    quint64 totalStops() const;
+
     /** @brief 获取累计定位次数 */
     quint64 totalSeeks() const;
+
+    /** @brief 获取平均回放倍速(同averageSpeed) */
+    qreal averagePlaybackSpeed() const;
+
+    /** @brief 获取累计回放总时长(毫秒，同totalPlayTimeMs) */
+    qint64 totalPlaybackDurationMs() const;
 
     /** @brief 重置所有统计计数器（含基础统计） */
     void resetStats();
@@ -176,6 +185,7 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalPlaybacks = 0;  ///< 累计回放启动次数
     quint64 m_totalPauses = 0;     ///< 累计暂停次数
+    quint64 m_totalStops = 0;      ///< 累计停止次数
     quint64 m_totalSeeks = 0;      ///< 累计定位次数
 };
 

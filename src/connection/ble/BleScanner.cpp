@@ -121,6 +121,7 @@ void BleScanner::onScanTimeout()
     }
 
     ++m_scanCount;
+    ++m_totalScanCycles;
     emit scanFinished();
     emit scanStateChanged(false);
 }
@@ -164,6 +165,12 @@ void BleScanner::clearHistory()
 /** @brief 获取累计启动扫描次数 @return 启动扫描总次数 */
 quint64 BleScanner::totalScanStarts() const { return m_totalScanStarts; }
 
+/** @brief 获取累计扫描周期完成次数 @return 扫描周期完成总次数 */
+quint64 BleScanner::totalScanCycles() const { return m_totalScanCycles; }
+
+/** @brief 获取累计去重设备地址总数 @return 不同设备地址的总数 */
+quint64 BleScanner::uniqueDevicesSeen() const { return static_cast<quint64>(m_seenAddresses.size()); }
+
 /** @brief 获取累计发现设备事件次数(不去重，包含RSSI更新) @return 发现设备事件总次数 */
 quint64 BleScanner::totalDiscoveryEvents() const { return m_totalDiscoveryEvents; }
 
@@ -187,6 +194,7 @@ double BleScanner::averageRssi() const
 void BleScanner::resetScannerStatistics()
 {
     m_totalScanStarts = 0;
+    m_totalScanCycles = 0;
     m_totalDiscoveryEvents = 0;
     m_scanCount = 0;
     m_seenAddresses.clear();

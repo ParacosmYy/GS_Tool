@@ -54,6 +54,7 @@ void BleScanner::onSimulateDiscovery()
         }
 
         ++m_scanCount;
+        ++m_totalScanCycles;
         emit scanFinished();
         emit scanStateChanged(false);
         return;

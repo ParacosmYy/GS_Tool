@@ -102,7 +102,6 @@ QVariantList UsbDeviceDetector::scanDevicesViaLibusb() {
 
         /* 读取设备描述符 */
         UsbDeviceDescriptor desc;
-        QByteArray descBytes(reinterpret_cast<const char*>(&desc), sizeof(desc));
 
         if (loader.getDeviceDescriptor(handle, &desc) != 0) {
             /* 描述符读取失败，使用WMIC数据 */

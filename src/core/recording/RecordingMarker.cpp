@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <QtMath>
+#include <QSet>
 
 // ============================================================================
 // 构造 / 析构
@@ -208,6 +209,12 @@ qint64 RecordingMarker::jumpToMarker(int index)
 // 统计接口
 // ============================================================================
 
+/** @brief 获取累计创建标记总数(同totalMarkersAdded) */
+quint64 RecordingMarker::totalMarkersCreated() const
+{
+    return m_totalMarkersAdded;
+}
+
 /** @brief 获取累计添加标记总数 */
 quint64 RecordingMarker::totalMarkersAdded() const
 {
@@ -224,6 +231,22 @@ quint64 RecordingMarker::totalMarkersRemoved() const
 quint64 RecordingMarker::totalJumpEvents() const
 {
     return m_totalJumpEvents;
+}
+
+/** @brief 获取累计导航到标记的次数(同totalJumpEvents) */
+quint64 RecordingMarker::totalMarkersNavigated() const
+{
+    return m_totalJumpEvents;
+}
+
+/** @brief 获取当前不同标签类型的数量 */
+int RecordingMarker::markerTypesCount() const
+{
+    QSet<QString> uniqueLabels;
+    for (const auto& marker : m_markers) {
+        uniqueLabels.insert(marker.label);
+    }
+    return uniqueLabels.size();
 }
 
 /**
