@@ -48,12 +48,11 @@ void YModemTransfer::sendBlock()
     }
     QByteArray packet = buildBlock(m_blockNumber, blockData);
     if (m_conn) {
-        writeChecked(packet);
+        if (!writeChecked(packet)) return;  // 写入失败时不推进进度
         ++m_stats.blocksSent;
     }
-    /* 仅在首次发送该块时更新进度(NAK重传时不重复推进)
-     * m_bytesSent指向当前块起始偏移，首次发送时sent > m_bytesSent
-     * 重传时m_bytesSent已被ACK回调推进，sent == m_bytesSent */
+    /* 仅在写入成功时更新进度 */
+    if (m_ymodemState == State::Error) return;
     qint64 sent = qMin(offset + dataSize,
                         static_cast<qint64>(m_currentData.size()));
     if (sent > m_bytesSent) {

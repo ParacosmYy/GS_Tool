@@ -86,7 +86,8 @@ QColor HeatmapWidget::valueToColor(double v) const {
 
 /** @brief 将像素坐标转换为数据矩阵的行列索引 @param pos 像素坐标 @return QPair<行,列>，越界返回<-1,-1> */
 QPair<int,int> HeatmapWidget::posToCell(const QPoint &pos) const {
-    int c = pos.x() / m_cellW, r = pos.y() / m_cellH;
+    int c = (pos.x() >= 0) ? pos.x() / m_cellW : -1;
+    int r = (pos.y() >= 0) ? pos.y() / m_cellH : -1;
     if (r >= 0 && r < m_data.size() && c >= 0 && c < m_data[r].size()) return {r,c};
     return {-1,-1};
 }

@@ -60,17 +60,17 @@ void ZoomController::zoomAt(int centerPixelX, double factor)
     auto ax = xAxis();
     if (!ax || !m_chart) return;
 
-    // 保存缩放前状态
+    double minVal = ax->min();
+    double maxVal = ax->max();
+    double range = maxVal - minVal;
+    if (range <= 0) return;
+
+    // 保存缩放前状态(在range校验之后，避免early return泄漏栈条目)
     pushZoomState();
 
     // 将像素中心映射到数据坐标
     double centerData = m_chart->mapToValue(
         QPointF(centerPixelX, 0)).x();
-
-    double minVal = ax->min();
-    double maxVal = ax->max();
-    double range = maxVal - minVal;
-    if (range <= 0) return;
 
     // 防止过度缩放
     double newRange = range / factor;

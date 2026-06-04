@@ -31,7 +31,7 @@ enum {
 /** @brief 向指定主题发布消息 @param topic 主题名 @param payload 消息负载 @param qos 服务质量等级(0/1/2) @return true=发布成功 */
 bool MqttConnection::publish(const QString& topic, const QByteArray& payload, int qos)
 {
-    if (m_state != ConnectionState::Connected) return false;
+    if (m_state != ConnectionState::Connected || !m_socket) return false;
     QByteArray variableHeader;
     const QByteArray topicUtf8 = topic.toUtf8();
     variableHeader.append(static_cast<char>((topicUtf8.size() >> 8) & 0xFF));
@@ -63,7 +63,7 @@ bool MqttConnection::publish(const QString& topic, const QByteArray& payload, in
 /** @brief 订阅指定MQTT主题 @param topic 主题过滤器 @param qos 请求的服务质量等级(0/1/2) @return true=订阅报文发送成功 */
 bool MqttConnection::subscribe(const QString& topic, int qos)
 {
-    if (m_state != ConnectionState::Connected) return false;
+    if (m_state != ConnectionState::Connected || !m_socket) return false;
     QByteArray payload;
     const QByteArray topicUtf8 = topic.toUtf8();
     payload.append(static_cast<char>((topicUtf8.size() >> 8) & 0xFF));
@@ -90,7 +90,7 @@ bool MqttConnection::subscribe(const QString& topic, int qos)
 /** @brief 取消订阅指定MQTT主题 @param topic 要取消的主题过滤器 */
 void MqttConnection::unsubscribe(const QString& topic)
 {
-    if (m_state != ConnectionState::Connected) return;
+    if (m_state != ConnectionState::Connected || !m_socket) return;
     QByteArray payload;
     const QByteArray topicUtf8 = topic.toUtf8();
     payload.append(static_cast<char>((topicUtf8.size() >> 8) & 0xFF));
@@ -115,7 +115,7 @@ void MqttConnection::unsubscribe(const QString& topic)
 /** @brief 心跳定时器回调，发送PINGREQ保活报文并统计 */
 void MqttConnection::onKeepAlive()
 {
-    if (m_state == ConnectionState::Connected) {
+    if (m_state == ConnectionState::Connected && m_socket) {
         QByteArray packet = buildMqttPacket(MqttPublish_PINGREQ, {});
         qint64 written = m_socket->write(packet);
         if (written == packet.size()) {
@@ -130,6 +130,7 @@ void MqttConnection::onKeepAlive()
 /** @brief 构建并发送MQTT CONNECT报文，包含客户端ID、认证信息和LWT遗嘱 */
 void MqttConnection::sendConnect()
 {
+    if (!m_socket) return;
     QByteArray payload;
     payload.append(static_cast<char>(0));
     payload.append(static_cast<char>(4));

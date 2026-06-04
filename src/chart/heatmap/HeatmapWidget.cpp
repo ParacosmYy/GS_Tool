@@ -83,7 +83,7 @@ void HeatmapWidget::setAutoScale(bool enabled)
 /** @brief 返回控件的推荐尺寸，基于数据行列数和单元格大小计算 @return 推荐的控件尺寸，空数据时返回200x200 */
 QSize HeatmapWidget::sizeHint() const
 {
-    if (m_data.isEmpty()) return QSize(200, 200);
+    if (m_data.isEmpty() || m_data[0].isEmpty()) return QSize(200, 200);
     return QSize(m_data[0].size() * m_cellSize, m_data.size() * m_cellSize);
 }
 
@@ -102,8 +102,9 @@ void HeatmapWidget::resizeEvent(QResizeEvent *event)
 /** @brief 鼠标移动事件处理，计算悬停单元格并发出cellHovered信号和工具提示 @param event 鼠标事件参数 */
 void HeatmapWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    int col = event->pos().x() / m_cellSize;
-    int row = event->pos().y() / m_cellSize;
+    int px = event->pos().x(), py = event->pos().y();
+    int col = (px >= 0) ? px / m_cellSize : -1;
+    int row = (py >= 0) ? py / m_cellSize : -1;
     if (row != m_hoverRow || col != m_hoverCol) {
         m_hoverRow = row;
         m_hoverCol = col;
@@ -120,8 +121,9 @@ void HeatmapWidget::mouseMoveEvent(QMouseEvent *event)
 /** @brief 鼠标按下事件处理，计算点击的单元格并发出cellClicked信号 @param event 鼠标事件参数 */
 void HeatmapWidget::mousePressEvent(QMouseEvent *event)
 {
-    int col = event->pos().x() / m_cellSize;
-    int row = event->pos().y() / m_cellSize;
+    int px = event->pos().x(), py = event->pos().y();
+    int col = (px >= 0) ? px / m_cellSize : -1;
+    int row = (py >= 0) ? py / m_cellSize : -1;
     if (row >= 0 && row < m_data.size() && col >= 0 && col < m_data[row].size()) {
         m_totalCellClicks++;
         emit cellClicked(row, col, m_data[row][col]);

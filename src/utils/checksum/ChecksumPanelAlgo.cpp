@@ -41,7 +41,13 @@ QByteArray ChecksumPanel::inputData() const
         // 二进制文件模式：输入框内容为文件路径
         QString path = m_inputEdit->toPlainText().trimmed();
         QFile file(path);
+        // 限制文件大小为16MB，防止大文件导致OOM
+        static const qint64 kMaxChecksumFileSize = 16 * 1024 * 1024;
         if (file.open(QIODevice::ReadOnly)) {
+            if (file.size() > kMaxChecksumFileSize) {
+                file.close();
+                return QByteArray();
+            }
             return file.readAll();
         }
         return QByteArray();

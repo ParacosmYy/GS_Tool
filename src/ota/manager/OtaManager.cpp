@@ -57,6 +57,8 @@ OtaManager::OtaManager(QObject* parent)
 /** @brief 析构函数 — 清理HEX转换产生的临时BIN文件 */
 OtaManager::~OtaManager()
 {
+    delete m_tempBinFile;
+    m_tempBinFile = nullptr;
     if (!m_tempBinPath.isEmpty()) {
         QFile::remove(m_tempBinPath);
     }

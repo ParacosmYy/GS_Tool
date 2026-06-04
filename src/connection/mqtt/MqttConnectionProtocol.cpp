@@ -129,7 +129,7 @@ void MqttConnection::handlePublish(const QByteArray& data, quint8 flags)
         offset += 2;
     }
     QByteArray payload = data.mid(offset);
-    ++m_totalBytesReceived;
+    m_totalBytesReceived += static_cast<quint64>(payload.size());
     ++m_totalReceived;
     ++m_totalMessageReceived;  ///< 累计接收PUBLISH消息数
     emit dataReceived(payload);

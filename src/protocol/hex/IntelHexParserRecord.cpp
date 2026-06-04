@@ -131,9 +131,12 @@ void computeStats(const QVector<Record>& records, ParseStats& stats)
             stats.dataRecordCount++;
             stats.totalDataBytes += rec.byteCount;
 
-            quint32 absAddr = baseAddr + rec.address;
+            // 使用quint64防止baseAddr + address溢出quint32
+            quint64 absAddr64 = static_cast<quint64>(baseAddr) + rec.address;
+            quint32 absAddr = (absAddr64 > 0xFFFFFFFF) ? 0xFFFFFFFF : static_cast<quint32>(absAddr64);
             if (absAddr < minAddr) minAddr = absAddr;
-            quint32 endAddr = absAddr + rec.byteCount;
+            quint64 endAddr64 = absAddr64 + rec.byteCount;
+            quint32 endAddr = (endAddr64 > 0xFFFFFFFF) ? 0xFFFFFFFF : static_cast<quint32>(endAddr64);
             if (endAddr > maxAddr) maxAddr = endAddr;
         } else if (rec.type == ExtendedLinearAddr) {
             if (rec.data.size() >= 2) {

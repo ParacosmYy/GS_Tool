@@ -28,6 +28,11 @@ TcpConnection::TcpConnection(QObject* parent)
 TcpConnection::~TcpConnection()
 {
     // 析构时仅释放资源，不发射信号(避免析构期间回调)
+    if (m_socket) {
+        disconnect(m_socket, nullptr, this, nullptr);
+        m_socket->disconnectFromHost();
+        m_socket = nullptr;
+    }
     if (m_clientSocket) {
         m_clientSocket->disconnectFromHost();
         m_clientSocket = nullptr;
@@ -97,6 +102,9 @@ bool TcpConnection::open()
             ++m_totalConnectionRetries;  // 累计连接重试次数
             m_isReconnectAttempt = true;  // 标记为重连，onSocketConnected中用于计数
             m_socket->abort();  // 中断当前连接，准备重连
+        } else {
+            // 已有socket但处于断开状态 — 清除重连标记
+            m_isReconnectAttempt = false;
         }
 
         updateState(ConnectionState::Connecting);

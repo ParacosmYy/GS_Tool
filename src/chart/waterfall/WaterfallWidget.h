@@ -112,6 +112,10 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     /** @brief 鼠标移动事件处理 */
     void mouseMoveEvent(QMouseEvent *event) override;
+    /** @brief 显示事件 — 恢复滚动定时器 */
+    void showEvent(QShowEvent *event) override;
+    /** @brief 隐藏事件 — 暂停滚动定时器(节省CPU) */
+    void hideEvent(QHideEvent *event) override;
 
 private:
     /** @brief 执行图像滚动，将旧数据上移 */

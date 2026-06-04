@@ -34,6 +34,7 @@ void HeatmapWidget::paintEvent(QPaintEvent *event)
 /** @brief 更新离屏缓存像素图，遍历所有数据单元格进行颜色填充和可选文字绘制 */
 void HeatmapWidget::updatePixmap()
 {
+    if (width() <= 0 || height() <= 0) { m_dirty = false; return; }
     m_cache = QPixmap(size());
     m_cache.fill(Qt::transparent);
     QPainter p(&m_cache);

@@ -12,6 +12,8 @@
 #include <QPaintEvent>
 #include <QResizeEvent>
 #include <QMouseEvent>
+#include <QShowEvent>
+#include <QHideEvent>
 #include <QLinearGradient>
 
 #include "core/theme/ThemeManager.h"
@@ -130,6 +132,20 @@ void WaterfallWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     m_waterfall = QPixmap();
+}
+
+/** @brief 显示事件 — 非暂停状态时恢复滚动定时器 @param event 显示事件 */
+void WaterfallWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (!m_paused) m_scrollTimer.start();
+}
+
+/** @brief 隐藏事件 — 停止滚动定时器以节省CPU @param event 隐藏事件 */
+void WaterfallWidget::hideEvent(QHideEvent *event)
+{
+    QWidget::hideEvent(event);
+    m_scrollTimer.stop();
 }
 
 /** @brief 鼠标移动事件处理，计算光标处的频率索引和幅度值并发送信号 @param event 鼠标事件参数 */

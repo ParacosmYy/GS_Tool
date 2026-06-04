@@ -13,6 +13,9 @@ SignalLineMonitor::SignalLineMonitor(QObject* parent)
 {
     m_pollTimer->setInterval(200);
     m_pollTimer->setSingleShot(false);
+    // 在构造时连接信号，避免重复start/stop导致连接累积
+    connect(m_pollTimer, &QTimer::timeout,
+            this, &SignalLineMonitor::onTick);
 }
 
 /** @brief 析构函数，自动停止轮询 */
@@ -38,9 +41,6 @@ void SignalLineMonitor::startPolling(IConnection* connection)
     // 获取初始状态，避免首次轮询就触发信号
     m_current = m_connection->pinoutSignals();
 
-    connect(m_pollTimer, &QTimer::timeout,
-            this, &SignalLineMonitor::onTick);
-
     m_durationTimer.start();
     m_pollTimer->start();
 }
@@ -50,8 +50,6 @@ void SignalLineMonitor::stopPolling()
 {
     if (m_pollTimer) {
         m_pollTimer->stop();
-        disconnect(m_pollTimer, &QTimer::timeout,
-                   this, &SignalLineMonitor::onTick);
     }
     m_connection = nullptr;
 }

@@ -47,6 +47,11 @@ void TriggerEngine::evaluateData(const QByteArray& data)
         }
         case MatchMode::Regex: {
             /* 正则表达式匹配: 惰性编译并缓存到规则结构体中 */
+            if (rule.pattern.isEmpty()) {
+                ++m_totalErrors;
+                ++m_totalActionErrors;
+                break;  // 跳过空正则(空正则匹配所有输入)
+            }
             if (rule.compiledRegex.pattern() != rule.pattern) {
                 rule.compiledRegex.setPattern(rule.pattern);
             }

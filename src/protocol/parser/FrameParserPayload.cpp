@@ -25,9 +25,15 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
 
     // 路径A: 有长度字段 -> 精确总长接收
     if (m_def.lengthFieldOffset >= 0) {
-        int expectedTotal = m_def.lengthFieldOffset + m_def.lengthFieldSize
-                            + m_expectedPayload + m_def.checksumSize
-                            + m_def.lengthAdjust;
+        // 使用qint64防止大载荷时整数溢出
+        qint64 expectedTotal64 = static_cast<qint64>(m_def.lengthFieldOffset)
+                               + m_def.lengthFieldSize
+                               + m_expectedPayload
+                               + m_def.checksumSize
+                               + m_def.lengthAdjust;
+        int expectedTotal = (expectedTotal64 > effectiveMax)
+                          ? effectiveMax + 1  // 强制触发溢出错误
+                          : static_cast<int>(expectedTotal64);
 
         if (expectedTotal > effectiveMax) {
             m_errorCount++;

@@ -82,7 +82,10 @@ void WebSocketConnection::parseFrames()
         }
 
         int maskSize = masked ? 4 : 0;
-        if (payloadLen > static_cast<quint64>(INT_MAX) - headerSize - maskSize) {
+        // 防止超大帧payload导致OOM(上限16MB)
+        static const quint64 kMaxFramePayload = 16 * 1024 * 1024;
+        if (payloadLen > kMaxFramePayload
+            || payloadLen > static_cast<quint64>(INT_MAX) - headerSize - maskSize) {
             m_buffer.clear();
             return;
         }
