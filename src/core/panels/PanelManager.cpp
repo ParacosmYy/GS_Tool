@@ -77,10 +77,22 @@ quint64 PanelManager::totalPanelsCreated() const { return m_totalPanelsCreated; 
 /** @brief 获取历史最大并发面板数 @return 最大并发数 */
 quint64 PanelManager::maxConcurrentPanels() const { return m_maxConcurrentPanels; }
 
+/** @brief 获取累计面板创建次数 @return 创建次数 */
+quint64 PanelManager::totalPanelCreations() const { return m_totalPanelCreations; }
+
+/** @brief 获取累计面板删除次数 @return 删除次数 */
+quint64 PanelManager::totalPanelDeletions() const { return m_totalPanelDeletions; }
+
+/** @brief 获取累计活跃面板追踪次数 @return 追踪总数 */
+quint64 PanelManager::totalActivePanelsTracked() const { return m_totalActivePanelsTracked; }
+
 /** @brief 重置所有统计计数器为零 */
 void PanelManager::resetStats()
 {
     m_totalPanelSwitches = 0;
     m_totalPanelsCreated = 0;
     m_maxConcurrentPanels = 0;
+    m_totalPanelCreations = 0;
+    m_totalPanelDeletions = 0;
+    m_totalActivePanelsTracked = 0;
 }

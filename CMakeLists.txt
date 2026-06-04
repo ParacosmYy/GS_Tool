@@ -180,6 +180,7 @@ set(SOURCES
 
     # ── F3: 多通道数据导出 ──
     src/utils/export/ChartExporter.cpp
+    src/utils/export/ChartExporterFormats.cpp
     src/utils/export/ExportDialog.cpp
 
     # ── F2: 自定义协议引擎 ──
@@ -244,6 +245,7 @@ set(SOURCES
     src/connection/ble/BleScannerDiscovery.cpp
     src/connection/ble/BleConnection.cpp
     src/connection/ble/BleGattModel.cpp
+    src/connection/ble/BleGattModelQuery.cpp
     src/connection/ble/BleGattBrowser.cpp
     src/connection/ble/BleGattBrowserServices.cpp
     src/connection/ble/BleConfigPanel.cpp
