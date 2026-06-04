@@ -74,6 +74,7 @@ QPair<double, double> ChartModel::globalYRange() const
     return qMakePair(globalMin, globalMax);
 }
 
+/** @brief 获取所有通道的显示名称列表 @return 通道名称字符串列表 */
 QStringList ChartModel::channelNames() const { return m_buffers.keys(); }
 
 /** @brief 获取当前X轴范围(基于帧索引和窗口大小) @return <起始值,结束值> */
@@ -87,18 +88,32 @@ QPair<double, double> ChartModel::xRange() const
     return qMakePair(0.0, static_cast<double>(m_frameIndex) + 10.0);
 }
 
+/** @brief 获取累计接收的数据点总数 @return 数据点计数 */
 qint64 ChartModel::totalPointsReceived() const { return m_totalPoints; }
+
+/** @brief 获取当前帧索引(已解析的帧序号) @return 帧索引 */
 qint64 ChartModel::currentFrameIndex() const { return m_frameIndex; }
 
 // ============================================================================
 // 统计接口
 // ============================================================================
 
+/** @brief 获取累计处理的数据点总数(含历史) @return 数据点计数 */
 quint64 ChartModel::totalDataPoints() const { return m_totalDataPoints; }
+
+/** @brief 获取累计创建的通道数 @return 通道创建计数 */
 quint64 ChartModel::channelsCreated() const { return m_channelsCreated; }
+
+/** @brief 获取累计移除的通道数 @return 通道移除计数 */
 quint64 ChartModel::channelsRemoved() const { return m_channelsRemoved; }
+
+/** @brief 获取当前活跃通道数量 @return 活跃通道计数 */
 quint64 ChartModel::totalChannelsActive() const { return static_cast<quint64>(m_buffers.size()); }
+
+/** @brief 获取所有通道中数据点数量的最大值 @return 最大数据点数 */
 quint64 ChartModel::maxDataPointsInChannel() const { return m_maxDataPointsInChannel; }
+
+/** @brief 获取峰值数据速率(点/秒) @return 峰值速率 */
 double ChartModel::peakDataRate() const { return m_peakDataRate; }
 
 /** @brief 重置所有图表统计计数器(不影响通道数据和配置) */
@@ -114,4 +129,5 @@ void ChartModel::resetChartStatistics()
     m_dataRatePointCount = 0;
 }
 
+/** @brief 重置统计计数器的别名，委托给resetChartStatistics() */
 void ChartModel::resetStats() { resetChartStatistics(); }

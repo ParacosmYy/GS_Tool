@@ -58,6 +58,7 @@ void BleGattBrowser::onTreeItemChanged()
     updateButtonStates();
 }
 
+/** @brief 服务发现完成回调，填充GATT服务树 @param services 发现的服务UUID列表 */
 void BleGattBrowser::onServicesDiscovered(const QStringList& services) { populateTree(services); }
 
 /** @brief 刷新按钮: 重新发现GATT服务 */

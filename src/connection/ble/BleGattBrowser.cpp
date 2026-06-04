@@ -256,6 +256,7 @@ QByteArray BleGattBrowser::parseHexInput(const QString& hexStr) const
     return QByteArray::fromHex(s.toUtf8());
 }
 
+/** @brief 从树控件项中提取特征属性标志位 @param item 树控件项指针 @return 特征属性标志位组合 */
 BleGattBrowser::CharProperties BleGattBrowser::getItemProperties(QTreeWidgetItem* item) const
 {
     if (!item) return CharProperties();
@@ -294,15 +295,24 @@ void BleGattBrowser::updateConnectionStatus()
 }
 
 // ---- 统计信息 ----
+/** @brief 获取累计服务发现次数 @return 服务发现总数 */
 quint64 BleGattBrowser::totalServiceDiscoveries() const { return m_totalServiceDiscoveries; }
+/** @brief 获取累计特征值读取次数 @return 特征值读取总数 */
 quint64 BleGattBrowser::totalCharacteristicReads() const { return m_totalCharacteristicReads; }
+/** @brief 获取累计特征值写入次数 @return 特征值写入总数 */
 quint64 BleGattBrowser::totalCharacteristicWrites() const { return m_totalCharacteristicWrites; }
+/** @brief 获取累计通知接收次数 @return 通知接收总数 */
 quint64 BleGattBrowser::totalNotificationsReceived() const { return m_totalNotificationsReceived; }
+/** @brief 获取累计描述符操作次数 @return 描述符操作总数 */
 quint64 BleGattBrowser::totalDescriptorOps() const { return m_totalDescriptorOps; }
+/** @brief 获取累计读取字节数 @return 读取字节总量 */
 quint64 BleGattBrowser::totalBytesRead() const { return m_totalBytesRead; }
+/** @brief 获取累计写入字节数 @return 写入字节总量 */
 quint64 BleGattBrowser::totalBytesWritten() const { return m_totalBytesWritten; }
+/** @brief 获取最后一次服务发现耗时 @return 发现耗时(毫秒) */
 qint64 BleGattBrowser::lastDiscoveryDurationMs() const { return m_lastDiscoveryDurationMs; }
 
+/** @brief 重置所有统计计数器 */
 void BleGattBrowser::resetStatistics()
 {
     m_totalServiceDiscoveries = m_totalCharacteristicReads = m_totalCharacteristicWrites = 0;

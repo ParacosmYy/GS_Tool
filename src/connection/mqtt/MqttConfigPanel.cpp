@@ -7,6 +7,7 @@
 #include <QFormLayout>
 #include <QHBoxLayout>
 
+/** @brief 构造MQTT配置面板，初始化服务器/认证/KeepAlive/Clean Session配置UI @param parent 父控件 */
 MqttConfigPanel::MqttConfigPanel(QWidget* parent)
     : QWidget(parent)
     , m_hostEdit(new QLineEdit(this))
@@ -93,6 +94,7 @@ MqttConfigPanel::MqttConfigPanel(QWidget* parent)
             this, [this]() { ++m_totalConfigChanges; });
 }
 
+/** @brief 获取当前MQTT连接配置参数 @return 包含host/port/clientId/username/password/keepAlive/cleanSession的配置Map */
 QVariantMap MqttConfigPanel::config() const
 {
     QVariantMap cfg;
@@ -106,6 +108,7 @@ QVariantMap MqttConfigPanel::config() const
     return cfg;
 }
 
+/** @brief 设置连接状态，更新按钮文本和控件可用性 @param connected true=已连接 */
 void MqttConfigPanel::setConnected(bool connected)
 {
     m_connected = connected;
@@ -122,10 +125,7 @@ void MqttConfigPanel::setConnected(bool connected)
     m_cleanSessionCheck->setEnabled(!connected);
 }
 
-/**
- * @brief 保存MQTT配置到QSettings
- * @param settings QSettings对象
- */
+/** @brief 保存MQTT配置到QSettings(不含密码) @param settings QSettings对象 */
 void MqttConfigPanel::saveSettings(QSettings& settings) const
 {
     settings.setValue(QStringLiteral("mqtt/host"), m_hostEdit->text());
@@ -138,10 +138,7 @@ void MqttConfigPanel::saveSettings(QSettings& settings) const
     /* 不保存密码到明文设置 — 安全考虑 */
 }
 
-/**
- * @brief 从QSettings加载MQTT配置
- * @param settings QSettings对象
- */
+/** @brief 从QSettings加载MQTT配置 @param settings QSettings对象 */
 void MqttConfigPanel::loadSettings(QSettings& settings)
 {
     m_hostEdit->setText(
@@ -159,9 +156,7 @@ void MqttConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("mqtt/cleanSession"), true).toBool());
 }
 
-/**
- * @brief 重置所有统计计数器
- */
+/** @brief 重置所有统计计数器 */
 void MqttConfigPanel::resetStatistics()
 {
     m_totalConnectAttempts = 0;

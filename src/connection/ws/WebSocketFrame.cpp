@@ -197,17 +197,29 @@ bool WebSocketConnection::ping(const QByteArray& payload)
 // 统计接口
 // ============================================================================
 
+/** @brief 获取累计WebSocket连接成功次数 @return 连接成功总数 */
 quint64 WebSocketConnection::totalConnections() const { return m_totalConnections; }
+/** @brief 获取累计发送消息数 @return 发送消息总数 */
 quint64 WebSocketConnection::totalMessagesSent() const { return m_totalMessagesSent; }
+/** @brief 获取累计接收消息数 @return 接收消息总数 */
 quint64 WebSocketConnection::totalMessagesReceived() const { return m_totalMessagesReceived; }
+/** @brief 获取累计发送字节数 @return 发送字节总量 */
 quint64 WebSocketConnection::totalBytesSent() const { return m_totalBytesSent; }
+/** @brief 获取累计接收字节数 @return 接收字节总量 */
 quint64 WebSocketConnection::totalBytesReceived() const { return m_totalBytesReceived; }
+/** @brief 获取累计错误次数 @return 错误总数 */
 quint64 WebSocketConnection::errorCount() const { return m_errorCount; }
+/** @brief 获取累计发送帧数 @return 帧发送总数 */
 quint64 WebSocketConnection::totalFramesSent() const { return m_totalFramesSent; }
+/** @brief 获取累计接收帧数 @return 帧接收总数 */
 quint64 WebSocketConnection::totalFramesReceived() const { return m_totalFramesReceived; }
+/** @brief 获取累计发送文本帧数 @return 文本帧发送总数 */
 quint64 WebSocketConnection::totalTextFrames() const { return m_totalTextFrames; }
+/** @brief 获取累计发送二进制帧数 @return 二进制帧发送总数 */
 quint64 WebSocketConnection::totalBinaryFrames() const { return m_totalBinaryFrames; }
+/** @brief 获取累计发送ping帧数 @return ping帧发送总数 */
 quint64 WebSocketConnection::totalPingFrames() const { return m_totalPingFrames; }
+/** @brief 获取累计接收pong帧数 @return pong帧接收总数 */
 quint64 WebSocketConnection::totalPongFrames() const { return m_totalPongFrames; }
 
 /** @brief 获取ping/pong交互总次数 @return ping帧发送数+pong帧接收数 */

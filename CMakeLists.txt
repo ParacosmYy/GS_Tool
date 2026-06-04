@@ -38,6 +38,7 @@ set(SOURCES
     src/core/mainwindow/MainWindowPanelConnect.cpp
     src/core/mainwindow/MainWindowLifecycle.cpp
     src/core/connect/ConnectionController.cpp
+    src/core/connect/ConnectionControllerQuery.cpp
     src/core/connect/ConnectionControllerReconnect.cpp
     src/core/connect/ConnectionControllerHandlers.cpp
     src/core/recording/RecordingController.cpp
@@ -125,6 +126,7 @@ set(SOURCES
     src/protocol/parser/FrameParserStateHandlers.cpp
     src/protocol/parser/FrameParserStats.cpp
     src/protocol/view/ProtocolView.cpp
+    src/protocol/view/ProtocolViewDisplay.cpp
     src/protocol/view/ProtocolViewMenu.cpp
     src/protocol/editor/FrameVisualEditor.cpp
     src/protocol/editor/FrameVisualEditorFields.cpp
