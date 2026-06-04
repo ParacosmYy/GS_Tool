@@ -218,6 +218,7 @@ set(SOURCES
     # ── F5: 仪表盘 ──
     src/dashboard/DashboardWidget.cpp
     src/dashboard/DashboardWidgetSerialization.cpp
+    src/dashboard/DashboardWidgetSlots.cpp
     src/dashboard/GaugeWidget.cpp
     src/dashboard/ProgressBarWidget.cpp
     src/dashboard/LedIndicatorWidget.cpp
