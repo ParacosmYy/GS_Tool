@@ -47,29 +47,129 @@ signals:
     void clearRequested();
 
 public:
+    /**
+     * @brief 构造终端控件
+     * @param parent 父Widget指针
+     */
     explicit TerminalWidget(QWidget* parent = nullptr);
+
+    /**
+     * @brief 设置数据模型
+     * @param model TerminalModel指针，提供终端数据源
+     */
     void setModel(TerminalModel* model);
+
+    /**
+     * @brief 设置方向过滤器(仅显示指定方向的数据)
+     * @param direction 数据方向(RX/TX/Both)
+     */
     void setDirectionFilter(DataDirection direction);
+
+    /** @brief 清除方向过滤器，恢复显示所有数据 */
     void clearDirectionFilter();
+
+    /**
+     * @brief 设置显示模式
+     * @param mode 显示模式(Text/Hex/Mixed/Decimal)
+     */
     void setDisplayMode(DisplayMode mode);
+
+    /**
+     * @brief 获取当前显示模式
+     * @return 当前DisplayMode枚举值
+     */
     DisplayMode displayMode() const;
+
+    /**
+     * @brief 设置是否显示时间戳
+     * @param show true=显示时间戳
+     */
     void setShowTimestamp(bool show);
+
+    /**
+     * @brief 查询时间戳显示状态
+     * @return true=时间戳已启用
+     */
     bool showTimestamp() const;
+
+    /**
+     * @brief 设置是否显示方向前缀(RX/TX)
+     * @param show true=显示方向前缀
+     */
     void setShowDirectionPrefix(bool show);
+
+    /**
+     * @brief 查询方向前缀显示状态
+     * @return true=方向前缀已启用
+     */
     bool showDirectionPrefix() const;
+
+    /**
+     * @brief 设置自动滚屏
+     * @param autoScroll true=新数据自动滚动到底部
+     */
     void setAutoScroll(bool autoScroll);
+
+    /**
+     * @brief 查询自动滚屏状态
+     * @return true=自动滚屏已启用
+     */
     bool autoScroll() const;
+
+    /** @brief 清空终端内容 */
     void clear();
+
+    /**
+     * @brief 获取当前选中的文本
+     * @return 选中区域的纯文本，无选中时返回空字符串
+     */
     QString selectedText() const;
+
+    /**
+     * @brief 设置搜索高亮模式
+     * @param pattern 搜索模式串(纯文本/正则/HEX)
+     * @param regex true=正则模式
+     * @param hex true=HEX模式
+     * @param caseSensitive true=区分大小写，默认false
+     * @param wholeWord true=全词匹配，默认false
+     */
     void setSearchHighlight(const QString& pattern, bool regex, bool hex,
                             bool caseSensitive = false, bool wholeWord = false);
+
+    /** @brief 清除搜索高亮 */
     void clearSearchHighlight();
+
+    /**
+     * @brief 获取搜索匹配总数
+     * @return 匹配数量，无搜索时返回0
+     */
     int searchMatchCount() const;
+
+    /**
+     * @brief 获取当前高亮的匹配索引
+     * @return 当前匹配索引(从0开始)，无搜索时返回-1
+     */
     int currentMatchIndex() const;
+
+    /**
+     * @brief 获取搜索管理器指针
+     * @return TerminalSearchManager指针
+     */
     TerminalSearchManager* searchManager() const;
+
+    /** @brief 跳转到下一个搜索匹配 */
     void gotoNextMatch();
+
+    /** @brief 跳转到上一个搜索匹配 */
     void gotoPrevMatch();
+
+    /** @brief 全选终端内容 */
     void selectAll();
+
+    /**
+     * @brief 返回控件推荐尺寸
+     * @return 推荐的QSize
+     */
     QSize sizeHint() const override;
 
 protected:

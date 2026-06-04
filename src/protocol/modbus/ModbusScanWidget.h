@@ -26,9 +26,10 @@ class ModbusScanWidget : public QWidget {
     Q_OBJECT
 
 public:
+    /** @brief 构造Modbus从站地址扫描器 @param parent 父控件指针 */
     explicit ModbusScanWidget(QWidget* parent = nullptr);
 
-    /** @brief 设置Modbus主站实例 */
+    /** @brief 设置Modbus主站实例 @param master ModbusMaster指针，用于发送探测请求 */
     void setModbusMaster(ModbusMaster* master);
 
     /**

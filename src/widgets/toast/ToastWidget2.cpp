@@ -3,6 +3,7 @@
  * @brief Toast通知组件v2实现 — 自动消失的悬浮提示(成功/警告/错误/信息)
  */
 #include "widgets/toast/ToastWidget2.h"
+#include "core/theme/ThemeManager.h"
 #include <QPainter>
 #include <QVBoxLayout>
 #include <QMouseEvent>
@@ -33,6 +34,12 @@ void ToastWidget::setupUi() {
 /** @brief 显示Toast消息 @param text 消息文本 @param type Toast类型 @param ms 显示时长(毫秒) */
 void ToastWidget::showMessage(const QString &text, ToastType type, int ms) {
     ++m_totalMessages;
+    switch (type) {
+    case Info: ++m_totalInfo; break;
+    case Success: ++m_totalSuccess; break;
+    case Warning: ++m_totalWarning; break;
+    case Error: ++m_totalError; break;
+    }
     m_type = type; m_label->setText(text); updateStyle();
     m_timer->start(ms); show(); raise();
 }
@@ -51,16 +58,17 @@ bool ToastWidget::isVisible() const { return QWidget::isVisible(); }
 /** @brief 设置Toast显示位置 @param c 屏幕角落 */
 void ToastWidget::setPosition(Qt::Corner c) { m_corner = c; }
 
-/** @brief 绘制Toast背景 — 按类型着色的圆角矩形 */
+/** @brief 绘制Toast背景 — 使用ThemeManager语义色的圆角矩形 */
 void ToastWidget::paintEvent(QPaintEvent *) {
     QPainter p(this); p.setRenderHint(QPainter::Antialiasing);
     QColor bg;
     switch (m_type) {
-    case Success: bg = QColor(46, 125, 50, 220); break;
-    case Warning: bg = QColor(237, 162, 0, 220); break;
-    case Error: bg = QColor(198, 40, 40, 220); break;
-    case Info: default: bg = QColor(33, 150, 243, 220); break;
+    case Success: bg = ThemeManager::instance().color(ThemeManager::SemanticColor::Success); break;
+    case Warning: bg = ThemeManager::instance().color(ThemeManager::SemanticColor::Warning); break;
+    case Error: bg = ThemeManager::instance().color(ThemeManager::SemanticColor::Error); break;
+    case Info: default: bg = ThemeManager::instance().color(ThemeManager::SemanticColor::Accent); break;
     }
+    bg.setAlpha(220);
     p.setBrush(bg); p.setPen(Qt::NoPen);
     p.drawRoundedRect(rect(), 8, 8);
 }

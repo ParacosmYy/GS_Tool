@@ -44,10 +44,13 @@ ExportDialog::ExportDialog(QWidget* parent)
     , m_formatCombo(nullptr)
     , m_pathEdit(nullptr)
     , m_exportBtn(nullptr)
+    , m_browseBtn(nullptr)
+    , m_cancelBtn(nullptr)
 {
     setObjectName("ExportDialog");
     setWindowTitle(tr("导出数据"));
     setupUI();
+    setupConnections();
 }
 
 // ---------------------------------------------------------------------------
@@ -107,8 +110,9 @@ void ExportDialog::setupUI()
 
     auto* browseBtn = new QPushButton(tr("浏览..."), this);
     browseBtn->setObjectName("browseBtn");
+    m_browseBtn = browseBtn;
     pathRow->addWidget(m_pathEdit, 1);
-    pathRow->addWidget(browseBtn);
+    pathRow->addWidget(m_browseBtn);
 
     formLayout->addRow(tr("文件路径:"), pathRow);
     mainLayout->addLayout(formLayout);
@@ -123,85 +127,11 @@ void ExportDialog::setupUI()
 
     auto* cancelBtn = new QPushButton(tr("取消"), this);
     cancelBtn->setObjectName("cancelBtn");
+    m_cancelBtn = cancelBtn;
 
     btnLayout->addWidget(m_exportBtn);
     btnLayout->addWidget(cancelBtn);
     mainLayout->addLayout(btnLayout);
 
-    /* --- 信号连接 --- */
-
-    // 浏览按钮：弹出文件保存对话框，根据当前格式更新默认扩展名
-    connect(browseBtn, &QPushButton::clicked, this, [this]() {
-        int idx = m_formatCombo->currentIndex();
-        QString ext;
-        QString filter;
-
-        switch (idx) {
-        case 0:  // CSV
-            ext    = "csv";
-            filter = tr("CSV 文件 (*.csv)");
-            break;
-        case 1:  // JSON
-            ext    = "json";
-            filter = tr("JSON 文件 (*.json)");
-            break;
-        case 2:  // PNG
-            ext    = "png";
-            filter = tr("PNG 图片 (*.png)");
-            break;
-        case 3:  // SVG
-            ext    = "svg";
-            filter = tr("SVG 文件 (*.svg)");
-            break;
-        default:
-            ext    = "csv";
-            filter = tr("所有文件 (*)");
-            break;
-        }
-
-        QString path = QFileDialog::getSaveFileName(
-            this, tr("选择导出文件"), m_pathEdit->text(), filter);
-
-        if (!path.isEmpty()) {
-            // 自动追加默认扩展名
-            if (!path.endsWith(QString(".%1").arg(ext), Qt::CaseInsensitive)) {
-                path += QString(".%1").arg(ext);
-            }
-            m_pathEdit->setText(path);
-        }
-    });
-
-    // 导出按钮：关闭对话框并发出 exportRequested 信号
-    connect(m_exportBtn, &QPushButton::clicked, this, [this]() {
-        ++m_totalExports;
-        emit exportRequested(m_pathEdit->text(), m_formatCombo->currentIndex());
-        accept();
-    });
-
-    // 取消按钮：关闭对话框
-    connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
-
-    // 格式切换：更新路径中的文件扩展名
-    connect(m_formatCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, [this](int index) {
-        ++m_totalFormatChanges;
-        QString path = m_pathEdit->text();
-        if (path.isEmpty()) {
-            return;
-        }
-
-        // 移除旧扩展名，追加新的
-        for (const auto* oldExt : s_defaultExtensions) {
-            if (path.endsWith(QString(oldExt), Qt::CaseInsensitive)) {
-                path.chop(static_cast<int>(qstrlen(oldExt)));
-                break;
-            }
-        }
-
-        if (index >= 0 && index < 4) {
-            path += QString(s_defaultExtensions[index]);
-        }
-
-        m_pathEdit->setText(path);
-    });
+    /* --- 信号连接见 setupConnections() (ExportDialogSlots.cpp) --- */
 }

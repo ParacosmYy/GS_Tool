@@ -127,6 +127,7 @@ bool TlsConnection::open()
             });
 
     updateState(ConnectionState::Connecting);
+    ++m_totalOpens;
     m_socket->connectToHostEncrypted(m_host, m_port);
     return true;
 }
@@ -134,6 +135,7 @@ bool TlsConnection::open()
 /** @brief 关闭TLS连接，断开信号并释放SSL socket */
 void TlsConnection::close()
 {
+    ++m_totalCloses;
     if (m_socket) {
         disconnect(m_socket, nullptr, this, nullptr);  // 断开所有信号防止析构期间回调
         m_socket->disconnectFromHost();
@@ -146,6 +148,7 @@ void TlsConnection::close()
 /** @brief 发送加密数据 @param data 待发送数据 @return 发送字节数，未连接返回-1 */
 qint64 TlsConnection::write(const QByteArray& data)
 {
+    ++m_totalWrites;
     if (!m_socket || m_state != ConnectionState::Connected) {
         return -1;
     }

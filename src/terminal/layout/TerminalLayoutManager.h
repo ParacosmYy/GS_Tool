@@ -17,14 +17,22 @@ class TerminalLayoutManager : public QObject {
     Q_OBJECT
 
 public:
-    explicit TerminalLayoutManager(QObject* parent = nullptr); ///< 构造
-    ~TerminalLayoutManager() override = default; ///< 析构
-    void initialize(TerminalWidget* mainTerminal, TerminalSearchBar* searchBar); ///< 初始化(传入主终端+搜索栏)
-    void setTerminalModel(TerminalModel* model); ///< 设置共享数据模型(须在initialize()后调用)
-    QWidget* container() const;              ///< 获取终端容器widget(随布局模式变化)
-    TerminalLayout layout() const;           ///< 获取当前布局模式
-    QList<TerminalWidget*> terminalWidgets() const; ///< 获取当前活动终端widget列表
-    TerminalWidget* primaryTerminal() const; ///< 获取主终端widget(分栏模式下为RX终端)
+    /** @brief 构造终端布局管理器 @param parent 父对象(通常为MainWindow) */
+    explicit TerminalLayoutManager(QObject* parent = nullptr);
+    /** @brief 析构函数 */
+    ~TerminalLayoutManager() override = default;
+    /** @brief 初始化布局管理器 @param mainTerminal 主终端控件指针 @param searchBar 搜索栏控件指针 */
+    void initialize(TerminalWidget* mainTerminal, TerminalSearchBar* searchBar);
+    /** @brief 设置共享数据模型(须在initialize()后调用) @param model TerminalModel指针 */
+    void setTerminalModel(TerminalModel* model);
+    /** @brief 获取终端容器widget @return 容器Widget指针 */
+    QWidget* container() const;
+    /** @brief 获取当前布局模式 @return TerminalLayout枚举值 */
+    TerminalLayout layout() const;
+    /** @brief 获取当前活动终端widget列表 @return 终端控件指针列表 */
+    QList<TerminalWidget*> terminalWidgets() const;
+    /** @brief 获取主终端widget @return 主终端指针，分栏模式下返回RX终端 */
+    TerminalWidget* primaryTerminal() const;
 
     // ---- 统计计数器 ----
 

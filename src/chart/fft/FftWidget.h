@@ -35,13 +35,19 @@ public:
     explicit FftWidget(ChartModel* model, QWidget* parent = nullptr);
     /** @brief 设置采样率(Hz)，默认1000Hz @param rate 采样率 */
     void setSampleRate(double rate);
-    double sampleRate() const; ///< 当前采样率
+    /** @brief 获取当前采样率 @return 采样率(Hz) */
+    double sampleRate() const;
     // ---- 统计计数接口 ----
-    quint64 totalTransforms() const;      ///< 累计FFT变换次数
-    quint64 totalPeakSearches() const;    ///< 峰值搜索次数
-    quint64 totalWindowChanges() const;   ///< 窗函数变更次数
-    quint64 totalSizeChanges() const;     ///< FFT大小变更次数
-    void resetFftWidgetStatistics();      ///< 重置统计计数器
+    /** @brief 获取累计FFT变换次数 @return FFT变换计数 */
+    quint64 totalTransforms() const;
+    /** @brief 获取峰值搜索次数 @return 峰值搜索计数 */
+    quint64 totalPeakSearches() const;
+    /** @brief 获取窗函数变更次数 @return 窗函数变更计数 */
+    quint64 totalWindowChanges() const;
+    /** @brief 获取FFT大小变更次数 @return FFT大小变更计数 */
+    quint64 totalSizeChanges() const;
+    /** @brief 重置统计计数器 */
+    void resetFftWidgetStatistics();
 
 public slots:
     void refreshSpectrum(); ///< 刷新频谱(从ChartModel读数据经FftEngine计算更新图表)

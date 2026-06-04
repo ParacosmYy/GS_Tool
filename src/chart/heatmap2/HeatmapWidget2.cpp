@@ -4,6 +4,7 @@
  */
 
 #include "chart/heatmap2/HeatmapWidget2.h"
+#include "core/theme/ThemeManager.h"
 #include <QPainter>
 #include <QMouseEvent>
 #include <QtMath>
@@ -43,11 +44,12 @@ void HeatmapWidget::paintEvent(QPaintEvent *) {
     m_totalRepaints++;
     QPainter p(this); p.setRenderHint(QPainter::Antialiasing, false);
     if (m_data.isEmpty()) return;
+    QColor gridColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Border);
     for (int r = 0; r < m_data.size(); ++r) {
         for (int c = 0; c < m_data[r].size(); ++c) {
             QColor color = valueToColor(m_data[r][c]);
             p.setBrush(color);
-            p.setPen(m_gridVisible ? QColor(40,40,40) : Qt::NoPen);
+            p.setPen(m_gridVisible ? gridColor : Qt::NoPen);
             p.drawRect(c*m_cellW, r*m_cellH, m_cellW, m_cellH);
         }
     }

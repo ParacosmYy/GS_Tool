@@ -55,46 +55,69 @@ public:
     /** @brief 禁止拷贝赋值 */
     ProtocolBridgeManager& operator=(const ProtocolBridgeManager&) = delete;
 
-    void setProtocolMode(ChartProtocolMode mode);              ///< 设置协议模式(切换时重置旧源、激活新源)
-    ChartProtocolMode protocolMode() const;                    ///< 获取当前协议模式
-    void feedData(const QByteArray& data);                     ///< 接收原始串口数据，路由到活动协议源
-    IProtocolBridge* activeBridge() const;                     ///< 获取当前活动桥指针(FrameParser模式为nullptr)
-    FrameParser* frameParser() const;                          ///< 获取FrameParser指针
-    JustFloatBridge* justFloatBridge() const;                  ///< 获取JustFloatBridge指针
-    FireWaterBridge* fireWaterBridge() const;                  ///< 获取FireWaterBridge指针
+    /** @brief 设置协议模式(切换时重置旧源、激活新源) @param mode 协议模式枚举 */
+    void setProtocolMode(ChartProtocolMode mode);
+    /** @brief 获取当前协议模式 @return 当前ChartProtocolMode枚举值 */
+    ChartProtocolMode protocolMode() const;
+    /** @brief 接收原始串口数据，路由到活动协议源 @param data 原始串口字节数据 */
+    void feedData(const QByteArray& data);
+    /** @brief 获取当前活动桥指针 @return 活动IProtocolBridge指针，FrameParser模式返回nullptr */
+    IProtocolBridge* activeBridge() const;
+    /** @brief 获取FrameParser指针 @return FrameParser指针 */
+    FrameParser* frameParser() const;
+    /** @brief 获取JustFloatBridge指针 @return JustFloatBridge指针 */
+    JustFloatBridge* justFloatBridge() const;
+    /** @brief 获取FireWaterBridge指针 @return FireWaterBridge指针 */
+    FireWaterBridge* fireWaterBridge() const;
 
     // ---- 桥接器状态查询 ----
-    BridgeStats bridgeStats() const;                           ///< 获取活动桥接器运行时统计
-    bool isParsing() const;                                    ///< 查询活动桥接器是否在解析
-    quint64 totalFramesParsed() const;                         ///< 活动桥接器累计成功解析帧数
-    quint64 totalErrors() const;                               ///< 活动桥接器累计解析错误次数
-    quint64 checksumErrors() const;                            ///< 活动桥接器累计校验错误(仅FrameParser)
+    /** @brief 获取活动桥接器运行时统计 @return BridgeStats结构体 */
+    BridgeStats bridgeStats() const;
+    /** @brief 查询活动桥接器是否在解析 @return true=正在解析 */
+    bool isParsing() const;
+    /** @brief 获取活动桥接器累计成功解析帧数 @return 解析帧计数 */
+    quint64 totalFramesParsed() const;
+    /** @brief 获取活动桥接器累计解析错误次数 @return 错误计数 */
+    quint64 totalErrors() const;
+    /** @brief 获取活动桥接器累计校验错误(仅FrameParser) @return 校验错误计数 */
+    quint64 checksumErrors() const;
 
     // ---- 管理器级统计 ----
-    quint64 totalBridges() const;                              ///< 累计桥接器切换次数
-    quint64 totalFramesParsedAll() const;                      ///< 所有协议源累计解析帧数
-    quint64 totalParseErrors() const;                          ///< 所有协议源累计解析错误数
-    quint64 totalBytesProcessed() const;                       ///< 累计处理字节总数
+    /** @brief 获取累计桥接器切换次数 @return 切换计数 */
+    quint64 totalBridges() const;
+    /** @brief 获取所有协议源累计解析帧数 @return 总解析帧计数 */
+    quint64 totalFramesParsedAll() const;
+    /** @brief 获取所有协议源累计解析错误数 @return 总错误计数 */
+    quint64 totalParseErrors() const;
+    /** @brief 获取累计处理字节总数 @return 总字节数 */
+    quint64 totalBytesProcessed() const;
 
     // ---- 每协议统计 ----
-    ProtocolStats protocolStats(ChartProtocolMode mode) const; ///< 获取指定协议累计统计
-    QMap<ChartProtocolMode, ProtocolStats> allProtocolStats() const; ///< 所有协议统计汇总
+    /** @brief 获取指定协议累计统计 @param mode 协议模式 @return 该协议的ProtocolStats */
+    ProtocolStats protocolStats(ChartProtocolMode mode) const;
+    /** @brief 获取所有协议统计汇总 @return 模式到统计的QMap */
+    QMap<ChartProtocolMode, ProtocolStats> allProtocolStats() const;
 
     // ---- 吞吐量 ----
-    ThroughputSnapshot throughput() const;                     ///< 当前吞吐量快照(1秒滑动窗口)
+    /** @brief 获取当前吞吐量快照(1秒滑动窗口) @return ThroughputSnapshot结构体 */
+    ThroughputSnapshot throughput() const;
 
     // ---- 自动检测 ----
     /** @brief 从数据流自动检测协议类型(JustFloat/FireWater/FrameParser) @param data 采样数据(≥64字节) @return 检测结果 */
     AutoDetectResult detectProtocol(const QByteArray& data) const;
-    void setAutoDetectEnabled(bool enable);                    ///< 启用/禁用自动检测(feedData时自动推断)
-    bool isAutoDetectEnabled() const;                          ///< 查询自动检测开关
-    AutoDetectResult lastAutoDetectResult() const;             ///< 最后一次自动检测结果
+    /** @brief 启用/禁用自动检测(feedData时自动推断) @param enable true=启用 */
+    void setAutoDetectEnabled(bool enable);
+    /** @brief 查询自动检测开关 @return true=自动检测已启用 */
+    bool isAutoDetectEnabled() const;
+    /** @brief 获取最后一次自动检测结果 @return AutoDetectResult结构体 */
+    AutoDetectResult lastAutoDetectResult() const;
 
     // ---- 运行时动态切换 ----
     /** @brief 动态切换活跃桥接器(不中断数据流、不重置旧源状态，适合快速切换) */
     void switchActiveBridge(ChartProtocolMode mode);
 
-    void resetStats();                                         ///< 重置所有统计，不影响运行状态
+    /** @brief 重置所有统计，不影响运行状态 */
+    void resetStats();
 
 signals:
     void frameParsed(const QVariantMap& fields, const QByteArray& rawFrame); ///< 转发活动源帧解析成功

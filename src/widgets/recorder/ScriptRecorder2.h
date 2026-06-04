@@ -122,6 +122,8 @@ private:
     quint64 m_totalRecords = 0;      ///< 总录制条目数
     quint64 m_totalPlaybacks = 0;    ///< 总回放次数
     quint64 m_totalPlaybackActions = 0; ///< 总回放动作数
+    quint64 m_totalClears = 0;       ///< 总清空录制条目次数
+    quint64 m_totalSpeedChanges = 0; ///< 总回放速度变更次数
 
 public:
     /** @brief 获取总录制条目数 @return 累计录制条目 */
@@ -130,6 +132,10 @@ public:
     quint64 totalPlaybacks() const { return m_totalPlaybacks; }
     /** @brief 获取总回放动作数 @return 累计回放动作 */
     quint64 totalPlaybackActions() const { return m_totalPlaybackActions; }
+    /** @brief 获取总清空录制条目次数 @return 累计清空次数 */
+    quint64 totalClears() const { return m_totalClears; }
+    /** @brief 获取总回放速度变更次数 @return 累计速度变更次数 */
+    quint64 totalSpeedChanges() const { return m_totalSpeedChanges; }
     /** @brief 重置录制器统计 */
-    void resetRecorderStatistics() { m_totalRecords = 0; m_totalPlaybacks = 0; m_totalPlaybackActions = 0; }
+    void resetRecorderStatistics() { m_totalRecords = 0; m_totalPlaybacks = 0; m_totalPlaybackActions = 0; m_totalClears = 0; m_totalSpeedChanges = 0; }
 };

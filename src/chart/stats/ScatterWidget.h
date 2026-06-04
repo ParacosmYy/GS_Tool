@@ -38,16 +38,26 @@ public slots:
     void refreshPlot(); ///< 刷新散点图，从ChartModel读取当前X/Y通道数据并计算Pearson相关系数
 
     // ---- 统计计数接口 ----
-    quint64 totalPointsPlotted() const;  ///< 累计绘制点数
-    quint64 totalPointsAdded() const;    ///< 累计添加点数(每次刷新时新增的散点数)
-    quint64 totalPointsRemoved() const;  ///< 累计移除点数(数据清空时清除的散点数)
-    quint64 totalAutoFits() const;       ///< 累计自动拟合次数(坐标轴范围自适应)
-    quint64 totalAxisChanges() const;    ///< 累计轴变更次数(X/Y通道切换触发)
-    quint64 totalSelections() const;     ///< 累计选择次数(数据刷新时的散点集替换)
-    quint64 totalUpdates() const;        ///< 累计更新次数（含手动/自动刷新）
-    quint64 totalClears() const;         ///< 累计清除次数
-    int pointDensityMax() const;         ///< 最近一次刷新的点密度网格最大值
-    double averageValue() const;         ///< 最近一次刷新的所有散点Y值平均
+    /** @brief 获取累计绘制点数 @return 绘制点计数 */
+    quint64 totalPointsPlotted() const;
+    /** @brief 获取累计添加点数 @return 每次刷新时新增的散点数 */
+    quint64 totalPointsAdded() const;
+    /** @brief 获取累计移除点数 @return 数据清空时清除的散点数 */
+    quint64 totalPointsRemoved() const;
+    /** @brief 获取累计自动拟合次数 @return 坐标轴范围自适应次数 */
+    quint64 totalAutoFits() const;
+    /** @brief 获取累计轴变更次数 @return X/Y通道切换触发次数 */
+    quint64 totalAxisChanges() const;
+    /** @brief 获取累计选择次数 @return 数据刷新时的散点集替换次数 */
+    quint64 totalSelections() const;
+    /** @brief 获取累计更新次数 @return 含手动/自动刷新的更新计数 */
+    quint64 totalUpdates() const;
+    /** @brief 获取累计清除次数 @return 清除计数 */
+    quint64 totalClears() const;
+    /** @brief 获取最近一次刷新的点密度网格最大值 @return 密度网格最大值 */
+    int pointDensityMax() const;
+    /** @brief 获取最近一次刷新的所有散点Y值平均 @return Y值平均值 */
+    double averageValue() const;
     /** @brief 获取累计散点数据更新次数(refreshPlot中有效数据绘制) */
     quint64 totalPointUpdates() const { return m_totalPointUpdates; }
     /** @brief 获取累计坐标轴自动缩放次数 */

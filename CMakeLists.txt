@@ -118,7 +118,10 @@ set(SOURCES
     src/core/theme/QssThemeGeneratorPanels.cpp
     src/core/theme/QssThemeGeneratorColors.cpp
     src/core/animation/AnimationUtility.cpp
+    src/core/animation/AnimationUtilityEffects.cpp
     src/core/theme/IconManager.cpp
+    src/core/icons/SvgIconProvider.cpp
+    src/core/icons/SvgIconProviderPrivate.cpp
     src/connection/serial_port/SerialConnection.cpp
     src/connection/serial_port/SerialConnectionError.cpp
     src/connection/serial_port/SerialConnectionUtility.cpp
@@ -307,6 +310,7 @@ set(SOURCES
     src/utils/export/ChartExporterFormats.cpp
     src/utils/export/ChartExporterImage.cpp
     src/utils/export/ExportDialog.cpp
+    src/utils/export/ExportDialogSlots.cpp
 
     # ── F2: 自定义协议引擎 ──
     src/protocol/schema/ProtocolSchema.cpp
@@ -356,6 +360,7 @@ set(SOURCES
     src/rtt/JLinkSdkLoaderQuery.cpp
     src/rtt/JLinkSdkLoaderRtt.cpp
     src/rtt/RttConfigPanel.cpp
+    src/rtt/RttConfigPanelSettings.cpp
     src/rtt/RttChannelManager.cpp
 
     # ── F7: 自动化触发 ──
@@ -395,6 +400,7 @@ set(SOURCES
 
     # ── F12: Bluetooth/BLE 调试 ──
     src/connection/ble/BleScanner.cpp
+    src/connection/ble/BleScannerStats.cpp
     src/connection/ble/BleScannerDiscovery.cpp
     src/connection/ble/BleScannerFilter.cpp
     src/connection/ble/BleConnection.cpp
@@ -553,6 +559,7 @@ set(SOURCES
     # ── F26: 设备注册表 ──
     src/core/device/DeviceRegistry.cpp
     src/core/device/DeviceProfilePanel.cpp
+    src/core/device/DeviceProfilePanelActions.cpp
 )
 
 set(HEADERS

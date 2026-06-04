@@ -112,6 +112,8 @@ private:
     quint64 m_totalFftRuns = 0;           ///< 总FFT运算次数
     quint64 m_totalPcmBytes = 0;          ///< 总输入PCM字节数
     quint64 m_totalRepaints = 0;          ///< 总重绘次数
+    quint64 m_totalPeakChanges = 0;       ///< 总峰值频率变化次数
+    quint64 m_totalConfigChanges = 0;     ///< 总配置变更次数
 
 public:
     /** @brief 获取总FFT运算次数 @return 累计FFT次数 */
@@ -120,6 +122,10 @@ public:
     quint64 totalPcmBytes() const { return m_totalPcmBytes; }
     /** @brief 获取总重绘次数 @return 累计重绘 */
     quint64 totalRepaints() const { return m_totalRepaints; }
+    /** @brief 获取总峰值频率变化次数 @return 累计峰值变化次数 */
+    quint64 totalPeakChanges() const { return m_totalPeakChanges; }
+    /** @brief 获取总配置变更次数 @return 累计配置变更次数 */
+    quint64 totalConfigChanges() const { return m_totalConfigChanges; }
     /** @brief 重置频谱统计计数器 */
-    void resetSpectrumStatistics() { m_totalFftRuns = 0; m_totalPcmBytes = 0; m_totalRepaints = 0; }
+    void resetSpectrumStatistics() { m_totalFftRuns = 0; m_totalPcmBytes = 0; m_totalRepaints = 0; m_totalPeakChanges = 0; m_totalConfigChanges = 0; }
 };

@@ -115,6 +115,8 @@
 | 279 | SignalLineWidgetStats/TriggerManagerStats/ProtocolTemplateLibraryBuiltins/UsbDescriptorViewerTree拆分 | 信号线控件统计独立+触发器管理器统计独立+协议模板内置构造独立+USB描述符树构建独立+SerialDetector静态成员修复 |
 | 278 | NumericDisplayWidgetPaint/HeatmapWidgetPaint/BookmarkWidgetStats/PerformanceOverlayStats拆分 | 数值绘制独立(NumericDisplayWidget 161→64行)+热力图渲染独立(HeatmapWidget 201→139行)+书签统计独立(BookmarkWidget 193→176行)+性能叠加层统计独立(PerformanceOverlay 183→119行) |
 | 279 | WebSocket/BLE/SerialConfig/SerialDetector/OtaManager/OtaWidget/XModem/YModem/ZModem统计增强+TriggerManagerStats/ChartWidgetSlots/UsbDescriptorViewerTree/ModbusSlaveStats/FlatBuffersDecoderRead拆分 | WebSocket握手统计+BLE resetStats修复+串口波特率/流控统计+芯片识别静态化+OTA CRC/浏览/取消+X/Y/ZModem超时/取消+编译修复 |
+| 280-284 | 持续统计增强+文件拆分+Doxygen审计+编译修复 | 多模块统计增强(ChecksumCalculator/ConverterPanel/RttConfigPanel/JLinkRttConnection/IconManager/PlaybackWidget/DataExporter/NavigationController等)+文件拆分(CursorOverlayPaintMain/ZModemTransferDispatch/TerminalSearchBarAnimation等) |
+| 285 | ClipboardManager/DataPipeline/ConnectionManager/NotificationManager/ShortcutManager/DataAggregator/SettingsManager/ResponsiveLayout统计增强+6文件拆分+Doxygen审计 | 8模块统计增强(hex/base64/restores/bytesCopied+pipeline stage/output+connection serial/network+notification critical/high+shortcut unregister/category+aggregator reset/timeWindow+settings sync/group)+FrameVisualEditorPreview/BleScannerFilter/ProtobufDecoderField/ProtocolEngineCore/TerminalHighlighterHighlight/PanelManagerFactorySystem拆分+11文件Doxygen补全 |
 
 ---
 

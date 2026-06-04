@@ -143,6 +143,9 @@ private:
     quint64 m_totalRepaints = 0;          ///< 总重绘次数
     quint64 m_totalTriggers = 0;          ///< 总触发次数
     quint64 m_totalOverflows = 0;         ///< 总溢出次数
+    quint64 m_totalClears = 0;            ///< 总数据清空次数
+    quint64 m_totalScaleChanges = 0;      ///< 总刻度变更次数
+    quint64 m_totalChannelChanges = 0;    ///< 总通道数变更次数
 
 public:
     /** @brief 获取总采样点数 @return 累计采样点 */
@@ -153,6 +156,12 @@ public:
     quint64 totalTriggers() const { return m_totalTriggers; }
     /** @brief 获取总溢出次数 @return 累计溢出 */
     quint64 totalOverflows() const { return m_totalOverflows; }
+    /** @brief 获取总数据清空次数 @return 累计清空次数 */
+    quint64 totalClears() const { return m_totalClears; }
+    /** @brief 获取总刻度变更次数 @return 累计刻度变更次数 */
+    quint64 totalScaleChanges() const { return m_totalScaleChanges; }
+    /** @brief 获取总通道数变更次数 @return 累计通道数变更次数 */
+    quint64 totalChannelChanges() const { return m_totalChannelChanges; }
     /** @brief 重置示波器统计计数器 */
-    void resetScopeStatistics() { m_totalSamples = 0; m_totalRepaints = 0; m_totalTriggers = 0; m_totalOverflows = 0; }
+    void resetScopeStatistics() { m_totalSamples = 0; m_totalRepaints = 0; m_totalTriggers = 0; m_totalOverflows = 0; m_totalClears = 0; m_totalScaleChanges = 0; m_totalChannelChanges = 0; }
 };

@@ -3,6 +3,7 @@
  * @brief 示波器Widget实现 — 多通道采样缓冲+网格绘制+触发控制
  */
 #include "widgets/scope/ScopeWidget.h"
+#include "core/theme/ThemeManager.h"
 #include <QPainter>
 #include <QResizeEvent>
 #include <QtMath>
@@ -13,7 +14,7 @@ ScopeWidget::ScopeWidget(QWidget *parent) : QWidget(parent) { setObjectName("Sco
 ScopeWidget::~ScopeWidget() = default;
 
 /** @brief 设置通道数量 @param c 通道数 */
-void ScopeWidget::setChannelCount(int c) { m_channels.resize(c); for (auto &ch : m_channels) ch.resize(m_bufferSize); }
+void ScopeWidget::setChannelCount(int c) { ++m_totalChannelChanges; m_channels.resize(c); for (auto &ch : m_channels) ch.resize(m_bufferSize); }
 /** @brief 设置采样缓冲区大小 @param s 缓冲区采样数 */
 void ScopeWidget::setSampleBuffer(int s) { m_bufferSize = s; for (auto &ch : m_channels) ch.resize(s); m_writePos = 0; }
 /** @brief 添加单个采样值 @param ch 通道索引 @param v 采样值 */
@@ -21,9 +22,9 @@ void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.s
 /** @brief 批量添加采样值 @param ch 通道索引 @param vals 采样值向量 */
 void ScopeWidget::addSamples(int ch, const QVector<double> &vals) { for (auto v : vals) addSample(ch, v); }
 /** @brief 设置时间轴缩放 @param ms 时间刻度(毫秒) */
-void ScopeWidget::setTimeScale(double ms) { m_timeScale = ms; }
+void ScopeWidget::setTimeScale(double ms) { m_timeScale = ms; ++m_totalScaleChanges; }
 /** @brief 设置电压轴缩放 @param v 电压刻度 */
-void ScopeWidget::setVoltageScale(double v) { m_voltScale = v; }
+void ScopeWidget::setVoltageScale(double v) { m_voltScale = v; ++m_totalScaleChanges; }
 /** @brief 设置触发通道 @param c 通道索引 */
 void ScopeWidget::setTriggerChannel(int c) { m_triggerCh = c; }
 /** @brief 设置触发电平 @param l 触发电平值 */
@@ -31,7 +32,7 @@ void ScopeWidget::setTriggerLevel(double l) { m_triggerLevel = l; }
 /** @brief 启停采集 @param on true启动 */
 void ScopeWidget::setRunning(bool on) { m_running = on; }
 /** @brief 清空所有通道数据 */
-void ScopeWidget::clearData() { for (auto &ch : m_channels) ch.fill(0); m_writePos = 0; }
+void ScopeWidget::clearData() { ++m_totalClears; for (auto &ch : m_channels) ch.fill(0); m_writePos = 0; }
 /** @brief 获取通道数量 @return 通道数 */
 int ScopeWidget::channelCount() const { return m_channels.size(); }
 /** @brief 查询是否正在采集 @return 运行中返回true */
@@ -42,7 +43,7 @@ void ScopeWidget::paintEvent(QPaintEvent *) {
     ++m_totalRepaints;
     QPainter p(this); p.setRenderHint(QPainter::Antialiasing);
     int w = width(), h = height();
-    p.fillRect(rect(), QColor(20, 20, 30));
+    p.fillRect(rect(), ThemeManager::instance().color(ThemeManager::SemanticColor::BgPrimary));
     drawGrid(p, w, h);
     static const QColor colors[] = { QColor(0,255,0), QColor(255,255,0), QColor(0,200,255), QColor(255,100,100) };
     for (int c = 0; c < m_channels.size(); ++c) {
@@ -61,7 +62,9 @@ void ScopeWidget::paintEvent(QPaintEvent *) {
 
 /** @brief 绘制网格线 — 点状网格+中心十字线 @param p 画笔 @param w 宽度 @param h 高度 */
 void ScopeWidget::drawGrid(QPainter &p, int w, int h) {
-    p.setPen(QPen(QColor(60, 60, 80), 1, Qt::DotLine));
+    QColor gridColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Border);
+    QColor crossColor = ThemeManager::instance().color(ThemeManager::SemanticColor::TextSecondary);
+    p.setPen(QPen(gridColor, 1, Qt::DotLine));
     for (int i = 1; i < kDivisions; ++i) {
         int x = i * w / kDivisions;
         p.drawLine(x, 0, x, h);
@@ -70,7 +73,7 @@ void ScopeWidget::drawGrid(QPainter &p, int w, int h) {
         int y = i * h / kDivisions;
         p.drawLine(0, y, w, y);
     }
-    p.setPen(QPen(QColor(100, 100, 120), 1));
+    p.setPen(QPen(crossColor, 1));
     p.drawLine(w/2, 0, w/2, h);
     p.drawLine(0, h/2, w, h/2);
 }

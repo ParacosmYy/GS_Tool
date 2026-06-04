@@ -59,9 +59,16 @@ private:
      */
     void setupUI();
 
+    /**
+     * @brief 初始化信号连接(浏览/导出/取消/格式切换)
+     */
+    void setupConnections();
+
     QComboBox*   m_formatCombo;  ///< 导出格式选择下拉框
     QLineEdit*   m_pathEdit;     ///< 文件路径输入框
     QPushButton* m_exportBtn;    ///< 导出按钮
+    QPushButton* m_browseBtn;    ///< 浏览按钮
+    QPushButton* m_cancelBtn;    ///< 取消按钮
 
     // ---- 统计计数器 ----
     quint64 m_totalExports = 0;  ///< 累计导出确认次数

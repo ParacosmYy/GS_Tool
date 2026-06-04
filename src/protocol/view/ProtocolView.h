@@ -37,12 +37,18 @@ class ProtocolView : public QWidget {
     Q_OBJECT
 
 public:
+    /** @brief 构造协议帧视图 @param parent 父控件指针 */
     explicit ProtocolView(QWidget* parent = nullptr);
-    void addFrame(const QVariantMap& fields);  ///< 添加一帧解析结果
-    void clear();                              ///< 清空所有解析结果
-    void setMaxRows(int max);                  ///< 设置最大行数(旧数据自动丢弃)
-    int rowCount() const;                      ///< 当前行数
-    QList<QVariantMap> allFrames() const;      ///< 获取所有解析结果(用于导出)
+    /** @brief 添加一帧解析结果到表格 @param fields 帧字段名值对 */
+    void addFrame(const QVariantMap& fields);
+    /** @brief 清空所有解析结果 */
+    void clear();
+    /** @brief 设置最大显示行数(旧数据自动丢弃) @param max 最大行数 */
+    void setMaxRows(int max);
+    /** @brief 获取当前表格行数 @return 行数 */
+    int rowCount() const;
+    /** @brief 获取所有解析结果(用于导出) @return QVariantMap列表 */
+    QList<QVariantMap> allFrames() const;
     /** @brief 设置数值字段着色范围 @param fieldName 字段名 @param range 着色范围 */
     void setFieldColorRange(const QString& fieldName, const FieldColorRange& range);
 
@@ -90,10 +96,14 @@ private:
     quint64 m_totalContextMenuActions = 0; ///< 右键菜单操作总次数
     static constexpr int kFixedColumns = 2; ///< 固定列数: 序号(#)+时间(Time)
 public:
-    quint64 totalFramesDisplayed() const { return m_totalFramesDisplayed; } ///< 已展示帧总数
-    quint64 totalExports() const { return m_totalExports; }                 ///< 导出计数
-    quint64 totalContextMenuActions() const { return m_totalContextMenuActions; } ///< 菜单操作计数
-    void resetViewStatistics();     ///< 重置协议视图统计计数器
+    /** @brief 获取已展示帧总数 @return 累计展示帧计数 */
+    quint64 totalFramesDisplayed() const { return m_totalFramesDisplayed; }
+    /** @brief 获取导出操作总次数 @return 导出计数 */
+    quint64 totalExports() const { return m_totalExports; }
+    /** @brief 获取右键菜单操作总次数 @return 菜单操作计数 */
+    quint64 totalContextMenuActions() const { return m_totalContextMenuActions; }
+    /** @brief 重置协议视图统计计数器 */
+    void resetViewStatistics();
 };
 
 #endif // PROTOCOLVIEW_H

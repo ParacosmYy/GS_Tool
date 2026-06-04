@@ -108,6 +108,7 @@ private:
     quint64 m_totalCommandsExecuted = 0; ///< 总命令执行次数
     quint64 m_totalPaletteShows = 0;     ///< 总面板显示次数
     quint64 m_totalFilterChanges = 0;    ///< 总过滤变更次数
+    quint64 m_totalDismissals = 0;       ///< 总面板关闭/取消次数
 
 public:
     /** @brief 获取总命令执行次数 @return 累计执行次数 */
@@ -116,6 +117,8 @@ public:
     quint64 totalPaletteShows() const { return m_totalPaletteShows; }
     /** @brief 获取总过滤变更次数 @return 累计变更次数 */
     quint64 totalFilterChanges() const { return m_totalFilterChanges; }
+    /** @brief 获取总面板关闭/取消次数 @return 累计关闭次数 */
+    quint64 totalDismissals() const { return m_totalDismissals; }
     /** @brief 重置命令面板统计 */
-    void resetPaletteStatistics() { m_totalCommandsExecuted = 0; m_totalPaletteShows = 0; m_totalFilterChanges = 0; }
+    void resetPaletteStatistics() { m_totalCommandsExecuted = 0; m_totalPaletteShows = 0; m_totalFilterChanges = 0; m_totalDismissals = 0; }
 };

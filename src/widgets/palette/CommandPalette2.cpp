@@ -35,7 +35,7 @@ void CommandPalette::hidePalette() { hide(); emit paletteHidden(); }
 /** @brief 获取已注册命令数量 @return 命令数 */
 int CommandPalette::commandCount() const { return m_commands.size(); }
 /** @brief 按键事件处理 — Escape关闭面板 @param e 按键事件 */
-void CommandPalette::keyPressEvent(QKeyEvent *e) { if (e->key() == Qt::Key_Escape) hidePalette(); else QWidget::keyPressEvent(e); }
+void CommandPalette::keyPressEvent(QKeyEvent *e) { if (e->key() == Qt::Key_Escape) { ++m_totalDismissals; hidePalette(); } else QWidget::keyPressEvent(e); }
 
 /** @brief 回车执行当前选中命令 */
 void CommandPalette::onReturnPressed() {

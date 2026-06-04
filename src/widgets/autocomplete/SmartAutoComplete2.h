@@ -102,6 +102,8 @@ private:
     quint64 m_totalTriggers = 0;         ///< 总补全触发次数
     quint64 m_totalSuggestions = 0;      ///< 总建议展示次数
     quint64 m_totalAccepts = 0;          ///< 总用户接受次数
+    quint64 m_totalDismissals = 0;       ///< 总关闭/取消补全次数
+    quint64 m_totalDictionaryUpdates = 0; ///< 总词典更新次数
 
 public:
     /** @brief 获取总补全触发次数 @return 累计触发次数 */
@@ -110,6 +112,10 @@ public:
     quint64 totalSuggestions() const { return m_totalSuggestions; }
     /** @brief 获取总用户接受次数 @return 累计接受次数 */
     quint64 totalAccepts() const { return m_totalAccepts; }
+    /** @brief 获取总关闭/取消补全次数 @return 累计关闭次数 */
+    quint64 totalDismissals() const { return m_totalDismissals; }
+    /** @brief 获取总词典更新次数 @return 累计词典更新次数 */
+    quint64 totalDictionaryUpdates() const { return m_totalDictionaryUpdates; }
     /** @brief 重置自动补全统计 */
-    void resetAutoComplete2Statistics() { m_totalTriggers = 0; m_totalSuggestions = 0; m_totalAccepts = 0; }
+    void resetAutoComplete2Statistics() { m_totalTriggers = 0; m_totalSuggestions = 0; m_totalAccepts = 0; m_totalDismissals = 0; m_totalDictionaryUpdates = 0; }
 };

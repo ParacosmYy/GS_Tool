@@ -103,12 +103,24 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalMessages = 0;         ///< 总消息显示次数
     quint64 m_totalDismisses = 0;        ///< 总关闭次数
+    quint64 m_totalInfo = 0;             ///< Info级别消息次数
+    quint64 m_totalSuccess = 0;          ///< Success级别消息次数
+    quint64 m_totalWarning = 0;          ///< Warning级别消息次数
+    quint64 m_totalError = 0;            ///< Error级别消息次数
 
 public:
     /** @brief 获取总消息显示次数 @return 累计显示次数 */
     quint64 totalMessages() const { return m_totalMessages; }
     /** @brief 获取总关闭次数 @return 累计关闭次数 */
     quint64 totalDismisses() const { return m_totalDismisses; }
+    /** @brief 获取Info级别消息次数 @return 累计Info消息次数 */
+    quint64 totalInfoMessages() const { return m_totalInfo; }
+    /** @brief 获取Success级别消息次数 @return 累计Success消息次数 */
+    quint64 totalSuccessMessages() const { return m_totalSuccess; }
+    /** @brief 获取Warning级别消息次数 @return 累计Warning消息次数 */
+    quint64 totalWarningMessages() const { return m_totalWarning; }
+    /** @brief 获取Error级别消息次数 @return 累计Error消息次数 */
+    quint64 totalErrorMessages() const { return m_totalError; }
     /** @brief 重置Toast统计计数器 */
-    void resetToast2Statistics() { m_totalMessages = 0; m_totalDismisses = 0; }
+    void resetToast2Statistics() { m_totalMessages = 0; m_totalDismisses = 0; m_totalInfo = 0; m_totalSuccess = 0; m_totalWarning = 0; m_totalError = 0; }
 };

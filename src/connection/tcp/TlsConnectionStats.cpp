@@ -27,4 +27,8 @@ void TlsConnection::resetStats()
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
     m_errorCount = 0;
+    m_totalOpens = 0;
+    m_totalCloses = 0;
+    m_totalWrites = 0;
+    m_totalSslErrors = 0;
 }

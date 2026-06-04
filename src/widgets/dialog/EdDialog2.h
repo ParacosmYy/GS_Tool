@@ -94,6 +94,10 @@ public:
      */
     bool isRememberChecked(const QString &key) const;
 
+protected:
+    /** @brief 对话框关闭时累计关闭计数 @param result 对话框结果码 */
+    void done(int result) override;
+
 signals:
     /** @brief 按钮被点击 @param role 按钮角色标识 */
     void buttonClicked(int role);
@@ -116,6 +120,7 @@ private:
     static inline quint64 s_totalOpens = 0;        ///< 对话框总打开次数
     static inline quint64 s_totalButtonPresses = 0; ///< 总按钮点击次数
     static inline quint64 s_totalRememberSets = 0;  ///< 总记住选择设置次数
+    static inline quint64 s_totalCloses = 0;        ///< 对话框总关闭次数(accept/reject)
 
 public:
     /** @brief 获取对话框总打开次数 @return 累计打开次数 */
@@ -124,6 +129,8 @@ public:
     static quint64 totalButtonPresses() { return s_totalButtonPresses; }
     /** @brief 获取总记住选择设置次数 @return 累计设置次数 */
     static quint64 totalRememberSets() { return s_totalRememberSets; }
+    /** @brief 获取对话框总关闭次数 @return 累计关闭次数 */
+    static quint64 totalCloses() { return s_totalCloses; }
     /** @brief 重置对话框统计计数器 */
-    static void resetDialog2Statistics() { s_totalOpens = 0; s_totalButtonPresses = 0; s_totalRememberSets = 0; }
+    static void resetDialog2Statistics() { s_totalOpens = 0; s_totalButtonPresses = 0; s_totalRememberSets = 0; s_totalCloses = 0; }
 };

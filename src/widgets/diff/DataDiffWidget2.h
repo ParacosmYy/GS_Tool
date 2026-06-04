@@ -96,12 +96,21 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalComparisons = 0;    ///< 总对比次数
     quint64 m_totalDiffBytes = 0;      ///< 总差异字节数
+    quint64 m_totalClears = 0;         ///< 总清空次数
+    quint64 m_totalDiffLines = 0;      ///< 总差异行数(累计)
+    quint64 m_totalDataUpdates = 0;    ///< 总数据更新次数(setLeftData/setRightData调用)
 
 public:
     /** @brief 获取总对比次数 @return 累计对比次数 */
     quint64 totalComparisons() const { return m_totalComparisons; }
     /** @brief 获取总差异字节数 @return 累计差异字节 */
     quint64 totalDiffBytes() const { return m_totalDiffBytes; }
+    /** @brief 获取总清空次数 @return 累计清空次数 */
+    quint64 totalClears() const { return m_totalClears; }
+    /** @brief 获取总差异行数 @return 累计差异行数 */
+    quint64 totalDiffLines() const { return m_totalDiffLines; }
+    /** @brief 获取总数据更新次数 @return 累计数据更新次数 */
+    quint64 totalDataUpdates() const { return m_totalDataUpdates; }
     /** @brief 重置数据对比统计 */
-    void resetDiff2Statistics() { m_totalComparisons = 0; m_totalDiffBytes = 0; }
+    void resetDiff2Statistics() { m_totalComparisons = 0; m_totalDiffBytes = 0; m_totalClears = 0; m_totalDiffLines = 0; m_totalDataUpdates = 0; }
 };

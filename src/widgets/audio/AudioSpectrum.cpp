@@ -17,15 +17,15 @@ AudioSpectrum::AudioSpectrum(QWidget *parent) : QWidget(parent) {
 AudioSpectrum::~AudioSpectrum() = default;
 
 /** @brief 设置采样率 @param r 采样率(Hz) */
-void AudioSpectrum::setSampleRate(int r) { m_sampleRate = r; }
+void AudioSpectrum::setSampleRate(int r) { m_sampleRate = r; ++m_totalConfigChanges; }
 /** @brief 设置FFT窗口大小 @param s FFT大小(必须是2的幂) */
-void AudioSpectrum::setFftSize(int s) { m_fftSize = s; }
+void AudioSpectrum::setFftSize(int s) { m_fftSize = s; ++m_totalConfigChanges; }
 /** @brief 设置分贝范围 @param min 最小dB @param max 最大dB */
-void AudioSpectrum::setDbRange(double min, double max) { m_minDb = min; m_maxDb = max; }
+void AudioSpectrum::setDbRange(double min, double max) { m_minDb = min; m_maxDb = max; ++m_totalConfigChanges; }
 /** @brief 设置频谱柱数量 @param b 柱数 */
-void AudioSpectrum::setBarCount(int b) { m_barCount = b; m_magnitudes.resize(b); m_smoothed.resize(b); }
+void AudioSpectrum::setBarCount(int b) { m_barCount = b; m_magnitudes.resize(b); m_smoothed.resize(b); ++m_totalConfigChanges; }
 /** @brief 设置平滑因子 @param f 平滑系数(0~1) */
-void AudioSpectrum::setSmoothFactor(double f) { m_smoothFactor = f; }
+void AudioSpectrum::setSmoothFactor(double f) { m_smoothFactor = f; ++m_totalConfigChanges; }
 /** @brief 获取当前采样率 @return 采样率(Hz) */
 int AudioSpectrum::sampleRate() const { return m_sampleRate; }
 /** @brief 获取当前FFT大小 @return FFT窗口大小 */
@@ -65,6 +65,7 @@ void AudioSpectrum::processFft() {
     int peakBar = 0; double peakVal = 0;
     for (int i = 0; i < m_barCount; ++i) if (m_smoothed[i] > peakVal) { peakVal = m_smoothed[i]; peakBar = i; }
     double freq = static_cast<double>(peakBar * binsPerBar) * m_sampleRate / m_fftSize;
+    ++m_totalPeakChanges;
     emit peakFrequencyChanged(freq);
     update();
 }

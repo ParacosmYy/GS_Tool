@@ -21,7 +21,7 @@ void EdDialog::setMessage(const QString &m) { auto *l = qobject_cast<QVBoxLayout
 /** @brief 添加标准按钮 @param b 标准按钮类型 */
 void EdDialog::addButton(StandardButton b) { Q_UNUSED(b); }
 /** @brief 添加自定义按钮 @param label 按钮文本 @param role 按钮角色 */
-void EdDialog::addCustomButton(const QString &label, int role) { Q_UNUSED(label); Q_UNUSED(role); ++s_totalButtonPresses; }
+void EdDialog::addCustomButton(const QString &label, int role) { Q_UNUSED(label); Q_UNUSED(role); ++s_totalButtonPresses; m_resultRole = role; }
 /** @brief 设置对话框图标 @param name 图标名称 */
 void EdDialog::setIcon(const QString &name) { Q_UNUSED(name); }
 /** @brief 设置自定义内容Widget @param w 内容Widget */
@@ -32,3 +32,6 @@ int EdDialog::resultRole() const { return m_resultRole; }
 void EdDialog::setRememberOption(const QString &key, const QString &label) { m_remember[key] = {key, label, false}; ++s_totalRememberSets; }
 /** @brief 检查"记住选择"是否被勾选 @param key 选项键 @return 已勾选返回true */
 bool EdDialog::isRememberChecked(const QString &key) const { return m_remember.value(key).checked; }
+
+/** @brief 对话框关闭时累计关闭计数 @param result 对话框结果码 */
+void EdDialog::done(int result) { ++s_totalCloses; QDialog::done(result); }

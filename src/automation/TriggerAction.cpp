@@ -30,6 +30,7 @@ void TriggerAction::execute(int actionType, const QByteArray& actionData)
     case ActionType::SendData: {
         /* 累计发送字节数 */
         m_totalSendBytes += actionData.size();
+        if (actionData.isEmpty()) ++m_totalActionErrors;
         /* 发送数据: 优先使用回调，否则发射信号 */
         if (m_sendCallback) {
             m_sendCallback(actionData);
@@ -77,6 +78,7 @@ void TriggerAction::execute(int actionType, const QByteArray& actionData)
 /** @brief 设置数据发送回调函数 @param callback 发送数据的回调函数 */
 void TriggerAction::setSendCallback(std::function<void(QByteArray)> callback)
 {
+    ++m_totalCallbacksSet;
     m_sendCallback = std::move(callback);
 }
 
@@ -98,10 +100,24 @@ quint64 TriggerAction::totalSendBytes() const
     return m_totalSendBytes;
 }
 
+/** @brief 获取累计动作执行错误次数 @return 错误总次数 */
+quint64 TriggerAction::totalActionErrors() const
+{
+    return m_totalActionErrors;
+}
+
+/** @brief 获取累计回调函数设置次数 @return setSendCallback调用次数 */
+quint64 TriggerAction::totalCallbacksSet() const
+{
+    return m_totalCallbacksSet;
+}
+
 /** @brief 重置执行统计计数器为零 */
 void TriggerAction::resetExecStatistics()
 {
     m_totalExecCount = 0;
     m_execCountByType.clear();
     m_totalSendBytes = 0;
+    m_totalActionErrors = 0;
+    m_totalCallbacksSet = 0;
 }

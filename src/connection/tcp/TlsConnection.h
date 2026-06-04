@@ -82,6 +82,18 @@ public:
     /** @brief 获取错误计数 */
     quint64 errorCount() const;
 
+    /** @brief 获取累计open()调用次数 */
+    quint64 totalOpens() const { return m_totalOpens; }
+
+    /** @brief 获取累计close()调用次数 */
+    quint64 totalCloses() const { return m_totalCloses; }
+
+    /** @brief 获取累计write()调用次数 */
+    quint64 totalWrites() const { return m_totalWrites; }
+
+    /** @brief 获取累计SSL/TLS协议错误次数(证书验证失败等) */
+    quint64 totalSslErrors() const { return m_totalSslErrors; }
+
     /** @brief 重置所有统计数据为零 */
     void resetStats();
 
@@ -119,6 +131,10 @@ private:
     quint64 m_totalBytesSent = 0;                   ///< 累计发送字节数
     quint64 m_totalBytesReceived = 0;               ///< 累计接收字节数
     quint64 m_errorCount = 0;                       ///< 错误发生次数
+    quint64 m_totalOpens = 0;                       ///< 累计open()调用次数
+    quint64 m_totalCloses = 0;                      ///< 累计close()调用次数
+    quint64 m_totalWrites = 0;                      ///< 累计write()调用次数
+    quint64 m_totalSslErrors = 0;                   ///< 累计SSL/TLS协议错误次数
 };
 
 #endif // TLSCONNECTION_H

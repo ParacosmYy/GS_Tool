@@ -23,17 +23,26 @@ public:
     void evaluateData(const QByteArray& data);
     /** @brief 评估解析后数值(ValueRange) @param name 数据标识 @param value 数值 */
     void evaluateValue(const QString& name, double value);
-    void addRule(const TriggerRuleConfig& rule);       ///< 添加触发器规则
-    void removeRule(int index);                        ///< 移除指定索引规则
-    void setRulesEnabled(bool enabled);                ///< 设置所有规则启用/禁用
+    /** @brief 添加触发器规则 @param rule 规则配置 */
+    void addRule(const TriggerRuleConfig& rule);
+    /** @brief 移除指定索引规则 @param index 规则索引 */
+    void removeRule(int index);
+    /** @brief 设置所有规则启用/禁用 @param enabled true=启用所有规则 */
+    void setRulesEnabled(bool enabled);
     /** @brief 设置指定规则启用/禁用 @param index 规则索引 @param enabled 启用状态 */
     void setRuleEnabled(int index, bool enabled);
-    const QList<TriggerRuleConfig>& rules() const;     ///< 获取所有规则列表
-    void clearRules();                                 ///< 清空所有规则
-    int matchCount() const;                            ///< 累计成功匹配次数
-    qint64 msSinceLastMatch() const;                   ///< 上次匹配距现在的ms数(无匹配返回-1)
-    void resetStatistics();                            ///< 重置统计(不重置规则)
-    int ruleMatchCount(int index) const;               ///< 指定规则匹配次数
+    /** @brief 获取所有规则列表 @return 规则配置列表的const引用 */
+    const QList<TriggerRuleConfig>& rules() const;
+    /** @brief 清空所有规则 */
+    void clearRules();
+    /** @brief 获取累计成功匹配次数 @return 匹配计数 */
+    int matchCount() const;
+    /** @brief 上次匹配距现在的毫秒数 @return 毫秒数，无匹配返回-1 */
+    qint64 msSinceLastMatch() const;
+    /** @brief 重置统计(不重置规则) */
+    void resetStatistics();
+    /** @brief 获取指定规则的匹配次数 @param index 规则索引 @return 该规则命中次数 */
+    int ruleMatchCount(int index) const;
     // ---- 扩展统计 getter ----
     quint64 totalEvaluations() const;      ///< 总评估次数(evaluateData/evaluateValue)
     quint64 totalMatches() const;          ///< 总匹配成功次数(quint64精度)

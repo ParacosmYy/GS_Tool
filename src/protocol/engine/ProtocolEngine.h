@@ -29,12 +29,18 @@ public:
     };
     Q_ENUM(ChecksumAlgorithm)
 
-    explicit ProtocolEngine(QObject *parent = nullptr); ///< 构造
-    ~ProtocolEngine() override;              ///< 析构
-    void setSchema(ProtocolSchema *schema);  ///< 设置协议帧结构定义
-    void feedData(const QByteArray &data);   ///< 喂入新的串口数据
-    void reset();                            ///< 重置解析状态，清空缓冲区
-    ProtocolSchema *currentSchema() const;   ///< 获取当前协议定义
+    /** @brief 构造协议解析引擎 @param parent 父对象 */
+    explicit ProtocolEngine(QObject *parent = nullptr);
+    /** @brief 析构函数 */
+    ~ProtocolEngine() override;
+    /** @brief 设置协议帧结构定义 @param schema ProtocolSchema指针，定义帧格式规则 */
+    void setSchema(ProtocolSchema *schema);
+    /** @brief 喂入新的串口数据，内部缓冲并尝试帧解析 @param data 原始串口字节数据 */
+    void feedData(const QByteArray &data);
+    /** @brief 重置解析状态，清空内部缓冲区 */
+    void reset();
+    /** @brief 获取当前协议定义 @return 当前ProtocolSchema指针，未设置时为nullptr */
+    ProtocolSchema *currentSchema() const;
 
     /* -- 校验算法配置 -- */
     void setChecksumAlgorithm(const QString &algo); ///< 设置校验算法(覆盖schema)

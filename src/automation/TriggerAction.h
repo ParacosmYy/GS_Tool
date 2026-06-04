@@ -65,6 +65,18 @@ public:
     quint64 totalSendBytes() const;
 
     /**
+     * @brief 获取累计动作执行错误次数(SendData回调失败/PlaySound失败等)
+     * @return 错误总次数
+     */
+    quint64 totalActionErrors() const;
+
+    /**
+     * @brief 获取累计回调函数设置次数
+     * @return setSendCallback调用次数
+     */
+    quint64 totalCallbacksSet() const;
+
+    /**
      * @brief 重置执行统计
      */
     void resetExecStatistics();
@@ -94,6 +106,10 @@ private:
     QMap<int, quint64> m_execCountByType;
     /** @brief SendData 动作累计发送字节总数 */
     quint64 m_totalSendBytes = 0;
+    /** @brief 累计动作执行错误次数 */
+    quint64 m_totalActionErrors = 0;
+    /** @brief 累计回调函数设置次数 */
+    quint64 m_totalCallbacksSet = 0;
 };
 
 #endif // TRIGGERACTION_H

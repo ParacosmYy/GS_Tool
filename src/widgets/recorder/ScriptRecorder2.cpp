@@ -20,13 +20,13 @@ void ScriptRecorder::recordAction(const QString &action, const QByteArray &data)
 /** @brief 开始回放录制的操作序列 */
 void ScriptRecorder::playback() { if (m_entries.isEmpty()) return; ++m_totalPlaybacks; m_playing = true; m_playIndex = 0; emit playbackStarted(); m_timer->start(10); }
 /** @brief 清空所有录制条目 */
-void ScriptRecorder::clear() { m_entries.clear(); }
+void ScriptRecorder::clear() { ++m_totalClears; m_entries.clear(); }
 /** @brief 获取所有录制条目 @return 条目列表 */
 QList<ScriptRecorder::RecordEntry> ScriptRecorder::entries() const { return m_entries; }
 /** @brief 获取录制条目数量 @return 条目数 */
 int ScriptRecorder::entryCount() const { return m_entries.size(); }
 /** @brief 设置回放速度倍率 @param s 速度倍率 */
-void ScriptRecorder::setPlaybackSpeed(double s) { m_speed = s; }
+void ScriptRecorder::setPlaybackSpeed(double s) { ++m_totalSpeedChanges; m_speed = s; }
 
 /** @brief 回放定时器回调 — 逐条发射操作信号 */
 void ScriptRecorder::onPlaybackTick() {
