@@ -111,6 +111,7 @@ void PacketBuilderPanel::onAddField()
 {
     if (!m_builder) { return; }
 
+    ++m_totalFieldEdits;
     PacketField field;
     field.name = tr("字段%1").arg(m_builder->fields().size() + 1);
     field.offset = 0;
@@ -131,6 +132,7 @@ void PacketBuilderPanel::onRemoveField()
 
     int row = m_fieldTable->currentRow();
     if (row >= 0) {
+        ++m_totalFieldEdits;
         m_builder->removeField(row);
         refreshTable();
     }
@@ -161,6 +163,7 @@ void PacketBuilderPanel::onLoadTemplate()
     if (path.isEmpty()) { return; }
 
     if (m_builder->loadTemplate(path)) {
+        ++m_totalTemplateLoads;
         refreshTable();
         m_hexPreview->setPlainText(tr("模板已加载: %1").arg(path));
     }
@@ -298,4 +301,6 @@ void PacketBuilderPanel::resetStatistics()
 {
     m_totalPacketsBuilt = 0;
     m_totalSends = 0;
+    m_totalFieldEdits = 0;
+    m_totalTemplateLoads = 0;
 }

@@ -45,7 +45,13 @@ public:
     /** @brief 获取累计发送数据包次数 */
     quint64 totalSends() const { return m_totalSends; }
 
-    /** @brief 重置所有统计计数器 */
+    /** @brief 获取累计字段编辑次数 @return 编辑次数 */
+    quint64 totalFieldEdits() const { return m_totalFieldEdits; }
+
+    /** @brief 获取累计模板加载次数 @return 加载次数 */
+    quint64 totalTemplateLoads() const { return m_totalTemplateLoads; }
+
+    /** @brief 重置所有统计计数器(构建/发送/字段编辑/模板加载) */
     void resetStatistics();
 
 private slots:
@@ -117,6 +123,8 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalPacketsBuilt = 0;   ///< 累计构建数据包次数
     quint64 m_totalSends = 0;          ///< 累计发送数据包次数
+    quint64 m_totalFieldEdits = 0;     ///< 累计字段编辑次数
+    quint64 m_totalTemplateLoads = 0;  ///< 累计模板加载次数
 };
 
 #endif // PACKETBUILDERPANEL_H

@@ -234,6 +234,7 @@ bool DragDropHelper::handleDrop(QDropEvent* event)
         break;
     }
 
+    ++s_totalDropsRejected;
     return false;
 }
 

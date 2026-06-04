@@ -82,13 +82,22 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalConversions = 0; ///< 累计转换次数
     quint64 m_totalCopyActions = 0; ///< 累计复制操作次数
+    quint64 m_totalAnalyses = 0;    ///< 累计时间戳分析次数
+    quint64 m_totalFormatChanges = 0; ///< 累计格式切换次数
+    quint64 m_totalTimestampParses = 0; ///< 累计时间戳解析次数
 public:
     /** @brief 获取累计转换次数 @return 转换次数 */
     quint64 totalConversions() const { return m_totalConversions; }
     /** @brief 获取累计复制操作次数 @return 复制次数 */
     quint64 totalCopyActions() const { return m_totalCopyActions; }
-    /** @brief 重置时间戳面板统计计数器(转换次数/复制次数) */
-    void resetTimestampPanelStatistics() { m_totalConversions = 0; m_totalCopyActions = 0; }
+    /** @brief 获取累计时间戳分析次数 @return 分析次数 */
+    quint64 totalAnalyses() const { return m_totalAnalyses; }
+    /** @brief 获取累计格式切换次数 @return 切换次数 */
+    quint64 totalFormatChanges() const { return m_totalFormatChanges; }
+    /** @brief 获取累计时间戳解析次数 @return 解析次数 */
+    quint64 totalTimestampParses() const { return m_totalTimestampParses; }
+    /** @brief 重置时间戳面板统计计数器(转换次数/复制次数/分析次数/格式切换/解析次数) */
+    void resetTimestampPanelStatistics();
 };
 
 #endif // TIMESTAMPPANEL_H

@@ -57,6 +57,8 @@ ChecksumPanel::ChecksumPanel(QWidget *parent)
                              static_cast<int>(alg));
     }
     m_algoCombo->setObjectName("checksumAlgoCombo");
+    connect(m_algoCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalAlgorithmChanges; });
     algoLayout->addWidget(m_algoCombo);
     algoLayout->addStretch();
     m_calcBtn->setObjectName("checksumCalcBtn");
@@ -125,6 +127,8 @@ ChecksumPanel::ChecksumPanel(QWidget *parent)
             this, &ChecksumPanel::onClearHistory);
     connect(m_historyList, &QListWidget::itemClicked,
             this, &ChecksumPanel::onHistoryItemSelected);
+    connect(m_inputEdit, &QTextEdit::textChanged,
+            this, [this]() { ++m_totalInputUpdates; });
 }
 
 /**
@@ -226,6 +230,7 @@ void ChecksumPanel::onCalculate()
 void ChecksumPanel::onCopyResult()
 {
     ++m_totalCopyActions;
+    ++m_totalCopyToClipboard;
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(QString::number(m_result, 16).toUpper());
 }
@@ -359,10 +364,37 @@ quint64 ChecksumPanel::totalCopyActions() const
 }
 
 /**
- * @brief 重置所有面板统计计数器(计算次数/复制次数)
+ * @brief 获取累计算法切换次数
+ */
+quint64 ChecksumPanel::totalAlgorithmChanges() const
+{
+    return m_totalAlgorithmChanges;
+}
+
+/**
+ * @brief 获取累计复制结果到剪贴板操作次数
+ */
+quint64 ChecksumPanel::totalCopyToClipboard() const
+{
+    return m_totalCopyToClipboard;
+}
+
+/**
+ * @brief 获取累计输入内容更新次数
+ */
+quint64 ChecksumPanel::totalInputUpdates() const
+{
+    return m_totalInputUpdates;
+}
+
+/**
+ * @brief 重置所有面板统计计数器(计算次数/复制次数/算法切换/剪贴板复制/输入更新)
  */
 void ChecksumPanel::resetPanelStatistics()
 {
     m_totalCalculations = 0;
     m_totalCopyActions = 0;
+    m_totalAlgorithmChanges = 0;
+    m_totalCopyToClipboard = 0;
+    m_totalInputUpdates = 0;
 }

@@ -99,6 +99,8 @@ TimestampPanel::TimestampPanel(QWidget *parent)
             this, &TimestampPanel::onClearHistory);
     connect(m_historyList, &QListWidget::itemClicked,
             this, &TimestampPanel::onHistorySelected);
+    connect(m_formatCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalFormatChanges; });
 }
 
 /**
@@ -107,6 +109,7 @@ TimestampPanel::TimestampPanel(QWidget *parent)
 void TimestampPanel::onConvert()
 {
     ++m_totalConversions;
+    ++m_totalAnalyses;
     QString text = m_timestampEdit->text().trimmed();
     if (text.isEmpty()) {
         m_resultLabel->setText(tr("结果：无输入"));
@@ -171,6 +174,8 @@ void TimestampPanel::convertByFormat(const QString &text, int formatIndex)
         m_copyBtn->setEnabled(false);
         return;
     }
+
+    ++m_totalTimestampParses;
 
     if (!inputIsTimestamp) {
         secs = m_analyzer.datetimeToUnix(dt, false);
@@ -240,4 +245,16 @@ void TimestampPanel::onHistorySelected()
     const QString text = item->data(Qt::UserRole).toString();
     m_timestampEdit->setText(text);
     onConvert();
+}
+
+/**
+ * @brief 重置时间戳面板统计计数器
+ */
+void TimestampPanel::resetTimestampPanelStatistics()
+{
+    m_totalConversions = 0;
+    m_totalCopyActions = 0;
+    m_totalAnalyses = 0;
+    m_totalFormatChanges = 0;
+    m_totalTimestampParses = 0;
 }

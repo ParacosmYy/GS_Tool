@@ -118,16 +118,19 @@ private:
     // ---- 统计计数器(静态，跨所有实例累积) ----
     static inline quint64 s_totalDragEnters = 0;     ///< 累计拖入事件次数
     static inline quint64 s_totalDrops = 0;          ///< 累计放下事件次数
+    static inline quint64 s_totalDropsRejected = 0;  ///< 累计拒绝放下事件次数
     static inline quint64 s_totalTargetsInstalled = 0; ///< 累计安装拖放目标次数
 public:
     /** @brief 获取累计拖入事件次数 */
     static quint64 totalDragEnters() { return s_totalDragEnters; }
     /** @brief 获取累计放下事件次数 */
     static quint64 totalDrops() { return s_totalDrops; }
+    /** @brief 获取累计拒绝放下事件次数 */
+    static quint64 totalDropsRejected() { return s_totalDropsRejected; }
     /** @brief 获取累计安装拖放目标次数 */
     static quint64 totalTargetsInstalled() { return s_totalTargetsInstalled; }
     /** @brief 重置拖放统计计数器 */
-    static void resetDragDropStatistics() { s_totalDragEnters = 0; s_totalDrops = 0; s_totalTargetsInstalled = 0; }
+    static void resetDragDropStatistics() { s_totalDragEnters = 0; s_totalDrops = 0; s_totalDropsRejected = 0; s_totalTargetsInstalled = 0; }
 };
 
 #endif // DRAG_DROP_HELPER_H
