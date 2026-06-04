@@ -76,28 +76,28 @@ public:
      */
     void setDbcParser(class DbcParser* parser);
 
-    /** @brief 获取累计监控帧总数 */
+    /** @brief 获取累计监控帧总数 @return 已监控帧数量 */
     quint64 totalFramesMonitored() const;
 
-    /** @brief 获取累计错误次数 */
+    /** @brief 获取累计错误次数 @return 错误计数 */
     quint64 totalErrors() const;
 
-    /** @brief 获取标准帧数量 */
+    /** @brief 获取标准帧数量 @return 标准帧计数 */
     quint64 totalStandardFrames() const { return m_totalStandardFrames; }
 
-    /** @brief 获取扩展帧数量 */
+    /** @brief 获取扩展帧数量 @return 扩展帧计数 */
     quint64 totalExtendedFrames() const { return m_totalExtendedFrames; }
 
-    /** @brief 获取CAN-FD帧数量 */
+    /** @brief 获取CAN-FD帧数量 @return CAN-FD帧计数 */
     quint64 totalFdFrames() const { return m_totalFdFrames; }
 
-    /** @brief 获取RTR帧数量 */
+    /** @brief 获取RTR帧数量 @return RTR帧计数 */
     quint64 totalRtrFrames() const { return m_totalRtrFrames; }
 
-    /** @brief 获取总接收字节数 */
+    /** @brief 获取总接收字节数 @return 字节总数 */
     quint64 totalBytesReceived() const { return m_totalBytesReceived; }
 
-    /** @brief 获取帧率(fps) */
+    /** @brief 获取帧率(fps) @return 当前帧率 */
     double frameRate() const;
 
     /** @brief 重置所有统计计数器 */

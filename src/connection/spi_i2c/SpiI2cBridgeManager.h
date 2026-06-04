@@ -36,10 +36,11 @@ public:
     void setTransport(IConnection* serial);
     /** @brief 切换桥接模式(自动关闭当前连接并配置新模式) @param mode 目标模式 @return true=切换成功 */
     bool switchMode(BridgeMode mode);
-    BridgeMode currentMode() const { return m_currentMode; } ///< 当前桥接模式
-    SpiConnection* spiConnection() const { return m_spiConn; } ///< SPI连接实例
-    I2cConnection* i2cConnection() const { return m_i2cConn; } ///< I2C连接实例
-    IConnection* activeConnection() const;   ///< 当前活跃连接(根据模式返回SPI或I2C)
+    BridgeMode currentMode() const { return m_currentMode; } ///< @return 当前桥接模式
+    SpiConnection* spiConnection() const { return m_spiConn; } ///< @return SPI连接实例
+    I2cConnection* i2cConnection() const { return m_i2cConn; } ///< @return I2C连接实例
+    /** @brief 获取当前活跃连接(根据模式返回SPI或I2C) @return 活跃连接指针 */
+    IConnection* activeConnection() const;
 
     // ---- 事务队列接口 ----
     /** @brief 入队桥接事务 @param transaction 桥接事务 */
@@ -64,9 +65,9 @@ public:
     quint64 i2cTransactions() const { return m_i2cTransactions; }
     /** @brief 获取桥接错误数 @return 累计错误次数 */
     quint64 bridgeErrors() const { return m_bridgeErrors; }
-    /** @brief 获取模式切换次数 @return 累计切换次数 */
+    /** @brief 获取模式切换次数 @return 累计模式切换次数 */
     quint64 totalModeSwitches() const { return m_totalModeSwitches; }
-    /** @brief 获取队列排空次数 @return 累计排空次数 */
+    /** @brief 获取队列排空次数 @return 累计队列排空次数 */
     quint64 totalQueueDrains() const { return m_totalQueueDrains; }
     /** @brief 重置所有桥接统计计数器 */
     void resetStats();

@@ -49,31 +49,37 @@ public:
     void setTransport(IConnection* serial);
 
     // ---- 统计信息接口 ----
-    quint64 totalTransfers() const { return m_totalTransfers; }  ///< 总传输次数
-    quint64 totalBytesSent() const { return m_totalBytesSent; }   ///< 总发送字节数
-    quint64 totalBytesReceived() const { return m_totalBytesReceived; } ///< 总接收字节数
-    quint64 totalTransferErrors() const { return m_totalTransferErrors; } ///< 总传输错误次数
-    quint64 totalCsToggles() const { return m_totalCsToggles; }   ///< 总CS片选切换次数
-    quint64 errorCount() const { return m_errorCount; }           ///< 错误计数
-    quint64 transferByMode(int mode) const;  ///< 指定SPI模式(0-3)的传输次数
-    int spiMode() const { return m_mode; }   ///< 当前SPI模式
-    int clockSpeed() const { return m_clockSpeed; } ///< 当前时钟频率
-    SpiBitOrder bitOrder() const { return m_bitOrder; } ///< 当前位序
-    SpiWordSize wordSize() const { return m_wordSize; } ///< 当前字长
-    bool csActiveLow() const { return m_csActiveLow; } ///< 当前CS极性
+    quint64 totalTransfers() const { return m_totalTransfers; }  ///< @return 总传输次数
+    quint64 totalBytesSent() const { return m_totalBytesSent; }   ///< @return 总发送字节数
+    quint64 totalBytesReceived() const { return m_totalBytesReceived; } ///< @return 总接收字节数
+    quint64 totalTransferErrors() const { return m_totalTransferErrors; } ///< @return 总传输错误次数
+    quint64 totalCsToggles() const { return m_totalCsToggles; }   ///< @return 总CS片选切换次数
+    quint64 errorCount() const { return m_errorCount; }           ///< @return 错误计数
+    /** @brief 获取指定SPI模式(0-3)的传输次数 @param mode SPI模式编号 @return 该模式的传输次数 */
+    quint64 transferByMode(int mode) const;
+    int spiMode() const { return m_mode; }   ///< @return 当前SPI模式
+    int clockSpeed() const { return m_clockSpeed; } ///< @return 当前时钟频率(Hz)
+    SpiBitOrder bitOrder() const { return m_bitOrder; } ///< @return 当前位序
+    SpiWordSize wordSize() const { return m_wordSize; } ///< @return 当前字长
+    bool csActiveLow() const { return m_csActiveLow; } ///< @return 当前CS极性
     void resetStats();                       ///< 重置所有统计计数器
 
 signals:
-    void transferCompleted(int txBytes, int rxBytes); ///< SPI传输完成信号
+    /** @brief SPI传输完成信号 @param txBytes 发送字节数 @param rxBytes 接收字节数 */
+    void transferCompleted(int txBytes, int rxBytes);
 
 private slots:
     void onTransportData(const QByteArray& data); ///< 底层串口数据到达回调
 
 private:
-    void updateState(ConnectionState newState); ///< 更新连接状态
-    qint64 sendCommand(quint8 cmd, const QByteArray& payload); ///< 发送协议命令帧
-    QByteArray buildTransferFrame(const QByteArray& txData); ///< 组装SPI传输命令帧
-    QByteArray buildConfigFrame();            ///< 组装SPI配置命令帧(含位序/字长/CS极性)
+    /** @brief 更新连接状态并发射stateChanged信号 @param newState 新连接状态 */
+    void updateState(ConnectionState newState);
+    /** @brief 发送协议命令帧 @param cmd 命令字节 @param payload 命令负载 @return 实际写入字节数 */
+    qint64 sendCommand(quint8 cmd, const QByteArray& payload);
+    /** @brief 组装SPI传输命令帧 @param txData 待传输数据 @return 编码后的命令帧 */
+    QByteArray buildTransferFrame(const QByteArray& txData);
+    /** @brief 组装SPI配置命令帧(含位序/字长/CS极性) @return 编码后的配置帧 */
+    QByteArray buildConfigFrame();
 
     // ---- 协议命令定义 ----
     static constexpr quint8 CMD_SPI_WRITE    = 0x01;  ///< SPI写命令

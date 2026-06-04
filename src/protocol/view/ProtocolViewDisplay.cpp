@@ -45,6 +45,7 @@ QStandardItem* ProtocolView::createColoredItem(const QString& fieldName,
     double numVal = value.toDouble(&ok);
     if (!ok) return item;
 
+    ++m_totalColorRangeMatches;  ///< 累计数值着色匹配次数
     const FieldColorRange& range = it.value();
     QColor warnColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Warning);
     QColor errColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Error);

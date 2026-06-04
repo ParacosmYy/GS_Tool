@@ -94,6 +94,8 @@ private:
     quint64 m_totalFramesDisplayed = 0;    ///< 已展示帧总数
     quint64 m_totalExports = 0;            ///< 导出操作总次数
     quint64 m_totalContextMenuActions = 0; ///< 右键菜单操作总次数
+    quint64 m_totalRowsPruned = 0;         ///< 累计因maxRows限制而丢弃的行数
+    quint64 m_totalColorRangeMatches = 0;  ///< 累计数值着色匹配次数(警告/错误区间)
     static constexpr int kFixedColumns = 2; ///< 固定列数: 序号(#)+时间(Time)
 public:
     /** @brief 获取已展示帧总数 @return 累计展示帧计数 */
@@ -102,6 +104,10 @@ public:
     quint64 totalExports() const { return m_totalExports; }
     /** @brief 获取右键菜单操作总次数 @return 菜单操作计数 */
     quint64 totalContextMenuActions() const { return m_totalContextMenuActions; }
+    /** @brief 获取因maxRows限制累计丢弃的行数 @return 丢弃行计数 */
+    quint64 totalRowsPruned() const { return m_totalRowsPruned; }
+    /** @brief 获取累计数值着色匹配次数(警告/错误区间) @return 着色计数 */
+    quint64 totalColorRangeMatches() const { return m_totalColorRangeMatches; }
     /** @brief 重置协议视图统计计数器 */
     void resetViewStatistics();
 };

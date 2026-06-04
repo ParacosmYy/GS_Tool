@@ -46,19 +46,19 @@ public:
      */
     void setManager(TcpMultiConnectionManager* manager);
 
-    /** @brief 获取累计连接次数 */
+    /** @brief 获取累计连接次数 @return 连接总次数 */
     quint64 totalConnections() const;
 
-    /** @brief 获取累计断开次数 */
+    /** @brief 获取累计断开次数 @return 断开总次数 */
     quint64 totalDisconnections() const;
 
-    /** @brief 获取累计广播发送次数 */
+    /** @brief 获取累计广播发送次数 @return 广播发送总次数 */
     quint64 totalBroadcastsSent() const { return m_totalBroadcastsSent; }
 
-    /** @brief 获取累计添加尝试次数(含用户取消) */
+    /** @brief 获取累计添加尝试次数(含用户取消) @return 添加尝试总次数 */
     quint64 totalAddAttempts() const { return m_totalAddAttempts; }
 
-    /** @brief 获取累计移除尝试次数 */
+    /** @brief 获取累计移除尝试次数 @return 移除尝试总次数 */
     quint64 totalRemoveAttempts() const { return m_totalRemoveAttempts; }
 
     /** @brief 重置所有统计计数器 */

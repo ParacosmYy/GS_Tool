@@ -46,10 +46,10 @@ public:
      */
     void setConnection(IConnection* connection);
 
-    /** @brief 获取累计发送AT命令次数 */
+    /** @brief 获取累计发送AT命令次数 @return 发送总次数 */
     quint64 totalCommandsSent() const;
 
-    /** @brief 获取累计接收响应次数 */
+    /** @brief 获取累计接收响应次数 @return 接收总次数 */
     quint64 totalResponsesReceived() const;
 
     /** @brief 获取累计发送失败次数(连接不可用/写入失败) @return 错误计数 */

@@ -65,4 +65,6 @@ void RegisterEditor::resetStatistics()
 {
     m_totalRegisterReads = 0;
     m_totalRegisterWrites = 0;
+    m_totalLogClears = 0;
+    m_totalErrors = 0;
 }

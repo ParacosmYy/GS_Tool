@@ -46,10 +46,10 @@ public:
      */
     QVariantList subscriptions() const;
 
-    /** @brief 获取累计订阅操作次数 */
+    /** @brief 获取累计订阅操作次数 @return 订阅总次数 */
     quint64 totalSubscriptions() const { return m_totalSubscriptions; }
 
-    /** @brief 获取累计取消订阅操作次数 */
+    /** @brief 获取累计取消订阅操作次数 @return 取消订阅总次数 */
     quint64 totalUnsubscriptions() const { return m_totalUnsubscriptions; }
 
     /** @brief 重置所有统计计数器 */

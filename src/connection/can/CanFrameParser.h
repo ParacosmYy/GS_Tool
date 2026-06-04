@@ -66,9 +66,9 @@ class CanFrameParser : public QObject {
 public:
     /** @brief 构造CAN帧解析器 @param parent 父QObject指针 */
     explicit CanFrameParser(QObject* parent = nullptr);
-    /** @brief 解析LAWICEL原始字符串为CanFrame @param rawData 原始帧数据 @return 解析结果 */
+    /** @brief 解析LAWICEL原始字符串为CanFrame @param rawData 原始帧数据 @return 解析后的CanFrame */
     CanFrame parseFrame(const QByteArray& rawData);
-    /** @brief 将CanFrame编码为LAWICEL格式 @return 编码后的字节序列(不含\r) */
+    /** @brief 将CanFrame编码为LAWICEL格式 @param frame CAN帧数据 @return 编码后的字节序列(不含\r) */
     QByteArray buildFrame(const CanFrame& frame);
     /** @brief 加载DBC数据库文件 @param filePath DBC文件路径 @return 成功返回true */
     bool loadDbcFile(const QString& filePath);

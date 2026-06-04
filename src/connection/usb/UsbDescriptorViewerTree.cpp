@@ -22,10 +22,12 @@ void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
         item->setText(0, name);
         item->setText(1, val);
         item->setText(2, desc);
+        ++m_totalNodesAdded;
     };
 
     // 设备描述符
     auto* devItem = new QTreeWidgetItem(m_descriptorTree);
+    ++m_totalNodesAdded;
     devItem->setText(0, tr("设备描述符"));
     devItem->setText(1, tr("VID:%1 PID:%2")
                           .arg(vid, 4, 16, QChar('0'))
@@ -52,6 +54,7 @@ void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
 
     // 配置描述符
     auto* cfgItem = new QTreeWidgetItem(devItem);
+    ++m_totalNodesAdded;
     cfgItem->setText(0, tr("配置描述符"));
     cfgItem->setText(1, "1");
     cfgItem->setText(2, tr("配置编号1"));
@@ -66,6 +69,7 @@ void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
 
     // 接口描述符
     auto* ifItem = new QTreeWidgetItem(cfgItem);
+    ++m_totalNodesAdded;
     ifItem->setText(0, tr("接口描述符"));
     ifItem->setText(1, "0");
     ifItem->setText(2, tr("接口0"));
@@ -81,6 +85,7 @@ void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
 
     // 端点描述符 IN
     auto* epIn = new QTreeWidgetItem(ifItem);
+    ++m_totalNodesAdded;
     epIn->setText(0, tr("端点描述符"));
     epIn->setText(1, "0x81");
     epIn->setText(2, tr("IN端点, Bulk传输"));
@@ -93,6 +98,7 @@ void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
 
     // 端点描述符 OUT
     auto* epOut = new QTreeWidgetItem(ifItem);
+    ++m_totalNodesAdded;
     epOut->setText(0, tr("端点描述符"));
     epOut->setText(1, "0x01");
     epOut->setText(2, tr("OUT端点, Bulk传输"));
@@ -118,6 +124,7 @@ void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
     hexDump += "00 01 01 02 03 01\n\n";
     hexDump += tr("注: 原始数据为占位，需通过libusb获取真实描述符");
     m_rawView->setPlainText(hexDump);
+    m_totalRawBytesViewed += 18;  ///< 累计查看的设备描述符字节数
 }
 
 /** @brief 解析18字节设备描述符 @param parent 父节点 @param raw 原始描述符数据 */
@@ -125,12 +132,15 @@ void UsbDescriptorViewer::addDeviceDescriptor(QTreeWidgetItem* parent,
                                                const QByteArray& raw) {
     if (raw.size() < 18) { return; }
 
+    m_totalRawBytesViewed += static_cast<quint64>(raw.size());
+
     auto addField = [&](const QString& name, const QString& val,
                         const QString& desc) {
         auto* item = new QTreeWidgetItem(parent);
         item->setText(0, name);
         item->setText(1, val);
         item->setText(2, desc);
+        ++m_totalNodesAdded;
     };
 
     quint8 bLength = static_cast<quint8>(raw[0]);
@@ -164,4 +174,25 @@ void UsbDescriptorViewer::addDeviceDescriptor(QTreeWidgetItem* parent,
     addField("bcdDevice",
              QString("0x%1").arg(bcdDevice, 4, 16, QChar('0')),
              tr("设备版本"));
+}
+
+/** @brief 获取累计描述符刷新次数 @return 刷新计数 */
+quint64 UsbDescriptorViewer::totalDescriptorRefreshes() const
+{
+    return m_totalDescriptorRefreshes;
+}
+
+/** @brief 获取累计查看设备次数 @return 设备查看计数 */
+quint64 UsbDescriptorViewer::totalDevicesViewed() const
+{
+    return m_totalDevicesViewed;
+}
+
+/** @brief 重置所有统计计数器 */
+void UsbDescriptorViewer::resetStatistics()
+{
+    m_totalDescriptorRefreshes = 0;
+    m_totalDevicesViewed = 0;
+    m_totalNodesAdded = 0;
+    m_totalRawBytesViewed = 0;
 }

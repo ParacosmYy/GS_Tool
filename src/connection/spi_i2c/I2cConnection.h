@@ -26,7 +26,8 @@ public:
     qint64 write(const QByteArray& data) override;     ///< 发送数据，返回实际写入字节数
     void configure(const QVariantMap& params) override; ///< 配置I2C参数(deviceAddress/clockSpeed等)
     // ---- I2C特有接口 ----
-    QList<int> scanBus();  ///< 扫描总线(7位地址0x03~0x77)
+    /** @brief 扫描总线(7位地址0x03~0x77) @return 发现的设备地址列表 */
+    QList<int> scanBus();
     /** @brief 从设备寄存器读取 @param deviceAddr 7位地址 @param regAddr 寄存器地址 @param length 长度 */
     QByteArray readRegister(int deviceAddr, int regAddr, int length);
     /** @brief 向设备寄存器写入 @param deviceAddr 7位地址 @param regAddr 寄存器地址 @param data 数据 */
@@ -35,19 +36,20 @@ public:
     QByteArray burstRead(int deviceAddr, int startReg, int count);
     /** @brief 突发写入 @param deviceAddr 7位地址 @param startReg 起始寄存器 @param data 数据 */
     bool burstWrite(int deviceAddr, int startReg, const QByteArray& data);
-    void setTransport(IConnection* serial); ///< 设置底层串口传输通道(不获取所有权)
+    /** @brief 设置底层串口传输通道(不获取所有权) @param serial 底层串口连接实例 */
+    void setTransport(IConnection* serial);
     // ---- 统计信息接口 ----
-    quint64 totalTransactions() const { return m_totalTransactions; } ///< 总事务次数
-    quint64 totalBytesWritten() const { return m_totalBytesWritten; } ///< 总写入字节数
-    quint64 totalBytesRead() const { return m_totalBytesRead; }       ///< 总读取字节数
-    quint64 totalNacks() const { return m_totalNacks; }               ///< 总NACK次数
-    quint64 totalBusErrors() const { return m_totalBusErrors; }       ///< 总线错误次数
-    quint64 totalBytesSent() const { return m_totalBytesSent; }       ///< 总发送字节数(兼容)
-    quint64 totalBytesReceived() const { return m_totalBytesReceived; } ///< 总接收字节数(兼容)
-    quint64 errorCount() const { return m_errorCount; }               ///< 错误计数
-    quint64 nackCount() const { return m_nackCount; }                 ///< NACK计数(兼容别名)
-    quint64 devicesFound() const { return m_devicesFound; }           ///< 扫描发现设备数
-    QList<int> lastScanResults() const { return m_lastScanResults; }  ///< 上次扫描结果
+    quint64 totalTransactions() const { return m_totalTransactions; } ///< @return 总事务次数
+    quint64 totalBytesWritten() const { return m_totalBytesWritten; } ///< @return 总写入字节数
+    quint64 totalBytesRead() const { return m_totalBytesRead; }       ///< @return 总读取字节数
+    quint64 totalNacks() const { return m_totalNacks; }               ///< @return 总NACK次数
+    quint64 totalBusErrors() const { return m_totalBusErrors; }       ///< @return 总线错误次数
+    quint64 totalBytesSent() const { return m_totalBytesSent; }       ///< @return 总发送字节数(兼容)
+    quint64 totalBytesReceived() const { return m_totalBytesReceived; } ///< @return 总接收字节数(兼容)
+    quint64 errorCount() const { return m_errorCount; }               ///< @return 错误计数
+    quint64 nackCount() const { return m_nackCount; }                 ///< @return NACK计数(兼容别名)
+    quint64 devicesFound() const { return m_devicesFound; }           ///< @return 扫描发现设备数
+    QList<int> lastScanResults() const { return m_lastScanResults; }  ///< @return 上次扫描结果
     void resetStats();                                                ///< 重置所有统计计数器
 
 signals:
@@ -66,14 +68,22 @@ private slots:
     void onTransportData(const QByteArray& data); ///< 底层串口数据到达回调
 
 private:
-    void updateState(ConnectionState newState);  ///< 更新连接状态
-    qint64 sendCommand(quint8 cmd, const QByteArray& payload); ///< 发送协议命令帧
-    QByteArray buildReadFrame(int deviceAddr, int regAddr, int length);   ///< 构建I2C读命令帧
-    QByteArray buildWriteFrame(int deviceAddr, int regAddr, const QByteArray& data); ///< 构建写命令帧
-    QByteArray buildBurstReadFrame(int deviceAddr, int startReg, int count);  ///< 构建突发读帧
-    QByteArray buildBurstWriteFrame(int deviceAddr, int startReg, const QByteArray& data); ///< 构建突发写帧
-    bool probeAddress(int addr);                 ///< 单地址ACK探测
-    QByteArray parseResponsePayload();           ///< 解析响应帧负载数据
+    /** @brief 更新连接状态并发射stateChanged信号 @param newState 新连接状态 */
+    void updateState(ConnectionState newState);
+    /** @brief 发送协议命令帧 @param cmd 命令字节 @param payload 命令负载 @return 实际写入字节数 */
+    qint64 sendCommand(quint8 cmd, const QByteArray& payload);
+    /** @brief 构建I2C读命令帧 @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param length 读取字节数 @return 编码后的命令帧 */
+    QByteArray buildReadFrame(int deviceAddr, int regAddr, int length);
+    /** @brief 构建写命令帧 @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param data 待写入数据 @return 编码后的命令帧 */
+    QByteArray buildWriteFrame(int deviceAddr, int regAddr, const QByteArray& data);
+    /** @brief 构建突发读帧 @param deviceAddr 设备7位地址 @param startReg 起始寄存器 @param count 读取字节数 @return 编码后的命令帧 */
+    QByteArray buildBurstReadFrame(int deviceAddr, int startReg, int count);
+    /** @brief 构建突发写帧 @param deviceAddr 设备7位地址 @param startReg 起始寄存器 @param data 待写入数据 @return 编码后的命令帧 */
+    QByteArray buildBurstWriteFrame(int deviceAddr, int startReg, const QByteArray& data);
+    /** @brief 单地址ACK探测 @param addr 目标设备地址 @return true=设备响应ACK */
+    bool probeAddress(int addr);
+    /** @brief 解析响应帧负载数据 @return 负载字节数组 */
+    QByteArray parseResponsePayload();
     // ---- 协议命令定义 ----
     static constexpr quint8 CMD_I2C_WRITE = 0x20, CMD_I2C_READ = 0x21, CMD_I2C_SCAN = 0x22;
     static constexpr quint8 CMD_I2C_CONFIG = 0x30, CMD_I2C_BURST_RD = 0x23, CMD_I2C_BURST_WR = 0x24;

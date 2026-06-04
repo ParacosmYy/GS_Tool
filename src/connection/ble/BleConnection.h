@@ -10,16 +10,18 @@ class BleConnection : public IConnection {
     Q_OBJECT
 
 public:
-    explicit BleConnection(QObject* parent = nullptr); ///< 构造BLE连接
-    ~BleConnection() override;               ///< 析构(自动断开连接)
+    /** @brief 构造BLE连接 @param parent 父对象 */
+    explicit BleConnection(QObject* parent = nullptr);
+    /** @brief 析构(自动断开连接) */
+    ~BleConnection() override;
     // ---- IConnection接口 ----
-    ConnectionType type() const override;    ///< 返回连接类型
-    QString name() const override;           ///< 返回BLE设备地址
-    ConnectionState state() const override;  ///< 返回当前连接状态
-    bool open() override;                    ///< 打开BLE连接(模拟异步)
+    ConnectionType type() const override;    ///< @return 连接类型
+    QString name() const override;           ///< @return BLE设备地址
+    ConnectionState state() const override;  ///< @return 当前连接状态
+    bool open() override;                    ///< @return true=成功发起连接
     void close() override;                   ///< 关闭BLE连接
-    qint64 write(const QByteArray& data) override; ///< 写入数据(-1=失败)
-    void configure(const QVariantMap& params) override; ///< 配置(address/deviceName)
+    qint64 write(const QByteArray& data) override; ///< @return 实际写入字节数，-1=失败
+    void configure(const QVariantMap& params) override; ///< @param params 配置(address/deviceName)
     // ---- BLE专用 ----
     /** @brief 连接到指定地址的BLE设备 @param address BLE设备地址 */
     void connectToDevice(const QString& address);
@@ -50,14 +52,18 @@ public:
     void resetStats();                       ///< 重置所有统计计数器
 
 signals:
-    void servicesDiscovered(const QStringList& services); ///< GATT服务发现完成
-    void characteristicRead(const QString& characteristicUuid, const QByteArray& value); ///< 特征值读取完成
+    /** @brief GATT服务发现完成 @param services 已发现的服务UUID列表 */
+    void servicesDiscovered(const QStringList& services);
+    /** @brief 特征值读取完成 @param characteristicUuid 特征UUID @param value 读取到的数据 */
+    void characteristicRead(const QString& characteristicUuid, const QByteArray& value);
 
 private slots:
-    void onConnectTimeout();                 ///< 模拟连接建立完成
+    /** @brief 模拟连接建立完成回调 */
+    void onConnectTimeout();
 
 private:
-    void initMockServices();                 ///< 初始化模拟GATT服务列表
+    /** @brief 初始化模拟GATT服务列表 */
+    void initMockServices();
     QString m_deviceAddress;                 ///< 目标BLE设备地址
     QString m_deviceName;                    ///< 目标BLE设备名称
     ConnectionState m_state = ConnectionState::Disconnected; ///< 当前连接状态

@@ -82,6 +82,7 @@ public:
         m_indicatorHeight = visualRect.height();
         m_indicatorY = visualRect.y();
         ++m_totalPositionChanges;
+        ++m_totalJumpMoves;
         update();
     }
 
@@ -90,7 +91,9 @@ public:
     // ── 统计计数器 ──
     quint64 totalAnimations() const { return m_totalAnimations; } ///< 动画启动总次数
     quint64 totalPositionChanges() const { return m_totalPositionChanges; } ///< 位置变更总次数
-    void resetIndicatorStatistics() { m_totalAnimations = 0; m_totalPositionChanges = 0; } ///< 重置统计
+    quint64 totalJumpMoves() const { return m_totalJumpMoves; } ///< 无动画跳转总次数(初始化/恢复会话)
+    quint64 totalThemeUpdates() const { return m_totalThemeUpdates; } ///< 主题颜色更新总次数
+    void resetIndicatorStatistics(); ///< 重置统计
 
     /** 设置指示线Y坐标(QPropertyAnimation写访问器) @param y 目标Y坐标 */
     void setIndicatorY(qreal y)
@@ -105,7 +108,7 @@ signals:
     void indicatorYChanged(qreal y);         ///< 指示线Y坐标变化信号
 
 public slots:
-    void updateThemeColor() { update(); }    ///< 主题切换时刷新颜色
+    void updateThemeColor() { ++m_totalThemeUpdates; update(); }    ///< 主题切换时刷新颜色
 
 protected:
     /** 绘制指示线(左侧3px宽accent色竖线，上下圆角) @param event 绘制事件 */
@@ -156,6 +159,17 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalAnimations = 0;     ///< 动画启动次数
     quint64 m_totalPositionChanges = 0;///< 位置变更次数
+    quint64 m_totalJumpMoves = 0;      ///< 无动画跳转次数
+    quint64 m_totalThemeUpdates = 0;   ///< 主题颜色更新次数
 };
+
+/** @brief 重置导航指示器统计计数器(内联实现) */
+inline void NavIndicatorWidget::resetIndicatorStatistics()
+{
+    m_totalAnimations = 0;
+    m_totalPositionChanges = 0;
+    m_totalJumpMoves = 0;
+    m_totalThemeUpdates = 0;
+}
 
 #endif // NAV_INDICATOR_WIDGET_H

@@ -28,6 +28,7 @@ public:
     /** @brief 行数据回调: 从offset返回count条记录 */
     using LineProvider = std::function<QVector<TerminalLine>(int offset, int count)>;
 
+    /** @brief 构造数据导出器 @param parent 父对象 */
     explicit DataExporter(QObject* parent = nullptr);
 
     /** @brief 全量导出(支持时间范围过滤) @param from/to 时间过滤(无效值=不限) */
@@ -59,16 +60,16 @@ public:
 
     // ---- 会话统计 ----
 
-    quint64 totalExports() const;        ///< 累计导出次数
-    quint64 totalBytesExported() const;   ///< 累计导出字节
-    quint64 totalRowsExported() const;    ///< 累计导出行数
-    quint64 totalErrors() const;          ///< 累计失败次数
-    quint64 totalCsvExports() const;      ///< CSV格式次数
-    quint64 totalHexDumpExports() const;  ///< HexDump格式次数
-    quint64 totalJsonExports() const;     ///< JSON格式次数
-    quint64 totalBinExports() const;      ///< 二进制格式次数
-    quint64 totalPlainExports() const;    ///< Plain格式次数
-    quint64 totalTimestampedExports() const; ///< Timestamped格式次数
+    quint64 totalExports() const;        ///< @return 累计导出次数
+    quint64 totalBytesExported() const;   ///< @return 累计导出字节
+    quint64 totalRowsExported() const;    ///< @return 累计导出行数
+    quint64 totalErrors() const;          ///< @return 累计失败次数
+    quint64 totalCsvExports() const;      ///< @return CSV格式次数
+    quint64 totalHexDumpExports() const;  ///< @return HexDump格式次数
+    quint64 totalJsonExports() const;     ///< @return JSON格式次数
+    quint64 totalBinExports() const;      ///< @return 二进制格式次数
+    quint64 totalPlainExports() const;    ///< @return Plain格式次数
+    quint64 totalTimestampedExports() const; ///< @return Timestamped格式次数
 
     /** @brief 获取累计导出总耗时(仅成功操作) @return 总耗时毫秒数 */
     qint64 totalExportDurationMs() const;

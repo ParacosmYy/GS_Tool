@@ -53,10 +53,10 @@ public:
     /** @brief 获取主题模型 @return 模型指针 */
     MqttTopicModel* topicModel() const;
 
-    /** @brief 获取累计自动重连次数 */
+    /** @brief 获取累计自动重连次数 @return 重连尝试总次数 */
     quint64 totalReconnectAttempts() const { return m_totalReconnectAttempts; }
 
-    /** @brief 获取累计发布操作次数(UI层面) */
+    /** @brief 获取累计发布操作次数(UI层面) @return 发布操作总次数 */
     quint64 totalPublishOps() const { return m_totalPublishOps; }
 
     /** @brief 重置UI层统计计数器 */

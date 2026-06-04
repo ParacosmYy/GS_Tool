@@ -39,10 +39,10 @@ public:
      */
     QVariantMap config() const;
 
-    /** @brief 获取累计连接尝试次数 */
+    /** @brief 获取累计连接尝试次数 @return 连接尝试总次数 */
     quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
 
-    /** @brief 获取累计配置变更次数 */
+    /** @brief 获取累计配置变更次数 @return 配置变更总次数 */
     quint64 totalConfigChanges() const { return m_totalConfigChanges; }
 
     /** @brief 重置所有统计计数器 */

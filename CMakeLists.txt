@@ -59,6 +59,7 @@ set(SOURCES
     src/core/send/SendControllerSend.cpp
     src/core/send/SendControllerStats.cpp
     src/core/send/SendHistoryManager.cpp
+    src/core/send/SendHistoryManagerStats.cpp
     src/core/event/EventBus.cpp
     src/core/event/EventBusStats.cpp
     src/core/widgets/AppDialog.cpp
@@ -130,6 +131,7 @@ set(SOURCES
     src/connection/serial_port/SerialConnectionUtility.cpp
     src/connection/serial_port/SerialConnectionStats.cpp
     src/connection/network/TcpConnection.cpp
+    src/connection/network/TcpConnectionLifecycle.cpp
     src/connection/network/TcpConnectionStats.cpp
     src/connection/network/TcpConnectionHelpers.cpp
     src/connection/network/TcpConnectionHandlers.cpp
@@ -150,6 +152,7 @@ set(SOURCES
     src/terminal/search/TerminalSearchBarAnimation.cpp
     src/terminal/types/DirectionFilter.cpp
     src/terminal/layout/TerminalLayoutManager.cpp
+    src/terminal/layout/TerminalLayoutManagerApply.cpp
     src/terminal/layout/TerminalLayoutManagerStats.cpp
     src/terminal/layout/TerminalLayoutSplit.cpp
     src/terminal/selection/TerminalSelectionManager.cpp
@@ -407,6 +410,7 @@ set(SOURCES
     # ── F11: 插件系统 ──
     src/plugin/PluginManager.cpp
     src/plugin/PluginManagerScan.cpp
+    src/plugin/PluginManagerQuery.cpp
     src/plugin/PluginApi.cpp
     src/plugin/PluginConfigPanel.cpp
     src/plugin/PluginConfigPanelSetup.cpp
@@ -418,6 +422,7 @@ set(SOURCES
     src/connection/ble/BleScannerDiscovery.cpp
     src/connection/ble/BleScannerFilter.cpp
     src/connection/ble/BleConnection.cpp
+    src/connection/ble/BleConnectionStats.cpp
     src/connection/ble/BleGattModel.cpp
     src/connection/ble/BleGattModelIndex.cpp
     src/connection/ble/BleGattModelQuery.cpp
@@ -439,6 +444,7 @@ set(SOURCES
     src/connection/can/CanFrameParserBuild.cpp
     src/connection/can/CanBusMonitor.cpp
     src/connection/can/CanBusMonitorFrame.cpp
+    src/connection/can/CanBusMonitorColor.cpp
     src/connection/can/CanBusMonitorStats.cpp
     src/connection/can/CanConfigPanel.cpp
     src/connection/can/CanConfigPanelPersist.cpp

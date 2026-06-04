@@ -33,28 +33,38 @@ public:
 
     // ---- USB专用接口 ----
 
-    bool setDevice(quint16 vid, quint16 pid);   ///< 设置目标USB设备(厂商ID/产品ID)
-    bool claimInterface(int interface);          ///< 声明USB接口
-    void releaseInterface(int interface);        ///< 释放USB接口
-    QByteArray bulkTransfer(int endpoint, const QByteArray& data); ///< Bulk传输，endpoint bit7决定方向
-    QByteArray interruptTransfer(int endpoint, const QByteArray& data); ///< Interrupt传输
-    QByteArray controlTransfer(quint8 requestType, quint8 request,  ///< Control传输
+    /** @brief 设置目标USB设备(厂商ID/产品ID) @param vid 厂商ID @param pid 产品ID @return true=设置成功 */
+    bool setDevice(quint16 vid, quint16 pid);
+    /** @brief 声明USB接口 @param interface 接口编号 @return true=声明成功 */
+    bool claimInterface(int interface);
+    /** @brief 释放USB接口 @param interface 接口编号 */
+    void releaseInterface(int interface);
+    /** @brief Bulk传输，endpoint bit7决定方向 @param endpoint 端点地址 @param data 发送数据 @return 接收到的数据 */
+    QByteArray bulkTransfer(int endpoint, const QByteArray& data);
+    /** @brief Interrupt传输 @param endpoint 端点地址 @param data 发送数据 @return 接收到的数据 */
+    QByteArray interruptTransfer(int endpoint, const QByteArray& data);
+    /** @brief Control传输 @param requestType 请求类型 @param request 请求码 @param value 值字段 @param index 索引字段 @param data 数据缓冲 @return 接收到的数据 */
+    QByteArray controlTransfer(quint8 requestType, quint8 request,
                                quint16 value, quint16 index, const QByteArray& data);
-    UsbDeviceDescriptor readDeviceDescriptor();  ///< 读取USB设备描述符(需先打开连接)
-    QString readStringDescriptor(quint8 descIndex); ///< 读取USB字符串描述符(iManufacturer/iProduct/iSerialNumber)
-    QVariantMap deviceDescriptorSummary();       ///< 获取设备描述符摘要(bcdUSB/class/vid/pid/manufacturer/product/serial)
-    bool detachKernelDriverIfNeeded(int interfaceNum); ///< 检查并分离内核驱动(Linux专用，Windows无操作)
+    /** @brief 读取USB设备描述符(需先打开连接) @return 设备描述符结构体 */
+    UsbDeviceDescriptor readDeviceDescriptor();
+    /** @brief 读取USB字符串描述符 @param descIndex 描述符索引(iManufacturer/iProduct/iSerialNumber) @return 字符串内容 */
+    QString readStringDescriptor(quint8 descIndex);
+    /** @brief 获取设备描述符摘要 @return 包含bcdUSB/class/vid/pid/manufacturer/product/serial的映射 */
+    QVariantMap deviceDescriptorSummary();
+    /** @brief 检查并分离内核驱动(Linux专用，Windows无操作) @param interfaceNum 接口编号 @return true=分离成功或无需分离 */
+    bool detachKernelDriverIfNeeded(int interfaceNum);
 
     // ---- 统计信息接口 ----
 
-    quint64 totalTransfers() const { return m_totalTransfers; }       ///< 总传输次数
-    quint64 totalBytesSent() const { return m_totalBytesSent; }       ///< 总发送字节数
-    quint64 totalBytesReceived() const { return m_totalBytesReceived; } ///< 总接收字节数
-    quint64 errorCount() const { return m_errorCount; }               ///< 错误计数
-    quint64 bulkTransferCount() const { return m_bulkTransferCount; } ///< Bulk传输次数
-    quint64 interruptTransferCount() const { return m_interruptTransferCount; } ///< Interrupt传输次数
-    quint64 controlTransferCount() const { return m_controlTransferCount; } ///< Control传输次数
-    quint64 kernelDetachCount() const { return m_kernelDetachCount; } ///< 内核驱动分离次数(Linux)
+    quint64 totalTransfers() const { return m_totalTransfers; }       ///< @return 总传输次数
+    quint64 totalBytesSent() const { return m_totalBytesSent; }       ///< @return 总发送字节数
+    quint64 totalBytesReceived() const { return m_totalBytesReceived; } ///< @return 总接收字节数
+    quint64 errorCount() const { return m_errorCount; }               ///< @return 错误计数
+    quint64 bulkTransferCount() const { return m_bulkTransferCount; } ///< @return Bulk传输次数
+    quint64 interruptTransferCount() const { return m_interruptTransferCount; } ///< @return Interrupt传输次数
+    quint64 controlTransferCount() const { return m_controlTransferCount; } ///< @return Control传输次数
+    quint64 kernelDetachCount() const { return m_kernelDetachCount; } ///< @return 内核驱动分离次数(Linux)
     void resetStats(); ///< 重置所有统计计数器
 
 private:

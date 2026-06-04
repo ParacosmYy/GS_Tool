@@ -32,10 +32,10 @@ public:
      */
     void setDevice(quint16 vid, quint16 pid);
 
-    /** @brief 获取累计描述符刷新次数 */
+    /** @brief 获取累计描述符刷新次数 @return 刷新总次数 */
     quint64 totalDescriptorRefreshes() const;
 
-    /** @brief 获取累计查看设备次数 */
+    /** @brief 获取累计查看设备次数 @return 查看总次数 */
     quint64 totalDevicesViewed() const;
 
     /** @brief 重置所有统计计数器 */
@@ -63,6 +63,14 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalDescriptorRefreshes = 0;  ///< 累计描述符刷新次数
     quint64 m_totalDevicesViewed = 0;        ///< 累计查看设备次数
+    quint64 m_totalNodesAdded = 0;           ///< 累计添加的树节点总数(设备/配置/接口/端点)
+    quint64 m_totalRawBytesViewed = 0;       ///< 累计查看的原始描述符字节数
+
+public:
+    /** @brief 获取累计添加树节点总数 @return 节点计数 */
+    quint64 totalNodesAdded() const { return m_totalNodesAdded; }
+    /** @brief 获取累计查看原始描述符字节数 @return 字节数 */
+    quint64 totalRawBytesViewed() const { return m_totalRawBytesViewed; }
 };
 
 #endif // USB_DESCRIPTOR_VIEWER_H

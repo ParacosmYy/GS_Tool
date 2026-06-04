@@ -38,6 +38,7 @@ void RegisterEditor::readAddress(int address)
 {
     if (!m_connection) {
         appendLog(tr("R [0x%1] → 错误: 未连接").arg(address, 2, 16, QChar('0')), false);
+        ++m_totalErrors;
         return;
     }
 
@@ -75,6 +76,7 @@ void RegisterEditor::writeAddress(int address, const QByteArray& data)
 {
     if (!m_connection) {
         appendLog(tr("W [0x%1] ← 错误: 未连接").arg(address, 2, 16, QChar('0')), true);
+        ++m_totalErrors;
         return;
     }
 
@@ -129,6 +131,7 @@ void RegisterEditor::onClearLogClicked()
 {
     if (m_log) {
         m_log->clear();
+        ++m_totalLogClears;
     }
 }
 

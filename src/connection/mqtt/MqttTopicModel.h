@@ -79,15 +79,15 @@ public:
     QModelIndex findTopicIndex(const QString& topic) const;
 
     // ---- 统计接口 ----
-    /** @brief 获取累计添加次数 */
+    /** @brief 获取累计添加次数 @return 添加总次数 */
     quint64 totalTopicsAdded() const;
-    /** @brief 获取累计移除次数 */
+    /** @brief 获取累计移除次数 @return 移除总次数 */
     quint64 totalTopicsRemoved() const;
-    /** @brief 获取累计去重跳过次数 */
+    /** @brief 获取累计去重跳过次数 @return 去重总次数 */
     quint64 totalDuplicateSkips() const;
-    /** @brief 获取累计QoS更新次数 */
+    /** @brief 获取累计QoS更新次数 @return QoS更新总次数 */
     quint64 totalQosUpdates() const;
-    /** @brief 获取累计消息路由次数 */
+    /** @brief 获取累计消息路由次数 @return 路由总次数 */
     quint64 totalMessagesRouted() const;
     /** @brief 获取树节点总数(含非叶节点) @return 节点总数(不含虚拟根节点) */
     int totalNodeCount() const;

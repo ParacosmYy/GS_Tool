@@ -47,22 +47,34 @@ public:
     void configure(const QVariantMap& params) override;  ///< 配置连接参数(host/port/clientId/username/password/keepAlive/cleanSession)
 
     // ---- MQTT专用接口 ----
-    void connectToHost(const QString& host, int port);   ///< 连接到指定MQTT服务器
-    void disconnectFromHost();                           ///< 断开MQTT连接
-    bool publish(const QString& topic, const QByteArray& payload, int qos = 0);  ///< 发布消息 @return true=发送成功
-    bool subscribe(const QString& topic, int qos = 0);   ///< 订阅主题 @return true=发送成功
-    void unsubscribe(const QString& topic);               ///< 取消订阅指定主题
+    /** @brief 连接到指定MQTT服务器 @param host 服务器地址 @param port 服务器端口 */
+    void connectToHost(const QString& host, int port);
+    /** @brief 断开MQTT连接 */
+    void disconnectFromHost();
+    /** @brief 发布消息到指定主题 @param topic 目标主题 @param payload 消息负载 @param qos QoS等级(0/1/2) @return true=发送成功 */
+    bool publish(const QString& topic, const QByteArray& payload, int qos = 0);
+    /** @brief 订阅指定主题 @param topic 订阅主题 @param qos QoS等级(0/1/2) @return true=发送成功 */
+    bool subscribe(const QString& topic, int qos = 0);
+    /** @brief 取消订阅指定主题 @param topic 要取消的主题 */
+    void unsubscribe(const QString& topic);
 
     // ---- LWT遗嘱消息接口 ----
-    void setWill(const MqttWillConfig& will);            ///< 配置遗嘱消息
-    void clearWill();                                    ///< 清除遗嘱消息配置
-    const MqttWillConfig& willConfig() const;            ///< @return 遗嘱配置(只读)
+    /** @brief 配置遗嘱消息 @param will 遗嘱消息配置 */
+    void setWill(const MqttWillConfig& will);
+    /** @brief 清除遗嘱消息配置 */
+    void clearWill();
+    /** @brief 获取遗嘱消息配置(只读) @return 遗嘱配置常量引用 */
+    const MqttWillConfig& willConfig() const;
 
     // ---- 消息队列接口 ----
-    bool enqueueMessage(const QString& topic, const QByteArray& payload, int qos = 0);  ///< 入队消息(断线时缓存)
-    int queueSize() const;                               ///< @return 待发送消息数
-    void setQueueLimit(int maxSize);                     ///< 设置队列最大容量(默认100)
-    int queueLimit() const;                              ///< @return 最大消息数
+    /** @brief 入队消息(断线时缓存) @param topic 目标主题 @param payload 消息负载 @param qos QoS等级 @return true=入队成功 */
+    bool enqueueMessage(const QString& topic, const QByteArray& payload, int qos = 0);
+    /** @brief 获取待发送消息数 @return 队列中消息数量 */
+    int queueSize() const;
+    /** @brief 设置队列最大容量 @param maxSize 最大消息数(默认100) */
+    void setQueueLimit(int maxSize);
+    /** @brief 获取队列最大容量 @return 最大消息数 */
+    int queueLimit() const;
 
     // ---- 统计接口 ----
     quint64 totalPublishes() const;                      ///< @return 累计发布消息数
@@ -79,8 +91,10 @@ public:
     quint64 qos2Count() const;                           ///< @return QoS2发布计数
     quint64 keepAliveSent() const;                       ///< @return 累计PINGREQ发送次数
     QDateTime lastConnectTime() const;                   ///< @return 最后连接发起时间
-    int subscriptionCount() const;                       ///< @return 当前订阅主题数
-    int pendingQueueSize() const;                        ///< @return 队列中的消息数
+    /** @brief 获取当前订阅主题数 @return 活跃订阅数量 */
+    int subscriptionCount() const;
+    /** @brief 获取队列中的消息数 @return 待发送消息数量 */
+    int pendingQueueSize() const;
     void resetStats();                                   ///< 重置所有统计计数器
 
 signals:
@@ -96,15 +110,24 @@ private slots:
     void onKeepAlive();                                  ///< KeepAlive定时器回调，发送PINGREQ
 
 private:
-    QByteArray buildMqttPacket(quint8 packetType, const QByteArray& payload);  ///< 构建MQTT协议报文
-    QByteArray encodeRemainingLength(int length);        ///< 编码剩余长度字段(MQTT可变长度编码)
-    void parseIncomingPacket();                          ///< 解析TCP接收缓冲区中的MQTT报文
-    void sendConnect();                                  ///< 发送MQTT CONNECT报文
-    void handleConnack(const QByteArray& data);          ///< 处理CONNACK响应报文
-    void handlePublish(const QByteArray& data, quint8 flags);  ///< 处理收到的PUBLISH报文
-    void handleSuback(const QByteArray& data);           ///< 处理SUBACK响应报文
-    QString generateClientId();                          ///< 生成唯一客户端ID
-    void flushPendingQueue();                            ///< 发送队列中缓存的待发消息
+    /** @brief 构建MQTT协议报文 @param packetType 报文类型 @param payload 报文负载 @return 编码后的完整报文 */
+    QByteArray buildMqttPacket(quint8 packetType, const QByteArray& payload);
+    /** @brief 编码剩余长度字段(MQTT可变长度编码) @param length 长度值 @return 编码后的字节序列 */
+    QByteArray encodeRemainingLength(int length);
+    /** @brief 解析TCP接收缓冲区中的MQTT报文 */
+    void parseIncomingPacket();
+    /** @brief 发送MQTT CONNECT报文 */
+    void sendConnect();
+    /** @brief 处理CONNACK响应报文 @param data CONNACK报文数据 */
+    void handleConnack(const QByteArray& data);
+    /** @brief 处理收到的PUBLISH报文 @param data PUBLISH报文数据 @param flags 报文标志字节 */
+    void handlePublish(const QByteArray& data, quint8 flags);
+    /** @brief 处理SUBACK响应报文 @param data SUBACK报文数据 */
+    void handleSuback(const QByteArray& data);
+    /** @brief 生成唯一客户端ID @return 客户端ID字符串 */
+    QString generateClientId();
+    /** @brief 发送队列中缓存的待发消息 */
+    void flushPendingQueue();
 
     // 配置参数
     QString m_host;                             ///< MQTT服务器地址

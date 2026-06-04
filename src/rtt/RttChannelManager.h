@@ -26,30 +26,30 @@ class RttChannelManager : public QObject {
     Q_OBJECT
 
 public:
-    /** @brief 构造函数 */
+    /** @brief 构造函数 @param parent 父对象 */
     explicit RttChannelManager(QObject* parent = nullptr);
 
-    /** @brief 添加一个 RTT 通道 */
+    /** @brief 添加一个 RTT 通道 @param channelId 通道编号(0-15) @param name 通道显示名称 */
     void addChannel(int channelId, const QString& name);
 
-    /** @brief 移除一个 RTT 通道 */
+    /** @brief 移除一个 RTT 通道 @param channelId 要移除的通道编号 */
     void removeChannel(int channelId);
 
-    /** @brief 获取所有活跃通道 */
+    /** @brief 获取所有活跃通道 @return 通道编号→名称的映射表 */
     QMap<int, QString> activeChannels() const;
 
-    /** @brief 路由数据到指定通道 */
+    /** @brief 路由数据到指定通道 @param channelId 目标通道编号 @param data 要路由的字节数据 */
     void routeData(int channelId, const QByteArray& data);
 
-    /** @brief 获取累计读取次数 */
+    /** @brief 获取累计读取次数 @return 读取总次数 */
     quint64 totalReads() const;
-    /** @brief 获取累计写入次数 */
+    /** @brief 获取累计写入次数 @return 写入总次数 */
     quint64 totalWrites() const;
-    /** @brief 获取累计读取字节数 */
+    /** @brief 获取累计读取字节数 @return 读取字节总数 */
     quint64 totalBytesRead() const;
-    /** @brief 获取累计写入字节数 */
+    /** @brief 获取累计写入字节数 @return 写入字节总数 */
     quint64 totalBytesWritten() const;
-    /** @brief 获取累计错误次数 */
+    /** @brief 获取累计错误次数 @return 错误总次数 */
     quint64 errorCount() const;
     /** @brief 重置所有统计计数器 */
     void resetChannelStatistics();

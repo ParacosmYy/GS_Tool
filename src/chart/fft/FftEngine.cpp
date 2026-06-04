@@ -1,10 +1,11 @@
 /**
  * @file FftEngine.cpp
- * @brief FFT频谱计算引擎实现 -- Cooley-Tukey radix-2 DIT算法
+ * @brief FFT频谱计算引擎实现 -- 构造/工具方法 + Cooley-Tukey蝶形运算
  *
- * 实现 Cooley-Tukey 时间抽取（DIT）基-2 FFT算法，
- * 包含位反转置换和蝶形运算两个核心步骤。
- * 附带四种常用窗函数的实现。
+ * 实现 FftEngine 构造函数、工具方法(nextPowerOf2/log2Int/bitReverse/
+ * windowTypeName)、主计算接口(compute)和Cooley-Tukey核心蝶形运算(fftRadix2)。
+ *
+ * 窗函数(applyWindow)/幅度谱(magnitudeSpectrum)/统计接口见 FftEngineWindow.cpp。
  */
 
 #include "chart/fft/FftEngine.h"
@@ -203,3 +204,5 @@ void FftEngine::fftRadix2(QVector<std::complex<double>>& data)
         }
     }
 }
+
+// applyWindow/magnitudeSpectrum/统计接口见 FftEngineWindow.cpp

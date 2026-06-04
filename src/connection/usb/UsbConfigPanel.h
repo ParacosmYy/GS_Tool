@@ -37,10 +37,10 @@ public:
      */
     void setDetector(UsbDeviceDetector* detector);
 
-    /** @brief 获取累计设备刷新次数 */
+    /** @brief 获取累计设备刷新次数 @return 刷新总次数 */
     quint64 totalDeviceRefreshes() const { return m_totalDeviceRefreshes; }
 
-    /** @brief 获取累计配置变更次数 */
+    /** @brief 获取累计配置变更次数 @return 配置变更总次数 */
     quint64 totalConfigChanges() const { return m_totalConfigChanges; }
 
     /** @brief 重置所有统计计数器 */

@@ -40,19 +40,19 @@ public:
      */
     QVariantMap config() const;
 
-    /** @brief 获取累计发起扫描次数 */
+    /** @brief 获取累计发起扫描次数 @return 扫描发起总次数 */
     quint64 totalScansInitiated() const { return m_totalScansInitiated; }
 
-    /** @brief 获取累计设备选择次数 */
+    /** @brief 获取累计设备选择次数 @return 设备选择总次数 */
     quint64 totalDeviceSelections() const { return m_totalDeviceSelections; }
 
-    /** @brief 获取累计连接尝试次数 */
+    /** @brief 获取累计连接尝试次数 @return 连接尝试总次数 */
     quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
 
-    /** @brief 获取累计发现的设备总数 */
+    /** @brief 获取累计发现的设备总数 @return 设备发现总次数 */
     quint64 totalDevicesDiscovered() const { return m_totalDevicesDiscovered; }
 
-    /** @brief 获取累计地址手动编辑次数 */
+    /** @brief 获取累计地址手动编辑次数 @return 编辑总次数 */
     quint64 totalAddressEdits() const { return m_totalAddressEdits; }
 
     /** @brief 重置所有统计计数器 */

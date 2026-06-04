@@ -19,11 +19,14 @@ class PanelManager : public QObject, private PanelManagerMembers {
     Q_OBJECT
 
 public:
-    explicit PanelManager(QObject* parent = nullptr); ///< 构造
-    ~PanelManager() override = default;     ///< 析构(QObject父子树自动回收)
+    /** @brief 构造面板管理器 @param parent 父对象 */
+    explicit PanelManager(QObject* parent = nullptr);
+    /** @brief 析构(QObject父子树自动回收) */
+    ~PanelManager() override = default;
     PanelManager(const PanelManager&) = delete; ///< 禁止拷贝
     PanelManager& operator=(const PanelManager&) = delete; ///< 禁止赋值
-    void createPanels(OtaManager* otaManager, TerminalModel* terminalModel); ///< 创建所有面板(调用一次)
+    /** @brief 创建所有面板(调用一次) @param otaManager OTA管理器实例 @param terminalModel 终端数据模型 */
+    void createPanels(OtaManager* otaManager, TerminalModel* terminalModel);
 
     // ==================== 面板 Getter ====================
 
@@ -102,32 +105,43 @@ public:
     QVector<QWidget*> allPanels() const;
 
     // ==================== BasePanel包装器 ====================
-    BasePanel* wrapper(QWidget* rawPanel) const;    ///< 获取面板的BasePanel包装器
-    void wrapPanels();                              ///< 创建所有BasePanel包装器
+    /** @brief 获取面板的BasePanel包装器 @param rawPanel 原始面板指针 @return BasePanel包装器，不存在返回nullptr */
+    BasePanel* wrapper(QWidget* rawPanel) const;
+    /** @brief 创建所有BasePanel包装器 */
+    void wrapPanels();
 
     // ==================== 响应式布局 ====================
 
-    void setCompactMode(bool compact);       ///< 设置紧凑模式(小窗口隐藏非关键面板扩展区域)
-    bool isCompactMode() const;              ///< 是否处于紧凑模式
+    /** @brief 设置紧凑模式(小窗口隐藏非关键面板扩展区域) @param compact true=启用紧凑模式 */
+    void setCompactMode(bool compact);
+    /** @brief 查询是否处于紧凑模式 @return true=紧凑模式 */
+    bool isCompactMode() const;
 
     // ==================== 面板统计 ====================
-    void onPanelSwitched(int visibleCount);  ///< 通知面板切换(由NavigationController调用)
-    quint64 totalPanelSwitches() const;      ///< 累计面板切换次数
-    quint64 totalPanelsCreated() const;      ///< 累计创建面板总数
-    quint64 maxConcurrentPanels() const;     ///< 历史最大并发面板数
-    quint64 totalPanelCreations() const;     ///< 累计面板创建次数(wrapPanels逐个创建)
-    quint64 totalPanelDeletions() const;     ///< 累计面板删除次数
-    quint64 totalActivePanelsTracked() const; ///< 累计活跃面板追踪次数
+    /** @brief 通知面板切换(由NavigationController调用) @param visibleCount 当前可见面板数 */
+    void onPanelSwitched(int visibleCount);
+    quint64 totalPanelSwitches() const;      ///< @return 累计面板切换次数
+    quint64 totalPanelsCreated() const;      ///< @return 累计创建面板总数
+    quint64 maxConcurrentPanels() const;     ///< @return 历史最大并发面板数
+    quint64 totalPanelCreations() const;     ///< @return 累计面板创建次数(wrapPanels逐个创建)
+    quint64 totalPanelDeletions() const;     ///< @return 累计面板删除次数
+    quint64 totalActivePanelsTracked() const; ///< @return 累计活跃面板追踪次数
     void resetStats();                       ///< 重置所有统计计数器
 
 private:
     // --- 面板工厂辅助方法(实现见PanelManagerFactory.cpp) ---
-    void createConnectionPanels(QWidget* parent);   ///< 创建连接层面板(BLE/CAN/MQTT/TCP/SPI/I2C/WS/USB)
-    void createProtocolPanels(QWidget* parent);     ///< 创建协议层面板(自定义协议/Modbus/Protobuf)
-    void createDebugPanels(QWidget* parent);        ///< 创建调试层面板(RTT/寄存器/信号线/流量/触发器)
-    void createChartExtensionPanels(QWidget* parent); ///< 创建图表扩展面板(FFT/散点/直方图)
-    void createToolPanels(QWidget* parent);         ///< 创建工具层面板(校验/转换/时间戳/数据包/对比)
-    void createSystemPanels(QWidget* parent);       ///< 创建系统层面板(插件/项目/设备/性能)
+    /** @brief 创建连接层面板(BLE/CAN/MQTT/TCP/SPI/I2C/WS/USB) @param parent 面板父控件 */
+    void createConnectionPanels(QWidget* parent);
+    /** @brief 创建协议层面板(自定义协议/Modbus/Protobuf) @param parent 面板父控件 */
+    void createProtocolPanels(QWidget* parent);
+    /** @brief 创建调试层面板(RTT/寄存器/信号线/流量/触发器) @param parent 面板父控件 */
+    void createDebugPanels(QWidget* parent);
+    /** @brief 创建图表扩展面板(FFT/散点/直方图) @param parent 面板父控件 */
+    void createChartExtensionPanels(QWidget* parent);
+    /** @brief 创建工具层面板(校验/转换/时间戳/数据包/对比) @param parent 面板父控件 */
+    void createToolPanels(QWidget* parent);
+    /** @brief 创建系统层面板(插件/项目/设备/性能) @param parent 面板父控件 */
+    void createSystemPanels(QWidget* parent);
 
     // --- BasePanel包装器 ---
     QMap<QWidget*, BasePanel*> m_wrappers;  ///< 原始面板→BasePanel包装器映射

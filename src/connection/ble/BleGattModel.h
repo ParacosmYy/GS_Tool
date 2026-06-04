@@ -93,13 +93,13 @@ public:
     int totalNodeCount() const;
 
     // ---- 统计信息接口 ----
-    /** @brief 获取总发现服务数 */
+    /** @brief 获取总发现服务数 @return 服务发现总次数 */
     quint64 totalServicesDiscovered() const { return m_totalServicesDiscovered; }
-    /** @brief 获取总特征读取次数 */
+    /** @brief 获取总特征读取次数 @return 特征读取总次数 */
     quint64 totalCharacteristicsRead() const { return m_totalCharacteristicsRead; }
-    /** @brief 获取总写入次数 */
+    /** @brief 获取总写入次数 @return 写入总次数 */
     quint64 totalWrites() const { return m_totalWrites; }
-    /** @brief 获取错误计数 */
+    /** @brief 获取错误计数 @return 错误总次数 */
     quint64 errorCount() const { return m_errorCount; }
     /** @brief 重置所有GATT统计计数器 */
     void resetGattStatistics();

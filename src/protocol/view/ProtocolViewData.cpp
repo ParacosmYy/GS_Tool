@@ -38,6 +38,7 @@ void ProtocolView::addFrame(const QVariantMap& fields)
     while (m_model->rowCount() > m_maxRows) {
         m_model->removeRow(0);
         if (!m_frames.isEmpty()) m_frames.removeFirst();
+        ++m_totalRowsPruned;
     }
     m_table->scrollToBottom();
     /* 自动调整列宽(每50帧或前3帧) */
@@ -106,6 +107,7 @@ void ProtocolView::onFrameError(const QString& reason, const QByteArray& rawFram
     while (m_model->rowCount() > m_maxRows) {
         m_model->removeRow(0);
         if (!m_frames.isEmpty()) m_frames.removeFirst();
+        ++m_totalRowsPruned;
     }
     m_table->scrollToBottom();
     m_statusLabel->setText(tr("帧数: %1 | 错误: %2").arg(m_totalFrames).arg(m_totalErrors));
@@ -117,4 +119,6 @@ void ProtocolView::resetViewStatistics()
     m_totalFramesDisplayed = 0;
     m_totalExports = 0;
     m_totalContextMenuActions = 0;
+    m_totalRowsPruned = 0;
+    m_totalColorRangeMatches = 0;
 }

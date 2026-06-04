@@ -45,21 +45,21 @@ public:
     void setConnection(BleConnection* connection);
 
     // ---- 统计接口 ----
-    /** @brief 获取累计服务发现次数 */
+    /** @brief 获取累计服务发现次数 @return 服务发现总次数 */
     quint64 totalServiceDiscoveries() const;
-    /** @brief 获取累计特征读取次数 */
+    /** @brief 获取累计特征读取次数 @return 特征读取总次数 */
     quint64 totalCharacteristicReads() const;
-    /** @brief 获取累计特征写入次数 */
+    /** @brief 获取累计特征写入次数 @return 特征写入总次数 */
     quint64 totalCharacteristicWrites() const;
-    /** @brief 获取累计通知接收次数 */
+    /** @brief 获取累计通知接收次数 @return 通知接收总次数 */
     quint64 totalNotificationsReceived() const;
-    /** @brief 获取累计描述符操作次数 */
+    /** @brief 获取累计描述符操作次数 @return 描述符操作总次数 */
     quint64 totalDescriptorOps() const;
-    /** @brief 获取累计读取字节数 */
+    /** @brief 获取累计读取字节数 @return 读取字节总数 */
     quint64 totalBytesRead() const;
-    /** @brief 获取累计写入字节数 */
+    /** @brief 获取累计写入字节数 @return 写入字节总数 */
     quint64 totalBytesWritten() const;
-    /** @brief 获取最近一次服务发现耗时(ms) */
+    /** @brief 获取最近一次服务发现耗时(ms) @return 最近发现耗时 */
     qint64 lastDiscoveryDurationMs() const;
     /** @brief 重置所有统计计数器 */
     void resetStatistics();

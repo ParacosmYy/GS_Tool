@@ -81,7 +81,7 @@ public:
 
     // ---- 统计计数接口 ----
 
-    /** @brief 获取累计导出操作总次数 @return 导出次数 */
+    /** @brief 获取累计导出操作总次数 @return 导出总次数 */
     quint64 totalExports() const;
 
     /** @brief 获取累计PNG导出次数 @return PNG导出计数 */
@@ -93,16 +93,16 @@ public:
     /** @brief 获取累计PDF导出次数(预留) @return PDF导出计数 */
     quint64 totalExportsPdf() const;
 
-    /** @brief 获取累计图表图片导出次数(PNG+SVG) @return 图片导出次数 */
+    /** @brief 获取累计图表图片导出次数(PNG+SVG) @return 图片导出总次数 */
     quint64 totalChartImages() const;
 
-    /** @brief 获取累计CSV导出的数据行总数 @return CSV行数 */
+    /** @brief 获取累计CSV导出的数据行总数 @return CSV行总数 */
     quint64 totalCsvRows() const;
 
     /** @brief 获取累计导出错误次数 @return 导出错误计数 */
     quint64 totalExportErrors() const;
 
-    /** @brief 获取累计导出失败次数(兼容旧接口) @return 失败次数 */
+    /** @brief 获取累计导出失败次数(兼容旧接口) @return 失败总次数 */
     quint64 totalErrors() const;
 
     /** @brief 获取累计导出字节总数(所有格式文件大小之和) @return 字节数 */

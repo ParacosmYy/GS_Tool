@@ -74,19 +74,19 @@ public:
      */
     void setReadLength(int length);
 
-    /** @brief 获取读操作次数 */
+    /** @brief 获取读操作次数 @return 读取总次数 */
     int readCount() const;
 
-    /** @brief 获取写操作次数 */
+    /** @brief 获取写操作次数 @return 写入总次数 */
     int writeCount() const;
 
-    /** @brief 导出操作日志为文本 */
+    /** @brief 导出操作日志为文本 @return 日志文本内容 */
     QString exportLog() const;
 
-    /** @brief 获取累计寄存器读取次数(quint64) */
+    /** @brief 获取累计寄存器读取次数(quint64) @return 读取总次数 */
     quint64 totalRegisterReads() const;
 
-    /** @brief 获取累计寄存器写入次数(quint64) */
+    /** @brief 获取累计寄存器写入次数(quint64) @return 写入总次数 */
     quint64 totalRegisterWrites() const;
 
     /** @brief 重置所有统计计数器 */
@@ -149,6 +149,14 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalRegisterReads = 0;               ///< 累计寄存器读取次数
     quint64 m_totalRegisterWrites = 0;              ///< 累计寄存器写入次数
+    quint64 m_totalLogClears = 0;                   ///< 累计日志清空次数
+    quint64 m_totalErrors = 0;                      ///< 累计读写错误次数(未连接/失败)
+
+public:
+    /** @brief 获取累计日志清空次数 @return 清空计数 */
+    quint64 totalLogClears() const { return m_totalLogClears; }
+    /** @brief 获取累计读写错误次数 @return 错误计数 */
+    quint64 totalErrors() const { return m_totalErrors; }
 };
 
 #endif // REGISTEREDITOR_H

@@ -2,7 +2,9 @@
  * @file ConnectionPool.h
  * @brief 连接池管理器，统一管理多种类型连接的生命周期和自动重连
  */
-#pragma once
+#ifndef CONNECTIONPOOL_H
+#define CONNECTIONPOOL_H
+
 #include <QObject>
 #include <QMap>
 #include <QString>
@@ -60,19 +62,19 @@ public:
 
     // ---- 统计接口 ----
 
-    /** @brief 获取累计创建连接次数 */
+    /** @brief 获取累计创建连接次数 @return 创建总次数 */
     quint64 totalCreated() const { return m_totalCreated; }
 
-    /** @brief 获取累计移除连接次数 */
+    /** @brief 获取累计移除连接次数 @return 移除总次数 */
     quint64 totalRemoved() const { return m_totalRemoved; }
 
-    /** @brief 获取累计自动重连触发次数 */
+    /** @brief 获取累计自动重连触发次数 @return 重连触发总次数 */
     quint64 totalReconnectAttempts() const { return m_totalReconnectAttempts; }
 
-    /** @brief 获取累计活动刷新次数 */
+    /** @brief 获取累计活动刷新次数 @return 活动刷新总次数 */
     quint64 totalActivityUpdates() const { return m_totalActivityUpdates; }
 
-    /** @brief 获取连接池满拒绝次数 */
+    /** @brief 获取连接池满拒绝次数 @return 池满事件总次数 */
     quint64 totalPoolFullEvents() const { return m_totalPoolFullEvents; }
 
     /** @brief 获取累计借出尝试次数 @return 借出尝试总次数 */
@@ -125,3 +127,5 @@ private:
     quint64 m_totalEvictions = 0;        ///< 累计淘汰连接次数
     quint64 m_totalWaitTimeouts = 0;     ///< 累计借出等待超时次数
 };
+
+#endif // CONNECTIONPOOL_H

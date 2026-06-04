@@ -129,11 +129,11 @@ private:
     quint64 m_totalSuccessfulLoads = 0; ///< 累计成功加载
     quint64 m_totalErrors = 0;          ///< 累计错误
 public:
-    /** @brief 获取累计加载尝试次数 */
+    /** @brief 获取累计加载尝试次数 @return 加载尝试总次数 */
     quint64 totalLoadAttempts() const { return m_totalLoadAttempts; }
-    /** @brief 获取累计成功加载次数 */
+    /** @brief 获取累计成功加载次数 @return 成功加载总次数 */
     quint64 totalSuccessfulLoads() const { return m_totalSuccessfulLoads; }
-    /** @brief 获取累计错误次数 */
+    /** @brief 获取累计错误次数 @return 错误总次数 */
     quint64 totalErrors() const { return m_totalErrors; }
     /** @brief 重置加载器统计计数器 */
     void resetLoaderStatistics() { m_totalLoadAttempts = 0; m_totalSuccessfulLoads = 0; m_totalErrors = 0; }

@@ -60,6 +60,7 @@ PlaybackWidget::PlaybackWidget(QWidget* parent)
 void PlaybackWidget::setDuration(qint64 durationMs)
 {
     m_durationMs = durationMs;
+    ++m_totalDurationChanges;
 
     // 时长有效时启用滑块，否则禁用
     m_slider->setEnabled(m_durationMs > 0);

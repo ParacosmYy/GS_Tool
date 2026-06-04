@@ -77,22 +77,22 @@ public:
     /** @brief 检查libusb是否可用 */
     bool isLibusbAvailable() const;
 
-    /** @brief 获取累计检测周期次数 */
+    /** @brief 获取累计检测周期次数 @return 检测周期总次数 */
     quint64 totalDetectionCycles() const;
 
-    /** @brief 获取累计检测到设备次数 */
+    /** @brief 获取累计检测到设备次数 @return 设备检测总次数 */
     quint64 totalDevicesDetected() const;
 
-    /** @brief 获取累计设备插入事件次数 */
+    /** @brief 获取累计设备插入事件次数 @return 插入事件总次数 */
     quint64 totalAttachEvents() const;
 
-    /** @brief 获取累计设备拔出事件次数 */
+    /** @brief 获取累计设备拔出事件次数 @return 拔出事件总次数 */
     quint64 totalDetachEvents() const;
 
-    /** @brief 获取libusb扫描调用次数 */
+    /** @brief 获取libusb扫描调用次数 @return libusb扫描总次数 */
     quint64 totalLibusbScans() const;
 
-    /** @brief 获取WMIC扫描调用次数 */
+    /** @brief 获取WMIC扫描调用次数 @return WMIC扫描总次数 */
     quint64 totalWmicScans() const;
 
     /** @brief 重置所有统计计数器 */

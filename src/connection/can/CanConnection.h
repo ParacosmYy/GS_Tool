@@ -50,40 +50,56 @@ public:
     void configure(const QVariantMap& params) override; ///< 配置CAN连接(bitrate/canFd/adapter/samplePoint/sjw/filters)
 
     // ---- CAN专用接口 ----
-    void setBitrate(int bitrate);              ///< 设置波特率(bps)
-    void setCanFdEnabled(bool enabled);        ///< 设置CAN-FD模式
-    void setBitTiming(const CanBitTiming& timing); ///< 设置位时序配置
-    CanBitTiming bitTiming() const;            ///< 获取当前位时序配置
-    bool sendFrame(int id, const QByteArray& data, bool extended = false); ///< 发送CAN帧
-    bool sendFdFrame(int id, const QByteArray& data, bool extended = false); ///< 发送CAN-FD帧(最长64字节)
-    void addFilter(const CanFilter& filter);   ///< 添加帧过滤器
-    void clearFilters();                       ///< 清除所有帧过滤器
-    QList<CanFilter> filters() const;          ///< 获取帧过滤器列表
-    bool acceptsFilter(quint32 id, bool extended) const; ///< 检查帧是否通过过滤器
-    void setSerialPort(IConnection* serialPort); ///< 设置底层串口连接(不转移所有权)
-    IConnection* serialPort() const;           ///< 获取底层串口连接
-    bool loadDbcFile(const QString& filePath); ///< 加载DBC数据库文件
-    QMap<QString, double> decodeFrameSignals(quint32 id, const QByteArray& data) const; ///< 解码CAN帧信号值(依赖已加载的DBC)
-    DbcParser* dbcParser() const;              ///< 获取DBC解析器实例(未加载时为nullptr)
+    /** @brief 设置波特率 @param bitrate 波特率(bps) */
+    void setBitrate(int bitrate);
+    /** @brief 设置CAN-FD模式 @param enabled true=启用CAN-FD */
+    void setCanFdEnabled(bool enabled);
+    /** @brief 设置位时序配置 @param timing 位时序参数 */
+    void setBitTiming(const CanBitTiming& timing);
+    /** @brief 获取当前位时序配置 @return 位时序结构体 */
+    CanBitTiming bitTiming() const;
+    /** @brief 发送CAN帧 @param id 帧ID @param data 帧数据 @param extended true=扩展帧 @return true=发送成功 */
+    bool sendFrame(int id, const QByteArray& data, bool extended = false);
+    /** @brief 发送CAN-FD帧(最长64字节) @param id 帧ID @param data 帧数据 @param extended true=扩展帧 @return true=发送成功 */
+    bool sendFdFrame(int id, const QByteArray& data, bool extended = false);
+    /** @brief 添加帧过滤器 @param filter 过滤器配置 */
+    void addFilter(const CanFilter& filter);
+    /** @brief 清除所有帧过滤器 */
+    void clearFilters();
+    /** @brief 获取帧过滤器列表 @return 过滤器列表 */
+    QList<CanFilter> filters() const;
+    /** @brief 检查帧是否通过过滤器 @param id 帧ID @param extended true=扩展帧 @return true=通过过滤 */
+    bool acceptsFilter(quint32 id, bool extended) const;
+    /** @brief 设置底层串口连接(不转移所有权) @param serialPort 串口连接实例 */
+    void setSerialPort(IConnection* serialPort);
+    /** @brief 获取底层串口连接 @return 串口连接指针 */
+    IConnection* serialPort() const;
+    /** @brief 加载DBC数据库文件 @param filePath DBC文件路径 @return true=加载成功 */
+    bool loadDbcFile(const QString& filePath);
+    /** @brief 解码CAN帧信号值(依赖已加载的DBC) @param id 帧ID @param data 帧数据 @return 信号名→物理值映射 */
+    QMap<QString, double> decodeFrameSignals(quint32 id, const QByteArray& data) const;
+    /** @brief 获取DBC解析器实例 @return 解析器指针，未加载时为nullptr */
+    DbcParser* dbcParser() const;
 
     // ---- 统计信息接口 ----
-    quint64 totalFramesSent() const { return m_totalFramesSent; }      ///< 累计发送帧数
-    quint64 totalFramesReceived() const { return m_totalFramesReceived; } ///< 累计接收帧数
-    quint64 totalBytesSent() const { return m_totalBytesSent; }        ///< 累计发送字节数
-    quint64 totalBytesReceived() const { return m_totalBytesReceived; } ///< 累计接收字节数
-    quint64 totalErrors() const { return m_totalErrors; }              ///< 累计错误次数
-    quint64 totalStandardFrames() const { return m_totalStandardFrames; } ///< 标准帧计数
-    quint64 totalExtendedFrames() const { return m_totalExtendedFrames; } ///< 扩展帧计数
-    quint64 totalRtrFrames() const { return m_totalRtrFrames; }        ///< RTR帧计数
-    quint64 totalErrorFrames() const { return m_totalErrorFrames; }    ///< 错误帧计数
-    quint64 totalFrameErrors() const { return m_totalFrameErrors; }    ///< 帧解析/构建失败计数
-    quint64 totalFramesFiltered() const { return m_totalFramesFiltered; } ///< 被过滤器丢弃的帧数
-    quint64 totalSignalsDecoded() const { return m_totalSignalsDecoded; } ///< 已解码的信号值总数
-    quint64 totalBusOffEvents() const { return m_totalBusOffEvents; }  ///< 累计总线关闭(Bus-Off)事件次数
-    quint64 totalFiltersActive() const { return m_totalFiltersActive; } ///< 当前激活的帧过滤器数量
-    quint64 totalDroppedFrames() const { return m_totalDroppedFrames; } ///< 累计丢帧数(缓冲区溢出/解析失败)
-    quint64 peakFramesPerSec() const { return m_peakFramesPerSec; } ///< 峰值每秒帧数
-    void resetStats(); ///< 重置所有统计计数器
+    quint64 totalFramesSent() const { return m_totalFramesSent; }      ///< @return 累计发送帧数
+    quint64 totalFramesReceived() const { return m_totalFramesReceived; } ///< @return 累计接收帧数
+    quint64 totalBytesSent() const { return m_totalBytesSent; }        ///< @return 累计发送字节数
+    quint64 totalBytesReceived() const { return m_totalBytesReceived; } ///< @return 累计接收字节数
+    quint64 totalErrors() const { return m_totalErrors; }              ///< @return 累计错误次数
+    quint64 totalStandardFrames() const { return m_totalStandardFrames; } ///< @return 标准帧计数
+    quint64 totalExtendedFrames() const { return m_totalExtendedFrames; } ///< @return 扩展帧计数
+    quint64 totalRtrFrames() const { return m_totalRtrFrames; }        ///< @return RTR帧计数
+    quint64 totalErrorFrames() const { return m_totalErrorFrames; }    ///< @return 错误帧计数
+    quint64 totalFrameErrors() const { return m_totalFrameErrors; }    ///< @return 帧解析/构建失败计数
+    quint64 totalFramesFiltered() const { return m_totalFramesFiltered; } ///< @return 被过滤器丢弃的帧数
+    quint64 totalSignalsDecoded() const { return m_totalSignalsDecoded; } ///< @return 已解码的信号值总数
+    quint64 totalBusOffEvents() const { return m_totalBusOffEvents; }  ///< @return 累计总线关闭(Bus-Off)事件次数
+    quint64 totalFiltersActive() const { return m_totalFiltersActive; } ///< @return 当前激活的帧过滤器数量
+    quint64 totalDroppedFrames() const { return m_totalDroppedFrames; } ///< @return 累计丢帧数(缓冲区溢出/解析失败)
+    quint64 peakFramesPerSec() const { return m_peakFramesPerSec; } ///< @return 峰值每秒帧数
+    /** @brief 重置所有统计计数器 */
+    void resetStats();
 
 signals:
     void frameReceived(int id, const QByteArray& data, bool extended, bool rtr); ///< 收到CAN帧
@@ -94,9 +110,12 @@ private slots:
     void onSerialDataReceived(const QByteArray& data); ///< 底层串口数据接收槽函数
 
 private:
-    qint64 sendCommand(const QString& cmd); ///< 向适配器发送LAWICEL原始命令
-    void parseBuffer();                     ///< 解析接收缓冲区中的LAWICEL帧
-    static QString bitrateToCommand(int bitrate); ///< 根据波特率获取LAWICEL S命令编号
+    /** @brief 向适配器发送LAWICEL原始命令 @param cmd LAWICEL命令字符串 @return 实际写入字节数 */
+    qint64 sendCommand(const QString& cmd);
+    /** @brief 解析接收缓冲区中的LAWICEL帧 */
+    void parseBuffer();
+    /** @brief 根据波特率获取LAWICEL S命令编号 @param bitrate 波特率值 @return LAWICEL命令字符 */
+    static QString bitrateToCommand(int bitrate);
 
     CanBitTiming m_bitTiming;          ///< 位时序配置
     bool m_canFdEnabled = false;       ///< CAN-FD模式开关

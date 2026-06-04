@@ -75,9 +75,9 @@ public:
     quint64 totalDiscoveryEvents() const;
     /** @brief 获取累计扫描总时长 @return 扫描总时长(ms) */
     quint64 totalScanDurationMs() const;
-    /** @brief 获取最佳RSSI值 @return RSSI值(dBm) */
+    /** @brief 获取最佳RSSI值 @return 最佳RSSI值(dBm) */
     int bestRssi() const;
-    /** @brief 获取最差RSSI值 @return RSSI值(dBm) */
+    /** @brief 获取最差RSSI值 @return 最差RSSI值(dBm) */
     int worstRssi() const;
     /** @brief 获取平均RSSI值 @return 平均RSSI(dBm) */
     double averageRssi() const;

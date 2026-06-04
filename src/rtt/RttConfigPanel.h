@@ -29,10 +29,10 @@ class RttConfigPanel : public QWidget {
     Q_OBJECT
 
 public:
-    /** @brief 构造函数 */
+    /** @brief 构造函数 @param parent 父控件 */
     explicit RttConfigPanel(QWidget* parent = nullptr);
 
-    /** @brief 获取当前配置参数 */
+    /** @brief 获取当前配置参数 @return QVariantMap 包含device/interface/speed/channel字段 */
     QVariantMap config() const;
 
     /**

@@ -41,22 +41,22 @@ public:
      */
     QVariantMap config() const;
 
-    /** @brief 获取累计配置变更次数 */
+    /** @brief 获取累计配置变更次数 @return 配置变更总次数 */
     quint64 totalConfigChanges() const { return m_totalConfigChanges; }
 
-    /** @brief 获取累计总线重置次数 */
+    /** @brief 获取累计总线重置次数 @return 重置总次数 */
     quint64 totalBusResets() const { return m_totalBusResets; }
 
-    /** @brief 获取累计波特率变更次数 */
+    /** @brief 获取累计波特率变更次数 @return 波特率变更总次数 */
     quint64 totalBitrateChanges() const { return m_totalBitrateChanges; }
 
-    /** @brief 获取累计连接尝试次数 */
+    /** @brief 获取累计连接尝试次数 @return 连接尝试总次数 */
     quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
 
-    /** @brief 获取累计CAN-FD模式切换次数 */
+    /** @brief 获取累计CAN-FD模式切换次数 @return 切换总次数 */
     quint64 totalCanFdToggles() const { return m_totalCanFdToggles; }
 
-    /** @brief 获取累计适配器切换次数 */
+    /** @brief 获取累计适配器切换次数 @return 切换总次数 */
     quint64 totalAdapterSwitches() const { return m_totalAdapterSwitches; }
 
     /** @brief 重置所有统计计数器 */

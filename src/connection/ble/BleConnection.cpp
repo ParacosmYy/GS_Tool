@@ -182,20 +182,4 @@ void BleConnection::initMockServices()
     m_services = MOCK_SERVICES;
 }
 
-/** @brief 重置所有统计计数器 */
-void BleConnection::resetStats()
-{
-    m_totalScans = 0;
-    m_totalConnections = 0;
-    m_totalDisconnections = 0;
-    m_totalServicesDiscovered = 0;
-    m_totalCharacteristicsRead = 0;
-    m_totalWrites = 0;
-    m_totalReads = 0;
-    m_totalCharacteristicWrites = 0;
-    m_totalCharacteristicReads = 0;
-    m_totalNotifications = 0;
-    m_totalBytesWritten = 0;
-    m_totalBytesRead = 0;
-    m_errorCount = 0;
-}
+// resetStats见 BleConnectionStats.cpp

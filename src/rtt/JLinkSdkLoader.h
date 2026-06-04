@@ -41,10 +41,10 @@ public:
     void setSpeed(int kHz);
 
     // ---- 统计接口 ----
-    quint64 totalLoadAttempts() const;     ///< 累计SDK加载尝试次数
-    quint64 totalLoadSuccesses() const;    ///< 累计成功加载次数
-    quint64 totalConnectAttempts() const;  ///< 累计设备连接尝试次数
-    quint64 totalRttStarts() const;        ///< 累计RTT启动次数
+    quint64 totalLoadAttempts() const;     ///< @return 累计SDK加载尝试次数
+    quint64 totalLoadSuccesses() const;    ///< @return 累计成功加载次数
+    quint64 totalConnectAttempts() const;  ///< @return 累计设备连接尝试次数
+    quint64 totalRttStarts() const;        ///< @return 累计RTT启动次数
     void resetSdkStatistics();             ///< 重置所有统计计数器归零
 
 signals:
@@ -52,6 +52,7 @@ signals:
     void sdkLoadFailed(const QString& error); ///< SDK加载失败信号
 
 private:
+    /** @brief 私有构造函数(单例模式) @param parent 父对象 */
     explicit JLinkSdkLoader(QObject* parent = nullptr);
     Q_DISABLE_COPY(JLinkSdkLoader)
     /** @brief 从已加载DLL解析所有SDK函数符号，JLINK_Open必需 @return true所有必需符号解析成功 */

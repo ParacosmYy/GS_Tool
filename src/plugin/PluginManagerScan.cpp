@@ -2,9 +2,10 @@
  * @file PluginManagerScan.cpp
  * @brief 插件扫描发现与统计查询实现
  *
- * 从 PluginManager 拆分而来，集中管理插件扫描（scanPlugins）、
- * 查询接口（plugin/pluginVersion/pluginDescription 等）以及
+ * 从 PluginManager 拆分而来，集中管理插件扫描（scanPlugins）和
  * 运行时统计数据（加载/失败/卸载次数、重置统计）。
+ *
+ * 查询接口(plugin/pluginVersion/pluginDescription等)见 PluginManagerQuery.cpp。
  *
  * @see PluginManager.h 头文件中完整的接口声明
  */
@@ -77,89 +78,6 @@ QStringList PluginManager::scanPlugins(const QString& pluginDir)
 }
 
 /**
- * @brief 获取所有已加载插件的名称列表
- * @return 插件名称列表
- */
-QStringList PluginManager::loadedPluginNames() const
-{
-    return m_plugins.keys();
-}
-
-/**
- * @brief 获取指定插件的接口指针
- * @param name 插件名称
- * @return 插件接口指针，未找到返回 nullptr
- */
-IEmbedDebugPlugin* PluginManager::plugin(const QString& name) const
-{
-    return m_plugins.value(name, nullptr);
-}
-
-/**
- * @brief 获取指定插件的版本号
- * @param name 插件名称
- * @return 版本字符串，未找到返回空字符串
- */
-QString PluginManager::pluginVersion(const QString& name) const
-{
-    IEmbedDebugPlugin* plug = m_plugins.value(name, nullptr);
-    return plug ? plug->version() : QString();
-}
-
-/**
- * @brief 获取指定插件的描述信息
- * @param name 插件名称
- * @return 描述字符串，未找到返回空字符串
- */
-QString PluginManager::pluginDescription(const QString& name) const
-{
-    IEmbedDebugPlugin* plug = m_plugins.value(name, nullptr);
-    return plug ? plug->description() : QString();
-}
-
-/**
- * @brief 获取已加载插件数量
- * @return 插件数量
- */
-int PluginManager::pluginCount() const
-{
-    return m_plugins.count();
-}
-
-/**
- * @brief 检查指定插件是否已加载
- * @param name 插件名称
- * @return true 已加载，false 未加载
- */
-bool PluginManager::isPluginLoaded(const QString& name) const
-{
-    return m_plugins.contains(name);
-}
-
-/**
- * @brief 获取所有插件的综合元数据列表
- *
- * 返回 QVariantList，每个元素为 QVariantMap，包含:
- *   - "name": 插件名称
- *   - "version": 版本号
- *   - "description": 插件描述
- *
- * @return 插件元数据列表
- */
-QVariantList PluginManager::pluginMetadataList() const
-{
-    QVariantList result;
-    for (auto it = m_plugins.constBegin(); it != m_plugins.constEnd(); ++it) {
-        QVariantMap meta;
-        meta[QStringLiteral("name")] = it.key();
-        meta[QStringLiteral("version")] = it.value()->version();
-        meta[QStringLiteral("description")] = it.value()->description();
-        result.append(meta);
-    }
-    return result;
-}
-
-/**
  * @brief 获取累计加载成功次数
  */
 quint64 PluginManager::totalLoadCount() const
@@ -200,3 +118,5 @@ void PluginManager::resetStats()
 {
     resetLoadStatistics();
 }
+
+// 查询接口(plugin/pluginVersion/pluginDescription等)见 PluginManagerQuery.cpp

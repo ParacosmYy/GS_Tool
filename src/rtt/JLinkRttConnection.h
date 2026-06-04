@@ -27,7 +27,7 @@ class JLinkRttConnection : public IConnection {
     Q_OBJECT
 
 public:
-    /** @brief 构造函数 */
+    /** @brief 构造函数 @param parent 父对象 */
     explicit JLinkRttConnection(QObject* parent = nullptr);
 
     /** @brief 析构函数，自动关闭连接 */
