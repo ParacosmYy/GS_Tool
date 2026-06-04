@@ -77,6 +77,8 @@ public:
     // ---- 统计计数接口 ----
     /** @brief 获取累计FFT变换次数 */
     quint64 totalTransforms() const;
+    /** @brief 获取累计峰值搜索次数(频谱最大幅度检测) */
+    quint64 totalPeakSearches() const;
     /** @brief 获取累计窗函数变更次数 */
     quint64 totalWindowChanges() const;
     /** @brief 获取累计FFT大小变更次数 */
@@ -165,6 +167,7 @@ private:
 
     // ---- 统计计数器 ----
     quint64 m_totalTransforms = 0;    ///< 累计FFT变换次数
+    quint64 m_totalPeakSearches = 0;  ///< 累计峰值搜索次数(频谱最大幅度检测)
     quint64 m_totalWindowChanges = 0; ///< 累计窗函数变更次数
     quint64 m_totalSizeChanges = 0;   ///< 累计FFT大小变更次数
 };

@@ -1,150 +1,113 @@
 /**
  * @file ProtocolBridgeManagerHelpers.cpp
- * @brief 协议桥管理器辅助函数实现
+ * @brief 协议桥管理器 — 内部信号处理槽和信号连接切换
  *
- * 从 ProtocolBridgeManager.cpp 拆分出的辅助功能:
- *   - 自动检测评分函数 (scoreJustFloat / scoreFireWater)
- *   - 自动检测接口 (detectProtocol / setAutoDetectEnabled / ...)
- *   - 吞吐量滑动窗口更新
+ * 从 ProtocolBridgeManager.cpp 拆分出的内部辅助功能:
+ *   - 信号处理槽: onFrameParserParsed / onFrameParserError / onBridgeParsed
+ *   - 信号连接切换: switchSource()
  *
  * 这些函数由 ProtocolBridgeManager 内部调用，不对外暴露。
  */
 
 #include "protocol/bridge/ProtocolBridgeManager.h"
 
-#include <QtGlobal>
-
 // ============================================================================
-// 自动检测评分函数
+// 内部信号处理槽
 // ============================================================================
 
-/** @brief 评估数据匹配 JustFloat 协议的程度 @param data 采样数据 @return 匹配分值 [0.0, 1.0] */
-double ProtocolBridgeManager::scoreJustFloat(const QByteArray& data) const
+/** @brief 处理FrameParser帧解析成功(累加统计+每协议+吞吐量后转发) @param fields 字段映射 @param rawFrame 原始帧数据 */
+void ProtocolBridgeManager::onFrameParserParsed(
+    const QVariantMap& fields, const QByteArray& rawFrame)
 {
-    static constexpr unsigned char kTail[4] = {0x00, 0x00, 0x80, 0x7F};
-    int tailMatches = 0;
-    int totalAlignments = 0;
+    ++m_totalFramesParsedAll;
 
-    for (int i = 0; i <= data.size() - 4; ++i) {
-        if (static_cast<unsigned char>(data[i])     == kTail[0] &&
-            static_cast<unsigned char>(data[i + 1]) == kTail[1] &&
-            static_cast<unsigned char>(data[i + 2]) == kTail[2] &&
-            static_cast<unsigned char>(data[i + 3]) == kTail[3]) {
-            ++tailMatches;
-            if (i % 4 == 0) { ++totalAlignments; }
-        }
+    // 更新每协议统计
+    m_protocolStats[ChartProtocolMode::FrameParser].frames++;
+    m_protocolStats[ChartProtocolMode::FrameParser].bytes +=
+        static_cast<quint64>(rawFrame.size());
+
+    // 更新吞吐量
+    updateThroughput(static_cast<quint64>(rawFrame.size()));
+
+    emit frameParsed(fields, rawFrame);
+}
+
+/** @brief 处理FrameParser帧解析错误(检测校验错误+每协议+累加统计+转发) @param reason 错误原因 @param rawFrame 原始帧数据 */
+void ProtocolBridgeManager::onFrameParserError(
+    const QString& reason, const QByteArray& rawFrame)
+{
+    if (reason.contains(QLatin1String("Checksum"))) {
+        m_checksumErrors++;
     }
+    m_totalErrors++;
+    ++m_totalParseErrors;
 
-    if (tailMatches == 0) { return 0.0; }
+    // 更新每协议错误统计
+    m_protocolStats[ChartProtocolMode::FrameParser].errors++;
 
-    double alignmentRatio = static_cast<double>(totalAlignments) /
-                            static_cast<double>(tailMatches);
-    double countBonus = qMin(1.0, static_cast<double>(tailMatches) / 2.0);
-    return alignmentRatio * countBonus;
+    emit frameError(reason, rawFrame);
 }
 
-/** @brief 评估数据匹配 FireWater 协议的程度 @param data 采样数据 @return 匹配分值 [0.0, 1.0] */
-double ProtocolBridgeManager::scoreFireWater(const QByteArray& data) const
+/** @brief 处理桥接器帧解析成功(累加帧计数+每协议+吞吐量后转发) @param fields 字段映射 @param rawFrame 原始帧数据 */
+void ProtocolBridgeManager::onBridgeParsed(
+    const QVariantMap& fields, const QByteArray& rawFrame)
 {
-    int printableCount = 0;
-    int newlineCount = 0;
-    int separatorCount = 0;
-    int digitDotCount = 0;
+    m_totalFramesParsed++;
+    ++m_totalFramesParsedAll;
 
-    for (int i = 0; i < data.size(); ++i) {
-        unsigned char ch = static_cast<unsigned char>(data[i]);
-        if (ch == '\n' || ch == '\r') { ++newlineCount; }
-        else if (ch == ',' || ch == '\t' || ch == ' ') { ++separatorCount; }
-        else if ((ch >= '0' && ch <= '9') || ch == '.' || ch == '-' || ch == '+') { ++digitDotCount; }
-        else if (ch >= 0x20 && ch < 0x7F) { ++printableCount; }
-    }
+    // 更新每协议统计(根据当前模式)
+    m_protocolStats[m_mode].frames++;
+    m_protocolStats[m_mode].bytes +=
+        static_cast<quint64>(rawFrame.size());
 
-    int totalChars = data.size();
-    if (totalChars == 0 || newlineCount == 0) { return 0.0; }
+    // 更新吞吐量
+    updateThroughput(static_cast<quint64>(rawFrame.size()));
 
-    double printableRatio =
-        static_cast<double>(printableCount + newlineCount +
-                            separatorCount + digitDotCount) / totalChars;
-    double separatorRatio = static_cast<double>(separatorCount) / totalChars;
-    double numericRatio = static_cast<double>(digitDotCount) / totalChars;
-
-    double score = printableRatio * 0.3 +
-                   qMin(separatorRatio * 5.0, 1.0) * 0.3 +
-                   qMin(numericRatio * 3.0, 1.0) * 0.2 +
-                   qMin(static_cast<double>(newlineCount) / 2.0, 1.0) * 0.2;
-    return qBound(0.0, score, 1.0);
+    emit frameParsed(fields, rawFrame);
 }
 
 // ============================================================================
-// 自动检测接口
+// 信号连接切换
 // ============================================================================
 
-/** @brief 从数据流自动检测协议类型 @param data 采样数据 @return 检测结果(模式+置信度) */
-ProtocolBridgeManager::AutoDetectResult
-ProtocolBridgeManager::detectProtocol(const QByteArray& data) const
+/** @brief 切换数据源连接(断开所有源→根据模式重连活动源→内部槽拦截统计) */
+void ProtocolBridgeManager::switchSource()
 {
-    AutoDetectResult result;
-    result.detectedMode = ChartProtocolMode::FrameParser;
-    result.confidence = 0.0;
-    result.detected = false;
+    // ---- 先断开所有源到本manager转发的连接 ----
+    disconnect(m_frameParser, &FrameParser::frameParsed,
+               this, &ProtocolBridgeManager::onFrameParserParsed);
+    disconnect(m_frameParser, &FrameParser::frameError,
+               this, &ProtocolBridgeManager::onFrameParserError);
+    disconnect(m_justFloat, &JustFloatBridge::frameParsed,
+               this, &ProtocolBridgeManager::onBridgeParsed);
+    disconnect(m_fireWater, &FireWaterBridge::frameParsed,
+               this, &ProtocolBridgeManager::onBridgeParsed);
 
-    if (data.size() < kAutoDetectMinBytes) { return result; }
+    // ---- 根据模式设置活动桥并连接信号 ----
+    switch (m_mode) {
+    case ChartProtocolMode::FrameParser:
+        m_activeBridge = nullptr;
+        connect(m_frameParser, &FrameParser::frameParsed,
+                this, &ProtocolBridgeManager::onFrameParserParsed);
+        connect(m_frameParser, &FrameParser::frameError,
+                this, &ProtocolBridgeManager::onFrameParserError);
+        break;
 
-    double jfScore = scoreJustFloat(data);
-    double fwScore = scoreFireWater(data);
+    case ChartProtocolMode::JustFloat:
+        m_activeBridge = m_justFloat;
+        connect(m_justFloat, &JustFloatBridge::frameParsed,
+                this, &ProtocolBridgeManager::onBridgeParsed);
+        break;
 
-    if (jfScore > fwScore && jfScore >= 0.5) {
-        result.detectedMode = ChartProtocolMode::JustFloat;
-        result.confidence = jfScore;
-        result.detected = true;
-    } else if (fwScore >= 0.5) {
-        result.detectedMode = ChartProtocolMode::FireWater;
-        result.confidence = fwScore;
-        result.detected = true;
-    } else {
-        result.detectedMode = ChartProtocolMode::FrameParser;
-        result.confidence = 1.0 - qMax(jfScore, fwScore);
-        result.detected = true;
-    }
+    case ChartProtocolMode::FireWater:
+        m_activeBridge = m_fireWater;
+        connect(m_fireWater, &FireWaterBridge::frameParsed,
+                this, &ProtocolBridgeManager::onBridgeParsed);
+        break;
 
-    return result;
-}
-
-/** @brief 启用/禁用自动检测模式 @param enable true启用 */
-void ProtocolBridgeManager::setAutoDetectEnabled(bool enable)
-{
-    m_autoDetectEnabled = enable;
-    m_autoDetectBuffer.clear();
-    m_lastDetectResult = AutoDetectResult();
-}
-
-/** @brief 查询自动检测是否启用 @return true已启用 */
-bool ProtocolBridgeManager::isAutoDetectEnabled() const
-{
-    return m_autoDetectEnabled;
-}
-
-/** @brief 获取最后一次自动检测结果 @return 检测结果快照 */
-ProtocolBridgeManager::AutoDetectResult
-ProtocolBridgeManager::lastAutoDetectResult() const
-{
-    return m_lastDetectResult;
-}
-
-// ============================================================================
-// 吞吐量计算
-// ============================================================================
-
-/** @brief 更新吞吐量滑动窗口 @param frameBytes 本次帧字节数 */
-void ProtocolBridgeManager::updateThroughput(quint64 frameBytes)
-{
-    ++m_throughputFrameCount;
-    m_throughputByteCount += frameBytes;
-
-    // 每隔10秒重置滑动窗口，避免长期累积导致速率失真
-    if (m_throughputTimer.elapsed() > 10000) {
-        m_throughputFrameCount = 0;
-        m_throughputByteCount = 0;
-        m_throughputTimer.restart();
+    default:
+        qWarning() << "ProtocolBridgeManager: unknown mode" << static_cast<int>(m_mode);
+        m_activeBridge = nullptr;
+        break;
     }
 }

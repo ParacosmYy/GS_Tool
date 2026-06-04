@@ -123,14 +123,17 @@ private:
     ZoomController* m_zoomController; ///< 缩放/平移控制器
 
     // ---- 统计计数器 ----
-    quint64 m_totalDataUpdates = 0;    ///< 总数据更新次数
-    quint64 m_totalRenders = 0;        ///< 总渲染次数
-    quint64 m_totalRedraws = 0;        ///< 总重绘次数(含主题切换/窗口尺寸变化等触发的重绘)
-    quint64 m_totalInteractions = 0;   ///< 总交互次数(暂停/清除等)
-    quint64 m_totalZoomEvents = 0;     ///< 总缩放事件次数
-    quint64 m_totalPanEvents = 0;      ///< 总平移事件次数
-    quint64 m_totalChannelToggles = 0; ///< 总通道开关切换次数
-    quint64 m_totalScreenshots = 0;    ///< 总截图导出次数
+    quint64 m_totalDataUpdates = 0;       ///< 总数据更新次数
+    quint64 m_totalRenders = 0;           ///< 总渲染次数
+    quint64 m_totalRedraws = 0;           ///< 总重绘次数(含主题切换/窗口尺寸变化等触发的重绘)
+    quint64 m_totalInteractions = 0;      ///< 总交互次数(暂停/清除等)
+    quint64 m_totalZoomEvents = 0;        ///< 总缩放事件次数
+    quint64 m_totalPanEvents = 0;         ///< 总平移事件次数
+    quint64 m_totalChannelToggles = 0;    ///< 总通道开关切换次数
+    quint64 m_totalScreenshots = 0;       ///< 总截图导出次数
+    quint64 m_totalSamplesAppended = 0;   ///< 总追加点数(帧数据写入时累加)
+    quint64 m_totalAutoScales = 0;        ///< 总自动缩放次数(Y轴自适应范围)
+    quint64 m_totalManualZooms = 0;       ///< 总手动缩放次数(用户主动缩放操作)
 
     // ---- FPS追踪 ----
     qint64 m_lastRenderTimeMs = 0;     ///< 上次渲染时间戳(ms)
@@ -153,6 +156,14 @@ public:
     quint64 totalChannelToggles() const { return m_totalChannelToggles; }
     /** @brief 获取总截图导出次数 @return 截图计数 */
     quint64 totalScreenshots() const { return m_totalScreenshots; }
+    /** @brief 获取总追加点数(帧数据写入时累加) @return 采样点追加计数 */
+    quint64 totalSamplesAppended() const { return m_totalSamplesAppended; }
+    /** @brief 获取总自动缩放次数(Y轴自适应范围) @return 自动缩放计数 */
+    quint64 totalAutoScales() const { return m_totalAutoScales; }
+    /** @brief 获取总手动缩放次数(用户主动缩放操作) @return 手动缩放计数 */
+    quint64 totalManualZooms() const { return m_totalManualZooms; }
+    /** @brief 获取总游标移动次数(委托自CursorOverlay) @return 游标移动计数 */
+    quint64 totalCursorMoves() const { return m_cursorOverlay ? m_cursorOverlay->totalCursorMoves() : 0; }
     /** @brief 获取当前渲染FPS @return FPS值 */
     double renderFps() const { return m_renderFps; }
     /** @brief 导出当前图表为截图(PNG) @param filePath 目标文件路径 @return true=导出成功 */

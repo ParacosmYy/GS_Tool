@@ -133,6 +133,9 @@ private:
     quint64 m_totalToggles = 0;    ///< 总折叠切换次数
     quint64 m_totalExpansions = 0; ///< 总展开次数
     quint64 m_totalCollapses = 0;  ///< 总折叠次数
+    quint64 m_totalShows = 0;      ///< 总显示次数(animateShow触发)
+    quint64 m_totalHides = 0;      ///< 总隐藏次数(animateHide触发)
+    quint64 m_totalTitleChanges = 0; ///< 总标题变更次数(setTitle触发)
 
 public:
     /** @brief 获取总折叠切换次数 @return 切换计数 */
@@ -141,6 +144,12 @@ public:
     quint64 totalExpansions() const { return m_totalExpansions; }
     /** @brief 获取总折叠次数 @return 折叠计数 */
     quint64 totalCollapses() const { return m_totalCollapses; }
+    /** @brief 获取总显示次数(animateShow触发) @return 显示计数 */
+    quint64 totalShows() const { return m_totalShows; }
+    /** @brief 获取总隐藏次数(animateHide触发) @return 隐藏计数 */
+    quint64 totalHides() const { return m_totalHides; }
+    /** @brief 获取总标题变更次数 @return 标题变更计数 */
+    quint64 totalTitleChanges() const { return m_totalTitleChanges; }
     /** @brief 重置面板统计计数器 */
     void resetPanelStatistics();
 };

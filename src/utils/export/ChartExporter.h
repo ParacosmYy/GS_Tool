@@ -84,14 +84,29 @@ public:
     /** @brief 获取累计导出操作总次数 @return 导出次数 */
     quint64 totalExports() const;
 
+    /** @brief 获取累计PNG导出次数 @return PNG导出计数 */
+    quint64 totalExportsPng() const;
+
+    /** @brief 获取累计CSV导出次数 @return CSV导出计数 */
+    quint64 totalExportsCsv() const;
+
+    /** @brief 获取累计PDF导出次数(预留) @return PDF导出计数 */
+    quint64 totalExportsPdf() const;
+
     /** @brief 获取累计图表图片导出次数(PNG+SVG) @return 图片导出次数 */
     quint64 totalChartImages() const;
 
     /** @brief 获取累计CSV导出的数据行总数 @return CSV行数 */
     quint64 totalCsvRows() const;
 
-    /** @brief 获取累计导出失败次数 @return 失败次数 */
+    /** @brief 获取累计导出错误次数 @return 导出错误计数 */
+    quint64 totalExportErrors() const;
+
+    /** @brief 获取累计导出失败次数(兼容旧接口) @return 失败次数 */
     quint64 totalErrors() const;
+
+    /** @brief 获取累计导出字节总数(所有格式文件大小之和) @return 字节数 */
+    quint64 totalBytesExported() const;
 
     /** @brief 重置所有导出统计计数器(导出次数/图片次数/CSV行数/错误次数) */
     void resetExportStatistics();
@@ -111,9 +126,14 @@ signals:
 
 private:
     quint64 m_totalExports = 0;       ///< 累计导出操作总次数
+    quint64 m_totalExportsPng = 0;    ///< 累计PNG导出次数
+    quint64 m_totalExportsCsv = 0;    ///< 累计CSV导出次数
+    quint64 m_totalExportsPdf = 0;    ///< 累计PDF导出次数(预留)
     quint64 m_totalChartImages = 0;   ///< 累计图表图片导出次数(PNG+SVG)
     quint64 m_totalCsvRows = 0;       ///< 累计CSV导出的数据行总数
-    quint64 m_totalErrors = 0;        ///< 累计导出失败次数
+    quint64 m_totalExportErrors = 0;  ///< 累计导出错误次数
+    quint64 m_totalErrors = 0;        ///< 累计导出失败次数(兼容旧接口)
+    quint64 m_totalBytesExported = 0; ///< 累计导出字节总数(所有格式文件大小之和)
 };
 
 #endif // CHART_EXPORTER_H

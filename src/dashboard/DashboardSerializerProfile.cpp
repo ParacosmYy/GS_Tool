@@ -41,6 +41,7 @@ bool DashboardSerializer::saveToProfile(const QString& profileName,
     for (const DashboardItemConfig& item : items)
         itemsArray.append(item.toJson());
     const QByteArray itemsJson = QJsonDocument(itemsArray).toJson(QJsonDocument::Compact);
+    m_totalBytesWritten += static_cast<quint64>(itemsJson.size());
 
     /* 写入配置文件数据 */
     settings.beginGroup(profileName);
@@ -54,7 +55,7 @@ bool DashboardSerializer::saveToProfile(const QString& profileName,
 
     qCInfo(lcDashboardProfile) << "配置文件已保存:" << profileName
                                << "面板数:" << items.size();
-    ++m_totalSaves; ++m_totalProfileSaves;
+    ++m_totalSaves; ++m_totalProfileSaves; ++m_totalSerializations;
     emit profileSaved(profileName);
     return true;
 }
@@ -89,6 +90,7 @@ bool DashboardSerializer::loadFromProfile(const QString& profileName,
     /* 解析JSON面板配置 */
     items.clear();
     if (!itemsJson.isEmpty()) {
+        m_totalBytesRead += static_cast<quint64>(itemsJson.toUtf8().size());
         QJsonParseError parseError;
         const QJsonDocument doc = QJsonDocument::fromJson(itemsJson.toUtf8(), &parseError);
         if (doc.isNull()) {
@@ -105,7 +107,7 @@ bool DashboardSerializer::loadFromProfile(const QString& profileName,
 
     qCInfo(lcDashboardProfile) << "已加载配置文件:" << profileName
                                << "面板数:" << items.size();
-    ++m_totalLoads; ++m_totalProfileLoads;
+    ++m_totalLoads; ++m_totalProfileLoads; ++m_totalDeserializations;
     emit profileLoaded(profileName, items.size());
     return true;
 }

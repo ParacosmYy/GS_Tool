@@ -207,6 +207,7 @@ void CursorOverlay::paintEvent(QPaintEvent* /*event*/)
     // 双游标模式: 绘制差值面板
     if (m_hasCursorA && m_hasCursorB) {
         ++m_totalMeasurements;
+        ++m_totalDeltaMeasurements;
         // 累计ΔX/ΔY用于计算平均值
         double deltaX = std::abs(m_cursorBX - m_cursorAX);
         m_sumDeltaX += deltaX;

@@ -73,22 +73,23 @@ bool DashboardSerializer::saveToFile(const QString& filePath,
                                      const QList<DashboardItemConfig>& items)
 {
     const QByteArray data = toJson(name, columns, items);
-    if (data.isEmpty() && !items.isEmpty()) { ++m_totalErrors; ++m_serializationErrors; return false; }
+    if (data.isEmpty() && !items.isEmpty()) { ++m_totalErrors; ++m_serializationErrors; ++m_totalSerializationErrors; return false; }
 
     QSaveFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         m_lastError = tr("无法打开文件写入: %1").arg(file.errorString());
-        ++m_totalErrors; ++m_serializationErrors; return false;
+        ++m_totalErrors; ++m_serializationErrors; ++m_totalSerializationErrors; return false;
     }
     file.write(data);
     if (!file.commit()) {
         m_lastError = tr("写入文件失败: %1").arg(file.errorString());
-        ++m_totalErrors; ++m_serializationErrors; return false;
+        ++m_totalErrors; ++m_serializationErrors; ++m_totalSerializationErrors; return false;
     }
 
     qCInfo(lcDashboardSerializer) << "布局已保存至:" << filePath;
-    ++m_totalSaves; ++m_totalExports;
+    ++m_totalSaves; ++m_totalExports; ++m_totalSerializations;
     m_totalBytesSerialized += static_cast<quint64>(data.size());
+    m_totalBytesWritten += static_cast<quint64>(data.size());
     m_maxProfileVersionSaved = qMax(m_maxProfileVersionSaved, kVersion);
     emit layoutSaved(filePath);
     return true;
@@ -110,6 +111,7 @@ bool DashboardSerializer::loadFromFile(const QString& filePath,
         ++m_totalErrors; ++m_deserializationErrors; return false;
     }
     ++m_totalImports;
+    m_totalBytesRead += static_cast<quint64>(data.size());
     m_totalBytesDeserialized += static_cast<quint64>(data.size());
     return loadFromJson(data, name, columns, items);
 }
@@ -150,7 +152,7 @@ bool DashboardSerializer::loadFromJson(const QByteArray& jsonData,
     for (const QJsonValue& val : itemsArray)
         items.append(DashboardItemConfig::fromJson(val.toObject()));
     qCInfo(lcDashboardSerializer) << "已加载布局:" << name << "面板数:" << items.size();
-    ++m_totalLoads;
+    ++m_totalLoads; ++m_totalDeserializations;
     emit layoutLoaded(name, items.size());
     return true;
 }
@@ -170,6 +172,7 @@ QByteArray DashboardSerializer::toJson(const QString& name, int columns,
     }
     root[QStringLiteral("items")] = itemsArray;
 
+    ++m_totalSerializations;
     return QJsonDocument(root).toJson(QJsonDocument::Indented);
 }
 
@@ -297,6 +300,21 @@ quint64 DashboardSerializer::serializationErrors() const { return m_serializatio
 /** @brief 获取累计反序列化错误次数 @return 错误次数 */
 quint64 DashboardSerializer::deserializationErrors() const { return m_deserializationErrors; }
 
+/** @brief 获取累计序列化操作次数 @return 序列化总数 */
+quint64 DashboardSerializer::totalSerializations() const { return m_totalSerializations; }
+
+/** @brief 获取累计反序列化操作次数 @return 反序列化总数 */
+quint64 DashboardSerializer::totalDeserializations() const { return m_totalDeserializations; }
+
+/** @brief 获取累计序列化错误次数(保存失败) @return 错误次数 */
+quint64 DashboardSerializer::totalSerializationErrors() const { return m_totalSerializationErrors; }
+
+/** @brief 获取累计写入文件字节数 @return 字节总数 */
+quint64 DashboardSerializer::totalBytesWritten() const { return m_totalBytesWritten; }
+
+/** @brief 获取累计读取文件字节数 @return 字节总数 */
+quint64 DashboardSerializer::totalBytesRead() const { return m_totalBytesRead; }
+
 void DashboardSerializer::resetSerializerStatistics()
 {
     m_totalSaves = 0; m_totalLoads = 0; m_totalValidations = 0;
@@ -306,4 +324,6 @@ void DashboardSerializer::resetSerializerStatistics()
     m_hasLoadedVersion = false;
     m_totalBytesSerialized = 0; m_totalBytesDeserialized = 0;
     m_serializationErrors = 0; m_deserializationErrors = 0;
+    m_totalSerializations = 0; m_totalDeserializations = 0;
+    m_totalSerializationErrors = 0; m_totalBytesWritten = 0; m_totalBytesRead = 0;
 }

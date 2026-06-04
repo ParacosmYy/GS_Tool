@@ -6,6 +6,7 @@
  *   - 管理器级统计: totalBridges/totalFramesParsedAll/totalParseErrors/totalBytesProcessed
  *   - 每协议统计: 各协议独立帧数/字节/错误查询
  *   - 吞吐量: 基于滑动窗口的实时帧率和字节率计算
+ *   - 吞吐量滑动窗口更新(updateThroughput)
  */
 
 #include "protocol/bridge/ProtocolBridgeManager.h"
@@ -81,4 +82,22 @@ ProtocolBridgeManager::ThroughputSnapshot ProtocolBridgeManager::throughput() co
         static_cast<double>(m_throughputByteCount) / elapsedSec;
 
     return m_lastThroughput;
+}
+
+// ============================================================================
+// 吞吐量滑动窗口更新
+// ============================================================================
+
+/** @brief 更新吞吐量滑动窗口 @param frameBytes 本次帧字节数 */
+void ProtocolBridgeManager::updateThroughput(quint64 frameBytes)
+{
+    ++m_throughputFrameCount;
+    m_throughputByteCount += frameBytes;
+
+    // 每隔10秒重置滑动窗口，避免长期累积导致速率失真
+    if (m_throughputTimer.elapsed() > 10000) {
+        m_throughputFrameCount = 0;
+        m_throughputByteCount = 0;
+        m_throughputTimer.restart();
+    }
 }

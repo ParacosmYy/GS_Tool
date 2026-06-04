@@ -85,6 +85,7 @@ void CursorOverlay::setCursorA(double x)
     m_cursorAX = x;
     m_hasCursorA = true;
     ++m_totalCursorMoves;
+    ++m_totalCursorCreations;
     update();
 }
 
@@ -94,12 +95,16 @@ void CursorOverlay::setCursorB(double x)
     m_cursorBX = x;
     m_hasCursorB = true;
     ++m_totalCursorMoves;
+    ++m_totalCursorCreations;
     update();
 }
 
 /** @brief 清除所有游标 */
 void CursorOverlay::clearCursors()
 {
+    if (m_hasCursorA || m_hasCursorB) {
+        ++m_totalCursorDeletions;
+    }
     m_hasCursorA = false;
     m_hasCursorB = false;
     update();
@@ -222,6 +227,7 @@ bool CursorOverlay::eventFilter(QObject* watched, QEvent* event)
                 m_cursorBX = pixelToDataX(px);
             }
             ++m_totalCursorMoves;
+            ++m_totalCursorDrags;
             update();
             return true;  // 消费：拖拽中
         }
@@ -262,16 +268,46 @@ void CursorOverlay::onThemeChanged()
 // 统计计数器接口
 // ============================================================
 
+/** @brief 返回游标创建总次数（双击/右键放置游标） @return 创建总次数 */
+quint64 CursorOverlay::totalCursorCreations() const
+{
+    return m_totalCursorCreations;
+}
+
+/** @brief 返回游标删除总次数（clearCursors调用次数） @return 删除总次数 */
+quint64 CursorOverlay::totalCursorDeletions() const
+{
+    return m_totalCursorDeletions;
+}
+
+/** @brief 返回游标拖拽移动总次数（鼠标拖拽游标） @return 拖拽总次数 */
+quint64 CursorOverlay::totalCursorDrags() const
+{
+    return m_totalCursorDrags;
+}
+
 /** @brief 返回游标移动总次数（含放置和拖拽） @return 移动总次数 */
 quint64 CursorOverlay::totalCursorMoves() const
 {
     return m_totalCursorMoves;
 }
 
-/** @brief 返回测量显示总次数（双游标差值面板绘制） @return 测量总次数 */
+/** @brief 返回差值测量总次数（双游标差值面板绘制） @return 差值测量总次数 */
+quint64 CursorOverlay::totalDeltaMeasurements() const
+{
+    return m_totalDeltaMeasurements;
+}
+
+/** @brief 返回测量显示总次数（双游标差值面板绘制，兼容旧接口） @return 测量总次数 */
 quint64 CursorOverlay::totalMeasurements() const
 {
     return m_totalMeasurements;
+}
+
+/** @brief 返回峰值吸附总次数（游标自动吸附到最近峰值点） @return 峰值吸附总次数 */
+quint64 CursorOverlay::totalSnapToPeak() const
+{
+    return m_totalSnapToPeak;
 }
 
 /** @brief 返回历次测量的平均ΔX值 @return 平均ΔX */
@@ -291,8 +327,13 @@ double CursorOverlay::averageDeltaY() const
 /** @brief 重置所有游标统计计数器为初始值 */
 void CursorOverlay::resetCursorStatistics()
 {
+    m_totalCursorCreations = 0;
+    m_totalCursorDeletions = 0;
+    m_totalCursorDrags = 0;
     m_totalCursorMoves = 0;
+    m_totalDeltaMeasurements = 0;
     m_totalMeasurements = 0;
+    m_totalSnapToPeak = 0;
     m_sumDeltaX = 0.0;
     m_sumDeltaY = 0.0;
 }

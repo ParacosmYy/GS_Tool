@@ -82,6 +82,12 @@ quint64 FftWidget::totalTransforms() const
     return m_totalTransforms;
 }
 
+/** @brief 获取累计峰值搜索次数(频谱最大幅度检测) */
+quint64 FftWidget::totalPeakSearches() const
+{
+    return m_totalPeakSearches;
+}
+
 /** @brief 获取累计窗函数变更次数 */
 quint64 FftWidget::totalWindowChanges() const
 {
@@ -98,6 +104,7 @@ quint64 FftWidget::totalSizeChanges() const
 void FftWidget::resetFftWidgetStatistics()
 {
     m_totalTransforms = 0;
+    m_totalPeakSearches = 0;
     m_totalWindowChanges = 0;
     m_totalSizeChanges = 0;
 }
@@ -157,6 +164,7 @@ void FftWidget::refreshSpectrum()
             m_fundamentalFreq = pt.x();
         }
     }
+    ++m_totalPeakSearches;
 
     m_xAxis->setRange(0, maxFreq);
     m_yAxis->setRange(0, qMax(maxMag * 1.1, 0.001)); // 留10%余量

@@ -82,6 +82,7 @@ void BasePanel::hideSkeleton()
 /** @brief 播放面板淡入+滑入显示动画(250ms OutCubic) */
 void BasePanel::animateShow()
 {
+    ++m_totalShows;
     show();
     setPanelOpacity(0.0);
 
@@ -108,6 +109,7 @@ void BasePanel::animateShow()
 /** @brief 播放面板淡出+滑出隐藏动画(200ms InCubic)，动画结束后隐藏控件 */
 void BasePanel::animateHide()
 {
+    ++m_totalHides;
     auto* group = new QParallelAnimationGroup(this);
 
     auto* fadeOut = new QPropertyAnimation(this, "panelOpacity");
@@ -169,10 +171,13 @@ void BasePanel::paintEvent(QPaintEvent* event)
 // 统计计数器
 // ============================================================================
 
-/** @brief 重置面板统计计数器(切换/展开/折叠) */
+/** @brief 重置面板统计计数器(切换/展开/折叠/显示/隐藏/标题变更) */
 void BasePanel::resetPanelStatistics()
 {
     m_totalToggles = 0;
     m_totalExpansions = 0;
     m_totalCollapses = 0;
+    m_totalShows = 0;
+    m_totalHides = 0;
+    m_totalTitleChanges = 0;
 }

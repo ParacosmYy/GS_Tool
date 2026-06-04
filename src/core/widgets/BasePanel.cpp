@@ -63,6 +63,7 @@ void BasePanel::setTitle(const QString& title)
     if (m_titleLabel) {
         m_titleLabel->setText(title);
     }
+    ++m_totalTitleChanges;
 }
 
 /** @brief 获取当前标题栏文字 @return 标题文字，标签未创建时返回空字符串 */

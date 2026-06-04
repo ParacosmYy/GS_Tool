@@ -19,6 +19,8 @@
 #include "dashboard/LedIndicatorWidget.h"
 #include "dashboard/NumericDisplayWidget.h"
 
+#include <QPaintEvent>
+
 /** @brief 构造函数，初始化UI、序列化器与示例控件 @param parent 父控件 */
 DashboardWidget::DashboardWidget(QWidget *parent)
     : QWidget(parent)
@@ -42,20 +44,28 @@ int DashboardWidget::addComponent(const QString &type, const QString &channel)
         g->setLabel(channel.isEmpty() ? tr("未命名") : channel);
         g->bindChannel(channel);
         g->setRange(0.0, 100.0);
+        ++m_totalRangeChanges;
         g->setValue(42.0);
+        ++m_totalUpdates;
+        ++m_totalValueChanged;
         widget = g;
     } else if (type == QLatin1String("progress")) {
         auto *p = new ProgressBarWidget(this);
         p->setLabel(channel.isEmpty() ? tr("进度") : channel);
         p->bindChannel(channel);
         p->setRange(0.0, 100.0);
+        ++m_totalRangeChanges;
         p->setValue(65.0);
+        ++m_totalUpdates;
+        ++m_totalValueChanged;
         widget = p;
     } else if (type == QLatin1String("led")) {
         auto *led = new LedIndicatorWidget(this);
         led->setOn(true);
         led->setColor(Qt::green);
         led->bindChannel(channel);
+        ++m_totalUpdates;
+        ++m_totalValueChanged;
         widget = led;
     } else if (type == QLatin1String("numeric")) {
         auto *n = new NumericDisplayWidget(this);
@@ -63,6 +73,8 @@ int DashboardWidget::addComponent(const QString &type, const QString &channel)
         n->setUnit(tr("V"));
         n->setPrecision(2);
         n->setValue(3.30);
+        ++m_totalUpdates;
+        ++m_totalValueChanged;
         widget = n;
     }
 
@@ -272,6 +284,13 @@ void DashboardWidget::setupUI()
     addComponent("numeric", tr("转速"));
 }
 
+/** @brief 重绘事件，累计重绘计数 @param event 绘制事件 */
+void DashboardWidget::paintEvent(QPaintEvent *event)
+{
+    ++m_totalRepaints;
+    QWidget::paintEvent(event);
+}
+
 // ─── 统计接口 ───────────────────────────────────────────────────────
 
 /** @brief 获取累计布局变更次数 @return 变更次数 */
@@ -312,4 +331,20 @@ void DashboardWidget::resetDashboardWidgetStatistics()
     m_totalWidgetsRemoved = 0;
     m_totalFullSaves = 0;
     m_totalFullLoads = 0;
+    m_totalUpdates = 0;
+    m_totalValueChanged = 0;
+    m_totalRangeChanges = 0;
+    m_totalRepaints = 0;
 }
+
+/** @brief 获取累计组件更新次数 @return 更新总数 */
+quint64 DashboardWidget::totalUpdates() const { return m_totalUpdates; }
+
+/** @brief 获取累计值变更通知次数 @return 变更总数 */
+quint64 DashboardWidget::totalValueChanged() const { return m_totalValueChanged; }
+
+/** @brief 获取累计范围变更次数 @return 范围变更总数 */
+quint64 DashboardWidget::totalRangeChanges() const { return m_totalRangeChanges; }
+
+/** @brief 获取累计重绘次数 @return 重绘总数 */
+quint64 DashboardWidget::totalRepaints() const { return m_totalRepaints; }

@@ -101,6 +101,23 @@ public:
     /** @brief 获取累计反序列化错误次数(loadFromJson/loadFromFile失败) @return 错误次数 */
     quint64 deserializationErrors() const;
 
+    // ---- 序列化生命周期统计 ----
+
+    /** @brief 获取累计序列化操作次数(toJson/saveToFile/saveToProfile成功) @return 序列化总数 */
+    quint64 totalSerializations() const;
+
+    /** @brief 获取累计反序列化操作次数(loadFromJson/loadFromFile/loadFromProfile成功) @return 反序列化总数 */
+    quint64 totalDeserializations() const;
+
+    /** @brief 获取累计序列化错误次数(所有保存操作失败) @return 错误次数 */
+    quint64 totalSerializationErrors() const;
+
+    /** @brief 获取累计写入文件字节数(file.write实际写入字节数) @return 字节总数 */
+    quint64 totalBytesWritten() const;
+
+    /** @brief 获取累计读取文件字节数(file.readAll读取字节数) @return 字节总数 */
+    quint64 totalBytesRead() const;
+
     void resetSerializerStatistics();  ///< 重置统计计数器
 
 signals:
@@ -138,6 +155,13 @@ private:
     mutable quint64 m_totalBytesDeserialized = 0;    ///< 累计反序列化输入字节数
     mutable quint64 m_serializationErrors = 0;       ///< 累计序列化错误次数
     mutable quint64 m_deserializationErrors = 0;     ///< 累计反序列化错误次数
+
+    // ---- 序列化生命周期统计计数器 ----
+    mutable quint64 m_totalSerializations = 0;       ///< 累计序列化操作次数
+    mutable quint64 m_totalDeserializations = 0;     ///< 累计反序列化操作次数
+    mutable quint64 m_totalSerializationErrors = 0;  ///< 累计序列化错误次数(保存失败)
+    mutable quint64 m_totalBytesWritten = 0;         ///< 累计写入文件字节数
+    mutable quint64 m_totalBytesRead = 0;            ///< 累计读取文件字节数
 };
 
 #endif // DASHBOARDSERIALIZER_H

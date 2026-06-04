@@ -17,6 +17,7 @@
 /** @brief X轴通道变更时自动刷新 @param index 下拉框索引(未使用) */
 void ScatterWidget::onXChannelChanged(int /*index*/)
 {
+    ++m_totalAxisChanges;
     if (m_autoRefresh) {
         refreshPlot();
     }
@@ -25,6 +26,7 @@ void ScatterWidget::onXChannelChanged(int /*index*/)
 /** @brief Y轴通道变更时自动刷新 @param index 下拉框索引(未使用) */
 void ScatterWidget::onYChannelChanged(int /*index*/)
 {
+    ++m_totalAxisChanges;
     if (m_autoRefresh) {
         refreshPlot();
     }
@@ -138,6 +140,21 @@ void ScatterWidget::applyThemeColors()
 /** @brief 获取累计绘制点数 @return 绘制点数 */
 quint64 ScatterWidget::totalPointsPlotted() const { return m_totalPointsPlotted; }
 
+/** @brief 获取累计添加点数(每次刷新时新增的散点数) @return 添加点计数 */
+quint64 ScatterWidget::totalPointsAdded() const { return m_totalPointsAdded; }
+
+/** @brief 获取累计移除点数(数据清空时清除的散点数) @return 移除点计数 */
+quint64 ScatterWidget::totalPointsRemoved() const { return m_totalPointsRemoved; }
+
+/** @brief 获取累计自动拟合次数(坐标轴范围自适应) @return 自动拟合计数 */
+quint64 ScatterWidget::totalAutoFits() const { return m_totalAutoFits; }
+
+/** @brief 获取累计轴变更次数(X/Y通道切换触发) @return 轴变更计数 */
+quint64 ScatterWidget::totalAxisChanges() const { return m_totalAxisChanges; }
+
+/** @brief 获取累计选择次数(数据刷新时的散点集替换) @return 选择计数 */
+quint64 ScatterWidget::totalSelections() const { return m_totalSelections; }
+
 /** @brief 获取累计更新次数 @return 更新次数 */
 quint64 ScatterWidget::totalUpdates() const { return m_totalUpdates; }
 
@@ -154,6 +171,11 @@ double ScatterWidget::averageValue() const { return m_averageValue; }
 void ScatterWidget::resetScatterStatistics()
 {
     m_totalPointsPlotted = 0;
+    m_totalPointsAdded = 0;
+    m_totalPointsRemoved = 0;
+    m_totalAutoFits = 0;
+    m_totalAxisChanges = 0;
+    m_totalSelections = 0;
     m_totalUpdates = 0;
     m_totalClears = 0;
     m_pointDensityMax = 0;

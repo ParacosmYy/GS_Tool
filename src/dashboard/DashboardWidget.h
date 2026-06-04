@@ -53,6 +53,16 @@ public:
     quint64 totalWidgetsRemoved() const;   ///< 累计移除组件次数
     quint64 totalFullSaves() const;        ///< 累计完整序列化保存次数
     quint64 totalFullLoads() const;        ///< 累计完整序列化加载次数
+
+    /** @brief 获取累计组件更新次数(setValue/bindChannel触发) @return 更新总数 */
+    quint64 totalUpdates() const;
+    /** @brief 获取累计值变更通知次数(valueChanged信号触发) @return 变更总数 */
+    quint64 totalValueChanged() const;
+    /** @brief 获取累计范围变更次数(setRange触发) @return 范围变更总数 */
+    quint64 totalRangeChanges() const;
+    /** @brief 获取累计重绘次数(paintEvent触发) @return 重绘总数 */
+    quint64 totalRepaints() const;
+
     void resetDashboardWidgetStatistics(); ///< 重置所有统计计数器
 
 signals:
@@ -61,6 +71,10 @@ signals:
     void loadedFromFile(const QString &filePath);       ///< 从文件加载完成
     void savedToProfile(const QString &profileName);    ///< 保存到配置文件完成
     void loadedFromProfile(const QString &profileName); ///< 从配置文件加载完成
+
+protected:
+    /** @brief 重绘事件，累计重绘计数 @param event 绘制事件 */
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     void setupUI();  ///< 初始化UI与示例控件
@@ -82,6 +96,10 @@ private:
     quint64 m_totalWidgetsRemoved = 0;
     quint64 m_totalFullSaves = 0;
     quint64 m_totalFullLoads = 0;
+    quint64 m_totalUpdates = 0;            ///< 累计组件更新次数
+    quint64 m_totalValueChanged = 0;       ///< 累计值变更通知次数
+    quint64 m_totalRangeChanges = 0;       ///< 累计范围变更次数
+    quint64 m_totalRepaints = 0;           ///< 累计重绘次数
 };
 
 #endif // DASHBOARD_WIDGET_H

@@ -108,7 +108,24 @@ public:
     /** @brief 获取累计配置删除次数 @return 删除总数 */
     quint64 profileDeletes() const;
 
-    /** @brief 重置所有统计计数器(通道统计+组件统计+布局统计+配置文件统计) */
+    // ==================== 布局生命周期统计 ====================
+
+    /** @brief 获取累计布局变更次数(增/删组件触发) @return 变更总数 */
+    quint64 totalLayoutChanges() const;
+
+    /** @brief 获取累计组件添加次数 @return 添加总数 */
+    quint64 totalWidgetAdditions() const;
+
+    /** @brief 获取累计组件移除次数 @return 移除总数 */
+    quint64 totalWidgetRemovals() const;
+
+    /** @brief 获取累计布局保存次数 @return 保存总数 */
+    quint64 totalLayoutSaves() const;
+
+    /** @brief 获取累计布局加载次数 @return 加载总数 */
+    quint64 totalLayoutLoads() const;
+
+    /** @brief 重置所有统计计数器(通道统计+组件统计+布局统计+配置文件统计+布局生命周期统计) */
     void resetAllStatistics();
 
 signals:
@@ -137,6 +154,13 @@ private:
     mutable quint64 m_profileSaves = 0;              ///< 累计配置保存次数
     mutable quint64 m_profileLoads = 0;              ///< 累计配置加载次数
     mutable quint64 m_profileDeletes = 0;            ///< 累计配置删除次数
+
+    // ---- 布局生命周期统计计数器 ----
+    mutable quint64 m_totalLayoutChanges = 0;                ///< 累计布局变更次数(增/删组件触发)
+    mutable quint64 m_totalWidgetAdditions = 0;              ///< 累计组件添加次数(addComponentConfig)
+    mutable quint64 m_totalWidgetRemovals = 0;               ///< 累计组件移除次数(removeComponentConfig)
+    mutable quint64 m_totalLayoutSaves = 0;                  ///< 累计布局保存次数(saveToFile成功)
+    mutable quint64 m_totalLayoutLoads = 0;                  ///< 累计布局加载次数(loadFromFile成功)
 };
 
 #endif // DASHBOARD_MODEL_H

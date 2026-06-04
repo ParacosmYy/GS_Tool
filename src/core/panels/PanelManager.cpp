@@ -62,6 +62,7 @@ bool PanelManager::isCompactMode() const
 void PanelManager::onPanelSwitched(int visibleCount)
 {
     ++m_totalPanelSwitches;
+    m_totalActivePanelsTracked += static_cast<quint64>(visibleCount);
     if (static_cast<quint64>(visibleCount) > m_maxConcurrentPanels) {
         m_maxConcurrentPanels = static_cast<quint64>(visibleCount);
     }

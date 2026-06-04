@@ -33,6 +33,9 @@ void ChartWidget::resetChartWidgetStatistics()
     m_totalPanEvents = 0;
     m_totalChannelToggles = 0;
     m_totalScreenshots = 0;
+    m_totalSamplesAppended = 0;
+    m_totalAutoScales = 0;
+    m_totalManualZooms = 0;
     m_lastRenderTimeMs = 0;
     m_renderFps = 0.0;
 }

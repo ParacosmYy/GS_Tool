@@ -199,6 +199,7 @@ void ScatterWidget::refreshPlot()
         m_correlationLabel->setText(tr("数据不足"));
         ++m_totalClears;
         ++m_totalUpdates;
+        ++m_totalPointsRemoved;
         m_pointDensityMax = 0;
         m_averageValue = 0.0;
         return;
@@ -214,6 +215,7 @@ void ScatterWidget::refreshPlot()
         m_correlationLabel->setText(tr("数据不足"));
         ++m_totalClears;
         ++m_totalUpdates;
+        ++m_totalPointsRemoved;
         m_pointDensityMax = 0;
         m_averageValue = 0.0;
         return;
@@ -237,7 +239,9 @@ void ScatterWidget::refreshPlot()
 
     m_series->replace(points);
     m_totalPointsPlotted += n;
+    m_totalPointsAdded += n;
     ++m_totalUpdates;
+    ++m_totalSelections;
 
     // 计算Y值平均
     double ySum = 0.0;
@@ -267,6 +271,7 @@ void ScatterWidget::refreshPlot()
     double yPad = qMax((yMax - yMin) * 0.05, 0.001);
     m_xAxis->setRange(xMin - xPad, xMax + xPad);
     m_yAxis->setRange(yMin - yPad, yMax + yPad);
+    ++m_totalAutoFits;
 
     // 更新轴标题
     m_xAxis->setTitleText(tr("X: %1").arg(xName));

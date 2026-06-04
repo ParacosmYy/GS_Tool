@@ -28,6 +28,8 @@ void DashboardModel::addComponentConfig(const QVariantMap &config)
     m_configs.append(config);
     ++m_totalWidgetsCreated;
     ++m_layoutChanges;
+    ++m_totalLayoutChanges;
+    ++m_totalWidgetAdditions;
     const QString type = config.value(QStringLiteral("type")).toString();
     if (!type.isEmpty()) {
         ++m_widgetsCreatedByType[type];
@@ -42,6 +44,8 @@ void DashboardModel::removeComponentConfig(int index)
         m_configs.removeAt(index);
         ++m_totalWidgetsRemoved;
         ++m_layoutChanges;
+        ++m_totalLayoutChanges;
+        ++m_totalWidgetRemovals;
         emit configChanged();
     }
 }
@@ -82,6 +86,7 @@ bool DashboardModel::saveToFile(const QString &filePath) const
 
     /* 统计：配置文件保存计数（const方法中修改mutable计数器） */
     ++m_profileSaves;
+    ++m_totalLayoutSaves;
     return true;
 }
 
@@ -119,6 +124,7 @@ bool DashboardModel::loadFromFile(const QString &filePath)
 
     /* 统计：配置文件加载计数 */
     ++m_profileLoads;
+    ++m_totalLayoutLoads;
 
     emit configChanged();
     return true;
@@ -241,7 +247,24 @@ quint64 DashboardModel::profileLoads() const { return m_profileLoads; }
 /** @brief 获取累计配置删除次数 @return 删除总数 */
 quint64 DashboardModel::profileDeletes() const { return m_profileDeletes; }
 
-/** @brief 重置所有统计计数器(通道统计+组件统计+布局统计+配置文件统计) */
+// ==================== 布局生命周期统计 ====================
+
+/** @brief 获取累计布局变更次数(增/删组件触发) @return 变更总数 */
+quint64 DashboardModel::totalLayoutChanges() const { return m_totalLayoutChanges; }
+
+/** @brief 获取累计组件添加次数 @return 添加总数 */
+quint64 DashboardModel::totalWidgetAdditions() const { return m_totalWidgetAdditions; }
+
+/** @brief 获取累计组件移除次数 @return 移除总数 */
+quint64 DashboardModel::totalWidgetRemovals() const { return m_totalWidgetRemovals; }
+
+/** @brief 获取累计布局保存次数 @return 保存总数 */
+quint64 DashboardModel::totalLayoutSaves() const { return m_totalLayoutSaves; }
+
+/** @brief 获取累计布局加载次数 @return 加载总数 */
+quint64 DashboardModel::totalLayoutLoads() const { return m_totalLayoutLoads; }
+
+/** @brief 重置所有统计计数器(通道统计+组件统计+布局统计+配置文件统计+布局生命周期统计) */
 void DashboardModel::resetAllStatistics()
 {
     /* 通道统计 */
@@ -258,4 +281,10 @@ void DashboardModel::resetAllStatistics()
     m_profileSaves = 0;
     m_profileLoads = 0;
     m_profileDeletes = 0;
+    /* 布局生命周期统计 */
+    m_totalLayoutChanges = 0;
+    m_totalWidgetAdditions = 0;
+    m_totalWidgetRemovals = 0;
+    m_totalLayoutSaves = 0;
+    m_totalLayoutLoads = 0;
 }

@@ -158,6 +158,14 @@ public:
     quint64 totalPanelsCreated() const;
     /** @brief 获取历史最大并发面板数 */
     quint64 maxConcurrentPanels() const;
+
+    /** @brief 获取累计面板创建次数(createPanels/wrapPanels触发) @return 创建次数 */
+    quint64 totalPanelCreations() const;
+    /** @brief 获取累计面板删除次数(析构时统计) @return 删除次数 */
+    quint64 totalPanelDeletions() const;
+    /** @brief 获取累计活跃面板追踪次数(onPanelSwitched累计) @return 追踪总数 */
+    quint64 totalActivePanelsTracked() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -170,6 +178,9 @@ private:
     quint64 m_totalPanelSwitches = 0;       ///< 累计面板切换次数
     quint64 m_totalPanelsCreated = 0;       ///< 累计创建面板总数
     quint64 m_maxConcurrentPanels = 0;      ///< 历史最大并发面板数
+    quint64 m_totalPanelCreations = 0;      ///< 累计面板创建次数(wrapPanels逐个创建)
+    quint64 m_totalPanelDeletions = 0;      ///< 累计面板删除次数
+    quint64 m_totalActivePanelsTracked = 0; ///< 累计活跃面板追踪次数
 };
 
 #endif // PANEL_MANAGER_H

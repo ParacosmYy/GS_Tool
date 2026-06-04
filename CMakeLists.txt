@@ -120,9 +120,11 @@ set(SOURCES
     src/protocol/bridge/ProtocolBridgeManager.cpp
     src/protocol/bridge/ProtocolBridgeManagerHelpers.cpp
     src/protocol/bridge/ProtocolBridgeManagerStats.cpp
+    src/protocol/bridge/ProtocolBridgeManagerAutoDetect.cpp
     src/chart/widget/ChartWidget.cpp
     src/chart/widget/ChartWidgetTheme.cpp
     src/chart/widget/ChartWidgetExport.cpp
+    src/chart/widget/ChartWidgetRender.cpp
     src/chart/model/ChannelConfig.cpp
     src/chart/model/ChartModel.cpp
     src/chart/model/ChartModelStats.cpp

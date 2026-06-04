@@ -71,6 +71,16 @@ public slots:
     // ---- 统计计数接口 ----
     /** @brief 获取累计绘制点数 */
     quint64 totalPointsPlotted() const;
+    /** @brief 获取累计添加点数(每次刷新时新增的散点数) @return 添加点计数 */
+    quint64 totalPointsAdded() const;
+    /** @brief 获取累计移除点数(数据清空时清除的散点数) @return 移除点计数 */
+    quint64 totalPointsRemoved() const;
+    /** @brief 获取累计自动拟合次数(坐标轴范围自适应) @return 自动拟合计数 */
+    quint64 totalAutoFits() const;
+    /** @brief 获取累计轴变更次数(X/Y通道切换触发) @return 轴变更计数 */
+    quint64 totalAxisChanges() const;
+    /** @brief 获取累计选择次数(数据刷新时的散点集替换) @return 选择计数 */
+    quint64 totalSelections() const;
     /** @brief 获取累计更新次数（含手动/自动刷新） */
     quint64 totalUpdates() const;
     /** @brief 获取累计清除次数 */
@@ -147,11 +157,16 @@ private:
     bool m_autoRefresh = false;      ///< 是否自动刷新
 
     // ---- 统计计数器 ----
-    quint64 m_totalPointsPlotted = 0; ///< 累计绘制点数
-    quint64 m_totalUpdates = 0;       ///< 累计更新次数（含手动/自动刷新）
-    quint64 m_totalClears = 0;        ///< 累计清除次数
-    int m_pointDensityMax = 0;        ///< 最近一次刷新的点密度网格最大值
-    double m_averageValue = 0.0;      ///< 最近一次刷新的所有散点Y值平均
+    quint64 m_totalPointsPlotted = 0;  ///< 累计绘制点数
+    quint64 m_totalPointsAdded = 0;    ///< 累计添加点数(每次刷新时新增的散点数)
+    quint64 m_totalPointsRemoved = 0;  ///< 累计移除点数(数据清空时清除的散点数)
+    quint64 m_totalAutoFits = 0;       ///< 累计自动拟合次数(坐标轴范围自适应)
+    quint64 m_totalAxisChanges = 0;    ///< 累计轴变更次数(X/Y通道切换触发)
+    quint64 m_totalSelections = 0;     ///< 累计选择次数(数据刷新时的散点集替换)
+    quint64 m_totalUpdates = 0;        ///< 累计更新次数（含手动/自动刷新）
+    quint64 m_totalClears = 0;         ///< 累计清除次数
+    int m_pointDensityMax = 0;         ///< 最近一次刷新的点密度网格最大值
+    double m_averageValue = 0.0;       ///< 最近一次刷新的所有散点Y值平均
 };
 
 #endif // SCATTERWIDGET_H
