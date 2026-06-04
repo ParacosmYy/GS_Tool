@@ -16,7 +16,7 @@
 #include <QTimer>
 #include <QDateTime>
 
-#include "shared/Constants.h"
+#include "shared/TimerConstants.h"
 #include "core/send/SendController.h"
 #include "ota/manager/OtaManager.h"
 #include "core/recording/RecordingController.h"
@@ -286,4 +286,3 @@ void ConnectionController::connectNetwork(ConnectionType type, const QVariantMap
 
 // onAutoReconnect() → ConnectionControllerReconnect.cpp
 // calcBackoffInterval() → ConnectionControllerReconnect.cpp
-

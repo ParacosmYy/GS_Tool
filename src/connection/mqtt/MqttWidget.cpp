@@ -214,7 +214,7 @@ void MqttWidget::setupUi()
     m_statKeepAlive->setObjectName("mqttStatKeepAlive");
     m_statConnAttempts = new QLabel(tr("0"), this);
     m_statConnAttempts->setObjectName("mqttStatConnAttempts");
-    m_statLastConnect = new QLabel(QStringLiteral("-"), this);
+    m_statLastConnect = new QLabel(tr("-"), this);
     m_statLastConnect->setObjectName("mqttStatLastConnect");
 
     statsLayout->addRow(tr("发布消息:"), m_statPublished);

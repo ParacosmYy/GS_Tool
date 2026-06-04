@@ -9,7 +9,8 @@
  */
 
 #include "connection/network/TcpConnection.h"
-#include "shared/Constants.h"
+#include "shared/ConnectionConstants.h"
+#include "shared/TimerConstants.h"
 #include <QNetworkInterface>
 
 /** @brief 构造TCP连接，初始化内部socket/server/timer为空 @param parent 父对象 */

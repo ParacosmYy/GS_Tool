@@ -13,7 +13,8 @@
 #include "serial/data/DataStatistics.h"
 #include "utils/export/DataExporter.h"
 #include "utils/data/ByteFormat.h"
-#include "shared/Constants.h"
+#include "shared/AppConstants.h"
+#include "shared/TimerConstants.h"
 
 #include <QFileDialog>
 #include "core/widgets/EdDialog.h"
@@ -207,4 +208,3 @@ void TerminalController::updateDataStatistics()
         m_dataStats->update(m_terminalModel->rxBytes(), m_terminalModel->txBytes());
     }
 }
-

@@ -12,7 +12,8 @@
  */
 
 #include "terminal/search/TerminalSearchBar.h"
-#include "shared/Constants.h"
+#include "shared/AnimationConstants.h"
+#include "shared/LayoutConstants.h"
 
 #include <QHBoxLayout>
 #include <QKeyEvent>

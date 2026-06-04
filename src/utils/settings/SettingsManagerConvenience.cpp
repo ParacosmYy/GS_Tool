@@ -7,7 +7,7 @@
  */
 
 #include "utils/settings/SettingsManager.h"
-#include "shared/Constants.h"
+#include "shared/AppConstants.h"
 
 // ============================================================
 // 便捷方法: 串口配置

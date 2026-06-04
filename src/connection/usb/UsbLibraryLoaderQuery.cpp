@@ -34,7 +34,7 @@ QString UsbLibraryLoader::lastError() const
 QString UsbLibraryLoader::versionString() const
 {
     if (!m_loaded) { return tr("libusb未加载"); }
-    return QStringLiteral("libusb-1.0 (loaded)");
+    return tr("libusb-1.0 (已加载)");
 }
 
 /* ---- 设备描述符查询 ---- */

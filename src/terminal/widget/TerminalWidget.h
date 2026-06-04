@@ -6,13 +6,13 @@
 #define TERMINALWIDGET_H
 
 #include <QWidget>
+#include "shared/AppConstants.h"
 #include "terminal/menu/TerminalContextMenuManager.h"
 #include "terminal/model/TerminalModel.h"
 #include "terminal/types/DirectionFilter.h"
 #include "terminal/selection/TerminalSelectionManager.h"
 #include "terminal/search/TerminalSearchManager.h"
 #include "terminal/search/TerminalSearchRenderer.h"
-#include "shared/Constants.h"
 #include "terminal/types/TerminalTypes.h"
 
 class QContextMenuEvent;
@@ -133,4 +133,3 @@ public:
 };
 
 #endif // TERMINALWIDGET_H
-

@@ -1,9 +1,11 @@
 /**
  * @file EdDialog.cpp
- * @brief 自定义对话框组件实现 — 统一替代 QMessageBox 的语义化弹窗
+ * @brief 自定义对话框组件实现 — 核心构造、绘制、动画、键盘事件
  *
  * 通过 paintEvent 自绘背景/左侧边框/图标, 按钮通过 objectName 供 QSS 定位。
  * 动画: 200ms OutCubic 淡入+缩放(95%→100%), 关闭时反向。
+ *
+ * 辅助方法(颜色/图标查询、关闭动画、静态便捷入口)见 EdDialogTabs.cpp。
  */
 
 #include "core/widgets/EdDialog.h"
@@ -208,113 +210,3 @@ void EdDialog::keyPressEvent(QKeyEvent* event)
     QDialog::keyPressEvent(event);
 }
 
-/**
- * @brief 获取当前类型的语义强调色
- */
-QColor EdDialog::accentColor() const
-{
-    using SC = ThemeManager::SemanticColor;
-    switch (m_type) {
-    case DialogType::Confirm:  return ThemeManager::instance().color(SC::Accent);
-    case DialogType::Warning:  return ThemeManager::instance().color(SC::Warning);
-    case DialogType::Error:    return ThemeManager::instance().color(SC::Error);
-    }
-    return ThemeManager::instance().color(SC::Accent);
-}
-
-/**
- * @brief 获取当前类型的图标 Unicode 字符
- */
-QString EdDialog::iconChar() const
-{
-    switch (m_type) {
-    case DialogType::Confirm:  return tr("✓");
-    case DialogType::Warning:  return tr("⚠");
-    case DialogType::Error:    return tr("✕");
-    }
-    return tr("✓");
-}
-
-/**
- * @brief 关闭动画 — 反向 200ms InCubic 淡出+缩小后关闭
- */
-void EdDialog::closeWithAnimation()
-{
-    QRect currentGeo = geometry();
-    QPoint center = currentGeo.center();
-    QRect endGeo = currentGeo;
-    endGeo.setWidth(static_cast<int>(currentGeo.width() * 0.95));
-    endGeo.setHeight(static_cast<int>(currentGeo.height() * 0.95));
-    endGeo.moveCenter(center);
-
-    auto* scaleAnim = new QPropertyAnimation(this, "geometry");
-    scaleAnim->setStartValue(currentGeo);
-    scaleAnim->setEndValue(endGeo);
-    scaleAnim->setDuration(200);
-    scaleAnim->setEasingCurve(QEasingCurve::InCubic);
-
-    auto* fadeAnim = new QPropertyAnimation(m_opacityEffect, "opacity");
-    fadeAnim->setStartValue(1.0);
-    fadeAnim->setEndValue(0.0);
-    fadeAnim->setDuration(200);
-    fadeAnim->setEasingCurve(QEasingCurve::InCubic);
-
-    auto* group = new QParallelAnimationGroup(this);
-    group->addAnimation(scaleAnim);
-    group->addAnimation(fadeAnim);
-    connect(group, &QAbstractAnimation::finished, this, [this]() {
-        ++s_totalDialogCloses;
-        QDialog::done(m_resultCode);
-    });
-    group->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-/**
- * @brief 静态便捷方法 — 确认对话框
- *
- * 显示确认/取消双按钮对话框, 返回用户是否点击了确认。
- *
- * @param parent 父窗口
- * @param title 标题文本
- * @param description 描述文本
- * @return true 用户点击确认, false 用户点击取消或关闭
- */
-bool EdDialog::confirm(QWidget* parent, const QString& title,
-                       const QString& description)
-{
-    EdDialog dlg(parent, title, description, DialogType::Confirm);
-    int result = dlg.exec();
-    return result == QDialog::Accepted;
-}
-
-/**
- * @brief 静态便捷方法 — 警告对话框
- *
- * 显示带警告图标和左侧 Warning 色边框的对话框。
- *
- * @param parent 父窗口
- * @param title 标题文本
- * @param description 描述文本
- */
-void EdDialog::warning(QWidget* parent, const QString& title,
-                       const QString& description)
-{
-    EdDialog dlg(parent, title, description, DialogType::Warning);
-    dlg.exec();
-}
-
-/**
- * @brief 静态便捷方法 — 错误对话框
- *
- * 显示带错误图标和左侧 Error 色边框的单按钮对话框。
- *
- * @param parent 父窗口
- * @param title 标题文本
- * @param description 描述文本
- */
-void EdDialog::error(QWidget* parent, const QString& title,
-                     const QString& description)
-{
-    EdDialog dlg(parent, title, description, DialogType::Error);
-    dlg.exec();
-}

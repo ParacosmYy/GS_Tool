@@ -256,17 +256,17 @@ QString CanFrameParser::messageName(quint32 frameId) const
 QString CanFrameParser::frameToString(const CanFrame& frame)
 {
     QString typeStr;
-    if (frame.fd)         typeStr += QStringLiteral("FD ");
-    if (frame.extended)   typeStr += QStringLiteral("EXT ");
-    if (frame.rtr)        typeStr += QStringLiteral("RTR ");
-    if (frame.error)      typeStr += QStringLiteral("ERR ");
-    if (typeStr.isEmpty()) typeStr = QStringLiteral("STD");
+    if (frame.fd)         typeStr += tr("FD ");
+    if (frame.extended)   typeStr += tr("EXT ");
+    if (frame.rtr)        typeStr += tr("RTR ");
+    if (frame.error)      typeStr += tr("ERR ");
+    if (typeStr.isEmpty()) typeStr = tr("STD");
 
     QString idStr = frame.extended
         ? QStringLiteral("%1").arg(frame.id, 8, 16, QLatin1Char('0')).toUpper()
         : QStringLiteral("%1").arg(frame.id, 3, 16, QLatin1Char('0')).toUpper();
 
-    return QStringLiteral("[%1] ID:0x%2 DLC:%3 %4")
+    return tr("[%1] ID:0x%2 DLC:%3 %4")
         .arg(typeStr, idStr)
         .arg(frame.dlc)
         .arg(frame.data.toHex(' ').toUpper());

@@ -12,6 +12,9 @@
  */
 
 #include "serial/config/SerialConfigPanel.h"
+#include "shared/ConnectionConstants.h"
+#include "shared/LayoutConstants.h"
+#include "shared/TimerConstants.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -23,7 +26,6 @@
 #include <QLineEdit>
 
 #include "core/widgets/AnimatedButton.h"
-#include "shared/Constants.h"
 
 // ---- UI布局 ----
 

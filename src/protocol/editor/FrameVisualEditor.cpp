@@ -138,7 +138,7 @@ void FrameVisualEditor::rebuildDefinition()
     for (int i = 0; i < m_fieldTable->rowCount(); ++i) {
         FieldDef field;
         auto* nameItem = m_fieldTable->item(i, 0);
-        field.name = nameItem ? nameItem->text() : QString("field_%1").arg(i);
+        field.name = nameItem ? nameItem->text() : tr("field_%1").arg(i);
         auto* typeCombo = qobject_cast<QComboBox*>(m_fieldTable->cellWidget(i, 1));
         field.type = typeCombo ? static_cast<FieldDef::Type>(typeCombo->currentIndex()) : FieldDef::UInt8;
         // 读取字节序ComboBox，调整类型中的LE/BE标记

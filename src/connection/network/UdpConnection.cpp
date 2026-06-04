@@ -9,7 +9,7 @@
  */
 
 #include "connection/network/UdpConnection.h"
-#include "shared/Constants.h"
+#include "shared/ConnectionConstants.h"
 #include <QVariant>
 
 /** @brief 构造UDP连接，初始化内部socket为空 @param parent 父对象 */

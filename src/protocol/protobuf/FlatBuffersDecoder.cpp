@@ -67,7 +67,7 @@ QVariantMap FlatBuffersDecoder::parseTable(const QByteArray& data,
         if (foff == 0) { continue; }
         int fdp = tableOffset + foff;
         if (fdp >= data.size()) { continue; }
-        QString fname = QString("field_%1").arg(i);
+        QString fname = tr("field_%1").arg(i);
         FbsBasicType ftype = FbsBasicType::Int32;
         QString ftypeName;
 

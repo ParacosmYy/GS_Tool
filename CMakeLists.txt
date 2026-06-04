@@ -46,6 +46,7 @@ set(SOURCES
     src/core/navigation/NavigationControllerAnimations.cpp
     src/core/navigation/IconNavBar.cpp
     src/core/send/SendController.cpp
+    src/core/send/SendControllerStats.cpp
     src/core/send/SendHistoryManager.cpp
     src/core/event/EventBus.cpp
     src/core/widgets/AppDialog.cpp
@@ -78,6 +79,7 @@ set(SOURCES
     src/core/widgets/ScriptRecorder.cpp
     src/core/widgets/DataDiffWidget.cpp
     src/core/widgets/EdDialog.cpp
+    src/core/widgets/EdDialogTabs.cpp
     src/core/connect/ConnectionManager.cpp
     src/core/connect/ConnectionFactory.cpp
     src/core/theme/ThemeManager.cpp
@@ -90,6 +92,7 @@ set(SOURCES
     src/core/theme/IconManager.cpp
     src/connection/serial_port/SerialConnection.cpp
     src/connection/serial_port/SerialConnectionError.cpp
+    src/connection/serial_port/SerialConnectionStats.cpp
     src/connection/network/TcpConnection.cpp
     src/connection/network/TcpConnectionStats.cpp
     src/connection/network/TcpConnectionHelpers.cpp

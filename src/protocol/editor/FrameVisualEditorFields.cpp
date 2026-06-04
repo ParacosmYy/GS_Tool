@@ -61,7 +61,7 @@ void FrameVisualEditor::onAddField()
 {
     int row = m_fieldTable->rowCount();
     m_fieldTable->insertRow(row);
-    m_fieldTable->setItem(row, 0, new QTableWidgetItem(QString("field_%1").arg(row)));
+    m_fieldTable->setItem(row, 0, new QTableWidgetItem(tr("field_%1").arg(row)));
 
     // 类型ComboBox(10种类型)
     auto* typeCombo = new QComboBox;

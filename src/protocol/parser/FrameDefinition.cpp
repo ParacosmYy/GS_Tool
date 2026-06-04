@@ -12,6 +12,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QCoreApplication>
 #include <QDebug>
 
 // ---- FieldDef 内部辅助 ----
@@ -117,7 +118,7 @@ QVariant FieldDef::extractValue(const QByteArray& payload) const
 QString FieldDef::formatValue(const QByteArray& payload) const
 {
     QVariant val = extractValue(payload);
-    if (!val.isValid()) return QString("N/A");
+    if (!val.isValid()) return QCoreApplication::translate("FieldDef", "N/A");
 
     if (type == Raw) {
         // Raw类型显示HEX

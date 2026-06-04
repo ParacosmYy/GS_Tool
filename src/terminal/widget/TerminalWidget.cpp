@@ -11,7 +11,8 @@
 #include "terminal/widget/TerminalWidget.h"
 #include "utils/crypto/HexConverter.h"
 #include "core/theme/ThemeManager.h"
-#include "shared/Constants.h"
+#include "shared/AppConstants.h"
+#include "shared/TimerConstants.h"
 #include <QScrollBar>
 #include <QApplication>
 #include <QClipboard>

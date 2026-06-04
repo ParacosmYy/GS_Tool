@@ -59,7 +59,7 @@ void ModbusScanWidget::onResponseReceived(const ModbusFrame& frame) {
     m_resultTable->setItem(row, 2, typeItem);
 
     // 响应功能码列
-    auto* fcItem = new QTableWidgetItem(QString("FC%1").arg(fc, 2, 10, QChar('0')));
+    auto* fcItem = new QTableWidgetItem(tr("FC%1").arg(fc, 2, 10, QChar('0')));
     fcItem->setTextAlignment(Qt::AlignCenter);
     m_resultTable->setItem(row, 3, fcItem);
 

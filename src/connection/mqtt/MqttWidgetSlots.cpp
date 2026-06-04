@@ -150,7 +150,7 @@ void MqttWidget::stopReconnect()
 /** @brief 格式化字节大小为人类可读字符串 @param bytes 字节数 @return 如"1.23 KB" */
 QString MqttWidget::formatBytes(quint64 bytes) const
 {
-    if (bytes < 1024) return QStringLiteral("%1 B").arg(bytes);
-    if (bytes < 1024 * 1024) return QStringLiteral("%1 KB").arg(bytes / 1024.0, 0, 'f', 2);
-    return QStringLiteral("%1 MB").arg(bytes / (1024.0 * 1024.0), 0, 'f', 2);
+    if (bytes < 1024) return tr("%1 B").arg(bytes);
+    if (bytes < 1024 * 1024) return tr("%1 KB").arg(bytes / 1024.0, 0, 'f', 2);
+    return tr("%1 MB").arg(bytes / (1024.0 * 1024.0), 0, 'f', 2);
 }

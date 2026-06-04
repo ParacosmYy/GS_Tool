@@ -13,7 +13,8 @@
  */
 #include "protocol/editor/FrameVisualEditor.h"
 #include "core/widgets/AnimatedButton.h"
-#include "shared/Constants.h"
+#include "shared/LayoutConstants.h"
+#include "shared/TimerConstants.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFormLayout>

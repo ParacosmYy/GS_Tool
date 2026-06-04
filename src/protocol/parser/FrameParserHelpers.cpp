@@ -48,7 +48,7 @@ QVariantMap FrameParser::extractFields(const QByteArray& frameData) const
 
     // 逐字段提取值
     for (const auto& field : m_def.fields) {
-        QString key = field.name.isEmpty() ? QString("field_%1").arg(field.offset) : field.name;
+        QString key = field.name.isEmpty() ? tr("field_%1").arg(field.offset) : field.name;
         result[key] = field.formatValue(payload);
     }
 

@@ -57,7 +57,7 @@ void UsbDescriptorViewer::loadDescriptors(quint16 vid, quint16 pid) {
     // 设备描述符
     auto* devItem = new QTreeWidgetItem(m_descriptorTree);
     devItem->setText(0, tr("设备描述符"));
-    devItem->setText(1, QString("VID:%1 PID:%2")
+    devItem->setText(1, tr("VID:%1 PID:%2")
                           .arg(vid, 4, 16, QChar('0'))
                           .arg(pid, 4, 16, QChar('0')));
     devItem->setText(2, tr("USB设备基本信息"));

@@ -9,7 +9,8 @@
  */
 
 #include "serial/config/SerialConfigPanel.h"
-#include "shared/Constants.h"
+#include "shared/AnimationConstants.h"
+#include "shared/TimerConstants.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
