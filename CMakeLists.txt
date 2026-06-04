@@ -301,6 +301,7 @@ set(SOURCES
     src/connection/can/CanConnectionProtocol.cpp
     src/connection/can/CanConnectionFrame.cpp
     src/connection/can/CanFrameParser.cpp
+    src/connection/can/CanFrameParserBuild.cpp
     src/connection/can/CanBusMonitor.cpp
     src/connection/can/CanBusMonitorFrame.cpp
     src/connection/can/CanConfigPanel.cpp
