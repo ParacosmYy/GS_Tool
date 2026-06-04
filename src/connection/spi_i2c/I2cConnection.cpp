@@ -108,8 +108,10 @@ qint64 I2cConnection::write(const QByteArray& data)
     if (written > 0) {
         ++m_totalTransactions;
         m_totalBytesSent += static_cast<quint64>(written);
+        m_totalBytesWritten += static_cast<quint64>(written);
     } else {
         ++m_errorCount;
+        ++m_totalBusErrors;
     }
     return written;
 }
@@ -154,6 +156,7 @@ QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
     ++m_totalTransactions;
     m_totalBytesSent += static_cast<quint64>(frame.size());
     m_totalBytesReceived += static_cast<quint64>(data.size());
+    m_totalBytesRead += static_cast<quint64>(data.size());
 
     emit registerRead(regAddr, data);
     return data;
@@ -173,8 +176,10 @@ bool I2cConnection::writeRegister(int deviceAddr, int regAddr, const QByteArray&
     if (written > 0) {
         ++m_totalTransactions;
         m_totalBytesSent += static_cast<quint64>(written);
+        m_totalBytesWritten += static_cast<quint64>(data.size());
     } else {
         ++m_errorCount;
+        ++m_totalBusErrors;
     }
     return written > 0;
 }
@@ -279,14 +284,18 @@ QByteArray I2cConnection::parseResponsePayload()
     return m_responseBuffer.mid(dataStart, avail);
 }
 
-/** @brief 重置所有I2C统计计数器(传输次数/字节数/错误/NACK/设备发现) */
+/** @brief 重置所有I2C统计计数器(传输次数/字节数/错误/NACK/总线错误/设备发现) */
 void I2cConnection::resetStats()
 {
     m_totalTransactions = 0;
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
+    m_totalBytesWritten = 0;
+    m_totalBytesRead = 0;
     m_errorCount = 0;
     m_nackCount = 0;
+    m_totalNacks = 0;
+    m_totalBusErrors = 0;
     m_devicesFound = 0;
     m_lastScanResults.clear();
 }

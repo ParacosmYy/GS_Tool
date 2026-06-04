@@ -126,6 +126,12 @@ public:
     /** @brief 获取会话操作错误总次数 @return 错误次数 */
     quint64 errorCount() const;
 
+    /** @brief 获取累计会话创建次数 @return 会话创建次数 */
+    quint64 totalSessionsCreated() const;
+
+    /** @brief 获取累计会话删除次数 @return 会话删除次数 */
+    quint64 totalSessionDeletes() const;
+
     /** @brief 重置所有会话管理统计计数器为零 */
     void resetSessionStatistics();
 
@@ -143,6 +149,8 @@ private:
     quint64 m_totalSaves = 0;          ///< 会话保存总次数
     quint64 m_totalLoads = 0;          ///< 会话加载总次数
     quint64 m_errorCount = 0;          ///< 会话操作错误总次数
+    quint64 m_totalSessionsCreated = 0; ///< 累计会话创建次数
+    quint64 m_totalSessionDeletes = 0;  ///< 累计会话删除次数
 };
 
 #endif // SESSIONMANAGER_H

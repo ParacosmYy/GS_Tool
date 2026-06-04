@@ -96,6 +96,7 @@ qint64 SpiConnection::write(const QByteArray& data)
 {
     if (m_state != ConnectionState::Connected) {
         ++m_errorCount;
+        ++m_totalTransferErrors;
         return -1;
     }
 
@@ -115,6 +116,7 @@ qint64 SpiConnection::write(const QByteArray& data)
         }
     } else {
         ++m_errorCount;
+        ++m_totalTransferErrors;
     }
     return written;
 }
@@ -184,6 +186,7 @@ void SpiConnection::setChipSelect(int csPin, bool active)
 {
     if (!m_serial || m_state != ConnectionState::Connected) return;
 
+    ++m_totalCsToggles;
     QByteArray payload;
     payload.append(static_cast<char>(csPin));
     payload.append(static_cast<char>(active ? 1 : 0));
@@ -261,13 +264,15 @@ quint64 SpiConnection::transferByMode(int mode) const
     return m_transferByMode[mode];
 }
 
-/** @brief 重置所有SPI统计计数器(传输次数/字节数/错误计数/模式统计) */
+/** @brief 重置所有SPI统计计数器(传输次数/字节数/错误计数/传输错误/CS切换/模式统计) */
 void SpiConnection::resetStats()
 {
     m_totalTransfers = 0;
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
     m_errorCount = 0;
+    m_totalTransferErrors = 0;
+    m_totalCsToggles = 0;
     for (int i = 0; i < 4; ++i) {
         m_transferByMode[i] = 0;
     }

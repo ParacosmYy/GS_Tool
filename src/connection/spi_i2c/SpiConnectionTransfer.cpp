@@ -22,6 +22,7 @@ QByteArray SpiConnection::transfer(const QByteArray& txData, SpiWordSize wordSiz
 {
     if (m_state != ConnectionState::Connected || !m_serial) {
         ++m_errorCount;
+        ++m_totalTransferErrors;
         return QByteArray();
     }
 

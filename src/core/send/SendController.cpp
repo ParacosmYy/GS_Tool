@@ -275,6 +275,7 @@ void SendController::onSendData()
  */
 void SendController::onQuickCommand(const QByteArray& data)
 {
+    ++m_totalMacroExecutions;  // 统计: 快捷指令(宏)执行次数递增
     sendAndRecord(data);
 }
 
@@ -304,12 +305,19 @@ quint64 SendController::totalErrors() const
     return m_totalErrors;
 }
 
-/** @brief 重置所有统计计数器(发送/字节/HEX/错误) */
+/** @brief 获取累计快捷指令(宏)执行次数 @return 宏执行次数 */
+quint64 SendController::totalMacroExecutions() const
+{
+    return m_totalMacroExecutions;
+}
+
+/** @brief 重置所有统计计数器(发送/字节/HEX/错误/宏) */
 void SendController::resetSendStatistics()
 {
     m_totalSends = 0;
     m_totalBytesSent = 0;
     m_totalHexSends = 0;
     m_totalErrors = 0;
+    m_totalMacroExecutions = 0;
 }
 

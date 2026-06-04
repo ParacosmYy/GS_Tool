@@ -109,6 +109,12 @@ public:
     /** @brief 获取总接收字节数 */
     quint64 totalBytesReceived() const { return m_totalBytesReceived; }
 
+    /** @brief 获取总传输错误次数 @return 传输过程中发生的错误总数 */
+    quint64 totalTransferErrors() const { return m_totalTransferErrors; }
+
+    /** @brief 获取总CS片选切换次数 @return 片选引脚选中/释放的累计次数 */
+    quint64 totalCsToggles() const { return m_totalCsToggles; }
+
     /** @brief 获取错误计数 */
     quint64 errorCount() const { return m_errorCount; }
 
@@ -179,6 +185,8 @@ private:
     quint64 m_totalBytesSent = 0;                   ///< 总发送字节数
     quint64 m_totalBytesReceived = 0;               ///< 总接收字节数
     quint64 m_errorCount = 0;                       ///< 错误计数
+    mutable quint64 m_totalTransferErrors = 0;      ///< 总传输错误次数
+    mutable quint64 m_totalCsToggles = 0;           ///< 总CS片选切换次数
     quint64 m_transferByMode[4] = {0, 0, 0, 0};    ///< 按SPI模式统计传输次数
 };
 

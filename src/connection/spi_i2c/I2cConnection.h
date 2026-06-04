@@ -52,40 +52,13 @@ public:
     /** @brief 扫描I2C总线，发现所有响应的设备(7位地址0x03~0x77) @return 发现的设备地址列表 */
     QList<int> scanBus();
 
-    /**
-     * @brief 从指定设备的寄存器读取数据(单次)
-     * @param deviceAddr 设备7位地址
-     * @param regAddr 寄存器地址
-     * @param length 读取长度(字节)
-     * @return 读取到的数据
-     */
+    /** @brief 从指定设备寄存器读取数据 @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param length 读取长度 @return 读取到的数据 */
     QByteArray readRegister(int deviceAddr, int regAddr, int length);
-
-    /**
-     * @brief 向指定设备的寄存器写入数据(单次)
-     * @param deviceAddr 设备7位地址
-     * @param regAddr 寄存器地址
-     * @param data 待写入的数据
-     * @return true=写入成功
-     */
+    /** @brief 向指定设备寄存器写入数据 @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param data 待写入数据 @return true=成功 */
     bool writeRegister(int deviceAddr, int regAddr, const QByteArray& data);
-
-    /**
-     * @brief 突发读取: 从起始寄存器连续读取多个字节
-     * @param deviceAddr 设备7位地址
-     * @param startReg 起始寄存器地址
-     * @param count 读取字节数
-     * @return 读取到的连续数据
-     */
+    /** @brief 突发读取: 从起始寄存器连续读取多字节 @param deviceAddr 设备7位地址 @param startReg 起始寄存器 @param count 字节数 @return 连续数据 */
     QByteArray burstRead(int deviceAddr, int startReg, int count);
-
-    /**
-     * @brief 突发写入: 从起始寄存器连续写入多个字节
-     * @param deviceAddr 设备7位地址
-     * @param startReg 起始寄存器地址
-     * @param data 待写入的连续数据
-     * @return true=写入成功
-     */
+    /** @brief 突发写入: 从起始寄存器连续写入多字节 @param deviceAddr 设备7位地址 @param startReg 起始寄存器 @param data 待写入数据 @return true=成功 */
     bool burstWrite(int deviceAddr, int startReg, const QByteArray& data);
 
     /** @brief 设置底层串口传输通道 @param serial 串口IConnection实例(不获取所有权) */
@@ -93,27 +66,28 @@ public:
 
     // ---- 统计信息接口 ----
 
-    /** @brief 获取总传输次数 */
-    quint64 totalTransfers() const { return m_totalTransactions; }
-
-    /** @brief 获取总发送字节数 */
+    /** @brief 获取总事务次数 @return I2C总线事务(读/写/探测)累计次数 */
+    quint64 totalTransactions() const { return m_totalTransactions; }
+    /** @brief 获取总写入字节数 @return 通过I2C总线成功写入的字节总数 */
+    quint64 totalBytesWritten() const { return m_totalBytesWritten; }
+    /** @brief 获取总读取字节数 @return 通过I2C总线成功读取的字节总数 */
+    quint64 totalBytesRead() const { return m_totalBytesRead; }
+    /** @brief 获取总NACK事件次数 @return 设备未响应的累计次数 */
+    quint64 totalNacks() const { return m_totalNacks; }
+    /** @brief 获取总线错误次数 @return I2C总线通信错误累计次数 */
+    quint64 totalBusErrors() const { return m_totalBusErrors; }
+    /** @brief 获取总发送字节数(兼容) */
     quint64 totalBytesSent() const { return m_totalBytesSent; }
-
-    /** @brief 获取总接收字节数 */
+    /** @brief 获取总接收字节数(兼容) */
     quint64 totalBytesReceived() const { return m_totalBytesReceived; }
-
     /** @brief 获取错误计数 */
     quint64 errorCount() const { return m_errorCount; }
-
-    /** @brief 获取NACK计数(设备未响应次数) */
+    /** @brief 获取NACK计数(兼容别名) */
     quint64 nackCount() const { return m_nackCount; }
-
     /** @brief 获取扫描发现的设备数量 */
     quint64 devicesFound() const { return m_devicesFound; }
-
     /** @brief 获取上次扫描发现的设备地址列表 */
     QList<int> lastScanResults() const { return m_lastScanResults; }
-
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -189,8 +163,12 @@ private:
     quint64 m_totalTransactions = 0;                ///< 总传输次数
     quint64 m_totalBytesSent = 0;                   ///< 总发送字节数
     quint64 m_totalBytesReceived = 0;               ///< 总接收字节数
+    quint64 m_totalBytesWritten = 0;                ///< 总写入字节数
+    quint64 m_totalBytesRead = 0;                   ///< 总读取字节数
     quint64 m_errorCount = 0;                       ///< 错误计数
     quint64 m_nackCount = 0;                        ///< NACK计数(设备未响应)
+    mutable quint64 m_totalNacks = 0;               ///< 总NACK事件次数
+    mutable quint64 m_totalBusErrors = 0;           ///< 总线错误次数
     quint64 m_devicesFound = 0;                     ///< 累计发现的设备数量
 
     // ---- 扫描结果缓存 ----

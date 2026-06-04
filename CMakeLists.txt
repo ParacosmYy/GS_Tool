@@ -105,6 +105,7 @@ set(SOURCES
     src/serial/commands/TimedSender.cpp
     src/serial/commands/SendHistory.cpp
     src/serial/data/DataStatistics.cpp
+    src/serial/data/DataStatisticsDisplay.cpp
     src/serial/data/DataStatisticsRolling.cpp
     src/serial/port/SerialDriverDetector.cpp
     src/serial/port/PortWatcher.cpp
@@ -157,6 +158,7 @@ set(SOURCES
     src/ota/protocols/ymodem/YModemTransferProtocol.cpp
     src/ota/protocols/zmodem/ZModemTransfer.cpp
     src/ota/protocols/zmodem/ZModemTransferHandlers.cpp
+    src/ota/protocols/zmodem/ZModemTransferProtocol.cpp
     src/utils/settings/SettingsManager.cpp
     src/utils/settings/SettingsManagerConvenience.cpp
     src/utils/export/DataExporter.cpp

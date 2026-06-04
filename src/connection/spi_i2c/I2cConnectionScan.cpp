@@ -69,6 +69,7 @@ bool I2cConnection::probeAddress(int addr)
         } else {
             /// 设备NACK
             ++m_nackCount;
+            ++m_totalNacks;
             ++m_totalTransactions;
             m_totalBytesSent += 4;
             emit nackReceived(addr);
@@ -78,6 +79,7 @@ bool I2cConnection::probeAddress(int addr)
 
     /// 无有效响应，视为通信错误
     ++m_errorCount;
+    ++m_totalBusErrors;
     return false;
 }
 
@@ -107,6 +109,7 @@ QByteArray I2cConnection::burstRead(int deviceAddr, int startReg, int count)
     ++m_totalTransactions;
     m_totalBytesSent += static_cast<quint64>(frame.size());
     m_totalBytesReceived += static_cast<quint64>(data.size());
+    m_totalBytesRead += static_cast<quint64>(data.size());
 
     emit burstReadComplete(startReg, data);
     return data;
@@ -126,8 +129,10 @@ bool I2cConnection::burstWrite(int deviceAddr, int startReg, const QByteArray& d
     if (written > 0) {
         ++m_totalTransactions;
         m_totalBytesSent += static_cast<quint64>(written);
+        m_totalBytesWritten += static_cast<quint64>(data.size());
     } else {
         ++m_errorCount;
+        ++m_totalBusErrors;
     }
     return written > 0;
 }

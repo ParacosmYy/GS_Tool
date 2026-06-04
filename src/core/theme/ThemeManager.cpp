@@ -169,9 +169,11 @@ QColor ThemeManager::color(SemanticColor color) const
 
     auto it = m_colorMap.constFind(color);
     if (it != m_colorMap.constEnd()) {
+        ++m_totalCacheHits;  // 统计: 语义色缓存命中
         return it.value();
     }
     // 兜底: 返回深灰色，避免程序崩溃
+    ++m_totalCacheMisses;  // 统计: 语义色缓存未命中
     qWarning() << "ThemeManager: unmapped SemanticColor" << static_cast<int>(color);
     return QColor(128, 128, 128);
 }
@@ -368,6 +370,18 @@ quint64 ThemeManager::totalStyleApplications() const
     return m_totalStyleApplications;
 }
 
+/** @brief 获取累计语义色缓存命中次数 @return 缓存命中次数 */
+quint64 ThemeManager::totalCacheHits() const
+{
+    return m_totalCacheHits;
+}
+
+/** @brief 获取累计语义色缓存未命中次数 @return 缓存未命中次数 */
+quint64 ThemeManager::totalCacheMisses() const
+{
+    return m_totalCacheMisses;
+}
+
 /** @brief 重置所有统计计数器为零 */
 void ThemeManager::resetStats()
 {
@@ -375,4 +389,6 @@ void ThemeManager::resetStats()
     m_totalCustomThemesLoaded = 0;
     m_totalColorQueries = 0;
     m_totalStyleApplications = 0;
+    m_totalCacheHits = 0;
+    m_totalCacheMisses = 0;
 }

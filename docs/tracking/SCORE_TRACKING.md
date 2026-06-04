@@ -58,6 +58,8 @@
 | 210 | YModemTransferProtocol/PortWatcherStats拆分 | YModem协议独立文件+端口监听统计独立 |
 | 211 | MainWindowLifecycle/ResponsiveLayoutQuery拆分+TrafficMonitor/SignalLine/PerformanceOverlay/TimedSender/DataStatistics linter增强 | 主窗口生命周期独立+响应式查询独立+流量/信号/性能/定时/数据统计增强 |
 | 212 | TimedSender统计增强+TrafficMonitor头文件修正 | 定时发送/字节/错误统计+流量监控getter修正 |
+| 213 | TriggerEngine+ThemeManager+SendController+SessionManager统计增强 | 触发器评估/执行/错误+主题缓存命中/未命中+发送宏执行+会话创建/删除 |
+| 214 | ZModemTransferProtocol/DataStatisticsDisplay拆分 | ZModem协议独立+数据统计显示独立 |
 
 ---
 

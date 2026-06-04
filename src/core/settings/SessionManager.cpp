@@ -25,6 +25,7 @@ SessionManager::SessionManager(QMainWindow* mainWindow, QObject* parent)
     , m_serialConfig(nullptr)
     , m_settingsController(nullptr)
 {
+    ++m_totalSessionsCreated;  // 统计: 会话创建次数递增
 }
 
 /** @brief 注入串口配置面板引用 */
@@ -145,10 +146,24 @@ quint64 SessionManager::errorCount() const
     return m_errorCount;
 }
 
+/** @brief 获取累计会话创建次数 @return 会话创建次数 */
+quint64 SessionManager::totalSessionsCreated() const
+{
+    return m_totalSessionsCreated;
+}
+
+/** @brief 获取累计会话删除次数 @return 会话删除次数 */
+quint64 SessionManager::totalSessionDeletes() const
+{
+    return m_totalSessionDeletes;
+}
+
 /** @brief 重置所有会话管理统计计数器为零 */
 void SessionManager::resetSessionStatistics()
 {
     m_totalSaves = 0;
     m_totalLoads = 0;
     m_errorCount = 0;
+    m_totalSessionsCreated = 0;
+    m_totalSessionDeletes = 0;
 }

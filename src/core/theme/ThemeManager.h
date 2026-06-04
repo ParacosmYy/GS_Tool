@@ -124,6 +124,12 @@ public:
     /** @brief 获取累计样式表应用次数 */
     quint64 totalStyleApplications() const;
 
+    /** @brief 获取累计语义色缓存命中次数 @return 缓存命中次数 */
+    quint64 totalCacheHits() const;
+
+    /** @brief 获取累计语义色缓存未命中次数 @return 缓存未命中次数 */
+    quint64 totalCacheMisses() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -161,6 +167,8 @@ private:
     quint64 m_totalCustomThemesLoaded = 0;  ///< 累计自定义主题加载次数
     mutable quint64 m_totalColorQueries = 0;        ///< 累计语义色查询次数
     quint64 m_totalStyleApplications = 0;   ///< 累计样式表应用次数
+    mutable quint64 m_totalCacheHits = 0;           ///< 累计语义色缓存命中次数
+    mutable quint64 m_totalCacheMisses = 0;         ///< 累计语义色缓存未命中次数
 };
 
 #endif // THEMEMANAGER_H
