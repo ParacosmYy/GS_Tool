@@ -67,6 +67,8 @@
 | 219 | MainWindowInit拆分+TriggerRule linter增强 | 主窗口构造函数拆分为MainWindowInit.cpp(250行)+触发器规则linter修正 |
 | 220 | QssThemeGeneratorWidgets/UsbDeviceDetectorStats拆分+Widget统计增强 | QSS主题生成器组件独立+USB检测统计独立+ScopeWidget/AudioSpectrum/FrequencyCounter/CommandPalette2/ScriptRecorder2/ToastWidget2/DataDiffWidget2/EdDialog2统计 |
 | 221 | Plugin/Scope/Audio/Freq/CommandPalette/Recorder/Toast/Diff统计增强+文件拆分 | PluginApi面板注册/通道/订阅+PluginManager扫描/发现+MainWindowPanelConnect+PanelManagerQuery拆分 |
+| 222 | QssThemeGeneratorWidgets/UsbDeviceDetectorStats拆分+Widget统计增强 | QSS主题生成器组件独立+USB检测统计独立+DataAggregator压缩 |
+| 223 | NotificationManager/WorkspaceManager/ConnectionMonitor统计增强+文件拆分 | 通知创建/确认/消除+工作区保存/加载/删除/切换+OtaWidgetDisplay+QuickCommandBarActions拆分 |
 
 ---
 
