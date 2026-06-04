@@ -406,6 +406,7 @@ set(SOURCES
 
     # ── F22: 校验和计算器 ──
     src/utils/checksum/ChecksumCalculator.cpp
+    src/utils/checksum/ChecksumCalculatorStats.cpp
     src/utils/checksum/ChecksumPanel.cpp
     src/utils/checksum/ChecksumPanelAlgo.cpp
 
