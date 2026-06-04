@@ -628,6 +628,7 @@ set(SOURCES
 
     # ── F30: 数据掩码编辑器 ──
     src/utils/bitmask/DataMaskEditor.cpp
+    src/utils/bitmask/DataMaskEditorIo.cpp
     src/utils/bitmask/DataMaskEditorStats.cpp
 
     # ── F31: 数据包重组引擎 ──
