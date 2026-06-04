@@ -281,12 +281,14 @@ set(SOURCES
     # ── F13: CAN/CAN-FD 总线 ──
     src/connection/can/CanConnection.cpp
     src/connection/can/CanConnectionProtocol.cpp
+    src/connection/can/CanConnectionFrame.cpp
     src/connection/can/CanFrameParser.cpp
     src/connection/can/CanBusMonitor.cpp
     src/connection/can/CanBusMonitorFrame.cpp
     src/connection/can/CanConfigPanel.cpp
     src/protocol/can/DbcParser.cpp
     src/protocol/can/DbcParserParse.cpp
+    src/protocol/can/DbcParserSignal.cpp
 
     # ── F14: MQTT 客户端 ──
     src/connection/mqtt/MqttConnection.cpp
@@ -347,6 +349,7 @@ set(SOURCES
     src/connection/usb/UsbDescriptorViewer.cpp
     src/connection/usb/UsbConfigPanel.cpp
     src/connection/usb/UsbLibraryLoader.cpp
+    src/connection/usb/UsbLibraryLoaderQuery.cpp
 
     # ── F21: 正则终端过滤器 ──
     src/terminal/filter/TerminalFilter.cpp

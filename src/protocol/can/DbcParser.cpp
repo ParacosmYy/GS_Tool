@@ -6,6 +6,7 @@
  * BO_消息、SG_信号、VAL_值表、CM_注释、BA_属性、BU_节点
  *
  * 私有行解析方法见 DbcParserParse.cpp
+ * 信号解码/值表查找/位域提取见 DbcParserSignal.cpp
  */
 
 #include "protocol/can/DbcParser.h"
@@ -148,74 +149,6 @@ DbcMessage DbcParser::messageByName(const QString& name) const
         return m_messages.value(it.value());
     }
     return DbcMessage{};
-}
-
-/**
- * @brief 解码CAN帧数据为信号值映射
- * @param msgId 消息ID
- * @param data 帧数据(最多8字节)
- * @return 信号名→物理值映射
- */
-QMap<QString, double> DbcParser::decodeFrame(uint32_t msgId,
-                                              const QByteArray& data) const
-{
-    QMap<QString, double> result;
-
-    auto it = m_messages.constFind(msgId);
-    if (it == m_messages.constEnd()) {
-        return result;
-    }
-
-    const DbcMessage& msg = it.value();
-    for (const DbcSignal& sig : msg.signalList) {
-        const uint64_t raw = extractBits(data, sig.startBit,
-                                          sig.bitLength, sig.byteOrder);
-        const double physical = static_cast<double>(raw) * sig.factor + sig.offset;
-        result[sig.name] = physical;
-    }
-    m_totalSignalsDecoded += static_cast<quint64>(msg.signalList.size());
-
-    return result;
-}
-
-/**
- * @brief 获取信号物理值的文本描述(含值表翻译)
- * @param msgId 消息ID
- * @param signalName 信号名
- * @param rawValue 原始值
- * @return 格式化字符串
- */
-QString DbcParser::formatSignalValue(uint32_t msgId,
-                                      const QString& signalName,
-                                      double rawValue) const
-{
-    auto msgIt = m_messages.constFind(msgId);
-    if (msgIt == m_messages.constEnd()) { return QString(); }
-
-    const DbcMessage& msg = msgIt.value();
-    const DbcSignal* targetSig = nullptr;
-    for (const DbcSignal& sig : msg.signalList) {
-        if (sig.name == signalName) { targetSig = &sig; break; }
-    }
-    if (!targetSig) { return QString(); }
-
-    /* 值表翻译(仅整数值) */
-    const int intVal = static_cast<int>(rawValue);
-    if (targetSig->valueTable.contains(intVal)) {
-        return targetSig->valueTable.value(intVal);
-    }
-
-    /* 通用格式: "值 单位" */
-    QString text;
-    if (targetSig->factor == 1.0 && targetSig->offset == 0.0) {
-        text = QString::number(intVal);
-    } else {
-        text = QString::number(rawValue, 'f', 2);
-    }
-    if (!targetSig->unit.isEmpty()) {
-        text += QLatin1Char(' ') + targetSig->unit;
-    }
-    return text;
 }
 
 /** @brief 获取解析错误信息 @return 最近一次解析错误描述 */
