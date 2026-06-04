@@ -659,6 +659,10 @@ set(SOURCES
     # ── 数据流过滤器 ──
     src/core/filter/DataStreamFilter.cpp
     src/core/filter/DataStreamFilterStats.cpp
+
+    # ── 协议响应模拟器 ──
+    src/protocol/simulator/ProtocolSimulator.cpp
+    src/protocol/simulator/ProtocolSimulatorStats.cpp
 )
 
 set(HEADERS
@@ -970,6 +974,9 @@ set(HEADERS
 
     # ── 数据流过滤器 ──
     src/core/filter/DataStreamFilter.h
+
+    # ── 协议响应模拟器 ──
+    src/protocol/simulator/ProtocolSimulator.h
 )
 
 set(RESOURCES
