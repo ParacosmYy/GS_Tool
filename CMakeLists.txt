@@ -62,6 +62,7 @@ set(SOURCES
     src/core/panels/PanelManager.cpp
     src/core/panels/PanelManagerCreation.cpp
     src/core/panels/PanelManagerGetters.cpp
+    src/core/panels/PanelManagerQuery.cpp
     src/core/background/BackgroundWidget.cpp
     src/core/background/BackgroundSettingsPopup.cpp
     src/core/widgets/BasePanel.cpp

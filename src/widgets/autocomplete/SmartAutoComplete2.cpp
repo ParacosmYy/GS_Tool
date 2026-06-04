@@ -14,7 +14,7 @@ SmartAutoComplete::SmartAutoComplete(QWidget *parent) : QWidget(parent, Qt::Popu
     auto *l = new QVBoxLayout(this); l->setContentsMargins(0,0,0,0);
     m_list = new QListWidget(this); m_list->setObjectName("autoList");
     l->addWidget(m_list);
-    connect(m_list, &QListWidget::itemClicked, this, [this](QListWidgetItem *item) { if (m_edit) m_edit->setText(item->text()); hide(); });
+    connect(m_list, &QListWidget::itemClicked, this, [this](QListWidgetItem *item) { if (m_edit) { ++m_totalAccepts; m_edit->setText(item->text()); } hide(); });
 }
 /** @brief 析构函数 */
 SmartAutoComplete::~SmartAutoComplete() = default;
@@ -44,8 +44,9 @@ void SmartAutoComplete::onTextChanged(const QString &text) {
     Qt::CaseSensitivity cs = m_caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
     for (const auto &w : m_dictionary) { if (w.contains(text, cs)) { results << w; if (results.size() >= m_maxSuggestions) break; } }
     if (results.isEmpty()) { hide(); return; }
+    ++m_totalTriggers;
     showSuggestions(results);
 }
 
 /** @brief 显示建议列表 @param items 建议文本列表 */
-void SmartAutoComplete::showSuggestions(const QStringList &items) { m_list->clear(); for (const auto &i : items) m_list->addItem(i); resize(250, qMin(items.size()*25, 200)); show(); raise(); }
+void SmartAutoComplete::showSuggestions(const QStringList &items) { m_totalSuggestions += items.size(); m_list->clear(); for (const auto &i : items) m_list->addItem(i); resize(250, qMin(items.size()*25, 200)); show(); raise(); }

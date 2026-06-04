@@ -22,6 +22,7 @@ int DataDiffWidget::diffCount() const { return m_diffCount; }
 
 /** @brief 计算逐行差异列表 @return DiffLine列表 */
 QList<DataDiffWidget::DiffLine> DataDiffWidget::computeDiff() const {
+    ++m_totalComparisons;
     QList<DiffLine> result;
     int lines = qMax((m_left.size()+m_bytesPerLine-1)/m_bytesPerLine, (m_right.size()+m_bytesPerLine-1)/m_bytesPerLine);
     m_diffCount = 0;
@@ -31,7 +32,7 @@ QList<DataDiffWidget::DiffLine> DataDiffWidget::computeDiff() const {
         dl.leftData = m_left.mid(i*m_bytesPerLine, m_bytesPerLine);
         dl.rightData = m_right.mid(i*m_bytesPerLine, m_bytesPerLine);
         dl.different = (dl.leftData != dl.rightData);
-        if (dl.different) m_diffCount++;
+        if (dl.different) { m_diffCount++; m_totalDiffBytes += qMax(dl.leftData.size(), dl.rightData.size()); }
         result.append(dl);
     }
     return result;

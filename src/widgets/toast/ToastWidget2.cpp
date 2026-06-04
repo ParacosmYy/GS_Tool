@@ -32,6 +32,7 @@ void ToastWidget::setupUi() {
 
 /** @brief 显示Toast消息 @param text 消息文本 @param type Toast类型 @param ms 显示时长(毫秒) */
 void ToastWidget::showMessage(const QString &text, ToastType type, int ms) {
+    ++m_totalMessages;
     m_type = type; m_label->setText(text); updateStyle();
     m_timer->start(ms); show(); raise();
 }
@@ -44,7 +45,7 @@ void ToastWidget::showWarning(const QString &t, int ms) { showMessage(t, Warning
 void ToastWidget::showError(const QString &t, int ms) { showMessage(t, Error, ms); }
 
 /** @brief 关闭Toast通知 */
-void ToastWidget::dismiss() { m_timer->stop(); hide(); }
+void ToastWidget::dismiss() { ++m_totalDismisses; m_timer->stop(); hide(); }
 /** @brief 查询Toast是否可见 @return 可见返回true */
 bool ToastWidget::isVisible() const { return QWidget::isVisible(); }
 /** @brief 设置Toast显示位置 @param c 屏幕角落 */

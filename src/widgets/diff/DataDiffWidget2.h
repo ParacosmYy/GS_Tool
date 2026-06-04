@@ -92,4 +92,16 @@ private:
     QByteArray m_right;             ///< 右侧二进制数据
     int m_bytesPerLine = 16;        ///< 每行显示字节数
     int m_diffCount = 0;            ///< 差异行计数
+
+    // ---- 统计计数器 ----
+    quint64 m_totalComparisons = 0;    ///< 总对比次数
+    quint64 m_totalDiffBytes = 0;      ///< 总差异字节数
+
+public:
+    /** @brief 获取总对比次数 @return 累计对比次数 */
+    quint64 totalComparisons() const { return m_totalComparisons; }
+    /** @brief 获取总差异字节数 @return 累计差异字节 */
+    quint64 totalDiffBytes() const { return m_totalDiffBytes; }
+    /** @brief 重置数据对比统计 */
+    void resetDiff2Statistics() { m_totalComparisons = 0; m_totalDiffBytes = 0; }
 };

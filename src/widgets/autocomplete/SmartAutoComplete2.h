@@ -97,4 +97,19 @@ private:
     int m_maxSuggestions = 10;          ///< 最大建议数量
     bool m_caseSensitive = false;       ///< 是否区分大小写
     int m_minChars = 2;                 ///< 触发补全的最小字符数
+
+    // ---- 统计计数器 ----
+    quint64 m_totalTriggers = 0;         ///< 总补全触发次数
+    quint64 m_totalSuggestions = 0;      ///< 总建议展示次数
+    quint64 m_totalAccepts = 0;          ///< 总用户接受次数
+
+public:
+    /** @brief 获取总补全触发次数 @return 累计触发次数 */
+    quint64 totalTriggers() const { return m_totalTriggers; }
+    /** @brief 获取总建议展示次数 @return 累计建议次数 */
+    quint64 totalSuggestions() const { return m_totalSuggestions; }
+    /** @brief 获取总用户接受次数 @return 累计接受次数 */
+    quint64 totalAccepts() const { return m_totalAccepts; }
+    /** @brief 重置自动补全统计 */
+    void resetAutoComplete2Statistics() { m_totalTriggers = 0; m_totalSuggestions = 0; m_totalAccepts = 0; }
 };

@@ -99,4 +99,16 @@ private:
     QTimer *m_timer = nullptr;          ///< 自动关闭定时器
     ToastType m_type = Info;            ///< 当前消息级别
     Qt::Corner m_corner = Qt::TopRightCorner; ///< 显示位置角落
+
+    // ---- 统计计数器 ----
+    quint64 m_totalMessages = 0;         ///< 总消息显示次数
+    quint64 m_totalDismisses = 0;        ///< 总关闭次数
+
+public:
+    /** @brief 获取总消息显示次数 @return 累计显示次数 */
+    quint64 totalMessages() const { return m_totalMessages; }
+    /** @brief 获取总关闭次数 @return 累计关闭次数 */
+    quint64 totalDismisses() const { return m_totalDismisses; }
+    /** @brief 重置Toast统计计数器 */
+    void resetToast2Statistics() { m_totalMessages = 0; m_totalDismisses = 0; }
 };
