@@ -198,6 +198,7 @@ set(SOURCES
     src/ota/protocols/zmodem/ZModemTransferProtocol.cpp
     src/utils/settings/SettingsManager.cpp
     src/utils/settings/SettingsManagerConvenience.cpp
+    src/utils/settings/SettingsManagerGroups.cpp
     src/utils/export/DataExporter.cpp
     src/utils/export/DataExporterFormats.cpp
     src/utils/export/DataExporterStreamed.cpp
@@ -257,6 +258,7 @@ set(SOURCES
     src/dashboard/LedIndicatorWidget.cpp
     src/dashboard/NumericDisplayWidget.cpp
     src/dashboard/DashboardModel.cpp
+    src/dashboard/DashboardModelItems.cpp
     src/dashboard/DashboardSerializer.cpp
     src/dashboard/DashboardSerializerExport.cpp
     src/dashboard/DashboardSerializerProfile.cpp
@@ -369,6 +371,7 @@ set(SOURCES
     src/protocol/protobuf/ProtobufDecoderEncoding.cpp
     src/protocol/protobuf/ProtobufDecoderHelpers.cpp
     src/protocol/protobuf/FlatBuffersDecoder.cpp
+    src/protocol/protobuf/FlatBuffersDecoderFields.cpp
     src/protocol/protobuf/FlatBuffersDecoderSchema.cpp
     src/protocol/protobuf/SchemaViewer.cpp
 
