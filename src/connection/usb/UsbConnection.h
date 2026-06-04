@@ -17,17 +17,19 @@ class UsbConnection : public IConnection {
     Q_OBJECT
 
 public:
+    /** @brief 构造USB连接 @param parent 父对象 */
     explicit UsbConnection(QObject* parent = nullptr);
+    /** @brief 析构，关闭连接并释放资源 */
     ~UsbConnection() override;
 
     // ---- IConnection 接口实现 ----
-    ConnectionType type() const override;
-    QString name() const override;
-    ConnectionState state() const override;
-    bool open() override;
-    void close() override;
-    qint64 write(const QByteArray& data) override;
-    void configure(const QVariantMap& params) override;
+    ConnectionType type() const override;              ///< 返回连接类型(USB)
+    QString name() const override;                     ///< 返回连接显示名称
+    ConnectionState state() const override;            ///< 返回当前连接状态
+    bool open() override;                              ///< 打开USB设备连接
+    void close() override;                             ///< 关闭USB设备连接
+    qint64 write(const QByteArray& data) override;     ///< 发送数据，返回实际写入字节数
+    void configure(const QVariantMap& params) override; ///< 配置USB参数(vid/pid/interface等)
 
     // ---- USB专用接口 ----
 

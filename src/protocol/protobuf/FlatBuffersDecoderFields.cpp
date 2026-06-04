@@ -32,6 +32,7 @@ QVariantMap FlatBuffersDecoder::parseTable(const QByteArray& data,
                                             const QString& rootTableName) const {
     QVariantMap result;
     if (tableOffset < 4 || tableOffset >= data.size()) { return result; }
+    ++m_totalTablesDecoded;
     qint32 vtableSoff = static_cast<qint32>(readOffset(data, tableOffset));
     int vtOff = tableOffset - vtableSoff;
     if (vtOff < 0 || vtOff + 1 >= data.size()) { return result; }
@@ -59,6 +60,7 @@ QVariantMap FlatBuffersDecoder::parseTable(const QByteArray& data,
             ftypeName = fd.typeName;
         }
         result[fname] = readTypedValue(data, fdp, ftype, ftypeName);
+        ++m_totalFieldsRead;
     }
     return result;
 }
@@ -74,11 +76,13 @@ QVariantMap FlatBuffersDecoder::parseStruct(const QByteArray& data,
                                              int pos,
                                              const FbsStructDef& sdef) const {
     QVariantMap result;
+    ++m_totalTablesDecoded;
     int off = pos;
     for (const auto& f : sdef.fields) {
         if (off >= data.size()) { break; }
         result[f.name] = readTypedValue(data, off, f.type, f.typeName);
         off += 4; // 简化：所有字段4字节对齐
+        ++m_totalFieldsRead;
     }
     return result;
 }

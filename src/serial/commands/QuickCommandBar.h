@@ -48,6 +48,7 @@ class QuickCommandBar : public QWidget {
     Q_OBJECT
 
 public:
+    /** @brief 构造快捷指令栏 @param parent 父控件 */
     explicit QuickCommandBar(QWidget* parent = nullptr);
 
     /** @brief 设置指令列表，替换当前全部指令并重建按钮 */

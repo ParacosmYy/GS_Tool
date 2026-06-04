@@ -35,29 +35,46 @@ public:
 
     static constexpr qint64 kMaxFirmwareSize = 64 * 1024 * 1024; ///< 最大固件64MB
 
+    /** @brief 构造OTA管理器 @param parent 父对象 */
     explicit OtaManager(QObject* parent = nullptr);
+    /** @brief 析构，释放传输协议实例 */
     ~OtaManager() override;
 
-    void setConnection(IConnection* conn); ///< 设置数据连接
+    /** @brief 设置数据连接 @param conn 连接实例(外部管理生命周期) */
+    void setConnection(IConnection* conn);
     /** @brief 开始OTA传输，自动检测BIN/HEX并转BIN @param protocol "xmodem-crc"等 */
     bool startTransfer(const QString& filePath, const QString& protocol = "xmodem-crc");
-    void cancelTransfer();   ///< 取消传输
-    bool isTransferring() const; ///< 是否正在传输
-    OtaState otaState() const;   ///< 当前状态
+    /** @brief 取消当前传输 */
+    void cancelTransfer();
+    /** @brief 是否正在传输 @return true=传输中 */
+    bool isTransferring() const;
+    /** @brief 获取当前OTA状态 @return 状态枚举 */
+    OtaState otaState() const;
 
-    int transferCount() const;       ///< 历史传输次数
-    bool lastTransferSuccess() const; ///< 上次是否成功
-    QString lastFileName() const;     ///< 上次文件名
-    QString currentProtocolName() const; ///< 当前协议名
+    /** @brief 获取历史传输次数 @return 传输次数 */
+    int transferCount() const;
+    /** @brief 上次传输是否成功 @return true=成功 */
+    bool lastTransferSuccess() const;
+    /** @brief 获取上次文件名 @return 文件名 */
+    QString lastFileName() const;
+    /** @brief 获取当前协议名 @return 协议名 */
+    QString currentProtocolName() const;
 
-    // 统计
-    quint64 totalTransfers() const;         ///< 传输尝试总次数
-    quint64 successfulTransfers() const;    ///< 成功次数
-    quint64 failedTransfers() const;        ///< 失败次数
-    quint64 totalBytesTransferred() const;  ///< 累计传输字节
-    quint64 totalCrcChecks() const;         ///< 累计CRC校验验证次数
-    double averageSpeed() const;            ///< 历史平均传输速率(字节/秒)
-    void resetTransferStatistics();         ///< 重置统计(不影响历史记录)
+    // ---- 统计 ----
+    /** @brief 获取传输尝试总次数 */
+    quint64 totalTransfers() const;
+    /** @brief 获取成功传输次数 */
+    quint64 successfulTransfers() const;
+    /** @brief 获取失败传输次数 */
+    quint64 failedTransfers() const;
+    /** @brief 获取累计传输字节数 */
+    quint64 totalBytesTransferred() const;
+    /** @brief 获取累计CRC校验验证次数 */
+    quint64 totalCrcChecks() const;
+    /** @brief 获取历史平均传输速率(字节/秒) */
+    double averageSpeed() const;
+    /** @brief 重置统计(不影响历史记录) */
+    void resetTransferStatistics();
 
     /** @brief 验证固件文件(存在/可读/大小限制) */
     bool validateFilePath(const QString& filePath, QString& errorMsg) const;
@@ -79,44 +96,54 @@ public:
                                 QString& outError);
 
 signals:
-    void progress(int percent, qint64 bytesSent, qint64 totalBytes); ///< 传输进度
-    void transferComplete();                          ///< 传输完成
-    void transferError(const QString& reason);        ///< 传输错误
-    void transferStats(double rateBytesPerSec, double etaSec); ///< 速率和ETA
-    void otaStateChanged(OtaManager::OtaState state); ///< 状态变化
-    void modeDegraded(const QString& message);         ///< 协议降级通知
+    /** @brief 传输进度更新 @param percent 百分比 @param bytesSent 已发送字节 @param totalBytes 总字节 */
+    void progress(int percent, qint64 bytesSent, qint64 totalBytes);
+    /** @brief 传输完成 */
+    void transferComplete();
+    /** @brief 传输错误 @param reason 错误原因 */
+    void transferError(const QString& reason);
+    /** @brief 速率和ETA更新 @param rateBytesPerSec 速率(字节/秒) @param etaSec 预计剩余时间(秒) */
+    void transferStats(double rateBytesPerSec, double etaSec);
+    /** @brief OTA状态变化 @param state 新状态 */
+    void otaStateChanged(OtaManager::OtaState state);
+    /** @brief 协议降级通知 @param message 降级说明 */
+    void modeDegraded(const QString& message);
 
 private:
-    void connectTransferSignals(BaseTransfer* transfer); ///< 绑定BaseTransfer信号
-    void connectXModemStats(); ///< 绑定XModem统计信号
-    void connectYModemStats(); ///< 绑定YModem统计信号
-    void setOtaState(OtaState state); ///< 设置状态并发射信号
-    /** @brief HEX→BIN转换，创建临时文件 */
+    /** @brief 绑定BaseTransfer信号到OTA管理器槽 @param transfer 传输协议实例 */
+    void connectTransferSignals(BaseTransfer* transfer);
+    /** @brief 绑定XModem统计信号 */
+    void connectXModemStats();
+    /** @brief 绑定YModem统计信号 */
+    void connectYModemStats();
+    /** @brief 设置OTA状态并发射otaStateChanged信号 @param state 新状态 */
+    void setOtaState(OtaState state);
+    /** @brief HEX转BIN转换，创建临时文件 @param hexPath HEX文件路径 @param outBinPath 输出BIN路径 @return true=转换成功 */
     bool convertHexToBin(const QString& hexPath, QString& outBinPath);
-    /** @brief 协议可读名称(用于错误消息) */
+    /** @brief 获取协议可读名称(用于错误消息) @param protocol 协议标识 @return 可读名称 */
     QString protocolDisplayName(const QString& protocol) const;
     /** @brief 计算文件的CRC32校验和 @param filePath 文件路径 @return CRC32十六进制字符串，失败返回空 */
     QString computeFileCrc32(const QString& filePath);
 
-    IConnection* m_conn = nullptr;
-    XModemTransfer* m_xmodem = nullptr;
-    YModemTransfer* m_ymodem = nullptr;
-    ZModemTransfer* m_zmodem = nullptr;
+    IConnection* m_conn = nullptr;               ///< 数据连接(不拥有)
+    XModemTransfer* m_xmodem = nullptr;          ///< XModem传输实例
+    YModemTransfer* m_ymodem = nullptr;          ///< YModem传输实例
+    ZModemTransfer* m_zmodem = nullptr;          ///< ZModem传输实例
 
-    OtaState m_otaState = OtaState::Idle;
-    QTemporaryFile* m_tempBinFile = nullptr; ///< HEX转BIN临时文件
-    QString m_tempBinPath;
-    QString m_currentFileName;
-    QString m_currentProtocol;
-    int m_transferCount = 0;
-    bool m_lastTransferSuccess = false;
+    OtaState m_otaState = OtaState::Idle;        ///< 当前OTA状态
+    QTemporaryFile* m_tempBinFile = nullptr;     ///< HEX转BIN临时文件
+    QString m_tempBinPath;                       ///< 临时BIN文件路径
+    QString m_currentFileName;                   ///< 当前传输文件名
+    QString m_currentProtocol;                   ///< 当前传输协议名
+    int m_transferCount = 0;                     ///< 历史传输次数
+    bool m_lastTransferSuccess = false;          ///< 上次传输是否成功
 
-    quint64 m_totalTransfers = 0;
-    quint64 m_successfulTransfers = 0;
-    quint64 m_failedTransfers = 0;
-    quint64 m_totalBytesTransferred = 0;
-    quint64 m_totalCrcChecks = 0;
-    qint64 m_currentFileSize = 0;
+    quint64 m_totalTransfers = 0;                ///< 传输尝试总次数
+    quint64 m_successfulTransfers = 0;           ///< 成功传输次数
+    quint64 m_failedTransfers = 0;               ///< 失败传输次数
+    quint64 m_totalBytesTransferred = 0;         ///< 累计传输字节数
+    quint64 m_totalCrcChecks = 0;                ///< 累计CRC校验次数
+    qint64 m_currentFileSize = 0;                ///< 当前文件大小(字节)
 
     // ---- 速率跟踪 ----
     QElapsedTimer m_transferTimer;          ///< 当前传输耗时计时器

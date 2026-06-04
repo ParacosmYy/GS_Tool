@@ -17,6 +17,7 @@ class TriggerEngine : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造触发器引擎 @param parent 父对象 */
     explicit TriggerEngine(QObject* parent = nullptr);
     /** @brief 评估原始字节数据(ExactString/Regex/HexBytes) @param data 待评估数据 */
     void evaluateData(const QByteArray& data);

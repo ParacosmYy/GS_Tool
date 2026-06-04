@@ -172,21 +172,4 @@ void BluetoothAtConsole::onPresetClicked()
     }
 }
 
-/** @brief 获取累计发送AT命令次数 */
-quint64 BluetoothAtConsole::totalCommandsSent() const
-{
-    return m_totalCommandsSent;
-}
-
-/** @brief 获取累计接收响应次数 */
-quint64 BluetoothAtConsole::totalResponsesReceived() const
-{
-    return m_totalResponsesReceived;
-}
-
-/** @brief 重置所有统计计数器 */
-void BluetoothAtConsole::resetStatistics()
-{
-    m_totalCommandsSent = 0;
-    m_totalResponsesReceived = 0;
-}
+// 统计getter/resetStatistics已移至 BluetoothAtConsoleStats.cpp

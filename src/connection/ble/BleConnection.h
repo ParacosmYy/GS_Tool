@@ -21,10 +21,14 @@ public:
     qint64 write(const QByteArray& data) override; ///< 写入数据(-1=失败)
     void configure(const QVariantMap& params) override; ///< 配置(address/deviceName)
     // ---- BLE专用 ----
-    void connectToDevice(const QString& address); ///< 连接到指定地址的BLE设备
-    void disconnectDevice();                 ///< 断开当前BLE设备
-    QStringList discoverServices();          ///< 发现GATT服务
-    QString deviceName() const;              ///< 获取设备名称
+    /** @brief 连接到指定地址的BLE设备 @param address BLE设备地址 */
+    void connectToDevice(const QString& address);
+    /** @brief 断开当前BLE设备 */
+    void disconnectDevice();
+    /** @brief 发现GATT服务 @return 已发现的服务UUID列表 */
+    QStringList discoverServices();
+    /** @brief 获取设备名称 @return 当前连接设备的名称 */
+    QString deviceName() const;
 
     // ---- 统计信息 ----
     quint64 totalScans() const { return m_totalScans; } ///< 总扫描次数

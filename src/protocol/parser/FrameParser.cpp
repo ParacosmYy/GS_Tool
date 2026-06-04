@@ -141,7 +141,10 @@ quint64 FrameParser::totalParseErrors() const { return m_totalParseErrors; }
 /** @brief 获取成功解析帧中的有效数据字节总数 @return 字节数 */
 quint64 FrameParser::totalBytesParsed() const { return m_totalBytesParsed; }
 
-/** @brief 重置所有统计计数器(帧数/字节/校验错误/溢出/解析错误/已解析字节) */
+/** @brief 获取累计同步丢失次数(帧头匹配失败导致缓冲区清空) @return 同步丢失次数 */
+quint64 FrameParser::totalSyncLost() const { return m_totalSyncLost; }
+
+/** @brief 重置所有统计计数器(帧数/字节/校验错误/溢出/解析错误/已解析字节/同步丢失) */
 void FrameParser::resetStats()
 {
     m_frameCount = 0;
@@ -152,6 +155,7 @@ void FrameParser::resetStats()
     m_totalOverflows = 0;
     m_totalParseErrors = 0;
     m_totalBytesParsed = 0;
+    m_totalSyncLost = 0;
 }
 
 // ============================================================================

@@ -81,6 +81,8 @@ public:
     quint64 totalDecoded() const;       ///< 累计解码的消息总数
     quint64 totalBytesDecoded() const;  ///< 累计解码的字节总数
     quint64 errorCount() const;         ///< 累计解码错误次数
+    quint64 totalTablesDecoded() const; ///< 累计解码的Table结构总数(含嵌套table)
+    quint64 totalFieldsRead() const;    ///< 累计读取的字段总数(含嵌套字段)
     void resetDecoderStatistics();      ///< 重置所有统计计数器
 
 private:
@@ -115,6 +117,8 @@ private:
     quint64 m_totalDecoded = 0;     ///< 累计解码消息总数
     quint64 m_totalBytesDecoded = 0;///< 累计解码字节总数
     quint64 m_errorCount = 0;       ///< 累计解码错误次数
+    mutable quint64 m_totalTablesDecoded = 0; ///< 累计解码Table结构总数(const方法parseTable中递增)
+    mutable quint64 m_totalFieldsRead = 0;    ///< 累计读取字段总数(const方法parseTable/parseStruct中递增)
 };
 
 #endif // FLATBUFFERS_DECODER_H

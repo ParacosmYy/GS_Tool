@@ -162,10 +162,4 @@ QString ProtocolSchemaEditor::jsonText() const
     return m_jsonEditor->toPlainText();
 }
 
-/** @brief 重置协议编辑器统计计数器 */
-void ProtocolSchemaEditor::resetSchemaEditorStatistics()
-{
-    m_totalSchemasLoaded = 0;
-    m_totalSchemasSaved = 0;
-    m_totalValidations = 0;
-}
+// resetSchemaEditorStatistics已移至 ProtocolSchemaEditorStats.cpp

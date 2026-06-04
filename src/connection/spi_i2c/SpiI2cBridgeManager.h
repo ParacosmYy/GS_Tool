@@ -28,44 +28,68 @@ class SpiI2cBridgeManager : public QObject {
     Q_OBJECT
 
 public:
-    explicit SpiI2cBridgeManager(QObject* parent = nullptr); ///< 构造
-    ~SpiI2cBridgeManager();                  ///< 析构，关闭并清理资源
-    void setTransport(IConnection* serial);  ///< 设置底层串口传输通道(不获取所有权)
-    bool switchMode(BridgeMode mode);        ///< 切换桥接模式(自动关闭当前连接并配置新模式)
+    /** @brief 构造SPI/I2C桥接管理器 @param parent 父对象 */
+    explicit SpiI2cBridgeManager(QObject* parent = nullptr);
+    /** @brief 析构，关闭并清理资源 */
+    ~SpiI2cBridgeManager();
+    /** @brief 设置底层串口传输通道(不获取所有权) @param serial 底层串口连接 */
+    void setTransport(IConnection* serial);
+    /** @brief 切换桥接模式(自动关闭当前连接并配置新模式) @param mode 目标模式 @return true=切换成功 */
+    bool switchMode(BridgeMode mode);
     BridgeMode currentMode() const { return m_currentMode; } ///< 当前桥接模式
     SpiConnection* spiConnection() const { return m_spiConn; } ///< SPI连接实例
     I2cConnection* i2cConnection() const { return m_i2cConn; } ///< I2C连接实例
     IConnection* activeConnection() const;   ///< 当前活跃连接(根据模式返回SPI或I2C)
 
     // ---- 事务队列接口 ----
-    void enqueueTransaction(const BridgeTransaction& transaction); ///< 入队桥接事务
-    int pendingCount() const { return m_queue.size(); } ///< 队列中待处理事务数量
-    void clearQueue();                       ///< 清空事务队列
-    void startQueueProcessing();             ///< 启动队列处理
-    void stopQueueProcessing();              ///< 停止队列处理
-    bool isProcessing() const { return m_processing; } ///< 队列是否正在处理
+    /** @brief 入队桥接事务 @param transaction 桥接事务 */
+    void enqueueTransaction(const BridgeTransaction& transaction);
+    /** @brief 获取队列中待处理事务数量 @return 待处理事务数 */
+    int pendingCount() const { return m_queue.size(); }
+    /** @brief 清空事务队列 */
+    void clearQueue();
+    /** @brief 启动队列处理 */
+    void startQueueProcessing();
+    /** @brief 停止队列处理 */
+    void stopQueueProcessing();
+    /** @brief 查询队列是否正在处理 @return true=正在处理 */
+    bool isProcessing() const { return m_processing; }
 
     // ---- 统计信息接口 ----
-    quint64 totalBridgeTransactions() const { return m_totalBridgeTransactions; } ///< 总桥接事务数
-    quint64 spiTransactions() const { return m_spiTransactions; }   ///< SPI事务数
-    quint64 i2cTransactions() const { return m_i2cTransactions; }   ///< I2C事务数
-    quint64 bridgeErrors() const { return m_bridgeErrors; }         ///< 桥接错误数
-    quint64 totalModeSwitches() const { return m_totalModeSwitches; } ///< 模式切换次数
-    quint64 totalQueueDrains() const { return m_totalQueueDrains; }  ///< 队列排空次数
-    void resetStats();                       ///< 重置所有桥接统计计数器
+    /** @brief 获取总桥接事务数 @return 累计事务处理次数 */
+    quint64 totalBridgeTransactions() const { return m_totalBridgeTransactions; }
+    /** @brief 获取SPI事务数 @return 累计SPI事务次数 */
+    quint64 spiTransactions() const { return m_spiTransactions; }
+    /** @brief 获取I2C事务数 @return 累计I2C事务次数 */
+    quint64 i2cTransactions() const { return m_i2cTransactions; }
+    /** @brief 获取桥接错误数 @return 累计错误次数 */
+    quint64 bridgeErrors() const { return m_bridgeErrors; }
+    /** @brief 获取模式切换次数 @return 累计切换次数 */
+    quint64 totalModeSwitches() const { return m_totalModeSwitches; }
+    /** @brief 获取队列排空次数 @return 累计排空次数 */
+    quint64 totalQueueDrains() const { return m_totalQueueDrains; }
+    /** @brief 重置所有桥接统计计数器 */
+    void resetStats();
 
 signals:
-    void modeSwitched(BridgeMode mode);      ///< 桥接模式切换完成信号
-    void transactionCompleted(bool success); ///< 事务处理完成信号
-    void queueDrained();                     ///< 队列已清空信号
-    void bridgeError(const QString& errorMsg); ///< 桥接错误信号
+    /** @brief 桥接模式切换完成信号 @param mode 切换后的模式 */
+    void modeSwitched(BridgeMode mode);
+    /** @brief 事务处理完成信号 @param success true=成功 */
+    void transactionCompleted(bool success);
+    /** @brief 队列已清空信号 */
+    void queueDrained();
+    /** @brief 桥接错误信号 @param errorMsg 错误信息 */
+    void bridgeError(const QString& errorMsg);
 
 private slots:
-    void processNextTransaction();            ///< 处理队列中的下一个事务
+    /** @brief 处理队列中的下一个事务 */
+    void processNextTransaction();
 
 private:
-    void executeSpiTransaction(const BridgeTransaction& transaction); ///< 执行单个SPI事务
-    void executeI2cTransaction(const BridgeTransaction& transaction); ///< 执行单个I2C事务
+    /** @brief 执行单个SPI事务 @param transaction 事务参数 */
+    void executeSpiTransaction(const BridgeTransaction& transaction);
+    /** @brief 执行单个I2C事务 @param transaction 事务参数 */
+    void executeI2cTransaction(const BridgeTransaction& transaction);
 
     // ---- 连接实例 ----
     SpiConnection* m_spiConn = nullptr;             ///< SPI连接实例(拥有)

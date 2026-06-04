@@ -16,26 +16,37 @@ class SpiConnection : public IConnection {
     Q_OBJECT
 
 public:
-    explicit SpiConnection(QObject* parent = nullptr); ///< 构造
-    ~SpiConnection() override;               ///< 析构，关闭连接
+    /** @brief 构造SPI连接 @param parent 父对象 */
+    explicit SpiConnection(QObject* parent = nullptr);
+    /** @brief 析构，关闭连接并释放资源 */
+    ~SpiConnection() override;
     // ---- IConnection接口 ----
-    ConnectionType type() const override;
-    QString name() const override;
-    ConnectionState state() const override;
-    bool open() override;
-    void close() override;
-    qint64 write(const QByteArray& data) override;
-    void configure(const QVariantMap& params) override;
+    ConnectionType type() const override;              ///< 返回连接类型(SPI)
+    QString name() const override;                     ///< 返回连接显示名称
+    ConnectionState state() const override;            ///< 返回当前连接状态
+    bool open() override;                              ///< 打开SPI连接
+    void close() override;                             ///< 关闭SPI连接
+    qint64 write(const QByteArray& data) override;     ///< 发送数据，返回实际写入字节数
+    void configure(const QVariantMap& params) override; ///< 配置SPI参数(mode/clockSpeed/device等)
     // ---- SPI特有接口 ----
-    void setSpiMode(int mode);               ///< 设置SPI模式(0~3)
-    void setClockSpeed(int speedHz);         ///< 设置时钟频率(Hz)
-    void setBitOrder(SpiBitOrder order);     ///< 设置位序(MSB/LSB)
-    void setWordSize(SpiWordSize wordSize);   ///< 设置字长(8/16/32位)
-    void setCsPolarity(bool activeLow);      ///< 设置CS极性(true=低有效)
-    QByteArray transfer(const QByteArray& txData); ///< SPI全双工传输
-    QByteArray transfer(const QByteArray& txData, SpiWordSize wordSize); ///< SPI全双工传输(指定字长)
-    void setChipSelect(int csPin, bool active); ///< 控制片选引脚
-    void setTransport(IConnection* serial);  ///< 设置底层串口传输通道(不获取所有权)
+    /** @brief 设置SPI模式(0~3) @param mode SPI模式编号 */
+    void setSpiMode(int mode);
+    /** @brief 设置时钟频率 @param speedHz 时钟频率(Hz) */
+    void setClockSpeed(int speedHz);
+    /** @brief 设置位序 @param order MSB或LSB */
+    void setBitOrder(SpiBitOrder order);
+    /** @brief 设置字长 @param wordSize 8/16/32位 */
+    void setWordSize(SpiWordSize wordSize);
+    /** @brief 设置CS极性 @param activeLow true=低有效 */
+    void setCsPolarity(bool activeLow);
+    /** @brief SPI全双工传输 @param txData 发送数据 @return 接收到的数据 */
+    QByteArray transfer(const QByteArray& txData);
+    /** @brief SPI全双工传输(指定字长) @param txData 发送数据 @param wordSize 字长 @return 接收到的数据 */
+    QByteArray transfer(const QByteArray& txData, SpiWordSize wordSize);
+    /** @brief 控制片选引脚 @param csPin 片选引脚编号 @param active true=激活 */
+    void setChipSelect(int csPin, bool active);
+    /** @brief 设置底层串口传输通道(不获取所有权) @param serial 底层串口连接 */
+    void setTransport(IConnection* serial);
 
     // ---- 统计信息接口 ----
     quint64 totalTransfers() const { return m_totalTransfers; }  ///< 总传输次数

@@ -130,6 +130,7 @@ void FrameParser::handleHeaderMatching(unsigned char byte)
             m_buffer.clear();
             m_headerMatchPos = 0;
             m_state = State::Idle;
+            ++m_totalSyncLost;
         }
         // 当前字节可能是新帧头的起始
         if (m_state == State::Idle && !m_def.header.isEmpty()

@@ -126,44 +126,5 @@ void UdpMulticastConnection::configure(const QVariantMap& params)
 
 // 组播组管理/统计接口见 UdpMulticastGroup.cpp
 
-/** @brief 数据到达回调，读取所有待处理数据报并发射dataReceived信号 */
-void UdpMulticastConnection::onReadyRead()
-{
-    if (!m_socket) return;
-
-    while (m_socket->hasPendingDatagrams()) {
-        QByteArray buffer;
-        buffer.resize(static_cast<int>(m_socket->pendingDatagramSize()));
-        QHostAddress sender;
-        quint16 senderPort = 0;
-
-        qint64 size = m_socket->readDatagram(buffer.data(), buffer.size(),
-                                              &sender, &senderPort);
-        if (size > 0) {
-            ++m_dgramsRecv;
-            m_rxBytes += size;
-            buffer.resize(static_cast<int>(size));
-            emit dataReceived(buffer);
-        }
-    }
-}
-
-/** @brief 网络错误回调，发射errorOccurred信号 @param error socket错误类型 */
-void UdpMulticastConnection::onError(QAbstractSocket::SocketError error)
-{
-    Q_UNUSED(error)
-    if (m_socket) {
-        emit errorOccurred(m_socket->errorString());
-    }
-}
-
-/** @brief 更新连接状态，状态变化时发射stateChanged信号 @param newState 新状态 */
-void UdpMulticastConnection::updateState(ConnectionState newState)
-{
-    if (m_state != newState) {
-        m_state = newState;
-        emit stateChanged(newState);
-    }
-}
-
+// onReadyRead/onError/updateState已移至 UdpMulticastConnectionHandlers.cpp
 // 组播组管理/统计接口见 UdpMulticastGroup.cpp

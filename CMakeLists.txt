@@ -295,6 +295,7 @@ set(SOURCES
     src/protocol/schema/ProtocolTemplateLibrary.cpp
     src/protocol/schema/ProtocolTemplateLibraryBuiltins.cpp
     src/protocol/editor/ProtocolSchemaEditor.cpp
+    src/protocol/editor/ProtocolSchemaEditorStats.cpp
     src/protocol/engine/ProtocolFieldMapper.cpp
 
     # ── F4: 终端增强 ──
@@ -374,7 +375,9 @@ set(SOURCES
     src/connection/ble/BleGattBrowserServices.cpp
     src/connection/ble/BleGattBrowserDisplay.cpp
     src/connection/ble/BleConfigPanel.cpp
+    src/connection/ble/BleConfigPanelSlots.cpp
     src/connection/ble/BluetoothAtConsole.cpp
+    src/connection/ble/BluetoothAtConsoleStats.cpp
 
     # ── F13: CAN/CAN-FD 总线 ──
     src/connection/can/CanConnection.cpp
@@ -410,6 +413,7 @@ set(SOURCES
     src/connection/tcp/TcpServerConnectionClients.cpp
     src/connection/tcp/TcpMultiConnectionManager.cpp
     src/connection/tcp/UdpMulticastConnection.cpp
+    src/connection/tcp/UdpMulticastConnectionHandlers.cpp
     src/connection/tcp/UdpMulticastGroup.cpp
     src/connection/tcp/TlsConnection.cpp
     src/connection/tcp/TlsConnectionSetup.cpp

@@ -33,35 +33,58 @@ public:
         bool hideUnnamed = false; ///< 是否隐藏无名设备
     };
 
+    /** @brief 构造BLE扫描器 @param parent 父对象 */
     explicit BleScanner(QObject* parent = nullptr);
+    /** @brief 析构，停止扫描并释放资源 */
     ~BleScanner() override;
 
     // ---- 扫描控制 ----
-    void startScan();                     ///< 开始扫描BLE设备
-    void stopScan();                      ///< 停止正在进行的扫描
-    void setFilter(const ScanFilter& f);  ///< 设置扫描过滤器
-    ScanFilter filter() const;            ///< 获取当前过滤器
+    /** @brief 开始扫描BLE设备 */
+    void startScan();
+    /** @brief 停止正在进行的扫描 */
+    void stopScan();
+    /** @brief 设置扫描过滤器 @param f 过滤器配置 */
+    void setFilter(const ScanFilter& f);
+    /** @brief 获取当前过滤器 @return 扫描过滤器配置 */
+    ScanFilter filter() const;
 
     // ---- 设备查询 ----
-    QVariantList discoveredDevices() const;              ///< 已发现的所有设备列表
-    QVariantMap deviceByAddress(const QString& addr) const; ///< 按地址查找设备
-    bool isScanning() const;                             ///< 是否正在扫描
-    qint64 scanElapsedTime() const;                      ///< 当前扫描已持续时间(ms)
+    /** @brief 已发现的所有设备列表 @return QVariantList设备信息列表 */
+    QVariantList discoveredDevices() const;
+    /** @brief 按地址查找设备 @param addr BLE设备地址 @return 设备信息Map */
+    QVariantMap deviceByAddress(const QString& addr) const;
+    /** @brief 是否正在扫描 @return true=正在扫描 */
+    bool isScanning() const;
+    /** @brief 当前扫描已持续时间 @return 毫秒数 */
+    qint64 scanElapsedTime() const;
 
     // ---- 统计接口 ----
-    int scanCount() const;               ///< 已完成的扫描次数
-    int totalDevicesFound() const;       ///< 累计发现设备总数(去重)
-    quint64 filteredDeviceCount() const; ///< 被过滤器过滤掉的设备数
-    quint64 totalScanStarts() const;     ///< 累计启动扫描次数
-    quint64 totalScanCycles() const;     ///< 累计扫描周期完成次数(含超时和队列耗尽)
-    quint64 uniqueDevicesSeen() const;   ///< 累计去重设备地址总数
-    quint64 totalDiscoveryEvents() const;///< 累计发现事件次数(含RSSI更新)
-    quint64 totalScanDurationMs() const; ///< 累计扫描总时长(ms)
-    int bestRssi() const;                ///< 最佳RSSI值
-    int worstRssi() const;               ///< 最差RSSI值
-    double averageRssi() const;          ///< 平均RSSI值
-    void clearHistory();                 ///< 清空扫描历史
-    void resetScannerStatistics();       ///< 重置所有统计计数器
+    /** @brief 获取已完成的扫描次数 @return 扫描完成次数 */
+    int scanCount() const;
+    /** @brief 获取累计发现设备总数(去重) @return 去重后的设备总数 */
+    int totalDevicesFound() const;
+    /** @brief 获取被过滤器过滤掉的设备数 @return 被过滤设备数 */
+    quint64 filteredDeviceCount() const;
+    /** @brief 获取累计启动扫描次数 @return 扫描启动总次数 */
+    quint64 totalScanStarts() const;
+    /** @brief 获取累计扫描周期完成次数(含超时和队列耗尽) @return 扫描周期完成次数 */
+    quint64 totalScanCycles() const;
+    /** @brief 获取累计去重设备地址总数 @return 去重地址数 */
+    quint64 uniqueDevicesSeen() const;
+    /** @brief 获取累计发现事件次数(含RSSI更新) @return 发现事件总次数 */
+    quint64 totalDiscoveryEvents() const;
+    /** @brief 获取累计扫描总时长 @return 扫描总时长(ms) */
+    quint64 totalScanDurationMs() const;
+    /** @brief 获取最佳RSSI值 @return RSSI值(dBm) */
+    int bestRssi() const;
+    /** @brief 获取最差RSSI值 @return RSSI值(dBm) */
+    int worstRssi() const;
+    /** @brief 获取平均RSSI值 @return 平均RSSI(dBm) */
+    double averageRssi() const;
+    /** @brief 清空扫描历史 */
+    void clearHistory();
+    /** @brief 重置所有统计计数器 */
+    void resetScannerStatistics();
 
 signals:
     void deviceFound(const QVariantMap& device);          ///< 发现新设备

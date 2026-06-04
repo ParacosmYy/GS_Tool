@@ -39,13 +39,13 @@ public:
     ~TcpServerConnection() override;
 
     // ---- IConnection接口实现 ----
-    ConnectionType type() const override;
-    QString name() const override;
-    ConnectionState state() const override;
-    bool open() override;
-    void close() override;
-    qint64 write(const QByteArray& data) override;
-    void configure(const QVariantMap& params) override;
+    ConnectionType type() const override;              ///< 返回连接类型(TcpServer)
+    QString name() const override;                     ///< 返回连接显示名称
+    ConnectionState state() const override;            ///< 返回当前连接状态
+    bool open() override;                              ///< 开始监听
+    void close() override;                             ///< 停止监听并断开所有客户端
+    qint64 write(const QByteArray& data) override;     ///< 广播数据到所有客户端
+    void configure(const QVariantMap& params) override; ///< 配置TCP服务器参数(address/port)
 
     // ---- TCP Server特有接口 ----
 

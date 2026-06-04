@@ -35,6 +35,7 @@ public:
     quint64 totalOverflows() const;          ///< 累计溢出次数(帧超最大长度)
     quint64 totalParseErrors() const;        ///< 累计解析错误次数
     quint64 totalBytesParsed() const;        ///< 成功解析帧中的有效数据字节总数
+    quint64 totalSyncLost() const;           ///< 累计同步丢失次数(帧头匹配失败导致缓冲区清空)
     void resetStats();                       ///< 重置所有统计计数器
 
 signals:
@@ -82,6 +83,7 @@ private:
     quint64 m_totalOverflows = 0;           ///< 累计溢出次数
     quint64 m_totalParseErrors = 0;         ///< 累计解析错误次数(含格式/长度/帧尾/超时)
     quint64 m_totalBytesParsed = 0;         ///< 成功解析帧中的有效数据字节总数
+    quint64 m_totalSyncLost = 0;            ///< 累计同步丢失次数(帧头匹配失败导致缓冲区清空)
 
     int m_maxFrameLength = kDefaultMaxFrameLength; ///< 帧长度上限（默认1024字节）
     int m_frameTimeoutMs = 500;             ///< 帧超时阈值（毫秒），0=禁用

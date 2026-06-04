@@ -30,6 +30,7 @@ class TriggerListPanel : public QWidget {
 
 public:
     /** @brief 构造函数 */
+    /** @brief 构造触发器规则列表面板 @param parent 父控件 */
     explicit TriggerListPanel(QWidget* parent = nullptr);
 
     /**
@@ -97,9 +98,13 @@ private:
     quint64 m_totalRuleToggles = 0; ///< 累计规则启停切换次数
     quint64 m_totalRuleReorders = 0;///< 累计规则重排次数
 public:
+    /** @brief 获取累计规则编辑次数 */
     quint64 totalRuleEdits() const { return m_totalRuleEdits; }
+    /** @brief 获取累计规则启停切换次数 */
     quint64 totalRuleToggles() const { return m_totalRuleToggles; }
+    /** @brief 获取累计规则重排次数 */
     quint64 totalRuleReorders() const { return m_totalRuleReorders; }
+    /** @brief 重置面板统计计数器归零 */
     void resetTriggerListStatistics() { m_totalRuleEdits = 0; m_totalRuleToggles = 0; m_totalRuleReorders = 0; }
 };
 

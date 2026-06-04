@@ -13,16 +13,18 @@ class I2cConnection : public IConnection {
     Q_OBJECT
 
 public:
-    explicit I2cConnection(QObject* parent = nullptr); ///< 构造
-    ~I2cConnection() override;                         ///< 关闭连接
+    /** @brief 构造I2C连接 @param parent 父对象 */
+    explicit I2cConnection(QObject* parent = nullptr);
+    /** @brief 析构，关闭连接并释放资源 */
+    ~I2cConnection() override;
     // ---- IConnection接口实现 ----
-    ConnectionType type() const override;
-    QString name() const override;
-    ConnectionState state() const override;
-    bool open() override;
-    void close() override;
-    qint64 write(const QByteArray& data) override;
-    void configure(const QVariantMap& params) override;
+    ConnectionType type() const override;              ///< 返回连接类型(I2C)
+    QString name() const override;                     ///< 返回连接显示名称
+    ConnectionState state() const override;            ///< 返回当前连接状态
+    bool open() override;                              ///< 打开I2C连接
+    void close() override;                             ///< 关闭I2C连接
+    qint64 write(const QByteArray& data) override;     ///< 发送数据，返回实际写入字节数
+    void configure(const QVariantMap& params) override; ///< 配置I2C参数(deviceAddress/clockSpeed等)
     // ---- I2C特有接口 ----
     QList<int> scanBus();  ///< 扫描总线(7位地址0x03~0x77)
     /** @brief 从设备寄存器读取 @param deviceAddr 7位地址 @param regAddr 寄存器地址 @param length 长度 */
