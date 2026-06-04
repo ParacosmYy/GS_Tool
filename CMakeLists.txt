@@ -47,6 +47,7 @@ set(SOURCES
     src/core/navigation/NavigationControllerAnimations.cpp
     src/core/navigation/IconNavBar.cpp
     src/core/send/SendController.cpp
+    src/core/send/SendControllerSend.cpp
     src/core/send/SendControllerStats.cpp
     src/core/send/SendHistoryManager.cpp
     src/core/event/EventBus.cpp
@@ -302,6 +303,7 @@ set(SOURCES
     src/plugin/PluginManagerScan.cpp
     src/plugin/PluginApi.cpp
     src/plugin/PluginConfigPanel.cpp
+    src/plugin/PluginConfigPanelUI.cpp
 
     # ── F12: Bluetooth/BLE 调试 ──
     src/connection/ble/BleScanner.cpp
