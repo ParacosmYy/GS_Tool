@@ -50,6 +50,7 @@ set(SOURCES
     src/core/send/SendHistoryManager.cpp
     src/core/event/EventBus.cpp
     src/core/widgets/AppDialog.cpp
+    src/core/widgets/AppDialogContent.cpp
     src/core/widgets/DragDropHelper.cpp
     src/plugin/loader/PluginLoader.cpp
     src/core/workspace/WorkspaceManager.cpp
@@ -202,6 +203,7 @@ set(SOURCES
     src/utils/export/DataExporterStreamed.cpp
     src/utils/export/DataExporterEdl.cpp
     src/utils/aggregator/DataAggregator.cpp
+    src/utils/aggregator/DataAggregatorCompute.cpp
     src/utils/log/DataLogger.cpp
     src/utils/log/DataLoggerEdl.cpp
     src/utils/log/DataLoggerPlayback.cpp
@@ -327,6 +329,7 @@ set(SOURCES
     src/connection/mqtt/MqttSubscriptionPanel.cpp
     src/connection/mqtt/MqttConfigPanel.cpp
     src/connection/mqtt/MqttWidget.cpp
+    src/connection/mqtt/MqttWidgetSubs.cpp
     src/connection/mqtt/MqttWidgetSlots.cpp
 
     # ── F15: TCP/UDP 增强 ──
