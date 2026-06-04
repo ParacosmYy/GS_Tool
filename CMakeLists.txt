@@ -80,6 +80,7 @@ set(SOURCES
     src/core/background/BackgroundWidgetPaint.cpp
     src/core/background/BackgroundSettingsPopup.cpp
     src/core/widgets/BasePanel.cpp
+    src/core/widgets/BasePanelConfig.cpp
     src/core/widgets/BasePanelStates.cpp
     src/core/widgets/AnimatedButton.cpp
     src/core/widgets/EmptyStateWidget.cpp
@@ -186,6 +187,7 @@ set(SOURCES
     src/chart/model/ChartModelSlots.cpp
     src/chart/model/ChartModelStats.cpp
     src/chart/scale/YAxisManager.cpp
+    src/chart/scale/YAxisManagerStats.cpp
     src/chart/overlay/CursorOverlay.cpp
     src/chart/overlay/CursorOverlayEvent.cpp
     src/chart/overlay/CursorOverlayPaint.cpp
@@ -243,6 +245,7 @@ set(SOURCES
     src/utils/log/DataLoggerPlayback.cpp
     src/utils/log/DataLoggerSession.cpp
     src/protocol/parser/FrameDefinition.cpp
+    src/protocol/parser/FrameDefinitionSerialization.cpp
     src/core/settings/SessionManager.cpp
     src/core/managers/ShortcutManager.cpp
     src/core/managers/ShortcutManagerPersist.cpp
@@ -465,6 +468,7 @@ set(SOURCES
     src/utils/converter/DataConverter.cpp
     src/utils/converter/DataConverterCodec.cpp
     src/utils/converter/ConverterPanel.cpp
+    src/utils/converter/ConverterPanelSlots.cpp
 
     # ── F24: 时间戳分析器 ──
     src/utils/timestamp/TimestampAnalyzer.cpp
