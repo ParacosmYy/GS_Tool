@@ -45,6 +45,7 @@ set(SOURCES
     src/core/recording/RecordingController.cpp
     src/core/navigation/NavigationController.cpp
     src/core/navigation/NavigationControllerAnimations.cpp
+    src/core/navigation/NavigationControllerStatus.cpp
     src/core/navigation/IconNavBar.cpp
     src/core/send/SendController.cpp
     src/core/send/SendControllerSend.cpp
@@ -326,6 +327,7 @@ set(SOURCES
     src/connection/can/CanFrameParserBuild.cpp
     src/connection/can/CanBusMonitor.cpp
     src/connection/can/CanBusMonitorFrame.cpp
+    src/connection/can/CanBusMonitorStats.cpp
     src/connection/can/CanConfigPanel.cpp
     src/protocol/can/DbcParser.cpp
     src/protocol/can/DbcParserParse.cpp
@@ -350,10 +352,12 @@ set(SOURCES
     src/connection/tcp/TcpMultiConnectionManager.cpp
     src/connection/tcp/UdpMulticastConnection.cpp
     src/connection/tcp/TlsConnection.cpp
+    src/connection/tcp/TlsConnectionStats.cpp
     src/connection/tcp/MultiConnectionPanel.cpp
 
     # ── F16: SPI/I2C 桥接 ──
     src/connection/spi_i2c/SpiConnection.cpp
+    src/connection/spi_i2c/SpiConnectionStats.cpp
     src/connection/spi_i2c/SpiConnectionTransfer.cpp
     src/connection/spi_i2c/I2cConnection.cpp
     src/connection/spi_i2c/I2cConnectionScan.cpp

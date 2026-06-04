@@ -94,6 +94,7 @@
 | 259 | SendControllerSend/PluginConfigPanelUI拆分 | 发送逻辑独立(283→124行)+插件面板列表/详情独立(283→238行) |
 | 260 | ChecksumCalculatorStats拆分 | 算法元数据/统计getter独立(281→193行) |
 | 261 | UdpConnectionStats拆分 | 多播组管理/统计getter/resetStats独立(275→219行) |
+| 262 | TlsConnectionStats/SpiConnectionStats/CanBusMonitorStats/NavigationControllerStatus拆分 | TLS统计独立(278→259行)+SPI统计独立(279→260行)+CAN监控统计独立(281→207行)+导航状态动画独立(285→160行) |
 
 ---
 

@@ -2,13 +2,11 @@
  * @file NavigationControllerAnimations.cpp
  * @brief 导航控制器动画方法实现 - 面板滑动切换动画、呼吸动画
  *
- * 从 NavigationController.cpp 拆分而来，包含所有动画相关方法:
+ * 从 NavigationController.cpp 拆分而来，包含面板滑动切换动画:
  *   - parentContainerWidth(): 获取面板父容器宽度（滑动距离计算）
  *   - animateSlideOut(): 旧面板滑出+淡出动画
  *   - animateSlideIn(): 新面板滑入+淡入动画
  *   - switchToPanel(): 面板切换协调器（防重入+并行动画组）
- *   - startBreathingAnimation(): 连接状态呼吸脉冲动画
- *   - stopBreathingAnimation(): 停止呼吸动画并恢复状态
  *
  * 动画规范 (CLAUDE.md 6.5):
  *   旧面板: pos (0,0)->(-width,0) 200ms InCubic, opacity 1->0
@@ -19,9 +17,7 @@
 #include "core/navigation/NavigationController.h"
 #include "shared/AnimationConstants.h"
 #include <QWidget>
-#include <QLabel>
 #include <QTreeView>
-#include <QSplitter>
 
 /** @brief 获取面板父容器宽度（serialPanel）作为滑动距离 */
 int NavigationController::parentContainerWidth(QWidget* panel) const
@@ -159,127 +155,5 @@ void NavigationController::switchToPanel(QWidget* newPanel)
     animGroup->start();
 }
 
-/**
- * @brief 启动连接状态呼吸动画
- *
- * 使用 QSequentialAnimationGroup 实现平滑往返脉冲:
- *   上半周期: opacity 0.3 -> 1.0, 1500ms, InOutSine (淡入)
- *   下半周期: opacity 1.0 -> 0.3, 1500ms, InOutSine (淡出)
- *   无限循环, 避免单方向动画结束时从1.0跳变到0.3的突兀感
- *
- * @param statusLabel 状态标签控件
- */
-void NavigationController::startBreathingAnimation(QLabel* statusLabel)
-{
-    // 如果已有呼吸动画在运行，不重复创建
-    if (m_breathingAnim && m_breathingAnim->state() == QAbstractAnimation::Running) {
-        return;
-    }
-
-    // 为状态标签创建透明度效果
-    if (!m_connStatusEffect) {
-        m_connStatusEffect = new QGraphicsOpacityEffect(statusLabel);
-        statusLabel->setGraphicsEffect(m_connStatusEffect);
-    }
-    m_connStatusEffect->setOpacity(1.0);
-
-    // 销毁旧动画(如果存在)
-    // 旧动画使用 DeleteWhenStopped + 无限循环，stop() 触发自动销毁
-    if (m_breathingAnim) {
-        m_breathingAnim->stop();
-        m_breathingAnim = nullptr;
-    }
-
-    // 构建呼吸动画: 顺序组 [0.3->1.0, 1500ms] + [1.0->0.3, 1500ms], 无限循环
-    auto* group = new QSequentialAnimationGroup(this);
-
-    // 上半周期: 0.3 -> 1.0 (淡入)
-    auto* fadeIn = new QPropertyAnimation(m_connStatusEffect, "opacity");
-    fadeIn->setStartValue(0.3);
-    fadeIn->setEndValue(1.0);
-    fadeIn->setDuration(Animations::kBreatheCycleMs);
-    fadeIn->setEasingCurve(QEasingCurve::InOutSine);
-    group->addAnimation(fadeIn);
-
-    // 下半周期: 1.0 -> 0.3 (淡出)
-    auto* fadeOut = new QPropertyAnimation(m_connStatusEffect, "opacity");
-    fadeOut->setStartValue(1.0);
-    fadeOut->setEndValue(0.3);
-    fadeOut->setDuration(Animations::kBreatheCycleMs);
-    fadeOut->setEasingCurve(QEasingCurve::InOutSine);
-    group->addAnimation(fadeOut);
-
-    group->setLoopCount(-1);  // 无限循环
-    group->start(QAbstractAnimation::DeleteWhenStopped);
-    m_breathingAnim = group;
-}
-
-/**
- * @brief 停止连接状态呼吸动画
- *
- * 停止动画组 -> 恢复标签完全不透明 -> 清理 effect 对象。
- * 动画组使用 DeleteWhenStopped，stop() 后 Qt 自动销毁，此处仅清空指针。
- *
- * @param statusLabel 状态标签控件（析构时可传 nullptr）
- */
-void NavigationController::stopBreathingAnimation(QLabel* statusLabel)
-{
-    if (m_breathingAnim) {
-        // DeleteWhenStopped: stop() 后 Qt 自动 delete，不可再次 delete
-        m_breathingAnim->stop();
-        m_breathingAnim = nullptr;
-    }
-    // 恢复状态标签完全不透明
-    // 注意: setGraphicsEffect(nullptr) 会自动 delete 旧的 effect，不可手动再 delete
-    if (m_connStatusEffect) {
-        m_connStatusEffect->setOpacity(1.0);
-        if (statusLabel) {
-            statusLabel->setGraphicsEffect(nullptr);  // Qt 自动 delete m_connStatusEffect
-        }
-        m_connStatusEffect = nullptr;
-    }
-}
-
-/**
- * @brief 响应断点变化，动画折叠/展开导航树
- *
- * 折叠: 通过 QSplitter::setSizes 将导航树宽度动画过渡到 0
- * 展开: 动画恢复到用户上次的 savedWidth
- *
- * 动画: 250ms OutCubic 分割器宽度过渡（通过 QPropertyAnimation 驱动分割器位置）
- *
- * @param collapsed true 表示应折叠导航树
- * @param splitter 主分割器（导航树 + 内容区）
- * @param savedWidth 用户上次的导航树展开宽度
- */
-void NavigationController::onBreakpointNavCollapse(
-    bool collapsed, QSplitter* splitter, int savedWidth)
-{
-    if (!splitter || splitter->sizes().size() < 2) return;
-
-    // 防止动画期间重复触发
-    static bool animating = false;
-    if (animating) return;
-
-    int currentNavWidth = splitter->sizes().at(0);
-
-    // 已在目标状态则跳过
-    if (collapsed && currentNavWidth == 0) return;
-    if (!collapsed && currentNavWidth > 0 && savedWidth <= 0) return;
-
-    animating = true;
-
-    // 直接设置分割器大小（QSplitter 的动画通过QPropertyAnimation比较复杂，
-    // 使用平滑过渡: 先设目标值，由布局系统自动过渡）
-    int targetWidth = collapsed ? 0 : (savedWidth > 0 ? savedWidth : 180);
-    int contentWidth = splitter->width() - targetWidth;
-
-    splitter->setSizes({targetWidth, contentWidth});
-
-    // 导航树可见性同步
-    if (m_navTree) {
-        m_navTree->setVisible(!collapsed);
-    }
-
-    animating = false;
-}
+// startBreathingAnimation/stopBreathingAnimation/onBreakpointNavCollapse
+// 见 NavigationControllerStatus.cpp
