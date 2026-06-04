@@ -87,6 +87,15 @@ public:
     /** @brief 获取累计渲染次数(paintEvent中实际绘制帧的次数) */
     quint64 totalRenders() const { return m_totalRenders; }
 
+    /** @brief 获取累计暂停操作次数 */
+    quint64 totalPauses() const { return m_totalPauses; }
+
+    /** @brief 获取累计恢复操作次数 */
+    quint64 totalResumes() const { return m_totalResumes; }
+
+    /** @brief 获取累计清除操作次数 */
+    quint64 totalClears() const { return m_totalClears; }
+
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -133,4 +142,7 @@ private:
     quint64 m_totalFrameUpdates = 0;    ///< 累计帧更新次数(addSpectrum中实际绘制新行)
     quint64 m_totalScrollEvents = 0;    ///< 累计滚动事件次数(定时器触发scrollImage)
     quint64 m_totalRenders = 0;         ///< 累计渲染次数(paintEvent中实际绘制帧)
+    quint64 m_totalPauses = 0;          ///< 累计暂停操作次数
+    quint64 m_totalResumes = 0;         ///< 累计恢复操作次数
+    quint64 m_totalClears = 0;          ///< 累计清除操作次数
 };

@@ -99,6 +99,7 @@ void ConverterPanel::onHistorySelected()
     if (!item) {
         return;
     }
+    ++m_totalHistorySelections;
     /* 历史只记录了摘要，不做恢复操作 */
 }
 
@@ -114,4 +115,6 @@ void ConverterPanel::resetStatistics()
     m_totalErrors = 0;
     m_totalFormatSwitches = 0;
     m_totalClipboardOps = 0;
+    m_totalPasteActions = 0;
+    m_totalHistorySelections = 0;
 }

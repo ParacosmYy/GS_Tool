@@ -37,6 +37,7 @@ bool FrameParser::handleCrcValidation()
         if (!verifyChecksum(m_buffer)) {
             m_errorCount++;
             m_totalChecksumErrors++;
+            m_totalValidationErrors++;
             ++m_totalParseErrors;  // CRC校验失败
             emit frameError(tr("校验和不匹配"), m_buffer);
             resetIntermediateState();
@@ -67,6 +68,7 @@ void FrameParser::handleChecksumVerifying(unsigned char byte)
     } else {
         m_errorCount++;
         m_totalChecksumErrors++;
+        m_totalValidationErrors++;
         ++m_totalParseErrors;  // 校验和不匹配
         emit frameError(tr("校验和不匹配"), m_buffer);
         resetIntermediateState();
@@ -94,15 +96,8 @@ void FrameParser::handleFooterMatching(unsigned char byte)
     }
 
     if (footerMatch) {
-        if (m_def.checksumType == ChecksumType::None || verifyChecksum(m_buffer)) {
-            completeFrame();
-        } else {
-            m_errorCount++;
-            m_totalChecksumErrors++;
-            ++m_totalParseErrors;  // 帧尾校验失败
-            emit frameError(tr("校验和不匹配"), m_buffer);
-            resetIntermediateState();
-        }
+        // CRC已在handleCrcValidation或handleChecksumVerifying中验证，无需重复校验
+        completeFrame();
     } else {
         m_errorCount++;
         ++m_totalParseErrors;  // 帧尾不匹配

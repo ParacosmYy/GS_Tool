@@ -28,12 +28,12 @@ User_Serial/
 
 ## 二、src/ 顶层目录
 
-> 下面按当前仓库真实目录写法整理。`shared/` 是正式目标层，但仓库里还没有独立目录，当前仍由 `core/theme/Constants.h` 兼容承接。
+> 下面按当前仓库真实目录写法整理。`shared/` 与 `interfaces/` 已落地为正式基础层，`core/theme/Constants.h` 仅保留兼容承接。
 
 | 目录 | 当前状态 | 角色口径 | 说明 |
 |------|----------|----------|------|
 | `interfaces/` | 已存在 | 纯虚接口层 | 放 `IConnection`、`IPanelProvider`、`IDataSink` 等契约 |
-| `shared/` | 当前未创建 | 公共基础层 | 共享常量、枚举、轻量类型的唯一真相路径 |
+| `shared/` | 已存在 | 公共基础层 | 共享常量、枚举、轻量类型的唯一真相路径 |
 | `core/` | 已存在 | 应用协调 + 基础 UI | `MainWindow`、`PanelManager`、`ThemeManager`、导航、基础 Widget |
 | `serial/` | 已存在 | 串口功能模块 | 配置、指令、数据、端口、信号线 |
 | `connection/` | 已存在 | 连接接入模块 | 串口、网络、BLE、CAN、MQTT、USB、WS 等连接实现 |
@@ -47,6 +47,7 @@ User_Serial/
 | `plugin/` | 已存在 | 插件扩展模块 | 插件管理、加载器、配置面板 |
 | `utils/` | 已存在 | 通用工具层 | 编解码、导出、日志、缓存、性能、时间戳等 |
 | `widgets/` | 已存在 | 独立复用控件库 | autocomplete、dialog、diff、palette、recorder、toast 等 |
+| `features/` | 迁移骨架 | 未来功能入口 | 只放归属说明和迁移骨架，不承载现有实现 |
 
 ---
 
@@ -69,6 +70,7 @@ User_Serial/
 | `plugin/` | `loader/`, `loader2/` |
 | `utils/` | `aggregator/`, `checksum/`, `clipboard/`, `converter/`, `crypto/`, `data/`, `export/`, `log/`, `packet/`, `perf/`, `pipeline/`, `timestamp/` |
 | `widgets/` | `audio/`, `autocomplete/`, `dialog/`, `diff/`, `freq/`, `palette/`, `recorder/`, `scope/`, `toast/` |
+| `features/` | 迁移骨架目录，默认平铺，后续仅承接归属说明 |
 
 ---
 
@@ -78,6 +80,7 @@ User_Serial/
 |------|------|------|
 | 共享常量与枚举 | `src/shared/` | 新增跨模块常量、枚举、轻量类型优先放这里 |
 | 旧常量伞头 | `src/core/theme/Constants.h` | 只允许转发旧 include，不允许新增域定义 |
+| 未来功能骨架 | `src/features/` | 仅作为迁移骨架和未来归属说明，不承载现有实现 |
 | 应用协调入口 | `src/core/mainwindow/MainWindow.*` | 只负责初始化、组装 UI、连接信号/槽 |
 | 面板编排中心 | `src/core/panels/PanelManager.*` | 只负责面板创建、注册、包装、映射和统计 |
 | 基础 UI 组件 | `src/core/widgets/` | 只放可复用壳层，不放功能桶里的业务逻辑 |
@@ -90,6 +93,42 @@ User_Serial/
 3. `MainWindow` 和 `PanelManager` 继续做编排，但新增业务流必须优先下沉到独立 Controller/Manager。
 4. `font/` 与 `fonts/`、`icon/` 与 `icons/`、`responsive/` 与 `layout/`、`shortcut/` 与 `managers/`、`widgets/` 与 `widgets2/`、`animation/` 与 `animation2/`、`loader/` 与 `loader2/` 这些分叉目录只允许冻结，不允许继续复制新分支。
 5. 目录命名优先沿用已有主线目录，不要再创造“更像”的新桶。
+
+### 四-A、目标骨架
+
+> 这部分描述兼容迁移阶段的目标落点，不要求一次性移动现有源码。
+
+| 目录 | 角色 | 新增规则 |
+|------|------|----------|
+| `src/shared/` | 共享基础层 | 新常量、枚举、轻量值类型优先落这里 |
+| `src/interfaces/` | 契约层 | 纯接口、抽象协议、回调类型放这里 |
+| `src/core/` | 应用协调层 | 只保留装配、导航、主题、基础 UI、会话 |
+| `src/features/` | 迁移骨架层 | 只做归属说明、骨架 README、未来功能入口说明 |
+| `src/connection/` 等现有业务模块 | 业务实现层 | 继续按领域收敛，不再新建平行实现目录 |
+
+新增目录规则:
+- 新功能优先寻找 canonical 目录，不要新建 `2`、`new`、`old`、`backup` 之类平行目录。
+- 如果历史分叉已经存在，只能冻结，不能继续复制。
+- 如果确实需要未来迁移入口，先在 `src/features/` 里放归属说明，再讨论是否新增具体目录。
+
+### 四-B、冻结目录
+
+以下目录仅保留兼容和历史引用，不再承载新实现：
+
+- `animation2/`
+- `widgets2/`
+- `loader2/`
+- `fonts/`
+- `icons/`
+- `responsive/`
+- `font/` 与 `fonts/`
+- `icon/` 与 `icons/`
+- `shortcut/` 与 `managers/`
+
+冻结规则:
+- 可以保留旧 include、旧资源引用和转发适配。
+- 不允许把新需求继续写入冻结目录。
+- 任何新骨架都应先落到 `src/features/` 或 canonical 路径。
 
 ---
 
@@ -125,8 +164,13 @@ docs/
 │   ├── 06-git-commit.md
 │   ├── 07-directory-structure.md  # 本文件
 │   └── 08-icon-standard.md
+├── architecture/                  # 架构骨架与迁移说明
+│   ├── README.md
+│   ├── target-structure.md
+│   ├── frozen-dirs.md
+│   ├── module-boundaries.md
+│   └── migration-roadmap.md
 ├── prd/                           # PRD 需求文档
-├── architecture/                  # 架构设计+审查
 ├── reviews/                       # 代码/UI/QA 审查
 └── tracking/                      # 评分追踪
 ```

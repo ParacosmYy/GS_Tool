@@ -11,13 +11,16 @@
 
 #include "connection/spi_i2c/SpiConnection.h"
 
+#include <QEventLoop>
+#include <QTimer>
+
 /** @brief SPI全双工传输(使用当前配置的默认字长)，同时发送和接收数据 @param txData 发送数据 @return 接收到的MISO数据 */
 QByteArray SpiConnection::transfer(const QByteArray& txData)
 {
     return transfer(txData, m_wordSize);
 }
 
-/** @brief SPI全双工传输(指定字长)，同时发送和接收数据 @param txData 发送数据 @param wordSize 本次传输使用的字长 @return 接收到的MISO数据 */
+/** @brief SPI全双工传输(指定字长)，同步等待响应到达后再返回 @param txData 发送数据 @param wordSize 本次传输使用的字长 @return 接收到的MISO数据 */
 QByteArray SpiConnection::transfer(const QByteArray& txData, SpiWordSize wordSize)
 {
     if (m_state != ConnectionState::Connected || !m_serial) {
@@ -45,6 +48,15 @@ QByteArray SpiConnection::transfer(const QByteArray& txData, SpiWordSize wordSiz
     frame.append(payload);
 
     m_serial->write(frame);
+
+    /// 同步等待响应(最多100ms)，通过事件循环处理readyRead信号
+    QEventLoop loop;
+    QTimer timeoutTimer;
+    timeoutTimer.setSingleShot(true);
+    connect(this, &IConnection::dataReceived, &loop, &QEventLoop::quit);
+    connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    timeoutTimer.start(100);
+    loop.exec();
 
     /// 解析响应数据(异步缓冲区中提取)
     QByteArray rxData;

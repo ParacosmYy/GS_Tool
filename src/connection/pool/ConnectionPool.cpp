@@ -33,12 +33,15 @@ QString ConnectionPool::createConnection(const QString &type, const QString &add
     return id;
 }
 
-/** @brief 移除连接 @param id 连接ID */
-void ConnectionPool::removeConnection(const QString &id) {
+/** @brief 移除连接(区分归还和驱逐语义) @param id 连接ID @param evicted true=池主动驱逐，false=用户主动归还 */
+void ConnectionPool::removeConnection(const QString &id, bool evicted) {
     if (m_pool.remove(id)) {
         ++m_totalRemoved;
-        ++m_totalReturnCount;
-        ++m_totalEvictions;
+        if (evicted) {
+            ++m_totalEvictions;
+        } else {
+            ++m_totalReturnCount;
+        }
         emit connectionRemoved(id);
     }
 }

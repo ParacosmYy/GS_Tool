@@ -187,6 +187,16 @@ quint64 ModbusScanWidget::totalErrors() const {
     return m_totalErrors;
 }
 
+/** @brief 获取累计扫描完成次数(正常结束或手动停止) @return 扫描完成次数 */
+quint64 ModbusScanWidget::totalScansCompleted() const {
+    return m_totalScansCompleted;
+}
+
+/** @brief 获取累计探测地址总数(每次发送探测请求递增) @return 探测地址数 */
+quint64 ModbusScanWidget::totalAddressesProbed() const {
+    return m_totalAddressesProbed;
+}
+
 /** @brief 重置所有统计计数器 */
 void ModbusScanWidget::resetStatistics() {
     m_totalScansInitiated  = 0;
@@ -194,5 +204,7 @@ void ModbusScanWidget::resetStatistics() {
     m_totalSuccessfulProbes = 0;
     m_totalTimeouts        = 0;
     m_totalErrors          = 0;
+    m_totalScansCompleted  = 0;
+    m_totalAddressesProbed = 0;
     updateStatsLabel();
 }

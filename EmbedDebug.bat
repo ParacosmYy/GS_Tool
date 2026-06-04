@@ -9,7 +9,7 @@ if exist "%~dp0build\EmbedDebug.exe" (
     exit /b 1
 )
 
-REM 检查Qt依赖是否已部署（以Qt6Core.dll为标志）
+REM Check Qt dependencies deployed (Qt6Core.dll as indicator)
 if not exist "%cd%\Qt6Core.dll" (
     echo Deploying Qt dependencies...
     "E:\Tool\DevEnv\Qt\6.8.3\mingw_64\bin\windeployqt.exe" "%cd%\EmbedDebug.exe" >nul 2>&1

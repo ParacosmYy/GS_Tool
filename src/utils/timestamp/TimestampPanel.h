@@ -70,6 +70,8 @@ private:
     quint64 m_totalTimestampParses = 0; ///< 累计时间戳解析次数
     quint64 m_totalFormatsSelected = 0; ///< 累计格式选中次数(下拉框选择)
     quint64 m_totalCopies = 0;       ///< 累计复制结果到剪贴板次数
+    quint64 m_totalNowActions = 0;   ///< 累计"当前时间"按钮点击次数
+    quint64 m_totalHistoryRestores = 0; ///< 累计历史记录恢复次数
 public:
     /** @brief 获取累计转换次数 @return 转换次数 */
     quint64 totalConversions() const { return m_totalConversions; }
@@ -85,7 +87,11 @@ public:
     quint64 totalFormatsSelected() const { return m_totalFormatsSelected; }
     /** @brief 获取累计复制结果次数 @return 复制次数 */
     quint64 totalCopies() const { return m_totalCopies; }
-    /** @brief 重置时间戳面板统计计数器(转换次数/复制次数/分析次数/格式切换/解析次数) */
+    /** @brief 获取累计"当前时间"按钮点击次数 @return 点击次数 */
+    quint64 totalNowActions() const { return m_totalNowActions; }
+    /** @brief 获取累计历史记录恢复次数 @return 恢复次数 */
+    quint64 totalHistoryRestores() const { return m_totalHistoryRestores; }
+    /** @brief 重置时间戳面板统计计数器(转换次数/复制次数/分析次数/格式切换/解析次数/当前时间/历史恢复) */
     void resetTimestampPanelStatistics();
 };
 

@@ -67,8 +67,8 @@
 
 ---
 
-## 三、评分追踪
+## 三、关联文档
 
-评分追踪独立文档: [docs/tracking/SCORE_TRACKING.md](../tracking/SCORE_TRACKING.md)
+评分追踪请看: [docs/tracking/SCORE_TRACKING.md](../tracking/SCORE_TRACKING.md)
 
-起点: 1分 | 目标: 1000分 | 每次 commit 默认记 1 分
+本文件只定义提交规则与提交格式，不再重复记录阶段评分、里程碑摘要或增长口径。

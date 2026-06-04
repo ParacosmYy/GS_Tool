@@ -92,6 +92,9 @@ public:
     /** @brief 获取游标拖拽取消总次数(未命中时Release) */
     quint64 totalDragCancels() const;
 
+    /** @brief 获取主题颜色刷新总次数(ThemeManager主题切换触发) */
+    quint64 totalThemeChanges() const;
+
 protected:
     /** @brief 绘制游标线和差值信息面板 */
     void paintEvent(QPaintEvent* event) override;
@@ -153,6 +156,7 @@ private:
     quint64 m_totalCursorToggles = 0;      ///< 游标可见性切换总次数
     quint64 m_totalHitTests = 0;           ///< 游标命中检测总次数
     quint64 m_totalDragCancels = 0;        ///< 游标拖拽取消总次数
+    quint64 m_totalThemeChanges = 0;      ///< 主题颜色刷新总次数
     double m_sumDeltaX = 0.0;               ///< 累计ΔX值(用于计算averageDeltaX)
     double m_sumDeltaY = 0.0;               ///< 累计ΔY值(首个通道，用于计算averageDeltaY)
 

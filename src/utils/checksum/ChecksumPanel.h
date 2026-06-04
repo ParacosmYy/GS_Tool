@@ -71,7 +71,13 @@ public:
     /** @brief 获取累计输入内容更新次数 @return 更新次数 */
     quint64 totalInputUpdates() const;
 
-    /** @brief 重置所有面板统计计数器(计算次数/复制次数/算法切换/剪贴板复制/输入更新) */
+    /** @brief 获取累计输入模式切换次数(十六进制/ASCII/文件) @return 模式切换次数 */
+    quint64 totalFormatChanges() const;
+
+    /** @brief 获取累计历史记录选择次数 @return 历史选择次数 */
+    quint64 totalHistorySelections() const;
+
+    /** @brief 重置所有面板统计计数器(计算次数/复制次数/算法切换/剪贴板复制/输入更新/模式切换/历史选择) */
     void resetPanelStatistics();
 
 signals:
@@ -130,6 +136,8 @@ private:
     quint64 m_totalAlgorithmChanges = 0; ///< 累计算法切换次数
     quint64 m_totalCopyToClipboard = 0; ///< 累计复制结果到剪贴板操作次数
     quint64 m_totalInputUpdates = 0;    ///< 累计输入内容更新次数
+    quint64 m_totalFormatChanges = 0;   ///< 累计输入模式切换次数(十六进制/ASCII/文件)
+    quint64 m_totalHistorySelections = 0; ///< 累计历史记录选择次数
 
 protected:
     /**

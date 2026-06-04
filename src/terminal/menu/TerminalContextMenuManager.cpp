@@ -37,6 +37,7 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
     m_pasteAction = m_contextMenu->addAction(
         tr("粘贴") + QString("\t") + QKeySequence(QKeySequence::Paste).toString());
     connect(m_pasteAction, &QAction::triggered, this, [this]() {
+        ++m_totalPasteActions;
         ++m_totalActionsTriggered;
         QString text = QApplication::clipboard()->text();
         if (!text.isEmpty()) emit pasteRequested(text);
@@ -46,6 +47,7 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
 
     m_clearAction = m_contextMenu->addAction(tr("清空"));
     connect(m_clearAction, &QAction::triggered, this, [this]() {
+        ++m_totalClearActions;
         ++m_totalActionsTriggered;
         emit clearRequested();
     });
@@ -92,6 +94,18 @@ quint64 TerminalContextMenuManager::totalCopyActions() const
     return m_totalCopyActions;
 }
 
+/** @brief 获取粘贴操作总触发次数 @return 用户点击"粘贴"菜单项的累计次数 */
+quint64 TerminalContextMenuManager::totalPasteActions() const
+{
+    return m_totalPasteActions;
+}
+
+/** @brief 获取清屏操作总触发次数 @return 用户点击"清屏"菜单项的累计次数 */
+quint64 TerminalContextMenuManager::totalClearActions() const
+{
+    return m_totalClearActions;
+}
+
 /** @brief 获取搜索操作总触发次数 @return 用户点击"搜索"菜单项的累计次数 */
 quint64 TerminalContextMenuManager::totalSearchActions() const
 {
@@ -109,6 +123,8 @@ void TerminalContextMenuManager::resetStats()
 {
     m_totalMenuShows = 0;
     m_totalCopyActions = 0;
+    m_totalPasteActions = 0;
+    m_totalClearActions = 0;
     m_totalSearchActions = 0;
     m_totalActionsTriggered = 0;
 }

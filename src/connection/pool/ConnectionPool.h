@@ -37,8 +37,8 @@ public:
 
     /** @brief 创建新连接并返回其ID @param type 连接类型 @param address 连接地址 @return 连接ID */
     QString createConnection(const QString &type, const QString &address);
-    /** @brief 移除指定连接 @param id 连接ID */
-    void removeConnection(const QString &id);
+    /** @brief 移除指定连接 @param id 连接ID @param evicted true=池主动驱逐(溢出/超时)，false=用户主动归还 */
+    void removeConnection(const QString &id, bool evicted = false);
     /** @brief 连接池中所有连接执行连接操作 */
     void connectAll();
     /** @brief 断开所有连接 */

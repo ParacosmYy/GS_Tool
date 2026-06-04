@@ -84,6 +84,12 @@ quint64 CursorOverlay::totalDragCancels() const
     return m_totalDragCancels;
 }
 
+/** @brief 返回主题颜色刷新总次数 @return 主题切换次数 */
+quint64 CursorOverlay::totalThemeChanges() const
+{
+    return m_totalThemeChanges;
+}
+
 /** @brief 返回历次测量的平均ΔX值 @return 平均ΔX */
 double CursorOverlay::averageDeltaX() const
 {
@@ -111,6 +117,7 @@ void CursorOverlay::resetCursorStatistics()
     m_totalCursorToggles = 0;
     m_totalHitTests = 0;
     m_totalDragCancels = 0;
+    m_totalThemeChanges = 0;
     m_sumDeltaX = 0.0;
     m_sumDeltaY = 0.0;
 }

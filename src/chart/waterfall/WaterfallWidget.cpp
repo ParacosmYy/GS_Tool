@@ -89,6 +89,7 @@ void WaterfallWidget::setScrollSpeed(int ms)
 /** @brief 清除所有历史数据和缓存像素图 */
 void WaterfallWidget::clear()
 {
+    ++m_totalClears;
     m_history.clear();
     m_currentLine = 0;
     m_waterfall = QPixmap();
@@ -96,10 +97,10 @@ void WaterfallWidget::clear()
 }
 
 /** @brief 暂停瀑布图数据接收和滚动 */
-void WaterfallWidget::pause() { m_paused = true; m_scrollTimer.stop(); }
+void WaterfallWidget::pause() { ++m_totalPauses; m_paused = true; m_scrollTimer.stop(); }
 
 /** @brief 恢复瀑布图数据接收和滚动 */
-void WaterfallWidget::resume() { m_paused = false; m_scrollTimer.start(); }
+void WaterfallWidget::resume() { ++m_totalResumes; m_paused = false; m_scrollTimer.start(); }
 
 /** @brief 绘制事件处理，将缓存瀑布图缩放绘制到控件上 @param event 绘制事件参数(未使用) */
 void WaterfallWidget::paintEvent(QPaintEvent *event)
@@ -180,4 +181,7 @@ void WaterfallWidget::resetStats()
     m_totalFrameUpdates = 0;
     m_totalScrollEvents = 0;
     m_totalRenders = 0;
+    m_totalPauses = 0;
+    m_totalResumes = 0;
+    m_totalClears = 0;
 }

@@ -60,7 +60,7 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 
 ## 三、模块清单
 
-> src/ 下有主模块，另有基础层处于收敛落地阶段。
+> src/ 下有主模块，基础层已经落地到 `shared/` 与 `interfaces/`，当前进入兼容迁移与骨架化收口阶段。
 
 ### 现有模块（12个）
 
@@ -84,4 +84,14 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 | 模块 | 路径 | 职责 | 状态 |
 |------|------|------|------|
 | `interfaces` | `src/interfaces/` | 纯虚接口定义（IConnection, IPanelProvider, IDataSink, IProtocolParser, IDevice） | 已定义，持续扩展 |
-| `shared` | `src/shared/` | 共享常量+枚举正式层（当前由 `core/theme/Constants.h` 兼容承接） | 🔧 收敛中 |
+| `shared` | `src/shared/` | 共享常量+枚举正式层（`core/theme/Constants.h` 仅作兼容转发） | ✅ 已落地，持续收口 |
+
+### 现阶段骨架口径
+
+| 入口 | 口径 |
+|------|------|
+| 稳定入口 | `AGENTS.md` 只保留索引和稳定规则 |
+| 主架构文档 | `docs/constraints/03-architecture.md` |
+| 目录骨架文档 | `docs/constraints/07-directory-structure.md` |
+| 冻结历史分叉 | `animation2/`、`widgets2/`、`loader2/`、`fonts/`、`icons/`、`responsive/` |
+| 未来迁移落点 | `src/features/`、`src/shared/`、`src/interfaces/`、`src/core/` 的各自 canonical 子目录 |

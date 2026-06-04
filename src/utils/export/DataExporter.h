@@ -83,6 +83,12 @@ public:
     /** @brief 获取最近一次导出的字节数 @return 最近导出字节数 */
     quint64 lastExportByteCount() const;
 
+    /** @brief 获取累计时间范围过滤跳过的行数 @return 过滤跳过行数 */
+    quint64 totalFilteredRows() const;
+
+    /** @brief 获取累计空数据跳过次数(输入为空或过滤后为空) @return 跳过次数 */
+    quint64 totalEmptySkips() const;
+
     void resetStats();                    ///< 重置所有统计
 
 signals:
@@ -149,6 +155,8 @@ private:
     qint64 m_lastExportDurationMs = 0;    ///< 最近一次导出耗时(毫秒)
     quint64 m_lastExportRowCount = 0;     ///< 最近一次导出行数
     quint64 m_lastExportByteCount = 0;    ///< 最近一次导出字节数
+    quint64 m_totalFilteredRows = 0;      ///< 累计时间范围过滤跳过的行数
+    quint64 m_totalEmptySkips = 0;        ///< 累计空数据跳过次数(输入为空或过滤后为空)
     QElapsedTimer m_exportTimer;          ///< 当前导出操作计时器
 
     // CSV配置成员

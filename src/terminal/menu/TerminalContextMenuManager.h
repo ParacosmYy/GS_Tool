@@ -61,6 +61,12 @@ public:
     /** @brief 获取复制操作总触发次数 @return 用户点击"复制"菜单项的累计次数 */
     quint64 totalCopyActions() const;
 
+    /** @brief 获取粘贴操作总触发次数 @return 用户点击"粘贴"菜单项的累计次数 */
+    quint64 totalPasteActions() const;
+
+    /** @brief 获取清屏操作总触发次数 @return 用户点击"清屏"菜单项的累计次数 */
+    quint64 totalClearActions() const;
+
     /** @brief 获取搜索操作总触发次数 @return 用户点击"搜索"菜单项的累计次数 */
     quint64 totalSearchActions() const;
 
@@ -84,6 +90,8 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalMenuShows = 0;       ///< 菜单总弹出次数
     quint64 m_totalCopyActions = 0;     ///< 复制操作总触发次数
+    quint64 m_totalPasteActions = 0;    ///< 粘贴操作总触发次数
+    quint64 m_totalClearActions = 0;    ///< 清屏操作总触发次数
     quint64 m_totalSearchActions = 0;   ///< 搜索操作总触发次数
     quint64 m_totalActionsTriggered = 0; ///< 菜单项总触发次数(含所有操作)
 };

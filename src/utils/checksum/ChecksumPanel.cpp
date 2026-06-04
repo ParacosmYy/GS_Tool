@@ -73,6 +73,10 @@ ChecksumPanel::ChecksumPanel(QWidget *parent)
     modeLayout->addWidget(m_inputModeCombo);
     modeLayout->addStretch();
 
+    // 统计: 输入模式切换计数
+    connect(m_inputModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { ++m_totalFormatChanges; });
+
     // 输入区
     m_inputEdit->setObjectName("checksumInputEdit");
     m_inputEdit->setPlaceholderText(
@@ -88,8 +92,6 @@ ChecksumPanel::ChecksumPanel(QWidget *parent)
     resultLayout->addStretch();
     m_copyBtn->setObjectName("copyResultBtn");
     m_copyBtn->setEnabled(false);
-    resultLayout->addWidget(m_resultLabel);
-    resultLayout->addStretch();
     resultLayout->addWidget(m_copyBtn);
 
     // 历史记录区

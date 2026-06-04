@@ -12,6 +12,8 @@
 /* 静态统计计数器定义 */
 quint64 TerminalSearchRenderer::s_totalRenders = 0;
 quint64 TerminalSearchRenderer::s_totalHighlights = 0;
+quint64 TerminalSearchRenderer::s_totalCurrentHighlights = 0;
+quint64 TerminalSearchRenderer::s_totalEmptySkips = 0;
 
 /** @brief 在终端绘制搜索高亮矩形，遍历匹配位置并计算字符偏移后填充高亮色 @param painter QPainter引用，用于绘制高亮矩形 @param fontMetrics 字体度量，用于计算字符宽度 @param searchManager 搜索管理器，提供匹配索引列表 @param cached 当前行缓存，包含字符偏移列表 @param displayLine 当前绘制行的显示行号 @param textXOffset 文本区域X偏移量 @param y 当前行Y坐标 @param lineHeight 行高 @param showDirectionPrefix 是否显示方向前缀[TX:]/[RX:] */
 void TerminalSearchRenderer::drawHighlights(
@@ -28,8 +30,9 @@ void TerminalSearchRenderer::drawHighlights(
     // 注意: HEX搜索时，lineProvider返回HexConverter::toHexString()格式的文本进行匹配，
     // 而cached.text可能是Text/Mixed/Decimal格式。高亮位置仅在Hex显示模式下准确。
     // 建议HEX搜索时自动切换到Hex显示模式以保证高亮对齐。
+    if (!searchManager) { ++s_totalEmptySkips; return; }
     const auto& matches = searchManager->searchMatches();
-    if (matches.isEmpty()) return;
+    if (matches.isEmpty()) { ++s_totalEmptySkips; return; }
 
     int curIdx = searchManager->currentMatchIndex();
 
@@ -65,6 +68,7 @@ void TerminalSearchRenderer::drawHighlights(
         int matchWidth = fontMetrics.horizontalAdvance(textForWidth.mid(col, match.length));
 
         // 当前匹配使用高亮强调色，其他匹配使用普通高亮色
+        if (mi == curIdx) ++s_totalCurrentHighlights;
         painter.fillRect(xStart, y + 2, matchWidth, lineHeight - 4,
                          (mi == curIdx) ? searchManager->currentMatchColor()
                                         : searchManager->searchHighlightColor());
@@ -77,4 +81,6 @@ void TerminalSearchRenderer::resetStatistics()
 {
     s_totalRenders = 0;
     s_totalHighlights = 0;
+    s_totalCurrentHighlights = 0;
+    s_totalEmptySkips = 0;
 }

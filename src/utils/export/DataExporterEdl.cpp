@@ -37,10 +37,10 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
 
     bool ok = false;
     switch (format) {
-    case Plain:       ok = exportPlain(outPath, lines); break;
+    case Plain:       ok = exportPlain(outPath, lines); ++m_totalPlainExports; break;
     case HexDump:     ok = exportHexDump(outPath, lines); ++m_totalHexDumpExports; break;
     case Csv:         ok = exportCsv(outPath, lines); ++m_totalCsvExports; break;
-    case Timestamped: ok = exportTimestamped(outPath, lines); break;
+    case Timestamped: ok = exportTimestamped(outPath, lines); ++m_totalTimestampedExports; break;
     case Bin:         ok = exportBin(outPath, lines); ++m_totalBinExports; break;
     case Json:        ok = exportJson(outPath, lines); ++m_totalJsonExports; break;
     default:

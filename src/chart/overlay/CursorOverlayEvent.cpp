@@ -92,6 +92,7 @@ bool CursorOverlay::eventFilter(QObject* watched, QEvent* event)
 /** @brief 主题切换时重新从ThemeManager加载所有颜色成员 */
 void CursorOverlay::onThemeChanged()
 {
+    ++m_totalThemeChanges;
     m_cursorAColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Error);
     m_cursorBColor = ThemeManager::instance().color(ThemeManager::SemanticColor::Accent);
     m_highlightColor = QColor(m_cursorAColor.red(), m_cursorAColor.green(),

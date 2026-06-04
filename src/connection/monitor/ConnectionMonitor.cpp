@@ -64,8 +64,17 @@ void ConnectionMonitor::startMonitoring(int interval) {
 /** @brief 停止心跳监控 */
 void ConnectionMonitor::stopMonitoring() { m_pingTimer->stop(); }
 
-/** @brief 重置所有统计数据为默认值 */
-void ConnectionMonitor::resetStats() { m_stats = Stats{}; }
+/**
+ * @brief 重置所有统计数据为默认值
+ * 保持当前连接状态和连接起始时间不变，避免totalConnectedTime计算异常
+ */
+void ConnectionMonitor::resetStats() {
+    State savedState = m_stats.currentState;
+    qint64 savedSince = m_stats.connectedSince;
+    m_stats = Stats{};
+    m_stats.currentState = savedState;
+    m_stats.connectedSince = savedSince;
+}
 
 /** @brief 重置所有统计计数器为零 */
 void ConnectionMonitor::resetMonitorStatistics() {

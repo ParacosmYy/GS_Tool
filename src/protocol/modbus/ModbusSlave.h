@@ -85,6 +85,12 @@ public:
     /** @brief 获取各功能码调用次数统计 */
     QMap<int, int> functionCodeStats() const;
 
+    /** @brief 获取CRC校验失败次数 @return CRC错误计数 */
+    quint64 totalCrcErrors() const;
+
+    /** @brief 获取不支持功能码被调用的次数 @return 不支持功能码计数 */
+    quint64 totalUnsupportedFunctions() const;
+
     /** @brief 重置统计数据 */
     void resetStatistics();
 
@@ -123,6 +129,8 @@ private:
     quint64 m_totalResponsesSent = 0;       ///< 已发送的响应帧总数（含正常+异常）
     quint64 m_totalSlaveErrors = 0;         ///< 从站内部错误次数（CRC失败/帧过短等）
     quint64 m_totalExceptionResponses = 0;  ///< 异常响应发送总数（功能码最高位置1的响应）
+    quint64 m_totalCrcErrors = 0;           ///< CRC校验失败次数
+    quint64 m_totalUnsupportedFunctions = 0; ///< 不支持功能码被调用的次数
     QMap<int, int> m_fcStats;               ///< 各功能码调用次数
 };
 

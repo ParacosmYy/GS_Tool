@@ -93,6 +93,8 @@ public:
     quint64 totalPositionChanges() const { return m_totalPositionChanges; } ///< 位置变更总次数
     quint64 totalJumpMoves() const { return m_totalJumpMoves; } ///< 无动画跳转总次数(初始化/恢复会话)
     quint64 totalThemeUpdates() const { return m_totalThemeUpdates; } ///< 主题颜色更新总次数
+    quint64 totalRepaints() const { return m_totalRepaints; } ///< 绘制事件总次数
+    quint64 totalResizeSyncs() const { return m_totalResizeSyncs; } ///< 尺寸同步总次数(跟随navTree resize)
     void resetIndicatorStatistics(); ///< 重置统计
 
     /** 设置指示线Y坐标(QPropertyAnimation写访问器) @param y 目标Y坐标 */
@@ -115,6 +117,7 @@ protected:
     void paintEvent(QPaintEvent* event) override
     {
         Q_UNUSED(event)
+        ++m_totalRepaints;
 
         // 防止高度无效时绘制
         if (m_indicatorHeight <= 0) return;
@@ -145,6 +148,7 @@ protected:
     {
         if (watched == m_navTree && event->type() == QEvent::Resize) {
             // 跟随 navTree 尺寸变化，覆盖整个树区域
+            ++m_totalResizeSyncs;
             setGeometry(0, 0, m_navTree->width(), m_navTree->height());
         }
         return QWidget::eventFilter(watched, event);
@@ -161,6 +165,8 @@ private:
     quint64 m_totalPositionChanges = 0;///< 位置变更次数
     quint64 m_totalJumpMoves = 0;      ///< 无动画跳转次数
     quint64 m_totalThemeUpdates = 0;   ///< 主题颜色更新次数
+    quint64 m_totalRepaints = 0;       ///< 绘制事件次数
+    quint64 m_totalResizeSyncs = 0;    ///< 尺寸同步次数
 };
 
 /** @brief 重置导航指示器统计计数器(内联实现) */
@@ -170,6 +176,8 @@ inline void NavIndicatorWidget::resetIndicatorStatistics()
     m_totalPositionChanges = 0;
     m_totalJumpMoves = 0;
     m_totalThemeUpdates = 0;
+    m_totalRepaints = 0;
+    m_totalResizeSyncs = 0;
 }
 
 #endif // NAV_INDICATOR_WIDGET_H

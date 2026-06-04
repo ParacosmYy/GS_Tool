@@ -50,7 +50,13 @@ quint64 DataExporter::lastExportRowCount() const { return m_lastExportRowCount; 
 /** @brief 获取最近一次导出的字节总数 @return 最近一次导出的字节数 */
 quint64 DataExporter::lastExportByteCount() const { return m_lastExportByteCount; }
 
-/** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数/各格式次数/耗时) */
+/** @brief 获取累计时间范围过滤跳过的行数 @return 过滤跳过行数 */
+quint64 DataExporter::totalFilteredRows() const { return m_totalFilteredRows; }
+
+/** @brief 获取累计空数据跳过次数(输入为空或过滤后为空) @return 跳过次数 */
+quint64 DataExporter::totalEmptySkips() const { return m_totalEmptySkips; }
+
+/** @brief 重置所有会话统计计数器(导出次数/字节数/行数/错误数/各格式次数/耗时/过滤行数/空跳过) */
 void DataExporter::resetStats()
 {
     m_totalExports = 0;
@@ -67,4 +73,6 @@ void DataExporter::resetStats()
     m_lastExportDurationMs = 0;
     m_lastExportRowCount = 0;
     m_lastExportByteCount = 0;
+    m_totalFilteredRows = 0;
+    m_totalEmptySkips = 0;
 }

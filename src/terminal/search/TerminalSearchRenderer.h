@@ -70,12 +70,20 @@ public:
     /** @brief 获取高亮匹配总次数 */
     static quint64 totalHighlights() { return s_totalHighlights; }
 
+    /** @brief 获取当前匹配高亮总次数(当前选中匹配项的高亮绘制次数) */
+    static quint64 totalCurrentHighlights() { return s_totalCurrentHighlights; }
+
+    /** @brief 获取无匹配跳过总次数(搜索匹配为空时直接返回的次数) */
+    static quint64 totalEmptySkips() { return s_totalEmptySkips; }
+
     /** @brief 重置所有统计计数器 */
     static void resetStatistics();
 
 private:
-    static quint64 s_totalRenders;    ///< 渲染总调用次数
-    static quint64 s_totalHighlights; ///< 高亮匹配总次数
+    static quint64 s_totalRenders;           ///< 渲染总调用次数
+    static quint64 s_totalHighlights;        ///< 高亮匹配总次数
+    static quint64 s_totalCurrentHighlights; ///< 当前匹配高亮总次数
+    static quint64 s_totalEmptySkips;        ///< 无匹配跳过总次数
 };
 
 #endif // TERMINALSEARCHRENDERER_H

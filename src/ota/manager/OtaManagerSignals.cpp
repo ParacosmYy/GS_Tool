@@ -41,6 +41,16 @@ void OtaManager::connectTransferSignals(BaseTransfer* transfer)
                     }
                 }
 
+                // 传输完成后清理HEX转BIN临时文件
+                if (!m_tempBinPath.isEmpty()) {
+                    QFile::remove(m_tempBinPath);
+                    m_tempBinPath.clear();
+                }
+                if (m_tempBinFile) {
+                    delete m_tempBinFile;
+                    m_tempBinFile = nullptr;
+                }
+
                 emit transferComplete();
             });
     connect(transfer, &BaseTransfer::transferError,

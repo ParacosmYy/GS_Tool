@@ -30,6 +30,22 @@ ConnectionQuickDialog::ConnectionQuickDialog(QWidget* parent)
     updateTypeUi();
 }
 
+/** @brief 重写exec，递增对话框显示计数 @return 对话框结果 */
+int ConnectionQuickDialog::exec()
+{
+    ++m_totalDialogShows;
+    return QDialog::exec();
+}
+
+/** @brief 重置所有统计计数器为零 */
+void ConnectionQuickDialog::resetStats()
+{
+    m_totalDialogShows = 0;
+    m_totalDialogAccepts = 0;
+    m_totalDialogCancels = 0;
+    m_totalTypeSwitches = 0;
+}
+
 /** @brief 构建对话框UI布局和控件 */
 void ConnectionQuickDialog::setupUi()
 {
@@ -102,14 +118,20 @@ void ConnectionQuickDialog::setupUi()
     form->addRow(m_buttonBox);
 }
 
-/** @brief 初始化控件信号连接 */
+/** @brief 初始化控件信号连接，同时跟踪用户操作统计 */
 void ConnectionQuickDialog::setupConnections()
 {
     connect(m_typeCombo,
             static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, [this](int) { updateTypeUi(); });
-    connect(m_buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(m_buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+            this, [this](int) { ++m_totalTypeSwitches; updateTypeUi(); });
+    connect(m_buttonBox, &QDialogButtonBox::accepted, this, [this]() {
+        ++m_totalDialogAccepts;
+        accept();
+    });
+    connect(m_buttonBox, &QDialogButtonBox::rejected, this, [this]() {
+        ++m_totalDialogCancels;
+        reject();
+    });
 }
 
 /** @brief 根据当前类型刷新默认值和字段可见性 */

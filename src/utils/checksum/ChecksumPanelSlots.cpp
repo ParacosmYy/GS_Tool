@@ -78,6 +78,7 @@ void ChecksumPanel::onHistoryItemSelected()
     if (!item) {
         return;
     }
+    ++m_totalHistorySelections;
     /* 从 item data 中恢复结果值 */
     bool ok = false;
     quint64 value = item->data(Qt::UserRole).toULongLong(&ok);

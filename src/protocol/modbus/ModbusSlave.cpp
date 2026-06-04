@@ -13,8 +13,10 @@ ModbusSlave::ModbusSlave(QObject* parent)
 {
 }
 
-/** @brief 设置从站地址 @param address 从站地址(1-247) */
+/** @brief 设置从站地址 @param address 从站地址(1-247)，超出范围会被钳位到有效范围 */
 void ModbusSlave::setSlaveAddress(int address) {
+    if (address < 1) address = 1;
+    if (address > 247) address = 247;
     m_slaveAddress = static_cast<quint8>(address);
 }
 
@@ -60,6 +62,7 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
                           requestData[requestData.size() - 1])) << 8);
     if (calculateCrc16(payload) != recvCrc) {
         ++m_totalSlaveErrors;
+        ++m_totalCrcErrors;
         return QByteArray(); // CRC校验失败
     }
 
@@ -97,6 +100,7 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
         break;
     default:
         ++m_exceptionCount;
+        ++m_totalUnsupportedFunctions;
         responsePayload = buildExceptionResponse(
             req, ModbusError::IllegalFunction);
         break;

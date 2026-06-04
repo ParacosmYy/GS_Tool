@@ -66,7 +66,13 @@ public:
     /** @brief 获取累计剪贴板操作次数(复制到剪贴板) @return 剪贴板操作总次数 */
     quint64 totalClipboardOps() const { return m_totalClipboardOps; }
 
-    /** @brief 重置所有转换器统计计数器(转换次数/复制次数/格式交换/输入变更/错误/格式切换/剪贴板) */
+    /** @brief 获取累计粘贴操作次数(从剪贴板粘贴到输入区) @return 粘贴次数 */
+    quint64 totalPasteActions() const { return m_totalPasteActions; }
+
+    /** @brief 获取累计历史记录选择次数 @return 历史选择次数 */
+    quint64 totalHistorySelections() const { return m_totalHistorySelections; }
+
+    /** @brief 重置所有转换器统计计数器(转换次数/复制次数/格式交换/输入变更/错误/格式切换/剪贴板/粘贴/历史选择) */
     void resetStatistics();
 
 private slots:
@@ -95,6 +101,15 @@ private slots:
      */
     void onHistorySelected();
 
+protected:
+    /**
+     * @brief 事件过滤器(拦截输入区粘贴操作用于统计)
+     * @param obj 监控对象
+     * @param event 事件
+     * @return 是否过滤
+     */
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
 private:
     QTextEdit *m_inputEdit;            ///< 输入区
     QComboBox *m_fromCombo;            ///< 源格式选择
@@ -115,6 +130,8 @@ private:
     quint64 m_totalErrors = 0;         ///< 累计转换错误次数
     quint64 m_totalFormatSwitches = 0; ///< 累计格式下拉框切换次数
     quint64 m_totalClipboardOps = 0;   ///< 累计剪贴板操作次数
+    quint64 m_totalPasteActions = 0;   ///< 累计粘贴操作次数(从剪贴板粘贴到输入区)
+    quint64 m_totalHistorySelections = 0; ///< 累计历史记录选择次数
 };
 
 #endif // CONVERTERPANEL_H

@@ -108,6 +108,7 @@ void TimestampPanel::convertByFormat(const QString &text, int formatIndex)
 /** @brief 填入当前时间戳 */
 void TimestampPanel::onNow()
 {
+    ++m_totalNowActions;
     qint64 now = TimestampAnalyzer::currentUnix(false);
     m_timestampEdit->setText(QString::number(now));
     onConvert();
@@ -137,6 +138,7 @@ void TimestampPanel::onHistorySelected()
     }
     const QString text = item->data(Qt::UserRole).toString();
     m_timestampEdit->setText(text);
+    ++m_totalHistoryRestores;
     onConvert();
 }
 
@@ -150,4 +152,6 @@ void TimestampPanel::resetTimestampPanelStatistics()
     m_totalTimestampParses = 0;
     m_totalFormatsSelected = 0;
     m_totalCopies = 0;
+    m_totalNowActions = 0;
+    m_totalHistoryRestores = 0;
 }

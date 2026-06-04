@@ -66,7 +66,11 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
 
     ++m_totalExports;
     QVector<TerminalLine> filtered = filterByTime(lines, from, to);
-    if (filtered.isEmpty()) return false;
+    if (filtered.isEmpty()) {
+        ++m_totalEmptySkips;
+        return false;
+    }
+    m_totalFilteredRows += static_cast<quint64>(lines.size() - filtered.size());
 
     // 开始计时
     m_exportTimer.start();

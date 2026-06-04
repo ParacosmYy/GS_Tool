@@ -25,6 +25,7 @@ JustFloatBridge::JustFloatBridge(QObject* parent)
     , m_channelCount(0)
     , m_channelsDetected(false)
 {
+    incBridgeInstanceCount();
 }
 
 // ============================================================
@@ -35,6 +36,8 @@ JustFloatBridge::JustFloatBridge(QObject* parent)
 void JustFloatBridge::feed(const QByteArray& data)
 {
     if (data.isEmpty()) return;
+
+    incBridgeParseCount();
 
     // 追加到缓冲区
     m_buffer.append(data);
@@ -142,8 +145,10 @@ int JustFloatBridge::tryParseFrame()
 
         // 通道数不匹配（后续帧的通道数必须与第一帧一致）
         if (detectedChannels != m_channelCount) {
-            // 通道数变化，可能是残缺帧，跳过
+            // 通道数变化，可能是残缺帧。跳过当前假尾部标记位置，从其后继续搜索
+            // 避免反复匹配同一位置导致CPU空转
             ++m_totalChannelMismatches;
+            i += kTailSize - 1;  // 跳过整个尾部标记
             continue;
         }
 

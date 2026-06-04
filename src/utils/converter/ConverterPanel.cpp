@@ -14,6 +14,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QKeyEvent>
 
 /**
  * @brief 构造函数，初始化转换面板布局
@@ -131,6 +132,23 @@ ConverterPanel::ConverterPanel(QWidget *parent)
             this, [this]() { ++m_totalFormatSwitches; });
     connect(m_toCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, [this]() { ++m_totalFormatSwitches; });
+
+    // 统计: 粘贴操作计数(事件过滤器拦截Ctrl+V)
+    m_inputEdit->installEventFilter(this);
+}
+
+/**
+ * @brief 事件过滤器 — 拦截输入区Ctrl+V粘贴操作用于统计
+ */
+bool ConverterPanel::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == m_inputEdit && event->type() == QEvent::KeyPress) {
+        auto *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->matches(QKeySequence::Paste)) {
+            ++m_totalPasteActions;
+        }
+    }
+    return QWidget::eventFilter(obj, event);
 }
 
 /**

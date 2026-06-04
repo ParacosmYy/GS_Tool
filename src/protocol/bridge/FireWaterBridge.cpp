@@ -20,6 +20,7 @@ FireWaterBridge::FireWaterBridge(QObject* parent)
     , m_firstLineIsData(false)
     , m_delimiter(QStringLiteral(","))
 {
+    incBridgeInstanceCount();
 }
 
 // ============================================================
@@ -30,6 +31,8 @@ FireWaterBridge::FireWaterBridge(QObject* parent)
 void FireWaterBridge::feed(const QByteArray& data)
 {
     if (data.isEmpty()) return;
+
+    incBridgeParseCount();
 
     // 追加到缓冲区
     m_buffer.append(data);

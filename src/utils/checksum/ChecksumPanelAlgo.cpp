@@ -150,7 +150,23 @@ quint64 ChecksumPanel::totalInputUpdates() const
 }
 
 /**
- * @brief 重置所有面板统计计数器(计算次数/复制次数/算法切换/剪贴板复制/输入更新)
+ * @brief 获取累计输入模式切换次数(十六进制/ASCII/文件)
+ */
+quint64 ChecksumPanel::totalFormatChanges() const
+{
+    return m_totalFormatChanges;
+}
+
+/**
+ * @brief 获取累计历史记录选择次数
+ */
+quint64 ChecksumPanel::totalHistorySelections() const
+{
+    return m_totalHistorySelections;
+}
+
+/**
+ * @brief 重置所有面板统计计数器(计算次数/复制次数/算法切换/剪贴板复制/输入更新/模式切换/历史选择)
  */
 void ChecksumPanel::resetPanelStatistics()
 {
@@ -159,4 +175,6 @@ void ChecksumPanel::resetPanelStatistics()
     m_totalAlgorithmChanges = 0;
     m_totalCopyToClipboard = 0;
     m_totalInputUpdates = 0;
+    m_totalFormatChanges = 0;
+    m_totalHistorySelections = 0;
 }

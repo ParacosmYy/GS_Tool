@@ -72,6 +72,34 @@ signals:
      * @param rawFrame 本帧的原始字节数据(用于ProtocolView的HEX显示)
      */
     void frameParsed(const QVariantMap& fields, const QByteArray& rawFrame);
+
+public:
+    // ---- 协议桥全局统计(static inline，跨所有实例共享) ----
+
+    /** @brief 获取累计桥接器实例创建总数 @return 实例计数 */
+    static quint64 totalBridgeInstances() { return s_totalBridgeInstances; }
+
+    /** @brief 获取累计桥接器解析调用总数(feed调用) @return 解析调用计数 */
+    static quint64 totalBridgeParses() { return s_totalBridgeParses; }
+
+    /** @brief 获取累计桥接器解析错误总数 @return 错误计数 */
+    static quint64 totalBridgeErrors() { return s_totalBridgeErrors; }
+
+    /** @brief 重置所有全局统计计数器(实例数/解析数/错误数) */
+    static void resetGlobalStats();
+
+protected:
+    /** @brief 子类构造时递增全局实例计数 */
+    void incBridgeInstanceCount() { ++s_totalBridgeInstances; }
+    /** @brief 子类feed()中递增解析计数 */
+    void incBridgeParseCount() { ++s_totalBridgeParses; }
+    /** @brief 子类解析错误时递增错误计数 */
+    void incBridgeErrorCount() { ++s_totalBridgeErrors; }
+
+private:
+    static inline quint64 s_totalBridgeInstances = 0; ///< 累计桥接器实例创建总数
+    static inline quint64 s_totalBridgeParses = 0;    ///< 累计桥接器解析调用总数
+    static inline quint64 s_totalBridgeErrors = 0;    ///< 累计桥接器解析错误总数
 };
 
 #endif // IPROTOCOLBRIDGE_H

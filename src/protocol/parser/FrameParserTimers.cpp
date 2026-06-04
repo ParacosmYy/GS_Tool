@@ -42,7 +42,16 @@ quint64 FrameParser::totalBytesParsed() const { return m_totalBytesParsed; }
 /** @brief 获取累计同步丢失次数(帧头匹配失败导致缓冲区清空) @return 同步丢失次数 */
 quint64 FrameParser::totalSyncLost() const { return m_totalSyncLost; }
 
-/** @brief 重置所有统计计数器(帧数/字节/校验错误/溢出/解析错误/已解析字节/同步丢失) */
+/** @brief 获取累计帧构建完成次数(completeFrame调用) @return 帧构建次数 */
+quint64 FrameParser::totalFramesBuilt() const { return m_totalFramesBuilt; }
+
+/** @brief 获取累计校验验证失败次数(CRC/校验和不匹配) @return 验证失败次数 */
+quint64 FrameParser::totalValidationErrors() const { return m_totalValidationErrors; }
+
+/** @brief 获取累计自动检测调用次数(为ProtocolBridgeManager预留) @return 自动检测调用次数 */
+quint64 FrameParser::totalAutoDetectCalls() const { return m_totalAutoDetectCalls; }
+
+/** @brief 重置所有统计计数器(帧数/字节/校验错误/溢出/解析错误/已解析字节/同步丢失/帧构建/验证错误/自动检测) */
 void FrameParser::resetStats()
 {
     m_frameCount = 0;
@@ -54,6 +63,9 @@ void FrameParser::resetStats()
     m_totalParseErrors = 0;
     m_totalBytesParsed = 0;
     m_totalSyncLost = 0;
+    m_totalFramesBuilt = 0;
+    m_totalValidationErrors = 0;
+    m_totalAutoDetectCalls = 0;
 }
 
 // ============================================================================
@@ -109,6 +121,7 @@ void FrameParser::completeFrame()
     QVariantMap fields = extractFields(m_buffer);
     m_frameCount++;
     m_totalFramesParsed++;
+    m_totalFramesBuilt++;
     m_totalBytesParsed += static_cast<quint64>(m_buffer.size());  // 累计已解析字节
     emit frameParsed(fields, m_buffer);
     reset();

@@ -70,6 +70,7 @@ void ModbusScanWidget::startScan(int from, int to) {
 /** @brief 停止正在进行的扫描，恢复UI状态并发射scanCompleted信号 */
 void ModbusScanWidget::stopScan() {
     m_scanning = false;
+    ++m_totalScansCompleted;
     updateScanButtonState(false);
 
     // 恢复范围输入
@@ -94,6 +95,7 @@ void ModbusScanWidget::scanNext() {
 
     m_progressBar->setValue(m_currentAddr - m_scanFrom);
     emit scanProgress(m_currentAddr);
+    ++m_totalAddressesProbed;
 
     // 根据用户选择发送对应功能码探测
     if (m_master) {

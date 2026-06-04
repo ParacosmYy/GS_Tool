@@ -65,6 +65,12 @@ public:
     /** @brief 获取累计异常响应次数 */
     quint64 totalErrors() const;
 
+    /** @brief 获取累计扫描完成次数(正常结束或手动停止) @return 扫描完成次数 */
+    quint64 totalScansCompleted() const;
+
+    /** @brief 获取累计探测地址总数(每次发送探测请求递增) @return 探测地址数 */
+    quint64 totalAddressesProbed() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -121,6 +127,8 @@ private:
     quint64 m_totalSuccessfulProbes = 0; ///< 累计成功探测次数
     quint64 m_totalTimeouts        = 0; ///< 累计超时次数
     quint64 m_totalErrors          = 0; ///< 累计异常响应次数
+    quint64 m_totalScansCompleted  = 0; ///< 累计扫描完成次数(正常结束或手动停止)
+    quint64 m_totalAddressesProbed = 0; ///< 累计探测地址总数(每次发送探测请求递增)
 };
 
 #endif // MODBUS_SCAN_WIDGET_H

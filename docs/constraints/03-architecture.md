@@ -23,7 +23,7 @@
 
 ### 2.1 分层定义
 
-> 下面的分层是本项目的唯一架构口径。`shared/` 不是“未来规划项”，而是正式的公共基础层；当前仓库仍在使用 `core/theme/Constants.h` 作为兼容伞头，但它只允许承接旧入口，不允许继续扩张。
+> 下面的分层是本项目的唯一架构口径。`shared/` 是正式的公共基础层；当前仓库仍在使用 `core/theme/Constants.h` 作为兼容伞头，但它只允许承接旧入口，不允许继续扩张。
 
 | 层级 | 目录 | 职责边界 | 允许依赖 |
 |------|------|----------|---------|
@@ -61,6 +61,7 @@ L0 interfaces/  →  无
 |------|--------------|------|
 | 共享常量与枚举 | `src/shared/` | 新增跨模块常量、枚举、轻量值类型优先落这里 |
 | 旧常量伞头 | `src/core/theme/Constants.h` | 仅兼容旧 include，不再新增域定义 |
+| 未来功能骨架 | `src/features/` | 仅作为未来迁移的归属说明和骨架入口，不承载现有业务实现 |
 | 应用协调入口 | `src/core/mainwindow/MainWindow.*` | 顶层窗口组装与生命周期协调 |
 | 面板编排 | `src/core/panels/PanelManager.*` | 面板创建、注册、包装、映射、切换统计 |
 | 基础 UI 组件 | `src/core/widgets/` | BasePanel、EmptyStateWidget、LoadingSpinner 等复用壳层 |
@@ -73,6 +74,38 @@ L0 interfaces/  →  无
 - 新功能如果属于外设接入、协议、终端、图表、自动化，优先归回各自模块，不要再塞进 `core/`。
 - `PanelManager` 和 `MainWindow` 只能做编排，不能回流业务计算、解析、IO、缓存和协议分发逻辑。
 - 任何新公共能力先判断是否属于 `shared/`，只有真正需要运行时行为的内容才进入 `core/`。
+- 历史分叉目录只允许冻结，不允许再向外扩张；新增实现优先进入 canonical 路径，不要再造平行目录。
+
+### 2.5-A 迁移骨架
+
+> 更细的迁移说明与目录入口见 `docs/architecture/README.md`。
+
+| 区域 | 目标口径 | 说明 |
+|------|----------|------|
+| `src/shared/` | 公共基础层 | 常量、枚举、轻量值对象、无状态 helper |
+| `src/interfaces/` | 契约层 | 纯虚接口、回调协议、跨模块抽象 |
+| `src/core/` | 应用协调层 | 顶层装配、导航、主题、基础 UI、会话 |
+| `src/features/` | 未来功能承接层 | 仅写归属说明和迁移骨架，不直接堆实现 |
+| `src/connection/` 等现有业务模块 | 业务模块层 | 继续按领域收敛，不再回流到 core |
+
+### 2.5-B 冻结目录
+
+以下目录只允许兼容维护，不允许继续复制新分支：
+
+- `animation2/`
+- `widgets2/`
+- `loader2/`
+- `fonts/`
+- `icons/`
+- `responsive/`
+- `shortcut/` 与 `managers/` 的并行能力
+- `font/` 与 `fonts/`
+- `icon/` 与 `icons/`
+
+冻结规则:
+- 冻结目录可以保留历史兼容和引用转发。
+- 冻结目录不接受新功能实现。
+- 新功能只能进入 canonical 路径或新定义的 `src/features/` 迁移入口。
 
 ### 2.6 中心化风险与整改阶段
 

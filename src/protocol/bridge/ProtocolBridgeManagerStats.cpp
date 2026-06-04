@@ -10,6 +10,19 @@
  */
 
 #include "protocol/bridge/ProtocolBridgeManager.h"
+#include "protocol/bridge/IProtocolBridge.h"
+
+// ============================================================================
+// IProtocolBridge 全局统计
+// ============================================================================
+
+/** @brief 重置IProtocolBridge全局统计计数器(实例数/解析数/错误数) */
+void IProtocolBridge::resetGlobalStats()
+{
+    s_totalBridgeInstances = 0;
+    s_totalBridgeParses = 0;
+    s_totalBridgeErrors = 0;
+}
 
 // ============================================================================
 // 管理器级统计接口

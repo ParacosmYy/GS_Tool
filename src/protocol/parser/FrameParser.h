@@ -36,6 +36,9 @@ public:
     quint64 totalParseErrors() const;        ///< 累计解析错误次数
     quint64 totalBytesParsed() const;        ///< 成功解析帧中的有效数据字节总数
     quint64 totalSyncLost() const;           ///< 累计同步丢失次数(帧头匹配失败导致缓冲区清空)
+    quint64 totalFramesBuilt() const;        ///< 累计帧构建完成次数(completeFrame调用)
+    quint64 totalValidationErrors() const;   ///< 累计校验验证失败次数(CRC/校验和不匹配)
+    quint64 totalAutoDetectCalls() const;    ///< 累计自动检测调用次数(为ProtocolBridgeManager预留)
     void resetStats();                       ///< 重置所有统计计数器
 
 signals:
@@ -84,6 +87,9 @@ private:
     quint64 m_totalParseErrors = 0;         ///< 累计解析错误次数(含格式/长度/帧尾/超时)
     quint64 m_totalBytesParsed = 0;         ///< 成功解析帧中的有效数据字节总数
     quint64 m_totalSyncLost = 0;            ///< 累计同步丢失次数(帧头匹配失败导致缓冲区清空)
+    quint64 m_totalFramesBuilt = 0;         ///< 累计帧构建完成次数(completeFrame调用)
+    quint64 m_totalValidationErrors = 0;    ///< 累计校验验证失败次数(CRC/校验和不匹配)
+    quint64 m_totalAutoDetectCalls = 0;     ///< 累计自动检测调用次数(为ProtocolBridgeManager预留)
 
     int m_maxFrameLength = kDefaultMaxFrameLength; ///< 帧长度上限（默认1024字节）
     int m_frameTimeoutMs = 500;             ///< 帧超时阈值（毫秒），0=禁用
