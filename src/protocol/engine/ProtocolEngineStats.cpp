@@ -44,6 +44,24 @@ quint64 ProtocolEngine::totalValidations() const
     return m_totalValidations;
 }
 
+/** @brief 获取校验验证通过次数 @return 通过次数 */
+quint64 ProtocolEngine::totalValidationPasses() const
+{
+    return m_totalValidationPasses;
+}
+
+/** @brief 获取校验验证失败次数 @return 失败次数 */
+quint64 ProtocolEngine::totalValidationFailures() const
+{
+    return m_totalValidationFailures;
+}
+
+/** @brief 获取CRC校验执行总次数(含通过和失败) @return CRC校验总次数 */
+quint64 ProtocolEngine::totalCrcChecks() const
+{
+    return m_totalCrcChecks;
+}
+
 /** @brief 获取解析错误总数(64位，含校验失败/格式错/溢出) @return 错误总数 */
 quint64 ProtocolEngine::totalParseErrors() const
 {
@@ -110,6 +128,9 @@ void ProtocolEngine::resetParseStatistics()
     m_totalBytesParsed = 0;
     m_crcPassCount = 0;
     m_crcFailCount = 0;
+    m_totalValidationPasses = 0;
+    m_totalValidationFailures = 0;
+    m_totalCrcChecks = 0;
 }
 
 /** @brief 重置所有引擎统计计数器(等同于resetParseStatistics) */

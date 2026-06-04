@@ -32,12 +32,14 @@ DataAggregator::~DataAggregator()
 
 /** @brief 添加数据源并指定聚合函数和窗口大小 @param name 数据源名称 @param func 聚合函数类型 @param window 滑动窗口大小 */
 void DataAggregator::addSource(const QString &name, AggregateFunc func, int window) {
+    ++m_totalSourceAdds;
     m_sources[name] = {func, window, {}, 0.0};
     emit sourceAdded(name);
 }
 
 /** @brief 移除指定名称的数据源(滑动窗口+时间窗口一并移除) @param name 数据源名称 */
 void DataAggregator::removeSource(const QString &name) {
+    ++m_totalSourceRemoves;
     m_sources.remove(name);
     m_timeWindows.remove(name);
     emit sourceRemoved(name);
@@ -45,6 +47,7 @@ void DataAggregator::removeSource(const QString &name) {
 
 /** @brief 向指定数据源输入一个新值，同时触发滑动窗口和时间窗口聚合计算 @param source 数据源名称 @param value 新数据值 */
 void DataAggregator::feedValue(const QString &source, double value) {
+    ++m_totalValuesFed;
     // 滑动窗口聚合
     auto it = m_sources.find(source);
     if (it == m_sources.end()) return;
@@ -230,6 +233,7 @@ void DataAggregator::processTimeWindow(const QString &source, double value, qint
                 it->history.removeFirst();
             }
             emit windowClosed(source, completed);
+            ++m_totalWindowsCompleted;
         }
 
         // 开启新窗口
@@ -270,5 +274,19 @@ qint64 DataAggregator::alignToWindow(qint64 timestampMs, int intervalSec) {
 /** @brief 定时触发滚动聚合，发射所有数据源的最新聚合结果 */
 void DataAggregator::onRollingTimeout() {
     if (m_sources.isEmpty()) return;
+    ++m_totalRollingEmits;
     emit rollingAggregation(allResults());
+}
+
+// ============================================================================
+// 统计接口
+// ============================================================================
+
+/** @brief 重置聚合器统计计数器 */
+void DataAggregator::resetAggregatorStatistics() {
+    m_totalValuesFed = 0;
+    m_totalWindowsCompleted = 0;
+    m_totalRollingEmits = 0;
+    m_totalSourceAdds = 0;
+    m_totalSourceRemoves = 0;
 }

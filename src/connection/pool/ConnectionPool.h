@@ -75,6 +75,21 @@ public:
     /** @brief 获取连接池满拒绝次数 */
     quint64 totalPoolFullEvents() const { return m_totalPoolFullEvents; }
 
+    /** @brief 获取累计借出尝试次数 @return 借出尝试总次数 */
+    quint64 totalBorrowAttempts() const { return m_totalBorrowAttempts; }
+
+    /** @brief 获取累计借出成功次数 @return 借出成功总次数 */
+    quint64 totalBorrowSuccesses() const { return m_totalBorrowSuccesses; }
+
+    /** @brief 获取累计归还连接次数 @return 归还总次数 */
+    quint64 totalReturnCount() const { return m_totalReturnCount; }
+
+    /** @brief 获取累计淘汰连接次数 @return 淘汰总次数 */
+    quint64 totalEvictions() const { return m_totalEvictions; }
+
+    /** @brief 获取累计借出等待超时次数 @return 超时总次数 */
+    quint64 totalWaitTimeouts() const { return m_totalWaitTimeouts; }
+
     /** @brief 重置所有统计计数器 */
     void resetPoolStatistics();
 
@@ -104,4 +119,9 @@ private:
     quint64 m_totalReconnectAttempts = 0;///< 累计自动重连触发次数
     quint64 m_totalActivityUpdates = 0;  ///< 累计活动刷新次数
     quint64 m_totalPoolFullEvents = 0;   ///< 连接池满拒绝次数
+    quint64 m_totalBorrowAttempts = 0;   ///< 累计借出尝试次数
+    quint64 m_totalBorrowSuccesses = 0;  ///< 累计借出成功次数
+    quint64 m_totalReturnCount = 0;      ///< 累计归还连接次数
+    quint64 m_totalEvictions = 0;        ///< 累计淘汰连接次数
+    quint64 m_totalWaitTimeouts = 0;     ///< 累计借出等待超时次数
 };

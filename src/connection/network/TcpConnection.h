@@ -115,6 +115,15 @@ public:
     /** @brief 获取累计重连成功次数(重连后onSocketConnected回调触发时计数) @return 重连成功总次数 */
     quint64 totalReconnects() const { return m_totalReconnects; }
 
+    /** @brief 获取累计DNS查询次数(每次connectToHost触发一次) @return DNS查询总次数 */
+    quint64 totalDnsLookups() const { return m_totalDnsLookups; }
+
+    /** @brief 获取累计DNS解析失败次数(HostNotFoundError时计数) @return DNS错误总次数 */
+    quint64 totalDnsErrors() const { return m_totalDnsErrors; }
+
+    /** @brief 获取累计KeepAlive探测次数(连接成功后设置KeepAlive时计数) @return KeepAlive探测总次数 */
+    quint64 totalKeepAliveProbes() const { return m_totalKeepAliveProbes; }
+
     /** @brief 获取连接建立平均延迟(毫秒，从发起connect到connected回调) @return 平均延迟，无数据时返回0 */
     double averageLatencyMs() const;
 
@@ -185,6 +194,9 @@ private:
     quint64 m_totalWrites = 0;           ///< 累计write()调用次数
     quint64 m_totalReconnectAttempts = 0;///< 累计重连尝试次数
     quint64 m_totalReconnects = 0;       ///< 累计重连成功次数
+    quint64 m_totalDnsLookups = 0;       ///< 累计DNS查询次数
+    quint64 m_totalDnsErrors = 0;        ///< 累计DNS解析失败次数
+    quint64 m_totalKeepAliveProbes = 0;  ///< 累计KeepAlive探测次数
 };
 
 #endif // TCPCONNECTION_H

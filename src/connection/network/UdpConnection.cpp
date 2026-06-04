@@ -120,9 +120,13 @@ qint64 UdpConnection::write(const QByteArray& data)
     if (written > 0) {
         ++m_totalDatagramsSent;
         m_totalBytesSent += static_cast<quint64>(written);
+        if (m_broadcast) {
+            ++m_totalBroadcastsSent;  // 广播数据报发送计数
+        }
         emit bytesWritten(written);
     } else if (written < 0) {
         ++m_errorCount;
+        ++m_totalDatagramErrors;  // 数据报发送失败计数
         emit errorOccurred(tr("UDP发送失败: %1").arg(m_socket->errorString()));
     }
     return written;
@@ -140,7 +144,10 @@ void UdpConnection::onReadyRead()
         quint16 senderPort;
         qint64 bytesRead = m_socket->readDatagram(buffer.data(), buffer.size(),
                                                    &senderAddr, &senderPort);
-        if (bytesRead < 0) continue;
+        if (bytesRead < 0) {
+            ++m_totalDatagramErrors;  // 数据报接收失败计数
+            continue;
+        }
         buffer.resize(static_cast<int>(bytesRead));
         ++m_totalDatagramsReceived;
         m_totalBytesReceived += static_cast<quint64>(bytesRead);
@@ -224,7 +231,7 @@ quint64 UdpConnection::totalBytesReceived() const { return m_totalBytesReceived;
 /** @brief 获取错误计数 @return 累计错误次数 */
 quint64 UdpConnection::errorCount() const { return m_errorCount; }
 
-/** @brief 重置所有统计数据(数据报/字节/错误计数)为零 */
+/** @brief 重置所有统计数据(数据报/字节/错误/广播计数)为零 */
 void UdpConnection::resetStats()
 {
     m_totalDatagramsSent = 0;
@@ -232,5 +239,7 @@ void UdpConnection::resetStats()
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
     m_errorCount = 0;
+    m_totalDatagramErrors = 0;
+    m_totalBroadcastsSent = 0;
 }
 

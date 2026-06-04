@@ -114,6 +114,19 @@ signals:
     /** @brief 系统剪贴板内容变更时发射 */
     void clipboardChanged();
 
+    /** @brief 获取累计推送文本次数 @return 计数 */
+    quint64 totalTextPushes() const;
+    /** @brief 获取累计推送二进制次数 @return 计数 */
+    quint64 totalBinaryPushes() const;
+    /** @brief 获取累计系统剪贴板写入次数 @return 计数 */
+    quint64 totalSystemWrites() const;
+    /** @brief 获取累计系统剪贴板变更事件次数 @return 计数 */
+    quint64 totalClipboardChanges() const;
+    /** @brief 获取累计固定条目次数 @return 计数 */
+    quint64 totalPins() const;
+    /** @brief 重置所有剪贴板管理器统计计数器 */
+    void resetClipboardStatistics();
+
 private:
     /** @brief 系统剪贴板变更回调 */
     void onClipboardChanged();
@@ -121,4 +134,10 @@ private:
     QList<ClipEntry> m_history;     ///< 历史条目列表
     int m_maxHistory = 50;          ///< 最大历史条目数
     QClipboard *m_clipboard = nullptr; ///< 系统剪贴板实例
+
+    quint64 m_totalTextPushes = 0;        ///< 累计推送文本次数
+    quint64 m_totalBinaryPushes = 0;      ///< 累计推送二进制次数
+    quint64 m_totalSystemWrites = 0;      ///< 累计系统剪贴板写入次数
+    quint64 m_totalClipboardChanges = 0;  ///< 累计系统剪贴板变更事件次数
+    quint64 m_totalPins = 0;              ///< 累计固定条目次数
 };

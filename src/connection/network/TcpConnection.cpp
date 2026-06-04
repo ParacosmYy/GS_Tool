@@ -94,6 +94,7 @@ bool TcpConnection::open()
 
         updateState(ConnectionState::Connecting);
         m_connectStartTime.start();  // 记录连接发起时刻，用于延迟计算
+        ++m_totalDnsLookups;  // 每次connectToHost触发一次DNS查询
         m_socket->connectToHost(m_host, m_port);
         // 启用TCP KeepAlive，长连接场景下可及时检测对端断开
         m_socket->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
@@ -220,6 +221,8 @@ void TcpConnection::onSocketConnected()
         m_isReconnectAttempt = false;
     }
 
+    ++m_totalKeepAliveProbes;  // 连接成功后KeepAlive生效
+
     updateState(ConnectionState::Connected);
 }
 
@@ -247,6 +250,9 @@ void TcpConnection::onSocketReadyRead()
 void TcpConnection::onSocketError(QAbstractSocket::SocketError error)
 {
     ++m_errorCount;  // 网络错误计数
+    if (error == QAbstractSocket::HostNotFoundError) {
+        ++m_totalDnsErrors;  // DNS解析失败计数
+    }
     QTcpSocket* sock = qobject_cast<QTcpSocket*>(sender());
     if (!sock) {
         emit errorOccurred(translateNetworkError(error, QString()));
@@ -344,46 +350,5 @@ void TcpConnection::updateState(ConnectionState newState)
     }
 }
 
-// ---- 统计计数器实现 ----
-
-/** @brief 获取累计连接成功次数 @return 连接成功总次数 */
-quint64 TcpConnection::totalConnections() const { return m_totalConnections; }
-
-/** @brief 获取累计断开连接次数 @return 断开连接总次数 */
-quint64 TcpConnection::totalDisconnections() const { return m_totalDisconnections; }
-
-/** @brief 获取累计发送字节数 @return 发送字节总数 */
-quint64 TcpConnection::totalBytesSent() const { return m_totalBytesSent; }
-
-/** @brief 获取累计接收字节数 @return 接收字节总数 */
-quint64 TcpConnection::totalBytesReceived() const { return m_totalBytesReceived; }
-
-/** @brief 获取累计错误次数 @return 错误总次数 */
-quint64 TcpConnection::errorCount() const { return m_errorCount; }
-
-/** @brief 重置所有统计计数器(连接/断开/字节/错误/打开尝试/写入/重连/延迟)为零 */
-void TcpConnection::resetStats()
-{
-    m_totalConnections = 0;
-    m_totalDisconnections = 0;
-    m_totalBytesSent = 0;
-    m_totalBytesReceived = 0;
-    m_errorCount = 0;
-    m_totalOpenAttempts = 0;
-    m_totalWrites = 0;
-    m_totalReconnectAttempts = 0;
-    m_totalReconnects = 0;
-    m_lastLatencyMs = 0;
-    m_maxLatencyMs = 0;
-    m_latencySampleCount = 0;
-    m_latencySumMs = 0;
-    m_isReconnectAttempt = false;
-}
-
-/** @brief 获取连接建立平均延迟(毫秒) @return 平均延迟，无采样数据时返回0 */
-double TcpConnection::averageLatencyMs() const
-{
-    if (m_latencySampleCount == 0) { return 0.0; }
-    return static_cast<double>(m_latencySumMs) / static_cast<double>(m_latencySampleCount);
-}
+// 统计计数器 getter/resetStats/averageLatencyMs 实现已拆分至 TcpConnectionStats.cpp
 

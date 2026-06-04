@@ -144,6 +144,9 @@ quint64 PortWatcher::totalPortScans() const { return m_totalPortScans; }
 /** @brief 获取累计热插拔事件次数 */
 quint64 PortWatcher::totalHotplugEvents() const { return m_totalHotplugEvents; }
 
+/** @brief 获取累计端口扫描错误次数 @return 扫描错误总次数 */
+quint64 PortWatcher::totalScanErrors() const { return m_totalScanErrors; }
+
 /** @brief 获取最近一次端口变更距现在的毫秒数 @return 毫秒数，无事件返回-1 */
 qint64 PortWatcher::msSinceLastChange() const
 {
@@ -201,6 +204,7 @@ void PortWatcher::resetWatcherStatistics()
     m_totalChanges = 0;
     m_totalPortScans = 0;
     m_totalHotplugEvents = 0;
+    m_totalScanErrors = 0;
     m_eventLog.clear();
     m_hasLastChange = false;
 }
@@ -326,10 +330,14 @@ void PortWatcher::onTimeout()
 QMap<QString, PortDeviceInfo> PortWatcher::queryAvailableDevices()
 {
     QMap<QString, PortDeviceInfo> devices;
-    const auto ports = QSerialPortInfo::availablePorts();
-    for (const QSerialPortInfo& info : ports) {
-        PortDeviceInfo dev = fromQtInfo(info);
-        devices[dev.portName] = dev;
+    try {
+        const auto ports = QSerialPortInfo::availablePorts();
+        for (const QSerialPortInfo& info : ports) {
+            PortDeviceInfo dev = fromQtInfo(info);
+            devices[dev.portName] = dev;
+        }
+    } catch (...) {
+        ++m_totalScanErrors;
     }
     return devices;
 }

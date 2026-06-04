@@ -87,6 +87,12 @@ public:
     quint64 totalBytesProcessed() const;
     /** @brief 获取校验验证执行总次数(含通过和失败) @return 验证总次数 */
     quint64 totalValidations() const;
+    /** @brief 获取校验验证通过次数 @return 通过次数 */
+    quint64 totalValidationPasses() const;
+    /** @brief 获取校验验证失败次数 @return 失败次数 */
+    quint64 totalValidationFailures() const;
+    /** @brief 获取CRC校验执行总次数(含通过和失败) @return CRC校验总次数 */
+    quint64 totalCrcChecks() const;
     /** @brief 获取解析错误总数(64位) @return 错误总数 */
     quint64 totalParseErrors() const;
     /** @brief 获取最后一次成功解析的时间戳 @return 毫秒级时间戳，未解析过返回0 */
@@ -130,6 +136,9 @@ private:
     quint64 m_framesRejected = 0;           ///< 因校验/验证失败被拒绝的帧计数
     quint64 m_totalBytesProcessed = 0;      ///< 引擎累计处理的总字节数
     quint64 m_totalValidations = 0;         ///< 校验验证执行总次数
+    quint64 m_totalValidationPasses = 0;    ///< 校验验证通过次数
+    quint64 m_totalValidationFailures = 0;  ///< 校验验证失败次数
+    quint64 m_totalCrcChecks = 0;           ///< CRC校验执行总次数
     quint64 m_totalParseErrors = 0;         ///< 解析错误总数(64位)
     qint64 m_lastParseTimestamp = 0;        ///< 最后一次成功解析的时间戳(ms)
     quint64 m_totalCrcErrors = 0;           ///< CRC校验错误次数

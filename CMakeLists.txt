@@ -83,6 +83,7 @@ set(SOURCES
     src/connection/serial_port/SerialConnection.cpp
     src/connection/serial_port/SerialConnectionError.cpp
     src/connection/network/TcpConnection.cpp
+    src/connection/network/TcpConnectionStats.cpp
     src/connection/network/UdpConnection.cpp
     src/terminal/widget/TerminalWidget.cpp
     src/terminal/widget/TerminalWidgetSlots.cpp

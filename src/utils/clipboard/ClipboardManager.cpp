@@ -20,6 +20,7 @@ ClipboardManager::~ClipboardManager() = default;
  * @param text 要记录的文本内容
  */
 void ClipboardManager::pushText(const QString &text) {
+    ++m_totalTextPushes;
     ClipEntry e; e.text = text; e.timestamp = QDateTime::currentMSecsSinceEpoch(); e.format = "text";
     m_history.prepend(e);
     if (m_history.size() > m_maxHistory) m_history.removeLast();
@@ -32,6 +33,7 @@ void ClipboardManager::pushText(const QString &text) {
  * @param fmt 数据格式标识
  */
 void ClipboardManager::pushBinary(const QByteArray &data, const QString &fmt) {
+    ++m_totalBinaryPushes;
     ClipEntry e; e.binary = data; e.timestamp = QDateTime::currentMSecsSinceEpoch(); e.format = fmt;
     m_history.prepend(e);
     if (m_history.size() > m_maxHistory) m_history.removeLast();
@@ -43,6 +45,7 @@ void ClipboardManager::pushBinary(const QByteArray &data, const QString &fmt) {
  * @param text 要写入的文本内容
  */
 void ClipboardManager::pushToSystemClipboard(const QString &text) {
+    ++m_totalSystemWrites;
     if (m_clipboard) m_clipboard->setText(text);
 }
 
@@ -82,7 +85,7 @@ void ClipboardManager::clearHistory() { m_history.clear(); }
  * @brief 将指定索引的记录标记为已固定
  * @param i 条目索引
  */
-void ClipboardManager::pinEntry(int i) { if (i >= 0 && i < m_history.size()) m_history[i].format = "pinned"; }
+void ClipboardManager::pinEntry(int i) { if (i >= 0 && i < m_history.size()) { m_history[i].format = "pinned"; ++m_totalPins; } }
 
 /**
  * @brief 将指定索引的记录取消固定标记
@@ -91,4 +94,28 @@ void ClipboardManager::pinEntry(int i) { if (i >= 0 && i < m_history.size()) m_h
 void ClipboardManager::unpinEntry(int i) { if (i >= 0 && i < m_history.size()) m_history[i].format = "text"; }
 
 /** @brief 系统剪贴板内容变化时的内部槽函数，转发clipboardChanged信号 */
-void ClipboardManager::onClipboardChanged() { emit clipboardChanged(); }
+void ClipboardManager::onClipboardChanged() { ++m_totalClipboardChanges; emit clipboardChanged(); }
+
+// ============================================================================
+// 统计接口
+// ============================================================================
+
+/** @brief 获取累计推送文本次数 @return 计数 */
+quint64 ClipboardManager::totalTextPushes() const { return m_totalTextPushes; }
+/** @brief 获取累计推送二进制次数 @return 计数 */
+quint64 ClipboardManager::totalBinaryPushes() const { return m_totalBinaryPushes; }
+/** @brief 获取累计系统剪贴板写入次数 @return 计数 */
+quint64 ClipboardManager::totalSystemWrites() const { return m_totalSystemWrites; }
+/** @brief 获取累计系统剪贴板变更事件次数 @return 计数 */
+quint64 ClipboardManager::totalClipboardChanges() const { return m_totalClipboardChanges; }
+/** @brief 获取累计固定条目次数 @return 计数 */
+quint64 ClipboardManager::totalPins() const { return m_totalPins; }
+
+/** @brief 重置所有剪贴板管理器统计计数器 */
+void ClipboardManager::resetClipboardStatistics() {
+    m_totalTextPushes = 0;
+    m_totalBinaryPushes = 0;
+    m_totalSystemWrites = 0;
+    m_totalClipboardChanges = 0;
+    m_totalPins = 0;
+}

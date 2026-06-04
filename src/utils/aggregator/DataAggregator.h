@@ -219,4 +219,25 @@ private:
     int m_maxHistoryWindows = 100;                  ///< 历史窗口最大保留数量
     QTimer m_rollingTimer;                          ///< 滚动聚合定时器
     bool m_rollingEnabled = false;                  ///< 滚动聚合是否启用
+
+    // ---- 统计计数器 ----
+    quint64 m_totalValuesFed = 0;          ///< 累计输入值总数
+    quint64 m_totalWindowsCompleted = 0;   ///< 累计完成的时间窗口数
+    quint64 m_totalRollingEmits = 0;       ///< 累计滚动聚合发射次数
+    quint64 m_totalSourceAdds = 0;         ///< 累计数据源添加次数
+    quint64 m_totalSourceRemoves = 0;      ///< 累计数据源移除次数
+
+public:
+    /** @brief 获取累计输入值总数 @return 计数 */
+    quint64 totalValuesFed() const { return m_totalValuesFed; }
+    /** @brief 获取累计完成的时间窗口数 @return 计数 */
+    quint64 totalWindowsCompleted() const { return m_totalWindowsCompleted; }
+    /** @brief 获取累计滚动聚合发射次数 @return 计数 */
+    quint64 totalRollingEmits() const { return m_totalRollingEmits; }
+    /** @brief 获取累计数据源添加次数 @return 计数 */
+    quint64 totalSourceAdds() const { return m_totalSourceAdds; }
+    /** @brief 获取累计数据源移除次数 @return 计数 */
+    quint64 totalSourceRemoves() const { return m_totalSourceRemoves; }
+    /** @brief 重置聚合器统计计数器 */
+    void resetAggregatorStatistics();
 };

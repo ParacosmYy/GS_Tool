@@ -51,6 +51,7 @@
 | 203 | SerialDetectorChip/TerminalSearchBuilders+WebSocket/Histogram/Scatter/Chart linter增强 | 芯片数据库和搜索构建器独立文件+帧统计/延迟追踪 |
 | 204 | HistogramWidgetStats/ChartWidgetExport拆分+BLE/TCP/Recording增强 | 统计计算独立文件+TCP Nagle/KeepAlive+BLE通知缓存 |
 | 205 | ModbusScanWidgetStats/ProtobufDecoderEncoding拆分+BLE/Recording/Settings统计增强 | Modbus扫描统计独立+Protobuf编解码独立+BLE连接/扫描周期+录制停止/标记+设置变更追踪 |
+| 206 | ClipboardManager/DataAggregator/ConnectionPool/TcpConnection/UdpConnection/PortWatcher统计增强 | 剪贴板推送/写入/固定计数+聚合器输入/窗口/滚动计数+连接池借还/驱逐+TCP DNS/KeepAlive+UDP广播/错误+端口扫描错误 |
 
 ---
 

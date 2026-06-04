@@ -42,6 +42,9 @@ ProtocolEngine::ProtocolEngine(QObject *parent)
     , m_totalBytesParsed(0)
     , m_crcPassCount(0)
     , m_crcFailCount(0)
+    , m_totalValidationPasses(0)
+    , m_totalValidationFailures(0)
+    , m_totalCrcChecks(0)
 {
 }
 
@@ -99,6 +102,9 @@ void ProtocolEngine::reset()
     m_totalBytesParsed = 0;
     m_crcPassCount = 0;
     m_crcFailCount = 0;
+    m_totalValidationPasses = 0;
+    m_totalValidationFailures = 0;
+    m_totalCrcChecks = 0;
 }
 
 /** @brief 获取当前使用的协议定义 @return 协议定义指针，未设置时为 nullptr */
@@ -172,6 +178,8 @@ bool ProtocolEngine::tryParseOneFrame()
         if (!checksumValid) {
             ++m_crcFailCount;
             ++m_totalCrcErrors;
+            ++m_totalValidationFailures;
+            ++m_totalCrcChecks;
             QString algoName = checksumAlgorithmToString(effectiveAlgo);
             emit parseError(tr("帧校验失败(%1): 期望=0x%2, 实际=0x%3")
                                 .arg(algoName)
@@ -184,6 +192,8 @@ bool ProtocolEngine::tryParseOneFrame()
             return true;
         }
         ++m_crcPassCount;
+        ++m_totalValidationPasses;
+        ++m_totalCrcChecks;
     }
 
     /* ---- 步骤7：解析字段 ---- */

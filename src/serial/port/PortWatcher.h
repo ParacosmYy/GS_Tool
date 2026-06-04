@@ -145,6 +145,8 @@ public:
     quint64 totalPortScans() const;
     /** @brief 获取累计热插拔事件次数 */
     quint64 totalHotplugEvents() const;
+    /** @brief 获取累计端口扫描错误次数 @return 扫描错误总次数 */
+    quint64 totalScanErrors() const;
     /** @brief 获取最近一次端口变更距现在的毫秒数，无事件返回-1 */
     qint64 msSinceLastChange() const;
     /** @brief 获取当前在线设备数 */
@@ -204,6 +206,7 @@ private:
     quint64 m_totalChanges = 0;     ///< 累计检测到变化的次数
     quint64 m_totalPortScans = 0;   ///< 累计端口扫描次数
     quint64 m_totalHotplugEvents = 0; ///< 累计热插拔事件次数
+    quint64 m_totalScanErrors = 0;   ///< 累计端口扫描错误次数
 
     // ---- 事件日志 ----
     QVector<PortEventRecord> m_eventLog; ///< 事件日志(按时间顺序，最新在末尾)
