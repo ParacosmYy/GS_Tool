@@ -94,6 +94,9 @@ set(SOURCES
     src/core/background/BackgroundWidget.cpp
     src/core/background/BackgroundWidgetPaint.cpp
     src/core/background/BackgroundSettingsPopup.cpp
+    src/core/health/ConnectionHealthMonitor.cpp
+    src/core/health/ConnectionHealthMonitorCalc.cpp
+    src/utils/logviewer/DataLogViewer.cpp
     src/core/widgets/BasePanel.cpp
     src/core/widgets/BasePanelConfig.cpp
     src/core/widgets/BasePanelStates.cpp
@@ -591,10 +594,22 @@ set(SOURCES
     src/utils/packet/PacketBuilderPanel.cpp
     src/utils/packet/PacketBuilderPanelFields.cpp
 
+    # ── 数据检查器 ──
+    src/utils/data_inspector/DataInspectorWidget.cpp
+    src/utils/data_inspector/DataInspectorWidgetStats.cpp
+
     # ── F26: 设备注册表 ──
     src/core/device/DeviceRegistry.cpp
     src/core/device/DeviceProfilePanel.cpp
     src/core/device/DeviceProfilePanelActions.cpp
+
+    # ── 信号发生器 ──
+    src/utils/signal_gen/SignalGeneratorWidget.cpp
+    src/utils/signal_gen/SignalGeneratorWidgetStats.cpp
+
+    # ── F27: 数据字节级对比 ──
+    src/utils/compare/DataCompareWidget.cpp
+    src/utils/compare/DataCompareWidgetStats.cpp
 )
 
 set(HEADERS
@@ -865,10 +880,16 @@ set(HEADERS
     src/utils/packet/PacketBuilder.h
     src/utils/packet/PacketBuilderPanel.h
 
+    # ── 数据检查器 ──
+    src/utils/data_inspector/DataInspectorWidget.h
+
     # ── F26: 设备注册表 ──
     src/core/device/DeviceProfile.h
     src/core/device/DeviceRegistry.h
     src/core/device/DeviceProfilePanel.h
+
+    # ── 信号发生器 ──
+    src/utils/signal_gen/SignalGeneratorWidget.h
 )
 
 set(RESOURCES
