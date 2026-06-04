@@ -1,0 +1,3 @@
+set(__QT_DEPLOY_TARGET_EmbedDebug_FILE E:/Embedded/Tool/Serial_tool/User_Serial/bld/EmbedDebug.exe)
+set(__QT_DEPLOY_TARGET_EmbedDebug_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_EmbedDebug_RUNTIME_DLLS E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/Qt6Svg.dll;E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/Qt6SerialPort.dll;E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/Qt6Charts.dll;E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/Qt6Network.dll;E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/Qt6OpenGLWidgets.dll;E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/Qt6Widgets.dll;E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/Qt6OpenGL.dll;E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/Qt6Gui.dll;E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/Qt6Core.dll)
