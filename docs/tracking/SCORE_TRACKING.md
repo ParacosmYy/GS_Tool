@@ -65,6 +65,8 @@
 | 217 | ChecksumPanel+PacketBuilderPanel+TimestampPanel统计增强 | 校验面板计算/算法/剪贴板+包构建器构建/发送/字段+时间戳分析/格式 |
 | 218 | ChecksumPanelAlgo拆分+ConverterPanel/DragDropHelper/TimestampPanel统计增强 | 校验算法独立+转换器格式切换+拖放拒绝计数+时间戳解析统计 |
 | 219 | MainWindowInit拆分+TriggerRule linter增强 | 主窗口构造函数拆分为MainWindowInit.cpp(250行)+触发器规则linter修正 |
+| 220 | QssThemeGeneratorWidgets/UsbDeviceDetectorStats拆分+Widget统计增强 | QSS主题生成器组件独立+USB检测统计独立+ScopeWidget/AudioSpectrum/FrequencyCounter/CommandPalette2/ScriptRecorder2/ToastWidget2/DataDiffWidget2/EdDialog2统计 |
+| 221 | Plugin/Scope/Audio/Freq/CommandPalette/Recorder/Toast/Diff统计增强+文件拆分 | PluginApi面板注册/通道/订阅+PluginManager扫描/发现+MainWindowPanelConnect+PanelManagerQuery拆分 |
 
 ---
 
