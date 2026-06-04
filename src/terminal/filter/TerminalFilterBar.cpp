@@ -54,6 +54,7 @@ TerminalFilterBar::TerminalFilterBar(QWidget *parent)
 
     connect(m_clearBtn, &QPushButton::clicked, this, [this]() {
         m_patternEdit->clear();
+        ++m_totalFilterClears;  ///< 统计: 过滤清除递增
         emit filterCleared();
     });
 
@@ -124,10 +125,17 @@ quint64 TerminalFilterBar::totalDirectionChanges() const
     return m_totalDirectionChanges;
 }
 
+/** @brief 获取累计过滤清除次数 @return 过滤清除次数 */
+quint64 TerminalFilterBar::totalFilterClears() const
+{
+    return m_totalFilterClears;
+}
+
 /** @brief 重置所有过滤统计计数器为零 */
 void TerminalFilterBar::resetFilterStatistics()
 {
     m_totalFilterChanges = 0;
     m_totalHighlightToggles = 0;
     m_totalDirectionChanges = 0;
+    m_totalFilterClears = 0;
 }

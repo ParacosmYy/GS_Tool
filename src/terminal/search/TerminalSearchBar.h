@@ -69,13 +69,15 @@ private:
     quint64 m_totalMatches = 0;         ///< 匹配结果总次数
     quint64 m_totalReplacements = 0;    ///< 替换操作总次数
     quint64 m_totalRegexSearches = 0;   ///< 正则搜索触发总次数
+    quint64 m_totalHexSearches = 0;     ///< HEX模式搜索触发总次数
 
 public:
     quint64 totalSearches() const { return m_totalSearches; }         ///< 搜索触发总次数
     quint64 totalMatches() const { return m_totalMatches; }          ///< 匹配结果总次数
     quint64 totalReplacements() const { return m_totalReplacements; } ///< 替换操作总次数
     quint64 totalRegexSearches() const { return m_totalRegexSearches; } ///< 正则搜索触发总次数
-    void resetSearchBarStatistics(); ///< 重置搜索栏统计计数器(含正则搜索计数)
+    quint64 totalHexSearches() const { return m_totalHexSearches; } ///< HEX模式搜索触发总次数
+    void resetSearchBarStatistics(); ///< 重置搜索栏统计计数器
 };
 
 #endif // TERMINALSEARCHBAR_H

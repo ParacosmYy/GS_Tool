@@ -22,6 +22,9 @@ quint64 TerminalModel::maxLineLength() const { return m_maxLineLength; }
 /** @brief 获取被过滤丢弃的行数 @return 过滤丢弃行数 */
 quint64 TerminalModel::filterBlockCount() const { return m_filterBlockCount; }
 
+/** @brief 获取环形缓冲区满覆盖次数 @return 覆盖次数 */
+quint64 TerminalModel::totalMaxLinesReached() const { return m_totalMaxLinesReached; }
+
 /** @brief 重置所有统计计数器为零 */
 void TerminalModel::resetStats()
 {
@@ -30,4 +33,5 @@ void TerminalModel::resetStats()
     m_totalBytesSent = 0;
     m_maxLineLength = 0;
     m_filterBlockCount = 0;
+    m_totalMaxLinesReached = 0;
 }

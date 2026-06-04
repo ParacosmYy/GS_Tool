@@ -57,6 +57,8 @@ public:
     quint64 totalHighlightToggles() const;
     /** @brief 获取累计方向变更次数 */
     quint64 totalDirectionChanges() const;
+    /** @brief 获取累计过滤清除次数 */
+    quint64 totalFilterClears() const;
     /** @brief 重置所有过滤统计计数器 */
     void resetFilterStatistics();
 
@@ -90,6 +92,7 @@ private:
     quint64 m_totalFilterChanges = 0;       ///< 累计过滤变更次数
     quint64 m_totalHighlightToggles = 0;    ///< 累计高亮切换次数
     quint64 m_totalDirectionChanges = 0;    ///< 累计方向变更次数
+    quint64 m_totalFilterClears = 0;        ///< 累计过滤清除次数
 };
 
 #endif // TERMINALFILTERBAR_H

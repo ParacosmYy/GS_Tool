@@ -41,7 +41,13 @@ quint64 SendController::totalMacroExecutions() const
     return m_totalMacroExecutions;
 }
 
-/** @brief 重置所有统计计数器(发送/字节/HEX/错误/宏) */
+/** @brief 获取累计定时发送次数 @return 定时发送次数 */
+quint64 SendController::totalTimedSends() const
+{
+    return m_totalTimedSends;
+}
+
+/** @brief 重置所有统计计数器(发送/字节/HEX/错误/宏/定时) */
 void SendController::resetSendStatistics()
 {
     m_totalSends = 0;
@@ -49,4 +55,5 @@ void SendController::resetSendStatistics()
     m_totalHexSends = 0;
     m_totalErrors = 0;
     m_totalMacroExecutions = 0;
+    m_totalTimedSends = 0;
 }

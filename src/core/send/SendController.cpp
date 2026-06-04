@@ -94,6 +94,7 @@ QWidget* SendController::createSendBar(QWidget* parent)
 
     // 定时发送器的数据通过 sendAndRecord 发出
     connect(m_timedSender, &TimedSender::sendData, this, [this](const QByteArray& data) {
+        ++m_totalTimedSends;  ///< 统计: 定时发送递增
         sendAndRecord(data);
     });
 

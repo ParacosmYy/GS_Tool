@@ -199,6 +199,7 @@ set(SOURCES
     src/chart/widget/ChartWidgetExport.cpp
     src/chart/widget/ChartWidgetRender.cpp
     src/chart/model/ChannelConfig.cpp
+    src/chart/model/ChannelConfigSet.cpp
     src/chart/model/ChannelConfigSetMethods.cpp
     src/chart/model/ChannelConfigStyle.cpp
     src/chart/model/ChartModel.cpp
@@ -284,6 +285,7 @@ set(SOURCES
     src/core/recording/RecordingMarkerQuery.cpp
     src/utils/log/RecordingFileFormat.cpp
     src/utils/log/RecordingFileIndex.cpp
+    src/utils/log/RecordingFileIndexStats.cpp
 
     # ── F3: 多通道数据导出 ──
     src/utils/export/ChartExporter.cpp
@@ -372,6 +374,7 @@ set(SOURCES
     src/plugin/PluginManagerScan.cpp
     src/plugin/PluginApi.cpp
     src/plugin/PluginConfigPanel.cpp
+    src/plugin/PluginConfigPanelSetup.cpp
     src/plugin/PluginConfigPanelUI.cpp
 
     # ── F12: Bluetooth/BLE 调试 ──
@@ -379,6 +382,7 @@ set(SOURCES
     src/connection/ble/BleScannerDiscovery.cpp
     src/connection/ble/BleConnection.cpp
     src/connection/ble/BleGattModel.cpp
+    src/connection/ble/BleGattModelIndex.cpp
     src/connection/ble/BleGattModelQuery.cpp
     src/connection/ble/BleGattBrowser.cpp
     src/connection/ble/BleGattBrowserSlots.cpp
@@ -411,16 +415,19 @@ set(SOURCES
     src/connection/mqtt/MqttConnectionPublish.cpp
     src/connection/mqtt/MqttTopicModel.cpp
     src/connection/mqtt/MqttTopicModelHelpers.cpp
+    src/connection/mqtt/MqttTopicModelRoute.cpp
     src/connection/mqtt/MqttTopicModelIndex.cpp
     src/connection/mqtt/MqttSubscriptionPanel.cpp
     src/connection/mqtt/MqttConfigPanel.cpp
     src/connection/mqtt/MqttWidget.cpp
     src/connection/mqtt/MqttWidgetSubs.cpp
+    src/connection/mqtt/MqttWidgetSubsSignals.cpp
     src/connection/mqtt/MqttWidgetSlots.cpp
 
     # ── F15: TCP/UDP 增强 ──
     src/connection/tcp/TcpServerConnection.cpp
     src/connection/tcp/TcpServerConnectionClients.cpp
+    src/connection/tcp/TcpServerConnectionHandlers.cpp
     src/connection/tcp/TcpMultiConnectionManager.cpp
     src/connection/tcp/UdpMulticastConnection.cpp
     src/connection/tcp/UdpMulticastConnectionHandlers.cpp

@@ -39,6 +39,9 @@ void TerminalSearchBar::triggerSearch()
         if (m_regexCheck->isChecked()) {
             ++m_totalRegexSearches;
         }
+        if (m_hexCheck->isChecked()) {
+            ++m_totalHexSearches;  ///< 统计: HEX模式搜索递增
+        }
         emit searchRequested(text, m_regexCheck->isChecked(), m_hexCheck->isChecked(),
                              m_caseCheck->isChecked(), m_wordCheck->isChecked());
     }
@@ -113,4 +116,5 @@ void TerminalSearchBar::resetSearchBarStatistics()
     m_totalMatches = 0;
     m_totalReplacements = 0;
     m_totalRegexSearches = 0;
+    m_totalHexSearches = 0;
 }

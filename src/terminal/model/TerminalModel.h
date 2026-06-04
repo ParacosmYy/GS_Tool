@@ -70,6 +70,7 @@ public:
     quint64 totalBytesSent() const;    ///< 获取累计发送字节数
     quint64 maxLineLength() const;     ///< 获取历史最长行长度(字节)
     quint64 filterBlockCount() const;  ///< 获取被过滤丢弃的行数
+    quint64 totalMaxLinesReached() const; ///< 获取环形缓冲区满覆盖次数
     void resetStats();                 ///< 重置所有统计计数器(保留rxBytes/txBytes)
 
 signals:
@@ -101,6 +102,7 @@ private:
     quint64 m_totalBytesSent = 0;      ///< 累计发送字节数(独立于m_txBytes)
     quint64 m_maxLineLength = 0;       ///< 历史最长行长度(字节数)
     quint64 m_filterBlockCount = 0;    ///< 被过滤丢弃的行数
+    quint64 m_totalMaxLinesReached = 0;///< 环形缓冲区满覆盖次数(行数达到上限)
 };
 
 #endif // TERMINALMODEL_H

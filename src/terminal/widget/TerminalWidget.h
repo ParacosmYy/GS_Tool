@@ -120,6 +120,9 @@ private:
     mutable quint64 m_totalLinesRendered = 0;     ///< 总渲染行数
     quint64 m_totalKeyPresses = 0;                ///< 总按键次数
     quint64 m_totalContextMenuActions = 0;        ///< 总右键菜单操作次数
+    quint64 m_totalClears = 0;                    ///< 总清屏次数
+    quint64 m_totalDisplayModeChanges = 0;        ///< 总显示模式切换次数(文本/HEX/混合/十进制)
+    quint64 m_totalMatchNavigations = 0;          ///< 总搜索匹配导航次数(F3/Shift+F3)
 
 public:
     /** @brief 获取总渲染行数 @return 渲染行计数 */
@@ -128,6 +131,12 @@ public:
     quint64 totalKeyPresses() const { return m_totalKeyPresses; }
     /** @brief 获取总右键菜单操作次数 @return 菜单操作计数 */
     quint64 totalContextMenuActions() const { return m_totalContextMenuActions; }
+    /** @brief 获取总清屏次数 @return 清屏计数 */
+    quint64 totalClears() const { return m_totalClears; }
+    /** @brief 获取总显示模式切换次数 @return 模式切换计数 */
+    quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; }
+    /** @brief 获取总搜索匹配导航次数 @return 导航计数 */
+    quint64 totalMatchNavigations() const { return m_totalMatchNavigations; }
     /** @brief 重置终端统计计数器 */
     void resetTerminalWidgetStatistics();
 };

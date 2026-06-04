@@ -150,6 +150,7 @@ void TerminalModel::appendLine(TerminalLine&& line)
         m_count++;
     } else {
         // 缓冲区已满，覆盖头指针位置的最旧数据
+        ++m_totalMaxLinesReached;  ///< 统计: 环形缓冲区满覆盖递增
         m_buffer[m_head] = std::move(line);
         m_head = (m_head + 1) % m_buffer.size();
     }

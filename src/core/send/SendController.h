@@ -69,7 +69,10 @@ public:
     /** @brief 获取累计快捷指令(宏)执行次数 @return 宏执行次数 */
     quint64 totalMacroExecutions() const;
 
-    /** @brief 重置所有统计计数器(发送/字节/HEX/错误/宏) */
+    /** @brief 获取累计定时发送次数 @return 定时发送次数 */
+    quint64 totalTimedSends() const;
+
+    /** @brief 重置所有统计计数器(发送/字节/HEX/错误/宏/定时) */
     void resetSendStatistics();
 
 signals:
@@ -129,6 +132,7 @@ private:
     quint64 m_totalHexSends = 0;    ///< 累计HEX模式发送次数
     quint64 m_totalErrors = 0;      ///< 累计发送错误次数
     quint64 m_totalMacroExecutions = 0; ///< 累计快捷指令(宏)执行次数
+    quint64 m_totalTimedSends = 0;  ///< 累计定时发送次数
 };
 
 #endif // SENDCONTROLLER_H

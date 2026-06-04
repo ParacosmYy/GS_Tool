@@ -36,6 +36,7 @@ TerminalSearchManager* TerminalWidget::searchManager() const { return m_searchMa
 /** @brief 跳转到下一个搜索匹配项 */
 void TerminalWidget::gotoNextMatch()
 {
+    ++m_totalMatchNavigations;  ///< 统计: 匹配导航递增
     int line = m_searchManager->gotoNextMatch();
     if (line >= 0) scrollToMatch(line); update();
 }
@@ -43,6 +44,7 @@ void TerminalWidget::gotoNextMatch()
 /** @brief 跳转到上一个搜索匹配项 */
 void TerminalWidget::gotoPrevMatch()
 {
+    ++m_totalMatchNavigations;  ///< 统计: 匹配导航递增
     int line = m_searchManager->gotoPrevMatch();
     if (line >= 0) scrollToMatch(line); update();
 }

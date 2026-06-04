@@ -70,10 +70,13 @@ void TerminalWidget::selectAll()
 }
 
 // ---- 统计计数器 ----
-/** @brief 重置终端统计计数器(渲染行数/按键/右键菜单操作) */
+/** @brief 重置终端统计计数器(渲染行数/按键/右键菜单/清屏/显示模式切换/匹配导航) */
 void TerminalWidget::resetTerminalWidgetStatistics()
 {
     m_totalLinesRendered = 0;
     m_totalKeyPresses = 0;
     m_totalContextMenuActions = 0;
+    m_totalClears = 0;
+    m_totalDisplayModeChanges = 0;
+    m_totalMatchNavigations = 0;
 }
