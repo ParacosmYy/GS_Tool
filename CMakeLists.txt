@@ -55,6 +55,7 @@ set(SOURCES
     src/core/widgets/AppDialog.cpp
     src/core/widgets/AppDialogContent.cpp
     src/core/widgets/DragDropHelper.cpp
+    src/core/widgets/DragDropHelperEvents.cpp
     src/plugin/loader/PluginLoader.cpp
     src/core/workspace/WorkspaceManager.cpp
     src/core/factory/WidgetFactory.cpp
@@ -381,14 +382,17 @@ set(SOURCES
     # ── F16: SPI/I2C 桥接 ──
     src/connection/spi_i2c/SpiConnection.cpp
     src/connection/spi_i2c/SpiConnectionStats.cpp
+    src/connection/spi_i2c/SpiConnectionConfig.cpp
     src/connection/spi_i2c/SpiConnectionTransfer.cpp
     src/connection/spi_i2c/I2cConnection.cpp
     src/connection/spi_i2c/I2cConnectionScan.cpp
     src/connection/spi_i2c/I2cConnectionTransfer.cpp
     src/connection/spi_i2c/SpiI2cBridgeManager.cpp
+    src/connection/spi_i2c/SpiI2cBridgeManagerQueue.cpp
     src/connection/spi_i2c/SpiI2cConfigPanel.cpp
     src/connection/spi_i2c/SpiI2cConfigPanelPersist.cpp
     src/connection/spi_i2c/RegisterEditor.cpp
+    src/connection/spi_i2c/RegisterEditorStats.cpp
 
     # ── F17: WebSocket 客户端 ──
     src/connection/ws/WebSocketConnection.cpp
