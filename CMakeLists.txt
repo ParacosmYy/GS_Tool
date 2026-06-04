@@ -113,6 +113,7 @@ set(SOURCES
     src/terminal/widget/TerminalWidgetSearch.cpp
     src/terminal/widget/TerminalWidgetPaint.cpp
     src/terminal/model/TerminalModel.cpp
+    src/terminal/model/TerminalModelStats.cpp
     src/terminal/search/TerminalSearchBar.cpp
     src/terminal/search/TerminalSearchBarHistory.cpp
     src/terminal/types/DirectionFilter.cpp
@@ -194,6 +195,7 @@ set(SOURCES
     src/chart/stats/ScatterWidgetCompute.cpp
     src/chart/stats/ScatterWidgetStats.cpp
     src/ota/manager/OtaManager.cpp
+    src/ota/manager/OtaManagerSignals.cpp
     src/ota/manager/OtaManagerFileOps.cpp
     src/ota/manager/OtaManagerProgress.cpp
     src/ota/manager/OtaManagerVerify.cpp
@@ -370,7 +372,9 @@ set(SOURCES
     src/connection/tcp/TcpServerConnectionClients.cpp
     src/connection/tcp/TcpMultiConnectionManager.cpp
     src/connection/tcp/UdpMulticastConnection.cpp
+    src/connection/tcp/UdpMulticastGroup.cpp
     src/connection/tcp/TlsConnection.cpp
+    src/connection/tcp/TlsConnectionSetup.cpp
     src/connection/tcp/TlsConnectionStats.cpp
     src/connection/tcp/MultiConnectionPanel.cpp
 

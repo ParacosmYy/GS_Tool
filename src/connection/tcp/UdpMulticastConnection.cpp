@@ -124,48 +124,7 @@ void UdpMulticastConnection::configure(const QVariantMap& params)
     }
 }
 
-/** @brief 加入指定组播组 @param groupAddress 组播地址 */
-void UdpMulticastConnection::joinGroup(const QHostAddress& groupAddress)
-{
-    if (!m_socket) return;
-
-    ++m_totalJoins;
-    if (m_usingCustomInterface && m_multicastInterface.isValid()) {
-        if (!m_socket->joinMulticastGroup(groupAddress, m_multicastInterface)) {
-            emit errorOccurred(tr("加入组播组失败: %1").arg(m_socket->errorString()));
-        }
-    } else {
-        if (!m_socket->joinMulticastGroup(groupAddress)) {
-            emit errorOccurred(tr("加入组播组失败: %1").arg(m_socket->errorString()));
-        }
-    }
-}
-
-/** @brief 离开指定组播组 @param groupAddress 组播地址 */
-void UdpMulticastConnection::leaveGroup(const QHostAddress& groupAddress)
-{
-    if (!m_socket) return;
-
-    ++m_totalLeaves;
-    if (m_usingCustomInterface && m_multicastInterface.isValid()) {
-        m_socket->leaveMulticastGroup(groupAddress, m_multicastInterface);
-    } else {
-        m_socket->leaveMulticastGroup(groupAddress);
-    }
-}
-
-/** @brief 设置组播数据发送使用的网络接口 @param interfaceName 网络接口名称 */
-void UdpMulticastConnection::setMulticastInterface(const QString& interfaceName)
-{
-    for (const QNetworkInterface& iface : QNetworkInterface::allInterfaces()) {
-        if (iface.humanReadableName() == interfaceName) {
-            m_multicastInterface = iface;
-            m_usingCustomInterface = true;
-            return;
-        }
-    }
-    m_usingCustomInterface = false;
-}
+// 组播组管理/统计接口见 UdpMulticastGroup.cpp
 
 /** @brief 数据到达回调，读取所有待处理数据报并发射dataReceived信号 */
 void UdpMulticastConnection::onReadyRead()
@@ -207,49 +166,4 @@ void UdpMulticastConnection::updateState(ConnectionState newState)
     }
 }
 
-/** @brief 获取已发送数据报计数 @return 发送数据报总数 */
-quint64 UdpMulticastConnection::datagramsSent() const
-{
-    return m_dgramsSent;
-}
-
-/** @brief 获取已接收数据报计数 @return 接收数据报总数 */
-quint64 UdpMulticastConnection::datagramsReceived() const
-{
-    return m_dgramsRecv;
-}
-
-/** @brief 获取累计发送字节数 @return 发送字节总量 */
-qint64 UdpMulticastConnection::totalBytesSent() const
-{
-    return m_txBytes;
-}
-
-/** @brief 获取累计接收字节数 @return 接收字节总量 */
-qint64 UdpMulticastConnection::totalBytesReceived() const
-{
-    return m_rxBytes;
-}
-
-/** @brief 重置统计数据(数据报/字节/加入离开次数)为零 */
-void UdpMulticastConnection::resetStatistics()
-{
-    m_dgramsSent = 0;
-    m_dgramsRecv = 0;
-    m_txBytes = 0;
-    m_rxBytes = 0;
-    m_totalJoins = 0;
-    m_totalLeaves = 0;
-}
-
-/** @brief 获取组播组加入总次数 @return 加入组播组总次数 */
-quint64 UdpMulticastConnection::totalJoins() const
-{
-    return m_totalJoins;
-}
-
-/** @brief 获取组播组离开总次数 @return 离开组播组总次数 */
-quint64 UdpMulticastConnection::totalLeaves() const
-{
-    return m_totalLeaves;
-}
+// 组播组管理/统计接口见 UdpMulticastGroup.cpp

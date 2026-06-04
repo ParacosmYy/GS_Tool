@@ -102,6 +102,7 @@
 | 266 | DataConverterCodec/ProtocolViewData/FftWidgetSlots/BleGattBrowserSlots拆分 + WidgetFactory mutable修复 | 编解码独立(DataConverter 175→80行)+协议帧数据独立(ProtocolView 158→63行)+FFT槽函数独立(FftWidget 175→80行)+BLE GATT操作槽独立(BleGattBrowser 147→47行) |
 | 267 | SendHistoryStats/MqttConnectionStats/TerminalSelectionManagerStats/SchemaViewerStats拆分 | 发送历史频率分析/统计独立(SendHistory 259→134行)+MQTT统计独立(MqttConnection 254→209行)+终端选区统计独立(TerminalSelection 253→197行)+Schema解码统计独立(SchemaViewer 251→149行) |
 | 268 | OtaHistoryModelStats/SerialDetectorQuery/DataDiffWidgetDiff/RecordingMarkerQuery拆分 | OTA统计摘要独立(OtaHistoryModel 260→143行)+串口多维度查询独立(SerialDetector 261→176行)+LCS差异算法独立(DataDiffWidget 263→137行)+标记查询导航独立(RecordingMarker 260→66行) |
+| 269 | OtaManagerSignals/UdpMulticastGroup/TerminalModelStats/TlsConnectionSetup拆分 | OTA信号连接/传输控制独立(OtaManager 257→63行)+UDP组播组管理独立(UdpMulticast 255→168行)+终端统计独立(TerminalModel 247→222行)+TLS证书/SSL回调独立(TlsConnection 259→194行) |
 
 ---
 
