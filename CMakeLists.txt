@@ -26,6 +26,7 @@ find_package(Qt6 REQUIRED COMPONENTS
     SerialPort
     Charts
     Network
+    Qml
 )
 
 # 源文件
@@ -648,6 +649,10 @@ set(SOURCES
     src/widgets/scope/ScopeChannelManager.cpp
     src/widgets/scope/ScopeChannelManagerStats.cpp
 
+    # ── LED矩阵模拟器 ──
+    src/widgets/led_matrix/LedMatrixSimulator.cpp
+    src/widgets/led_matrix/LedMatrixSimulatorStats.cpp
+
     # ── F32: 十六进制内存编辑器 ──
     src/utils/hex_editor/MemoryHexEditor.cpp
     src/utils/hex_editor/MemoryHexEditorExport.cpp
@@ -674,6 +679,15 @@ set(SOURCES
     src/protocol/simulator/ProtocolSimulator.cpp
     src/protocol/simulator/ProtocolSimulatorStats.cpp
 
+    # ── 协议字段编辑器 ──
+    src/protocol/field_editor/ProtocolFieldEditor.cpp
+    src/protocol/field_editor/ProtocolFieldEditorUI.cpp
+    src/protocol/field_editor/ProtocolFieldEditorStats.cpp
+
+    # ── F34: JS 可脚本化协议引擎 ──
+    src/protocol/scriptable/ScriptableProtocolEngine.cpp
+    src/protocol/scriptable/ScriptableProtocolEngineStats.cpp
+
     # ── 通知历史 ──
     src/core/notification/NotificationHistory.cpp
     src/core/notification/NotificationHistoryStats.cpp
@@ -681,6 +695,18 @@ set(SOURCES
     # ── 串口流量分析 ──
     src/serial/profiler/SerialPortProfiler.cpp
     src/serial/profiler/SerialPortProfilerStats.cpp
+
+    # ── 串口时序分析 ──
+    src/serial/timing/SerialTimingAnalyzer.cpp
+    src/serial/timing/SerialTimingAnalyzerStats.cpp
+
+    # ── 环形缓冲区可视化 ──
+    src/widgets/circular/CircularBufferWidget.cpp
+    src/widgets/circular/CircularBufferWidgetStats.cpp
+
+    # ── 波形发生器 ──
+    src/utils/waveform/WaveformGenerator.cpp
+    src/utils/waveform/WaveformGeneratorStats.cpp
 )
 
 set(HEADERS
@@ -991,6 +1017,9 @@ set(HEADERS
     # ── 示波器通道管理 ──
     src/widgets/scope/ScopeChannelManager.h
 
+    # ── LED矩阵模拟器 ──
+    src/widgets/led_matrix/LedMatrixSimulator.h
+
     # ── F32: 十六进制内存编辑器 ──
     src/utils/hex_editor/MemoryHexEditor.h
 
@@ -1012,11 +1041,26 @@ set(HEADERS
     # ── 协议响应模拟器 ──
     src/protocol/simulator/ProtocolSimulator.h
 
+    # ── 协议字段编辑器 ──
+    src/protocol/field_editor/ProtocolFieldEditor.h
+
+    # ── F34: JS 可脚本化协议引擎 ──
+    src/protocol/scriptable/ScriptableProtocolEngine.h
+
     # ── 通知历史 ──
     src/core/notification/NotificationHistory.h
 
     # ── 串口流量分析 ──
     src/serial/profiler/SerialPortProfiler.h
+
+    # ── 串口时序分析 ──
+    src/serial/timing/SerialTimingAnalyzer.h
+
+    # ── 环形缓冲区可视化 ──
+    src/widgets/circular/CircularBufferWidget.h
+
+    # ── 波形发生器 ──
+    src/utils/waveform/WaveformGenerator.h
 )
 
 set(RESOURCES
@@ -1042,6 +1086,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::SerialPort
     Qt6::Charts
     Qt6::Network
+    Qt6::Qml
 )
 
 # Windows平台特殊设置
