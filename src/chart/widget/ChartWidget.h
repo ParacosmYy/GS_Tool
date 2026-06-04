@@ -127,6 +127,14 @@ private:
     quint64 m_totalRenders = 0;        ///< 总渲染次数
     quint64 m_totalRedraws = 0;        ///< 总重绘次数(含主题切换/窗口尺寸变化等触发的重绘)
     quint64 m_totalInteractions = 0;   ///< 总交互次数(暂停/清除等)
+    quint64 m_totalZoomEvents = 0;     ///< 总缩放事件次数
+    quint64 m_totalPanEvents = 0;      ///< 总平移事件次数
+    quint64 m_totalChannelToggles = 0; ///< 总通道开关切换次数
+    quint64 m_totalScreenshots = 0;    ///< 总截图导出次数
+
+    // ---- FPS追踪 ----
+    qint64 m_lastRenderTimeMs = 0;     ///< 上次渲染时间戳(ms)
+    double m_renderFps = 0.0;          ///< 当前渲染FPS
 
 public:
     /** @brief 获取总数据更新次数 @return 数据更新计数 */
@@ -137,6 +145,18 @@ public:
     quint64 totalRedraws() const { return m_totalRedraws; }
     /** @brief 获取总交互次数 @return 交互计数 */
     quint64 totalInteractions() const { return m_totalInteractions; }
+    /** @brief 获取总缩放事件次数 @return 缩放计数 */
+    quint64 totalZoomEvents() const { return m_totalZoomEvents; }
+    /** @brief 获取总平移事件次数 @return 平移计数 */
+    quint64 totalPanEvents() const { return m_totalPanEvents; }
+    /** @brief 获取总通道开关切换次数 @return 切换计数 */
+    quint64 totalChannelToggles() const { return m_totalChannelToggles; }
+    /** @brief 获取总截图导出次数 @return 截图计数 */
+    quint64 totalScreenshots() const { return m_totalScreenshots; }
+    /** @brief 获取当前渲染FPS @return FPS值 */
+    double renderFps() const { return m_renderFps; }
+    /** @brief 导出当前图表为截图(PNG) @param filePath 目标文件路径 @return true=导出成功 */
+    bool exportScreenshot(const QString& filePath);
     /** @brief 重置波形图统计计数器 */
     void resetChartWidgetStatistics();
 };

@@ -138,12 +138,24 @@ void ScatterWidget::applyThemeColors()
 /** @brief 获取累计绘制点数 @return 绘制点数 */
 quint64 ScatterWidget::totalPointsPlotted() const { return m_totalPointsPlotted; }
 
+/** @brief 获取累计更新次数 @return 更新次数 */
+quint64 ScatterWidget::totalUpdates() const { return m_totalUpdates; }
+
 /** @brief 获取累计清除次数 @return 清除次数 */
 quint64 ScatterWidget::totalClears() const { return m_totalClears; }
+
+/** @brief 获取最近一次刷新的点密度网格最大值 @return 密度最大值 */
+int ScatterWidget::pointDensityMax() const { return m_pointDensityMax; }
+
+/** @brief 获取最近一次刷新的所有散点Y值平均 @return Y值平均 */
+double ScatterWidget::averageValue() const { return m_averageValue; }
 
 /** @brief 重置所有散点图统计计数器 */
 void ScatterWidget::resetScatterStatistics()
 {
     m_totalPointsPlotted = 0;
+    m_totalUpdates = 0;
     m_totalClears = 0;
+    m_pointDensityMax = 0;
+    m_averageValue = 0.0;
 }

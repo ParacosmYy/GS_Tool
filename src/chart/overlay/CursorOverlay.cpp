@@ -274,9 +274,25 @@ quint64 CursorOverlay::totalMeasurements() const
     return m_totalMeasurements;
 }
 
+/** @brief 返回历次测量的平均ΔX值 @return 平均ΔX */
+double CursorOverlay::averageDeltaX() const
+{
+    if (m_totalMeasurements == 0) return 0.0;
+    return m_sumDeltaX / static_cast<double>(m_totalMeasurements);
+}
+
+/** @brief 返回历次测量的平均ΔY值(首个通道) @return 平均ΔY */
+double CursorOverlay::averageDeltaY() const
+{
+    if (m_totalMeasurements == 0) return 0.0;
+    return m_sumDeltaY / static_cast<double>(m_totalMeasurements);
+}
+
 /** @brief 重置所有游标统计计数器为初始值 */
 void CursorOverlay::resetCursorStatistics()
 {
     m_totalCursorMoves = 0;
     m_totalMeasurements = 0;
+    m_sumDeltaX = 0.0;
+    m_sumDeltaY = 0.0;
 }

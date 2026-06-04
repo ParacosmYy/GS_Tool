@@ -64,6 +64,7 @@ class CanFrameParser : public QObject {
     Q_OBJECT
 
 public:
+    /** @brief 构造CAN帧解析器 @param parent 父QObject指针 */
     explicit CanFrameParser(QObject* parent = nullptr);
     /** @brief 解析LAWICEL原始字符串为CanFrame @param rawData 原始帧数据 @return 解析结果 */
     CanFrame parseFrame(const QByteArray& rawData);
@@ -79,30 +80,40 @@ public:
     static QString frameToString(const CanFrame& frame);
 
     // ---- 统计信息接口 ----
+    /** @brief 获取累计解析帧数 */
     quint64 totalFramesParsed() const { return m_totalFramesParsed; }
+    /** @brief 获取累计解析错误数 */
     quint64 totalParseErrors() const { return m_totalParseErrors; }
+    /** @brief 获取累计处理字节数 */
     quint64 totalBytesProcessed() const { return m_totalBytesProcessed; }
+    /** @brief 获取标准帧计数 */
     quint64 totalStandardFrames() const { return m_totalStandardFrames; }
+    /** @brief 获取扩展帧计数 */
     quint64 totalExtendedFrames() const { return m_totalExtendedFrames; }
+    /** @brief 获取CAN-FD帧计数 */
     quint64 totalFdFrames() const { return m_totalFdFrames; }
+    /** @brief 获取RTR帧计数 */
     quint64 totalRtrFrames() const { return m_totalRtrFrames; }
+    /** @brief 重置所有解析器统计计数器 */
     void resetParserStatistics();
 
 private:
+    /** @brief 解析两个十六进制字符为一个字节 @param hex 指向两个十六进制字符的指针 @return 解析后的字节值 */
     static quint8 parseHexByte(const char* hex);
+    /** @brief 解析数据区中所有十六进制字节 @param d 数据区指针 @param byteCount 要解析的字节数 @return 解析后的QByteArray */
     static QByteArray parseHexData(const char* d, int byteCount);
 
     DbcParser* m_dbcParser = nullptr;   ///< DBC解析器(延迟创建)
     QString m_dbcFilePath;              ///< DBC文件路径
 
     // ---- 统计计数器 ----
-    quint64 m_totalFramesParsed = 0;
-    quint64 m_totalParseErrors = 0;
-    quint64 m_totalBytesProcessed = 0;
-    quint64 m_totalStandardFrames = 0;
-    quint64 m_totalExtendedFrames = 0;
-    quint64 m_totalFdFrames = 0;
-    quint64 m_totalRtrFrames = 0;
+    quint64 m_totalFramesParsed = 0;        ///< 累计解析帧数
+    quint64 m_totalParseErrors = 0;         ///< 累计解析错误数
+    quint64 m_totalBytesProcessed = 0;      ///< 累计处理字节数
+    quint64 m_totalStandardFrames = 0;      ///< 标准帧计数
+    quint64 m_totalExtendedFrames = 0;      ///< 扩展帧计数
+    quint64 m_totalFdFrames = 0;            ///< CAN-FD帧计数
+    quint64 m_totalRtrFrames = 0;           ///< RTR帧计数
 };
 
 #endif // CANFRAMEPARSER_H

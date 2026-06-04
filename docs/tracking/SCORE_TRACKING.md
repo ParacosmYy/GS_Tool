@@ -47,6 +47,7 @@
 | 190 | Tier3核心功能实现 | BLE GATT/MQTT TopicModel/CAN DBC/USB全部从空方法变为功能实现 |
 | 200 | 功能增强里程碑 | CRC验证/仪表盘持久化/快捷键系统/图标扩展等第二优先级完成 |
 | 201 | 搜索/OTA/串口/协议深度增强 | 终端多规则过滤+OTA校验和+21厂商芯片库+协议桥自动检测+嵌套Protobuf |
+| 202 | MqttTopicModelIndex/TerminalFilterApply/CanBusMonitorFrame拆分 | .cpp文件体积持续控制在400行以内 |
 
 ---
 

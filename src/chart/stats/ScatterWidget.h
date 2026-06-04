@@ -71,8 +71,14 @@ public slots:
     // ---- 统计计数接口 ----
     /** @brief 获取累计绘制点数 */
     quint64 totalPointsPlotted() const;
+    /** @brief 获取累计更新次数（含手动/自动刷新） */
+    quint64 totalUpdates() const;
     /** @brief 获取累计清除次数 */
     quint64 totalClears() const;
+    /** @brief 获取最近一次刷新的点密度网格最大值 */
+    int pointDensityMax() const;
+    /** @brief 获取最近一次刷新的所有散点Y值平均 */
+    double averageValue() const;
     /** @brief 重置所有散点图统计计数器 */
     void resetScatterStatistics();
 
@@ -142,7 +148,10 @@ private:
 
     // ---- 统计计数器 ----
     quint64 m_totalPointsPlotted = 0; ///< 累计绘制点数
-    quint64 m_totalClears = 0;       ///< 累计清除次数
+    quint64 m_totalUpdates = 0;       ///< 累计更新次数（含手动/自动刷新）
+    quint64 m_totalClears = 0;        ///< 累计清除次数
+    int m_pointDensityMax = 0;        ///< 最近一次刷新的点密度网格最大值
+    double m_averageValue = 0.0;      ///< 最近一次刷新的所有散点Y值平均
 };
 
 #endif // SCATTERWIDGET_H

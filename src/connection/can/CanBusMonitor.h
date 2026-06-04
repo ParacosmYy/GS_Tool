@@ -114,50 +114,28 @@ private:
     /** @brief 更新统计面板标签文本 */
     void updateStatsDisplay();
 
-    /** @brief 帧列表表格控件 */
-    QTableWidget* m_frameTable;
+    QTableWidget* m_frameTable;               ///< 帧列表表格控件
+    QTableWidget* m_signalTable;              ///< 信号解码表格控件
+    QLabel* m_countLabel;                     ///< 帧计数标签
+    QPushButton* m_clearBtn;                  ///< 清空按钮
+    QCheckBox* m_autoScrollCheck;             ///< 自动滚动复选框
+    QLineEdit* m_filterEdit;                  ///< 帧ID过滤输入框
+    QComboBox* m_typeFilterCombo;             ///< 帧类型过滤下拉框
+    QLabel* m_statsLabel;                     ///< 统计信息标签
 
-    /** @brief 信号解码表格控件 */
-    QTableWidget* m_signalTable;
+    int m_frameCount = 0;                   ///< 帧计数器
 
-    /** @brief 帧计数标签 */
-    QLabel* m_countLabel;
+    static constexpr int kMaxRows = 10000;  ///< 最大显示行数
 
-    /** @brief 清空按钮 */
-    QPushButton* m_clearBtn;
+    QMap<quint32, int> m_idFrequency;       ///< 帧ID频率统计
 
-    /** @brief 自动滚动复选框 */
-    QCheckBox* m_autoScrollCheck;
+    QString m_frameIdFilter;                ///< 当前帧ID过滤文本
 
-    /** @brief 帧ID过滤输入框 */
-    QLineEdit* m_filterEdit;
+    class DbcParser* m_dbcParser = nullptr; ///< DBC解析器(不拥有所有权)
 
-    /** @brief 帧类型过滤下拉框 */
-    QComboBox* m_typeFilterCombo;
+    QElapsedTimer m_rateTimer;              ///< 帧率计算计时器
 
-    /** @brief 统计信息标签 */
-    QLabel* m_statsLabel;
-
-    /** @brief 帧计数器 */
-    int m_frameCount = 0;
-
-    /** @brief 最大显示行数 */
-    static constexpr int kMaxRows = 10000;
-
-    /** @brief 帧ID频率统计 */
-    QMap<quint32, int> m_idFrequency;
-
-    /** @brief 当前帧ID过滤文本 */
-    QString m_frameIdFilter;
-
-    /** @brief DBC解析器(不拥有所有权) */
-    class DbcParser* m_dbcParser = nullptr;
-
-    /** @brief 帧率计算计时器 */
-    QElapsedTimer m_rateTimer;
-
-    /** @brief 帧率计算用帧数 */
-    int m_rateFrameCount = 0;
+    int m_rateFrameCount = 0;               ///< 帧率计算用帧数
 
     // ---- 统计计数器 ----
     quint64 m_totalFramesMonitored = 0;         ///< 累计监控帧总数

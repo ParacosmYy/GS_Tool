@@ -198,6 +198,9 @@ void ScatterWidget::refreshPlot()
         m_series->replace({});
         m_correlationLabel->setText(tr("数据不足"));
         ++m_totalClears;
+        ++m_totalUpdates;
+        m_pointDensityMax = 0;
+        m_averageValue = 0.0;
         return;
     }
 
@@ -210,6 +213,9 @@ void ScatterWidget::refreshPlot()
         m_series->replace({});
         m_correlationLabel->setText(tr("数据不足"));
         ++m_totalClears;
+        ++m_totalUpdates;
+        m_pointDensityMax = 0;
+        m_averageValue = 0.0;
         return;
     }
 
@@ -231,6 +237,30 @@ void ScatterWidget::refreshPlot()
 
     m_series->replace(points);
     m_totalPointsPlotted += n;
+    ++m_totalUpdates;
+
+    // 计算Y值平均
+    double ySum = 0.0;
+    for (int i = 0; i < n; ++i) {
+        ySum += yData[i].y();
+    }
+    m_averageValue = (n > 0) ? ySum / n : 0.0;
+
+    // 计算点密度网格(将数据空间划分为20x20网格，统计每格点数)
+    constexpr int kGridSize = 20;
+    int densityGrid[kGridSize][kGridSize] = {};
+    double xRange = (xMax - xMin) > 1e-12 ? (xMax - xMin) : 1.0;
+    double yRange = (yMax - yMin) > 1e-12 ? (yMax - yMin) : 1.0;
+    int maxDensity = 0;
+    for (int i = 0; i < n; ++i) {
+        int gx = qBound(0, static_cast<int>((points[i].x() - xMin) / xRange * kGridSize), kGridSize - 1);
+        int gy = qBound(0, static_cast<int>((points[i].y() - yMin) / yRange * kGridSize), kGridSize - 1);
+        ++densityGrid[gx][gy];
+        if (densityGrid[gx][gy] > maxDensity) {
+            maxDensity = densityGrid[gx][gy];
+        }
+    }
+    m_pointDensityMax = maxDensity;
 
     // 自动调整坐标轴范围（留5%余量）
     double xPad = qMax((xMax - xMin) * 0.05, 0.001);

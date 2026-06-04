@@ -9,7 +9,7 @@
 #include <QSslSocket>
 #include <QUrl>
 
-/** @brief 构造WebSocket连接，初始化心跳定时器 @param parent 父对象 */
+/** @brief 构造WebSocket连接，初始化心跳定时器和延迟追踪 @param parent 父对象 */
 WebSocketConnection::WebSocketConnection(QObject* parent)
     : IConnection(parent)
     , m_pingTimer(new QTimer(this))
@@ -52,7 +52,7 @@ bool WebSocketConnection::open()
     return connectToUrl(m_url);
 }
 
-/** @brief 关闭WebSocket连接(发送close帧后关闭TCP) */
+/** @brief 关闭WebSocket连接(发送close帧后关闭TCP，清空消息队列) */
 void WebSocketConnection::close()
 {
     if (m_pingTimer) {
@@ -70,6 +70,8 @@ void WebSocketConnection::close()
     }
     m_handshakeDone = false;
     m_buffer.clear();
+    m_sendQueue.clear();
+    m_connectionTimer.invalidate();
     updateState(ConnectionState::Disconnected);
 }
 
@@ -123,6 +125,8 @@ bool WebSocketConnection::connectToUrl(const QString& url)
     m_socket = new QTcpSocket(this);
     m_handshakeDone = false;
     m_buffer.clear();
+    m_sendQueue.clear();
+    m_connectionTimer.invalidate();
 
     connect(m_socket, &QTcpSocket::connected,
             this, &WebSocketConnection::onTcpConnected);
@@ -167,6 +171,7 @@ void WebSocketConnection::onTcpReadyRead()
 
     if (!m_handshakeDone) {
         if (!parseHandshakeResponse()) { return; }
+        m_connectionTimer.start();  // 连接成功，启动运行计时器
         updateState(ConnectionState::Connected);
         m_pingTimer->start();
     }
@@ -174,9 +179,10 @@ void WebSocketConnection::onTcpReadyRead()
     parseFrames();
 }
 
-/** @brief 心跳定时器触发，发送ping帧保持连接活跃 */
+/** @brief 心跳定时器触发，发送ping帧保持连接活跃并记录发送时间戳 */
 void WebSocketConnection::onPingTimeout()
 {
+    m_pingSendTime.start();  // 记录ping发送时刻，用于延迟计算
     ping();
 }
 

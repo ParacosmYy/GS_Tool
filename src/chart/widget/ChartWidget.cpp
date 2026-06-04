@@ -11,6 +11,10 @@
 
 #include <QtCharts>
 #include <QResizeEvent>
+#include <QElapsedTimer>
+#include <QDateTime>
+#include <QFileDialog>
+#include <QPainter>
 #include <algorithm>
 
 // ============================================================================
@@ -96,6 +100,13 @@ void ChartWidget::setupUI()
     // 缩放/平移变化时刷新游标叠加层(坐标映射变了)
     connect(m_zoomController, &ZoomController::viewChanged,
             m_cursorOverlay, qOverload<>(&QWidget::update));
+    // 统计缩放/平移事件次数
+    connect(m_zoomController, &ZoomController::viewChanged, this, [this]() {
+        ++m_totalZoomEvents;
+    });
+    connect(m_zoomController, &ZoomController::zoomReset, this, [this]() {
+        ++m_totalZoomEvents;
+    });
 }
 
 /** @brief 创建顶部工具栏，包含暂停/清除/游标/窗口大小/状态标签 @return 工具栏Widget指针 */
@@ -238,6 +249,16 @@ void ChartWidget::updateChart(const QStringList& updatedChannels)
 
     ++m_totalRenders;
 
+    // FPS追踪: 基于两次渲染间隔计算瞬时FPS
+    qint64 nowMs = QDateTime::currentMSecsSinceEpoch();
+    if (m_lastRenderTimeMs > 0) {
+        qint64 deltaMs = nowMs - m_lastRenderTimeMs;
+        if (deltaMs > 0) {
+            m_renderFps = 1000.0 / static_cast<double>(deltaMs);
+        }
+    }
+    m_lastRenderTimeMs = nowMs;
+
     // 刷新每个更新通道的series数据
     for (const QString& name : updatedChannels) {
         auto it = m_seriesMap.find(name);
@@ -374,4 +395,33 @@ void ChartWidget::onClearClicked()
 {
     ++m_totalInteractions;
     clear();
+}
+
+// ============================================================================
+// 截图导出 + 统计重置
+// ============================================================================
+
+/** @brief 导出当前图表为截图(PNG) @param filePath 目标文件路径 @return true=导出成功 */
+bool ChartWidget::exportScreenshot(const QString& filePath)
+{
+    if (!m_chartView) return false;
+
+    QPixmap pixmap = m_chartView->grab();
+    ++m_totalScreenshots;
+    return pixmap.save(filePath, "PNG");
+}
+
+/** @brief 重置波形图统计计数器 */
+void ChartWidget::resetChartWidgetStatistics()
+{
+    m_totalDataUpdates = 0;
+    m_totalRenders = 0;
+    m_totalRedraws = 0;
+    m_totalInteractions = 0;
+    m_totalZoomEvents = 0;
+    m_totalPanEvents = 0;
+    m_totalChannelToggles = 0;
+    m_totalScreenshots = 0;
+    m_lastRenderTimeMs = 0;
+    m_renderFps = 0.0;
 }

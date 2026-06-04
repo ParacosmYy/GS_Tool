@@ -85,11 +85,20 @@ public slots:
     /** @brief 刷新直方图显示 -- 从ChartModel读取数据并重新计算 */
     void refreshHistogram();
 
+    /** @brief 导出当前直方图数据到CSV文件 @param filePath 目标文件路径 @return true=导出成功 */
+    bool exportToCsv(const QString& filePath);
+
     // ---- 统计计数接口 ----
     /** @brief 获取累计刷新更新次数 */
     quint64 totalUpdates() const;
     /** @brief 获取累计分桶数变更次数 */
     quint64 totalBinChanges() const;
+    /** @brief 获取累计分桶计算次数 */
+    quint64 totalBinsComputed() const;
+    /** @brief 获取峰值所在桶索引(上次计算结果) @return 桶索引，无数据返回-1 */
+    int peakBinIndex() const;
+    /** @brief 获取最大桶计数值(上次计算结果) @return 最大计数 */
+    int maxBinCount() const;
     /** @brief 重置所有直方图统计计数器 */
     void resetHistogramStatistics();
 
@@ -117,7 +126,7 @@ private:
     QValueAxis* m_yAxis;              ///< Y轴（计数）
 
     QComboBox* m_channelCombo;        ///< 通道选择下拉框
-    QSpinBox* m_binsSpin;             ///< 分桶数输入框 (10~200, 默认30)
+    QSpinBox* m_binsSpin;             ///< 分桶数输入框 (5~200, 默认30)
     QPushButton* m_refreshBtn;        ///< 手动刷新按钮
     QCheckBox* m_autoRefreshCheck;    ///< 自动刷新复选框
     QLabel* m_statsLabel;             ///< 统计摘要标签
@@ -127,6 +136,9 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalUpdates = 0;       ///< 累计刷新更新次数
     quint64 m_totalBinChanges = 0;    ///< 累计分桶数变更次数
+    quint64 m_totalBinsComputed = 0;  ///< 累计分桶计算次数
+    int m_peakBinIndex = -1;          ///< 峰值所在桶索引(上次计算结果)
+    int m_maxBinCount = 0;            ///< 最大桶计数值(上次计算结果)
 };
 
 #endif // HISTOGRAMWIDGET_H

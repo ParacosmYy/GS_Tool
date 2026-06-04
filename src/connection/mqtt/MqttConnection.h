@@ -34,23 +34,37 @@ struct MqttPendingMessage {
 class MqttConnection : public IConnection {
     Q_OBJECT
 public:
+    /** @brief 构造MQTT客户端连接 @param parent 父对象 */
     explicit MqttConnection(QObject* parent = nullptr);
+    /** @brief 析构函数，关闭连接释放资源 */
     ~MqttConnection() override;
 
     // ---- IConnection 接口实现 ----
+    /** @brief 获取连接类型 @return 固定返回ConnectionType::Mqtt */
     ConnectionType type() const override;
+    /** @brief 获取连接显示名称 @return "主机:端口"或"未配置" */
     QString name() const override;
+    /** @brief 获取当前连接状态 @return 连接状态枚举 */
     ConnectionState state() const override;
+    /** @brief 打开MQTT连接，发起TCP握手 @return true=成功发起连接 */
     bool open() override;
+    /** @brief 关闭MQTT连接，发送DISCONNECT报文后断开TCP */
     void close() override;
+    /** @brief 向默认主题写入数据(QoS0发布) @param data 待发送数据 @return 成功返回数据大小，失败返回-1 */
     qint64 write(const QByteArray& data) override;
+    /** @brief 配置MQTT连接参数 @param params 参数映射(支持host/port/clientId/username/password/keepAlive/cleanSession) */
     void configure(const QVariantMap& params) override;
 
     // ---- MQTT专用接口 ----
+    /** @brief 连接到指定MQTT服务器 @param host 服务器地址 @param port 端口号 */
     void connectToHost(const QString& host, int port);
+    /** @brief 断开MQTT连接 */
     void disconnectFromHost();
+    /** @brief 发布消息到指定主题 @param topic 目标主题 @param payload 消息负载 @param qos QoS等级(0/1/2) @return true=发送成功 */
     bool publish(const QString& topic, const QByteArray& payload, int qos = 0);
+    /** @brief 订阅指定主题 @param topic 主题路径 @param qos QoS等级(0/1/2) @return true=发送成功 */
     bool subscribe(const QString& topic, int qos = 0);
+    /** @brief 取消订阅指定主题 @param topic 主题路径 */
     void unsubscribe(const QString& topic);
 
     // ---- LWT遗嘱消息接口 ----
@@ -72,85 +86,115 @@ public:
     int queueLimit() const;
 
     // ---- 统计接口 ----
+    /** @brief 获取累计发布消息数 @return 发布计数 */
     quint64 totalPublishes() const;
+    /** @brief 获取累计接收消息数 @return 接收计数 */
     quint64 totalReceived() const;
+    /** @brief 获取累计订阅次数 @return 订阅计数 */
     quint64 totalSubscriptions() const;
+    /** @brief 获取累计发送字节数 @return 发送字节数 */
     quint64 totalBytesSent() const;
+    /** @brief 获取累计接收字节数 @return 接收字节数 */
     quint64 totalBytesReceived() const;
+    /** @brief 获取累计错误次数 @return 错误计数 */
     quint64 errorCount() const;
+    /** @brief 获取累计连接尝试次数 @return 连接尝试计数 */
     quint64 connectionAttempts() const;
+    /** @brief 获取QoS0发布消息数 @return QoS0计数 */
     quint64 qos0Count() const;
+    /** @brief 获取QoS1发布消息数 @return QoS1计数 */
     quint64 qos1Count() const;
+    /** @brief 获取QoS2发布消息数 @return QoS2计数 */
     quint64 qos2Count() const;
+    /** @brief 获取累计PINGREQ发送次数 @return 心跳计数 */
     quint64 keepAliveSent() const;
+    /** @brief 获取最后一次连接发起时间 @return 时间戳 */
     QDateTime lastConnectTime() const;
+    /** @brief 获取当前订阅数量 @return 订阅主题数 */
     int subscriptionCount() const;
+    /** @brief 获取待发送队列大小 @return 队列中的消息数 */
     int pendingQueueSize() const;
+    /** @brief 重置所有统计计数器 */
     void resetStats();
 
 signals:
+    /** @brief 收到MQTT消息 @param topic 消息主题 @param payload 消息负载 */
     void messageReceived(const QString& topic, const QByteArray& payload);
+    /** @brief 连接成功建立 */
     void connected();
+    /** @brief 连接断开 */
     void disconnected();
     /** @brief 消息队列溢出信号(丢弃旧消息时发出) @param count 丢弃的消息数 */
     void queueOverflow(int count);
 
 private slots:
+    /** @brief TCP socket数据就绪回调 */
     void onSocketReadyRead();
+    /** @brief TCP socket连接成功回调 */
     void onSocketConnected();
+    /** @brief TCP socket断开回调 */
     void onSocketDisconnected();
+    /** @brief KeepAlive定时器回调，发送PINGREQ */
     void onKeepAlive();
 
 private:
+    /** @brief 构建MQTT协议报文 @param packetType 报文类型 @param payload 负载数据 @return 完整报文字节流 */
     QByteArray buildMqttPacket(quint8 packetType, const QByteArray& payload);
+    /** @brief 编码剩余长度字段(MQTT可变长度编码) @param length 长度值 @return 编码后的字节序列 */
     QByteArray encodeRemainingLength(int length);
+    /** @brief 解析TCP接收缓冲区中的MQTT报文 */
     void parseIncomingPacket();
+    /** @brief 发送MQTT CONNECT报文 */
     void sendConnect();
+    /** @brief 处理CONNACK响应报文 @param data 报文数据 */
     void handleConnack(const QByteArray& data);
+    /** @brief 处理收到的PUBLISH报文 @param data 报文数据 @param flags 报文标志位 */
     void handlePublish(const QByteArray& data, quint8 flags);
+    /** @brief 处理SUBACK响应报文 @param data 报文数据 */
     void handleSuback(const QByteArray& data);
+    /** @brief 生成唯一客户端ID @return 客户端ID字符串 */
     QString generateClientId();
     /** @brief 发送队列中缓存的待发消息 */
     void flushPendingQueue();
 
     // 配置参数
-    QString m_host;
-    int m_port = 1883;
-    QString m_clientId;
-    QString m_username;
-    QString m_password;
-    int m_keepAliveInterval = 60;
-    bool m_cleanSession = true;
-    quint16 m_packetId = 0;
+    QString m_host;                             ///< MQTT服务器地址
+    int m_port = 1883;                          ///< MQTT服务器端口
+    QString m_clientId;                         ///< 客户端唯一标识
+    QString m_username;                         ///< 认证用户名
+    QString m_password;                         ///< 认证密码
+    int m_keepAliveInterval = 60;               ///< KeepAlive间隔(秒)
+    bool m_cleanSession = true;                 ///< 清除会话标志
+    quint16 m_packetId = 0;                     ///< 报文ID自增计数器
 
     // LWT遗嘱消息
-    MqttWillConfig m_will;
+    MqttWillConfig m_will;                      ///< 遗嘱消息配置
 
     // 消息队列
     QQueue<MqttPendingMessage> m_pendingQueue; ///< 断线时消息缓存队列
     int m_queueLimit = 100;                     ///< 队列最大容量
 
     // 网络资源
-    QTcpSocket* m_socket;
-    QTimer* m_keepAlive;
-    ConnectionState m_state = ConnectionState::Disconnected;
-    QByteArray m_rxBuffer;
-    int m_expectedLength = -1;
-    QStringList m_subscriptions;
+    QTcpSocket* m_socket;                       ///< TCP socket
+    QTimer* m_keepAlive;                        ///< KeepAlive定时器
+    ConnectionState m_state = ConnectionState::Disconnected; ///< 当前连接状态
+    QByteArray m_rxBuffer;                      ///< 接收缓冲区
+    int m_expectedLength = -1;                  ///< 期望的报文长度(-1=未解析)
+    QStringList m_subscriptions;                ///< 已订阅主题列表
 
     // 统计计数器
-    quint64 m_totalPublishes = 0;
-    quint64 m_totalReceived = 0;
-    quint64 m_totalSubscriptions = 0;
-    quint64 m_totalBytesSent = 0;
-    quint64 m_totalBytesReceived = 0;
-    quint64 m_errorCount = 0;
-    quint64 m_connectionAttempts = 0;
-    quint64 m_qos0Count = 0;
-    quint64 m_qos1Count = 0;
-    quint64 m_qos2Count = 0;
-    quint64 m_keepAliveSent = 0;
-    QDateTime m_lastConnectTime;
+    quint64 m_totalPublishes = 0;               ///< 累计发布消息数
+    quint64 m_totalReceived = 0;                ///< 累计接收消息数
+    quint64 m_totalSubscriptions = 0;           ///< 累计订阅次数
+    quint64 m_totalBytesSent = 0;               ///< 累计发送字节数
+    quint64 m_totalBytesReceived = 0;           ///< 累计接收字节数
+    quint64 m_errorCount = 0;                   ///< 累计错误次数
+    quint64 m_connectionAttempts = 0;           ///< 累计连接尝试次数
+    quint64 m_qos0Count = 0;                    ///< QoS0发布计数
+    quint64 m_qos1Count = 0;                    ///< QoS1发布计数
+    quint64 m_qos2Count = 0;                    ///< QoS2发布计数
+    quint64 m_keepAliveSent = 0;                ///< 累计PINGREQ发送次数
+    QDateTime m_lastConnectTime;                ///< 最后连接发起时间
 };
 
 #endif // MQTTCONNECTION_H

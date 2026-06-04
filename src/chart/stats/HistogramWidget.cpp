@@ -21,6 +21,9 @@
 #include <QtCharts>
 #include <algorithm>
 #include <cmath>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
 
 /** @brief 构造直方图控件 @param model 数据模型指针 @param parent 父控件 */
 HistogramWidget::HistogramWidget(ChartModel* model, QWidget* parent)
@@ -90,7 +93,7 @@ QWidget* HistogramWidget::createToolbar()
     binsLabel->setObjectName(QStringLiteral("HistogramBinsLabel"));
     m_binsSpin = new QSpinBox(toolbar);
     m_binsSpin->setObjectName(QStringLiteral("HistogramBinsSpin"));
-    m_binsSpin->setRange(10, 200);
+    m_binsSpin->setRange(5, 200);
     m_binsSpin->setValue(30);
     connect(m_binsSpin, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &HistogramWidget::onBinsChanged);
@@ -262,10 +265,18 @@ void HistogramWidget::refreshHistogram()
 
     // 自动调整Y轴
     int maxCount = 0;
-    for (const auto& [center, count] : histData) {
-        maxCount = std::max(maxCount, count);
+    int peakIdx = 0;
+    for (int i = 0; i < histData.size(); ++i) {
+        const auto& [center, count] = histData[i];
+        if (count > maxCount) {
+            maxCount = count;
+            peakIdx = i;
+        }
     }
     m_yAxis->setRange(0, qMax(maxCount + 1, 1));
+    m_peakBinIndex = peakIdx;
+    m_maxBinCount = maxCount;
+    ++m_totalBinsComputed;
 
     // 更新统计摘要
     Stats s = computeStats(data);
@@ -381,9 +392,60 @@ quint64 HistogramWidget::totalBinChanges() const
     return m_totalBinChanges;
 }
 
+/** @brief 获取累计分桶计算次数 @return 计算次数 */
+quint64 HistogramWidget::totalBinsComputed() const
+{
+    return m_totalBinsComputed;
+}
+
+/** @brief 获取峰值所在桶索引 @return 桶索引，无数据返回-1 */
+int HistogramWidget::peakBinIndex() const
+{
+    return m_peakBinIndex;
+}
+
+/** @brief 获取最大桶计数值 @return 最大计数 */
+int HistogramWidget::maxBinCount() const
+{
+    return m_maxBinCount;
+}
+
+/** @brief 导出当前直方图数据到CSV文件 @param filePath 目标文件路径 @return true=导出成功 */
+bool HistogramWidget::exportToCsv(const QString& filePath)
+{
+    if (!m_model || !m_barSet || m_barSet->count() == 0) {
+        return false;
+    }
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return false;
+    }
+
+    QTextStream stream(&file);
+    stream << tr("桶中心值") << "," << tr("计数") << "\n";
+
+    QString channel = m_channelCombo->currentText();
+    QVector<QPointF> data = m_model->channelData(channel);
+    int bins = m_binsSpin->value();
+    auto histData = computeHistogram(data, bins);
+
+    for (const auto& [center, count] : histData) {
+        stream << QStringLiteral("%1,%2\n")
+                      .arg(center, 0, 'f', 6)
+                      .arg(count);
+    }
+
+    file.close();
+    return true;
+}
+
 /** @brief 重置所有直方图统计计数器 */
 void HistogramWidget::resetHistogramStatistics()
 {
     m_totalUpdates = 0;
     m_totalBinChanges = 0;
+    m_totalBinsComputed = 0;
+    m_peakBinIndex = -1;
+    m_maxBinCount = 0;
 }

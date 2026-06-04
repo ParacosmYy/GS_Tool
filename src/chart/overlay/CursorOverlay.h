@@ -82,6 +82,12 @@ public:
     /** @brief 获取测量显示总次数（双游标差值面板绘制） */
     quint64 totalMeasurements() const;
 
+    /** @brief 获取历次测量的平均ΔX值 @return 平均ΔX */
+    double averageDeltaX() const;
+
+    /** @brief 获取历次测量的平均ΔY值(首个通道) @return 平均ΔY */
+    double averageDeltaY() const;
+
     /** @brief 重置所有游标统计计数器为初始值 */
     void resetCursorStatistics();
 
@@ -170,6 +176,8 @@ private:
     // 统计计数器
     quint64 m_totalCursorMoves = 0;     ///< 游标移动总次数（含放置和拖拽）
     quint64 m_totalMeasurements = 0;    ///< 测量显示总次数（双游标差值面板绘制）
+    double m_sumDeltaX = 0.0;           ///< 累计ΔX值(用于计算averageDeltaX)
+    double m_sumDeltaY = 0.0;           ///< 累计ΔY值(首个通道，用于计算averageDeltaY)
 
 private slots:
     /**

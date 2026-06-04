@@ -51,6 +51,7 @@ set(SOURCES
     src/core/workspace/WorkspaceManager.cpp
     src/core/factory/WidgetFactory.cpp
     src/serial/detector/SerialDetector.cpp
+    src/serial/detector/SerialDetectorChip.cpp
     src/chart/waterfall/WaterfallWidget.cpp
     src/chart/heatmap/HeatmapWidget.cpp
     src/core/settings/SettingsController.cpp
@@ -92,6 +93,7 @@ set(SOURCES
     src/terminal/layout/TerminalLayoutManager.cpp
     src/terminal/selection/TerminalSelectionManager.cpp
     src/terminal/search/TerminalSearchManager.cpp
+    src/terminal/search/TerminalSearchBuilders.cpp
     src/terminal/search/TerminalSearchRenderer.cpp
     src/terminal/menu/TerminalContextMenuManager.cpp
     src/serial/config/SerialConfigPanel.cpp

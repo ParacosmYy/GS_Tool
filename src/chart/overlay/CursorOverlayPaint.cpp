@@ -24,6 +24,7 @@
 #include <QChartView>
 #include <QChart>
 #include <algorithm>
+#include <cmath>
 
 // ============================================================
 // 绘制辅助 — 静态插值函数
@@ -206,6 +207,19 @@ void CursorOverlay::paintEvent(QPaintEvent* /*event*/)
     // 双游标模式: 绘制差值面板
     if (m_hasCursorA && m_hasCursorB) {
         ++m_totalMeasurements;
+        // 累计ΔX/ΔY用于计算平均值
+        double deltaX = std::abs(m_cursorBX - m_cursorAX);
+        m_sumDeltaX += deltaX;
+        // 累计首个通道的ΔY
+        if (m_model && !m_model->channelNames().isEmpty()) {
+            const QString& firstCh = m_model->channelNames().first();
+            const QVector<QPointF>& data = m_model->channelData(firstCh);
+            double valA = 0.0, valB = 0.0;
+            if (interpolateY(data, m_cursorAX, valA) &&
+                interpolateY(data, m_cursorBX, valB)) {
+                m_sumDeltaY += std::abs(valB - valA);
+            }
+        }
         drawDeltaPanel(painter);
     }
 

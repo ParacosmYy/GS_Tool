@@ -69,43 +69,23 @@ public:
     void loadSettings(QSettings& settings);
 
 signals:
-    /** @brief 用户点击连接/断开按钮 */
+    /** @brief 用户点击连接按钮 */
     void connectRequested();
+    /** @brief 用户点击断开按钮 */
     void disconnectRequested();
 
 private:
-    /** @brief CAN适配器选择下拉框 */
-    QComboBox* m_adapterCombo;
-
-    /** @brief 波特率下拉框 */
-    QComboBox* m_bitrateCombo;
-
-    /** @brief CAN-FD模式复选框 */
-    QCheckBox* m_canFdCheck;
-
-    /** @brief 连接/断开按钮 */
-    QPushButton* m_connectBtn;
-
-    /** @brief 状态标签 */
-    QLabel* m_statusLabel;
-
-    /** @brief 采样点(0.5~0.9)输入框 */
-    QDoubleSpinBox* m_samplePointSpin;
-
-    /** @brief SJW(1~4)输入框 */
-    QSpinBox* m_sjwSpin;
-
-    /** @brief 过滤器ID输入框 */
-    QLineEdit* m_filterIdEdit;
-
-    /** @brief 过滤器掩码输入框 */
-    QLineEdit* m_filterMaskEdit;
-
-    /** @brief 过滤器扩展帧复选框 */
-    QCheckBox* m_filterExtCheck;
-
-    /** @brief 当前是否已连接 */
-    bool m_connected = false;
+    QComboBox* m_adapterCombo;         ///< CAN适配器选择下拉框
+    QComboBox* m_bitrateCombo;         ///< 波特率下拉框
+    QCheckBox* m_canFdCheck;           ///< CAN-FD模式复选框
+    QPushButton* m_connectBtn;         ///< 连接/断开按钮
+    QLabel* m_statusLabel;             ///< 状态标签
+    QDoubleSpinBox* m_samplePointSpin; ///< 采样点(0.5~0.9)输入框
+    QSpinBox* m_sjwSpin;              ///< SJW(1~4)输入框
+    QLineEdit* m_filterIdEdit;        ///< 过滤器ID输入框
+    QLineEdit* m_filterMaskEdit;      ///< 过滤器掩码输入框
+    QCheckBox* m_filterExtCheck;      ///< 过滤器扩展帧复选框
+    bool m_connected = false;         ///< 当前是否已连接
 
     // ---- 统计计数器 ----
     quint64 m_totalConfigChanges = 0;  ///< 累计配置变更次数

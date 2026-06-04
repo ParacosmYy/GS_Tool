@@ -19,6 +19,8 @@
 #include "connection/interface/IConnection.h"
 #include <QTcpSocket>
 #include <QTimer>
+#include <QElapsedTimer>
+#include <QQueue>
 
 /**
  * @brief WebSocket客户端连接实现
@@ -98,6 +100,45 @@ public:
     /** @brief 获取错误计数 */
     quint64 errorCount() const;
 
+    /** @brief 获取已发送帧总数(包含所有opcode) @return 帧发送总数 */
+    quint64 totalFramesSent() const;
+
+    /** @brief 获取已接收帧总数(包含所有opcode) @return 帧接收总数 */
+    quint64 totalFramesReceived() const;
+
+    /** @brief 获取已发送文本帧总数 @return 文本帧发送总数 */
+    quint64 totalTextFrames() const;
+
+    /** @brief 获取已接收文本帧总数 @return 文本帧接收总数 */
+    quint64 totalBinaryFrames() const;
+
+    /** @brief 获取已发送ping帧总数 @return ping帧发送总数 */
+    quint64 totalPingFrames() const;
+
+    /** @brief 获取已接收pong帧总数 @return pong帧接收总数 */
+    quint64 totalPongFrames() const;
+
+    /** @brief 获取ping/pong平均延迟(毫秒) @return 平均延迟，无数据时返回0 */
+    double averageLatencyMs() const;
+
+    /** @brief 获取ping/pong最大延迟(毫秒) @return 最大延迟，无数据时返回0 */
+    qint64 maxLatencyMs() const;
+
+    /** @brief 获取当前连接的运行时长(秒) @return 连接时长，未连接时返回0 */
+    qint64 connectionUptimeSeconds() const;
+
+    /** @brief 获取当前消息队列大小 @return 队列中待发送消息数量 */
+    int messageQueueSize() const;
+
+    /** @brief 获取消息队列容量上限 @return 队列最大容量 */
+    int messageQueueLimit() const;
+
+    /** @brief 设置消息队列容量上限 @param limit 最大容量，小于等于0不限 */
+    void setMessageQueueLimit(int limit);
+
+    /** @brief 获取因队列满而丢弃的消息数 @return 丢弃消息总数 */
+    quint64 totalMessagesDropped() const;
+
     /** @brief 重置所有统计数据为零 */
     void resetStats();
 
@@ -166,6 +207,25 @@ private:
     QString m_handshakeKey;             ///< 握手Sec-WebSocket-Key
     bool m_handshakeDone = false;       ///< 握手是否完成
 
+    // ---- 延迟追踪 ----
+    QElapsedTimer m_pingSendTime;       ///< ping发送时间戳
+    qint64 m_lastLatencyMs = 0;         ///< 最近一次ping/pong延迟(ms)
+    qint64 m_maxLatencyMs = 0;          ///< 最大ping/pong延迟(ms)
+    quint64 m_latencySampleCount = 0;   ///< 延迟采样次数
+    qint64 m_latencySumMs = 0;          ///< 延迟累计总和(ms)
+
+    // ---- 连接时长 ----
+    QElapsedTimer m_connectionTimer;    ///< 连接建立后的运行计时器
+
+    // ---- 消息队列 ----
+    struct QueuedMessage {               ///< 待发送消息结构
+        bool isText = false;             ///< true=文本帧, false=二进制帧
+        QByteArray data;                 ///< 消息内容(文本用toUtf8()后)
+    };
+    QQueue<QueuedMessage> m_sendQueue;  ///< 发送队列
+    int m_queueLimit = 1000;            ///< 队列容量上限
+    quint64 m_totalMessagesDropped = 0; ///< 因队列满而丢弃的消息数
+
     // ---- 统计计数器 ----
     quint64 m_totalConnections = 0;         ///< 累计WebSocket连接成功次数
     quint64 m_totalMessagesSent = 0;        ///< 已发送消息总数(文本+二进制)
@@ -173,6 +233,12 @@ private:
     quint64 m_totalBytesSent = 0;           ///< 已发送字节总数(帧级别)
     quint64 m_totalBytesReceived = 0;       ///< 已接收字节总数(帧级别)
     quint64 m_errorCount = 0;               ///< 错误发生次数
+    quint64 m_totalFramesSent = 0;          ///< 已发送帧总数(含所有opcode)
+    quint64 m_totalFramesReceived = 0;      ///< 已接收帧总数(含所有opcode)
+    quint64 m_totalTextFrames = 0;          ///< 已发送文本帧总数
+    quint64 m_totalBinaryFrames = 0;        ///< 已发送二进制帧总数
+    quint64 m_totalPingFrames = 0;          ///< 已发送ping帧总数
+    quint64 m_totalPongFrames = 0;          ///< 已接收pong帧总数
 };
 
 #endif // WEBSOCKETCONNECTION_H

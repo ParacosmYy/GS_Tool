@@ -29,7 +29,9 @@ class MqttTopicModel : public QAbstractItemModel {
     Q_OBJECT
 
 public:
+    /** @brief 构造MQTT主题树模型 @param parent 父对象指针 */
     explicit MqttTopicModel(QObject* parent = nullptr);
+    /** @brief 析构函数，释放整棵主题树 */
     ~MqttTopicModel() override;
 
     // ---- QAbstractItemModel 完整接口 ----
@@ -57,33 +59,40 @@ public:
 
     // ---- 主题管理接口 ----
 
-    /// @brief 添加主题，按'/'分割构建层级 @param topic 主题路径 @param qos QoS(0/1/2)
+    /** @brief 添加主题，按'/'分割构建层级 @param topic 主题路径 @param qos QoS(0/1/2) */
     void addTopic(const QString& topic, int qos = 0);
-    /// @brief 移除主题并重建树 @param topic 主题路径
+    /** @brief 移除主题并重建树 @param topic 主题路径 */
     void removeTopic(const QString& topic);
-    /// @brief 更新已有主题QoS @param topic 主题路径 @param qos 新QoS @return 是否成功
+    /** @brief 更新已有主题QoS @param topic 主题路径 @param qos 新QoS @return 是否成功 */
     bool updateTopic(const QString& topic, int qos);
-    /// @brief 清除所有主题
+    /** @brief 清除所有主题 */
     void clearTopics();
-    /// @brief 主题是否存在 @param topic 主题路径 @return 是否存在
+    /** @brief 主题是否存在 @param topic 主题路径 @return 是否存在 */
     bool hasTopic(const QString& topic) const;
-    /// @brief 当前主题数量 @return 主题总数
+    /** @brief 当前主题数量 @return 主题总数 */
     int topicCount() const;
-    /// @brief 获取指定主题QoS @param topic 主题路径 @return QoS等级，不存在返回-1
+    /** @brief 获取指定主题QoS @param topic 主题路径 @return QoS等级，不存在返回-1 */
     int topicQos(const QString& topic) const;
-    /// @brief 获取所有主题列表 @return 主题路径字符串列表
+    /** @brief 获取所有主题列表 @return 主题路径字符串列表 */
     QStringList topics() const;
-    /// @brief 根据主题路径查找模型索引 @param topic 完整路径 @return 第0列索引
+    /** @brief 根据主题路径查找模型索引 @param topic 完整路径 @return 第0列索引 */
     QModelIndex findTopicIndex(const QString& topic) const;
 
     // ---- 统计接口 ----
-    quint64 totalTopicsAdded() const;     ///< 累计添加次数
-    quint64 totalTopicsRemoved() const;   ///< 累计移除次数
-    quint64 totalDuplicateSkips() const;  ///< 累计去重跳过次数
-    quint64 totalQosUpdates() const;      ///< 累计QoS更新次数
-    quint64 totalMessagesRouted() const;  ///< 累计消息路由次数
-    int totalNodeCount() const;           ///< 树节点总数(含非叶节点)
-    void resetTopicStatistics();          ///< 重置统计计数器
+    /** @brief 获取累计添加次数 */
+    quint64 totalTopicsAdded() const;
+    /** @brief 获取累计移除次数 */
+    quint64 totalTopicsRemoved() const;
+    /** @brief 获取累计去重跳过次数 */
+    quint64 totalDuplicateSkips() const;
+    /** @brief 获取累计QoS更新次数 */
+    quint64 totalQosUpdates() const;
+    /** @brief 获取累计消息路由次数 */
+    quint64 totalMessagesRouted() const;
+    /** @brief 获取树节点总数(含非叶节点) @return 节点总数(不含虚拟根节点) */
+    int totalNodeCount() const;
+    /** @brief 重置统计计数器 */
+    void resetTopicStatistics();
 
     // ---- 消息路由接口 ----
     /**
@@ -95,16 +104,24 @@ public:
     bool routeMessage(const QString& topic, const QByteArray& payload);
 
 signals:
-    void topicAdded(const QString& topic, int qos);          ///< 主题添加信号
-    void topicRemoved(const QString& topic);                 ///< 主题移除信号
-    void topicQosChanged(const QString& topic, int oldQos, int newQos); ///< QoS变更信号
-    void topicsCleared();                                    ///< 所有主题清除信号
+    /** @brief 主题添加信号 @param topic 主题路径 @param qos QoS等级 */
+    void topicAdded(const QString& topic, int qos);
+    /** @brief 主题移除信号 @param topic 主题路径 */
+    void topicRemoved(const QString& topic);
+    /** @brief QoS变更信号 @param topic 主题路径 @param oldQos 旧QoS @param newQos 新QoS */
+    void topicQosChanged(const QString& topic, int oldQos, int newQos);
+    /** @brief 所有主题清除信号 */
+    void topicsCleared();
 
 private:
-    TopicNode* nodeFromIndex(const QModelIndex& index) const; ///< 索引→节点
-    TopicNode* findOrCreateChild(TopicNode* parentNode, const QString& name); ///< 查找/创建子节点
-    TopicNode* findLeafNode(TopicNode* root, const QString& fullPath) const;  ///< 递归查找叶节点
-    int countNodes(const TopicNode* node) const;             ///< 递归统计节点数
+    /** @brief 从模型索引获取对应的树节点指针 @param index 模型索引 @return 对应的TopicNode指针 */
+    TopicNode* nodeFromIndex(const QModelIndex& index) const;
+    /** @brief 在父节点下查找或创建指定名称的子节点 @param parentNode 父节点 @param name 子节点名称 @return 已有或新创建的子节点指针 */
+    TopicNode* findOrCreateChild(TopicNode* parentNode, const QString& name);
+    /** @brief 递归查找指定完整路径的叶节点 @param root 搜索起始根节点 @param fullPath 目标完整路径 @return 匹配的叶节点指针，未找到返回nullptr */
+    TopicNode* findLeafNode(TopicNode* root, const QString& fullPath) const;
+    /** @brief 递归统计以指定节点为根的子树节点总数 @param node 起始节点 @return 节点总数(包含自身) */
+    int countNodes(const TopicNode* node) const;
     /** @brief MQTT通配符匹配(支持+和#) @param topicParts 消息主题段 @param subParts 订阅模式段 @return 是否匹配 */
     bool topicMatchesSubscription(const QStringList& topicParts, const QStringList& subParts) const;
 

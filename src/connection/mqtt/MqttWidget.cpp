@@ -132,9 +132,9 @@ void MqttWidget::setupUi()
 
     m_pubQosCombo = new QComboBox(this);
     m_pubQosCombo->setObjectName("mqttPubQosCombo");
-    m_pubQosCombo->addItem("QoS 0", 0);
-    m_pubQosCombo->addItem("QoS 1", 1);
-    m_pubQosCombo->addItem("QoS 2", 2);
+    m_pubQosCombo->addItem(tr("QoS 0"), 0);
+    m_pubQosCombo->addItem(tr("QoS 1"), 1);
+    m_pubQosCombo->addItem(tr("QoS 2"), 2);
 
     m_retainCheck = new QCheckBox(tr("Retain"), this);
     m_retainCheck->setObjectName("mqttRetainCheck");
@@ -194,27 +194,27 @@ void MqttWidget::setupUi()
     statsGroup->setObjectName("mqttStatsGroup");
     auto* statsLayout = new QFormLayout(statsGroup);
 
-    m_statPublished = new QLabel("0", this);
+    m_statPublished = new QLabel(tr("0"), this);
     m_statPublished->setObjectName("mqttStatPublished");
-    m_statReceived = new QLabel("0", this);
+    m_statReceived = new QLabel(tr("0"), this);
     m_statReceived->setObjectName("mqttStatReceived");
-    m_statQos0 = new QLabel("0", this);
+    m_statQos0 = new QLabel(tr("0"), this);
     m_statQos0->setObjectName("mqttStatQos0");
-    m_statQos1 = new QLabel("0", this);
+    m_statQos1 = new QLabel(tr("0"), this);
     m_statQos1->setObjectName("mqttStatQos1");
-    m_statQos2 = new QLabel("0", this);
+    m_statQos2 = new QLabel(tr("0"), this);
     m_statQos2->setObjectName("mqttStatQos2");
-    m_statBytesSent = new QLabel("0 B", this);
+    m_statBytesSent = new QLabel(tr("0 B"), this);
     m_statBytesSent->setObjectName("mqttStatBytesSent");
-    m_statBytesReceived = new QLabel("0 B", this);
+    m_statBytesReceived = new QLabel(tr("0 B"), this);
     m_statBytesReceived->setObjectName("mqttStatBytesReceived");
-    m_statQueueSize = new QLabel("0", this);
+    m_statQueueSize = new QLabel(tr("0"), this);
     m_statQueueSize->setObjectName("mqttStatQueueSize");
-    m_statKeepAlive = new QLabel("0", this);
+    m_statKeepAlive = new QLabel(tr("0"), this);
     m_statKeepAlive->setObjectName("mqttStatKeepAlive");
-    m_statConnAttempts = new QLabel("0", this);
+    m_statConnAttempts = new QLabel(tr("0"), this);
     m_statConnAttempts->setObjectName("mqttStatConnAttempts");
-    m_statLastConnect = new QLabel("-", this);
+    m_statLastConnect = new QLabel(QStringLiteral("-"), this);
     m_statLastConnect->setObjectName("mqttStatLastConnect");
 
     statsLayout->addRow(tr("发布消息:"), m_statPublished);
