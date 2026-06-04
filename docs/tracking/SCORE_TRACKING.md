@@ -69,6 +69,8 @@
 | 221 | Plugin/Scope/Audio/Freq/CommandPalette/Recorder/Toast/Diff统计增强+文件拆分 | PluginApi面板注册/通道/订阅+PluginManager扫描/发现+MainWindowPanelConnect+PanelManagerQuery拆分 |
 | 222 | QssThemeGeneratorWidgets/UsbDeviceDetectorStats拆分+Widget统计增强 | QSS主题生成器组件独立+USB检测统计独立+DataAggregator压缩 |
 | 223 | NotificationManager/WorkspaceManager/ConnectionMonitor统计增强+文件拆分 | 通知创建/确认/消除+工作区保存/加载/删除/切换+OtaWidgetDisplay+QuickCommandBarActions拆分 |
+| 224 | QssThemeGeneratorWidgets/UsbDeviceDetectorStats拆分+PluginLoader2/SpiI2cBridge统计增强 | PluginLoader2加载/卸载/扫描+SpiI2cBridge模式切换/队列排空 |
+| 225 | PluginLoader2/SpiI2cBridgeManager统计增强+IntelHex/OtaManager拆分修复 | IntelHex命名空间修复+OtaManagerVerify拆分 |
 
 ---
 
