@@ -118,6 +118,7 @@ set(SOURCES
     src/terminal/layout/TerminalLayoutManagerStats.cpp
     src/terminal/layout/TerminalLayoutSplit.cpp
     src/terminal/selection/TerminalSelectionManager.cpp
+    src/terminal/selection/TerminalSelectionManagerStats.cpp
     src/terminal/search/TerminalSearchManager.cpp
     src/terminal/search/TerminalSearchBuilders.cpp
     src/terminal/search/TerminalSearchRenderer.cpp
@@ -130,6 +131,7 @@ set(SOURCES
     src/serial/data/BookmarkWidget.cpp
     src/serial/commands/TimedSender.cpp
     src/serial/commands/SendHistory.cpp
+    src/serial/commands/SendHistoryStats.cpp
     src/serial/data/DataStatistics.cpp
     src/serial/data/DataStatisticsRefresh.cpp
     src/serial/data/DataStatisticsDisplay.cpp
@@ -348,6 +350,7 @@ set(SOURCES
     # ── F14: MQTT 客户端 ──
     src/connection/mqtt/MqttConnection.cpp
     src/connection/mqtt/MqttConnectionProtocol.cpp
+    src/connection/mqtt/MqttConnectionStats.cpp
     src/connection/mqtt/MqttConnectionPublish.cpp
     src/connection/mqtt/MqttTopicModel.cpp
     src/connection/mqtt/MqttTopicModelHelpers.cpp
@@ -403,6 +406,7 @@ set(SOURCES
     src/protocol/protobuf/FlatBuffersDecoderFields.cpp
     src/protocol/protobuf/FlatBuffersDecoderSchema.cpp
     src/protocol/protobuf/SchemaViewer.cpp
+    src/protocol/protobuf/SchemaViewerStats.cpp
 
     # ── F20: USB 调试 ──
     src/connection/usb/UsbConnection.cpp
