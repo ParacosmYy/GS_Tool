@@ -137,47 +137,6 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
 }
 
 // ============================================================
-// 窗函数
-// ============================================================
-
-/** @brief 对复数序列应用窗函数(原地修改) @param data 输入/输出复数序列 @param window 窗函数类型 */
-void FftEngine::applyWindow(QVector<std::complex<double>>& data, WindowType window)
-{
-    const int N = data.size();
-    if (N <= 1) {
-        return;
-    }
-
-    switch (window) {
-    case WindowType::Rectangular:
-        break;
-
-    case WindowType::Hanning:
-        for (int n = 0; n < N; ++n) {
-            double w = 0.5 * (1.0 - qCos(2.0 * M_PI * n / (N - 1)));
-            data[n] *= w;
-        }
-        break;
-
-    case WindowType::Hamming:
-        for (int n = 0; n < N; ++n) {
-            double w = 0.54 - 0.46 * qCos(2.0 * M_PI * n / (N - 1));
-            data[n] *= w;
-        }
-        break;
-
-    case WindowType::Blackman:
-        for (int n = 0; n < N; ++n) {
-            double w = 0.42
-                     - 0.50 * qCos(2.0 * M_PI * n / (N - 1))
-                     + 0.08 * qCos(4.0 * M_PI * n / (N - 1));
-            data[n] *= w;
-        }
-        break;
-    }
-}
-
-// ============================================================
 // Cooley-Tukey radix-2 DIT FFT
 // ============================================================
 

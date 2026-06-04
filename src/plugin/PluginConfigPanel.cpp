@@ -153,12 +153,12 @@ void PluginConfigPanel::setupUI()
     /* 加载按钮: 弹出文件选择对话框 */
     connect(m_loadBtn, &QPushButton::clicked, this, [this]() {
 #ifdef Q_OS_WIN
-        const QString filter = tr("Plugins (*.dll)");
+        const QString filter = tr("插件 (*.dll)");
 #else
-        const QString filter = tr("Plugins (*.so)");
+        const QString filter = tr("插件 (*.so)");
 #endif
         const QString path = QFileDialog::getOpenFileName(
-            this, tr("Select Plugin"), QString(), filter);
+            this, tr("选择插件"), QString(), filter);
         if (!path.isEmpty()) {
             ++m_totalPluginLoads;
             emit loadPluginRequested(path);

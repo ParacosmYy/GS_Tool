@@ -53,7 +53,7 @@ QByteArray DataPipeline::process(const QByteArray &input) {
             emit stageProcessed(stage.name, inSize, data.size());
         } catch (...) {
             ++m_totalStageErrors;
-            emit stageError(stage.name, tr("Processing failed"));
+            emit stageError(stage.name, tr("处理失败"));
         }
     }
     emit pipelineComplete(data);

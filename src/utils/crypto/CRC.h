@@ -96,6 +96,11 @@ inline uint8_t checksum(const uint8_t* data, int length)
 inline uint8_t checksum(const QByteArray& ba)
 { return checksum(reinterpret_cast<const uint8_t*>(ba.constData()), ba.size()); }
 
+// ---- 统计重置 ----
+
+/** @brief 重置所有CRC统计计数器(计算次数和已处理字节数归零) */
+inline void resetStatistics() { s_totalComputations = 0; s_totalBytesProcessed = 0; }
+
 } // namespace CRC
 
 #endif // CRC_H

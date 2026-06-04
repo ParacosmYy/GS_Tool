@@ -99,7 +99,7 @@ void ProtocolSchemaEditor::loadSchema(ProtocolSchema *schema)
     ++m_totalSchemasLoaded;  ///< 统计: 加载协议
 
     if (!m_schema) {
-        m_statusLabel->setText(tr("Invalid schema"));
+        m_statusLabel->setText(tr("无效的协议定义"));
         return;
     }
 
@@ -110,9 +110,9 @@ void ProtocolSchemaEditor::loadSchema(ProtocolSchema *schema)
             doc.toJson(QJsonDocument::Indented));
 
         m_jsonEditor->setPlainText(jsonStr);
-        m_statusLabel->setText(tr("Loaded: %1").arg(m_schema->name()));
+        m_statusLabel->setText(tr("已加载: %1").arg(m_schema->name()));
     } else {
-        m_statusLabel->setText(tr("Invalid schema"));
+        m_statusLabel->setText(tr("无效的协议定义"));
     }
 }
 

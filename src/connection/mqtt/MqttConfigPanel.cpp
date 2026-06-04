@@ -16,7 +16,7 @@ MqttConfigPanel::MqttConfigPanel(QWidget* parent)
     , m_usernameEdit(new QLineEdit(this))
     , m_passwordEdit(new QLineEdit(this))
     , m_keepAliveSpin(new QSpinBox(this))
-    , m_cleanSessionCheck(new QCheckBox(tr("Clean Session"), this))
+    , m_cleanSessionCheck(new QCheckBox(tr("清除会话"), this))
     , m_connectBtn(new QPushButton(tr("连接"), this))
     , m_statusLabel(new QLabel(tr("未连接"), this))
 {
@@ -64,7 +64,7 @@ MqttConfigPanel::MqttConfigPanel(QWidget* parent)
     form->addRow(tr("客户端ID:"), m_clientIdEdit);
     form->addRow(tr("用户名:"), m_usernameEdit);
     form->addRow(tr("密码:"), m_passwordEdit);
-    form->addRow(tr("Keep Alive:"), m_keepAliveSpin);
+    form->addRow(tr("心跳间隔:"), m_keepAliveSpin);
     form->addRow(m_cleanSessionCheck);
 
     auto btnLayout = new QHBoxLayout();

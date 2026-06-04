@@ -159,10 +159,13 @@ qint64 PluginApi::totalBytesSent() const
 }
 
 /**
- * @brief 重置发送统计
+ * @brief 重置所有插件API统计(发送计数/字节数/面板注册/通道添加/订阅切换)
  */
 void PluginApi::resetSendStatistics()
 {
     m_sendCount = 0;
     m_sendBytes = 0;
+    m_totalPanelRegistrations = 0;
+    m_totalChannelAdditions = 0;
+    m_totalSubscribeToggles = 0;
 }

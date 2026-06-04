@@ -132,7 +132,7 @@ void ConnectionController::onPortRemoved(const QString& portName)
         // 标记为非用户主动断开（物理拔出属于意外断开，可触发自动重连）
         m_userInitiatedDisconnect = false;
 
-        teardownConnection(tr("port removed: %1").arg(portName));
+        teardownConnection(tr("端口已移除: %1").arg(portName));
 
         // 通知 UI 连接因端口拔出而断开
         emit connectionStateChanged(ConnectionState::Disconnected, portName);

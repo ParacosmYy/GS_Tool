@@ -79,13 +79,13 @@ void ConnectionMonitor::resetMonitorStatistics() {
 /** @brief 获取当前状态的本地化显示文本 @return 状态对应的翻译字符串 */
 QString ConnectionMonitor::stateString() const {
     switch (m_stats.currentState) {
-    case Disconnected: return tr("Disconnected");
-    case Connecting: return tr("Connecting");
-    case Connected: return tr("Connected");
-    case Reconnecting: return tr("Reconnecting");
-    case Error: return tr("Error");
+    case Disconnected: return tr("已断开");
+    case Connecting: return tr("连接中");
+    case Connected: return tr("已连接");
+    case Reconnecting: return tr("重连中");
+    case Error: return tr("错误");
     }
-    return tr("Unknown");
+    return tr("未知");
 }
 
 /** @brief 心跳定时器超时回调，定时发射statsUpdated信号 */

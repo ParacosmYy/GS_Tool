@@ -11,7 +11,7 @@ CommandPalette::CommandPalette(QWidget *parent) : QWidget(parent, Qt::Popup) {
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(8,8,8,8);
     m_search = new QLineEdit(this); m_search->setObjectName("paletteSearch");
-    m_search->setPlaceholderText(tr("Type a command..."));
+    m_search->setPlaceholderText(tr("输入命令..."));
     layout->addWidget(m_search);
     m_list = new QListWidget(this); m_list->setObjectName("paletteList");
     layout->addWidget(m_list);

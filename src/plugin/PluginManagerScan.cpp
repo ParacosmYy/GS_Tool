@@ -184,11 +184,13 @@ quint64 PluginManager::totalUnloadCount() const
 }
 
 /**
- * @brief 重置加载统计
+ * @brief 重置所有插件管理统计(加载/失败/卸载/扫描/发现文件)
  */
 void PluginManager::resetLoadStatistics()
 {
     m_loadCount = 0;
     m_failCount = 0;
     m_unloadCount = 0;
+    m_scanCount = 0;
+    m_discoveredFiles = 0;
 }

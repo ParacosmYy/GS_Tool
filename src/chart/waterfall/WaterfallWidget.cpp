@@ -106,7 +106,7 @@ void WaterfallWidget::paintEvent(QPaintEvent *event)
     if (m_waterfall.isNull()) {
         p.fillRect(rect(), Qt::black);
         p.setPen(Qt::gray);
-        p.drawText(rect(), Qt::AlignCenter, tr("No data"));
+        p.drawText(rect(), Qt::AlignCenter, tr("无数据"));
         return;
     }
     p.drawPixmap(0, 0, m_waterfall.scaled(size(), Qt::IgnoreAspectRatio, Qt::FastTransformation));

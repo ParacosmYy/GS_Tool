@@ -115,6 +115,6 @@ public:
     quint64 totalEdgeDetections() const { return m_totalEdgeDetections; }
     /** @brief 获取总门控周期次数 @return 累计门控周期 */
     quint64 totalGateCycles() const { return m_totalGateCycles; }
-    /** @brief 重置频率计数器统计 */
-    void resetFreqStatistics() { m_totalSamples = 0; m_totalEdgeDetections = 0; m_totalGateCycles = 0; }
+    /** @brief 重置频率计数器统计(采样点/边沿检测/门控周期/脉冲计数) */
+    void resetFreqStatistics() { m_totalSamples = 0; m_totalEdgeDetections = 0; m_totalGateCycles = 0; m_pulseCount = 0; }
 };

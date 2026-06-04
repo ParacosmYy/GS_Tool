@@ -23,7 +23,7 @@ void FrequencyCounter::setupUi() {
     m_freqLabel->setObjectName("freqValueLabel");
     m_freqLabel->setAlignment(Qt::AlignCenter);
     layout->addWidget(m_freqLabel);
-    m_countLabel = new QLabel(tr("Pulses: 0"), this);
+    m_countLabel = new QLabel(tr("脉冲: 0"), this);
     m_countLabel->setObjectName("freqCountLabel");
     m_countLabel->setAlignment(Qt::AlignCenter);
     layout->addWidget(m_countLabel);
@@ -36,7 +36,7 @@ void FrequencyCounter::feedSample(double value) {
     if (above && !m_lastAbove) {
         ++m_totalEdgeDetections;
         m_pulseCount++;
-        m_countLabel->setText(tr("Pulses: %1").arg(m_pulseCount));
+        m_countLabel->setText(tr("脉冲: %1").arg(m_pulseCount));
         emit pulseCounted(m_pulseCount);
     }
     m_lastAbove = above;
@@ -67,7 +67,7 @@ void FrequencyCounter::setGateTime(int ms) { m_gateTime = ms; }
 /** @brief 设置触发电平 @param l 触发电平值 */
 void FrequencyCounter::setTriggerLevel(double l) { m_triggerLevel = l; }
 /** @brief 重置计数器和频率显示 */
-void FrequencyCounter::reset() { m_pulseCount = 0; m_frequency = 0; m_freqLabel->setText(tr("0.000 Hz")); m_countLabel->setText(tr("Pulses: 0")); }
+void FrequencyCounter::reset() { m_pulseCount = 0; m_frequency = 0; m_freqLabel->setText(tr("0.000 Hz")); m_countLabel->setText(tr("脉冲: 0")); }
 /** @brief 获取当前测量频率 @return 频率(Hz) */
 double FrequencyCounter::frequency() const { return m_frequency; }
 /** @brief 获取当前信号周期 @return 周期(秒) */

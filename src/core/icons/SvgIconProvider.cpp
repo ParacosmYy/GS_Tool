@@ -44,11 +44,11 @@ QIcon SvgIconProvider::icon(const QString &name, const QSize &size, const QStrin
     locker.unlock();
     QByteArray svgData = loadSvgData(name);
     locker.relock();
-    if (svgData.isEmpty()) { emit iconLoadFailed(name, tr("SVG file not found")); return QIcon(); }
+    if (svgData.isEmpty()) { emit iconLoadFailed(name, tr("SVG文件未找到")); return QIcon(); }
     QByteArray tintedData = applyTint(svgData, tint);
     ++m_totalTintOps;
     QSvgRenderer renderer(tintedData);
-    if (!renderer.isValid()) { emit iconLoadFailed(name, tr("SVG render failed")); return QIcon(); }
+    if (!renderer.isValid()) { emit iconLoadFailed(name, tr("SVG渲染失败")); return QIcon(); }
     QPixmap px(size * qApp->devicePixelRatio());
     px.fill(Qt::transparent);
     QPainter painter(&px);

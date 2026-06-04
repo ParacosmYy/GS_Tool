@@ -20,7 +20,7 @@ void DragDropHelper::unregisterHandler(const QString &mime) { m_handlers.remove(
 /** @brief 处理拖放释放事件 — 匹配MIME处理器或纯文本回退 @param event 拖放事件 @return 成功处理返回true */
 bool DragDropHelper::handleDrop(QDropEvent *event) {
     const auto *mime = event->mimeData();
-    if (!mime) { ++m_totalRejectedDrops; emit dropRejected(tr("No data")); return false; }
+    if (!mime) { ++m_totalRejectedDrops; emit dropRejected(tr("无数据")); return false; }
     for (auto it = m_handlers.constBegin(); it != m_handlers.constEnd(); ++it) {
         if (mime->hasFormat(it.key())) {
             QByteArray data = mime->data(it.key());
@@ -39,7 +39,7 @@ bool DragDropHelper::handleDrop(QDropEvent *event) {
         return true;
     }
     ++m_totalRejectedDrops;
-    emit dropRejected(tr("Unsupported format"));
+    emit dropRejected(tr("不支持的格式"));
     return false;
 }
 

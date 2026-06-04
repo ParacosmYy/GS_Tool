@@ -32,7 +32,7 @@ bool PluginLoader::loadPlugin(const QString &filePath)
     QFileInfo fi(filePath);
     if (!fi.exists()) {
         ++m_totalLoadFailures;
-        emit loadError(fi.fileName(), tr("File not found: %1").arg(filePath));
+        emit loadError(fi.fileName(), tr("文件未找到: %1").arg(filePath));
         return false;
     }
     auto *loader = new QPluginLoader(filePath, this);

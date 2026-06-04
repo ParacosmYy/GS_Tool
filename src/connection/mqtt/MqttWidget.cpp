@@ -136,7 +136,7 @@ void MqttWidget::setupUi()
     m_pubQosCombo->addItem(tr("QoS 1"), 1);
     m_pubQosCombo->addItem(tr("QoS 2"), 2);
 
-    m_retainCheck = new QCheckBox(tr("Retain"), this);
+    m_retainCheck = new QCheckBox(tr("保留"), this);
     m_retainCheck->setObjectName("mqttRetainCheck");
 
     auto* pubHeaderLayout = new QHBoxLayout();
