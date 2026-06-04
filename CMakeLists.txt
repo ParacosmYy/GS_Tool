@@ -689,8 +689,6 @@ set(SOURCES
     src/protocol/field_editor/ProtocolFieldEditorStats.cpp
 
     # ── F34: JS 可脚本化协议引擎 ──
-    src/protocol/scriptable/ScriptableProtocolEngine.cpp
-    src/protocol/scriptable/ScriptableProtocolEngineStats.cpp
 
     # ── 通知历史 ──
     src/core/notification/NotificationHistory.cpp
@@ -720,6 +718,10 @@ set(SOURCES
     # ── F34: 数据速率计算器 ──
     src/utils/rate/DataRateCalculator.cpp
     src/utils/rate/DataRateCalculatorStats.cpp
+
+    # ── F33: 数据编解码机 ──
+    src/utils/encoder/SerialDataEncoder.cpp
+    src/utils/encoder/SerialDataEncoderStats.cpp
 )
 
 set(HEADERS
@@ -1061,7 +1063,6 @@ set(HEADERS
     src/protocol/field_editor/ProtocolFieldEditor.h
 
     # ── F34: JS 可脚本化协议引擎 ──
-    src/protocol/scriptable/ScriptableProtocolEngine.h
 
     # ── 通知历史 ──
     src/core/notification/NotificationHistory.h
@@ -1080,6 +1081,9 @@ set(HEADERS
 
     # ── F35: 数据流分割器 ──
     src/utils/splitter/DataStreamSplitter.h
+
+    # ── F34: 数据速率计算器 ──
+    src/utils/rate/DataRateCalculator.h
 )
 
 set(RESOURCES
