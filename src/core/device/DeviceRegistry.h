@@ -97,10 +97,15 @@ private:
     mutable quint64 m_totalSaves = 0;           ///< 累计保存次数
     mutable quint64 m_totalLoads = 0;           ///< 累计加载次数
 public:
+    /** @brief 获取累计设备配置添加次数 */
     quint64 totalAdds() const { return m_totalAdds; }
+    /** @brief 获取累计设备配置移除次数 */
     quint64 totalRemoves() const { return m_totalRemoves; }
+    /** @brief 获取累计配置保存到文件次数 */
     quint64 totalSaves() const { return m_totalSaves; }
+    /** @brief 获取累计从文件加载配置次数 */
     quint64 totalLoads() const { return m_totalLoads; }
+    /** @brief 重置注册表所有统计计数器 */
     void resetRegistryStatistics() { m_totalAdds = 0; m_totalRemoves = 0; m_totalSaves = 0; m_totalLoads = 0; }
 };
 

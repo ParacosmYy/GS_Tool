@@ -79,6 +79,21 @@ public:
 
     // ---- RTT 统计 getter ----
 
+    /** @brief RTT连接运行统计数据结构体，聚合全部运行期间计数器 */
+    struct Stats {
+        quint64 totalReads = 0;               ///< 累计读操作次数
+        quint64 totalWrites = 0;              ///< 累计写操作次数
+        quint64 totalBytesRead = 0;           ///< 累计读取字节总数
+        quint64 totalBytesWritten = 0;        ///< 累计写入字节总数
+        quint64 errorCount = 0;               ///< 累计错误次数
+        quint64 totalConnectionAttempts = 0;  ///< 累计连接尝试次数
+        quint64 totalDisconnections = 0;      ///< 累计断开连接次数
+        quint64 connectionFailures = 0;       ///< 累计连接失败次数
+        quint64 totalBufferOverflows = 0;     ///< 累计缓冲区溢出次数
+        quint64 totalTimeouts = 0;            ///< 累计超时次数
+        qint64  totalLatencyMs = 0;           ///< 累计延迟(毫秒，用于计算平均值)
+    };
+
     /** @brief 获取累计读操作次数 */
     quint64 totalReads() const;
 
@@ -95,10 +110,25 @@ public:
     quint64 rttErrorCount() const;
 
     /** @brief 获取累计连接尝试次数 @return 连接尝试总次数 */
-    quint64 totalConnectionAttempts() const { return m_totalConnectionAttempts; }
+    quint64 totalConnectionAttempts() const { return m_stats.totalConnectionAttempts; }
+
+    /** @brief 获取累计断开连接次数 @return 断开连接总次数 */
+    quint64 totalDisconnections() const { return m_stats.totalDisconnections; }
+
+    /** @brief 获取累计连接失败次数 @return 失败总次数 */
+    quint64 connectionFailures() const { return m_stats.connectionFailures; }
 
     /** @brief 获取累计缓冲区溢出次数(写入时通道缓冲满) @return 溢出总次数 */
-    quint64 totalBufferOverflows() const { return m_totalBufferOverflows; }
+    quint64 totalBufferOverflows() const { return m_stats.totalBufferOverflows; }
+
+    /** @brief 获取累计超时次数 @return 超时总次数 */
+    quint64 totalTimeouts() const { return m_stats.totalTimeouts; }
+
+    /** @brief 获取平均延迟(毫秒) @return 平均延迟，无连接时返回0.0 */
+    double avgLatencyMs() const;
+
+    /** @brief 获取统计数据的只读引用 @return Stats常量引用 */
+    const Stats& stats() const { return m_stats; }
 
     /** @brief 重置 RTT 统计计数器为初始值 */
     void resetRttStatistics();
@@ -110,13 +140,7 @@ private:
     JLinkSdkLoader* m_sdkLoader = nullptr;                  ///< SDK 加载器单例引用
 
     // RTT 统计计数器
-    quint64 m_totalReads = 0;           ///< 累计读操作次数
-    quint64 m_totalWrites = 0;          ///< 累计写操作次数
-    quint64 m_totalBytesRead = 0;       ///< 累计读取字节总数
-    quint64 m_totalBytesWritten = 0;    ///< 累计写入字节总数
-    quint64 m_errorCount = 0;           ///< 累计错误次数
-    quint64 m_totalConnectionAttempts = 0; ///< 累计连接尝试次数
-    quint64 m_totalBufferOverflows = 0;    ///< 累计缓冲区溢出次数
+    Stats m_stats;    ///< 聚合统计结构体
 };
 
 #endif // JLINKRTTCONNECTION_H

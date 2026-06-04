@@ -92,6 +92,12 @@ public:
     /** @brief 获取累计借出等待超时次数 @return 超时总次数 */
     quint64 totalWaitTimeouts() const { return m_totalWaitTimeouts; }
 
+    /** @brief 获取连接池峰值大小 @return 历史最大池大小 */
+    int peakPoolSize() const { return m_peakPoolSize; }
+
+    /** @brief 获取平均借出耗时(ms) @return 平均借出时间 */
+    double avgBorrowTimeMs() const;
+
     /** @brief 重置所有统计计数器 */
     void resetPoolStatistics();
 
@@ -126,6 +132,8 @@ private:
     quint64 m_totalReturnCount = 0;      ///< 累计归还连接次数
     quint64 m_totalEvictions = 0;        ///< 累计淘汰连接次数
     quint64 m_totalWaitTimeouts = 0;     ///< 累计借出等待超时次数
+    int m_peakPoolSize = 0;              ///< 连接池历史峰值大小
+    qint64 m_totalBorrowTimeMs = 0;      ///< 累计借出总耗时(ms)
 };
 
 #endif // CONNECTIONPOOL_H

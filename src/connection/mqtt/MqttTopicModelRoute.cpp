@@ -13,6 +13,7 @@
  */
 
 #include "connection/mqtt/MqttTopicModel.h"
+#include <QElapsedTimer>
 
 // ============================================================
 // 主题查询接口
@@ -85,6 +86,9 @@ bool MqttTopicModel::routeMessage(const QString& topic, const QByteArray& payloa
 {
     if (topic.isEmpty()) return false;
 
+    QElapsedTimer routeTimer;
+    routeTimer.start();
+
     /* 精确匹配: 查找是否已有该主题 */
     bool matched = false;
     if (m_topics.contains(topic)) {
@@ -105,5 +109,8 @@ bool MqttTopicModel::routeMessage(const QString& topic, const QByteArray& payloa
         ++m_totalMessagesRouted;
         m_totalPayloadBytesRouted += static_cast<quint64>(payload.size());
     }
+
+    /* 累计路由耗时(微秒) */
+    m_totalRouteTimeUs += static_cast<qint64>(routeTimer.nsecsElapsed() / 1000);
     return matched;
 }

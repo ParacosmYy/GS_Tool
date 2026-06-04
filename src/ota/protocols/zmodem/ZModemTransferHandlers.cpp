@@ -30,7 +30,7 @@ void ZModemTransfer::handleStateWaitingRinit(int type)
 void ZModemTransfer::handleStateSendingFile(int type, const QByteArray& headerData){
     if (type == ZRPOS) {
         m_timeoutTimer->stop();
-        ++m_totalZrposReceived;
+        ++m_zstats.zrposReceived;
         m_retryCount = 0;
         if (headerData.size() >= 4) {
             m_fileOffset = 0;
@@ -72,7 +72,7 @@ void ZModemTransfer::handleStateSendingData(int type, const QByteArray& headerDa
 {
     if (type == ZRPOS) {
         m_timeoutTimer->stop();
-        ++m_totalZrposReceived;
+        ++m_zstats.zrposReceived;
         m_retryCount++;
         if (m_retryCount > m_maxRetries) {
             sendCancelBytes();
@@ -150,18 +150,18 @@ void ZModemTransfer::handleStateSendingFin(int type)
 /** @brief 超时处理: 根据当前状态重试对应操作 */
 void ZModemTransfer::handleTimeout()
 {
-    ++m_totalTimeouts;
+    ++m_zstats.timeouts;
     QString curState = stateToString(m_zmodemState);
     switch (m_zmodemState) {
     case State::WaitingRinit:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZRQINIT, attempt" << m_retryCount;
-        ++m_totalRetries;
+        ++m_zstats.retries;
         sendZRQINIT();
         m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::SendingFile:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZFILE, attempt" << m_retryCount;
-        ++m_totalRetries;
+        ++m_zstats.retries;
         sendZFILE();
         m_timeoutTimer->start(m_timeoutMs);
         break;
@@ -171,18 +171,18 @@ void ZModemTransfer::handleTimeout()
         break;
     case State::SendingFin:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZFIN, attempt" << m_retryCount;
-        ++m_totalRetries;
+        ++m_zstats.retries;
         sendZFIN();
         m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::SendingData:
         qWarning() << "ZModem: timeout in" << curState << "- offset:" << m_fileOffset << "bytes:" << m_bytesSent;
-        ++m_totalRetries;
+        ++m_zstats.retries;
         sendDataSubpackets();
         break;
     case State::SendingEof:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZEOF";
-        ++m_totalRetries;
+        ++m_zstats.retries;
         sendZEOF();
         m_timeoutTimer->start(m_timeoutMs);
         break;

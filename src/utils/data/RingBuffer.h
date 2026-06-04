@@ -32,12 +32,17 @@ public:
     void push(const T& item)
     {
         QMutexLocker locker(&m_mutex);
+        ++m_totalPushes;
         m_buffer[m_tail] = item;
         m_tail = (m_tail + 1) % m_capacity;
         if (m_count == m_capacity) {
+            ++m_totalOverflows;
             m_head = (m_head + 1) % m_capacity;  // 覆盖最旧
         } else {
             m_count++;
+        }
+        if (m_count > m_peakUsage) {
+            m_peakUsage = m_count;
         }
     }
 
@@ -46,6 +51,7 @@ public:
     {
         QMutexLocker locker(&m_mutex);
         if (m_count == 0) return false;
+        ++m_totalPops;
         item = m_buffer[m_head];
         m_head = (m_head + 1) % m_capacity;
         m_count--;
@@ -103,6 +109,33 @@ public:
         return true;
     }
 
+    // ---- 内联统计计数接口 ----
+
+    /** @brief 获取累计push写入次数 @return 写入总次数 */
+    quint64 totalPushes() const { return m_totalPushes; }
+
+    /** @brief 获取累计pop读取次数 @return 读取总次数 */
+    quint64 totalPops() const { return m_totalPops; }
+
+    /** @brief 获取累计覆盖溢出次数(缓冲区满时新数据覆盖旧数据) @return 溢出次数 */
+    quint64 totalOverflows() const { return m_totalOverflows; }
+
+    /** @brief 获取历史峰值使用量(元素数) @return 峰值元素数量 */
+    int peakUsage() const { return m_peakUsage; }
+
+    /** @brief 获取缓冲区总容量 @return 容量 */
+    int capacity() const { return m_capacity; }
+
+    /** @brief 重置所有统计计数器(pops/pushes/overflows/peak归零) */
+    void resetStats()
+    {
+        QMutexLocker locker(&m_mutex);
+        m_totalPushes = 0;
+        m_totalPops = 0;
+        m_totalOverflows = 0;
+        m_peakUsage = 0;
+    }
+
 private:
     mutable QMutex m_mutex;       ///< 线程安全互斥锁
     QVector<T> m_buffer;          ///< 底层存储容器
@@ -110,6 +143,12 @@ private:
     int m_head;                   ///< 读位置索引（最旧元素）
     int m_tail;                   ///< 写位置索引（下一个写入位置）
     int m_count;                  ///< 当前有效元素数量
+
+    // ---- 内联统计计数器 ----
+    quint64 m_totalPushes = 0;    ///< 累计push写入次数
+    quint64 m_totalPops = 0;      ///< 累计pop读取次数
+    quint64 m_totalOverflows = 0; ///< 累计覆盖溢出次数(缓冲区满时push)
+    int m_peakUsage = 0;          ///< 历史峰值使用量(元素数)
 };
 
 #endif // RINGBUFFER_H

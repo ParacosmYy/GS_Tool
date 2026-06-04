@@ -78,7 +78,7 @@ void DataStatistics::reset()
     m_totalHistogramUpdates = 0;
     m_totalSlidingWindowResets = 0;
     m_totalThroughputSnapshots = 0;
-    m_totalResets = 0;
+    // 注意: m_totalResets 不在此处清零，保留累计重置次数
     m_totalFormatChanges = 0;
 
     // 重置错误计数

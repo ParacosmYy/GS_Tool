@@ -111,6 +111,7 @@ void UsbConfigPanel::onScanClicked() {
 /** @brief 设备选择变更时更新VID/PID */
 void UsbConfigPanel::onDeviceChanged(int index) {
     if (index < 0) { return; }
+    ++m_totalDeviceSelections;
     QVariantMap dev = m_deviceCombo->itemData(index).toMap();
     if (!dev.isEmpty()) {
         m_vidSpin->setValue(dev["vid"].toUInt());
@@ -121,6 +122,7 @@ void UsbConfigPanel::onDeviceChanged(int index) {
 /** @brief 连接/断开按钮点击处理 */
 void UsbConfigPanel::onConnectClicked() {
     if (!m_connected) {
+        ++m_totalConnectAttempts;
         quint16 vid = static_cast<quint16>(m_vidSpin->value());
         quint16 pid = static_cast<quint16>(m_pidSpin->value());
         int iface = m_interfaceSpin->value();
@@ -166,4 +168,6 @@ void UsbConfigPanel::resetStatistics()
 {
     m_totalDeviceRefreshes = 0;
     m_totalConfigChanges = 0;
+    m_totalDeviceSelections = 0;
+    m_totalConnectAttempts = 0;
 }

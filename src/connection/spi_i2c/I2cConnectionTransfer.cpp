@@ -15,6 +15,9 @@
 
 #include "connection/spi_i2c/I2cConnection.h"
 
+#include <QEventLoop>
+#include <QTimer>
+
 /** @brief 从指定设备的寄存器读取数据(I2C读时序) @param deviceAddr 设备7位地址 @param regAddr 寄存器地址 @param length 读取长度 @return 读取到的数据 */
 QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
 {
@@ -30,6 +33,15 @@ QByteArray I2cConnection::readRegister(int deviceAddr, int regAddr, int length)
     /// 构建并发送I2C读命令帧
     QByteArray frame = buildReadFrame(deviceAddr, regAddr, length);
     m_serial->write(frame);
+
+    /// 同步等待响应(最多100ms)
+    QEventLoop loop;
+    QTimer timeoutTimer;
+    timeoutTimer.setSingleShot(true);
+    connect(this, &IConnection::dataReceived, &loop, &QEventLoop::quit);
+    connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    timeoutTimer.start(100);
+    loop.exec();
 
     /// 解析响应数据
     QByteArray payload = parseResponsePayload();

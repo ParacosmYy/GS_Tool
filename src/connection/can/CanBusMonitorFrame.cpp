@@ -63,7 +63,6 @@ void CanBusMonitor::addFrame(const CanFrame& frame)
     }
     if (frame.rtr) {
         ++m_totalRtrFrames;
-        ++m_totalErrors;
     }
     if (frame.fd) {
         ++m_totalFdFrames;

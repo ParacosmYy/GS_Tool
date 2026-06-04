@@ -50,28 +50,30 @@ int JLinkRttConnection::channel() const
 }
 
 /** @brief 获取累计读操作次数 @return 读操作总次数 */
-quint64 JLinkRttConnection::totalReads() const { return m_totalReads; }
+quint64 JLinkRttConnection::totalReads() const { return m_stats.totalReads; }
 
 /** @brief 获取累计写操作次数 @return 写操作总次数 */
-quint64 JLinkRttConnection::totalWrites() const { return m_totalWrites; }
+quint64 JLinkRttConnection::totalWrites() const { return m_stats.totalWrites; }
 
 /** @brief 获取累计读取字节总数 @return 读取字节总数 */
-quint64 JLinkRttConnection::totalBytesRead() const { return m_totalBytesRead; }
+quint64 JLinkRttConnection::totalBytesRead() const { return m_stats.totalBytesRead; }
 
 /** @brief 获取累计写入字节总数 @return 写入字节总数 */
-quint64 JLinkRttConnection::totalBytesWritten() const { return m_totalBytesWritten; }
+quint64 JLinkRttConnection::totalBytesWritten() const { return m_stats.totalBytesWritten; }
 
 /** @brief 获取累计错误次数 @return 错误总次数 */
-quint64 JLinkRttConnection::rttErrorCount() const { return m_errorCount; }
+quint64 JLinkRttConnection::rttErrorCount() const { return m_stats.errorCount; }
+
+/** @brief 获取平均延迟(毫秒) @return 平均延迟，无连接时返回0.0 */
+double JLinkRttConnection::avgLatencyMs() const
+{
+    if (m_stats.totalConnectionAttempts == 0) return 0.0;
+    return static_cast<double>(m_stats.totalLatencyMs) /
+           static_cast<double>(m_stats.totalConnectionAttempts);
+}
 
 /** @brief 重置 RTT 统计计数器为初始值 */
 void JLinkRttConnection::resetRttStatistics()
 {
-    m_totalReads = 0;
-    m_totalWrites = 0;
-    m_totalBytesRead = 0;
-    m_totalBytesWritten = 0;
-    m_errorCount = 0;
-    m_totalConnectionAttempts = 0;
-    m_totalBufferOverflows = 0;
+    m_stats = Stats{};
 }

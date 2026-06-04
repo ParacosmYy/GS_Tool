@@ -41,10 +41,42 @@ public:
     void setSpeed(int kHz);
 
     // ---- 统计接口 ----
+
+    /** @brief SDK运行统计数据结构体，聚合全部运行期间计数器 */
+    struct Stats {
+        quint64 totalLoadAttempts = 0;     ///< 累计SDK加载尝试次数
+        quint64 totalLoadSuccesses = 0;    ///< 累计成功加载次数
+        quint64 totalLoadFailures = 0;     ///< 累计加载失败次数
+        quint64 totalUnloads = 0;          ///< 累计SDK卸载次数
+        quint64 totalConnectAttempts = 0;  ///< 累计设备连接尝试次数
+        quint64 totalRttStarts = 0;        ///< 累计RTT启动次数
+        quint64 totalRttStops = 0;         ///< 累计RTT停止次数
+        quint64 totalRttReads = 0;         ///< 累计RTT读操作次数
+        quint64 totalRttWrites = 0;        ///< 累计RTT写操作次数
+        quint64 dllPathQueries = 0;        ///< 累计DLL路径查询次数
+        quint64 sdkVersionQueries = 0;     ///< 累计SDK版本查询次数
+    };
+
     quint64 totalLoadAttempts() const;     ///< @return 累计SDK加载尝试次数
     quint64 totalLoadSuccesses() const;    ///< @return 累计成功加载次数
     quint64 totalConnectAttempts() const;  ///< @return 累计设备连接尝试次数
     quint64 totalRttStarts() const;        ///< @return 累计RTT启动次数
+    /** @brief 获取累计加载失败次数 @return 失败总数 */
+    quint64 totalLoadFailures() const { return m_stats.totalLoadFailures; }
+    /** @brief 获取累计SDK卸载次数 @return 卸载总数 */
+    quint64 totalUnloads() const { return m_stats.totalUnloads; }
+    /** @brief 获取累计RTT停止次数 @return 停止总数 */
+    quint64 totalRttStops() const { return m_stats.totalRttStops; }
+    /** @brief 获取累计RTT读操作次数 @return 读操作总数 */
+    quint64 totalRttReads() const { return m_stats.totalRttReads; }
+    /** @brief 获取累计RTT写操作次数 @return 写操作总数 */
+    quint64 totalRttWrites() const { return m_stats.totalRttWrites; }
+    /** @brief 获取累计DLL路径查询次数 @return 查询总数 */
+    quint64 totalDllPathQueries() const { return m_stats.dllPathQueries; }
+    /** @brief 获取累计SDK版本查询次数 @return 查询总数 */
+    quint64 totalSdkVersionQueries() const { return m_stats.sdkVersionQueries; }
+    /** @brief 获取统计数据的只读引用 @return Stats常量引用 */
+    const Stats& stats() const { return m_stats; }
     void resetSdkStatistics();             ///< 重置所有统计计数器归零
 
 signals:
@@ -90,10 +122,7 @@ private:
     static QMutex s_mutex;  ///< 单例访问互斥锁
 
     // ---- 统计计数器 ----
-    quint64 m_totalLoadAttempts = 0;    ///< 累计SDK加载尝试次数
-    quint64 m_totalLoadSuccesses = 0;   ///< 累计成功加载次数
-    quint64 m_totalConnectAttempts = 0; ///< 累计设备连接尝试次数
-    quint64 m_totalRttStarts = 0;       ///< 累计RTT启动次数
+    Stats m_stats;    ///< 聚合统计结构体
 };
 
 #endif // JLINKSDKLOADER_H

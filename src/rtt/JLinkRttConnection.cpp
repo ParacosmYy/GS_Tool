@@ -82,12 +82,13 @@ bool JLinkRttConnection::open()
         return true;
     }
 
-    ++m_totalConnectionAttempts; ///< 统计: 连接尝试递增
+    ++m_stats.totalConnectionAttempts; ///< 统计: 连接尝试递增
 
     // 步骤 1: 确保 SDK 已加载
     if (!m_sdkLoader->isLoaded()) {
         if (!m_sdkLoader->load()) {
-            ++m_errorCount;
+            ++m_stats.errorCount;
+            ++m_stats.connectionFailures;
             emit errorOccurred(tr("J-Link SDK 加载失败，请检查 JLinkARM.dll 是否可用"));
             return false;
         }
@@ -100,7 +101,8 @@ bool JLinkRttConnection::open()
         ifValue = 0;
     }
     if (!m_sdkLoader->selectInterface(ifValue)) {
-        ++m_errorCount;
+        ++m_stats.errorCount;
+        ++m_stats.connectionFailures;
         emit errorOccurred(tr("选择调试接口失败（JTAG/SWD）"));
         return false;
     }
@@ -114,7 +116,8 @@ bool JLinkRttConnection::open()
     // 步骤 4: 连接到目标设备
     const QString deviceId = m_config.value(QStringLiteral("deviceId")).toString();
     if (!m_sdkLoader->connectToDevice(deviceId)) {
-        ++m_errorCount;
+        ++m_stats.errorCount;
+        ++m_stats.connectionFailures;
         emit errorOccurred(tr("连接目标设备失败: %1").arg(deviceId.isEmpty() ? tr("未指定设备") : deviceId));
         return false;
     }
@@ -122,7 +125,8 @@ bool JLinkRttConnection::open()
     // 步骤 5: 启动 RTT 通信
     const int rttResult = m_sdkLoader->rttStart();
     if (rttResult != 0) {
-        ++m_errorCount;
+        ++m_stats.errorCount;
+        ++m_stats.connectionFailures;
         emit errorOccurred(tr("启动 RTT 通信失败，错误码: %1").arg(rttResult));
         m_sdkLoader->disconnect();
         return false;
@@ -146,6 +150,7 @@ void JLinkRttConnection::close()
 
     // 停止 RTT 通信
     m_sdkLoader->rttStop();
+    ++m_stats.totalDisconnections;
 
     // 断开设备连接
     m_sdkLoader->disconnect();
@@ -169,17 +174,17 @@ qint64 JLinkRttConnection::write(const QByteArray& data)
         return -1;
     }
 
-    ++m_totalWrites;
+    ++m_stats.totalWrites;
     const int written = m_sdkLoader->rttWrite(m_channel, data.constData(), data.size());
     if (written < 0) {
-        ++m_errorCount;
+        ++m_stats.errorCount;
         emit errorOccurred(tr("RTT 通道 %1 写入失败").arg(m_channel));
         return -1;
     }
 
-    m_totalBytesWritten += static_cast<quint64>(written);
+    m_stats.totalBytesWritten += static_cast<quint64>(written);
     if (written < data.size()) {
-        ++m_totalBufferOverflows; ///< 统计: 写入不完整时缓冲区溢出递增
+        ++m_stats.totalBufferOverflows; ///< 统计: 写入不完整时缓冲区溢出递增
     }
     emit bytesWritten(written);
     return written;

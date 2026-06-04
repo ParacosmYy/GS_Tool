@@ -54,6 +54,8 @@ bool JLinkSdkLoader::isLoaded() const
  *  @return 版本号字符串，未加载时返回空，已加载但版本函数不可用时返回"未知" */
 QString JLinkSdkLoader::sdkVersion() const
 {
+    ++m_stats.sdkVersionQueries;
+
     if (!m_loaded || !m_fnGetDLLVersion) {
         if (!m_loaded) {
             return QString();
@@ -82,32 +84,29 @@ QString JLinkSdkLoader::sdkVersion() const
 /** @brief 获取SDK加载尝试总次数 @return 累计加载尝试次数 */
 quint64 JLinkSdkLoader::totalLoadAttempts() const
 {
-    return m_totalLoadAttempts;
+    return m_stats.totalLoadAttempts;
 }
 
 /** @brief 获取SDK加载成功总次数 @return 累计加载成功次数 */
 quint64 JLinkSdkLoader::totalLoadSuccesses() const
 {
-    return m_totalLoadSuccesses;
+    return m_stats.totalLoadSuccesses;
 }
 
 /** @brief 获取设备连接尝试总次数 @return 累计连接尝试次数 */
 quint64 JLinkSdkLoader::totalConnectAttempts() const
 {
-    return m_totalConnectAttempts;
+    return m_stats.totalConnectAttempts;
 }
 
 /** @brief 获取RTT启动总次数 @return 累计RTT启动次数 */
 quint64 JLinkSdkLoader::totalRttStarts() const
 {
-    return m_totalRttStarts;
+    return m_stats.totalRttStarts;
 }
 
 /** @brief 重置SDK统计计数器为初始值(全部归零) */
 void JLinkSdkLoader::resetSdkStatistics()
 {
-    m_totalLoadAttempts = 0;
-    m_totalLoadSuccesses = 0;
-    m_totalConnectAttempts = 0;
-    m_totalRttStarts = 0;
+    m_stats = Stats{};
 }

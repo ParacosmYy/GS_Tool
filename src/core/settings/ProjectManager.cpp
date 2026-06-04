@@ -68,11 +68,15 @@ bool ProjectManager::loadProject(const QString &filePath)
     file.close();
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+    if (parseError.error != QJsonParseError::NoError) {
+        ++m_saveErrorCount;
+        emit errorOccurred(tr("工程文件JSON解析失败: %1 (偏移: %2)")
+            .arg(parseError.errorString()).arg(parseError.offset));
+        return false;
+    }
     ++m_totalLoads;
     ProjectConfig config;
-    if (parseError.error == QJsonParseError::NoError) {
-        config = ProjectConfig::fromJson(doc);
-    }
+    config = ProjectConfig::fromJson(doc);
     config.filePath = filePath;
     m_currentProject = config;
     addToRecent(filePath);

@@ -33,6 +33,8 @@ class SmartAutoComplete : public QWidget {
     Q_OBJECT
 
 public:
+    /** @brief 构造智能自动补全弹出列表
+     *  @param parent 父控件 */
     explicit SmartAutoComplete(QWidget* parent = nullptr);
 
     /** @brief 设置数据源(发送历史条目) */

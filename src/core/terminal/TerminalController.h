@@ -77,12 +77,17 @@ private:
     quint64 m_totalScrollToBottom = 0;      ///< 累计滚动到底部次数
     quint64 m_totalBufferOverflows = 0;     ///< 累计缓冲区溢出次数
 public:
+    /** @brief 获取累计显示模式切换次数 */
     quint64 totalDisplayModeChanges() const { return m_totalDisplayModeChanges; }
+    /** @brief 获取累计清屏次数 */
     quint64 totalClears() const { return m_totalClears; }
+    /** @brief 获取累计搜索次数 */
     quint64 totalSearches() const { return m_totalSearches; }
+    /** @brief 获取累计导出次数 */
     quint64 totalExports() const { return m_totalExports; }
     quint64 totalScrollToBottom() const { return m_totalScrollToBottom; } ///< 累计滚动到底部次数
     quint64 totalBufferOverflows() const { return m_totalBufferOverflows; } ///< 累计缓冲区溢出次数
+    /** @brief 重置终端控制器基础统计计数器（不含滚动/缓冲区溢出） */
     void resetTerminalControllerStatistics() { m_totalDisplayModeChanges = 0; m_totalClears = 0; m_totalSearches = 0; m_totalExports = 0; }
     /** @brief 重置所有终端控制器统计计数器(含滚动/缓冲区溢出) */
     void resetStats() { m_totalDisplayModeChanges = 0; m_totalClears = 0; m_totalSearches = 0; m_totalExports = 0; m_totalScrollToBottom = 0; m_totalBufferOverflows = 0; }

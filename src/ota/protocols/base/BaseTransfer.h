@@ -47,22 +47,32 @@ public:
     /** @brief 查询是否正在运行 @return true=传输中 */
     virtual bool isRunning() const;
 
-    // ── 统计计数器 Getter ──
+    // ── 统计 ──
 
-    /** @brief 获取已发送数据包总数 @return 累计发送包数 */
-    quint64 totalPacketsSent() const;
+    /** @brief 传输统计结构体，聚合所有运行时计数器和时间戳 */
+    struct Stats {
+        quint64 packetsSent = 0;        ///< 已发送数据包总数
+        quint64 packetsReceived = 0;    ///< 已接收数据包总数
+        quint64 retries = 0;            ///< 重试总次数
+        quint64 errors = 0;             ///< 传输错误总次数
+        qint64 bytesTransferred = 0;    ///< 累计传输字节数
+        qint64 startTime = 0;           ///< 最近一次传输开始时间戳(ms epoch)
+        qint64 endTime = 0;             ///< 最近一次传输结束时间戳(ms epoch)
+        qint64 transferDuration = 0;    ///< 最近一次传输持续时长(ms)
+    };
 
-    /** @brief 获取已接收数据包总数 @return 累计接收包数 */
-    quint64 totalPacketsReceived() const;
-
-    /** @brief 获取重试总次数 @return 累计重试次数 */
-    quint64 totalRetries() const;
-
-    /** @brief 获取传输错误总次数 @return 累计错误次数 */
-    quint64 totalErrors() const;
+    /** @brief 获取统计数据的只读引用 @return Stats常引用 */
+    const Stats& stats() const { return m_stats; }
 
     /** @brief 重置传输统计计数器(不影响传输状态) */
-    void resetTransferStatistics();
+    void resetStats() { m_stats = Stats{}; }
+
+    // ── 向后兼容的便捷 Getter ──
+    quint64 totalPacketsSent() const { return m_stats.packetsSent; }      ///< 获取已发送数据包总数
+    quint64 totalPacketsReceived() const { return m_stats.packetsReceived; } ///< 获取已接收数据包总数
+    quint64 totalRetries() const { return m_stats.retries; }              ///< 获取重试总次数
+    quint64 totalErrors() const { return m_stats.errors; }                ///< 获取传输错误总次数
+    void resetTransferStatistics() { resetStats(); }                      ///< 向后兼容别名
 
 signals:
     /** @brief 进度更新 @param percent 百分比 @param sent 已发送 @param total 总字节 */
@@ -134,11 +144,7 @@ private:
     TransferState m_transferState = TransferState::Idle; ///< 基类传输状态
     void setTransferState(TransferState state);           ///< 内部状态设置
 
-    // ── 统计计数器 ──
-    quint64 m_totalPacketsSent = 0;     ///< 已发送数据包总数
-    quint64 m_totalPacketsReceived = 0; ///< 已接收数据包总数
-    quint64 m_totalRetries = 0;         ///< 重试总次数
-    quint64 m_totalErrors = 0;          ///< 传输错误总次数
+    Stats m_stats;                       ///< 传输统计实例
 };
 
 #endif // BASE_TRANSFER_H

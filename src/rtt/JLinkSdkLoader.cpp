@@ -55,7 +55,7 @@ bool JLinkSdkLoader::load(const QString& path)
 {
     QMutexLocker locker(&s_mutex);
 
-    ++m_totalLoadAttempts;
+    ++m_stats.totalLoadAttempts;
 
     if (m_loaded) {
         unload();
@@ -68,6 +68,7 @@ bool JLinkSdkLoader::load(const QString& path)
 
     if (!m_library->load()) {
         const QString error = m_library->errorString();
+        ++m_stats.totalLoadFailures;
         emit sdkLoadFailed(tr("SDK 加载失败: %1").arg(error));
         delete m_library;
         m_library = nullptr;
@@ -76,6 +77,7 @@ bool JLinkSdkLoader::load(const QString& path)
 
     // 解析所有 SDK 函数符号，JLINK_Open 为必需
     if (!resolveFunctions()) {
+        ++m_stats.totalLoadFailures;
         const QString libPath = m_library->fileName();
         emit sdkLoadFailed(tr("SDK 符号解析失败，库文件无效: %1").arg(libPath));
         m_library->unload();
@@ -85,7 +87,7 @@ bool JLinkSdkLoader::load(const QString& path)
     }
 
     m_loaded = true;
-    ++m_totalLoadSuccesses;
+    ++m_stats.totalLoadSuccesses;
     emit sdkLoaded();
     return true;
 }
@@ -102,6 +104,9 @@ void JLinkSdkLoader::unload()
     }
 
     m_loaded = false;
+    if (m_stats.totalLoadSuccesses > 0) {
+        ++m_stats.totalUnloads;
+    }
     m_fnOpen = nullptr;
     m_fnClose = nullptr;
     m_fnConnect = nullptr;
@@ -124,7 +129,7 @@ bool JLinkSdkLoader::connectToDevice(const QString& deviceId)
         return false;
     }
 
-    ++m_totalConnectAttempts;
+    ++m_stats.totalConnectAttempts;
 
     // 先打开 J-Link 句柄
     const int openResult = m_fnOpen();

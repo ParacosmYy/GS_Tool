@@ -5,6 +5,7 @@
 
 #include "connection/pool/ConnectionPool.h"
 #include <QDateTime>
+#include <QElapsedTimer>
 
 /** @brief 构造函数 - 初始化重连定时器 @param parent 父对象 */
 ConnectionPool::ConnectionPool(QObject *parent) : QObject(parent), m_reconnectTimer(new QTimer(this)) {
@@ -16,6 +17,9 @@ ConnectionPool::~ConnectionPool() { disconnectAll(); }
 
 /** @brief 创建新连接条目 @param type 连接类型 @param addr 地址 @return 连接ID，池满返回空 */
 QString ConnectionPool::createConnection(const QString &type, const QString &addr) {
+    QElapsedTimer borrowTimer;
+    borrowTimer.start();
+
     ++m_totalBorrowAttempts;
     if (m_pool.size() >= m_maxConnections) {
         ++m_totalPoolFullEvents;
@@ -29,6 +33,13 @@ QString ConnectionPool::createConnection(const QString &type, const QString &add
     PoolEntry e; e.id = id; e.type = type; e.address = addr;
     e.created = QDateTime::currentMSecsSinceEpoch(); e.lastActivity = e.created;
     m_pool[id] = e;
+
+    /* 更新峰值 */
+    if (m_pool.size() > m_peakPoolSize) {
+        m_peakPoolSize = m_pool.size();
+    }
+
+    m_totalBorrowTimeMs += static_cast<qint64>(borrowTimer.elapsed());
     emit connectionCreated(id);
     return id;
 }
@@ -100,6 +111,12 @@ void ConnectionPool::onReconnectTimer() {
     }
 }
 
+/** @brief 获取平均借出耗时(ms) @return 平均借出时间 */
+double ConnectionPool::avgBorrowTimeMs() const {
+    if (m_totalBorrowSuccesses == 0) return 0.0;
+    return static_cast<double>(m_totalBorrowTimeMs) / static_cast<double>(m_totalBorrowSuccesses);
+}
+
 /** @brief 重置所有统计计数器 */
 void ConnectionPool::resetPoolStatistics() {
     m_totalCreated = 0;
@@ -112,4 +129,6 @@ void ConnectionPool::resetPoolStatistics() {
     m_totalReturnCount = 0;
     m_totalEvictions = 0;
     m_totalWaitTimeouts = 0;
+    m_peakPoolSize = 0;
+    m_totalBorrowTimeMs = 0;
 }

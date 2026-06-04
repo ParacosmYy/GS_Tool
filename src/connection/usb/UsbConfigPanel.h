@@ -43,6 +43,12 @@ public:
     /** @brief 获取累计配置变更次数 @return 配置变更总次数 */
     quint64 totalConfigChanges() const { return m_totalConfigChanges; }
 
+    /** @brief 获取累计设备选择次数 @return 设备选择总次数 */
+    quint64 totalDeviceSelections() const { return m_totalDeviceSelections; }
+
+    /** @brief 获取累计连接尝试次数 @return 连接尝试总次数 */
+    quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -95,6 +101,8 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalDeviceRefreshes = 0;  ///< 累计设备刷新次数
     quint64 m_totalConfigChanges = 0;    ///< 累计配置变更次数
+    quint64 m_totalDeviceSelections = 0; ///< 累计设备选择次数
+    quint64 m_totalConnectAttempts = 0;  ///< 累计连接尝试次数
 };
 
 #endif // USB_CONFIG_PANEL_H

@@ -44,6 +44,21 @@ enum class ActionType {
 };
 
 /**
+ * @brief 规则级统计计数器
+ *
+ * 由 TriggerEngine 在匹配评估期间递增，用于追踪单条规则的运行时指标。
+ * 所有字段均为 mutable，以便在 const 上下文（如 evaluateData）中更新。
+ */
+struct TriggerRuleStats {
+    quint64 totalEvaluations = 0;   ///< 累计被评估次数（含启用/禁用状态）
+    quint64 totalMatches = 0;       ///< 累计匹配成功次数
+    quint64 totalMisses = 0;        ///< 累计匹配失败次数
+    quint64 falsePositives = 0;     ///< 累计误报次数（匹配成功但动作执行失败）
+    qint64  lastEvaluationTimeMs = -1; ///< 上次评估耗时(毫秒)，-1表示尚未评估
+    double  avgEvaluationTimeMs = 0.0; ///< 平均评估耗时(毫秒)
+};
+
+/**
  * @brief 触发器规则配置结构体
  *
  * 包含规则名称、匹配模式、匹配模式、动作类型和动作数据等完整配置。
@@ -59,6 +74,7 @@ struct TriggerRuleConfig {
     QByteArray actionData;      ///< 动作附加数据（如发送的内容）
     bool enabled = true;        ///< 是否启用
     mutable QRegularExpression compiledRegex; ///< 缓存的编译后正则表达式(Rule使用时惰性编译)
+    mutable TriggerRuleStats stats;           ///< 规则级统计计数器（由引擎递增）
 
     /**
      * @brief 创建默认规则配置

@@ -20,7 +20,7 @@ int JLinkSdkLoader::rttStart()
     }
 
     // cmd=0: RTT_START
-    ++m_totalRttStarts;
+    ++m_stats.totalRttStarts;
     return m_fnRttControl(0, nullptr);
 }
 
@@ -34,6 +34,7 @@ int JLinkSdkLoader::rttStop()
     }
 
     // cmd=1: RTT_STOP
+    ++m_stats.totalRttStops;
     return m_fnRttControl(1, nullptr);
 }
 
@@ -46,6 +47,7 @@ int JLinkSdkLoader::rttRead(int channel, char* buf, int size)
         return -1;
     }
 
+    ++m_stats.totalRttReads;
     return m_fnRttRead(channel, buf, size);
 }
 
@@ -58,6 +60,7 @@ int JLinkSdkLoader::rttWrite(int channel, const char* buf, int numBytes)
         return -1;
     }
 
+    ++m_stats.totalRttWrites;
     return m_fnRttWrite(channel, buf, numBytes);
 }
 

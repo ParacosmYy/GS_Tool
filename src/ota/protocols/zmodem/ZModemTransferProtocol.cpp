@@ -59,7 +59,7 @@ bool ZModemTransfer::parseHexFrame(const QByteArray& data, int& type, QByteArray
     quint16 receivedCrc = static_cast<quint16>((crcHi << 8) | crcLo);
     quint16 calculatedCrc = CRC::crc16Ccitt(crcInput);
     if (receivedCrc != calculatedCrc) {
-        ++m_totalCrcErrors;  ///< 统计: CRC校验失败
+        ++m_zstats.crcErrors;  ///< 统计: CRC校验失败
         qWarning() << "ZModem: CRC16 mismatch frame" << type
                    << "rx:" << Qt::hex << receivedCrc << "calc:" << calculatedCrc
                    << "state:" << stateToString(m_zmodemState);
@@ -84,7 +84,7 @@ void ZModemTransfer::sendZRQINIT() { if (m_conn) writeChecked(buildHexHeader(ZRQ
 void ZModemTransfer::sendZFILE()
 {
     if (!m_conn) return;
-    ++m_totalZfileSent;
+    ++m_zstats.zfileSent;
     if (!writeChecked(buildBinHeader(ZFILE))) return;
     QFileInfo info(m_filePath);
     QByteArray fi = QString("%1 %2 0").arg(info.fileName()).arg(info.size()).toUtf8();

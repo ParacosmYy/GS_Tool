@@ -31,7 +31,7 @@ bool PluginLoader::loadPlugin(const QString &filePath)
 {
     QFileInfo fi(filePath);
     if (!fi.exists()) {
-        ++m_totalLoadFailures;
+        ++m_stats.totalLoadFailures;
         emit loadError(fi.fileName(), tr("文件未找到: %1").arg(filePath));
         return false;
     }
@@ -41,7 +41,7 @@ bool PluginLoader::loadPlugin(const QString &filePath)
     if (!instance) {
         QString err = loader->errorString();
         delete loader;
-        ++m_totalLoadFailures;
+        ++m_stats.totalLoadFailures;
         emit loadError(fi.fileName(), err);
         return false;
     }
@@ -53,7 +53,7 @@ bool PluginLoader::loadPlugin(const QString &filePath)
     info.loaded = true;
     m_loaders[info.name] = loader;
     m_plugins[info.name] = info;
-    ++m_totalLoadSuccesses;
+    ++m_stats.totalLoadSuccesses;
     emit pluginLoaded(info.name);
     return true;
 }
@@ -67,7 +67,7 @@ void PluginLoader::unloadPlugin(const QString &name)
         delete it.value();
         m_loaders.erase(it);
         m_plugins.remove(name);
-        ++m_totalUnloads;
+        ++m_stats.totalUnloads;
         emit pluginUnloaded(name);
     }
 }

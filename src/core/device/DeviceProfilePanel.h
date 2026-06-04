@@ -111,10 +111,15 @@ private:
     quint64 m_totalImports = 0;          ///< 累计导入次数
     quint64 m_totalExports = 0;          ///< 累计导出次数
 public:
+    /** @brief 获取累计设备选择次数 */
     quint64 totalSelections() const { return m_totalSelections; }
+    /** @brief 获取累计配置编辑次数 */
     quint64 totalProfileEdits() const { return m_totalProfileEdits; }
+    /** @brief 获取累计导入配置次数 */
     quint64 totalImports() const { return m_totalImports; }
+    /** @brief 获取累计导出配置次数 */
     quint64 totalExports() const { return m_totalExports; }
+    /** @brief 重置设备面板所有统计计数器 */
     void resetProfilePanelStatistics() { m_totalSelections = 0; m_totalProfileEdits = 0; m_totalImports = 0; m_totalExports = 0; }
 };
 

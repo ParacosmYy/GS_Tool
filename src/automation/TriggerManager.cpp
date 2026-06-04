@@ -25,11 +25,11 @@ TriggerManager::TriggerManager(QObject* parent)
 
     /* 引擎命中时递增管理器级触发器计数 */
     connect(m_engine, &TriggerEngine::triggered,
-            this, [this]() { ++m_totalTriggersFired; });
+            this, [this]() { ++m_stats.totalTriggersFired; });
 
     /* 动作执行时递增管理器级动作计数 */
     connect(m_engine, &TriggerEngine::actionRequired,
-            this, [this]() { ++m_totalActionsExecuted; });
+            this, [this]() { ++m_stats.totalActionsExecuted; });
 }
 
 /** @brief 析构函数 */
@@ -70,7 +70,7 @@ bool TriggerManager::loadRules(const QString& filePath)
         }
     }
 
-    ++m_totalRuleImports;
+    ++m_stats.totalRuleImports;
     emit rulesChanged();
     return true;
 }
@@ -92,7 +92,7 @@ bool TriggerManager::saveRules(const QString& filePath)
 
     file.write(doc.toJson(QJsonDocument::Indented));
     file.close();
-    ++m_totalRuleExports;
+    ++m_stats.totalRuleExports;
     return true;
 }
 
@@ -106,7 +106,7 @@ QList<TriggerRuleConfig> TriggerManager::rules() const
 void TriggerManager::addRule(const TriggerRuleConfig& rule)
 {
     m_engine->addRule(rule);
-    ++m_totalRulesAdded;
+    ++m_stats.totalRulesAdded;
     emit rulesChanged();
 }
 
@@ -114,7 +114,7 @@ void TriggerManager::addRule(const TriggerRuleConfig& rule)
 void TriggerManager::removeRule(int index)
 {
     m_engine->removeRule(index);
-    ++m_totalRulesRemoved;
+    ++m_stats.totalRulesRemoved;
     emit rulesChanged();
 }
 
@@ -129,7 +129,7 @@ void TriggerManager::updateRule(int index, const TriggerRuleConfig& rule)
 {
     if (index >= 0 && index < m_engine->rules().size()) {
         m_engine->replaceRule(index, rule);
-        ++m_totalRuleUpdates;
+        ++m_stats.totalRuleUpdates;
         emit rulesChanged();
     }
 }

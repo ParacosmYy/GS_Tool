@@ -21,6 +21,23 @@ class TriggerEngine;
 class TriggerAction;
 
 /**
+ * @brief 触发器管理器统计计数器
+ *
+ * 追踪规则生命周期、触发命中、动作执行和管理器级操作的累计指标。
+ */
+struct TriggerManagerStats {
+    quint64 totalRulesAdded = 0;       ///< 累计添加规则次数
+    quint64 totalRulesRemoved = 0;     ///< 累计移除规则次数
+    quint64 totalRuleUpdates = 0;      ///< 累计更新规则次数
+    quint64 totalTriggersFired = 0;    ///< 累计触发器命中次数
+    quint64 totalActionsExecuted = 0;  ///< 累计动作执行次数
+    quint64 totalRuleImports = 0;      ///< 累计规则导入次数
+    quint64 totalRuleExports = 0;      ///< 累计规则导出次数
+    int     activeRuleCount = 0;       ///< 当前活跃（已启用）规则数
+    double  avgResponseTimeMs = 0.0;   ///< 从命中到动作执行完成的平均响应时间(毫秒)
+};
+
+/**
  * @brief 触发器管理器
  *
  * 门面模式，整合引擎和动作执行器。
@@ -66,37 +83,45 @@ public:
     /** @brief 重置引擎统计计数 */
     void resetStatistics();
 
-    // ---- 管理器统计 getter ----
+    // ---- Stats struct 接口 ----
+
+    /** @brief 获取统计计数器只读引用 @return 当前统计快照 */
+    const TriggerManagerStats& stats() const { return m_stats; }
+
+    /** @brief 重置所有管理器统计计数器为初始值 */
+    void resetStats() { m_stats = TriggerManagerStats{}; }
+
+    // ---- 兼容性 getter（委托给 m_stats） ----
 
     /** @brief 获取累计添加规则次数 @return 添加次数 */
-    quint64 totalRulesAdded() const;
+    quint64 totalRulesAdded() const { return m_stats.totalRulesAdded; }
 
     /** @brief 获取累计移除规则次数 @return 移除次数 */
-    quint64 totalRulesRemoved() const;
+    quint64 totalRulesRemoved() const { return m_stats.totalRulesRemoved; }
 
     /** @brief 获取累计更新规则次数 @return 更新次数 */
-    quint64 totalRuleUpdates() const;
+    quint64 totalRuleUpdates() const { return m_stats.totalRuleUpdates; }
 
     /** @brief 获取累计修改规则次数(同totalRuleUpdates) @return 修改次数 */
-    quint64 totalRulesModified() const { return m_totalRuleUpdates; }
+    quint64 totalRulesModified() const { return m_stats.totalRuleUpdates; }
 
     /** @brief 获取累计触发器命中次数 @return 命中次数 */
-    quint64 totalTriggersFired() const;
+    quint64 totalTriggersFired() const { return m_stats.totalTriggersFired; }
 
     /** @brief 获取累计动作执行次数 @return 执行次数 */
-    quint64 totalActionsExecuted() const;
+    quint64 totalActionsExecuted() const { return m_stats.totalActionsExecuted; }
 
     /** @brief 获取累计错误次数(正则编译失败等) @return 错误次数 */
     quint64 totalErrors() const;
 
     /** @brief 获取累计规则导入次数 @return 导入次数 */
-    quint64 totalRuleImports() const { return m_totalRuleImports; }
+    quint64 totalRuleImports() const { return m_stats.totalRuleImports; }
 
     /** @brief 获取累计规则导出次数 @return 导出次数 */
-    quint64 totalRuleExports() const { return m_totalRuleExports; }
+    quint64 totalRuleExports() const { return m_stats.totalRuleExports; }
 
-    /** @brief 重置管理器统计计数器为初始值 */
-    void resetManagerStatistics();
+    /** @brief 重置管理器统计计数器为初始值（兼容旧接口） */
+    void resetManagerStatistics() { resetStats(); }
 
     /** @brief 更新规则列表UI @param panel 触发器列表面板指针 */
     void syncListPanel(class TriggerListPanel* panel);
@@ -109,14 +134,7 @@ private:
     TriggerEngine* m_engine = nullptr;   ///< 触发器引擎实例
     TriggerAction* m_action = nullptr;   ///< 动作执行器实例
 
-    // 管理器统计计数器
-    quint64 m_totalRulesAdded = 0;       ///< 累计添加规则次数
-    quint64 m_totalRulesRemoved = 0;     ///< 累计移除规则次数
-    quint64 m_totalRuleUpdates = 0;      ///< 累计更新规则次数
-    quint64 m_totalTriggersFired = 0;    ///< 累计触发器命中次数
-    quint64 m_totalActionsExecuted = 0;  ///< 累计动作执行次数
-    quint64 m_totalRuleImports = 0;      ///< 累计规则导入次数
-    quint64 m_totalRuleExports = 0;      ///< 累计规则导出次数
+    TriggerManagerStats m_stats;         ///< 管理器统计计数器
     /* totalErrors() 委托给 TriggerEngine::totalErrors()，无需独立成员 */
 };
 

@@ -176,6 +176,15 @@ int MqttTopicModel::totalNodeCount() const
     return countNodes(m_rootNode) - 1; /* 减去虚拟根节点 */
 }
 
+/** @brief 获取消息路由平均耗时(ms)
+ *  @return 平均路由耗时，无路由时返回0
+ */
+double MqttTopicModel::avgUpdateTimeMs() const
+{
+    if (m_totalMessagesRouted == 0) return 0.0;
+    return static_cast<double>(m_totalRouteTimeUs) / static_cast<double>(m_totalMessagesRouted) / 1000.0;
+}
+
 /** @brief 重置所有主题统计计数器 */
 void MqttTopicModel::resetTopicStatistics()
 {
@@ -186,4 +195,5 @@ void MqttTopicModel::resetTopicStatistics()
     m_totalMessagesRouted = 0;
     m_totalPayloadBytesRouted = 0;
     m_totalWildcardMatches = 0;
+    m_totalRouteTimeUs = 0;
 }

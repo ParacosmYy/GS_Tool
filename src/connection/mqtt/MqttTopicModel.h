@@ -95,6 +95,8 @@ public:
     quint64 totalWildcardMatches() const;
     /** @brief 获取树节点总数(含非叶节点) @return 节点总数(不含虚拟根节点) */
     int totalNodeCount() const;
+    /** @brief 获取消息路由平均耗时 @return 平均更新耗时(ms) */
+    double avgUpdateTimeMs() const;
     /** @brief 重置统计计数器 */
     void resetTopicStatistics();
 
@@ -139,6 +141,9 @@ private:
     quint64 m_totalMessagesRouted = 0;    ///< 累计消息路由次数
     quint64 m_totalPayloadBytesRouted = 0;///< 累计路由消息的负载字节数
     quint64 m_totalWildcardMatches = 0;   ///< 累计通配符匹配命中次数
+
+    // 路由耗时统计
+    qint64  m_totalRouteTimeUs = 0;       ///< 累计路由总耗时(微秒)
 };
 
 #endif // MQTTTOPICMODEL_H

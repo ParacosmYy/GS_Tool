@@ -27,6 +27,7 @@ TriggerListPanel::TriggerListPanel(QWidget* parent)
 /** @brief 设置要显示的规则列表，清空后逐条添加为列表项 @param rules 规则配置列表 */
 void TriggerListPanel::setRules(const QList<TriggerRuleConfig>& rules)
 {
+    ++m_stats.totalDisplays;
     m_ruleList->clear();
 
     for (const TriggerRuleConfig& rule : rules) {
@@ -107,11 +108,15 @@ void TriggerListPanel::setupUI()
     mainLayout->addLayout(btnLayout);
 
     /* 信号连接 */
-    connect(m_addBtn, &QPushButton::clicked, this, &TriggerListPanel::addRuleRequested);
+    connect(m_addBtn, &QPushButton::clicked, this, [this]() {
+        ++m_stats.totalRuleCreates;
+        emit addRuleRequested();
+    });
 
     connect(m_removeBtn, &QPushButton::clicked, this, [this]() {
         const int row = m_ruleList->currentRow();
         if (row >= 0) {
+            ++m_stats.totalRuleDeletes;
             emit removeRuleRequested(row);
         }
     });
@@ -119,7 +124,7 @@ void TriggerListPanel::setupUI()
     connect(m_editBtn, &QPushButton::clicked, this, [this]() {
         const int row = m_ruleList->currentRow();
         if (row >= 0) {
-            ++m_totalRuleEdits;
+            ++m_stats.totalRuleEdits;
             emit editRuleRequested(row);
         }
     });
@@ -127,7 +132,7 @@ void TriggerListPanel::setupUI()
     connect(m_moveUpBtn, &QPushButton::clicked, this, [this]() {
         const int row = m_ruleList->currentRow();
         if (row > 0) {
-            ++m_totalRuleReorders;
+            ++m_stats.totalRuleReorders;
             emit moveUpRequested(row);
         }
     });
@@ -135,7 +140,7 @@ void TriggerListPanel::setupUI()
     connect(m_moveDownBtn, &QPushButton::clicked, this, [this]() {
         const int row = m_ruleList->currentRow();
         if (row >= 0 && row < m_ruleList->count() - 1) {
-            ++m_totalRuleReorders;
+            ++m_stats.totalRuleReorders;
             emit moveDownRequested(row);
         }
     });
@@ -145,7 +150,12 @@ void TriggerListPanel::setupUI()
         const int row = m_ruleList->row(item);
         const bool newState = item->checkState() != Qt::Checked;
         item->setCheckState(newState ? Qt::Checked : Qt::Unchecked);
-        ++m_totalRuleToggles;
+        ++m_stats.totalRuleToggles;
         emit ruleEnabledChanged(row, newState);
+    });
+
+    /* 列表选择变化 */
+    connect(m_ruleList, &QListWidget::currentRowChanged, this, [this](int) {
+        ++m_stats.selectionChanges;
     });
 }

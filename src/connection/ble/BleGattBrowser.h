@@ -65,6 +65,8 @@ public:
     quint64 totalServiceExpands() const;
     /** @brief 获取累计描述符读取次数 @return 描述符读取总次数 */
     quint64 totalDescriptorReads() const;
+    /** @brief 获取累计连接尝试次数 @return 连接尝试总次数 */
+    quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -146,6 +148,7 @@ private:
     qint64  m_lastDiscoveryDurationMs = 0;       ///< 最后发现耗时
     quint64 m_totalServiceExpands = 0;           ///< 服务展开操作次数
     quint64 m_totalDescriptorReads = 0;          ///< 描述符读取次数
+    quint64 m_totalConnectAttempts = 0;          ///< 连接尝试次数
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(BleGattBrowser::CharProperties)

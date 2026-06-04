@@ -10,6 +10,20 @@
 #include <QList>
 
 /**
+ * @brief 插件加载器统计计数器
+ *
+ * 追踪插件发现、加载/卸载、扫描和失败指标。
+ */
+struct PluginLoaderStats {
+    quint64 totalPluginsDiscovered = 0;   ///< 累计发现插件文件次数
+    quint64 totalLoadSuccesses = 0;       ///< 累计加载成功次数
+    quint64 totalLoadFailures = 0;        ///< 累计加载失败次数
+    quint64 totalUnloads = 0;             ///< 累计卸载次数
+    quint64 totalScans = 0;               ///< 累计扫描次数
+    quint64 totalDirectoriesScanned = 0;  ///< 累计扫描目录数
+};
+
+/**
  * @class PluginLoader
  * @brief 插件加载器，管理插件搜索路径、文件扫描和动态加载/卸载
  */
@@ -51,17 +65,26 @@ public:
     /** @brief 扫描所有搜索路径中的插件 @return 发现的插件信息列表 */
     QList<PluginInfo> scanPlugins();
 
-    // ---- 统计计数器 ----
+    // ---- Stats struct 接口 ----
+
+    /** @brief 获取统计计数器只读引用 @return 当前统计快照 */
+    const PluginLoaderStats& stats() const { return m_stats; }
+
+    /** @brief 重置所有统计计数器为初始值 */
+    void resetStats() { m_stats = PluginLoaderStats{}; }
+
+    // ---- 兼容性 getter（委托给 m_stats） ----
+
     /** @brief 获取累计加载成功次数 @return 成功次数 */
-    quint64 totalLoadSuccesses() const { return m_totalLoadSuccesses; }
+    quint64 totalLoadSuccesses() const { return m_stats.totalLoadSuccesses; }
     /** @brief 获取累计加载失败次数 @return 失败次数 */
-    quint64 totalLoadFailures() const { return m_totalLoadFailures; }
+    quint64 totalLoadFailures() const { return m_stats.totalLoadFailures; }
     /** @brief 获取累计卸载次数 @return 卸载次数 */
-    quint64 totalUnloads() const { return m_totalUnloads; }
+    quint64 totalUnloads() const { return m_stats.totalUnloads; }
     /** @brief 获取累计扫描次数 @return 扫描次数 */
-    quint64 totalScans() const { return m_totalScans; }
-    /** @brief 重置所有统计计数器 */
-    void resetLoaderStatistics() { m_totalLoadSuccesses = 0; m_totalLoadFailures = 0; m_totalUnloads = 0; m_totalScans = 0; }
+    quint64 totalScans() const { return m_stats.totalScans; }
+    /** @brief 重置所有统计计数器（兼容旧接口） */
+    void resetLoaderStatistics() { resetStats(); }
 
 signals:
     /** @brief 扫描发现新插件 @param info 插件信息 */
@@ -78,9 +101,5 @@ private:
     QMap<QString, QPluginLoader *> m_loaders;        ///< 插件名称到加载器的映射
     QMap<QString, PluginInfo> m_plugins;             ///< 插件名称到信息的映射
 
-    // ---- 统计 ----
-    quint64 m_totalLoadSuccesses = 0;     ///< 统计: 累计加载成功次数
-    quint64 m_totalLoadFailures = 0;      ///< 统计: 累计加载失败次数
-    quint64 m_totalUnloads = 0;           ///< 统计: 累计卸载次数
-    quint64 m_totalScans = 0;             ///< 统计: 累计扫描次数
+    PluginLoaderStats m_stats;                       ///< 加载器统计计数器
 };

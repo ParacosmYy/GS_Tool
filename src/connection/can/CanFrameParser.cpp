@@ -42,6 +42,7 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
         if (!ok) { ++m_totalParseErrors; return frame; }
         frame.dlc = static_cast<quint8>(QByteArray(d + 3, 1).toUInt(&ok, 16));
         if (!ok || frame.dlc > 8) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 4 + frame.dlc * 2) { ++m_totalParseErrors; return frame; }
         frame.extended = false;
         frame.data = parseHexData(d + 4, frame.dlc);
         ++m_totalStandardFrames;
@@ -55,6 +56,7 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
         if (!ok) { ++m_totalParseErrors; return frame; }
         frame.dlc = static_cast<quint8>(QByteArray(d + 8, 1).toUInt(&ok, 16));
         if (!ok || frame.dlc > 8) { ++m_totalParseErrors; return frame; }
+        if (rawData.size() < 9 + frame.dlc * 2) { ++m_totalParseErrors; return frame; }
         frame.extended = true;
         frame.data = parseHexData(d + 9, frame.dlc);
         ++m_totalExtendedFrames;
@@ -98,6 +100,7 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
         const int rawDlc = QByteArray(d + 3, 1).toUInt(&ok, 16);
         if (!ok || rawDlc > 15) { ++m_totalParseErrors; return frame; }
         const int byteCount = CanFrame::dlcToBytes(rawDlc);
+        if (rawData.size() < 4 + byteCount * 2) { ++m_totalParseErrors; return frame; }
         frame.dlc = static_cast<quint8>(rawDlc);
         frame.extended = false;
         frame.fd = true;
@@ -115,6 +118,7 @@ CanFrame CanFrameParser::parseFrame(const QByteArray& rawData)
         const int rawDlc = QByteArray(d + 8, 1).toUInt(&ok, 16);
         if (!ok || rawDlc > 15) { ++m_totalParseErrors; return frame; }
         const int byteCount = CanFrame::dlcToBytes(rawDlc);
+        if (rawData.size() < 9 + byteCount * 2) { ++m_totalParseErrors; return frame; }
         frame.dlc = static_cast<quint8>(rawDlc);
         frame.extended = true;
         frame.fd = true;

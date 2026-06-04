@@ -41,6 +41,21 @@ public:
     /** @brief 路由数据到指定通道 @param channelId 目标通道编号 @param data 要路由的字节数据 */
     void routeData(int channelId, const QByteArray& data);
 
+    /** @brief 通道管理器运行统计数据结构体，聚合全部运行期间计数器 */
+    struct Stats {
+        quint64 totalChannelCreated = 0;   ///< 累计创建通道次数
+        quint64 totalChannelRemoved = 0;   ///< 累计移除通道次数
+        int     activeChannels = 0;         ///< 当前活跃通道数
+        quint64 totalDataRouted = 0;        ///< 累计路由数据次数
+        quint64 totalBytesRouted = 0;       ///< 累计路由字节数
+        quint64 totalReads = 0;             ///< 累计读取次数
+        quint64 totalWrites = 0;            ///< 累计写入次数
+        quint64 totalBytesRead = 0;         ///< 累计读取字节数
+        quint64 totalBytesWritten = 0;      ///< 累计写入字节总数
+        quint64 errorCount = 0;             ///< 累计错误次数
+        quint64 channelQueries = 0;         ///< 累计通道查询次数
+    };
+
     /** @brief 获取累计读取次数 @return 读取总次数 */
     quint64 totalReads() const;
     /** @brief 获取累计写入次数 @return 写入总次数 */
@@ -51,6 +66,20 @@ public:
     quint64 totalBytesWritten() const;
     /** @brief 获取累计错误次数 @return 错误总次数 */
     quint64 errorCount() const;
+    /** @brief 获取累计创建通道次数 @return 创建总次数 */
+    quint64 totalChannelCreated() const { return m_stats.totalChannelCreated; }
+    /** @brief 获取累计移除通道次数 @return 移除总次数 */
+    quint64 totalChannelRemoved() const { return m_stats.totalChannelRemoved; }
+    /** @brief 获取当前活跃通道数 @return 活跃通道数 */
+    int currentActiveChannels() const { return m_stats.activeChannels; }
+    /** @brief 获取累计路由数据次数 @return 路由总次数 */
+    quint64 totalDataRouted() const { return m_stats.totalDataRouted; }
+    /** @brief 获取累计路由字节数 @return 路由字节总数 */
+    quint64 totalBytesRouted() const { return m_stats.totalBytesRouted; }
+    /** @brief 获取累计通道查询次数 @return 查询总次数 */
+    quint64 totalChannelQueries() const { return m_stats.channelQueries; }
+    /** @brief 获取统计数据的只读引用 @return Stats常量引用 */
+    const Stats& stats() const { return m_stats; }
     /** @brief 重置所有统计计数器 */
     void resetChannelStatistics();
 
