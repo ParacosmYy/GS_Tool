@@ -95,6 +95,7 @@
 | 260 | ChecksumCalculatorStats拆分 | 算法元数据/统计getter独立(281→193行) |
 | 261 | UdpConnectionStats拆分 | 多播组管理/统计getter/resetStats独立(275→219行) |
 | 262 | TlsConnectionStats/SpiConnectionStats/CanBusMonitorStats/NavigationControllerStatus拆分 | TLS统计独立(278→259行)+SPI统计独立(279→260行)+CAN监控统计独立(281→207行)+导航状态动画独立(285→160行) |
+| 263 | DataStatisticsRefresh/ResponsiveLayoutTransition/DbcParserDecode/UsbDeviceDetectorDescriptor拆分 | 刷新定时器独立(279→208行)+布局过渡动画独立(276→190行)+DBC位域解码独立(272→144行)+USB描述符获取独立(272→145行) |
 
 ---
 

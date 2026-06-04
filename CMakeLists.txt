@@ -130,6 +130,7 @@ set(SOURCES
     src/serial/commands/TimedSender.cpp
     src/serial/commands/SendHistory.cpp
     src/serial/data/DataStatistics.cpp
+    src/serial/data/DataStatisticsRefresh.cpp
     src/serial/data/DataStatisticsDisplay.cpp
     src/serial/data/DataStatisticsRolling.cpp
     src/serial/port/SerialDriverDetector.cpp
@@ -223,6 +224,7 @@ set(SOURCES
     src/core/managers/ShortcutManagerActions.cpp
     src/core/managers/ShortcutManagerQuery.cpp
     src/core/layout/ResponsiveLayout.cpp
+    src/core/layout/ResponsiveLayoutTransition.cpp
     src/core/layout/ResponsiveLayoutQuery.cpp
 
     # ── F1: 数据录制回放 ──
@@ -332,6 +334,7 @@ set(SOURCES
     src/protocol/can/DbcParser.cpp
     src/protocol/can/DbcParserParse.cpp
     src/protocol/can/DbcParserSignal.cpp
+    src/protocol/can/DbcParserDecode.cpp
 
     # ── F14: MQTT 客户端 ──
     src/connection/mqtt/MqttConnection.cpp
@@ -396,6 +399,7 @@ set(SOURCES
     src/connection/usb/UsbConnectionTransfer.cpp
     src/connection/usb/UsbConnectionDescriptors.cpp
     src/connection/usb/UsbDeviceDetector.cpp
+    src/connection/usb/UsbDeviceDetectorDescriptor.cpp
     src/connection/usb/UsbDeviceDetectorWmic.cpp
     src/connection/usb/UsbDeviceDetectorStats.cpp
     src/connection/usb/UsbDescriptorViewer.cpp
