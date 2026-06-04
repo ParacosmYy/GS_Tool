@@ -71,6 +71,12 @@
 | 223 | NotificationManager/WorkspaceManager/ConnectionMonitor统计增强+文件拆分 | 通知创建/确认/消除+工作区保存/加载/删除/切换+OtaWidgetDisplay+QuickCommandBarActions拆分 |
 | 224 | QssThemeGeneratorWidgets/UsbDeviceDetectorStats拆分+PluginLoader2/SpiI2cBridge统计增强 | PluginLoader2加载/卸载/扫描+SpiI2cBridge模式切换/队列排空 |
 | 225 | PluginLoader2/SpiI2cBridgeManager统计增强+IntelHex/OtaManager拆分修复 | IntelHex命名空间修复+OtaManagerVerify拆分 |
+| 226 | TcpConnectionHelpers/ProtocolEngineParsing拆分+多模块统计增强+头文件压缩 | TCP辅助函数独立+协议引擎解析独立+AnimationUtility2/WidgetFactory等统计 |
+| 227 | ProtocolBridgeManager.h压缩+DataPipeline/PluginLoader统计增强 | .h从271→136行+管线处理/字节/错误+插件加载统计 |
+| 228 | WebSocketConnection/PortWatcher头文件压缩+DashboardWidgetSlots拆分 | .h分别从247→103/230→102行+仪表盘槽函数独立 |
+| 229-231 | Linter自动拆分+多模块统计增强 | OtaHistoryModelIndex/ZoomControllerQuery/UsbConnectionDescriptors等拆分 |
+| 232 | BLE/CAN/MQTT/UDP/Terminal/Recording/Playback统计增强+文件拆分 | 连接模块帧错误/退订/队列+终端布局/搜索/过滤统计 |
+| 233 | ModbusSlaveResponse/FrameParserStats拆分+连接模块统计增强 | Modbus从站响应独立+帧解析器统计独立 |
 
 ---
 
