@@ -108,6 +108,7 @@ void ProtocolSchemaEditor::loadSchema(ProtocolSchema *schema)
     }
 
     if (m_schema->isValid()) {
+        ++m_totalSchemaImports;
         const QJsonObject jsonObj = m_schema->toJson();
         const QJsonDocument doc(jsonObj);
         const QString jsonStr = QString::fromUtf8(
@@ -136,6 +137,7 @@ void ProtocolSchemaEditor::validateJson()
         m_jsonEditor->toPlainText().toUtf8());
 
     if (ok && tmpSchema->isValid()) {
+        ++m_totalSchemaExports;
         m_statusLabel->setText(
             tr("✓ 有效协议: %1").arg(tmpSchema->name()));
         m_statusLabel->setProperty("validationState",

@@ -67,6 +67,16 @@ public:
     /** @brief 获取检测到的峰值频率总次数（基频检测命中） @return 峰值频率次数 */
     quint64 totalPeakFrequenciesDetected() const { return m_totalPeakFrequenciesDetected; }
 
+    /** @brief 获取FFT长度变更总次数(不同size参数调用compute) @return 尺寸变更次数 */
+    quint64 totalSizeChanges() const { return m_totalSizeChanges; }
+
+    /** @brief 获取零填充总次数(输入数据不足FFT长度时补零) @return 零填充次数 */
+    quint64 totalZeroPaddingCount() const { return m_totalZeroPaddingCount; }
+
+    /** @brief 获取平均计算时间(微秒) @return 平均耗时 */
+    double avgComputeTimeUs() const { return (m_totalComputeCount > 0)
+        ? static_cast<double>(m_totalComputeTimeUs) / m_totalComputeCount : 0.0; }
+
     /** @brief 重置所有统计计数器为初始值 */
     void resetFftStatistics();
 
@@ -102,6 +112,11 @@ private:
     quint64 m_errorCount = 0;             ///< FFT计算中发生的错误次数
     quint64 m_totalWindowTypeChanges = 0; ///< 窗函数类型变更总次数
     quint64 m_totalPeakFrequenciesDetected = 0; ///< 峰值频率检测总次数
+    quint64 m_totalSizeChanges = 0;      ///< FFT长度变更总次数(不同size参数)
+    quint64 m_totalZeroPaddingCount = 0; ///< 零填充总次数(数据不足时补零)
+    quint64 m_totalComputeTimeUs = 0;    ///< 累计FFT计算耗时(微秒)
+    quint64 m_totalComputeCount = 0;     ///< 计算次数(用于平均值)
+    int m_lastFftSize = 0;               ///< 上次FFT长度(检测尺寸变更)
 };
 
 #endif // FFTENGINE_H

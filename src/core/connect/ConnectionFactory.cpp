@@ -40,6 +40,9 @@
 quint64 ConnectionFactory::s_totalCreated = 0;
 QMap<ConnectionType, quint64> ConnectionFactory::s_totalByType;
 quint64 ConnectionFactory::s_errorCount = 0;
+quint64 ConnectionFactory::s_totalDestroyed = 0;
+quint64 ConnectionFactory::s_totalTypeChanges = 0;
+static ConnectionType s_lastCreatedType = ConnectionType::Serial; ///< 上一次创建的连接类型，用于跟踪类型切换
 
 /** @brief 根据连接类型枚举创建对应的IConnection子类实例 @param type 连接类型枚举 @param parent 父对象指针 @return 新创建的连接实例，未知类型返回nullptr */
 IConnection* ConnectionFactory::create(ConnectionType type, QObject* parent)
@@ -97,7 +100,14 @@ IConnection* ConnectionFactory::create(ConnectionType type, QObject* parent)
 
     /* 更新统计计数器 */
     ++s_totalCreated;
+    if (s_totalCreated > 1) {
+        ++s_totalDestroyed;  ///< 新连接创建意味着替换(销毁)了前一个连接
+    }
     ++s_totalByType[type];
+    if (s_totalCreated > 1 && type != s_lastCreatedType) {
+        ++s_totalTypeChanges;
+    }
+    s_lastCreatedType = type;
 
     return conn;
 }
@@ -111,10 +121,18 @@ quint64 ConnectionFactory::totalByType(ConnectionType type) { return s_totalByTy
 /** @brief 获取累计创建失败次数 @return 失败总次数 */
 quint64 ConnectionFactory::factoryErrorCount() { return s_errorCount; }
 
+/** @brief 获取累计连接销毁次数 @return 销毁总次数 */
+quint64 ConnectionFactory::totalDestroyed() { return s_totalDestroyed; }
+
+/** @brief 获取累计连接类型切换次数 @return 类型切换总次数 */
+quint64 ConnectionFactory::totalTypeChanges() { return s_totalTypeChanges; }
+
 /** @brief 重置工厂统计计数器为初始值 */
 void ConnectionFactory::resetFactoryStatistics()
 {
     s_totalCreated = 0;
     s_totalByType.clear();
     s_errorCount = 0;
+    s_totalDestroyed = 0;
+    s_totalTypeChanges = 0;
 }

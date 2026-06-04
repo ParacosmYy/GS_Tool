@@ -126,6 +126,9 @@ public:
     quint64 totalPanelCreations() const;     ///< @return 累计面板创建次数(wrapPanels逐个创建)
     quint64 totalPanelDeletions() const;     ///< @return 累计面板删除次数
     quint64 totalActivePanelsTracked() const; ///< @return 累计活跃面板追踪次数
+    quint64 totalPanelRegisters() const;     ///< @return 累计面板注册次数(wrapPanels中)
+    quint64 totalPanelUnregisters() const;   ///< @return 累计面板注销次数
+    quint64 totalCategoryExpands() const;    ///< @return 累计分类展开次数
     void resetStats();                       ///< 重置所有统计计数器
 
 private:
@@ -154,6 +157,9 @@ private:
     quint64 m_totalPanelCreations = 0;      ///< 累计面板创建次数(wrapPanels逐个创建)
     quint64 m_totalPanelDeletions = 0;      ///< 累计面板删除次数
     quint64 m_totalActivePanelsTracked = 0; ///< 累计活跃面板追踪次数
+    quint64 m_totalPanelRegisters = 0;      ///< 累计面板注册次数(wrapPanels中)
+    quint64 m_totalPanelUnregisters = 0;    ///< 累计面板注销次数
+    quint64 m_totalCategoryExpands = 0;     ///< 累计分类展开次数
 };
 
 #endif // PANEL_MANAGER_H

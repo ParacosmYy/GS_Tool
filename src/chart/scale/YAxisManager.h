@@ -39,6 +39,9 @@ public:
     void removeAxis(const QString& channel);
     /** @brief 更新通道Y轴的范围 @param channel 通道名称 @param min 最小值 @param max 最大值 */
     void updateRange(const QString& channel, double min, double max);
+
+    /** @brief 手动设置通道Y轴范围(区别于自动缩放)，递增手动设置计数 @param channel 通道名称 @param min 最小值 @param max 最大值 */
+    void setManualRange(const QString& channel, double min, double max);
     /** @brief 获取通道对应的QValueAxis @param channel 通道名称 @return 轴指针，不存在返回nullptr */
     QValueAxis* axisForChannel(const QString& channel) const;
     /** @brief 将series附加到通道对应的Y轴 @param channel 通道名称 @param series 线条序列 */
@@ -62,6 +65,12 @@ public:
     quint64 totalAxisAdds() const { return m_totalAxisAdds; }
     /** @brief 获取累计轴移除次数 @return 移除次数 */
     quint64 totalAxisRemoves() const { return m_totalAxisRemoves; }
+    /** @brief 获取累计手动范围设置次数 @return 手动设置次数 */
+    quint64 totalManualRangeSets() const;
+    /** @brief 获取累计主题颜色应用次数 @return 主题应用次数 */
+    quint64 totalThemeApplied() const;
+    /** @brief 获取历史峰值轴数量 @return 峰值轴数量 */
+    quint64 peakAxisCount() const;
     /** @brief 重置所有Y轴统计计数器 */
     void resetYAxisStatistics();
 
@@ -89,6 +98,9 @@ private:
     quint64 m_totalAutoScaleEvents = 0;            ///< 累计自动缩放事件次数
     quint64 m_totalAxisAdds = 0;                   ///< 累计轴添加次数
     quint64 m_totalAxisRemoves = 0;                ///< 累计轴移除次数
+    quint64 m_totalManualRangeSets = 0;            ///< 累计手动范围设置次数
+    quint64 m_totalThemeApplied = 0;              ///< 累计主题颜色应用次数
+    quint64 m_peakAxisCount = 0;                  ///< 历史峰值轴数量
 };
 
 #endif // YAXISMANAGER_H

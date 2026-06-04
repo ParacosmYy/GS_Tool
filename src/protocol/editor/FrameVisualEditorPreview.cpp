@@ -78,5 +78,6 @@ void FrameVisualEditor::resetEditorStatistics()
     m_totalFrameValidations = 0;
     m_totalProtocolLoads = 0;
     m_totalProtocolSaves = 0;
+    m_totalFieldRearranges = 0;
     m_validationErrors = 0;
 }

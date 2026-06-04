@@ -71,6 +71,15 @@ public:
     /** @brief 别名，调用resetChartStatistics */
     void resetStats();
 
+    /** @brief 获取数据更新信号发射总次数 @return 更新信号次数 */
+    quint64 totalDataUpdates() const;
+    /** @brief 获取数据清空操作总次数 @return 清空次数 */
+    quint64 totalClears() const;
+    /** @brief 获取配置变更总次数(通道配置集更换) @return 配置变更次数 */
+    quint64 totalConfigChanges() const;
+    /** @brief 获取窗口大小变更总次数 @return 窗口大小变更次数 */
+    quint64 totalWindowResizes() const;
+
     // ---- 操作 ----
     /** @brief 添加通道(更新统计) @param config 通道配置 */
     void addChannel(const ChannelConfig& config);
@@ -122,6 +131,10 @@ private:
     double m_peakDataRate = 0.0;            ///< 峰值数据速率（数据点/秒）
     qint64 m_dataRateTimestamp = 0;         ///< 速率计算用的上次时间戳（毫秒纪元）
     quint64 m_dataRatePointCount = 0;       ///< 速率计算窗口内的数据点累计
+    quint64 m_totalDataUpdates = 0;         ///< 数据更新信号发射总次数
+    quint64 m_totalClears = 0;             ///< 数据清空操作总次数
+    quint64 m_totalConfigChanges = 0;      ///< 配置变更总次数(通道配置集更换)
+    quint64 m_totalWindowResizes = 0;      ///< 窗口大小变更总次数
 
     // 刷新合并
     QTimer* m_refreshTimer;                     ///< 定时刷新定时器（合并高频更新）

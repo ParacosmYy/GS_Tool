@@ -101,12 +101,14 @@ QSerialPort::FlowControl SerialConnection::flowControl() const
 /** @brief 设置DTR信号电平 @param enabled true=高电平，false=低电平 */
 void SerialConnection::setDtr(bool enabled)
 {
+    ++m_totalPinChanges;
     m_serial.setDataTerminalReady(enabled);
 }
 
 /** @brief 设置RTS信号电平 @param enabled true=高电平，false=低电平 */
 void SerialConnection::setRts(bool enabled)
 {
+    ++m_totalPinChanges;
     m_serial.setRequestToSend(enabled);
 }
 
@@ -127,6 +129,7 @@ bool SerialConnection::isRts() const
 /** @brief 通过参数映射配置串口(工厂模式下的统一配置入口)，未识别的key安全忽略，数值型参数有范围检查 @param params 参数映射表，支持portName/baudRate/dataBits/parity/stopBits/flowControl/dtr/rts */
 void SerialConnection::configure(const QVariantMap& params)
 {
+    ++m_totalConfigChanges;
     if (params.contains("portName"))
         setPortName(params["portName"].toString());
     if (params.contains("baudRate"))
@@ -186,7 +189,7 @@ void SerialConnection::onReadyRead()
     }
 }
 
-/** @brief 重置所有操作统计计数器(totalOpens/totalCloses/totalBytesWritten/totalBytesRead/errorCount归零)，不影响SerialErrorCounters */
+/** @brief 重置所有操作统计计数器(totalOpens/totalCloses/totalBytesWritten/totalBytesRead/errorCount/configChanges/pinChanges归零)，不影响SerialErrorCounters */
 void SerialConnection::resetStats()
 {
     m_totalOpens = 0;
@@ -195,4 +198,6 @@ void SerialConnection::resetStats()
     m_totalBytesRead = 0;
     m_totalWrites = 0;
     m_errorCount = 0;
+    m_totalConfigChanges = 0;
+    m_totalPinChanges = 0;
 }

@@ -81,6 +81,11 @@ public:
     quint64 filterPassCount() const;                ///< 过滤通过总行数
     quint64 filterBlockCount() const;               ///< 过滤阻塞总行数
     quint64 totalFilters() const;                   ///< 累计添加过滤规则总数
+    quint64 totalFilterEnables() const;             ///< 累计规则启用次数
+    quint64 totalFilterDisables() const;            ///< 累计规则禁用次数
+    quint64 totalFilterMatches() const;             ///< 累计正则匹配命中次数(Include+Exclude)
+    quint64 totalModeChanges() const;               ///< 累计过滤模式切换次数(Include↔Exclude)
+    quint64 totalTimestampFiltersSet() const;       ///< 累计时间戳过滤设置次数
     void resetStatistics();                         ///< 重置所有统计
 
 signals:
@@ -107,6 +112,11 @@ private:
     quint64 m_filterPassCount = 0;                  ///< 过滤通过行数
     quint64 m_filterBlockCount = 0;                 ///< 过滤阻塞行数
     quint64 m_totalFilters = 0;                     ///< 累计添加过滤规则总数
+    quint64 m_totalFilterEnables = 0;               ///< 累计规则启用次数
+    quint64 m_totalFilterDisables = 0;              ///< 累计规则禁用次数
+    quint64 m_totalFilterMatches = 0;               ///< 累计正则匹配命中次数(Include+Exclude)
+    quint64 m_totalModeChanges = 0;                 ///< 累计过滤模式切换次数(Include↔Exclude)
+    quint64 m_totalTimestampFiltersSet = 0;         ///< 累计时间戳过滤设置次数
 };
 
 #endif // TERMINALFILTER_H

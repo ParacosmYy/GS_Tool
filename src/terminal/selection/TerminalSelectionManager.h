@@ -78,6 +78,12 @@ public:
     /** @brief 通知复制操作已完成，递增复制计数并更新字符数统计 @param charCount 本次复制的字符数 */
     void notifyCopyPerformed(quint64 charCount = 0);
 
+    /** @brief 通知全选操作已触发，递增全选计数 */
+    void notifySelectAll();
+
+    /** @brief 通知双击选词操作，递增双击选词计数 @param charCount 选中单词的字符数 */
+    void notifyDoubleClickSelect(quint64 charCount = 0);
+
     // ── 统计计数器 Getter ──
 
     /** @brief 获取总选择次数 @return 用户完成选区的总次数 */
@@ -104,6 +110,15 @@ public:
     /** @brief 获取总拖拽选择次数(多行拖拽) @return 拖拽选择计数 */
     quint64 totalDragSelects() const;
 
+    /** @brief 获取全选操作总次数(Ctrl+A或程序化全选) @return 全选次数 */
+    quint64 totalSelectAllCalls() const;
+
+    /** @brief 获取选区被取消总次数(点击空白区域取消选区) @return 取消次数 */
+    quint64 totalSelectionCancels() const;
+
+    /** @brief 获取双击选词总次数(双击选中单词) @return 双击选词次数 */
+    quint64 totalDoubleClickSelects() const;
+
     /** @brief 重置所有统计计数器为零 */
     void resetStats();
 
@@ -125,6 +140,9 @@ private:
     quint64 m_totalSelectionsChanged = 0; ///< 选区变更总次数(拖拽/程序化)
     quint64 m_totalClickSelects = 0;    ///< 总点击选择次数(单行点击选区)
     quint64 m_totalDragSelects = 0;     ///< 总拖拽选择次数(多行拖拽选区)
+    quint64 m_totalSelectAllCalls = 0;  ///< 全选操作总次数(Ctrl+A或程序化)
+    quint64 m_totalSelectionCancels = 0;///< 选区被取消总次数(点击空白取消)
+    quint64 m_totalDoubleClickSelects = 0; ///< 双击选词总次数(双击选中单词)
 };
 
 #endif // TERMINALSELECTIONMANAGER_H

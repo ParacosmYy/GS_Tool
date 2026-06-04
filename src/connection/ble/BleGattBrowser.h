@@ -61,6 +61,10 @@ public:
     quint64 totalBytesWritten() const;
     /** @brief 获取最近一次服务发现耗时(ms) @return 最近发现耗时 */
     qint64 lastDiscoveryDurationMs() const;
+    /** @brief 获取累计服务展开操作次数 @return 服务展开总次数 */
+    quint64 totalServiceExpands() const;
+    /** @brief 获取累计描述符读取次数 @return 描述符读取总次数 */
+    quint64 totalDescriptorReads() const;
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -140,6 +144,8 @@ private:
     quint64 m_totalBytesRead = 0;                ///< 读取字节数
     quint64 m_totalBytesWritten = 0;             ///< 写入字节数
     qint64  m_lastDiscoveryDurationMs = 0;       ///< 最后发现耗时
+    quint64 m_totalServiceExpands = 0;           ///< 服务展开操作次数
+    quint64 m_totalDescriptorReads = 0;          ///< 描述符读取次数
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(BleGattBrowser::CharProperties)

@@ -127,7 +127,23 @@ void ChartModel::resetChartStatistics()
     m_peakDataRate = 0.0;
     m_dataRateTimestamp = 0;
     m_dataRatePointCount = 0;
+    m_totalDataUpdates = 0;
+    m_totalClears = 0;
+    m_totalConfigChanges = 0;
+    m_totalWindowResizes = 0;
 }
 
 /** @brief 重置统计计数器的别名，委托给resetChartStatistics() */
 void ChartModel::resetStats() { resetChartStatistics(); }
+
+/** @brief 获取数据更新信号发射总次数 @return 更新信号次数 */
+quint64 ChartModel::totalDataUpdates() const { return m_totalDataUpdates; }
+
+/** @brief 获取数据清空操作总次数 @return 清空次数 */
+quint64 ChartModel::totalClears() const { return m_totalClears; }
+
+/** @brief 获取配置变更总次数 @return 配置变更次数 */
+quint64 ChartModel::totalConfigChanges() const { return m_totalConfigChanges; }
+
+/** @brief 获取窗口大小变更总次数 @return 窗口大小变更次数 */
+quint64 ChartModel::totalWindowResizes() const { return m_totalWindowResizes; }

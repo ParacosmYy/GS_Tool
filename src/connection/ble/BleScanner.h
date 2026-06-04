@@ -75,6 +75,10 @@ public:
     quint64 totalDiscoveryEvents() const;
     /** @brief 获取累计扫描总时长 @return 扫描总时长(ms) */
     quint64 totalScanDurationMs() const;
+    /** @brief 获取累计停止扫描次数 @return 停止扫描总次数 */
+    quint64 totalScanStops() const;
+    /** @brief 获取累计设备连接尝试次数 @return 设备连接尝试总次数 */
+    quint64 totalDeviceConnects() const;
     /** @brief 获取最佳RSSI值 @return 最佳RSSI值(dBm) */
     int bestRssi() const;
     /** @brief 获取最差RSSI值 @return 最差RSSI值(dBm) */
@@ -121,6 +125,8 @@ private:
     quint64 m_totalDiscoveryEvents = 0;    ///< 累计发现事件次数
     quint64 m_filteredDeviceCount = 0;     ///< 被过滤设备数
     quint64 m_totalScanDurationMs = 0;     ///< 累计扫描总时长
+    quint64 m_totalScanStops = 0;          ///< 累计停止扫描次数
+    quint64 m_totalDeviceConnects = 0;     ///< 累计设备连接尝试次数
     int     m_bestRssi = 0;                ///< 最佳RSSI值
     int     m_worstRssi = 0;               ///< 最差RSSI值
     qint64  m_rssiSum = 0;                 ///< RSSI累计总和

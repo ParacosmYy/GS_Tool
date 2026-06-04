@@ -39,6 +39,8 @@ void TerminalLayoutManager::resetStats()
     m_totalTabRemoves = 0;
     m_totalMerges = 0;
     m_totalViewModeChanges = 0;
+    m_totalSplitToggles = 0;
+    m_totalTabReorders = 0;
 }
 
 /** @brief 通知行清除事件，累加清除行数到统计计数器 @param lines 本次清除的行数 */
@@ -95,4 +97,16 @@ quint64 TerminalLayoutManager::totalMerges() const
 quint64 TerminalLayoutManager::totalViewModeChanges() const
 {
     return m_totalViewModeChanges;
+}
+
+/** @brief 获取分栏开关切换总次数(进入/退出分栏) @return 累计切换次数 */
+quint64 TerminalLayoutManager::totalSplitToggles() const
+{
+    return m_totalSplitToggles;
+}
+
+/** @brief 获取Tab重排总次数(拖拽改变Tab顺序) @return 累计重排次数 */
+quint64 TerminalLayoutManager::totalTabReorders() const
+{
+    return m_totalTabReorders;
 }

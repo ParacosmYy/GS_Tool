@@ -99,6 +99,7 @@ void BleScanner::onSimulateDiscovery()
     /* 更新或添加设备 */
     const bool isNew = updateDeviceList(device);
     if (isNew) {
+        ++m_totalDeviceConnects;
         if (!m_seenAddresses.contains(addr)) {
             m_seenAddresses.append(addr);
         }

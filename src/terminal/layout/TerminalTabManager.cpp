@@ -9,6 +9,7 @@
 #include "terminal/layout/TerminalTabManager.h"
 
 #include <QTabWidget>
+#include <QTabBar>
 #include <QTextEdit>
 #include <QVBoxLayout>
 
@@ -55,6 +56,15 @@ void TerminalTabManager::setupUI()
         emit currentTabChanged(index);
     });
 
+    /* 标签页被拖拽移动时递增统计计数 */
+    connect(m_tabWidget, &QTabWidget::tabBarClicked, this, [this](int index) {
+        Q_UNUSED(index);
+        // tabBarClicked仅记录点击，实际移动通过tabMoved信号跟踪
+    });
+    connect(m_tabWidget->tabBar(), &QTabBar::tabMoved, this, [this](int, int) {
+        ++m_totalTabMoves;
+    });
+
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
 }
@@ -96,6 +106,15 @@ void TerminalTabManager::removeTab(int index)
     emit tabRemoved(index);
 }
 
+/** @brief 重命名指定索引的标签页标题并递增重命名计数 @param index 标签页索引 @param title 新标题 */
+void TerminalTabManager::renameTab(int index, const QString &title)
+{
+    if (!m_tabWidget) return;
+    if (index < 0 || index >= m_tabWidget->count()) return;
+    m_tabWidget->setTabText(index, title);
+    ++m_totalTabRenames;
+}
+
 /** @brief 获取标签页数量 @return 当前标签页总数 */
 int TerminalTabManager::tabCount() const
 {
@@ -108,7 +127,7 @@ int TerminalTabManager::currentTabIndex() const
     return m_tabWidget ? m_tabWidget->currentIndex() : -1;
 }
 
-/** @brief 重置所有统计计数器为零(添加/移除/切换/峰值/关闭请求) */
+/** @brief 重置所有统计计数器为零(添加/移除/切换/峰值/关闭请求/重命名/拖拽/最短存活) */
 void TerminalTabManager::resetStatistics()
 {
     m_totalTabAdds = 0;
@@ -116,4 +135,7 @@ void TerminalTabManager::resetStatistics()
     m_totalTabSwitches = 0;
     m_peakTabCount = 0;
     m_totalTabCloseRequests = 0;
+    m_totalTabRenames = 0;
+    m_totalTabMoves = 0;
+    m_minTabLifetime = 0;
 }

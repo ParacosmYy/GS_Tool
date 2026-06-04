@@ -45,6 +45,13 @@ public:
     void removeTab(int index);
 
     /**
+     * @brief 重命名指定索引的标签页标题
+     * @param index 标签页索引
+     * @param title 新标题
+     */
+    void renameTab(int index, const QString &title);
+
+    /**
      * @brief 获取标签页数量
      * @return 当前标签页总数
      */
@@ -70,6 +77,15 @@ public:
 
     /** @brief 获取累计标签页关闭前确认总次数(如有确认机制) */
     quint64 totalTabCloseRequests() const { return m_totalTabCloseRequests; }
+
+    /** @brief 获取累计标签页重命名总次数 */
+    quint64 totalTabRenames() const { return m_totalTabRenames; }
+
+    /** @brief 获取累计标签页拖拽移动总次数(拖拽改变顺序) */
+    quint64 totalTabMoves() const { return m_totalTabMoves; }
+
+    /** @brief 获取历史最短标签页存活时间(毫秒) @return 最短存活时间，0表示无记录 */
+    quint64 minTabLifetime() const { return m_minTabLifetime; }
 
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
@@ -104,6 +120,9 @@ private:
     quint64 m_totalTabSwitches = 0;     ///< 标签页切换总次数
     quint64 m_peakTabCount = 0;         ///< 历史峰值标签页数量
     quint64 m_totalTabCloseRequests = 0;///< 累计标签页关闭请求总次数
+    quint64 m_totalTabRenames = 0;     ///< 累计标签页重命名总次数
+    quint64 m_totalTabMoves = 0;       ///< 累计标签页拖拽移动总次数
+    quint64 m_minTabLifetime = 0;      ///< 历史最短标签页存活时间(毫秒)
 };
 
 #endif // TERMINAL_TAB_MANAGER_H

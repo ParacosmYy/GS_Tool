@@ -31,6 +31,12 @@ TerminalSelectionManager::TerminalSelectionManager(QObject* parent)
 void TerminalSelectionManager::onMousePress(double y, int scrollOffset, int lineHeight)
 {
     if (lineHeight <= 0) return;  // 防止除零
+
+    // 如果之前有选区，新按下意味着取消旧选区
+    if (hasSelection()) {
+        ++m_totalSelectionCancels;
+    }
+
     m_isSelecting = true;
     int line = scrollOffset + static_cast<int>(y) / lineHeight;
     m_selectionStartLine = line;
@@ -172,6 +178,7 @@ void TerminalSelectionManager::setSelectionBgColor(const QColor& color)
  * @brief 程序化设置选区范围，直接指定起始和结束行号
  *
  * 同时更新选区统计计数器(选择次数)。
+ * 当startLine=0且endLine为极大值时视为全选操作，递增全选计数。
  *
  * @param startLine 选区起始行号
  * @param endLine 选区结束行号
@@ -185,12 +192,32 @@ void TerminalSelectionManager::setSelection(int startLine, int endLine)
     // 程序化设置选区时更新选择统计
     ++m_totalSelections;
     ++m_totalSelectionsChanged;
+
+    // 检测全选操作: startLine为0且endLine为极大值时视为全选
+    if (startLine == 0 && endLine >= 0x7FFFFFFF) {
+        ++m_totalSelectAllCalls;
+    }
 }
 
 /** @brief 通知复制操作已完成，递增复制计数并更新字符数统计 @param charCount 本次复制的字符数 */
 void TerminalSelectionManager::notifyCopyPerformed(quint64 charCount)
 {
     ++m_totalCopies;
+    if (charCount > 0) {
+        updateSelectionStats(charCount);
+    }
+}
+
+/** @brief 通知全选操作已触发，递增全选计数 */
+void TerminalSelectionManager::notifySelectAll()
+{
+    ++m_totalSelectAllCalls;
+}
+
+/** @brief 通知双击选词操作，递增双击选词计数并更新字符数统计 @param charCount 选中单词的字符数 */
+void TerminalSelectionManager::notifyDoubleClickSelect(quint64 charCount)
+{
+    ++m_totalDoubleClickSelects;
     if (charCount > 0) {
         updateSelectionStats(charCount);
     }

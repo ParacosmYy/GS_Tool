@@ -61,6 +61,12 @@ quint64 BleScanner::totalDiscoveryEvents() const { return m_totalDiscoveryEvents
 /** @brief 获取累计扫描总时长(毫秒) */
 quint64 BleScanner::totalScanDurationMs() const { return m_totalScanDurationMs; }
 
+/** @brief 获取累计停止扫描次数 */
+quint64 BleScanner::totalScanStops() const { return m_totalScanStops; }
+
+/** @brief 获取累计设备连接尝试次数 */
+quint64 BleScanner::totalDeviceConnects() const { return m_totalDeviceConnects; }
+
 /** @brief 获取最佳RSSI值(信号最强) */
 int BleScanner::bestRssi() const { return m_bestRssi; }
 
@@ -84,6 +90,8 @@ void BleScanner::resetScannerStatistics()
     m_seenAddresses.clear();
     m_filteredDeviceCount = 0;
     m_totalScanDurationMs = 0;
+    m_totalScanStops = 0;
+    m_totalDeviceConnects = 0;
     m_bestRssi = 0;
     m_worstRssi = 0;
     m_rssiSum = 0;

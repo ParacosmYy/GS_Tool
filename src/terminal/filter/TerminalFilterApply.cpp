@@ -34,6 +34,7 @@ bool TerminalFilter::filter(const QString& text)
         hasEnabled = true;
         if (rule.regex.isValid() && rule.regex.match(text).hasMatch()) {
             anyMatched = true;
+            ++m_totalFilterMatches;  ///< 统计: 正则匹配命中次数递增
             break;  // 短路: 已知有匹配，无需继续
         }
     }
@@ -91,6 +92,7 @@ bool TerminalFilter::filter(const QString& text, qint64 timestamp)
  */
 void TerminalFilter::setTimestampRange(const QDateTime& from, const QDateTime& to)
 {
+    ++m_totalTimestampFiltersSet;  ///< 统计: 时间戳过滤设置次数递增
     if (from.isValid()) {
         m_timestampFrom = from;
         m_timestampFromMs = from.toMSecsSinceEpoch();

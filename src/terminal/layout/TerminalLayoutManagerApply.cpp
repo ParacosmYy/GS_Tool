@@ -40,6 +40,10 @@ void TerminalLayoutManager::setLayout(TerminalLayout layout)
     if (m_layout == layout) return;
     ++m_totalSwitches;  ///< 统计: 布局切换次数递增
     ++m_totalViewModeChanges;  ///< 统计: 视图模式变更次数递增
+    // 统计: 混合↔分栏切换时递增分栏开关计数
+    if ((m_layout == TerminalLayout::Mixed) != (layout == TerminalLayout::Mixed)) {
+        ++m_totalSplitToggles;
+    }
     m_layout = layout;
     applyLayout();
     emit layoutChanged(m_layout);

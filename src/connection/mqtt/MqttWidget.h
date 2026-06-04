@@ -59,6 +59,18 @@ public:
     /** @brief 获取累计发布操作次数(UI层面) @return 发布操作总次数 */
     quint64 totalPublishOps() const { return m_totalPublishOps; }
 
+    /** @brief 获取累计订阅操作次数 @return 订阅总次数 */
+    quint64 totalSubscriptions() const { return m_totalSubscriptions; }
+
+    /** @brief 获取累计取消订阅操作次数 @return 取消订阅总次数 */
+    quint64 totalUnsubscriptions() const { return m_totalUnsubscriptions; }
+
+    /** @brief 获取累计消息显示次数 @return 消息显示总次数 */
+    quint64 totalMessageDisplays() const { return m_totalMessageDisplays; }
+
+    /** @brief 获取累计主题过滤操作次数 @return 主题过滤总次数 */
+    quint64 totalTopicFilters() const { return m_totalTopicFilters; }
+
     /** @brief 重置UI层统计计数器 */
     void resetWidgetStatistics();
 
@@ -132,6 +144,10 @@ private:
     // UI统计计数器
     quint64 m_totalReconnectAttempts = 0;    ///< 累计自动重连次数
     quint64 m_totalPublishOps = 0;           ///< 累计发布操作次数
+    quint64 m_totalSubscriptions = 0;        ///< 累计订阅操作次数
+    quint64 m_totalUnsubscriptions = 0;      ///< 累计取消订阅操作次数
+    quint64 m_totalMessageDisplays = 0;      ///< 累计消息显示次数
+    quint64 m_totalTopicFilters = 0;         ///< 累计主题过滤操作次数
 };
 
 #endif // MQTTWIDGET_H

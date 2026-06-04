@@ -53,6 +53,36 @@ quint64 TerminalFilter::totalFilters() const
     return m_totalFilters;
 }
 
+/** @brief 获取累计规则启用次数 @return 启用计数 */
+quint64 TerminalFilter::totalFilterEnables() const
+{
+    return m_totalFilterEnables;
+}
+
+/** @brief 获取累计规则禁用次数 @return 禁用计数 */
+quint64 TerminalFilter::totalFilterDisables() const
+{
+    return m_totalFilterDisables;
+}
+
+/** @brief 获取累计正则匹配命中次数 @return 匹配命中计数 */
+quint64 TerminalFilter::totalFilterMatches() const
+{
+    return m_totalFilterMatches;
+}
+
+/** @brief 获取累计过滤模式切换次数 @return 模式切换计数 */
+quint64 TerminalFilter::totalModeChanges() const
+{
+    return m_totalModeChanges;
+}
+
+/** @brief 获取累计时间戳过滤设置次数 @return 时间戳过滤设置计数 */
+quint64 TerminalFilter::totalTimestampFiltersSet() const
+{
+    return m_totalTimestampFiltersSet;
+}
+
 /** @brief 重置所有统计计数器为零 */
 void TerminalFilter::resetStatistics()
 {
@@ -61,6 +91,11 @@ void TerminalFilter::resetStatistics()
     m_filterPassCount = 0;
     m_filterBlockCount = 0;
     m_totalFilters = 0;
+    m_totalFilterEnables = 0;
+    m_totalFilterDisables = 0;
+    m_totalFilterMatches = 0;
+    m_totalModeChanges = 0;
+    m_totalTimestampFiltersSet = 0;
 }
 
 // ---- 私有方法 ----

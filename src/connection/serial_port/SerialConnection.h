@@ -122,7 +122,13 @@ public:
     /** @brief 获取累计错误次数 @return 自上次重置以来的错误总次数(含致命+可恢复) */
     quint64 errorCount() const { return m_errorCount; }
 
-    /** @brief 重置所有操作统计计数器(totalOpens/totalCloses/totalBytesWritten/totalBytesRead/totalWrites/errorCount归零) */
+    /** @brief 获取累计配置变更次数 @return 自上次重置以来的参数配置变更总次数 */
+    quint64 totalConfigChanges() const { return m_totalConfigChanges; }
+
+    /** @brief 获取累计信号线操作次数(DTR/RTS切换) @return 自上次重置以来的信号线操作总次数 */
+    quint64 totalPinChanges() const { return m_totalPinChanges; }
+
+    /** @brief 重置所有操作统计计数器(totalOpens/totalCloses/totalBytesWritten/totalBytesRead/totalWrites/errorCount/configChanges/pinChanges归零) */
     void resetStats();
 
 private slots:
@@ -157,6 +163,8 @@ private:
     quint64 m_totalBytesRead = 0;    ///< 累计串口读取字节总数
     quint64 m_totalWrites = 0;       ///< 累计write()调用次数
     quint64 m_errorCount = 0;        ///< 累计错误总次数(致命错误+可恢复错误)
+    quint64 m_totalConfigChanges = 0; ///< 累计参数配置变更次数
+    quint64 m_totalPinChanges = 0;   ///< 累计信号线操作次数(DTR/RTS切换)
 };
 
 #endif // SERIALCONNECTION_H

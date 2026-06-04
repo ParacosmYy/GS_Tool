@@ -109,6 +109,7 @@ private:
     quint64 m_totalFrameValidations = 0; ///< 帧校验总次数
     quint64 m_totalProtocolLoads = 0; ///< 协议加载总次数
     quint64 m_totalProtocolSaves = 0; ///< 协议保存总次数
+    quint64 m_totalFieldRearranges = 0; ///< 字段重排总次数(上移/下移)
     quint64 m_validationErrors = 0; ///< 校验错误总次数
 
 public:
@@ -120,6 +121,7 @@ public:
     quint64 totalFrameValidations() const { return m_totalFrameValidations; } ///< 帧校验总次数
     quint64 totalProtocolLoads() const { return m_totalProtocolLoads; } ///< 协议加载总次数
     quint64 totalProtocolSaves() const { return m_totalProtocolSaves; } ///< 协议保存总次数
+    quint64 totalFieldRearranges() const { return m_totalFieldRearranges; } ///< 字段重排总次数(上移/下移)
     quint64 totalValidationErrors() const { return m_validationErrors; } ///< 校验错误总次数
     void resetEditorStatistics(); ///< 重置帧编辑器统计计数器
 

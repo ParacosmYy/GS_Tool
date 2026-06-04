@@ -60,6 +60,7 @@ void TerminalModel::appendSent(const QByteArray& data)
 /** @brief 清空所有缓冲区数据和统计计数，发射dataCleared信号 */
 void TerminalModel::clear()
 {
+    ++m_totalClears;  ///< 统计: 数据清空次数递增
     {
         QMutexLocker locker(&m_mutex);
         m_head = 0;
@@ -153,6 +154,11 @@ void TerminalModel::appendLine(TerminalLine&& line)
         ++m_totalMaxLinesReached;  ///< 统计: 环形缓冲区满覆盖递增
         m_buffer[m_head] = std::move(line);
         m_head = (m_head + 1) % m_buffer.size();
+    }
+
+    // 更新峰值行数统计
+    if (static_cast<quint64>(m_count) > m_peakLineCount) {
+        m_peakLineCount = static_cast<quint64>(m_count);
     }
 }
 

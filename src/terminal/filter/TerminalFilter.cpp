@@ -96,6 +96,12 @@ void TerminalFilter::setRuleEnabled(int index, bool enabled)
 {
     if (index >= 0 && index < m_rules.size()) {
         m_rules[index].enabled = enabled;
+        // 统计: 记录规则启用/禁用次数
+        if (enabled) {
+            ++m_totalFilterEnables;
+        } else {
+            ++m_totalFilterDisables;
+        }
         emit filterRulesChanged();
     }
 }
@@ -133,6 +139,7 @@ FilterMode TerminalFilter::filterMode() const
 void TerminalFilter::setFilterMode(FilterMode mode)
 {
     if (m_filterMode != mode) {
+        ++m_totalModeChanges;  ///< 统计: 过滤模式切换次数递增
         m_filterMode = mode;
         emit filterRulesChanged();
     }

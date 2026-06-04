@@ -62,6 +62,7 @@ bool PanelManager::isCompactMode() const
 void PanelManager::onPanelSwitched(int visibleCount)
 {
     ++m_totalPanelSwitches;
+    ++m_totalCategoryExpands;
     m_totalActivePanelsTracked += static_cast<quint64>(visibleCount);
     if (static_cast<quint64>(visibleCount) > m_maxConcurrentPanels) {
         m_maxConcurrentPanels = static_cast<quint64>(visibleCount);
@@ -86,6 +87,15 @@ quint64 PanelManager::totalPanelDeletions() const { return m_totalPanelDeletions
 /** @brief 获取累计活跃面板追踪次数 @return 追踪总数 */
 quint64 PanelManager::totalActivePanelsTracked() const { return m_totalActivePanelsTracked; }
 
+/** @brief 获取累计面板注册次数(wrapPanels中) @return 注册总数 */
+quint64 PanelManager::totalPanelRegisters() const { return m_totalPanelRegisters; }
+
+/** @brief 获取累计面板注销次数 @return 注销总数 */
+quint64 PanelManager::totalPanelUnregisters() const { return m_totalPanelUnregisters; }
+
+/** @brief 获取累计分类展开次数 @return 展开总数 */
+quint64 PanelManager::totalCategoryExpands() const { return m_totalCategoryExpands; }
+
 /** @brief 重置所有统计计数器为零 */
 void PanelManager::resetStats()
 {
@@ -95,4 +105,7 @@ void PanelManager::resetStats()
     m_totalPanelCreations = 0;
     m_totalPanelDeletions = 0;
     m_totalActivePanelsTracked = 0;
+    m_totalPanelRegisters = 0;
+    m_totalPanelUnregisters = 0;
+    m_totalCategoryExpands = 0;
 }

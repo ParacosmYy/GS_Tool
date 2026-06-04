@@ -110,6 +110,7 @@ void BleGattBrowser::populateTree(const QStringList& services)
         svcItem->setText(2, tr("主要服务"));
         svcItem->setExpanded(true);
         svcItem->setData(0, Qt::UserRole, "service");
+        ++m_totalServiceExpands;
 
         const int charCount = (shortUuid == "00001800") ? 3 : (shortUuid == "6e400001") ? 2 : 2;
         for (int i = 0; i < charCount; ++i) {
@@ -129,6 +130,7 @@ void BleGattBrowser::populateTree(const QStringList& services)
 /** @brief 添加描述符子节点 @param charItem 特征节点 @param charIndex 特征索引 */
 void BleGattBrowser::addDescriptors(QTreeWidgetItem* charItem, int charIndex)
 {
+    ++m_totalDescriptorReads;
     auto* cccd = new QTreeWidgetItem(charItem);
     cccd->setText(0, tr("CCCD(通知/指示开关)"));
     cccd->setText(1, "00002902-0000-1000-8000-00805f9b34fb");

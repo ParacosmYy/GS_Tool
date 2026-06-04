@@ -17,6 +17,7 @@
 /** @brief 将当前选中行上移一行(交换所有列数据和控件) */
 void FrameVisualEditor::onMoveFieldUp()
 {
+    ++m_totalFieldRearranges;
     int row = m_fieldTable->currentRow();
     if (row <= 0) return;
     for (int col = 0; col < m_fieldTable->columnCount(); ++col) {
@@ -36,6 +37,7 @@ void FrameVisualEditor::onMoveFieldUp()
 /** @brief 将当前选中行下移一行(交换所有列数据和控件) */
 void FrameVisualEditor::onMoveFieldDown()
 {
+    ++m_totalFieldRearranges;
     int row = m_fieldTable->currentRow();
     if (row < 0 || row >= m_fieldTable->rowCount() - 1) return;
     for (int col = 0; col < m_fieldTable->columnCount(); ++col) {

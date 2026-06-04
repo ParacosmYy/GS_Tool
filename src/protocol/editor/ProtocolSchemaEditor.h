@@ -89,6 +89,8 @@ private:
     quint64 m_totalValidations = 0;         ///< 验证操作总次数
     quint64 m_totalValidationFailures = 0;  ///< 验证失败次数
     quint64 m_totalJsonEdits = 0;           ///< JSON编辑修改次数
+    quint64 m_totalSchemaImports = 0;       ///< 外部Schema导入总次数
+    quint64 m_totalSchemaExports = 0;       ///< Schema导出总次数
 
 public:
     /** @brief 获取加载协议总次数 @return 加载计数 */
@@ -101,6 +103,10 @@ public:
     quint64 totalValidationFailures() const { return m_totalValidationFailures; }
     /** @brief 获取JSON编辑修改次数 @return 编辑计数 */
     quint64 totalJsonEdits() const { return m_totalJsonEdits; }
+    /** @brief 获取外部Schema导入总次数 @return 导入计数 */
+    quint64 totalSchemaImports() const { return m_totalSchemaImports; }
+    /** @brief 获取Schema导出总次数 @return 导出计数 */
+    quint64 totalSchemaExports() const { return m_totalSchemaExports; }
     /** @brief 重置协议编辑器统计计数器 */
     void resetSchemaEditorStatistics();
 };

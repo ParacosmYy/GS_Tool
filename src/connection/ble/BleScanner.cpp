@@ -61,6 +61,7 @@ void BleScanner::stopScan()
     }
 
     if (wasScanning) {
+        ++m_totalScanStops;
         /* 记录本次扫描时长 */
         if (m_scanElapsed.isValid()) {
             m_totalScanDurationMs += static_cast<quint64>(m_scanElapsed.elapsed());

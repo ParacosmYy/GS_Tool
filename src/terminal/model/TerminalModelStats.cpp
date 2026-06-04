@@ -25,6 +25,18 @@ quint64 TerminalModel::filterBlockCount() const { return m_filterBlockCount; }
 /** @brief 获取环形缓冲区满覆盖次数 @return 覆盖次数 */
 quint64 TerminalModel::totalMaxLinesReached() const { return m_totalMaxLinesReached; }
 
+/** @brief 获取数据清空总次数 @return 清空次数 */
+quint64 TerminalModel::totalClears() const { return m_totalClears; }
+
+/** @brief 获取搜索执行总次数 @return 搜索次数 */
+quint64 TerminalModel::totalSearchesPerformed() const { return m_totalSearchesPerformed; }
+
+/** @brief 获取历史峰值行数 @return 峰值行数 */
+quint64 TerminalModel::peakLineCount() const { return m_peakLineCount; }
+
+/** @brief 通知搜索操作已执行，递增搜索计数 */
+void TerminalModel::notifySearchPerformed() { ++m_totalSearchesPerformed; }
+
 /** @brief 重置所有统计计数器为零 */
 void TerminalModel::resetStats()
 {
@@ -34,4 +46,7 @@ void TerminalModel::resetStats()
     m_maxLineLength = 0;
     m_filterBlockCount = 0;
     m_totalMaxLinesReached = 0;
+    m_totalClears = 0;
+    m_totalSearchesPerformed = 0;
+    m_peakLineCount = 0;
 }

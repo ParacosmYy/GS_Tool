@@ -135,6 +135,7 @@ void ChartModel::flushPendingUpdates()
         return;
     }
 
+    ++m_totalDataUpdates;  ///< 统计: 数据更新信号发射次数递增
     QStringList updates = m_pendingUpdates;
     m_pendingUpdates.clear();
     emit dataUpdated(updates);

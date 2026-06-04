@@ -62,4 +62,8 @@ void MqttWidget::resetWidgetStatistics()
 {
     m_totalReconnectAttempts = 0;
     m_totalPublishOps = 0;
+    m_totalSubscriptions = 0;
+    m_totalUnsubscriptions = 0;
+    m_totalMessageDisplays = 0;
+    m_totalTopicFilters = 0;
 }

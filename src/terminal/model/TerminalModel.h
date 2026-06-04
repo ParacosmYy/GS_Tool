@@ -71,7 +71,13 @@ public:
     quint64 maxLineLength() const;     ///< 获取历史最长行长度(字节)
     quint64 filterBlockCount() const;  ///< 获取被过滤丢弃的行数
     quint64 totalMaxLinesReached() const; ///< 获取环形缓冲区满覆盖次数
+    quint64 totalClears() const;          ///< 获取数据清空总次数
+    quint64 totalSearchesPerformed() const; ///< 获取搜索执行总次数
+    quint64 peakLineCount() const;        ///< 获取历史峰值行数(缓冲区最大占用)
     void resetStats();                 ///< 重置所有统计计数器(保留rxBytes/txBytes)
+
+    /** @brief 通知搜索操作已执行，递增搜索计数 */
+    void notifySearchPerformed();
 
 signals:
     /** @brief 新数据到达通知 @param firstNewLine 新数据起始行号 @param count 新增行数 */
@@ -103,6 +109,9 @@ private:
     quint64 m_maxLineLength = 0;       ///< 历史最长行长度(字节数)
     quint64 m_filterBlockCount = 0;    ///< 被过滤丢弃的行数
     quint64 m_totalMaxLinesReached = 0;///< 环形缓冲区满覆盖次数(行数达到上限)
+    quint64 m_totalClears = 0;         ///< 数据清空总次数
+    quint64 m_totalSearchesPerformed = 0; ///< 搜索执行总次数
+    quint64 m_peakLineCount = 0;       ///< 历史峰值行数(缓冲区最大占用)
 };
 
 #endif // TERMINALMODEL_H

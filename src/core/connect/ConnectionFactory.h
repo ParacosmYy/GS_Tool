@@ -67,6 +67,12 @@ public:
     /** @brief 获取累计创建失败次数（类型未实现等） */
     static quint64 factoryErrorCount();
 
+    /** @brief 获取累计连接销毁次数 @return 销毁总次数 */
+    static quint64 totalDestroyed();
+
+    /** @brief 获取累计连接类型切换次数 @return 类型切换总次数 */
+    static quint64 totalTypeChanges();
+
     /** @brief 重置工厂统计计数器为初始值 */
     static void resetFactoryStatistics();
 
@@ -74,6 +80,8 @@ private:
     static quint64 s_totalCreated;                                ///< 累计创建连接总次数
     static QMap<ConnectionType, quint64> s_totalByType;           ///< 各类型创建次数
     static quint64 s_errorCount;                                  ///< 累计创建失败次数
+    static quint64 s_totalDestroyed;                              ///< 累计连接销毁次数
+    static quint64 s_totalTypeChanges;                            ///< 累计连接类型切换次数
 };
 
 #endif // CONNECTION_FACTORY_H

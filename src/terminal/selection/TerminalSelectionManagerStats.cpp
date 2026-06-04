@@ -49,6 +49,24 @@ quint64 TerminalSelectionManager::totalDragSelects() const
     return m_totalDragSelects;
 }
 
+/** @brief 获取全选操作总次数 @return 全选次数 */
+quint64 TerminalSelectionManager::totalSelectAllCalls() const
+{
+    return m_totalSelectAllCalls;
+}
+
+/** @brief 获取选区被取消总次数 @return 取消次数 */
+quint64 TerminalSelectionManager::totalSelectionCancels() const
+{
+    return m_totalSelectionCancels;
+}
+
+/** @brief 获取双击选词总次数 @return 双击选词次数 */
+quint64 TerminalSelectionManager::totalDoubleClickSelects() const
+{
+    return m_totalDoubleClickSelects;
+}
+
 /** @brief 重置所有统计计数器为零(选区状态不受影响) */
 void TerminalSelectionManager::resetStats()
 {
@@ -59,4 +77,7 @@ void TerminalSelectionManager::resetStats()
     m_totalSelectionsChanged = 0;
     m_totalClickSelects = 0;
     m_totalDragSelects = 0;
+    m_totalSelectAllCalls = 0;
+    m_totalSelectionCancels = 0;
+    m_totalDoubleClickSelects = 0;
 }

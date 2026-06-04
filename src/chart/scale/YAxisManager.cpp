@@ -76,6 +76,10 @@ void YAxisManager::createAxis(const QString& channel, const QColor& color,
     m_axes[channel] = {axis, side, color, unit};
 
     ++m_totalAutoScaleEvents;
+    // 更新峰值轴数量
+    if (static_cast<quint64>(m_axes.size()) > m_peakAxisCount) {
+        m_peakAxisCount = static_cast<quint64>(m_axes.size());
+    }
     ++m_totalAxisAdds;
     emit axesChanged();
 }
@@ -119,6 +123,17 @@ void YAxisManager::updateRange(const QString& channel, double min, double max)
     if (it != m_axes.end()) {
         it->axis->setRange(min, max);
         ++m_totalRescales;
+    }
+}
+
+/** @brief 手动设置通道Y轴范围(区别于自动缩放)，递增手动设置计数 @param channel 通道名称 @param min 最小值 @param max 最大值 */
+void YAxisManager::setManualRange(const QString& channel, double min, double max)
+{
+    auto it = m_axes.find(channel);
+    if (it != m_axes.end()) {
+        it->axis->setRange(min, max);
+        ++m_totalRescales;
+        ++m_totalManualRangeSets;
     }
 }
 

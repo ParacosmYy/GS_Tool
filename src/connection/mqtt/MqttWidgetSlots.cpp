@@ -62,6 +62,7 @@ void MqttWidget::onConnectionStateChanged(ConnectionState state)
                 .arg(ThemeManager::instance().color(SC::Success).name()));
         m_statusText->setText(tr("已连接 - %1").arg(m_connection->name()));
         m_configPanel->setConnected(true);
+        ++m_totalSubscriptions;
         stopReconnect();
         break;
     case ConnectionState::Connecting:
@@ -82,6 +83,7 @@ void MqttWidget::onConnectionStateChanged(ConnectionState state)
                 .arg(ThemeManager::instance().color(SC::TextMuted).name()));
         m_statusText->setText(tr("未连接"));
         m_configPanel->setConnected(false);
+        ++m_totalUnsubscriptions;
         if (m_autoReconnect) startReconnect();
         break;
     case ConnectionState::Error:
@@ -102,6 +104,8 @@ void MqttWidget::onConnectionStateChanged(ConnectionState state)
 /** @brief 接收到MQTT消息，路由到主题模型 @param topic 消息主题 @param payload 消息负载 */
 void MqttWidget::onMessageReceived(const QString& topic, const QByteArray& payload)
 {
+    ++m_totalMessageDisplays;
+    ++m_totalTopicFilters;
     m_topicModel->routeMessage(topic, payload);
 }
 

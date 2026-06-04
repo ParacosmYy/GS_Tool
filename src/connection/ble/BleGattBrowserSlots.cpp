@@ -117,6 +117,12 @@ quint64 BleGattBrowser::totalBytesWritten() const { return m_totalBytesWritten; 
 /** @brief 获取最后一次服务发现耗时 @return 发现耗时(毫秒) */
 qint64 BleGattBrowser::lastDiscoveryDurationMs() const { return m_lastDiscoveryDurationMs; }
 
+/** @brief 获取累计服务展开操作次数 @return 服务展开总次数 */
+quint64 BleGattBrowser::totalServiceExpands() const { return m_totalServiceExpands; }
+
+/** @brief 获取累计描述符读取次数 @return 描述符读取总次数 */
+quint64 BleGattBrowser::totalDescriptorReads() const { return m_totalDescriptorReads; }
+
 /** @brief 重置所有统计计数器 */
 void BleGattBrowser::resetStatistics()
 {
@@ -124,4 +130,6 @@ void BleGattBrowser::resetStatistics()
     m_totalNotificationsReceived = m_totalDescriptorOps = 0;
     m_totalBytesRead = m_totalBytesWritten = 0;
     m_lastDiscoveryDurationMs = 0;
+    m_totalServiceExpands = 0;
+    m_totalDescriptorReads = 0;
 }

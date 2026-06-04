@@ -13,6 +13,7 @@
 #include "chart/fft/FftEngine.h"
 
 #include <QtMath>
+#include <QElapsedTimer>
 #include <algorithm>
 
 /** @brief 执行FFT频谱计算: 加窗→FFT→单边幅度谱 @param timeData 时域采样点(x=序号,y=采样值) @param sampleRate 采样率(Hz) @param window 窗函数类型 @param fftSize FFT长度(2的幂,0=自动) @return 频谱数据(x=频率Hz,y=幅度)，长度为fftSize/2 */
@@ -37,6 +38,21 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
     /* 确定FFT长度: 用户指定 or 自动取nextPowerOf2 */
     const int N = (fftSize > 0) ? nextPowerOf2(fftSize)
                                 : nextPowerOf2(timeData.size());
+
+    /* 统计: FFT长度变更检测 */
+    if (m_lastFftSize != 0 && N != m_lastFftSize) {
+        ++m_totalSizeChanges;
+    }
+    m_lastFftSize = N;
+
+    /* 统计: 零填充检测(输入数据不足FFT长度) */
+    if (timeData.size() < N) {
+        ++m_totalZeroPaddingCount;
+    }
+
+    /* 计时: 测量FFT计算耗时 */
+    QElapsedTimer computeTimer;
+    computeTimer.start();
 
     /* 构造复数序列，从时域数据的Y值提取 */
     QVector<std::complex<double>> data;
@@ -79,6 +95,10 @@ QVector<QPointF> FftEngine::compute(const QVector<QPointF>& timeData,
     if (maxMag > 0.0) {
         ++m_totalPeakFrequenciesDetected;
     }
+
+    /* 统计: 累计计算耗时 */
+    m_totalComputeTimeUs += static_cast<quint64>(computeTimer.nsecsElapsed() / 1000);
+    ++m_totalComputeCount;
 
     emit spectrumComputed(spectrum, fundamentalFreq);
     return spectrum;

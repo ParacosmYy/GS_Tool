@@ -36,6 +36,7 @@ ChartModel::ChartModel(QObject* parent)
 /** @brief 设置通道配置集(重建缓冲区并发射channelsChanged) @param configSet 通道配置集 */
 void ChartModel::setChannelConfigSet(const ChannelConfigSet& configSet)
 {
+    ++m_totalConfigChanges;  ///< 统计: 配置变更次数递增
     m_configSet = configSet;
     rebuildBuffers();
 
@@ -55,6 +56,9 @@ const ChannelConfigSet& ChartModel::channelConfigSet() const
 void ChartModel::setWindowSize(int points)
 {
     if (points < 1) points = 1;
+    if (points != m_windowSize) {
+        ++m_totalWindowResizes;  ///< 统计: 窗口大小变更次数递增
+    }
     m_windowSize = points;
 
     for (auto it = m_buffers.begin(); it != m_buffers.end(); ++it) {
@@ -166,6 +170,7 @@ void ChartModel::addDataPoint(const QString& displayName, double value)
 /** @brief 清除所有通道数据、帧索引和待刷新队列，发射dataCleared */
 void ChartModel::clear()
 {
+    ++m_totalClears;  ///< 统计: 数据清空次数递增
     m_frameIndex = 0;
     m_totalPoints = 0;
     m_pendingUpdates.clear();

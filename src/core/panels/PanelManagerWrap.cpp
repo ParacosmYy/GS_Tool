@@ -96,6 +96,7 @@ void PanelManager::wrapPanels()
         w->setObjectName(panel->objectName() + "Wrapper");
         m_wrappers[panel] = w;
         ++m_totalPanelCreations;
+        ++m_totalPanelRegisters;
     };
 
     // ---- 核心 (排除 m_terminal/m_searchBar/m_quickCmdBar) ----
