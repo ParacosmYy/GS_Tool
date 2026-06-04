@@ -62,7 +62,7 @@ QVariant OtaHistoryModel::data(const QModelIndex& index, int role) const
             if (rec.durationMs < 1000) return tr("%1 ms").arg(rec.durationMs);
             return tr("%1 s").arg(rec.durationMs / 1000.0, 0, 'f', 1);
         case ColResult:
-            return rec.success ? QObject::tr("成功") : QObject::tr("失败");
+            return rec.success ? tr("成功") : tr("失败");
         default:
             return QVariant();
         }

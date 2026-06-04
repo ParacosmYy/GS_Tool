@@ -154,13 +154,13 @@ void SettingsController::onLanguageChanged(int index)
     QString langCode = m_toolbarController->languageCodeAt(index);
     SettingsManager::instance().saveLanguage(langCode);
 
-    // 用硬编码字符串而非 tr()，因为翻译此刻尚未生效
+    // 用 tr() 包裹状态栏消息，确保 i18n 兼容
     if (langCode == Language::ENGLISH) {
         m_mainWindow->statusBar()->showMessage(
-            QStringLiteral("Language changed to English, restart to apply"), 3000);
+            tr("Language changed to English, restart to apply"), 3000);
     } else {
         m_mainWindow->statusBar()->showMessage(
-            QStringLiteral("语言已切换为中文，重启后生效"), 3000);
+            tr("语言已切换为中文，重启后生效"), 3000);
     }
 }
 

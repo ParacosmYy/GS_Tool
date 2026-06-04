@@ -2,13 +2,8 @@
  * @file PluginManager.h
  * @brief 插件管理器 — 动态加载/卸载第三方插件并管理其生命周期
  *
- * 扫描指定目录的 DLL 文件，加载实现 IEmbedDebugPlugin 接口的插件，
- * 管理插件的初始化、运行和关闭过程。
- *
- * 协作关系:
- *   - IEmbedDebugPlugin: 插件接口契约
- *   - PluginApi: 提供给插件的宿主 API
- *   - PluginConfigPanel: 插件管理 UI
+ * 扫描指定目录的DLL文件，加载实现IEmbedDebugPlugin接口的插件。
+ * 协作: IEmbedDebugPlugin(接口) / PluginApi(宿主API) / PluginConfigPanel(UI)
  */
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
@@ -21,143 +16,48 @@
 
 class PluginApi;
 
-/**
- * @brief 插件管理器
- *
- * 负责插件的发现、加载、初始化和卸载。
- * 每个插件以名称为 key 存储在映射表中。
- */
+/** @brief 插件管理器 — 负责插件的发现、加载、初始化和卸载 */
 class PluginManager : public QObject {
     Q_OBJECT
 
 public:
-    /** @brief 构造函数 */
     explicit PluginManager(QObject* parent = nullptr);
-
-    /** @brief 析构函数，自动卸载所有插件 */
     ~PluginManager() override;
 
-    /**
-     * @brief 扫描目录中的插件文件
-     * @param pluginDir 插件目录路径
-     * @return 找到的插件文件路径列表
-     */
-    QStringList scanPlugins(const QString& pluginDir);
+    QStringList scanPlugins(const QString& pluginDir); ///< 扫描目录中的插件文件
+    bool loadPlugin(const QString& filePath);          ///< 加载指定插件
+    void unloadPlugin(const QString& name);            ///< 卸载指定插件
+    void unloadAll();                                  ///< 卸载所有已加载插件
+    QStringList loadedPluginNames() const;             ///< 获取所有已加载插件名称
+    IEmbedDebugPlugin* plugin(const QString& name) const; ///< 获取指定插件接口指针
+    QString pluginVersion(const QString& name) const;  ///< 获取指定插件版本号
+    QString pluginDescription(const QString& name) const; ///< 获取指定插件描述
+    int pluginCount() const;                           ///< 获取已加载插件数量
+    bool isPluginLoaded(const QString& name) const;    ///< 检查插件是否已加载
+    QVariantList pluginMetadataList() const;           ///< 获取所有插件综合信息列表
 
-    /**
-     * @brief 加载指定插件
-     * @param filePath 插件 DLL 文件路径
-     * @return true 加载成功，false 加载失败
-     */
-    bool loadPlugin(const QString& filePath);
-
-    /**
-     * @brief 卸载指定插件
-     * @param name 插件名称
-     */
-    void unloadPlugin(const QString& name);
-
-    /** @brief 卸载所有已加载的插件 */
-    void unloadAll();
-
-    /** @brief 获取所有已加载插件的名称列表 */
-    QStringList loadedPluginNames() const;
-
-    /**
-     * @brief 获取指定插件的接口指针
-     * @param name 插件名称
-     * @return 插件接口指针，未找到返回 nullptr
-     */
-    IEmbedDebugPlugin* plugin(const QString& name) const;
-
-    /**
-     * @brief 获取指定插件的版本号
-     * @param name 插件名称
-     * @return 版本字符串，未找到返回空字符串
-     */
-    QString pluginVersion(const QString& name) const;
-
-    /**
-     * @brief 获取指定插件的描述
-     * @param name 插件名称
-     * @return 描述字符串，未找到返回空字符串
-     */
-    QString pluginDescription(const QString& name) const;
-
-    /**
-     * @brief 获取已加载插件数量
-     * @return 插件数量
-     */
-    int pluginCount() const;
-
-    /**
-     * @brief 检查指定插件是否已加载
-     * @param name 插件名称
-     * @return true 已加载，false 未加载
-     */
-    bool isPluginLoaded(const QString& name) const;
-
-    /**
-     * @brief 获取所有插件的综合信息列表
-     * @return QVariantList，每项包含 name/version/description
-     */
-    QVariantList pluginMetadataList() const;
-
-    /** @brief 获取累计加载成功次数 @return 成功次数 */
-    quint64 totalLoadCount() const;
-
-    /** @brief 获取累计加载失败次数 @return 失败次数 */
-    quint64 totalFailCount() const;
-
-    /** @brief 获取累计卸载次数 @return 卸载次数 */
-    quint64 totalUnloadCount() const;
-
-    /** @brief 重置加载统计 */
+    quint64 totalLoadCount() const;       ///< 获取累计加载成功次数
+    quint64 totalFailCount() const;       ///< 获取累计加载失败次数
+    quint64 totalUnloadCount() const;     ///< 获取累计卸载次数
     void resetLoadStatistics();
-
-    /** @brief 获取累计扫描次数 @return 扫描次数 */
     quint64 totalScanCount() const { return m_scanCount; }
-    /** @brief 获取累计发现插件文件数 @return 发现文件数 */
     quint64 totalDiscoveredFiles() const { return m_discoveredFiles; }
-    /** @brief 获取累计插件加载次数 @return 加载次数 */
     quint64 totalPluginLoads() const { return m_loadCount; }
-    /** @brief 获取累计插件卸载次数 @return 卸载次数 */
     quint64 totalPluginUnloads() const { return m_unloadCount; }
-    /** @brief 获取累计扫描尝试次数 @return 扫描尝试次数 */
     quint64 totalScanAttempts() const { return m_scanCount; }
-    /** @brief 获取累计加载错误次数 @return 加载错误次数 */
     quint64 totalLoadErrors() const { return m_failCount; }
-    /** @brief 重置所有插件管理统计(含加载/卸载/扫描/错误/发现文件) */
     void resetStats();
 
 signals:
-    /** @brief 插件加载成功信号 */
     void pluginLoaded(const QString& name);
-
-    /** @brief 插件卸载信号 */
     void pluginUnloaded(const QString& name);
-
-    /**
-     * @brief 插件错误信号
-     * @param name 插件名称
-     * @param error 错误描述
-     */
     void pluginError(const QString& name, const QString& error);
 
 private:
     QMap<QString, IEmbedDebugPlugin*> m_plugins;  ///< 插件名称→接口映射
-    PluginApi* m_api = nullptr;                     ///< 宿主 API 实例
-
-    /** @brief 累计加载成功次数 */
-    quint64 m_loadCount = 0;
-    /** @brief 累计加载失败次数 */
-    quint64 m_failCount = 0;
-    /** @brief 累计卸载次数 */
-    quint64 m_unloadCount = 0;
-    /** @brief 累计扫描目录次数 */
-    quint64 m_scanCount = 0;
-    /** @brief 累计发现插件文件数 */
-    quint64 m_discoveredFiles = 0;
+    PluginApi* m_api = nullptr;
+    quint64 m_loadCount = 0, m_failCount = 0, m_unloadCount = 0;
+    quint64 m_scanCount = 0, m_discoveredFiles = 0;
 };
 
 #endif // PLUGINMANAGER_H
