@@ -93,6 +93,7 @@
 | 258 | TerminalWidgetSearch/DashboardWidgetPersistence/WebSocketFrameStats拆分 | 搜索功能独立+持久化方法独立+WebSocket统计getter独立 |
 | 259 | SendControllerSend/PluginConfigPanelUI拆分 | 发送逻辑独立(283→124行)+插件面板列表/详情独立(283→238行) |
 | 260 | ChecksumCalculatorStats拆分 | 算法元数据/统计getter独立(281→193行) |
+| 261 | UdpConnectionStats拆分 | 多播组管理/统计getter/resetStats独立(275→219行) |
 
 ---
 

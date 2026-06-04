@@ -103,6 +103,7 @@ set(SOURCES
     src/connection/network/TcpConnectionHelpers.cpp
     src/connection/network/TcpConnectionHandlers.cpp
     src/connection/network/UdpConnection.cpp
+    src/connection/network/UdpConnectionStats.cpp
     src/terminal/widget/TerminalWidget.cpp
     src/terminal/widget/TerminalWidgetEvents.cpp
     src/terminal/widget/TerminalWidgetSlots.cpp
