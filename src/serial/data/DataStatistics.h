@@ -115,40 +115,40 @@ public:
     /** @brief 获取峰值速率更新总次数 */
     quint64 totalPeakUpdates() const;
     /** @brief 获取updateErrors()调用总次数 */
-    quint64 totalErrorUpdates() const { return m_totalErrorUpdates; }
+    quint64 totalErrorUpdates() const;
     /** @brief 获取updateConnectionHealth()调用总次数 */
-    quint64 totalHealthUpdates() const { return m_totalHealthUpdates; }
+    quint64 totalHealthUpdates() const;
     /** @brief 获取定时器刷新总周期数 */
-    quint64 totalRefreshCycles() const { return m_totalRefreshCycles; }
+    quint64 totalRefreshCycles() const;
     /** @brief 获取update()中的速率计算总次数 */
-    quint64 totalCalculations() const { return m_totalCalculations; }
+    quint64 totalCalculations() const;
     /** @brief 重置数据统计计数器(不影响面板显示) */
     void resetDataStatistics();
 
     // ---- 滚动吞吐量 ----
 
     /** @brief 获取滚动窗口RX平均速率(bytes/s) @return 最近kRollingWindowSeconds秒的平均RX速率 */
-    double rollingRxBytesPerSec() const { return m_rollingRxBytesPerSec; }
+    double rollingRxBytesPerSec() const;
 
     /** @brief 获取滚动窗口TX平均速率(bytes/s) @return 最近kRollingWindowSeconds秒的平均TX速率 */
-    double rollingTxBytesPerSec() const { return m_rollingTxBytesPerSec; }
+    double rollingTxBytesPerSec() const;
 
     /** @brief 获取滚动窗口RX包速率(packets/s) @return 最近kRollingWindowSeconds秒的RX包速率 */
-    double rollingRxPacketsPerSec() const { return m_rollingRxPacketsPerSec; }
+    double rollingRxPacketsPerSec() const;
 
     /** @brief 获取滚动窗口TX包速率(packets/s) @return 最近kRollingWindowSeconds秒的TX包速率 */
-    double rollingTxPacketsPerSec() const { return m_rollingTxPacketsPerSec; }
+    double rollingTxPacketsPerSec() const;
 
     /** @brief 获取滚动窗口大小(秒) @return 窗口秒数 */
-    int rollingWindowSize() const { return kRollingWindowSeconds; }
+    int rollingWindowSize() const;
 
     // ---- 直方图 ----
 
     /** @brief 获取吞吐量直方图数据(RX+TX合计) @return 直方图桶列表 */
-    QVector<HistogramBucket> throughputHistogram() const { return m_histogramBuckets; }
+    QVector<HistogramBucket> throughputHistogram() const;
 
     /** @brief 获取直方图总采样次数 */
-    int histogramTotalSamples() const { return m_histogramTotalSamples; }
+    int histogramTotalSamples() const;
 
     // ---- 吞吐量采样历史 ----
 

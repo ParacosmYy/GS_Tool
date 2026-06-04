@@ -254,6 +254,7 @@ set(SOURCES
     src/connection/mqtt/MqttSubscriptionPanel.cpp
     src/connection/mqtt/MqttConfigPanel.cpp
     src/connection/mqtt/MqttWidget.cpp
+    src/connection/mqtt/MqttWidgetSlots.cpp
 
     # ── F15: TCP/UDP 增强 ──
     src/connection/tcp/TcpServerConnection.cpp

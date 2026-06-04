@@ -125,6 +125,24 @@ QVector<ThroughputSample> DataStatistics::throughputHistory(int maxCount) const
 
 // ---- 统计计数器 ----
 
+quint64 DataStatistics::totalErrorUpdates() const { return m_totalErrorUpdates; }
+quint64 DataStatistics::totalHealthUpdates() const { return m_totalHealthUpdates; }
+quint64 DataStatistics::totalRefreshCycles() const { return m_totalRefreshCycles; }
+quint64 DataStatistics::totalCalculations() const { return m_totalCalculations; }
+
+// ---- 滚动吞吐量查询 ----
+
+double DataStatistics::rollingRxBytesPerSec() const { return m_rollingRxBytesPerSec; }
+double DataStatistics::rollingTxBytesPerSec() const { return m_rollingTxBytesPerSec; }
+double DataStatistics::rollingRxPacketsPerSec() const { return m_rollingRxPacketsPerSec; }
+double DataStatistics::rollingTxPacketsPerSec() const { return m_rollingTxPacketsPerSec; }
+int DataStatistics::rollingWindowSize() const { return kRollingWindowSeconds; }
+
+// ---- 直方图查询 ----
+
+QVector<HistogramBucket> DataStatistics::throughputHistogram() const { return m_histogramBuckets; }
+int DataStatistics::histogramTotalSamples() const { return m_histogramTotalSamples; }
+
 /** @brief 重置数据统计计数器(不影响面板显示) */
 void DataStatistics::resetDataStatistics()
 {
