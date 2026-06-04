@@ -6,6 +6,7 @@
 #include "core/theme/ThemeManager.h"
 #include <QPainter>
 #include <QResizeEvent>
+#include <QElapsedTimer>
 #include <QtMath>
 
 /** @brief 构造函数，默认2通道 @param parent 父Widget */
@@ -41,6 +42,9 @@ bool ScopeWidget::isRunning() const { return m_running; }
 /** @brief 绘制示波器波形 — 暗色背景+网格+多通道波形路径 */
 void ScopeWidget::paintEvent(QPaintEvent *) {
     ++m_totalRepaints;
+    QElapsedTimer renderTimer;
+    renderTimer.start();
+
     QPainter p(this); p.setRenderHint(QPainter::Antialiasing);
     int w = width(), h = height();
     p.fillRect(rect(), ThemeManager::instance().color(ThemeManager::SemanticColor::BgPrimary));
@@ -51,6 +55,7 @@ void ScopeWidget::paintEvent(QPaintEvent *) {
         ThemeManager::instance().color(ThemeManager::SemanticColor::Accent),       ///< 通道2: 蓝色
         ThemeManager::instance().color(ThemeManager::SemanticColor::Error)         ///< 通道3: 红色
     };
+    quint64 pointsThisFrame = 0;
     for (int c = 0; c < m_channels.size(); ++c) {
         p.setPen(QPen(colors[c % 4], 1.5));
         int drawLen = m_wrapped ? m_bufferSize : m_writePos;
@@ -66,6 +71,18 @@ void ScopeWidget::paintEvent(QPaintEvent *) {
             if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
         }
         p.drawPath(path);
+        pointsThisFrame += static_cast<quint64>(drawLen);
+    }
+    m_totalPointsRendered += pointsThisFrame;
+
+    // 统计: 增量更新平均渲染耗时(指数移动平均，alpha=0.1)
+    {
+        double elapsed = static_cast<double>(renderTimer.elapsed());
+        if (m_totalRepaints == 1) {
+            m_avgRenderTimeMs = elapsed;
+        } else {
+            m_avgRenderTimeMs = 0.9 * m_avgRenderTimeMs + 0.1 * elapsed;
+        }
     }
 }
 
@@ -101,4 +118,6 @@ quint64 ScopeWidget::totalChannelChanges() const { return m_totalChannelChanges;
 quint64 ScopeWidget::totalPauses() const { return m_totalPauses; }
 quint64 ScopeWidget::totalRestarts() const { return m_totalRestarts; }
 quint64 ScopeWidget::totalTriggerFires() const { return m_totalTriggerFires; }
-void ScopeWidget::resetScopeStatistics() { m_totalSamples = 0; m_totalRepaints = 0; m_totalTriggers = 0; m_totalOverflows = 0; m_totalClears = 0; m_totalScaleChanges = 0; m_totalChannelChanges = 0; m_totalPauses = 0; m_totalRestarts = 0; m_totalTriggerFires = 0; }
+quint64 ScopeWidget::totalPointsRendered() const { return m_totalPointsRendered; }
+double ScopeWidget::avgRenderTimeMs() const { return m_avgRenderTimeMs; }
+void ScopeWidget::resetScopeStatistics() { m_totalSamples = 0; m_totalRepaints = 0; m_totalTriggers = 0; m_totalOverflows = 0; m_totalClears = 0; m_totalScaleChanges = 0; m_totalChannelChanges = 0; m_totalPauses = 0; m_totalRestarts = 0; m_totalTriggerFires = 0; m_totalPointsRendered = 0; m_avgRenderTimeMs = 0.0; }

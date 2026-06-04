@@ -64,6 +64,8 @@ private:
     quint64 m_totalPauses = 0;            ///< 总暂停次数
     quint64 m_totalRestarts = 0;          ///< 总重启次数
     quint64 m_totalTriggerFires = 0;      ///< 总触发信号发射次数
+    quint64 m_totalPointsRendered = 0;    ///< 总渲染数据点数
+    double m_avgRenderTimeMs = 0.0;       ///< 平均渲染耗时(毫秒)
 
 public:
     quint64 totalSamples() const;         ///< 获取总采样点数
@@ -76,5 +78,7 @@ public:
     quint64 totalPauses() const;          ///< 获取总暂停次数
     quint64 totalRestarts() const;        ///< 获取总重启次数
     quint64 totalTriggerFires() const;    ///< 获取总触发发射次数
+    quint64 totalPointsRendered() const;  ///< 获取总渲染数据点数
+    double avgRenderTimeMs() const;       ///< 获取平均渲染耗时(毫秒)
     void resetScopeStatistics();          ///< 重置示波器统计计数器
 };

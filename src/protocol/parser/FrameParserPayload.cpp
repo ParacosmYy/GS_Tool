@@ -32,6 +32,7 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
         if (expectedTotal > effectiveMax) {
             m_errorCount++;
             ++m_totalParseErrors;  // 期望总长超出限制
+            ++m_totalMalformedFrames;  ///< 统计: 期望总帧长超限视为畸形帧
             emit frameError(
                 tr("期望总帧长度 (%1) 超过最大值 (%2)")
                     .arg(expectedTotal).arg(effectiveMax),
@@ -52,6 +53,7 @@ void FrameParser::handlePayloadReceiving(unsigned char byte)
             m_errorCount++;
             ++m_totalOverflows;
             ++m_totalParseErrors;  // 帧尾搜索溢出
+            ++m_totalMalformedFrames;  ///< 统计: 帧尾搜索溢出视为畸形帧
             emit frameError(
                 tr("帧缓冲区 (%1) 超过最大值 (%2)，搜索帧尾时溢出")
                     .arg(m_buffer.size()).arg(effectiveMax),
