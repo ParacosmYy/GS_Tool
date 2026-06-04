@@ -52,6 +52,7 @@ set(SOURCES
     src/core/send/SendControllerStats.cpp
     src/core/send/SendHistoryManager.cpp
     src/core/event/EventBus.cpp
+    src/core/event/EventBusStats.cpp
     src/core/widgets/AppDialog.cpp
     src/core/widgets/AppDialogContent.cpp
     src/core/widgets/DragDropHelper.cpp
@@ -65,6 +66,7 @@ set(SOURCES
     src/chart/waterfall/WaterfallWidget.cpp
     src/chart/heatmap/HeatmapWidget.cpp
     src/core/settings/SettingsController.cpp
+    src/core/settings/SettingsControllerPersistence.cpp
     src/core/toolbar/ToolbarController.cpp
     src/core/terminal/TerminalController.cpp
     src/core/panels/PanelManager.cpp
@@ -159,7 +161,9 @@ set(SOURCES
     src/protocol/hex/IntelHexParser.cpp
     src/protocol/hex/IntelHexParserRecord.cpp
     src/protocol/bridge/JustFloatBridge.cpp
+    src/protocol/bridge/JustFloatBridgeStats.cpp
     src/protocol/bridge/FireWaterBridge.cpp
+    src/protocol/bridge/FireWaterBridgeStats.cpp
     src/protocol/bridge/ProtocolBridgeManager.cpp
     src/protocol/bridge/ProtocolBridgeManagerConfig.cpp
     src/protocol/bridge/ProtocolBridgeManagerHelpers.cpp
