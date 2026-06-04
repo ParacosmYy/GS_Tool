@@ -90,6 +90,7 @@
 | 247-250 | Stats A/B批量增强+Linter大规模文件拆分 | TCP/UDP/WebSocket/TCP Server/TerminalHighlighter/FrameVisualEditor/DataStatistics/ThemeManager统计增强+ChannelConfigSetMethods/ProtocolBridgeManagerConfig/I2cConnectionTransfer/ZoomControllerViewport等20+文件拆分 |
 | 251-256 | 持续文件拆分(PacketBuilderPanelFields/HistogramWidgetUI/TcpConnectionHandlers/ThemeManagerApply/ShortcutManagerQuery/MqttWidgetSubs/DataAggregatorCompute/DashboardModelItems/FlatBuffersDecoderFields/ConnectionControllerLifecycle/TerminalWidgetEvents等) | 所有.cpp控制在300行以内+统计计数器独立+事件处理独立 |
 | 257 | SerialConfigPanelConfig/TriggerEngineStats/DataExporterStats拆分+多模块统计增强+头文件压缩 | 配置读取/统计getter独立文件+SignalLineMonitor/TrafficMonitor/PerformanceMonitor/CanConnectionProtocol统计增强+14个.h压缩至<180行 |
+| 258 | TerminalWidgetSearch/DashboardWidgetPersistence/WebSocketFrameStats拆分 | 搜索功能独立+持久化方法独立+WebSocket统计getter独立 |
 
 ---
 

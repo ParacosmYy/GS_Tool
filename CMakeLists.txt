@@ -105,6 +105,7 @@ set(SOURCES
     src/terminal/widget/TerminalWidget.cpp
     src/terminal/widget/TerminalWidgetEvents.cpp
     src/terminal/widget/TerminalWidgetSlots.cpp
+    src/terminal/widget/TerminalWidgetSearch.cpp
     src/terminal/widget/TerminalWidgetPaint.cpp
     src/terminal/model/TerminalModel.cpp
     src/terminal/search/TerminalSearchBar.cpp
@@ -257,6 +258,7 @@ set(SOURCES
     src/dashboard/DashboardWidget.cpp
     src/dashboard/DashboardWidgetSerialization.cpp
     src/dashboard/DashboardWidgetSlots.cpp
+    src/dashboard/DashboardWidgetPersistence.cpp
     src/dashboard/GaugeWidget.cpp
     src/dashboard/ProgressBarWidget.cpp
     src/dashboard/LedIndicatorWidget.cpp
@@ -360,6 +362,7 @@ set(SOURCES
     # ── F17: WebSocket 客户端 ──
     src/connection/ws/WebSocketConnection.cpp
     src/connection/ws/WebSocketFrame.cpp
+    src/connection/ws/WebSocketFrameStats.cpp
     src/connection/ws/WsConfigPanel.cpp
 
     # ── F18: Modbus 主站/从站 ──
