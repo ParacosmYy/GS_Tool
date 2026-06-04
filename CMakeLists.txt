@@ -50,6 +50,8 @@ set(SOURCES
     src/core/connect/ConnectionPresetBuilder.cpp
     src/core/recording/RecordingController.cpp
     src/core/recording/RecordingControllerStats.cpp
+    src/core/recording/DataStreamRecorder.cpp
+    src/core/recording/DataStreamRecorderStats.cpp
     src/core/navigation/NavigationController.cpp
     src/core/navigation/NavigationControllerQuery.cpp
     src/core/navigation/NavigationControllerAnimations.cpp
@@ -640,8 +642,14 @@ set(SOURCES
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
 
+    # ── 示波器通道管理 ──
+    src/widgets/scope/ScopeChannelManager.cpp
+    src/widgets/scope/ScopeChannelManagerStats.cpp
+
     # ── F32: 十六进制内存编辑器 ──
     src/utils/hex_editor/MemoryHexEditor.cpp
+    src/utils/hex_editor/MemoryHexEditorExport.cpp
+    src/utils/hex_editor/MemoryHexEditorInternal.cpp
     src/utils/hex_editor/MemoryHexEditorStats.cpp
 
     # ── 波形模式检测 ──
@@ -663,6 +671,14 @@ set(SOURCES
     # ── 协议响应模拟器 ──
     src/protocol/simulator/ProtocolSimulator.cpp
     src/protocol/simulator/ProtocolSimulatorStats.cpp
+
+    # ── 通知历史 ──
+    src/core/notification/NotificationHistory.cpp
+    src/core/notification/NotificationHistoryStats.cpp
+
+    # ── 串口流量分析 ──
+    src/serial/profiler/SerialPortProfiler.cpp
+    src/serial/profiler/SerialPortProfilerStats.cpp
 )
 
 set(HEADERS
@@ -679,6 +695,7 @@ set(HEADERS
 
     src/core/widgets/AnimatedButton.h
     src/core/recording/RecordingController.h
+    src/core/recording/DataStreamRecorder.h
     src/core/navigation/NavigationController.h
     src/core/navigation/IconNavBar.h
     src/core/send/SendController.h
@@ -968,6 +985,9 @@ set(HEADERS
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.h
 
+    # ── 示波器通道管理 ──
+    src/widgets/scope/ScopeChannelManager.h
+
     # ── F32: 十六进制内存编辑器 ──
     src/utils/hex_editor/MemoryHexEditor.h
 
@@ -988,6 +1008,12 @@ set(HEADERS
 
     # ── 协议响应模拟器 ──
     src/protocol/simulator/ProtocolSimulator.h
+
+    # ── 通知历史 ──
+    src/core/notification/NotificationHistory.h
+
+    # ── 串口流量分析 ──
+    src/serial/profiler/SerialPortProfiler.h
 )
 
 set(RESOURCES
