@@ -18,12 +18,14 @@ void ProtocolSchema::setName(const QString &name)
 void ProtocolSchema::setFraming(const FramingRule &rule)
 {
     m_framing = rule;
+    ++m_totalBuilds;  // 累计编程构造计数
 }
 
 /** @brief 追加一个字段定义 @param field 字段定义 */
 void ProtocolSchema::addField(const FieldDefinition &field)
 {
     m_fields.append(field);
+    ++m_totalBuilds;  // 累计编程构造计数
 }
 
 /** @brief 设置协议定义是否有效 @param valid 有效标志 */
