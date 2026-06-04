@@ -39,9 +39,9 @@ ConnectionType UdpConnection::type() const
 QString UdpConnection::name() const
 {
     if (m_broadcast) {
-        return QString("UDP:%1:broadcast").arg(m_localPort);
+        return tr("UDP:%1:broadcast").arg(m_localPort);
     }
-    return QString("UDP:%1→%2:%3")
+    return tr("UDP:%1→%2:%3")
         .arg(m_localPort)
         .arg(m_remoteHost.toString())
         .arg(m_remotePort);

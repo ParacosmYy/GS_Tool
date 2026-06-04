@@ -61,6 +61,7 @@ bool DataLogger::seekToTimestamp(qint64 timestamp)
 {
     QMutexLocker locker(&m_mutex);
     if (!m_playing) return false;
+    ++m_totalSeeks;  ///< 累计seek跳转操作次数
     if (timestamp < 0) {
         emit error(tr("无效的查找时间戳: %1").arg(timestamp));
         return false;
@@ -152,7 +153,7 @@ quint64 DataLogger::totalPlaybacks() const { return m_totalPlaybacks; }
 /** @brief 获取累计错误次数 @return 错误计数 */
 quint64 DataLogger::totalErrors() const { return m_totalErrors; }
 
-/** @brief 重置所有统计计数器 */
+/** @brief 重置所有统计计数器(写入/书签/记录/字节/回放/错误/暂停/恢复/seek归零) */
 void DataLogger::resetStats()
 {
     m_totalLogsWritten = 0;
@@ -161,4 +162,9 @@ void DataLogger::resetStats()
     m_totalBytesRecorded = 0;
     m_totalPlaybacks = 0;
     m_totalErrors = 0;
+    m_totalRecordingPauses = 0;
+    m_totalRecordingResumes = 0;
+    m_totalPlaybackPauses = 0;
+    m_totalPlaybackResumes = 0;
+    m_totalSeeks = 0;
 }

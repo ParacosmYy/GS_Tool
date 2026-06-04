@@ -100,20 +100,22 @@ void DataLogger::stopPlayback()
     emit playbackFinished();
 }
 
-/** @brief 暂停回放 */
+/** @brief 暂停回放，停止定时器并累计已消耗的基准时间 */
 void DataLogger::pausePlayback()
 {
     if (!m_playing || m_playbackPaused) return;
     m_playbackPaused = true;
+    ++m_totalPlaybackPauses;  ///< 累计回放暂停次数
     m_playbackTimer->stop();
     m_playbackBaseTime += static_cast<qint64>(m_playbackElapsed.elapsed() * m_playbackSpeed);
 }
 
-/** @brief 恢复回放 */
+/** @brief 恢复回放，重启定时器和计时器 */
 void DataLogger::resumePlayback()
 {
     if (!m_playing || !m_playbackPaused) return;
     m_playbackPaused = false;
+    ++m_totalPlaybackResumes;  ///< 累计回放恢复次数
     m_playbackElapsed.restart();
     m_playbackTimer->start();
 }

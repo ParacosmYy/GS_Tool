@@ -14,6 +14,7 @@
  */
 
 #include "core/background/BackgroundWidget.h"
+#include "core/theme/ThemeManager.h"
 #include "shared/TimerConstants.h"
 #include <QPainter>
 #include <QPaintEvent>
@@ -30,8 +31,8 @@ void BackgroundWidget::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // 第1层：纯黑底色
-    painter.fillRect(rect(), Qt::black);
+    // 第1层：主题背景色底色
+    painter.fillRect(rect(), ThemeManager::instance().color(ThemeManager::SemanticColor::BgPrimary));
 
     // 第2层：背景图（模糊版），居中裁剪覆盖，使用预缓存避免每帧缩放
     if (!m_scaledBlurredImage.isNull()) {

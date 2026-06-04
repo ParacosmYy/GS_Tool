@@ -1,9 +1,11 @@
 /**
  * @file FlatBuffersDecoderSchema.cpp
- * @brief FlatBuffers解码器 - FBS Schema文本解析
+ * @brief FlatBuffers解码器 - FBS Schema加载与类型解析辅助
  *
- * 从 FlatBuffersDecoder.cpp 拆分而来，包含 .fbs 文件的加载和
- * Schema文本解析逻辑（table/struct/enum定义提取）。
+ * 从 FlatBuffersDecoder.cpp 拆分而来，包含 .fbs 文件的加载、
+ * 构造函数、isLoaded() 以及匿名命名空间的类型解析辅助函数。
+ *
+ * parseFbsContent() 已拆分至 FlatBuffersDecoderParse.cpp。
  * 二进制解码逻辑见 FlatBuffersDecoder.cpp。
  */
 
@@ -175,48 +177,4 @@ bool FlatBuffersDecoder::loadFbsFile(const QString& filePath) {
 /** @brief 检查是否已成功加载.fbs文件 @return 已加载返回true，否则返回false */
 bool FlatBuffersDecoder::isLoaded() const { return m_loaded; }
 
-/**
- * @brief 解析.fbs文件文本内容为内存模式定义
- *
- * 移除注释后，提取root_type声明，然后按正则匹配table/struct/enum块，
- * 分别解析为FbsTableDef/FbsStructDef/FbsEnumDef并存入内部容器。
- *
- * @param content .fbs文件的完整文本内容
- */
-void FlatBuffersDecoder::parseFbsContent(const QString& content) {
-    QString cleaned = content;
-    cleaned.remove(QRegularExpression(R"(/\*.*?\*/)",
-        QRegularExpression::DotMatchesEverythingOption));
-    cleaned.remove(QRegularExpression(R"(//[^\n]*)"));
-    QRegularExpression rootRe(R"(root_type\s+(\w+)\s*;)");
-    auto rm = rootRe.match(cleaned);
-    if (rm.hasMatch()) { m_rootTypeName = rm.captured(1); }
-    QRegularExpression blockRe(
-        R"((table|struct|enum)\s+(\w+)\s*(?::\s*(\w+)\s*)?\{([^}]*)\})");
-    auto it = blockRe.globalMatch(cleaned);
-    while (it.hasNext()) {
-        auto m = it.next();
-        QString kw = m.captured(1), name = m.captured(2);
-        QString ta = m.captured(3), body = m.captured(4);
-        QString full = kw + QLatin1Char(' ') + name +
-            (kw == QLatin1String("enum") ? QLatin1String(":") + ta : QString()) +
-            QLatin1String(" {") + body + QLatin1Char('}');
-        if (kw == QLatin1String("table")) {
-            FbsTableDef td; td.name = name; td.fields = extractFields(full);
-            m_tables[td.name] = td;
-        } else if (kw == QLatin1String("struct")) {
-            FbsStructDef sd; sd.name = name; sd.fields = extractFields(full);
-            for (const auto& f : std::as_const(sd.fields)) {
-                if (kTypeSizes.contains(f.type)) sd.byteSize += kTypeSizes.value(f.type);
-                else if (f.type == FbsBasicType::Struct) {
-                    auto si = m_structs.constFind(f.typeName);
-                    if (si != m_structs.constEnd()) sd.byteSize += si.value().byteSize;
-                }
-            }
-            m_structs[sd.name] = sd;
-        } else if (kw == QLatin1String("enum")) {
-            FbsEnumDef ed = parseEnumDef(full);
-            if (!ed.name.isEmpty()) m_enums[ed.name] = ed;
-        }
-    }
-}
+// parseFbsContent() 见 FlatBuffersDecoderParse.cpp

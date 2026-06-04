@@ -55,6 +55,22 @@ public:
     quint64 totalBytesRecorded() const;  ///< 累计录制的字节总数
     quint64 totalPlaybacks() const;      ///< 累计回放启动次数
     quint64 totalErrors() const;         ///< 累计发生的错误次数
+
+    /** @brief 获取累计录制暂停次数 @return 暂停总数 */
+    quint64 totalRecordingPauses() const { return m_totalRecordingPauses; }
+
+    /** @brief 获取累计录制恢复次数 @return 恢复总数 */
+    quint64 totalRecordingResumes() const { return m_totalRecordingResumes; }
+
+    /** @brief 获取累计回放暂停次数 @return 暂停总数 */
+    quint64 totalPlaybackPauses() const { return m_totalPlaybackPauses; }
+
+    /** @brief 获取累计回放恢复次数 @return 恢复总数 */
+    quint64 totalPlaybackResumes() const { return m_totalPlaybackResumes; }
+
+    /** @brief 获取累计seek跳转操作次数 @return seek操作总数 */
+    quint64 totalSeeks() const { return m_totalSeeks; }
+
     void resetStats();                   ///< 重置所有会话统计计数器
 
 signals:
@@ -103,6 +119,11 @@ private:
     quint64 m_totalBytesRecorded = 0; ///< 累计字节总数
     quint64 m_totalPlaybacks = 0;     ///< 累计回放次数
     quint64 m_totalErrors = 0;        ///< 累计错误次数
+    quint64 m_totalRecordingPauses = 0;  ///< 累计录制暂停次数
+    quint64 m_totalRecordingResumes = 0; ///< 累计录制恢复次数
+    quint64 m_totalPlaybackPauses = 0;   ///< 累计回放暂停次数
+    quint64 m_totalPlaybackResumes = 0;  ///< 累计回放恢复次数
+    quint64 m_totalSeeks = 0;            ///< 累计seek跳转操作次数
 };
 
 #endif // DATALOGGER_H

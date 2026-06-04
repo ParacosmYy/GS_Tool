@@ -85,7 +85,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
         m_lastError = tr("文件魔数不匹配: 期望\"%1\"").arg(QString::fromLatin1(kMagic));
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors; ++m_deserializationErrors;
+        ++m_totalErrors; ++m_deserializationErrors; ++m_totalValidationFailures;
         return false;
     }
 
@@ -96,7 +96,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                           .arg(fileVersion).arg(kVersion);
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors; ++m_deserializationErrors;
+        ++m_totalErrors; ++m_deserializationErrors; ++m_totalValidationFailures;
         return false;
     }
 
@@ -112,7 +112,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
         m_lastError = tr("文件头保留字节非零，文件可能已损坏");
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors; ++m_deserializationErrors;
+        ++m_totalErrors; ++m_deserializationErrors; ++m_totalValidationFailures;
         return false;
     }
 
@@ -211,7 +211,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
                           .arg(QString::fromLatin1(kEofMarker));
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         file.close();
-        ++m_totalErrors; ++m_deserializationErrors;
+        ++m_totalErrors; ++m_deserializationErrors; ++m_totalValidationFailures;
         return false;
     }
 

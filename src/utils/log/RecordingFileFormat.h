@@ -121,6 +121,7 @@ private:
     quint64 m_deserializationErrors = 0;   ///< 累计反序列化(加载)错误次数
     quint64 m_lookupsPerformed = 0;        ///< 累计索引查找次数(元数据查询)
     quint64 m_cacheHits = 0;              ///< 累计缓存命中次数(重复加载相同文件)
+    quint64 m_totalValidationFailures = 0; ///< 累计文件校验失败次数(魔数/版本/EOF/保留字节)
 public:
     /** @brief 获取累计保存次数 @return 保存次数 */
     quint64 totalSaves() const { return m_totalSaves; }
@@ -141,6 +142,9 @@ public:
     quint64 lookupsPerformed() const { return m_lookupsPerformed; }
     /** @brief 获取累计缓存命中次数(重复加载相同文件) @return 命中次数 */
     quint64 cacheHits() const { return m_cacheHits; }
+
+    /** @brief 获取累计文件校验失败次数(魔数/版本/EOF/保留字节不匹配) @return 校验失败总数 */
+    quint64 totalValidationFailures() const { return m_totalValidationFailures; }
 
     /** @brief 重置文件格式统计计数器(包含所有统计) */
     void resetFileFormatStatistics();

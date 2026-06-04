@@ -94,19 +94,21 @@ void DataLogger::stopRecording()
     }
 }
 
-/** @brief 暂停录制，记录暂停起始时间 */
+/** @brief 暂停录制，记录暂停起始时间并递增暂停计数 */
 void DataLogger::pauseRecording()
 {
     if (!m_recording || m_paused) return;
     m_paused = true;
+    ++m_totalRecordingPauses;  ///< 累计录制暂停次数
     m_pauseStartTime = m_recordTimer.elapsed();
 }
 
-/** @brief 恢复录制，累加暂停时长到m_pauseOffset */
+/** @brief 恢复录制，累加暂停时长到m_pauseOffset并递增恢复计数 */
 void DataLogger::resumeRecording()
 {
     if (!m_recording || !m_paused) return;
     m_paused = false;
+    ++m_totalRecordingResumes;  ///< 累计录制恢复次数
     m_pauseOffset += (m_recordTimer.elapsed() - m_pauseStartTime);
 }
 

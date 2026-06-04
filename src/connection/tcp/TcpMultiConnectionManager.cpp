@@ -27,7 +27,7 @@ TcpMultiConnectionManager::~TcpMultiConnectionManager()
     m_ports.clear();
 }
 
-/** @brief 添加一条新的TCP连接 @param host 目标主机地址 @param port 目标端口号 @return 新连接的ID */
+/** @brief 添加一条新的TCP连接(创建socket/注册信号/发起连接)，连接失败不阻塞，错误通过信号通知 @param host 目标主机地址 @param port 目标端口号 @return 新连接的ID */
 int TcpMultiConnectionManager::addConnection(const QString& host, int port)
 {
     auto* socket = new QTcpSocket(this);
@@ -46,6 +46,13 @@ int TcpMultiConnectionManager::addConnection(const QString& host, int port)
             this, &TcpMultiConnectionManager::onError);
 
     socket->connectToHost(QHostAddress(host), static_cast<quint16>(port));
+
+    // 更新同时在线连接数峰值
+    quint64 currentCount = static_cast<quint64>(m_connections.size());
+    if (currentCount > m_peakConnections) {
+        m_peakConnections = currentCount;
+    }
+
     emit connectionAdded(id, host, port);
     return id;
 }
@@ -73,9 +80,10 @@ int TcpMultiConnectionManager::connectionCount() const
     return m_connections.size();
 }
 
-/** @brief 向所有已连接的socket广播数据 @param data 要发送的数据 @return 成功发送的socket数量 */
+/** @brief 向所有已连接的socket广播数据，累计发送字节和写入调用计数 @param data 要发送的数据 @return 成功发送的socket数量 */
 int TcpMultiConnectionManager::sendToAll(const QByteArray& data)
 {
+    ++m_totalWrites;  // 累计sendToAll()调用次数
     int count = 0;
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
         QTcpSocket* socket = it.value();
@@ -103,18 +111,7 @@ int TcpMultiConnectionManager::connectionPort(int id) const
     return m_ports.value(id, -1);
 }
 
-/** @brief 获取累计连接总数 @return 历史连接总数 */
-quint64 TcpMultiConnectionManager::totalConnections() const { return m_totalConnections; }
-/** @brief 获取累计断开总数 @return 历史断开总数 */
-quint64 TcpMultiConnectionManager::totalDisconnections() const { return m_totalDisconnections; }
-/** @brief 获取累计发送字节数 @return 发送字节总量 */
-quint64 TcpMultiConnectionManager::totalBytesSent() const { return m_totalBytesSent; }
-/** @brief 获取累计接收字节数 @return 接收字节总量 */
-quint64 TcpMultiConnectionManager::totalBytesReceived() const { return m_totalBytesReceived; }
-/** @brief 获取累计错误次数 @return 错误总数 */
-quint64 TcpMultiConnectionManager::errorCount() const { return m_errorCount; }
-
-/** @brief 重置所有连接统计计数器 */
+/** @brief 重置所有连接统计计数器(连接/断开/字节/错误/写入/峰值/失败归零) */
 void TcpMultiConnectionManager::resetConnectionStatistics()
 {
     m_totalConnections = 0;
@@ -122,6 +119,9 @@ void TcpMultiConnectionManager::resetConnectionStatistics()
     m_totalBytesSent = 0;
     m_totalBytesReceived = 0;
     m_errorCount = 0;
+    m_totalWrites = 0;
+    m_peakConnections = 0;
+    m_totalConnectionFailures = 0;
 }
 
 /** @brief socket数据到达回调，累计接收字节数并转发数据信号 */
@@ -152,7 +152,7 @@ void TcpMultiConnectionManager::onDisconnected()
     }
 }
 
-/** @brief socket错误回调，累计错误计数并转发错误信号 @param error socket错误类型 */
+/** @brief socket错误回调，累计错误计数和连接失败计数并转发错误信号 @param error socket错误类型 */
 void TcpMultiConnectionManager::onError(QAbstractSocket::SocketError error)
 {
     Q_UNUSED(error)
@@ -162,6 +162,10 @@ void TcpMultiConnectionManager::onError(QAbstractSocket::SocketError error)
     int id = idForSocket(socket);
     if (id >= 0) {
         ++m_errorCount;
+        // 连接阶段错误(DNS/超时/拒绝等)单独计数
+        if (socket->state() != QAbstractSocket::ConnectedState) {
+            ++m_totalConnectionFailures;
+        }
         emit connectionError(id, socket->errorString());
     }
 }

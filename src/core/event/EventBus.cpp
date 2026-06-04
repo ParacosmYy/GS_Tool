@@ -164,6 +164,7 @@ void EventBus::publish(const QString& eventName, const QVariant& data)
  */
 void EventBus::publishAsync(const QString& eventName, const QVariant& data)
 {
+    ++m_totalAsyncPublished;  // 累计异步发布计数
     emit eventPublished(eventName, data);
 }
 

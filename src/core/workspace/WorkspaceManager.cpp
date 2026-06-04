@@ -78,7 +78,7 @@ quint64 WorkspaceManager::activeWorkspaceTimeMs() const
     return total;
 }
 
-/** @brief 重置所有工作区统计计数器(保存/加载/删除/切换/新建/活跃时长) */
+/** @brief 重置所有工作区统计计数器(保存/加载/删除/切换/新建/活跃时长/导出错误/导入错误) */
 void WorkspaceManager::resetWorkspaceStatistics()
 {
     m_totalSaves = 0;
@@ -90,6 +90,8 @@ void WorkspaceManager::resetWorkspaceStatistics()
     m_totalWorkspacesCreated = 0;
     m_totalWorkspacesDeleted = 0;
     m_activeWorkspaceTimeMs = 0;
+    m_totalExportErrors = 0;
+    m_totalImportErrors = 0;
     m_activeTimer.restart();
 }
 
@@ -98,7 +100,10 @@ void WorkspaceManager::exportToFile(const QString &name, const QString &filePath
 {
     ++m_totalExportFiles;
     auto it = m_workspaces.constFind(name);
-    if (it == m_workspaces.constEnd()) return;
+    if (it == m_workspaces.constEnd()) {
+        ++m_totalExportErrors;  // 导出失败: 工作区不存在
+        return;
+    }
     const auto &layout = it.value();
     QJsonObject root;
     root["name"] = layout.name;
@@ -112,17 +117,27 @@ void WorkspaceManager::exportToFile(const QString &name, const QString &filePath
         states[it2.key()] = QJsonValue::fromVariant(it2.value());
     root["panelStates"] = states;
     QFile f(filePath);
-    if (f.open(QIODevice::WriteOnly)) f.write(QJsonDocument(root).toJson());
+    if (!f.open(QIODevice::WriteOnly)) {
+        ++m_totalExportErrors;  // 导出失败: 文件写入错误
+        return;
+    }
+    f.write(QJsonDocument(root).toJson());
 }
 
 /** @brief 从JSON文件导入工作区布局 @param filePath 导入文件路径 @return 导入成功返回true */
 bool WorkspaceManager::importFromFile(const QString &filePath)
 {
     QFile f(filePath);
-    if (!f.open(QIODevice::ReadOnly)) return false;
+    if (!f.open(QIODevice::ReadOnly)) {
+        ++m_totalImportErrors;  // 导入失败: 文件读取错误
+        return false;
+    }
     ++m_totalImportFiles;
     auto doc = QJsonDocument::fromJson(f.readAll());
-    if (!doc.isObject()) return false;
+    if (!doc.isObject()) {
+        ++m_totalImportErrors;  // 导入失败: JSON格式错误
+        return false;
+    }
     auto obj = doc.object();
     WorkspaceLayout layout;
     layout.name = obj["name"].toString();

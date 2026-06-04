@@ -73,7 +73,10 @@ BleGattBrowser::BleGattBrowser(QWidget* parent)
 
     /* 顶部状态栏 */
     auto* topBar = new QHBoxLayout();
-    m_connectionStatus->setStyleSheet("font-weight: bold;");
+    // font-weight: bold 由QSS通过 #lblConnectionStatus 控制，不硬编码
+    QFont statusFont = m_connectionStatus->font();
+    statusFont.setBold(true);
+    m_connectionStatus->setFont(statusFont);
     topBar->addWidget(m_connectionStatus);
     topBar->addStretch();
     topBar->addWidget(m_serviceCountLabel);

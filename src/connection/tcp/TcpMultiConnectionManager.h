@@ -54,17 +54,33 @@ public:
     /** @brief 获取连接的端口号 @param id 连接唯一ID @return 端口号 */
     int connectionPort(int id) const;
 
-    /** @brief 获取累计连接次数 */
-    quint64 totalConnections() const;
-    /** @brief 获取累计断开次数 */
-    quint64 totalDisconnections() const;
-    /** @brief 获取累计发送字节数 */
-    quint64 totalBytesSent() const;
-    /** @brief 获取累计接收字节数 */
-    quint64 totalBytesReceived() const;
-    /** @brief 获取累计错误次数 */
-    quint64 errorCount() const;
-    /** @brief 重置所有统计计数器 */
+    // ---- 统计接口 ----
+
+    /** @brief 获取累计连接次数(含成功和失败) @return 连接尝试总数 */
+    quint64 totalConnections() const { return m_totalConnections; }
+
+    /** @brief 获取累计断开次数 @return 断开总数 */
+    quint64 totalDisconnections() const { return m_totalDisconnections; }
+
+    /** @brief 获取累计发送字节数 @return 发送字节总量 */
+    quint64 totalBytesSent() const { return m_totalBytesSent; }
+
+    /** @brief 获取累计接收字节数 @return 接收字节总量 */
+    quint64 totalBytesReceived() const { return m_totalBytesReceived; }
+
+    /** @brief 获取累计错误次数(含连接错误和socket错误) @return 错误总数 */
+    quint64 errorCount() const { return m_errorCount; }
+
+    /** @brief 获取累计sendToAll()调用次数 @return 写入调用总数 */
+    quint64 totalWrites() const { return m_totalWrites; }
+
+    /** @brief 获取历史同时在线连接数峰值 @return 峰值连接数 */
+    quint64 peakConnections() const { return m_peakConnections; }
+
+    /** @brief 获取累计连接失败次数(DNS/超时/拒绝等) @return 连接失败总数 */
+    quint64 totalConnectionFailures() const { return m_totalConnectionFailures; }
+
+    /** @brief 重置所有统计计数器(连接/断开/字节/错误/写入/峰值/失败归零) */
     void resetConnectionStatistics();
 
 signals:
@@ -94,11 +110,14 @@ private:
     QMap<int, int> m_ports;                ///< 连接ID到端口号映射
     int m_nextId = 1;                      ///< 下一个分配的连接ID
 
-    quint64 m_totalConnections = 0;        ///< 累计连接次数
+    quint64 m_totalConnections = 0;        ///< 累计连接次数(含成功和失败)
     quint64 m_totalDisconnections = 0;     ///< 累计断开次数
     quint64 m_totalBytesSent = 0;          ///< 累计发送字节数
     quint64 m_totalBytesReceived = 0;      ///< 累计接收字节数
-    quint64 m_errorCount = 0;              ///< 累计错误次数
+    quint64 m_errorCount = 0;              ///< 累计错误次数(含连接错误和socket错误)
+    quint64 m_totalWrites = 0;             ///< 累计sendToAll()调用次数
+    quint64 m_peakConnections = 0;         ///< 历史同时在线连接数峰值
+    quint64 m_totalConnectionFailures = 0; ///< 累计连接失败次数
 };
 
 #endif // TCPMULTICONNECTIONMANAGER_H

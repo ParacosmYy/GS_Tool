@@ -26,6 +26,7 @@
  *   - m_deserializationErrors: 反序列化错误次数
  *   - m_lookupsPerformed: 索引查找次数
  *   - m_cacheHits: 缓存命中次数
+ *   - m_totalValidationFailures: 文件校验失败次数
  */
 void RecordingFileFormat::resetFileFormatStatistics()
 {
@@ -38,4 +39,5 @@ void RecordingFileFormat::resetFileFormatStatistics()
     m_deserializationErrors = 0;
     m_lookupsPerformed = 0;
     m_cacheHits = 0;
+    m_totalValidationFailures = 0;
 }

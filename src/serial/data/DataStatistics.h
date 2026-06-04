@@ -62,6 +62,12 @@ public:
     /** @brief 获取TX累计总字节数 @return 发送字节总数 */
     quint64 totalTxBytes() const;
 
+    /** @brief 获取RX累计数据包(更新)计数 @return RX数据包总数 */
+    quint64 totalRxPackets() const { return m_rxPackets; }
+
+    /** @brief 获取TX累计数据包(更新)计数 @return TX数据包总数 */
+    quint64 totalTxPackets() const { return m_txPackets; }
+
     // ---- 基础统计计数器 ----
     quint64 totalUpdates() const;              ///< update()调用总次数
     double peakRate() const;                   ///< 历史峰值速率(RX/TX中较大者, bytes/s)

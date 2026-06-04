@@ -45,7 +45,12 @@ void ScopeWidget::paintEvent(QPaintEvent *) {
     int w = width(), h = height();
     p.fillRect(rect(), ThemeManager::instance().color(ThemeManager::SemanticColor::BgPrimary));
     drawGrid(p, w, h);
-    static const QColor colors[] = { QColor(0,255,0), QColor(255,255,0), QColor(0,200,255), QColor(255,100,100) };
+    static const QColor colors[] = {
+        ThemeManager::instance().color(ThemeManager::SemanticColor::Success),      ///< 通道0: 绿色
+        ThemeManager::instance().color(ThemeManager::SemanticColor::Warning),      ///< 通道1: 黄色
+        ThemeManager::instance().color(ThemeManager::SemanticColor::Accent),       ///< 通道2: 蓝色
+        ThemeManager::instance().color(ThemeManager::SemanticColor::Error)         ///< 通道3: 红色
+    };
     for (int c = 0; c < m_channels.size(); ++c) {
         p.setPen(QPen(colors[c % 4], 1.5));
         int drawLen = qMin(m_writePos, m_bufferSize);

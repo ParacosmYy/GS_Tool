@@ -120,6 +120,12 @@ public:
     /** @brief 获取累计发布的事件总数(同步+异步)别名 @return 事件数 */
     quint64 totalPublishes() const { return m_totalPublished; }
 
+    /** @brief 获取累计异步发布(publishAsync)的事件总数 @return 异步事件数 */
+    quint64 totalAsyncPublished() const { return m_totalAsyncPublished; }
+
+    /** @brief 获取累计同步发布(publish)的事件总数(=totalPublished-totalAsyncPublished) @return 同步事件数 */
+    quint64 totalSyncPublished() const;
+
     /** @brief 获取累计订阅操作总数 @return 订阅数 */
     quint64 totalSubscriptions() const;
 
@@ -132,7 +138,7 @@ public:
     /** @brief 获取单个事件的历史峰值订阅者数 @return 峰值订阅者数 */
     quint64 peakSubscribersPerEvent() const;
 
-    /** @brief 重置所有统计计数器(发布/订阅/取消订阅/回调/峰值) */
+    /** @brief 重置所有统计计数器(发布/异步发布/订阅/取消订阅/回调/峰值) */
     void resetEventStatistics();
 
     /** @brief 重置所有统计计数器(resetEventStatistics的简短别名) */
@@ -165,6 +171,7 @@ private:
 
     // 统计计数器
     quint64 m_totalPublished = 0;               ///< 累计发布的事件总数(同步+异步)
+    quint64 m_totalAsyncPublished = 0;          ///< 累计异步发布(publishAsync)的事件总数
     quint64 m_totalSubscriptions = 0;           ///< 累计订阅操作总数
     quint64 m_totalUnsubscriptions = 0;         ///< 累计取消订阅操作总数
     quint64 m_totalHandlersCalled = 0;          ///< 累计调用的回调处理器总数

@@ -46,6 +46,13 @@ quint64 EventBus::totalPublished() const
     return m_totalPublished;
 }
 
+/** @brief 获取累计同步发布的事件总数(=totalPublished-totalAsyncPublished) @return 同步事件数 */
+quint64 EventBus::totalSyncPublished() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_totalPublished - m_totalAsyncPublished;
+}
+
 /** @brief 获取累计订阅操作总数 @return 订阅数 */
 quint64 EventBus::totalSubscriptions() const
 {
@@ -74,11 +81,12 @@ quint64 EventBus::peakSubscribersPerEvent() const
     return m_peakSubscribersPerEvent;
 }
 
-/** @brief 重置所有统计计数器(发布/订阅/取消订阅/回调/峰值) */
+/** @brief 重置所有统计计数器(发布/异步发布/订阅/取消订阅/回调/峰值) */
 void EventBus::resetEventStatistics()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_totalPublished = 0;
+    m_totalAsyncPublished = 0;
     m_totalSubscriptions = 0;
     m_totalUnsubscriptions = 0;
     m_totalHandlersCalled = 0;

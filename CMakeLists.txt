@@ -175,6 +175,7 @@ set(SOURCES
     src/serial/data/DataStatisticsRefresh.cpp
     src/serial/data/DataStatisticsDisplay.cpp
     src/serial/data/DataStatisticsRolling.cpp
+    src/serial/data/DataStatisticsUpdate.cpp
     src/serial/port/SerialDriverDetector.cpp
     src/serial/port/PortWatcher.cpp
     src/serial/port/PortWatcherPoll.cpp
@@ -184,6 +185,7 @@ set(SOURCES
     src/protocol/parser/FrameParserStateHandlers.cpp
     src/protocol/parser/FrameParserPayload.cpp
     src/protocol/parser/FrameParserStats.cpp
+    src/protocol/parser/FrameParserTimers.cpp
     src/protocol/view/ProtocolView.cpp
     src/protocol/view/ProtocolViewData.cpp
     src/protocol/view/ProtocolViewDisplay.cpp
@@ -247,6 +249,7 @@ set(SOURCES
     src/ota/manager/OtaManagerProgress.cpp
     src/ota/manager/OtaManagerVerify.cpp
     src/ota/widget/OtaWidget.cpp
+    src/ota/widget/OtaWidgetDragDrop.cpp
     src/ota/widget/OtaWidgetDisplay.cpp
     src/ota/widget/OtaWidgetSlots.cpp
     src/ota/widget/OtaWidgetSlots2.cpp
@@ -260,6 +263,8 @@ set(SOURCES
     src/ota/protocols/ymodem/YModemTransfer.cpp
     src/ota/protocols/ymodem/YModemTransferStats.cpp
     src/ota/protocols/ymodem/YModemTransferHandlers.cpp
+    src/ota/protocols/ymodem/YModemTransferHandlersEarly.cpp
+    src/ota/protocols/ymodem/YModemTransferHandlersFinal.cpp
     src/ota/protocols/ymodem/YModemTransferProtocol.cpp
     src/ota/protocols/zmodem/ZModemTransfer.cpp
     src/ota/protocols/zmodem/ZModemTransferHandlers.cpp
@@ -316,6 +321,8 @@ set(SOURCES
     src/protocol/schema/ProtocolSchema.cpp
     src/protocol/schema/ProtocolSchemaConfig.cpp
     src/protocol/schema/ProtocolSchemaFields.cpp
+    src/protocol/schema/ProtocolSchemaStats.cpp
+    src/protocol/schema/ProtocolSchemaParse.cpp
     src/protocol/engine/ProtocolEngine.cpp
     src/protocol/engine/ProtocolEngineStats.cpp
     src/protocol/engine/ProtocolEngineCore.cpp
@@ -506,6 +513,7 @@ set(SOURCES
     src/protocol/protobuf/FlatBuffersDecoderFields.cpp
     src/protocol/protobuf/FlatBuffersDecoderRead.cpp
     src/protocol/protobuf/FlatBuffersDecoderSchema.cpp
+    src/protocol/protobuf/FlatBuffersDecoderParse.cpp
     src/protocol/protobuf/SchemaViewer.cpp
     src/protocol/protobuf/SchemaViewerStats.cpp
 

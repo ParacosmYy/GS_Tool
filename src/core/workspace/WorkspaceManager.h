@@ -79,6 +79,8 @@ private:
     quint64 m_totalWorkspacesCreated = 0;    ///< 总新建工作区次数
     quint64 m_totalWorkspacesDeleted = 0;    ///< 总删除工作区次数
     quint64 m_activeWorkspaceTimeMs = 0;     ///< 当前激活工作区累计活跃时长(毫秒)
+    mutable quint64 m_totalExportErrors = 0;  ///< 累计导出失败次数(在const方法中更新)
+    quint64 m_totalImportErrors = 0;          ///< 累计导入失败次数
     QElapsedTimer m_activeTimer;             ///< 当前激活工作区计时器
 
 public:
@@ -100,6 +102,13 @@ public:
     quint64 totalWorkspacesDeleted() const { return m_totalWorkspacesDeleted; }
     /** @brief 获取当前激活工作区累计活跃时长(毫秒) @return 活跃时长毫秒数 */
     quint64 activeWorkspaceTimeMs() const;
-    /** @brief 重置工作区统计计数器 */
+
+    /** @brief 获取累计导出失败次数(文件写入错误) @return 导出错误总数 */
+    quint64 totalExportErrors() const { return m_totalExportErrors; }
+
+    /** @brief 获取累计导入失败次数(文件读取/解析错误) @return 导入错误总数 */
+    quint64 totalImportErrors() const { return m_totalImportErrors; }
+
+    /** @brief 重置工作区统计计数器(包含所有计数器归零) */
     void resetWorkspaceStatistics();
 };
