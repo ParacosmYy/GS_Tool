@@ -84,7 +84,7 @@ struct TriggerRuleConfig {
     static TriggerRuleConfig fromJson(const QJsonObject& json)
     {
         TriggerRuleConfig config;
-        config.name = json["name"].toString(QStringLiteral("未命名规则"));
+        config.name = json["name"].toString(QCoreApplication::translate("TriggerRule", "未命名规则"));
         config.matchMode = static_cast<MatchMode>(json["matchMode"].toInt(0));
         config.pattern = json["pattern"].toString();
         config.valueMin = json["valueMin"].toDouble(0.0);
