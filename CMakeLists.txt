@@ -158,6 +158,7 @@ set(SOURCES
     src/chart/zoom/ZoomControllerQuery.cpp
     src/chart/zoom/ZoomControllerStats.cpp
     src/chart/fft/FftEngine.cpp
+    src/chart/fft/FftEngineWindow.cpp
     src/chart/fft/FftWidget.cpp
     src/chart/fft/FftWidgetSetup.cpp
     src/chart/stats/HistogramWidget.cpp
@@ -214,6 +215,7 @@ set(SOURCES
     # ── F3: 多通道数据导出 ──
     src/utils/export/ChartExporter.cpp
     src/utils/export/ChartExporterFormats.cpp
+    src/utils/export/ChartExporterImage.cpp
     src/utils/export/ExportDialog.cpp
 
     # ── F2: 自定义协议引擎 ──
