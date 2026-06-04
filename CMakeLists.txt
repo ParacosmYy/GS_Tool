@@ -63,6 +63,7 @@ set(SOURCES
     src/core/terminal/TerminalController.cpp
     src/core/panels/PanelManager.cpp
     src/core/panels/PanelManagerCreation.cpp
+    src/core/panels/PanelManagerFactory.cpp
     src/core/panels/PanelManagerGetters.cpp
     src/core/panels/PanelManagerQuery.cpp
     src/core/background/BackgroundWidget.cpp
@@ -177,6 +178,7 @@ set(SOURCES
     src/ota/protocols/base/BaseTransfer.cpp
     src/ota/protocols/xmodem/XModemTransfer.cpp
     src/ota/protocols/xmodem/XModemTransferHandlers.cpp
+    src/ota/protocols/xmodem/XModemTransferProtocol.cpp
     src/ota/protocols/ymodem/YModemTransfer.cpp
     src/ota/protocols/ymodem/YModemTransferHandlers.cpp
     src/ota/protocols/ymodem/YModemTransferProtocol.cpp
@@ -193,6 +195,7 @@ set(SOURCES
     src/utils/log/DataLogger.cpp
     src/utils/log/DataLoggerEdl.cpp
     src/utils/log/DataLoggerPlayback.cpp
+    src/utils/log/DataLoggerSession.cpp
     src/protocol/parser/FrameDefinition.cpp
     src/core/settings/SessionManager.cpp
     src/core/managers/ShortcutManager.cpp

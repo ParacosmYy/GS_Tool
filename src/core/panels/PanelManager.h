@@ -121,6 +121,14 @@ public:
     void resetStats();                       ///< 重置所有统计计数器
 
 private:
+    // --- 面板工厂辅助方法(实现见PanelManagerFactory.cpp) ---
+    void createConnectionPanels(QWidget* parent);   ///< 创建连接层面板(BLE/CAN/MQTT/TCP/SPI/I2C/WS/USB)
+    void createProtocolPanels(QWidget* parent);     ///< 创建协议层面板(自定义协议/Modbus/Protobuf)
+    void createDebugPanels(QWidget* parent);        ///< 创建调试层面板(RTT/寄存器/信号线/流量/触发器)
+    void createChartExtensionPanels(QWidget* parent); ///< 创建图表扩展面板(FFT/散点/直方图)
+    void createToolPanels(QWidget* parent);         ///< 创建工具层面板(校验/转换/时间戳/数据包/对比)
+    void createSystemPanels(QWidget* parent);       ///< 创建系统层面板(插件/项目/设备/性能)
+
     // --- BasePanel包装器 ---
     QMap<QWidget*, BasePanel*> m_wrappers;  ///< 原始面板→BasePanel包装器映射
     bool m_compactMode = false;             ///< 紧凑模式标志
