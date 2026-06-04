@@ -26,6 +26,7 @@ find_package(Qt6 REQUIRED COMPONENTS
     SerialPort
     Charts
     Network
+    Qml
 )
 
 # 源文件
@@ -1112,6 +1113,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::SerialPort
     Qt6::Charts
     Qt6::Network
+    Qt6::Qml
 )
 
 # Windows平台特殊设置
