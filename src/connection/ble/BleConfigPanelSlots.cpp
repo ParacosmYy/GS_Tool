@@ -32,6 +32,7 @@ void BleConfigPanel::onDeviceFound(const QVariantMap& device)
 
     m_deviceCombo->addItem(display);
     m_deviceList.append(device);
+    ++m_totalDevicesDiscovered;
     m_statusLabel->setText(
         tr("发现设备: %1").arg(name));
 }
@@ -70,9 +71,12 @@ void BleConfigPanel::loadSettings(QSettings& settings)
     }
 }
 
-/** @brief 重置所有统计计数器 */
+/** @brief 重置所有统计计数器(扫描/设备选择/连接/发现设备/地址编辑) */
 void BleConfigPanel::resetStatistics()
 {
     m_totalScansInitiated = 0;
     m_totalDeviceSelections = 0;
+    m_totalConnectAttempts = 0;
+    m_totalDevicesDiscovered = 0;
+    m_totalAddressEdits = 0;
 }

@@ -71,27 +71,51 @@ private:
         WaitingZAck, SendingEof, SendingFin, Done, Error
     };
 
-    void setState(State s);                            ///< 设置协议状态
-    static QString stateToString(State s);             ///< 状态→字符串(调试用)
+    /** @brief 设置协议状态 @param s 目标状态 */
+    void setState(State s);
+
+    /** @brief 将状态枚举转换为字符串(调试用) @param s 状态枚举 @return 状态名称字符串 */
+    static QString stateToString(State s);
 
     // ---- 帧解析与构建 ----
+
+    /** @brief 解析HEX帧头部 @param data 原始数据 @param type 输出: 帧类型 @param headerData 输出: 帧头数据 @return true=解析成功 */
     bool parseHexFrame(const QByteArray& data, int& type, QByteArray& headerData);
+
+    /** @brief 构建HEX帧头 @param frameType 帧类型 @param data 帧数据 @return HEX编码的帧字节数组 */
     QByteArray buildHexHeader(quint8 frameType, const QByteArray& data = QByteArray());
+
+    /** @brief 构建BIN帧头 @param frameType 帧类型 @param data 帧数据 @return BIN编码的帧字节数组 */
     QByteArray buildBinHeader(quint8 frameType, const QByteArray& data = QByteArray());
+
+    /** @brief 构建数据子帧 @param endFlag 结束标记(ZCRCE/ZCRCG/ZCRCQ/ZCRCW) @param data 载荷数据 @return 完整的数据子帧字节数组 */
     QByteArray buildDataSubpacket(char endFlag, const QByteArray& data);
 
-    /** @brief ZDLE转义: 对data中的控制字符进行转义 */
+    /** @brief ZDLE转义: 对data中的控制字符进行转义 @param data 原始数据 @return 转义后的字节数组 */
     QByteArray escapeZdle(const QByteArray& data) const;
 
     // ---- 发送流程 ----
-    void sendZRQINIT();        ///< 发送初始化请求
-    void sendZFILE();          ///< 发送文件信息
-    void sendZDATA();          ///< 发送数据帧头
-    void sendDataSubpackets(); ///< 批量发送数据子帧
-    void sendZEOF();           ///< 发送文件结束
-    void sendZFIN();           ///< 发送会话结束
 
-    QByteArray toHex(quint32 val, int digits); ///< 数值→HEX ASCII
+    /** @brief 发送初始化请求(ZRQINIT) */
+    void sendZRQINIT();
+
+    /** @brief 发送文件信息(ZFILE) */
+    void sendZFILE();
+
+    /** @brief 发送数据帧头(ZDATA) */
+    void sendZDATA();
+
+    /** @brief 批量发送数据子帧 */
+    void sendDataSubpackets();
+
+    /** @brief 发送文件结束(ZEOF) */
+    void sendZEOF();
+
+    /** @brief 发送会话结束(ZFIN) */
+    void sendZFIN();
+
+    /** @brief 将数值转换为HEX ASCII字符串 @param val 数值 @param digits 位数 @return HEX字符串 */
+    QByteArray toHex(quint32 val, int digits);
 
     /**
      * @brief 安全写入数据到连接，检测连接断开

@@ -1,4 +1,10 @@
-/** @file DataStatistics.h @brief 数据统计面板 - 实时收发统计、滚动吞吐量、直方图和错误监控。职责: RX/TX累计字节/速率/峰值/持续时间/错误计数/滚动吞吐量/直方图/采样历史。流程: update()->增量速率 | updateErrors()->错误显示 | onRefreshTimer()->定时刷新 */
+/**
+ * @file DataStatistics.h
+ * @brief 数据统计面板 - 实时收发统计、滚动吞吐量、直方图和错误监控
+ *
+ * 职责: RX/TX累计字节/速率/峰值/持续时间/错误计数/滚动吞吐量/直方图/采样历史
+ * 流程: update()->增量速率 | updateErrors()->错误显示 | onRefreshTimer()->定时刷新
+ */
 
 #ifndef DATASTATISTICS_H
 #define DATASTATISTICS_H
@@ -69,45 +75,104 @@ public:
     quint64 totalTxPackets() const { return m_txPackets; }
 
     // ---- 基础统计计数器 ----
-    quint64 totalUpdates() const;              ///< update()调用总次数
-    double peakRate() const;                   ///< 历史峰值速率(RX/TX中较大者, bytes/s)
-    quint64 totalBytesCounted() const;         ///< 所有update()调用传入的字节总数(RX+TX)
-    quint64 totalPeakUpdates() const;          ///< 峰值速率更新总次数
-    quint64 totalErrorUpdates() const;         ///< updateErrors()调用总次数
-    quint64 totalHealthUpdates() const;        ///< updateConnectionHealth()调用总次数
-    quint64 totalRefreshCycles() const;        ///< 定时器刷新总周期数
-    quint64 totalCalculations() const;         ///< update()中的速率计算总次数
-    quint64 totalHistogramUpdates() const;     ///< 直方图更新总次数
-    quint64 totalSlidingWindowResets() const;  ///< 滑动窗口重置总次数
-    quint64 totalThroughputSnapshots() const;  ///< 吞吐量快照记录总次数
-    quint64 totalResets() const;               ///< reset()调用总次数
-    quint64 totalFormatChanges() const;        ///< 格式切换总次数(预留)
-    void resetDataStatistics();                ///< 重置数据统计计数器(不影响面板显示)
+
+    /** @brief 获取update()调用总次数 @return 更新次数 */
+    quint64 totalUpdates() const;
+
+    /** @brief 获取历史峰值速率(RX/TX中较大者) @return 峰值速率(bytes/s) */
+    double peakRate() const;
+
+    /** @brief 获取所有update()调用传入的字节总数(RX+TX) @return 字节总数 */
+    quint64 totalBytesCounted() const;
+
+    /** @brief 获取峰值速率更新总次数 @return 更新次数 */
+    quint64 totalPeakUpdates() const;
+
+    /** @brief 获取updateErrors()调用总次数 @return 错误更新次数 */
+    quint64 totalErrorUpdates() const;
+
+    /** @brief 获取updateConnectionHealth()调用总次数 @return 健康更新次数 */
+    quint64 totalHealthUpdates() const;
+
+    /** @brief 获取定时器刷新总周期数 @return 刷新周期数 */
+    quint64 totalRefreshCycles() const;
+
+    /** @brief 获取update()中的速率计算总次数 @return 计算次数 */
+    quint64 totalCalculations() const;
+
+    /** @brief 获取直方图更新总次数 @return 更新次数 */
+    quint64 totalHistogramUpdates() const;
+
+    /** @brief 获取滑动窗口重置总次数 @return 重置次数 */
+    quint64 totalSlidingWindowResets() const;
+
+    /** @brief 获取吞吐量快照记录总次数 @return 快照次数 */
+    quint64 totalThroughputSnapshots() const;
+
+    /** @brief 获取reset()调用总次数 @return 重置次数 */
+    quint64 totalResets() const;
+
+    /** @brief 获取格式切换总次数(预留) @return 切换次数 */
+    quint64 totalFormatChanges() const;
+
+    /** @brief 重置数据统计计数器(不影响面板显示) */
+    void resetDataStatistics();
 
     // ---- 滚动吞吐量 ----
-    double rollingRxBytesPerSec() const;       ///< 滚动窗口RX平均速率(bytes/s)
-    double rollingTxBytesPerSec() const;       ///< 滚动窗口TX平均速率(bytes/s)
-    double rollingRxPacketsPerSec() const;     ///< 滚动窗口RX包速率(packets/s)
-    double rollingTxPacketsPerSec() const;     ///< 滚动窗口TX包速率(packets/s)
-    int rollingWindowSize() const;             ///< 滚动窗口大小(秒)
-    QVector<HistogramBucket> throughputHistogram() const; ///< 吞吐量直方图数据(RX+TX合计)
-    int histogramTotalSamples() const;         ///< 直方图总采样次数
-    QVector<ThroughputSample> throughputHistory(int maxCount = 0) const; ///< 最近N个吞吐量采样点(0=全部)
-    int throughputHistoryCapacity() const { return kMaxThroughputSamples; } ///< 采样历史最大保留条数
+
+    /** @brief 获取滚动窗口RX平均速率 @return 速率(bytes/s) */
+    double rollingRxBytesPerSec() const;
+
+    /** @brief 获取滚动窗口TX平均速率 @return 速率(bytes/s) */
+    double rollingTxBytesPerSec() const;
+
+    /** @brief 获取滚动窗口RX包速率 @return 包速率(packets/s) */
+    double rollingRxPacketsPerSec() const;
+
+    /** @brief 获取滚动窗口TX包速率 @return 包速率(packets/s) */
+    double rollingTxPacketsPerSec() const;
+
+    /** @brief 获取滚动窗口大小 @return 窗口大小(秒) */
+    int rollingWindowSize() const;
+
+    /** @brief 获取吞吐量直方图数据(RX+TX合计) @return 直方图桶列表 */
+    QVector<HistogramBucket> throughputHistogram() const;
+
+    /** @brief 获取直方图总采样次数 @return 采样次数 */
+    int histogramTotalSamples() const;
+
+    /** @brief 获取最近N个吞吐量采样点 @param maxCount 最大条数，0=全部 @return 采样点向量 */
+    QVector<ThroughputSample> throughputHistory(int maxCount = 0) const;
+
+    /** @brief 获取采样历史最大保留条数 @return 容量值 */
+    int throughputHistoryCapacity() const { return kMaxThroughputSamples; }
 
 signals:
-    void rollingThroughputUpdated(double rxBytesPerSec, double txBytesPerSec); ///< 滚动吞吐量更新信号(每秒发射)
+    /** @brief 滚动吞吐量更新信号(每秒发射) @param rxBytesPerSec RX速率(bytes/s) @param txBytesPerSec TX速率(bytes/s) */
+    void rollingThroughputUpdated(double rxBytesPerSec, double txBytesPerSec);
 
 private slots:
-    void onRefreshTimer(); ///< 定时器回调：每秒刷新速率、峰值、持续时间、滚动窗口、直方图
+    /** @brief 定时器回调：每秒刷新速率、峰值、持续时间、滚动窗口、直方图 */
+    void onRefreshTimer();
 
 private:
-    void setupUI(); ///< 初始化UI布局
-    QFrame* createStatsFrame(const QString& label, QLabel*& valueLabel, const QString& objectName, const QString& frameName = QString()); ///< 创建统计数据框架
-    QString formatRate(double bytesPerSec) const; ///< 速率格式化(bytes/s->人类可读)
-    void updateRollingThroughput();  ///< 更新滚动窗口吞吐量
-    void updateHistogram(double totalBytesPerSec); ///< 更新直方图数据
-    void initHistogramBuckets();     ///< 初始化直方图桶
+    /** @brief 初始化UI布局 */
+    void setupUI();
+
+    /** @brief 创建统计数据框架 @param label 统计项名称 @param valueLabel 输出: 值标签指针 @param objectName 控件objectName @param frameName 框架objectName(可选) @return 创建的QFrame */
+    QFrame* createStatsFrame(const QString& label, QLabel*& valueLabel, const QString& objectName, const QString& frameName = QString());
+
+    /** @brief 速率格式化(bytes/s->人类可读) @param bytesPerSec 速率值 @return 格式化字符串 */
+    QString formatRate(double bytesPerSec) const;
+
+    /** @brief 更新滚动窗口吞吐量 */
+    void updateRollingThroughput();
+
+    /** @brief 更新直方图数据 @param totalBytesPerSec 当前总速率(bytes/s) */
+    void updateHistogram(double totalBytesPerSec);
+
+    /** @brief 初始化直方图桶 */
+    void initHistogramBuckets();
 
     // ---- 控件指针 ----
     QLabel* m_rxTotalLabel;        ///< RX累计字节数显示

@@ -47,6 +47,18 @@ public:
     /** @brief 获取累计总线重置次数 */
     quint64 totalBusResets() const { return m_totalBusResets; }
 
+    /** @brief 获取累计波特率变更次数 */
+    quint64 totalBitrateChanges() const { return m_totalBitrateChanges; }
+
+    /** @brief 获取累计连接尝试次数 */
+    quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
+
+    /** @brief 获取累计CAN-FD模式切换次数 */
+    quint64 totalCanFdToggles() const { return m_totalCanFdToggles; }
+
+    /** @brief 获取累计适配器切换次数 */
+    quint64 totalAdapterSwitches() const { return m_totalAdapterSwitches; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -88,8 +100,12 @@ private:
     bool m_connected = false;         ///< 当前是否已连接
 
     // ---- 统计计数器 ----
-    quint64 m_totalConfigChanges = 0;  ///< 累计配置变更次数
-    quint64 m_totalBusResets = 0;      ///< 累计总线重置次数
+    quint64 m_totalConfigChanges = 0;   ///< 累计配置变更次数
+    quint64 m_totalBusResets = 0;       ///< 累计总线重置次数
+    quint64 m_totalBitrateChanges = 0;  ///< 累计波特率变更次数
+    quint64 m_totalConnectAttempts = 0; ///< 累计连接尝试次数
+    quint64 m_totalCanFdToggles = 0;    ///< 累计CAN-FD模式切换次数
+    quint64 m_totalAdapterSwitches = 0; ///< 累计适配器切换次数
 };
 
 #endif // CANCONFIGPANEL_H

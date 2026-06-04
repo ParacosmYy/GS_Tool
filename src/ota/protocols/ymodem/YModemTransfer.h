@@ -1,4 +1,10 @@
-/** @file YModemTransfer.h @brief YMODEM协议传输器 - PC端Sender。基于XMODEM-CRC+Block0文件信息+批量传输。状态: WaitingStart->SendingBlock0->SendingData->SendingEOT->Done。协作: BaseTransfer/IConnection/CRC/OtaManager */
+/**
+ * @file YModemTransfer.h
+ * @brief YMODEM协议传输器 - PC端Sender。基于XMODEM-CRC+Block0文件信息+批量传输
+ *
+ * 状态: WaitingStart->SendingBlock0->SendingData->SendingEOT->Done
+ * 协作: BaseTransfer/IConnection/CRC/OtaManager
+ */
 #ifndef YMODEMTRANSFER_H
 #define YMODEMTRANSFER_H
 
@@ -38,8 +44,11 @@ public:
     void resetYmodemStatistics();
 
 signals:
-    void transferStats(double rateBytesPerSec, double etaSec, const QString& fileName); ///< 速率/ETA更新(每次ACK后)
-    void fileTransferComplete(const QString& fileName, int index); ///< 单文件完成(批量模式)
+    /** @brief 速率/ETA更新(每次ACK后) @param rateBytesPerSec 速率(字节/秒) @param etaSec 预计剩余时间(秒) @param fileName 当前文件名 */
+    void transferStats(double rateBytesPerSec, double etaSec, const QString& fileName);
+
+    /** @brief 单文件完成(批量模式) @param fileName 完成的文件名 @param index 文件在列表中的索引 */
+    void fileTransferComplete(const QString& fileName, int index);
 
 protected:
     // === BaseTransfer 钩子实现 ===

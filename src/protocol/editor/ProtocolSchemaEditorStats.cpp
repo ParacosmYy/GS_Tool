@@ -8,10 +8,12 @@
 
 #include "protocol/editor/ProtocolSchemaEditor.h"
 
-/** @brief 重置协议编辑器统计计数器 */
+/** @brief 重置协议编辑器统计计数器(加载/保存/验证/验证失败/编辑) */
 void ProtocolSchemaEditor::resetSchemaEditorStatistics()
 {
     m_totalSchemasLoaded = 0;
     m_totalSchemasSaved = 0;
     m_totalValidations = 0;
+    m_totalValidationFailures = 0;
+    m_totalJsonEdits = 0;
 }

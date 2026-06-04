@@ -66,7 +66,7 @@ BleConfigPanel::BleConfigPanel(QWidget* parent)
         emit scanRequested();
     });
     connect(m_connectBtn, &QPushButton::clicked,
-            this, &BleConfigPanel::connectRequested);
+            this, [this]() { ++m_totalConnectAttempts; emit connectRequested(); });
     connect(m_deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &BleConfigPanel::onDeviceSelected);
 }

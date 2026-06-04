@@ -40,6 +40,7 @@ void MultiConnectionPanel::setManager(TcpMultiConnectionManager* manager)
 void MultiConnectionPanel::onAddClicked()
 {
     if (!m_manager) return;
+    ++m_totalAddAttempts;
 
     /// 创建输入对话框
     QDialog dialog(this);
@@ -84,6 +85,7 @@ void MultiConnectionPanel::onRemoveClicked()
     if (!m_connectionList || !m_connectionList->currentItem() || !m_manager) {
         return;
     }
+    ++m_totalRemoveAttempts;
     int id = m_connectionList->currentItem()->data(Qt::UserRole).toInt();
     m_manager->removeConnection(id);
 }
@@ -97,6 +99,7 @@ void MultiConnectionPanel::onSendAllClicked()
     if (text.isEmpty()) return;
 
     QByteArray data = text.toUtf8();
+    ++m_totalBroadcastsSent;
     int count = m_manager->sendToAll(data);
     if (m_statusLabel) {
         m_statusLabel->setText(tr("已发送到 %1 个连接").arg(count));
@@ -133,58 +136,7 @@ void MultiConnectionPanel::onConnectionRemoved(int id)
     ++m_totalDisconnections;
 }
 
-/** @brief 初始化UI布局: 连接列表/添加移除按钮/广播输入/状态标签 */
-void MultiConnectionPanel::setupUi()
-{
-    auto* layout = new QVBoxLayout(this);
-
-    /// 连接列表
-    m_connectionList = new QListWidget(this);
-    m_connectionList->setObjectName("tcpMultiConnectionList");
-
-    /// 按钮行：添加 / 移除
-    auto* btnLayout = new QHBoxLayout();
-    m_addBtn = new QPushButton(tr("添加连接"), this);
-    m_addBtn->setObjectName("tcpMultiAddBtn");
-
-    m_removeBtn = new QPushButton(tr("移除连接"), this);
-    m_removeBtn->setObjectName("tcpMultiRemoveBtn");
-
-    btnLayout->addWidget(m_addBtn);
-    btnLayout->addWidget(m_removeBtn);
-
-    /// 广播消息输入和发送
-    auto* sendLayout = new QHBoxLayout();
-    m_broadcastEdit = new QLineEdit(this);
-    m_broadcastEdit->setObjectName("tcpMultiBroadcastEdit");
-    m_broadcastEdit->setPlaceholderText(tr("输入广播消息..."));
-
-    m_sendAllBtn = new QPushButton(tr("发送全部"), this);
-    m_sendAllBtn->setObjectName("tcpMultiSendAllBtn");
-
-    sendLayout->addWidget(m_broadcastEdit);
-    sendLayout->addWidget(m_sendAllBtn);
-
-    /// 状态标签
-    m_statusLabel = new QLabel(tr("连接数: 0"), this);
-    m_statusLabel->setObjectName("tcpMultiStatusLabel");
-
-    layout->addWidget(m_connectionList);
-    layout->addLayout(btnLayout);
-    layout->addLayout(sendLayout);
-    layout->addWidget(m_statusLabel);
-}
-
-/** @brief 初始化信号连接: 添加/移除/广播发送按钮 */
-void MultiConnectionPanel::setupConnections()
-{
-    connect(m_addBtn, &QPushButton::clicked,
-            this, &MultiConnectionPanel::onAddClicked);
-    connect(m_removeBtn, &QPushButton::clicked,
-            this, &MultiConnectionPanel::onRemoveClicked);
-    connect(m_sendAllBtn, &QPushButton::clicked,
-            this, &MultiConnectionPanel::onSendAllClicked);
-}
+// setupUi()/setupConnections() 已拆分至 MultiConnectionPanelUI.cpp
 
 /** @brief 获取累计连接次数 @return 历史连接总数 */
 quint64 MultiConnectionPanel::totalConnections() const
@@ -198,9 +150,12 @@ quint64 MultiConnectionPanel::totalDisconnections() const
     return m_totalDisconnections;
 }
 
-/** @brief 重置所有统计计数器 */
+/** @brief 重置所有统计计数器(连接/断开/广播/添加/移除) */
 void MultiConnectionPanel::resetStatistics()
 {
     m_totalConnections = 0;
     m_totalDisconnections = 0;
+    m_totalBroadcastsSent = 0;
+    m_totalAddAttempts = 0;
+    m_totalRemoveAttempts = 0;
 }

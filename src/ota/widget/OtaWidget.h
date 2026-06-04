@@ -38,13 +38,27 @@ public:
     void setConnection(IConnection* conn);
 
     // ---- 统计访问器 ----
-    quint64 totalTransfersStarted() const { return m_totalTransfersStarted; }   ///< 传输启动计数
-    quint64 totalTransfersCompleted() const { return m_totalTransfersCompleted; } ///< 传输完成计数
-    quint64 totalTransfersFailed() const { return m_totalTransfersFailed; }     ///< 传输失败计数
-    quint64 totalBytesTransferred() const { return m_totalBytesTransferred; }   ///< 累计字节
-    quint64 totalBrowseClicks() const { return m_totalBrowseClicks; }           ///< 浏览按钮点击计数
-    quint64 totalCancelOps() const { return m_totalCancelOps; }                 ///< 取消操作计数
-    void resetOtaWidgetStatistics(); ///< 重置面板统计(不影响历史记录)
+
+    /** @brief 获取传输启动计数 @return 启动次数 */
+    quint64 totalTransfersStarted() const { return m_totalTransfersStarted; }
+
+    /** @brief 获取传输完成计数 @return 完成次数 */
+    quint64 totalTransfersCompleted() const { return m_totalTransfersCompleted; }
+
+    /** @brief 获取传输失败计数 @return 失败次数 */
+    quint64 totalTransfersFailed() const { return m_totalTransfersFailed; }
+
+    /** @brief 获取累计传输字节数 @return 字节总数 */
+    quint64 totalBytesTransferred() const { return m_totalBytesTransferred; }
+
+    /** @brief 获取浏览按钮点击计数 @return 点击次数 */
+    quint64 totalBrowseClicks() const { return m_totalBrowseClicks; }
+
+    /** @brief 获取取消操作计数 @return 取消次数 */
+    quint64 totalCancelOps() const { return m_totalCancelOps; }
+
+    /** @brief 重置面板统计(不影响历史记录) */
+    void resetOtaWidgetStatistics();
 
 signals:
     void transferStarted(const QString& filename);    ///< 传输开始 @param filename 文件名
@@ -52,32 +66,74 @@ signals:
     void transferFailed(const QString& filename, const QString& error);           ///< 传输失败
 
 private slots:
-    void onBrowseFile();     ///< 浏览固件文件
-    void onStartTransfer();  ///< 开始传输
-    void onCancelTransfer(); ///< 取消传输
-    void onProgress(int percent, qint64 bytesSent, qint64 totalBytes); ///< 进度更新
-    void onTransferComplete();          ///< 传输完成(100%+变色+校验和)
-    void onTransferError(const QString& reason); ///< 传输错误
-    void onTransferStats(double rateBytesPerSec, double etaSec); ///< 速率/ETA
-    void onOtaStateChanged(OtaManager::OtaState state);          ///< OTA状态变化
+    /** @brief 浏览固件文件 */
+    void onBrowseFile();
+
+    /** @brief 开始传输 */
+    void onStartTransfer();
+
+    /** @brief 取消传输 */
+    void onCancelTransfer();
+
+    /** @brief 进度更新 @param percent 百分比 @param bytesSent 已发送字节 @param totalBytes 总字节 */
+    void onProgress(int percent, qint64 bytesSent, qint64 totalBytes);
+
+    /** @brief 传输完成(100%+变色+校验和) */
+    void onTransferComplete();
+
+    /** @brief 传输错误 @param reason 错误原因 */
+    void onTransferError(const QString& reason);
+
+    /** @brief 速率/ETA更新 @param rateBytesPerSec 速率(字节/秒) @param etaSec 预计剩余时间(秒) */
+    void onTransferStats(double rateBytesPerSec, double etaSec);
+
+    /** @brief OTA状态变化 @param state 新状态 */
+    void onOtaStateChanged(OtaManager::OtaState state);
 
 private:
-    void setupUI();           ///< 初始化UI
-    QGroupBox* setupFileGroup();     ///< 文件选择组(输入框+浏览+拖放提示)
-    QGroupBox* setupConfigGroup();   ///< 传输配置组(协议+按钮)
-    QGroupBox* setupProgressGroup(); ///< 进度显示组(进度条+速率+ETA+校验和)
-    QGroupBox* setupLogGroup();      ///< 日志输出组
-    QGroupBox* setupHistoryGroup();  ///< OTA历史记录组(树视图+清除)
-    void appendLog(const QString& msg);             ///< 追加时间戳日志
-    void setTransferring(bool transferring);         ///< 切换传输UI状态
-    void startCompletionAnimation();                 ///< accent->success变色
-    void handleDroppedFile(const QString& filePath); ///< 处理拖入文件
+    /** @brief 初始化UI */
+    void setupUI();
+
+    /** @brief 创建文件选择组(输入框+浏览+拖放提示) @return 分组QGroupBox */
+    QGroupBox* setupFileGroup();
+
+    /** @brief 创建传输配置组(协议+按钮) @return 分组QGroupBox */
+    QGroupBox* setupConfigGroup();
+
+    /** @brief 创建进度显示组(进度条+速率+ETA+校验和) @return 分组QGroupBox */
+    QGroupBox* setupProgressGroup();
+
+    /** @brief 创建日志输出组 @return 分组QGroupBox */
+    QGroupBox* setupLogGroup();
+
+    /** @brief 创建OTA历史记录组(树视图+清除) @return 分组QGroupBox */
+    QGroupBox* setupHistoryGroup();
+
+    /** @brief 追加时间戳日志 @param msg 日志消息 */
+    void appendLog(const QString& msg);
+
+    /** @brief 切换传输UI状态 @param transferring true=传输中 */
+    void setTransferring(bool transferring);
+
+    /** @brief 启动accent->success变色动画 */
+    void startCompletionAnimation();
+
+    /** @brief 处理拖入文件 @param filePath 文件路径 */
+    void handleDroppedFile(const QString& filePath);
 
     // ---- 拖放事件重写 ----
-    void dragEnterEvent(QDragEnterEvent* event) override;  ///< 拖入: 校验文件后缀
-    void dragMoveEvent(QDragMoveEvent* event) override;    ///< 拖动: 持续接受
-    void dropEvent(QDropEvent* event) override;            ///< 放下: 提取路径
-    void dragLeaveEvent(QDragLeaveEvent* event) override;  ///< 拖离: 恢复样式
+
+    /** @brief 拖入: 校验文件后缀 @param event 拖入事件 */
+    void dragEnterEvent(QDragEnterEvent* event) override;
+
+    /** @brief 拖动: 持续接受 @param event 拖动事件 */
+    void dragMoveEvent(QDragMoveEvent* event) override;
+
+    /** @brief 放下: 提取文件路径 @param event 放下事件 */
+    void dropEvent(QDropEvent* event) override;
+
+    /** @brief 拖离: 恢复样式 @param event 拖离事件 */
+    void dragLeaveEvent(QDragLeaveEvent* event) override;
 
     OtaManager* m_manager;              ///< OTA管理器(业务逻辑层)
 

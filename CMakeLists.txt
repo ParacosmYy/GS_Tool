@@ -289,6 +289,7 @@ set(SOURCES
     src/utils/export/DataExporterEdl.cpp
     src/utils/aggregator/DataAggregator.cpp
     src/utils/aggregator/DataAggregatorCompute.cpp
+    src/utils/aggregator/DataAggregatorTimeWindow.cpp
     src/utils/log/DataLogger.cpp
     src/utils/log/DataLoggerEdl.cpp
     src/utils/log/DataLoggerPlayback.cpp
@@ -431,6 +432,7 @@ set(SOURCES
 
     # ── F13: CAN/CAN-FD 总线 ──
     src/connection/can/CanConnection.cpp
+    src/connection/can/CanConnectionConfig.cpp
     src/connection/can/CanConnectionProtocol.cpp
     src/connection/can/CanConnectionFrame.cpp
     src/connection/can/CanFrameParser.cpp
@@ -448,6 +450,7 @@ set(SOURCES
     # ── F14: MQTT 客户端 ──
     src/connection/mqtt/MqttConnection.cpp
     src/connection/mqtt/MqttConnectionProtocol.cpp
+    src/connection/mqtt/MqttConnectionQueue.cpp
     src/connection/mqtt/MqttConnectionStats.cpp
     src/connection/mqtt/MqttConnectionPublish.cpp
     src/connection/mqtt/MqttTopicModel.cpp
@@ -473,6 +476,7 @@ set(SOURCES
     src/connection/tcp/TlsConnectionSetup.cpp
     src/connection/tcp/TlsConnectionStats.cpp
     src/connection/tcp/MultiConnectionPanel.cpp
+    src/connection/tcp/MultiConnectionPanelUI.cpp
 
     # ── F16: SPI/I2C 桥接 ──
     src/connection/spi_i2c/SpiConnection.cpp
@@ -525,6 +529,7 @@ set(SOURCES
 
     # ── F20: USB 调试 ──
     src/connection/usb/UsbConnection.cpp
+    src/connection/usb/UsbConnectionLifecycle.cpp
     src/connection/usb/UsbConnectionInterface.cpp
     src/connection/usb/UsbConnectionTransfer.cpp
     src/connection/usb/UsbConnectionDescriptors.cpp

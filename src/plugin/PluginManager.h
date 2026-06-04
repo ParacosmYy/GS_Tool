@@ -103,13 +103,13 @@ public:
      */
     QVariantList pluginMetadataList() const;
 
-    /** @brief 获取累计加载成功次数 */
+    /** @brief 获取累计加载成功次数 @return 成功次数 */
     quint64 totalLoadCount() const;
 
-    /** @brief 获取累计加载失败次数 */
+    /** @brief 获取累计加载失败次数 @return 失败次数 */
     quint64 totalFailCount() const;
 
-    /** @brief 获取累计卸载次数 */
+    /** @brief 获取累计卸载次数 @return 卸载次数 */
     quint64 totalUnloadCount() const;
 
     /** @brief 重置加载统计 */

@@ -92,12 +92,24 @@ private:
     quint64 m_totalStops = 0;       ///< 累计停止请求次数
     quint64 m_totalSeeks = 0;       ///< 累计定位请求次数
     quint64 m_totalSpeedChanges = 0;///< 累计变速请求次数
+
 public:
+    /** @brief 获取累计播放请求次数 @return 播放次数 */
     quint64 totalPlays() const { return m_totalPlays; }
+
+    /** @brief 获取累计暂停请求次数 @return 暂停次数 */
     quint64 totalPauses() const { return m_totalPauses; }
+
+    /** @brief 获取累计停止请求次数 @return 停止次数 */
     quint64 totalStops() const { return m_totalStops; }
+
+    /** @brief 获取累计定位请求次数 @return 定位次数 */
     quint64 totalSeeks() const { return m_totalSeeks; }
+
+    /** @brief 获取累计变速请求次数 @return 变速次数 */
     quint64 totalSpeedChanges() const { return m_totalSpeedChanges; }
+
+    /** @brief 重置所有播放面板统计计数器 */
     void resetPlaybackWidgetStatistics() { m_totalPlays = 0; m_totalPauses = 0; m_totalStops = 0; m_totalSeeks = 0; m_totalSpeedChanges = 0; }
 };
 

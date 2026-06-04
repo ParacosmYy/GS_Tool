@@ -59,6 +59,12 @@ public:
     quint64 totalSuggestions() const { return m_totalSuggestions; }
     /** @brief 获取用户选择补全项总次数 */
     quint64 totalSelections() const { return m_totalSelections; }
+    /** @brief 获取用户取消(ESC/点击外部)次数 */
+    quint64 totalCancellations() const { return m_totalCancellations; }
+    /** @brief 获取键盘导航(上下键)总次数 */
+    quint64 totalKeyNavigations() const { return m_totalKeyNavigations; }
+    /** @brief 获取无匹配结果自动隐藏次数 */
+    quint64 totalNoMatchHides() const { return m_totalNoMatchHides; }
     /** @brief 重置所有统计计数器 */
     void resetAutoCompleteStatistics();
 
@@ -80,6 +86,9 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalSuggestions = 0;       ///< 建议列表显示次数
     quint64 m_totalSelections = 0;        ///< 用户选择补全项次数
+    quint64 m_totalCancellations = 0;     ///< 用户取消(ESC/点击外部)次数
+    quint64 m_totalKeyNavigations = 0;    ///< 键盘导航(上下键)次数
+    quint64 m_totalNoMatchHides = 0;      ///< 无匹配结果自动隐藏次数
 };
 
 #endif // SMART_AUTO_COMPLETE_H

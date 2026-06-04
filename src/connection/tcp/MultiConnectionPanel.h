@@ -52,6 +52,15 @@ public:
     /** @brief 获取累计断开次数 */
     quint64 totalDisconnections() const;
 
+    /** @brief 获取累计广播发送次数 */
+    quint64 totalBroadcastsSent() const { return m_totalBroadcastsSent; }
+
+    /** @brief 获取累计添加尝试次数(含用户取消) */
+    quint64 totalAddAttempts() const { return m_totalAddAttempts; }
+
+    /** @brief 获取累计移除尝试次数 */
+    quint64 totalRemoveAttempts() const { return m_totalRemoveAttempts; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -91,6 +100,9 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalConnections = 0;                   ///< 累计连接次数
     quint64 m_totalDisconnections = 0;                ///< 累计断开次数
+    quint64 m_totalBroadcastsSent = 0;                ///< 累计广播发送次数
+    quint64 m_totalAddAttempts = 0;                   ///< 累计添加尝试次数
+    quint64 m_totalRemoveAttempts = 0;                ///< 累计移除尝试次数
 };
 
 #endif // MULTICONNECTIONPANEL_H

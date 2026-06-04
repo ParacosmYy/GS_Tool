@@ -1,4 +1,7 @@
-/** @file XModemTransfer.h @brief XMODEM协议传输器 - PC端Sender实现。支持Checksum/CRC/1K三种模式，继承BaseTransfer通过4个纯虚钩子注入协议逻辑 */
+/**
+ * @file XModemTransfer.h
+ * @brief XMODEM协议传输器 - PC端Sender实现。支持Checksum/CRC/1K三种模式，继承BaseTransfer通过4个纯虚钩子注入协议逻辑
+ */
 #ifndef XMODEMTRANSFER_H
 #define XMODEMTRANSFER_H
 
@@ -34,23 +37,41 @@ public:
     /** @brief 获取预计剩余时间 @return 秒数，无法估算返回-1 */
     double etaSeconds() const;
     // ---- 统计接口 ----
-    quint64 totalBlocksSent() const;      ///< 累计发送块总数
-    quint64 totalRetries() const;         ///< 累计重试次数
-    quint64 totalModeSwitches() const;    ///< 累计模式降级次数
-    quint64 xmodemErrorCount() const;     ///< 累计错误次数
-    quint64 totalCrcErrors() const { return m_totalCrcErrors; } ///< 累计CRC校验被拒次数(NAK触发)
-    quint64 totalTimeouts() const { return m_totalTimeouts; }   ///< 累计超时事件次数
-    void resetXmodemStatistics();         ///< 重置统计计数器
+
+    /** @brief 获取累计发送块总数 @return 数据块计数 */
+    quint64 totalBlocksSent() const;
+
+    /** @brief 获取累计重试次数 @return 重试计数 */
+    quint64 totalRetries() const;
+
+    /** @brief 获取累计模式降级次数 @return 降级计数 */
+    quint64 totalModeSwitches() const;
+
+    /** @brief 获取累计错误次数 @return 错误计数 */
+    quint64 xmodemErrorCount() const;
+
+    /** @brief 获取累计CRC校验被拒次数(NAK触发) @return CRC错误计数 */
+    quint64 totalCrcErrors() const { return m_totalCrcErrors; }
+
+    /** @brief 获取累计超时事件次数 @return 超时计数 */
+    quint64 totalTimeouts() const { return m_totalTimeouts; }
+
+    /** @brief 重置XModem统计计数器 */
+    void resetXmodemStatistics();
 
 signals:
-    void transferStats(double rateBytesPerSec, double etaSec); ///< 传输速率和ETA更新
-    void modeDegraded(const QString& fromMode, const QString& toMode); ///< 协议模式自动降级通知
+    /** @brief 传输速率和ETA更新 @param rateBytesPerSec 当前速率(字节/秒) @param etaSec 预计剩余时间(秒) */
+    void transferStats(double rateBytesPerSec, double etaSec);
+
+    /** @brief 协议模式自动降级通知 @param fromMode 降级前模式名 @param toMode 降级后模式名 */
+    void modeDegraded(const QString& fromMode, const QString& toMode);
 
 protected:
     // === BaseTransfer 钩子实现 ===
     /** @brief 协议初始化: 加载文件→校验→重置计数器→等待接收方启动信号。文件>16MB/不可读/数据空拒绝 */
     bool onStartInit() override;
-    void sendCancelBytes() override;  ///< 发送2个CAN字节取消传输
+    /** @brief 发送2个CAN字节取消传输 */
+    void sendCancelBytes() override;
     /** @brief 接收数据状态机: WaitingForStart→SendingBlock→SendingEOT→Done。每块最多重试10次 */
     void processReceivedData() override;
     /** @brief 超时重发: SendingBlock重发当前块, SendingEOT重发EOT, WaitingForStart延长等待(3倍超时) */

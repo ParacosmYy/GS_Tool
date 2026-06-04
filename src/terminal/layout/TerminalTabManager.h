@@ -65,6 +65,12 @@ public:
     /** @brief 获取标签页切换总次数 */
     quint64 totalTabSwitches() const { return m_totalTabSwitches; }
 
+    /** @brief 获取历史峰值标签页数量 */
+    quint64 peakTabCount() const { return m_peakTabCount; }
+
+    /** @brief 获取累计标签页关闭前确认总次数(如有确认机制) */
+    quint64 totalTabCloseRequests() const { return m_totalTabCloseRequests; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -93,9 +99,11 @@ private:
 
     QTabWidget *m_tabWidget; ///< 内部标签页控件
 
-    quint64 m_totalTabAdds = 0;     ///< 标签页添加总次数
-    quint64 m_totalTabRemoves = 0;  ///< 标签页移除总次数
-    quint64 m_totalTabSwitches = 0; ///< 标签页切换总次数
+    quint64 m_totalTabAdds = 0;         ///< 标签页添加总次数
+    quint64 m_totalTabRemoves = 0;      ///< 标签页移除总次数
+    quint64 m_totalTabSwitches = 0;     ///< 标签页切换总次数
+    quint64 m_peakTabCount = 0;         ///< 历史峰值标签页数量
+    quint64 m_totalTabCloseRequests = 0;///< 累计标签页关闭请求总次数
 };
 
 #endif // TERMINAL_TAB_MANAGER_H

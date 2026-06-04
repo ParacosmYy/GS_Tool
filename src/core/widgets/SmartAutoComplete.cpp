@@ -64,6 +64,7 @@ void SmartAutoComplete::showForPrefix(const QString& prefix, const QPoint& posit
     }
 
     if (m_listWidget->count() == 0) {
+        ++m_totalNoMatchHides;
         hide();
         return;
     }
@@ -113,6 +114,7 @@ bool SmartAutoComplete::handleKeyEvent(QKeyEvent* event)
             int next = qMin(m_listWidget->currentRow() + 1,
                             m_listWidget->count() - 1);
             m_listWidget->setCurrentRow(next);
+            ++m_totalKeyNavigations;
         }
         return true;
 
@@ -120,6 +122,7 @@ bool SmartAutoComplete::handleKeyEvent(QKeyEvent* event)
         if (m_listWidget->count() > 0) {
             int prev = qMax(m_listWidget->currentRow() - 1, 0);
             m_listWidget->setCurrentRow(prev);
+            ++m_totalKeyNavigations;
         }
         return true;
 
@@ -133,6 +136,7 @@ bool SmartAutoComplete::handleKeyEvent(QKeyEvent* event)
         return true;
 
     case Qt::Key_Escape:
+        ++m_totalCancellations;
         hideComplete();
         return true;
 
@@ -177,9 +181,12 @@ void SmartAutoComplete::sortEntries(QVector<int>& indices) const
 
 // ──────────────────────── 统计重置 ────────────────────────
 
-/** @brief 重置自动补全统计计数器(建议次数和选择次数) */
+/** @brief 重置自动补全统计计数器(建议次数/选择次数/取消/导航/无匹配隐藏) */
 void SmartAutoComplete::resetAutoCompleteStatistics()
 {
     m_totalSuggestions = 0;
     m_totalSelections = 0;
+    m_totalCancellations = 0;
+    m_totalKeyNavigations = 0;
+    m_totalNoMatchHides = 0;
 }

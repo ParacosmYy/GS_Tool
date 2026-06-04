@@ -39,11 +39,11 @@ ModbusConfigPanel::ModbusConfigPanel(QWidget* parent)
 
     // 配置变更统计: 模式/从站地址/超时时间变化时计数
     connect(m_modeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, [this]() { ++m_totalConfigChanges; ++m_totalScanRequests; });
+            this, [this]() { ++m_totalConfigChanges; ++m_totalScanRequests; ++m_totalModeSwitches; });
     connect(m_slaveSpin, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, [this]() { ++m_totalConfigChanges; });
+            this, [this]() { ++m_totalConfigChanges; ++m_totalSlaveAddressChanges; });
     connect(m_timeoutSpin, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, [this]() { ++m_totalConfigChanges; });
+            this, [this]() { ++m_totalConfigChanges; ++m_totalTimeoutChanges; });
 }
 
 /** @brief 获取当前配置(模式/从站地址/超时) @return 配置QVariantMap */
@@ -58,6 +58,7 @@ QVariantMap ModbusConfigPanel::config() const {
 /** @brief 保存Modbus配置到QSettings @param settings QSettings对象 */
 void ModbusConfigPanel::saveSettings(QSettings& settings) const
 {
+    ++const_cast<ModbusConfigPanel*>(this)->m_totalConfigSaves;
     settings.setValue(QStringLiteral("modbus/mode"),
                      m_modeCombo->currentIndex());
     settings.setValue(QStringLiteral("modbus/slaveAddress"),
@@ -69,6 +70,7 @@ void ModbusConfigPanel::saveSettings(QSettings& settings) const
 /** @brief 从QSettings加载Modbus配置 @param settings QSettings对象 */
 void ModbusConfigPanel::loadSettings(QSettings& settings)
 {
+    ++m_totalConfigLoads;
     m_modeCombo->setCurrentIndex(
         settings.value(QStringLiteral("modbus/mode"), 0).toInt());
     m_slaveSpin->setValue(
@@ -77,9 +79,14 @@ void ModbusConfigPanel::loadSettings(QSettings& settings)
         settings.value(QStringLiteral("modbus/timeout"), 1000).toInt());
 }
 
-/** @brief 重置所有统计计数器(配置变更数/扫描请求数) */
+/** @brief 重置所有统计计数器(配置变更/扫描请求/模式切换/从站地址/超时/保存/加载) */
 void ModbusConfigPanel::resetStatistics()
 {
     m_totalConfigChanges = 0;
     m_totalScanRequests = 0;
+    m_totalModeSwitches = 0;
+    m_totalSlaveAddressChanges = 0;
+    m_totalTimeoutChanges = 0;
+    m_totalConfigSaves = 0;
+    m_totalConfigLoads = 0;
 }

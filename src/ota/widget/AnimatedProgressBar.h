@@ -1,4 +1,9 @@
-/** @file AnimatedProgressBar.h @brief 带shimmer流动效果的进度条 -- OTA传输视觉反馈。header-only实现，QPropertyAnimation驱动shimmerOffset属性，颜色从ThemeManager获取 */
+/**
+ * @file AnimatedProgressBar.h
+ * @brief 带shimmer流动效果的进度条 -- OTA传输视觉反馈
+ *
+ * header-only实现，QPropertyAnimation驱动shimmerOffset属性，颜色从ThemeManager获取
+ */
 
 #ifndef ANIMATEDPROGRESSBAR_H
 #define ANIMATEDPROGRESSBAR_H
@@ -17,16 +22,18 @@ class AnimatedProgressBar : public QProgressBar {
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
 
 public:
-    explicit AnimatedProgressBar(QWidget* parent = nullptr) ///< 构造，初始化进度条并设置objectName
+    /** @brief 构造进度条并设置objectName @param parent 父控件 */
+    explicit AnimatedProgressBar(QWidget* parent = nullptr)
         : QProgressBar(parent), m_shimmerOffset(0.0), m_shimmerAnim(nullptr)
         , m_customChunkColor(false)
     {
         setObjectName("animatedProgressBar");
     }
 
-    qreal shimmerOffset() const { return m_shimmerOffset; } ///< 获取shimmer偏移量[0.0, 1.0]
+    /** @brief 获取shimmer偏移量 @return 偏移量[0.0, 1.0] */
+    qreal shimmerOffset() const { return m_shimmerOffset; }
 
-    /** 设置shimmer偏移量，由QPropertyAnimation驱动 @param offset 目标偏移量[0.0, 1.0] */
+    /** @brief 设置shimmer偏移量，由QPropertyAnimation驱动 @param offset 目标偏移量[0.0, 1.0] */
     void setShimmerOffset(qreal offset) {
         if (!qFuzzyCompare(m_shimmerOffset, offset)) {
             m_shimmerOffset = offset;
@@ -40,9 +47,10 @@ signals:
     void chunkColorChanged();                ///< chunkColor属性变更通知
 
 public:
-    QColor chunkColor() const { return m_chunkColor; } ///< 获取chunk自定义颜色(无效QColor=未设置)
+    /** @brief 获取chunk自定义颜色 @return 自定义颜色，无效QColor表示未设置 */
+    QColor chunkColor() const { return m_chunkColor; }
 
-    /** 设置chunk自定义颜色，由QPropertyAnimation驱动传输完成变色动画 @param color 目标颜色 */
+    /** @brief 设置chunk自定义颜色，由QPropertyAnimation驱动传输完成变色动画 @param color 目标颜色 */
     void setChunkColor(const QColor& color) {
         m_chunkColor = color;
         m_customChunkColor = true;
@@ -50,19 +58,28 @@ public:
         update();
     }
 
-    void resetChunkColor() {                 ///< 恢复QSS主题默认chunk颜色
+    /** @brief 恢复QSS主题默认chunk颜色 */
+    void resetChunkColor() {
         m_customChunkColor = false;
         m_chunkColor = QColor();
         emit chunkColorChanged();
         update();
     }
 
-    void setValue(int value) { ++m_totalValueUpdates; QProgressBar::setValue(value); } ///< 重写setValue，增加统计
-    quint64 totalAnimations() const { return m_totalAnimations; }  ///< 动画播放总次数
-    quint64 totalValueUpdates() const { return m_totalValueUpdates; } ///< 值更新总次数
-    void resetStatistics() { m_totalAnimations = 0; m_totalValueUpdates = 0; } ///< 重置统计计数器
+    /** @brief 重写setValue，增加统计计数 @param value 新进度值 */
+    void setValue(int value) { ++m_totalValueUpdates; QProgressBar::setValue(value); }
 
-    void startShimmer() {                   ///< 启动shimmer流动动画(2000ms循环)
+    /** @brief 获取动画播放总次数 @return 动画计数 */
+    quint64 totalAnimations() const { return m_totalAnimations; }
+
+    /** @brief 获取值更新总次数 @return 更新计数 */
+    quint64 totalValueUpdates() const { return m_totalValueUpdates; }
+
+    /** @brief 重置统计计数器 */
+    void resetStatistics() { m_totalAnimations = 0; m_totalValueUpdates = 0; }
+
+    /** @brief 启动shimmer流动动画(2000ms循环) */
+    void startShimmer() {
         stopShimmer();
         ++m_totalAnimations;
         m_shimmerAnim = new QPropertyAnimation(this, "shimmerOffset");
@@ -74,7 +91,8 @@ public:
         m_shimmerAnim->start(QAbstractAnimation::DeleteWhenStopped);
     }
 
-    void stopShimmer() {                    ///< 停止shimmer动画(置nullptr防悬空指针)
+    /** @brief 停止shimmer动画(置nullptr防悬空指针) */
+    void stopShimmer() {
         if (m_shimmerAnim) {
             m_shimmerAnim->stop();
             m_shimmerAnim = nullptr;

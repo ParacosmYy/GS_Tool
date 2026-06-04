@@ -42,7 +42,7 @@ public:
 
     /** @brief 设置数据连接 @param conn 连接实例(外部管理生命周期) */
     void setConnection(IConnection* conn);
-    /** @brief 开始OTA传输，自动检测BIN/HEX并转BIN @param protocol "xmodem-crc"等 */
+    /** @brief 开始OTA传输，自动检测BIN/HEX并转BIN @param filePath 固件文件路径 @param protocol 协议名(如"xmodem-crc"，默认"xmodem-crc") @return true=启动成功 */
     bool startTransfer(const QString& filePath, const QString& protocol = "xmodem-crc");
     /** @brief 取消当前传输 */
     void cancelTransfer();
@@ -61,24 +61,24 @@ public:
     QString currentProtocolName() const;
 
     // ---- 统计 ----
-    /** @brief 获取传输尝试总次数 */
+    /** @brief 获取传输尝试总次数 @return 总次数 */
     quint64 totalTransfers() const;
-    /** @brief 获取成功传输次数 */
+    /** @brief 获取成功传输次数 @return 成功次数 */
     quint64 successfulTransfers() const;
-    /** @brief 获取失败传输次数 */
+    /** @brief 获取失败传输次数 @return 失败次数 */
     quint64 failedTransfers() const;
-    /** @brief 获取累计传输字节数 */
+    /** @brief 获取累计传输字节数 @return 字节总数 */
     quint64 totalBytesTransferred() const;
-    /** @brief 获取累计CRC校验验证次数 */
+    /** @brief 获取累计CRC校验验证次数 @return 校验次数 */
     quint64 totalCrcChecks() const;
-    /** @brief 获取历史平均传输速率(字节/秒) */
+    /** @brief 获取历史平均传输速率 @return 速率(字节/秒) */
     double averageSpeed() const;
     /** @brief 重置统计(不影响历史记录) */
     void resetTransferStatistics();
 
-    /** @brief 验证固件文件(存在/可读/大小限制) */
+    /** @brief 验证固件文件(存在/可读/大小限制) @param filePath 文件路径 @param errorMsg 输出: 错误描述 @return true=有效 */
     bool validateFilePath(const QString& filePath, QString& errorMsg) const;
-    /** @brief 检测文件类型(.bin→Binary, .hex→IntelHex) */
+    /** @brief 检测文件类型(.bin->Binary, .hex->IntelHex) @param filePath 文件路径 @return 文件类型枚举 */
     FirmwareType detectFirmwareType(const QString& filePath) const;
 
     /**

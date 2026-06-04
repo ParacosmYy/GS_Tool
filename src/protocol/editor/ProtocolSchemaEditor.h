@@ -84,9 +84,11 @@ private:
     ProtocolSchema *m_schema;     ///< 当前编辑的协议定义
 
     // ---- 统计计数器 ----
-    quint64 m_totalSchemasLoaded = 0;  ///< 加载协议总次数
-    quint64 m_totalSchemasSaved = 0;   ///< 保存协议总次数
-    quint64 m_totalValidations = 0;    ///< 验证操作总次数
+    quint64 m_totalSchemasLoaded = 0;       ///< 加载协议总次数
+    quint64 m_totalSchemasSaved = 0;        ///< 保存协议总次数
+    quint64 m_totalValidations = 0;         ///< 验证操作总次数
+    quint64 m_totalValidationFailures = 0;  ///< 验证失败次数
+    quint64 m_totalJsonEdits = 0;           ///< JSON编辑修改次数
 
 public:
     /** @brief 获取加载协议总次数 @return 加载计数 */
@@ -95,6 +97,10 @@ public:
     quint64 totalSchemasSaved() const { return m_totalSchemasSaved; }
     /** @brief 获取验证操作总次数 @return 验证计数 */
     quint64 totalValidations() const { return m_totalValidations; }
+    /** @brief 获取验证失败次数 @return 失败计数 */
+    quint64 totalValidationFailures() const { return m_totalValidationFailures; }
+    /** @brief 获取JSON编辑修改次数 @return 编辑计数 */
+    quint64 totalJsonEdits() const { return m_totalJsonEdits; }
     /** @brief 重置协议编辑器统计计数器 */
     void resetSchemaEditorStatistics();
 };

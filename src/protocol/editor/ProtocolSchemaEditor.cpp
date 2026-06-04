@@ -86,6 +86,10 @@ void ProtocolSchemaEditor::setupUI()
     connect(m_validateBtn, &QPushButton::clicked,
             this, &ProtocolSchemaEditor::validateJson);
 
+    connect(m_jsonEditor, &QTextEdit::textChanged, this, [this]() {
+        ++m_totalJsonEdits;
+    });
+
     connect(saveBtn, &QPushButton::clicked, this, [this]() {
         ++m_totalSchemasSaved;  ///< 统计: 保存协议
         emit saveRequested(m_jsonEditor->toPlainText());
@@ -137,6 +141,7 @@ void ProtocolSchemaEditor::validateJson()
         m_statusLabel->setProperty("validationState",
                                    QStringLiteral("valid"));
     } else {
+        ++m_totalValidationFailures;
         m_statusLabel->setText(
             tr("✗ 错误: %1").arg(tmpSchema->lastError()));
         m_statusLabel->setProperty("validationState",

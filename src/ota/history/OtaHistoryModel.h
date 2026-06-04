@@ -78,17 +78,17 @@ public:
     /** @brief 从SettingsManager加载历史记录 */
     void loadFromSettings();
 
-    /** @brief 获取成功传输次数 */
+    /** @brief 获取成功传输次数 @return 成功次数 */
     int successCount() const;
-    /** @brief 获取失败传输次数 */
+    /** @brief 获取失败传输次数 @return 失败次数 */
     int failureCount() const;
-    /** @brief 获取成功率（0.0~1.0） */
+    /** @brief 获取成功率 @return 比率(0.0~1.0) */
     double successRate() const;
-    /** @brief 获取累计传输总字节数 */
+    /** @brief 获取累计传输总字节数 @return 字节总数 */
     qint64 totalBytesTransferred() const;
-    /** @brief 获取平均传输耗时（毫秒） */
+    /** @brief 获取平均传输耗时 @return 毫秒数 */
     qint64 averageDurationMs() const;
-    /** @brief 生成统计摘要文本 */
+    /** @brief 生成统计摘要文本 @return 多行摘要字符串 */
     QString statisticsSummary() const;
 
     // ── 统计计数器 Getter ──

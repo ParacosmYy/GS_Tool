@@ -84,29 +84,35 @@ public:
     void resetRecordingStatistics();
 
 signals:
-    /** @brief 状态栏消息通知 */
+    /** @brief 状态栏消息通知 @param msg 消息文本 @param timeoutMs 显示时长(毫秒，0=默认) */
     void statusMessage(const QString& msg, int timeoutMs = 0);
 
-    /** @brief 回放数据输出信号 */
+    /** @brief 回放数据输出信号 @param data 回放的字节数据 @param direction 方向标识 */
     void playbackData(const QByteArray& data, qint64 direction);
 
-    /** @brief 请求添加书签信号 */
+    /** @brief 请求添加书签信号 @param label 书签标签文本 */
     void addBookmarkRequested(const QString& label);
 
 private slots:
     /** @brief 录制按钮切换处理: 开始/暂停/继续录制 */
     void onToggleRecording();
+
     /** @brief 停止录制按钮处理 */
     void onStopRecording();
+
     /** @brief 打开日志文件并开始回放 */
     void onOpenPlayback();
+
     /** @brief 停止当前回放 */
     void onStopPlayback();
-    /** @brief 回放数据转发 */
+
+    /** @brief 回放数据转发 @param data 回放数据 @param direction 方向标识 */
     void onPlaybackData(const QByteArray& data, qint64 direction);
-    /** @brief 回放进度更新 */
+
+    /** @brief 回放进度更新 @param percent 完成百分比(0.0~1.0) */
     void onPlaybackProgress(qreal percent);
-    /** @brief 录制停止通知 */
+
+    /** @brief 录制停止通知 @param filePath 日志文件路径 @param count 录制的数据条数 @param durationMs 录制时长(毫秒) */
     void onRecordingStopped(const QString& filePath, int count, qint64 durationMs);
 
 private:

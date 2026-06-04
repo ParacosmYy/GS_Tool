@@ -124,6 +124,12 @@ signals:
     quint64 totalClipboardChanges() const;
     /** @brief 获取累计固定条目次数 @return 计数 */
     quint64 totalPins() const;
+    /** @brief 获取累计取消固定条目次数 @return 计数 */
+    quint64 totalUnpins() const { return m_totalUnpins; }
+    /** @brief 获取累计清空历史次数 @return 计数 */
+    quint64 totalClears() const { return m_totalClears; }
+    /** @brief 获取累计溢出淘汰条目数 @return 计数 */
+    quint64 totalEvictions() const { return m_totalEvictions; }
     /** @brief 重置所有剪贴板管理器统计计数器 */
     void resetClipboardStatistics();
 
@@ -140,4 +146,7 @@ private:
     quint64 m_totalSystemWrites = 0;      ///< 累计系统剪贴板写入次数
     quint64 m_totalClipboardChanges = 0;  ///< 累计系统剪贴板变更事件次数
     quint64 m_totalPins = 0;              ///< 累计固定条目次数
+    quint64 m_totalUnpins = 0;            ///< 累计取消固定条目次数
+    quint64 m_totalClears = 0;            ///< 累计清空历史次数
+    quint64 m_totalEvictions = 0;         ///< 累计溢出淘汰条目数
 };

@@ -107,6 +107,7 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
             ++m_totalBusResets;
             emit disconnectRequested();
         } else {
+            ++m_totalConnectAttempts;
             emit connectRequested();
         }
     });
@@ -114,10 +115,10 @@ CanConfigPanel::CanConfigPanel(QWidget* parent)
     /* ── 配置变更计数 ── */
     auto countChange = [this]() { ++m_totalConfigChanges; };
     connect(m_adapterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, countChange);
+            this, [this]() { ++m_totalConfigChanges; ++m_totalAdapterSwitches; });
     connect(m_bitrateCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, countChange);
-    connect(m_canFdCheck, &QCheckBox::stateChanged, this, countChange);
+            this, [this]() { ++m_totalConfigChanges; ++m_totalBitrateChanges; });
+    connect(m_canFdCheck, &QCheckBox::checkStateChanged, this, [this]() { ++m_totalConfigChanges; ++m_totalCanFdToggles; });
     connect(m_samplePointSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             this, countChange);
     connect(m_sjwSpin, QOverload<int>::of(&QSpinBox::valueChanged),

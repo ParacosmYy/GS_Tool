@@ -102,13 +102,26 @@ protected:
     virtual void handleTimeout() = 0;
 
     // === 工具方法 ===
-    void finishTransfer();              ///< 完成传输(Done+transferComplete)
-    void markIdle();                    ///< 重置为Idle
-    void markDone();                    ///< 设置为Done
-    void markError();                   ///< 设置为Error
 
+    /** @brief 完成传输(Done+transferComplete) */
+    void finishTransfer();
+
+    /** @brief 重置为Idle状态 */
+    void markIdle();
+
+    /** @brief 设置为Done状态 */
+    void markDone();
+
+    /** @brief 设置为Error状态 */
+    void markError();
+
+    /** @brief 查询是否为Idle状态 @return true=Idle */
     bool isIdle() const { return m_transferState == TransferState::Idle; }
+
+    /** @brief 查询是否为Done状态 @return true=Done */
     bool isDone() const { return m_transferState == TransferState::Done; }
+
+    /** @brief 查询是否为Error状态 @return true=Error */
     bool isError() const { return m_transferState == TransferState::Error; }
 
 private slots:

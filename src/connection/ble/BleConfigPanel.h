@@ -46,6 +46,15 @@ public:
     /** @brief 获取累计设备选择次数 */
     quint64 totalDeviceSelections() const { return m_totalDeviceSelections; }
 
+    /** @brief 获取累计连接尝试次数 */
+    quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
+
+    /** @brief 获取累计发现的设备总数 */
+    quint64 totalDevicesDiscovered() const { return m_totalDevicesDiscovered; }
+
+    /** @brief 获取累计地址手动编辑次数 */
+    quint64 totalAddressEdits() const { return m_totalAddressEdits; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
@@ -109,6 +118,9 @@ private:
     // ---- 统计计数器 ----
     quint64 m_totalScansInitiated = 0;    ///< 累计发起扫描次数
     quint64 m_totalDeviceSelections = 0;  ///< 累计设备选择次数
+    quint64 m_totalConnectAttempts = 0;   ///< 累计连接尝试次数
+    quint64 m_totalDevicesDiscovered = 0; ///< 累计发现的设备总数
+    quint64 m_totalAddressEdits = 0;      ///< 累计地址手动编辑次数
 };
 
 #endif // BLECONFIGPANEL_H
