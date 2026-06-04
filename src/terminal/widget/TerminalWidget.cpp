@@ -3,7 +3,9 @@
  * @brief 自绘制终端控件实现 — 构造/配置/搜索/缓存格式化
  *
  * 渲染逻辑(paintEvent, paintLine)已拆分至 TerminalWidgetPaint.cpp。
- * 事件处理/槽函数/右键菜单/统计计数已拆分至 TerminalWidgetSlots.cpp。
+ * 输入事件处理(resizeEvent, wheelEvent, mousePress/Move/ReleaseEvent,
+ * keyPressEvent)已拆分至 TerminalWidgetEvents.cpp。
+ * 槽函数/右键菜单/统计计数已拆分至 TerminalWidgetSlots.cpp。
  * 本文件保留: 构造/析构、模型配置、方向过滤、显示模式、搜索委托、
  * 缓存格式化(formatToCache)。
  */

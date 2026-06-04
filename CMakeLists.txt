@@ -38,6 +38,7 @@ set(SOURCES
     src/core/mainwindow/MainWindowPanelConnect.cpp
     src/core/mainwindow/MainWindowLifecycle.cpp
     src/core/connect/ConnectionController.cpp
+    src/core/connect/ConnectionControllerLifecycle.cpp
     src/core/connect/ConnectionControllerQuery.cpp
     src/core/connect/ConnectionControllerReconnect.cpp
     src/core/connect/ConnectionControllerHandlers.cpp
@@ -102,6 +103,7 @@ set(SOURCES
     src/connection/network/TcpConnectionHandlers.cpp
     src/connection/network/UdpConnection.cpp
     src/terminal/widget/TerminalWidget.cpp
+    src/terminal/widget/TerminalWidgetEvents.cpp
     src/terminal/widget/TerminalWidgetSlots.cpp
     src/terminal/widget/TerminalWidgetPaint.cpp
     src/terminal/model/TerminalModel.cpp
@@ -369,6 +371,7 @@ set(SOURCES
     # ── F19: Protobuf/FlatBuffers 解码 ──
     src/protocol/protobuf/ProtobufDecoder.cpp
     src/protocol/protobuf/ProtobufDecoderEncoding.cpp
+    src/protocol/protobuf/ProtobufDecoderVarint.cpp
     src/protocol/protobuf/ProtobufDecoderHelpers.cpp
     src/protocol/protobuf/FlatBuffersDecoder.cpp
     src/protocol/protobuf/FlatBuffersDecoderFields.cpp
