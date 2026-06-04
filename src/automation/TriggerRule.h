@@ -16,6 +16,7 @@
 
 #include <QString>
 #include <QByteArray>
+#include <QCoreApplication>
 #include <QJsonObject>
 
 /**
@@ -64,7 +65,7 @@ struct TriggerRuleConfig {
     static TriggerRuleConfig createDefault()
     {
         TriggerRuleConfig config;
-        config.name = QStringLiteral("新规则");
+        config.name = QCoreApplication::translate("TriggerRule", "新规则");
         config.matchMode = MatchMode::ExactString;
         config.pattern = QString();
         config.valueMin = 0;

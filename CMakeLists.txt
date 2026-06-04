@@ -32,6 +32,7 @@ find_package(Qt6 REQUIRED COMPONENTS
 set(SOURCES
     src/main.cpp
     src/core/mainwindow/MainWindow.cpp
+    src/core/mainwindow/MainWindowInit.cpp
     src/core/mainwindow/MainWindowSetupUI.cpp
     src/core/mainwindow/MainWindowSignalConnect.cpp
     src/core/mainwindow/MainWindowPanelConnect.cpp
