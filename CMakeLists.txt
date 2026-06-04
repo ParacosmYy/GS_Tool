@@ -209,6 +209,7 @@ set(SOURCES
     # ── F1: 数据录制回放 ──
     src/core/recording/RecordingTimeline.cpp
     src/core/recording/PlaybackController.cpp
+    src/core/recording/PlaybackControllerSpeed.cpp
     src/core/recording/PlaybackWidget.cpp
     src/core/recording/RecordingMarker.cpp
     src/utils/log/RecordingFileFormat.cpp
@@ -321,6 +322,7 @@ set(SOURCES
 
     # ── F15: TCP/UDP 增强 ──
     src/connection/tcp/TcpServerConnection.cpp
+    src/connection/tcp/TcpServerConnectionClients.cpp
     src/connection/tcp/TcpMultiConnectionManager.cpp
     src/connection/tcp/UdpMulticastConnection.cpp
     src/connection/tcp/TlsConnection.cpp

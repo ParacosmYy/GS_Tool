@@ -124,41 +124,6 @@ void TcpServerConnection::stopListening()
     updateState(ConnectionState::Disconnected);
 }
 
-/** @brief 获取已连接的客户端列表 @return 客户端"地址:端口"字符串列表 */
-QStringList TcpServerConnection::connectedClients() const
-{
-    QStringList result;
-    for (auto it = m_clients.constBegin(); it != m_clients.constEnd(); ++it) {
-        QTcpSocket* socket = it.value();
-        if (socket && socket->state() == QAbstractSocket::ConnectedState) {
-            result.append(clientInfo(socket));
-        }
-    }
-    return result;
-}
-
-/** @brief 向所有已连接客户端广播数据 @param data 待广播的字节数据 @return 成功发送的客户端数量 */
-int TcpServerConnection::broadcastToClients(const QByteArray& data)
-{
-    int count = 0;
-    for (auto it = m_clients.begin(); it != m_clients.end(); ++it) {
-        QTcpSocket* socket = it.value();
-        if (socket && socket->state() == QAbstractSocket::ConnectedState) {
-            qint64 written = socket->write(data);
-            if (written > 0) {
-                m_totalTxBytes += written;
-                socket->flush();
-                emit bytesWritten(written);
-                count++;
-            }
-        }
-    }
-    if (count > 0) {
-        ++m_broadcastCount;
-    }
-    return count;
-}
-
 /** @brief 新客户端连接回调，注册socket并连接断开/数据到达/错误信号 */
 void TcpServerConnection::onNewConnection()
 {
@@ -269,54 +234,7 @@ QString TcpServerConnection::clientInfo(QTcpSocket* socket)
     return QString("%1:%2").arg(socket->peerAddress().toString()).arg(socket->peerPort());
 }
 
-/** @brief 获取历史累计连接客户端总数 @return 客户端连接总数 */
-quint64 TcpServerConnection::totalClientCount() const
-{
-    return m_totalClientCount;
-}
-
-/** @brief 获取历史累计断开客户端总数 @return 客户端断开总数 */
-quint64 TcpServerConnection::totalClientDisconnections() const
-{
-    return m_totalClientDisconnections;
-}
-
-/** @brief 获取已广播数据包总数 @return 广播次数 */
-quint64 TcpServerConnection::broadcastCount() const
-{
-    return m_broadcastCount;
-}
-
-/** @brief 获取累计接收字节数 @return 接收字节总量 */
-quint64 TcpServerConnection::totalBytesReceived() const
-{
-    return m_totalRxBytes;
-}
-
-/** @brief 获取累计发送字节数 @return 发送字节总量 */
-quint64 TcpServerConnection::totalBytesSent() const
-{
-    return m_totalTxBytes;
-}
-
-/** @brief 获取累计accept错误次数 @return accept错误总数 */
-quint64 TcpServerConnection::totalAcceptErrors() const
-{
-    return m_totalAcceptErrors;
-}
-
-/** @brief 重置所有统计计数器为零 */
-void TcpServerConnection::resetStatistics()
-{
-    m_totalClientCount = 0;
-    m_totalClientDisconnections = 0;
-    m_broadcastCount = 0;
-    m_totalRxBytes = 0;
-    m_totalTxBytes = 0;
-    m_totalAcceptErrors = 0;
-    m_totalListenAttempts = 0;
-    m_totalWrites = 0;
-    m_totalRejectedConnections = 0;
-    m_peakConnectedClients = 0;
-    m_totalErrors = 0;
-}
+// 客户端管理/统计查询方法已拆分至 TcpServerConnectionClients.cpp:
+//   connectedClients() / broadcastToClients() / totalClientCount()
+//   totalClientDisconnections() / broadcastCount() / totalBytesReceived()
+//   totalBytesSent() / totalAcceptErrors() / resetStatistics()
