@@ -47,6 +47,7 @@ bool ModbusSlave::coilValue(int addr) const {
 QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
     // 最小帧长度: slave(1)+func(1)+CRC(2) = 4字节
     if (requestData.size() < 4) {
+        ++m_totalSlaveErrors;
         return QByteArray();
     }
 
@@ -58,6 +59,7 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
                       (static_cast<quint16>(static_cast<quint8>(
                           requestData[requestData.size() - 1])) << 8);
     if (calculateCrc16(payload) != recvCrc) {
+        ++m_totalSlaveErrors;
         return QByteArray(); // CRC校验失败
     }
 
@@ -70,6 +72,7 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
 
     // 根据功能码分派处理
     QByteArray responsePayload;
+    ++m_totalRequestsHandled;
     ++m_fcStats[static_cast<int>(req.function)];
     switch (req.function) {
     case ModbusFunction::ReadHoldingRegisters:
@@ -107,6 +110,12 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
     quint16 crcVal = calculateCrc16(responsePayload);
     responsePayload.append(static_cast<char>(crcVal & 0xFF));
     responsePayload.append(static_cast<char>((crcVal >> 8) & 0xFF));
+    ++m_totalResponsesSent;
+    // 检测异常响应（功能码最高位置1）
+    if (responsePayload.size() >= 2
+        && (static_cast<quint8>(responsePayload[1]) & 0x80)) {
+        ++m_totalExceptionResponses;
+    }
     return responsePayload;
 }
 
@@ -293,16 +302,44 @@ quint64 ModbusSlave::exceptionCount() const
     return m_exceptionCount;
 }
 
+/** @brief 获取已成功处理的请求总数 @return 已处理请求数 */
+quint64 ModbusSlave::totalRequestsHandled() const
+{
+    return m_totalRequestsHandled;
+}
+
+/** @brief 获取已发送的响应帧总数 @return 响应发送总数 */
+quint64 ModbusSlave::totalResponsesSent() const
+{
+    return m_totalResponsesSent;
+}
+
+/** @brief 获取从站内部错误次数 @return 内部错误计数 */
+quint64 ModbusSlave::totalSlaveErrors() const
+{
+    return m_totalSlaveErrors;
+}
+
+/** @brief 获取异常响应发送总数 @return 异常响应计数 */
+quint64 ModbusSlave::totalExceptionResponses() const
+{
+    return m_totalExceptionResponses;
+}
+
 /** @brief 获取各功能码调用次数统计 @return 功能码→调用次数映射 */
 QMap<int, int> ModbusSlave::functionCodeStats() const
 {
     return m_fcStats;
 }
 
-/** @brief 重置所有统计计数器(请求数/异常数/功能码统计) */
+/** @brief 重置所有统计计数器(请求数/异常数/功能码统计/已处理/已发送/内部错误/异常响应) */
 void ModbusSlave::resetStatistics()
 {
     m_requestCount = 0;
     m_exceptionCount = 0;
+    m_totalRequestsHandled = 0;
+    m_totalResponsesSent = 0;
+    m_totalSlaveErrors = 0;
+    m_totalExceptionResponses = 0;
     m_fcStats.clear();
 }

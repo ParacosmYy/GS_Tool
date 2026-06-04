@@ -144,4 +144,6 @@ void CanConnection::resetStats()
     m_totalErrorFrames = 0;
     m_totalFramesFiltered = 0;
     m_totalSignalsDecoded = 0;
+    m_totalBusOffEvents = 0;
+    m_totalFiltersActive = 0;
 }

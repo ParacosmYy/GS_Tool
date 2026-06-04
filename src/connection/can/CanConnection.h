@@ -115,6 +115,10 @@ public:
     quint64 totalFramesFiltered() const { return m_totalFramesFiltered; }
     /** @brief 获取已解码的信号值总数 */
     quint64 totalSignalsDecoded() const { return m_totalSignalsDecoded; }
+    /** @brief 获取累计总线关闭(Bus-Off)事件次数 @return Bus-Off事件总数 */
+    quint64 totalBusOffEvents() const { return m_totalBusOffEvents; }
+    /** @brief 获取当前激活的帧过滤器数量 @return 激活的过滤器数量 */
+    quint64 totalFiltersActive() const { return m_totalFiltersActive; }
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -159,6 +163,8 @@ private:
     quint64 m_totalErrorFrames = 0;         ///< 错误帧计数
     quint64 m_totalFramesFiltered = 0;      ///< 被过滤器丢弃的帧数
     mutable quint64 m_totalSignalsDecoded = 0; ///< 已解码的信号值总数
+    mutable quint64 m_totalBusOffEvents = 0; ///< 累计总线关闭事件次数
+    mutable quint64 m_totalFiltersActive = 0; ///< 当前激活的帧过滤器数量
 };
 
 #endif // CANCONNECTION_H

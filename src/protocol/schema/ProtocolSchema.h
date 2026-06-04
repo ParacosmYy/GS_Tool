@@ -69,80 +69,42 @@ public:
     /** @brief 析构函数 */
     ~ProtocolSchema() override;
 
-    /**
-     * @brief 从 JSON 文件加载协议定义
-     * @param filePath JSON 文件路径
-     * @return 加载成功返回 true
-     */
+    /** @brief 从 JSON 文件加载协议定义 @param filePath JSON 文件路径 @return 加载成功返回 true */
     bool loadFromJson(const QString &filePath);
 
-    /**
-     * @brief 从 JSON 字节数据加载协议定义
-     * @param jsonData JSON 格式的字节数组
-     * @return 加载成功返回 true
-     */
+    /** @brief 从 JSON 字节数据加载协议定义 @param jsonData JSON 格式的字节数组 @return 加载成功返回 true */
     bool loadFromJsonData(const QByteArray &jsonData);
 
-    /**
-     * @brief 获取协议名称
-     * @return 协议名称字符串
-     */
+    /** @brief 获取协议名称 @return 协议名称字符串 */
     QString name() const;
 
-    /**
-     * @brief 获取帧定界规则
-     * @return 当前帧定界规则
-     */
+    /** @brief 获取帧定界规则 @return 当前帧定界规则 */
     FramingRule framing() const;
 
-    /**
-     * @brief 获取所有字段定义
-     * @return 字段定义列表
-     */
+    /** @brief 获取所有字段定义 @return 字段定义列表 */
     QList<FieldDefinition> fields() const;
 
-    /**
-     * @brief 检查协议定义是否有效
-     * @return 有效返回 true
-     */
+    /** @brief 检查协议定义是否有效 @return 有效返回 true */
     bool isValid() const;
 
-    /**
-     * @brief 将当前协议定义序列化为 JSON 对象
-     * @return 包含完整协议定义的 QJsonObject
-     */
+    /** @brief 将当前协议定义序列化为 JSON 对象 @return 包含完整协议定义的 QJsonObject */
     QJsonObject toJson() const;
 
-    /**
-     * @brief 获取最近一次解析错误的描述信息
-     * @return 错误描述字符串，无错误时为空
-     */
+    /** @brief 获取最近一次解析错误的描述信息 @return 错误描述字符串，无错误时为空 */
     QString lastError() const;
 
     /* —— 可编程构造用 setter —— */
 
-    /**
-     * @brief 设置协议名称
-     * @param name 协议名称
-     */
+    /** @brief 设置协议名称 @param name 协议名称 */
     void setName(const QString &name);
 
-    /**
-     * @brief 设置帧定界规则
-     * @param rule 帧定界规则
-     */
+    /** @brief 设置帧定界规则 @param rule 帧定界规则 */
     void setFraming(const FramingRule &rule);
 
-    /**
-     * @brief 追加一个字段定义
-     * @param field 字段定义
-     */
+    /** @brief 追加一个字段定义 @param field 字段定义 */
     void addField(const FieldDefinition &field);
 
-    /**
-     * @brief 设置协议定义是否有效
-     * @param valid 有效标志
-     */
+    /** @brief 设置协议定义是否有效 @param valid 有效标志 */
     void setValid(bool valid);
 
     /* —— 统计计数器接口 —— */
@@ -162,6 +124,12 @@ public:
     /** @brief 获取协议定义校验失败次数 */
     quint64 validationErrors() const;
 
+    /** @brief 获取协议定义加载失败次数（文件读取/格式错误） @return 加载失败计数 */
+    quint64 totalSchemaErrors() const;
+
+    /** @brief 获取当前活跃的协议定义数量（已加载且有效） @return 活跃协议数 */
+    quint64 totalActiveSchemas() const;
+
     /** @brief 重置所有统计计数器 */
     void resetSchemaStatistics();
 
@@ -180,19 +148,13 @@ private:
     quint64 m_maxSchemaSize = 0;        ///< 历史最大协议定义大小(字节)
     quint64 m_totalValidations = 0;     ///< 协议定义校验执行总次数
     quint64 m_validationErrors = 0;     ///< 协议定义校验失败次数
+    quint64 m_totalSchemaErrors = 0;    ///< 协议定义加载失败次数（文件读取/格式错误）
+    quint64 m_totalActiveSchemas = 0;   ///< 当前活跃的协议定义数量（已加载且有效）
 
-    /**
-     * @brief 将校验类型枚举转换为字符串
-     * @param type 校验算法枚举值
-     * @return 字符串标识
-     */
+    /** @brief 将校验类型枚举转换为字符串 @param type 校验算法枚举值 @return 字符串标识 */
     QString checksumTypeToString(ChecksumType type) const;
 
-    /**
-     * @brief 将字符串转换为校验类型枚举
-     * @param str 校验算法字符串标识
-     * @return 对应的枚举值
-     */
+    /** @brief 将字符串转换为校验类型枚举 @param str 校验算法字符串标识 @return 对应的枚举值 */
     ChecksumType checksumTypeFromString(const QString &str) const;
 };
 

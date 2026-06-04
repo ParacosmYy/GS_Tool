@@ -116,6 +116,12 @@ public:
     /** @brief 获取指定功能码的调用次数 @param fc 功能码 */
     quint64 functionCodeCount(int fc) const;
 
+    /** @brief 获取累计Modbus异常响应次数（功能码最高位置1的响应） @return 异常响应数 */
+    quint64 totalExceptions() const;
+
+    /** @brief 获取累计重试发送次数 @return 重试次数 */
+    quint64 totalRetries() const;
+
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -180,6 +186,8 @@ private:
     quint64 m_totalResponses   = 0;       ///< 累计接收有效响应总数
     quint64 m_totalTimeouts    = 0;       ///< 累计超时次数
     quint64 m_totalErrors      = 0;       ///< 累计Modbus异常响应总数
+    quint64 m_totalExceptions  = 0;       ///< 累计Modbus异常响应次数（功能码最高位置1）
+    quint64 m_totalRetries     = 0;       ///< 累计重试发送次数
     quint64 m_successfulReads  = 0;       ///< 累计读操作成功次数
     quint64 m_failedReads      = 0;       ///< 累计读操作失败次数
     quint64 m_successfulWrites = 0;       ///< 累计写操作成功次数

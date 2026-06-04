@@ -30,6 +30,7 @@ bool ProtocolSchema::loadFromJson(const QString &filePath)
     if (!file.open(QIODevice::ReadOnly)) {
         m_valid = false;
         m_lastError = tr("无法打开文件: %1").arg(filePath);
+        ++m_totalSchemaErrors;
         return false;
     }
 
@@ -39,6 +40,7 @@ bool ProtocolSchema::loadFromJson(const QString &filePath)
     if (data.isEmpty()) {
         m_valid = false;
         m_lastError = tr("文件内容为空: %1").arg(filePath);
+        ++m_totalSchemaErrors;
         return false;
     }
 
@@ -58,11 +60,13 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     if (doc.isNull()) {
         m_lastError = tr("JSON 解析失败: %1").arg(parseError.errorString());
         ++m_validationErrors;
+        ++m_totalSchemaErrors;
         return false;
     }
     if (!doc.isObject()) {
         m_lastError = tr("JSON 根元素必须是对象");
         ++m_validationErrors;
+        ++m_totalSchemaErrors;
         return false;
     }
 
@@ -72,11 +76,13 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     if (!root.contains(QStringLiteral("name"))) {
         m_lastError = tr("缺少必填字段: name");
         ++m_validationErrors;
+        ++m_totalSchemaErrors;
         return false;
     }
     if (!root.value(QStringLiteral("name")).isString()) {
         m_lastError = tr("字段 name 必须为字符串类型");
         ++m_validationErrors;
+        ++m_totalSchemaErrors;
         return false;
     }
     m_name = root.value(QStringLiteral("name")).toString();
@@ -85,11 +91,13 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     if (!root.contains(QStringLiteral("framing"))) {
         m_lastError = tr("缺少必填字段: framing");
         ++m_validationErrors;
+        ++m_totalSchemaErrors;
         return false;
     }
     if (!root.value(QStringLiteral("framing")).isObject()) {
         m_lastError = tr("字段 framing 必须为对象类型");
         ++m_validationErrors;
+        ++m_totalSchemaErrors;
         return false;
     }
 
@@ -99,6 +107,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
     if (!framingObj.contains(QStringLiteral("type"))) {
         m_lastError = tr("framing 中缺少必填字段: type");
         ++m_validationErrors;
+        ++m_totalSchemaErrors;
         return false;
     }
     m_framing.type = framingObj.value(QStringLiteral("type")).toString();
@@ -140,6 +149,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
         if (!root.value(QStringLiteral("fields")).isArray()) {
             m_lastError = tr("字段 fields 必须为数组类型");
             ++m_validationErrors;
+            ++m_totalSchemaErrors;
             return false;
         }
 
@@ -148,6 +158,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
             if (!fieldsArr.at(i).isObject()) {
                 m_lastError = tr("fields[%1] 必须为对象类型").arg(i);
                 ++m_validationErrors;
+                ++m_totalSchemaErrors;
                 return false;
             }
 
@@ -162,11 +173,13 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
             if (field.name.isEmpty()) {
                 m_lastError = tr("fields[%1] 缺少有效的 name 字段").arg(i);
                 ++m_validationErrors;
+                ++m_totalSchemaErrors;
                 return false;
             }
             if (field.size <= 0) {
                 m_lastError = tr("fields[%1] 的 size 必须大于 0").arg(i);
                 ++m_validationErrors;
+                ++m_totalSchemaErrors;
                 return false;
             }
 
@@ -178,6 +191,7 @@ bool ProtocolSchema::loadFromJsonData(const QByteArray &jsonData)
 
     /* 统计计数器更新 */
     ++m_totalSchemas;
+    ++m_totalActiveSchemas;
     m_totalFieldCount += static_cast<quint64>(m_fields.size());
     quint64 schemaSize = static_cast<quint64>(jsonData.size());
     if (schemaSize > m_maxSchemaSize) {
@@ -352,7 +366,19 @@ quint64 ProtocolSchema::validationErrors() const
     return m_validationErrors;
 }
 
-/** @brief 重置所有Schema统计计数器(加载数/字段数/最大大小/校验) */
+/** @brief 获取协议定义加载失败次数 @return 加载失败计数 */
+quint64 ProtocolSchema::totalSchemaErrors() const
+{
+    return m_totalSchemaErrors;
+}
+
+/** @brief 获取当前活跃的协议定义数量 @return 活跃协议数 */
+quint64 ProtocolSchema::totalActiveSchemas() const
+{
+    return m_totalActiveSchemas;
+}
+
+/** @brief 重置所有Schema统计计数器(加载数/字段数/最大大小/校验/错误/活跃数) */
 void ProtocolSchema::resetSchemaStatistics()
 {
     m_totalSchemas = 0;
@@ -360,6 +386,8 @@ void ProtocolSchema::resetSchemaStatistics()
     m_maxSchemaSize = 0;
     m_totalValidations = 0;
     m_validationErrors = 0;
+    m_totalSchemaErrors = 0;
+    m_totalActiveSchemas = 0;
 }
 
 /** @brief 重置所有统计计数器（别名，调用resetSchemaStatistics） */

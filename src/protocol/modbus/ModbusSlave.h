@@ -69,6 +69,18 @@ public:
     /** @brief 获取异常响应计数 */
     quint64 exceptionCount() const;
 
+    /** @brief 获取已成功处理的请求总数（地址匹配+CRC通过） @return 已处理请求数 */
+    quint64 totalRequestsHandled() const;
+
+    /** @brief 获取已发送的响应帧总数（含正常+异常） @return 响应发送总数 */
+    quint64 totalResponsesSent() const;
+
+    /** @brief 获取从站内部错误次数（CRC失败/帧过短等） @return 内部错误计数 */
+    quint64 totalSlaveErrors() const;
+
+    /** @brief 获取异常响应发送总数（功能码最高位置1的响应） @return 异常响应计数 */
+    quint64 totalExceptionResponses() const;
+
     /** @brief 获取各功能码调用次数统计 */
     QMap<int, int> functionCodeStats() const;
 
@@ -108,6 +120,14 @@ private:
     quint64 m_requestCount = 0;
     /** @brief 异常响应计数 */
     quint64 m_exceptionCount = 0;
+    /** @brief 已成功处理的请求总数（地址匹配+CRC通过） */
+    quint64 m_totalRequestsHandled = 0;
+    /** @brief 已发送的响应帧总数（含正常+异常） */
+    quint64 m_totalResponsesSent = 0;
+    /** @brief 从站内部错误次数（CRC失败/帧过短等） */
+    quint64 m_totalSlaveErrors = 0;
+    /** @brief 异常响应发送总数（功能码最高位置1的响应） */
+    quint64 m_totalExceptionResponses = 0;
     /** @brief 各功能码调用次数 */
     QMap<int, int> m_fcStats;
 };

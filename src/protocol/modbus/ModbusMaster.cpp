@@ -180,6 +180,8 @@ void ModbusMaster::onRawDataReceived(const QByteArray& data) {
 /** @brief 超时回调：按读写类型分类递增失败计数并发射timeout信号 */
 void ModbusMaster::onTimeout() {
     ++m_totalTimeouts;
+    // 超时后若自动重发则计入重试统计
+    ++m_totalRetries;
     // 按读写分类统计失败
     if (isReadFunction(m_lastFunction)) {
         ++m_failedReads;
@@ -214,6 +216,7 @@ void ModbusMaster::parseResponse(const QByteArray& data) {
 
     if (frame.exception) {
         ++m_totalErrors;
+        ++m_totalExceptions;
         if (isReadFunction(fc)) {
             ++m_failedReads;
         } else if (isWriteFunction(fc)) {
@@ -264,6 +267,12 @@ quint64 ModbusMaster::totalTimeouts() const { return m_totalTimeouts; }
 /** @brief 获取累计Modbus异常响应总数 @return 错误数 */
 quint64 ModbusMaster::totalErrors() const { return m_totalErrors; }
 
+/** @brief 获取累计Modbus异常响应次数（功能码最高位置1的响应） @return 异常响应数 */
+quint64 ModbusMaster::totalExceptions() const { return m_totalExceptions; }
+
+/** @brief 获取累计重试发送次数 @return 重试次数 */
+quint64 ModbusMaster::totalRetries() const { return m_totalRetries; }
+
 /** @brief 获取累计读操作成功次数 @return 成功读次数 */
 quint64 ModbusMaster::successfulReads() const { return m_successfulReads; }
 
@@ -287,6 +296,8 @@ void ModbusMaster::resetStats() {
     m_totalResponses   = 0;
     m_totalTimeouts    = 0;
     m_totalErrors      = 0;
+    m_totalExceptions  = 0;
+    m_totalRetries     = 0;
     m_successfulReads  = 0;
     m_failedReads      = 0;
     m_successfulWrites = 0;

@@ -60,6 +60,7 @@
 | 212 | TimedSender统计增强+TrafficMonitor头文件修正 | 定时发送/字节/错误统计+流量监控getter修正 |
 | 213 | TriggerEngine+ThemeManager+SendController+SessionManager统计增强 | 触发器评估/执行/错误+主题缓存命中/未命中+发送宏执行+会话创建/删除 |
 | 214 | ZModemTransferProtocol/DataStatisticsDisplay拆分 | ZModem协议独立+数据统计显示独立 |
+| 215 | ModbusMaster+ModbusSlave+CanConnection+ProtocolSchema统计增强 | Modbus主站请求/响应/超时/异常+从站处理/响应/错误+CAN帧错误+模式加载/验证/错误 |
 
 ---
 
