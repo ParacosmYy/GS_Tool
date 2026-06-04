@@ -104,6 +104,7 @@
 | 268 | OtaHistoryModelStats/SerialDetectorQuery/DataDiffWidgetDiff/RecordingMarkerQuery拆分 | OTA统计摘要独立(OtaHistoryModel 260→143行)+串口多维度查询独立(SerialDetector 261→176行)+LCS差异算法独立(DataDiffWidget 263→137行)+标记查询导航独立(RecordingMarker 260→66行) |
 | 269 | OtaManagerSignals/UdpMulticastGroup/TerminalModelStats/TlsConnectionSetup拆分 | OTA信号连接/传输控制独立(OtaManager 257→63行)+UDP组播组管理独立(UdpMulticast 255→168行)+终端统计独立(TerminalModel 247→222行)+TLS证书/SSL回调独立(TlsConnection 259→194行) |
 | 270 | RegisterEditorStats/SpiConnectionConfig/DragDropHelperEvents/SpiI2cBridgeManagerQueue拆分 | 寄存器日志/统计独立(RegisterEditor 265→207行)+SPI配置/帧组装独立(SpiConnection 260→122行)+拖放事件处理独立(DragDropHelper 259→103行)+桥接事务队列独立(SpiI2cBridgeManager 240→78行) |
+| 271 | ChecksumPanelSlots/TimestampPanelConvert/ModbusMasterProtocol/QuickCommandBarDialog拆分 | 校验槽函数/拖放独立(ChecksumPanel 268→137行)+时间戳转换独立(TimestampPanel 264→108行)+Modbus帧协议独立(ModbusMaster 253→114行)+快捷指令编辑对话框独立(QuickCommandBar 238→55行) |
 
 ---
 

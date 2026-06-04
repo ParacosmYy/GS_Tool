@@ -132,6 +132,7 @@ set(SOURCES
     src/serial/config/SerialConfigPanelConfig.cpp
     src/serial/commands/QuickCommandBar.cpp
     src/serial/commands/QuickCommandBarActions.cpp
+    src/serial/commands/QuickCommandBarDialog.cpp
     src/serial/data/BookmarkWidget.cpp
     src/serial/commands/TimedSender.cpp
     src/serial/commands/SendHistory.cpp
@@ -403,6 +404,7 @@ set(SOURCES
     # ── F18: Modbus 主站/从站 ──
     src/protocol/modbus/ModbusMaster.cpp
     src/protocol/modbus/ModbusMasterStats.cpp
+    src/protocol/modbus/ModbusMasterProtocol.cpp
     src/protocol/modbus/ModbusSlave.cpp
     src/protocol/modbus/ModbusSlaveResponse.cpp
     src/protocol/modbus/ModbusScanWidget.cpp
@@ -445,6 +447,7 @@ set(SOURCES
     src/utils/checksum/ChecksumCalculatorStats.cpp
     src/utils/checksum/ChecksumPanel.cpp
     src/utils/checksum/ChecksumPanelAlgo.cpp
+    src/utils/checksum/ChecksumPanelSlots.cpp
 
     # ── F23: ASCII/表格转换器 ──
     src/utils/converter/DataConverter.cpp
@@ -454,6 +457,7 @@ set(SOURCES
     # ── F24: 时间戳分析器 ──
     src/utils/timestamp/TimestampAnalyzer.cpp
     src/utils/timestamp/TimestampPanel.cpp
+    src/utils/timestamp/TimestampPanelConvert.cpp
 
     # ── F25: 数据包构建器 ──
     src/utils/packet/PacketBuilder.cpp
