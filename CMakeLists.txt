@@ -98,6 +98,7 @@ set(SOURCES
     src/terminal/widget/TerminalWidgetPaint.cpp
     src/terminal/model/TerminalModel.cpp
     src/terminal/search/TerminalSearchBar.cpp
+    src/terminal/search/TerminalSearchBarHistory.cpp
     src/terminal/types/DirectionFilter.cpp
     src/terminal/layout/TerminalLayoutManager.cpp
     src/terminal/layout/TerminalLayoutSplit.cpp
@@ -146,6 +147,7 @@ set(SOURCES
     src/chart/scale/YAxisManager.cpp
     src/chart/overlay/CursorOverlay.cpp
     src/chart/overlay/CursorOverlayPaint.cpp
+    src/chart/overlay/CursorOverlayInteraction.cpp
     src/chart/zoom/ZoomController.cpp
     src/chart/zoom/ZoomControllerQuery.cpp
     src/chart/zoom/ZoomControllerStats.cpp
@@ -289,6 +291,7 @@ set(SOURCES
     # ── F14: MQTT 客户端 ──
     src/connection/mqtt/MqttConnection.cpp
     src/connection/mqtt/MqttConnectionProtocol.cpp
+    src/connection/mqtt/MqttConnectionPublish.cpp
     src/connection/mqtt/MqttTopicModel.cpp
     src/connection/mqtt/MqttTopicModelHelpers.cpp
     src/connection/mqtt/MqttTopicModelIndex.cpp

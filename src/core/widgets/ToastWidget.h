@@ -179,13 +179,13 @@ private:
     QGraphicsOpacityEffect* m_opacityEffect = nullptr; ///< 淡入淡出特效
 
     // ---- 统计计数器(静态，跨所有实例累积) ----
-    static inline quint64 s_totalShows = 0;          ///< 总显示次数
-    static inline quint64 s_totalDismisses = 0;      ///< 总消失次数
-    static inline quint64 s_totalErrors = 0;         ///< 总错误通知次数
+    static inline quint64 s_totalShows = 0;     ///< 总显示次数
+    static inline quint64 s_totalDismisses = 0; ///< 总消失次数
+    static inline quint64 s_totalErrors = 0;    ///< 总错误通知次数
 public:
-    static quint64 totalShows() { return s_totalShows; }           ///< 总显示次数
-    static quint64 totalDismisses() { return s_totalDismisses; }   ///< 总消失次数
-    static quint64 totalErrors() { return s_totalErrors; }         ///< 总错误通知次数
+    static quint64 totalShows() { return s_totalShows; }       ///< 总显示次数
+    static quint64 totalDismisses() { return s_totalDismisses; } ///< 总消失次数
+    static quint64 totalErrors() { return s_totalErrors; }     ///< 总错误通知次数
     static void resetToastStatistics() { s_totalShows = 0; s_totalDismisses = 0; s_totalErrors = 0; }
 private:
     static constexpr int kWidth = 320, kMinHeight = 48;

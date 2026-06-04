@@ -1,10 +1,4 @@
-/**
- * @file MainWindow.h
- * @brief 主窗口 — 应用程序入口界面，组装所有面板和控制器
- *
- * MainWindow像嵌入式main.c一样简洁：初始化对象→组装UI→连接信号/槽。
- * 所有业务逻辑委托给Controller/Manager类，MainWindow本身不包含业务逻辑。
- */
+/** @file MainWindow.h @brief 主窗口 -- 应用程序入口界面，组装所有面板和控制器。像嵌入式main.c一样简洁: 初始化对象->组装UI->连接信号/槽。业务逻辑委托给Controller/Manager */
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -52,84 +46,38 @@
 #include "core/layout/ResponsiveLayout.h"
 #include "core/managers/ShortcutManager.h"
 
-/**
- * @brief 主窗口 - EmbedDebug 应用的顶层窗口
- *
- * 职责: IDE布局构建 + 子Controller组装(依赖注入协调者) + 信号/槽连接
- * 不包含业务逻辑，所有逻辑委托给各 Controller。
- * 设计模式: 中介者模式(Mediator) - 协调各 Controller 交互
- * 协作: ConnectionController/SendController/NavigationController/
- *        ToolbarController/SettingsController/TerminalController/RecordingController
- */
+/** @brief 主窗口 - EmbedDebug顶层窗口。职责: IDE布局构建+子Controller组装(依赖注入协调者)+信号/槽连接。中介者模式 */
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    /**
-     * @brief 构造主窗口，初始化所有子模块并组装 UI
-     * @param parent 父窗口，默认无父级
-     */
-    explicit MainWindow(QWidget* parent = nullptr);
-
-    /** @brief 析构，QObject 父子树自动销毁所有子组件 */
-    ~MainWindow() override = default;
+    explicit MainWindow(QWidget* parent = nullptr); ///< 构造(初始化子模块+组装UI)
+    ~MainWindow() override = default;        ///< 析构(QObject父子树自动销毁)
 
 protected:
-    /**
-     * @brief 窗口关闭事件处理
-     * 在关闭前执行清理工作: 停止呼吸动画、停止录制/回放、保存设置、关闭连接
-     * @param event 关闭事件
-     */
-    void closeEvent(QCloseEvent* event) override;
+    void closeEvent(QCloseEvent* event) override; ///< 关闭事件(停动画/停录制/保存设置/关连接)
 
 private slots:
-    /** @brief 切换背景设置弹出面板的显示/隐藏 */
-    void onBgSettingsToggled();
+    void onBgSettingsToggled();              ///< 切换背景设置弹出面板
 
 private:
-    /** @brief 构建完整的 UI 布局（背景层→分割器→导航树→面板栈→发送栏） */
-    void setupUI();
-
-    /** @brief 创建左侧导航树区域(导航树+选中滑动指示器) @return 导航树区域widget */
-    QWidget* createNavigationArea();
-    /** @brief 创建右侧面板内容区域(面板栈+终端+快捷指令+发送栏) @return 内容区域widget */
-    QWidget* createContentArea();
-
-    /** @brief 创建并初始化状态栏（连接状态、RX/TX 字节数） */
-    void setupStatusBar();
-
-    /** @brief 连接所有模块间信号/槽，内部调用8个子方法按功能分组 */
-    void connectSignals();
-    /** @brief 串口连接/断开/DTR/RTS/波特率信号路由 */
-    void connectSerialSignals();
-    /** @brief 串口数据流+状态/错误信号路由 */
-    void connectSerialDataFlow();
-    /** @brief 快捷指令/发送控制器信号路由 */
-    void connectSerialSendSignals();
-    /** @brief 自动重连状态指示信号路由 */
-    void connectReconnectSignals();
-    /** @brief 工具栏/录制状态消息信号路由 */
-    void connectToolbarSignals();
-    /** @brief 搜索/协议桥/帧编辑/导航信号路由 */
-    void connectSearchAndProtocolSignals();
-    /** @brief 串口热插拔状态栏通知 */
-    void connectPortWatchSignals();
-    /** @brief 主题切换 + Toast通知信号路由 */
-    void connectThemeSignals();
-    /** @brief OTA传输Toast通知信号路由 */
-    void connectOtaSignals();
-    /** @brief 书签面板CRUD信号路由 */
-    void connectBookmarkSignals();
-
-    /**
-     * @brief 处理连接状态变更（更新状态栏、配置面板按钮、呼吸动画）
-     * @param state 新的连接状态枚举
-     * @param connName 连接名称
-     */
-    void handleConnectionState(ConnectionState state, const QString& connName);
-
-    /** @brief 从磁盘恢复用户偏好（语言、主题、面板索引、统计定时器） */
-    void restoreUserSession(int lastPanel);
+    void setupUI();                          ///< 构建完整UI布局(背景->分割器->导航树->面板栈->发送栏)
+    QWidget* createNavigationArea();         ///< 创建左侧导航树区域
+    QWidget* createContentArea();            ///< 创建右侧面板内容区域
+    void setupStatusBar();                   ///< 创建并初始化状态栏
+    void connectSignals();                   ///< 连接所有模块间信号/槽(调用8个子方法)
+    void connectSerialSignals();             ///< 串口连接/断开/DTR/RTS/波特率信号路由
+    void connectSerialDataFlow();            ///< 串口数据流+状态/错误信号路由
+    void connectSerialSendSignals();         ///< 快捷指令/发送控制器信号路由
+    void connectReconnectSignals();          ///< 自动重连状态指示信号路由
+    void connectToolbarSignals();            ///< 工具栏/录制状态消息信号路由
+    void connectSearchAndProtocolSignals();  ///< 搜索/协议桥/帧编辑/导航信号路由
+    void connectPortWatchSignals();          ///< 串口热插拔状态栏通知
+    void connectThemeSignals();              ///< 主题切换+Toast通知信号路由
+    void connectOtaSignals();                ///< OTA传输Toast通知信号路由
+    void connectBookmarkSignals();           ///< 书签面板CRUD信号路由
+    void handleConnectionState(ConnectionState state, const QString& connName); ///< 处理连接状态变更
+    void restoreUserSession(int lastPanel);  ///< 从磁盘恢复用户偏好
 
     // ---- 核心组件 ----
     ConnectionManager* m_connManager;          ///< 连接管理器(IConnection生命周期)

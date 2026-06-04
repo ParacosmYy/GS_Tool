@@ -1,23 +1,11 @@
-/**
- * @file BleConnection.h
- * @brief BLE连接实现 — 适配器模式，封装蓝牙BLE到IConnection接口
- *
- * 职责: BLE设备连接/断开、GATT服务发现、特征值读写，
- * 通过IConnection统一接口供上层使用。
- * 当前为模拟实现，真实BLE集成需链接Qt Bluetooth模块。
- */
+/** @file BleConnection.h @brief BLE连接实现 -- 适配器模式封装蓝牙BLE到IConnection接口。当前为模拟实现，真实BLE需链接Qt Bluetooth模块 */
 #ifndef BLECONNECTION_H
 #define BLECONNECTION_H
 
 #include "connection/interface/IConnection.h"
 #include <QTimer>
 
-/**
- * @brief BLE连接实现
- *
- * 封装BLE底层通信，实现IConnection统一接口。
- * 模拟连接状态转换和数据回环，GATT服务返回预设列表。
- */
+/** @brief BLE连接实现。封装BLE底层通信，模拟连接状态转换和数据回环 */
 class BleConnection : public IConnection {
     Q_OBJECT
 

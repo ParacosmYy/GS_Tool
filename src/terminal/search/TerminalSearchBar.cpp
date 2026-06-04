@@ -7,18 +7,16 @@
  *   - 收起: 36 -> 0, 150ms, QEasingCurve::InCubic
  *
  * 搜索历史通过 QCompleter 提供自动补全下拉列表。
+ *
+ * 搜索操作/历史管理/统计 见 TerminalSearchBarHistory.cpp。
  */
 
 #include "terminal/search/TerminalSearchBar.h"
 #include "shared/Constants.h"
-#include "utils/crypto/HexConverter.h"
 
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QPropertyAnimation>
-#include <QGraphicsOpacityEffect>
-#include <QRegularExpression>
-#include <QStyle>
 #include <QCompleter>
 #include <QStringListModel>
 
@@ -146,6 +144,10 @@ void TerminalSearchBar::setupUI()
             this, &TerminalSearchBar::onCloseClicked);
 }
 
+// 搜索操作/历史管理/统计(triggerSearch/onSearchTextChanged/isValidHex/
+// setResultText/updateSearchHistory/resetSearchBarStatistics)
+// 见 TerminalSearchBarHistory.cpp
+
 /** @brief 获取当前搜索输入框中的文本 */
 QString TerminalSearchBar::searchPattern() const
 {
@@ -236,101 +238,8 @@ void TerminalSearchBar::deactivate()
     m_activeAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-/**
- * @brief 搜索文本变化时验证HEX合法性并触发搜索
- * @param text 当前搜索框文本
- *
- * HEX模式下验证输入合法性，非法时显示错误样式。
- * 合法或非HEX模式时委托给 triggerSearch() 统一处理。
- */
-void TerminalSearchBar::onSearchTextChanged(const QString& text)
-{
-    // HEX模式下验证输入合法性
-    if (m_hexCheck->isChecked() && !text.isEmpty()) {
-        if (!isValidHex(text)) {
-            // 非法HEX: 通过动态属性切换错误样式
-            m_searchInput->setProperty("hasError", true);
-            m_searchInput->style()->unpolish(m_searchInput);
-            m_searchInput->style()->polish(m_searchInput);
-            m_resultLabel->setProperty("hasError", true);
-            m_resultLabel->style()->unpolish(m_resultLabel);
-            m_resultLabel->style()->polish(m_resultLabel);
-            m_resultLabel->setText(tr("非法HEX"));
-            return;
-        }
-    }
-
-    // 恢复正常样式
-    m_searchInput->setProperty("hasError", false);
-    m_searchInput->style()->unpolish(m_searchInput);
-    m_searchInput->style()->polish(m_searchInput);
-    m_resultLabel->setProperty("hasError", false);
-    m_resultLabel->style()->unpolish(m_resultLabel);
-    m_resultLabel->style()->polish(m_resultLabel);
-
-    triggerSearch();
-}
-
-/**
- * @brief 统一的搜索触发入口
- *
- * 根据当前搜索框内容和选项状态发射 searchRequested 或 searchCleared 信号。
- * 被文本变化和选项变化两种场景共用。
- */
-void TerminalSearchBar::triggerSearch()
-{
-    const QString text = m_searchInput->text();
-    if (text.isEmpty()) {
-        m_resultLabel->clear();
-        emit searchCleared();
-    } else {
-        ++m_totalSearches;
-        if (m_regexCheck->isChecked()) {
-            ++m_totalRegexSearches;
-        }
-        emit searchRequested(text, m_regexCheck->isChecked(), m_hexCheck->isChecked(),
-                             m_caseCheck->isChecked(), m_wordCheck->isChecked());
-    }
-}
-
 /** @brief 关闭按钮点击，委托给 deactivate() */
 void TerminalSearchBar::onCloseClicked()
 {
     deactivate();
-}
-
-/** @brief 验证HEX输入是否合法(委托给HexConverter::isValidHex) @param text 待验证的字符串 @return true合法 */
-bool TerminalSearchBar::isValidHex(const QString& text) const
-{
-    return HexConverter::isValidHex(text);
-}
-
-/** @brief 设置匹配结果显示文本 @param text 要显示的结果文本(如"3/15"或"非法HEX") */
-void TerminalSearchBar::setResultText(const QString& text)
-{
-    m_resultLabel->setText(text);
-}
-
-/**
- * @brief 更新搜索历史补全列表
- * @param history 最新的搜索历史列表
- *
- * 将历史列表设置到 QCompleter 的 QStringListModel 中，
- * 补全器会自动根据当前输入过滤匹配项。
- */
-void TerminalSearchBar::updateSearchHistory(const QStringList& history)
-{
-    auto* model = qobject_cast<QStringListModel*>(m_completer->model());
-    if (model) {
-        model->setStringList(history);
-    }
-}
-
-/** @brief 重置搜索栏统计计数器 */
-void TerminalSearchBar::resetSearchBarStatistics()
-{
-    m_totalSearches = 0;
-    m_totalMatches = 0;
-    m_totalReplacements = 0;
-    m_totalRegexSearches = 0;
 }

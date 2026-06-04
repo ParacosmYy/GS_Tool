@@ -1,15 +1,4 @@
-/**
- * @file TerminalLayoutManager.h
- * @brief 终端布局管理器 — 管理终端区域的组件布局和搜索栏动画
- *
- * 管理混合/左右分栏/上下分栏三种终端显示布局的切换逻辑。
- * 将分栏逻辑从MainWindow中解耦，避免MainWindow膨胀。
- *
- * 布局模式:
- *   - Mixed(混合): 搜索栏 + 主终端，所有方向数据混合显示
- *   - LeftRight(左右分栏): 搜索栏 + Splitter(RX终端 | TX终端)
- *   - TopBottom(上下分栏): 搜索栏 + Splitter(RX终端 / TX终端)
- */
+/** @file TerminalLayoutManager.h @brief 终端布局管理器 -- 管理终端区域的组件布局和搜索栏动画。支持Mixed/LeftRight/TopBottom三种布局模式 */
 #ifndef TERMINALLAYOUTMANAGER_H
 #define TERMINALLAYOUTMANAGER_H
 
@@ -23,71 +12,19 @@ class TerminalModel;
 class TerminalSearchBar;
 class QBoxLayout;
 
-/**
- * @brief 终端布局管理器 — 管理终端的显示布局模式
- *
- * 封装混合/左右分栏/上下分栏三种布局的切换逻辑。
- * 分栏模式下自动创建RX/TX专用终端，共用同一个TerminalModel。
- *
- * 协作关系:
- *   - MainWindow: 创建并初始化此管理器
- *   - TerminalWidget: 提供终端显示控件
- *   - TerminalSearchBar: 提供搜索功能
- *   - NavigationController: 触发布局切换
- */
+/** @brief 终端布局管理器。封装Mixed/LeftRight/TopBottom三种布局切换。分栏模式自动创建RX/TX终端，共用同一TerminalModel */
 class TerminalLayoutManager : public QObject {
     Q_OBJECT
 
 public:
-    /** @brief 构造函数 @param parent 父对象 */
-    explicit TerminalLayoutManager(QObject* parent = nullptr);
-    /** @brief 析构函数，销毁分栏终端 */
-    ~TerminalLayoutManager() override = default;
-
-    /**
-     * @brief 初始化管理器，传入主终端控件和搜索栏
-     *
-     * 调用后管理器获得这些控件的所有权管理权。
-     * @param mainTerminal 主终端控件(混合模式下使用)
-     * @param searchBar 搜索栏(三种模式共用)
-     */
-    void initialize(TerminalWidget* mainTerminal, TerminalSearchBar* searchBar);
-
-    /**
-     * @brief 设置共享的数据模型
-     *
-     * 分栏终端和主终端共用同一个TerminalModel。
-     * 必须在initialize()之后调用。
-     * @param model 数据模型指针
-     */
-    void setTerminalModel(TerminalModel* model);
-
-    /**
-     * @brief 获取终端容器widget
-     *
-     * 容器内容随布局模式变化:
-     *   - 混合=searchBar+terminal
-     *   - 分栏=searchBar+splitter(rx+tx)
-     * @return 可嵌入外部布局的容器widget
-     */
-    QWidget* container() const;
-
-    /** @brief 获取当前布局模式 @return TerminalLayout枚举 */
-    TerminalLayout layout() const;
-
-    /**
-     * @brief 获取当前活动的终端widget列表
-     *
-     * 用于显示模式/时间戳等批量设置。
-     * @return 混合模式1个，分栏模式2个
-     */
-    QList<TerminalWidget*> terminalWidgets() const;
-
-    /**
-     * @brief 获取主终端widget
-     * @return 混合模式下唯一的一个，分栏模式下为RX终端
-     */
-    TerminalWidget* primaryTerminal() const;
+    explicit TerminalLayoutManager(QObject* parent = nullptr); ///< 构造
+    ~TerminalLayoutManager() override = default; ///< 析构
+    void initialize(TerminalWidget* mainTerminal, TerminalSearchBar* searchBar); ///< 初始化(传入主终端+搜索栏)
+    void setTerminalModel(TerminalModel* model); ///< 设置共享数据模型(须在initialize()后调用)
+    QWidget* container() const;              ///< 获取终端容器widget(随布局模式变化)
+    TerminalLayout layout() const;           ///< 获取当前布局模式
+    QList<TerminalWidget*> terminalWidgets() const; ///< 获取当前活动终端widget列表
+    TerminalWidget* primaryTerminal() const; ///< 获取主终端widget(分栏模式下为RX终端)
 
     // ---- 统计计数器 ----
 
