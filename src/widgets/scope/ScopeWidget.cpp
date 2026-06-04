@@ -18,7 +18,7 @@ void ScopeWidget::setChannelCount(int c) { ++m_totalChannelChanges; m_channels.r
 /** @brief 设置采样缓冲区大小 @param s 缓冲区采样数 */
 void ScopeWidget::setSampleBuffer(int s) { m_bufferSize = s; for (auto &ch : m_channels) ch.resize(s); m_writePos = 0; }
 /** @brief 添加单个采样值 @param ch 通道索引 @param v 采样值 */
-void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.size()) { m_channels[ch][m_writePos % m_bufferSize] = v; ++m_totalSamples; if (ch == 0) { m_writePos++; if (m_writePos >= m_bufferSize) { m_writePos = 0; ++m_totalOverflows; emit dataOverflow(); } if (m_running && qAbs(v - m_triggerLevel) < 0.01 && ch == m_triggerCh) { ++m_totalTriggerFires; emit triggerFired(); } } } }
+void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.size()) { m_channels[ch][m_writePos % m_bufferSize] = v; ++m_totalSamples; if (ch == 0) { m_writePos++; if (m_writePos >= m_bufferSize) { m_writePos = 0; m_wrapped = true; ++m_totalOverflows; emit dataOverflow(); } if (m_running && qAbs(v - m_triggerLevel) < 0.01 && ch == m_triggerCh) { ++m_totalTriggerFires; emit triggerFired(); } } } }
 /** @brief 批量添加采样值 @param ch 通道索引 @param vals 采样值向量 */
 void ScopeWidget::addSamples(int ch, const QVector<double> &vals) { for (auto v : vals) addSample(ch, v); }
 /** @brief 设置时间轴缩放 @param ms 时间刻度(毫秒) */
@@ -32,7 +32,7 @@ void ScopeWidget::setTriggerLevel(double l) { m_triggerLevel = l; }
 /** @brief 启停采集 @param on true启动 */
 void ScopeWidget::setRunning(bool on) { if (m_running && !on) ++m_totalPauses; if (!m_running && on) ++m_totalRestarts; m_running = on; }
 /** @brief 清空所有通道数据 */
-void ScopeWidget::clearData() { ++m_totalClears; for (auto &ch : m_channels) ch.fill(0); m_writePos = 0; }
+void ScopeWidget::clearData() { ++m_totalClears; for (auto &ch : m_channels) ch.fill(0); m_writePos = 0; m_wrapped = false; }
 /** @brief 获取通道数量 @return 通道数 */
 int ScopeWidget::channelCount() const { return m_channels.size(); }
 /** @brief 查询是否正在采集 @return 运行中返回true */
@@ -53,12 +53,16 @@ void ScopeWidget::paintEvent(QPaintEvent *) {
     };
     for (int c = 0; c < m_channels.size(); ++c) {
         p.setPen(QPen(colors[c % 4], 1.5));
-        int drawLen = qMin(m_writePos, m_bufferSize);
+        int drawLen = m_wrapped ? m_bufferSize : m_writePos;
         if (drawLen < 2) continue;
+        // 电压刻度为0时跳过绘制，避免除零产生inf/nan
+        double scale = (qFuzzyIsNull(m_voltScale)) ? 1.0 : m_voltScale;
         QPainterPath path;
+        int startIdx = m_wrapped ? m_writePos : 0;
         for (int i = 0; i < drawLen; ++i) {
+            int bufIdx = (startIdx + i) % m_bufferSize;
             double x = static_cast<double>(i) / drawLen * w;
-            double y = h / 2.0 - m_channels[c][i] / m_voltScale * (h / kDivisions);
+            double y = h / 2.0 - m_channels[c][bufIdx] / scale * (h / kDivisions);
             if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
         }
         p.drawPath(path);

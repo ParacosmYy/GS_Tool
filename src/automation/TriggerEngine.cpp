@@ -46,11 +46,13 @@ void TriggerEngine::evaluateData(const QByteArray& data)
             break;
         }
         case MatchMode::Regex: {
-            /* 正则表达式匹配 */
-            QRegularExpression re(rule.pattern);
-            if (re.isValid()) {
+            /* 正则表达式匹配: 惰性编译并缓存到规则结构体中 */
+            if (rule.compiledRegex.pattern() != rule.pattern) {
+                rule.compiledRegex.setPattern(rule.pattern);
+            }
+            if (rule.compiledRegex.isValid()) {
                 QString text = QString::fromUtf8(data);
-                matched = re.match(text).hasMatch();
+                matched = rule.compiledRegex.match(text).hasMatch();
             } else {
                 /* 正则编译失败，计入错误和动作错误 */
                 ++m_totalErrors;
@@ -88,11 +90,9 @@ void TriggerEngine::evaluateData(const QByteArray& data)
     }
 }
 
-/** @brief 评估解析后的数值，仅匹配ValueRange规则检查数值范围 @param name 数据标识 @param value 数值 */
+/** @brief 评估解析后的数值，仅匹配ValueRange规则检查数值范围，支持通道名过滤 @param name 数据标识(用于通道过滤) @param value 数值 */
 void TriggerEngine::evaluateValue(const QString& name, double value)
 {
-    Q_UNUSED(name)
-
     if (!m_enabled) {
         return;
     }
@@ -112,6 +112,11 @@ void TriggerEngine::evaluateValue(const QString& name, double value)
 
         /* 每条启用的 ValueRange 规则计为一次评估 */
         ++m_totalTriggersEvaluated;
+
+        /* 通道过滤: 如果规则指定了pattern作为通道名，仅匹配同名通道 */
+        if (!rule.pattern.isEmpty() && rule.pattern != name) {
+            continue;
+        }
 
         if (value >= rule.valueMin && value <= rule.valueMax) {
             ++m_matchCount;
@@ -142,6 +147,18 @@ void TriggerEngine::addRule(const TriggerRuleConfig& rule)
         }
         if (activeCount > m_peakRulesActive) {
             m_peakRulesActive = activeCount;
+        }
+    }
+}
+
+/** @brief 替换指定索引的规则，保持原位置不变 @param index 规则索引 @param rule 新规则配置 */
+void TriggerEngine::replaceRule(int index, const TriggerRuleConfig& rule)
+{
+    if (index >= 0 && index < m_rules.size()) {
+        m_rules[index] = rule;
+        // 重置该规则的匹配计数
+        if (index < m_ruleMatchCounts.size()) {
+            m_ruleMatchCounts[index] = 0;
         }
     }
 }

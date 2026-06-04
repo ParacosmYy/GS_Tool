@@ -156,6 +156,18 @@ quint64 MqttTopicModel::totalMessagesRouted() const
     return m_totalMessagesRouted;
 }
 
+/** @brief 获取累计路由消息的负载字节数 @return 负载字节总数 */
+quint64 MqttTopicModel::totalPayloadBytesRouted() const
+{
+    return m_totalPayloadBytesRouted;
+}
+
+/** @brief 获取累计通配符匹配命中次数 @return 通配符匹配总次数 */
+quint64 MqttTopicModel::totalWildcardMatches() const
+{
+    return m_totalWildcardMatches;
+}
+
 /** @brief 获取树中所有节点总数(含非叶节点)
  *  @return 节点总数(不含虚拟根节点)
  */
@@ -172,4 +184,6 @@ void MqttTopicModel::resetTopicStatistics()
     m_totalDuplicateSkips = 0;
     m_totalQosUpdates = 0;
     m_totalMessagesRouted = 0;
+    m_totalPayloadBytesRouted = 0;
+    m_totalWildcardMatches = 0;
 }

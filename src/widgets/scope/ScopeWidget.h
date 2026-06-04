@@ -136,6 +136,7 @@ private:
     double m_triggerLevel = 0.0;         ///< 触发电平阈值
     bool m_running = true;               ///< 运行状态标志
     int m_writePos = 0;                  ///< 环形缓冲区写入位置
+    bool m_wrapped = false;              ///< 环形缓冲区是否已写满一轮
     static constexpr int kDivisions = 10; ///< 水平分度数
 
     // ---- 统计计数器 ----

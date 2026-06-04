@@ -15,6 +15,12 @@
 #include <QDialog>
 #include <QString>
 #include <QMap>
+#include <QHash>
+
+class QLabel;
+class QCheckBox;
+class QDialogButtonBox;
+class QPushButton;
 
 /**
  * @brief EmbedDebug统一对话框
@@ -115,6 +121,15 @@ private:
 
     QMap<QString, RememberEntry> m_remember; ///< 记住选择条目表（按键名索引）
     int m_resultRole = 0;                    ///< 对话框结果角色值
+
+    // ---- UI控件 ----
+    QLabel* m_iconLabel = nullptr;           ///< 图标标签
+    QLabel* m_titleLabel = nullptr;          ///< 标题标签
+    QLabel* m_messageLabel = nullptr;        ///< 消息标签
+    QDialogButtonBox* m_buttonBox = nullptr; ///< 按钮盒
+    QCheckBox* m_rememberCheck = nullptr;    ///< 记住选择复选框
+    QVBoxLayout* m_contentArea = nullptr;    ///< 自定义内容区域布局
+    QHash<QAbstractButton*, int> m_customButtons; ///< 自定义按钮→角色映射
 
     // ---- 统计计数器(static inline，跨实例累积) ----
     static inline quint64 s_totalOpens = 0;        ///< 对话框总打开次数

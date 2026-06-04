@@ -128,8 +128,7 @@ void TriggerManager::setRuleEnabled(int index, bool enabled)
 void TriggerManager::updateRule(int index, const TriggerRuleConfig& rule)
 {
     if (index >= 0 && index < m_engine->rules().size()) {
-        m_engine->removeRule(index);
-        m_engine->addRule(rule);
+        m_engine->replaceRule(index, rule);
         ++m_totalRuleUpdates;
         emit rulesChanged();
     }

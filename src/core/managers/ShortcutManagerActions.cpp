@@ -51,9 +51,9 @@ int ShortcutManager::resolveConflicts(const QString& preferredId, const QStringL
         if (it == m_shortcuts.end()) continue;
 
         // 从默认键出发，尝试添加Shift或Alt修饰
-        int combo = it->defaultKeySequence[0];
-        int key = combo & ~Qt::KeyboardModifierMask;
-        int mods = combo & Qt::KeyboardModifierMask;
+        QKeyCombination combo = it->defaultKeySequence[0];
+        int key = combo.toCombined() & ~Qt::KeyboardModifierMask;
+        int mods = combo.toCombined() & Qt::KeyboardModifierMask;
 
         QKeySequence candidate;
         if ((mods & Qt::ShiftModifier) == 0) {

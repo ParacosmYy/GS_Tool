@@ -122,6 +122,8 @@ private slots:
 private:
     /** @brief 更新连接状态 */
     void updateState(ConnectionState newState);
+    /** @brief 清理socket资源(用于open()失败路径) */
+    void cleanupSocket();
 
     // ---- 配置参数 ----
     QString m_host;                                 ///< 目标主机地址

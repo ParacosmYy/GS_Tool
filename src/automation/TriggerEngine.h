@@ -25,6 +25,8 @@ public:
     void evaluateValue(const QString& name, double value);
     /** @brief 添加触发器规则 @param rule 规则配置 */
     void addRule(const TriggerRuleConfig& rule);
+    /** @brief 替换指定索引的规则(保持位置不变) @param index 规则索引 @param rule 新规则配置 */
+    void replaceRule(int index, const TriggerRuleConfig& rule);
     /** @brief 移除指定索引规则 @param index 规则索引 */
     void removeRule(int index);
     /** @brief 设置所有规则启用/禁用 @param enabled true=启用所有规则 */

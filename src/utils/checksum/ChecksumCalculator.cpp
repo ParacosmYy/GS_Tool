@@ -161,7 +161,8 @@ quint64 ChecksumCalculator::calculate(const QByteArray &data, Algorithm alg) con
     }
 
     case CustomCrc:
-        return 0; // 使用 calculateCustom
+        /* CustomCrc需要额外的多项式和位宽参数，使用上一次配置的参数 */
+        return calculateCustom(data, m_lastCustomPolynomial, m_lastCustomWidth);
     }
 
     return 0;
@@ -173,6 +174,10 @@ quint64 ChecksumCalculator::calculateCustom(const QByteArray &data, quint64 poly
     if (data.isEmpty() || polynomial == 0) {
         return 0;
     }
+
+    /* 记住最近一次参数，供calculate()的CustomCrc分支使用 */
+    m_lastCustomPolynomial = polynomial;
+    m_lastCustomWidth = width;
 
     ++m_totalCustomCalculations; ///< 统计: 自定义CRC计算递增
     ++m_totalCalculations;

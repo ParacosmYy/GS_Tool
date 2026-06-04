@@ -89,6 +89,10 @@ public:
     quint64 totalQosUpdates() const;
     /** @brief 获取累计消息路由次数 @return 路由总次数 */
     quint64 totalMessagesRouted() const;
+    /** @brief 获取累计路由消息的负载字节数 @return 负载字节总数 */
+    quint64 totalPayloadBytesRouted() const;
+    /** @brief 获取累计通配符匹配命中次数 @return 通配符匹配总次数 */
+    quint64 totalWildcardMatches() const;
     /** @brief 获取树节点总数(含非叶节点) @return 节点总数(不含虚拟根节点) */
     int totalNodeCount() const;
     /** @brief 重置统计计数器 */
@@ -133,6 +137,8 @@ private:
     quint64 m_totalDuplicateSkips = 0;    ///< 累计去重
     quint64 m_totalQosUpdates = 0;        ///< 累计QoS更新
     quint64 m_totalMessagesRouted = 0;    ///< 累计消息路由次数
+    quint64 m_totalPayloadBytesRouted = 0;///< 累计路由消息的负载字节数
+    quint64 m_totalWildcardMatches = 0;   ///< 累计通配符匹配命中次数
 };
 
 #endif // MQTTTOPICMODEL_H

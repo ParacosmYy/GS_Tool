@@ -78,3 +78,13 @@ void TlsConnection::onStateChanged(QAbstractSocket::SocketState socketState)
         updateState(ConnectionState::Disconnected);
     }
 }
+
+/** @brief 清理socket资源(用于open()失败路径)，防止残留半初始化的socket */
+void TlsConnection::cleanupSocket()
+{
+    if (m_socket) {
+        m_socket->deleteLater();
+        m_socket = nullptr;
+    }
+    updateState(ConnectionState::Disconnected);
+}

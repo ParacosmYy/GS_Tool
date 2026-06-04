@@ -18,6 +18,7 @@
 #include <QByteArray>
 #include <QCoreApplication>
 #include <QJsonObject>
+#include <QRegularExpression>
 
 /**
  * @brief 匹配模式枚举
@@ -57,6 +58,7 @@ struct TriggerRuleConfig {
     ActionType actionType;      ///< 动作类型
     QByteArray actionData;      ///< 动作附加数据（如发送的内容）
     bool enabled = true;        ///< 是否启用
+    mutable QRegularExpression compiledRegex; ///< 缓存的编译后正则表达式(Rule使用时惰性编译)
 
     /**
      * @brief 创建默认规则配置

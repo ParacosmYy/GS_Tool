@@ -44,7 +44,8 @@ void AudioSpectrum::feedData(const QByteArray &pcmData) {
 /** @brief 执行FFT频谱分析 — 计算各频段能量、平滑处理、发射频谱更新信号 */
 void AudioSpectrum::processFft() {
     ++m_totalFftRuns;
-    int binsPerBar = m_fftSize / 2 / m_barCount;
+    if (m_barCount <= 0 || m_fftSize <= 0) return;
+    int binsPerBar = qMax(1, m_fftSize / 2 / m_barCount);
     for (int i = 0; i < m_barCount; ++i) {
         double mag = 0;
         for (int j = 0; j < binsPerBar; ++j) {

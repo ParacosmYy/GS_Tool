@@ -82,6 +82,8 @@ private:
     mutable quint64 m_totalCustomCalculations = 0; ///< 累计自定义CRC计算次数
     mutable quint64 m_totalCalculateAllCalls = 0; ///< 累计批量计算(calculateAll)调用次数
     mutable QMap<int, quint64> m_algorithmCounts; ///< 按算法统计计算次数，索引为Algorithm枚举值
+    mutable quint64 m_lastCustomPolynomial = 0x1021; ///< 最近一次自定义CRC使用的多项式(默认CRC-16 CCITT)
+    mutable int m_lastCustomWidth = 16;           ///< 最近一次自定义CRC使用的位宽(默认16)
 };
 
 #endif // CHECKSUMCALCULATOR_H

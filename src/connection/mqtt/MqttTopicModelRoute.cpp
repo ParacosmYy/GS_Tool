@@ -76,14 +76,13 @@ QModelIndex MqttTopicModel::findTopicIndex(const QString& topic) const
 // 消息路由接口
 // ============================================================
 
-/** @brief 将收到的消息路由到匹配的主题节点，更新统计计数
- *  @param topic 消息主题(精确匹配)
- *  @param payload 消息负载(用于未来扩展，如消息计数)
+/** @brief 将收到的消息路由到匹配的主题节点，更新统计计数(含负载字节数和通配符统计)
+ *  @param topic 消息主题(精确匹配+通配符匹配)
+ *  @param payload 消息负载(统计负载字节数)
  *  @return true=匹配到至少一个主题
  */
 bool MqttTopicModel::routeMessage(const QString& topic, const QByteArray& payload)
 {
-    Q_UNUSED(payload)
     if (topic.isEmpty()) return false;
 
     /* 精确匹配: 查找是否已有该主题 */
@@ -97,10 +96,14 @@ bool MqttTopicModel::routeMessage(const QString& topic, const QByteArray& payloa
     for (const auto& sub : m_topics) {
         if (topicMatchesSubscription(topicParts, sub.split('/', Qt::SkipEmptyParts))) {
             matched = true;
+            ++m_totalWildcardMatches;
             break;
         }
     }
 
-    if (matched) ++m_totalMessagesRouted;
+    if (matched) {
+        ++m_totalMessagesRouted;
+        m_totalPayloadBytesRouted += static_cast<quint64>(payload.size());
+    }
     return matched;
 }

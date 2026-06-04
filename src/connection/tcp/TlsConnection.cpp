@@ -60,11 +60,13 @@ bool TlsConnection::open()
         QFile certFile(m_certPath);
         if (!certFile.open(QIODevice::ReadOnly)) {
             emit errorOccurred(tr("无法打开证书文件: %1").arg(m_certPath));
+            cleanupSocket();
             return false;
         }
         QSslCertificate cert(&certFile, QSsl::Pem);
         if (cert.isNull()) {
             emit errorOccurred(tr("证书解析失败: %1").arg(m_certPath));
+            cleanupSocket();
             return false;
         }
         m_socket->setLocalCertificate(cert);
@@ -73,11 +75,13 @@ bool TlsConnection::open()
         QFile keyFile(m_keyPath);
         if (!keyFile.open(QIODevice::ReadOnly)) {
             emit errorOccurred(tr("无法打开私钥文件: %1").arg(m_keyPath));
+            cleanupSocket();
             return false;
         }
         QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem);
         if (key.isNull()) {
             emit errorOccurred(tr("私钥解析失败: %1").arg(m_keyPath));
+            cleanupSocket();
             return false;
         }
         m_socket->setPrivateKey(key);
