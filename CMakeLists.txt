@@ -240,6 +240,7 @@ set(SOURCES
     src/chart/zoom/ZoomControllerViewport.cpp
     src/chart/zoom/ZoomControllerHandlers.cpp
     src/chart/fft/FftEngine.cpp
+    src/chart/fft/FftEngineCompute.cpp
     src/chart/fft/FftEngineWindow.cpp
     src/chart/fft/FftWidget.cpp
     src/chart/fft/FftWidgetSlots.cpp
@@ -313,6 +314,7 @@ set(SOURCES
     src/core/recording/PlaybackController.cpp
     src/core/recording/PlaybackControllerSpeed.cpp
     src/core/recording/PlaybackWidget.cpp
+    src/core/recording/PlaybackWidgetSlots.cpp
     src/core/recording/RecordingMarker.cpp
     src/core/recording/RecordingMarkerQuery.cpp
     src/utils/log/RecordingFileFormat.cpp
@@ -352,6 +354,7 @@ set(SOURCES
 
     # ── F5: 仪表盘 ──
     src/dashboard/DashboardWidget.cpp
+    src/dashboard/DashboardWidgetLayout.cpp
     src/dashboard/DashboardWidgetSerialization.cpp
     src/dashboard/DashboardWidgetSlots.cpp
     src/dashboard/DashboardWidgetPersistence.cpp
@@ -498,6 +501,7 @@ set(SOURCES
     src/connection/spi_i2c/SpiI2cConfigPanelUI.cpp
     src/connection/spi_i2c/SpiI2cConfigPanelPersist.cpp
     src/connection/spi_i2c/RegisterEditor.cpp
+    src/connection/spi_i2c/RegisterEditorUI.cpp
     src/connection/spi_i2c/RegisterEditorStats.cpp
 
     # ── F17: WebSocket 客户端 ──
@@ -551,6 +555,7 @@ set(SOURCES
 
     # ── F21: 正则终端过滤器 ──
     src/terminal/filter/TerminalFilter.cpp
+    src/terminal/filter/TerminalFilterCompat.cpp
     src/terminal/filter/TerminalFilterApply.cpp
     src/terminal/filter/TerminalFilterStats.cpp
     src/terminal/filter/TerminalFilterBar.cpp

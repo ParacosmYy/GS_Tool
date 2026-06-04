@@ -19,57 +19,93 @@ class ChartModel : public QObject {
     Q_OBJECT
 
 public:
-    explicit ChartModel(QObject* parent = nullptr); ///< 构造
+    /** @brief 构造图表数据模型 @param parent 父对象 */
+    explicit ChartModel(QObject* parent = nullptr);
     // ---- 配置 ----
-    void setChannelConfigSet(const ChannelConfigSet& configSet); ///< 设置通道配置集(重建缓冲区)
-    const ChannelConfigSet& channelConfigSet() const; ///< 获取当前通道配置集
-    void setWindowSize(int points);          ///< 设置滑动窗口大小
-    int windowSize() const;                  ///< 获取滑动窗口大小
-    void setRefreshInterval(int ms);         ///< 设置刷新间隔(ms, 0=每次数据立即刷新)
-    int refreshInterval() const;             ///< 获取刷新间隔
+    /** @brief 设置通道配置集(重建缓冲区) @param configSet 通道配置集 */
+    void setChannelConfigSet(const ChannelConfigSet& configSet);
+    /** @brief 获取当前通道配置集 @return 配置集常引用 */
+    const ChannelConfigSet& channelConfigSet() const;
+    /** @brief 设置滑动窗口大小 @param points 最大可见数据点数 */
+    void setWindowSize(int points);
+    /** @brief 获取滑动窗口大小 @return 最大可见数据点数 */
+    int windowSize() const;
+    /** @brief 设置刷新间隔 @param ms 毫秒数，0=每次数据立即刷新 */
+    void setRefreshInterval(int ms);
+    /** @brief 获取刷新间隔 @return 毫秒数 */
+    int refreshInterval() const;
 
     // ---- 数据查询 ----
-    QVector<QPointF> channelData(const QString& displayName) const; ///< 指定通道可见数据点
-    QMap<QString, QVector<QPointF>> allChannelData() const; ///< 所有启用通道数据
-    QPair<double, double> channelYRange(const QString& displayName) const; ///< 指定通道Y值范围
-    QPair<double, double> globalYRange() const; ///< 全局Y值范围
-    QStringList channelNames() const;        ///< 通道名称列表
-    QPair<double, double> xRange() const;    ///< X轴范围
-    qint64 totalPointsReceived() const;      ///< 总接收数据点数
-    qint64 currentFrameIndex() const;        ///< 当前帧索引(X轴计数器)
+    /** @brief 获取指定通道的可见数据点 @param displayName 通道名称 @return 数据点向量 */
+    QVector<QPointF> channelData(const QString& displayName) const;
+    /** @brief 获取所有启用通道的数据 @return 通道名到数据点集的映射 */
+    QMap<QString, QVector<QPointF>> allChannelData() const;
+    /** @brief 获取指定通道的Y值范围 @param displayName 通道名称 @return (min, max)对 */
+    QPair<double, double> channelYRange(const QString& displayName) const;
+    /** @brief 获取全局Y值范围(所有通道) @return (min, max)对 */
+    QPair<double, double> globalYRange() const;
+    /** @brief 获取所有通道名称列表 @return 名称列表 */
+    QStringList channelNames() const;
+    /** @brief 获取当前X轴范围 @return (min, max)对 */
+    QPair<double, double> xRange() const;
+    /** @brief 获取总接收数据点数 @return 累计点数 */
+    qint64 totalPointsReceived() const;
+    /** @brief 获取当前帧索引(X轴计数器) @return 帧索引 */
+    qint64 currentFrameIndex() const;
 
     // ---- 统计信息 ----
-    quint64 totalDataPoints() const;         ///< 跨所有通道的数据点总数
-    quint64 channelsCreated() const;         ///< 历史创建通道总数(累计)
-    quint64 channelsRemoved() const;         ///< 历史移除通道总数(累计)
-    quint64 totalChannelsActive() const;     ///< 当前活跃通道数(实时)
-    quint64 maxDataPointsInChannel() const;  ///< 单通道最大数据点数(峰值)
-    double peakDataRate() const;             ///< 峰值数据速率(点/秒)
-    void resetChartStatistics();             ///< 重置图表统计(不影响通道数据和配置)
-    void resetStats();                       ///< 别名，调用resetChartStatistics
+    /** @brief 获取跨所有通道的数据点总数 @return 数据点总数 */
+    quint64 totalDataPoints() const;
+    /** @brief 获取历史创建通道总数(累计) @return 创建总数 */
+    quint64 channelsCreated() const;
+    /** @brief 获取历史移除通道总数(累计) @return 移除总数 */
+    quint64 channelsRemoved() const;
+    /** @brief 获取当前活跃通道数(实时) @return 活跃通道数 */
+    quint64 totalChannelsActive() const;
+    /** @brief 获取单通道最大数据点数(峰值) @return 峰值数据点数 */
+    quint64 maxDataPointsInChannel() const;
+    /** @brief 获取峰值数据速率 @return 数据点/秒 */
+    double peakDataRate() const;
+    /** @brief 重置图表统计(不影响通道数据和配置) */
+    void resetChartStatistics();
+    /** @brief 别名，调用resetChartStatistics */
+    void resetStats();
 
     // ---- 操作 ----
-    void addChannel(const ChannelConfig& config); ///< 添加通道(更新统计)
-    void removeChannel(const QString& displayName); ///< 移除通道(更新统计)
-    void addDataPoint(const QString& displayName, double value); ///< 添加数据点(含统计)
-    void clear();                            ///< 清除所有通道数据
+    /** @brief 添加通道(更新统计) @param config 通道配置 */
+    void addChannel(const ChannelConfig& config);
+    /** @brief 移除通道(更新统计) @param displayName 通道名称 */
+    void removeChannel(const QString& displayName);
+    /** @brief 添加数据点(含统计) @param displayName 通道名称 @param value 数据值 */
+    void addDataPoint(const QString& displayName, double value);
+    /** @brief 清除所有通道数据 */
+    void clear();
 
 signals:
-    void dataUpdated(const QStringList& updatedChannels); ///< 通道数据更新通知
-    void channelsChanged();                  ///< 通道配置变更通知
-    void dataCleared();                      ///< 全部数据已清除
+    /** @brief 通道数据更新通知 @param updatedChannels 已更新的通道列表 */
+    void dataUpdated(const QStringList& updatedChannels);
+    /** @brief 通道配置变更通知 */
+    void channelsChanged();
+    /** @brief 全部数据已清除 */
+    void dataCleared();
 
 public slots:
-    void onFrameParsed(const QVariantMap& fields, const QByteArray& rawFrame); ///< 接收帧解析结果
+    /** @brief 接收帧解析结果 @param fields 解析后的字段映射 @param rawFrame 原始帧字节 */
+    void onFrameParsed(const QVariantMap& fields, const QByteArray& rawFrame);
 
 private slots:
-    void onRefreshTick();                    ///< 定时刷新(合并高频更新)
+    /** @brief 定时刷新(合并高频更新) */
+    void onRefreshTick();
 
 private:
-    struct ChannelBuffer { QVector<QPointF> points; int sampleCounter = 0; }; ///< 单通道内部缓冲区
-    void rebuildBuffers();                   ///< 重建所有通道缓冲区
-    void appendPoint(const QString& displayName, double value, int sampleDivisor); ///< 追加数据点(含降采样)
-    void flushPendingUpdates();              ///< 打包发射dataUpdated并清空待刷新列表
+    /** @brief 单通道内部缓冲区 */
+    struct ChannelBuffer { QVector<QPointF> points; int sampleCounter = 0; };
+    /** @brief 重建所有通道缓冲区 */
+    void rebuildBuffers();
+    /** @brief 追加数据点(含降采样) @param displayName 通道名称 @param value 数据值 @param sampleDivisor 降采样比率 */
+    void appendPoint(const QString& displayName, double value, int sampleDivisor);
+    /** @brief 打包发射dataUpdated并清空待刷新列表 */
+    void flushPendingUpdates();
 
     ChannelConfigSet m_configSet;               ///< 当前通道配置集合
     QMap<QString, ChannelBuffer> m_buffers;     ///< 通道名 → 数据缓冲区映射

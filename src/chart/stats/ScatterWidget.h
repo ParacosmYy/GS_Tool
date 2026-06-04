@@ -32,7 +32,8 @@ class ScatterWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit ScatterWidget(ChartModel* model, QWidget* parent = nullptr); ///< 构造散点图控件，model为外部拥有的数据模型
+    /** @brief 构造散点图控件 @param model 外部拥有的ChartModel数据模型 @param parent 父控件指针 */
+    explicit ScatterWidget(ChartModel* model, QWidget* parent = nullptr);
 
 public slots:
     void refreshPlot(); ///< 刷新散点图，从ChartModel读取当前X/Y通道数据并计算Pearson相关系数
@@ -64,22 +65,34 @@ public slots:
     quint64 totalAxisAutoScales() const { return m_totalAxisAutoScales; }
     /** @brief 获取累计渲染次数(图表重绘) */
     quint64 totalRenders() const { return m_totalRenders; }
-    void resetScatterStatistics();       ///< 重置所有散点图统计计数器
+    /** @brief 重置所有散点图统计计数器 */
+    void resetScatterStatistics();
 
 private slots:
-    void onXChannelChanged(int index);   ///< X轴通道选择变更
-    void onYChannelChanged(int index);   ///< Y轴通道选择变更
-    void onAutoRefreshToggled(bool checked); ///< 自动刷新开关切换
-    void onDataUpdated(const QStringList& updatedChannels); ///< ChartModel数据更新时触发重绘
-    void onChannelsChanged();            ///< 通道列表变更时更新通道选择下拉框
-    void onThemeChanged();               ///< 主题切换响应
+    /** @brief X轴通道选择变更处理 @param index 下拉框选中索引 */
+    void onXChannelChanged(int index);
+    /** @brief Y轴通道选择变更处理 @param index 下拉框选中索引 */
+    void onYChannelChanged(int index);
+    /** @brief 自动刷新开关切换 @param checked 是否启用自动刷新 */
+    void onAutoRefreshToggled(bool checked);
+    /** @brief ChartModel数据更新时触发重绘 @param updatedChannels 已更新的通道列表 */
+    void onDataUpdated(const QStringList& updatedChannels);
+    /** @brief 通道列表变更时更新通道选择下拉框 */
+    void onChannelsChanged();
+    /** @brief 主题切换响应，更新图表视觉元素 */
+    void onThemeChanged();
 
 private:
-    void setupUI();                      ///< 初始化UI布局
-    QWidget* createToolbar();            ///< 创建顶部配置工具栏
-    void setupChart();                   ///< 创建散点图图表区域
-    void applyThemeColors();             ///< 应用当前主题颜色到图表
-    double computePearsonCorrelation(    ///< 计算Pearson相关系数，数据不足或零方差时返回NaN
+    /** @brief 初始化UI布局(图表+工具栏) */
+    void setupUI();
+    /** @brief 创建顶部配置工具栏 @return 工具栏Widget指针 */
+    QWidget* createToolbar();
+    /** @brief 创建散点图图表区域(QChartView/QScatterSeries/坐标轴) */
+    void setupChart();
+    /** @brief 应用当前主题颜色到图表(背景/网格/轴标签/散点颜色) */
+    void applyThemeColors();
+    /** @brief 计算Pearson相关系数 @param xData X轴数据点集 @param yData Y轴数据点集 @return 相关系数，数据不足或零方差时返回NaN */
+    double computePearsonCorrelation(
         const QVector<QPointF>& xData, const QVector<QPointF>& yData);
 
     ChartModel* m_model;              ///< 数据模型（外部拥有）

@@ -81,7 +81,8 @@ void EmptyStateWidget::setActionButton(const QString& text,
     // 断开之前的所有连接，避免重复
     m_actionBtn->disconnect();
     if (callback) {
-        connect(m_actionBtn, &QPushButton::clicked, this, [cb = std::move(callback)]() {
+        connect(m_actionBtn, &QPushButton::clicked, this, [this, cb = std::move(callback)]() {
+            ++m_totalActionButtonClicks;
             cb();
         });
     }
@@ -152,4 +153,5 @@ void EmptyStateWidget::resetEmptyStateStatistics()
 {
     m_totalStateChanges = 0;
     m_totalIconChanges = 0;
+    m_totalActionButtonClicks = 0;
 }

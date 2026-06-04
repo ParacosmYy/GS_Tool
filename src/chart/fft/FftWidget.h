@@ -56,24 +56,36 @@ public:
     void resetFftWidgetStatistics();
 
 public slots:
-    void refreshSpectrum(); ///< 刷新频谱(从ChartModel读数据经FftEngine计算更新图表)
+    /** @brief 刷新频谱(从ChartModel读数据经FftEngine计算更新图表) */
+    void refreshSpectrum();
 
 private slots:
-    void onChannelChanged(int index);     ///< 通道选择变更
-    void onWindowChanged(int index);      ///< 窗函数选择变更
-    void onFftSizeChanged(int value);     ///< FFT大小变更
-    void onAutoRefreshToggled(bool checked); ///< 自动刷新开关
-    void onDataUpdated(const QStringList& updatedChannels); ///< 数据更新(自动刷新模式触发重算)
-    void onChannelsChanged();             ///< 通道列表变更更新下拉框
-    void onThemeChanged();                ///< 主题切换更新图表视觉元素
+    /** @brief 通道选择变更处理 @param index 下拉框选中索引 */
+    void onChannelChanged(int index);
+    /** @brief 窗函数选择变更处理 @param index 下拉框选中索引 */
+    void onWindowChanged(int index);
+    /** @brief FFT大小变更处理 @param value 新的FFT大小 */
+    void onFftSizeChanged(int value);
+    /** @brief 自动刷新开关切换 @param checked 是否启用 */
+    void onAutoRefreshToggled(bool checked);
+    /** @brief 数据更新(自动刷新模式触发重算) @param updatedChannels 已更新的通道列表 */
+    void onDataUpdated(const QStringList& updatedChannels);
+    /** @brief 通道列表变更更新下拉框 */
+    void onChannelsChanged();
+    /** @brief 主题切换更新图表视觉元素 */
+    void onThemeChanged();
 
 private:
-    void setupUI();               ///< 初始化UI布局
-    QWidget* createToolbar();     ///< 创建顶部配置工具栏
-    void setupChart();            ///< 创建频谱图表区域
+    /** @brief 初始化UI布局(图表+工具栏) */
+    void setupUI();
+    /** @brief 创建顶部配置工具栏 @return 工具栏Widget指针 */
+    QWidget* createToolbar();
+    /** @brief 创建频谱图表区域(QChartView/QLineSeries/坐标轴) */
+    void setupChart();
     /** @brief 应用当前主题颜色到图表(背景/网格/轴标签/频谱线) */
     void applyThemeColors();
-    void populateFftSizes();      ///< 填充FFT大小下拉框
+    /** @brief 填充FFT大小下拉框(256/512/1024/2048/4096) */
+    void populateFftSizes();
     // ---- 数据与引擎 ----
     ChartModel* m_model;              ///< 数据模型(外部拥有)
     FftEngine* m_engine;              ///< FFT计算引擎

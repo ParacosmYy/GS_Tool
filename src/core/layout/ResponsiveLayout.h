@@ -81,6 +81,8 @@ public:
     quint64 breakpointChangeCount() const;
     /** @brief 导航树折叠/展开切换总次数 @return 总次数 */
     quint64 navCollapseToggleCount() const;
+    /** @brief 获取Widget可见性策略注册总次数 @return 注册计数 */
+    quint64 totalWidgetRegistrations() const { return m_totalWidgetRegistrations; }
     /** @brief 重置所有统计计数器 */
     void resetStats();
 
@@ -124,6 +126,7 @@ private:
     quint64 m_totalLayoutChanges = 0;      ///< resize触发布局变更次数
     quint64 m_breakpointChangeCount = 0;   ///< 断点实际切换次数
     quint64 m_navCollapseToggleCount = 0;  ///< 导航折叠切换次数
+    quint64 m_totalWidgetRegistrations = 0; ///< Widget可见性策略注册次数
 };
 
 #endif // RESPONSIVELAYOUT_H

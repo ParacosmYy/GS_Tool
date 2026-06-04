@@ -48,6 +48,7 @@ void LedIndicatorWidget::setOn(bool on)
 void LedIndicatorWidget::setColor(const QColor &color)
 {
     m_color = color;
+    ++m_totalColorChanges;
     update();
 }
 
@@ -144,4 +145,5 @@ void LedIndicatorWidget::resetStatistics()
 {
     m_totalStateChanges = 0;
     m_totalBlinks = 0;
+    m_totalColorChanges = 0;
 }

@@ -25,27 +25,43 @@ class DashboardWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit DashboardWidget(QWidget *parent = nullptr);  ///< 构造函数
-    ~DashboardWidget() override;                          ///< 析构函数
+    /** @brief 构造仪表盘主容器 @param parent 父控件指针 */
+    explicit DashboardWidget(QWidget *parent = nullptr);
+    /** @brief 析构函数，子控件由Qt父子树自动销毁 */
+    ~DashboardWidget() override;
 
-    int addComponent(const QString &type, const QString &channel); ///< 添加子组件，返回索引(-1失败)
-    void removeComponent(int index);                               ///< 移除指定索引组件
+    /** @brief 添加子组件到网格布局 @param type 组件类型: "gauge"/"progress"/"led"/"numeric" @param channel 绑定数据通道 @return 组件索引，失败返回-1 */
+    int addComponent(const QString &type, const QString &channel);
+    /** @brief 移除指定索引的组件并重新排列网格 @param index 组件索引 */
+    void removeComponent(int index);
 
-    void loadLayout(const QVariantMap &layout);       ///< 从QVariantMap恢复布局(简单)
-    QVariantMap saveLayout() const;                   ///< 导出到QVariantMap(简单)
+    /** @brief 从QVariantMap恢复布局(简单序列化) @param layout 布局描述 */
+    void loadLayout(const QVariantMap &layout);
+    /** @brief 将当前布局导出为QVariantMap(简单序列化) @return 布局描述 */
+    QVariantMap saveLayout() const;
 
-    QList<DashboardItemConfig> saveToItems() const;   ///< 导出到DashboardItemConfig(完整属性)
-    void loadFromItems(const QList<DashboardItemConfig> &items, int columns); ///< 从配置恢复(完整)
-    DashboardSerializer* serializer() const;          ///< 获取序列化器实例
+    /** @brief 导出到DashboardItemConfig列表(完整属性序列化) @return 配置列表 */
+    QList<DashboardItemConfig> saveToItems() const;
+    /** @brief 从DashboardItemConfig列表恢复布局(完整属性反序列化) @param items 配置列表 @param columns 网格列数 */
+    void loadFromItems(const QList<DashboardItemConfig> &items, int columns);
+    /** @brief 获取底层序列化器实例 @return 序列化器指针 */
+    DashboardSerializer* serializer() const;
 
-    bool saveToFile(const QString &filePath, const QString &name);   ///< 保存到JSON文件
-    bool loadFromFile(const QString &filePath);                      ///< 从JSON文件加载
-    bool saveToProfile(const QString &profileName);                  ///< 保存到QSettings配置
-    bool loadFromProfile(const QString &profileName);                ///< 从QSettings配置加载
+    /** @brief 保存当前布局到JSON文件 @param filePath 目标文件路径 @param name 布局名称 @return true=保存成功 */
+    bool saveToFile(const QString &filePath, const QString &name);
+    /** @brief 从JSON文件加载布局 @param filePath 源文件路径 @return true=加载成功 */
+    bool loadFromFile(const QString &filePath);
+    /** @brief 保存当前布局到QSettings命名配置 @param profileName 配置名称 @return true=保存成功 */
+    bool saveToProfile(const QString &profileName);
+    /** @brief 从QSettings命名配置加载布局 @param profileName 配置名称 @return true=加载成功 */
+    bool loadFromProfile(const QString &profileName);
 
-    QWidget *componentAt(int index) const;  ///< 获取指定索引子组件
-    int componentCount() const;             ///< 获取子组件总数
-    int gridColumns() const;                ///< 获取网格列数
+    /** @brief 获取指定索引的子组件 @param index 组件索引 @return 子控件指针，越界返回nullptr */
+    QWidget *componentAt(int index) const;
+    /** @brief 获取子组件总数 @return 组件数量 */
+    int componentCount() const;
+    /** @brief 获取网格列数 @return 列数(固定3列) */
+    int gridColumns() const;
 
     // ---- 统计接口 ----
     quint64 totalLayoutChanges() const;    ///< 累计布局变更次数

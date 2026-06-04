@@ -32,6 +32,7 @@ LoadingSpinner::LoadingSpinner(int size, QWidget* parent)
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, [this]() {
         m_angle = (m_angle + 36) % 360;
+        ++m_totalTicks;
         update();
     });
     m_timer->start(100);
@@ -92,6 +93,7 @@ void LoadingSpinner::resetSpinnerStatistics()
 {
     m_totalStarts = 0;
     m_totalStops = 0;
+    m_totalTicks = 0;
 }
 
 // ============================================================================

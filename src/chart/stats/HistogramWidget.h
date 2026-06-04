@@ -111,18 +111,28 @@ public slots:
     void resetHistogramStatistics();
 
 private slots:
-    void onChannelChanged(int index);           ///< 通道选择变更
-    void onBinsChanged(int value);              ///< 分桶数变更
-    void onAutoRefreshToggled(bool checked);    ///< 自动刷新开关切换
-    void onDataUpdated(const QStringList& updatedChannels);  ///< 数据更新
-    void onChannelsChanged();                   ///< 通道列表变更
-    void onThemeChanged();                      ///< 主题切换响应
+    /** @brief 通道选择变更处理 @param index 下拉框选中索引 */
+    void onChannelChanged(int index);
+    /** @brief 分桶数变更处理 @param value 新的分桶数 */
+    void onBinsChanged(int value);
+    /** @brief 自动刷新开关切换 @param checked 是否启用 */
+    void onAutoRefreshToggled(bool checked);
+    /** @brief ChartModel数据更新时触发重算 @param updatedChannels 已更新的通道列表 */
+    void onDataUpdated(const QStringList& updatedChannels);
+    /** @brief 通道列表变更时更新通道选择下拉框 */
+    void onChannelsChanged();
+    /** @brief 主题切换响应，更新图表视觉元素 */
+    void onThemeChanged();
 
 private:
-    void setupUI();         ///< 初始化UI布局
-    QWidget* createToolbar();  ///< 创建顶部配置工具栏
-    void setupChart();      ///< 创建直方图图表区域
-    void applyThemeColors();   ///< 应用当前主题颜色到图表
+    /** @brief 初始化UI布局(图表+工具栏+统计标签) */
+    void setupUI();
+    /** @brief 创建顶部配置工具栏 @return 工具栏Widget指针 */
+    QWidget* createToolbar();
+    /** @brief 创建直方图图表区域(QChartView/QBarSeries/坐标轴) */
+    void setupChart();
+    /** @brief 应用当前主题颜色到图表(背景/网格/轴标签/柱体颜色) */
+    void applyThemeColors();
 
     ChartModel* m_model;              ///< 数据模型（外部拥有）
 

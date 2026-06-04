@@ -15,12 +15,12 @@
 #include <QPointF>
 #include <complex>
 
-/// @brief FFT频谱计算引擎 — 封装Cooley-Tukey radix-2 FFT算法和常用窗函数，接收时域采样数据，输出频率-幅度谱
+/** @brief FFT频谱计算引擎 — 封装Cooley-Tukey radix-2 FFT算法和常用窗函数，接收时域采样数据，输出频率-幅度谱 */
 class FftEngine : public QObject {
     Q_OBJECT
 
 public:
-    /// @brief 窗函数类型 — Rectangular(最高分辨率/最差泄漏)、Hanning(均衡推荐)、Hamming(旁瓣衰减稍弱)、Blackman(最强抑制/最低分辨率)
+    /** @brief 窗函数类型 — Rectangular(最高分辨率/最差泄漏)、Hanning(均衡推荐)、Hamming(旁瓣衰减稍弱)、Blackman(最强抑制/最低分辨率) */
     enum class WindowType {
         Rectangular,  ///< 矩形窗（无窗）
         Hanning,      ///< 汉宁窗

@@ -62,6 +62,7 @@ public:
     void resetChunkColor() {
         m_customChunkColor = false;
         m_chunkColor = QColor();
+        ++m_totalColorResets;
         emit chunkColorChanged();
         update();
     }
@@ -75,8 +76,11 @@ public:
     /** @brief 获取值更新总次数 @return 更新计数 */
     quint64 totalValueUpdates() const { return m_totalValueUpdates; }
 
+    /** @brief 获取chunk颜色重置总次数 @return 重置计数 */
+    quint64 totalColorResets() const { return m_totalColorResets; }
+
     /** @brief 重置统计计数器 */
-    void resetStatistics() { m_totalAnimations = 0; m_totalValueUpdates = 0; }
+    void resetStatistics() { m_totalAnimations = 0; m_totalValueUpdates = 0; m_totalColorResets = 0; }
 
     /** @brief 启动shimmer流动动画(2000ms循环) */
     void startShimmer() {
@@ -176,6 +180,7 @@ private:
 
     mutable quint64 m_totalAnimations = 0;  ///< 动画播放总次数
     mutable quint64 m_totalValueUpdates = 0; ///< 值更新总次数
+    mutable quint64 m_totalColorResets = 0; ///< chunk颜色重置总次数
 };
 
 #endif // ANIMATEDPROGRESSBAR_H

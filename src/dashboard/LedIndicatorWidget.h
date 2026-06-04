@@ -22,25 +22,25 @@ class LedIndicatorWidget : public QWidget
     Q_OBJECT
 
 public:
-    /// 构造函数
+    /** @brief 构造LED指示灯控件 @param parent 父控件指针 */
     explicit LedIndicatorWidget(QWidget *parent = nullptr);
 
-    /// 设置开关状态
+    /** @brief 设置开关状态 @param on true=亮，false=灭 */
     void setOn(bool on);
 
-    /// 设置 LED 颜色
+    /** @brief 设置LED颜色 @param color 颜色值 */
     void setColor(const QColor &color);
 
-    /// 绑定数据通道
+    /** @brief 绑定数据通道名称 @param channelName 通道名称 */
     void bindChannel(const QString &channelName);
 
-    /// 获取开关状态
+    /** @brief 获取开关状态 @return true=亮，false=灭 */
     bool isOn() const { return m_on; }
 
-    /// 获取颜色
+    /** @brief 获取LED颜色 @return 当前颜色 */
     QColor color() const { return m_color; }
 
-    /// 获取通道名
+    /** @brief 获取绑定的数据通道名 @return 通道名称 */
     QString channelName() const { return m_channelName; }
 
     /** @brief 获取状态切换总次数 */
@@ -49,14 +49,17 @@ public:
     /** @brief 获取闪烁总次数 */
     quint64 totalBlinks() const { return m_totalBlinks; }
 
+    /** @brief 获取颜色变更总次数 */
+    quint64 totalColorChanges() const { return m_totalColorChanges; }
+
     /** @brief 重置所有统计计数器 */
     void resetStatistics();
 
 protected:
-    /// 绘制事件 —— 绘制圆形 LED
+    /** @brief 绘制事件 — 绘制圆形LED指示灯、径向渐变发光效果和高光 @param event 绘制事件参数 */
     void paintEvent(QPaintEvent *event) override;
 
-    /// 建议最小尺寸
+    /** @brief 建议最小尺寸 @return 40x40像素 */
     QSize minimumSizeHint() const override;
 
 private:
@@ -66,6 +69,7 @@ private:
 
     quint64 m_totalStateChanges = 0;       ///< 状态切换总次数
     mutable quint64 m_totalBlinks = 0;     ///< 闪烁总次数(paintEvent中递增)
+    quint64 m_totalColorChanges = 0;       ///< 颜色变更总次数
 };
 
 #endif // LED_INDICATOR_WIDGET_H

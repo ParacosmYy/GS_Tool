@@ -20,34 +20,34 @@ class GaugeWidget : public QWidget
     Q_OBJECT
 
 public:
-    /// 构造函数
+    /** @brief 构造量表控件 @param parent 父控件指针 */
     explicit GaugeWidget(QWidget *parent = nullptr);
 
-    /// 设置当前值
+    /** @brief 设置当前显示值 @param value 新的显示值 */
     void setValue(double value);
 
-    /// 设置量程范围
+    /** @brief 设置量程范围 @param min 最小值 @param max 最大值 */
     void setRange(double min, double max);
 
-    /// 设置显示标签
+    /** @brief 设置显示标签文本 @param label 标签字符串 */
     void setLabel(const QString &label);
 
-    /// 绑定数据通道
+    /** @brief 绑定数据通道名称 @param channelName 通道名称 */
     void bindChannel(const QString &channelName);
 
-    /// 获取当前值
+    /** @brief 获取当前显示值 @return 当前值 */
     double value() const { return m_value; }
 
-    /// 获取量程最小值
+    /** @brief 获取量程最小值 @return 最小值 */
     double min() const { return m_min; }
 
-    /// 获取量程最大值
+    /** @brief 获取量程最大值 @return 最大值 */
     double max() const { return m_max; }
 
-    /// 获取标签
+    /** @brief 获取显示标签 @return 标签文本 */
     QString label() const { return m_label; }
 
-    /// 获取通道名
+    /** @brief 获取绑定的数据通道名 @return 通道名称 */
     QString channelName() const { return m_channelName; }
 
     // ---- 统计计数接口 ----
@@ -63,10 +63,10 @@ public:
     void resetGaugeStatistics();
 
 protected:
-    /// 绘制事件 —— 绘制圆形仪表盘、刻度与指针
+    /** @brief 绘制事件 — 绘制圆形仪表盘、刻度线、指针与数值文本 @param event 绘制事件参数 */
     void paintEvent(QPaintEvent *event) override;
 
-    /// 建议的最小尺寸
+    /** @brief 建议最小尺寸 @return 120x120像素 */
     QSize minimumSizeHint() const override;
 
 private:

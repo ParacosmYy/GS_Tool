@@ -53,6 +53,8 @@ public:
     quint64 totalStateChanges() const { return m_totalStateChanges; }
     /** @brief 获取图标变更总次数 */
     quint64 totalIconChanges() const { return m_totalIconChanges; }
+    /** @brief 获取操作按钮点击总次数 */
+    quint64 totalActionButtonClicks() const { return m_totalActionButtonClicks; }
     /** @brief 重置所有统计计数器 */
     void resetEmptyStateStatistics();
 
@@ -68,6 +70,7 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalStateChanges = 0;     ///< 状态内容变更次数(标题/描述)
     quint64 m_totalIconChanges = 0;      ///< 图标变更次数
+    quint64 m_totalActionButtonClicks = 0; ///< 操作按钮点击次数
 };
 
 #endif // EMPTY_STATE_WIDGET_H

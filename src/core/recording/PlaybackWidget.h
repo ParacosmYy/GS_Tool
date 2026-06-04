@@ -80,6 +80,11 @@ private:
      */
     void setupUI();
 
+    /**
+     * @brief 初始化信号连接
+     */
+    void setupConnections();
+
     QPushButton* m_playBtn;     ///< 播放/暂停按钮
     QSlider*     m_slider;      ///< 进度滑块
     QComboBox*   m_speedCombo;  ///< 倍速选择下拉框

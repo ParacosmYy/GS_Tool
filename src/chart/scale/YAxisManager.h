@@ -17,7 +17,8 @@
 #include <QVector>
 #include <QtCharts>
 
-enum class YAxisSide { Left, Right }; ///< Y轴放置位置枚举
+/** @brief Y轴放置位置枚举 */
+enum class YAxisSide { Left, Right };
 
 class QChart;
 
@@ -26,16 +27,24 @@ class YAxisManager : public QObject {
     Q_OBJECT
 
 public:
-    explicit YAxisManager(QChart* chart, QObject* parent = nullptr); ///< 构造Y轴管理器，关联QChart对象
-    ~YAxisManager(); ///< 析构时清理所有轴
+    /** @brief 构造Y轴管理器，关联QChart对象 @param chart QChart指针 @param parent 父对象 */
+    explicit YAxisManager(QChart* chart, QObject* parent = nullptr);
+    /** @brief 析构时清理所有轴 */
+    ~YAxisManager();
 
-    void createAxis(const QString& channel, const QColor& color,  ///< 为通道创建独立Y轴，颜色设为通道颜色
+    /** @brief 为通道创建独立Y轴 @param channel 通道名称 @param color 轴标签颜色 @param side 放置位置(左/右) @param unit 单位文本 */
+    void createAxis(const QString& channel, const QColor& color,
                     YAxisSide side, const QString& unit = QString());
-    void removeAxis(const QString& channel); ///< 移除通道对应的Y轴
-    void updateRange(const QString& channel, double min, double max); ///< 更新通道Y轴的范围
-    QValueAxis* axisForChannel(const QString& channel) const; ///< 获取通道对应的QValueAxis，不存在返回nullptr
-    void attachSeries(const QString& channel, QLineSeries* series); ///< 将series附加到通道对应的Y轴
-    void clearAll(); ///< 清除所有Y轴（通道变化时全量重建）
+    /** @brief 移除通道对应的Y轴 @param channel 通道名称 */
+    void removeAxis(const QString& channel);
+    /** @brief 更新通道Y轴的范围 @param channel 通道名称 @param min 最小值 @param max 最大值 */
+    void updateRange(const QString& channel, double min, double max);
+    /** @brief 获取通道对应的QValueAxis @param channel 通道名称 @return 轴指针，不存在返回nullptr */
+    QValueAxis* axisForChannel(const QString& channel) const;
+    /** @brief 将series附加到通道对应的Y轴 @param channel 通道名称 @param series 线条序列 */
+    void attachSeries(const QString& channel, QLineSeries* series);
+    /** @brief 清除所有Y轴（通道变化时全量重建） */
+    void clearAll();
 
     /** @brief 根据通道列表自动分配Y轴左右侧: <=4通道交替分配，>4通道按单位分组 */
     static QVector<YAxisSide> autoAssignSides(
@@ -45,17 +54,24 @@ public:
     void applyThemeColors(const QColor& gridColor, const QColor& labelColor);
 
     // ---- 统计计数接口 ----
-    quint64 totalRescales() const;       ///< 累计缩放重算次数
-    quint64 totalAutoScaleEvents() const; ///< 累计自动缩放事件次数
-    quint64 totalAxisAdds() const { return m_totalAxisAdds; } ///< 累计轴添加次数
-    quint64 totalAxisRemoves() const { return m_totalAxisRemoves; } ///< 累计轴移除次数
-    void resetYAxisStatistics();         ///< 重置所有Y轴统计计数器
+    /** @brief 获取累计缩放重算次数 @return 重算次数 */
+    quint64 totalRescales() const;
+    /** @brief 获取累计自动缩放事件次数 @return 自动缩放次数 */
+    quint64 totalAutoScaleEvents() const;
+    /** @brief 获取累计轴添加次数 @return 添加次数 */
+    quint64 totalAxisAdds() const { return m_totalAxisAdds; }
+    /** @brief 获取累计轴移除次数 @return 移除次数 */
+    quint64 totalAxisRemoves() const { return m_totalAxisRemoves; }
+    /** @brief 重置所有Y轴统计计数器 */
+    void resetYAxisStatistics();
 
 signals:
-    void axesChanged(); ///< Y轴布局变化信号（增删轴后通知ChartWidget刷新）
+    /** @brief Y轴布局变化信号（增删轴后通知ChartWidget刷新） */
+    void axesChanged();
 
 private:
-    int countAxesOnSide(YAxisSide side) const; ///< 获取指定侧已使用的轴数量
+    /** @brief 获取指定侧已使用的轴数量 @param side 左/右侧 @return 轴数量 */
+    int countAxesOnSide(YAxisSide side) const;
 
     /** @brief 轴信息结构体 */
     struct AxisInfo {

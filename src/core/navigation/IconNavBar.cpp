@@ -111,6 +111,7 @@ QPushButton* IconNavBar::createCategoryButton(const NavCategory& category)
 void IconNavBar::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event)
+    ++m_totalRenders;
 
     // 无激活项时不绘制
     if (m_activeIndex < 0) return;
@@ -155,4 +156,5 @@ void IconNavBar::resetNavStatistics()
 {
     m_totalCategorySwitches = 0;
     m_totalButtonClicks = 0;
+    m_totalRenders = 0;
 }

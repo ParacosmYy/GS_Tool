@@ -65,26 +65,39 @@ struct ChannelConfig {
     int sampleDivisor = 1;   ///< 降采样比率: 每隔 sampleDivisor 帧取一个数据点 (1=不降采样)
 
     // ---- 计算接口 ----
-    double compute(const QVariantMap& fields) const; ///< 从帧解析结果中计算本通道数值(字段不存在返回NaN)
-    bool canCompute(const QVariantMap& fields) const; ///< 判断帧数据是否包含本通道所需的所有字段
+    /** @brief 从帧解析结果中计算本通道数值 @param fields 帧字段映射 @return 计算结果，字段不存在返回NaN */
+    double compute(const QVariantMap& fields) const;
+    /** @brief 判断帧数据是否包含本通道所需的所有字段 @param fields 帧字段映射 @return true=可计算 */
+    bool canCompute(const QVariantMap& fields) const;
 
     // ---- JSON序列化 ----
-    QJsonObject toJson() const;               ///< 序列化为JSON对象
-    static ChannelConfig fromJson(const QJsonObject& obj); ///< 从JSON反序列化
+    /** @brief 序列化为JSON对象 @return QJsonObject */
+    QJsonObject toJson() const;
+    /** @brief 从JSON反序列化 @param obj JSON对象 @return 通道配置 */
+    static ChannelConfig fromJson(const QJsonObject& obj);
 };
 
 /** @brief 通道配置集合 -- 管理多个ChannelConfig，负责整体序列化和批量计算。典型用法: generateDefaults()->调整参数->computeAll(fields)->toJson()/fromJson()持久化 */
 class ChannelConfigSet {
 public:
-    void addChannel(const ChannelConfig& config); ///< 添加通道配置
-    void removeChannel(const QString& displayName); ///< 移除通道配置(按displayName匹配)
-    const QVector<ChannelConfig>& channels() const; ///< 获取所有通道配置(只读)
-    ChannelConfig* findChannel(const QString& displayName); ///< 按名称查找通道(可修改)
-    const ChannelConfig* findChannel(const QString& displayName) const; ///< 按名称查找通道(只读)
-    QMap<QString, double> computeAll(const QVariantMap& fields) const; ///< 计算所有启用通道的值
-    QJsonObject toJson() const;               ///< 序列化为JSON { "channels": [...] }
-    static ChannelConfigSet fromJson(const QJsonObject& obj); ///< 从JSON反序列化
-    static ChannelConfigSet generateDefaults(const QVector<FieldDef>& fields); ///< 从FieldDef生成默认配置
+    /** @brief 添加通道配置 @param config 通道配置 */
+    void addChannel(const ChannelConfig& config);
+    /** @brief 移除通道配置(按displayName匹配) @param displayName 通道名称 */
+    void removeChannel(const QString& displayName);
+    /** @brief 获取所有通道配置(只读) @return 配置向量常引用 */
+    const QVector<ChannelConfig>& channels() const;
+    /** @brief 按名称查找通道(可修改) @param displayName 通道名称 @return 通道指针，未找到返回nullptr */
+    ChannelConfig* findChannel(const QString& displayName);
+    /** @brief 按名称查找通道(只读) @param displayName 通道名称 @return 通道指针，未找到返回nullptr */
+    const ChannelConfig* findChannel(const QString& displayName) const;
+    /** @brief 计算所有启用通道的值 @param fields 帧字段映射 @return 通道名到计算值的映射 */
+    QMap<QString, double> computeAll(const QVariantMap& fields) const;
+    /** @brief 序列化为JSON @return QJsonObject { "channels": [...] } */
+    QJsonObject toJson() const;
+    /** @brief 从JSON反序列化 @param obj JSON对象 @return 配置集 */
+    static ChannelConfigSet fromJson(const QJsonObject& obj);
+    /** @brief 从FieldDef生成默认配置 @param fields 字段定义列表 @return 默认配置集 */
+    static ChannelConfigSet generateDefaults(const QVector<FieldDef>& fields);
 
     // ---- 统计计数器接口 ----
 

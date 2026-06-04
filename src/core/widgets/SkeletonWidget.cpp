@@ -52,6 +52,7 @@ SkeletonWidget::SkeletonWidget(int width, int height, int borderRadius,
 void SkeletonWidget::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
+    ++m_totalRenders;
 
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
@@ -83,4 +84,5 @@ void SkeletonWidget::resetSkeletonStatistics()
 {
     m_totalAnimations = 0;
     m_totalLayoutChanges = 0;
+    m_totalRenders = 0;
 }

@@ -31,6 +31,7 @@ void ExportDialog::setupConnections()
 {
     // 浏览按钮：弹出文件保存对话框，根据当前格式更新默认扩展名
     connect(m_browseBtn, &QPushButton::clicked, this, [this]() {
+        ++m_totalBrowseClicks;
         int idx = m_formatCombo->currentIndex();
         QString ext;
         QString filter;

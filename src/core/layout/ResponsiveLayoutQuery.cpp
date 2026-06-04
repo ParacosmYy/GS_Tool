@@ -115,4 +115,5 @@ void ResponsiveLayout::resetStats()
     m_totalLayoutChanges = 0;
     m_breakpointChangeCount = 0;
     m_navCollapseToggleCount = 0;
+    m_totalWidgetRegistrations = 0;
 }

@@ -21,7 +21,7 @@ class QTextEdit;
 class QLabel;
 class QSplitter;
 
-/// @brief 差异行类型
+/** @brief 差异行类型枚举 */
 enum class DiffLineType {
     Unchanged,  ///< 未变化
     Added,      ///< 新增(左侧无，右侧有)
@@ -29,12 +29,12 @@ enum class DiffLineType {
     Modified    ///< 修改(两侧都有但内容不同)
 };
 
-/// @brief 差异行数据
+/** @brief 差异行数据结构 */
 struct DiffLine {
-    DiffLineType type;
-    QString leftText;   ///< 左侧文本
-    QString rightText;  ///< 右侧文本
-    int lineNumber = 0; ///< 行号
+    DiffLineType type;   ///< 行差异类型
+    QString leftText;    ///< 左侧文本
+    QString rightText;   ///< 右侧文本
+    int lineNumber = 0;  ///< 行号
 };
 
 /**
@@ -44,26 +44,33 @@ class DataDiffWidget : public QWidget {
     Q_OBJECT
 
 public:
+    /** @brief 构造数据对比视图 @param parent 父控件 */
     explicit DataDiffWidget(QWidget* parent = nullptr);
 
-    /// @brief 设置对比数据并执行diff
+    /** @brief 设置对比数据并执行diff @param leftData 左侧原始数据 @param rightData 右侧修改数据 */
     void setData(const QString& leftData, const QString& rightData);
 
-    /// @brief 设置标签文本
+    /** @brief 设置左侧标签文本 @param label 标签字符串 */
     void setLeftLabel(const QString& label);
+    /** @brief 设置右侧标签文本 @param label 标签字符串 */
     void setRightLabel(const QString& label);
 
-    /// @brief 清空对比数据
+    /** @brief 清空对比数据 */
     void clear();
 
-    /// @brief 差异统计
+    /** @brief 获取新增行数 @return 新增行计数 */
     int addedCount() const { return m_added; }
+    /** @brief 获取删除行数 @return 删除行计数 */
     int removedCount() const { return m_removed; }
+    /** @brief 获取修改行数 @return 修改行计数 */
     int modifiedCount() const { return m_modified; }
 
 private:
+    /** @brief 使用LCS算法计算差异 @param left 左侧行列表 @param right 右侧行列表 @return 差异行列表 */
     QVector<DiffLine> computeDiff(const QStringList& left, const QStringList& right) const;
+    /** @brief 刷新左右编辑器显示 */
     void refreshDisplay();
+    /** @brief 获取差异类型对应的语义颜色 @param type 差异类型 @return 颜色值 */
     QColor diffColor(DiffLineType type) const;
 
     QLabel* m_leftLabel = nullptr;      ///< objectName="diffLeftLabel"

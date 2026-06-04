@@ -37,6 +37,8 @@ public:
     quint64 totalAnimations() const { return m_totalAnimations; }
     /** @brief 获取布局变更总次数 */
     quint64 totalLayoutChanges() const { return m_totalLayoutChanges; }
+    /** @brief 获取累计渲染次数(paintEvent触发) */
+    quint64 totalRenders() const { return m_totalRenders; }
     /** @brief 重置所有统计计数器 */
     void resetSkeletonStatistics();
 
@@ -52,6 +54,7 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalAnimations = 0;     ///< 动画循环完成次数(微光回到起点计一次)
     quint64 m_totalLayoutChanges = 0;  ///< 布局变更次数
+    mutable quint64 m_totalRenders = 0; ///< 累计渲染次数(paintEvent触发)
 };
 
 #endif // SKELETON_WIDGET_H

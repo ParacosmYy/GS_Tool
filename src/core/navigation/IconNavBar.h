@@ -58,6 +58,8 @@ public:
     quint64 totalCategorySwitches() const { return m_totalCategorySwitches; }
     /** @brief 获取按钮点击总次数 */
     quint64 totalButtonClicks() const { return m_totalButtonClicks; }
+    /** @brief 获取累计渲染次数(paintEvent触发，绘制激活指示线) */
+    quint64 totalRenders() const { return m_totalRenders; }
     /** @brief 重置所有统计计数器 */
     void resetNavStatistics();
 
@@ -82,6 +84,7 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalCategorySwitches = 0;      ///< 分类切换次数
     quint64 m_totalButtonClicks = 0;          ///< 按钮点击次数
+    mutable quint64 m_totalRenders = 0;       ///< 累计渲染次数(paintEvent触发)
 };
 
 #endif // ICON_NAV_BAR_H

@@ -21,31 +21,31 @@ class NumericDisplayWidget : public QWidget
     Q_OBJECT
 
 public:
-    /// 构造函数
+    /** @brief 构造数值显示控件 @param parent 父控件指针 */
     explicit NumericDisplayWidget(QWidget *parent = nullptr);
 
-    /// 设置当前值
+    /** @brief 设置当前显示值 @param value 新的显示值 */
     void setValue(double value);
 
-    /// 设置显示单位
+    /** @brief 设置显示单位文本 @param unit 单位字符串，如"V"、"mA" */
     void setUnit(const QString &unit);
 
-    /// 设置小数位数
+    /** @brief 设置小数位数 @param precision 小数位数，默认2 */
     void setPrecision(int precision);
 
-    /// 绑定数据通道
+    /** @brief 绑定数据通道名称 @param channelName 通道名称 */
     void bindChannel(const QString &channelName);
 
-    /// 获取当前值
+    /** @brief 获取当前显示值 @return 当前值 */
     double value() const { return m_value; }
 
-    /// 获取单位
+    /** @brief 获取显示单位 @return 单位字符串 */
     QString unit() const { return m_unit; }
 
-    /// 获取精度
+    /** @brief 获取小数位数 @return 精度位数 */
     int precision() const { return m_precision; }
 
-    /// 获取通道名
+    /** @brief 获取绑定的数据通道名 @return 通道名称 */
     QString channelName() const { return m_channelName; }
 
     /** @brief 获取值更新总次数 */
@@ -61,10 +61,10 @@ public:
     void resetStatistics();
 
 protected:
-    /// 绘制事件 —— 绘制大号数值、单位与标签
+    /** @brief 绘制事件 — 绘制背景矩形、通道标签、大号数值和单位后缀 @param event 绘制事件参数 */
     void paintEvent(QPaintEvent *event) override;
 
-    /// 建议最小尺寸
+    /** @brief 建议最小尺寸 @return 120x60像素 */
     QSize minimumSizeHint() const override;
 
 private:

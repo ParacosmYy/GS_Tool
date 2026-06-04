@@ -20,7 +20,7 @@ class QChartView;
 class ChartModel;
 class ZoomController;
 
-/// @brief 游标测量叠加层 — 叠加在ChartView上方，绘制两条竖线游标和差值信息面板，使用QPainter直接绘制
+/** @brief 游标测量叠加层 — 叠加在ChartView上方，绘制两条竖线游标和差值信息面板，使用QPainter直接绘制 */
 class CursorOverlay : public QWidget {
     Q_OBJECT
 

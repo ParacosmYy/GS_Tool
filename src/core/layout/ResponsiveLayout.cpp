@@ -77,6 +77,7 @@ void ResponsiveLayout::registerWidgetVisibility(
 {
     if (!widget) return;
     m_visibilityPolicies[widget] = policy;
+    ++m_totalWidgetRegistrations;
     // 立即应用当前断点的策略
     applyVisibilityPolicy(m_currentBreakpoint);
 }

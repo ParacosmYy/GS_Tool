@@ -12,7 +12,7 @@
 #include <QVariantMap>
 #include <QList>
 
-/// @brief 仪表盘配置模型 — 负责组件配置的增删查、数据通道管理与持久化
+/** @brief 仪表盘配置模型 — 负责组件配置的增删查、数据通道管理与持久化 */
 class DashboardModel : public QObject
 {
     Q_OBJECT

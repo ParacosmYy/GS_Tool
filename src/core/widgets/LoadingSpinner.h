@@ -47,6 +47,8 @@ public:
     quint64 totalStarts() const { return m_totalStarts; }
     /** @brief 获取动画停止总次数 */
     quint64 totalStops() const { return m_totalStops; }
+    /** @brief 获取旋转定时器触发总次数(累计滴答计数) */
+    quint64 totalTicks() const { return m_totalTicks; }
     /** @brief 重置所有统计计数器 */
     void resetSpinnerStatistics();
 
@@ -64,6 +66,7 @@ private:
     // ── 统计计数器 ──
     quint64 m_totalStarts = 0;   ///< 动画启动次数
     quint64 m_totalStops = 0;    ///< 动画停止次数
+    mutable quint64 m_totalTicks = 0; ///< 旋转定时器触发总次数(累计滴答)
 };
 
 #endif // LOADING_SPINNER_H
