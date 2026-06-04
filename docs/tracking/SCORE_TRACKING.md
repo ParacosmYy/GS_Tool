@@ -80,6 +80,8 @@
 | 234-235 | BackgroundWidgetPaint/FrameVisualEditorFields拆分+PacketBuilder/Timestamp统计增强 | 背景绘制独立+帧编辑器字段独立+包构建/时间戳统计 |
 | 236-237 | CursorOverlayInteraction/MqttConnectionPublish/TerminalSearchBarHistory拆分+10个头文件压缩 | 游标交互独立+MQTT发布独立+搜索历史独立 |
 | 238 | BleConnection/SerialDetector头文件压缩 | BLE连接/串口检测器Doxygen压缩 |
+| 239 | CanConnectionFrame/DbcParserSignal/UsbLibraryLoaderQuery拆分+头文件压缩 | CAN帧独立+DBC信号独立+USB查询独立 |
+| 240 | DashboardSerializerExport/ModbusMasterStats/JLinkSdkLoaderQuery拆分+多模块压缩 | Dashboard导出独立+Modbus统计独立+JLink查询独立+23个头文件压缩至<180行 |
 
 ---
 
