@@ -38,6 +38,16 @@ public:
     /** @brief 获取所有已注册的类型名称 @return 类型名称列表 */
     QStringList registeredTypes() const;
 
+    // ---- 统计计数器 ----
+    /** @brief 获取累计注册类型次数 @return 注册次数 */
+    quint64 totalRegistrations() const { return m_totalRegistrations; }
+    /** @brief 获取累计创建控件次数 @return 创建次数 */
+    quint64 totalCreations() const { return m_totalCreations; }
+    /** @brief 获取累计创建失败次数(未注册类型) @return 失败次数 */
+    quint64 totalCreationFailures() const { return m_totalCreationFailures; }
+    /** @brief 重置所有统计计数器 */
+    void resetFactoryStatistics() { m_totalRegistrations = 0; m_totalCreations = 0; m_totalCreationFailures = 0; }
+
     /**
      * @brief 模板注册方法，自动生成创建函数
      * @tparam T 控件派生类型
@@ -50,4 +60,9 @@ public:
 
 private:
     QMap<QString, WidgetCreator> m_creators;  ///< 类型名称到创建函数的映射
+
+    // ---- 统计 ----
+    quint64 m_totalRegistrations = 0;      ///< 统计: 累计类型注册次数
+    mutable quint64 m_totalCreations = 0;  ///< 统计: 累计控件创建成功次数
+    mutable quint64 m_totalCreationFailures = 0; ///< 统计: 累计控件创建失败次数
 };

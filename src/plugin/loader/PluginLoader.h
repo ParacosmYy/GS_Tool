@@ -51,6 +51,18 @@ public:
     /** @brief 扫描所有搜索路径中的插件 @return 发现的插件信息列表 */
     QList<PluginInfo> scanPlugins();
 
+    // ---- 统计计数器 ----
+    /** @brief 获取累计加载成功次数 @return 成功次数 */
+    quint64 totalLoadSuccesses() const { return m_totalLoadSuccesses; }
+    /** @brief 获取累计加载失败次数 @return 失败次数 */
+    quint64 totalLoadFailures() const { return m_totalLoadFailures; }
+    /** @brief 获取累计卸载次数 @return 卸载次数 */
+    quint64 totalUnloads() const { return m_totalUnloads; }
+    /** @brief 获取累计扫描次数 @return 扫描次数 */
+    quint64 totalScans() const { return m_totalScans; }
+    /** @brief 重置所有统计计数器 */
+    void resetLoaderStatistics() { m_totalLoadSuccesses = 0; m_totalLoadFailures = 0; m_totalUnloads = 0; m_totalScans = 0; }
+
 signals:
     /** @brief 扫描发现新插件 @param info 插件信息 */
     void pluginFound(const PluginInfo &info);
@@ -65,4 +77,10 @@ private:
     QStringList m_searchPaths;                       ///< 插件搜索路径列表
     QMap<QString, QPluginLoader *> m_loaders;        ///< 插件名称到加载器的映射
     QMap<QString, PluginInfo> m_plugins;             ///< 插件名称到信息的映射
+
+    // ---- 统计 ----
+    quint64 m_totalLoadSuccesses = 0;     ///< 统计: 累计加载成功次数
+    quint64 m_totalLoadFailures = 0;      ///< 统计: 累计加载失败次数
+    quint64 m_totalUnloads = 0;           ///< 统计: 累计卸载次数
+    quint64 m_totalScans = 0;             ///< 统计: 累计扫描次数
 };

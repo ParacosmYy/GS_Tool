@@ -41,6 +41,18 @@ public:
     /** @brief 批量预加载图标到缓存 @param names 图标名称列表 @param size 目标尺寸 */
     void preloadIcons(const QStringList &names, const QSize &size);
 
+    // ---- 统计计数器 ----
+    /** @brief 获取累计图标注册次数 @return 注册次数 */
+    quint64 totalIconRegistrations() const { return m_totalIconRegistrations; }
+    /** @brief 获取累计图标渲染次数 @return 渲染次数 */
+    quint64 totalRenders() const { return m_totalRenders; }
+    /** @brief 获取累计缓存命中次数 @return 命中次数 */
+    quint64 totalCacheHits() const { return m_totalCacheHits; }
+    /** @brief 获取累计缓存清除次数 @return 清除次数 */
+    quint64 totalCacheClears() const { return m_totalCacheClears; }
+    /** @brief 重置所有统计计数器 */
+    void resetIconProviderStatistics() { m_totalIconRegistrations = 0; m_totalRenders = 0; m_totalCacheHits = 0; m_totalCacheClears = 0; }
+
 signals:
     /** @brief 新图标注册完成时发射 @param name 图标名称 */
     void iconRegistered(const QString &name);
@@ -54,4 +66,10 @@ private:
     QMap<QString, QByteArray> m_svgData;                    ///< 图标名称到SVG原始数据的映射
     QMap<QString, QMap<quint64, QPixmap>> m_cache;          ///< 二级缓存：名称->(缓存键->像素图)
     QColor m_defaultColor;                                   ///< 默认着色颜色
+
+    // ---- 统计 ----
+    quint64 m_totalIconRegistrations = 0;       ///< 统计: 累计图标注册次数
+    mutable quint64 m_totalRenders = 0;         ///< 统计: 累计SVG渲染次数
+    mutable quint64 m_totalCacheHits = 0;       ///< 统计: 累计缓存命中次数
+    quint64 m_totalCacheClears = 0;             ///< 统计: 累计缓存清除次数
 };

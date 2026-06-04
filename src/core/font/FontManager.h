@@ -46,6 +46,16 @@ public:
     /** @brief 重置所有预设为默认值 */
     void resetToDefaults();
 
+    // ---- 统计计数器 ----
+    /** @brief 获取累计字体文件加载次数 @return 加载次数 */
+    quint64 totalFontLoads() const { return m_totalFontLoads; }
+    /** @brief 获取累计字体加载失败次数 @return 失败次数 */
+    quint64 totalFontLoadFailures() const { return m_totalFontLoadFailures; }
+    /** @brief 获取累计预设字体修改次数 @return 修改次数 */
+    quint64 totalPresetChanges() const { return m_totalPresetChanges; }
+    /** @brief 重置所有统计计数器 */
+    void resetFontStatistics() { m_totalFontLoads = 0; m_totalFontLoadFailures = 0; m_totalPresetChanges = 0; }
+
 signals:
     /** @brief 字体文件加载完成时发射 @param name 字体名称 */
     void fontLoaded(const QString &name);
@@ -59,4 +69,9 @@ private:
     QMap<PresetFont, QFont> m_presets;  ///< 预设角色到字体的映射
     QMap<QString, int> m_loadedIds;     ///< 已加载字体的名称到ID映射
     QString m_defaultFamily;            ///< 默认字体族名称
+
+    // ---- 统计 ----
+    quint64 m_totalFontLoads = 0;        ///< 统计: 累计字体文件加载成功次数
+    quint64 m_totalFontLoadFailures = 0; ///< 统计: 累计字体文件加载失败次数
+    quint64 m_totalPresetChanges = 0;    ///< 统计: 累计预设字体修改次数
 };

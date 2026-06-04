@@ -54,17 +54,18 @@ void AnimationUtility::animateProperty(QObject *target, const QString &prop, con
     connect(anim, &QVariantAnimation::finished, this, &AnimationUtility::onFinished);
     m_animations[target] = anim;
     anim->start(QVariantAnimation::DeleteWhenStopped);
+    ++m_totalAnimationsStarted;
     emit animationStarted(target);
 }
 
 /** @brief 停止所有活跃动画并清空动画映射表 */
-void AnimationUtility::stopAll() { for (auto *a : m_animations) a->stop(); m_animations.clear(); }
+void AnimationUtility::stopAll() { int n = m_animations.size(); for (auto *a : m_animations) a->stop(); m_totalAnimationsStopped += static_cast<quint64>(n); m_animations.clear(); }
 
 /**
  * @brief 停止指定目标对象上的动画
  * @param t 目标QObject指针
  */
-void AnimationUtility::stopForTarget(QObject *t) { auto it = m_animations.find(t); if (it != m_animations.end()) { it.value()->stop(); m_animations.erase(it); } }
+void AnimationUtility::stopForTarget(QObject *t) { auto it = m_animations.find(t); if (it != m_animations.end()) { it.value()->stop(); m_animations.erase(it); ++m_totalAnimationsStopped; } }
 
 /**
  * @brief 查询指定目标对象是否有活跃动画
@@ -86,4 +87,4 @@ void AnimationUtility::setDefaultDuration(int ms) { m_defaultDuration = ms; }
 void AnimationUtility::setDefaultCurve(const QEasingCurve &c) { m_defaultCurve = c; }
 
 /** @brief 动画完成内部处理，从映射表中移除并发射animationFinished信号 */
-void AnimationUtility::onFinished() { auto *anim = qobject_cast<QVariantAnimation *>(sender()); if (!anim) return; for (auto it = m_animations.begin(); it != m_animations.end(); ++it) if (it.value() == anim) { emit animationFinished(it.key()); m_animations.erase(it); return; } }
+void AnimationUtility::onFinished() { auto *anim = qobject_cast<QVariantAnimation *>(sender()); if (!anim) return; for (auto it = m_animations.begin(); it != m_animations.end(); ++it) if (it.value() == anim) { ++m_totalAnimationsFinished; emit animationFinished(it.key()); m_animations.erase(it); return; } }

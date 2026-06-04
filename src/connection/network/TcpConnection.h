@@ -2,10 +2,8 @@
  * @file TcpConnection.h
  * @brief TCP连接实现 - 支持Client/Server双模式的TCP网络连接
  *
- * 职责:
- *   1. Client模式: 主动连接远程设备的TCP服务器（如WiFi串口模块、嵌入式Linux板）
- *   2. Server模式: 本地监听端口，等待远程客户端连接（如远程数据采集）
- *   3. 复用IConnection抽象接口，上层无需关心连接类型
+ * 职责: Client模式(主动连接远程TCP服务器) + Server模式(本地监听等待连接)
+ * 复用IConnection抽象接口，上层无需关心连接类型
  *
  * 设计模式: 策略模式 — TcpConnection是IConnection的一个具体策略实现
  *

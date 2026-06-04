@@ -11,13 +11,14 @@ IconManager::IconManager(QObject *parent) : QObject(parent) {}
 IconManager::~IconManager() = default;
 
 /** @brief 注册图标(亮暗主题共用同一路径) @param name 图标名称 @param path SVG文件路径 */
-void IconManager::registerIcon(const QString &name, const QString &path) { m_lightPaths[name] = path; m_darkPaths[name] = path; m_cache.remove(name); emit iconRegistered(name); }
+void IconManager::registerIcon(const QString &name, const QString &path) { m_lightPaths[name] = path; m_darkPaths[name] = path; m_cache.remove(name); ++m_totalIconRegistrations; emit iconRegistered(name); }
 /** @brief 注册带主题区分的图标 @param name 图标名称 @param light 亮色主题路径 @param dark 暗色主题路径 */
-void IconManager::registerThemedIcon(const QString &name, const QString &light, const QString &dark) { m_lightPaths[name] = light; m_darkPaths[name] = dark; m_cache.remove(name); emit iconRegistered(name); }
+void IconManager::registerThemedIcon(const QString &name, const QString &light, const QString &dark) { m_lightPaths[name] = light; m_darkPaths[name] = dark; m_cache.remove(name); ++m_totalIconRegistrations; emit iconRegistered(name); }
 
 /** @brief 获取图标(带缓存，按当前主题选择路径) @param name 图标名称 @return QIcon对象 */
 QIcon IconManager::icon(const QString &name) const {
-    if (m_cache.contains(name)) return m_cache[name];
+    ++m_totalIconLookups;
+    if (m_cache.contains(name)) { ++m_totalCacheHits; return m_cache[name]; }
     QString path = m_darkTheme ? m_darkPaths.value(name) : m_lightPaths.value(name);
     if (path.isEmpty()) return QIcon();
     QIcon ic(path);
@@ -32,7 +33,7 @@ bool IconManager::hasIcon(const QString &name) const { return m_lightPaths.conta
 /** @brief 获取所有已注册图标名称 @return 图标名称列表 */
 QStringList IconManager::availableIcons() const { return m_lightPaths.keys(); }
 /** @brief 切换图标主题(亮/暗)并清空缓存 @param dark 是否为暗色主题 */
-void IconManager::setTheme(bool dark) { m_darkTheme = dark; m_cache.clear(); emit themeChanged(dark); }
+void IconManager::setTheme(bool dark) { m_darkTheme = dark; m_cache.clear(); ++m_totalThemeSwitches; emit themeChanged(dark); }
 /** @brief 预加载所有已注册图标到缓存 */
 void IconManager::preloadAll(const QSize &sz) { for (auto it = m_lightPaths.constBegin(); it != m_lightPaths.constEnd(); ++it) icon(it.key()); }
 /** @brief 清空图标缓存 */

@@ -89,6 +89,7 @@ set(SOURCES
     src/connection/serial_port/SerialConnectionError.cpp
     src/connection/network/TcpConnection.cpp
     src/connection/network/TcpConnectionStats.cpp
+    src/connection/network/TcpConnectionHelpers.cpp
     src/connection/network/UdpConnection.cpp
     src/terminal/widget/TerminalWidget.cpp
     src/terminal/widget/TerminalWidgetSlots.cpp
@@ -202,6 +203,7 @@ set(SOURCES
     src/protocol/schema/ProtocolSchemaFields.cpp
     src/protocol/engine/ProtocolEngine.cpp
     src/protocol/engine/ProtocolEngineStats.cpp
+    src/protocol/engine/ProtocolEngineParsing.cpp
     src/protocol/engine/ProtocolEngineChecksum.cpp
     src/protocol/engine/ProtocolEngineAlgorithm.cpp
     src/protocol/schema/ProtocolTemplateLibrary.cpp

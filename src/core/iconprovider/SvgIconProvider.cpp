@@ -22,7 +22,7 @@ SvgIconProvider::~SvgIconProvider() = default;
  */
 void SvgIconProvider::registerIcon(const QString &name, const QString &svgPath) {
     QFile f(svgPath);
-    if (f.open(QIODevice::ReadOnly)) { m_svgData[name] = f.readAll(); emit iconRegistered(name); }
+    if (f.open(QIODevice::ReadOnly)) { m_svgData[name] = f.readAll(); ++m_totalIconRegistrations; emit iconRegistered(name); }
 }
 
 /**
@@ -31,7 +31,7 @@ void SvgIconProvider::registerIcon(const QString &name, const QString &svgPath) 
  * @param data SVG文件的原始字节数据
  */
 void SvgIconProvider::registerSvgData(const QString &name, const QByteArray &data) {
-    m_svgData[name] = data; emit iconRegistered(name);
+    m_svgData[name] = data; ++m_totalIconRegistrations; emit iconRegistered(name);
 }
 
 /**
@@ -47,10 +47,11 @@ QPixmap SvgIconProvider::icon(const QString &name, const QSize &size, const QCol
     auto cacheIt = m_cache.constFind(name);
     if (cacheIt != m_cache.constEnd()) {
         auto pixIt = cacheIt->constFind(key);
-        if (pixIt != cacheIt->constEnd()) return pixIt.value();
+        if (pixIt != cacheIt->constEnd()) { ++m_totalCacheHits; return pixIt.value(); }
     }
     auto svgIt = m_svgData.constFind(name);
     if (svgIt == m_svgData.constEnd()) return QPixmap();
+    ++m_totalRenders;
     QByteArray svg = c.isValid() ? applyColor(svgIt.value(), c) : svgIt.value();
     QSvgRenderer renderer(svg);
     QPixmap pix(size); pix.fill(Qt::transparent);
@@ -95,7 +96,7 @@ QStringList SvgIconProvider::availableIcons() const { return m_svgData.keys(); }
 void SvgIconProvider::setDefaultColor(const QColor &c) { m_defaultColor = c; }
 
 /** @brief 清空所有已缓存的渲染结果 */
-void SvgIconProvider::clearCache() { m_cache.clear(); }
+void SvgIconProvider::clearCache() { m_cache.clear(); ++m_totalCacheClears; }
 
 /**
  * @brief 预加载指定名称列表的图标到缓存

@@ -48,37 +48,16 @@ public:
 
     // ---- CSV配置 ----
 
-    /**
-     * @brief 设置CSV列分隔符
-     *
-     * 默认为逗号(',')。可设为制表符('\t')、分号(';')等。
-     * 影响所有CSV格式导出(全量/流式/EDL范围)。
-     * 分隔符变更不影响escapeCsvField()中的RFC 4180转义逻辑。
-     *
-     * @param delim 分隔符字符
-     */
+    /** @brief 设置CSV列分隔符，默认逗号(',')，可设为制表符/分号等 @param delim 分隔符字符 */
     void setCsvDelimiter(QChar delim);
 
-    /**
-     * @brief 获取当前CSV列分隔符
-     * @return 分隔符字符
-     */
+    /** @brief 获取当前CSV列分隔符 @return 分隔符字符 */
     QChar csvDelimiter() const;
 
-    /**
-     * @brief 设置CSV是否写入UTF-8 BOM头
-     *
-     * 默认启用(true)。BOM头(0xEF 0xBB 0xBF)确保Excel中文环境下
-     * 正确识别UTF-8编码。如需导出无BOM的CSV(兼容某些工具)可关闭。
-     *
-     * @param enable true=写入BOM，false=不写入
-     */
+    /** @brief 设置CSV是否写入UTF-8 BOM头(默认启用，确保Excel中文兼容) @param enable true=写入BOM */
     void setCsvBomEnabled(bool enable);
 
-    /**
-     * @brief 获取CSV是否写入BOM头
-     * @return true=启用BOM
-     */
+    /** @brief 获取CSV是否写入BOM头 @return true=启用BOM */
     bool isCsvBomEnabled() const;
 
     // ---- 会话统计 ----
@@ -92,32 +71,16 @@ public:
     quint64 totalJsonExports() const;     ///< JSON格式次数
     quint64 totalBinExports() const;      ///< 二进制格式次数
 
-    /**
-     * @brief 获取累计导出总耗时(毫秒)
-     *
-     * 从每次导出开始到完成(文件写入并关闭)的耗时总和。
-     * 仅统计成功的导出操作。
-     *
-     * @return 总耗时毫秒数
-     */
+    /** @brief 获取累计导出总耗时(仅统计成功操作) @return 总耗时毫秒数 */
     qint64 totalExportDurationMs() const;
 
-    /**
-     * @brief 获取最近一次导出操作的耗时(毫秒)
-     * @return 最近一次导出耗时；若从未导出过返回0
-     */
+    /** @brief 获取最近一次导出耗时 @return 最近导出耗时(ms)，未导出过返回0 */
     qint64 lastExportDurationMs() const;
 
-    /**
-     * @brief 获取最近一次导出的记录数量
-     * @return 最近一次导出的行数
-     */
+    /** @brief 获取最近一次导出的行数 @return 最近导出行数 */
     quint64 lastExportRowCount() const;
 
-    /**
-     * @brief 获取最近一次导出的字节总数
-     * @return 最近一次导出的字节数
-     */
+    /** @brief 获取最近一次导出的字节数 @return 最近导出字节数 */
     quint64 lastExportByteCount() const;
 
     void resetStats();                    ///< 重置所有统计
@@ -160,18 +123,10 @@ private:
                                         const QDateTime& from, const QDateTime& to) const;
     QVector<TerminalLine> readEdlRange(const QString& edlPath, qint64 fromMs, qint64 toMs);
 
-    /**
-     * @brief 写入CSV BOM头(如果启用)
-     * @param file 已打开的文件对象
-     * @param path 文件路径(用于错误报告)
-     * @return true=BOM写入成功或不需要BOM
-     */
+    /** @brief 写入CSV BOM头(如果启用) @param file 已打开的文件对象 @param path 文件路径(错误报告) @return true=成功或不需要BOM */
     bool writeCsvBom(QFile& file, const QString& path);
 
-    /**
-     * @brief 生成CSV表头行
-     * @return 表头字符串(不含尾随换行)
-     */
+    /** @brief 生成CSV表头行 @return 表头字符串(不含尾随换行) */
     QString csvHeader() const;
 
     static QString toAsciiString(const QByteArray& data);     ///< 不可打印→'.'

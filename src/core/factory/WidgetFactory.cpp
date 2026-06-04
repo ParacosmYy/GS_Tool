@@ -16,6 +16,7 @@ WidgetFactory::~WidgetFactory() = default;
 void WidgetFactory::registerType(const QString &typeName, WidgetCreator creator)
 {
     m_creators[typeName] = creator;
+    ++m_totalRegistrations;
 }
 
 /** @brief 注销指定名称的控件类型，移除其创建函数 @param typeName 要注销的控件类型名称 */
@@ -29,8 +30,10 @@ QWidget* WidgetFactory::create(const QString &typeName, QWidget *parent) const
 {
     auto it = m_creators.constFind(typeName);
     if (it != m_creators.constEnd()) {
+        ++m_totalCreations;
         return it.value()(parent);
     }
+    ++m_totalCreationFailures;
     return nullptr;
 }
 

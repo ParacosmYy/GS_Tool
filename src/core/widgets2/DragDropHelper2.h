@@ -47,6 +47,18 @@ public:
     /** @brief 获取内部拖拽数据 @param mimeType MIME类型 @return 拖拽数据 */
     QByteArray dragData(const QString &mimeType) const;
 
+    // ---- 统计计数器 ----
+    /** @brief 获取累计拖入事件处理次数 @return 拖入次数 */
+    quint64 totalDragEnters() const { return m_totalDragEnters; }
+    /** @brief 获取累计放下事件成功处理次数 @return 成功放下次数 */
+    quint64 totalSuccessfulDrops() const { return m_totalSuccessfulDrops; }
+    /** @brief 获取累计放下事件拒绝次数 @return 拒绝次数 */
+    quint64 totalRejectedDrops() const { return m_totalRejectedDrops; }
+    /** @brief 获取累计处理器注册次数 @return 注册次数 */
+    quint64 totalHandlerRegistrations() const { return m_totalHandlerRegistrations; }
+    /** @brief 重置所有统计计数器 */
+    void resetDragDrop2Statistics() { m_totalDragEnters = 0; m_totalSuccessfulDrops = 0; m_totalRejectedDrops = 0; m_totalHandlerRegistrations = 0; }
+
 signals:
     /** @brief 数据被成功放下时发射 @param mimeType MIME类型 @param data 数据内容 */
     void dataDropped(const QString &mimeType, const QByteArray &data);
@@ -60,4 +72,10 @@ private:
     QStringList m_acceptedTypes;               ///< 接受的MIME类型列表
     QMap<QString, QByteArray> m_dragData;      ///< 内部拖拽数据
     bool m_internalDrag = false;               ///< 是否为内部拖拽模式
+
+    // ---- 统计 ----
+    quint64 m_totalDragEnters = 0;             ///< 统计: 累计拖入事件处理次数
+    quint64 m_totalSuccessfulDrops = 0;        ///< 统计: 累计放下成功次数
+    quint64 m_totalRejectedDrops = 0;          ///< 统计: 累计放下拒绝次数
+    quint64 m_totalHandlerRegistrations = 0;   ///< 统计: 累计处理器注册次数
 };

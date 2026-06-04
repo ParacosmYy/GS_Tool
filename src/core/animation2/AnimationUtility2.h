@@ -43,6 +43,16 @@ public:
     /** @brief 设置默认缓动曲线 @param curve 缓动曲线 */
     void setDefaultCurve(const QEasingCurve &curve);
 
+    // ---- 统计计数器 ----
+    /** @brief 获取累计启动的动画总次数 @return 动画启动次数 */
+    quint64 totalAnimationsStarted() const { return m_totalAnimationsStarted; }
+    /** @brief 获取累计完成的动画总次数 @return 动画完成次数 */
+    quint64 totalAnimationsFinished() const { return m_totalAnimationsFinished; }
+    /** @brief 获取累计手动停止的动画总次数 @return 动画停止次数 */
+    quint64 totalAnimationsStopped() const { return m_totalAnimationsStopped; }
+    /** @brief 重置所有统计计数器 */
+    void resetAnimationStatistics() { m_totalAnimationsStarted = 0; m_totalAnimationsFinished = 0; m_totalAnimationsStopped = 0; }
+
 signals:
     /** @brief 动画完成时发射 @param target 目标对象 */
     void animationFinished(QObject *target);
@@ -56,4 +66,9 @@ private:
     QMap<QObject *, QVariantAnimation *> m_animations;  ///< 目标对象到动画实例的映射
     int m_defaultDuration = 300;                         ///< 默认动画时长(毫秒)
     QEasingCurve m_defaultCurve{QEasingCurve::OutCubic}; ///< 默认缓动曲线
+
+    // ---- 统计 ----
+    quint64 m_totalAnimationsStarted = 0;   ///< 统计: 累计动画启动次数
+    quint64 m_totalAnimationsFinished = 0;  ///< 统计: 累计动画完成次数
+    quint64 m_totalAnimationsStopped = 0;   ///< 统计: 累计手动停止次数
 };

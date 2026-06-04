@@ -41,6 +41,18 @@ public:
     /** @brief 清除所有图标缓存 */
     void clearCache();
 
+    // ---- 统计计数器 ----
+    /** @brief 获取累计图标注册次数 @return 注册次数 */
+    quint64 totalIconRegistrations() const { return m_totalIconRegistrations; }
+    /** @brief 获取累计图标查找次数 @return 查找次数 */
+    quint64 totalIconLookups() const { return m_totalIconLookups; }
+    /** @brief 获取累计缓存命中次数 @return 命中次数 */
+    quint64 totalCacheHits() const { return m_totalCacheHits; }
+    /** @brief 获取累计主题切换次数 @return 切换次数 */
+    quint64 totalThemeSwitches() const { return m_totalThemeSwitches; }
+    /** @brief 重置所有统计计数器 */
+    void resetIconStatistics() { m_totalIconRegistrations = 0; m_totalIconLookups = 0; m_totalCacheHits = 0; m_totalThemeSwitches = 0; }
+
 signals:
     /** @brief 新图标注册时发射 @param name 图标名称 */
     void iconRegistered(const QString &name);
@@ -52,4 +64,10 @@ private:
     QMap<QString, QString> m_darkPaths;   ///< 暗色主题图标路径映射
     QMap<QString, QIcon> m_cache;         ///< 图标缓存
     bool m_darkTheme = false;             ///< 当前是否为暗色主题
+
+    // ---- 统计 ----
+    quint64 m_totalIconRegistrations = 0; ///< 统计: 累计图标注册次数
+    mutable quint64 m_totalIconLookups = 0; ///< 统计: 累计图标查找次数
+    mutable quint64 m_totalCacheHits = 0;   ///< 统计: 累计缓存命中次数
+    quint64 m_totalThemeSwitches = 0;     ///< 统计: 累计主题切换次数
 };

@@ -12,8 +12,9 @@ FontManager::~FontManager() = default;
 /** @brief 从文件加载字体到应用字体库 @param name 字体名称标识 @param path 字体文件路径 @return 加载成功返回true */
 bool FontManager::loadFont(const QString &name, const QString &path) {
     int id = QFontDatabase::addApplicationFont(path);
-    if (id < 0) return false;
+    if (id < 0) { ++m_totalFontLoadFailures; return false; }
     m_loadedIds[name] = id;
+    ++m_totalFontLoads;
     emit fontLoaded(name);
     return true;
 }
@@ -26,9 +27,9 @@ QFont FontManager::font(const QString &name, int sz) const {
 }
 
 /** @brief 设置预设字体 @param p 预设字体枚举 @param f 字体对象 */
-void FontManager::setFont(PresetFont p, const QFont &f) { m_presets[p] = f; emit fontChanged(p); }
+void FontManager::setFont(PresetFont p, const QFont &f) { m_presets[p] = f; ++m_totalPresetChanges; emit fontChanged(p); }
 /** @brief 设置预设字体大小 @param p 预设字体枚举 @param sz 字号 */
-void FontManager::setFontSize(PresetFont p, int sz) { auto f = m_presets.value(p); f.setPointSize(sz); m_presets[p] = f; emit fontChanged(p); }
+void FontManager::setFontSize(PresetFont p, int sz) { auto f = m_presets.value(p); f.setPointSize(sz); m_presets[p] = f; ++m_totalPresetChanges; emit fontChanged(p); }
 /** @brief 设置默认字体族名 @param f 字体族名 */
 void FontManager::setDefaultFamily(const QString &f) { m_defaultFamily = f; }
 /** @brief 获取默认字体族名 @return 字体族名 */

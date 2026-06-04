@@ -13,18 +13,19 @@ DragDropHelper::DragDropHelper(QObject *parent) : QObject(parent) {}
 DragDropHelper::~DragDropHelper() = default;
 
 /** @brief 注册MIME类型处理回调 @param mime MIME类型字符串 @param h 处理回调函数 */
-void DragDropHelper::registerHandler(const QString &mime, DropHandler h) { m_handlers[mime] = h; }
+void DragDropHelper::registerHandler(const QString &mime, DropHandler h) { m_handlers[mime] = h; ++m_totalHandlerRegistrations; }
 /** @brief 注销MIME类型处理回调 @param mime MIME类型字符串 */
 void DragDropHelper::unregisterHandler(const QString &mime) { m_handlers.remove(mime); }
 
 /** @brief 处理拖放释放事件 — 匹配MIME处理器或纯文本回退 @param event 拖放事件 @return 成功处理返回true */
 bool DragDropHelper::handleDrop(QDropEvent *event) {
     const auto *mime = event->mimeData();
-    if (!mime) { emit dropRejected(tr("No data")); return false; }
+    if (!mime) { ++m_totalRejectedDrops; emit dropRejected(tr("No data")); return false; }
     for (auto it = m_handlers.constBegin(); it != m_handlers.constEnd(); ++it) {
         if (mime->hasFormat(it.key())) {
             QByteArray data = mime->data(it.key());
             it.value()(data, it.key());
+            ++m_totalSuccessfulDrops;
             emit dataDropped(it.key(), data);
             event->acceptProposedAction();
             return true;
@@ -32,10 +33,12 @@ bool DragDropHelper::handleDrop(QDropEvent *event) {
     }
     if (mime->hasText()) {
         QByteArray data = mime->text().toUtf8();
+        ++m_totalSuccessfulDrops;
         emit dataDropped("text/plain", data);
         event->acceptProposedAction();
         return true;
     }
+    ++m_totalRejectedDrops;
     emit dropRejected(tr("Unsupported format"));
     return false;
 }
@@ -45,8 +48,8 @@ bool DragDropHelper::handleDragEnter(QDragEnterEvent *event) {
     const auto *mime = event->mimeData();
     QStringList found;
     for (const auto &type : m_acceptedTypes) if (mime->hasFormat(type)) found << type;
-    if (!found.isEmpty()) { event->acceptProposedAction(); emit dragEntered(found); return true; }
-    if (mime->hasText()) { event->acceptProposedAction(); return true; }
+    if (!found.isEmpty()) { ++m_totalDragEnters; event->acceptProposedAction(); emit dragEntered(found); return true; }
+    if (mime->hasText()) { ++m_totalDragEnters; event->acceptProposedAction(); return true; }
     return false;
 }
 
