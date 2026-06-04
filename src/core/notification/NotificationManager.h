@@ -72,4 +72,19 @@ private:
     QList<Notification> m_history;           ///< 已消除的历史通知
     int m_maxHistory = 100;                  ///< 最大历史条数
     int m_counter = 0;                       ///< 通知ID自增计数器
+
+    // ---- 统计计数器 ----
+    quint64 m_totalNotifications = 0;        ///< 总通知创建次数
+    quint64 m_totalAcknowledges = 0;         ///< 总确认次数
+    quint64 m_totalDismisses = 0;            ///< 总消除次数
+
+public:
+    /** @brief 获取总通知创建次数 @return 累计创建次数 */
+    quint64 totalNotifications() const { return m_totalNotifications; }
+    /** @brief 获取总确认次数 @return 累计确认次数 */
+    quint64 totalAcknowledges() const { return m_totalAcknowledges; }
+    /** @brief 获取总消除次数 @return 累计消除次数 */
+    quint64 totalDismisses() const { return m_totalDismisses; }
+    /** @brief 重置通知统计计数器 */
+    void resetNotificationStatistics() { m_totalNotifications = 0; m_totalAcknowledges = 0; m_totalDismisses = 0; }
 };

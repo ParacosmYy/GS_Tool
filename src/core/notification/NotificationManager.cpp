@@ -17,6 +17,7 @@ QString NotificationManager::notify(const QString &title, const QString &msg, Pr
     n.id = id; n.title = title; n.message = msg; n.priority = prio;
     n.timestamp = QDateTime::currentMSecsSinceEpoch(); n.acknowledged = false;
     m_active[id] = n;
+    ++m_totalNotifications;
     m_history.prepend(n);
     pruneHistory();
     emit notificationAdded(n);
@@ -27,12 +28,12 @@ QString NotificationManager::notify(const QString &title, const QString &msg, Pr
 /** @brief 确认通知 @param id 通知ID */
 void NotificationManager::acknowledge(const QString &id) {
     auto it = m_active.find(id);
-    if (it != m_active.end()) { it->acknowledged = true; emit notificationAcknowledged(id); emit unreadCountChanged(unreadCount()); }
+    if (it != m_active.end()) { ++m_totalAcknowledges; it->acknowledged = true; emit notificationAcknowledged(id); emit unreadCountChanged(unreadCount()); }
 }
 
 /** @brief 关闭通知 @param id 通知ID */
 void NotificationManager::dismiss(const QString &id) {
-    m_active.remove(id); emit notificationDismissed(id); emit unreadCountChanged(unreadCount());
+    ++m_totalDismisses; m_active.remove(id); emit notificationDismissed(id); emit unreadCountChanged(unreadCount());
 }
 
 /** @brief 清除所有通知和历史 */

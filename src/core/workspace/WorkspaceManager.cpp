@@ -16,6 +16,7 @@ WorkspaceManager::~WorkspaceManager() = default;
 /** @brief 保存工作区布局到内存映射 @param layout 工作区布局配置 */
 void WorkspaceManager::saveWorkspace(const WorkspaceLayout &layout)
 {
+    ++m_totalSaves;
     m_workspaces[layout.name] = layout;
     emit workspaceSaved(layout.name);
 }
@@ -23,12 +24,14 @@ void WorkspaceManager::saveWorkspace(const WorkspaceLayout &layout)
 /** @brief 按名称加载工作区布局 @param name 工作区名称 @return 工作区布局，不存在时返回默认构造 */
 WorkspaceLayout WorkspaceManager::loadWorkspace(const QString &name) const
 {
+    ++m_totalLoads;
     return m_workspaces.value(name);
 }
 
 /** @brief 删除指定工作区，若为当前激活则清空激活状态 @param name 工作区名称 */
 void WorkspaceManager::deleteWorkspace(const QString &name)
 {
+    ++m_totalDeletions;
     m_workspaces.remove(name);
     if (m_activeWorkspace == name) m_activeWorkspace.clear();
     emit workspaceDeleted(name);
@@ -43,6 +46,7 @@ bool WorkspaceManager::exists(const QString &name) const { return m_workspaces.c
 void WorkspaceManager::setActiveWorkspace(const QString &name)
 {
     if (m_activeWorkspace != name) {
+        ++m_totalSwitches;
         m_activeWorkspace = name;
         emit activeWorkspaceChanged(name);
     }

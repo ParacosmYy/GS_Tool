@@ -105,6 +105,7 @@ set(SOURCES
     src/serial/config/SerialConfigPanel.cpp
     src/serial/config/SerialConfigPanelUI.cpp
     src/serial/commands/QuickCommandBar.cpp
+    src/serial/commands/QuickCommandBarActions.cpp
     src/serial/data/BookmarkWidget.cpp
     src/serial/commands/TimedSender.cpp
     src/serial/commands/SendHistory.cpp
@@ -151,6 +152,7 @@ set(SOURCES
     src/ota/manager/OtaManagerFileOps.cpp
     src/ota/manager/OtaManagerProgress.cpp
     src/ota/widget/OtaWidget.cpp
+    src/ota/widget/OtaWidgetDisplay.cpp
     src/ota/widget/OtaWidgetSlots.cpp
     src/ota/widget/OtaWidgetSlots2.cpp
     src/ota/history/OtaHistoryModel.cpp

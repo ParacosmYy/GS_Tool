@@ -67,4 +67,22 @@ signals:
 private:
     QMap<QString, WorkspaceLayout> m_workspaces;  ///< 工作区名称到布局的映射
     QString m_activeWorkspace;                      ///< 当前激活的工作区名称
+
+    // ---- 统计计数器 ----
+    quint64 m_totalSaves = 0;              ///< 总保存次数
+    mutable quint64 m_totalLoads = 0;      ///< 总加载次数
+    quint64 m_totalDeletions = 0;          ///< 总删除次数
+    quint64 m_totalSwitches = 0;           ///< 总切换次数
+
+public:
+    /** @brief 获取总保存次数 @return 累计保存次数 */
+    quint64 totalSaves() const { return m_totalSaves; }
+    /** @brief 获取总加载次数 @return 累计加载次数 */
+    quint64 totalLoads() const { return m_totalLoads; }
+    /** @brief 获取总删除次数 @return 累计删除次数 */
+    quint64 totalDeletions() const { return m_totalDeletions; }
+    /** @brief 获取总切换次数 @return 累计切换次数 */
+    quint64 totalSwitches() const { return m_totalSwitches; }
+    /** @brief 重置工作区统计计数器 */
+    void resetWorkspaceStatistics() { m_totalSaves = 0; m_totalLoads = 0; m_totalDeletions = 0; m_totalSwitches = 0; }
 };

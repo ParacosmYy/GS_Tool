@@ -27,6 +27,7 @@ void ConnectionMonitor::setState(State s) {
     }
     if (s == Reconnecting) m_stats.reconnectCount++;
     m_stats.currentState = s;
+    ++m_totalStateChanges;  ///< 统计: 状态变更次数递增
     emit stateChanged(s, old);
     emit statsUpdated(m_stats);
 }
@@ -46,12 +47,13 @@ void ConnectionMonitor::recordBytesReceived(qint64 b) { m_stats.bytesReceived +=
 /** @brief 记录延迟测量值，超过阈值时发射latencyWarning信号 @param ms 延迟毫秒数 */
 void ConnectionMonitor::recordLatency(double ms) {
     m_stats.latencyMs = ms;
-    if (ms > m_latencyThreshold) emit latencyWarning(ms);
+    ++m_totalLatencyRecords;  ///< 统计: 延迟采样次数递增
+    if (ms > m_latencyThreshold) { ++m_totalLatencyWarnings; emit latencyWarning(ms); }
     emit statsUpdated(m_stats);
 }
 
 /** @brief 记录一次错误，更新错误计数和最后错误信息 @param e 错误描述文本 */
-void ConnectionMonitor::recordError(const QString &e) { m_stats.errorCount++; m_stats.lastError = e; emit statsUpdated(m_stats); }
+void ConnectionMonitor::recordError(const QString &e) { m_stats.errorCount++; ++m_totalErrorsRecorded; m_stats.lastError = e; emit statsUpdated(m_stats); }
 
 /** @brief 开始心跳监控，以指定间隔定时发射statsUpdated信号 @param interval 心跳间隔(毫秒)，默认5000ms */
 void ConnectionMonitor::startMonitoring(int interval) {
@@ -64,6 +66,15 @@ void ConnectionMonitor::stopMonitoring() { m_pingTimer->stop(); }
 
 /** @brief 重置所有统计数据为默认值 */
 void ConnectionMonitor::resetStats() { m_stats = Stats{}; }
+
+/** @brief 重置所有统计计数器为零 */
+void ConnectionMonitor::resetMonitorStatistics() {
+    m_totalStateChanges = 0;
+    m_totalLatencyRecords = 0;
+    m_totalLatencyWarnings = 0;
+    m_totalPings = 0;
+    m_totalErrorsRecorded = 0;
+}
 
 /** @brief 获取当前状态的本地化显示文本 @return 状态对应的翻译字符串 */
 QString ConnectionMonitor::stateString() const {
@@ -78,4 +89,4 @@ QString ConnectionMonitor::stateString() const {
 }
 
 /** @brief 心跳定时器超时回调，定时发射statsUpdated信号 */
-void ConnectionMonitor::onPingTimer() { emit statsUpdated(m_stats); }
+void ConnectionMonitor::onPingTimer() { ++m_totalPings; emit statsUpdated(m_stats); }

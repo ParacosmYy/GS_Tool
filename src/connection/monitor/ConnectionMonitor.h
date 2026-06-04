@@ -82,6 +82,25 @@ public:
     /** @brief 获取当前状态的本地化显示文本 @return 状态翻译字符串 */
     QString stateString() const;
 
+    // ---- 统计计数器(getter) ----
+    /** @brief 获取累计状态变更次数 @return 状态切换总次数 */
+    quint64 totalStateChanges() const { return m_totalStateChanges; }
+
+    /** @brief 获取累计延迟记录次数 @return 延迟采样总次数 */
+    quint64 totalLatencyRecords() const { return m_totalLatencyRecords; }
+
+    /** @brief 获取累计延迟警告次数 @return 延迟超过阈值的总次数 */
+    quint64 totalLatencyWarnings() const { return m_totalLatencyWarnings; }
+
+    /** @brief 获取累计心跳ping次数 @return 心跳定时器触发总次数 */
+    quint64 totalPings() const { return m_totalPings; }
+
+    /** @brief 获取累计错误记录次数(quint64版本) @return 错误记录总次数 */
+    quint64 totalErrorsRecorded() const { return m_totalErrorsRecorded; }
+
+    /** @brief 重置所有统计计数器为零 */
+    void resetMonitorStatistics();
+
 signals:
     /** @brief 连接状态变化信号 @param newState 新状态 @param oldState 旧状态 */
     void stateChanged(State newState, State oldState);
@@ -106,6 +125,13 @@ private:
     QTimer *m_pingTimer = nullptr;          ///< 心跳定时器
     int m_pingInterval = 5000;              ///< 心跳间隔(ms)
     double m_latencyThreshold = 500.0;      ///< 延迟警告阈值(ms)
+
+    // ---- 统计计数器 ----
+    quint64 m_totalStateChanges = 0;        ///< 统计: 状态变更总次数
+    quint64 m_totalLatencyRecords = 0;      ///< 统计: 延迟采样总次数
+    quint64 m_totalLatencyWarnings = 0;     ///< 统计: 延迟警告总次数
+    quint64 m_totalPings = 0;               ///< 统计: 心跳ping总次数
+    quint64 m_totalErrorsRecorded = 0;      ///< 统计: 错误记录总次数
 };
 
 #endif // CONNECTIONMONITOR_H
