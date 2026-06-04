@@ -48,6 +48,8 @@ public:
     quint64 totalFlowControlToggles() const { return m_totalFlowControlToggles; }
     quint64 totalRefreshPorts() const { return m_totalRefreshPorts; }
     quint64 totalConnectAttempts() const { return m_totalConnectAttempts; }
+    quint64 totalConfigLoads() const { return m_totalConfigLoads; }
+    quint64 totalConfigSaves() const { return m_totalConfigSaves; }
     void resetStats();
 
 public slots:
@@ -90,6 +92,7 @@ private:
     bool m_connected = false, m_connecting = false, m_dtrState = true, m_rtsState = true;
     quint64 m_totalConfigChanges = 0, m_totalBaudChanges = 0, m_totalPortSwitches = 0;
     quint64 m_totalFlowControlToggles = 0, m_totalRefreshPorts = 0, m_totalConnectAttempts = 0;
+    quint64 m_totalConfigLoads = 0, m_totalConfigSaves = 0;
     QAbstractAnimation* m_breathAnim = nullptr;
 };
 

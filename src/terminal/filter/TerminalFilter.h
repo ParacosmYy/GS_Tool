@@ -87,6 +87,8 @@ public:
     quint64 totalFilterMatches() const;             ///< 累计正则匹配命中次数(Include+Exclude)
     quint64 totalModeChanges() const;               ///< 累计过滤模式切换次数(Include↔Exclude)
     quint64 totalTimestampFiltersSet() const;       ///< 累计时间戳过滤设置次数
+    quint64 totalRegexCompiles() const;             ///< 累计正则编译次数(含规则添加/更新/大小写切换)
+    quint64 totalFilterChainTimeouts() const;       ///< 累计过滤链超时次数(预留)
     void resetStatistics();                         ///< 重置所有统计
 
 signals:
@@ -118,6 +120,8 @@ private:
     quint64 m_totalFilterMatches = 0;               ///< 累计正则匹配命中次数(Include+Exclude)
     quint64 m_totalModeChanges = 0;                 ///< 累计过滤模式切换次数(Include↔Exclude)
     quint64 m_totalTimestampFiltersSet = 0;         ///< 累计时间戳过滤设置次数
+    mutable quint64 m_totalRegexCompiles = 0;       ///< 累计正则编译次数
+    quint64 m_totalFilterChainTimeouts = 0;         ///< 累计过滤链超时次数(预留)
 };
 
 #endif // TERMINALFILTER_H

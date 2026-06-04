@@ -122,6 +122,10 @@ private:
     quint64 m_lookupsPerformed = 0;        ///< 累计索引查找次数(元数据查询)
     quint64 m_cacheHits = 0;              ///< 累计缓存命中次数(重复加载相同文件)
     quint64 m_totalValidationFailures = 0; ///< 累计文件校验失败次数(魔数/版本/EOF/保留字节)
+    quint64 m_totalCacheMisses = 0;       ///< 累计缓存未命中次数(加载新文件)
+    quint64 m_totalIndexBuilds = 0;       ///< 累计索引构建次数(保存时建立索引)
+    quint64 m_totalSegmentsLoaded = 0;    ///< 累计数据段加载数(分块读取次数)
+    quint64 m_totalSeekOperations = 0;    ///< 累计文件定位操作次数(读取偏移跳转)
 public:
     /** @brief 获取累计保存次数 @return 保存次数 */
     quint64 totalSaves() const { return m_totalSaves; }
@@ -145,6 +149,15 @@ public:
 
     /** @brief 获取累计文件校验失败次数(魔数/版本/EOF/保留字节不匹配) @return 校验失败总数 */
     quint64 totalValidationFailures() const { return m_totalValidationFailures; }
+
+    /** @brief 获取累计缓存未命中次数(加载新文件时路径不匹配) @return 未命中次数 */
+    quint64 totalCacheMisses() const { return m_totalCacheMisses; }
+    /** @brief 获取累计索引构建次数(保存时建立段索引) @return 构建次数 */
+    quint64 totalIndexBuilds() const { return m_totalIndexBuilds; }
+    /** @brief 获取累计数据段加载数(分块读取次数) @return 段加载数 */
+    quint64 totalSegmentsLoaded() const { return m_totalSegmentsLoaded; }
+    /** @brief 获取累计文件定位操作次数 @return 定位操作数 */
+    quint64 totalSeekOperations() const { return m_totalSeekOperations; }
 
     /** @brief 重置文件格式统计计数器(包含所有统计) */
     void resetFileFormatStatistics();

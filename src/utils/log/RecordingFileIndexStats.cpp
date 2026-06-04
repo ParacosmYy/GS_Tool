@@ -27,6 +27,10 @@
  *   - m_lookupsPerformed: 索引查找次数
  *   - m_cacheHits: 缓存命中次数
  *   - m_totalValidationFailures: 文件校验失败次数
+ *   - m_totalCacheMisses: 缓存未命中次数
+ *   - m_totalIndexBuilds: 索引构建次数
+ *   - m_totalSegmentsLoaded: 数据段加载数
+ *   - m_totalSeekOperations: 文件定位操作次数
  */
 void RecordingFileFormat::resetFileFormatStatistics()
 {
@@ -40,4 +44,8 @@ void RecordingFileFormat::resetFileFormatStatistics()
     m_lookupsPerformed = 0;
     m_cacheHits = 0;
     m_totalValidationFailures = 0;
+    m_totalCacheMisses = 0;
+    m_totalIndexBuilds = 0;
+    m_totalSegmentsLoaded = 0;
+    m_totalSeekOperations = 0;
 }

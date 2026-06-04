@@ -35,6 +35,7 @@ void FrameParser::processByte(unsigned char byte)
         m_errorCount++;
         ++m_totalOverflows;
         ++m_totalParseErrors;  // 溢出也是解析错误
+        ++m_totalMalformedFrames;  ///< 统计: 超大帧视为畸形帧
         resetIntermediateState();
 
         emit frameError(
@@ -158,6 +159,7 @@ void FrameParser::handleLengthReceiving(unsigned char byte)
     if (m_expectedPayload < 0 || m_expectedPayload > effectiveMax) {
         m_errorCount++;
         ++m_totalParseErrors;  // 无效帧长度
+        ++m_totalMalformedFrames;  ///< 统计: 无效帧长度视为畸形帧
         emit frameError(
             tr("无效帧长度: %1 (最大允许: %2)")
                 .arg(m_expectedPayload).arg(effectiveMax),

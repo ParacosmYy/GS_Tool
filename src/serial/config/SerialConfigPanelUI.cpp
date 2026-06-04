@@ -152,6 +152,7 @@ void SerialConfigPanel::setupSignalAndConnectControls(QVBoxLayout* mainLayout)
             emit disconnectRequested();
         } else {
             ++m_totalConnectAttempts;
+            ++m_totalConfigSaves;  ///< 统计: 连接尝试时触发配置持久化
             m_connecting = true;
             m_connectBtn->setEnabled(false);
             m_connectBtn->setText(tr("连接中..."));

@@ -39,6 +39,8 @@ public:
     quint64 totalFramesBuilt() const;        ///< 累计帧构建完成次数(completeFrame调用)
     quint64 totalValidationErrors() const;   ///< 累计校验验证失败次数(CRC/校验和不匹配)
     quint64 totalAutoDetectCalls() const;    ///< 累计自动检测调用次数(为ProtocolBridgeManager预留)
+    quint64 totalMalformedFrames() const;    ///< 累计畸形帧次数(帧头/帧尾/长度异常)
+    double avgFrameSize() const;             ///< 平均帧大小(字节)
     void resetStats();                       ///< 重置所有统计计数器
 
 signals:
@@ -90,6 +92,8 @@ private:
     quint64 m_totalFramesBuilt = 0;         ///< 累计帧构建完成次数(completeFrame调用)
     quint64 m_totalValidationErrors = 0;    ///< 累计校验验证失败次数(CRC/校验和不匹配)
     quint64 m_totalAutoDetectCalls = 0;     ///< 累计自动检测调用次数(为ProtocolBridgeManager预留)
+    quint64 m_totalMalformedFrames = 0;     ///< 累计畸形帧次数(帧头/帧尾/长度异常)
+    double m_avgFrameSize = 0.0;            ///< 平均帧大小(字节)
 
     int m_maxFrameLength = kDefaultMaxFrameLength; ///< 帧长度上限（默认1024字节）
     int m_frameTimeoutMs = 500;             ///< 帧超时阈值（毫秒），0=禁用

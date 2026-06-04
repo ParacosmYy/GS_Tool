@@ -83,6 +83,18 @@ quint64 TerminalFilter::totalTimestampFiltersSet() const
     return m_totalTimestampFiltersSet;
 }
 
+/** @brief 获取累计正则编译次数(含规则添加/更新/大小写切换) @return 编译次数 */
+quint64 TerminalFilter::totalRegexCompiles() const
+{
+    return m_totalRegexCompiles;
+}
+
+/** @brief 获取累计过滤链超时次数(预留) @return 超时次数 */
+quint64 TerminalFilter::totalFilterChainTimeouts() const
+{
+    return m_totalFilterChainTimeouts;
+}
+
 /** @brief 重置所有统计计数器为零 */
 void TerminalFilter::resetStatistics()
 {
@@ -96,6 +108,8 @@ void TerminalFilter::resetStatistics()
     m_totalFilterMatches = 0;
     m_totalModeChanges = 0;
     m_totalTimestampFiltersSet = 0;
+    m_totalRegexCompiles = 0;
+    m_totalFilterChainTimeouts = 0;
 }
 
 // ---- 私有方法 ----
@@ -108,6 +122,7 @@ void TerminalFilter::resetStatistics()
  */
 QRegularExpression TerminalFilter::compileRegex(const QString& pattern, bool caseSensitive) const
 {
+    ++m_totalRegexCompiles;  ///< 统计: 每次编译正则递增
     QRegularExpression::PatternOptions options = QRegularExpression::NoPatternOption;
     if (!caseSensitive) {
         options |= QRegularExpression::CaseInsensitiveOption;

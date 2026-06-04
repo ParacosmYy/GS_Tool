@@ -197,6 +197,7 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
     file.close();
     m_filePath = filePath;
     ++m_totalSaves;
+    ++m_totalIndexBuilds;  ///< 统计: 保存时构建段索引
     m_totalBytesWritten += static_cast<quint64>(jsonBytes.size() + m_rawData.size());
     return true;
 }

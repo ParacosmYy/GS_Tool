@@ -39,6 +39,7 @@ bool FrameParser::handleCrcValidation()
             m_totalChecksumErrors++;
             m_totalValidationErrors++;
             ++m_totalParseErrors;  // CRC校验失败
+            ++m_totalMalformedFrames;  ///< 统计: CRC校验失败视为畸形帧
             emit frameError(tr("校验和不匹配"), m_buffer);
             resetIntermediateState();
             return false;
@@ -70,6 +71,7 @@ void FrameParser::handleChecksumVerifying(unsigned char byte)
         m_totalChecksumErrors++;
         m_totalValidationErrors++;
         ++m_totalParseErrors;  // 校验和不匹配
+        ++m_totalMalformedFrames;  ///< 统计: 校验和验证失败视为畸形帧
         emit frameError(tr("校验和不匹配"), m_buffer);
         resetIntermediateState();
     }
@@ -101,6 +103,7 @@ void FrameParser::handleFooterMatching(unsigned char byte)
     } else {
         m_errorCount++;
         ++m_totalParseErrors;  // 帧尾不匹配
+        ++m_totalMalformedFrames;  ///< 统计: 帧尾不匹配视为畸形帧
         emit frameError(tr("帧尾不匹配"), m_buffer);
         resetIntermediateState();
     }

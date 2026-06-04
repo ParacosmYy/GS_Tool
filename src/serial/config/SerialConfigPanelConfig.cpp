@@ -42,6 +42,7 @@ bool SerialConfigPanel::rtsEnabled() const { return m_rtsState; }
 /** @brief 从配置映射恢复串口参数(端口/波特率/数据位/校验/停止位/流控/DTR/RTS/自动重连) @param config 配置映射 */
 void SerialConfigPanel::restoreConfig(const QVariantMap& config)
 {
+    ++m_totalConfigLoads;  ///< 统计: 配置加载次数递增
     if (config.contains("portName")) {
         int idx = m_portCombo->findData(config["portName"].toString());
         if (idx >= 0) m_portCombo->setCurrentIndex(idx);

@@ -181,6 +181,9 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
         constexpr qint64 chunkSize = 1024 * 1024;  ///< 每次读取1MB
         qint64 totalRead = 0;
 
+        // --- 统计：文件定位操作(数据区起始位置) ---
+        ++m_totalSeekOperations;
+
         while (totalRead < rawBytesRemaining) {
             const qint64 toRead = qMin(chunkSize, rawBytesRemaining - totalRead);
             QByteArray chunk = file.read(toRead);
@@ -196,6 +199,7 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
 
             m_rawData.append(chunk);
             totalRead += chunk.size();
+            ++m_totalSegmentsLoaded;  ///< 统计: 每个分块读取计为一段
 
             // 计算并上报进度 (0.1 ~ 1.0 区间映射)
             const qreal progress = 0.1 + 0.9 * (static_cast<qreal>(totalRead)
@@ -220,6 +224,8 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
     // --- 统计：缓存命中检测（同一文件路径重复加载） ---
     if (m_filePath == filePath) {
         ++m_cacheHits;
+    } else {
+        ++m_totalCacheMisses;
     }
     m_filePath = filePath;
 

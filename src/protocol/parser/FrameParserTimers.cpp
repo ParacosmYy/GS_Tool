@@ -51,7 +51,13 @@ quint64 FrameParser::totalValidationErrors() const { return m_totalValidationErr
 /** @brief 获取累计自动检测调用次数(为ProtocolBridgeManager预留) @return 自动检测调用次数 */
 quint64 FrameParser::totalAutoDetectCalls() const { return m_totalAutoDetectCalls; }
 
-/** @brief 重置所有统计计数器(帧数/字节/校验错误/溢出/解析错误/已解析字节/同步丢失/帧构建/验证错误/自动检测) */
+/** @brief 获取累计畸形帧次数(帧头/帧尾/长度异常) @return 畸形帧次数 */
+quint64 FrameParser::totalMalformedFrames() const { return m_totalMalformedFrames; }
+
+/** @brief 获取平均帧大小(字节) @return 平均字节数，无帧时返回0 */
+double FrameParser::avgFrameSize() const { return m_avgFrameSize; }
+
+/** @brief 重置所有统计计数器(帧数/字节/校验错误/溢出/解析错误/已解析字节/同步丢失/帧构建/验证错误/自动检测/畸形帧/平均帧大小) */
 void FrameParser::resetStats()
 {
     m_frameCount = 0;
@@ -66,6 +72,8 @@ void FrameParser::resetStats()
     m_totalFramesBuilt = 0;
     m_totalValidationErrors = 0;
     m_totalAutoDetectCalls = 0;
+    m_totalMalformedFrames = 0;
+    m_avgFrameSize = 0.0;
 }
 
 // ============================================================================
@@ -85,6 +93,7 @@ bool FrameParser::checkTimeout()
         resetIntermediateState();
         m_errorCount++;
         ++m_totalParseErrors;  // 帧超时
+        ++m_totalMalformedFrames;  ///< 统计: 超时不完整帧视为畸形帧
 
         emit frameError(
             tr("帧超时: 已接收 %1 字节 (%2ms)，不完整帧已丢弃")
@@ -123,6 +132,17 @@ void FrameParser::completeFrame()
     m_totalFramesParsed++;
     m_totalFramesBuilt++;
     m_totalBytesParsed += static_cast<quint64>(m_buffer.size());  // 累计已解析字节
+
+    // 统计: 增量更新平均帧大小(指数移动平均，alpha=0.1)
+    {
+        double currentSize = static_cast<double>(m_buffer.size());
+        if (m_totalFramesParsed == 1) {
+            m_avgFrameSize = currentSize;
+        } else {
+            m_avgFrameSize = 0.9 * m_avgFrameSize + 0.1 * currentSize;
+        }
+    }
+
     emit frameParsed(fields, m_buffer);
     reset();
 }
