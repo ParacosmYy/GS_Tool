@@ -40,7 +40,7 @@ public:
 
     /** @brief 计算百分位数 @param data 数据 @param p 百分位(0~100) @param method 插值方法 @return 百分位值 */
     double compute(const QVector<double>& data, double p,
-                   Interpolation method = Interpolation::Linear) const;
+                   Interpolation method = Interpolation::Linear);
 
     /** @brief 计算多个百分位数 @param data 数据 @param percentiles 百分位数列表 @return 百分位值列表 */
     QVector<double> computeMany(const QVector<double>& data,

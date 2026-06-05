@@ -42,12 +42,12 @@ public:
 
     /** @brief 设计滤波器 @param type 类型 @param order 阶数 @param cutoffNorm 归一化截止(0~1) @param window 窗函数 @return 设计结果 */
     DesignResult design(FilterType type, int order, double cutoffNorm,
-                        WindowType window) const;
+                        WindowType window);
 
     /** @brief 设计带通/带阻 @param type 类型 @param order 阶数 @param lowNorm 低截止 @param highNorm 高截止 @param window 窗函数 @return 结果 */
     DesignResult designBand(FilterType type, int order,
                             double lowNorm, double highNorm,
-                            WindowType window) const;
+                            WindowType window);
 
     /** @brief Kaiser窗参数估算 @param rippleDb 纹波(dB) @param transitionWidth 过渡带宽 @return (阶数, beta) */
     QPair<int, double> kaiserParams(double rippleDb, double transitionWidth) const;

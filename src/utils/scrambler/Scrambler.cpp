@@ -71,6 +71,9 @@ QByteArray Scrambler::generateSequence(int length)
 
 quint8 Scrambler::nextByte()
 {
+    /* 多项式至少需要2位才有效 */
+    if (m_polynomial <= 1) return 0;
+
     quint8 result = 0;
     for (int bit = 0; bit < 8; ++bit) {
         /* 找到最高有效位位置 */

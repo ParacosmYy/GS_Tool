@@ -32,7 +32,7 @@ public:
     explicit LinearPredictiveCoder(QObject* parent = nullptr);
 
     /** @brief LPC分析 @param data 信号 @param order 阶数 @return LPC结果 */
-    LpcResult analyze(const QVector<double>& data, int order) const;
+    LpcResult analyze(const QVector<double>& data, int order);
 
     /** @brief 合成(逆滤波) @param residual 残差 @param coefficients LPC系数 @return 合成信号 */
     QVector<double> synthesize(const QVector<double>& residual,

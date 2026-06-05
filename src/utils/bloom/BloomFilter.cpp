@@ -11,6 +11,9 @@ BloomFilter::BloomFilter(quint64 expectedItems, double falsePositiveRate,
                          QObject* parent)
     : QObject(parent), m_insertedCount(0)
 {
+    /* 防止expectedItems为0导致除零 */
+    expectedItems = qMax(expectedItems, static_cast<quint64>(1));
+
     /* 最优参数: m = -n*ln(p) / (ln2)^2, k = (m/n)*ln2 */
     double ln2 = qLn(2.0);
     m_bitCount = static_cast<quint64>(
@@ -70,7 +73,7 @@ double BloomFilter::fillRatio() const
     for (quint64 word : m_bits) {
         setBits += qPopulationCount(word);
     }
-    return static_cast<double>(setBits) / m_bitCount;
+    return (m_bitCount > 0) ? static_cast<double>(setBits) / m_bitCount : 0.0;
 }
 
 quint32 BloomFilter::hashN(const QByteArray& data, int n) const

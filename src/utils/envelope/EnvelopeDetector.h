@@ -26,7 +26,7 @@ public:
     explicit EnvelopeDetector(QObject* parent = nullptr);
 
     /** @brief 检测包络 @param data 信号 @param method 方法 @return 包络 */
-    QVector<double> detect(const QVector<double>& data, Method method) const;
+    QVector<double> detect(const QVector<double>& data, Method method);
 
     /** @brief Hilbert变换(解析信号虚部) @param data 信号 @return 虚部 */
     QVector<double> hilbertTransform(const QVector<double>& data) const;

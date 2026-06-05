@@ -11,7 +11,7 @@ ZeroCrossingRate::ZeroCrossingRate(QObject* parent)
     : QObject(parent), m_timeSum(0.0) {}
 
 ZeroCrossingRate::Result ZeroCrossingRate::compute(
-    const QVector<double>& data, double sampleRate) const
+    const QVector<double>& data, double sampleRate)
 {
     Result result;
     if (data.size() < 2) return result;

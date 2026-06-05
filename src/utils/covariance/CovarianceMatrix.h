@@ -25,7 +25,7 @@ public:
 
     /** @brief 计算协方差矩阵 @param data 每行一个样本,每列一个变量 @param sample 样本还是总体 @return 协方差矩阵 */
     QVector<QVector<double>> compute(const QVector<QVector<double>>& data,
-                                     bool sample = true) const;
+                                     bool sample = true);
 
     /** @brief 计算相关矩阵 @param covMatrix 协方差矩阵 @return 相关系数矩阵 */
     QVector<QVector<double>> correlationMatrix(

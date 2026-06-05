@@ -13,7 +13,7 @@ FirFilterDesigner::FirFilterDesigner(QObject* parent)
     : QObject(parent), m_timeSum(0.0) {}
 
 FirFilterDesigner::DesignResult FirFilterDesigner::design(
-    FilterType type, int order, double cutoffNorm, WindowType window) const
+    FilterType type, int order, double cutoffNorm, WindowType window)
 {
     DesignResult result;
     if (order < 1 || cutoffNorm <= 0.0 || cutoffNorm >= 0.5) return result;
@@ -56,7 +56,7 @@ FirFilterDesigner::DesignResult FirFilterDesigner::design(
 
 FirFilterDesigner::DesignResult FirFilterDesigner::designBand(
     FilterType type, int order, double lowNorm, double highNorm,
-    WindowType window) const
+    WindowType window)
 {
     DesignResult result;
     if (order < 1 || lowNorm >= highNorm || lowNorm <= 0.0 || highNorm >= 0.5)

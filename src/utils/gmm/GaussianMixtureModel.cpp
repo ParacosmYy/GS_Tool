@@ -102,6 +102,7 @@ double GaussianMixtureModel::probabilityDensity(double x) const
 
 int GaussianMixtureModel::assignComponent(double x) const
 {
+    if (m_components.isEmpty()) return -1;
     int best = 0;
     double bestResp = 0.0;
     for (int j = 0; j < m_components.size(); ++j) {

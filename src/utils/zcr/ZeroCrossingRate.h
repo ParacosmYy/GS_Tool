@@ -32,7 +32,7 @@ public:
     explicit ZeroCrossingRate(QObject* parent = nullptr);
 
     /** @brief 计算过零率 @param data 信号 @param sampleRate 采样率 @return 结果 */
-    Result compute(const QVector<double>& data, double sampleRate = 1.0) const;
+    Result compute(const QVector<double>& data, double sampleRate = 1.0);
 
     /** @brief 滑动窗口过零率 @param data 信号 @param windowSize 窗口大小 @param hopSize 步进 @return 每窗口过零率 */
     QVector<double> slidingWindowRate(const QVector<double>& data,

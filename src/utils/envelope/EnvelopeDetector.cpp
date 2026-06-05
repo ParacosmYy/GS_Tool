@@ -13,7 +13,7 @@ EnvelopeDetector::EnvelopeDetector(QObject* parent)
     : QObject(parent), m_timeSum(0.0) {}
 
 QVector<double> EnvelopeDetector::detect(const QVector<double>& data,
-                                          Method method) const
+                                          Method method)
 {
     QVector<double> result;
     if (data.isEmpty()) return result;

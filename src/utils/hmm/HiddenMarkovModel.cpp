@@ -105,7 +105,7 @@ double HiddenMarkovModel::backward(const QVector<int>& observations) const
     return prob;
 }
 
-QVector<int> HiddenMarkovModel::viterbi(const QVector<int>& observations) const
+QVector<int> HiddenMarkovModel::viterbi(const QVector<int>& observations)
 {
     int T = observations.size();
     QVector<int> path(T, 0);

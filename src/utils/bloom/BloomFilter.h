@@ -63,7 +63,7 @@ private:
     quint64 m_bitCount;
     int m_hashCount;
     quint64 m_insertedCount;
-    Stats m_stats;
+    mutable Stats m_stats;
 };
 
 #endif // BLOOMFILTER_H

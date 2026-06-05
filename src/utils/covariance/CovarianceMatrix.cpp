@@ -12,7 +12,7 @@ CovarianceMatrix::CovarianceMatrix(QObject* parent)
     : QObject(parent), m_timeSum(0.0) {}
 
 QVector<QVector<double>> CovarianceMatrix::compute(
-    const QVector<QVector<double>>& data, bool sample) const
+    const QVector<QVector<double>>& data, bool sample)
 {
     QElapsedTimer timer;
     timer.start();
@@ -21,6 +21,11 @@ QVector<QVector<double>> CovarianceMatrix::compute(
     if (n == 0) return {};
 
     int d = data[0].size();
+    if (d == 0) return {};
+    /* 验证所有行维度一致 */
+    for (int k = 1; k < n; ++k) {
+        if (data[k].size() != d) return {};
+    }
     QVector<QVector<double>> cov(d, QVector<double>(d, 0.0));
 
     QVector<double> mean = computeMean(data);

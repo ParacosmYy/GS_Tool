@@ -36,7 +36,7 @@ public:
     /** @brief 设计IIR滤波器 @param type 类型 @param approx 近似 @param order 阶数 @param cutoffNorm 归一化截止 @param rippleDb 纹波(dB) @return biquad级联 */
     QVector<Biquad> design(FilterType type, Approximation approx,
                            int order, double cutoffNorm,
-                           double rippleDb = 1.0) const;
+                           double rippleDb = 1.0);
 
     /** @brief 频率响应 @param sections biquad级联 @param numPoints 点数 @return (频率,幅度dB) */
     QVector<QPair<double, double>> frequencyResponse(

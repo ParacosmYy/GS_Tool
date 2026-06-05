@@ -12,7 +12,7 @@ LinearPredictiveCoder::LinearPredictiveCoder(QObject* parent)
     : QObject(parent), m_timeSum(0.0) {}
 
 LinearPredictiveCoder::LpcResult LinearPredictiveCoder::analyze(
-    const QVector<double>& data, int order) const
+    const QVector<double>& data, int order)
 {
     LpcResult result;
     if (data.size() < order + 1 || order < 1) return result;

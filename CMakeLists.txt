@@ -951,6 +951,7 @@ set(SOURCES
     src/utils/covariance/CovarianceMatrix.cpp
     src/utils/percentile/PercentileCalculator.cpp
     src/utils/scrambler/Scrambler.cpp
+    src/utils/bloom/BloomFilter.cpp
 )
 
 set(HEADERS

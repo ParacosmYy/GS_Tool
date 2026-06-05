@@ -15,8 +15,11 @@ IirFilterDesigner::IirFilterDesigner(QObject* parent)
 
 QVector<IirFilterDesigner::Biquad> IirFilterDesigner::design(
     FilterType type, Approximation approx, int order,
-    double cutoffNorm, double rippleDb) const
+    double cutoffNorm, double rippleDb)
 {
+    /* 输入验证: 阶数/截止频率范围检查 */
+    if (order < 1 || cutoffNorm <= 0.0 || cutoffNorm >= 0.5) return {};
+
     QElapsedTimer timer;
     timer.start();
 
@@ -27,7 +30,8 @@ QVector<IirFilterDesigner::Biquad> IirFilterDesigner::design(
     case Approximation::ChebyshevType1:
         poles = chebyshev1Poles(order, rippleDb); break;
     case Approximation::ChebyshevType2:
-        poles = chebyshev1Poles(order, rippleDb); break;
+        /* Type2暂回退到Butterworth(需独立零点/极点计算) */
+        poles = butterworthPoles(order); break;
     }
 
     QVector<Biquad> sections = polesToBiquads(poles, type, cutoffNorm);
@@ -46,7 +50,7 @@ QVector<std::complex<double>> IirFilterDesigner::butterworthPoles(int order) con
     QVector<std::complex<double>> poles;
     for (int k = 0; k < order; ++k) {
         double angle = M_PI * (2.0 * k + order + 1) / (2.0 * order);
-        poles.append({qCos(angle), qSin(angle)});
+        poles.append(std::complex<double>(qCos(angle), qSin(angle)));
     }
     return poles;
 }
@@ -55,14 +59,14 @@ QVector<std::complex<double>> IirFilterDesigner::chebyshev1Poles(
     int order, double rippleDb) const
 {
     double eps = qSqrt(qPow(10.0, rippleDb / 10.0) - 1.0);
-    double gamma = qAsinh(1.0 / eps) / order;
+    double gamma = std::asinh(1.0 / eps) / order;
 
     QVector<std::complex<double>> poles;
     for (int k = 0; k < order; ++k) {
         double angle = M_PI * (2.0 * k + 1) / (2.0 * order);
-        double re = -qSinh(gamma) * qSin(angle);
-        double im = qCosh(gamma) * qCos(angle);
-        poles.append({re, im});
+        double re = -std::sinh(gamma) * qSin(angle);
+        double im = std::cosh(gamma) * qCos(angle);
+        poles.append(std::complex<double>(re, im));
     }
     return poles;
 }

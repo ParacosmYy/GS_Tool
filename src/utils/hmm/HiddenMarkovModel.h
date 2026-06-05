@@ -42,7 +42,7 @@ public:
     double backward(const QVector<int>& observations) const;
 
     /** @brief Viterbi解码 @param observations 观测序列 @return 最优状态序列 */
-    QVector<int> viterbi(const QVector<int>& observations) const;
+    QVector<int> viterbi(const QVector<int>& observations);
 
     /** @brief Baum-Welch训练 @param observations 观测序列 @param maxIterations 最大迭代 @param tolerance 收敛阈值 @return 最终log似然 */
     double train(const QVector<int>& observations,

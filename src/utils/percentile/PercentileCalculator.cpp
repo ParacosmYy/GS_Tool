@@ -12,7 +12,7 @@ PercentileCalculator::PercentileCalculator(QObject* parent)
     : QObject(parent), m_timeSum(0.0) {}
 
 double PercentileCalculator::compute(const QVector<double>& data, double p,
-                                      Interpolation method) const
+                                      Interpolation method)
 {
     if (data.isEmpty() || p < 0.0 || p > 100.0) return 0.0;
 
