@@ -15,7 +15,7 @@ EdgeDetector2::EdgeDetector2(QObject* parent)
 }
 
 QVector<double> EdgeDetector2::sobel(const QVector<double>& image,
-                                      int width, int height) const
+                                      int width, int height)
 {
     QElapsedTimer timer;
     timer.start();
@@ -52,7 +52,7 @@ QVector<double> EdgeDetector2::sobel(const QVector<double>& image,
 }
 
 QVector<double> EdgeDetector2::prewitt(const QVector<double>& image,
-                                       int width, int height) const
+                                       int width, int height)
 {
     QElapsedTimer timer;
     timer.start();
@@ -90,7 +90,7 @@ QVector<double> EdgeDetector2::prewitt(const QVector<double>& image,
 
 QVector<double> EdgeDetector2::canny(const QVector<double>& image,
                                       int width, int height,
-                                      const CannyParams& params) const
+                                      const CannyParams& params)
 {
     QElapsedTimer timer;
     timer.start();

@@ -23,7 +23,7 @@ void AllpassFilter::addFirstOrderSection(double coefficient)
     sec.x1 = 0.0;
     sec.y1 = 0.0;
     m_sections.append(sec);
-    m_delayLines.append({});
+    m_delayLines.append(QVector<double>{});
     m_delayWritePos.append(0);
     ++m_stats.totalSectionsCreated;
 }
@@ -38,7 +38,7 @@ void AllpassFilter::addSecondOrderSection(double alpha, double beta)
     sec.y1 = 0.0;
     sec.y2 = 0.0;
     m_sections.append(sec);
-    m_delayLines.append({});
+    m_delayLines.append(QVector<double>{});
     m_delayWritePos.append(0);
     ++m_stats.totalSectionsCreated;
 }

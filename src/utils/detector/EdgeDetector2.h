@@ -63,7 +63,7 @@ public:
      * @return 梯度幅值图 [width * height]
      */
     QVector<double> sobel(const QVector<double>& image,
-                          int width, int height) const;
+                          int width, int height);
 
     /**
      * @brief Prewitt边缘检测
@@ -73,7 +73,7 @@ public:
      * @return 梯度幅值图
      */
     QVector<double> prewitt(const QVector<double>& image,
-                            int width, int height) const;
+                            int width, int height);
 
     /**
      * @brief Canny边缘检测(完整流程)
@@ -85,7 +85,7 @@ public:
      */
     QVector<double> canny(const QVector<double>& image,
                           int width, int height,
-                          const CannyParams& params) const;
+                          const CannyParams& params);
 
     /**
      * @brief 高斯模糊

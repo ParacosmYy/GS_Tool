@@ -128,3 +128,106 @@ void SpectralFlatness2::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 计算子带平坦度
+ *
+ * 将频谱均匀分割为numBands个子带，分别计算每个子带的平坦度。
+ * 用于多分辨率频谱分析，识别不同频段的音调/噪声特性。
+ *
+ * @param spectrum 功率谱
+ * @param numBands 子带数量
+ * @return 每个子带的平坦度值
+ */
+QVector<double> SpectralFlatness2::computeSubbandFlatness(
+    const QVector<double>& spectrum, int numBands) const
+{
+    const int totalBins = spectrum.size();
+    QVector<double> flatness(numBands, 0.0);
+
+    if (totalBins == 0 || numBands <= 0) return flatness;
+
+    /* 计算每个子带的bin范围 */
+    int binsPerBand = totalBins / numBands;
+    if (binsPerBand < 1) binsPerBand = 1;
+
+    for (int b = 0; b < numBands; ++b) {
+        int lo = b * binsPerBand;
+        int hi = qMin((b + 1) * binsPerBand - 1, totalBins - 1);
+        if (lo >= totalBins) break;
+
+        int count = hi - lo + 1;
+        if (count <= 0) continue;
+
+        /* 算术平均 */
+        double arSum = 0.0;
+        for (int i = lo; i <= hi; ++i) {
+            arSum += qMax(1e-20, spectrum[i]);
+        }
+        double am = arSum / static_cast<double>(count);
+
+        /* 几何平均 (对数空间) */
+        double logSum = 0.0;
+        for (int i = lo; i <= hi; ++i) {
+            logSum += qLn(qMax(1e-20, spectrum[i]));
+        }
+        double gm = qExp(logSum / static_cast<double>(count));
+
+        if (am > 1e-20) {
+            flatness[b] = qBound(0.0, gm / am, 1.0);
+        }
+    }
+    return flatness;
+}
+
+/**
+ * @brief 批量计算多帧频谱平坦度
+ *
+ * 对多帧频谱数据逐一计算平坦度，返回每帧的结果。
+ * 适用于实时音频处理中连续帧的分析。
+ *
+ * @param frames 多帧频谱数据
+ * @return 每帧的平坦度值
+ */
+QVector<double> SpectralFlatness2::computeBatch(
+    const QVector<QVector<double>>& frames)
+{
+    const int numFrames = frames.size();
+    QVector<double> results(numFrames);
+
+    for (int f = 0; f < numFrames; ++f) {
+        results[f] = compute(frames[f]);
+    }
+    return results;
+}
+
+/**
+ * @brief 计算频谱的峰值因子
+ *
+ * 峰值因子 = 最大值 / 算术平均，用于补充平坦度分析。
+ * 高峰值因子表示存在强音调成分。
+ *
+ * @param spectrum 功率谱
+ * @return 峰值因子
+ */
+double SpectralFlatness2::crestFactor(const QVector<double>& spectrum) const
+{
+    const int totalBins = spectrum.size();
+    if (totalBins == 0) return 0.0;
+
+    int lo = qBound(0, m_loBin, totalBins - 1);
+    int hi = qBound(lo, m_hiBin, totalBins - 1);
+    int count = hi - lo + 1;
+    if (count <= 0) return 0.0;
+
+    double maxVal = 0.0;
+    double sum = 0.0;
+    for (int i = lo; i <= hi; ++i) {
+        double val = qMax(0.0, spectrum[i]);
+        maxVal = qMax(maxVal, val);
+        sum += val;
+    }
+
+    double mean = sum / static_cast<double>(count);
+    return (mean > 1e-20) ? maxVal / mean : 0.0;
+}

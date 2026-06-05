@@ -73,7 +73,7 @@ public:
      * @param alpha 参数alpha
      * @return 根的列表(升序)
      */
-    std::vector<double> findRoots(int n, double alpha) const;
+    std::vector<double> findRoots(int n, double alpha);
 
     /**
      * @brief 计算Gauss-Laguerre积分节点和权重
@@ -82,7 +82,7 @@ public:
      * @return (nodes, weights)对
      */
     std::pair<std::vector<double>, std::vector<double>> gaussNodesWeights(
-        int n, double alpha) const;
+        int n, double alpha);
 
     /**
      * @brief 使用Gauss-Laguerre积分计算 \int_0^inf f(x) x^alpha e^{-x} dx
@@ -91,7 +91,7 @@ public:
      * @param f 被积函数
      * @return 积分值
      */
-    double integrate(int n, double alpha, const std::function<double(double)>& f) const;
+    double integrate(int n, double alpha, const std::function<double(double)>& f);
 
     /**
      * @brief 计算三项递推系数
@@ -125,6 +125,6 @@ private:
      */
     double laguerreRoot(int n, double alpha, double initialGuess, int maxIter = 100) const;
 
-    Stats m_stats;                  ///< 统计信息
-    double m_timeSum = 0.0;         ///< 累计耗时
+    mutable Stats m_stats;                  ///< 统计信息
+    mutable double m_timeSum = 0.0;         ///< 累计耗时
 };

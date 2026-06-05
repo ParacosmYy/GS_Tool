@@ -16,7 +16,7 @@ GoertzelAlgorithm::GoertzelAlgorithm(QObject* parent)
 GoertzelAlgorithm::FrequencyResult GoertzelAlgorithm::detectFrequency(
     const QVector<double>& samples,
     double targetFreq,
-    double sampleRate) const
+    double sampleRate)
 {
     QElapsedTimer timer;
     timer.start();

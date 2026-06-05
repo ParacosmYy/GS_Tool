@@ -113,7 +113,7 @@ double LaguerrePoly::laguerreRoot(int n, double alpha, double initialGuess, int 
 }
 
 /** @brief 求所有实根 @param n 阶数 @param alpha 参数 @return 根列表 */
-std::vector<double> LaguerrePoly::findRoots(int n, double alpha) const
+std::vector<double> LaguerrePoly::findRoots(int n, double alpha)
 {
     QElapsedTimer timer;
     timer.start();
@@ -177,7 +177,7 @@ std::vector<double> LaguerrePoly::findRoots(int n, double alpha) const
 
 /** @brief 计算Gauss-Laguerre节点和权重 @param n 积分点数 @param alpha 参数 @return (节点, 权重) */
 std::pair<std::vector<double>, std::vector<double>> LaguerrePoly::gaussNodesWeights(
-    int n, double alpha) const
+    int n, double alpha)
 {
     QElapsedTimer timer;
     timer.start();
@@ -210,7 +210,7 @@ std::pair<std::vector<double>, std::vector<double>> LaguerrePoly::gaussNodesWeig
 }
 
 /** @brief Gauss-Laguerre积分 @param n 积分点数 @param alpha 参数 @param f 被积函数 @return 积分值 */
-double LaguerrePoly::integrate(int n, double alpha, const std::function<double(double)>& f) const
+double LaguerrePoly::integrate(int n, double alpha, const std::function<double(double)>& f)
 {
     QElapsedTimer timer;
     timer.start();

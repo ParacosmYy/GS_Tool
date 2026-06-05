@@ -13,6 +13,7 @@
 #include "utils/fft63/WignerVille2.h"
 
 #include <QElapsedTimer>
+#include <QStringList>
 #include <QtMath>
 
 /**
@@ -139,6 +140,11 @@ void WignerVille2::resetStatistics()
 /**
  * @brief 生成指定长度的窗函数
  *
+ * 支持三种窗函数:
+ * - hann: Hann窗，主瓣宽、旁瓣低，适合一般时频分析
+ * - hamming: Hamming窗，旁瓣最低，适合频谱分析
+ * - rect: 矩形窗，主瓣最窄但旁瓣高
+ *
  * @param n 窗函数长度
  * @return 窗函数系数向量
  */
@@ -160,4 +166,63 @@ QVector<double> WignerVille2::generateWindow(int n) const
     }
     /* "rect"窗为全1，已初始化 */
     return w;
+}
+
+/**
+ * @brief 计算WVD的时间边缘特性
+ *
+ * 对WVD沿频率轴积分应恢复原始信号功率。
+ * 用于验证WVD计算的正确性。
+ *
+ * @param wvd Wigner-Ville分布矩阵
+ * @return 时间边缘(每行的能量总和)
+ */
+QVector<double> WignerVille2::timeMarginal(const QVector<QVector<double>>& wvd) const
+{
+    const int timeBins = wvd.size();
+    QVector<double> marginal(timeBins, 0.0);
+    for (int t = 0; t < timeBins; ++t) {
+        double sum = 0.0;
+        const int freqBins = wvd[t].size();
+        for (int f = 0; f < freqBins; ++f) {
+            sum += wvd[t][f];
+        }
+        marginal[t] = sum;
+    }
+    return marginal;
+}
+
+/**
+ * @brief 计算WVD的频率边缘特性
+ *
+ * 对WVD沿时间轴积分应恢复功率谱密度。
+ * 用于验证WVD的能量守恒特性。
+ *
+ * @param wvd Wigner-Ville分布矩阵
+ * @return 频率边缘(每列的能量总和)
+ */
+QVector<double> WignerVille2::freqMarginal(const QVector<QVector<double>>& wvd) const
+{
+    if (wvd.isEmpty()) return {};
+    const int timeBins = wvd.size();
+    const int freqBins = wvd[0].size();
+    QVector<double> marginal(freqBins, 0.0);
+    for (int f = 0; f < freqBins; ++f) {
+        for (int t = 0; t < timeBins; ++t) {
+            marginal[f] += wvd[t][f];
+        }
+    }
+    return marginal;
+}
+
+/**
+ * @brief 获取当前配置参数摘要
+ * @return 参数描述字符串列表
+ */
+QStringList WignerVille2::parameterSummary() const
+{
+    QStringList summary;
+    summary << QString("信号长度: %1").arg(m_n);
+    summary << QString("窗函数: %1").arg(m_winType);
+    return summary;
 }

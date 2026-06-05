@@ -24,6 +24,16 @@ struct AllpassSection {
     double x2 = 0.0;            ///< z^{-2} 状态(二阶)
     double y1 = 0.0;            ///< 前一输出
     double y2 = 0.0;            ///< z^{-2} 输出状态
+
+    /** @brief 相等比较(比较系数和延迟, 不比较状态) */
+    bool operator==(const AllpassSection& other) const {
+        return qFuzzyIsNull(coefficient - other.coefficient)
+            && qFuzzyIsNull(delay - other.delay);
+    }
+    /** @brief 不等比较 */
+    bool operator!=(const AllpassSection& other) const {
+        return !(*this == other);
+    }
 };
 
 /**

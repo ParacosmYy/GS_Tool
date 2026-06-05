@@ -19,6 +19,72 @@
 #include <QtMath>
 #include <algorithm>
 
+/* === 文件局部辅助函数: 简化的DFT实现 === */
+namespace {
+
+/**
+ * @brief 实序列前向DFT，返回交织的[re0,im0,re1,im1,...]
+ * @param x 输入实序列
+ * @param N 序列长度
+ * @return 交织的复数DFT结果
+ */
+QVector<double> realDFTFwd(const QVector<double>& x, int N)
+{
+    QVector<double> X(N * 2, 0.0);
+    for (int k = 0; k < N; ++k) {
+        double re = 0.0, im = 0.0;
+        for (int n = 0; n < N; ++n) {
+            double angle = -2.0 * M_PI * k * n / N;
+            re += x[n] * qCos(angle);
+            im += x[n] * qSin(angle);
+        }
+        X[2 * k] = re;
+        X[2 * k + 1] = im;
+    }
+    return X;
+}
+
+/**
+ * @brief 逆DFT，输入为交织的[re0,im0,re1,im1,...]
+ * @param X 交织的复数频域数据
+ * @param N 序列长度
+ * @return 逆变换后的实序列
+ */
+QVector<double> realDFTInverse(const QVector<double>& X, int N)
+{
+    QVector<double> x(N, 0.0);
+    for (int n = 0; n < N; ++n) {
+        double val = 0.0;
+        for (int k = 0; k < N; ++k) {
+            double angle = 2.0 * M_PI * k * n / N;
+            val += X[2 * k] * qCos(angle) - X[2 * k + 1] * qSin(angle);
+        }
+        x[n] = val / N;
+    }
+    return x;
+}
+
+/**
+ * @brief 频域复数相乘
+ * @param A 第一个复数序列 (交织格式)
+ * @param B 第二个复数序列 (交织格式)
+ * @param N 序列长度
+ * @return 复数乘积 (交织格式)
+ */
+QVector<double> complexMul(const QVector<double>& A, const QVector<double>& B, int N)
+{
+    QVector<double> C(N * 2, 0.0);
+    for (int k = 0; k < N; ++k) {
+        double ar = A[2 * k], ai = A[2 * k + 1];
+        double br = B[2 * k], bi = B[2 * k + 1];
+        C[2 * k] = ar * br - ai * bi;
+        C[2 * k + 1] = ar * bi + ai * br;
+    }
+    return C;
+}
+
+} /* 匿名命名空间 */
+
 /**
  * @brief 构造函数，初始化快速卷积器
  * @param parent 父QObject指针
@@ -104,7 +170,7 @@ QVector<double> FastConv3::process(const QVector<double>& input)
         /* 预计算核的FFT */
         QVector<double> paddedKernel(fftSize, 0.0);
         for (int i = 0; i < M; ++i) paddedKernel[i] = m_kernel[i];
-        QVector<double> kernelFFT = realDFTForward(paddedKernel, fftSize);
+        QVector<double> kernelFFT = realDFTFwd(paddedKernel, fftSize);
 
         /* 逐块处理 */
         for (int start = 0; start < N; start += blockLen) {
@@ -118,8 +184,8 @@ QVector<double> FastConv3::process(const QVector<double>& input)
             }
 
             /* FFT卷积当前块 */
-            QVector<double> blockFFT = realDFTForward(block, fftSize);
-            QVector<double> convFFT = complexMultiply(blockFFT, kernelFFT, fftSize);
+            QVector<double> blockFFT = realDFTFwd(block, fftSize);
+            QVector<double> convFFT = complexMul(blockFFT, kernelFFT, fftSize);
             QVector<double> convBlock = realDFTInverse(convFFT, fftSize);
 
             /* Overlap-add到输出 */
@@ -194,11 +260,11 @@ QVector<double> FastConv3::fftConvolve(const QVector<double>& a, const QVector<d
     for (int i = 0; i < M; ++i) pb[i] = b[i];
 
     /* 前向FFT */
-    QVector<double> fftA = realDFTForward(pa, fftSize);
-    QVector<double> fftB = realDFTForward(pb, fftSize);
+    QVector<double> fftA = realDFTFwd(pa, fftSize);
+    QVector<double> fftB = realDFTFwd(pb, fftSize);
 
     /* 频域相乘 */
-    QVector<double> fftProd = complexMultiply(fftA, fftB, fftSize);
+    QVector<double> fftProd = complexMul(fftA, fftB, fftSize);
 
     /* 逆FFT */
     QVector<double> result = realDFTInverse(fftProd, fftSize);
@@ -223,58 +289,4 @@ int FastConv3::nextPow2(int n) const
     n |= n >> 8;
     n |= n >> 16;
     return n + 1;
-}
-
-/* === 辅助方法: 简化的DFT实现 === */
-
-/**
- * @brief 实序列前向DFT，返回交织的[re0,im0,re1,im1,...]
- */
-QVector<double> FastConv3::realDFTForward(const QVector<double>& x, int N) const
-{
-    /* 使用简化DFT (非FFT) 适用于中等规模 */
-    QVector<double> X(N * 2, 0.0);
-    for (int k = 0; k < N; ++k) {
-        double re = 0.0, im = 0.0;
-        for (int n = 0; n < N; ++n) {
-            double angle = -2.0 * M_PI * k * n / N;
-            re += x[n] * qCos(angle);
-            im += x[n] * qSin(angle);
-        }
-        X[2 * k] = re;
-        X[2 * k + 1] = im;
-    }
-    return X;
-}
-
-/**
- * @brief 逆DFT，输入为交织的[re0,im0,re1,im1,...]
- */
-QVector<double> FastConv3::realDFTInverse(const QVector<double>& X, int N) const
-{
-    QVector<double> x(N, 0.0);
-    for (int n = 0; n < N; ++n) {
-        double val = 0.0;
-        for (int k = 0; k < N; ++k) {
-            double angle = 2.0 * M_PI * k * n / N;
-            val += X[2 * k] * qCos(angle) - X[2 * k + 1] * qSin(angle);
-        }
-        x[n] = val / N;
-    }
-    return x;
-}
-
-/**
- * @brief 频域复数相乘
- */
-QVector<double> FastConv3::complexMultiply(const QVector<double>& A, const QVector<double>& B, int N) const
-{
-    QVector<double> C(N * 2, 0.0);
-    for (int k = 0; k < N; ++k) {
-        double ar = A[2 * k], ai = A[2 * k + 1];
-        double br = B[2 * k], bi = B[2 * k + 1];
-        C[2 * k] = ar * br - ai * bi;
-        C[2 * k + 1] = ar * bi + ai * br;
-    }
-    return C;
 }

@@ -66,7 +66,7 @@ public:
     QVector<QPair<QString, int>> fuzzySearch(
         const QString& target,
         const QVector<QString>& candidates,
-        int maxDistance) const;
+        int maxDistance);
 
     /**
      * @brief 获取所有编辑距离<=maxDist的邻居

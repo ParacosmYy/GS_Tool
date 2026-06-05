@@ -3,7 +3,7 @@
  * @brief 布谷鸟过滤器实现 — 有界假阳性率的集合成员查询
  */
 
-#include "utils/hash2/CuckooFilterV2.h"
+#include "utils/hash2/CuckooFilter.h"
 
 #include <QElapsedTimer>
 #include <QCryptographicHash>

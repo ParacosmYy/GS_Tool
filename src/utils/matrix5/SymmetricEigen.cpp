@@ -25,7 +25,7 @@ void SymmetricEigen::setTolerance(double tolerance)
 }
 
 SymmetricEigen::EigenResult SymmetricEigen::decompose(
-    const QVector<double>& matrix, int n) const
+    const QVector<double>& matrix, int n)
 {
     QElapsedTimer timer;
     timer.start();
@@ -143,7 +143,7 @@ SymmetricEigen::EigenResult SymmetricEigen::decompose(
 }
 
 QVector<double> SymmetricEigen::eigenvaluesOnly(
-    const QVector<double>& matrix, int n) const
+    const QVector<double>& matrix, int n)
 {
     auto result = decompose(matrix, n);
     return result.eigenvalues;

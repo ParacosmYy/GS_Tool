@@ -13,6 +13,7 @@
 #include "utils/dsp62/DynamicEQ3.h"
 
 #include <QElapsedTimer>
+#include <QStringList>
 #include <QtMath>
 
 /**
@@ -176,4 +177,67 @@ void DynamicEQ3::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;
+}
+
+/**
+ * @brief 获取当前参数配置摘要
+ *
+ * 返回所有关键参数的当前值，用于调试和状态监控。
+ *
+ * @return 参数描述字符串列表
+ */
+QStringList DynamicEQ3::parameterSummary() const
+{
+    QStringList summary;
+    summary << QString("中心频率: %1 Hz").arg(m_freq, 0, 'f', 1);
+    summary << QString("带宽: %1 倍频程").arg(m_bw, 0, 'f', 2);
+    summary << QString("阈值: %1 dB").arg(m_threshold, 0, 'f', 1);
+    summary << QString("比率: %1:1").arg(m_ratio, 0, 'f', 1);
+    summary << QString("攻击: %1 ms").arg(m_attack, 0, 'f', 1);
+    summary << QString("释放: %1 ms").arg(m_release, 0, 'f', 1);
+    return summary;
+}
+
+/**
+ * @brief 验证参数是否在有效范围内
+ *
+ * 检查所有参数是否满足约束条件:
+ * - 频率 >= 20 Hz
+ * - 带宽 > 0
+ * - 比率 >= 1.0
+ * - 攻击 > 0 ms
+ * - 释放 > 0 ms
+ *
+ * @return true如果所有参数有效
+ */
+bool DynamicEQ3::validateParameters() const
+{
+    if (m_freq < 20.0) return false;
+    if (m_bw <= 0.0) return false;
+    if (m_ratio < 1.0) return false;
+    if (m_attack <= 0.0) return false;
+    if (m_release <= 0.0) return false;
+    return true;
+}
+
+/**
+ * @brief 预计算频带内的平均能量估计
+ *
+ * 对输入信号进行简单的频带能量估计，用于预测压缩量。
+ * 使用RMS(均方根)计算频带内的近似能量。
+ *
+ * @param input 输入信号
+ * @return 估计的频带能量(dB)
+ */
+double DynamicEQ3::estimateBandEnergy(const QVector<double>& input) const
+{
+    if (input.isEmpty()) return -120.0;
+
+    /* 简单RMS估计 */
+    double sumSq = 0.0;
+    for (double sample : input) {
+        sumSq += sample * sample;
+    }
+    double rms = qSqrt(sumSq / static_cast<double>(input.size()));
+    return 20.0 * qLog10(qMax(1e-10, rms));
 }

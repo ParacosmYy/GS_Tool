@@ -3,7 +3,7 @@
  * @brief 多准则峰值检测器实现 — 突出度与宽度分析
  */
 
-#include "utils/signal9/MultiCriteriaPeakDetector.h"
+#include "utils/signal9/PeakDetector2.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

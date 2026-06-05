@@ -50,7 +50,7 @@ public:
      */
     FrequencyResult detectFrequency(const QVector<double>& samples,
                                      double targetFreq,
-                                     double sampleRate) const;
+                                     double sampleRate);
 
     /**
      * @brief 批量检测多个频率

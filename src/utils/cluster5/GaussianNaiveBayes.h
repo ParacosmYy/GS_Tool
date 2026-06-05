@@ -155,6 +155,6 @@ private:
     QVector<int> m_classes;                      ///< 类别列表(排序)
     int m_numFeatures = 0;                       ///< 特征维度
 
-    Stats m_stats;
-    double m_timeSum = 0.0;
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;
 };

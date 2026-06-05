@@ -179,6 +179,6 @@ private:
     QVector<double> m_knots;                ///< 节点向量
     int m_degree = 3;                       ///< 样条阶数
 
-    Stats m_stats;
-    double m_timeSum = 0.0;
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;
 };

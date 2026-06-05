@@ -60,7 +60,7 @@ public:
      * @param n 矩阵维度
      * @return 分解结果(特征值+特征向量)
      */
-    EigenResult decompose(const QVector<double>& matrix, int n) const;
+    EigenResult decompose(const QVector<double>& matrix, int n);
 
     /**
      * @brief 仅计算特征值(不计算特征向量)
@@ -69,7 +69,7 @@ public:
      * @return 特征值(降序)
      */
     QVector<double> eigenvaluesOnly(const QVector<double>& matrix,
-                                     int n) const;
+                                     int n);
 
     /**
      * @brief 重构矩阵: Q * D * Q^T

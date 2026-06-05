@@ -29,9 +29,9 @@ int LevenshteinAutomaton::editDistance(const QString& s1,
         curr[0] = i;
         for (int j = 1; j <= n; ++j) {
             int cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
-            curr[j] = qMin({prev[j] + 1,         /* 删除 */
-                            curr[j - 1] + 1,      /* 插入 */
-                            prev[j - 1] + cost}); /* 替换 */
+            curr[j] = qMin(qMin(prev[j] + 1,         /* 删除 */
+                            curr[j - 1] + 1),         /* 插入 */
+                            prev[j - 1] + cost);      /* 替换 */
         }
         std::swap(prev, curr);
     }
@@ -70,7 +70,7 @@ bool LevenshteinAutomaton::fuzzyMatch(const QString& target,
             int del = (j <= i + maxDistance - 1) ? prev[j] + 1 : 999999;
             int ins = (j >= i - maxDistance + 1) ? curr[j - 1] + 1 : 999999;
             int sub = prev[j - 1] + cost;
-            curr[j] = qMin({del, ins, sub});
+            curr[j] = qMin(qMin(del, ins), sub);
             if (curr[j] <= maxDistance) anyValid = true;
         }
 
@@ -95,7 +95,7 @@ bool LevenshteinAutomaton::fuzzyMatch(const QString& target,
 QVector<QPair<QString, int>> LevenshteinAutomaton::fuzzySearch(
     const QString& target,
     const QVector<QString>& candidates,
-    int maxDistance) const
+    int maxDistance)
 {
     QElapsedTimer timer;
     timer.start();

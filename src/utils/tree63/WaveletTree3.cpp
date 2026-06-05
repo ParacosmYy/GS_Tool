@@ -19,6 +19,16 @@
 #include <QElapsedTimer>
 #include <algorithm>
 
+/* 匿命名空间辅助函数: 递归删除小波树节点 */
+namespace {
+    void deleteWTNodes(WaveletTree3::WTNode* node) {
+        if (!node) return;
+        deleteWTNodes(node->left);
+        deleteWTNodes(node->right);
+        delete node;
+    }
+}
+
 /**
  * @brief 构造函数，初始化小波树
  * @param parent 父QObject指针
@@ -320,16 +330,4 @@ int WaveletTree3::selectNode(WTNode* n, int symbol, int k, int lo, int hi) const
     }
 
     return -1;
-}
-
-/**
- * @brief 递归删除小波树节点 (匿名命名空间)
- */
-namespace {
-    void deleteWTNodes(WaveletTree3::WTNode* node) {
-        if (!node) return;
-        deleteWTNodes(node->left);
-        deleteWTNodes(node->right);
-        delete node;
-    }
 }
