@@ -932,6 +932,23 @@ set(SOURCES
     src/utils/rk2/Rk2Solver.cpp
     src/utils/collocation/CollocationSolver.cpp
 
+    # ── Wave 45: 线性代数/特征值/逼近 ──
+    src/utils/minimizer/GoldenSectionSearch.cpp
+    src/utils/backtrack/BacktrackingLineSearch.cpp
+    src/utils/divided_diff/DividedDifference.cpp
+    src/utils/tridiag/TridiagonalSolver.cpp
+    src/utils/schur/SchurDecomposition.cpp
+    src/utils/rational/RationalInterpolation.cpp
+    src/utils/chebyshev2/ChebyshevApproximation.cpp
+    src/utils/bandmat/BandMatrixSolver.cpp
+    src/utils/sylvester/SylvesterSolver.cpp
+    src/utils/pade/PadeApproximant.cpp
+    src/utils/sturm/SturmSequence.cpp
+    src/utils/qrstep/QrEigenSolver.cpp
+    src/utils/hessenberg/HessenbergReduction.cpp
+    src/utils/butterfly/ButterflyOperation.cpp
+    src/utils/circulant/CirculantSolver.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -2184,6 +2201,23 @@ set(HEADERS
     src/utils/autodiff/numericalDifferentiator.h
     src/utils/rk2/Rk2Solver.h
     src/utils/collocation/CollocationSolver.h
+
+    # ── Wave 45: 线性代数/特征值/逼近 ──
+    src/utils/minimizer/GoldenSectionSearch.h
+    src/utils/backtrack/BacktrackingLineSearch.h
+    src/utils/divided_diff/DividedDifference.h
+    src/utils/tridiag/TridiagonalSolver.h
+    src/utils/schur/SchurDecomposition.h
+    src/utils/rational/RationalInterpolation.h
+    src/utils/chebyshev2/ChebyshevApproximation.h
+    src/utils/bandmat/BandMatrixSolver.h
+    src/utils/sylvester/SylvesterSolver.h
+    src/utils/pade/PadeApproximant.h
+    src/utils/sturm/SturmSequence.h
+    src/utils/qrstep/QrEigenSolver.h
+    src/utils/hessenberg/HessenbergReduction.h
+    src/utils/butterfly/ButterflyOperation.h
+    src/utils/circulant/CirculantSolver.h
 )
 
 set(RESOURCES
