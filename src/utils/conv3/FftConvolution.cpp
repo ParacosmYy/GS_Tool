@@ -62,13 +62,13 @@ QVector<double> FftConvolution::convolve(const QVector<double>& signal,
         int fftLen = nextPowerOf2(fullLen);
 
         /* 零填充到fftLen */
-        QVector<complex> sigFreq(fftLen);
-        QVector<complex> kerFreq(fftLen);
+        QVector<std::complex<double>> sigFreq(fftLen);
+        QVector<std::complex<double>> kerFreq(fftLen);
         for (int i = 0; i < sigLen; ++i) {
-            sigFreq[i] = complex(signal[i], 0.0);
+            sigFreq[i] = std::complex<double>(signal[i], 0.0);
         }
         for (int i = 0; i < kernelLen; ++i) {
-            kerFreq[i] = complex(kernel[i], 0.0);
+            kerFreq[i] = std::complex<double>(kernel[i], 0.0);
         }
 
         /* 正变换 */
@@ -129,9 +129,9 @@ QVector<double> FftConvolution::overlapAdd(const QVector<double>& signal,
     int fftLen = nextPowerOf2(blockSz + kernelLen - 1);
 
     /* 预计算核的FFT */
-    QVector<complex> kerFreq(fftLen);
+    QVector<std::complex<double>> kerFreq(fftLen);
     for (int i = 0; i < kernelLen; ++i) {
-        kerFreq[i] = complex(kernel[i], 0.0);
+        kerFreq[i] = std::complex<double>(kernel[i], 0.0);
     }
     fft(kerFreq);
     m_stats.totalFftsExecuted += 1;
@@ -145,9 +145,9 @@ QVector<double> FftConvolution::overlapAdd(const QVector<double>& signal,
         int thisBlock = qMin(blockSz, sigLen - pos);
 
         /* 零填充当前块 */
-        QVector<complex> blockFreq(fftLen);
+        QVector<std::complex<double>> blockFreq(fftLen);
         for (int i = 0; i < thisBlock; ++i) {
-            blockFreq[i] = complex(signal[pos + i], 0.0);
+            blockFreq[i] = std::complex<double>(signal[pos + i], 0.0);
         }
 
         /* 正变换 + 频域乘法 + 逆变换 */
@@ -191,13 +191,13 @@ QVector<double> FftConvolution::crossCorrelate(const QVector<double>& a,
     int fftLen = nextPowerOf2(fullLen);
 
     /* 翻转b用于互相关 */
-    QVector<complex> aFreq(fftLen);
-    QVector<complex> bFreq(fftLen);
+    QVector<std::complex<double>> aFreq(fftLen);
+    QVector<std::complex<double>> bFreq(fftLen);
     for (int i = 0; i < a.size(); ++i) {
-        aFreq[i] = complex(a[i], 0.0);
+        aFreq[i] = std::complex<double>(a[i], 0.0);
     }
     for (int i = 0; i < b.size(); ++i) {
-        bFreq[i] = complex(b[b.size() - 1 - i], 0.0);
+        bFreq[i] = std::complex<double>(b[b.size() - 1 - i], 0.0);
     }
 
     fft(aFreq);
@@ -225,7 +225,7 @@ void FftConvolution::resetStatistics()
 }
 
 /** @brief 基2 FFT @param data 复数数组 @param inverse 逆变换 */
-void FftConvolution::fft(QVector<complex>& data, bool inverse)
+void FftConvolution::fft(QVector<std::complex<double>>& data, bool inverse)
 {
     int n = data.size();
     if (n <= 1) return;
@@ -246,13 +246,13 @@ void FftConvolution::fft(QVector<complex>& data, bool inverse)
     double sign = inverse ? 1.0 : -1.0;
     for (int len = 2; len <= n; len <<= 1) {
         double angle = sign * 2.0 * M_PI / len;
-        complex wLen(qCos(angle), qSin(angle));
+        std::complex<double> wLen(qCos(angle), qSin(angle));
 
         for (int i = 0; i < n; i += len) {
-            complex w(1.0, 0.0);
+            std::complex<double> w(1.0, 0.0);
             for (int j = 0; j < len / 2; ++j) {
-                complex u = data[i + j];
-                complex v = data[i + j + len / 2] * w;
+                std::complex<double> u = data[i + j];
+                std::complex<double> v = data[i + j + len / 2] * w;
                 data[i + j] = u + v;
                 data[i + j + len / 2] = u - v;
                 w = w * wLen;

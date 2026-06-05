@@ -113,7 +113,7 @@ std::shared_ptr<SymbolicDerivative::Expr> SymbolicDerivative::parseAtom(
 
     /* 函数: sin, cos, tan, exp, ln */
     if (pos + 2 < expr.size()) {
-        QStringRef ref(&expr, pos, 3);
+        QStringView ref(QStringView{expr}.mid(pos, 3));
         if (ref == "sin" || ref == "cos" || ref == "tan" || ref == "exp") {
             QString fname = ref.toString();
             pos += 3;
@@ -466,7 +466,7 @@ QString SymbolicDerivative::toString(const std::shared_ptr<Expr>& expr) const
 }
 
 QString SymbolicDerivative::deriveAndFormat(const QString& exprStr,
-                                             const QString& variable) const
+                                             const QString& variable)
 {
     auto ast = parse(exprStr);
     if (!ast) return "PARSE_ERROR";

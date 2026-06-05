@@ -88,6 +88,6 @@ signals:
 private:
     double m_location;
     double m_scale;
-    Stats m_stats;
-    double m_timeSum;
+    mutable Stats m_stats;
+    mutable double m_timeSum;
 };

@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QVector>
 #include <QMap>
+#include <QHash>
 #include <QSet>
 #include <QChar>
 
@@ -83,7 +84,7 @@ public:
      * @return 是否匹配(到达接受状态)
      */
     bool simulate(const NfaDefinition& nfa,
-                  const QString& input) const;
+                  const QString& input);
 
     /**
      * @brief 子集构造法: NFA转DFA

@@ -24,6 +24,11 @@ signals:
     void processingComplete(int samples);
 private:
     double allpassFilter(double sample, int stage);
+    double currentLFOValue() const;
+    void setLFOWaveform(int type);
+    QVector<double> processWithMix(const QVector<double>& input, double dryWet);
+    double phaseResponse(double freq) const;
+    double magnitudeResponse(double freq) const;
     double m_rate = 0.5; double m_depth = 0.7;
     double m_feedback = 0.5; int m_stages = 4;
     double m_sampleRate = 44100.0;

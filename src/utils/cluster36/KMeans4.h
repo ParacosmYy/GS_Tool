@@ -17,6 +17,9 @@ public:
 signals:
     void fitComplete(int k, double inertia);
 private:
+    void initCentroidsRandom(const QVector<QVector<double>>& data, int k);
+    void initCentroidsKMeansPlusPlus(const QVector<QVector<double>>& data, int k, int dim);
+    double squaredDistance(const QVector<double>& a, const QVector<double>& b, int dim) const;
     int m_k = 3; int m_maxIter = 300; int m_initMethod = 0;
     QVector<QVector<double>> m_centroids; double m_inertia = 0.0;
     Stats m_stats; double m_timeSum = 0.0;

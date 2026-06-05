@@ -5,6 +5,8 @@
 #pragma once
 #include <QObject>
 #include <QVector>
+#include <QString>
+#include <QSet>
 class GrayCode3 : public QObject {
     Q_OBJECT
 public:
@@ -16,6 +18,8 @@ public:
     int hammingDistance(quint32 a, quint32 b) const;
     QVector<QVector<int>> distanceMatrix(int bits) const;
     QVector<quint32> neighbors(quint32 gray, int bits) const;
+    bool isValidSequence(const QVector<quint32>& sequence, int bits) const;
+    QString toString(quint32 gray, int bits) const;
     Stats stats() const { return m_stats; }
     void resetStatistics();
 signals:

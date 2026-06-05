@@ -72,7 +72,7 @@ public:
      * @return 导数字符串
      */
     QString deriveAndFormat(const QString& exprStr,
-                            const QString& variable) const;
+                            const QString& variable);
 
     /** @brief 获取统计 */
     Stats stats() const;

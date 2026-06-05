@@ -152,14 +152,13 @@ double NoiseGate2::processOne(double sample)
     }
 
     /* m_envelope在此处复用为增益平滑变量 */
-    static double gain = 0.0;
-    gain = coeff * gain + (1.0 - coeff) * targetGain;
-    gain = qBound(0.0, gain, 1.0);
+    m_gain = coeff * m_gain + (1.0 - coeff) * targetGain;
+    m_gain = qBound(0.0, m_gain, 1.0);
 
     /* 更新统计信息 */
     m_stats.totalSamplesProcessed++;
 
-    return sample * gain;
+    return sample * m_gain;
 }
 
 /**
@@ -205,6 +204,7 @@ void NoiseGate2::reset()
     m_envelope = -120.0;
     m_gateOpen = false;
     m_holdTimer = 0.0;
+    m_gain = 0.0;
 }
 
 /**

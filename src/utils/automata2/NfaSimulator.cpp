@@ -58,7 +58,7 @@ QSet<int> NfaSimulator::move(const NfaDefinition& nfa,
 }
 
 bool NfaSimulator::simulate(const NfaDefinition& nfa,
-                             const QString& input) const
+                             const QString& input)
 {
     QElapsedTimer timer;
     timer.start();
@@ -102,7 +102,7 @@ NfaSimulator::DfaResult NfaSimulator::convertToDfa(
     /* 初始DFA状态 = NFA起始状态的epsilon闭包 */
     QSet<int> startClosure = epsilonClosure(nfa, {nfa.startState});
     QVector<QSet<int>> dfaStates = {startClosure};
-    QMap<QSet<int>, int> stateIndex;
+    QHash<QSet<int>, int> stateIndex;
     stateIndex[startClosure] = 0;
 
     /* 检查初始状态是否为接受 */

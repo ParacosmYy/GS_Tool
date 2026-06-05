@@ -24,6 +24,10 @@ signals:
     void processingComplete(int samples);
 private:
     double interpolate(double frac, double a, double b) const;
+    double allpassInterpolate(double frac, double a, double b) const;
+    QVector<double> processWithMix(const QVector<double>& input, double dryWet);
+    double currentDelayMs() const;
+    double frequencyResponse(double freq) const;
     double m_rate = 0.3; double m_depth = 0.8;
     double m_feedback = 0.5; double m_minDelay = 0.5; double m_maxDelay = 5.0;
     double m_sampleRate = 44100.0; double m_phase = 0.0;

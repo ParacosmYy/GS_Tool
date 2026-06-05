@@ -67,6 +67,39 @@ public:
     /** @brief 重置滤波器状态 */
     void reset();
 
+    /**
+     * @brief 处理分离的左右声道并交织输出
+     * @param left 左声道
+     * @param right 右声道
+     * @return 交错输出
+     */
+    QVector<float> processDeinterleaved(const QVector<float>& left,
+                                         const QVector<float>& right);
+
+    /**
+     * @brief 计算宽度轮廓(每段的侧边/中间能量比)
+     * @param input 交错输入
+     * @param segmentLen 每段长度(帧)
+     * @return 宽度系数数组
+     */
+    QVector<float> getWidthProfile(const QVector<float>& input, int segmentLen = 1024);
+
+    /**
+     * @brief 计算左右声道归一化互相关
+     * @param input 交错输入
+     * @return 相关系数(-1~1)
+     */
+    float computeCorrelation(const QVector<float>& input) const;
+
+    /**
+     * @brief 自适应宽度处理(根据信号相关性动态调整)
+     * @param input 交错输入
+     * @param analysisWindow 分析窗口大小(帧)
+     * @return 交错输出
+     */
+    QVector<float> processWithAutoWidth(const QVector<float>& input,
+                                          int analysisWindow = 2048);
+
 signals:
     /** 处理完成 */
     void frameProcessed(int sampleCount, double processingTimeMs);

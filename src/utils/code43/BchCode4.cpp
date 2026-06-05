@@ -14,6 +14,8 @@
 #include "utils/code43/BchCode4.h"
 
 #include <QElapsedTimer>
+#include <QMap>
+#include <QSet>
 #include <QtMath>
 #include <algorithm>
 

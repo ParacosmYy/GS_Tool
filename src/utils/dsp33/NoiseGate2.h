@@ -28,6 +28,6 @@ private:
     double m_threshold = -40.0; double m_hysteresis = 6.0;
     double m_attack = 1.0; double m_release = 50.0; double m_hold = 10.0;
     double m_sampleRate = 44100.0;
-    double m_envelope = 0.0; bool m_gateOpen = false; double m_holdTimer = 0.0;
+    double m_envelope = 0.0; bool m_gateOpen = false; double m_holdTimer = 0.0; double m_gain = 0.0;
     Stats m_stats; double m_timeSum = 0.0;
 };
