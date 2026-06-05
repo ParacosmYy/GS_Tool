@@ -192,6 +192,7 @@ private:
     bool m_alertEnabled = true;        ///< 告警开关
     double m_lastHealthScore = 100.0;  ///< 上一次健康评分(用于变化检测)
     bool m_alertActive = false;        ///< 当前是否处于告警状态(避免重复触发)
+    qint64 m_lastBurstTimestamp = 0;   ///< 上次突发的最新错误时间戳(用于去重)
 
     // ── 统计 ──
     SerialHealthStats m_stats;         ///< 统计数据

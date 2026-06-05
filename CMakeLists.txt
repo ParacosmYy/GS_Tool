@@ -1425,6 +1425,9 @@ set(HEADERS
 
     # -- F86: 脊线检测器 --
     src/utils/peakdetect/RidgeDetector.h
+
+    # -- F87: 数据性能分析器 --
+    src/utils/profiler/DataProfiler.h
 )
 
 set(RESOURCES

@@ -78,6 +78,7 @@ void AudioSpectrum::paintEvent(QPaintEvent *) {
     QPainter p(this); p.setRenderHint(QPainter::Antialiasing);
     int w = width(), h = height();
     p.fillRect(rect(), Qt::transparent);
+    if (m_barCount <= 0 || m_smoothed.size() < m_barCount) return;
     double barW = static_cast<double>(w) / m_barCount * 0.8;
     double gap = static_cast<double>(w) / m_barCount * 0.2;
     for (int i = 0; i < m_barCount; ++i) {

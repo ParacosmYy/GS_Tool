@@ -331,12 +331,17 @@ double SerialHealthMonitor::calculateHealthScore() const
 
     /* ── 稳定性评分(0-100, 权重30%) ── */
     double stabilityScore = 100.0;
-    if (m_stats.uptimeSeconds > 0) {
-        /* 每分钟断开次数 */
-        const double dropsPerMin = static_cast<double>(m_stats.connectionDrops)
-                                   / (static_cast<double>(m_stats.uptimeSeconds) / 60.0);
-        const double dropPenalty = qMin(1.0, dropsPerMin);
-        stabilityScore = (1.0 - dropPenalty) * 100.0;
+    if (m_stats.connectionDrops > 0) {
+        if (m_stats.uptimeSeconds > 0) {
+            /* 每分钟断开次数 */
+            const double dropsPerMin = static_cast<double>(m_stats.connectionDrops)
+                                       / (static_cast<double>(m_stats.uptimeSeconds) / 60.0);
+            const double dropPenalty = qMin(1.0, dropsPerMin);
+            stabilityScore = (1.0 - dropPenalty) * 100.0;
+        } else {
+            /* 运行时间为0但有断开记录: 连接极不稳定 */
+            stabilityScore = 0.0;
+        }
     }
 
     return qMax(0.0, qMin(100.0, errorScore * 0.7 + stabilityScore * 0.3));
@@ -390,8 +395,12 @@ void SerialHealthMonitor::detectBurst()
     const qint64 span = newest - oldest;
 
     if (span <= BURST_WINDOW_MS && span >= 0) {
-        m_stats.errorBursts++;
-        emit errorBurstDetected(BURST_MIN_ERRORS);
+        /* 去重: 仅当此突发与上次记录的突发不重叠时才计为新突发 */
+        if (m_lastBurstTimestamp < oldest) {
+            m_lastBurstTimestamp = newest;
+            m_stats.errorBursts++;
+            emit errorBurstDetected(BURST_MIN_ERRORS);
+        }
     }
 }
 
