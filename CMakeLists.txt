@@ -690,6 +690,12 @@ set(SOURCES
     src/utils/integrator/NumericalIntegrator.cpp
     src/utils/convolution/ConvolutionEngine.cpp
     src/utils/modulation/Demodulator.cpp
+    src/utils/pid/PidController.cpp
+    src/utils/fft2/FftPipeline.cpp
+    src/utils/bayes/BayesClassifier.cpp
+    src/utils/regress/RegressionEngine.cpp
+    src/utils/pca/PcaAnalyzer.cpp
+    src/utils/dtw2/FastDtw.cpp
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
@@ -1461,7 +1467,23 @@ set(HEADERS
     # -- F94: 变点检测器 --
     src/utils/changept/ChangepointDetector.h
 
-    # -- F95: 眼图引擎 --
+    # -- F95: PID控制器 --
+    src/utils/pid/PidController.h
+
+    # -- F96: FFT管道 --
+    src/utils/fft2/FftPipeline.h
+
+    # -- F97: 贝叶斯分类器 --
+    src/utils/bayes/BayesClassifier.h
+
+    # -- F98: 回归引擎 --
+    src/utils/regress/RegressionEngine.h
+
+    # -- F99: PCA主成分分析器 --
+    src/utils/pca/PcaAnalyzer.h
+
+    # -- F100: 快速DTW距离 --
+    src/utils/dtw2/FastDtw.h
     src/utils/eye/EyeDiagramEngine.h
 
     # -- F96: 符号解码器 --
