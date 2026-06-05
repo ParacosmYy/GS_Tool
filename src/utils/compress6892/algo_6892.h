@@ -1,0 +1,21 @@
+/**
+ * @file algo_6892.h
+ * @brief Algorithm module 6892
+ */
+#pragma once
+#include <QObject>
+#include <QVector>
+class algo_6892 : public QObject {
+    Q_OBJECT
+public:
+    struct Stats { quint64 calls=0; quint64 items=0; quint64 errors=0; };
+    explicit algo_6892(QObject *p=nullptr) : QObject(p) {}
+    ~algo_6892() override = default;
+    QVector<double> compute(const QVector<double> &input);
+    Stats stats() const { return m_stats; }
+    void resetStats() { m_stats = {}; }
+signals:
+    void computed(const QVector<double> &result);
+private:
+    Stats m_stats;
+};
