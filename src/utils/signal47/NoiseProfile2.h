@@ -33,6 +33,10 @@ public:
     int framesLearned() const { return m_framesLearned; }
     Stats stats() const { return m_stats; }
     void resetStatistics();
+    void resetProfile();
+    double noiseFloorDb() const;
+    QVector<double> bandSnr() const;
+    double bandSnrRange(int startBin, int endBin) const;
 
 signals:
     void profileUpdated(int frames, double noiseFloor);

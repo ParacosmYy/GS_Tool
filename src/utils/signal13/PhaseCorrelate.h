@@ -134,6 +134,6 @@ private:
      */
     static int nextPowerOfTwo(int n);
 
-    Stats m_stats;
-    double m_timeSum = 0.0;                     ///< 处理时间累加器
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;                     ///< 处理时间累加器
 };

@@ -3,7 +3,7 @@
  * @brief 音高检测器实现
  */
 
-#include "PitchTracker.h"
+#include "utils/signal18/PitchDetector.h"
 #include <QElapsedTimer>
 #include <cmath>
 #include <algorithm>

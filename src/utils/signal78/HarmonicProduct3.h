@@ -4,12 +4,13 @@
 #include <QPair>
 
 /**
- * @brief HarmonicProduct3 - 谐波乘积谱基音检测
+ * @brief HarmonicPitchDetector - 谐波乘积谱基音检测器
  *
  * 通过谐波乘积谱(HPS)方法检测基音频率，
  * 将频谱与其下采样版本相乘以增强基频分量。
+ * 支持从频谱幅度或时域帧直接检测。
  */
-class HarmonicProduct3 : public QObject {
+class HarmonicPitchDetector : public QObject {
     Q_OBJECT
 public:
     struct Stats {
@@ -18,7 +19,7 @@ public:
         double avgProcessingTimeMs = 0.0;
     };
 
-    explicit HarmonicProduct3(QObject* parent = nullptr);
+    explicit HarmonicPitchDetector(QObject* parent = nullptr);
 
     /** @brief 设置采样率和HPS阶数 */
     void initialize(double sampleRate, int harmonics = 5);

@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QVector>
 #include <QPair>
+#include <QMap>
 
 class Chromagram2 : public QObject
 {
@@ -45,7 +46,11 @@ private:
 
     void buildNoteFilters();
     QVector<double> chordTemplate(const QString& chord) const;
+    double cosineSimilarity(const QVector<double>& a,
+                            const QVector<double>& b) const;
+    double pearsonCorrelation(const QVector<double>& x,
+                              const double y[12]) const;
 
-    Stats m_stats;
-    double m_timeSum = 0.0;
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;
 };

@@ -174,7 +174,7 @@ double NoiseProfile2::snr() const
 
     if (totalNoise < 1e-24) return 60.0;
     double snrLin = totalSignal / totalNoise;
-    return 10.0 * qLog10(qMax(1e-12, snrLin));
+    return 10.0 * qLn(qMax(1e-12, snrLin)) / qLn(10.0);
 }
 
 /**
@@ -217,7 +217,7 @@ double NoiseProfile2::noiseFloorDb() const
         totalPower += m_noisePower[i];
     }
     double avgPower = totalPower / n;
-    return 10.0 * qLog10(qMax(1e-12, avgPower));
+    return 10.0 * (qLn(qMax(1e-12, avgPower)) / qLn(10.0));
 }
 
 /**
@@ -235,7 +235,7 @@ QVector<double> NoiseProfile2::bandSnr() const
     for (int i = 0; i < n; ++i) {
         if (m_noisePower[i] > 1e-24) {
             double ratio = m_signalPower[i] / m_noisePower[i];
-            bandSnrVec[i] = 10.0 * qLog10(qMax(1e-12, ratio));
+            bandSnrVec[i] = 10.0 * (qLn(qMax(1e-12, ratio)) / qLn(10.0));
         } else {
             bandSnrVec[i] = 60.0; /* 噪声极低，SNR很高 */
         }
@@ -267,5 +267,5 @@ double NoiseProfile2::bandSnrRange(int lowBin, int highBin) const
 
     if (totalNoise < 1e-24 || count == 0) return 60.0;
     double ratio = totalSignal / totalNoise;
-    return 10.0 * qLog10(qMax(1e-12, ratio));
+    return 10.0 * (qLn(qMax(1e-12, ratio)) / qLn(10.0));
 }

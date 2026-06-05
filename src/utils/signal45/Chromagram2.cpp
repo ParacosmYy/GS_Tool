@@ -301,7 +301,6 @@ QString Chromagram2::detectChord(const QVector<double>& chroma) const
         }
     }
 
-    emit chordDetected(bestChord, bestScore);
     return bestChord;
 }
 
