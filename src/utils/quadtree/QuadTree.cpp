@@ -82,7 +82,7 @@ void QuadTree::subdivide()
     m_points.clear();
 }
 
-QVector<QuadTree::Point> QuadTree::queryRange(const Rect& range) const
+QVector<QuadTree::Point> QuadTree::queryRange(const Rect& range)
 {
     QElapsedTimer timer;
     timer.start();
@@ -90,12 +90,12 @@ QVector<QuadTree::Point> QuadTree::queryRange(const Rect& range) const
     QVector<Point> result;
     queryRangeImpl(range, result);
 
-    const_cast<QuadTree*>(this)->m_stats.totalQueries++;
-    const_cast<QuadTree*>(this)->m_timeSum += timer.elapsed();
-    const_cast<QuadTree*>(this)->m_stats.avgProcessingTimeMs = m_timeSum /
+    m_stats.totalQueries++;
+    m_timeSum += timer.elapsed();
+    m_stats.avgProcessingTimeMs = m_timeSum /
         (m_stats.totalInserts + m_stats.totalQueries);
 
-    const_cast<QuadTree*>(this)->rangeQueryCompleted(result.size());
+    emit rangeQueryCompleted(result.size());
     return result;
 }
 
@@ -115,7 +115,7 @@ void QuadTree::queryRangeImpl(const Rect& range, QVector<Point>& result) const
     }
 }
 
-QVector<QuadTree::Point> QuadTree::nearestNeighbors(double x, double y, int k) const
+QVector<QuadTree::Point> QuadTree::nearestNeighbors(double x, double y, int k)
 {
     QElapsedTimer timer;
     timer.start();

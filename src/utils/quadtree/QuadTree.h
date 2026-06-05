@@ -48,10 +48,10 @@ public:
     bool insert(const Point& point);
 
     /** @brief 范围查询 @param range 查询范围 @return 范围内的点 */
-    QVector<Point> queryRange(const Rect& range) const;
+    QVector<Point> queryRange(const Rect& range);
 
     /** @brief 最近邻查询 @param x X坐标 @param y Y坐标 @param k 数量 @return 最近的k个点 */
-    QVector<Point> nearestNeighbors(double x, double y, int k = 1) const;
+    QVector<Point> nearestNeighbors(double x, double y, int k = 1);
 
     /** @brief 总点数(递归统计所有子节点) */
     int size() const;
@@ -75,8 +75,8 @@ private:
     QuadTree* m_sw;
     QuadTree* m_se;
     int m_size;
-    Stats m_stats;
-    double m_timeSum;
+    mutable Stats m_stats;
+    mutable double m_timeSum;
 };
 
 #endif // QUADTREE_H

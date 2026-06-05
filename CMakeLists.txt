@@ -966,6 +966,23 @@ set(SOURCES
     src/utils/jacobi_iter/JacobiSolver.cpp
     src/utils/gauss_seidel/GaussSeidelSolver.cpp
 
+    # ── Wave 47: 线性求解器/特征值/分解更新 ──
+    src/utils/cgls/CglsSolver.cpp
+    src/utils/bicgstab/BicgstabSolver.cpp
+    src/utils/gmres/GmresSolver.cpp
+    src/utils/minres/MinresSolver.cpp
+    src/utils/symm_eigen/SymmetricEigenSolver.cpp
+    src/utils/tridiag_eigen/TridiagEigenSolver.cpp
+    src/utils/qz/QzDecomposition.cpp
+    src/utils/svd2/SvdSolver.cpp
+    src/utils/polar/PolarDecomposition.cpp
+    src/utils/qrupdate/QrUpdate.cpp
+    src/utils/cholupdate/CholeskyUpdate.cpp
+    src/utils/schur_update/SchurReorder.cpp
+    src/utils/arnoldi/ArnoldiProcess.cpp
+    src/utils/power2/InverseIteration.cpp
+    src/utils/nystrom/NystromApproximation.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -2252,6 +2269,23 @@ set(HEADERS
     src/utils/sor/SorSolver.h
     src/utils/jacobi_iter/JacobiSolver.h
     src/utils/gauss_seidel/GaussSeidelSolver.h
+
+    # ── Wave 47: 线性求解器/特征值/分解更新 ──
+    src/utils/cgls/CglsSolver.h
+    src/utils/bicgstab/BicgstabSolver.h
+    src/utils/gmres/GmresSolver.h
+    src/utils/minres/MinresSolver.h
+    src/utils/symm_eigen/SymmetricEigenSolver.h
+    src/utils/tridiag_eigen/TridiagEigenSolver.h
+    src/utils/qz/QzDecomposition.h
+    src/utils/svd2/SvdSolver.h
+    src/utils/polar/PolarDecomposition.h
+    src/utils/qrupdate/QrUpdate.h
+    src/utils/cholupdate/CholeskyUpdate.h
+    src/utils/schur_update/SchurReorder.h
+    src/utils/arnoldi/ArnoldiProcess.h
+    src/utils/power2/InverseIteration.h
+    src/utils/nystrom/NystromApproximation.h
 )
 
 set(RESOURCES
