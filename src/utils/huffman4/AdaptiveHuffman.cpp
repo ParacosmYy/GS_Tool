@@ -1,13 +1,13 @@
 /**
- * @file AdaptiveHuffman.cpp
+ * @file AdaptiveHuffmanV2.cpp
  * @brief 自适应Huffman编码实现(FGK算法)
  */
 
-#include "AdaptiveHuffman.h"
+#include "AdaptiveHuffmanV2.h"
 #include <QElapsedTimer>
 #include <cstring>
 
-AdaptiveHuffman::AdaptiveHuffman(int alphabetSize, QObject* parent)
+AdaptiveHuffmanV2::AdaptiveHuffmanV2(int alphabetSize, QObject* parent)
     : QObject(parent)
     , m_alphabetSize(alphabetSize)
     , m_timeSum(0.0)
@@ -15,7 +15,7 @@ AdaptiveHuffman::AdaptiveHuffman(int alphabetSize, QObject* parent)
     resetTree();
 }
 
-QByteArray AdaptiveHuffman::encode(const QByteArray& data)
+QByteArray AdaptiveHuffmanV2::encode(const QByteArray& data)
 {
     QElapsedTimer timer;
     timer.start();
@@ -76,7 +76,7 @@ QByteArray AdaptiveHuffman::encode(const QByteArray& data)
     return m_bitBuffer;
 }
 
-QByteArray AdaptiveHuffman::decode(const QByteArray& data, int originalSize)
+QByteArray AdaptiveHuffmanV2::decode(const QByteArray& data, int originalSize)
 {
     QElapsedTimer timer;
     timer.start();
@@ -144,13 +144,13 @@ QByteArray AdaptiveHuffman::decode(const QByteArray& data, int originalSize)
     return result;
 }
 
-double AdaptiveHuffman::compressionRatio() const
+double AdaptiveHuffmanV2::compressionRatio() const
 {
     if (m_stats.totalBytesOut == 0) return 0.0;
     return static_cast<double>(m_stats.totalBytesOut) / m_stats.totalBytesIn;
 }
 
-AdaptiveHuffman::Node* AdaptiveHuffman::createNode(int symbol, int weight,
+AdaptiveHuffmanV2::Node* AdaptiveHuffmanV2::createNode(int symbol, int weight,
                                                      int order, Node* parent)
 {
     Node* n = new Node();
@@ -163,7 +163,7 @@ AdaptiveHuffman::Node* AdaptiveHuffman::createNode(int symbol, int weight,
     return n;
 }
 
-void AdaptiveHuffman::updateTree(Node* node)
+void AdaptiveHuffmanV2::updateTree(Node* node)
 {
     while (node) {
         Node* leader = findLeader(node);
@@ -175,7 +175,7 @@ void AdaptiveHuffman::updateTree(Node* node)
     }
 }
 
-AdaptiveHuffman::Node* AdaptiveHuffman::findLeader(Node* node)
+AdaptiveHuffmanV2::Node* AdaptiveHuffmanV2::findLeader(Node* node)
 {
     /* 简化: 在同权重节点中找最高order */
     Node* leader = node;
@@ -192,7 +192,7 @@ AdaptiveHuffman::Node* AdaptiveHuffman::findLeader(Node* node)
     return leader;
 }
 
-void AdaptiveHuffman::swapNodes(Node* a, Node* b)
+void AdaptiveHuffmanV2::swapNodes(Node* a, Node* b)
 {
     std::swap(a->order, b->order);
     if (a->parent) {
@@ -208,7 +208,7 @@ void AdaptiveHuffman::swapNodes(Node* a, Node* b)
     if (!b->parent) m_root = b;
 }
 
-void AdaptiveHuffman::deleteTree(Node* node)
+void AdaptiveHuffmanV2::deleteTree(Node* node)
 {
     if (!node) return;
     deleteTree(node->left);
@@ -216,7 +216,7 @@ void AdaptiveHuffman::deleteTree(Node* node)
     delete node;
 }
 
-void AdaptiveHuffman::resetTree()
+void AdaptiveHuffmanV2::resetTree()
 {
     deleteTree(m_root);
     m_symbolNodes.clear();
@@ -224,7 +224,7 @@ void AdaptiveHuffman::resetTree()
     m_nyt = m_root;
 }
 
-void AdaptiveHuffman::writeBit(int bit)
+void AdaptiveHuffmanV2::writeBit(int bit)
 {
     if (m_bitPos == 0)
         m_bitBuffer.append(static_cast<char>(0));
@@ -233,7 +233,7 @@ void AdaptiveHuffman::writeBit(int bit)
     m_bitPos = (m_bitPos + 1) % 8;
 }
 
-void AdaptiveHuffman::writeCode(Node* node)
+void AdaptiveHuffmanV2::writeCode(Node* node)
 {
     if (!node || !node->parent) return;
     QVector<int> bits;
@@ -245,7 +245,7 @@ void AdaptiveHuffman::writeCode(Node* node)
     for (int b : bits) writeBit(b);
 }
 
-int AdaptiveHuffman::readBit(const QByteArray& data)
+int AdaptiveHuffmanV2::readBit(const QByteArray& data)
 {
     int byteIdx = m_readBitPos / 8;
     int bitIdx = 7 - (m_readBitPos % 8);
@@ -254,9 +254,9 @@ int AdaptiveHuffman::readBit(const QByteArray& data)
     return (static_cast<quint8>(data[byteIdx]) >> bitIdx) & 1;
 }
 
-AdaptiveHuffman::Stats AdaptiveHuffman::stats() const { return m_stats; }
+AdaptiveHuffmanV2::Stats AdaptiveHuffmanV2::stats() const { return m_stats; }
 
-void AdaptiveHuffman::resetStatistics()
+void AdaptiveHuffmanV2::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;

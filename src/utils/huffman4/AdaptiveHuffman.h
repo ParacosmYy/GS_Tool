@@ -1,5 +1,5 @@
 /**
- * @file AdaptiveHuffman.h
+ * @file AdaptiveHuffmanV2.h
  * @brief 自适应Huffman编码
  */
 
@@ -15,7 +15,7 @@
  * 动态构建Huffman树,无需预先统计频率。
  * 支持单遍编码/解码,适用于流式数据。
  */
-class AdaptiveHuffman : public QObject
+class AdaptiveHuffmanV2 : public QObject
 {
     Q_OBJECT
 
@@ -29,7 +29,7 @@ public:
         double avgProcessingTimeMs = 0.0; ///< 平均处理时间(ms)
     };
 
-    explicit AdaptiveHuffman(int alphabetSize = 256, QObject* parent = nullptr);
+    explicit AdaptiveHuffmanV2(int alphabetSize = 256, QObject* parent = nullptr);
 
     /**
      * @brief 编码数据
