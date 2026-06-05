@@ -1,107 +1,173 @@
 /**
  * @file KernelPca.h
- * @brief 核主成分分析 — 非线性降维
+ * @brief 核主成分分析 — RBF/多项式/线性核函数
  *
- * 功能: 使用核技巧(RBF/多项式/线性)实现非线性PCA，
- *       将高维数据映射到特征空间后执行主成分分析。
+ * 实现核主成分分析(Kernel PCA)，支持三种核函数:
+ *   - RBF(径向基函数/高斯核): 适用于非线性流形
+ *   - 多项式核: 适用于多项式关系
+ *   - 线性核: 退化为标准PCA
  *
- * 协作: GaussianMixture(分布建模) / ArimaModel(时序分析)
+ * 协作: SymmetricEigen(特征分解) / DataNormalizer(归一化)
  */
-#ifndef KERNELPCA_H
-#define KERNELPCA_H
+#pragma once
 
 #include <QObject>
 #include <QVector>
+#include <QString>
+#include <QPair>
 
 /**
- * @brief 核主成分分析器
+ * @class KernelPca
+ * @brief 核主成分分析引擎
+ *
+ * 通过核技巧将数据映射到高维空间后执行PCA，
+ * 可以捕获数据中的非线性结构。
  */
-class KernelPca : public QObject {
+class KernelPca : public QObject
+{
     Q_OBJECT
 
 public:
     /** @brief 核函数类型 */
-    enum class Kernel {
-        Rbf,            ///< 径向基核(Gaussian)
-        Polynomial,     ///< 多项式核
-        Linear          ///< 线性核
+    enum class KernelType {
+        RBF,           ///< 径向基函数(高斯核)
+        Polynomial,    ///< 多项式核
+        Linear         ///< 线性核(标准PCA)
     };
-    Q_ENUM(Kernel)
+    Q_ENUM(KernelType)
 
-    /** @brief 核参数 */
-    struct KernelParams {
-        double gamma = 1.0;         ///< RBF核参数γ
-        double degree = 3.0;        ///< 多项式核度数
-        double coef0 = 1.0;         ///< 多项式核偏移
+    /** @brief 变换结果 */
+    struct TransformResult {
+        QVector<QVector<double>> projectedData; ///< 投影后的数据
+        QVector<double> eigenvalues;            ///< 核矩阵特征值
+        QVector<QVector<double>> eigenvectors;  ///< 特征向量
+        double explainedVariance = 0.0;         ///< 解释方差比
+        int componentsUsed = 0;                 ///< 使用的主成分数
     };
 
-    /** @brief 统计 */
+    /** @brief 统计信息 */
     struct Stats {
-        quint64 totalTransforms = 0;        ///< 累计变换次数
-        double  avgProcessingTimeMs = 0.0;  ///< 平均处理耗时(ms)
+        quint64 totalFits = 0;                ///< 累计拟合次数
+        quint64 totalTransforms = 0;          ///< 累计变换次数
+        quint64 totalSamplesProcessed = 0;    ///< 累计处理样本数
+        double  avgProcessingTimeMs = 0.0;    ///< 平均处理耗时(ms)
     };
 
+    /** @brief 构造函数 @param parent 父对象 */
     explicit KernelPca(QObject* parent = nullptr);
 
     /**
-     * @brief 拟合核PCA模型
+     * @brief 设置核函数类型
+     * @param type 核类型
+     */
+    void setKernelType(KernelType type);
+
+    /**
+     * @brief 设置核函数参数
+     * @param gamma RBF的gamma参数(默认1.0)
+     * @param degree 多项式的阶数(默认3)
+     * @param coef0 多项式的常数项(默认1.0)
+     */
+    void setKernelParameters(double gamma, int degree = 3, double coef0 = 1.0);
+
+    /**
+     * @brief 设置目标主成分数
+     * @param components 主成分数(0=自动选择)
+     */
+    void setComponentCount(int components);
+
+    /**
+     * @brief 设置方差保留比例(自动选择主成分数时使用)
+     * @param ratio 保留比例(0.0~1.0, 默认0.95)
+     */
+    void setVarianceRatio(double ratio);
+
+    /**
+     * @brief 拟合模型
      * @param data 输入数据(每行一个样本)
-     * @param kernel 核函数类型
-     * @param params 核参数
-     * @param nComponents 保留的主成分数(0=自动)
-     * @return 实际保留的主成分数
      */
-    int fit(const QVector<QVector<double>>& data,
-            Kernel kernel,
-            const KernelParams& params,
-            int nComponents = 0);
-
-    /** @brief 拟合核PCA(使用默认参数) */
-    int fit(const QVector<QVector<double>>& data,
-            int nComponents = 0);
+    void fit(const QVector<QVector<double>>& data);
 
     /**
-     * @brief 变换单个样本
-     * @param sample 输入样本
-     * @return 降维后的坐标
-     */
-    QVector<double> transform(const QVector<double>& sample) const;
-
-    /**
-     * @brief 批量变换
+     * @brief 变换数据(投影到核主成分空间)
      * @param data 输入数据
-     * @return 降维后的数据
+     * @return 变换结果
      */
-    QVector<QVector<double>> transformBatch(
+    TransformResult transform(const QVector<QVector<double>>& data) const;
+
+    /**
+     * @brief 拟合并变换(便捷方法)
+     * @param data 输入数据
+     * @return 变换结果
+     */
+    TransformResult fitTransform(const QVector<QVector<double>>& data);
+
+    /**
+     * @brief 变换单个新样本
+     * @param sample 样本向量
+     * @return 投影坐标
+     */
+    QVector<double> transformSample(const QVector<double>& sample) const;
+
+    /**
+     * @brief 计算核矩阵
+     * @param data 输入数据
+     * @return 核矩阵(n x n)
+     */
+    QVector<QVector<double>> computeKernelMatrix(
         const QVector<QVector<double>>& data) const;
 
-    /** @brief 获取特征值 */
-    QVector<double> eigenvalues() const { return m_eigenvalues; }
+    /**
+     * @brief 获取解释方差比
+     * @return 各主成分的方差比
+     */
+    QVector<double> explainedVarianceRatio() const;
 
-    const Stats& stats() const { return m_stats; }
+    /** @brief 模型是否已拟合 */
+    bool isFitted() const;
+
+    /** @brief 获取统计信息 */
+    Stats stats() const;
+
+    /** @brief 重置统计 */
     void resetStatistics();
 
 signals:
-    /** @brief 变换完成 @param dimensions 输出维度 */
-    void transformCompleted(int dimensions);
+    /** @brief 拟合完成 @param components 主成分数 @param variance 解释方差 */
+    void fitCompleted(int components, double variance);
+
+    /** @brief 变换完成 @param samples 样本数 @param dimensions 降维后维度 */
+    void transformCompleted(int samples, int dimensions);
 
 private:
-    /** @brief 计算核函数值 */
-    double kernelValue(const QVector<double>& x,
-                       const QVector<double>& y) const;
+    /** @brief 计算两个向量的核函数值 */
+    double kernelValue(const QVector<double>& a,
+                       const QVector<double>& b) const;
 
-    /** @brief 幂迭代求最大特征向量 */
-    QVector<double> powerIteration(
-        const QVector<QVector<double>>& matrix, int maxIter) const;
+    /** @brief 特征值分解(幂迭代+Deflation) */
+    void eigenDecompose(QVector<QVector<double>>& matrix,
+                        QVector<double>& eigenvalues,
+                        QVector<QVector<double>>& eigenvectors,
+                        int numComponents) const;
 
-    QVector<QVector<double>> m_trainData;   ///< 训练数据
-    QVector<QVector<double>> m_alphas;      ///< 投影系数
-    QVector<double> m_eigenvalues;          ///< 特征值
-    Kernel m_kernel = Kernel::Rbf;          ///< 核函数类型
-    KernelParams m_params;                   ///< 核参数
-    int m_nComponents = 0;                  ///< 主成分数
-    Stats m_stats;                           ///< 统计信息
-    mutable double m_timeSum = 0.0;          ///< 累计耗时
+    /** @brief 中心化核矩阵 */
+    QVector<QVector<double>> centerKernelMatrix(
+        const QVector<QVector<double>>& K) const;
+
+    KernelType m_kernelType = KernelType::RBF; ///< 核类型
+    double m_gamma = 1.0;      ///< RBF gamma参数
+    int m_degree = 3;          ///< 多项式阶数
+    double m_coef0 = 1.0;     ///< 多项式常数项
+    int m_components = 0;      ///< 目标主成分数
+    double m_varianceRatio = 0.95; ///< 方差保留比例
+
+    QVector<QVector<double>> m_trainingData; ///< 训练数据
+    QVector<double> m_eigenvalues;           ///< 特征值
+    QVector<QVector<double>> m_eigenvectors; ///< 特征向量
+    QVector<double> m_kColMean;              ///< 核矩阵列均值
+    double m_kMean = 0.0;                    ///< 核矩阵总均值
+    bool m_fitted = false;                   ///< 是否已拟合
+
+    mutable Stats m_stats;         ///< 操作统计
+    mutable double m_timeSum = 0.0;///< 累计耗时
 };
-
-#endif // KERNELPCA_H
