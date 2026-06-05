@@ -3,7 +3,7 @@
  * @brief IIR陷波滤波器实现 — 2阶双二阶节(Direct Form I)
  */
 
-#include "NotchFilterV2.h"
+#include "utils/filter3/NotchFilter.h"
 
 #include <QElapsedTimer>
 #include <cmath>

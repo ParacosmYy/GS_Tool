@@ -3,7 +3,7 @@
  * @brief 计数型布隆过滤器实现 — MurmurHash3多哈希+计数器数组
  */
 
-#include "utils/bloom3/FrequencyBloomFilter.h"
+#include "utils/bloom3/CountingBloomFilter.h"
 
 #include <QtGlobal>
 #include <QtMath>

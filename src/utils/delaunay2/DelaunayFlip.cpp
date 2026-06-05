@@ -52,7 +52,8 @@ QVector<QVector<int>> DelaunayFlip::triangulate(
 
     double dx = maxX - minX;
     double dy = maxY - minY;
-    double dmax = std::max(dx, dy, 1e-10);
+    double dmax = qMax(dx, dy);
+    if (dmax < 1e-10) dmax = 1e-10;
     double midX = (minX + maxX) / 2.0;
     double midY = (minY + maxY) / 2.0;
 

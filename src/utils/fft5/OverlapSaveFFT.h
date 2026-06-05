@@ -10,6 +10,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <complex>
 #include <vector>
 
 /**

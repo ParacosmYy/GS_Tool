@@ -13,6 +13,8 @@
 
 #include <QObject>
 #include <QVector>
+#include <QMap>
+#include <QString>
 
 /**
  * @brief 基于LSH的近似最近邻搜索器

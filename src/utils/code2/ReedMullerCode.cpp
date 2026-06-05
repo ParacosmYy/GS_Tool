@@ -258,7 +258,7 @@ QVector<QVector<int>> ReedMullerCode::buildMonomials(int m, int r)
     for (int order = 0; order <= r; ++order) {
         /* 枚举从m个变量中选order个的所有组合 */
         if (order == 0) {
-            monomials.append({}); /* 常数1 */
+            monomials.append(QVector<int>{}); /* 常数1 */
             continue;
         }
 

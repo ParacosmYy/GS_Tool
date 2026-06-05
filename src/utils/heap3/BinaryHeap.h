@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QVector>
 #include <QHash>
+#include <QVariant>
 #include <utility>
 
 /**
