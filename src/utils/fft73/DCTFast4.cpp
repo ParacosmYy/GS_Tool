@@ -2,8 +2,8 @@
  * @file DCTFast4.cpp
  * @brief 快速离散余弦变换(DCT)实现
  *
- * 实现DCT-II和DCT-III的快速算法，支持1D和2D变换。
- * DCT广泛用于图像压缩(JPEG)和音频编码。
+ * 实现DCT-II(前向)和DCT-III(逆变换)快速算法，
+ * 支持一维和二维DCT变换，适用于图像/音频压缩。
  */
 
 #include "utils/fft73/DCTFast4.h"
@@ -23,26 +23,35 @@ DCTFast4::DCTFast4(QObject* parent)
 
 /**
  * @brief 设置变换大小
- * @param n 变换大小
+ * @param n 变换长度
  */
 void DCTFast4::setSize(int n)
 {
-    m_n = qMax(4, n);
+    m_n = qMax(2, n);
 }
 
 /**
  * @brief 前向DCT-II变换
  * @param data 输入数据
  * @return DCT系数
+ *
+ * DCT-II公式: X[k] = sum_{n=0}^{N-1} x[n] * cos(pi*(2n+1)*k / (2N))
  */
 QVector<double> DCTFast4::forward(const QVector<double>& data)
 {
     QElapsedTimer timer;
     timer.start();
 
-    QVector<double> result = dctII(data);
+    QVector<double> result;
+    if (data.isEmpty()) {
+        m_timeSum += timer.elapsed();
+        m_stats.totalTransforms++;
+        m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalTransforms;
+        return result;
+    }
 
-    // 更新统计信息
+    result = dctII(data);
+
     qint64 elapsed = timer.elapsed();
     m_stats.totalTransforms++;
     m_stats.totalPoints += data.size();
@@ -57,55 +66,87 @@ QVector<double> DCTFast4::forward(const QVector<double>& data)
  * @brief 逆DCT-III变换
  * @param coeffs DCT系数
  * @return 重建的时域信号
+ *
+ * DCT-III公式: x[n] = (1/2)X[0] + sum_{k=1}^{N-1} X[k]*cos(pi*k*(2n+1)/(2N))
  */
 QVector<double> DCTFast4::inverse(const QVector<double>& coeffs)
 {
     QElapsedTimer timer;
     timer.start();
 
-    QVector<double> result = dctIII(coeffs);
+    QVector<double> result;
+    if (coeffs.isEmpty()) {
+        m_timeSum += timer.elapsed();
+        m_stats.totalTransforms++;
+        m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalTransforms;
+        return result;
+    }
 
-    m_timeSum += timer.elapsed();
+    result = dctIII(coeffs);
+
+    qint64 elapsed = timer.elapsed();
+    m_stats.totalTransforms++;
+    m_stats.totalPoints += coeffs.size();
+    m_timeSum += elapsed;
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalTransforms;
+
+    emit transformCompleted(coeffs.size());
     return result;
 }
 
 /**
- * @brief 2D DCT变换
- * @param data 输入2D数据矩阵
- * @return 2D DCT系数矩阵
+ * @brief 二维DCT变换
+ * @param data 输入二维矩阵
+ * @return 二维DCT系数矩阵
+ *
+ * 先对每行执行DCT，再对每列执行DCT(行列可分离)。
  */
 QVector<QVector<double>> DCTFast4::forward2D(const QVector<QVector<double>>& data)
 {
     QElapsedTimer timer;
     timer.start();
 
-    if (data.isEmpty()) return QVector<QVector<double>>();
+    QVector<QVector<double>> result;
+    if (data.isEmpty()) {
+        m_timeSum += timer.elapsed();
+        m_stats.totalTransforms++;
+        m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalTransforms;
+        return result;
+    }
 
     int rows = data.size();
     int cols = data[0].size();
 
-    // 先对每行做1D DCT
+    /* 步骤1: 对每行执行DCT-II */
     QVector<QVector<double>> temp(rows);
-    for (int i = 0; i < rows; ++i) {
-        temp[i] = dctII(data[i]);
+    for (int r = 0; r < rows; ++r) {
+        temp[r] = dctII(data[r]);
     }
 
-    // 再对每列做1D DCT
-    QVector<QVector<double>> result(rows, QVector<double>(cols, 0.0));
-    for (int j = 0; j < cols; ++j) {
+    /* 步骤2: 对每列执行DCT-II */
+    result.resize(rows);
+    for (int r = 0; r < rows; ++r) {
+        result[r].resize(cols, 0.0);
+    }
+
+    for (int c = 0; c < cols; ++c) {
         QVector<double> col(rows);
-        for (int i = 0; i < rows; ++i) col[i] = temp[i][j];
-        QVector<double> colDCT = dctII(col);
-        for (int i = 0; i < rows; ++i) result[i][j] = colDCT[i];
+        for (int r = 0; r < rows; ++r) {
+            col[r] = temp[r][c];
+        }
+        QVector<double> dctCol = dctII(col);
+        for (int r = 0; r < rows; ++r) {
+            result[r][c] = dctCol[r];
+        }
     }
 
-    // 更新统计信息
     qint64 elapsed = timer.elapsed();
     m_stats.totalTransforms++;
     m_stats.totalPoints += rows * cols;
     m_timeSum += elapsed;
     m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalTransforms;
 
+    emit transformCompleted(rows * cols);
     return result;
 }
 
@@ -119,55 +160,63 @@ void DCTFast4::resetStatistics()
 }
 
 /**
- * @brief DCT-II实现
- * @param x 输入序列
+ * @brief DCT-II直接计算
+ * @param x 输入向量
  * @return DCT-II系数
  *
- * X[k] = sum_{n=0}^{N-1} x[n] * cos(pi*(2n+1)*k/(2N))
+ * 直接计算DCT-II: X[k] = sum_{n=0}^{N-1} x[n] * cos(pi*(2n+1)*k / (2N))
+ * 对于k=0的直流分量不乘归一化系数。
  */
 QVector<double> DCTFast4::dctII(const QVector<double>& x)
 {
     int N = x.size();
     QVector<double> X(N, 0.0);
 
+    /* 预计算余弦表 */
+    QVector<double> cosTable(N * N);
+    for (int k = 0; k < N; ++k) {
+        for (int n = 0; n < N; ++n) {
+            cosTable[k * N + n] = qCos(M_PI * (2 * n + 1) * k / (2.0 * N));
+        }
+    }
+
     for (int k = 0; k < N; ++k) {
         double sum = 0.0;
         for (int n = 0; n < N; ++n) {
-            sum += x[n] * qCos(M_PI * (2 * n + 1) * k / (2.0 * N));
+            sum += x[n] * cosTable[k * N + n];
         }
         X[k] = sum;
-    }
-
-    // 第一个系数缩放（正交归一化）
-    X[0] *= 1.0 / qSqrt(static_cast<double>(N));
-    double scale = qSqrt(2.0 / N);
-    for (int k = 1; k < N; ++k) {
-        X[k] *= scale;
     }
 
     return X;
 }
 
 /**
- * @brief DCT-III实现（逆DCT）
- * @param X 输入DCT系数
- * @return 时域序列
+ * @brief DCT-III直接计算(逆变换)
+ * @param X DCT系数
+ * @return 重建的时域信号
  *
- * x[n] = (1/2)X[0] + sum_{k=1}^{N-1} X[k] * cos(pi*k*(2n+1)/(2N))
+ * DCT-III: x[n] = (1/N) * [ X[0]/2 + sum_{k=1}^{N-1} X[k]*cos(pi*k*(2n+1)/(2N)) ]
  */
 QVector<double> DCTFast4::dctIII(const QVector<double>& X)
 {
     int N = X.size();
     QVector<double> x(N, 0.0);
-    double scale = qSqrt(2.0 / N);
-    double scale0 = 1.0 / qSqrt(static_cast<double>(N));
+
+    /* 预计算余弦表 */
+    QVector<double> cosTable(N * N);
+    for (int n = 0; n < N; ++n) {
+        for (int k = 0; k < N; ++k) {
+            cosTable[n * N + k] = qCos(M_PI * k * (2 * n + 1) / (2.0 * N));
+        }
+    }
 
     for (int n = 0; n < N; ++n) {
-        double sum = scale0 * X[0];
+        double sum = X[0] * 0.5;
         for (int k = 1; k < N; ++k) {
-            sum += scale * X[k] * qCos(M_PI * k * (2 * n + 1) / (2.0 * N));
+            sum += X[k] * cosTable[n * N + k];
         }
-        x[n] = sum;
+        x[n] = sum * 2.0 / N;
     }
 
     return x;

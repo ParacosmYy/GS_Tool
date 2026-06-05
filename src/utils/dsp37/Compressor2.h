@@ -18,6 +18,7 @@ public:
 signals:
     void processingComplete(int samples);
 private:
+    double computeGain(double inputDb) const;
     double m_threshold = -20.0; double m_ratio = 4.0; double m_knee = 6.0;
     double m_attack = 10.0; double m_release = 100.0; double m_sampleRate = 44100.0;
     double m_envelope = 0.0; double m_gainReduction = 0.0;

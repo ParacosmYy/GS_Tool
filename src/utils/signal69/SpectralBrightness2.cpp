@@ -186,3 +186,60 @@ bool SpectralBrightness2::isHighFrequencyDominant() const
 {
     return m_brightness > 0.5;
 }
+
+/**
+ * @brief 计算频谱质心频率
+ *
+ * 频谱质心是能量加权的平均频率，反映频谱的"重心"位置。
+ * 质心越高说明高频分量越显著。
+ *
+ * @param spectrum 输入的幅度频谱
+ * @return 质心频率（Hz）
+ */
+double SpectralBrightness2::spectralCentroid(const QVector<double>& spectrum) const
+{
+    if (spectrum.isEmpty()) return 0.0;
+
+    double binWidth = m_sampleRate / m_fftSize;
+    double weightedSum = 0.0;
+    double totalWeight = 0.0;
+
+    for (int i = 0; i < spectrum.size(); ++i) {
+        double weight = spectrum[i] * spectrum[i];
+        weightedSum += i * binWidth * weight;
+        totalWeight += weight;
+    }
+
+    if (totalWeight < 1e-15) return 0.0;
+    return weightedSum / totalWeight;
+}
+
+/**
+ * @brief 计算频谱带宽
+ *
+ * 频谱带宽是频率偏离质心的加权标准差，
+ * 反映频谱能量的集中程度。
+ *
+ * @param spectrum 输入的幅度频谱
+ * @return 频谱带宽（Hz）
+ */
+double SpectralBrightness2::spectralBandwidth(const QVector<double>& spectrum) const
+{
+    if (spectrum.isEmpty()) return 0.0;
+
+    double centroid = spectralCentroid(spectrum);
+    double binWidth = m_sampleRate / m_fftSize;
+    double weightedSum = 0.0;
+    double totalWeight = 0.0;
+
+    for (int i = 0; i < spectrum.size(); ++i) {
+        double freq = i * binWidth;
+        double diff = freq - centroid;
+        double weight = spectrum[i] * spectrum[i];
+        weightedSum += diff * diff * weight;
+        totalWeight += weight;
+    }
+
+    if (totalWeight < 1e-15) return 0.0;
+    return qSqrt(weightedSum / totalWeight);
+}

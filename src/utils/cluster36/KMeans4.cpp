@@ -12,6 +12,7 @@
 #include "utils/cluster36/KMeans4.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtGlobal>
 
 #include <cmath>

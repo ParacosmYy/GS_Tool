@@ -140,3 +140,67 @@ void GoertzelAlgorithm4::resetStatistics()
     m_stats = Stats();
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 计算单个频率的相位
+ * @param signal 输入信号
+ * @param freq 目标频率(Hz)
+ * @return 相位值(弧度)
+ */
+double GoertzelAlgorithm4::computePhase(const QVector<double>& signal, double freq) const
+{
+    int N = qMin(signal.size(), m_blockSize);
+    if (N == 0) return 0.0;
+
+    double k = freq * N / m_sampleRate;
+    double w = 2.0 * M_PI * k / N;
+    double coeff = 2.0 * qCos(w);
+
+    double s0 = 0.0, s1 = 0.0, s2 = 0.0;
+    for (int i = 0; i < N; ++i) {
+        s0 = signal[i] + coeff * s1 - s2;
+        s2 = s1;
+        s1 = s0;
+    }
+
+    double re = s1 - s2 * qCos(w);
+    double im = s2 * qSin(w);
+
+    return qAtan2(im, re);
+}
+
+/**
+ * @brief 计算单个频率的功率
+ * @param signal 输入信号
+ * @param freq 目标频率(Hz)
+ * @return 功率值（幅度的平方）
+ */
+double GoertzelAlgorithm4::computePower(const QVector<double>& signal, double freq) const
+{
+    double mag = computeSingle(signal, freq);
+    return mag * mag;
+}
+
+/**
+ * @brief 批量检测DTMF音调
+ * @param signal 输入信号
+ * @return 检测到的频率-幅度对（仅返回超过阈值的频率）
+ */
+QVector<QPair<double, double>> GoertzelAlgorithm4::detectPeaks(
+    const QVector<double>& signal, double threshold) const
+{
+    QVector<QPair<double, double>> peaks;
+
+    for (double freq : m_targets) {
+        double mag = computeSingle(signal, freq);
+        if (mag > threshold) {
+            peaks.append({freq, mag});
+        }
+    }
+
+    // 按幅度降序排列
+    std::sort(peaks.begin(), peaks.end(),
+              [](const auto& a, const auto& b) { return a.second > b.second; });
+
+    return peaks;
+}

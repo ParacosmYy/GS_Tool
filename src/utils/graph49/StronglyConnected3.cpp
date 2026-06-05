@@ -14,6 +14,7 @@
 #include "utils/graph49/StronglyConnected3.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <algorithm>
 #include <stack>
 

@@ -196,3 +196,31 @@ double BridgeDetect3::bridgeRatio() const
     if (total == 0) return 0.0;
     return static_cast<double>(m_numBridges) / static_cast<double>(total);
 }
+
+/**
+ * @brief 获取每个顶点的度数
+ * @param v 顶点索引
+ * @return 该顶点的邻居数量
+ */
+int BridgeDetect3::vertexDegree(int v) const
+{
+    if (v < 0 || v >= m_n) return 0;
+    return m_adj[v].size();
+}
+
+/**
+ * @brief 检查指定边是否为桥边
+ * @param u 第一个端点
+ * @param v 第二个端点
+ * @return 是否为桥边
+ */
+bool BridgeDetect3::isBridge(int u, int v) const
+{
+    for (const auto& bridge : m_bridges) {
+        if ((bridge.first == u && bridge.second == v) ||
+            (bridge.first == v && bridge.second == u)) {
+            return true;
+        }
+    }
+    return false;
+}

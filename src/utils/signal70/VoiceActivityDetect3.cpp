@@ -41,7 +41,7 @@ void VoiceActivityDetect3::setFrameSize(int size)
 
 /**
  * @brief 设置悬挂帧数
- * @param frames 检测到语音结束后保持为语音的帧数
+ * @param frames 检测到语音结束后保持为语音的额外帧数
  */
 void VoiceActivityDetect3::setHangover(int frames)
 {
@@ -52,6 +52,12 @@ void VoiceActivityDetect3::setHangover(int frames)
  * @brief 检测信号中的语音活动
  * @param signal 输入语音信号
  * @return 每帧的语音检测结果（1=语音，0=静音）
+ *
+ * 检测流程：
+ * 1. 分帧计算每帧的能量和过零率
+ * 2. 使用前几帧估计噪声基底
+ * 3. 自适应阈值判定（能量+过零率双特征）
+ * 4. 应用hangover机制平滑检测结果
  */
 QVector<int> VoiceActivityDetect3::detect(const QVector<double>& signal)
 {
@@ -64,7 +70,7 @@ QVector<int> VoiceActivityDetect3::detect(const QVector<double>& signal)
     int numFrames = signal.size() / m_frameSize;
     result.reserve(numFrames);
 
-    // 第一遍：计算所有帧的能量和过零率，估计噪声水平
+    // 第一遍：计算所有帧的能量和过零率
     QVector<double> energies(numFrames);
     QVector<double> zcrs(numFrames);
     for (int f = 0; f < numFrames; ++f) {
@@ -76,7 +82,7 @@ QVector<int> VoiceActivityDetect3::detect(const QVector<double>& signal)
         zcrs[f] = computeZCR(frame);
     }
 
-    // 使用前几帧估计噪声能量（假设前5帧为静音）
+    // 第二遍：估计噪声水平（使用前5帧，假设为静音）
     int noiseFrames = qMin(5, numFrames);
     double noiseEnergy = 0.0;
     double noiseZCR = 0.0;
@@ -88,30 +94,30 @@ QVector<int> VoiceActivityDetect3::detect(const QVector<double>& signal)
     noiseZCR /= qMax(noiseFrames, 1);
 
     // 自适应阈值
-    double energyThreshold = qMax(noiseEnergy * 2.0, 1e-8);
-    double zcrThreshold = noiseZCR + 0.15;
+    double energyThreshold = qMax(noiseEnergy * 2.5, 1e-8);
+    double zcrHighThreshold = noiseZCR + 0.3;
 
-    // 第二遍：逐帧检测
+    // 第三遍：逐帧检测 + hangover平滑
     m_speechFrames = 0;
     int hangoverCount = 0;
 
     for (int f = 0; f < numFrames; ++f) {
         bool isSpeech = false;
 
-        // 能量检测
+        // 能量特征判定
         if (energies[f] > energyThreshold) {
             isSpeech = true;
         }
 
-        // 过零率辅助检测（高频噪声区分）
-        if (isSpeech && zcrs[f] > zcrThreshold + 0.3) {
-            // 高过零率可能是噪声，降低置信度
-            if (energies[f] < energyThreshold * 4.0) {
+        // 过零率辅助判定（区分高频噪声）
+        if (isSpeech && zcrs[f] > zcrHighThreshold + 0.2) {
+            // 高过零率+低能量→可能是噪声
+            if (energies[f] < energyThreshold * 5.0) {
                 isSpeech = false;
             }
         }
 
-        // 悬 hangover机制
+        // Hangover机制：语音结束后保持N帧
         if (isSpeech) {
             hangoverCount = m_hangover;
         } else if (hangoverCount > 0) {
@@ -149,9 +155,9 @@ void VoiceActivityDetect3::resetStatistics()
 }
 
 /**
- * @brief 计算帧能量
+ * @brief 计算帧的RMS能量
  * @param frame 输入帧
- * @return 帧的RMS能量
+ * @return 帧的RMS能量值
  */
 double VoiceActivityDetect3::computeEnergy(const QVector<double>& frame) const
 {
@@ -164,7 +170,7 @@ double VoiceActivityDetect3::computeEnergy(const QVector<double>& frame) const
 }
 
 /**
- * @brief 计算帧过零率
+ * @brief 计算帧的过零率
  * @param frame 输入帧
  * @return 过零率（0~1之间）
  */
@@ -178,4 +184,52 @@ double VoiceActivityDetect3::computeZCR(const QVector<double>& frame) const
         }
     }
     return static_cast<double>(crossings) / (frame.size() - 1);
+}
+
+/**
+ * @brief 计算帧的峰值能量
+ * @param frame 输入帧
+ * @return 帧的峰值绝对值
+ */
+double VoiceActivityDetect3::computePeak(const QVector<double>& frame) const
+{
+    if (frame.isEmpty()) return 0.0;
+    double peak = 0.0;
+    for (double s : frame) {
+        peak = qMax(peak, qAbs(s));
+    }
+    return peak;
+}
+
+/**
+ * @brief 计算帧的频谱质心（简化版）
+ * @param frame 输入帧
+ * @return 频谱质心估计（归一化频率0~0.5）
+ *
+ * 使用DFT幅度谱的加权平均估计频谱质心，
+ * 用于区分语音（低质心）和噪声（高质心）。
+ */
+double VoiceActivityDetect3::computeSpectralCentroid(const QVector<double>& frame) const
+{
+    int N = frame.size();
+    if (N == 0) return 0.0;
+
+    // 简化DFT计算幅度谱
+    int numBins = N / 2 + 1;
+    double weightedSum = 0.0;
+    double totalWeight = 0.0;
+
+    for (int k = 0; k < numBins; ++k) {
+        double re = 0.0, im = 0.0;
+        for (int n = 0; n < N; ++n) {
+            double angle = 2.0 * M_PI * k * n / N;
+            re += frame[n] * qCos(angle);
+            im -= frame[n] * qSin(angle);
+        }
+        double mag = qSqrt(re * re + im * im);
+        weightedSum += k * mag;
+        totalWeight += mag;
+    }
+
+    return (totalWeight > 1e-12) ? weightedSum / (totalWeight * N) : 0.0;
 }

@@ -7,7 +7,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "cluster37/GaussianMixture8.h"
+#include "utils/cluster37/GaussianMixture8.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

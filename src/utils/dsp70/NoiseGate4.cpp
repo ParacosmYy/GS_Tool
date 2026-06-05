@@ -156,3 +156,51 @@ void NoiseGate4::resetStatistics()
     m_stats = Stats();
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 计算信号的RMS电平(dB)
+ * @param signal 输入信号
+ * @return RMS电平(dB)，静音返回-120dB
+ */
+double NoiseGate4::computeRMSLevel(const QVector<double>& signal) const
+{
+    if (signal.isEmpty()) return -120.0;
+    double sumSq = 0.0;
+    for (double s : signal) sumSq += s * s;
+    double rms = qSqrt(sumSq / signal.size());
+    if (rms < 1e-10) return -120.0;
+    return 20.0 * qLn(rms) / qLn(10.0);
+}
+
+/**
+ * @brief 计算信号的峰值电平(dB)
+ * @param signal 输入信号
+ * @return 峰值电平(dB)，静音返回-120dB
+ */
+double NoiseGate4::computePeakLevel(const QVector<double>& signal) const
+{
+    if (signal.isEmpty()) return -120.0;
+    double peak = 0.0;
+    for (double s : signal) peak = qMax(peak, qAbs(s));
+    if (peak < 1e-10) return -120.0;
+    return 20.0 * qLn(peak) / qLn(10.0);
+}
+
+/**
+ * @brief 计算信号中被门控（衰减）的采样点比例
+ * @param input 输入信号
+ * @return 门控比例(0~1)，0=无门控，1=全部静音
+ */
+double NoiseGate4::gateRatio(const QVector<double>& input) const
+{
+    if (input.isEmpty()) return 0.0;
+
+    double thresholdLin = qPow(10.0, m_threshold / 20.0);
+    int gatedCount = 0;
+
+    for (double s : input) {
+        if (qAbs(s) < thresholdLin) gatedCount++;
+    }
+
+    return static_cast<double>(gatedCount) / input.size();
+}

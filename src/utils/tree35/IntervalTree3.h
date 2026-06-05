@@ -32,5 +32,5 @@ private:
     void collectAll(Node* n, QList<Interval>& out) const;
     void destroyTree(Node* n);
     Node* m_root = nullptr; int m_size = 0;
-    Stats m_stats; double m_timeSum = 0.0;
+    mutable Stats m_stats; mutable double m_timeSum = 0.0;
 };

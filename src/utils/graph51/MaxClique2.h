@@ -17,6 +17,8 @@ public:
 signals:
     void searchComplete(int size);
 private:
+    QVector<int> greedyColoring(const QVector<int>& order) const;
+    QVector<int> degeneracyOrdering() const;
     int m_n = 0;
     QVector<QVector<int>> m_adj;
     Stats m_stats; double m_timeSum = 0.0;

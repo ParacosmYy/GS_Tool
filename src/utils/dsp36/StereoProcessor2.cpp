@@ -121,7 +121,7 @@ QPair<double, double> StereoProcessor2::processOne(double left, double right)
         if (x > threshold)
             return threshold + headroom * (1.0 - qExp(-(x - threshold) / headroom));
         if (x < -threshold)
-            return -(threshold + headroom * (1.0 - qExp(-(-x - threshold) / headroom));
+            return -(threshold + headroom * (1.0 - qExp(-(-x - threshold) / headroom)));
         return x;
     };
 

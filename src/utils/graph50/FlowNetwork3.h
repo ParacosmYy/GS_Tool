@@ -16,5 +16,7 @@ signals:
     void flowComplete(double cost, double flow);
 private:
     int m_n = 0;
+    QVector<int> m_rowPtr, m_colIdx;
+    QVector<double> m_values;
     Stats m_stats; double m_timeSum = 0.0;
 };

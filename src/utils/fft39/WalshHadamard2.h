@@ -19,5 +19,5 @@ private:
     QVector<double> padToLength(const QVector<double>& input, int len) const;
     int bitReverse(int value, int bits) const;
     void updateTimeStats(double elapsed) const;
-    Stats m_stats; double m_timeSum = 0.0;
+    mutable Stats m_stats; mutable double m_timeSum = 0.0;
 };

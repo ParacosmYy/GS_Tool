@@ -1,9 +1,9 @@
 /**
  * @file MeanShift4.cpp
- * @brief MeanShift均值漂移聚类实现
+ * @brief MeanShift均值漂移聚类算法实现
  *
- * 实现基于核密度估计的MeanShift聚类算法，通过迭代
- * 将每个点移动到局部密度最大值（模式），自动确定簇数。
+ * 实现基于核密度估计的均值漂移聚类算法，通过迭代将每个点
+ * 移向局部密度最大的位置(模态)，最终收敛到相同模态的点归为同一簇。
  */
 
 #include "utils/cluster70/MeanShift4.h"
@@ -22,8 +22,8 @@ MeanShift4::MeanShift4(QObject* parent)
 }
 
 /**
- * @brief 设置核带宽
- * @param bw 带宽参数
+ * @brief 设置核函数带宽
+ * @param bw 带宽参数，影响聚类粒度
  */
 void MeanShift4::setBandwidth(double bw)
 {
@@ -32,7 +32,7 @@ void MeanShift4::setBandwidth(double bw)
 
 /**
  * @brief 设置核函数类型
- * @param type 核函数："gaussian" 或 "flat"
+ * @param type 核函数名称: "gaussian" 或 "flat"
  */
 void MeanShift4::setKernelType(const QString& type)
 {
@@ -51,9 +51,14 @@ void MeanShift4::setMaxIterations(int iter)
 }
 
 /**
- * @brief 对数据点进行MeanShift聚类
+ * @brief 对数据点执行MeanShift聚类
  * @param points 输入数据点集合
- * @return 每个点的聚类标签
+ * @return 每个点的簇标签
+ *
+ * 算法流程:
+ * 1. 对每个点迭代执行均值漂移直到收敛
+ * 2. 收敛位置即为模态(聚类中心)
+ * 3. 合并距离小于带宽的模态为同一簇
  */
 QVector<int> MeanShift4::cluster(const QVector<QVector<double>>& points)
 {
@@ -61,63 +66,79 @@ QVector<int> MeanShift4::cluster(const QVector<QVector<double>>& points)
     timer.start();
 
     const int N = points.size();
-    if (N == 0) return QVector<int>();
+    QVector<int> labels(N, 0);
+    m_modes.clear();
 
-    const int D = points[0].size();
+    if (N == 0) {
+        m_timeSum += timer.elapsed();
+        m_stats.totalShifts++;
+        m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalShifts;
+        return labels;
+    }
 
-    // 对每个点执行MeanShift迭代
-    QVector<QVector<double>> shifted(N);
-    int totalIters = 0;
+    /* 阶段1: 对每个点执行均值漂移 */
+    QVector<QVector<double>> converged(N);
+    int totalIter = 0;
 
     for (int i = 0; i < N; ++i) {
         QVector<double> current = points[i];
-        for (int iter = 0; iter < m_maxIter; ++iter) {
-            QVector<double> next = shiftPoint(current, points);
-            // 检查收敛
-            double move = 0.0;
-            for (int d = 0; d < D; ++d) {
-                double diff = next[d] - current[d];
-                move += diff * diff;
+        int iter = 0;
+
+        while (iter < m_maxIter) {
+            QVector<double> shifted = shiftPoint(current, points);
+
+            /* 检查收敛: 位移小于阈值 */
+            double moveDist = 0.0;
+            for (int d = 0; d < shifted.size(); ++d) {
+                double diff = shifted[d] - current[d];
+                moveDist += diff * diff;
             }
-            current = next;
-            totalIters++;
-            if (qSqrt(move) < 1e-6 * m_bandwidth) break;
+            moveDist = qSqrt(moveDist);
+
+            current = shifted;
+            iter++;
+            totalIter++;
+
+            if (moveDist < 1e-6 * m_bandwidth) break;
         }
-        shifted[i] = current;
+
+        converged[i] = current;
     }
 
-    // 聚合收敛点（距离小于带宽的合并为一个簇）
-    m_modes.clear();
-    QVector<int> labels(N, -1);
-
+    /* 阶段2: 合并相近的模态 */
     for (int i = 0; i < N; ++i) {
-        bool found = false;
+        int assignedCluster = -1;
+
         for (int c = 0; c < m_modes.size(); ++c) {
             double dist = 0.0;
-            for (int d = 0; d < D; ++d) {
-                double diff = shifted[i][d] - m_modes[c][d];
+            for (int d = 0; d < m_modes[c].size(); ++d) {
+                double diff = converged[i][d] - m_modes[c][d];
                 dist += diff * diff;
             }
-            if (qSqrt(dist) < m_bandwidth * 0.5) {
-                labels[i] = c;
-                found = true;
+            dist = qSqrt(dist);
+
+            if (dist < m_bandwidth * 0.5) {
+                assignedCluster = c;
                 break;
             }
         }
-        if (!found) {
-            labels[i] = m_modes.size();
-            m_modes.append(shifted[i]);
+
+        if (assignedCluster == -1) {
+            assignedCluster = m_modes.size();
+            m_modes.append(converged[i]);
         }
+
+        labels[i] = assignedCluster;
     }
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalShifts++;
     m_stats.totalPoints += N;
     m_timeSum += elapsed;
     m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalShifts;
 
-    emit clusteringCompleted(m_modes.size(), totalIters / N);
+    emit clusteringCompleted(m_modes.size(), totalIter);
     return labels;
 }
 
@@ -131,54 +152,61 @@ void MeanShift4::resetStatistics()
 }
 
 /**
- * @brief 计算单个点的漂移目标
- * @param pt 当前点
- * @param all 所有点
+ * @brief 对单个点执行一次均值漂移
+ * @param pt 当前点位置
+ * @param all 所有点集合
  * @return 漂移后的新位置
+ *
+ * 使用核函数加权的均值计算漂移方向:
+ * new_x = sum(kernel(||x - xi||/h) * xi) / sum(kernel(||x - xi||/h))
  */
-QVector<double> MeanShift4::shiftPoint(const QVector<double>& pt,
-                                        const QVector<QVector<double>>& all)
+QVector<double> MeanShift4::shiftPoint(const QVector<double>& pt, const QVector<QVector<double>>& all)
 {
     int D = pt.size();
     QVector<double> numerator(D, 0.0);
     double denominator = 0.0;
 
-    for (const auto& other : all) {
+    for (const auto& xi : all) {
         double distSq = 0.0;
         for (int d = 0; d < D; ++d) {
-            double diff = pt[d] - other[d];
+            double diff = pt[d] - xi[d];
             distSq += diff * diff;
         }
-        double w = kernelWeight(qSqrt(distSq));
+        double dist = qSqrt(distSq);
+
+        double w = kernelWeight(dist / m_bandwidth);
         if (w > 0.0) {
             for (int d = 0; d < D; ++d) {
-                numerator[d] += w * other[d];
+                numerator[d] += w * xi[d];
             }
             denominator += w;
         }
     }
 
     QVector<double> result(D, 0.0);
-    if (denominator > 1e-300) {
+    if (denominator > 1e-15) {
         for (int d = 0; d < D; ++d) {
             result[d] = numerator[d] / denominator;
         }
+    } else {
+        result = pt;
     }
+
     return result;
 }
 
 /**
- * @brief 核函数权重计算
- * @param dist 距离
- * @return 核权重值
+ * @brief 计算核函数权重
+ * @param dist 归一化距离 (distance / bandwidth)
+ * @return 核函数权重值
  */
 double MeanShift4::kernelWeight(double dist) const
 {
-    double ratio = dist / m_bandwidth;
-    if (m_kernel == "gaussian") {
-        return qExp(-0.5 * ratio * ratio);
+    if (m_kernel == "flat") {
+        /* Flat核: 带宽范围内权重为1 */
+        return (dist <= 1.0) ? 1.0 : 0.0;
     } else {
-        // Flat (均匀)核
-        return (ratio <= 1.0) ? 1.0 : 0.0;
+        /* 高斯核: exp(-0.5 * dist^2) */
+        return qExp(-0.5 * dist * dist);
     }
 }
