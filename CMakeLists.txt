@@ -655,7 +655,6 @@ set(SOURCES
     src/utils/scaler/DataScalerWidget.cpp
     src/utils/threshold/DataThresholdMonitor.cpp
     src/utils/capture/DataCaptureBuffer.cpp
-    src/utils/ratelimiter/DataRateLimiter.cpp
     src/utils/crc_verifier/CrcStreamVerifier.cpp
 
     # ── 滚动折线图 ──
@@ -794,11 +793,20 @@ set(SOURCES
     # -- F51: 数据同步引擎 --
     src/utils/synchronizer/DataSynchronizer.cpp
 
+    # -- F52: 数据速率限制器 --
+    src/utils/rate/DataRateLimiter.cpp
+
     # -- F52: 滑动窗口聚合器 --
     src/utils/aggregator2/WindowedAggregator.cpp
 
     # -- F53: 数据降采样引擎 --
     src/utils/reductor/DataReducer.cpp
+
+    # -- F54: 数据缓存 --
+    src/utils/cache/DataCache.cpp
+
+    # -- F55: 串口设备模拟器 --
+    src/serial/simulator/SerialSimulator.cpp
 )
 
 set(HEADERS
@@ -1167,6 +1175,9 @@ set(HEADERS
     # ── F34: 数据速率计算器 ──
     src/utils/rate/DataRateCalculator.h
 
+    # -- F52: 数据速率限制器 --
+    src/utils/rate/DataRateLimiter.h
+
     # ── F33: 数据编解码机 ──
     src/utils/encoder/SerialDataEncoder.h
 
@@ -1217,6 +1228,9 @@ set(HEADERS
 
     # -- F53: 数据降采样引擎 --
     src/utils/reductor/DataReducer.h
+
+    # -- F54: 数据缓存 --
+    src/utils/cache/DataCache.h
 )
 
 set(RESOURCES
