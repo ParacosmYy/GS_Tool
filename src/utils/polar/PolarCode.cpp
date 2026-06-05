@@ -217,11 +217,11 @@ void PolarCode::scDecodeRecursive(const QVector<double>& llr,
                                    int offset, int length)
 {
     if (length == 1) {
-        // 叶节点: 判决
+        /* 叶节点: llr是局部向量, 只有1个元素 */
         if (m_frozenSet.contains(offset)) {
-            decodedBits[offset] = 0; // 冻结位固定为0
+            decodedBits[offset] = 0;
         } else {
-            decodedBits[offset] = (llr[offset] >= 0) ? 0 : 1;
+            decodedBits[offset] = (llr[0] >= 0) ? 0 : 1;
         }
         return;
     }

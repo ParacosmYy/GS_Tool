@@ -64,8 +64,8 @@ void BPlusTree::insert(int key, int value)
     }
 
     /* 叶子已满，需分裂 */
-    splitLeaf(leaf, key, value);
-    ++m_size;
+    bool wasSplit = splitLeaf(leaf, key, value);
+    if (wasSplit) ++m_size;
     m_stats.totalInserts++;
     m_timeSum += timer.elapsed();
     m_stats.avgProcessingTimeMs = m_timeSum /
@@ -74,7 +74,7 @@ void BPlusTree::insert(int key, int value)
     emit nodeSplit(key);
 }
 
-void BPlusTree::splitLeaf(Node* leaf, int key, int value)
+bool BPlusTree::splitLeaf(Node* leaf, int key, int value)
 {
     /* 临时数组 */
     QVector<int> tmpK = leaf->keys;
@@ -85,7 +85,7 @@ void BPlusTree::splitLeaf(Node* leaf, int key, int value)
         tmpV[idx] = value;
         leaf->keys = tmpK;
         leaf->values = tmpV;
-        return;
+        return false;
     }
     tmpK.insert(idx, key);
     tmpV.insert(idx, value);
@@ -102,6 +102,7 @@ void BPlusTree::splitLeaf(Node* leaf, int key, int value)
 
     int promotingKey = newLeaf->keys.first();
     splitInternal(leaf, newLeaf, promotingKey);
+    return true;
 }
 
 void BPlusTree::splitInternal(Node* node, Node* newChild, int promotingKey)
@@ -253,9 +254,10 @@ void BPlusTree::rebalanceLeaf(Node* leaf, int key)
     if (idx < par->children.size() - 1) {
         Node* right = par->children[idx + 1];
         if (right->keys.size() > minKeys) {
+            int borrowedKey = right->keys.first();
             leaf->keys.append(right->keys.takeFirst());
             leaf->values.append(right->values.takeFirst());
-            par->keys[idx] = right->keys.first();
+            par->keys[idx] = borrowedKey;
             return;
         }
     }
@@ -299,7 +301,12 @@ void BPlusTree::rebalanceInternal(Node* node, int idx)
         m_root = node->children.first();
         m_root->parent = nullptr;
         int pidx = par->children.indexOf(node);
-        if (pidx >= 0) par->children.removeAt(pidx);
+        if (pidx >= 0) {
+            par->children.removeAt(pidx);
+            /* 同时移除对应的分隔键 */
+            if (pidx < par->keys.size()) par->keys.removeAt(pidx);
+            else if (!par->keys.isEmpty()) par->keys.removeLast();
+        }
         delete node;
     }
 }

@@ -87,10 +87,13 @@ QVector<quint8> TurboDecoder::decode(const QVector<double>& sysReceived,
         // DEC2: 使用交织后的系统位 + 校验2 + 交织后的外信息
         extrinsic2 = bcjrLogMap(sysReceived, par2Received, interleavedExt);
 
-        // 解交织
-        QVector<double> deinterleaved(dataLen);
-        for (int i = 0; i < dataLen && i < interleaver.size(); ++i) {
-            deinterleaved[interleaver[i]] = extrinsic2[i];
+        /* 解交织: 交织器长度不足时补恒等映射 */
+        QVector<double> deinterleaved(dataLen, 0.0);
+        for (int i = 0; i < dataLen; ++i) {
+            int idx = (i < interleaver.size()) ? interleaver[i] : i;
+            if (idx >= 0 && idx < dataLen) {
+                deinterleaved[idx] = extrinsic2[i];
+            }
         }
         extrinsic2 = deinterleaved;
     }

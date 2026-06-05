@@ -244,10 +244,10 @@ double TDigest::interpolateQuantile(double q) const
         const double halfWeight = c.weight * 0.5;
 
         if (cumulativeWeight + halfWeight >= targetWeight) {
-            // 目标在当前质心的左半部分
             if (i == 0) return m_minValue;
             const double prevEnd = cumulativeWeight;
-            const double ratio = (targetWeight - prevEnd) / c.weight;
+            const double w = qMax(c.weight, 1e-15);
+            const double ratio = (targetWeight - prevEnd) / w;
             return m_centroids[i - 1].mean +
                    ratio * (c.mean - m_centroids[i - 1].mean);
         }
@@ -255,9 +255,9 @@ double TDigest::interpolateQuantile(double q) const
         cumulativeWeight += halfWeight;
 
         if (cumulativeWeight + halfWeight >= targetWeight) {
-            // 目标在当前质心的右半部分
             if (i == m_centroids.size() - 1) return m_maxValue;
-            const double ratio = (targetWeight - cumulativeWeight) / c.weight;
+            const double w = qMax(c.weight, 1e-15);
+            const double ratio = (targetWeight - cumulativeWeight) / w;
             return c.mean + ratio * (m_centroids[i + 1].mean - c.mean);
         }
 

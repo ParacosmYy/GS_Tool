@@ -133,7 +133,7 @@ quint8 MuLawEncoder::muLawEncode(qint16 sample)
     const int BIAS = 0x84;
     const int CLIP = 32635;
 
-    int sign = (sample < 0) ? 0 : 1;
+    int sign = (sample < 0) ? 1 : 0;
     int magnitude = std::abs(sample);
     if (magnitude > CLIP) magnitude = CLIP;
     magnitude += BIAS;
@@ -161,7 +161,7 @@ qint16 MuLawEncoder::muLawDecode(quint8 code)
     int magnitude = ((mantissa << 3) | 0x84) << exponent;
     magnitude -= 0x84;
 
-    return static_cast<qint16>(sign ? magnitude : -magnitude);
+    return static_cast<qint16>(sign ? -magnitude : magnitude);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -172,7 +172,7 @@ quint8 MuLawEncoder::aLawEncode(qint16 sample)
 {
     const int CLIP = 31744;
 
-    int sign = (sample < 0) ? 0 : 1;
+    int sign = (sample < 0) ? 1 : 0;
     int magnitude = std::abs(sample);
     if (magnitude > CLIP) magnitude = CLIP;
 
@@ -213,7 +213,7 @@ qint16 MuLawEncoder::aLawDecode(quint8 code)
         magnitude = ((mantissa << 4) | 0x108) << (exponent - 1);
     }
 
-    return static_cast<qint16>(sign ? magnitude : -magnitude);
+    return static_cast<qint16>(sign ? -magnitude : magnitude);
 }
 
 // ═══════════════════════════════════════════════════════════

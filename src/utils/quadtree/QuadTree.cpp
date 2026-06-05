@@ -39,7 +39,6 @@ bool QuadTree::insert(const Point& point)
 
     if (m_points.size() < m_capacity && !m_divided) {
         m_points.append(point);
-        m_size++;
         m_stats.totalInserts++;
         m_timeSum += timer.elapsed();
         m_stats.avgProcessingTimeMs = m_timeSum /
@@ -141,6 +140,15 @@ QVector<QuadTree::Point> QuadTree::nearestNeighbors(double x, double y, int k) c
 
     const_cast<QuadTree*>(this)->m_timeSum += timer.elapsed();
     return result;
+}
+
+int QuadTree::size() const
+{
+    int count = m_points.size();
+    if (m_divided) {
+        count += m_nw->size() + m_ne->size() + m_sw->size() + m_se->size();
+    }
+    return count;
 }
 
 void QuadTree::resetStatistics()

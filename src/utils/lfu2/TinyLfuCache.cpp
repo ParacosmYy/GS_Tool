@@ -29,6 +29,11 @@ bool TinyLfuCache::access(int key)
 
     if (hit) {
         m_stats.totalHits++;
+        /* 如果在窗口缓存中，更新LRU位置 */
+        if (m_window.contains(key)) {
+            m_windowLru.removeOne(key);
+            m_windowLru.append(key);
+        }
         /* 如果在主缓存中，更新频率链表 */
         if (m_main.contains(key)) {
             int oldFreq = m_main[key].freq;

@@ -53,7 +53,8 @@ public:
     /** @brief 最近邻查询 @param x X坐标 @param y Y坐标 @param k 数量 @return 最近的k个点 */
     QVector<Point> nearestNeighbors(double x, double y, int k = 1) const;
 
-    int size() const { return m_size; }
+    /** @brief 总点数(递归统计所有子节点) */
+    int size() const;
     const Stats& stats() const { return m_stats; }
     void resetStatistics();
 

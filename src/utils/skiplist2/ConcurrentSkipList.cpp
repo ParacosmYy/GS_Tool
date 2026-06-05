@@ -154,6 +154,7 @@ bool ConcurrentSkipList::contains(double value)
 
 QVector<double> ConcurrentSkipList::rangeQuery(double minVal, double maxVal) const
 {
+    QMutexLocker locker(&m_globalMutex);
     QVector<double> result;
     Node* current = m_head;
 
@@ -174,6 +175,7 @@ QVector<double> ConcurrentSkipList::rangeQuery(double minVal, double maxVal) con
 
 QVector<double> ConcurrentSkipList::toSortedList() const
 {
+    QMutexLocker locker(&m_globalMutex);
     QVector<double> result;
     Node* current = m_head->forward[0];
     while (current) {

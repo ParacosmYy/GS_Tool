@@ -66,7 +66,7 @@ private:
         explicit Node(bool leaf) : isLeaf(leaf) {}
     };
 
-    void splitLeaf(Node* leaf, int key, int value);
+    bool splitLeaf(Node* leaf, int key, int value);
     void splitInternal(Node* node, Node* newChild, int promotingKey);
     void rebalanceLeaf(Node* leaf, int key);
     void rebalanceInternal(Node* node, int idx);
