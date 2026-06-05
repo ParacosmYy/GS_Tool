@@ -68,6 +68,8 @@ private slots:
 
 private:
     void setupUI();                    ///< 构建界面布局
+    void createControls(QWidget *parent, QFormLayout *form); ///< 创建参数控件
+    void connectSignals();             ///< 连接信号槽
     void updateParamsFromControls();   ///< 从控件同步参数到 Generator
     void drawWaveform(QPainter &p);    ///< QPainter 绘制波形曲线
 

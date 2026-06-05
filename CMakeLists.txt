@@ -2425,17 +2425,11 @@ set(SOURCES
     src/utils/wavegen/WaveformGeneratorWidget.cpp
     src/utils/wavegen/WaveformGeneratorWidgetStats.cpp
 
-    # ── GPS/NMEA 数据可视化 ──
-    src/utils/gps/NmeaParser.cpp
-    src/utils/gps/NmeaParserStats.cpp
-    src/utils/gps/GpsTrackWidget.cpp
-    src/utils/gps/GpsTrackWidgetStats.cpp
-
-    # ── F84: BLE Scanner ──
-    src/connection/ble_scanner/BleDeviceScanner.cpp
-    src/connection/ble_scanner/BleDeviceScannerStats.cpp
-    src/connection/ble_scanner/BleScanWidget.cpp
-    src/connection/ble_scanner/BleScanWidgetStats.cpp
+    # ── F85: MQTT Client Engine ──
+    src/connection/mqtt_client/MqttClientEngine.cpp
+    src/connection/mqtt_client/MqttClientEngineStats.cpp
+    src/connection/mqtt_client/MqttClientPanel.cpp
+    src/connection/mqtt_client/MqttClientPanelStats.cpp
 )
 
 set(HEADERS
@@ -4636,10 +4630,10 @@ set(HEADERS
     src/utils/wavegen/WaveformGenerator.h
     src/utils/wavegen/WaveformGeneratorWidget.h
 
-    # ── F84: BLE Scanner ──
-    src/connection/ble_scanner/BleScanTypes.h
-    src/connection/ble_scanner/BleDeviceScanner.h
-    src/connection/ble_scanner/BleScanWidget.h
+    # ── F85: MQTT Client Engine ──
+    src/connection/mqtt_client/MqttClientTypes.h
+    src/connection/mqtt_client/MqttClientEngine.h
+    src/connection/mqtt_client/MqttClientPanel.h
 )
 
 set(RESOURCES

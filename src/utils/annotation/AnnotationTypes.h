@@ -2,7 +2,7 @@
  * @file AnnotationTypes.h
  * @brief 数据标注工具类型定义 — 标注类型枚举、标注数据结构
  *
- * 定义 AnnotationType 枚举和 AnnotationEntry 结构体，供 AnnotationManager
+ * 定义 AnnotationKind 枚举和 AnnotationEntry 结构体，供 AnnotationManager
  * 和 AnnotationWidget 共享使用。支持 Marker / Region / Event / Measurement
  * 四种标注类型。
  *
@@ -91,9 +91,9 @@ struct Action {
 
 } // namespace annotation
 
-/* ── 全局类型别名 — 保持对外接口简洁 ── */
-using AnnotationType  = annotation::Type;
-using DataAnnotation  = annotation::Entry;
+/* ── 全局类型别名 — 避免与旧版 DataAnnotation 冲突 ── */
+using AnnotationKind   = annotation::Type;
+using AnnotationEntry  = annotation::Entry;
 using AnnotationAction = annotation::Action;
 
 #endif // ANNOTATION_TYPES_H

@@ -39,15 +39,7 @@ WaveformGenerator *WaveformGeneratorWidget::generator() const
     return m_generator;
 }
 
-WaveGen::Stats WaveformGeneratorWidget::stats() const
-{
-    return m_generator->stats();
-}
-
-void WaveformGeneratorWidget::resetStatistics()
-{
-    m_generator->resetStatistics();
-}
+// stats() and resetStatistics() are in WaveformGeneratorWidgetStats.cpp
 
 // ══════════════════════════════════════════════
 // paintEvent -- 绘制波形预览
@@ -133,7 +125,6 @@ void WaveformGeneratorWidget::setupUI()
     mainLayout->setContentsMargins(8, 8, 8, 8);
     mainLayout->setSpacing(8);
 
-    // ---- 左侧参数面板 ----
     auto *leftPanel = new QWidget(this);
     leftPanel->setObjectName(QStringLiteral("wavegenLeftPanel"));
     leftPanel->setFixedWidth(240);
@@ -141,8 +132,20 @@ void WaveformGeneratorWidget::setupUI()
     form->setContentsMargins(4, 4, 4, 4);
     form->setSpacing(6);
 
-    // 波形类型
-    m_typeCombo = new QComboBox(leftPanel);
+    createControls(leftPanel, form);
+    mainLayout->addWidget(leftPanel);
+
+    auto *previewFrame = new QFrame(this);
+    previewFrame->setObjectName(QStringLiteral("wavegenPreviewFrame"));
+    previewFrame->setFrameShape(QFrame::StyledPanel);
+    mainLayout->addWidget(previewFrame, 1);
+
+    connectSignals();
+}
+
+void WaveformGeneratorWidget::createControls(QWidget *parent, QFormLayout *form)
+{
+    m_typeCombo = new QComboBox(parent);
     m_typeCombo->setObjectName(QStringLiteral("wavegenTypeCombo"));
     m_typeCombo->addItem(tr("Sine"),   static_cast<int>(WaveGen::WaveformType::Sine));
     m_typeCombo->addItem(tr("Square"), static_cast<int>(WaveGen::WaveformType::Square));
@@ -152,8 +155,7 @@ void WaveformGeneratorWidget::setupUI()
     m_typeCombo->addItem(tr("Custom"), static_cast<int>(WaveGen::WaveformType::Custom));
     form->addRow(tr("Type:"), m_typeCombo);
 
-    // 频率
-    m_freqSpin = new QDoubleSpinBox(leftPanel);
+    m_freqSpin = new QDoubleSpinBox(parent);
     m_freqSpin->setObjectName(QStringLiteral("wavegenFreqSpin"));
     m_freqSpin->setRange(0.01, 100000.0);
     m_freqSpin->setValue(1000.0);
@@ -161,40 +163,36 @@ void WaveformGeneratorWidget::setupUI()
     m_freqSpin->setDecimals(1);
     form->addRow(tr("Frequency:"), m_freqSpin);
 
-    // 振幅滑块 (0~200 → 0.0~2.0)
-    m_ampLabel = new QLabel(QStringLiteral("1.00"), leftPanel);
+    m_ampLabel = new QLabel(QStringLiteral("1.00"), parent);
     m_ampLabel->setObjectName(QStringLiteral("wavegenAmpLabel"));
-    m_ampSlider = new QSlider(Qt::Horizontal, leftPanel);
+    m_ampSlider = new QSlider(Qt::Horizontal, parent);
     m_ampSlider->setObjectName(QStringLiteral("wavegenAmpSlider"));
     m_ampSlider->setRange(0, 200);
     m_ampSlider->setValue(100);
     form->addRow(tr("Amplitude:"), m_ampSlider);
     form->addRow(QString(), m_ampLabel);
 
-    // 偏移滑块 (-100~100 → -1.0~1.0)
-    m_offLabel = new QLabel(QStringLiteral("0.00"), leftPanel);
+    m_offLabel = new QLabel(QStringLiteral("0.00"), parent);
     m_offLabel->setObjectName(QStringLiteral("wavegenOffLabel"));
-    m_offSlider = new QSlider(Qt::Horizontal, leftPanel);
+    m_offSlider = new QSlider(Qt::Horizontal, parent);
     m_offSlider->setObjectName(QStringLiteral("wavegenOffSlider"));
     m_offSlider->setRange(-100, 100);
     m_offSlider->setValue(0);
     form->addRow(tr("Offset:"), m_offSlider);
     form->addRow(QString(), m_offLabel);
 
-    // 相位滑块 (0~360°)
-    m_phaseLabel = new QLabel(QStringLiteral("0°"), leftPanel);
+    m_phaseLabel = new QLabel(QStringLiteral("0°"), parent);
     m_phaseLabel->setObjectName(QStringLiteral("wavegenPhaseLabel"));
-    m_phaseSlider = new QSlider(Qt::Horizontal, leftPanel);
+    m_phaseSlider = new QSlider(Qt::Horizontal, parent);
     m_phaseSlider->setObjectName(QStringLiteral("wavegenPhaseSlider"));
     m_phaseSlider->setRange(0, 360);
     m_phaseSlider->setValue(0);
     form->addRow(tr("Phase:"), m_phaseSlider);
     form->addRow(QString(), m_phaseLabel);
 
-    // 占空比滑块 (1~99%, 仅方波)
-    m_dutyLabel = new QLabel(QStringLiteral("50%"), leftPanel);
+    m_dutyLabel = new QLabel(QStringLiteral("50%"), parent);
     m_dutyLabel->setObjectName(QStringLiteral("wavegenDutyLabel"));
-    m_dutySlider = new QSlider(Qt::Horizontal, leftPanel);
+    m_dutySlider = new QSlider(Qt::Horizontal, parent);
     m_dutySlider->setObjectName(QStringLiteral("wavegenDutySlider"));
     m_dutySlider->setRange(1, 99);
     m_dutySlider->setValue(50);
@@ -203,26 +201,19 @@ void WaveformGeneratorWidget::setupUI()
     form->addRow(tr("Duty:"), m_dutySlider);
     form->addRow(QString(), m_dutyLabel);
 
-    // 启停按钮
     auto *btnLayout = new QHBoxLayout();
-    m_startBtn = new QPushButton(tr("Start"), leftPanel);
+    m_startBtn = new QPushButton(tr("Start"), parent);
     m_startBtn->setObjectName(QStringLiteral("wavegenStartBtn"));
-    m_stopBtn = new QPushButton(tr("Stop"), leftPanel);
+    m_stopBtn = new QPushButton(tr("Stop"), parent);
     m_stopBtn->setObjectName(QStringLiteral("wavegenStopBtn"));
     m_stopBtn->setEnabled(false);
     btnLayout->addWidget(m_startBtn);
     btnLayout->addWidget(m_stopBtn);
     form->addRow(btnLayout);
+}
 
-    mainLayout->addWidget(leftPanel);
-
-    // ---- 右侧预览画布 (占满剩余空间) ----
-    auto *previewFrame = new QFrame(this);
-    previewFrame->setObjectName(QStringLiteral("wavegenPreviewFrame"));
-    previewFrame->setFrameShape(QFrame::StyledPanel);
-    mainLayout->addWidget(previewFrame, 1);
-
-    // ---- 信号连接 ----
+void WaveformGeneratorWidget::connectSignals()
+{
     connect(m_typeCombo, &QComboBox::currentIndexChanged,
             this, &WaveformGeneratorWidget::onTypeChanged);
     connect(m_freqSpin, &QDoubleSpinBox::valueChanged,
@@ -240,11 +231,9 @@ void WaveformGeneratorWidget::setupUI()
     connect(m_stopBtn, &QPushButton::clicked,
             this, &WaveformGeneratorWidget::onStopClicked);
 
-    // 转发 generator 的 dataGenerated 信号
     connect(m_generator, &WaveformGenerator::dataGenerated,
             this, &WaveformGeneratorWidget::dataGenerated);
 
-    // 参数变更时刷新预览
     connect(m_generator, &WaveformGenerator::paramsChanged,
             this, QOverload<>::of(&QWidget::update));
 }
