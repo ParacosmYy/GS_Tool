@@ -5,8 +5,8 @@
  * 功能: 基于多重哈希的概率数据结构，支持add/remove/contains，
  *       饱和计数器防止溢出，误判率估计，统计操作次数/元素数/耗时。
  */
-#ifndef COUNTINGBLOOMFILTER_H
-#define COUNTINGBLOOMFILTER_H
+#ifndef COUNTINGBLOOMFILTER2_H
+#define COUNTINGBLOOMFILTER2_H
 
 #include <QObject>
 #include <QVector>
@@ -14,7 +14,7 @@
 /**
  * @brief 计数型布隆过滤器
  */
-class CountingBloomFilter : public QObject {
+class CountingBloomFilter2 : public QObject {
     Q_OBJECT
 
 public:
@@ -35,7 +35,7 @@ public:
      * @param falsePositiveRate 期望误判率
      * @param parent 父对象
      */
-    explicit CountingBloomFilter(int expectedElements = 10000,
+    explicit CountingBloomFilter2(int expectedElements = 10000,
                                  double falsePositiveRate = 0.01,
                                  QObject* parent = nullptr);
 
@@ -92,4 +92,4 @@ private:
     double m_timeSum;
 };
 
-#endif // COUNTINGBLOOMFILTER_H
+#endif // COUNTINGBLOOMFILTER2_H

@@ -998,6 +998,23 @@ set(SOURCES
     src/utils/groebner/GroebnerBasis.cpp
     src/utils/grobner2/MultivariatePolynomial.cpp
 
+    # ── Wave 49: 计算几何/空间索引 ──
+    src/utils/bsp_tree/BspTree2d.cpp
+    src/utils/interval_tree/IntervalTreeSearch.cpp
+    src/utils/segment_tree/SegmentTreeRange.cpp
+    src/utils/delaunay2/DelaunayFlip.cpp
+    src/utils/voronoi2/VoronoiDiagram.cpp
+    src/utils/convex_hull2/ChanConvexHull.cpp
+    src/utils/polygon/PolygonTriangulation.cpp
+    src/utils/line_sweep/LineSweepIntersect.cpp
+    src/utils/geo_dist/GeodesicDistance.cpp
+    src/utils/r_tree/RTreeSearch.cpp
+    src/utils/kd_tree2/KdTreeBalancer.cpp
+    src/utils/quadtree2/QuadtreeRegion.cpp
+    src/utils/octree/OctreeVolume.cpp
+    src/utils/point_location/PointLocation.cpp
+    src/utils/nearest_neighbor2/ApproxNearestNeighbor.cpp
+
     # -- Wave 44-45: 新工具模块 --
     src/utils/fft4/FastCorrelation.cpp
     src/utils/dwt3/SymmetricWavelet.cpp
@@ -1019,6 +1036,21 @@ set(SOURCES
     src/utils/graph5/GraphColoring.cpp
     src/utils/align/NeedlemanWunsch.cpp
     src/utils/cluster3/KMedoids.cpp
+
+    # ── Wave 54: 新增工具模块 ──
+    src/utils/cluster2/AgglomerativeClusterer.cpp
+    src/utils/compress2/Lz4Compressor.cpp
+    src/utils/detrend2/PolynomialDetrend.cpp
+    src/utils/interpolate2/BicubicInterpolator.cpp
+    src/utils/lts2/LtsRegression.cpp
+    src/utils/optim2/SimulatedAnnealing2.cpp
+    src/utils/phase2/PhaseUnwrapper.cpp
+    src/utils/priority2/BinomialHeap.cpp
+    src/utils/savitzky2/SavitzkyGolay2D.cpp
+    src/utils/segment2/GraphSegmenter.cpp
+    src/utils/set2/DisjointSetForest.cpp
+    src/utils/signal3/VoiceActivityDetector2.cpp
+    src/utils/streaming3/StreamingQuantile2.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -2339,6 +2371,23 @@ set(HEADERS
     src/utils/groebner/GroebnerBasis.h
     src/utils/grobner2/MultivariatePolynomial.h
 
+    # ── Wave 49: 计算几何/空间索引 ──
+    src/utils/bsp_tree/BspTree2d.h
+    src/utils/interval_tree/IntervalTreeSearch.h
+    src/utils/segment_tree/SegmentTreeRange.h
+    src/utils/delaunay2/DelaunayFlip.h
+    src/utils/voronoi2/VoronoiDiagram.h
+    src/utils/convex_hull2/ChanConvexHull.h
+    src/utils/polygon/PolygonTriangulation.h
+    src/utils/line_sweep/LineSweepIntersect.h
+    src/utils/geo_dist/GeodesicDistance.h
+    src/utils/r_tree/RTreeSearch.h
+    src/utils/kd_tree2/KdTreeBalancer.h
+    src/utils/quadtree2/QuadtreeRegion.h
+    src/utils/octree/OctreeVolume.h
+    src/utils/point_location/PointLocation.h
+    src/utils/nearest_neighbor2/ApproxNearestNeighbor.h
+
     # -- Wave 44-45: 新工具模块头文件 --
     src/utils/fft4/FastCorrelation.h
     src/utils/dwt3/SymmetricWavelet.h
@@ -2360,6 +2409,22 @@ set(HEADERS
     src/utils/graph5/GraphColoring.h
     src/utils/align/NeedlemanWunsch.h
     src/utils/cluster3/KMedoids.h
+
+    # ── Wave 54: 新增工具模块头文件 ──
+    src/utils/cluster2/AgglomerativeClusterer.h
+    src/utils/compress2/Lz4Compressor.h
+    src/utils/detrend2/PolynomialDetrend.h
+    src/utils/graph5/AStarSearch.h
+    src/utils/interpolate2/BicubicInterpolator.h
+    src/utils/lts2/LtsRegression.h
+    src/utils/optim2/SimulatedAnnealing2.h
+    src/utils/phase2/PhaseUnwrapper.h
+    src/utils/priority2/BinomialHeap.h
+    src/utils/savitzky2/SavitzkyGolay2D.h
+    src/utils/segment2/GraphSegmenter.h
+    src/utils/set2/DisjointSetForest.h
+    src/utils/signal3/VoiceActivityDetector2.h
+    src/utils/streaming3/StreamingQuantile2.h
 )
 
 set(RESOURCES

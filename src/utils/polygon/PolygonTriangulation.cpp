@@ -21,14 +21,14 @@ PolygonTriangulation::PolygonTriangulation(QObject* parent)
 // 公开方法
 // ============================================================================
 
-QVector<QPair<int,int,int>> PolygonTriangulation::triangulate(
+QVector<QVector<int>> PolygonTriangulation::triangulate(
     QVector<QPair<double,double>> polygon)
 {
     QElapsedTimer timer;
     timer.start();
 
     int n = polygon.size();
-    QVector<QPair<int,int,int>> result;
+    QVector<QVector<int>> result;
 
     if (n < 3) {
         ++m_stats.totalTriangulations;

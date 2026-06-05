@@ -39,7 +39,7 @@ public:
      * @param points 输入二维点集
      * @return 三角形列表，每个三角形为三个顶点索引
      */
-    QVector<QPair<int,int,int>> triangulate(
+    QVector<QVector<int>> triangulate(
         QVector<QPair<double,double>> points);
 
     /** @brief 获取统计信息 */

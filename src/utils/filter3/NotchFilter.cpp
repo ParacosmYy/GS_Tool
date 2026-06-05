@@ -1,9 +1,9 @@
 /**
- * @file NotchFilter.cpp
+ * @file NotchFilterV2.cpp
  * @brief IIR陷波滤波器实现 — 2阶双二阶节(Direct Form I)
  */
 
-#include "NotchFilter.h"
+#include "NotchFilterV2.h"
 
 #include <QElapsedTimer>
 #include <cmath>
@@ -12,18 +12,18 @@
 // 构造 / 析构
 // ═══════════════════════════════════════════════════════════
 
-NotchFilter::NotchFilter(QObject* parent)
+NotchFilterV2::NotchFilterV2(QObject* parent)
     : QObject(parent)
 {
 }
 
-NotchFilter::~NotchFilter() = default;
+NotchFilterV2::~NotchFilterV2() = default;
 
 // ═══════════════════════════════════════════════════════════
 // 滤波器设计
 // ═══════════════════════════════════════════════════════════
 
-void NotchFilter::design(double freqHz, double Q, double sampleRate)
+void NotchFilterV2::design(double freqHz, double Q, double sampleRate)
 {
     QElapsedTimer timer;
     timer.start();
@@ -74,7 +74,7 @@ void NotchFilter::design(double freqHz, double Q, double sampleRate)
 // 滤波应用
 // ═══════════════════════════════════════════════════════════
 
-QVector<double> NotchFilter::apply(const QVector<double>& signal)
+QVector<double> NotchFilterV2::apply(const QVector<double>& signal)
 {
     QElapsedTimer timer;
     timer.start();
@@ -102,7 +102,7 @@ QVector<double> NotchFilter::apply(const QVector<double>& signal)
     return output;
 }
 
-double NotchFilter::processSample(double sample)
+double NotchFilterV2::processSample(double sample)
 {
     /* Direct Form I: y[n] = b0*x[n] + b1*x[n-1] + b2*x[n-2]
      *                        - a1*y[n-1] - a2*y[n-2]         */
@@ -118,7 +118,7 @@ double NotchFilter::processSample(double sample)
     return y;
 }
 
-void NotchFilter::resetState()
+void NotchFilterV2::resetState()
 {
     m_x1 = m_x2 = m_y1 = m_y2 = 0.0;
 }
@@ -127,12 +127,12 @@ void NotchFilter::resetState()
 // 查询
 // ═══════════════════════════════════════════════════════════
 
-NotchFilter::Parameters NotchFilter::parameters() const
+NotchFilterV2::Parameters NotchFilterV2::parameters() const
 {
     return m_params;
 }
 
-bool NotchFilter::isDesigned() const
+bool NotchFilterV2::isDesigned() const
 {
     return m_designed;
 }
@@ -141,12 +141,12 @@ bool NotchFilter::isDesigned() const
 // 统计
 // ═══════════════════════════════════════════════════════════
 
-NotchFilter::Stats NotchFilter::stats() const
+NotchFilterV2::Stats NotchFilterV2::stats() const
 {
     return m_stats;
 }
 
-void NotchFilter::resetStatistics()
+void NotchFilterV2::resetStatistics()
 {
     m_stats = Stats{};
 }

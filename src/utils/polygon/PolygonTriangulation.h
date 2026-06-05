@@ -40,7 +40,7 @@ public:
      * @param polygon 多边形顶点列表(按顺时针或逆时针排列)
      * @return 三角形列表，每个三角形为三个顶点索引
      */
-    QVector<QPair<int,int,int>> triangulate(
+    QVector<QVector<int>> triangulate(
         QVector<QPair<double,double>> polygon);
 
     /** @brief 获取统计信息 */

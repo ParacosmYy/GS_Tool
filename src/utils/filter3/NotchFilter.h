@@ -5,24 +5,24 @@
  * 设计并应用IIR陷波滤波器, 可指定中心频率、Q值和采样率,
  * 适用于工频干扰消除、窄带噪声抑制等嵌入式信号调理场景。
  */
-#ifndef NOTCHFILTER_H
-#define NOTCHFILTER_H
+#ifndef NOTCHFILTERV2_H
+#define NOTCHFILTERV2_H
 
 #include <QObject>
 #include <QVector>
 
 /**
- * @class NotchFilter
- * @brief IIR陷波滤波器 — 可调中心频率/Q值的带阻滤波
+ * @class NotchFilterV2
+ * @brief IIR陷波滤波器V2 — 可调中心频率/Q值的带阻滤波
  *
  * 典型用法:
  * @code
- *   NotchFilter filter;
+ *   NotchFilterV2 filter;
  *   filter.design(50.0, 30.0, 1000.0); // 50Hz陷波
  *   auto output = filter.apply(signal);
  * @endcode
  */
-class NotchFilter : public QObject {
+class NotchFilterV2 : public QObject {
     Q_OBJECT
 
 public:
@@ -41,10 +41,10 @@ public:
     };
 
     /** @brief 构造函数 @param parent 父对象 */
-    explicit NotchFilter(QObject* parent = nullptr);
+    explicit NotchFilterV2(QObject* parent = nullptr);
 
     /** @brief 析构函数 */
-    ~NotchFilter() override;
+    ~NotchFilterV2() override;
 
     // ── 核心接口 ──
 
@@ -116,4 +116,4 @@ private:
     Stats m_stats;
 };
 
-#endif // NOTCHFILTER_H
+#endif // NOTCHFILTERV2_H

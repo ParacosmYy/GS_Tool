@@ -9,7 +9,7 @@
 #include <QtMath>
 
 /** @brief 构造函数 @param expectedElements 预期元素 @param falsePositiveRate 误判率 @param parent 父对象 */
-CountingBloomFilter::CountingBloomFilter(int expectedElements,
+CountingBloomFilter2::CountingBloomFilter2(int expectedElements,
                                          double falsePositiveRate,
                                          QObject* parent)
     : QObject(parent)
@@ -21,7 +21,7 @@ CountingBloomFilter::CountingBloomFilter(int expectedElements,
 }
 
 /** @brief 计算最优参数 @param n 元素数 @param fpRate 误判率 */
-void CountingBloomFilter::computeOptimalParams(int n, double fpRate)
+void CountingBloomFilter2::computeOptimalParams(int n, double fpRate)
 {
     if (n <= 0) n = 10000;
     if (fpRate <= 0 || fpRate >= 1) fpRate = 0.01;
@@ -40,7 +40,7 @@ void CountingBloomFilter::computeOptimalParams(int n, double fpRate)
 }
 
 /** @brief 添加元素 @param value 元素值 */
-void CountingBloomFilter::add(int value)
+void CountingBloomFilter2::add(int value)
 {
     QElapsedTimer timer;
     timer.start();
@@ -64,7 +64,7 @@ void CountingBloomFilter::add(int value)
 }
 
 /** @brief 移除元素 @param value 元素值 @return 是否成功 */
-bool CountingBloomFilter::remove(int value)
+bool CountingBloomFilter2::remove(int value)
 {
     QElapsedTimer timer;
     timer.start();
@@ -102,7 +102,7 @@ bool CountingBloomFilter::remove(int value)
 }
 
 /** @brief 查询是否可能包含 @param value 元素值 @return 是否可能包含 */
-bool CountingBloomFilter::contains(int value)
+bool CountingBloomFilter2::contains(int value)
 {
     QVector<int> positions = hashPositions(value);
     for (int pos : positions) {
@@ -113,7 +113,7 @@ bool CountingBloomFilter::contains(int value)
 }
 
 /** @brief 批量添加 @param values 元素列表 */
-void CountingBloomFilter::addBatch(const QVector<int>& values)
+void CountingBloomFilter2::addBatch(const QVector<int>& values)
 {
     for (int v : values) {
         add(v);
@@ -121,7 +121,7 @@ void CountingBloomFilter::addBatch(const QVector<int>& values)
 }
 
 /** @brief 清空过滤器 */
-void CountingBloomFilter::clear()
+void CountingBloomFilter2::clear()
 {
     m_counters.fill(0, m_bitSize);
     m_elementCount = 0;
@@ -130,13 +130,13 @@ void CountingBloomFilter::clear()
 }
 
 /** @brief 估计元素数 @return 元素数 */
-int CountingBloomFilter::estimatedElementCount() const
+int CountingBloomFilter2::estimatedElementCount() const
 {
     return m_elementCount;
 }
 
 /** @brief 估计误判率 @return 误判率 */
-double CountingBloomFilter::estimatedFalsePositiveRate() const
+double CountingBloomFilter2::estimatedFalsePositiveRate() const
 {
     if (m_elementCount <= 0) return 0.0;
     /* p = (1 - e^(-kn/m))^k */
@@ -147,13 +147,13 @@ double CountingBloomFilter::estimatedFalsePositiveRate() const
 }
 
 /** @brief 过滤器容量 @return 位数组大小 */
-int CountingBloomFilter::capacity() const { return m_bitSize; }
+int CountingBloomFilter2::capacity() const { return m_bitSize; }
 
 /** @brief 哈希函数数 @return k值 */
-int CountingBloomFilter::hashCount() const { return m_numHashes; }
+int CountingBloomFilter2::hashCount() const { return m_numHashes; }
 
 /** @brief 计算k个哈希位置 @param value 元素 @return 位置列表 */
-QVector<int> CountingBloomFilter::hashPositions(int value) const
+QVector<int> CountingBloomFilter2::hashPositions(int value) const
 {
     QVector<int> positions(m_numHashes);
     quint32 h1 = murmurHash(value, 0);
@@ -167,7 +167,7 @@ QVector<int> CountingBloomFilter::hashPositions(int value) const
 }
 
 /** @brief MurmurHash3变体 @param value 输入 @param seed 种子 @return 哈希值 */
-quint32 CountingBloomFilter::murmurHash(int value, int seed) const
+quint32 CountingBloomFilter2::murmurHash(int value, int seed) const
 {
     quint32 h = static_cast<quint32>(seed);
     quint32 k = static_cast<quint32>(value);
@@ -193,7 +193,7 @@ quint32 CountingBloomFilter::murmurHash(int value, int seed) const
 }
 
 /** @brief 重置统计 */
-void CountingBloomFilter::resetStatistics()
+void CountingBloomFilter2::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;

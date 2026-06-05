@@ -62,9 +62,9 @@ QVector<QVector<QPair<double,double>>> VoronoiDual::compute(
     QVector<QPair<double,double>> cc(triCount);
 
     for (int i = 0; i < triCount; ++i) {
-        int a = triangles[i].first;
-        int b = triangles[i].second;
-        int c = triangles[i].third;
+        int a = triangles[i][0];
+        int b = triangles[i][1];
+        int c = triangles[i][2];
         cc[i] = circumcenter(sites[a], sites[b], sites[c]);
     }
 
@@ -79,9 +79,9 @@ QVector<QVector<QPair<double,double>>> VoronoiDual::compute(
     std::map<EdgeKey, std::vector<int>> edgeTriMap;
     for (int i = 0; i < triCount; ++i) {
         int verts[3] = {
-            triangles[i].first,
-            triangles[i].second,
-            triangles[i].third
+            triangles[i][0],
+            triangles[i][1],
+            triangles[i][2]
         };
         for (int e = 0; e < 3; ++e) {
             int va = verts[e];
@@ -98,9 +98,9 @@ QVector<QVector<QPair<double,double>>> VoronoiDual::compute(
     std::vector<std::vector<int>> siteTriangles(n);
     for (int i = 0; i < triCount; ++i) {
         int verts[3] = {
-            triangles[i].first,
-            triangles[i].second,
-            triangles[i].third
+            triangles[i][0],
+            triangles[i][1],
+            triangles[i][2]
         };
         for (int v = 0; v < 3; ++v) {
             if (verts[v] >= 0 && verts[v] < n) {
