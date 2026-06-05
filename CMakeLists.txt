@@ -731,6 +731,12 @@ set(SOURCES
     src/utils/polyreg/PolynomialRegression.cpp
     src/utils/gof/GoodnessOfFit.cpp
     src/utils/ringbuffer3/LockFreeRingBuffer.cpp
+    src/utils/tokenizer/StreamTokenizer.cpp
+    src/utils/suffixarray/SuffixArray.cpp
+    src/utils/minhash/MinHashSignature.cpp
+    src/utils/timerwheel/TimerWheel.cpp
+    src/utils/slidingpercentile/SlidingPercentile.cpp
+    src/utils/autopcor/AutoCorrelation.cpp
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
@@ -1644,6 +1650,12 @@ set(HEADERS
     src/utils/polyreg/PolynomialRegression.h
     src/utils/gof/GoodnessOfFit.h
     src/utils/ringbuffer3/LockFreeRingBuffer.h
+    src/utils/tokenizer/StreamTokenizer.h
+    src/utils/suffixarray/SuffixArray.h
+    src/utils/minhash/MinHashSignature.h
+    src/utils/timerwheel/TimerWheel.h
+    src/utils/slidingpercentile/SlidingPercentile.h
+    src/utils/autopcor/AutoCorrelation.h
 
     # -- F128~F142: Wave 22 工具模块 --
     src/utils/fir/FirFilterDesigner.h
