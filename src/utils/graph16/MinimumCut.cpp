@@ -89,12 +89,12 @@ MinimumCut::CutResult MinimumCut::findMinCutWeighted(
         double totalWeight = 0.0;
 
         for (const auto& e : edges) {
-            int cnt = std::max(1, static_cast<int>(e.third));
+            int cnt = std::max(1, static_cast<int>(e.weight));
             for (int k = 0; k < cnt; ++k) {
-                flatEdges.append({e.first, e.second});
-                weights.append(e.third / cnt);
+                flatEdges.append({e.u, e.v});
+                weights.append(e.weight / cnt);
             }
-            totalWeight += e.third;
+            totalWeight += e.weight;
         }
 
         /* 随机收缩到2个超级顶点 */
@@ -129,10 +129,10 @@ MinimumCut::CutResult MinimumCut::findMinCutWeighted(
         /* 计算割权重 */
         double cutWeight = 0.0;
         for (int i = 0; i < edges.size(); ++i) {
-            int ru = findRoot(parent, edges[i].first);
-            int rv = findRoot(parent, edges[i].second);
+            int ru = findRoot(parent, edges[i].u);
+            int rv = findRoot(parent, edges[i].v);
             if (ru != rv) {
-                cutWeight += edges[i].third;
+                cutWeight += edges[i].weight;
             }
         }
 

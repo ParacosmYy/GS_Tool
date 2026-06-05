@@ -16,6 +16,7 @@
 #include <QPair>
 #include <QMap>
 #include <QSet>
+#include <tuple>
 
 /**
  * @class MinimumCut
@@ -44,8 +45,12 @@ public:
         bool valid = false;              /**< 结果是否有效 */
     };
 
-    /** @brief 边: (顶点u, 顶点v, 权重) */
-    using WeightedEdge = QTriple<int, int, double>;
+    /** @brief 加权边: (顶点u, 顶点v, 权重) */
+    struct WeightedEdge {
+        int u;                 /**< 顶点u */
+        int v;                 /**< 顶点v */
+        double weight;         /**< 边权重 */
+    };
 
     /** @brief 构造函数 */
     explicit MinimumCut(QObject* parent = nullptr);
