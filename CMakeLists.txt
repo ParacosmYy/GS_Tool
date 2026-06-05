@@ -651,6 +651,7 @@ set(SOURCES
     src/utils/pattern/BytePatternAnalyzer.cpp
     src/utils/pattern/BytePatternAnalyzerStats.cpp
     src/utils/pattern/DataPatternDetector.cpp
+    src/utils/ratelimiter/DataRateLimiter.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp

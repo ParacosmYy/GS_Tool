@@ -107,3 +107,15 @@ double ProtocolSession::computeP95() const
     if (idx >= sorted.size()) { idx = sorted.size() - 1; }
     return sorted[idx];
 }
+
+/** @brief 记录单次响应时间到列表 @param timeMs 响应时间(ms) */
+void ProtocolSession::recordResponseTime(double timeMs)
+{
+    m_responseTimes.append(timeMs);
+    if (m_responseTimes.size() > 1000) {
+        m_responseTimes.removeFirst();
+    }
+    if (timeMs > m_stats.maxResponseTimeMs) {
+        m_stats.maxResponseTimeMs = timeMs;
+    }
+}

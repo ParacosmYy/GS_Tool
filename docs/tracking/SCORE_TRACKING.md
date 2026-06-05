@@ -28,6 +28,9 @@
 | 191-200 | ProtocolEngine CRC验证+Dashboard持久化+BLE Scanner增强+ShortcutManager键盘系统+Lucide图标扩展 | 200 |
 | 201 | 终端搜索增强(大小写/全词/历史)+OTA CRC32校验+串口芯片识别21厂商+协议桥自动检测+Protobuf嵌套解码 | 201 |
 | 202-266 | 持续文件拆分+统计增强+Doxygen补全+WidgetFactory mutable修复 | 266 |
+| 267-293 | 统计增强+接口实现+EdDialog/TriggerEngine/ChecksumCalculator/PluginLoader/I2C修复 | 293 |
+| 294-306 | MiniChartWidget/NavIndicator/ToastWidget/USB libusb/头文件精简/Terminal-Utils增强 | 306 |
+| 307-343 | ConnectionHealthMonitor/DataLogViewer/DataInspector/SignalGenerator/DataCompare/DataComparator/DataPatternDetector/DataStreamRecorder/PacketTemplateLib/WaveformPreview/FrequencyCounter/DataAnnotation/ConnectionProfileManager/LedMatrixSimulator/ProtocolFieldEditor/ScriptableProtocolEngine/SerialTimingAnalyzer/WaveformGenerator/DataChecksumVerifier/CircularBufferWidget/ByteFrequencyAnalyzer/SerialProtocolFuzzer/PacketLossDetector/SerialPortProfiler/ScopeChannelManager/ScrollChartWidget/DataStreamFilter/ProtocolSimulator/DataHistoryBuffer/MemoryHexEditor/ProtocolTimerWidget/DataMaskEditor/ConfigProfileManager+多模块编译修复 | 343 |
 
 ---
 

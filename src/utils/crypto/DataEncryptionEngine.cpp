@@ -11,6 +11,7 @@
 
 #include <QRandomGenerator>
 #include <QString>
+#include <QMessageAuthenticationCode>
 
 // ── 构造 / 析构 ──
 
