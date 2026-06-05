@@ -679,7 +679,7 @@ set(SOURCES
     src/utils/state/StateTracker.cpp
     src/utils/cycle/CycleDetector.cpp
     src/utils/smoother/DataSmoother.cpp
-    src/utils/peaks/PeakDetector.cpp
+    # src/utils/peaks/PeakDetector.cpp  # removed: duplicate of peak/PeakDetector
     src/utils/warp/TimeWarp.cpp
     src/utils/resample/DataResampler.cpp
     src/utils/classifier/DataClassifier.cpp
@@ -764,7 +764,7 @@ set(SOURCES
     src/utils/bloomfilter2/CountingBloomFilter.cpp
     src/utils/rscode/ReedSolomonCodec.cpp
     src/utils/spectrum/SpectralFlatness.cpp
-    src/utils/convolutional/ConvolutionalCoder.cpp
+    # src/utils/convolutional/ConvolutionalCoder.cpp  # removed: duplicate of code4/ConvolutionalCoder
     src/utils/cosinedist/CosineDistance.cpp
     src/utils/edgedetect/EdgeDetector.cpp
     src/utils/mass/MassEstimator.cpp
@@ -856,7 +856,7 @@ set(SOURCES
     src/utils/sort3/TimSort.cpp
 
     # -- Wave 39: 信号处理V2 --
-    src/utils/wiener2/WienerFilter2.cpp
+    # src/utils/wiener2/WienerFilter2.cpp  # removed: duplicate of signal6/WienerFilter
     src/utils/kalman4/ParticleFilter.cpp
     src/utils/ekf/ExtendedKalman.cpp
     src/utils/complement/ComplementaryFilter.cpp
@@ -865,7 +865,7 @@ set(SOURCES
     src/utils/notch/NotchFilter.cpp
     src/utils/peakdetect2/PeakDetector2.cpp
     src/utils/align/SignalAligner.cpp
-    src/utils/window2/WindowFunction.cpp
+    # src/utils/window2/WindowFunction.cpp  # removed: duplicate of dsp6/WindowFunction
 
     # -- Wave 40: 特征提取 --
     src/utils/shorttime/ShortTimeEnergy.cpp
@@ -1295,7 +1295,7 @@ set(SOURCES
     src/utils/zcr/ZeroCrossingRate.cpp
     src/utils/thd/ThdAnalyzer.cpp
     src/utils/hmm/HiddenMarkovModel.cpp
-    src/utils/viterbi/ViterbiDecoder.cpp
+    # src/utils/viterbi/ViterbiDecoder.cpp  # removed: duplicate of signal16/ViterbiDecoder
     src/utils/gmm/GaussianMixtureModel.cpp
     src/utils/covariance/CovarianceMatrix.cpp
     src/utils/percentile/PercentileCalculator.cpp
@@ -1465,13 +1465,13 @@ set(SOURCES
 
     # ── Wave 93: FFT卷积/配对堆/正则引擎/DTW ──
     src/utils/conv3/FftConvolution.cpp
-    src/utils/heap7/PairingHeap.cpp
+    # src/utils/heap7/PairingHeap.cpp  # removed: duplicate of heap4/PairingHeap
     src/utils/regex2/RegexEngine.cpp
     src/utils/distance3/DynamicTimeWarping.cpp
 
     # ── Wave 94: SCC/红黑树/三角插值/线段树 ──
-    src/utils/graph14/StronglyConnected.cpp
-    src/utils/tree6/RedBlackTree2.cpp
+    # src/utils/graph14/StronglyConnected.cpp  # removed: duplicate of graph7/StronglyConnected
+    # src/utils/tree6/RedBlackTree2.cpp  # removed: duplicate of tree4/RedBlackTree2
     src/utils/interp6/TrigonometricInterp.cpp
     src/utils/segment4/LazySegmentTree.cpp
 
@@ -1485,7 +1485,7 @@ set(SOURCES
     src/utils/priority3/FibonacciPriorityQueue.cpp
     src/utils/kdtree3/KdTreeNearest.cpp
     src/utils/entropy4/ShannonCoding.cpp
-    src/utils/automata3/DfaMinimizer.cpp
+    # src/utils/automata3/DfaMinimizer.cpp  # removed: duplicate of automata/DfaMinimizer
 
     # ── Wave 97: 正态性检验/自适应FFT/并查集/Huffman ──
     src/utils/norm_test/NormalityTest.cpp
@@ -1551,6 +1551,16 @@ set(SOURCES
     src/utils/matrix9/SchurDecomp.cpp
     src/utils/dsp8/FractionalDelay.cpp
     src/utils/signal9/PeakDetector2.cpp
+
+    # ── Wave 110: 亲和力/扰码器/采样率转换/快速Hartley/最大团/稀疏QR/谱白化/配对堆 ──
+    src/utils/cluster22/AffinityCluster.cpp
+    src/utils/code23/Scrambler.cpp
+    src/utils/dsp24/SampleRateConv.cpp
+    src/utils/fft25/FastHartley.cpp
+    src/utils/graph38/MaxClique.cpp
+    src/utils/matrix27/SparseQR.cpp
+    src/utils/signal26/SpectralWhitening.cpp
+    src/utils/tree27/PairingHeap2.cpp
 )
 
 set(HEADERS
@@ -2309,7 +2319,7 @@ set(HEADERS
     src/utils/lru/LruCache.h
     src/utils/bloom/BloomFilter.h
     src/utils/hmm/HiddenMarkovModel.h
-    src/utils/viterbi/ViterbiDecoder.h
+    # src/utils/viterbi/ViterbiDecoder.h  # removed: duplicate of signal16/ViterbiDecoder
     src/utils/gmm/GaussianMixtureModel.h
     src/utils/covariance/CovarianceMatrix.h
     src/utils/percentile/PercentileCalculator.h
@@ -2342,7 +2352,7 @@ set(HEADERS
     src/utils/fcs/FcsChecker.h
     src/utils/snr/SnrEstimator.h
     src/utils/jaro/JaroWinkler.h
-    src/utils/convolutional/ConvolutionalCoder.h
+    # src/utils/convolutional/ConvolutionalCoder.h  # removed: duplicate of code4/ConvolutionalCoder
     src/utils/cosinedist/CosineDistance.h
     src/utils/edgedetect/EdgeDetector.h
     src/utils/mass/MassEstimator.h
@@ -2424,7 +2434,7 @@ set(HEADERS
     src/utils/sort3/TimSort.h
 
     # -- Wave 39: 信号处理V2 --
-    src/utils/wiener2/WienerFilter2.h
+    # src/utils/wiener2/WienerFilter2.h  # removed: duplicate of signal6/WienerFilter
     src/utils/kalman4/ParticleFilter.h
     src/utils/ekf/ExtendedKalman.h
     src/utils/complement/ComplementaryFilter.h
@@ -2433,7 +2443,7 @@ set(HEADERS
     src/utils/notch/NotchFilter.h
     src/utils/peakdetect2/PeakDetector2.h
     src/utils/align/SignalAligner.h
-    src/utils/window2/WindowFunction.h
+    # src/utils/window2/WindowFunction.h  # removed: duplicate of dsp6/WindowFunction
     src/utils/shorttime/ShortTimeEnergy.h
     src/utils/zcr2/ZeroCrossingRate2.h
     src/utils/spectral/SpectralFeatures.h
@@ -2729,11 +2739,11 @@ set(HEADERS
     # suffix3/SuffixAutomaton.h removed (duplicate of suffix)
     # DUPLICATE REMOVED: src/utils/pca2/KernelPca.h
     src/utils/conv3/FftConvolution.h
-    src/utils/heap7/PairingHeap.h
+    # src/utils/heap7/PairingHeap.h  # removed: duplicate of heap4/PairingHeap
     src/utils/regex2/RegexEngine.h
     src/utils/distance3/DynamicTimeWarping.h
-    src/utils/graph14/StronglyConnected.h
-    src/utils/tree6/RedBlackTree2.h
+    # src/utils/graph14/StronglyConnected.h  # removed: duplicate of graph7/StronglyConnected
+    # src/utils/tree6/RedBlackTree2.h  # removed: duplicate of tree4/RedBlackTree2
     src/utils/interp6/TrigonometricInterp.h
     src/utils/segment4/LazySegmentTree.h
     src/utils/sort8/RadixSort.h
@@ -2743,7 +2753,7 @@ set(HEADERS
     src/utils/priority3/FibonacciPriorityQueue.h
     src/utils/kdtree3/KdTreeNearest.h
     src/utils/entropy4/ShannonCoding.h
-    src/utils/automata3/DfaMinimizer.h
+    # src/utils/automata3/DfaMinimizer.h  # removed: duplicate of automata/DfaMinimizer
     src/utils/norm_test/NormalityTest.h
     src/utils/adaptive_fft/AdaptiveFFT.h
     src/utils/disjoint2/WeightedDisjointSet.h
@@ -2824,7 +2834,7 @@ set(HEADERS
     src/utils/fft14/HilbertTransform.h
     src/utils/graph26/MinimumCostFlow.h
     src/utils/graph27/ChinesePostman.h
-    src/utils/matrix15/ToeplitzSolver.h
+    # src/utils/matrix15/ToeplitzSolver.h  # removed: duplicate of toeplitz/ToeplitzSolver
     src/utils/matrix16/KrylovSolver.h
     src/utils/signal14/Cepstrum.h
     src/utils/signal15/MusicAlgorithm.h
@@ -2837,7 +2847,7 @@ set(HEADERS
     src/utils/graph30/FlowNetwork2.h
     src/utils/matrix19/SparseLU.h
     src/utils/signal18/PitchDetector.h
-    src/utils/tree19/FenwickTree2D.h
+    # src/utils/tree19/FenwickTree2D.h  # removed: duplicate of fenwick2/FenwickTree2D
     # Wave 125-138
     src/utils/cluster12/SpectralClustering3.h
     src/utils/code13/ReedMullerCode.h
@@ -2846,7 +2856,7 @@ set(HEADERS
     src/utils/graph28/DominatorTree.h
     src/utils/matrix17/SchurDecomp2.h
     src/utils/signal16/ViterbiDecoder.h
-    src/utils/tree17/IntervalTree2.h
+    # src/utils/tree17/IntervalTree2.h  # removed: duplicate of tree9/IntervalTree2
     src/utils/cluster13/BirchClustering.h
     src/utils/code14/ConvolutionalCode2.h
     src/utils/dsp15/DelayLine.h
@@ -2867,7 +2877,7 @@ set(HEADERS
     src/utils/matrix20/SparseCholesky.h
     src/utils/matrix21/GeneralizedEigen.h
     src/utils/signal19/SpectralSubtract.h
-    src/utils/signal20/Beamformer.h
+    # src/utils/signal20/Beamformer.h  # removed: duplicate of dsp5/Beamformer
     src/utils/tree20/LinkCutTree.h
     src/utils/tree21/EulerTourTree.h
     src/utils/cluster17/SubspaceCluster.h
@@ -2886,6 +2896,16 @@ set(HEADERS
     src/utils/matrix23/SymmetricEigen3.h
     src/utils/signal22/EnvelopeDetect.h
     src/utils/tree23/CartesianTree2.h
+
+    # ── Wave 110: 亲和力/扰码器/采样率转换/快速Hartley/最大团/稀疏QR/谱白化/配对堆 ──
+    src/utils/cluster22/AffinityCluster.h
+    src/utils/code23/Scrambler.h
+    src/utils/dsp24/SampleRateConv.h
+    src/utils/fft25/FastHartley.h
+    src/utils/graph38/MaxClique.h
+    src/utils/matrix27/SparseQR.h
+    src/utils/signal26/SpectralWhitening.h
+    src/utils/tree27/PairingHeap2.h
 )
 
 set(RESOURCES

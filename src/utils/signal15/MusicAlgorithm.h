@@ -78,7 +78,7 @@ public:
 
 signals:
     /** @brief 估计完成 @param signals 信号数 @param timeMs 耗时 */
-    void estimationComplete(int signals, double timeMs);
+    void estimationComplete(int signalCount, double timeMs);
 
 private:
     /** @brief 计算采样协方差矩阵 @param data 输入数据 @return 协方差矩阵 */

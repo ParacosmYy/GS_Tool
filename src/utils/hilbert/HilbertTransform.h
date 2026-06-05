@@ -12,7 +12,7 @@
 #include <QVector>
 #include <complex>
 
-class HilbertTransform : public QObject {
+class HilbertTransformer : public QObject {
     Q_OBJECT
 public:
     /** 操作统计 */
@@ -21,7 +21,7 @@ public:
         double  avgProcessingTimeMs = 0.0;
     };
 
-    explicit HilbertTransform(QObject* parent = nullptr);
+    explicit HilbertTransformer(QObject* parent = nullptr);
 
     /** @brief Hilbert变换(频域) @param signal 输入信号 @return 变换结果 */
     QVector<double> transform(const QVector<double>& signal);

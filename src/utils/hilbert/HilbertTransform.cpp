@@ -3,22 +3,22 @@
  * @brief Hilbert变换实现 — 频域方法
  */
 
-#include "utils/hilbert/HilbertTransform.h"
+#include "utils/hilbert/HilbertTransformer.h"
 
 #include <QElapsedTimer>
 #include <cmath>
 
-HilbertTransform::HilbertTransform(QObject* parent)
+HilbertTransformer::HilbertTransformer(QObject* parent)
     : QObject(parent), m_timeSum(0.0) {}
 
-int HilbertTransform::nextPow2(int n) const
+int HilbertTransformer::nextPow2(int n) const
 {
     int p = 1;
     while (p < n) p <<= 1;
     return p;
 }
 
-void HilbertTransform::fft(QVector<std::complex<double>>& data, bool inverse)
+void HilbertTransformer::fft(QVector<std::complex<double>>& data, bool inverse)
 {
     int n = data.size();
     if (n <= 1) return;
@@ -51,7 +51,7 @@ void HilbertTransform::fft(QVector<std::complex<double>>& data, bool inverse)
     }
 }
 
-QVector<double> HilbertTransform::transform(const QVector<double>& signal)
+QVector<double> HilbertTransformer::transform(const QVector<double>& signal)
 {
     auto analytic = analyticSignal(signal);
     QVector<double> result;
@@ -68,7 +68,7 @@ QVector<double> HilbertTransform::transform(const QVector<double>& signal)
     return result;
 }
 
-QVector<std::complex<double>> HilbertTransform::analyticSignal(
+QVector<std::complex<double>> HilbertTransformer::analyticSignal(
     const QVector<double>& signal)
 {
     QElapsedTimer timer;
@@ -106,7 +106,7 @@ QVector<std::complex<double>> HilbertTransform::analyticSignal(
     return result;
 }
 
-QVector<double> HilbertTransform::instantaneousFrequency(
+QVector<double> HilbertTransformer::instantaneousFrequency(
     const QVector<double>& signal, double sampleRate)
 {
     auto analytic = analyticSignal(signal);
@@ -126,7 +126,7 @@ QVector<double> HilbertTransform::instantaneousFrequency(
     return freq;
 }
 
-QVector<double> HilbertTransform::envelope(const QVector<double>& signal)
+QVector<double> HilbertTransformer::envelope(const QVector<double>& signal)
 {
     auto analytic = analyticSignal(signal);
     QVector<double> env(signal.size());
@@ -135,7 +135,7 @@ QVector<double> HilbertTransform::envelope(const QVector<double>& signal)
     return env;
 }
 
-void HilbertTransform::resetStatistics()
+void HilbertTransformer::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;
