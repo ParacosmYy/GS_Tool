@@ -1,6 +1,6 @@
 /**
  * @file EnvelopeDetector.cpp
- * @brief 信号包络检测实现 — 峰值/RMS/Hilbert/Attack-Release
+ * @brief 信号包络检测器2实现 — 峰值/RMS/Hilbert/Attack-Release
  */
 
 #include "utils/signal5/EnvelopeDetector.h"
@@ -10,14 +10,14 @@
 #include <algorithm>
 
 /** @brief 构造函数 @param parent 父对象 */
-EnvelopeDetector::EnvelopeDetector(QObject* parent)
+EnvelopeDetector2::EnvelopeDetector2(QObject* parent)
     : QObject(parent)
     , m_timeSum(0.0)
 {
 }
 
 /** @brief 峰值包络 @param signal 输入信号 @param windowSize 窗口大小 @return 包络曲线 */
-QVector<double> EnvelopeDetector::peakEnvelope(
+QVector<double> EnvelopeDetector2::peakEnvelope(
     const QVector<double>& signal, int windowSize)
 {
     QElapsedTimer timer;
@@ -55,7 +55,7 @@ QVector<double> EnvelopeDetector::peakEnvelope(
 }
 
 /** @brief RMS包络 @param signal 输入信号 @param windowSize 窗口大小 @return RMS包络曲线 */
-QVector<double> EnvelopeDetector::rmsEnvelope(
+QVector<double> EnvelopeDetector2::rmsEnvelope(
     const QVector<double>& signal, int windowSize)
 {
     QElapsedTimer timer;
@@ -69,7 +69,7 @@ QVector<double> EnvelopeDetector::rmsEnvelope(
 
     QVector<double> envelope(n, 0.0);
 
-    /* 滑动窗口RMS: 使用累积和方法加速 */
+    /* 预计算平方值 */
     QVector<double> sq(n);
     for (int i = 0; i < n; ++i) {
         sq[i] = signal[i] * signal[i];
@@ -97,7 +97,7 @@ QVector<double> EnvelopeDetector::rmsEnvelope(
 }
 
 /** @brief Hilbert变换(通过DFT) @param signal 输入信号 @return 虚部 */
-QVector<double> EnvelopeDetector::hilbertTransform(
+QVector<double> EnvelopeDetector2::hilbertTransform(
     const QVector<double>& signal) const
 {
     int n = signal.size();
@@ -203,7 +203,7 @@ QVector<double> EnvelopeDetector::hilbertTransform(
 }
 
 /** @brief Hilbert变换包络 @param signal 输入信号 @return 包络曲线 */
-QVector<double> EnvelopeDetector::hilbertEnvelope(
+QVector<double> EnvelopeDetector2::hilbertEnvelope(
     const QVector<double>& signal)
 {
     QElapsedTimer timer;
@@ -233,7 +233,7 @@ QVector<double> EnvelopeDetector::hilbertEnvelope(
 }
 
 /** @brief Attack-Release包络 @param signal 输入信号 @param attackCoeff 攻击系数 @param releaseCoeff 释放系数 @return 包络曲线 */
-QVector<double> EnvelopeDetector::attackReleaseEnvelope(
+QVector<double> EnvelopeDetector2::attackReleaseEnvelope(
     const QVector<double>& signal,
     double attackCoeff,
     double releaseCoeff)
@@ -276,7 +276,7 @@ QVector<double> EnvelopeDetector::attackReleaseEnvelope(
 }
 
 /** @brief 重置统计 */
-void EnvelopeDetector::resetStatistics()
+void EnvelopeDetector2::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;

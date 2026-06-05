@@ -6,6 +6,7 @@
 #include "utils/segment2/GraphSegmenter.h"
 
 #include <QElapsedTimer>
+#include <QMap>
 #include <QtMath>
 #include <algorithm>
 

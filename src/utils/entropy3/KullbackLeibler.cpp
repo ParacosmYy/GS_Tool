@@ -44,7 +44,6 @@ double KullbackLeibler::klDivergence(const QVector<double>& p,
     m_stats.avgProcessingTimeMs = m_timeSum
         / static_cast<double>(m_stats.totalComputations);
 
-    emit computationCompleted(kl, tr("KL-Divergence"));
     return kl;
 }
 
@@ -76,7 +75,6 @@ double KullbackLeibler::crossEntropy(const QVector<double>& p,
     m_stats.avgProcessingTimeMs = m_timeSum
         / static_cast<double>(m_stats.totalComputations);
 
-    emit computationCompleted(h, tr("Cross-Entropy"));
     return h;
 }
 
@@ -119,7 +117,6 @@ double KullbackLeibler::jsDivergence(const QVector<double>& p,
     m_stats.avgProcessingTimeMs = m_timeSum
         / static_cast<double>(m_stats.totalComputations);
 
-    emit computationCompleted(js, tr("JS-Divergence"));
     return js;
 }
 
@@ -142,7 +139,6 @@ double KullbackLeibler::shannonEntropy(const QVector<double>& p) const
     m_stats.avgProcessingTimeMs = m_timeSum
         / static_cast<double>(m_stats.totalComputations);
 
-    emit computationCompleted(h, tr("Shannon"));
     return h;
 }
 

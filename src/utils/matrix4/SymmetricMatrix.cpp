@@ -60,7 +60,6 @@ QVector<double> SymmetricMatrix::multiply(const QVector<double>& vec) const
     m_stats.avgProcessingTimeMs = m_timeSum
         / static_cast<double>(m_stats.totalOperations);
 
-    emit operationCompleted(tr("Multiply"));
     return result;
 }
 
@@ -155,7 +154,6 @@ QVector<double> SymmetricMatrix::eigenvalues() const
     m_stats.avgProcessingTimeMs = m_timeSum
         / static_cast<double>(m_stats.totalOperations);
 
-    emit operationCompleted(tr("Eigenvalues"));
     return eigenvals;
 }
 
@@ -189,7 +187,6 @@ double SymmetricMatrix::determinant() const
     m_stats.avgProcessingTimeMs = m_timeSum
         / static_cast<double>(m_stats.totalOperations);
 
-    emit operationCompleted(tr("Determinant"));
     return det;
 }
 

@@ -87,6 +87,6 @@ private:
     double m_epsilon;              /**< 误差容限 */
     QVector<Tuple> m_summary;      /**< 摘要结构 */
     int m_n;                       /**< 已处理元素数 */
-    Stats m_stats;                 /**< 统计 */
+    mutable Stats m_stats;                 /**< 统计 */
     mutable double m_timeSum;      /**< 累计时间 */
 };

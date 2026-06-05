@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QVector>
 #include <QPair>
+#include <QVariant>
 
 /**
  * @class BinomialHeap

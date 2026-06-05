@@ -75,9 +75,9 @@ signals:
     void setsUnited(int root1, int root2, int newSetCount);
 
 private:
-    QVector<int> m_parent;      /**< 父节点数组 */
-    QVector<int> m_rank;        /**< 秩数组 */
+    mutable QVector<int> m_parent;      /**< 父节点数组 */
+    mutable QVector<int> m_rank;        /**< 秩数组 */
     int m_setCount;             /**< 当前集合数 */
-    Stats m_stats;              /**< 统计 */
+    mutable Stats m_stats;              /**< 统计 */
     mutable double m_timeSum;   /**< 累计时间 */
 };

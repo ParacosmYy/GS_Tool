@@ -1,6 +1,6 @@
 /**
  * @file LuDecomposition.h
- * @brief LU分解 — 部分主元选取/求解/行列式/逆矩阵
+ * @brief LU分解2 — 部分主元选取/求解/行列式/逆矩阵(linalg4)
  *
  * 功能: 对方阵执行LU分解(PA=LU)，支持线性方程组求解、
  *       行列式计算和矩阵求逆，使用部分主元选取保证数值稳定性。
@@ -13,9 +13,9 @@
 #include <QVector>
 
 /**
- * @brief LU分解器(部分主元选取)
+ * @brief LU分解器2(部分主元选取) — linalg4变体
  */
-class LuDecomposition : public QObject {
+class LuDecomposition2 : public QObject {
     Q_OBJECT
 
 public:
@@ -26,7 +26,7 @@ public:
     };
 
     /** @brief 构造函数 @param parent 父对象 */
-    explicit LuDecomposition(QObject* parent = nullptr);
+    explicit LuDecomposition2(QObject* parent = nullptr);
 
     /**
      * @brief LU分解(PA = LU)
@@ -68,18 +68,7 @@ signals:
     void decompositionCompleted(int n);
 
 private:
-    /**
-     * @brief 前代求解 Ly = Pb
-     * @param b 变换后的右端向量
-     * @return y向量
-     */
     QVector<double> forwardSub(const QVector<double>& b) const;
-
-    /**
-     * @brief 回代求解 Ux = y
-     * @param y 中间向量
-     * @return x向量
-     */
     QVector<double> backSub(const QVector<double>& y) const;
 
     int m_n;                                    ///< 矩阵维度

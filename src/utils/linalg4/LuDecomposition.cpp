@@ -1,16 +1,16 @@
 /**
- * @file LuDecomposition.cpp
+ * @file LuDecomposition2.cpp
  * @brief LU分解实现 — 部分主元选取/求解/行列式/逆矩阵
  */
 
-#include "utils/linalg4/LuDecomposition.h"
+#include "utils/linalg4/LuDecomposition2.h"
 
 #include <QElapsedTimer>
 #include <QtMath>
 #include <algorithm>
 
 /** @brief 构造函数 @param parent 父对象 */
-LuDecomposition::LuDecomposition(QObject* parent)
+LuDecomposition2::LuDecomposition2(QObject* parent)
     : QObject(parent)
     , m_n(0)
     , m_parity(1)
@@ -21,7 +21,7 @@ LuDecomposition::LuDecomposition(QObject* parent)
 }
 
 /** @brief LU分解 @param A 方阵输入 @return 是否成功 */
-bool LuDecomposition::decompose(const QVector<QVector<double>>& A)
+bool LuDecomposition2::decompose(const QVector<QVector<double>>& A)
 {
     QElapsedTimer timer;
     timer.start();
@@ -106,7 +106,7 @@ bool LuDecomposition::decompose(const QVector<QVector<double>>& A)
 }
 
 /** @brief 前代求解 Ly = Pb @param b 变换后右端向量 @return y向量 */
-QVector<double> LuDecomposition::forwardSub(const QVector<double>& b) const
+QVector<double> LuDecomposition2::forwardSub(const QVector<double>& b) const
 {
     QVector<double> y(m_n, 0.0);
     for (int i = 0; i < m_n; ++i) {
@@ -120,7 +120,7 @@ QVector<double> LuDecomposition::forwardSub(const QVector<double>& b) const
 }
 
 /** @brief 回代求解 Ux = y @param y 中间向量 @return x向量 */
-QVector<double> LuDecomposition::backSub(const QVector<double>& y) const
+QVector<double> LuDecomposition2::backSub(const QVector<double>& y) const
 {
     QVector<double> x(m_n, 0.0);
     for (int i = m_n - 1; i >= 0; --i) {
@@ -138,7 +138,7 @@ QVector<double> LuDecomposition::backSub(const QVector<double>& y) const
 }
 
 /** @brief 求解线性方程组 @param b 右端向量 @return 解向量 */
-QVector<double> LuDecomposition::solve(const QVector<double>& b)
+QVector<double> LuDecomposition2::solve(const QVector<double>& b)
 {
     if (!m_decomposed || m_singular || b.size() != m_n) return {};
 
@@ -153,7 +153,7 @@ QVector<double> LuDecomposition::solve(const QVector<double>& b)
 }
 
 /** @brief 计算行列式 @return 行列式值 */
-double LuDecomposition::determinant()
+double LuDecomposition2::determinant()
 {
     if (!m_decomposed) return 0.0;
 
@@ -165,7 +165,7 @@ double LuDecomposition::determinant()
 }
 
 /** @brief 计算逆矩阵 @return 逆矩阵 */
-QVector<QVector<double>> LuDecomposition::inverse()
+QVector<QVector<double>> LuDecomposition2::inverse()
 {
     if (!m_decomposed || m_singular) return {};
 
@@ -193,7 +193,7 @@ QVector<QVector<double>> LuDecomposition::inverse()
 }
 
 /** @brief 重置统计 */
-void LuDecomposition::resetStatistics()
+void LuDecomposition2::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;

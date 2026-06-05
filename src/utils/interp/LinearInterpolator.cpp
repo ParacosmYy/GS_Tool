@@ -114,7 +114,6 @@ QVector<double> LinearInterpolator::interpolateBatch(
     m_stats.avgProcessingTimeMs = m_timeSum
         / static_cast<double>(m_stats.totalInterpolations);
 
-    emit interpolationComplete(xs.size());
     return results;
 }
 

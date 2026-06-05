@@ -168,7 +168,7 @@ double PhaseUnwrapper::wrapDiff(double diff) const
 {
     double d = diff;
     /* 将差值归到 [-pi, pi] 范围 */
-    d = qFmod(d + M_PI, 2.0 * M_PI);
+    d = std::fmod(d + M_PI, 2.0 * M_PI);
     if (d < 0.0) d += 2.0 * M_PI;
     return d - M_PI;
 }

@@ -1,9 +1,10 @@
 /**
  * @file EnvelopeDetector.h
- * @brief 信号包络检测 — 峰值/RMS/Hilbert/Attack-Release
+ * @brief 信号包络检测器2 — 峰值/RMS/Hilbert/Attack-Release
  *
  * 功能: 提取信号的包络曲线，支持峰值包络、RMS包络、Hilbert变换包络
  *       和Attack-Release包络四种方法，用于信号分析和音频处理。
+ *       与envelope/EnvelopeDetector不同，本模块提供更细粒度的方法控制。
  *
  * 协作: SpectrumAnalyzer(频谱) / DigitalFilter(滤波器)
  */
@@ -13,9 +14,9 @@
 #include <QVector>
 
 /**
- * @brief 信号包络检测器
+ * @brief 信号包络检测器(增强版)
  */
-class EnvelopeDetector : public QObject {
+class EnvelopeDetector2 : public QObject {
     Q_OBJECT
 
 public:
@@ -26,7 +27,7 @@ public:
     };
 
     /** @brief 构造函数 @param parent 父对象 */
-    explicit EnvelopeDetector(QObject* parent = nullptr);
+    explicit EnvelopeDetector2(QObject* parent = nullptr);
 
     /**
      * @brief 峰值包络

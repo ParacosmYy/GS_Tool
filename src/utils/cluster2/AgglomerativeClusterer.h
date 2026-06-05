@@ -12,6 +12,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QMap>
 #include <QPair>
 #include <functional>
 
