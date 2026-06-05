@@ -100,6 +100,69 @@ int GrayCode6::grayToBinary(int gray) const
 }
 
 /**
+ * @brief 生成n位Gray码的所有相邻差分
+ *
+ * 计算Gray码序列中相邻码字之间的汉明距离(始终为1)，
+ * 并返回每个位置的翻转位索引。可用于解码和错误检测。
+ *
+ * @param bits Gray码位数
+ * @return 每个位置翻转的位索引(0-indexed)
+ */
+QVector<int> GrayCode6::generateFlipSequence(int bits)
+{
+    QElapsedTimer timer;
+    timer.start();
+
+    QVector<int> flips;
+
+    if (bits < 1 || bits > 31) {
+        m_timeSum += timer.elapsed();
+        return flips;
+    }
+
+    /* 生成完整Gray码序列 */
+    QVector<int> seq = generate(bits);
+
+    /* 计算相邻码字的异或，找出翻转位 */
+    for (int i = 1; i < seq.size(); ++i) {
+        int diff = seq[i] ^ seq[i - 1];
+        int bitPos = 0;
+        while (diff > 1) {
+            diff >>= 1;
+            bitPos++;
+        }
+        flips.append(bitPos);
+    }
+
+    m_timeSum += timer.elapsed();
+
+    return flips;
+}
+
+/**
+ * @brief 验证序列是否为合法的Gray码
+ *
+ * 检查序列中每对相邻元素是否恰好只有一位不同。
+ *
+ * @param sequence 待验证的码字序列
+ * @return true如果是合法的Gray码序列
+ */
+bool GrayCode6::validateGraySequence(const QVector<int>& sequence) const
+{
+    if (sequence.size() < 2) return true;
+
+    for (int i = 1; i < sequence.size(); ++i) {
+        int diff = sequence[i] ^ sequence[i - 1];
+        /* 恰好一位不同 => diff是2的幂 */
+        if (diff == 0 || (diff & (diff - 1)) != 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
  * @brief 重置所有统计数据
  *
  * 将序列生成计数、转换计数和计时归零。

@@ -165,3 +165,72 @@ void DBSCAN10::resetStatistics()
     m_stats = Stats();
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 计算核心点数量
+ * @param points 数据点集合
+ * @return 满足minPts邻域条件的核心点数量
+ */
+int DBSCAN10::countCorePoints(const QVector<QVector<double>>& points) const
+{
+    const int N = points.size();
+    if (N == 0) return 0;
+
+    const int D = points[0].size();
+    int coreCount = 0;
+
+    for (int i = 0; i < N; ++i) {
+        int neighborCount = 0;
+        for (int j = 0; j < N; ++j) {
+            if (i == j) continue;
+            double dist = 0.0;
+            for (int d = 0; d < D; ++d) {
+                double diff = points[i][d] - points[j][d];
+                dist += diff * diff;
+            }
+            if (qSqrt(dist) <= m_eps) neighborCount++;
+        }
+        if (neighborCount >= m_minPts) coreCount++;
+    }
+
+    return coreCount;
+}
+
+/**
+ * @brief 估计数据集的最佳epsilon参数
+ * @param points 数据点集合
+ * @param k 邻居数量（通常等于minPts）
+ * @return 建议的epsilon值
+ *
+ * 使用k-distance图法：计算每个点到第k近邻的距离，
+ * 然后返回这些距离的中位数作为建议的epsilon。
+ */
+double DBSCAN10::estimateEpsilon(const QVector<QVector<double>>& points, int k) const
+{
+    const int N = points.size();
+    if (N == 0 || k <= 0) return m_eps;
+
+    const int D = points[0].size();
+    QVector<double> kDistances;
+
+    for (int i = 0; i < N; ++i) {
+        QVector<double> dists;
+        for (int j = 0; j < N; ++j) {
+            if (i == j) continue;
+            double dist = 0.0;
+            for (int d = 0; d < D; ++d) {
+                double diff = points[i][d] - points[j][d];
+                dist += diff * diff;
+            }
+            dists.append(qSqrt(dist));
+        }
+        std::sort(dists.begin(), dists.end());
+        if (k - 1 < dists.size()) {
+            kDistances.append(dists[k - 1]);
+        }
+    }
+
+    if (kDistances.isEmpty()) return m_eps;
+    std::sort(kDistances.begin(), kDistances.end());
+    return kDistances[kDistances.size() / 2];
+}

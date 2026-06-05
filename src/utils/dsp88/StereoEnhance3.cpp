@@ -108,6 +108,47 @@ void StereoEnhance3::setWidth(double width)
 }
 
 /**
+ * @brief 计算当前立体声的相关系数
+ *
+ * 相关系数表示左右声道的线性相关程度:
+ * r = Σ(L[i]*R[i]) / sqrt(ΣL[i]^2 * ΣR[i]^2)
+ *
+ * r接近1: 高度相关(窄立体声)
+ * r接近0: 不相关(宽立体声)
+ * r接近-1: 反相关(超宽/异常)
+ *
+ * @param left 左声道采样
+ * @param right 右声道采样
+ * @return 相关系数(-1~1)
+ */
+double StereoEnhance3::correlation(const QVector<double>& left,
+                                    const QVector<double>& right) const
+{
+    int N = qMin(left.size(), right.size());
+    if (N == 0) return 0.0;
+
+    double sumLR = 0.0, sumLL = 0.0, sumRR = 0.0;
+    for (int i = 0; i < N; ++i) {
+        sumLR += left[i] * right[i];
+        sumLL += left[i] * left[i];
+        sumRR += right[i] * right[i];
+    }
+
+    double denom = qSqrt(sumLL * sumRR);
+    if (denom < 1e-15) return 0.0;
+    return sumLR / denom;
+}
+
+/**
+ * @brief 获取当前宽度设置
+ * @return 宽度参数(0~1)
+ */
+double StereoEnhance3::width() const
+{
+    return m_width;
+}
+
+/**
  * @brief 重置所有统计数据
  *
  * 将采样计数、帧计数和计时归零。

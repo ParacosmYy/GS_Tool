@@ -26,6 +26,12 @@ public:
     /** @brief 设置增强宽度(0~1) */
     void setWidth(double width);
 
+    /** @brief 计算左右声道相关系数 */
+    double correlation(const QVector<double>& left, const QVector<double>& right) const;
+
+    /** @brief 获取当前宽度 */
+    double width() const;
+
     Stats stats() const { return m_stats; }
     void resetStatistics();
 

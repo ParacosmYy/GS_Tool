@@ -24,6 +24,15 @@ public:
     /** @brief 批量计算过零率序列 */
     QVector<double> computeSequence(const QVector<double>& samples, int frameSize, int hopSize);
 
+    /** @brief 利用ZCR估计频率 */
+    double estimateFrequency(const QVector<double>& frame, double sampleRate) const;
+
+    /** @brief 检测帧是否为有声 */
+    bool isVoiced(const QVector<double>& frame, double lowThreshold = 0.01, double highThreshold = 0.45) const;
+
+    /** @brief 计算短时能量 */
+    double shortTimeEnergy(const QVector<double>& frame) const;
+
     Stats stats() const { return m_stats; }
     void resetStatistics();
 

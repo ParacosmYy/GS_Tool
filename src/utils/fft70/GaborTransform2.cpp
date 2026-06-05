@@ -182,3 +182,47 @@ void GaborTransform2::designGaborAtom()
         for (double& g : m_gabor) g /= norm;
     }
 }
+
+/**
+ * @brief 计算Gabor系数的能量分布
+ * @param transform Gabor变换结果
+ * @return 每帧的总能量
+ */
+QVector<double> GaborTransform2::energyDistribution(const QVector<QVector<double>>& transform) const
+{
+    QVector<double> energy;
+    if (transform.isEmpty()) return energy;
+
+    energy.reserve(transform.size());
+    for (const auto& frame : transform) {
+        double sum = 0.0;
+        for (double v : frame) sum += v * v;
+        energy.append(sum);
+    }
+    return energy;
+}
+
+/**
+ * @brief 计算瞬时频率估计
+ * @param transform Gabor变换结果
+ * @return 每帧的峰值频率索引
+ */
+QVector<int> GaborTransform2::peakFrequencies(const QVector<QVector<double>>& transform) const
+{
+    QVector<int> peaks;
+    if (transform.isEmpty()) return peaks;
+
+    peaks.reserve(transform.size());
+    for (const auto& frame : transform) {
+        int bestBin = 0;
+        double bestVal = 0.0;
+        for (int k = 0; k < frame.size(); ++k) {
+            if (frame[k] > bestVal) {
+                bestVal = frame[k];
+                bestBin = k;
+            }
+        }
+        peaks.append(bestBin);
+    }
+    return peaks;
+}

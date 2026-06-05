@@ -10,7 +10,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "matrix42/SparseCholesky3.h"
+#include "utils/matrix42/SparseCholesky3.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

@@ -191,3 +191,49 @@ QVector<int> WalshHadamard4::sequencyPermutation(int n) const
 
     return perm;
 }
+
+/**
+ * @brief 计算Walsh功率谱
+ * @param data 输入数据
+ * @return 功率谱（变换系数的平方）
+ */
+QVector<double> WalshHadamard4::powerSpectrum(const QVector<double>& data) const
+{
+    QVector<double> fwd = forward(data);
+    for (double& v : fwd) v = v * v;
+    return fwd;
+}
+
+/**
+ * @brief 使用WHT进行自相关计算
+ * @param data 输入信号
+ * @return 自相关函数
+ *
+ * 利用Wiener-Khinchin定理：自相关 = IWHT(WHT(x)^2)
+ */
+QVector<double> WalshHadamard4::autoCorrelation(const QVector<double>& data) const
+{
+    // 前向变换
+    QVector<double> fwd = forward(data);
+
+    // 功率谱（取平方）
+    for (double& v : fwd) v = v * v;
+
+    // 逆变换得到自相关
+    return inverse(fwd);
+}
+
+/**
+ * @brief 计算序列的Walsh序号
+ * @param data 输入序列
+ * @return Walsh序号（过零次数）
+ */
+int WalshHadamard4::walshOrder(const QVector<double>& data) const
+{
+    if (data.size() < 2) return 0;
+    int crossings = 0;
+    for (int i = 1; i < data.size(); ++i) {
+        if ((data[i] >= 0.0) != (data[i - 1] >= 0.0)) crossings++;
+    }
+    return crossings;
+}

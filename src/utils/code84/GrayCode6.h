@@ -27,6 +27,12 @@ public:
     /** @brief Gray码转二进制 */
     int grayToBinary(int gray) const;
 
+    /** @brief 生成Gray码翻转位序列 */
+    QVector<int> generateFlipSequence(int bits);
+
+    /** @brief 验证序列是否为合法Gray码 */
+    bool validateGraySequence(const QVector<int>& sequence) const;
+
     Stats stats() const { return m_stats; }
     void resetStatistics();
 

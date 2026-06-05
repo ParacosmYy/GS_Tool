@@ -1,5 +1,6 @@
 #include "KroneckerProduct3.h"
 #include <QElapsedTimer>
+#include <algorithm>
 
 /**
  * @brief 构造函数，初始化Kronecker积计算器
@@ -18,6 +19,10 @@ KroneckerProduct3::KroneckerProduct3(QObject* parent)
  * C[i*p+j, k*q+l] = A[i,k] * B[j,l]
  *
  * 结果矩阵的每个块都是A的对应元素乘以整个B矩阵。
+ * Kronecker积满足以下性质：
+ * - (A ⊗ B)(C ⊗ D) = AC ⊗ BD（若维度兼容）
+ * - (A ⊗ B)^T = A^T ⊗ B^T
+ * - (A ⊗ B)^{-1} = A^{-1} ⊗ B^{-1}（若A、B可逆）
  *
  * @param a 左操作数矩阵A(m x n)
  * @param b 右操作数矩阵B(p x q)
@@ -34,7 +39,16 @@ QVector<QVector<double>> KroneckerProduct3::compute(const QVector<QVector<double
     const int rowsB = b.size();
     const int colsB = (rowsB > 0) ? b[0].size() : 0;
 
+    /// 输入验证：检查空矩阵
     if (rowsA == 0 || colsA == 0 || rowsB == 0 || colsB == 0) return {};
+
+    /// 验证所有行长度一致
+    for (int i = 0; i < rowsA; ++i) {
+        if (a[i].size() != colsA) return {};
+    }
+    for (int i = 0; i < rowsB; ++i) {
+        if (b[i].size() != colsB) return {};
+    }
 
     const int resultRows = rowsA * rowsB;
     const int resultCols = colsA * colsB;
@@ -42,7 +56,7 @@ QVector<QVector<double>> KroneckerProduct3::compute(const QVector<QVector<double
     /// 初始化结果矩阵
     QVector<QVector<double>> result(resultRows, QVector<double>(resultCols, 0.0));
 
-    /// 计算Kronecker积
+    /// 计算Kronecker积：逐块填充
     long long elementsComputed = 0;
     for (int ia = 0; ia < rowsA; ++ia) {
         for (int ja = 0; ja < colsA; ++ja) {
@@ -72,6 +86,9 @@ QVector<QVector<double>> KroneckerProduct3::compute(const QVector<QVector<double
  * 将两个向量视为列向量，计算Kronecker积并展平为一维向量。
  * a(m) ⊗ b(n) = [a[0]*b, a[1]*b, ..., a[m-1]*b]，长度为m*n。
  *
+ * 此形式常用于张量积空间的向量化表示，
+ * 在量子计算（张量网络）和信号处理中有广泛应用。
+ *
  * @param a 左操作数向量
  * @param b 右操作数向量
  * @return 展平后的Kronecker积向量
@@ -89,7 +106,7 @@ QVector<double> KroneckerProduct3::computeFlat(const QVector<double>& a, const Q
     QVector<double> result;
     result.reserve(na * nb);
 
-    /// 展平Kronecker积
+    /// 展平Kronecker积：a[i] * b[j] 逐元素相乘
     for (int i = 0; i < na; ++i) {
         for (int j = 0; j < nb; ++j) {
             result.append(a[i] * b[j]);

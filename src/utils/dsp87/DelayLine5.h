@@ -24,6 +24,12 @@ public:
     /** @brief 设置延迟参数(延迟时间/反馈/混合比) */
     void setParameters(double delayMs, double feedback, double mix);
 
+    /** @brief 计算回声密度 */
+    double echoDensity(double thresholdMin = -60.0) const;
+
+    /** @brief 获取当前参数 */
+    QVector<double> parameters() const;
+
     Stats stats() const { return m_stats; }
     void resetStatistics();
 

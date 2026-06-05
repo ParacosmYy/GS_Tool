@@ -193,3 +193,46 @@ void HouseholderQR2::resetStatistics()
     m_stats = Stats();
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 计算矩阵的条件数估计
+ * @return 条件数估计值（R对角线最大/最小比值）
+ */
+double HouseholderQR2::conditionNumber() const
+{
+    if (m_R.isEmpty()) return 1.0;
+
+    int minDim = qMin(m_rows, m_cols);
+    double maxDiag = 0.0, minDiag = 1e18;
+
+    for (int i = 0; i < minDim; ++i) {
+        double d = qAbs(m_R[i][i]);
+        maxDiag = qMax(maxDiag, d);
+        minDiag = qMin(minDiag, d);
+    }
+
+    return (minDiag > 1e-300) ? maxDiag / minDiag : 1e18;
+}
+
+/**
+ * @brief 计算矩阵的有效秩
+ * @param tol 容差阈值
+ * @return 有效秩（R对角线中大于tol*max(|diag|)的元素个数）
+ */
+int HouseholderQR2::effectiveRank(double tol) const
+{
+    if (m_R.isEmpty()) return 0;
+
+    int minDim = qMin(m_rows, m_cols);
+    double maxDiag = 0.0;
+    for (int i = 0; i < minDim; ++i) {
+        maxDiag = qMax(maxDiag, qAbs(m_R[i][i]));
+    }
+
+    double threshold = tol * maxDiag;
+    int rank = 0;
+    for (int i = 0; i < minDim; ++i) {
+        if (qAbs(m_R[i][i]) > threshold) rank++;
+    }
+    return rank;
+}

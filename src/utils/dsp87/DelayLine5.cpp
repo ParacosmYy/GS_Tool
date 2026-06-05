@@ -108,6 +108,41 @@ void DelayLine5::setParameters(double delayMs, double feedback, double mix)
 }
 
 /**
+ * @brief 计算当前延迟线的理论回声密度
+ *
+ * 回声密度指在单位时间内可区分的回声数量。
+ * 基于反馈系数和延迟时间计算:
+ * - 回声数 = -ln(threshold) / -ln(feedback)
+ * - 回声密度 = 回声数 / 延迟时间
+ *
+ * @param thresholdMin 回声的最小可听阈值(默认-60dB)
+ * @return 回声密度(回声数/秒)
+ */
+double DelayLine5::echoDensity(double thresholdMin) const
+{
+    if (m_feedback <= 0.0 || m_delayMs <= 0.0) return 0.0;
+
+    /* 计算回声衰减到阈值以下所需的次数 */
+    double decayRatio = qPow(10.0, thresholdMin / 20.0); /* dB转线性 */
+    if (m_feedback >= 1.0) return 1e6;
+
+    int echoCount = static_cast<int>(qLn(decayRatio) / qLn(m_feedback)) + 1;
+    echoCount = qMax(1, echoCount);
+
+    double density = static_cast<double>(echoCount) / (m_delayMs / 1000.0);
+    return density;
+}
+
+/**
+ * @brief 获取当前延迟参数
+ * @return {延迟时间ms, 反馈系数, 干湿比}
+ */
+QVector<double> DelayLine5::parameters() const
+{
+    return {m_delayMs, m_feedback, m_mix};
+}
+
+/**
  * @brief 重置所有统计数据
  *
  * 将采样计数、缓冲区计数和计时归零。

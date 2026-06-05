@@ -171,3 +171,34 @@ double ChorusEffect3::lfo(double phase, int voice) const
     double p = phase + voice * 0.1;
     return qSin(p);
 }
+
+/**
+ * @brief 计算当前参数下的理论延迟范围
+ * @return QPair(最小延迟ms, 最大延迟ms)
+ */
+QPair<double, double> ChorusEffect3::delayRange() const
+{
+    double minDelay = 0.0;
+    double maxDelay = m_depth * 2.0; // LFO范围[-1,1]映射到[0, depth*2]
+    return {minDelay, maxDelay};
+}
+
+/**
+ * @brief 计算合唱效果的调制频率范围
+ * @return 调制频率(Hz)
+ */
+double ChorusEffect3::modulationFrequency() const
+{
+    return m_rate;
+}
+
+/**
+ * @brief 重置延迟线缓冲区
+ */
+void ChorusEffect3::resetBuffers()
+{
+    for (auto& buf : m_buffers) {
+        std::fill(buf.begin(), buf.end(), 0.0);
+    }
+    std::fill(m_bufPos.begin(), m_bufPos.end(), 0);
+}

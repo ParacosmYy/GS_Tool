@@ -19,7 +19,11 @@ ConstantQ4::ConstantQ4(QObject* parent)
  * 在高频段分辨率较粗，呈对数分布。这使得它比线性FFT
  * 更适合音乐信号分析，因为音阶本身就是对数分布的。
  *
- * 使用简化的频域计算方法，对每个频段计算能量。
+ * 算法流程：
+ * 1. 计算对数分布的频带中心频率
+ * 2. 对每个频带计算最优Q值的窗口长度
+ * 3. 加汉宁窗后在该频带中心频率处计算DFT
+ * 4. 取幅度作为该频带的能量值
  *
  * @param samples 输入采样数据
  * @param sampleRate 采样率(Hz)
@@ -37,9 +41,14 @@ QVector<double> ConstantQ4::transform(const QVector<double>& samples, double sam
     const int N = samples.size();
     if (N == 0 || minFreq <= 0.0 || maxFreq <= minFreq) return {};
 
+    /// 参数验证
+    binsPerOctave = qBound(1, binsPerOctave, 48);
+
     /// 计算总八度数和频带数
     const double octaves = std::log2(maxFreq / minFreq);
     const int totalBins = static_cast<int>(std::ceil(octaves * binsPerOctave));
+
+    if (totalBins <= 0 || totalBins > 10000) return {};
 
     /// 预计算各频带的中心频率
     m_binFreqs.resize(totalBins);
@@ -47,19 +56,23 @@ QVector<double> ConstantQ4::transform(const QVector<double>& samples, double sam
         m_binFreqs[k] = minFreq * std::pow(2.0, static_cast<double>(k) / binsPerOctave);
     }
 
-    /// 预计算FFT（简化DFT）
-    QVector<double> magnitudes(totalBins);
+    /// 计算品质因子Q
     const double Q = 1.0 / (std::pow(2.0, 1.0 / binsPerOctave) - 1.0);
 
+    /// 预分配输出
+    QVector<double> magnitudes(totalBins);
+
+    /// 逐频带计算CQT值
     for (int k = 0; k < totalBins; ++k) {
         double freq = m_binFreqs[k];
         int windowSize = qMin(N, static_cast<int>(Q * sampleRate / freq));
+        windowSize = qMax(4, windowSize);  ///< 确保最小窗口
 
-        /// 窗口边界
+        /// 窗口中心对齐
         int start = qMax(0, (N - windowSize) / 2);
         double real = 0.0, imag = 0.0;
 
-        /// 计算该频带的DFT值（加汉宁窗）
+        /// 加汉宁窗DFT计算该频带的复数值
         for (int i = 0; i < windowSize; ++i) {
             double t = static_cast<double>(i) / sampleRate;
             double window = 0.5 * (1.0 - std::cos(2.0 * M_PI * i / (windowSize - 1)));
@@ -68,6 +81,7 @@ QVector<double> ConstantQ4::transform(const QVector<double>& samples, double sam
             imag -= sample * std::sin(2.0 * M_PI * freq * t);
         }
 
+        /// 计算归一化幅度
         magnitudes[k] = std::sqrt(real * real + imag * imag) / windowSize;
     }
 

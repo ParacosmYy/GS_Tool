@@ -105,6 +105,48 @@ void NoiseGate5::setParameters(double thresholdDb, double attackMs, double relea
 }
 
 /**
+ * @brief 检测输入信号的RMS电平
+ *
+ * 计算输入缓冲区的均方根(RMS)电平，以dB表示。
+ * RMS电平比瞬时幅值更能反映信号的平均响度，
+ * 常用于噪声门的侧链控制。
+ *
+ * @param input 输入音频缓冲区
+ * @return RMS电平(dB)
+ */
+double NoiseGate5::computeRmsLevel(const QVector<double>& input) const
+{
+    if (input.isEmpty()) return -120.0;
+
+    double sumSq = 0.0;
+    for (double sample : input) {
+        sumSq += sample * sample;
+    }
+    double rms = qSqrt(sumSq / input.size());
+
+    if (rms < 1e-10) return -120.0;
+    return 20.0 * qLn(rms) / qLn(10.0);
+}
+
+/**
+ * @brief 获取当前门状态
+ * @return true表示门开启(信号通过)，false表示门关闭(信号被抑制)
+ */
+bool NoiseGate5::isGateOpen() const
+{
+    return m_gateOpen;
+}
+
+/**
+ * @brief 获取当前阈值设置
+ * @return 门限阈值(dB)
+ */
+double NoiseGate5::threshold() const
+{
+    return m_threshold;
+}
+
+/**
  * @brief 重置所有统计数据
  *
  * 将采样处理计数、门事件计数和计时归零。

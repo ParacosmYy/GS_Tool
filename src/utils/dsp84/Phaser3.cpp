@@ -18,11 +18,12 @@ Phaser3::Phaser3(QObject* parent)
  *
  * Phaser通过级联全通滤波器产生相位偏移：
  * 1. LFO（低频振荡器）调制全通滤波器的截止频率
- * 2. 全通滤波器改变信号相位但保持幅度
+ * 2. 全通滤波器改变信号相位但保持幅度不变
  * 3. 原始信号与处理后的信号混合产生相位抵消（梳状陷波）
- * 4. 反馈回路增强效果
+ * 4. 反馈回路增强效果深度和持续性
  *
- * 典型效果：旋转的"嗖嗖"声，常用于吉他和合成器。
+ * 典型效果：旋转的"嗖嗖"声，广泛用于吉他和合成器音色塑造。
+ * 每级全通滤波器提供一个陷波点，级数越多陷波点越密集。
  *
  * @param input 输入音频采样序列
  * @return 处理后的音频采样序列
@@ -37,25 +38,27 @@ QVector<double> Phaser3::process(const QVector<double>& input)
 
     QVector<double> output(n);
 
-    /// 全通滤波器状态（每级两个延迟单元）
+    /// 全通滤波器状态（每级需要两个延迟单元）
     const int numStages = m_stages;
-    QVector<double> xState(numStages, 0.0);  ///< 输入延迟
-    QVector<double> yState(numStages, 0.0);  ///< 输出延迟
+    QVector<double> xState(numStages, 0.0);  ///< 输入延迟状态
+    QVector<double> yState(numStages, 0.0);  ///< 输出延迟状态
 
     static double feedback = 0.0;
     const double sampleRate = 44100.0;
     static double phase = 0.0;
 
+    /// 逐采样处理
     for (int i = 0; i < n; ++i) {
-        /// LFO调制：三角波产生中心频率偏移
-        double lfoValue = 2.0 * std::abs(2.0 * (phase * m_rate - std::floor(phase * m_rate + 0.5))) - 1.0;
+        /// LFO调制：三角波产生中心频率的周期性偏移
+        double lfoValue = 2.0 * std::abs(2.0 * (phase * m_rate -
+                          std::floor(phase * m_rate + 0.5))) - 1.0;
         double modFreq = 1000.0 + lfoValue * 800.0;  ///< 调制范围200~1800Hz
 
-        /// 计算全通系数
+        /// 计算一阶全通滤波器系数 a1 = (tan(w) - 1) / (tan(w) + 1)
         double tanVal = std::tan(M_PI * modFreq / sampleRate);
         double a1 = (tanVal - 1.0) / (tanVal + 1.0);
 
-        /// 级联全通滤波处理
+        /// 级联全通滤波处理（每级提供180度相位偏移）
         double sample = input[i] + feedback * 0.7;
 
         for (int s = 0; s < numStages; ++s) {
@@ -65,10 +68,10 @@ QVector<double> Phaser3::process(const QVector<double>& input)
             sample = newSample;
         }
 
-        /// 更新反馈
+        /// 更新反馈状态
         feedback = sample;
 
-        /// 混合原始信号与处理后信号
+        /// 混合原始信号与处理后信号（等量混合产生最大干涉）
         output[i] = input[i] * 0.5 + sample * 0.5;
         output[i] = qBound(-1.0, output[i], 1.0);
 

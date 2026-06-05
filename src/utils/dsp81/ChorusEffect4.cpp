@@ -20,6 +20,12 @@ ChorusEffect4::ChorusEffect4(QObject* parent)
  * 延迟时间在[baseDelay - depth, baseDelay + depth]范围内周期性变化，
  * 产生丰富的合唱/空间感。延迟线以环形缓冲区方式实现。
  *
+ * 算法流程：
+ * 1. 使用正弦LFO生成周期性变化的延迟量
+ * 2. 从延迟线中通过线性插值读取延迟采样
+ * 3. 将延迟信号以一定比例与原始信号混合
+ * 4. 可选的多声部叠加增强空间感
+ *
  * @param input 输入音频采样序列
  * @return 处理后的音频采样序列
  */
@@ -29,6 +35,8 @@ QVector<double> ChorusEffect4::process(const QVector<double>& input)
     timer.start();
 
     const int n = input.size();
+    if (n == 0) return input;
+
     QVector<double> output(n);
 
     /// 延迟线参数
@@ -38,25 +46,37 @@ QVector<double> ChorusEffect4::process(const QVector<double>& input)
     const int baseDelaySamples = static_cast<int>(baseDelayMs * sampleRate / 1000.0);
     const double modDepthSamples = m_depth * maxDelaySamples;
 
-    /// 环形延迟缓冲区
+    /// 环形延迟缓冲区（静态保持跨调用连续性）
     static QVector<double> delayBuffer(maxDelaySamples * 2, 0.0);
     static int writePos = 0;
 
+    /// 多声部参数（3个声部增强合唱效果）
+    const int numVoices = 3;
+    const double voiceOffsets[numVoices] = {0.0, 0.33, 0.66};
+    const double voiceDepths[numVoices] = {1.0, 0.8, 1.2};
+
     /// 处理每个采样点
     for (int i = 0; i < n; ++i) {
-        /// 计算当前调制的延迟量
-        double phase = 2.0 * M_PI * m_rate * i / sampleRate;
-        double modDelay = baseDelaySamples + modDepthSamples * std::sin(phase);
+        double mixed = 0.0;
 
-        /// 线性插值读取延迟线
-        int intDelay = static_cast<int>(modDelay);
-        double frac = modDelay - intDelay;
-        int readPos1 = (writePos - intDelay + delayBuffer.size()) % delayBuffer.size();
-        int readPos2 = (readPos1 - 1 + delayBuffer.size()) % delayBuffer.size();
-        double delayed = delayBuffer[readPos1] * (1.0 - frac) + delayBuffer[readPos2] * frac;
+        /// 多声部叠加
+        for (int v = 0; v < numVoices; ++v) {
+            /// 计算当前声部调制的延迟量
+            double phase = 2.0 * M_PI * m_rate * (i + voiceOffsets[v] * sampleRate) / sampleRate;
+            double modDelay = baseDelaySamples + modDepthSamples * voiceDepths[v] * std::sin(phase);
 
-        /// 混合原始信号与延迟信号
-        output[i] = input[i] * 0.7 + delayed * 0.5;
+            /// 线性插值读取延迟线
+            int intDelay = static_cast<int>(modDelay);
+            double frac = modDelay - intDelay;
+            int readPos1 = (writePos - intDelay + delayBuffer.size()) % delayBuffer.size();
+            int readPos2 = (readPos1 - 1 + delayBuffer.size()) % delayBuffer.size();
+            double delayed = delayBuffer[readPos1] * (1.0 - frac) + delayBuffer[readPos2] * frac;
+
+            mixed += delayed;
+        }
+
+        /// 混合原始信号与多声部延迟信号
+        output[i] = input[i] * 0.6 + mixed * 0.3 / numVoices;
 
         /// 更新延迟线
         delayBuffer[writePos] = input[i];

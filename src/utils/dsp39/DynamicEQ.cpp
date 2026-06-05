@@ -9,7 +9,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "dsp39/DynamicEQ.h"
+#include "utils/dsp39/DynamicEQ.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

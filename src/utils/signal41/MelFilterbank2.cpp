@@ -10,7 +10,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "signal41/MelFilterbank2.h"
+#include "utils/signal41/MelFilterbank2.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

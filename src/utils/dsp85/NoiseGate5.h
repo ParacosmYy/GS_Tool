@@ -24,6 +24,15 @@ public:
     /** @brief 设置门限参数(阈值/攻击/释放/保持) */
     void setParameters(double thresholdDb, double attackMs, double releaseMs, double holdMs);
 
+    /** @brief 检测输入信号的RMS电平(dB) */
+    double computeRmsLevel(const QVector<double>& input) const;
+
+    /** @brief 获取当前门状态 */
+    bool isGateOpen() const;
+
+    /** @brief 获取当前阈值 */
+    double threshold() const;
+
     Stats stats() const { return m_stats; }
     void resetStatistics();
 

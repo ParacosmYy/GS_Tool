@@ -105,6 +105,68 @@ QVector<double> ZeroCrossing4::computeSequence(const QVector<double>& samples, i
 }
 
 /**
+ * @brief 估计信号的主频率
+ *
+ * 利用过零率估计正弦信号的主频率。
+ * 对于纯正弦波: f ≈ ZCR * fs / 2
+ * 对于复杂信号，此估计为近似值。
+ *
+ * @param frame 输入帧
+ * @param sampleRate 采样率(Hz)
+ * @return 估计的频率(Hz)
+ */
+double ZeroCrossing4::estimateFrequency(const QVector<double>& frame, double sampleRate) const
+{
+    if (frame.size() < 2 || sampleRate <= 0.0) return 0.0;
+
+    double zcr = compute(frame);
+    /* 过零率转换为频率: f = ZCR * sampleRate / 2 */
+    double freq = zcr * sampleRate / 2.0;
+
+    return freq;
+}
+
+/**
+ * @brief 检测帧是否为有声(语音活动检测)
+ *
+ * 简单VAD: 如果过零率过高(噪声特征)或过低(静音)，
+ * 判定为无声。中间范围判定为有声。
+ *
+ * @param frame 输入帧
+ * @param lowThreshold 低过零率阈值(默认0.01)
+ * @param highThreshold 高过零率阈值(默认0.45)
+ * @return true如果判定为有声帧
+ */
+bool ZeroCrossing4::isVoiced(const QVector<double>& frame,
+                              double lowThreshold, double highThreshold) const
+{
+    double zcr = compute(frame);
+
+    /* 过零率在合理范围内判定为有声 */
+    return (zcr > lowThreshold && zcr < highThreshold);
+}
+
+/**
+ * @brief 计算帧的短时能量
+ *
+ * 作为ZCR的补充特征，用于更精确的VAD。
+ * 能量低于阈值的帧即使ZCR合理也判定为静音。
+ *
+ * @param frame 输入帧
+ * @return 短时能量(均方值)
+ */
+double ZeroCrossing4::shortTimeEnergy(const QVector<double>& frame) const
+{
+    if (frame.isEmpty()) return 0.0;
+
+    double energy = 0.0;
+    for (double sample : frame) {
+        energy += sample * sample;
+    }
+    return energy / frame.size();
+}
+
+/**
  * @brief 重置所有统计数据
  *
  * 将帧分析计数、过零计数和计时归零。

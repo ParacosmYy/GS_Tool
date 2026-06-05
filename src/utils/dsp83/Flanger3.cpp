@@ -21,7 +21,8 @@ Flanger3::Flanger3(QObject* parent)
  * 2. 延迟信号与原始信号混合产生相位干涉（梳状滤波）
  * 3. 反馈回路增强效果强度
  *
- * 产生的效果是空灵的"喷气式飞机"声音。
+ * 产生的效果是空灵的"喷气式飞机"声音，常用于
+ * 吉他、鼓声和人声的空间效果处理。
  *
  * @param input 输入音频采样序列
  * @return 处理后的音频采样序列
@@ -36,7 +37,7 @@ QVector<double> Flanger3::process(const QVector<double>& input)
 
     QVector<double> output(n);
 
-    /// 延迟线参数
+    /// 延迟线参数配置
     const double sampleRate = 44100.0;
     const int maxDelaySamples = static_cast<int>(m_delay * sampleRate / 1000.0 * 2);
     const int bufferSize = qMax(256, maxDelaySamples * 2);
@@ -46,27 +47,28 @@ QVector<double> Flanger3::process(const QVector<double>& input)
     static int writePos = 0;
     static double phase = 0.0;
 
-    /// 处理每个采样
+    /// 处理每个采样点
     for (int i = 0; i < n; ++i) {
-        /// 计算当前延迟（正弦调制）
-        double modDelay = m_delay * (1.0 + std::sin(2.0 * M_PI * m_rate * phase)) * 0.5;
+        /// 计算当前延迟量（正弦LFO调制）
+        double lfoPhase = 2.0 * M_PI * m_rate * phase;
+        double modDelay = m_delay * (1.0 + std::sin(lfoPhase)) * 0.5;
         int delaySamples = static_cast<int>(modDelay * sampleRate / 1000.0);
         delaySamples = qBound(1, delaySamples, bufferSize - 1);
 
-        /// 从延迟线读取（线性插值）
+        /// 从延迟线读取（线性插值提高音质）
         double frac = modDelay * sampleRate / 1000.0 - delaySamples;
         int readPos1 = (writePos - delaySamples + bufferSize) % bufferSize;
         int readPos2 = (readPos1 - 1 + bufferSize) % bufferSize;
         double delayed = delayBuffer[readPos1] * (1.0 - frac) + delayBuffer[readPos2] * frac;
 
-        /// 混合原始信号和延迟信号
+        /// 混合原始信号和延迟信号（梳状滤波效果）
         output[i] = input[i] * 0.7 + delayed * 0.3;
 
-        /// 更新延迟线（带反馈）
+        /// 更新延迟线（带反馈回路增强效果）
         delayBuffer[writePos] = input[i] + delayed * m_feedback;
         writePos = (writePos + 1) % bufferSize;
 
-        /// 推进相位
+        /// 推进LFO相位（周期性重置避免累积误差）
         phase += 1.0 / sampleRate;
         if (phase > 1.0 / m_rate) phase -= 1.0 / m_rate;
     }

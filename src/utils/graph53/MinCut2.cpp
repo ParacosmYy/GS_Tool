@@ -9,7 +9,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "graph53/MinCut2.h"
+#include "utils/graph53/MinCut2.h"
 
 #include <QElapsedTimer>
 #include <QtMath>
