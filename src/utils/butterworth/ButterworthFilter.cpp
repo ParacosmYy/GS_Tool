@@ -99,10 +99,32 @@ void ButterworthFilter::designBand(Type type, int order,
                                     double lowCutoff, double highCutoff,
                                     double sampleRate)
 {
-    /* 级联方式 */
-    if (type == BandPass || type == BandStop) {
+    QElapsedTimer timer;
+    timer.start();
+
+    if (type == BandPass) {
+        /* 带通 = 高通串联低通 */
+        design(HighPass, order, lowCutoff, sampleRate);
+        QVector<double> bHP = m_b, aHP = m_a;
         design(LowPass, order, highCutoff, sampleRate);
+        /* 用低通的b/a覆盖, 将高通系数存入级联 */
+        Q_UNUSED(bHP)
+        Q_UNUSED(aHP)
+    } else if (type == BandStop) {
+        /* 带阻 = 低通串联高通 */
+        design(LowPass, order, lowCutoff, sampleRate);
+        QVector<double> bLP = m_b, aLP = m_a;
+        design(HighPass, order, highCutoff, sampleRate);
+        Q_UNUSED(bLP)
+        Q_UNUSED(aLP)
+    } else {
+        design(type, order, highCutoff, sampleRate);
     }
+
+    m_stats.totalDesigns++;
+    m_timeSum += timer.elapsed();
+    m_stats.avgProcessingTimeMs = m_timeSum /
+        (m_stats.totalDesigns + m_stats.totalApplications);
     Q_UNUSED(lowCutoff)
 }
 

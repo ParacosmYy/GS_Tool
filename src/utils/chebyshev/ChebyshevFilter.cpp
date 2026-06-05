@@ -42,20 +42,15 @@ void ChebyshevFilter::design(Type type, int order, double cutoff,
     double a0 = 1.0;
     QVector<double> aCoeffs(order + 1, 0.0);
     aCoeffs[0] = 1.0;
+    QVector<double> bCoeffs(order + 1, 0.0);
+    bCoeffs[0] = 1.0;
 
     for (int k = 0; k < order / 2; ++k) {
         double angle = M_PI * (2 * k + 1) / (2 * order);
         double sigma = -std::sinh(std::asinh(1.0 / eps) / order) * std::sin(angle);
         double omega = std::cosh(std::asinh(1.0 / eps) / order) * std::cos(angle);
 
-        double w0sq = sigma * sigma + omega * omega;
-        double w0 = std::sqrt(w0sq);
-        double Q = w0 / (2.0 * std::abs(sigma));
-
-        /* 频率缩放 */
-        double w0n = w0 * wc;
         double alpha = std::sin(M_PI * cutoff / sampleRate);
-        double cosw0 = std::cos(M_PI * cutoff / sampleRate);
 
         /* 双线性变换系数 */
         double beta = 0.5 * (1.0 - alpha) / (1.0 + alpha);
@@ -67,13 +62,22 @@ void ChebyshevFilter::design(Type type, int order, double cutoff,
         double a1 = -2.0 * gamma / (0.5 + beta);
         double a2 = 2.0 * beta / (0.5 + beta);
 
-        /* 与现有系数卷积 */
+        /* 分母系数卷积 */
         QVector<double> newA(aCoeffs.size() + 2, 0.0);
-        QVector<double> section = {1.0, a1, a2};
+        QVector<double> sectionA = {1.0, a1, a2};
         for (int i = 0; i < static_cast<int>(aCoeffs.size()); ++i)
             for (int j = 0; j < 3; ++j)
-                newA[i + j] += aCoeffs[i] * section[j];
+                newA[i + j] += aCoeffs[i] * sectionA[j];
         aCoeffs = newA;
+
+        /* 分子系数卷积 */
+        QVector<double> newB(bCoeffs.size() + 2, 0.0);
+        QVector<double> sectionB = {b0, b1, b2};
+        for (int i = 0; i < static_cast<int>(bCoeffs.size()); ++i)
+            for (int j = 0; j < 3; ++j)
+                newB[i + j] += bCoeffs[i] * sectionB[j];
+        bCoeffs = newB;
+
         a0 *= (0.5 + beta);
     }
 
@@ -90,10 +94,11 @@ void ChebyshevFilter::design(Type type, int order, double cutoff,
 
     m_a = aCoeffs;
 
-    /* 分子: 全部为gain */
+    /* 使用卷积后的分子系数 */
     double gain = 1.0 / a0;
-    for (int i = 0; i <= order; ++i)
-        m_b[i] = gain;
+    m_b.resize(bCoeffs.size());
+    for (int i = 0; i < bCoeffs.size(); ++i)
+        m_b[i] = bCoeffs[i] * gain;
 
     if (type == HighPass) {
         for (int i = 0; i < m_b.size(); ++i)

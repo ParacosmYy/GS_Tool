@@ -100,14 +100,15 @@ double QuantileSketch::query(double percentile)
     const double eps = static_cast<double>(m_count) * m_epsilon;
 
     int cumG = 0;
-    double result = m_summary[0].value;
+    double result = m_summary.last().value;
 
     for (int i = 0; i < m_summary.size(); ++i) {
-        cumG += m_summary[i].g;
         const double target = rank - eps;
         if (static_cast<double>(cumG) + static_cast<double>(m_summary[i].delta) / 2.0 > target) {
+            result = m_summary[i].value;
             break;
         }
+        cumG += m_summary[i].g;
         result = m_summary[i].value;
     }
 
@@ -187,40 +188,29 @@ void QuantileSketch::resetStatistics()
 // 内部辅助
 // ═══════════════════════════════════════════════════════════
 
-void QuantileSketch::compress(int band)
+void QuantileSketch::compress(int twoEpsN)
 {
-    if (m_summary.size() <= 2) {
-        return;
-    }
+    if (m_summary.size() <= 2) return;
 
+    /* GK压缩: 合并满足 g_i + delta_i <= 2*eps*N 的相邻元组 */
     QVector<Tuple> compressed;
     compressed.reserve(m_summary.size());
+    compressed.append(m_summary[0]);
 
-    int i = 0;
-    while (i < m_summary.size()) {
-        if (i == 0 || i == m_summary.size() - 1) {
-            // 保留首尾元组
-            compressed.append(m_summary[i]);
-            ++i;
+    for (int i = 1; i < m_summary.size() - 1; ++i) {
+        Tuple& last = compressed.last();
+        if (last.g + m_summary[i].g + m_summary[i].delta <= twoEpsN) {
+            /* 合并: 累加g, 取较大的delta */
+            last.g += m_summary[i].g;
+            last.delta = qMax(last.delta, m_summary[i].delta);
         } else {
-            // 合并相邻且band相同的元组
-            Tuple merged = m_summary[i];
-            int j = i + 1;
-            while (j < m_summary.size() - 1) {
-                if (this->band(merged.delta) == this->band(m_summary[j].delta)) {
-                    merged.g += m_summary[j].g;
-                    ++j;
-                } else {
-                    break;
-                }
-            }
-            compressed.append(merged);
-            i = j;
+            compressed.append(m_summary[i]);
         }
     }
+    /* 保留尾元组 */
+    compressed.append(m_summary.last());
 
     m_summary = std::move(compressed);
-    Q_UNUSED(band)
 }
 
 int QuantileSketch::band(int delta) const

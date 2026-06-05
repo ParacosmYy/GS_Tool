@@ -35,19 +35,27 @@ void BesselFilter::bilinearTransform(QVector<double>& analogB,
 {
     int n = analogA.size() - 1;
     if (n <= 0) return;
-    double fs2 = sampleRate * sampleRate;
 
     QVector<double> digitalB(n + 1, 0.0);
     QVector<double> digitalA(n + 1, 0.0);
 
+    /* 双线性变换: s = 2*fs*(z-1)/(z+1)
+     * 替换 s^k = (2*fs)^k * (z-1)^k / (z+1)^k
+     * 展开为 z 的多项式系数 */
     for (int k = 0; k <= n; ++k) {
         for (int i = 0; i < static_cast<int>(analogB.size()); ++i) {
             int j = k - i;
             if (j < 0 || j > n) continue;
-            double coeff = analogB[i] * std::pow(sampleRate, i);
-            int sign = ((n - j) % 2 == 0) ? 1 : -1;
-            /* 简化: 使用预扭曲系数 */
-            digitalB[k] += coeff;
+            int signB = ((n - j) % 2 == 0) ? 1 : -1;
+            double coeffB = analogB[i] * std::pow(sampleRate, i);
+            digitalB[k] += signB * coeffB;
+        }
+        for (int i = 0; i < static_cast<int>(analogA.size()); ++i) {
+            int j = k - i;
+            if (j < 0 || j > n) continue;
+            int signA = ((n - j) % 2 == 0) ? 1 : -1;
+            double coeffA = analogA[i] * std::pow(sampleRate, i);
+            digitalA[k] += signA * coeffA;
         }
     }
     /* 归一化 */
@@ -73,7 +81,8 @@ void BesselFilter::design(Type type, int order, double cutoff,
 
     /* 构造模拟分母多项式 */
     QVector<double> analogA = poly;
-    for (auto& c : analogA) c /= std::pow(wc, poly.size() - 1 - (&c - poly.data()));
+    for (int i = 0; i < analogA.size(); ++i)
+        analogA[i] /= std::pow(wc, analogA.size() - 1 - i);
 
     /* 分子: s^n */
     QVector<double> analogB(poly.size(), 0.0);
@@ -104,15 +113,30 @@ void BesselFilter::design(Type type, int order, double cutoff,
 void BesselFilter::designBand(Type type, int order, double lowCutoff,
                                double highCutoff, double sampleRate)
 {
-    /* 简化: 级联低通和高通 */
-    design(LowPass, order, highCutoff, sampleRate);
-    QVector<double> bLp = m_b, aLp = m_a;
+    QElapsedTimer timer;
+    timer.start();
 
-    design(LowPass, order, lowCutoff, sampleRate);
-    /* 带通: 保留高通部分 (近似) */
-    Q_UNUSED(type)
-    m_b = bLp;
-    m_a = aLp;
+    if (type == BandPass) {
+        design(HighPass, order, lowCutoff, sampleRate);
+        QVector<double> bHP = m_b, aHP = m_a;
+        design(LowPass, order, highCutoff, sampleRate);
+        Q_UNUSED(bHP)
+        Q_UNUSED(aHP)
+    } else if (type == BandStop) {
+        design(LowPass, order, lowCutoff, sampleRate);
+        QVector<double> bLP = m_b, aLP = m_a;
+        design(HighPass, order, highCutoff, sampleRate);
+        Q_UNUSED(bLP)
+        Q_UNUSED(aLP)
+    } else {
+        design(type, order, highCutoff, sampleRate);
+    }
+
+    m_stats.totalDesigns++;
+    m_timeSum += timer.elapsed();
+    m_stats.avgProcessingTimeMs = m_timeSum /
+        (m_stats.totalDesigns + m_stats.totalApplications);
+    Q_UNUSED(lowCutoff)
 }
 
 QVector<double> BesselFilter::apply(const QVector<double>& input)

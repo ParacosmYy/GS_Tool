@@ -176,8 +176,12 @@ QByteArray LempelZivWelch::decompress(const QByteArray& data)
         if (code < nextCode) {
             entry = dict[code];
         } else if (code == nextCode) {
-            entry = dict[prevCode] +
-                    QByteArray(1, dict[prevCode][0]);
+            QByteArray prev = dict.value(prevCode);
+            if (prev.isEmpty()) {
+                emit error(tr("LZW解压错误: 前驱编码 %1 对应空条目").arg(prevCode));
+                return {};
+            }
+            entry = prev + QByteArray(1, prev[0]);
         } else {
             emit error(tr("LZW解压错误: 编码 %1 超出字典范围").arg(code));
             return {};

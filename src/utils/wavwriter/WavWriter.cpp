@@ -84,9 +84,8 @@ bool WavWriter::write(const QVector<double>& samples)
 
     m_stats.totalSamplesWritten += samples.size();
     m_timeSum += timer.elapsed();
-    m_stats.avgProcessingTimeMs =
-        (m_stats.totalFilesWritten + m_stats.totalSamplesWritten > 0)
-        ? m_timeSum / (m_stats.totalFilesWritten + 1) : 0.0;
+    m_stats.avgProcessingTimeMs = m_timeSum /
+        qMax(m_stats.totalSamplesWritten, 1ULL);
 
     return true;
 }

@@ -45,6 +45,12 @@ QVector<double> LombScargle::compute(
     for (int f = 0; f < freqs.size(); ++f) {
         double omega = 2.0 * M_PI * freqs[f];
 
+        /* 零频率跳过 */
+        if (omega == 0.0) {
+            power.append(0.0);
+            continue;
+        }
+
         /* 计算tau(时间偏移) */
         double sinSum = 0.0, cosSum = 0.0;
         for (int i = 0; i < n; ++i) {

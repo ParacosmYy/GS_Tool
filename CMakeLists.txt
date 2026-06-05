@@ -868,6 +868,13 @@ set(SOURCES
     src/utils/align/SignalAligner.cpp
     src/utils/window2/WindowFunction.cpp
 
+    # -- Wave 40: 特征提取 --
+    src/utils/shorttime/ShortTimeEnergy.cpp
+    src/utils/zcr2/ZeroCrossingRate2.cpp
+    src/utils/spectral/SpectralFeatures.cpp
+    src/utils/mfcc/MfccExtractor.cpp
+    src/utils/pitch2/PitchDetector2.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -2056,6 +2063,11 @@ set(HEADERS
     src/utils/peakdetect2/PeakDetector2.h
     src/utils/align/SignalAligner.h
     src/utils/window2/WindowFunction.h
+    src/utils/shorttime/ShortTimeEnergy.h
+    src/utils/zcr2/ZeroCrossingRate2.h
+    src/utils/spectral/SpectralFeatures.h
+    src/utils/mfcc/MfccExtractor.h
+    src/utils/pitch2/PitchDetector2.h
 )
 
 set(RESOURCES

@@ -217,6 +217,7 @@ void RealFFT::butterfly(QVector<double>& re, QVector<double>& im,
 int RealFFT::nextPowerOf2(int n) const
 {
     if (n <= 0) return 1;
+    if (n > (1 << 30)) return (1 << 30);
     n--;
     n |= n >> 1;
     n |= n >> 2;

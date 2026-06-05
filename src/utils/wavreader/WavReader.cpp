@@ -80,6 +80,7 @@ bool WavReader::open(const QString& filename)
 
 double WavReader::readSample()
 {
+    if (m_file.atEnd()) return 0.0;
     QDataStream in(&m_file);
     in.setByteOrder(QDataStream::LittleEndian);
 
@@ -149,6 +150,8 @@ QVector<double> WavReader::read(int count)
     m_samplesRead += toRead;
     m_stats.totalSamplesRead += toRead;
     m_timeSum += timer.elapsed();
+    m_stats.avgProcessingTimeMs = m_timeSum /
+        qMax(m_stats.totalSamplesRead, 1ULL);
 
     return result;
 }

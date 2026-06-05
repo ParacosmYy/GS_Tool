@@ -133,6 +133,11 @@ void ArcCache::put(const QString& key, const QVariant& value)
         arcReplace(key);
     }
 
+    /* 缓存满时先淘汰 */
+    if (static_cast<int>(m_t1.size() + m_t2.size()) >= m_capacity) {
+        arcReplace(key);
+    }
+
     // 插入到T1前端
     m_t1.emplace_front(key, value);
     m_t1Map[key] = m_t1.begin();
