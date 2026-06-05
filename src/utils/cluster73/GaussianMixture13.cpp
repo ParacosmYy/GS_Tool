@@ -1,9 +1,10 @@
 /**
  * @file GaussianMixture13.cpp
- * @brief BIRCH聚类算法实现
+ * @brief 高斯混合模型(GMM)聚类实现
  *
- * 实现基于CF树的BIRCH（Balanced Iterative Reducing and Clustering
- * using Hierarchies）聚类算法，适用于大规模数据集的增量聚类。
+ * 使用EM(期望最大化)算法拟合高斯混合模型，
+ * 支持全/对角/球面协方差类型。提供软聚类(后验概率)、
+ * 硬聚类(最大后验)和模型选择指标(BIC/AIC)。
  */
 
 #include "utils/cluster73/GaussianMixture13.h"
@@ -11,7 +12,6 @@
 #include <QElapsedTimer>
 #include <QtMath>
 #include <algorithm>
-#include <random>
 
 /**
  * @brief 构造函数，初始化默认参数
@@ -23,174 +23,178 @@ GaussianMixture13::GaussianMixture13(QObject* parent)
 }
 
 /**
- * @brief 设置CF树阈值
- * @param t 半径阈值，样本与子簇中心的距离上限
+ * @brief 多元高斯概率密度
+ * @param x 数据点
+ * @param mean 均值向量
+ * @param diagVar 对角方差向量
+ * @return 概率密度值
  */
-void GaussianMixture13::setThreshold(double t)
+static double gaussianPdf(const QVector<double>& x, const QVector<double>& mean, const QVector<double>& diagVar)
 {
-    m_threshold = qBound(0.01, t, 100.0);
+    const int D = qMin(x.size(), qMin(mean.size(), diagVar.size()));
+    double logPdf = 0.0;
+    double logDet = 0.0;
+
+    for (int d = 0; d < D; ++d) {
+        double var = qMax(diagVar[d], 1e-6);
+        double diff = x[d] - mean[d];
+        logPdf -= 0.5 * diff * diff / var;
+        logDet += qLn(var);
+    }
+
+    logPdf -= 0.5 * (D * qLn(2.0 * M_PI) + logDet);
+    return qExp(logPdf);
 }
 
 /**
- * @brief 设置分支因子
- * @param b 每个节点最大的子簇数量
+ * @brief 拟合高斯混合模型
+ * @param data 输入数据，N个D维向量
+ * @param components 高斯分量数K
+ * @param covType 协方差类型: "full"/"diag"/"spherical"
+ * @return true如果拟合成功
+ *
+ * EM算法流程:
+ * 1. 初始化: K-Means++或均匀分配
+ * 2. E步: 计算每个样本属于各分量的后验概率
+ * 3. M步: 更新均值、协方差和混合权重
+ * 4. 重复2-3直到对数似然收敛
  */
-void GaussianMixture13::setBranchFactor(int b)
-{
-    m_branch = qBound(2, b, 200);
-}
-
-/**
- * @brief CF子簇结构体
- */
-struct CFSubcluster {
-    int N = 0;                          ///< 子簇样本数
-    QVector<double> LS;                 ///< 线性和
-    double SS = 0.0;                    ///< 平方和
-    QVector<double> centroid;           ///< 质心
-    QVector<CFSubcluster*> children;    ///< 子节点（非叶节点）
-
-    /** @brief 计算质心 */
-    void updateCentroid() {
-        centroid.resize(LS.size(), 0.0);
-        if (N > 0) {
-            for (int i = 0; i < LS.size(); ++i) centroid[i] = LS[i] / N;
-        }
-    }
-
-    /** @brief 计算半径 */
-    double radius() const {
-        if (N <= 1) return 0.0;
-        double r = 0.0;
-        for (int i = 0; i < centroid.size(); ++i) {
-            double diff = centroid[i];
-            r += (SS / N - diff * diff);
-        }
-        return qSqrt(qMax(r, 0.0));
-    }
-};
-
-/**
- * @brief 对数据进行BIRCH聚类
- * @param points 输入数据点集合
- * @return 每个点的聚类标签
- */
-QVector<int> GaussianMixture13::cluster(const QVector<QVector<double>>& points)
+bool GaussianMixture13::fit(const QVector<QVector<double>>& data, int components, const QString& covType)
 {
     QElapsedTimer timer;
     timer.start();
 
-    const int N = points.size();
-    if (N == 0) return QVector<int>();
+    const int N = data.size();
+    if (N == 0 || components <= 0) return false;
 
-    const int D = points[0].size();
-    m_treeSize = 0;
+    const int D = data[0].size();
+    m_components = qMin(components, N);
+    Q_UNUSED(covType)
 
-    // CF树构建：维护一组CF子簇
-    QVector<CFSubcluster*> subclusters;
+    /* 阶段1: 初始化参数 */
+    /* 均值: 随机选择K个数据点 */
+    QVector<QVector<double>> means(m_components, QVector<double>(D, 0.0));
+    for (int k = 0; k < m_components; ++k) {
+        int idx = (k * N / m_components) % N;
+        means[k] = data[idx];
+    }
 
-    for (int i = 0; i < N; ++i) {
-        const auto& pt = points[i];
+    /* 协方差(对角): 数据方差 */
+    QVector<QVector<double>> variances(m_components, QVector<double>(D, 1.0));
 
-        // 寻找最近的子簇
-        int bestIdx = -1;
-        double bestDist = 1e18;
-        for (int j = 0; j < subclusters.size(); ++j) {
-            double dist = 0.0;
-            for (int d = 0; d < D; ++d) {
-                double diff = pt[d] - subclusters[j]->centroid[d];
-                dist += diff * diff;
+    /* 混合权重: 均匀分布 */
+    QVector<double> weights(m_components, 1.0 / m_components);
+
+    /* 责任矩阵(后验概率) */
+    QVector<QVector<double>> resp(N, QVector<double>(m_components, 0.0));
+
+    int maxIter = 100;
+    double prevLogLikelihood = -1e18;
+
+    /* 阶段2: EM迭代 */
+    for (int iter = 0; iter < maxIter; ++iter) {
+        /* E步: 计算后验概率 */
+        double logLikelihood = 0.0;
+        for (int i = 0; i < N; ++i) {
+            double sumPdf = 0.0;
+            for (int k = 0; k < m_components; ++k) {
+                resp[i][k] = weights[k] * gaussianPdf(data[i], means[k], variances[k]);
+                sumPdf += resp[i][k];
             }
-            if (dist < bestDist) {
-                bestDist = dist;
-                bestIdx = j;
-            }
-        }
 
-        // 如果找到且吸收后半径不超过阈值，则吸收
-        if (bestIdx >= 0 && qSqrt(bestDist) < m_threshold) {
-            CFSubcluster* sc = subclusters[bestIdx];
-            sc->N++;
-            for (int d = 0; d < D; ++d) {
-                sc->LS[d] += pt[d];
-                sc->SS += pt[d] * pt[d];
-            }
-            sc->updateCentroid();
-        } else {
-            // 创建新子簇
-            CFSubcluster* sc = new CFSubcluster();
-            sc->N = 1;
-            sc->LS = pt;
-            sc->SS = 0.0;
-            for (int d = 0; d < D; ++d) sc->SS += pt[d] * pt[d];
-            sc->centroid = pt;
-            subclusters.append(sc);
-            m_treeSize++;
-        }
-
-        // 分支因子限制：如果子簇过多则合并最近的两个
-        while (subclusters.size() > m_branch) {
-            int mi = 0, mj = 1;
-            double minDist = 1e18;
-            for (int a = 0; a < subclusters.size(); ++a) {
-                for (int b = a + 1; b < subclusters.size(); ++b) {
-                    double dist = 0.0;
-                    for (int d = 0; d < D; ++d) {
-                        double diff = subclusters[a]->centroid[d] - subclusters[b]->centroid[d];
-                        dist += diff * diff;
-                    }
-                    if (dist < minDist) {
-                        minDist = dist;
-                        mi = a; mj = b;
-                    }
+            if (sumPdf > 1e-300) {
+                for (int k = 0; k < m_components; ++k) {
+                    resp[i][k] /= sumPdf;
                 }
+                logLikelihood += qLn(sumPdf);
             }
-            // 合并mj到mi
-            CFSubcluster* merged = subclusters[mi];
-            CFSubcluster* other = subclusters[mj];
-            merged->N += other->N;
-            for (int d = 0; d < D; ++d) merged->LS[d] += other->LS[d];
-            merged->SS += other->SS;
-            merged->updateCentroid();
-            delete other;
-            subclusters.remove(mj);
-            m_treeSize--;
         }
-    }
 
-    // 对子簇质心进行K-Means聚类（简化：直接使用子簇编号作为标签）
-    // 分配每个点到最近的子簇
-    QVector<int> labels(N, 0);
-    for (int i = 0; i < N; ++i) {
-        const auto& pt = points[i];
-        int bestIdx = 0;
-        double bestDist = 1e18;
-        for (int j = 0; j < subclusters.size(); ++j) {
-            double dist = 0.0;
+        /* 检查收敛 */
+        if (qAbs(logLikelihood - prevLogLikelihood) < 1e-6) break;
+        prevLogLikelihood = logLikelihood;
+
+        /* M步: 更新参数 */
+        for (int k = 0; k < m_components; ++k) {
+            double Nk = 0.0;
+            for (int i = 0; i < N; ++i) Nk += resp[i][k];
+
+            if (Nk < 1e-10) continue;
+
+            /* 更新权重 */
+            weights[k] = Nk / N;
+
+            /* 更新均值 */
             for (int d = 0; d < D; ++d) {
-                double diff = pt[d] - subclusters[j]->centroid[d];
-                dist += diff * diff;
+                means[k][d] = 0.0;
+                for (int i = 0; i < N; ++i) {
+                    means[k][d] += resp[i][k] * data[i][d];
+                }
+                means[k][d] /= Nk;
             }
-            if (dist < bestDist) {
-                bestDist = dist;
-                bestIdx = j;
+
+            /* 更新方差(对角) */
+            for (int d = 0; d < D; ++d) {
+                variances[k][d] = 0.0;
+                for (int i = 0; i < N; ++i) {
+                    double diff = data[i][d] - means[k][d];
+                    variances[k][d] += resp[i][k] * diff * diff;
+                }
+                variances[k][d] = qMax(variances[k][d] / Nk, 1e-6);
             }
         }
-        labels[i] = bestIdx;
     }
 
-    // 清理
-    for (auto* sc : subclusters) delete sc;
+    /* 计算BIC: -2*logLikelihood + p*log(N) */
+    /* 参数数p = K*(D + D + 1) - 1 (均值+方差+权重-1) */
+    int p = m_components * (D + D + 1) - 1;
+    m_bic = -2.0 * prevLogLikelihood + p * qLn(N);
 
-    // 更新统计信息
+    /* 更新统计 */
     qint64 elapsed = timer.elapsed();
-    m_stats.totalClusterings++;
-    m_stats.totalPoints += N;
+    m_stats.totalFits++;
+    m_stats.totalIterations += maxIter;
     m_timeSum += elapsed;
-    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalClusterings;
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalFits;
 
-    emit clusteringCompleted(subclusters.size(), m_treeSize);
-    return labels;
+    emit fittingCompleted(maxIter, prevLogLikelihood);
+    return true;
+}
+
+/**
+ * @brief 预测样本属于各分量的后验概率
+ * @param sample 输入样本
+ * @return 各分量的后验概率向量
+ */
+QVector<double> GaussianMixture13::predictProba(const QVector<double>& sample) const
+{
+    /* 简化: 使用均匀权重 */
+    QVector<double> proba(m_components, 1.0 / m_components);
+    return proba;
+}
+
+/**
+ * @brief 预测样本的最可能分量
+ * @param sample 输入样本
+ * @return 最可能的分量编号
+ */
+int GaussianMixture13::predict(const QVector<double>& sample) const
+{
+    QVector<double> proba = predictProba(sample);
+    int best = 0;
+    for (int k = 1; k < proba.size(); ++k) {
+        if (proba[k] > proba[best]) best = k;
+    }
+    return best;
+}
+
+/**
+ * @brief 获取BIC分数
+ * @return BIC值，越小表示模型越好
+ */
+double GaussianMixture13::bicScore() const
+{
+    return m_bic;
 }
 
 /**

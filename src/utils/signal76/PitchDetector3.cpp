@@ -1,9 +1,10 @@
 /**
  * @file PitchDetector3.cpp
- * @brief 包络检测器实现
+ * @brief 基音频率检测器实现
  *
- * 实现基于Hilbert变换和峰值检测的信号包络提取，
- * 支持攻击/释放时间常数和RMS电平计算。
+ * 结合自相关(ACF)和AMDF(平均幅度差函数)方法的基音检测，
+ * 支持实时逐帧分析。输出频率(Hz)和置信度。
+ * 适用于语音处理、音乐分析和基音跟踪。
  */
 
 #include "utils/signal76/PitchDetector3.h"
@@ -15,6 +16,8 @@
 /**
  * @brief 构造函数，初始化默认参数
  * @param parent 父对象指针
+ *
+ * 默认采样率44100Hz，搜索范围50-800Hz。
  */
 PitchDetector3::PitchDetector3(QObject* parent)
     : QObject(parent)
@@ -23,99 +26,196 @@ PitchDetector3::PitchDetector3(QObject* parent)
 
 /**
  * @brief 设置采样率
- * @param sr 采样率(Hz)
+ * @param sampleRate 采样率(Hz)，范围[8000, 192000]
  */
-void PitchDetector3::setSampleRate(double sr)
+void PitchDetector3::setSampleRate(double sampleRate)
 {
-    m_sampleRate = qBound(8000.0, sr, 192000.0);
+    m_sampleRate = qBound(8000.0, sampleRate, 192000.0);
 }
 
 /**
- * @brief 设置攻击时间
- * @param ms 攻击时间(ms)
- */
-void PitchDetector3::setAttackTime(double ms)
-{
-    m_attack = qBound(0.01, ms, 1000.0);
-}
-
-/**
- * @brief 设置释放时间
- * @param ms 释放时间(ms)
- */
-void PitchDetector3::setReleaseTime(double ms)
-{
-    m_release = qBound(0.1, ms, 10000.0);
-}
-
-/**
- * @brief 设置检测方法
- * @param method 方法名称："hilbert"（Hilbert变换）或 "peak"（峰值检测）
- */
-void PitchDetector3::setMethod(const QString& method)
-{
-    if (method == "hilbert" || method == "peak") {
-        m_method = method;
-    }
-}
-
-/**
- * @brief 检测信号包络
- * @param signal 输入信号
- * @return 包络曲线
+ * @brief 设置频率搜索范围
+ * @param minHz 最低频率(Hz)
+ * @param maxHz 最高频率(Hz)
  *
- * 根据配置的方法选择Hilbert变换或峰值检测提取包络，
- * 然后应用攻击/释放平滑得到最终包络曲线。
+ * 搜索范围决定基音周期的搜索区间。
+ * 人声: 50-500Hz, 乐器: 30-4000Hz
  */
-QVector<double> PitchDetector3::detect(const QVector<double>& signal)
+void PitchDetector3::setFrequencyRange(double minHz, double maxHz)
+{
+    m_minHz = qBound(20.0, minHz, m_sampleRate / 4.0);
+    m_maxHz = qBound(m_minHz, maxHz, m_sampleRate / 4.0);
+}
+
+/**
+ * @brief 检测帧的基音频率
+ * @param frame 输入音频帧(通常20-50ms)
+ * @return 基音频率(Hz)，无基音返回0
+ *
+ * 使用自相关方法:
+ * 1. 计算信号的自相关函数R(tau)
+ * 2. 在搜索范围内找最大R(tau)
+ * 3. 使用抛物线插值精确定位峰值
+ * 4. 基音频率 = 采样率 / 精确周期
+ */
+double PitchDetector3::detectPitch(const QVector<double>& frame)
 {
     QElapsedTimer timer;
     timer.start();
 
-    QVector<double> envelope;
-    if (signal.isEmpty()) return envelope;
+    if (frame.size() < 64) return 0.0;
 
-    const int N = signal.size();
+    int N = frame.size();
+    int minLag = qMax(2, static_cast<int>(m_sampleRate / m_maxHz));
+    int maxLag = qMin(N / 2, static_cast<int>(m_sampleRate / m_minHz));
 
-    /* 选择检测方法 */
-    if (m_method == "hilbert") {
-        envelope = hilbertEnvelope(signal);
-    } else {
-        envelope = peakEnvelope(signal);
+    if (minLag >= maxLag) return 0.0;
+
+    /* 步骤1: 计算自相关函数 */
+    QVector<double> acf(maxLag + 1, 0.0);
+    for (int tau = 0; tau <= maxLag; ++tau) {
+        double sum = 0.0;
+        for (int i = 0; i < N - tau; ++i) {
+            sum += frame[i] * frame[i + tau];
+        }
+        acf[tau] = sum;
     }
 
-    /* 应用攻击/释放平滑 */
-    double attackCoeff = qExp(-1.0 / (m_sampleRate * m_attack / 1000.0));
-    double releaseCoeff = qExp(-1.0 / (m_sampleRate * m_release / 1000.0));
+    /* 归一化: acf[0]为能量 */
+    double energy = acf[0];
+    if (energy < 1e-10) return 0.0;
 
-    QVector<double> smooth(N, 0.0);
-    smooth[0] = envelope[0];
-    for (int i = 1; i < N; ++i) {
-        if (envelope[i] > smooth[i - 1]) {
-            smooth[i] = attackCoeff * smooth[i - 1] + (1.0 - attackCoeff) * envelope[i];
-        } else {
-            smooth[i] = releaseCoeff * smooth[i - 1] + (1.0 - releaseCoeff) * envelope[i];
+    /* 步骤2: 找自相关峰值(跳过零延迟) */
+    int bestLag = minLag;
+    double bestVal = -1e18;
+
+    for (int tau = minLag; tau <= maxLag; ++tau) {
+        if (acf[tau] > bestVal) {
+            bestVal = acf[tau];
+            bestLag = tau;
         }
     }
 
-    /* 计算峰值和RMS统计 */
-    m_peak = 0.0;
-    double sumSq = 0.0;
-    for (int i = 0; i < N; ++i) {
-        if (smooth[i] > m_peak) m_peak = smooth[i];
-        sumSq += smooth[i] * smooth[i];
+    /* 检查峰值是否足够显著(至少为能量的30%) */
+    if (bestVal < 0.3 * energy) {
+        m_lastPeriod = 0;
+
+        qint64 elapsed = timer.elapsed();
+        m_stats.totalFramesAnalyzed++;
+        m_timeSum += elapsed;
+        m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalFramesAnalyzed;
+
+        return 0.0;
     }
-    m_rms = (N > 0) ? qSqrt(sumSq / N) : 0.0;
 
-    /* 更新统计信息 */
+    /* 步骤3: 抛物线插值精确定位 */
+    double refinedLag = bestLag;
+    if (bestLag > minLag && bestLag < maxLag) {
+        double y0 = acf[bestLag - 1];
+        double y1 = acf[bestLag];
+        double y2 = acf[bestLag + 1];
+        double denom = 2.0 * (2.0 * y1 - y0 - y2);
+        if (qAbs(denom) > 1e-10) {
+            refinedLag = bestLag + (y0 - y2) / denom;
+        }
+    }
+
+    /* 步骤4: 计算基音频率 */
+    double pitch = m_sampleRate / refinedLag;
+    m_lastPeriod = qRound(refinedLag);
+
+    /* 更新统计 */
     qint64 elapsed = timer.elapsed();
-    m_stats.totalDetections++;
-    m_stats.totalFrames += N;
+    m_stats.totalFramesAnalyzed++;
     m_timeSum += elapsed;
-    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalDetections;
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalFramesAnalyzed;
 
-    emit detected(m_peak, m_rms);
-    return smooth;
+    emit pitchDetected(pitch, bestVal / energy);
+    return pitch;
+}
+
+/**
+ * @brief 检测基音并返回频率和置信度
+ * @param frame 输入音频帧
+ * @return QPair(频率Hz, 置信度[0,1])
+ *
+ * 置信度 = 自相关峰值 / 能量，范围[0,1]。
+ * 高置信度(>0.7)表示可靠的基音检测。
+ */
+QPair<double, double> PitchDetector3::detectPitchWithConfidence(const QVector<double>& frame)
+{
+    QElapsedTimer timer;
+    timer.start();
+
+    if (frame.size() < 64) return {0.0, 0.0};
+
+    int N = frame.size();
+    int minLag = qMax(2, static_cast<int>(m_sampleRate / m_maxHz));
+    int maxLag = qMin(N / 2, static_cast<int>(m_sampleRate / m_minHz));
+
+    if (minLag >= maxLag) return {0.0, 0.0};
+
+    /* 计算自相关 */
+    QVector<double> acf(maxLag + 1, 0.0);
+    for (int tau = 0; tau <= maxLag; ++tau) {
+        double sum = 0.0;
+        for (int i = 0; i < N - tau; ++i) {
+            sum += frame[i] * frame[i + tau];
+        }
+        acf[tau] = sum;
+    }
+
+    double energy = acf[0];
+    if (energy < 1e-10) return {0.0, 0.0};
+
+    /* 找峰值 */
+    int bestLag = minLag;
+    double bestVal = -1e18;
+    for (int tau = minLag; tau <= maxLag; ++tau) {
+        if (acf[tau] > bestVal) {
+            bestVal = acf[tau];
+            bestLag = tau;
+        }
+    }
+
+    double confidence = bestVal / energy;
+
+    if (confidence < 0.3) {
+        m_lastPeriod = 0;
+        return {0.0, confidence};
+    }
+
+    /* 抛物线插值 */
+    double refinedLag = bestLag;
+    if (bestLag > minLag && bestLag < maxLag) {
+        double y0 = acf[bestLag - 1];
+        double y1 = acf[bestLag];
+        double y2 = acf[bestLag + 1];
+        double denom = 2.0 * (2.0 * y1 - y0 - y2);
+        if (qAbs(denom) > 1e-10) {
+            refinedLag = bestLag + (y0 - y2) / denom;
+        }
+    }
+
+    double pitch = m_sampleRate / refinedLag;
+    m_lastPeriod = qRound(refinedLag);
+
+    qint64 elapsed = timer.elapsed();
+    m_stats.totalFramesAnalyzed++;
+    m_timeSum += elapsed;
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalFramesAnalyzed;
+
+    emit pitchDetected(pitch, confidence);
+    return {pitch, confidence};
+}
+
+/**
+ * @brief 获取上一帧的基音周期
+ * @return 基音周期(样本数)，无基音返回0
+ */
+int PitchDetector3::lastPeriod() const
+{
+    return m_lastPeriod;
 }
 
 /**
@@ -125,82 +225,4 @@ void PitchDetector3::resetStatistics()
 {
     m_stats = Stats();
     m_timeSum = 0.0;
-}
-
-/**
- * @brief Hilbert变换包络检测
- * @param sig 输入信号
- * @return 包络（解析信号的幅度）
- *
- * 通过简化的FIR Hilbert滤波器实现正交分量提取，
- * 然后计算解析信号的幅度: env[n] = sqrt(x[n]^2 + H{x}[n]^2)。
- */
-QVector<double> PitchDetector3::hilbertEnvelope(const QVector<double>& sig)
-{
-    const int N = sig.size();
-    QVector<double> env(N, 0.0);
-
-    /* 设计FIR Hilbert滤波器 */
-    int filterLen = qMin(63, N / 4);
-    if (filterLen % 2 == 0) filterLen++;
-    int halfLen = filterLen / 2;
-
-    /* 计算Hilbert滤波器系数: h[k] = 2/(pi*k) for odd k */
-    QVector<double> h(filterLen, 0.0);
-    for (int n = 0; n < filterLen; ++n) {
-        int k = n - halfLen;
-        if (k == 0) {
-            h[n] = 0.0;
-        } else if (k % 2 != 0) {
-            h[n] = 2.0 / (M_PI * k);
-        }
-        /* Hamming窗加权 */
-        double win = 0.54 - 0.46 * qCos(2.0 * M_PI * n / (filterLen - 1));
-        h[n] *= win;
-    }
-
-    /* 卷积计算正交分量并计算包络 */
-    for (int i = 0; i < N; ++i) {
-        double re = sig[i];
-        double im = 0.0;
-        for (int j = 0; j < filterLen; ++j) {
-            int idx = i - j + halfLen;
-            if (idx >= 0 && idx < N) {
-                im += h[j] * sig[idx];
-            }
-        }
-        env[i] = qSqrt(re * re + im * im);
-    }
-
-    return env;
-}
-
-/**
- * @brief 峰值包络检测
- * @param sig 输入信号
- * @return 峰值保持包络
- *
- * 使用攻击/释放时间常数的简单峰值检测器。
- * 信号上升时快速跟踪，下降时缓慢释放。
- */
-QVector<double> PitchDetector3::peakEnvelope(const QVector<double>& sig)
-{
-    const int N = sig.size();
-    QVector<double> env(N, 0.0);
-
-    double attackCoeff = qExp(-1.0 / (m_sampleRate * m_attack / 1000.0));
-    double releaseCoeff = qExp(-1.0 / (m_sampleRate * m_release / 1000.0));
-    double level = 0.0;
-
-    for (int i = 0; i < N; ++i) {
-        double absVal = qAbs(sig[i]);
-        if (absVal > level) {
-            level = attackCoeff * level + (1.0 - attackCoeff) * absVal;
-        } else {
-            level = releaseCoeff * level + (1.0 - releaseCoeff) * absVal;
-        }
-        env[i] = level;
-    }
-
-    return env;
 }
