@@ -874,6 +874,21 @@ set(SOURCES
     src/utils/spectral/SpectralFeatures.cpp
     src/utils/mfcc/MfccExtractor.cpp
     src/utils/pitch2/PitchDetector2.cpp
+    src/utils/ode/RungeKuttaSolver.cpp
+    src/utils/decomp/LuDecomposition.cpp
+    src/utils/decomp2/CholeskyDecomposition.cpp
+    src/utils/graph4/BellmanFord.cpp
+    src/utils/graph5/FloydWarshall.cpp
+    src/utils/mst/KruskalMST.cpp
+    src/utils/mst2/PrimMST.cpp
+    src/utils/stringmatch/KmpMatcher.cpp
+    src/utils/stringmatch2/BoyerMooreMatcher.cpp
+    src/utils/treap/Treap.cpp
+    src/utils/splay/SplayTree.cpp
+    src/utils/kdtree/KDTree.cpp
+    src/utils/cic/CicFilter.cpp
+    src/utils/optimize/SimulatedAnnealing.cpp
+    src/utils/optimize2/GeneticOptimizer.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -2068,6 +2083,21 @@ set(HEADERS
     src/utils/spectral/SpectralFeatures.h
     src/utils/mfcc/MfccExtractor.h
     src/utils/pitch2/PitchDetector2.h
+    src/utils/ode/RungeKuttaSolver.h
+    src/utils/decomp/LuDecomposition.h
+    src/utils/decomp2/CholeskyDecomposition.h
+    src/utils/graph4/BellmanFord.h
+    src/utils/graph5/FloydWarshall.h
+    src/utils/mst/KruskalMST.h
+    src/utils/mst2/PrimMST.h
+    src/utils/stringmatch/KmpMatcher.h
+    src/utils/stringmatch2/BoyerMooreMatcher.h
+    src/utils/treap/Treap.h
+    src/utils/splay/SplayTree.h
+    src/utils/kdtree/KDTree.h
+    src/utils/cic/CicFilter.h
+    src/utils/optimize/SimulatedAnnealing.h
+    src/utils/optimize2/GeneticOptimizer.h
 )
 
 set(RESOURCES
