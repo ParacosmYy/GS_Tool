@@ -117,6 +117,6 @@ private:
     int m_maxIter;                 ///< 最大迭代次数
     double m_tol;                  ///< 收敛容差
 
-    Stats m_stats;
-    double m_timeSum = 0.0;        ///< 处理时间累加器
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;        ///< 处理时间累加器
 };

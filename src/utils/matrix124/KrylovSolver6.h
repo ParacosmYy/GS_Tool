@@ -59,4 +59,5 @@ signals:
 
 private:
     Stats m_stats; double m_timeSum = 0.0;
+    QVector<double> m_residualHistory;
 };

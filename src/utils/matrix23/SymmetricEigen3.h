@@ -66,7 +66,7 @@ private:
                         QVector<QVector<double>>& q, int n) const;
     int implicitQR(QVector<double>& diag, QVector<double>& offDiag,
                    QVector<QVector<double>>& q, int n);
-    void wilkinsonShift(double d, double e, double& sigma) const;
+    void wilkinsonShift(double d, double e, double dd, double& sigma) const;
     void givensRotation(double a, double b, double& c, double& s) const;
 
     int m_maxIterations;            ///< 最大QR迭代次数

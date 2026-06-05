@@ -143,9 +143,9 @@ private:
         const QVector<QVector<double>>& M, int rows, int cols);
 
     int m_crossover;                           ///< 交叉点阈值
-    int m_trimRows = 0;                        ///< 裁剪行数
-    int m_trimCols = 0;                        ///< 裁剪列数
+    mutable int m_trimRows = 0;                ///< 裁剪行数(padToPowerOfTwo中修改)
+    mutable int m_trimCols = 0;                ///< 裁剪列数(padToPowerOfTwo中修改)
 
-    Stats m_stats;
-    double m_timeSum = 0.0;                     ///< 处理时间累加器
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;            ///< 处理时间累加器
 };

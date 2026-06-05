@@ -11,6 +11,7 @@
 #include "utils/matrix51/SparseCholesky4.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
 #include <algorithm>
 #include <cmath>

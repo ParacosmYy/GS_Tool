@@ -5,6 +5,7 @@
 
 #include "utils/matrix12/CompressedCol.h"
 
+#include <QSet>
 #include <QtMath>
 #include <QtGlobal>
 #include <algorithm>
@@ -140,7 +141,7 @@ QVector<double> CompressedCol::spMV(const QVector<double>& x) const
 QPair<QVector<double>, QPair<int, double>>
 CompressedCol::gaussSeidel(const QVector<double>& b,
                             int maxIter,
-                            double tolerance) const
+                            double tolerance)
 {
     m_timer.start();
 

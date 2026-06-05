@@ -36,8 +36,8 @@ signals:
     void factorizationCompleted(int bandwidth, int size);
 
 private:
-    Stats m_stats;
-    double m_timeSum = 0.0;
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;
     int m_n = 0;
     int m_halfBandwidth = 0;
     QVector<QVector<double>> m_factoredBands;

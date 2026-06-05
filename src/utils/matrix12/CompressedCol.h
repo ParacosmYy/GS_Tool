@@ -71,7 +71,7 @@ public:
     QPair<QVector<double>, QPair<int, double>>
     gaussSeidel(const QVector<double>& b,
                 int maxIter = 1000,
-                double tolerance = 1e-10) const;
+                double tolerance = 1e-10);
 
     /**
      * @brief 矩阵转置
@@ -115,7 +115,7 @@ private:
     QVector<int>    m_rowIdx;   ///< 行索引
     QVector<int>    m_colPtr;   ///< 列指针(m_cols+1个元素)
 
-    Stats              m_stats;
-    double             m_timeSum = 0.0;
+    mutable Stats              m_stats;
+    mutable double             m_timeSum = 0.0;
     mutable QElapsedTimer m_timer;
 };

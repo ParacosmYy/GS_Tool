@@ -6,6 +6,7 @@
 #include "utils/matrix20/SparseCholesky.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
 
 #include <algorithm>
