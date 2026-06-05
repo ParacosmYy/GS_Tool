@@ -2,25 +2,16 @@
 #include <QElapsedTimer>
 #include <cmath>
 #include <algorithm>
-
 /**
  * @brief 构造函数，初始化Turbo码编解码器
  * @param parent 父对象指针
  */
-TurboCode7::TurboCode7(QObject* parent)
-    : QObject(parent)
-{
-}
-
+TurboCode7::TurboCode7(QObject* parent) : QObject(parent) {}
 /**
  * @brief 设置迭代解码次数
  * @param iterations 迭代次数，越多纠错性能越好但延迟越高
  */
-void TurboCode7::setIterations(int iterations)
-{
-    m_iterations = qMax(1, iterations);
-}
-
+void TurboCode7::setIterations(int iterations) { m_iterations = qMax(1, iterations); }
 /**
  * @brief 交织器：伪随机重排比特顺序
  * @param bits 输入比特序列

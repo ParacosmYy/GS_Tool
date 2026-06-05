@@ -1,10 +1,10 @@
 /**
  * @file DBSCAN11.cpp
- * @brief DBSCAN密度聚类算法实现
+ * @brief DBSCAN密度聚类算法实现(增强版)
  *
- * 实现基于密度的空间聚类应用DBSCAN(Density-Based Spatial
- * Clustering of Applications with Noise)，支持自动发现簇数和
- * 噪声点识别。
+ * 支持任意距离度量(欧氏/曼哈顿/切比雪夫)的密度聚类，
+ * 自动发现簇数量，识别噪声点。支持预计算距离矩阵和
+ * 自定义距离度量。
  */
 
 #include "utils/cluster72/DBSCAN11.h"
@@ -16,6 +16,8 @@
 /**
  * @brief 构造函数，初始化默认参数
  * @param parent 父对象指针
+ *
+ * 默认距离度量为欧氏距离。
  */
 DBSCAN11::DBSCAN11(QObject* parent)
     : QObject(parent)
@@ -23,35 +25,57 @@ DBSCAN11::DBSCAN11(QObject* parent)
 }
 
 /**
- * @brief 设置邻域半径
- * @param eps epsilon半径
+ * @brief 设置自定义距离度量
+ * @param metric 距离度量名称: "euclidean"/"manhattan"/"chebyshev"
  */
-void DBSCAN11::setEpsilon(double eps)
+void DBSCAN11::setDistanceMetric(const QString& metric)
 {
-    m_eps = qBound(0.001, eps, 1000.0);
+    m_metric = metric.toLower();
 }
 
 /**
- * @brief 设置核心点最小邻居数
- * @param minPts 最小点数
+ * @brief 计算两点间距离
+ * @param a 第一个点
+ * @param b 第二个点
+ * @param metric 距离度量类型
+ * @return 距离值
  */
-void DBSCAN11::setMinPoints(int minPts)
+static double computeDist(const QVector<double>& a, const QVector<double>& b, const QString& metric)
 {
-    m_minPts = qMax(2, minPts);
+    const int D = qMin(a.size(), b.size());
+    if (metric == "manhattan") {
+        double dist = 0.0;
+        for (int i = 0; i < D; ++i) dist += qAbs(a[i] - b[i]);
+        return dist;
+    }
+    if (metric == "chebyshev") {
+        double dist = 0.0;
+        for (int i = 0; i < D; ++i) dist = qMax(dist, qAbs(a[i] - b[i]));
+        return dist;
+    }
+    /* 默认: 欧氏距离 */
+    double dist = 0.0;
+    for (int i = 0; i < D; ++i) {
+        double diff = a[i] - b[i];
+        dist += diff * diff;
+    }
+    return qSqrt(dist);
 }
 
 /**
- * @brief 对数据点进行DBSCAN聚类
+ * @brief 执行DBSCAN聚类
  * @param points 输入数据点集合
- * @return 每个点的聚类标签（-1表示噪声点）
+ * @param epsilon 邻域半径
+ * @param minPts 核心点最小邻居数
+ * @return 每个点的簇标签(-1为噪声)
  *
  * 算法流程:
- * 1. 预计算距离矩阵
- * 2. 对每个未分类点查找epsilon邻域
- * 3. 若邻域内点数 >= minPts，创建新簇并扩展
- * 4. 否则标记为噪声点
+ * 1. 预计算每个点的邻域列表
+ * 2. 标记核心点(邻域内点数 >= minPts)
+ * 3. 从核心点出发BFS扩展簇
+ * 4. 未被任何簇包含的点标记为噪声
  */
-QVector<int> DBSCAN11::cluster(const QVector<QVector<double>>& points)
+QVector<int> DBSCAN11::fit(const QVector<QVector<double>>& points, double epsilon, int minPts)
 {
     QElapsedTimer timer;
     timer.start();
@@ -59,102 +83,173 @@ QVector<int> DBSCAN11::cluster(const QVector<QVector<double>>& points)
     const int N = points.size();
     if (N == 0) return QVector<int>();
 
-    const int D = points[0].size();
-    QVector<int> labels(N, -1); /* -1 = 未分类 */
-    m_numClusters = 0;
-    m_noiseCount = 0;
+    minPts = qMax(2, minPts);
+    m_labels = QVector<int>(N, -2); /* -2 = 未访问 */
+    m_corePoints.clear();
 
-    /* 阶段1: 预计算距离矩阵（加速邻域查询） */
-    QVector<QVector<double>> distMatrix(N, QVector<double>(N, 0.0));
+    /* 阶段1: 预计算邻域 */
+    QVector<QVector<int>> neighborhoods(N);
     for (int i = 0; i < N; ++i) {
         for (int j = i + 1; j < N; ++j) {
-            double dist = 0.0;
-            for (int d = 0; d < D; ++d) {
-                double diff = points[i][d] - points[j][d];
-                dist += diff * diff;
+            double d = computeDist(points[i], points[j], m_metric);
+            if (d <= epsilon) {
+                neighborhoods[i].append(j);
+                neighborhoods[j].append(i);
             }
-            dist = qSqrt(dist);
-            distMatrix[i][j] = dist;
-            distMatrix[j][i] = dist;
         }
     }
 
-    /* 阶段2: 预计算每个点的邻域列表 */
-    QVector<QVector<int>> neighborhoods(N);
+    /* 阶段2: 识别核心点 */
     for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < N; ++j) {
-            if (i != j && distMatrix[i][j] <= m_eps) {
-                neighborhoods[i].append(j);
-            }
+        if (neighborhoods[i].size() >= minPts) {
+            m_corePoints.append(i);
         }
     }
 
     /* 阶段3: DBSCAN主循环 */
+    int clusterId = 0;
     for (int i = 0; i < N; ++i) {
-        if (labels[i] != -1) continue; /* 跳过已分类点 */
+        if (m_labels[i] != -2) continue;
 
-        /* 查找epsilon邻域内的点 */
-        const QVector<int>& neighbors = neighborhoods[i];
-
-        if (neighbors.size() < m_minPts) {
-            /* 邻域内点数不足，标记为噪声（可能后续被重新标记为边界点） */
-            labels[i] = -1;
+        if (neighborhoods[i].size() < minPts) {
+            m_labels[i] = -1; /* 噪声(暂时) */
             continue;
         }
 
         /* 创建新簇 */
-        int clusterId = m_numClusters;
-        m_numClusters++;
-        labels[i] = clusterId;
+        m_labels[i] = clusterId;
 
-        /* 阶段4: 扩展簇 - 使用种子集合BFS */
-        QVector<int> seeds = neighbors;
+        /* BFS扩展簇 */
+        QVector<int> seeds = neighborhoods[i];
         int seedIdx = 0;
         while (seedIdx < seeds.size()) {
             int q = seeds[seedIdx];
             seedIdx++;
 
-            /* 噪声点重新标记为边界点 */
-            if (labels[q] == -1) {
-                labels[q] = clusterId;
+            if (m_labels[q] == -1) {
+                m_labels[q] = clusterId; /* 噪声变边界点 */
             }
+            if (m_labels[q] != -2) continue;
 
-            /* 跳过已分类的非噪声点 */
-            if (labels[q] != -1 && q != i) continue;
+            m_labels[q] = clusterId;
 
-            labels[q] = clusterId;
-
-            /* 查找q的邻域 */
-            const QVector<int>& qNeighbors = neighborhoods[q];
-
-            /* 如果q是核心点，将其邻域加入种子集合 */
-            if (qNeighbors.size() >= m_minPts) {
-                for (int n : qNeighbors) {
-                    if (labels[n] == -1) {
-                        if (!seeds.contains(n)) {
-                            seeds.append(n);
-                        }
+            if (neighborhoods[q].size() >= minPts) {
+                for (int n : neighborhoods[q]) {
+                    if (m_labels[n] < 0) {
+                        if (!seeds.contains(n)) seeds.append(n);
                     }
                 }
             }
         }
-    }
 
-    /* 统计噪声点数量 */
-    m_noiseCount = 0;
-    for (int i = 0; i < N; ++i) {
-        if (labels[i] == -1) m_noiseCount++;
+        clusterId++;
     }
 
     /* 更新统计信息 */
-    qint64 elapsed = timer.elapsed();
-    m_stats.totalClusterings++;
-    m_stats.totalPoints += N;
-    m_timeSum += elapsed;
-    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalClusterings;
+    int noiseCount = 0;
+    for (int i = 0; i < N; ++i) {
+        if (m_labels[i] == -1) noiseCount++;
+    }
 
-    emit clusteringCompleted(m_numClusters, m_noiseCount);
-    return labels;
+    qint64 elapsed = timer.elapsed();
+    m_stats.totalClusters += clusterId;
+    m_stats.totalNoisePoints += noiseCount;
+    m_timeSum += elapsed;
+    m_stats.avgProcessingTimeMs = m_timeSum / qMax(1, (m_stats.totalClusters + m_stats.totalNoisePoints));
+
+    emit clusteringCompleted(clusterId, noiseCount);
+    return m_labels;
+}
+
+/**
+ * @brief 使用预计算距离矩阵执行聚类
+ * @param distMatrix N*N距离矩阵(对称)
+ * @param epsilon 邻域半径
+ * @param minPts 核心点最小邻居数
+ * @return 每个点的簇标签(-1为噪声)
+ *
+ * 当距离矩阵已知时(如外部计算)，可直接使用而无需重新计算。
+ */
+QVector<int> DBSCAN11::fitFromDistance(const QVector<QVector<double>>& distMatrix, double epsilon, int minPts)
+{
+    QElapsedTimer timer;
+    timer.start();
+
+    const int N = distMatrix.size();
+    if (N == 0) return QVector<int>();
+
+    minPts = qMax(2, minPts);
+    m_labels = QVector<int>(N, -2);
+    m_corePoints.clear();
+
+    /* 从距离矩阵构建邻域 */
+    QVector<QVector<int>> neighborhoods(N);
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            if (i != j && distMatrix[i].size() > j && distMatrix[i][j] <= epsilon) {
+                neighborhoods[i].append(j);
+            }
+        }
+    }
+
+    /* 识别核心点 */
+    for (int i = 0; i < N; ++i) {
+        if (neighborhoods[i].size() >= minPts) {
+            m_corePoints.append(i);
+        }
+    }
+
+    /* DBSCAN主循环 */
+    int clusterId = 0;
+    for (int i = 0; i < N; ++i) {
+        if (m_labels[i] != -2) continue;
+        if (neighborhoods[i].size() < minPts) {
+            m_labels[i] = -1;
+            continue;
+        }
+
+        m_labels[i] = clusterId;
+        QVector<int> seeds = neighborhoods[i];
+        int seedIdx = 0;
+        while (seedIdx < seeds.size()) {
+            int q = seeds[seedIdx++];
+            if (m_labels[q] == -1) m_labels[q] = clusterId;
+            if (m_labels[q] != -2) continue;
+            m_labels[q] = clusterId;
+            if (neighborhoods[q].size() >= minPts) {
+                for (int n : neighborhoods[q]) {
+                    if (m_labels[n] < 0 && !seeds.contains(n)) seeds.append(n);
+                }
+            }
+        }
+        clusterId++;
+    }
+
+    int noiseCount = 0;
+    for (int i = 0; i < N; ++i) if (m_labels[i] == -1) noiseCount++;
+
+    qint64 elapsed = timer.elapsed();
+    m_stats.totalClusters += clusterId;
+    m_stats.totalNoisePoints += noiseCount;
+    m_timeSum += elapsed;
+    m_stats.avgProcessingTimeMs = m_timeSum / qMax(1, (m_stats.totalClusters + m_stats.totalNoisePoints));
+
+    emit clusteringCompleted(clusterId, noiseCount);
+    return m_labels;
+}
+
+/**
+ * @brief 获取指定簇的所有点索引
+ * @param clusterId 簇编号
+ * @return 该簇内所有点的索引列表
+ */
+QVector<int> DBSCAN11::getClusterPoints(int clusterId) const
+{
+    QVector<int> pts;
+    for (int i = 0; i < m_labels.size(); ++i) {
+        if (m_labels[i] == clusterId) pts.append(i);
+    }
+    return pts;
 }
 
 /**
@@ -164,73 +259,4 @@ void DBSCAN11::resetStatistics()
 {
     m_stats = Stats();
     m_timeSum = 0.0;
-}
-
-/**
- * @brief 计算核心点数量
- * @param points 数据点集合
- * @return 满足minPts邻域条件的核心点数量
- */
-int DBSCAN11::countCorePoints(const QVector<QVector<double>>& points) const
-{
-    const int N = points.size();
-    if (N == 0) return 0;
-
-    const int D = points[0].size();
-    int coreCount = 0;
-
-    for (int i = 0; i < N; ++i) {
-        int neighborCount = 0;
-        for (int j = 0; j < N; ++j) {
-            if (i == j) continue;
-            double dist = 0.0;
-            for (int d = 0; d < D; ++d) {
-                double diff = points[i][d] - points[j][d];
-                dist += diff * diff;
-            }
-            if (qSqrt(dist) <= m_eps) neighborCount++;
-        }
-        if (neighborCount >= m_minPts) coreCount++;
-    }
-
-    return coreCount;
-}
-
-/**
- * @brief 估计数据集的最佳epsilon参数
- * @param points 数据点集合
- * @param k 邻居数量（通常等于minPts）
- * @return 建议的epsilon值
- *
- * 使用k-distance图法：计算每个点到第k近邻的距离，
- * 然后返回这些距离的中位数作为建议的epsilon。
- */
-double DBSCAN11::estimateEpsilon(const QVector<QVector<double>>& points, int k) const
-{
-    const int N = points.size();
-    if (N == 0 || k <= 0) return m_eps;
-
-    const int D = points[0].size();
-    QVector<double> kDistances;
-
-    for (int i = 0; i < N; ++i) {
-        QVector<double> dists;
-        for (int j = 0; j < N; ++j) {
-            if (i == j) continue;
-            double dist = 0.0;
-            for (int d = 0; d < D; ++d) {
-                double diff = points[i][d] - points[j][d];
-                dist += diff * diff;
-            }
-            dists.append(qSqrt(dist));
-        }
-        std::sort(dists.begin(), dists.end());
-        if (k - 1 < dists.size()) {
-            kDistances.append(dists[k - 1]);
-        }
-    }
-
-    if (kDistances.isEmpty()) return m_eps;
-    std::sort(kDistances.begin(), kDistances.end());
-    return kDistances[kDistances.size() / 2];
 }

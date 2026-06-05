@@ -1,9 +1,10 @@
 /**
  * @file SparseGMRES2.cpp
- * @brief Householder QR分解实现
+ * @brief 稀疏矩阵GMRES求解器实现
  *
- * 实现基于Householder反射的QR分解，支持线性方程组求解
- * 和残差范数计算。适用于最小二乘问题和矩阵计算。
+ * 实现广义最小残差法(GMRES)求解稀疏线性方程组Ax=b。
+ * 使用Arnoldi迭代构建Krylov子空间，配合restarted策略
+ * 控制内存使用。支持COO稀疏存储格式。
  */
 
 #include "utils/matrix77/SparseGMRES2.h"
@@ -15,6 +16,8 @@
 /**
  * @brief 构造函数，初始化默认参数
  * @param parent 父对象指针
+ *
+ * 默认: 最大迭代100次，容差1e-8，重启步数30
  */
 SparseGMRES2::SparseGMRES2(QObject* parent)
     : QObject(parent)
@@ -22,166 +25,222 @@ SparseGMRES2::SparseGMRES2(QObject* parent)
 }
 
 /**
- * @brief 设置待分解矩阵
- * @param A 输入矩阵，m行n列
+ * @brief 设置矩阵维度
+ * @param n 矩阵行/列数
  */
-void SparseGMRES2::setMatrix(const QVector<QVector<double>>& A)
+void SparseGMRES2::setDimension(int n)
 {
-    if (A.isEmpty()) return;
-    m_rows = A.size();
-    m_cols = A[0].size();
-
-    /* 拷贝到内部存储R矩阵 */
-    m_R.clear();
-    m_R.resize(m_rows);
-    for (int i = 0; i < m_rows; ++i) {
-        m_R[i].resize(m_cols, 0.0);
-        for (int j = 0; j < qMin(static_cast<int>(A[i].size()), m_cols); ++j) {
-            m_R[i][j] = A[i][j];
-        }
-    }
-    m_Q.clear();
+    m_n = qMax(0, n);
+    m_rowPtr.clear();
+    m_colIdx.clear();
+    m_values.clear();
 }
 
 /**
- * @brief 执行QR分解
- * @return 分解是否成功
+ * @brief 添加稀疏矩阵元素(COO格式)
+ * @param row 行索引
+ * @param col 列索引
+ * @param val 非零值
  *
- * 使用Householder反射逐列消元，将A分解为正交矩阵Q和上三角矩阵R。
- * Householder向量v通过列向量的范数计算得到，反射矩阵H = I - 2vv^T/v^Tv。
+ * 以COO格式暂存元素，solve时直接使用进行SpMV。
  */
-bool SparseGMRES2::decompose()
+void SparseGMRES2::addEntry(int row, int col, double val)
 {
-    QElapsedTimer timer;
-    timer.start();
-
-    if (m_rows == 0 || m_cols == 0 || m_R.isEmpty()) return false;
-
-    int m = m_rows;
-    int n = m_cols;
-    int minDim = qMin(m, n);
-
-    /* 初始化Q为单位矩阵 */
-    m_Q.resize(m);
-    for (int i = 0; i < m; ++i) {
-        m_Q[i].resize(m, 0.0);
-        m_Q[i][i] = 1.0;
-    }
-
-    /* Householder变换逐列消元 */
-    for (int k = 0; k < minDim; ++k) {
-        /* 计算第k列下半部分的二范数 */
-        double norm = 0.0;
-        for (int i = k; i < m; ++i) {
-            norm += m_R[i][k] * m_R[i][k];
-        }
-        norm = qSqrt(norm);
-
-        if (norm < 1e-15) continue;
-
-        /* 计算Householder向量参数 */
-        double alpha = (m_R[k][k] >= 0) ? -norm : norm;
-        double beta = norm * (norm + qAbs(m_R[k][k]));
-
-        /* 构造Householder向量: v = R[k:m, k] */
-        m_R[k][k] -= alpha;
-
-        if (qAbs(beta) < 1e-300) continue;
-
-        /* 应用Householder变换到R的右侧列: R = H * R */
-        for (int j = k; j < n; ++j) {
-            double dot = 0.0;
-            for (int i = k; i < m; ++i) {
-                dot += m_R[i][k] * m_R[i][j];
-            }
-            double coeff = dot / beta;
-            for (int i = k; i < m; ++i) {
-                m_R[i][j] -= coeff * m_R[i][k];
-            }
-        }
-
-        /* 应用Householder变换到Q: Q = Q * H^T = Q * H */
-        for (int j = 0; j < m; ++j) {
-            double dot = 0.0;
-            for (int i = k; i < m; ++i) {
-                dot += m_R[i][k] * m_Q[j][i];
-            }
-            double coeff = dot / beta;
-            for (int i = k; i < m; ++i) {
-                m_Q[j][i] -= coeff * m_R[i][k];
-            }
-        }
-
-        /* 恢复对角元素为精确值 */
-        m_R[k][k] = alpha;
-    }
-
-    /* 清零R的下三角部分(消除数值误差) */
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < qMin(i, n); ++j) {
-            m_R[i][j] = 0.0;
-        }
-    }
-
-    /* 更新统计信息 */
-    qint64 elapsed = timer.elapsed();
-    m_stats.totalDecompositions++;
-    m_timeSum += elapsed;
-    m_stats.avgProcessingTimeMs = m_timeSum / (m_stats.totalDecompositions + m_stats.totalSolves);
-
-    emit decompositionCompleted(m, n);
-    return true;
+    if (row < 0 || row >= m_n || col < 0 || col >= m_n) return;
+    if (qFuzzyIsNull(val)) return;
+    m_rowPtr.append(row);
+    m_colIdx.append(col);
+    m_values.append(val);
 }
 
 /**
- * @brief 使用QR分解求解线性方程组Ax=b
- * @param b 右端项
+ * @brief 设置最大迭代次数
+ * @param iter 最大迭代次数
+ */
+void SparseGMRES2::setMaxIterations(int iter)
+{
+    m_maxIter = qMax(1, iter);
+}
+
+/**
+ * @brief 设置收敛容差
+ * @param tol 相对残差容差
+ */
+void SparseGMRES2::setTolerance(double tol)
+{
+    m_tol = qBound(1e-15, tol, 1.0);
+}
+
+/**
+ * @brief 设置重启步数
+ * @param m GMRES(m)的重启步数
+ */
+void SparseGMRES2::setRestart(int m)
+{
+    m_restart = qMax(1, m);
+}
+
+/**
+ * @brief 稀疏矩阵向量乘法
+ * @param x 输入向量
+ * @return 结果向量y = A*x
+ *
+ * 使用COO格式的稀疏矩阵进行SpMV运算。
+ */
+QVector<double> SparseGMRES2::spMV(const QVector<double>& x) const
+{
+    QVector<double> y(m_n, 0.0);
+    for (int i = 0; i < m_rowPtr.size(); ++i) {
+        int r = m_rowPtr[i];
+        int c = m_colIdx[i];
+        if (r < m_n && c < x.size()) {
+            y[r] += m_values[i] * x[c];
+        }
+    }
+    return y;
+}
+
+/**
+ * @brief 求解稀疏线性方程组Ax=b
+ * @param b 右端项向量
  * @return 解向量x
  *
- * 利用QR分解结果求解Ax=b等价于R*x = Q^T*b。
- * 先计算Q^T*b，再对上三角矩阵R进行回代。
+ * GMRES(m) restarted算法流程:
+ * 1. 计算初始残差 r0 = b - A*x0
+ * 2. Arnoldi过程构建Krylov子空间的正交基V
+ * 3. 构建上Hessenberg矩阵H
+ * 4. Givens旋转将H三角化
+ * 5. 回代求解最小二乘问题
+ * 6. 更新解向量 x = x0 + V*y
+ * 7. 检查收敛，未收敛则重启
  */
 QVector<double> SparseGMRES2::solve(const QVector<double>& b)
 {
     QElapsedTimer timer;
     timer.start();
 
-    QVector<double> x(m_cols, 0.0);
-    if (m_Q.isEmpty() || m_R.isEmpty()) return x;
+    QVector<double> x(m_n, 0.0);
+    if (m_n == 0 || m_rowPtr.isEmpty()) return x;
 
-    int m = m_rows;
-    int n = m_cols;
+    int m = qMin(m_restart, m_n);
+    m_iterUsed = 0;
+    m_residual = 1e18;
 
-    /* 步骤1: 计算 Q^T * b */
-    QVector<double> Qtb(m, 0.0);
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < m; ++j) {
-            Qtb[i] += m_Q[i][j] * ((j < b.size()) ? b[j] : 0.0);
+    /* 计算初始残差 r0 = b - A*x0 */
+    QVector<double> r = b;
+    QVector<double> ax = spMV(x);
+    for (int i = 0; i < m_n; ++i) r[i] -= ax[i];
+
+    double beta = 0.0;
+    for (int i = 0; i < m_n; ++i) beta += r[i] * r[i];
+    beta = qSqrt(beta);
+
+    if (beta < 1e-300) {
+        m_residual = 0.0;
+
+        qint64 elapsed = timer.elapsed();
+        m_stats.totalSolves++;
+        m_timeSum += elapsed;
+        m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalSolves;
+
+        emit solveCompleted(0, 0.0);
+        return x;
+    }
+
+    double bnorm = 0.0;
+    for (int i = 0; i < m_n; ++i) bnorm += b[i] * b[i];
+    bnorm = qSqrt(qMax(bnorm, 1e-300));
+
+    /* GMRES(m) 外循环(restarted) */
+    for (int outer = 0; outer < m_maxIter; ++outer) {
+        /* 初始化Arnoldi向量 */
+        QVector<QVector<double>> V(m + 1, QVector<double>(m_n, 0.0));
+        for (int i = 0; i < m_n; ++i) V[0][i] = r[i] / beta;
+
+        /* 上Hessenberg矩阵和Givens参数 */
+        QVector<QVector<double>> H(m + 1, QVector<double>(m, 0.0));
+        QVector<double> cs(m, 0.0), sn(m, 0.0);
+        QVector<double> g(m + 1, 0.0);
+        g[0] = beta;
+
+        int j;
+        for (j = 0; j < m && m_iterUsed < m_maxIter; ++j) {
+            /* Arnoldi步骤: w = A * V[j] */
+            QVector<double> w = spMV(V[j]);
+
+            /* Modified Gram-Schmidt正交化 */
+            for (int i = 0; i <= j; ++i) {
+                double dot = 0.0;
+                for (int k = 0; k < m_n; ++k) dot += w[k] * V[i][k];
+                H[i][j] = dot;
+                for (int k = 0; k < m_n; ++k) w[k] -= dot * V[i][k];
+            }
+
+            /* 归一化得到V[j+1] */
+            double nrm = 0.0;
+            for (int k = 0; k < m_n; ++k) nrm += w[k] * w[k];
+            H[j + 1][j] = qSqrt(nrm);
+            if (H[j + 1][j] > 1e-300) {
+                for (int k = 0; k < m_n; ++k) V[j + 1][k] = w[k] / H[j + 1][j];
+            }
+
+            /* 应用之前的Givens旋转 */
+            for (int i = 0; i < j; ++i) {
+                double temp = cs[i] * H[i][j] + sn[i] * H[i + 1][j];
+                H[i + 1][j] = -sn[i] * H[i][j] + cs[i] * H[i + 1][j];
+                H[i][j] = temp;
+            }
+
+            /* 新的Givens旋转 */
+            double rr = qSqrt(H[j][j] * H[j][j] + H[j + 1][j] * H[j + 1][j]);
+            cs[j] = H[j][j] / qMax(rr, 1e-300);
+            sn[j] = H[j + 1][j] / qMax(rr, 1e-300);
+            H[j][j] = rr;
+            H[j + 1][j] = 0.0;
+
+            /* 更新g向量 */
+            g[j + 1] = -sn[j] * g[j];
+            g[j] = cs[j] * g[j];
+
+            m_iterUsed++;
+            m_residual = qAbs(g[j + 1]) / bnorm;
+            if (m_residual < m_tol) break;
         }
-    }
 
-    /* 步骤2: 回代 R * x = Qtb */
-    for (int i = qMin(n, m) - 1; i >= 0; --i) {
-        double sum = Qtb[i];
-        for (int j = i + 1; j < n; ++j) {
-            sum -= m_R[i][j] * x[j];
+        /* 回代求解最小二乘问题 Hy = g */
+        QVector<double> y(j, 0.0);
+        for (int i = j - 1; i >= 0; --i) {
+            y[i] = g[i];
+            for (int k = i + 1; k < j; ++k) y[i] -= H[i][k] * y[k];
+            y[i] /= (qAbs(H[i][i]) > 1e-300) ? H[i][i] : 1.0;
         }
-        x[i] = (qAbs(m_R[i][i]) > 1e-15) ? sum / m_R[i][i] : 0.0;
-    }
 
-    /* 步骤3: 计算残差范数 */
-    m_residual = 0.0;
-    for (int i = n; i < m; ++i) {
-        m_residual += Qtb[i] * Qtb[i];
+        /* 更新解向量: x += V * y */
+        for (int i = 0; i < j; ++i) {
+            for (int k = 0; k < m_n; ++k) {
+                x[k] += y[i] * V[i][k];
+            }
+        }
+
+        if (m_residual < m_tol) break;
+
+        /* 计算新残差用于重启 */
+        r = b;
+        ax = spMV(x);
+        for (int i = 0; i < m_n; ++i) r[i] -= ax[i];
+        beta = 0.0;
+        for (int i = 0; i < m_n; ++i) beta += r[i] * r[i];
+        beta = qSqrt(beta);
     }
-    m_residual = qSqrt(m_residual);
 
     /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalSolves++;
+    m_stats.totalIterations += m_iterUsed;
     m_timeSum += elapsed;
-    m_stats.avgProcessingTimeMs = m_timeSum / (m_stats.totalDecompositions + m_stats.totalSolves);
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalSolves;
 
+    emit solveCompleted(m_iterUsed, m_residual);
     return x;
 }
 
@@ -192,47 +251,4 @@ void SparseGMRES2::resetStatistics()
 {
     m_stats = Stats();
     m_timeSum = 0.0;
-}
-
-/**
- * @brief 计算矩阵的条件数估计
- * @return 条件数估计值（R对角线最大/最小比值）
- */
-double SparseGMRES2::conditionNumber() const
-{
-    if (m_R.isEmpty()) return 1.0;
-
-    int minDim = qMin(m_rows, m_cols);
-    double maxDiag = 0.0, minDiag = 1e18;
-
-    for (int i = 0; i < minDim; ++i) {
-        double d = qAbs(m_R[i][i]);
-        maxDiag = qMax(maxDiag, d);
-        minDiag = qMin(minDiag, d);
-    }
-
-    return (minDiag > 1e-300) ? maxDiag / minDiag : 1e18;
-}
-
-/**
- * @brief 计算矩阵的有效秩
- * @param tol 容差阈值
- * @return 有效秩（R对角线中大于tol*max(|diag|)的元素个数）
- */
-int SparseGMRES2::effectiveRank(double tol) const
-{
-    if (m_R.isEmpty()) return 0;
-
-    int minDim = qMin(m_rows, m_cols);
-    double maxDiag = 0.0;
-    for (int i = 0; i < minDim; ++i) {
-        maxDiag = qMax(maxDiag, qAbs(m_R[i][i]));
-    }
-
-    double threshold = tol * maxDiag;
-    int rank = 0;
-    for (int i = 0; i < minDim; ++i) {
-        if (qAbs(m_R[i][i]) > threshold) rank++;
-    }
-    return rank;
 }

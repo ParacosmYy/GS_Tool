@@ -3,28 +3,19 @@
 #include <algorithm>
 
 /**
- * @brief 构造函数，初始化AVL平衡树
- * @param parent 父对象指针
+ * @brief 构造函数
  */
-AVLTree9::AVLTree9(QObject* parent)
-    : QObject(parent), m_root(nullptr)
-{
-}
+AVLTree9::AVLTree9(QObject* parent) : QObject(parent), m_root(nullptr) {}
 
 /**
  * @brief 获取节点高度
- * @param node 节点指针
- * @return 节点高度，空节点返回0
  */
 static int nodeHeight(AVLTree9::Node* node)
 {
     return node ? node->height : 0;
 }
 
-/**
- * @brief 更新节点高度
- * @param node 待更新节点
- */
+/** @brief 更新节点高度 */
 static void updateHeight(AVLTree9::Node* node)
 {
     if (node) {
@@ -32,21 +23,13 @@ static void updateHeight(AVLTree9::Node* node)
     }
 }
 
-/**
- * @brief 计算节点平衡因子
- * @param node 待计算节点
- * @return 平衡因子(左子树高度 - 右子树高度)
- */
+/** @brief 计算平衡因子 */
 static int balanceFactor(AVLTree9::Node* node)
 {
     return node ? nodeHeight(node->left) - nodeHeight(node->right) : 0;
 }
 
-/**
- * @brief 右旋操作(LL型)
- * @param y 不平衡节点
- * @return 旋转后的根节点
- */
+/** @brief 右旋(LL型) */
 static AVLTree9::Node* rotateRight(AVLTree9::Node* y)
 {
     AVLTree9::Node* x = y->left;
@@ -57,11 +40,7 @@ static AVLTree9::Node* rotateRight(AVLTree9::Node* y)
     return x;
 }
 
-/**
- * @brief 左旋操作(RR型)
- * @param x 不平衡节点
- * @return 旋转后的根节点
- */
+/** @brief 左旋(RR型) */
 static AVLTree9::Node* rotateLeft(AVLTree9::Node* x)
 {
     AVLTree9::Node* y = x->right;
@@ -117,11 +96,7 @@ void AVLTree9::insert(double key, int value)
     emit inserted(key);
 }
 
-/**
- * @brief 查找最小节点
- * @param node 子树根节点
- * @return 最小节点
- */
+/** @brief 查找最小节点 */
 static AVLTree9::Node* findMin(AVLTree9::Node* node)
 {
     while (node && node->left) node = node->left;
