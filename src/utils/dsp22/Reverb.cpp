@@ -213,7 +213,7 @@ double Reverb::processAllpass(double input, int filterIdx)
  * @param input 输入信号
  * @return 早期反射信号
  */
-double Reverb::Reverb::processEarlyReflections(double input)
+double Reverb::processEarlyReflections(double input)
 {
     /* 简单早期反射模型: 4次延迟叠加 */
     static const double kGains[] = {0.42, 0.38, 0.32, 0.28, 0.22, 0.17};
