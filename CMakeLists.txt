@@ -656,6 +656,8 @@ set(SOURCES
     src/utils/threshold/DataThresholdMonitor.cpp
     src/utils/capture/DataCaptureBuffer.cpp
     src/utils/crc_verifier/CrcStreamVerifier.cpp
+    src/utils/segment/DataSegmentAnalyzer.cpp
+    src/utils/outlier/OutlierDetector.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
