@@ -693,6 +693,8 @@ set(SOURCES
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
+    src/utils/eye/EyeDiagramEngine.cpp
+    src/utils/symbol/SymbolDecoder.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1458,6 +1460,12 @@ set(HEADERS
 
     # -- F94: 变点检测器 --
     src/utils/changept/ChangepointDetector.h
+
+    # -- F95: 眼图引擎 --
+    src/utils/eye/EyeDiagramEngine.h
+
+    # -- F96: 符号解码器 --
+    src/utils/symbol/SymbolDecoder.h
 )
 
 set(RESOURCES
