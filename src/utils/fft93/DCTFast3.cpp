@@ -113,6 +113,49 @@ QVector<double> DCTFast3::compute(const QVector<double>& input)
 }
 
 /**
+ * @brief 计算逆DCT(从频域恢复时域信号)
+ *
+ * 根据当前DCT类型自动选择对应的逆变换。
+ *
+ * @param coeffs DCT系数
+ * @return 逆变换后的时域信号
+ */
+QVector<double> DCTFast3::inverse(const QVector<double>& coeffs) const
+{
+    if (coeffs.isEmpty()) return QVector<double>();
+
+    int N = coeffs.size();
+    QVector<double> signal(N, 0.0);
+
+    if (m_type == 2) {
+        /* IDCT-II = DCT-III */
+        for (int n = 0; n < N; ++n) {
+            double sum = coeffs[0] / std::sqrt(2.0);
+            for (int k = 1; k < N; ++k) {
+                double angle = M_PI * k * (2.0 * n + 1) / (2.0 * N);
+                sum += coeffs[k] * std::cos(angle);
+            }
+            signal[n] = sum * std::sqrt(2.0 / N);
+        }
+    } else if (m_type == 3) {
+        /* IDCT-III = DCT-II */
+        for (int n = 0; n < N; ++n) {
+            double sum = 0.0;
+            for (int k = 0; k < N; ++k) {
+                double angle = M_PI * (2.0 * k + 1) * n / (2.0 * N);
+                double normFactor = (k == 0) ? std::sqrt(1.0 / N) : std::sqrt(2.0 / N);
+                sum += coeffs[k] * normFactor * std::cos(angle);
+            }
+            signal[n] = sum;
+        }
+    } else {
+        signal = coeffs;
+    }
+
+    return signal;
+}
+
+/**
  * @brief 重置统计数据
  */
 void DCTFast3::resetStatistics()

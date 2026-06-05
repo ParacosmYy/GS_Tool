@@ -101,6 +101,35 @@ void ConstantQ5::compute(const QVector<double>& samples)
 }
 
 /**
+ * @brief 获取常数Q值
+ * @return Q值(频率分辨率参数)
+ */
+double ConstantQ5::qValue() const
+{
+    return 1.0 / (std::pow(2.0, 1.0 / m_bins) - 1.0);
+}
+
+/**
+ * @brief 获取总频率箱数
+ * @return 频率箱数量
+ */
+int ConstantQ5::totalBins() const
+{
+    int numOctaves = static_cast<int>(std::ceil(std::log2(m_maxFreq / m_minFreq)));
+    return numOctaves * m_bins;
+}
+
+/**
+ * @brief 获取指定频率箱的中心频率
+ * @param binIndex 频率箱索引
+ * @return 中心频率(Hz)
+ */
+double ConstantQ5::binFrequency(int binIndex) const
+{
+    return m_minFreq * std::pow(2.0, static_cast<double>(binIndex) / m_bins);
+}
+
+/**
  * @brief 重置统计数据
  */
 void ConstantQ5::resetStatistics()

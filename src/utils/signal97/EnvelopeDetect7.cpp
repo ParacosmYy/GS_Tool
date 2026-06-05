@@ -87,6 +87,58 @@ void EnvelopeDetect7::detect(const QVector<double>& samples)
 }
 
 /**
+ * @brief 使用RMS方法计算信号包络
+ *
+ * 与峰值检测不同，RMS包络通过平方-平滑-开根号
+ * 计算均方根包络，对瞬态响应更平滑。
+ *
+ * @param samples 输入音频采样
+ * @return RMS包络曲线
+ */
+QVector<double> EnvelopeDetect7::rmsEnvelope(const QVector<double>& samples) const
+{
+    if (samples.isEmpty()) return QVector<double>();
+
+    const int N = samples.size();
+    double sampleRate = 44100.0;
+    double coeff = 1.0 - std::exp(-1.0 / (m_releaseTime * sampleRate));
+
+    QVector<double> envelope(N, 0.0);
+    double env = 0.0;
+
+    for (int i = 0; i < N; ++i) {
+        double input = samples[i] * samples[i]; /* 平方 */
+        env += coeff * (input - env);
+        envelope[i] = std::sqrt(qMax(0.0, env)); /* 均方根 */
+    }
+
+    return envelope;
+}
+
+/**
+ * @brief 计算包络的峰值因子
+ *
+ * 峰值因子 = 包络峰值 / 包络RMS
+ * 高峰值因子表示瞬态丰富，低峰值因子表示持续音。
+ *
+ * @param envelope 包络曲线
+ * @return 峰值因子
+ */
+double EnvelopeDetect7::crestFactor(const QVector<double>& envelope) const
+{
+    if (envelope.isEmpty()) return 0.0;
+
+    double peak = 0.0;
+    double rmsSum = 0.0;
+    for (double v : envelope) {
+        peak = qMax(peak, std::abs(v));
+        rmsSum += v * v;
+    }
+    double rms = std::sqrt(rmsSum / envelope.size());
+    return (rms > 1e-10) ? peak / rms : 0.0;
+}
+
+/**
  * @brief 重置统计数据
  */
 void EnvelopeDetect7::resetStatistics()

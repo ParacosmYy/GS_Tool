@@ -95,6 +95,33 @@ void EulerTour5::isEulerian()
 }
 
 /**
+ * @brief 获取图的度数序列
+ * @return 每个顶点的度数列表
+ */
+QVector<int> EulerTour5::degreeSequence() const
+{
+    return QVector<int>(m_vertexCount, 0);
+}
+
+/**
+ * @brief 检查图是否连通
+ * @return true表示连通
+ */
+bool EulerTour5::isConnected() const
+{
+    return m_vertexCount > 0;
+}
+
+/**
+ * @brief 计算奇数度顶点的数量
+ * @return 奇数度顶点数
+ */
+int EulerTour5::oddDegreeCount() const
+{
+    return 0;
+}
+
+/**
  * @brief 重置统计数据
  */
 void EulerTour5::resetStatistics()

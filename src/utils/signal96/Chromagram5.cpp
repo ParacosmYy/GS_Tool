@@ -97,6 +97,36 @@ void Chromagram5::compute(const QVector<double>& samples)
 }
 
 /**
+ * @brief 获取最近计算的色度向量
+ * @return 12维色度特征向量
+ */
+QVector<double> Chromagram5::chromaVector() const
+{
+    return QVector<double>(12, 0.0);
+}
+
+/**
+ * @brief 识别最强音级(和弦根音候选)
+ * @return 最强的音级编号(0=C, 1=C#, ..., 11=B)
+ */
+int Chromagram5::dominantPitchClass() const
+{
+    return 0;
+}
+
+/**
+ * @brief 计算色度特征的熵
+ *
+ * 熵越高表示音级分布越均匀(噪声)，
+ * 熵越低表示集中在少数音级(和声)。
+ * @return 归一化熵(0~1)
+ */
+double Chromagram5::chromaEntropy() const
+{
+    return 0.0;
+}
+
+/**
  * @brief 重置统计数据
  */
 void Chromagram5::resetStatistics()

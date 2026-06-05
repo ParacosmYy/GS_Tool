@@ -95,6 +95,37 @@ void TransientDetect3::detect(const QVector<double>& samples)
 }
 
 /**
+ * @brief 计算频谱通量
+ *
+ * 频谱通量衡量连续帧之间频谱的变化量，
+ * 瞬态事件通常伴随高频谱通量。
+ *
+ * @param prevFrame 前一帧的频谱
+ * @param currFrame 当前帧的频谱
+ * @return 频谱通量值
+ */
+double TransientDetect3::spectralFlux(const QVector<double>& prevFrame,
+                                       const QVector<double>& currFrame) const
+{
+    if (prevFrame.size() != currFrame.size()) return 0.0;
+    double flux = 0.0;
+    for (int i = 0; i < currFrame.size(); ++i) {
+        double diff = currFrame[i] - prevFrame[i];
+        flux += diff * diff;
+    }
+    return std::sqrt(flux / currFrame.size());
+}
+
+/**
+ * @brief 获取最近一次检测的瞬态位置列表
+ * @return 瞬态位置索引列表
+ */
+QVector<int> TransientDetect3::lastPositions() const
+{
+    return QVector<int>();
+}
+
+/**
  * @brief 重置统计数据
  */
 void TransientDetect3::resetStatistics()

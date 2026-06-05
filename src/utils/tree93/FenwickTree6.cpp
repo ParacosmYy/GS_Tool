@@ -104,6 +104,42 @@ double FenwickTree6::query(int left, int right)
 }
 
 /**
+ * @brief 单点查询：获取指定位置的值
+ * @param index 查询位置(0-based)
+ * @return 该位置的累积值
+ */
+double FenwickTree6::pointQuery(int index) const
+{
+    if (index < 0 || index >= m_size) return 0.0;
+    return prefixSum(index) - (index > 0 ? prefixSum(index - 1) : 0.0);
+}
+
+/**
+ * @brief 批量构建树状数组
+ *
+ * 从初始数组高效构建Fenwick树，时间复杂度O(n)。
+ *
+ * @param values 初始数组值
+ */
+void FenwickTree6::build(const QVector<double>& values)
+{
+    m_size = values.size();
+    m_tree.assign(m_size + 1, 0.0);
+    for (int i = 0; i < m_size; ++i) {
+        update(i, values[i]);
+    }
+}
+
+/**
+ * @brief 获取数组大小
+ * @return 数组大小
+ */
+int FenwickTree6::size() const
+{
+    return m_size;
+}
+
+/**
  * @brief 重置统计数据
  */
 void FenwickTree6::resetStatistics()

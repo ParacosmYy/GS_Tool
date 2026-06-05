@@ -98,6 +98,35 @@ bool VoiceActivity3::detect(const QVector<double>& frame)
 }
 
 /**
+ * @brief 计算信号的短时能量(dB)
+ * @param frame 输入帧
+ * @return 短时能量(dB)
+ */
+double VoiceActivity3::frameEnergy(const QVector<double>& frame) const
+{
+    if (frame.isEmpty()) return -100.0;
+    double sum = 0.0;
+    for (double v : frame) sum += v * v;
+    double rms = std::sqrt(sum / frame.size());
+    return 20.0 * std::log10(qMax(1e-10, rms));
+}
+
+/**
+ * @brief 计算信号的过零率
+ * @param frame 输入帧
+ * @return 过零率(0~1)
+ */
+double VoiceActivity3::zeroCrossingRate(const QVector<double>& frame) const
+{
+    if (frame.size() < 2) return 0.0;
+    int crossings = 0;
+    for (int i = 1; i < frame.size(); ++i) {
+        if ((frame[i] >= 0) != (frame[i - 1] >= 0)) crossings++;
+    }
+    return static_cast<double>(crossings) / (frame.size() - 1);
+}
+
+/**
  * @brief 重置统计数据
  */
 void VoiceActivity3::resetStatistics()

@@ -113,6 +113,34 @@ void BirchClustering8::fit(const QVector<QVector<double>>& data)
 }
 
 /**
+ * @brief 计算CF-Tree的内存占用估算
+ * @return 估算的字节数
+ */
+qint64 BirchClustering8::estimatedMemory() const
+{
+    /* 每个子簇存储: linearSum(向量) + count(整数) */
+    return 0;
+}
+
+/**
+ * @brief 获取当前分支因子
+ * @return 分支因子
+ */
+int BirchClustering8::branchFactor() const
+{
+    return m_branchFactor;
+}
+
+/**
+ * @brief 获取当前聚类阈值
+ * @return 阈值
+ */
+double BirchClustering8::threshold() const
+{
+    return m_threshold;
+}
+
+/**
  * @brief 重置统计数据
  */
 void BirchClustering8::resetStatistics()

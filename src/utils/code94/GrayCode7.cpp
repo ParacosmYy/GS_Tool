@@ -97,6 +97,47 @@ void GrayCode7::generateAll()
 }
 
 /**
+ * @brief 将Gray码序列转换为二进制序列
+ * @param graySequence Gray码值列表
+ * @return 对应的二进制值列表
+ */
+QVector<int> GrayCode7::grayToBinary(const QVector<int>& graySequence) const
+{
+    QVector<int> result;
+    for (int gray : graySequence) {
+        int value = gray;
+        for (int mask = value >> 1; mask != 0; mask >>= 1) {
+            value ^= mask;
+        }
+        result.append(value);
+    }
+    return result;
+}
+
+/**
+ * @brief 将二进制序列转换为Gray码序列
+ * @param binarySequence 二进制值列表
+ * @return 对应的Gray码值列表
+ */
+QVector<int> GrayCode7::binaryToGray(const QVector<int>& binarySequence) const
+{
+    QVector<int> result;
+    for (int val : binarySequence) {
+        result.append(val ^ (val >> 1));
+    }
+    return result;
+}
+
+/**
+ * @brief 计算两个相邻Gray码的汉明距离
+ * @return 汉明距离(理论上始终为1)
+ */
+int GrayCode7::adjacentHammingDistance() const
+{
+    return 1;
+}
+
+/**
  * @brief 重置统计数据
  */
 void GrayCode7::resetStatistics()

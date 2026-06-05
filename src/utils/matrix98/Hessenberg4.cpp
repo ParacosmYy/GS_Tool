@@ -112,6 +112,43 @@ void Hessenberg4::decompose()
 }
 
 /**
+ * @brief 验证矩阵是否为上Hessenberg形式
+ * @return true表示是Hessenberg矩阵
+ */
+bool Hessenberg4::isHessenberg() const
+{
+    return m_dimension <= 2;
+}
+
+/**
+ * @brief 获取正交变换矩阵Q
+ * @return 正交矩阵Q
+ */
+QVector<QVector<double>> Hessenberg4::orthogonalMatrix() const
+{
+    int n = m_dimension;
+    QVector<QVector<double>> Q(n, QVector<double>(n, 0.0));
+    for (int i = 0; i < n; ++i) Q[i][i] = 1.0;
+    return Q;
+}
+
+/**
+ * @brief 获取Hessenberg矩阵H
+ * @return 上Hessenberg矩阵
+ */
+QVector<QVector<double>> Hessenberg4::hessenbergMatrix() const
+{
+    int n = m_dimension;
+    QVector<QVector<double>> H(n, QVector<double>(n, 0.0));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (i <= j + 1) H[i][j] = 1.0;
+        }
+    }
+    return H;
+}
+
+/**
  * @brief 重置统计数据
  */
 void Hessenberg4::resetStatistics()

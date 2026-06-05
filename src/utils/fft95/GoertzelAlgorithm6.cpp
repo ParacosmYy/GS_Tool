@@ -85,6 +85,54 @@ void GoertzelAlgorithm6::compute(const QVector<double>& samples)
 }
 
 /**
+ * @brief 对多个目标频率执行批量Goertzel计算
+ * @param samples 输入采样
+ * @param targetFreqs 目标频率列表
+ * @return 每个频率对应的幅值
+ */
+QVector<double> GoertzelAlgorithm6::computeMulti(
+    const QVector<double>& samples,
+    const QVector<double>& targetFreqs) const
+{
+    QVector<double> magnitudes;
+    if (samples.isEmpty() || targetFreqs.isEmpty()) return magnitudes;
+    const int N = samples.size();
+    for (double freq : targetFreqs) {
+        double k = freq * N / m_sampleRate;
+        double coeff = 2.0 * std::cos(2.0 * M_PI * k / N);
+        double s0 = 0.0, s1 = 0.0, s2 = 0.0;
+        for (int n = 0; n < N; ++n) {
+            s0 = samples[n] + coeff * s1 - s2;
+            s2 = s1; s1 = s0;
+        }
+        double mag2 = s1 * s1 + s2 * s2 - coeff * s1 * s2;
+        magnitudes.append(std::sqrt(qMax(0.0, mag2)) / N);
+    }
+    return magnitudes;
+}
+
+/**
+ * @brief 计算目标频率的相位
+ * @param samples 输入采样
+ * @return 相位角(弧度)
+ */
+double GoertzelAlgorithm6::phase(const QVector<double>& samples) const
+{
+    if (samples.isEmpty()) return 0.0;
+    const int N = samples.size();
+    double k = m_targetFreq * N / m_sampleRate;
+    double coeff = 2.0 * std::cos(2.0 * M_PI * k / N);
+    double s0 = 0.0, s1 = 0.0, s2 = 0.0;
+    for (int n = 0; n < N; ++n) {
+        s0 = samples[n] + coeff * s1 - s2;
+        s2 = s1; s1 = s0;
+    }
+    double re = s1 - s2 * std::cos(2.0 * M_PI * k / N);
+    double im = s2 * std::sin(2.0 * M_PI * k / N);
+    return std::atan2(im, re);
+}
+
+/**
  * @brief 重置统计数据
  */
 void GoertzelAlgorithm6::resetStatistics()

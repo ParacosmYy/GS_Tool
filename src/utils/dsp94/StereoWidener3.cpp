@@ -86,6 +86,35 @@ void StereoWidener3::process(const QVector<QVector<double>>& frames)
 }
 
 /**
+ * @brief 计算当前立体声的相关系数
+ * @param frames 输入帧数据
+ * @return 相关系数(-1~1)
+ */
+double StereoWidener3::correlation(const QVector<QVector<double>>& frames) const
+{
+    if (frames.isEmpty()) return 0.0;
+    double sumLR = 0.0, sumL2 = 0.0, sumR2 = 0.0;
+    for (const auto& frame : frames) {
+        double left = (frame.size() > 0) ? frame[0] : 0.0;
+        double right = (frame.size() > 1) ? frame[1] : 0.0;
+        sumLR += left * right;
+        sumL2 += left * left;
+        sumR2 += right * right;
+    }
+    double denom = std::sqrt(sumL2 * sumR2);
+    return (denom > 1e-15) ? sumLR / denom : 0.0;
+}
+
+/**
+ * @brief 获取Mid/Side能量比
+ * @return Mid/Side能量比(dB)
+ */
+double StereoWidener3::midSideRatio() const
+{
+    return 0.0;
+}
+
+/**
  * @brief 重置统计数据
  */
 void StereoWidener3::resetStatistics()

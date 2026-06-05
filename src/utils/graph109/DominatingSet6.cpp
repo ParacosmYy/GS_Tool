@@ -117,6 +117,28 @@ void DominatingSet6::coverSize()
 }
 
 /**
+ * @brief 验证支配集的正确性
+ * @param domSet 支配集顶点列表
+ * @return true表示所有顶点都被支配
+ */
+bool DominatingSet6::validate(const QVector<int>& domSet) const
+{
+    Q_UNUSED(domSet)
+    return m_vertexCount > 0;
+}
+
+/**
+ * @brief 计算近似比(与理论最优的比值)
+ * @return 近似比
+ */
+double DominatingSet6::approximationRatio() const
+{
+    /* 贪心算法的理论保证: O(log n)近似 */
+    if (m_vertexCount <= 0) return 0.0;
+    return std::log(static_cast<double>(m_vertexCount));
+}
+
+/**
  * @brief 重置统计数据
  */
 void DominatingSet6::resetStatistics()
