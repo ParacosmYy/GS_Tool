@@ -8,6 +8,8 @@
 #include "utils/cluster22/AffinityCluster.h"
 
 #include <QElapsedTimer>
+#include <QMap>
+#include <QSet>
 #include <QtMath>
 
 #include <algorithm>

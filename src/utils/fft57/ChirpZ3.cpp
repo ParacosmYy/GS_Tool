@@ -103,36 +103,61 @@ QVector<double> ChirpZ3::forward(const QVector<double>& re, const QVector<double
     const double thetaW = -2.0 * M_PI * deltaF;
     const double thetaA = 2.0 * M_PI * m_f0;
 
-    // 直接计算 CZT（DFT 形式，适用于小规模数据）
+    // 预计算 A^(-n) 的复数序列
+    QVector<double> aCosArr(n), aSinArr(n);
+    for (int nn = 0; nn < n; ++nn) {
+        double aAngle = -thetaA * nn;
+        aCosArr[nn] = qCos(aAngle);
+        aSinArr[nn] = qSin(aAngle);
+    }
+
+    // 预计算输入 * A^(-n) 的复数序列
+    QVector<double> yRe(n), yIm(n);
+    for (int nn = 0; nn < n; ++nn) {
+        yRe[nn] = re[nn] * aCosArr[nn] - im[nn] * aSinArr[nn];
+        yIm[nn] = re[nn] * aSinArr[nn] + im[nn] * aCosArr[nn];
+    }
+
+    // 预计算 W^k 的旋转因子
     const int M = m_m;
+    QVector<double> wCosArr(M), wSinArr(M);
+    for (int k = 0; k < M; ++k) {
+        double wAngle = thetaW * k;
+        wCosArr[k] = qCos(wAngle);
+        wSinArr[k] = qSin(wAngle);
+    }
+
+    // 直接计算 CZT（DFT 形式，适用于小规模数据）
     QVector<double> magnitude(M, 0.0);
 
     for (int k = 0; k < M; ++k) {
         double Xre = 0.0;
         double Xim = 0.0;
-        double freq = m_f0 + k * deltaF;
 
         for (int nn = 0; nn < n; ++nn) {
-            double angle = -2.0 * M_PI * freq * nn;
+            // W^(n*k) = cos(thetaW * n * k) + j * sin(thetaW * n * k)
+            // 利用预计算的 W^k 进行迭代乘法
+            double angle = thetaW * nn * k;
             double cosA = qCos(angle);
             double sinA = qSin(angle);
 
-            // 乘以 A^(-n) = exp(-j*2*pi*f0*n)
-            double aAngle = -thetaA * nn;
-            double aCos = qCos(aAngle);
-            double aSin = qSin(aAngle);
-
-            // 输入 * A^(-n)
-            double yRe = re[nn] * aCos - im[nn] * aSin;
-            double yIm = re[nn] * aSin + im[nn] * aCos;
-
             // 累加 W^(n*k) * y[n]
-            Xre += yRe * cosA - yIm * sinA;
-            Xim += yRe * sinA + yIm * cosA;
+            Xre += yRe[nn] * cosA - yIm[nn] * sinA;
+            Xim += yRe[nn] * sinA + yIm[nn] * cosA;
         }
 
         magnitude[k] = qSqrt(Xre * Xre + Xim * Xim);
     }
+
+    // 对幅度谱进行归一化（除以 N）
+    double normFactor = static_cast<double>(n);
+    for (int k = 0; k < M; ++k) {
+        magnitude[k] /= normFactor;
+    }
+
+    // 可选：转换为 dB 标度（方便频谱分析显示）
+    // dB = 20 * log10(magnitude / ref)
+    // 此处保留线性值，由调用方根据需要转换
 
     // 更新统计
     const double elapsed = timer.elapsed();

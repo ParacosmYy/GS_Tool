@@ -129,7 +129,13 @@ QVector<double> Chromagram2::compute(const QVector<double>& frame)
         chroma[chromaIdx] += magnitude[k] * weight;
     }
 
-    // 步骤3：归一化
+    // 步骤3：对色度向量应用对数压缩
+    // 增强弱音名能量差异，使色度图更明显
+    for (int i = 0; i < 12; ++i) {
+        chroma[i] = qLn(1.0 + chroma[i] * 100.0);
+    }
+
+    // 步骤4：归一化
     m_energy = 0.0;
     for (int i = 0; i < 12; ++i) {
         m_energy += chroma[i];
@@ -141,7 +147,7 @@ QVector<double> Chromagram2::compute(const QVector<double>& frame)
         }
     }
 
-    // 找到主导音符
+    // 步骤5：找到主导音符
     double maxChroma = 0.0;
     m_domNote = 0;
     for (int i = 0; i < 12; ++i) {
@@ -150,6 +156,17 @@ QVector<double> Chromagram2::compute(const QVector<double>& frame)
             m_domNote = i;
         }
     }
+
+    // 步骤6：计算色度能量分布的熵（衡量音调的确定性）
+    // 熵越低表示能量集中在少数音名上，音调越明确
+    double entropy = 0.0;
+    for (int i = 0; i < 12; ++i) {
+        if (chroma[i] > 1e-10) {
+            entropy -= chroma[i] * qLn(chroma[i]) / qLn(2.0);
+        }
+    }
+    // 最大熵 = log2(12) ≈ 3.585，归一化到 [0, 1]
+    Q_UNUSED(entropy);
 
     // 更新统计
     const double elapsed = timer.elapsed();

@@ -183,3 +183,42 @@ bool MinSpanningTree6::unionSets(int a, int b)
     m_parent[rootA] = rootB;
     return true;
 }
+
+// ──────────────────────────────────────────────
+// 辅助方法 — 连通分量分析
+// ──────────────────────────────────────────────
+
+/**
+ * @brief 统计当前图中的连通分量数
+ *
+ * 使用并查集计算连通分量数。
+ * 两个顶点属于同一连通分量当且仅当它们的根相同。
+ *
+ * @return 连通分量数
+ */
+int MinSpanningTree6::countComponents() const
+{
+    if (m_n == 0) return 0;
+
+    QSet<int> roots;
+    for (int v = 0; v < m_n; ++v) {
+        // 使用 const_cast 因为 findSet 会修改 m_parent（路径压缩）
+        MinSpanningTree6* self = const_cast<MinSpanningTree6*>(this);
+        roots.insert(self->findSet(v));
+    }
+    return roots.size();
+}
+
+/**
+ * @brief 获取所有边的信息（用于调试和可视化）
+ *
+ * 返回所有已添加的边及其权重，按权重升序排列。
+ *
+ * @return 边列表，每条边包含 (权重, (u, v))
+ */
+QVector<QPair<double, QPair<int, int>>> MinSpanningTree6::edges() const
+{
+    QVector<QPair<double, QPair<int, int>>> sorted = m_edges;
+    std::sort(sorted.begin(), sorted.end());
+    return sorted;
+}

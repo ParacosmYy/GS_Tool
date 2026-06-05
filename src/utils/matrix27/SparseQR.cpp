@@ -46,7 +46,7 @@ void SparseQR::buildFromCOO(const QVector<int>& rows, const QVector<int>& cols,
     m_perm.clear();
 
     /* 从COO构建行稀疏存储: m_R[col][row] = value */
-    int nnz = qMin({rows.size(), cols.size(), values.size()});
+    int nnz = std::min({rows.size(), cols.size(), values.size()});
     for (int idx = 0; idx < nnz; ++idx) {
         int r = rows[idx];
         int c = cols[idx];

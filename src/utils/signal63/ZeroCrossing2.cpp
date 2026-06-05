@@ -3,10 +3,18 @@
  * @brief 过零检测器实现 (过零率 + 频率估计)
  *
  * 实现基于过零检测的频率分析方法:
- * - 过零率: 信号在单位时间内穿越零电平的次数
- * - 频率估计: 根据相邻正-负过零点的时间间隔估计基频
+ * - 过零率(ZCR): 信号在单位时间内穿越零电平的次数
+ *   ZCR = (过零次数) / (信号时长)
+ * - 频率估计: 根据相邻正到负过零点的时间间隔估计基频
+ *   freq = sampleRate / medianPeriod
  * - 最小距离约束: 过滤噪声引起的虚假过零
- * 常用于音高检测、语音端点检测和简单频率测量。
+ *
+ * 检测策略:
+ * - 只统计正到负方向的过零 (更稳定的基频估计)
+ * - 使用线性插值精确定位过零位置 (亚采样精度)
+ * - 使用阈值带 [-thresh, +thresh] 抑制低幅噪声
+ * - 使用最小间距过滤密集虚假过零
+ * - 使用周期中位数(非均值)提高鲁棒性
  *
  * @author EmbedDebug Team
  * @version 1.0
@@ -22,6 +30,8 @@
 /**
  * @brief 构造函数，初始化过零检测器
  * @param parent 父QObject指针
+ *
+ * 默认参数: sampleRate=44100, threshold=0.0, minDist=10
  */
 ZeroCrossing2::ZeroCrossing2(QObject* parent)
     : QObject(parent)
@@ -31,6 +41,8 @@ ZeroCrossing2::ZeroCrossing2(QObject* parent)
 /**
  * @brief 设置采样率
  * @param sr 采样率 (Hz)，默认 44100.0
+ *
+ * 采样率用于将过零间隔转换为频率
  */
 void ZeroCrossing2::setSampleRate(double sr)
 {
@@ -41,8 +53,9 @@ void ZeroCrossing2::setSampleRate(double sr)
  * @brief 设置过零阈值
  * @param thresh 过零检测阈值 (默认 0.0)
  *
- * 信号必须穿越 -thresh ~ +thresh 区域才算有效过零
- * 设置非零阈值可以抑制噪声
+ * 信号必须穿越 [-thresh, +thresh] 区域才算有效过零:
+ * - thresh = 0: 严格过零检测
+ * - thresh > 0: 滞后阈值，抑制小幅振荡噪声
  */
 void ZeroCrossing2::setThreshold(double thresh)
 {
@@ -54,6 +67,7 @@ void ZeroCrossing2::setThreshold(double thresh)
  * @param samples 两个过零点之间的最小采样间隔 (默认 10)
  *
  * 用于过滤噪声引起的密集虚假过零
+ * 对于基频检测，建议设置为 sampleRate / maxExpectedFreq
  */
 void ZeroCrossing2::setMinDistance(int samples)
 {
@@ -63,12 +77,18 @@ void ZeroCrossing2::setMinDistance(int samples)
 /**
  * @brief 检测信号中的过零点并估计频率
  *
- * 检测流程:
- * 1. 遍历信号，找到符号变化点 (正变负或负变正)
- * 2. 使用线性插值精确定位过零位置
- * 3. 应用阈值过滤和最小距离约束
- * 4. 根据过零率估计频率: freq = crossingRate * sampleRate / 2
- * 5. 根据相邻过零间隔估计基频
+ * 处理流程:
+ * 1. 遍历信号，检测正到负方向的符号变化点
+ * 2. 使用线性插值精确定位过零位置 (亚采样精度)
+ *    crossPos = i + |signal[i]| / |signal[i+1] - signal[i]|
+ * 3. 应用阈值带过滤: 信号必须穿越 [-thresh, +thresh]
+ * 4. 应用最小距离约束: 过滤密集虚假过零
+ * 5. 根据过零间隔的中位数估计基频
+ *
+ * 频率估计方法:
+ * - 多个过零点: freq = sampleRate / medianPeriod (中位数，鲁棒)
+ * - 单个过零点: freq = crossingRate * sampleRate / 2
+ * - 无过零点: freq = 0
  *
  * @param signal 输入信号
  * @return 过零点的精确位置列表 (以采样为单位的小数位置)
@@ -94,7 +114,7 @@ QVector<double> ZeroCrossing2::detect(const QVector<double>& signal)
 
     const int N = signal.size();
 
-    /* 步骤1: 检测所有符号变化点 */
+    /* 步骤1: 检测所有正到负方向的过零点 */
     QVector<double> rawCrossings;
 
     for (int i = 0; i < N - 1; ++i) {
@@ -123,7 +143,7 @@ QVector<double> ZeroCrossing2::detect(const QVector<double>& signal)
         }
     }
 
-    /* 步骤2: 应用最小距离约束 */
+    /* 步骤2: 应用最小距离约束过滤虚假过零 */
     double lastCrossing = -m_minDist * 2.0;
     for (double pos : rawCrossings) {
         if (pos - lastCrossing >= m_minDist) {
@@ -136,7 +156,7 @@ QVector<double> ZeroCrossing2::detect(const QVector<double>& signal)
 
     /* 步骤3: 估计频率 */
     if (m_count >= 2) {
-        /* 方法1: 基于过零间隔的中位数 */
+        /* 方法: 基于过零间隔的中位数 */
         QVector<double> periods;
         for (int i = 1; i < m_count; ++i) {
             double period = crossings[i] - crossings[i - 1];
@@ -146,17 +166,17 @@ QVector<double> ZeroCrossing2::detect(const QVector<double>& signal)
         }
 
         if (!periods.isEmpty()) {
-            /* 取中位数周期，更鲁棒 */
+            /* 取中位数周期，比均值更鲁棒 */
             std::sort(periods.begin(), periods.end());
             double medianPeriod = periods[periods.size() / 2];
             m_freq = m_sampleRate / medianPeriod;
         }
     } else if (m_count == 1 && N > 1) {
-        /* 单个过零点: 使用过零率估计 */
+        /* 单个过零点: 使用过零率估计 (粗略) */
         m_freq = m_count * m_sampleRate / (2.0 * N);
     }
 
-    /* 限制频率范围 */
+    /* 限制频率范围在 [0, Nyquist] */
     m_freq = qBound(0.0, m_freq, m_sampleRate / 2.0);
 
     /* 更新统计 */
@@ -172,6 +192,8 @@ QVector<double> ZeroCrossing2::detect(const QVector<double>& signal)
 
 /**
  * @brief 重置所有统计数据
+ *
+ * 重置统计计数器、计时器累积、频率和过零计数
  */
 void ZeroCrossing2::resetStatistics()
 {

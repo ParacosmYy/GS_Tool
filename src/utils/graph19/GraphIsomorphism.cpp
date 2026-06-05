@@ -7,6 +7,7 @@
 
 #include <QCryptographicHash>
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
 #include <algorithm>
 #include <random>

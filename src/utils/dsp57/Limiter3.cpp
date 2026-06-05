@@ -160,9 +160,31 @@ QVector<double> Limiter3::process(const QVector<double>& input)
         output[i] = delayed[i] * gainReductionCurve[i];
     }
 
-    // 步骤4：最终硬限幅（安全网）
+    // 步骤4：平滑增益曲线（减少量化噪声）
+    for (int pass = 0; pass < 2; ++pass) {
+        for (int i = 1; i < n - 1; ++i) {
+            gainReductionCurve[i] = gainReductionCurve[i] * 0.7
+                + (gainReductionCurve[i - 1] + gainReductionCurve[i + 1]) * 0.15;
+        }
+    }
+
+    // 步骤5：应用增益
+    QVector<double> output(n, 0.0);
+    for (int i = 0; i < n; ++i) {
+        output[i] = delayed[i] * gainReductionCurve[i];
+    }
+
+    // 步骤6：最终硬限幅（安全网）
     for (int i = 0; i < n; ++i) {
         output[i] = qBound(-threshLin, output[i], threshLin);
+    }
+
+    // 步骤7：淡入淡出处理（避免首尾咔嗒声）
+    const int fadeLen = qMin(32, n / 4);
+    for (int i = 0; i < fadeLen; ++i) {
+        double fade = static_cast<double>(i) / fadeLen;
+        output[i] *= fade;
+        output[n - 1 - i] *= fade;
     }
 
     // 更新统计

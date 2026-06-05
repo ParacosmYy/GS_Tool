@@ -5,6 +5,8 @@
 
 #include "TripletLoss.h"
 #include <QElapsedTimer>
+#include <QMap>
+#include <QVector>
 #include <cmath>
 #include <algorithm>
 #include <numeric>

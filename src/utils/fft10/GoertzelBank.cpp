@@ -50,7 +50,7 @@ QVector<GoertzelBank::ToneResult> GoertzelBank::detect(
     }
 
     m_stats.totalDetections++;
-    m_stats.totalTonesFound += results.count(
+    m_stats.totalTonesFound += std::count_if(results.begin(), results.end(),
         [](const ToneResult& t) { return t.detected; });
     m_timeSum += timer.elapsed();
     m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalDetections;

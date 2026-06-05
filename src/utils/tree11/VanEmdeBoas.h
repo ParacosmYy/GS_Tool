@@ -119,8 +119,8 @@ signals:
     void elementRemoved(int value);
 
 private:
-    Stats m_stats;
-    double m_timeSum = 0.0;
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;
 
     /** @brief vEB树内部节点 */
     struct Node {

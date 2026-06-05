@@ -127,7 +127,7 @@ void BridgeTree::build()
     m_low.assign(m_n, -1);
     m_component.assign(m_n, -1);
 
-    for (auto& flag : m_isBridgeEdge) flag = false;
+    std::fill(m_isBridgeEdge.begin(), m_isBridgeEdge.end(), false);
 
     /* Step 1: Tarjan DFS查找所有桥边 */
     int dfsTimer = 0;

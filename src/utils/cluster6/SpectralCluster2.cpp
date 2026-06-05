@@ -5,6 +5,7 @@
 
 #include "SpectralCluster2.h"
 #include <QElapsedTimer>
+#include <QMap>
 #include <cmath>
 #include <algorithm>
 #include <numeric>
