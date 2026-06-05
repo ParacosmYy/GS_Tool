@@ -11,7 +11,7 @@
 
 #include <QObject>
 #include <QVector>
-#include <QComplexDouble>
+#include <complex>
 
 /**
  * @brief FFT快速卷积 — 重叠相加法(Overlap-Add)
@@ -81,7 +81,7 @@ signals:
 
 private:
     /** @brief 基2 FFT(就地) @param data 复数数组 @param inverse 是否逆变换 */
-    void fft(QVector<QComplexDouble>& data, bool inverse = false);
+    void fft(QVector<std::complex<double>>& data, bool inverse = false);
 
     /** @brief 计算下一个2的幂 @param n 输入值 @return >=n的最小2幂 */
     static int nextPowerOf2(int n);

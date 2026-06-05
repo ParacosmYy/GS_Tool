@@ -39,10 +39,17 @@ public:
 
     /** @brief Canny参数 */
     struct CannyParams {
-        double lowThreshold = 50.0;     ///< 低阈值
-        double highThreshold = 150.0;   ///< 高阈值
-        int gaussianKernelSize = 5;     ///< 高斯核大小(奇数)
-        double gaussianSigma = 1.4;     ///< 高斯标准差
+        double lowThreshold;     ///< 低阈值
+        double highThreshold;   ///< 高阈值
+        int gaussianKernelSize;     ///< 高斯核大小(奇数)
+        double gaussianSigma;     ///< 高斯标准差
+
+        CannyParams()
+            : lowThreshold(50.0)
+            , highThreshold(150.0)
+            , gaussianKernelSize(5)
+            , gaussianSigma(1.4)
+        {}
     };
 
     /** @brief 构造函数 @param parent 父对象 */
@@ -78,7 +85,7 @@ public:
      */
     QVector<double> canny(const QVector<double>& image,
                           int width, int height,
-                          const CannyParams& params = CannyParams()) const;
+                          const CannyParams& params) const;
 
     /**
      * @brief 高斯模糊
