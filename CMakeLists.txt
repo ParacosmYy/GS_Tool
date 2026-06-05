@@ -1374,6 +1374,15 @@ set(HEADERS
 
     # -- F75: 直方图构建器 --
     src/utils/histogram/HistogramBuilder.h
+
+    # -- F76: 频谱分析器 --
+    src/utils/spectrum/SpectrumAnalyzer.h
+
+    # -- F77: 统计分布 --
+    src/utils/statdist/StatDistribution.h
+
+    # -- F78: 熵计算器 --
+    src/utils/entropy/EntropyCalculator.h
 )
 
 set(RESOURCES
