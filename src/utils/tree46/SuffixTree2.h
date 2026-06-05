@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QVector>
 #include <QList>
+#include <QMap>
 #include <QPair>
 
 class SuffixTree2 : public QObject
@@ -59,6 +60,7 @@ private:
     bool walkDown(int node);
     int newNode(int start, int end);
     void destroyTree();
+    void findPathToNode(int current, int target, QVector<int>& path) const;
 
     Stats m_stats;
     double m_timeSum = 0.0;
