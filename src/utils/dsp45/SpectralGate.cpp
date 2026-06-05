@@ -108,7 +108,7 @@ void SpectralGate::learnNoiseProfile(const QVector<double>& noise)
     for (int i = 0; i < halfN; ++i) {
         sumPower += m_noiseProfile[i] * m_noiseProfile[i];
     }
-    m_noiseFloor = 10.0 * qLog10(sumPower / halfN + 1e-12);
+    m_noiseFloor = 10.0 * std::log10(sumPower / halfN + 1e-12);
     m_profileLearned = true;
 }
 

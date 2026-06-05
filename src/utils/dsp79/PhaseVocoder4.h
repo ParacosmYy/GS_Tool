@@ -39,6 +39,9 @@ signals:
     void frameProcessed(double phaseCorrection);
 
 private:
+    /** @brief 线性插值重采样 */
+    QVector<double> resample(const QVector<double>& input, int targetLen) const;
+
     Stats m_stats;
     double m_timeSum = 0.0;
     int m_fftSize = 2048;
