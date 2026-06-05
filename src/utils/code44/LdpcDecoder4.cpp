@@ -11,6 +11,7 @@
 #include <QElapsedTimer>
 #include <QtMath>
 #include <algorithm>
+#include <cmath>
 
 /**
  * @brief 构造函数，初始化默认参数
@@ -89,12 +90,12 @@ QVector<int> LdpcDecoder4::decode(const QVector<double>& llr)
                 double prodTanh = 1.0;
                 for (int jj = 0; jj < n; ++jj) {
                     if (jj == j || m_H[i][jj] != 1) continue;
-                    double t = qTanh(v2c[jj][i] / 2.0);
+                    double t = std::tanh(v2c[jj][i] / 2.0);
                     prodTanh *= t;
                 }
                 /* clamp避免数值溢出 */
                 prodTanh = qBound(-1.0 + 1e-10, prodTanh, 1.0 - 1e-10);
-                c2v[i][j] = 2.0 * qAtanh(prodTanh);
+                c2v[i][j] = 2.0 * std::atanh(prodTanh);
             }
         }
 
@@ -199,12 +200,12 @@ QVector<int> LdpcDecoder4::decodeLayered(const QVector<double>& llr)
                     if (idx2 == idx) continue;
                     int jj = connected[idx2];
                     double effLlr = appLlr[jj] - residual[i][jj];
-                    double t = qTanh(effLlr / 2.0);
+                    double t = std::tanh(effLlr / 2.0);
                     prodTanh *= t;
                 }
                 prodTanh = qBound(-1.0 + 1e-10, prodTanh, 1.0 - 1e-10);
 
-                double newResidual = 2.0 * qAtanh(prodTanh);
+                double newResidual = 2.0 * std::atanh(prodTanh);
                 double delta = newResidual - residual[i][j];
 
                 /* 更新后验LLR和残余 */

@@ -10,6 +10,7 @@
 #include "utils/code46/ErasureCode3.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
 #include <algorithm>
 

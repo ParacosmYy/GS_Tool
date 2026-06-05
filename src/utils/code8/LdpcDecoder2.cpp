@@ -9,6 +9,7 @@
 #include <QtMath>
 #include <algorithm>
 #include <numeric>
+#include <cmath>
 
 /** @brief 构造函数 @param parent 父对象 */
 LdpcDecoder2::LdpcDecoder2(QObject* parent)
@@ -248,13 +249,13 @@ void LdpcDecoder2::checkNodeUpdateSumProduct(int iteration)
                         break;
                     }
                 }
-                double t = qTanh(qVal / 2.0);
+                double t = std::tanh(qVal / 2.0);
                 t = qBound(-1.0 + 1e-12, t, 1.0 - 1e-12);
                 prodTanH *= t;
             }
 
             prodTanH = qBound(-1.0 + 1e-12, prodTanH, 1.0 - 1e-12);
-            double rVal = 2.0 * qAtanh(prodTanH);
+            double rVal = 2.0 * std::atanh(prodTanH);
 
             /* 写回R消息 */
             for (int ri = 0; ri < m_varEdges[v].size(); ++ri) {
@@ -360,7 +361,7 @@ QVector<int> LdpcDecoder2::computeSyndrome(const QVector<int>& bits) const
 double LdpcDecoder2::phiFunction(double x) const
 {
     if (x < 1e-12) return 30.0; /* 避免log(0) */
-    double t = qTanh(x / 2.0);
+    double t = std::tanh(x / 2.0);
     if (t < 1e-30) return 30.0;
     return qLn(t);
 }

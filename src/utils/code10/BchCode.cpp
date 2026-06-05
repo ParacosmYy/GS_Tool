@@ -6,6 +6,7 @@
 #include "utils/code10/BchCode.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 
 #include <cmath>
 #include <algorithm>

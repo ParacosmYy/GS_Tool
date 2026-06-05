@@ -184,7 +184,7 @@ QVector<int> ConvolutionalCode5::decode(const QVector<double>& softBits)
     const int n = m_generators.size();
 
     /* 去打孔 */
-    QVector<double> depunctured = depuncture(softBits);
+    QVector<int> depunctured = depuncture(softBits);
     const int totalSymbols = depunctured.size();
     const int numSteps = totalSymbols / n;
 
