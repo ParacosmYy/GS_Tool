@@ -1055,10 +1055,23 @@ set(SOURCES
     src/utils/morpho2/MorphologicalOps.cpp
     src/utils/fit3/SplineInterpolation.cpp
     src/utils/conv2/Convolution2D.cpp
+    src/utils/linalg4/LuDecomposition.cpp
     src/utils/signal5/EnvelopeDetector.cpp
     src/utils/graph9/MinimumSpanningTree.cpp
     src/utils/code3/HammingCode.cpp
     src/utils/cluster3/GaussianMixture2.cpp
+
+    # ── Wave 71: 节律/解码/编码/螺旋 ──
+    src/utils/circadian/CircadianRhythm.cpp
+    src/utils/viterbi2/ViterbiDecoder2.cpp
+    src/utils/golomb2/GolombRiceCoder.cpp
+    src/utils/spiral/SpiralMatrix.cpp
+
+    # ── Wave 72: 组合/模拟/三角剖分 ──
+    src/utils/nqueens/NQueensSolver.cpp
+    src/utils/hanoi/HanoiTower.cpp
+    src/utils/life/GameOfLife.cpp
+    src/utils/delaunay3/DelaunayTriangulation2.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -2442,6 +2455,18 @@ set(HEADERS
     src/utils/graph9/MinimumSpanningTree.h
     src/utils/code3/HammingCode.h
     src/utils/cluster3/GaussianMixture2.h
+
+    # ── Wave 71: 节律/解码/编码/螺旋 ──
+    src/utils/circadian/CircadianRhythm.h
+    src/utils/viterbi2/ViterbiDecoder2.h
+    src/utils/golomb2/GolombRiceCoder.h
+    src/utils/spiral/SpiralMatrix.h
+
+    # ── Wave 72: 组合/模拟/三角剖分 ──
+    src/utils/nqueens/NQueensSolver.h
+    src/utils/hanoi/HanoiTower.h
+    src/utils/life/GameOfLife.h
+    src/utils/delaunay3/DelaunayTriangulation2.h
 )
 
 set(RESOURCES
