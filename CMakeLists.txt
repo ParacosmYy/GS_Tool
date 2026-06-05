@@ -725,6 +725,12 @@ set(SOURCES
     src/utils/voicedetect/VoiceActivityDetector.cpp
     src/utils/dynhistogram/DynamicHistogram.cpp
     src/utils/ticker/TickEngine.cpp
+    src/utils/circqueue/CircularPriorityQueue.cpp
+    src/utils/rollingrank/RollingRank.cpp
+    src/utils/expmove/ExponentialMoving.cpp
+    src/utils/polyreg/PolynomialRegression.cpp
+    src/utils/gof/GoodnessOfFit.cpp
+    src/utils/ringbuffer3/LockFreeRingBuffer.cpp
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
@@ -1632,6 +1638,12 @@ set(HEADERS
     src/utils/voicedetect/VoiceActivityDetector.h
     src/utils/dynhistogram/DynamicHistogram.h
     src/utils/ticker/TickEngine.h
+    src/utils/circqueue/CircularPriorityQueue.h
+    src/utils/rollingrank/RollingRank.h
+    src/utils/expmove/ExponentialMoving.h
+    src/utils/polyreg/PolynomialRegression.h
+    src/utils/gof/GoodnessOfFit.h
+    src/utils/ringbuffer3/LockFreeRingBuffer.h
 
     # -- F128~F142: Wave 22 工具模块 --
     src/utils/fir/FirFilterDesigner.h
