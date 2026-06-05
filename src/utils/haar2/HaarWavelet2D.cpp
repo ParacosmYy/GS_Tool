@@ -3,7 +3,7 @@
  * @brief 二维Haar小波变换实现
  */
 
-#include "utils/haar2/HaarWavelet2DEnhanced.h"
+#include "utils/haar2/HaarWavelet2D.h"
 
 #include <QtMath>
 #include <algorithm>
