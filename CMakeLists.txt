@@ -772,6 +772,11 @@ set(SOURCES
     src/utils/lcs2/LcsSolver.cpp
     src/utils/reservoir/ReservoirSampler.cpp
 
+    # -- F180~F182: 增强编码/排序 --
+    src/utils/rle2/RunLengthEncoder2.cpp
+    src/utils/shannon2/HuffmanTreeBuilder.cpp
+    src/utils/sort2/RadixSorter.cpp
+
     # -- F172~F177: Wave 25 工具模块 --
     src/utils/wiener/WienerFilter.cpp
     src/utils/circularbuffer2/CircularPowerBuffer.cpp
@@ -797,6 +802,26 @@ set(SOURCES
     src/utils/lifting/LiftingScheme.cpp
     src/utils/lzw2/LzwCodec2.cpp
     src/utils/mergesort/MergeSorter.cpp
+
+    # -- F192~F203: Wave 33 工具模块 --
+    src/utils/whitening/SpectralWhitener.cpp
+    src/utils/peaks2/MultiPeakDetector.cpp
+    src/utils/pingpong/PingPongBuffer.cpp
+    src/utils/rle2/RunLengthEncoder2.cpp
+    src/utils/shannon2/HuffmanTreeBuilder.cpp
+    src/utils/graph2/TopologicalSorter.cpp
+    src/utils/segment2/SegmentTree.cpp
+    src/utils/sort2/QuickSelect.cpp
+    src/utils/sort2/RadixSorter.cpp
+
+    # -- F204~F210: Wave 34 工具模块(linter) --
+    src/utils/bloomfilter3/ScalableBloomFilter.cpp
+    src/utils/fenwick/FenwickTree.cpp
+    src/utils/lfu2/TinyLfuCache.cpp
+    src/utils/merkle/MerkleTree.cpp
+    src/utils/roaring/RoaringBitmap.cpp
+    src/utils/skiplist2/ConcurrentSkipList.cpp
+    src/utils/sparsae/SparseArray.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1064,6 +1089,22 @@ set(SOURCES
     src/utils/quantize2/MuLawEncoder.cpp
     src/utils/polar/PolarCode.cpp
     src/utils/turbo/TurboDecoder.cpp
+
+    # -- F186~F200: Wave 35 工具模块 --
+    src/utils/rle2/RunLengthEncoder2.cpp
+    src/utils/shannon2/HuffmanTreeBuilder.cpp
+    src/utils/sort2/RadixSorter.cpp
+    src/utils/sort2/QuickSelect.cpp
+    src/utils/graph2/TopologicalSorter.cpp
+    src/utils/segment2/SegmentTree.cpp
+    src/utils/fenwick/FenwickTree.cpp
+    src/utils/sparsae/SparseArray.cpp
+    src/utils/roaring/RoaringBitmap.cpp
+    src/utils/ringhash/RingHash.cpp
+    src/utils/bloomfilter3/ScalableBloomFilter.cpp
+    src/utils/merkle/MerkleTree.cpp
+    src/utils/skiplist2/ConcurrentSkipList.cpp
+    src/utils/lfu2/TinyLfuCache.cpp
 )
 
 set(HEADERS
@@ -1669,6 +1710,12 @@ set(HEADERS
     # -- F117: 频谱平坦度 --
     src/utils/spectrum/SpectralFlatness.h
 
+    # -- F180~F182: 增强编码/排序 --
+    src/utils/rle2/RunLengthEncoder2.h
+    src/utils/shannon2/HuffmanTreeBuilder.h
+    src/utils/sort2/RadixSorter.h
+    src/utils/sort2/QuickSelect.h
+
     # -- F172~F177: Wave 25 工具模块 --
     src/utils/wiener/WienerFilter.h
     src/utils/circularbuffer2/CircularPowerBuffer.h
@@ -1694,6 +1741,19 @@ set(HEADERS
     src/utils/lifting/LiftingScheme.h
     src/utils/lzw2/LzwCodec2.h
     src/utils/mergesort/MergeSorter.h
+
+    # -- F192~F203: Wave 33 工具模块 --
+    src/utils/whitening/SpectralWhitener.h
+    src/utils/peaks2/MultiPeakDetector.h
+    src/utils/pingpong/PingPongBuffer.h
+    src/utils/twoway/TwoWayMap.h
+    src/utils/rle2/RunLengthEncoder2.h
+    src/utils/shannon2/HuffmanTreeBuilder.h
+    src/utils/graph2/TopologicalSorter.h
+    src/utils/graph2/UnionFind.h
+    src/utils/segment2/SegmentTree.h
+    src/utils/sort2/QuickSelect.h
+    src/utils/sort2/RadixSorter.h
 
     # -- F101: 一维卡尔曼滤波器 --
     src/utils/kalman/KalmanFilter1D.h
@@ -1858,6 +1918,23 @@ set(HEADERS
     src/utils/quantize2/MuLawEncoder.h
     src/utils/polar/PolarCode.h
     src/utils/turbo/TurboDecoder.h
+
+    # -- F186~F200: Wave 35 工具模块 --
+    src/utils/rle2/RunLengthEncoder2.h
+    src/utils/shannon2/HuffmanTreeBuilder.h
+    src/utils/sort2/RadixSorter.h
+    src/utils/sort2/QuickSelect.h
+    src/utils/graph2/TopologicalSorter.h
+    src/utils/graph2/UnionFind.h
+    src/utils/segment2/SegmentTree.h
+    src/utils/fenwick/FenwickTree.h
+    src/utils/sparsae/SparseArray.h
+    src/utils/roaring/RoaringBitmap.h
+    src/utils/ringhash/RingHash.h
+    src/utils/bloomfilter3/ScalableBloomFilter.h
+    src/utils/merkle/MerkleTree.h
+    src/utils/skiplist2/ConcurrentSkipList.h
+    src/utils/lfu2/TinyLfuCache.h
 )
 
 set(RESOURCES
