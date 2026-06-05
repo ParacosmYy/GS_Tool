@@ -767,6 +767,12 @@ set(SOURCES
     src/utils/hex_diff/HexDiffEnginePatch.cpp
 )
 
+    # -- F43: 高级数据日志 --
+    src/utils/logger2/SerialDataLogger.cpp
+    src/utils/logger2/SerialDataLoggerRotation.cpp
+    src/utils/logger2/SerialDataLoggerStats.cpp
+    src/utils/logger2/SerialDataLoggerExport.cpp
+
 set(HEADERS
     # 接口层 - 零出站依赖的纯虚接口
     src/interfaces/IPanelProvider.h
@@ -1161,6 +1167,9 @@ set(HEADERS
 
     # -- F48: Hex差异引擎 --
     src/utils/hex_diff/HexDiffEngine.h
+
+    # -- F43: 高级数据日志 --
+    src/utils/logger2/SerialDataLogger.h
 )
 
 set(RESOURCES
