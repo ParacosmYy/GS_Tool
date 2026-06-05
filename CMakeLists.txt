@@ -856,6 +856,18 @@ set(SOURCES
     src/utils/fft3/RealFFT.cpp
     src/utils/sort3/TimSort.cpp
 
+    # -- Wave 39: 信号处理V2 --
+    src/utils/wiener2/WienerFilter2.cpp
+    src/utils/kalman4/ParticleFilter.cpp
+    src/utils/ekf/ExtendedKalman.cpp
+    src/utils/complement/ComplementaryFilter.cpp
+    src/utils/savitzky/SavitzkyGolay.cpp
+    src/utils/medfilt/MedianFilter.cpp
+    src/utils/notch/NotchFilter.cpp
+    src/utils/peakdetect2/PeakDetector2.cpp
+    src/utils/align/SignalAligner.cpp
+    src/utils/window2/WindowFunction.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -2032,6 +2044,18 @@ set(HEADERS
     src/utils/rle4/LempelZivWelch.h
     src/utils/fft3/RealFFT.h
     src/utils/sort3/TimSort.h
+
+    # -- Wave 39: 信号处理V2 --
+    src/utils/wiener2/WienerFilter2.h
+    src/utils/kalman4/ParticleFilter.h
+    src/utils/ekf/ExtendedKalman.h
+    src/utils/complement/ComplementaryFilter.h
+    src/utils/savitzky/SavitzkyGolay.h
+    src/utils/medfilt/MedianFilter.h
+    src/utils/notch/NotchFilter.h
+    src/utils/peakdetect2/PeakDetector2.h
+    src/utils/align/SignalAligner.h
+    src/utils/window2/WindowFunction.h
 )
 
 set(RESOURCES
