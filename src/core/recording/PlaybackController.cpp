@@ -134,10 +134,12 @@ void PlaybackController::onTick()
         /* 到达终点：停止并通知 */
         m_playing = false;
         m_timer->stop();
+        /* 累计本次实际播放时长(从上次累积点到终点) */
+        qint64 segmentPlayed = m_durationMs - m_currentTimeMs;
         m_currentTimeMs = m_durationMs;
         ++m_playCount;
         ++m_totalCompletions;
-        m_totalPlayTimeMs += m_durationMs;
+        m_totalPlayTimeMs += qMax(segmentPlayed, qint64(0));
 
         emit playbackFinished();
         emit playbackStopped();

@@ -823,6 +823,7 @@ set(SOURCES
 
     # -- F62: 数据包组装器 --
     src/protocol/assembly/PacketAssembler.cpp
+    src/protocol/assembly/PacketAssemblyOps.cpp
 
     # -- F60: 协议流量复制 --
     src/protocol/duplicate/ProtocolDuplicator.cpp
