@@ -737,6 +737,12 @@ set(SOURCES
     src/utils/timerwheel/TimerWheel.cpp
     src/utils/slidingpercentile/SlidingPercentile.cpp
     src/utils/autopcor/AutoCorrelation.cpp
+    src/utils/deadzone/DeadZoneFilter.cpp
+    src/utils/movingmax/MovingMinMax.cpp
+    src/utils/ringhash/RollingHash.cpp
+    src/utils/countmin/CountMinSketch.cpp
+    src/utils/cuckoo/CuckooFilter.cpp
+    src/utils/bloomfilter2/ScalableBloomFilter.cpp
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
@@ -1656,6 +1662,12 @@ set(HEADERS
     src/utils/timerwheel/TimerWheel.h
     src/utils/slidingpercentile/SlidingPercentile.h
     src/utils/autopcor/AutoCorrelation.h
+    src/utils/deadzone/DeadZoneFilter.h
+    src/utils/movingmax/MovingMinMax.h
+    src/utils/ringhash/RollingHash.h
+    src/utils/countmin/CountMinSketch.h
+    src/utils/cuckoo/CuckooFilter.h
+    src/utils/bloomfilter2/ScalableBloomFilter.h
 
     # -- F128~F142: Wave 22 工具模块 --
     src/utils/fir/FirFilterDesigner.h
