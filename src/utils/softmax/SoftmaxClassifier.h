@@ -32,12 +32,21 @@ public:
 
     /** @brief 训练参数 */
     struct TrainConfig {
-        double learningRate = 0.01;  ///< 学习率
-        int maxEpochs = 100;         ///< 最大训练轮数
-        int batchSize = 32;          ///< 批量大小(0=全批量)
-        double tolerance = 1e-6;     ///< 收敛容差
-        double lambda = 0.0;         ///< L2正则化系数
-        bool shuffle = true;         ///< 是否每轮打乱数据
+        double learningRate;  ///< 学习率
+        int maxEpochs;         ///< 最大训练轮数
+        int batchSize;          ///< 批量大小(0=全批量)
+        double tolerance;     ///< 收敛容差
+        double lambda;         ///< L2正则化系数
+        bool shuffle;         ///< 是否每轮打乱数据
+
+        TrainConfig()
+            : learningRate(0.01)
+            , maxEpochs(100)
+            , batchSize(32)
+            , tolerance(1e-6)
+            , lambda(0.0)
+            , shuffle(true)
+        {}
     };
 
     /** @brief 训练结果 */
