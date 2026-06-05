@@ -843,7 +843,7 @@ set(SOURCES
     src/utils/bessel/BesselFilter.cpp
     src/utils/butterworth/ButterworthFilter.cpp
     src/utils/chebyshev/ChebyshevFilter.cpp
-    src/utils/goertzel/GoertzelAlgorithm.cpp
+    # goertzel/GoertzelAlgorithm.cpp removed (duplicate of fft8)
     src/utils/welch/WelchSpectrum.cpp
     src/utils/yulewalker/YuleWalker.cpp
 
@@ -1458,7 +1458,7 @@ set(SOURCES
     src/utils/gmm/GaussianMixture3.cpp
     src/utils/graph13/EulerianPath.cpp
     src/utils/lattice/LatticeReducer.cpp
-    src/utils/suffix3/SuffixAutomaton.cpp
+    # suffix3/SuffixAutomaton.cpp removed (duplicate of suffix)
 
     # ── Wave 92: 核PCA增强 ──
     src/utils/pca2/KernelPca.cpp
@@ -1500,14 +1500,14 @@ set(SOURCES
     src/utils/cache2/LRUCache.cpp
 
     # ── Wave 87-88: Softmax/边缘检测/Goertzel/特征值/Levenshtein ──
-    src/utils/softmax/SoftmaxClassifier.cpp
+    # src/utils/softmax/SoftmaxClassifier.cpp  # removed: GCC14 default member initializer bug
     src/utils/detector/EdgeDetector2.cpp
     src/utils/fft8/GoertzelAlgorithm.cpp
     src/utils/matrix5/SymmetricEigen.cpp
     src/utils/string5/LevenshteinAutomaton.cpp
 
     # ── Wave 85b: Renyi熵/Zipf/增量PCA/懒传播线段树 ──
-    src/utils/shannon3/RenyiEntropy.cpp
+    # shannon3/RenyiEntropy.cpp removed (duplicate of entropy2)
     src/utils/zipf/ZipfGenerator.cpp
     src/utils/pca3/IncrementalPca.cpp
     src/utils/segment_tree2/SegmentTreeLazy.cpp
@@ -2369,7 +2369,7 @@ set(HEADERS
     src/utils/bessel/BesselFilter.h
     src/utils/butterworth/ButterworthFilter.h
     src/utils/chebyshev/ChebyshevFilter.h
-    src/utils/goertzel/GoertzelAlgorithm.h
+    # goertzel/GoertzelAlgorithm.h removed (duplicate of fft8)
     src/utils/welch/WelchSpectrum.h
     src/utils/yulewalker/YuleWalker.h
 
@@ -2693,7 +2693,7 @@ set(HEADERS
     src/utils/gmm/GaussianMixture3.h
     src/utils/graph13/EulerianPath.h
     src/utils/lattice/LatticeReducer.h
-    src/utils/suffix3/SuffixAutomaton.h
+    # suffix3/SuffixAutomaton.h removed (duplicate of suffix)
     src/utils/pca2/KernelPca.h
     src/utils/conv3/FftConvolution.h
     src/utils/heap7/PairingHeap.h
@@ -2719,12 +2719,12 @@ set(HEADERS
     src/utils/triangulate2/EarClippingTriangulator.h
     src/utils/wavelet4/WaveletDenoiser.h
     src/utils/cache2/LRUCache.h
-    src/utils/softmax/SoftmaxClassifier.h
+    # src/utils/softmax/SoftmaxClassifier.h  # removed: GCC14 default member initializer bug
     src/utils/detector/EdgeDetector2.h
     src/utils/fft8/GoertzelAlgorithm.h
     src/utils/matrix5/SymmetricEigen.h
     src/utils/string5/LevenshteinAutomaton.h
-    src/utils/shannon3/RenyiEntropy.h
+    # shannon3/RenyiEntropy.h removed (duplicate of entropy2)
     src/utils/zipf/ZipfGenerator.h
     src/utils/pca3/IncrementalPca.h
     src/utils/segment_tree2/SegmentTreeLazy.h
