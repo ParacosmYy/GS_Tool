@@ -40,6 +40,7 @@ void TlsConnection::onEncrypted()
 void TlsConnection::onSslErrors(const QList<QSslError>& errors)
 {
     ++m_totalSslErrors;
+    if (!m_socket) return;
     if (!m_peerVerify) {
         /// 不验证对端时，忽略所有SSL错误继续连接
         m_socket->ignoreSslErrors(errors);

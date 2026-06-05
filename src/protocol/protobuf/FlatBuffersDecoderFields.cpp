@@ -81,7 +81,18 @@ QVariantMap FlatBuffersDecoder::parseStruct(const QByteArray& data,
     for (const auto& f : sdef.fields) {
         if (off >= data.size()) { break; }
         result[f.name] = readTypedValue(data, off, f.type, f.typeName);
-        off += 4; // 简化：所有字段4字节对齐
+        /* 根据字段类型确定字节大小，而非硬编码4字节对齐 */
+        int fieldSize = 4;  // 默认4字节(包含Bool/Int8~UInt32/Float32/Table/Enum)
+        switch (f.type) {
+        case FbsBasicType::Int8: case FbsBasicType::UInt8: case FbsBasicType::Bool:
+            fieldSize = 1; break;
+        case FbsBasicType::Int16: case FbsBasicType::UInt16:
+            fieldSize = 2; break;
+        case FbsBasicType::Int64: case FbsBasicType::UInt64: case FbsBasicType::Float64:
+            fieldSize = 8; break;
+        default: break; // Int32/UInt32/Float32/String/Struct/Table 保持4字节
+        }
+        off += fieldSize;
         ++m_totalFieldsRead;
     }
     return result;

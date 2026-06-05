@@ -12,6 +12,8 @@
 
 #include <QPainter>
 #include <QPaintEvent>
+#include <QShowEvent>
+#include <QHideEvent>
 #include <QTimer>
 #include <QConicalGradient>
 
@@ -128,4 +130,18 @@ void LoadingSpinner::paintEvent(QPaintEvent* event)
     p.setPen(pen);
     p.drawArc(rect().adjusted(m_lineWidth, m_lineWidth, -m_lineWidth, -m_lineWidth),
               0, 270 * 16);
+}
+
+/** @brief 显示事件 — 若动画未运行则恢复旋转 @param event 显示事件 */
+void LoadingSpinner::showEvent(QShowEvent* event)
+{
+    QWidget::showEvent(event);
+    if (!m_timer->isActive()) m_timer->start(100);
+}
+
+/** @brief 隐藏事件 — 暂停旋转动画以节省CPU @param event 隐藏事件 */
+void LoadingSpinner::hideEvent(QHideEvent* event)
+{
+    QWidget::hideEvent(event);
+    m_timer->stop();
 }

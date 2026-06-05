@@ -101,6 +101,11 @@ bool OtaManager::convertHexToBin(const QString& hexPath, QString& outBinPath)
         m_tempBinFile = nullptr;
         return false;
     }
+    if (!m_tempBinFile->flush()) {
+        delete m_tempBinFile;
+        m_tempBinFile = nullptr;
+        return false;
+    }
     m_tempBinFile->close();
 
     // 清理旧的临时文件(磁盘上)

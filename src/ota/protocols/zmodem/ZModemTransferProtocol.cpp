@@ -123,7 +123,7 @@ void ZModemTransfer::sendDataSubpackets()
         if (!writeChecked(buildDataSubpacket(endFlag, chunk))) return;
         offset += chunkSize;
         m_bytesSent = offset;
-        int pct = static_cast<int>((offset * 100) / m_fileData.size());
+        int pct = static_cast<int>((offset * 100) / qMax(m_fileData.size(), qint64(1)));
         if (pct != lastPct || isLast) {
             emit progress(pct, offset, m_fileData.size());
             lastPct = pct;

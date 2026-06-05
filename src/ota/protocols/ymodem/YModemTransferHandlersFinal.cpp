@@ -49,7 +49,8 @@ void YModemTransfer::handleStateSendingFinalBlock0(char ch, int& readIdx)
 {
     if (ch == ACK) {
         m_timeoutTimer->stop();
-        emit progress(100, m_totalBytes, m_totalBytes);
+        /* 防御: m_totalBytes为0时进度仍为100% */
+        emit progress(100, qMax(m_totalBytes, qint64(1)), qMax(m_totalBytes, qint64(1)));
         m_ymodemState = State::Done;
         finishTransfer();
     } else if (ch == NAK) {
@@ -59,7 +60,8 @@ void YModemTransfer::handleStateSendingFinalBlock0(char ch, int& readIdx)
             sendCancelBytes();
             m_ymodemState = State::Error;
             markError();
-            emit transferError(tr("最终 Block 0 被拒绝"));
+            emit transferError(tr("最终 Block 0 被拒绝: 重试次数耗尽 (%1次)")
+            .arg(kMaxBlockRetries));
             m_receiveBuffer.remove(0, readIdx);
             return;
         }

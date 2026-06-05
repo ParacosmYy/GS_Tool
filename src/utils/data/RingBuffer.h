@@ -112,19 +112,19 @@ public:
     // ---- 内联统计计数接口 ----
 
     /** @brief 获取累计push写入次数 @return 写入总次数 */
-    quint64 totalPushes() const { return m_totalPushes; }
+    quint64 totalPushes() const { QMutexLocker locker(&m_mutex); return m_totalPushes; }
 
     /** @brief 获取累计pop读取次数 @return 读取总次数 */
-    quint64 totalPops() const { return m_totalPops; }
+    quint64 totalPops() const { QMutexLocker locker(&m_mutex); return m_totalPops; }
 
     /** @brief 获取累计覆盖溢出次数(缓冲区满时新数据覆盖旧数据) @return 溢出次数 */
-    quint64 totalOverflows() const { return m_totalOverflows; }
+    quint64 totalOverflows() const { QMutexLocker locker(&m_mutex); return m_totalOverflows; }
 
     /** @brief 获取历史峰值使用量(元素数) @return 峰值元素数量 */
-    int peakUsage() const { return m_peakUsage; }
+    int peakUsage() const { QMutexLocker locker(&m_mutex); return m_peakUsage; }
 
     /** @brief 获取缓冲区总容量 @return 容量 */
-    int capacity() const { return m_capacity; }
+    int capacity() const { QMutexLocker locker(&m_mutex); return m_capacity; }
 
     /** @brief 重置所有统计计数器(pops/pushes/overflows/peak归零) */
     void resetStats()

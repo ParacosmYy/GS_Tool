@@ -112,8 +112,7 @@ void NavigationController::onBreakpointNavCollapse(
     if (!splitter || splitter->sizes().size() < 2) return;
 
     /* 防止动画期间重复触发 */
-    static bool animating = false;
-    if (animating) return;
+    if (m_navCollapseAnimating) return;
 
     int currentNavWidth = splitter->sizes().at(0);
 
@@ -121,7 +120,7 @@ void NavigationController::onBreakpointNavCollapse(
     if (collapsed && currentNavWidth == 0) return;
     if (!collapsed && currentNavWidth > 0 && savedWidth <= 0) return;
 
-    animating = true;
+    m_navCollapseAnimating = true;
 
     int targetWidth = collapsed ? 0 : (savedWidth > 0 ? savedWidth : 180);
     int contentWidth = splitter->width() - targetWidth;
@@ -133,5 +132,5 @@ void NavigationController::onBreakpointNavCollapse(
         m_navTree->setVisible(!collapsed);
     }
 
-    animating = false;
+    m_navCollapseAnimating = false;
 }

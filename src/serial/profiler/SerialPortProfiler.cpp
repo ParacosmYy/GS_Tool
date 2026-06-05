@@ -76,7 +76,10 @@ void SerialPortProfiler::markPacketBoundary()
 
     const qint64 now = m_timer.isValid() ? m_timer.elapsed() : 0;
     m_packetTimes.append(now);
-    const int pktSize = static_cast<int>(m_currentPacketBytes);
+    /* 防御: quint64->int截断保护，超大包记录为INT_MAX */
+    const int pktSize = (m_currentPacketBytes <= static_cast<quint64>(INT_MAX))
+        ? static_cast<int>(m_currentPacketBytes)
+        : INT_MAX;
     m_packetSizes.append(pktSize);
 
     // 突发检测: 至少两个包才能比较间隔

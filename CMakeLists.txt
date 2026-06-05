@@ -619,6 +619,10 @@ set(SOURCES
     src/utils/compare/DataCompareWidget.cpp
     src/utils/compare/DataCompareWidgetStats.cpp
 
+    # ── F37: 数据比较器 ──
+    src/utils/compare/DataComparator.cpp
+    src/utils/compare/DataComparatorStats.cpp
+
     # ── 频率计数器 ──
     src/utils/frequency/FrequencyCounterWidget.cpp
     src/utils/frequency/FrequencyCounterWidgetStats.cpp
@@ -723,6 +727,22 @@ set(SOURCES
     # ── F33: 数据编解码机 ──
     src/utils/encoder/SerialDataEncoder.cpp
     src/utils/encoder/SerialDataEncoderStats.cpp
+
+    # ── F36: 丢包检测器 ──
+    src/utils/loss/PacketLossDetector.cpp
+    src/utils/loss/PacketLossDetectorStats.cpp
+
+    # ── F38: 字节频率分析器 ──
+    src/utils/frequency2/ByteFrequencyAnalyzer.cpp
+    src/utils/frequency2/ByteFrequencyAnalyzerStats.cpp
+
+    # ── F39: 协议模糊测试器 ──
+    src/utils/fuzzer/SerialProtocolFuzzer.cpp
+    src/utils/fuzzer/SerialProtocolFuzzerStats.cpp
+
+    # ── F40: 帧模板库 ──
+    src/utils/template_lib/FrameTemplateLibrary.cpp
+    src/utils/template_lib/FrameTemplateLibraryStats.cpp
 )
 
 set(HEADERS
@@ -1015,6 +1035,9 @@ set(HEADERS
     # ── 频率计数器 ──
     src/utils/frequency/FrequencyCounterWidget.h
 
+    # ── F37: 数据比较器 ──
+    src/utils/compare/DataComparator.h
+
     # ── F28: 数据流标注管理 ──
     src/utils/annotation/DataAnnotationWidget.h
 
@@ -1088,6 +1111,18 @@ set(HEADERS
 
     # ── F33: 数据编解码机 ──
     src/utils/encoder/SerialDataEncoder.h
+
+    # ── F36: 丢包检测器 ──
+    src/utils/loss/PacketLossDetector.h
+
+    # ── F38: 字节频率分析器 ──
+    src/utils/frequency2/ByteFrequencyAnalyzer.h
+
+    # ── F39: 协议模糊测试器 ──
+    src/utils/fuzzer/SerialProtocolFuzzer.h
+
+    # ── F40: 帧模板库 ──
+    src/utils/template_lib/FrameTemplateLibrary.h
 )
 
 set(RESOURCES

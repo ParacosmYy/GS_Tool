@@ -59,12 +59,15 @@ void XModemTransfer::handleStateSendingBlock(char ch, int& readIdx)
         // ACK确认后推进已发送字节数（sendBlock不再自动推进，防止NAK重传时跳块）
         int bs = blockSize();
         qint64 remaining = m_data.size() - m_bytesSent;
+        if (remaining < 0) remaining = 0;  // 防御: offset超过文件大小时钳位
         m_bytesSent += qMin(static_cast<qint64>(bs), remaining);
 
         // 更新速率统计
         updateTransferStats();
 
-        int percent = static_cast<int>((static_cast<qint64>(m_bytesSent) * 100) / m_data.size());
+        int percent = (m_data.size() > 0)
+            ? static_cast<int>((static_cast<qint64>(m_bytesSent) * 100) / m_data.size())
+            : 100;
         emit progress(percent, m_bytesSent, m_data.size());
 
         if (m_bytesSent >= m_data.size()) {

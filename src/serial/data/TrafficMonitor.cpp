@@ -90,6 +90,7 @@ void TrafficMonitor::reset()
     m_peakTxRate = 0.0;
     m_rxHistory.clear();
     m_txHistory.clear();
+    m_totalElapsedSec = 0.0;
     m_elapsed.restart();
 }
 
@@ -135,8 +136,9 @@ void TrafficMonitor::calculateRates()
     double rx = m_rxBytes / elapsed;
     double tx = m_txBytes / elapsed;
 
-    // 计算总经过时间（秒），用作历史 X 轴
-    double timestamp = m_elapsed.elapsed() / 1000.0;
+    // 使用累计时间作为历史X轴(保证单调递增)
+    m_totalElapsedSec += elapsed;
+    double timestamp = m_totalElapsedSec;
 
     // 追加到历史队列
     m_rxHistory.append(QPointF(timestamp, rx));

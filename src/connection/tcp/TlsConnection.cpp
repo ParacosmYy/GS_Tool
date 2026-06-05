@@ -95,11 +95,13 @@ bool TlsConnection::open()
         QFile caFile(m_caPath);
         if (!caFile.open(QIODevice::ReadOnly)) {
             emit errorOccurred(tr("无法打开CA证书文件: %1").arg(m_caPath));
+            cleanupSocket();
             return false;
         }
         QSslCertificate caCert(&caFile, QSsl::Pem);
         if (caCert.isNull()) {
             emit errorOccurred(tr("CA证书解析失败: %1").arg(m_caPath));
+            cleanupSocket();
             return false;
         }
         QSslConfiguration sslConfig = m_socket->sslConfiguration();

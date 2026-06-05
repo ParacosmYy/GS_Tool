@@ -70,8 +70,12 @@ QVariant FlatBuffersDecoder::readScalarValue(const QByteArray& data,
         }
         break;
     default:
+        /* 未知类型默认按4字节读取，避免64位类型被截断 */
         if (pos + 4 <= data.size()) return QVariant::fromValue(readOffset(data, pos));
         break;
+    case FbsBasicType::Int64: case FbsBasicType::UInt64:
+        /* readScalarValue不处理64位类型，由readTypedValue专管 */
+        return {};
     }
     return {};
 }

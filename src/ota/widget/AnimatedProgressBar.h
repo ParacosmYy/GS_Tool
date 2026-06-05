@@ -2,7 +2,15 @@
  * @file AnimatedProgressBar.h
  * @brief 带shimmer流动效果的进度条 -- OTA传输视觉反馈
  *
- * header-only实现，QPropertyAnimation驱动shimmerOffset属性，颜色从ThemeManager获取
+ * Header-only实现，QPropertyAnimation驱动shimmerOffset属性，颜色从ThemeManager获取。
+ * 传输进行时在进度条chunk上显示水平移动亮光带(shimmer效果)。
+ * 支持自定义chunk颜色动画(如传输完成绿色渐变)。
+ *
+ * 属性:
+ *   - shimmerOffset: shimmer光带位置[0.0, 1.0]，2000ms线性循环
+ *   - chunkColor: 自定义进度条填充颜色
+ *
+ * 统计: 动画播放/值更新/颜色重置/shimmer启停/chunk颜色变更计数器
  */
 #ifndef ANIMATEDPROGRESSBAR_H
 #define ANIMATEDPROGRESSBAR_H

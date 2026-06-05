@@ -55,6 +55,10 @@ public:
 protected:
     /** @brief 绘制旋转圆弧 */
     void paintEvent(QPaintEvent* event) override;
+    /** @brief 显示事件 — 恢复旋转动画 */
+    void showEvent(QShowEvent* event) override;
+    /** @brief 隐藏事件 — 暂停旋转动画(节省CPU) */
+    void hideEvent(QHideEvent* event) override;
 
 private:
     int m_lineWidth = 3;  ///< 弧线宽度(px)

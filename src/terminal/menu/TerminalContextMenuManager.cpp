@@ -73,7 +73,7 @@ TerminalContextMenuManager::TerminalContextMenuManager(QObject* parent)
 /** @brief 显示右键菜单(根据是否有选中文本来启用/禁用复制按钮)，同时递增菜单弹出计数 @param event 右键菜单事件 @param hasSelection 当前是否有选中文本 */
 void TerminalContextMenuManager::showContextMenu(QContextMenuEvent* event, bool hasSelection)
 {
-    if (!m_contextMenu) return;
+    if (!m_contextMenu || !event) return;
     m_copyAction->setEnabled(hasSelection);
     ++m_totalMenuShows;
     m_contextMenu->popup(event->globalPos());

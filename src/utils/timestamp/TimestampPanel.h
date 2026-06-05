@@ -1,11 +1,15 @@
 /**
  * @file TimestampPanel.h
- * @brief 时间戳工具面板 UI
+ * @brief 时间戳工具面板 UI — 提供时间戳输入、格式选择和转换结果显示的交互面板
+ *
+ * 支持 Unix秒/Unix毫秒/ISO日期 三种格式的双向转换。
+ * 包含转换历史记录列表，限制最近30条记录。
+ * 会话统计: 转换次数/复制次数/分析次数/格式切换/解析次数/当前时间按钮/历史恢复
+ *
+ * 协作: TimestampAnalyzer(转换引擎) / TimestampPanelConvert(槽函数+统计)
+ *
  * @author Serial Tool Team
  * @date 2026-06-02
- *
- * 提供时间戳输入、格式选择和转换结果显示的交互面板。
- * 支持双向转换和结果复制。
  */
 
 #ifndef TIMESTAMPPANEL_H

@@ -86,8 +86,9 @@ void YModemTransfer::handleStateSendingData(char ch, int& readIdx)
         m_blockNumber++;
         // 更新速率统计
         updateTransferStats();
-        int percent = static_cast<int>(
-            (static_cast<qint64>(m_totalBytesSent) * 100) / m_totalBytes);
+        int percent = (m_totalBytes > 0)
+            ? static_cast<int>((static_cast<qint64>(m_totalBytesSent) * 100) / m_totalBytes)
+            : 100;
         emit progress(percent, m_totalBytesSent, m_totalBytes);
         if (m_bytesSent >= m_currentData.size()) {
             m_ymodemState = State::SendingEOT;
@@ -106,7 +107,7 @@ void YModemTransfer::handleStateSendingData(char ch, int& readIdx)
             sendCancelBytes();
             m_ymodemState = State::Error;
             markError();
-            emit transferError(tr("NAK重试次数过多"));
+            emit transferError(tr("数据块被拒绝: 重试次数过多 (块 %1)").arg(m_blockNumber));
             m_receiveBuffer.remove(0, readIdx);
             return;
         }

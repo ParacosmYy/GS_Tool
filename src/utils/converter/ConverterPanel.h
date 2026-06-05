@@ -1,10 +1,13 @@
 /**
  * @file ConverterPanel.h
- * @brief 数据格式转换面板 UI
+ * @brief 数据格式转换面板 UI — 提供格式选择、输入输出区域、交换和复制功能
+ *
+ * 支持 Hex/ASCII/Base64/Decimal/Octal/Binary 等格式的双向转换。
+ * 包含转换历史记录列表，限制最近30条记录。
+ * 会话统计: 转换次数/复制次数/格式交换/输入变更/错误/剪贴板操作
+ *
  * @author Serial Tool Team
  * @date 2026-06-02
- *
- * 提供格式选择、输入输出区域、交换和复制功能的交互面板。
  */
 
 #ifndef CONVERTERPANEL_H
@@ -20,7 +23,10 @@
 
 /**
  * @class ConverterPanel
- * @brief 数据格式转换器 UI 面板
+ * @brief 数据格式转换器 UI 面板 — 格式选择+输入输出+交换+复制+历史记录
+ *
+ * 协作: DataConverter(转换引擎) / ConverterPanelSlots(槽函数) /
+ *       ConverterPanel.cpp(构造+事件过滤)
  */
 class ConverterPanel : public QWidget
 {
@@ -33,16 +39,10 @@ public:
      */
     explicit ConverterPanel(QWidget *parent = nullptr);
 
-    /**
-     * @brief 设置输入内容
-     * @param text 输入文本
-     */
+    /** @brief 设置输入内容(程序化设置，不触发统计) @param text 输入文本 */
     void setInput(const QString &text);
 
-    /**
-     * @brief 获取输出内容
-     * @return 转换后的文本
-     */
+    /** @brief 获取输出内容 @return 转换后的文本 */
     QString output() const;
 
     /** @brief 获取累计转换操作次数 @return 转换次数 */

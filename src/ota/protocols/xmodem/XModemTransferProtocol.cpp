@@ -55,6 +55,14 @@ void XModemTransfer::sendBlock()
     // 使用累计已发送字节数作为偏移，而非从块号反算。
     // XModem 块号在 1-255 间循环，不能用于计算文件偏移。
     qint64 offset = m_bytesSent;
+    // 防御: offset超过数据大小时直接结束，避免负数转无符号后的截断
+    if (offset >= m_data.size()) {
+        m_xmodemState = State::SendingEOT;
+        m_blockRetryCount = 0;
+        sendEOT();
+        m_timeoutTimer->start(m_timeoutMs);
+        return;
+    }
     int dataSize = qMin(static_cast<int>(m_data.size() - offset), bs);
 
     if (dataSize <= 0) {

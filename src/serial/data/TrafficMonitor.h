@@ -137,6 +137,7 @@ private:
     quint64 m_totalPeakRateExceededEvents = 0; ///< 累计峰值速率被刷新的事件次数
     quint64 m_totalPacketsIn = 0;               ///< 累计接收包次数
     quint64 m_totalPacketsOut = 0;              ///< 累计发送包次数
+    double m_totalElapsedSec = 0.0;             ///< 累计经过时间(秒)，用于速率历史X轴
 };
 
 #endif // TRAFFICMONITOR_H

@@ -82,6 +82,8 @@ private:
     quint64 m_totalCategoryClicks = 0;  ///< 分类节点点击总次数
     quint64 m_totalRestoresByIndex = 0; ///< 通过索引恢复面板总次数(会话恢复)
     quint64 m_totalNavTreeRebuilds = 0; ///< 导航树重建总次数(buildNavTree调用)
+
+    bool m_navCollapseAnimating = false; ///< 断点折叠动画进行中标志(防止重复触发)
 };
 
 #endif // NAVIGATION_CONTROLLER_H

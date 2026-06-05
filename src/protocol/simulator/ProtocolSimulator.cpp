@@ -281,14 +281,14 @@ void ProtocolSimulator::processPendingResponses()
             m_stats.totalBytesSent += static_cast<quint64>(pending.data.size());
 
             /* 计算实际响应延迟(用于平均响应时间) */
-            qint64 actualDelay = now - (pending.sendAtMs -
-                /* 从sendAtMs反推起始时间: 需要记录原始延迟 */
-                0); /* 简化: 使用sendAtMs - now作为近似 */
-            Q_UNUSED(actualDelay)
-
-            m_sumResponseTimeMs += static_cast<quint64>(
-                now - (pending.sendAtMs)); /* 此值<=0表示已超时 */
-            m_responseTimeCount++;
+            qint64 responseDelta = now - pending.sendAtMs;
+            if (responseDelta < 0) {
+                /* 系统时钟回拨导致负值，跳过该采样点 */
+                Q_UNUSED(responseDelta)
+            } else {
+                m_sumResponseTimeMs += static_cast<quint64>(responseDelta);
+                m_responseTimeCount++;
+            }
 
             if (m_responseTimeCount > 0) {
                 m_stats.avgResponseTimeMs =

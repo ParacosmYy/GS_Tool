@@ -1,4 +1,12 @@
-/** @file NavIndicatorWidget.h @brief 导航树选中滑动指示器 -- 左侧accent色竖线的平滑滑动动画(250ms OutCubic)。QPropertyAnimation驱动indicatorY, ThemeManager取色 */
+/**
+ * @file NavIndicatorWidget.h
+ * @brief 导航树选中滑动指示器 -- 左侧accent色竖线的平滑滑动动画(250ms OutCubic)
+ *
+ * QPropertyAnimation驱动indicatorY属性变化，ThemeManager获取当前主题accent色。
+ * 作为透明覆盖层放置在QTreeView上方，选中项切换时指示线平滑滑动过渡。
+ *
+ * 统计: 动画启动/位置变更/跳转/主题更新/重绘/尺寸同步计数器
+ */
 
 #ifndef NAV_INDICATOR_WIDGET_H
 #define NAV_INDICATOR_WIDGET_H

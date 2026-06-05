@@ -151,10 +151,16 @@ void WaterfallWidget::hideEvent(QHideEvent *event)
 /** @brief 鼠标移动事件处理，计算光标处的频率索引和幅度值并发送信号 @param event 鼠标事件参数 */
 void WaterfallWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    if (m_history.isEmpty()) return;
     int x = event->pos().x();
     int y = event->pos().y();
-    int col = (width() > 0) ? x * (m_history.isEmpty() ? 1 : m_history[0].size()) / width() : 0;
+    /* 使用最后一行(最新)的宽度作为参考，而非第一行(最旧) */
+    int spectrumBins = qMax(1, m_history.last().size());
+    int col = (width() > 0) ? x * spectrumBins / width() : 0;
     int row = (height() > 0) ? y * m_maxLines / height() : 0;
+    /* 防御负坐标: x<0时col为负 */
+    if (x < 0) col = -1;
+    if (y < 0) row = -1;
     if (row >= 0 && row < m_history.size() && col >= 0 && col < m_history[row].size()) {
         m_totalCursorQueries++;
         emit valueAtCursor(col, m_history[row][col]);

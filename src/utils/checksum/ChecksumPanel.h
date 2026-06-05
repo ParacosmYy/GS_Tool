@@ -1,4 +1,12 @@
-/** @file ChecksumPanel.h @brief 校验和计算面板 UI -- 数据输入(十六进制/ASCII/文件)、算法选择、结果显示 */
+/**
+ * @file ChecksumPanel.h
+ * @brief 数据校验和面板 — 多算法校验和计算与比较工具
+ *
+ * 提供 HEX/ASCII/文件 三种输入模式和 16 种校验算法(Sum8/16/32/XOR8/CRC系列/MD5/SHA系列)。
+ * 文件输入限制16MB防止OOM。支持校验结果复制和计算历史记录(最近50条)。
+ *
+ * 会话统计: 计算次数/复制次数/算法切换/剪贴板操作/输入更新/格式切换/历史选择
+ */
 #ifndef CHECKSUMPANEL_H
 #define CHECKSUMPANEL_H
 

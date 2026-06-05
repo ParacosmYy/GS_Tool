@@ -122,10 +122,10 @@ QString DbcParser::formatSignalValue(uint32_t msgId,
     }
     if (!targetSig) { return QString(); }
 
-    /* 值表翻译(仅整数值) */
-    const int intVal = static_cast<int>(rawValue);
-    if (targetSig->valueTable.contains(intVal)) {
-        return targetSig->valueTable.value(intVal);
+    /* 值表翻译(仅整数值) — 使用qint64避免大信号值溢出 */
+    const qint64 intVal = static_cast<qint64>(rawValue);
+    if (targetSig->valueTable.contains(static_cast<int>(intVal))) {
+        return targetSig->valueTable.value(static_cast<int>(intVal));
     }
 
     /* 通用格式: "值 单位" */

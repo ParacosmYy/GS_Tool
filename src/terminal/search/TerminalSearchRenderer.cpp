@@ -51,11 +51,15 @@ void TerminalSearchRenderer::drawHighlights(
     }
 
     // 遍历所有匹配项，筛选属于当前行的匹配并绘制高亮矩形
+    // 优化: 利用matches按行排序的特性，提前终止不匹配的行
     ++s_totalRenders;
     int highlightCount = 0;
+    bool foundLine = false;
     for (int mi = 0; mi < matches.size(); ++mi) {
         const auto& match = matches[mi];
-        if (match.line != displayLine) continue;
+        if (match.line < displayLine) continue;  // 跳过之前的行
+        if (match.line > displayLine) break;      // 超过当前行，提前终止
+        foundLine = true;
         ++highlightCount;
 
         // match.startCol 是包含前缀的文本中的列偏移，减去前缀长度后

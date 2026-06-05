@@ -76,7 +76,10 @@ QByteArray ModbusSlave::processRequest(const QByteArray& requestData) {
     // 根据功能码分派处理
     QByteArray responsePayload;
     ++m_totalRequestsHandled;
-    ++m_fcStats[static_cast<int>(req.function)];
+    /* 防御: 功能码作为Map键，避免越界。仅统计已知功能码 */
+    if (static_cast<int>(req.function) >= 1 && static_cast<int>(req.function) <= 127) {
+        ++m_fcStats[static_cast<int>(req.function)];
+    }
     switch (req.function) {
     case ModbusFunction::ReadHoldingRegisters:
     case ModbusFunction::ReadInputRegisters:

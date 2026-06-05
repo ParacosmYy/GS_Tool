@@ -24,7 +24,8 @@ UdpConnection::~UdpConnection()
     // 析构时仅释放资源，不发射信号(避免析构期间回调)
     if (m_socket) {
         m_socket->close();
-        m_socket = nullptr;  // deleteLater在析构中无效，直接置空
+        delete m_socket;     // 析构中deleteLater无效，直接delete释放
+        m_socket = nullptr;
     }
     m_state = ConnectionState::Disconnected;
 }

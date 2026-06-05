@@ -156,22 +156,55 @@ void ZModemTransfer::handleTimeout()
     case State::WaitingRinit:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZRQINIT, attempt" << m_retryCount;
         ++m_stats.retries;
+        ++m_retryCount;
+        if (m_retryCount > m_maxRetries) {
+            sendCancelBytes();
+            m_zmodemState = State::Error;
+            markError();
+            emit transferError(tr("等待ZRINIT超时: 重试次数耗尽 (%1次)").arg(m_maxRetries));
+            return;
+        }
         sendZRQINIT();
         m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::SendingFile:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZFILE, attempt" << m_retryCount;
         ++m_stats.retries;
+        ++m_retryCount;
+        if (m_retryCount > m_maxRetries) {
+            sendCancelBytes();
+            m_zmodemState = State::Error;
+            markError();
+            emit transferError(tr("发送ZFILE超时: 重试次数耗尽 (%1次)").arg(m_maxRetries));
+            return;
+        }
         sendZFILE();
         m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::WaitingZAck:
         qWarning() << "ZModem: timeout in" << curState << "- bytes sent:" << m_bytesSent;
+        ++m_stats.retries;
+        ++m_retryCount;
+        if (m_retryCount > m_maxRetries) {
+            sendCancelBytes();
+            m_zmodemState = State::Error;
+            markError();
+            emit transferError(tr("等待ZACK超时: 重试次数耗尽 (%1次)").arg(m_maxRetries));
+            return;
+        }
         m_timeoutTimer->start(m_timeoutMs);
         break;
     case State::SendingFin:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZFIN, attempt" << m_retryCount;
         ++m_stats.retries;
+        ++m_retryCount;
+        if (m_retryCount > m_maxRetries) {
+            sendCancelBytes();
+            m_zmodemState = State::Error;
+            markError();
+            emit transferError(tr("发送ZFIN超时: 重试次数耗尽 (%1次)").arg(m_maxRetries));
+            return;
+        }
         sendZFIN();
         m_timeoutTimer->start(m_timeoutMs);
         break;
@@ -179,6 +212,12 @@ void ZModemTransfer::handleTimeout()
         qWarning() << "ZModem: timeout in" << curState << "- offset:" << m_fileOffset << "bytes:" << m_bytesSent;
         ++m_stats.retries;
         sendDataSubpackets();
+        /* sendDataSubpackets在数据未发完时用singleShot异步续传，
+           仅在全部发完进入WaitingZAck时才启动timeoutTimer。
+           若sendDataSubpackets提前返回(连接断开/取消)，需兜底启动定时器 */
+        if (m_zmodemState != State::WaitingZAck && m_zmodemState != State::Error) {
+            m_timeoutTimer->start(m_timeoutMs);
+        }
         break;
     case State::SendingEof:
         qWarning() << "ZModem: timeout in" << curState << "- retrying ZEOF";
