@@ -4,16 +4,8 @@
  * @author EmbedDebug Team
  * @date 2026-06-05
  *
- * 对 QByteArray 执行字节级精确比较，支持:
- * - 逐字节 diff 结果生成（匹配/不匹配/插入/删除）
- * - 连续差异块分组
- * - 并排 hex dump 输出（类 hexdump -C 格式）
- * - 统一差异格式文本输出
- * - 上下文行扩展（差异块周围 N 字节）
- * - 三路比较（base/A/B 共识与冲突）
- * - 补丁生成与应用（将 dataA 变换为 dataB）
- * - 颜色标记（匹配/差异/插入/删除）
- * - 统计计数器与信号通知
+ * 逐字节 diff、连续差异块分组、并排 hex dump、统一差异格式、
+ * 上下文行扩展、三路比较、补丁生成与应用、颜色标记、统计。
  */
 
 #ifndef HEXDIFFENGINE_H
@@ -27,16 +19,11 @@
 
 /**
  * @class HexDiffEngine
- * @brief 十六进制差异引擎，提供字节级精确比较和补丁操作
+ * @brief 十六进制差异引擎 — 字节级精确比较、三路合并、补丁操作
  *
- * 核心功能:
- * - compare() 逐字节对比，返回 DiffEntry 列表
- * - compareBlocks() 将连续差异合并为 DiffBlock
- * - threeWayCompare() 三路合并比较
- * - generatePatch() / applyPatch() 补丁生成与应用
- * - sideBySideHexDump() 并排 hex dump 文本
- * - unifiedDiff() 统一差异格式输出
- * 统计计数器跟踪所有累计指标。
+ * compare() 逐字节对比返回 DiffEntry; compareBlocks() 合并连续差异块;
+ * threeWayCompare() 三路合并; generatePatch()/applyPatch() 补丁操作;
+ * sideBySideHexDump() 并排 hex dump; unifiedDiff() 统一差异格式。
  */
 class HexDiffEngine : public QObject
 {
@@ -120,129 +107,55 @@ public:
     /** @brief 构造十六进制差异引擎 @param parent 父对象 */
     explicit HexDiffEngine(QObject *parent = nullptr);
 
-    /**
-     * @brief 逐字节比较两个 QByteArray
-     * @param dataA 数据缓冲区 A
-     * @param dataB 数据缓冲区 B
-     * @return 逐字节差异条目列表
-     *
-     * 完成后发射 comparisonComplete 信号，每个连续差异块
-     * 发射 diffBlockFound 信号。
-     */
+    /** @brief 逐字节比较两个 QByteArray，发射 comparisonComplete/diffBlockFound 信号 */
     QList<DiffEntry> compare(const QByteArray &dataA, const QByteArray &dataB);
 
-    /**
-     * @brief 将差异条目合并为连续差异块
-     * @param entries 逐字节差异条目列表
-     * @return 连续差异块列表
-     *
-     * 将相邻的相同 DiffKind 条目合并为一个 DiffBlock。
-     */
+    /** @brief 将差异条目合并为连续差异块（相邻同类型合并） */
     QList<DiffBlock> compareBlocks(const QList<DiffEntry> &entries) const;
 
-    /**
-     * @brief 生成并排 hex dump 文本
-     * @param dataA 数据 A
-     * @param dataB 数据 B
-     * @param bytesPerLine 每行字节数（默认 16）
-     * @return 类 hexdump -C 格式的多行文本
-     */
+    /** @brief 并排 hex dump（类 hexdump -C 格式），差异用 '!' 插入 '+' 删除 '-' 标记 */
     QString sideBySideHexDump(const QByteArray &dataA, const QByteArray &dataB,
                               int bytesPerLine = 16) const;
 
-    /**
-     * @brief 生成带上下文行的差异块文本
-     * @param dataA 数据 A
-     * @param dataB 数据 B
-     * @param contextBytes 上下文字节数（默认 8）
-     * @return 仅包含差异块及其上下文的文本
-     */
+    /** @brief 带上下文行的差异块文本，contextBytes 为上下文字节数 */
     QString contextDiff(const QByteArray &dataA, const QByteArray &dataB,
                         int contextBytes = 8) const;
 
-    /**
-     * @brief 生成统一差异格式输出
-     * @param dataA 数据 A
-     * @param dataB 数据 B
-     * @param labelA 数据 A 标签
-     * @param labelB 数据 B 标签
-     * @return 统一差异格式文本
-     */
+    /** @brief 统一差异格式输出，labelA/labelB 为数据标签 */
     QString unifiedDiff(const QByteArray &dataA, const QByteArray &dataB,
                         const QString &labelA = "A",
                         const QString &labelB = "B") const;
 
-    /**
-     * @brief 执行三路比较
-     * @param base 基准数据
-     * @param dataA 分支 A
-     * @param dataB 分支 B
-     * @return 三路比较结果（共识/冲突统计）
-     *
-     * 三路比较以 base 为基准，比较 A 和 B 相对 base 的变化，
-     * 标记三方一致（共识）或分歧（冲突）的字节。
-     */
+    /** @brief 三路比较（base/A/B），标记共识与冲突，返回共识率 */
     ThreeWayResult threeWayCompare(const QByteArray &base,
                                    const QByteArray &dataA,
                                    const QByteArray &dataB);
 
-    /**
-     * @brief 生成将 dataA 变换为 dataB 的补丁
-     * @param dataA 原始数据
-     * @param dataB 目标数据
-     * @return 补丁条目列表
-     */
+    /** @brief 生成将 dataA 变换为 dataB 的补丁条目列表 */
     QList<PatchEntry> generatePatch(const QByteArray &dataA,
                                     const QByteArray &dataB);
 
-    /**
-     * @brief 应用补丁到数据
-     * @param data 原始数据
-     * @param patch 补丁条目列表
-     * @param verify 是否校验原始字节（默认 true）
-     * @return 应用补丁后的数据；校验失败返回空 QByteArray
-     */
+    /** @brief 应用补丁到 data，verify=true 时校验原始字节，失败返回空 QByteArray */
     QByteArray applyPatch(const QByteArray &data,
                           const QList<PatchEntry> &patch,
                           bool verify = true);
 
-    /**
-     * @brief 获取累计统计计数器快照
-     * @return 统计结构体副本
-     */
+    /** @brief 获取累计统计计数器快照 */
     Stats stats() const;
 
     /** @brief 重置所有累计统计计数器为初始值 */
     void resetStatistics();
 
 signals:
-    /**
-     * @brief 比较完成时发射
-     * @param similarity 相似度百分比 (0.0 ~ 100.0)
-     */
+    /** @brief 比较完成时发射，similarity 为相似度百分比 (0.0~100.0) */
     void comparisonComplete(double similarity);
 
-    /**
-     * @brief 发现差异块时逐个发射
-     * @param offset 差异块起始偏移
-     * @param length 差异块字节长度
-     */
+    /** @brief 发现差异块时逐个发射 */
     void diffBlockFound(quint64 offset, int length);
 
 private:
-    /**
-     * @brief 格式化单字节为两位大写十六进制
-     * @param byte 字节值
-     * @return 两位十六进制字符串
-     */
-    static QString formatHexByte(quint8 byte);
-
-    /**
-     * @brief 格式化偏移地址为8位十六进制
-     * @param offset 偏移值
-     * @return 8位十六进制字符串
-     */
-    static QString formatOffset(quint64 offset);
+    static QString formatHexByte(quint8 byte);    ///< 单字节→两位大写Hex
+    static QString formatOffset(quint64 offset);  ///< 偏移→8位大写Hex
 
     Stats m_stats;                ///< 累计统计计数器
     double m_similaritySum = 0.0; ///< 累计相似度总和（用于计算平均值）

@@ -757,8 +757,13 @@ set(SOURCES
     src/chart/filter/WaveformFilterCompute.cpp
 
     # -- F47: 数据流录制器 --
-    src/utils/recorder/DataStreamRecorder.cpp
-    src/utils/recorder/DataStreamRecorderExport.cpp
+    src/utils/recorder/StreamCaptureRecorder.cpp
+    src/utils/recorder/StreamCaptureRecorderExport.cpp
+
+    # -- F48: Hex差异引擎 --
+    src/utils/hex_diff/HexDiffEngine.cpp
+    src/utils/hex_diff/HexDiffEngineDiff.cpp
+    src/utils/hex_diff/HexDiffEnginePatch.cpp
 )
 
 set(HEADERS
@@ -1140,6 +1145,9 @@ set(HEADERS
     # ── F40: 帧模板库 ──
     src/utils/template_lib/FrameTemplateLibrary.h
 
+    # ── F41: 帧解码器 ──
+    src/utils/decoder/SerialFrameDecoder.h
+
     # -- F42: 数据加密引擎 --
     src/utils/crypto/DataEncryptionEngine.h
 
@@ -1147,7 +1155,10 @@ set(HEADERS
     src/chart/filter/WaveformFilter.h
 
     # -- F47: 数据流录制器 --
-    src/utils/recorder/DataStreamRecorder.h
+    src/utils/recorder/StreamCaptureRecorder.h
+
+    # -- F48: Hex差异引擎 --
+    src/utils/hex_diff/HexDiffEngine.h
 )
 
 set(RESOURCES
