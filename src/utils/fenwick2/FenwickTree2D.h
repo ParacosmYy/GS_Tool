@@ -14,6 +14,7 @@
 #include <QPair>
 
 #include <vector>
+#include <tuple>
 
 /**
  * @brief 二维树状数组 — 支持矩阵区域求和与点更新
@@ -76,7 +77,7 @@ public:
      * @brief 批量更新
      * @param updates 更新列表 (x, y, delta)
      */
-    void batchUpdate(const QVector<QTriple<int, int, qint64>>& updates);
+    void batchUpdate(const QVector<std::tuple<int, int, qint64>>& updates);
 
     /** @brief 获取行数 @return 行数 */
     int rows() const { return m_rows; }

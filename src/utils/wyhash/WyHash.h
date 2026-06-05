@@ -71,6 +71,8 @@ private:
     static quint32 readLE32(const QByteArray& data, int offset);
     /** @brief 64位混合函数(wymix) @param a 值A @param b 值B @return 混合结果 */
     static quint64 wymix(quint64 a, quint64 b);
+    /** @brief 内部统计更新辅助 @param len 输入长度 */
+    void updateStats(int len);
 
     quint64 m_seed;                 ///< 哈希种子
     QElapsedTimer m_timer;          ///< 计时器

@@ -94,6 +94,9 @@ private:
     static constexpr quint32 PARENT       = 4;  ///< 标志: 父节点
     static constexpr quint32 ROOT         = 8;  ///< 标志: 根节点
 
+    /** @brief 处理一个完整的 chunk(1024字节) */
+    void processChunk();
+
     quint32 m_key[8];               ///< 链值/密钥(8个32位字)
     quint64 m_chunkCounter;         ///< 块计数器
     quint32 m_flags;                ///< 当前标志

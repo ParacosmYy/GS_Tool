@@ -1057,7 +1057,7 @@ set(SOURCES
     src/utils/fit3/SplineInterpolation.cpp
     src/utils/conv2/Convolution2D.cpp
     # src/utils/linalg4/LuDecomposition.cpp  # removed: conflicts with decomp/LuDecomposition (same class name)
-    src/utils/signal5/EnvelopeDetector.cpp
+    # src/utils/signal5/EnvelopeDetector.cpp  # removed: file does not exist
     src/utils/graph9/MinimumSpanningTree.cpp
     src/utils/code3/HammingCode.cpp
     src/utils/cluster3/GaussianMixture2.cpp
@@ -1358,7 +1358,7 @@ set(SOURCES
     src/utils/lfu2/TinyLfuCache.cpp
 
     # -- F201~F220: Wave 33+Linter 工具模块 --
-    src/utils/graph3/DijkstraShortestPath.cpp
+    # src/utils/graph3/DijkstraShortestPath.cpp  # removed: duplicate (already in Wave 40)
     src/utils/heap2/FibonacciHeap.cpp
     src/utils/kalman3/UnscentedKalmanFilter.cpp
     src/utils/quadtree/QuadTree.cpp
@@ -1418,6 +1418,13 @@ set(SOURCES
     src/utils/sha3/Sha3Hash.cpp
     src/utils/sha512/Sha512Hash.cpp
 
+    # ── Wave 84: 哈希函数集合(.cpp) ──
+    src/utils/farmhash/FarmHash.cpp
+    src/utils/metro/MetroHash.cpp
+    src/utils/murmur64/MurmurHash64.cpp
+    src/utils/polyhash/PolynomialHash.cpp
+    src/utils/spooky/SpookyHash.cpp
+
     # ── Wave 89: Cauchy分布/原子环形缓冲/MCMC采样/Catmull-Rom样条 ──
     src/utils/cauchy/CauchyDistribution.cpp
     src/utils/ring4/RingBufferAtomic.cpp
@@ -1429,6 +1436,88 @@ set(SOURCES
     src/utils/l1/L1Regularization.cpp
     src/utils/matmul/MatrixMultiply.cpp
     src/utils/spdy/SpdyCompressor.cpp
+
+    # ── Wave 85: 图算法/插值/压缩/线性代数 ──
+    # src/utils/dijkstra/DijkstraShortestPath.cpp  # removed: conflicts with graph3/DijkstraShortestPath
+    # src/utils/graph12/BellmanFord.cpp  # removed: conflicts with graph4/BellmanFord
+    src/utils/hmm2/HiddenMarkovModel2.cpp
+    # src/utils/interp5/AkimaInterpolation.cpp  # removed: conflicts with interp3/AkimaInterpolation
+    src/utils/lzw3/LzwEncoder.cpp
+    src/utils/qr4/GivensQRUpdate.cpp
+    src/utils/rolling_hash/RollingHash3.cpp
+
+    # ── Wave 86: 哈希模块 ──
+    src/utils/echohash/EchoHash.cpp
+    src/utils/md6/Md6Hash.cpp
+    src/utils/jh/JhHash.cpp
+
+    # ── Wave 91: SGD/小波包/B-Tree/GMM/欧拉路径/格基规约/后缀自动机 ──
+    src/utils/sgd/StochasticGradientDescent.cpp
+    src/utils/dwt4/WaveletPacket.cpp
+    src/utils/btree5/BTreeMap.cpp
+    src/utils/gmm/GaussianMixture3.cpp
+    src/utils/graph13/EulerianPath.cpp
+    src/utils/lattice/LatticeReducer.cpp
+    src/utils/suffix3/SuffixAutomaton.cpp
+
+    # ── Wave 92: 核PCA增强 ──
+    src/utils/pca2/KernelPca.cpp
+
+    # ── Wave 93: FFT卷积/配对堆/正则引擎/DTW ──
+    src/utils/conv3/FftConvolution.cpp
+    src/utils/heap7/PairingHeap.cpp
+    src/utils/regex2/RegexEngine.cpp
+    src/utils/distance3/DynamicTimeWarping.cpp
+
+    # ── Wave 94: SCC/红黑树/三角插值/线段树 ──
+    src/utils/graph14/StronglyConnected.cpp
+    src/utils/tree6/RedBlackTree2.cpp
+    src/utils/interp6/TrigonometricInterp.cpp
+    src/utils/segment4/LazySegmentTree.cpp
+
+    # ── Wave 95: 基数排序/计数布隆/拓扑排序/CSR ──
+    src/utils/sort8/RadixSort.cpp
+    src/utils/bloom7/CountingBloomFilter.cpp
+    src/utils/graph15/TopologicalSort.cpp
+    src/utils/matrix5/SparseMatrixCSR.cpp
+
+    # ── Wave 96: 斐波那契队列/KD树/Shannon/DFA ──
+    src/utils/priority3/FibonacciPriorityQueue.cpp
+    src/utils/kdtree3/KdTreeNearest.cpp
+    src/utils/entropy4/ShannonCoding.cpp
+    src/utils/automata3/DfaMinimizer.cpp
+
+    # ── Wave 97: 正态性检验/自适应FFT/并查集/Huffman ──
+    src/utils/norm_test/NormalityTest.cpp
+    src/utils/adaptive_fft/AdaptiveFFT.cpp
+    src/utils/disjoint2/WeightedDisjointSet.cpp
+    src/utils/huffman4/AdaptiveHuffman.cpp
+
+    # ── Wave 98: 多项式插值/三角剖分/小波去噪/LRU ──
+    src/utils/poly_interp/PolynomialInterpolator.cpp
+    src/utils/triangulate2/EarClippingTriangulator.cpp
+    src/utils/wavelet4/WaveletDenoiser.cpp
+    src/utils/cache2/LRUCache.cpp
+
+    # ── Wave 87-88: Softmax/边缘检测/Goertzel/特征值/Levenshtein ──
+    src/utils/softmax/SoftmaxClassifier.cpp
+    src/utils/detector/EdgeDetector2.cpp
+    src/utils/fft8/GoertzelAlgorithm.cpp
+    src/utils/matrix5/SymmetricEigen.cpp
+    src/utils/string5/LevenshteinAutomaton.cpp
+
+    # ── Wave 85b: Renyi熵/Zipf/增量PCA/懒传播线段树 ──
+    src/utils/shannon3/RenyiEntropy.cpp
+    src/utils/zipf/ZipfGenerator.cpp
+    src/utils/pca3/IncrementalPca.cpp
+    src/utils/segment_tree2/SegmentTreeLazy.cpp
+
+    # ── 哈希模块补充cpp ──
+    src/utils/blake3/Blake3Hash.cpp
+    src/utils/keccak/KeccakHash.cpp
+    src/utils/siphash/SipHash.cpp
+    src/utils/wyhash/WyHash.cpp
+    src/utils/xxhash/XxHash.cpp
 )
 
 set(HEADERS
@@ -2503,7 +2592,7 @@ set(HEADERS
     src/utils/fit3/SplineInterpolation.h
     src/utils/conv2/Convolution2D.h
     # src/utils/linalg4/LuDecomposition.h  # removed: conflicts with decomp/LuDecomposition (same class name)
-    src/utils/signal5/EnvelopeDetector.h
+    # src/utils/signal5/EnvelopeDetector.h  # removed: file does not exist
     src/utils/graph9/MinimumSpanningTree.h
     src/utils/code3/HammingCode.h
     src/utils/cluster3/GaussianMixture2.h
@@ -2582,6 +2671,63 @@ set(HEADERS
     src/utils/l1/L1Regularization.h
     src/utils/matmul/MatrixMultiply.h
     src/utils/spdy/SpdyCompressor.h
+
+    # ── Wave 85: 图算法/插值/压缩/线性代数 ──
+    # src/utils/dijkstra/DijkstraShortestPath.h  # removed: conflicts with graph3/DijkstraShortestPath
+    # src/utils/graph12/BellmanFord.h  # removed: conflicts with graph4/BellmanFord
+    src/utils/hmm2/HiddenMarkovModel2.h
+    # src/utils/interp5/AkimaInterpolation.h  # removed: conflicts with interp3/AkimaInterpolation
+    src/utils/lzw3/LzwEncoder.h
+    src/utils/qr4/GivensQRUpdate.h
+    src/utils/rolling_hash/RollingHash3.h
+
+    # ── Wave 86: 哈希模块 ──
+    src/utils/echohash/EchoHash.h
+    src/utils/md6/Md6Hash.h
+    src/utils/jh/JhHash.h
+
+    # ── Wave 91-98 headers ──
+    src/utils/sgd/StochasticGradientDescent.h
+    src/utils/dwt4/WaveletPacket.h
+    src/utils/btree5/BTreeMap.h
+    src/utils/gmm/GaussianMixture3.h
+    src/utils/graph13/EulerianPath.h
+    src/utils/lattice/LatticeReducer.h
+    src/utils/suffix3/SuffixAutomaton.h
+    src/utils/pca2/KernelPca.h
+    src/utils/conv3/FftConvolution.h
+    src/utils/heap7/PairingHeap.h
+    src/utils/regex2/RegexEngine.h
+    src/utils/distance3/DynamicTimeWarping.h
+    src/utils/graph14/StronglyConnected.h
+    src/utils/tree6/RedBlackTree2.h
+    src/utils/interp6/TrigonometricInterp.h
+    src/utils/segment4/LazySegmentTree.h
+    src/utils/sort8/RadixSort.h
+    src/utils/bloom7/CountingBloomFilter.h
+    src/utils/graph15/TopologicalSort.h
+    src/utils/matrix5/SparseMatrixCSR.h
+    src/utils/priority3/FibonacciPriorityQueue.h
+    src/utils/kdtree3/KdTreeNearest.h
+    src/utils/entropy4/ShannonCoding.h
+    src/utils/automata3/DfaMinimizer.h
+    src/utils/norm_test/NormalityTest.h
+    src/utils/adaptive_fft/AdaptiveFFT.h
+    src/utils/disjoint2/WeightedDisjointSet.h
+    src/utils/huffman4/AdaptiveHuffman.h
+    src/utils/poly_interp/PolynomialInterpolator.h
+    src/utils/triangulate2/EarClippingTriangulator.h
+    src/utils/wavelet4/WaveletDenoiser.h
+    src/utils/cache2/LRUCache.h
+    src/utils/softmax/SoftmaxClassifier.h
+    src/utils/detector/EdgeDetector2.h
+    src/utils/fft8/GoertzelAlgorithm.h
+    src/utils/matrix5/SymmetricEigen.h
+    src/utils/string5/LevenshteinAutomaton.h
+    src/utils/shannon3/RenyiEntropy.h
+    src/utils/zipf/ZipfGenerator.h
+    src/utils/pca3/IncrementalPca.h
+    src/utils/segment_tree2/SegmentTreeLazy.h
 )
 
 set(RESOURCES

@@ -89,15 +89,15 @@ qint64 FenwickTree2D::value(int x, int y) const
 }
 
 /** @brief 批量更新 @param updates 更新列表 */
-void FenwickTree2D::batchUpdate(const QVector<QTriple<int, int, qint64>>& updates)
+void FenwickTree2D::batchUpdate(const QVector<std::tuple<int, int, qint64>>& updates)
 {
     QElapsedTimer timer;
     timer.start();
 
     for (const auto& u : updates) {
-        int x = u.first;
-        int y = u.second;
-        qint64 delta = u.third;
+        int x = std::get<0>(u);
+        int y = std::get<1>(u);
+        qint64 delta = std::get<2>(u);
         if (x < 0 || x >= m_rows || y < 0 || y >= m_cols) continue;
 
         m_data[x][y] += delta;
