@@ -87,6 +87,10 @@ QVector<double> Flanger3::process(const QVector<double>& input)
 /**
  * @brief 设置Flanger效果参数
  *
+ * 延迟时间控制梳状滤波的间距，延迟越短齿距越大。
+ * LFO速率控制效果的"旋转"速度。
+ * 反馈系数控制效果的持续性和强度，过高的反馈可能导致自激。
+ *
  * @param delayMs 最大延迟时间(ms)，典型1~5ms
  * @param rateHz LFO调制速率(Hz)，典型0.1~3.0Hz
  * @param feedback 反馈系数(0.0~0.95)，越高效果越强
@@ -100,6 +104,10 @@ void Flanger3::setParameters(double delayMs, double rateHz, double feedback)
 
 /**
  * @brief 获取当前统计数据
+ *
+ * 返回包含处理采样总数、应用缓冲区数和平均处理耗时的统计信息，
+ * 可用于实时性能监控和延迟分析。
+ *
  * @return 包含采样处理数、缓冲区数和平均耗时的Stats结构
  */
 Flanger3::Stats Flanger3::stats() const
@@ -109,6 +117,10 @@ Flanger3::Stats Flanger3::stats() const
 
 /**
  * @brief 重置所有统计数据为零值
+ *
+ * 将所有计数器归零并清除累计时间，用于新一轮的性能统计。
+ * 不影响当前的Flanger参数设置（延迟/速率/反馈）。
+ * 重置后首次process()调用的耗时将作为新的基准。
  */
 void Flanger3::resetStatistics()
 {

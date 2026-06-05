@@ -100,7 +100,8 @@ QVector<double> ConstantQ4::transform(const QVector<double>& samples, double sam
  * @brief 获取各频带的中心频率列表
  *
  * 在transform()之后调用，返回实际计算使用的频带中心频率。
- * 频率按对数等间隔分布。
+ * 频率按对数等间隔分布，每个八度包含binsPerOctave个频带。
+ * 可用于绘制频谱图的频率轴标签。
  *
  * @return 频带中心频率向量(Hz)
  */

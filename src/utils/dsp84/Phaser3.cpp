@@ -93,10 +93,14 @@ QVector<double> Phaser3::process(const QVector<double>& input)
 /**
  * @brief 设置Phaser效果参数
  *
+ * 级数决定陷波点的数量，级数越多效果越复杂。
+ * 速率控制陷波频率的扫描速度。
+ * 深度控制频率调制范围，反馈控制共振强度。
+ *
  * @param stages 全通滤波器级数(2~12)，级数越多效果越丰富
  * @param rateHz LFO调制速率(Hz)，典型0.1~2.0Hz
- * @param depth 调制深度(0.0~1.0)
- * @param feedback 反馈系数(0.0~0.95)
+ * @param depth 调制深度(0.0~1.0)，控制频率偏移范围
+ * @param feedback 反馈系数(0.0~0.95)，控制共振强度
  */
 void Phaser3::setParameters(int stages, double rateHz, double depth, double feedback)
 {
@@ -117,6 +121,10 @@ Phaser3::Stats Phaser3::stats() const
 
 /**
  * @brief 重置所有统计数据为零值
+ *
+ * 将所有计数器归零并清除累计时间，用于新一轮的性能统计。
+ * 不影响当前的Phaser参数设置（级数/速率/深度/反馈）。
+ * 重置后首次process()调用的耗时将作为新的基准。
  */
 void Phaser3::resetStatistics()
 {

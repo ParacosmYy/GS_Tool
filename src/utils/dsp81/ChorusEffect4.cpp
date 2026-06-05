@@ -96,6 +96,10 @@ QVector<double> ChorusEffect4::process(const QVector<double>& input)
 /**
  * @brief 设置合唱效果的调制参数
  *
+ * 调制深度控制延迟线的变化幅度，深度越大空间感越强。
+ * 调制速率控制延迟变化的频率，速率越高颤音效果越明显。
+ * 典型合唱效果使用低速率(0.5~2.0Hz)和中等深度(0.3~0.7)。
+ *
  * @param depth 调制深度(0.0~1.0)，控制延迟变化幅度
  * @param rateHz 调制速率(Hz)，控制延迟变化频率，典型值0.5~3.0Hz
  */
@@ -107,6 +111,10 @@ void ChorusEffect4::setModulation(double depth, double rateHz)
 
 /**
  * @brief 获取当前统计数据
+ *
+ * 返回包含处理采样总数、应用缓冲区数和平均处理耗时的统计信息，
+ * 用于性能监控和效果器参数调优参考。
+ *
  * @return 包含采样处理数、缓冲区数和平均耗时的Stats结构
  */
 ChorusEffect4::Stats ChorusEffect4::stats() const
@@ -116,6 +124,9 @@ ChorusEffect4::Stats ChorusEffect4::stats() const
 
 /**
  * @brief 重置所有统计数据为零值
+ *
+ * 将所有计数器归零并清除累计时间，用于新一轮的性能统计。
+ * 不影响当前的调制参数设置。
  */
 void ChorusEffect4::resetStatistics()
 {
