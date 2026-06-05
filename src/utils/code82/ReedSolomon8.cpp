@@ -148,36 +148,23 @@ QVector<int> ReedSolomon8::decode(const QVector<int>& codeword, int nSym)
     return decoded;
 }
 
-/**
- * @brief GF(256)乘法
- * @param a 操作数a
- * @param b 操作数b
- * @return a*b mod 不可约多项式
- */
+/** @brief GF(256)乘法，使用不可约多项式0x11D */
 int ReedSolomon8::gfMultiply(int a, int b) const
 {
-    int result = 0;
-    a &= 0xFF;
-    b &= 0xFF;
+    int result = 0; a &= 0xFF; b &= 0xFF;
     while (b) {
         if (b & 1) result ^= a;
         a <<= 1;
-        if (a & 0x100) a ^= 0x11D;  ///< x^8 + x^4 + x^3 + x^2 + 1
+        if (a & 0x100) a ^= 0x11D;
         b >>= 1;
     }
     return result;
 }
 
-/**
- * @brief GF(256)幂运算
- * @param base 底数
- * @param exp 指数
- * @return base^exp in GF(256)
- */
+/** @brief GF(256)幂运算 */
 int ReedSolomon8::gfPow(int base, int exp) const
 {
-    int result = 1;
-    base &= 0xFF;
+    int result = 1; base &= 0xFF;
     while (exp > 0) {
         if (exp & 1) result = gfMultiply(result, base);
         base = gfMultiply(base, base);
@@ -186,20 +173,8 @@ int ReedSolomon8::gfPow(int base, int exp) const
     return result;
 }
 
-/**
- * @brief 获取当前统计数据
- * @return 包含编码/解码块数和平均耗时的Stats结构
- */
-ReedSolomon8::Stats ReedSolomon8::stats() const
-{
-    return m_stats;
-}
+/** @brief 获取当前统计数据 */
+ReedSolomon8::Stats ReedSolomon8::stats() const { return m_stats; }
 
-/**
- * @brief 重置所有统计数据为零值
- */
-void ReedSolomon8::resetStatistics()
-{
-    m_stats = Stats{};
-    m_timeSum = 0.0;
-}
+/** @brief 重置所有统计数据为零值 */
+void ReedSolomon8::resetStatistics() { m_stats = Stats{}; m_timeSum = 0.0; }

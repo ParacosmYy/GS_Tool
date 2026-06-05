@@ -7,7 +7,7 @@
  * 所有方法都带 QElapsedTimer 计时和统计追踪。
  */
 
-#include "graph62/IndependentSet2.h"
+#include "utils/graph62/IndependentSet2.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

@@ -10,7 +10,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "dsp40/Deesser.h"
+#include "utils/dsp40/Deesser.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

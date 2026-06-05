@@ -33,7 +33,9 @@ QVector<double> Flanger3::process(const QVector<double>& input)
     timer.start();
 
     const int n = input.size();
-    if (n == 0) return input;
+    if (n == 0) return {};
+
+    QVector<double> output(n);
 
     QVector<double> output(n);
 

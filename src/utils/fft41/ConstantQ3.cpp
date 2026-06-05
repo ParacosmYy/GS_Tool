@@ -17,7 +17,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "fft41/ConstantQ3.h"
+#include "utils/fft41/ConstantQ3.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

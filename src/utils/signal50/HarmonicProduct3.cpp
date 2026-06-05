@@ -7,7 +7,7 @@
  * 支持多基频检测和泛音频率序列提取。
  */
 
-#include "signal50/HarmonicProduct3.h"
+#include "utils/signal50/HarmonicProduct3.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

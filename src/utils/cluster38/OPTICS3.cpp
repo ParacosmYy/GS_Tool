@@ -10,7 +10,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "cluster38/OPTICS3.h"
+#include "utils/cluster38/OPTICS3.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

@@ -70,7 +70,7 @@ void DynamicEQ::initFilters()
 
         /* 归一化频率 */
         double w0 = 2.0 * M_PI * fc / fs;
-        double alpha = qSin(w0) * qSinh(qLn(2.0) / 2.0 * bw * w0 / qSin(w0));
+        double alpha = qSin(w0) * std::sinh(qLn(2.0) / 2.0 * bw * w0 / qSin(w0));
         alpha = qBound(1e-10, alpha, 1.0);
 
         /* 带通滤波器系数 */

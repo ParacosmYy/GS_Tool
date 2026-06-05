@@ -10,7 +10,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "tree42/RedBlackTree4.h"
+#include "utils/tree42/RedBlackTree4.h"
 
 #include <QElapsedTimer>
 #include <QStack>

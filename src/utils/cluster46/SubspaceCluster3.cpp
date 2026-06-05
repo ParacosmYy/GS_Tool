@@ -7,7 +7,7 @@
  * 支持参数配置、统计追踪和计时记录。
  */
 
-#include "cluster46/SubspaceCluster3.h"
+#include "utils/cluster46/SubspaceCluster3.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

@@ -7,7 +7,7 @@
  * 编码、打孔/去打孔和软判决译码功能。
  */
 
-#include "code47/ConvolutionalCode5.h"
+#include "utils/code47/ConvolutionalCode5.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

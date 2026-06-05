@@ -8,7 +8,7 @@
  * 所有处理均带统计追踪和 QElapsedTimer 计时。
  */
 
-#include "dsp48/TransientShaper.h"
+#include "utils/dsp48/TransientShaper.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

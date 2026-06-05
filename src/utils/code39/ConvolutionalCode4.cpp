@@ -10,7 +10,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "code39/ConvolutionalCode4.h"
+#include "utils/code39/ConvolutionalCode4.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

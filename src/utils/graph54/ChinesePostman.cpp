@@ -9,7 +9,7 @@
  * 所有运算带有QElapsedTimer计时和统计信息追踪。
  */
 
-#include "graph54/ChinesePostman.h"
+#include "utils/graph54/ChinesePostman.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

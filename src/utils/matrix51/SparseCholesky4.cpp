@@ -8,7 +8,7 @@
  * 支持三角求解和填充比统计。
  */
 
-#include "matrix51/SparseCholesky4.h"
+#include "utils/matrix51/SparseCholesky4.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

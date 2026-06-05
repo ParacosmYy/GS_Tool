@@ -7,7 +7,7 @@
  * 支持单频跟踪和批量频率分析。
  */
 
-#include "fft49/SlidingDFT3.h"
+#include "utils/fft49/SlidingDFT3.h"
 
 #include <QElapsedTimer>
 #include <QtMath>

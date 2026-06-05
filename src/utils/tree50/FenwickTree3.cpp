@@ -12,7 +12,7 @@
  *   get(i,j) = sum(i,j) 展开后由 4 棵树线性组合得到。
  */
 
-#include "tree50/FenwickTree3.h"
+#include "utils/tree50/FenwickTree3.h"
 
 #include <QElapsedTimer>
 #include <QtMath>
