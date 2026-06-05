@@ -139,12 +139,14 @@
 | 436 | protocol+connection模块新增 | ProtocolLogicEngine+ProtocolSequencer+ProtocolDecoder+SvdParser+SvdViewerWidget+PortBridge+BridgeConfigPanel |
 | 437 | utils五大工具模块+PID扩展 | FilterDesigner+FirmwareDiffer+FirmwarePatchGenerator+NmeaParser+GpsTrackWidget+NetworkScanner+NetworkTopologyWidget+StateMachineDesigner+PidSimulator+PidTunerWidget |
 | 438 | 文档新增 | FEATURE_ROADMAP.md功能路线图 |
+| 439 | DataFlowMeter.h文件体积修复 | .h从252→115行(Doxygen精简) |
+| 440 | CMakeLists构建系统全量注册 | Sources+632 .cpp / Headers+584 .h (共1216条目) |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#438` 的完整记录
+- 当前文档已整理到 `#440` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

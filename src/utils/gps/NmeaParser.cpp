@@ -12,6 +12,7 @@
 
 #include <QDate>
 #include <QTime>
+#include <QTimeZone>
 #include <QtMath>
 
 // ---------------------------------------------------------------------------
@@ -251,7 +252,7 @@ void NmeaParser::parseRmc(const QVector<QByteArray> &fields)
     const QDate date = QDate::fromString(QString::fromLatin1(fields[9]),
                                           QStringLiteral("ddMMyy"));
     if (time.isValid() && date.isValid()) {
-        QDateTime dt(date, time, Qt::UTC);
+        QDateTime dt(date, time, QTimeZone::UTC);
         m_currentPos.timestamp = dt;
     }
 

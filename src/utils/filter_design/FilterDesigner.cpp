@@ -12,6 +12,7 @@
 
 #include <QtMath>
 #include <algorithm>
+#include <cmath>
 
 // ============================================================
 // 构造
@@ -222,7 +223,7 @@ QPair<QVector<double>, QVector<double>> FilterDesigner::chebyshev1(
     int order, double Wn, double rippleDb, FilterType type) const
 {
     const double eps = qSqrt(qPow(10.0, rippleDb / 10.0) - 1.0);
-    const double mu = qAsinh(1.0 / eps) / order;
+    const double mu = std::asinh(1.0 / eps) / order;
     QVector<std::complex<double>> poles;
 
     for (int k = 0; k < order; ++k) {
