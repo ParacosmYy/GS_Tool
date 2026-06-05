@@ -1,5 +1,5 @@
 /**
- * @file PolarCode.h
+ * @file PolarCodec.h
  * @brief Polar码编解码器 — 冻结位/SC解码/信道极化
  *
  * 提供Polar码(极化码)的编码器和SC(连续消除)解码器实现,
@@ -15,13 +15,13 @@
 #include <QSet>
 
 /**
- * @class PolarCode
+ * @class PolarCodec
  * @brief Polar码编解码器
  *
  * Polar码是唯一可证明达到信道容量的线性分组码。
  * 码长 N=2^n, 信息位 K, 冻结位 N-K。
  */
-class PolarCode : public QObject {
+class PolarCodec : public QObject {
     Q_OBJECT
 
 public:
@@ -39,10 +39,10 @@ public:
      * @param k 信息位数, 默认128
      * @param parent 父对象
      */
-    explicit PolarCode(int n = 8, int k = 128, QObject* parent = nullptr);
+    explicit PolarCodec(int n = 8, int k = 128, QObject* parent = nullptr);
 
     /** @brief 析构函数 */
-    ~PolarCode() override;
+    ~PolarCodec() override;
 
     // ── 编码 ──
 

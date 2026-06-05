@@ -30,11 +30,15 @@ public:
 
     /** @brief CQT参数配置 */
     struct Parameters {
-        double minFreq = 32.70;    ///< 最低频率(C1)
-        double maxFreq = 4186.0;   ///< 最高频率(C8)
-        int binsPerOctave = 12;    ///< 每倍频程频率bin数
-        double sampleRate = 44100.0;///< 采样率
-        double threshold = 0.0054; ///< 稀疏化阈值
+        double minFreq;    ///< 最低频率(C1)
+        double maxFreq;   ///< 最高频率(C8)
+        int binsPerOctave;    ///< 每倍频程频率bin数
+        double sampleRate;///< 采样率
+        double threshold; ///< 稀疏化阈值
+
+        Parameters()
+            : minFreq(32.70), maxFreq(4186.0), binsPerOctave(12)
+            , sampleRate(44100.0), threshold(0.0054) {}
     };
 
     /**

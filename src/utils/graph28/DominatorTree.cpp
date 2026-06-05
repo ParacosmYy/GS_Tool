@@ -191,7 +191,6 @@ QVector<DominatorTree::DomInfo> DominatorTree::computeDominanceFrontiers(
 
     int totalFrontierSize = 0;
     for (const auto& info : result) totalFrontierSize += info.dominanceFrontier.size();
-    emit frontiersComputed(totalFrontierSize);
     return result;
 }
 
@@ -244,17 +243,6 @@ int DominatorTree::find(int v, QVector<int>& ancestor,
             label[v] = label[u];
     }
     return label[v];
-}
-
-/* ========== Union ========== */
-
-void DominatorTree::link(int v, int w, QVector<int>& size,
-                          QVector<int>& child)
-{
-    /* 简单union(不用按秩合并, Lengauer-Tarjan中由ancestor数组替代) */
-    Q_UNUSED(size);
-    Q_UNUSED(child);
-    ancestor[w] = v; /* 简化实现 */
 }
 
 /* ========== 重置统计 ========== */

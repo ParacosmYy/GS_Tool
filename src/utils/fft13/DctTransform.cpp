@@ -1,5 +1,5 @@
 /**
- * @file DctTransform.cpp
+ * @file DctTransformV2.cpp
  * @brief 离散余弦变换实现 — DCT-I/II/III/IV 四种类型
  */
 
@@ -9,7 +9,7 @@
 #include <QtMath>
 
 /** @brief 构造函数 @param parent 父对象 */
-DctTransform::DctTransform(QObject* parent)
+DctTransformV2::DctTransformV2(QObject* parent)
     : QObject(parent)
 {
 }
@@ -20,7 +20,7 @@ DctTransform::DctTransform(QObject* parent)
  * @param type DCT 类型
  * @return 变换结果
  */
-QVector<double> DctTransform::forward(const QVector<double>& input, DctType type)
+QVector<double> DctTransformV2::forward(const QVector<double>& input, DctType type)
 {
     QElapsedTimer timer;
     timer.start();
@@ -64,7 +64,7 @@ QVector<double> DctTransform::forward(const QVector<double>& input, DctType type
  * @param type DCT 类型
  * @return 时域数据
  */
-QVector<double> DctTransform::inverse(const QVector<double>& coefficients,
+QVector<double> DctTransformV2::inverse(const QVector<double>& coefficients,
                                       DctType type)
 {
     QElapsedTimer timer;
@@ -109,7 +109,7 @@ QVector<double> DctTransform::inverse(const QVector<double>& coefficients,
  * @param keepCount 保留个数
  * @return 截断后的系数
  */
-QVector<double> DctTransform::truncateCoefficients(
+QVector<double> DctTransformV2::truncateCoefficients(
     const QVector<double>& coefficients, int keepCount) const
 {
     int n = coefficients.size();
@@ -122,7 +122,7 @@ QVector<double> DctTransform::truncateCoefficients(
 }
 
 /** @brief 重置统计信息 */
-void DctTransform::resetStatistics()
+void DctTransformV2::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;
@@ -132,7 +132,7 @@ void DctTransform::resetStatistics()
  * @brief DCT-I 变换
  * X[k] = sum_{n=0}^{N-1} x[n] * cos(pi*n*k/(N-1))
  */
-QVector<double> DctTransform::dctTypeI(const QVector<double>& input)
+QVector<double> DctTransformV2::dctTypeI(const QVector<double>& input)
 {
     int n = input.size();
     if (n < 2) return input;
@@ -161,7 +161,7 @@ QVector<double> DctTransform::dctTypeI(const QVector<double>& input)
  * @brief DCT-II 变换 (标准压缩DCT)
  * X[k] = sum_{n=0}^{N-1} x[n] * cos(pi*(2n+1)*k/(2N))
  */
-QVector<double> DctTransform::dctTypeII(const QVector<double>& input)
+QVector<double> DctTransformV2::dctTypeII(const QVector<double>& input)
 {
     int n = input.size();
 
@@ -198,7 +198,7 @@ QVector<double> DctTransform::dctTypeII(const QVector<double>& input)
  * @brief DCT-III 变换 (DCT-II 的逆)
  * X[k] = x[0]/2 + sum_{n=1}^{N-1} x[n] * cos(pi*n*(2k+1)/(2N))
  */
-QVector<double> DctTransform::dctTypeIII(const QVector<double>& input)
+QVector<double> DctTransformV2::dctTypeIII(const QVector<double>& input)
 {
     int n = input.size();
 
@@ -233,7 +233,7 @@ QVector<double> DctTransform::dctTypeIII(const QVector<double>& input)
  * @brief DCT-IV 变换
  * X[k] = sum_{n=0}^{N-1} x[n] * cos(pi*(2n+1)*(2k+1)/(4N))
  */
-QVector<double> DctTransform::dctTypeIV(const QVector<double>& input)
+QVector<double> DctTransformV2::dctTypeIV(const QVector<double>& input)
 {
     int n = input.size();
 
@@ -265,7 +265,7 @@ QVector<double> DctTransform::dctTypeIV(const QVector<double>& input)
  * @param real 实部数组
  * @param imag 虚部数组
  */
-void DctTransform::fft(QVector<double>& real, QVector<double>& imag)
+void DctTransformV2::fft(QVector<double>& real, QVector<double>& imag)
 {
     int n = real.size();
     if (n <= 1) return;

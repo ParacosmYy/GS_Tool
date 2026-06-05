@@ -186,7 +186,6 @@ QVector<IntervalTree2::Interval> IntervalTree2::queryOverlaps(
                      + m_stats.totalQueries;
     m_stats.avgProcessingTimeMs = (totalOps > 0) ? m_timeSum / totalOps : 0.0;
 
-    emit queryCompleted(result.size());
     return result;
 }
 

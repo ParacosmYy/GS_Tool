@@ -1,21 +1,27 @@
 /**
- * @file PeakDetector2.cpp
+ * @file MultiCriteriaPeakDetector.cpp
  * @brief 多准则峰值检测器实现 — 突出度与宽度分析
  */
 
-#include "utils/signal9/PeakDetector2.h"
+#include "utils/signal9/MultiCriteriaPeakDetector.h"
 
 #include <QElapsedTimer>
 #include <QtMath>
 #include <algorithm>
 
-PeakDetector2::PeakDetector2(QObject* parent)
+MultiCriteriaPeakDetector::MultiCriteriaPeakDetector(QObject* parent)
     : QObject(parent)
     , m_timeSum(0.0)
 {
 }
 
-QVector<PeakInfo> PeakDetector2::detectPeaks(const QVector<double>& signal,
+/** @brief 使用默认参数检测峰值 */
+QVector<PeakInfo> MultiCriteriaPeakDetector::detectPeaks(const QVector<double>& signal)
+{
+    return detectPeaks(signal, DetectionParams{});
+}
+
+QVector<PeakInfo> MultiCriteriaPeakDetector::detectPeaks(const QVector<double>& signal,
                                                const DetectionParams& params)
 {
     QElapsedTimer timer;
@@ -84,7 +90,7 @@ QVector<PeakInfo> PeakDetector2::detectPeaks(const QVector<double>& signal,
     return peaks;
 }
 
-QVector<int> PeakDetector2::findLocalMaxima(const QVector<double>& signal,
+QVector<int> MultiCriteriaPeakDetector::findLocalMaxima(const QVector<double>& signal,
                                               int minDistance) const
 {
     int N = signal.size();
@@ -107,7 +113,7 @@ QVector<int> PeakDetector2::findLocalMaxima(const QVector<double>& signal,
     return maxima;
 }
 
-double PeakDetector2::computeProminence(const QVector<double>& signal,
+double MultiCriteriaPeakDetector::computeProminence(const QVector<double>& signal,
                                           int peakIndex,
                                           int* leftBase,
                                           int* rightBase) const
@@ -129,7 +135,7 @@ double PeakDetector2::computeProminence(const QVector<double>& signal,
     return peakVal - baseline;
 }
 
-double PeakDetector2::computeWidth(const QVector<double>& signal, int peakIndex,
+double MultiCriteriaPeakDetector::computeWidth(const QVector<double>& signal, int peakIndex,
                                      double prominence, double relHeight) const
 {
     int N = signal.size();
@@ -161,7 +167,7 @@ double PeakDetector2::computeWidth(const QVector<double>& signal, int peakIndex,
     return rightCross - leftCross;
 }
 
-QVector<PeakInfo> PeakDetector2::sortByProminence(const QVector<PeakInfo>& peaks,
+QVector<PeakInfo> MultiCriteriaPeakDetector::sortByProminence(const QVector<PeakInfo>& peaks,
                                                     bool descending) const
 {
     QVector<PeakInfo> sorted = peaks;
@@ -179,7 +185,7 @@ QVector<PeakInfo> PeakDetector2::sortByProminence(const QVector<PeakInfo>& peaks
     return sorted;
 }
 
-QVector<PeakInfo> PeakDetector2::filterPeaks(const QVector<PeakInfo>& peaks,
+QVector<PeakInfo> MultiCriteriaPeakDetector::filterPeaks(const QVector<PeakInfo>& peaks,
                                                double minProminence,
                                                double minWidth) const
 {
@@ -192,7 +198,7 @@ QVector<PeakInfo> PeakDetector2::filterPeaks(const QVector<PeakInfo>& peaks,
     return filtered;
 }
 
-QVector<int> PeakDetector2::suppressNonMaxima(const QVector<int>& candidates,
+QVector<int> MultiCriteriaPeakDetector::suppressNonMaxima(const QVector<int>& candidates,
                                                 const QVector<double>& signal,
                                                 int minDistance) const
 {
@@ -226,7 +232,7 @@ QVector<int> PeakDetector2::suppressNonMaxima(const QVector<int>& candidates,
     return result;
 }
 
-int PeakDetector2::findLeftBase(const QVector<double>& signal, int peakIndex) const
+int MultiCriteriaPeakDetector::findLeftBase(const QVector<double>& signal, int peakIndex) const
 {
     int N = signal.size();
     double peakVal = signal[peakIndex];
@@ -246,7 +252,7 @@ int PeakDetector2::findLeftBase(const QVector<double>& signal, int peakIndex) co
     return baseIdx;
 }
 
-int PeakDetector2::findRightBase(const QVector<double>& signal, int peakIndex) const
+int MultiCriteriaPeakDetector::findRightBase(const QVector<double>& signal, int peakIndex) const
 {
     int N = signal.size();
     double peakVal = signal[peakIndex];
@@ -264,7 +270,7 @@ int PeakDetector2::findRightBase(const QVector<double>& signal, int peakIndex) c
     return baseIdx;
 }
 
-double PeakDetector2::interpolateCrossing(int x1, double y1, int x2, double y2,
+double MultiCriteriaPeakDetector::interpolateCrossing(int x1, double y1, int x2, double y2,
                                             double level) const
 {
     if (qFabs(y2 - y1) < 1e-15) return (x1 + x2) / 2.0;
@@ -272,12 +278,12 @@ double PeakDetector2::interpolateCrossing(int x1, double y1, int x2, double y2,
     return x1 + (level - y1) / (y2 - y1) * (x2 - x1);
 }
 
-PeakDetector2::Stats PeakDetector2::stats() const
+MultiCriteriaPeakDetector::Stats MultiCriteriaPeakDetector::stats() const
 {
     return m_stats;
 }
 
-void PeakDetector2::resetStatistics()
+void MultiCriteriaPeakDetector::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;

@@ -1,5 +1,5 @@
 /**
- * @file SvdSolver.h
+ * @file SvdSolverV2.h
  * @brief SVD求解器 — Golub-Kahan双对角化 + 隐式QR
  *
  * 功能: 对矩阵进行奇异值分解，计算全部奇异值和右奇异向量V^T，
@@ -13,7 +13,7 @@
 #include <QObject>
 #include <QVector>
 
-class SvdSolver : public QObject {
+class SvdSolverV2 : public QObject {
     Q_OBJECT
 
 public:
@@ -23,7 +23,7 @@ public:
         double  avgProcessingTimeMs = 0.0;
     };
 
-    explicit SvdSolver(QObject* parent = nullptr);
+    explicit SvdSolverV2(QObject* parent = nullptr);
 
     /**
      * @brief 对矩阵进行SVD分解

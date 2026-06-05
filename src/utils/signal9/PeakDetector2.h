@@ -1,5 +1,5 @@
 /**
- * @file PeakDetector2.h
+ * @file MultiCriteriaPeakDetector.h
  * @brief 多准则峰值检测器 — 突出度与宽度分析
  *
  * 功能: 多准则峰值检测, 结合幅度阈值、突出度(prominence)、宽度(width)三个维度,
@@ -39,7 +39,7 @@ struct PeakInfo {
  *
  * 每个阶段独立可配置阈值, 级联过滤保证检测质量。
  */
-class PeakDetector2 : public QObject
+class MultiCriteriaPeakDetector : public QObject
 {
     Q_OBJECT
 
@@ -53,6 +53,8 @@ public:
         double prominenceFraction = 0.5;    ///< 突出度分数(宽度测量高度)
         int plateauSize = 0;                ///< 平台大小容忍度
         bool sortByProminence = true;       ///< 结果按突出度排序
+
+        DetectionParams() = default;
     };
 
     /** @brief 统计信息 */
@@ -64,7 +66,7 @@ public:
         double avgProcessingTimeMs = 0.0;   ///< 平均处理耗时(ms)
     };
 
-    explicit PeakDetector2(QObject* parent = nullptr);
+    explicit MultiCriteriaPeakDetector(QObject* parent = nullptr);
 
     /**
      * @brief 检测信号中的峰值(完整流程)
@@ -73,7 +75,10 @@ public:
      * @return 峰值信息列表(按突出度降序或按位置排序)
      */
     QVector<PeakInfo> detectPeaks(const QVector<double>& signal,
-                                   const DetectionParams& params = {});
+                                   const DetectionParams& params);
+
+    /** @brief 使用默认参数检测峰值 */
+    QVector<PeakInfo> detectPeaks(const QVector<double>& signal);
 
     /**
      * @brief 仅查找候选局部极大值(不做突出度/宽度分析)

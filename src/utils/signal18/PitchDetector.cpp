@@ -3,13 +3,13 @@
  * @brief 音高检测器实现
  */
 
-#include "PitchDetector.h"
+#include "PitchTracker.h"
 #include <QElapsedTimer>
 #include <cmath>
 #include <algorithm>
 #include <limits>
 
-PitchDetector::PitchDetector(double sampleRate, double minFreq,
+PitchTracker::PitchTracker(double sampleRate, double minFreq,
                              double maxFreq, QObject* parent)
     : QObject(parent)
     , m_sampleRate(sampleRate)
@@ -19,7 +19,7 @@ PitchDetector::PitchDetector(double sampleRate, double minFreq,
 {
 }
 
-PitchDetector::FrameResult PitchDetector::detect(const QVector<double>& frame,
+PitchTracker::FrameResult PitchTracker::detect(const QVector<double>& frame,
                                                   Method method)
 {
     QElapsedTimer timer;
@@ -142,7 +142,7 @@ PitchDetector::FrameResult PitchDetector::detect(const QVector<double>& frame,
     return result;
 }
 
-QVector<PitchDetector::FrameResult> PitchDetector::detectBatch(
+QVector<PitchTracker::FrameResult> PitchTracker::detectBatch(
     const QVector<double>& signal, int frameSize, int hopSize)
 {
     QVector<FrameResult> results;
@@ -157,7 +157,7 @@ QVector<PitchDetector::FrameResult> PitchDetector::detectBatch(
     return results;
 }
 
-QVector<QPair<double,int>> PitchDetector::frequencyHistogram(int bins) const
+QVector<QPair<double,int>> PitchTracker::frequencyHistogram(int bins) const
 {
     if (m_freqHistory.isEmpty()) return {};
 
@@ -180,12 +180,12 @@ QVector<QPair<double,int>> PitchDetector::frequencyHistogram(int bins) const
     return hist;
 }
 
-void PitchDetector::setVoicingThreshold(double threshold)
+void PitchTracker::setVoicingThreshold(double threshold)
 {
     m_threshold = qBound(0.0, threshold, 1.0);
 }
 
-QVector<double> PitchDetector::yinDifference(const QVector<double>& frame) const
+QVector<double> PitchTracker::yinDifference(const QVector<double>& frame) const
 {
     int n = frame.size() / 2;
     QVector<double> diff(n, 0.0);
@@ -201,7 +201,7 @@ QVector<double> PitchDetector::yinDifference(const QVector<double>& frame) const
     return diff;
 }
 
-QVector<double> PitchDetector::yinCMND(const QVector<double>& diff) const
+QVector<double> PitchTracker::yinCMND(const QVector<double>& diff) const
 {
     int n = diff.size();
     QVector<double> cmnd(n, 1.0);
@@ -214,7 +214,7 @@ QVector<double> PitchDetector::yinCMND(const QVector<double>& diff) const
     return cmnd;
 }
 
-QVector<double> PitchDetector::autocorrelation(const QVector<double>& frame) const
+QVector<double> PitchTracker::autocorrelation(const QVector<double>& frame) const
 {
     int n = frame.size();
     QVector<double> acf(n, 0.0);
@@ -234,7 +234,7 @@ QVector<double> PitchDetector::autocorrelation(const QVector<double>& frame) con
     return acf;
 }
 
-double PitchDetector::parabolicRefine(const QVector<double>& data,
+double PitchTracker::parabolicRefine(const QVector<double>& data,
                                        int idx) const
 {
     if (idx <= 0 || idx >= data.size() - 1) return static_cast<double>(idx);
@@ -250,7 +250,7 @@ double PitchDetector::parabolicRefine(const QVector<double>& data,
     return static_cast<double>(idx) + delta;
 }
 
-double PitchDetector::computeRMS(const QVector<double>& frame) const
+double PitchTracker::computeRMS(const QVector<double>& frame) const
 {
     if (frame.isEmpty()) return 0.0;
     double sum = 0.0;
@@ -258,7 +258,7 @@ double PitchDetector::computeRMS(const QVector<double>& frame) const
     return std::sqrt(sum / frame.size());
 }
 
-void PitchDetector::resetStatistics()
+void PitchTracker::resetStatistics()
 {
     m_stats = Stats{};
     m_freqHistory.clear();

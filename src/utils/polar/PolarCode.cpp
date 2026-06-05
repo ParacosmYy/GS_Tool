@@ -1,9 +1,9 @@
 /**
- * @file PolarCode.cpp
+ * @file PolarCodec.cpp
  * @brief Polar码编解码器实现
  */
 
-#include "PolarCode.h"
+#include "PolarCodec.h"
 
 #include <QElapsedTimer>
 #include <cmath>
@@ -14,7 +14,7 @@
 // 构造 / 析构
 // ═══════════════════════════════════════════════════════════
 
-PolarCode::PolarCode(int n, int k, QObject* parent)
+PolarCodec::PolarCodec(int n, int k, QObject* parent)
     : QObject(parent)
     , m_n(n)
     , m_N(1 << n)
@@ -24,13 +24,13 @@ PolarCode::PolarCode(int n, int k, QObject* parent)
     selectFrozenBits();
 }
 
-PolarCode::~PolarCode() = default;
+PolarCodec::~PolarCodec() = default;
 
 // ═══════════════════════════════════════════════════════════
 // 编码
 // ═══════════════════════════════════════════════════════════
 
-QVector<quint8> PolarCode::encode(const QVector<quint8>& infoBits)
+QVector<quint8> PolarCodec::encode(const QVector<quint8>& infoBits)
 {
     if (infoBits.size() != m_K) {
         emit error(tr("Polar码编码错误: 信息位长度%1不等于K=%2")
@@ -60,7 +60,7 @@ QVector<quint8> PolarCode::encode(const QVector<quint8>& infoBits)
 // 解码
 // ═══════════════════════════════════════════════════════════
 
-QVector<quint8> PolarCode::decodeSC(const QVector<quint8>& receivedBits)
+QVector<quint8> PolarCodec::decodeSC(const QVector<quint8>& receivedBits)
 {
     if (receivedBits.size() != m_N) {
         emit error(tr("Polar码SC解码错误: 接收长度%1不等于N=%2")
@@ -98,7 +98,7 @@ QVector<quint8> PolarCode::decodeSC(const QVector<quint8>& receivedBits)
     return infoBits;
 }
 
-QVector<quint8> PolarCode::decodeSCLlr(const QVector<double>& llr)
+QVector<quint8> PolarCodec::decodeSCLlr(const QVector<double>& llr)
 {
     if (llr.size() != m_N) {
         emit error(tr("Polar码LLR解码错误: LLR长度不匹配"));
@@ -132,23 +132,23 @@ QVector<quint8> PolarCode::decodeSCLlr(const QVector<double>& llr)
 // 配置
 // ═══════════════════════════════════════════════════════════
 
-int PolarCode::blockLength() const { return m_N; }
-int PolarCode::infoLength() const { return m_K; }
-double PolarCode::codeRate() const { return static_cast<double>(m_K) / static_cast<double>(m_N); }
-QVector<int> PolarCode::frozenPositions() const { return m_frozenPositions; }
+int PolarCodec::blockLength() const { return m_N; }
+int PolarCodec::infoLength() const { return m_K; }
+double PolarCodec::codeRate() const { return static_cast<double>(m_K) / static_cast<double>(m_N); }
+QVector<int> PolarCodec::frozenPositions() const { return m_frozenPositions; }
 
 // ═══════════════════════════════════════════════════════════
 // 统计
 // ═══════════════════════════════════════════════════════════
 
-PolarCode::Stats PolarCode::stats() const { return m_stats; }
-void PolarCode::resetStatistics() { m_stats = Stats{}; }
+PolarCodec::Stats PolarCodec::stats() const { return m_stats; }
+void PolarCodec::resetStatistics() { m_stats = Stats{}; }
 
 // ═══════════════════════════════════════════════════════════
 // 内部: 可靠性计算(巴塔恰里亚参数)
 // ═══════════════════════════════════════════════════════════
 
-void PolarCode::computeReliability()
+void PolarCodec::computeReliability()
 {
     // 使用简化巴塔恰里亚参数递归计算
     m_reliability.resize(m_N);
@@ -168,7 +168,7 @@ void PolarCode::computeReliability()
     }
 }
 
-void PolarCode::selectFrozenBits()
+void PolarCodec::selectFrozenBits()
 {
     // 按可靠性排序, 选择最不可靠的N-K位作为冻结位
     QVector<QPair<double, int>> indexed;
@@ -196,7 +196,7 @@ void PolarCode::selectFrozenBits()
 // 内部: Polar变换
 // ═══════════════════════════════════════════════════════════
 
-void PolarCode::polarTransform(QVector<quint8>& bits) const
+void PolarCodec::polarTransform(QVector<quint8>& bits) const
 {
     for (int stage = 0; stage < m_n; ++stage) {
         const int step = 1 << (stage + 1);
@@ -212,7 +212,7 @@ void PolarCode::polarTransform(QVector<quint8>& bits) const
 // 内部: SC解码递归
 // ═══════════════════════════════════════════════════════════
 
-void PolarCode::scDecodeRecursive(const QVector<double>& llr,
+void PolarCodec::scDecodeRecursive(const QVector<double>& llr,
                                    QVector<quint8>& decodedBits,
                                    int offset, int length)
 {
@@ -247,7 +247,7 @@ void PolarCode::scDecodeRecursive(const QVector<double>& llr,
     scDecodeRecursive(rightLlr, decodedBits, offset + half, half);
 }
 
-double PolarCode::llrLeft(double a, double b) const
+double PolarCodec::llrLeft(double a, double b) const
 {
     // f(a, b) = sign(a)*sign(b)*min(|a|, |b|)
     const double absA = std::abs(a);
@@ -257,7 +257,7 @@ double PolarCode::llrLeft(double a, double b) const
     return signA * signB * std::min(absA, absB);
 }
 
-double PolarCode::llrRight(double a, double b, quint8 u) const
+double PolarCodec::llrRight(double a, double b, quint8 u) const
 {
     // g(a, b, u) = b + (1 - 2*u) * a
     return b + (1.0 - 2.0 * static_cast<double>(u)) * a;

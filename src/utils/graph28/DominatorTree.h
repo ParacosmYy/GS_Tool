@@ -88,9 +88,7 @@ private:
     /** 并查集Find(路径压缩) */
     int find(int v, QVector<int>& ancestor, QVector<int>& label,
              const QVector<int>& semi);
-    /** 并查集Union */
-    void link(int v, int w, QVector<int>& size, QVector<int>& child);
 
-    Stats  m_stats;         ///< 统计信息
-    double m_timeSum = 0.0; ///< 累计耗时
+    mutable Stats  m_stats;         ///< 统计信息
+    mutable double m_timeSum = 0.0; ///< 累计耗时
 };

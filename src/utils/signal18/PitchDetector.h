@@ -12,7 +12,7 @@
  * @brief 音高检测器
  * 结合YIN算法和自相关法，支持实时逐帧检测
  */
-class PitchDetector : public QObject
+class PitchTracker : public QObject
 {
     Q_OBJECT
 
@@ -47,7 +47,7 @@ public:
      * @param maxFreq 最高检测频率(Hz)
      * @param parent 父对象
      */
-    explicit PitchDetector(double sampleRate = 44100.0,
+    explicit PitchTracker(double sampleRate = 44100.0,
                            double minFreq = 50.0, double maxFreq = 2000.0,
                            QObject* parent = nullptr);
 

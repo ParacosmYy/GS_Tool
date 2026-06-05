@@ -39,6 +39,9 @@ public:
     /** 构造函数 */
     explicit IntervalTree2(QObject* parent = nullptr);
 
+    /** 析构函数 */
+    ~IntervalTree2() override;
+
     /** @brief 插入一个区间 @param low 下界 @param high 上界 @param id 标识(默认自增) */
     void insert(double low, double high, int id = -1);
 
@@ -129,6 +132,6 @@ private:
     int   m_size;           ///< 区间总数
     int   m_nextId;         ///< 自增ID
 
-    Stats  m_stats;         ///< 统计信息
-    double m_timeSum = 0.0; ///< 累计耗时
+    mutable Stats  m_stats;         ///< 统计信息
+    mutable double m_timeSum = 0.0; ///< 累计耗时
 };

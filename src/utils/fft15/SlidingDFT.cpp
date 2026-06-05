@@ -158,7 +158,6 @@ QVector<QPair<int, double>> SlidingDFT::detectPeaks(double threshold) const
             m_bins[k].magnitude > m_bins[k + 1].magnitude)
         {
             peaks.append({k, m_bins[k].magnitude});
-            emit peakDetected(k, binToFrequency(k), m_bins[k].magnitude);
         }
     }
 

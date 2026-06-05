@@ -1,5 +1,5 @@
 /**
- * @file SvdSolver.cpp
+ * @file SvdSolverV2.cpp
  * @brief SVD求解器实现 — Golub-Kahan双对角化 + 隐式QR位移
  */
 
@@ -8,7 +8,7 @@
 #include <QElapsedTimer>
 #include <cmath>
 
-SvdSolver::SvdSolver(QObject* parent)
+SvdSolverV2::SvdSolverV2(QObject* parent)
     : QObject(parent)
     , m_timeSum(0.0)
 {
@@ -168,7 +168,7 @@ static void qrIteration(QVector<double>& d, QVector<double>& e, int p)
 }
 
 QPair<QVector<double>, QVector<QVector<double>>>
-SvdSolver::decompose(const QVector<QVector<double>>& matA)
+SvdSolverV2::decompose(const QVector<QVector<double>>& matA)
 {
     QElapsedTimer timer;
     timer.start();
@@ -214,7 +214,7 @@ SvdSolver::decompose(const QVector<QVector<double>>& matA)
     return {d, V};
 }
 
-void SvdSolver::resetStatistics()
+void SvdSolverV2::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;

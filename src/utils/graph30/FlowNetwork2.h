@@ -53,7 +53,7 @@ public:
     /** @brief 获取节点数 */
     int nodeCount() const { return m_n; }
     /** @brief 获取边数 */
-    int edgeCount() const { return m_edges.size() / 2; }
+    int edgeCount() const { return m_graph.size() / 2; }
 
     Stats stats() const { return m_stats; }
     void resetStatistics();

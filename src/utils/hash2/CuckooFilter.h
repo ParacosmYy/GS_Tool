@@ -1,5 +1,5 @@
 /**
- * @file CuckooFilter.h
+ * @file CuckooFilterV2.h
  * @brief 布谷鸟过滤器 — 有界假阳性率的集合成员查询
  *
  * 功能: 实现布谷鸟过滤器, 支持高效的插入、查询和删除操作,
@@ -24,7 +24,7 @@
  * 查询: 检查两个候选bucket是否包含匹配指纹。
  * 删除: 仅删除一个匹配指纹(支持删除是相对于Bloom的核心优势)。
  */
-class CuckooFilter : public QObject
+class CuckooFilterV2 : public QObject
 {
     Q_OBJECT
 
@@ -35,6 +35,8 @@ public:
         int entriesPerBucket = 4;           ///< 每个bucket的指纹槽位数
         int fingerprintBits = 8;            ///< 指纹位数(影响假阳性率)
         int maxKicks = 500;                 ///< 插入时最大踢出次数
+
+        Config() = default;
     };
 
     /** @brief 过滤器容量信息 */
@@ -56,14 +58,17 @@ public:
         double avgProcessingTimeMs = 0.0;   ///< 平均处理耗时(ms)
     };
 
-    explicit CuckooFilter(QObject* parent = nullptr);
+    explicit CuckooFilterV2(QObject* parent = nullptr);
 
     /**
      * @brief 初始化过滤器
      * @param config 配置参数
      * @return true=初始化成功
      */
-    bool initialize(const Config& config = {});
+    bool initialize(const Config& config);
+
+    /** @brief 初始化过滤器(使用默认配置) @return true=初始化成功 */
+    bool initialize();
 
     /**
      * @brief 插入一个元素

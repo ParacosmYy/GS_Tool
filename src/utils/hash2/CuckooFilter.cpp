@@ -1,9 +1,9 @@
 /**
- * @file CuckooFilter.cpp
+ * @file CuckooFilterV2.cpp
  * @brief 布谷鸟过滤器实现 — 有界假阳性率的集合成员查询
  */
 
-#include "utils/hash2/CuckooFilter.h"
+#include "utils/hash2/CuckooFilterV2.h"
 
 #include <QElapsedTimer>
 #include <QCryptographicHash>
@@ -11,13 +11,13 @@
 #include <algorithm>
 #include <random>
 
-CuckooFilter::CuckooFilter(QObject* parent)
+CuckooFilterV2::CuckooFilterV2(QObject* parent)
     : QObject(parent)
     , m_timeSum(0.0)
 {
 }
 
-bool CuckooFilter::initialize(const Config& config)
+bool CuckooFilterV2::initialize(const Config& config)
 {
     m_config = config;
 
@@ -36,7 +36,13 @@ bool CuckooFilter::initialize(const Config& config)
     return true;
 }
 
-bool CuckooFilter::insert(const QByteArray& data)
+/** @brief 初始化(默认配置) */
+bool CuckooFilterV2::initialize()
+{
+    return initialize(Config{});
+}
+
+bool CuckooFilterV2::insert(const QByteArray& data)
 {
     QElapsedTimer timer;
     timer.start();
@@ -103,7 +109,7 @@ bool CuckooFilter::insert(const QByteArray& data)
     return false;
 }
 
-bool CuckooFilter::contains(const QByteArray& data) const
+bool CuckooFilterV2::contains(const QByteArray& data) const
 {
     if (m_buckets.isEmpty() || m_itemCount == 0) return false;
 
@@ -118,7 +124,7 @@ bool CuckooFilter::contains(const QByteArray& data) const
     return false;
 }
 
-bool CuckooFilter::remove(const QByteArray& data)
+bool CuckooFilterV2::remove(const QByteArray& data)
 {
     QElapsedTimer timer;
     timer.start();
@@ -153,7 +159,7 @@ bool CuckooFilter::remove(const QByteArray& data)
     return false;
 }
 
-int CuckooFilter::batchInsert(const QVector<QByteArray>& items)
+int CuckooFilterV2::batchInsert(const QVector<QByteArray>& items)
 {
     int success = 0;
     for (const auto& item : items) {
@@ -162,7 +168,7 @@ int CuckooFilter::batchInsert(const QVector<QByteArray>& items)
     return success;
 }
 
-void CuckooFilter::clear()
+void CuckooFilterV2::clear()
 {
     for (auto& bucket : m_buckets) {
         bucket.fill(0);
@@ -170,7 +176,7 @@ void CuckooFilter::clear()
     m_itemCount = 0;
 }
 
-CuckooFilter::CapacityInfo CuckooFilter::capacityInfo() const
+CuckooFilterV2::CapacityInfo CuckooFilterV2::capacityInfo() const
 {
     CapacityInfo info;
     info.totalSlots = m_config.bucketCount * m_config.entriesPerBucket;
@@ -183,12 +189,12 @@ CuckooFilter::CapacityInfo CuckooFilter::capacityInfo() const
     return info;
 }
 
-CuckooFilter::Config CuckooFilter::config() const
+CuckooFilterV2::Config CuckooFilterV2::config() const
 {
     return m_config;
 }
 
-double CuckooFilter::estimateFalsePositiveRate(int fpBits, int entriesPerBucket) const
+double CuckooFilterV2::estimateFalsePositiveRate(int fpBits, int entriesPerBucket) const
 {
     /* 布谷鸟过滤器假阳性率上限: 2b / 2^f
      * 其中 b = entriesPerBucket, f = fingerprintBits */
@@ -196,7 +202,7 @@ double CuckooFilter::estimateFalsePositiveRate(int fpBits, int entriesPerBucket)
     return static_cast<double>(2 * entriesPerBucket) / fpSpace;
 }
 
-CuckooFilter::Config CuckooFilter::optimalConfig(int targetCapacity,
+CuckooFilterV2::Config CuckooFilterV2::optimalConfig(int targetCapacity,
                                                    double targetFPR) const
 {
     Config config;
@@ -222,7 +228,7 @@ CuckooFilter::Config CuckooFilter::optimalConfig(int targetCapacity,
     return config;
 }
 
-quint32 CuckooFilter::fingerprint(const QByteArray& data) const
+quint32 CuckooFilterV2::fingerprint(const QByteArray& data) const
 {
     /* 使用SHA256的截断作为指纹 */
     QByteArray hash = QCryptographicHash::hash(data, QCryptographicHash::Sha256);
@@ -242,7 +248,7 @@ quint32 CuckooFilter::fingerprint(const QByteArray& data) const
     return (fp == 0) ? 1 : fp; /* 0表示空槽, 指纹不能为0 */
 }
 
-quint32 CuckooFilter::primaryIndex(const QByteArray& data) const
+quint32 CuckooFilterV2::primaryIndex(const QByteArray& data) const
 {
     /* 使用SHA256的另一部分作为主索引 */
     QByteArray hash = QCryptographicHash::hash(data, QCryptographicHash::Sha256);
@@ -255,7 +261,7 @@ quint32 CuckooFilter::primaryIndex(const QByteArray& data) const
     return idx % m_config.bucketCount;
 }
 
-quint32 CuckooFilter::alternateIndex(quint32 primary, quint32 fp) const
+quint32 CuckooFilterV2::alternateIndex(quint32 primary, quint32 fp) const
 {
     /* 部分键布谷鸟哈希: i2 = i1 XOR hash(fp) */
     /* 使用简单的hash以避免依赖MurmurHash */
@@ -267,7 +273,7 @@ quint32 CuckooFilter::alternateIndex(quint32 primary, quint32 fp) const
     return (primary ^ h) % m_config.bucketCount;
 }
 
-int CuckooFilter::findInBucket(int bucketIdx, quint32 fp) const
+int CuckooFilterV2::findInBucket(int bucketIdx, quint32 fp) const
 {
     if (bucketIdx < 0 || bucketIdx >= m_buckets.size()) return -1;
 
@@ -278,7 +284,7 @@ int CuckooFilter::findInBucket(int bucketIdx, quint32 fp) const
     return -1;
 }
 
-bool CuckooFilter::insertToBucket(int bucketIdx, quint32 fp)
+bool CuckooFilterV2::insertToBucket(int bucketIdx, quint32 fp)
 {
     if (bucketIdx < 0 || bucketIdx >= m_buckets.size()) return false;
 
@@ -292,12 +298,12 @@ bool CuckooFilter::insertToBucket(int bucketIdx, quint32 fp)
     return false;
 }
 
-CuckooFilter::Stats CuckooFilter::stats() const
+CuckooFilterV2::Stats CuckooFilterV2::stats() const
 {
     return m_stats;
 }
 
-void CuckooFilter::resetStatistics()
+void CuckooFilterV2::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;
