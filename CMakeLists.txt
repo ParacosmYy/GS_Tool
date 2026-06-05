@@ -681,6 +681,12 @@ set(SOURCES
     src/utils/smoother/DataSmoother.cpp
     src/utils/peaks/PeakDetector.cpp
     src/utils/warp/TimeWarp.cpp
+    src/utils/profiler/DataProfiler.cpp
+    src/utils/resample/DataResampler.cpp
+    src/utils/classifier/DataClassifier.cpp
+    src/utils/quantize/DataQuantizer.cpp
+    src/utils/autocorr/AutoCorrelator.cpp
+    src/utils/peakdetect/RidgeDetector.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1404,6 +1410,21 @@ set(HEADERS
 
     # -- F81: 数据窗口管理器 --
     src/utils/window/DataWindowManager.h
+
+    # -- F82: 数据分类器 --
+    src/utils/classifier/DataClassifier.h
+
+    # -- F83: 数据量化器 --
+    src/utils/quantize/DataQuantizer.h
+
+    # -- F84: 数据重采样器 --
+    src/utils/resample/DataResampler.h
+
+    # -- F85: 自相关器 --
+    src/utils/autocorr/AutoCorrelator.h
+
+    # -- F86: 脊线检测器 --
+    src/utils/peakdetect/RidgeDetector.h
 )
 
 set(RESOURCES
