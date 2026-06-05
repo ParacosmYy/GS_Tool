@@ -12,7 +12,6 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QMessageBox>
 #include <QDateTime>
 #include <QColorDialog>
 #include <QLineEdit>

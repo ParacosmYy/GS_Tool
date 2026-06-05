@@ -17,7 +17,6 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QScrollBar>
 #include <QApplication>
 

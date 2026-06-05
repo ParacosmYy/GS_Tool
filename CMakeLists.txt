@@ -835,6 +835,9 @@ set(SOURCES
 
     # -- F57: 数据流量计 --
     src/utils/flow/DataFlowMeter.cpp
+
+    # -- F58: 协议回放引擎 --
+    src/protocol/replay/ProtocolReplayEngine.cpp
 )
 
 set(HEADERS
@@ -1283,6 +1286,9 @@ set(HEADERS
 
     # -- F57: 数据流量计 --
     src/utils/flow/DataFlowMeter.h
+
+    # -- F58: 协议回放引擎 --
+    src/protocol/replay/ProtocolReplayEngine.h
 )
 
 set(RESOURCES

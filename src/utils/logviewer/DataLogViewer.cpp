@@ -17,7 +17,6 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
