@@ -107,7 +107,7 @@ double SimplexNoise::fractal2D(double x, double y, int octaves,
 }
 
 QVector<double> SimplexNoise::generate2DMap(int width, int height,
-                                              double scale) const
+                                              double scale)
 {
     QElapsedTimer timer;
     timer.start();
@@ -121,8 +121,8 @@ QVector<double> SimplexNoise::generate2DMap(int width, int height,
         }
     }
 
-    const_cast<SimplexNoise*>(this)->m_stats.totalSamples += width * height;
-    const_cast<SimplexNoise*>(this)->emit mapGenerated(width, height);
+    m_stats.totalSamples += width * height;
+    emit mapGenerated(width, height);
     return map;
 }
 

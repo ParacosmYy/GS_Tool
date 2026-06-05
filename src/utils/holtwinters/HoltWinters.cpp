@@ -19,6 +19,7 @@ HoltWinters::FitResult HoltWinters::fit(
 
     FitResult result;
     int n = data.size();
+    if (seasonLength <= 0) seasonLength = 1;
     if (n < 2 * seasonLength) {
         m_stats.totalFits++;
         return result;
@@ -75,8 +76,9 @@ HoltWinters::FitResult HoltWinters::fit(
 }
 
 QVector<double> HoltWinters::forecast(const FitResult& result, int steps,
-                                       int seasonLength) const
+                                       int seasonLength)
 {
+    if (seasonLength <= 0) seasonLength = 1;
     QVector<double> predictions;
     predictions.reserve(steps);
 
@@ -95,8 +97,8 @@ QVector<double> HoltWinters::forecast(const FitResult& result, int steps,
         predictions.append(pred);
     }
 
-    const_cast<HoltWinters*>(this)->m_stats.totalForecasts += steps;
-    const_cast<HoltWinters*>(this)->emit forecastCompleted(steps);
+    m_stats.totalForecasts += steps;
+    emit forecastCompleted(steps);
     return predictions;
 }
 

@@ -765,6 +765,28 @@ set(SOURCES
     src/utils/bloomfilter2/CountingBloomFilter.cpp
     src/utils/rscode/ReedSolomonCodec.cpp
     src/utils/spectrum/SpectralFlatness.cpp
+    src/utils/convolutional/ConvolutionalCoder.cpp
+    src/utils/cosinedist/CosineDistance.cpp
+    src/utils/edgedetect/EdgeDetector.cpp
+    src/utils/mass/MassEstimator.cpp
+    src/utils/lcs2/LcsSolver.cpp
+    src/utils/reservoir/ReservoirSampler.cpp
+
+    # -- F172~F177: Wave 25 工具模块 --
+    src/utils/wiener/WienerFilter.cpp
+    src/utils/circularbuffer2/CircularPowerBuffer.cpp
+    src/utils/golomb/GolombCoder.cpp
+    src/utils/peakhold/PeakHoldDetector.cpp
+    src/utils/lomb/LombPeriodogram.cpp
+    src/utils/bintree/BinaryIntervalTree.cpp
+
+    # -- F178~F183: Wave 31 工具模块 --
+    src/utils/movingaverage2/SynchronizedMovingAverage.cpp
+    src/utils/histogram3/StreamingHistogram.cpp
+    src/utils/qr/QrDecomposition.cpp
+    src/utils/kalman2/ExtendedKalmanFilter.cpp
+    src/utils/tfidf/TfidfVectorizer.cpp
+    src/utils/pagerank/PageRank.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1017,6 +1039,21 @@ set(SOURCES
     src/utils/fcs/FcsChecker.cpp
     src/utils/snr/SnrEstimator.cpp
     src/utils/jaro/JaroWinkler.cpp
+
+    # -- F172~F185: Wave 25 工具模块 --
+    src/utils/lzw2/LzwCodec2.cpp
+    src/utils/runlength2/RunLengthEncoder.cpp
+    src/utils/huffman2/AdaptiveHuffman.cpp
+    src/utils/delta/DeltaEncoder.cpp
+    src/utils/bitmap/BitmapIndex.cpp
+    src/utils/mergesort/MergeSorter.cpp
+    src/utils/hyperloglog/HyperLogLog.cpp
+    src/utils/tdigest/TDigest.cpp
+    src/utils/dwt2/DaubechiesWavelet.cpp
+    src/utils/lifting/LiftingScheme.cpp
+    src/utils/quantize2/MuLawEncoder.cpp
+    src/utils/polar/PolarCode.cpp
+    src/utils/turbo/TurboDecoder.cpp
 )
 
 set(HEADERS
@@ -1622,6 +1659,22 @@ set(HEADERS
     # -- F117: 频谱平坦度 --
     src/utils/spectrum/SpectralFlatness.h
 
+    # -- F172~F177: Wave 25 工具模块 --
+    src/utils/wiener/WienerFilter.h
+    src/utils/circularbuffer2/CircularPowerBuffer.h
+    src/utils/golomb/GolombCoder.h
+    src/utils/peakhold/PeakHoldDetector.h
+    src/utils/lomb/LombPeriodogram.h
+    src/utils/bintree/BinaryIntervalTree.h
+
+    # -- F178~F183: Wave 31 工具模块 --
+    src/utils/movingaverage2/SynchronizedMovingAverage.h
+    src/utils/histogram3/StreamingHistogram.h
+    src/utils/qr/QrDecomposition.h
+    src/utils/kalman2/ExtendedKalmanFilter.h
+    src/utils/tfidf/TfidfVectorizer.h
+    src/utils/pagerank/PageRank.h
+
     # -- F101: 一维卡尔曼滤波器 --
     src/utils/kalman/KalmanFilter1D.h
 
@@ -1764,6 +1817,27 @@ set(HEADERS
     src/utils/fcs/FcsChecker.h
     src/utils/snr/SnrEstimator.h
     src/utils/jaro/JaroWinkler.h
+    src/utils/convolutional/ConvolutionalCoder.h
+    src/utils/cosinedist/CosineDistance.h
+    src/utils/edgedetect/EdgeDetector.h
+    src/utils/mass/MassEstimator.h
+    src/utils/lcs2/LcsSolver.h
+    src/utils/reservoir/ReservoirSampler.h
+
+    # -- F172~F185: Wave 25 工具模块 --
+    src/utils/lzw2/LzwCodec2.h
+    src/utils/runlength2/RunLengthEncoder.h
+    src/utils/huffman2/AdaptiveHuffman.h
+    src/utils/delta/DeltaEncoder.h
+    src/utils/bitmap/BitmapIndex.h
+    src/utils/mergesort/MergeSorter.h
+    src/utils/hyperloglog/HyperLogLog.h
+    src/utils/tdigest/TDigest.h
+    src/utils/dwt2/DaubechiesWavelet.h
+    src/utils/lifting/LiftingScheme.h
+    src/utils/quantize2/MuLawEncoder.h
+    src/utils/polar/PolarCode.h
+    src/utils/turbo/TurboDecoder.h
 )
 
 set(RESOURCES

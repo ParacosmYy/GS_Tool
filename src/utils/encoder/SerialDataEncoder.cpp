@@ -23,7 +23,7 @@ SerialDataEncoder::SerialDataEncoder(QObject *parent)
 // ── 核心编解码 API ──
 
 /** @brief 编码原始字节数据为指定格式 @param data 原始字节 @param encoding 目标编码 @return 编码结果 */
-QByteArray SerialDataEncoder::encode(const QByteArray &data, Encoding encoding) const
+QByteArray SerialDataEncoder::encode(const QByteArray &data, Encoding encoding)
 {
     if (data.isEmpty()) return QByteArray();
     QByteArray result;
@@ -51,7 +51,7 @@ QByteArray SerialDataEncoder::encode(const QByteArray &data, Encoding encoding) 
 }
 
 /** @brief 从指定格式解码为原始字节 @param data 编码数据 @param encoding 源编码 @return 解码结果 */
-QByteArray SerialDataEncoder::decode(const QByteArray &data, Encoding encoding) const
+QByteArray SerialDataEncoder::decode(const QByteArray &data, Encoding encoding)
 {
     if (data.isEmpty()) return QByteArray();
     QByteArray result;
@@ -86,7 +86,19 @@ QByteArray SerialDataEncoder::decode(const QByteArray &data, Encoding encoding) 
 /** @brief 编码为字符串形式 @param data 原始字节 @param encoding 目标编码 @return 编码后字符串 */
 QString SerialDataEncoder::encodeToString(const QByteArray &data, Encoding encoding) const
 {
-    return QString::fromLatin1(encode(data, encoding));
+    if (data.isEmpty()) return {};
+    QByteArray result;
+    switch (encoding) {
+    case Encoding::Hex:              result = encodeHex(data); break;
+    case Encoding::Base64:           result = data.toBase64(); break;
+    case Encoding::Ascii:            result = data; break;
+    case Encoding::Binary:           result = encodeBinary(data); break;
+    case Encoding::UrlEncode:        result = encodeUrl(data); break;
+    case Encoding::QuotedPrintable:  result = encodeQuotedPrintable(data); break;
+    case Encoding::Base32:           result = encodeBase32(data); break;
+    case Encoding::Base85:           result = encodeBase85(data); break;
+    }
+    return QString::fromLatin1(result);
 }
 
 // ── 自动检测与校验 ──

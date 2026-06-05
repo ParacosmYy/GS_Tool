@@ -44,7 +44,7 @@ public:
 
     /** @brief 预测 @param result 拟合结果 @param steps 步数 @param seasonLength 季节长度 @return 预测值 */
     QVector<double> forecast(const FitResult& result, int steps,
-                              int seasonLength) const;
+                              int seasonLength);
 
     /** @brief 自动拟合(网格搜索最优参数) @param data 时间序列 @param seasonLength 季节长度 @return 最佳拟合结果 */
     FitResult autoFit(const QVector<double>& data, int seasonLength);
@@ -60,8 +60,8 @@ private:
     double computeMape(const QVector<double>& actual,
                        const QVector<double>& fitted) const;
 
-    Stats m_stats;
-    double m_timeSum;
+    mutable Stats m_stats;
+    mutable double m_timeSum;
 };
 
 #endif // HOLTWINTERS_H

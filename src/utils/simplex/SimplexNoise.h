@@ -35,7 +35,7 @@ public:
 
     /** @brief 生成2D噪声图 @param width 宽 @param height 高 @param scale 缩放 @return 噪声矩阵(行优先) */
     QVector<double> generate2DMap(int width, int height,
-                                   double scale = 0.01) const;
+                                   double scale = 0.01);
 
     void setSeed(int seed);
 

@@ -63,7 +63,7 @@ public:
      * @param encoding 目标编码格式
      * @return 编码后的字节数组，失败返回空
      */
-    QByteArray encode(const QByteArray &data, Encoding encoding) const;
+    QByteArray encode(const QByteArray &data, Encoding encoding);
 
     /**
      * @brief 从指定格式解码为原始字节
@@ -71,7 +71,7 @@ public:
      * @param encoding 源编码格式
      * @return 解码后的原始字节，失败返回空
      */
-    QByteArray decode(const QByteArray &data, Encoding encoding) const;
+    QByteArray decode(const QByteArray &data, Encoding encoding);
 
     /**
      * @brief 编码为字符串形式
@@ -114,13 +114,13 @@ public:
 
 signals:
     /** @brief 编码完成信号 @param result 编码结果 @param encoding 使用的编码格式 */
-    void encodeComplete(const QByteArray &result, Encoding encoding) const;
+    void encodeComplete(const QByteArray &result, Encoding encoding);
 
     /** @brief 解码完成信号 @param result 解码结果 @param encoding 使用的编码格式 */
-    void decodeComplete(const QByteArray &result, Encoding encoding) const;
+    void decodeComplete(const QByteArray &result, Encoding encoding);
 
     /** @brief 操作错误信号 @param errorMessage 错误描述(中文) @param encoding 相关的编码格式 */
-    void error(const QString &errorMessage, Encoding encoding) const;
+    void error(const QString &errorMessage, Encoding encoding);
 
 private:
     // ---- 各编码格式的内部实现 ----
