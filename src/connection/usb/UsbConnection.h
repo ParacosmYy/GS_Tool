@@ -1,10 +1,25 @@
 /**
  * @file UsbConnection.h
- * @brief USB连接实现 — 通过libusb与USB设备通信
+ * @brief USB连接实现 — 通过libusb动态加载与USB设备通信
  *
  * 实现IConnection接口，提供USB设备的打开/关闭/读写操作，
- * 支持Bulk/Interrupt/Control三种传输模式。
- * 通过UsbLibraryLoader动态加载libusb，无需编译时链接。
+ * 支持Bulk/Interrupt/Control三种USB传输模式。
+ *
+ * 依赖:
+ *   - UsbLibraryLoader: 动态加载libusb共享库，无需编译时链接
+ *   - IConnection: 统一连接接口
+ *
+ * 传输模式:
+ *   - Bulk传输: 默认端点0x01，适合大批量数据
+ *   - Interrupt传输: 适合小包实时数据(HID等)
+ *   - Control传输: 控制请求(EP0)，requestType bit7决定方向
+ *
+ * 安全约束:
+ *   - write(data): 空数据直接返回0，不发起USB传输
+ *   - controlTransfer: 数据长度限制在65535字节内防止截断
+ *   - 返回值通过qBound限制在合法范围内
+ *
+ * 统计: 传输次数/字节数/错误/分类型计数/内核分离/重置/打开次数
  */
 #ifndef USB_CONNECTION_H
 #define USB_CONNECTION_H

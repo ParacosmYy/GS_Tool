@@ -44,6 +44,7 @@ ConnectionState UsbConnection::state() const {
 qint64 UsbConnection::write(const QByteArray& data) {
     if (m_state != ConnectionState::Connected) { return -1; }
     if (!m_devHandle) { return -1; }
+    if (data.isEmpty()) { return 0; }
 
     auto& loader = UsbLibraryLoader::instance();
     int transferred = 0;

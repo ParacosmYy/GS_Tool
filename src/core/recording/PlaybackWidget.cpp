@@ -81,7 +81,7 @@ void PlaybackWidget::setCurrentTime(qint64 timeMs)
     const bool wasBlocked = m_slider->blockSignals(true);
 
     if (m_durationMs > 0) {
-        const int pos = static_cast<int>((timeMs * 10000) / m_durationMs);
+        const int pos = static_cast<int>((static_cast<double>(timeMs) / static_cast<double>(m_durationMs)) * 10000.0);
         m_slider->setValue(qBound(0, pos, 10000));
     } else {
         m_slider->setValue(0);

@@ -175,10 +175,8 @@ void DataStreamRecorder::addAnnotation(const QString& text)
     QString line;
     switch (m_config.format) {
     case FileFormat::Raw:
-        /* 原始格式不支持内联标注，写入独立的标注标记 */
-        line = QStringLiteral("[ANNOTATION] %1").arg(text);
-        m_file.write(line.toUtf8());
-        m_file.write("\n");
+        /* Raw格式不写入文本标注以避免破坏二进制帧结构 */
+        /* 标注仅记录到统计计数器 */
         break;
     case FileFormat::HexDump:
         line = QStringLiteral("; @ANNOTATION %1 -- %2")
@@ -206,10 +204,8 @@ void DataStreamRecorder::addMarker(const QString& label)
     QString line;
     switch (m_config.format) {
     case FileFormat::Raw:
-        line = QStringLiteral("[MARKER] %1 @ byte %2")
-            .arg(label).arg(m_sessionBytes);
-        m_file.write(line.toUtf8());
-        m_file.write("\n");
+        /* Raw格式不写入文本标记以避免破坏二进制帧结构 */
+        /* 标记仅记录到统计计数器 */
         break;
     case FileFormat::HexDump:
         line = QStringLiteral("; @MARKER %1 @ offset 0x%2 @ %3")
@@ -314,13 +310,15 @@ void DataStreamRecorder::writeHeader()
 /** @brief 原始二进制写入，方向标记0x00=TX/0x01=RX+2字节长度前缀 */
 void DataStreamRecorder::writeRaw(const QByteArray& data, bool isReceived)
 {
+    const int writeLen = qMin(data.size(), 65535);
+
     if (m_config.includeDirection) {
         /* 方向标记: 0x00=TX, 0x01=RX, 后跟2字节长度(小端)，然后数据 */
         char dir = isReceived ? 0x01 : 0x00;
         m_file.write(&dir, 1);
 
         /* 2字节长度前缀(小端序) */
-        quint16 len = static_cast<quint16>(qMin(data.size(), 65535));
+        quint16 len = static_cast<quint16>(writeLen);
         char lenBuf[2] = { static_cast<char>(len & 0xFF), static_cast<char>((len >> 8) & 0xFF) };
         m_file.write(lenBuf, 2);
     }
@@ -331,7 +329,7 @@ void DataStreamRecorder::writeRaw(const QByteArray& data, bool isReceived)
         m_file.write(reinterpret_cast<const char*>(&usec), sizeof(usec));
     }
 
-    m_file.write(data);
+    m_file.write(data.left(writeLen));
 }
 
 /** @brief 时间戳CSV写入: "ISO时间戳","TX/RX",字节数,"HEX字符串" */

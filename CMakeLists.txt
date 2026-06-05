@@ -807,6 +807,15 @@ set(SOURCES
 
     # -- F55: 串口设备模拟器 --
     src/serial/simulator/SerialSimulator.cpp
+    src/serial/simulator/SerialSimulatorProfiles.cpp
+
+    # -- F53: 字节流解析器 --
+    src/protocol/parser2/ByteStreamParser.cpp
+    src/protocol/parser2/ByteStreamParserStateMachine.cpp
+
+    # -- F56: 数据验证器 --
+    src/utils/validator/DataValidator.cpp
+    src/utils/validator/DataValidatorRules.cpp
 )
 
 set(HEADERS
@@ -1229,8 +1238,17 @@ set(HEADERS
     # -- F53: 数据降采样引擎 --
     src/utils/reductor/DataReducer.h
 
+    # -- F53: 字节流解析器 --
+    src/protocol/parser2/ByteStreamParser.h
+
+    # -- F55: 串口设备模拟器 --
+    src/serial/simulator/SerialSimulator.h
+
     # -- F54: 数据缓存 --
     src/utils/cache/DataCache.h
+
+    # -- F56: 数据验证器 --
+    src/utils/validator/DataValidator.h
 )
 
 set(RESOURCES

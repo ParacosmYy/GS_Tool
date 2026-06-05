@@ -221,35 +221,25 @@ double ProtocolMonitor::anomalyThreshold() const
     return m_anomalyThreshold;
 }
 
-/**
- * @brief 设置序列完成后是否自动循环
- * @param enabled true=完成后从第一步重新开始
- */
+/** @brief 设置序列完成后是否自动循环 */
 void ProtocolMonitor::setLoopEnabled(bool enabled)
 {
     m_loopEnabled = enabled;
 }
 
-/**
- * @brief 获取循环模式状态
- */
+/** @brief 获取循环模式状态 */
 bool ProtocolMonitor::isLoopEnabled() const
 {
     return m_loopEnabled;
 }
 
-/**
- * @brief 设置严格模式
- * @param enabled true=意外消息直接重置序列；false=仅记录异常继续当前步骤
- */
+/** @brief 设置严格模式(意外消息直接重置序列) */
 void ProtocolMonitor::setStrictMode(bool enabled)
 {
     m_strictMode = enabled;
 }
 
-/**
- * @brief 获取严格模式状态
- */
+/** @brief 获取严格模式状态 */
 bool ProtocolMonitor::isStrictMode() const
 {
     return m_strictMode;
@@ -259,19 +249,13 @@ bool ProtocolMonitor::isStrictMode() const
 // 统计
 // --------------------------------------------------------------------------
 
-/**
- * @brief 获取运行统计(只读引用)
- */
+/** @brief 获取运行统计(只读引用) */
 const ProtocolMonitor::MonitorStats& ProtocolMonitor::stats() const
 {
     return m_stats;
 }
 
-/**
- * @brief 重置所有统计计数器和辅助变量
- *
- * 不影响序列定义、监控状态和配置。
- */
+/** @brief 重置所有统计计数器，不影响序列定义和配置 */
 void ProtocolMonitor::resetStatistics()
 {
     m_stats = MonitorStats{};
@@ -284,17 +268,13 @@ void ProtocolMonitor::resetStatistics()
 // 异常历史
 // --------------------------------------------------------------------------
 
-/**
- * @brief 获取异常记录列表
- */
+/** @brief 获取异常记录列表 */
 QList<ProtocolMonitor::AnomalyRecord> ProtocolMonitor::anomalyHistory() const
 {
     return m_anomalyHistory;
 }
 
-/**
- * @brief 清空异常历史
- */
+/** @brief 清空异常历史 */
 void ProtocolMonitor::clearAnomalyHistory()
 {
     m_anomalyHistory.clear();
@@ -304,18 +284,13 @@ void ProtocolMonitor::clearAnomalyHistory()
 // 序列进度
 // --------------------------------------------------------------------------
 
-/**
- * @brief 获取当前步骤索引
- * @return 步骤索引(0-based)，-1表示未开始或未监控
- */
+/** @brief 获取当前步骤索引(-1=未开始) */
 int ProtocolMonitor::currentStepIndex() const
 {
     return m_currentStep;
 }
 
-/**
- * @brief 获取序列总步骤数
- */
+/** @brief 获取序列总步骤数 */
 int ProtocolMonitor::totalSteps() const
 {
     return m_steps.size();
@@ -325,12 +300,7 @@ int ProtocolMonitor::totalSteps() const
 // 私有方法
 // --------------------------------------------------------------------------
 
-/**
- * @brief 推进到下一个序列步骤
- *
- * 如果已到最后一步，发射 sequenceComplete() 信号。
- * 若循环模式开启则重新开始；否则停止监控。
- */
+/** @brief 推进到下一个序列步骤，完成时发射sequenceComplete */
 void ProtocolMonitor::advanceToNextStep()
 {
     ++m_currentStep;
@@ -357,9 +327,7 @@ void ProtocolMonitor::advanceToNextStep()
     startStepTimer();
 }
 
-/**
- * @brief 重置序列位置到起点并启动第一步的超时定时器
- */
+/** @brief 重置序列位置到起点并启动超时定时器 */
 void ProtocolMonitor::resetSequencePosition()
 {
     m_currentStep = m_steps.isEmpty() ? -1 : 0;
@@ -368,11 +336,7 @@ void ProtocolMonitor::resetSequencePosition()
     }
 }
 
-/**
- * @brief 检查当前步骤是否超时
- *
- * 由 m_stepTimer 单次超时触发。可选步骤超时不计为异常。
- */
+/** @brief 检查当前步骤是否超时(可选步骤自动跳过) */
 void ProtocolMonitor::checkTimeoutForStep()
 {
     if (!m_monitoring || m_currentStep < 0 || m_currentStep >= m_steps.size()) {
@@ -398,12 +362,7 @@ void ProtocolMonitor::checkTimeoutForStep()
     advanceToNextStep();
 }
 
-/**
- * @brief 发射异常信号并记录到历史
- * @param type 异常类型
- * @param description 异常描述
- * @param actualType 实际消息类型(可能为空)
- */
+/** @brief 发射异常信号并记录到历史 */
 void ProtocolMonitor::emitAnomaly(AnomalyType type,
                                   const QString& description,
                                   const QByteArray& actualType)
@@ -433,12 +392,7 @@ void ProtocolMonitor::emitAnomaly(AnomalyType type,
     emit anomalyDetected(typeName, description);
 }
 
-/**
- * @brief 重新计算派生统计值
- *
- * 计算: 平均消息间隔、消息速率、异常率。
- * 在每次 feedMessage 后调用以保持统计实时性。
- */
+/** @brief 重新计算平均间隔/消息速率/异常率 */
 void ProtocolMonitor::updateStats()
 {
     //-- 平均消息间隔 --//
@@ -463,11 +417,7 @@ void ProtocolMonitor::updateStats()
     }
 }
 
-/**
- * @brief 为当前步骤启动超时定时器
- *
- * 定时器为单次触发，超时后调用 checkTimeoutForStep()。
- */
+/** @brief 为当前步骤启动单次超时定时器 */
 void ProtocolMonitor::startStepTimer()
 {
     if (m_currentStep < 0 || m_currentStep >= m_steps.size()) {

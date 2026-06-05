@@ -149,10 +149,11 @@ QByteArray UsbConnection::controlTransfer(quint8 requestType,
 
     if (isOut) {
         /* 发送Control请求 */
+        int dataLen = qMin(data.size(), 65535);
         int result = loader.controlTransfer(
             m_devHandle, requestType, request, value, index,
             reinterpret_cast<unsigned char*>(const_cast<char*>(data.constData())),
-            static_cast<quint16>(data.size()),
+            static_cast<quint16>(dataLen),
             m_timeout);
 
         if (result < 0) {
@@ -163,9 +164,10 @@ QByteArray UsbConnection::controlTransfer(quint8 requestType,
 
         ++m_totalTransfers;
         ++m_controlTransferCount;
-        m_totalBytesSent += static_cast<quint64>(result);
-        emit bytesWritten(result);
-        return data.left(result);
+        int sent = qBound(0, result, data.size());
+        m_totalBytesSent += static_cast<quint64>(sent);
+        emit bytesWritten(sent);
+        return data.left(sent);
     } else {
         /* 接收Control响应 */
         QByteArray buffer(256, '\0');
@@ -183,10 +185,11 @@ QByteArray UsbConnection::controlTransfer(quint8 requestType,
 
         ++m_totalTransfers;
         ++m_controlTransferCount;
-        m_totalBytesReceived += static_cast<quint64>(result);
-        QByteArray received = buffer.left(result);
-        emit dataReceived(received);
-        return received;
+        int received = qBound(0, result, buffer.size());
+        m_totalBytesReceived += static_cast<quint64>(received);
+        QByteArray receivedData = buffer.left(received);
+        emit dataReceived(receivedData);
+        return receivedData;
     }
 }
 

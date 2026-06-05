@@ -13,6 +13,8 @@ RecordingController::RecordingController(DataLogger* logger, QObject* parent)
     : QObject(parent)
     , m_logger(logger)
 {
+    if (!m_logger) return;
+
     connect(m_logger, &DataLogger::playbackData,
             this, &RecordingController::onPlaybackData);
     connect(m_logger, &DataLogger::playbackProgress,
@@ -75,6 +77,10 @@ void RecordingController::onToggleRecording()
 {
     if (!m_logger) {
         qWarning() << "RecordingController::onToggleRecording: m_logger is null";
+        return;
+    }
+    if (!m_recordAction) {
+        qWarning() << "RecordingController::onToggleRecording: m_recordAction is null";
         return;
     }
     if (m_logger->isRecording()) {
