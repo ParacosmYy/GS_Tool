@@ -24,7 +24,9 @@ signals:
     void flowComplete(double flow);
 private:
     bool bfsLevel();
+    bool bfsLevelThreshold(double delta);
     double dfsSend(int u, double flow);
+    double dfsSendThreshold(int u, double flow, double delta);
     int m_n = 0, m_source = 0, m_sink = 0;
     QVector<QVector<QPair<int,double>>> m_adj;
     QVector<int> m_level, m_iter;

@@ -28,6 +28,8 @@ private:
     struct Node { double center; QList<Interval> byLow, byHigh; Node *left, *right; };
     Node* build(QList<Interval>& intervals);
     void queryPoint(Node* n, double p, QList<QPair<QPair<double,double>,int>>& result) const;
+    void queryRangeHelper(Node* n, double lo, double hi, QList<QPair<QPair<double,double>,int>>& result) const;
+    void collectAll(Node* n, QList<Interval>& out) const;
     void destroyTree(Node* n);
     Node* m_root = nullptr; int m_size = 0;
     Stats m_stats; double m_timeSum = 0.0;

@@ -25,6 +25,9 @@ signals:
     void frameComputed(int frameIndex);
 private:
     void createChromaMap();
+    double pearsonCorr(const QVector<double>& chroma, const double profile[12], int shift) const;
+    double chordMatch(const QVector<double>& chroma, const int* notes, int noteCount, int root) const;
+    void forwardFFT(QVector<double>& real, QVector<double>& imag);
     double m_sampleRate = 44100.0; int m_fftSize = 4096; int m_hopSize = 2048;
     double m_refFreq = 261.63; QVector<QVector<int>> m_chromaMap;
     Stats m_stats; double m_timeSum = 0.0;

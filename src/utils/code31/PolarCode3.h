@@ -21,6 +21,12 @@ public:
 signals:
     void decodeComplete(bool crcPassed);
 private:
+    void scDecodeRecursive(QVector<double>& llr, QVector<int>& uHat, int start, int len) const;
+    double signProd(double a, double b) const;
+    bool checkCRC(const QVector<int>& bits) const;
+    void updateLLR(QVector<double>& llr, const QVector<int>& bits, int idx) const;
+    void generateFrozenSet();
+    double bhattacharyya(int index) const;
     int m_n = 0, m_k = 0, m_listSize = 8, m_crcBits = 16;
     QVector<int> m_frozen;
     Stats m_stats; double m_timeSum = 0.0;

@@ -24,6 +24,8 @@ signals:
 private:
     double clusterDistance(const QVector<int>& a, const QVector<int>& b,
                           const QVector<QVector<double>>& data) const;
+    double euclidean(const QVector<double>& a, const QVector<double>& b) const;
+    int findRoot(QVector<int>& parent, int x) const;
     Linkage m_linkage = Ward; double m_threshold = 0.0;
     QVector<QPair<int,int>> m_merges; QVector<double> m_mergeDistances;
     Stats m_stats; double m_timeSum = 0.0;
