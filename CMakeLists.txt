@@ -707,6 +707,12 @@ set(SOURCES
     src/utils/signalgen/SignalGenerator.cpp
     src/utils/ringbuf2/RingBufferEx.cpp
     src/utils/bitalloc/BitAllocator.cpp
+    src/utils/spinbox/SpinLockQueue.cpp
+    src/utils/timerpool/TimerPool.cpp
+    src/utils/detrend/DetrendEngine.cpp
+    src/utils/zscore/ZScoreNormalizer.cpp
+    src/utils/medoid/KMedoidClusterer.cpp
+    src/utils/votecomp/VotingCompositor.cpp
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
@@ -1532,6 +1538,24 @@ set(HEADERS
 
     # -- F115: 位分配器 --
     src/utils/bitalloc/BitAllocator.h
+
+    # -- F116: 自旋锁队列 --
+    src/utils/spinbox/SpinLockQueue.h
+
+    # -- F117: 定时器池 --
+    src/utils/timerpool/TimerPool.h
+
+    # -- F118: 去趋势引擎 --
+    src/utils/detrend/DetrendEngine.h
+
+    # -- F119: Z-Score标准化器 --
+    src/utils/zscore/ZScoreNormalizer.h
+
+    # -- F120: K-Medoid聚类器 --
+    src/utils/medoid/KMedoidClusterer.h
+
+    # -- F121: 投票组合器 --
+    src/utils/votecomp/VotingCompositor.h
 )
 
 set(RESOURCES
