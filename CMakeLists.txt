@@ -983,6 +983,21 @@ set(SOURCES
     src/utils/power2/InverseIteration.cpp
     src/utils/nystrom/NystromApproximation.cpp
 
+    # ── Wave 48: 算法/字符串/多项式 ──
+    src/utils/interp3/AkimaInterpolation.cpp
+    src/utils/spectral2/SpectralClustering.cpp
+    src/utils/procrustes/ProcrustesAnalysis.cpp
+    src/utils/mahal/MahalanobisDistance.cpp
+    src/utils/hungarian/HungarianAlgorithm.cpp
+    src/utils/tsp/TspSolver.cpp
+    src/utils/edmonds/EdmondsMatching.cpp
+    src/utils/lcp_array/LcpArray.cpp
+    src/utils/min_rotation/MinimalRotation.cpp
+    src/utils/polynomial_root/PolynomialRoots.cpp
+    src/utils/resultant/PolynomialResultant.cpp
+    src/utils/groebner/GroebnerBasis.cpp
+    src/utils/grobner2/MultivariatePolynomial.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -2286,6 +2301,21 @@ set(HEADERS
     src/utils/arnoldi/ArnoldiProcess.h
     src/utils/power2/InverseIteration.h
     src/utils/nystrom/NystromApproximation.h
+
+    # ── Wave 48: 算法/字符串/多项式 ──
+    src/utils/interp3/AkimaInterpolation.h
+    src/utils/spectral2/SpectralClustering.h
+    src/utils/procrustes/ProcrustesAnalysis.h
+    src/utils/mahal/MahalanobisDistance.h
+    src/utils/hungarian/HungarianAlgorithm.h
+    src/utils/tsp/TspSolver.h
+    src/utils/edmonds/EdmondsMatching.h
+    src/utils/lcp_array/LcpArray.h
+    src/utils/min_rotation/MinimalRotation.h
+    src/utils/polynomial_root/PolynomialRoots.h
+    src/utils/resultant/PolynomialResultant.h
+    src/utils/groebner/GroebnerBasis.h
+    src/utils/grobner2/MultivariatePolynomial.h
 )
 
 set(RESOURCES
