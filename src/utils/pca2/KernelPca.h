@@ -93,7 +93,7 @@ public:
      * @param data 输入数据
      * @return 变换结果
      */
-    TransformResult transform(const QVector<QVector<double>>& data) const;
+    TransformResult transform(const QVector<QVector<double>>& data);
 
     /**
      * @brief 拟合并变换(便捷方法)

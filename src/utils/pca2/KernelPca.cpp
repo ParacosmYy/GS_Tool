@@ -153,7 +153,7 @@ void KernelPca::fit(const QVector<QVector<double>>& data)
  *  @param data 输入数据
  *  @return 变换结果 */
 KernelPca::TransformResult KernelPca::transform(
-    const QVector<QVector<double>>& data) const
+    const QVector<QVector<double>>& data)
 {
     QElapsedTimer timer;
     timer.start();
