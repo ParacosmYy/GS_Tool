@@ -2361,6 +2361,14 @@ set(SOURCES
     src/utils/matrix165/SingularValueSolver.cpp
     src/utils/signal163/WienerFilter.cpp
     src/utils/tree162/BStarTree.cpp
+    src/utils/cluster160/MeanShift7.cpp
+    src/utils/code161/GolayCode3.cpp
+    src/utils/dsp162/StereoEnhancer.cpp
+    src/utils/fft163/HaarWaveletTransform.cpp
+    src/utils/graph176/FlowNetwork.cpp
+    src/utils/matrix166/LeastSquaresSolver.cpp
+    src/utils/signal164/NoiseProfiler.cpp
+    src/utils/tree163/LeftistHeap.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -2427,6 +2435,7 @@ set(SOURCES
 
     # ── F85: MQTT Client Engine ──
     src/connection/mqtt_client/MqttClientEngine.cpp
+    src/connection/mqtt_client/MqttClientEnginePacket.cpp
     src/connection/mqtt_client/MqttClientEngineStats.cpp
     src/connection/mqtt_client/MqttClientPanel.cpp
     src/connection/mqtt_client/MqttClientPanelStats.cpp
@@ -4569,6 +4578,14 @@ set(HEADERS
     src/utils/matrix165/SingularValueSolver.h
     src/utils/signal163/WienerFilter.h
     src/utils/tree162/BStarTree.h
+    src/utils/cluster160/MeanShift7.h
+    src/utils/code161/GolayCode3.h
+    src/utils/dsp162/StereoEnhancer.h
+    src/utils/fft163/HaarWaveletTransform.h
+    src/utils/graph176/FlowNetwork.h
+    src/utils/matrix166/LeastSquaresSolver.h
+    src/utils/signal164/NoiseProfiler.h
+    src/utils/tree163/LeftistHeap.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h

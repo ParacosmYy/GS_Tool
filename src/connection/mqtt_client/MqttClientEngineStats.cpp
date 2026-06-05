@@ -21,6 +21,16 @@ quint64 MqttClientEngine::errorCount() const { return m_errorCount; }
 quint64 MqttClientEngine::connectionAttempts() const { return m_connectionAttempts; }
 /** @brief 获取累计重连成功次数 @return 重连计数 */
 quint64 MqttClientEngine::successfulReconnects() const { return m_successfulReconnects; }
+/** @brief 获取QoS0发布数 @return QoS0计数 */
+quint64 MqttClientEngine::qos0Publishes() const { return m_qos0Publishes; }
+/** @brief 获取QoS1发布数 @return QoS1计数 */
+quint64 MqttClientEngine::qos1Publishes() const { return m_qos1Publishes; }
+/** @brief 获取QoS2发布数 @return QoS2计数 */
+quint64 MqttClientEngine::qos2Publishes() const { return m_qos2Publishes; }
+/** @brief 获取PINGREQ发送次数 @return 心跳计数 */
+quint64 MqttClientEngine::keepAliveSent() const { return m_keepAliveSent; }
+/** @brief 获取待发送队列大小 @return 队列中消息数 */
+int MqttClientEngine::pendingQueueSize() const { return m_pendingQueue.size(); }
 
 /** @brief 重置所有统计计数器 */
 void MqttClientEngine::resetStats()
@@ -32,4 +42,8 @@ void MqttClientEngine::resetStats()
     m_errorCount = 0;
     m_connectionAttempts = 0;
     m_successfulReconnects = 0;
+    m_qos0Publishes = 0;
+    m_qos1Publishes = 0;
+    m_qos2Publishes = 0;
+    m_keepAliveSent = 0;
 }
