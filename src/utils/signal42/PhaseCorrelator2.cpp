@@ -39,7 +39,7 @@ void PhaseCorrelator2::fft2D(QVector<double>& real, QVector<double>& imag, int w
     for (int y = 0; y < h; ++y) {
         int rowSize = w;
         /* 1D FFT (Cooley-Tukey) */
-        for (int s = 1; s < qLn2(w) + 1; ++s) {
+        for (int s = 1; s < qLn(w) / qLn(2.0) + 1; ++s) {
             int m = 1 << s;
             int halfM = m >> 1;
             for (int k = 0; k < w; k += m) {
@@ -62,7 +62,7 @@ void PhaseCorrelator2::fft2D(QVector<double>& real, QVector<double>& imag, int w
 
     /* 列变换 */
     for (int x = 0; x < w; ++x) {
-        for (int s = 1; s < qLn2(h) + 1; ++s) {
+        for (int s = 1; s < qLn(h) / qLn(2.0) + 1; ++s) {
             int m = 1 << s;
             int halfM = m >> 1;
             for (int k = 0; k < h; k += m) {

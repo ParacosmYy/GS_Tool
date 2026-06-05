@@ -93,6 +93,78 @@ bool SuffixTree4::search(const QString& pattern)
 }
 
 /**
+ * @brief 统计模式串在文本中出现的次数
+ *
+ * 利用后缀数组在O(m log n)时间内计算模式串出现次数。
+ *
+ * @param pattern 待搜索的模式串
+ * @return 出现次数
+ */
+int SuffixTree4::countOccurrences(const QString& pattern) const
+{
+    if (pattern.isEmpty() || m_text.isEmpty()) return 0;
+
+    int n = m_text.length();
+    int m = pattern.length();
+
+    /* 构建后缀数组 */
+    QVector<int> sa(n);
+    for (int i = 0; i < n; ++i) sa[i] = i;
+    std::sort(sa.begin(), sa.end(), [&](int a, int b) {
+        return m_text.mid(a) < m_text.mid(b);
+    });
+
+    /* 使用二分查找计算上下界 */
+    int lo = 0, hi = n - 1;
+    while (lo <= hi) {
+        int mid = (lo + hi) / 2;
+        if (m_text.mid(sa[mid], m) < pattern) lo = mid + 1;
+        else hi = mid - 1;
+    }
+    int lower = lo;
+
+    lo = 0; hi = n - 1;
+    while (lo <= hi) {
+        int mid = (lo + hi) / 2;
+        if (m_text.mid(sa[mid], m) <= pattern) lo = mid + 1;
+        else hi = mid - 1;
+    }
+    int upper = lo;
+
+    return qMax(0, upper - lower);
+}
+
+/**
+ * @brief 获取最长重复子串
+ * @return 最长的在文本中出现至少两次的子串
+ */
+QString SuffixTree4::longestRepeatedSubstring() const
+{
+    if (m_text.isEmpty()) return QString();
+
+    int n = m_text.length();
+    QVector<int> sa(n);
+    for (int i = 0; i < n; ++i) sa[i] = i;
+    std::sort(sa.begin(), sa.end(), [&](int a, int b) {
+        return m_text.mid(a) < m_text.mid(b);
+    });
+
+    /* 计算LCP数组并找最大值 */
+    int maxLCP = 0;
+    int maxIdx = 0;
+    for (int i = 1; i < n; ++i) {
+        int lcp = 0;
+        while (sa[i] + lcp < n && sa[i - 1] + lcp < n &&
+               m_text[sa[i] + lcp] == m_text[sa[i - 1] + lcp]) {
+            lcp++;
+        }
+        if (lcp > maxLCP) { maxLCP = lcp; maxIdx = sa[i]; }
+    }
+
+    return m_text.mid(maxIdx, maxLCP);
+}
+
+/**
  * @brief 重置统计数据
  */
 void SuffixTree4::resetStatistics()

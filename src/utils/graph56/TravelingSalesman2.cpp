@@ -260,7 +260,7 @@ double TravelingSalesman2::threeOpt(QVector<int>& tour)
                     double d3 = m_dist[a * m_n + e] + m_dist[d * m_n + b] +
                                 m_dist[c * m_n + f];
 
-                    double bestD = qMin({d1, d2, d3});
+                    double bestD = qMin(qMin(d1, d2), d3);
                     if (bestD < d0 - 1e-10) {
                         if (bestD == d1) {
                             std::reverse(tour.begin() + i + 1, tour.begin() + j + 1);

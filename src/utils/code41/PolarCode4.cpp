@@ -234,7 +234,7 @@ void PolarCode4::generateFrozenSet()
         m_infoSet.append(reliability[i].second);
     }
     for (int i = 0; i < m_n - m_k; ++i) {
-        m_frozenSet.insert(reliability[i].second);
+        m_frozenSet.append(reliability[i].second);
     }
 }
 

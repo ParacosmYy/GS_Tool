@@ -1,9 +1,9 @@
 /**
  * @file KMeans8.cpp
- * @brief BIRCH聚类算法实现
+ * @brief K-Means聚类算法实现
  *
- * 实现基于CF树的BIRCH（Balanced Iterative Reducing and Clustering
- * using Hierarchies）聚类算法，适用于大规模数据集的增量聚类。
+ * 实现经典K-Means++聚类算法，支持欧氏距离和曼哈顿距离度量，
+ * 使用K-Means++初始化策略加速收敛。适用于中等规模数据集聚类。
  */
 
 #include "utils/cluster71/KMeans8.h"
@@ -23,57 +23,44 @@ KMeans8::KMeans8(QObject* parent)
 }
 
 /**
- * @brief 设置CF树阈值
- * @param t 半径阈值，样本与子簇中心的距离上限
+ * @brief 设置簇数量
+ * @param k 簇数量，必须>=2
  */
-void KMeans8::setNumClusters(double t)
+void KMeans8::setNumClusters(int k)
 {
-    m_k = qBound(2, (int)t, 1000);
+    m_k = qMax(2, k);
 }
 
 /**
- * @brief 设置分支因子
- * @param b 每个节点最大的子簇数量
+ * @brief 设置最大迭代次数
+ * @param iter 最大迭代次数
  */
-void KMeans8::setMaxIterations(int b)
+void KMeans8::setMaxIterations(int iter)
 {
-    m_maxIter = qMax(1, b);
+    m_maxIter = qMax(10, iter);
 }
 
 /**
- * @brief CF子簇结构体
+ * @brief 设置距离度量类型
+ * @param metric 距离度量名称: "euclidean"或"manhattan"
  */
-struct KCluster {
-    int N = 0;                          ///< 子簇样本数
-    QVector<double> LS;                 ///< 线性和
-    double SS = 0.0;                    ///< 平方和
-    QVector<double> centroid;           ///< 质心
-    QVector<KCluster*> children;    ///< 子节点（非叶节点）
-
-    /** @brief 计算质心 */
-    void updateCentroid() {
-        centroid.resize(LS.size(), 0.0);
-        if (N > 0) {
-            for (int i = 0; i < LS.size(); ++i) centroid[i] = LS[i] / N;
-        }
+void KMeans8::setDistanceMetric(const QString& metric)
+{
+    if (metric == "euclidean" || metric == "manhattan") {
+        m_metric = metric;
     }
-
-    /** @brief 计算半径 */
-    double radius() const {
-        if (N <= 1) return 0.0;
-        double r = 0.0;
-        for (int i = 0; i < centroid.size(); ++i) {
-            double diff = centroid[i];
-            r += (SS / N - diff * diff);
-        }
-        return qSqrt(qMax(r, 0.0));
-    }
-};
+}
 
 /**
- * @brief 对数据进行BIRCH聚类
- * @param points 输入数据点集合
- * @return 每个点的聚类标签
+ * @brief 执行K-Means聚类
+ * @param points 输入数据点集合，每个点为D维向量
+ * @return 每个点的簇标签(0~k-1)
+ *
+ * 算法流程:
+ * 1. K-Means++初始化：按距离概率选取初始质心
+ * 2. 分配步骤：将每个点分配到最近质心
+ * 3. 更新步骤：重新计算各簇质心
+ * 4. 重复2-3直到收敛或达到最大迭代次数
  */
 QVector<int> KMeans8::cluster(const QVector<QVector<double>>& points)
 {
@@ -84,112 +71,100 @@ QVector<int> KMeans8::cluster(const QVector<QVector<double>>& points)
     if (N == 0) return QVector<int>();
 
     const int D = points[0].size();
-    m_treeSize = 0;
+    const int k = qMin(m_k, N);
 
-    // CF树构建：维护一组CF子簇
-    QVector<KCluster*> subclusters;
+    /* 阶段1: K-Means++初始化质心 */
+    std::mt19937 rng(42);
+    m_centroids.clear();
+    m_centroids.resize(k);
 
-    for (int i = 0; i < N; ++i) {
-        const auto& pt = points[i];
+    /* 随机选择第一个质心 */
+    int firstIdx = rng() % N;
+    m_centroids[0] = points[firstIdx];
 
-        // 寻找最近的子簇
-        int bestIdx = -1;
-        double bestDist = 1e18;
-        for (int j = 0; j < subclusters.size(); ++j) {
-            double dist = 0.0;
-            for (int d = 0; d < D; ++d) {
-                double diff = pt[d] - subclusters[j]->centroid[d];
-                dist += diff * diff;
-            }
-            if (dist < bestDist) {
-                bestDist = dist;
-                bestIdx = j;
-            }
+    /* 按距离概率选取后续质心 */
+    QVector<double> minDist(N, 1e18);
+    for (int c = 1; c < k; ++c) {
+        double totalDist = 0.0;
+        for (int i = 0; i < N; ++i) {
+            double d = distance(points[i], m_centroids[c - 1]);
+            d = d * d;
+            minDist[i] = qMin(minDist[i], d);
+            totalDist += minDist[i];
         }
 
-        // 如果找到且吸收后半径不超过阈值，则吸收
-        if (bestIdx >= 0 && qSqrt(bestDist) < m_threshold) {
-            KCluster* sc = subclusters[bestIdx];
-            sc->N++;
-            for (int d = 0; d < D; ++d) {
-                sc->LS[d] += pt[d];
-                sc->SS += pt[d] * pt[d];
-            }
-            sc->updateCentroid();
-        } else {
-            // 创建新子簇
-            KCluster* sc = new KCluster();
-            sc->N = 1;
-            sc->LS = pt;
-            sc->SS = 0.0;
-            for (int d = 0; d < D; ++d) sc->SS += pt[d] * pt[d];
-            sc->centroid = pt;
-            subclusters.append(sc);
-            m_treeSize++;
+        /* 按距离加权概率选择下一个质心 */
+        double r = std::uniform_real_distribution<double>(0, totalDist)(rng);
+        double cumSum = 0.0;
+        int chosen = 0;
+        for (int i = 0; i < N; ++i) {
+            cumSum += minDist[i];
+            if (cumSum >= r) { chosen = i; break; }
         }
+        m_centroids[c] = points[chosen];
+    }
 
-        // 分支因子限制：如果子簇过多则合并最近的两个
-        while (subclusters.size() > m_branch) {
-            int mi = 0, mj = 1;
-            double minDist = 1e18;
-            for (int a = 0; a < subclusters.size(); ++a) {
-                for (int b = a + 1; b < subclusters.size(); ++b) {
-                    double dist = 0.0;
-                    for (int d = 0; d < D; ++d) {
-                        double diff = subclusters[a]->centroid[d] - subclusters[b]->centroid[d];
-                        dist += diff * diff;
-                    }
-                    if (dist < minDist) {
-                        minDist = dist;
-                        mi = a; mj = b;
-                    }
+    /* 阶段2: 迭代优化 */
+    QVector<int> labels(N, 0);
+    QVector<int> clusterSizes(k, 0);
+
+    for (int iter = 0; iter < m_maxIter; ++iter) {
+        bool changed = false;
+
+        /* 分配步骤: 每个点分配到最近质心 */
+        for (int i = 0; i < N; ++i) {
+            double bestDist = 1e18;
+            int bestCluster = 0;
+            for (int c = 0; c < k; ++c) {
+                double d = distance(points[i], m_centroids[c]);
+                if (d < bestDist) {
+                    bestDist = d;
+                    bestCluster = c;
                 }
             }
-            // 合并mj到mi
-            KCluster* merged = subclusters[mi];
-            KCluster* other = subclusters[mj];
-            merged->N += other->N;
-            for (int d = 0; d < D; ++d) merged->LS[d] += other->LS[d];
-            merged->SS += other->SS;
-            merged->updateCentroid();
-            delete other;
-            subclusters.remove(mj);
-            m_treeSize--;
+            if (labels[i] != bestCluster) {
+                labels[i] = bestCluster;
+                changed = true;
+            }
         }
-    }
 
-    // 对子簇质心进行K-Means聚类（简化：直接使用子簇编号作为标签）
-    // 分配每个点到最近的子簇
-    QVector<int> labels(N, 0);
-    for (int i = 0; i < N; ++i) {
-        const auto& pt = points[i];
-        int bestIdx = 0;
-        double bestDist = 1e18;
-        for (int j = 0; j < subclusters.size(); ++j) {
-            double dist = 0.0;
+        /* 收敛检测 */
+        if (!changed) break;
+
+        /* 更新步骤: 重新计算质心 */
+        m_centroids = QVector<QVector<double>>(k, QVector<double>(D, 0.0));
+        clusterSizes.fill(0);
+        for (int i = 0; i < N; ++i) {
+            int c = labels[i];
+            clusterSizes[c]++;
             for (int d = 0; d < D; ++d) {
-                double diff = pt[d] - subclusters[j]->centroid[d];
-                dist += diff * diff;
-            }
-            if (dist < bestDist) {
-                bestDist = dist;
-                bestIdx = j;
+                m_centroids[c][d] += points[i][d];
             }
         }
-        labels[i] = bestIdx;
+        for (int c = 0; c < k; ++c) {
+            if (clusterSizes[c] > 0) {
+                for (int d = 0; d < D; ++d) {
+                    m_centroids[c][d] /= clusterSizes[c];
+                }
+            }
+        }
     }
 
-    // 清理
-    for (auto* sc : subclusters) delete sc;
+    /* 计算惯性(簇内平方和) */
+    m_inertia = 0.0;
+    for (int i = 0; i < N; ++i) {
+        double d = distance(points[i], m_centroids[labels[i]]);
+        m_inertia += d * d;
+    }
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalClusterings++;
     m_stats.totalPoints += N;
     m_timeSum += elapsed;
     m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalClusterings;
 
-    emit clusteringCompleted(subclusters.size(), m_treeSize);
+    emit clusteringCompleted(k, m_inertia);
     return labels;
 }
 
@@ -200,4 +175,32 @@ void KMeans8::resetStatistics()
 {
     m_stats = Stats();
     m_timeSum = 0.0;
+}
+
+/**
+ * @brief 计算两点之间的距离
+ * @param a 第一个点
+ * @param b 第二个点
+ * @return 距离值
+ *
+ * 根据m_metric选择欧氏距离或曼哈顿距离。
+ */
+double KMeans8::distance(const QVector<double>& a, const QVector<double>& b) const
+{
+    const int D = qMin(a.size(), b.size());
+    if (m_metric == "manhattan") {
+        double dist = 0.0;
+        for (int i = 0; i < D; ++i) {
+            dist += qAbs(a[i] - b[i]);
+        }
+        return dist;
+    }
+
+    /* 默认: 欧氏距离 */
+    double dist = 0.0;
+    for (int i = 0; i < D; ++i) {
+        double diff = a[i] - b[i];
+        dist += diff * diff;
+    }
+    return qSqrt(dist);
 }

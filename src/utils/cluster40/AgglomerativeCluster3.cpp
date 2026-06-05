@@ -8,6 +8,7 @@
 #include "utils/cluster40/AgglomerativeCluster3.h"
 
 #include <QElapsedTimer>
+#include <QMap>
 #include <QtMath>
 
 #include <algorithm>

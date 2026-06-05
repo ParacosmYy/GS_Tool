@@ -15,7 +15,7 @@
  * @brief 构造函数，初始化默认分析参数
  * @param parent 父QObject对象指针
  */
-Tonality4::TonalityTonality4(QObject* parent)
+Tonality4::Tonality4(QObject* parent)
     : QObject(parent)
 {
 }

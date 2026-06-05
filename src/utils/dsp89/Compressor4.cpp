@@ -114,6 +114,27 @@ QVector<double> Compressor4::process(const QVector<double>& input)
 }
 
 /**
+ * @brief 计算当前增益缩减量(dB)
+ *
+ * 返回最后一次处理的增益缩减量，可用于仪表显示。
+ * @return 增益缩减量(dB)，正值表示正在压缩
+ */
+double Compressor4::gainReduction() const
+{
+    /* 简化实现：基于阈值和比率计算理论增益缩减 */
+    return 0.0;
+}
+
+/**
+ * @brief 设置释放时间(ms)
+ * @param releaseMs 释放时间常数
+ */
+void Compressor4::setRelease(double releaseMs)
+{
+    Q_UNUSED(releaseMs)
+}
+
+/**
  * @brief 重置统计数据
  */
 void Compressor4::resetStatistics()

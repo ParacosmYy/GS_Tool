@@ -58,7 +58,7 @@ void ConstantQ3::setParameters(double minFreq, double maxFreq, int binsPerOctave
 
     /* 计算FFT大小（基于最低频的Q值） */
     double Q = 1.0 / (qPow(2.0, 1.0 / m_binsPerOctave) - 1.0);
-    m_fftSize = (int)qPow(2.0, qCeil(qLn2(Q * m_sampleRate / m_minFreq)));
+    m_fftSize = (int)qPow(2.0, qCeil(qLn(Q * m_sampleRate / m_minFreq) / qLn(2.0)));
 
     /* 构建频率表 */
     m_freqs.resize(m_totalBins);

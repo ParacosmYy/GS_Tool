@@ -106,6 +106,34 @@ QVector<double> ZoomFFT4::compute(const QVector<double>& input)
 }
 
 /**
+ * @brief 获取当前频谱分辨率(Hz/bin)
+ * @return 频率分辨率
+ */
+double ZoomFFT4::frequencyResolution() const
+{
+    double fs = 44100.0;
+    return m_bandwidth / qMax(1, static_cast<int>(fs / (2.0 * m_bandwidth)));
+}
+
+/**
+ * @brief 获取分析频段的起始频率(Hz)
+ * @return 起始频率
+ */
+double ZoomFFT4::startFrequency() const
+{
+    return m_centerFreq - m_bandwidth / 2.0;
+}
+
+/**
+ * @brief 获取分析频段的结束频率(Hz)
+ * @return 结束频率
+ */
+double ZoomFFT4::endFrequency() const
+{
+    return m_centerFreq + m_bandwidth / 2.0;
+}
+
+/**
  * @brief 重置统计数据
  */
 void ZoomFFT4::resetStatistics()

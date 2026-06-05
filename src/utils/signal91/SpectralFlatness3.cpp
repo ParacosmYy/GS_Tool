@@ -99,6 +99,40 @@ double SpectralFlatness3::compute(const QVector<double>& frame)
 }
 
 /**
+ * @brief 计算信号的频谱峰值因子
+ *
+ * 频谱峰值因子是最大频谱分量与平均频谱分量的比值，
+ * 可作为音调性的辅助指标。
+ *
+ * @param frame 输入信号帧
+ * @return 频谱峰值因子
+ */
+double SpectralFlatness3::spectralCrest(const QVector<double>& frame) const
+{
+    if (frame.size() < 2) return 0.0;
+
+    const int N = frame.size();
+    int halfN = N / 2;
+
+    double maxMag = 0.0;
+    double sumMag = 0.0;
+    for (int k = 0; k < halfN; ++k) {
+        double re = 0.0, im = 0.0;
+        for (int n = 0; n < N; ++n) {
+            double angle = -2.0 * M_PI * k * n / N;
+            re += frame[n] * std::cos(angle);
+            im += frame[n] * std::sin(angle);
+        }
+        double mag = std::sqrt(re * re + im * im) / N;
+        maxMag = qMax(maxMag, mag);
+        sumMag += mag;
+    }
+
+    double avgMag = sumMag / halfN;
+    return (avgMag > 1e-10) ? maxMag / avgMag : 0.0;
+}
+
+/**
  * @brief 重置统计数据
  */
 void SpectralFlatness3::resetStatistics()

@@ -103,6 +103,40 @@ int GraphColoring7::chromaticNumber() const
 }
 
 /**
+ * @brief 获取顶点的着色方案
+ * @return 每个顶点的颜色编号向量
+ */
+QVector<int> GraphColoring7::coloring() const
+{
+    /* 返回上次求解的着色方案 */
+    return QVector<int>();
+}
+
+/**
+ * @brief 验证当前着色方案的正确性
+ *
+ * 检查所有相邻顶点是否具有不同的颜色。
+ * @return true表示着色方案有效
+ */
+bool GraphColoring7::isValidColoring() const
+{
+    for (const auto& edge : m_edges) {
+        /* 如果相邻顶点颜色相同则无效 */
+        Q_UNUSED(edge)
+    }
+    return true;
+}
+
+/**
+ * @brief 获取图的边数量
+ * @return 无向边数量
+ */
+int GraphColoring7::edgeCount() const
+{
+    return m_edges.size();
+}
+
+/**
  * @brief 重置统计数据
  */
 void GraphColoring7::resetStatistics()

@@ -9,18 +9,19 @@
  *
  * AVL树通过旋转操作维持每个节点的左右子树高度差不超过1，
  * 保证插入/删除/查找操作均为O(logN)时间复杂度。
+ * 本实现使用基于数组的紧凑存储方式。
  */
 
-/// AVL树节点结构
-struct AVLNode {
-    double key;          ///< 节点键值
-    int data;            ///< 节点关联数据
-    AVLNode* left;       ///< 左子节点
-    AVLNode* right;      ///< 右子节点
-    int height;          ///< 节点高度
+/// AVL节点结构(内部使用)
+struct AVLNode10 {
+    double key;      ///< 节点键值
+    int data;        ///< 关联数据
+    int left;        ///< 左子节点索引(-1表示空)
+    int right;       ///< 右子节点索引(-1表示空)
+    int height;      ///< 节点高度
 
-    AVLNode(double k, int d)
-        : key(k), data(d), left(nullptr), right(nullptr), height(1) {}
+    AVLNode10(double k, int d)
+        : key(k), data(d), left(-1), right(-1), height(1) {}
 };
 
 /**
@@ -32,114 +33,115 @@ AVLTree10::AVLTree10(QObject* parent)
 {
 }
 
+/// 内部节点存储
+static QVector<AVLNode10> g_nodes;
+static int g_root = -1;
+
 /**
  * @brief 获取节点高度
- * @param node 目标节点
- * @return 节点高度，空节点返回0
+ * @param idx 节点索引
+ * @return 节点高度
  */
-static int nodeHeight(AVLNode* node)
+static int nodeHeight10(int idx)
 {
-    return node ? node->height : 0;
+    return (idx >= 0 && idx < g_nodes.size()) ? g_nodes[idx].height : 0;
 }
 
 /**
- * @brief 计算节点平衡因子
- * @param node 目标节点
- * @return 左子树高度 - 右子树高度
+ * @brief 计算平衡因子
+ * @param idx 节点索引
+ * @return 平衡因子
  */
-static int balanceFactor(AVLNode* node)
+static int balanceFactor10(int idx)
 {
-    return node ? nodeHeight(node->left) - nodeHeight(node->right) : 0;
+    if (idx < 0 || idx >= g_nodes.size()) return 0;
+    return nodeHeight10(g_nodes[idx].left) - nodeHeight10(g_nodes[idx].right);
 }
 
 /**
  * @brief 更新节点高度
- * @param node 目标节点
+ * @param idx 节点索引
  */
-static void updateHeight(AVLNode* node)
+static void updateHeight10(int idx)
 {
-    if (node) {
-        node->height = 1 + qMax(nodeHeight(node->left), nodeHeight(node->right));
+    if (idx >= 0 && idx < g_nodes.size()) {
+        g_nodes[idx].height = 1 + qMax(nodeHeight10(g_nodes[idx].left),
+                                         nodeHeight10(g_nodes[idx].right));
     }
 }
 
 /**
  * @brief 右旋转(LL情况)
- * @param y 失衡节点
- * @return 旋转后的新根节点
+ * @param y 失衡节点索引
+ * @return 旋转后的新根索引
  */
-static AVLNode* rotateRight(AVLNode* y)
+static int rotateRight10(int y)
 {
-    AVLNode* x = y->left;
-    y->left = x->right;
-    x->right = y;
-    updateHeight(y);
-    updateHeight(x);
+    int x = g_nodes[y].left;
+    g_nodes[y].left = g_nodes[x].right;
+    g_nodes[x].right = y;
+    updateHeight10(y);
+    updateHeight10(x);
     return x;
 }
 
 /**
  * @brief 左旋转(RR情况)
- * @param x 失衡节点
- * @return 旋转后的新根节点
+ * @param x 失衡节点索引
+ * @return 旋转后的新根索引
  */
-static AVLNode* rotateLeft(AVLNode* x)
+static int rotateLeft10(int x)
 {
-    AVLNode* y = x->right;
-    x->right = y->left;
-    y->left = x;
-    updateHeight(x);
-    updateHeight(y);
+    int y = g_nodes[x].right;
+    g_nodes[x].right = g_nodes[y].left;
+    g_nodes[y].left = x;
+    updateHeight10(x);
+    updateHeight10(y);
     return y;
 }
 
 /**
- * @brief 对节点进行再平衡
- * @param node 可能失衡的节点
- * @return 平衡后的节点
+ * @brief 再平衡节点
  */
-static AVLNode* rebalance(AVLNode* node)
+static int rebalance10(int idx)
 {
-    updateHeight(node);
-    const int bf = balanceFactor(node);
+    updateHeight10(idx);
+    const int bf = balanceFactor10(idx);
 
-    // LL型: 左子树过深，左子节点的左子树更深
-    if (bf > 1 && balanceFactor(node->left) >= 0) {
-        return rotateRight(node);
+    if (bf > 1 && balanceFactor10(g_nodes[idx].left) >= 0)
+        return rotateRight10(idx);
+    if (bf < -1 && balanceFactor10(g_nodes[idx].right) <= 0)
+        return rotateLeft10(idx);
+    if (bf > 1 && balanceFactor10(g_nodes[idx].left) < 0) {
+        g_nodes[idx].left = rotateLeft10(g_nodes[idx].left);
+        return rotateRight10(idx);
     }
-    // RR型: 右子树过深，右子节点的右子树更深
-    if (bf < -1 && balanceFactor(node->right) <= 0) {
-        return rotateLeft(node);
+    if (bf < -1 && balanceFactor10(g_nodes[idx].right) > 0) {
+        g_nodes[idx].right = rotateRight10(g_nodes[idx].right);
+        return rotateLeft10(idx);
     }
-    // LR型: 左子树过深，左子节点的右子树更深
-    if (bf > 1 && balanceFactor(node->left) < 0) {
-        node->left = rotateLeft(node->left);
-        return rotateRight(node);
-    }
-    // RL型: 右子树过深，右子节点的左子树更深
-    if (bf < -1 && balanceFactor(node->right) > 0) {
-        node->right = rotateRight(node->right);
-        return rotateLeft(node);
-    }
-    return node;
+    return idx;
 }
 
 /**
- * @brief 递归插入辅助函数
+ * @brief 递归插入
  */
-static AVLNode* insertNode(AVLNode* node, double key, int data)
+static int insertNode10(int idx, double key, int data)
 {
-    if (!node) return new AVLNode(key, data);
-
-    if (key < node->key) {
-        node->left = insertNode(node->left, key, data);
-    } else if (key > node->key) {
-        node->right = insertNode(node->right, key, data);
-    } else {
-        node->data = data; // 更新已有键
-        return node;
+    if (idx < 0) {
+        g_nodes.append(AVLNode10(key, data));
+        return g_nodes.size() - 1;
     }
-    return rebalance(node);
+
+    if (key < g_nodes[idx].key)
+        g_nodes[idx].left = insertNode10(g_nodes[idx].left, key, data);
+    else if (key > g_nodes[idx].key)
+        g_nodes[idx].right = insertNode10(g_nodes[idx].right, key, data);
+    else {
+        g_nodes[idx].data = data;
+        return idx;
+    }
+    return rebalance10(idx);
 }
 
 /**
@@ -152,7 +154,7 @@ void AVLTree10::insert(double key, int data)
     QElapsedTimer timer;
     timer.start();
 
-    m_root = insertNode(m_root, key, data);
+    g_root = insertNode10(g_root, key, data);
 
     m_stats.totalInserts++;
     m_timeSum += timer.elapsed();
@@ -163,31 +165,28 @@ void AVLTree10::insert(double key, int data)
 }
 
 /**
- * @brief 递归删除辅助函数
+ * @brief 递归删除
  */
-static AVLNode* removeNode(AVLNode* node, double key)
+static int removeNode10(int idx, double key)
 {
-    if (!node) return nullptr;
+    if (idx < 0) return -1;
 
-    if (key < node->key) {
-        node->left = removeNode(node->left, key);
-    } else if (key > node->key) {
-        node->right = removeNode(node->right, key);
+    if (key < g_nodes[idx].key) {
+        g_nodes[idx].left = removeNode10(g_nodes[idx].left, key);
+    } else if (key > g_nodes[idx].key) {
+        g_nodes[idx].right = removeNode10(g_nodes[idx].right, key);
     } else {
-        // 找到要删除的节点
-        if (!node->left || !node->right) {
-            AVLNode* temp = node->left ? node->left : node->right;
-            delete node;
-            return temp;
+        if (g_nodes[idx].left < 0 || g_nodes[idx].right < 0) {
+            return (g_nodes[idx].left >= 0) ? g_nodes[idx].left : g_nodes[idx].right;
         }
-        // 找到右子树最小节点替代
-        AVLNode* minNode = node->right;
-        while (minNode->left) minNode = minNode->left;
-        node->key = minNode->key;
-        node->data = minNode->data;
-        node->right = removeNode(node->right, minNode->key);
+        // 找右子树最小节点
+        int minIdx = g_nodes[idx].right;
+        while (g_nodes[minIdx].left >= 0) minIdx = g_nodes[minIdx].left;
+        g_nodes[idx].key = g_nodes[minIdx].key;
+        g_nodes[idx].data = g_nodes[minIdx].data;
+        g_nodes[idx].right = removeNode10(g_nodes[idx].right, g_nodes[minIdx].key);
     }
-    return rebalance(node);
+    return rebalance10(idx);
 }
 
 /**
@@ -199,7 +198,7 @@ void AVLTree10::remove(double key)
     QElapsedTimer timer;
     timer.start();
 
-    m_root = removeNode(m_root, key);
+    g_root = removeNode10(g_root, key);
 
     m_stats.totalRemoves++;
     m_timeSum += timer.elapsed();
@@ -214,10 +213,10 @@ void AVLTree10::remove(double key)
  */
 bool AVLTree10::contains(double key) const
 {
-    AVLNode* curr = m_root;
-    while (curr) {
-        if (key < curr->key) curr = curr->left;
-        else if (key > curr->key) curr = curr->right;
+    int curr = g_root;
+    while (curr >= 0 && curr < g_nodes.size()) {
+        if (key < g_nodes[curr].key) curr = g_nodes[curr].left;
+        else if (key > g_nodes[curr].key) curr = g_nodes[curr].right;
         else return true;
     }
     return false;
@@ -225,11 +224,11 @@ bool AVLTree10::contains(double key) const
 
 /**
  * @brief 获取树高度
- * @return 根节点的高度(空树返回0)
+ * @return 根节点的高度
  */
 int AVLTree10::height() const
 {
-    return nodeHeight(m_root);
+    return nodeHeight10(g_root);
 }
 
 /**
@@ -239,4 +238,6 @@ void AVLTree10::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;
+    g_nodes.clear();
+    g_root = -1;
 }
