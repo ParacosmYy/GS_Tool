@@ -293,7 +293,7 @@ set(SOURCES
     src/ota/protocols/zmodem/ZModemTransferDispatch.cpp
     src/utils/settings/SettingsManager.cpp
     src/utils/settings/SettingsManagerConvenience.cpp
-    # MISSING FILE REMOVED: src/utils/settings/SettingsManagerGroups.cpp
+    src/utils/settings/SettingsManagerGroups.cpp
     src/utils/export/DataExporter.cpp
     src/utils/export/DataExporterFormats.cpp
     src/utils/export/DataExporterUtils.cpp
