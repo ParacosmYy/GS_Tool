@@ -889,6 +889,16 @@ set(SOURCES
     src/utils/cic/CicFilter.cpp
     src/utils/optimize/SimulatedAnnealing.cpp
     src/utils/optimize2/GeneticOptimizer.cpp
+    src/utils/rabin2/RabinKarpMulti.cpp
+    src/utils/interp2/CubicInterpolator.cpp
+    src/utils/phase/PhaseDetector.cpp
+    src/utils/dft2/GoertzelSpectrum.cpp
+    src/utils/qr2/HouseholderQR.cpp
+    src/utils/eigen2/PowerIteration.cpp
+    src/utils/bfgs/BfgsOptimizer.cpp
+    src/utils/dct/DctTransform.cpp
+    src/utils/distance/DistanceMetric.cpp
+    src/utils/cluster2/DbScan.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -2098,6 +2108,16 @@ set(HEADERS
     src/utils/cic/CicFilter.h
     src/utils/optimize/SimulatedAnnealing.h
     src/utils/optimize2/GeneticOptimizer.h
+    src/utils/rabin2/RabinKarpMulti.h
+    src/utils/interp2/CubicInterpolator.h
+    src/utils/phase/PhaseDetector.h
+    src/utils/dft2/GoertzelSpectrum.h
+    src/utils/qr2/HouseholderQR.h
+    src/utils/eigen2/PowerIteration.h
+    src/utils/bfgs/BfgsOptimizer.h
+    src/utils/dct/DctTransform.h
+    src/utils/distance/DistanceMetric.h
+    src/utils/cluster2/DbScan.h
 )
 
 set(RESOURCES
