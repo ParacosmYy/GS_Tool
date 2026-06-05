@@ -36,6 +36,6 @@ private:
     bool m_recursive = false;
     bool m_terminated = true;
     int m_numStates = 64;
-    Stats m_stats;
-    double m_timeSum = 0.0;
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;
 };

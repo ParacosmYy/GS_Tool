@@ -178,6 +178,89 @@ double MeanShift3::gaussianKernel(double dist) const
         / (m_bandwidth * qSqrt(2.0 * M_PI));
 }
 
+/**
+ * @brief 自适应带宽估计 — 基于局部密度自动调整带宽
+ * @param point 当前点
+ * @param data 全部数据
+ * @return 自适应带宽值
+ *
+ * 使用第k近邻距离作为局部密度估计，密度高的区域用较小带宽，
+ * 密度低的区域用较大带宽，实现密度自适应的均值漂移。
+ */
+double MeanShift3::adaptiveBandwidth(const QVector<double>& point,
+                                      const QVector<QVector<double>>& data) const
+{
+    int n = data.size();
+    if (n == 0) return m_bandwidth;
+
+    /* 计算当前点到所有其他点的距离 */
+    QVector<double> distances(n);
+    for (int i = 0; i < n; ++i) {
+        double distSq = 0.0;
+        int dim = qMin(point.size(), data[i].size());
+        for (int d = 0; d < dim; ++d) {
+            double diff = point[d] - data[i][d];
+            distSq += diff * diff;
+        }
+        distances[i] = qSqrt(distSq);
+    }
+
+    /* 排序取第k近邻距离 */
+    int k = qMax(1, static_cast<int>(qSqrt(static_cast<double>(n))));
+    std::sort(distances.begin(), distances.end());
+    double knnDist = distances[qMin(k, n - 1)];
+
+    /* 自适应带宽 = 基础带宽与k近邻距离的加权平均 */
+    return qMax(m_bandwidth * 0.5, 0.5 * (m_bandwidth + knnDist));
+}
+
+/**
+ * @brief 估计点集的核密度
+ * @param point 待估计点
+ * @param data 参考数据集
+ * @return 核密度估计值
+ *
+ * 使用当前配置的核函数类型和带宽对指定位置进行核密度估计。
+ * 密度越高表示该位置附近的样本越密集。
+ */
+double MeanShift3::estimateDensity(const QVector<double>& point,
+                                    const QVector<QVector<double>>& data) const
+{
+    int n = data.size();
+    if (n == 0) return 0.0;
+
+    int dim = point.size();
+    double density = 0.0;
+    double h = m_bandwidth;
+
+    for (const auto& xi : data) {
+        double distSq = 0.0;
+        for (int d = 0; d < dim && d < xi.size(); ++d) {
+            double diff = point[d] - xi[d];
+            distSq += diff * diff;
+        }
+        double dist = qSqrt(distSq);
+
+        if (m_kernelType == 0) {
+            density += gaussianKernel(dist);
+        } else if (m_kernelType == 1) {
+            if (dist <= h) {
+                double u = dist / h;
+                density += 0.75 * (1.0 - u * u) / h;
+            }
+        } else {
+            if (dist <= h) {
+                density += 1.0 / h;
+            }
+        }
+    }
+
+    /* 归一化 */
+    double volume = qPow(h, dim);
+    density /= (static_cast<double>(n) * qMax(1e-12, volume));
+    return density;
+}
+
 /** @brief 重置统计 */
 void MeanShift3::resetStatistics()
 {

@@ -25,6 +25,8 @@ signals:
 private:
     QVector<double> shiftPoint(const QVector<double>& point, const QVector<QVector<double>>& data) const;
     double gaussianKernel(double dist) const;
+    double adaptiveBandwidth(const QVector<double>& point, const QVector<QVector<double>>& data) const;
+    double estimateDensity(const QVector<double>& point, const QVector<QVector<double>>& data) const;
     double m_bandwidth = 1.0; int m_kernelType = 0;
     int m_maxIter = 300; double m_tol = 1e-4;
     QVector<QVector<double>> m_centers; QVector<int> m_labels;

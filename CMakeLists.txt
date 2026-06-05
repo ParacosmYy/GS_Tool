@@ -1299,7 +1299,7 @@ set(SOURCES
     src/utils/gmm/GaussianMixtureModel.cpp
     src/utils/covariance/CovarianceMatrix.cpp
     src/utils/percentile/PercentileCalculator.cpp
-    src/utils/scrambler/Scrambler.cpp
+    # src/utils/scrambler/Scrambler.cpp  (duplicate of code23)
     src/utils/bloom/BloomFilter.cpp
 
     # -- F143~F157: Wave 23 工具模块 --
@@ -2323,7 +2323,7 @@ set(HEADERS
     src/utils/gmm/GaussianMixtureModel.h
     src/utils/covariance/CovarianceMatrix.h
     src/utils/percentile/PercentileCalculator.h
-    src/utils/scrambler/Scrambler.h
+    # src/utils/scrambler/Scrambler.h  (duplicate of code23)
 
     # -- F143~F157: Wave 23 工具模块 --
     src/utils/agc/AutomaticGainControl.h

@@ -6,6 +6,7 @@
 #include "utils/aes2/AesCbc.h"
 
 #include <QElapsedTimer>
+#include <QtCore/qrandom.h>
 #include <QtGlobal>
 
 #include <cstring>
@@ -342,7 +343,7 @@ QByteArray AesCbc::generateKey() const
 {
     QByteArray key(m_keySize, '\0');
     for (int i = 0; i < m_keySize; ++i) {
-        key[i] = static_cast<char>(qrand() & 0xFF);
+        key[i] = static_cast<char>(QRandomGenerator::global()->generate() & 0xFF);
     }
     return key;
 }
@@ -352,7 +353,7 @@ QByteArray AesCbc::generateIv() const
 {
     QByteArray iv(16, '\0');
     for (int i = 0; i < 16; ++i) {
-        iv[i] = static_cast<char>(qrand() & 0xFF);
+        iv[i] = static_cast<char>(QRandomGenerator::global()->generate() & 0xFF);
     }
     return iv;
 }
