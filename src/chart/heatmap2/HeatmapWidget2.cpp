@@ -21,7 +21,7 @@ HeatmapWidget::~HeatmapWidget() = default;
 void HeatmapWidget::setData(const QVector<QVector<double>> &m) { m_data = m; m_totalDataUpdates++; update(); }
 
 /** @brief 设置单元格的宽高像素值 @param w 单元格宽度(像素) @param h 单元格高度(像素) */
-void HeatmapWidget::setCellSize(int w, int h) { m_cellW = w; m_cellH = h; update(); }
+void HeatmapWidget::setCellSize(int w, int h) { m_cellW = qMax(1, w); m_cellH = qMax(1, h); update(); }
 
 /** @brief 设置颜色映射的值域范围 @param min 值域下界 @param max 值域上界 */
 void HeatmapWidget::setColorRange(double min, double max) { m_minVal = min; m_maxVal = max; update(); }

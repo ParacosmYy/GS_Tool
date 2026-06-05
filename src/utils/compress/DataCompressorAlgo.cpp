@@ -103,17 +103,17 @@ QByteArray DataCompressor::decompressHuffman(const QByteArray& data)
 
     QVector<quint32> freq(256, 0);
     for (int i = 0; i < 256; ++i) {
-        freq[i] = (static_cast<quint8>(data[i * 4]) << 24) |
-                  (static_cast<quint8>(data[i * 4 + 1]) << 16) |
-                  (static_cast<quint8>(data[i * 4 + 2]) << 8) |
-                   static_cast<quint8>(data[i * 4 + 3]);
+        freq[i] = (static_cast<quint32>(static_cast<quint8>(data[i * 4])) << 24) |
+                  (static_cast<quint32>(static_cast<quint8>(data[i * 4 + 1])) << 16) |
+                  (static_cast<quint32>(static_cast<quint8>(data[i * 4 + 2])) << 8) |
+                   static_cast<quint32>(static_cast<quint8>(data[i * 4 + 3]));
     }
 
     int offset = freqTableSize;
-    quint32 bitCount = (static_cast<quint8>(data[offset]) << 24) |
-                       (static_cast<quint8>(data[offset + 1]) << 16) |
-                       (static_cast<quint8>(data[offset + 2]) << 8) |
-                        static_cast<quint8>(data[offset + 3]);
+    quint32 bitCount = (static_cast<quint32>(static_cast<quint8>(data[offset])) << 24) |
+                       (static_cast<quint32>(static_cast<quint8>(data[offset + 1])) << 16) |
+                       (static_cast<quint32>(static_cast<quint8>(data[offset + 2])) << 8) |
+                        static_cast<quint32>(static_cast<quint8>(data[offset + 3]));
     offset += 4;
 
     HuffNode* root = buildHuffmanTree(freq);
@@ -337,9 +337,9 @@ int DataCompressor::readHeader(const QByteArray& data, Algorithm expectedAlgo) c
     if (data.size() < HEADER_SIZE) return -1;
     if (data[0] != MAGIC_0 || data[1] != MAGIC_1) return -1;
     if (static_cast<Algorithm>(static_cast<quint8>(data[2])) != expectedAlgo) return -1;
-    quint32 originalSize = (static_cast<quint8>(data[3]) << 24) |
-                           (static_cast<quint8>(data[4]) << 16) |
-                           (static_cast<quint8>(data[5]) << 8) |
-                            static_cast<quint8>(data[6]);
+    quint32 originalSize = (static_cast<quint32>(static_cast<quint8>(data[3])) << 24) |
+                           (static_cast<quint32>(static_cast<quint8>(data[4])) << 16) |
+                           (static_cast<quint32>(static_cast<quint8>(data[5])) << 8) |
+                            static_cast<quint32>(static_cast<quint8>(data[6]));
     return static_cast<int>(originalSize);
 }

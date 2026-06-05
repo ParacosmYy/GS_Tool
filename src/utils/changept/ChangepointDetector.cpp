@@ -18,7 +18,7 @@ ChangepointDetector::ChangepointDetector(QObject* parent)
 void ChangepointDetector::setMethod(Method m) { m_method = m; }
 void ChangepointDetector::setPenalty(double p) { m_penalty = p; }
 void ChangepointDetector::setMinSegmentLength(int len) { m_minSegmentLength = qMax(1, len); }
-void ChangepointDetector::setWindowSize(int s) { m_windowSize = qMax(2, s); }
+void ChangepointDetector::setWindowSize(int s) { m_windowSize = qMax(4, s); }
 void ChangepointDetector::setConfidenceThreshold(double t) { m_confidenceThreshold = qBound(0.0, t, 1.0); }
 
 QList<ChangepointDetector::Changepoint> ChangepointDetector::detect(const QVector<double>& data)

@@ -998,6 +998,28 @@ set(SOURCES
     src/utils/groebner/GroebnerBasis.cpp
     src/utils/grobner2/MultivariatePolynomial.cpp
 
+    # -- Wave 44-45: 新工具模块 --
+    src/utils/fft4/FastCorrelation.cpp
+    src/utils/dwt3/SymmetricWavelet.cpp
+    src/utils/lz77/Lz77Compressor.cpp
+    src/utils/huffman3/CanonicalHuffman.cpp
+    src/utils/segment3/IntervalTree.cpp
+    src/utils/sort4/IntroSort.cpp
+    src/utils/detrend2/LinearDetrend.cpp
+    src/utils/normalize2/MinMaxScaler.cpp
+
+    # -- Wave 46-47 --
+    src/utils/wavelet3/DaubechiesD4.cpp
+    src/utils/fft5/OverlapSaveFFT.cpp
+    src/utils/filter3/NotchFilter.cpp
+    src/utils/peakdetect2/ZeroCrossingDetector.cpp
+    src/utils/crc64b2/Crc64Ecma.cpp
+    src/utils/compress2/LzssCompressor.cpp
+    src/utils/heap3/BinaryHeap.cpp
+    src/utils/graph5/GraphColoring.cpp
+    src/utils/align/NeedlemanWunsch.cpp
+    src/utils/cluster3/KMedoids.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -2316,6 +2338,28 @@ set(HEADERS
     src/utils/resultant/PolynomialResultant.h
     src/utils/groebner/GroebnerBasis.h
     src/utils/grobner2/MultivariatePolynomial.h
+
+    # -- Wave 44-45: 新工具模块头文件 --
+    src/utils/fft4/FastCorrelation.h
+    src/utils/dwt3/SymmetricWavelet.h
+    src/utils/lz77/Lz77Compressor.h
+    src/utils/huffman3/CanonicalHuffman.h
+    src/utils/segment3/IntervalTree.h
+    src/utils/sort4/IntroSort.h
+    src/utils/detrend2/LinearDetrend.h
+    src/utils/normalize2/MinMaxScaler.h
+
+    # -- Wave 46-47 --
+    src/utils/wavelet3/DaubechiesD4.h
+    src/utils/fft5/OverlapSaveFFT.h
+    src/utils/filter3/NotchFilter.h
+    src/utils/peakdetect2/ZeroCrossingDetector.h
+    src/utils/crc64b2/Crc64Ecma.h
+    src/utils/compress2/LzssCompressor.h
+    src/utils/heap3/BinaryHeap.h
+    src/utils/graph5/GraphColoring.h
+    src/utils/align/NeedlemanWunsch.h
+    src/utils/cluster3/KMedoids.h
 )
 
 set(RESOURCES

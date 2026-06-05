@@ -119,11 +119,13 @@ QVariant FlatBuffersDecoder::readTypedValue(const QByteArray& data,
         return {};
     case FbsBasicType::String: {
         quint32 soff = readOffset(data, pos);
-        int sp = pos + soff;
+        /* 防止quint32+int溢出: 检查偏移是否合理 */
+        if (soff > static_cast<quint32>(data.size())) return {};
+        int sp = pos + static_cast<int>(soff);
         if (sp + 4 <= data.size()) {
             quint32 slen = readOffset(data, sp);
-            if (sp + 4 + static_cast<int>(slen) <= data.size())
-                return QString::fromUtf8(data.constData() + sp + 4, slen);
+            if (slen <= static_cast<quint32>(data.size() - sp - 4))
+                return QString::fromUtf8(data.constData() + sp + 4, static_cast<int>(slen));
         }
         return {};
     }

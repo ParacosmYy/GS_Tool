@@ -64,12 +64,12 @@ bool ScalableBloomFilter::contains(const QByteArray& item) const
             }
         }
         if (found) {
-            const_cast<ScalableBloomFilter*>(this)->m_stats.totalQueries++;
+            m_stats.totalQueries++;
             return true;
         }
     }
 
-    const_cast<ScalableBloomFilter*>(this)->m_stats.totalQueries++;
+    m_stats.totalQueries++;
     return false;
 }
 

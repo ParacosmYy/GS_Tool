@@ -189,7 +189,7 @@ void FrequencyCounterWidget::setWindowSize(WindowSize size)
  */
 void FrequencyCounterWidget::onWindowTick()
 {
-    const double ws = static_cast<double>(static_cast<int>(m_windowSize));
+    const double ws = qMax(1.0, static_cast<double>(static_cast<int>(m_windowSize)));
 
     // 计算数据包频率
     m_lastPacketFreq = static_cast<double>(m_windowPackets) / ws;

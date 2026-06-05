@@ -81,13 +81,13 @@ bool CuckooFilter::contains(const QByteArray& item) const
     for (auto idx : {i1, i2}) {
         for (int j = 0; j < BUCKET_SIZE; ++j) {
             if (m_buckets[idx].occupied[j] && m_buckets[idx].fps[j] == fp) {
-                const_cast<CuckooFilter*>(this)->m_stats.totalQueries++;
+                m_stats.totalQueries++;
                 return true;
             }
         }
     }
 
-    const_cast<CuckooFilter*>(this)->m_stats.totalQueries++;
+    m_stats.totalQueries++;
     return false;
 }
 

@@ -152,10 +152,11 @@ QByteArray AdaptiveHuffman::decode(const QByteArray& data, int originalSize)
     initTree();
 
     // 读取头部
-    int bitCount = (static_cast<quint8>(data[4]) << 24) |
-                   (static_cast<quint8>(data[5]) << 16) |
-                   (static_cast<quint8>(data[6]) << 8) |
-                   static_cast<quint8>(data[7]);
+    int bitCount = static_cast<int>(
+        (static_cast<quint32>(static_cast<quint8>(data[4])) << 24) |
+        (static_cast<quint32>(static_cast<quint8>(data[5])) << 16) |
+        (static_cast<quint32>(static_cast<quint8>(data[6])) << 8) |
+        static_cast<quint32>(static_cast<quint8>(data[7])));
 
     QVector<bool> bits = unpackBits(data.mid(8), bitCount);
 

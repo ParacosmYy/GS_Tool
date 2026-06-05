@@ -494,10 +494,11 @@ int PacketReassembler::readLengthField(const QByteArray& data,
         return static_cast<int>((static_cast<quint16>(ptr[0]) << 8) |
                                 static_cast<quint16>(ptr[1]));
     case 4:
-        return static_cast<int>((static_cast<quint32>(ptr[0]) << 24) |
-                                (static_cast<quint32>(ptr[1]) << 16) |
-                                (static_cast<quint32>(ptr[2]) << 8) |
-                                static_cast<quint32>(ptr[3]));
+        return static_cast<int>(static_cast<qint32>(
+            (static_cast<quint32>(ptr[0]) << 24) |
+            (static_cast<quint32>(ptr[1]) << 16) |
+            (static_cast<quint32>(ptr[2]) << 8) |
+            static_cast<quint32>(ptr[3])));
     default:
         return -1;
     }

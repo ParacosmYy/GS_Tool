@@ -62,8 +62,8 @@ private:
     quint64 m_scaleFactor;
     double m_growthRate;
     QVector<BloomLayer> m_filters;
-    Stats m_stats;
-    double m_timeSum;
+    mutable Stats m_stats;
+    mutable double m_timeSum;
 };
 
 #endif // SCALABLEBLOOMFILTER_H

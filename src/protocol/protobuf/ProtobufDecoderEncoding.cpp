@@ -49,7 +49,7 @@ QByteArray ProtobufDecoder::encodeMessage(const QVariantMap& fields) const {
                 int wireType = fieldMap.value("wireType", 0).toInt();
                 QVariant val = fieldMap.value("value");
 
-                quint64 tag = static_cast<quint64>((fieldNum << 3) | wireType);
+                quint64 tag = (static_cast<quint64>(fieldNum) << 3) | static_cast<quint64>(wireType);
                 writeVarint(buf, tag);
                 encodeSingleValue(buf, wireType, val);
             }

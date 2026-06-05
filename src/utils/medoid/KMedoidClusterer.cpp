@@ -31,7 +31,11 @@ QList<KMedoidClusterer::Cluster> KMedoidClusterer::cluster(const QVector<double>
     std::mt19937 rng(42);
     QVector<int> indices(n);
     for (int i = 0; i < n; ++i) indices[i] = i;
-    std::shuffle(indices.begin(), indices.end(), rng);
+    /* Fisher-Yates洗牌: 避免std::shuffle与QVector迭代器的兼容性问题 */
+    for (int i = n - 1; i > 0; --i) {
+        int j = static_cast<int>(rng() % static_cast<unsigned>(i + 1));
+        std::swap(indices[i], indices[j]);
+    }
 
     QVector<int> medoids;
     for (int i = 0; i < k; ++i) medoids.append(indices[i]);

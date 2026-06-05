@@ -129,13 +129,13 @@ void ResponsiveLayout::loadColumnConfig()
     QSettings settings;
     settings.beginGroup("layout/responsiveGrid");
     if (settings.contains("colsMobile"))
-        m_columns[Mobile] = settings.value("colsMobile", 1).toInt();
+        m_columns[Mobile] = qMax(1, settings.value("colsMobile", 1).toInt());
     if (settings.contains("colsTablet"))
-        m_columns[Tablet] = settings.value("colsTablet", 2).toInt();
+        m_columns[Tablet] = qMax(1, settings.value("colsTablet", 2).toInt());
     if (settings.contains("colsDesktop"))
-        m_columns[Desktop] = settings.value("colsDesktop", 3).toInt();
+        m_columns[Desktop] = qMax(1, settings.value("colsDesktop", 3).toInt());
     if (settings.contains("colsWide"))
-        m_columns[Wide] = settings.value("colsWide", 4).toInt();
+        m_columns[Wide] = qMax(1, settings.value("colsWide", 4).toInt());
     settings.endGroup();
 }
 
@@ -160,7 +160,7 @@ void ResponsiveLayout::setGeometry(const QRect &rect)
         m_lastBp = bp;
     }
 
-    int cols = m_columns.value(bp, 1);
+    int cols = qMax(1, m_columns.value(bp, 1));
     int spacing = this->spacing();
     QRect area = rect.adjusted(contentsMargins().left(), contentsMargins().top(),
                                -contentsMargins().right(), -contentsMargins().bottom());

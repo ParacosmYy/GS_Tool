@@ -71,8 +71,8 @@ private:
     int m_numBuckets;
     int m_size;
     QVector<Bucket> m_buckets;
-    Stats m_stats;
-    double m_timeSum;
+    mutable Stats m_stats;
+    mutable double m_timeSum;
 };
 
 #endif // CUCKOOFILTER_H

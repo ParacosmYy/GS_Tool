@@ -12,12 +12,17 @@ CrossValidator::ValidationResult CrossValidator::validate(
     QElapsedTimer timer; timer.start();
     int n = data.size();
     ValidationResult result;
-    if (n == 0 || k <= 0) return result;
+    if (n == 0 || k <= 0 || k > n) return result;
 
     /* 随机打乱索引 */
     QVector<int> indices(n);
     for (int i = 0; i < n; ++i) indices[i] = i;
-    std::random_device rd; std::mt19937 g(rd()); std::shuffle(indices.begin(), indices.end(), g);
+    std::random_device rd; std::mt19937 g(rd());
+    /* Fisher-Yates洗牌: 避免std::shuffle与QVector迭代器的兼容性问题 */
+    for (int i = n - 1; i > 0; --i) {
+        int j = static_cast<int>(g() % static_cast<unsigned>(i + 1));
+        std::swap(indices[i], indices[j]);
+    }
 
     result.foldScores.resize(k);
     double sum = 0.0;

@@ -43,7 +43,7 @@ quint64 CountMinSketch::estimate(const QByteArray& item) const
         minVal = qMin(minVal, m_table[d][idx]);
     }
 
-    const_cast<CountMinSketch*>(this)->m_stats.totalQueries++;
+    m_stats.totalQueries++;
     return minVal;
 }
 

@@ -30,7 +30,7 @@ int TerminalWidget::paintLine(QPainter& painter, const CachedLine& cached, int y
     }
 
     // 选择背景色
-    if (m_selectionManager->hasSelection()) {
+    if (m_selectionManager && m_selectionManager->hasSelection()) {
         int selStart = m_selectionManager->normalizedStartLine();
         int selEnd = m_selectionManager->normalizedEndLine();
         if (displayLine >= selStart && displayLine <= selEnd)

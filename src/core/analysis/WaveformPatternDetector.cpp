@@ -255,7 +255,7 @@ void WaveformPatternDetector::detectDropouts()
 
             /* 置信度: 跌落越深置信度越高 */
             double dropRatio = 1.0 - (minVal / absMean);
-            double confidence = qBound(0.0, dropRatio / m_config.dropoutThreshold * 0.5, 1.0);
+            double confidence = qBound(0.0, dropRatio / qMax(m_config.dropoutThreshold, 1e-9) * 0.5, 1.0);
 
             DetectedPattern pattern;
             pattern.type = PatternType::Dropout;

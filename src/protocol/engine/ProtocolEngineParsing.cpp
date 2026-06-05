@@ -93,7 +93,7 @@ int ProtocolEngine::readLengthField(const QByteArray &buffer,
 
     quint32 value = 0;
     for (int i = 0; i < size; ++i) {
-        value |= (static_cast<quint8>(buffer.at(offset + i)) << (8 * i));
+        value |= (static_cast<quint32>(static_cast<quint8>(buffer.at(offset + i))) << (8 * i));
     }
     return static_cast<int>(value);
 }

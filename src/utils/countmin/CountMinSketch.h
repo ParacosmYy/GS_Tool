@@ -54,8 +54,8 @@ private:
     int m_depth;
     int m_width;
     QVector<QVector<quint64>> m_table;
-    Stats m_stats;
-    double m_timeSum;
+    mutable Stats m_stats;
+    mutable double m_timeSum;
 };
 
 #endif // COUNTMINSKETCH_H

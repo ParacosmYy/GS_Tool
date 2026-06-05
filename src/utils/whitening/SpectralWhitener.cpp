@@ -43,7 +43,7 @@ QVector<double> SpectralWhitener::whiten(const QVector<double>& input, double st
     /* 计算平均幅度 */
     double avgMag = 0.0;
     for (int i = 1; i < fftN / 2; ++i) avgMag += mag[i];
-    avgMag /= (fftN / 2 - 1);
+    avgMag /= qMax(fftN / 2 - 1, 1);
 
     /* 白化: 缩放频谱使幅度趋向平均值 */
     for (int i = 0; i < fftN / 2; ++i) {

@@ -94,10 +94,11 @@ QByteArray MuLawEncoder::decode(const QByteArray& compandedData)
     }
 
     // 读取头部
-    const int sampleCount = (static_cast<quint8>(compandedData[0]) << 24) |
-                            (static_cast<quint8>(compandedData[1]) << 16) |
-                            (static_cast<quint8>(compandedData[2]) << 8) |
-                             static_cast<quint8>(compandedData[3]);
+    const int sampleCount = static_cast<int>(
+        (static_cast<quint32>(static_cast<quint8>(compandedData[0])) << 24) |
+        (static_cast<quint32>(static_cast<quint8>(compandedData[1])) << 16) |
+        (static_cast<quint32>(static_cast<quint8>(compandedData[2])) << 8) |
+        static_cast<quint32>(static_cast<quint8>(compandedData[3])));
 
     QByteArray result;
     result.reserve(sampleCount * 2);

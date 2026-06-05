@@ -96,9 +96,9 @@ quint32 MinHashSignature::murmurHash(const QByteArray& data,
     for (; i + 4 <= len; i += 4) {
         quint32 k = static_cast<quint32>(
             static_cast<quint8>(ptr[i]) |
-            (static_cast<quint8>(ptr[i + 1]) << 8) |
-            (static_cast<quint8>(ptr[i + 2]) << 16) |
-            (static_cast<quint8>(ptr[i + 3]) << 24));
+            (static_cast<quint32>(static_cast<quint8>(ptr[i + 1])) << 8) |
+            (static_cast<quint32>(static_cast<quint8>(ptr[i + 2])) << 16) |
+            (static_cast<quint32>(static_cast<quint8>(ptr[i + 3])) << 24));
         k *= 0xcc9e2d51;
         k = (k << 15) | (k >> 17);
         k *= 0x1b873593;

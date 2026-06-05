@@ -195,10 +195,11 @@ QByteArray DeltaEncoder::decode(const QByteArray& data)
     }
 
     // 读取头部
-    int originalSize = (static_cast<quint8>(data[0]) << 24) |
-                       (static_cast<quint8>(data[1]) << 16) |
-                       (static_cast<quint8>(data[2]) << 8) |
-                       static_cast<quint8>(data[3]);
+    int originalSize = static_cast<int>(
+        (static_cast<quint32>(static_cast<quint8>(data[0])) << 24) |
+        (static_cast<quint32>(static_cast<quint8>(data[1])) << 16) |
+        (static_cast<quint32>(static_cast<quint8>(data[2])) << 8) |
+        static_cast<quint32>(static_cast<quint8>(data[3])));
     auto modeUsed = static_cast<Mode>(static_cast<quint8>(data[4]));
 
     QByteArray result;

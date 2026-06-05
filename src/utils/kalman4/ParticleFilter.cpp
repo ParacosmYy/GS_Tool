@@ -1,6 +1,6 @@
 /**
  * @file ParticleFilter.cpp
- * @brief 粒子滤波器实现 — 非线性非高斯状态估计
+ * @brief 粒子滤波器实现 — 序贯蒙特卡洛非线性状态估计
  */
 
 #include "utils/kalman4/ParticleFilter.h"
@@ -14,6 +14,7 @@
 ParticleFilter::ParticleFilter(QObject* parent)
     : QObject(parent)
     , m_stateDim(1)
+    , m_obsDim(1)
     , m_processNoise(0.1)
     , m_timeSum(0.0)
 {
@@ -21,18 +22,20 @@ ParticleFilter::ParticleFilter(QObject* parent)
 
 /** @brief 初始化粒子滤波器
  *  @param stateDim 状态维度
- *  @param numParticles 粒子数量 */
-void ParticleFilter::initialize(int stateDim, int numParticles)
+ *  @param obsDim 观测维度 */
+void ParticleFilter::initialize(int stateDim, int obsDim)
 {
     m_stateDim = qMax(1, stateDim);
-    int nPart = qMax(10, numParticles);
-    m_particles.resize(nPart);
+    m_obsDim = qMax(1, obsDim);
+
+    const int numParticles = 100;
+    m_particles.resize(numParticles);
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::normal_distribution<double> dist(0.0, 1.0);
 
-    double uniformWeight = 1.0 / static_cast<double>(nPart);
+    double uniformWeight = 1.0 / static_cast<double>(numParticles);
     for (auto& p : m_particles) {
         p.state.resize(m_stateDim);
         for (int d = 0; d < m_stateDim; ++d) {
@@ -42,9 +45,8 @@ void ParticleFilter::initialize(int stateDim, int numParticles)
     }
 }
 
-/** @brief 预测步骤
- *  @param stateFunc 状态转移函数 */
-void ParticleFilter::predict(const StateFunc& stateFunc)
+/** @brief 预测步骤(状态转移) */
+void ParticleFilter::predict()
 {
     QElapsedTimer timer;
     timer.start();
@@ -54,7 +56,9 @@ void ParticleFilter::predict(const StateFunc& stateFunc)
     std::normal_distribution<double> noise(0.0, m_processNoise);
 
     for (auto& p : m_particles) {
-        p.state = stateFunc(p.state);
+        if (m_stateFunc) {
+            p.state = m_stateFunc(p.state);
+        }
         for (int d = 0; d < m_stateDim; ++d) {
             p.state[d] += noise(gen);
         }
@@ -69,17 +73,23 @@ void ParticleFilter::predict(const StateFunc& stateFunc)
     emit predictionCompleted(m_particles.size());
 }
 
-/** @brief 更新步骤
- *  @param obsFunc 观测似然函数
+/** @brief 更新步骤(观测修正)
  *  @param measurement 观测值 */
-void ParticleFilter::update(const ObsFunc& obsFunc, double measurement)
+void ParticleFilter::update(double measurement)
 {
     QElapsedTimer timer;
     timer.start();
 
-    /* 更新权重 */
+    /* 更新权重: 使用观测似然函数 */
     for (auto& p : m_particles) {
-        double likelihood = obsFunc(p.state, measurement);
+        double likelihood = 1.0;
+        if (m_obsFunc) {
+            likelihood = m_obsFunc(p.state, measurement);
+        } else {
+            /* 默认: 基于第一个状态分量与观测值的高斯似然 */
+            double diff = (p.state.isEmpty() ? 0.0 : p.state[0]) - measurement;
+            likelihood = qExp(-0.5 * diff * diff / (m_processNoise * m_processNoise));
+        }
         p.weight *= qMax(1e-300, likelihood);
     }
 
@@ -100,8 +110,8 @@ void ParticleFilter::update(const ObsFunc& obsFunc, double measurement)
     emit updateCompleted(ess);
 }
 
-/** @brief 获取加权平均状态估计 @return 状态向量 */
-QVector<double> ParticleFilter::estimate() const
+/** @brief 获取当前加权平均状态 @return 状态向量 */
+QVector<double> ParticleFilter::state() const
 {
     QVector<double> est(m_stateDim, 0.0);
     for (const auto& p : m_particles) {
@@ -110,6 +120,18 @@ QVector<double> ParticleFilter::estimate() const
         }
     }
     return est;
+}
+
+/** @brief 设置状态转移函数 @param func 转移函数 */
+void ParticleFilter::setStateFunc(const StateFunc& func)
+{
+    m_stateFunc = func;
+}
+
+/** @brief 设置观测似然函数 @param func 似然函数 */
+void ParticleFilter::setObsFunc(const ObsFunc& func)
+{
+    m_obsFunc = func;
 }
 
 /** @brief 设置过程噪声标准差 @param sigma 噪声标准差 */
@@ -135,7 +157,7 @@ void ParticleFilter::resetStatistics()
     m_timeSum = 0.0;
 }
 
-/** @brief 系统重采样(低方差) */
+/** @brief 系统重采样(低方差法) */
 void ParticleFilter::resample()
 {
     int n = m_particles.size();

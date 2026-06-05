@@ -191,7 +191,7 @@ QMap<int, double> BayesClassifier::predictProba(const QVector<double>& feature)
         sumExp += it.value();
     }
     for (auto it = logProbs.begin(); it != logProbs.end(); ++it)
-        it.value() /= sumExp;
+        it.value() /= qMax(sumExp, 1e-15);
 
     return logProbs;
 }

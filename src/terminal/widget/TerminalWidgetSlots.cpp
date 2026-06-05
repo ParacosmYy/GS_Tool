@@ -48,7 +48,7 @@ void TerminalWidget::onDataCleared()
 /** @brief 计算并更新可见行范围(首行索引+可见行数+缓存构建) */
 void TerminalWidget::updateVisibleRange()
 {
-    m_visibleLines = height() / m_lineHeight;
+    m_visibleLines = height() / qMax(1, m_lineHeight);
     if (m_model) {
         m_maxScrollOffset = m_directionFilter->isFiltered()
             ? qMax(0, m_directionFilter->filteredLineCount() - m_visibleLines)
