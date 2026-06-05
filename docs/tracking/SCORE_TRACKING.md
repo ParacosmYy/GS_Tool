@@ -31,6 +31,7 @@
 | 267-293 | 统计增强+接口实现+EdDialog/TriggerEngine/ChecksumCalculator/PluginLoader/I2C修复 | 293 |
 | 294-306 | MiniChartWidget/NavIndicator/ToastWidget/USB libusb/头文件精简/Terminal-Utils增强 | 306 |
 | 307-343 | ConnectionHealthMonitor/DataLogViewer/DataInspector/SignalGenerator/DataCompare/DataComparator/DataPatternDetector/DataStreamRecorder/PacketTemplateLib/WaveformPreview/FrequencyCounter/DataAnnotation/ConnectionProfileManager/LedMatrixSimulator/ProtocolFieldEditor/ScriptableProtocolEngine/SerialTimingAnalyzer/WaveformGenerator/DataChecksumVerifier/CircularBufferWidget/ByteFrequencyAnalyzer/SerialProtocolFuzzer/PacketLossDetector/SerialPortProfiler/ScopeChannelManager/ScrollChartWidget/DataStreamFilter/ProtocolSimulator/DataHistoryBuffer/MemoryHexEditor/ProtocolTimerWidget/DataMaskEditor/ConfigProfileManager+多模块编译修复 | 343 |
+| 344-371 | Wave 7-10工具模块批量实现(WindowedAggregator/DataCaptureBuffer/CrcStreamVerifier/DataReducer/DataScalerWidget/DataSynchronizer/DataThresholdMonitor/DataComparator/DataLossDetector/FrequencyCounter2/DataStreamFuzzer/ProtocolTemplateLib/ProtocolMonitor/DataRateLimiter/ByteStreamParser拆分/SerialSimulator拆分/DataCache/DataValidator/PacketAssembler)+Wave 11(DataCompressor压缩引擎/PacketAssembler组装器拆分/ProtocolDuplicator流量复制器拆分/SerialHealthMonitor串口健康监控/DataFlowMeter数据流量计) | 371 |
 
 ---
 
