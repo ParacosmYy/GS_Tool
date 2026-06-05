@@ -21,12 +21,13 @@ void DataAggregator::computeAggregate(const QString &source) {
     auto it = m_sources.find(source);
     if (it == m_sources.end() || it->values.isEmpty()) return;
     const auto &vals = it->values;
+    const int count = vals.size(); ///< 缓存size()避免重复调用
     switch (it->func) {
     case Sum:     { double s=0; for (auto v:vals) s+=v; it->result=s; break; }
-    case Average: { double s=0; for (auto v:vals) s+=v; it->result=vals.isEmpty()?0.0:s/vals.size(); break; }
+    case Average: { double s=0; for (auto v:vals) s+=v; it->result=s/static_cast<double>(count); break; }
     case Min:     { double m=vals[0]; for (auto v:vals) if (v<m) m=v; it->result=m; break; }
     case Max:     { double m=vals[0]; for (auto v:vals) if (v>m) m=v; it->result=m; break; }
-    case Count:   it->result=vals.size(); break;
+    case Count:   it->result=count; break;
     case First:   it->result=vals.first(); break;
     case Last:    it->result=vals.last(); break;
     }

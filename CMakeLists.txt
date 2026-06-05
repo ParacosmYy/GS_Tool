@@ -765,13 +765,26 @@ set(SOURCES
     src/utils/hex_diff/HexDiffEngine.cpp
     src/utils/hex_diff/HexDiffEngineDiff.cpp
     src/utils/hex_diff/HexDiffEnginePatch.cpp
-)
 
     # -- F43: 高级数据日志 --
     src/utils/logger2/SerialDataLogger.cpp
     src/utils/logger2/SerialDataLoggerRotation.cpp
     src/utils/logger2/SerialDataLoggerStats.cpp
     src/utils/logger2/SerialDataLoggerExport.cpp
+
+    # -- F45: 数据包可视化 --
+    src/protocol/visual/PacketVisualizer.cpp
+    src/protocol/visual/PacketVisualizerPaint.cpp
+    src/protocol/visual/PacketVisualizerStats.cpp
+
+    # -- F49: 协议会话管理 --
+    src/protocol/session/ProtocolSession.cpp
+    src/protocol/session/ProtocolSessionStats.cpp
+
+    # -- F50: 串口脚本引擎 --
+    src/serial/script/SerialScriptEngine.cpp
+    src/serial/script/SerialScriptEngineStats.cpp
+)
 
 set(HEADERS
     # 接口层 - 零出站依赖的纯虚接口
@@ -1170,6 +1183,15 @@ set(HEADERS
 
     # -- F43: 高级数据日志 --
     src/utils/logger2/SerialDataLogger.h
+
+    # -- F45: 数据包可视化 --
+    src/protocol/visual/PacketVisualizer.h
+
+    # -- F49: 协议会话管理 --
+    src/protocol/session/ProtocolSession.h
+
+    # -- F50: 串口脚本引擎 --
+    src/serial/script/SerialScriptEngine.h
 )
 
 set(RESOURCES

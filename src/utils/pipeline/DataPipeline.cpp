@@ -14,11 +14,15 @@ DataPipeline::DataPipeline(QObject *parent) : QObject(parent) {}
 /** @brief 析构函数 */
 DataPipeline::~DataPipeline() = default;
 
-/** @brief 在管道末尾添加一个处理阶段(默认启用) @param name 阶段名称 @param fn 处理函数 */
-void DataPipeline::addStage(const QString &name, StageFunc fn) { ++m_totalStageAdds; m_stages.append({name, fn, true}); }
+/** @brief 在管道末尾添加一个处理阶段(默认启用，空函数跳过) @param name 阶段名称 @param fn 处理函数 */
+void DataPipeline::addStage(const QString &name, StageFunc fn) {
+    if (!fn) return; ///< 空函数防护
+    ++m_totalStageAdds; m_stages.append({name, fn, true});
+}
 
-/** @brief 在指定位置插入一个处理阶段(默认启用) @param idx 插入位置索引 @param name 阶段名称 @param fn 处理函数 */
+/** @brief 在指定位置插入一个处理阶段(默认启用，空函数跳过) @param idx 插入位置索引 @param name 阶段名称 @param fn 处理函数 */
 void DataPipeline::insertStage(int idx, const QString &name, StageFunc fn) {
+    if (!fn) return; ///< 空函数防护
     if (idx >= 0 && idx <= m_stages.size()) { ++m_totalStageAdds; m_stages.insert(idx, {name, fn, true}); }
 }
 
@@ -47,9 +51,16 @@ QByteArray DataPipeline::process(const QByteArray &input) {
     QByteArray data = input;
     for (const auto &stage : m_stages) {
         if (!stage.enabled) continue;
+        if (!stage.fn) { ///< 空函数防护: 跳过无效的阶段处理函数
+            ++m_totalStageErrors;
+            emit stageError(stage.name, tr("处理函数为空"));
+            continue;
+        }
         int inSize = data.size();
         try {
             data = stage.fn(data);
+            // 阶段函数返回null QByteArray时转为空数组，避免后续阶段处理异常
+            if (data.isNull()) { data = QByteArray(); }
             emit stageProcessed(stage.name, inSize, data.size());
         } catch (...) {
             ++m_totalStageErrors;

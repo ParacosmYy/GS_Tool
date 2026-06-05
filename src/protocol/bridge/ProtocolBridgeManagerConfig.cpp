@@ -28,7 +28,7 @@ void ProtocolBridgeManager::setProtocolMode(ChartProtocolMode mode)
     // 重置旧源状态
     if (m_activeBridge) {
         m_activeBridge->reset();
-    } else if (m_mode == ChartProtocolMode::FrameParser) {
+    } else if (m_mode == ChartProtocolMode::FrameParser && m_frameParser) {
         m_frameParser->reset();
     }
 

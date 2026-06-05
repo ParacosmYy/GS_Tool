@@ -17,12 +17,13 @@
 
 /** @brief 设置ModbusMaster实例(绑定响应/超时/异常信号) @param master Modbus主站指针 */
 void ModbusScanWidget::setModbusMaster(ModbusMaster* master) {
-    /* 使用static_cast消除信号名重载歧义(QObject::timeout/error) */
+    /* 使用static_cast消除信号名重载歧义 */
+    using ResponseSig = void (ModbusMaster::*)(const ModbusFrame&);
     using TimeoutSig  = void (ModbusMaster::*)(int, int);
     using ErrorSig    = void (ModbusMaster::*)(ModbusError);
 
     if (m_master) {
-        disconnect(m_master, &ModbusMaster::responseReceived,
+        disconnect(m_master, static_cast<ResponseSig>(&ModbusMaster::responseReceived),
                    this, &ModbusScanWidget::onResponseReceived);
         disconnect(m_master, static_cast<TimeoutSig>(&ModbusMaster::timeout),
                    this, &ModbusScanWidget::onScanTimeout);
@@ -31,7 +32,7 @@ void ModbusScanWidget::setModbusMaster(ModbusMaster* master) {
     }
     m_master = master;
     if (m_master) {
-        connect(m_master, &ModbusMaster::responseReceived,
+        connect(m_master, static_cast<ResponseSig>(&ModbusMaster::responseReceived),
                 this, &ModbusScanWidget::onResponseReceived);
         connect(m_master, static_cast<TimeoutSig>(&ModbusMaster::timeout),
                 this, &ModbusScanWidget::onScanTimeout);

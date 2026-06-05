@@ -30,10 +30,10 @@ DataAggregator::~DataAggregator()
 
 // ---- 滑动窗口聚合(原有接口) ----
 
-/** @brief 添加数据源并指定聚合函数和窗口大小 @param name 数据源名称 @param func 聚合函数类型 @param window 滑动窗口大小 */
+/** @brief 添加数据源并指定聚合函数和窗口大小(窗口大小最小值1) @param name 数据源名称 @param func 聚合函数类型 @param window 滑动窗口大小，最小值1 */
 void DataAggregator::addSource(const QString &name, AggregateFunc func, int window) {
     ++m_totalSourceAdds;
-    m_sources[name] = {func, window, {}, 0.0};
+    m_sources[name] = {func, qMax(1, window), {}, 0.0};
     emit sourceAdded(name);
 }
 
@@ -85,10 +85,16 @@ QMap<QString, double> DataAggregator::allResults() const {
 /** @brief 获取所有数据源名称列表 @return 数据源名称列表 */
 QStringList DataAggregator::sources() const { return m_sources.keys(); }
 
-/** @brief 设置指定数据源的滑动窗口大小 @param src 数据源名称 @param sz 新窗口大小 */
+/** @brief 设置指定数据源的滑动窗口大小(缩小时自动裁剪缓冲区) @param src 数据源名称 @param sz 新窗口大小，最小值1 */
 void DataAggregator::setWindowSize(const QString &src, int sz) {
     auto it = m_sources.find(src);
-    if (it != m_sources.end()) it->windowSize = sz;
+    if (it != m_sources.end()) {
+        it->windowSize = qMax(1, sz);
+        // 缩小窗口时裁剪缓冲区中多余的旧值
+        while (it->values.size() > it->windowSize) {
+            it->values.removeFirst();
+        }
+    }
 }
 
 /** @brief 设置指定数据源的聚合函数 @param src 数据源名称 @param fn 聚合函数类型 */
