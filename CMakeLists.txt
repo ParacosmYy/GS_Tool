@@ -840,6 +840,22 @@ set(SOURCES
     src/utils/voronoi/VoronoiDiagram.cpp
     src/utils/wavelet2/HaarWavelet2D.cpp
 
+    # -- F226~F231: Wave 39 DSP工具模块 --
+    src/utils/bessel/BesselFilter.cpp
+    src/utils/butterworth/ButterworthFilter.cpp
+    src/utils/chebyshev/ChebyshevFilter.cpp
+    src/utils/goertzel/GoertzelAlgorithm.cpp
+    src/utils/welch/WelchSpectrum.cpp
+    src/utils/yulewalker/YuleWalker.cpp
+
+    # -- Wave 38 --
+    src/utils/catboost/CatBoostEstimator.cpp
+    src/utils/lru3/ArcCache.cpp
+    src/utils/quantile/QuantileSketch.cpp
+    src/utils/rle4/LempelZivWelch.cpp
+    src/utils/fft3/RealFFT.cpp
+    src/utils/sort3/TimSort.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -1992,6 +2008,14 @@ set(HEADERS
     src/utils/voronoi/VoronoiDiagram.h
     src/utils/wavelet2/HaarWavelet2D.h
 
+    # -- F226~F231: Wave 39 DSP工具模块 --
+    src/utils/bessel/BesselFilter.h
+    src/utils/butterworth/ButterworthFilter.h
+    src/utils/chebyshev/ChebyshevFilter.h
+    src/utils/goertzel/GoertzelAlgorithm.h
+    src/utils/welch/WelchSpectrum.h
+    src/utils/yulewalker/YuleWalker.h
+
     # -- F226~F232: Wave 33 工具模块(续) --
     src/utils/autocorr/AutoCorrelator.h
     src/utils/crosscorr/CrossCorrelator.h
@@ -2000,6 +2024,14 @@ set(HEADERS
     src/utils/wavreader/WavReader.h
     src/utils/hilbert/HilbertTransform.h
     src/utils/lomb2/LombScargle.h
+
+    # -- Wave 38 --
+    src/utils/catboost/CatBoostEstimator.h
+    src/utils/lru3/ArcCache.h
+    src/utils/quantile/QuantileSketch.h
+    src/utils/rle4/LempelZivWelch.h
+    src/utils/fft3/RealFFT.h
+    src/utils/sort3/TimSort.h
 )
 
 set(RESOURCES
