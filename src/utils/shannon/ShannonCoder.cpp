@@ -11,9 +11,11 @@
 #include <QtMath>
 #include <algorithm>
 
+/** @brief 构造函数 @param parent 父对象 */
 ShannonCoder::ShannonCoder(QObject* parent)
     : QObject(parent), m_timeSum(0.0) {}
 
+/** @brief 编码 @param data 输入数据 @return 编码结果 */
 QByteArray ShannonCoder::encode(const QByteArray& data)
 {
     QElapsedTimer timer;
@@ -62,7 +64,6 @@ QByteArray ShannonCoder::encode(const QByteArray& data)
     hs << static_cast<quint32>(data.size());
     hs << static_cast<quint32>(bitStream.size());
 
-    /* 频率表序列化 */
     quint16 symbolCount = 0;
     for (int i = 0; i < 256; ++i) {
         if (freq[i] > 0) ++symbolCount;
@@ -98,6 +99,7 @@ QByteArray ShannonCoder::encode(const QByteArray& data)
     return result;
 }
 
+/** @brief 解码 @param data 编码数据 @return 原始数据 */
 QByteArray ShannonCoder::decode(const QByteArray& data)
 {
     QElapsedTimer timer;
@@ -114,7 +116,6 @@ QByteArray ShannonCoder::decode(const QByteArray& data)
     quint16 symbolCount = 0;
     hs >> originalSize >> totalBits >> symbolCount;
 
-    /* 反序列化频率表 */
     QVector<quint32> freq(256, 0);
     for (quint16 i = 0; i < symbolCount; ++i) {
         quint8 sym = 0;
@@ -123,18 +124,15 @@ QByteArray ShannonCoder::decode(const QByteArray& data)
         freq[sym] = f;
     }
 
-    /* 重建编码表 */
     int headerSize = 8 + static_cast<int>(symbolCount) * 5 + 2;
     buildCodeTable(freq, originalSize);
 
-    /* 反转编码表: code -> symbol */
     QMap<QByteArray, int> decodeMap;
     for (auto it = m_codeTable.constBegin();
          it != m_codeTable.constEnd(); ++it) {
         decodeMap[it.value()] = it.key();
     }
 
-    /* 解码位流 */
     QByteArray packed = data.mid(headerSize);
     QByteArray bitStream;
     bitStream.reserve(totalBits);
@@ -165,6 +163,7 @@ QByteArray ShannonCoder::decode(const QByteArray& data)
     return result;
 }
 
+/** @brief 计算Shannon熵 @param data 数据 @return 熵 */
 double ShannonCoder::entropy(const QByteArray& data) const
 {
     if (data.isEmpty()) return 0.0;
@@ -179,14 +178,15 @@ double ShannonCoder::entropy(const QByteArray& data) const
     return H;
 }
 
+/** @brief 获取符号表 @return 符号信息 */
 QVector<ShannonCoder::SymbolInfo> ShannonCoder::symbolTable() const
 {
     return m_symbolTable;
 }
 
+/** @brief 构建编码表 @param freq 频率 @param total 总数 */
 void ShannonCoder::buildCodeTable(const QVector<quint32>& freq, int total)
 {
-    /* 收集非零频率符号并按频率降序排序 */
     struct SymbolFreq { int symbol; quint32 freq; };
     QVector<SymbolFreq> symbols;
     for (int i = 0; i < 256; ++i) {
@@ -199,11 +199,9 @@ void ShannonCoder::buildCodeTable(const QVector<quint32>& freq, int total)
 
     if (symbols.isEmpty()) return;
 
-    /* 递归Shannon-Fano编码 */
     m_codeTable.clear();
     m_symbolTable.clear();
 
-    /* Lambda: 对符号范围[left, right)分配编码 */
     std::function<void(int, int, QByteArray)> assign =
         [&](int left, int right, QByteArray code) {
             if (left + 1 == right) {
@@ -217,7 +215,6 @@ void ShannonCoder::buildCodeTable(const QVector<quint32>& freq, int total)
                 return;
             }
 
-            /* 找分割点: 左右总频率尽量平衡 */
             quint64 leftSum = 0, totalSum = 0;
             for (int i = left; i < right; ++i) totalSum += symbols[i].freq;
 
@@ -238,6 +235,7 @@ void ShannonCoder::buildCodeTable(const QVector<quint32>& freq, int total)
     assign(0, symbols.size(), QByteArray());
 }
 
+/** @brief 构建频率表 @param data 数据 @return 频率表 */
 QVector<quint32> ShannonCoder::buildFreqTable(const QByteArray& data) const
 {
     QVector<quint32> freq(256, 0);
@@ -247,6 +245,7 @@ QVector<quint32> ShannonCoder::buildFreqTable(const QByteArray& data) const
     return freq;
 }
 
+/** @brief 重置统计 */
 void ShannonCoder::resetStatistics()
 {
     m_stats = Stats{};
