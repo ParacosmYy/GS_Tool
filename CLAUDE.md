@@ -30,6 +30,7 @@
 4. **零编译错误才能commit** — 编译不过必须先修
 5. **每次commit后必须验证 EmbedDebug.bat 能正常启动**
 5.5. **禁止提交构建系统(CMakeLists.txt)中不存在的源文件** — 所有 .h/.cpp 必须先在 CMakeLists.txt 注册才能提交。禁止"查无产生"死代码刷分
+5.6. **禁止提交build产物** — 严禁将编译中间文件(.o/.obj)、生成文件(moc_*/ui_*/qrc_*)、构建目录(build/)、二进制产物(.exe/.dll/.a/.so)等作为commit内容提交。仅允许提交源码(.h/.cpp/.qss/.qrc/.ui/.cmake/CMakeLists.txt等)和项目配置文件。build产物充数一律回退
 
 ### 架构铁律
 6. **分层单向依赖**: 表现层→业务层→数据层→基础设施层，**禁止反向**

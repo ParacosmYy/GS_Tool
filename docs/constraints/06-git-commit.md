@@ -64,7 +64,8 @@
 - 禁止不经架构审查直接加新类
 - 禁止把明显不完整的改动硬拆成多个无说明的 commit
 - 禁止提交后 `EmbedDebug.bat` 无法启动
-- **禁止提交构建系统(CMakeLists.txt)中不存在的源文件** — 所有 .h/.cpp 文件必须在 CMakeLists.txt 中注册后才能提交。禁止创建"查无产生"的死代码文件来刷分。违反此条的 commit 一经发现全部回退。
+- **禁止提交构建系统(CMakeLists.txt)中不存在的源文件** — 所有 .h/.cpp 文件必须在 CMakeLists.txt 中注册后才能提交。禁止创建"查无产生"的死代码文件来刷分。违反此条的 commit 一经发现全部回退
+- **禁止提交build产物作为代码** — 严禁将编译中间文件(.o/.obj)、Qt生成文件(moc_*/ui_*/qrc_*)、构建目录(build/)、二进制产物(.exe/.dll/.a/.so)、CMake缓存(CMakeCache.txt/CMakeFiles/)等作为新特性代码commit。允许提交的文件类型: .h/.cpp/.qss/.qrc/.ui/.cmake/CMakeLists.txt/.md/.json/.py/.bat/.sh 等源码和配置文件。build产物充数一律回退
 
 ---
 
