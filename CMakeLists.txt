@@ -973,6 +973,15 @@ set(SOURCES
     src/utils/ttest/TTestCalculator.cpp
     src/utils/moment/StatisticalMoments.cpp
     src/utils/ks/KsTestCalculator.cpp
+
+    # -- F158~F171: Wave 24 工具模块 --
+    src/utils/bootstrap/BootstrapResampler.cpp
+    src/utils/chisq/ChiSquareTest.cpp
+    src/utils/anova/AnovaTest.cpp
+    src/utils/lrc/LrcChecksum.cpp
+    src/utils/fcs/FcsChecker.cpp
+    src/utils/snr/SnrEstimator.cpp
+    src/utils/jaro/JaroWinkler.cpp
 )
 
 set(HEADERS
@@ -1655,6 +1664,19 @@ set(HEADERS
     src/utils/ttest/TTestCalculator.h
     src/utils/moment/StatisticalMoments.h
     src/utils/ks/KsTestCalculator.h
+
+    # -- F158~F171: Wave 24 工具模块 --
+    src/utils/bootstrap/BootstrapResampler.h
+    src/utils/lfu/LfuCache.h
+    src/utils/trie/TrieMap.h
+    src/utils/skiplist/SkipList.h
+    src/utils/heap/GenHeap.h
+    src/utils/chisq/ChiSquareTest.h
+    src/utils/anova/AnovaTest.h
+    src/utils/lrc/LrcChecksum.h
+    src/utils/fcs/FcsChecker.h
+    src/utils/snr/SnrEstimator.h
+    src/utils/jaro/JaroWinkler.h
 )
 
 set(RESOURCES
