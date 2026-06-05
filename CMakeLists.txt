@@ -713,6 +713,12 @@ set(SOURCES
     src/utils/zscore/ZScoreNormalizer.cpp
     src/utils/medoid/KMedoidClusterer.cpp
     src/utils/votecomp/VotingCompositor.cpp
+    src/utils/markov2/MarkovChain.cpp
+    src/utils/fuzzy2/FuzzyLogicEngine.cpp
+    src/utils/crc64b/Crc64Engine.cpp
+    src/utils/rle/RunLengthCodec.cpp
+    src/utils/lzw/LzwCompressor.cpp
+    src/utils/huffman/HuffmanCodec.cpp
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
@@ -930,6 +936,21 @@ set(SOURCES
 
     # -- F71: 事件时间线 --
     src/utils/timeline/EventTimeline.cpp
+
+    # -- F128~F142: Wave 22 工具模块 --
+    src/utils/fir/FirFilterDesigner.cpp
+    src/utils/iir/IirFilterDesigner.cpp
+    src/utils/lpc/LinearPredictiveCoder.cpp
+    src/utils/envelope/EnvelopeDetector.cpp
+    src/utils/stft/StftAnalyzer.cpp
+    src/utils/zcr/ZeroCrossingRate.cpp
+    src/utils/thd/ThdAnalyzer.cpp
+    src/utils/hmm/HiddenMarkovModel.cpp
+    src/utils/viterbi/ViterbiDecoder.cpp
+    src/utils/gmm/GaussianMixtureModel.cpp
+    src/utils/covariance/CovarianceMatrix.cpp
+    src/utils/percentile/PercentileCalculator.cpp
+    src/utils/scrambler/Scrambler.cpp
 )
 
 set(HEADERS
@@ -1556,6 +1577,41 @@ set(HEADERS
 
     # -- F121: 投票组合器 --
     src/utils/votecomp/VotingCompositor.h
+
+    # -- F122: 马尔可夫链 --
+    src/utils/markov2/MarkovChain.h
+
+    # -- F123: 模糊逻辑引擎 --
+    src/utils/fuzzy2/FuzzyLogicEngine.h
+
+    # -- F124: CRC-64校验引擎 --
+    src/utils/crc64b/Crc64Engine.h
+
+    # -- F125: 游程编码 --
+    src/utils/rle/RunLengthCodec.h
+
+    # -- F126: LZW压缩 --
+    src/utils/lzw/LzwCompressor.h
+
+    # -- F127: 霍夫曼编码 --
+    src/utils/huffman/HuffmanCodec.h
+
+    # -- F128~F142: Wave 22 工具模块 --
+    src/utils/fir/FirFilterDesigner.h
+    src/utils/iir/IirFilterDesigner.h
+    src/utils/lpc/LinearPredictiveCoder.h
+    src/utils/envelope/EnvelopeDetector.h
+    src/utils/stft/StftAnalyzer.h
+    src/utils/zcr/ZeroCrossingRate.h
+    src/utils/thd/ThdAnalyzer.h
+    src/utils/lru/LruCache.h
+    src/utils/bloom/BloomFilter.h
+    src/utils/hmm/HiddenMarkovModel.h
+    src/utils/viterbi/ViterbiDecoder.h
+    src/utils/gmm/GaussianMixtureModel.h
+    src/utils/covariance/CovarianceMatrix.h
+    src/utils/percentile/PercentileCalculator.h
+    src/utils/scrambler/Scrambler.h
 )
 
 set(RESOURCES
