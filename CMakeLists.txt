@@ -524,6 +524,7 @@ set(SOURCES
     src/connection/ws/WsConfigPanel.cpp
 
     # ── F18: Modbus 主站/从站 ──
+    # -- F44: Modbus Master --
     src/protocol/modbus/ModbusMaster.cpp
     src/protocol/modbus/ModbusMasterStats.cpp
     src/protocol/modbus/ModbusMasterProtocol.cpp
@@ -1001,6 +1002,7 @@ set(HEADERS
     src/connection/ws/WsConfigPanel.h
 
     # ── F18: Modbus 主站/从站 ──
+    # -- F44: Modbus Master --
     src/protocol/modbus/ModbusTypes.h
     src/protocol/modbus/ModbusMaster.h
     src/protocol/modbus/ModbusSlave.h
