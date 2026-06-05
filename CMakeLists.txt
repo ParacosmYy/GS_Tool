@@ -2410,6 +2410,12 @@ set(SOURCES
     src/utils/filter_design/FilterDesignerStats.cpp
     src/utils/filter_design/FilterDesignerWidget.cpp
     src/utils/filter_design/FilterDesignerWidgetStats.cpp
+
+    # ── F82: Waveform Generator ──
+    src/utils/wavegen/WaveformGenerator.cpp
+    src/utils/wavegen/WaveformGeneratorStats.cpp
+    src/utils/wavegen/WaveformGeneratorWidget.cpp
+    src/utils/wavegen/WaveformGeneratorWidgetStats.cpp
 )
 
 set(HEADERS
@@ -4596,6 +4602,11 @@ set(HEADERS
     src/utils/gps/GpsTypes.h
     src/utils/gps/NmeaParser.h
     src/utils/gps/GpsTrackWidget.h
+
+    # ── F82: Waveform Generator ──
+    src/utils/wavegen/WaveGenTypes.h
+    src/utils/wavegen/WaveformGenerator.h
+    src/utils/wavegen/WaveformGeneratorWidget.h
 )
 
 set(RESOURCES
