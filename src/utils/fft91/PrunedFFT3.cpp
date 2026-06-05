@@ -82,6 +82,38 @@ QVector<double> PrunedFFT3::compute(const QVector<double>& input)
 }
 
 /**
+ * @brief 获取当前掩码中需要计算的频率分量数量
+ * @return 活跃频率分量数
+ */
+int PrunedFFT3::activeBinCount() const
+{
+    int count = 0;
+    for (bool v : m_pruneMask) {
+        if (v) count++;
+    }
+    return count;
+}
+
+/**
+ * @brief 计算剪枝后的计算节省比例
+ * @return 节省的计算量百分比(0.0~1.0)
+ */
+double PrunedFFT3::savingsRatio() const
+{
+    if (m_pruneMask.isEmpty()) return 0.0;
+    int active = activeBinCount();
+    return 1.0 - static_cast<double>(active) / m_pruneMask.size();
+}
+
+/**
+ * @brief 设置全频段计算(重置掩码)
+ */
+void PrunedFFT3::setFullSpectrum()
+{
+    m_pruneMask.clear();
+}
+
+/**
  * @brief 重置统计数据
  */
 void PrunedFFT3::resetStatistics()

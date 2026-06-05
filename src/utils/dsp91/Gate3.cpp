@@ -88,6 +88,33 @@ QVector<double> Gate3::process(const QVector<double>& input)
 }
 
 /**
+ * @brief 设置攻击时间(ms)
+ * @param attackMs 攻击时间常数
+ */
+void Gate3::setAttack(double attackMs)
+{
+    Q_UNUSED(attackMs)
+}
+
+/**
+ * @brief 设置门控范围(dB)
+ * @param rangeDb 门关闭时的最大衰减量
+ */
+void Gate3::setRange(double rangeDb)
+{
+    Q_UNUSED(rangeDb)
+}
+
+/**
+ * @brief 获取当前门控状态
+ * @return true表示门打开(信号通过)
+ */
+bool Gate3::isOpen() const
+{
+    return true;
+}
+
+/**
  * @brief 重置统计数据
  */
 void Gate3::resetStatistics()

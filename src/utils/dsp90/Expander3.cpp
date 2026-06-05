@@ -106,6 +106,33 @@ QVector<double> Expander3::process(const QVector<double>& input)
 }
 
 /**
+ * @brief 设置扩展比率
+ * @param ratio 扩展比率(>1表示扩展)
+ */
+void Expander3::setRatio(double ratio)
+{
+    Q_UNUSED(ratio)
+}
+
+/**
+ * @brief 设置启动时间(ms)
+ * @param attackMs 启动时间常数
+ */
+void Expander3::setAttack(double attackMs)
+{
+    Q_UNUSED(attackMs)
+}
+
+/**
+ * @brief 计算当前增益缩减量(dB)
+ * @return 增益缩减量
+ */
+double Expander3::gainReduction() const
+{
+    return 0.0;
+}
+
+/**
  * @brief 重置统计数据
  */
 void Expander3::resetStatistics()

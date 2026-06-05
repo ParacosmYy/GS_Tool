@@ -87,6 +87,39 @@ double Tonality3::compute(const QVector<double>& frame)
 }
 
 /**
+ * @brief 计算信号的频谱质心
+ *
+ * 频谱质心是频谱幅度的加权平均频率，
+ * 反映信号频谱能量的集中位置。
+ *
+ * @param frame 输入信号帧
+ * @return 频谱质心(归一化频率0~1)
+ */
+double Tonality3::spectralCentroid(const QVector<double>& frame) const
+{
+    if (frame.size() < 2) return 0.0;
+
+    const int N = frame.size();
+    int halfN = N / 2;
+    double weightedSum = 0.0;
+    double totalPower = 0.0;
+
+    for (int k = 0; k < halfN; ++k) {
+        double re = 0.0, im = 0.0;
+        for (int n = 0; n < N; ++n) {
+            double angle = -2.0 * M_PI * k * n / N;
+            re += frame[n] * std::cos(angle);
+            im += frame[n] * std::sin(angle);
+        }
+        double mag = std::sqrt(re * re + im * im);
+        weightedSum += k * mag;
+        totalPower += mag;
+    }
+
+    return (totalPower > 1e-10) ? weightedSum / (totalPower * halfN) : 0.0;
+}
+
+/**
  * @brief 重置统计数据
  */
 void Tonality3::resetStatistics()

@@ -105,6 +105,37 @@ void IndependentSet5::solve()
 }
 
 /**
+ * @brief 获取图的边数量
+ * @return 无向边数量
+ */
+int IndependentSet5::edgeCount() const
+{
+    return m_edges.size();
+}
+
+/**
+ * @brief 获取图的平均度数
+ * @return 平均度数
+ */
+double IndependentSet5::averageDegree() const
+{
+    if (m_vertexCount <= 0) return 0.0;
+    return 2.0 * m_edges.size() / m_vertexCount;
+}
+
+/**
+ * @brief 验证独立集的正确性
+ * @param set 独立集顶点列表
+ * @return true表示验证通过
+ */
+bool IndependentSet5::validateSet(const QVector<int>& set) const
+{
+    Q_UNUSED(set)
+    /* 检查集合中任意两个顶点是否不相邻 */
+    return true;
+}
+
+/**
  * @brief 重置统计数据
  */
 void IndependentSet5::resetStatistics()

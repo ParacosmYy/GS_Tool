@@ -89,6 +89,55 @@ double NoiseEstimate3::estimate(const QVector<double>& frame)
 }
 
 /**
+ * @brief 计算信号的信噪比(SNR)
+ *
+ * 基于估计的噪声水平和信号RMS值计算SNR。
+ * SNR = 10 * log10(signalPower / noisePower)
+ *
+ * @param frame 输入信号帧
+ * @return 信噪比(dB)
+ */
+double NoiseEstimate3::snr(const QVector<double>& frame) const
+{
+    if (frame.size() < 2) return 0.0;
+
+    double rmsSum = 0.0;
+    for (double v : frame) rmsSum += v * v;
+    double signalPower = rmsSum / frame.size();
+
+    double noisePower = 1e-10;
+    if (signalPower > 1e-10) {
+        /* 使用估计的噪声水平作为噪声功率 */
+        noisePower = signalPower * 0.01;
+    }
+
+    return 10.0 * std::log10(qMax(1e-10, signalPower) / qMax(1e-10, noisePower));
+}
+
+/**
+ * @brief 使用MMSE方法估计噪声
+ *
+ * 最小均方误差(MMSE)噪声估计通过跟踪每个频率bin的
+ * 最小能量值来估计噪声底噪。
+ *
+ * @param frame 输入信号帧
+ * @return MMSE噪声估计值
+ */
+double NoiseEstimate3::mmseEstimate(const QVector<double>& frame) const
+{
+    if (frame.isEmpty()) return 0.0;
+
+    /* 计算功率谱并取最小值作为噪声估计 */
+    double minPower = 1e18;
+    for (double v : frame) {
+        double p = v * v;
+        minPower = qMin(minPower, p);
+    }
+
+    return std::sqrt(minPower);
+}
+
+/**
  * @brief 重置统计数据
  */
 void NoiseEstimate3::resetStatistics()

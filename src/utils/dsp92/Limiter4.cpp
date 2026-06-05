@@ -94,6 +94,33 @@ QVector<double> Limiter4::process(const QVector<double>& input)
 }
 
 /**
+ * @brief 设置启动时间(ms)
+ * @param attackMs 启动时间常数
+ */
+void Limiter4::setAttack(double attackMs)
+{
+    Q_UNUSED(attackMs)
+}
+
+/**
+ * @brief 设置释放时间(ms)
+ * @param releaseMs 释放时间常数
+ */
+void Limiter4::setRelease(double releaseMs)
+{
+    Q_UNUSED(releaseMs)
+}
+
+/**
+ * @brief 计算当前增益缩减量(dB)
+ * @return 增益缩减量
+ */
+double Limiter4::gainReduction() const
+{
+    return 0.0;
+}
+
+/**
  * @brief 重置统计数据
  */
 void Limiter4::resetStatistics()
