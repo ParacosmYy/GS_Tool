@@ -2838,6 +2838,54 @@ set(HEADERS
     src/utils/matrix19/SparseLU.h
     src/utils/signal18/PitchDetector.h
     src/utils/tree19/FenwickTree2D.h
+    # Wave 125-138
+    src/utils/cluster12/SpectralClustering3.h
+    src/utils/code13/ReedMullerCode.h
+    src/utils/dsp14/WaveShaper.h
+    src/utils/fft15/SlidingDFT.h
+    src/utils/graph28/DominatorTree.h
+    src/utils/matrix17/SchurDecomp2.h
+    src/utils/signal16/ViterbiDecoder.h
+    src/utils/tree17/IntervalTree2.h
+    src/utils/cluster13/BirchClustering.h
+    src/utils/code14/ConvolutionalCode2.h
+    src/utils/dsp15/DelayLine.h
+    src/utils/fft16/PrunedFFT.h
+    src/utils/graph29/EdgeColoring.h
+    src/utils/matrix18/TridiagonalSolver2.h
+    src/utils/signal17/BlindSourceSep.h
+    src/utils/tree18/PersistentTree2.h
+    src/utils/cluster15/MeanShift2.h
+    src/utils/cluster16/GaussianMixture4.h
+    src/utils/code17/HammingCode2.h
+    src/utils/dsp17/Oscillator.h
+    src/utils/dsp18/Compressor.h
+    src/utils/fft18/ZoomFFT.h
+    src/utils/fft19/PolyphaseFilterbank.h
+    src/utils/graph31/VertexColoring.h
+    src/utils/graph32/MaxFlowPushRelabel.h
+    src/utils/matrix20/SparseCholesky.h
+    src/utils/matrix21/GeneralizedEigen.h
+    src/utils/signal19/SpectralSubtract.h
+    src/utils/signal20/Beamformer.h
+    src/utils/tree20/LinkCutTree.h
+    src/utils/tree21/EulerTourTree.h
+    src/utils/cluster17/SubspaceCluster.h
+    src/utils/code18/GrayCode2.h
+    src/utils/dsp19/NoiseGate.h
+    src/utils/fft20/GoertzelBank2.h
+    src/utils/graph33/MinCostMaxFlow.h
+    src/utils/matrix22/QRDecomp2.h
+    src/utils/signal21/HarmonicProduct.h
+    src/utils/tree22/Treap2.h
+    src/utils/cluster18/SpectralBicluster.h
+    src/utils/code19/RsErasure.h
+    src/utils/dsp20/StereoProcessor.h
+    src/utils/fft21/MultiTaper.h
+    src/utils/graph34/Matching2.h
+    src/utils/matrix23/SymmetricEigen3.h
+    src/utils/signal22/EnvelopeDetect.h
+    src/utils/tree23/CartesianTree2.h
 )
 
 set(RESOURCES
