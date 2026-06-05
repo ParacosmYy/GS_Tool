@@ -719,6 +719,12 @@ set(SOURCES
     src/utils/rle/RunLengthCodec.cpp
     src/utils/lzw/LzwCompressor.cpp
     src/utils/huffman/HuffmanCodec.cpp
+    src/utils/shannon/ShannonCoder.cpp
+    src/utils/haar/HaarWavelet.cpp
+    src/utils/bezier/BezierSpline.cpp
+    src/utils/voicedetect/VoiceActivityDetector.cpp
+    src/utils/dynhistogram/DynamicHistogram.cpp
+    src/utils/ticker/TickEngine.cpp
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
@@ -952,6 +958,21 @@ set(SOURCES
     src/utils/percentile/PercentileCalculator.cpp
     src/utils/scrambler/Scrambler.cpp
     src/utils/bloom/BloomFilter.cpp
+
+    # -- F143~F157: Wave 23 工具模块 --
+    src/utils/agc/AutomaticGainControl.cpp
+    src/utils/rms/RmsMeter.cpp
+    src/utils/levenshtein/LevenshteinDistance.cpp
+    src/utils/ngram/NgramAnalyzer.cpp
+    src/utils/aho/AhoCorasickMatcher.cpp
+    src/utils/rabin/RabinKarpMatcher.cpp
+    src/utils/interleaver/BlockInterleaver.cpp
+    src/utils/cepstrum/CepstrumAnalyzer.cpp
+    src/utils/gabor/GaborTransform.cpp
+    src/utils/pitch/PitchDetector.cpp
+    src/utils/ttest/TTestCalculator.cpp
+    src/utils/moment/StatisticalMoments.cpp
+    src/utils/ks/KsTestCalculator.cpp
 )
 
 set(HEADERS
@@ -1596,6 +1617,12 @@ set(HEADERS
 
     # -- F127: 霍夫曼编码 --
     src/utils/huffman/HuffmanCodec.h
+    src/utils/shannon/ShannonCoder.h
+    src/utils/haar/HaarWavelet.h
+    src/utils/bezier/BezierSpline.h
+    src/utils/voicedetect/VoiceActivityDetector.h
+    src/utils/dynhistogram/DynamicHistogram.h
+    src/utils/ticker/TickEngine.h
 
     # -- F128~F142: Wave 22 工具模块 --
     src/utils/fir/FirFilterDesigner.h
@@ -1613,6 +1640,21 @@ set(HEADERS
     src/utils/covariance/CovarianceMatrix.h
     src/utils/percentile/PercentileCalculator.h
     src/utils/scrambler/Scrambler.h
+
+    # -- F143~F157: Wave 23 工具模块 --
+    src/utils/agc/AutomaticGainControl.h
+    src/utils/rms/RmsMeter.h
+    src/utils/levenshtein/LevenshteinDistance.h
+    src/utils/ngram/NgramAnalyzer.h
+    src/utils/aho/AhoCorasickMatcher.h
+    src/utils/rabin/RabinKarpMatcher.h
+    src/utils/interleaver/BlockInterleaver.h
+    src/utils/cepstrum/CepstrumAnalyzer.h
+    src/utils/gabor/GaborTransform.h
+    src/utils/pitch/PitchDetector.h
+    src/utils/ttest/TTestCalculator.h
+    src/utils/moment/StatisticalMoments.h
+    src/utils/ks/KsTestCalculator.h
 )
 
 set(RESOURCES
