@@ -41,7 +41,8 @@ QVector<DelaunayTriangulation2::Triangle> DelaunayTriangulation2::triangulate(
     }
 
     double dx = maxX - minX, dy = maxY - minY;
-    double dmax = qMax(dx, dy, 1.0);
+    double dmax = qMax(dx, dy);
+    if (dmax < 1.0) dmax = 1.0;
     double midX = (minX + maxX) / 2.0, midY = (minY + maxY) / 2.0;
 
     /* 超级三角形顶点 */
