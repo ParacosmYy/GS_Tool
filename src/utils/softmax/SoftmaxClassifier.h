@@ -62,7 +62,7 @@ public:
     TrainResult train(const QVector<QVector<double>>& X,
                       const QVector<int>& labels,
                       int nClasses,
-                      const TrainConfig& config = TrainConfig());
+                      const TrainConfig& config);
 
     /**
      * @brief 预测单个样本的类别

@@ -5,8 +5,8 @@
  * 功能: Goertzel算法用于快速计算指定频率的DFT分量，
  *       无需完整FFT，适合DTMF检测等场景，统计计算次数/耗时。
  */
-#ifndef GOERTZELALGORITHM_H
-#define GOERTZELALGORITHM_H
+#ifndef GOERTZELDETECTOR_H
+#define GOERTZELDETECTOR_H
 
 #include <QObject>
 #include <QVector>
@@ -51,4 +51,4 @@ private:
     double m_timeSum;
 };
 
-#endif // GOERTZELALGORITHM_H
+#endif // GOERTZELDETECTOR_H
