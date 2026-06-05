@@ -132,12 +132,19 @@
 | 358-366 | Wave 8-9功能冲刺+编译修复 | DataEncryptionEngine(XOR/AES/RC4/Caesar/Vigenere)+SerialFrameDecoder(帧解码/组装/校验)+WaveformFilter(8种DSP)+ModbusMaster(RTU/TCP)+SerialDataLogger(6格式/轮转/压缩)+ProtocolSession(请求响应追踪/P95)+DataRateLimiter(令牌桶/漏桶)+HexDiffEngine(字节级对比/补丁)+PacketVisualizer(彩色字段图)+SerialScriptEngine(脚本/条件分支)+StreamCaptureRecorder(重命名避免MOC冲突)+ModbusScanWidget信号重载修复+CMakeLists修复+DataPipeline/DataAggregator/ProtocolBridge null安全 |
 | 367-419 | Wave 10-46工具模块大规模实现+持续bug修复 | 200+算法/数据结构/信号处理/机器学习/数值方法模块实现(LRUCache/BloomFilter/Trie/QuadTree/BPlusTree/Fenwick/SegmentTree/SuffixArray/RadixTree/DisjointSet/ConvexHull/Voronoi/FFT2/Bessel/Butterworth/Chebyshev/Goertzel/Welch/YuleWalker/CatBoost/ARIMA/NaiveBayes/KernelPca/CrossValidator等)+PolarCode越界/BPlusTree分裂计数/MuLaw符号/ConcurrentSkipList竞态/TDigest除零/QuadTree计数/Turbo交织器/ArcCache驱逐/TinyLfu LRU/Fenwick const/Huffman析构/LombScargle除零/QuantileSketch GK压缩/RealFFT溢出/LZW空条目/WavWriter统计/WavReader EOF/Bessel双线性变换/Butterworth带通/Chebyshev分子/LombScargle变量名等30+bug修复 |
 | 420-424 | Batch 12 bug修复 — 安全/崩溃/除零/整数溢出/const_cast | ProtocolEngineParsing quint8<<24整数溢出+HeatmapWidget2 setCellSize除零+TerminalWidgetPaint m_selectionManager空指针+TerminalWidgetSlots lineHeight除零+CrossValidator Fisher-Yates替代std::shuffle+k>n边界+KMedoidClusterer Fisher-Yates+CubicInterpolator mutable替代const_cast+ChangepointDetector windowSize>=4+FrequencyCounterWidget ws除零+BayesClassifier sumExp除零+ScalableBloomFilter mutable+CuckooFilter mutable+WaveformPatternDetector dropoutThreshold除零+PacketReassembler qint32转换+BloomFilter/MinHashSignature/DeltaEncoder/AdaptiveHuffman/MuLawEncoder/DataCompressorAlgo quint8<<24整数溢出(6文件)+QuadTree mutable+CountMinSketch mutable+ResponsiveLayout2 cols除零+ProtobufDecoderEncoding fieldNum<<3溢出+FlatBuffersDecoderRead soff溢出+SpectralWhitener fftN/2除零 |
+| 425 | CMakeLists ODR冲突清理 | 注释26+个重复类定义(SpectralCluster2/TurboDecoder/GoertzelAlgorithm/GraphIsomorphism/ReedSolomon2/SylvesterSolver/AdaptiveHuffman/AutoCorrelation等)+禁用utils/eye/EyeDiagramEngine(chart/eye为canonical) |
+| 426 | 约束文档更新 | CLAUDE.md + 06-git-commit.md 更新 |
+| 427-434 | Wave 74-134 .cpp批量实现(按模块分层提交8个commit) | cluster(74-118, 26文件)+code(75-119, 24文件)+dsp(76-120, 20文件)+fft(77-121, 21文件)+graph(90-134, 27文件)+matrix(80-124, 26文件)+signal(78-122, 25文件)+tree+interp+poly+string(78-122, 30文件) |
+| 435 | chart模块新增 | MathExpressionParser(数学表达式解析)+EyeDiagramEngine(眼图绘制)+EyeDiagramWidget+WaveformMath |
+| 436 | protocol+connection模块新增 | ProtocolLogicEngine+ProtocolSequencer+ProtocolDecoder+SvdParser+SvdViewerWidget+PortBridge+BridgeConfigPanel |
+| 437 | utils五大工具模块+PID扩展 | FilterDesigner+FirmwareDiffer+FirmwarePatchGenerator+NmeaParser+GpsTrackWidget+NetworkScanner+NetworkTopologyWidget+StateMachineDesigner+PidSimulator+PidTunerWidget |
+| 438 | 文档新增 | FEATURE_ROADMAP.md功能路线图 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#160` 附近的阶段性记录
-- 后续新增分数时，优先补“阶段摘要”和“里程碑”，不再恢复长篇流水账
+- 当前文档已整理到 `#438` 的完整记录
+- 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
