@@ -1,5 +1,5 @@
 /**
- * @file HaarWavelet2D.h
+ * @file HaarWavelet2DEnhanced.h
  * @brief 二维Haar小波变换 — 信号/图像多分辨率分析
  *
  * 功能: 对二维数据(如传感器矩阵、图像帧)进行Haar小波
@@ -16,7 +16,7 @@
 /**
  * @brief 二维Haar小波变换
  */
-class HaarWavelet2D : public QObject {
+class HaarWavelet2DEnhanced : public QObject {
     Q_OBJECT
 
 public:
@@ -26,7 +26,7 @@ public:
         double  avgProcessingTimeMs = 0.0; ///< 平均处理耗时(ms)
     };
 
-    explicit HaarWavelet2D(QObject* parent = nullptr);
+    explicit HaarWavelet2DEnhanced(QObject* parent = nullptr);
 
     /**
      * @brief 正向Haar小波变换

@@ -1,15 +1,15 @@
 /**
- * @file HouseholderQR.cpp
+ * @file HouseholderQR2.cpp
  * @brief Householder QR分解实现
  */
 
-#include "utils/qr3/HouseholderQR.h"
+#include "utils/qr3/HouseholderQR2.h"
 
 #include <QElapsedTimer>
 #include <cmath>
 
 /** @brief 构造函数 @param parent 父对象 */
-HouseholderQR::HouseholderQR(QObject* parent)
+HouseholderQR2::HouseholderQR2(QObject* parent)
     : QObject(parent)
 {
 }
@@ -21,7 +21,7 @@ HouseholderQR::HouseholderQR(QObject* parent)
  * 使用Householder反射逐步将矩阵化为上三角形式。
  * 存储Householder向量用于后续构造Q矩阵和求解。
  */
-void HouseholderQR::compute(const QVector<QVector<double>>& matrix)
+void HouseholderQR2::compute(const QVector<QVector<double>>& matrix)
 {
     QElapsedTimer timer;
     timer.start();
@@ -103,7 +103,7 @@ void HouseholderQR::compute(const QVector<QVector<double>>& matrix)
  * 从Householder向量显式构造Q = H1*H2*...*Hn。
  * Q初始化为单位矩阵，依次应用每个Householder反射。
  */
-QVector<QVector<double>> HouseholderQR::Q() const
+QVector<QVector<double>> HouseholderQR2::Q() const
 {
     if (!m_computed) return {};
 
@@ -139,7 +139,7 @@ QVector<QVector<double>> HouseholderQR::Q() const
  * @brief 获取上三角矩阵R
  * @return R矩阵(m×n)
  */
-QVector<QVector<double>> HouseholderQR::R() const
+QVector<QVector<double>> HouseholderQR2::R() const
 {
     if (!m_computed) return {};
 
@@ -161,7 +161,7 @@ QVector<QVector<double>> HouseholderQR::R() const
  * 1. 计算 y = Q^T * b (通过Householder反射)
  * 2. 回代 R * x = y
  */
-QVector<double> HouseholderQR::solve(const QVector<double>& b) const
+QVector<double> HouseholderQR2::solve(const QVector<double>& b) const
 {
     if (!m_computed || b.size() != m_rows) return {};
 
@@ -200,7 +200,7 @@ QVector<double> HouseholderQR::solve(const QVector<double>& b) const
 }
 
 /** @brief 重置统计信息 */
-void HouseholderQR::resetStatistics()
+void HouseholderQR2::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSumMs = 0.0;

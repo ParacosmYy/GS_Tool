@@ -1,5 +1,5 @@
 /**
- * @file HouseholderQR.h
+ * @file HouseholderQR2.h
  * @brief Householder QR分解 — 正交三角分解与线性求解
  *
  * 功能: 将矩阵A分解为正交矩阵Q和上三角矩阵R(A=QR)，
@@ -19,7 +19,7 @@
  * 使用Householder反射逐步将矩阵化为上三角形式。
  * Q存储为Householder向量，可按需显式构造。
  */
-class HouseholderQR : public QObject {
+class HouseholderQR2 : public QObject {
     Q_OBJECT
 
 public:
@@ -29,7 +29,7 @@ public:
         double  avgProcessingTimeMs = 0.0; ///< 平均处理耗时(ms)
     };
 
-    explicit HouseholderQR(QObject* parent = nullptr);
+    explicit HouseholderQR2(QObject* parent = nullptr);
 
     /**
      * @brief 执行QR分解

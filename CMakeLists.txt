@@ -1403,6 +1403,32 @@ set(SOURCES
     src/utils/qr3/HouseholderQR.cpp
     src/utils/sturm2/SturmSequence.cpp
     src/utils/whitening2/ZcaWhitening.cpp
+
+    # ── Wave 83: AES/NFA/符号求导/2D树状数组/Fisher精确检验 ──
+    src/utils/aes2/AesCbc.cpp
+    src/utils/automata2/NfaSimulator.cpp
+    src/utils/derivative3/SymbolicDerivative.cpp
+    src/utils/fenwick2/FenwickTree2D.cpp
+    src/utils/fisher/FisherExactTest.cpp
+    src/utils/heap6/BinaryHeap2.cpp
+    src/utils/interleaver2/TurboInterleaver.cpp
+    src/utils/tpsa/TpsaEngine.cpp
+
+    # ── Wave 84: SHA-3/SHA-512 ──
+    src/utils/sha3/Sha3Hash.cpp
+    src/utils/sha512/Sha512Hash.cpp
+
+    # ── Wave 89: Cauchy分布/原子环形缓冲/MCMC采样/Catmull-Rom样条 ──
+    src/utils/cauchy/CauchyDistribution.cpp
+    src/utils/ring4/RingBufferAtomic.cpp
+    src/utils/mcmc/MetropolisHastings.cpp
+    src/utils/spline3/CatmullRomSpline.cpp
+
+    # ── Wave 90: 子串搜索/L1正则化/矩阵乘法/SPDY压缩 ──
+    src/utils/substring/SubstringSearch.cpp
+    src/utils/l1/L1Regularization.cpp
+    src/utils/matmul/MatrixMultiply.cpp
+    src/utils/spdy/SpdyCompressor.cpp
 )
 
 set(HEADERS
@@ -2518,6 +2544,44 @@ set(HEADERS
     src/utils/tensor3/TensorDecomposition.h
     src/utils/treap2/ImplicitTreap.h
     src/utils/whitening2/ZcaWhitening.h
+
+    # ── Wave 83: AES/NFA/符号求导/2D树状数组/Fisher精确检验 ──
+    src/utils/aes2/AesCbc.h
+    src/utils/automata2/NfaSimulator.h
+    src/utils/derivative3/SymbolicDerivative.h
+    src/utils/fenwick2/FenwickTree2D.h
+    src/utils/fisher/FisherExactTest.h
+    src/utils/heap6/BinaryHeap2.h
+    src/utils/interleaver2/TurboInterleaver.h
+    src/utils/tpsa/TpsaEngine.h
+
+    # ── Wave 84: 哈希函数集合(header-only) ──
+    src/utils/blake3/Blake3Hash.h
+    src/utils/farmhash/FarmHash.h
+    src/utils/keccak/KeccakHash.h
+    src/utils/metro/MetroHash.h
+    src/utils/murmur64/MurmurHash64.h
+    src/utils/polyhash/PolynomialHash.h
+    src/utils/siphash/SipHash.h
+    src/utils/spooky/SpookyHash.h
+    src/utils/wyhash/WyHash.h
+    src/utils/xxhash/XxHash.h
+
+    # ── Wave 84: SHA-3/SHA-512 ──
+    src/utils/sha3/Sha3Hash.h
+    src/utils/sha512/Sha512Hash.h
+
+    # ── Wave 89: Cauchy分布/原子环形缓冲/MCMC采样/CatmullRom样条 ──
+    src/utils/cauchy/CauchyDistribution.h
+    src/utils/ring4/RingBufferAtomic.h
+    src/utils/mcmc/MetropolisHastings.h
+    src/utils/spline3/CatmullRomSpline.h
+
+    # ── Wave 90: 子串搜索/L1正则化/矩阵乘法/SPDY压缩 ──
+    src/utils/substring/SubstringSearch.h
+    src/utils/l1/L1Regularization.h
+    src/utils/matmul/MatrixMultiply.h
+    src/utils/spdy/SpdyCompressor.h
 )
 
 set(RESOURCES

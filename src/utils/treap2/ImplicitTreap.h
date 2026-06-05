@@ -12,6 +12,7 @@
 #include <QObject>
 #include <QVector>
 #include <QElapsedTimer>
+#include <QRandomGenerator>
 
 /**
  * @brief 隐式Treap(按位置索引的平衡树)
@@ -84,7 +85,7 @@ private:
         Node*     left = nullptr;  ///< 左子节点
         Node*     right = nullptr; ///< 右子节点
 
-        explicit Node(double v) : value(v), priority(qrand()) {}
+        explicit Node(double v) : value(v), priority(QRandomGenerator::global()->generate()) {}
     };
 
     /** @brief 更新子树大小 */
