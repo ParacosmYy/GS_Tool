@@ -1,6 +1,6 @@
 /**
- * @file ChecksumCalculator.h
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation
+ * @file PowerAnalyzer.h
+ * @brief Analyze power consumption patterns from current/voltage samples
  */
 #pragma once
 #include <QObject>
@@ -10,9 +10,9 @@
 #include <QDateTime>
 
 /**
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation
+ * @brief Analyze power consumption patterns from current/voltage samples
  */
-class ChecksumCalculator : public QObject {
+class PowerAnalyzer : public QObject {
     Q_OBJECT
 public:
     /** @brief Statistics counters */
@@ -23,8 +23,8 @@ public:
         quint64 lastOperationMs = 0;
     };
 
-    explicit ChecksumCalculator(QObject *parent = nullptr);
-    ~ChecksumCalculator() override;
+    explicit PowerAnalyzer(QObject *parent = nullptr);
+    ~PowerAnalyzer() override;
 
     /** @brief Process input data and return result */
     QByteArray process(const QByteArray &input);

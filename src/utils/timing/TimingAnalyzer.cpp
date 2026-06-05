@@ -1,17 +1,17 @@
 /**
- * @file ChecksumCalculator.cpp
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation implementation
+ * @file TimingAnalyzer.cpp
+ * @brief Measure and analyze timing characteristics of serial protocols implementation
  */
-#include "checksum/ChecksumCalculator.h"
+#include "timing/TimingAnalyzer.h"
 
-ChecksumCalculator::ChecksumCalculator(QObject *parent)
+TimingAnalyzer::TimingAnalyzer(QObject *parent)
     : QObject(parent)
 {
 }
 
-ChecksumCalculator::~ChecksumCalculator() = default;
+TimingAnalyzer::~TimingAnalyzer() = default;
 
-QByteArray ChecksumCalculator::process(const QByteArray &input)
+QByteArray TimingAnalyzer::process(const QByteArray &input)
 {
     QElapsedTimer timer;
     timer.start();
@@ -32,7 +32,7 @@ QByteArray ChecksumCalculator::process(const QByteArray &input)
     return result;
 }
 
-void ChecksumCalculator::resetStatistics()
+void TimingAnalyzer::resetStatistics()
 {
     m_stats = Stats{};
 }

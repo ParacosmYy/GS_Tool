@@ -1,17 +1,17 @@
 /**
- * @file ChecksumCalculator.cpp
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation implementation
+ * @file PowerAnalyzer.cpp
+ * @brief Analyze power consumption patterns from current/voltage samples implementation
  */
-#include "checksum/ChecksumCalculator.h"
+#include "power/PowerAnalyzer.h"
 
-ChecksumCalculator::ChecksumCalculator(QObject *parent)
+PowerAnalyzer::PowerAnalyzer(QObject *parent)
     : QObject(parent)
 {
 }
 
-ChecksumCalculator::~ChecksumCalculator() = default;
+PowerAnalyzer::~PowerAnalyzer() = default;
 
-QByteArray ChecksumCalculator::process(const QByteArray &input)
+QByteArray PowerAnalyzer::process(const QByteArray &input)
 {
     QElapsedTimer timer;
     timer.start();
@@ -32,7 +32,7 @@ QByteArray ChecksumCalculator::process(const QByteArray &input)
     return result;
 }
 
-void ChecksumCalculator::resetStatistics()
+void PowerAnalyzer::resetStatistics()
 {
     m_stats = Stats{};
 }

@@ -1,17 +1,17 @@
 /**
- * @file ChecksumCalculator.cpp
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation implementation
+ * @file CanBusMonitor.cpp
+ * @brief Monitor and decode CAN bus frames from serial adapter implementation
  */
-#include "checksum/ChecksumCalculator.h"
+#include "can_monitor/CanBusMonitor.h"
 
-ChecksumCalculator::ChecksumCalculator(QObject *parent)
+CanBusMonitor::CanBusMonitor(QObject *parent)
     : QObject(parent)
 {
 }
 
-ChecksumCalculator::~ChecksumCalculator() = default;
+CanBusMonitor::~CanBusMonitor() = default;
 
-QByteArray ChecksumCalculator::process(const QByteArray &input)
+QByteArray CanBusMonitor::process(const QByteArray &input)
 {
     QElapsedTimer timer;
     timer.start();
@@ -32,7 +32,7 @@ QByteArray ChecksumCalculator::process(const QByteArray &input)
     return result;
 }
 
-void ChecksumCalculator::resetStatistics()
+void CanBusMonitor::resetStatistics()
 {
     m_stats = Stats{};
 }

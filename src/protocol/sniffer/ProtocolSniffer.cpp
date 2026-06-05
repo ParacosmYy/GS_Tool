@@ -1,17 +1,17 @@
 /**
- * @file ChecksumCalculator.cpp
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation implementation
+ * @file ProtocolSniffer.cpp
+ * @brief Passively sniff and decode multi-protocol serial traffic implementation
  */
-#include "checksum/ChecksumCalculator.h"
+#include "sniffer/ProtocolSniffer.h"
 
-ChecksumCalculator::ChecksumCalculator(QObject *parent)
+ProtocolSniffer::ProtocolSniffer(QObject *parent)
     : QObject(parent)
 {
 }
 
-ChecksumCalculator::~ChecksumCalculator() = default;
+ProtocolSniffer::~ProtocolSniffer() = default;
 
-QByteArray ChecksumCalculator::process(const QByteArray &input)
+QByteArray ProtocolSniffer::process(const QByteArray &input)
 {
     QElapsedTimer timer;
     timer.start();
@@ -32,7 +32,7 @@ QByteArray ChecksumCalculator::process(const QByteArray &input)
     return result;
 }
 
-void ChecksumCalculator::resetStatistics()
+void ProtocolSniffer::resetStatistics()
 {
     m_stats = Stats{};
 }

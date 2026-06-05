@@ -1,6 +1,6 @@
 /**
- * @file ChecksumCalculator.h
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation
+ * @file CanBusMonitor.h
+ * @brief Monitor and decode CAN bus frames from serial adapter
  */
 #pragma once
 #include <QObject>
@@ -10,9 +10,9 @@
 #include <QDateTime>
 
 /**
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation
+ * @brief Monitor and decode CAN bus frames from serial adapter
  */
-class ChecksumCalculator : public QObject {
+class CanBusMonitor : public QObject {
     Q_OBJECT
 public:
     /** @brief Statistics counters */
@@ -23,8 +23,8 @@ public:
         quint64 lastOperationMs = 0;
     };
 
-    explicit ChecksumCalculator(QObject *parent = nullptr);
-    ~ChecksumCalculator() override;
+    explicit CanBusMonitor(QObject *parent = nullptr);
+    ~CanBusMonitor() override;
 
     /** @brief Process input data and return result */
     QByteArray process(const QByteArray &input);

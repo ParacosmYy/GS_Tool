@@ -1,17 +1,17 @@
 /**
- * @file ChecksumCalculator.cpp
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation implementation
+ * @file BootloaderEngine.cpp
+ * @brief Manage firmware bootloading via serial with CRC verification implementation
  */
-#include "checksum/ChecksumCalculator.h"
+#include "bootloader/BootloaderEngine.h"
 
-ChecksumCalculator::ChecksumCalculator(QObject *parent)
+BootloaderEngine::BootloaderEngine(QObject *parent)
     : QObject(parent)
 {
 }
 
-ChecksumCalculator::~ChecksumCalculator() = default;
+BootloaderEngine::~BootloaderEngine() = default;
 
-QByteArray ChecksumCalculator::process(const QByteArray &input)
+QByteArray BootloaderEngine::process(const QByteArray &input)
 {
     QElapsedTimer timer;
     timer.start();
@@ -32,7 +32,7 @@ QByteArray ChecksumCalculator::process(const QByteArray &input)
     return result;
 }
 
-void ChecksumCalculator::resetStatistics()
+void BootloaderEngine::resetStatistics()
 {
     m_stats = Stats{};
 }

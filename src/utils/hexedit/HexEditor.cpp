@@ -1,17 +1,17 @@
 /**
- * @file ChecksumCalculator.cpp
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation implementation
+ * @file HexEditor.cpp
+ * @brief Hex editor widget for binary data viewing and editing implementation
  */
-#include "checksum/ChecksumCalculator.h"
+#include "hexedit/HexEditor.h"
 
-ChecksumCalculator::ChecksumCalculator(QObject *parent)
+HexEditor::HexEditor(QObject *parent)
     : QObject(parent)
 {
 }
 
-ChecksumCalculator::~ChecksumCalculator() = default;
+HexEditor::~HexEditor() = default;
 
-QByteArray ChecksumCalculator::process(const QByteArray &input)
+QByteArray HexEditor::process(const QByteArray &input)
 {
     QElapsedTimer timer;
     timer.start();
@@ -32,7 +32,7 @@ QByteArray ChecksumCalculator::process(const QByteArray &input)
     return result;
 }
 
-void ChecksumCalculator::resetStatistics()
+void HexEditor::resetStatistics()
 {
     m_stats = Stats{};
 }

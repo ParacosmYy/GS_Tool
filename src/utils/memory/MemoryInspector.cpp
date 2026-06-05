@@ -1,17 +1,17 @@
 /**
- * @file ChecksumCalculator.cpp
- * @brief Calculate CRC8/CRC16/CRC32/checksums for protocol validation implementation
+ * @file MemoryInspector.cpp
+ * @brief Inspect and visualize memory layout of embedded targets implementation
  */
-#include "checksum/ChecksumCalculator.h"
+#include "memory/MemoryInspector.h"
 
-ChecksumCalculator::ChecksumCalculator(QObject *parent)
+MemoryInspector::MemoryInspector(QObject *parent)
     : QObject(parent)
 {
 }
 
-ChecksumCalculator::~ChecksumCalculator() = default;
+MemoryInspector::~MemoryInspector() = default;
 
-QByteArray ChecksumCalculator::process(const QByteArray &input)
+QByteArray MemoryInspector::process(const QByteArray &input)
 {
     QElapsedTimer timer;
     timer.start();
@@ -32,7 +32,7 @@ QByteArray ChecksumCalculator::process(const QByteArray &input)
     return result;
 }
 
-void ChecksumCalculator::resetStatistics()
+void MemoryInspector::resetStatistics()
 {
     m_stats = Stats{};
 }
