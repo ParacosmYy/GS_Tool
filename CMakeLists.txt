@@ -915,6 +915,23 @@ set(SOURCES
     src/utils/taylor/TaylorSeries.cpp
     src/utils/hermite/HermiteInterpolation.cpp
 
+    # ── Wave 44: 数值方法/ODE求根/积分 ──
+    src/utils/conjugate/ConjugateGradient.cpp
+    src/utils/lagrange/LagrangeInterpolation.cpp
+    src/utils/bisect/BisectionSolver.cpp
+    src/utils/romberg/RombergIntegration.cpp
+    src/utils/adams/AdamsBashforth.cpp
+    src/utils/predictor_corrector/PredictorCorrector.cpp
+    src/utils/greville/GrevilleAbscissae.cpp
+    src/utils/laguerre/LaguerreSolver.cpp
+    src/utils/horner/HornerScheme.cpp
+    src/utils/newtonroot/NewtonRaphson.cpp
+    src/utils/gaussquad/GaussLegendre.cpp
+    src/utils/richardson/RichardsonExtrapolation.cpp
+    src/utils/autodiff/numericalDifferentiator.cpp
+    src/utils/rk2/Rk2Solver.cpp
+    src/utils/collocation/CollocationSolver.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -2150,6 +2167,23 @@ set(HEADERS
     src/utils/peakhold2/PeakTracker.h
     src/utils/stacked/StackedEnsemble.h
     src/utils/taylor/TaylorSeries.h
+
+    # ── Wave 44: 数值方法/ODE求根/积分 ──
+    src/utils/conjugate/ConjugateGradient.h
+    src/utils/lagrange/LagrangeInterpolation.h
+    src/utils/bisect/BisectionSolver.h
+    src/utils/romberg/RombergIntegration.h
+    src/utils/adams/AdamsBashforth.h
+    src/utils/predictor_corrector/PredictorCorrector.h
+    src/utils/greville/GrevilleAbscissae.h
+    src/utils/laguerre/LaguerreSolver.h
+    src/utils/horner/HornerScheme.h
+    src/utils/newtonroot/NewtonRaphson.h
+    src/utils/gaussquad/GaussLegendre.h
+    src/utils/richardson/RichardsonExtrapolation.h
+    src/utils/autodiff/numericalDifferentiator.h
+    src/utils/rk2/Rk2Solver.h
+    src/utils/collocation/CollocationSolver.h
 )
 
 set(RESOURCES
