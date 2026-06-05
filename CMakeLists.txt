@@ -816,6 +816,24 @@ set(SOURCES
     # -- F56: 数据验证器 --
     src/utils/validator/DataValidator.cpp
     src/utils/validator/DataValidatorRules.cpp
+
+    # -- F55: 数据压缩器 --
+    src/utils/compress/DataCompressor.cpp
+    src/utils/compress/DataCompressorAlgo.cpp
+
+    # -- F62: 数据包组装器 --
+    src/protocol/assembly/PacketAssembler.cpp
+
+    # -- F60: 协议流量复制 --
+    src/protocol/duplicate/ProtocolDuplicator.cpp
+    src/protocol/duplicate/ProtocolDuplicatorStats.cpp
+    src/protocol/duplicate/ProtocolDuplicatorIO.cpp
+
+    # -- F61: 串口健康监控 --
+    src/serial/health/SerialHealthMonitor.cpp
+
+    # -- F57: 数据流量计 --
+    src/utils/flow/DataFlowMeter.cpp
 )
 
 set(HEADERS
@@ -1249,6 +1267,21 @@ set(HEADERS
 
     # -- F56: 数据验证器 --
     src/utils/validator/DataValidator.h
+
+    # -- F55: 数据压缩器 --
+    src/utils/compress/DataCompressor.h
+
+    # -- F62: 数据包组装器 --
+    src/protocol/assembly/PacketAssembler.h
+
+    # -- F60: 协议流量复制 --
+    src/protocol/duplicate/ProtocolDuplicator.h
+
+    # -- F61: 串口健康监控 --
+    src/serial/health/SerialHealthMonitor.h
+
+    # -- F57: 数据流量计 --
+    src/utils/flow/DataFlowMeter.h
 )
 
 set(RESOURCES
