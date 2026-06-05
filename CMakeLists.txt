@@ -687,6 +687,12 @@ set(SOURCES
     src/utils/autocorr/AutoCorrelator.cpp
     src/utils/peakdetect/RidgeDetector.cpp
     src/utils/freq/FrequencyCounter2.cpp
+    src/utils/integrator/NumericalIntegrator.cpp
+    src/utils/convolution/ConvolutionEngine.cpp
+    src/utils/modulation/Demodulator.cpp
+    src/utils/segmenter/StreamSegmenter.cpp
+    src/utils/cluster/KMeansClusterer.cpp
+    src/utils/changept/ChangepointDetector.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1431,6 +1437,27 @@ set(HEADERS
 
     # -- F87: 高精度频率计数器 --
     src/utils/freq/FrequencyCounter2.h
+
+    # -- F88: 数值积分器 --
+    src/utils/integrator/NumericalIntegrator.h
+
+    # -- F89: 卷积引擎 --
+    src/utils/convolution/ConvolutionEngine.h
+
+    # -- F90: 解调器 --
+    src/utils/modulation/Demodulator.h
+
+    # -- F91: 离群值检测器 --
+    src/utils/outlier/OutlierDetector.h
+
+    # -- F92: 数据流分段器 --
+    src/utils/segmenter/StreamSegmenter.h
+
+    # -- F93: K-Means聚类器 --
+    src/utils/cluster/KMeansClusterer.h
+
+    # -- F94: 变点检测器 --
+    src/utils/changept/ChangepointDetector.h
 )
 
 set(RESOURCES
