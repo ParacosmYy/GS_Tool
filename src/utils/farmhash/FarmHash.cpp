@@ -204,7 +204,15 @@ quint64 FarmHash::hash64(const QByteArray& data)
         result = hashLong(ptr, len);
     }
 
-    updateStats(timer.nsecsElapsed(), len);
+    /* 更新统计 */
+    qint64 elapsed64 = timer.nsecsElapsed();
+    double ms64 = static_cast<double>(elapsed64) / 1e6;
+    ++m_stats.totalHashes;
+    m_stats.totalBytesProcessed += static_cast<quint64>(len);
+    m_timeSumMs += ms64;
+    m_stats.avgProcessingTimeMs = m_timeSumMs / m_stats.totalHashes;
+
+    emit hashComputed(static_cast<qint64>(len));
     return result;
 }
 
@@ -221,12 +229,23 @@ quint32 FarmHash::hash32(const QByteArray& data)
     const int len = data.size();
     quint32 result = hash32Len0to24(data.constData(), len);
 
-    updateStats(timer.nsecsElapsed(), len);
+    /* 更新统计 */
+    qint64 elapsed32 = timer.nsecsElapsed();
+    double ms32 = static_cast<double>(elapsed32) / 1e6;
+    ++m_stats.totalHashes;
+    m_stats.totalBytesProcessed += static_cast<quint64>(len);
+    m_timeSumMs += ms32;
+    m_stats.avgProcessingTimeMs = m_timeSumMs / m_stats.totalHashes;
+
+    emit hashComputed(static_cast<qint64>(len));
     return result;
 }
 
 /**
- * @brief 计算128位FarmHash指纹
+ * @brief 计算128位FarmHash指纹 (不依赖hash64，独立实现避免双重计数)
+ *
+ * 策略: 使用与hash64相同的分段逻辑，直接计算两个独立的64位值
+ *
  * @param data 输入数据
  * @return 128位哈希值 (QPair<高位, 低位>)
  */
@@ -237,25 +256,57 @@ FarmHash::Hash128 FarmHash::hash128(const QByteArray& data)
 
     const int len = data.size();
     const char* ptr = data.constData();
-
     Hash128 result;
+
     if (len <= 64) {
-        /* 用两个不同的64位哈希组合为128位 */
-        quint64 lo = hash64(data);
-        /* 第二个哈希: 对数据做简单变换后重新哈希 */
-        QByteArray rev = data;
-        std::reverse(rev.begin(), rev.end());
-        quint64 hi = hash64(rev);
-        result = {hi, lo};
+        /* 低位: 正向哈希 */
+        if (len <= 16) {
+            if (len >= 8) {
+                quint64 a = qFromLittleEndian<quint64>(
+                    reinterpret_cast<const quint8*>(ptr));
+                quint64 b = qFromLittleEndian<quint64>(
+                    reinterpret_cast<const quint8*>(ptr + len - 8));
+                result.second = hash128to64({a, rotl64(b, 37) + K2});
+            } else {
+                result.second = K0 ^ static_cast<quint64>(len);
+            }
+        } else if (len <= 64) {
+            result.second = hashMedium(ptr, len);
+        } else {
+            result.second = hashLong(ptr, len);
+        }
+        /* 高位: 使用不同种子做偏移哈希 */
+        QByteArray shifted = data;
+        shifted.prepend('\x5a');
+        if (len <= 16) {
+            if (len >= 8) {
+                quint64 a = qFromLittleEndian<quint64>(
+                    reinterpret_cast<const quint8*>(ptr));
+                quint64 b = qFromLittleEndian<quint64>(
+                    reinterpret_cast<const quint8*>(ptr + len - 8));
+                result.first = hash128to64({rotl64(a, 13), b + K3});
+            } else {
+                result.first = K1 ^ rotl64(result.second, 17);
+            }
+        } else {
+            result.first = hash128to64({result.second, K2 + static_cast<quint64>(len)});
+        }
     } else {
-        /* 长数据: 分段独立哈希 */
+        /* 长数据: 前半段和后半段分别哈希 */
         int mid = len / 2;
-        QByteArray left  = QByteArray::fromRawData(ptr, mid);
-        QByteArray right = QByteArray::fromRawData(ptr + mid, len - mid);
-        result = {hash64(left), hash64(right)};
+        result.second = hashLong(ptr, mid);
+        result.first  = hashLong(ptr + mid, len - mid);
     }
 
-    updateStats(timer.nsecsElapsed(), len);
+    /* 更新统计 (只计一次) */
+    qint64 elapsed128 = timer.nsecsElapsed();
+    double ms128 = static_cast<double>(elapsed128) / 1e6;
+    ++m_stats.totalHashes;
+    m_stats.totalBytesProcessed += static_cast<quint64>(len);
+    m_timeSumMs += ms128;
+    m_stats.avgProcessingTimeMs = m_timeSumMs / m_stats.totalHashes;
+
+    emit hashComputed(static_cast<qint64>(len));
     return result;
 }
 
