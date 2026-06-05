@@ -8,6 +8,8 @@
 #include <QElapsedTimer>
 #include <QtMath>
 
+#include <QMap>
+
 #include <algorithm>
 #include <limits>
 #include <cmath>

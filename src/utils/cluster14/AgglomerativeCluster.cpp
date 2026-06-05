@@ -5,6 +5,8 @@
 
 #include "AgglomerativeCluster.h"
 #include <QElapsedTimer>
+#include <QSet>
+
 #include <cmath>
 #include <algorithm>
 #include <limits>

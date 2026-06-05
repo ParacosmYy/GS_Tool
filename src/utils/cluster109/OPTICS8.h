@@ -41,4 +41,5 @@ private:
     double m_timeSum = 0.0;
     double m_epsilon = 1.0;
     int m_minPts = 5;
+    QVector<QPair<int, double>> m_orderingCache;
 };

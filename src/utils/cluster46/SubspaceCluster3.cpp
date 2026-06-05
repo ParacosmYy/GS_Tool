@@ -10,7 +10,9 @@
 #include "utils/cluster46/SubspaceCluster3.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
+
 #include <algorithm>
 #include <random>
 

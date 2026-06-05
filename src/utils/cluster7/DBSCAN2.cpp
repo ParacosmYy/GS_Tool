@@ -6,7 +6,9 @@
 #include "utils/cluster7/DBSCAN2.h"
 
 #include <QElapsedTimer>
+#include <QMap>
 #include <QtMath>
+
 #include <algorithm>
 #include <queue>
 

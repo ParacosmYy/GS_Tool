@@ -12,7 +12,10 @@
 #include "utils/cluster41/HierarchicalCluster4.h"
 
 #include <QElapsedTimer>
+#include <QMap>
+#include <QList>
 #include <QtMath>
+
 #include <algorithm>
 #include <limits>
 

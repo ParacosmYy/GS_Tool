@@ -48,7 +48,7 @@ MeanShift2::ClusterResult MeanShift2::cluster1D(const QVector<double>& data)
     QVector<QVector<double>> multiData;
     multiData.reserve(data.size());
     for (double v : data) {
-        multiData.append({v});
+        multiData.append(QVector<double>{v});
     }
     return cluster(multiData);
 }

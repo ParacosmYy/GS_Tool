@@ -46,4 +46,7 @@ private:
     QString m_covType = QStringLiteral("full");
     int m_maxIter = 100;
     double m_tolerance = 1e-6;
+    QVector<QVector<double>> m_means;
+    QVector<QVector<double>> m_variances;
+    QVector<double> m_weights;
 };
