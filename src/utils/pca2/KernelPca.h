@@ -107,7 +107,7 @@ public:
      * @param sample 样本向量
      * @return 投影坐标
      */
-    QVector<double> transformSample(const QVector<double>& sample) const;
+    QVector<double> transformSample(const QVector<double>& sample);
 
     /**
      * @brief 计算核矩阵

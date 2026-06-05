@@ -215,7 +215,7 @@ KernelPca::TransformResult KernelPca::fitTransform(
  *  @param sample 样本向量
  *  @return 投影坐标 */
 QVector<double> KernelPca::transformSample(
-    const QVector<double>& sample) const
+    const QVector<double>& sample)
 {
     if (!m_fitted) return {};
 

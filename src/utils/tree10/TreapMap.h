@@ -27,10 +27,6 @@ class TreapMap : public QObject {
     Q_OBJECT
 
 public:
-    /** @brief 键值对类型 */
-    using KeyType = int;
-    using ValueType = double;
-
     /** @brief 统计信息 */
     struct Stats {
         int totalInserts = 0;          ///< 累计插入次数
@@ -42,178 +38,61 @@ public:
         double avgProcessingTimeMs = 0.0; ///< 平均处理时间(ms)
     };
 
-    /**
-     * @brief 构造函数
-     * @param parent 父对象
-     */
-    explicit TreapMap(QObject* parent = nullptr);
+    explicit TreapMap(QObject* parent = nullptr);  ///< @brief 构造函数
+    ~TreapMap();                                    ///< @brief 析构函数 — 释放所有节点
 
-    /**
-     * @brief 析构函数 — 释放所有节点
-     */
-    ~TreapMap();
-
-    /* 禁止拷贝 */
-    TreapMap(const TreapMap&) = delete;
+    TreapMap(const TreapMap&) = delete;             ///< 禁止拷贝
     TreapMap& operator=(const TreapMap&) = delete;
 
-    /**
-     * @brief 插入键值对
-     * @param key 键
-     * @param value 值
-     */
-    void insert(int key, double value);
+    void insert(int key, double value);     ///< @brief 插入键值对
+    bool remove(int key);                   ///< @brief 删除键 @return 是否成功
+    bool find(int key, double& value) const;///< @brief 查找键 @return 是否找到
 
-    /**
-     * @brief 删除键
-     * @param key 要删除的键
-     * @return true=删除成功
-     */
-    bool remove(int key);
-
-    /**
-     * @brief 查找键对应的值
-     * @param key 键
-     * @param value 输出值
-     * @return true=找到
-     */
-    bool find(int key, double& value) const;
-
-    /**
-     * @brief 按键范围分裂树
-     * @param threshold 分裂阈值: key <= threshold在左树
-     * @param left 输出左树(小键)
-     * @param right 输出右树(大键)
-     */
+    /** @brief 按阈值分裂树: key<=threshold在左树 */
     void split(int threshold, TreapMap& left, TreapMap& right);
-
-    /**
-     * @brief 合并两棵树(要求left所有key < right所有key)
-     * @param left 左树
-     * @param right 右树
-     */
+    /** @brief 合并两棵树(要求left所有key < right所有key) */
     static TreapMap* merge(TreapMap* left, TreapMap* right);
 
-    /**
-     * @brief 中序遍历收集所有键值对
-     * @return 按键排序的键值对列表
-     */
+    /** @brief 中序遍历，返回按键排序的键值对列表 */
     QVector<std::pair<int, double>> inorderTraversal() const;
+    int size() const { return m_size; }    ///< @brief 节点数
+    int height() const;                    ///< @brief 树高度
 
-    /**
-     * @brief 获取树的大小
-     * @return 节点数
-     */
-    int size() const { return m_size; }
-
-    /**
-     * @brief 获取树的高度
-     * @return 高度
-     */
-    int height() const;
-
-    /**
-     * @brief 获取第k小的元素(顺序统计)
-     * @param k 排名(0-based)
-     * @param key 输出键
-     * @param value 输出值
-     * @return true=成功
-     */
+    /** @brief 获取第k小元素(0-based) */
     bool kthElement(int k, int& key, double& value) const;
+    void clear();                          ///< @brief 清空树
 
-    /** @brief 清空树 */
-    void clear();
-
-    /** @brief 获取统计信息 */
     const Stats& stats() const { return m_stats; }
-
-    /** @brief 重置统计信息 */
     void resetStatistics();
 
 private:
-    /**
-     * @brief Treap节点
-     */
+    /** @brief Treap节点 */
     struct Node {
-        int key;                ///< 键(BST性质)
-        double value;           ///< 值
-        int priority;           ///< 优先级(堆性质)
-        int subtreeSize;        ///< 子树大小(顺序统计)
-        Node* left;             ///< 左子树
-        Node* right;            ///< 右子树
-
+        int key;                    ///< 键(BST性质)
+        double value;               ///< 值
+        int priority;               ///< 优先级(堆性质)
+        int subtreeSize;            ///< 子树大小(顺序统计)
+        Node* left;                 ///< 左子树
+        Node* right;                ///< 右子树
         explicit Node(int k, double v, int prio)
             : key(k), value(v), priority(prio), subtreeSize(1)
             , left(nullptr), right(nullptr) {}
     };
 
-    /**
-     * @brief 右旋转
-     * @param node 旋转根
-     * @return 新根
-     */
-    Node* rotateRight(Node* node);
-
-    /**
-     * @brief 左旋转
-     * @param node 旋转根
-     * @return 新根
-     */
-    Node* rotateLeft(Node* node);
-
-    /**
-     * @brief 递归插入
-     * @param node 当前节点
-     * @param key 键
-     * @param value 值
-     * @param priority 优先级
-     * @return 新根
-     */
-    Node* insertImpl(Node* node, int key, double value, int priority);
-
-    /**
-     * @brief 递归删除
-     * @param node 当前节点
-     * @param key 键
-     * @return 新根
-     */
-    Node* removeImpl(Node* node, int key);
-
-    /**
-     * @brief 分裂实现
-     * @param node 当前节点
-     * @param threshold 阈值
-     * @param left 输出左树根
-     * @param right 输出右树根
-     */
-    void splitImpl(Node* node, int threshold, Node*& left, Node*& right);
-
-    /**
-     * @brief 合并实现
-     * @param left 左树根
-     * @param right 右树根
-     * @return 合并后的根
-     */
-    Node* mergeImpl(Node* left, Node* right);
-
-    /** @brief 更新子树大小 @param node 节点 */
-    void updateSize(Node* node);
-
-    /** @brief 递归中序遍历 @param node 节点 @param result 结果列表 */
-    void inorderImpl(Node* node, QVector<std::pair<int, double>>& result) const;
-
-    /** @brief 递归求高度 @param node 节点 @return 高度 */
-    int heightImpl(Node* node) const;
-
-    /** @brief 递归删除所有节点 @param node 节点 */
-    void destroyTree(Node* node);
-
-    /** @brief 深拷贝子树 @param node 源节点 @return 新节点 */
-    Node* cloneTree(Node* node) const;
+    Node* rotateRight(Node* node);  ///< @brief 右旋转
+    Node* rotateLeft(Node* node);   ///< @brief 左旋转
+    Node* insertImpl(Node* node, int key, double value, int priority); ///< @brief 递归插入
+    Node* removeImpl(Node* node, int key);          ///< @brief 递归删除
+    void splitImpl(Node* node, int threshold, Node*& left, Node*& right); ///< @brief 分裂实现
+    Node* mergeImpl(Node* left, Node* right);       ///< @brief 合并实现
+    void updateSize(Node* node);    ///< @brief 更新子树大小
+    void inorderImpl(Node* node, QVector<std::pair<int, double>>& result) const; ///< @brief 中序遍历
+    int heightImpl(Node* node) const;               ///< @brief 递归求高度
+    void destroyTree(Node* node);   ///< @brief 递归销毁
+    Node* cloneTree(Node* node) const;///< @brief 深拷贝子树
 
     Node* m_root;                   ///< 树根
     int m_size;                     ///< 节点数
-
     mutable Stats m_stats;          ///< 统计信息
     mutable double m_timeSum = 0.0; ///< 累计耗时
 };
