@@ -899,6 +899,21 @@ set(SOURCES
     src/utils/dct/DctTransform.cpp
     src/utils/distance/DistanceMetric.cpp
     src/utils/cluster2/DbScan.cpp
+    src/utils/gmixture/GaussianMixture.cpp
+    src/utils/bayes3/NaiveBayesClassifier.cpp
+    src/utils/crossval/CrossValidator.cpp
+    src/utils/emd/EarthMoverDistance.cpp
+    src/utils/peakhold2/PeakTracker.cpp
+    src/utils/cepstrum3/CepstralAnalysis.cpp
+    src/utils/entropy2/RenyiEntropy.cpp
+    src/utils/pca2/KernelPca.cpp
+    src/utils/arima/ArimaModel.cpp
+    src/utils/stacked/StackedEnsemble.cpp
+    src/utils/glm/GeneralizedLinearModel.cpp
+    src/utils/ensemble/BaggingEnsemble.cpp
+    src/utils/bernstein/BernsteinPolynomial.cpp
+    src/utils/taylor/TaylorSeries.cpp
+    src/utils/hermite/HermiteInterpolation.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -2118,6 +2133,23 @@ set(HEADERS
     src/utils/dct/DctTransform.h
     src/utils/distance/DistanceMetric.h
     src/utils/cluster2/DbScan.h
+
+    # -- Wave 42 头文件 --
+    src/utils/arima/ArimaModel.h
+    src/utils/bayes3/NaiveBayesClassifier.h
+    src/utils/bernstein/BernsteinPolynomial.h
+    src/utils/cepstrum3/CepstralAnalysis.h
+    src/utils/crossval/CrossValidator.h
+    src/utils/emd/EarthMoverDistance.h
+    src/utils/ensemble/BaggingEnsemble.h
+    src/utils/entropy2/RenyiEntropy.h
+    src/utils/glm/GeneralizedLinearModel.h
+    src/utils/gmixture/GaussianMixture.h
+    src/utils/hermite/HermiteInterpolation.h
+    src/utils/pca2/KernelPca.h
+    src/utils/peakhold2/PeakTracker.h
+    src/utils/stacked/StackedEnsemble.h
+    src/utils/taylor/TaylorSeries.h
 )
 
 set(RESOURCES
