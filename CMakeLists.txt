@@ -878,6 +878,7 @@ set(SOURCES
     src/utils/decomp2/CholeskyDecomposition.cpp
     src/utils/graph4/BellmanFord.cpp
     src/utils/graph5/FloydWarshall.cpp
+    src/utils/graph5/AStarSearch.cpp
     src/utils/mst/KruskalMST.cpp
     src/utils/mst2/PrimMST.cpp
     src/utils/stringmatch/KmpMatcher.cpp
@@ -1055,7 +1056,7 @@ set(SOURCES
     src/utils/morpho2/MorphologicalOps.cpp
     src/utils/fit3/SplineInterpolation.cpp
     src/utils/conv2/Convolution2D.cpp
-    src/utils/linalg4/LuDecomposition.cpp
+    # src/utils/linalg4/LuDecomposition.cpp  # removed: conflicts with decomp/LuDecomposition (same class name)
     src/utils/signal5/EnvelopeDetector.cpp
     src/utils/graph9/MinimumSpanningTree.cpp
     src/utils/code3/HammingCode.cpp
@@ -1377,6 +1378,31 @@ set(SOURCES
     src/utils/wavreader/WavReader.cpp
     src/utils/hilbert/HilbertTransform.cpp
     src/utils/lomb2/LombScargle.cpp
+    # -- Wave 73: linter未跟踪模块集成 --
+    src/utils/aho2/CommentzWalter.cpp
+    src/utils/btree4/BStarTree.cpp
+    src/utils/dict/TrieMap.cpp
+    src/utils/friedman/FriedmanTest.cpp
+    src/utils/golay/GolayCode.cpp
+    src/utils/haar2/HaarWavelet2D.cpp
+    src/utils/horner2/HornerScheme.cpp
+    src/utils/inv_perm/InversePermutation.cpp
+    src/utils/levenshtein2/DamerauLevenshtein.cpp
+    src/utils/lfsr/LfsrSequence.cpp
+    src/utils/median3/MedianFilter3D.cpp
+    src/utils/median_abs/MedianAbsoluteDeviation.cpp
+    src/utils/min_cut/MinCut.cpp
+    src/utils/poly_roots/PolynomialRoots.cpp
+    src/utils/quadtree3/QuadtreeBalancer.cpp
+    src/utils/reed_solomon2/ReedSolomon2.cpp
+    src/utils/simon/SimonSpeckCipher.cpp
+    src/utils/suffix2/SuffixArray2.cpp
+    src/utils/tensor3/TensorDecomposition.cpp
+    src/utils/treap2/ImplicitTreap.cpp
+    src/utils/cuckoo_hash/CuckooHashTable.cpp
+    src/utils/qr3/HouseholderQR.cpp
+    src/utils/sturm2/SturmSequence.cpp
+    src/utils/whitening2/ZcaWhitening.cpp
 )
 
 set(HEADERS
@@ -2450,7 +2476,7 @@ set(HEADERS
     src/utils/morpho2/MorphologicalOps.h
     src/utils/fit3/SplineInterpolation.h
     src/utils/conv2/Convolution2D.h
-    src/utils/linalg4/LuDecomposition.h
+    # src/utils/linalg4/LuDecomposition.h  # removed: conflicts with decomp/LuDecomposition (same class name)
     src/utils/signal5/EnvelopeDetector.h
     src/utils/graph9/MinimumSpanningTree.h
     src/utils/code3/HammingCode.h
@@ -2467,6 +2493,31 @@ set(HEADERS
     src/utils/hanoi/HanoiTower.h
     src/utils/life/GameOfLife.h
     src/utils/delaunay3/DelaunayTriangulation2.h
+    # -- Wave 73: linter未跟踪模块集成 --
+    src/utils/aho2/CommentzWalter.h
+    src/utils/btree4/BStarTree.h
+    src/utils/cuckoo_hash/CuckooHashTable.h
+    src/utils/dict/TrieMap.h
+    src/utils/friedman/FriedmanTest.h
+    src/utils/golay/GolayCode.h
+    src/utils/haar2/HaarWavelet2D.h
+    src/utils/horner2/HornerScheme.h
+    src/utils/inv_perm/InversePermutation.h
+    src/utils/levenshtein2/DamerauLevenshtein.h
+    src/utils/lfsr/LfsrSequence.h
+    src/utils/median3/MedianFilter3D.h
+    src/utils/median_abs/MedianAbsoluteDeviation.h
+    src/utils/min_cut/MinCut.h
+    src/utils/poly_roots/PolynomialRoots.h
+    src/utils/qr3/HouseholderQR.h
+    src/utils/quadtree3/QuadtreeBalancer.h
+    src/utils/reed_solomon2/ReedSolomon2.h
+    src/utils/simon/SimonSpeckCipher.h
+    src/utils/sturm2/SturmSequence.h
+    src/utils/suffix2/SuffixArray2.h
+    src/utils/tensor3/TensorDecomposition.h
+    src/utils/treap2/ImplicitTreap.h
+    src/utils/whitening2/ZcaWhitening.h
 )
 
 set(RESOURCES

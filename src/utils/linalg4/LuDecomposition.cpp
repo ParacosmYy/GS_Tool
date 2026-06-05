@@ -3,7 +3,7 @@
  * @brief LU分解实现 — 部分主元选取/求解/行列式/逆矩阵
  */
 
-#include "utils/linalg4/LuDecomposition2.h"
+#include "utils/linalg4/LuDecomposition.h"
 
 #include <QElapsedTimer>
 #include <QtMath>
