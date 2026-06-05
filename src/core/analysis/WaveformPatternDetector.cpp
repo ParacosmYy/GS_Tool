@@ -108,7 +108,9 @@ void WaveformPatternDetector::analyze()
         return;
     }
 
-    int patternsBefore = m_patterns.size();
+    /* 清空上次检测结果，防止无界累积 */
+    m_patterns.clear();
+    int patternsBefore = 0;
 
     /* 按配置顺序运行各检测算法 */
     if (m_config.detectSpikes) {
@@ -295,7 +297,7 @@ void WaveformPatternDetector::detectDropouts()
 void WaveformPatternDetector::detectPeriodicPatterns()
 {
     int bufSize = m_buffer.size();
-    if (bufSize < m_config.minPatternLength * 2) return;
+    if (bufSize < 2 || bufSize < m_config.minPatternLength * 2) return;
 
     /* 计算方差，常数信号无周期 */
     double stddev = (m_runningCount > 1)
@@ -383,7 +385,7 @@ void WaveformPatternDetector::detectPeriodicPatterns()
 void WaveformPatternDetector::detectLevelChanges()
 {
     int bufSize = m_buffer.size();
-    if (bufSize < m_config.minPatternLength * 3) return;
+    if (bufSize < 3 || bufSize < m_config.minPatternLength * 3) return;
 
     double stddev = (m_runningCount > 1)
         ? qSqrt(m_runningM2 / static_cast<double>(m_runningCount - 1))

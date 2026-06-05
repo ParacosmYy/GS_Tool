@@ -98,7 +98,12 @@ ByteFrequencyAnalyzer::AnalysisResult ByteFrequencyAnalyzer::analyze(const QByte
     result.leastFrequentByte = static_cast<quint64>(minByte);
 
     /* ---- 步骤4: 计算香农熵 ---- */
-    result.maxEntropy        = std::log2(256.0);  /* 固定为 8.0 bit */
+    /* 计算实际出现的不同字节数，用于正确的归一化 */
+    int uniqueBytes = 0;
+    for (int i = 0; i < 256; ++i) {
+        if (m_byteCounts[i] > 0) ++uniqueBytes;
+    }
+    result.maxEntropy        = (uniqueBytes > 1) ? std::log2(static_cast<double>(uniqueBytes)) : 0.0;
     result.shannonEntropy    = computeShannonEntropy();
     result.normalizedEntropy = (result.maxEntropy > 0.0)
         ? result.shannonEntropy / result.maxEntropy

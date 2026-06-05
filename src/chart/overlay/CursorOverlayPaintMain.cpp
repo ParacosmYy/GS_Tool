@@ -89,9 +89,10 @@ void CursorOverlay::drawDeltaPanel(QPainter& painter)
         lines << tr("1/ΔX: %1").arg(1.0 / deltaX, 0, 'f', 4);
     }
 
-    // 各通道ΔY — 使用二分查找+插值(避免O(N)遍历和QVector拷贝)
-    for (const QString& ch : m_model->channelNames()) {
-        const QVector<QPointF>& data = m_model->channelData(ch);
+    // 各通道ΔY — 使用二分查找+插值
+    const QStringList channelNames = m_model->channelNames();
+    for (const QString& ch : channelNames) {
+        const QVector<QPointF> data = m_model->channelData(ch);
         double valA = 0.0, valB = 0.0;
         if (interpolateYForMain(data, m_cursorAX, valA) &&
             interpolateYForMain(data, m_cursorBX, valB)) {
