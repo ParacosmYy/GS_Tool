@@ -102,7 +102,10 @@ void RingBufferAtomic::clear()
     m_tail.store(0, std::memory_order_relaxed);
 }
 
-RingBufferAtomic::Stats RingBufferAtomic::stats() const { return m_stats; }
+RingBufferAtomic::Stats RingBufferAtomic::stats() const
+{
+    return m_stats;
+}
 
 void RingBufferAtomic::resetStatistics()
 {

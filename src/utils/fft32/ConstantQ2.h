@@ -19,6 +19,9 @@ public:
     QVector<double> inverse(const QVector<double>& cqtCoeffs);
     QVector<double> frequencies() const;
     int totalBins() const;
+    int windowLength(int k) const;
+    double frequencyResolution(int k) const;
+    QVector<double> chromaFeatures(const QVector<double>& cqtCoeffs) const;
     Stats stats() const { return m_stats; }
     void resetStatistics();
 signals:

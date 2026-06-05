@@ -24,7 +24,7 @@ TurboInterleaver::TurboInterleaver(QObject* parent)
 {
 }
 
-QVector<int> TurboInterleaver::generateSRandom(int length, int spread) const
+QVector<int> TurboInterleaver::generateSRandom(int length, int spread)
 {
     QElapsedTimer timer;
     timer.start();
@@ -84,7 +84,7 @@ QVector<int> TurboInterleaver::generateSRandom(int length, int spread) const
     return perm;
 }
 
-QVector<int> TurboInterleaver::generateUMTS(int length) const
+QVector<int> TurboInterleaver::generateUMTS(int length)
 {
     QElapsedTimer timer;
     timer.start();

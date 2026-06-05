@@ -3,7 +3,7 @@
  * @brief Householder QR分解实现
  */
 
-#include "utils/qr3/HouseholderQR2.h"
+#include "utils/qr3/HouseholderQR.h"
 
 #include <QElapsedTimer>
 #include <cmath>

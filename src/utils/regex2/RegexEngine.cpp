@@ -82,7 +82,7 @@ bool RegexEngine::compile(const QString& pattern)
 
     auto pushConcat = [&]() {
         while (concatPending > 0) {
-            postfix.append({"CONCAT", {}});
+            postfix.append(QPair<QString, QSet<QChar>>{"CONCAT", {}});
             concatPending--;
         }
     };
@@ -226,7 +226,7 @@ RegexEngine::MatchResult RegexEngine::match(const QString& text) const
 }
 
 /** @brief 查找所有匹配 @param text 输入文本 @return 所有匹配 */
-QVector<RegexEngine::MatchResult> RegexEngine::matchAll(const QString& text) const
+QVector<RegexEngine::MatchResult> RegexEngine::matchAll(const QString& text)
 {
     if (!m_compiled) return {};
 
@@ -243,10 +243,10 @@ QVector<RegexEngine::MatchResult> RegexEngine::matchAll(const QString& text) con
     }
 
     qint64 elapsed = timer.elapsed();
-    const_cast<RegexEngine*>(this)->m_timeSum += static_cast<double>(elapsed);
-    const_cast<RegexEngine*>(this)->m_stats.totalMatches += results.size();
-    const_cast<RegexEngine*>(this)->m_stats.totalSuccessfulMatches += results.size();
-    const_cast<RegexEngine*>(this)->m_stats.avgProcessingTimeMs = m_timeSum
+    m_timeSum += static_cast<double>(elapsed);
+    m_stats.totalMatches += results.size();
+    m_stats.totalSuccessfulMatches += results.size();
+    m_stats.avgProcessingTimeMs = m_timeSum
         / (m_stats.totalCompilations + m_stats.totalMatches);
 
     emit matchComplete(!results.isEmpty(), results.size());

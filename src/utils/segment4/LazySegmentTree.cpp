@@ -57,7 +57,7 @@ void LazySegmentTree::rangeUpdate(int left, int right, double value, UpdateOp op
 
 /** @brief 区间查询 @param left 左端 @param right 右端 @param type 查询类型 @return 结果 */
 LazySegmentTree::QueryResult LazySegmentTree::rangeQuery(
-    int left, int right, QueryType type) const
+    int left, int right, QueryType type)
 {
     if (!isBuilt() || left > right || left < 0 || right >= m_size) {
         return QueryResult{};
@@ -77,7 +77,7 @@ LazySegmentTree::QueryResult LazySegmentTree::rangeQuery(
     ++m_stats.totalQueries;
 
     qint64 elapsed = timer.elapsed();
-    const_cast<LazySegmentTree*>(this)->m_timeSum += static_cast<double>(elapsed);
+    m_timeSum += static_cast<double>(elapsed);
     m_stats.avgProcessingTimeMs = m_timeSum
         / (m_stats.totalUpdates + m_stats.totalQueries);
 
@@ -93,7 +93,7 @@ void LazySegmentTree::pointUpdate(int index, double value, UpdateOp op)
 }
 
 /** @brief 单点查询 @param index 位置 @return 值 */
-double LazySegmentTree::pointQuery(int index) const
+double LazySegmentTree::pointQuery(int index)
 {
     if (!isBuilt() || index < 0 || index >= m_size) return 0.0;
     QueryResult r = rangeQuery(index, index);
@@ -101,7 +101,7 @@ double LazySegmentTree::pointQuery(int index) const
 }
 
 /** @brief 获取原始数据快照 @return 数据 */
-QVector<double> LazySegmentTree::data() const
+QVector<double> LazySegmentTree::data()
 {
     if (!isBuilt()) return {};
 
@@ -237,7 +237,7 @@ void LazySegmentTree::buildHelper(int idx, int l, int r,
 
 /** @brief 递归更新 @param idx 节点 @param l 左界 @param r 右界 @param ql 查询左 @param qr 查询右 @param val 值 @param op 操作 */
 void LazySegmentTree::updateHelper(int idx, int l, int r, int ql, int qr,
-                                    double val, UpdateOp op) const
+                                    double val, UpdateOp op)
 {
     m_stats.totalNodesVisited++;
 

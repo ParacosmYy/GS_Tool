@@ -109,7 +109,7 @@ double SparseMatrixCSR::get(int row, int col) const
 /* ---------- SpMV ---------- */
 
 QVector<double> SparseMatrixCSR::multiplyVector(
-    const QVector<double>& x) const
+    const QVector<double>& x)
 {
     QElapsedTimer timer;
     timer.start();
@@ -139,12 +139,12 @@ QVector<double> SparseMatrixCSR::multiplyVector(
 
 /* ---------- 转置 ---------- */
 
-SparseMatrixCSR SparseMatrixCSR::transpose() const
+SparseMatrixCSR* SparseMatrixCSR::transpose()
 {
     QElapsedTimer timer;
     timer.start();
 
-    SparseMatrixCSR result(m_cols, m_rows, parent());
+    SparseMatrixCSR* result = new SparseMatrixCSR(m_cols, m_rows, parent());
     int nnz = nonZeroCount();
 
     /* 统计每列非零元素数 */
@@ -154,22 +154,22 @@ SparseMatrixCSR SparseMatrixCSR::transpose() const
     }
 
     /* 构建行指针(转置后的行对应原列) */
-    result.m_rowPtr.resize(m_cols + 1, 0);
+    result->m_rowPtr.resize(m_cols + 1, 0);
     for (int i = 0; i < m_cols; ++i) {
-        result.m_rowPtr[i + 1] = result.m_rowPtr[i] + colCounts[i];
+        result->m_rowPtr[i + 1] = result->m_rowPtr[i] + colCounts[i];
     }
 
     /* 填充值和列索引 */
-    result.m_values.resize(nnz);
-    result.m_colIndices.resize(nnz);
+    result->m_values.resize(nnz);
+    result->m_colIndices.resize(nnz);
 
-    QVector<int> currentPos = result.m_rowPtr;
+    QVector<int> currentPos = result->m_rowPtr;
     for (int i = 0; i < m_rows; ++i) {
         for (int j = m_rowPtr[i]; j < m_rowPtr[i + 1]; ++j) {
             int col = m_colIndices[j];
             int pos = currentPos[col]++;
-            result.m_values[pos] = m_values[j];
-            result.m_colIndices[pos] = i; /* 原行号变为列号 */
+            result->m_values[pos] = m_values[j];
+            result->m_colIndices[pos] = i; /* 原行号变为列号 */
         }
     }
 
@@ -178,7 +178,7 @@ SparseMatrixCSR SparseMatrixCSR::transpose() const
     m_stats.avgProcessingTimeMs = (m_stats.totalTransposes > 0)
         ? m_timeSum / m_stats.totalTransposes : 0.0;
 
-    emit transposeCompleted(result.m_rows, result.m_cols);
+    emit transposeCompleted(result->m_rows, result->m_cols);
     return result;
 }
 

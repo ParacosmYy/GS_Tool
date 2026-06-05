@@ -75,7 +75,7 @@ public:
      * @param k 最近邻数量
      * @return 按距离排序的邻居列表
      */
-    QVector<Neighbor> knnSearch(const Point& query, int k) const;
+    QVector<Neighbor> knnSearch(const Point& query, int k);
 
     /**
      * @brief 球形范围查询
@@ -83,14 +83,14 @@ public:
      * @param radius 半径
      * @return 范围内的点索引及距离
      */
-    QVector<Neighbor> rangeSearch(const Point& center, double radius) const;
+    QVector<Neighbor> rangeSearch(const Point& center, double radius);
 
     /**
      * @brief 查询最近邻(单点)
      * @param query 查询点
      * @return 最近邻(索引和距离)
      */
-    Neighbor nearestNeighbor(const Point& query) const;
+    Neighbor nearestNeighbor(const Point& query);
 
     /** @brief 树是否已构建 */
     bool isBuilt() const { return m_root != nullptr; }

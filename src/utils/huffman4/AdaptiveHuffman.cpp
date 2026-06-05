@@ -3,7 +3,7 @@
  * @brief 自适应Huffman编码实现(FGK算法)
  */
 
-#include "AdaptiveHuffmanV2.h"
+#include "AdaptiveHuffman.h"
 #include <QElapsedTimer>
 #include <cstring>
 

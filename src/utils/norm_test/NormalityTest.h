@@ -27,6 +27,7 @@ public:
         double pValue = 0.0;    ///< p值
         bool isNormal = false;  ///< 是否通过正态性(α=0.05)
         int sampleSize = 0;     ///< 样本大小
+        double timeMs = 0.0;    ///< 处理耗时(ms)
     };
 
     /** @brief 统计信息 */

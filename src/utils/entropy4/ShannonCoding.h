@@ -76,21 +76,21 @@ public:
      * @param data 待编码文本
      * @return 编码结果
      */
-    EncodingResult encodeShannon(const QString& data) const;
+    EncodingResult encodeShannon(const QString& data);
 
     /**
      * @brief Huffman编码
      * @param data 待编码文本
      * @return 编码结果
      */
-    EncodingResult encodeHuffman(const QString& data) const;
+    EncodingResult encodeHuffman(const QString& data);
 
     /**
      * @brief 对比Shannon-Fano与Huffman编码
      * @param data 待编码文本
      * @return 对比结果
      */
-    ComparisonResult compare(const QString& data) const;
+    ComparisonResult compare(const QString& data);
 
     /**
      * @brief 从概率表构建Shannon-Fano编码

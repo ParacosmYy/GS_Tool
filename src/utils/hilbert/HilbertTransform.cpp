@@ -3,7 +3,7 @@
  * @brief Hilbert变换实现 — 频域方法
  */
 
-#include "utils/hilbert/HilbertTransformer.h"
+#include "utils/hilbert/HilbertTransform.h"
 
 #include <QElapsedTimer>
 #include <cmath>

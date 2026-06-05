@@ -1675,7 +1675,7 @@ set(SOURCES
     src/utils/signal40/PitchTracker2.cpp
     src/utils/tree40/FenwickTree2D2.cpp
     src/utils/cluster37/GaussianMixture8.cpp
-    src/utils/code38/ReedSolomon3.cpp
+    # src/utils/code38/ReedSolomon3.cpp  # removed: conflicts with code9/ReedSolomon3
     src/utils/dsp39/DynamicEQ.cpp
     src/utils/fft40/PrunedFFT3.cpp
     src/utils/graph53/MinCut2.cpp
@@ -1686,7 +1686,7 @@ set(SOURCES
     src/utils/code39/ConvolutionalCode4.cpp
     src/utils/dsp40/Deesser.cpp
     src/utils/fft41/ConstantQ3.cpp
-    src/utils/graph54/ChinesePostman.cpp
+    # src/utils/graph54/ChinesePostman.cpp  # removed: conflicts with graph27/ChinesePostman
     src/utils/matrix43/SchurDecomp4.cpp
     src/utils/signal42/PhaseCorrelator2.cpp
     src/utils/tree42/RedBlackTree4.cpp
@@ -1696,7 +1696,7 @@ set(SOURCES
     src/utils/fft42/GoertzelAlgorithm2.cpp
     src/utils/graph55/BipartiteMatch3.cpp
     src/utils/matrix44/SymmetricEigen6.cpp
-    src/utils/signal43/SpectralClustering3.cpp
+    # src/utils/signal43/SpectralClustering3.cpp  # removed: conflicts with cluster12/SpectralClustering3
     src/utils/tree43/AVLTree4.cpp
     src/utils/cluster40/AgglomerativeCluster3.cpp
     src/utils/code41/PolarCode4.cpp
@@ -3163,7 +3163,7 @@ set(HEADERS
     src/utils/signal40/PitchTracker2.h
     src/utils/tree40/FenwickTree2D2.h
     src/utils/cluster37/GaussianMixture8.h
-    src/utils/code38/ReedSolomon3.h
+    # src/utils/code38/ReedSolomon3.h  # removed: conflicts with code9/ReedSolomon3
     src/utils/dsp39/DynamicEQ.h
     src/utils/fft40/PrunedFFT3.h
     src/utils/graph53/MinCut2.h
@@ -3174,7 +3174,7 @@ set(HEADERS
     src/utils/code39/ConvolutionalCode4.h
     src/utils/dsp40/Deesser.h
     src/utils/fft41/ConstantQ3.h
-    src/utils/graph54/ChinesePostman.h
+    # src/utils/graph54/ChinesePostman.h  # removed: conflicts with graph27/ChinesePostman
     src/utils/matrix43/SchurDecomp4.h
     src/utils/signal42/PhaseCorrelator2.h
     src/utils/tree42/RedBlackTree4.h
@@ -3184,7 +3184,7 @@ set(HEADERS
     src/utils/fft42/GoertzelAlgorithm2.h
     src/utils/graph55/BipartiteMatch3.h
     src/utils/matrix44/SymmetricEigen6.h
-    src/utils/signal43/SpectralClustering3.h
+    # src/utils/signal43/SpectralClustering3.h  # removed: conflicts with cluster12/SpectralClustering3
     src/utils/tree43/AVLTree4.h
     src/utils/cluster40/AgglomerativeCluster3.h
     src/utils/code41/PolarCode4.h

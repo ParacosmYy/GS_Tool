@@ -3,7 +3,7 @@
  * @brief Polar码编解码器实现
  */
 
-#include "PolarCodec.h"
+#include "utils/polar/PolarCode.h"
 
 #include <QElapsedTimer>
 #include <cmath>

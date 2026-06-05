@@ -110,7 +110,7 @@ QVector<QVector<double>> MatrixMultiply::strassen(
     }
 
     /* 简化: 仅对方阵做Strassen, 非方阵降级 */
-    int sz = qMax({m, n, k});
+    int sz = qMax(qMax(m, n), k);
     int half = sz / 2;
 
     /* 简单实现: 仅分块乘法 */

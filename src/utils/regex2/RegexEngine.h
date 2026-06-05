@@ -74,7 +74,7 @@ public:
      * @param text 输入文本
      * @return 所有匹配结果列表
      */
-    QVector<MatchResult> matchAll(const QString& text) const;
+    QVector<MatchResult> matchAll(const QString& text);
 
     /**
      * @brief 测试文本是否完全匹配
@@ -132,6 +132,6 @@ private:
     int m_startState = -1;          ///< NFA起始状态
     int m_acceptState = -1;         ///< NFA接受状态
     QVector<NfaState> m_states;     ///< NFA状态表
-    Stats m_stats;                  ///< 统计信息
-    double m_timeSum = 0.0;         ///< 累计耗时
+    mutable Stats m_stats;                  ///< 统计信息
+    mutable double m_timeSum = 0.0;         ///< 累计耗时
 };

@@ -45,14 +45,14 @@ public:
      * @param spread 最小距离约束S(典型值 sqrt(N/2))
      * @return 置换表 perm[i]=j 表示位置i映射到位置j
      */
-    QVector<int> generateSRandom(int length, int spread) const;
+    QVector<int> generateSRandom(int length, int spread);
 
     /**
      * @brief 生成UMTS标准交织置换表
      * @param length 帧长(必须为40~5114之间的合法值)
      * @return 置换表
      */
-    QVector<int> generateUMTS(int length) const;
+    QVector<int> generateUMTS(int length);
 
     /**
      * @brief 生成解交织表(置换表逆映射)

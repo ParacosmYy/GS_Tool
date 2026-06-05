@@ -15,5 +15,9 @@ public:
 signals:
     void transformComplete(int size);
 private:
+    int nextPowerOfTwo(int n) const;
+    QVector<double> padToLength(const QVector<double>& input, int len) const;
+    int bitReverse(int value, int bits) const;
+    void updateTimeStats(double elapsed) const;
     Stats m_stats; double m_timeSum = 0.0;
 };

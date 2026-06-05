@@ -97,6 +97,7 @@ signals:
     void queried(double result);
 
 private:
+    double queryInternal(int r, int c) const;
     int m_rows = 0;                 ///< 行数
     int m_cols = 0;                 ///< 列数
     QVector<QVector<double>> m_tree; ///< 二维树状数组(1-based索引)

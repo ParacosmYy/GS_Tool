@@ -58,7 +58,7 @@ public:
      * @param edges 边列表
      * @return 排序结果(含层级信息)
      */
-    SortResult sortKahn(int numVertices, const EdgeList& edges) const;
+    SortResult sortKahn(int numVertices, const EdgeList& edges);
 
     /**
      * @brief DFS拓扑排序
@@ -66,7 +66,7 @@ public:
      * @param edges 边列表
      * @return 排序结果(不含层级信息)
      */
-    SortResult sortDFS(int numVertices, const EdgeList& edges) const;
+    SortResult sortDFS(int numVertices, const EdgeList& edges);
 
     /**
      * @brief 检测图中是否有环
@@ -74,7 +74,7 @@ public:
      * @param edges 边列表
      * @return 是否有环
      */
-    bool hasCycle(int numVertices, const EdgeList& edges) const;
+    bool hasCycle(int numVertices, const EdgeList& edges);
 
     /**
      * @brief 获取统计信息

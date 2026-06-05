@@ -20,7 +20,7 @@ TopologicalSort::TopologicalSort(QObject* parent)
 /* ---------- Kahn算法(BFS) ---------- */
 
 TopologicalSort::SortResult TopologicalSort::sortKahn(
-    int numVertices, const EdgeList& edges) const
+    int numVertices, const EdgeList& edges)
 {
     QElapsedTimer timer;
     timer.start();
@@ -101,7 +101,7 @@ TopologicalSort::SortResult TopologicalSort::sortKahn(
 /* ---------- DFS拓扑排序 ---------- */
 
 TopologicalSort::SortResult TopologicalSort::sortDFS(
-    int numVertices, const EdgeList& edges) const
+    int numVertices, const EdgeList& edges)
 {
     QElapsedTimer timer;
     timer.start();
@@ -150,7 +150,7 @@ TopologicalSort::SortResult TopologicalSort::sortDFS(
 
 /* ---------- 环检测 ---------- */
 
-bool TopologicalSort::hasCycle(int numVertices, const EdgeList& edges) const
+bool TopologicalSort::hasCycle(int numVertices, const EdgeList& edges)
 {
     auto result = sortKahn(numVertices, edges);
     return result.hasCycle;

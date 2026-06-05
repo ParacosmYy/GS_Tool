@@ -18,6 +18,9 @@ public:
 signals:
     void frameProcessed(int index, double freq, double conf);
 private:
+    double detectACF(const QVector<double>& frame) const;
+    double detectYIN(const QVector<double>& frame) const;
+    double detectCepstrum(const QVector<double>& frame) const;
     double m_sampleRate = 44100.0; int m_frameSize = 2048;
     int m_hopSize = 512; int m_method = 0;
     Stats m_stats; double m_timeSum = 0.0;

@@ -81,13 +81,13 @@ public:
      * @param x 输入向量(长度必须等于列数)
      * @return 结果向量
      */
-    QVector<double> multiplyVector(const QVector<double>& x) const;
+    QVector<double> multiplyVector(const QVector<double>& x);
 
     /**
      * @brief 矩阵转置，返回新的CSR矩阵
      * @return 转置矩阵
      */
-    SparseMatrixCSR transpose() const;
+    SparseMatrixCSR* transpose();
 
     /**
      * @brief 获取指定行的非零元素

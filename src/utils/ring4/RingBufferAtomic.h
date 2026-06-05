@@ -23,10 +23,10 @@ class RingBufferAtomic : public QObject
 public:
     /** @brief 统计信息 */
     struct Stats {
-        std::atomic<int> totalWrites{0};     /**< 总写入次数 */
-        std::atomic<int> totalReads{0};      /**< 总读取次数 */
-        std::atomic<long long> totalBytesWritten{0}; /**< 总写入字节 */
-        std::atomic<long long> totalBytesRead{0};    /**< 总读取字节 */
+        int totalWrites = 0;     /**< 总写入次数 */
+        int totalReads = 0;      /**< 总读取次数 */
+        long long totalBytesWritten = 0; /**< 总写入字节 */
+        long long totalBytesRead = 0;    /**< 总读取字节 */
     };
 
     /** @brief 构造函数 */

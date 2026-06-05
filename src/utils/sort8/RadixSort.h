@@ -13,6 +13,7 @@
 #pragma once
 
 #include <QObject>
+#include <QVariant>
 #include <QVector>
 #include <functional>
 
@@ -55,7 +56,7 @@ public:
      */
     QVector<QVariant> sortLSD(const QVector<QVariant>& data,
                                KeyExtractor keyExtractor,
-                               int maxDigits) const;
+                               int maxDigits);
 
     /**
      * @brief MSD基数排序(递归分桶)
@@ -66,14 +67,14 @@ public:
      */
     QVector<QVariant> sortMSD(const QVector<QVariant>& data,
                                KeyExtractor keyExtractor,
-                               int maxDigits) const;
+                               int maxDigits);
 
     /**
      * @brief 便捷方法: 对整数向量进行LSD排序
      * @param values 整数向量
      * @return 排序后的向量
      */
-    QVector<qint64> sortIntegers(const QVector<qint64>& values) const;
+    QVector<qint64> sortIntegers(const QVector<qint64>& values);
 
     /**
      * @brief 获取统计信息

@@ -24,6 +24,10 @@ signals:
     void treeModified(const QString& operation, int u, int v);
 private:
     int findRoot(int u) const;
+    int nodeDepth(int u) const;
+    int computeSubtreeSize(int u);
+    void updateAncestorSizes(int u, int delta);
+    void resetSubtreeParent(int u);
     int m_n;
     QVector<int> m_parent; QVector<int> m_rank; QVector<int> m_size;
     QVector<QVector<int>> m_children;

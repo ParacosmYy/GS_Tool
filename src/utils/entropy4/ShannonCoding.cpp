@@ -20,7 +20,7 @@ ShannonCoding::ShannonCoding(QObject* parent)
 /* ---------- Shannon-Fano编码 ---------- */
 
 ShannonCoding::EncodingResult ShannonCoding::encodeShannon(
-    const QString& data) const
+    const QString& data)
 {
     QElapsedTimer timer;
     timer.start();
@@ -53,7 +53,7 @@ ShannonCoding::EncodingResult ShannonCoding::encodeShannon(
 /* ---------- Huffman编码 ---------- */
 
 ShannonCoding::EncodingResult ShannonCoding::encodeHuffman(
-    const QString& data) const
+    const QString& data)
 {
     QElapsedTimer timer;
     timer.start();
@@ -86,7 +86,7 @@ ShannonCoding::EncodingResult ShannonCoding::encodeHuffman(
 /* ---------- 对比 ---------- */
 
 ShannonCoding::ComparisonResult ShannonCoding::compare(
-    const QString& data) const
+    const QString& data)
 {
     ComparisonResult cmp;
     cmp.shannon = encodeShannon(data);

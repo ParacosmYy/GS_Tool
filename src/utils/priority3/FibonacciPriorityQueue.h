@@ -13,6 +13,7 @@
 #pragma once
 
 #include <QObject>
+#include <QVariant>
 #include <QVector>
 #include <QMap>
 #include <functional>
@@ -125,6 +126,9 @@ private:
         FibNode* right = nullptr;   /**< 右兄弟 */
         int degree = 0;         /**< 度(子节点数) */
         bool marked = false;    /**< 是否被标记(失去过子节点) */
+
+        FibNode(double k, const QVariant& p)
+            : key(k), payload(p) {}
     };
 
     /** @brief 将节点加入根链表 */

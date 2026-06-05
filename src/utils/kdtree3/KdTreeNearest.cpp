@@ -71,7 +71,7 @@ bool KdTreeNearest::build(const QVector<Point>& points)
 /* ---------- KNN查询 ---------- */
 
 QVector<KdTreeNearest::Neighbor> KdTreeNearest::knnSearch(
-    const Point& query, int k) const
+    const Point& query, int k)
 {
     QElapsedTimer timer;
     timer.start();
@@ -102,7 +102,7 @@ QVector<KdTreeNearest::Neighbor> KdTreeNearest::knnSearch(
 /* ---------- 范围查询 ---------- */
 
 QVector<KdTreeNearest::Neighbor> KdTreeNearest::rangeSearch(
-    const Point& center, double radius) const
+    const Point& center, double radius)
 {
     QElapsedTimer timer;
     timer.start();
@@ -127,7 +127,7 @@ QVector<KdTreeNearest::Neighbor> KdTreeNearest::rangeSearch(
 /* ---------- 最近邻 ---------- */
 
 KdTreeNearest::Neighbor KdTreeNearest::nearestNeighbor(
-    const Point& query) const
+    const Point& query)
 {
     auto results = knnSearch(query, 1);
     if (results.isEmpty()) {

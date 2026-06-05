@@ -81,7 +81,7 @@ public:
      * @return 查询结果
      */
     QueryResult rangeQuery(int left, int right,
-                           QueryType type = QueryType::All) const;
+                           QueryType type = QueryType::All);
 
     /**
      * @brief 单点更新
@@ -97,7 +97,7 @@ public:
      * @param index 位置
      * @return 该点的值
      */
-    double pointQuery(int index) const;
+    double pointQuery(int index);
 
     /** @brief 数据大小 @return 元素数量 */
     int size() const { return m_size; }
@@ -106,7 +106,7 @@ public:
     bool isBuilt() const { return m_size > 0; }
 
     /** @brief 获取原始数据快照 @return 数据 */
-    QVector<double> data() const;
+    QVector<double> data();
 
     const Stats& stats() const { return m_stats; }
     void resetStatistics();
@@ -142,7 +142,7 @@ private:
 
     /** @brief 递归更新 @param idx 节点 @param l 左界 @param r 右界 @param ql 查询左 @param qr 查询右 @param val 值 @param op 操作 */
     void updateHelper(int idx, int l, int r, int ql, int qr,
-                      double val, UpdateOp op) const;
+                      double val, UpdateOp op);
 
     /** @brief 递归查询 @param idx 节点 @param l 左界 @param r 右界 @param ql 查询左 @param qr 查询右 @param result 结果 */
     void queryHelper(int idx, int l, int r, int ql, int qr,
@@ -150,6 +150,6 @@ private:
 
     int m_size = 0;                         ///< 数据大小
     mutable QVector<Node> m_tree;           ///< 线段树节点数组(mutable for lazy)
-    Stats m_stats;                          ///< 统计信息
-    double m_timeSum = 0.0;                 ///< 累计耗时
+    mutable Stats m_stats;                          ///< 统计信息
+    mutable double m_timeSum = 0.0;                 ///< 累计耗时
 };

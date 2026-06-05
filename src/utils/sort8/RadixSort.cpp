@@ -27,7 +27,7 @@ void RadixSort::setRadix(int radix)
 
 QVector<QVariant> RadixSort::sortLSD(const QVector<QVariant>& data,
                                        KeyExtractor keyExtractor,
-                                       int maxDigits) const
+                                       int maxDigits)
 {
     QElapsedTimer timer;
     timer.start();
@@ -60,7 +60,7 @@ QVector<QVariant> RadixSort::sortLSD(const QVector<QVariant>& data,
 
 QVector<QVariant> RadixSort::sortMSD(const QVector<QVariant>& data,
                                        KeyExtractor keyExtractor,
-                                       int maxDigits) const
+                                       int maxDigits)
 {
     QElapsedTimer timer;
     timer.start();
@@ -87,7 +87,7 @@ QVector<QVariant> RadixSort::sortMSD(const QVector<QVariant>& data,
 
 /* ---------- 整数便捷排序 ---------- */
 
-QVector<qint64> RadixSort::sortIntegers(const QVector<qint64>& values) const
+QVector<qint64> RadixSort::sortIntegers(const QVector<qint64>& values)
 {
     QElapsedTimer timer;
     timer.start();

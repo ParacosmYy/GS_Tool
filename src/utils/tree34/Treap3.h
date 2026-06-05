@@ -37,6 +37,9 @@ private:
     Node* insert(Node* root, double key, int value);
     Node* remove(Node* root, double key);
     void destroyTree(Node* n);
+    void rangeSumHelper(Node* n, double lo, double hi, double& sum) const;
+    void rangeAddHelper(Node* n, double lo, double hi, double delta);
+    void inOrderCollect(Node* n, QVector<QPair<double,int>>& result) const;
     Node* m_root = nullptr; int m_size = 0;
     Stats m_stats; double m_timeSum = 0.0;
 };

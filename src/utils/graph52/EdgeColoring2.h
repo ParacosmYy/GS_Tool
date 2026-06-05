@@ -17,6 +17,8 @@ public:
 signals:
     void coloringComplete(int colors);
 private:
+    int kempeChainSwap(int edgeIdx, QVector<QVector<bool>>& vertexUsed,
+                       QVector<int>& colors, int maxColors);
     int m_n = 0;
     QVector<QPair<int,int>> m_edges;
     Stats m_stats; double m_timeSum = 0.0;
