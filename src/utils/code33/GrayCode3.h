@@ -14,10 +14,10 @@ public:
     explicit GrayCode3(QObject* parent = nullptr);
     quint32 encode(quint32 binary) const;
     quint32 decode(quint32 gray) const;
-    QVector<quint32> generateSequence(int bits) const;
+    QVector<quint32> generateSequence(int bits);
     int hammingDistance(quint32 a, quint32 b) const;
-    QVector<QVector<int>> distanceMatrix(int bits) const;
-    QVector<quint32> neighbors(quint32 gray, int bits) const;
+    QVector<QVector<int>> distanceMatrix(int bits);
+    QVector<quint32> neighbors(quint32 gray, int bits);
     bool isValidSequence(const QVector<quint32>& sequence, int bits) const;
     QString toString(quint32 gray, int bits) const;
     Stats stats() const { return m_stats; }
@@ -25,5 +25,5 @@ public:
 signals:
     void sequenceGenerated(int bits, int length);
 private:
-    Stats m_stats; double m_timeSum = 0.0;
+    mutable Stats m_stats; mutable double m_timeSum = 0.0;
 };

@@ -129,3 +129,60 @@ void SpectralBrightness2::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 获取高低频能量比
+ *
+ * 计算高频能量与低频能量的比值（高/低）。
+ * 与brightness不同，此处不归一化到[0,1]。
+ *
+ * @return 高低频能量比
+ */
+double SpectralBrightness2::energyRatio() const
+{
+    if (m_lowE < 1e-15) return 0.0;
+    return m_highE / m_lowE;
+}
+
+/**
+ * @brief 获取总能量
+ * @return 低频能量与高频能量之和
+ */
+double SpectralBrightness2::totalEnergy() const
+{
+    return m_lowE + m_highE;
+}
+
+/**
+ * @brief 获取低频能量占比
+ * @return 低频能量占总能量的比例
+ */
+double SpectralBrightness2::lowEnergyRatio() const
+{
+    double total = totalEnergy();
+    if (total < 1e-15) return 0.0;
+    return m_lowE / total;
+}
+
+/**
+ * @brief 获取分界频率对应的FFT bin索引
+ * @return 分界bin索引
+ */
+int SpectralBrightness2::cutoffBin() const
+{
+    double binWidth = m_sampleRate / m_fftSize;
+    return static_cast<int>(m_cutoff / binWidth);
+}
+
+/**
+ * @brief 判断频谱是否以高频能量为主
+ *
+ * 当亮度超过0.5时，高频能量超过低频能量，
+ * 通常意味着信号包含丰富的高频谐波或噪声。
+ *
+ * @return 是否为高频主导
+ */
+bool SpectralBrightness2::isHighFrequencyDominant() const
+{
+    return m_brightness > 0.5;
+}

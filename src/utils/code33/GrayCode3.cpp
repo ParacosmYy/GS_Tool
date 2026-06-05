@@ -70,7 +70,7 @@ quint32 GrayCode3::decode(quint32 gray) const
  * @param bits 位宽（1~31）
  * @return 格雷码序列
  */
-QVector<quint32> GrayCode3::generateSequence(int bits) const
+QVector<quint32> GrayCode3::generateSequence(int bits)
 {
     QElapsedTimer timer;
     timer.start();
@@ -131,7 +131,7 @@ int GrayCode3::hammingDistance(quint32 a, quint32 b) const
  * @param bits 位宽
  * @return 距离矩阵 [2^bits x 2^bits]
  */
-QVector<QVector<int>> GrayCode3::distanceMatrix(int bits) const
+QVector<QVector<int>> GrayCode3::distanceMatrix(int bits)
 {
     QElapsedTimer timer;
     timer.start();
@@ -175,7 +175,7 @@ QVector<QVector<int>> GrayCode3::distanceMatrix(int bits) const
  * @param bits 位宽
  * @return 邻居格雷码列表（bits个）
  */
-QVector<quint32> GrayCode3::neighbors(quint32 gray, int bits) const
+QVector<quint32> GrayCode3::neighbors(quint32 gray, int bits)
 {
     bits = qBound(1, bits, 31);
     QVector<quint32> result;

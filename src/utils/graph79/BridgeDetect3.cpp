@@ -143,3 +143,56 @@ void BridgeDetect3::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 检查图是否为2-边连通
+ *
+ * 2-边连通图中没有桥边，即删除任意一条边图仍然连通。
+ * 这等价于所有边都属于至少一个环。
+ *
+ * @return 如果图为2-边连通则返回true
+ */
+bool BridgeDetect3::isTwoEdgeConnected() const
+{
+    return m_numBridges == 0 && m_n > 1;
+}
+
+/**
+ * @brief 获取图的边数
+ * @return 无向边总数
+ */
+int BridgeDetect3::edgeCount() const
+{
+    int count = 0;
+    for (const auto& adj : m_adj) {
+        count += adj.size();
+    }
+    return count / 2;
+}
+
+/**
+ * @brief 清除所有边，保留顶点数
+ */
+void BridgeDetect3::clearEdges()
+{
+    for (auto& adj : m_adj) {
+        adj.clear();
+    }
+    m_bridges.clear();
+    m_numBridges = 0;
+}
+
+/**
+ * @brief 获取桥边的权重占比
+ *
+ * 在加权图中可用来评估网络的脆弱性。
+ * 桥边越多，网络越容易因单边故障而断开。
+ *
+ * @return 桥边占总边数的比例
+ */
+double BridgeDetect3::bridgeRatio() const
+{
+    int total = edgeCount();
+    if (total == 0) return 0.0;
+    return static_cast<double>(m_numBridges) / static_cast<double>(total);
+}

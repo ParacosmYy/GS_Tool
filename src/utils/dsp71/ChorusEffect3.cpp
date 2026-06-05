@@ -71,6 +71,10 @@ void ChorusEffect3::setMix(double mix)
  * @brief 处理音频信号
  * @param input 输入音频采样
  * @return 处理后的音频采样
+ *
+ * 每个声部使用独立的延迟线，延迟时间由LFO调制。
+ * 声部间通过相位偏移产生去相关效果，反馈增加丰富度。
+ * 使用线性插值读取延迟线避免量化噪声。
  */
 QVector<double> ChorusEffect3::process(const QVector<double>& input)
 {
@@ -80,10 +84,10 @@ QVector<double> ChorusEffect3::process(const QVector<double>& input)
     if (input.isEmpty()) return QVector<double>();
 
     const int N = input.size();
-    const int maxDelay = qRound(44100.0 * (m_depth + 5.0) / 1000.0) + 2;
     const double sr = 44100.0;
+    const int maxDelay = qRound(sr * (m_depth + 5.0) / 1000.0) + 2;
 
-    // 初始化延迟线
+    /* 初始化延迟线缓冲区 */
     if (m_buffers.size() != m_voices) {
         m_buffers.resize(m_voices);
         m_bufPos.resize(m_voices, 0);
@@ -103,36 +107,36 @@ QVector<double> ChorusEffect3::process(const QVector<double>& input)
         double wet = 0.0;
 
         for (int v = 0; v < m_voices; ++v) {
-            // 计算当前延迟（LFO调制）
-            double delaySamples = m_depth * sr / 1000.0 * lfo(phase + v * 2.0 * M_PI / m_voices, v);
-            delaySamples = qBound(1.0, delaySamples + m_depth * sr / 1000.0, maxDelay - 1.0);
+            /* 步骤1: 计算当前延迟(LFO调制) */
+            double lfoVal = lfo(phase + v * 2.0 * M_PI / m_voices, v);
+            double delaySamples = m_depth * sr / 1000.0 * (1.0 + lfoVal) * 0.5;
+            delaySamples = qBound(1.0, delaySamples + 1.0, maxDelay - 2.0);
 
-            // 写入延迟线
-            m_buffers[v][m_bufPos[v]] = input[i] + m_feedback * m_buffers[v][(m_bufPos[v] + maxDelay - 1) % maxDelay];
+            /* 步骤2: 写入延迟线(含反馈) */
+            int prevPos = (m_bufPos[v] + maxDelay - 1) % maxDelay;
+            m_buffers[v][m_bufPos[v]] = input[i] + m_feedback * m_buffers[v][prevPos];
 
-            // 线性插值读取
+            /* 步骤3: 线性插值读取延迟线 */
             int intDelay = static_cast<int>(delaySamples);
             double frac = delaySamples - intDelay;
-            int readPos = (m_bufPos[v] + maxDelay - intDelay) % maxDelay;
-            int readPos2 = (readPos + maxDelay - 1) % maxDelay;
-            double sample = (1.0 - frac) * m_buffers[v][readPos] + frac * m_buffers[v][readPos2];
+            int readPos1 = (m_bufPos[v] + maxDelay - intDelay) % maxDelay;
+            int readPos2 = (readPos1 + maxDelay - 1) % maxDelay;
+            double sample = (1.0 - frac) * m_buffers[v][readPos1] + frac * m_buffers[v][readPos2];
 
             wet += sample;
             m_bufPos[v] = (m_bufPos[v] + 1) % maxDelay;
         }
 
-        // 平均多声部
+        /* 步骤4: 平均多声部并混合 */
         wet /= m_voices;
-
-        // 干湿混合
         output[i] = input[i] * (1.0 - m_mix) + wet * m_mix;
 
-        // 更新LFO相位
+        /* 步骤5: 更新LFO相位 */
         phase += phaseInc;
         if (phase >= 2.0 * M_PI) phase -= 2.0 * M_PI;
     }
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalProcessings++;
     m_stats.totalSamples += N;
@@ -157,10 +161,13 @@ void ChorusEffect3::resetStatistics()
  * @param phase 当前相位
  * @param voice 声部编号
  * @return LFO输出值[-1, 1]
+ *
+ * 使用正弦波作为基本LFO波形，各声部通过微小偏移
+ * 产生去相关效果，增加合唱的丰富度。
  */
 double ChorusEffect3::lfo(double phase, int voice) const
 {
-    // 正弦波LFO + 声部间微调
+    /* 正弦波LFO + 声部间微调 */
     double p = phase + voice * 0.1;
     return qSin(p);
 }

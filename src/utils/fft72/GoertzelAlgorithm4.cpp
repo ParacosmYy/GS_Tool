@@ -61,6 +61,9 @@ void GoertzelAlgorithm4::clearTargets()
  * @brief 计算所有目标频率的幅度
  * @param signal 输入信号
  * @return 频率到幅度的映射
+ *
+ * 对每个目标频率独立执行Goertzel算法，计算该频率的DFT幅度。
+ * 复杂度O(N * K)，K为目标频率数，当K远小于N时比FFT更高效。
  */
 QMap<double, double> GoertzelAlgorithm4::compute(const QVector<double>& signal)
 {
@@ -73,7 +76,7 @@ QMap<double, double> GoertzelAlgorithm4::compute(const QVector<double>& signal)
         result[freq] = computeSingle(signal, freq);
     }
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalComputations++;
     m_stats.totalBins += m_targets.size();
@@ -89,16 +92,23 @@ QMap<double, double> GoertzelAlgorithm4::compute(const QVector<double>& signal)
  * @param signal 输入信号
  * @param freq 目标频率(Hz)
  * @return 该频率的幅度值
+ *
+ * Goertzel算法递推公式:
+ *   s[n] = x[n] + coeff * s[n-1] - s[n-2]
+ * 其中 coeff = 2 * cos(2*pi*k/N)
+ * 最终幅度 = sqrt(Re^2 + Im^2)
  */
 double GoertzelAlgorithm4::computeSingle(const QVector<double>& signal, double freq) const
 {
     int N = qMin(signal.size(), m_blockSize);
+    if (N == 0) return 0.0;
 
-    // 计算Goertzel系数
+    /* 计算Goertzel系数 */
     double k = freq * N / m_sampleRate;
     double w = 2.0 * M_PI * k / N;
     double coeff = 2.0 * qCos(w);
 
+    /* 递推计算 */
     double s0 = 0.0;
     double s1 = 0.0;
     double s2 = 0.0;
@@ -109,10 +119,15 @@ double GoertzelAlgorithm4::computeSingle(const QVector<double>& signal, double f
         s1 = s0;
     }
 
-    // 计算幅度
+    /* 从最终状态计算复数DFT值 */
     double re = s1 - s2 * qCos(w);
     double im = s2 * qSin(w);
+
+    /* 返回幅度 */
     double magnitude = qSqrt(re * re + im * im);
+
+    /* 归一化 */
+    magnitude /= (N / 2.0);
 
     return magnitude;
 }

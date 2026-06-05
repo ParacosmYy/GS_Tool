@@ -161,3 +161,65 @@ void Cepstrum3::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 获取倒频谱的有效峰值数量
+ *
+ * 在基频搜索范围内统计超过平均值2倍的峰值个数。
+ * 多峰值通常表明信号包含多个谐波分量。
+ *
+ * @return 有效峰值数量
+ */
+int Cepstrum3::peakCount() const
+{
+    if (m_cepstrum.isEmpty()) return 0;
+
+    int minQ = qMax(1, static_cast<int>(m_sampleRate / 1000.0));
+    int maxQ = qMin(m_cepstrum.size() - 1,
+                    static_cast<int>(m_sampleRate / 50.0));
+
+    if (minQ >= maxQ) return 0;
+
+    /* 计算平均值 */
+    double meanVal = 0.0;
+    for (int q = minQ; q <= maxQ; ++q) {
+        meanVal += qAbs(m_cepstrum[q]);
+    }
+    meanVal /= (maxQ - minQ + 1);
+
+    /* 统计超过2倍平均值的局部峰值 */
+    int peaks = 0;
+    for (int q = minQ + 1; q < maxQ; ++q) {
+        if (m_cepstrum[q] > m_cepstrum[q - 1] &&
+            m_cepstrum[q] > m_cepstrum[q + 1] &&
+            m_cepstrum[q] > meanVal * 2.0) {
+            peaks++;
+        }
+    }
+
+    return peaks;
+}
+
+/**
+ * @brief 检查基频检测结果是否可靠
+ *
+ * 通过音质指标判断检测结果的可信度。
+ * 音质越高，表示峰值越突出，基频检测越可靠。
+ *
+ * @return 检测结果是否可靠
+ */
+bool Cepstrum3::isReliable() const
+{
+    return m_quality > 3.0 && m_fundFreq > 0.0;
+}
+
+/**
+ * @brief 获取倒频谱在指定quefrency位置的值
+ * @param quefrency 目标quefrency索引
+ * @return 倒频谱值，索引越界返回0
+ */
+double Cepstrum3::cepstrumAt(int quefrency) const
+{
+    if (quefrency < 0 || quefrency >= m_cepstrum.size()) return 0.0;
+    return m_cepstrum[quefrency];
+}

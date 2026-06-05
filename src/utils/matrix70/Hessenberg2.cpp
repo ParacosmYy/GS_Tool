@@ -185,3 +185,54 @@ void Hessenberg2::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 检查约简结果是否为有效的海森堡形式
+ *
+ * 验证H矩阵的下次对角线以下元素是否足够接近零。
+ * 允许一定的数值误差（阈值1e-10）。
+ *
+ * @return 是否满足海森堡形式
+ */
+bool Hessenberg2::isHessenbergForm() const
+{
+    if (m_H.isEmpty()) return false;
+    int n = m_H.size();
+
+    for (int i = 2; i < n; ++i) {
+        for (int j = 0; j < i - 1; ++j) {
+            if (qAbs(m_H[i][j]) > 1e-10) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief 计算变换的正交性误差
+ *
+ * 验证Q^T * Q是否接近单位矩阵。非零误差表示数值精度损失。
+ *
+ * @return 正交性误差（Frobenius范数）
+ */
+double Hessenberg2::orthogonalityError() const
+{
+    if (m_Q.isEmpty()) return 0.0;
+    int n = m_Q.size();
+    double error = 0.0;
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            double dot = 0.0;
+            for (int k = 0; k < n; ++k) {
+                dot += m_Q[k][i] * m_Q[k][j];
+            }
+            double expected = (i == j) ? 1.0 : 0.0;
+            double diff = dot - expected;
+            error += diff * diff;
+        }
+    }
+
+    return qSqrt(error);
+}

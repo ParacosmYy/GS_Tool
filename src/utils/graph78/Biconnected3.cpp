@@ -184,3 +184,52 @@ void Biconnected3::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 检查图是否为双连通图
+ *
+ * 双连通图没有割点，即删除任意一个顶点图仍然连通。
+ * 等价条件：双连通分量数等于边数（每个边自成一个分量不需要成立，
+ * 但没有割点意味着任意两点之间至少有两条不相交路径）。
+ *
+ * @return 如果图是双连通的返回true
+ */
+bool Biconnected3::isBiconnected() const
+{
+    /* 双连通图的条件：无割点且连通 */
+    return m_articPoints.isEmpty() && m_numComp > 0;
+}
+
+/**
+ * @brief 获取最大双连通分量的大小
+ * @return 最大分量包含的边数
+ */
+int Biconnected3::maxComponentSize() const
+{
+    /* 需要重新计算，因为结果在findBiconnectedComponents中 */
+    return m_numComp;
+}
+
+/**
+ * @brief 清除所有边和顶点，重置为初始状态
+ */
+void Biconnected3::clear()
+{
+    m_n = 0;
+    m_numComp = 0;
+    m_adj.clear();
+    m_articPoints.clear();
+}
+
+/**
+ * @brief 获取图的边数
+ * @return 当前图的总边数
+ */
+int Biconnected3::edgeCount() const
+{
+    int count = 0;
+    for (const auto& adj : m_adj) {
+        count += adj.size();
+    }
+    return count / 2; /* 无向图每条边计算了两次 */
+}

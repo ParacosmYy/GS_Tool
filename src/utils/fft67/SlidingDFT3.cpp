@@ -150,3 +150,58 @@ void SlidingDFT3::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 重置所有DFT系数
+ *
+ * 将所有频率bin的DFT系数归零，等效于开始一个新窗口。
+ * 在处理不连续的信号段时使用。
+ */
+void SlidingDFT3::resetCoefficients()
+{
+    m_X.fill(0.0);
+    m_Xprev.fill(0.0);
+    m_pos = 0;
+}
+
+/**
+ * @brief 获取指定频率bin对应的实际频率
+ * @param k bin索引
+ * @return 对应的频率值（Hz），索引越界返回0
+ */
+double SlidingDFT3::binFrequency(int k) const
+{
+    if (k < 0 || k >= m_n) return 0.0;
+    return static_cast<double>(k) * 44100.0 / m_n;
+}
+
+/**
+ * @brief 获取幅度最大的频率bin索引
+ *
+ * 搜索所有频率bin，返回幅度最大的那个。
+ * 可用于快速确定信号的主频分量。
+ *
+ * @return 最大幅度对应的bin索引
+ */
+int SlidingDFT3::peakBin() const
+{
+    int bestK = 0;
+    double bestMag = 0.0;
+    for (int k = 0; k < m_n; ++k) {
+        double mag = qAbs(m_X[k]);
+        if (mag > bestMag) {
+            bestMag = mag;
+            bestK = k;
+        }
+    }
+    return bestK;
+}
+
+/**
+ * @brief 获取峰值频率
+ * @return 幅度最大的频率分量（Hz）
+ */
+double SlidingDFT3::peakFrequency() const
+{
+    return binFrequency(peakBin());
+}

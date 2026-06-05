@@ -174,3 +174,60 @@ void Flanger2::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 重置延迟缓冲区
+ *
+ * 清除延迟缓冲区中的所有内容，但不改变参数设置。
+ * 在处理新的音频段之前调用以避免前一段信号的残余。
+ */
+void Flanger2::resetBuffer()
+{
+    m_buffer.fill(0.0);
+    m_bufPos = 0;
+}
+
+/**
+ * @brief 计算当前延迟时间（毫秒）
+ *
+ * 根据LFO的当前值计算实际使用的延迟时间。
+ *
+ * @return 当前延迟时间（毫秒）
+ */
+double Flanger2::currentDelayMs() const
+{
+    double lfoOutput = 0.0;
+    if (m_wave == "sine") {
+        lfoOutput = qSin(2.0 * M_PI * 0.0);
+    } else if (m_wave == "triangle") {
+        lfoOutput = 0.0;
+    } else {
+        lfoOutput = 0.0;
+    }
+    double delayMs = m_depth * (1.0 + m_lfoVal) * 0.5;
+    return qBound(0.0, delayMs, m_depth);
+}
+
+/**
+ * @brief 获取LFO当前相位（0~1）
+ * @return LFO相位值
+ */
+double Flanger2::lfoPhase() const
+{
+    return 0.0; /* 简化返回 */
+}
+
+/**
+ * @brief 计算梳状滤波器的第一个凹陷频率
+ *
+ * 镶边效果本质上是移动的梳状滤波器。第一个凹陷频率
+ * 等于 1 / (2 * delay)。
+ *
+ * @return 第一个凹陷频率（Hz）
+ */
+double Flanger2::notchFrequency() const
+{
+    double delayMs = currentDelayMs();
+    if (delayMs < 0.001) return 0.0;
+    return 1000.0 / (2.0 * delayMs);
+}

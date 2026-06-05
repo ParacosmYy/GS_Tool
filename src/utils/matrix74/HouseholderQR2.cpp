@@ -30,6 +30,8 @@ void HouseholderQR2::setMatrix(const QVector<QVector<double>>& A)
     if (A.isEmpty()) return;
     m_rows = A.size();
     m_cols = A[0].size();
+
+    /* 拷贝到内部存储R矩阵 */
     m_R.clear();
     m_R.resize(m_rows);
     for (int i = 0; i < m_rows; ++i) {
@@ -44,6 +46,9 @@ void HouseholderQR2::setMatrix(const QVector<QVector<double>>& A)
 /**
  * @brief 执行QR分解
  * @return 分解是否成功
+ *
+ * 使用Householder反射逐列消元，将A分解为正交矩阵Q和上三角矩阵R。
+ * Householder向量v通过列向量的范数计算得到，反射矩阵H = I - 2vv^T/v^Tv。
  */
 bool HouseholderQR2::decompose()
 {
@@ -56,16 +61,16 @@ bool HouseholderQR2::decompose()
     int n = m_cols;
     int minDim = qMin(m, n);
 
-    // 初始化Q为单位矩阵
+    /* 初始化Q为单位矩阵 */
     m_Q.resize(m);
     for (int i = 0; i < m; ++i) {
         m_Q[i].resize(m, 0.0);
         m_Q[i][i] = 1.0;
     }
 
-    // Householder变换逐列消元
+    /* Householder变换逐列消元 */
     for (int k = 0; k < minDim; ++k) {
-        // 提取第k列的下半部分
+        /* 计算第k列下半部分的二范数 */
         double norm = 0.0;
         for (int i = k; i < m; ++i) {
             norm += m_R[i][k] * m_R[i][k];
@@ -74,15 +79,16 @@ bool HouseholderQR2::decompose()
 
         if (norm < 1e-15) continue;
 
-        // 计算Householder向量
+        /* 计算Householder向量参数 */
         double alpha = (m_R[k][k] >= 0) ? -norm : norm;
         double beta = norm * (norm + qAbs(m_R[k][k]));
 
+        /* 构造Householder向量: v = R[k:m, k] */
         m_R[k][k] -= alpha;
 
         if (qAbs(beta) < 1e-300) continue;
 
-        // 应用Householder变换到R的右侧列
+        /* 应用Householder变换到R的右侧列: R = H * R */
         for (int j = k; j < n; ++j) {
             double dot = 0.0;
             for (int i = k; i < m; ++i) {
@@ -94,7 +100,7 @@ bool HouseholderQR2::decompose()
             }
         }
 
-        // 应用Householder变换到Q
+        /* 应用Householder变换到Q: Q = Q * H^T = Q * H */
         for (int j = 0; j < m; ++j) {
             double dot = 0.0;
             for (int i = k; i < m; ++i) {
@@ -106,18 +112,18 @@ bool HouseholderQR2::decompose()
             }
         }
 
-        // 恢复对角元素
+        /* 恢复对角元素为精确值 */
         m_R[k][k] = alpha;
     }
 
-    // 清零R的下三角
+    /* 清零R的下三角部分(消除数值误差) */
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < qMin(i, n); ++j) {
             m_R[i][j] = 0.0;
         }
     }
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalDecompositions++;
     m_timeSum += elapsed;
@@ -131,6 +137,9 @@ bool HouseholderQR2::decompose()
  * @brief 使用QR分解求解线性方程组Ax=b
  * @param b 右端项
  * @return 解向量x
+ *
+ * 利用QR分解结果求解Ax=b等价于R*x = Q^T*b。
+ * 先计算Q^T*b，再对上三角矩阵R进行回代。
  */
 QVector<double> HouseholderQR2::solve(const QVector<double>& b)
 {
@@ -143,7 +152,7 @@ QVector<double> HouseholderQR2::solve(const QVector<double>& b)
     int m = m_rows;
     int n = m_cols;
 
-    // 计算 Q^T * b
+    /* 步骤1: 计算 Q^T * b */
     QVector<double> Qtb(m, 0.0);
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < m; ++j) {
@@ -151,7 +160,7 @@ QVector<double> HouseholderQR2::solve(const QVector<double>& b)
         }
     }
 
-    // 回代 R * x = Q^T * b
+    /* 步骤2: 回代 R * x = Qtb */
     for (int i = qMin(n, m) - 1; i >= 0; --i) {
         double sum = Qtb[i];
         for (int j = i + 1; j < n; ++j) {
@@ -160,16 +169,14 @@ QVector<double> HouseholderQR2::solve(const QVector<double>& b)
         x[i] = (qAbs(m_R[i][i]) > 1e-15) ? sum / m_R[i][i] : 0.0;
     }
 
-    // 计算残差
+    /* 步骤3: 计算残差范数 */
     m_residual = 0.0;
-    for (int i = 0; i < m; ++i) {
-        double r = ((i < b.size()) ? b[i] : 0.0);
-        for (int j = 0; j < n; ++j) {
-            r -= m_Q[i][j] * 0.0; // 简化残差计算
-        }
+    for (int i = n; i < m; ++i) {
+        m_residual += Qtb[i] * Qtb[i];
     }
+    m_residual = qSqrt(m_residual);
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalSolves++;
     m_timeSum += elapsed;

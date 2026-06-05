@@ -27,7 +27,7 @@ WalshHadamard4::WalshHadamard4(QObject* parent)
  */
 void WalshHadamard4::setSize(int n)
 {
-    // 向上取整到最近的2的幂
+    /* 向上取整到最近的2的幂 */
     int p = 1;
     while (p < n && p < 8192) p <<= 1;
     m_n = p;
@@ -37,6 +37,9 @@ void WalshHadamard4::setSize(int n)
  * @brief 前向Walsh-Hadamard变换
  * @param data 输入数据（长度自动补齐到2的幂）
  * @return 变换结果
+ *
+ * 执行Walsh-Hadamard变换，结果为自然序(Hadamard序)。
+ * 变换后可用sequencyOrder()转换为序列序。
  */
 QVector<double> WalshHadamard4::forward(const QVector<double>& data)
 {
@@ -46,7 +49,7 @@ QVector<double> WalshHadamard4::forward(const QVector<double>& data)
     QVector<double> result = data;
     int n = result.size();
 
-    // 补齐到2的幂
+    /* 补齐到2的幂 */
     int p = 1;
     while (p < n) p <<= 1;
     if (p != n) {
@@ -56,7 +59,7 @@ QVector<double> WalshHadamard4::forward(const QVector<double>& data)
 
     fwht(result);
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalTransforms++;
     m_stats.totalPoints += n;
@@ -71,6 +74,8 @@ QVector<double> WalshHadamard4::forward(const QVector<double>& data)
  * @brief 逆Walsh-Hadamard变换
  * @param data 输入变换系数
  * @return 逆变换结果
+ *
+ * 逆变换与前向变换结构相同，仅额外除以N进行归一化。
  */
 QVector<double> WalshHadamard4::inverse(const QVector<double>& data)
 {
@@ -80,6 +85,7 @@ QVector<double> WalshHadamard4::inverse(const QVector<double>& data)
     QVector<double> result = data;
     int n = result.size();
 
+    /* 补齐到2的幂 */
     int p = 1;
     while (p < n) p <<= 1;
     if (p != n) {
@@ -87,15 +93,23 @@ QVector<double> WalshHadamard4::inverse(const QVector<double>& data)
         n = p;
     }
 
+    /* 执行FWHT(正变换和逆变换结构相同) */
     fwht(result);
 
-    // 逆变换需要除以N
-    for (double& v : result) v /= n;
+    /* 逆变换需要除以N进行归一化 */
+    double norm = 1.0 / static_cast<double>(n);
+    for (double& v : result) {
+        v *= norm;
+    }
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
+    m_stats.totalTransforms++;
+    m_stats.totalPoints += n;
     m_timeSum += elapsed;
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalTransforms;
 
+    emit transformCompleted(n);
     return result;
 }
 
@@ -103,6 +117,9 @@ QVector<double> WalshHadamard4::inverse(const QVector<double>& data)
  * @brief 将结果转换为序列序（Walsh序）
  * @param data 自然序变换结果
  * @return 序列序排列的结果
+ *
+ * 通过Gray码位反转将Hadamard序转换为Walsh序(序列序)，
+ * 使变换系数按零交叉数排列。
  */
 QVector<double> WalshHadamard4::sequencyOrder(const QVector<double>& data) const
 {
@@ -129,6 +146,8 @@ void WalshHadamard4::resetStatistics()
  * @param data 输入输出数据
  *
  * 使用蝶形运算的FWHT，时间复杂度O(N*logN)。
+ * 基本运算: x' = x + y, y' = x - y
+ * 逐层递归分解，每层将数据分成两组进行蝶形运算。
  */
 void WalshHadamard4::fwht(QVector<double>& data)
 {
@@ -151,22 +170,22 @@ void WalshHadamard4::fwht(QVector<double>& data)
  * @return 排列索引向量
  *
  * 使用Gray码重排实现自然序到序列序的转换。
+ * 先进行位反转，再应用Gray码变换。
  */
 QVector<int> WalshHadamard4::sequencyPermutation(int n) const
 {
     QVector<int> perm(n);
-    // 使用位反转+Gray码生成序列序
     int bits = 0;
     int temp = n;
     while (temp > 1) { bits++; temp >>= 1; }
 
     for (int i = 0; i < n; ++i) {
-        // 位反转
+        /* 步骤1: 位反转 */
         int rev = 0;
         for (int b = 0; b < bits; ++b) {
             if (i & (1 << b)) rev |= (1 << (bits - 1 - b));
         }
-        // Gray码转换
+        /* 步骤2: Gray码转换 */
         perm[i] = rev ^ (rev >> 1);
     }
 

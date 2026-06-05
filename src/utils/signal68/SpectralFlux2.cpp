@@ -180,3 +180,55 @@ void SpectralFlux2::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 获取平均通量值
+ *
+ * 计算通量序列的平均值，反映信号整体的变化强度。
+ * 高平均通量表示信号变化剧烈。
+ *
+ * @return 平均通量
+ */
+double SpectralFlux2::averageFlux() const
+{
+    if (m_stats.totalFrames <= 1) return m_totalFlux;
+    return m_totalFlux / m_stats.totalFrames;
+}
+
+/**
+ * @brief 计算通量序列的归一化值
+ *
+ * 将通量归一化到[0,1]范围，便于不同信号之间的比较。
+ *
+ * @param fluxValues 原始通量序列
+ * @return 归一化后的通量序列
+ */
+QVector<double> SpectralFlux2::normalizeFlux(const QVector<double>& fluxValues) const
+{
+    if (fluxValues.isEmpty()) return fluxValues;
+
+    double maxVal = *std::max_element(fluxValues.begin(), fluxValues.end());
+    if (maxVal < 1e-10) return QVector<double>(fluxValues.size(), 0.0);
+
+    QVector<double> normalized;
+    normalized.reserve(fluxValues.size());
+    for (double v : fluxValues) {
+        normalized.append(v / maxVal);
+    }
+    return normalized;
+}
+
+/**
+ * @brief 获取峰值密度
+ *
+ * 计算每秒的峰值数量，反映音符事件的密度。
+ *
+ * @return 每秒峰值数
+ */
+double SpectralFlux2::peaksPerSecond() const
+{
+    if (m_stats.totalFrames <= 0) return 0.0;
+    double duration = static_cast<double>(m_stats.totalFrames) * m_hopSize / 44100.0;
+    if (duration < 0.001) return 0.0;
+    return static_cast<double>(m_peaks.size()) / duration;
+}

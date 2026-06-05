@@ -194,3 +194,40 @@ void Phaser2::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 重置滤波器状态
+ *
+ * 清除所有全通滤波器的内部状态和LFO相位。
+ * 在处理新的音频段之前调用以避免状态泄漏。
+ */
+void Phaser2::resetState()
+{
+    m_allpassX.fill(0.0);
+    m_allpassY.fill(0.0);
+    m_lfoPos = 0.0;
+}
+
+/**
+ * @brief 计算当前LFO相位对应的调制频率
+ *
+ * 将当前LFO位置映射到全通滤波器的中心频率范围。
+ *
+ * @return 当前的调制频率（Hz）
+ */
+double Phaser2::currentModFrequency() const
+{
+    double minFreq = 200.0;
+    double maxFreq = 8000.0;
+    double lfoVal = 2.0 * qAbs(2.0 * (m_lfoPos - qFloor(m_lfoPos + 0.5)));
+    return minFreq + (maxFreq - minFreq) * lfoVal * m_depth;
+}
+
+/**
+ * @brief 获取当前LFO相位角度
+ * @return 相位角度（0~360度）
+ */
+double Phaser2::lfoPhaseDegrees() const
+{
+    return m_lfoPos * 360.0;
+}

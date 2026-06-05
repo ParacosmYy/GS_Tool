@@ -69,7 +69,7 @@ static double rngGaussian(quint32 spineValue, int position)
     double u1 = (s & 0xFFFFFF) / 16777216.0 + 1e-10;
     s = s * 0x45d9f3bU + 0x1b56c4e9U;
     double u2 = (s & 0xFFFFFF) / 16777216.0 + 1e-10;
-    return qSrt(-2.0 * qLn(u1)) * qCos(2.0 * M_PI * u2);
+    return qSqrt(-2.0 * qLn(u1)) * qCos(2.0 * M_PI * u2);
 }
 
 /**

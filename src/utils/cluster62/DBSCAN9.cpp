@@ -172,3 +172,64 @@ void DBSCAN9::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 获取噪声点占总点数的比例
+ *
+ * 计算最近一次聚类中噪声点所占百分比。
+ * 高噪声比可能表明ε值设置过小或minPts值过大。
+ *
+ * @return 噪声比例（0.0~1.0），无数据时返回0
+ */
+double DBSCAN9::noiseRatio() const
+{
+    if (m_stats.totalPoints == 0) return 0.0;
+    return static_cast<double>(m_noiseCount) /
+        static_cast<double>(m_stats.totalPoints);
+}
+
+/**
+ * @brief 获取核心点占总点数的比例
+ *
+ * 核心点比例反映了数据集的密度分布。
+ * 比例过低说明大部分区域为稀疏区域。
+ *
+ * @return 核心点比例（0.0~1.0）
+ */
+double DBSCAN9::corePointRatio() const
+{
+    if (m_stats.totalPoints == 0) return 0.0;
+    return static_cast<double>(m_corePoints.size()) /
+        static_cast<double>(m_stats.totalPoints);
+}
+
+/**
+ * @brief 验证聚类结果的内部一致性
+ *
+ * 检查所有非噪声点是否都被分配到有效的簇，
+ * 以及簇编号是否从0连续递增。
+ *
+ * @return 结果是否一致
+ */
+bool DBSCAN9::validateResult(const QVector<int>& labels) const
+{
+    if (labels.isEmpty()) return true;
+
+    /* 检查簇编号范围 */
+    int maxLabel = 0;
+    for (int l : labels) {
+        if (l >= maxLabel) maxLabel = l;
+    }
+
+    /* 非噪声标签应该从0连续 */
+    QSet<int> usedLabels;
+    for (int l : labels) {
+        if (l >= 0) usedLabels.insert(l);
+    }
+
+    for (int i = 0; i < maxLabel; ++i) {
+        if (!usedLabels.contains(i)) return false;
+    }
+
+    return true;
+}

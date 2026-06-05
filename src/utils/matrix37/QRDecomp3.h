@@ -23,6 +23,6 @@ signals:
     void decompositionComplete(int rows, int cols, int rank);
 private:
     int m_rows = 0, m_cols = 0;
-    QVector<double> m_QR; QVector<double> m_tau;
+    QVector<double> m_QR; QVector<double> m_tau; QVector<int> m_pivot;
     Stats m_stats; double m_timeSum = 0.0;
 };

@@ -25,6 +25,7 @@ public:
 signals:
     void spectrumUpdated(int numBins);
 private:
+    void initCoefficients();
     int m_n = 256; double m_sampleRate = 44100.0;
     QVector<double> m_real, m_imag;
     QVector<double> m_coeffReal, m_coeffImag;

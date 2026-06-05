@@ -175,3 +175,63 @@ void ConstantQ3::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 获取每个频率bin的中心频率
+ * @return bin中心频率数组（Hz）
+ */
+QVector<double> ConstantQ3::binFrequencies() const
+{
+    QVector<double> freqs(m_numBins);
+    for (int k = 0; k < m_numBins; ++k) {
+        freqs[k] = m_fmin * qPow(2.0, static_cast<double>(k) / m_bpo);
+    }
+    return freqs;
+}
+
+/**
+ * @brief 获取频率分辨率
+ *
+ * 返回最低频率bin和最高频率bin的频率分辨率之比。
+ * CQT的核心优势就是低频分辨率远高于高频。
+ *
+ * @return pair(最低分辨率Hz, 最高分辨率Hz)
+ */
+QPair<double, double> ConstantQ3::frequencyResolution() const
+{
+    if (m_numBins == 0) return {0.0, 0.0};
+
+    double fLow = m_fmin;
+    double fHigh = m_fmin * qPow(2.0, static_cast<double>(m_numBins - 1) / m_bpo);
+
+    /* 频率分辨率 = f / Q */
+    double resLow = fLow / m_Q;
+    double resHigh = fHigh / m_Q;
+
+    return {resLow, resHigh};
+}
+
+/**
+ * @brief 获取最大核长度
+ *
+ * 最长核对应最低频率bin，决定了处理的最小信号长度。
+ *
+ * @return 最长核的采样点数
+ */
+int ConstantQ3::maxKernelLength() const
+{
+    int maxLen = 0;
+    for (const auto& kernel : m_kernels) {
+        maxLen = qMax(maxLen, kernel.size());
+    }
+    return maxLen;
+}
+
+/**
+ * @brief 获取总核数（等于频率bin数）
+ * @return 核数量
+ */
+int ConstantQ3::totalKernels() const
+{
+    return m_kernels.size();
+}

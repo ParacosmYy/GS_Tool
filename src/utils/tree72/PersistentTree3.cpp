@@ -32,11 +32,12 @@ int PersistentTree3::insert(double key, int value, int version)
     QElapsedTimer timer;
     timer.start();
 
-    // 获取基版本的根
+    /* 获取基版本的根节点 */
     PNode* base = (version >= 0 && version < m_versions.size())
                       ? m_versions[version]
                       : nullptr;
 
+    /* 路径复制插入 */
     PNode* newRoot = insertNode(base, key, value);
     m_versions.append(newRoot);
 
@@ -54,6 +55,8 @@ int PersistentTree3::insert(double key, int value, int version)
  * @brief 在指定版本中删除键（创建新版本）
  * @param key 键
  * @param version 基于的版本号
+ *
+ * 通过收集所有元素(排除要删除的键)重建平衡树。
  */
 void PersistentTree3::remove(double key, int version)
 {
@@ -64,17 +67,26 @@ void PersistentTree3::remove(double key, int version)
                       ? m_versions[version]
                       : nullptr;
 
-    // 递归删除（路径复制）
-    PNode* newRoot = nullptr;
-    if (base != nullptr) {
-        // 简化删除：重建不含key的树
-        QVector<QPair<double, int>> elements;
-        collectInOrder(base, elements);
-        newRoot = buildBalanced(elements, 0, elements.size() - 1, key);
+    /* 收集中序遍历的所有元素 */
+    QVector<QPair<double, int>> elements;
+    collectInOrder(base, elements);
+
+    /* 过滤掉要删除的键 */
+    QVector<QPair<double, int>> filtered;
+    for (const auto& elem : elements) {
+        if (elem.first != key) {
+            filtered.append(elem);
+        }
     }
 
+    /* 重建平衡树 */
+    PNode* newRoot = buildBalanced(filtered, 0, filtered.size() - 1);
     m_versions.append(newRoot);
-    m_timeSum += timer.elapsed();
+
+    qint64 elapsed = timer.elapsed();
+    m_stats.totalInserts++;
+    m_timeSum += elapsed;
+    m_stats.avgProcessingTimeMs = m_timeSum / (m_stats.totalInserts + m_stats.totalQueries);
 
     emit versionCreated(m_versions.size() - 1);
 }
@@ -87,17 +99,27 @@ void PersistentTree3::remove(double key, int version)
  */
 bool PersistentTree3::contains(double key, int version) const
 {
+    QElapsedTimer timer;
+    timer.start();
+
     PNode* root = (version >= 0 && version < m_versions.size())
                       ? m_versions[version]
                       : nullptr;
 
+    bool found = false;
     PNode* cur = root;
     while (cur != nullptr) {
         if (key < cur->key) cur = cur->left;
         else if (key > cur->key) cur = cur->right;
-        else return true;
+        else { found = true; break; }
     }
-    return false;
+
+    const_cast<PersistentTree3*>(this)->m_stats.totalQueries++;
+    const_cast<PersistentTree3*>(this)->m_timeSum += timer.elapsed();
+    const_cast<PersistentTree3*>(this)->m_stats.avgProcessingTimeMs =
+        m_timeSum / (m_stats.totalInserts + m_stats.totalQueries);
+
+    return found;
 }
 
 /**
@@ -131,7 +153,8 @@ int PersistentTree3::rank(double key, int version) const
 
     const_cast<PersistentTree3*>(this)->m_stats.totalQueries++;
     const_cast<PersistentTree3*>(this)->m_timeSum += timer.elapsed();
-    m_stats.avgProcessingTimeMs = m_timeSum / (m_stats.totalInserts + m_stats.totalQueries);
+    const_cast<PersistentTree3*>(this)->m_stats.avgProcessingTimeMs =
+        m_timeSum / (m_stats.totalInserts + m_stats.totalQueries);
 
     return r;
 }
@@ -164,7 +187,7 @@ PersistentTree3::PNode* PersistentTree3::insertNode(PNode* n, double key, int va
     } else if (key > n->key) {
         newNode->right = insertNode(n->right, key, val);
     } else {
-        newNode->val = val; // 更新
+        newNode->val = val; /* 更新已存在的键 */
     }
 
     newNode->count = nodeCount(newNode->left) + nodeCount(newNode->right) + 1;
@@ -180,4 +203,48 @@ PersistentTree3::PNode* PersistentTree3::cloneNode(PNode* n)
 {
     if (n == nullptr) return nullptr;
     return new PNode{n->key, n->val, n->count, n->left, n->right};
+}
+
+/**
+ * @brief 计算子树节点数
+ * @param n 节点指针
+ * @return 子树中的节点数
+ */
+int PersistentTree3::nodeCount(PNode* n) const
+{
+    return (n != nullptr) ? n->count : 0;
+}
+
+/**
+ * @brief 中序遍历收集所有键值对
+ * @param n 当前节点
+ * @param elements 输出的键值对列表
+ */
+void PersistentTree3::collectInOrder(PNode* n, QVector<QPair<double, int>>& elements)
+{
+    if (n == nullptr) return;
+    collectInOrder(n->left, elements);
+    elements.append(qMakePair(n->key, n->val));
+    collectInOrder(n->right, elements);
+}
+
+/**
+ * @brief 从排序数组构建平衡BST
+ * @param elements 排序后的键值对数组
+ * @param start 起始索引
+ * @param end 结束索引
+ * @return 平衡BST的根节点
+ */
+PersistentTree3::PNode* PersistentTree3::buildBalanced(
+    const QVector<QPair<double, int>>& elements, int start, int end)
+{
+    if (start > end) return nullptr;
+
+    int mid = (start + end) / 2;
+    PNode* node = new PNode{elements[mid].first, elements[mid].second, 0, nullptr, nullptr};
+    node->left = buildBalanced(elements, start, mid - 1);
+    node->right = buildBalanced(elements, mid + 1, end);
+    node->count = nodeCount(node->left) + nodeCount(node->right) + 1;
+
+    return node;
 }

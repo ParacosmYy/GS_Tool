@@ -163,3 +163,53 @@ void EnvelopeFollower3::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 重置包络状态
+ *
+ * 将当前电平和峰值归零，但不影响统计数据。
+ * 适用于处理新的音频段时清除前一帧的状态。
+ */
+void EnvelopeFollower3::resetState()
+{
+    m_level = 0.0;
+    m_peak = 0.0;
+}
+
+/**
+ * @brief 计算分贝值
+ *
+ * 将当前电平转换为分贝标度。
+ * 0dB对应幅度1.0，负值表示衰减。
+ *
+ * @return 当前电平的分贝值
+ */
+double EnvelopeFollower3::currentLevelDb() const
+{
+    if (m_level <= 0.0) return -120.0;
+    return 20.0 * qLn(m_level) / qLn(10.0);
+}
+
+/**
+ * @brief 获取峰值分贝值
+ * @return 峰值电平的分贝值
+ */
+double EnvelopeFollower3::peakLevelDb() const
+{
+    if (m_peak <= 0.0) return -120.0;
+    return 20.0 * qLn(m_peak) / qLn(10.0);
+}
+
+/**
+ * @brief 计算峰值因数（ Crest Factor）
+ *
+ * 峰值因数 = 峰值 / RMS电平。高峰值因数表示信号有尖锐的瞬态。
+ * 正弦波约1.41，方波为1.0，音乐通常2~6。
+ *
+ * @return 峰值因数
+ */
+double EnvelopeFollower3::crestFactor() const
+{
+    if (m_level < 1e-10) return 0.0;
+    return m_peak / m_level;
+}

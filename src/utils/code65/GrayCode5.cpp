@@ -186,3 +186,53 @@ void GrayCode5::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 验证格雷码序列的正确性
+ *
+ * 检查生成的格雷码序列是否满足格雷码性质：
+ * 相邻两数之间只有一个比特不同。
+ *
+ * @return 序列是否满足格雷码性质
+ */
+bool GrayCode5::validateSequence() const
+{
+    QVector<int> code = generateCode();
+    for (int i = 1; i < code.size(); ++i) {
+        if (hammingDistance(code[i], code[i - 1]) != 1) {
+            return false;
+        }
+    }
+    /* 首尾也应只有一个比特不同（循环格雷码） */
+    if (code.size() > 2) {
+        if (hammingDistance(code.first(), code.last()) != 1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief 计算格雷码的总转换次数
+ *
+ * 在完整格雷码序列中，每个比特位发生翻转的次数。
+ * 可用于分析格雷码的均衡性。
+ *
+ * @return 每个比特位的翻转次数
+ */
+QVector<int> GrayCode5::transitionCounts() const
+{
+    QVector<int> code = generateCode();
+    QVector<int> counts(m_bits, 0);
+
+    for (int i = 1; i < code.size(); ++i) {
+        int diff = code[i] ^ code[i - 1];
+        for (int b = 0; b < m_bits; ++b) {
+            if (diff & (1 << b)) {
+                counts[b]++;
+            }
+        }
+    }
+
+    return counts;
+}

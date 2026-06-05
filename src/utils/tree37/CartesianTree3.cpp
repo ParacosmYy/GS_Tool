@@ -8,6 +8,7 @@
 #include "utils/tree37/CartesianTree3.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 
 #include <algorithm>
 #include <limits>
@@ -115,7 +116,7 @@ void CartesianTree3::build(const QVector<double>& values)
  * @param hi 区间右端点（包含）
  * @return 区间最小值
  */
-double CartesianTree3::rangeMinimum(int lo, int hi) const
+double CartesianTree3::rangeMinimum(int lo, int hi)
 {
     QElapsedTimer timer;
     timer.start();
@@ -146,7 +147,7 @@ double CartesianTree3::rangeMinimum(int lo, int hi) const
  * @param hi 区间右端点（包含）
  * @return 区间最大值
  */
-double CartesianTree3::rangeMaximum(int lo, int hi) const
+double CartesianTree3::rangeMaximum(int lo, int hi)
 {
     QElapsedTimer timer;
     timer.start();
@@ -179,7 +180,7 @@ double CartesianTree3::rangeMaximum(int lo, int hi) const
  * @param j 第二个索引
  * @return LCA节点的原始索引
  */
-int CartesianTree3::lca(int i, int j) const
+int CartesianTree3::lca(int i, int j)
 {
     if (i < 0 || i >= m_size || j < 0 || j >= m_size) return -1;
     if (i == j) return i;

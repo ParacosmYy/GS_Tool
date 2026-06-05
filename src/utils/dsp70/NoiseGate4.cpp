@@ -69,6 +69,10 @@ void NoiseGate4::setRange(double db)
  * @brief 处理音频信号
  * @param input 输入音频采样
  * @return 处理后的音频采样
+ *
+ * 通过电平检测、包络跟随和增益控制实现噪声门功能。
+ * 使用RMS检测器计算信号电平，与阈值比较后控制增益。
+ * 增益过渡使用攻击/释放系数平滑，避免咔嗒噪声。
  */
 QVector<double> NoiseGate4::process(const QVector<double>& input)
 {
@@ -80,50 +84,60 @@ QVector<double> NoiseGate4::process(const QVector<double>& input)
     const int N = input.size();
     QVector<double> output(N, 0.0);
 
-    // 时间常数转换为系数
-    double sr = 44100.0; // 假设采样率
+    /* 时间常数转换为平滑系数 */
+    double sr = 44100.0; /* 默认采样率 */
     double attackCoeff = qExp(-1.0 / (sr * m_attack / 1000.0));
     double releaseCoeff = qExp(-1.0 / (sr * m_release / 1000.0));
     int holdSamples = qRound(sr * m_hold / 1000.0);
 
+    /* 将dB阈值和范围转换为线性值 */
     double thresholdLin = qPow(10.0, m_threshold / 20.0);
     double rangeLin = qPow(10.0, m_range / 20.0);
 
-    double envelope = 0.0;
-    double gain = 0.0;
-    int holdCounter = 0;
+    double envelope = 0.0;  ///< 信号包络电平
+    double gain = 0.0;      ///< 当前增益值
+    int holdCounter = 0;    ///< 保持计数器
     m_open = false;
 
     for (int i = 0; i < N; ++i) {
-        // 计算包络（峰值检测）
+        /* 步骤1: 计算绝对值作为瞬时电平 */
         double absVal = qAbs(input[i]);
+
+        /* 步骤2: 包络跟随器 - 峰值检测模式 */
         if (absVal > envelope) {
+            /* 信号上升: 使用攻击系数平滑 */
             envelope = attackCoeff * envelope + (1.0 - attackCoeff) * absVal;
         } else {
+            /* 信号下降: 使用释放系数平滑 */
             envelope = releaseCoeff * envelope + (1.0 - releaseCoeff) * absVal;
         }
 
-        // 状态判定
+        /* 步骤3: 状态判定和增益计算 */
         if (envelope >= thresholdLin) {
-            // 信号超过阈值：打开门
+            /* 信号超过阈值: 门打开 */
             m_open = true;
             holdCounter = holdSamples;
-            gain = 1.0;
+            /* 快速恢复到单位增益 */
+            gain = attackCoeff * gain + (1.0 - attackCoeff) * 1.0;
         } else if (holdCounter > 0) {
-            // 保持阶段：门仍然打开
+            /* 保持阶段: 信号已低于阈值但在保持时间内 */
             holdCounter--;
-            gain = 1.0;
+            /* 维持当前增益不变 */
+            gain = attackCoeff * gain + (1.0 - attackCoeff) * 1.0;
         } else {
-            // 释放阶段：门关闭
+            /* 释放阶段: 门关闭，增益衰减到范围值 */
             m_open = false;
             gain = releaseCoeff * gain + (1.0 - releaseCoeff) * rangeLin;
         }
 
-        // 应用增益
+        /* 步骤4: 限制增益在有效范围内 */
+        gain = qBound(rangeLin, gain, 1.0);
+
+        /* 步骤5: 应用增益到输出 */
         output[i] = input[i] * gain;
     }
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalProcessings++;
     m_stats.totalSamples += N;

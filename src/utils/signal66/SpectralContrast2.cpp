@@ -192,3 +192,46 @@ void SpectralContrast2::resetStatistics()
     m_stats = Stats{};
     m_timeSum = 0.0;
 }
+
+/**
+ * @brief 获取平均对比度
+ *
+ * 计算所有子带对比度的算术平均值，
+ * 反映频谱整体的峰值突出程度。
+ *
+ * @return 平均对比度值
+ */
+double SpectralContrast2::averageContrast() const
+{
+    if (m_peaks.size() != m_valleys.size() || m_peaks.isEmpty()) return 0.0;
+
+    double sum = 0.0;
+    for (int i = 0; i < m_peaks.size(); ++i) {
+        if (m_valleys[i] > 1e-10) {
+            sum += qLn(m_peaks[i] / m_valleys[i]);
+        }
+    }
+    return sum / m_peaks.size();
+}
+
+/**
+ * @brief 获取最大对比度所在的子带索引
+ * @return 最大对比度的子带索引
+ */
+int SpectralContrast2::maxContrastBand() const
+{
+    if (m_peaks.size() != m_valleys.size() || m_peaks.isEmpty()) return -1;
+
+    int bestBand = 0;
+    double maxContrast = -std::numeric_limits<double>::max();
+    for (int i = 0; i < m_peaks.size(); ++i) {
+        if (m_valleys[i] > 1e-10) {
+            double c = qLn(m_peaks[i] / m_valleys[i]);
+            if (c > maxContrast) {
+                maxContrast = c;
+                bestBand = i;
+            }
+        }
+    }
+    return bestBand;
+}

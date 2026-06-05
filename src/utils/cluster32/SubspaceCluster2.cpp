@@ -8,6 +8,8 @@
 #include "utils/cluster32/SubspaceCluster2.h"
 
 #include <QElapsedTimer>
+#include <QMap>
+#include <QSet>
 #include <QtMath>
 
 #include <algorithm>

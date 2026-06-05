@@ -44,6 +44,12 @@ void DBSCAN10::setMinPoints(int minPts)
  * @brief 对数据点进行DBSCAN聚类
  * @param points 输入数据点集合
  * @return 每个点的聚类标签（-1表示噪声点）
+ *
+ * 算法流程:
+ * 1. 预计算距离矩阵
+ * 2. 对每个未分类点查找epsilon邻域
+ * 3. 若邻域内点数 >= minPts，创建新簇并扩展
+ * 4. 否则标记为噪声点
  */
 QVector<int> DBSCAN10::cluster(const QVector<QVector<double>>& points)
 {
@@ -54,11 +60,11 @@ QVector<int> DBSCAN10::cluster(const QVector<QVector<double>>& points)
     if (N == 0) return QVector<int>();
 
     const int D = points[0].size();
-    QVector<int> labels(N, -1); // -1 = 未分类
+    QVector<int> labels(N, -1); /* -1 = 未分类 */
     m_numClusters = 0;
     m_noiseCount = 0;
 
-    // 预计算距离矩阵（加速邻域查询）
+    /* 阶段1: 预计算距离矩阵（加速邻域查询） */
     QVector<QVector<double>> distMatrix(N, QVector<double>(N, 0.0));
     for (int i = 0; i < N; ++i) {
         for (int j = i + 1; j < N; ++j) {
@@ -73,56 +79,58 @@ QVector<int> DBSCAN10::cluster(const QVector<QVector<double>>& points)
         }
     }
 
-    // DBSCAN主循环
+    /* 阶段2: 预计算每个点的邻域列表 */
+    QVector<QVector<int>> neighborhoods(N);
     for (int i = 0; i < N; ++i) {
-        if (labels[i] != -1) continue; // 已分类
-
-        // 查找epsilon邻域内的点
-        QVector<int> neighbors;
         for (int j = 0; j < N; ++j) {
-            if (distMatrix[i][j] <= m_eps) {
-                neighbors.append(j);
+            if (i != j && distMatrix[i][j] <= m_eps) {
+                neighborhoods[i].append(j);
             }
         }
+    }
+
+    /* 阶段3: DBSCAN主循环 */
+    for (int i = 0; i < N; ++i) {
+        if (labels[i] != -1) continue; /* 跳过已分类点 */
+
+        /* 查找epsilon邻域内的点 */
+        const QVector<int>& neighbors = neighborhoods[i];
 
         if (neighbors.size() < m_minPts) {
-            // 标记为噪声（可能后续被重新标记为边界点）
+            /* 邻域内点数不足，标记为噪声（可能后续被重新标记为边界点） */
             labels[i] = -1;
             continue;
         }
 
-        // 创建新簇
+        /* 创建新簇 */
         int clusterId = m_numClusters;
         m_numClusters++;
         labels[i] = clusterId;
 
-        // 扩展簇：处理种子集合
+        /* 阶段4: 扩展簇 - 使用种子集合BFS */
         QVector<int> seeds = neighbors;
         int seedIdx = 0;
         while (seedIdx < seeds.size()) {
             int q = seeds[seedIdx];
             seedIdx++;
 
+            /* 噪声点重新标记为边界点 */
             if (labels[q] == -1) {
-                // 噪声点重新标记为边界点
                 labels[q] = clusterId;
             }
-            if (labels[q] != -1 && q != i) continue; // 已分类且不是当前点
+
+            /* 跳过已分类的非噪声点 */
+            if (labels[q] != -1 && q != i) continue;
 
             labels[q] = clusterId;
 
-            // 查找q的邻域
-            QVector<int> qNeighbors;
-            for (int j = 0; j < N; ++j) {
-                if (distMatrix[q][j] <= m_eps) {
-                    qNeighbors.append(j);
-                }
-            }
+            /* 查找q的邻域 */
+            const QVector<int>& qNeighbors = neighborhoods[q];
 
-            // 如果q是核心点，将其邻域加入种子集合
+            /* 如果q是核心点，将其邻域加入种子集合 */
             if (qNeighbors.size() >= m_minPts) {
                 for (int n : qNeighbors) {
-                    if (labels[n] == -1 || (n != i && labels[n] == -1)) {
+                    if (labels[n] == -1) {
                         if (!seeds.contains(n)) {
                             seeds.append(n);
                         }
@@ -132,13 +140,13 @@ QVector<int> DBSCAN10::cluster(const QVector<QVector<double>>& points)
         }
     }
 
-    // 统计噪声点数量
+    /* 统计噪声点数量 */
     m_noiseCount = 0;
     for (int i = 0; i < N; ++i) {
         if (labels[i] == -1) m_noiseCount++;
     }
 
-    // 更新统计信息
+    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
     m_stats.totalClusterings++;
     m_stats.totalPoints += N;

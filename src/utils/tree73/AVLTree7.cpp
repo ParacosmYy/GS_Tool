@@ -83,10 +83,10 @@ int AVLTree7::rank(double key) const
         if (key < cur->key) {
             cur = cur->left;
         } else if (key > cur->key) {
-            r += nodeCount(cur->left) + 1;
+            r += nodeCountAVL(cur->left) + 1;
             cur = cur->right;
         } else {
-            r += nodeCount(cur->left);
+            r += nodeCountAVL(cur->left);
             break;
         }
     }
@@ -109,7 +109,7 @@ double AVLTree7::select(int k) const
 
     AVLNode* cur = m_root;
     while (cur != nullptr) {
-        int leftSize = nodeCount(cur->left);
+        int leftSize = nodeCountAVL(cur->left);
         if (k < leftSize) {
             cur = cur->left;
         } else if (k > leftSize) {
@@ -168,7 +168,7 @@ AVLTree7::AVLNode* AVLTree7::insertNode(AVLNode* n, double key, int val)
 
     // 更新高度和计数
     n->height = 1 + qMax(nodeHeight(n->left), nodeHeight(n->right));
-    n->count = 1 + nodeCount(n->left) + nodeCount(n->right);
+    n->count = 1 + nodeCountAVL(n->left) + nodeCountAVL(n->right);
 
     return balance(n);
 }
@@ -202,7 +202,7 @@ AVLTree7::AVLNode* AVLTree7::removeNode(AVLNode* n, double key)
     }
 
     n->height = 1 + qMax(nodeHeight(n->left), nodeHeight(n->right));
-    n->count = 1 + nodeCount(n->left) + nodeCount(n->right);
+    n->count = 1 + nodeCountAVL(n->left) + nodeCountAVL(n->right);
 
     return balance(n);
 }
@@ -253,6 +253,13 @@ int AVLTree7::balanceFactor(AVLNode* n) const
  * @param n 旋转节点
  * @return 旋转后的新根
  */
+/**
+ * @brief 获取节点子树大小
+ * @param n 节点指针
+ * @return 子树中的节点数量，空节点返回0
+ */
+static int nodeCountAVL(AVLTree7::AVLNode* n) { return (n != nullptr) ? n->count : 0; }
+
 AVLTree7::AVLNode* AVLTree7::rotateLeft(AVLNode* n)
 {
     AVLNode* r = n->right;
@@ -261,8 +268,8 @@ AVLTree7::AVLNode* AVLTree7::rotateLeft(AVLNode* n)
 
     n->height = 1 + qMax(nodeHeight(n->left), nodeHeight(n->right));
     r->height = 1 + qMax(nodeHeight(r->left), nodeHeight(r->right));
-    n->count = 1 + nodeCount(n->left) + nodeCount(n->right);
-    r->count = 1 + nodeCount(r->left) + nodeCount(r->right);
+    n->count = 1 + nodeCountAVL(n->left) + nodeCountAVL(n->right);
+    r->count = 1 + nodeCountAVL(r->left) + nodeCountAVL(r->right);
 
     return r;
 }
@@ -280,8 +287,8 @@ AVLTree7::AVLNode* AVLTree7::rotateRight(AVLNode* n)
 
     n->height = 1 + qMax(nodeHeight(n->left), nodeHeight(n->right));
     l->height = 1 + qMax(nodeHeight(l->left), nodeHeight(l->right));
-    n->count = 1 + nodeCount(n->left) + nodeCount(n->right);
-    l->count = 1 + nodeCount(l->left) + nodeCount(l->right);
+    n->count = 1 + nodeCountAVL(n->left) + nodeCountAVL(n->right);
+    l->count = 1 + nodeCountAVL(l->left) + nodeCountAVL(l->right);
 
     return l;
 }
@@ -301,7 +308,3 @@ void AVLTree7::rangeQueryNode(AVLNode* n, double lo, double hi, QVector<int>& re
     if (n->key < hi) rangeQueryNode(n->right, lo, hi, res);
 }
 
-/**
- * @brief 获取节点子树大小
- */
-static int nodeCountHelper(AVLTree7::AVLNode* n) { return (n) ? n->count : 0; }
