@@ -97,10 +97,12 @@ void ZModemTransfer::sendZDATA()
     if (!m_conn) return;
     ++m_stats.zdataFrames;
     QByteArray offsetData;
-    offsetData.append(static_cast<char>(m_fileOffset & 0xFF));
-    offsetData.append(static_cast<char>((m_fileOffset >> 8) & 0xFF));
-    offsetData.append(static_cast<char>((m_fileOffset >> 16) & 0xFF));
-    offsetData.append(static_cast<char>((m_fileOffset >> 24) & 0xFF));
+    /// ZModem帧头偏移量仅4字节，文件>4GB时高位被截断(协议设计限制)
+    qint64 safeOffset = qMin(m_fileOffset, static_cast<qint64>(0xFFFFFFFF));
+    offsetData.append(static_cast<char>(safeOffset & 0xFF));
+    offsetData.append(static_cast<char>((safeOffset >> 8) & 0xFF));
+    offsetData.append(static_cast<char>((safeOffset >> 16) & 0xFF));
+    offsetData.append(static_cast<char>((safeOffset >> 24) & 0xFF));
     writeChecked(buildBinHeader(ZDATA, offsetData));
 }
 /** @brief 异步分块发送数据子包，每批最多kChunksPerTick个，防止UI冻结 */
@@ -148,10 +150,12 @@ void ZModemTransfer::sendZEOF()
     if (!m_conn) return;
     QByteArray offsetData;
     qint64 size = m_fileData.size();
-    offsetData.append(static_cast<char>(size & 0xFF));
-    offsetData.append(static_cast<char>((size >> 8) & 0xFF));
-    offsetData.append(static_cast<char>((size >> 16) & 0xFF));
-    offsetData.append(static_cast<char>((size >> 24) & 0xFF));
+    /// ZModem帧头偏移量仅4字节，文件>4GB时高位被截断(协议设计限制)
+    qint64 safeSize = qMin(size, static_cast<qint64>(0xFFFFFFFF));
+    offsetData.append(static_cast<char>(safeSize & 0xFF));
+    offsetData.append(static_cast<char>((safeSize >> 8) & 0xFF));
+    offsetData.append(static_cast<char>((safeSize >> 16) & 0xFF));
+    offsetData.append(static_cast<char>((safeSize >> 24) & 0xFF));
     writeChecked(buildHexHeader(ZEOF, offsetData));
 }
 /** @brief 发送ZFIN帧，结束ZMODEM会话 */

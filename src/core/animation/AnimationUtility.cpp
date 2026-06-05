@@ -13,8 +13,8 @@
 
 /// 静态统计实例
 AnimationUtility::Stats AnimationUtility::s_stats;
-quint64 AnimationUtility::s_durationSumMs = 0;
-quint64 AnimationUtility::s_durationCount = 0;
+std::atomic<quint64> AnimationUtility::s_durationSumMs{0};
+std::atomic<quint64> AnimationUtility::s_durationCount{0};
 
 /** @brief 获取统计计数器只读引用 @return 当前统计快照 */
 const AnimationUtility::Stats& AnimationUtility::stats()
@@ -26,8 +26,8 @@ const AnimationUtility::Stats& AnimationUtility::stats()
 void AnimationUtility::resetStatistics()
 {
     s_stats = Stats{};
-    s_durationSumMs = 0;
-    s_durationCount = 0;
+    s_durationSumMs.store(0, std::memory_order_relaxed);
+    s_durationCount.store(0, std::memory_order_relaxed);
 }
 
 /** @brief 确保控件有透明度特效 @param widget 目标控件 @return 透明度特效指针 */
@@ -57,15 +57,14 @@ QPropertyAnimation* AnimationUtility::fadeIn(QWidget* widget,
     anim->setEndValue(1.0);
     anim->setEasingCurve(curve);
 
-    /* 统计: 创建 + 完成时记录时长 */
     ++s_stats.totalAnimationsCreated;
     if (curve != QEasingCurve::OutCubic) ++s_stats.totalEasingChanges;
     QObject::connect(anim, &QAbstractAnimation::finished, anim, [dur = durationMs]() {
         ++s_stats.totalAnimationsCompleted;
-        s_durationSumMs += dur;
-        ++s_durationCount;
-        s_stats.avgDurationMs = s_durationCount > 0
-            ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+        s_durationSumMs.fetch_add(dur, std::memory_order_relaxed);
+        quint64 count = s_durationCount.fetch_add(1, std::memory_order_relaxed) + 1;
+        s_stats.avgDurationMs = count > 0
+            ? static_cast<double>(s_durationSumMs.load(std::memory_order_relaxed)) / static_cast<double>(count)
             : 0.0;
     });
 
@@ -92,14 +91,13 @@ QPropertyAnimation* AnimationUtility::fadeOut(QWidget* widget,
     ++s_stats.totalAnimationsCreated;
     if (curve != QEasingCurve::InCubic) ++s_stats.totalEasingChanges;
 
-    /* 连接 finished 信号: 先更新统计，再调用用户回调 */
     QObject::connect(anim, &QAbstractAnimation::finished, anim,
         [onFinished, durationMs]() {
             ++s_stats.totalAnimationsCompleted;
-            s_durationSumMs += durationMs;
-            ++s_durationCount;
-            s_stats.avgDurationMs = s_durationCount > 0
-                ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+            s_durationSumMs.fetch_add(durationMs, std::memory_order_relaxed);
+            quint64 count = s_durationCount.fetch_add(1, std::memory_order_relaxed) + 1;
+            s_stats.avgDurationMs = count > 0
+                ? static_cast<double>(s_durationSumMs.load(std::memory_order_relaxed)) / static_cast<double>(count)
                 : 0.0;
             if (onFinished) onFinished();
         });

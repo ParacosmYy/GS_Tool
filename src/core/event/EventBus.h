@@ -16,6 +16,7 @@
 #include <QVariant>
 #include <functional>
 #include <mutex>
+#include <atomic>
 
 /** @brief 全局事件总线 - 模块间松耦合通信的中心调度器(单例) */
 class EventBus : public QObject {
@@ -43,13 +44,13 @@ public:
     // ---- 统计接口 ----
     quint64 totalPublished() const;                       ///< 获取累计发布事件总数(同步+异步)
     quint64 totalPublishes() const { return m_totalPublished; } ///< totalPublished别名
-    quint64 totalAsyncPublished() const { return m_totalAsyncPublished; } ///< 获取累计异步发布事件总数
+    quint64 totalAsyncPublished() const { return m_totalAsyncPublished.load(std::memory_order_relaxed); } ///< 获取累计异步发布事件总数
     quint64 totalSyncPublished() const;                   ///< 获取累计同步发布事件总数
     quint64 totalSubscriptions() const;                   ///< 获取累计订阅操作总数
     quint64 totalUnsubscriptions() const;                 ///< 获取累计取消订阅操作总数
     quint64 totalHandlersCalled() const;                  ///< 获取累计回调处理器调用总数
     quint64 peakSubscribersPerEvent() const;              ///< 获取单个事件历史峰值订阅者数
-    quint64 totalHandlerErrors() const { return m_totalHandlerErrors; } ///< 获取累计回调处理器异常次数
+    quint64 totalHandlerErrors() const { return m_totalHandlerErrors.load(std::memory_order_relaxed); } ///< 获取累计回调处理器异常次数
     quint64 totalPublishsWithNoSubscribers() const { return m_totalPublishsWithNoSubscribers; } ///< 获取无订阅者发布次数
     quint64 totalUniqueEventNames() const { return m_totalUniqueEventNames; } ///< 获取独立事件名称总数
     void resetEventStatistics();                          ///< 重置所有统计计数器
@@ -73,12 +74,12 @@ private:
     QMultiMap<QString, int> m_eventSubscriptions;  ///< 事件名称→订阅ID列表
     mutable std::mutex m_mutex;                     ///< 线程安全互斥锁
     quint64 m_totalPublished = 0;               ///< 累计发布事件总数(同步+异步)
-    quint64 m_totalAsyncPublished = 0;          ///< 累计异步发布事件总数
+    std::atomic<quint64> m_totalAsyncPublished{0};  ///< 累计异步发布事件总数(原子操作)
     quint64 m_totalSubscriptions = 0;           ///< 累计订阅操作总数
     quint64 m_totalUnsubscriptions = 0;         ///< 累计取消订阅操作总数
-    quint64 m_totalHandlersCalled = 0;          ///< 累计回调处理器调用总数
+    std::atomic<quint64> m_totalHandlersCalled{0};  ///< 累计回调处理器调用总数(原子操作)
     quint64 m_peakSubscribersPerEvent = 0;      ///< 单个事件历史峰值订阅者数
-    quint64 m_totalHandlerErrors = 0;           ///< 累计回调处理器执行异常次数
+    std::atomic<quint64> m_totalHandlerErrors{0};   ///< 累计回调处理器执行异常次数(原子操作)
     quint64 m_totalPublishsWithNoSubscribers = 0; ///< 累计发布时无订阅者的事件数
     quint64 m_totalUniqueEventNames = 0;        ///< 历史上去重后的独立事件名称总数
     void handleAsyncEvent(const QString& eventName, const QVariant& data); ///< 处理异步事件发布

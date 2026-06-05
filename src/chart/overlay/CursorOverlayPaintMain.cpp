@@ -72,8 +72,8 @@ void CursorOverlay::drawDeltaPanel(QPainter& painter)
         ++m_totalDeltaMeasurements;
         m_sumDeltaX += deltaX;
         if (!m_model->channelNames().isEmpty()) {
-            const QString& firstCh = m_model->channelNames().first();
-            const QVector<QPointF>& data = m_model->channelData(firstCh);
+            const QString firstCh = m_model->channelNames().first();
+            const QVector<QPointF> data = m_model->channelData(firstCh);
             double valA = 0.0, valB = 0.0;
             if (interpolateYForMain(data, m_cursorAX, valA) &&
                 interpolateYForMain(data, m_cursorBX, valB)) {

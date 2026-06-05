@@ -19,11 +19,11 @@ AudioSpectrum::~AudioSpectrum() = default;
 /** @brief 设置采样率 @param r 采样率(Hz) */
 void AudioSpectrum::setSampleRate(int r) { m_sampleRate = r; ++m_totalConfigChanges; }
 /** @brief 设置FFT窗口大小 @param s FFT大小(必须是2的幂) */
-void AudioSpectrum::setFftSize(int s) { m_fftSize = s; ++m_totalConfigChanges; }
+void AudioSpectrum::setFftSize(int s) { if (s < 1) s = 1; m_fftSize = s; ++m_totalConfigChanges; }
 /** @brief 设置分贝范围 @param min 最小dB @param max 最大dB */
-void AudioSpectrum::setDbRange(double min, double max) { m_minDb = min; m_maxDb = max; ++m_totalConfigChanges; }
+void AudioSpectrum::setDbRange(double min, double max) { if (max <= min) max = min + 1.0; m_minDb = min; m_maxDb = max; ++m_totalConfigChanges; }
 /** @brief 设置频谱柱数量 @param b 柱数 */
-void AudioSpectrum::setBarCount(int b) { m_barCount = b; m_magnitudes.resize(b); m_smoothed.resize(b); ++m_totalConfigChanges; }
+void AudioSpectrum::setBarCount(int b) { if (b < 1) b = 1; m_barCount = b; m_magnitudes.resize(b); m_smoothed.resize(b); ++m_totalConfigChanges; }
 /** @brief 设置平滑因子 @param f 平滑系数(0~1) */
 void AudioSpectrum::setSmoothFactor(double f) { m_smoothFactor = f; ++m_totalConfigChanges; }
 /** @brief 获取当前采样率 @return 采样率(Hz) */
@@ -58,7 +58,8 @@ void AudioSpectrum::processFft() {
         mag = qSqrt(mag / binsPerBar);
         double db = 20.0 * qLn(qMax(mag, 1.0)) / qLn(10.0);
         db = qBound(m_minDb, db, m_maxDb);
-        double norm = (db - m_minDb) / (m_maxDb - m_minDb);
+        double range = m_maxDb - m_minDb;
+        double norm = (range > 0.0) ? (db - m_minDb) / range : 0.0;
         m_smoothed[i] = m_smoothFactor * m_smoothed[i] + (1.0 - m_smoothFactor) * norm;
         m_magnitudes[i] = norm;
     }

@@ -101,11 +101,11 @@ qint64 SpiConnection::sendCommand(quint8 cmd, const QByteArray& payload)
 
     QByteArray frame;
     frame.append(static_cast<char>(cmd));
-    /// 长度(2字节小端)
-    quint16 len = static_cast<quint16>(payload.size());
+    /// 长度(2字节小端)，限制最大65535字节防止静默截断
+    quint16 len = static_cast<quint16>(qMin(payload.size(), 65535));
     frame.append(static_cast<char>(len & 0xFF));
     frame.append(static_cast<char>((len >> 8) & 0xFF));
-    frame.append(payload);
+    frame.append(payload.left(len));
 
     return m_serial->write(frame);
 }
@@ -115,10 +115,10 @@ QByteArray SpiConnection::buildTransferFrame(const QByteArray& txData)
 {
     QByteArray frame;
     frame.append(static_cast<char>(CMD_SPI_TRANSFER));
-    quint16 len = static_cast<quint16>(txData.size());
+    quint16 len = static_cast<quint16>(qMin(txData.size(), 65535));
     frame.append(static_cast<char>(len & 0xFF));
     frame.append(static_cast<char>((len >> 8) & 0xFF));
-    frame.append(txData);
+    frame.append(txData.left(len));
     return frame;
 }
 

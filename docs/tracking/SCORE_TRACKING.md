@@ -127,6 +127,7 @@
 | 341-355 | Wave 5-6功能冲刺 | DataChecksumVerifier拆分(Algo+Stats)+SerialDataEncoder(8种编解码)+BytePatternAnalyzer(通配符搜索)+DataStreamSplitter(4种分割)+DataRateCalculator(滑动窗口速率)+Qt6::Qml链接修复 |
 | 356 | Bug修复Batch 7 — 25+安全/崩溃/逻辑bug修复 | NavigationController静态变量→实例成员+LoadingSpinner showEvent/hideEvent+YModem除零保护+ZModem无限重试限制/定时器兜底+TlsConnection CA证书泄漏+onSslErrors空指针+UdpConnection析构泄漏+XModem offset溢出+TrafficMonitor非单调时间戳+DbcParserDecode int溢出+RingBuffer线程安全+FlatBuffers类型大小+SerialPortProfiler截断+ZModem除零+ProtocolSimulator负值包装+ModbusSlave功能码范围+WaterfallWidget鼠标+OtaManager flush+TerminalSearchRenderer提前终止+TerminalContextMenuManager空事件 |
 | 357 | Wave 7功能冲刺 — 5大新工具+25+bug修复+头文件压缩 | DataComparator(LCS差异算法/相似度/Hex并排对比)+PacketLossDetector(序列号追踪/间隙检测/rollover)+ByteFrequencyAnalyzer(Shannon熵/累积频率/模式检测)+SerialProtocolFuzzer(6种fuzz策略/确定性PRNG)+FrameTemplateLibrary(帧模板CRUD/校验组装/JSON导入导出)+linter修复(RingBuffer/TrafficMonitor/ChecksumPanel/ConverterPanel/TimestampPanel/NavIndicator/TerminalSearchRenderer/AnimatedProgressBar/NavigationController) |
+| 358-366 | Wave 8-9功能冲刺+编译修复 | DataEncryptionEngine(XOR/AES/RC4/Caesar/Vigenere)+SerialFrameDecoder(帧解码/组装/校验)+WaveformFilter(8种DSP)+ModbusMaster(RTU/TCP)+SerialDataLogger(6格式/轮转/压缩)+ProtocolSession(请求响应追踪/P95)+DataRateLimiter(令牌桶/漏桶)+HexDiffEngine(字节级对比/补丁)+PacketVisualizer(彩色字段图)+SerialScriptEngine(脚本/条件分支)+StreamCaptureRecorder(重命名避免MOC冲突)+ModbusScanWidget信号重载修复+CMakeLists修复+DataPipeline/DataAggregator/ProtocolBridge null安全 |
 
 ---
 

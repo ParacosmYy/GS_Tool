@@ -1,13 +1,20 @@
 /**
  * @file AnimationUtility.h
- * @brief 动画工具集 - 提供常用动画效果的工厂方法
+ * @brief 动画工具集 — 提供常用UI动画效果的静态工厂方法
  *
- * 统一管理项目中所有动画参数和效果，避免各控件重复创建动画。
- * 提供淡入淡出、滑动、缩放、弹性弹出等预设效果。
+ * 统一管理项目中所有动画参数和效果，避免各控件重复创建动画代码。
+ * 提供淡入淡出、滑动、缩放、弹性弹出、抖动等预设效果。
+ *
+ * 所有方法返回 QPropertyAnimation* (或启动动画组)，动画对象设置
+ * DeleteWhenStopped 自动清理。
+ *
+ * 线程安全: s_durationSumMs/s_durationCount 使用 std::atomic 保护，
+ * 防止多个动画并发完成时统计计数器数据竞争。
  *
  * 用法:
  *   AnimationUtility::fadeIn(widget, 200);
  *   AnimationUtility::slideIn(widget, SlideDirection::FromRight, 300);
+ *   AnimationUtility::shake(widget, 8, 3);
  */
 
 #ifndef ANIMATION_UTILITY_H
@@ -16,6 +23,7 @@
 #include <QEasingCurve>
 #include <QPoint>
 #include <functional>
+#include <atomic>
 
 class QWidget;
 class QPropertyAnimation;
@@ -153,9 +161,9 @@ private:
     /// 获取滑动偏移量
     static QPoint slideOffset(SlideDirection direction, const QWidget* widget);
 
-    static Stats s_stats;               ///< 全局统计实例(静态存储)
-    static quint64 s_durationSumMs;     ///< 累计动画时长总和(用于计算加权平均)
-    static quint64 s_durationCount;     ///< 累计已完成动画计数(用于计算加权平均)
+    static Stats s_stats;                           ///< 全局统计实例(静态存储)
+    static std::atomic<quint64> s_durationSumMs;    ///< 累计动画时长总和(原子操作)
+    static std::atomic<quint64> s_durationCount;    ///< 累计已完成动画计数(原子操作)
 };
 
 #endif // ANIMATION_UTILITY_H

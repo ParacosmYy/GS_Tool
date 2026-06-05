@@ -164,9 +164,10 @@ void EventBus::publish(const QString& eventName, const QVariant& data)
         try {
             cb(data);
         } catch (...) {
-            ++m_totalHandlerErrors;  // 累计回调处理器执行异常
+            // 异常计数通过原子操作避免数据竞争
+            m_totalHandlerErrors.fetch_add(1, std::memory_order_relaxed);
         }
-        ++m_totalHandlersCalled;  // 累计回调调用计数
+        m_totalHandlersCalled.fetch_add(1, std::memory_order_relaxed);
     }
 }
 
@@ -177,7 +178,7 @@ void EventBus::publish(const QString& eventName, const QVariant& data)
  */
 void EventBus::publishAsync(const QString& eventName, const QVariant& data)
 {
-    ++m_totalAsyncPublished;  // 累计异步发布计数
+    m_totalAsyncPublished.fetch_add(1, std::memory_order_relaxed);  // 原子递增异步发布计数
     emit eventPublished(eventName, data);
 }
 

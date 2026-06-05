@@ -15,11 +15,11 @@ ScopeWidget::ScopeWidget(QWidget *parent) : QWidget(parent) { setObjectName("Sco
 ScopeWidget::~ScopeWidget() = default;
 
 /** @brief 设置通道数量 @param c 通道数 */
-void ScopeWidget::setChannelCount(int c) { ++m_totalChannelChanges; m_channels.resize(c); for (auto &ch : m_channels) ch.resize(m_bufferSize); }
+void ScopeWidget::setChannelCount(int c) { if (c < 1) c = 1; ++m_totalChannelChanges; m_channels.resize(c); for (auto &ch : m_channels) ch.resize(m_bufferSize); }
 /** @brief 设置采样缓冲区大小 @param s 缓冲区采样数 */
-void ScopeWidget::setSampleBuffer(int s) { m_bufferSize = s; for (auto &ch : m_channels) ch.resize(s); m_writePos = 0; }
+void ScopeWidget::setSampleBuffer(int s) { if (s < 1) s = 1; m_bufferSize = s; for (auto &ch : m_channels) ch.resize(s); m_writePos = 0; m_wrapped = false; }
 /** @brief 添加单个采样值 @param ch 通道索引 @param v 采样值 */
-void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.size()) { m_channels[ch][m_writePos % m_bufferSize] = v; ++m_totalSamples; if (ch == 0) { m_writePos++; if (m_writePos >= m_bufferSize) { m_writePos = 0; m_wrapped = true; ++m_totalOverflows; emit dataOverflow(); } if (m_running && qAbs(v - m_triggerLevel) < 0.01 && ch == m_triggerCh) { ++m_totalTriggerFires; emit triggerFired(); } } } }
+void ScopeWidget::addSample(int ch, double v) { if (ch >= 0 && ch < m_channels.size() && m_bufferSize > 0) { m_channels[ch][m_writePos % m_bufferSize] = v; ++m_totalSamples; if (ch == 0) { m_writePos++; if (m_writePos >= m_bufferSize) { m_writePos = 0; m_wrapped = true; ++m_totalOverflows; emit dataOverflow(); } if (m_running && qAbs(v - m_triggerLevel) < 0.01 && ch == m_triggerCh) { ++m_totalTriggerFires; emit triggerFired(); } } } }
 /** @brief 批量添加采样值 @param ch 通道索引 @param vals 采样值向量 */
 void ScopeWidget::addSamples(int ch, const QVector<double> &vals) { for (auto v : vals) addSample(ch, v); }
 /** @brief 设置时间轴缩放 @param ms 时间刻度(毫秒) */

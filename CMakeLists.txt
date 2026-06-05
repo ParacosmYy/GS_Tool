@@ -304,6 +304,7 @@ set(SOURCES
     src/utils/aggregator/DataAggregator.cpp
     src/utils/aggregator/DataAggregatorCompute.cpp
     src/utils/aggregator/DataAggregatorTimeWindow.cpp
+    src/utils/pipeline/DataPipeline.cpp
     src/utils/log/DataLogger.cpp
     src/utils/log/DataLoggerEdl.cpp
     src/utils/log/DataLoggerPlayback.cpp
@@ -651,7 +652,11 @@ set(SOURCES
     src/utils/pattern/BytePatternAnalyzer.cpp
     src/utils/pattern/BytePatternAnalyzerStats.cpp
     src/utils/pattern/DataPatternDetector.cpp
+    src/utils/scaler/DataScalerWidget.cpp
+    src/utils/threshold/DataThresholdMonitor.cpp
+    src/utils/capture/DataCaptureBuffer.cpp
     src/utils/ratelimiter/DataRateLimiter.cpp
+    src/utils/crc_verifier/CrcStreamVerifier.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -785,6 +790,15 @@ set(SOURCES
     # -- F50: 串口脚本引擎 --
     src/serial/script/SerialScriptEngine.cpp
     src/serial/script/SerialScriptEngineStats.cpp
+
+    # -- F51: 数据同步引擎 --
+    src/utils/synchronizer/DataSynchronizer.cpp
+
+    # -- F52: 滑动窗口聚合器 --
+    src/utils/aggregator2/WindowedAggregator.cpp
+
+    # -- F53: 数据降采样引擎 --
+    src/utils/reductor/DataReducer.cpp
 )
 
 set(HEADERS
@@ -907,6 +921,7 @@ set(HEADERS
     src/utils/settings/SettingsManager.h
     src/utils/export/DataExporter.h
     src/utils/aggregator/DataAggregator.h
+    src/utils/pipeline/DataPipeline.h
     src/utils/log/DataLogger.h
     src/utils/data/DataBookmark.h
     src/utils/data/ByteFormat.h
@@ -1193,6 +1208,15 @@ set(HEADERS
 
     # -- F50: 串口脚本引擎 --
     src/serial/script/SerialScriptEngine.h
+
+    # -- F51: 数据同步引擎 --
+    src/utils/synchronizer/DataSynchronizer.h
+
+    # -- F52: 滑动窗口聚合器 --
+    src/utils/aggregator2/WindowedAggregator.h
+
+    # -- F53: 数据降采样引擎 --
+    src/utils/reductor/DataReducer.h
 )
 
 set(RESOURCES

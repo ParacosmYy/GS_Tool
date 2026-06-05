@@ -92,7 +92,7 @@ void StreamCaptureRecorder::stop()
 
     m_stats.recordingDurationMs = static_cast<double>(m_elapsedTimer.elapsed());
     if (m_stats.totalRecords > 0) {
-        m_stats.avgRecordSize = m_stats.totalBytesRecorded / m_stats.totalRecords;
+        m_stats.avgRecordSize = static_cast<double>(m_stats.totalBytesRecorded) / static_cast<double>(m_stats.totalRecords);
     }
 
     if (m_streamingMode && m_streamFile.isOpen()) {
@@ -136,7 +136,7 @@ void StreamCaptureRecorder::recordData(const QByteArray& data, Direction directi
         m_streamFile.write(reinterpret_cast<const char*>(&timestampUs), sizeof(quint64));
         char dir = (direction == Direction::RX) ? 0x01 : 0x00;
         m_streamFile.write(&dir, 1);
-        quint32 len = static_cast<quint32>(data.size());
+        quint32 len = static_cast<quint32>(qMin(data.size(), 2147483647));  // 限制在INT_MAX内防止截断
         m_streamFile.write(reinterpret_cast<const char*>(&len), sizeof(quint32));
         m_streamFile.write(data);
     } else {
@@ -159,7 +159,7 @@ void StreamCaptureRecorder::recordData(const QByteArray& data, Direction directi
     m_stats.totalBytesRecorded += static_cast<quint64>(data.size());
     ++m_stats.totalRecords;
     if (m_stats.totalRecords > 0) {
-        m_stats.avgRecordSize = m_stats.totalBytesRecorded / m_stats.totalRecords;
+        m_stats.avgRecordSize = static_cast<double>(m_stats.totalBytesRecorded) / static_cast<double>(m_stats.totalRecords);
     }
 
     emit recordAdded(timestampUs);

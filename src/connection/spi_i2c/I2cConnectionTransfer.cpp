@@ -88,10 +88,10 @@ qint64 I2cConnection::sendCommand(quint8 cmd, const QByteArray& payload)
 
     QByteArray frame;
     frame.append(static_cast<char>(cmd));
-    quint16 len = static_cast<quint16>(payload.size());
+    quint16 len = static_cast<quint16>(qMin(payload.size(), 65535));
     frame.append(static_cast<char>(len & 0xFF));
     frame.append(static_cast<char>((len >> 8) & 0xFF));
-    frame.append(payload);
+    frame.append(payload.left(len));
 
     return m_serial->write(frame);
 }

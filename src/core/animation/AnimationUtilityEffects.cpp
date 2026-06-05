@@ -59,10 +59,10 @@ QPropertyAnimation* AnimationUtility::slideIn(QWidget* widget,
     if (curve != QEasingCurve::OutCubic) ++s_stats.totalEasingChanges;
     QObject::connect(anim, &QAbstractAnimation::finished, anim, [dur = durationMs]() {
         ++s_stats.totalAnimationsCompleted;
-        s_durationSumMs += dur;
-        ++s_durationCount;
-        s_stats.avgDurationMs = s_durationCount > 0
-            ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+        s_durationSumMs.fetch_add(dur, std::memory_order_relaxed);
+        quint64 count = s_durationCount.fetch_add(1, std::memory_order_relaxed) + 1;
+        s_stats.avgDurationMs = count > 0
+            ? static_cast<double>(s_durationSumMs.load(std::memory_order_relaxed)) / static_cast<double>(count)
             : 0.0;
     });
 
@@ -92,14 +92,13 @@ QPropertyAnimation* AnimationUtility::slideOut(QWidget* widget,
     ++s_stats.totalAnimationsCreated;
     if (curve != QEasingCurve::InCubic) ++s_stats.totalEasingChanges;
 
-    /* 连接 finished 信号: 先更新统计，再调用用户回调 */
     QObject::connect(anim, &QAbstractAnimation::finished, anim,
         [onFinished, durationMs]() {
             ++s_stats.totalAnimationsCompleted;
-            s_durationSumMs += durationMs;
-            ++s_durationCount;
-            s_stats.avgDurationMs = s_durationCount > 0
-                ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+            s_durationSumMs.fetch_add(durationMs, std::memory_order_relaxed);
+            quint64 count = s_durationCount.fetch_add(1, std::memory_order_relaxed) + 1;
+            s_stats.avgDurationMs = count > 0
+                ? static_cast<double>(s_durationSumMs.load(std::memory_order_relaxed)) / static_cast<double>(count)
                 : 0.0;
             if (onFinished) onFinished();
         });
@@ -148,10 +147,10 @@ void AnimationUtility::scaleIn(QWidget* widget, int durationMs)
 
     QObject::connect(group, &QAbstractAnimation::finished, group, [dur = durationMs]() {
         ++s_stats.totalAnimationsCompleted;
-        s_durationSumMs += dur;
-        ++s_durationCount;
-        s_stats.avgDurationMs = s_durationCount > 0
-            ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+        s_durationSumMs.fetch_add(dur, std::memory_order_relaxed);
+        quint64 count = s_durationCount.fetch_add(1, std::memory_order_relaxed) + 1;
+        s_stats.avgDurationMs = count > 0
+            ? static_cast<double>(s_durationSumMs.load(std::memory_order_relaxed)) / static_cast<double>(count)
             : 0.0;
     });
 
@@ -175,15 +174,14 @@ QPropertyAnimation* AnimationUtility::bounceIn(QWidget* widget,
     anim->setEndValue(target);
     anim->setEasingCurve(QEasingCurve::OutBack);
 
-    /* 统计: 创建 + 缓动变更(OutBack非默认) + 完成 */
     ++s_stats.totalAnimationsCreated;
     ++s_stats.totalEasingChanges;
     QObject::connect(anim, &QAbstractAnimation::finished, anim, [dur = durationMs]() {
         ++s_stats.totalAnimationsCompleted;
-        s_durationSumMs += dur;
-        ++s_durationCount;
-        s_stats.avgDurationMs = s_durationCount > 0
-            ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+        s_durationSumMs.fetch_add(dur, std::memory_order_relaxed);
+        quint64 count = s_durationCount.fetch_add(1, std::memory_order_relaxed) + 1;
+        s_stats.avgDurationMs = count > 0
+            ? static_cast<double>(s_durationSumMs.load(std::memory_order_relaxed)) / static_cast<double>(count)
             : 0.0;
     });
 
@@ -216,15 +214,14 @@ void AnimationUtility::shake(QWidget* widget, int amplitude, int count)
     back->setEndValue(origin);
     group->addAnimation(back);
 
-    /* 统计: 抖动视为一次动画创建 + 完成(总时长=count*2*50+50) */
     ++s_stats.totalAnimationsCreated;
     const int totalMs = count * 2 * 50 + 50;
     QObject::connect(group, &QAbstractAnimation::finished, group, [totalMs]() {
         ++s_stats.totalAnimationsCompleted;
-        s_durationSumMs += totalMs;
-        ++s_durationCount;
-        s_stats.avgDurationMs = s_durationCount > 0
-            ? static_cast<double>(s_durationSumMs) / static_cast<double>(s_durationCount)
+        s_durationSumMs.fetch_add(totalMs, std::memory_order_relaxed);
+        quint64 cnt = s_durationCount.fetch_add(1, std::memory_order_relaxed) + 1;
+        s_stats.avgDurationMs = cnt > 0
+            ? static_cast<double>(s_durationSumMs.load(std::memory_order_relaxed)) / static_cast<double>(cnt)
             : 0.0;
     });
 

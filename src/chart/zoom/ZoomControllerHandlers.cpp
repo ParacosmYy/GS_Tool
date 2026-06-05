@@ -100,6 +100,8 @@ void ZoomController::handleMouseRelease(QMouseEvent* event)
         if (rubberRect.width() < 5 || rubberRect.height() < 5) return;
 
         if (m_chart) {
+            // 先验证坐标轴可用，再推入缩放栈(防止轴为空时产生孤立状态)
+            if (!xAxis() && !yAxis()) return;
             pushZoomState();
 
             // 将框选矩形映射到数据坐标

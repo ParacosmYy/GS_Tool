@@ -50,7 +50,7 @@ quint64 EventBus::totalPublished() const
 quint64 EventBus::totalSyncPublished() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_totalPublished - m_totalAsyncPublished;
+    return m_totalPublished - m_totalAsyncPublished.load(std::memory_order_relaxed);
 }
 
 /** @brief 获取累计订阅操作总数 @return 订阅数 */
@@ -86,12 +86,12 @@ void EventBus::resetEventStatistics()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_totalPublished = 0;
-    m_totalAsyncPublished = 0;
+    m_totalAsyncPublished.store(0, std::memory_order_relaxed);
     m_totalSubscriptions = 0;
     m_totalUnsubscriptions = 0;
-    m_totalHandlersCalled = 0;
+    m_totalHandlersCalled.store(0, std::memory_order_relaxed);
     m_peakSubscribersPerEvent = 0;
-    m_totalHandlerErrors = 0;
+    m_totalHandlerErrors.store(0, std::memory_order_relaxed);
     m_totalPublishsWithNoSubscribers = 0;
     m_totalUniqueEventNames = 0;
 }

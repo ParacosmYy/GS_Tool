@@ -42,10 +42,10 @@ QByteArray SpiConnection::transfer(const QByteArray& txData, SpiWordSize wordSiz
 
     QByteArray frame;
     frame.append(static_cast<char>(CMD_SPI_TRANSFER));
-    quint16 len = static_cast<quint16>(payload.size());
+    quint16 len = static_cast<quint16>(qMin(payload.size(), 65535));
     frame.append(static_cast<char>(len & 0xFF));
     frame.append(static_cast<char>((len >> 8) & 0xFF));
-    frame.append(payload);
+    frame.append(payload.left(len));
 
     m_serial->write(frame);
 
