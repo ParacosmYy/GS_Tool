@@ -3,112 +3,103 @@
  * @brief 流式分词器实现
  */
 
-#include "utils/tokenizer/StreamTokenizer.h"
-
+#include "StreamTokenizer.h"
 #include <QElapsedTimer>
 
 StreamTokenizer::StreamTokenizer(QObject* parent)
-    : QObject(parent), m_quote('"'), m_escape('\\'),
-      m_keepEmpty(false), m_timeSum(0.0)
+    : QObject(parent)
+    , m_timeSum(0.0)
 {
-    m_delimiters = " \t\n\r";
 }
 
-void StreamTokenizer::setDelimiters(const QByteArray& delimiters)
-{
-    m_delimiters = delimiters;
-}
-
-void StreamTokenizer::setQuote(char quote) { m_quote = quote; }
-void StreamTokenizer::setEscape(char escape) { m_escape = escape; }
-void StreamTokenizer::setKeepEmptyTokens(bool keep) { m_keepEmpty = keep; }
-
-QStringList StreamTokenizer::tokenize(const QByteArray& data)
+QVector<QString> StreamTokenizer::tokenize(const QString& text,
+                                             const QString& delimiters) const
 {
     QElapsedTimer timer;
     timer.start();
 
-    QStringList tokens;
-    QByteArray current;
-    bool inQuote = false;
-    bool escaped = false;
+    QVector<QString> tokens;
+    int start = 0;
 
-    for (int i = 0; i < data.size(); ++i) {
-        char c = data[i];
-
-        if (escaped) {
-            current.append(c);
-            escaped = false;
-            continue;
+    for (int i = 0; i <= text.size(); ++i) {
+        bool isDelim = (i == text.size()) || delimiters.contains(text[i]);
+        if (isDelim && i > start) {
+            tokens.append(text.mid(start, i - start));
+            start = i + 1;
+        } else if (isDelim) {
+            start = i + 1;
         }
-
-        if (c == m_escape) {
-            escaped = true;
-            continue;
-        }
-
-        if (c == m_quote) {
-            inQuote = !inQuote;
-            continue;
-        }
-
-        if (!inQuote && m_delimiters.contains(c)) {
-            if (m_keepEmpty || !current.isEmpty()) {
-                tokens.append(QString::fromUtf8(current));
-                current.clear();
-            }
-            continue;
-        }
-
-        current.append(c);
     }
 
-    if (m_keepEmpty || !current.isEmpty()) {
-        tokens.append(QString::fromUtf8(current));
-    }
-
-    m_stats.totalTokensExtracted += tokens.size();
-    m_stats.totalBytesProcessed += data.size();
-    m_stats.totalLinesProcessed++;
+    m_stats.totalTokenized++;
+    m_stats.totalTokens += tokens.size();
     m_timeSum += timer.elapsed();
-    m_stats.avgProcessingTimeMs = m_timeSum /
-        qMax(m_stats.totalLinesProcessed, 1ULL);
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalTokenized;
 
-    emit lineTokenized(tokens.size());
+    emit tokenizationCompleted(tokens.size());
     return tokens;
 }
 
-QVector<QStringList> StreamTokenizer::feed(const QByteArray& data)
+QVector<QString> StreamTokenizer::ngrams(const QString& text, int n) const
 {
-    m_buffer.append(data);
-    QVector<QStringList> results;
+    QVector<QString> result;
+    if (n <= 0 || n > text.size()) return result;
 
-    while (true) {
-        int nlIdx = m_buffer.indexOf('\n');
-        if (nlIdx < 0) break;
+    for (int i = 0; i <= text.size() - n; ++i)
+        result.append(text.mid(i, n));
 
-        QByteArray line = m_buffer.left(nlIdx);
-        if (!line.isEmpty() && line.back() == '\r') line.chop(1);
-        m_buffer.remove(0, nlIdx + 1);
+    m_stats.totalTokens += result.size();
+    return result;
+}
 
-        results.append(tokenize(line));
+void StreamTokenizer::setStopWords(const QSet<QString>& words)
+{
+    m_stopWords = words;
+}
+
+QVector<QString> StreamTokenizer::filterStopWords(const QVector<QString>& tokens) const
+{
+    QVector<QString> filtered;
+    for (const QString& t : tokens) {
+        if (!m_stopWords.contains(t.toLower()))
+            filtered.append(t);
+        else
+            m_stats.totalFiltered++;
     }
-
-    return results;
+    return filtered;
 }
 
-QStringList StreamTokenizer::flush()
+QVector<QString> StreamTokenizer::toLower(const QVector<QString>& tokens)
 {
-    if (m_buffer.isEmpty()) return {};
-    QStringList tokens = tokenize(m_buffer);
-    m_buffer.clear();
-    return tokens;
+    QVector<QString> result;
+    result.reserve(tokens.size());
+    for (const QString& t : tokens)
+        result.append(t.toLower());
+    return result;
 }
 
-void StreamTokenizer::reset()
+QVector<QString> StreamTokenizer::unique(const QVector<QString>& tokens)
 {
-    m_buffer.clear();
+    QSet<QString> seen;
+    QVector<QString> result;
+    for (const QString& t : tokens) {
+        if (!seen.contains(t)) {
+            seen.insert(t);
+            result.append(t);
+        }
+    }
+    return result;
 }
+
+QMap<QString, int> StreamTokenizer::frequency(const QVector<QString>& tokens)
+{
+    QMap<QString, int> freq;
+    for (const QString& t : tokens)
+        freq[t]++;
+    return freq;
+}
+
+StreamTokenizer::Stats StreamTokenizer::stats() const { return m_stats; }
 
 void StreamTokenizer::resetStatistics()
 {

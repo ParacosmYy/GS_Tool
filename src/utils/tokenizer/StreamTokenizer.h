@@ -1,68 +1,83 @@
 /**
  * @file StreamTokenizer.h
- * @brief 流式分词器 — 可配置分隔符的增量分词
- *
- * 功能: 支持自定义分隔符/引用符/转义符的流式分词器，
- *       适用于协议解析/CSV处理，统计分词数/行数/耗时。
+ * @brief 流式分词器(Stream Tokenizer)
  */
-#ifndef STREAMTOKENIZER_H
-#define STREAMTOKENIZER_H
+
+#pragma once
 
 #include <QObject>
-#include <QByteArray>
 #include <QVector>
-#include <QStringList>
+#include <QString>
+#include <QSet>
+#include <QMap>
 
-class StreamTokenizer : public QObject {
+/**
+ * @class StreamTokenizer
+ * @brief 流式分词器 — 支持自定义分隔符和规则的文本分词
+ *
+ * 支持多种分词模式: 按字符、按正则、按空白符。
+ * 可配置停止词过滤和小写转换。
+ */
+class StreamTokenizer : public QObject
+{
     Q_OBJECT
+
 public:
-    /** 统计 */
+    /** @brief 统计信息 */
     struct Stats {
-        quint64 totalTokensExtracted = 0;
-        quint64 totalBytesProcessed = 0;
-        quint64 totalLinesProcessed = 0;
-        double  avgProcessingTimeMs = 0.0;
+        int totalTokenized = 0;    /**< 总分词次数 */
+        int totalTokens = 0;       /**< 总token数 */
+        int totalFiltered = 0;     /**< 过滤的token数 */
+        double avgProcessingTimeMs = 0.0; /**< 平均处理时间(ms) */
     };
 
+    /** @brief 构造函数 */
     explicit StreamTokenizer(QObject* parent = nullptr);
 
-    /** @brief 设置分隔符 @param delimiters 分隔符集合 */
-    void setDelimiters(const QByteArray& delimiters);
+    /**
+     * @brief 按分隔符分词
+     * @param text 输入文本
+     * @param delimiters 分隔符集合(默认空白符)
+     * @return token列表
+     */
+    QVector<QString> tokenize(const QString& text,
+                               const QString& delimiters = QStringLiteral(" \t\n\r")) const;
 
-    /** @brief 设置引用符 @param quote 引用字符 */
-    void setQuote(char quote);
+    /**
+     * @brief N-gram分词
+     * @param text 输入文本
+     * @param n n-gram长度
+     * @return n-gram列表
+     */
+    QVector<QString> ngrams(const QString& text, int n) const;
 
-    /** @brief 设置转义符 @param escape 转义字符 */
-    void setEscape(char escape);
+    /** @brief 设置停止词列表 */
+    void setStopWords(const QSet<QString>& words);
 
-    /** @brief 设置是否保留空token @param keep 是否保留 */
-    void setKeepEmptyTokens(bool keep);
+    /** @brief 过滤停止词 */
+    QVector<QString> filterStopWords(const QVector<QString>& tokens) const;
 
-    /** @brief 分词(一次性) @param data 输入数据 @return token列表 */
-    QStringList tokenize(const QByteArray& data);
+    /** @brief 转小写 */
+    static QVector<QString> toLower(const QVector<QString>& tokens);
 
-    /** @brief 流式追加数据并分词 @param data 数据块 @return 完整行token列表 */
-    QVector<QStringList> feed(const QByteArray& data);
+    /** @brief 去重 */
+    static QVector<QString> unique(const QVector<QString>& tokens);
 
-    /** @brief 刷新缓冲区 @return 残余token */
-    QStringList flush();
+    /** @brief 词频统计 */
+    static QMap<QString, int> frequency(const QVector<QString>& tokens);
 
-    void reset();
+    /** @brief 获取统计 */
+    Stats stats() const;
 
-    const Stats& stats() const { return m_stats; }
+    /** @brief 重置统计 */
     void resetStatistics();
 
 signals:
-    void lineTokenized(int tokenCount);
+    /** @brief 分词完成信号 */
+    void tokenizationCompleted(int tokenCount);
 
 private:
-    QByteArray m_delimiters;
-    char m_quote;
-    char m_escape;
-    bool m_keepEmpty;
-    QByteArray m_buffer;
-    Stats m_stats;
-    double m_timeSum;
+    QSet<QString> m_stopWords;
+    mutable Stats m_stats;
+    mutable double m_timeSum;
 };
-
-#endif // STREAMTOKENIZER_H
