@@ -5,8 +5,8 @@
 
 #include "utils/graph/GraphAnalyzer.h"
 
+#include <QtCore/QSet>
 #include <QElapsedTimer>
-#include <QSet>
 #include <QtMath>
 #include <queue>
 #include <stack>
