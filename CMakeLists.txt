@@ -170,7 +170,7 @@ set(SOURCES
     src/terminal/search/TerminalSearchManager.cpp
     src/terminal/search/TerminalSearchBuilders.cpp
     src/terminal/search/TerminalSearchBuild.cpp
-    src/terminal/search/TerminalSearchBuild.cpp
+    # DUPLICATE REMOVED: src/terminal/search/TerminalSearchBuild.cpp
     src/terminal/search/TerminalSearchRenderer.cpp
     src/terminal/menu/TerminalContextMenuManager.cpp
     src/serial/config/SerialConfigPanel.cpp
@@ -224,7 +224,7 @@ set(SOURCES
     src/protocol/bridge/ProtocolBridgeManagerHelpers.cpp
     src/protocol/bridge/ProtocolBridgeManagerStats.cpp
     src/protocol/bridge/ProtocolBridgeManagerAutoDetect.cpp
-    src/protocol/bridge/ProtocolBridgeManagerConfig.cpp
+    # DUPLICATE REMOVED: src/protocol/bridge/ProtocolBridgeManagerConfig.cpp
     src/chart/widget/ChartWidget.cpp
     src/chart/widget/ChartWidgetSlots.cpp
     src/chart/widget/ChartWidgetTheme.cpp
@@ -288,7 +288,7 @@ set(SOURCES
     src/ota/protocols/zmodem/ZModemTransfer.cpp
     src/ota/protocols/zmodem/ZModemTransferHandlers.cpp
     src/ota/protocols/zmodem/ZModemTransferFrames.cpp
-    src/ota/protocols/zmodem/ZModemTransferFrames.cpp
+    # DUPLICATE REMOVED: src/ota/protocols/zmodem/ZModemTransferFrames.cpp
     src/ota/protocols/zmodem/ZModemTransferProtocol.cpp
     src/ota/protocols/zmodem/ZModemTransferDispatch.cpp
     src/utils/settings/SettingsManager.cpp
@@ -383,7 +383,7 @@ set(SOURCES
     src/dashboard/DashboardSerializerExport.cpp
     src/dashboard/DashboardSerializerProfile.cpp
     src/dashboard/DashboardSerializerProfileCrud.cpp
-    src/dashboard/DashboardSerializerProfileCrud.cpp
+    # DUPLICATE REMOVED: src/dashboard/DashboardSerializerProfileCrud.cpp
     src/dashboard/DashboardSerializerStats.cpp
 
     # ── F6: J-Link RTT ──
@@ -806,12 +806,12 @@ set(SOURCES
     src/utils/whitening/SpectralWhitener.cpp
     src/utils/peaks2/MultiPeakDetector.cpp
     src/utils/pingpong/PingPongBuffer.cpp
-    src/utils/rle2/RunLengthEncoder2.cpp
-    src/utils/shannon2/HuffmanTreeBuilder.cpp
+    # DUPLICATE REMOVED: src/utils/rle2/RunLengthEncoder2.cpp
+    # DUPLICATE REMOVED: src/utils/shannon2/HuffmanTreeBuilder.cpp
     src/utils/graph2/TopologicalSorter.cpp
     src/utils/segment2/SegmentTree.cpp
     src/utils/sort2/QuickSelect.cpp
-    src/utils/sort2/RadixSorter.cpp
+    # DUPLICATE REMOVED: src/utils/sort2/RadixSorter.cpp
 
     # -- F204~F210: Wave 34 工具模块(linter) --
     src/utils/bloomfilter3/ScalableBloomFilter.cpp
@@ -1263,7 +1263,7 @@ set(SOURCES
     src/utils/batch/DataBatchProcessor.cpp
 
     # -- F64: 数据采样器 --
-    src/utils/sampler/DataSampler.cpp
+    # DUPLICATE REMOVED: src/utils/sampler/DataSampler.cpp
 
     # -- F65: 多流数据合并器 --
     src/utils/merger/DataStreamMerger.cpp
@@ -1275,13 +1275,13 @@ set(SOURCES
     src/protocol/validator/ProtocolFrameValidator.cpp
 
     # -- F68: 数据关联器 --
-    src/utils/correlator/DataCorrelator.cpp
+    # DUPLICATE REMOVED: src/utils/correlator/DataCorrelator.cpp
 
     # -- F69: 数据插值器 --
-    src/utils/interpolator/DataInterpolator.cpp
+    # DUPLICATE REMOVED: src/utils/interpolator/DataInterpolator.cpp
 
     # -- F70: 数据质量评分 --
-    src/utils/quality/DataQualityScorer.cpp
+    # DUPLICATE REMOVED: src/utils/quality/DataQualityScorer.cpp
 
     # -- F71: 事件时间线 --
     src/utils/timeline/EventTimeline.cpp
@@ -1327,53 +1327,53 @@ set(SOURCES
     src/utils/jaro/JaroWinkler.cpp
 
     # -- F172~F185: Wave 25 工具模块 --
-    src/utils/lzw2/LzwCodec2.cpp
+    # DUPLICATE REMOVED: src/utils/lzw2/LzwCodec2.cpp
     src/utils/runlength2/RunLengthEncoder.cpp
-    src/utils/huffman2/AdaptiveHuffman.cpp
-    src/utils/delta/DeltaEncoder.cpp
-    src/utils/bitmap/BitmapIndex.cpp
-    src/utils/mergesort/MergeSorter.cpp
-    src/utils/hyperloglog/HyperLogLog.cpp
+    # DUPLICATE REMOVED: src/utils/huffman2/AdaptiveHuffman.cpp
+    # DUPLICATE REMOVED: src/utils/delta/DeltaEncoder.cpp
+    # DUPLICATE REMOVED: src/utils/bitmap/BitmapIndex.cpp
+    # DUPLICATE REMOVED: src/utils/mergesort/MergeSorter.cpp
+    # DUPLICATE REMOVED: src/utils/hyperloglog/HyperLogLog.cpp
     src/utils/tdigest/TDigest.cpp
-    src/utils/dwt2/DaubechiesWavelet.cpp
-    src/utils/lifting/LiftingScheme.cpp
+    # DUPLICATE REMOVED: src/utils/dwt2/DaubechiesWavelet.cpp
+    # DUPLICATE REMOVED: src/utils/lifting/LiftingScheme.cpp
     src/utils/quantize2/MuLawEncoder.cpp
     src/utils/polar/PolarCode.cpp
-    src/utils/turbo/TurboDecoder.cpp
+    # turbo/TurboDecoder.cpp removed (duplicate of code6)
 
     # -- F186~F200: Wave 35 工具模块 --
-    src/utils/rle2/RunLengthEncoder2.cpp
-    src/utils/shannon2/HuffmanTreeBuilder.cpp
-    src/utils/sort2/RadixSorter.cpp
-    src/utils/sort2/QuickSelect.cpp
-    src/utils/graph2/TopologicalSorter.cpp
-    src/utils/segment2/SegmentTree.cpp
-    src/utils/fenwick/FenwickTree.cpp
-    src/utils/sparsae/SparseArray.cpp
-    src/utils/roaring/RoaringBitmap.cpp
+    # DUPLICATE REMOVED: src/utils/rle2/RunLengthEncoder2.cpp
+    # DUPLICATE REMOVED: src/utils/shannon2/HuffmanTreeBuilder.cpp
+    # DUPLICATE REMOVED: src/utils/sort2/RadixSorter.cpp
+    # DUPLICATE REMOVED: src/utils/sort2/QuickSelect.cpp
+    # DUPLICATE REMOVED: src/utils/graph2/TopologicalSorter.cpp
+    # DUPLICATE REMOVED: src/utils/segment2/SegmentTree.cpp
+    # DUPLICATE REMOVED: src/utils/fenwick/FenwickTree.cpp
+    # DUPLICATE REMOVED: src/utils/sparsae/SparseArray.cpp
+    # DUPLICATE REMOVED: src/utils/roaring/RoaringBitmap.cpp
     src/utils/ringhash/RingHash.cpp
-    src/utils/bloomfilter3/ScalableBloomFilter.cpp
-    src/utils/merkle/MerkleTree.cpp
-    src/utils/skiplist2/ConcurrentSkipList.cpp
-    src/utils/lfu2/TinyLfuCache.cpp
+    # DUPLICATE REMOVED: src/utils/bloomfilter3/ScalableBloomFilter.cpp
+    # DUPLICATE REMOVED: src/utils/merkle/MerkleTree.cpp
+    # DUPLICATE REMOVED: src/utils/skiplist2/ConcurrentSkipList.cpp
+    # DUPLICATE REMOVED: src/utils/lfu2/TinyLfuCache.cpp
 
     # -- F201~F220: Wave 33+Linter 工具模块 --
     # src/utils/graph3/DijkstraShortestPath.cpp  # removed: duplicate (already in Wave 40)
-    src/utils/heap2/FibonacciHeap.cpp
-    src/utils/kalman3/UnscentedKalmanFilter.cpp
-    src/utils/quadtree/QuadTree.cpp
-    src/utils/svd/SingularValueDecomposition.cpp
-    src/utils/btree/BPlusTree.cpp
-    src/utils/suffix/SuffixAutomaton.cpp
-    src/utils/radixtree/RadixTree.cpp
-    src/utils/disjoint/DisjointSet.cpp
-    src/utils/convhull/ConvexHull.cpp
-    src/utils/voronoi/VoronoiDiagram.cpp
-    src/utils/wavelet2/HaarWavelet2D.cpp
-    src/utils/rle3/BurrowsWheelerTransform.cpp
-    src/utils/autocorr/AutoCorrelator.cpp
-    src/utils/crosscorr/CrossCorrelator.cpp
-    src/utils/resample/DataResampler.cpp
+    # DUPLICATE REMOVED: src/utils/heap2/FibonacciHeap.cpp
+    # DUPLICATE REMOVED: src/utils/kalman3/UnscentedKalmanFilter.cpp
+    # DUPLICATE REMOVED: src/utils/quadtree/QuadTree.cpp
+    # DUPLICATE REMOVED: src/utils/svd/SingularValueDecomposition.cpp
+    # DUPLICATE REMOVED: src/utils/btree/BPlusTree.cpp
+    # DUPLICATE REMOVED: src/utils/suffix/SuffixAutomaton.cpp
+    # DUPLICATE REMOVED: src/utils/radixtree/RadixTree.cpp
+    # DUPLICATE REMOVED: src/utils/disjoint/DisjointSet.cpp
+    # DUPLICATE REMOVED: src/utils/convhull/ConvexHull.cpp
+    # DUPLICATE REMOVED: src/utils/voronoi/VoronoiDiagram.cpp
+    # DUPLICATE REMOVED: src/utils/wavelet2/HaarWavelet2D.cpp
+    # DUPLICATE REMOVED: src/utils/rle3/BurrowsWheelerTransform.cpp
+    # DUPLICATE REMOVED: src/utils/autocorr/AutoCorrelator.cpp
+    # DUPLICATE REMOVED: src/utils/crosscorr/CrossCorrelator.cpp
+    # DUPLICATE REMOVED: src/utils/resample/DataResampler.cpp
     src/utils/wavwriter/WavWriter.cpp
     src/utils/wavreader/WavReader.cpp
     src/utils/hilbert/HilbertTransform.cpp
@@ -1461,7 +1461,7 @@ set(SOURCES
     # suffix3/SuffixAutomaton.cpp removed (duplicate of suffix)
 
     # ── Wave 92: 核PCA增强 ──
-    src/utils/pca2/KernelPca.cpp
+    # DUPLICATE REMOVED: src/utils/pca2/KernelPca.cpp
 
     # ── Wave 93: FFT卷积/配对堆/正则引擎/DTW ──
     src/utils/conv3/FftConvolution.cpp
@@ -2192,13 +2192,13 @@ set(HEADERS
     src/utils/peaks2/MultiPeakDetector.h
     src/utils/pingpong/PingPongBuffer.h
     src/utils/twoway/TwoWayMap.h
-    src/utils/rle2/RunLengthEncoder2.h
-    src/utils/shannon2/HuffmanTreeBuilder.h
+    # DUPLICATE REMOVED: src/utils/rle2/RunLengthEncoder2.h
+    # DUPLICATE REMOVED: src/utils/shannon2/HuffmanTreeBuilder.h
     src/utils/graph2/TopologicalSorter.h
     src/utils/graph2/UnionFind.h
     src/utils/segment2/SegmentTree.h
-    src/utils/sort2/QuickSelect.h
-    src/utils/sort2/RadixSorter.h
+    # DUPLICATE REMOVED: src/utils/sort2/QuickSelect.h
+    # DUPLICATE REMOVED: src/utils/sort2/RadixSorter.h
 
     # -- F101: 一维卡尔曼滤波器 --
     src/utils/kalman/KalmanFilter1D.h
@@ -2350,28 +2350,28 @@ set(HEADERS
     src/utils/reservoir/ReservoirSampler.h
 
     # -- F172~F185: Wave 25 工具模块 --
-    src/utils/lzw2/LzwCodec2.h
+    # DUPLICATE REMOVED: src/utils/lzw2/LzwCodec2.h
     src/utils/runlength2/RunLengthEncoder.h
-    src/utils/huffman2/AdaptiveHuffman.h
-    src/utils/delta/DeltaEncoder.h
-    src/utils/bitmap/BitmapIndex.h
-    src/utils/mergesort/MergeSorter.h
-    src/utils/hyperloglog/HyperLogLog.h
+    # DUPLICATE REMOVED: src/utils/huffman2/AdaptiveHuffman.h
+    # DUPLICATE REMOVED: src/utils/delta/DeltaEncoder.h
+    # DUPLICATE REMOVED: src/utils/bitmap/BitmapIndex.h
+    # DUPLICATE REMOVED: src/utils/mergesort/MergeSorter.h
+    # DUPLICATE REMOVED: src/utils/hyperloglog/HyperLogLog.h
     src/utils/tdigest/TDigest.h
-    src/utils/dwt2/DaubechiesWavelet.h
-    src/utils/lifting/LiftingScheme.h
+    # DUPLICATE REMOVED: src/utils/dwt2/DaubechiesWavelet.h
+    # DUPLICATE REMOVED: src/utils/lifting/LiftingScheme.h
     src/utils/quantize2/MuLawEncoder.h
     src/utils/polar/PolarCode.h
-    src/utils/turbo/TurboDecoder.h
+    # turbo/TurboDecoder.h removed (duplicate of code6)
 
     # -- F186~F200: Wave 35 工具模块 --
-    src/utils/rle2/RunLengthEncoder2.h
-    src/utils/shannon2/HuffmanTreeBuilder.h
-    src/utils/sort2/RadixSorter.h
-    src/utils/sort2/QuickSelect.h
-    src/utils/graph2/TopologicalSorter.h
-    src/utils/graph2/UnionFind.h
-    src/utils/segment2/SegmentTree.h
+    # DUPLICATE REMOVED: src/utils/rle2/RunLengthEncoder2.h
+    # DUPLICATE REMOVED: src/utils/shannon2/HuffmanTreeBuilder.h
+    # DUPLICATE REMOVED: src/utils/sort2/RadixSorter.h
+    # DUPLICATE REMOVED: src/utils/sort2/QuickSelect.h
+    # DUPLICATE REMOVED: src/utils/graph2/TopologicalSorter.h
+    # DUPLICATE REMOVED: src/utils/graph2/UnionFind.h
+    # DUPLICATE REMOVED: src/utils/segment2/SegmentTree.h
     src/utils/fenwick/FenwickTree.h
     src/utils/sparsae/SparseArray.h
     src/utils/roaring/RoaringBitmap.h
@@ -2407,9 +2407,9 @@ set(HEADERS
     src/utils/yulewalker/YuleWalker.h
 
     # -- F226~F232: Wave 33 工具模块(续) --
-    src/utils/autocorr/AutoCorrelator.h
-    src/utils/crosscorr/CrossCorrelator.h
-    src/utils/resample/DataResampler.h
+    # DUPLICATE REMOVED: src/utils/autocorr/AutoCorrelator.h
+    # DUPLICATE REMOVED: src/utils/crosscorr/CrossCorrelator.h
+    # DUPLICATE REMOVED: src/utils/resample/DataResampler.h
     src/utils/wavwriter/WavWriter.h
     src/utils/wavreader/WavReader.h
     src/utils/hilbert/HilbertTransform.h
@@ -2727,7 +2727,7 @@ set(HEADERS
     src/utils/graph13/EulerianPath.h
     src/utils/lattice/LatticeReducer.h
     # suffix3/SuffixAutomaton.h removed (duplicate of suffix)
-    src/utils/pca2/KernelPca.h
+    # DUPLICATE REMOVED: src/utils/pca2/KernelPca.h
     src/utils/conv3/FftConvolution.h
     src/utils/heap7/PairingHeap.h
     src/utils/regex2/RegexEngine.h
@@ -2805,6 +2805,39 @@ set(HEADERS
     src/utils/optimize4/NewtonMethod.h
     src/utils/signal12/Autocorrelation.h
     src/utils/interp10/RationalInterp.h
+    # Wave 119-130
+    src/utils/cluster9/OpticsClustering.h
+    src/utils/code10/BchCode.h
+    src/utils/dsp11/MultiRateFilter.h
+    src/utils/fft12/ConstantQTransform.h
+    src/utils/graph25/SteinerTree.h
+    src/utils/matrix14/StrassenMultiply.h
+    src/utils/signal13/PhaseCorrelate.h
+    src/utils/tree14/BPlusTree3.h
+    src/utils/cluster10/GaussianProcess.h
+    src/utils/cluster11/IsolationForest.h
+    src/utils/code11/GolayCode2.h
+    src/utils/code12/SpinalCode.h
+    src/utils/dsp12/FilterBank2.h
+    src/utils/dsp13/AdaptiveFilter2.h
+    src/utils/fft13/DctTransform.h
+    src/utils/fft14/HilbertTransform.h
+    src/utils/graph26/MinimumCostFlow.h
+    src/utils/graph27/ChinesePostman.h
+    src/utils/matrix15/ToeplitzSolver.h
+    src/utils/matrix16/KrylovSolver.h
+    src/utils/signal14/Cepstrum.h
+    src/utils/signal15/MusicAlgorithm.h
+    src/utils/tree15/SegmentTreeBeats.h
+    src/utils/tree16/WeightedUnionFind.h
+    src/utils/cluster14/AgglomerativeCluster.h
+    src/utils/code15/PolarCode2.h
+    src/utils/dsp16/BiquadFilter.h
+    src/utils/fft17/ShortTimeFFT.h
+    src/utils/graph30/FlowNetwork2.h
+    src/utils/matrix19/SparseLU.h
+    src/utils/signal18/PitchDetector.h
+    src/utils/tree19/FenwickTree2D.h
 )
 
 set(RESOURCES
