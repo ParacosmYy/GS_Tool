@@ -949,6 +949,23 @@ set(SOURCES
     src/utils/butterfly/ButterflyOperation.cpp
     src/utils/circulant/CirculantSolver.cpp
 
+    # ── Wave 46: 优化/特征值/迭代求解 ──
+    src/utils/gram_schmidt/GramSchmidt.cpp
+    src/utils/nelder_mead/NelderMead.cpp
+    src/utils/davidson/DavidsonEigen.cpp
+    src/utils/lanczos/LanczosEigen.cpp
+    src/utils/powerquad/PowerMethodGeneralized.cpp
+    src/utils/lobatto/LobattoIntegration.cpp
+    src/utils/clenshaw_curtis/ClenshawCurtis.cpp
+    src/utils/toeplitz/ToeplitzSolver.cpp
+    src/utils/hankel/HankelSolver.cpp
+    src/utils/vandermonde/VandermondeSolver.cpp
+    src/utils/sparse_lu/SparseDirectSolver.cpp
+    src/utils/ilu/IncompleteLU.cpp
+    src/utils/sor/SorSolver.cpp
+    src/utils/jacobi_iter/JacobiSolver.cpp
+    src/utils/gauss_seidel/GaussSeidelSolver.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -2218,6 +2235,23 @@ set(HEADERS
     src/utils/hessenberg/HessenbergReduction.h
     src/utils/butterfly/ButterflyOperation.h
     src/utils/circulant/CirculantSolver.h
+
+    # ── Wave 46: 优化/特征值/迭代求解 ──
+    src/utils/gram_schmidt/GramSchmidt.h
+    src/utils/nelder_mead/NelderMead.h
+    src/utils/davidson/DavidsonEigen.h
+    src/utils/lanczos/LanczosEigen.h
+    src/utils/powerquad/PowerMethodGeneralized.h
+    src/utils/lobatto/LobattoIntegration.h
+    src/utils/clenshaw_curtis/ClenshawCurtis.h
+    src/utils/toeplitz/ToeplitzSolver.h
+    src/utils/hankel/HankelSolver.h
+    src/utils/vandermonde/VandermondeSolver.h
+    src/utils/sparse_lu/SparseDirectSolver.h
+    src/utils/ilu/IncompleteLU.h
+    src/utils/sor/SorSolver.h
+    src/utils/jacobi_iter/JacobiSolver.h
+    src/utils/gauss_seidel/GaussSeidelSolver.h
 )
 
 set(RESOURCES

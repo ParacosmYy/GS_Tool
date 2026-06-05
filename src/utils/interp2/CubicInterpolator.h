@@ -49,7 +49,7 @@ public:
     /** @brief 批量求值
      *  @param xPoints 查询点数组
      *  @return 插值结果数组 */
-    QVector<double> evaluateBatch(const QVector<double>& xPoints) const;
+    QVector<double> evaluateBatch(const QVector<double>& xPoints);
 
     /** @brief 获取统计 */
     const Stats& stats() const { return m_stats; }
@@ -78,8 +78,8 @@ private:
     QVector<double> m_d;    ///< 系数d
     bool m_built;           ///< 是否已构建
 
-    double m_timeSum;       ///< 处理时间累加器
-    Stats m_stats;          ///< 统计信息
+    mutable double m_timeSum;       ///< 处理时间累加器
+    mutable Stats m_stats;          ///< 统计信息
 };
 
 #endif // CUBICINTERPOLATOR_H

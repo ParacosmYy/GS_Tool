@@ -121,7 +121,7 @@ double CubicInterpolator::evaluate(double x) const
 
 /** @brief 批量求值 */
 QVector<double> CubicInterpolator::evaluateBatch(
-    const QVector<double>& xPoints) const
+    const QVector<double>& xPoints)
 {
     QElapsedTimer timer;
     timer.start();
@@ -132,13 +132,12 @@ QVector<double> CubicInterpolator::evaluateBatch(
         result.append(evaluate(x));
 
     double elapsed = static_cast<double>(timer.elapsed());
-    const_cast<CubicInterpolator*>(this)->m_timeSum += elapsed;
-    auto& s = const_cast<CubicInterpolator*>(this)->m_stats;
-    ++s.totalInterpolations;
-    s.avgProcessingTimeMs = m_timeSum
-        / static_cast<double>(s.totalInterpolations);
+    m_timeSum += elapsed;
+    ++m_stats.totalInterpolations;
+    m_stats.avgProcessingTimeMs = m_timeSum
+        / static_cast<double>(m_stats.totalInterpolations);
 
-    emit const_cast<CubicInterpolator*>(this)->interpolationCompleted(xPoints.size());
+    emit interpolationCompleted(xPoints.size());
     return result;
 }
 
