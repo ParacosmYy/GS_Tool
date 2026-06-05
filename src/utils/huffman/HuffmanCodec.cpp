@@ -1,203 +1,364 @@
 /**
  * @file HuffmanCodec.cpp
- * @brief Huffman编码器实现
+ * @brief 霍夫曼编解码器实现
  */
 
-#include "utils/huffman/HuffmanCodec.h"
-#include <QElapsedTimer>
-#include <QList>
-#include <algorithm>
+#include "HuffmanCodec.h"
 
-HuffmanCodec::HuffmanCodec(QObject* parent) : QObject(parent), m_timeSum(0.0) {}
+#include <QElapsedTimer>
+#include <QDataStream>
+#include <QIODevice>
+#include <algorithm>
+#include <queue>
+
+// ═══════════════════════════════════════════════════════════
+// 构造 / 析构
+// ═══════════════════════════════════════════════════════════
+
+HuffmanCodec::HuffmanCodec(QObject* parent)
+    : QObject(parent)
+{
+}
+
+HuffmanCodec::~HuffmanCodec() = default;
+
+// ═══════════════════════════════════════════════════════════
+// 编码
+// ═══════════════════════════════════════════════════════════
 
 QByteArray HuffmanCodec::encode(const QByteArray& data)
 {
-    QElapsedTimer timer;
-    timer.start();
-
-    QByteArray result;
-    if (data.isEmpty()) return result;
-
-    /* 统计频率 */
-    QMap<quint8, int> freq;
-    for (int i = 0; i < data.size(); ++i) freq[static_cast<quint8>(data[i])]++;
-
-    /* 写频率表到头部(用于解码) */
-    quint16 symbolCount = freq.size();
-    result.append(static_cast<char>((symbolCount >> 8) & 0xFF));
-    result.append(static_cast<char>(symbolCount & 0xFF));
-
-    for (auto it = freq.begin(); it != freq.end(); ++it) {
-        result.append(static_cast<char>(it.key()));
-        quint32 f = it.value();
-        result.append(static_cast<char>((f >> 24) & 0xFF));
-        result.append(static_cast<char>((f >> 16) & 0xFF));
-        result.append(static_cast<char>((f >> 8) & 0xFF));
-        result.append(static_cast<char>(f & 0xFF));
+    if (data.isEmpty()) {
+        m_stats.totalEncodes += 1;
+        emit encoded({}, 0.0);
+        return {};
     }
 
-    /* 构建Huffman树和编码表 */
-    HuffNode* root = buildTree(freq);
-    QMap<quint8, QByteArray> codes;
-    buildCodes(root, QByteArray(), codes);
+    // 1. 构建频率表
+    QVector<quint32> freq = buildFreqTable(data);
 
-    /* 编码数据 */
-    QByteArray bitBuffer;
-    int bitCount = 0;
-    quint8 currentByte = 0;
+    // 2. 构建霍夫曼树
+    HuffNode* root = buildTree(freq);
+    if (!root) {
+        emit error(tr("霍夫曼编码错误: 无法构建编码树"));
+        m_stats.totalEncodes += 1;
+        emit encoded(data, 1.0);
+        return data;
+    }
+
+    // 3. 生成编码表
+    m_codeTable.clear();
+    generateCodes(root, QByteArray());
+
+    // 4. 编码数据到位流
+    QByteArray bitStream;
+    bitStream.reserve(data.size());
 
     for (int i = 0; i < data.size(); ++i) {
-        quint8 byte = static_cast<quint8>(data[i]);
-        const QByteArray& code = codes[byte];
-        for (int j = 0; j < code.size(); ++j) {
-            currentByte = (currentByte << 1) | (code[j] == '1' ? 1 : 0);
-            ++bitCount;
-            if (bitCount == 8) {
-                bitBuffer.append(static_cast<char>(currentByte));
-                currentByte = 0;
-                bitCount = 0;
-            }
-        }
+        const int symbol = static_cast<quint8>(data[i]);
+        bitStream.append(m_codeTable.value(symbol));
     }
 
-    /* 写入剩余位 */
-    quint8 paddingBits = 0;
-    if (bitCount > 0) {
-        paddingBits = 8 - bitCount;
-        currentByte <<= paddingBits;
-        bitBuffer.append(static_cast<char>(currentByte));
-    }
+    // 5. 位流转字节数组
+    QByteArray packedBytes = bitsToPackedBytes(bitStream);
 
-    /* 写padding信息和编码数据 */
-    result.append(static_cast<char>(paddingBits));
-    result.append(static_cast<char>((bitBuffer.size() >> 24) & 0xFF));
-    result.append(static_cast<char>((bitBuffer.size() >> 16) & 0xFF));
-    result.append(static_cast<char>((bitBuffer.size() >> 8) & 0xFF));
-    result.append(static_cast<char>(bitBuffer.size() & 0xFF));
-    result.append(bitBuffer);
+    // 6. 组装输出: 原始大小(4B) + 位流长度(4B) + 频率表 + 压缩数据
+    QByteArray result;
+    QDataStream stream(&result, QIODevice::WriteOnly);
+    stream << static_cast<quint32>(data.size());
+    stream << static_cast<quint32>(bitStream.size());
 
-    deleteTree(root);
+    QByteArray freqData = serializeFreqTable(freq);
+    stream << static_cast<quint32>(freqData.size());
+    result.append(freqData);
+    result.append(packedBytes);
 
-    double elapsed = timer.elapsed();
-    ++m_stats.totalEncodes;
-    m_stats.totalBytesIn += data.size();
-    m_stats.totalBytesOut += result.size();
-    m_stats.avgCompressionRatio = (m_stats.totalBytesIn > 0)
-        ? static_cast<double>(m_stats.totalBytesOut) / m_stats.totalBytesIn : 0.0;
-    m_timeSum += elapsed;
-    quint64 totalOps = m_stats.totalEncodes + m_stats.totalDecodes;
-    m_stats.averageProcessingTimeMs = (totalOps > 0) ? m_timeSum / totalOps : 0.0;
+    // 7. 释放树
+    freeTree(root);
 
-    emit encodeComplete(data.size(), result.size(), m_stats.avgCompressionRatio);
+    // 更新统计
+    m_stats.totalEncodes += 1;
+    const double ratio = static_cast<double>(result.size()) /
+                         static_cast<double>(data.size());
+    updateAvgRatio(ratio);
+
+    emit encoded(result, ratio);
     return result;
 }
+
+// ═══════════════════════════════════════════════════════════
+// 解码
+// ═══════════════════════════════════════════════════════════
 
 QByteArray HuffmanCodec::decode(const QByteArray& data)
 {
-    QElapsedTimer timer;
-    timer.start();
+    if (data.size() < 12) {
+        emit error(tr("霍夫曼解码错误: 数据太短, 缺少头部"));
+        return {};
+    }
+
+    // 1. 读取头部
+    QDataStream stream(data);
+    quint32 originalSize = 0;
+    quint32 totalBits = 0;
+    quint32 freqTableSize = 0;
+    stream >> originalSize >> totalBits >> freqTableSize;
+
+    // 2. 反序列化频率表
+    int bytesRead = 0;
+    const QByteArray freqRaw = data.mid(12,
+                                        static_cast<int>(freqTableSize));
+    QVector<quint32> freq = deserializeFreqTable(freqRaw, &bytesRead);
+
+    // 3. 重建霍夫曼树
+    HuffNode* root = buildTree(freq);
+    if (!root) {
+        emit error(tr("霍夫曼解码错误: 无法重建编码树"));
+        return {};
+    }
+
+    // 4. 解码位流
+    const int headerSize = 12 + static_cast<int>(freqTableSize);
+    const QByteArray packedData = data.mid(headerSize);
+    QByteArray bitStream = packedBytesToBits(
+        packedData, static_cast<int>(totalBits));
 
     QByteArray result;
-    int pos = 0;
+    result.reserve(static_cast<int>(originalSize));
 
-    if (data.size() < 2) return result;
-
-    /* 读取频率表 */
-    quint16 symbolCount = (static_cast<quint8>(data[0]) << 8) | static_cast<quint8>(data[1]);
-    pos = 2;
-
-    QMap<quint8, int> freq;
-    for (int i = 0; i < symbolCount && pos + 4 < data.size(); ++i) {
-        quint8 byte = static_cast<quint8>(data[pos++]);
-        quint32 f = (static_cast<quint8>(data[pos]) << 24) | (static_cast<quint8>(data[pos+1]) << 16) |
-                    (static_cast<quint8>(data[pos+2]) << 8) | static_cast<quint8>(data[pos+3]);
-        pos += 4;
-        freq[byte] = f;
-    }
-
-    /* 重建树 */
-    HuffNode* root = buildTree(freq);
-
-    /* 读取padding */
-    quint8 paddingBits = static_cast<quint8>(data[pos++]);
-
-    /* 读取编码数据长度 */
-    quint32 encodedLen = (static_cast<quint8>(data[pos]) << 24) | (static_cast<quint8>(data[pos+1]) << 16) |
-                         (static_cast<quint8>(data[pos+2]) << 8) | static_cast<quint8>(data[pos+3]);
-    pos += 4;
-
-    /* 解码 */
     HuffNode* current = root;
-    int totalBits = encodedLen * 8 - paddingBits;
-    int bitIdx = 0;
+    for (int i = 0; i < bitStream.size(); ++i) {
+        if (bitStream[i] == '0') {
+            current = current->left;
+        } else {
+            current = current->right;
+        }
 
-    while (bitIdx < totalBits && pos < data.size()) {
-        quint8 byte = static_cast<quint8>(data[pos]);
-        int bitsInByte = qMin(8, totalBits - bitIdx);
+        if (!current) {
+            emit error(tr("霍夫曼解码错误: 位流损坏, 解码路径无效"));
+            freeTree(root);
+            return {};
+        }
 
-        for (int b = 7; b >= 8 - bitsInByte && bitIdx < totalBits; --b) {
-            bool bit = (byte >> b) & 1;
-            current = bit ? current->right : current->left;
-            ++bitIdx;
+        if (current->symbol >= 0) {
+            result.append(static_cast<char>(current->symbol));
+            current = root;
 
-            if (current->left == nullptr && current->right == nullptr) {
-                result.append(static_cast<char>(current->byte));
-                current = root;
+            if (result.size() >= static_cast<int>(originalSize)) {
+                break;
             }
         }
-        ++pos;
     }
 
-    deleteTree(root);
+    freeTree(root);
 
-    double elapsed = timer.elapsed();
-    ++m_stats.totalDecodes;
-    m_timeSum += elapsed;
-    quint64 totalOps = m_stats.totalEncodes + m_stats.totalDecodes;
-    m_stats.averageProcessingTimeMs = (totalOps > 0) ? m_timeSum / totalOps : 0.0;
-
-    emit decodeComplete(data.size(), result.size());
+    m_stats.totalDecodes += 1;
+    emit decoded(result);
     return result;
 }
 
-HuffmanCodec::HuffNode* HuffmanCodec::buildTree(const QMap<quint8, int>& freq)
+// ═══════════════════════════════════════════════════════════
+// 统计
+// ═══════════════════════════════════════════════════════════
+
+HuffmanCodec::Stats HuffmanCodec::stats() const
 {
-    QList<HuffNode*> nodes;
-    for (auto it = freq.begin(); it != freq.end(); ++it)
-        nodes.append(new HuffNode(it.key(), it.value()));
+    return m_stats;
+}
 
-    while (nodes.size() > 1) {
-        std::sort(nodes.begin(), nodes.end(),
-                  [](const HuffNode* a, const HuffNode* b) { return a->freq < b->freq; });
+void HuffmanCodec::resetStatistics()
+{
+    m_stats = Stats{};
+}
 
-        HuffNode* left = nodes.takeFirst();
-        HuffNode* right = nodes.takeFirst();
-        HuffNode* parent = new HuffNode(0, left->freq + right->freq);
+// ═══════════════════════════════════════════════════════════
+// 内部实现
+// ═══════════════════════════════════════════════════════════
+
+QVector<quint32> HuffmanCodec::buildFreqTable(
+    const QByteArray& data) const
+{
+    QVector<quint32> freq(256, 0);
+    for (int i = 0; i < data.size(); ++i) {
+        freq[static_cast<quint8>(data[i])]++;
+    }
+    return freq;
+}
+
+HuffmanCodec::HuffNode* HuffmanCodec::buildTree(
+    const QVector<quint32>& freq)
+{
+    auto cmp = [](const HuffNode* a, const HuffNode* b) {
+        return a->freq > b->freq;
+    };
+    std::priority_queue<HuffNode*, std::vector<HuffNode*>,
+                        decltype(cmp)> minHeap(cmp);
+
+    for (int i = 0; i < 256; ++i) {
+        if (freq[i] > 0) {
+            auto* node = new HuffNode();
+            node->symbol = i;
+            node->freq = freq[i];
+            minHeap.push(node);
+        }
+    }
+
+    if (minHeap.size() == 1) {
+        auto* leaf = minHeap.top();
+        minHeap.pop();
+        auto* root = new HuffNode();
+        root->freq = leaf->freq;
+        root->left = leaf;
+        return root;
+    }
+
+    while (minHeap.size() > 1) {
+        auto* left = minHeap.top();
+        minHeap.pop();
+        auto* right = minHeap.top();
+        minHeap.pop();
+
+        auto* parent = new HuffNode();
+        parent->freq = left->freq + right->freq;
         parent->left = left;
         parent->right = right;
-        nodes.append(parent);
+
+        minHeap.push(parent);
     }
-    return nodes.isEmpty() ? nullptr : nodes.first();
+
+    return minHeap.empty() ? nullptr : minHeap.top();
 }
 
-void HuffmanCodec::buildCodes(HuffNode* node, const QByteArray& prefix,
-                                QMap<quint8, QByteArray>& codes)
+void HuffmanCodec::generateCodes(HuffNode* node, const QByteArray& code)
 {
-    if (!node) return;
-    if (!node->left && !node->right) {
-        codes[node->byte] = prefix.isEmpty() ? QByteArray("0") : prefix;
+    if (!node) {
         return;
     }
-    buildCodes(node->left, prefix + "0", codes);
-    buildCodes(node->right, prefix + "1", codes);
+
+    if (node->symbol >= 0) {
+        m_codeTable[node->symbol] = code.isEmpty()
+            ? QByteArray(1, '0') : code;
+        return;
+    }
+
+    generateCodes(node->left, code + '0');
+    generateCodes(node->right, code + '1');
 }
 
-void HuffmanCodec::deleteTree(HuffNode* node)
+void HuffmanCodec::freeTree(HuffNode* node)
 {
-    if (!node) return;
-    deleteTree(node->left);
-    deleteTree(node->right);
+    if (!node) {
+        return;
+    }
+    freeTree(node->left);
+    freeTree(node->right);
     delete node;
 }
 
-void HuffmanCodec::resetStatistics() { m_stats = Stats{}; m_timeSum = 0.0; }
+QByteArray HuffmanCodec::serializeFreqTable(
+    const QVector<quint32>& freq) const
+{
+    QByteArray result;
+    QDataStream stream(&result, QIODevice::WriteOnly);
+
+    quint16 count = 0;
+    for (int i = 0; i < 256; ++i) {
+        if (freq[i] > 0) {
+            ++count;
+        }
+    }
+
+    stream << count;
+    for (int i = 0; i < 256; ++i) {
+        if (freq[i] > 0) {
+            stream << static_cast<quint8>(i);
+            stream << freq[i];
+        }
+    }
+
+    return result;
+}
+
+QVector<quint32> HuffmanCodec::deserializeFreqTable(
+    const QByteArray& data, int* bytesRead) const
+{
+    QVector<quint32> freq(256, 0);
+    QDataStream stream(data);
+
+    quint16 count = 0;
+    stream >> count;
+
+    for (quint16 i = 0; i < count; ++i) {
+        quint8 symbol = 0;
+        quint32 f = 0;
+        stream >> symbol >> f;
+        freq[symbol] = f;
+    }
+
+    if (bytesRead) {
+        *bytesRead = static_cast<int>(
+            2 + static_cast<quint64>(count) * 5);
+    }
+
+    return freq;
+}
+
+QByteArray HuffmanCodec::bitsToPackedBytes(
+    const QByteArray& bits) const
+{
+    QByteArray result;
+    const int totalBits = bits.size();
+    const int fullBytes = totalBits / 8;
+
+    for (int i = 0; i < fullBytes; ++i) {
+        quint8 byte = 0;
+        for (int b = 0; b < 8; ++b) {
+            if (bits[i * 8 + b] == '1') {
+                byte |= (1 << (7 - b));
+            }
+        }
+        result.append(static_cast<char>(byte));
+    }
+
+    const int remain = totalBits % 8;
+    if (remain > 0) {
+        quint8 byte = 0;
+        for (int b = 0; b < remain; ++b) {
+            if (bits[fullBytes * 8 + b] == '1') {
+                byte |= (1 << (7 - b));
+            }
+        }
+        result.append(static_cast<char>(byte));
+    }
+
+    return result;
+}
+
+QByteArray HuffmanCodec::packedBytesToBits(
+    const QByteArray& bytes, int totalBits) const
+{
+    QByteArray result;
+    result.reserve(totalBits);
+
+    for (int i = 0; i < bytes.size() && result.size() < totalBits; ++i) {
+        const quint8 byte = static_cast<quint8>(bytes[i]);
+        for (int b = 7; b >= 0 && result.size() < totalBits; --b) {
+            result.append((byte & (1 << b)) ? '1' : '0');
+        }
+    }
+
+    return result;
+}
+
+void HuffmanCodec::updateAvgRatio(double ratio)
+{
+    const auto n = m_stats.totalEncodes;
+    if (n == 1) {
+        m_stats.avgCompressionRatio = ratio;
+    } else {
+        m_stats.avgCompressionRatio =
+            m_stats.avgCompressionRatio *
+                static_cast<double>(n - 1) / static_cast<double>(n) +
+            ratio / static_cast<double>(n);
+    }
+}

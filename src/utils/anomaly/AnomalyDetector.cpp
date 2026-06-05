@@ -160,18 +160,25 @@ void AnomalyDetector::updateBaseline(double value)
         m_buffer.remove(0, m_buffer.size() - m_windowSize);
     }
 
+    if (m_buffer.isEmpty()) {
+        m_baselineMean = 0.0;
+        m_baselineStddev = 1e-10;
+        return;
+    }
+
+    const int n = m_buffer.size();
     double sum = 0.0;
     for (double v : m_buffer) {
         sum += v;
     }
-    m_baselineMean = sum / m_buffer.size();
+    m_baselineMean = sum / n;
 
     double sqSum = 0.0;
     for (double v : m_buffer) {
         double d = v - m_baselineMean;
         sqSum += d * d;
     }
-    m_baselineStddev = qSqrt(sqSum / m_buffer.size());
+    m_baselineStddev = qSqrt(sqSum / n);
     if (m_baselineStddev < 1e-10) {
         m_baselineStddev = 1e-10;
     }

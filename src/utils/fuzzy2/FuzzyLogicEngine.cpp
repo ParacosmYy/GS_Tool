@@ -1,121 +1,239 @@
 /**
  * @file FuzzyLogicEngine.cpp
- * @brief 模糊逻辑引擎实现
+ * @brief 模糊逻辑引擎实现 — Mamdani推理 + 重心法去模糊化
  */
 
-#include "utils/fuzzy2/FuzzyLogicEngine.h"
+#include "FuzzyLogicEngine.h"
+
 #include <QElapsedTimer>
-#include <QtMath>
+#include <algorithm>
+
+// ═══════════════════════════════════════════════════════════
+// 构造 / 析构
+// ═══════════════════════════════════════════════════════════
 
 FuzzyLogicEngine::FuzzyLogicEngine(QObject* parent)
-    : QObject(parent), m_outputMin(0.0), m_outputMax(100.0),
-      m_outputResolution(100), m_timeSum(0.0) {}
-
-void FuzzyLogicEngine::addMembershipFunction(const QString& varName, const QString& termName,
-                                              MfType type, const QVector<double>& params)
+    : QObject(parent)
 {
-    m_inputMfs[varName][termName] = {type, params};
 }
 
-void FuzzyLogicEngine::setOutputRange(double minVal, double maxVal, int resolution)
+FuzzyLogicEngine::~FuzzyLogicEngine() = default;
+
+// ═══════════════════════════════════════════════════════════
+// 配置
+// ═══════════════════════════════════════════════════════════
+
+void FuzzyLogicEngine::addMembershipFunction(const QString& variable,
+                                             const QString& term,
+                                             const TrapezoidMF& mf)
 {
-    m_outputMin = minVal;
-    m_outputMax = maxVal;
-    m_outputResolution = qMax(10, resolution);
+    m_membershipFunctions[variable][term] = mf;
+
+    if (!m_inputVariables.contains(variable)) {
+        m_inputVariables.append(variable);
+    }
 }
 
-void FuzzyLogicEngine::addRule(const Rule& rule) { m_rules.append(rule); }
+void FuzzyLogicEngine::addTriangleMF(const QString& variable,
+                                     const QString& term,
+                                     double a, double b, double c)
+{
+    TrapezoidMF mf{a, b, b, c};
+    addMembershipFunction(variable, term, mf);
+}
+
+void FuzzyLogicEngine::addRule(const QStringList& inputTerms,
+                               const QString& outputVar,
+                               const QString& outputTerm)
+{
+    FuzzyRule rule;
+    rule.inputTerms = inputTerms;
+    rule.outputVariable = outputVar;
+    rule.outputTerm = outputTerm;
+    m_rules.append(rule);
+}
+
+void FuzzyLogicEngine::setDefuzzResolution(int resolution)
+{
+    m_defuzzResolution = qMax(10, resolution);
+}
+
+// ═══════════════════════════════════════════════════════════
+// 推理
+// ═══════════════════════════════════════════════════════════
 
 double FuzzyLogicEngine::evaluate(const QMap<QString, double>& inputs)
 {
     QElapsedTimer timer;
     timer.start();
 
-    /* 1. 模糊化: 计算每个输入对每个隶属函数的隶属度 */
-    QMap<QString, QMap<QString, double>> fuzzified;
-    for (auto it = m_inputMfs.begin(); it != m_inputMfs.end(); ++it) {
-        const QString& varName = it.key();
-        double inputVal = inputs.value(varName, 0.0);
-        for (auto mfIt = it.value().begin(); mfIt != it.value().end(); ++mfIt) {
-            fuzzified[varName][mfIt.key()] = membership(inputVal, mfIt.value().type, mfIt.value().params);
-        }
-    }
-
-    /* 2. 规则推理: 计算每条规则的激活强度(取最小AND) */
+    // 1. 计算每条规则的触发强度(取输入隶属度的最小值)
+    QMap<QString, double> clippedHeights;
     int rulesFired = 0;
-    QMap<QString, double> outputActivations;
 
-    for (const Rule& rule : m_rules) {
+    for (const auto& rule : m_rules) {
         double strength = 1.0;
-        for (auto condIt = rule.conditions.begin(); condIt != rule.conditions.end(); ++condIt) {
-            const QString& var = condIt.key();
-            const QString& term = condIt.value();
-            double mu = fuzzified.value(var).value(term, 0.0);
-            strength = qMin(strength, mu);
+
+        for (int i = 0; i < rule.inputTerms.size() &&
+                        i < m_inputVariables.size(); ++i) {
+            const QString& varName = m_inputVariables[i];
+            const QString& termName = rule.inputTerms[i];
+
+            if (!inputs.contains(varName)) {
+                strength = 0.0;
+                break;
+            }
+
+            const double deg = membershipDegree(varName, termName,
+                                                inputs.value(varName));
+            strength = qMin(strength, deg);
         }
 
         if (strength > 0.0) {
-            double current = outputActivations.value(rule.outputTerm, 0.0);
-            outputActivations[rule.outputTerm] = qMax(current, strength);
-            ++rulesFired;
+            rulesFired++;
+            const QString& key = rule.outputTerm;
+            if (clippedHeights.contains(key)) {
+                clippedHeights[key] = qMax(clippedHeights[key], strength);
+            } else {
+                clippedHeights[key] = strength;
+            }
         }
     }
 
-    /* 3. 去模糊化: 质心法 */
-    double step = (m_outputMax - m_outputMin) / m_outputResolution;
-    double numerator = 0.0, denominator = 0.0;
+    // 2. 去模糊化
+    double result = centroidDefuzzify(clippedHeights);
 
-    for (int i = 0; i <= m_outputResolution; ++i) {
-        double x = m_outputMin + i * step;
-        double aggMu = 0.0;
-        for (auto it = outputActivations.begin(); it != outputActivations.end(); ++it) {
-            aggMu = qMax(aggMu, it.value());
-        }
+    // 3. 更新统计
+    m_stats.totalEvaluations += 1;
+    m_stats.totalRulesFired += static_cast<quint64>(rulesFired);
+    updateAvgTime(timer.nsecsElapsed() / 1000);
 
-        /* 简化: 使用最大激活度作为聚合隶属度 */
-        double maxActivation = 0.0;
-        for (auto it = outputActivations.begin(); it != outputActivations.end(); ++it)
-            maxActivation = qMax(maxActivation, it.value());
-
-        numerator += x * maxActivation;
-        denominator += maxActivation;
-    }
-
-    double result = (denominator > 1e-15) ? numerator / denominator : (m_outputMin + m_outputMax) / 2.0;
-
-    /* 更新统计 */
-    double elapsed = timer.elapsed();
-    ++m_stats.totalEvaluations;
-    m_stats.totalRulesFired += rulesFired;
-    m_stats.avgRulesFired = static_cast<double>(m_stats.totalRulesFired) / m_stats.totalEvaluations;
-    m_timeSum += elapsed;
-    m_stats.averageProcessingTimeMs = m_timeSum / m_stats.totalEvaluations;
-
-    emit evaluationComplete(result, rulesFired);
+    emit evaluated(result, rulesFired);
     return result;
 }
 
-double FuzzyLogicEngine::membership(double x, MfType type, const QVector<double>& p) const
+// ═══════════════════════════════════════════════════════════
+// 辅助
+// ═══════════════════════════════════════════════════════════
+
+double FuzzyLogicEngine::membershipDegree(const QString& variable,
+                                          const QString& term,
+                                          double x) const
 {
-    switch (type) {
-    case MfType::Triangle:
-        if (p.size() < 3) return 0.0;
-        if (x <= p[0] || x >= p[2]) return 0.0;
-        if (x <= p[1]) return (x - p[0]) / (p[1] - p[0] + 1e-15);
-        return (p[2] - x) / (p[2] - p[1] + 1e-15);
-
-    case MfType::Trapezoid:
-        if (p.size() < 4) return 0.0;
-        if (x < p[0] || x > p[3]) return 0.0;
-        if (x >= p[1] && x <= p[2]) return 1.0;
-        if (x < p[1]) return (x - p[0]) / (p[1] - p[0] + 1e-15);
-        return (p[3] - x) / (p[3] - p[2] + 1e-15);
-
-    case MfType::Gaussian:
-        if (p.size() < 2) return 0.0;
-        return qExp(-0.5 * qPow((x - p[0]) / (p[1] + 1e-15), 2));
+    if (!m_membershipFunctions.contains(variable)) {
+        return 0.0;
     }
-    return 0.0;
+    const auto& terms = m_membershipFunctions[variable];
+    if (!terms.contains(term)) {
+        return 0.0;
+    }
+    return trapezoidValue(terms[term], x);
 }
 
-void FuzzyLogicEngine::resetStatistics() { m_stats = Stats{}; m_timeSum = 0.0; }
+void FuzzyLogicEngine::clear()
+{
+    m_membershipFunctions.clear();
+    m_inputVariables.clear();
+    m_rules.clear();
+    m_stats = Stats{};
+}
+
+// ═══════════════════════════════════════════════════════════
+// 统计
+// ═══════════════════════════════════════════════════════════
+
+FuzzyLogicEngine::Stats FuzzyLogicEngine::stats() const
+{
+    return m_stats;
+}
+
+void FuzzyLogicEngine::resetStatistics()
+{
+    m_stats = Stats{};
+}
+
+// ═══════════════════════════════════════════════════════════
+// 内部实现
+// ═══════════════════════════════════════════════════════════
+
+double FuzzyLogicEngine::trapezoidValue(const TrapezoidMF& mf,
+                                        double x) const
+{
+    if (x <= mf.a || x >= mf.d) {
+        return 0.0;
+    }
+    if (x >= mf.b && x <= mf.c) {
+        return 1.0;
+    }
+    if (x < mf.b) {
+        return (mf.b - mf.a) > 0.0
+            ? (x - mf.a) / (mf.b - mf.a) : 1.0;
+    }
+    return (mf.d - mf.c) > 0.0
+        ? (mf.d - x) / (mf.d - mf.c) : 1.0;
+}
+
+double FuzzyLogicEngine::centroidDefuzzify(
+    const QMap<QString, double>& clippedHeights) const
+{
+    if (clippedHeights.isEmpty()) {
+        return 0.0;
+    }
+
+    // 确定输出范围
+    double xMin = std::numeric_limits<double>::max();
+    double xMax = std::numeric_limits<double>::lowest();
+
+    for (const auto& termEntry : m_membershipFunctions) {
+        for (auto it = termEntry.constBegin();
+             it != termEntry.constEnd(); ++it) {
+            xMin = qMin(xMin, it.value().a);
+            xMax = qMax(xMax, it.value().d);
+        }
+    }
+
+    if (xMin >= xMax) {
+        return 0.0;
+    }
+
+    // 重心法数值积分
+    const double step = (xMax - xMin) /
+                        static_cast<double>(m_defuzzResolution);
+    double numerator = 0.0;
+    double denominator = 0.0;
+
+    for (int i = 0; i <= m_defuzzResolution; ++i) {
+        const double x = xMin + static_cast<double>(i) * step;
+
+        double aggValue = 0.0;
+        for (auto it = clippedHeights.constBegin();
+             it != clippedHeights.constEnd(); ++it) {
+            for (const auto& varTerms : m_membershipFunctions) {
+                if (varTerms.contains(it.key())) {
+                    const double raw = trapezoidValue(
+                        varTerms[it.key()], x);
+                    const double clipped = qMin(raw, it.value());
+                    aggValue = qMax(aggValue, clipped);
+                }
+            }
+        }
+
+        numerator += x * aggValue * step;
+        denominator += aggValue * step;
+    }
+
+    return (denominator > 0.0) ? (numerator / denominator) : 0.0;
+}
+
+void FuzzyLogicEngine::updateAvgTime(qint64 elapsedUs)
+{
+    const auto n = m_stats.totalEvaluations;
+    if (n == 1) {
+        m_stats.avgProcessingTime = static_cast<double>(elapsedUs);
+    } else {
+        m_stats.avgProcessingTime =
+            m_stats.avgProcessingTime *
+                static_cast<double>(n - 1) / static_cast<double>(n) +
+            static_cast<double>(elapsedUs) / static_cast<double>(n);
+    }
+}

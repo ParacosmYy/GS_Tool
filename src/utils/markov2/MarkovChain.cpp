@@ -1,131 +1,216 @@
 /**
  * @file MarkovChain.cpp
- * @brief 马尔可夫链实现
+ * @brief 一阶马尔可夫链引擎实现
  */
 
-#include "utils/markov2/MarkovChain.h"
+#include "MarkovChain.h"
+
 #include <QElapsedTimer>
-#include <QtMath>
-#include <random>
+#include <algorithm>
 
-MarkovChain::MarkovChain(QObject* parent) : QObject(parent), m_timeSum(0.0) {}
+// ═══════════════════════════════════════════════════════════
+// 构造 / 析构
+// ═══════════════════════════════════════════════════════════
 
-void MarkovChain::train(const QVector<int>& sequence)
+MarkovChain::MarkovChain(QObject* parent)
+    : QObject(parent)
 {
-    if (sequence.size() < 2) return;
-
-    for (int i = 0; i < sequence.size() - 1; ++i) {
-        int from = sequence[i];
-        int to = sequence[i + 1];
-        m_transitions[from][to]++;
-        m_stateCounts[from]++;
-    }
-
-    /* 确保所有状态都有记录 */
-    for (int state : sequence) {
-        if (!m_stateCounts.contains(state)) m_stateCounts[state] = 0;
-    }
-    m_stats.stateCount = m_stateCounts.size();
 }
 
-int MarkovChain::predict(int currentState)
+MarkovChain::~MarkovChain() = default;
+
+// ═══════════════════════════════════════════════════════════
+// 核心操作
+// ═══════════════════════════════════════════════════════════
+
+void MarkovChain::addTransition(const QString& from, const QString& to)
 {
     QElapsedTimer timer;
     timer.start();
 
-    if (!m_transitions.contains(currentState)) return -1;
+    ensureState(from);
+    ensureState(to);
 
-    int bestNext = -1;
-    int bestCount = 0;
-    for (auto it = m_transitions[currentState].begin();
-         it != m_transitions[currentState].end(); ++it) {
-        if (it.value() > bestCount) { bestCount = it.value(); bestNext = it.key(); }
-    }
+    m_transitions[from][to] += 1;
+    m_rowTotals[from] += 1;
 
-    double prob = (m_stateCounts[currentState] > 0)
-        ? static_cast<double>(bestCount) / m_stateCounts[currentState] : 0.0;
+    m_stats.totalSteps += 1;
+    updateAvgTime(timer.nsecsElapsed() / 1000);
 
-    ++m_stats.totalPredictions;
-    m_timeSum += timer.elapsed();
-    m_stats.averageProcessingTimeMs = m_timeSum / m_stats.totalPredictions;
-
-    emit predictionMade(currentState, bestNext, prob);
-    return bestNext;
+    emit transitionAdded(from, to);
 }
 
-QMap<int, double> MarkovChain::predictProba(int currentState)
+QString MarkovChain::predictNext(const QString& current) const
 {
-    QMap<int, double> proba;
-    if (!m_stateCounts.contains(currentState) || m_stateCounts[currentState] == 0) return proba;
+    if (!m_transitions.contains(current)) {
+        return {};
+    }
 
-    int total = m_stateCounts[currentState];
-    if (m_transitions.contains(currentState)) {
-        for (auto it = m_transitions[currentState].begin();
-             it != m_transitions[currentState].end(); ++it) {
-            proba[it.key()] = static_cast<double>(it.value()) / total;
+    const auto& row = m_transitions[current];
+    QString bestState;
+    quint64 bestCount = 0;
+
+    for (auto it = row.constBegin(); it != row.constEnd(); ++it) {
+        if (it.value() > bestCount) {
+            bestCount = it.value();
+            bestState = it.key();
         }
     }
-    return proba;
+
+    return bestState;
 }
 
-QMap<int, double> MarkovChain::stationaryDistribution() const
+QMap<QString, double> MarkovChain::transitionProbabilities(
+    const QString& state) const
 {
-    /* 幂迭代法求平稳分布 */
-    QMap<int, double> pi;
-    for (auto it = m_stateCounts.begin(); it != m_stateCounts.end(); ++it)
-        pi[it.key()] = 1.0 / m_stateCounts.size();
+    QMap<QString, double> result;
 
-    for (int iter = 0; iter < 100; ++iter) {
-        QMap<int, double> newPi;
-        for (auto from = m_stateCounts.begin(); from != m_stateCounts.end(); ++from) {
-            if (!m_transitions.contains(from.key())) continue;
-            int totalFrom = m_stateCounts[from.key()];
-            for (auto to = m_transitions[from.key()].begin();
-                 to != m_transitions[from.key()].end(); ++to) {
-                double tProb = static_cast<double>(to.value()) / totalFrom;
-                newPi[to.key()] += pi[from.key()] * tProb;
-            }
-        }
-        pi = newPi;
+    if (!m_transitions.contains(state)) {
+        return result;
     }
-    return pi;
-}
 
-QVector<int> MarkovChain::generate(int startState, int length)
-{
-    QVector<int> result;
-    result.reserve(length);
-    int current = startState;
-    std::mt19937 rng(42);
-
-    for (int i = 0; i < length; ++i) {
-        result.append(current);
-        QMap<int, double> proba = predictProba(current);
-        if (proba.isEmpty()) break;
-
-        double r = static_cast<double>(rng()) / rng.max();
-        double cumulative = 0.0;
-        for (auto it = proba.begin(); it != proba.end(); ++it) {
-            cumulative += it.value();
-            if (r <= cumulative) { current = it.key(); break; }
-        }
+    const quint64 total = m_rowTotals.value(state, 0);
+    if (total == 0) {
+        return result;
     }
+
+    const auto& row = m_transitions[state];
+    for (auto it = row.constBegin(); it != row.constEnd(); ++it) {
+        result[it.key()] = static_cast<double>(it.value()) /
+                           static_cast<double>(total);
+    }
+
     return result;
 }
 
-int MarkovChain::stateCount() const { return m_stateCounts.size(); }
-
-double MarkovChain::transitionProb(int from, int to) const
+QMap<QString, double> MarkovChain::stationaryDistribution(
+    int iterations) const
 {
-    if (!m_stateCounts.contains(from) || m_stateCounts[from] == 0) return 0.0;
-    if (!m_transitions.contains(from) || !m_transitions[from].contains(to)) return 0.0;
-    return static_cast<double>(m_transitions[from][to]) / m_stateCounts[from];
+    QMap<QString, double> dist;
+
+    if (m_stateList.isEmpty()) {
+        return dist;
+    }
+
+    const int n = m_stateList.size();
+    const double initVal = 1.0 / static_cast<double>(n);
+    for (const auto& s : m_stateList) {
+        dist[s] = initVal;
+    }
+
+    for (int iter = 0; iter < iterations; ++iter) {
+        QMap<QString, double> next;
+        for (const auto& s : m_stateList) {
+            next[s] = 0.0;
+        }
+
+        for (const auto& from : m_stateList) {
+            const auto probs = transitionProbabilities(from);
+            const double fromProb = dist[from];
+
+            if (probs.isEmpty()) {
+                const double spread = fromProb / static_cast<double>(n);
+                for (const auto& s : m_stateList) {
+                    next[s] += spread;
+                }
+            } else {
+                for (auto it = probs.constBegin(); it != probs.constEnd();
+                     ++it) {
+                    next[it.key()] += fromProb * it.value();
+                }
+            }
+        }
+
+        dist = next;
+    }
+
+    return dist;
 }
 
-void MarkovChain::reset()
+// ═══════════════════════════════════════════════════════════
+// 批量操作
+// ═══════════════════════════════════════════════════════════
+
+void MarkovChain::addSequence(const QVector<QString>& states)
+{
+    if (states.size() < 2) {
+        emit error(tr("序列长度不足, 至少需要2个状态"));
+        return;
+    }
+
+    QElapsedTimer timer;
+    timer.start();
+
+    for (int i = 0; i < states.size() - 1; ++i) {
+        ensureState(states[i]);
+        ensureState(states[i + 1]);
+        m_transitions[states[i]][states[i + 1]] += 1;
+        m_rowTotals[states[i]] += 1;
+        m_stats.totalSteps += 1;
+    }
+
+    updateAvgTime(timer.nsecsElapsed() / 1000);
+}
+
+void MarkovChain::clear()
 {
     m_transitions.clear();
-    m_stateCounts.clear();
+    m_rowTotals.clear();
+    m_stateList.clear();
+    m_stats = Stats{};
 }
 
-void MarkovChain::resetStatistics() { m_stats = Stats{}; m_timeSum = 0.0; }
+// ═══════════════════════════════════════════════════════════
+// 查询
+// ═══════════════════════════════════════════════════════════
+
+QVector<QString> MarkovChain::states() const
+{
+    return m_stateList;
+}
+
+quint64 MarkovChain::transitionCount(const QString& from) const
+{
+    return m_rowTotals.value(from, 0);
+}
+
+// ═══════════════════════════════════════════════════════════
+// 统计
+// ═══════════════════════════════════════════════════════════
+
+MarkovChain::Stats MarkovChain::stats() const
+{
+    return m_stats;
+}
+
+void MarkovChain::resetStatistics()
+{
+    m_stats = Stats{};
+}
+
+// ═══════════════════════════════════════════════════════════
+// 内部辅助
+// ═══════════════════════════════════════════════════════════
+
+void MarkovChain::ensureState(const QString& state)
+{
+    if (!m_rowTotals.contains(state)) {
+        m_stateList.append(state);
+        m_rowTotals[state] = 0;
+        m_stats.totalStates = static_cast<quint64>(m_stateList.size());
+        emit stateAdded(state);
+    }
+}
+
+void MarkovChain::updateAvgTime(qint64 elapsedUs)
+{
+    const auto n = m_stats.totalSteps;
+    if (n == 1) {
+        m_stats.avgProcessingTime = static_cast<double>(elapsedUs);
+    } else {
+        m_stats.avgProcessingTime =
+            m_stats.avgProcessingTime *
+                static_cast<double>(n - 1) / static_cast<double>(n) +
+            static_cast<double>(elapsedUs) / static_cast<double>(n);
+    }
+}
