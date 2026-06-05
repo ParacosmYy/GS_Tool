@@ -743,11 +743,28 @@ set(SOURCES
     src/utils/countmin/CountMinSketch.cpp
     src/utils/cuckoo/CuckooFilter.cpp
     src/utils/bloomfilter2/ScalableBloomFilter.cpp
+    src/utils/ratechange/RateOfChange.cpp
+    src/utils/simplex/SimplexNoise.cpp
+    src/utils/holtwinters/HoltWinters.cpp
+    src/utils/multiproc/ProcessMonitor.cpp
+    src/utils/slidingwindow3/SlidingWindowCounter.cpp
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
     src/utils/eye/EyeDiagramEngine.cpp
     src/utils/symbol/SymbolDecoder.cpp
+    src/utils/multiset/CountingMultiSet.cpp
+    src/utils/deque/IndexedDeque.cpp
+    src/utils/hamming/HammingCode.cpp
+    src/utils/gradient/NumericalGradient.cpp
+    src/utils/armodel/AutoRegressiveModel.cpp
+    src/utils/fractal/FractalDimension.cpp
+    src/utils/hurst/HurstExponent.cpp
+    src/utils/permutation/PermutationGenerator.cpp
+    src/utils/combination/CombinationGenerator.cpp
+    src/utils/bloomfilter2/CountingBloomFilter.cpp
+    src/utils/rscode/ReedSolomonCodec.cpp
+    src/utils/spectrum/SpectralFlatness.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1576,6 +1593,35 @@ set(HEADERS
     # -- F96: 符号解码器 --
     src/utils/symbol/SymbolDecoder.h
 
+    # -- F104: 计数多重集合 --
+    src/utils/multiset/CountingMultiSet.h
+    # -- F105: 索引双端队列 --
+    src/utils/deque/IndexedDeque.h
+    # -- F106: AVL平衡二叉搜索树 --
+    src/utils/avltree/AvlTree.h
+    # -- F107: 红黑树 --
+    src/utils/redblack/RedBlackTree.h
+    # -- F108: 汉明码编解码器 --
+    src/utils/hamming/HammingCode.h
+    # -- F109: 数值梯度计算器 --
+    src/utils/gradient/NumericalGradient.h
+    # -- F110: 自回归模型 --
+    src/utils/armodel/AutoRegressiveModel.h
+    # -- F111: 分形维数估计器 --
+    src/utils/fractal/FractalDimension.h
+    # -- F112: Hurst指数 --
+    src/utils/hurst/HurstExponent.h
+    # -- F113: 排列生成器 --
+    src/utils/permutation/PermutationGenerator.h
+    # -- F114: 组合生成器 --
+    src/utils/combination/CombinationGenerator.h
+    # -- F115: 计数型布隆过滤器 --
+    src/utils/bloomfilter2/CountingBloomFilter.h
+    # -- F116: Reed-Solomon编解码器 --
+    src/utils/rscode/ReedSolomonCodec.h
+    # -- F117: 频谱平坦度 --
+    src/utils/spectrum/SpectralFlatness.h
+
     # -- F101: 一维卡尔曼滤波器 --
     src/utils/kalman/KalmanFilter1D.h
 
@@ -1627,6 +1673,11 @@ set(HEADERS
     # -- F121: 投票组合器 --
     src/utils/votecomp/VotingCompositor.h
 
+    src/utils/ratechange/RateOfChange.h
+    src/utils/simplex/SimplexNoise.h
+    src/utils/holtwinters/HoltWinters.h
+    src/utils/multiproc/ProcessMonitor.h
+    src/utils/slidingwindow3/SlidingWindowCounter.h
     # -- F122: 马尔可夫链 --
     src/utils/markov2/MarkovChain.h
 
