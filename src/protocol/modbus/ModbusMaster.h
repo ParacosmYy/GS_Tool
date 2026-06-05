@@ -69,6 +69,12 @@ public:
     bool writeMultipleCoils(int start, const QList<bool>& values); ///< @brief FC15写多个线圈
     bool writeMultipleRegisters(int start, const QList<quint16>& values); ///< @brief FC16
 
+    // ---- 带从站地址的重载 ----
+    bool readCoils(int slave, int start, int count);                ///< @brief FC01读线圈(指定从站)
+    bool readDiscreteInputs(int slave, int start, int count);       ///< @brief FC02读离散输入(指定从站)
+    bool readHoldingRegisters(int slave, int start, int count);     ///< @brief FC03读保持寄存器(指定从站)
+    bool readInputRegisters(int slave, int start, int count);       ///< @brief FC04读输入寄存器(指定从站)
+
     // ---- 统计接口 ----
     ModbusMasterStats stats() const;   ///< @brief 获取统计快照
     void resetStatistics();            ///< @brief 重置所有统计

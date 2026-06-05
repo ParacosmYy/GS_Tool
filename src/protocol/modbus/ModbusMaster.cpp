@@ -138,6 +138,30 @@ bool ModbusMaster::readInputRegisters(int start, int count) {
     return sendRequest(0x04, static_cast<quint16>(start), static_cast<quint16>(count));
 }
 
+/** @brief FC01读线圈(指定从站) @param slave 从站地址 @param start 起始地址 @param count 数量 */
+bool ModbusMaster::readCoils(int slave, int start, int count) {
+    m_slaveAddress = static_cast<quint8>(slave);
+    return readCoils(start, count);
+}
+
+/** @brief FC02读离散输入(指定从站) @param slave 从站地址 @param start 起始地址 @param count 数量 */
+bool ModbusMaster::readDiscreteInputs(int slave, int start, int count) {
+    m_slaveAddress = static_cast<quint8>(slave);
+    return readDiscreteInputs(start, count);
+}
+
+/** @brief FC03读保持寄存器(指定从站) @param slave 从站地址 @param start 起始地址 @param count 数量 */
+bool ModbusMaster::readHoldingRegisters(int slave, int start, int count) {
+    m_slaveAddress = static_cast<quint8>(slave);
+    return readHoldingRegisters(start, count);
+}
+
+/** @brief FC04读输入寄存器(指定从站) @param slave 从站地址 @param start 起始地址 @param count 数量 */
+bool ModbusMaster::readInputRegisters(int slave, int start, int count) {
+    m_slaveAddress = static_cast<quint8>(slave);
+    return readInputRegisters(start, count);
+}
+
 /** @brief FC05写单个线圈 @param addr 地址 @param on ON/OFF @return true=已发送 */
 bool ModbusMaster::writeSingleCoil(int addr, bool on) {
     QByteArray data(2, '\0');
