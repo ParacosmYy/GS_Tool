@@ -14,6 +14,7 @@
 #include <QList>
 #include <QPair>
 #include <QMap>
+#include <QSet>
 
 /**
  * @brief 社区检测引擎 — Louvain模块度优化
@@ -96,6 +97,10 @@ private:
 
     /** @brief 第二阶段: 聚合社区为超节点，构建新图 @param nodeComm 节点->社区映射 @return 新图的边列表 */
     QList<Edge> aggregateCommunities(const QVector<int>& nodeComm);
+
+    /** @brief 从节点-社区映射构建Community列表 @param nodeComm 节点->社区映射 @param commMembers 社区->成员映射 @return Community列表 */
+    QList<Community> buildCommunityList(const QVector<int>& nodeComm,
+                                        const QMap<int, QList<int>>& commMembers) const;
 
     double m_resolution = 1.0;              ///< 解析度参数
     int m_nodeCount = 0;                    ///< 节点数

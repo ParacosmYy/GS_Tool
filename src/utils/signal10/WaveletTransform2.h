@@ -103,6 +103,9 @@ private:
                                      const QVector<double>& waveRe,
                                      const QVector<double>& waveIm) const;
 
+    /** @brief 阶乘辅助函数 @param n 非负整数 @return n! */
+    long long factorial(int n) const;
+
     double m_sampleRate = 1000.0;           ///< 采样率(Hz)
     double m_minFreq = 1.0;                 ///< 最低分析频率(Hz)
     double m_maxFreq = 400.0;               ///< 最高分析频率(Hz)
