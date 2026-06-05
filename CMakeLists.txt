@@ -681,12 +681,12 @@ set(SOURCES
     src/utils/smoother/DataSmoother.cpp
     src/utils/peaks/PeakDetector.cpp
     src/utils/warp/TimeWarp.cpp
-    src/utils/profiler/DataProfiler.cpp
     src/utils/resample/DataResampler.cpp
     src/utils/classifier/DataClassifier.cpp
     src/utils/quantize/DataQuantizer.cpp
     src/utils/autocorr/AutoCorrelator.cpp
     src/utils/peakdetect/RidgeDetector.cpp
+    src/utils/freq/FrequencyCounter2.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1402,6 +1402,9 @@ set(HEADERS
     # -- F78: 熵计算器 --
     src/utils/entropy/EntropyCalculator.h
 
+    # -- F78b: 数据归一化器 --
+    src/utils/normalize/DataNormalizer.h
+
     # -- F79: 互相关分析器 --
     src/utils/crosscorr/CrossCorrelator.h
 
@@ -1426,8 +1429,8 @@ set(HEADERS
     # -- F86: 脊线检测器 --
     src/utils/peakdetect/RidgeDetector.h
 
-    # -- F87: 数据性能分析器 --
-    src/utils/profiler/DataProfiler.h
+    # -- F87: 高精度频率计数器 --
+    src/utils/freq/FrequencyCounter2.h
 )
 
 set(RESOURCES
