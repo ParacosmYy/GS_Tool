@@ -1518,6 +1518,39 @@ set(SOURCES
     src/utils/siphash/SipHash.cpp
     src/utils/wyhash/WyHash.cpp
     src/utils/xxhash/XxHash.cpp
+
+    # ── Wave 105-106: 关节点/SG滤波器/斜堆/SVD/Introsort/区间树/多边形裁剪/在线分位数 ──
+    src/utils/graph18/ArticulationPoint.cpp
+    src/utils/detrend3/SavitzkyGolayFilter.cpp
+    src/utils/heap8/SkewHeap.cpp
+    src/utils/linalg6/SvdSolver.cpp
+    src/utils/sort10/Introsort2.cpp
+    src/utils/tree9/IntervalTree2.cpp
+    src/utils/geo3/PolygonClipper.cpp
+    src/utils/quantile3/OnlineQuantile.cpp
+
+    # ── Wave 107-118 additional sources ──
+    src/utils/dsp7/AllpassFilter.cpp
+    src/utils/cluster5/GaussianNaiveBayes.cpp
+    src/utils/code6/TurboDecoder.cpp
+    src/utils/hash2/CuckooFilter.cpp
+    src/utils/interp8/BSplineInterp.cpp
+    src/utils/matrix8/BandMatrix2.cpp
+    src/utils/graph19/GraphIsomorphism.cpp
+    src/utils/poly4/LaguerrePoly.cpp
+    src/utils/string7/RabinKarp2.cpp
+    src/utils/cluster6/SpectralCluster2.cpp
+    src/utils/code7/PolarCode.cpp
+    src/utils/fft10/GoertzelBank.cpp
+    src/utils/graph20/BridgeTree.cpp
+    src/utils/graph21/GraphDrawing.cpp
+    src/utils/loss5/TripletLoss.cpp
+    src/utils/matrix10/BlockMatrix.cpp
+    src/utils/segment5/PersistentSegmentTree.cpp
+    src/utils/tree11/VanEmdeBoas.cpp
+    src/utils/matrix9/SchurDecomp.cpp
+    src/utils/dsp8/FractionalDelay.cpp
+    src/utils/signal9/PeakDetector2.cpp
 )
 
 set(HEADERS
@@ -2728,6 +2761,50 @@ set(HEADERS
     src/utils/zipf/ZipfGenerator.h
     src/utils/pca3/IncrementalPca.h
     src/utils/segment_tree2/SegmentTreeLazy.h
+
+    # ── Wave 105-106 headers ──
+    src/utils/graph18/ArticulationPoint.h
+    src/utils/detrend3/SavitzkyGolayFilter.h
+    src/utils/heap8/SkewHeap.h
+    src/utils/linalg6/SvdSolver.h
+    src/utils/sort10/Introsort2.h
+    src/utils/tree9/IntervalTree2.h
+    src/utils/geo3/PolygonClipper.h
+    src/utils/quantile3/OnlineQuantile.h
+
+    # ── Wave 107-118 headers ──
+    src/utils/dsp7/AllpassFilter.h
+    src/utils/cluster5/GaussianNaiveBayes.h
+    src/utils/code6/TurboDecoder.h
+    src/utils/hash2/CuckooFilter.h
+    src/utils/interp8/BSplineInterp.h
+    src/utils/matrix8/BandMatrix2.h
+    src/utils/graph19/GraphIsomorphism.h
+    src/utils/dsp9/ParametricEq.h
+    src/utils/graph22/CommunityDetection.h
+    src/utils/matrix11/HouseholderBidiag.h
+    src/utils/interp9/CubicSpline2.h
+    src/utils/signal10/WaveletTransform2.h
+    src/utils/code8/LdpcDecoder2.h
+    src/utils/cluster7/DBSCAN2.h
+    src/utils/tree12/WeightedBalancedTree.h
+    src/utils/poly4/LaguerrePoly.h
+    src/utils/poly5/OrthogonalPoly.h
+    src/utils/signal11/Resampler.h
+    src/utils/string8/AhoCorasick2.h
+    src/utils/tree13/ScapegoatTree2.h
+    src/utils/dsp10/FirDesigner.h
+    src/utils/graph23/MaxBipartiteMatch.h
+    src/utils/loss6/FocalLoss2.h
+    src/utils/matrix12/CompressedCol.h
+    src/utils/cluster8/MeanShift.h
+    src/utils/code9/ReedSolomon3.h
+    src/utils/fft11/MovingDFT.h
+    src/utils/graph24/VertexCover.h
+    src/utils/matrix13/SchurComplement.h
+    src/utils/optimize4/NewtonMethod.h
+    src/utils/signal12/Autocorrelation.h
+    src/utils/interp10/RationalInterp.h
 )
 
 set(RESOURCES
