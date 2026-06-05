@@ -56,10 +56,10 @@ QVector<QPair<int, int>> AhoCorasick2::search(const QString& text) const
         /* 查找匹配转移: 先查精确字符，再查通配符 */
         int next = -1;
         if (m_trie[state].children.contains(c)) {
-            next = m_trie[state].children[c];
+            next = m_trie[state].children.value(c);
         } else if (m_trie[state].children.contains(QLatin1Char('?'))) {
             /* 通配符匹配任意字符 */
-            next = m_trie[state].children[QLatin1Char('?')];
+            next = m_trie[state].children.value(QLatin1Char('?'));
             ++m_stats.totalWildcards;
         }
 
@@ -70,11 +70,11 @@ QVector<QPair<int, int>> AhoCorasick2::search(const QString& text) const
             while (state != 0) {
                 state = m_trie[state].fail;
                 if (m_trie[state].children.contains(c)) {
-                    state = m_trie[state].children[c];
+                    state = m_trie[state].children.value(c);
                     break;
                 } else if (m_trie[state].children.contains(
                     QLatin1Char('?'))) {
-                    state = m_trie[state].children[QLatin1Char('?')];
+                    state = m_trie[state].children.value(QLatin1Char('?'));
                     ++m_stats.totalWildcards;
                     break;
                 }
@@ -92,7 +92,6 @@ QVector<QPair<int, int>> AhoCorasick2::search(const QString& text) const
     m_stats.avgProcessingTimeMs = m_timeSum
         / static_cast<double>(m_stats.totalSearches);
 
-    emit searchCompleted(results.size());
     return results;
 }
 

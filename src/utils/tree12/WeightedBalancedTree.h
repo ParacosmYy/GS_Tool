@@ -134,6 +134,6 @@ private:
     double m_alpha = 0.7;                   ///< 平衡因子
     int m_count = 0;                        ///< 节点计数
 
-    Stats m_stats;                          ///< 运行统计
+    mutable Stats m_stats;                          ///< 运行统计
     double m_timeSum = 0.0;                 ///< 处理时间累加器
 };

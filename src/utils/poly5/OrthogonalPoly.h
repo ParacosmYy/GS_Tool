@@ -68,7 +68,7 @@ public:
      * @return (节点数组, 权重数组)
      */
     QPair<QVector<double>, QVector<double>>
-    gaussQuadrature(PolyFamily family, int nPoints) const;
+    gaussQuadrature(PolyFamily family, int nPoints);
 
     /**
      * @brief 使用正交多项式进行最小二乘拟合
@@ -81,7 +81,7 @@ public:
     QVector<double> polyFit(PolyFamily family,
                             const QVector<double>& xData,
                             const QVector<double>& yData,
-                            int degree) const;
+                            int degree);
 
     /**
      * @brief 使用展开系数计算拟合值
@@ -120,7 +120,7 @@ private:
                         const QVector<double>& yData,
                         const QVector<double>& weights) const;
 
-    Stats              m_stats;
-    double             m_timeSum = 0.0;
+    mutable Stats              m_stats;
+    mutable double             m_timeSum = 0.0;
     mutable QElapsedTimer m_timer;
 };

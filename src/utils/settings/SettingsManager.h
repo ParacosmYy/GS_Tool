@@ -79,8 +79,8 @@ private:
     ~SettingsManager() override;                         ///< 同步配置到磁盘，退出所有未关闭分组
     SettingsManager(const SettingsManager&) = delete;
     SettingsManager& operator=(const SettingsManager&) = delete;
-    QSettings m_settings;              ///< Qt配置存储引擎
-    QStack<QString> m_groupStack;      ///< 分组嵌套栈
+    mutable QSettings m_settings;      ///< Qt配置存储引擎(const方法需beginGroup/endGroup)
+    mutable QStack<QString> m_groupStack; ///< 分组嵌套栈
     // ---- 统计计数器 ----
     mutable quint64 m_totalReads = 0;      ///< 配置读取总次数
     quint64 m_totalWrites = 0;            ///< 配置写入总次数

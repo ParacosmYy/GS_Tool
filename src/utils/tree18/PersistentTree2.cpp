@@ -1,6 +1,7 @@
 /**
  * @file PersistentTree2.cpp
  * @brief 持久化平衡BST实现 — 路径拷贝 + 版本化查询 + 版本GC
+ */
 #include "utils/tree18/PersistentTree2.h"
 #include <QElapsedTimer>
 #include <algorithm>

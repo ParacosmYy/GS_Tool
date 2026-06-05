@@ -57,6 +57,6 @@ private:
     int rmqQuery(int i, int j) const;
     void destroyTree();
 
-    Stats m_stats;
-    double m_timeSum = 0.0;
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;
 };

@@ -6,6 +6,7 @@
 #include "utils/interp9/CubicSpline2.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
 #include <algorithm>
 
@@ -234,9 +235,9 @@ void CubicSpline2::resetStatistics()
 }
 
 /** @brief Thomas算法求解三对角方程组 */
-QVector<double> CubicSpline2::thomasSolve(const QVector<double>& lower,
-                                           const QVector<double>& mainDiag,
-                                           const QVector<double>& upper,
+QVector<double> CubicSpline2::thomasSolve(QVector<double> lower,
+                                           QVector<double> mainDiag,
+                                           QVector<double> upper,
                                            const QVector<double>& rhs) const
 {
     int n = rhs.size();

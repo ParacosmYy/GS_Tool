@@ -1,6 +1,7 @@
 /**
  * @file LinkCutTree.cpp
  * @brief Link-Cut树实现 — Splay路径 + 动态树连通性 + 路径聚合
+ */
 
 #include "utils/tree20/LinkCutTree.h"
 

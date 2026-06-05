@@ -103,8 +103,8 @@ private:
     /** @brief LCA加速: 欧拉环游+深度+首次出现 */
     QVector<int> m_euler;           ///< 欧拉环游序列
     QVector<int> m_eulerDepth;      ///< 对应深度
-    QVector<int> m_firstOccur;      ///< 节点首次出现位置
-    bool m_lcaCacheValid;           ///< LCA缓存是否有效
+    mutable QVector<int> m_firstOccur;      ///< 节点首次出现位置
+    mutable bool m_lcaCacheValid;           ///< LCA缓存是否有效
 
     Stats m_stats;
     double m_timeSum = 0.0;         ///< 处理时间累加器

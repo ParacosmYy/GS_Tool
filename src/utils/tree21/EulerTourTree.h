@@ -131,6 +131,6 @@ private:
     QVector<int> m_vertexLast;     ///< 顶点最后出现的欧拉索引
     QVector<double> m_values;      ///< 顶点值
 
-    Stats m_stats;
-    double m_timeSum = 0.0;        ///< 处理时间累加器
+    mutable Stats m_stats;
+    mutable double m_timeSum = 0.0;        ///< 处理时间累加器
 };

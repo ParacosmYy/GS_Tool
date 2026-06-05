@@ -83,9 +83,9 @@ signals:
 
 private:
     /** @brief Thomas算法求解三对角方程组 @param lower 下对角线 @param main 主对角线 @param upper 上对角线 @param rhs 右端项 @return 解向量 */
-    QVector<double> thomasSolve(const QVector<double>& lower,
-                                const QVector<double>& main,
-                                const QVector<double>& upper,
+    QVector<double> thomasSolve(QVector<double> lower,
+                                QVector<double> main,
+                                QVector<double> upper,
                                 const QVector<double>& rhs) const;
 
     /** @brief 二分查找x所在的段索引 @param x 查询点 @return 段索引 */

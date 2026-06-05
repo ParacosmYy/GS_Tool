@@ -79,7 +79,7 @@ int CartesianTree2::lca(int u, int v) const
         self->m_euler.clear();
         self->m_eulerDepth.clear();
         self->m_firstOccur.resize(m_nodes.size(), -1);
-        self->eulerHelper(m_root, self->m_euler, self->m_eulerDepth);
+        self->eulerHelper(m_root, self->m_euler, 0, self->m_eulerDepth);
         self->m_lcaCacheValid = true;
     }
 
@@ -244,12 +244,12 @@ QVector<int> CartesianTree2::eulerTour() const
 {
     QVector<int> euler;
     QVector<int> depthList;
-    eulerHelper(m_root, euler, depthList);
+    eulerHelper(m_root, euler, 0, depthList);
     return euler;
 }
 
-/** @brief 欧拉环游递归辅助 @param idx 当前节点 @param euler 欧拉序列 @param depthList 深度序列 */
-void CartesianTree2::eulerHelper(int idx, QVector<int>& euler,
+/** @brief 欧拉环游递归辅助 @param idx 当前节点 @param euler 欧拉序列 @param depth 当前深度 @param depthList 深度序列 */
+void CartesianTree2::eulerHelper(int idx, QVector<int>& euler, int depth,
                                   QVector<int>& depthList) const
 {
     if (idx < 0) return;
@@ -259,33 +259,20 @@ void CartesianTree2::eulerHelper(int idx, QVector<int>& euler,
         m_firstOccur[idx] = euler.size();
     }
 
-    int depth = (m_nodes[idx].parent < 0) ? 0
-                : depthList.isEmpty() ? 1
-                : depthList.last() + 1;
-
     euler.append(idx);
-    depthList.append(depth - (m_nodes[idx].parent < 0 ? 0 : depthList.isEmpty() ? 0 : 0));
-
-    /* 正确计算深度 */
-    int curDepth = 0;
-    int tmp = idx;
-    while (m_nodes[tmp].parent >= 0) {
-        ++curDepth;
-        tmp = m_nodes[tmp].parent;
-    }
-    depthList[depthList.size() - 1] = curDepth;
+    depthList.append(depth);
 
     /* 递归遍历左子树 */
     if (m_nodes[idx].left >= 0) {
-        eulerHelper(m_nodes[idx].left, euler, depthList);
+        eulerHelper(m_nodes[idx].left, euler, depth + 1, depthList);
         euler.append(idx);
-        depthList.append(curDepth);
+        depthList.append(depth);
     }
 
     /* 递归遍历右子树 */
     if (m_nodes[idx].right >= 0) {
-        eulerHelper(m_nodes[idx].right, euler, depthList);
+        eulerHelper(m_nodes[idx].right, euler, depth + 1, depthList);
         euler.append(idx);
-        depthList.append(curDepth);
+        depthList.append(depth);
     }
 }

@@ -162,7 +162,7 @@ int CartesianTree4::rangeMinimum(int lo, int hi) const
 
     /* 更新统计 */
     double elapsed = timer.elapsed();
-    const_cast<double&>(m_timeSum) += elapsed;
+    m_timeSum += elapsed;
     m_stats.totalQueries++;
     m_stats.avgProcessingTimeMs = m_timeSum / (m_stats.totalBuilds + m_stats.totalQueries);
 

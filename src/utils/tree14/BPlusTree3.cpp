@@ -55,7 +55,7 @@ BPlusTree3::Node* BPlusTree3::findLeaf(int key) const
         while (idx < cur->keys.size() && key >= decompressKey(cur, idx)) {
             ++idx;
         }
-        cur = cur->children[std::min(idx, cur->children.size() - 1)];
+        cur = cur->children[qMin(static_cast<int>(idx), static_cast<int>(cur->children.size() - 1))];
     }
     return cur;
 }
@@ -275,7 +275,7 @@ int BPlusTree3::bulkLoad(const QList<QPair<int, QByteArray>>& pairs)
 
     for (int i = 0; i < pairs.size(); i += leafCapacity) {
         Node* leaf = createNode(true);
-        int end = std::min(i + leafCapacity, pairs.size());
+        int end = qMin(i + leafCapacity, static_cast<int>(pairs.size()));
 
         for (int j = i; j < end; ++j) {
             leaf->keys.append(pairs[j].first);
@@ -303,7 +303,7 @@ int BPlusTree3::bulkLoad(const QList<QPair<int, QByteArray>>& pairs)
 
         for (int i = 0; i < currentLevel.size(); i += m_order) {
             Node* parent = createNode(false);
-            int end = std::min(i + m_order, static_cast<int>(currentLevel.size()));
+            int end = qMin(i + m_order, static_cast<int>(currentLevel.size()));
 
             for (int j = i; j < end; ++j) {
                 parent->children.append(currentLevel[j]);

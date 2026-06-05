@@ -227,6 +227,6 @@ private:
     QMap<Version, VersionInfo> m_versions; ///< 版本映射
     Version m_nextVersion;                ///< 下一版本号
 
-    Stats m_stats;                        ///< 操作统计
-    double m_timeSum = 0.0;               ///< 累计耗时
+    mutable Stats m_stats;                        ///< 操作统计
+    mutable double m_timeSum = 0.0;               ///< 累计耗时
 };

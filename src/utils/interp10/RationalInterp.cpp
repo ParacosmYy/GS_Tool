@@ -6,6 +6,7 @@
 #include "utils/interp10/RationalInterp.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
 #include <algorithm>
 

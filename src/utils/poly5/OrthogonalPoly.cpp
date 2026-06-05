@@ -102,7 +102,7 @@ QVector<double> OrthogonalPoly::evaluateRange(PolyFamily family, int maxOrder,
  * 使用Newton法求多项式根，然后由导数计算权重
  */
 QPair<QVector<double>, QVector<double>>
-OrthogonalPoly::gaussQuadrature(PolyFamily family, int nPoints) const
+OrthogonalPoly::gaussQuadrature(PolyFamily family, int nPoints)
 {
     m_timer.start();
 
@@ -180,7 +180,7 @@ OrthogonalPoly::gaussQuadrature(PolyFamily family, int nPoints) const
 QVector<double> OrthogonalPoly::polyFit(PolyFamily family,
                                          const QVector<double>& xData,
                                          const QVector<double>& yData,
-                                         int degree) const
+                                         int degree)
 {
     m_timer.start();
 
