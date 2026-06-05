@@ -658,6 +658,11 @@ set(SOURCES
     src/utils/crc_verifier/CrcStreamVerifier.cpp
     src/utils/segment/DataSegmentAnalyzer.cpp
     src/utils/outlier/OutlierDetector.cpp
+    src/utils/quality/DataQualityScorer.cpp
+    src/utils/sampler/DataSampler.cpp
+    src/utils/interpolator/DataInterpolator.cpp
+    src/utils/timeline/EventTimeline.cpp
+    src/utils/correlator/DataCorrelator.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -840,6 +845,36 @@ set(SOURCES
 
     # -- F58: 协议回放引擎 --
     src/protocol/replay/ProtocolReplayEngine.cpp
+
+    # -- F59: 数据变换管线 --
+    src/utils/transform/DataTransformer.cpp
+
+    # -- F63: 数据批处理器 --
+    src/utils/batch/DataBatchProcessor.cpp
+
+    # -- F64: 数据采样器 --
+    src/utils/sampler/DataSampler.cpp
+
+    # -- F65: 多流数据合并器 --
+    src/utils/merger/DataStreamMerger.cpp
+
+    # -- F66: 环形缓冲区 --
+    src/utils/ring/DataRingBuffer.cpp
+
+    # -- F67: 协议帧验证器 --
+    src/protocol/validator/ProtocolFrameValidator.cpp
+
+    # -- F68: 数据关联器 --
+    src/utils/correlator/DataCorrelator.cpp
+
+    # -- F69: 数据插值器 --
+    src/utils/interpolator/DataInterpolator.cpp
+
+    # -- F70: 数据质量评分 --
+    src/utils/quality/DataQualityScorer.cpp
+
+    # -- F71: 事件时间线 --
+    src/utils/timeline/EventTimeline.cpp
 )
 
 set(HEADERS
@@ -1291,6 +1326,36 @@ set(HEADERS
 
     # -- F58: 协议回放引擎 --
     src/protocol/replay/ProtocolReplayEngine.h
+
+    # -- F59: 数据变换管线 --
+    src/utils/transform/DataTransformer.h
+
+    # -- F63: 数据批处理器 --
+    src/utils/batch/DataBatchProcessor.h
+
+    # -- F64: 数据采样器 --
+    src/utils/sampler/DataSampler.h
+
+    # -- F65: 多流数据合并器 --
+    src/utils/merger/DataStreamMerger.h
+
+    # -- F66: 环形缓冲区 --
+    src/utils/ring/DataRingBuffer.h
+
+    # -- F67: 协议帧验证器 --
+    src/protocol/validator/ProtocolFrameValidator.h
+
+    # -- F68: 数据关联器 --
+    src/utils/correlator/DataCorrelator.h
+
+    # -- F69: 数据插值器 --
+    src/utils/interpolator/DataInterpolator.h
+
+    # -- F70: 数据质量评分 --
+    src/utils/quality/DataQualityScorer.h
+
+    # -- F71: 事件时间线 --
+    src/utils/timeline/EventTimeline.h
 )
 
 set(RESOURCES
