@@ -788,6 +788,16 @@ set(SOURCES
     src/utils/tfidf/TfidfVectorizer.cpp
     src/utils/pagerank/PageRank.cpp
 
+    # -- F184~F191: Wave 32 工具模块(linter) --
+    src/utils/bitmap/BitmapIndex.cpp
+    src/utils/delta/DeltaEncoder.cpp
+    src/utils/dwt2/DaubechiesWavelet.cpp
+    src/utils/huffman2/AdaptiveHuffman.cpp
+    src/utils/hyperloglog/HyperLogLog.cpp
+    src/utils/lifting/LiftingScheme.cpp
+    src/utils/lzw2/LzwCodec2.cpp
+    src/utils/mergesort/MergeSorter.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -1674,6 +1684,16 @@ set(HEADERS
     src/utils/kalman2/ExtendedKalmanFilter.h
     src/utils/tfidf/TfidfVectorizer.h
     src/utils/pagerank/PageRank.h
+
+    # -- F184~F191: Wave 32 工具模块(linter) --
+    src/utils/bitmap/BitmapIndex.h
+    src/utils/delta/DeltaEncoder.h
+    src/utils/dwt2/DaubechiesWavelet.h
+    src/utils/huffman2/AdaptiveHuffman.h
+    src/utils/hyperloglog/HyperLogLog.h
+    src/utils/lifting/LiftingScheme.h
+    src/utils/lzw2/LzwCodec2.h
+    src/utils/mergesort/MergeSorter.h
 
     # -- F101: 一维卡尔曼滤波器 --
     src/utils/kalman/KalmanFilter1D.h

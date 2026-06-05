@@ -126,7 +126,7 @@ QByteArray AdaptiveHuffman::encode(const QByteArray& data)
     m_stats.treeNodes = m_tree.size();
 
     const double bps = static_cast<double>(allBits.size()) /
-                       static_cast<double>(std::max(data.size(), 1));
+                       static_cast<double>(std::max(data.size(), qsizetype(1)));
     if (m_stats.totalEncodes == 1) {
         m_stats.avgBitsPerSymbol = bps;
     } else {

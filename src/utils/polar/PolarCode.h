@@ -12,6 +12,7 @@
 #include <QObject>
 #include <QVector>
 #include <QByteArray>
+#include <QSet>
 
 /**
  * @class PolarCode

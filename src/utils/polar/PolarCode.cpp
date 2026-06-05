@@ -20,7 +20,6 @@ PolarCode::PolarCode(int n, int k, QObject* parent)
     , m_N(1 << n)
     , m_K(k)
 {
-    m_numStates = 1; // 不需要trellis状态
     computeReliability();
     selectFrozenBits();
 }
@@ -78,15 +77,15 @@ QVector<quint8> PolarCode::decodeSC(const QVector<quint8>& receivedBits)
         llr[i] = (receivedBits[i] == 0) ? 10.0 : -10.0;
     }
 
-    QVector<quint8> decoded(m_N, 0);
-    scDecodeRecursive(llr, decoded, 0, m_N);
+    QVector<quint8> decodedBits(m_N, 0);
+    scDecodeRecursive(llr, decodedBits, 0, m_N);
 
     // 提取信息位
     QVector<quint8> infoBits;
     infoBits.reserve(m_K);
     for (int i = 0; i < m_N; ++i) {
         if (!m_frozenSet.contains(i)) {
-            infoBits.append(decoded[i]);
+            infoBits.append(decodedBits[i]);
         }
     }
 
@@ -109,14 +108,14 @@ QVector<quint8> PolarCode::decodeSCLlr(const QVector<double>& llr)
     QElapsedTimer timer;
     timer.start();
 
-    QVector<quint8> decoded(m_N, 0);
-    scDecodeRecursive(llr, decoded, 0, m_N);
+    QVector<quint8> decodedBits(m_N, 0);
+    scDecodeRecursive(llr, decodedBits, 0, m_N);
 
     QVector<quint8> infoBits;
     infoBits.reserve(m_K);
     for (int i = 0; i < m_N; ++i) {
         if (!m_frozenSet.contains(i)) {
-            infoBits.append(decoded[i]);
+            infoBits.append(decodedBits[i]);
         }
     }
 
@@ -214,15 +213,15 @@ void PolarCode::polarTransform(QVector<quint8>& bits) const
 // ═══════════════════════════════════════════════════════════
 
 void PolarCode::scDecodeRecursive(const QVector<double>& llr,
-                                   QVector<quint8>& decoded,
+                                   QVector<quint8>& decodedBits,
                                    int offset, int length)
 {
     if (length == 1) {
         // 叶节点: 判决
         if (m_frozenSet.contains(offset)) {
-            decoded[offset] = 0; // 冻结位固定为0
+            decodedBits[offset] = 0; // 冻结位固定为0
         } else {
-            decoded[offset] = (llr[offset] >= 0) ? 0 : 1;
+            decodedBits[offset] = (llr[offset] >= 0) ? 0 : 1;
         }
         return;
     }
@@ -236,16 +235,16 @@ void PolarCode::scDecodeRecursive(const QVector<double>& llr,
     }
 
     // 递归左子树
-    scDecodeRecursive(leftLlr, decoded, offset, half);
+    scDecodeRecursive(leftLlr, decodedBits, offset, half);
 
     // 计算右子节点LLR (g函数)
     QVector<double> rightLlr(half);
     for (int i = 0; i < half; ++i) {
-        rightLlr[i] = llrRight(llr[i], llr[i + half], decoded[offset + i]);
+        rightLlr[i] = llrRight(llr[i], llr[i + half], decodedBits[offset + i]);
     }
 
     // 递归右子树
-    scDecodeRecursive(rightLlr, decoded, offset + half, half);
+    scDecodeRecursive(rightLlr, decodedBits, offset + half, half);
 }
 
 double PolarCode::llrLeft(double a, double b) const

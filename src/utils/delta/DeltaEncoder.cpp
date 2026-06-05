@@ -175,7 +175,7 @@ QByteArray DeltaEncoder::encode(const QByteArray& data)
     m_stats.totalBytesOut += static_cast<quint64>(result.size());
 
     const double ratio = static_cast<double>(result.size()) /
-                         static_cast<double>(std::max(data.size(), 1));
+                         static_cast<double>(std::max(data.size(), qsizetype(1)));
     if (m_stats.totalEncodes == 1) {
         m_stats.avgRatio = ratio;
     } else {
