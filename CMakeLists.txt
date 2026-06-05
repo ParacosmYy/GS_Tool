@@ -748,6 +748,17 @@ set(SOURCES
     # ── F41: 帧解码器 ──
     src/utils/decoder/SerialFrameDecoder.cpp
     src/utils/decoder/SerialFrameDecoderBuild.cpp
+
+    # -- F42: 数据加密引擎 --
+    src/utils/crypto/DataEncryptionEngine.cpp
+
+    # -- F46: 波形滤波器 --
+    src/chart/filter/WaveformFilter.cpp
+    src/chart/filter/WaveformFilterCompute.cpp
+
+    # -- F47: 数据流录制器 --
+    src/utils/recorder/DataStreamRecorder.cpp
+    src/utils/recorder/DataStreamRecorderExport.cpp
 )
 
 set(HEADERS
@@ -1128,6 +1139,15 @@ set(HEADERS
 
     # ── F40: 帧模板库 ──
     src/utils/template_lib/FrameTemplateLibrary.h
+
+    # -- F42: 数据加密引擎 --
+    src/utils/crypto/DataEncryptionEngine.h
+
+    # -- F46: 波形滤波器 --
+    src/chart/filter/WaveformFilter.h
+
+    # -- F47: 数据流录制器 --
+    src/utils/recorder/DataStreamRecorder.h
 )
 
 set(RESOURCES
