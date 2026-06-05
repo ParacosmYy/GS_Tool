@@ -2353,6 +2353,14 @@ set(SOURCES
     src/utils/tree121/Treap11.cpp
     src/utils/tree122/BPlusTree13.cpp
     src/utils/tree161/IntervalHeap.cpp
+    src/utils/cluster159/DBSCAN8.cpp
+    src/utils/code160/PolarCode4.cpp
+    src/utils/dsp161/MultibandGate.cpp
+    src/utils/fft162/ConstantQTransform.cpp
+    src/utils/graph175/ChromaticIndex.cpp
+    src/utils/matrix165/SingularValueSolver.cpp
+    src/utils/signal163/WienerFilter.cpp
+    src/utils/tree162/BStarTree.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -2416,6 +2424,18 @@ set(SOURCES
     src/utils/wavegen/WaveformGeneratorStats.cpp
     src/utils/wavegen/WaveformGeneratorWidget.cpp
     src/utils/wavegen/WaveformGeneratorWidgetStats.cpp
+
+    # ── GPS/NMEA 数据可视化 ──
+    src/utils/gps/NmeaParser.cpp
+    src/utils/gps/NmeaParserStats.cpp
+    src/utils/gps/GpsTrackWidget.cpp
+    src/utils/gps/GpsTrackWidgetStats.cpp
+
+    # ── F84: BLE Scanner ──
+    src/connection/ble_scanner/BleDeviceScanner.cpp
+    src/connection/ble_scanner/BleDeviceScannerStats.cpp
+    src/connection/ble_scanner/BleScanWidget.cpp
+    src/connection/ble_scanner/BleScanWidgetStats.cpp
 )
 
 set(HEADERS
@@ -4547,6 +4567,14 @@ set(HEADERS
     src/utils/tree121/Treap11.h
     src/utils/tree122/BPlusTree13.h
     src/utils/tree161/IntervalHeap.h
+    src/utils/cluster159/DBSCAN8.h
+    src/utils/code160/PolarCode4.h
+    src/utils/dsp161/MultibandGate.h
+    src/utils/fft162/ConstantQTransform.h
+    src/utils/graph175/ChromaticIndex.h
+    src/utils/matrix165/SingularValueSolver.h
+    src/utils/signal163/WienerFilter.h
+    src/utils/tree162/BStarTree.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
@@ -4607,6 +4635,11 @@ set(HEADERS
     src/utils/wavegen/WaveGenTypes.h
     src/utils/wavegen/WaveformGenerator.h
     src/utils/wavegen/WaveformGeneratorWidget.h
+
+    # ── F84: BLE Scanner ──
+    src/connection/ble_scanner/BleScanTypes.h
+    src/connection/ble_scanner/BleDeviceScanner.h
+    src/connection/ble_scanner/BleScanWidget.h
 )
 
 set(RESOURCES
