@@ -665,6 +665,10 @@ set(SOURCES
     src/utils/anomaly/AnomalyDetector.cpp
     src/utils/filter2/DigitalFilter.cpp
     src/utils/predictor/TrendPredictor.cpp
+    src/utils/histogram/HistogramBuilder.cpp
+    src/utils/spectrum/SpectrumAnalyzer.cpp
+    src/utils/statdist/StatDistribution.cpp
+    src/utils/entropy/EntropyCalculator.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1367,6 +1371,9 @@ set(HEADERS
 
     # -- F74: 趋势预测器 --
     src/utils/predictor/TrendPredictor.h
+
+    # -- F75: 直方图构建器 --
+    src/utils/histogram/HistogramBuilder.h
 )
 
 set(RESOURCES
