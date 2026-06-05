@@ -117,7 +117,7 @@ SymmetricEigen::EigenResult SymmetricEigen::decompose(
     QVector<int> indices(n);
     for (int i = 0; i < n; ++i) indices[i] = i;
     std::sort(indices.begin(), indices.end(),
-              [this](int a, int b) {
+              [&result](int a, int b) {
                   return result.eigenvalues[a] > result.eigenvalues[b];
               });
 

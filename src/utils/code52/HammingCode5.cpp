@@ -180,9 +180,77 @@ QVector<int> HammingCode5::decode(const QVector<int>& received)
 
 /**
  * @brief 重置所有统计数据
+ *
+ * 将编码次数、解码次数、错误次数、累计处理时间全部归零。
+ * 不影响已设置的参数（m_k, m_r, m_n）和校验矩阵。
  */
 void HammingCode5::resetStatistics()
 {
     m_stats = Stats();
     m_timeSum = 0.0;
+}
+
+/**
+ * @brief 获取码率 (数据位/码字长度)
+ * @return 码率值，范围(0, 1)
+ *
+ * 码率反映了编码的效率：
+ * - Hamming(7,4): 码率 = 4/7 ≈ 0.571
+ * - Hamming(15,11): 码率 = 11/15 ≈ 0.733
+ * - Hamming(31,26): 码率 = 26/31 ≈ 0.839
+ *
+ * 码率越高，纠错能力越弱但传输效率越高。
+ */
+double HammingCode5::codeRate() const
+{
+    return static_cast<double>(m_k) / m_n;
+}
+
+/**
+ * @brief 计算Hamming距离（两个码字之间的不同位数）
+ * @param a 第一个码字
+ * @param b 第二个码字
+ * @return Hamming距离
+ *
+ * Hamming码的最小Hamming距离为3，因此可以：
+ * - 检测2位错误
+ * - 纠正1位错误
+ */
+int HammingCode5::hammingDistance(const QVector<int>& a, const QVector<int>& b) const
+{
+    int dist = 0;
+    int len = qMin(a.size(), b.size());
+    for (int i = 0; i < len; ++i) {
+        if (a[i] != b[i]) ++dist;
+    }
+    return dist;
+}
+
+/**
+ * @brief 在码字中注入指定数量的随机错误比特
+ * @param code 原始码字
+ * @param numErrors 注入的错误数量，不超过码字长度
+ * @return 含错误的码字副本
+ *
+ * 用于测试纠错能力。随机选择numErrors个位置翻转比特。
+ */
+QVector<int> HammingCode5::injectErrors(const QVector<int>& code, int numErrors) const
+{
+    QVector<int> corrupted = code;
+    numErrors = qMin(numErrors, code.size());
+
+    /* 使用简单的伪随机选择避免重复 */
+    QVector<int> positions(code.size());
+    for (int i = 0; i < code.size(); ++i) positions[i] = i;
+
+    /* Fisher-Yates洗牌 */
+    for (int i = positions.size() - 1; i > 0 && numErrors > 0; --i) {
+        int j = i * 1103515245 + 12345; /* 简单LCG伪随机 */
+        j = (j >= 0) ? j % (i + 1) : (-j) % (i + 1);
+        if (i != j) std::swap(positions[i], positions[j]);
+        corrupted[positions[i]] ^= 1;
+        --numErrors;
+    }
+
+    return corrupted;
 }

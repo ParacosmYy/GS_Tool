@@ -20,5 +20,8 @@ private:
     double m_eps = 1.0; int m_minPts = 5;
     QVector<double> m_reachability;
     double dist(const QVector<double>& a, const QVector<double>& b) const;
+    double computeCoreDist(const QVector<QVector<double>>& data, int pt, const QVector<int>& neighbors);
+    void updateSeeds(const QVector<QVector<double>>& data, int pt, const QVector<int>& neighbors,
+                     double coreDist, const QVector<bool>& visited, QList<int>& seeds, QVector<int>& labels);
     Stats m_stats; double m_timeSum = 0.0;
 };

@@ -183,9 +183,66 @@ QPair<QVector<double>, QVector<double>> RecursiveDFT2::inverse(const QVector<dou
 
 /**
  * @brief 重置所有统计数据
+ *
+ * 将变换次数、总点数、累计处理时间归零。
+ * 不影响已设置的变换大小m_n。
  */
 void RecursiveDFT2::resetStatistics()
 {
     m_stats = Stats();
     m_timeSum = 0.0;
+}
+
+/**
+ * @brief 计算频谱幅度
+ * @param re 频域实部
+ * @param im 频域虚部
+ * @return 幅度谱向量
+ *
+ * 幅度 = sqrt(re^2 + im^2)
+ * 适用于分析forward()的输出结果。
+ */
+QVector<double> RecursiveDFT2::magnitude(const QVector<double>& re, const QVector<double>& im) const
+{
+    int len = qMin(re.size(), im.size());
+    QVector<double> mag(len);
+    for (int i = 0; i < len; ++i)
+        mag[i] = qSqrt(re[i] * re[i] + im[i] * im[i]);
+    return mag;
+}
+
+/**
+ * @brief 计算频谱相位
+ * @param re 频域实部
+ * @param im 频域虚部
+ * @return 相位谱向量（弧度）
+ *
+ * 相位 = atan2(im, re)
+ * 返回值范围 [-pi, pi]
+ */
+QVector<double> RecursiveDFT2::phase(const QVector<double>& re, const QVector<double>& im) const
+{
+    int len = qMin(re.size(), im.size());
+    QVector<double> ph(len);
+    for (int i = 0; i < len; ++i)
+        ph[i] = qAtan2(im[i], re[i]);
+    return ph;
+}
+
+/**
+ * @brief 计算功率谱密度 (PSD)
+ * @param re 频域实部
+ * @param im 频域虚部
+ * @return 功率谱密度向量
+ *
+ * PSD = (re^2 + im^2) / N
+ * 归一化后可用于频谱分析和能量分布计算。
+ */
+QVector<double> RecursiveDFT2::powerSpectrum(const QVector<double>& re, const QVector<double>& im) const
+{
+    int len = qMin(re.size(), im.size());
+    QVector<double> psd(len);
+    for (int i = 0; i < len; ++i)
+        psd[i] = (re[i] * re[i] + im[i] * im[i]) / m_n;
+    return psd;
 }

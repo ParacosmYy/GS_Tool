@@ -25,5 +25,6 @@ private:
     void splay(Node* x);
     void rotL(Node* x); void rotR(Node* x);
     void destroy(Node* n);
+    void updateStats(QElapsedTimer& timer);
     Stats m_stats; double m_timeSum = 0.0;
 };
