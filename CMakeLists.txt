@@ -755,7 +755,6 @@ set(SOURCES
     src/utils/symbol/SymbolDecoder.cpp
     src/utils/multiset/CountingMultiSet.cpp
     src/utils/deque/IndexedDeque.cpp
-    src/utils/hamming/HammingCode.cpp
     src/utils/gradient/NumericalGradient.cpp
     src/utils/armodel/AutoRegressiveModel.cpp
     src/utils/fractal/FractalDimension.cpp
@@ -1051,6 +1050,15 @@ set(SOURCES
     src/utils/set2/DisjointSetForest.cpp
     src/utils/signal3/VoiceActivityDetector2.cpp
     src/utils/streaming3/StreamingQuantile2.cpp
+
+    # ── Wave 55: 新增工具模块 ──
+    src/utils/morpho2/MorphologicalOps.cpp
+    src/utils/fit3/SplineInterpolation.cpp
+    src/utils/conv2/Convolution2D.cpp
+    src/utils/signal5/EnvelopeDetector.cpp
+    src/utils/graph9/MinimumSpanningTree.cpp
+    src/utils/code3/HammingCode.cpp
+    src/utils/cluster3/GaussianMixture2.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1940,8 +1948,7 @@ set(HEADERS
     src/utils/avltree/AvlTree.h
     # -- F107: 红黑树 --
     src/utils/redblack/RedBlackTree.h
-    # -- F108: 汉明码编解码器 --
-    src/utils/hamming/HammingCode.h
+    # -- F108: 汉明码编解码器 (duplicate removed) --
     # -- F109: 数值梯度计算器 --
     src/utils/gradient/NumericalGradient.h
     # -- F110: 自回归模型 --
@@ -2425,6 +2432,16 @@ set(HEADERS
     src/utils/set2/DisjointSetForest.h
     src/utils/signal3/VoiceActivityDetector2.h
     src/utils/streaming3/StreamingQuantile2.h
+
+    # ── Wave 55: 新增工具模块头文件 ──
+    src/utils/morpho2/MorphologicalOps.h
+    src/utils/fit3/SplineInterpolation.h
+    src/utils/conv2/Convolution2D.h
+    src/utils/linalg4/LuDecomposition.h
+    src/utils/signal5/EnvelopeDetector.h
+    src/utils/graph9/MinimumSpanningTree.h
+    src/utils/code3/HammingCode.h
+    src/utils/cluster3/GaussianMixture2.h
 )
 
 set(RESOURCES

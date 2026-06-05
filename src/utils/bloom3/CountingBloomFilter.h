@@ -119,7 +119,7 @@ private:
     quint64 m_expectedItems;         ///< 预期元素数
     double m_fpRate;                 ///< 期望误判率
 
-    QElapsedTimer m_timer;           ///< 计时器
-    double m_timeSum;                ///< 累计耗时
+    mutable QElapsedTimer m_timer;   ///< 计时器
+    mutable double m_timeSum;        ///< 累计耗时
     mutable Stats m_stats;
 };

@@ -41,7 +41,7 @@ public:
      * @return token列表
      */
     QVector<QString> tokenize(const QString& text,
-                               const QString& delimiters = QStringLiteral(" \t\n\r")) const;
+                               const QString& delimiters = QStringLiteral(" \t\n\r"));
 
     /**
      * @brief N-gram分词

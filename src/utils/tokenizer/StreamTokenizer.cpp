@@ -13,7 +13,7 @@ StreamTokenizer::StreamTokenizer(QObject* parent)
 }
 
 QVector<QString> StreamTokenizer::tokenize(const QString& text,
-                                             const QString& delimiters) const
+                                             const QString& delimiters)
 {
     QElapsedTimer timer;
     timer.start();
