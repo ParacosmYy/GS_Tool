@@ -661,8 +661,10 @@ set(SOURCES
     src/utils/quality/DataQualityScorer.cpp
     src/utils/sampler/DataSampler.cpp
     src/utils/interpolator/DataInterpolator.cpp
-    src/utils/timeline/EventTimeline.cpp
     src/utils/correlator/DataCorrelator.cpp
+    src/utils/anomaly/AnomalyDetector.cpp
+    src/utils/filter2/DigitalFilter.cpp
+    src/utils/predictor/TrendPredictor.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1356,6 +1358,15 @@ set(HEADERS
 
     # -- F71: 事件时间线 --
     src/utils/timeline/EventTimeline.h
+
+    # -- F72: 异常检测器 --
+    src/utils/anomaly/AnomalyDetector.h
+
+    # -- F73: 数字滤波器 --
+    src/utils/filter2/DigitalFilter.h
+
+    # -- F74: 趋势预测器 --
+    src/utils/predictor/TrendPredictor.h
 )
 
 set(RESOURCES
