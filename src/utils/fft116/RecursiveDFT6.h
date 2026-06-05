@@ -50,4 +50,9 @@ signals:
 
 private:
     Stats m_stats; double m_timeSum = 0.0;
+    int m_maxRecursionDepth = 20;
+    int m_slidingSize = 0;
+    double m_slidingSampleRate = 44100.0;
+    QVector<double> m_slidingBuffer;
+    QVector<QPair<double, double>> m_slidingSpectrum;
 };

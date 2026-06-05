@@ -55,4 +55,5 @@ signals:
 
 private:
     Stats m_stats; double m_timeSum = 0.0;
+    bool m_useBluestein = true;
 };

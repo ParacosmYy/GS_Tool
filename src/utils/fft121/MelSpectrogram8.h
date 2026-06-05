@@ -62,4 +62,11 @@ signals:
 
 private:
     Stats m_stats; double m_timeSum = 0.0;
+    int m_numMelBands = 128;
+    int m_fftSize = 2048;
+    double m_sampleRate = 44100.0;
+    double m_lowFreq = 0.0;
+    double m_highFreq = 22050.0;
+    QVector<QVector<double>> m_filterBank;
+    bool m_filterBankReady = false;
 };

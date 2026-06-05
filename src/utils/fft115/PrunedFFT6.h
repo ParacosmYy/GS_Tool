@@ -46,4 +46,5 @@ signals:
 
 private:
     Stats m_stats; double m_timeSum = 0.0;
+    int m_fftSize = 256;
 };

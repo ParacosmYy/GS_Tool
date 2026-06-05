@@ -109,6 +109,9 @@ public:
     QVector<double> designLowpass(double cutoff, double sampleRate,
                                   int order) const;
 
+    /** @brief 设计默认滤波器(使用当前参数) */
+    void designDefaultFilter();
+
     // ── 辅助 ──
 
     /** @brief 计算有效频率分辨率 @return 分辨率(Hz) */

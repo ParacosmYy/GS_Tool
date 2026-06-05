@@ -52,4 +52,11 @@ signals:
 
 private:
     Stats m_stats; double m_timeSum = 0.0;
+    double m_minFreq = 32.7;
+    double m_maxFreq = 4186.0;
+    int m_binsPerOctave = 12;
+    double m_sampleRate = 44100.0;
+    QVector<double> m_centerFreqs;
+    bool m_kernelComputed = false;
+    QVector<QVector<QPair<double, double>>> m_kernel;
 };

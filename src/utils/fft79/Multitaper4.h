@@ -39,6 +39,7 @@ signals:
     void estimationCompleted(int taperCount, int fftSize);
 
 private:
+    void generateDPSS(int N);
     Stats m_stats;
     double m_timeSum = 0.0;
     double m_NW = 4.0;
