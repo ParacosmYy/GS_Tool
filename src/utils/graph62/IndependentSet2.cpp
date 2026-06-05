@@ -10,6 +10,7 @@
 #include "utils/graph62/IndependentSet2.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
 #include <algorithm>
 #include <queue>

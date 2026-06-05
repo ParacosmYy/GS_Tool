@@ -14,6 +14,9 @@
 
 #include "utils/graph57/Bridges2.h"
 
+#include <QSet>
+#include <QStack>
+
 #include <QElapsedTimer>
 #include <algorithm>
 #include <stack>

@@ -6,6 +6,7 @@
 #include "utils/graph23/MaxBipartiteMatch.h"
 
 #include <QtMath>
+#include <QSet>
 #include <QtGlobal>
 #include <algorithm>
 #include <cmath>

@@ -40,6 +40,14 @@ signals:
     void treeComputed(int edgeCount, double weight);
 
 private:
+    /** @brief Kruskal算法求解 */
+    QVector<QPair<int,int>> kruskalSolve(int n,
+        const QVector<QPair<QPair<int,int>,double>>& edges);
+
+    /** @brief Prim算法求解 */
+    QVector<QPair<int,int>> primSolve(int n,
+        const QVector<QPair<QPair<int,int>,double>>& edges);
+
     Stats m_stats;
     double m_timeSum = 0.0;
     double m_totalWeight = 0.0;

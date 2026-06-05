@@ -1,5 +1,6 @@
 #include "StronglyConnected5.h"
 #include <QElapsedTimer>
+#include <QSet>
 #include <algorithm>
 
 /**

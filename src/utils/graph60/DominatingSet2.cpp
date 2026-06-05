@@ -10,6 +10,7 @@
 #include "utils/graph60/DominatingSet2.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
 #include <algorithm>
 #include <limits>

@@ -9,6 +9,7 @@
 #include "utils/graph59/SteinerTree2.h"
 
 #include <QElapsedTimer>
+#include <QSet>
 #include <QtMath>
 #include <algorithm>
 #include <limits>

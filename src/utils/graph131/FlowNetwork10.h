@@ -58,4 +58,5 @@ signals:
 
 private:
     Stats m_stats; double m_timeSum = 0.0;
+    QVector<QVector<double>> m_flowMatrix;
 };

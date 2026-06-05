@@ -145,7 +145,7 @@ QMap<QString, VertexColoring::ColoringResult> VertexColoring::compareAll()
 /* ──────────────────── 验证与分析 ──────────────────── */
 
 /** @brief 验证着色合法性 @param colors 颜色分配 @return 冲突边列表 */
-QVector<QPair<int, int>> VertexColoring::validateColoring(const QVector<int>& colors) const
+QVector<QPair<int, int>> VertexColoring::validateColoring(const QVector<int>& colors)
 {
     QVector<QPair<int, int>> conflicts;
 

@@ -127,7 +127,7 @@ public:
      * @param colors 颜色分配
      * @return 冲突边列表
      */
-    QVector<QPair<int, int>> validateColoring(const QVector<int>& colors) const;
+    QVector<QPair<int, int>> validateColoring(const QVector<int>& colors);
 
     /**
      * @brief 计算色数上下界
