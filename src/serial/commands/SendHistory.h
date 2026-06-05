@@ -78,7 +78,7 @@ public:
     void setMaxEntries(int max);
 
     /** @brief 获取历史总发送次数（包括去重的） */
-    int totalSendCount() const;
+    quint64 totalSendCount() const;
 
     /** @brief 获取最常发送的命令（按频率排序） */
     QList<QPair<QString, int>> mostFrequent(int topN = 10) const;
@@ -111,7 +111,7 @@ signals:
 private:
     QList<SendEntry> m_entries;             ///< 历史记录列表，按时间顺序排列
     QMap<QString, int> m_freqMap;           ///< 命令频率统计 text -> count
-    int m_totalSendCount = 0;               ///< 总发送次数（含去重）
+    quint64 m_totalSendCount = 0;               ///< 总发送次数（含去重），使用quint64防止溢出
     int m_maxEntries = 50;                  ///< 最大记录条数
     quint64 m_totalRecords = 0;             ///< 历史记录总条目数（累计添加）
     quint64 m_totalDuplicateSkips = 0;      ///< 因连续重复而被跳过的去重次数

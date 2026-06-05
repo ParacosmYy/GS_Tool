@@ -1,111 +1,146 @@
-/** @file ModbusMaster.h @brief Modbus主站(客户端) -- 发起请求并处理响应。支持RTU/ASCII/TCP模式，提供标准功能码便捷方法和自定义帧发送。统计增强: 按功能码分类计数 */
+/**
+ * @file ModbusMaster.h
+ * @brief Modbus主站(客户端) -- 支持RTU/TCP双模式，8种标准功能码
+ *
+ * 通过IConnection(RTU串口)或QTcpSocket(TCP)发送Modbus请求帧，
+ * 管理超时、CRC校验、事务ID追踪和响应解析。
+ * 帧发送与响应解析: @see ModbusMasterProtocol.cpp
+ * 统计接口: @see ModbusMasterStats.cpp
+ */
 #ifndef MODBUS_MASTER_H
 #define MODBUS_MASTER_H
 
 #include <QObject>
 #include <QTimer>
+#include <QTcpSocket>
 #include <QMap>
+#include <array>
 #include "protocol/modbus/ModbusTypes.h"
 #include "connection/interface/IConnection.h"
 
-/** @brief Modbus主站控制器。负责构造请求帧、发送并等待响应、超时管理。提供运行时统计接口，按功能码追踪读写成功率 */
+/** @brief Modbus主站运行时统计快照 */
+struct ModbusMasterStats {
+    quint64 totalRequests    = 0;  ///< 累计发送请求总数
+    quint64 totalResponses   = 0;  ///< 累计接收有效响应总数
+    quint64 totalTimeouts    = 0;  ///< 累计超时次数
+    quint64 totalCrcErrors   = 0;  ///< 累计CRC校验失败次数
+    quint64 totalExceptions  = 0;  ///< 累计Modbus异常响应次数
+    quint64 bytesTransmitted = 0;  ///< 累计发送字节数
+    quint64 bytesReceived    = 0;  ///< 累计接收字节数
+    std::array<quint64, 8> requestsByFunctionCode = {}; ///< [0]=FC01..[7]=FC16
+};
+
+/**
+ * @brief Modbus主站控制器 -- RTU/TCP双模式，构造PDU/ADU，解析响应
+ */
 class ModbusMaster : public QObject {
     Q_OBJECT
 
 public:
-    /** @brief 构造Modbus主站控制器 @param parent 父对象 */
-    explicit ModbusMaster(QObject* parent = nullptr);
+    /** @brief Modbus传输模式 */
+    enum class Mode { RTU, TCP };
+    Q_ENUM(Mode)
 
-    /** @brief 设置底层连接 @param connection IConnection连接实例 */
-    void setConnection(IConnection* connection);
+    explicit ModbusMaster(QObject* parent = nullptr); ///< @brief 构造主站
+    ~ModbusMaster() override;                         ///< @brief 析构释放TCP资源
 
-    /** @brief 设置响应超时时间 @param ms 超时毫秒数 */
-    void setTimeout(int ms);
+    // ---- 配置接口 ----
+    void setConnection(IConnection* connection);      ///< @brief 设置串口连接(RTU模式)
+    void setSlaveAddress(int address);                ///< @brief 设置从站地址(1-247)
+    void setMode(Mode mode);                          ///< @brief 设置传输模式
+    void setTimeout(int ms);                          ///< @brief 设置超时(毫秒)
+    void setBaudRate(int baudRate);                   ///< @brief 设置RTU波特率
+    void setTcpTarget(const QString& host, quint16 port = 502); ///< @brief 设置TCP目标
+    Mode mode() const;                                ///< @brief 当前传输模式
+    int timeout() const;                              ///< @brief 当前超时毫秒数
 
-    /** @brief 获取当前响应超时时间 @return 超时毫秒数 */
-    int timeout() const;
+    // ---- 通用请求接口 ----
+    /** @brief 发送Modbus请求 @param functionCode 功能码 @param startAddress 起始地址 @param quantity 数量 @param data 写入数据(读操作忽略) @return true=已发送 */
+    bool sendRequest(quint8 functionCode, quint16 startAddress,
+                     quint16 quantity, const QByteArray& data = QByteArray());
 
-    /** @brief 读线圈状态(FC01) @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=请求已发送 */
-    bool readCoils(int slave, int start, int count);
-    /** @brief 读保持寄存器(FC03) @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=请求已发送 */
-    bool readHoldingRegisters(int slave, int start, int count);
-    /** @brief 读输入寄存器(FC04) @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=请求已发送 */
-    bool readInputRegisters(int slave, int start, int count);
-    /** @brief 写单个寄存器(FC06) @param slave 从站地址 @param addr 寄存器地址 @param value 写入值 @return true=请求已发送 */
-    bool writeSingleRegister(int slave, int addr, quint16 value);
-    /** @brief 写多个寄存器(FC16) @param slave 从站地址 @param addr 起始地址 @param values 写入值列表 @return true=请求已发送 */
-    bool writeMultipleRegisters(int slave, int addr, const QList<quint16>& values);
-    /** @brief 发送自定义Modbus帧 @param frame Modbus帧结构 @return true=发送成功 */
-    bool sendCustomFrame(const ModbusFrame& frame);
+    // ---- 功能码便捷方法 ----
+    bool readCoils(int start, int count);              ///< @brief FC01读线圈
+    bool readDiscreteInputs(int start, int count);     ///< @brief FC02读离散输入
+    bool readHoldingRegisters(int start, int count);   ///< @brief FC03读保持寄存器
+    bool readInputRegisters(int start, int count);     ///< @brief FC04读输入寄存器
+    bool writeSingleCoil(int addr, bool on);           ///< @brief FC05写单个线圈
+    bool writeSingleRegister(int addr, quint16 value); ///< @brief FC06写单个寄存器
+    bool writeMultipleCoils(int start, const QList<bool>& values); ///< @brief FC15写多个线圈
+    bool writeMultipleRegisters(int start, const QList<quint16>& values); ///< @brief FC16
 
     // ---- 统计接口 ----
-    quint64 totalRequests() const;            ///< @brief 累计发送请求总数 @return 请求次数
-    quint64 totalResponses() const;           ///< @brief 累计接收有效响应总数 @return 响应次数
-    quint64 totalTimeouts() const;            ///< @brief 累计超时次数 @return 超时次数
-    quint64 totalErrors() const;              ///< @brief 累计Modbus异常响应总数 @return 异常次数
-    quint64 successfulReads() const;          ///< @brief 累计读操作成功次数 @return 成功次数
-    quint64 failedReads() const;              ///< @brief 累计读操作失败次数(含超时+异常) @return 失败次数
-    quint64 successfulWrites() const;         ///< @brief 累计写操作成功次数 @return 成功次数
-    quint64 failedWrites() const;             ///< @brief 累计写操作失败次数(含超时+异常) @return 失败次数
-    /** @brief 获取指定功能码的调用次数 @param fc 功能码 @return 调用次数 */
-    quint64 functionCodeCount(int fc) const;
-    quint64 totalExceptions() const;          ///< @brief 累计Modbus异常响应次数(功能码最高位置1) @return 异常次数
-    quint64 totalRetries() const;             ///< @brief 累计重试发送次数 @return 重试次数
-    /** @brief 重置所有统计计数器 */
-    void resetStats();
+    ModbusMasterStats stats() const;   ///< @brief 获取统计快照
+    void resetStatistics();            ///< @brief 重置所有统计
+    void resetStats();                 ///< @brief 兼容旧接口
 
     // ---- 兼容旧接口 ----
-    /** @brief 读寄存器(默认FC03, 兼容旧接口) @param slave 从站地址 @param start 起始地址 @param count 读取数量 @return true=请求已发送 */
+    bool sendCustomFrame(const ModbusFrame& frame);
+    void setConnection(IConnection* connection, int slave);
     bool readRegisters(int slave, int start, int count);
-    quint64 requestCount() const;             ///< @brief 已发送请求计数(兼容旧接口) @return 请求次数
-    quint64 responseCount() const;            ///< @brief 已接收响应计数(兼容旧接口) @return 响应次数
-    quint64 timeoutCount() const;             ///< @brief 超时次数(兼容旧接口) @return 超时次数
-    quint64 errorCount() const;               ///< @brief 异常响应计数(兼容旧接口) @return 异常次数
-    /** @brief 重置统计数据(兼容旧接口, 等同resetStats) */
-    void resetStatistics();
+    quint64 totalRequests() const;
+    quint64 totalResponses() const;
+    quint64 totalTimeouts() const;
+    quint64 totalErrors() const;
+    quint64 totalCrcErrors() const;
+    quint64 successfulReads() const;
+    quint64 failedReads() const;
+    quint64 successfulWrites() const;
+    quint64 failedWrites() const;
+    quint64 totalExceptions() const;
+    quint64 totalRetries() const;
+    quint64 functionCodeCount(int fc) const;
+    quint64 bytesTransmitted() const;
+    quint64 bytesReceived() const;
 
 signals:
-    /** @brief 收到有效响应 @param frame 响应帧数据 */
-    void responseReceived(const ModbusFrame& frame);
-    /** @brief 响应超时 @param slave 从站地址 @param function 功能码 */
-    void timeout(int slave, int function);
-    /** @brief Modbus异常响应 @param errorCode 异常码 */
-    void error(ModbusError errorCode);
+    void responseReceived(const QByteArray& data, quint8 functionCode); ///< @brief 收到响应PDU
+    void timeoutOccurred(quint8 functionCode);                          ///< @brief 超时
+    void communicationError(const QString& message);                    ///< @brief 通信错误
+    void responseReceived(const ModbusFrame& frame);  ///< @brief 兼容旧信号
+    void timeout(int slave, int function);            ///< @brief 兼容旧信号
+    void error(ModbusError errorCode);                ///< @brief 兼容旧信号
 
 private slots:
-    /** @brief 处理底层连接收到的原始数据 @param data 原始字节流 */
-    void onRawDataReceived(const QByteArray& data);
-    /** @brief 响应超时处理，累加超时计数并尝试恢复 */
-    void onTimeout();
+    void onRawDataReceived(const QByteArray& data); ///< @brief RTU串口数据到达
+    void onTcpReadyRead();                          ///< @brief TCP数据到达
+    void onTimeout();                               ///< @brief 超时处理
 
 private:
-    /** @brief 发送原始帧数据到底层连接 @param rawData 完整帧字节(含CRC) @return true=发送成功 */
+    QByteArray buildRtuAdu(quint8 slave, quint8 fc, quint16 start, quint16 qty, const QByteArray& data);
+    QByteArray buildTcpAdu(quint8 fc, quint16 start, quint16 qty, const QByteArray& data);
     bool sendFrame(const QByteArray& rawData);
-    /** @brief 解析底层连接收到的响应帧 @param data 原始响应数据 */
-    void parseResponse(const QByteArray& data);
-    /** @brief 判断功能码是否为读操作 @param fc 功能码 @return true=读操作 */
+    void parseRtuResponse(const QByteArray& data);
+    void parseTcpResponse(const QByteArray& data);
+    void handleResponse(const ModbusFrame& frame);
+    static int fcToIndex(quint8 fc);
     static bool isReadFunction(quint8 fc);
-    /** @brief 判断功能码是否为写操作 @param fc 功能码 @return true=写操作 */
     static bool isWriteFunction(quint8 fc);
+    void connectTcpSocket();
+    void disconnectTcpSocket();
 
-    IConnection* m_connection = nullptr;  ///< 底层连接接口
-    int          m_timeoutMs   = 1000;    ///< 超时时间（毫秒）
-    quint8       m_lastSlave   = 1;       ///< 上次请求的从站地址
-    quint8       m_lastFunction = 3;      ///< 上次请求的功能码
-    QTimer*      m_timer       = nullptr; ///< 响应超时定时器
-    QByteArray   m_rxBuffer;              ///< 接收缓冲区
+    IConnection* m_connection   = nullptr;  ///< RTU底层连接
+    Mode         m_mode         = Mode::RTU;///< 传输模式
+    quint8       m_slaveAddress = 1;        ///< 从站地址
+    int          m_timeoutMs    = 1000;     ///< 超时毫秒
+    int          m_baudRate     = 9600;     ///< RTU波特率
+    QString      m_tcpHost;                 ///< TCP主机
+    quint16      m_tcpPort      = 502;      ///< TCP端口
+    QTcpSocket*  m_tcpSocket    = nullptr;  ///< TCP套接字
+    quint16      m_transactionId= 0;        ///< TCP事务ID
+    quint16      m_lastTxId     = 0;        ///< 最近事务ID
+    quint8       m_lastFunction = 3;        ///< 上次功能码
+    QTimer*      m_timer        = nullptr;  ///< 超时定时器
+    QByteArray   m_rxBuffer;                ///< 接收缓冲区
 
-    quint64 m_totalRequests    = 0;       ///< 累计发送请求总数
-    quint64 m_totalResponses   = 0;       ///< 累计接收有效响应总数
-    quint64 m_totalTimeouts    = 0;       ///< 累计超时次数
-    quint64 m_totalErrors      = 0;       ///< 累计Modbus异常响应总数
-    quint64 m_totalExceptions  = 0;       ///< 累计Modbus异常响应次数（功能码最高位置1）
-    quint64 m_totalRetries     = 0;       ///< 累计重试发送次数
-    quint64 m_successfulReads  = 0;       ///< 累计读操作成功次数
-    quint64 m_failedReads      = 0;       ///< 累计读操作失败次数
-    quint64 m_successfulWrites = 0;       ///< 累计写操作成功次数
-    quint64 m_failedWrites     = 0;       ///< 累计写操作失败次数
-    QMap<int, quint64> m_fcStats;         ///< 各功能码调用次数
+    quint64 m_totalRequests    = 0; quint64 m_totalResponses   = 0;
+    quint64 m_totalTimeouts    = 0; quint64 m_totalCrcErrors   = 0;
+    quint64 m_totalErrors      = 0; quint64 m_totalExceptions  = 0;
+    quint64 m_totalRetries     = 0;
+    quint64 m_successfulReads  = 0; quint64 m_failedReads      = 0;
+    quint64 m_successfulWrites = 0; quint64 m_failedWrites     = 0;
+    quint64 m_bytesTransmitted = 0; quint64 m_bytesReceived    = 0;
+    QMap<int, quint64> m_fcStats;           ///< 各功能码调用次数
 };
 
 #endif // MODBUS_MASTER_H

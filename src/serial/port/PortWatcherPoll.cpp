@@ -140,11 +140,16 @@ QMap<QString, PortDeviceInfo> PortWatcher::queryAvailableDevices()
     return devices;
 }
 
-/** @brief 将QSerialPortInfo转换为PortDeviceInfo @param info Qt串口信息 @return 设备信息 */
+/** @brief 将QSerialPortInfo转换为PortDeviceInfo(含空端口名防护) @param info Qt串口信息 @return 设备信息 */
 PortDeviceInfo PortWatcher::fromQtInfo(const QSerialPortInfo& info)
 {
     PortDeviceInfo dev;
-    dev.portName = info.portName();
+    dev.portName = info.portName().trimmed();
+    // 空端口名回退: 使用系统路径或占位符，避免空键导致QMap异常
+    if (dev.portName.isEmpty()) {
+        dev.portName = info.systemLocation().isEmpty()
+            ? QObject::tr("未知端口") : info.systemLocation();
+    }
     dev.description = info.description();
     dev.manufacturer = info.manufacturer();
     dev.serialNumber = info.serialNumber();

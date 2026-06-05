@@ -34,9 +34,10 @@ void SerialConfigPanel::updatePinoutLeds(const PinoutSignals& pinSignals)
     updateLed(m_dcdLed, pinSignals.dcd); updateLed(m_riLed, pinSignals.ri);
 }
 
-/** @brief 刷新信号按钮视觉状态，通过QSS property驱动颜色切换 */
+/** @brief 刷新信号按钮视觉状态，通过QSS property驱动颜色切换 @param btn 信号按钮(空指针安全检查) @param high true=高电平 false=低电平 */
 void SerialConfigPanel::refreshSignalStyle(QPushButton* btn, bool high)
 {
+    if (!btn) return; ///< 空指针防护: 防止btn为nullptr时崩溃
     btn->setProperty("signalState", high ? "high" : "low");
     btn->style()->unpolish(btn);
     btn->style()->polish(btn);

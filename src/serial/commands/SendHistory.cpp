@@ -132,8 +132,13 @@ void SendHistory::setMaxEntries(int max)
     // 限制最大记录数的最小值为1，防止设为0导致异常
     m_maxEntries = qMax(1, max);
 
-    // 如果当前记录数已经超过新的上限，裁剪掉多余的旧记录
+    // 如果当前记录数已经超过新的上限，裁剪掉多余的旧记录并同步频率映射
     while (m_entries.size() > m_maxEntries) {
+        const QString oldText = m_entries.first().text;
+        if (m_freqMap.contains(oldText)) {
+            if (--m_freqMap[oldText] <= 0)
+                m_freqMap.remove(oldText);
+        }
         m_entries.removeFirst();
     }
 }

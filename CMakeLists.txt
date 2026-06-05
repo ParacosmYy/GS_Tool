@@ -649,6 +649,7 @@ set(SOURCES
     # ── F31: 字节模式搜索器 ──
     src/utils/pattern/BytePatternAnalyzer.cpp
     src/utils/pattern/BytePatternAnalyzerStats.cpp
+    src/utils/pattern/DataPatternDetector.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -743,6 +744,10 @@ set(SOURCES
     # ── F40: 帧模板库 ──
     src/utils/template_lib/FrameTemplateLibrary.cpp
     src/utils/template_lib/FrameTemplateLibraryStats.cpp
+
+    # ── F41: 帧解码器 ──
+    src/utils/decoder/SerialFrameDecoder.cpp
+    src/utils/decoder/SerialFrameDecoderBuild.cpp
 )
 
 set(HEADERS

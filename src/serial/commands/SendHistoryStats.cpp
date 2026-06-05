@@ -63,7 +63,7 @@ QString SendHistory::statisticsSummary() const
 }
 
 /** @brief 获取历史总发送次数 @return 总发送次数（含去重） */
-int SendHistory::totalSendCount() const
+quint64 SendHistory::totalSendCount() const
 {
     return m_totalSendCount;
 }
