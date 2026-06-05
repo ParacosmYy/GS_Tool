@@ -653,6 +653,7 @@ set(SOURCES
     src/utils/pattern/BytePatternAnalyzerStats.cpp
     src/utils/pattern/DataPatternDetector.cpp
     src/utils/scaler/DataScalerWidget.cpp
+    src/utils/normalize/DataNormalizer.cpp
     src/utils/threshold/DataThresholdMonitor.cpp
     src/utils/capture/DataCaptureBuffer.cpp
     src/utils/crc_verifier/CrcStreamVerifier.cpp
@@ -669,10 +670,17 @@ set(SOURCES
     src/utils/spectrum/SpectrumAnalyzer.cpp
     src/utils/statdist/StatDistribution.cpp
     src/utils/entropy/EntropyCalculator.cpp
+    src/utils/crosscorr/CrossCorrelator.cpp
+    src/utils/derivative/NumericalDerivative.cpp
+    src/utils/window/DataWindowManager.cpp
     src/utils/decomposer/SignalDecomposer.cpp
     src/utils/sliding/SlidingWindowStats.cpp
     src/utils/trigger/DataTrigger.cpp
     src/utils/state/StateTracker.cpp
+    src/utils/cycle/CycleDetector.cpp
+    src/utils/smoother/DataSmoother.cpp
+    src/utils/peaks/PeakDetector.cpp
+    src/utils/warp/TimeWarp.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
@@ -1387,6 +1395,15 @@ set(HEADERS
 
     # -- F78: 熵计算器 --
     src/utils/entropy/EntropyCalculator.h
+
+    # -- F79: 互相关分析器 --
+    src/utils/crosscorr/CrossCorrelator.h
+
+    # -- F80: 数值微分器 --
+    src/utils/derivative/NumericalDerivative.h
+
+    # -- F81: 数据窗口管理器 --
+    src/utils/window/DataWindowManager.h
 )
 
 set(RESOURCES
