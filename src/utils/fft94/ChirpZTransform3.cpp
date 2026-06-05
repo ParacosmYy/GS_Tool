@@ -108,6 +108,50 @@ void ChirpZTransform3::compute(const QVector<double>& input)
 }
 
 /**
+ * @brief 获取当前比率参数
+ * @return 螺旋比率
+ */
+double ChirpZTransform3::ratio() const
+{
+    return m_ratio;
+}
+
+/**
+ * @brief 获取当前变换阶数
+ * @return 输出点数
+ */
+int ChirpZTransform3::order() const
+{
+    return m_order;
+}
+
+/**
+ * @brief 计算单位圆上的频率响应(CZT特例)
+ *
+ * 当ratio=1时，CZT退化为单位圆上的DFT，
+ * 可用于Zoom FFT分析。
+ *
+ * @param input 输入信号
+ * @return 频率响应幅度
+ */
+QVector<double> ChirpZTransform3::unitCircleResponse(const QVector<double>& input) const
+{
+    if (input.isEmpty()) return QVector<double>();
+    int N = input.size();
+    QVector<double> response(m_order, 0.0);
+    for (int k = 0; k < m_order; ++k) {
+        double re = 0.0, im = 0.0;
+        for (int n = 0; n < N; ++n) {
+            double angle = -2.0 * M_PI * k * n / m_order;
+            re += input[n] * std::cos(angle);
+            im += input[n] * std::sin(angle);
+        }
+        response[k] = std::sqrt(re * re + im * im);
+    }
+    return response;
+}
+
+/**
  * @brief 重置统计数据
  */
 void ChirpZTransform3::resetStatistics()

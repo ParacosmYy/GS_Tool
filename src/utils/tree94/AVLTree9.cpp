@@ -74,42 +74,24 @@ static AVLTree9::Node* rotateLeft(AVLTree9::Node* x)
 
 /**
  * @brief 递归插入辅助函数
- * @param node 当前子树根节点
+ * @param node 当前子树根
  * @param key 插入键
  * @param value 关联值
- * @return 平衡后的子树根节点
+ * @return 平衡后的子树根
  */
 static AVLTree9::Node* insertNode(AVLTree9::Node* node, double key, int value)
 {
     if (!node) return new AVLTree9::Node{key, value, 1, nullptr, nullptr};
-
-    if (key < node->key) {
-        node->left = insertNode(node->left, key, value);
-    } else if (key > node->key) {
-        node->right = insertNode(node->right, key, value);
-    } else {
-        node->value = value;
-        return node;
-    }
+    if (key < node->key) node->left = insertNode(node->left, key, value);
+    else if (key > node->key) node->right = insertNode(node->right, key, value);
+    else { node->value = value; return node; }
 
     updateHeight(node);
     int bf = balanceFactor(node);
-
-    /* LL型 */
     if (bf > 1 && key < node->left->key) return rotateRight(node);
-    /* RR型 */
     if (bf < -1 && key > node->right->key) return rotateLeft(node);
-    /* LR型 */
-    if (bf > 1 && key > node->left->key) {
-        node->left = rotateLeft(node->left);
-        return rotateRight(node);
-    }
-    /* RL型 */
-    if (bf < -1 && key < node->right->key) {
-        node->right = rotateRight(node->right);
-        return rotateLeft(node);
-    }
-
+    if (bf > 1 && key > node->left->key) { node->left = rotateLeft(node->left); return rotateRight(node); }
+    if (bf < -1 && key < node->right->key) { node->right = rotateRight(node->right); return rotateLeft(node); }
     return node;
 }
 
@@ -148,44 +130,27 @@ static AVLTree9::Node* findMin(AVLTree9::Node* node)
 
 /**
  * @brief 递归删除辅助函数
- * @param node 当前子树根节点
- * @param key 待删除键
- * @return 平衡后的子树根节点
  */
 static AVLTree9::Node* removeNode(AVLTree9::Node* node, double key)
 {
     if (!node) return nullptr;
-
-    if (key < node->key) {
-        node->left = removeNode(node->left, key);
-    } else if (key > node->key) {
-        node->right = removeNode(node->right, key);
-    } else {
+    if (key < node->key) node->left = removeNode(node->left, key);
+    else if (key > node->key) node->right = removeNode(node->right, key);
+    else {
         if (!node->left || !node->right) {
             AVLTree9::Node* child = node->left ? node->left : node->right;
-            delete node;
-            return child;
+            delete node; return child;
         }
         AVLTree9::Node* successor = findMin(node->right);
-        node->key = successor->key;
-        node->value = successor->value;
+        node->key = successor->key; node->value = successor->value;
         node->right = removeNode(node->right, successor->key);
     }
-
     updateHeight(node);
     int bf = balanceFactor(node);
-
     if (bf > 1 && balanceFactor(node->left) >= 0) return rotateRight(node);
-    if (bf > 1 && balanceFactor(node->left) < 0) {
-        node->left = rotateLeft(node->left);
-        return rotateRight(node);
-    }
+    if (bf > 1 && balanceFactor(node->left) < 0) { node->left = rotateLeft(node->left); return rotateRight(node); }
     if (bf < -1 && balanceFactor(node->right) <= 0) return rotateLeft(node);
-    if (bf < -1 && balanceFactor(node->right) > 0) {
-        node->right = rotateRight(node->right);
-        return rotateLeft(node);
-    }
-
+    if (bf < -1 && balanceFactor(node->right) > 0) { node->right = rotateRight(node->right); return rotateLeft(node); }
     return node;
 }
 

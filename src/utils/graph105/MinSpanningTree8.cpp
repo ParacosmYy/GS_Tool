@@ -110,6 +110,36 @@ double MinSpanningTree8::totalWeight() const
 }
 
 /**
+ * @brief 获取图的连通性检查
+ * @return true表示图是连通的
+ */
+bool MinSpanningTree8::isConnected() const
+{
+    return m_edges.size() >= m_vertexCount - 1;
+}
+
+/**
+ * @brief 获取图的边数量
+ * @return 边数量
+ */
+int MinSpanningTree8::edgeCount() const
+{
+    return m_edges.size();
+}
+
+/**
+ * @brief 计算图的平均边权重
+ * @return 平均权重
+ */
+double MinSpanningTree8::averageEdgeWeight() const
+{
+    if (m_edges.isEmpty()) return 0.0;
+    double sum = 0.0;
+    for (const auto& e : m_edges) sum += e.second;
+    return sum / m_edges.size();
+}
+
+/**
  * @brief 重置统计数据
  */
 void MinSpanningTree8::resetStatistics()

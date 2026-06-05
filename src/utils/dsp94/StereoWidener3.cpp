@@ -115,6 +115,38 @@ double StereoWidener3::midSideRatio() const
 }
 
 /**
+ * @brief 获取当前宽度设置
+ * @return 宽度参数
+ */
+double StereoWidener3::width() const
+{
+    return m_width;
+}
+
+/**
+ * @brief 将单声道信号转换为立体声
+ *
+ * 通过添加微小延迟和相位偏移创建伪立体声效果。
+ *
+ * @param mono 单声道输入
+ * @param delaySamples 延迟采样数(1~30)
+ * @return 双声道输出
+ */
+QVector<QVector<double>> StereoWidener3::monoToStereo(
+    const QVector<double>& mono, int delaySamples) const
+{
+    if (mono.isEmpty()) return QVector<QVector<double>>();
+    int N = mono.size();
+    QVector<QVector<double>> stereo(N, QVector<double>(2, 0.0));
+    for (int i = 0; i < N; ++i) {
+        stereo[i][0] = mono[i];
+        int delayed = qMax(0, i - delaySamples);
+        stereo[i][1] = mono[delayed] * 0.7;
+    }
+    return stereo;
+}
+
+/**
  * @brief 重置统计数据
  */
 void StereoWidener3::resetStatistics()

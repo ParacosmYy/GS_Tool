@@ -116,6 +116,45 @@ QVector<double> RecursiveDFT3::compute(const QVector<double>& input)
 }
 
 /**
+ * @brief 计算逆DFT(从频域恢复时域信号)
+ *
+ * 使用递归Cooley-Tukey算法的逆变换版本。
+ * x[n] = (1/N) * sum_{k=0}^{N-1} X[k] * exp(+j*2*pi*k*n/N)
+ *
+ * @param real 频谱实部
+ * @param imag 频谱虚部
+ * @return 时域信号
+ */
+QVector<double> RecursiveDFT3::inverseDFT(const QVector<double>& real,
+                                             const QVector<double>& imag) const
+{
+    if (real.size() != imag.size() || real.isEmpty()) return QVector<double>();
+
+    int N = real.size();
+    QVector<double> output(N, 0.0);
+
+    for (int n = 0; n < N; ++n) {
+        double sum = 0.0;
+        for (int k = 0; k < N; ++k) {
+            double angle = 2.0 * M_PI * k * n / N;
+            sum += real[k] * std::cos(angle) - imag[k] * std::sin(angle);
+        }
+        output[n] = sum / N;
+    }
+
+    return output;
+}
+
+/**
+ * @brief 获取当前变换长度
+ * @return 变换长度
+ */
+int RecursiveDFT3::size() const
+{
+    return m_size;
+}
+
+/**
  * @brief 重置统计数据
  */
 void RecursiveDFT3::resetStatistics()

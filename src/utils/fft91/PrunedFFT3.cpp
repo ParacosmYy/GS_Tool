@@ -114,6 +114,29 @@ void PrunedFFT3::setFullSpectrum()
 }
 
 /**
+ * @brief 获取计算效率提升比例
+ * @return 相比全FFT节省的计算量百分比(0~1)
+ */
+double PrunedFFT3::efficiencyGain() const
+{
+    return savingsRatio();
+}
+
+/**
+ * @brief 设置指定频率范围激活(便捷方法)
+ * @param minFreq 最小频率索引
+ * @param maxFreq 最大频率索引
+ * @param totalBins 总频率bin数
+ */
+void PrunedFFT3::setFrequencyRange(int minFreq, int maxFreq, int totalBins)
+{
+    m_pruneMask.resize(totalBins, false);
+    for (int i = minFreq; i <= maxFreq && i < totalBins; ++i) {
+        m_pruneMask[i] = true;
+    }
+}
+
+/**
  * @brief 重置统计数据
  */
 void PrunedFFT3::resetStatistics()

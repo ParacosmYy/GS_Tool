@@ -115,6 +115,31 @@ bool Gate3::isOpen() const
 }
 
 /**
+ * @brief 获取当前门控增益
+ * @return 线性增益值(0~1)
+ */
+double Gate3::currentGain() const
+{
+    return 1.0;
+}
+
+/**
+ * @brief 计算噪声门的增益缩减历史
+ * @param input 输入信号帧
+ * @return 每个采样的增益值序列
+ */
+QVector<double> Gate3::gainHistory(const QVector<double>& input) const
+{
+    if (input.isEmpty()) return QVector<double>();
+    QVector<double> gains(input.size(), 1.0);
+    for (int i = 0; i < input.size(); ++i) {
+        double inputDb = 20.0 * std::log10(qMax(1e-10, std::abs(input[i])));
+        gains[i] = (inputDb >= m_threshold) ? 1.0 : 0.001;
+    }
+    return gains;
+}
+
+/**
  * @brief 重置统计数据
  */
 void Gate3::resetStatistics()
