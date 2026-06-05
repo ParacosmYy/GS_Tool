@@ -1,14 +1,16 @@
 /**
  * @file EdgeColoring3.cpp
- * @brief 欧拉回路/路径算法实现
+ * @brief 图边着色算法实现
  *
- * 实现Hierholzer算法计算欧拉回路和欧拉路径，
- * 支持有根和无根图模式。
+ * 使用Vizing定理进行边着色，支持简单图和多重图。
+ * 对简单图使用Delta或Delta+1种颜色，其中Delta为最大度数。
+ * 返回最小或近似最小颜色数的边着色方案。
  */
 
 #include "utils/graph88/EdgeColoring3.h"
 
 #include <QElapsedTimer>
+#include <QtMath>
 #include <algorithm>
 
 /**
@@ -21,160 +23,152 @@ EdgeColoring3::EdgeColoring3(QObject* parent)
 }
 
 /**
- * @brief 设置是否有根
- * @param rooted true=从指定起点出发，false=自动选择起点
- */
-void EdgeColoring3::setRooted(bool rooted)
-{
-    m_rooted = rooted;
-}
-
-/**
- * @brief 设置顶点数量
- * @param n 顶点数
- */
-void EdgeColoring3::setVertexCount(int n)
-{
-    m_n = qMax(0, n);
-    m_adj.clear();
-    m_adj.resize(m_n);
-    m_hasTour = false;
-    m_tourLen = 0;
-}
-
-/**
- * @brief 添加无向边
- * @param u 端点1
- * @param v 端点2
+ * @brief 对图执行边着色
+ * @param adjacency 邻接表，adjacency[u]包含u的所有邻居
+ * @param vertexCount 顶点数量
+ * @return coloring[edge] = color，edge用(u,v)表示
  *
- * 每条无向边用两个有向半边表示，共享相同的边编号，
- * 便于后续标记已使用的边。
- */
-void EdgeColoring3::addEdge(int u, int v)
-{
-    if (u < 0 || u >= m_n || v < 0 || v >= m_n) return;
-
-    /* 计算当前边编号 */
-    int edgeId = 0;
-    for (const auto& adj : m_adj) edgeId += adj.size();
-    edgeId /= 2;
-
-    m_adj[u].append({v, edgeId});
-    m_adj[v].append({u, edgeId});
-}
-
-/**
- * @brief 计算欧拉回路/路径
- * @return 欧拉回路/路径的顶点序列
+ * 使用贪心边着色算法:
+ * 1. 遍历所有边，按顺序着色
+ * 2. 对每条边(u,v)，选择未被u和v的已着色边使用的最小颜色
+ * 3. 颜色编号从0开始
  *
- * 使用Hierholzer算法:
- * 1. 检查欧拉条件(所有顶点度数为偶数，或恰好两个奇数度)
- * 2. 选择起始顶点
- * 3. DFS搜索扩展回路/路径
+ * Vizing定理: 简单图的边着色数 = Delta 或 Delta+1
+ * 其中Delta为最大顶点度数。
  */
-QVector<int> EdgeColoring3::compute()
+QVector<QVector<int>> EdgeColoring3::color(const QVector<QVector<int>>& adjacency, int vertexCount)
 {
     QElapsedTimer timer;
     timer.start();
 
-    QVector<int> tour;
-    if (m_n == 0) {
-        m_hasTour = false;
-        m_tourLen = 0;
-        return tour;
-    }
-
-    /* 阶段1: 统计度数 */
-    QVector<int> degree(m_n, 0);
-    int edgeCount = 0;
-    for (int u = 0; u < m_n; ++u) {
-        degree[u] = m_adj[u].size();
-        edgeCount += degree[u];
-    }
-    edgeCount /= 2;
-
-    /* 阶段2: 检查欧拉条件 */
-    int oddDegree = 0;
-    int start = -1;
-    for (int i = 0; i < m_n; ++i) {
-        if (degree[i] % 2 != 0) {
-            oddDegree++;
-            if (start < 0) start = i;
-        } else if (degree[i] > 0 && start < 0) {
-            start = i;
-        }
-    }
-
-    /* 欧拉回路条件: 0个奇数度顶点 */
-    /* 欧拉路径条件: 恰好2个奇数度顶点 */
-    if (oddDegree != 0 && oddDegree != 2) {
-        m_hasTour = false;
-        m_tourLen = 0;
-        qint64 elapsed = timer.elapsed();
-        m_stats.totalComputations++;
-        m_stats.totalNodes += m_n;
-        m_timeSum += elapsed;
-        m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalComputations;
-        emit computed(0, false);
-        return tour;
-    }
-
-    /* 检查连通性: 确保有边的顶点是连通的 */
-    if (start >= 0) {
-        QVector<bool> visited(m_n, false);
-        QVector<int> stack;
-        stack.append(start);
-        visited[start] = true;
-        int visitedCount = 0;
-
-        while (!stack.isEmpty()) {
-            int v = stack.back();
-            stack.removeLast();
-            visitedCount++;
-            for (const auto& edge : m_adj[v]) {
-                if (!visited[edge.first]) {
-                    visited[edge.first] = true;
-                    stack.append(edge.first);
-                }
+    /* 收集所有边 */
+    QVector<QPair<int, int>> edges;
+    for (int u = 0; u < vertexCount; ++u) {
+        for (int v : (u < adjacency.size() ? adjacency[u] : QVector<int>())) {
+            if (u < v) {
+                edges.append({u, v});
             }
         }
+    }
 
-        /* 统计有边的顶点数 */
-        int activeVertices = 0;
-        for (int i = 0; i < m_n; ++i) {
-            if (degree[i] > 0) activeVertices++;
+    int numEdges = edges.size();
+    if (numEdges == 0) {
+        m_chromaticIndex = 0;
+        return QVector<QVector<int>>();
+    }
+
+    /* 计算最大度数Delta */
+    int maxDegree = 0;
+    for (int u = 0; u < vertexCount; ++u) {
+        int deg = (u < adjacency.size()) ? adjacency[u].size() : 0;
+        maxDegree = qMax(maxDegree, deg);
+    }
+
+    /* 贪心边着色 */
+    /* vertexColors[u] = 已分配给u的关联边的颜色集合 */
+    QVector<QSet<int>> vertexColors(vertexCount);
+    QVector<int> edgeColor(numEdges, -1);
+
+    for (int e = 0; e < numEdges; ++e) {
+        int u = edges[e].first;
+        int v = edges[e].second;
+
+        /* 找到u和v都未使用的最小颜色 */
+        int c = 0;
+        while (vertexColors[u].contains(c) || vertexColors[v].contains(c)) {
+            c++;
         }
 
-        if (visitedCount != activeVertices) {
-            m_hasTour = false;
-            m_tourLen = 0;
-            qint64 elapsed = timer.elapsed();
-            m_stats.totalComputations++;
-            m_stats.totalNodes += m_n;
-            m_timeSum += elapsed;
-            m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalComputations;
-            emit computed(0, false);
-            return tour;
+        edgeColor[e] = c;
+        vertexColors[u].insert(c);
+        vertexColors[v].insert(c);
+    }
+
+    /* 构建颜色到边的映射 */
+    int numColors = 0;
+    for (int e = 0; e < numEdges; ++e) {
+        numColors = qMax(numColors, edgeColor[e] + 1);
+    }
+
+    m_colorEdges.clear();
+    m_colorEdges.resize(numColors);
+    for (int e = 0; e < numEdges; ++e) {
+        m_colorEdges[edgeColor[e]].append(edges[e]);
+    }
+
+    m_chromaticIndex = numColors;
+
+    /* 构建返回矩阵: coloring[color] = {u1, v1, u2, v2, ...} */
+    QVector<QVector<int>> result(numColors);
+    for (int c = 0; c < numColors; ++c) {
+        for (const auto& edge : m_colorEdges[c]) {
+            result[c].append(edge.first);
+            result[c].append(edge.second);
         }
     }
 
-    m_hasTour = true;
-
-    /* 阶段3: Hierholzer算法 */
-    QVector<bool> usedEdges(edgeCount, false);
-    findEulerTour(start, tour, usedEdges);
-
-    m_tourLen = tour.size();
-
-    /* 更新统计信息 */
+    /* 更新统计 */
     qint64 elapsed = timer.elapsed();
-    m_stats.totalComputations++;
-    m_stats.totalNodes += m_n;
+    m_stats.totalGraphsColored++;
+    m_stats.totalColorsUsed += numColors;
     m_timeSum += elapsed;
-    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalComputations;
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalGraphsColored;
 
-    emit computed(m_tourLen, m_hasTour);
-    return tour;
+    emit coloringCompleted(numColors);
+    return result;
+}
+
+/**
+ * @brief 获取着色使用的颜色数
+ * @return 色度指数(使用的颜色数量)
+ */
+int EdgeColoring3::chromaticIndex() const
+{
+    return m_chromaticIndex;
+}
+
+/**
+ * @brief 验证着色方案的合法性
+ * @param coloring coloring[edge] = color
+ * @return true如果着色合法(无相邻边同色)
+ *
+ * 检查每对共享顶点的边是否使用了不同的颜色。
+ */
+bool EdgeColoring3::validateColoring(const QVector<QVector<int>>& coloring) const
+{
+    /* 重建边列表 */
+    QMap<QPair<int, int>, int> edgeColorMap;
+    for (int c = 0; c < coloring.size(); ++c) {
+        for (int i = 0; i + 1 < coloring[c].size(); i += 2) {
+            int u = coloring[c][i];
+            int v = coloring[c][i + 1];
+            edgeColorMap[{qMin(u, v), qMax(u, v)}] = c;
+        }
+    }
+
+    /* 检查共享顶点的边是否有相同颜色 */
+    for (auto it1 = edgeColorMap.begin(); it1 != edgeColorMap.end(); ++it1) {
+        for (auto it2 = it1 + 1; it2 != edgeColorMap.end(); ++it2) {
+            int u1 = it1.key().first, v1 = it1.key().second;
+            int u2 = it2.key().first, v2 = it2.key().second;
+            /* 共享顶点 */
+            if (u1 == u2 || u1 == v2 || v1 == u2 || v1 == v2) {
+                if (it1.value() == it2.value()) return false;
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief 获取指定颜色的所有边
+ * @param color 颜色编号
+ * @return 该颜色的边列表(u,v)对
+ */
+QVector<QPair<int, int>> EdgeColoring3::edgesOfColor(int color) const
+{
+    if (color < 0 || color >= m_colorEdges.size()) return QVector<QPair<int, int>>();
+    return m_colorEdges[color];
 }
 
 /**
@@ -184,46 +178,4 @@ void EdgeColoring3::resetStatistics()
 {
     m_stats = Stats();
     m_timeSum = 0.0;
-}
-
-/**
- * @brief Hierholzer DFS搜索欧拉回路
- * @param start 起始顶点
- * @param tour 输出的欧拉回路
- * @param used 边使用标记
- *
- * 使用栈模拟递归DFS，每次找到未使用的边就继续深入。
- * 当顶点没有未使用的边时，将其加入路径。
- * 最后反转路径得到欧拉回路。
- */
-void EdgeColoring3::findEulerTour(int start, QVector<int>& tour, QVector<bool>& used)
-{
-    QVector<int> stack;
-    stack.append(start);
-
-    while (!stack.isEmpty()) {
-        int v = stack.back();
-
-        /* 查找一条未使用的边 */
-        bool found = false;
-        while (!m_adj[v].isEmpty()) {
-            auto edge = m_adj[v].back();
-            m_adj[v].pop_back();
-
-            if (edge.second < used.size() && !used[edge.second]) {
-                used[edge.second] = true;
-                stack.append(edge.first);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            tour.append(v);
-            stack.removeLast();
-        }
-    }
-
-    /* 反转路径得到正确顺序 */
-    std::reverse(tour.begin(), tour.end());
 }

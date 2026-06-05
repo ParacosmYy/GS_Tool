@@ -19,7 +19,7 @@
  * @param parent 父对象指针
  *
  * 默认阈值0dB，释放时间50ms，增益衰减为0。
- * 内部状态初始化为1.0(单位增益)。
+ * 内部平滑增益初始化为1.0(单位增益，无衰减)。
  */
 Limiter4::Limiter4(QObject* parent)
     : QObject(parent)
@@ -32,10 +32,12 @@ Limiter4::Limiter4(QObject* parent)
  *
  * 典型值: 0dB(标准限制)，-1dB(安全限制)
  * 限制器将信号增益衰减以确保不超过该阈值。
+ * 0dB阈值意味着信号幅度不超过1.0。
  */
 void Limiter4::setThreshold(double thresholdDb)
 {
     m_threshold = thresholdDb;
+    /* 阈值存储为dB值，在process中转换为线性值使用 */
 }
 
 /**
@@ -43,12 +45,14 @@ void Limiter4::setThreshold(double thresholdDb)
  * @param releaseMs 释放时间(ms)，控制增益恢复速度
  *
  * 较长的释放时间使增益变化更平滑但响度损失更大。
- * 自适应模式下，大幅衰减时使用更长的释放时间。
+ * 自适应模式下，大幅衰减时自动使用更长的释放时间
+ * 以避免低频失真(pumping effect)。
  * 典型值: 10-200ms，范围[1, 1000]
  */
 void Limiter4::setReleaseTime(double releaseMs)
 {
     m_release = qBound(1.0, releaseMs, 1000.0);
+    /* 释放系数在process中根据m_release动态计算 */
 }
 
 /**
@@ -63,7 +67,10 @@ void Limiter4::setReleaseTime(double releaseMs)
 void Limiter4::setLookahead(double lookaheadMs)
 {
     Q_UNUSED(lookaheadMs)
-    /* 前瞻缓冲在process中隐式实现 */
+    /* 前瞻缓冲在process中隐式实现。
+     * 真正的前瞻需要延迟线缓冲区，当前版本暂不使用参数。
+     * 计划在未来版本中实现基于环形缓冲区的延迟补偿。
+     */
 }
 
 /**
@@ -74,9 +81,10 @@ void Limiter4::setLookahead(double lookaheadMs)
  * 处理流程:
  * 1. 检测输入信号的峰值电平
  * 2. 计算防止信号超过阈值所需的最小增益
- * 3. 使用包络跟随器平滑增益变化(快攻击/慢释放)
+ * 3. 使用包络跟随器平滑增益变化(瞬时攻击/自适应释放)
  * 4. 应用增益到信号
- * 5. 硬限制确保绝对不超过阈值
+ * 5. 硬限制安全网确保绝对不超过阈值
+ * 6. 统计峰值增益衰减量
  */
 QVector<double> Limiter4::process(const QVector<double>& input)
 {
@@ -89,12 +97,18 @@ QVector<double> Limiter4::process(const QVector<double>& input)
     const double sr = 44100.0;
     QVector<double> output(N, 0.0);
 
-    /* 释放系数 */
+    /* 步骤0: 预计算常量 */
     double releaseCoeff = qExp(-1.0 / (m_release * sr / 1000.0));
     double thresholdLin = qPow(10.0, m_threshold / 20.0);
 
-    double smoothGain = 1.0; /* 当前增益(线性) */
+    /* 自适应释放系数(大幅衰减时使用更长释放) */
+    double adaptiveReleaseFactor = 5.0;
+    double adaptiveReleaseCoeff = qExp(-1.0 / (m_release * adaptiveReleaseFactor * sr / 1000.0));
+
+    double smoothGain = 1.0; /* 当前平滑增益(线性，1.0=无衰减) */
     double peakReduction = 0.0;
+    double sumReduction = 0.0;
+    int reductionFrames = 0;
 
     for (int i = 0; i < N; ++i) {
         /* 步骤1: 计算输入峰值电平 */
@@ -106,23 +120,25 @@ QVector<double> Limiter4::process(const QVector<double>& input)
             targetGain = thresholdLin / qMax(absVal, 1e-10);
         }
 
-        /* 步骤3: 平滑增益变化 */
-        /* 攻击: 立即跟踪更低的增益(瞬态保护) */
-        /* 释放: 缓慢恢复到1.0 */
+        /* 步骤3: 平滑增益变化(包络跟随器) */
+        /* 攻击: 瞬时跟踪更低的增益(砖墙特性) */
+        /* 释放: 根据衰减量自适应选择释放速度 */
         if (targetGain < smoothGain) {
-            /* 瞬时攻击(砖墙特性) */
+            /* 瞬时攻击(砖墙特性): 立即下降到目标增益 */
             smoothGain = targetGain;
         } else {
-            /* 平滑释放 */
-            smoothGain = releaseCoeff * smoothGain + (1.0 - releaseCoeff) * targetGain;
+            /* 自适应释放: 衰减越大释放越慢 */
+            double currentReduction = 1.0 - smoothGain;
+            double coeff = (currentReduction > 0.3) ? adaptiveReleaseCoeff : releaseCoeff;
+            smoothGain = coeff * smoothGain + (1.0 - coeff) * targetGain;
         }
 
-        /* 步骤4: 应用增益 */
+        /* 步骤4: 应用增益到信号 */
         output[i] = input[i] * smoothGain;
 
         /* 步骤5: 硬限制安全网(确保绝对不超过阈值) */
         if (qAbs(output[i]) > thresholdLin) {
-            output[i] = (output[i] > 0 ? 1 : -1) * thresholdLin;
+            output[i] = (output[i] > 0 ? 1.0 : -1.0) * thresholdLin;
         }
 
         /* 跟踪增益衰减量 */
@@ -130,17 +146,26 @@ QVector<double> Limiter4::process(const QVector<double>& input)
         if (reductionDb > peakReduction) {
             peakReduction = reductionDb;
         }
+        if (reductionDb > 0.1) {
+            sumReduction += reductionDb;
+            reductionFrames++;
+        }
     }
 
-    /* 更新统计 */
+    /* 步骤6: 更新统计信息 */
     m_gainReduction = peakReduction;
 
     qint64 elapsed = timer.elapsed();
     m_stats.totalSamplesProcessed += N;
     if (peakReduction > 0.1) m_stats.totalGainReductions++;
     m_timeSum += elapsed;
-    m_stats.avgProcessingTimeMs = m_timeSum / qMax(1, m_stats.totalSamplesProcessed);
 
+    /* 平均处理时间 */
+    if (m_stats.totalSamplesProcessed > 0) {
+        m_stats.avgProcessingTimeMs = m_timeSum * 1000.0 / m_stats.totalSamplesProcessed;
+    }
+
+    /* 发送增益衰减信号 */
     if (peakReduction > 0.1) {
         emit gainReductionApplied(peakReduction);
     }
@@ -163,11 +188,13 @@ double Limiter4::currentGainReduction() const
 /**
  * @brief 重置统计信息
  *
- * 清零所有累计统计数据和计时累加器。
- * 增益衰减量保留当前值(非统计量)。
+ * 清零所有累计统计数据(totalSamplesProcessed, totalGainReductions)
+ * 和计时累加器(m_timeSum)，平均处理时间归零。
+ * 注意: 增益衰减量(m_gainReduction)保留当前值(非统计量)。
  */
 void Limiter4::resetStatistics()
 {
     m_stats = Stats();
     m_timeSum = 0.0;
 }
+

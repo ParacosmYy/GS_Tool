@@ -1,9 +1,10 @@
 /**
  * @file TridiagonalEigen3.cpp
- * @brief Householder QR分解实现
+ * @brief 三对角矩阵特征值求解器实现
  *
- * 实现基于Householder反射的QR分解，支持线性方程组求解
- * 和残差范数计算。适用于最小二乘问题和矩阵计算。
+ * 使用隐式QR算法求解对称三对角矩阵的全部特征值和特征向量。
+ * 通过Wilkinson位移加速收敛，使用Givens旋转保持三对角结构。
+ * 适用于由Lanczos或Householder三对角化得到的矩阵。
  */
 
 #include "utils/matrix78/TridiagonalEigen3.h"
@@ -15,6 +16,8 @@
 /**
  * @brief 构造函数，初始化默认参数
  * @param parent 父对象指针
+ *
+ * 默认容差1e-12，最大迭代1000次。
  */
 TridiagonalEigen3::TridiagonalEigen3(QObject* parent)
     : QObject(parent)
@@ -22,167 +25,229 @@ TridiagonalEigen3::TridiagonalEigen3(QObject* parent)
 }
 
 /**
- * @brief 设置待分解矩阵
- * @param A 输入矩阵，m行n列
+ * @brief 设置收敛容差
+ * @param tol 特征值收敛容差，推荐1e-12
  */
-void TridiagonalEigen3::setMatrix(const QVector<QVector<double>>& A)
+void TridiagonalEigen3::setTolerance(double tol)
 {
-    if (A.isEmpty()) return;
-    m_rows = A.size();
-    m_cols = A[0].size();
-
-    /* 拷贝到内部存储R矩阵 */
-    m_R.clear();
-    m_R.resize(m_rows);
-    for (int i = 0; i < m_rows; ++i) {
-        m_R[i].resize(m_cols, 0.0);
-        for (int j = 0; j < qMin(static_cast<int>(A[i].size()), m_cols); ++j) {
-            m_R[i][j] = A[i][j];
-        }
-    }
-    m_Q.clear();
+    m_tolerance = qBound(1e-16, tol, 1.0);
 }
 
 /**
- * @brief 执行QR分解
- * @return 分解是否成功
- *
- * 使用Householder反射逐列消元，将A分解为正交矩阵Q和上三角矩阵R。
- * Householder向量v通过列向量的范数计算得到，反射矩阵H = I - 2vv^T/v^Tv。
+ * @brief 设置最大迭代次数
+ * @param maxIter 最大QR迭代次数
  */
-bool TridiagonalEigen3::decompose()
+void TridiagonalEigen3::setMaxIterations(int maxIter)
+{
+    m_maxIterations = qMax(10, maxIter);
+}
+
+/**
+ * @brief 从对角线和次对角线求解特征值
+ * @param diag 主对角线元素(d0, d1, ..., dn-1)
+ * @param subdiag 次对角线元素(e0, e1, ..., en-2)
+ * @return 特征值向量(按升序排列)
+ *
+ * 使用隐式QR算法:
+ * 1. 复制对角线到工作数组
+ * 2. 从底部开始对每个子矩阵执行QR迭代
+ * 3. Wilkinson位移: d[l] + d[l+1])/2 + sign*delta/2
+ * 4. Givens旋转消元并保持三对角结构
+ * 5. 收敛后输出特征值
+ */
+QVector<double> TridiagonalEigen3::eigenvalues(const QVector<double>& diag, const QVector<double>& subdiag)
 {
     QElapsedTimer timer;
     timer.start();
 
-    if (m_rows == 0 || m_cols == 0 || m_R.isEmpty()) return false;
+    int n = diag.size();
+    if (n == 0) return QVector<double>();
 
-    int m = m_rows;
-    int n = m_cols;
-    int minDim = qMin(m, n);
-
-    /* 初始化Q为单位矩阵 */
-    m_Q.resize(m);
-    for (int i = 0; i < m; ++i) {
-        m_Q[i].resize(m, 0.0);
-        m_Q[i][i] = 1.0;
+    /* 工作数组 */
+    QVector<double> d = diag;
+    QVector<double> e(n, 0.0);
+    for (int i = 0; i < qMin(subdiag.size(), n - 1); ++i) {
+        e[i] = subdiag[i];
     }
 
-    /* Householder变换逐列消元 */
-    for (int k = 0; k < minDim; ++k) {
-        /* 计算第k列下半部分的二范数 */
-        double norm = 0.0;
-        for (int i = k; i < m; ++i) {
-            norm += m_R[i][k] * m_R[i][k];
-        }
-        norm = qSqrt(norm);
+    /* 隐式QR迭代 */
+    for (int l = 0; l < n - 1; ++l) {
+        int iter = 0;
+        int m = l;
 
-        if (norm < 1e-15) continue;
-
-        /* 计算Householder向量参数 */
-        double alpha = (m_R[k][k] >= 0) ? -norm : norm;
-        double beta = norm * (norm + qAbs(m_R[k][k]));
-
-        /* 构造Householder向量: v = R[k:m, k] */
-        m_R[k][k] -= alpha;
-
-        if (qAbs(beta) < 1e-300) continue;
-
-        /* 应用Householder变换到R的右侧列: R = H * R */
-        for (int j = k; j < n; ++j) {
-            double dot = 0.0;
-            for (int i = k; i < m; ++i) {
-                dot += m_R[i][k] * m_R[i][j];
-            }
-            double coeff = dot / beta;
-            for (int i = k; i < m; ++i) {
-                m_R[i][j] -= coeff * m_R[i][k];
-            }
+        while (m < n - 1) {
+            /* 检查次对角线元素是否可忽略 */
+            double dd = qAbs(d[m]) + qAbs(d[m + 1]);
+            if (qAbs(e[m]) <= m_tolerance * dd) break;
+            m++;
         }
 
-        /* 应用Householder变换到Q: Q = Q * H^T = Q * H */
-        for (int j = 0; j < m; ++j) {
-            double dot = 0.0;
-            for (int i = k; i < m; ++i) {
-                dot += m_R[i][k] * m_Q[j][i];
+        if (m == l) continue;
+
+        if (iter >= m_maxIterations) break;
+
+        /* Wilkinson位移 */
+        double g = (d[l + 1] - d[l]) / (2.0 * e[l]);
+        double r = qSqrt(g * g + 1.0);
+        double shift = d[m] - d[l] + e[l] / (g + (g >= 0 ? qAbs(r) : -qAbs(r)));
+
+        /* 隐式QR步: Givens旋转 */
+        double c = 1.0, s = 1.0;
+        double p = 0.0;
+
+        for (int i = l; i < m; ++i) {
+            double f = s * e[i];
+            double b = c * e[i];
+
+            if (qAbs(f) >= qAbs(shift)) {
+                c = shift / f;
+                r = qSqrt(c * c + 1.0);
+                e[i] = f * r;
+                s = 1.0 / r;
+                c = c * s;
+            } else {
+                s = f / shift;
+                r = qSqrt(s * s + 1.0);
+                e[i] = shift * r;
+                c = 1.0 / r;
+                s = s * c;
             }
-            double coeff = dot / beta;
-            for (int i = k; i < m; ++i) {
-                m_Q[j][i] -= coeff * m_R[i][k];
-            }
+
+            shift = d[i + 1] - p;
+            r = (d[i] - shift) * s + 2.0 * c * b;
+            p = s * r;
+            d[i] = shift + p;
+            shift = c * r - b;
         }
 
-        /* 恢复对角元素为精确值 */
-        m_R[k][k] = alpha;
+        d[l] -= p;
+        e[l] = shift;
+        e[m] = 0.0;
+
+        iter++;
+        l--; /* 重新检查 */
     }
 
-    /* 清零R的下三角部分(消除数值误差) */
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < qMin(i, n); ++j) {
-            m_R[i][j] = 0.0;
-        }
-    }
+    /* 按升序排序 */
+    std::sort(d.begin(), d.end());
 
-    /* 更新统计信息 */
+    /* 更新统计 */
     qint64 elapsed = timer.elapsed();
-    m_stats.totalDecompositions++;
+    m_stats.totalEigensolves++;
+    m_stats.totalEigenvalues += n;
     m_timeSum += elapsed;
-    m_stats.avgProcessingTimeMs = m_timeSum / (m_stats.totalDecompositions + m_stats.totalSolves);
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalEigensolves;
 
-    emit decompositionCompleted(m, n);
-    return true;
+    emit eigensolveCompleted(n);
+    return d;
 }
 
 /**
- * @brief 使用QR分解求解线性方程组Ax=b
- * @param b 右端项
- * @return 解向量x
+ * @brief 求解特征值和特征向量
+ * @param diag 主对角线
+ * @param subdiag 次对角线
+ * @return QPair(特征值向量, 特征向量矩阵)
  *
- * 利用QR分解结果求解Ax=b等价于R*x = Q^T*b。
- * 先计算Q^T*b，再对上三角矩阵R进行回代。
+ * 在计算特征值的同时累积Givens旋转变换，
+ * 得到对应的特征向量矩阵。
  */
-QVector<double> TridiagonalEigen3::solve(const QVector<double>& b)
+QPair<QVector<double>, QVector<QVector<double>>> TridiagonalEigen3::eigenDecomposition(
+    const QVector<double>& diag, const QVector<double>& subdiag)
 {
     QElapsedTimer timer;
     timer.start();
 
-    QVector<double> x(m_cols, 0.0);
-    if (m_Q.isEmpty() || m_R.isEmpty()) return x;
+    int n = diag.size();
+    if (n == 0) return {QVector<double>(), QVector<QVector<double>>()};
 
-    int m = m_rows;
-    int n = m_cols;
+    /* 初始化特征向量矩阵为单位阵 */
+    QVector<QVector<double>> V(n, QVector<double>(n, 0.0));
+    for (int i = 0; i < n; ++i) V[i][i] = 1.0;
 
-    /* 步骤1: 计算 Q^T * b */
-    QVector<double> Qtb(m, 0.0);
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < m; ++j) {
-            Qtb[i] += m_Q[i][j] * ((j < b.size()) ? b[j] : 0.0);
+    QVector<double> d = diag;
+    QVector<double> e(n, 0.0);
+    for (int i = 0; i < qMin(subdiag.size(), n - 1); ++i) e[i] = subdiag[i];
+
+    /* QR迭代 + 累积变换 */
+    for (int l = 0; l < n - 1; ++l) {
+        int iter = 0;
+        int m = l;
+
+        while (m < n - 1) {
+            double dd = qAbs(d[m]) + qAbs(d[m + 1]);
+            if (qAbs(e[m]) <= m_tolerance * dd) break;
+            m++;
+        }
+        if (m == l) continue;
+        if (iter >= m_maxIterations) break;
+
+        double g = (d[l + 1] - d[l]) / (2.0 * e[l]);
+        double r = qSqrt(g * g + 1.0);
+        double shift = d[m] - d[l] + e[l] / (g + (g >= 0 ? qAbs(r) : -qAbs(r)));
+
+        double c = 1.0, s = 1.0, p = 0.0;
+
+        for (int i = l; i < m; ++i) {
+            double f = s * e[i];
+            double b = c * e[i];
+
+            if (qAbs(f) >= qAbs(shift)) {
+                c = shift / f;
+                r = qSqrt(c * c + 1.0);
+                e[i] = f * r;
+                s = 1.0 / r;
+                c = c * s;
+            } else {
+                s = f / shift;
+                r = qSqrt(s * s + 1.0);
+                e[i] = shift * r;
+                c = 1.0 / r;
+                s = s * c;
+            }
+
+            shift = d[i + 1] - p;
+            r = (d[i] - shift) * s + 2.0 * c * b;
+            p = s * r;
+            d[i] = shift + p;
+            shift = c * r - b;
+
+            /* 累积Givens旋转到特征向量矩阵 */
+            for (int k = 0; k < n; ++k) {
+                double t = V[k][i];
+                V[k][i] = c * t + s * V[k][i + 1];
+                V[k][i + 1] = -s * t + c * V[k][i + 1];
+            }
+        }
+
+        d[l] -= p;
+        e[l] = shift;
+        e[m] = 0.0;
+        iter++;
+        l--;
+    }
+
+    /* 特征值排序 */
+    QVector<int> idx(n);
+    for (int i = 0; i < n; ++i) idx[i] = i;
+    std::sort(idx.begin(), idx.end(), [&](int a, int b) { return d[a] < d[b]; });
+
+    QVector<double> evals(n);
+    QVector<QVector<double>> evecs(n, QVector<double>(n));
+    for (int i = 0; i < n; ++i) {
+        evals[i] = d[idx[i]];
+        for (int j = 0; j < n; ++j) {
+            evecs[i][j] = V[j][idx[i]];
         }
     }
 
-    /* 步骤2: 回代 R * x = Qtb */
-    for (int i = qMin(n, m) - 1; i >= 0; --i) {
-        double sum = Qtb[i];
-        for (int j = i + 1; j < n; ++j) {
-            sum -= m_R[i][j] * x[j];
-        }
-        x[i] = (qAbs(m_R[i][i]) > 1e-15) ? sum / m_R[i][i] : 0.0;
-    }
-
-    /* 步骤3: 计算残差范数 */
-    m_residual = 0.0;
-    for (int i = n; i < m; ++i) {
-        m_residual += Qtb[i] * Qtb[i];
-    }
-    m_residual = qSqrt(m_residual);
-
-    /* 更新统计信息 */
     qint64 elapsed = timer.elapsed();
-    m_stats.totalSolves++;
+    m_stats.totalEigensolves++;
+    m_stats.totalEigenvalues += n;
     m_timeSum += elapsed;
-    m_stats.avgProcessingTimeMs = m_timeSum / (m_stats.totalDecompositions + m_stats.totalSolves);
+    m_stats.avgProcessingTimeMs = m_timeSum / m_stats.totalEigensolves;
 
-    return x;
+    emit eigensolveCompleted(n);
+    return {evals, evecs};
 }
 
 /**
@@ -192,47 +257,4 @@ void TridiagonalEigen3::resetStatistics()
 {
     m_stats = Stats();
     m_timeSum = 0.0;
-}
-
-/**
- * @brief 计算矩阵的条件数估计
- * @return 条件数估计值（R对角线最大/最小比值）
- */
-double TridiagonalEigen3::conditionNumber() const
-{
-    if (m_R.isEmpty()) return 1.0;
-
-    int minDim = qMin(m_rows, m_cols);
-    double maxDiag = 0.0, minDiag = 1e18;
-
-    for (int i = 0; i < minDim; ++i) {
-        double d = qAbs(m_R[i][i]);
-        maxDiag = qMax(maxDiag, d);
-        minDiag = qMin(minDiag, d);
-    }
-
-    return (minDiag > 1e-300) ? maxDiag / minDiag : 1e18;
-}
-
-/**
- * @brief 计算矩阵的有效秩
- * @param tol 容差阈值
- * @return 有效秩（R对角线中大于tol*max(|diag|)的元素个数）
- */
-int TridiagonalEigen3::effectiveRank(double tol) const
-{
-    if (m_R.isEmpty()) return 0;
-
-    int minDim = qMin(m_rows, m_cols);
-    double maxDiag = 0.0;
-    for (int i = 0; i < minDim; ++i) {
-        maxDiag = qMax(maxDiag, qAbs(m_R[i][i]));
-    }
-
-    double threshold = tol * maxDiag;
-    int rank = 0;
-    for (int i = 0; i < minDim; ++i) {
-        if (qAbs(m_R[i][i]) > threshold) rank++;
-    }
-    return rank;
 }

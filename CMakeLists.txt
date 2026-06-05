@@ -101,7 +101,7 @@ set(SOURCES
     src/core/background/BackgroundSettingsPopup.cpp
     src/core/health/ConnectionHealthMonitor.cpp
     src/core/health/ConnectionHealthMonitorCalc.cpp
-    src/utils/logviewer/DataLogViewer.cpp
+    # src/utils/logviewer/DataLogViewer.cpp (file missing)
     src/core/widgets/BasePanel.cpp
     src/core/widgets/BasePanelConfig.cpp
     src/core/widgets/BasePanelStates.cpp
@@ -293,7 +293,7 @@ set(SOURCES
     src/ota/protocols/zmodem/ZModemTransferDispatch.cpp
     src/utils/settings/SettingsManager.cpp
     src/utils/settings/SettingsManagerConvenience.cpp
-    src/utils/settings/SettingsManagerGroups.cpp
+    # MISSING FILE REMOVED: src/utils/settings/SettingsManagerGroups.cpp
     src/utils/export/DataExporter.cpp
     src/utils/export/DataExporterFormats.cpp
     src/utils/export/DataExporterUtils.cpp
@@ -1259,8 +1259,8 @@ set(SOURCES
     # -- F59: 数据变换管线 --
     src/utils/transform/DataTransformer.cpp
 
-    # -- F63: 数据批处理器 --
-    src/utils/batch/DataBatchProcessor.cpp
+    # -- F63: 数据批处理器 (file missing) --
+    # src/utils/batch/DataBatchProcessor.cpp
 
     # -- F64: 数据采样器 --
     # DUPLICATE REMOVED: src/utils/sampler/DataSampler.cpp
@@ -2161,8 +2161,8 @@ set(HEADERS
     # -- F59: 数据变换管线 --
     src/utils/transform/DataTransformer.h
 
-    # -- F63: 数据批处理器 --
-    src/utils/batch/DataBatchProcessor.h
+    # -- F63: 数据批处理器 (file missing) --
+    # src/utils/batch/DataBatchProcessor.h
 
     # -- F64: 数据采样器 --
     src/utils/sampler/DataSampler.h
