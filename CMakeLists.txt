@@ -696,6 +696,17 @@ set(SOURCES
     src/utils/regress/RegressionEngine.cpp
     src/utils/pca/PcaAnalyzer.cpp
     src/utils/dtw2/FastDtw.cpp
+    src/utils/bitfield/BitFieldParser.cpp
+    src/utils/circbuf/CircularStatsBuffer.cpp
+    src/utils/hysteresis/HysteresisFilter.cpp
+    src/utils/kalman/KalmanFilter1D.cpp
+    src/utils/wavelet/WaveletTransform.cpp
+    src/utils/queuetheory/QueueSimulator.cpp
+    src/utils/monte/MonteCarloSimulator.cpp
+    src/utils/graph/GraphAnalyzer.cpp
+    src/utils/signalgen/SignalGenerator.cpp
+    src/utils/ringbuf2/RingBufferEx.cpp
+    src/utils/bitalloc/BitAllocator.cpp
     src/utils/segmenter/StreamSegmenter.cpp
     src/utils/cluster/KMeansClusterer.cpp
     src/utils/changept/ChangepointDetector.cpp
@@ -1488,6 +1499,39 @@ set(HEADERS
 
     # -- F96: 符号解码器 --
     src/utils/symbol/SymbolDecoder.h
+
+    # -- F101: 一维卡尔曼滤波器 --
+    src/utils/kalman/KalmanFilter1D.h
+
+    # -- F102: 小波变换引擎 --
+    src/utils/wavelet/WaveletTransform.h
+
+    # -- F103: 位域解析器 --
+    src/utils/bitfield/BitFieldParser.h
+
+    # -- F104: 统计环形缓冲区 --
+    src/utils/circbuf/CircularStatsBuffer.h
+
+    # -- F105: 滞后滤波器 --
+    src/utils/hysteresis/HysteresisFilter.h
+
+    # -- F110: 队列理论模拟器 --
+    src/utils/queuetheory/QueueSimulator.h
+
+    # -- F111: 蒙特卡洛模拟器 --
+    src/utils/monte/MonteCarloSimulator.h
+
+    # -- F112: 图分析器 --
+    src/utils/graph/GraphAnalyzer.h
+
+    # -- F113: 信号发生器 --
+    src/utils/signalgen/SignalGenerator.h
+
+    # -- F114: 扩展环形缓冲区 --
+    src/utils/ringbuf2/RingBufferEx.h
+
+    # -- F115: 位分配器 --
+    src/utils/bitalloc/BitAllocator.h
 )
 
 set(RESOURCES
