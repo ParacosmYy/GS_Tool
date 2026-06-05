@@ -22,6 +22,8 @@ signals:
     void updated(int lo, int hi);
 private:
     void pushDown(int idx); void pullUp(int idx);
+    void updateAvgTime(double elapsedMs);
+    void rangeUpdateImpl(int lo, int hi, double val, int opType);
     int m_n = 0;
     QVector<double> m_sum, m_min, m_max;
     QVector<double> m_lazyAdd, m_lazyMul, m_lazyAssign;
