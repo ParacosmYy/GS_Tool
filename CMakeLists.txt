@@ -669,6 +669,10 @@ set(SOURCES
     src/utils/spectrum/SpectrumAnalyzer.cpp
     src/utils/statdist/StatDistribution.cpp
     src/utils/entropy/EntropyCalculator.cpp
+    src/utils/decomposer/SignalDecomposer.cpp
+    src/utils/sliding/SlidingWindowStats.cpp
+    src/utils/trigger/DataTrigger.cpp
+    src/utils/state/StateTracker.cpp
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
