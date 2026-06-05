@@ -171,6 +171,41 @@ QVector<double> ChirpZ3::forward(const QVector<double>& re, const QVector<double
 }
 
 // ──────────────────────────────────────────────
+// 辅助方法 — 频率映射
+// ──────────────────────────────────────────────
+
+/**
+ * @brief 将输出 bin 索引转换为归一化频率
+ *
+ * 给定输出 bin 索引 k，对应的归一化频率为：
+ * freq = f0 + k * (f1 - f0) / M
+ *
+ * @param k 输出 bin 索引（0-based）
+ * @return 归一化频率值
+ */
+double ChirpZ3::binToFrequency(int k) const
+{
+    if (k < 0 || k >= m_m) return 0.0;
+    return m_f0 + static_cast<double>(k) * (m_f1 - m_f0) / m_m;
+}
+
+/**
+ * @brief 将归一化频率转换为输出 bin 索引
+ *
+ * 反向映射：给定频率找到最近的输出 bin 索引。
+ *
+ * @param freq 归一化频率值
+ * @return 最近的 bin 索引，-1 表示频率超出范围
+ */
+int ChirpZ3::frequencyToBin(double freq) const
+{
+    if (m_m <= 0 || freq < m_f0 || freq > m_f1) return -1;
+    double deltaF = (m_f1 - m_f0) / m_m;
+    int bin = static_cast<int>(qRound((freq - m_f0) / deltaF));
+    return qBound(0, bin, m_m - 1);
+}
+
+// ──────────────────────────────────────────────
 // 统计接口
 // ──────────────────────────────────────────────
 

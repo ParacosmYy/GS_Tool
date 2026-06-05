@@ -16,6 +16,40 @@
 #include <algorithm>
 
 // ──────────────────────────────────────────────
+// 文件局部辅助函数
+// ──────────────────────────────────────────────
+
+/**
+ * @brief 递归收集除指定 ID 外的所有区间
+ * @param n 当前节点
+ * @param out 收集结果容器
+ * @param excludeId 要排除的区间 ID
+ */
+static void collectNodes(IntervalTree4::Node* n,
+                          QVector<QPair<QPair<double, double>, int>>& out,
+                          int excludeId)
+{
+    if (n == nullptr) return;
+    if (n->id != excludeId) {
+        out.append({{n->lo, n->hi}, n->id});
+    }
+    collectNodes(n->left, out, excludeId);
+    collectNodes(n->right, out, excludeId);
+}
+
+/**
+ * @brief 递归释放节点内存
+ * @param n 当前节点
+ */
+static void clearTree(IntervalTree4::Node* n)
+{
+    if (n == nullptr) return;
+    clearTree(n->left);
+    clearTree(n->right);
+    delete n;
+}
+
+// ──────────────────────────────────────────────
 // 构造函数
 // ──────────────────────────────────────────────
 
@@ -296,7 +330,7 @@ IntervalTree4::Node* IntervalTree4::rotateRight(Node* n)
         n->right ? n->right->maxHi : -1e18));
     l->maxHi = qMax(l->hi, qMax(
         l->left ? l->left->maxHi : -1e18,
-        l->right ? r->right->maxHi : -1e18));
+        l->right ? l->right->maxHi : -1e18));
 
     return l;
 }

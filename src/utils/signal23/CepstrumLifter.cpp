@@ -8,6 +8,7 @@
 #include <QElapsedTimer>
 #include <QtMath>
 #include <algorithm>
+#include <cmath>
 
 /** @brief 构造函数 @param parent 父对象 */
 CepstrumLifter::CepstrumLifter(QObject* parent)
@@ -358,7 +359,7 @@ void CepstrumLifter::ifft(QVector<double>& re, QVector<double>& im)
 /** @brief Hz转Mel @param hz 频率(Hz) @return Mel值 */
 double CepstrumLifter::hzToMel(double hz) const
 {
-    return 2595.0 * qLog10(1.0 + hz / 700.0);
+    return 2595.0 * std::log10(1.0 + hz / 700.0);
 }
 
 /** @brief Mel转Hz @param mel Mel值 @return 频率(Hz) */

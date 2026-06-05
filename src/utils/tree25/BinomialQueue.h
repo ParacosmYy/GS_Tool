@@ -10,6 +10,7 @@
 #pragma once
 
 #include <QObject>
+#include <QElapsedTimer>
 #include <QVector>
 #include <QList>
 

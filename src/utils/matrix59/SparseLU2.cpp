@@ -55,12 +55,23 @@ void SparseLU2::setMatrix(int n, const QVector<int>& rows,
 
     if (m_n == 0) return;
 
-    // 将 COO 转为稠密矩阵（用于简化 LU 分解）
-    // 对于大矩阵，实际应用中应使用更高效的稀疏结构
-    // 这里为了正确性使用稠密表示
-    Q_UNUSED(rows);
-    Q_UNUSED(cols);
-    Q_UNUSED(vals);
+    // 初始化 L 为单位矩阵，U 从 COO 数据填充
+    m_Lval.resize(m_n * m_n, 0.0);
+    m_Uval.resize(m_n * m_n, 0.0);
+
+    for (int i = 0; i < m_n; ++i) {
+        m_Lval[i * m_n + i] = 1.0;
+    }
+
+    // 将 COO 数据填入 U 矩阵
+    const int nnz = qMin(rows.size(), qMin(cols.size(), vals.size()));
+    for (int i = 0; i < nnz; ++i) {
+        int r = rows[i];
+        int c = cols[i];
+        if (r >= 0 && r < m_n && c >= 0 && c < m_n) {
+            m_Uval[r * m_n + c] = vals[i];
+        }
+    }
 }
 
 // ──────────────────────────────────────────────
