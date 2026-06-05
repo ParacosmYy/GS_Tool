@@ -1,17 +1,17 @@
 /**
- * @file GoertzelAlgorithm.cpp
+ * @file GoertzelDetector.cpp
  * @brief Goertzel算法实现 — 单频点DFT
  */
 
-#include "utils/goertzel/GoertzelAlgorithm.h"
+#include "utils/goertzel/GoertzelDetector.h"
 
 #include <QElapsedTimer>
 #include <cmath>
 
-GoertzelAlgorithm::GoertzelAlgorithm(QObject* parent)
+GoertzelDetector::GoertzelDetector(QObject* parent)
     : QObject(parent), m_timeSum(0.0) {}
 
-double GoertzelAlgorithm::computeMagnitude(
+double GoertzelDetector::computeMagnitude(
     const QVector<double>& signal, double targetFreq, double sampleRate)
 {
     QElapsedTimer timer;
@@ -44,14 +44,14 @@ double GoertzelAlgorithm::computeMagnitude(
     return mag;
 }
 
-double GoertzelAlgorithm::computePower(
+double GoertzelDetector::computePower(
     const QVector<double>& signal, double targetFreq, double sampleRate)
 {
     double mag = computeMagnitude(signal, targetFreq, sampleRate);
     return mag * mag;
 }
 
-QVector<double> GoertzelAlgorithm::computeMultiFrequency(
+QVector<double> GoertzelDetector::computeMultiFrequency(
     const QVector<double>& signal,
     const QVector<double>& frequencies,
     double sampleRate)
@@ -71,7 +71,7 @@ QVector<double> GoertzelAlgorithm::computeMultiFrequency(
     return magnitudes;
 }
 
-QChar GoertzelAlgorithm::detectDTMF(const QVector<double>& signal,
+QChar GoertzelDetector::detectDTMF(const QVector<double>& signal,
                                      double sampleRate)
 {
     QElapsedTimer timer;
@@ -108,7 +108,7 @@ QChar GoertzelAlgorithm::detectDTMF(const QVector<double>& signal,
     return key;
 }
 
-void GoertzelAlgorithm::resetStatistics()
+void GoertzelDetector::resetStatistics()
 {
     m_stats = Stats{};
     m_timeSum = 0.0;

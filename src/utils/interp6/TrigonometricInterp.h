@@ -11,7 +11,7 @@
 
 #include <QObject>
 #include <QVector>
-#include <QComplexDouble>
+#include <complex>
 
 /**
  * @brief 三角插值 — FFT驱动的周期信号插值
@@ -96,10 +96,10 @@ signals:
 
 private:
     /** @brief 基2 FFT @param data 复数数据 @param inverse 逆变换 */
-    void fft(QVector<QComplexDouble>& data, bool inverse = false);
+    void fft(QVector<std::complex<double>>& data, bool inverse = false);
 
     /** @brief 慢速DFT @param data 复数数据 @param inverse 逆变换 */
-    void slowDft(QVector<QComplexDouble>& data, bool inverse = false);
+    void slowDft(QVector<std::complex<double>>& data, bool inverse = false);
 
     /** @brief 下一个2的幂 @param n 输入 @return 2幂 */
     static int nextPowerOf2(int n);

@@ -36,9 +36,9 @@ QVector<double> TrigonometricInterp::interpolate(const QVector<double>& data,
     int fftLen = nextPowerOf2(n);
 
     /* 零填充到fftLen */
-    QVector<QComplexDouble> freq(fftLen);
+    QVector<std::complex<double>> freq(fftLen);
     for (int i = 0; i < n; ++i) {
-        freq[i] = QComplexDouble(data[i], 0.0);
+        freq[i] = std::complex<double>(data[i], 0.0);
     }
 
     /* 前向FFT */
@@ -57,7 +57,7 @@ QVector<double> TrigonometricInterp::interpolate(const QVector<double>& data,
     /* 将频谱插入到更大的FFT长度 */
     int outFftLen = nextPowerOf2(outLen);
 
-    QVector<QComplexDouble> expanded(outFftLen);
+    QVector<std::complex<double>> expanded(outFftLen);
     int halfN = fftLen / 2;
 
     /* 保留DC和正频率 */
@@ -73,7 +73,7 @@ QVector<double> TrigonometricInterp::interpolate(const QVector<double>& data,
 
     /* 中间补零 */
     for (int k = halfN + 1; k < outFftLen - halfN; ++k) {
-        expanded[k] = QComplexDouble(0.0, 0.0);
+        expanded[k] = std::complex<double>(0.0, 0.0);
     }
 
     /* 逆FFT */
@@ -112,9 +112,9 @@ QVector<double> TrigonometricInterp::interpolateAt(const QVector<double>& data,
     int fftLen = nextPowerOf2(n);
 
     /* 计算FFT */
-    QVector<QComplexDouble> freq(fftLen);
+    QVector<std::complex<double>> freq(fftLen);
     for (int i = 0; i < n; ++i) {
-        freq[i] = QComplexDouble(data[i], 0.0);
+        freq[i] = std::complex<double>(data[i], 0.0);
     }
     fft(freq);
     m_stats.totalFftsExecuted += 1;
@@ -126,7 +126,7 @@ QVector<double> TrigonometricInterp::interpolateAt(const QVector<double>& data,
     for (double pos : positions) {
         /* 归一化位置到[0, 2*PI) */
         double t = pos * 2.0 * M_PI;
-        QComplexDouble sum(0.0, 0.0);
+        std::complex<double> sum(0.0, 0.0);
 
         int halfLen = fftLen / 2;
         /* DC分量 */
@@ -135,7 +135,7 @@ QVector<double> TrigonometricInterp::interpolateAt(const QVector<double>& data,
         /* 正频率 */
         for (int k = 1; k <= halfLen; ++k) {
             double angle = static_cast<double>(k) * t;
-            QComplexDouble twiddle(qCos(angle), qSin(angle));
+            std::complex<double> twiddle(qCos(angle), qSin(angle));
             sum += freq[k] * twiddle;
         }
 
@@ -143,7 +143,7 @@ QVector<double> TrigonometricInterp::interpolateAt(const QVector<double>& data,
         for (int k = halfLen + 1; k < fftLen; ++k) {
             int negK = k - fftLen;
             double angle = static_cast<double>(negK) * t;
-            QComplexDouble twiddle(qCos(angle), qSin(angle));
+            std::complex<double> twiddle(qCos(angle), qSin(angle));
             sum += freq[k] * twiddle;
         }
 
@@ -172,9 +172,9 @@ TrigonometricInterp::SpectrumInfo TrigonometricInterp::analyzeSpectrum(
     int n = data.size();
     int fftLen = nextPowerOf2(n);
 
-    QVector<QComplexDouble> freq(fftLen);
+    QVector<std::complex<double>> freq(fftLen);
     for (int i = 0; i < n; ++i) {
-        freq[i] = QComplexDouble(data[i], 0.0);
+        freq[i] = std::complex<double>(data[i], 0.0);
     }
     fft(freq);
     m_stats.totalFftsExecuted += 1;
@@ -258,7 +258,7 @@ void TrigonometricInterp::resetStatistics()
 }
 
 /** @brief 基2 FFT @param data 复数数据 @param inverse 逆变换 */
-void TrigonometricInterp::fft(QVector<QComplexDouble>& data, bool inverse)
+void TrigonometricInterp::fft(QVector<std::complex<double>>& data, bool inverse)
 {
     int n = data.size();
     if (n <= 1) return;
@@ -279,13 +279,13 @@ void TrigonometricInterp::fft(QVector<QComplexDouble>& data, bool inverse)
     double sign = inverse ? 1.0 : -1.0;
     for (int len = 2; len <= n; len <<= 1) {
         double angle = sign * 2.0 * M_PI / len;
-        QComplexDouble wLen(qCos(angle), qSin(angle));
+        std::complex<double> wLen(qCos(angle), qSin(angle));
 
         for (int i = 0; i < n; i += len) {
-            QComplexDouble w(1.0, 0.0);
+            std::complex<double> w(1.0, 0.0);
             for (int j = 0; j < len / 2; ++j) {
-                QComplexDouble u = data[i + j];
-                QComplexDouble v = data[i + j + len / 2] * w;
+                std::complex<double> u = data[i + j];
+                std::complex<double> v = data[i + j + len / 2] * w;
                 data[i + j] = u + v;
                 data[i + j + len / 2] = u - v;
                 w = w * wLen;
@@ -301,17 +301,17 @@ void TrigonometricInterp::fft(QVector<QComplexDouble>& data, bool inverse)
 }
 
 /** @brief 慢速DFT @param data 复数数据 @param inverse 逆变换 */
-void TrigonometricInterp::slowDft(QVector<QComplexDouble>& data, bool inverse)
+void TrigonometricInterp::slowDft(QVector<std::complex<double>>& data, bool inverse)
 {
     int n = data.size();
-    QVector<QComplexDouble> result(n);
+    QVector<std::complex<double>> result(n);
 
     double sign = inverse ? 1.0 : -1.0;
     for (int k = 0; k < n; ++k) {
-        QComplexDouble sum(0.0, 0.0);
+        std::complex<double> sum(0.0, 0.0);
         for (int j = 0; j < n; ++j) {
             double angle = sign * 2.0 * M_PI * k * j / n;
-            QComplexDouble twiddle(qCos(angle), qSin(angle));
+            std::complex<double> twiddle(qCos(angle), qSin(angle));
             sum += data[j] * twiddle;
         }
         result[k] = inverse ? sum / static_cast<double>(n) : sum;

@@ -1,5 +1,5 @@
 /**
- * @file GoertzelAlgorithm.h
+ * @file GoertzelDetector.h
  * @brief Goertzel算法 — 单频点DFT快速计算
  *
  * 功能: Goertzel算法用于快速计算指定频率的DFT分量，
@@ -11,7 +11,7 @@
 #include <QObject>
 #include <QVector>
 
-class GoertzelAlgorithm : public QObject {
+class GoertzelDetector : public QObject {
     Q_OBJECT
 public:
     struct Stats {
@@ -20,7 +20,7 @@ public:
         double  avgProcessingTimeMs = 0.0;
     };
 
-    explicit GoertzelAlgorithm(QObject* parent = nullptr);
+    explicit GoertzelDetector(QObject* parent = nullptr);
 
     /** @brief 计算单频点幅度 @param signal 输入信号 @param targetFreq 目标频率 @param sampleRate 采样率 @return 幅度 */
     double computeMagnitude(const QVector<double>& signal,
