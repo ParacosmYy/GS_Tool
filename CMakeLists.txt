@@ -823,6 +823,23 @@ set(SOURCES
     src/utils/skiplist2/ConcurrentSkipList.cpp
     src/utils/sparsae/SparseArray.cpp
 
+    # -- F211~F215: Wave 35 工具模块 --
+    src/utils/svd/SingularValueDecomposition.cpp
+    src/utils/kalman3/UnscentedKalmanFilter.cpp
+    src/utils/graph3/DijkstraShortestPath.cpp
+    src/utils/heap2/FibonacciHeap.cpp
+    src/utils/quadtree/QuadTree.cpp
+
+    # -- F216~F225: Wave 36 工具模块(linter) --
+    src/utils/btree/BPlusTree.cpp
+    src/utils/convhull/ConvexHull.cpp
+    src/utils/disjoint/DisjointSet.cpp
+    src/utils/radixtree/RadixTree.cpp
+    src/utils/rle3/BurrowsWheelerTransform.cpp
+    src/utils/suffix/SuffixAutomaton.cpp
+    src/utils/voronoi/VoronoiDiagram.cpp
+    src/utils/wavelet2/HaarWavelet2D.cpp
+
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.cpp
     src/widgets/chart/ScrollChartWidgetStats.cpp
@@ -1105,6 +1122,28 @@ set(SOURCES
     src/utils/merkle/MerkleTree.cpp
     src/utils/skiplist2/ConcurrentSkipList.cpp
     src/utils/lfu2/TinyLfuCache.cpp
+
+    # -- F201~F220: Wave 33+Linter 工具模块 --
+    src/utils/graph3/DijkstraShortestPath.cpp
+    src/utils/heap2/FibonacciHeap.cpp
+    src/utils/kalman3/UnscentedKalmanFilter.cpp
+    src/utils/quadtree/QuadTree.cpp
+    src/utils/svd/SingularValueDecomposition.cpp
+    src/utils/btree/BPlusTree.cpp
+    src/utils/suffix/SuffixAutomaton.cpp
+    src/utils/radixtree/RadixTree.cpp
+    src/utils/disjoint/DisjointSet.cpp
+    src/utils/convhull/ConvexHull.cpp
+    src/utils/voronoi/VoronoiDiagram.cpp
+    src/utils/wavelet2/HaarWavelet2D.cpp
+    src/utils/rle3/BurrowsWheelerTransform.cpp
+    src/utils/autocorr/AutoCorrelator.cpp
+    src/utils/crosscorr/CrossCorrelator.cpp
+    src/utils/resample/DataResampler.cpp
+    src/utils/wavwriter/WavWriter.cpp
+    src/utils/wavreader/WavReader.cpp
+    src/utils/hilbert/HilbertTransform.cpp
+    src/utils/lomb2/LombScargle.cpp
 )
 
 set(HEADERS
@@ -1935,6 +1974,32 @@ set(HEADERS
     src/utils/merkle/MerkleTree.h
     src/utils/skiplist2/ConcurrentSkipList.h
     src/utils/lfu2/TinyLfuCache.h
+
+    # -- F211~F215: Wave 35 工具模块 --
+    src/utils/svd/SingularValueDecomposition.h
+    src/utils/kalman3/UnscentedKalmanFilter.h
+    src/utils/graph3/DijkstraShortestPath.h
+    src/utils/heap2/FibonacciHeap.h
+    src/utils/quadtree/QuadTree.h
+
+    # -- F216~F225: Wave 36 工具模块(linter) --
+    src/utils/btree/BPlusTree.h
+    src/utils/convhull/ConvexHull.h
+    src/utils/disjoint/DisjointSet.h
+    src/utils/radixtree/RadixTree.h
+    src/utils/rle3/BurrowsWheelerTransform.h
+    src/utils/suffix/SuffixAutomaton.h
+    src/utils/voronoi/VoronoiDiagram.h
+    src/utils/wavelet2/HaarWavelet2D.h
+
+    # -- F226~F232: Wave 33 工具模块(续) --
+    src/utils/autocorr/AutoCorrelator.h
+    src/utils/crosscorr/CrossCorrelator.h
+    src/utils/resample/DataResampler.h
+    src/utils/wavwriter/WavWriter.h
+    src/utils/wavreader/WavReader.h
+    src/utils/hilbert/HilbertTransform.h
+    src/utils/lomb2/LombScargle.h
 )
 
 set(RESOURCES

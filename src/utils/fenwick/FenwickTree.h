@@ -41,7 +41,7 @@ public:
     double prefixSum(int index) const;
 
     /** @brief 区间和 [left, right] @param left 左 @param right 右 @return 和 */
-    double rangeSum(int left, int right) const;
+    double rangeSum(int left, int right);
 
     /** @brief 获取单点值 @param index 索引 @return 值 */
     double valueAt(int index) const;

@@ -88,7 +88,7 @@ double FenwickTree::prefixSum(int index) const
     return sum;
 }
 
-double FenwickTree::rangeSum(int left, int right) const
+double FenwickTree::rangeSum(int left, int right)
 {
     QElapsedTimer timer;
     timer.start();
@@ -106,7 +106,7 @@ double FenwickTree::rangeSum(int left, int right) const
         qMax(m_stats.totalPrefixQueries + m_stats.totalRangeQueries +
              m_stats.totalUpdates, 1ULL);
 
-    const_cast<FenwickTree*>(this)->emit rangeQueried(left, right, result);
+    emit rangeQueried(left, right, result);
     return result;
 }
 
