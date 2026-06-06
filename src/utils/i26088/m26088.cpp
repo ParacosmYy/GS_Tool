@@ -1,0 +1,2 @@
+#include "i26088/m26088.h"
+QVector<double> m26088::run(const QVector<double>&in) { m_s.c++; m_s.i+=in.size(); return in; }
