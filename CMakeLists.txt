@@ -2545,6 +2545,14 @@ set(SOURCES
     src/utils/matrix188/ThomasAlgorithm.cpp
     src/utils/signal186/EnvelopeDetector3.cpp
     src/utils/tree185/RedBlackTree9.cpp
+    src/utils/cluster183/SubspaceCluster5.cpp
+    src/utils/code184/BifidCode.cpp
+    src/utils/dsp185/DynamicEQ2.cpp
+    src/utils/fft186/DST4.cpp
+    src/utils/graph199/StrongConnectivity3.cpp
+    src/utils/matrix189/GaussSeidel.cpp
+    src/utils/signal187/SignalSynchronizer2.cpp
+    src/utils/tree186/ScapegoatTree5.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4944,6 +4952,14 @@ set(HEADERS
     src/utils/matrix188/ThomasAlgorithm.h
     src/utils/signal186/EnvelopeDetector3.h
     src/utils/tree185/RedBlackTree9.h
+    src/utils/cluster183/SubspaceCluster5.h
+    src/utils/code184/BifidCode.h
+    src/utils/dsp185/DynamicEQ2.h
+    src/utils/fft186/DST4.h
+    src/utils/graph199/StrongConnectivity3.h
+    src/utils/matrix189/GaussSeidel.h
+    src/utils/signal187/SignalSynchronizer2.h
+    src/utils/tree186/ScapegoatTree5.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
