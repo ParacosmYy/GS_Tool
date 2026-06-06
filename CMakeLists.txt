@@ -2449,6 +2449,14 @@ set(SOURCES
     src/utils/matrix176/BandedSolver.cpp
     src/utils/signal174/CorrelationAnalyzer.cpp
     src/utils/tree173/Treap6.cpp
+    src/utils/cluster171/GaussianMixture12.cpp
+    src/utils/code172/DeltaCode.cpp
+    src/utils/dsp173/SpectralRepair.cpp
+    src/utils/fft174/WinogradFFT.cpp
+    src/utils/graph187/GraphMatching2.cpp
+    src/utils/matrix177/IterativeSolver.cpp
+    src/utils/signal175/FeatureExtractor.cpp
+    src/utils/tree174/SplayTree6.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4752,6 +4760,14 @@ set(HEADERS
     src/utils/matrix176/BandedSolver.h
     src/utils/signal174/CorrelationAnalyzer.h
     src/utils/tree173/Treap6.h
+    src/utils/cluster171/GaussianMixture12.h
+    src/utils/code172/DeltaCode.h
+    src/utils/dsp173/SpectralRepair.h
+    src/utils/fft174/WinogradFFT.h
+    src/utils/graph187/GraphMatching2.h
+    src/utils/matrix177/IterativeSolver.h
+    src/utils/signal175/FeatureExtractor.h
+    src/utils/tree174/SplayTree6.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
