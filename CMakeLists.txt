@@ -2401,6 +2401,14 @@ set(SOURCES
     src/utils/matrix170/CholeskySolver.cpp
     src/utils/signal168/HarmonicAnalyzer.cpp
     src/utils/tree167/ScapegoatTree4.cpp
+    src/utils/cluster165/FuzzyCMeans6.cpp
+    src/utils/code166/TrellisCode.cpp
+    src/utils/dsp167/ConvolutionReverb.cpp
+    src/utils/fft168/NumberTheoreticTransform.cpp
+    src/utils/graph181/EulerTour.cpp
+    src/utils/matrix171/LUDecomposition.cpp
+    src/utils/signal169/SignalSynchronizer.cpp
+    src/utils/tree168/WeightBalancedTree4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4656,6 +4664,14 @@ set(HEADERS
     src/utils/matrix170/CholeskySolver.h
     src/utils/signal168/HarmonicAnalyzer.h
     src/utils/tree167/ScapegoatTree4.h
+    src/utils/cluster165/FuzzyCMeans6.h
+    src/utils/code166/TrellisCode.h
+    src/utils/dsp167/ConvolutionReverb.h
+    src/utils/fft168/NumberTheoreticTransform.h
+    src/utils/graph181/EulerTour.h
+    src/utils/matrix171/LUDecomposition.h
+    src/utils/signal169/SignalSynchronizer.h
+    src/utils/tree168/WeightBalancedTree4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
