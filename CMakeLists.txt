@@ -2393,6 +2393,14 @@ set(SOURCES
     src/utils/matrix169/SparseSolver.cpp
     src/utils/signal167/PitchDetector.cpp
     src/utils/tree166/VanEmdeBoas.cpp
+    src/utils/cluster164/BirchClustering5.cpp
+    src/utils/code165/ErasureCode4.cpp
+    src/utils/dsp166/Deconvolver.cpp
+    src/utils/fft167/WalshHadamard.cpp
+    src/utils/graph180/StoerWagner.cpp
+    src/utils/matrix170/CholeskySolver.cpp
+    src/utils/signal168/HarmonicAnalyzer.cpp
+    src/utils/tree167/ScapegoatTree4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4640,6 +4648,14 @@ set(HEADERS
     src/utils/matrix169/SparseSolver.h
     src/utils/signal167/PitchDetector.h
     src/utils/tree166/VanEmdeBoas.h
+    src/utils/cluster164/BirchClustering5.h
+    src/utils/code165/ErasureCode4.h
+    src/utils/dsp166/Deconvolver.h
+    src/utils/fft167/WalshHadamard.h
+    src/utils/graph180/StoerWagner.h
+    src/utils/matrix170/CholeskySolver.h
+    src/utils/signal168/HarmonicAnalyzer.h
+    src/utils/tree167/ScapegoatTree4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
