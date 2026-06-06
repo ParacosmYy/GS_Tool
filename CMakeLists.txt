@@ -2465,6 +2465,14 @@ set(SOURCES
     src/utils/matrix178/SparseLU.cpp
     src/utils/signal176/WaveletDenoiser2.cpp
     src/utils/tree175/AvlTree3.cpp
+    src/utils/cluster173/MeanShift8.cpp
+    src/utils/code174/VigenereCode.cpp
+    src/utils/dsp175/NoiseGate3.cpp
+    src/utils/fft176/Goertzel4.cpp
+    src/utils/graph189/IndependentSet3.cpp
+    src/utils/matrix179/SchurDecomposition4.cpp
+    src/utils/signal177/Periodogram.cpp
+    src/utils/tree176/BTree4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4784,6 +4792,14 @@ set(HEADERS
     src/utils/matrix178/SparseLU.h
     src/utils/signal176/WaveletDenoiser2.h
     src/utils/tree175/AvlTree3.h
+    src/utils/cluster173/MeanShift8.h
+    src/utils/code174/VigenereCode.h
+    src/utils/dsp175/NoiseGate3.h
+    src/utils/fft176/Goertzel4.h
+    src/utils/graph189/IndependentSet3.h
+    src/utils/matrix179/SchurDecomposition4.h
+    src/utils/signal177/Periodogram.h
+    src/utils/tree176/BTree4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
