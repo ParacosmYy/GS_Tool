@@ -2369,6 +2369,14 @@ set(SOURCES
     src/utils/matrix166/LeastSquaresSolver.cpp
     src/utils/signal164/NoiseProfiler.cpp
     src/utils/tree163/LeftistHeap.cpp
+    src/utils/cluster161/GaussianMixture11.cpp
+    src/utils/code162/BCHCode4.cpp
+    src/utils/dsp163/VocalRemover.cpp
+    src/utils/fft164/DiscreteCosineTransform.cpp
+    src/utils/graph177/MinCostFlow.cpp
+    src/utils/matrix167/ConditionEstimator.cpp
+    src/utils/signal165/ChannelEqualizer.cpp
+    src/utils/tree164/PairingHeap.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -2439,6 +2447,12 @@ set(SOURCES
     src/connection/mqtt_client/MqttClientEngineStats.cpp
     src/connection/mqtt_client/MqttClientPanel.cpp
     src/connection/mqtt_client/MqttClientPanelStats.cpp
+
+    # ── F88: Script Engine ──
+    src/utils/scripting/ScriptEngine.cpp
+    src/utils/scripting/ScriptEngineStats.cpp
+    src/utils/scripting/ScriptEditorWidget.cpp
+    src/utils/scripting/ScriptEditorWidgetStats.cpp
 )
 
 set(HEADERS
@@ -4586,6 +4600,14 @@ set(HEADERS
     src/utils/matrix166/LeastSquaresSolver.h
     src/utils/signal164/NoiseProfiler.h
     src/utils/tree163/LeftistHeap.h
+    src/utils/cluster161/GaussianMixture11.h
+    src/utils/code162/BCHCode4.h
+    src/utils/dsp163/VocalRemover.h
+    src/utils/fft164/DiscreteCosineTransform.h
+    src/utils/graph177/MinCostFlow.h
+    src/utils/matrix167/ConditionEstimator.h
+    src/utils/signal165/ChannelEqualizer.h
+    src/utils/tree164/PairingHeap.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
@@ -4651,6 +4673,11 @@ set(HEADERS
     src/connection/mqtt_client/MqttClientTypes.h
     src/connection/mqtt_client/MqttClientEngine.h
     src/connection/mqtt_client/MqttClientPanel.h
+
+    # ── F88: Script Engine ──
+    src/utils/scripting/ScriptTypes.h
+    src/utils/scripting/ScriptEngine.h
+    src/utils/scripting/ScriptEditorWidget.h
 )
 
 set(RESOURCES
