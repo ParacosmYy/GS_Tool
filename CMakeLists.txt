@@ -2521,6 +2521,14 @@ set(SOURCES
     src/utils/matrix185/BiCGSTAB.cpp
     src/utils/signal183/AdaptiveFilter3.cpp
     src/utils/tree182/AA4.cpp
+    src/utils/cluster180/GaussianMixture13.cpp
+    src/utils/code181/BeaufortCode.cpp
+    src/utils/dsp182/Deesser2.cpp
+    src/utils/fft183/SplitRadixFFT4.cpp
+    src/utils/graph196/GraphIsomorphism.cpp
+    src/utils/matrix186/GMRES.cpp
+    src/utils/signal184/SignalClassifier.cpp
+    src/utils/tree183/Treap7.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4896,6 +4904,14 @@ set(HEADERS
     src/utils/matrix185/BiCGSTAB.h
     src/utils/signal183/AdaptiveFilter3.h
     src/utils/tree182/AA4.h
+    src/utils/cluster180/GaussianMixture13.h
+    src/utils/code181/BeaufortCode.h
+    src/utils/dsp182/Deesser2.h
+    src/utils/fft183/SplitRadixFFT4.h
+    src/utils/graph196/GraphIsomorphism.h
+    src/utils/matrix186/GMRES.h
+    src/utils/signal184/SignalClassifier.h
+    src/utils/tree183/Treap7.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
