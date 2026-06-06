@@ -2457,6 +2457,14 @@ set(SOURCES
     src/utils/matrix177/IterativeSolver.cpp
     src/utils/signal175/FeatureExtractor.cpp
     src/utils/tree174/SplayTree6.cpp
+    src/utils/cluster172/KMedoids14.cpp
+    src/utils/code173/CaesarCode.cpp
+    src/utils/dsp174/Limiter3.cpp
+    src/utils/fft175/DistributedArithmetic4.cpp
+    src/utils/graph188/MaximumClique.cpp
+    src/utils/matrix178/SparseLU.cpp
+    src/utils/signal176/WaveletDenoiser2.cpp
+    src/utils/tree175/AvlTree3.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4768,6 +4776,14 @@ set(HEADERS
     src/utils/matrix177/IterativeSolver.h
     src/utils/signal175/FeatureExtractor.h
     src/utils/tree174/SplayTree6.h
+    src/utils/cluster172/KMedoids14.h
+    src/utils/code173/CaesarCode.h
+    src/utils/dsp174/Limiter3.h
+    src/utils/fft175/DistributedArithmetic4.h
+    src/utils/graph188/MaximumClique.h
+    src/utils/matrix178/SparseLU.h
+    src/utils/signal176/WaveletDenoiser2.h
+    src/utils/tree175/AvlTree3.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
