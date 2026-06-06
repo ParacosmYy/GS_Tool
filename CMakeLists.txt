@@ -2497,6 +2497,14 @@ set(SOURCES
     src/utils/matrix182/SVD3.cpp
     src/utils/signal180/Resampler2.cpp
     src/utils/tree179/IntervalTree4.cpp
+    src/utils/cluster177/SpectralCluster7.cpp
+    src/utils/code178/ADFGVXCode.cpp
+    src/utils/dsp179/Limiter4.cpp
+    src/utils/fft180/WinogradFFT4.cpp
+    src/utils/graph193/EdgeColoring.cpp
+    src/utils/matrix183/SparseQR.cpp
+    src/utils/signal181/Correlator.cpp
+    src/utils/tree180/SuffixTree4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4848,6 +4856,14 @@ set(HEADERS
     src/utils/matrix182/SVD3.h
     src/utils/signal180/Resampler2.h
     src/utils/tree179/IntervalTree4.h
+    src/utils/cluster177/SpectralCluster7.h
+    src/utils/code178/ADFGVXCode.h
+    src/utils/dsp179/Limiter4.h
+    src/utils/fft180/WinogradFFT4.h
+    src/utils/graph193/EdgeColoring.h
+    src/utils/matrix183/SparseQR.h
+    src/utils/signal181/Correlator.h
+    src/utils/tree180/SuffixTree4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
