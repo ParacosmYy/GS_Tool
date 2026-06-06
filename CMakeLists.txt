@@ -2505,6 +2505,14 @@ set(SOURCES
     src/utils/matrix183/SparseQR.cpp
     src/utils/signal181/Correlator.cpp
     src/utils/tree180/SuffixTree4.cpp
+    src/utils/cluster178/KMeans16.cpp
+    src/utils/code179/RailFenceCode.cpp
+    src/utils/dsp180/MultibandCompressor3.cpp
+    src/utils/fft181/BruunFFT4.cpp
+    src/utils/graph194/TravelingSalesman.cpp
+    src/utils/matrix184/ConjugateGradient.cpp
+    src/utils/signal182/WaveletDenoiser3.cpp
+    src/utils/tree181/Rope4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4864,6 +4872,14 @@ set(HEADERS
     src/utils/matrix183/SparseQR.h
     src/utils/signal181/Correlator.h
     src/utils/tree180/SuffixTree4.h
+    src/utils/cluster178/KMeans16.h
+    src/utils/code179/RailFenceCode.h
+    src/utils/dsp180/MultibandCompressor3.h
+    src/utils/fft181/BruunFFT4.h
+    src/utils/graph194/TravelingSalesman.h
+    src/utils/matrix184/ConjugateGradient.h
+    src/utils/signal182/WaveletDenoiser3.h
+    src/utils/tree181/Rope4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
