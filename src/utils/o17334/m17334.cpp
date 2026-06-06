@@ -1,0 +1,2 @@
+#include "o17334/m17334.h"
+QVector<double> m17334::run(const QVector<double>&in) { m_s.c++; m_s.i+=in.size(); return in; }
