@@ -2425,6 +2425,14 @@ set(SOURCES
     src/utils/matrix173/SVD2.cpp
     src/utils/signal171/Resampler.cpp
     src/utils/tree170/RedBlackTree8.cpp
+    src/utils/cluster168/DBSCAN9.cpp
+    src/utils/code169/ArithmeticCode.cpp
+    src/utils/dsp170/SpectralGate.cpp
+    src/utils/fft171/ZoomFFT.cpp
+    src/utils/graph184/TransitiveClosure.cpp
+    src/utils/matrix174/EigenVectorSolver.cpp
+    src/utils/signal172/EnvelopeDetector2.cpp
+    src/utils/tree171/AA_Tree3.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4704,6 +4712,14 @@ set(HEADERS
     src/utils/matrix173/SVD2.h
     src/utils/signal171/Resampler.h
     src/utils/tree170/RedBlackTree8.h
+    src/utils/cluster168/DBSCAN9.h
+    src/utils/code169/ArithmeticCode.h
+    src/utils/dsp170/SpectralGate.h
+    src/utils/fft171/ZoomFFT.h
+    src/utils/graph184/TransitiveClosure.h
+    src/utils/matrix174/EigenVectorSolver.h
+    src/utils/signal172/EnvelopeDetector2.h
+    src/utils/tree171/AA_Tree3.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
