@@ -2481,6 +2481,14 @@ set(SOURCES
     src/utils/matrix180/SymmetricEigenSolver.cpp
     src/utils/signal178/WindowFunction.cpp
     src/utils/tree177/FenwickTree4.cpp
+    src/utils/cluster175/BirchClustering6.cpp
+    src/utils/code176/TranspositionCode.cpp
+    src/utils/dsp177/Expander2.cpp
+    src/utils/fft178/PrimeFactorFFT4.cpp
+    src/utils/graph191/DominatingSet4.cpp
+    src/utils/matrix181/GeneralizedEigenSolver.cpp
+    src/utils/signal179/FilterDesign.cpp
+    src/utils/tree178/SegmentTree4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4816,6 +4824,14 @@ set(HEADERS
     src/utils/matrix180/SymmetricEigenSolver.h
     src/utils/signal178/WindowFunction.h
     src/utils/tree177/FenwickTree4.h
+    src/utils/cluster175/BirchClustering6.h
+    src/utils/code176/TranspositionCode.h
+    src/utils/dsp177/Expander2.h
+    src/utils/fft178/PrimeFactorFFT4.h
+    src/utils/graph191/DominatingSet4.h
+    src/utils/matrix181/GeneralizedEigenSolver.h
+    src/utils/signal179/FilterDesign.h
+    src/utils/tree178/SegmentTree4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
