@@ -2417,6 +2417,14 @@ set(SOURCES
     src/utils/matrix172/QRDecomposition.cpp
     src/utils/signal170/AdaptiveLineEnhancer2.cpp
     src/utils/tree169/BPlusTree6.cpp
+    src/utils/cluster167/KMeans15.cpp
+    src/utils/code168/HuffmanCode3.cpp
+    src/utils/dsp169/DynamicEQ.cpp
+    src/utils/fft170/SlidingDFT4.cpp
+    src/utils/graph183/TopologicalSort.cpp
+    src/utils/matrix173/SVD2.cpp
+    src/utils/signal171/Resampler.cpp
+    src/utils/tree170/RedBlackTree8.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4688,6 +4696,14 @@ set(HEADERS
     src/utils/matrix172/QRDecomposition.h
     src/utils/signal170/AdaptiveLineEnhancer2.h
     src/utils/tree169/BPlusTree6.h
+    src/utils/cluster167/KMeans15.h
+    src/utils/code168/HuffmanCode3.h
+    src/utils/dsp169/DynamicEQ.h
+    src/utils/fft170/SlidingDFT4.h
+    src/utils/graph183/TopologicalSort.h
+    src/utils/matrix173/SVD2.h
+    src/utils/signal171/Resampler.h
+    src/utils/tree170/RedBlackTree8.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
