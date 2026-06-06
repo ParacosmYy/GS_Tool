@@ -2377,6 +2377,14 @@ set(SOURCES
     src/utils/matrix167/ConditionEstimator.cpp
     src/utils/signal165/ChannelEqualizer.cpp
     src/utils/tree164/PairingHeap.cpp
+    src/utils/cluster162/OPTICS5.cpp
+    src/utils/code163/ReedMullerCode2.cpp
+    src/utils/dsp164/PhaseVocoder.cpp
+    src/utils/fft165/DiscreteSineTransform.cpp
+    src/utils/graph178/BipartiteMatch.cpp
+    src/utils/matrix168/EigenValueSolver.cpp
+    src/utils/signal166/Beamformer2.cpp
+    src/utils/tree165/FibonacciHeap.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4608,6 +4616,14 @@ set(HEADERS
     src/utils/matrix167/ConditionEstimator.h
     src/utils/signal165/ChannelEqualizer.h
     src/utils/tree164/PairingHeap.h
+    src/utils/cluster162/OPTICS5.h
+    src/utils/code163/ReedMullerCode2.h
+    src/utils/dsp164/PhaseVocoder.h
+    src/utils/fft165/DiscreteSineTransform.h
+    src/utils/graph178/BipartiteMatch.h
+    src/utils/matrix168/EigenValueSolver.h
+    src/utils/signal166/Beamformer2.h
+    src/utils/tree165/FibonacciHeap.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
