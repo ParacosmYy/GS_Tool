@@ -2489,6 +2489,14 @@ set(SOURCES
     src/utils/matrix181/GeneralizedEigenSolver.cpp
     src/utils/signal179/FilterDesign.cpp
     src/utils/tree178/SegmentTree4.cpp
+    src/utils/cluster176/FuzzyCMeans7.cpp
+    src/utils/code177/PlayfairCode.cpp
+    src/utils/dsp178/Gate3.cpp
+    src/utils/fft179/RaderFFT4.cpp
+    src/utils/graph192/VertexCover4.cpp
+    src/utils/matrix182/SVD3.cpp
+    src/utils/signal180/Resampler2.cpp
+    src/utils/tree179/IntervalTree4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4832,6 +4840,14 @@ set(HEADERS
     src/utils/matrix181/GeneralizedEigenSolver.h
     src/utils/signal179/FilterDesign.h
     src/utils/tree178/SegmentTree4.h
+    src/utils/cluster176/FuzzyCMeans7.h
+    src/utils/code177/PlayfairCode.h
+    src/utils/dsp178/Gate3.h
+    src/utils/fft179/RaderFFT4.h
+    src/utils/graph192/VertexCover4.h
+    src/utils/matrix182/SVD3.h
+    src/utils/signal180/Resampler2.h
+    src/utils/tree179/IntervalTree4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
