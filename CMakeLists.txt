@@ -2441,6 +2441,14 @@ set(SOURCES
     src/utils/matrix175/TridiagonalSolver.cpp
     src/utils/signal173/SignalGenerator2.cpp
     src/utils/tree172/CartesianTree5.cpp
+    src/utils/cluster170/SubspaceCluster4.cpp
+    src/utils/code171/RunLengthCode3.cpp
+    src/utils/dsp172/TransientShaper2.cpp
+    src/utils/fft173/SplitRadixFFT.cpp
+    src/utils/graph186/DominatingSet3.cpp
+    src/utils/matrix176/BandedSolver.cpp
+    src/utils/signal174/CorrelationAnalyzer.cpp
+    src/utils/tree173/Treap6.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4736,6 +4744,14 @@ set(HEADERS
     src/utils/matrix175/TridiagonalSolver.h
     src/utils/signal173/SignalGenerator2.h
     src/utils/tree172/CartesianTree5.h
+    src/utils/cluster170/SubspaceCluster4.h
+    src/utils/code171/RunLengthCode3.h
+    src/utils/dsp172/TransientShaper2.h
+    src/utils/fft173/SplitRadixFFT.h
+    src/utils/graph186/DominatingSet3.h
+    src/utils/matrix176/BandedSolver.h
+    src/utils/signal174/CorrelationAnalyzer.h
+    src/utils/tree173/Treap6.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
