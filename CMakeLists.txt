@@ -2553,6 +2553,14 @@ set(SOURCES
     src/utils/matrix189/GaussSeidel.cpp
     src/utils/signal187/SignalSynchronizer2.cpp
     src/utils/tree186/ScapegoatTree5.cpp
+    src/utils/cluster184/OPTICS6.cpp
+    src/utils/code185/NihilistCode.cpp
+    src/utils/dsp186/TransientShaper3.cpp
+    src/utils/fft187/WHT4.cpp
+    src/utils/graph200/EulerTour3.cpp
+    src/utils/matrix190/SparseLU2.cpp
+    src/utils/signal188/FeatureExtractor2.cpp
+    src/utils/tree187/WeightBalancedTree5.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4960,6 +4968,14 @@ set(HEADERS
     src/utils/matrix189/GaussSeidel.h
     src/utils/signal187/SignalSynchronizer2.h
     src/utils/tree186/ScapegoatTree5.h
+    src/utils/cluster184/OPTICS6.h
+    src/utils/code185/NihilistCode.h
+    src/utils/dsp186/TransientShaper3.h
+    src/utils/fft187/WHT4.h
+    src/utils/graph200/EulerTour3.h
+    src/utils/matrix190/SparseLU2.h
+    src/utils/signal188/FeatureExtractor2.h
+    src/utils/tree187/WeightBalancedTree5.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
