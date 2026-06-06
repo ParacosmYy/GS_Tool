@@ -2385,6 +2385,14 @@ set(SOURCES
     src/utils/matrix168/EigenValueSolver.cpp
     src/utils/signal166/Beamformer2.cpp
     src/utils/tree165/FibonacciHeap.cpp
+    src/utils/cluster163/Agglomerative6.cpp
+    src/utils/code164/ConvolutionalCode6.cpp
+    src/utils/dsp165/GranularSynthesis.cpp
+    src/utils/fft166/ModifiedDCT.cpp
+    src/utils/graph179/Hungarian.cpp
+    src/utils/matrix169/SparseSolver.cpp
+    src/utils/signal167/PitchDetector.cpp
+    src/utils/tree166/VanEmdeBoas.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4624,6 +4632,14 @@ set(HEADERS
     src/utils/matrix168/EigenValueSolver.h
     src/utils/signal166/Beamformer2.h
     src/utils/tree165/FibonacciHeap.h
+    src/utils/cluster163/Agglomerative6.h
+    src/utils/code164/ConvolutionalCode6.h
+    src/utils/dsp165/GranularSynthesis.h
+    src/utils/fft166/ModifiedDCT.h
+    src/utils/graph179/Hungarian.h
+    src/utils/matrix169/SparseSolver.h
+    src/utils/signal167/PitchDetector.h
+    src/utils/tree166/VanEmdeBoas.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
