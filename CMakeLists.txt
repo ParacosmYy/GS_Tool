@@ -2433,6 +2433,14 @@ set(SOURCES
     src/utils/matrix174/EigenVectorSolver.cpp
     src/utils/signal172/EnvelopeDetector2.cpp
     src/utils/tree171/AA_Tree3.cpp
+    src/utils/cluster169/HierarchicalCluster6.cpp
+    src/utils/code170/LempelZivWelch3.cpp
+    src/utils/dsp171/MultibandCompressor2.cpp
+    src/utils/fft172/PrimeFactorFFT.cpp
+    src/utils/graph185/GraphColoring5.cpp
+    src/utils/matrix175/TridiagonalSolver.cpp
+    src/utils/signal173/SignalGenerator2.cpp
+    src/utils/tree172/CartesianTree5.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4720,6 +4728,14 @@ set(HEADERS
     src/utils/matrix174/EigenVectorSolver.h
     src/utils/signal172/EnvelopeDetector2.h
     src/utils/tree171/AA_Tree3.h
+    src/utils/cluster169/HierarchicalCluster6.h
+    src/utils/code170/LempelZivWelch3.h
+    src/utils/dsp171/MultibandCompressor2.h
+    src/utils/fft172/PrimeFactorFFT.h
+    src/utils/graph185/GraphColoring5.h
+    src/utils/matrix175/TridiagonalSolver.h
+    src/utils/signal173/SignalGenerator2.h
+    src/utils/tree172/CartesianTree5.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
