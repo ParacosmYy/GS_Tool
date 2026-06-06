@@ -2409,6 +2409,14 @@ set(SOURCES
     src/utils/matrix171/LUDecomposition.cpp
     src/utils/signal169/SignalSynchronizer.cpp
     src/utils/tree168/WeightBalancedTree4.cpp
+    src/utils/cluster166/SpectralCluster6.cpp
+    src/utils/code167/GrayCode3.cpp
+    src/utils/dsp168/BinauralProcessor.cpp
+    src/utils/fft169/DiscreteHartleyTransform.cpp
+    src/utils/graph182/StrongConnectivity.cpp
+    src/utils/matrix172/QRDecomposition.cpp
+    src/utils/signal170/AdaptiveLineEnhancer2.cpp
+    src/utils/tree169/BPlusTree6.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4672,6 +4680,14 @@ set(HEADERS
     src/utils/matrix171/LUDecomposition.h
     src/utils/signal169/SignalSynchronizer.h
     src/utils/tree168/WeightBalancedTree4.h
+    src/utils/cluster166/SpectralCluster6.h
+    src/utils/code167/GrayCode3.h
+    src/utils/dsp168/BinauralProcessor.h
+    src/utils/fft169/DiscreteHartleyTransform.h
+    src/utils/graph182/StrongConnectivity.h
+    src/utils/matrix172/QRDecomposition.h
+    src/utils/signal170/AdaptiveLineEnhancer2.h
+    src/utils/tree169/BPlusTree6.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
