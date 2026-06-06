@@ -2529,6 +2529,14 @@ set(SOURCES
     src/utils/matrix186/GMRES.cpp
     src/utils/signal184/SignalClassifier.cpp
     src/utils/tree183/Treap7.cpp
+    src/utils/cluster181/KMedoids15.cpp
+    src/utils/code182/AutokeyCode.cpp
+    src/utils/dsp183/PhaseCorrelator.cpp
+    src/utils/fft184/HexFFT4.cpp
+    src/utils/graph197/MaximumFlow.cpp
+    src/utils/matrix187/Cholesky3.cpp
+    src/utils/signal185/PitchDetector3.cpp
+    src/utils/tree184/WAVL4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4912,6 +4920,14 @@ set(HEADERS
     src/utils/matrix186/GMRES.h
     src/utils/signal184/SignalClassifier.h
     src/utils/tree183/Treap7.h
+    src/utils/cluster181/KMedoids15.h
+    src/utils/code182/AutokeyCode.h
+    src/utils/dsp183/PhaseCorrelator.h
+    src/utils/fft184/HexFFT4.h
+    src/utils/graph197/MaximumFlow.h
+    src/utils/matrix187/Cholesky3.h
+    src/utils/signal185/PitchDetector3.h
+    src/utils/tree184/WAVL4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
