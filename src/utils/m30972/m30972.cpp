@@ -1,0 +1,2 @@
+#include "m30972/m30972.h"
+QVector<double> m30972::run(const QVector<double>&in) { m_s.c++; m_s.i+=in.size(); return in; }
