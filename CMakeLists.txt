@@ -2513,6 +2513,14 @@ set(SOURCES
     src/utils/matrix184/ConjugateGradient.cpp
     src/utils/signal182/WaveletDenoiser3.cpp
     src/utils/tree181/Rope4.cpp
+    src/utils/cluster179/DBSCAN10.cpp
+    src/utils/code180/AffineCode.cpp
+    src/utils/dsp181/SpectralGate2.cpp
+    src/utils/fft182/MixedRadixFFT4.cpp
+    src/utils/graph195/ChinesePostman.cpp
+    src/utils/matrix185/BiCGSTAB.cpp
+    src/utils/signal183/AdaptiveFilter3.cpp
+    src/utils/tree182/AA4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4880,6 +4888,14 @@ set(HEADERS
     src/utils/matrix184/ConjugateGradient.h
     src/utils/signal182/WaveletDenoiser3.h
     src/utils/tree181/Rope4.h
+    src/utils/cluster179/DBSCAN10.h
+    src/utils/code180/AffineCode.h
+    src/utils/dsp181/SpectralGate2.h
+    src/utils/fft182/MixedRadixFFT4.h
+    src/utils/graph195/ChinesePostman.h
+    src/utils/matrix185/BiCGSTAB.h
+    src/utils/signal183/AdaptiveFilter3.h
+    src/utils/tree182/AA4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
