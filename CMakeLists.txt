@@ -2473,6 +2473,14 @@ set(SOURCES
     src/utils/matrix179/SchurDecomposition4.cpp
     src/utils/signal177/Periodogram.cpp
     src/utils/tree176/BTree4.cpp
+    src/utils/cluster174/Agglomerative7.cpp
+    src/utils/code175/SubstitutionCode.cpp
+    src/utils/dsp176/Compressor2.cpp
+    src/utils/fft177/ChirpZ4.cpp
+    src/utils/graph190/Biconnected9.cpp
+    src/utils/matrix180/SymmetricEigenSolver.cpp
+    src/utils/signal178/WindowFunction.cpp
+    src/utils/tree177/FenwickTree4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4800,6 +4808,14 @@ set(HEADERS
     src/utils/matrix179/SchurDecomposition4.h
     src/utils/signal177/Periodogram.h
     src/utils/tree176/BTree4.h
+    src/utils/cluster174/Agglomerative7.h
+    src/utils/code175/SubstitutionCode.h
+    src/utils/dsp176/Compressor2.h
+    src/utils/fft177/ChirpZ4.h
+    src/utils/graph190/Biconnected9.h
+    src/utils/matrix180/SymmetricEigenSolver.h
+    src/utils/signal178/WindowFunction.h
+    src/utils/tree177/FenwickTree4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
