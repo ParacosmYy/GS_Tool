@@ -2729,6 +2729,14 @@ set(SOURCES
     src/utils/matrix211/ConjugateGradient4.cpp
     src/utils/signal209/FilterDesign4.cpp
     src/utils/tree208/ScapegoatTree6.cpp
+    src/utils/cluster206/SpectralCluster10.cpp
+    src/utils/code207/SeriatedPlayfair2.cpp
+    src/utils/dsp208/SpectralGate4.cpp
+    src/utils/fft209/BruunFFT6.cpp
+    src/utils/graph222/ChinesePostman3.cpp
+    src/utils/matrix212/BiCGSTAB4.cpp
+    src/utils/signal210/WaveletDenoiser7.cpp
+    src/utils/tree209/VanEmdeBoas5.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5312,6 +5320,14 @@ set(HEADERS
     src/utils/matrix211/ConjugateGradient4.h
     src/utils/signal209/FilterDesign4.h
     src/utils/tree208/ScapegoatTree6.h
+    src/utils/cluster206/SpectralCluster10.h
+    src/utils/code207/SeriatedPlayfair2.h
+    src/utils/dsp208/SpectralGate4.h
+    src/utils/fft209/BruunFFT6.h
+    src/utils/graph222/ChinesePostman3.h
+    src/utils/matrix212/BiCGSTAB4.h
+    src/utils/signal210/WaveletDenoiser7.h
+    src/utils/tree209/VanEmdeBoas5.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
