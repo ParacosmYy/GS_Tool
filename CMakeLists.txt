@@ -2577,6 +2577,14 @@ set(SOURCES
     src/utils/matrix192/BandSolver2.cpp
     src/utils/signal190/WaveletDenoiser4.cpp
     src/utils/tree189/AvlTree4.cpp
+    src/utils/cluster187/MeanShift9.cpp
+    src/utils/code188/Chaocipher.cpp
+    src/utils/dsp189/Delay3.cpp
+    src/utils/fft190/SlidingDFT5.cpp
+    src/utils/graph203/GraphColoring6.cpp
+    src/utils/matrix193/TridiagonalSolver2.cpp
+    src/utils/signal191/Resampler3.cpp
+    src/utils/tree190/BPlusTree7.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5008,6 +5016,14 @@ set(HEADERS
     src/utils/matrix192/BandSolver2.h
     src/utils/signal190/WaveletDenoiser4.h
     src/utils/tree189/AvlTree4.h
+    src/utils/cluster187/MeanShift9.h
+    src/utils/code188/Chaocipher.h
+    src/utils/dsp189/Delay3.h
+    src/utils/fft190/SlidingDFT5.h
+    src/utils/graph203/GraphColoring6.h
+    src/utils/matrix193/TridiagonalSolver2.h
+    src/utils/signal191/Resampler3.h
+    src/utils/tree190/BPlusTree7.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
