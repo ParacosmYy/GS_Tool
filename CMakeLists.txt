@@ -2617,6 +2617,14 @@ set(SOURCES
     src/utils/matrix197/GeneralizedEigenSolver2.cpp
     src/utils/signal195/FilterDesign2.cpp
     src/utils/tree194/SegmentTree5.cpp
+    src/utils/cluster192/GaussianMixture15.cpp
+    src/utils/code193/PolluxCode.cpp
+    src/utils/dsp194/Compressor3.cpp
+    src/utils/fft195/PrimeFactorFFT5.cpp
+    src/utils/graph208/VertexCover5.cpp
+    src/utils/matrix198/SVD4.cpp
+    src/utils/signal196/Resampler4.cpp
+    src/utils/tree195/IntervalTree5.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5088,6 +5096,14 @@ set(HEADERS
     src/utils/matrix197/GeneralizedEigenSolver2.h
     src/utils/signal195/FilterDesign2.h
     src/utils/tree194/SegmentTree5.h
+    src/utils/cluster192/GaussianMixture15.h
+    src/utils/code193/PolluxCode.h
+    src/utils/dsp194/Compressor3.h
+    src/utils/fft195/PrimeFactorFFT5.h
+    src/utils/graph208/VertexCover5.h
+    src/utils/matrix198/SVD4.h
+    src/utils/signal196/Resampler4.h
+    src/utils/tree195/IntervalTree5.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
