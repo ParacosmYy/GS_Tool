@@ -2689,6 +2689,14 @@ set(SOURCES
     src/utils/matrix206/SparseQR3.cpp
     src/utils/signal204/Correlator3.cpp
     src/utils/tree203/SuffixTree6.cpp
+    src/utils/cluster201/SpectralCluster9.cpp
+    src/utils/code202/SeriatedPlayfair.cpp
+    src/utils/dsp203/SpectralGate3.cpp
+    src/utils/fft204/BruunFFT5.cpp
+    src/utils/graph217/TravelingSalesman3.cpp
+    src/utils/matrix207/ConjugateGradient3.cpp
+    src/utils/signal205/WaveletDenoiser6.cpp
+    src/utils/tree204/Rope6.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5232,6 +5240,14 @@ set(HEADERS
     src/utils/matrix206/SparseQR3.h
     src/utils/signal204/Correlator3.h
     src/utils/tree203/SuffixTree6.h
+    src/utils/cluster201/SpectralCluster9.h
+    src/utils/code202/SeriatedPlayfair.h
+    src/utils/dsp203/SpectralGate3.h
+    src/utils/fft204/BruunFFT5.h
+    src/utils/graph217/TravelingSalesman3.h
+    src/utils/matrix207/ConjugateGradient3.h
+    src/utils/signal205/WaveletDenoiser6.h
+    src/utils/tree204/Rope6.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
