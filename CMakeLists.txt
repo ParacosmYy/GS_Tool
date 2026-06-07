@@ -2649,6 +2649,14 @@ set(SOURCES
     src/utils/matrix201/BiCGSTAB2.cpp
     src/utils/signal199/AdaptiveFilter4.cpp
     src/utils/tree198/AA5.cpp
+    src/utils/cluster196/GaussianMixture16.cpp
+    src/utils/code197/TapirCode.cpp
+    src/utils/dsp198/Deesser3.cpp
+    src/utils/fft199/MixedRadixFFT5.cpp
+    src/utils/graph212/GraphIsomorphism2.cpp
+    src/utils/matrix202/GMRES2.cpp
+    src/utils/signal200/SignalClassifier3.cpp
+    src/utils/tree199/Treap8.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5152,6 +5160,14 @@ set(HEADERS
     src/utils/matrix201/BiCGSTAB2.h
     src/utils/signal199/AdaptiveFilter4.h
     src/utils/tree198/AA5.h
+    src/utils/cluster196/GaussianMixture16.h
+    src/utils/code197/TapirCode.h
+    src/utils/dsp198/Deesser3.h
+    src/utils/fft199/MixedRadixFFT5.h
+    src/utils/graph212/GraphIsomorphism2.h
+    src/utils/matrix202/GMRES2.h
+    src/utils/signal200/SignalClassifier3.h
+    src/utils/tree199/Treap8.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
