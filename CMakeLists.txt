@@ -2657,6 +2657,14 @@ set(SOURCES
     src/utils/matrix202/GMRES2.cpp
     src/utils/signal200/SignalClassifier3.cpp
     src/utils/tree199/Treap8.cpp
+    src/utils/cluster197/KMedoids16.cpp
+    src/utils/code198/RouteCipher.cpp
+    src/utils/dsp199/PhaseCorrelator2.cpp
+    src/utils/fft200/RaderFFT5.cpp
+    src/utils/graph213/MaximumFlow2.cpp
+    src/utils/matrix203/Cholesky4.cpp
+    src/utils/signal201/PitchDetector4.cpp
+    src/utils/tree200/WAVL5.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5168,6 +5176,14 @@ set(HEADERS
     src/utils/matrix202/GMRES2.h
     src/utils/signal200/SignalClassifier3.h
     src/utils/tree199/Treap8.h
+    src/utils/cluster197/KMedoids16.h
+    src/utils/code198/RouteCipher.h
+    src/utils/dsp199/PhaseCorrelator2.h
+    src/utils/fft200/RaderFFT5.h
+    src/utils/graph213/MaximumFlow2.h
+    src/utils/matrix203/Cholesky4.h
+    src/utils/signal201/PitchDetector4.h
+    src/utils/tree200/WAVL5.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
