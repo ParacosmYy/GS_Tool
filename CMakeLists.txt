@@ -2561,6 +2561,14 @@ set(SOURCES
     src/utils/matrix190/SparseLU2.cpp
     src/utils/signal188/FeatureExtractor2.cpp
     src/utils/tree187/WeightBalancedTree5.cpp
+    src/utils/cluster185/GaussianMixture14.cpp
+    src/utils/code186/TrifidCode.cpp
+    src/utils/dsp187/MultibandGate2.cpp
+    src/utils/fft188/NumberTheoreticTransform2.cpp
+    src/utils/graph201/TransitiveClosure2.cpp
+    src/utils/matrix191/IterativeRefinement.cpp
+    src/utils/signal189/SignalGenerator3.cpp
+    src/utils/tree188/CartesianTree6.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4976,6 +4984,14 @@ set(HEADERS
     src/utils/matrix190/SparseLU2.h
     src/utils/signal188/FeatureExtractor2.h
     src/utils/tree187/WeightBalancedTree5.h
+    src/utils/cluster185/GaussianMixture14.h
+    src/utils/code186/TrifidCode.h
+    src/utils/dsp187/MultibandGate2.h
+    src/utils/fft188/NumberTheoreticTransform2.h
+    src/utils/graph201/TransitiveClosure2.h
+    src/utils/matrix191/IterativeRefinement.h
+    src/utils/signal189/SignalGenerator3.h
+    src/utils/tree188/CartesianTree6.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
