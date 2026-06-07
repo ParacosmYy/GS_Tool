@@ -2745,6 +2745,14 @@ set(SOURCES
     src/utils/matrix213/SymmetricEigenSolver3.cpp
     src/utils/signal211/Correlator4.cpp
     src/utils/tree210/RedBlackTree11.cpp
+    src/utils/cluster208/KMedoids17.cpp
+    src/utils/code209/FractionatedMorse2.cpp
+    src/utils/dsp210/Flanger3.cpp
+    src/utils/fft211/DCT6.cpp
+    src/utils/graph224/HamiltonianCycle2.cpp
+    src/utils/matrix214/ThomasAlgorithm3.cpp
+    src/utils/signal212/Resampler5.cpp
+    src/utils/tree211/SplayTree8.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5344,6 +5352,14 @@ set(HEADERS
     src/utils/matrix213/SymmetricEigenSolver3.h
     src/utils/signal211/Correlator4.h
     src/utils/tree210/RedBlackTree11.h
+    src/utils/cluster208/KMedoids17.h
+    src/utils/code209/FractionatedMorse2.h
+    src/utils/dsp210/Flanger3.h
+    src/utils/fft211/DCT6.h
+    src/utils/graph224/HamiltonianCycle2.h
+    src/utils/matrix214/ThomasAlgorithm3.h
+    src/utils/signal212/Resampler5.h
+    src/utils/tree211/SplayTree8.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
