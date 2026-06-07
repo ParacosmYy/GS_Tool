@@ -2609,6 +2609,14 @@ set(SOURCES
     src/utils/matrix196/SymmetricEigenSolver2.cpp
     src/utils/signal194/WindowFunction2.cpp
     src/utils/tree193/FenwickTree5.cpp
+    src/utils/cluster191/SpectralCluster8.cpp
+    src/utils/code192/StraddlingCheckerboard.cpp
+    src/utils/dsp193/Phaser2.cpp
+    src/utils/fft194/ChirpZ5.cpp
+    src/utils/graph207/Biconnected10.cpp
+    src/utils/matrix197/GeneralizedEigenSolver2.cpp
+    src/utils/signal195/FilterDesign2.cpp
+    src/utils/tree194/SegmentTree5.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5072,6 +5080,14 @@ set(HEADERS
     src/utils/matrix196/SymmetricEigenSolver2.h
     src/utils/signal194/WindowFunction2.h
     src/utils/tree193/FenwickTree5.h
+    src/utils/cluster191/SpectralCluster8.h
+    src/utils/code192/StraddlingCheckerboard.h
+    src/utils/dsp193/Phaser2.h
+    src/utils/fft194/ChirpZ5.h
+    src/utils/graph207/Biconnected10.h
+    src/utils/matrix197/GeneralizedEigenSolver2.h
+    src/utils/signal195/FilterDesign2.h
+    src/utils/tree194/SegmentTree5.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
