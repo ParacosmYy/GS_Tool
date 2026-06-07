@@ -2697,6 +2697,14 @@ set(SOURCES
     src/utils/matrix207/ConjugateGradient3.cpp
     src/utils/signal205/WaveletDenoiser6.cpp
     src/utils/tree204/Rope6.cpp
+    src/utils/cluster202/KMeans19.cpp
+    src/utils/code203/ColumnarTransposition.cpp
+    src/utils/dsp204/Deesser4.cpp
+    src/utils/fft205/SplitRadixFFT5.cpp
+    src/utils/graph218/GraphIsomorphism3.cpp
+    src/utils/matrix208/BiCGSTAB3.cpp
+    src/utils/signal206/SignalClassifier4.cpp
+    src/utils/tree205/Treap9.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5248,6 +5256,14 @@ set(HEADERS
     src/utils/matrix207/ConjugateGradient3.h
     src/utils/signal205/WaveletDenoiser6.h
     src/utils/tree204/Rope6.h
+    src/utils/cluster202/KMeans19.h
+    src/utils/code203/ColumnarTransposition.h
+    src/utils/dsp204/Deesser4.h
+    src/utils/fft205/SplitRadixFFT5.h
+    src/utils/graph218/GraphIsomorphism3.h
+    src/utils/matrix208/BiCGSTAB3.h
+    src/utils/signal206/SignalClassifier4.h
+    src/utils/tree205/Treap9.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
