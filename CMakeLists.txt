@@ -2585,6 +2585,14 @@ set(SOURCES
     src/utils/matrix193/TridiagonalSolver2.cpp
     src/utils/signal191/Resampler3.cpp
     src/utils/tree190/BPlusTree7.cpp
+    src/utils/cluster188/Agglomerative8.cpp
+    src/utils/code189/BazeleriesCode.cpp
+    src/utils/dsp190/Reverb2.cpp
+    src/utils/fft191/ZoomFFT2.cpp
+    src/utils/graph204/HamiltonianCycle.cpp
+    src/utils/matrix194/EigenVectorSolver2.cpp
+    src/utils/signal192/SignalClassifier2.cpp
+    src/utils/tree191/SplayTree7.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5024,6 +5032,14 @@ set(HEADERS
     src/utils/matrix193/TridiagonalSolver2.h
     src/utils/signal191/Resampler3.h
     src/utils/tree190/BPlusTree7.h
+    src/utils/cluster188/Agglomerative8.h
+    src/utils/code189/BazeleriesCode.h
+    src/utils/dsp190/Reverb2.h
+    src/utils/fft191/ZoomFFT2.h
+    src/utils/graph204/HamiltonianCycle.h
+    src/utils/matrix194/EigenVectorSolver2.h
+    src/utils/signal192/SignalClassifier2.h
+    src/utils/tree191/SplayTree7.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
