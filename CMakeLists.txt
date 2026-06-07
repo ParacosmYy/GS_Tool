@@ -2673,6 +2673,14 @@ set(SOURCES
     src/utils/matrix204/ThomasAlgorithm2.cpp
     src/utils/signal202/FilterDesign3.cpp
     src/utils/tree201/RedBlackTree10.cpp
+    src/utils/cluster199/SubspaceCluster6.cpp
+    src/utils/code200/FoursquareCode2.cpp
+    src/utils/dsp201/Gate4.cpp
+    src/utils/fft202/DST5.cpp
+    src/utils/graph215/StrongConnectivity4.cpp
+    src/utils/matrix205/GaussSeidel2.cpp
+    src/utils/signal203/SignalSynchronizer3.cpp
+    src/utils/tree202/IntervalTree6.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5200,6 +5208,14 @@ set(HEADERS
     src/utils/matrix204/ThomasAlgorithm2.h
     src/utils/signal202/FilterDesign3.h
     src/utils/tree201/RedBlackTree10.h
+    src/utils/cluster199/SubspaceCluster6.h
+    src/utils/code200/FoursquareCode2.h
+    src/utils/dsp201/Gate4.h
+    src/utils/fft202/DST5.h
+    src/utils/graph215/StrongConnectivity4.h
+    src/utils/matrix205/GaussSeidel2.h
+    src/utils/signal203/SignalSynchronizer3.h
+    src/utils/tree202/IntervalTree6.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
