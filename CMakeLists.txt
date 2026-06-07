@@ -2569,6 +2569,14 @@ set(SOURCES
     src/utils/matrix191/IterativeRefinement.cpp
     src/utils/signal189/SignalGenerator3.cpp
     src/utils/tree188/CartesianTree6.cpp
+    src/utils/cluster186/KMeans17.cpp
+    src/utils/code187/GronsfeldCode.cpp
+    src/utils/dsp188/SpectralRepair2.cpp
+    src/utils/fft189/DistributedArithmetic5.cpp
+    src/utils/graph202/MaximumClique2.cpp
+    src/utils/matrix192/BandSolver2.cpp
+    src/utils/signal190/WaveletDenoiser4.cpp
+    src/utils/tree189/AvlTree4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -4992,6 +5000,14 @@ set(HEADERS
     src/utils/matrix191/IterativeRefinement.h
     src/utils/signal189/SignalGenerator3.h
     src/utils/tree188/CartesianTree6.h
+    src/utils/cluster186/KMeans17.h
+    src/utils/code187/GronsfeldCode.h
+    src/utils/dsp188/SpectralRepair2.h
+    src/utils/fft189/DistributedArithmetic5.h
+    src/utils/graph202/MaximumClique2.h
+    src/utils/matrix192/BandSolver2.h
+    src/utils/signal190/WaveletDenoiser4.h
+    src/utils/tree189/AvlTree4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
