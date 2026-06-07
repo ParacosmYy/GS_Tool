@@ -2593,6 +2593,14 @@ set(SOURCES
     src/utils/matrix194/EigenVectorSolver2.cpp
     src/utils/signal192/SignalClassifier2.cpp
     src/utils/tree191/SplayTree7.cpp
+    src/utils/cluster189/BirchClustering7.cpp
+    src/utils/code190/DoubleTranspositionCode.cpp
+    src/utils/dsp191/Chorus2.cpp
+    src/utils/fft192/Goertzel5.cpp
+    src/utils/graph205/IndependentSet4.cpp
+    src/utils/matrix195/SchurDecomposition5.cpp
+    src/utils/signal193/Periodogram2.cpp
+    src/utils/tree192/VanEmdeBoas4.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5040,6 +5048,14 @@ set(HEADERS
     src/utils/matrix194/EigenVectorSolver2.h
     src/utils/signal192/SignalClassifier2.h
     src/utils/tree191/SplayTree7.h
+    src/utils/cluster189/BirchClustering7.h
+    src/utils/code190/DoubleTranspositionCode.h
+    src/utils/dsp191/Chorus2.h
+    src/utils/fft192/Goertzel5.h
+    src/utils/graph205/IndependentSet4.h
+    src/utils/matrix195/SchurDecomposition5.h
+    src/utils/signal193/Periodogram2.h
+    src/utils/tree192/VanEmdeBoas4.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
