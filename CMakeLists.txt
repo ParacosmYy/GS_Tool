@@ -2681,6 +2681,14 @@ set(SOURCES
     src/utils/matrix205/GaussSeidel2.cpp
     src/utils/signal203/SignalSynchronizer3.cpp
     src/utils/tree202/IntervalTree6.cpp
+    src/utils/cluster200/OPTICS7.cpp
+    src/utils/code201/DigrafidCode.cpp
+    src/utils/dsp202/Limiter6.cpp
+    src/utils/fft203/WinogradFFT6.cpp
+    src/utils/graph216/EdgeColoring3.cpp
+    src/utils/matrix206/SparseQR3.cpp
+    src/utils/signal204/Correlator3.cpp
+    src/utils/tree203/SuffixTree6.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5216,6 +5224,14 @@ set(HEADERS
     src/utils/matrix205/GaussSeidel2.h
     src/utils/signal203/SignalSynchronizer3.h
     src/utils/tree202/IntervalTree6.h
+    src/utils/cluster200/OPTICS7.h
+    src/utils/code201/DigrafidCode.h
+    src/utils/dsp202/Limiter6.h
+    src/utils/fft203/WinogradFFT6.h
+    src/utils/graph216/EdgeColoring3.h
+    src/utils/matrix206/SparseQR3.h
+    src/utils/signal204/Correlator3.h
+    src/utils/tree203/SuffixTree6.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
