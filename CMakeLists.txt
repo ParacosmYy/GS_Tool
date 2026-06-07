@@ -2665,6 +2665,14 @@ set(SOURCES
     src/utils/matrix203/Cholesky4.cpp
     src/utils/signal201/PitchDetector4.cpp
     src/utils/tree200/WAVL5.cpp
+    src/utils/cluster198/HierarchicalCluster8.cpp
+    src/utils/code199/TwoSquareCode2.cpp
+    src/utils/dsp200/Convolver3.cpp
+    src/utils/fft201/DCT5.cpp
+    src/utils/graph214/MinimumSpanningTree2.cpp
+    src/utils/matrix204/ThomasAlgorithm2.cpp
+    src/utils/signal202/FilterDesign3.cpp
+    src/utils/tree201/RedBlackTree10.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5184,6 +5192,14 @@ set(HEADERS
     src/utils/matrix203/Cholesky4.h
     src/utils/signal201/PitchDetector4.h
     src/utils/tree200/WAVL5.h
+    src/utils/cluster198/HierarchicalCluster8.h
+    src/utils/code199/TwoSquareCode2.h
+    src/utils/dsp200/Convolver3.h
+    src/utils/fft201/DCT5.h
+    src/utils/graph214/MinimumSpanningTree2.h
+    src/utils/matrix204/ThomasAlgorithm2.h
+    src/utils/signal202/FilterDesign3.h
+    src/utils/tree201/RedBlackTree10.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
