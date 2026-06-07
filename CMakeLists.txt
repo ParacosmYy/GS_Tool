@@ -2601,6 +2601,14 @@ set(SOURCES
     src/utils/matrix195/SchurDecomposition5.cpp
     src/utils/signal193/Periodogram2.cpp
     src/utils/tree192/VanEmdeBoas4.cpp
+    src/utils/cluster190/FuzzyCMeans8.cpp
+    src/utils/code191/TwoSquareCode.cpp
+    src/utils/dsp192/Flanger2.cpp
+    src/utils/fft193/DHT4.cpp
+    src/utils/graph206/DominatingSet5.cpp
+    src/utils/matrix196/SymmetricEigenSolver2.cpp
+    src/utils/signal194/WindowFunction2.cpp
+    src/utils/tree193/FenwickTree5.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5056,6 +5064,14 @@ set(HEADERS
     src/utils/matrix195/SchurDecomposition5.h
     src/utils/signal193/Periodogram2.h
     src/utils/tree192/VanEmdeBoas4.h
+    src/utils/cluster190/FuzzyCMeans8.h
+    src/utils/code191/TwoSquareCode.h
+    src/utils/dsp192/Flanger2.h
+    src/utils/fft193/DHT4.h
+    src/utils/graph206/DominatingSet5.h
+    src/utils/matrix196/SymmetricEigenSolver2.h
+    src/utils/signal194/WindowFunction2.h
+    src/utils/tree193/FenwickTree5.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
