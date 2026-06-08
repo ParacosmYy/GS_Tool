@@ -2865,6 +2865,14 @@ set(SOURCES
     src/utils/matrix228/ThomasAlgorithm4.cpp
     src/utils/signal226/Resampler6.cpp
     src/utils/tree225/SplayTree9.cpp
+    src/utils/cluster223/HierarchicalCluster10.cpp
+    src/utils/code224/BaudotCode4.cpp
+    src/utils/dsp225/Phaser4.cpp
+    src/utils/fft226/DST7.cpp
+    src/utils/graph239/EulerTour5.cpp
+    src/utils/matrix229/SparseLU4.cpp
+    src/utils/signal227/SignalSynchronizer5.cpp
+    src/utils/tree226/FenwickTree7.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5584,6 +5592,14 @@ set(HEADERS
     src/utils/matrix228/ThomasAlgorithm4.h
     src/utils/signal226/Resampler6.h
     src/utils/tree225/SplayTree9.h
+    src/utils/cluster223/HierarchicalCluster10.h
+    src/utils/code224/BaudotCode4.h
+    src/utils/dsp225/Phaser4.h
+    src/utils/fft226/DST7.h
+    src/utils/graph239/EulerTour5.h
+    src/utils/matrix229/SparseLU4.h
+    src/utils/signal227/SignalSynchronizer5.h
+    src/utils/tree226/FenwickTree7.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
