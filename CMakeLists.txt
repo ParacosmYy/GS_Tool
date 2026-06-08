@@ -2849,6 +2849,14 @@ set(SOURCES
     src/utils/matrix226/BiCGSTAB6.cpp
     src/utils/signal224/WaveletDenoiser9.cpp
     src/utils/tree223/VanEmdeBoas6.cpp
+    src/utils/cluster221/GaussianMixture20.cpp
+    src/utils/code222/FoursquareCode5.cpp
+    src/utils/dsp223/SpectralGate5.cpp
+    src/utils/fft224/BruunFFT7.cpp
+    src/utils/graph237/GraphIsomorphism6.cpp
+    src/utils/matrix227/SymmetricEigenSolver4.cpp
+    src/utils/signal225/Correlator5.cpp
+    src/utils/tree224/RedBlackTree12.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5552,6 +5560,14 @@ set(HEADERS
     src/utils/matrix226/BiCGSTAB6.h
     src/utils/signal224/WaveletDenoiser9.h
     src/utils/tree223/VanEmdeBoas6.h
+    src/utils/cluster221/GaussianMixture20.h
+    src/utils/code222/FoursquareCode5.h
+    src/utils/dsp223/SpectralGate5.h
+    src/utils/fft224/BruunFFT7.h
+    src/utils/graph237/GraphIsomorphism6.h
+    src/utils/matrix227/SymmetricEigenSolver4.h
+    src/utils/signal225/Correlator5.h
+    src/utils/tree224/RedBlackTree12.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
