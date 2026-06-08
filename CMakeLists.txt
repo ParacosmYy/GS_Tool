@@ -2945,6 +2945,14 @@ set(SOURCES
     src/utils/matrix238/SchurDecomposition8.cpp
     src/utils/signal236/WindowFunction4.cpp
     src/utils/tree235/BPlusTree10.cpp
+    src/utils/cluster233/FuzzyCMeans11.cpp
+    src/utils/code234/SeriatedPlayfair4.cpp
+    src/utils/dsp235/Expander8.cpp
+    src/utils/fft236/RaderFFT8.cpp
+    src/utils/graph249/TravelingSalesman6.cpp
+    src/utils/matrix239/ConjugateGradient6.cpp
+    src/utils/signal237/FilterDesign6.cpp
+    src/utils/tree236/ScapegoatTree8.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5744,6 +5752,14 @@ set(HEADERS
     src/utils/matrix238/SchurDecomposition8.h
     src/utils/signal236/WindowFunction4.h
     src/utils/tree235/BPlusTree10.h
+    src/utils/cluster233/FuzzyCMeans11.h
+    src/utils/code234/SeriatedPlayfair4.h
+    src/utils/dsp235/Expander8.h
+    src/utils/fft236/RaderFFT8.h
+    src/utils/graph249/TravelingSalesman6.h
+    src/utils/matrix239/ConjugateGradient6.h
+    src/utils/signal237/FilterDesign6.h
+    src/utils/tree236/ScapegoatTree8.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
