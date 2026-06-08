@@ -2897,6 +2897,14 @@ set(SOURCES
     src/utils/matrix232/GMRES4.cpp
     src/utils/signal230/EnvelopeDetector5.cpp
     src/utils/tree229/Treap11.cpp
+    src/utils/cluster227/KMeans22.cpp
+    src/utils/code228/RouteCipher3.cpp
+    src/utils/dsp229/Compressor5.cpp
+    src/utils/fft230/SlidingDFT7.cpp
+    src/utils/graph243/GraphColoring8.cpp
+    src/utils/matrix233/TridiagonalSolver4.cpp
+    src/utils/signal231/AdaptiveFilter6.cpp
+    src/utils/tree230/Rope8.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5648,6 +5656,14 @@ set(HEADERS
     src/utils/matrix232/GMRES4.h
     src/utils/signal230/EnvelopeDetector5.h
     src/utils/tree229/Treap11.h
+    src/utils/cluster227/KMeans22.h
+    src/utils/code228/RouteCipher3.h
+    src/utils/dsp229/Compressor5.h
+    src/utils/fft230/SlidingDFT7.h
+    src/utils/graph243/GraphColoring8.h
+    src/utils/matrix233/TridiagonalSolver4.h
+    src/utils/signal231/AdaptiveFilter6.h
+    src/utils/tree230/Rope8.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
