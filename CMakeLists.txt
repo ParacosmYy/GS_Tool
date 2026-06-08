@@ -2913,6 +2913,14 @@ set(SOURCES
     src/utils/matrix234/SVD6.cpp
     src/utils/signal232/PitchDetector6.cpp
     src/utils/tree231/BTree6.cpp
+    src/utils/cluster229/GaussianMixture22.cpp
+    src/utils/code230/BaudotCode5.cpp
+    src/utils/dsp231/Expander7.cpp
+    src/utils/fft232/HexFFT7.cpp
+    src/utils/graph245/MaximumFlow4.cpp
+    src/utils/matrix235/Cholesky6.cpp
+    src/utils/signal233/SignalClassifier6.cpp
+    src/utils/tree232/SegmentTree7.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5680,6 +5688,14 @@ set(HEADERS
     src/utils/matrix234/SVD6.h
     src/utils/signal232/PitchDetector6.h
     src/utils/tree231/BTree6.h
+    src/utils/cluster229/GaussianMixture22.h
+    src/utils/code230/BaudotCode5.h
+    src/utils/dsp231/Expander7.h
+    src/utils/fft232/HexFFT7.h
+    src/utils/graph245/MaximumFlow4.h
+    src/utils/matrix235/Cholesky6.h
+    src/utils/signal233/SignalClassifier6.h
+    src/utils/tree232/SegmentTree7.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
