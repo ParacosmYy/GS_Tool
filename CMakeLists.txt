@@ -2985,6 +2985,14 @@ set(SOURCES
     src/utils/matrix243/SparseLU4.cpp
     src/utils/signal241/SignalSynchronizer6.cpp
     src/utils/tree240/FenwickTree8.cpp
+    src/utils/cluster238/SubspaceCluster9.cpp
+    src/utils/code239/TapirCode4.cpp
+    src/utils/dsp240/Delay6.cpp
+    src/utils/fft241/WHT7.cpp
+    src/utils/graph254/TransitiveClosure5.cpp
+    src/utils/matrix244/IterativeRefinement4.cpp
+    src/utils/signal242/FeatureExtractor5.cpp
+    src/utils/tree241/CartesianTree9.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5824,6 +5832,14 @@ set(HEADERS
     src/utils/matrix243/SparseLU4.h
     src/utils/signal241/SignalSynchronizer6.h
     src/utils/tree240/FenwickTree8.h
+    src/utils/cluster238/SubspaceCluster9.h
+    src/utils/code239/TapirCode4.h
+    src/utils/dsp240/Delay6.h
+    src/utils/fft241/WHT7.h
+    src/utils/graph254/TransitiveClosure5.h
+    src/utils/matrix244/IterativeRefinement4.h
+    src/utils/signal242/FeatureExtractor5.h
+    src/utils/tree241/CartesianTree9.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
