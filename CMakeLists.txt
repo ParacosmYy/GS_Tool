@@ -3049,6 +3049,14 @@ set(SOURCES
     src/utils/matrix251/EigenVectorSolver6.cpp
     src/utils/signal249/Periodogram6.cpp
     src/utils/tree248/AvlTree8.cpp
+    src/utils/cluster246/BirchClustering12.cpp
+    src/utils/code247/StraddlingCheckerboard5.cpp
+    src/utils/dsp248/MultibandGate5.cpp
+    src/utils/fft249/Goertzel9.cpp
+    src/utils/graph262/DominatingSet9.cpp
+    src/utils/matrix252/SchurDecomposition9.cpp
+    src/utils/signal250/WindowFunction5.cpp
+    src/utils/tree249/BPlusTree11.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5952,6 +5960,14 @@ set(HEADERS
     src/utils/matrix251/EigenVectorSolver6.h
     src/utils/signal249/Periodogram6.h
     src/utils/tree248/AvlTree8.h
+    src/utils/cluster246/BirchClustering12.h
+    src/utils/code247/StraddlingCheckerboard5.h
+    src/utils/dsp248/MultibandGate5.h
+    src/utils/fft249/Goertzel9.h
+    src/utils/graph262/DominatingSet9.h
+    src/utils/matrix252/SchurDecomposition9.h
+    src/utils/signal250/WindowFunction5.h
+    src/utils/tree249/BPlusTree11.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
