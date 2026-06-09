@@ -3033,6 +3033,14 @@ set(SOURCES
     src/utils/matrix249/Cholesky7.cpp
     src/utils/signal247/SignalClassifier7.cpp
     src/utils/tree246/SegmentTree8.cpp
+    src/utils/cluster244/KMeans25.cpp
+    src/utils/code245/FoursquareCode8.cpp
+    src/utils/dsp246/Deesser7.cpp
+    src/utils/fft247/MixedRadixFFT8.cpp
+    src/utils/graph260/ChinesePostman8.cpp
+    src/utils/matrix250/BiCGSTAB9.cpp
+    src/utils/signal248/WaveletDenoiser12.cpp
+    src/utils/tree247/AA8.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -5920,6 +5928,14 @@ set(HEADERS
     src/utils/matrix249/Cholesky7.h
     src/utils/signal247/SignalClassifier7.h
     src/utils/tree246/SegmentTree8.h
+    src/utils/cluster244/KMeans25.h
+    src/utils/code245/FoursquareCode8.h
+    src/utils/dsp246/Deesser7.h
+    src/utils/fft247/MixedRadixFFT8.h
+    src/utils/graph260/ChinesePostman8.h
+    src/utils/matrix250/BiCGSTAB9.h
+    src/utils/signal248/WaveletDenoiser12.h
+    src/utils/tree247/AA8.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
