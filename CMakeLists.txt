@@ -90,6 +90,7 @@ set(SOURCES
     src/core/toolbar/ToolbarControllerQuery.cpp
     src/core/terminal/TerminalController.cpp
     src/core/terminal/TerminalControllerDisplay.cpp
+    src/core/terminal/TerminalExportOptions.cpp
     src/core/panels/PanelManager.cpp
     src/core/panels/PanelManagerCreation.cpp
     src/core/panels/PanelManagerFactory.cpp
@@ -3282,6 +3283,14 @@ set(SOURCES
     src/utils/matrix280/SchurDecomposition11.cpp
     src/utils/signal278/WindowFunction7.cpp
     src/utils/tree277/BPlusTree13.cpp
+    src/utils/cluster275/FuzzyCMeans14.cpp
+    src/utils/code276/SeriatedPlayfair7.cpp
+    src/utils/dsp277/Expander14.cpp
+    src/utils/fft278/RaderFFT11.cpp
+    src/utils/graph291/TravelingSalesman9.cpp
+    src/utils/matrix281/ConjugateGradient9.cpp
+    src/utils/signal279/FilterDesign9.cpp
+    src/utils/tree278/ScapegoatTree11.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6417,6 +6426,14 @@ set(HEADERS
     src/utils/matrix280/SchurDecomposition11.h
     src/utils/signal278/WindowFunction7.h
     src/utils/tree277/BPlusTree13.h
+    src/utils/cluster275/FuzzyCMeans14.h
+    src/utils/code276/SeriatedPlayfair7.h
+    src/utils/dsp277/Expander14.h
+    src/utils/fft278/RaderFFT11.h
+    src/utils/graph291/TravelingSalesman9.h
+    src/utils/matrix281/ConjugateGradient9.h
+    src/utils/signal279/FilterDesign9.h
+    src/utils/tree278/ScapegoatTree11.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
