@@ -3343,6 +3343,14 @@ set(SOURCES
     src/utils/matrix287/GaussSeidel8.cpp
     src/utils/signal285/SignalGenerator9.cpp
     src/utils/tree284/WeightBalancedTree11.cpp
+    src/utils/cluster282/GaussianMixture33.cpp
+    src/utils/code283/MorbitCode7.cpp
+    src/utils/dsp284/Limiter12.cpp
+    src/utils/fft285/ZoomFFT8.cpp
+    src/utils/graph298/EdgeColoring9.cpp
+    src/utils/matrix288/GMRES8.cpp
+    src/utils/signal286/EnvelopeDetector9.cpp
+    src/utils/tree285/Treap15.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6539,6 +6547,14 @@ set(HEADERS
     src/utils/matrix287/GaussSeidel8.h
     src/utils/signal285/SignalGenerator9.h
     src/utils/tree284/WeightBalancedTree11.h
+    src/utils/cluster282/GaussianMixture33.h
+    src/utils/code283/MorbitCode7.h
+    src/utils/dsp284/Limiter12.h
+    src/utils/fft285/ZoomFFT8.h
+    src/utils/graph298/EdgeColoring9.h
+    src/utils/matrix288/GMRES8.h
+    src/utils/signal286/EnvelopeDetector9.h
+    src/utils/tree285/Treap15.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
