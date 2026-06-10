@@ -91,6 +91,10 @@ QWidget* SendController::createSendBar(QWidget* parent)
     // 发送按钮 / 回车触发发送
     connect(m_sendBtn, &QPushButton::clicked, this, &SendController::onSendData);
     connect(m_sendInput, &QLineEdit::returnPressed, this, &SendController::onSendData);
+    connect(m_sendInput, &QLineEdit::textChanged,
+            this, &SendController::updateSendInputValidation);
+    connect(m_sendModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &SendController::updateSendInputValidation);
 
     // 定时发送器的数据通过 sendAndRecord 发出
     connect(m_timedSender, &TimedSender::sendData, this, [this](const QByteArray& data) {
@@ -118,6 +122,37 @@ void SendController::setConnection(IConnection* conn)
 TimedSender* SendController::timedSender() const
 {
     return m_timedSender;
+}
+
+/** @brief 设置发送输入框错误样式 */
+void SendController::setSendInputError(bool hasError)
+{
+    if (!m_sendInput) {
+        return;
+    }
+
+    m_sendInput->setProperty("hasError", hasError);
+    m_sendInput->style()->unpolish(m_sendInput);
+    m_sendInput->style()->polish(m_sendInput);
+}
+
+/** @brief 根据当前发送模式即时校验输入内容 */
+void SendController::updateSendInputValidation()
+{
+    if (!m_sendInput || !m_sendModeCombo) {
+        return;
+    }
+
+    const bool isHex = (m_sendModeCombo->currentIndex() == 1);
+    const QString text = m_sendInput->text();
+    const bool invalidHex = isHex && !text.isEmpty() && !HexConverter::isValidHex(text);
+    if (m_newlineCombo) {
+        m_newlineCombo->setEnabled(!isHex);
+    }
+    m_sendInput->setPlaceholderText(isHex
+        ? tr("输入HEX数据，如 AA 55 01 00 FE")
+        : tr("输入要发送的数据..."));
+    setSendInputError(invalidHex);
 }
 
 // sendAndRecord/onSendData/onQuickCommand见 SendControllerSend.cpp

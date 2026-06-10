@@ -188,7 +188,13 @@ QVector<NavPanelMapping> PanelManager::panelMappings() const
         if (!descriptor.navVisible || descriptor.navOrder < 0) {
             continue;
         }
-        mappings.append({descriptor.groupKey, descriptor.titleKey, panelWidgetForDescriptor(this, descriptor)});
+        mappings.append({
+            descriptor.groupKey,
+            descriptor.titleKey,
+            panelWidgetForDescriptor(this, descriptor),
+            descriptor.id,
+            descriptor.iconName
+        });
     }
     return mappings;
 }

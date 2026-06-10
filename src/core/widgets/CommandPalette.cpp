@@ -48,12 +48,14 @@ CommandPalette::CommandPalette(QWidget* parent)
     QFont searchFont;
     searchFont.setPointSize(14);
     m_searchEdit->setFont(searchFont);
+    m_searchEdit->installEventFilter(this);
     layout->addWidget(m_searchEdit);
 
     // 命令列表
     m_listWidget = new QListWidget(m_panelWidget);
     m_listWidget->setObjectName("commandPaletteList");
     m_listWidget->setVerticalScrollMode(QListWidget::ScrollPerPixel);
+    m_listWidget->installEventFilter(this);
     layout->addWidget(m_listWidget);
 
     // 信号连接
@@ -127,6 +129,10 @@ bool CommandPalette::eventFilter(QObject* obj, QEvent* event)
             int row = m_listWidget->currentRow() - 1;
             if (row >= 0)
                 m_listWidget->setCurrentRow(row);
+            return true;
+        }
+        if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+            onItemActivated(m_listWidget->currentItem());
             return true;
         }
     }

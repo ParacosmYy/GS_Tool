@@ -66,6 +66,7 @@ private slots:
 private:
     void refreshList(const QString& filter = QString());  ///< 刷新过滤后的命令列表
     bool fuzzyMatch(const QString& filter, const QString& target) const; ///< 模糊子序列匹配
+    int matchScore(const QString& filter, const CommandEntry& command) const; ///< 计算搜索匹配分数，数值越小越靠前
 
     QWidget* m_panelWidget = nullptr;       ///< objectName="commandPalettePanel"
     QLineEdit* m_searchEdit = nullptr;      ///< objectName="commandPaletteSearch"

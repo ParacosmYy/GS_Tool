@@ -88,10 +88,12 @@ public slots:
 private slots:
     /** @brief 发送按钮/回车: 前置检查→解析(文本/HEX)→追加换行→sendAndRecord→记录历史 */
     void onSendData();
+    void updateSendInputValidation(); ///< 输入内容或模式变化时即时刷新HEX合法性提示
 
 private:
     /** @brief 统一发送: 写入连接+记录终端+记录日志 @param data 原始字节 @return 是否成功 */
     bool sendAndRecord(const QByteArray& data);
+    void setSendInputError(bool hasError); ///< 切换发送输入框错误样式
 
     // ==================== 核心依赖 ====================
 

@@ -102,22 +102,24 @@ bool SendController::sendAndRecord(const QByteArray& data)
  */
 void SendController::onSendData()
 {
+    QString text = m_sendInput->text();
+    if (text.isEmpty()) {
+        setSendInputError(false);
+        emit statusMessage(tr("发送内容为空"));
+        return;
+    }
+
     if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
         emit statusMessage(tr("发送失败: 未连接"));
         return;
     }
-
-    QString text = m_sendInput->text();
-    if (text.isEmpty()) return;
 
     bool isHex = (m_sendModeCombo->currentIndex() == 1);
     QByteArray data;
     if (isHex) {
         data = HexConverter::fromHexString(text);
         if (data.isEmpty()) {
-            m_sendInput->setProperty("hasError", true);
-            m_sendInput->style()->unpolish(m_sendInput);
-            m_sendInput->style()->polish(m_sendInput);
+            setSendInputError(true);
             emit statusMessage(tr("HEX 格式错误: 请输入有效的十六进制数据，如 \"AA 55 01 00 FE\""));
             return;
         }
@@ -137,9 +139,7 @@ void SendController::onSendData()
         if (isHex) ++m_totalHexSends;
         m_historyManager->recordHistory(text, isHex);
         m_sendInput->clear();
-        m_sendInput->setProperty("hasError", false);
-        m_sendInput->style()->unpolish(m_sendInput);
-        m_sendInput->style()->polish(m_sendInput);
+        setSendInputError(false);
     }
 }
 
