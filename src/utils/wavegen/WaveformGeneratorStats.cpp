@@ -7,12 +7,12 @@
 
 #include "utils/wavegen/WaveformGenerator.h"
 
-WaveGen::Stats WaveformGenerator::stats() const
+WaveGen::Stats WaveGenEngine::stats() const
 {
     return m_stats;
 }
 
-void WaveformGenerator::resetStatistics()
+void WaveGenEngine::resetStatistics()
 {
     m_stats = WaveGen::Stats{};
 }

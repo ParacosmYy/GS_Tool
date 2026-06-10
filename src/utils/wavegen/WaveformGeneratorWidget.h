@@ -9,8 +9,8 @@
  * 右侧画布以 QPainter 绘制 2 个周期的波形预览。
  */
 
-#ifndef WAVEGEN_WAVEFORMGENERATORWIDGET_H
-#define WAVEGEN_WAVEFORMGENERATORWIDGET_H
+#ifndef WAVEGEN_WAVEGENWIDGET_H
+#define WAVEGEN_WAVEGENWIDGET_H
 
 #include <QByteArray>
 #include <QComboBox>
@@ -23,7 +23,8 @@
 
 #include "utils/wavegen/WaveGenTypes.h"
 
-class WaveformGenerator;
+class QFormLayout;
+class WaveGenEngine;
 
 /**
  * @class WaveformGeneratorWidget
@@ -40,7 +41,7 @@ public:
     explicit WaveformGeneratorWidget(QWidget *parent = nullptr);
 
     /** @brief 获取内部发生器实例 @return 指针,所有权属于本控件 */
-    WaveformGenerator *generator() const;
+    WaveGenEngine *generator() const;
 
     /** @brief 获取统计快照 @return 统计结构体 */
     WaveGen::Stats stats() const;
@@ -88,7 +89,7 @@ private:
     QPushButton *m_stopBtn;            ///< 停止流式输出
 
     // ---- 内部状态 ----
-    WaveformGenerator *m_generator;    ///< 波形发生器实例
+    WaveGenEngine *m_generator;        ///< 波形发生器实例
 };
 
 #endif // WAVEGEN_WAVEFORMGENERATORWIDGET_H

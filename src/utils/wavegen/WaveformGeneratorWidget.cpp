@@ -24,7 +24,7 @@
 
 WaveformGeneratorWidget::WaveformGeneratorWidget(QWidget *parent)
     : QWidget(parent)
-    , m_generator(new WaveformGenerator(this))
+    , m_generator(new WaveGenEngine(this))
 {
     setupUI();
     updateParamsFromControls();
@@ -34,7 +34,7 @@ WaveformGeneratorWidget::WaveformGeneratorWidget(QWidget *parent)
 // 公开接口
 // ══════════════════════════════════════════════
 
-WaveformGenerator *WaveformGeneratorWidget::generator() const
+WaveGenEngine *WaveformGeneratorWidget::generator() const
 {
     return m_generator;
 }
@@ -231,10 +231,10 @@ void WaveformGeneratorWidget::connectSignals()
     connect(m_stopBtn, &QPushButton::clicked,
             this, &WaveformGeneratorWidget::onStopClicked);
 
-    connect(m_generator, &WaveformGenerator::dataGenerated,
+    connect(m_generator, &WaveGenEngine::dataGenerated,
             this, &WaveformGeneratorWidget::dataGenerated);
 
-    connect(m_generator, &WaveformGenerator::paramsChanged,
+    connect(m_generator, &WaveGenEngine::paramsChanged,
             this, QOverload<>::of(&QWidget::update));
 }
 
@@ -291,7 +291,7 @@ void WaveformGeneratorWidget::drawWaveform(QPainter &p)
     previewParams.sampleRate = previewParams.frequency * ptsPerCycle;
     previewParams.sampleCount = totalPts;
 
-    WaveformGenerator tempGen;
+    WaveGenEngine tempGen;
     tempGen.setParams(previewParams);
     QVector<double> samples = tempGen.generateRaw(totalPts);
 

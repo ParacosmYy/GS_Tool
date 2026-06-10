@@ -9,8 +9,8 @@
  * 支持 AM/FM 调制、相位连续频率扫掠、自定义波形插值。
  */
 
-#ifndef WAVEGEN_WAVEFORMGENERATOR_H
-#define WAVEGEN_WAVEFORMGENERATOR_H
+#ifndef WAVEGEN_WAVEGENENGINE_H
+#define WAVEGEN_WAVEGENENGINE_H
 
 #include <QByteArray>
 #include <QObject>
@@ -31,15 +31,15 @@
  *
  * 相位在连续生成中自动累积，保证波形连续无跳变。
  */
-class WaveformGenerator : public QObject {
+class WaveGenEngine : public QObject {
     Q_OBJECT
 
 public:
     /** @brief 构造波形发生器 @param parent 父对象 */
-    explicit WaveformGenerator(QObject *parent = nullptr);
+    explicit WaveGenEngine(QObject *parent = nullptr);
 
     /** @brief 析构，停止流式输出 */
-    ~WaveformGenerator() override;
+    ~WaveGenEngine() override;
 
     // ── 参数配置 ──
 
@@ -106,4 +106,4 @@ private:
     WaveGen::Stats m_stats;             ///< 统计计数器
 };
 
-#endif // WAVEGEN_WAVEFORMGENERATOR_H
+#endif // WAVEGEN_WAVEGENENGINE_H

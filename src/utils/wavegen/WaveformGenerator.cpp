@@ -8,26 +8,28 @@
 #include "utils/wavegen/WaveformGenerator.h"
 
 #include <QDataStream>
+#include <QIODevice>
 #include <QtMath>
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <random>
 
 // ══════════════════════════════════════════════
 // 构造 / 析构
 // ══════════════════════════════════════════════
 
-WaveformGenerator::WaveformGenerator(QObject *parent)
+WaveGenEngine::WaveGenEngine(QObject *parent)
     : QObject(parent)
     , m_timer(new QTimer(this))
 {
     m_timer->setSingleShot(false);
     connect(m_timer, &QTimer::timeout,
-            this, &WaveformGenerator::onStreamingTick);
+            this, &WaveGenEngine::onStreamingTick);
 }
 
-WaveformGenerator::~WaveformGenerator()
+WaveGenEngine::~WaveGenEngine()
 {
     stopStreaming();
 }
@@ -36,7 +38,7 @@ WaveformGenerator::~WaveformGenerator()
 // 参数配置
 // ══════════════════════════════════════════════
 
-void WaveformGenerator::setParams(const WaveGen::WaveGenParams &params)
+void WaveGenEngine::setParams(const WaveGen::WaveGenParams &params)
 {
     m_params = params;
     m_phaseAccumulator = params.phase;
@@ -44,17 +46,17 @@ void WaveformGenerator::setParams(const WaveGen::WaveGenParams &params)
     emit paramsChanged();
 }
 
-WaveGen::WaveGenParams WaveformGenerator::params() const
+WaveGen::WaveGenParams WaveGenEngine::params() const
 {
     return m_params;
 }
 
-void WaveformGenerator::setChunkSize(int size)
+void WaveGenEngine::setChunkSize(int size)
 {
     m_chunkSize = qBound(1, size, 65536);
 }
 
-int WaveformGenerator::chunkSize() const
+int WaveGenEngine::chunkSize() const
 {
     return m_chunkSize;
 }
@@ -63,7 +65,7 @@ int WaveformGenerator::chunkSize() const
 // 流式输出控制
 // ══════════════════════════════════════════════
 
-void WaveformGenerator::startStreaming(int intervalMs)
+void WaveGenEngine::startStreaming(int intervalMs)
 {
     if (m_streaming) {
         return;
@@ -72,7 +74,7 @@ void WaveformGenerator::startStreaming(int intervalMs)
     m_timer->start(qMax(1, intervalMs));
 }
 
-void WaveformGenerator::stopStreaming()
+void WaveGenEngine::stopStreaming()
 {
     if (!m_streaming) {
         return;
@@ -81,7 +83,7 @@ void WaveformGenerator::stopStreaming()
     m_timer->stop();
 }
 
-bool WaveformGenerator::isStreaming() const
+bool WaveGenEngine::isStreaming() const
 {
     return m_streaming;
 }
@@ -90,7 +92,7 @@ bool WaveformGenerator::isStreaming() const
 // 单次生成
 // ══════════════════════════════════════════════
 
-QVector<double> WaveformGenerator::generateRaw(int count)
+QVector<double> WaveGenEngine::generateRaw(int count)
 {
     QVector<double> result;
     result.reserve(count);
@@ -105,7 +107,7 @@ QVector<double> WaveformGenerator::generateRaw(int count)
     return result;
 }
 
-QByteArray WaveformGenerator::quantize(const QVector<double> &raw) const
+QByteArray WaveGenEngine::quantize(const QVector<double> &raw) const
 {
     return toBytes(raw);
 }
@@ -114,7 +116,7 @@ QByteArray WaveformGenerator::quantize(const QVector<double> &raw) const
 // 流式定时器回调
 // ══════════════════════════════════════════════
 
-void WaveformGenerator::onStreamingTick()
+void WaveGenEngine::onStreamingTick()
 {
     if (!m_streaming) {
         return;
@@ -130,7 +132,7 @@ void WaveformGenerator::onStreamingTick()
 // 核心采样计算
 // ══════════════════════════════════════════════
 
-double WaveformGenerator::computeSample(int index)
+double WaveGenEngine::computeSample(int index)
 {
     const double sr = m_params.sampleRate;
     const double t = static_cast<double>(index) / sr;
@@ -155,7 +157,7 @@ double WaveformGenerator::computeSample(int index)
 
     case WaveGen::WaveformType::Triangle: {
         double period = 1.0 / freq;
-        double tMod = qFmod(t + phase / (2.0 * M_PI * freq), period);
+        double tMod = std::fmod(t + phase / (2.0 * M_PI * freq), period);
         if (tMod < 0) tMod += period;
         double frac = tMod / period;
         if (frac < 0.5) {
@@ -168,7 +170,7 @@ double WaveformGenerator::computeSample(int index)
 
     case WaveGen::WaveformType::Sawtooth: {
         double period = 1.0 / freq;
-        double tMod = qFmod(t + phase / (2.0 * M_PI * freq), period);
+        double tMod = std::fmod(t + phase / (2.0 * M_PI * freq), period);
         if (tMod < 0) tMod += period;
         double frac = tMod / period;
         sample = amp * (2.0 * frac - 1.0);
@@ -191,7 +193,7 @@ double WaveformGenerator::computeSample(int index)
             break;
         }
         double period = 1.0 / freq;
-        double tMod = qFmod(t, period);
+        double tMod = std::fmod(t, period);
         if (tMod < 0) tMod += period;
         double frac = tMod / period;
         double fidx = frac * (data.size() - 1);
@@ -212,7 +214,7 @@ double WaveformGenerator::computeSample(int index)
 // 调制
 // ══════════════════════════════════════════════
 
-double WaveformGenerator::applyModulation(double sample, double t)
+double WaveGenEngine::applyModulation(double sample, double t)
 {
     if (m_params.modType == WaveGen::ModulationType::None) {
         return sample;
@@ -238,7 +240,7 @@ double WaveformGenerator::applyModulation(double sample, double t)
 // 量化 + 字节序转换
 // ══════════════════════════════════════════════
 
-QByteArray WaveformGenerator::toBytes(const QVector<double> &raw) const
+QByteArray WaveGenEngine::toBytes(const QVector<double> &raw) const
 {
     QByteArray result;
     QDataStream stream(&result, QIODevice::WriteOnly);
