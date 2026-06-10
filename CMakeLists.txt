@@ -3153,6 +3153,14 @@ set(SOURCES
     src/utils/matrix264/BiCGSTAB11.cpp
     src/utils/signal262/WaveletDenoiser14.cpp
     src/utils/tree261/AA9.cpp
+    src/utils/cluster259/Agglomerative13.cpp
+    src/utils/code260/PolluxCode6.cpp
+    src/utils/dsp261/NoiseGate8.cpp
+    src/utils/fft262/SplitRadixFFT9.cpp
+    src/utils/graph275/GraphIsomorphism11.cpp
+    src/utils/matrix265/EigenVectorSolver7.cpp
+    src/utils/signal263/Periodogram7.cpp
+    src/utils/tree262/AvlTree9.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6160,6 +6168,14 @@ set(HEADERS
     src/utils/matrix264/BiCGSTAB11.h
     src/utils/signal262/WaveletDenoiser14.h
     src/utils/tree261/AA9.h
+    src/utils/cluster259/Agglomerative13.h
+    src/utils/code260/PolluxCode6.h
+    src/utils/dsp261/NoiseGate8.h
+    src/utils/fft262/SplitRadixFFT9.h
+    src/utils/graph275/GraphIsomorphism11.h
+    src/utils/matrix265/EigenVectorSolver7.h
+    src/utils/signal263/Periodogram7.h
+    src/utils/tree262/AvlTree9.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
