@@ -439,3 +439,52 @@ quint16 MqttClientEngine::nextPacketId()
     return id;
 }
 
+/** @brief 编码MQTT剩余长度字段 @param length 长度值 @return 编码后的字节 */
+QByteArray MqttClientEngine::encodeRemainingLength(int length)
+{
+    QByteArray result;
+    do {
+        quint8 byte = static_cast<quint8>(length % 128);
+        length /= 128;
+        if (length > 0) {
+            byte |= 0x80;
+        }
+        result.append(static_cast<char>(byte));
+    } while (length > 0);
+    return result;
+}
+
+/** @brief 解码MQTT剩余长度字段 @param data 数据 @param offset 起始偏移 @return 长度值（-1=不完整） */
+int MqttClientEngine::decodeRemainingLength(const QByteArray& data, int* offset)
+{
+    int multiplier = 1;
+    int value = 0;
+    int idx = *offset;
+    quint8 byte = 0;
+    do {
+        if (idx >= data.size()) {
+            return -1;
+        }
+        byte = static_cast<quint8>(data[idx]);
+        value += (byte & 0x7F) * multiplier;
+        multiplier *= 128;
+        ++idx;
+    } while ((byte & 0x80) != 0);
+    *offset = idx;
+    return value;
+}
+
+/** @brief 构建主题过滤器字节（保留扩展） */
+QByteArray MqttClientEngine::buildTopicFilter(const QString& topic)
+{
+    QByteArray tf = topic.toUtf8();
+    QByteArray result;
+    result.append(static_cast<char>((tf.size() >> 8) & 0xFF));
+    result.append(static_cast<char>(tf.size() & 0xFF));
+    result.append(tf);
+    return result;
+}
+
+    return id;
+}
+

@@ -1,23 +1,20 @@
 /**
  * @file MqttClientEnginePacket.cpp
- * @brief MQTT客户端引擎 — 接收报文解析与编解码辅助
+ * @brief MQTT客户端引擎 — 入站报文解析与处理
  *
- * 处理MQTT v3.1.1所有入站报文(CONNACK/PUBLISH/PUBACK/PUBREC/PUBREL/
- * PUBCOMP/SUBACK/UNSUBACK/PINGRESP)的解析与响应，以及剩余长度编解码和
- * 主题过滤器构建辅助方法。
+ * 从 MqttClientEngine.cpp 拆分而来，包含接收缓冲区解析和所有
+ * CONNACK/PUBLISH/SUBACK/PUBACK/PUBREC/PUBREL/PUBCOMP/PINGRESP 处理逻辑。
  */
 
 #include "connection/mqtt_client/MqttClientEngine.h"
 
-/** MQTT固定报文类型 */
-enum MqttPacketType {
+/** MQTT固定报文类型（与Engine.cpp共享） */
+enum PacketType {
     CONNECT = 1, CONNACK = 2, PUBLISH = 3, PUBACK = 4,
     PUBREC = 5, PUBREL = 6, PUBCOMP = 7, SUBSCRIBE = 8,
     SUBACK = 9, UNSUBSCRIBE = 10, UNSUBACK = 11, PINGREQ = 12,
     PINGRESP = 13, DISCONNECT = 14
 };
-
-// ── 接收报文解析 ────────────────────────────────────────────
 
 /** @brief 处理接收缓冲区中的所有完整报文 */
 void MqttClientEngine::handleIncomingPacket()
@@ -64,7 +61,7 @@ void MqttClientEngine::processConnack(const QByteArray& data)
     if (returnCode == 0) {
         m_connected = true;
         m_reconnectAttempts = 0;
-        if (m_reconnectAttempts == 0 && m_connectionAttempts > 1) {
+        if (m_connectionAttempts > 1) {
             ++m_successfulReconnects;
         }
         int ka = m_params.keepAlive > 0 ? m_params.keepAlive : 60;
@@ -106,7 +103,6 @@ void MqttClientEngine::processPublish(const QByteArray& data, int header)
 
     QByteArray payload = data.mid(pos);
     bool retained = (header & 0x01) != 0;
-
     ++m_totalReceived;
 
     /* QoS1 → PUBACK */
@@ -118,7 +114,7 @@ void MqttClientEngine::processPublish(const QByteArray& data, int header)
         ack.append(static_cast<char>(pid & 0xFF));
         m_socket->write(ack);
     }
-    /* QoS2 → PUBREC (简化处理) */
+    /* QoS2 → PUBREC */
     if (qos == MqttQos::QoS2) {
         QByteArray rec;
         rec.append(static_cast<char>(static_cast<int>(PUBREC) << 4));
@@ -192,51 +188,3 @@ void MqttClientEngine::processPubcomp(const QByteArray& data)
 
 /** @brief 处理PINGRESP报文 */
 void MqttClientEngine::processPingresp() { /* 心跳已确认 */ }
-
-// ── 编解码辅助 ────────────────────────────────────────────────
-
-/** @brief 编码MQTT剩余长度字段 @param length 长度值 @return 编码后的字节 */
-QByteArray MqttClientEngine::encodeRemainingLength(int length)
-{
-    QByteArray result;
-    do {
-        quint8 byte = static_cast<quint8>(length % 128);
-        length /= 128;
-        if (length > 0) {
-            byte |= 0x80;
-        }
-        result.append(static_cast<char>(byte));
-    } while (length > 0);
-    return result;
-}
-
-/** @brief 解码MQTT剩余长度字段 @param data 数据 @param offset 起始偏移 @return 长度值（-1=不完整） */
-int MqttClientEngine::decodeRemainingLength(const QByteArray& data, int* offset)
-{
-    int multiplier = 1;
-    int value = 0;
-    int idx = *offset;
-    quint8 byte = 0;
-    do {
-        if (idx >= data.size()) {
-            return -1;
-        }
-        byte = static_cast<quint8>(data[idx]);
-        value += (byte & 0x7F) * multiplier;
-        multiplier *= 128;
-        ++idx;
-    } while ((byte & 0x80) != 0);
-    *offset = idx;
-    return value;
-}
-
-/** @brief 构建主题过滤器字节（未使用，保留扩展） */
-QByteArray MqttClientEngine::buildTopicFilter(const QString& topic)
-{
-    QByteArray tf = topic.toUtf8();
-    QByteArray result;
-    result.append(static_cast<char>((tf.size() >> 8) & 0xFF));
-    result.append(static_cast<char>(tf.size() & 0xFF));
-    result.append(tf);
-    return result;
-}
