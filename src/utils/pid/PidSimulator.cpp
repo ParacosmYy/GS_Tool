@@ -11,6 +11,7 @@
 #include <QRandomGenerator>
 #include <QtMath>
 #include <algorithm>
+#include <cmath>
 
 /* ============================================================
  * 构造
@@ -176,7 +177,7 @@ QVector<double> PidSimulator::generateSetpoint(PidResponseType type, int steps) 
             sp[i] = 0.5 * (1.0 + qSin(2.0 * M_PI * 0.5 * t));
             break;
         case PidResponseType::Square:
-            sp[i] = (qFmod(t, 2.0) < 1.0) ? 1.0 : 0.0;
+            sp[i] = (std::fmod(t, 2.0) < 1.0) ? 1.0 : 0.0;
             break;
         case PidResponseType::Impulse:
             sp[i] = (i == 0) ? 1.0 : 0.0;

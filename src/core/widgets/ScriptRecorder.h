@@ -13,7 +13,7 @@ class QListWidget; class QPushButton; class QLabel; class QSlider;
 /** @brief 脚本动作类型枚举 */
 enum class ScriptActionType { SendData, Delay, Connect, Disconnect, Comment };
 /** @brief 脚本动作数据结构 */
-struct ScriptAction {
+struct RecordedScriptAction {
     ScriptActionType type; ///< 动作类型
     QString data;          ///< 动作数据(发送内容/延时毫秒/注释等)
     bool isHex = false;    ///< 是否为十六进制格式(仅SendData)
@@ -36,9 +36,9 @@ public:
     /** @brief 查询是否正在回放 @return true=回放中 */
     bool isPlaying() const { return m_playing; }
     /** @brief 获取当前脚本动作列表 @return 动作列表 */
-    QVector<ScriptAction> script() const;
+    QVector<RecordedScriptAction> script() const;
     /** @brief 加载外部脚本动作列表 @param actions 动作列表 */
-    void loadScript(const QVector<ScriptAction>& actions);
+    void loadScript(const QVector<RecordedScriptAction>& actions);
     /** @brief 清空当前脚本 */
     void clearScript();
 public slots:
@@ -77,7 +77,7 @@ private:
     QPushButton* m_stopBtn = nullptr; QPushButton* m_saveBtn = nullptr;
     QPushButton* m_loadBtn = nullptr; QPushButton* m_clearBtn = nullptr;
     QLabel* m_statusLabel = nullptr; QSlider* m_speedSlider = nullptr;
-    QVector<ScriptAction> m_actions;
+    QVector<RecordedScriptAction> m_actions;
     bool m_recording = false; bool m_playing = false; int m_playbackIndex = 0;
     QElapsedTimer m_recordTimer; class QTimer* m_playbackTimer = nullptr;
 

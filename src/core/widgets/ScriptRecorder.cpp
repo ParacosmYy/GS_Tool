@@ -65,10 +65,10 @@ ScriptRecorder::ScriptRecorder(QWidget* parent) : QWidget(parent) {
 }
 
 /** @brief 获取当前脚本动作序列 @return 脚本动作向量 */
-QVector<ScriptAction> ScriptRecorder::script() const { return m_actions; }
+QVector<RecordedScriptAction> ScriptRecorder::script() const { return m_actions; }
 
 /** @brief 加载外部脚本动作序列并刷新列表显示 @param a 要加载的脚本动作向量 */
-void ScriptRecorder::loadScript(const QVector<ScriptAction>& a) { m_actions=a; refreshList(); }
+void ScriptRecorder::loadScript(const QVector<RecordedScriptAction>& a) { m_actions=a; refreshList(); }
 
 /** @brief 清除所有已录制的脚本动作 */
 void ScriptRecorder::clearScript() { m_actions.clear(); refreshList(); m_statusLabel->setText(tr("已清除")); }

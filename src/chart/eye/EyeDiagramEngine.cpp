@@ -20,6 +20,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <algorithm>
+#include <cmath>
 
 // ============================================================
 // 构造 / 参数
@@ -344,8 +345,8 @@ EyeMeasurement EyeDiagramEngine::measure() const
 
     /* --- SNR (dB) --- */
     if (m.jitterRms > 0.0) {
-        m.signalToNoiseRatio = 20.0 * qLog10(qMax(1.0e-12,
-                                                    m.eyeHeight / (2.0 * m.jitterRms)));
+        m.signalToNoiseRatio = 20.0 * std::log10(qMax(1.0e-12,
+                                                       m.eyeHeight / (2.0 * m.jitterRms)));
     }
 
     /* --- Q因子 --- */

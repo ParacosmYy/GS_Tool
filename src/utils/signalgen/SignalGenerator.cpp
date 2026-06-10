@@ -2,7 +2,9 @@
  * @file SignalGenerator.cpp
  * @brief Generate test signals for protocol verification implementation
  */
-#include "signalgen/SignalGenerator.h"
+#include "utils/signalgen/SignalGenerator.h"
+
+#include <QElapsedTimer>
 
 SignalGenerator::SignalGenerator(QObject *parent)
     : QObject(parent)
