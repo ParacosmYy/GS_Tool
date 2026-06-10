@@ -65,10 +65,10 @@ void AnnotationWidget::setupUI()
     m_filterCombo = new QComboBox(this);
     m_filterCombo->setObjectName(QStringLiteral("annotToolFilterCombo"));
     m_filterCombo->addItem(tr("全部类型"), -1);
-    m_filterCombo->addItem(tr("标记"),   static_cast<int>(AnnotationType::Marker));
-    m_filterCombo->addItem(tr("区域"),   static_cast<int>(AnnotationType::Region));
-    m_filterCombo->addItem(tr("事件"),   static_cast<int>(AnnotationType::Event));
-    m_filterCombo->addItem(tr("测量"),   static_cast<int>(AnnotationType::Measurement));
+    m_filterCombo->addItem(tr("标记"),   static_cast<int>(AnnotationKind::Marker));
+    m_filterCombo->addItem(tr("区域"),   static_cast<int>(AnnotationKind::Region));
+    m_filterCombo->addItem(tr("事件"),   static_cast<int>(AnnotationKind::Event));
+    m_filterCombo->addItem(tr("测量"),   static_cast<int>(AnnotationKind::Measurement));
 
     m_addBtn = new QPushButton(tr("添加"), this);
     m_addBtn->setObjectName(QStringLiteral("annotToolAddBtn"));
@@ -188,10 +188,10 @@ void AnnotationWidget::mousePressEvent(QMouseEvent* event)
             qint64 pos = m_timelineMin + static_cast<qint64>(ratio * range);
             ++m_stats.totalTimelineClicks;
 
-            DataAnnotation a;
+            AnnotationEntry a;
             a.startPos = pos;
             a.endPos   = pos;
-            a.type     = AnnotationType::Marker;
+            a.type     = AnnotationKind::Marker;
             a.label    = tr("标注 @ %1").arg(pos);
             m_manager->addAnnotation(a);
             emit timelineClicked(pos);
@@ -216,7 +216,7 @@ void AnnotationWidget::setDataRange(qint64 minPos, qint64 maxPos)
 void AnnotationWidget::onAddClicked()
 {
     ++m_stats.totalAdds;
-    DataAnnotation a;
+    AnnotationEntry a;
     a.startPos = (m_timelineMin + m_timelineMax) / 2;
     a.endPos   = a.startPos;
     a.label    = tr("新标注");
@@ -228,10 +228,10 @@ void AnnotationWidget::onEditClicked()
 {
     if (m_selectedId.isEmpty()) return;
     ++m_stats.totalEdits;
-    DataAnnotation a = m_manager->annotation(m_selectedId);
+    AnnotationEntry a = m_manager->annotation(m_selectedId);
     if (!a.id.isEmpty()) {
         int nextType = (static_cast<int>(a.type) + 1) % 4;
-        a.type = static_cast<AnnotationType>(nextType);
+        a.type = static_cast<AnnotationKind>(nextType);
         m_manager->updateAnnotation(m_selectedId, a);
     }
 }
@@ -300,7 +300,7 @@ void AnnotationWidget::onTableDoubleClicked(int row, int col)
 }
 
 /** @brief 管理器标注添加 — 增量刷新 */
-void AnnotationWidget::onAnnotationAdded(const DataAnnotation& a)
+void AnnotationWidget::onAnnotationAdded(const AnnotationEntry& a)
 {
     addTableRow(a);
     m_countLabel->setText(tr("%1 条标注").arg(m_table->rowCount()));
@@ -317,7 +317,7 @@ void AnnotationWidget::onAnnotationRemoved(const QString& id)
 }
 
 /** @brief 管理器标注更新 — 更新对应行 */
-void AnnotationWidget::onAnnotationUpdated(const DataAnnotation& a)
+void AnnotationWidget::onAnnotationUpdated(const AnnotationEntry& a)
 {
     int row = findRowById(a.id);
     if (row >= 0) updateTableRow(row, a);
@@ -333,20 +333,20 @@ void AnnotationWidget::refreshTable()
     m_table->setRowCount(0);
     m_table->setUpdatesEnabled(false);
 
-    QList<DataAnnotation> list = m_manager->allAnnotations();
+    QList<AnnotationEntry> list = m_manager->allAnnotations();
 
     /* 类型过滤 */
     int typeFilter = m_filterCombo->currentData().toInt();
     if (typeFilter >= 0) {
         auto filtered = m_manager->filterByType(
-            static_cast<AnnotationType>(typeFilter));
+            static_cast<AnnotationKind>(typeFilter));
         list = filtered;
     }
 
     /* 关键字搜索 */
     QString keyword = m_searchEdit->text().trimmed();
     if (!keyword.isEmpty()) {
-        QList<DataAnnotation> filtered;
+        QList<AnnotationEntry> filtered;
         for (const auto& a : list) {
             if (a.label.contains(keyword, Qt::CaseInsensitive)
                 || a.category.contains(keyword, Qt::CaseInsensitive)) {
@@ -365,7 +365,7 @@ void AnnotationWidget::refreshTable()
 }
 
 /** @brief 添加表格行 @param a 标注数据 */
-void AnnotationWidget::addTableRow(const DataAnnotation& a)
+void AnnotationWidget::addTableRow(const AnnotationEntry& a)
 {
     int row = m_table->rowCount();
     m_table->insertRow(row);
@@ -373,7 +373,7 @@ void AnnotationWidget::addTableRow(const DataAnnotation& a)
 }
 
 /** @brief 更新表格行 @param row 行号 @param a 标注数据 */
-void AnnotationWidget::updateTableRow(int row, const DataAnnotation& a)
+void AnnotationWidget::updateTableRow(int row, const AnnotationEntry& a)
 {
     auto* idItem     = new QTableWidgetItem(a.id);
     auto* typeItem   = new QTableWidgetItem(typeDisplayName(a.type));
@@ -413,13 +413,13 @@ int AnnotationWidget::findRowById(const QString& id) const
 }
 
 /** @brief 标注类型的显示名称 @param type 标注类型 @return 经过 tr() 的名称 */
-QString AnnotationWidget::typeDisplayName(AnnotationType type) const
+QString AnnotationWidget::typeDisplayName(AnnotationKind type) const
 {
     switch (type) {
-    case AnnotationType::Marker:      return tr("标记");
-    case AnnotationType::Region:      return tr("区域");
-    case AnnotationType::Event:       return tr("事件");
-    case AnnotationType::Measurement: return tr("测量");
+    case AnnotationKind::Marker:      return tr("标记");
+    case AnnotationKind::Region:      return tr("区域");
+    case AnnotationKind::Event:       return tr("事件");
+    case AnnotationKind::Measurement: return tr("测量");
     }
     return tr("未知");
 }

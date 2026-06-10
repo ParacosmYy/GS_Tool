@@ -72,17 +72,17 @@ private slots:
     void onSearchChanged(const QString& text);
     void onFilterChanged(int index);
     void onTableDoubleClicked(int row, int col);
-    void onAnnotationAdded(const DataAnnotation& a);
+    void onAnnotationAdded(const AnnotationEntry& a);
     void onAnnotationRemoved(const QString& id);
-    void onAnnotationUpdated(const DataAnnotation& a);
+    void onAnnotationUpdated(const AnnotationEntry& a);
 
 private:
     void setupUI();
     void refreshTable();
-    void addTableRow(const DataAnnotation& a);
-    void updateTableRow(int row, const DataAnnotation& a);
+    void addTableRow(const AnnotationEntry& a);
+    void updateTableRow(int row, const AnnotationEntry& a);
     int  findRowById(const QString& id) const;
-    QString typeDisplayName(AnnotationType type) const;
+    QString typeDisplayName(AnnotationKind type) const;
 
     AnnotationManager* m_manager;      ///< 标注管理器（非拥有）
     QTableWidget*      m_table;        ///< 标注列表

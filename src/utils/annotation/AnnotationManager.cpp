@@ -36,9 +36,9 @@ void AnnotationManager::clear()
 /* ── CRUD ── */
 
 /** @brief 添加标注 @param annotation 标注数据 @return 添加后的标注 */
-DataAnnotation AnnotationManager::addAnnotation(const DataAnnotation& annotation)
+AnnotationEntry AnnotationManager::addAnnotation(const AnnotationEntry& annotation)
 {
-    DataAnnotation a = annotation;
+    AnnotationEntry a = annotation;
     if (a.id.isEmpty()) {
         a.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     }
@@ -52,7 +52,7 @@ DataAnnotation AnnotationManager::addAnnotation(const DataAnnotation& annotation
     if (m_stats.activeCount > m_stats.peakCount) {
         m_stats.peakCount = m_stats.activeCount;
     }
-    pushUndo(AnnotationAction::Add, DataAnnotation{}, a);
+    pushUndo(AnnotationAction::Add, AnnotationEntry{}, a);
     emit annotationAdded(a);
     return a;
 }
@@ -62,11 +62,11 @@ bool AnnotationManager::removeAnnotation(const QString& id)
 {
     for (int i = 0; i < m_annotations.size(); ++i) {
         if (m_annotations.at(i).id == id) {
-            DataAnnotation before = m_annotations.at(i);
+            AnnotationEntry before = m_annotations.at(i);
             m_annotations.removeAt(i);
             ++m_stats.totalRemoved;
             m_stats.activeCount = static_cast<int>(m_annotations.size());
-            pushUndo(AnnotationAction::Remove, before, DataAnnotation{});
+            pushUndo(AnnotationAction::Remove, before, AnnotationEntry{});
             emit annotationRemoved(id);
             return true;
         }
@@ -76,12 +76,12 @@ bool AnnotationManager::removeAnnotation(const QString& id)
 
 /** @brief 更新标注 @param id 标注 ID @param annotation 新数据 @return 是否成功 */
 bool AnnotationManager::updateAnnotation(const QString& id,
-                                          const DataAnnotation& annotation)
+                                          const AnnotationEntry& annotation)
 {
     for (int i = 0; i < m_annotations.size(); ++i) {
         if (m_annotations.at(i).id == id) {
-            DataAnnotation before = m_annotations.at(i);
-            DataAnnotation after = annotation;
+            AnnotationEntry before = m_annotations.at(i);
+            AnnotationEntry after = annotation;
             after.id = id;
             m_annotations[i] = after;
             ++m_stats.totalUpdated;
@@ -94,16 +94,16 @@ bool AnnotationManager::updateAnnotation(const QString& id,
 }
 
 /** @brief 获取标注 @param id 标注 ID @return 标注数据 */
-DataAnnotation AnnotationManager::annotation(const QString& id) const
+AnnotationEntry AnnotationManager::annotation(const QString& id) const
 {
     for (const auto& a : m_annotations) {
         if (a.id == id) return a;
     }
-    return DataAnnotation{};
+    return AnnotationEntry{};
 }
 
 /** @brief 获取所有标注 @return 标注列表 */
-QList<DataAnnotation> AnnotationManager::allAnnotations() const
+QList<AnnotationEntry> AnnotationManager::allAnnotations() const
 {
     return m_annotations;
 }
@@ -111,9 +111,9 @@ QList<DataAnnotation> AnnotationManager::allAnnotations() const
 /* ── 过滤 / 搜索 ── */
 
 /** @brief 按类型过滤 @param type 标注类型 @return 匹配的标注 */
-QList<DataAnnotation> AnnotationManager::filterByType(AnnotationType type) const
+QList<AnnotationEntry> AnnotationManager::filterByType(AnnotationKind type) const
 {
-    QList<DataAnnotation> result;
+    QList<AnnotationEntry> result;
     for (const auto& a : m_annotations) {
         if (a.type == type) result.append(a);
     }
@@ -121,10 +121,10 @@ QList<DataAnnotation> AnnotationManager::filterByType(AnnotationType type) const
 }
 
 /** @brief 按分类过滤 @param category 分类名称 @return 匹配的标注 */
-QList<DataAnnotation> AnnotationManager::filterByCategory(
+QList<AnnotationEntry> AnnotationManager::filterByCategory(
     const QString& category) const
 {
-    QList<DataAnnotation> result;
+    QList<AnnotationEntry> result;
     for (const auto& a : m_annotations) {
         if (a.category.compare(category, Qt::CaseInsensitive) == 0) {
             result.append(a);
@@ -134,10 +134,10 @@ QList<DataAnnotation> AnnotationManager::filterByCategory(
 }
 
 /** @brief 按时间范围过滤 @param from 起始 @param to 结束 @return 匹配的标注 */
-QList<DataAnnotation> AnnotationManager::filterByTimeRange(
+QList<AnnotationEntry> AnnotationManager::filterByTimeRange(
     const QDateTime& from, const QDateTime& to) const
 {
-    QList<DataAnnotation> result;
+    QList<AnnotationEntry> result;
     for (const auto& a : m_annotations) {
         if (a.timestamp >= from && a.timestamp <= to) {
             result.append(a);
@@ -147,10 +147,10 @@ QList<DataAnnotation> AnnotationManager::filterByTimeRange(
 }
 
 /** @brief 关键字搜索（匹配 label 和 category） @param keyword 关键字 @return 匹配标注 */
-QList<DataAnnotation> AnnotationManager::search(const QString& keyword) const
+QList<AnnotationEntry> AnnotationManager::search(const QString& keyword) const
 {
     ++m_stats.totalSearches;
-    QList<DataAnnotation> result;
+    QList<AnnotationEntry> result;
     for (const auto& a : m_annotations) {
         if (a.label.contains(keyword, Qt::CaseInsensitive)
             || a.category.contains(keyword, Qt::CaseInsensitive)) {
@@ -161,10 +161,10 @@ QList<DataAnnotation> AnnotationManager::search(const QString& keyword) const
 }
 
 /** @brief 检测重叠 @param annotation 目标注 @return 重叠标注列表 */
-QList<DataAnnotation> AnnotationManager::findOverlaps(
-    const DataAnnotation& annotation) const
+QList<AnnotationEntry> AnnotationManager::findOverlaps(
+    const AnnotationEntry& annotation) const
 {
-    QList<DataAnnotation> result;
+    QList<AnnotationEntry> result;
     for (const auto& a : m_annotations) {
         if (a.id == annotation.id) continue;
         if (!a.isRegion() || !annotation.isRegion()) continue;
@@ -181,7 +181,7 @@ QList<DataAnnotation> AnnotationManager::findOverlaps(
 /* ── 持久化 ── */
 
 /** @brief 序列化单条标注为 JSON 对象 */
-static QJsonObject annotationToJson(const DataAnnotation& a)
+static QJsonObject annotationToJson(const AnnotationEntry& a)
 {
     QJsonObject obj;
     obj[QStringLiteral("id")]       = a.id;
@@ -196,12 +196,12 @@ static QJsonObject annotationToJson(const DataAnnotation& a)
 }
 
 /** @brief 从 JSON 对象反序列化标注 */
-static DataAnnotation jsonToAnnotation(const QJsonObject& obj)
+static AnnotationEntry jsonToAnnotation(const QJsonObject& obj)
 {
-    DataAnnotation a;
+    AnnotationEntry a;
     a.id       = obj[QStringLiteral("id")].toString();
-    a.type     = static_cast<AnnotationType>(
-        obj[QStringLiteral("type")].toInt(static_cast<int>(AnnotationType::Marker)));
+    a.type     = static_cast<AnnotationKind>(
+        obj[QStringLiteral("type")].toInt(static_cast<int>(AnnotationKind::Marker)));
     a.startPos = obj[QStringLiteral("startPos")].toInteger();
     a.endPos   = obj[QStringLiteral("endPos")].toInteger();
     a.label    = obj[QStringLiteral("label")].toString();
@@ -265,7 +265,7 @@ bool AnnotationManager::exportToCsv(const QString& filePath) const
     /* 数据行 */
     for (const auto& a : m_annotations) {
         out << a.id << QStringLiteral(",")
-            << DataAnnotation::typeName(a.type) << QStringLiteral(",")
+            << AnnotationEntry::typeName(a.type) << QStringLiteral(",")
             << a.startPos << QStringLiteral(",")
             << a.endPos << QStringLiteral(",")
             << QStringLiteral("\"%1\"").arg(a.label) << QStringLiteral(",")
@@ -282,8 +282,8 @@ bool AnnotationManager::exportToCsv(const QString& filePath) const
 
 /** @brief 压入撤销栈 @param action 操作类型 @param before 操作前 @param after 操作后 */
 void AnnotationManager::pushUndo(AnnotationAction::Kind action,
-                                  const DataAnnotation& before,
-                                  const DataAnnotation& after)
+                                  const AnnotationEntry& before,
+                                  const AnnotationEntry& after)
 {
     AnnotationAction act;
     act.kind = action;

@@ -39,36 +39,36 @@ public:
     /** @brief 构造管理器 @param parent 父对象 */
     explicit AnnotationManager(QObject* parent = nullptr);
 
-    /** @brief 添加标注 @param annotation 标注数据 @return 添加后的标注（含生成的 id） */
-    DataAnnotation addAnnotation(const DataAnnotation& annotation);
+    /** @brief 添加标注 @param entry 标注数据 @return 添加后的标注（含生成的 id） */
+    AnnotationEntry addAnnotation(const AnnotationEntry& entry);
 
     /** @brief 移除标注 @param id 标注 ID @return 是否成功 */
     bool removeAnnotation(const QString& id);
 
-    /** @brief 更新标注 @param id 标注 ID @param annotation 新数据 @return 是否成功 */
-    bool updateAnnotation(const QString& id, const DataAnnotation& annotation);
+    /** @brief 更新标注 @param id 标注 ID @param entry 新数据 @return 是否成功 */
+    bool updateAnnotation(const QString& id, const AnnotationEntry& entry);
 
     /** @brief 获取标注 @param id 标注 ID @return 标注数据（未找到则 id 为空） */
-    DataAnnotation annotation(const QString& id) const;
+    AnnotationEntry annotation(const QString& id) const;
 
     /** @brief 获取所有标注 @return 标注列表 */
-    QList<DataAnnotation> allAnnotations() const;
+    QList<AnnotationEntry> allAnnotations() const;
 
-    /** @brief 按类型过滤 @param type 标注类型 @return 匹配的标注 */
-    QList<DataAnnotation> filterByType(AnnotationType type) const;
+    /** @brief 按类型过滤 @param kind 标注类型 @return 匹配的标注 */
+    QList<AnnotationEntry> filterByType(AnnotationKind kind) const;
 
     /** @brief 按分类过滤 @param category 分类名称 @return 匹配的标注 */
-    QList<DataAnnotation> filterByCategory(const QString& category) const;
+    QList<AnnotationEntry> filterByCategory(const QString& category) const;
 
     /** @brief 按时间范围过滤 @param from 起始时间 @param to 结束时间 @return 匹配的标注 */
-    QList<DataAnnotation> filterByTimeRange(
+    QList<AnnotationEntry> filterByTimeRange(
         const QDateTime& from, const QDateTime& to) const;
 
     /** @brief 关键字搜索 @param keyword 关键字 @return 匹配的标注 */
-    QList<DataAnnotation> search(const QString& keyword) const;
+    QList<AnnotationEntry> search(const QString& keyword) const;
 
-    /** @brief 检测与指定标注重叠的标注 @param annotation 目标注 @return 重叠标注列表 */
-    QList<DataAnnotation> findOverlaps(const DataAnnotation& annotation) const;
+    /** @brief 检测与指定标注重叠的标注 @param entry 目标注 @return 重叠标注列表 */
+    QList<AnnotationEntry> findOverlaps(const AnnotationEntry& entry) const;
 
     /** @brief 保存标注到 JSON 文件 @param filePath 文件路径 @return 是否成功 */
     bool saveToJson(const QString& filePath) const;
@@ -100,22 +100,22 @@ public:
     void resetStatistics();
 
 signals:
-    /** @brief 标注已添加 @param annotation 添加后的标注 */
-    void annotationAdded(const DataAnnotation& annotation);
+    /** @brief 标注已添加 @param entry 添加后的标注 */
+    void annotationAdded(const AnnotationEntry& entry);
     /** @brief 标注已移除 @param id 被移除的标注 ID */
     void annotationRemoved(const QString& id);
-    /** @brief 标注已更新 @param annotation 更新后的标注 */
-    void annotationUpdated(const DataAnnotation& annotation);
+    /** @brief 标注已更新 @param entry 更新后的标注 */
+    void annotationUpdated(const AnnotationEntry& entry);
 
 private:
     void pushUndo(AnnotationAction::Kind action,
-                  const DataAnnotation& before,
-                  const DataAnnotation& after);
+                  const AnnotationEntry& before,
+                  const AnnotationEntry& after);
 
-    QList<DataAnnotation> m_annotations;    ///< 标注列表
-    QList<AnnotationAction> m_undoStack;    ///< 撤销栈（最多 50 条）
-    QList<AnnotationAction> m_redoStack;    ///< 重做栈
-    Stats m_stats;                          ///< 运行统计
+    QList<AnnotationEntry> m_annotations;    ///< 标注列表
+    QList<AnnotationAction> m_undoStack;     ///< 撤销栈（最多 50 条）
+    QList<AnnotationAction> m_redoStack;     ///< 重做栈
+    Stats m_stats;                           ///< 运行统计
 };
 
 #endif // ANNOTATION_MANAGER_H
