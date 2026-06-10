@@ -3249,6 +3249,14 @@ set(SOURCES
     src/utils/matrix276/SVD9.cpp
     src/utils/signal274/AdaptiveFilter9.cpp
     src/utils/tree273/Rope11.cpp
+    src/utils/cluster271/GaussianMixture31.cpp
+    src/utils/code272/BaudotCode11.cpp
+    src/utils/dsp273/Expander13.cpp
+    src/utils/fft274/HexFFT10.cpp
+    src/utils/graph287/MaximumFlow7.cpp
+    src/utils/matrix277/Cholesky9.cpp
+    src/utils/signal275/SignalClassifier9.cpp
+    src/utils/tree274/SegmentTree10.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6352,6 +6360,14 @@ set(HEADERS
     src/utils/matrix276/SVD9.h
     src/utils/signal274/AdaptiveFilter9.h
     src/utils/tree273/Rope11.h
+    src/utils/cluster271/GaussianMixture31.h
+    src/utils/code272/BaudotCode11.h
+    src/utils/dsp273/Expander13.h
+    src/utils/fft274/HexFFT10.h
+    src/utils/graph287/MaximumFlow7.h
+    src/utils/matrix277/Cholesky9.h
+    src/utils/signal275/SignalClassifier9.h
+    src/utils/tree274/SegmentTree10.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
@@ -6423,6 +6439,13 @@ set(HEADERS
     src/utils/scripting/ScriptEngine.h
     src/utils/scripting/ScriptEditorWidget.h
 )
+
+# 批量算法草稿目录存在大量重复 QObject 类名，不能直接进入主 GUI 目标。
+foreach(source_list SOURCES HEADERS)
+    list(FILTER ${source_list} EXCLUDE REGEX
+        "^src/utils/(cluster|code|dsp|fft|graph|matrix|signal|tree)[0-9]+/"
+    )
+endforeach()
 
 set(RESOURCES
     resources/app.qrc
