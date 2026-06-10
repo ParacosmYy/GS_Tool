@@ -46,7 +46,9 @@ int TerminalSearchManager::setSearchHighlight(
     int modelLineCount,
     const std::function<QByteArray(int)>& lineAtFn)
 {
-    m_searchPattern = pattern;
+    const QString effectivePattern = regex ? pattern : pattern.trimmed();
+
+    m_searchPattern = effectivePattern;
     m_searchRegex = regex;
     m_searchHex = hex;
     m_searchCaseSensitive = caseSensitive;
@@ -54,7 +56,7 @@ int TerminalSearchManager::setSearchHighlight(
     m_currentMatchIndex = -1;
     m_searchMatches.clear();
 
-    if (pattern.isEmpty() || cachedLines.isEmpty()) {
+    if (effectivePattern.isEmpty() || cachedLines.isEmpty()) {
         emit searchMatchesChanged(0, -1);
         return 0;
     }
@@ -100,11 +102,11 @@ int TerminalSearchManager::setSearchHighlight(
     // 按搜索模式分发到对应的构建方法
     bool valid = true;
     if (hex) {
-        valid = buildHexSearch(pattern, lineProvider);
+        valid = buildHexSearch(effectivePattern, lineProvider);
     } else if (regex) {
-        valid = buildRegexSearch(pattern, caseSensitive, lineProvider);
+        valid = buildRegexSearch(effectivePattern, caseSensitive, lineProvider);
     } else {
-        buildPlainSearch(pattern, caseSensitive, wholeWord, lineProvider);
+        buildPlainSearch(effectivePattern, caseSensitive, wholeWord, lineProvider);
     }
 
     if (!valid) {
@@ -114,7 +116,7 @@ int TerminalSearchManager::setSearchHighlight(
     }
 
     ++m_totalSearches;  // 每次有效搜索执行，累计搜索次数
-    addToHistory(pattern);  // 添加到搜索历史
+    addToHistory(effectivePattern);  // 添加到搜索历史
 
     if (!m_searchMatches.isEmpty()) {
         m_currentMatchIndex = 0;

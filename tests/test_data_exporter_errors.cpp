@@ -18,6 +18,8 @@ private slots:
     void failedPlainExportDoesNotIncrementPlainExportCounter();
     void failedStreamedPlainExportDoesNotIncrementPlainExportCounter();
     void filteredOutLinesEmitExportError();
+    void failedPlainExportDoesNotIncrementTotalExports();
+    void filteredOutLinesDoNotIncrementTotalExports();
 };
 
 namespace {
@@ -198,6 +200,42 @@ void DataExporterErrorsTest::filteredOutLinesEmitExportError()
     QCOMPARE(spy.count(), 1);
     QVERIFY(spy.first().at(1).toString().contains(QStringLiteral("时间范围")));
     QCOMPARE(exporter.totalEmptySkips(), 1ULL);
+}
+
+void DataExporterErrorsTest::failedPlainExportDoesNotIncrementTotalExports()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    DataExporter exporter;
+
+    const bool ok = exporter.exportToFile(dir.path(),
+                                          DataExporter::Plain,
+                                          {makeLine(QDateTime::currentDateTime())});
+
+    QVERIFY(!ok);
+    QCOMPARE(exporter.totalExports(), 0ULL);
+    QCOMPARE(exporter.totalRowsExported(), 0ULL);
+    QCOMPARE(exporter.totalBytesExported(), 0ULL);
+}
+
+void DataExporterErrorsTest::filteredOutLinesDoNotIncrementTotalExports()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    DataExporter exporter;
+    const QDateTime base = QDateTime::fromString(QStringLiteral("2026-06-11T10:00:00"),
+                                                 Qt::ISODate);
+
+    const bool ok = exporter.exportToFile(dir.filePath(QStringLiteral("capture.txt")),
+                                          DataExporter::Plain,
+                                          {makeLine(base)},
+                                          base.addSecs(60),
+                                          base.addSecs(120));
+
+    QVERIFY(!ok);
+    QCOMPARE(exporter.totalExports(), 0ULL);
+    QCOMPARE(exporter.totalRowsExported(), 0ULL);
+    QCOMPARE(exporter.totalBytesExported(), 0ULL);
 }
 
 QTEST_MAIN(DataExporterErrorsTest)

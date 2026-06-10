@@ -98,14 +98,15 @@ QList<SendEntry> SendHistory::search(const QString& keyword) const
     ++m_totalSearches;
     ++m_totalHistoryAccesses;
 
-    if (keyword.isEmpty()) {
+    const QString normalizedKeyword = keyword.trimmed();
+    if (normalizedKeyword.isEmpty()) {
         // 关键词为空时返回所有记录
         return m_entries;
     }
 
     // 遍历所有条目，大小写不敏感匹配
     for (const SendEntry& entry : m_entries) {
-        if (entry.text.contains(keyword, Qt::CaseInsensitive)) {
+        if (entry.text.contains(normalizedKeyword, Qt::CaseInsensitive)) {
             result.append(entry);
         }
     }

@@ -33,20 +33,22 @@
 void TerminalSearchBar::triggerSearch()
 {
     const QString text = m_searchInput->text();
-    if (text.isEmpty()) {
+    const bool regexMode = m_regexCheck->isChecked();
+    const QString effectiveText = regexMode ? text : text.trimmed();
+    if (effectiveText.isEmpty()) {
         m_resultLabel->clear();
         emit searchCleared();
     } else {
         ++m_totalSearches;
-        if (m_regexCheck->isChecked()) {
+        if (regexMode) {
             ++m_totalRegexSearches;
         }
         if (m_hexCheck->isChecked()) {
             ++m_totalHexSearches;  ///< 统计: HEX模式搜索递增
         }
         /* 保存搜索模式到QSettings历史 */
-        saveRecentSearch(text);
-        emit searchRequested(text, m_regexCheck->isChecked(), m_hexCheck->isChecked(),
+        saveRecentSearch(effectiveText);
+        emit searchRequested(effectiveText, regexMode, m_hexCheck->isChecked(),
                              m_caseCheck->isChecked(), m_wordCheck->isChecked());
     }
 }

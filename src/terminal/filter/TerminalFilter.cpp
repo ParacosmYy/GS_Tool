@@ -29,14 +29,20 @@ TerminalFilter::TerminalFilter(QObject *parent)
  */
 int TerminalFilter::addRule(const QString& pattern, bool caseSensitive, bool enabled)
 {
-    QRegularExpression re = compileRegex(pattern, caseSensitive);
+    const QString normalizedPattern = pattern.trimmed();
+    if (normalizedPattern.isEmpty()) {
+        emit patternError(tr("过滤规则不能为空"));
+        return -1;
+    }
+
+    QRegularExpression re = compileRegex(normalizedPattern, caseSensitive);
     if (!re.isValid()) {
         emit patternError(re.errorString());
         return -1;
     }
 
     FilterRule rule;
-    rule.pattern = pattern;
+    rule.pattern = normalizedPattern;
     rule.regex = re;
     rule.enabled = enabled;
     rule.caseSensitive = caseSensitive;
@@ -75,13 +81,19 @@ bool TerminalFilter::updateRule(int index, const QString& pattern)
         return false;
     }
 
-    QRegularExpression re = compileRegex(pattern, m_rules[index].caseSensitive);
+    const QString normalizedPattern = pattern.trimmed();
+    if (normalizedPattern.isEmpty()) {
+        emit patternError(tr("过滤规则不能为空"));
+        return false;
+    }
+
+    QRegularExpression re = compileRegex(normalizedPattern, m_rules[index].caseSensitive);
     if (!re.isValid()) {
         emit patternError(re.errorString());
         return false;
     }
 
-    m_rules[index].pattern = pattern;
+    m_rules[index].pattern = normalizedPattern;
     m_rules[index].regex = re;
     emit filterRulesChanged();
     return true;

@@ -74,7 +74,6 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
         return false;
     }
 
-    ++m_totalExports;
     QVector<TerminalLine> filtered = filterByTime(lines, from, to);
     if (filtered.isEmpty()) {
         ++m_totalEmptySkips;
@@ -178,6 +177,7 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
     m_totalExportDurationMs += durationMs;
 
     if (ok) {
+        ++m_totalExports;
         switch (format) {
         case Plain:       ++m_totalPlainExports; break;
         case HexDump:     ++m_totalHexDumpExports; break;

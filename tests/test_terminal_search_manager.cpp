@@ -13,6 +13,8 @@ private slots:
     void emptyPatternClearsSearchWithoutCountingError();
     void emptyTerminalReturnsNoMatchesWithoutCountingError();
     void validSearchAddsHistoryAndCountsSearch();
+    void plainSearchTrimsKeywordWhitespace();
+    void whitespaceOnlyPlainSearchClearsWithoutCounting();
 };
 
 namespace {
@@ -156,6 +158,53 @@ void TerminalSearchManagerTest::validSearchAddsHistoryAndCountsSearch()
     QCOMPARE(manager.totalSearches(), 1ULL);
     QCOMPARE(manager.totalMatches(), 1ULL);
     QCOMPARE(historySpy.count(), 1);
+}
+
+void TerminalSearchManagerTest::plainSearchTrimsKeywordWhitespace()
+{
+    TerminalSearchManager manager;
+
+    const int count = manager.setSearchHighlight(QStringLiteral("  error  "),
+                                                 false,
+                                                 false,
+                                                 false,
+                                                 false,
+                                                 cachedLines(),
+                                                 nullptr,
+                                                 1,
+                                                 lineBytes);
+
+    QCOMPARE(count, 1);
+    QCOMPARE(manager.searchPattern(), QStringLiteral("error"));
+    QCOMPARE(manager.searchHistory(), QStringList{QStringLiteral("error")});
+    QCOMPARE(manager.totalSearches(), 1ULL);
+}
+
+void TerminalSearchManagerTest::whitespaceOnlyPlainSearchClearsWithoutCounting()
+{
+    TerminalSearchManager manager;
+    QSignalSpy historySpy(&manager, &TerminalSearchManager::searchHistoryChanged);
+    QSignalSpy matchesSpy(&manager, &TerminalSearchManager::searchMatchesChanged);
+
+    const int count = manager.setSearchHighlight(QStringLiteral("   "),
+                                                 false,
+                                                 false,
+                                                 false,
+                                                 false,
+                                                 cachedLines(),
+                                                 nullptr,
+                                                 1,
+                                                 lineBytes);
+
+    QCOMPARE(count, 0);
+    QCOMPARE(manager.searchPattern(), QString());
+    QCOMPARE(manager.searchMatchCount(), 0);
+    QCOMPARE(manager.currentMatchIndex(), -1);
+    QCOMPARE(manager.searchErrorCount(), 0ULL);
+    QCOMPARE(manager.totalSearches(), 0ULL);
+    QVERIFY(manager.searchHistory().isEmpty());
+    QCOMPARE(historySpy.count(), 0);
+    QCOMPARE(matchesSpy.count(), 1);
 }
 
 QTEST_MAIN(TerminalSearchManagerTest)

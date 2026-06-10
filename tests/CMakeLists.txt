@@ -533,6 +533,45 @@ endif()
 add_test(NAME TerminalFilterBar COMMAND test_terminal_filter_bar)
 
 # ============================================================
+# 终端过滤器核心测试
+# ============================================================
+
+add_executable(test_terminal_filter
+    test_terminal_filter.cpp
+    ${CMAKE_SOURCE_DIR}/src/terminal/filter/TerminalFilter.cpp
+    ${CMAKE_SOURCE_DIR}/src/terminal/filter/TerminalFilterApply.cpp
+    ${CMAKE_SOURCE_DIR}/src/terminal/filter/TerminalFilterCompat.cpp
+    ${CMAKE_SOURCE_DIR}/src/terminal/filter/TerminalFilterStats.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/theme/ThemeManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/theme/ThemeManagerApply.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/theme/ThemeManagerColor.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/theme/ThemeManagerStats.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/settings/SettingsManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/settings/SettingsManagerConvenience.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/settings/SettingsManagerGroups.cpp
+)
+
+target_include_directories(test_terminal_filter PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_terminal_filter PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_terminal_filter PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME TerminalFilter COMMAND test_terminal_filter)
+
+# ============================================================
 # 终端导出路径规范化测试
 # ============================================================
 

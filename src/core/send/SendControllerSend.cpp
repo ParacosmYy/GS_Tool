@@ -30,6 +30,11 @@
  */
 bool SendController::sendAndRecord(const QByteArray& data)
 {
+    if (data.isEmpty()) {
+        emit statusMessage(tr("发送内容为空"));
+        return false;
+    }
+
     // 前置检查1: 连接是否存在
     if (!m_currentConn) {
         ++m_totalErrors;
@@ -115,6 +120,7 @@ void SendController::onSendData()
         data = HexConverter::fromHexString(text);
         if (data.isEmpty()) {
             setSendInputError(true);
+            ++m_totalErrors;
             emit statusMessage(tr("HEX 格式错误: 请输入有效的十六进制数据，如 \"AA 55 01 00 FE\""));
             return;
         }
@@ -123,6 +129,7 @@ void SendController::onSendData()
     }
 
     if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
+        ++m_totalErrors;
         emit statusMessage(tr("发送失败: 未连接"));
         return;
     }

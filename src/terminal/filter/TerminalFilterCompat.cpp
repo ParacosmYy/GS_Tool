@@ -17,8 +17,16 @@
 /** @brief 设置单条正则表达式模式并编译 @param pattern 正则表达式字符串 @return true=模式有效，false=编译失败 */
 bool TerminalFilter::setPattern(const QString &pattern)
 {
-    m_pattern = pattern;
-    m_regex = compileRegex(pattern, m_caseSensitive);
+    const QString normalizedPattern = pattern.trimmed();
+    if (normalizedPattern.isEmpty()) {
+        m_pattern.clear();
+        m_regex = QRegularExpression();
+        emit patternError(tr("过滤规则不能为空"));
+        return false;
+    }
+
+    m_pattern = normalizedPattern;
+    m_regex = compileRegex(normalizedPattern, m_caseSensitive);
 
     if (!m_regex.isValid()) {
         emit patternError(m_regex.errorString());
@@ -30,7 +38,7 @@ bool TerminalFilter::setPattern(const QString &pattern)
 /** @brief 对文本执行正则匹配(单模式兼容) @param text 待匹配文本 @return true=匹配成功 */
 bool TerminalFilter::match(const QString &text) const
 {
-    if (!m_regex.isValid()) {
+    if (m_pattern.isEmpty() || !m_regex.isValid()) {
         return false;
     }
     bool result = m_regex.match(text).hasMatch();
@@ -44,7 +52,7 @@ bool TerminalFilter::match(const QString &text) const
 /** @brief 提取捕获组内容(单模式兼容) @param text 待提取文本 @return 捕获组字符串列表 */
 QStringList TerminalFilter::captureGroups(const QString &text) const
 {
-    if (!m_regex.isValid()) {
+    if (m_pattern.isEmpty() || !m_regex.isValid()) {
         return {};
     }
 

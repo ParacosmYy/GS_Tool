@@ -15,6 +15,8 @@ private slots:
     void validHexAfterErrorSearchesAndClearsError();
     void invalidRegexDoesNotSearchOrCount();
     void validRegexAfterErrorSearchesAndClearsError();
+    void plainSearchTrimsWhitespaceBeforeRequest();
+    void whitespaceOnlyPlainSearchClearsWithoutCounting();
     void escapeInSearchInputClosesSearchBar();
     void repeatedDeactivateEmitsClosedOnce();
     void hexModeUnchecksRegexMode();
@@ -112,6 +114,42 @@ void TerminalSearchBarTest::validRegexAfterErrorSearchesAndClearsError()
     QCOMPARE(input->property("hasError").toBool(), false);
     QCOMPARE(result->property("hasError").toBool(), false);
     QCOMPARE(searchBar.totalRegexSearches(), 1ULL);
+}
+
+void TerminalSearchBarTest::plainSearchTrimsWhitespaceBeforeRequest()
+{
+    TerminalSearchBar searchBar;
+    auto* input = searchBar.findChild<QLineEdit*>("searchBarInput");
+    QVERIFY(input);
+    QSignalSpy searchSpy(&searchBar, &TerminalSearchBar::searchRequested);
+    QSignalSpy clearSpy(&searchBar, &TerminalSearchBar::searchCleared);
+
+    input->setText(QStringLiteral("  error  "));
+
+    QCOMPARE(searchSpy.count(), 1);
+    QCOMPARE(clearSpy.count(), 0);
+    const auto args = searchSpy.first();
+    QCOMPARE(args.at(0).toString(), QStringLiteral("error"));
+    QCOMPARE(searchBar.totalSearches(), 1ULL);
+}
+
+void TerminalSearchBarTest::whitespaceOnlyPlainSearchClearsWithoutCounting()
+{
+    TerminalSearchBar searchBar;
+    auto* input = searchBar.findChild<QLineEdit*>("searchBarInput");
+    auto* result = searchBar.findChild<QLabel*>("searchBarResult");
+    QVERIFY(input);
+    QVERIFY(result);
+    QSignalSpy searchSpy(&searchBar, &TerminalSearchBar::searchRequested);
+    QSignalSpy clearSpy(&searchBar, &TerminalSearchBar::searchCleared);
+
+    result->setText(QStringLiteral("未找到"));
+    input->setText(QStringLiteral("   "));
+
+    QCOMPARE(searchSpy.count(), 0);
+    QCOMPARE(clearSpy.count(), 1);
+    QCOMPARE(searchBar.totalSearches(), 0ULL);
+    QVERIFY(result->text().isEmpty());
 }
 
 void TerminalSearchBarTest::escapeInSearchInputClosesSearchBar()

@@ -12,6 +12,8 @@ private slots:
     void recentTextsLimitCountsUniqueCommands();
     void addEntryIgnoresWhitespaceOnlyText();
     void addEntryTrimsTextForHistoryAndDuplicateDetection();
+    void searchTrimsKeywordWhitespace();
+    void searchWhitespaceOnlyReturnsAllEntries();
 };
 
 void SendHistoryTest::recentTextsDeduplicateNonConsecutiveCommandsByRecency()
@@ -65,6 +67,31 @@ void SendHistoryTest::addEntryTrimsTextForHistoryAndDuplicateDetection()
     QCOMPARE(history.recentTexts(), QStringList{QStringLiteral("AT")});
     QCOMPARE(history.totalDuplicateSkips(), 1ULL);
     QCOMPARE(changedSpy.count(), 1);
+}
+
+void SendHistoryTest::searchTrimsKeywordWhitespace()
+{
+    SendHistory history;
+    history.addEntry(QStringLiteral("AT"), false);
+    history.addEntry(QStringLiteral("RESET"), false);
+
+    const QList<SendEntry> result = history.search(QStringLiteral("  at  "));
+
+    QCOMPARE(result.size(), 1);
+    QCOMPARE(result.first().text, QStringLiteral("AT"));
+}
+
+void SendHistoryTest::searchWhitespaceOnlyReturnsAllEntries()
+{
+    SendHistory history;
+    history.addEntry(QStringLiteral("AT"), false);
+    history.addEntry(QStringLiteral("RESET"), false);
+
+    const QList<SendEntry> result = history.search(QStringLiteral("   "));
+
+    QCOMPARE(result.size(), 2);
+    QCOMPARE(result.at(0).text, QStringLiteral("AT"));
+    QCOMPARE(result.at(1).text, QStringLiteral("RESET"));
 }
 
 QTEST_MAIN(SendHistoryTest)

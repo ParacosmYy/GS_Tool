@@ -25,11 +25,14 @@ private slots:
     void textModeRestoresTextPlaceholder();
     void emptySendReportsEmptyInputBeforeConnectionState();
     void invalidHexSendReportsFormatBeforeConnectionState();
+    void invalidHexSendCountsAsSendError();
     void nonEmptySendReportsDisconnected();
+    void disconnectedManualSendCountsAsSendError();
     void timedSendDisconnectedDoesNotCountAsSuccessfulTimedSend();
     void timedSendConnectedCountsAfterSuccessfulWrite();
     void quickCommandDisconnectedDoesNotCountAsMacroExecution();
     void quickCommandConnectedCountsAfterSuccessfulWrite();
+    void quickCommandEmptyDataDoesNotCountAsSuccessfulSend();
 };
 
 namespace {
@@ -199,6 +202,23 @@ void SendControllerValidationTest::invalidHexSendReportsFormatBeforeConnectionSt
     QCOMPARE(fixture.input->property("hasError").toBool(), true);
 }
 
+void SendControllerValidationTest::invalidHexSendCountsAsSendError()
+{
+    SendBarFixture fixture;
+    QVERIFY(fixture.input);
+    QVERIFY(fixture.modeCombo);
+    QVERIFY(fixture.sendBar);
+    auto* sendButton = fixture.sendBar->findChild<QPushButton*>("sendButton");
+    QVERIFY(sendButton);
+
+    fixture.modeCombo->setCurrentIndex(1);
+    fixture.input->setText(QStringLiteral("AA 5"));
+    QTest::mouseClick(sendButton, Qt::LeftButton);
+
+    QCOMPARE(fixture.controller.totalErrors(), 1ULL);
+    QCOMPARE(fixture.controller.totalSends(), 0ULL);
+}
+
 void SendControllerValidationTest::nonEmptySendReportsDisconnected()
 {
     SendBarFixture fixture;
@@ -213,6 +233,21 @@ void SendControllerValidationTest::nonEmptySendReportsDisconnected()
 
     QCOMPARE(spy.count(), 1);
     QCOMPARE(spy.first().first().toString(), QStringLiteral("发送失败: 未连接"));
+}
+
+void SendControllerValidationTest::disconnectedManualSendCountsAsSendError()
+{
+    SendBarFixture fixture;
+    QVERIFY(fixture.input);
+    QVERIFY(fixture.sendBar);
+    auto* sendButton = fixture.sendBar->findChild<QPushButton*>("sendButton");
+    QVERIFY(sendButton);
+
+    fixture.input->setText(QStringLiteral("AT"));
+    QTest::mouseClick(sendButton, Qt::LeftButton);
+
+    QCOMPARE(fixture.controller.totalErrors(), 1ULL);
+    QCOMPARE(fixture.controller.totalSends(), 0ULL);
 }
 
 void SendControllerValidationTest::timedSendDisconnectedDoesNotCountAsSuccessfulTimedSend()
@@ -271,6 +306,22 @@ void SendControllerValidationTest::quickCommandConnectedCountsAfterSuccessfulWri
     QCOMPARE(fixture.controller.totalMacroExecutions(), 1ULL);
     QCOMPARE(fixture.controller.totalSends(), 1ULL);
     QCOMPARE(connection.writtenData, QByteArray("AT"));
+}
+
+void SendControllerValidationTest::quickCommandEmptyDataDoesNotCountAsSuccessfulSend()
+{
+    SendBarFixture fixture;
+    FakeConnection connection(ConnectionState::Connected);
+    fixture.controller.setConnection(&connection);
+    QSignalSpy spy(&fixture.controller, &SendController::statusMessage);
+
+    fixture.controller.onQuickCommand(QByteArray());
+
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.first().first().toString(), QStringLiteral("发送内容为空"));
+    QCOMPARE(fixture.controller.totalMacroExecutions(), 0ULL);
+    QCOMPARE(fixture.controller.totalSends(), 0ULL);
+    QVERIFY(connection.writtenData.isEmpty());
 }
 
 QTEST_MAIN(SendControllerValidationTest)
