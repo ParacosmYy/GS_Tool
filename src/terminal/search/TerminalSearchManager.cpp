@@ -55,13 +55,9 @@ int TerminalSearchManager::setSearchHighlight(
     m_searchMatches.clear();
 
     if (pattern.isEmpty() || cachedLines.isEmpty()) {
-        ++m_searchErrorCount;  // 搜索参数无效，累计错误计数
         emit searchMatchesChanged(0, -1);
         return 0;
     }
-
-    ++m_totalSearches;  // 每次有效搜索执行，累计搜索次数
-    addToHistory(pattern);  // 添加到搜索历史
 
     // 构建行遍历回调: 每次调用填入 (displayIdx, text)，返回false表示遍历结束
     int cursor = 0;
@@ -117,6 +113,9 @@ int TerminalSearchManager::setSearchHighlight(
         return 0;
     }
 
+    ++m_totalSearches;  // 每次有效搜索执行，累计搜索次数
+    addToHistory(pattern);  // 添加到搜索历史
+
     if (!m_searchMatches.isEmpty()) {
         m_currentMatchIndex = 0;
     }
@@ -161,4 +160,3 @@ void TerminalSearchManager::clearSearchHighlight()
     m_currentMatchIndex = -1;
     emit searchMatchesChanged(0, -1);
 }
-

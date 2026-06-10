@@ -109,11 +109,6 @@ void SendController::onSendData()
         return;
     }
 
-    if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
-        emit statusMessage(tr("发送失败: 未连接"));
-        return;
-    }
-
     bool isHex = (m_sendModeCombo->currentIndex() == 1);
     QByteArray data;
     if (isHex) {
@@ -125,6 +120,11 @@ void SendController::onSendData()
         }
     } else {
         data = text.toUtf8();
+    }
+
+    if (!m_currentConn || m_currentConn->state() != ConnectionState::Connected) {
+        emit statusMessage(tr("发送失败: 未连接"));
+        return;
     }
 
     if (!isHex && m_newlineCombo && m_newlineCombo->currentIndex() > 0) {
@@ -146,6 +146,7 @@ void SendController::onSendData()
 /** @brief 快捷指令触发处理 @param data 预编码的原始字节数据 */
 void SendController::onQuickCommand(const QByteArray& data)
 {
-    ++m_totalMacroExecutions;
-    sendAndRecord(data);
+    if (sendAndRecord(data)) {
+        ++m_totalMacroExecutions;
+    }
 }

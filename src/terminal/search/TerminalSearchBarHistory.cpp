@@ -20,6 +20,7 @@
 
 #include <QStringListModel>
 #include <QCompleter>
+#include <QRegularExpression>
 #include <QStyle>
 #include <QSettings>
 
@@ -70,6 +71,19 @@ void TerminalSearchBar::onSearchTextChanged(const QString& text)
             m_resultLabel->style()->unpolish(m_resultLabel);
             m_resultLabel->style()->polish(m_resultLabel);
             m_resultLabel->setText(tr("非法HEX"));
+            return;
+        }
+    }
+    if (m_regexCheck->isChecked() && !text.isEmpty()) {
+        const QRegularExpression regex(text);
+        if (!regex.isValid()) {
+            m_searchInput->setProperty("hasError", true);
+            m_searchInput->style()->unpolish(m_searchInput);
+            m_searchInput->style()->polish(m_searchInput);
+            m_resultLabel->setProperty("hasError", true);
+            m_resultLabel->style()->unpolish(m_resultLabel);
+            m_resultLabel->style()->polish(m_resultLabel);
+            m_resultLabel->setText(tr("非法正则"));
             return;
         }
     }

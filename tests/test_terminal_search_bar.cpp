@@ -13,6 +13,8 @@ class TerminalSearchBarTest : public QObject {
 private slots:
     void togglingHexWithInvalidTextDoesNotSearch();
     void validHexAfterErrorSearchesAndClearsError();
+    void invalidRegexDoesNotSearchOrCount();
+    void validRegexAfterErrorSearchesAndClearsError();
     void escapeInSearchInputClosesSearchBar();
     void repeatedDeactivateEmitsClosedOnce();
     void hexModeUnchecksRegexMode();
@@ -64,6 +66,52 @@ void TerminalSearchBarTest::validHexAfterErrorSearchesAndClearsError()
     QCOMPARE(args.at(2).toBool(), true);
     QCOMPARE(input->property("hasError").toBool(), false);
     QCOMPARE(result->property("hasError").toBool(), false);
+}
+
+void TerminalSearchBarTest::invalidRegexDoesNotSearchOrCount()
+{
+    TerminalSearchBar searchBar;
+    auto* input = searchBar.findChild<QLineEdit*>("searchBarInput");
+    auto* regexCheck = searchBar.findChild<QCheckBox*>("searchBarRegexCheck");
+    auto* result = searchBar.findChild<QLabel*>("searchBarResult");
+    QVERIFY(input);
+    QVERIFY(regexCheck);
+    QVERIFY(result);
+    QSignalSpy searchSpy(&searchBar, &TerminalSearchBar::searchRequested);
+
+    regexCheck->setChecked(true);
+    input->setText(QStringLiteral("["));
+
+    QCOMPARE(searchSpy.count(), 0);
+    QCOMPARE(result->text(), QStringLiteral("非法正则"));
+    QCOMPARE(input->property("hasError").toBool(), true);
+    QCOMPARE(searchBar.totalSearches(), 0ULL);
+    QCOMPARE(searchBar.totalRegexSearches(), 0ULL);
+}
+
+void TerminalSearchBarTest::validRegexAfterErrorSearchesAndClearsError()
+{
+    TerminalSearchBar searchBar;
+    auto* input = searchBar.findChild<QLineEdit*>("searchBarInput");
+    auto* regexCheck = searchBar.findChild<QCheckBox*>("searchBarRegexCheck");
+    auto* result = searchBar.findChild<QLabel*>("searchBarResult");
+    QVERIFY(input);
+    QVERIFY(regexCheck);
+    QVERIFY(result);
+
+    regexCheck->setChecked(true);
+    input->setText(QStringLiteral("["));
+    QSignalSpy searchSpy(&searchBar, &TerminalSearchBar::searchRequested);
+
+    input->setText(QStringLiteral("ERR.*"));
+
+    QCOMPARE(searchSpy.count(), 1);
+    const auto args = searchSpy.first();
+    QCOMPARE(args.at(0).toString(), QStringLiteral("ERR.*"));
+    QCOMPARE(args.at(1).toBool(), true);
+    QCOMPARE(input->property("hasError").toBool(), false);
+    QCOMPARE(result->property("hasError").toBool(), false);
+    QCOMPARE(searchBar.totalRegexSearches(), 1ULL);
 }
 
 void TerminalSearchBarTest::escapeInSearchInputClosesSearchBar()

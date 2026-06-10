@@ -18,6 +18,27 @@
 #include <QTextStream>
 #include <QDateTime>
 
+namespace {
+
+enum class StreamedInputError {
+    None,
+    EmptyPath,
+    MissingProvider,
+    EmptyData
+};
+
+StreamedInputError validateStreamedExportInput(const QString& filePath,
+                                               const DataExporter::LineProvider& lineProvider,
+                                               int totalLines)
+{
+    if (filePath.isEmpty()) return StreamedInputError::EmptyPath;
+    if (!lineProvider) return StreamedInputError::MissingProvider;
+    if (totalLines <= 0) return StreamedInputError::EmptyData;
+    return StreamedInputError::None;
+}
+
+} // namespace
+
 // ---- 流式导出入口 ----
 
 /** @brief 导出数据到文件(流式模式+进度回调)，记录耗时和统计 @param filePath 目标路径 @param format 格式 @param lineProvider 行数据提供回调 @param totalLines 总行数 @param batchSize 每批行数 @param progress 进度回调(返回false取消) @return 是否成功 */
@@ -26,10 +47,26 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
                                    int totalLines, int batchSize,
                                    ProgressCallback progress)
 {
-    if (totalLines <= 0 || !lineProvider || filePath.isEmpty()) return false;
+    switch (validateStreamedExportInput(filePath, lineProvider, totalLines)) {
+    case StreamedInputError::None:
+        break;
+    case StreamedInputError::EmptyPath:
+        ++m_totalErrors;
+        emit exportError(filePath, tr("文件路径为空"));
+        return false;
+    case StreamedInputError::MissingProvider:
+        ++m_totalErrors;
+        emit exportError(filePath, tr("数据源不可用"));
+        return false;
+    case StreamedInputError::EmptyData:
+        ++m_totalEmptySkips;
+        emit exportError(filePath, tr("没有数据可导出"));
+        return false;
+    }
 
     ++m_totalExports;
     m_exportTimer.start();
+    const int effectiveBatchSize = (batchSize > 0) ? batchSize : 1000;
 
     bool ok = false;
     int rowsExported = 0;
@@ -40,7 +77,7 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
         if (!openTextFile(file, out, filePath)) break;
         int offset = 0;
         while (offset < totalLines) {
-            QVector<TerminalLine> batch = lineProvider(offset, qMin(batchSize, totalLines - offset));
+            QVector<TerminalLine> batch = lineProvider(offset, qMin(effectiveBatchSize, totalLines - offset));
             if (batch.isEmpty()) break;
             for (const TerminalLine& line : batch) {
                 out << QString("[%1] [%2] %3 | %4\n")
@@ -57,8 +94,12 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
                 return false;
             }
         }
+        if (rowsExported <= 0) {
+            file.close();
+            emit exportError(filePath, tr("没有数据可导出"));
+            break;
+        }
         ok = flushAndCheck(file, out, filePath);
-        ++m_totalPlainExports;
         break;
     }
     case Csv: {
@@ -69,7 +110,7 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
         out << csvHeader() << '\n';
         int offset = 0;
         while (offset < totalLines) {
-            QVector<TerminalLine> batch = lineProvider(offset, qMin(batchSize, totalLines - offset));
+            QVector<TerminalLine> batch = lineProvider(offset, qMin(effectiveBatchSize, totalLines - offset));
             if (batch.isEmpty()) break;
             for (const TerminalLine& line : batch) {
                 out << line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz") << m_csvDelimiter
@@ -86,14 +127,18 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
                 return false;
             }
         }
+        if (rowsExported <= 0) {
+            file.close();
+            emit exportError(filePath, tr("没有数据可导出"));
+            break;
+        }
         ok = flushAndCheck(file, out, filePath);
-        ++m_totalCsvExports;
         break;
     }
-    case HexDump:     ok = exportStreamedHexDump(filePath, lineProvider, totalLines, batchSize); ++m_totalHexDumpExports; break;
-    case Timestamped: ok = exportStreamedTimestamped(filePath, lineProvider, totalLines, batchSize); ++m_totalTimestampedExports; break;
-    case Bin:         ok = exportStreamedBin(filePath, lineProvider, totalLines, batchSize); ++m_totalBinExports; break;
-    case Json:        ok = exportStreamedJson(filePath, lineProvider, totalLines, batchSize); ++m_totalJsonExports; break;
+    case HexDump:     ok = exportStreamedHexDump(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Timestamped: ok = exportStreamedTimestamped(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Bin:         ok = exportStreamedBin(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Json:        ok = exportStreamedJson(filePath, lineProvider, totalLines, effectiveBatchSize); break;
     default:
         ++m_totalErrors;
         emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
@@ -105,6 +150,15 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
     m_totalExportDurationMs += durationMs;
 
     if (ok) {
+        switch (format) {
+        case Plain:       ++m_totalPlainExports; break;
+        case HexDump:     ++m_totalHexDumpExports; break;
+        case Csv:         ++m_totalCsvExports; break;
+        case Timestamped: ++m_totalTimestampedExports; break;
+        case Bin:         ++m_totalBinExports; break;
+        case Json:        ++m_totalJsonExports; break;
+        default: break;
+        }
         m_totalRowsExported += static_cast<quint64>(rowsExported > 0 ? rowsExported : totalLines);
         m_lastExportRowCount = static_cast<quint64>(rowsExported > 0 ? rowsExported : totalLines);
         m_lastExportByteCount = 0;
@@ -123,19 +177,35 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
                                    LineProvider lineProvider,
                                    int totalLines, int batchSize)
 {
-    if (totalLines <= 0 || !lineProvider || filePath.isEmpty()) return false;
+    switch (validateStreamedExportInput(filePath, lineProvider, totalLines)) {
+    case StreamedInputError::None:
+        break;
+    case StreamedInputError::EmptyPath:
+        ++m_totalErrors;
+        emit exportError(filePath, tr("文件路径为空"));
+        return false;
+    case StreamedInputError::MissingProvider:
+        ++m_totalErrors;
+        emit exportError(filePath, tr("数据源不可用"));
+        return false;
+    case StreamedInputError::EmptyData:
+        ++m_totalEmptySkips;
+        emit exportError(filePath, tr("没有数据可导出"));
+        return false;
+    }
 
     ++m_totalExports;
     m_exportTimer.start();
+    const int effectiveBatchSize = (batchSize > 0) ? batchSize : 1000;
 
     bool ok = false;
     switch (format) {
-    case Plain:       ok = exportStreamedPlain(filePath, lineProvider, totalLines, batchSize); ++m_totalPlainExports; break;
-    case HexDump:     ok = exportStreamedHexDump(filePath, lineProvider, totalLines, batchSize); ++m_totalHexDumpExports; break;
-    case Csv:         ok = exportStreamedCsv(filePath, lineProvider, totalLines, batchSize); ++m_totalCsvExports; break;
-    case Timestamped: ok = exportStreamedTimestamped(filePath, lineProvider, totalLines, batchSize); ++m_totalTimestampedExports; break;
-    case Bin:         ok = exportStreamedBin(filePath, lineProvider, totalLines, batchSize); ++m_totalBinExports; break;
-    case Json:        ok = exportStreamedJson(filePath, lineProvider, totalLines, batchSize); ++m_totalJsonExports; break;
+    case Plain:       ok = exportStreamedPlain(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case HexDump:     ok = exportStreamedHexDump(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Csv:         ok = exportStreamedCsv(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Timestamped: ok = exportStreamedTimestamped(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Bin:         ok = exportStreamedBin(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Json:        ok = exportStreamedJson(filePath, lineProvider, totalLines, effectiveBatchSize); break;
     default:
         ++m_totalErrors;
         emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
@@ -148,6 +218,15 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
     m_totalExportDurationMs += durationMs;
 
     if (ok) {
+        switch (format) {
+        case Plain:       ++m_totalPlainExports; break;
+        case HexDump:     ++m_totalHexDumpExports; break;
+        case Csv:         ++m_totalCsvExports; break;
+        case Timestamped: ++m_totalTimestampedExports; break;
+        case Bin:         ++m_totalBinExports; break;
+        case Json:        ++m_totalJsonExports; break;
+        default: break;
+        }
         // 流式模式下无法精确统计字节数，用totalLines估算
         m_totalRowsExported += static_cast<quint64>(totalLines);
         m_lastExportRowCount = static_cast<quint64>(totalLines);
@@ -184,6 +263,11 @@ bool DataExporter::exportStreamedPlain(const QString& path, LineProvider provide
         }
         offset += batch.size();
     }
+    if (offset <= 0) {
+        file.close();
+        emit exportError(path, tr("没有数据可导出"));
+        return false;
+    }
     return flushAndCheck(file, out, path);
 }
 
@@ -213,6 +297,11 @@ bool DataExporter::exportStreamedHexDump(const QString& path, LineProvider provi
         }
         residual = batchData.mid(pos);
         offset += batch.size();
+    }
+    if (offset <= 0) {
+        file.close();
+        emit exportError(path, tr("没有数据可导出"));
+        return false;
     }
     if (!residual.isEmpty())
         out << formatHexDumpLine(residual, globalAddr) << '\n';
@@ -246,6 +335,11 @@ bool DataExporter::exportStreamedCsv(const QString& path, LineProvider provider,
                 << escapeCsvField(toAsciiString(line.data)) << '\n';
         }
         offset += batch.size();
+    }
+    if (offset <= 0) {
+        file.close();
+        emit exportError(path, tr("没有数据可导出"));
+        return false;
     }
     return flushAndCheck(file, out, path);
 }

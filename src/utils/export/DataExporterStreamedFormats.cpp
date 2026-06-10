@@ -39,6 +39,11 @@ bool DataExporter::exportStreamedTimestamped(const QString& path, LineProvider p
         }
         offset += batch.size();
     }
+    if (offset <= 0) {
+        file.close();
+        emit exportError(path, tr("没有数据可导出"));
+        return false;
+    }
     return flushAndCheck(file, out, path);
 }
 
@@ -64,6 +69,11 @@ bool DataExporter::exportStreamedBin(const QString& path, LineProvider provider,
         }
         offset += batch.size();
     }
+    if (offset <= 0) {
+        file.close();
+        emit exportError(path, tr("没有数据可导出"));
+        return false;
+    }
     file.close();
     return true;
 }
@@ -86,6 +96,10 @@ bool DataExporter::exportStreamedJson(const QString& path, LineProvider provider
             linesArray.append(lineObj);
         }
         offset += batch.size();
+    }
+    if (offset <= 0) {
+        emit exportError(path, tr("没有数据可导出"));
+        return false;
     }
 
     QJsonObject root;

@@ -86,13 +86,19 @@ void SendHistoryManager::setupAutoComplete(QLineEdit* input, QWidget* parentWidg
 /** @brief 记录一条发送历史（自动添加到历史列表并递增统计） @param text 发送文本内容 @param isHex 是否为十六进制格式 */
 void SendHistoryManager::recordHistory(const QString& text, bool isHex)
 {
+    const int previousSize = m_sendHistory->entries().size();
     m_sendHistory->addEntry(text, isHex);
+    const int currentSize = m_sendHistory->entries().size();
+    if (currentSize <= previousSize) {
+        return;
+    }
+
     ++m_totalAdds;  // 累计添加计数
 
     // 更新历史峰值大小
-    const quint64 currentSize = static_cast<quint64>(m_sendHistory->entries().size());
-    if (currentSize > m_peakHistorySize) {
-        m_peakHistorySize = currentSize;
+    const quint64 currentHistorySize = static_cast<quint64>(currentSize);
+    if (currentHistorySize > m_peakHistorySize) {
+        m_peakHistorySize = currentHistorySize;
     }
 }
 

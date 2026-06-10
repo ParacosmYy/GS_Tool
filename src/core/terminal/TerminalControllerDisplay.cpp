@@ -7,6 +7,7 @@
  */
 
 #include "core/terminal/TerminalController.h"
+#include "core/terminal/TerminalExportOptions.h"
 #include "terminal/model/TerminalModel.h"
 #include "terminal/widget/TerminalWidget.h"
 #include "terminal/layout/TerminalLayoutManager.h"
@@ -86,16 +87,12 @@ void TerminalController::onExportData(QWidget* parent)
     }
 
     QString filter = tr("文本文件 (*.txt);;CSV文件 (*.csv);;二进制文件 (*.bin)");
+    QString selectedFilter;
     QString filePath = QFileDialog::getSaveFileName(parent, tr("导出数据"),
-                                                     QString(), filter);
+                                                     QString(), filter, &selectedFilter);
     if (filePath.isEmpty()) return;
 
-    // 根据文件扩展名自动选择导出格式
-    DataExporter::Format format = DataExporter::Plain;
-    if (filePath.endsWith(".csv", Qt::CaseInsensitive))
-        format = DataExporter::Csv;
-    else if (filePath.endsWith(".bin", Qt::CaseInsensitive))
-        format = DataExporter::Bin;
+    const auto exportOptions = normalizedTerminalExportOptions(filePath, selectedFilter);
 
     // 批量流式导出: 通过 lineProvider 回调分批拉取数据，lines() 内部已加锁保证线程安全
     int totalLines = m_terminalModel->lineCount();
@@ -103,8 +100,8 @@ void TerminalController::onExportData(QWidget* parent)
         return m_terminalModel->lines(offset, count);
     };
 
-    if (m_dataExporter->exportStreamed(filePath, format, lineProvider, totalLines)) {
-        emit statusMessage(tr("已导出至 %1").arg(filePath), 3000);
+    if (m_dataExporter->exportStreamed(exportOptions.filePath, exportOptions.format, lineProvider, totalLines)) {
+        emit statusMessage(tr("已导出至 %1").arg(exportOptions.filePath), 3000);
     } else {
         EdDialog::error(parent, tr("导出失败"), tr("无法写入文件"));
     }

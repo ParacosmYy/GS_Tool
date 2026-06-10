@@ -25,15 +25,17 @@ SendHistory::SendHistory(QObject* parent)
  */
 void SendHistory::addEntry(const QString& text, bool isHex)
 {
+    const QString normalizedText = text.trimmed();
+
     // 忽略空内容
-    if (text.isEmpty()) {
+    if (normalizedText.isEmpty()) {
         return;
     }
 
     // 与最后一条内容相同时不添加，避免连续发送同一命令导致历史刷屏
     if (!m_entries.isEmpty()) {
         const SendEntry& last = m_entries.last();
-        if (last.text == text && last.isHex == isHex) {
+        if (last.text == normalizedText && last.isHex == isHex) {
             ++m_totalDuplicateSkips;
             return;
         }
@@ -41,14 +43,14 @@ void SendHistory::addEntry(const QString& text, bool isHex)
 
     // 构造新条目
     SendEntry entry;
-    entry.text = text;
+    entry.text = normalizedText;
     entry.isHex = isHex;
     entry.time = QDateTime::currentDateTime();
 
     m_entries.append(entry);
 
     // 更新频率统计和累计记录数
-    m_freqMap[text]++;
+    m_freqMap[normalizedText]++;
     m_totalSendCount++;
     ++m_totalRecords;
 
@@ -65,16 +67,18 @@ void SendHistory::addEntry(const QString& text, bool isHex)
     emit historyChanged();
 }
 
-/** @brief 获取最近count条发送文本(从新到旧) @param count 请求数量 @return 文本列表 */
+/** @brief 获取最近count条唯一发送文本(从新到旧) @param count 请求数量 @return 文本列表 */
 QStringList SendHistory::recentTexts(int count) const
 {
     ++m_totalHistoryAccesses;
     QStringList result;
 
-    // 从最新的记录往前取，最多取count条
-    int start = qMax(0, m_entries.size() - count);
-    for (int i = m_entries.size() - 1; i >= start; --i) {
-        result.append(m_entries[i].text);
+    // 从最新的记录往前取，普通补全只展示唯一文本，避免下拉列表重复刷屏
+    for (int i = m_entries.size() - 1; i >= 0 && result.size() < count; --i) {
+        const QString& text = m_entries[i].text;
+        if (!result.contains(text)) {
+            result.append(text);
+        }
     }
 
     return result;

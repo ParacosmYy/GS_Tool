@@ -369,6 +369,7 @@ add_test(NAME TerminalSearchBar COMMAND test_terminal_search_bar)
 
 add_executable(test_send_controller_validation
     test_send_controller_validation.cpp
+    ${CMAKE_SOURCE_DIR}/src/connection/interface/IConnection.h
     ${CMAKE_SOURCE_DIR}/src/core/send/SendController.cpp
     ${CMAKE_SOURCE_DIR}/src/core/send/SendControllerSend.cpp
     ${CMAKE_SOURCE_DIR}/src/core/send/SendControllerStats.cpp
@@ -408,6 +409,67 @@ if(WIN32)
 endif()
 
 add_test(NAME SendControllerValidation COMMAND test_send_controller_validation)
+
+# ============================================================
+# 定时发送器测试
+# ============================================================
+
+add_executable(test_timed_sender
+    test_timed_sender.cpp
+    ${CMAKE_SOURCE_DIR}/src/serial/commands/TimedSender.cpp
+    ${CMAKE_SOURCE_DIR}/src/serial/commands/TimedSenderStats.cpp
+)
+
+target_include_directories(test_timed_sender PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_timed_sender PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_timed_sender PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME TimedSender COMMAND test_timed_sender)
+
+# ============================================================
+# 发送历史补全管理统计测试
+# ============================================================
+
+add_executable(test_send_history_manager
+    test_send_history_manager.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/send/SendHistoryManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/send/SendHistoryManagerStats.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/widgets/SmartAutoComplete.cpp
+    ${CMAKE_SOURCE_DIR}/src/serial/commands/SendHistory.cpp
+    ${CMAKE_SOURCE_DIR}/src/serial/commands/SendHistoryStats.cpp
+)
+
+target_include_directories(test_send_history_manager PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_send_history_manager PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_send_history_manager PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SendHistoryManager COMMAND test_send_history_manager)
 
 # ============================================================
 # 快捷指令栏交互测试

@@ -29,12 +29,24 @@ void QuickCommandBar::rebuildButtons()
     // 为每条指令创建新按钮
     for (int i = 0; i < m_commands.size(); ++i) {
         const auto& cmd = m_commands[i];
-        auto* btn = new AnimatedButton(cmd.name);
+        const QString displayName = cmd.name.trimmed().isEmpty()
+                                        ? tr("指令%1").arg(i + 1)
+                                        : cmd.name.trimmed();
+        auto* btn = new AnimatedButton(displayName);
         btn->setObjectName(QString("quickCmdBtn_%1").arg(i));
         btn->setProperty("quickCmdBtn", true);
         btn->setMinimumSize(80, 32);
         btn->setMaximumWidth(160);
-        btn->setToolTip(cmd.data.isEmpty() ? cmd.name : cmd.data);
+        const bool hasData = !cmd.data.isEmpty();
+        const bool hasValidHex = !cmd.isHex || HexConverter::isValidHex(cmd.data);
+        btn->setEnabled(hasData && hasValidHex);
+        if (!hasData) {
+            btn->setToolTip(tr("请先编辑指令数据"));
+        } else if (!hasValidHex) {
+            btn->setToolTip(tr("HEX格式无效: %1").arg(cmd.data));
+        } else {
+            btn->setToolTip(cmd.data);
+        }
 
         // 点击按钮时发送数据并更新统计计数器
         connect(btn, &QPushButton::clicked, this, [this, cmd]() {

@@ -1,7 +1,9 @@
 #include <QtTest/QtTest>
 
 #include "core/send/SendController.h"
+#include "connection/interface/IConnection.h"
 #include "serial/commands/SendHistory.h"
+#include "serial/commands/TimedSender.h"
 #include "terminal/model/TerminalModel.h"
 #include "utils/log/DataLogger.h"
 
@@ -22,10 +24,43 @@ private slots:
     void hexModeShowsHexPlaceholder();
     void textModeRestoresTextPlaceholder();
     void emptySendReportsEmptyInputBeforeConnectionState();
+    void invalidHexSendReportsFormatBeforeConnectionState();
     void nonEmptySendReportsDisconnected();
+    void timedSendDisconnectedDoesNotCountAsSuccessfulTimedSend();
+    void timedSendConnectedCountsAfterSuccessfulWrite();
+    void quickCommandDisconnectedDoesNotCountAsMacroExecution();
+    void quickCommandConnectedCountsAfterSuccessfulWrite();
 };
 
 namespace {
+class FakeConnection : public IConnection {
+    Q_OBJECT
+
+public:
+    explicit FakeConnection(ConnectionState state, QObject* parent = nullptr)
+        : IConnection(parent)
+        , m_state(state)
+    {
+    }
+
+    ConnectionType type() const override { return ConnectionType::Serial; }
+    QString name() const override { return QStringLiteral("FakeConnection"); }
+    ConnectionState state() const override { return m_state; }
+    bool open() override { m_state = ConnectionState::Connected; return true; }
+    void close() override { m_state = ConnectionState::Disconnected; }
+    qint64 write(const QByteArray& data) override
+    {
+        writtenData.append(data);
+        return data.size();
+    }
+    void configure(const QVariantMap& params) override { Q_UNUSED(params); }
+
+    QByteArray writtenData;
+
+private:
+    ConnectionState m_state;
+};
+
 struct SendBarFixture {
     QWidget parent;
     TerminalModel model;
@@ -145,6 +180,25 @@ void SendControllerValidationTest::emptySendReportsEmptyInputBeforeConnectionSta
     QCOMPARE(spy.first().first().toString(), QStringLiteral("发送内容为空"));
 }
 
+void SendControllerValidationTest::invalidHexSendReportsFormatBeforeConnectionState()
+{
+    SendBarFixture fixture;
+    QVERIFY(fixture.input);
+    QVERIFY(fixture.modeCombo);
+    QVERIFY(fixture.sendBar);
+    auto* sendButton = fixture.sendBar->findChild<QPushButton*>("sendButton");
+    QVERIFY(sendButton);
+    QSignalSpy spy(&fixture.controller, &SendController::statusMessage);
+
+    fixture.modeCombo->setCurrentIndex(1);
+    fixture.input->setText(QStringLiteral("AA 5"));
+    QTest::mouseClick(sendButton, Qt::LeftButton);
+
+    QCOMPARE(spy.count(), 1);
+    QVERIFY(spy.first().first().toString().contains(QStringLiteral("HEX 格式错误")));
+    QCOMPARE(fixture.input->property("hasError").toBool(), true);
+}
+
 void SendControllerValidationTest::nonEmptySendReportsDisconnected()
 {
     SendBarFixture fixture;
@@ -159,6 +213,64 @@ void SendControllerValidationTest::nonEmptySendReportsDisconnected()
 
     QCOMPARE(spy.count(), 1);
     QCOMPARE(spy.first().first().toString(), QStringLiteral("发送失败: 未连接"));
+}
+
+void SendControllerValidationTest::timedSendDisconnectedDoesNotCountAsSuccessfulTimedSend()
+{
+    SendBarFixture fixture;
+    QVERIFY(fixture.controller.timedSender());
+    QSignalSpy spy(&fixture.controller, &SendController::statusMessage);
+
+    fixture.controller.timedSender()->setInterval(1);
+    fixture.controller.timedSender()->setData(QByteArray("AT"));
+    fixture.controller.timedSender()->start();
+    QTRY_VERIFY_WITH_TIMEOUT(spy.count() >= 1, 80);
+    fixture.controller.timedSender()->stop();
+
+    QCOMPARE(fixture.controller.totalTimedSends(), 0ULL);
+    QCOMPARE(fixture.controller.totalSends(), 0ULL);
+}
+
+void SendControllerValidationTest::timedSendConnectedCountsAfterSuccessfulWrite()
+{
+    SendBarFixture fixture;
+    FakeConnection connection(ConnectionState::Connected);
+    fixture.controller.setConnection(&connection);
+
+    fixture.controller.timedSender()->setInterval(1);
+    fixture.controller.timedSender()->setData(QByteArray("AT"));
+    fixture.controller.timedSender()->start();
+    QTRY_VERIFY_WITH_TIMEOUT(fixture.controller.totalTimedSends() >= 1ULL, 80);
+    fixture.controller.timedSender()->stop();
+
+    QVERIFY(fixture.controller.totalTimedSends() >= 1ULL);
+    QVERIFY(fixture.controller.totalSends() >= 1ULL);
+    QVERIFY(connection.writtenData.contains(QByteArray("AT")));
+}
+
+void SendControllerValidationTest::quickCommandDisconnectedDoesNotCountAsMacroExecution()
+{
+    SendBarFixture fixture;
+    QSignalSpy spy(&fixture.controller, &SendController::statusMessage);
+
+    fixture.controller.onQuickCommand(QByteArray("AT"));
+
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(fixture.controller.totalMacroExecutions(), 0ULL);
+    QCOMPARE(fixture.controller.totalSends(), 0ULL);
+}
+
+void SendControllerValidationTest::quickCommandConnectedCountsAfterSuccessfulWrite()
+{
+    SendBarFixture fixture;
+    FakeConnection connection(ConnectionState::Connected);
+    fixture.controller.setConnection(&connection);
+
+    fixture.controller.onQuickCommand(QByteArray("AT"));
+
+    QCOMPARE(fixture.controller.totalMacroExecutions(), 1ULL);
+    QCOMPARE(fixture.controller.totalSends(), 1ULL);
+    QCOMPARE(connection.writtenData, QByteArray("AT"));
 }
 
 QTEST_MAIN(SendControllerValidationTest)

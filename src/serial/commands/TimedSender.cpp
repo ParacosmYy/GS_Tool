@@ -12,6 +12,22 @@
 
 #include "serial/commands/TimedSender.h"
 
+namespace {
+
+QList<QByteArray> nonEmptyQueue(const QList<QByteArray>& queue)
+{
+    QList<QByteArray> result;
+    result.reserve(queue.size());
+    for (const QByteArray& data : queue) {
+        if (!data.isEmpty()) {
+            result.append(data);
+        }
+    }
+    return result;
+}
+
+} // namespace
+
 /** @brief 构造定时发送器，初始化定时器并连接超时信号，初始状态停止，间隔1000ms @param parent 父对象 */
 TimedSender::TimedSender(QObject* parent)
     : QObject(parent)
@@ -42,7 +58,7 @@ int TimedSender::interval() const
 void TimedSender::setData(const QByteArray& data)
 {
     QMutexLocker locker(&m_mutex);
-    m_queue = {data};
+    m_queue = data.isEmpty() ? QList<QByteArray>() : QList<QByteArray>{data};
     m_queueIndex = 0;
 }
 
@@ -50,7 +66,7 @@ void TimedSender::setData(const QByteArray& data)
 void TimedSender::setDataQueue(const QList<QByteArray>& queue)
 {
     QMutexLocker locker(&m_mutex);
-    m_queue = queue;
+    m_queue = nonEmptyQueue(queue);
     m_queueIndex = 0;
 }
 
