@@ -3177,6 +3177,14 @@ set(SOURCES
     src/utils/matrix267/ConjugateGradient8.cpp
     src/utils/signal265/FilterDesign8.cpp
     src/utils/tree264/ScapegoatTree10.cpp
+    src/utils/cluster262/SpectralCluster14.cpp
+    src/utils/code263/DoubleTranspositionCode6.cpp
+    src/utils/dsp264/Chorus7.cpp
+    src/utils/fft265/PrimeFactorFFT10.cpp
+    src/utils/graph278/ChinesePostman11.cpp
+    src/utils/matrix268/BiCGSTAB12.cpp
+    src/utils/signal266/WaveletDenoiser15.cpp
+    src/utils/tree265/VanEmdeBoas9.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6208,6 +6216,14 @@ set(HEADERS
     src/utils/matrix267/ConjugateGradient8.h
     src/utils/signal265/FilterDesign8.h
     src/utils/tree264/ScapegoatTree10.h
+    src/utils/cluster262/SpectralCluster14.h
+    src/utils/code263/DoubleTranspositionCode6.h
+    src/utils/dsp264/Chorus7.h
+    src/utils/fft265/PrimeFactorFFT10.h
+    src/utils/graph278/ChinesePostman11.h
+    src/utils/matrix268/BiCGSTAB12.h
+    src/utils/signal266/WaveletDenoiser15.h
+    src/utils/tree265/VanEmdeBoas9.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
