@@ -24,6 +24,8 @@ struct NavPanelMapping {
     const char* category;   ///< 分组翻译键（如 "连接"/"终端"/"图表"/"协议"/"工具"/"调试"/"系统"）
     const char* name;       ///< 面板翻译键，传给 tr() 进行运行时翻译匹配
     QWidget* widget;        ///< 目标面板指针
+    const char* id = "";    ///< 稳定面板ID，用于命令、会话和图标导航等非显示语义
+    const char* iconName = ""; ///< Lucide图标逻辑名，不包含路径或.svg后缀
 };
 
 /** @brief 导航控制器 - 导航树构建、面板切换滑动动画、呼吸动画。动画规范: 旧面板200ms InCubic滑出+淡出, 新面板250ms OutCubic滑入+淡入。设计模式: 数据驱动/动画封装 */
@@ -40,6 +42,9 @@ public:
     void stopBreathingAnimation(QLabel* statusLabel); ///< 停止呼吸动画(恢复完全不透明)
     void setCurrentPanel(QWidget* panel);   ///< 设置当前面板(初始化用，不触发动画)
     QWidget* lookupPanel(const QString& translatedName) const; ///< 通过翻译后名称查找panel
+    QWidget* firstPanelInCategory(const QString& categoryKey) const; ///< 获取指定导航分类下的首个面板
+    QWidget* nextPanelInCategory(const QString& categoryKey) const; ///< 获取指定分类下相对当前面板的下一个面板
+    QString categoryForPanel(QWidget* panel) const; ///< 获取面板所属导航分类原始键
     const QVector<NavPanelMapping>& mappings() const { return m_navPanelMappings; } ///< 获取映射表
     int currentPanelIndex() const;          ///< 当前面板在映射表中的索引(0~N-1, -1=未找到)
     bool restorePanelByIndex(int index);    ///< 通过索引恢复面板(启动/会话恢复用，无动画)
@@ -56,6 +61,9 @@ public:
     quint64 totalNavTreeRebuilds() const;    ///< 导航树重建总次数(buildNavTree调用)
     void resetNavigationStatistics();        ///< 重置所有导航统计计数器
 
+signals:
+    void currentPanelChanged(QWidget* panel); ///< 当前面板变化，用于同步紧凑导航等外围入口
+
 private slots:
     void onThemeChanged();                   ///< 主题切换时刷新导航树圆点图标颜色
 
@@ -63,11 +71,13 @@ private:
     void animateSlideOut(QWidget* oldPanel, QParallelAnimationGroup* group); ///< 旧面板滑出+淡出: pos (0,0)->(-width,0) 200ms InCubic
     void animateSlideIn(QWidget* newPanel, QParallelAnimationGroup* group); ///< 新面板滑入+淡入: pos (width,0)->(0,0) 250ms OutCubic
     int parentContainerWidth(QWidget* panel) const; ///< 获取面板父容器宽度作为滑动距离
+    void syncNavTreeSelection(QWidget* panel); ///< 根据当前面板同步导航树选中项
 
     QVector<NavPanelMapping> m_navPanelMappings; ///< 导航面板映射表(数据驱动)
     QWidget* m_currentPanel = nullptr;       ///< 当前显示的面板
     bool m_panelSwitching = false;           ///< 是否正在执行面板切换动画
     QTreeView* m_navTree = nullptr;          ///< 导航树视图指针
+    QMetaObject::Connection m_navTreeClickedConnection; ///< 导航树点击连接，重建时用于断开旧连接
     QParallelAnimationGroup* m_switchAnimGroup = nullptr; ///< 当前面板切换动画组
     QSequentialAnimationGroup* m_breathingAnim = nullptr; ///< 连接状态呼吸动画
     QPointer<QGraphicsOpacityEffect> m_connStatusEffect; ///< 连接状态标签透明度效果

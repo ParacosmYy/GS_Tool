@@ -19,6 +19,7 @@
 class QPushButton;
 class QVBoxLayout;
 class QButtonGroup;
+struct NavPanelMapping;
 
 /**
  * @brief 导航分类条目
@@ -45,6 +46,9 @@ public:
 
     /** @brief 设置导航分类列表 */
     void setCategories(const QVector<NavCategory>& categories);
+
+    /** @brief 从面板映射生成分类列表，保持分类首次出现顺序 */
+    static QVector<NavCategory> categoriesFromMappings(const QVector<NavPanelMapping>& mappings);
 
     /** @brief 设置当前激活分类ID */
     void setActiveCategory(const QString& id);

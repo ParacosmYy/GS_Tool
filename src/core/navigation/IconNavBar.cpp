@@ -7,6 +7,8 @@
  */
 
 #include "core/navigation/IconNavBar.h"
+#include "core/navigation/NavigationController.h"
+#include "core/theme/IconManager.h"
 #include "core/theme/ThemeManager.h"
 
 #include <QPushButton>
@@ -14,6 +16,8 @@
 #include <QButtonGroup>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QCoreApplication>
+#include <QSet>
 
 // ─── 构造/析构 ───────────────────────────────────────────
 
@@ -57,6 +61,36 @@ void IconNavBar::setCategories(const QVector<NavCategory>& categories)
     m_activeCategory.clear();
 }
 
+/** @brief 从面板映射生成分类列表，保持映射中分类首次出现顺序 */
+QVector<NavCategory> IconNavBar::categoriesFromMappings(const QVector<NavPanelMapping>& mappings)
+{
+    QVector<NavCategory> categories;
+    QSet<QString> seen;
+
+    for (const auto& mapping : mappings) {
+        const QString categoryId = QString::fromUtf8(mapping.category);
+        if (!seen.contains(categoryId)) {
+            NavCategory category;
+            category.id = categoryId;
+            category.label = QCoreApplication::translate("Nav", mapping.category);
+            category.iconName = QString::fromUtf8(mapping.iconName);
+            category.panelIds.append(QString::fromUtf8(mapping.id));
+            categories.append(category);
+            seen.insert(categoryId);
+            continue;
+        }
+
+        for (auto& category : categories) {
+            if (category.id == categoryId) {
+                category.panelIds.append(QString::fromUtf8(mapping.id));
+                break;
+            }
+        }
+    }
+
+    return categories;
+}
+
 // ─── 激活状态 ────────────────────────────────────────────
 
 /** @brief 设置当前激活的分类，更新按钮选中态并触发重绘 @param id 分类标识符 */
@@ -88,12 +122,23 @@ QPushButton* IconNavBar::createCategoryButton(const NavCategory& category)
     auto* btn = new QPushButton(this);
     btn->setObjectName("iconNavBarButton_" + category.id);
     btn->setFixedSize(48, 48);
-    btn->setToolTip(category.label);
+    QString tooltip = tr("%1 · %2 个面板").arg(category.label).arg(category.panelIds.size());
+    if (category.panelIds.size() > 1) {
+        tooltip += QLatin1Char('\n') + tr("再次点击切换下一个");
+    }
+    btn->setToolTip(tooltip);
     btn->setCheckable(true);
 
-    // 占位图标文本: 取iconName首字符大写
+    // 优先使用统一 IconManager，资源缺失时才退回文本占位。
     if (!category.iconName.isEmpty()) {
-        btn->setText(QString(category.iconName.at(0)).toUpper());
+        const QIcon icon = IconManager::instance().icon(category.iconName);
+        if (!icon.isNull()) {
+            btn->setIcon(icon);
+            btn->setIconSize(QSize(20, 20));
+            btn->setText(QString());
+        } else {
+            btn->setText(QString(category.iconName.at(0)).toUpper());
+        }
     }
 
     connect(btn, &QPushButton::clicked, this, [this, id = category.id]() {

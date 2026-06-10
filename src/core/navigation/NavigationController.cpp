@@ -31,6 +31,8 @@ static QIcon createDotIcon(const QColor& color)
     return QIcon(dot);
 }
 
+static constexpr int kNavPanelMappingIndexRole = Qt::UserRole + 1;
+
 /** @brief 构造导航控制器，连接ThemeManager::themeChanged信号用于刷新图标颜色 @param parent 父对象 */
 NavigationController::NavigationController(QObject* parent)
     : QObject(parent)
@@ -57,6 +59,11 @@ NavigationController::~NavigationController()
 /** @brief 构建导航树模型并展开全部节点，按category字段自动分组并使用Accent色圆点图标 @param navTree 导航树视图控件 @param mappings 面板映射表(必须包含category字段) */
 void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPanelMapping>& mappings)
 {
+    if (m_navTreeClickedConnection) {
+        disconnect(m_navTreeClickedConnection);
+        m_navTreeClickedConnection = {};
+    }
+
     m_navTree = navTree;
     m_navPanelMappings = mappings;
 
@@ -85,7 +92,8 @@ void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPan
     }
 
     // 将面板叶子节点添加到对应的 category 分组
-    for (const auto& mapping : mappings) {
+    for (int mappingIndex = 0; mappingIndex < mappings.size(); ++mappingIndex) {
+        const auto& mapping = mappings[mappingIndex];
         QString cat = QCoreApplication::translate("Nav", mapping.category);
         auto* catItem = categoryItems.value(cat, nullptr);
         if (!catItem) continue;
@@ -93,13 +101,70 @@ void NavigationController::buildNavTree(QTreeView* navTree, const QVector<NavPan
         QString panelName = QCoreApplication::translate("MainWindow", mapping.name);
         auto* panelItem = new QStandardItem(panelName);
         panelItem->setEditable(false);
+        panelItem->setData(mappingIndex, kNavPanelMappingIndexRole);
         catItem->appendRow(panelItem);
     }
 
     navTree->setModel(treeModel);
     navTree->expandAll();  // 默认展开所有分组
+    m_navTreeClickedConnection = connect(navTree, &QTreeView::clicked, this, [this](const QModelIndex& index) {
+        bool ok = false;
+        const int mappingIndex = index.data(kNavPanelMappingIndexRole).toInt(&ok);
+        if (!ok || mappingIndex < 0 || mappingIndex >= m_navPanelMappings.size()) {
+            return;
+        }
+
+        QWidget* panel = m_navPanelMappings[mappingIndex].widget;
+        if (panel) {
+            switchToPanel(panel);
+        }
+    });
     ++m_totalTreeExpansions;  ///< 统计: 导航树展开操作递增
     ++m_totalNavTreeRebuilds; ///< 统计: 导航树重建次数递增
+}
+
+/** @brief 根据目标面板同步导航树当前选中项 */
+void NavigationController::syncNavTreeSelection(QWidget* panel)
+{
+    if (!m_navTree || !panel) {
+        return;
+    }
+
+    auto* model = qobject_cast<QStandardItemModel*>(m_navTree->model());
+    if (!model) {
+        return;
+    }
+
+    auto* root = model->invisibleRootItem();
+    if (!root) {
+        return;
+    }
+
+    for (int mappingIndex = 0; mappingIndex < m_navPanelMappings.size(); ++mappingIndex) {
+        if (m_navPanelMappings[mappingIndex].widget != panel) {
+            continue;
+        }
+
+        for (int categoryRow = 0; categoryRow < root->rowCount(); ++categoryRow) {
+            auto* categoryItem = root->child(categoryRow);
+            if (!categoryItem) {
+                continue;
+            }
+
+            for (int panelRow = 0; panelRow < categoryItem->rowCount(); ++panelRow) {
+                auto* panelItem = categoryItem->child(panelRow);
+                if (!panelItem || panelItem->data(kNavPanelMappingIndexRole).toInt() != mappingIndex) {
+                    continue;
+                }
+
+                const QModelIndex panelModelIndex = panelItem->index();
+                m_navTree->setCurrentIndex(panelModelIndex);
+                m_navTree->scrollTo(panelModelIndex);
+                return;
+            }
+        }
+        return;
+    }
 }
 
 /** @brief 收集所有可切换面板widget(从映射表中提取所有非空widget) @return 面板widget向量 */
@@ -151,6 +216,8 @@ bool NavigationController::restorePanelByIndex(int index)
     target->move(0, 0);
     target->setVisible(true);
     m_currentPanel = target;
+    syncNavTreeSelection(target);
+    emit currentPanelChanged(target);
     ++m_totalRestoresByIndex;  ///< 统计: 通过索引恢复面板次数递增
 
     return true;
@@ -159,7 +226,10 @@ bool NavigationController::restorePanelByIndex(int index)
 /** @brief 设置当前面板(初始化用，不触发动画) @param panel 目标面板widget */
 void NavigationController::setCurrentPanel(QWidget* panel)
 {
+    if (m_currentPanel == panel) return;
     m_currentPanel = panel;
+    syncNavTreeSelection(panel);
+    emit currentPanelChanged(panel);
 }
 
 // lookupPanel/统计计数器/onThemeChanged见 NavigationControllerQuery.cpp

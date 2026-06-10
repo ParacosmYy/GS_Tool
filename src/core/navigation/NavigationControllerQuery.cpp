@@ -38,6 +38,57 @@ QWidget* NavigationController::lookupPanel(const QString& translatedName) const
     return nullptr;
 }
 
+/** @brief 获取指定导航分类下的首个面板 @param categoryKey 原始分类翻译键或翻译后的分类名 @return 首个面板指针，未找到返回nullptr */
+QWidget* NavigationController::firstPanelInCategory(const QString& categoryKey) const
+{
+    for (const auto& mapping : m_navPanelMappings) {
+        const QString rawCategory = QString::fromUtf8(mapping.category);
+        const QString translatedCategory = QCoreApplication::translate("Nav", mapping.category);
+        if ((categoryKey == rawCategory || categoryKey == translatedCategory) && mapping.widget) {
+            return mapping.widget;
+        }
+    }
+    return nullptr;
+}
+
+/** @brief 获取指定分类内相对当前面板的下一个面板，当前不在该分类时返回首个面板 */
+QWidget* NavigationController::nextPanelInCategory(const QString& categoryKey) const
+{
+    QVector<QWidget*> categoryPanels;
+    for (const auto& mapping : m_navPanelMappings) {
+        const QString rawCategory = QString::fromUtf8(mapping.category);
+        const QString translatedCategory = QCoreApplication::translate("Nav", mapping.category);
+        if ((categoryKey == rawCategory || categoryKey == translatedCategory) && mapping.widget) {
+            categoryPanels.append(mapping.widget);
+        }
+    }
+
+    if (categoryPanels.isEmpty()) {
+        return nullptr;
+    }
+
+    const int currentIndex = categoryPanels.indexOf(m_currentPanel);
+    if (currentIndex < 0) {
+        return categoryPanels.first();
+    }
+    return categoryPanels.at((currentIndex + 1) % categoryPanels.size());
+}
+
+/** @brief 获取面板所属导航分类原始键 @param panel 面板指针 @return 分类翻译键，未找到返回空字符串 */
+QString NavigationController::categoryForPanel(QWidget* panel) const
+{
+    if (!panel) {
+        return {};
+    }
+
+    for (const auto& mapping : m_navPanelMappings) {
+        if (mapping.widget == panel) {
+            return QString::fromUtf8(mapping.category);
+        }
+    }
+    return {};
+}
+
 // ---- 统计计数器实现 ----
 
 /** @brief 获取导航切换总次数 @return 切换总次数 */

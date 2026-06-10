@@ -119,6 +119,8 @@ void NavigationController::switchToPanel(QWidget* newPanel)
 
     QWidget* oldPanel = m_currentPanel;
     m_currentPanel = newPanel;
+    syncNavTreeSelection(newPanel);
+    emit currentPanelChanged(newPanel);
 
     // 隐藏所有非当前、非旧面板，并清除残留的 opacity effect 和位移偏移
     for (auto* w : allSwitchablePanels()) {
