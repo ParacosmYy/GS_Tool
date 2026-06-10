@@ -610,6 +610,10 @@ set(SOURCES
     src/utils/packet/PacketBuilderPanel.cpp
     src/utils/packet/PacketBuilderPanelFields.cpp
 
+    # ── 设备模拟器 ──
+    src/utils/simulator/DeviceSimulator.cpp
+    src/utils/simulator/DeviceSimulatorPanel.cpp
+
     # ── 数据检查器 ──
     src/utils/data_inspector/DataInspectorWidget.cpp
     src/utils/data_inspector/DataInspectorWidgetStats.cpp
@@ -3323,6 +3327,14 @@ set(SOURCES
     src/utils/matrix285/SparseLU7.cpp
     src/utils/signal283/SignalSynchronizer9.cpp
     src/utils/tree282/FenwickTree11.cpp
+    src/utils/cluster280/SubspaceCluster12.cpp
+    src/utils/code281/TapirCode7.cpp
+    src/utils/dsp282/Delay9.cpp
+    src/utils/fft283/WHT10.cpp
+    src/utils/graph296/TransitiveClosure8.cpp
+    src/utils/matrix286/IterativeRefinement7.cpp
+    src/utils/signal284/FeatureExtractor8.cpp
+    src/utils/tree283/CartesianTree12.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -3681,6 +3693,11 @@ set(HEADERS
     src/utils/packet/PacketField.h
     src/utils/packet/PacketBuilder.h
     src/utils/packet/PacketBuilderPanel.h
+
+    # ── 设备模拟器 ──
+    src/utils/simulator/SimulatorTypes.h
+    src/utils/simulator/DeviceSimulator.h
+    src/utils/simulator/DeviceSimulatorPanel.h
 
     # ── 数据检查器 ──
     src/utils/data_inspector/DataInspectorWidget.h
@@ -6498,6 +6515,14 @@ set(HEADERS
     src/utils/matrix285/SparseLU7.h
     src/utils/signal283/SignalSynchronizer9.h
     src/utils/tree282/FenwickTree11.h
+    src/utils/cluster280/SubspaceCluster12.h
+    src/utils/code281/TapirCode7.h
+    src/utils/dsp282/Delay9.h
+    src/utils/fft283/WHT10.h
+    src/utils/graph296/TransitiveClosure8.h
+    src/utils/matrix286/IterativeRefinement7.h
+    src/utils/signal284/FeatureExtractor8.h
+    src/utils/tree283/CartesianTree12.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
