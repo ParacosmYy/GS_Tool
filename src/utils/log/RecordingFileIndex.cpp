@@ -46,11 +46,19 @@
 bool RecordingFileFormat::loadFromFile(const QString& filePath)
 {
     m_lastError.clear();
+    const QString normalizedPath = filePath.trimmed();
 
-    QFile file(filePath);
+    if (normalizedPath.isEmpty()) {
+        m_lastError = tr("文件路径不能为空");
+        qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
+        ++m_totalErrors; ++m_deserializationErrors;
+        return false;
+    }
+
+    QFile file(normalizedPath);
     if (!file.open(QIODevice::ReadOnly)) {
         m_lastError = tr("无法打开文件读取: %1 (%2)")
-                          .arg(filePath, file.errorString());
+                          .arg(normalizedPath, file.errorString());
         qWarning() << "[RecordingFileFormat] loadFromFile:" << m_lastError;
         ++m_totalErrors; ++m_deserializationErrors;
         return false;
@@ -222,12 +230,12 @@ bool RecordingFileFormat::loadFromFile(const QString& filePath)
     file.close();
 
     // --- 统计：缓存命中检测（同一文件路径重复加载） ---
-    if (m_filePath == filePath) {
+    if (m_filePath == normalizedPath) {
         ++m_cacheHits;
     } else {
         ++m_totalCacheMisses;
     }
-    m_filePath = filePath;
+    m_filePath = normalizedPath;
 
     // --- 统计：累计读取字节数(不含头部和EOF) ---
     m_totalBytesRead += static_cast<quint64>(jsonBytes.size() + rawBytesRemaining);

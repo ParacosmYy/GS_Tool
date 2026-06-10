@@ -54,7 +54,14 @@ bool DataLogger::startRecording(const QString& filePath)
 {
     if (m_recording) stopRecording();
 
-    m_recordFile = new QFile(filePath, this);
+    const QString normalizedPath = filePath.trimmed();
+    if (normalizedPath.isEmpty()) {
+        ++m_totalErrors;
+        emit error(tr("录制文件路径不能为空"));
+        return false;
+    }
+
+    m_recordFile = new QFile(normalizedPath, this);
     if (!m_recordFile->open(QIODevice::WriteOnly)) {
         ++m_totalErrors;
         emit error(tr("无法创建日志文件: %1").arg(filePath));
@@ -122,7 +129,7 @@ bool DataLogger::isPaused() const { return m_paused; }
 /** @brief 记录一条数据到日志文件 @param data 原始字节数据 @param dir 数据方向(RX/TX) */
 void DataLogger::logData(const QByteArray& data, Direction dir)
 {
-    if (!m_recording || m_paused || !m_recordFile) return;
+    if (!m_recording || m_paused || !m_recordFile || data.isEmpty()) return;
 
     quint64 timestamp = static_cast<quint64>(m_recordTimer.elapsed() - m_pauseOffset);
     writeRecord(timestamp, dir, data);

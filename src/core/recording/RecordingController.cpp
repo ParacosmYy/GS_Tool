@@ -62,12 +62,15 @@ void RecordingController::setupActions(QToolBar* toolbar)
             this, &RecordingController::onOpenPlayback);
     connect(m_stopPlaybackAction, &QAction::triggered,
             this, &RecordingController::onStopPlayback);
+
+    updateActionStates();
 }
 
 /** @brief 连接状态变化通知 */
 void RecordingController::setConnected(bool connected)
 {
     m_connected = connected;
+    updateActionStates();
 }
 
 // 统计getter和resetRecordingStatistics()见 RecordingControllerStats.cpp
@@ -188,4 +191,32 @@ void RecordingController::onRecordingStopped(const QString& filePath, int count,
             .arg(count)
             .arg(durationMs / 1000.0, 0, 'f', 1),
         5000);
+}
+
+void RecordingController::updateActionStates()
+{
+    const bool isRecording = m_logger && m_logger->isRecording();
+    const bool isPlayingBack = m_logger && m_logger->isPlaying();
+
+    if (m_recordAction) {
+        m_recordAction->setEnabled(m_connected || isRecording);
+        if (!m_connected && !isRecording) {
+            m_recordAction->blockSignals(true);
+            m_recordAction->setChecked(false);
+            m_recordAction->setText(tr("录制"));
+            m_recordAction->blockSignals(false);
+        }
+    }
+
+    if (m_stopRecordAction) {
+        m_stopRecordAction->setEnabled(isRecording);
+    }
+
+    if (m_playbackAction) {
+        m_playbackAction->setEnabled(!isPlayingBack);
+    }
+
+    if (m_stopPlaybackAction) {
+        m_stopPlaybackAction->setEnabled(isPlayingBack);
+    }
 }

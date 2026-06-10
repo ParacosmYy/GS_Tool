@@ -43,12 +43,14 @@ bool DataStreamRecorder::start(const RecordingConfig& config)
     }
 
     /* 验证配置: 文件路径不能为空 */
-    if (config.filePath.isEmpty()) {
+    const QString normalizedPath = config.filePath.trimmed();
+    if (normalizedPath.isEmpty()) {
         emit errorOccurred(tr("录制文件路径不能为空"));
         return false;
     }
 
     m_config = config;
+    m_config.filePath = normalizedPath;
     m_fileIndex = 0;
     m_sessionBytes = 0;
     m_sessionPackets = 0;
@@ -172,6 +174,9 @@ void DataStreamRecorder::addAnnotation(const QString& text)
 {
     if (!m_recording) return;
 
+    const QString normalizedText = text.trimmed();
+    if (normalizedText.isEmpty()) return;
+
     QString line;
     switch (m_config.format) {
     case FileFormat::Raw:
@@ -180,26 +185,29 @@ void DataStreamRecorder::addAnnotation(const QString& text)
         break;
     case FileFormat::HexDump:
         line = QStringLiteral("; @ANNOTATION %1 -- %2")
-            .arg(QDateTime::currentDateTime().toString(Qt::ISODateWithMs), text);
+            .arg(QDateTime::currentDateTime().toString(Qt::ISODateWithMs), normalizedText);
         m_file.write(line.toUtf8());
         m_file.write("\n");
         break;
     case FileFormat::TimestampedCsv:
         line = QStringLiteral("\"%1\",\"ANNOTATION\",\"0\",\"%2\"")
-            .arg(QDateTime::currentDateTime().toString(Qt::ISODateWithMs), text);
+            .arg(QDateTime::currentDateTime().toString(Qt::ISODateWithMs), normalizedText);
         m_file.write(line.toUtf8());
         m_file.write("\n");
         break;
     }
 
     ++m_recordingStats.totalAnnotations;
-    emit annotationAdded(text);
+    emit annotationAdded(normalizedText);
 }
 
 /** @brief 添加位置标记(带时间戳书签)，便于事后快速定位 @param label 标记标签 */
 void DataStreamRecorder::addMarker(const QString& label)
 {
     if (!m_recording) return;
+
+    const QString normalizedLabel = label.trimmed();
+    if (normalizedLabel.isEmpty()) return;
 
     QString line;
     switch (m_config.format) {
@@ -209,7 +217,7 @@ void DataStreamRecorder::addMarker(const QString& label)
         break;
     case FileFormat::HexDump:
         line = QStringLiteral("; @MARKER %1 @ offset 0x%2 @ %3")
-            .arg(label)
+            .arg(normalizedLabel)
             .arg(m_sessionBytes, 0, 16)
             .arg(QDateTime::currentDateTime().toString(Qt::ISODateWithMs));
         m_file.write(line.toUtf8());
@@ -218,7 +226,7 @@ void DataStreamRecorder::addMarker(const QString& label)
     case FileFormat::TimestampedCsv:
         line = QStringLiteral("\"%1\",\"MARKER\",\"0\",\"%2 @ byte %3\"")
             .arg(QDateTime::currentDateTime().toString(Qt::ISODateWithMs))
-            .arg(label)
+            .arg(normalizedLabel)
             .arg(m_sessionBytes);
         m_file.write(line.toUtf8());
         m_file.write("\n");
@@ -226,7 +234,7 @@ void DataStreamRecorder::addMarker(const QString& label)
     }
 
     ++m_recordingStats.totalAnnotations;
-    emit annotationAdded(label);
+    emit annotationAdded(normalizedLabel);
 }
 
 // ============================================================

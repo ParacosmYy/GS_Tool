@@ -121,6 +121,14 @@ QString RecordingFileFormat::lastError() const
 bool RecordingFileFormat::saveToFile(const QString& filePath)
 {
     m_lastError.clear();
+    const QString normalizedPath = filePath.trimmed();
+
+    if (normalizedPath.isEmpty()) {
+        m_lastError = tr("文件路径不能为空");
+        qWarning() << "[RecordingFileFormat] saveToFile:" << m_lastError;
+        ++m_totalErrors; ++m_serializationErrors;
+        return false;
+    }
 
     if (m_rawData.isEmpty()) {
         m_lastError = tr("无录制数据可保存，请先设置数据");
@@ -142,10 +150,10 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
         return false;
     }
 
-    QFile file(filePath);
+    QFile file(normalizedPath);
     if (!file.open(QIODevice::WriteOnly)) {
         m_lastError = tr("无法打开文件写入: %1 (%2)")
-                          .arg(filePath, file.errorString());
+                          .arg(normalizedPath, file.errorString());
         qWarning() << "[RecordingFileFormat] saveToFile:" << m_lastError;
         ++m_totalErrors; ++m_serializationErrors;
         return false;
@@ -195,7 +203,7 @@ bool RecordingFileFormat::saveToFile(const QString& filePath)
     }
 
     file.close();
-    m_filePath = filePath;
+    m_filePath = normalizedPath;
     ++m_totalSaves;
     ++m_totalIndexBuilds;  ///< 统计: 保存时构建段索引
     m_totalBytesWritten += static_cast<quint64>(jsonBytes.size() + m_rawData.size());

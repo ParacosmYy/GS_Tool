@@ -85,6 +85,14 @@ bool ChartExporter::exportToCsv(const QString& filePath,
                                 const QStringList& channelNames,
                                 const QList<QList<double>>& data)
 {
+    const QString normalizedPath = filePath.trimmed();
+    if (normalizedPath.isEmpty()) {
+        ++m_totalErrors;
+        ++m_totalExportErrors;
+        emit exportFailed(tr("文件路径为空"));
+        return false;
+    }
+
     if (channelNames.isEmpty() || data.isEmpty()) {
         ++m_totalErrors;
         ++m_totalExportErrors;
@@ -92,11 +100,11 @@ bool ChartExporter::exportToCsv(const QString& filePath,
         return false;
     }
 
-    QFile file(filePath);
+    QFile file(normalizedPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         ++m_totalErrors;
         ++m_totalExportErrors;
-        emit exportFailed(tr("无法打开文件: %1").arg(filePath));
+        emit exportFailed(tr("无法打开文件: %1").arg(normalizedPath));
         return false;
     }
 
@@ -135,7 +143,7 @@ bool ChartExporter::exportToCsv(const QString& filePath,
     ++m_totalExportsCsv;
     m_totalCsvRows += static_cast<quint64>(maxRows);
     m_totalBytesExported += static_cast<quint64>(file.size());
-    emit exportCompleted(filePath);
+    emit exportCompleted(normalizedPath);
     return true;
 }
 

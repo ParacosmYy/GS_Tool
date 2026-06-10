@@ -605,6 +605,7 @@ add_test(NAME TerminalExportOptions COMMAND test_terminal_export_options)
 add_executable(test_data_exporter_errors
     test_data_exporter_errors.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/export/DataExporter.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/export/DataExporterEdl.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/export/DataExporterFormats.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/export/DataExporterStreamed.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/export/DataExporterStreamedFormats.cpp
@@ -629,6 +630,196 @@ if(WIN32)
 endif()
 
 add_test(NAME DataExporterErrors COMMAND test_data_exporter_errors)
+
+# ============================================================
+# 数据流录制器错误反馈测试
+# ============================================================
+
+add_executable(test_data_stream_recorder
+    test_data_stream_recorder.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/recording/DataStreamRecorder.cpp
+)
+
+target_include_directories(test_data_stream_recorder PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_data_stream_recorder PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_data_stream_recorder PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME DataStreamRecorder COMMAND test_data_stream_recorder)
+
+# ============================================================
+# 数据日志会话交互测试
+# ============================================================
+
+add_executable(test_data_logger_session
+    test_data_logger_session.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/DataLogger.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/DataLoggerEdl.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/DataLoggerPlayback.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/DataLoggerSession.cpp
+)
+
+target_include_directories(test_data_logger_session PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_data_logger_session PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_data_logger_session PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME DataLoggerSession COMMAND test_data_logger_session)
+
+# ============================================================
+# 录制文件格式路径校验测试
+# ============================================================
+
+add_executable(test_recording_file_format
+    test_recording_file_format.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/RecordingFileFormat.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/RecordingFileIndex.cpp
+)
+
+target_include_directories(test_recording_file_format PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_recording_file_format PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_recording_file_format PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME RecordingFileFormat COMMAND test_recording_file_format)
+
+# ============================================================
+# 图表导出错误反馈测试
+# ============================================================
+
+add_executable(test_chart_exporter_errors
+    test_chart_exporter_errors.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/export/ChartExporter.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/export/ChartExporterFormats.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/export/ChartExporterImage.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/export/ChartExporterJson.cpp
+    ${CMAKE_SOURCE_DIR}/src/chart/model/ChartModel.cpp
+    ${CMAKE_SOURCE_DIR}/src/chart/model/ChartModelSlots.cpp
+    ${CMAKE_SOURCE_DIR}/src/chart/model/ChartModelStats.cpp
+    ${CMAKE_SOURCE_DIR}/src/chart/model/ChannelConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/chart/model/ChannelConfigSet.cpp
+    ${CMAKE_SOURCE_DIR}/src/chart/model/ChannelConfigSetMethods.cpp
+    ${CMAKE_SOURCE_DIR}/src/chart/model/ChannelConfigStyle.cpp
+)
+
+target_include_directories(test_chart_exporter_errors PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_chart_exporter_errors PRIVATE
+    Qt6::Charts
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Svg
+    Qt6::Test
+    Qt6::Widgets
+)
+
+if(WIN32)
+    target_compile_definitions(test_chart_exporter_errors PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME ChartExporterErrors COMMAND test_chart_exporter_errors)
+
+# ============================================================
+# 导出对话框输入校验测试
+# ============================================================
+
+add_executable(test_export_dialog_validation
+    test_export_dialog_validation.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/export/ExportDialog.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/export/ExportDialogSlots.cpp
+)
+
+target_include_directories(test_export_dialog_validation PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_export_dialog_validation PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Test
+    Qt6::Widgets
+)
+
+if(WIN32)
+    target_compile_definitions(test_export_dialog_validation PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME ExportDialogValidation COMMAND test_export_dialog_validation)
+
+# ============================================================
+# 录制控制器工具栏状态测试
+# ============================================================
+
+add_executable(test_recording_controller_actions
+    test_recording_controller_actions.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/recording/RecordingController.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/recording/RecordingControllerStats.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/DataLogger.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/DataLoggerEdl.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/DataLoggerPlayback.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/log/DataLoggerSession.cpp
+)
+
+target_include_directories(test_recording_controller_actions PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_recording_controller_actions PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Test
+    Qt6::Widgets
+)
+
+if(WIN32)
+    target_compile_definitions(test_recording_controller_actions PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME RecordingControllerActions COMMAND test_recording_controller_actions)
 
 # ============================================================
 # 发送历史补全数据测试

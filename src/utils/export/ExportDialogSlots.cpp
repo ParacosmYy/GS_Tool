@@ -68,18 +68,28 @@ void ExportDialog::setupConnections()
                 path += QString(".%1").arg(ext);
             }
             m_pathEdit->setText(path);
+            updateExportButtonState();
         }
     });
 
     // 导出按钮：关闭对话框并发出 exportRequested 信号
     connect(m_exportBtn, &QPushButton::clicked, this, [this]() {
+        const QString path = selectedPath();
+        if (path.isEmpty()) {
+            updateExportButtonState();
+            return;
+        }
+
         ++m_totalExports;
-        emit exportRequested(m_pathEdit->text(), m_formatCombo->currentIndex());
+        emit exportRequested(path, m_formatCombo->currentIndex());
         accept();
     });
 
     // 取消按钮：关闭对话框
     connect(m_cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
+
+    connect(m_pathEdit, &QLineEdit::textChanged,
+            this, [this]() { updateExportButtonState(); });
 
     // 格式切换：更新路径中的文件扩展名
     connect(m_formatCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -103,5 +113,8 @@ void ExportDialog::setupConnections()
         }
 
         m_pathEdit->setText(path);
+        updateExportButtonState();
     });
+
+    updateExportButtonState();
 }

@@ -18,10 +18,17 @@ bool DataLogger::startPlayback(const QString& filePath)
 {
     if (m_playing) stopPlayback();
 
-    m_playbackFile = new QFile(filePath, this);
+    const QString normalizedPath = filePath.trimmed();
+    if (normalizedPath.isEmpty()) {
+        ++m_totalErrors;
+        emit error(tr("回放文件路径不能为空"));
+        return false;
+    }
+
+    m_playbackFile = new QFile(normalizedPath, this);
     if (!m_playbackFile->open(QIODevice::ReadOnly)) {
         ++m_totalErrors;
-        emit error(tr("无法打开日志文件: %1").arg(filePath));
+        emit error(tr("无法打开日志文件: %1").arg(normalizedPath));
         delete m_playbackFile;
         m_playbackFile = nullptr;
         return false;
@@ -76,9 +83,11 @@ bool DataLogger::startPlayback(const QString& filePath)
     QByteArray data;
     if (readNextRecord(hdr, data)) {
         m_nextRecordTime = static_cast<qint64>(hdr.timestamp);
+        m_totalBytesPlayedBack += static_cast<quint64>(data.size());
         emit playbackData(data, hdr.direction);
         m_playedRecords = 1;
         m_playbackBaseTime = 0;
+        emit playbackProgress(static_cast<qreal>(m_playedRecords) / m_totalRecords);
     }
 
     m_playbackElapsed.start();

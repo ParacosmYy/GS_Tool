@@ -23,29 +23,39 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
                                 const QString& outPath,
                                 qint64 fromMs, qint64 toMs)
 {
-    if (edlPath.isEmpty() || outPath.isEmpty()) return false;
+    const QString normalizedEdlPath = edlPath.trimmed();
+    const QString normalizedOutPath = outPath.trimmed();
 
-    ++m_totalExports;
-    if (fromMs >= 0 && toMs >= 0 && fromMs > toMs) return false;
+    if (normalizedEdlPath.isEmpty() || normalizedOutPath.isEmpty()) {
+        ++m_totalErrors;
+        emit exportError(normalizedOutPath, tr("文件路径为空"));
+        return false;
+    }
+
+    if (fromMs >= 0 && toMs >= 0 && fromMs > toMs) {
+        ++m_totalErrors;
+        emit exportError(normalizedOutPath, tr("时间范围无效: 起始时间晚于结束时间"));
+        return false;
+    }
 
     // 开始计时
     m_exportTimer.start();
 
-    QVector<TerminalLine> lines = readEdlRange(edlPath, fromMs, toMs);
+    QVector<TerminalLine> lines = readEdlRange(normalizedEdlPath, fromMs, toMs);
     m_lastExportRangeCount = lines.size();
     if (lines.isEmpty()) return false;
 
     bool ok = false;
     switch (format) {
-    case Plain:       ok = exportPlain(outPath, lines); ++m_totalPlainExports; break;
-    case HexDump:     ok = exportHexDump(outPath, lines); ++m_totalHexDumpExports; break;
-    case Csv:         ok = exportCsv(outPath, lines); ++m_totalCsvExports; break;
-    case Timestamped: ok = exportTimestamped(outPath, lines); ++m_totalTimestampedExports; break;
-    case Bin:         ok = exportBin(outPath, lines); ++m_totalBinExports; break;
-    case Json:        ok = exportJson(outPath, lines); ++m_totalJsonExports; break;
+    case Plain:       ok = exportPlain(normalizedOutPath, lines); break;
+    case HexDump:     ok = exportHexDump(normalizedOutPath, lines); break;
+    case Csv:         ok = exportCsv(normalizedOutPath, lines); break;
+    case Timestamped: ok = exportTimestamped(normalizedOutPath, lines); break;
+    case Bin:         ok = exportBin(normalizedOutPath, lines); break;
+    case Json:        ok = exportJson(normalizedOutPath, lines); break;
     default:
         ++m_totalErrors;
-        emit exportError(outPath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
+        emit exportError(normalizedOutPath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
         return false;
     }
 
@@ -55,6 +65,16 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
     m_totalExportDurationMs += durationMs;
 
     if (ok) {
+        ++m_totalExports;
+        switch (format) {
+        case Plain:       ++m_totalPlainExports; break;
+        case HexDump:     ++m_totalHexDumpExports; break;
+        case Csv:         ++m_totalCsvExports; break;
+        case Timestamped: ++m_totalTimestampedExports; break;
+        case Bin:         ++m_totalBinExports; break;
+        case Json:        ++m_totalJsonExports; break;
+        default: break;
+        }
         quint64 byteCount = 0;
         for (const auto& line : lines) {
             byteCount += static_cast<quint64>(line.data.size());
@@ -63,7 +83,7 @@ bool DataExporter::exportRange(const QString& edlPath, Format format,
         m_totalRowsExported += static_cast<quint64>(lines.size());
         m_lastExportRowCount = static_cast<quint64>(lines.size());
         m_lastExportByteCount = byteCount;
-        emit exportCompleted(outPath, format,
+        emit exportCompleted(normalizedOutPath, format,
                              m_lastExportRowCount, byteCount, durationMs);
     } else {
         ++m_totalErrors;

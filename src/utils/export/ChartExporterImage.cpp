@@ -31,6 +31,14 @@
  */
 bool ChartExporter::exportToPng(const QString& filePath, QWidget* widget)
 {
+    const QString normalizedPath = filePath.trimmed();
+    if (normalizedPath.isEmpty()) {
+        ++m_totalErrors;
+        ++m_totalExportErrors;
+        emit exportFailed(tr("文件路径为空"));
+        return false;
+    }
+
     if (!widget) {
         ++m_totalErrors;
         ++m_totalExportErrors;
@@ -46,10 +54,10 @@ bool ChartExporter::exportToPng(const QString& filePath, QWidget* widget)
         return false;
     }
 
-    if (!pixmap.save(filePath, "PNG")) {
+    if (!pixmap.save(normalizedPath, "PNG")) {
         ++m_totalErrors;
         ++m_totalExportErrors;
-        emit exportFailed(tr("PNG 保存失败: %1").arg(filePath));
+        emit exportFailed(tr("PNG 保存失败: %1").arg(normalizedPath));
         return false;
     }
 
@@ -57,11 +65,11 @@ bool ChartExporter::exportToPng(const QString& filePath, QWidget* widget)
     ++m_totalExportsPng;
     ++m_totalChartImages;
     // PNG文件大小估算(像素宽×高×4字节RGBA近似)
-    QFileInfo fi(filePath);
+    QFileInfo fi(normalizedPath);
     if (fi.exists()) {
         m_totalBytesExported += static_cast<quint64>(fi.size());
     }
-    emit exportCompleted(filePath);
+    emit exportCompleted(normalizedPath);
     return true;
 }
 
@@ -82,6 +90,14 @@ bool ChartExporter::exportToPng(const QString& filePath, QWidget* widget)
  */
 bool ChartExporter::exportToSvg(const QString& filePath, QWidget* widget)
 {
+    const QString normalizedPath = filePath.trimmed();
+    if (normalizedPath.isEmpty()) {
+        ++m_totalErrors;
+        ++m_totalExportErrors;
+        emit exportFailed(tr("文件路径为空"));
+        return false;
+    }
+
     if (!widget) {
         ++m_totalErrors;
         ++m_totalExportErrors;
@@ -91,7 +107,7 @@ bool ChartExporter::exportToSvg(const QString& filePath, QWidget* widget)
 
     /* 配置 SVG 生成器 */
     QSvgGenerator generator;
-    generator.setFileName(filePath);
+    generator.setFileName(normalizedPath);
     generator.setSize(widget->size());
     generator.setViewBox(QRect(0, 0, widget->width(), widget->height()));
     generator.setTitle(tr("EmbedDebug 图表导出"));
@@ -99,6 +115,12 @@ bool ChartExporter::exportToSvg(const QString& filePath, QWidget* widget)
 
     /* 使用 QPainter 渲染到 SVG */
     QPainter painter(&generator);
+    if (!painter.isActive()) {
+        ++m_totalErrors;
+        ++m_totalExportErrors;
+        emit exportFailed(tr("SVG 保存失败: %1").arg(normalizedPath));
+        return false;
+    }
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::TextAntialiasing);
     widget->render(&painter);
@@ -107,10 +129,10 @@ bool ChartExporter::exportToSvg(const QString& filePath, QWidget* widget)
     ++m_totalExports;
     ++m_totalChartImages;
     ++m_totalExportsSvg;
-    QFileInfo svgFi(filePath);
+    QFileInfo svgFi(normalizedPath);
     if (svgFi.exists()) {
         m_totalBytesExported += static_cast<quint64>(svgFi.size());
     }
-    emit exportCompleted(filePath);
+    emit exportCompleted(normalizedPath);
     return true;
 }

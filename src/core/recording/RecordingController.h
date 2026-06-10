@@ -59,6 +59,8 @@ private slots:
     void onRecordingStopped(const QString& filePath, int count, qint64 durationMs);
 
 private:
+    void updateActionStates();             ///< 根据连接和运行状态刷新工具栏动作
+
     DataLogger* m_logger;
     QAction* m_recordAction = nullptr;
     QAction* m_stopRecordAction = nullptr;

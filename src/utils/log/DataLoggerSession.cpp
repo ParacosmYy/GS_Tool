@@ -93,7 +93,11 @@ bool DataLogger::seekToTimestamp(qint64 timestamp)
 /** @brief 跳转到指定书签位置 @param index 书签索引 @return true=跳转成功 */
 bool DataLogger::seekToBookmark(int index)
 {
-    if (index < 0 || index >= m_bookmarks.size()) return false;
+    if (index < 0 || index >= m_bookmarks.size()) {
+        ++m_totalErrors;
+        emit error(tr("无效的书签索引: %1").arg(index));
+        return false;
+    }
     return seekToTimestamp(m_bookmarks[index].timestamp);
 }
 
@@ -102,13 +106,18 @@ bool DataLogger::seekToBookmark(int index)
 /** @brief 添加书签(标记当前录制位置) @param label 书签标签 @param streamId 数据流标识 */
 void DataLogger::addBookmark(const QString& label, const QString& streamId)
 {
+    QString normalizedLabel = label.trimmed();
+    if (normalizedLabel.isEmpty()) {
+        normalizedLabel = tr("书签%1").arg(m_bookmarks.size() + 1);
+    }
+
     qint64 ts;
     if (m_recording) {
         ts = m_recordTimer.elapsed() - m_pauseOffset;
     } else {
         ts = QDateTime::currentDateTime().toMSecsSinceEpoch();
     }
-    m_bookmarks.append(DataBookmark(ts, label, streamId));
+    m_bookmarks.append(DataBookmark(ts, normalizedLabel, streamId.trimmed()));
     ++m_totalBookmarks;
     std::sort(m_bookmarks.begin(), m_bookmarks.end());
     emit bookmarksChanged();
@@ -120,7 +129,11 @@ QVector<DataBookmark> DataLogger::bookmarks() const { return m_bookmarks; }
 /** @brief 删除指定索引的书签 @param index 书签索引 */
 void DataLogger::removeBookmark(int index)
 {
-    if (index < 0 || index >= m_bookmarks.size()) return;
+    if (index < 0 || index >= m_bookmarks.size()) {
+        ++m_totalErrors;
+        emit error(tr("无效的书签索引: %1").arg(index));
+        return;
+    }
     m_bookmarks.removeAt(index);
     emit bookmarksChanged();
 }

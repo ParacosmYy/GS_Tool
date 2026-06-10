@@ -64,6 +64,11 @@ private:
      */
     void setupConnections();
 
+    /**
+     * @brief 根据路径输入内容刷新导出按钮可用状态
+     */
+    void updateExportButtonState();
+
     QComboBox*   m_formatCombo;  ///< 导出格式选择下拉框
     QLineEdit*   m_pathEdit;     ///< 文件路径输入框
     QPushButton* m_exportBtn;    ///< 导出按钮

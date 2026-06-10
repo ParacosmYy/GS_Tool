@@ -63,21 +63,22 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
                                  ProgressCallback progress,
                                  const QDateTime& from, const QDateTime& to)
 {
-    if (filePath.isEmpty()) {
+    const QString normalizedPath = filePath.trimmed();
+    if (normalizedPath.isEmpty()) {
         ++m_totalErrors;
-        emit exportError(filePath, tr("文件路径为空"));
+        emit exportError(normalizedPath, tr("文件路径为空"));
         return false;
     }
     if (lines.isEmpty()) {
         ++m_totalEmptySkips;
-        emit exportError(filePath, tr("没有数据可导出"));
+        emit exportError(normalizedPath, tr("没有数据可导出"));
         return false;
     }
 
     QVector<TerminalLine> filtered = filterByTime(lines, from, to);
     if (filtered.isEmpty()) {
         ++m_totalEmptySkips;
-        emit exportError(filePath, tr("时间范围内没有数据可导出"));
+        emit exportError(normalizedPath, tr("时间范围内没有数据可导出"));
         return false;
     }
     m_totalFilteredRows += static_cast<quint64>(lines.size() - filtered.size());
@@ -88,30 +89,30 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
     const int totalRows = filtered.size();
     switch (format) {
     case Plain: {
-        QFile file(filePath);
+        QFile file(normalizedPath);
         QTextStream out;
-        if (!openTextFile(file, out, filePath)) break;
+        if (!openTextFile(file, out, normalizedPath)) break;
         for (int i = 0; i < totalRows; ++i) {
             const TerminalLine& line = filtered[i];
             out << QString("[%1] [%2] %3 | %4\n")
                     .arg(line.timestamp.toString("yyyy-MM-dd HH:mm:ss.zzz"),
                          (line.direction == DataDirection::Rx) ? "RX" : "TX",
                          HexConverter::toHexString(line.data), toAsciiString(line.data));
-            if (!reportProgress(progress, filePath, i + 1, totalRows)) {
+            if (!reportProgress(progress, normalizedPath, i + 1, totalRows)) {
                 file.close();
                 ++m_totalCancelled;
-                emit exportCancelled(filePath);
+                emit exportCancelled(normalizedPath);
                 return false;
             }
         }
-        ok = flushAndCheck(file, out, filePath);
+        ok = flushAndCheck(file, out, normalizedPath);
         break;
     }
     case Csv: {
-        QFile file(filePath);
+        QFile file(normalizedPath);
         QTextStream out;
-        if (!openTextFile(file, out, filePath)) break;
-        if (!writeCsvBom(file, filePath)) { file.close(); break; }
+        if (!openTextFile(file, out, normalizedPath)) break;
+        if (!writeCsvBom(file, normalizedPath)) { file.close(); break; }
         out << csvHeader() << '\n';
         for (int i = 0; i < totalRows; ++i) {
             const TerminalLine& line = filtered[i];
@@ -119,14 +120,14 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
                 << ((line.direction == DataDirection::Rx) ? "RX" : "TX") << m_csvDelimiter
                 << HexConverter::toHexString(line.data) << m_csvDelimiter
                 << escapeCsvField(toAsciiString(line.data)) << '\n';
-            if (!reportProgress(progress, filePath, i + 1, totalRows)) {
+            if (!reportProgress(progress, normalizedPath, i + 1, totalRows)) {
                 file.close();
                 ++m_totalCancelled;
-                emit exportCancelled(filePath);
+                emit exportCancelled(normalizedPath);
                 return false;
             }
         }
-        ok = flushAndCheck(file, out, filePath);
+        ok = flushAndCheck(file, out, normalizedPath);
         break;
     }
     case Json: {
@@ -142,33 +143,33 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
             lineObj["hex"] = HexConverter::toHexString(line.data);
             lineObj["ascii"] = toAsciiString(line.data);
             linesArray.append(lineObj);
-            if (!reportProgress(progress, filePath, i + 1, totalRows)) {
+            if (!reportProgress(progress, normalizedPath, i + 1, totalRows)) {
                 ++m_totalCancelled;
-                emit exportCancelled(filePath);
+                emit exportCancelled(normalizedPath);
                 return false;
             }
         }
         root["lines"] = linesArray;
-        QFile file(filePath);
+        QFile file(normalizedPath);
         if (!file.open(QIODevice::WriteOnly)) {
-            emit exportError(filePath, tr("无法打开文件: %1").arg(file.errorString()));
+            emit exportError(normalizedPath, tr("无法打开文件: %1").arg(file.errorString()));
             break;
         }
         QJsonDocument doc(root);
         if (file.write(doc.toJson(QJsonDocument::Indented)) == -1) {
-            emit exportError(filePath, tr("写入文件失败: %1").arg(file.errorString()));
+            emit exportError(normalizedPath, tr("写入文件失败: %1").arg(file.errorString()));
             file.close(); break;
         }
         file.close();
         ok = true;
         break;
     }
-    case HexDump:     ok = exportHexDump(filePath, filtered); break;
-    case Timestamped: ok = exportTimestamped(filePath, filtered); break;
-    case Bin:         ok = exportBin(filePath, filtered); break;
+    case HexDump:     ok = exportHexDump(normalizedPath, filtered); break;
+    case Timestamped: ok = exportTimestamped(normalizedPath, filtered); break;
+    case Bin:         ok = exportBin(normalizedPath, filtered); break;
     default:
         ++m_totalErrors;
-        emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
+        emit exportError(normalizedPath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
         return false;
     }
 
@@ -195,7 +196,7 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
         m_totalRowsExported += static_cast<quint64>(filtered.size());
         m_lastExportRowCount = static_cast<quint64>(filtered.size());
         m_lastExportByteCount = byteCount;
-        emit exportCompleted(filePath, format,
+        emit exportCompleted(normalizedPath, format,
                              m_lastExportRowCount, byteCount, durationMs);
     } else {
         ++m_totalErrors;
@@ -222,22 +223,22 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
                                  const QVector<TerminalLine>& lines,
                                  const QDateTime& from, const QDateTime& to)
 {
-    if (filePath.isEmpty()) {
+    const QString normalizedPath = filePath.trimmed();
+    if (normalizedPath.isEmpty()) {
         ++m_totalErrors;
-        emit exportError(filePath, tr("文件路径为空"));
+        emit exportError(normalizedPath, tr("文件路径为空"));
         return false;
     }
     if (lines.isEmpty()) {
         ++m_totalEmptySkips;
-        emit exportError(filePath, tr("没有数据可导出"));
+        emit exportError(normalizedPath, tr("没有数据可导出"));
         return false;
     }
 
-    ++m_totalExports;
     QVector<TerminalLine> filtered = filterByTime(lines, from, to);
     if (filtered.isEmpty()) {
         ++m_totalEmptySkips;
-        emit exportError(filePath, tr("时间范围内没有数据可导出"));
+        emit exportError(normalizedPath, tr("时间范围内没有数据可导出"));
         return false;
     }
     m_totalFilteredRows += static_cast<quint64>(lines.size() - filtered.size());
@@ -247,15 +248,15 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
 
     bool ok = false;
     switch (format) {
-    case Plain:       ok = exportPlain(filePath, filtered); break;
-    case HexDump:     ok = exportHexDump(filePath, filtered); break;
-    case Csv:         ok = exportCsv(filePath, filtered); break;
-    case Timestamped: ok = exportTimestamped(filePath, filtered); break;
-    case Bin:         ok = exportBin(filePath, filtered); break;
-    case Json:        ok = exportJson(filePath, filtered); break;
+    case Plain:       ok = exportPlain(normalizedPath, filtered); break;
+    case HexDump:     ok = exportHexDump(normalizedPath, filtered); break;
+    case Csv:         ok = exportCsv(normalizedPath, filtered); break;
+    case Timestamped: ok = exportTimestamped(normalizedPath, filtered); break;
+    case Bin:         ok = exportBin(normalizedPath, filtered); break;
+    case Json:        ok = exportJson(normalizedPath, filtered); break;
     default:
         ++m_totalErrors;
-        emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
+        emit exportError(normalizedPath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
         return false;
     }
 
@@ -265,6 +266,7 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
     m_totalExportDurationMs += durationMs;
 
     if (ok) {
+        ++m_totalExports;
         switch (format) {
         case Plain:       ++m_totalPlainExports; break;
         case HexDump:     ++m_totalHexDumpExports; break;
@@ -282,7 +284,7 @@ bool DataExporter::exportToFile(const QString& filePath, Format format,
         m_totalRowsExported += static_cast<quint64>(filtered.size());
         m_lastExportRowCount = static_cast<quint64>(filtered.size());
         m_lastExportByteCount = byteCount;
-        emit exportCompleted(filePath, format,
+        emit exportCompleted(normalizedPath, format,
                              m_lastExportRowCount, byteCount, durationMs);
     } else {
         ++m_totalErrors;

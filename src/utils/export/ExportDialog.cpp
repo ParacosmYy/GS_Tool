@@ -63,7 +63,7 @@ ExportDialog::ExportDialog(QWidget* parent)
  */
 QString ExportDialog::selectedPath() const
 {
-    return m_pathEdit ? m_pathEdit->text() : QString();
+    return m_pathEdit ? m_pathEdit->text().trimmed() : QString();
 }
 
 /**
@@ -124,6 +124,7 @@ void ExportDialog::setupUI()
     m_exportBtn = new QPushButton(tr("导出"), this);
     m_exportBtn->setObjectName("exportBtn");
     m_exportBtn->setDefault(true);
+    m_exportBtn->setEnabled(false);
 
     auto* cancelBtn = new QPushButton(tr("取消"), this);
     cancelBtn->setObjectName("cancelBtn");
@@ -134,4 +135,14 @@ void ExportDialog::setupUI()
     mainLayout->addLayout(btnLayout);
 
     /* --- 信号连接见 setupConnections() (ExportDialogSlots.cpp) --- */
+}
+
+void ExportDialog::updateExportButtonState()
+{
+    if (!m_exportBtn || !m_pathEdit) {
+        return;
+    }
+
+    const bool hasPath = !m_pathEdit->text().trimmed().isEmpty();
+    m_exportBtn->setEnabled(hasPath);
 }

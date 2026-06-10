@@ -47,24 +47,24 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
                                    int totalLines, int batchSize,
                                    ProgressCallback progress)
 {
-    switch (validateStreamedExportInput(filePath, lineProvider, totalLines)) {
+    const QString normalizedPath = filePath.trimmed();
+    switch (validateStreamedExportInput(normalizedPath, lineProvider, totalLines)) {
     case StreamedInputError::None:
         break;
     case StreamedInputError::EmptyPath:
         ++m_totalErrors;
-        emit exportError(filePath, tr("文件路径为空"));
+        emit exportError(normalizedPath, tr("文件路径为空"));
         return false;
     case StreamedInputError::MissingProvider:
         ++m_totalErrors;
-        emit exportError(filePath, tr("数据源不可用"));
+        emit exportError(normalizedPath, tr("数据源不可用"));
         return false;
     case StreamedInputError::EmptyData:
         ++m_totalEmptySkips;
-        emit exportError(filePath, tr("没有数据可导出"));
+        emit exportError(normalizedPath, tr("没有数据可导出"));
         return false;
     }
 
-    ++m_totalExports;
     m_exportTimer.start();
     const int effectiveBatchSize = (batchSize > 0) ? batchSize : 1000;
 
@@ -72,9 +72,9 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
     int rowsExported = 0;
     switch (format) {
     case Plain: {
-        QFile file(filePath);
+        QFile file(normalizedPath);
         QTextStream out;
-        if (!openTextFile(file, out, filePath)) break;
+        if (!openTextFile(file, out, normalizedPath)) break;
         int offset = 0;
         while (offset < totalLines) {
             QVector<TerminalLine> batch = lineProvider(offset, qMin(effectiveBatchSize, totalLines - offset));
@@ -87,26 +87,26 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
             }
             offset += batch.size();
             rowsExported = offset;
-            if (!reportProgress(progress, filePath, rowsExported, totalLines)) {
+            if (!reportProgress(progress, normalizedPath, rowsExported, totalLines)) {
                 file.close();
                 ++m_totalCancelled;
-                emit exportCancelled(filePath);
+                emit exportCancelled(normalizedPath);
                 return false;
             }
         }
         if (rowsExported <= 0) {
             file.close();
-            emit exportError(filePath, tr("没有数据可导出"));
+            emit exportError(normalizedPath, tr("没有数据可导出"));
             break;
         }
-        ok = flushAndCheck(file, out, filePath);
+        ok = flushAndCheck(file, out, normalizedPath);
         break;
     }
     case Csv: {
-        QFile file(filePath);
+        QFile file(normalizedPath);
         QTextStream out;
-        if (!openTextFile(file, out, filePath)) break;
-        if (!writeCsvBom(file, filePath)) { file.close(); break; }
+        if (!openTextFile(file, out, normalizedPath)) break;
+        if (!writeCsvBom(file, normalizedPath)) { file.close(); break; }
         out << csvHeader() << '\n';
         int offset = 0;
         while (offset < totalLines) {
@@ -120,28 +120,28 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
             }
             offset += batch.size();
             rowsExported = offset;
-            if (!reportProgress(progress, filePath, rowsExported, totalLines)) {
+            if (!reportProgress(progress, normalizedPath, rowsExported, totalLines)) {
                 file.close();
                 ++m_totalCancelled;
-                emit exportCancelled(filePath);
+                emit exportCancelled(normalizedPath);
                 return false;
             }
         }
         if (rowsExported <= 0) {
             file.close();
-            emit exportError(filePath, tr("没有数据可导出"));
+            emit exportError(normalizedPath, tr("没有数据可导出"));
             break;
         }
-        ok = flushAndCheck(file, out, filePath);
+        ok = flushAndCheck(file, out, normalizedPath);
         break;
     }
-    case HexDump:     ok = exportStreamedHexDump(filePath, lineProvider, totalLines, effectiveBatchSize); break;
-    case Timestamped: ok = exportStreamedTimestamped(filePath, lineProvider, totalLines, effectiveBatchSize); break;
-    case Bin:         ok = exportStreamedBin(filePath, lineProvider, totalLines, effectiveBatchSize); break;
-    case Json:        ok = exportStreamedJson(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case HexDump:     ok = exportStreamedHexDump(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Timestamped: ok = exportStreamedTimestamped(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Bin:         ok = exportStreamedBin(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Json:        ok = exportStreamedJson(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
     default:
         ++m_totalErrors;
-        emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
+        emit exportError(normalizedPath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
         return false;
     }
 
@@ -150,6 +150,7 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
     m_totalExportDurationMs += durationMs;
 
     if (ok) {
+        ++m_totalExports;
         switch (format) {
         case Plain:       ++m_totalPlainExports; break;
         case HexDump:     ++m_totalHexDumpExports; break;
@@ -162,7 +163,7 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
         m_totalRowsExported += static_cast<quint64>(rowsExported > 0 ? rowsExported : totalLines);
         m_lastExportRowCount = static_cast<quint64>(rowsExported > 0 ? rowsExported : totalLines);
         m_lastExportByteCount = 0;
-        emit exportCompleted(filePath, format,
+        emit exportCompleted(normalizedPath, format,
                              m_lastExportRowCount, m_lastExportByteCount, durationMs);
     } else {
         ++m_totalErrors;
@@ -177,38 +178,38 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
                                    LineProvider lineProvider,
                                    int totalLines, int batchSize)
 {
-    switch (validateStreamedExportInput(filePath, lineProvider, totalLines)) {
+    const QString normalizedPath = filePath.trimmed();
+    switch (validateStreamedExportInput(normalizedPath, lineProvider, totalLines)) {
     case StreamedInputError::None:
         break;
     case StreamedInputError::EmptyPath:
         ++m_totalErrors;
-        emit exportError(filePath, tr("文件路径为空"));
+        emit exportError(normalizedPath, tr("文件路径为空"));
         return false;
     case StreamedInputError::MissingProvider:
         ++m_totalErrors;
-        emit exportError(filePath, tr("数据源不可用"));
+        emit exportError(normalizedPath, tr("数据源不可用"));
         return false;
     case StreamedInputError::EmptyData:
         ++m_totalEmptySkips;
-        emit exportError(filePath, tr("没有数据可导出"));
+        emit exportError(normalizedPath, tr("没有数据可导出"));
         return false;
     }
 
-    ++m_totalExports;
     m_exportTimer.start();
     const int effectiveBatchSize = (batchSize > 0) ? batchSize : 1000;
 
     bool ok = false;
     switch (format) {
-    case Plain:       ok = exportStreamedPlain(filePath, lineProvider, totalLines, effectiveBatchSize); break;
-    case HexDump:     ok = exportStreamedHexDump(filePath, lineProvider, totalLines, effectiveBatchSize); break;
-    case Csv:         ok = exportStreamedCsv(filePath, lineProvider, totalLines, effectiveBatchSize); break;
-    case Timestamped: ok = exportStreamedTimestamped(filePath, lineProvider, totalLines, effectiveBatchSize); break;
-    case Bin:         ok = exportStreamedBin(filePath, lineProvider, totalLines, effectiveBatchSize); break;
-    case Json:        ok = exportStreamedJson(filePath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Plain:       ok = exportStreamedPlain(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
+    case HexDump:     ok = exportStreamedHexDump(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Csv:         ok = exportStreamedCsv(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Timestamped: ok = exportStreamedTimestamped(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Bin:         ok = exportStreamedBin(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
+    case Json:        ok = exportStreamedJson(normalizedPath, lineProvider, totalLines, effectiveBatchSize); break;
     default:
         ++m_totalErrors;
-        emit exportError(filePath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
+        emit exportError(normalizedPath, tr("不支持的导出格式: %1").arg(static_cast<int>(format)));
         return false;
     }
 
@@ -218,6 +219,7 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
     m_totalExportDurationMs += durationMs;
 
     if (ok) {
+        ++m_totalExports;
         switch (format) {
         case Plain:       ++m_totalPlainExports; break;
         case HexDump:     ++m_totalHexDumpExports; break;
@@ -231,7 +233,7 @@ bool DataExporter::exportStreamed(const QString& filePath, Format format,
         m_totalRowsExported += static_cast<quint64>(totalLines);
         m_lastExportRowCount = static_cast<quint64>(totalLines);
         m_lastExportByteCount = 0; // 流式模式无法精确统计，设为0
-        emit exportCompleted(filePath, format,
+        emit exportCompleted(normalizedPath, format,
                              m_lastExportRowCount, m_lastExportByteCount, durationMs);
     } else {
         ++m_totalErrors;

@@ -11,15 +11,21 @@ class DataExporterErrorsTest : public QObject {
 private slots:
     void emptyLinesEmitExportError();
     void emptyPathEmitsExportError();
+    void whitespacePathEmitsExportError();
     void streamedEmptyPathEmitsExportError();
+    void streamedWhitespacePathEmitsExportError();
     void streamedEmptyInputEmitsExportError();
     void streamedProviderEmptyBatchDoesNotReportSuccess();
     void streamedNonPositiveBatchSizeFallsBackToDefaultBatch();
     void failedPlainExportDoesNotIncrementPlainExportCounter();
     void failedStreamedPlainExportDoesNotIncrementPlainExportCounter();
+    void failedStreamedExportDoesNotIncrementTotalExports();
     void filteredOutLinesEmitExportError();
     void failedPlainExportDoesNotIncrementTotalExports();
     void filteredOutLinesDoNotIncrementTotalExports();
+    void rangeExportEmptyPathsEmitExportError();
+    void rangeExportWhitespacePathsEmitExportError();
+    void rangeExportInvalidTimeRangeDoesNotIncrementTotalExports();
 };
 
 namespace {
@@ -63,12 +69,45 @@ void DataExporterErrorsTest::emptyPathEmitsExportError()
     QCOMPARE(exporter.totalErrors(), 1ULL);
 }
 
+void DataExporterErrorsTest::whitespacePathEmitsExportError()
+{
+    DataExporter exporter;
+    QSignalSpy spy(&exporter, &DataExporter::exportError);
+
+    const bool ok = exporter.exportToFile(QStringLiteral("   "),
+                                          DataExporter::Plain,
+                                          {makeLine(QDateTime::currentDateTime())});
+
+    QVERIFY(!ok);
+    QCOMPARE(spy.count(), 1);
+    QVERIFY(spy.first().at(1).toString().contains(QStringLiteral("文件路径为空")));
+    QCOMPARE(exporter.totalErrors(), 1ULL);
+    QCOMPARE(exporter.totalExports(), 0ULL);
+}
+
 void DataExporterErrorsTest::streamedEmptyPathEmitsExportError()
 {
     DataExporter exporter;
     QSignalSpy spy(&exporter, &DataExporter::exportError);
 
     const bool ok = exporter.exportStreamed(QString(),
+                                            DataExporter::Plain,
+                                            [](int, int) { return QVector<TerminalLine>{makeLine(QDateTime::currentDateTime())}; },
+                                            1);
+
+    QVERIFY(!ok);
+    QCOMPARE(spy.count(), 1);
+    QVERIFY(spy.first().at(1).toString().contains(QStringLiteral("文件路径为空")));
+    QCOMPARE(exporter.totalErrors(), 1ULL);
+    QCOMPARE(exporter.totalExports(), 0ULL);
+}
+
+void DataExporterErrorsTest::streamedWhitespacePathEmitsExportError()
+{
+    DataExporter exporter;
+    QSignalSpy spy(&exporter, &DataExporter::exportError);
+
+    const bool ok = exporter.exportStreamed(QStringLiteral("   "),
                                             DataExporter::Plain,
                                             [](int, int) { return QVector<TerminalLine>{makeLine(QDateTime::currentDateTime())}; },
                                             1);
@@ -181,6 +220,25 @@ void DataExporterErrorsTest::failedStreamedPlainExportDoesNotIncrementPlainExpor
     QCOMPARE(exporter.lastExportRowCount(), 0ULL);
 }
 
+void DataExporterErrorsTest::failedStreamedExportDoesNotIncrementTotalExports()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    DataExporter exporter;
+
+    const bool ok = exporter.exportStreamed(dir.path(),
+                                            DataExporter::Plain,
+                                            [](int, int) {
+                                                return QVector<TerminalLine>{makeLine(QDateTime::currentDateTime())};
+                                            },
+                                            1);
+
+    QVERIFY(!ok);
+    QCOMPARE(exporter.totalExports(), 0ULL);
+    QCOMPARE(exporter.totalRowsExported(), 0ULL);
+    QCOMPARE(exporter.lastExportRowCount(), 0ULL);
+}
+
 void DataExporterErrorsTest::filteredOutLinesEmitExportError()
 {
     QTemporaryDir dir;
@@ -236,6 +294,56 @@ void DataExporterErrorsTest::filteredOutLinesDoNotIncrementTotalExports()
     QCOMPARE(exporter.totalExports(), 0ULL);
     QCOMPARE(exporter.totalRowsExported(), 0ULL);
     QCOMPARE(exporter.totalBytesExported(), 0ULL);
+}
+
+void DataExporterErrorsTest::rangeExportEmptyPathsEmitExportError()
+{
+    DataExporter exporter;
+    QSignalSpy spy(&exporter, &DataExporter::exportError);
+
+    const bool ok = exporter.exportRange(QString(), DataExporter::Plain, QStringLiteral("out.txt"));
+
+    QVERIFY(!ok);
+    QCOMPARE(spy.count(), 1);
+    QVERIFY(spy.first().at(1).toString().contains(QStringLiteral("文件路径为空")));
+    QCOMPARE(exporter.totalErrors(), 1ULL);
+    QCOMPARE(exporter.totalExports(), 0ULL);
+}
+
+void DataExporterErrorsTest::rangeExportWhitespacePathsEmitExportError()
+{
+    DataExporter exporter;
+    QSignalSpy spy(&exporter, &DataExporter::exportError);
+
+    const bool ok = exporter.exportRange(QStringLiteral("   "),
+                                         DataExporter::Plain,
+                                         QStringLiteral("   "));
+
+    QVERIFY(!ok);
+    QCOMPARE(spy.count(), 1);
+    QVERIFY(spy.first().at(1).toString().contains(QStringLiteral("文件路径为空")));
+    QCOMPARE(exporter.totalErrors(), 1ULL);
+    QCOMPARE(exporter.totalExports(), 0ULL);
+}
+
+void DataExporterErrorsTest::rangeExportInvalidTimeRangeDoesNotIncrementTotalExports()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    DataExporter exporter;
+    QSignalSpy spy(&exporter, &DataExporter::exportError);
+
+    const bool ok = exporter.exportRange(dir.filePath(QStringLiteral("capture.edl")),
+                                         DataExporter::Plain,
+                                         dir.filePath(QStringLiteral("out.txt")),
+                                         200,
+                                         100);
+
+    QVERIFY(!ok);
+    QCOMPARE(spy.count(), 1);
+    QVERIFY(spy.first().at(1).toString().contains(QStringLiteral("时间范围")));
+    QCOMPARE(exporter.totalErrors(), 1ULL);
+    QCOMPARE(exporter.totalExports(), 0ULL);
 }
 
 QTEST_MAIN(DataExporterErrorsTest)
