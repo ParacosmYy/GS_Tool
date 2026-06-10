@@ -3161,6 +3161,14 @@ set(SOURCES
     src/utils/matrix265/EigenVectorSolver7.cpp
     src/utils/signal263/Periodogram7.cpp
     src/utils/tree262/AvlTree9.cpp
+    src/utils/cluster260/BirchClustering13.cpp
+    src/utils/code261/StraddlingCheckerboard6.cpp
+    src/utils/dsp262/MultibandGate6.cpp
+    src/utils/fft263/Goertzel10.cpp
+    src/utils/graph276/DominatingSet10.cpp
+    src/utils/matrix266/SchurDecomposition10.cpp
+    src/utils/signal264/WindowFunction6.cpp
+    src/utils/tree263/BPlusTree12.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6176,6 +6184,14 @@ set(HEADERS
     src/utils/matrix265/EigenVectorSolver7.h
     src/utils/signal263/Periodogram7.h
     src/utils/tree262/AvlTree9.h
+    src/utils/cluster260/BirchClustering13.h
+    src/utils/code261/StraddlingCheckerboard6.h
+    src/utils/dsp262/MultibandGate6.h
+    src/utils/fft263/Goertzel10.h
+    src/utils/graph276/DominatingSet10.h
+    src/utils/matrix266/SchurDecomposition10.h
+    src/utils/signal264/WindowFunction6.h
+    src/utils/tree263/BPlusTree12.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
