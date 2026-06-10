@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QMap>
 #include "core/navigation/NavigationController.h"
+#include "core/panels/PanelDescriptor.h"
 #include "core/panels/PanelManagerPanels.h"
 #include "core/widgets/BasePanel.h"
 #include "core/widgets/ScriptRecorder.h"
@@ -93,6 +94,7 @@ public:
     void resetStats();
 
 private:
+    QVector<PanelDescriptor> panelDescriptors() const;
     void createConnectionPanels(QWidget* parent);
     void createProtocolPanels(QWidget* parent);
     void createDebugPanels(QWidget* parent);

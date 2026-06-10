@@ -99,55 +99,10 @@ void PanelManager::wrapPanels()
         ++m_totalPanelRegisters;
     };
 
-    // ---- 核心 (排除 m_terminal/m_searchBar/m_quickCmdBar) ----
-    wrap(m_serialConfig, tr("配置"));
-    wrap(m_dataStats, tr("统计"));
-    wrap(m_protocolView, tr("协议"));
-    wrap(m_frameEditor, tr("帧编辑器"));
-    wrap(m_chartWidget, tr("波形图"));
-    wrap(m_otaWidget, tr("OTA升级"));
-    wrap(m_bookmarkWidget, tr("书签"));
-    // ---- 录制回放 / 仪表盘 / 终端增强 / 脚本录制 ----
-    wrap(m_playbackWidget, tr("录制回放"));
-    wrap(m_dashboardWidget, tr("仪表盘"));
-    wrap(m_terminalFilterBar, tr("终端过滤"));
-    wrap(m_scriptRecorder, tr("脚本录制"));
-    // ---- 连接层 ----
-    wrap(m_bleConfigPanel, tr("BLE配置"));
-    wrap(m_bleGattBrowser, tr("BLE浏览"));
-    wrap(m_canConfigPanel, tr("CAN配置"));
-    wrap(m_canBusMonitor, tr("CAN监控"));
-    wrap(m_mqttConfigPanel, tr("MQTT配置"));
-    wrap(m_mqttSubscriptionPanel, tr("MQTT订阅"));
-    wrap(m_multiConnectionPanel, tr("TCP多连接"));
-    wrap(m_spiI2cConfigPanel, tr("SPI/I2C"));
-    wrap(m_wsConfigPanel, tr("WebSocket"));
-    wrap(m_usbConfigPanel, tr("USB配置"));
-    wrap(m_usbDescriptorViewer, tr("USB描述符"));
-    // ---- 协议层 ----
-    wrap(m_protocolSchemaEditor, tr("自定义协议"));
-    wrap(m_modbusConfigPanel, tr("Modbus配置"));
-    wrap(m_modbusScanWidget, tr("Modbus扫描"));
-    wrap(m_schemaViewer, tr("Protobuf查看"));
-    // ---- 调试层 ----
-    wrap(m_rttConfigPanel, tr("RTT配置"));
-    wrap(m_registerEditor, tr("寄存器编辑"));
-    wrap(m_signalLineWidget, tr("信号线"));
-    wrap(m_trafficMonitorWidget, tr("流量监控"));
-    wrap(m_triggerListPanel, tr("触发器"));
-    wrap(m_performanceOverlay, tr("性能监控"));
-    // ---- 图表扩展 ----
-    wrap(m_fftWidget, tr("FFT频谱"));
-    wrap(m_scatterWidget, tr("散点图"));
-    wrap(m_histogramWidget, tr("直方图"));
-    // ---- 工具层 ----
-    wrap(m_checksumPanel, tr("校验计算"));
-    wrap(m_converterPanel, tr("数据转换"));
-    wrap(m_timestampPanel, tr("时间戳"));
-    wrap(m_packetBuilderPanel, tr("数据包构建"));
-    wrap(m_dataDiffPanel, tr("数据对比"));
-    // ---- 系统层 ----
-    wrap(m_pluginConfigPanel, tr("插件系统"));
-    wrap(m_projectWelcomeDialog, tr("项目管理"));
-    wrap(m_deviceProfilePanel, tr("设备档案"));
+    for (const auto& descriptor : panelDescriptors()) {
+        if (descriptor.wrapperPolicy != PanelWrapperPolicy::Wrapped) {
+            continue;
+        }
+        wrap(descriptor.rawWidget, tr(descriptor.titleKey));
+    }
 }

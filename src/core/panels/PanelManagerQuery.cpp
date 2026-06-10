@@ -75,107 +75,139 @@
 #include "core/device/DeviceProfilePanel.h"
 #include "utils/perf/PerformanceOverlay.h"
 
+#include <algorithm>
+
 // ==================== 映射表 ====================
+
+QVector<PanelDescriptor> PanelManager::panelDescriptors() const
+{
+    QVector<PanelDescriptor> descriptors;
+    descriptors.reserve(47);
+
+    auto add = [&descriptors](const char* id,
+                              const char* objectName,
+                              const char* groupKey,
+                              const char* titleKey,
+                              const char* iconName,
+                              QWidget* rawWidget,
+                              PanelWrapperPolicy wrapperPolicy,
+                              int navOrder,
+                              int stackOrder,
+                              bool navVisible = true,
+                              bool includeInPanelStack = true) {
+        descriptors.append(PanelDescriptor{
+            id,
+            objectName,
+            groupKey,
+            titleKey,
+            iconName,
+            rawWidget,
+            wrapperPolicy,
+            navOrder,
+            stackOrder,
+            navVisible,
+            includeInPanelStack
+        });
+    };
+
+    add("serial.config", "serialConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "配置"), "cable", m_serialConfig, PanelWrapperPolicy::Wrapped, 0, 0);
+    add("connection.ble.config", "bleConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "BLE配置"), "bluetooth", m_bleConfigPanel, PanelWrapperPolicy::Wrapped, 1, 14);
+    add("connection.ble.gatt", "bleGattBrowserPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "BLE浏览"), "bluetooth-connected", m_bleGattBrowser, PanelWrapperPolicy::Wrapped, 2, 15);
+    add("connection.can.config", "canConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "CAN配置"), "circle-gauge", m_canConfigPanel, PanelWrapperPolicy::Wrapped, 3, 16);
+    add("connection.can.monitor", "canBusMonitorPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "CAN监控"), "activity", m_canBusMonitor, PanelWrapperPolicy::Wrapped, 4, 17);
+    add("connection.mqtt.config", "mqttConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "MQTT配置"), "radio-tower", m_mqttConfigPanel, PanelWrapperPolicy::Wrapped, 5, 18);
+    add("connection.mqtt.subscription", "mqttSubscriptionPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "MQTT订阅"), "rss", m_mqttSubscriptionPanel, PanelWrapperPolicy::Wrapped, 6, 19);
+    add("connection.tcp.multi", "multiConnectionPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "TCP多连接"), "network", m_multiConnectionPanel, PanelWrapperPolicy::Wrapped, 7, 20);
+    add("connection.spi_i2c", "spiI2cConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "SPI/I2C"), "cpu", m_spiI2cConfigPanel, PanelWrapperPolicy::Wrapped, 8, 21);
+    add("connection.websocket", "wsConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "WebSocket"), "globe", m_wsConfigPanel, PanelWrapperPolicy::Wrapped, 9, 22);
+    add("connection.usb.config", "usbConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "USB配置"), "usb", m_usbConfigPanel, PanelWrapperPolicy::Wrapped, 10, 23);
+    add("connection.usb.descriptor", "usbDescriptorViewerPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "USB描述符"), "file-search", m_usbDescriptorViewer, PanelWrapperPolicy::Wrapped, 11, 24);
+
+    add("terminal.main", "terminalPanel", QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "终端"), "terminal", m_terminal, PanelWrapperPolicy::RawPersistent, 12, 6);
+    add("terminal.stats", "dataStatsPanel", QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "统计"), "chart-no-axes-combined", m_dataStats, PanelWrapperPolicy::Wrapped, 13, 1);
+    add("terminal.playback", "playbackWidgetPanel", QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "录制回放"), "history", m_playbackWidget, PanelWrapperPolicy::Wrapped, 14, 10);
+    add("terminal.filter", "terminalFilterBarPanel", QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "终端过滤"), "filter", m_terminalFilterBar, PanelWrapperPolicy::Wrapped, 15, 12);
+    add("terminal.script", "scriptRecorderPanel", QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "脚本录制"), "file-clock", m_scriptRecorder, PanelWrapperPolicy::Wrapped, 16, 13);
+
+    add("chart.main", "chartWidgetPanel", QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "波形图"), "chart-line", m_chartWidget, PanelWrapperPolicy::Wrapped, 17, 4);
+    add("chart.fft", "fftWidgetPanel", QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "FFT频谱"), "audio-lines", m_fftWidget, PanelWrapperPolicy::Wrapped, 18, 35);
+    add("chart.dashboard", "dashboardWidgetPanel", QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "仪表盘"), "layout-dashboard", m_dashboardWidget, PanelWrapperPolicy::Wrapped, 19, 11);
+    add("chart.scatter", "scatterWidgetPanel", QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "散点图"), "scatter-chart", m_scatterWidget, PanelWrapperPolicy::Wrapped, 20, 36);
+    add("chart.histogram", "histogramWidgetPanel", QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "直方图"), "bar-chart-3", m_histogramWidget, PanelWrapperPolicy::Wrapped, 21, 37);
+
+    add("protocol.view", "protocolViewPanel", QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "协议"), "braces", m_protocolView, PanelWrapperPolicy::Wrapped, 22, 2);
+    add("protocol.frame_editor", "frameEditorPanel", QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "帧编辑器"), "blocks", m_frameEditor, PanelWrapperPolicy::Wrapped, 23, 3);
+    add("protocol.schema_editor", "protocolSchemaEditorPanel", QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "自定义协议"), "file-code-2", m_protocolSchemaEditor, PanelWrapperPolicy::Wrapped, 24, 25);
+    add("protocol.modbus.config", "modbusConfigPanel", QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "Modbus配置"), "sliders-horizontal", m_modbusConfigPanel, PanelWrapperPolicy::Wrapped, 25, 26);
+    add("protocol.modbus.scan", "modbusScanWidgetPanel", QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "Modbus扫描"), "scan-search", m_modbusScanWidget, PanelWrapperPolicy::Wrapped, 26, 27);
+    add("protocol.protobuf.schema", "schemaViewerPanel", QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "Protobuf查看"), "file-json", m_schemaViewer, PanelWrapperPolicy::Wrapped, 27, 28);
+
+    add("tool.ota", "otaWidgetPanel", QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "OTA升级"), "upload", m_otaWidget, PanelWrapperPolicy::Wrapped, 28, 5);
+    add("tool.bookmark", "bookmarkWidgetPanel", QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "书签"), "bookmark", m_bookmarkWidget, PanelWrapperPolicy::Wrapped, 29, 9);
+    add("tool.checksum", "checksumPanel", QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "校验计算"), "badge-check", m_checksumPanel, PanelWrapperPolicy::Wrapped, 30, 38);
+    add("tool.converter", "converterPanel", QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "数据转换"), "repeat", m_converterPanel, PanelWrapperPolicy::Wrapped, 31, 39);
+    add("tool.timestamp", "timestampPanel", QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "时间戳"), "clock", m_timestampPanel, PanelWrapperPolicy::Wrapped, 32, 40);
+    add("tool.packet_builder", "packetBuilderPanel", QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "数据包构建"), "package-plus", m_packetBuilderPanel, PanelWrapperPolicy::Wrapped, 33, 41);
+    add("tool.data_diff", "dataDiffPanel", QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "数据对比"), "git-compare", m_dataDiffPanel, PanelWrapperPolicy::Wrapped, 34, 42);
+
+    add("debug.rtt", "rttConfigPanel", QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "RTT配置"), "waypoints", m_rttConfigPanel, PanelWrapperPolicy::Wrapped, 35, 29);
+    add("debug.register", "registerEditorPanel", QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "寄存器编辑"), "table-properties", m_registerEditor, PanelWrapperPolicy::Wrapped, 36, 30);
+    add("debug.signal_line", "signalLineWidgetPanel", QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "信号线"), "activity", m_signalLineWidget, PanelWrapperPolicy::Wrapped, 37, 31);
+    add("debug.traffic", "trafficMonitorWidgetPanel", QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "流量监控"), "area-chart", m_trafficMonitorWidget, PanelWrapperPolicy::Wrapped, 38, 32);
+    add("debug.trigger", "triggerListPanel", QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "触发器"), "zap", m_triggerListPanel, PanelWrapperPolicy::Wrapped, 39, 33);
+    add("debug.performance", "performanceOverlayPanel", QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "性能监控"), "gauge", m_performanceOverlay, PanelWrapperPolicy::Wrapped, 40, 46);
+
+    add("system.plugin", "pluginConfigPanel", QT_TRANSLATE_NOOP("Nav", "系统"), QT_TRANSLATE_NOOP("MainWindow", "插件系统"), "puzzle", m_pluginConfigPanel, PanelWrapperPolicy::Wrapped, 41, 43);
+    add("system.project", "projectWelcomeDialogPanel", QT_TRANSLATE_NOOP("Nav", "系统"), QT_TRANSLATE_NOOP("MainWindow", "项目管理"), "folder-kanban", m_projectWelcomeDialog, PanelWrapperPolicy::Wrapped, 42, 44);
+    add("system.device_profile", "deviceProfilePanel", QT_TRANSLATE_NOOP("Nav", "系统"), QT_TRANSLATE_NOOP("MainWindow", "设备档案"), "microchip", m_deviceProfilePanel, PanelWrapperPolicy::Wrapped, 43, 45);
+
+    add("terminal.search", "searchBarPanel", "", "", "search", m_searchBar, PanelWrapperPolicy::Overlay, -1, 7, false);
+    add("terminal.quick_command", "quickCmdBarPanel", "", "", "send", m_quickCmdBar, PanelWrapperPolicy::FixedBar, -1, 8, false);
+
+    return descriptors;
+}
+
+static QWidget* panelWidgetForDescriptor(const PanelManager* manager, const PanelDescriptor& descriptor)
+{
+    return descriptor.wrapperPolicy == PanelWrapperPolicy::Wrapped
+        ? manager->wrapper(descriptor.rawWidget)
+        : descriptor.rawWidget;
+}
 
 /** @brief 获取导航树面板映射表，使用QT_TRANSLATE_NOOP标记翻译键 */
 QVector<NavPanelMapping> PanelManager::panelMappings() const
 {
-    return {
-        // ---- 连接 ----
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "配置"),       wrapper(m_serialConfig)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "BLE配置"),    wrapper(m_bleConfigPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "BLE浏览"),    wrapper(m_bleGattBrowser)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "CAN配置"),    wrapper(m_canConfigPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "CAN监控"),    wrapper(m_canBusMonitor)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "MQTT配置"),   wrapper(m_mqttConfigPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "MQTT订阅"),   wrapper(m_mqttSubscriptionPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "TCP多连接"),  wrapper(m_multiConnectionPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "SPI/I2C"),    wrapper(m_spiI2cConfigPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "WebSocket"),  wrapper(m_wsConfigPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "USB配置"),    wrapper(m_usbConfigPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "USB描述符"),  wrapper(m_usbDescriptorViewer)},
+    auto descriptors = panelDescriptors();
+    std::sort(descriptors.begin(), descriptors.end(), [](const PanelDescriptor& lhs, const PanelDescriptor& rhs) {
+        return lhs.navOrder < rhs.navOrder;
+    });
 
-        // ---- 终端 ----
-        {QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "终端"),       m_terminal},
-        {QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "统计"),       wrapper(m_dataStats)},
-        {QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "录制回放"),   wrapper(m_playbackWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "终端过滤"),   wrapper(m_terminalFilterBar)},
-        {QT_TRANSLATE_NOOP("Nav", "终端"), QT_TRANSLATE_NOOP("MainWindow", "脚本录制"),   wrapper(m_scriptRecorder)},
-
-        // ---- 图表 ----
-        {QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "波形图"),     wrapper(m_chartWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "FFT频谱"),    wrapper(m_fftWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "仪表盘"),     wrapper(m_dashboardWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "散点图"),     wrapper(m_scatterWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "图表"), QT_TRANSLATE_NOOP("MainWindow", "直方图"),     wrapper(m_histogramWidget)},
-
-        // ---- 协议 ----
-        {QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "协议"),       wrapper(m_protocolView)},
-        {QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "帧编辑器"),   wrapper(m_frameEditor)},
-        {QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "自定义协议"), wrapper(m_protocolSchemaEditor)},
-        {QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "Modbus配置"), wrapper(m_modbusConfigPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "Modbus扫描"), wrapper(m_modbusScanWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "协议"), QT_TRANSLATE_NOOP("MainWindow", "Protobuf查看"), wrapper(m_schemaViewer)},
-
-        // ---- 工具 ----
-        {QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "OTA升级"),    wrapper(m_otaWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "书签"),       wrapper(m_bookmarkWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "校验计算"),   wrapper(m_checksumPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "数据转换"),   wrapper(m_converterPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "时间戳"),     wrapper(m_timestampPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "数据包构建"), wrapper(m_packetBuilderPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "工具"), QT_TRANSLATE_NOOP("MainWindow", "数据对比"),   wrapper(m_dataDiffPanel)},
-
-        // ---- 调试 ----
-        {QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "RTT配置"),    wrapper(m_rttConfigPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "寄存器编辑"), wrapper(m_registerEditor)},
-        {QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "信号线"),     wrapper(m_signalLineWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "流量监控"),   wrapper(m_trafficMonitorWidget)},
-        {QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "触发器"),     wrapper(m_triggerListPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "调试"), QT_TRANSLATE_NOOP("MainWindow", "性能监控"),   wrapper(m_performanceOverlay)},
-
-        // ---- 系统 ----
-        {QT_TRANSLATE_NOOP("Nav", "系统"), QT_TRANSLATE_NOOP("MainWindow", "插件系统"),   wrapper(m_pluginConfigPanel)},
-        {QT_TRANSLATE_NOOP("Nav", "系统"), QT_TRANSLATE_NOOP("MainWindow", "项目管理"),   wrapper(m_projectWelcomeDialog)},
-        {QT_TRANSLATE_NOOP("Nav", "系统"), QT_TRANSLATE_NOOP("MainWindow", "设备档案"),   wrapper(m_deviceProfilePanel)},
-    };
+    QVector<NavPanelMapping> mappings;
+    mappings.reserve(descriptors.size());
+    for (const auto& descriptor : descriptors) {
+        if (!descriptor.navVisible || descriptor.navOrder < 0) {
+            continue;
+        }
+        mappings.append({descriptor.groupKey, descriptor.titleKey, panelWidgetForDescriptor(this, descriptor)});
+    }
+    return mappings;
 }
 
 /** @brief 获取所有可切换面板列表，用于NavigationController::switchToPanel() */
 QVector<QWidget*> PanelManager::allPanels() const
 {
-    return {
-        wrapper(m_serialConfig), wrapper(m_dataStats),
-        wrapper(m_protocolView), wrapper(m_frameEditor),
-        wrapper(m_chartWidget),  wrapper(m_otaWidget),
-        m_terminal, m_searchBar, m_quickCmdBar,
-        wrapper(m_bookmarkWidget),
-        wrapper(m_playbackWidget),
-        wrapper(m_dashboardWidget),
-        wrapper(m_terminalFilterBar),
-        wrapper(m_scriptRecorder),
-        // 连接层
-        wrapper(m_bleConfigPanel),       wrapper(m_bleGattBrowser),
-        wrapper(m_canConfigPanel),       wrapper(m_canBusMonitor),
-        wrapper(m_mqttConfigPanel),      wrapper(m_mqttSubscriptionPanel),
-        wrapper(m_multiConnectionPanel), wrapper(m_spiI2cConfigPanel),
-        wrapper(m_wsConfigPanel),        wrapper(m_usbConfigPanel),
-        wrapper(m_usbDescriptorViewer),
-        // 协议层
-        wrapper(m_protocolSchemaEditor), wrapper(m_modbusConfigPanel),
-        wrapper(m_modbusScanWidget),     wrapper(m_schemaViewer),
-        // 调试层
-        wrapper(m_rttConfigPanel),       wrapper(m_registerEditor),
-        wrapper(m_signalLineWidget),     wrapper(m_trafficMonitorWidget),
-        wrapper(m_triggerListPanel),
-        // 图表扩展
-        wrapper(m_fftWidget),     wrapper(m_scatterWidget),  wrapper(m_histogramWidget),
-        // 工具层
-        wrapper(m_checksumPanel), wrapper(m_converterPanel),
-        wrapper(m_timestampPanel), wrapper(m_packetBuilderPanel),
-        wrapper(m_dataDiffPanel),
-        // 系统层
-        wrapper(m_pluginConfigPanel),    wrapper(m_projectWelcomeDialog),
-        wrapper(m_deviceProfilePanel),   wrapper(m_performanceOverlay),
-    };
+    auto descriptors = panelDescriptors();
+    std::sort(descriptors.begin(), descriptors.end(), [](const PanelDescriptor& lhs, const PanelDescriptor& rhs) {
+        return lhs.stackOrder < rhs.stackOrder;
+    });
+
+    QVector<QWidget*> panels;
+    panels.reserve(descriptors.size());
+    for (const auto& descriptor : descriptors) {
+        if (!descriptor.includeInPanelStack || descriptor.stackOrder < 0) {
+            continue;
+        }
+        panels.append(panelWidgetForDescriptor(this, descriptor));
+    }
+    return panels;
 }

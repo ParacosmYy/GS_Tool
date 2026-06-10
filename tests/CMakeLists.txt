@@ -43,3 +43,30 @@ endif()
 
 # 注册为CTest测试
 add_test(NAME ProtocolBridges COMMAND test_protocol_bridges)
+
+# ============================================================
+# 面板元数据描述结构测试
+# ============================================================
+
+add_executable(test_panel_descriptor
+    test_panel_descriptor.cpp
+)
+
+target_include_directories(test_panel_descriptor PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_panel_descriptor PRIVATE
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_panel_descriptor PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME PanelDescriptor COMMAND test_panel_descriptor)

@@ -8,7 +8,8 @@
  * 新增面板时必须:
  *   1. 在此文件添加前向声明 + 成员指针
  *   2. 在 PanelManagerCreation.cpp 的 createPanels() 中创建实例
- *   3. 在 PanelManager.cpp 的 getters/mappings/allPanels 中注册
+ *   3. 在 PanelManagerGetters.cpp 中添加 getter
+ *   4. 在 PanelManagerQuery.cpp 的 panelDescriptors() 中登记元数据
  */
 
 #ifndef PANEL_MANAGER_PANELS_H
