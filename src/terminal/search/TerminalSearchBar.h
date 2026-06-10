@@ -39,6 +39,7 @@ public slots:
     void activate();                ///< 激活搜索栏并聚焦输入框，不可见时播放展开动画
     void deactivate();              ///< 关闭搜索栏并清除，播放收起动画
     void setResultText(const QString& text); ///< 设置匹配结果显示文本（如 "3/15"）
+    void setMatchResult(int total, int current); ///< 设置匹配统计显示（0命中时给出明确反馈）
     void updateSearchHistory(const QStringList& history); ///< 更新搜索历史补全列表
 
 signals:
@@ -47,8 +48,12 @@ signals:
     void searchCleared(); ///< 搜索清除信号（搜索框为空时发射）
     void closed();        ///< 搜索栏关闭信号（收起动画完成后发射）
 
+protected:
+    bool eventFilter(QObject* obj, QEvent* event) override; ///< 处理搜索输入框Esc关闭
+
 private slots:
     void onSearchTextChanged(const QString& text); ///< 搜索文本变化时触发搜索或清除
+    void refreshSearchFromControls(); ///< 搜索选项变化时按当前输入重新校验并触发搜索
     void onCloseClicked(); ///< 关闭按钮点击，委托给deactivate()
 
 private:

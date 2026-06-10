@@ -131,6 +131,7 @@ void TerminalWidget::clear()
     m_cachedLineCount = 0;
     m_directionFilter->reset();
     m_selectionManager->reset();
+    m_searchManager->clearSearchHighlight();
     m_scrollOffset = 0;          // 防御性重置：防止未来调用模式变更导致滚动位置残留
     m_maxScrollOffset = 0;       // 同步重置最大滚动偏移
     // 同步清空底层数据模型，防止缓存清空后下次paintEvent从模型重建导致旧数据闪现(P2-01)

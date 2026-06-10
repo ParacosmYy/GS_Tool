@@ -19,6 +19,7 @@
 #include <QKeyEvent>
 #include <QPropertyAnimation>
 #include <QCompleter>
+#include <QSignalBlocker>
 #include <QStringListModel>
 
 /** @brief 构造函数 - 初始化界面(含搜索历史补全器)并隐藏搜索栏(Ctrl+F激活) @param parent 父控件 */
@@ -57,6 +58,7 @@ void TerminalSearchBar::setupUI()
     m_searchInput->setPlaceholderText(tr("搜索... (支持正则表达式)"));
     m_searchInput->setMinimumWidth(Layout::kSearchInputMinWidth);
     m_searchInput->setClearButtonEnabled(true);
+    m_searchInput->installEventFilter(this);
     layout->addWidget(m_searchInput);
 
     // 搜索历史补全器: 大小写不敏感，弹出列表最多10条
@@ -118,33 +120,57 @@ void TerminalSearchBar::setupUI()
             this, &TerminalSearchBar::onSearchTextChanged);
 
     // 正则/HEX/大小写/全词复选框变化时重新触发搜索
-    auto retrigger = [this]() { triggerSearch(); };
-    connect(m_regexCheck, &QCheckBox::toggled, this, retrigger);
-    connect(m_hexCheck, &QCheckBox::toggled, this, retrigger);
+    auto retrigger = [this]() { refreshSearchFromControls(); };
     connect(m_caseCheck, &QCheckBox::toggled, this, retrigger);
     connect(m_wordCheck, &QCheckBox::toggled, this, retrigger);
 
-    // HEX模式与全词/大小写互斥: HEX启用时禁用全词和大小写
+    // HEX模式与正则/全词/大小写互斥: 先修正控件状态, 再按最终模式刷新搜索
     connect(m_hexCheck, &QCheckBox::toggled, this, [this](bool checked) {
         m_caseCheck->setEnabled(!checked);
         m_wordCheck->setEnabled(!checked);
         if (checked) {
+            const QSignalBlocker regexBlocker(m_regexCheck);
+            const QSignalBlocker caseBlocker(m_caseCheck);
+            const QSignalBlocker wordBlocker(m_wordCheck);
+            m_regexCheck->setChecked(false);
             m_caseCheck->setChecked(false);
             m_wordCheck->setChecked(false);
+        } else {
+            m_wordCheck->setEnabled(!m_regexCheck->isChecked());
         }
+        refreshSearchFromControls();
     });
 
-    // 正则模式与全词互斥: 正则启用时禁用全词
+    // 正则模式与HEX/全词互斥: 避免同时发出HEX和正则搜索条件
     connect(m_regexCheck, &QCheckBox::toggled, this, [this](bool checked) {
-        m_wordCheck->setEnabled(!checked && !m_hexCheck->isChecked());
         if (checked) {
+            const QSignalBlocker hexBlocker(m_hexCheck);
+            const QSignalBlocker wordBlocker(m_wordCheck);
+            m_hexCheck->setChecked(false);
             m_wordCheck->setChecked(false);
         }
+        m_caseCheck->setEnabled(!m_hexCheck->isChecked());
+        m_wordCheck->setEnabled(!checked && !m_hexCheck->isChecked());
+        refreshSearchFromControls();
     });
 
     // 关闭按钮
     connect(m_closeBtn, &QPushButton::clicked,
             this, &TerminalSearchBar::onCloseClicked);
+}
+
+/** @brief 事件过滤器: 搜索输入框按Esc时关闭搜索栏 */
+bool TerminalSearchBar::eventFilter(QObject* obj, QEvent* event)
+{
+    if (obj == m_searchInput && event->type() == QEvent::KeyPress) {
+        auto* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Escape) {
+            deactivate();
+            return true;
+        }
+    }
+
+    return QWidget::eventFilter(obj, event);
 }
 
 // 搜索操作/历史管理/统计(triggerSearch/onSearchTextChanged/isValidHex/

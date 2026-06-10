@@ -81,6 +81,9 @@ private slots:
     void onApplyClicked();
 
 private:
+    void setPatternError(const QString &message);
+    void clearPatternError();
+
     QLineEdit *m_patternEdit;       ///< 正则表达式输入框
     QComboBox *m_historyCombo;      ///< 过滤历史下拉框
     QCheckBox *m_caseCheck;         ///< 大小写敏感复选框

@@ -85,6 +85,12 @@ void TerminalSearchBar::onSearchTextChanged(const QString& text)
     triggerSearch();
 }
 
+/** @brief 搜索选项变化时复用当前输入文本的校验路径 */
+void TerminalSearchBar::refreshSearchFromControls()
+{
+    onSearchTextChanged(m_searchInput->text());
+}
+
 /** @brief 验证HEX输入是否合法(委托给HexConverter::isValidHex) @param text 待验证的字符串 @return true合法 */
 bool TerminalSearchBar::isValidHex(const QString& text) const
 {
@@ -95,6 +101,22 @@ bool TerminalSearchBar::isValidHex(const QString& text) const
 void TerminalSearchBar::setResultText(const QString& text)
 {
     m_resultLabel->setText(text);
+}
+
+/** @brief 根据匹配总数和当前位置更新结果标签 */
+void TerminalSearchBar::setMatchResult(int total, int current)
+{
+    if (m_searchInput->text().isEmpty()) {
+        m_resultLabel->clear();
+        return;
+    }
+
+    if (total <= 0) {
+        m_resultLabel->setText(tr("未找到"));
+        return;
+    }
+
+    m_resultLabel->setText(tr("%1/%2").arg(current + 1).arg(total));
 }
 
 /**
