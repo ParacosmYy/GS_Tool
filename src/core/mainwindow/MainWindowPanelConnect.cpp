@@ -88,10 +88,7 @@ void MainWindow::connectSearchAndProtocolSignals()
 
     // 搜索匹配结果 -> 搜索栏显示匹配计数
     connect(m_panelManager->terminal(), &TerminalWidget::searchMatchesChanged,
-            this, [this](int total, int current) {
-                m_panelManager->searchBar()->setResultText(total == 0 ? QString() :
-                    tr("%1/%2").arg(current + 1).arg(total));
-            });
+            m_panelManager->searchBar(), &TerminalSearchBar::setMatchResult);
 
     // 搜索历史变化 -> 搜索栏更新补全列表
     connect(m_panelManager->terminal()->searchManager(),

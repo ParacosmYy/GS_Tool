@@ -11,6 +11,7 @@
  */
 
 #include "core/mainwindow/MainWindow.h"
+#include "core/mainwindow/MainWindowLayoutState.h"
 #include "shared/AppConstants.h"
 
 /** @brief 注册全局快捷键管理器，包含搜索/命令面板/录制/清屏/发送/保存/工程/连接/关闭快捷键 @param shortcutManager 快捷键管理器实例 @param commandPalette 命令面板实例 */
@@ -19,7 +20,7 @@ void MainWindow::registerShortcuts()
     m_shortcutManager = &ShortcutManager::instance();
     m_shortcutManager->registerShortcut(
         "search.find", QKeySequence("Ctrl+F"),
-        this, [this]() { m_panelManager->searchBar()->activate(); },
+        this, [this]() { openTerminalSearch(); },
         tr("搜索"), ShortcutContext::Global);
     m_shortcutManager->registerShortcut(
         "nav.commandPalette", QKeySequence("Ctrl+P"),
@@ -68,6 +69,18 @@ void MainWindow::registerShortcuts()
     }
 }
 
+/** @brief 打开终端搜索，确保从任意面板触发时都回到终端上下文 */
+void MainWindow::openTerminalSearch()
+{
+    if (m_navController && m_panelManager && m_panelManager->terminal()) {
+        m_navController->switchToPanel(m_panelManager->terminal());
+    }
+
+    if (m_panelManager && m_panelManager->searchBar()) {
+        m_panelManager->searchBar()->activate();
+    }
+}
+
 /** @brief 初始化响应式布局，监听窗口宽度变化自动切换断点(移动端/平板/桌面/宽屏) */
 void MainWindow::setupResponsiveLayout()
 {
@@ -84,19 +97,19 @@ void MainWindow::setupResponsiveLayout()
             statusBar()->showMessage(tr("已切换到平板布局"), 2000);
             m_panelManager->setCompactMode(false);
         } else if (bp == ResponsiveLayout::Breakpoint::Desktop) {
-            if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
+            if (m_mainSplitter && navTreeIsCollapsedInSplitterSizes(m_mainSplitter->sizes(), m_useIconNavBar)) {
                 int navWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
                 if (navWidth <= 0) navWidth = 200;
-                m_mainSplitter->setSizes({navWidth, width() - navWidth});
+                m_mainSplitter->setSizes(restoredNavigationSplitterSizes(navWidth, width(), m_useIconNavBar));
             }
             if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
             statusBar()->showMessage(tr("已切换到桌面布局"), 2000);
             m_panelManager->setCompactMode(false);
         } else if (bp == ResponsiveLayout::Breakpoint::Wide) {
-            if (m_mainSplitter && m_mainSplitter->sizes().at(0) == 0) {
+            if (m_mainSplitter && navTreeIsCollapsedInSplitterSizes(m_mainSplitter->sizes(), m_useIconNavBar)) {
                 int navWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
                 if (navWidth <= 0) navWidth = 240;
-                m_mainSplitter->setSizes({navWidth, width() - navWidth});
+                m_mainSplitter->setSizes(restoredNavigationSplitterSizes(navWidth, width(), m_useIconNavBar));
             }
             if (m_iconNavBar && m_useIconNavBar) { m_iconNavBar->show(); }
             statusBar()->showMessage(tr("已切换到宽屏布局"), 2000);

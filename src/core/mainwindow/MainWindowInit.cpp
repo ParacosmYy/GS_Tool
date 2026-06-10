@@ -25,7 +25,6 @@
 #include "shared/AppConstants.h"
 #include <QVBoxLayout>
 #include <QSplitter>
-#include <QShortcut>
 #include <QKeySequence>
 #include <QDir>
 
@@ -83,25 +82,20 @@ MainWindow::MainWindow(QWidget* parent)
 
     // 填充图标导航栏分类(从面板映射表提取去重分类)
     if (m_useIconNavBar && m_iconNavBar) {
-        QVector<NavCategory> categories;
         const auto& mappings = m_panelManager->panelMappings();
-        QMap<QString, NavCategory> seen;
-        for (const auto& m : mappings) {
-            if (!seen.contains(m.category)) {
-                NavCategory cat;
-                cat.id = QString::fromUtf8(m.category);
-                cat.label = tr(m.category);
-                cat.panelIds.append(QString::fromUtf8(m.name));
-                seen.insert(m.category, cat);
-            } else {
-                seen[m.category].panelIds.append(QString::fromUtf8(m.name));
-            }
-        }
-        categories = seen.values().toVector();
-        m_iconNavBar->setCategories(categories);
+        m_iconNavBar->setCategories(IconNavBar::categoriesFromMappings(mappings));
         connect(m_iconNavBar, &IconNavBar::categoryClicked, this,
                 [this](const QString& id) {
-            Q_UNUSED(id);
+            if (auto* panel = m_navController->nextPanelInCategory(id)) {
+                m_navController->switchToPanel(panel);
+            }
+        });
+        connect(m_navController, &NavigationController::currentPanelChanged, this,
+                [this](QWidget* panel) {
+            const QString category = m_navController->categoryForPanel(panel);
+            if (!category.isEmpty()) {
+                m_iconNavBar->setActiveCategory(category);
+            }
         });
     }
 
@@ -114,12 +108,60 @@ MainWindow::MainWindow(QWidget* parent)
         QVector<CommandEntry> cmds;
         for (const auto& m : m_panelManager->panelMappings()) {
             CommandEntry e;
-            e.id = "nav." + QString(m.name);
+            e.id = "nav." + QString::fromUtf8(m.id);
             e.category = tr("导航");
             e.label = tr(m.name);
             e.action = [this, m]() { m_navController->switchToPanel(m.widget); };
             cmds.append(e);
         }
+        cmds.append({
+            "search.find",
+            tr("操作"),
+            tr("打开终端搜索"),
+            QStringLiteral("Ctrl+F"),
+            [this]() { openTerminalSearch(); },
+        });
+        cmds.append({
+            "terminal.clear",
+            tr("操作"),
+            tr("清空终端"),
+            QStringLiteral("Ctrl+L"),
+            [this]() { m_terminalController->onClearTerminal(); },
+        });
+        cmds.append({
+            "connection.new",
+            tr("操作"),
+            tr("新建连接"),
+            QStringLiteral("Ctrl+N"),
+            [this]() { openQuickConnectionDialog(); },
+        });
+        cmds.append({
+            "project.save",
+            tr("操作"),
+            tr("保存工程"),
+            QStringLiteral("Ctrl+S"),
+            [this]() {
+                if (m_sessionManager) {
+                    m_sessionManager->saveSession();
+                }
+            },
+        });
+        cmds.append({
+            "script.recordToggle",
+            tr("操作"),
+            tr("切换脚本录制"),
+            QStringLiteral("Ctrl+Shift+R"),
+            [this]() {
+                if (!m_scriptRecorder) {
+                    return;
+                }
+                if (m_scriptRecorder->isRecording()) {
+                    m_scriptRecorder->stopRecording();
+                } else {
+                    m_scriptRecorder->startRecording();
+                }
+            },
+        });
         m_commandPalette->registerCommands(cmds);
     }
 

@@ -8,12 +8,11 @@
  */
 
 #include "core/mainwindow/MainWindow.h"
+#include "core/mainwindow/MainWindowLayoutState.h"
 #include "shared/LayoutConstants.h"
 
 #include <QVBoxLayout>
 #include <QSplitter>
-#include <QShortcut>
-#include <QKeySequence>
 
 /** @brief 构建完整的UI布局（背景层→分割器→导航树→面板栈→发送栏） */
 void MainWindow::setupUI()
@@ -46,27 +45,20 @@ void MainWindow::setupUI()
 
     bgLayout->addWidget(m_mainSplitter, 1);
 
-    // Ctrl+F 快捷键激活搜索栏
-    auto* searchShortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
-    connect(searchShortcut, &QShortcut::activated, m_panelManager->searchBar(), &TerminalSearchBar::activate);
-
     // 导航树宽度持久化: 分割器拖动后自动保存
     connect(m_mainSplitter, &QSplitter::splitterMoved,
             this, [this]() {
         auto sizes = m_mainSplitter->sizes();
-        if (!sizes.isEmpty() && sizes.at(0) > 0) {
-            SettingsManager::instance().set("layout/navTreeWidth", sizes.at(0));
+        const int navTreeWidth = savedNavTreeWidthFromSplitterSizes(sizes, m_useIconNavBar);
+        if (navTreeWidth > 0) {
+            SettingsManager::instance().set("layout/navTreeWidth", navTreeWidth);
         }
     });
 
     // 恢复上次的导航树宽度（在buildNavTree之后，导航树已有模型）
     int savedNavWidth = SettingsManager::instance().get("layout/navTreeWidth").toInt();
     if (savedNavWidth > 0 && m_mainSplitter) {
-        if (m_useIconNavBar) {
-            m_mainSplitter->setSizes({56, savedNavWidth, width() - savedNavWidth - 56});
-        } else {
-            m_mainSplitter->setSizes({savedNavWidth, width() - savedNavWidth});
-        }
+        m_mainSplitter->setSizes(restoredNavigationSplitterSizes(savedNavWidth, width(), m_useIconNavBar));
     }
 }
 

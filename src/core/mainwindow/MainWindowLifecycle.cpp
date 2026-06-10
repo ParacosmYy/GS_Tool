@@ -14,6 +14,7 @@
  */
 
 #include "core/mainwindow/MainWindow.h"
+#include "core/mainwindow/MainWindowLayoutState.h"
 #include "serial/commands/TimedSender.h"
 #include <QCloseEvent>
 
@@ -124,8 +125,9 @@ void MainWindow::closeEvent(QCloseEvent* event)
     // 保存导航树宽度(Compact模式时保存上次展开宽度)
     if (m_mainSplitter) {
         auto sizes = m_mainSplitter->sizes();
-        if (sizes.size() > 0 && sizes.at(0) > 0) {
-            SettingsManager::instance().set("layout/navTreeWidth", sizes.at(0));
+        const int navTreeWidth = savedNavTreeWidthFromSplitterSizes(sizes, m_useIconNavBar);
+        if (navTreeWidth > 0) {
+            SettingsManager::instance().set("layout/navTreeWidth", navTreeWidth);
         }
     }
 
