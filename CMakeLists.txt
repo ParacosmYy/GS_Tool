@@ -35,6 +35,7 @@ set(SOURCES
     src/core/mainwindow/MainWindow.cpp
     src/core/mainwindow/MainWindowInit.cpp
     src/core/mainwindow/MainWindowConnectionEntry.cpp
+    src/core/mainwindow/MainWindowLayoutState.cpp
     src/core/mainwindow/MainWindowSetupUI.cpp
     src/core/mainwindow/MainWindowSignalConnect.cpp
     src/core/mainwindow/MainWindowSignalConnectUI.cpp
@@ -3273,6 +3274,14 @@ set(SOURCES
     src/utils/matrix279/EigenVectorSolver8.cpp
     src/utils/signal277/Periodogram8.cpp
     src/utils/tree276/AvlTree10.cpp
+    src/utils/cluster274/BirchClustering14.cpp
+    src/utils/code275/StraddlingCheckerboard7.cpp
+    src/utils/dsp276/MultibandGate7.cpp
+    src/utils/fft277/Goertzel11.cpp
+    src/utils/graph290/DominatingSet11.cpp
+    src/utils/matrix280/SchurDecomposition11.cpp
+    src/utils/signal278/WindowFunction7.cpp
+    src/utils/tree277/BPlusTree13.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6400,6 +6409,14 @@ set(HEADERS
     src/utils/matrix279/EigenVectorSolver8.h
     src/utils/signal277/Periodogram8.h
     src/utils/tree276/AvlTree10.h
+    src/utils/cluster274/BirchClustering14.h
+    src/utils/code275/StraddlingCheckerboard7.h
+    src/utils/dsp276/MultibandGate7.h
+    src/utils/fft277/Goertzel11.h
+    src/utils/graph290/DominatingSet11.h
+    src/utils/matrix280/SchurDecomposition11.h
+    src/utils/signal278/WindowFunction7.h
+    src/utils/tree277/BPlusTree13.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
