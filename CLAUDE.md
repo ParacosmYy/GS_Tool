@@ -18,6 +18,7 @@
 | Git + Commit规则 | [docs/constraints/06-git-commit.md](docs/constraints/06-git-commit.md) | 每次提交 |
 | 目录结构 | [docs/constraints/07-directory-structure.md](docs/constraints/07-directory-structure.md) | 涉及文件创建/移动 |
 | 图标标准 | [docs/constraints/08-icon-standard.md](docs/constraints/08-icon-standard.md) | 涉及图标/SVG使用 |
+| Serial Station架构 | [docs/serial_station_architecture.md](docs/serial_station_architecture.md) | 涉及串口上位机重构/新增协议 |
 
 ---
 
@@ -26,11 +27,12 @@
 ### 工作流铁律
 1. **禁止不经PRD直接写代码** — 每个功能必须有PRD
 2. **禁止不经架构审查直接加新类** — 新类必须通过检查清单
-3. **每次commit ≥ 300行代码变更** — 不足300行不允许commit
+3. **每次 commit 必须为一次完整代码增量，代码变更量≥500行** — 不足500行不允许代码 commit（不计文档/空白/注释）。
 4. **零编译错误才能commit** — 编译不过必须先修
-5. **每次commit后必须验证 EmbedDebug.bat 能正常启动**
+5. **`EmbedDebug.bat` 双击能启动是最低验收线** — 每次 commit 后必须验证；任何影响构建、启动、入口、资源、依赖、路径的改动，收口前也必须验证或说明无法验证的具体原因
 5.5. **禁止提交构建系统(CMakeLists.txt)中不存在的源文件** — 所有 .h/.cpp 必须先在 CMakeLists.txt 注册才能提交。禁止"查无产生"死代码刷分
 5.6. **禁止提交build产物** — 严禁将编译中间文件(.o/.obj)、生成文件(moc_*/ui_*/qrc_*)、构建目录(build/)、二进制产物(.exe/.dll/.a/.so)等作为commit内容提交。仅允许提交源码(.h/.cpp/.qss/.qrc/.ui/.cmake/CMakeLists.txt等)和项目配置文件。build产物充数一律回退
+5.7. **构建目录永远只允许 `build/` 一个** — 禁止创建、引用、兼容 `build2/`、`build-debug/`、`build-release/` 等平行构建目录；`EmbedDebug.bat` 只能从 `build/EmbedDebug.exe` 启动
 
 ### 架构铁律
 6. **分层单向依赖**: 表现层→业务层→数据层→基础设施层，**禁止反向**
@@ -38,6 +40,7 @@
 8. **MainWindow.cpp ≤ 500行** — 超过必须拆分
 9. **公共组件只写一次** — CRC/HexConverter/RingBuffer/SettingsManager等已验证组件不得重写
 10. **模块间依赖必须遵循 [03-architecture.md](docs/constraints/03-architecture.md) 的依赖方向规则** — 禁止反向依赖、禁止同层横向依赖、禁止跨层跳级
+10.5. **Serial Station必须遵循 [docs/serial_station_architecture.md](docs/serial_station_architecture.md)** — UI、core、protocols、services、workers 边界必须隔离；core 不依赖具体协议，协议不依赖 UI
 
 ### 编码铁律
 11. **C++17标准** — 头文件引用: Qt→STL→项目，使用相对src路径
@@ -64,7 +67,7 @@
 | 项 | 值 |
 |----|-----|
 | 应用名称 | EmbedDebug |
-| 项目路径 | `E:\Embedded\Tool\Serial_tool\User_Serial` |
+| 项目路径 | `D:\Workplace\Embedded_workplace\User_workplace\GS_Tool` |
 | 当前版本 | 0.1.0 |
 | 评分 | 见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md) |
 | Git分支 | `feat/embed-debug` |

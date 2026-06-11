@@ -2,6 +2,8 @@
 
 > 本文档是 EmbedDebug 约束体系的第8模块。涉及图标使用时必须加载。
 
+> 图标与资源改动不能成为阻断项：若涉及 `resources/`、`app.qrc`、图标打包与启动资源的变更，必须确保项目仍以单一 `build/` 构建路径运行，且 `EmbedDebug.bat` 双击可启动。
+
 ---
 
 ## 一、图标库选型
@@ -48,6 +50,7 @@
 | 命令面板列表项 | 16 | CommandPalette 结果项 |
 | Tab 标签图标 | 16 | 标签页入口 |
 | 空状态图标 | 48 | EmptyStateWidget 中心视觉 |
+| Serial Station 面板图标 | 16 | 串口工站内 port/protocol/log/command/status 面板 |
 
 ### 使用规则
 
@@ -160,6 +163,22 @@
 - 尺寸是否符合使用场景。
 - 着色是否遵循当前主题。
 - 是否已经完成资源注册和缓存接入。
+
+### 8.2 Serial Station 推荐图标
+
+Serial Station 新面板优先复用 Lucide 语义图标，不为单个协议创建风格不一致的新图标。
+
+| 场景 | 推荐逻辑名 | 说明 |
+|------|------------|------|
+| 串口配置 | `cable` | 端口、波特率、打开/关闭 |
+| 协议选择 | `braces` 或 `file-code` | 协议、帧、解析 |
+| 命令发送 | `send` | 指令输入、快捷发送 |
+| 收发日志 | `list` 或 `terminal` | RX/TX 日志 |
+| 状态栏 | `activity` | 会话状态、吞吐量 |
+| 导出 | `download` | 日志/数据导出 |
+| 回放 | `rotate-ccw` 或 `play` | 数据回放 |
+
+如果推荐图标尚未存在于 `resources/icons/lucide/`，按“新增图标流程”添加并注册到 `resources/app.qrc`。
 
 ---
 

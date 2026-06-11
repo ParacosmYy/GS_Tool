@@ -8,6 +8,7 @@
 - `src/interfaces/` - 纯虚接口与契约
 - `src/core/` - 应用协调、基础 UI、导航、主题、会话
 - `src/features/` - 未来功能归属入口，只放骨架和说明
+- `src/apps/serial_station/` - 新串口上位机工站，按 ui/controller/core/protocols/services/workers 分层
 - `src/connection/` - 连接接入实现
 - `src/protocol/` - 协议解析与协议桥
 - `src/terminal/` - 终端显示与搜索
@@ -23,3 +24,4 @@
 1. 新能力优先落入 canonical 目录。
 2. 如果归属不清晰，先在 `src/features/` 放归属说明，再决定是否创建实现目录。
 3. 不新增 `2`、`new`、`old`、`bak` 之类的平行实现目录。
+4. 串口上位机重构、新协议扩展和串口收发框架拆分优先落入 `src/apps/serial_station/`，不要继续向旧 `src/serial/` 功能桶追加耦合逻辑。

@@ -1,11 +1,9 @@
 # Build directories
-build*/
-bld/
-cmake-build-*/
+/build/
 .worktrees/
-x64/
-Debug/
-Release/
+
+# Agent entrypoint must be tracked even if ignored globally.
+!/AGENTS.md
 
 # IDE files
 # 保留项目级 .vscode 配置 (c_cpp_properties.json, settings.json)

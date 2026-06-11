@@ -9,9 +9,10 @@
 ```
 User_Serial/
 ├── CMakeLists.txt                 # CMake 构建配置
+├── AGENTS.md                      # Agent 强制入口（索引+稳定规则）
 ├── CLAUDE.md                      # 约束文档主入口（索引+铁律）
 ├── README.md                      # 项目说明文档
-├── EmbedDebug.bat                 # 双击启动脚本
+├── EmbedDebug.bat                 # 双击启动脚本；最低运行入口，必须保持可用
 ├── embeddebug_settings.json       # 运行时配置
 ├── docs/                          # 文档目录
 │   ├── constraints/               # 约束文档模块
@@ -24,6 +25,10 @@ User_Serial/
 └── tests/                         # 测试
 ```
 
+`EmbedDebug.bat` 是用户侧最低运行入口，不属于可随意替换的临时脚本。任何改变构建输出目录、可执行文件名、Qt 部署路径或启动参数的改动，都必须同步检查并验证该 bat 双击启动链路。
+
+构建目录只能有一个：`build/`。根目录下禁止出现或引用 `build2/`、`build-debug/`、`build-release/`、`cmake-build-*` 等平行构建目录；`EmbedDebug.bat` 也不得为这些目录保留 fallback。
+
 ---
 
 ## 二、src/ 顶层目录
@@ -32,6 +37,7 @@ User_Serial/
 
 | 目录 | 当前状态 | 角色口径 | 说明 |
 |------|----------|----------|------|
+| `apps/` | 规划新增 | 独立工站 app 层 | 新串口工站等可独立演进的工作站模块 |
 | `interfaces/` | 已存在 | 纯虚接口层 | 放 `IConnection`、`IPanelProvider`、`IDataSink` 等契约 |
 | `shared/` | 已存在 | 公共基础层 | 共享常量、枚举、轻量类型的唯一真相路径 |
 | `core/` | 已存在 | 应用协调 + 基础 UI | `MainWindow`、`PanelManager`、`ThemeManager`、导航、基础 Widget |
@@ -72,6 +78,61 @@ User_Serial/
 | `widgets/` | `audio/`, `autocomplete/`, `dialog/`, `diff/`, `freq/`, `palette/`, `recorder/`, `scope/`, `toast/` |
 | `features/` | 迁移骨架目录，默认平铺，后续仅承接归属说明 |
 
+### Serial Station 目标子目录
+
+> 这是 C++/Qt 目标结构，不是 Python 目录。所有生产文件使用 `.h/.cpp`，测试使用 QTest。
+
+```text
+src/apps/serial_station/
+├── SerialStationApp.h/.cpp
+├── SerialStationWindow.h/.cpp
+├── SerialStationController.h/.cpp
+├── SerialStationModels.h
+├── SerialStationConstants.h
+├── SerialStationConfig.h/.cpp
+├── ui/
+│   ├── SerialMainPanel.h/.cpp
+│   ├── SerialPortPanel.h/.cpp
+│   ├── SerialProtocolPanel.h/.cpp
+│   ├── SerialLogPanel.h/.cpp
+│   ├── SerialCommandPanel.h/.cpp
+│   └── SerialStatusBar.h/.cpp
+├── core/
+│   ├── SerialPort.h/.cpp
+│   ├── SerialManager.h/.cpp
+│   ├── SerialSession.h/.cpp
+│   ├── SerialDispatcher.h/.cpp
+│   ├── SerialCodec.h/.cpp
+│   └── SerialError.h
+├── protocols/
+│   ├── ISerialProtocol.h
+│   ├── SerialProtocolRegistry.h/.cpp
+│   ├── SerialProtocolEvent.h
+│   ├── modbus_rtu/
+│   ├── custom_md/
+│   └── ascii_text/
+├── services/
+│   ├── SerialLogService.h/.cpp
+│   ├── SerialExportService.h/.cpp
+│   ├── SerialReplayService.h/.cpp
+│   └── DeviceProfileService.h/.cpp
+└── workers/
+    ├── SerialReaderWorker.h/.cpp
+    └── SerialCommandWorker.h/.cpp
+```
+
+对应测试目录：
+
+```text
+tests/serial_station/
+├── test_serial_manager.cpp
+├── test_serial_dispatcher.cpp
+├── test_serial_protocol_registry.cpp
+├── test_modbus_rtu_protocol.cpp
+├── test_custom_md_protocol.cpp
+└── test_ascii_text_protocol.cpp
+```
+
 ---
 
 ## 四、唯一真相路径与收敛规则
@@ -82,6 +143,7 @@ User_Serial/
 | 旧常量伞头 | `src/core/theme/Constants.h` | 只允许转发旧 include，不允许新增域定义 |
 | 未来功能骨架 | `src/features/` | 仅作为迁移骨架和未来归属说明，不承载现有实现 |
 | 应用协调入口 | `src/core/mainwindow/MainWindow.*` | 只负责初始化、组装 UI、连接信号/槽 |
+| Serial Station 新工站 | `src/apps/serial_station/` | 新串口上位机重构落点，内部按 ui/controller/core/protocols/services/workers 分层 |
 | 面板编排中心 | `src/core/panels/PanelManager.*` | 只负责面板创建、注册、包装、映射和统计 |
 | 基础 UI 组件 | `src/core/widgets/` | 只放可复用壳层，不放功能桶里的业务逻辑 |
 | 主题运行时 | `src/core/theme/ThemeManager.*` | 只管主题切换、QSS 加载和主题状态 |
@@ -104,12 +166,14 @@ User_Serial/
 | `src/interfaces/` | 契约层 | 纯接口、抽象协议、回调类型放这里 |
 | `src/core/` | 应用协调层 | 只保留装配、导航、主题、基础 UI、会话 |
 | `src/features/` | 迁移骨架层 | 只做归属说明、骨架 README、未来功能入口说明 |
+| `src/apps/serial_station/` | 新串口工站层 | 按专项文档落地，不回流到旧 `src/serial/` |
 | `src/connection/` 等现有业务模块 | 业务实现层 | 继续按领域收敛，不再新建平行实现目录 |
 
 新增目录规则:
 - 新功能优先寻找 canonical 目录，不要新建 `2`、`new`、`old`、`backup` 之类平行目录。
 - 如果历史分叉已经存在，只能冻结，不能继续复制。
 - 如果确实需要未来迁移入口，先在 `src/features/` 里放归属说明，再讨论是否新增具体目录。
+- 如果是串口上位机重构或新增串口业务协议，优先进入 `src/apps/serial_station/`，不要继续扩张旧 `src/serial/` 和 `src/protocol/` 的耦合点。
 
 ### 四-B、冻结目录
 

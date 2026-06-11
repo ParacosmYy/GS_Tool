@@ -7,6 +7,7 @@
 ## 一、语言和风格
 
 - 统一使用 C++17。
+- 任何涉及构建目录、启动脚本、Qt 运行依赖、CMake 配置的改动，必须基于单一 `build/` 路径验证，且保持 `EmbedDebug.bat` 双击可启动。
 - 头文件引用顺序固定为：Qt -> STL -> 项目头文件。
 - 项目内头文件优先使用相对 `src` 根目录的路径，例如 `#include "core/Constants.h"`。
 - Qt 信号/槽必须使用新式 `connect` 语法，禁止 `SIGNAL` / `SLOT` 宏。
@@ -22,6 +23,7 @@
 - 默认情况下，文件名与类名保持一致，采用 PascalCase。
 - 默认情况下，源文件放在职责对应的子目录中，避免把不同层次的实现堆在一起。
 - 如果一个新文件的归属不清楚，先回到 `03-architecture.md` 和 `07-directory-structure.md` 确认 canonical 目录，不要先创建平行分支目录。
+- Serial Station 新文件必须使用 C++ `.h/.cpp` 组织，路径和职责按 `docs/serial_station_architecture.md` 执行，不允许按脚本语言目录样式创建 `.py` 生产文件。
 
 ### 2.2 允许的例外
 
@@ -169,6 +171,17 @@
 | 命名空间 | camelCase | `namespace hexConvert` |
 | 宏 | UPPER_SNAKE_CASE | `EMBEDDEBUG_VERSION` |
 
+### 6.1 Serial Station 命名补充
+
+| 类型 | 规范 | 示例 |
+|------|------|------|
+| 工站入口类 | `SerialStation*` 前缀 | `SerialStationController` |
+| UI 面板类 | `Serial*Panel` 或明确 QWidget 名称 | `SerialPortPanel`, `SerialLogPanel` |
+| core 类 | `Serial*` 前缀，避免和旧模块重名 | `SerialManager`, `SerialDispatcher` |
+| 协议接口 | `ISerialProtocol` | `ISerialProtocol.h` |
+| 具体协议类 | 协议名 + `Protocol/Parser/Command/Frame` | `ModbusRtuProtocol`, `CustomMdParser` |
+| 测试文件 | `test_serial_station_<对象>.cpp` 或 `tests/serial_station/test_<对象>.cpp` | `test_modbus_rtu_protocol.cpp` |
+
 ---
 
 ## 七、头文件规则
@@ -282,6 +295,12 @@ emit errorOccurred(ErrorLevel::Error, tr("串口 %1 打开失败: %2").arg(m_por
 | 在非主线程调用 `setStyleSheet()` | 会触发界面更新 | 回到主线程统一刷新 |
 | 在主线程用 `QThread::sleep()` 阻塞 | 冻结 UI | 使用事件驱动或 worker 线程 |
 
+### 10.4 Serial Station 线程边界
+
+- `SerialReaderWorker` 和 `SerialCommandWorker` 不允许持有 QWidget 指针。
+- 串口读取结果必须通过 Qt signal 交给 `SerialStationController` 或 `SerialDispatcher`，再由主线程更新 UI。
+- 协议 `feed()` 可以维护内部解析缓存，但不得直接启动线程、写文件或触发 UI。
+
 ---
 
 ## 十一、单元测试标准
@@ -294,6 +313,10 @@ tests/
 ├── test_hexconverter.cpp
 ├── test_ringbuffer.cpp
 ├── test_frameparser.cpp
+├── serial_station/
+│   ├── test_serial_manager.cpp
+│   ├── test_serial_dispatcher.cpp
+│   └── test_modbus_rtu_protocol.cpp
 └── test_<模块名>_<功能>.cpp
 ```
 
@@ -315,6 +338,8 @@ tests/
 |---------|-----------|---------|
 | utils/ | ≥ 80% | CRC、HexConverter、RingBuffer |
 | protocol/ | ≥ 70% | FrameParser、ModbusEngine |
+| apps/serial_station/protocols/ | ≥ 80% | buildCommand、feed、半包/粘包、异常校验 |
+| apps/serial_station/core/ | ≥ 70% | SerialManager、SerialDispatcher、SerialCodec |
 | connection/ | ≥ 50% | IConnection 接口、SerialConnection |
 | UI 层 | ≥ 30% | 关键交互逻辑 |
 

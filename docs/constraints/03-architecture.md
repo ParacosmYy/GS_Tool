@@ -2,6 +2,8 @@
 
 > 本文档是 EmbedDebug 约束体系的第3模块。涉及架构/新增类时必须加载。
 
+> 构建与启动边界：项目只允许单一构建目录 `build/`；涉及 `EmbedDebug.bat`、启动路径、Qt 运行依赖、CMake 与构建目录变更的架构决策，必须收口前验证 `EmbedDebug.bat` 双击启动。
+
 ---
 
 ## 一、设计模式要求
@@ -33,6 +35,7 @@
 | L3 | `src/connection/`、`src/protocol/`、`src/serial/` | 外设接入、协议解析、串口相关功能 | L2, L1, L0 |
 | L4 | `src/terminal/`、`src/chart/`、`src/rtt/` | 终端显示、图表展示、RTT 接入等面向数据呈现的模块 | L3, L2, L1, L0 |
 | L5 | `src/ota/`、`src/automation/`、`src/dashboard/`、`src/plugin/` | 面向场景的业务编排、扩展和自动化 | L4, L3, L2, L1, L0 |
+| L5-A | `src/apps/serial_station/` | 新串口工站 app，内部按 ui/controller/core/protocols/services/workers 分层 | L3, L2, L1, L0；内部规则见 `docs/serial_station_architecture.md` |
 | L6 | `src/core/` | 应用协调、基础 UI、面板编排、导航、会话、主题运行时 | 可依赖全部下层，不得被下层依赖 |
 
 ### 2.2 依赖矩阵
@@ -63,6 +66,7 @@ L0 interfaces/  →  无
 | 旧常量伞头 | `src/core/theme/Constants.h` | 仅兼容旧 include，不再新增域定义 |
 | 未来功能骨架 | `src/features/` | 仅作为未来迁移的归属说明和骨架入口，不承载现有业务实现 |
 | 应用协调入口 | `src/core/mainwindow/MainWindow.*` | 顶层窗口组装与生命周期协调 |
+| Serial Station 新工站 | `src/apps/serial_station/` | 串口上位机重构目标，不回流到旧 `src/serial/` 功能桶 |
 | 面板编排 | `src/core/panels/PanelManager.*` | 面板创建、注册、包装、映射、切换统计 |
 | 基础 UI 组件 | `src/core/widgets/` | BasePanel、EmptyStateWidget、LoadingSpinner 等复用壳层 |
 | 导航与切换 | `src/core/navigation/` | 导航树、指示器、切换动画、路由控制 |
@@ -75,6 +79,28 @@ L0 interfaces/  →  无
 - `PanelManager` 和 `MainWindow` 只能做编排，不能回流业务计算、解析、IO、缓存和协议分发逻辑。
 - 任何新公共能力先判断是否属于 `shared/`，只有真正需要运行时行为的内容才进入 `core/`。
 - 历史分叉目录只允许冻结，不允许再向外扩张；新增实现优先进入 canonical 路径，不要再造平行目录。
+- 新串口上位机能力优先进入 `src/apps/serial_station/`，不要继续把协议、收发、日志和 UI 混写进旧 `src/serial/` 或 `MainWindow`。
+
+### 2.5-C Serial Station 内部边界
+
+`src/apps/serial_station/` 是一个 C++/Qt app 模块，内部依赖方向固定为：
+
+```text
+ui/ -> SerialStationController -> core/ + protocols/ + services/
+workers/ -> core/，结果通过 Qt signal 回 controller
+core/ -> protocols/ISerialProtocol + SerialProtocolRegistry，不依赖具体协议目录
+protocols/<name>/ -> protocols/ISerialProtocol + shared/utils，不依赖 ui/core/services
+services/ -> shared/utils，不直接操作 QWidget 或串口线程
+```
+
+硬性规则：
+
+- UI 面板只发 signal，不直接调用 `SerialManager` 或具体协议对象。
+- `core/` 只处理 `QByteArray`、会话状态、线程和分发，不理解 Modbus/custom/ascii 的业务语义。
+- 具体协议只能通过 `ISerialProtocol` 和 registry 进入运行时。
+- 协议目录不能 include QWidget、`SerialStationWindow`、`SerialStationController`。
+- 日志、导出、回放属于 `services/`，不能散落在 UI 槽函数或协议 parser 中。
+- 更完整规则以 `docs/serial_station_architecture.md` 为准。
 
 ### 2.5-A 迁移骨架
 
@@ -86,6 +112,7 @@ L0 interfaces/  →  无
 | `src/interfaces/` | 契约层 | 纯虚接口、回调协议、跨模块抽象 |
 | `src/core/` | 应用协调层 | 顶层装配、导航、主题、基础 UI、会话 |
 | `src/features/` | 未来功能承接层 | 仅写归属说明和迁移骨架，不直接堆实现 |
+| `src/apps/serial_station/` | 新串口工站 | C++/Qt 串口上位机重构落点，内部强制分层 |
 | `src/connection/` 等现有业务模块 | 业务模块层 | 继续按领域收敛，不再回流到 core |
 
 ### 2.5-B 冻结目录

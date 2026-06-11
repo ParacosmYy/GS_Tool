@@ -7,6 +7,7 @@
 ## 一、设计目标
 
 - UI 不是“看起来现代”就算完成，而是要让状态、层级、可操作性一眼可检查。
+- 涉及构建目录、启动路径、构建脚本变更相关的 UI 工程改造，必须保证 `EmbedDebug.bat` 双击可运行，并且项目只保留 `build/` 单一路径。
 - 任何新界面都应能回答三个问题：当前是什么状态、用户能做什么、下一步会发生什么。
 - 风格允许演进，但语义 token、状态命名和组件职责必须稳定。
 
@@ -157,6 +158,7 @@
 - 一个组件只解决一类问题，不允许“既负责布局、又负责状态、又负责业务处理”。
 - 重复职责实现必须收敛到公共组件，不能在多个页面里复制粘贴一份近似逻辑。
 - 如果两个控件的代码只有命名不同、行为几乎相同，应优先抽象共享基类或共享 helper。
+- Serial Station 的 `ui/` 面板只负责显示和发出用户意图 signal，不允许拼接 `QByteArray` 协议帧、不允许解析协议、不允许直接写日志文件。
 
 ### 7.2 按钮体系
 
@@ -286,6 +288,18 @@
 - 新增 UI 能力优先复用 `src/core/widgets/` 的公共壳层，不要在业务模块里重复写一份相似 UI。
 - 未来 UI 能力如果暂时没有明确归属，先在 `src/features/` 或对应架构说明里写清落点，再决定是否创建实现目录。
 - 新 UI 文件必须先确认 `objectName`、token、状态名和动画归属，再开始编码。
+- Serial Station 专用 UI 放在 `src/apps/serial_station/ui/`，命名为 `SerialPortPanel`、`SerialProtocolPanel`、`SerialCommandPanel`、`SerialLogPanel`、`SerialStatusBar` 等。
+- Serial Station UI 只连接 `SerialStationController` 暴露的 slot/signal，不直接 include `core/SerialManager.h` 或具体协议头文件。
+
+### 13-A Serial Station UI 面板边界
+
+| 面板 | 允许职责 | 禁止职责 |
+|------|----------|----------|
+| `SerialPortPanel` | 串口号、波特率、打开/关闭按钮、连接状态输入 | 直接调用 `QSerialPort` 或 `SerialManager` |
+| `SerialProtocolPanel` | 协议选择、设备地址、模式配置 | include 具体协议实现或解析 bytes |
+| `SerialCommandPanel` | 指令输入、快捷命令按钮、发送意图 signal | 拼 Modbus/custom 帧 |
+| `SerialLogPanel` | 收发日志展示、过滤、清空、导出按钮 | 直接写文件 |
+| `SerialStatusBar` | 当前会话摘要、吞吐量、错误状态 | 处理业务状态机 |
 
 ---
 
