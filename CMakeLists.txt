@@ -3474,6 +3474,14 @@ set(SOURCES
     src/utils/matrix303/TridiagonalSolver9.cpp
     src/utils/signal301/PitchDetector11.cpp
     src/utils/tree300/BTree11.cpp
+    src/utils/cluster298/DBSCAN18.cpp
+    src/utils/code299/BazeleriesCode8.cpp
+    src/utils/dsp300/MultibandCompressor11.cpp
+    src/utils/fft301/NumberTheoreticTransform9.cpp
+    src/utils/graph314/GraphColoring13.cpp
+    src/utils/matrix304/SVD11.cpp
+    src/utils/signal302/AdaptiveFilter11.cpp
+    src/utils/tree301/Rope13.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6801,6 +6809,14 @@ set(HEADERS
     src/utils/matrix303/TridiagonalSolver9.h
     src/utils/signal301/PitchDetector11.h
     src/utils/tree300/BTree11.h
+    src/utils/cluster298/DBSCAN18.h
+    src/utils/code299/BazeleriesCode8.h
+    src/utils/dsp300/MultibandCompressor11.h
+    src/utils/fft301/NumberTheoreticTransform9.h
+    src/utils/graph314/GraphColoring13.h
+    src/utils/matrix304/SVD11.h
+    src/utils/signal302/AdaptiveFilter11.h
+    src/utils/tree301/Rope13.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
