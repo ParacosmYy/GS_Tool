@@ -3378,6 +3378,14 @@ set(SOURCES
     src/utils/matrix291/GMRES9.cpp
     src/utils/signal289/EnvelopeDetector10.cpp
     src/utils/tree288/Treap16.cpp
+    src/utils/cluster286/KMeans31.cpp
+    src/utils/code287/FoursquareCode14.cpp
+    src/utils/dsp288/Deesser10.cpp
+    src/utils/fft289/MixedRadixFFT11.cpp
+    src/utils/graph302/ChinesePostman14.cpp
+    src/utils/matrix292/BiCGSTAB15.cpp
+    src/utils/signal290/WaveletDenoiser18.cpp
+    src/utils/tree289/AA11.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6609,6 +6617,14 @@ set(HEADERS
     src/utils/matrix291/GMRES9.h
     src/utils/signal289/EnvelopeDetector10.h
     src/utils/tree288/Treap16.h
+    src/utils/cluster286/KMeans31.h
+    src/utils/code287/FoursquareCode14.h
+    src/utils/dsp288/Deesser10.h
+    src/utils/fft289/MixedRadixFFT11.h
+    src/utils/graph302/ChinesePostman14.h
+    src/utils/matrix292/BiCGSTAB15.h
+    src/utils/signal290/WaveletDenoiser18.h
+    src/utils/tree289/AA11.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
