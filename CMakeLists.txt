@@ -50,6 +50,9 @@ set(SOURCES
     src/core/connect/ConnectionControllerHandlers.cpp
     src/core/connect/ConnectionControllerTeardown.cpp
     src/core/connect/ConnectionPresetBuilder.cpp
+    src/core/connect/QuickConnectionCatalog.cpp
+    src/core/connect/QuickConnectionValidation.cpp
+    src/core/connect/SerialConnectionParams.cpp
     src/core/recording/RecordingController.cpp
     src/core/recording/RecordingControllerStats.cpp
     src/core/recording/DataStreamRecorder.cpp
@@ -3351,6 +3354,14 @@ set(SOURCES
     src/utils/matrix288/GMRES8.cpp
     src/utils/signal286/EnvelopeDetector9.cpp
     src/utils/tree285/Treap15.cpp
+    src/utils/cluster283/KMeans30.cpp
+    src/utils/code284/RouteCipher7.cpp
+    src/utils/dsp285/Compressor9.cpp
+    src/utils/fft286/SlidingDFT11.cpp
+    src/utils/graph299/VertexCover11.cpp
+    src/utils/matrix289/TridiagonalSolver8.cpp
+    src/utils/signal287/PitchDetector10.cpp
+    src/utils/tree286/BTree10.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -3440,6 +3451,9 @@ set(HEADERS
     src/core/mainwindow/MainWindow.h
     src/core/connect/ConnectionController.h
     src/core/connect/ConnectionPresetBuilder.h
+    src/core/connect/QuickConnectionCatalog.h
+    src/core/connect/QuickConnectionValidation.h
+    src/core/connect/SerialConnectionParams.h
 
     src/core/widgets/AnimatedButton.h
     src/core/recording/RecordingController.h
@@ -6555,6 +6569,14 @@ set(HEADERS
     src/utils/matrix288/GMRES8.h
     src/utils/signal286/EnvelopeDetector9.h
     src/utils/tree285/Treap15.h
+    src/utils/cluster283/KMeans30.h
+    src/utils/code284/RouteCipher7.h
+    src/utils/dsp285/Compressor9.h
+    src/utils/fft286/SlidingDFT11.h
+    src/utils/graph299/VertexCover11.h
+    src/utils/matrix289/TridiagonalSolver8.h
+    src/utils/signal287/PitchDetector10.h
+    src/utils/tree286/BTree10.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
