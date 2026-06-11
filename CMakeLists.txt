@@ -3450,6 +3450,14 @@ set(SOURCES
     src/utils/matrix300/IterativeRefinement8.cpp
     src/utils/signal298/FeatureExtractor9.cpp
     src/utils/tree297/CartesianTree13.cpp
+    src/utils/cluster295/OPTICS14.cpp
+    src/utils/code296/DigrafidCode8.cpp
+    src/utils/dsp297/Reverb10.cpp
+    src/utils/fft298/DistributedArithmetic12.cpp
+    src/utils/graph311/MaximumClique9.cpp
+    src/utils/matrix301/GaussSeidel9.cpp
+    src/utils/signal299/SignalGenerator10.cpp
+    src/utils/tree298/WeightBalancedTree12.cpp
 
     # ── Wave 50: New Feature Modules (Sources) ──
     src/protocol/svd/SvdParser.cpp
@@ -6753,6 +6761,14 @@ set(HEADERS
     src/utils/matrix300/IterativeRefinement8.h
     src/utils/signal298/FeatureExtractor9.h
     src/utils/tree297/CartesianTree13.h
+    src/utils/cluster295/OPTICS14.h
+    src/utils/code296/DigrafidCode8.h
+    src/utils/dsp297/Reverb10.h
+    src/utils/fft298/DistributedArithmetic12.h
+    src/utils/graph311/MaximumClique9.h
+    src/utils/matrix301/GaussSeidel9.h
+    src/utils/signal299/SignalGenerator10.h
+    src/utils/tree298/WeightBalancedTree12.h
 
     # ── Wave 50: New Feature Modules (Headers) ──
     src/protocol/svd/SvdTypes.h
