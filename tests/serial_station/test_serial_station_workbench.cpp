@@ -62,8 +62,9 @@ void SerialStationWorkbenchTest::commandModeComboOnlyShowsSupportedModes()
     }
 
     QVERIFY(modeValues.contains(QStringLiteral("ascii")));
+    QVERIFY(modeValues.contains(QStringLiteral("hex")));
     QVERIFY(modeValues.contains(QStringLiteral("protocol")));
-    QVERIFY(!modeValues.contains(QStringLiteral("hex")));
+    QCOMPARE(modeValues.count(QStringLiteral("hex")), 1);
 }
 
 void SerialStationWorkbenchTest::commandSendReportsControllerErrorWhenClosed()

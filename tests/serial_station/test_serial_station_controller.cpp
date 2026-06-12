@@ -23,6 +23,9 @@ private slots:
     void unsupportedModeFailsBeforeConnectionCheck_data();
     void unsupportedModeFailsBeforeConnectionCheck();
     void closedSerialPortRejectsAsciiSend();
+    void closedSerialPortRejectsHexSend();
+    void invalidHexFailsBeforeConnectionCheck_data();
+    void invalidHexFailsBeforeConnectionCheck();
     void closedSerialPortRejectsProtocolSend();
     void failureSignalsCarryNormalizedPayload();
     void rejectedCommandsDoNotEmitPortError();
@@ -107,10 +110,9 @@ void SerialStationControllerTest::unsupportedModeFailsBeforeConnectionCheck_data
     QTest::addColumn<QString>("mode");
     QTest::addColumn<QString>("normalizedMode");
 
-    QTest::newRow("hex-mode") << QStringLiteral("01 02") << QStringLiteral("hex") << QStringLiteral("hex");
     QTest::newRow("binary-mode") << QStringLiteral("PING") << QStringLiteral("binary") << QStringLiteral("binary");
     QTest::newRow("blank-mode") << QStringLiteral("PING") << QStringLiteral(" ") << QString();
-    QTest::newRow("mixed-case") << QStringLiteral("PING") << QStringLiteral("Hex") << QStringLiteral("hex");
+    QTest::newRow("raw-mode") << QStringLiteral("PING") << QStringLiteral("Raw") << QStringLiteral("raw");
 }
 
 void SerialStationControllerTest::unsupportedModeFailsBeforeConnectionCheck()
@@ -161,6 +163,62 @@ void SerialStationControllerTest::closedSerialPortRejectsAsciiSend()
     QCOMPARE(args.at(0).toString(), QStringLiteral("AT+GMR"));
     QCOMPARE(args.at(1).toString(), QStringLiteral("ascii"));
     QCOMPARE(args.at(2).toString(), QStringLiteral("串口未连接，无法发送"));
+}
+
+void SerialStationControllerTest::closedSerialPortRejectsHexSend()
+{
+    SerialStationController controller;
+    QSignalSpy failedSpy(&controller, &SerialStationController::serialCommandFailed);
+    QSignalSpy preparedSpy(&controller, &SerialStationController::serialCommandPrepared);
+    QSignalSpy sentSpy(&controller, &SerialStationController::serialCommandSent);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+
+    controller.sendCommand(QStringLiteral(" 01 03 00 00 00 02 "), QStringLiteral(" HEX "));
+
+    QCOMPARE(failedSpy.count(), 1);
+    QCOMPARE(preparedSpy.count(), 0);
+    QCOMPARE(sentSpy.count(), 0);
+    QCOMPARE(errorSpy.count(), 1);
+
+    const QList<QVariant> args = failedSpy.takeFirst();
+    QCOMPARE(args.at(0).toString(), QStringLiteral("01 03 00 00 00 02"));
+    QCOMPARE(args.at(1).toString(), QStringLiteral("hex"));
+    QCOMPARE(args.at(2).toString(), QStringLiteral("串口未连接，无法发送"));
+}
+
+void SerialStationControllerTest::invalidHexFailsBeforeConnectionCheck_data()
+{
+    QTest::addColumn<QString>("command");
+    QTest::addColumn<QString>("message");
+
+    QTest::newRow("odd") << QStringLiteral("0") << QStringLiteral("HEX 字符数量必须为偶数");
+    QTest::newRow("bad-char") << QStringLiteral("01 ZZ") << QStringLiteral("HEX 内容包含非法字符");
+    QTest::newRow("empty-after-prefix") << QStringLiteral("0x") << QStringLiteral("HEX 内容为空");
+}
+
+void SerialStationControllerTest::invalidHexFailsBeforeConnectionCheck()
+{
+    QFETCH(QString, command);
+    QFETCH(QString, message);
+
+    SerialStationController controller;
+    QSignalSpy failedSpy(&controller, &SerialStationController::serialCommandFailed);
+    QSignalSpy preparedSpy(&controller, &SerialStationController::serialCommandPrepared);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.sendCommand(command, QStringLiteral("hex"));
+
+    QCOMPARE(failedSpy.count(), 1);
+    QCOMPARE(preparedSpy.count(), 0);
+    QCOMPARE(errorSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 1);
+
+    const QList<QVariant> args = failedSpy.takeFirst();
+    QCOMPARE(args.at(0).toString(), command.trimmed());
+    QCOMPARE(args.at(1).toString(), QStringLiteral("hex"));
+    QCOMPARE(args.at(2).toString(), message);
+    QVERIFY(systemLogSpy.takeFirst().at(0).toString().contains(message));
 }
 
 void SerialStationControllerTest::closedSerialPortRejectsProtocolSend()

@@ -1012,6 +1012,62 @@ endif()
 add_test(NAME SerialPortPanel COMMAND test_serial_port_panel)
 
 # ============================================================
+# Serial Station命令面板测试
+# ============================================================
+
+add_executable(test_serial_command_panel
+    serial_station/test_serial_command_panel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
+)
+
+target_include_directories(test_serial_command_panel PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_command_panel PRIVATE
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_command_panel PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialCommandPanel COMMAND test_serial_command_panel)
+
+# ============================================================
+# Serial Station发送编码器测试
+# ============================================================
+
+add_executable(test_serial_codec
+    serial_station/test_serial_codec.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+)
+
+target_include_directories(test_serial_codec PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_codec PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_codec PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialCodec COMMAND test_serial_codec)
+
+# ============================================================
 # Serial Station Dispatcher测试
 # ============================================================
 
@@ -1047,6 +1103,7 @@ add_executable(test_serial_station_controller
     serial_station/test_serial_station_controller.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialManager.cpp
@@ -1083,6 +1140,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationWindow.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp

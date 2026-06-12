@@ -169,12 +169,14 @@
 | 465 | Serial Station Dispatcher实现 | 新增core/SerialDispatcher承接bytes到协议feed，controller移除接收协议直持有，补dispatcher/controller/workbench回归 |
 | 466 | Serial Station配置摘要PRD/Specs | 定义UART配置校验、标准化摘要、Controller连接日志和错误路径验收 |
 | 467 | Serial Station配置摘要实现 | SerialPortConfig新增标准化、错误原因和摘要，Controller/SerialManager使用统一配置诊断，补配置和控制器回归 |
+| 468 | Serial Station发送编码器PRD/Specs | 定义core/SerialCodec承接ASCII/HEX/协议发送帧构建，补HEX模式验收 |
+| 469 | Serial Station发送编码器实现 | 新增SerialCodec复用HexConverter，Controller接入统一编码结果，命令面板开放HEX模式并补codec/command/controller/workbench回归 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#467` 的完整记录
+- 当前文档已整理到 `#469` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

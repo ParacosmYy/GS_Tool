@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include "apps/serial_station/core/SerialCodec.h"
 #include "apps/serial_station/core/SerialDispatcher.h"
 #include "apps/serial_station/core/SerialManager.h"
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
@@ -128,7 +129,8 @@ signals:
 
 private:
     QString normalizeSendMode(const QString& mode) const;
-    QByteArray buildCommandFrame(const QString& command, const QString& mode) const;
+    SerialCodec::EncodeResult buildCommandFrame(const QString& command,
+                                                const QString& mode) const;
     void resetReceiveDispatcher();
     void processProtocolEvent(const SerialProtocolEvent& event);
     QString eventPayloadText(const SerialProtocolEvent& event) const;
@@ -141,6 +143,7 @@ private:
     SerialProtocolRegistry m_protocols;
     SerialManager m_serialManager;
     SerialDispatcher m_dispatcher;
+    SerialCodec m_codec;
 };
 
 } // namespace serial_station

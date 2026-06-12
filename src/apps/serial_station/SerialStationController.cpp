@@ -1,6 +1,6 @@
 #include "apps/serial_station/SerialStationController.h"
 
-#include <QtCore/QVariantMap>
+#include <memory>
 
 #include "apps/serial_station/SerialStationConstants.h"
 
@@ -59,15 +59,10 @@ void SerialStationController::sendCommand(const QString& command, const QString&
     const QString trimmedCommand = command.trimmed();
     const QString normalizedMode = normalizeSendMode(mode);
 
-    if (trimmedCommand.isEmpty()) {
-        emitSendFailure(trimmedCommand, normalizedMode, tr("发送内容为空"));
-        return;
-    }
-
-    if (normalizedMode != QStringLiteral("ascii") &&
-        normalizedMode != QStringLiteral("protocol")) {
-        emitSendFailure(trimmedCommand, normalizedMode,
-                        tr("发送模式暂不支持: %1").arg(mode.trimmed()));
+    const SerialCodec::EncodeResult encodeResult =
+        buildCommandFrame(trimmedCommand, normalizedMode);
+    if (!encodeResult.ok) {
+        emitSendFailure(trimmedCommand, encodeResult.normalizedMode, encodeResult.errorMessage);
         return;
     }
 
@@ -76,24 +71,20 @@ void SerialStationController::sendCommand(const QString& command, const QString&
         return;
     }
 
-    const QByteArray frame = buildCommandFrame(trimmedCommand, normalizedMode);
-    if (frame.isEmpty()) {
-        emitSendFailure(trimmedCommand, normalizedMode, tr("协议构建出的发送帧为空"));
-        return;
-    }
+    emit serialCommandPrepared(trimmedCommand, encodeResult.normalizedMode, encodeResult.frame);
 
-    emit serialCommandPrepared(trimmedCommand, normalizedMode, frame);
-
-    const qint64 bytesWritten = m_serialManager.send(frame);
+    const qint64 bytesWritten = m_serialManager.send(encodeResult.frame);
     if (bytesWritten <= 0) {
-        emitSendFailure(trimmedCommand, normalizedMode, tr("串口写入失败"));
+        emitSendFailure(trimmedCommand, encodeResult.normalizedMode, tr("串口写入失败"));
         return;
     }
 
     emit serialTxCounted();
     emit serialTxLogged(tr("%1 [%2] %3 bytes")
-                            .arg(trimmedCommand, normalizedMode, QString::number(bytesWritten)));
-    emit serialCommandSent(trimmedCommand, normalizedMode, bytesWritten);
+                            .arg(trimmedCommand,
+                                 encodeResult.normalizedMode,
+                                 QString::number(bytesWritten)));
+    emit serialCommandSent(trimmedCommand, encodeResult.normalizedMode, bytesWritten);
 }
 
 void SerialStationController::handleBytesReceived(const QByteArray& bytes)
@@ -123,23 +114,14 @@ void SerialStationController::handleBytesReceived(const QByteArray& bytes)
 
 QString SerialStationController::normalizeSendMode(const QString& mode) const
 {
-    return mode.trimmed().toLower();
+    return m_codec.normalizeMode(mode);
 }
 
-QByteArray SerialStationController::buildCommandFrame(const QString& command,
-                                                      const QString& mode) const
+SerialCodec::EncodeResult SerialStationController::buildCommandFrame(const QString& command,
+                                                                     const QString& mode) const
 {
-    Q_UNUSED(mode)
-
     const std::unique_ptr<ISerialProtocol> protocol = m_protocols.createDefault();
-    if (!protocol) {
-        return {};
-    }
-
-    QVariantMap params;
-    params.insert(QStringLiteral("text"), command);
-    params.insert(QStringLiteral("appendNewline"), false);
-    return protocol->buildCommand(command, params);
+    return m_codec.encode(command, mode, protocol.get());
 }
 
 void SerialStationController::resetReceiveDispatcher()

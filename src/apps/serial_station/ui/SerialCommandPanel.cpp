@@ -105,6 +105,7 @@ void SerialCommandPanel::setupUi()
     m_modeCombo = new QComboBox(this);
     m_modeCombo->setObjectName(QStringLiteral("serialCommandModeCombo"));
     m_modeCombo->addItem(tr("ASCII"), QStringLiteral("ascii"));
+    m_modeCombo->addItem(tr("HEX"), QStringLiteral("hex"));
     m_modeCombo->addItem(tr("协议命令"), QStringLiteral("protocol"));
 
     m_sendButton = new QPushButton(tr("发送"), this);
