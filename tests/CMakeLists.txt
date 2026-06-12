@@ -1152,6 +1152,33 @@ endif()
 add_test(NAME SerialDispatcher COMMAND test_serial_dispatcher)
 
 # ============================================================
+# Serial Station日志服务测试
+# ============================================================
+
+add_executable(test_serial_log_service
+    serial_station/test_serial_log_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+)
+
+target_include_directories(test_serial_log_service PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_log_service PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_log_service PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialLogService COMMAND test_serial_log_service)
+
+# ============================================================
 # Serial Station控制器发送闭环测试
 # ============================================================
 

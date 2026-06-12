@@ -180,12 +180,13 @@
 | 476 | GO Loop启动验证实现 | 新增bat启动探针、sample改用自动探针、README补缺Go替代路径并补agent-loop循环测试 |
 | 477 | README企业级宣传入口 | README升级为企业级项目首页，补稳定界面预览、真实能力证据、启动验证和工程工作流说明 |
 | 478 | Serial Station日志服务PRD/Specs | 定义services层结构化日志记录、过滤、容量裁剪和导出文本边界，禁止UI/串口线程/协议层越界 |
+| 479 | Serial Station日志服务实现 | 新增services/SerialLogService结构化日志仓库，支持TX/RX/System/Error、过滤、容量裁剪、纯文本和JSON Lines输出并补QTest |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#478` 的完整记录
+- 当前文档已整理到 `#479` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
