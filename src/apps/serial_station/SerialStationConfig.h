@@ -1,10 +1,16 @@
-#pragma once
+#ifndef SERIAL_STATION_CONFIG_H
+#define SERIAL_STATION_CONFIG_H
 
-#include <QString>
-#include <QSerialPort>
+#include <QtCore/QString>
+#include <QtSerialPort/QSerialPort>
 
 namespace serial_station {
 
+/**
+ * @brief Serial Station 的串口配置值对象。
+ *
+ * 该类型只描述 UART 参数，不直接打开串口，也不持有 QWidget。
+ */
 struct SerialPortConfig {
     QString portName;
     int baudRate = 115200;
@@ -12,18 +18,23 @@ struct SerialPortConfig {
     QSerialPort::Parity parity = QSerialPort::NoParity;
     QSerialPort::StopBits stopBits = QSerialPort::OneStop;
     QSerialPort::FlowControl flowControl = QSerialPort::NoFlowControl;
-    int readTimeoutMs = 1000;
+    bool dtrEnabled = false;
+    bool rtsEnabled = false;
 
-    bool isValid() const {
-        return !portName.trimmed().isEmpty() && baudRate > 0;
-    }
+    bool isValid() const;
 };
 
+/**
+ * @brief Serial Station 的运行配置。
+ */
 struct SerialStationConfig {
     SerialPortConfig port;
     bool autoReconnect = false;
     int reconnectIntervalMs = 1500;
-    int maxReconnectCount = 5;
+
+    bool isReconnectEnabled() const;
 };
 
 } // namespace serial_station
+
+#endif // SERIAL_STATION_CONFIG_H

@@ -79,6 +79,15 @@ set(SOURCES
     src/plugin/loader/PluginLoader.cpp
     src/core/workspace/WorkspaceManager.cpp
     src/core/factory/WidgetFactory.cpp
+    src/apps/serial_station/SerialStationApp.cpp
+    src/apps/serial_station/SerialStationWindow.cpp
+    src/apps/serial_station/SerialStationController.cpp
+    src/apps/serial_station/SerialStationConfig.cpp
+    src/apps/serial_station/core/SerialPort.cpp
+    src/apps/serial_station/core/SerialManager.cpp
+    src/apps/serial_station/core/SerialSession.cpp
+    src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
+    src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     src/serial/detector/SerialDetector.cpp
     src/serial/detector/SerialDetectorChip.cpp
     src/serial/detector/SerialDetectorQuery.cpp
@@ -3574,6 +3583,19 @@ set(HEADERS
     src/interfaces/IDataSink.h
     src/interfaces/IProtocolParser.h
     src/interfaces/IDevice.h
+    src/apps/serial_station/SerialStationApp.h
+    src/apps/serial_station/SerialStationWindow.h
+    src/apps/serial_station/SerialStationController.h
+    src/apps/serial_station/SerialStationConfig.h
+    src/apps/serial_station/SerialStationModels.h
+    src/apps/serial_station/SerialStationConstants.h
+    src/apps/serial_station/core/SerialPort.h
+    src/apps/serial_station/core/SerialManager.h
+    src/apps/serial_station/core/SerialSession.h
+    src/apps/serial_station/protocols/SerialProtocolEvent.h
+    src/apps/serial_station/protocols/ISerialProtocol.h
+    src/apps/serial_station/protocols/SerialProtocolRegistry.h
+    src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.h
     src/core/event/EventBus.h
 
     src/core/mainwindow/MainWindow.h

@@ -875,3 +875,87 @@ if(WIN32)
 endif()
 
 add_test(NAME WorkspaceManager COMMAND test_workspace_manager)
+
+# ============================================================
+# Serial Station ASCII文本协议测试
+# ============================================================
+
+add_executable(test_ascii_text_protocol
+    serial_station/test_ascii_text_protocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+)
+
+target_include_directories(test_ascii_text_protocol PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_ascii_text_protocol PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_ascii_text_protocol PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME AsciiTextProtocol COMMAND test_ascii_text_protocol)
+
+# ============================================================
+# Serial Station协议注册表测试
+# ============================================================
+
+add_executable(test_serial_protocol_registry
+    serial_station/test_serial_protocol_registry.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+)
+
+target_include_directories(test_serial_protocol_registry PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_protocol_registry PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_protocol_registry PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialProtocolRegistry COMMAND test_serial_protocol_registry)
+
+# ============================================================
+# Serial Station会话状态测试
+# ============================================================
+
+add_executable(test_serial_session
+    serial_station/test_serial_session.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
+)
+
+target_include_directories(test_serial_session PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_session PRIVATE
+    Qt6::Core
+    Qt6::SerialPort
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_session PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialSession COMMAND test_serial_session)
