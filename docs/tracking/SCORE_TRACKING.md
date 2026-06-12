@@ -165,12 +165,13 @@
 | 461 | Serial Station发送闭环实现 | UI发送意图接入SerialStationController，失败/日志/计数信号回写工作台，补controller与workbench回归测试 |
 | 462 | Serial Station接收闭环PRD/Specs | 定义SerialManager bytes经controller协议feed到RX日志/计数的接收闭环，明确半包和空bytes路径 |
 | 463 | Serial Station接收闭环实现 | SerialManager bytes接入controller默认协议feed，RX日志/计数回写工作台，补半包/粘包/重置回归测试 |
+| 464 | Serial Station Dispatcher PRD/Specs | 定义core/SerialDispatcher承接bytes到协议feed的职责，要求controller移除直接接收协议持有 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#463` 的完整记录
+- 当前文档已整理到 `#464` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
