@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-12 14:12:32
+- Generated: 2026-06-12 15:39:54
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -8,11 +8,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Working tree source files under src | 82020 |
-| Direct CMake source references | 6078 |
+| Working tree source files under src | 82022 |
+| Direct CMake source references | 6083 |
 | Source files not directly referenced by CMake | 75977 |
-| Existing src/apps/serial_station files | 22 |
-| CMake refs under src/apps/serial_station | 22 |
+| Existing src/apps/serial_station files | 24 |
+| CMake refs under src/apps/serial_station | 24 |
 | Generated-looking utils directories | 39670 |
 
 ## Source Files By Module
@@ -29,7 +29,7 @@
 | ota | 36 |
 | widgets | 30 |
 | dashboard | 28 |
-| apps | 22 |
+| apps | 24 |
 | plugin | 15 |
 | rtt | 12 |
 | automation | 11 |
@@ -50,9 +50,9 @@
 | serial | 60 |
 | terminal | 50 |
 | ota | 36 |
+| (root) | 29 |
 | dashboard | 28 |
-| (root) | 26 |
-| apps | 22 |
+| apps | 24 |
 | plugin | 13 |
 | widgets | 12 |
 | rtt | 12 |
@@ -187,8 +187,8 @@ Only the first 80 generated-looking utils directories are listed.
 | src/apps/serial_station/SerialStationController.cpp | True | True |
 | src/apps/serial_station/SerialStationConfig.h | True | True |
 | src/apps/serial_station/SerialStationConfig.cpp | True | True |
-| src/apps/serial_station/ui/SerialPortPanel.h | False | False |
-| src/apps/serial_station/ui/SerialPortPanel.cpp | False | False |
+| src/apps/serial_station/ui/SerialPortPanel.h | True | True |
+| src/apps/serial_station/ui/SerialPortPanel.cpp | True | True |
 | src/apps/serial_station/core/SerialPort.h | True | True |
 | src/apps/serial_station/core/SerialPort.cpp | True | True |
 | src/apps/serial_station/core/SerialManager.h | True | True |
@@ -228,6 +228,8 @@ Only the first 80 generated-looking utils directories are listed.
 - `src/apps/serial_station/SerialStationModels.h`
 - `src/apps/serial_station/SerialStationWindow.cpp`
 - `src/apps/serial_station/SerialStationWindow.h`
+- `src/apps/serial_station/ui/SerialPortPanel.cpp`
+- `src/apps/serial_station/ui/SerialPortPanel.h`
 
 ## Interpretation
 
