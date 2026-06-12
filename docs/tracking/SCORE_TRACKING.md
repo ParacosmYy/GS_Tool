@@ -192,12 +192,13 @@
 | 488 | Serial Station回放服务实现 | 新增SerialReplayService，将结构化日志或JSON Lines转换为回放计划，支持方向过滤、速度倍率、延迟钳制和错误路径QTest |
 | 489 | Serial Station UI回放预览PRD/Specs | 定义日志面板回放入口经Window转发到Controller，使用SerialReplayService生成预览计划并回写系统日志，明确本阶段不真实串口发送 |
 | 490 | Serial Station UI回放预览实现 | 日志面板新增回放入口，Controller接入SerialReplayService生成预览计划，Window完成signal闭环，README同步企业级能力描述并补QTest |
+| 491 | Serial Station UART基础可用性PRD/Specs | 定义端口枚举详情、手动COM输入、UART配置摘要、刷新反馈和无真实串口依赖测试，优先修复基础上位机入口 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#490` 的完整记录
+- 当前文档已整理到 `#491` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
