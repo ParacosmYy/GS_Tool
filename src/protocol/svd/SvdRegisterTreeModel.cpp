@@ -252,7 +252,6 @@ void SvdRegisterTreeModel::buildTree(const SvdDevice& device)
     /* 创建设备根节点 */
     auto* devNode = new SvdTreeNode();
     devNode->name = device.name;
-    devNode->address = formatAddress(device.baseAddress);
     devNode->description = device.description;
     devNode->level = SvdTreeNode::Level::Device;
     devNode->parent = m_rootNode;

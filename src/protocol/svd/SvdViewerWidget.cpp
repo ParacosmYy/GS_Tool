@@ -236,7 +236,8 @@ void SvdViewerWidget::onTreeSelectionChanged()
         QString name = m_treeModel->data(
             m_treeModel->index(idx.row(),
                                SvdRegisterTreeModel::ColName,
-                               idx.parent())).toString();
+                               idx.parent()),
+            Qt::DisplayRole).toString();
         pathParts.prepend(name);
         idx = idx.parent();
     }
@@ -294,12 +295,14 @@ void SvdViewerWidget::updateDetailPanel(const QString& peripheralName,
     html += tr("<h3>%1</h3>").arg(
         m_treeModel->data(m_treeModel->index(
             current.row(), SvdRegisterTreeModel::ColName,
-            current.parent())).toString());
+            current.parent()),
+            Qt::DisplayRole).toString());
 
     /* 地址 */
     QString addr = m_treeModel->data(m_treeModel->index(
         current.row(), SvdRegisterTreeModel::ColAddress,
-        current.parent())).toString();
+        current.parent()),
+        Qt::DisplayRole).toString();
     if (!addr.isEmpty()) {
         html += tr("<b>地址:</b> %1<br>").arg(addr);
     }
@@ -307,7 +310,8 @@ void SvdViewerWidget::updateDetailPanel(const QString& peripheralName,
     /* 偏移 */
     QString offset = m_treeModel->data(m_treeModel->index(
         current.row(), SvdRegisterTreeModel::ColOffset,
-        current.parent())).toString();
+        current.parent()),
+        Qt::DisplayRole).toString();
     if (!offset.isEmpty()) {
         html += tr("<b>偏移:</b> %1<br>").arg(offset);
     }
@@ -315,7 +319,8 @@ void SvdViewerWidget::updateDetailPanel(const QString& peripheralName,
     /* 位宽 */
     QString size = m_treeModel->data(m_treeModel->index(
         current.row(), SvdRegisterTreeModel::ColSize,
-        current.parent())).toString();
+        current.parent()),
+        Qt::DisplayRole).toString();
     if (!size.isEmpty()) {
         html += tr("<b>位宽:</b> %1<br>").arg(size);
     }
@@ -323,7 +328,8 @@ void SvdViewerWidget::updateDetailPanel(const QString& peripheralName,
     /* 访问权限 */
     QString access = m_treeModel->data(m_treeModel->index(
         current.row(), SvdRegisterTreeModel::ColAccess,
-        current.parent())).toString();
+        current.parent()),
+        Qt::DisplayRole).toString();
     if (!access.isEmpty()) {
         html += tr("<b>访问:</b> %1<br>").arg(access);
     }
@@ -331,7 +337,8 @@ void SvdViewerWidget::updateDetailPanel(const QString& peripheralName,
     /* 复位值 */
     QString reset = m_treeModel->data(m_treeModel->index(
         current.row(), SvdRegisterTreeModel::ColResetValue,
-        current.parent())).toString();
+        current.parent()),
+        Qt::DisplayRole).toString();
     if (!reset.isEmpty()) {
         html += tr("<b>复位值:</b> %1<br>").arg(reset);
     }
@@ -339,7 +346,8 @@ void SvdViewerWidget::updateDetailPanel(const QString& peripheralName,
     /* 描述 */
     QString desc = m_treeModel->data(m_treeModel->index(
         current.row(), SvdRegisterTreeModel::ColDescription,
-        current.parent())).toString();
+        current.parent()),
+        Qt::DisplayRole).toString();
     if (!desc.isEmpty()) {
         html += tr("<b>描述:</b> %1").arg(desc);
     }

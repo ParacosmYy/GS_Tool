@@ -989,3 +989,42 @@ if(WIN32)
 endif()
 
 add_test(NAME SerialPortPanel COMMAND test_serial_port_panel)
+
+# ============================================================
+# Qt6兼容回归测试
+# ============================================================
+
+add_executable(test_qt6_compat_regressions
+    test_qt6_compat_regressions.cpp
+    ${CMAKE_SOURCE_DIR}/src/protocol/svd/SvdParser.cpp
+    ${CMAKE_SOURCE_DIR}/src/protocol/svd/SvdParserStats.cpp
+    ${CMAKE_SOURCE_DIR}/src/protocol/svd/SvdRegisterTreeModel.cpp
+    ${CMAKE_SOURCE_DIR}/src/protocol/svd/SvdViewerWidgetStats.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/scripting/ScriptEngine.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/scripting/ScriptEngineStats.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/l1/L1Regularization.cpp
+    ${CMAKE_SOURCE_DIR}/src/connection/mqtt_client/MqttClientEngine.cpp
+    ${CMAKE_SOURCE_DIR}/src/connection/mqtt_client/MqttClientEnginePacket.cpp
+    ${CMAKE_SOURCE_DIR}/src/connection/mqtt_client/MqttClientEngineStats.cpp
+)
+
+target_include_directories(test_qt6_compat_regressions PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_qt6_compat_regressions PRIVATE
+    Qt6::Core
+    Qt6::Network
+    Qt6::Qml
+    Qt6::Test
+    Qt6::Widgets
+)
+
+if(WIN32)
+    target_compile_definitions(test_qt6_compat_regressions PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME Qt6CompatRegressions COMMAND test_qt6_compat_regressions)

@@ -15,6 +15,8 @@
 
 #include "protocol/svd/SvdTypes.h"
 
+class QXmlStreamReader;
+
 /**
  * @brief CMSIS SVD 文件解析器
  *

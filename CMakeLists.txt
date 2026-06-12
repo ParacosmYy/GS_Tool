@@ -50,9 +50,6 @@ set(SOURCES
     src/core/connect/ConnectionControllerHandlers.cpp
     src/core/connect/ConnectionControllerTeardown.cpp
     src/core/connect/ConnectionPresetBuilder.cpp
-    src/core/connect/QuickConnectionCatalog.cpp
-    src/core/connect/QuickConnectionValidation.cpp
-    src/core/connect/SerialConnectionParams.cpp
     src/core/recording/RecordingController.cpp
     src/core/recording/RecordingControllerStats.cpp
     src/core/recording/DataStreamRecorder.cpp
@@ -1583,6 +1580,12 @@ set(SOURCES
     src/utils/matrix9/SchurDecomp.cpp
     src/utils/dsp8/FractionalDelay.cpp
     src/utils/signal9/PeakDetector2.cpp
+    src/utils/interp9/CubicSpline2.cpp
+    src/utils/poly5/OrthogonalPoly.cpp
+    src/utils/string8/AhoCorasick2.cpp
+    src/utils/loss6/FocalLoss2.cpp
+    src/utils/optimize4/NewtonMethod.cpp
+    src/utils/interp10/RationalInterp.cpp
 
     # ── Wave 110: 亲和力/扰码器/采样率转换/快速Hartley/最大团/稀疏QR/谱白化/配对堆 ──
     src/utils/cluster22/AffinityCluster.cpp
@@ -3558,6 +3561,12 @@ set(SOURCES
     src/utils/filter_design/FilterDesignerWidget.cpp
     src/utils/filter_design/FilterDesignerWidgetStats.cpp
 
+    # ── GPS/NMEA 数据可视化 ──
+    src/utils/gps/NmeaParser.cpp
+    src/utils/gps/NmeaParserStats.cpp
+    src/utils/gps/GpsTrackWidget.cpp
+    src/utils/gps/GpsTrackWidgetStats.cpp
+
     # ── F82: Waveform Generator ──
     src/utils/wavegen/WaveformGenerator.cpp
     src/utils/wavegen/WaveformGeneratorStats.cpp
@@ -3603,9 +3612,6 @@ set(HEADERS
     src/core/mainwindow/MainWindow.h
     src/core/connect/ConnectionController.h
     src/core/connect/ConnectionPresetBuilder.h
-    src/core/connect/QuickConnectionCatalog.h
-    src/core/connect/QuickConnectionValidation.h
-    src/core/connect/SerialConnectionParams.h
 
     src/core/widgets/AnimatedButton.h
     src/core/recording/RecordingController.h
@@ -4238,7 +4244,7 @@ set(HEADERS
     src/utils/delta/DeltaEncoder.h
     src/utils/dwt2/DaubechiesWavelet.h
     src/utils/huffman2/AdaptiveHuffman.h
-    src/utils/hyperloglog/HyperLogLog.h
+    # src/utils/hyperloglog/HyperLogLog.h  # removed: duplicate class
     # src/utils/lifting/LiftingScheme.h  # removed: duplicate class
     src/utils/lzw2/LzwCodec2.h
     src/utils/mergesort/MergeSorter.h
@@ -4346,13 +4352,13 @@ set(HEADERS
     src/utils/minhash/MinHashSignature.h
     src/utils/timerwheel/TimerWheel.h
     src/utils/slidingpercentile/SlidingPercentile.h
-    src/utils/autopcor/AutoCorrelation.h
+    # src/utils/autopcor/AutoCorrelation.h  # removed: duplicate class
     src/utils/deadzone/DeadZoneFilter.h
     # src/utils/movingmax/MovingMinMax.h  # removed: duplicate class
     src/utils/ringhash/RollingHash.h
     src/utils/countmin/CountMinSketch.h
-    src/utils/cuckoo/CuckooFilter.h
-    src/utils/bloomfilter2/ScalableBloomFilter.h
+    # src/utils/cuckoo/CuckooFilter.h  # removed: duplicate class
+    # src/utils/bloomfilter2/ScalableBloomFilter.h  # removed: duplicate class
 
     # -- F128~F142: Wave 22 工具模块 --
     src/utils/fir/FirFilterDesigner.h
@@ -4382,7 +4388,7 @@ set(HEADERS
     src/utils/cepstrum/CepstrumAnalyzer.h
     src/utils/gabor/GaborTransform.h
     src/utils/pitch/PitchDetector.h
-    src/utils/ttest/TTestCalculator.h
+    # src/utils/ttest/TTestCalculator.h  # removed: duplicate class
     # src/utils/moment/StatisticalMoments.h  # removed: duplicate class
     src/utils/ks/KsTestCalculator.h
 
@@ -4452,7 +4458,7 @@ set(HEADERS
     src/utils/rle3/BurrowsWheelerTransform.h
     src/utils/suffix/SuffixAutomaton.h
     src/utils/voronoi/VoronoiDiagram.h
-    src/utils/wavelet2/HaarWavelet2D.h
+    # src/utils/wavelet2/HaarWavelet2D.h  # removed: duplicate class
 
     # -- F226~F231: Wave 39 DSP工具模块 --
     src/utils/bessel/BesselFilter.h
@@ -4469,7 +4475,7 @@ set(HEADERS
     src/utils/wavwriter/WavWriter.h
     src/utils/wavreader/WavReader.h
     src/utils/hilbert/HilbertTransform.h
-    src/utils/lomb2/LombScargle.h
+    # src/utils/lomb2/LombScargle.h  # removed: duplicate class
 
     # -- Wave 38 --
     src/utils/catboost/CatBoostEstimator.h
@@ -4487,7 +4493,7 @@ set(HEADERS
     src/utils/savitzky/SavitzkyGolay.h
     src/utils/medfilt/MedianFilter.h
     src/utils/notch/NotchFilter.h
-    src/utils/peakdetect2/PeakDetector2.h
+    # src/utils/peakdetect2/PeakDetector2.h  # removed: duplicate class
     # src/utils/align/SignalAligner.h  # removed: duplicate class
     # src/utils/window2/WindowFunction.h  # removed: duplicate of dsp6/WindowFunction
     src/utils/shorttime/ShortTimeEnergy.h
@@ -4515,10 +4521,10 @@ set(HEADERS
     src/utils/phase/PhaseDetector.h
     src/utils/dft2/GoertzelSpectrum.h
     src/utils/qr2/HouseholderQR.h
-    src/utils/eigen2/PowerIteration.h
+    # src/utils/eigen2/PowerIteration.h  # removed: duplicate class
     # src/utils/bfgs/BfgsOptimizer.h  # removed: duplicate class
     src/utils/dct/DctTransform.h
-    src/utils/distance/DistanceMetric.h
+    # src/utils/distance/DistanceMetric.h  # removed: duplicate class
     # src/utils/cluster2/DbScan.h  # removed: duplicate class
 
     # -- Wave 42 头文件 --
@@ -4548,7 +4554,7 @@ set(HEADERS
     src/utils/greville/GrevilleAbscissae.h
     src/utils/laguerre/LaguerreSolver.h
     src/utils/horner/HornerScheme.h
-    src/utils/newtonroot/NewtonRaphson.h
+    # src/utils/newtonroot/NewtonRaphson.h  # removed: duplicate class
     # src/utils/gaussquad/GaussLegendre.h  # removed: duplicate class
     src/utils/richardson/RichardsonExtrapolation.h
     src/utils/autodiff/numericalDifferentiator.h
@@ -4567,7 +4573,7 @@ set(HEADERS
     # src/utils/sylvester/SylvesterSolver.h  # removed: duplicate class (superseded by matrix29)
     src/utils/pade/PadeApproximant.h
     src/utils/sturm/SturmSequence.h
-    src/utils/qrstep/QrEigenSolver.h
+    # src/utils/qrstep/QrEigenSolver.h  # removed: duplicate class
     # src/utils/hessenberg/HessenbergReduction.h  # removed: duplicate class
     src/utils/butterfly/ButterflyOperation.h
     src/utils/circulant/CirculantSolver.h
@@ -4598,7 +4604,7 @@ set(HEADERS
     src/utils/tridiag_eigen/TridiagEigenSolver.h
     src/utils/qz/QzDecomposition.h
     src/utils/svd2/SvdSolver.h
-    src/utils/polar/PolarDecomposition.h
+    # src/utils/polar/PolarDecomposition.h  # removed: duplicate class
     # src/utils/qrupdate/QrUpdate.h  # removed: duplicate class
     src/utils/cholupdate/CholeskyUpdate.h
     src/utils/schur_update/SchurReorder.h
@@ -4617,7 +4623,7 @@ set(HEADERS
     src/utils/lcp_array/LcpArray.h
     src/utils/min_rotation/MinimalRotation.h
     src/utils/polynomial_root/PolynomialRoots.h
-    src/utils/resultant/PolynomialResultant.h
+    # src/utils/resultant/PolynomialResultant.h  # removed: duplicate class
     # src/utils/groebner/GroebnerBasis.h  # removed: duplicate class
     src/utils/grobner2/MultivariatePolynomial.h
 
@@ -4702,10 +4708,10 @@ set(HEADERS
     src/utils/btree4/BStarTree.h
     src/utils/cuckoo_hash/CuckooHashTable.h
     src/utils/dict/TrieMap.h
-    src/utils/friedman/FriedmanTest.h
+    # src/utils/friedman/FriedmanTest.h  # removed: duplicate class
     # src/utils/golay/GolayCode.h  # removed: duplicate class
     src/utils/haar2/HaarWavelet2D.h
-    src/utils/horner2/HornerScheme.h
+    # src/utils/horner2/HornerScheme.h  # removed: duplicate class
     # src/utils/inv_perm/InversePermutation.h  # removed: duplicate class
     src/utils/levenshtein2/DamerauLevenshtein.h
     src/utils/lfsr/LfsrSequence.h

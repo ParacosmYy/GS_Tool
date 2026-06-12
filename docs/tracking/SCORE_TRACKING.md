@@ -148,12 +148,13 @@
 | 444 | 启动链路与Agent Runtime工具 | EmbedDebug.bat委托PowerShell启动器+bootstrap/doctor/debug/simplify/agent-loop工具+本机local_env移出Git |
 | 445 | UI QSS职责收敛+UART配置面板 | 工业工作台主题刷新+TerminalFilter/MQTT/AppDialog内联样式迁移到QSS+Serial Station串口配置面板 |
 | 446 | Source Tree瘦身审计PRD | 文件过多/重复轮子/UART缺口审计路线落档 |
+| 447 | Qt6兼容构建修复回归 | MQTT/SVD/Script/L1兼容修复收口+Qt6CompatRegressions测试 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#446` 的完整记录
+- 当前文档已整理到 `#447` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

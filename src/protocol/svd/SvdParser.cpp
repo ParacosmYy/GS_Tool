@@ -80,7 +80,7 @@ bool SvdParser::parseDevice(QXmlStreamReader& xml)
         xml.readNext();
 
         if (xml.isStartElement()) {
-            const QStringRef tag = xml.name();
+            const auto tag = xml.name();
             if (tag == QLatin1String("name")) {
                 m_device.name = xml.readElementText();
             } else if (tag == QLatin1String("vendor")) {
@@ -155,7 +155,7 @@ void SvdParser::parsePeripheral(QXmlStreamReader& xml)
 
         if (!xml.isStartElement()) continue;
 
-        const QStringRef tag = xml.name();
+        const auto tag = xml.name();
 
         if (tag == QLatin1String("name")) {
             periph.name = xml.readElementText();
@@ -216,7 +216,7 @@ void SvdParser::parseRegister(QXmlStreamReader& xml, QVector<SvdRegister>& out)
 
         if (!xml.isStartElement()) continue;
 
-        const QStringRef tag = xml.name();
+        const auto tag = xml.name();
 
         if (tag == QLatin1String("name")) {
             reg.name = xml.readElementText();
@@ -275,7 +275,7 @@ void SvdParser::parseCluster(QXmlStreamReader& xml, QVector<SvdCluster>& out)
 
         if (!xml.isStartElement()) continue;
 
-        const QStringRef tag = xml.name();
+        const auto tag = xml.name();
 
         if (tag == QLatin1String("name")) {
             cluster.name = xml.readElementText();
@@ -317,7 +317,7 @@ void SvdParser::parseField(QXmlStreamReader& xml, QVector<SvdField>& out)
 
         if (!xml.isStartElement()) continue;
 
-        const QStringRef tag = xml.name();
+        const auto tag = xml.name();
 
         if (tag == QLatin1String("name")) {
             field.name = xml.readElementText();
@@ -365,7 +365,7 @@ void SvdParser::parseEnumeratedValues(QXmlStreamReader& xml,
                     break;
                 }
                 if (!xml.isStartElement()) continue;
-                const QStringRef tag = xml.name();
+                const auto tag = xml.name();
                 if (tag == QLatin1String("name")) {
                     ev.name = xml.readElementText();
                 } else if (tag == QLatin1String("description")) {

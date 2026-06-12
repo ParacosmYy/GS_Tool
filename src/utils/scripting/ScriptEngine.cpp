@@ -23,7 +23,7 @@ ScriptAction ScriptAction::fromVariantMap(const QMap<QString, QVariant>& map)
     a.code = map["code"].toString();
     a.language = static_cast<ScriptLanguage>(map["language"].toInt(0));
     a.triggers = map["triggers"].toStringList();
-    a.enabled = map["enabled"].toBool(true);
+    a.enabled = map.contains("enabled") ? map["enabled"].toBool() : true;
 
     const QVariantMap pm = map["params"].toMap();
     for (auto it = pm.constBegin(); it != pm.constEnd(); ++it)
@@ -70,7 +70,6 @@ ScriptEngine::ScriptEngine(QObject* parent)
     : QObject(parent)
 {
     setObjectName(QStringLiteral("ScriptEngine"));
-    m_engine.setQObjectPointer(nullptr);
 }
 
 // ============================================================

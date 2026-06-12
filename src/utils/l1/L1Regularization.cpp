@@ -8,6 +8,12 @@
 #include <cmath>
 #include <algorithm>
 
+L1Regularization::L1Regularization(QObject* parent)
+    : QObject(parent)
+    , m_timeSum(0.0)
+{
+}
+
 QVector<double> L1Regularization::lasso(const QVector<QVector<double>>& X,
                                            const QVector<double>& y,
                                            double lambda, int maxIter,

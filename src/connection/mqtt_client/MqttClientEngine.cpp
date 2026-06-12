@@ -485,6 +485,3 @@ QByteArray MqttClientEngine::buildTopicFilter(const QString& topic)
     return result;
 }
 
-    return id;
-}
-
