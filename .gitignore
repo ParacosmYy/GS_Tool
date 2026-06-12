@@ -1,5 +1,6 @@
 # Build directories
 /build/
+/dist/
 .worktrees/
 
 # Agent entrypoint must be tracked even if ignored globally.
@@ -59,6 +60,9 @@ tools/local_env.bat
 
 # Dependencies
 node_modules/
+.venv/
+__pycache__/
+*.egg-info/
 
 # Temp files
 *.tmp

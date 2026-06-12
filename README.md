@@ -92,6 +92,15 @@ cmake --build build --target EmbedDebug --parallel 4
 
 The only supported build directory is `build/`. Parallel build directories are not part of the documented workflow.
 
+UV packaging shortcut:
+
+```powershell
+uv run package-embeddebug --skip-build --clean
+uv run package-embeddebug --skip-build --clean --zip
+```
+
+This is the supported packaging shortcut for the C++/Qt application. PyInstaller is for Python application bodies; EmbedDebug is packaged by reusing `build/EmbedDebug.exe`, running Qt `windeployqt`, and writing a distributable folder under ignored `dist/`.
+
 ## Verification
 
 Core local checks:
