@@ -6908,7 +6908,7 @@ set(HEADERS
 # 批量算法草稿目录存在大量重复 QObject 类名，不能直接进入主 GUI 目标。
 foreach(source_list SOURCES HEADERS)
     list(FILTER ${source_list} EXCLUDE REGEX
-        "^src/utils/(cluster|code|dsp|fft|graph|matrix|signal|tree)[0-9]+/"
+        "^src/utils/[^/]*[0-9]+/"
     )
 endforeach()
 
