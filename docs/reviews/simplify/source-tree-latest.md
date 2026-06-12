@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-12 15:39:54
+- Generated: 2026-06-12 15:51:29
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -9,8 +9,11 @@
 | Metric | Value |
 |--------|-------|
 | Working tree source files under src | 82022 |
-| Direct CMake source references | 6083 |
-| Source files not directly referenced by CMake | 75977 |
+| Raw CMake source references | 6083 |
+| Declared CMake source references | 5977 |
+| Active CMake source references | 1690 |
+| Filtered generated utils references | 4287 |
+| Source files not active in CMake | 80366 |
 | Existing src/apps/serial_station files | 24 |
 | CMake refs under src/apps/serial_station | 24 |
 | Generated-looking utils directories | 39670 |
@@ -38,11 +41,11 @@
 | utilities | 3 |
 | (root) | 1 |
 
-## CMake References By Module
+## Active CMake References By Module
 
 | Module | References |
 |--------|------------|
-| utils | 5237 |
+| utils | 844 |
 | core | 190 |
 | connection | 153 |
 | protocol | 151 |
@@ -80,86 +83,86 @@
 
 | Path | Files | CMake refs |
 |------|-------|------------|
-| src/utils/graph5 | 6 | 6 |
-| src/utils/tree28 | 5 | 2 |
-| src/utils/code260 | 4 | 2 |
-| src/utils/cluster23 | 4 | 2 |
-| src/utils/tree29 | 4 | 1 |
-| src/utils/code27 | 4 | 2 |
-| src/utils/signal217 | 4 | 2 |
-| src/utils/code25 | 4 | 2 |
-| src/utils/tree33 | 4 | 2 |
-| src/utils/tree34 | 4 | 2 |
-| src/utils/cluster241 | 4 | 2 |
-| src/utils/fft26 | 4 | 2 |
-| src/utils/tree31 | 4 | 2 |
-| src/utils/cluster24 | 4 | 2 |
-| src/utils/cluster221 | 4 | 2 |
-| src/utils/code30 | 4 | 2 |
-| src/utils/graph43 | 4 | 2 |
-| src/utils/tree262 | 4 | 2 |
-| src/utils/graph41 | 4 | 2 |
-| src/utils/graph42 | 4 | 2 |
+| src/utils/graph5 | 6 | 0 |
+| src/utils/tree28 | 5 | 0 |
+| src/utils/code260 | 4 | 0 |
+| src/utils/cluster23 | 4 | 0 |
+| src/utils/tree29 | 4 | 0 |
+| src/utils/code27 | 4 | 0 |
+| src/utils/signal217 | 4 | 0 |
+| src/utils/code25 | 4 | 0 |
+| src/utils/tree33 | 4 | 0 |
+| src/utils/tree34 | 4 | 0 |
+| src/utils/cluster241 | 4 | 0 |
+| src/utils/fft26 | 4 | 0 |
+| src/utils/tree31 | 4 | 0 |
+| src/utils/cluster24 | 4 | 0 |
+| src/utils/cluster221 | 4 | 0 |
+| src/utils/code30 | 4 | 0 |
+| src/utils/graph43 | 4 | 0 |
+| src/utils/tree262 | 4 | 0 |
+| src/utils/graph41 | 4 | 0 |
+| src/utils/graph42 | 4 | 0 |
 | src/utils/interp172 | 4 | 0 |
-| src/utils/graph44 | 4 | 2 |
-| src/utils/code29 | 4 | 2 |
-| src/utils/code28 | 4 | 2 |
-| src/utils/sort2 | 4 | 4 |
-| src/utils/signal24 | 4 | 2 |
-| src/utils/cluster201 | 4 | 2 |
-| src/utils/signal237 | 4 | 2 |
-| src/utils/cluster25 | 4 | 2 |
-| src/utils/matrix167 | 4 | 2 |
-| src/utils/matrix168 | 4 | 2 |
-| src/utils/matrix169 | 4 | 2 |
-| src/utils/code180 | 4 | 2 |
-| src/utils/cluster29 | 4 | 2 |
-| src/utils/code200 | 4 | 2 |
+| src/utils/graph44 | 4 | 0 |
+| src/utils/code29 | 4 | 0 |
+| src/utils/code28 | 4 | 0 |
+| src/utils/sort2 | 4 | 0 |
+| src/utils/signal24 | 4 | 0 |
+| src/utils/cluster201 | 4 | 0 |
+| src/utils/signal237 | 4 | 0 |
+| src/utils/cluster25 | 4 | 0 |
+| src/utils/matrix167 | 4 | 0 |
+| src/utils/matrix168 | 4 | 0 |
+| src/utils/matrix169 | 4 | 0 |
+| src/utils/code180 | 4 | 0 |
+| src/utils/cluster29 | 4 | 0 |
+| src/utils/code200 | 4 | 0 |
 | src/utils/tree5 | 4 | 0 |
-| src/utils/matrix5 | 4 | 4 |
-| src/utils/matrix196 | 4 | 2 |
-| src/utils/matrix216 | 4 | 2 |
-| src/utils/code162 | 4 | 2 |
-| src/utils/matrix170 | 4 | 2 |
-| src/utils/matrix176 | 4 | 2 |
-| src/utils/code163 | 4 | 2 |
-| src/utils/cluster261 | 4 | 2 |
-| src/utils/cluster27 | 4 | 2 |
-| src/utils/tree40 | 4 | 2 |
-| src/utils/cluster26 | 4 | 2 |
-| src/utils/signal197 | 4 | 2 |
-| src/utils/code240 | 4 | 2 |
-| src/utils/code24 | 4 | 2 |
-| src/utils/signal167 | 4 | 2 |
-| src/utils/signal166 | 4 | 2 |
-| src/utils/signal165 | 4 | 2 |
-| src/utils/signal168 | 4 | 2 |
-| src/utils/signal177 | 4 | 2 |
-| src/utils/code220 | 4 | 2 |
-| src/utils/cluster28 | 4 | 2 |
-| src/utils/signal25 | 4 | 2 |
-| src/utils/graph235 | 4 | 2 |
-| src/utils/fft30 | 4 | 2 |
-| src/utils/fft31 | 4 | 2 |
-| src/utils/dsp198 | 4 | 2 |
-| src/utils/graph175 | 4 | 2 |
-| src/utils/fft239 | 4 | 2 |
-| src/utils/fft29 | 4 | 2 |
-| src/utils/fft199 | 4 | 2 |
-| src/utils/dsp238 | 4 | 2 |
-| src/utils/signal33 | 4 | 2 |
-| src/utils/graph255 | 4 | 2 |
-| src/utils/fft219 | 4 | 2 |
-| src/utils/fft33 | 4 | 2 |
-| src/utils/dsp218 | 4 | 2 |
-| src/utils/dsp164 | 4 | 2 |
-| src/utils/dsp163 | 4 | 2 |
-| src/utils/dsp178 | 4 | 2 |
-| src/utils/dsp165 | 4 | 2 |
-| src/utils/graph195 | 4 | 2 |
-| src/utils/fft259 | 4 | 2 |
-| src/utils/dsp166 | 4 | 2 |
-| src/utils/graph177 | 4 | 2 |
+| src/utils/matrix5 | 4 | 0 |
+| src/utils/matrix196 | 4 | 0 |
+| src/utils/matrix216 | 4 | 0 |
+| src/utils/code162 | 4 | 0 |
+| src/utils/matrix170 | 4 | 0 |
+| src/utils/matrix176 | 4 | 0 |
+| src/utils/code163 | 4 | 0 |
+| src/utils/cluster261 | 4 | 0 |
+| src/utils/cluster27 | 4 | 0 |
+| src/utils/tree40 | 4 | 0 |
+| src/utils/cluster26 | 4 | 0 |
+| src/utils/signal197 | 4 | 0 |
+| src/utils/code240 | 4 | 0 |
+| src/utils/code24 | 4 | 0 |
+| src/utils/signal167 | 4 | 0 |
+| src/utils/signal166 | 4 | 0 |
+| src/utils/signal165 | 4 | 0 |
+| src/utils/signal168 | 4 | 0 |
+| src/utils/signal177 | 4 | 0 |
+| src/utils/code220 | 4 | 0 |
+| src/utils/cluster28 | 4 | 0 |
+| src/utils/signal25 | 4 | 0 |
+| src/utils/graph235 | 4 | 0 |
+| src/utils/fft30 | 4 | 0 |
+| src/utils/fft31 | 4 | 0 |
+| src/utils/dsp198 | 4 | 0 |
+| src/utils/graph175 | 4 | 0 |
+| src/utils/fft239 | 4 | 0 |
+| src/utils/fft29 | 4 | 0 |
+| src/utils/fft199 | 4 | 0 |
+| src/utils/dsp238 | 4 | 0 |
+| src/utils/signal33 | 4 | 0 |
+| src/utils/graph255 | 4 | 0 |
+| src/utils/fft219 | 4 | 0 |
+| src/utils/fft33 | 4 | 0 |
+| src/utils/dsp218 | 4 | 0 |
+| src/utils/dsp164 | 4 | 0 |
+| src/utils/dsp163 | 4 | 0 |
+| src/utils/dsp178 | 4 | 0 |
+| src/utils/dsp165 | 4 | 0 |
+| src/utils/graph195 | 4 | 0 |
+| src/utils/fft259 | 4 | 0 |
+| src/utils/dsp166 | 4 | 0 |
+| src/utils/graph177 | 4 | 0 |
 
 Only the first 80 generated-looking utils directories are listed.
 
@@ -236,3 +239,4 @@ Only the first 80 generated-looking utils directories are listed.
 1. A high `src/utils` count usually means historical generated or duplicate utility code should be frozen and audited before deletion.
 2. Old UART configuration exists in the current mainline. The missing part is the new `src/apps/serial_station/` minimal UART loop.
 3. Do not delete by directory name alone. First remove unneeded files from CMake, build, launch, then delete in a separate reviewed step.
+4. Use active CMake references, not raw text references, as the closest audit signal for the main GUI target compile surface.

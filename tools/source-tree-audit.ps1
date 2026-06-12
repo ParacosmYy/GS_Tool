@@ -60,6 +60,60 @@ function Add-Section {
     $Lines.Add("")
 }
 
+function Remove-CMakeLineComments {
+    param([string]$Text)
+
+    $cleanLines = foreach ($line in ($Text -split "`r?`n")) {
+        $quoteCount = 0
+        $cutIndex = -1
+
+        for ($i = 0; $i -lt $line.Length; $i++) {
+            $ch = $line[$i]
+            if ($ch -eq '"') {
+                $quoteCount++
+            } elseif ($ch -eq '#' -and (($quoteCount % 2) -eq 0)) {
+                $cutIndex = $i
+                break
+            }
+        }
+
+        if ($cutIndex -ge 0) {
+            $line.Substring(0, $cutIndex)
+        } else {
+            $line
+        }
+    }
+
+    return ($cleanLines -join [Environment]::NewLine)
+}
+
+function Get-CMakeSourceRefs {
+    param([string]$Text)
+
+    $absoluteStyleRefs = @(
+        [regex]::Matches($Text, "(?:src|tests)/[A-Za-z0-9_./+-]+\.(?:cpp|cxx|cc|c|h|hpp|hh|ui|qrc)") |
+            ForEach-Object { Convert-ToRepoPath $_.Value } |
+            Sort-Object -Unique
+    )
+    $testRelativeRefs = @(
+        [regex]::Matches($Text, "serial_station/[A-Za-z0-9_./+-]+\.(?:cpp|cxx|cc|c|h|hpp|hh|ui|qrc)") |
+            ForEach-Object { Convert-ToRepoPath ("tests/" + $_.Value) } |
+            Sort-Object -Unique
+    )
+
+    return @($absoluteStyleRefs + $testRelativeRefs | Sort-Object -Unique)
+}
+
+function Remove-GeneratedUtilsRefs {
+    param([string[]]$Refs)
+
+    return @(
+        $Refs |
+            Where-Object { $_ -notmatch "^src/utils/[^/]*[0-9]+/" } |
+            Sort-Object -Unique
+    )
+}
+
 $repoRoot = Get-RepoRoot
 Set-Location $repoRoot
 
@@ -91,24 +145,22 @@ $cmakeFiles = @(
         Where-Object { $_ -match "(^|/)CMakeLists\.txt$" -and $_ -notlike "build/*" }
 )
 $cmakeText = ($cmakeFiles | ForEach-Object { Get-Content -Raw -Path (Join-Path $repoRoot $_) }) -join [Environment]::NewLine
-$absoluteStyleCmakeRefs = @(
-    [regex]::Matches($cmakeText, "(?:src|tests)/[A-Za-z0-9_./+-]+\.(?:cpp|cxx|cc|c|h|hpp|hh|ui|qrc)") |
-        ForEach-Object { Convert-ToRepoPath $_.Value } |
+$declaredCmakeText = Remove-CMakeLineComments $cmakeText
+$rawCmakeRefs = @(Get-CMakeSourceRefs $cmakeText)
+$declaredCmakeRefs = @(Get-CMakeSourceRefs $declaredCmakeText)
+$activeCmakeRefs = @(Remove-GeneratedUtilsRefs $declaredCmakeRefs)
+$filteredGeneratedUtilsRefs = @(
+    $declaredCmakeRefs |
+        Where-Object { $_ -match "^src/utils/[^/]*[0-9]+/" } |
         Sort-Object -Unique
 )
-$testRelativeCmakeRefs = @(
-    [regex]::Matches($cmakeText, "serial_station/[A-Za-z0-9_./+-]+\.(?:cpp|cxx|cc|c|h|hpp|hh|ui|qrc)") |
-        ForEach-Object { Convert-ToRepoPath ("tests/" + $_.Value) } |
-        Sort-Object -Unique
-)
-$cmakeRefs = @($absoluteStyleCmakeRefs + $testRelativeCmakeRefs | Sort-Object -Unique)
 
-$cmakeByModule = $cmakeRefs |
+$cmakeByModule = $activeCmakeRefs |
     Group-Object { Get-TopModule $_ } |
     Sort-Object Count -Descending
 
 $cmakeSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
-foreach ($ref in $cmakeRefs) {
+foreach ($ref in $activeCmakeRefs) {
     [void]$cmakeSet.Add($ref)
 }
 
@@ -134,7 +186,7 @@ $frozenHits = foreach ($pattern in $frozenPatterns) {
     [pscustomobject]@{
         Path = $pattern.TrimEnd("/")
         Count = $files.Count
-        CMakeRefs = @($cmakeRefs | Where-Object { $_.StartsWith($pattern, [System.StringComparison]::OrdinalIgnoreCase) }).Count
+        CMakeRefs = @($activeCmakeRefs | Where-Object { $_.StartsWith($pattern, [System.StringComparison]::OrdinalIgnoreCase) }).Count
     }
 }
 
@@ -150,7 +202,7 @@ foreach ($path in $srcFiles) {
 }
 
 $utilsCMakeCounts = @{}
-foreach ($path in $cmakeRefs) {
+foreach ($path in $activeCmakeRefs) {
     if ($path -match "^src/utils/([^/]+)/") {
         $dir = $Matches[1]
         if (-not $utilsCMakeCounts.ContainsKey($dir)) {
@@ -232,7 +284,7 @@ $serialStationRows = foreach ($path in $serialStationExpected) {
 }
 
 $existingSerialStationFiles = @($repoFiles | ForEach-Object { Convert-ToRepoPath $_ } | Where-Object { $_ -like "src/apps/serial_station/*" })
-$serialStationCMakeRefs = @($cmakeRefs | Where-Object { $_ -like "src/apps/serial_station/*" })
+$serialStationCMakeRefs = @($activeCmakeRefs | Where-Object { $_ -like "src/apps/serial_station/*" })
 
 $lines = [System.Collections.Generic.List[string]]::new()
 $lines.Add("# Source Tree Audit")
@@ -245,8 +297,11 @@ Add-Section $lines "Summary"
 $lines.Add("| Metric | Value |")
 $lines.Add("|--------|-------|")
 $lines.Add("| Working tree source files under src | $($srcFiles.Count) |")
-$lines.Add("| Direct CMake source references | $($cmakeRefs.Count) |")
-$lines.Add("| Source files not directly referenced by CMake | $($notDirectlyInCMake.Count) |")
+$lines.Add("| Raw CMake source references | $($rawCmakeRefs.Count) |")
+$lines.Add("| Declared CMake source references | $($declaredCmakeRefs.Count) |")
+$lines.Add("| Active CMake source references | $($activeCmakeRefs.Count) |")
+$lines.Add("| Filtered generated utils references | $($filteredGeneratedUtilsRefs.Count) |")
+$lines.Add("| Source files not active in CMake | $($notDirectlyInCMake.Count) |")
 $lines.Add("| Existing src/apps/serial_station files | $($existingSerialStationFiles.Count) |")
 $lines.Add("| CMake refs under src/apps/serial_station | $($serialStationCMakeRefs.Count) |")
 $lines.Add("| Generated-looking utils directories | $($generatedUtilsDirs.Count) |")
@@ -258,7 +313,7 @@ foreach ($group in $srcByModule) {
     $lines.Add("| $($group.Name) | $($group.Count) |")
 }
 
-Add-Section $lines "CMake References By Module"
+Add-Section $lines "Active CMake References By Module"
 $lines.Add("| Module | References |")
 $lines.Add("|--------|------------|")
 foreach ($group in $cmakeByModule) {
@@ -310,6 +365,7 @@ Add-Section $lines "Interpretation"
 $lines.Add('1. A high `src/utils` count usually means historical generated or duplicate utility code should be frozen and audited before deletion.')
 $lines.Add('2. Old UART configuration exists in the current mainline. The missing part is the new `src/apps/serial_station/` minimal UART loop.')
 $lines.Add("3. Do not delete by directory name alone. First remove unneeded files from CMake, build, launch, then delete in a separate reviewed step.")
+$lines.Add("4. Use active CMake references, not raw text references, as the closest audit signal for the main GUI target compile surface.")
 
 $output = $lines -join [Environment]::NewLine
 
