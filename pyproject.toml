@@ -12,6 +12,7 @@ dependencies = []
 [project.scripts]
 package-embeddebug = "tools.package_embeddebug:main"
 start-embeddebug = "tools.start_embeddebug:main"
+test-embeddebug-tools = "tools.test_embeddebug_tools:main"
 
 [tool.uv]
 package = true

@@ -199,12 +199,13 @@
 | 495 | UV启动快捷工具PRD/Specs | 定义uv run start-embeddebug入口，复用EmbedDebug.bat最低启动链路，支持dry-run/wait并保持单一build目录 |
 | 496 | UV启动快捷工具实现 | 新增tools/start_embeddebug.py和pyproject入口，支持uv run start-embeddebug启动bat链路、dry-run和wait参数，README同步快捷启动说明 |
 | 497 | UV工具自测PRD/Specs | 定义uv run test-embeddebug-tools入口，使用unittest覆盖启动/打包工具纯逻辑，不启动GUI、不构建、不调用windeployqt |
+| 498 | UV工具自测实现 | 新增tools/test_embeddebug_tools.py和pyproject入口，覆盖start/package工具纯逻辑，README同步uv工具自测命令 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#497` 的完整记录
+- 当前文档已整理到 `#498` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
