@@ -196,12 +196,13 @@
 | 492 | Serial Station UART基础可用性实现 | 串口面板补端口详情显示、真实端口名item data、手动COM输入、UART配置摘要和参数变化联动，README同步基础UART能力并补面板QTest |
 | 493 | UV打包快捷工具PRD/Specs | 定义uv run package-embeddebug入口，编排CMake构建、Qt windeployqt部署、dist目录和zip产物，不使用PyInstaller打C++本体 |
 | 494 | UV打包快捷工具实现 | 新增pyproject入口和tools/package_embeddebug.py，支持uv run package-embeddebug构建/复用build产物、windeployqt部署、dist目录和zip包 |
+| 495 | UV启动快捷工具PRD/Specs | 定义uv run start-embeddebug入口，复用EmbedDebug.bat最低启动链路，支持dry-run/wait并保持单一build目录 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#494` 的完整记录
+- 当前文档已整理到 `#495` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
