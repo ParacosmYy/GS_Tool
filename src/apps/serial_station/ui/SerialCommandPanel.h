@@ -4,6 +4,8 @@
 #include <QtCore/QString>
 #include <QtWidgets/QWidget>
 
+#include "apps/serial_station/ui/SerialCommandHistoryModel.h"
+
 class QComboBox;
 class QLineEdit;
 class QPushButton;
@@ -40,6 +42,29 @@ public:
      */
     void setSendEnabled(bool enabled);
 
+    /**
+     * @brief 最近命令数量。
+     */
+    int historyCount() const;
+
+    /**
+     * @brief 最近命令文本快照。
+     */
+    QStringList historyCommands() const;
+
+public slots:
+    /**
+     * @brief 确认最近一次发送成功并写入历史。
+     */
+    void confirmLastSentCommand();
+
+    /**
+     * @brief 记录一条已经发送成功的命令。
+     * @param command 命令文本
+     * @param mode 发送模式
+     */
+    void recordSentCommand(const QString& command, const QString& mode);
+
 signals:
     /**
      * @brief 用户请求发送一条命令。
@@ -57,19 +82,28 @@ signals:
 private slots:
     void emitSendRequested();
     void applyQuickCommand();
+    void applyHistoryCommand(int index);
+    void clearHistory();
     void updateSendButtonState();
 
 private:
     void setupUi();
     void connectSignals();
     QToolButton* createQuickButton(const QString& text, const QString& command);
+    void refreshHistoryUi();
+    void setModeById(const QString& mode);
 
     QLineEdit* m_commandEdit = nullptr;
     QComboBox* m_modeCombo = nullptr;
+    QComboBox* m_historyCombo = nullptr;
     QPushButton* m_sendButton = nullptr;
+    QPushButton* m_clearHistoryButton = nullptr;
     QToolButton* m_readIdButton = nullptr;
     QToolButton* m_pingButton = nullptr;
     QToolButton* m_resetButton = nullptr;
+    SerialCommandHistoryModel m_history;
+    QString m_pendingCommand;
+    QString m_pendingMode;
 };
 
 } // namespace serial_station

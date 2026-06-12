@@ -37,6 +37,7 @@ private slots:
     void logClearResetsRxCounter();
     void quickCommandFillsCommandInput();
     void logClearRemovesPreviewLines();
+    void workbenchExposesCommandHistoryControls();
 };
 
 void SerialStationWorkbenchTest::windowContainsWorkbenchRegions()
@@ -263,6 +264,18 @@ void SerialStationWorkbenchTest::logClearRemovesPreviewLines()
 
     QTest::mouseClick(clearButton, Qt::LeftButton);
     QVERIFY(logView->toPlainText().isEmpty());
+}
+
+void SerialStationWorkbenchTest::workbenchExposesCommandHistoryControls()
+{
+    SerialStationWindow window;
+    auto* historyCombo = window.findChild<QComboBox*>(QStringLiteral("serialCommandHistoryCombo"));
+    auto* historyClearButton = window.findChild<QPushButton*>(QStringLiteral("serialHistoryClearButton"));
+    QVERIFY(historyCombo != nullptr);
+    QVERIFY(historyClearButton != nullptr);
+
+    QVERIFY(!historyCombo->isEnabled());
+    QVERIFY(!historyClearButton->isEnabled());
 }
 
 QTEST_MAIN(SerialStationWorkbenchTest)

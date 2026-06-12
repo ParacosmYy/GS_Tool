@@ -26,7 +26,7 @@ Embedded debugging often spreads one session across a serial terminal, a wavefor
 
 | Area | Current capability |
 |------|--------------------|
-| Serial Station | Independent `src/apps/serial_station/` workbench with UART port discovery, manual COM input, 115200 8N1-style configuration summary, command panel, structured logs, log export, replay preview, status bar, send/receive loop, dispatcher, codec, and protocol registry |
+| Serial Station | Independent `src/apps/serial_station/` workbench with UART port discovery, manual COM input, 115200 8N1-style configuration summary, command panel with recent command history, structured logs, log export, replay preview, status bar, send/receive loop, dispatcher, codec, and protocol registry |
 | Protocols | `ascii_text`, `modbus_rtu`, and `custom_md` are implemented under the new Serial Station protocol boundary with QTest coverage |
 | Encoding | ASCII, HEX, and protocol command send paths are centralized through `SerialCodec` |
 | Data views | Terminal, waveform preview, FFT, multi-axis charts, histogram/scatter, heatmap, dashboard widgets, and performance panels are present in the application modules |
@@ -42,7 +42,7 @@ Some integrations are intentionally marked as staged: BLE, CAN, MQTT, USB, and S
 The preview above is a maintained repository asset, not a generated build artifact. It summarizes the current workbench layout:
 
 - left navigation for connection, protocol, terminal, chart, OTA, dashboard, and automation areas;
-- central Serial Station workbench for UART port setup, manual COM entry, protocol mode, command send, structured logs, export/replay preview, and status;
+- central Serial Station workbench for UART port setup, manual COM entry, protocol mode, command send with recent history, structured logs, export/replay preview, and status;
 - right-side analysis surfaces for waveforms, decoded frames, recordings, and diagnostics.
 
 ## Architecture

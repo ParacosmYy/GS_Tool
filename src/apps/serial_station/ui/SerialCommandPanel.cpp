@@ -1,5 +1,6 @@
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 
+#include <QtCore/QSignalBlocker>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
@@ -34,10 +35,40 @@ void SerialCommandPanel::setSendEnabled(bool enabled)
 {
     m_commandEdit->setEnabled(enabled);
     m_modeCombo->setEnabled(enabled);
+    m_historyCombo->setEnabled(enabled && m_history.count() > 0);
     m_sendButton->setEnabled(enabled && !commandText().isEmpty());
+    m_clearHistoryButton->setEnabled(m_history.count() > 0);
     m_readIdButton->setEnabled(enabled);
     m_pingButton->setEnabled(enabled);
     m_resetButton->setEnabled(enabled);
+}
+
+int SerialCommandPanel::historyCount() const
+{
+    return m_history.count();
+}
+
+QStringList SerialCommandPanel::historyCommands() const
+{
+    return m_history.commands();
+}
+
+void SerialCommandPanel::confirmLastSentCommand()
+{
+    if (m_pendingCommand.trimmed().isEmpty()) {
+        return;
+    }
+
+    recordSentCommand(m_pendingCommand, m_pendingMode);
+    m_pendingCommand.clear();
+    m_pendingMode.clear();
+}
+
+void SerialCommandPanel::recordSentCommand(const QString& command, const QString& mode)
+{
+    if (m_history.recordCommand(command, mode)) {
+        refreshHistoryUi();
+    }
 }
 
 void SerialCommandPanel::emitSendRequested()
@@ -47,6 +78,8 @@ void SerialCommandPanel::emitSendRequested()
         updateSendButtonState();
         return;
     }
+    m_pendingCommand = command;
+    m_pendingMode = sendMode();
     emit sendRequested(command, sendMode());
 }
 
@@ -65,6 +98,25 @@ void SerialCommandPanel::applyQuickCommand()
     m_commandEdit->setText(command);
     emit quickCommandSelected(command);
     updateSendButtonState();
+}
+
+void SerialCommandPanel::applyHistoryCommand(int index)
+{
+    const int historyIndex = m_historyCombo->itemData(index).toInt();
+    const QString command = m_history.commandAt(historyIndex);
+    if (command.isEmpty()) {
+        return;
+    }
+
+    m_commandEdit->setText(command);
+    setModeById(m_history.modeAt(historyIndex));
+    updateSendButtonState();
+}
+
+void SerialCommandPanel::clearHistory()
+{
+    m_history.clear();
+    refreshHistoryUi();
 }
 
 void SerialCommandPanel::updateSendButtonState()
@@ -115,6 +167,26 @@ void SerialCommandPanel::setupUi()
     inputRow->addWidget(m_modeCombo);
     inputRow->addWidget(m_sendButton);
 
+    auto* historyRow = new QHBoxLayout();
+    historyRow->setContentsMargins(0, 0, 0, 0);
+    historyRow->setSpacing(8);
+
+    auto* historyLabel = new QLabel(tr("最近"), this);
+    historyLabel->setObjectName(QStringLiteral("serialHistoryLabel"));
+
+    m_historyCombo = new QComboBox(this);
+    m_historyCombo->setObjectName(QStringLiteral("serialCommandHistoryCombo"));
+    m_historyCombo->setPlaceholderText(tr("暂无最近命令"));
+    m_historyCombo->setEnabled(false);
+
+    m_clearHistoryButton = new QPushButton(tr("清空最近"), this);
+    m_clearHistoryButton->setObjectName(QStringLiteral("serialHistoryClearButton"));
+    m_clearHistoryButton->setEnabled(false);
+
+    historyRow->addWidget(historyLabel);
+    historyRow->addWidget(m_historyCombo, 1);
+    historyRow->addWidget(m_clearHistoryButton);
+
     auto* quickRow = new QHBoxLayout();
     quickRow->setContentsMargins(0, 0, 0, 0);
     quickRow->setSpacing(8);
@@ -138,6 +210,7 @@ void SerialCommandPanel::setupUi()
 
     root->addLayout(headerRow);
     root->addLayout(inputRow);
+    root->addLayout(historyRow);
     root->addWidget(divider);
     root->addLayout(quickRow);
 }
@@ -150,6 +223,10 @@ void SerialCommandPanel::connectSignals()
             this, &SerialCommandPanel::emitSendRequested);
     connect(m_commandEdit, &QLineEdit::textChanged,
             this, &SerialCommandPanel::updateSendButtonState);
+    connect(m_historyCombo, QOverload<int>::of(&QComboBox::activated),
+            this, &SerialCommandPanel::applyHistoryCommand);
+    connect(m_clearHistoryButton, &QPushButton::clicked,
+            this, &SerialCommandPanel::clearHistory);
     connect(m_readIdButton, &QToolButton::clicked,
             this, &SerialCommandPanel::applyQuickCommand);
     connect(m_pingButton, &QToolButton::clicked,
@@ -166,6 +243,27 @@ QToolButton* SerialCommandPanel::createQuickButton(const QString& text, const QS
     button->setProperty("command", command);
     button->setToolButtonStyle(Qt::ToolButtonTextOnly);
     return button;
+}
+
+void SerialCommandPanel::refreshHistoryUi()
+{
+    const QSignalBlocker blocker(m_historyCombo);
+    m_historyCombo->clear();
+    for (int i = 0; i < m_history.count(); ++i) {
+        m_historyCombo->addItem(m_history.displayTextAt(i), i);
+    }
+
+    const bool hasHistory = m_history.count() > 0;
+    m_historyCombo->setEnabled(m_commandEdit->isEnabled() && hasHistory);
+    m_clearHistoryButton->setEnabled(hasHistory);
+}
+
+void SerialCommandPanel::setModeById(const QString& mode)
+{
+    const int index = m_modeCombo->findData(mode);
+    if (index >= 0) {
+        m_modeCombo->setCurrentIndex(index);
+    }
 }
 
 } // namespace serial_station

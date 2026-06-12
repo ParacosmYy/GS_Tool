@@ -1074,6 +1074,7 @@ add_test(NAME SerialPortPanel COMMAND test_serial_port_panel)
 add_executable(test_serial_command_panel
     serial_station/test_serial_command_panel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandHistoryModel.cpp
 )
 
 target_include_directories(test_serial_command_panel PRIVATE
@@ -1249,6 +1250,7 @@ add_executable(test_serial_station_replay_flow
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandHistoryModel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialLogPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialStatusBar.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
@@ -1422,6 +1424,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandHistoryModel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialLogPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialStatusBar.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp

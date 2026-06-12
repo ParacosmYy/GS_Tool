@@ -117,6 +117,8 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             m_logPanel, &SerialLogPanel::appendSystem);
     connect(m_controller.get(), &SerialStationController::serialTxCounted,
             m_statusBar, &SerialStatusBar::incrementTx);
+    connect(m_controller.get(), &SerialStationController::serialTxCounted,
+            m_commandPanel, &SerialCommandPanel::confirmLastSentCommand);
     connect(m_controller.get(), &SerialStationController::serialRxCounted,
             m_statusBar, &SerialStatusBar::incrementRx);
     connect(m_controller.get(), &SerialStationController::serialErrorCounted,

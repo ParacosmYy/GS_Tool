@@ -1430,13 +1430,15 @@ QLabel#serialLogTitle {
     font-weight: bold;
 }
 QLabel#serialCommandHint,
+QLabel#serialHistoryLabel,
 QLabel#serialQuickLabel,
 QLabel#serialLogCountLabel {
     color: #7f849c;
 }
 QLineEdit#serialCommandEdit,
 QLineEdit#serialLogFilterEdit,
-QComboBox#serialCommandModeCombo {
+QComboBox#serialCommandModeCombo,
+QComboBox#serialCommandHistoryCombo {
     background-color: #1a1b26;
     border: 1px solid #414868;
     border-radius: 6px;
@@ -1446,7 +1448,8 @@ QComboBox#serialCommandModeCombo {
 }
 QLineEdit#serialCommandEdit:focus,
 QLineEdit#serialLogFilterEdit:focus,
-QComboBox#serialCommandModeCombo:hover {
+QComboBox#serialCommandModeCombo:hover,
+QComboBox#serialCommandHistoryCombo:hover {
     border-color: #7aa2f7;
 }
 QPushButton#serialCommandSendButton {
@@ -1466,8 +1469,10 @@ QPushButton#serialCommandSendButton:disabled {
     border-color: #3b4261;
 }
 QToolButton#serialQuickCommandButton,
+QPushButton#serialHistoryClearButton,
 QPushButton#serialLogClearButton,
-QPushButton#serialLogExportButton {
+QPushButton#serialLogExportButton,
+QPushButton#serialLogReplayButton {
     background-color: #292e42;
     color: #a9b1d6;
     border: 1px solid #414868;
@@ -1476,11 +1481,31 @@ QPushButton#serialLogExportButton {
     padding: 4px 10px;
 }
 QToolButton#serialQuickCommandButton:hover,
+QPushButton#serialHistoryClearButton:hover,
 QPushButton#serialLogClearButton:hover,
-QPushButton#serialLogExportButton:hover {
+QPushButton#serialLogExportButton:hover,
+QPushButton#serialLogReplayButton:hover {
     background-color: #3b4261;
     border-color: #7aa2f7;
     color: #c0caf5;
+}
+QToolButton#serialQuickCommandButton:pressed,
+QPushButton#serialHistoryClearButton:pressed,
+QPushButton#serialLogClearButton:pressed,
+QPushButton#serialLogExportButton:pressed,
+QPushButton#serialLogReplayButton:pressed {
+    background-color: #4b557c;
+    border-color: #6a9af0;
+    color: #ffffff;
+}
+QToolButton#serialQuickCommandButton:disabled,
+QPushButton#serialHistoryClearButton:disabled,
+QPushButton#serialLogClearButton:disabled,
+QPushButton#serialLogExportButton:disabled,
+QPushButton#serialLogReplayButton:disabled {
+    background-color: #1f2335;
+    border-color: #2f354f;
+    color: #565f89;
 }
 QFrame#serialCommandDivider {
     color: #2f354f;

@@ -4,8 +4,10 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QToolButton>
 
+#include "apps/serial_station/ui/SerialCommandHistoryModel.h"
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 
+using serial_station::SerialCommandHistoryModel;
 using serial_station::SerialCommandPanel;
 
 class SerialCommandPanelTest : public QObject {
@@ -22,6 +24,16 @@ private slots:
     void quickCommandFillsInputAndEmitsSelection();
     void disablingSendDisablesInputsAndQuickButtons();
     void reEnableSendKeepsButtonDisabledUntilCommandExists();
+    void historyModelRejectsEmptyCommands();
+    void historyModelMovesDuplicateToFrontAndCountsUse();
+    void historyModelKeepsModeSpecificEntries();
+    void historyModelTrimsOldestCommand();
+    void recordSentCommandUpdatesHistoryCombo();
+    void historyComboAppliesCommandAndMode();
+    void clearHistoryRemovesItemsWithoutChangingInput();
+    void sendIntentDoesNotRecordHistoryUntilConfirmed();
+    void confirmedSendRecordsTrimmedCommand();
+    void disablingSendDisablesHistorySelectionButKeepsClearAvailable();
 };
 
 void SerialCommandPanelTest::modeComboExposesAsciiHexAndProtocol()
@@ -192,6 +204,182 @@ void SerialCommandPanelTest::reEnableSendKeepsButtonDisabledUntilCommandExists()
     commandEdit->setText(QStringLiteral("PING"));
 
     QVERIFY(sendButton->isEnabled());
+}
+
+void SerialCommandPanelTest::historyModelRejectsEmptyCommands()
+{
+    SerialCommandHistoryModel model;
+
+    QVERIFY(!model.recordCommand(QStringLiteral("   "), QStringLiteral("ascii")));
+    QCOMPARE(model.count(), 0);
+    QVERIFY(model.isEmpty());
+    QCOMPARE(model.commands(), QStringList());
+}
+
+void SerialCommandPanelTest::historyModelMovesDuplicateToFrontAndCountsUse()
+{
+    SerialCommandHistoryModel model;
+
+    QVERIFY(model.recordCommand(QStringLiteral("AT+GMR"), QStringLiteral("ascii")));
+    QVERIFY(model.recordCommand(QStringLiteral("PING"), QStringLiteral("ascii")));
+    QVERIFY(model.recordCommand(QStringLiteral(" AT+GMR "), QStringLiteral("ascii")));
+
+    QCOMPARE(model.count(), 2);
+    QCOMPARE(model.commandAt(0), QStringLiteral("AT+GMR"));
+    QCOMPARE(model.commandAt(1), QStringLiteral("PING"));
+    QVERIFY(model.displayTextAt(0).contains(QStringLiteral("2x")));
+}
+
+void SerialCommandPanelTest::historyModelKeepsModeSpecificEntries()
+{
+    SerialCommandHistoryModel model;
+
+    QVERIFY(model.recordCommand(QStringLiteral("01 03 00 00"), QStringLiteral("ascii")));
+    QVERIFY(model.recordCommand(QStringLiteral("01 03 00 00"), QStringLiteral("hex")));
+
+    QCOMPARE(model.count(), 2);
+    QVERIFY(model.contains(QStringLiteral("01 03 00 00"), QStringLiteral("ascii")));
+    QVERIFY(model.contains(QStringLiteral("01 03 00 00"), QStringLiteral("hex")));
+    QCOMPARE(model.modeAt(0), QStringLiteral("hex"));
+    QCOMPARE(model.modeAt(1), QStringLiteral("ascii"));
+}
+
+void SerialCommandPanelTest::historyModelTrimsOldestCommand()
+{
+    SerialCommandHistoryModel model(3);
+
+    QVERIFY(model.recordCommand(QStringLiteral("CMD1"), QStringLiteral("ascii")));
+    QVERIFY(model.recordCommand(QStringLiteral("CMD2"), QStringLiteral("ascii")));
+    QVERIFY(model.recordCommand(QStringLiteral("CMD3"), QStringLiteral("ascii")));
+    QVERIFY(model.recordCommand(QStringLiteral("CMD4"), QStringLiteral("ascii")));
+
+    QCOMPARE(model.count(), 3);
+    QCOMPARE(model.commands(), QStringList({QStringLiteral("CMD4"),
+                                            QStringLiteral("CMD3"),
+                                            QStringLiteral("CMD2")}));
+    QVERIFY(!model.contains(QStringLiteral("CMD1"), QStringLiteral("ascii")));
+}
+
+void SerialCommandPanelTest::recordSentCommandUpdatesHistoryCombo()
+{
+    SerialCommandPanel panel;
+    auto* historyCombo = panel.findChild<QComboBox*>(QStringLiteral("serialCommandHistoryCombo"));
+    auto* clearButton = panel.findChild<QPushButton*>(QStringLiteral("serialHistoryClearButton"));
+    QVERIFY(historyCombo != nullptr);
+    QVERIFY(clearButton != nullptr);
+
+    QCOMPARE(panel.historyCount(), 0);
+    QVERIFY(!historyCombo->isEnabled());
+    QVERIFY(!clearButton->isEnabled());
+
+    panel.recordSentCommand(QStringLiteral("PING"), QStringLiteral("ascii"));
+
+    QCOMPARE(panel.historyCount(), 1);
+    QCOMPARE(panel.historyCommands(), QStringList({QStringLiteral("PING")}));
+    QCOMPARE(historyCombo->count(), 1);
+    QVERIFY(historyCombo->isEnabled());
+    QVERIFY(clearButton->isEnabled());
+    QVERIFY(historyCombo->itemText(0).contains(QStringLiteral("PING")));
+}
+
+void SerialCommandPanelTest::historyComboAppliesCommandAndMode()
+{
+    SerialCommandPanel panel;
+    auto* commandEdit = panel.findChild<QLineEdit*>(QStringLiteral("serialCommandEdit"));
+    auto* modeCombo = panel.findChild<QComboBox*>(QStringLiteral("serialCommandModeCombo"));
+    auto* historyCombo = panel.findChild<QComboBox*>(QStringLiteral("serialCommandHistoryCombo"));
+    auto* sendButton = panel.findChild<QPushButton*>(QStringLiteral("serialCommandSendButton"));
+    QVERIFY(commandEdit != nullptr);
+    QVERIFY(modeCombo != nullptr);
+    QVERIFY(historyCombo != nullptr);
+    QVERIFY(sendButton != nullptr);
+
+    panel.recordSentCommand(QStringLiteral("AT+GMR"), QStringLiteral("ascii"));
+    panel.recordSentCommand(QStringLiteral("01 03 00 00"), QStringLiteral("hex"));
+    QCOMPARE(historyCombo->count(), 2);
+
+    historyCombo->setCurrentIndex(0);
+    QVERIFY(QMetaObject::invokeMethod(&panel, "applyHistoryCommand", Q_ARG(int, 0)));
+
+    QCOMPARE(commandEdit->text(), QStringLiteral("01 03 00 00"));
+    QCOMPARE(modeCombo->currentData().toString(), QStringLiteral("hex"));
+    QVERIFY(sendButton->isEnabled());
+}
+
+void SerialCommandPanelTest::clearHistoryRemovesItemsWithoutChangingInput()
+{
+    SerialCommandPanel panel;
+    auto* commandEdit = panel.findChild<QLineEdit*>(QStringLiteral("serialCommandEdit"));
+    auto* historyCombo = panel.findChild<QComboBox*>(QStringLiteral("serialCommandHistoryCombo"));
+    auto* clearButton = panel.findChild<QPushButton*>(QStringLiteral("serialHistoryClearButton"));
+    QVERIFY(commandEdit != nullptr);
+    QVERIFY(historyCombo != nullptr);
+    QVERIFY(clearButton != nullptr);
+
+    panel.recordSentCommand(QStringLiteral("PING"), QStringLiteral("ascii"));
+    commandEdit->setText(QStringLiteral("AT+GMR"));
+    QTest::mouseClick(clearButton, Qt::LeftButton);
+
+    QCOMPARE(panel.historyCount(), 0);
+    QCOMPARE(historyCombo->count(), 0);
+    QCOMPARE(commandEdit->text(), QStringLiteral("AT+GMR"));
+    QVERIFY(commandEdit->isEnabled());
+    QVERIFY(!clearButton->isEnabled());
+}
+
+void SerialCommandPanelTest::sendIntentDoesNotRecordHistoryUntilConfirmed()
+{
+    SerialCommandPanel panel;
+    auto* commandEdit = panel.findChild<QLineEdit*>(QStringLiteral("serialCommandEdit"));
+    auto* sendButton = panel.findChild<QPushButton*>(QStringLiteral("serialCommandSendButton"));
+    QVERIFY(commandEdit != nullptr);
+    QVERIFY(sendButton != nullptr);
+
+    commandEdit->setText(QStringLiteral("PING"));
+    QTest::mouseClick(sendButton, Qt::LeftButton);
+
+    QCOMPARE(panel.historyCount(), 0);
+}
+
+void SerialCommandPanelTest::confirmedSendRecordsTrimmedCommand()
+{
+    SerialCommandPanel panel;
+    auto* commandEdit = panel.findChild<QLineEdit*>(QStringLiteral("serialCommandEdit"));
+    auto* modeCombo = panel.findChild<QComboBox*>(QStringLiteral("serialCommandModeCombo"));
+    QVERIFY(commandEdit != nullptr);
+    QVERIFY(modeCombo != nullptr);
+
+    const int protocolIndex = modeCombo->findData(QStringLiteral("protocol"));
+    QVERIFY(protocolIndex >= 0);
+    modeCombo->setCurrentIndex(protocolIndex);
+    commandEdit->setText(QStringLiteral("  READ_ID  "));
+
+    QSignalSpy spy(&panel, &SerialCommandPanel::sendRequested);
+    QVERIFY(spy.isValid());
+    QVERIFY(QMetaObject::invokeMethod(&panel, "emitSendRequested"));
+    panel.confirmLastSentCommand();
+
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(panel.historyCount(), 1);
+    QCOMPARE(panel.historyCommands(), QStringList({QStringLiteral("READ_ID")}));
+}
+
+void SerialCommandPanelTest::disablingSendDisablesHistorySelectionButKeepsClearAvailable()
+{
+    SerialCommandPanel panel;
+    auto* historyCombo = panel.findChild<QComboBox*>(QStringLiteral("serialCommandHistoryCombo"));
+    auto* clearButton = panel.findChild<QPushButton*>(QStringLiteral("serialHistoryClearButton"));
+    QVERIFY(historyCombo != nullptr);
+    QVERIFY(clearButton != nullptr);
+
+    panel.recordSentCommand(QStringLiteral("PING"), QStringLiteral("ascii"));
+    QVERIFY(historyCombo->isEnabled());
+    QVERIFY(clearButton->isEnabled());
+
+    panel.setSendEnabled(false);
+
+    QVERIFY(!historyCombo->isEnabled());
+    QVERIFY(clearButton->isEnabled());
 }
 
 QTEST_MAIN(SerialCommandPanelTest)
