@@ -1413,6 +1413,99 @@ QLabel#serialPortStatusLabel[state="error"] {
     border-color: #ef4444;
     background-color: #fef2f2;
 }
+QSplitter#serialWorkbenchSplitter::handle {
+    background-color: #e5e7eb;
+    width: 8px;
+}
+QWidget#serialWorkbenchCenter,
+QWidget#serialCommandPanel,
+QWidget#serialLogPanel {
+    background-color: #f8fafc;
+    border: 1px solid #dbe3ee;
+    border-radius: 8px;
+}
+QLabel#serialCommandTitle,
+QLabel#serialLogTitle {
+    color: #111827;
+    font-weight: bold;
+}
+QLabel#serialCommandHint,
+QLabel#serialQuickLabel,
+QLabel#serialLogCountLabel {
+    color: #64748b;
+}
+QLineEdit#serialCommandEdit,
+QLineEdit#serialLogFilterEdit,
+QComboBox#serialCommandModeCombo {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #111827;
+    min-height: 28px;
+    padding: 4px 8px;
+}
+QLineEdit#serialCommandEdit:focus,
+QLineEdit#serialLogFilterEdit:focus,
+QComboBox#serialCommandModeCombo:hover {
+    border-color: #2563eb;
+}
+QPushButton#serialCommandSendButton {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: 1px solid #2563eb;
+    border-radius: 6px;
+    font-weight: bold;
+    min-height: 30px;
+    padding: 4px 16px;
+}
+QPushButton#serialCommandSendButton:hover { background-color: #3b82f6; }
+QPushButton#serialCommandSendButton:pressed { background-color: #1d4ed8; }
+QPushButton#serialCommandSendButton:disabled {
+    background-color: #d1d5db;
+    color: #9ca3af;
+    border-color: #d1d5db;
+}
+QToolButton#serialQuickCommandButton,
+QPushButton#serialLogClearButton,
+QPushButton#serialLogExportButton {
+    background-color: #ffffff;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    min-height: 28px;
+    padding: 4px 10px;
+}
+QToolButton#serialQuickCommandButton:hover,
+QPushButton#serialLogClearButton:hover,
+QPushButton#serialLogExportButton:hover {
+    background-color: #f1f5f9;
+    border-color: #2563eb;
+    color: #1d4ed8;
+}
+QFrame#serialCommandDivider {
+    color: #dbe3ee;
+    background-color: #dbe3ee;
+    max-height: 1px;
+}
+QPlainTextEdit#serialLogView {
+    background-color: #ffffff;
+    color: #111827;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-family: Consolas, "JetBrains Mono", monospace;
+    font-size: 13px;
+}
+QWidget#serialStatusBar {
+    background-color: #ffffff;
+    border: 1px solid #dbe3ee;
+    border-radius: 6px;
+}
+QWidget#serialStatusBar QLabel {
+    color: #334155;
+}
+QLabel#serialStatusStateLabel[state="open"] { color: #15803d; }
+QLabel#serialStatusStateLabel[state="opening"] { color: #a16207; }
+QLabel#serialStatusStateLabel[state="error"] { color: #b91c1c; }
 
 /* === 工具栏下拉框 - 布局/主题/语言选择 === */
 QComboBox#layoutCombo,

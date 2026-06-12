@@ -1,9 +1,14 @@
 #include "apps/serial_station/SerialStationWindow.h"
 
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QSplitter>
 #include <QtWidgets/QVBoxLayout>
 
 #include "apps/serial_station/SerialStationController.h"
+#include "apps/serial_station/ui/SerialCommandPanel.h"
+#include "apps/serial_station/ui/SerialLogPanel.h"
 #include "apps/serial_station/ui/SerialPortPanel.h"
+#include "apps/serial_station/ui/SerialStatusBar.h"
 
 namespace serial_station {
 
@@ -13,13 +18,38 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
 {
     setObjectName(QStringLiteral("serialStationWindow"));
 
-    auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
+    auto* rootLayout = new QVBoxLayout(this);
+    rootLayout->setContentsMargins(10, 10, 10, 10);
+    rootLayout->setSpacing(8);
+
+    auto* workbench = new QSplitter(Qt::Horizontal, this);
+    workbench->setObjectName(QStringLiteral("serialWorkbenchSplitter"));
+    workbench->setChildrenCollapsible(false);
 
     m_portPanel = new SerialPortPanel(this);
     m_portPanel->setObjectName(QStringLiteral("serialPortPanel"));
-    layout->addWidget(m_portPanel);
+    workbench->addWidget(m_portPanel);
+
+    auto* centerPanel = new QWidget(this);
+    centerPanel->setObjectName(QStringLiteral("serialWorkbenchCenter"));
+    auto* centerLayout = new QVBoxLayout(centerPanel);
+    centerLayout->setContentsMargins(0, 0, 0, 0);
+    centerLayout->setSpacing(8);
+
+    m_commandPanel = new SerialCommandPanel(centerPanel);
+    m_logPanel = new SerialLogPanel(centerPanel);
+
+    centerLayout->addWidget(m_commandPanel);
+    centerLayout->addWidget(m_logPanel, 1);
+    workbench->addWidget(centerPanel);
+    workbench->setStretchFactor(0, 0);
+    workbench->setStretchFactor(1, 1);
+    workbench->setSizes({280, 720});
+
+    m_statusBar = new SerialStatusBar(this);
+
+    rootLayout->addWidget(workbench, 1);
+    rootLayout->addWidget(m_statusBar);
 
     connect(m_portPanel, &SerialPortPanel::connectRequested,
             m_controller.get(), &SerialStationController::connectSerialPort);
@@ -29,6 +59,34 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             m_portPanel, &SerialPortPanel::setSessionState);
     connect(m_controller.get(), &SerialStationController::serialErrorOccurred,
             m_portPanel, &SerialPortPanel::setErrorMessage);
+    connect(m_controller.get(), &SerialStationController::serialStateChanged,
+            m_statusBar, &SerialStatusBar::setSessionState);
+    connect(m_controller.get(), &SerialStationController::serialErrorOccurred,
+            this, [this](const QString& message) {
+                m_statusBar->incrementErrors();
+                m_logPanel->appendSystem(message);
+            });
+    connect(m_portPanel, &SerialPortPanel::connectRequested,
+            this, [this](const SerialPortConfig& config) {
+                m_statusBar->setPortConfig(config);
+                m_logPanel->appendSystem(tr("应用串口配置: %1 @ %2")
+                                             .arg(config.portName, QString::number(config.baudRate)));
+            });
+    connect(m_commandPanel, &SerialCommandPanel::sendRequested,
+            this, [this](const QString& command, const QString& mode) {
+                m_statusBar->incrementTx();
+                m_logPanel->appendTx(tr("%1 [%2]").arg(command, mode));
+            });
+    connect(m_commandPanel, &SerialCommandPanel::quickCommandSelected,
+            this, [this](const QString& command) {
+                m_logPanel->appendSystem(tr("载入快捷命令: %1").arg(command));
+            });
+    connect(m_logPanel, &SerialLogPanel::cleared,
+            m_statusBar, &SerialStatusBar::resetCounters);
+    connect(m_logPanel, &SerialLogPanel::exportRequested,
+            this, [this]() {
+                m_logPanel->appendSystem(tr("导出请求已记录，文件服务将在后续阶段接入"));
+            });
 }
 
 SerialStationWindow::~SerialStationWindow() = default;

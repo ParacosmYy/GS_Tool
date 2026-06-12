@@ -991,6 +991,47 @@ endif()
 add_test(NAME SerialPortPanel COMMAND test_serial_port_panel)
 
 # ============================================================
+# Serial Station工作台壳层测试
+# ============================================================
+
+add_executable(test_serial_station_workbench
+    serial_station/test_serial_station_workbench.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationWindow.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialLogPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialStatusBar.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+)
+
+target_include_directories(test_serial_station_workbench PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_station_workbench PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::SerialPort
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_station_workbench PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialStationWorkbench COMMAND test_serial_station_workbench)
+
+# ============================================================
 # Qt6兼容回归测试
 # ============================================================
 
