@@ -1,5 +1,9 @@
 #include "apps/serial_station/SerialStationWindow.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
+#include <QtCore/QStandardPaths>
+#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QVBoxLayout>
@@ -11,6 +15,45 @@
 #include "apps/serial_station/ui/SerialStatusBar.h"
 
 namespace serial_station {
+
+namespace {
+
+QString defaultExportDirectory()
+{
+    const QString documents =
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    if (!documents.isEmpty()) {
+        return documents;
+    }
+
+    return QDir::homePath();
+}
+
+SerialExportFormat exportFormatForPath(const QString& filePath)
+{
+    const QString suffix = QFileInfo(filePath).suffix().toLower();
+    if (suffix == QStringLiteral("txt") || suffix == QStringLiteral("log")) {
+        return SerialExportFormat::PlainText;
+    }
+
+    if (suffix == QStringLiteral("csv")) {
+        return SerialExportFormat::Csv;
+    }
+
+    return SerialExportFormat::JsonLines;
+}
+
+QString normalizedExportPath(const QString& filePath)
+{
+    const QFileInfo fileInfo(filePath);
+    if (!fileInfo.suffix().isEmpty()) {
+        return filePath;
+    }
+
+    return filePath + QStringLiteral(".jsonl");
+}
+
+} // namespace
 
 SerialStationWindow::SerialStationWindow(QWidget* parent)
     : QWidget(parent)
@@ -94,7 +137,23 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             m_statusBar, &SerialStatusBar::resetCounters);
     connect(m_logPanel, &SerialLogPanel::exportRequested,
             this, [this]() {
-                m_logPanel->appendSystem(tr("导出请求已记录，文件服务将在后续阶段接入"));
+                const QString defaultPath = QDir(defaultExportDirectory())
+                    .filePath(m_controller->suggestedExportFileName(SerialExportFormat::JsonLines));
+                const QString selectedPath = QFileDialog::getSaveFileName(
+                    this,
+                    tr("导出串口日志"),
+                    defaultPath,
+                    tr("JSON Lines (*.jsonl);;Text (*.txt *.log);;CSV (*.csv)"));
+
+                if (selectedPath.trimmed().isEmpty()) {
+                    m_logPanel->appendSystem(tr("日志导出已取消"));
+                    return;
+                }
+
+                SerialExportRequest request;
+                request.filePath = normalizedExportPath(selectedPath);
+                request.format = exportFormatForPath(request.filePath);
+                m_controller->exportLogRecords(request);
             });
 }
 

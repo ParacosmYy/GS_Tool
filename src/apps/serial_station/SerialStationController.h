@@ -9,6 +9,7 @@
 #include "apps/serial_station/core/SerialDispatcher.h"
 #include "apps/serial_station/core/SerialManager.h"
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
+#include "apps/serial_station/services/SerialExportService.h"
 #include "apps/serial_station/services/SerialLogService.h"
 
 namespace serial_station {
@@ -61,6 +62,12 @@ public:
      * @param filter 过滤条件
      */
     QString logJsonLines(const SerialLogFilter& filter) const;
+
+    /** @brief 导出当前结构化日志快照。 */
+    SerialExportResult exportLogRecords(const SerialExportRequest& request);
+
+    /** @brief 根据导出格式生成建议文件名。 */
+    QString suggestedExportFileName(SerialExportFormat format) const;
 
 public slots:
     /**
@@ -144,9 +151,7 @@ signals:
      * @param mode 发送模式
      * @param frame 已构建帧
      */
-    void serialCommandPrepared(const QString& command,
-                               const QString& mode,
-                               const QByteArray& frame);
+    void serialCommandPrepared(const QString& command, const QString& mode, const QByteArray& frame);
 
     /**
      * @brief 命令发送成功。
@@ -154,9 +159,7 @@ signals:
      * @param mode 发送模式
      * @param bytesWritten 写入字节数
      */
-    void serialCommandSent(const QString& command,
-                           const QString& mode,
-                           qint64 bytesWritten);
+    void serialCommandSent(const QString& command, const QString& mode, qint64 bytesWritten);
 
     /**
      * @brief 命令发送失败。
@@ -164,9 +167,7 @@ signals:
      * @param mode 发送模式
      * @param message 失败原因
      */
-    void serialCommandFailed(const QString& command,
-                             const QString& mode,
-                             const QString& message);
+    void serialCommandFailed(const QString& command, const QString& mode, const QString& message);
 
 private:
     QString normalizeSendMode(const QString& mode) const;
@@ -191,6 +192,7 @@ private:
     SerialDispatcher m_dispatcher;
     SerialCodec m_codec;
     SerialLogService m_logService;
+    SerialExportService m_exportService;
 };
 
 } // namespace serial_station

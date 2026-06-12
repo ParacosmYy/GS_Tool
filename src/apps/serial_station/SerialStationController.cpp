@@ -30,46 +30,6 @@ SerialManager& SerialStationController::serialManager()
     return m_serialManager;
 }
 
-SerialLogService& SerialStationController::logService()
-{
-    return m_logService;
-}
-
-const SerialLogService& SerialStationController::logService() const
-{
-    return m_logService;
-}
-
-QVector<SerialLogRecord> SerialStationController::logRecords() const
-{
-    return m_logService.records();
-}
-
-QVector<SerialLogRecord> SerialStationController::logRecords(const SerialLogFilter& filter) const
-{
-    return m_logService.records(filter);
-}
-
-QString SerialStationController::logPlainText() const
-{
-    return m_logService.toPlainText();
-}
-
-QString SerialStationController::logPlainText(const SerialLogFilter& filter) const
-{
-    return m_logService.toPlainText(filter);
-}
-
-QString SerialStationController::logJsonLines() const
-{
-    return m_logService.toJsonLines();
-}
-
-QString SerialStationController::logJsonLines(const SerialLogFilter& filter) const
-{
-    return m_logService.toJsonLines(filter);
-}
-
 void SerialStationController::connectSerialPort(const SerialPortConfig& config)
 {
     resetReceiveDispatcher();

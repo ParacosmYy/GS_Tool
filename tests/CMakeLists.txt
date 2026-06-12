@@ -1213,12 +1213,14 @@ add_test(NAME SerialExportService COMMAND test_serial_export_service)
 add_executable(test_serial_station_controller_log_service
     serial_station/test_serial_station_controller_log_service.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerExport.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialManager.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
@@ -1246,18 +1248,62 @@ endif()
 add_test(NAME SerialStationControllerLogService COMMAND test_serial_station_controller_log_service)
 
 # ============================================================
-# Serial Station控制器发送闭环测试
+# Serial Station日志导出闭环测试
 # ============================================================
 
-add_executable(test_serial_station_controller
-    serial_station/test_serial_station_controller.cpp
+add_executable(test_serial_station_export_flow
+    serial_station/test_serial_station_export_flow.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerExport.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialManager.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
+)
+
+target_include_directories(test_serial_station_export_flow PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_station_export_flow PRIVATE
+    Qt6::Core
+    Qt6::SerialPort
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_station_export_flow PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialStationExportFlow COMMAND test_serial_station_export_flow)
+
+# ============================================================
+# Serial Station控制器发送闭环测试
+# ============================================================
+
+add_executable(test_serial_station_controller
+    serial_station/test_serial_station_controller.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerExport.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
@@ -1291,6 +1337,7 @@ add_executable(test_serial_station_workbench
     serial_station/test_serial_station_workbench.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationWindow.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerExport.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
@@ -1301,6 +1348,8 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialManager.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp

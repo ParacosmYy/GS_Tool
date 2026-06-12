@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 485分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 515分
+> 当前: 486分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 514分
 
 ---
 
@@ -187,12 +187,13 @@
 | 483 | Serial Station导出服务实现 | 新增services/SerialExportService，支持PlainText/JSON Lines/CSV格式化、QSaveFile原子写入、BOM和错误路径QTest |
 | 484 | README企业级宣传约束入口强化 | CLAUDE/工作流/Git约束同步声明README必须作为企业级对外入口维护，产品能力变化时必须检查是否同步更新 |
 | 485 | Serial Station UI导出闭环PRD/Specs | 定义日志导出按钮经Window选择路径、Controller调用导出服务、结果回写结构化日志的跨层闭环 |
+| 486 | Serial Station UI导出闭环实现 | Controller接入SerialExportService，Window导出按钮选择路径并调用controller，补导出闭环QTest和CMake注册 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#485` 的完整记录
+- 当前文档已整理到 `#486` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
