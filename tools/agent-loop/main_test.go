@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -89,6 +90,53 @@ func TestLoadConfigKeepsConfiguredCommands(t *testing.T) {
 	}
 }
 
+func TestRunLoopPassesWhenCheckSucceeds(t *testing.T) {
+	dir := t.TempDir()
+	cfg := Config{
+		Workdir:    dir,
+		MaxRounds:  1,
+		MaxMinutes: 1,
+		Check:      []string{successCommand()},
+	}
+
+	if err := runLoop(cfg); err != nil {
+		t.Fatalf("runLoop returned error: %v", err)
+	}
+}
+
+func TestRunLoopFailsWhenCheckFailsWithoutFix(t *testing.T) {
+	dir := t.TempDir()
+	cfg := Config{
+		Workdir:    dir,
+		MaxRounds:  1,
+		MaxMinutes: 1,
+		Check:      []string{failureCommand()},
+	}
+
+	err := runLoop(cfg)
+	if err == nil || !strings.Contains(err.Error(), "no fix") {
+		t.Fatalf("runLoop error = %v, want missing fix error", err)
+	}
+}
+
+func TestRunLoopPassesAfterFixCommand(t *testing.T) {
+	dir := t.TempDir()
+	cfg := Config{
+		Workdir:    dir,
+		MaxRounds:  3,
+		MaxMinutes: 1,
+		Check:      []string{flagCheckCommand()},
+		Fix:        []string{flagFixCommand()},
+	}
+
+	if err := runLoop(cfg); err != nil {
+		t.Fatalf("runLoop returned error: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "ok.flag")); err != nil {
+		t.Fatalf("fix command did not create marker: %v", err)
+	}
+}
+
 func writeConfig(t *testing.T, dir string, body string) string {
 	t.Helper()
 
@@ -97,4 +145,32 @@ func writeConfig(t *testing.T, dir string, body string) string {
 		t.Fatalf("write config: %v", err)
 	}
 	return path
+}
+
+func successCommand() string {
+	if runtime.GOOS == "windows" {
+		return "Write-Output ok"
+	}
+	return "echo ok"
+}
+
+func failureCommand() string {
+	if runtime.GOOS == "windows" {
+		return "exit 1"
+	}
+	return "exit 1"
+}
+
+func flagCheckCommand() string {
+	if runtime.GOOS == "windows" {
+		return "if (Test-Path .\\ok.flag) { exit 0 } else { exit 1 }"
+	}
+	return "test -f ok.flag"
+}
+
+func flagFixCommand() string {
+	if runtime.GOOS == "windows" {
+		return "Set-Content -Path .\\ok.flag -Value ok"
+	}
+	return "touch ok.flag"
 }

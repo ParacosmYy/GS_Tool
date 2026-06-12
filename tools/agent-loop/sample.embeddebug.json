@@ -6,7 +6,7 @@
     "powershell -NoProfile -ExecutionPolicy Bypass -File .\\tools\\doctor.ps1"
   ],
   "check": [
-    ".\\EmbedDebug.bat"
+    "powershell -NoProfile -ExecutionPolicy Bypass -File .\\tools\\verify_embeddebug_launch.ps1"
   ],
   "fix": []
 }
