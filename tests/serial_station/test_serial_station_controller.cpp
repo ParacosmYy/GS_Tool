@@ -10,6 +10,8 @@ using serial_station::SerialPortConfig;
 using serial_station::SerialSessionState;
 using serial_station::SerialStationController;
 
+Q_DECLARE_METATYPE(SerialPortConfig)
+
 class SerialStationControllerTest : public QObject {
     Q_OBJECT
 
@@ -44,13 +46,17 @@ private slots:
     void reconnectResetsPartialReceiveBuffer();
     void disconnectResetsPartialReceiveBuffer();
     void disconnectThenNewLineDoesNotUseOldPartialBytes();
+    void validConfigConnectLogsConfigSummaryBeforeOpen();
     void invalidConfigConnectReportsError();
+    void invalidConfigConnectReportsConfigValidationReason_data();
+    void invalidConfigConnectReportsConfigValidationReason();
     void disconnectReturnsClosedState();
 };
 
 void SerialStationControllerTest::initTestCase()
 {
     qRegisterMetaType<SerialSessionState>("SerialSessionState");
+    qRegisterMetaType<SerialPortConfig>("SerialPortConfig");
 }
 
 void SerialStationControllerTest::defaultProtocolIsAvailable()
@@ -536,6 +542,32 @@ void SerialStationControllerTest::disconnectThenNewLineDoesNotUseOldPartialBytes
     QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("NEW"));
 }
 
+void SerialStationControllerTest::validConfigConnectLogsConfigSummaryBeforeOpen()
+{
+    SerialStationController controller;
+    SerialPortConfig config;
+    config.portName = QStringLiteral("  COM_DOES_NOT_EXIST  ");
+    config.baudRate = 57600;
+    config.dataBits = QSerialPort::Data7;
+    config.parity = QSerialPort::EvenParity;
+    config.stopBits = QSerialPort::TwoStop;
+    config.flowControl = QSerialPort::HardwareControl;
+    config.dtrEnabled = true;
+    config.rtsEnabled = false;
+
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.connectSerialPort(config);
+
+    QVERIFY(systemLogSpy.count() >= 1);
+    const QString firstLog = systemLogSpy.first().at(0).toString();
+    QVERIFY(firstLog.contains(QStringLiteral("正在打开串口")));
+    QVERIFY(firstLog.contains(QStringLiteral("COM_DOES_NOT_EXIST 57600 7E2 硬件流控")));
+    QVERIFY(firstLog.contains(QStringLiteral("DTR=on RTS=off")));
+    QCOMPARE(controller.serialManager().session().config().portName,
+             QStringLiteral("COM_DOES_NOT_EXIST"));
+}
+
 void SerialStationControllerTest::invalidConfigConnectReportsError()
 {
     SerialStationController controller;
@@ -552,6 +584,67 @@ void SerialStationControllerTest::invalidConfigConnectReportsError()
     QVERIFY(stateSpy.count() >= 1);
     QCOMPARE(controller.serialManager().session().state(), SerialSessionState::Error);
     QVERIFY(!controller.serialManager().session().isOpen());
+    QCOMPARE(errorSpy.takeFirst().at(0).toString(), QStringLiteral("串口端口名为空"));
+    QCOMPARE(controller.serialManager().session().errorString(), QStringLiteral("串口端口名为空"));
+}
+
+void SerialStationControllerTest::invalidConfigConnectReportsConfigValidationReason_data()
+{
+    QTest::addColumn<SerialPortConfig>("config");
+    QTest::addColumn<QString>("message");
+
+    SerialPortConfig emptyPort;
+    emptyPort.portName = QStringLiteral("  ");
+    emptyPort.baudRate = 115200;
+    QTest::newRow("empty-port") << emptyPort << QStringLiteral("串口端口名为空");
+
+    SerialPortConfig badBaud;
+    badBaud.portName = QStringLiteral("COM_BAD_BAUD");
+    badBaud.baudRate = 0;
+    QTest::newRow("bad-baud") << badBaud << QStringLiteral("串口波特率必须大于 0");
+
+    SerialPortConfig badDataBits;
+    badDataBits.portName = QStringLiteral("COM_BAD_DATA");
+    badDataBits.dataBits = static_cast<QSerialPort::DataBits>(-1);
+    QTest::newRow("bad-data-bits") << badDataBits << QStringLiteral("串口数据位不受支持");
+
+    SerialPortConfig badParity;
+    badParity.portName = QStringLiteral("COM_BAD_PARITY");
+    badParity.parity = static_cast<QSerialPort::Parity>(-1);
+    QTest::newRow("bad-parity") << badParity << QStringLiteral("串口校验位不受支持");
+
+    SerialPortConfig badStopBits;
+    badStopBits.portName = QStringLiteral("COM_BAD_STOP");
+    badStopBits.stopBits = static_cast<QSerialPort::StopBits>(-1);
+    QTest::newRow("bad-stop-bits") << badStopBits << QStringLiteral("串口停止位不受支持");
+
+    SerialPortConfig badFlow;
+    badFlow.portName = QStringLiteral("COM_BAD_FLOW");
+    badFlow.flowControl = static_cast<QSerialPort::FlowControl>(-1);
+    QTest::newRow("bad-flow") << badFlow << QStringLiteral("串口流控不受支持");
+}
+
+void SerialStationControllerTest::invalidConfigConnectReportsConfigValidationReason()
+{
+    QFETCH(SerialPortConfig, config);
+    QFETCH(QString, message);
+
+    SerialStationController controller;
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorOccurred);
+    QSignalSpy stateSpy(&controller, &SerialStationController::serialStateChanged);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+    QSignalSpy errorCountSpy(&controller, &SerialStationController::serialErrorCounted);
+
+    controller.connectSerialPort(config);
+
+    QCOMPARE(errorSpy.count(), 1);
+    QCOMPARE(stateSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 1);
+    QCOMPARE(errorCountSpy.count(), 1);
+    QCOMPARE(errorSpy.takeFirst().at(0).toString(), message);
+    QCOMPARE(systemLogSpy.takeFirst().at(0).toString(), message);
+    QCOMPARE(controller.serialManager().session().state(), SerialSessionState::Error);
+    QCOMPARE(controller.serialManager().session().errorString(), message);
 }
 
 void SerialStationControllerTest::disconnectReturnsClosedState()

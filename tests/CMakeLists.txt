@@ -961,6 +961,27 @@ endif()
 add_test(NAME SerialSession COMMAND test_serial_session)
 
 # ============================================================
+# Serial Station配置测试
+# ============================================================
+
+add_executable(test_serial_station_config
+    serial_station/test_serial_station_config.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+)
+
+target_include_directories(test_serial_station_config PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_station_config PRIVATE
+    Qt6::Core
+    Qt6::SerialPort
+    Qt6::Test
+)
+
+add_test(NAME SerialStationConfig COMMAND test_serial_station_config)
+
+# ============================================================
 # Serial Station UART配置面板测试
 # ============================================================
 

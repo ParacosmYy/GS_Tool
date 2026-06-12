@@ -21,8 +21,9 @@ SerialPortConfig SerialPort::config() const
 
 bool SerialPort::open()
 {
-    if (!m_config.isValid()) {
-        emit errorOccurred(tr("串口配置无效"));
+    const QString validationError = m_config.validationError();
+    if (!validationError.isEmpty()) {
+        emit errorOccurred(validationError);
         return false;
     }
 
@@ -30,7 +31,7 @@ bool SerialPort::open()
         m_port.close();
     }
 
-    m_port.setPortName(m_config.portName);
+    m_port.setPortName(m_config.normalizedPortName());
     m_port.setBaudRate(m_config.baudRate);
     m_port.setDataBits(m_config.dataBits);
     m_port.setParity(m_config.parity);

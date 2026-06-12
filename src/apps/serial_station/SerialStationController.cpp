@@ -33,6 +33,15 @@ SerialManager& SerialStationController::serialManager()
 void SerialStationController::connectSerialPort(const SerialPortConfig& config)
 {
     resetReceiveDispatcher();
+    const QString validationError = config.validationError();
+    if (!validationError.isEmpty()) {
+        m_serialManager.rejectConfiguration(config, validationError);
+        emit serialErrorCounted();
+        emit serialSystemLogged(validationError);
+        return;
+    }
+
+    emit serialSystemLogged(tr("正在打开串口: %1").arg(config.summary()));
     m_serialManager.configure(config);
     if (!m_serialManager.open()) {
         emit serialErrorOccurred(m_serialManager.session().errorString());

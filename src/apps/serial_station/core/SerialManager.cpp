@@ -12,8 +12,17 @@ SerialManager::SerialManager(QObject* parent)
 
 void SerialManager::configure(const SerialPortConfig& config)
 {
-    m_session.setConfig(config);
-    m_port.configure(config);
+    const SerialPortConfig normalizedConfig = config.normalized();
+    m_session.setConfig(normalizedConfig);
+    m_port.configure(normalizedConfig);
+}
+
+void SerialManager::rejectConfiguration(const SerialPortConfig& config, const QString& message)
+{
+    configure(config);
+    m_session.markError(message);
+    emit errorOccurred(message);
+    emit stateChanged(m_session.state());
 }
 
 SerialSession SerialManager::session() const
