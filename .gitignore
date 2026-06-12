@@ -48,6 +48,8 @@ Desktop.ini
 # Settings (local)
 embeddebug_settings.json
 test_output_*.txt
+local_env.bat
+tools/local_env.bat
 
 # Temp files
 *.tmp

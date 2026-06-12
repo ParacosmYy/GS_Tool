@@ -1,0 +1,12 @@
+{
+  "workdir": "../..",
+  "max_rounds": 20,
+  "max_minutes": 30,
+  "execute": [
+    "cmake --build .\\build --config Release --parallel 4"
+  ],
+  "check": [
+    ".\\EmbedDebug.bat"
+  ],
+  "fix": []
+}

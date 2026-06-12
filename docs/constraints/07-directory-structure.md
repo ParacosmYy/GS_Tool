@@ -13,6 +13,7 @@ User_Serial/
 ├── CLAUDE.md                      # 约束文档主入口（索引+铁律）
 ├── README.md                      # 项目说明文档
 ├── EmbedDebug.bat                 # 双击启动脚本；最低运行入口，必须保持可用
+├── Beta.bat                       # 兼容启动入口，调用 EmbedDebug.bat
 ├── embeddebug_settings.json       # 运行时配置
 ├── docs/                          # 文档目录
 │   ├── constraints/               # 约束文档模块
@@ -20,12 +21,14 @@ User_Serial/
 │   ├── architecture/              # 架构文档（设计+审查）
 │   ├── reviews/                   # 代码审查 + UI/UX 审查 + QA 报告
 │   └── tracking/                  # 评分追踪
+├── tools/                         # 本地开发、启动、审计和 Agent 执行工具
 ├── resources/                     # 资源文件
 ├── src/                           # 源代码
 └── tests/                         # 测试
 ```
 
 `EmbedDebug.bat` 是用户侧最低运行入口，不属于可随意替换的临时脚本。任何改变构建输出目录、可执行文件名、Qt 部署路径或启动参数的改动，都必须同步检查并验证该 bat 双击启动链路。
+`Beta.bat` 仅保留兼容调用，不得承载独立构建/部署逻辑。
 
 构建目录只能有一个：`build/`。根目录下禁止出现或引用 `build2/`、`build-debug/`、`build-release/`、`cmake-build-*` 等平行构建目录；`EmbedDebug.bat` 也不得为这些目录保留 fallback。
 
@@ -234,7 +237,32 @@ docs/
 │   ├── frozen-dirs.md
 │   ├── module-boundaries.md
 │   └── migration-roadmap.md
+├── superpowers/                   # Specs、BATCH、LOOP 和执行计划
+│   ├── specs/                     # Specs 模板
+│   ├── plans/                     # 分步执行计划
+│   ├── BATCH_PROTOCOL.md
+│   └── LOOP_PROTOCOL.md
 ├── prd/                           # PRD 需求文档
 ├── reviews/                       # 代码/UI/QA 审查
+│   ├── debug/                     # LOOP Debug 追踪报告
+│   └── simplify/                  # LOOP Simplify 只读扫描报告
 └── tracking/                      # 评分追踪
 ```
+
+---
+
+## 七、tools/ 目录
+
+```
+tools/
+├── bootstrap_env.bat              # 本机环境探测，生成 local_env.bat
+├── debug-trace.ps1                # LOOP Debug 追踪报告生成入口
+├── doctor.ps1                     # LOOP Doctor 系统体检，只读诊断，构建/启动需显式参数
+├── launch_embeddebug.ps1          # EmbedDebug.bat 调用的启动/构建/部署脚本
+├── simplify-scan.ps1              # LOOP Simplify 只读扫描入口
+├── qss-generator/                 # QSS 生成工具
+├── project-audit/                 # 项目审计工具
+└── agent-loop/                    # Specs 驱动的 Go 执行循环工具
+```
+
+`tools/agent-loop/` 只用于 Agent 迭代执行辅助，不属于 EmbedDebug 产品运行时，不接入 CMake，不生成或引用第二构建目录。

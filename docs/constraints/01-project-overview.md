@@ -52,6 +52,16 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 
 `EmbedDebug.bat` 是用户侧最低运行入口，必须保持双击可启动。若 `build/EmbedDebug.exe` 不存在，`EmbedDebug.bat` 必须在当前机器可用环境下自动尝试配置/构建；失败时必须在弹窗输出具体缺失组件和修复命令。
 
+### 克隆后可运行环境
+
+克隆后首次运行只允许按固定顺序操作：
+
+1. 双击 `tools\bootstrap_env.bat`（自动写入 `local_env.bat`）。
+2. 确认控制台显示了 `QT_PREFIX / MINGW_BIN / CMAKE_BIN / NINJA_BIN`。
+3. 双击 `EmbedDebug.bat`（或 `Beta.bat`）启动。
+
+约束：`local_env.bat` 仅为机器本地环境文件，不提交 git；若启动失败，必须直接指出缺的依赖项并给出修复命令。
+
 - bat 只能从 `build/EmbedDebug.exe` 启动应用。
 - 如果缺少 Qt 运行库，bat 应尝试执行 `windeployqt` 或给出明确错误信息。
 - 任何修改 CMake、输出目录、可执行文件名、资源路径、Qt 部署路径、启动脚本的任务，收口前必须验证 `EmbedDebug.bat`。
