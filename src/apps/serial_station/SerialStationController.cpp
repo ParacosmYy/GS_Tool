@@ -2,6 +2,8 @@
 
 #include <QtCore/QVariantMap>
 
+#include "apps/serial_station/SerialStationConstants.h"
+
 namespace serial_station {
 
 SerialStationController::SerialStationController(QObject* parent)
@@ -9,10 +11,13 @@ SerialStationController::SerialStationController(QObject* parent)
     , m_serialManager(this)
 {
     m_protocols.registerBuiltInProtocols();
+    resetReceiveProtocol();
     connect(&m_serialManager, &SerialManager::stateChanged,
             this, &SerialStationController::serialStateChanged);
     connect(&m_serialManager, &SerialManager::errorOccurred,
             this, &SerialStationController::serialErrorOccurred);
+    connect(&m_serialManager, &SerialManager::bytesReceived,
+            this, &SerialStationController::handleBytesReceived);
 }
 
 SerialProtocolRegistry& SerialStationController::protocols()
@@ -27,6 +32,7 @@ SerialManager& SerialStationController::serialManager()
 
 void SerialStationController::connectSerialPort(const SerialPortConfig& config)
 {
+    resetReceiveProtocol();
     m_serialManager.configure(config);
     if (!m_serialManager.open()) {
         emit serialErrorOccurred(m_serialManager.session().errorString());
@@ -36,6 +42,7 @@ void SerialStationController::connectSerialPort(const SerialPortConfig& config)
 void SerialStationController::disconnectSerialPort()
 {
     m_serialManager.close();
+    resetReceiveProtocol();
 }
 
 void SerialStationController::sendCommand(const QString& command, const QString& mode)
@@ -80,6 +87,33 @@ void SerialStationController::sendCommand(const QString& command, const QString&
     emit serialCommandSent(trimmedCommand, normalizedMode, bytesWritten);
 }
 
+void SerialStationController::handleBytesReceived(const QByteArray& bytes)
+{
+    if (bytes.isEmpty()) {
+        return;
+    }
+
+    if (!m_receiveProtocol) {
+        resetReceiveProtocol();
+    }
+
+    if (!m_receiveProtocol) {
+        emit serialErrorCounted();
+        emit serialSystemLogged(tr("接收协议不可用，已丢弃 %1 bytes").arg(bytes.size()));
+        return;
+    }
+
+    const QVector<SerialProtocolEvent> events = m_receiveProtocol->feed(bytes);
+    if (events.isEmpty()) {
+        emit serialSystemLogged(tr("接收缓存 %1 bytes，等待完整帧").arg(bytes.size()));
+        return;
+    }
+
+    for (const SerialProtocolEvent& event : events) {
+        processProtocolEvent(event);
+    }
+}
+
 QString SerialStationController::normalizeSendMode(const QString& mode) const
 {
     return mode.trimmed().toLower();
@@ -99,6 +133,60 @@ QByteArray SerialStationController::buildCommandFrame(const QString& command,
     params.insert(QStringLiteral("text"), command);
     params.insert(QStringLiteral("appendNewline"), false);
     return protocol->buildCommand(command, params);
+}
+
+void SerialStationController::resetReceiveProtocol()
+{
+    m_receiveProtocol = m_protocols.createDefault();
+    if (m_receiveProtocol) {
+        m_receiveProtocol->reset();
+    }
+}
+
+void SerialStationController::processProtocolEvent(const SerialProtocolEvent& event)
+{
+    if (event.type == serialStationConstants::kAsciiFrameType) {
+        emit serialRxCounted();
+        emit serialRxLogged(eventPayloadText(event));
+        return;
+    }
+
+    if (event.type == serialStationConstants::kLogType) {
+        const QString text = eventPayloadText(event);
+        emit serialSystemLogged(text);
+        return;
+    }
+
+    emit serialErrorCounted();
+    emit serialSystemLogged(tr("未知接收事件: %1").arg(event.type));
+}
+
+QString SerialStationController::eventPayloadText(const SerialProtocolEvent& event) const
+{
+    const QString text = event.payload.value(QStringLiteral("text")).toString().trimmed();
+    if (!text.isEmpty()) {
+        return text;
+    }
+
+    const QString message = event.payload.value(QStringLiteral("message")).toString().trimmed();
+    if (!message.isEmpty()) {
+        return message;
+    }
+
+    if (!event.raw.isEmpty()) {
+        return rawBytesSummary(event.raw);
+    }
+
+    return tr("空接收事件");
+}
+
+QString SerialStationController::rawBytesSummary(const QByteArray& bytes) const
+{
+    if (bytes.isEmpty()) {
+        return tr("<empty>");
+    }
+
+    return QString::fromLatin1(bytes.toHex(' ').toUpper());
 }
 
 void SerialStationController::emitSendFailure(const QString& command,

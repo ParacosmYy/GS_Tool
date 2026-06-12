@@ -28,6 +28,22 @@ private slots:
     void repeatedRejectedCommandsCountEveryFailure();
     void emptyCommandSystemLogDoesNotInventCommandContext();
     void defaultProtocolBuildsAsciiFrame();
+    void emptyReceiveBytesAreIgnored();
+    void completeAsciiLineProducesRxLog();
+    void completeAsciiLineDoesNotCountErrors();
+    void splitAsciiLineBuffersUntilNewline();
+    void multipleAsciiLinesProduceMultipleRxCounts();
+    void carriageReturnIsTrimmedFromAsciiLine();
+    void partialReceiveBytesCreateSystemCacheLog();
+    void partialReceiveThenCompleteLineKeepsBufferedContent();
+    void emptyAsciiLineFallsBackToRawSummary();
+    void newlineOnlyAfterPartialProducesBufferedFrame();
+    void oversizedPartialBufferIsClearedByProtocol();
+    void receiveAfterOversizedBufferStartsFresh();
+    void emptyBytesBetweenPartialChunksDoNotBreakFrame();
+    void reconnectResetsPartialReceiveBuffer();
+    void disconnectResetsPartialReceiveBuffer();
+    void disconnectThenNewLineDoesNotUseOldPartialBytes();
     void invalidConfigConnectReportsError();
     void disconnectReturnsClosedState();
 };
@@ -256,6 +272,268 @@ void SerialStationControllerTest::defaultProtocolBuildsAsciiFrame()
 
     params.insert(QStringLiteral("appendNewline"), true);
     QCOMPARE(protocol->buildCommand(QStringLiteral("ignored"), params), QByteArray("AT+GMR\n"));
+}
+
+void SerialStationControllerTest::emptyReceiveBytesAreIgnored()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+
+    controller.handleBytesReceived(QByteArray());
+
+    QCOMPARE(rxSpy.count(), 0);
+    QCOMPARE(rxCountSpy.count(), 0);
+    QCOMPARE(systemLogSpy.count(), 0);
+    QCOMPARE(errorSpy.count(), 0);
+}
+
+void SerialStationControllerTest::completeAsciiLineProducesRxLog()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("OK\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 0);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("OK"));
+}
+
+void SerialStationControllerTest::completeAsciiLineDoesNotCountErrors()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("READY\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(errorSpy.count(), 0);
+    QCOMPARE(systemLogSpy.count(), 0);
+}
+
+void SerialStationControllerTest::splitAsciiLineBuffersUntilNewline()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("O"));
+
+    QCOMPARE(rxSpy.count(), 0);
+    QCOMPARE(rxCountSpy.count(), 0);
+    QCOMPARE(systemLogSpy.count(), 1);
+    QVERIFY(systemLogSpy.takeFirst().at(0).toString().contains(QStringLiteral("接收缓存")));
+
+    controller.handleBytesReceived(QByteArray("K\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("OK"));
+}
+
+void SerialStationControllerTest::multipleAsciiLinesProduceMultipleRxCounts()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("OK\nERR\nREADY\n"));
+
+    QCOMPARE(rxSpy.count(), 3);
+    QCOMPARE(rxCountSpy.count(), 3);
+    QCOMPARE(systemLogSpy.count(), 0);
+    QCOMPARE(rxSpy.at(0).at(0).toString(), QStringLiteral("OK"));
+    QCOMPARE(rxSpy.at(1).at(0).toString(), QStringLiteral("ERR"));
+    QCOMPARE(rxSpy.at(2).at(0).toString(), QStringLiteral("READY"));
+}
+
+void SerialStationControllerTest::carriageReturnIsTrimmedFromAsciiLine()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+
+    controller.handleBytesReceived(QByteArray("VERSION 1.0\r\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("VERSION 1.0"));
+}
+
+void SerialStationControllerTest::partialReceiveBytesCreateSystemCacheLog()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+
+    controller.handleBytesReceived(QByteArray("PARTIAL"));
+
+    QCOMPARE(rxSpy.count(), 0);
+    QCOMPARE(rxCountSpy.count(), 0);
+    QCOMPARE(systemLogSpy.count(), 1);
+    QCOMPARE(errorSpy.count(), 0);
+    QVERIFY(systemLogSpy.takeFirst().at(0).toString().contains(QStringLiteral("7 bytes")));
+}
+
+void SerialStationControllerTest::partialReceiveThenCompleteLineKeepsBufferedContent()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("VER"));
+    controller.handleBytesReceived(QByteArray("SION"));
+    controller.handleBytesReceived(QByteArray("?\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 2);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("VERSION?"));
+}
+
+void SerialStationControllerTest::emptyAsciiLineFallsBackToRawSummary()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 0);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("0A"));
+}
+
+void SerialStationControllerTest::newlineOnlyAfterPartialProducesBufferedFrame()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("ACK"));
+    controller.handleBytesReceived(QByteArray("\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 1);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("ACK"));
+}
+
+void SerialStationControllerTest::oversizedPartialBufferIsClearedByProtocol()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+    const QByteArray oversized(9000, 'A');
+
+    controller.handleBytesReceived(oversized);
+    controller.handleBytesReceived(QByteArray("\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QVERIFY(systemLogSpy.count() >= 1);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("0A"));
+}
+
+void SerialStationControllerTest::receiveAfterOversizedBufferStartsFresh()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+    const QByteArray oversized(9000, 'B');
+
+    controller.handleBytesReceived(oversized);
+    controller.handleBytesReceived(QByteArray("OK\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QVERIFY(systemLogSpy.count() >= 1);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("OK"));
+}
+
+void SerialStationControllerTest::emptyBytesBetweenPartialChunksDoNotBreakFrame()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("O"));
+    controller.handleBytesReceived(QByteArray());
+    controller.handleBytesReceived(QByteArray("K\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 1);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("OK"));
+}
+
+void SerialStationControllerTest::reconnectResetsPartialReceiveBuffer()
+{
+    SerialStationController controller;
+    SerialPortConfig invalidConfig;
+    invalidConfig.portName.clear();
+    invalidConfig.baudRate = 115200;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("STALE"));
+    controller.connectSerialPort(invalidConfig);
+    controller.handleBytesReceived(QByteArray("\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QVERIFY(systemLogSpy.count() >= 1);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("0A"));
+}
+
+void SerialStationControllerTest::disconnectResetsPartialReceiveBuffer()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.handleBytesReceived(QByteArray("STALE"));
+    controller.disconnectSerialPort();
+    controller.handleBytesReceived(QByteArray("\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QVERIFY(systemLogSpy.count() >= 1);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("0A"));
+}
+
+void SerialStationControllerTest::disconnectThenNewLineDoesNotUseOldPartialBytes()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+
+    controller.handleBytesReceived(QByteArray("OLD"));
+    controller.disconnectSerialPort();
+    controller.handleBytesReceived(QByteArray("NEW\n"));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("NEW"));
 }
 
 void SerialStationControllerTest::invalidConfigConnectReportsError()

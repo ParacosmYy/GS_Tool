@@ -5,7 +5,10 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <memory>
+
 #include "apps/serial_station/core/SerialManager.h"
+#include "apps/serial_station/protocols/ISerialProtocol.h"
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
 
 namespace serial_station {
@@ -43,6 +46,12 @@ public slots:
      */
     void sendCommand(const QString& command, const QString& mode);
 
+    /**
+     * @brief 处理串口核心层收到的原始字节。
+     * @param bytes 原始接收数据
+     */
+    void handleBytesReceived(const QByteArray& bytes);
+
 signals:
     /**
      * @brief 串口会话状态变化。
@@ -63,6 +72,12 @@ signals:
     void serialTxLogged(const QString& text);
 
     /**
+     * @brief 接收日志需要展示到 UI。
+     * @param text 日志文本
+     */
+    void serialRxLogged(const QString& text);
+
+    /**
      * @brief 系统日志需要展示到 UI。
      * @param text 日志文本
      */
@@ -72,6 +87,11 @@ signals:
      * @brief 一次发送成功。
      */
     void serialTxCounted();
+
+    /**
+     * @brief 一次接收帧解析成功。
+     */
+    void serialRxCounted();
 
     /**
      * @brief 一次发送失败。
@@ -111,12 +131,17 @@ signals:
 private:
     QString normalizeSendMode(const QString& mode) const;
     QByteArray buildCommandFrame(const QString& command, const QString& mode) const;
+    void resetReceiveProtocol();
+    void processProtocolEvent(const SerialProtocolEvent& event);
+    QString eventPayloadText(const SerialProtocolEvent& event) const;
+    QString rawBytesSummary(const QByteArray& bytes) const;
     void emitSendFailure(const QString& command,
                          const QString& mode,
                          const QString& message);
 
     SerialProtocolRegistry m_protocols;
     SerialManager m_serialManager;
+    std::unique_ptr<ISerialProtocol> m_receiveProtocol;
 };
 
 } // namespace serial_station
