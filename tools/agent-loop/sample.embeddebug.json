@@ -3,7 +3,7 @@
   "max_rounds": 20,
   "max_minutes": 30,
   "execute": [
-    "cmake --build .\\build --config Release --parallel 4"
+    "powershell -NoProfile -ExecutionPolicy Bypass -File .\\tools\\doctor.ps1"
   ],
   "check": [
     ".\\EmbedDebug.bat"
