@@ -91,12 +91,16 @@ void SerialLogPanel::setupUi()
     m_exportButton = new QPushButton(tr("导出"), this);
     m_exportButton->setObjectName(QStringLiteral("serialLogExportButton"));
 
+    m_replayButton = new QPushButton(tr("回放"), this);
+    m_replayButton->setObjectName(QStringLiteral("serialLogReplayButton"));
+
     header->addWidget(title);
     header->addWidget(m_countLabel);
     header->addStretch();
     header->addWidget(m_filterEdit);
     header->addWidget(m_clearButton);
     header->addWidget(m_exportButton);
+    header->addWidget(m_replayButton);
 
     m_logView = new QPlainTextEdit(this);
     m_logView->setObjectName(QStringLiteral("serialLogView"));
@@ -114,6 +118,8 @@ void SerialLogPanel::connectSignals()
             this, &SerialLogPanel::clearLog);
     connect(m_exportButton, &QPushButton::clicked,
             this, &SerialLogPanel::exportRequested);
+    connect(m_replayButton, &QPushButton::clicked,
+            this, &SerialLogPanel::replayRequested);
     connect(m_filterEdit, &QLineEdit::textChanged,
             this, &SerialLogPanel::updateFilter);
 }

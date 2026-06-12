@@ -11,6 +11,7 @@
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
 #include "apps/serial_station/services/SerialExportService.h"
 #include "apps/serial_station/services/SerialLogService.h"
+#include "apps/serial_station/services/SerialReplayService.h"
 
 namespace serial_station {
 
@@ -30,37 +31,22 @@ public:
     SerialLogService& logService();
     const SerialLogService& logService() const;
 
-    /**
-     * @brief 返回当前会话结构化日志快照。
-     */
+    /** @brief 返回当前会话结构化日志快照。 */
     QVector<SerialLogRecord> logRecords() const;
 
-    /**
-     * @brief 返回过滤后的结构化日志快照。
-     * @param filter 过滤条件
-     */
+    /** @brief 返回过滤后的结构化日志快照。 */
     QVector<SerialLogRecord> logRecords(const SerialLogFilter& filter) const;
 
-    /**
-     * @brief 返回当前会话日志纯文本。
-     */
+    /** @brief 返回当前会话日志纯文本。 */
     QString logPlainText() const;
 
-    /**
-     * @brief 返回过滤后的日志纯文本。
-     * @param filter 过滤条件
-     */
+    /** @brief 返回过滤后的日志纯文本。 */
     QString logPlainText(const SerialLogFilter& filter) const;
 
-    /**
-     * @brief 返回当前会话日志 JSON Lines。
-     */
+    /** @brief 返回当前会话日志 JSON Lines。 */
     QString logJsonLines() const;
 
-    /**
-     * @brief 返回过滤后的日志 JSON Lines。
-     * @param filter 过滤条件
-     */
+    /** @brief 返回过滤后的日志 JSON Lines。 */
     QString logJsonLines(const SerialLogFilter& filter) const;
 
     /** @brief 导出当前结构化日志快照。 */
@@ -68,6 +54,10 @@ public:
 
     /** @brief 根据导出格式生成建议文件名。 */
     QString suggestedExportFileName(SerialExportFormat format) const;
+
+    /** @brief 基于当前日志生成回放预览计划。 */
+    SerialReplayPlan previewReplayPlan(
+        const SerialReplayOptions& options = SerialReplayOptions());
 
 public slots:
     /**
@@ -193,6 +183,7 @@ private:
     SerialCodec m_codec;
     SerialLogService m_logService;
     SerialExportService m_exportService;
+    SerialReplayService m_replayService;
 };
 
 } // namespace serial_station

@@ -1235,6 +1235,56 @@ endif()
 add_test(NAME SerialReplayService COMMAND test_serial_replay_service)
 
 # ============================================================
+# Serial Station UI回放预览闭环测试
+# ============================================================
+
+add_executable(test_serial_station_replay_flow
+    serial_station/test_serial_station_replay_flow.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationWindow.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerExport.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerReplay.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialLogPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialStatusBar.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialReplayService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
+)
+
+target_include_directories(test_serial_station_replay_flow PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_station_replay_flow PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::SerialPort
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_station_replay_flow PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialStationReplayFlow COMMAND test_serial_station_replay_flow)
+
+# ============================================================
 # Serial Station控制器日志服务接入测试
 # ============================================================
 
@@ -1366,6 +1416,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationWindow.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerExport.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerReplay.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
@@ -1378,6 +1429,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialReplayService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp

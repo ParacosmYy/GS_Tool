@@ -135,6 +135,8 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             });
     connect(m_logPanel, &SerialLogPanel::cleared,
             m_statusBar, &SerialStatusBar::resetCounters);
+    connect(m_logPanel, &SerialLogPanel::cleared,
+            m_controller.get(), &SerialStationController::clearLogRecords);
     connect(m_logPanel, &SerialLogPanel::exportRequested,
             this, [this]() {
                 const QString defaultPath = QDir(defaultExportDirectory())
@@ -154,6 +156,10 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
                 request.filePath = normalizedExportPath(selectedPath);
                 request.format = exportFormatForPath(request.filePath);
                 m_controller->exportLogRecords(request);
+            });
+    connect(m_logPanel, &SerialLogPanel::replayRequested,
+            this, [this]() {
+                m_controller->previewReplayPlan();
             });
 }
 

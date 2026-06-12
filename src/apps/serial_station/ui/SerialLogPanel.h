@@ -55,6 +55,9 @@ signals:
      */
     void exportRequested();
 
+    /** @brief 用户请求预览日志回放计划。 */
+    void replayRequested();
+
     /**
      * @brief 日志内容被清空。
      */
@@ -75,6 +78,7 @@ private:
     QLabel* m_countLabel = nullptr;
     QPushButton* m_clearButton = nullptr;
     QPushButton* m_exportButton = nullptr;
+    QPushButton* m_replayButton = nullptr;
     QStringList m_lines;
 };
 

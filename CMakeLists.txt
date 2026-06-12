@@ -80,6 +80,7 @@ set(SOURCES
     src/apps/serial_station/SerialStationWindow.cpp
     src/apps/serial_station/SerialStationController.cpp
     src/apps/serial_station/SerialStationControllerExport.cpp
+    src/apps/serial_station/SerialStationControllerReplay.cpp
     src/apps/serial_station/SerialStationConfig.cpp
     src/apps/serial_station/ui/SerialPortPanel.cpp
     src/apps/serial_station/ui/SerialCommandPanel.cpp
