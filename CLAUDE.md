@@ -12,6 +12,7 @@
 |------|------|---------|
 | 项目概况 + 构建环境 | [docs/constraints/01-project-overview.md](docs/constraints/01-project-overview.md) | 每次开发 |
 | 开发工作流 + Agent | [docs/constraints/02-workflow.md](docs/constraints/02-workflow.md) | 每次迭代 |
+| README 企业级宣传标准 | [docs/constraints/02-workflow.md#41-readme-企业级宣传标准](docs/constraints/02-workflow.md#41-readme-企业级宣传标准) | 涉及 README / 对外说明 / 产品宣传 |
 | 架构原则 + 设计模式 | [docs/constraints/03-architecture.md](docs/constraints/03-architecture.md) | 涉及架构/新增类 |
 | 编码规范 | [docs/constraints/04-coding-standard.md](docs/constraints/04-coding-standard.md) | 每次编码 |
 | UI执行标准 | [docs/constraints/05-ui-standard.md](docs/constraints/05-ui-standard.md) | 涉及UI改动 |
@@ -33,6 +34,7 @@
 5.5. **禁止提交构建系统(CMakeLists.txt)中不存在的源文件** — 所有 .h/.cpp 必须先在 CMakeLists.txt 注册才能提交。禁止"查无产生"死代码刷分
 5.6. **禁止提交build产物** — 严禁将编译中间文件(.o/.obj)、生成文件(moc_*/ui_*/qrc_*)、构建目录(build/)、二进制产物(.exe/.dll/.a/.so)等作为commit内容提交。仅允许提交源码(.h/.cpp/.qss/.qrc/.ui/.cmake/CMakeLists.txt等)和项目配置文件。build产物充数一律回退
 5.7. **构建目录永远只允许 `build/` 一个** — 禁止创建、引用、兼容 `build2/`、`build-debug/`、`build-release/` 等平行构建目录；`EmbedDebug.bat` 只能从 `build/EmbedDebug.exe` 启动
+5.8. **README 必须按企业级宣传入口维护** — README 是项目对外第一入口，后续涉及产品能力、UI、Serial Station、协议、构建或启动方式变化时，必须按 [02-workflow §4.1](docs/constraints/02-workflow.md#41-readme-企业级宣传标准) 检查是否同步更新，禁止只堆命令、空泛口号或无法由代码/测试/文档证明的宣传点
 
 ### 架构铁律
 6. **分层单向依赖**: 表现层→业务层→数据层→基础设施层，**禁止反向**
