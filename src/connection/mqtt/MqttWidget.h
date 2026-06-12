@@ -103,6 +103,8 @@ private:
     void stopReconnect();
     /** @brief 格式化字节大小为可读字符串 @param bytes 字节数 @return 格式化字符串 */
     QString formatBytes(quint64 bytes) const;
+    /** @brief 更新状态指示灯的QSS状态属性 @param stateName QSS state属性值 */
+    void setStatusIndicatorState(const QString& stateName);
 
     // 核心组件
     MqttConnection* m_connection;            ///< MQTT连接(外部拥有)

@@ -83,6 +83,7 @@ set(SOURCES
     src/apps/serial_station/SerialStationWindow.cpp
     src/apps/serial_station/SerialStationController.cpp
     src/apps/serial_station/SerialStationConfig.cpp
+    src/apps/serial_station/ui/SerialPortPanel.cpp
     src/apps/serial_station/core/SerialPort.cpp
     src/apps/serial_station/core/SerialManager.cpp
     src/apps/serial_station/core/SerialSession.cpp
@@ -3589,6 +3590,7 @@ set(HEADERS
     src/apps/serial_station/SerialStationConfig.h
     src/apps/serial_station/SerialStationModels.h
     src/apps/serial_station/SerialStationConstants.h
+    src/apps/serial_station/ui/SerialPortPanel.h
     src/apps/serial_station/core/SerialPort.h
     src/apps/serial_station/core/SerialManager.h
     src/apps/serial_station/core/SerialSession.h

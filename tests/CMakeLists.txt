@@ -959,3 +959,33 @@ if(WIN32)
 endif()
 
 add_test(NAME SerialSession COMMAND test_serial_session)
+
+# ============================================================
+# Serial Station UART配置面板测试
+# ============================================================
+
+add_executable(test_serial_port_panel
+    serial_station/test_serial_port_panel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+)
+
+target_include_directories(test_serial_port_panel PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_port_panel PRIVATE
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::SerialPort
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_port_panel PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialPortPanel COMMAND test_serial_port_panel)

@@ -8,6 +8,7 @@
 namespace serial_station {
 
 class SerialStationController;
+class SerialPortPanel;
 
 /**
  * @brief Serial Station 顶层窗口骨架。
@@ -23,6 +24,7 @@ public:
 
 private:
     std::unique_ptr<SerialStationController> m_controller;
+    SerialPortPanel* m_portPanel = nullptr;
 };
 
 } // namespace serial_station

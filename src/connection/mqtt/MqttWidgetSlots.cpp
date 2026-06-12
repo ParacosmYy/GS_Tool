@@ -15,7 +15,8 @@
 #include "connection/mqtt/MqttConnection.h"
 #include "connection/mqtt/MqttConfigPanel.h"
 #include "connection/mqtt/MqttTopicModel.h"
-#include "core/theme/ThemeManager.h"
+
+#include <QStyle>
 
 /** @brief 连接按钮点击，应用配置并打开连接 */
 void MqttWidget::onConnectClicked()
@@ -51,54 +52,42 @@ void MqttWidget::onPublishClicked()
 /** @brief 连接状态变更回调，更新UI指示和自动重连 */
 void MqttWidget::onConnectionStateChanged(ConnectionState state)
 {
-    using SC = ThemeManager::SemanticColor;
     switch (state) {
     case ConnectionState::Connected:
-        m_statusIndicator->setStyleSheet(
-            QStringLiteral("QLabel#mqttStatusIndicator {"
-                            " background-color: %1;"
-                            " border-radius: 7px;"
-                            " }")
-                .arg(ThemeManager::instance().color(SC::Success).name()));
+        setStatusIndicatorState(QStringLiteral("connected"));
         m_statusText->setText(tr("已连接 - %1").arg(m_connection->name()));
         m_configPanel->setConnected(true);
         ++m_totalSubscriptions;
         stopReconnect();
         break;
     case ConnectionState::Connecting:
-        m_statusIndicator->setStyleSheet(
-            QStringLiteral("QLabel#mqttStatusIndicator {"
-                            " background-color: %1;"
-                            " border-radius: 7px;"
-                            " }")
-                .arg(ThemeManager::instance().color(SC::Warning).name()));
+        setStatusIndicatorState(QStringLiteral("connecting"));
         m_statusText->setText(tr("连接中..."));
         break;
     case ConnectionState::Disconnected:
-        m_statusIndicator->setStyleSheet(
-            QStringLiteral("QLabel#mqttStatusIndicator {"
-                            " background-color: %1;"
-                            " border-radius: 7px;"
-                            " }")
-                .arg(ThemeManager::instance().color(SC::TextMuted).name()));
+        setStatusIndicatorState(QStringLiteral("disconnected"));
         m_statusText->setText(tr("未连接"));
         m_configPanel->setConnected(false);
         ++m_totalUnsubscriptions;
         if (m_autoReconnect) startReconnect();
         break;
     case ConnectionState::Error:
-        m_statusIndicator->setStyleSheet(
-            QStringLiteral("QLabel#mqttStatusIndicator {"
-                            " background-color: %1;"
-                            " border-radius: 7px;"
-                            " }")
-                .arg(ThemeManager::instance().color(SC::Error).name()));
+        setStatusIndicatorState(QStringLiteral("error"));
         m_statusText->setText(tr("连接错误"));
         m_configPanel->setConnected(false);
         if (m_autoReconnect) startReconnect();
         break;
     }
     updateStatistics();
+}
+
+/** @brief 更新状态指示灯QSS属性并重新应用样式 @param stateName 状态名 */
+void MqttWidget::setStatusIndicatorState(const QString& stateName)
+{
+    m_statusIndicator->setProperty("state", stateName);
+    m_statusIndicator->style()->unpolish(m_statusIndicator);
+    m_statusIndicator->style()->polish(m_statusIndicator);
+    m_statusIndicator->update();
 }
 
 /** @brief 接收到MQTT消息，路由到主题模型 @param topic 消息主题 @param payload 消息负载 */

@@ -3,18 +3,18 @@
  * @brief AppDialog 内容构建器与动画方法实现
  *
  * 从 AppDialog.cpp 拆分而来，包含 UI 布局构建(setupUI)、
- * 主题样式应用(applyStyle)和窗口显示动画(showEvent)三个核心方法。
- * 所有颜色通过 ThemeManager 语义色获取，不硬编码。
+ * QSS状态属性应用(applyStyle)和窗口显示动画(showEvent)三个核心方法。
+ * 所有颜色由主题QSS根据 objectName 和 dialogType 属性提供。
  */
 
 #include "core/widgets/AppDialog.h"
-#include "core/theme/ThemeManager.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QShowEvent>
+#include <QStyle>
 
 // ---- UI 构建 ----
 
@@ -81,84 +81,34 @@ void AppDialog::setupUI()
     m_messageLabel->setText(m_message);
 }
 
-/** @brief 从ThemeManager获取语义色并应用QSS样式，根据弹窗类型设置确认按钮颜色 */
+/** @brief 应用弹窗类型属性，让主题QSS接管颜色和按钮状态 */
 void AppDialog::applyStyle()
 {
-    /* 从 ThemeManager 获取语义色，确保对话框跟随主题切换 */
-    auto& theme = ThemeManager::instance();
-    const QString bgSecondary = theme.color(ThemeManager::SemanticColor::BgSecondary).name();
-    const QString borderClr = theme.color(ThemeManager::SemanticColor::Border).name();
-    const QString textPrimary = theme.color(ThemeManager::SemanticColor::TextPrimary).name();
-    const QString textSecondary = theme.color(ThemeManager::SemanticColor::TextSecondary).name();
-    const QString bgHover = theme.color(ThemeManager::SemanticColor::BgHover).name();
-    const QString accent = theme.color(ThemeManager::SemanticColor::Accent).name();
-    const QString accentHover = theme.color(ThemeManager::SemanticColor::AccentHover).name();
-
-    setStyleSheet(QString(R"(
-        #appDialog {
-            background-color: %1;
-            border: 1px solid %2;
-            border-radius: 12px;
-        }
-        #dialogTitle {
-            color: %3;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        #dialogMessage {
-            color: %4;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        #dialogCancelBtn {
-            background-color: %2;
-            color: %4;
-            border: 1px solid %5;
-            border-radius: 6px;
-            padding: 0 16px;
-        }
-        #dialogCancelBtn:hover {
-            background-color: %5;
-            color: %3;
-        }
-        #dialogConfirmBtn {
-            background-color: %6;
-            color: #ffffff;
-            border: none;
-            border-radius: 6px;
-            padding: 0 16px;
-        }
-        #dialogConfirmBtn:hover {
-            background-color: %7;
-        }
-    )").arg(bgSecondary, borderClr, textPrimary, textSecondary, bgHover, accent, accentHover));
-
-    // 根据类型调整确认按钮颜色
-    const QString warningClr = theme.color(ThemeManager::SemanticColor::Warning).name();
-    const QString errorClr = theme.color(ThemeManager::SemanticColor::Error).name();
-
+    QString dialogType;
     switch (m_type) {
     case Type::Confirm:
-        m_confirmBtn->setStyleSheet(
-            QString("background-color: %1; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
-                    "#dialogConfirmBtn:hover { background-color: %2; }").arg(accent, accentHover));
+        dialogType = QStringLiteral("confirm");
         break;
     case Type::Warning:
-        m_confirmBtn->setStyleSheet(
-            QString("background-color: %1; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
-                    "#dialogConfirmBtn:hover { background-color: %1; }").arg(warningClr));
+        dialogType = QStringLiteral("warning");
         break;
     case Type::Error:
-        m_confirmBtn->setStyleSheet(
-            QString("background-color: %1; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
-                    "#dialogConfirmBtn:hover { background-color: %1; }").arg(errorClr));
+        dialogType = QStringLiteral("error");
         break;
     case Type::Information:
-        m_confirmBtn->setStyleSheet(
-            QString("background-color: %1; color: #fff; border: none; border-radius: 6px; padding: 0 16px;"
-                    "#dialogConfirmBtn:hover { background-color: %2; }").arg(accent, accentHover));
+        dialogType = QStringLiteral("information");
         break;
     }
+
+    setProperty("dialogType", dialogType);
+    m_confirmBtn->setProperty("dialogType", dialogType);
+
+    style()->unpolish(this);
+    style()->polish(this);
+    m_confirmBtn->style()->unpolish(m_confirmBtn);
+    m_confirmBtn->style()->polish(m_confirmBtn);
+    update();
+    m_confirmBtn->update();
 }
 
 /** @brief 窗口显示事件处理，居中于父窗口并播放淡入动画 @param event 显示事件指针 */

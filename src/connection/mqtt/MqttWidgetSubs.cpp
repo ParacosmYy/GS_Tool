@@ -13,7 +13,6 @@
 #include "connection/mqtt/MqttSubscriptionPanel.h"
 #include "connection/mqtt/MqttTopicModel.h"
 #include "connection/interface/IConnection.h"
-#include "core/theme/ThemeManager.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -38,12 +37,7 @@ void MqttWidget::setupUi()
     m_statusIndicator = new QLabel(this);
     m_statusIndicator->setObjectName("mqttStatusIndicator");
     m_statusIndicator->setFixedSize(14, 14);
-    m_statusIndicator->setStyleSheet(
-        QStringLiteral("QLabel#mqttStatusIndicator {"
-                        " background-color: %1;"
-                        " border-radius: 7px;"
-                        " }")
-            .arg(ThemeManager::instance().color(ThemeManager::SemanticColor::Error).name()));
+    setStatusIndicatorState(QStringLiteral("error"));
 
     m_statusText = new QLabel(tr("未连接"), this);
     m_statusText->setObjectName("mqttStatusText");

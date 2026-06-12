@@ -8,6 +8,7 @@
 #include "terminal/filter/TerminalFilterBar.h"
 
 #include <QRegularExpression>
+#include <QStyle>
 
 /** @brief 构造函数，初始化过滤栏UI布局并连接信号槽 @param parent 父控件 */
 TerminalFilterBar::TerminalFilterBar(QWidget *parent)
@@ -130,13 +131,19 @@ void TerminalFilterBar::onApplyClicked()
 void TerminalFilterBar::setPatternError(const QString &message)
 {
     m_patternEdit->setToolTip(message);
-    m_patternEdit->setStyleSheet(QStringLiteral("QLineEdit#filterPatternEdit { border: 1px solid #d93025; }"));
+    m_patternEdit->setProperty("hasError", true);
+    m_patternEdit->style()->unpolish(m_patternEdit);
+    m_patternEdit->style()->polish(m_patternEdit);
+    m_patternEdit->update();
 }
 
 void TerminalFilterBar::clearPatternError()
 {
     m_patternEdit->setToolTip(QString());
-    m_patternEdit->setStyleSheet(QString());
+    m_patternEdit->setProperty("hasError", false);
+    m_patternEdit->style()->unpolish(m_patternEdit);
+    m_patternEdit->style()->polish(m_patternEdit);
+    m_patternEdit->update();
 }
 
 /** @brief 获取累计过滤变更次数 @return 过滤变更次数 */
