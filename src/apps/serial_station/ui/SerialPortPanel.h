@@ -63,6 +63,7 @@ signals:
 private slots:
     void refreshPorts();
     void emitConnectRequested();
+    void updateSummary();
 
 private:
     void setupUi();
@@ -79,6 +80,7 @@ private:
     QCheckBox* m_dtrCheck = nullptr;
     QCheckBox* m_rtsCheck = nullptr;
     QLabel* m_statusLabel = nullptr;
+    QLabel* m_summaryLabel = nullptr;
     QPushButton* m_refreshButton = nullptr;
     QPushButton* m_connectButton = nullptr;
     QPushButton* m_disconnectButton = nullptr;

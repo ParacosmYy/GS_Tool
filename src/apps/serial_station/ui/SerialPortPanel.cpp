@@ -1,5 +1,6 @@
 #include "apps/serial_station/ui/SerialPortPanel.h"
 
+#include <QtCore/QStringList>
 #include <QtCore/QVariant>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QtWidgets/QCheckBox>
@@ -16,6 +17,29 @@
 namespace serial_station {
 
 namespace {
+
+QString portDisplayText(const QSerialPortInfo& port)
+{
+    QStringList parts;
+    parts << port.portName();
+
+    if (!port.description().trimmed().isEmpty()) {
+        parts << port.description().trimmed();
+    }
+
+    if (!port.manufacturer().trimmed().isEmpty()) {
+        parts << port.manufacturer().trimmed();
+    }
+
+    if (port.hasVendorIdentifier() && port.hasProductIdentifier()) {
+        parts << QStringLiteral("VID:%1 PID:%2")
+                     .arg(port.vendorIdentifier(), 4, 16, QLatin1Char('0'))
+                     .arg(port.productIdentifier(), 4, 16, QLatin1Char('0'))
+                     .toUpper();
+    }
+
+    return parts.join(QStringLiteral(" - "));
+}
 
 template <typename EnumType>
 void addEnumItem(QComboBox* combo, const QString& label, EnumType value)
@@ -48,7 +72,15 @@ SerialPortPanel::SerialPortPanel(QWidget* parent)
 SerialPortConfig SerialPortPanel::currentConfig() const
 {
     SerialPortConfig config;
-    config.portName = m_portCombo->currentText().trimmed();
+    const int portIndex = m_portCombo->currentIndex();
+    const QString storedPortName = m_portCombo->currentData().toString().trimmed();
+    const bool usesListedPort =
+        portIndex >= 0 && m_portCombo->currentText() == m_portCombo->itemText(portIndex);
+    if (usesListedPort && !storedPortName.isEmpty()) {
+        config.portName = storedPortName;
+    } else {
+        config.portName = m_portCombo->currentText().trimmed();
+    }
     config.baudRate = m_baudCombo->currentText().toInt();
     config.dataBits = currentEnumValue(m_dataBitsCombo, QSerialPort::Data8);
     config.parity = currentEnumValue(m_parityCombo, QSerialPort::NoParity);
@@ -72,6 +104,8 @@ void SerialPortPanel::setSessionState(SerialSessionState state)
     m_parityCombo->setEnabled(!isOpen && !isOpening);
     m_stopBitsCombo->setEnabled(!isOpen && !isOpening);
     m_flowControlCombo->setEnabled(!isOpen && !isOpening);
+    m_dtrCheck->setEnabled(!isOpen && !isOpening);
+    m_rtsCheck->setEnabled(!isOpen && !isOpening);
     m_refreshButton->setEnabled(!isOpen && !isOpening);
 
     switch (state) {
@@ -105,11 +139,14 @@ void SerialPortPanel::refreshPorts()
 
     const QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     for (const QSerialPortInfo& port : ports) {
-        m_portCombo->addItem(port.portName());
+        m_portCombo->addItem(portDisplayText(port), port.portName());
     }
 
     if (!previous.isEmpty()) {
-        const int index = m_portCombo->findText(previous);
+        int index = m_portCombo->findData(previous);
+        if (index < 0) {
+            index = m_portCombo->findText(previous);
+        }
         if (index >= 0) {
             m_portCombo->setCurrentIndex(index);
         }
@@ -120,10 +157,11 @@ void SerialPortPanel::refreshPorts()
         m_portCombo->setEditText(QString());
         setStatusText(tr("未发现串口，可手动输入端口名"), QStringLiteral("warning"));
     } else {
-        m_portCombo->setEditable(false);
+        m_portCombo->setEditable(true);
         setStatusText(tr("已刷新串口列表"), QStringLiteral("closed"));
     }
 
+    updateSummary();
     emit refreshRequested();
 }
 
@@ -209,8 +247,14 @@ void SerialPortPanel::setupUi()
     m_statusLabel->setObjectName(QStringLiteral("serialPortStatusLabel"));
     m_statusLabel->setWordWrap(true);
 
+    m_summaryLabel = new QLabel(this);
+    m_summaryLabel->setObjectName(QStringLiteral("serialUartSummaryLabel"));
+    m_summaryLabel->setWordWrap(true);
+    m_summaryLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
     rootLayout->addWidget(group);
     rootLayout->addWidget(buttonRow);
+    rootLayout->addWidget(m_summaryLabel);
     rootLayout->addWidget(m_statusLabel);
     rootLayout->addStretch();
 }
@@ -258,6 +302,27 @@ void SerialPortPanel::connectSignals()
     connect(m_refreshButton, &QPushButton::clicked, this, &SerialPortPanel::refreshPorts);
     connect(m_connectButton, &QPushButton::clicked, this, &SerialPortPanel::emitConnectRequested);
     connect(m_disconnectButton, &QPushButton::clicked, this, &SerialPortPanel::disconnectRequested);
+    connect(m_portCombo, &QComboBox::currentTextChanged, this, &SerialPortPanel::updateSummary);
+    connect(m_baudCombo, &QComboBox::currentTextChanged, this, &SerialPortPanel::updateSummary);
+    connect(m_dataBitsCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &SerialPortPanel::updateSummary);
+    connect(m_parityCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &SerialPortPanel::updateSummary);
+    connect(m_stopBitsCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &SerialPortPanel::updateSummary);
+    connect(m_flowControlCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &SerialPortPanel::updateSummary);
+    connect(m_dtrCheck, &QCheckBox::toggled, this, &SerialPortPanel::updateSummary);
+    connect(m_rtsCheck, &QCheckBox::toggled, this, &SerialPortPanel::updateSummary);
+}
+
+void SerialPortPanel::updateSummary()
+{
+    if (!m_summaryLabel) {
+        return;
+    }
+
+    m_summaryLabel->setText(tr("UART: %1").arg(currentConfig().summary()));
 }
 
 void SerialPortPanel::setStatusText(const QString& text, const QString& stateName)
