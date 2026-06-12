@@ -172,12 +172,13 @@
 | 468 | Serial Station发送编码器PRD/Specs | 定义core/SerialCodec承接ASCII/HEX/协议发送帧构建，补HEX模式验收 |
 | 469 | Serial Station发送编码器实现 | 新增SerialCodec复用HexConverter，Controller接入统一编码结果，命令面板开放HEX模式并补codec/command/controller/workbench回归 |
 | 470 | Serial Station Modbus RTU协议PRD/Specs | 定义modbus_rtu协议注册、主站请求构建、流式解析、CRC错误和QTest验收 |
+| 471 | README企业级宣传标准约束 | 在文档线补充README首屏定位、截图预览、架构概览、真实能力证据和可执行命令要求 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#470` 的完整记录
+- 当前文档已整理到 `#471` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
