@@ -13,7 +13,9 @@ namespace serial_station {
 enum class SerialLogDirection {
     Rx,
     Tx,
-    Internal
+    System,
+    Error,
+    Internal = System
 };
 
 /**

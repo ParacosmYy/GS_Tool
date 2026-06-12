@@ -9,6 +9,7 @@
 #include "apps/serial_station/core/SerialDispatcher.h"
 #include "apps/serial_station/core/SerialManager.h"
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
+#include "apps/serial_station/services/SerialLogService.h"
 
 namespace serial_station {
 
@@ -25,6 +26,41 @@ public:
 
     SerialProtocolRegistry& protocols();
     SerialManager& serialManager();
+    SerialLogService& logService();
+    const SerialLogService& logService() const;
+
+    /**
+     * @brief 返回当前会话结构化日志快照。
+     */
+    QVector<SerialLogRecord> logRecords() const;
+
+    /**
+     * @brief 返回过滤后的结构化日志快照。
+     * @param filter 过滤条件
+     */
+    QVector<SerialLogRecord> logRecords(const SerialLogFilter& filter) const;
+
+    /**
+     * @brief 返回当前会话日志纯文本。
+     */
+    QString logPlainText() const;
+
+    /**
+     * @brief 返回过滤后的日志纯文本。
+     * @param filter 过滤条件
+     */
+    QString logPlainText(const SerialLogFilter& filter) const;
+
+    /**
+     * @brief 返回当前会话日志 JSON Lines。
+     */
+    QString logJsonLines() const;
+
+    /**
+     * @brief 返回过滤后的日志 JSON Lines。
+     * @param filter 过滤条件
+     */
+    QString logJsonLines(const SerialLogFilter& filter) const;
 
 public slots:
     /**
@@ -50,6 +86,11 @@ public slots:
      * @param bytes 原始接收数据
      */
     void handleBytesReceived(const QByteArray& bytes);
+
+    /**
+     * @brief 清空 controller 持有的结构化日志。
+     */
+    void clearLogRecords();
 
 signals:
     /**
@@ -132,10 +173,15 @@ private:
     SerialCodec::EncodeResult buildCommandFrame(const QString& command,
                                                 const QString& mode) const;
     void resetReceiveDispatcher();
+    void handleSerialManagerError(const QString& message);
     void processProtocolEvent(const SerialProtocolEvent& event);
     QString eventPayloadText(const SerialProtocolEvent& event) const;
     QString rawBytesSummary(const QByteArray& bytes) const;
     QString bufferedReceiveText(const SerialDispatcher::FeedSummary& summary) const;
+    void logTx(const QString& text, const QByteArray& payload, const QVariantMap& fields);
+    void logRx(const QString& text, const QByteArray& payload, const QVariantMap& fields);
+    void logSystem(const QString& text, const QVariantMap& fields = QVariantMap());
+    void logError(const QString& text, const QVariantMap& fields = QVariantMap());
     void emitSendFailure(const QString& command,
                          const QString& mode,
                          const QString& message);
@@ -144,6 +190,7 @@ private:
     SerialManager m_serialManager;
     SerialDispatcher m_dispatcher;
     SerialCodec m_codec;
+    SerialLogService m_logService;
 };
 
 } // namespace serial_station

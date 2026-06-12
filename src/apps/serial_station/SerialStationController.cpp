@@ -15,7 +15,7 @@ SerialStationController::SerialStationController(QObject* parent)
     connect(&m_serialManager, &SerialManager::stateChanged,
             this, &SerialStationController::serialStateChanged);
     connect(&m_serialManager, &SerialManager::errorOccurred,
-            this, &SerialStationController::serialErrorOccurred);
+            this, &SerialStationController::handleSerialManagerError);
     connect(&m_serialManager, &SerialManager::bytesReceived,
             this, &SerialStationController::handleBytesReceived);
 }
@@ -30,6 +30,46 @@ SerialManager& SerialStationController::serialManager()
     return m_serialManager;
 }
 
+SerialLogService& SerialStationController::logService()
+{
+    return m_logService;
+}
+
+const SerialLogService& SerialStationController::logService() const
+{
+    return m_logService;
+}
+
+QVector<SerialLogRecord> SerialStationController::logRecords() const
+{
+    return m_logService.records();
+}
+
+QVector<SerialLogRecord> SerialStationController::logRecords(const SerialLogFilter& filter) const
+{
+    return m_logService.records(filter);
+}
+
+QString SerialStationController::logPlainText() const
+{
+    return m_logService.toPlainText();
+}
+
+QString SerialStationController::logPlainText(const SerialLogFilter& filter) const
+{
+    return m_logService.toPlainText(filter);
+}
+
+QString SerialStationController::logJsonLines() const
+{
+    return m_logService.toJsonLines();
+}
+
+QString SerialStationController::logJsonLines(const SerialLogFilter& filter) const
+{
+    return m_logService.toJsonLines(filter);
+}
+
 void SerialStationController::connectSerialPort(const SerialPortConfig& config)
 {
     resetReceiveDispatcher();
@@ -37,11 +77,13 @@ void SerialStationController::connectSerialPort(const SerialPortConfig& config)
     if (!validationError.isEmpty()) {
         m_serialManager.rejectConfiguration(config, validationError);
         emit serialErrorCounted();
-        emit serialSystemLogged(validationError);
+        logSystem(validationError, {{QStringLiteral("reason"), validationError}});
         return;
     }
 
-    emit serialSystemLogged(tr("正在打开串口: %1").arg(config.summary()));
+    logSystem(tr("正在打开串口: %1").arg(config.summary()),
+              {{QStringLiteral("portName"), config.portName.trimmed()},
+               {QStringLiteral("baudRate"), config.baudRate}});
     m_serialManager.configure(config);
     if (!m_serialManager.open()) {
         emit serialErrorOccurred(m_serialManager.session().errorString());
@@ -79,11 +121,16 @@ void SerialStationController::sendCommand(const QString& command, const QString&
         return;
     }
 
+    const QString logText = tr("%1 [%2] %3 bytes")
+                                .arg(trimmedCommand,
+                                     encodeResult.normalizedMode,
+                                     QString::number(bytesWritten));
     emit serialTxCounted();
-    emit serialTxLogged(tr("%1 [%2] %3 bytes")
-                            .arg(trimmedCommand,
-                                 encodeResult.normalizedMode,
-                                 QString::number(bytesWritten)));
+    logTx(logText,
+          encodeResult.frame,
+          {{QStringLiteral("command"), trimmedCommand},
+           {QStringLiteral("mode"), encodeResult.normalizedMode},
+           {QStringLiteral("bytesWritten"), bytesWritten}});
     emit serialCommandSent(trimmedCommand, encodeResult.normalizedMode, bytesWritten);
 }
 
@@ -98,12 +145,15 @@ void SerialStationController::handleBytesReceived(const QByteArray& bytes)
 
     if (summary.status == SerialDispatcher::FeedStatus::MissingProtocol) {
         emit serialErrorCounted();
-        emit serialSystemLogged(tr("接收协议不可用，已丢弃 %1 bytes").arg(summary.inputBytes));
+        logError(tr("接收协议不可用，已丢弃 %1 bytes").arg(summary.inputBytes),
+                 {{QStringLiteral("inputBytes"), summary.inputBytes}});
         return;
     }
 
     if (summary.status == SerialDispatcher::FeedStatus::Buffered) {
-        emit serialSystemLogged(bufferedReceiveText(summary));
+        logSystem(bufferedReceiveText(summary),
+                  {{QStringLiteral("inputBytes"), summary.inputBytes},
+                   {QStringLiteral("protocolName"), summary.protocolName}});
         return;
     }
 
@@ -129,22 +179,43 @@ void SerialStationController::resetReceiveDispatcher()
     m_dispatcher.setProtocol(m_protocols.createDefault());
 }
 
+void SerialStationController::clearLogRecords()
+{
+    m_logService.clear();
+}
+
+void SerialStationController::handleSerialManagerError(const QString& message)
+{
+    m_logService.appendError(message,
+                             QStringLiteral("serial_manager"),
+                             {{QStringLiteral("source"), QStringLiteral("serial_manager")}});
+    emit serialErrorOccurred(message);
+}
+
 void SerialStationController::processProtocolEvent(const SerialProtocolEvent& event)
 {
     if (event.type == serialStationConstants::kAsciiFrameType) {
+        const QString text = eventPayloadText(event);
         emit serialRxCounted();
-        emit serialRxLogged(eventPayloadText(event));
+        logRx(text,
+              event.raw,
+              {{QStringLiteral("eventType"), event.type},
+               {QStringLiteral("protocolName"), event.protocolName}});
         return;
     }
 
     if (event.type == serialStationConstants::kLogType) {
         const QString text = eventPayloadText(event);
-        emit serialSystemLogged(text);
+        logSystem(text,
+                  {{QStringLiteral("eventType"), event.type},
+                   {QStringLiteral("protocolName"), event.protocolName}});
         return;
     }
 
     emit serialErrorCounted();
-    emit serialSystemLogged(tr("未知接收事件: %1").arg(event.type));
+    logError(tr("未知接收事件: %1").arg(event.type),
+             {{QStringLiteral("eventType"), event.type},
+              {QStringLiteral("protocolName"), event.protocolName}});
 }
 
 QString SerialStationController::eventPayloadText(const SerialProtocolEvent& event) const
@@ -185,6 +256,34 @@ QString SerialStationController::bufferedReceiveText(const SerialDispatcher::Fee
         .arg(QString::number(summary.inputBytes), summary.protocolName);
 }
 
+void SerialStationController::logTx(const QString& text,
+                                    const QByteArray& payload,
+                                    const QVariantMap& fields)
+{
+    m_logService.appendTx(text, payload, QStringLiteral("controller"), fields);
+    emit serialTxLogged(text);
+}
+
+void SerialStationController::logRx(const QString& text,
+                                    const QByteArray& payload,
+                                    const QVariantMap& fields)
+{
+    m_logService.appendRx(text, payload, QStringLiteral("protocol"), fields);
+    emit serialRxLogged(text);
+}
+
+void SerialStationController::logSystem(const QString& text, const QVariantMap& fields)
+{
+    m_logService.appendSystem(text, QStringLiteral("controller"), fields);
+    emit serialSystemLogged(text);
+}
+
+void SerialStationController::logError(const QString& text, const QVariantMap& fields)
+{
+    m_logService.appendError(text, QStringLiteral("controller"), fields);
+    emit serialSystemLogged(text);
+}
+
 void SerialStationController::emitSendFailure(const QString& command,
                                               const QString& mode,
                                               const QString& message)
@@ -195,7 +294,10 @@ void SerialStationController::emitSendFailure(const QString& command,
     }
 
     emit serialErrorCounted();
-    emit serialSystemLogged(logText);
+    logError(logText,
+             {{QStringLiteral("command"), command},
+              {QStringLiteral("mode"), mode},
+              {QStringLiteral("message"), message}});
     emit serialCommandFailed(command, mode, message);
 }
 

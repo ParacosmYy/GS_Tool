@@ -7,17 +7,9 @@
 #include <QtCore/QVariantMap>
 #include <QtCore/QVector>
 
-namespace serial_station {
+#include "apps/serial_station/SerialStationModels.h"
 
-/**
- * @brief Serial Station 日志方向。
- */
-enum class SerialLogDirection {
-    Rx,
-    Tx,
-    System,
-    Error
-};
+namespace serial_station {
 
 /**
  * @brief Serial Station 结构化日志记录。

@@ -1179,6 +1179,45 @@ endif()
 add_test(NAME SerialLogService COMMAND test_serial_log_service)
 
 # ============================================================
+# Serial Station控制器日志服务接入测试
+# ============================================================
+
+add_executable(test_serial_station_controller_log_service
+    serial_station/test_serial_station_controller_log_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
+)
+
+target_include_directories(test_serial_station_controller_log_service PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_station_controller_log_service PRIVATE
+    Qt6::Core
+    Qt6::SerialPort
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_station_controller_log_service PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialStationControllerLogService COMMAND test_serial_station_controller_log_service)
+
+# ============================================================
 # Serial Station控制器发送闭环测试
 # ============================================================
 
