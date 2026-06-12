@@ -82,6 +82,14 @@ Recommended first run on this repository:
 
 `local_env.bat` is generated for the local machine and must not be committed.
 
+UV start shortcut:
+
+```powershell
+uv run start-embeddebug
+```
+
+This delegates to `EmbedDebug.bat`; the batch file remains the minimum supported user entry point.
+
 Manual configure/build path:
 
 ```powershell
