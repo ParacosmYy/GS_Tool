@@ -66,6 +66,14 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
                 m_statusBar->incrementErrors();
                 m_logPanel->appendSystem(message);
             });
+    connect(m_controller.get(), &SerialStationController::serialTxLogged,
+            m_logPanel, &SerialLogPanel::appendTx);
+    connect(m_controller.get(), &SerialStationController::serialSystemLogged,
+            m_logPanel, &SerialLogPanel::appendSystem);
+    connect(m_controller.get(), &SerialStationController::serialTxCounted,
+            m_statusBar, &SerialStatusBar::incrementTx);
+    connect(m_controller.get(), &SerialStationController::serialErrorCounted,
+            m_statusBar, &SerialStatusBar::incrementErrors);
     connect(m_portPanel, &SerialPortPanel::connectRequested,
             this, [this](const SerialPortConfig& config) {
                 m_statusBar->setPortConfig(config);
@@ -73,10 +81,7 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
                                              .arg(config.portName, QString::number(config.baudRate)));
             });
     connect(m_commandPanel, &SerialCommandPanel::sendRequested,
-            this, [this](const QString& command, const QString& mode) {
-                m_statusBar->incrementTx();
-                m_logPanel->appendTx(tr("%1 [%2]").arg(command, mode));
-            });
+            m_controller.get(), &SerialStationController::sendCommand);
     connect(m_commandPanel, &SerialCommandPanel::quickCommandSelected,
             this, [this](const QString& command) {
                 m_logPanel->appendSystem(tr("载入快捷命令: %1").arg(command));

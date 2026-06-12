@@ -85,7 +85,7 @@ void SerialCommandPanel::setupUi()
     auto* title = new QLabel(tr("命令发送"), this);
     title->setObjectName(QStringLiteral("serialCommandTitle"));
 
-    auto* hint = new QLabel(tr("输入 ASCII/Hex 指令，后续由协议层构建真实帧"), this);
+    auto* hint = new QLabel(tr("输入 ASCII 或协议命令，由控制器交给协议层构建发送帧"), this);
     hint->setObjectName(QStringLiteral("serialCommandHint"));
     hint->setWordWrap(true);
 
@@ -105,7 +105,6 @@ void SerialCommandPanel::setupUi()
     m_modeCombo = new QComboBox(this);
     m_modeCombo->setObjectName(QStringLiteral("serialCommandModeCombo"));
     m_modeCombo->addItem(tr("ASCII"), QStringLiteral("ascii"));
-    m_modeCombo->addItem(tr("Hex"), QStringLiteral("hex"));
     m_modeCombo->addItem(tr("协议命令"), QStringLiteral("protocol"));
 
     m_sendButton = new QPushButton(tr("发送"), this);

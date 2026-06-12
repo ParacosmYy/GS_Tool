@@ -991,6 +991,40 @@ endif()
 add_test(NAME SerialPortPanel COMMAND test_serial_port_panel)
 
 # ============================================================
+# Serial Station控制器发送闭环测试
+# ============================================================
+
+add_executable(test_serial_station_controller
+    serial_station/test_serial_station_controller.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialPort.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+)
+
+target_include_directories(test_serial_station_controller PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_station_controller PRIVATE
+    Qt6::Core
+    Qt6::SerialPort
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_station_controller PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialStationController COMMAND test_serial_station_controller)
+
+# ============================================================
 # Serial Station工作台壳层测试
 # ============================================================
 

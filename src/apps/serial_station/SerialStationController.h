@@ -1,7 +1,9 @@
 #ifndef SERIAL_STATION_CONTROLLER_H
 #define SERIAL_STATION_CONTROLLER_H
 
+#include <QtCore/QByteArray>
 #include <QtCore/QObject>
+#include <QtCore/QString>
 
 #include "apps/serial_station/core/SerialManager.h"
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
@@ -34,6 +36,13 @@ public slots:
      */
     void disconnectSerialPort();
 
+    /**
+     * @brief 发送 UI 提交的命令。
+     * @param command 命令文本
+     * @param mode 发送模式
+     */
+    void sendCommand(const QString& command, const QString& mode);
+
 signals:
     /**
      * @brief 串口会话状态变化。
@@ -47,7 +56,65 @@ signals:
      */
     void serialErrorOccurred(const QString& message);
 
+    /**
+     * @brief 发送日志需要展示到 UI。
+     * @param text 日志文本
+     */
+    void serialTxLogged(const QString& text);
+
+    /**
+     * @brief 系统日志需要展示到 UI。
+     * @param text 日志文本
+     */
+    void serialSystemLogged(const QString& text);
+
+    /**
+     * @brief 一次发送成功。
+     */
+    void serialTxCounted();
+
+    /**
+     * @brief 一次发送失败。
+     */
+    void serialErrorCounted();
+
+    /**
+     * @brief 命令已构建为发送帧。
+     * @param command 命令文本
+     * @param mode 发送模式
+     * @param frame 已构建帧
+     */
+    void serialCommandPrepared(const QString& command,
+                               const QString& mode,
+                               const QByteArray& frame);
+
+    /**
+     * @brief 命令发送成功。
+     * @param command 命令文本
+     * @param mode 发送模式
+     * @param bytesWritten 写入字节数
+     */
+    void serialCommandSent(const QString& command,
+                           const QString& mode,
+                           qint64 bytesWritten);
+
+    /**
+     * @brief 命令发送失败。
+     * @param command 命令文本
+     * @param mode 发送模式
+     * @param message 失败原因
+     */
+    void serialCommandFailed(const QString& command,
+                             const QString& mode,
+                             const QString& message);
+
 private:
+    QString normalizeSendMode(const QString& mode) const;
+    QByteArray buildCommandFrame(const QString& command, const QString& mode) const;
+    void emitSendFailure(const QString& command,
+                         const QString& mode,
+                         const QString& message);
+
     SerialProtocolRegistry m_protocols;
     SerialManager m_serialManager;
 };
