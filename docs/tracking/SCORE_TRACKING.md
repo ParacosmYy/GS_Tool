@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 487分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 513分
+> 当前: 488分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 512分
 
 ---
 
@@ -189,12 +189,13 @@
 | 485 | Serial Station UI导出闭环PRD/Specs | 定义日志导出按钮经Window选择路径、Controller调用导出服务、结果回写结构化日志的跨层闭环 |
 | 486 | Serial Station UI导出闭环实现 | Controller接入SerialExportService，Window导出按钮选择路径并调用controller，补导出闭环QTest和CMake注册 |
 | 487 | Serial Station回放服务PRD/Specs | 定义services层日志回放计划能力，从结构化日志或JSON Lines生成可回放事件序列，不触碰UI/controller/core |
+| 488 | Serial Station回放服务实现 | 新增SerialReplayService，将结构化日志或JSON Lines转换为回放计划，支持方向过滤、速度倍率、延迟钳制和错误路径QTest |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#487` 的完整记录
+- 当前文档已整理到 `#488` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
