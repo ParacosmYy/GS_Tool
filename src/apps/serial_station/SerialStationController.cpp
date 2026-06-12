@@ -11,7 +11,7 @@ SerialStationController::SerialStationController(QObject* parent)
     , m_serialManager(this)
 {
     m_protocols.registerBuiltInProtocols();
-    resetReceiveProtocol();
+    resetReceiveDispatcher();
     connect(&m_serialManager, &SerialManager::stateChanged,
             this, &SerialStationController::serialStateChanged);
     connect(&m_serialManager, &SerialManager::errorOccurred,
@@ -32,7 +32,7 @@ SerialManager& SerialStationController::serialManager()
 
 void SerialStationController::connectSerialPort(const SerialPortConfig& config)
 {
-    resetReceiveProtocol();
+    resetReceiveDispatcher();
     m_serialManager.configure(config);
     if (!m_serialManager.open()) {
         emit serialErrorOccurred(m_serialManager.session().errorString());
@@ -42,7 +42,7 @@ void SerialStationController::connectSerialPort(const SerialPortConfig& config)
 void SerialStationController::disconnectSerialPort()
 {
     m_serialManager.close();
-    resetReceiveProtocol();
+    m_dispatcher.reset();
 }
 
 void SerialStationController::sendCommand(const QString& command, const QString& mode)
@@ -89,23 +89,21 @@ void SerialStationController::sendCommand(const QString& command, const QString&
 
 void SerialStationController::handleBytesReceived(const QByteArray& bytes)
 {
-    if (bytes.isEmpty()) {
+    const QVector<SerialProtocolEvent> events = m_dispatcher.feed(bytes);
+    const SerialDispatcher::FeedSummary summary = m_dispatcher.lastFeedSummary();
+
+    if (summary.status == SerialDispatcher::FeedStatus::EmptyInput) {
         return;
     }
 
-    if (!m_receiveProtocol) {
-        resetReceiveProtocol();
-    }
-
-    if (!m_receiveProtocol) {
+    if (summary.status == SerialDispatcher::FeedStatus::MissingProtocol) {
         emit serialErrorCounted();
-        emit serialSystemLogged(tr("接收协议不可用，已丢弃 %1 bytes").arg(bytes.size()));
+        emit serialSystemLogged(tr("接收协议不可用，已丢弃 %1 bytes").arg(summary.inputBytes));
         return;
     }
 
-    const QVector<SerialProtocolEvent> events = m_receiveProtocol->feed(bytes);
-    if (events.isEmpty()) {
-        emit serialSystemLogged(tr("接收缓存 %1 bytes，等待完整帧").arg(bytes.size()));
+    if (summary.status == SerialDispatcher::FeedStatus::Buffered) {
+        emit serialSystemLogged(bufferedReceiveText(summary));
         return;
     }
 
@@ -135,12 +133,9 @@ QByteArray SerialStationController::buildCommandFrame(const QString& command,
     return protocol->buildCommand(command, params);
 }
 
-void SerialStationController::resetReceiveProtocol()
+void SerialStationController::resetReceiveDispatcher()
 {
-    m_receiveProtocol = m_protocols.createDefault();
-    if (m_receiveProtocol) {
-        m_receiveProtocol->reset();
-    }
+    m_dispatcher.setProtocol(m_protocols.createDefault());
 }
 
 void SerialStationController::processProtocolEvent(const SerialProtocolEvent& event)
@@ -187,6 +182,16 @@ QString SerialStationController::rawBytesSummary(const QByteArray& bytes) const
     }
 
     return QString::fromLatin1(bytes.toHex(' ').toUpper());
+}
+
+QString SerialStationController::bufferedReceiveText(const SerialDispatcher::FeedSummary& summary) const
+{
+    if (summary.protocolName.isEmpty()) {
+        return tr("接收缓存 %1 bytes，等待完整帧").arg(summary.inputBytes);
+    }
+
+    return tr("接收缓存 %1 bytes，等待 %2 完整帧")
+        .arg(QString::number(summary.inputBytes), summary.protocolName);
 }
 
 void SerialStationController::emitSendFailure(const QString& command,

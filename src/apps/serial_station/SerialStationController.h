@@ -5,10 +5,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <memory>
-
+#include "apps/serial_station/core/SerialDispatcher.h"
 #include "apps/serial_station/core/SerialManager.h"
-#include "apps/serial_station/protocols/ISerialProtocol.h"
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
 
 namespace serial_station {
@@ -131,17 +129,18 @@ signals:
 private:
     QString normalizeSendMode(const QString& mode) const;
     QByteArray buildCommandFrame(const QString& command, const QString& mode) const;
-    void resetReceiveProtocol();
+    void resetReceiveDispatcher();
     void processProtocolEvent(const SerialProtocolEvent& event);
     QString eventPayloadText(const SerialProtocolEvent& event) const;
     QString rawBytesSummary(const QByteArray& bytes) const;
+    QString bufferedReceiveText(const SerialDispatcher::FeedSummary& summary) const;
     void emitSendFailure(const QString& command,
                          const QString& mode,
                          const QString& message);
 
     SerialProtocolRegistry m_protocols;
     SerialManager m_serialManager;
-    std::unique_ptr<ISerialProtocol> m_receiveProtocol;
+    SerialDispatcher m_dispatcher;
 };
 
 } // namespace serial_station
