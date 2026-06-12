@@ -9,6 +9,8 @@ namespace serialStationConstants {
 
 inline const QString kDefaultProtocolName = QStringLiteral("ascii_text");
 inline const QString kAsciiFrameType = QStringLiteral("frame");
+inline const QString kModbusFrameType = QStringLiteral("modbus_frame");
+inline const QString kModbusErrorType = QStringLiteral("modbus_error");
 inline const QString kLogType = QStringLiteral("log");
 inline constexpr int kDefaultBaudRate = 115200;
 inline constexpr int kDefaultReconnectIntervalMs = 1500;

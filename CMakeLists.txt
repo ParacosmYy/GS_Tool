@@ -91,6 +91,7 @@ set(SOURCES
     src/apps/serial_station/core/SerialSession.cpp
     src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
     src/serial/detector/SerialDetector.cpp
     src/serial/detector/SerialDetectorChip.cpp
     src/serial/detector/SerialDetectorQuery.cpp
@@ -3617,6 +3618,7 @@ set(HEADERS
     src/apps/serial_station/protocols/ISerialProtocol.h
     src/apps/serial_station/protocols/SerialProtocolRegistry.h
     src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.h
+    src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.h
     src/core/event/EventBus.h
 
     src/core/mainwindow/MainWindow.h

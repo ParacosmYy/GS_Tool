@@ -911,6 +911,7 @@ add_executable(test_serial_protocol_registry
     serial_station/test_serial_protocol_registry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
 target_include_directories(test_serial_protocol_registry PRIVATE
@@ -930,6 +931,33 @@ if(WIN32)
 endif()
 
 add_test(NAME SerialProtocolRegistry COMMAND test_serial_protocol_registry)
+
+# ============================================================
+# Serial Station Modbus RTU协议测试
+# ============================================================
+
+add_executable(test_modbus_rtu_protocol
+    serial_station/test_modbus_rtu_protocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
+)
+
+target_include_directories(test_modbus_rtu_protocol PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_modbus_rtu_protocol PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_modbus_rtu_protocol PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME ModbusRtuProtocol COMMAND test_modbus_rtu_protocol)
 
 # ============================================================
 # Serial Station会话状态测试
@@ -1110,6 +1138,7 @@ add_executable(test_serial_station_controller
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
 target_include_directories(test_serial_station_controller PRIVATE
@@ -1151,6 +1180,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
 target_include_directories(test_serial_station_workbench PRIVATE
