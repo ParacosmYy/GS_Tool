@@ -104,12 +104,12 @@ function Get-CMakeSourceRefs {
     return @($absoluteStyleRefs + $testRelativeRefs | Sort-Object -Unique)
 }
 
-function Remove-GeneratedUtilsRefs {
+function Remove-FilteredUtilsRefs {
     param([string[]]$Refs)
 
     return @(
         $Refs |
-            Where-Object { $_ -notmatch "^src/utils/[^/]*[0-9]+/" } |
+            Where-Object { $_ -notmatch "^src/utils/([^/]*[0-9]+|pid|simulator)/" } |
             Sort-Object -Unique
     )
 }
@@ -149,10 +149,10 @@ $cmakeText = ($cmakeFiles | ForEach-Object { Get-Content -Raw -Path (Join-Path $
 $declaredCmakeText = Remove-CMakeLineComments $cmakeText
 $rawCmakeRefs = @(Get-CMakeSourceRefs $cmakeText)
 $declaredCmakeRefs = @(Get-CMakeSourceRefs $declaredCmakeText)
-$activeCmakeRefs = @(Remove-GeneratedUtilsRefs $declaredCmakeRefs)
-$filteredGeneratedUtilsRefs = @(
+$activeCmakeRefs = @(Remove-FilteredUtilsRefs $declaredCmakeRefs)
+$filteredUtilsRefs = @(
     $declaredCmakeRefs |
-        Where-Object { $_ -match "^src/utils/[^/]*[0-9]+/" } |
+        Where-Object { $_ -match "^src/utils/([^/]*[0-9]+|pid|simulator)/" } |
         Sort-Object -Unique
 )
 
@@ -389,7 +389,7 @@ $lines.Add("| Working tree source files under src | $($srcFiles.Count) |")
 $lines.Add("| Raw CMake source references | $($rawCmakeRefs.Count) |")
 $lines.Add("| Declared CMake source references | $($declaredCmakeRefs.Count) |")
 $lines.Add("| Active CMake source references | $($activeCmakeRefs.Count) |")
-$lines.Add("| Filtered generated utils references | $($filteredGeneratedUtilsRefs.Count) |")
+$lines.Add("| Filtered utils references | $($filteredUtilsRefs.Count) |")
 $lines.Add("| Source files not active in CMake | $($notDirectlyInCMake.Count) |")
 $lines.Add("| Existing src/apps/serial_station files | $($existingSerialStationFiles.Count) |")
 $lines.Add("| CMake refs under src/apps/serial_station | $($serialStationCMakeRefs.Count) |")

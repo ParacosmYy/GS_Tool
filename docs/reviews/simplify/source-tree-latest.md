@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-12 16:15:34
+- Generated: 2026-06-12 16:35:50
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -11,9 +11,9 @@
 | Working tree source files under src | 82022 |
 | Raw CMake source references | 6059 |
 | Declared CMake source references | 5953 |
-| Active CMake source references | 1666 |
-| Filtered generated utils references | 4287 |
-| Source files not active in CMake | 80366 |
+| Active CMake source references | 1652 |
+| Filtered utils references | 4301 |
+| Source files not active in CMake | 80380 |
 | Existing src/apps/serial_station files | 24 |
 | CMake refs under src/apps/serial_station | 24 |
 | Generated-looking utils directories | 39670 |
@@ -45,7 +45,7 @@
 
 | Module | References |
 |--------|------------|
-| utils | 844 |
+| utils | 830 |
 | core | 190 |
 | connection | 153 |
 | protocol | 151 |
@@ -173,7 +173,6 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/export | 16 | 16 |
 | src/utils/checksum | 11 | 11 |
 | src/utils/log | 9 | 9 |
-| src/utils/pid | 9 | 9 |
 | src/utils/packet | 8 | 8 |
 | src/utils/filter_design | 7 | 7 |
 | src/utils/firmware | 7 | 7 |
@@ -187,7 +186,6 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/compare | 6 | 5 |
 | src/utils/hex_editor | 5 | 5 |
 | src/utils/rate | 5 | 5 |
-| src/utils/simulator | 7 | 5 |
 | src/utils/timestamp | 5 | 5 |
 | src/utils/aggregator | 4 | 4 |
 | src/utils/bitmask | 4 | 4 |
@@ -290,6 +288,8 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/divided_diff | 2 | 2 |
 | src/utils/dynhistogram | 2 | 2 |
 | src/utils/echohash | 2 | 2 |
+| src/utils/edgedetect | 2 | 2 |
+| src/utils/edmonds | 2 | 2 |
 
 Only the first 120 active utils directories are listed.
 
@@ -307,7 +307,6 @@ Only the first 120 active utils directories are listed.
 | src/utils/perf | 6 | 6 | 4 | 1 | True |
 | src/utils/timestamp | 5 | 5 | 4 | 1 | True |
 | src/utils/export | 16 | 16 | 3 | 1 | True |
-| src/utils/pid | 9 | 9 | 0 | 0 | False |
 | src/utils/filter_design | 7 | 7 | 0 | 0 | False |
 | src/utils/firmware | 7 | 7 | 0 | 0 | False |
 | src/utils/gps | 7 | 7 | 0 | 0 | False |
@@ -318,7 +317,6 @@ Only the first 120 active utils directories are listed.
 | src/utils/compare | 6 | 5 | 0 | 0 | False |
 | src/utils/hex_editor | 5 | 5 | 0 | 0 | False |
 | src/utils/rate | 5 | 5 | 0 | 0 | False |
-| src/utils/simulator | 7 | 5 | 0 | 0 | False |
 | src/utils/aggregator | 4 | 4 | 0 | 0 | False |
 | src/utils/bitmask | 4 | 4 | 0 | 0 | False |
 | src/utils/gmm | 4 | 4 | 0 | 0 | False |
@@ -417,6 +415,8 @@ Only the first 120 active utils directories are listed.
 | src/utils/divided_diff | 2 | 2 | 0 | 0 | False |
 | src/utils/dynhistogram | 2 | 2 | 0 | 0 | False |
 | src/utils/echohash | 2 | 2 | 0 | 0 | False |
+| src/utils/edgedetect | 2 | 2 | 0 | 0 | False |
+| src/utils/edmonds | 2 | 2 | 0 | 0 | False |
 
 Only the first 120 active utils dependency rows are listed.
 
@@ -424,7 +424,6 @@ Only the first 120 active utils dependency rows are listed.
 
 | Path | Files | Active CMake refs | External include refs | External modules |
 |------|-------|-------------------|-----------------------|------------------|
-| src/utils/pid | 9 | 9 | 0 | 0 |
 | src/utils/filter_design | 7 | 7 | 0 | 0 |
 | src/utils/firmware | 7 | 7 | 0 | 0 |
 | src/utils/gps | 7 | 7 | 0 | 0 |
@@ -435,7 +434,6 @@ Only the first 120 active utils dependency rows are listed.
 | src/utils/compare | 6 | 5 | 0 | 0 |
 | src/utils/hex_editor | 5 | 5 | 0 | 0 |
 | src/utils/rate | 5 | 5 | 0 | 0 |
-| src/utils/simulator | 7 | 5 | 0 | 0 |
 | src/utils/aggregator | 4 | 4 | 0 | 0 |
 | src/utils/bitmask | 4 | 4 | 0 | 0 |
 | src/utils/gmm | 4 | 4 | 0 | 0 |
@@ -504,6 +502,8 @@ Only the first 120 active utils dependency rows are listed.
 | src/utils/circqueue | 2 | 2 | 0 | 0 |
 | src/utils/circulant | 2 | 2 | 0 | 0 |
 | src/utils/classifier | 2 | 2 | 0 | 0 |
+| src/utils/clenshaw_curtis | 2 | 2 | 0 | 0 |
+| src/utils/cluster | 2 | 2 | 0 | 0 |
 
 Only the first 80 low-risk active utils candidates are listed.
 

@@ -6936,9 +6936,10 @@ set(HEADERS
 )
 
 # 批量算法草稿目录存在大量重复 QObject 类名，不能直接进入主 GUI 目标。
+# 低风险 active utils 候选先从主 GUI 目标过滤，源码保留供后续审查或独立目标承接。
 foreach(source_list SOURCES HEADERS)
     list(FILTER ${source_list} EXCLUDE REGEX
-        "^src/utils/[^/]*[0-9]+/"
+        "^src/utils/([^/]*[0-9]+|pid|simulator)/"
     )
 endforeach()
 
