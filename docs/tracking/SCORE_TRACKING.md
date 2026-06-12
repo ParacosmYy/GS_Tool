@@ -176,12 +176,13 @@
 | 472 | Serial Station Modbus RTU协议实现 | 新增modbus_rtu协议构帧和流式解析，注册内置协议并补Modbus/registry回归测试 |
 | 473 | Serial Station Custom MD协议PRD/Specs | 定义custom_md默认MCU调试帧、构帧参数、流式解析、重同步和QTest验收 |
 | 474 | Serial Station Custom MD协议实现 | 新增custom_md默认MCU调试帧构建和流式解析，注册内置协议并补custom/registry回归测试 |
+| 475 | GO Loop启动验证PRD/Specs | 定义agent-loop自动bat启动探针、缺Go诊断、循环测试和工具验收路径 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#474` 的完整记录
+- 当前文档已整理到 `#475` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
