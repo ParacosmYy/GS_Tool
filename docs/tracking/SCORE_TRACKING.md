@@ -161,12 +161,13 @@
 | 457 | Serial Station UART面板主题优化 | 三套QSS补齐串口配置面板、输入控件、按钮层级和状态条样式 |
 | 458 | Serial Station工作台壳层PRD/Specs | 定义命令区、日志区、状态栏和UI边界，禁止UI越过controller/core/protocol |
 | 459 | Serial Station工作台壳层实现 | 新增命令区、日志区、状态栏并接入窗口装配和QTest，形成四区调试台 |
+| 460 | Serial Station发送闭环PRD/Specs | 定义UI send意图经controller到protocol/core的第一版闭环，明确未打开/空命令/未知模式错误路径 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#459` 的完整记录
+- 当前文档已整理到 `#460` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
