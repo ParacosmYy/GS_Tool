@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-12 15:51:29
+- Generated: 2026-06-12 15:57:09
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -165,6 +165,133 @@
 | src/utils/graph177 | 4 | 0 |
 
 Only the first 80 generated-looking utils directories are listed.
+
+## Active Utils Directories By CMake References
+
+| Path | Files | Active CMake refs |
+|------|-------|-------------------|
+| src/utils/export | 16 | 16 |
+| src/utils/checksum | 11 | 11 |
+| src/utils/log | 9 | 9 |
+| src/utils/pid | 9 | 9 |
+| src/utils/packet | 8 | 8 |
+| src/utils/filter_design | 7 | 7 |
+| src/utils/firmware | 7 | 7 |
+| src/utils/gps | 7 | 7 |
+| src/utils/network | 7 | 7 |
+| src/utils/scripting | 7 | 7 |
+| src/utils/statemachine | 7 | 7 |
+| src/utils/wavegen | 7 | 7 |
+| src/utils/converter | 6 | 6 |
+| src/utils/perf | 6 | 6 |
+| src/utils/compare | 6 | 5 |
+| src/utils/hex_editor | 5 | 5 |
+| src/utils/rate | 5 | 5 |
+| src/utils/simulator | 7 | 5 |
+| src/utils/timestamp | 5 | 5 |
+| src/utils/aggregator | 4 | 4 |
+| src/utils/bitmask | 4 | 4 |
+| src/utils/crypto | 4 | 4 |
+| src/utils/gmm | 4 | 4 |
+| src/utils/hex_diff | 4 | 4 |
+| src/utils/packet_lib | 4 | 4 |
+| src/utils/pattern | 5 | 4 |
+| src/utils/ringhash | 4 | 4 |
+| src/utils/settings | 3 | 4 |
+| src/utils/spectrum | 4 | 4 |
+| src/utils/waveform | 4 | 4 |
+| src/utils/align | 4 | 3 |
+| src/utils/annotation | 10 | 3 |
+| src/utils/compress | 3 | 3 |
+| src/utils/data | 4 | 3 |
+| src/utils/data_inspector | 3 | 3 |
+| src/utils/decoder | 3 | 3 |
+| src/utils/encoder | 3 | 3 |
+| src/utils/frequency | 3 | 3 |
+| src/utils/fuzzer | 3 | 3 |
+| src/utils/loss | 3 | 3 |
+| src/utils/protocol_timer | 3 | 3 |
+| src/utils/recorder | 3 | 3 |
+| src/utils/signal_gen | 3 | 3 |
+| src/utils/splitter | 3 | 3 |
+| src/utils/template_lib | 3 | 3 |
+| src/utils/validator | 3 | 3 |
+| src/utils/adams | 2 | 2 |
+| src/utils/adaptive_fft | 2 | 2 |
+| src/utils/agc | 2 | 2 |
+| src/utils/aho | 2 | 2 |
+| src/utils/anomaly | 2 | 2 |
+| src/utils/anova | 2 | 2 |
+| src/utils/arima | 2 | 2 |
+| src/utils/armodel | 2 | 2 |
+| src/utils/arnoldi | 2 | 2 |
+| src/utils/autocorr | 2 | 2 |
+| src/utils/autodiff | 2 | 2 |
+| src/utils/backtrack | 2 | 2 |
+| src/utils/bandmat | 2 | 2 |
+| src/utils/bayes | 2 | 2 |
+| src/utils/bernstein | 2 | 2 |
+| src/utils/bessel | 2 | 2 |
+| src/utils/bezier | 2 | 2 |
+| src/utils/bicgstab | 2 | 2 |
+| src/utils/bintree | 2 | 2 |
+| src/utils/bisect | 2 | 2 |
+| src/utils/bitalloc | 2 | 2 |
+| src/utils/bitfield | 2 | 2 |
+| src/utils/bitmap | 2 | 2 |
+| src/utils/bloom | 2 | 2 |
+| src/utils/bootstrap | 2 | 2 |
+| src/utils/bsp_tree | 2 | 2 |
+| src/utils/btree | 2 | 2 |
+| src/utils/butterfly | 2 | 2 |
+| src/utils/butterworth | 2 | 2 |
+| src/utils/cache | 2 | 2 |
+| src/utils/catboost | 2 | 2 |
+| src/utils/cauchy | 2 | 2 |
+| src/utils/cepstrum | 2 | 2 |
+| src/utils/cgls | 2 | 2 |
+| src/utils/changept | 2 | 2 |
+| src/utils/chebyshev | 2 | 2 |
+| src/utils/chisq | 2 | 2 |
+| src/utils/cholupdate | 2 | 2 |
+| src/utils/cic | 2 | 2 |
+| src/utils/circadian | 2 | 2 |
+| src/utils/circbuf | 2 | 2 |
+| src/utils/circqueue | 2 | 2 |
+| src/utils/circulant | 2 | 2 |
+| src/utils/classifier | 2 | 2 |
+| src/utils/clenshaw_curtis | 2 | 2 |
+| src/utils/cluster | 2 | 2 |
+| src/utils/collocation | 2 | 2 |
+| src/utils/combination | 2 | 2 |
+| src/utils/complement | 2 | 2 |
+| src/utils/conjugate | 2 | 2 |
+| src/utils/convhull | 2 | 2 |
+| src/utils/convolution | 2 | 2 |
+| src/utils/correlator | 2 | 2 |
+| src/utils/cosinedist | 2 | 2 |
+| src/utils/countmin | 2 | 2 |
+| src/utils/covariance | 2 | 2 |
+| src/utils/crc64b | 2 | 2 |
+| src/utils/crosscorr | 2 | 2 |
+| src/utils/crossval | 2 | 2 |
+| src/utils/cuckoo_hash | 2 | 2 |
+| src/utils/davidson | 2 | 2 |
+| src/utils/dct | 2 | 2 |
+| src/utils/deadzone | 2 | 2 |
+| src/utils/decomp | 2 | 2 |
+| src/utils/delta | 2 | 2 |
+| src/utils/deque | 2 | 2 |
+| src/utils/derivative | 2 | 2 |
+| src/utils/detector | 2 | 2 |
+| src/utils/detrend | 2 | 2 |
+| src/utils/dict | 2 | 2 |
+| src/utils/disjoint | 2 | 2 |
+| src/utils/divided_diff | 2 | 2 |
+| src/utils/dynhistogram | 2 | 2 |
+| src/utils/echohash | 2 | 2 |
+
+Only the first 120 active utils directories are listed.
 
 ## Old UART Configuration Evidence
 

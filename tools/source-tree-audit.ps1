@@ -230,6 +230,14 @@ $generatedUtilsStats = foreach ($dir in $generatedUtilsDirs) {
     }
 }
 
+$activeUtilsStats = foreach ($dir in ($utilsCMakeCounts.Keys | Sort-Object)) {
+    [pscustomobject]@{
+        Path = "src/utils/$dir"
+        Files = if ($utilsFileCounts.ContainsKey($dir)) { $utilsFileCounts[$dir] } else { 0 }
+        ActiveCMakeRefs = $utilsCMakeCounts[$dir]
+    }
+}
+
 $oldUartEvidence = @(
     "src/serial/config/SerialConfigPanel.h",
     "src/serial/config/SerialConfigPanelUI.cpp",
@@ -336,6 +344,17 @@ foreach ($row in ($generatedUtilsStats | Sort-Object Count -Descending | Select-
 if ($generatedUtilsStats.Count -gt 80) {
     $lines.Add("")
     $lines.Add("Only the first 80 generated-looking utils directories are listed.")
+}
+
+Add-Section $lines "Active Utils Directories By CMake References"
+$lines.Add("| Path | Files | Active CMake refs |")
+$lines.Add("|------|-------|-------------------|")
+foreach ($row in ($activeUtilsStats | Sort-Object -Property @{Expression = "ActiveCMakeRefs"; Descending = $true}, Path | Select-Object -First 120)) {
+    $lines.Add("| $($row.Path) | $($row.Files) | $($row.ActiveCMakeRefs) |")
+}
+if ($activeUtilsStats.Count -gt 120) {
+    $lines.Add("")
+    $lines.Add("Only the first 120 active utils directories are listed.")
 }
 
 Add-Section $lines "Old UART Configuration Evidence"
