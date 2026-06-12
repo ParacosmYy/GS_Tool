@@ -1253,26 +1253,165 @@ QLabel#mqttStatusIndicator[state="error"] {
     background-color: #ef4444;
 }
 
-/* === Serial Station UART配置状态 === */
+/* === Serial Station UART配置面板 === */
+QWidget#serialPortPanel {
+    background-color: #f8fafc;
+    border: 1px solid #dbe3ee;
+    border-radius: 8px;
+}
+QGroupBox#serialPortConfigGroup {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    margin-top: 18px;
+    padding-top: 12px;
+}
+QGroupBox#serialPortConfigGroup::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 12px;
+    padding: 2px 8px;
+    color: #111827;
+    background-color: #f8fafc;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-weight: bold;
+}
+QComboBox#serialPortCombo,
+QComboBox#serialBaudCombo,
+QComboBox#serialDataBitsCombo,
+QComboBox#serialParityCombo,
+QComboBox#serialStopBitsCombo,
+QComboBox#serialFlowControlCombo {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #111827;
+    min-height: 28px;
+    padding: 4px 8px;
+}
+QComboBox#serialPortCombo:hover,
+QComboBox#serialBaudCombo:hover,
+QComboBox#serialDataBitsCombo:hover,
+QComboBox#serialParityCombo:hover,
+QComboBox#serialStopBitsCombo:hover,
+QComboBox#serialFlowControlCombo:hover {
+    border-color: #2563eb;
+}
+QComboBox#serialPortCombo:disabled,
+QComboBox#serialBaudCombo:disabled,
+QComboBox#serialDataBitsCombo:disabled,
+QComboBox#serialParityCombo:disabled,
+QComboBox#serialStopBitsCombo:disabled,
+QComboBox#serialFlowControlCombo:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
+QWidget#serialLineControlBox {
+    background-color: transparent;
+}
+QCheckBox#serialDtrCheck,
+QCheckBox#serialRtsCheck {
+    color: #4b5563;
+    spacing: 6px;
+}
+QCheckBox#serialDtrCheck::indicator,
+QCheckBox#serialRtsCheck::indicator {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #9ca3af;
+    border-radius: 3px;
+    background-color: #ffffff;
+}
+QCheckBox#serialDtrCheck::indicator:checked,
+QCheckBox#serialRtsCheck::indicator:checked {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+QPushButton#serialRefreshButton {
+    background-color: #ffffff;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    min-height: 30px;
+    padding: 4px 12px;
+}
+QPushButton#serialRefreshButton:hover {
+    background-color: #f1f5f9;
+    border-color: #2563eb;
+    color: #1d4ed8;
+}
+QPushButton#serialRefreshButton:pressed {
+    background-color: #e2e8f0;
+}
+QPushButton#serialRefreshButton:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
+QPushButton#serialConnectButton {
+    background-color: #16a34a;
+    color: #ffffff;
+    border: 1px solid #16a34a;
+    border-radius: 6px;
+    font-weight: bold;
+    min-height: 30px;
+    padding: 4px 16px;
+}
+QPushButton#serialConnectButton:hover {
+    background-color: #22c55e;
+    border-color: #22c55e;
+}
+QPushButton#serialConnectButton:pressed {
+    background-color: #15803d;
+}
+QPushButton#serialConnectButton:disabled {
+    background-color: #d1d5db;
+    color: #9ca3af;
+    border-color: #d1d5db;
+}
+QPushButton#serialDisconnectButton {
+    background-color: transparent;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    min-height: 30px;
+    padding: 4px 16px;
+}
+QPushButton#serialDisconnectButton:hover {
+    background-color: #fef2f2;
+    border-color: #dc2626;
+}
+QPushButton#serialDisconnectButton:pressed {
+    background-color: #fee2e2;
+}
+QPushButton#serialDisconnectButton:disabled {
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
 QLabel#serialPortStatusLabel {
     color: #4b5563;
-    padding: 4px 8px;
+    padding: 7px 10px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    background-color: #f3f4f6;
+    background-color: #ffffff;
 }
 QLabel#serialPortStatusLabel[state="open"] {
     color: #15803d;
     border-color: #22c55e;
+    background-color: #f0fdf4;
 }
 QLabel#serialPortStatusLabel[state="opening"],
 QLabel#serialPortStatusLabel[state="warning"] {
     color: #a16207;
     border-color: #f59e0b;
+    background-color: #fffbeb;
 }
 QLabel#serialPortStatusLabel[state="error"] {
     color: #b91c1c;
     border-color: #ef4444;
+    background-color: #fef2f2;
 }
 
 /* === 工具栏下拉框 - 布局/主题/语言选择 === */

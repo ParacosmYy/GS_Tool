@@ -158,12 +158,13 @@
 | 454 | Active utils依赖审计实现 | source-tree-audit统计外部include并输出低风险拆分候选 |
 | 455 | Active utils CMake拆分BATCH方案 | 12个可审查子任务落档，明确人工审查前不并行 |
 | 456 | Active utils CMake拆分串行探针 | 主目标过滤pid/simulator并同步审计脚本口径，构建/测试/doctor/bat通过 |
+| 457 | Serial Station UART面板主题优化 | 三套QSS补齐串口配置面板、输入控件、按钮层级和状态条样式 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#456` 的完整记录
+- 当前文档已整理到 `#457` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
