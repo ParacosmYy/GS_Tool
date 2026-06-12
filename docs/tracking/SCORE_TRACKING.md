@@ -184,12 +184,13 @@
 | 480 | Serial Station控制器日志接入PRD/Specs | 定义Controller写入SerialLogService的结构化日志闭环，保持UI信号兼容且不改UI生产文件 |
 | 481 | Serial Station控制器日志接入实现 | Controller持有并写入SerialLogService，提供日志快照/过滤/文本/JSON接口，补独立控制器日志接入QTest |
 | 482 | Serial Station导出服务PRD/Specs | 定义services层日志导出能力，支持PlainText/JSON Lines/CSV和文件写入错误路径，不改UI/controller |
+| 483 | Serial Station导出服务实现 | 新增services/SerialExportService，支持PlainText/JSON Lines/CSV格式化、QSaveFile原子写入、BOM和错误路径QTest |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#482` 的完整记录
+- 当前文档已整理到 `#483` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

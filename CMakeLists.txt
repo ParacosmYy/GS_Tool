@@ -89,6 +89,7 @@ set(SOURCES
     src/apps/serial_station/core/SerialPort.cpp
     src/apps/serial_station/core/SerialManager.cpp
     src/apps/serial_station/core/SerialSession.cpp
+    src/apps/serial_station/services/SerialExportService.cpp
     src/apps/serial_station/services/SerialLogService.cpp
     src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
@@ -3616,6 +3617,7 @@ set(HEADERS
     src/apps/serial_station/core/SerialPort.h
     src/apps/serial_station/core/SerialManager.h
     src/apps/serial_station/core/SerialSession.h
+    src/apps/serial_station/services/SerialExportService.h
     src/apps/serial_station/services/SerialLogService.h
     src/apps/serial_station/protocols/SerialProtocolEvent.h
     src/apps/serial_station/protocols/ISerialProtocol.h
