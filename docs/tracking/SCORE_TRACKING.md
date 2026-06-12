@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 499分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 501分
+> 当前: 500分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 500分
 
 ---
 
@@ -201,12 +201,13 @@
 | 497 | UV工具自测PRD/Specs | 定义uv run test-embeddebug-tools入口，使用unittest覆盖启动/打包工具纯逻辑，不启动GUI、不构建、不调用windeployqt |
 | 498 | UV工具自测实现 | 新增tools/test_embeddebug_tools.py和pyproject入口，覆盖start/package工具纯逻辑，README同步uv工具自测命令 |
 | 499 | UV打包产物校验PRD/Specs | 定义uv run verify-package-embeddebug入口，离线校验dist发布目录的exe、Qt平台插件、README和随包文档 |
+| 500 | UV打包产物校验实现 | 新增tools/verify_package_embeddebug.py和pyproject入口，支持最新dist目录或指定目录离线校验并补unittest覆盖 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#499` 的完整记录
+- 当前文档已整理到 `#500` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

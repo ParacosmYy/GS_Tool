@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import contextlib
 import io
+import os
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from zipfile import ZipFile
 
-from tools import package_embeddebug, start_embeddebug
+from tools import package_embeddebug, start_embeddebug, verify_package_embeddebug
 
 
 class StartEmbedDebugToolTest(unittest.TestCase):
@@ -79,6 +80,65 @@ class PackageEmbedDebugToolTest(unittest.TestCase):
 
         self.assertIn("EmbedDebug-dev-windows-x64/EmbedDebug.exe", names)
         self.assertIn("EmbedDebug-dev-windows-x64/docs/README.txt", names)
+
+
+class VerifyPackageEmbedDebugToolTest(unittest.TestCase):
+    def test_missing_package_dir_reports_failure(self) -> None:
+        ok, messages = verify_package_embeddebug.verify_package_dir(Path("missing-package"))
+
+        self.assertFalse(ok)
+        self.assertEqual(messages, ["missing: package directory missing-package"])
+
+    def test_verify_package_dir_reports_required_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            package_dir = Path(temp_dir) / "EmbedDebug-dev-windows-x64"
+            for relative_path in verify_package_embeddebug.REQUIRED_RELATIVE_PATHS:
+                target = package_dir / relative_path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("placeholder", encoding="utf-8")
+
+            ok, messages = verify_package_embeddebug.verify_package_dir(package_dir)
+
+        self.assertTrue(ok)
+        self.assertIn("ok: EmbedDebug.exe", messages)
+        self.assertIn("ok: platforms/qwindows.dll", messages)
+
+    def test_verify_package_dir_lists_missing_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            package_dir = Path(temp_dir) / "EmbedDebug-dev-windows-x64"
+            package_dir.mkdir()
+            (package_dir / "EmbedDebug.exe").write_text("placeholder", encoding="utf-8")
+
+            ok, messages = verify_package_embeddebug.verify_package_dir(package_dir)
+
+        self.assertFalse(ok)
+        self.assertIn("ok: EmbedDebug.exe", messages)
+        self.assertIn("missing: platforms/qwindows.dll", messages)
+
+    def test_latest_package_dir_selects_newest_candidate(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            dist_root = root / "dist"
+            old_dir = dist_root / "EmbedDebug-old-windows-x64"
+            new_dir = dist_root / "EmbedDebug-new-windows-x64"
+            ignored_dir = dist_root / "OtherTool-new-windows-x64"
+            old_dir.mkdir(parents=True)
+            new_dir.mkdir()
+            ignored_dir.mkdir()
+
+            old_time = 1_700_000_000
+            new_time = old_time + 60
+            old_dir.touch()
+            new_dir.touch()
+            ignored_dir.touch()
+
+            os.utime(old_dir, (old_time, old_time))
+            os.utime(new_dir, (new_time, new_time))
+            os.utime(ignored_dir, (new_time + 60, new_time + 60))
+
+            latest = verify_package_embeddebug.latest_package_dir(root)
+
+        self.assertEqual(latest.name, "EmbedDebug-new-windows-x64")
 
 
 def main() -> int:

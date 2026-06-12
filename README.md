@@ -105,10 +105,12 @@ UV packaging shortcut:
 ```powershell
 uv run package-embeddebug --skip-build --clean
 uv run package-embeddebug --skip-build --clean --zip
+uv run verify-package-embeddebug
 uv run test-embeddebug-tools
 ```
 
 This is the supported packaging shortcut for the C++/Qt application. PyInstaller is for Python application bodies; EmbedDebug is packaged by reusing `build/EmbedDebug.exe`, running Qt `windeployqt`, and writing a distributable folder under ignored `dist/`.
+`verify-package-embeddebug` checks the packaged folder offline before release, including the executable, Qt platform plugin, README, and bundled constraint document.
 
 ## Verification
 
