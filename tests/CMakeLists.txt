@@ -911,6 +911,7 @@ add_executable(test_serial_protocol_registry
     serial_station/test_serial_protocol_registry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
@@ -931,6 +932,33 @@ if(WIN32)
 endif()
 
 add_test(NAME SerialProtocolRegistry COMMAND test_serial_protocol_registry)
+
+# ============================================================
+# Serial Station Custom MD协议测试
+# ============================================================
+
+add_executable(test_custom_md_protocol
+    serial_station/test_custom_md_protocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+)
+
+target_include_directories(test_custom_md_protocol PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_custom_md_protocol PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_custom_md_protocol PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME CustomMdProtocol COMMAND test_custom_md_protocol)
 
 # ============================================================
 # Serial Station Modbus RTU协议测试
@@ -1138,6 +1166,7 @@ add_executable(test_serial_station_controller
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
@@ -1180,6 +1209,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 

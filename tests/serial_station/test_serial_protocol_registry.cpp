@@ -13,6 +13,7 @@ private slots:
     void rejectDuplicateProtocolName();
     void defaultProtocolMustExist();
     void builtInProtocolsIncludeModbusRtu();
+    void builtInProtocolsIncludeCustomMd();
 };
 
 void SerialProtocolRegistryTest::registerAndCreateProtocol()
@@ -63,6 +64,17 @@ void SerialProtocolRegistryTest::builtInProtocolsIncludeModbusRtu()
     QVERIFY(registry.contains(QStringLiteral("modbus_rtu")));
     QCOMPARE(registry.defaultProtocol(), QStringLiteral("ascii_text"));
     QVERIFY(registry.create(QStringLiteral("modbus_rtu")) != nullptr);
+}
+
+void SerialProtocolRegistryTest::builtInProtocolsIncludeCustomMd()
+{
+    SerialProtocolRegistry registry;
+
+    registry.registerBuiltInProtocols();
+
+    QVERIFY(registry.contains(QStringLiteral("custom_md")));
+    QCOMPARE(registry.defaultProtocol(), QStringLiteral("ascii_text"));
+    QVERIFY(registry.create(QStringLiteral("custom_md")) != nullptr);
 }
 
 QTEST_MAIN(SerialProtocolRegistryTest)

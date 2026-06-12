@@ -4,6 +4,7 @@
 
 #include "apps/serial_station/SerialStationConstants.h"
 #include "apps/serial_station/protocols/ascii_text/AsciiTextProtocol.h"
+#include "apps/serial_station/protocols/custom_md/CustomMdProtocol.h"
 #include "apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.h"
 
 namespace serial_station {
@@ -30,6 +31,9 @@ void SerialProtocolRegistry::registerBuiltInProtocols()
     });
     registerProtocol(QStringLiteral("modbus_rtu"), [] {
         return std::make_unique<ModbusRtuProtocol>();
+    });
+    registerProtocol(QStringLiteral("custom_md"), [] {
+        return std::make_unique<CustomMdProtocol>();
     });
     setDefaultProtocol(serialStationConstants::kDefaultProtocolName);
 }
