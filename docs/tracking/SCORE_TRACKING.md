@@ -154,12 +154,13 @@
 | 450 | Source Tree active CMake审计标准 | PRD-081/Specs定义raw/declared/active引用口径 |
 | 451 | Source Tree active CMake审计实现 | source-tree-audit区分raw/declared/active并刷新报告 |
 | 452 | Active utils编译面报告 | source-tree-audit列出仍在主目标中的utils目录 |
+| 453 | Active utils依赖审计标准 | PRD-082/Specs定义外部include证据与低风险候选口径 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#452` 的完整记录
+- 当前文档已整理到 `#453` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
