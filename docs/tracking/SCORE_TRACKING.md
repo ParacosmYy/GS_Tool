@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 502分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 498分
+> 当前: 503分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 497分
 
 ---
 
@@ -204,12 +204,13 @@
 | 500 | UV打包产物校验实现 | 新增tools/verify_package_embeddebug.py和pyproject入口，支持最新dist目录或指定目录离线校验并补unittest覆盖 |
 | 501 | Serial Station命令历史UI PRD/Specs | 定义命令面板最近命令、去重容量、选择回填和清空历史边界，仅限ui层不触碰协议/core |
 | 502 | Serial Station命令历史UI实现 | 新增ui层SerialCommandHistoryModel并接入命令面板最近命令、成功发送确认、选择回填、清空和QSS/QTest覆盖 |
+| 503 | Serial Station协议选择UI PRD/Specs | 定义协议选择面板、controller默认协议切换、结构化日志、窗口闭环和README同步边界 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#502` 的完整记录
+- 当前文档已整理到 `#503` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
