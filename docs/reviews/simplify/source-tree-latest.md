@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-12 15:57:09
+- Generated: 2026-06-12 16:15:34
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -9,9 +9,9 @@
 | Metric | Value |
 |--------|-------|
 | Working tree source files under src | 82022 |
-| Raw CMake source references | 6083 |
-| Declared CMake source references | 5977 |
-| Active CMake source references | 1690 |
+| Raw CMake source references | 6059 |
+| Declared CMake source references | 5953 |
+| Active CMake source references | 1666 |
 | Filtered generated utils references | 4287 |
 | Source files not active in CMake | 80366 |
 | Existing src/apps/serial_station files | 24 |
@@ -53,13 +53,13 @@
 | serial | 60 |
 | terminal | 50 |
 | ota | 36 |
-| (root) | 29 |
 | dashboard | 28 |
 | apps | 24 |
 | plugin | 13 |
-| widgets | 12 |
 | rtt | 12 |
+| widgets | 12 |
 | automation | 11 |
+| (root) | 5 |
 | interfaces | 4 |
 
 ## Frozen Or Duplicate Directory Hits
@@ -293,6 +293,220 @@ Only the first 80 generated-looking utils directories are listed.
 
 Only the first 120 active utils directories are listed.
 
+## Active Utils External Include Evidence
+
+| Path | Files | Active CMake refs | External include refs | External modules | Canonical |
+|------|-------|-------------------|-----------------------|------------------|-----------|
+| src/utils/crypto | 4 | 4 | 27 | 6 | True |
+| src/utils/settings | 3 | 4 | 12 | 4 | True |
+| src/utils/data | 4 | 3 | 11 | 4 | True |
+| src/utils/log | 9 | 9 | 6 | 1 | True |
+| src/utils/checksum | 11 | 11 | 4 | 1 | True |
+| src/utils/packet | 8 | 8 | 4 | 1 | True |
+| src/utils/converter | 6 | 6 | 4 | 1 | True |
+| src/utils/perf | 6 | 6 | 4 | 1 | True |
+| src/utils/timestamp | 5 | 5 | 4 | 1 | True |
+| src/utils/export | 16 | 16 | 3 | 1 | True |
+| src/utils/pid | 9 | 9 | 0 | 0 | False |
+| src/utils/filter_design | 7 | 7 | 0 | 0 | False |
+| src/utils/firmware | 7 | 7 | 0 | 0 | False |
+| src/utils/gps | 7 | 7 | 0 | 0 | False |
+| src/utils/network | 7 | 7 | 0 | 0 | False |
+| src/utils/scripting | 7 | 7 | 0 | 0 | False |
+| src/utils/statemachine | 7 | 7 | 0 | 0 | False |
+| src/utils/wavegen | 7 | 7 | 0 | 0 | False |
+| src/utils/compare | 6 | 5 | 0 | 0 | False |
+| src/utils/hex_editor | 5 | 5 | 0 | 0 | False |
+| src/utils/rate | 5 | 5 | 0 | 0 | False |
+| src/utils/simulator | 7 | 5 | 0 | 0 | False |
+| src/utils/aggregator | 4 | 4 | 0 | 0 | False |
+| src/utils/bitmask | 4 | 4 | 0 | 0 | False |
+| src/utils/gmm | 4 | 4 | 0 | 0 | False |
+| src/utils/hex_diff | 4 | 4 | 0 | 0 | False |
+| src/utils/packet_lib | 4 | 4 | 0 | 0 | False |
+| src/utils/pattern | 5 | 4 | 0 | 0 | False |
+| src/utils/ringhash | 4 | 4 | 0 | 0 | False |
+| src/utils/spectrum | 4 | 4 | 0 | 0 | False |
+| src/utils/waveform | 4 | 4 | 0 | 0 | False |
+| src/utils/align | 4 | 3 | 0 | 0 | False |
+| src/utils/annotation | 10 | 3 | 0 | 0 | False |
+| src/utils/compress | 3 | 3 | 0 | 0 | False |
+| src/utils/data_inspector | 3 | 3 | 0 | 0 | False |
+| src/utils/decoder | 3 | 3 | 0 | 0 | False |
+| src/utils/encoder | 3 | 3 | 0 | 0 | False |
+| src/utils/frequency | 3 | 3 | 0 | 0 | False |
+| src/utils/fuzzer | 3 | 3 | 0 | 0 | False |
+| src/utils/loss | 3 | 3 | 0 | 0 | False |
+| src/utils/protocol_timer | 3 | 3 | 0 | 0 | False |
+| src/utils/recorder | 3 | 3 | 0 | 0 | False |
+| src/utils/signal_gen | 3 | 3 | 0 | 0 | False |
+| src/utils/splitter | 3 | 3 | 0 | 0 | False |
+| src/utils/template_lib | 3 | 3 | 0 | 0 | False |
+| src/utils/validator | 3 | 3 | 0 | 0 | False |
+| src/utils/adams | 2 | 2 | 0 | 0 | False |
+| src/utils/adaptive_fft | 2 | 2 | 0 | 0 | False |
+| src/utils/agc | 2 | 2 | 0 | 0 | False |
+| src/utils/aho | 2 | 2 | 0 | 0 | False |
+| src/utils/anomaly | 2 | 2 | 0 | 0 | False |
+| src/utils/anova | 2 | 2 | 0 | 0 | False |
+| src/utils/arima | 2 | 2 | 0 | 0 | False |
+| src/utils/armodel | 2 | 2 | 0 | 0 | False |
+| src/utils/arnoldi | 2 | 2 | 0 | 0 | False |
+| src/utils/autocorr | 2 | 2 | 0 | 0 | False |
+| src/utils/autodiff | 2 | 2 | 0 | 0 | False |
+| src/utils/backtrack | 2 | 2 | 0 | 0 | False |
+| src/utils/bandmat | 2 | 2 | 0 | 0 | False |
+| src/utils/bayes | 2 | 2 | 0 | 0 | False |
+| src/utils/bernstein | 2 | 2 | 0 | 0 | False |
+| src/utils/bessel | 2 | 2 | 0 | 0 | False |
+| src/utils/bezier | 2 | 2 | 0 | 0 | False |
+| src/utils/bicgstab | 2 | 2 | 0 | 0 | False |
+| src/utils/bintree | 2 | 2 | 0 | 0 | False |
+| src/utils/bisect | 2 | 2 | 0 | 0 | False |
+| src/utils/bitalloc | 2 | 2 | 0 | 0 | False |
+| src/utils/bitfield | 2 | 2 | 0 | 0 | False |
+| src/utils/bitmap | 2 | 2 | 0 | 0 | False |
+| src/utils/bloom | 2 | 2 | 0 | 0 | False |
+| src/utils/bootstrap | 2 | 2 | 0 | 0 | False |
+| src/utils/bsp_tree | 2 | 2 | 0 | 0 | False |
+| src/utils/btree | 2 | 2 | 0 | 0 | False |
+| src/utils/butterfly | 2 | 2 | 0 | 0 | False |
+| src/utils/butterworth | 2 | 2 | 0 | 0 | False |
+| src/utils/cache | 2 | 2 | 0 | 0 | False |
+| src/utils/catboost | 2 | 2 | 0 | 0 | False |
+| src/utils/cauchy | 2 | 2 | 0 | 0 | False |
+| src/utils/cepstrum | 2 | 2 | 0 | 0 | False |
+| src/utils/cgls | 2 | 2 | 0 | 0 | False |
+| src/utils/changept | 2 | 2 | 0 | 0 | False |
+| src/utils/chebyshev | 2 | 2 | 0 | 0 | False |
+| src/utils/chisq | 2 | 2 | 0 | 0 | False |
+| src/utils/cholupdate | 2 | 2 | 0 | 0 | False |
+| src/utils/cic | 2 | 2 | 0 | 0 | False |
+| src/utils/circadian | 2 | 2 | 0 | 0 | False |
+| src/utils/circbuf | 2 | 2 | 0 | 0 | False |
+| src/utils/circqueue | 2 | 2 | 0 | 0 | False |
+| src/utils/circulant | 2 | 2 | 0 | 0 | False |
+| src/utils/classifier | 2 | 2 | 0 | 0 | False |
+| src/utils/clenshaw_curtis | 2 | 2 | 0 | 0 | False |
+| src/utils/cluster | 2 | 2 | 0 | 0 | False |
+| src/utils/collocation | 2 | 2 | 0 | 0 | False |
+| src/utils/combination | 2 | 2 | 0 | 0 | False |
+| src/utils/complement | 2 | 2 | 0 | 0 | False |
+| src/utils/conjugate | 2 | 2 | 0 | 0 | False |
+| src/utils/convhull | 2 | 2 | 0 | 0 | False |
+| src/utils/convolution | 2 | 2 | 0 | 0 | False |
+| src/utils/correlator | 2 | 2 | 0 | 0 | False |
+| src/utils/cosinedist | 2 | 2 | 0 | 0 | False |
+| src/utils/countmin | 2 | 2 | 0 | 0 | False |
+| src/utils/covariance | 2 | 2 | 0 | 0 | False |
+| src/utils/crc64b | 2 | 2 | 0 | 0 | False |
+| src/utils/crosscorr | 2 | 2 | 0 | 0 | False |
+| src/utils/crossval | 2 | 2 | 0 | 0 | False |
+| src/utils/cuckoo_hash | 2 | 2 | 0 | 0 | False |
+| src/utils/davidson | 2 | 2 | 0 | 0 | False |
+| src/utils/dct | 2 | 2 | 0 | 0 | False |
+| src/utils/deadzone | 2 | 2 | 0 | 0 | False |
+| src/utils/decomp | 2 | 2 | 0 | 0 | False |
+| src/utils/delta | 2 | 2 | 0 | 0 | False |
+| src/utils/deque | 2 | 2 | 0 | 0 | False |
+| src/utils/derivative | 2 | 2 | 0 | 0 | False |
+| src/utils/detector | 2 | 2 | 0 | 0 | False |
+| src/utils/detrend | 2 | 2 | 0 | 0 | False |
+| src/utils/dict | 2 | 2 | 0 | 0 | False |
+| src/utils/disjoint | 2 | 2 | 0 | 0 | False |
+| src/utils/divided_diff | 2 | 2 | 0 | 0 | False |
+| src/utils/dynhistogram | 2 | 2 | 0 | 0 | False |
+| src/utils/echohash | 2 | 2 | 0 | 0 | False |
+
+Only the first 120 active utils dependency rows are listed.
+
+## Low-Risk Active Utils Split Candidates
+
+| Path | Files | Active CMake refs | External include refs | External modules |
+|------|-------|-------------------|-----------------------|------------------|
+| src/utils/pid | 9 | 9 | 0 | 0 |
+| src/utils/filter_design | 7 | 7 | 0 | 0 |
+| src/utils/firmware | 7 | 7 | 0 | 0 |
+| src/utils/gps | 7 | 7 | 0 | 0 |
+| src/utils/network | 7 | 7 | 0 | 0 |
+| src/utils/scripting | 7 | 7 | 0 | 0 |
+| src/utils/statemachine | 7 | 7 | 0 | 0 |
+| src/utils/wavegen | 7 | 7 | 0 | 0 |
+| src/utils/compare | 6 | 5 | 0 | 0 |
+| src/utils/hex_editor | 5 | 5 | 0 | 0 |
+| src/utils/rate | 5 | 5 | 0 | 0 |
+| src/utils/simulator | 7 | 5 | 0 | 0 |
+| src/utils/aggregator | 4 | 4 | 0 | 0 |
+| src/utils/bitmask | 4 | 4 | 0 | 0 |
+| src/utils/gmm | 4 | 4 | 0 | 0 |
+| src/utils/hex_diff | 4 | 4 | 0 | 0 |
+| src/utils/packet_lib | 4 | 4 | 0 | 0 |
+| src/utils/pattern | 5 | 4 | 0 | 0 |
+| src/utils/ringhash | 4 | 4 | 0 | 0 |
+| src/utils/spectrum | 4 | 4 | 0 | 0 |
+| src/utils/waveform | 4 | 4 | 0 | 0 |
+| src/utils/align | 4 | 3 | 0 | 0 |
+| src/utils/annotation | 10 | 3 | 0 | 0 |
+| src/utils/compress | 3 | 3 | 0 | 0 |
+| src/utils/data_inspector | 3 | 3 | 0 | 0 |
+| src/utils/decoder | 3 | 3 | 0 | 0 |
+| src/utils/encoder | 3 | 3 | 0 | 0 |
+| src/utils/frequency | 3 | 3 | 0 | 0 |
+| src/utils/fuzzer | 3 | 3 | 0 | 0 |
+| src/utils/loss | 3 | 3 | 0 | 0 |
+| src/utils/protocol_timer | 3 | 3 | 0 | 0 |
+| src/utils/recorder | 3 | 3 | 0 | 0 |
+| src/utils/signal_gen | 3 | 3 | 0 | 0 |
+| src/utils/splitter | 3 | 3 | 0 | 0 |
+| src/utils/template_lib | 3 | 3 | 0 | 0 |
+| src/utils/validator | 3 | 3 | 0 | 0 |
+| src/utils/adams | 2 | 2 | 0 | 0 |
+| src/utils/adaptive_fft | 2 | 2 | 0 | 0 |
+| src/utils/agc | 2 | 2 | 0 | 0 |
+| src/utils/aho | 2 | 2 | 0 | 0 |
+| src/utils/anomaly | 2 | 2 | 0 | 0 |
+| src/utils/anova | 2 | 2 | 0 | 0 |
+| src/utils/arima | 2 | 2 | 0 | 0 |
+| src/utils/armodel | 2 | 2 | 0 | 0 |
+| src/utils/arnoldi | 2 | 2 | 0 | 0 |
+| src/utils/autocorr | 2 | 2 | 0 | 0 |
+| src/utils/autodiff | 2 | 2 | 0 | 0 |
+| src/utils/backtrack | 2 | 2 | 0 | 0 |
+| src/utils/bandmat | 2 | 2 | 0 | 0 |
+| src/utils/bayes | 2 | 2 | 0 | 0 |
+| src/utils/bernstein | 2 | 2 | 0 | 0 |
+| src/utils/bessel | 2 | 2 | 0 | 0 |
+| src/utils/bezier | 2 | 2 | 0 | 0 |
+| src/utils/bicgstab | 2 | 2 | 0 | 0 |
+| src/utils/bintree | 2 | 2 | 0 | 0 |
+| src/utils/bisect | 2 | 2 | 0 | 0 |
+| src/utils/bitalloc | 2 | 2 | 0 | 0 |
+| src/utils/bitfield | 2 | 2 | 0 | 0 |
+| src/utils/bitmap | 2 | 2 | 0 | 0 |
+| src/utils/bloom | 2 | 2 | 0 | 0 |
+| src/utils/bootstrap | 2 | 2 | 0 | 0 |
+| src/utils/bsp_tree | 2 | 2 | 0 | 0 |
+| src/utils/btree | 2 | 2 | 0 | 0 |
+| src/utils/butterfly | 2 | 2 | 0 | 0 |
+| src/utils/butterworth | 2 | 2 | 0 | 0 |
+| src/utils/cache | 2 | 2 | 0 | 0 |
+| src/utils/catboost | 2 | 2 | 0 | 0 |
+| src/utils/cauchy | 2 | 2 | 0 | 0 |
+| src/utils/cepstrum | 2 | 2 | 0 | 0 |
+| src/utils/cgls | 2 | 2 | 0 | 0 |
+| src/utils/changept | 2 | 2 | 0 | 0 |
+| src/utils/chebyshev | 2 | 2 | 0 | 0 |
+| src/utils/chisq | 2 | 2 | 0 | 0 |
+| src/utils/cholupdate | 2 | 2 | 0 | 0 |
+| src/utils/cic | 2 | 2 | 0 | 0 |
+| src/utils/circadian | 2 | 2 | 0 | 0 |
+| src/utils/circbuf | 2 | 2 | 0 | 0 |
+| src/utils/circqueue | 2 | 2 | 0 | 0 |
+| src/utils/circulant | 2 | 2 | 0 | 0 |
+| src/utils/classifier | 2 | 2 | 0 | 0 |
+
+Only the first 80 low-risk active utils candidates are listed.
+
 ## Old UART Configuration Evidence
 
 | Path | Exists | In CMake |
@@ -367,3 +581,4 @@ Only the first 120 active utils directories are listed.
 2. Old UART configuration exists in the current mainline. The missing part is the new `src/apps/serial_station/` minimal UART loop.
 3. Do not delete by directory name alone. First remove unneeded files from CMake, build, launch, then delete in a separate reviewed step.
 4. Use active CMake references, not raw text references, as the closest audit signal for the main GUI target compile surface.
+5. Low-risk active utils candidates are inputs for a later CMake split PRD; they are not deletion approval.

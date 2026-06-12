@@ -96,7 +96,7 @@ function Get-CMakeSourceRefs {
             Sort-Object -Unique
     )
     $testRelativeRefs = @(
-        [regex]::Matches($Text, "serial_station/[A-Za-z0-9_./+-]+\.(?:cpp|cxx|cc|c|h|hpp|hh|ui|qrc)") |
+        [regex]::Matches($Text, "(?<!apps/)serial_station/[A-Za-z0-9_./+-]+\.(?:cpp|cxx|cc|c|h|hpp|hh|ui|qrc)") |
             ForEach-Object { Convert-ToRepoPath ("tests/" + $_.Value) } |
             Sort-Object -Unique
     )
@@ -120,6 +120,7 @@ Set-Location $repoRoot
 $resolvedOutFile = Assert-ReportPath -RepoRoot $repoRoot -Path $OutFile
 
 $sourceExtensions = @(".cpp", ".cxx", ".cc", ".c", ".h", ".hpp", ".hh", ".ui", ".qrc")
+$includeScanExtensions = @(".cpp", ".cxx", ".cc", ".c", ".h", ".hpp", ".hh")
 $trackedFiles = @(git ls-files)
 $untrackedFiles = @(git ls-files --others --exclude-standard)
 $repoFiles = @(
@@ -237,6 +238,86 @@ $activeUtilsStats = foreach ($dir in ($utilsCMakeCounts.Keys | Sort-Object)) {
         ActiveCMakeRefs = $utilsCMakeCounts[$dir]
     }
 }
+
+$canonicalUtilsDirs = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+foreach ($dir in @(
+    "checksum",
+    "converter",
+    "crypto",
+    "data",
+    "export",
+    "log",
+    "packet",
+    "perf",
+    "pipeline",
+    "settings",
+    "timestamp"
+)) {
+    [void]$canonicalUtilsDirs.Add($dir)
+}
+
+$includeScanFiles = @(
+    $activeCmakeRefs |
+        Where-Object {
+            ($_ -like "src/*" -or $_ -like "tests/*") -and
+            $includeScanExtensions -contains ([System.IO.Path]::GetExtension($_).ToLowerInvariant()) -and
+            (Test-Path -LiteralPath (Join-Path $repoRoot $_) -PathType Leaf)
+        } |
+        Sort-Object -Unique
+)
+
+$utilsExternalIncludeRefs = @{}
+$utilsExternalIncludeModules = @{}
+foreach ($dir in $utilsCMakeCounts.Keys) {
+    $utilsExternalIncludeRefs[$dir] = 0
+    $utilsExternalIncludeModules[$dir] = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+}
+
+$includePattern = '^\s*#\s*include\s*[<"]([^>"]+)[>"]'
+foreach ($file in $includeScanFiles) {
+    $filePath = Join-Path $repoRoot $file
+    foreach ($match in (Select-String -LiteralPath $filePath -Pattern $includePattern -AllMatches)) {
+        foreach ($includeMatch in $match.Matches) {
+            $includePath = Convert-ToRepoPath $includeMatch.Groups[1].Value
+            if ($includePath -match "^utils/([^/]+)/") {
+                $targetDir = $Matches[1]
+                if (-not $utilsCMakeCounts.ContainsKey($targetDir)) {
+                    continue
+                }
+
+                $targetPrefix = "src/utils/$targetDir/"
+                if ($file.StartsWith($targetPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+                    continue
+                }
+
+                $utilsExternalIncludeRefs[$targetDir]++
+                [void]$utilsExternalIncludeModules[$targetDir].Add((Get-TopModule $file))
+            }
+        }
+    }
+}
+
+$activeUtilsDependencyStats = foreach ($row in $activeUtilsStats) {
+    $dir = $row.Path -replace "^src/utils/", ""
+    [pscustomobject]@{
+        Path = $row.Path
+        Files = $row.Files
+        ActiveCMakeRefs = $row.ActiveCMakeRefs
+        ExternalIncludeRefs = $utilsExternalIncludeRefs[$dir]
+        ExternalModules = $utilsExternalIncludeModules[$dir].Count
+        Canonical = $canonicalUtilsDirs.Contains($dir)
+    }
+}
+
+$lowRiskActiveUtilsCandidates = @(
+    $activeUtilsDependencyStats |
+        Where-Object {
+            $_.ActiveCMakeRefs -gt 0 -and
+            $_.ExternalIncludeRefs -eq 0 -and
+            -not $_.Canonical
+        } |
+        Sort-Object -Property @{Expression = "ActiveCMakeRefs"; Descending = $true}, Path
+)
 
 $oldUartEvidence = @(
     "src/serial/config/SerialConfigPanel.h",
@@ -357,6 +438,30 @@ if ($activeUtilsStats.Count -gt 120) {
     $lines.Add("Only the first 120 active utils directories are listed.")
 }
 
+Add-Section $lines "Active Utils External Include Evidence"
+$lines.Add("| Path | Files | Active CMake refs | External include refs | External modules | Canonical |")
+$lines.Add("|------|-------|-------------------|-----------------------|------------------|-----------|")
+foreach ($row in ($activeUtilsDependencyStats | Sort-Object -Property @{Expression = "ExternalIncludeRefs"; Descending = $true}, @{Expression = "ActiveCMakeRefs"; Descending = $true}, Path | Select-Object -First 120)) {
+    $lines.Add("| $($row.Path) | $($row.Files) | $($row.ActiveCMakeRefs) | $($row.ExternalIncludeRefs) | $($row.ExternalModules) | $($row.Canonical) |")
+}
+if ($activeUtilsDependencyStats.Count -gt 120) {
+    $lines.Add("")
+    $lines.Add("Only the first 120 active utils dependency rows are listed.")
+}
+
+Add-Section $lines "Low-Risk Active Utils Split Candidates"
+$lines.Add("| Path | Files | Active CMake refs | External include refs | External modules |")
+$lines.Add("|------|-------|-------------------|-----------------------|------------------|")
+foreach ($row in ($lowRiskActiveUtilsCandidates | Select-Object -First 80)) {
+    $lines.Add("| $($row.Path) | $($row.Files) | $($row.ActiveCMakeRefs) | $($row.ExternalIncludeRefs) | $($row.ExternalModules) |")
+}
+if ($lowRiskActiveUtilsCandidates.Count -eq 0) {
+    $lines.Add("| (none) | 0 | 0 | 0 | 0 |")
+} elseif ($lowRiskActiveUtilsCandidates.Count -gt 80) {
+    $lines.Add("")
+    $lines.Add("Only the first 80 low-risk active utils candidates are listed.")
+}
+
 Add-Section $lines "Old UART Configuration Evidence"
 $lines.Add("| Path | Exists | In CMake |")
 $lines.Add("|------|--------|----------|")
@@ -385,6 +490,7 @@ $lines.Add('1. A high `src/utils` count usually means historical generated or du
 $lines.Add('2. Old UART configuration exists in the current mainline. The missing part is the new `src/apps/serial_station/` minimal UART loop.')
 $lines.Add("3. Do not delete by directory name alone. First remove unneeded files from CMake, build, launch, then delete in a separate reviewed step.")
 $lines.Add("4. Use active CMake references, not raw text references, as the closest audit signal for the main GUI target compile surface.")
+$lines.Add("5. Low-risk active utils candidates are inputs for a later CMake split PRD; they are not deletion approval.")
 
 $output = $lines -join [Environment]::NewLine
 
