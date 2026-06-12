@@ -33,11 +33,15 @@
    $total = 0
    foreach ($line in $codeDiff) {
        $fields = $line -split "`t"
-       if ($fields.Length -ge 2) { $total += [int]$fields[0] + [int]$fields[1] }
+      if ($fields.Length -ge 2) { $total += [int]$fields[0] + [int]$fields[1] }
    }
    "code_line_delta=$total"
    ```
 6. **任何代码提交都需先在 `docs/tracking/SCORE_TRACKING.md` 补充对应加分记录或里程碑说明**，提交前由变更人确认。
+7. `local_env.bat` 为本地环境文件，必须在 `.gitignore` 中排除且不纳入提交。
+8. 超过单点修复的任务必须分阶段 commit：约束/PRD/Specs、构建与工具、生产代码、测试、清理与审计报告应尽量拆开提交。
+9. 每个阶段完成后都要及时 commit，不把多个阶段长期堆在工作区；确因验证依赖无法立即提交时，必须先记录原因并在下一可验证点提交。
+10. 每次提交前必须检查 `git status --short` 和 `git diff --cached --stat`，确认没有混入 `local_env.bat`、build 产物、无关用户改动或平行构建目录。
 
 ### 硬性禁止
 
