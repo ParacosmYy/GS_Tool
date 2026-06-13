@@ -1,5 +1,8 @@
 #include <QtTest/QtTest>
 
+#include <QtCore/QDataStream>
+#include <QtCore/QIODevice>
+
 #include <memory>
 
 #include "apps/serial_station/SerialStationController.h"
@@ -11,6 +14,30 @@ using serial_station::SerialSessionState;
 using serial_station::SerialStationController;
 
 Q_DECLARE_METATYPE(SerialPortConfig)
+
+namespace {
+
+QByteArray controllerTestFloatBytes(float value)
+{
+    QByteArray bytes;
+    QDataStream stream(&bytes, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    stream << value;
+    return bytes;
+}
+
+QByteArray controllerTestJustFloatFrame(std::initializer_list<float> values)
+{
+    QByteArray frame;
+    for (const float value : values) {
+        frame.append(controllerTestFloatBytes(value));
+    }
+    frame.append(QByteArray::fromHex("0000807F"));
+    return frame;
+}
+
+} // namespace
 
 class SerialStationControllerTest : public QObject {
     Q_OBJECT
@@ -50,6 +77,7 @@ private slots:
     void oversizedPartialBufferIsClearedByProtocol();
     void receiveAfterOversizedBufferStartsFresh();
     void emptyBytesBetweenPartialChunksDoNotBreakFrame();
+    void justFloatMeasurementProducesRxLog();
     void reconnectResetsPartialReceiveBuffer();
     void disconnectResetsPartialReceiveBuffer();
     void disconnectThenNewLineDoesNotUseOldPartialBytes();
@@ -614,6 +642,25 @@ void SerialStationControllerTest::emptyBytesBetweenPartialChunksDoNotBreakFrame(
     QCOMPARE(rxCountSpy.count(), 1);
     QCOMPARE(systemLogSpy.count(), 1);
     QCOMPARE(rxSpy.takeFirst().at(0).toString(), QStringLiteral("OK"));
+}
+
+void SerialStationControllerTest::justFloatMeasurementProducesRxLog()
+{
+    SerialStationController controller;
+    QSignalSpy rxSpy(&controller, &SerialStationController::serialRxLogged);
+    QSignalSpy rxCountSpy(&controller, &SerialStationController::serialRxCounted);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+
+    controller.setActiveProtocol(QStringLiteral("just_float"));
+    controller.handleBytesReceived(controllerTestJustFloatFrame({1.5F, -2.25F}));
+
+    QCOMPARE(rxSpy.count(), 1);
+    QCOMPARE(rxCountSpy.count(), 1);
+    QCOMPARE(errorSpy.count(), 0);
+    const QString text = rxSpy.takeFirst().at(0).toString();
+    QVERIFY(text.contains(QStringLiteral("JustFloat")));
+    QVERIFY(text.contains(QStringLiteral("1.5")));
+    QVERIFY(text.contains(QStringLiteral("-2.25")));
 }
 
 void SerialStationControllerTest::reconnectResetsPartialReceiveBuffer()

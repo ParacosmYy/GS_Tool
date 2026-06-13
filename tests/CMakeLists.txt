@@ -931,6 +931,33 @@ endif()
 add_test(NAME AsciiTextProtocol COMMAND test_ascii_text_protocol)
 
 # ============================================================
+# Serial Station JustFloat协议测试
+# ============================================================
+
+add_executable(test_just_float_protocol
+    serial_station/test_just_float_protocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/just_float/JustFloatProtocol.cpp
+)
+
+target_include_directories(test_just_float_protocol PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_just_float_protocol PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_just_float_protocol PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME JustFloatProtocol COMMAND test_just_float_protocol)
+
+# ============================================================
 # Serial Station协议注册表测试
 # ============================================================
 
@@ -939,6 +966,7 @@ add_executable(test_serial_protocol_registry
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/just_float/JustFloatProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
@@ -1383,6 +1411,7 @@ add_executable(test_serial_station_replay_flow
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/just_float/JustFloatProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
@@ -1423,9 +1452,11 @@ add_executable(test_serial_station_controller_log_service
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/just_float/JustFloatProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
@@ -1464,9 +1495,11 @@ add_executable(test_serial_station_export_flow
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/just_float/JustFloatProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
@@ -1505,9 +1538,11 @@ add_executable(test_serial_station_controller
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/just_float/JustFloatProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 
@@ -1564,6 +1599,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/just_float/JustFloatProtocol.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
 )
 

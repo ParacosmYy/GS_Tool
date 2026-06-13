@@ -53,6 +53,7 @@ private slots:
     void workbenchExposesCommandHistoryControls();
     void workbenchExposesProtocolSelectionControls();
     void protocolSelectionUpdatesControllerAndLog();
+    void protocolSelectionCanChooseJustFloat();
     void workbenchExposesProfileControls();
     void defaultProfileDirectoryStartsWithFallbackPath();
     void settingDefaultProfileDirectoryNormalizesPath();
@@ -399,6 +400,7 @@ void SerialStationWorkbenchTest::workbenchExposesProtocolSelectionControls()
 
     QVERIFY(combo->findData(QStringLiteral("ascii_text")) >= 0);
     QVERIFY(combo->findData(QStringLiteral("custom_md")) >= 0);
+    QVERIFY(combo->findData(QStringLiteral("just_float")) >= 0);
     QVERIFY(combo->findData(QStringLiteral("modbus_rtu")) >= 0);
     QCOMPARE(panel->activeProtocol(), QStringLiteral("ascii_text"));
     QVERIFY(status->text().contains(QStringLiteral("ascii_text")));
@@ -422,6 +424,26 @@ void SerialStationWorkbenchTest::protocolSelectionUpdatesControllerAndLog()
     QCOMPARE(controller->activeProtocolName(), QStringLiteral("custom_md"));
     QVERIFY(logView->toPlainText().contains(QStringLiteral("已切换串口协议")));
     QVERIFY(logView->toPlainText().contains(QStringLiteral("custom_md")));
+}
+
+void SerialStationWorkbenchTest::protocolSelectionCanChooseJustFloat()
+{
+    SerialStationWindow window;
+    auto* controller = window.findChild<SerialStationController*>();
+    auto* combo = window.findChild<QComboBox*>(QStringLiteral("serialProtocolCombo"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(controller != nullptr);
+    QVERIFY(combo != nullptr);
+    QVERIFY(logView != nullptr);
+
+    const int justFloatIndex = combo->findData(QStringLiteral("just_float"));
+    QVERIFY(justFloatIndex >= 0);
+    combo->setCurrentIndex(justFloatIndex);
+    emit combo->activated(justFloatIndex);
+
+    QCOMPARE(controller->activeProtocolName(), QStringLiteral("just_float"));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("已切换串口协议")));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("just_float")));
 }
 
 void SerialStationWorkbenchTest::workbenchExposesProfileControls()

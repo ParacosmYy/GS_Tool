@@ -1,10 +1,40 @@
 #include "apps/serial_station/SerialStationController.h"
 
+#include <QtCore/QCoreApplication>
+#include <QtCore/QStringList>
+#include <QtCore/QVariantList>
+
 #include <memory>
 
 #include "apps/serial_station/SerialStationConstants.h"
 
 namespace serial_station {
+namespace {
+
+QString measurementPayloadText(const SerialProtocolEvent& event)
+{
+    const QVariantList values = event.payload.value(QStringLiteral("values")).toList();
+    if (values.isEmpty()) {
+        return QString();
+    }
+
+    QStringList parts;
+    parts.reserve(values.size());
+    for (int i = 0; i < values.size(); ++i) {
+        parts.append(QCoreApplication::translate("SerialStationController", "ch%1=%2")
+                         .arg(QString::number(i + 1),
+                              QString::number(values.at(i).toDouble(), 'g', 6)));
+    }
+
+    const QString format = event.payload.value(QStringLiteral("format")).toString();
+    const QString label = format.compare(QStringLiteral("just_float"), Qt::CaseInsensitive) == 0
+                              ? QStringLiteral("JustFloat")
+                              : format.trimmed();
+    return QCoreApplication::translate("SerialStationController", "%1 measurement: %2")
+        .arg(label.isEmpty() ? event.protocolName : label, parts.join(QStringLiteral(", ")));
+}
+
+} // namespace
 
 SerialStationController::SerialStationController(QObject* parent)
     : QObject(parent)
@@ -206,6 +236,19 @@ void SerialStationController::processProtocolEvent(const SerialProtocolEvent& ev
         logSystem(text,
                   {{QStringLiteral("eventType"), event.type},
                    {QStringLiteral("protocolName"), event.protocolName}});
+        return;
+    }
+
+    if (event.type == QStringLiteral("measurement")) {
+        const QString measurementText = measurementPayloadText(event);
+        const QString text = measurementText.isEmpty() ? eventPayloadText(event) : measurementText;
+        emit serialRxCounted();
+        logRx(text,
+              event.raw,
+              {{QStringLiteral("eventType"), event.type},
+               {QStringLiteral("protocolName"), event.protocolName},
+               {QStringLiteral("channelCount"),
+                event.payload.value(QStringLiteral("channelCount")).toInt()}});
         return;
     }
 

@@ -35,7 +35,7 @@
 |--------|----------|----------|----------|----------|
 | Serial Station 串口工站 | `src/apps/serial_station/`、QTest、README 启动入口 | E5 | U4，档案/日志/命令闭环 | D1，自动化测试 |
 | UART 配置链路 | 端口枚举、手动 COM、UART 摘要、连接/断开 UI | E4 | U3 | D1，未声明真实硬件验证 |
-| 协议收发与解析 | `ascii_text`、`modbus_rtu`、`custom_md`、registry 测试 | E4 | U3 | D1 |
+| 协议收发与解析 | `ascii_text`、`modbus_rtu`、`custom_md`、`just_float`、registry 测试 | E5 | U3 | D1 |
 | 命令历史与配置档案 | 最近命令、`.edserialprofile` 保存/加载、启动加载、默认档案目录持久化、目录导入、最近档案索引、失效清理与回退 | E5 | U4 | D1 |
 | 日志、导出、回放预览 | 结构化日志服务、导出服务、回放服务、UI 流程测试 | E4/E5 | U3 | D1 |
 | 终端与数据视图 | terminal、chart、FFT、heatmap、histogram/scatter、dashboard 模块 | E3/E4，按模块不同 | U2/U3 | D0-D1 |
@@ -59,7 +59,7 @@ Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial
 1. 使用 `.\EmbedDebug.bat --station serial` 直达串口工站。
 2. 选择真实端口或手动输入 COM 端口。
 3. 配置波特率、数据位、校验位、停止位、流控、DTR 和 RTS。
-4. 选择协议：`ascii_text`、`modbus_rtu` 或 `custom_md`。
+4. 选择协议：`ascii_text`、`modbus_rtu`、`custom_md` 或 `just_float`。
 5. 使用 ASCII、HEX 或协议模式发送命令。
 6. 查看 TX/RX/System 日志和状态计数。
 7. 导出日志，或生成回放预览。
@@ -72,6 +72,13 @@ Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial
 14. 使用 `.\EmbedDebug.bat --station serial --profile-dir .\profiles\line-a` 固定保存/加载档案的默认目录；该目录会持久化，后续普通启动也会优先回到上次工位目录。
 15. 成功保存或加载 `.edserialprofile` 后，工作台会自动把该文件所在目录记为新的默认档案目录；清空最近档案不会删除真实档案文件，也不会丢失工位默认目录。
 16. 默认目录中已有多个 `.edserialprofile` 或 `.json` 档案时，使用“导入目录”一次纳入最近档案列表，再从下拉框切换工位配置。
+
+协议方向说明：
+
+- `ascii_text` 面向常规文本终端和 AT 类命令。
+- `modbus_rtu` 面向基础 Modbus 主站请求与响应解析。
+- `custom_md` 面向自定义 MCU 调试帧。
+- `just_float` 参考 VOFA+ JustFloat 数据路径，支持小端 IEEE754 float 数组 + `00 00 80 7F` 帧尾解析，当前达到 E5/U3/D1：可在工作台选择并经自动化测试验证解析，但尚未接入完整波形工作区，真实设备未验证。
 
 内部边界：
 
@@ -193,8 +200,8 @@ cmake --build build --target test_startup_options test_serial_profile_catalog_se
 协议验证：
 
 ```powershell
-cmake --build build --target test_ascii_text_protocol test_modbus_rtu_protocol test_custom_md_protocol test_serial_protocol_registry --parallel 4
-ctest --test-dir build -R "AsciiTextProtocol|ModbusRtuProtocol|CustomMdProtocol|SerialProtocolRegistry" --output-on-failure
+cmake --build build --target test_ascii_text_protocol test_modbus_rtu_protocol test_custom_md_protocol test_just_float_protocol test_serial_protocol_registry --parallel 4
+ctest --test-dir build -R "AsciiTextProtocol|ModbusRtuProtocol|CustomMdProtocol|JustFloatProtocol|SerialProtocolRegistry" --output-on-failure
 ```
 
 ## 仓库结构
@@ -252,6 +259,7 @@ GS_Tool/
 | 优先级 | 方向 | 目标 |
 |--------|------|------|
 | P0 | Serial Station 一键套用/连接和档案管理深化 | 最近档案索引、目录导入、清空、失效清理、默认档案目录记忆、上次档案快捷启动和缺失回退已落地，下一步补可控连接策略 |
+| P0 | VOFA+/OmniProbe 式数据观察路径 | JustFloat 基础解析和协议选择已落地，下一步把 measurement 事件接入字段侧栏、波形工作区和虚拟串口样本验证 |
 | P0 | 虚拟串口或硬件回环验证 | 将串口工站设备证据从 D1 提升到更接近真实现场 |
 | P1 | QSS token 生成和 UI 一致性 | 降低手写主题漂移，统一控件层级 |
 | P1 | 对话框和错误反馈统一 | 用一致的应用级反馈替代零散消息流 |

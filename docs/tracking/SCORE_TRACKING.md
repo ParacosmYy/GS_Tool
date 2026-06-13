@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 531分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 469分
+> 当前: 532分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 468分
 
 ---
 
@@ -233,12 +233,13 @@
 | 529 | Serial Station档案目录快捷启动 | 新增 `--profile-dir`/`--serial-profile-dir` 启动参数，工作台保存/加载档案默认目录可由启动脚本固定，并拆分窗口档案实现文件 |
 | 530 | Serial Station默认档案目录持久化 | 默认档案目录写入 `SerialProfileCatalogService`，启动参数、保存和加载成功后自动记忆目录，后续窗口恢复工位目录且清空最近不丢目录 |
 | 531 | Serial Station默认目录档案导入 | 默认档案目录支持扫描 `.edserialprofile`/`.json` 并一键导入最近档案索引，工作台新增“导入目录”入口且不改变当前已应用配置 |
+| 532 | Serial Station JustFloat协议基础 | 参考 VOFA+ 数据路径新增 `just_float` 协议，支持 float 数组帧解析、半包粘包、异常 payload 诊断、registry 和工作台选择闭环 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#531` 的完整记录
+- 当前文档已整理到 `#532` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

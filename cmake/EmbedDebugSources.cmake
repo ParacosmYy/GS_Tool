@@ -74,6 +74,7 @@ set(SOURCES
     src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
     src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp
+    src/apps/serial_station/protocols/just_float/JustFloatProtocol.cpp
     src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp
     src/serial/detector/SerialDetector.cpp
     src/serial/detector/SerialDetectorChip.cpp
@@ -3395,6 +3396,7 @@ set(HEADERS
     src/apps/serial_station/protocols/SerialProtocolRegistry.h
     src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.h
     src/apps/serial_station/protocols/custom_md/CustomMdProtocol.h
+    src/apps/serial_station/protocols/just_float/JustFloatProtocol.h
     src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.h
     src/core/event/EventBus.h
 

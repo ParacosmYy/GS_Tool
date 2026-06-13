@@ -14,6 +14,8 @@ private slots:
     void defaultProtocolMustExist();
     void builtInProtocolsIncludeModbusRtu();
     void builtInProtocolsIncludeCustomMd();
+    void builtInProtocolsIncludeJustFloat();
+    void createJustFloatReturnsIndependentInstances();
 };
 
 void SerialProtocolRegistryTest::registerAndCreateProtocol()
@@ -75,6 +77,32 @@ void SerialProtocolRegistryTest::builtInProtocolsIncludeCustomMd()
     QVERIFY(registry.contains(QStringLiteral("custom_md")));
     QCOMPARE(registry.defaultProtocol(), QStringLiteral("ascii_text"));
     QVERIFY(registry.create(QStringLiteral("custom_md")) != nullptr);
+}
+
+void SerialProtocolRegistryTest::builtInProtocolsIncludeJustFloat()
+{
+    SerialProtocolRegistry registry;
+
+    registry.registerBuiltInProtocols();
+
+    QVERIFY(registry.contains(QStringLiteral("just_float")));
+    QCOMPARE(registry.defaultProtocol(), QStringLiteral("ascii_text"));
+    QVERIFY(registry.create(QStringLiteral("just_float")) != nullptr);
+}
+
+void SerialProtocolRegistryTest::createJustFloatReturnsIndependentInstances()
+{
+    SerialProtocolRegistry registry;
+    registry.registerBuiltInProtocols();
+
+    std::unique_ptr<ISerialProtocol> first = registry.create(QStringLiteral("just_float"));
+    std::unique_ptr<ISerialProtocol> second = registry.create(QStringLiteral("JUST_FLOAT"));
+
+    QVERIFY(first != nullptr);
+    QVERIFY(second != nullptr);
+    QVERIFY(first.get() != second.get());
+    QCOMPARE(first->name(), QStringLiteral("just_float"));
+    QCOMPARE(second->name(), QStringLiteral("just_float"));
 }
 
 QTEST_MAIN(SerialProtocolRegistryTest)
