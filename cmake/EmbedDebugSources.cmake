@@ -259,10 +259,6 @@ set(SOURCES
     src/chart/stats/ScatterWidget.cpp
     src/chart/stats/ScatterWidgetCompute.cpp
     src/chart/stats/ScatterWidgetStats.cpp
-    src/chart/eye/EyeDiagramEngine.cpp
-    src/chart/eye/EyeDiagramEngineStats.cpp
-    src/chart/eye/EyeDiagramWidget.cpp
-    src/chart/eye/EyeDiagramWidgetStats.cpp
     src/ota/manager/OtaManager.cpp
     src/ota/manager/OtaManagerSignals.cpp
     src/ota/manager/OtaManagerFileOps.cpp
@@ -1186,12 +1182,6 @@ set(SOURCES
     # -- F46: 波形滤波器 --
     src/chart/filter/WaveformFilter.cpp
     src/chart/filter/WaveformFilterCompute.cpp
-
-    # -- F118: 波形数学引擎 --
-    src/chart/math/WaveformMath.cpp
-    src/chart/math/WaveformMathStats.cpp
-    src/chart/math/MathExpressionParser.cpp
-    src/chart/math/MathExpressionParserStats.cpp
 
     # -- F47: 数据流录制器 --
     src/utils/recorder/StreamCaptureRecorder.cpp
@@ -3707,9 +3697,6 @@ set(HEADERS
     src/chart/fft/FftWidget.h
     src/chart/stats/HistogramWidget.h
     src/chart/stats/ScatterWidget.h
-    src/chart/eye/EyeTypes.h
-    src/chart/eye/EyeDiagramEngine.h
-    src/chart/eye/EyeDiagramWidget.h
     src/ota/manager/OtaManager.h
     src/ota/widget/OtaWidget.h
     src/ota/history/OtaHistoryModel.h
@@ -3998,11 +3985,6 @@ set(HEADERS
 
     # -- F46: 波形滤波器 --
     src/chart/filter/WaveformFilter.h
-
-    # -- F118: 波形数学引擎 --
-    src/chart/math/MathTypes.h
-    src/chart/math/WaveformMath.h
-    src/chart/math/MathExpressionParser.h
 
     # -- F47: 数据流录制器 --
     src/utils/recorder/StreamCaptureRecorder.h
