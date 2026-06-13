@@ -6,11 +6,15 @@
 #include <QtCore/QStringList>
 #include <memory>
 
+class QComboBox;
+class QPushButton;
+
 namespace serial_station {
 
 class SerialCommandPanel;
 class SerialLogPanel;
 class SerialProtocolPanel;
+class SerialProfileCatalogService;
 struct SerialProfileResult;
 struct SerialProfileWriteResult;
 class SerialStationController;
@@ -49,20 +53,42 @@ public:
      */
     bool loadStartupProfile(const QString& filePath);
 
+    /**
+     * @brief 最近成功使用过的配置档案路径。
+     */
+    QStringList recentProfilePaths() const;
+
+    /**
+     * @brief 最近一次成功使用的配置档案路径。
+     */
+    QString lastProfilePath() const;
+
+    /**
+     * @brief 重新加载最近一次成功使用的配置档案。
+     * @return true 表示上次档案已成功重新应用
+     */
+    bool reloadLastProfile();
+
 private:
     SerialStationProfile collectCurrentProfile(const QString& name,
                                                const QString& description,
                                                const QStringList& tags) const;
     void applyProfileToUi(const SerialStationProfile& profile);
+    void recordSuccessfulProfilePath(const QString& filePath);
+    void refreshProfileCatalogUi();
     void saveProfileWithDialog();
     void loadProfileWithDialog();
+    void loadSelectedRecentProfile(int index);
 
     std::unique_ptr<SerialStationController> m_controller;
+    std::unique_ptr<SerialProfileCatalogService> m_profileCatalog;
     SerialPortPanel* m_portPanel = nullptr;
     SerialProtocolPanel* m_protocolPanel = nullptr;
     SerialCommandPanel* m_commandPanel = nullptr;
     SerialLogPanel* m_logPanel = nullptr;
     SerialStatusBar* m_statusBar = nullptr;
+    QComboBox* m_recentProfileCombo = nullptr;
+    QPushButton* m_reloadLastProfileButton = nullptr;
 };
 
 } // namespace serial_station

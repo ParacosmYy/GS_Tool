@@ -2,14 +2,18 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QSignalBlocker>
 #include <QtCore/QStandardPaths>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QVBoxLayout>
 
 #include "apps/serial_station/SerialStationController.h"
+#include "apps/serial_station/services/SerialProfileCatalogService.h"
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 #include "apps/serial_station/ui/SerialLogPanel.h"
 #include "apps/serial_station/ui/SerialPortPanel.h"
@@ -70,6 +74,7 @@ QString normalizedProfilePath(const QString& filePath)
 SerialStationWindow::SerialStationWindow(QWidget* parent)
     : QWidget(parent)
     , m_controller(std::make_unique<SerialStationController>(this))
+    , m_profileCatalog(std::make_unique<SerialProfileCatalogService>())
 {
     setObjectName(QStringLiteral("serialStationWindow"));
 
@@ -83,12 +88,24 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     profileToolbarLayout->setContentsMargins(0, 0, 0, 0);
     profileToolbarLayout->setSpacing(8);
 
+    auto* recentProfileLabel = new QLabel(tr("最近档案"), profileToolbar);
+    recentProfileLabel->setObjectName(QStringLiteral("serialProfileRecentLabel"));
+    m_recentProfileCombo = new QComboBox(profileToolbar);
+    m_recentProfileCombo->setObjectName(QStringLiteral("serialProfileRecentCombo"));
+    m_recentProfileCombo->setMinimumWidth(260);
+    m_recentProfileCombo->setPlaceholderText(tr("暂无最近档案"));
+
+    m_reloadLastProfileButton = new QPushButton(tr("重载上次"), profileToolbar);
+    m_reloadLastProfileButton->setObjectName(QStringLiteral("serialProfileReloadLastButton"));
+
     auto* saveProfileButton = new QPushButton(tr("保存档案"), profileToolbar);
     saveProfileButton->setObjectName(QStringLiteral("serialProfileSaveButton"));
     auto* loadProfileButton = new QPushButton(tr("加载档案"), profileToolbar);
     loadProfileButton->setObjectName(QStringLiteral("serialProfileLoadButton"));
 
-    profileToolbarLayout->addStretch();
+    profileToolbarLayout->addWidget(recentProfileLabel);
+    profileToolbarLayout->addWidget(m_recentProfileCombo, 1);
+    profileToolbarLayout->addWidget(m_reloadLastProfileButton);
     profileToolbarLayout->addWidget(loadProfileButton);
     profileToolbarLayout->addWidget(saveProfileButton);
 
@@ -212,6 +229,12 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             this, &SerialStationWindow::saveProfileWithDialog);
     connect(loadProfileButton, &QPushButton::clicked,
             this, &SerialStationWindow::loadProfileWithDialog);
+    connect(m_reloadLastProfileButton, &QPushButton::clicked,
+            this, &SerialStationWindow::reloadLastProfile);
+    connect(m_recentProfileCombo, QOverload<int>::of(&QComboBox::activated),
+            this, &SerialStationWindow::loadSelectedRecentProfile);
+
+    refreshProfileCatalogUi();
 }
 
 SerialStationWindow::~SerialStationWindow() = default;
@@ -225,6 +248,7 @@ SerialProfileWriteResult SerialStationWindow::saveCurrentProfileToFile(
     const SerialStationProfile profile = collectCurrentProfile(name, description, tags);
     const SerialProfileWriteResult result = m_controller->saveProfileToFile(profile, filePath);
     if (result.ok) {
+        recordSuccessfulProfilePath(result.filePath);
         m_logPanel->appendSystem(tr("已保存配置档案: %1").arg(result.filePath));
     } else {
         m_logPanel->appendSystem(tr("保存配置档案失败: %1").arg(result.errorMessage));
@@ -241,6 +265,7 @@ SerialProfileResult SerialStationWindow::loadProfileFromFile(const QString& file
     }
 
     applyProfileToUi(result.profile);
+    recordSuccessfulProfilePath(filePath);
     m_logPanel->appendSystem(tr("已加载配置档案: %1").arg(result.profile.name));
     return result;
 }
@@ -252,6 +277,32 @@ bool SerialStationWindow::loadStartupProfile(const QString& filePath)
         m_logPanel->appendSystem(tr("启动档案已应用: %1").arg(result.profile.name));
     } else {
         m_logPanel->appendSystem(tr("启动档案加载失败: %1").arg(result.errorMessage));
+    }
+    return result.ok;
+}
+
+QStringList SerialStationWindow::recentProfilePaths() const
+{
+    return m_profileCatalog->recentProfilePaths();
+}
+
+QString SerialStationWindow::lastProfilePath() const
+{
+    return m_profileCatalog->lastProfilePath();
+}
+
+bool SerialStationWindow::reloadLastProfile()
+{
+    const QString path = lastProfilePath();
+    if (path.isEmpty()) {
+        m_logPanel->appendSystem(tr("没有可重载的配置档案"));
+        refreshProfileCatalogUi();
+        return false;
+    }
+
+    const SerialProfileResult result = loadProfileFromFile(path);
+    if (result.ok) {
+        m_logPanel->appendSystem(tr("重载上次配置档案: %1").arg(path));
     }
     return result.ok;
 }
@@ -292,6 +343,34 @@ void SerialStationWindow::applyProfileToUi(const SerialStationProfile& profile)
     m_statusBar->setPortConfig(profile.port);
 }
 
+void SerialStationWindow::recordSuccessfulProfilePath(const QString& filePath)
+{
+    if (m_profileCatalog->recordProfilePath(filePath)) {
+        refreshProfileCatalogUi();
+    }
+}
+
+void SerialStationWindow::refreshProfileCatalogUi()
+{
+    if (!m_recentProfileCombo || !m_reloadLastProfileButton) {
+        return;
+    }
+
+    const QSignalBlocker blocker(m_recentProfileCombo);
+    m_recentProfileCombo->clear();
+    const QStringList paths = recentProfilePaths();
+    for (const QString& path : paths) {
+        const QString displayName = QFileInfo(path).fileName().isEmpty()
+            ? path
+            : QFileInfo(path).fileName();
+        m_recentProfileCombo->addItem(displayName, path);
+    }
+
+    const bool hasLastProfile = !lastProfilePath().isEmpty();
+    m_recentProfileCombo->setEnabled(!paths.isEmpty());
+    m_reloadLastProfileButton->setEnabled(hasLastProfile);
+}
+
 void SerialStationWindow::saveProfileWithDialog()
 {
     const QString defaultPath = QDir(defaultExportDirectory())
@@ -325,6 +404,16 @@ void SerialStationWindow::loadProfileWithDialog()
     }
 
     loadProfileFromFile(selectedPath);
+}
+
+void SerialStationWindow::loadSelectedRecentProfile(int index)
+{
+    const QString path = m_recentProfileCombo->itemData(index).toString();
+    if (path.trimmed().isEmpty()) {
+        return;
+    }
+
+    loadProfileFromFile(path);
 }
 
 } // namespace serial_station

@@ -11,6 +11,7 @@
 
 #include "apps/serial_station/SerialStationController.h"
 #include "apps/serial_station/SerialStationWindow.h"
+#include "apps/serial_station/services/SerialProfileCatalogService.h"
 #include "apps/serial_station/services/SerialProfileService.h"
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 #include "apps/serial_station/ui/SerialLogPanel.h"
@@ -21,6 +22,7 @@
 using serial_station::SerialCommandPanel;
 using serial_station::SerialLogPanel;
 using serial_station::SerialPortPanel;
+using serial_station::SerialProfileCatalogService;
 using serial_station::SerialProfileCommand;
 using serial_station::SerialProfileService;
 using serial_station::SerialProtocolPanel;
@@ -33,6 +35,8 @@ class SerialStationWorkbenchTest : public QObject {
     Q_OBJECT
 
 private slots:
+    void init();
+    void cleanup();
     void windowContainsWorkbenchRegions();
     void commandModeComboOnlyShowsSupportedModes();
     void commandSendReportsControllerErrorWhenClosed();
@@ -50,13 +54,29 @@ private slots:
     void workbenchExposesProtocolSelectionControls();
     void protocolSelectionUpdatesControllerAndLog();
     void workbenchExposesProfileControls();
+    void workbenchExposesRecentProfileControls();
     void loadingProfileAppliesWorkbenchState();
+    void successfulProfileLoadUpdatesRecentCatalog();
+    void failedProfileLoadDoesNotUpdateRecentCatalog();
+    void reloadLastProfileAppliesPersistedCatalogPath();
     void loadingStartupProfileAppliesWorkbenchState();
     void loadingMissingStartupProfileReportsFailure();
     void loadingInvalidStartupProfileDoesNotPolluteWorkbenchState();
     void savingCurrentWorkbenchProfileWritesReusableFile();
     void loadingInvalidProfileDoesNotPolluteWorkbenchState();
 };
+
+void SerialStationWorkbenchTest::init()
+{
+    SerialProfileCatalogService catalog;
+    catalog.clear();
+}
+
+void SerialStationWorkbenchTest::cleanup()
+{
+    SerialProfileCatalogService catalog;
+    catalog.clear();
+}
 
 static SerialStationProfile sampleProfile()
 {
@@ -365,6 +385,17 @@ void SerialStationWorkbenchTest::workbenchExposesProfileControls()
     QVERIFY(window.findChild<QPushButton*>(QStringLiteral("serialProfileLoadButton")) != nullptr);
 }
 
+void SerialStationWorkbenchTest::workbenchExposesRecentProfileControls()
+{
+    SerialStationWindow window;
+
+    auto* recentCombo = window.findChild<QComboBox*>(QStringLiteral("serialProfileRecentCombo"));
+    auto* reloadButton = window.findChild<QPushButton*>(QStringLiteral("serialProfileReloadLastButton"));
+    QVERIFY(recentCombo != nullptr);
+    QVERIFY(reloadButton != nullptr);
+    QVERIFY(!reloadButton->isEnabled());
+}
+
 void SerialStationWorkbenchTest::loadingProfileAppliesWorkbenchState()
 {
     SerialProfileService service;
@@ -400,6 +431,71 @@ void SerialStationWorkbenchTest::loadingProfileAppliesWorkbenchState()
     QCOMPARE(commandPanel->commandText(), QStringLiteral("AA 55"));
     QCOMPARE(commandPanel->historyCount(), 2);
     QVERIFY(logView->toPlainText().contains(QStringLiteral("已加载配置档案")));
+}
+
+void SerialStationWorkbenchTest::successfulProfileLoadUpdatesRecentCatalog()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString path = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), path).ok);
+
+    SerialStationWindow window;
+    QVERIFY(window.loadProfileFromFile(path).ok);
+
+    QCOMPARE(window.lastProfilePath(), path);
+    QCOMPARE(window.recentProfilePaths(), QStringList({path}));
+
+    auto* recentCombo = window.findChild<QComboBox*>(QStringLiteral("serialProfileRecentCombo"));
+    auto* reloadButton = window.findChild<QPushButton*>(QStringLiteral("serialProfileReloadLastButton"));
+    QVERIFY(recentCombo != nullptr);
+    QVERIFY(reloadButton != nullptr);
+    QCOMPARE(recentCombo->count(), 1);
+    QCOMPARE(recentCombo->itemData(0).toString(), path);
+    QVERIFY(reloadButton->isEnabled());
+}
+
+void SerialStationWorkbenchTest::failedProfileLoadDoesNotUpdateRecentCatalog()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString missingPath = QDir(tempDir.path()).filePath(QStringLiteral("missing.edserialprofile"));
+
+    SerialStationWindow window;
+    const auto result = window.loadProfileFromFile(missingPath);
+
+    QVERIFY(!result.ok);
+    QVERIFY(window.recentProfilePaths().isEmpty());
+    QCOMPARE(window.lastProfilePath(), QString());
+}
+
+void SerialStationWorkbenchTest::reloadLastProfileAppliesPersistedCatalogPath()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString path = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), path).ok);
+
+    {
+        SerialStationWindow firstWindow;
+        QVERIFY(firstWindow.loadProfileFromFile(path).ok);
+    }
+
+    SerialStationWindow secondWindow;
+    QVERIFY(secondWindow.reloadLastProfile());
+
+    auto* portPanel = secondWindow.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel"));
+    auto* commandPanel = secondWindow.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel"));
+    auto* logView = secondWindow.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(portPanel != nullptr);
+    QVERIFY(commandPanel != nullptr);
+    QVERIFY(logView != nullptr);
+    QCOMPARE(secondWindow.lastProfilePath(), path);
+    QCOMPARE(portPanel->currentConfig().portName, QStringLiteral("COM8"));
+    QCOMPARE(commandPanel->commandText(), QStringLiteral("AA 55"));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("重载上次配置档案")));
 }
 
 void SerialStationWorkbenchTest::loadingStartupProfileAppliesWorkbenchState()
