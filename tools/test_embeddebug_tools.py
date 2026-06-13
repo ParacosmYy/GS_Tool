@@ -12,6 +12,10 @@ import unittest
 from pathlib import Path
 from zipfile import ZipFile
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 from tools import package_embeddebug, start_embeddebug, verify_package_embeddebug
 
 

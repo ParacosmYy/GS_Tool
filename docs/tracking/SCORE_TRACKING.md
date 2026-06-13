@@ -213,12 +213,13 @@
 | 509 | CMake源码清单模块化 | 将根CMake中的SOURCES/HEADERS清单拆入cmake/EmbedDebugSources.cmake，配置、主目标构建和EmbedDebug.bat启动探针通过 |
 | 510 | CMake审计工具兼容include清单 | project-audit和source-tree-audit纳入cmake/*.cmake片段，补Python工具测试并刷新source-tree审计报告 |
 | 511 | CMake源码清单去重 | 移除chart eye/math重复CMake条目，project-audit duplicate entries归零，配置、主目标构建和启动探针通过 |
+| 512 | Python工具自测直接入口 | 修复python tools/test_embeddebug_tools.py导入路径，直接Python入口和uv脚本入口均通过 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#511` 的完整记录
+- 当前文档已整理到 `#512` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
