@@ -51,6 +51,9 @@ private slots:
     void protocolSelectionUpdatesControllerAndLog();
     void workbenchExposesProfileControls();
     void loadingProfileAppliesWorkbenchState();
+    void loadingStartupProfileAppliesWorkbenchState();
+    void loadingMissingStartupProfileReportsFailure();
+    void loadingInvalidStartupProfileDoesNotPolluteWorkbenchState();
     void savingCurrentWorkbenchProfileWritesReusableFile();
     void loadingInvalidProfileDoesNotPolluteWorkbenchState();
 };
@@ -397,6 +400,88 @@ void SerialStationWorkbenchTest::loadingProfileAppliesWorkbenchState()
     QCOMPARE(commandPanel->commandText(), QStringLiteral("AA 55"));
     QCOMPARE(commandPanel->historyCount(), 2);
     QVERIFY(logView->toPlainText().contains(QStringLiteral("已加载配置档案")));
+}
+
+void SerialStationWorkbenchTest::loadingStartupProfileAppliesWorkbenchState()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString path = QDir(tempDir.path()).filePath(QStringLiteral("startup.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), path).ok);
+
+    SerialStationWindow window;
+    QVERIFY2(window.loadStartupProfile(path), "启动档案加载入口应复用工作台加载流程");
+
+    auto* portPanel = window.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel"));
+    auto* commandPanel = window.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(portPanel != nullptr);
+    QVERIFY(commandPanel != nullptr);
+    QVERIFY(logView != nullptr);
+    QCOMPARE(portPanel->currentConfig().portName, QStringLiteral("COM8"));
+    QCOMPARE(commandPanel->sendMode(), QStringLiteral("hex"));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("启动档案")));
+}
+
+void SerialStationWorkbenchTest::loadingMissingStartupProfileReportsFailure()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString missingPath = QDir(tempDir.path()).filePath(QStringLiteral("missing.edserialprofile"));
+
+    SerialStationWindow window;
+    auto* portPanel = window.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel"));
+    auto* commandPanel = window.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(portPanel != nullptr);
+    QVERIFY(commandPanel != nullptr);
+    QVERIFY(logView != nullptr);
+    const auto originalConfig = portPanel->currentConfig();
+    const QString originalCommand = commandPanel->commandText();
+
+    QVERIFY(!window.loadStartupProfile(missingPath));
+
+    const auto currentConfig = portPanel->currentConfig();
+    QCOMPARE(currentConfig.portName, originalConfig.portName);
+    QCOMPARE(currentConfig.baudRate, originalConfig.baudRate);
+    QCOMPARE(currentConfig.dataBits, originalConfig.dataBits);
+    QCOMPARE(currentConfig.parity, originalConfig.parity);
+    QCOMPARE(currentConfig.stopBits, originalConfig.stopBits);
+    QCOMPARE(currentConfig.flowControl, originalConfig.flowControl);
+    QCOMPARE(commandPanel->commandText(), originalCommand);
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("启动档案加载失败")));
+}
+
+void SerialStationWorkbenchTest::loadingInvalidStartupProfileDoesNotPolluteWorkbenchState()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString goodPath = QDir(tempDir.path()).filePath(QStringLiteral("good.edserialprofile"));
+    const QString badPath = QDir(tempDir.path()).filePath(QStringLiteral("bad.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), goodPath).ok);
+    QFile badFile(badPath);
+    QVERIFY(badFile.open(QIODevice::WriteOnly));
+    badFile.write("{\"commands\":[");
+    badFile.close();
+
+    SerialStationWindow window;
+    QVERIFY(window.loadStartupProfile(goodPath));
+    QVERIFY(!window.loadStartupProfile(badPath));
+
+    auto* portPanel = window.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel"));
+    auto* commandPanel = window.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel"));
+    auto* protocolPanel = window.findChild<SerialProtocolPanel*>(QStringLiteral("serialProtocolPanel"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(portPanel != nullptr);
+    QVERIFY(commandPanel != nullptr);
+    QVERIFY(protocolPanel != nullptr);
+    QVERIFY(logView != nullptr);
+    QCOMPARE(portPanel->currentConfig().portName, QStringLiteral("COM8"));
+    QCOMPARE(protocolPanel->activeProtocol(), QStringLiteral("custom_md"));
+    QCOMPARE(commandPanel->commandText(), QStringLiteral("AA 55"));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("启动档案加载失败")));
 }
 
 void SerialStationWorkbenchTest::savingCurrentWorkbenchProfileWritesReusableFile()

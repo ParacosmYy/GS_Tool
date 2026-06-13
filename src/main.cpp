@@ -49,9 +49,7 @@ int main(int argc, char* argv[])
     const StartupOptions startupOptions = StartupOptions::fromArguments(QCoreApplication::arguments());
     MainWindow window;
     window.show();
-    if (!startupOptions.panelId().isEmpty()) {
-        window.openPanelById(startupOptions.panelId());
-    }
+    window.applyStartupOptions(startupOptions);
 
     return app.exec();
 }

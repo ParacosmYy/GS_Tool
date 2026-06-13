@@ -34,32 +34,75 @@ QString stationAliasToPanelId(const QString& station)
 
 } // namespace
 
-StartupOptions::StartupOptions(const QString& panelId)
+StartupOptions::StartupOptions(const QString& panelId, const QString& profileFilePath)
     : m_panelId(panelId.trimmed())
+    , m_profileFilePath(profileFilePath.trimmed())
 {
 }
 
 StartupOptions StartupOptions::fromArguments(const QStringList& arguments)
 {
+    QString panelId;
+    QString profileFilePath;
+
     for (int index = 1; index < arguments.size(); ++index) {
         const QString argument = arguments.at(index).trimmed();
         if (argument == QStringLiteral("--panel")) {
-            return StartupOptions(valueAfterFlag(arguments, index));
+            const QString value = valueAfterFlag(arguments, index);
+            if (value.isEmpty()) {
+                return StartupOptions({}, {});
+            }
+            panelId = value;
+            ++index;
+            continue;
         }
         if (argument.startsWith(QStringLiteral("--panel="))) {
-            return StartupOptions(argument.mid(QStringLiteral("--panel=").size()));
+            panelId = argument.mid(QStringLiteral("--panel=").size()).trimmed();
+            continue;
         }
         if (argument == QStringLiteral("--station")) {
-            return StartupOptions(stationAliasToPanelId(valueAfterFlag(arguments, index)));
+            const QString value = valueAfterFlag(arguments, index);
+            if (value.isEmpty()) {
+                return StartupOptions({}, {});
+            }
+            panelId = stationAliasToPanelId(value);
+            ++index;
+            continue;
         }
         if (argument.startsWith(QStringLiteral("--station="))) {
-            return StartupOptions(stationAliasToPanelId(argument.mid(QStringLiteral("--station=").size())));
+            panelId = stationAliasToPanelId(argument.mid(QStringLiteral("--station=").size()));
+            continue;
+        }
+        if (argument == QStringLiteral("--profile") || argument == QStringLiteral("--serial-profile")) {
+            const QString value = valueAfterFlag(arguments, index);
+            if (value.isEmpty()) {
+                return StartupOptions({}, {});
+            }
+            profileFilePath = value;
+            ++index;
+            continue;
+        }
+        if (argument.startsWith(QStringLiteral("--profile="))) {
+            profileFilePath = argument.mid(QStringLiteral("--profile=").size()).trimmed();
+            continue;
+        }
+        if (argument.startsWith(QStringLiteral("--serial-profile="))) {
+            profileFilePath = argument.mid(QStringLiteral("--serial-profile=").size()).trimmed();
+            continue;
         }
     }
-    return StartupOptions();
+    if (!profileFilePath.isEmpty() && panelId.isEmpty()) {
+        panelId = QStringLiteral("serial.station");
+    }
+    return StartupOptions(panelId, profileFilePath);
 }
 
 QString StartupOptions::panelId() const
 {
     return m_panelId;
+}
+
+QString StartupOptions::profileFilePath() const
+{
+    return m_profileFilePath;
 }

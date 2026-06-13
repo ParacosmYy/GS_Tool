@@ -245,6 +245,17 @@ SerialProfileResult SerialStationWindow::loadProfileFromFile(const QString& file
     return result;
 }
 
+bool SerialStationWindow::loadStartupProfile(const QString& filePath)
+{
+    const SerialProfileResult result = loadProfileFromFile(filePath);
+    if (result.ok) {
+        m_logPanel->appendSystem(tr("启动档案已应用: %1").arg(result.profile.name));
+    } else {
+        m_logPanel->appendSystem(tr("启动档案加载失败: %1").arg(result.errorMessage));
+    }
+    return result.ok;
+}
+
 SerialStationProfile SerialStationWindow::collectCurrentProfile(
     const QString& name,
     const QString& description,

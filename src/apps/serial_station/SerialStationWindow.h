@@ -43,6 +43,12 @@ public:
      */
     SerialProfileResult loadProfileFromFile(const QString& filePath);
 
+    /**
+     * @brief 启动阶段加载配置档案。
+     * @return true 表示档案已成功应用；失败时保持工站打开供用户修正
+     */
+    bool loadStartupProfile(const QString& filePath);
+
 private:
     SerialStationProfile collectCurrentProfile(const QString& name,
                                                const QString& description,

@@ -15,6 +15,8 @@
 
 #include "core/mainwindow/MainWindow.h"
 #include "core/mainwindow/MainWindowLayoutState.h"
+#include "core/mainwindow/StartupOptions.h"
+#include "apps/serial_station/SerialStationWindow.h"
 #include "serial/commands/TimedSender.h"
 #include <QCloseEvent>
 
@@ -43,6 +45,25 @@ bool MainWindow::openPanelById(const QString& panelId)
         return false;
     }
     return m_navController->restorePanelById(panelId);
+}
+
+/** @brief 应用启动参数(面板直达+Serial Station档案加载)，保持MainWindow只做装配转发 @param options 已解析启动参数 @return true表示启动路由成功或无路由需求 */
+bool MainWindow::applyStartupOptions(const StartupOptions& options)
+{
+    bool routeOk = true;
+    if (!options.panelId().isEmpty()) {
+        routeOk = openPanelById(options.panelId());
+    }
+
+    if (options.profileFilePath().isEmpty()) {
+        return routeOk;
+    }
+
+    auto* serialStation = m_panelManager ? m_panelManager->serialStationWindow() : nullptr;
+    if (!serialStation) {
+        return false;
+    }
+    return routeOk && serialStation->loadStartupProfile(options.profileFilePath());
 }
 
 /** @brief 处理连接状态变更(更新状态栏/配置面板/呼吸动画/自动切面板) @param state 连接状态枚举 @param connName 连接名称 */

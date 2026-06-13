@@ -13,7 +13,7 @@
  * @brief 解析 EmbedDebug 启动参数中的工作台直达请求。
  *
  * 仅保留应用协调层需要的稳定 panel id，不持有窗口或面板指针。
- * 当前支持 `--panel <id>`、`--panel=<id>`、`--station serial` 和 `--station=serial`。
+ * 当前支持 `--panel <id>`、`--station serial` 以及 Serial Station profile 启动档案参数。
  */
 class StartupOptions {
 public:
@@ -32,9 +32,16 @@ public:
      */
     QString panelId() const;
 
+    /**
+     * @brief 获取启动时需要加载的 Serial Station 配置档案路径。
+     * @return 档案路径；为空表示不加载启动档案
+     */
+    QString profileFilePath() const;
+
 private:
-    explicit StartupOptions(const QString& panelId); ///< 内部构造，写入已标准化面板ID
+    StartupOptions(const QString& panelId, const QString& profileFilePath); ///< 写入已标准化启动选项
     QString m_panelId; ///< 启动后需要打开的稳定面板ID
+    QString m_profileFilePath; ///< 启动后需要加载的 Serial Station 档案路径
 };
 
 #endif // STARTUP_OPTIONS_H
