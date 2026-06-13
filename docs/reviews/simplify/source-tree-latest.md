@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-13 17:14:43
+- Generated: 2026-06-13 17:27:51
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -9,11 +9,11 @@
 | Metric | Value |
 |--------|-------|
 | Working tree source files under src | 82048 |
-| Raw CMake source references | 6100 |
-| Declared CMake source references | 5994 |
-| Active CMake source references | 1693 |
+| Raw CMake source references | 6058 |
+| Declared CMake source references | 5952 |
+| Active CMake source references | 1651 |
 | Filtered utils references | 4301 |
-| Source files not active in CMake | 80380 |
+| Source files not active in CMake | 80422 |
 | Existing src/apps/serial_station files | 50 |
 | CMake refs under src/apps/serial_station | 50 |
 | Generated-looking utils directories | 39670 |
@@ -45,7 +45,7 @@
 
 | Module | References |
 |--------|------------|
-| utils | 830 |
+| utils | 788 |
 | core | 190 |
 | connection | 153 |
 | protocol | 151 |
@@ -174,13 +174,7 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/checksum | 11 | 11 |
 | src/utils/log | 9 | 9 |
 | src/utils/packet | 8 | 8 |
-| src/utils/filter_design | 7 | 7 |
-| src/utils/firmware | 7 | 7 |
-| src/utils/gps | 7 | 7 |
-| src/utils/network | 7 | 7 |
 | src/utils/scripting | 7 | 7 |
-| src/utils/statemachine | 7 | 7 |
-| src/utils/wavegen | 7 | 7 |
 | src/utils/converter | 6 | 6 |
 | src/utils/perf | 6 | 6 |
 | src/utils/compare | 6 | 5 |
@@ -290,6 +284,12 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/echohash | 2 | 2 |
 | src/utils/edgedetect | 2 | 2 |
 | src/utils/edmonds | 2 | 2 |
+| src/utils/ekf | 2 | 2 |
+| src/utils/emd | 2 | 2 |
+| src/utils/ensemble | 2 | 2 |
+| src/utils/entropy | 2 | 2 |
+| src/utils/envelope | 2 | 2 |
+| src/utils/expmove | 2 | 2 |
 
 Only the first 120 active utils directories are listed.
 
@@ -307,13 +307,7 @@ Only the first 120 active utils directories are listed.
 | src/utils/perf | 6 | 6 | 4 | 1 | True |
 | src/utils/timestamp | 5 | 5 | 4 | 1 | True |
 | src/utils/export | 16 | 16 | 3 | 1 | True |
-| src/utils/filter_design | 7 | 7 | 0 | 0 | False |
-| src/utils/firmware | 7 | 7 | 0 | 0 | False |
-| src/utils/gps | 7 | 7 | 0 | 0 | False |
-| src/utils/network | 7 | 7 | 0 | 0 | False |
 | src/utils/scripting | 7 | 7 | 0 | 0 | False |
-| src/utils/statemachine | 7 | 7 | 0 | 0 | False |
-| src/utils/wavegen | 7 | 7 | 0 | 0 | False |
 | src/utils/compare | 6 | 5 | 0 | 0 | False |
 | src/utils/hex_editor | 5 | 5 | 0 | 0 | False |
 | src/utils/rate | 5 | 5 | 0 | 0 | False |
@@ -417,6 +411,12 @@ Only the first 120 active utils directories are listed.
 | src/utils/echohash | 2 | 2 | 0 | 0 | False |
 | src/utils/edgedetect | 2 | 2 | 0 | 0 | False |
 | src/utils/edmonds | 2 | 2 | 0 | 0 | False |
+| src/utils/ekf | 2 | 2 | 0 | 0 | False |
+| src/utils/emd | 2 | 2 | 0 | 0 | False |
+| src/utils/ensemble | 2 | 2 | 0 | 0 | False |
+| src/utils/entropy | 2 | 2 | 0 | 0 | False |
+| src/utils/envelope | 2 | 2 | 0 | 0 | False |
+| src/utils/expmove | 2 | 2 | 0 | 0 | False |
 
 Only the first 120 active utils dependency rows are listed.
 
@@ -424,13 +424,7 @@ Only the first 120 active utils dependency rows are listed.
 
 | Path | Files | Active CMake refs | External include refs | External modules |
 |------|-------|-------------------|-----------------------|------------------|
-| src/utils/filter_design | 7 | 7 | 0 | 0 |
-| src/utils/firmware | 7 | 7 | 0 | 0 |
-| src/utils/gps | 7 | 7 | 0 | 0 |
-| src/utils/network | 7 | 7 | 0 | 0 |
 | src/utils/scripting | 7 | 7 | 0 | 0 |
-| src/utils/statemachine | 7 | 7 | 0 | 0 |
-| src/utils/wavegen | 7 | 7 | 0 | 0 |
 | src/utils/compare | 6 | 5 | 0 | 0 |
 | src/utils/hex_editor | 5 | 5 | 0 | 0 |
 | src/utils/rate | 5 | 5 | 0 | 0 |
@@ -504,6 +498,12 @@ Only the first 120 active utils dependency rows are listed.
 | src/utils/classifier | 2 | 2 | 0 | 0 |
 | src/utils/clenshaw_curtis | 2 | 2 | 0 | 0 |
 | src/utils/cluster | 2 | 2 | 0 | 0 |
+| src/utils/collocation | 2 | 2 | 0 | 0 |
+| src/utils/combination | 2 | 2 | 0 | 0 |
+| src/utils/complement | 2 | 2 | 0 | 0 |
+| src/utils/conjugate | 2 | 2 | 0 | 0 |
+| src/utils/convhull | 2 | 2 | 0 | 0 |
+| src/utils/convolution | 2 | 2 | 0 | 0 |
 
 Only the first 80 low-risk active utils candidates are listed.
 

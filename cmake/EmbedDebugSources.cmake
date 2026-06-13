@@ -3490,10 +3490,6 @@ set(SOURCES
     src/protocol/logic/LogicSamplerStats.cpp
     src/protocol/logic/ProtocolDecoder.cpp
     src/protocol/logic/ProtocolDecoderStats.cpp
-    src/utils/firmware/FirmwareDiffer.cpp
-    src/utils/firmware/FirmwareDifferStats.cpp
-    src/utils/firmware/FirmwarePatchGenerator.cpp
-    src/utils/firmware/FirmwarePatchGeneratorStats.cpp
     src/connection/bridge/PortBridge.cpp
     src/connection/bridge/PortBridgeStats.cpp
     src/connection/bridge/BridgeConfigPanel.cpp
@@ -3501,18 +3497,6 @@ set(SOURCES
     src/chart/math/MathExpressionParser.cpp
     src/chart/math/MathExpressionParserStats.cpp
     # src/utils/pid/PidController.cpp  # removed: duplicate (already in Wave 1 section)
-
-    # ── F73: 状态机设计器 ──
-    src/utils/statemachine/StateMachineDesigner.cpp
-    src/utils/statemachine/StateMachineDesignerStats.cpp
-    src/utils/statemachine/StateMachineWidget.cpp
-    src/utils/statemachine/StateMachineWidgetStats.cpp
-
-    # ── F74: 网络拓扑发现 (Sources) ──
-    src/utils/network/NetworkScanner.cpp
-    src/utils/network/NetworkScannerStats.cpp
-    src/utils/network/NetworkTopologyWidget.cpp
-    src/utils/network/NetworkTopologyWidgetStats.cpp
 
     # ── F75: Eye Diagram Analyzer (Sources) ──
     src/chart/eye/EyeDiagramEngine.cpp
@@ -3529,24 +3513,6 @@ set(SOURCES
     # ── F76: Waveform Math Engine (Sources) ──
     src/chart/math/WaveformMath.cpp
     src/chart/math/WaveformMathStats.cpp
-
-    # ── F77: Digital Filter Designer ──
-    src/utils/filter_design/FilterDesigner.cpp
-    src/utils/filter_design/FilterDesignerStats.cpp
-    src/utils/filter_design/FilterDesignerWidget.cpp
-    src/utils/filter_design/FilterDesignerWidgetStats.cpp
-
-    # ── GPS/NMEA 数据可视化 ──
-    src/utils/gps/NmeaParser.cpp
-    src/utils/gps/NmeaParserStats.cpp
-    src/utils/gps/GpsTrackWidget.cpp
-    src/utils/gps/GpsTrackWidgetStats.cpp
-
-    # ── F82: Waveform Generator ──
-    src/utils/wavegen/WaveformGenerator.cpp
-    src/utils/wavegen/WaveformGeneratorStats.cpp
-    src/utils/wavegen/WaveformGeneratorWidget.cpp
-    src/utils/wavegen/WaveformGeneratorWidgetStats.cpp
 
     # ── F85: MQTT Client Engine ──
     src/connection/mqtt_client/MqttClientEngine.cpp
@@ -6852,25 +6818,12 @@ set(HEADERS
     src/protocol/logic/LogicTypes.h
     src/protocol/logic/LogicSampler.h
     src/protocol/logic/ProtocolDecoder.h
-    src/utils/firmware/FirmwareTypes.h
-    src/utils/firmware/FirmwareDiffer.h
-    src/utils/firmware/FirmwarePatchGenerator.h
     src/connection/bridge/BridgeTypes.h
     src/connection/bridge/PortBridge.h
     src/connection/bridge/BridgeConfigPanel.h
     src/chart/math/MathTypes.h
     src/chart/math/MathExpressionParser.h
     # src/utils/pid/PidController.h  # removed: duplicate (already in Wave 1 section)
-
-    # ── F73: 状态机设计器 (Headers) ──
-    src/utils/statemachine/SmTypes.h
-    src/utils/statemachine/StateMachineDesigner.h
-    src/utils/statemachine/StateMachineWidget.h
-
-    # ── F74: 网络拓扑发现 (Headers) ──
-    src/utils/network/NetworkTypes.h
-    src/utils/network/NetworkScanner.h
-    src/utils/network/NetworkTopologyWidget.h
 
     # ── F75: Eye Diagram Analyzer (Headers) ──
     src/chart/eye/EyeTypes.h
@@ -6885,23 +6838,8 @@ set(HEADERS
     # ── F76: Waveform Math Engine (Headers) ──
     src/chart/math/WaveformMath.h
 
-    # ── F77: Digital Filter Designer ──
-    src/utils/filter_design/FilterTypes.h
-    src/utils/filter_design/FilterDesigner.h
-    src/utils/filter_design/FilterDesignerWidget.h
-
     # ── PID Tuner ──
     src/utils/pid/PidTunerTypes.h
-
-    # ── GPS/NMEA 数据可视化 ──
-    src/utils/gps/GpsTypes.h
-    src/utils/gps/NmeaParser.h
-    src/utils/gps/GpsTrackWidget.h
-
-    # ── F82: Waveform Generator ──
-    src/utils/wavegen/WaveGenTypes.h
-    src/utils/wavegen/WaveformGenerator.h
-    src/utils/wavegen/WaveformGeneratorWidget.h
 
     # ── F85: MQTT Client Engine ──
     src/connection/mqtt_client/MqttClientTypes.h
