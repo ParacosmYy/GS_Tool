@@ -104,7 +104,19 @@ Pop-Location
 | Specs 模板 | 已存在：`docs/superpowers/specs/SPECS_TEMPLATE.md` |
 | PRD-072 实例 | 已存在：`docs/superpowers/specs/PRD_072_Agent_Iteration_Runtime_Specs.md` |
 | GO 源码 | 已存在：`tools/agent-loop/main.go` |
-| GO 测试 | 已存在：`tools/agent-loop/main_test.go`；当前机器未安装 `go.exe`，因此未运行 |
+| GO 测试 | 已存在：`tools/agent-loop/main_test.go`；`go version` 失败，当前 PATH 无 `go.exe`，因此未运行 |
 | BATCH 文档 | 已存在：`docs/superpowers/BATCH_PROTOCOL.md` |
 | LOOP 文档 | 已存在：`docs/superpowers/LOOP_PROTOCOL.md` |
-| 启动探针 | `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\verify_embeddebug_launch.ps1` 已验证通过 |
+| Doctor | `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1` 通过：0 failure，1 warning（`go.exe` 不在 PATH） |
+| 启动探针 | `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\verify_embeddebug_launch.ps1` 通过：`launch_result=PASSED` |
+| 最近收口 | `3e9343908 Agent Runtime: 收口GO验证命令` |
+
+## 11. 剩余验证缺口
+
+当前仓库已经具备 Specs / GO / BATCH / LOOP 的文档和源码闭环，但本机缺少 Go 工具链，无法执行：
+
+```powershell
+Push-Location .\tools\agent-loop; go test .; Pop-Location
+```
+
+在 `go.exe` 可用前，PRD-072 只能声明“源码和测试已落地，Doctor 与启动探针已验证”，不能声明 GO 执行器单测已通过。
