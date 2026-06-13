@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import importlib.util
 import os
 import sys
 import tempfile
@@ -12,6 +13,17 @@ from pathlib import Path
 from zipfile import ZipFile
 
 from tools import package_embeddebug, start_embeddebug, verify_package_embeddebug
+
+
+def load_project_audit_module():
+    """加载连字符目录下的 project_audit 工具模块。"""
+    module_path = start_embeddebug.repo_root() / "tools" / "project-audit" / "project_audit.py"
+    spec = importlib.util.spec_from_file_location("project_audit", module_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load project audit module: {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class StartEmbedDebugToolTest(unittest.TestCase):
@@ -139,6 +151,31 @@ class VerifyPackageEmbedDebugToolTest(unittest.TestCase):
             latest = verify_package_embeddebug.latest_package_dir(root)
 
         self.assertEqual(latest.name, "EmbedDebug-new-windows-x64")
+
+
+class ProjectAuditToolTest(unittest.TestCase):
+    def test_cmake_entries_reads_included_cmake_source_list(self) -> None:
+        project_audit = load_project_audit_module()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            cmake_dir = root / "cmake"
+            src_dir = root / "src"
+            cmake_dir.mkdir()
+            src_dir.mkdir()
+            (root / "CMakeLists.txt").write_text(
+                "include(cmake/EmbedDebugSources.cmake)\n",
+                encoding="utf-8",
+            )
+            (cmake_dir / "EmbedDebugSources.cmake").write_text(
+                "set(SOURCES\n    src/main.cpp\n)\n",
+                encoding="utf-8",
+            )
+            (src_dir / "main.cpp").write_text("int main() { return 0; }\n", encoding="utf-8")
+
+            entries = project_audit.cmake_entries(root)
+
+        self.assertIn("src/main.cpp", entries)
 
 
 def main() -> int:

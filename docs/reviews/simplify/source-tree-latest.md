@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-12 16:35:50
+- Generated: 2026-06-13 17:07:33
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -8,14 +8,14 @@
 
 | Metric | Value |
 |--------|-------|
-| Working tree source files under src | 82022 |
-| Raw CMake source references | 6059 |
-| Declared CMake source references | 5953 |
-| Active CMake source references | 1652 |
+| Working tree source files under src | 82048 |
+| Raw CMake source references | 6100 |
+| Declared CMake source references | 5994 |
+| Active CMake source references | 1693 |
 | Filtered utils references | 4301 |
 | Source files not active in CMake | 80380 |
-| Existing src/apps/serial_station files | 24 |
-| CMake refs under src/apps/serial_station | 24 |
+| Existing src/apps/serial_station files | 50 |
+| CMake refs under src/apps/serial_station | 50 |
 | Generated-looking utils directories | 39670 |
 
 ## Source Files By Module
@@ -28,11 +28,11 @@
 | connection | 165 |
 | chart | 82 |
 | serial | 61 |
+| apps | 50 |
 | terminal | 50 |
 | ota | 36 |
 | widgets | 30 |
 | dashboard | 28 |
-| apps | 24 |
 | plugin | 15 |
 | rtt | 12 |
 | automation | 11 |
@@ -51,15 +51,15 @@
 | protocol | 151 |
 | chart | 73 |
 | serial | 60 |
+| apps | 50 |
 | terminal | 50 |
 | ota | 36 |
 | dashboard | 28 |
-| apps | 24 |
+| (root) | 20 |
 | plugin | 13 |
-| rtt | 12 |
 | widgets | 12 |
+| rtt | 12 |
 | automation | 11 |
-| (root) | 5 |
 | interfaces | 4 |
 
 ## Frozen Or Duplicate Directory Hits
@@ -297,7 +297,7 @@ Only the first 120 active utils directories are listed.
 
 | Path | Files | Active CMake refs | External include refs | External modules | Canonical |
 |------|-------|-------------------|-----------------------|------------------|-----------|
-| src/utils/crypto | 4 | 4 | 27 | 6 | True |
+| src/utils/crypto | 4 | 4 | 30 | 7 | True |
 | src/utils/settings | 3 | 4 | 12 | 4 | True |
 | src/utils/data | 4 | 3 | 11 | 4 | True |
 | src/utils/log | 9 | 9 | 6 | 1 | True |
@@ -550,6 +550,10 @@ Only the first 80 low-risk active utils candidates are listed.
 
 ## Existing Serial Station Files
 
+- `src/apps/serial_station/core/SerialCodec.cpp`
+- `src/apps/serial_station/core/SerialCodec.h`
+- `src/apps/serial_station/core/SerialDispatcher.cpp`
+- `src/apps/serial_station/core/SerialDispatcher.h`
 - `src/apps/serial_station/core/SerialManager.cpp`
 - `src/apps/serial_station/core/SerialManager.h`
 - `src/apps/serial_station/core/SerialPort.cpp`
@@ -558,7 +562,11 @@ Only the first 80 low-risk active utils candidates are listed.
 - `src/apps/serial_station/core/SerialSession.h`
 - `src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp`
 - `src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.h`
+- `src/apps/serial_station/protocols/custom_md/CustomMdProtocol.cpp`
+- `src/apps/serial_station/protocols/custom_md/CustomMdProtocol.h`
 - `src/apps/serial_station/protocols/ISerialProtocol.h`
+- `src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.cpp`
+- `src/apps/serial_station/protocols/modbus_rtu/ModbusRtuProtocol.h`
 - `src/apps/serial_station/protocols/SerialProtocolEvent.h`
 - `src/apps/serial_station/protocols/SerialProtocolRegistry.cpp`
 - `src/apps/serial_station/protocols/SerialProtocolRegistry.h`
@@ -569,11 +577,29 @@ Only the first 80 low-risk active utils candidates are listed.
 - `src/apps/serial_station/SerialStationConstants.h`
 - `src/apps/serial_station/SerialStationController.cpp`
 - `src/apps/serial_station/SerialStationController.h`
+- `src/apps/serial_station/SerialStationControllerExport.cpp`
+- `src/apps/serial_station/SerialStationControllerReplay.cpp`
 - `src/apps/serial_station/SerialStationModels.h`
 - `src/apps/serial_station/SerialStationWindow.cpp`
 - `src/apps/serial_station/SerialStationWindow.h`
+- `src/apps/serial_station/services/SerialExportService.cpp`
+- `src/apps/serial_station/services/SerialExportService.h`
+- `src/apps/serial_station/services/SerialLogService.cpp`
+- `src/apps/serial_station/services/SerialLogService.h`
+- `src/apps/serial_station/services/SerialReplayService.cpp`
+- `src/apps/serial_station/services/SerialReplayService.h`
+- `src/apps/serial_station/ui/SerialCommandHistoryModel.cpp`
+- `src/apps/serial_station/ui/SerialCommandHistoryModel.h`
+- `src/apps/serial_station/ui/SerialCommandPanel.cpp`
+- `src/apps/serial_station/ui/SerialCommandPanel.h`
+- `src/apps/serial_station/ui/SerialLogPanel.cpp`
+- `src/apps/serial_station/ui/SerialLogPanel.h`
 - `src/apps/serial_station/ui/SerialPortPanel.cpp`
 - `src/apps/serial_station/ui/SerialPortPanel.h`
+- `src/apps/serial_station/ui/SerialProtocolPanel.cpp`
+- `src/apps/serial_station/ui/SerialProtocolPanel.h`
+- `src/apps/serial_station/ui/SerialStatusBar.cpp`
+- `src/apps/serial_station/ui/SerialStatusBar.h`
 
 ## Interpretation
 

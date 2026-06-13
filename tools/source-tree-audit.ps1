@@ -143,7 +143,10 @@ $srcByModule = $srcFiles |
 $cmakeFiles = @(
     $repoFiles |
         ForEach-Object { Convert-ToRepoPath $_ } |
-        Where-Object { $_ -match "(^|/)CMakeLists\.txt$" -and $_ -notlike "build/*" }
+        Where-Object {
+            ($_ -match "(^|/)CMakeLists\.txt$" -or $_ -match "^cmake/.+\.cmake$") -and
+            $_ -notlike "build/*"
+        }
 )
 $cmakeText = ($cmakeFiles | ForEach-Object { Get-Content -Raw -Path (Join-Path $repoRoot $_) }) -join [Environment]::NewLine
 $declaredCmakeText = Remove-CMakeLineComments $cmakeText

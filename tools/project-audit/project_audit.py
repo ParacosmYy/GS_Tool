@@ -58,16 +58,23 @@ def numbered_utils(root: Path):
     return dict(sorted(families.items(), key=lambda item: (-len(item[1]), item[0])))
 
 
-def cmake_entries(root: Path):
-    cmake_path = root / "CMakeLists.txt"
-    entries: list[str] = []
-    if not cmake_path.exists():
-        return entries
+def cmake_audit_files(root: Path) -> list[Path]:
+    """返回需要参与源码清单审计的 CMake 文件。"""
+    paths = [path for path in root.rglob("CMakeLists.txt") if "build" not in path.parts]
+    cmake_dir = root / "cmake"
+    if cmake_dir.exists():
+        paths.extend(path for path in cmake_dir.rglob("*.cmake") if "build" not in path.parts)
+    return sorted(set(paths))
 
-    for line in cmake_path.read_text(encoding="utf-8", errors="replace").splitlines():
-        match = CMAKE_LIST_RE.match(line.replace("\\", "/"))
-        if match:
-            entries.append(match.group(1))
+
+def cmake_entries(root: Path):
+    entries: list[str] = []
+
+    for cmake_path in cmake_audit_files(root):
+        for line in cmake_path.read_text(encoding="utf-8", errors="replace").splitlines():
+            match = CMAKE_LIST_RE.match(line.replace("\\", "/"))
+            if match:
+                entries.append(match.group(1))
     return entries
 
 
