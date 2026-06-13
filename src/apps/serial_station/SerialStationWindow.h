@@ -69,6 +69,12 @@ public:
      */
     bool reloadLastProfile();
 
+    /**
+     * @brief 清空最近配置档案索引。
+     * @return true 表示清空前存在最近档案
+     */
+    bool clearRecentProfiles();
+
 private:
     SerialStationProfile collectCurrentProfile(const QString& name,
                                                const QString& description,
@@ -89,6 +95,7 @@ private:
     SerialStatusBar* m_statusBar = nullptr;
     QComboBox* m_recentProfileCombo = nullptr;
     QPushButton* m_reloadLastProfileButton = nullptr;
+    QPushButton* m_clearRecentProfilesButton = nullptr;
 };
 
 } // namespace serial_station

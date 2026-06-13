@@ -48,6 +48,44 @@ QStringList SerialProfileCatalogService::recentProfilePaths() const
     return normalizedRecentPaths();
 }
 
+bool SerialProfileCatalogService::containsProfilePath(const QString& filePath) const
+{
+    const QString normalizedPath = normalizePath(filePath);
+    if (normalizedPath.isEmpty()) {
+        return false;
+    }
+
+    return normalizedRecentPaths().contains(normalizedPath);
+}
+
+bool SerialProfileCatalogService::removeProfilePath(const QString& filePath)
+{
+    const QString normalizedPath = normalizePath(filePath);
+    if (normalizedPath.isEmpty()) {
+        return false;
+    }
+
+    QStringList paths = normalizedRecentPaths();
+    if (!paths.removeOne(normalizedPath)) {
+        return false;
+    }
+
+    writeRecentPaths(paths);
+    const QString currentLastPath = lastProfilePath();
+    if (currentLastPath == normalizedPath || !paths.contains(currentLastPath)) {
+        const QString lastKey = QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
+                                                            QLatin1String(kLastProfileKey));
+        if (paths.isEmpty()) {
+            m_settings->remove(lastKey);
+        } else {
+            m_settings->set(lastKey, paths.first());
+        }
+    }
+
+    m_settings->sync();
+    return true;
+}
+
 QString SerialProfileCatalogService::lastProfilePath() const
 {
     return normalizePath(m_settings->get(QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
@@ -76,7 +114,8 @@ QStringList SerialProfileCatalogService::normalizedRecentPaths() const
     const QVariant stored = m_settings->get(QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
                                                                         QLatin1String(kRecentProfilesKey)));
     QStringList rawPaths = stored.toStringList();
-    if (rawPaths.isEmpty() && stored.typeId() == QMetaType::QString) {
+    if ((rawPaths.isEmpty() && stored.typeId() == QMetaType::QString)
+        || (rawPaths.size() == 1 && rawPaths.first().contains(QLatin1Char('|')))) {
         rawPaths = stored.toString().split(QLatin1Char('|'), Qt::SkipEmptyParts);
     }
 

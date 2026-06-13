@@ -97,6 +97,8 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
 
     m_reloadLastProfileButton = new QPushButton(tr("重载上次"), profileToolbar);
     m_reloadLastProfileButton->setObjectName(QStringLiteral("serialProfileReloadLastButton"));
+    m_clearRecentProfilesButton = new QPushButton(tr("清空最近"), profileToolbar);
+    m_clearRecentProfilesButton->setObjectName(QStringLiteral("serialProfileClearRecentButton"));
 
     auto* saveProfileButton = new QPushButton(tr("保存档案"), profileToolbar);
     saveProfileButton->setObjectName(QStringLiteral("serialProfileSaveButton"));
@@ -106,6 +108,7 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     profileToolbarLayout->addWidget(recentProfileLabel);
     profileToolbarLayout->addWidget(m_recentProfileCombo, 1);
     profileToolbarLayout->addWidget(m_reloadLastProfileButton);
+    profileToolbarLayout->addWidget(m_clearRecentProfilesButton);
     profileToolbarLayout->addWidget(loadProfileButton);
     profileToolbarLayout->addWidget(saveProfileButton);
 
@@ -231,6 +234,8 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             this, &SerialStationWindow::loadProfileWithDialog);
     connect(m_reloadLastProfileButton, &QPushButton::clicked,
             this, &SerialStationWindow::reloadLastProfile);
+    connect(m_clearRecentProfilesButton, &QPushButton::clicked,
+            this, &SerialStationWindow::clearRecentProfiles);
     connect(m_recentProfileCombo, QOverload<int>::of(&QComboBox::activated),
             this, &SerialStationWindow::loadSelectedRecentProfile);
 
@@ -307,6 +312,15 @@ bool SerialStationWindow::reloadLastProfile()
     return result.ok;
 }
 
+bool SerialStationWindow::clearRecentProfiles()
+{
+    const bool hadRecentProfiles = !recentProfilePaths().isEmpty() || !lastProfilePath().isEmpty();
+    m_profileCatalog->clear();
+    refreshProfileCatalogUi();
+    m_logPanel->appendSystem(tr("最近配置档案已清空"));
+    return hadRecentProfiles;
+}
+
 SerialStationProfile SerialStationWindow::collectCurrentProfile(
     const QString& name,
     const QString& description,
@@ -352,7 +366,7 @@ void SerialStationWindow::recordSuccessfulProfilePath(const QString& filePath)
 
 void SerialStationWindow::refreshProfileCatalogUi()
 {
-    if (!m_recentProfileCombo || !m_reloadLastProfileButton) {
+    if (!m_recentProfileCombo || !m_reloadLastProfileButton || !m_clearRecentProfilesButton) {
         return;
     }
 
@@ -369,6 +383,7 @@ void SerialStationWindow::refreshProfileCatalogUi()
     const bool hasLastProfile = !lastProfilePath().isEmpty();
     m_recentProfileCombo->setEnabled(!paths.isEmpty());
     m_reloadLastProfileButton->setEnabled(hasLastProfile);
+    m_clearRecentProfilesButton->setEnabled(!paths.isEmpty() || hasLastProfile);
 }
 
 void SerialStationWindow::saveProfileWithDialog()

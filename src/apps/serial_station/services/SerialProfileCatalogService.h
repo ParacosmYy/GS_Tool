@@ -31,6 +31,17 @@ public:
     QStringList recentProfilePaths() const;
 
     /**
+     * @brief 判断档案路径是否已经进入最近档案索引。
+     */
+    bool containsProfilePath(const QString& filePath) const;
+
+    /**
+     * @brief 从最近档案索引移除一条路径。
+     * @return true 表示路径存在且已移除
+     */
+    bool removeProfilePath(const QString& filePath);
+
+    /**
      * @brief 最近一次成功使用的档案路径。
      */
     QString lastProfilePath() const;

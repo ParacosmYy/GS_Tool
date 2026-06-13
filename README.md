@@ -24,7 +24,7 @@
 | 主开发分支 | `feat/embed-debug` |
 | 用户入口 | 仓库根目录 `EmbedDebug.bat` |
 | 串口工站直达 | `EmbedDebug.bat --station serial` |
-| 档案化串口工站 | `EmbedDebug.bat --station serial --profile <file.edserialprofile>`，工作台内支持最近档案和重载上次 |
+| 档案化串口工站 | `EmbedDebug.bat --station serial --profile <file.edserialprofile>`，工作台内支持最近档案、重载上次和清空最近 |
 | 构建系统 | CMake + Ninja，只允许使用 `build/` |
 | UI 技术栈 | Qt Widgets、QSS 主题、SVG 图标资源 |
 | 工程治理 | PRD、Specs、TDD、启动验证、架构约束、评分追踪 |
@@ -36,7 +36,7 @@
 | Serial Station 串口工站 | `src/apps/serial_station/`、QTest、README 启动入口 | E5 | U4，档案/日志/命令闭环 | D1，自动化测试 |
 | UART 配置链路 | 端口枚举、手动 COM、UART 摘要、连接/断开 UI | E4 | U3 | D1，未声明真实硬件验证 |
 | 协议收发与解析 | `ascii_text`、`modbus_rtu`、`custom_md`、registry 测试 | E4 | U3 | D1 |
-| 命令历史与配置档案 | 最近命令、`.edserialprofile` 保存/加载、启动加载、最近档案索引 | E5 | U4 | D1 |
+| 命令历史与配置档案 | 最近命令、`.edserialprofile` 保存/加载、启动加载、最近档案索引与清理 | E5 | U4 | D1 |
 | 日志、导出、回放预览 | 结构化日志服务、导出服务、回放服务、UI 流程测试 | E4/E5 | U3 | D1 |
 | 终端与数据视图 | terminal、chart、FFT、heatmap、histogram/scatter、dashboard 模块 | E3/E4，按模块不同 | U2/U3 | D0-D1 |
 | OTA 与文件链路 | X/Y/ZMODEM、HEX/BIN、导出基础设施 | E3/E4 | U2 | D0-D1 |
@@ -52,7 +52,7 @@ Device:      D0 未验证 -> D4 真实设备验证
 
 ## Serial Station
 
-Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial_station/`。它已经从“串口助手入口”推进到“可保存、可加载、可启动套用配置档案，并能从最近档案快速恢复工位配置”的调试工站。
+Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial_station/`。它已经从“串口助手入口”推进到“可保存、可加载、可启动套用配置档案，并能从最近档案快速恢复和维护工位配置”的调试工站。
 
 典型使用路径：
 
@@ -66,6 +66,7 @@ Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial
 8. 保存或加载 UART/协议/命令档案。
 9. 使用 `.\EmbedDebug.bat --station serial --profile <file.edserialprofile>` 直接打开预配置工站。
 10. 在工作台内通过“最近档案”下拉或“重载上次”恢复上次工位配置。
+11. 临时测试档案污染列表时，使用“清空最近”清理索引；该操作不会删除 `.edserialprofile` 文件。
 
 内部边界：
 
@@ -231,7 +232,7 @@ GS_Tool/
 
 | 优先级 | 方向 | 目标 |
 |--------|------|------|
-| P0 | Serial Station 一键套用/连接和档案管理深化 | 最近档案已落地，下一步补档案管理和可控连接策略 |
+| P0 | Serial Station 一键套用/连接和档案管理深化 | 最近档案索引和清理已落地，下一步补可控连接策略 |
 | P0 | 虚拟串口或硬件回环验证 | 将串口工站设备证据从 D1 提升到更接近真实现场 |
 | P1 | QSS token 生成和 UI 一致性 | 降低手写主题漂移，统一控件层级 |
 | P1 | 对话框和错误反馈统一 | 用一致的应用级反馈替代零散消息流 |
