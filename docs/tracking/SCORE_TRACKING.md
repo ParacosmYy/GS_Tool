@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 505分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 495分
+> 当前: 506分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 494分
 
 ---
 
@@ -207,12 +207,13 @@
 | 503 | Serial Station协议选择UI PRD/Specs | 定义协议选择面板、controller默认协议切换、结构化日志、窗口闭环和README同步边界 |
 | 504 | Serial Station协议选择UI实现 | 新增协议选择面板、controller默认协议切换slot、窗口闭环、QSS/README同步和QTest覆盖 |
 | 505 | Serial Station主入口收敛 | 将SerialStationWindow接入主窗口导航，用户可从连接分类进入串口工站，构建/QTest/启动探针通过 |
+| 506 | Agent Runtime验证命令收口 | PRD-072改用Doctor和自动启动探针作为GO验证路径，记录缺Go时的替代验证口径 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#505` 的完整记录
+- 当前文档已整理到 `#506` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

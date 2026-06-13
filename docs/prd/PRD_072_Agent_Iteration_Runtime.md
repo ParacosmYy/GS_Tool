@@ -76,8 +76,11 @@
 
 ```powershell
 cmake --build .\build --config Release --parallel 4
-.\EmbedDebug.bat
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\verify_embeddebug_launch.ps1
 Push-Location .\tools\agent-loop; go test .; Pop-Location
 ```
 
-如果当前机器没有 Go 工具链，必须记录 `go version` 的失败原因，并保留 Qt 构建和 bat 启动验证结果。
+`verify_embeddebug_launch.ps1` 是自动化启动探针：它通过 `EmbedDebug.bat` 启动应用，确认出现新的 `EmbedDebug.exe` 进程，然后只关闭本次新启动的进程，避免 GO Loop 被 GUI 长时间占用。
+
+如果当前机器没有 Go 工具链，必须记录 `go version` 的失败原因，并保留 Doctor、Qt 构建和启动探针验证结果。
