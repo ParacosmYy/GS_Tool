@@ -2,6 +2,7 @@
 #define SERIAL_COMMAND_PANEL_H
 
 #include <QtCore/QString>
+#include <QtCore/QVector>
 #include <QtWidgets/QWidget>
 
 #include "apps/serial_station/ui/SerialCommandHistoryModel.h"
@@ -12,6 +13,8 @@ class QPushButton;
 class QToolButton;
 
 namespace serial_station {
+
+struct SerialProfileCommand;
 
 /**
  * @brief Serial Station 命令发送面板。
@@ -51,6 +54,12 @@ public:
      * @brief 最近命令文本快照。
      */
     QStringList historyCommands() const;
+
+    /**
+     * @brief 将档案中的默认发送模式和命令列表应用到 UI。
+     */
+    void applyProfileCommands(const QVector<SerialProfileCommand>& commands,
+                              const QString& defaultMode);
 
 public slots:
     /**

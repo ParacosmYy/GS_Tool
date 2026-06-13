@@ -10,6 +10,8 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 
+#include "apps/serial_station/SerialStationModels.h"
+
 namespace serial_station {
 
 SerialCommandPanel::SerialCommandPanel(QWidget* parent)
@@ -51,6 +53,26 @@ int SerialCommandPanel::historyCount() const
 QStringList SerialCommandPanel::historyCommands() const
 {
     return m_history.commands();
+}
+
+void SerialCommandPanel::applyProfileCommands(const QVector<SerialProfileCommand>& commands,
+                                              const QString& defaultMode)
+{
+    m_history.clear();
+    setModeById(defaultMode);
+    m_commandEdit->clear();
+
+    for (auto it = commands.crbegin(); it != commands.crend(); ++it) {
+        m_history.recordCommand(it->payload, it->mode);
+    }
+
+    refreshHistoryUi();
+    if (!commands.isEmpty()) {
+        const SerialProfileCommand& firstCommand = commands.first();
+        m_commandEdit->setText(firstCommand.payload);
+        setModeById(firstCommand.mode);
+    }
+    updateSendButtonState();
 }
 
 void SerialCommandPanel::confirmLastSentCommand()

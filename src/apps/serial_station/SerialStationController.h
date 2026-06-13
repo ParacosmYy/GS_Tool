@@ -12,6 +12,7 @@
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
 #include "apps/serial_station/services/SerialExportService.h"
 #include "apps/serial_station/services/SerialLogService.h"
+#include "apps/serial_station/services/SerialProfileService.h"
 #include "apps/serial_station/services/SerialReplayService.h"
 
 namespace serial_station {
@@ -61,6 +62,13 @@ public:
     /** @brief 基于当前日志生成回放预览计划。 */
     SerialReplayPlan previewReplayPlan(
         const SerialReplayOptions& options = SerialReplayOptions());
+
+    /** @brief 保存 Serial Station 配置档案到文件。 */
+    SerialProfileWriteResult saveProfileToFile(const SerialStationProfile& profile,
+                                               const QString& filePath);
+
+    /** @brief 从文件加载 Serial Station 配置档案。 */
+    SerialProfileResult loadProfileFromFile(const QString& filePath);
 
 public slots:
     /**
@@ -198,6 +206,7 @@ private:
     SerialCodec m_codec;
     SerialLogService m_logService;
     SerialExportService m_exportService;
+    SerialProfileService m_profileService;
     SerialReplayService m_replayService;
 };
 

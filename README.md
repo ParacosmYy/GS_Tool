@@ -26,7 +26,7 @@ Embedded debugging often spreads one session across a serial terminal, a wavefor
 
 | Area | Current capability |
 |------|--------------------|
-| Serial Station | Independent `src/apps/serial_station/` workbench with UART port discovery, manual COM input, 115200 8N1-style configuration summary, selectable default protocol, command panel with recent command history, structured logs, log export, replay preview, status bar, send/receive loop, dispatcher, codec, and protocol registry |
+| Serial Station | Independent `src/apps/serial_station/` workbench with UART port discovery, manual COM input, 115200 8N1-style configuration summary, selectable default protocol, command panel with recent command history, profile save/load, structured logs, log export, replay preview, status bar, send/receive loop, dispatcher, codec, and protocol registry |
 | Protocols | `ascii_text`, `modbus_rtu`, and `custom_md` are implemented under the new Serial Station protocol boundary with QTest coverage |
 | Encoding | ASCII, HEX, and protocol command send paths are centralized through `SerialCodec` |
 | Data views | Terminal, waveform preview, FFT, multi-axis charts, histogram/scatter, heatmap, dashboard widgets, and performance panels are present in the application modules |
@@ -42,7 +42,7 @@ Some integrations are intentionally marked as staged: BLE, CAN, MQTT, USB, and S
 The preview above is a maintained repository asset, not a generated build artifact. It summarizes the current workbench layout:
 
 - left navigation for connection, protocol, terminal, chart, OTA, dashboard, and automation areas;
-- main navigation entry for the Serial Station workbench, with UART port setup, manual COM entry, protocol selection, protocol mode, command send with recent history, structured logs, export/replay preview, and status;
+- main navigation entry for the Serial Station workbench, with UART port setup, manual COM entry, protocol selection, protocol mode, command send with recent history, profile save/load, structured logs, export/replay preview, and status;
 - right-side analysis surfaces for waveforms, decoded frames, recordings, and diagnostics.
 
 ## Architecture
@@ -196,8 +196,8 @@ Primary entry documents:
 
 Near-term work is focused on making the product body more coherent, not just expanding build files:
 
-- wire the Serial Station profile service into UI, so UART/protocol/command profiles can be applied from the workbench;
-- connect logging/export/replay services into the Serial Station UI without crossing controller boundaries;
+- add profile list/recent-profile management and one-click apply/connect flows on top of the current profile save/load path;
+- harden logging/export/replay services in the Serial Station UI without crossing controller boundaries;
 - continue replacing ad hoc UI styling with maintainable QSS and generated theme tokens;
 - fill staged BLE/CAN/MQTT/USB/RTT integrations with real backend behavior and tests;
 - add release packaging after the `EmbedDebug.bat` launch path remains stable.

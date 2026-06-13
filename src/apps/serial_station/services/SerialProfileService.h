@@ -6,19 +6,9 @@
 #include <QtCore/QVector>
 
 #include "apps/serial_station/SerialStationConfig.h"
+#include "apps/serial_station/SerialStationModels.h"
 
 namespace serial_station {
-
-/**
- * @brief Serial Station 档案中的快捷命令项。
- *
- * 只描述用户可复用的发送入口，不持有协议对象或串口资源。
- */
-struct SerialProfileCommand {
-    QString name;    ///< 用户可见命令名称
-    QString payload; ///< 命令内容，按 mode 解释为 ASCII/HEX/协议命令
-    QString mode;    ///< 发送模式: ascii/hex/protocol
-};
 
 /**
  * @brief Serial Station 工站配置档案。

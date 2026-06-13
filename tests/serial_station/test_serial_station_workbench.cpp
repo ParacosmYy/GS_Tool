@@ -1,4 +1,7 @@
 #include <QtTest/QtTest>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QTemporaryDir>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
@@ -8,6 +11,7 @@
 
 #include "apps/serial_station/SerialStationController.h"
 #include "apps/serial_station/SerialStationWindow.h"
+#include "apps/serial_station/services/SerialProfileService.h"
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 #include "apps/serial_station/ui/SerialLogPanel.h"
 #include "apps/serial_station/ui/SerialPortPanel.h"
@@ -17,7 +21,10 @@
 using serial_station::SerialCommandPanel;
 using serial_station::SerialLogPanel;
 using serial_station::SerialPortPanel;
+using serial_station::SerialProfileCommand;
+using serial_station::SerialProfileService;
 using serial_station::SerialProtocolPanel;
+using serial_station::SerialStationProfile;
 using serial_station::SerialStationController;
 using serial_station::SerialStationWindow;
 using serial_station::SerialStatusBar;
@@ -42,7 +49,34 @@ private slots:
     void workbenchExposesCommandHistoryControls();
     void workbenchExposesProtocolSelectionControls();
     void protocolSelectionUpdatesControllerAndLog();
+    void workbenchExposesProfileControls();
+    void loadingProfileAppliesWorkbenchState();
+    void savingCurrentWorkbenchProfileWritesReusableFile();
+    void loadingInvalidProfileDoesNotPolluteWorkbenchState();
 };
+
+static SerialStationProfile sampleProfile()
+{
+    SerialStationProfile profile;
+    profile.name = QStringLiteral("Factory Line A");
+    profile.description = QStringLiteral("Regression profile");
+    profile.tags = {QStringLiteral("factory"), QStringLiteral("line-a")};
+    profile.port.portName = QStringLiteral("COM8");
+    profile.port.baudRate = 57600;
+    profile.port.dataBits = QSerialPort::Data7;
+    profile.port.parity = QSerialPort::EvenParity;
+    profile.port.stopBits = QSerialPort::TwoStop;
+    profile.port.flowControl = QSerialPort::HardwareControl;
+    profile.port.dtrEnabled = true;
+    profile.port.rtsEnabled = true;
+    profile.protocolName = QStringLiteral("custom_md");
+    profile.sendMode = QStringLiteral("hex");
+    profile.commands = {
+        {QStringLiteral("Ping"), QStringLiteral("AA 55"), QStringLiteral("hex")},
+        {QStringLiteral("Read Version"), QStringLiteral("AT+GMR"), QStringLiteral("ascii")},
+    };
+    return profile;
+}
 
 void SerialStationWorkbenchTest::windowContainsWorkbenchRegions()
 {
@@ -318,6 +352,107 @@ void SerialStationWorkbenchTest::protocolSelectionUpdatesControllerAndLog()
     QCOMPARE(controller->activeProtocolName(), QStringLiteral("custom_md"));
     QVERIFY(logView->toPlainText().contains(QStringLiteral("已切换串口协议")));
     QVERIFY(logView->toPlainText().contains(QStringLiteral("custom_md")));
+}
+
+void SerialStationWorkbenchTest::workbenchExposesProfileControls()
+{
+    SerialStationWindow window;
+
+    QVERIFY(window.findChild<QPushButton*>(QStringLiteral("serialProfileSaveButton")) != nullptr);
+    QVERIFY(window.findChild<QPushButton*>(QStringLiteral("serialProfileLoadButton")) != nullptr);
+}
+
+void SerialStationWorkbenchTest::loadingProfileAppliesWorkbenchState()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString path = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), path).ok);
+
+    SerialStationWindow window;
+    const auto result = window.loadProfileFromFile(path);
+    QVERIFY2(result.ok, qPrintable(result.errorMessage));
+
+    auto* portPanel = window.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel"));
+    auto* protocolPanel = window.findChild<SerialProtocolPanel*>(QStringLiteral("serialProtocolPanel"));
+    auto* commandPanel = window.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(portPanel != nullptr);
+    QVERIFY(protocolPanel != nullptr);
+    QVERIFY(commandPanel != nullptr);
+    QVERIFY(logView != nullptr);
+
+    const auto config = portPanel->currentConfig();
+    QCOMPARE(config.portName, QStringLiteral("COM8"));
+    QCOMPARE(config.baudRate, 57600);
+    QCOMPARE(config.dataBits, QSerialPort::Data7);
+    QCOMPARE(config.parity, QSerialPort::EvenParity);
+    QCOMPARE(config.stopBits, QSerialPort::TwoStop);
+    QCOMPARE(config.flowControl, QSerialPort::HardwareControl);
+    QVERIFY(config.dtrEnabled);
+    QVERIFY(config.rtsEnabled);
+    QCOMPARE(protocolPanel->activeProtocol(), QStringLiteral("custom_md"));
+    QCOMPARE(commandPanel->sendMode(), QStringLiteral("hex"));
+    QCOMPARE(commandPanel->commandText(), QStringLiteral("AA 55"));
+    QCOMPARE(commandPanel->historyCount(), 2);
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("已加载配置档案")));
+}
+
+void SerialStationWorkbenchTest::savingCurrentWorkbenchProfileWritesReusableFile()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString sourcePath = QDir(tempDir.path()).filePath(QStringLiteral("source.edserialprofile"));
+    const QString savedPath = QDir(tempDir.path()).filePath(QStringLiteral("saved.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), sourcePath).ok);
+
+    SerialStationWindow window;
+    QVERIFY(window.loadProfileFromFile(sourcePath).ok);
+    const auto writeResult = window.saveCurrentProfileToFile(
+        savedPath,
+        QStringLiteral("Saved Profile"),
+        QStringLiteral("Saved from workbench"),
+        {QStringLiteral("saved")});
+    QVERIFY2(writeResult.ok, qPrintable(writeResult.errorMessage));
+
+    const auto loadResult = service.loadFromFile(savedPath);
+    QVERIFY2(loadResult.ok, qPrintable(loadResult.errorMessage));
+    QCOMPARE(loadResult.profile.name, QStringLiteral("Saved Profile"));
+    QCOMPARE(loadResult.profile.description, QStringLiteral("Saved from workbench"));
+    QCOMPARE(loadResult.profile.tags, QStringList({QStringLiteral("saved")}));
+    QCOMPARE(loadResult.profile.port.portName, QStringLiteral("COM8"));
+    QCOMPARE(loadResult.profile.protocolName, QStringLiteral("custom_md"));
+    QCOMPARE(loadResult.profile.sendMode, QStringLiteral("hex"));
+    QCOMPARE(loadResult.profile.commands.size(), 2);
+    QCOMPARE(loadResult.profile.commands.first().payload, QStringLiteral("AA 55"));
+}
+
+void SerialStationWorkbenchTest::loadingInvalidProfileDoesNotPolluteWorkbenchState()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString goodPath = QDir(tempDir.path()).filePath(QStringLiteral("good.edserialprofile"));
+    const QString badPath = QDir(tempDir.path()).filePath(QStringLiteral("bad.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), goodPath).ok);
+    QFile badFile(badPath);
+    QVERIFY(badFile.open(QIODevice::WriteOnly));
+    badFile.write("{\"name\":");
+    badFile.close();
+
+    SerialStationWindow window;
+    QVERIFY(window.loadProfileFromFile(goodPath).ok);
+    const auto result = window.loadProfileFromFile(badPath);
+    QVERIFY(!result.ok);
+
+    auto* portPanel = window.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel"));
+    auto* commandPanel = window.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel"));
+    QVERIFY(portPanel != nullptr);
+    QVERIFY(commandPanel != nullptr);
+    QCOMPARE(portPanel->currentConfig().portName, QStringLiteral("COM8"));
+    QCOMPARE(commandPanel->commandText(), QStringLiteral("AA 55"));
 }
 
 QTEST_MAIN(SerialStationWorkbenchTest)

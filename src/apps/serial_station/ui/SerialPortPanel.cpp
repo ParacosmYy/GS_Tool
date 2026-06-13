@@ -91,6 +91,33 @@ SerialPortConfig SerialPortPanel::currentConfig() const
     return config;
 }
 
+void SerialPortPanel::applyConfig(const SerialPortConfig& config)
+{
+    const SerialPortConfig normalized = config.normalized();
+    int portIndex = m_portCombo->findData(normalized.portName);
+    if (portIndex < 0) {
+        portIndex = m_portCombo->findText(normalized.portName);
+    }
+    if (portIndex >= 0) {
+        m_portCombo->setCurrentIndex(portIndex);
+    } else {
+        m_portCombo->setEditText(normalized.portName);
+    }
+
+    if (m_baudCombo->findText(QString::number(normalized.baudRate)) < 0) {
+        m_baudCombo->addItem(QString::number(normalized.baudRate));
+    }
+    m_baudCombo->setCurrentText(QString::number(normalized.baudRate));
+    m_dataBitsCombo->setCurrentIndex(m_dataBitsCombo->findData(static_cast<int>(normalized.dataBits)));
+    m_parityCombo->setCurrentIndex(m_parityCombo->findData(static_cast<int>(normalized.parity)));
+    m_stopBitsCombo->setCurrentIndex(m_stopBitsCombo->findData(static_cast<int>(normalized.stopBits)));
+    m_flowControlCombo->setCurrentIndex(
+        m_flowControlCombo->findData(static_cast<int>(normalized.flowControl)));
+    m_dtrCheck->setChecked(normalized.dtrEnabled);
+    m_rtsCheck->setChecked(normalized.rtsEnabled);
+    updateSummary();
+}
+
 void SerialPortPanel::setSessionState(SerialSessionState state)
 {
     const bool isOpen = state == SerialSessionState::Open;

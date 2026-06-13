@@ -39,6 +39,8 @@ private slots:
     void refreshKeepsManualModeEditable();
     void invalidBaudTextShowsInvalidConfig();
     void errorStateCanReturnToClosedState();
+    void applyConfigRestoresProfileValues();
+    void applyConfigAcceptsCustomBaudRate();
 };
 
 namespace {
@@ -511,6 +513,59 @@ void SerialPortPanelTest::errorStateCanReturnToClosedState()
     QCOMPARE(statusLabel->text(), QStringLiteral("未连接"));
     QVERIFY(requireButton(panel, QStringLiteral("serialConnectButton"))->isEnabled());
     QVERIFY(!requireButton(panel, QStringLiteral("serialDisconnectButton"))->isEnabled());
+}
+
+void SerialPortPanelTest::applyConfigRestoresProfileValues()
+{
+    SerialPortPanel panel;
+    SerialPortConfig config;
+    config.portName = QStringLiteral("COM_PROFILE");
+    config.baudRate = 57600;
+    config.dataBits = QSerialPort::Data7;
+    config.parity = QSerialPort::EvenParity;
+    config.stopBits = QSerialPort::TwoStop;
+    config.flowControl = QSerialPort::HardwareControl;
+    config.dtrEnabled = true;
+    config.rtsEnabled = true;
+
+    panel.applyConfig(config);
+
+    const SerialPortConfig applied = panel.currentConfig();
+    QCOMPARE(applied.portName, QStringLiteral("COM_PROFILE"));
+    QCOMPARE(applied.baudRate, 57600);
+    QCOMPARE(applied.dataBits, QSerialPort::Data7);
+    QCOMPARE(applied.parity, QSerialPort::EvenParity);
+    QCOMPARE(applied.stopBits, QSerialPort::TwoStop);
+    QCOMPARE(applied.flowControl, QSerialPort::HardwareControl);
+    QVERIFY(applied.dtrEnabled);
+    QVERIFY(applied.rtsEnabled);
+    QVERIFY(summaryText(panel).contains(QStringLiteral("COM_PROFILE")));
+    QVERIFY(summaryText(panel).contains(QStringLiteral("57600")));
+    QVERIFY(summaryText(panel).contains(QStringLiteral("7E2")));
+    QVERIFY(summaryText(panel).contains(QStringLiteral("硬件流控")));
+}
+
+void SerialPortPanelTest::applyConfigAcceptsCustomBaudRate()
+{
+    SerialPortPanel panel;
+    auto* baudCombo = requireCombo(panel, QStringLiteral("serialBaudCombo"));
+    SerialPortConfig config;
+    config.portName = QStringLiteral("COM_CUSTOM_PROFILE");
+    config.baudRate = 250000;
+    config.dataBits = QSerialPort::Data8;
+    config.parity = QSerialPort::NoParity;
+    config.stopBits = QSerialPort::OneStop;
+    config.flowControl = QSerialPort::NoFlowControl;
+
+    QVERIFY(baudCombo->findText(QStringLiteral("250000")) < 0);
+    panel.applyConfig(config);
+
+    QCOMPARE(panel.currentConfig().portName, QStringLiteral("COM_CUSTOM_PROFILE"));
+    QCOMPARE(panel.currentConfig().baudRate, 250000);
+    QVERIFY(baudCombo->findText(QStringLiteral("250000")) >= 0);
+    QCOMPARE(baudCombo->currentText(), QStringLiteral("250000"));
+    QVERIFY(panel.currentConfig().isValid());
+    QVERIFY(summaryText(panel).contains(QStringLiteral("250000")));
 }
 
 QTEST_MAIN(SerialPortPanelTest)

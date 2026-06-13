@@ -5,6 +5,7 @@
 #include <QtCore/QStandardPaths>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QVBoxLayout>
 
@@ -54,6 +55,16 @@ QString normalizedExportPath(const QString& filePath)
     return filePath + QStringLiteral(".jsonl");
 }
 
+QString normalizedProfilePath(const QString& filePath)
+{
+    const QFileInfo fileInfo(filePath);
+    if (!fileInfo.suffix().isEmpty()) {
+        return filePath;
+    }
+
+    return filePath + QStringLiteral(".edserialprofile");
+}
+
 } // namespace
 
 SerialStationWindow::SerialStationWindow(QWidget* parent)
@@ -65,6 +76,21 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     auto* rootLayout = new QVBoxLayout(this);
     rootLayout->setContentsMargins(10, 10, 10, 10);
     rootLayout->setSpacing(8);
+
+    auto* profileToolbar = new QWidget(this);
+    profileToolbar->setObjectName(QStringLiteral("serialProfileToolbar"));
+    auto* profileToolbarLayout = new QHBoxLayout(profileToolbar);
+    profileToolbarLayout->setContentsMargins(0, 0, 0, 0);
+    profileToolbarLayout->setSpacing(8);
+
+    auto* saveProfileButton = new QPushButton(tr("保存档案"), profileToolbar);
+    saveProfileButton->setObjectName(QStringLiteral("serialProfileSaveButton"));
+    auto* loadProfileButton = new QPushButton(tr("加载档案"), profileToolbar);
+    loadProfileButton->setObjectName(QStringLiteral("serialProfileLoadButton"));
+
+    profileToolbarLayout->addStretch();
+    profileToolbarLayout->addWidget(loadProfileButton);
+    profileToolbarLayout->addWidget(saveProfileButton);
 
     auto* workbench = new QSplitter(Qt::Horizontal, this);
     workbench->setObjectName(QStringLiteral("serialWorkbenchSplitter"));
@@ -105,6 +131,7 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
 
     m_statusBar = new SerialStatusBar(this);
 
+    rootLayout->addWidget(profileToolbar);
     rootLayout->addWidget(workbench, 1);
     rootLayout->addWidget(m_statusBar);
 
@@ -181,8 +208,112 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             this, [this]() {
                 m_controller->previewReplayPlan();
             });
+    connect(saveProfileButton, &QPushButton::clicked,
+            this, &SerialStationWindow::saveProfileWithDialog);
+    connect(loadProfileButton, &QPushButton::clicked,
+            this, &SerialStationWindow::loadProfileWithDialog);
 }
 
 SerialStationWindow::~SerialStationWindow() = default;
+
+SerialProfileWriteResult SerialStationWindow::saveCurrentProfileToFile(
+    const QString& filePath,
+    const QString& name,
+    const QString& description,
+    const QStringList& tags)
+{
+    const SerialStationProfile profile = collectCurrentProfile(name, description, tags);
+    const SerialProfileWriteResult result = m_controller->saveProfileToFile(profile, filePath);
+    if (result.ok) {
+        m_logPanel->appendSystem(tr("已保存配置档案: %1").arg(result.filePath));
+    } else {
+        m_logPanel->appendSystem(tr("保存配置档案失败: %1").arg(result.errorMessage));
+    }
+    return result;
+}
+
+SerialProfileResult SerialStationWindow::loadProfileFromFile(const QString& filePath)
+{
+    const SerialProfileResult result = m_controller->loadProfileFromFile(filePath);
+    if (!result.ok) {
+        m_logPanel->appendSystem(tr("加载配置档案失败: %1").arg(result.errorMessage));
+        return result;
+    }
+
+    applyProfileToUi(result.profile);
+    m_logPanel->appendSystem(tr("已加载配置档案: %1").arg(result.profile.name));
+    return result;
+}
+
+SerialStationProfile SerialStationWindow::collectCurrentProfile(
+    const QString& name,
+    const QString& description,
+    const QStringList& tags) const
+{
+    SerialStationProfile profile;
+    profile.name = name;
+    profile.description = description;
+    profile.tags = tags;
+    profile.port = m_portPanel->currentConfig();
+    profile.protocolName = m_protocolPanel->activeProtocol();
+    profile.sendMode = m_commandPanel->sendMode();
+
+    const QStringList history = m_commandPanel->historyCommands();
+    for (int index = 0; index < history.size(); ++index) {
+        SerialProfileCommand command;
+        command.name = tr("命令 %1").arg(index + 1);
+        command.payload = history.at(index);
+        command.mode = profile.sendMode;
+        profile.commands.append(command);
+    }
+    if (profile.commands.isEmpty() && !m_commandPanel->commandText().isEmpty()) {
+        profile.commands.append({tr("当前命令"), m_commandPanel->commandText(), profile.sendMode});
+    }
+    return profile;
+}
+
+void SerialStationWindow::applyProfileToUi(const SerialStationProfile& profile)
+{
+    m_portPanel->applyConfig(profile.port);
+    m_protocolPanel->setActiveProtocol(profile.protocolName);
+    m_controller->setActiveProtocol(profile.protocolName);
+    m_commandPanel->applyProfileCommands(profile.commands, profile.sendMode);
+    m_statusBar->setPortConfig(profile.port);
+}
+
+void SerialStationWindow::saveProfileWithDialog()
+{
+    const QString defaultPath = QDir(defaultExportDirectory())
+        .filePath(QStringLiteral("serial-station.edserialprofile"));
+    const QString selectedPath = QFileDialog::getSaveFileName(
+        this,
+        tr("保存串口工站档案"),
+        defaultPath,
+        tr("Serial Station Profile (*.edserialprofile);;JSON (*.json)"));
+
+    if (selectedPath.trimmed().isEmpty()) {
+        m_logPanel->appendSystem(tr("配置档案保存已取消"));
+        return;
+    }
+
+    const QString profileName = QFileInfo(selectedPath).completeBaseName();
+    saveCurrentProfileToFile(normalizedProfilePath(selectedPath), profileName);
+}
+
+void SerialStationWindow::loadProfileWithDialog()
+{
+    const QString selectedPath = QFileDialog::getOpenFileName(
+        this,
+        tr("加载串口工站档案"),
+        defaultExportDirectory(),
+        tr("Serial Station Profile (*.edserialprofile);;JSON (*.json);;All Files (*.*)"));
+
+    if (selectedPath.trimmed().isEmpty()) {
+        m_logPanel->appendSystem(tr("配置档案加载已取消"));
+        return;
+    }
+
+    loadProfileFromFile(selectedPath);
+}
 
 } // namespace serial_station

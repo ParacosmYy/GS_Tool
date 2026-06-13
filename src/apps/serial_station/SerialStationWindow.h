@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QWidget>
 
+#include <QtCore/QStringList>
 #include <memory>
 
 namespace serial_station {
@@ -10,7 +11,10 @@ namespace serial_station {
 class SerialCommandPanel;
 class SerialLogPanel;
 class SerialProtocolPanel;
+struct SerialProfileResult;
+struct SerialProfileWriteResult;
 class SerialStationController;
+struct SerialStationProfile;
 class SerialStatusBar;
 class SerialPortPanel;
 
@@ -26,7 +30,27 @@ public:
     explicit SerialStationWindow(QWidget* parent = nullptr);
     ~SerialStationWindow() override;
 
+    /**
+     * @brief 保存当前工作台配置档案，供自动化测试和 UI 入口复用。
+     */
+    SerialProfileWriteResult saveCurrentProfileToFile(const QString& filePath,
+                                                      const QString& name,
+                                                      const QString& description = QString(),
+                                                      const QStringList& tags = QStringList());
+
+    /**
+     * @brief 从文件加载配置档案并应用到工作台 UI。
+     */
+    SerialProfileResult loadProfileFromFile(const QString& filePath);
+
 private:
+    SerialStationProfile collectCurrentProfile(const QString& name,
+                                               const QString& description,
+                                               const QStringList& tags) const;
+    void applyProfileToUi(const SerialStationProfile& profile);
+    void saveProfileWithDialog();
+    void loadProfileWithDialog();
+
     std::unique_ptr<SerialStationController> m_controller;
     SerialPortPanel* m_portPanel = nullptr;
     SerialProtocolPanel* m_protocolPanel = nullptr;

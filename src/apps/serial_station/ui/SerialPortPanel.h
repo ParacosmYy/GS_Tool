@@ -32,6 +32,12 @@ public:
     SerialPortConfig currentConfig() const;
 
     /**
+     * @brief 将档案中的 UART 配置应用到 UI 控件。
+     * @param config UART 配置值对象
+     */
+    void applyConfig(const SerialPortConfig& config);
+
+    /**
      * @brief 把会话状态同步到按钮和状态文案。
      * @param state 当前串口会话状态
      */

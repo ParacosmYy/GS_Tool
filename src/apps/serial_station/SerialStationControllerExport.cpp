@@ -63,6 +63,35 @@ SerialExportResult SerialStationController::exportLogRecords(const SerialExportR
     return result;
 }
 
+SerialProfileWriteResult SerialStationController::saveProfileToFile(
+    const SerialStationProfile& profile,
+    const QString& filePath)
+{
+    const SerialProfileWriteResult result = m_profileService.saveToFile(profile, filePath);
+    if (result.ok) {
+        logSystem(QStringLiteral("已保存配置档案: %1").arg(result.filePath),
+                  {{QStringLiteral("filePath"), result.filePath}});
+    } else {
+        logError(QStringLiteral("保存配置档案失败: %1").arg(result.errorMessage),
+                 {{QStringLiteral("filePath"), filePath}});
+    }
+    return result;
+}
+
+SerialProfileResult SerialStationController::loadProfileFromFile(const QString& filePath)
+{
+    const SerialProfileResult result = m_profileService.loadFromFile(filePath);
+    if (result.ok) {
+        logSystem(QStringLiteral("已加载配置档案: %1").arg(result.profile.name),
+                  {{QStringLiteral("filePath"), filePath},
+                   {QStringLiteral("profileName"), result.profile.name}});
+    } else {
+        logError(QStringLiteral("加载配置档案失败: %1").arg(result.errorMessage),
+                 {{QStringLiteral("filePath"), filePath}});
+    }
+    return result;
+}
+
 QString SerialStationController::suggestedExportFileName(SerialExportFormat format) const
 {
     const QString timestamp =
