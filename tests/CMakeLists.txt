@@ -1291,6 +1291,35 @@ endif()
 add_test(NAME SerialReplayService COMMAND test_serial_replay_service)
 
 # ============================================================
+# Serial Station配置档案服务测试
+# ============================================================
+
+add_executable(test_serial_profile_service
+    serial_station/test_serial_profile_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationConfig.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileService.cpp
+)
+
+target_include_directories(test_serial_profile_service PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_profile_service PRIVATE
+    Qt6::Core
+    Qt6::SerialPort
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_profile_service PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialProfileService COMMAND test_serial_profile_service)
+
+# ============================================================
 # Serial Station UI回放预览闭环测试
 # ============================================================
 

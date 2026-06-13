@@ -196,7 +196,7 @@ Primary entry documents:
 
 Near-term work is focused on making the product body more coherent, not just expanding build files:
 
-- enrich Serial Station UI with parameterized protocol commands and persisted protocol profiles;
+- wire the Serial Station profile service into UI, so UART/protocol/command profiles can be applied from the workbench;
 - connect logging/export/replay services into the Serial Station UI without crossing controller boundaries;
 - continue replacing ad hoc UI styling with maintainable QSS and generated theme tokens;
 - fill staged BLE/CAN/MQTT/USB/RTT integrations with real backend behavior and tests;

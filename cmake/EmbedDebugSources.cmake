@@ -67,6 +67,7 @@ set(SOURCES
     src/apps/serial_station/core/SerialSession.cpp
     src/apps/serial_station/services/SerialExportService.cpp
     src/apps/serial_station/services/SerialLogService.cpp
+    src/apps/serial_station/services/SerialProfileService.cpp
     src/apps/serial_station/services/SerialReplayService.cpp
     src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
@@ -3376,6 +3377,7 @@ set(HEADERS
     src/apps/serial_station/core/SerialSession.h
     src/apps/serial_station/services/SerialExportService.h
     src/apps/serial_station/services/SerialLogService.h
+    src/apps/serial_station/services/SerialProfileService.h
     src/apps/serial_station/services/SerialReplayService.h
     src/apps/serial_station/protocols/SerialProtocolEvent.h
     src/apps/serial_station/protocols/ISerialProtocol.h
