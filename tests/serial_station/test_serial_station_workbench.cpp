@@ -69,6 +69,14 @@ private slots:
     void clearRecentProfilesWithoutRecentKeepsDefaultDirectory();
     void loadStartupProfileUpdatesDefaultProfileDirectory();
     void loadStartupLastProfileUpdatesDefaultProfileDirectory();
+    void workbenchExposesProfileDirectoryImportControl();
+    void importingDefaultProfileDirectoryRefreshesRecentProfiles();
+    void importingDefaultProfileDirectoryLogsImportedCount();
+    void importingEmptyDefaultProfileDirectoryLogsNoProfiles();
+    void importingDefaultProfileDirectoryDoesNotApplyProfile();
+    void clickingImportDirectoryButtonImportsProfiles();
+    void importingAlreadyKnownDirectoryLogsNoNewProfiles();
+    void importingMissingDefaultProfileDirectoryKeepsRecentProfiles();
     void workbenchExposesRecentProfileControls();
     void workbenchExposesPruneMissingProfileControl();
     void loadingProfileAppliesWorkbenchState();
@@ -657,6 +665,169 @@ void SerialStationWorkbenchTest::loadStartupLastProfileUpdatesDefaultProfileDire
     QVERIFY(window.loadStartupLastProfile());
 
     QCOMPARE(window.defaultProfileDirectory(), QFileInfo(profilePath).absolutePath());
+}
+
+void SerialStationWorkbenchTest::workbenchExposesProfileDirectoryImportControl()
+{
+    SerialStationWindow window;
+
+    auto* importButton = window.findChild<QPushButton*>(QStringLiteral("serialProfileImportDirectoryButton"));
+
+    QVERIFY(importButton != nullptr);
+    QCOMPARE(importButton->text(), QStringLiteral("导入目录"));
+}
+
+void SerialStationWorkbenchTest::importingDefaultProfileDirectoryRefreshesRecentProfiles()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    const QString firstPath = dir.filePath(QStringLiteral("alpha.edserialprofile"));
+    const QString secondPath = dir.filePath(QStringLiteral("beta.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), firstPath).ok);
+    QVERIFY(service.saveToFile(sampleProfile(), secondPath).ok);
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(tempDir.path());
+
+    QCOMPARE(window.importProfilesFromDefaultDirectory(), 2);
+
+    QCOMPARE(window.recentProfilePaths(),
+             QStringList({dir.absoluteFilePath(QStringLiteral("beta.edserialprofile")),
+                          dir.absoluteFilePath(QStringLiteral("alpha.edserialprofile"))}));
+    auto* recentCombo = window.findChild<QComboBox*>(QStringLiteral("serialProfileRecentCombo"));
+    auto* reloadButton = window.findChild<QPushButton*>(QStringLiteral("serialProfileReloadLastButton"));
+    auto* clearButton = window.findChild<QPushButton*>(QStringLiteral("serialProfileClearRecentButton"));
+    QVERIFY(recentCombo != nullptr);
+    QVERIFY(reloadButton != nullptr);
+    QVERIFY(clearButton != nullptr);
+    QCOMPARE(recentCombo->count(), 2);
+    QVERIFY(recentCombo->isEnabled());
+    QVERIFY(reloadButton->isEnabled());
+    QVERIFY(clearButton->isEnabled());
+}
+
+void SerialStationWorkbenchTest::importingDefaultProfileDirectoryLogsImportedCount()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString profilePath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), profilePath).ok);
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(tempDir.path());
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(logView != nullptr);
+
+    QCOMPARE(window.importProfilesFromDefaultDirectory(), 1);
+
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("已导入配置档案: 1")));
+}
+
+void SerialStationWorkbenchTest::importingEmptyDefaultProfileDirectoryLogsNoProfiles()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(tempDir.path());
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(logView != nullptr);
+
+    QCOMPARE(window.importProfilesFromDefaultDirectory(), 0);
+
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("未发现可导入配置档案")));
+    QVERIFY(window.recentProfilePaths().isEmpty());
+}
+
+void SerialStationWorkbenchTest::importingDefaultProfileDirectoryDoesNotApplyProfile()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    SerialStationProfile profile = sampleProfile();
+    profile.port.portName = QStringLiteral("COM42");
+    profile.protocolName = QStringLiteral("custom_md");
+    profile.sendMode = QStringLiteral("hex");
+    const QString profilePath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(profile, profilePath).ok);
+
+    SerialStationWindow window;
+    auto* portPanel = window.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel"));
+    auto* protocolPanel = window.findChild<SerialProtocolPanel*>(QStringLiteral("serialProtocolPanel"));
+    auto* commandPanel = window.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel"));
+    QVERIFY(portPanel != nullptr);
+    QVERIFY(protocolPanel != nullptr);
+    QVERIFY(commandPanel != nullptr);
+    const auto beforeConfig = portPanel->currentConfig();
+    const QString beforeProtocol = protocolPanel->activeProtocol();
+    const QString beforeCommand = commandPanel->commandText();
+    window.setDefaultProfileDirectory(tempDir.path());
+
+    QCOMPARE(window.importProfilesFromDefaultDirectory(), 1);
+
+    QCOMPARE(portPanel->currentConfig().portName, beforeConfig.portName);
+    QCOMPARE(protocolPanel->activeProtocol(), beforeProtocol);
+    QCOMPARE(commandPanel->commandText(), beforeCommand);
+}
+
+void SerialStationWorkbenchTest::clickingImportDirectoryButtonImportsProfiles()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString profilePath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), profilePath).ok);
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(tempDir.path());
+    auto* importButton = window.findChild<QPushButton*>(QStringLiteral("serialProfileImportDirectoryButton"));
+    QVERIFY(importButton != nullptr);
+
+    QTest::mouseClick(importButton, Qt::LeftButton);
+
+    QCOMPARE(window.recentProfilePaths(), QStringList({QDir(tempDir.path()).absoluteFilePath(QStringLiteral("line-a.edserialprofile"))}));
+}
+
+void SerialStationWorkbenchTest::importingAlreadyKnownDirectoryLogsNoNewProfiles()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString profilePath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), profilePath).ok);
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(tempDir.path());
+    QCOMPARE(window.importProfilesFromDefaultDirectory(), 1);
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(logView != nullptr);
+    logView->clear();
+
+    QCOMPARE(window.importProfilesFromDefaultDirectory(), 0);
+
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("没有新的可导入配置档案")));
+}
+
+void SerialStationWorkbenchTest::importingMissingDefaultProfileDirectoryKeepsRecentProfiles()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString profilePath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), profilePath).ok);
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(tempDir.path());
+    QCOMPARE(window.importProfilesFromDefaultDirectory(), 1);
+    const QStringList beforeRecent = window.recentProfilePaths();
+    window.setDefaultProfileDirectory(QDir(tempDir.path()).filePath(QStringLiteral("missing")));
+
+    QCOMPARE(window.importProfilesFromDefaultDirectory(), 0);
+
+    QCOMPARE(window.recentProfilePaths(), beforeRecent);
 }
 
 void SerialStationWorkbenchTest::workbenchExposesRecentProfileControls()

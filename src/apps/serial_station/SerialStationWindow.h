@@ -98,6 +98,12 @@ public:
      */
     bool clearRecentProfiles();
 
+    /**
+     * @brief 从当前默认档案目录导入配置档案路径。
+     * @return 本次新纳入最近列表的档案数量
+     */
+    int importProfilesFromDefaultDirectory();
+
 private:
     SerialStationProfile collectCurrentProfile(const QString& name,
                                                const QString& description,

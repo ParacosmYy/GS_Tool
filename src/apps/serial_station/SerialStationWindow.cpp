@@ -92,6 +92,8 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     m_pruneMissingProfilesButton->setObjectName(QStringLiteral("serialProfilePruneMissingButton"));
     m_clearRecentProfilesButton = new QPushButton(tr("清空最近"), profileToolbar);
     m_clearRecentProfilesButton->setObjectName(QStringLiteral("serialProfileClearRecentButton"));
+    auto* importProfileDirectoryButton = new QPushButton(tr("导入目录"), profileToolbar);
+    importProfileDirectoryButton->setObjectName(QStringLiteral("serialProfileImportDirectoryButton"));
 
     auto* saveProfileButton = new QPushButton(tr("保存档案"), profileToolbar);
     saveProfileButton->setObjectName(QStringLiteral("serialProfileSaveButton"));
@@ -103,6 +105,7 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     profileToolbarLayout->addWidget(m_reloadLastProfileButton);
     profileToolbarLayout->addWidget(m_pruneMissingProfilesButton);
     profileToolbarLayout->addWidget(m_clearRecentProfilesButton);
+    profileToolbarLayout->addWidget(importProfileDirectoryButton);
     profileToolbarLayout->addWidget(loadProfileButton);
     profileToolbarLayout->addWidget(saveProfileButton);
 
@@ -234,6 +237,8 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             });
     connect(m_clearRecentProfilesButton, &QPushButton::clicked,
             this, &SerialStationWindow::clearRecentProfiles);
+    connect(importProfileDirectoryButton, &QPushButton::clicked,
+            this, &SerialStationWindow::importProfilesFromDefaultDirectory);
     connect(m_recentProfileCombo, QOverload<int>::of(&QComboBox::activated),
             this, &SerialStationWindow::loadSelectedRecentProfile);
 
@@ -311,6 +316,22 @@ bool SerialStationWindow::clearRecentProfiles()
     refreshProfileCatalogUi();
     m_logPanel->appendSystem(tr("最近配置档案已清空"));
     return hadRecentProfiles;
+}
+
+int SerialStationWindow::importProfilesFromDefaultDirectory()
+{
+    const QString directoryPath = defaultProfileDirectory();
+    const QStringList discoveredPaths = m_profileCatalog->discoverProfilePaths(directoryPath);
+    const int importedCount = m_profileCatalog->importProfileDirectory(directoryPath);
+    refreshProfileCatalogUi();
+    if (importedCount > 0) {
+        m_logPanel->appendSystem(tr("已导入配置档案: %1").arg(importedCount));
+    } else if (!discoveredPaths.isEmpty()) {
+        m_logPanel->appendSystem(tr("没有新的可导入配置档案"));
+    } else {
+        m_logPanel->appendSystem(tr("未发现可导入配置档案"));
+    }
+    return importedCount;
 }
 
 SerialStationProfile SerialStationWindow::collectCurrentProfile(

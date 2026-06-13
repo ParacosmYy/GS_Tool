@@ -118,6 +118,46 @@ QString SerialProfileCatalogService::lastProfilePath() const
                              .toString());
 }
 
+QStringList SerialProfileCatalogService::discoverProfilePaths(const QString& directoryPath) const
+{
+    const QString normalizedDirectory = normalizePath(directoryPath);
+    if (normalizedDirectory.isEmpty()) {
+        return {};
+    }
+
+    QDir directory(normalizedDirectory);
+    if (!directory.exists()) {
+        return {};
+    }
+
+    const QFileInfoList entries = directory.entryInfoList(
+        {QStringLiteral("*.edserialprofile"), QStringLiteral("*.json")},
+        QDir::Files | QDir::Readable,
+        QDir::Name | QDir::IgnoreCase);
+
+    QStringList paths;
+    for (const QFileInfo& entry : entries) {
+        const QString path = normalizePath(entry.absoluteFilePath());
+        if (!path.isEmpty() && !paths.contains(path)) {
+            paths.append(path);
+        }
+    }
+    return paths;
+}
+
+int SerialProfileCatalogService::importProfileDirectory(const QString& directoryPath)
+{
+    int importedCount = 0;
+    const QStringList paths = discoverProfilePaths(directoryPath);
+    for (const QString& path : paths) {
+        const bool alreadyKnown = containsProfilePath(path);
+        if (recordProfilePath(path) && !alreadyKnown) {
+            ++importedCount;
+        }
+    }
+    return importedCount;
+}
+
 bool SerialProfileCatalogService::setDefaultProfileDirectory(const QString& directoryPath)
 {
     const QString normalizedPath = normalizePath(directoryPath);

@@ -69,6 +69,23 @@ private slots:
     void setDefaultProfileDirectoryCollapsesParentSegments();
     void clearDefaultProfileDirectoryIsIdempotent();
     void defaultProfileDirectoryKeepsLastProfilePathIndependent();
+    void discoverProfilePathsReturnsEmptyForBlankDirectory();
+    void discoverProfilePathsReturnsEmptyForMissingDirectory();
+    void discoverProfilePathsFindsSupportedExtensionsOnly();
+    void discoverProfilePathsSortsByFileName();
+    void discoverProfilePathsDoesNotModifyCatalog();
+    void discoverProfilePathsDoesNotScanSubdirectories();
+    void importProfileDirectoryRecordsDiscoveredProfiles();
+    void importProfileDirectoryReturnsOnlyNewlyImportedCount();
+    void importProfileDirectoryKeepsDefaultDirectory();
+    void importProfileDirectoryRespectsRecentLimit();
+    void importProfileDirectoryPersistsAcrossInstances();
+    void importProfileDirectoryHandlesJsonProfiles();
+    void discoverProfilePathsTrimsDirectoryInput();
+    void discoverProfilePathsKeepsCatalogDefaultDirectory();
+    void importMissingProfileDirectoryReturnsZero();
+    void importEmptyProfileDirectoryKeepsExistingCatalog();
+    void importProfileDirectoryKeepsUnrelatedRecentProfiles();
 };
 
 void SerialProfileCatalogServiceTest::init()
@@ -835,6 +852,290 @@ void SerialProfileCatalogServiceTest::defaultProfileDirectoryKeepsLastProfilePat
 
     QCOMPARE(catalog.defaultProfileDirectory(), QString());
     QCOMPARE(catalog.lastProfilePath(), QStringLiteral("C:/profiles/line-a/profile.edserialprofile"));
+}
+
+void SerialProfileCatalogServiceTest::discoverProfilePathsReturnsEmptyForBlankDirectory()
+{
+    SerialProfileCatalogService catalog;
+
+    QVERIFY(catalog.discoverProfilePaths(QStringLiteral("   ")).isEmpty());
+}
+
+void SerialProfileCatalogServiceTest::discoverProfilePathsReturnsEmptyForMissingDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+
+    SerialProfileCatalogService catalog;
+
+    QVERIFY(catalog.discoverProfilePaths(QDir(tempDir.path()).filePath(QStringLiteral("missing"))).isEmpty());
+}
+
+void SerialProfileCatalogServiceTest::discoverProfilePathsFindsSupportedExtensionsOnly()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile profileA(dir.filePath(QStringLiteral("line-a.edserialprofile")));
+    QVERIFY(profileA.open(QIODevice::WriteOnly));
+    profileA.close();
+    QFile profileB(dir.filePath(QStringLiteral("line-b.json")));
+    QVERIFY(profileB.open(QIODevice::WriteOnly));
+    profileB.close();
+    QFile ignored(dir.filePath(QStringLiteral("notes.txt")));
+    QVERIFY(ignored.open(QIODevice::WriteOnly));
+    ignored.close();
+
+    SerialProfileCatalogService catalog;
+
+    QCOMPARE(catalog.discoverProfilePaths(tempDir.path()),
+             QStringList({dir.absoluteFilePath(QStringLiteral("line-a.edserialprofile")),
+                          dir.absoluteFilePath(QStringLiteral("line-b.json"))}));
+}
+
+void SerialProfileCatalogServiceTest::discoverProfilePathsSortsByFileName()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    const QStringList names = {
+        QStringLiteral("zeta.edserialprofile"),
+        QStringLiteral("alpha.edserialprofile"),
+        QStringLiteral("beta.json"),
+    };
+    for (const QString& name : names) {
+        QFile file(dir.filePath(name));
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.close();
+    }
+
+    SerialProfileCatalogService catalog;
+
+    QCOMPARE(catalog.discoverProfilePaths(tempDir.path()),
+             QStringList({dir.absoluteFilePath(QStringLiteral("alpha.edserialprofile")),
+                          dir.absoluteFilePath(QStringLiteral("beta.json")),
+                          dir.absoluteFilePath(QStringLiteral("zeta.edserialprofile"))}));
+}
+
+void SerialProfileCatalogServiceTest::discoverProfilePathsDoesNotModifyCatalog()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile file(dir.filePath(QStringLiteral("line-a.edserialprofile")));
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+
+    SerialProfileCatalogService catalog;
+    QVERIFY(!catalog.discoverProfilePaths(tempDir.path()).isEmpty());
+
+    QVERIFY(catalog.recentProfilePaths().isEmpty());
+    QCOMPARE(catalog.lastProfilePath(), QString());
+}
+
+void SerialProfileCatalogServiceTest::discoverProfilePathsDoesNotScanSubdirectories()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QVERIFY(dir.mkpath(QStringLiteral("nested")));
+    QFile nested(dir.filePath(QStringLiteral("nested/line-a.edserialprofile")));
+    QVERIFY(nested.open(QIODevice::WriteOnly));
+    nested.close();
+
+    SerialProfileCatalogService catalog;
+
+    QVERIFY(catalog.discoverProfilePaths(tempDir.path()).isEmpty());
+}
+
+void SerialProfileCatalogServiceTest::importProfileDirectoryRecordsDiscoveredProfiles()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile first(dir.filePath(QStringLiteral("alpha.edserialprofile")));
+    QVERIFY(first.open(QIODevice::WriteOnly));
+    first.close();
+    QFile second(dir.filePath(QStringLiteral("beta.edserialprofile")));
+    QVERIFY(second.open(QIODevice::WriteOnly));
+    second.close();
+
+    SerialProfileCatalogService catalog;
+
+    QCOMPARE(catalog.importProfileDirectory(tempDir.path()), 2);
+    QCOMPARE(catalog.recentProfilePaths(),
+             QStringList({dir.absoluteFilePath(QStringLiteral("beta.edserialprofile")),
+                          dir.absoluteFilePath(QStringLiteral("alpha.edserialprofile"))}));
+    QCOMPARE(catalog.lastProfilePath(), dir.absoluteFilePath(QStringLiteral("beta.edserialprofile")));
+}
+
+void SerialProfileCatalogServiceTest::importProfileDirectoryReturnsOnlyNewlyImportedCount()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile first(dir.filePath(QStringLiteral("alpha.edserialprofile")));
+    QVERIFY(first.open(QIODevice::WriteOnly));
+    first.close();
+    QFile second(dir.filePath(QStringLiteral("beta.edserialprofile")));
+    QVERIFY(second.open(QIODevice::WriteOnly));
+    second.close();
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(dir.absoluteFilePath(QStringLiteral("alpha.edserialprofile"))));
+
+    QCOMPARE(catalog.importProfileDirectory(tempDir.path()), 1);
+
+    QCOMPARE(catalog.recentProfilePaths(),
+             QStringList({dir.absoluteFilePath(QStringLiteral("beta.edserialprofile")),
+                          dir.absoluteFilePath(QStringLiteral("alpha.edserialprofile"))}));
+}
+
+void SerialProfileCatalogServiceTest::importProfileDirectoryKeepsDefaultDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile file(dir.filePath(QStringLiteral("line-a.edserialprofile")));
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(QDir(tempDir.path()).filePath(QStringLiteral("profiles"))));
+    const QString before = catalog.defaultProfileDirectory();
+
+    QCOMPARE(catalog.importProfileDirectory(tempDir.path()), 1);
+
+    QCOMPARE(catalog.defaultProfileDirectory(), before);
+}
+
+void SerialProfileCatalogServiceTest::importProfileDirectoryRespectsRecentLimit()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    for (int i = 0; i < 12; ++i) {
+        QFile file(dir.filePath(QStringLiteral("line-%1.edserialprofile").arg(i, 2, 10, QLatin1Char('0'))));
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.close();
+    }
+
+    SerialProfileCatalogService catalog;
+
+    QCOMPARE(catalog.importProfileDirectory(tempDir.path()), 12);
+    QCOMPARE(catalog.recentProfilePaths().size(), 8);
+    QCOMPARE(QFileInfo(catalog.recentProfilePaths().first()).fileName(), QStringLiteral("line-11.edserialprofile"));
+    QCOMPARE(QFileInfo(catalog.recentProfilePaths().last()).fileName(), QStringLiteral("line-04.edserialprofile"));
+}
+
+void SerialProfileCatalogServiceTest::importProfileDirectoryPersistsAcrossInstances()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile file(dir.filePath(QStringLiteral("line-a.edserialprofile")));
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+
+    {
+        SerialProfileCatalogService catalog;
+        QCOMPARE(catalog.importProfileDirectory(tempDir.path()), 1);
+    }
+
+    SerialProfileCatalogService reloadedCatalog;
+
+    QCOMPARE(reloadedCatalog.recentProfilePaths(),
+             QStringList({dir.absoluteFilePath(QStringLiteral("line-a.edserialprofile"))}));
+}
+
+void SerialProfileCatalogServiceTest::importProfileDirectoryHandlesJsonProfiles()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile file(dir.filePath(QStringLiteral("legacy.json")));
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+
+    SerialProfileCatalogService catalog;
+
+    QCOMPARE(catalog.importProfileDirectory(tempDir.path()), 1);
+    QCOMPARE(catalog.recentProfilePaths(), QStringList({dir.absoluteFilePath(QStringLiteral("legacy.json"))}));
+}
+
+void SerialProfileCatalogServiceTest::discoverProfilePathsTrimsDirectoryInput()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile file(dir.filePath(QStringLiteral("line-a.edserialprofile")));
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+
+    SerialProfileCatalogService catalog;
+
+    QCOMPARE(catalog.discoverProfilePaths(QStringLiteral("  %1  ").arg(tempDir.path())),
+             QStringList({dir.absoluteFilePath(QStringLiteral("line-a.edserialprofile"))}));
+}
+
+void SerialProfileCatalogServiceTest::discoverProfilePathsKeepsCatalogDefaultDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile file(dir.filePath(QStringLiteral("line-a.edserialprofile")));
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(QDir(tempDir.path()).filePath(QStringLiteral("profiles"))));
+    const QString before = catalog.defaultProfileDirectory();
+
+    QVERIFY(!catalog.discoverProfilePaths(tempDir.path()).isEmpty());
+
+    QCOMPARE(catalog.defaultProfileDirectory(), before);
+}
+
+void SerialProfileCatalogServiceTest::importMissingProfileDirectoryReturnsZero()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    SerialProfileCatalogService catalog;
+
+    QCOMPARE(catalog.importProfileDirectory(QDir(tempDir.path()).filePath(QStringLiteral("missing"))), 0);
+
+    QVERIFY(catalog.recentProfilePaths().isEmpty());
+    QCOMPARE(catalog.lastProfilePath(), QString());
+}
+
+void SerialProfileCatalogServiceTest::importEmptyProfileDirectoryKeepsExistingCatalog()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(QStringLiteral("C:/profiles/existing.edserialprofile")));
+    const QStringList beforeRecent = catalog.recentProfilePaths();
+    const QString beforeLast = catalog.lastProfilePath();
+
+    QCOMPARE(catalog.importProfileDirectory(tempDir.path()), 0);
+
+    QCOMPARE(catalog.recentProfilePaths(), beforeRecent);
+    QCOMPARE(catalog.lastProfilePath(), beforeLast);
+}
+
+void SerialProfileCatalogServiceTest::importProfileDirectoryKeepsUnrelatedRecentProfiles()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QFile file(dir.filePath(QStringLiteral("line-a.edserialprofile")));
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(QStringLiteral("C:/profiles/existing.edserialprofile")));
+
+    QCOMPARE(catalog.importProfileDirectory(tempDir.path()), 1);
+
+    QCOMPARE(catalog.recentProfilePaths(),
+             QStringList({dir.absoluteFilePath(QStringLiteral("line-a.edserialprofile")),
+                          QStringLiteral("C:/profiles/existing.edserialprofile")}));
 }
 
 QTEST_GUILESS_MAIN(SerialProfileCatalogServiceTest)

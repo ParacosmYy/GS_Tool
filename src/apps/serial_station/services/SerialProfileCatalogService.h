@@ -53,6 +53,20 @@ public:
     QString lastProfilePath() const;
 
     /**
+     * @brief 发现目录下可纳入最近列表的配置档案路径。
+     * @param directoryPath 待扫描目录
+     * @return 当前目录中的 `.edserialprofile` 和 `.json` 文件绝对路径
+     */
+    QStringList discoverProfilePaths(const QString& directoryPath) const;
+
+    /**
+     * @brief 将目录下的配置档案批量纳入最近档案索引。
+     * @param directoryPath 待导入目录
+     * @return 本次新纳入最近列表的档案数量
+     */
+    int importProfileDirectory(const QString& directoryPath);
+
+    /**
      * @brief 设置保存/加载档案对话框的默认目录。
      * @param directoryPath 目录路径
      * @return true 表示目录有效并已写入配置
