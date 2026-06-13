@@ -54,6 +54,12 @@ public:
     bool loadStartupProfile(const QString& filePath);
 
     /**
+     * @brief 启动阶段加载最近一次成功使用的配置档案。
+     * @return true 表示上次档案已成功应用
+     */
+    bool loadStartupLastProfile();
+
+    /**
      * @brief 最近成功使用过的配置档案路径。
      */
     QStringList recentProfilePaths() const;

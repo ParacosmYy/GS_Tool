@@ -55,7 +55,7 @@ bool MainWindow::applyStartupOptions(const StartupOptions& options)
         routeOk = openPanelById(options.panelId());
     }
 
-    if (options.profileFilePath().isEmpty()) {
+    if (options.profileFilePath().isEmpty() && !options.loadLastProfile()) {
         return routeOk;
     }
 
@@ -63,7 +63,10 @@ bool MainWindow::applyStartupOptions(const StartupOptions& options)
     if (!serialStation) {
         return false;
     }
-    return routeOk && serialStation->loadStartupProfile(options.profileFilePath());
+    if (!options.profileFilePath().isEmpty()) {
+        return routeOk && serialStation->loadStartupProfile(options.profileFilePath());
+    }
+    return routeOk && serialStation->loadStartupLastProfile();
 }
 
 /** @brief 处理连接状态变更(更新状态栏/配置面板/呼吸动画/自动切面板) @param state 连接状态枚举 @param connName 连接名称 */

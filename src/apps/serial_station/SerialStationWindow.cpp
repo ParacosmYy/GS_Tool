@@ -286,6 +286,19 @@ bool SerialStationWindow::loadStartupProfile(const QString& filePath)
     return result.ok;
 }
 
+bool SerialStationWindow::loadStartupLastProfile()
+{
+    const QString path = lastProfilePath();
+    if (path.isEmpty()) {
+        m_logPanel->appendSystem(tr("没有可用于启动的上次配置档案"));
+        refreshProfileCatalogUi();
+        return false;
+    }
+
+    m_logPanel->appendSystem(tr("启动上次配置档案: %1").arg(path));
+    return loadStartupProfile(path);
+}
+
 QStringList SerialStationWindow::recentProfilePaths() const
 {
     return m_profileCatalog->recentProfilePaths();

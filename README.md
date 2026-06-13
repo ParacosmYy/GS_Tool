@@ -24,7 +24,7 @@
 | 主开发分支 | `feat/embed-debug` |
 | 用户入口 | 仓库根目录 `EmbedDebug.bat` |
 | 串口工站直达 | `EmbedDebug.bat --station serial` |
-| 档案化串口工站 | `EmbedDebug.bat --station serial --profile <file.edserialprofile>`，工作台内支持最近档案、重载上次和清空最近 |
+| 档案化串口工站 | `EmbedDebug.bat --station serial --profile <file.edserialprofile>` 或 `--last-profile`，工作台内支持最近档案、重载上次和清空最近 |
 | 构建系统 | CMake + Ninja，只允许使用 `build/` |
 | UI 技术栈 | Qt Widgets、QSS 主题、SVG 图标资源 |
 | 工程治理 | PRD、Specs、TDD、启动验证、架构约束、评分追踪 |
@@ -67,6 +67,7 @@ Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial
 9. 使用 `.\EmbedDebug.bat --station serial --profile <file.edserialprofile>` 直接打开预配置工站。
 10. 在工作台内通过“最近档案”下拉或“重载上次”恢复上次工位配置。
 11. 临时测试档案污染列表时，使用“清空最近”清理索引；该操作不会删除 `.edserialprofile` 文件。
+12. 使用 `.\EmbedDebug.bat --last-profile` 直接恢复最近一次成功使用的串口工站档案。
 
 内部边界：
 
@@ -127,6 +128,12 @@ L0   src/interfaces/           纯接口契约
 .\EmbedDebug.bat --station serial --profile .\profiles\line-a.edserialprofile
 ```
 
+直达 Serial Station 并恢复最近一次成功使用的档案：
+
+```powershell
+.\EmbedDebug.bat --last-profile
+```
+
 手动配置和构建：
 
 ```powershell
@@ -158,6 +165,7 @@ cmake -G Ninja -B build -DCMAKE_PREFIX_PATH=C:/msys64/mingw64
 cmake --build build --target EmbedDebug --parallel 4
 .\EmbedDebug.bat --station serial
 .\EmbedDebug.bat --station serial --profile <file.edserialprofile>
+.\EmbedDebug.bat --last-profile
 ```
 
 Serial Station 聚焦验证：
@@ -232,7 +240,7 @@ GS_Tool/
 
 | 优先级 | 方向 | 目标 |
 |--------|------|------|
-| P0 | Serial Station 一键套用/连接和档案管理深化 | 最近档案索引和清理已落地，下一步补可控连接策略 |
+| P0 | Serial Station 一键套用/连接和档案管理深化 | 最近档案索引、清理和上次档案快捷启动已落地，下一步补可控连接策略 |
 | P0 | 虚拟串口或硬件回环验证 | 将串口工站设备证据从 D1 提升到更接近真实现场 |
 | P1 | QSS token 生成和 UI 一致性 | 降低手写主题漂移，统一控件层级 |
 | P1 | 对话框和错误反馈统一 | 用一致的应用级反馈替代零散消息流 |

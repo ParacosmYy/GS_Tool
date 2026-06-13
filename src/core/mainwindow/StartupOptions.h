@@ -38,10 +38,19 @@ public:
      */
     QString profileFilePath() const;
 
+    /**
+     * @brief 是否请求加载 Serial Station 最近一次成功使用的配置档案。
+     * @return true 表示未提供显式档案路径时应尝试加载上次档案
+     */
+    bool loadLastProfile() const;
+
 private:
-    StartupOptions(const QString& panelId, const QString& profileFilePath); ///< 写入已标准化启动选项
+    StartupOptions(const QString& panelId,
+                   const QString& profileFilePath,
+                   bool loadLastProfile); ///< 写入已标准化启动选项
     QString m_panelId; ///< 启动后需要打开的稳定面板ID
     QString m_profileFilePath; ///< 启动后需要加载的 Serial Station 档案路径
+    bool m_loadLastProfile = false; ///< 是否加载最近一次成功使用的 Serial Station 档案
 };
 
 #endif // STARTUP_OPTIONS_H
