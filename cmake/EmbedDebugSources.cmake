@@ -14,6 +14,7 @@ set(SOURCES
     src/core/mainwindow/MainWindowPanelConnectOta.cpp
     src/core/mainwindow/MainWindowInitShortcuts.cpp
     src/core/mainwindow/MainWindowLifecycle.cpp
+    src/core/mainwindow/StartupOptions.cpp
     src/core/connect/ConnectionController.cpp
     src/core/connect/ConnectionControllerLifecycle.cpp
     src/core/connect/ConnectionControllerQuery.cpp
@@ -3385,6 +3386,7 @@ set(HEADERS
     src/core/event/EventBus.h
 
     src/core/mainwindow/MainWindow.h
+    src/core/mainwindow/StartupOptions.h
     src/core/connect/ConnectionController.h
     src/core/connect/ConnectionPresetBuilder.h
 

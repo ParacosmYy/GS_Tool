@@ -13,6 +13,7 @@
 #include <QSequentialAnimationGroup>
 #include <QGraphicsOpacityEffect>
 #include <QPointer>
+#include <QString>
 
 class QTreeView;
 class QLabel;
@@ -48,6 +49,7 @@ public:
     const QVector<NavPanelMapping>& mappings() const { return m_navPanelMappings; } ///< 获取映射表
     int currentPanelIndex() const;          ///< 当前面板在映射表中的索引(0~N-1, -1=未找到)
     bool restorePanelByIndex(int index);    ///< 通过索引恢复面板(启动/会话恢复用，无动画)
+    bool restorePanelById(const QString& panelId); ///< 通过稳定面板ID恢复面板(启动参数/命令入口用，无动画)
 
     void onBreakpointNavCollapse(bool collapsed, QSplitter* splitter, int savedWidth); ///< 响应断点变化调整导航树
     quint64 totalNavigations() const;        ///< 导航切换总次数(含所有switchToPanel)

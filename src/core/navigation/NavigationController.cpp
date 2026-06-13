@@ -223,6 +223,23 @@ bool NavigationController::restorePanelByIndex(int index)
     return true;
 }
 
+/** @brief 通过稳定面板ID恢复面板，复用索引恢复流程保持选中态和显示状态一致 @param panelId 稳定面板ID @return true成功 false未找到或目标为空 */
+bool NavigationController::restorePanelById(const QString& panelId)
+{
+    const QString normalizedId = panelId.trimmed();
+    if (normalizedId.isEmpty()) {
+        return false;
+    }
+
+    for (int index = 0; index < m_navPanelMappings.size(); ++index) {
+        const QString mappingId = QString::fromUtf8(m_navPanelMappings[index].id);
+        if (mappingId == normalizedId) {
+            return restorePanelByIndex(index);
+        }
+    }
+    return false;
+}
+
 /** @brief 设置当前面板(初始化用，不触发动画) @param panel 目标面板widget */
 void NavigationController::setCurrentPanel(QWidget* panel)
 {

@@ -13,6 +13,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include "core/mainwindow/MainWindow.h"
+#include "core/mainwindow/StartupOptions.h"
 #include "shared/AppConstants.h"
 #include "utils/settings/SettingsManager.h"
 
@@ -45,8 +46,12 @@ int main(int argc, char* argv[])
     }
 
     // 创建并显示主窗口
+    const StartupOptions startupOptions = StartupOptions::fromArguments(QCoreApplication::arguments());
     MainWindow window;
     window.show();
+    if (!startupOptions.panelId().isEmpty()) {
+        window.openPanelById(startupOptions.panelId());
+    }
 
     return app.exec();
 }

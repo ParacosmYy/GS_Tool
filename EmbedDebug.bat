@@ -12,7 +12,7 @@ if not exist "%LAUNCHER%" (
     exit /b 1
 )
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%LAUNCHER%" -RootDir "%ROOT_DIR%."
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%LAUNCHER%" -RootDir "%ROOT_DIR%." -AppArguments "%*"
 set "EXIT_CODE=%ERRORLEVEL%"
 
 if not "%EXIT_CODE%"=="0" (

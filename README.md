@@ -82,6 +82,12 @@ Recommended first run on this repository:
 
 `local_env.bat` is generated for the local machine and must not be committed.
 
+To open directly into the Serial Station workbench:
+
+```powershell
+.\EmbedDebug.bat --station serial
+```
+
 UV start shortcut:
 
 ```powershell

@@ -53,6 +53,7 @@ class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(QWidget* parent = nullptr); ///< 构造(初始化子模块+组装UI)
     ~MainWindow() override = default;        ///< 析构(QObject父子树自动销毁)
+    bool openPanelById(const QString& panelId); ///< 按稳定面板ID打开导航面板，供启动参数和外部入口复用
 
 protected:
     void closeEvent(QCloseEvent* event) override; ///< 关闭事件(停动画/停录制/保存设置/关连接)

@@ -36,6 +36,15 @@ void MainWindow::restoreUserSession(int lastPanel)
     m_terminalController->startStatsTimer();
 }
 
+/** @brief 按稳定面板ID打开导航面板，保持MainWindow只转发到导航控制器 @param panelId PanelManager注册的稳定ID @return true打开成功 false未找到 */
+bool MainWindow::openPanelById(const QString& panelId)
+{
+    if (!m_navController) {
+        return false;
+    }
+    return m_navController->restorePanelById(panelId);
+}
+
 /** @brief 处理连接状态变更(更新状态栏/配置面板/呼吸动画/自动切面板) @param state 连接状态枚举 @param connName 连接名称 */
 void MainWindow::handleConnectionState(ConnectionState state, const QString& connName)
 {

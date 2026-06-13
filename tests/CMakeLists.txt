@@ -178,6 +178,33 @@ endif()
 add_test(NAME NavigationControllerCategory COMMAND test_navigation_controller_category)
 
 # ============================================================
+# 启动参数解析测试
+# ============================================================
+
+add_executable(test_startup_options
+    test_startup_options.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/mainwindow/StartupOptions.cpp
+)
+
+target_include_directories(test_startup_options PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_startup_options PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_startup_options PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME StartupOptions COMMAND test_startup_options)
+
+# ============================================================
 # MainWindow布局状态计算测试
 # ============================================================
 

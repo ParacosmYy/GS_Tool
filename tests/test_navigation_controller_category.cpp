@@ -17,6 +17,8 @@ private slots:
     void selectsNavTreeItemForCurrentPanel();
     void selectsNavTreeItemForInterleavedCategoryMapping();
     void clickingNavTreeLeafSwitchesCurrentPanel();
+    void restoresPanelByStableId();
+    void unknownStableIdDoesNotChangeCurrentPanel();
 };
 
 void NavigationControllerCategoryTest::findsFirstPanelByCategoryKey()
@@ -165,6 +167,45 @@ void NavigationControllerCategoryTest::clickingNavTreeLeafSwitchesCurrentPanel()
     QCOMPARE(controller.currentPanelIndex(), 1);
     QCOMPARE(spy.count(), 1);
     QCOMPARE(qvariant_cast<QWidget*>(spy.first().first()), &chartPanel);
+}
+
+void NavigationControllerCategoryTest::restoresPanelByStableId()
+{
+    NavigationController controller;
+    QWidget serialPanel;
+    QWidget stationPanel;
+    QTreeView navTree;
+
+    controller.buildNavTree(&navTree, {
+        {"连接", "配置", &serialPanel, "serial.config", "cable"},
+        {"连接", "串口工站", &stationPanel, "serial.station", "terminal"},
+    });
+
+    QVERIFY(controller.restorePanelById(QStringLiteral("serial.station")));
+    QCOMPARE(controller.currentPanelIndex(), 1);
+    QVERIFY(stationPanel.isVisible());
+    QVERIFY(!serialPanel.isVisible());
+    QVERIFY(navTree.currentIndex().isValid());
+    QCOMPARE(navTree.currentIndex().data().toString(), QStringLiteral("串口工站"));
+}
+
+void NavigationControllerCategoryTest::unknownStableIdDoesNotChangeCurrentPanel()
+{
+    NavigationController controller;
+    QWidget serialPanel;
+    QWidget stationPanel;
+    QTreeView navTree;
+
+    controller.buildNavTree(&navTree, {
+        {"连接", "配置", &serialPanel, "serial.config", "cable"},
+        {"连接", "串口工站", &stationPanel, "serial.station", "terminal"},
+    });
+    QVERIFY(controller.restorePanelById(QStringLiteral("serial.config")));
+
+    QVERIFY(!controller.restorePanelById(QStringLiteral("missing.station")));
+    QCOMPARE(controller.currentPanelIndex(), 0);
+    QVERIFY(serialPanel.isVisible());
+    QVERIFY(!stationPanel.isVisible());
 }
 
 QTEST_MAIN(NavigationControllerCategoryTest)

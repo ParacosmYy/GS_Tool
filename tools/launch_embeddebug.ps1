@@ -1,6 +1,8 @@
 param(
     [Parameter(Mandatory = $true)]
-    [string]$RootDir
+    [string]$RootDir,
+
+    [string]$AppArguments = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -245,7 +247,16 @@ if (-not (Test-Path -LiteralPath (Join-Path $buildDir "Qt6Core.dll") -PathType L
 }
 
 Write-Info "start EmbedDebug."
-$process = Start-Process -FilePath $exePath -WorkingDirectory $buildDir -PassThru
+$startProcessArgs = @{
+    FilePath = $exePath
+    WorkingDirectory = $buildDir
+    PassThru = $true
+}
+if (-not [string]::IsNullOrWhiteSpace($AppArguments)) {
+    Write-Info "application arguments: $AppArguments"
+    $startProcessArgs["ArgumentList"] = $AppArguments
+}
+$process = Start-Process @startProcessArgs
 Start-Sleep -Seconds 1
 
 if ($process.HasExited) {
