@@ -298,9 +298,6 @@ set(SOURCES
     src/utils/export/DataExporterStreamed.cpp
     src/utils/export/DataExporterStreamedFormats.cpp
     src/utils/export/DataExporterEdl.cpp
-    src/utils/aggregator/DataAggregator.cpp
-    src/utils/aggregator/DataAggregatorCompute.cpp
-    src/utils/aggregator/DataAggregatorTimeWindow.cpp
     src/utils/pipeline/DataPipeline.cpp
     src/utils/log/DataLogger.cpp
     src/utils/log/DataLoggerEdl.cpp
@@ -619,12 +616,8 @@ set(SOURCES
     src/utils/signal_gen/SignalGeneratorWidgetStats.cpp
 
     # ── F27: 数据字节级对比 ──
-    src/utils/compare/DataCompareWidget.cpp
-    src/utils/compare/DataCompareWidgetStats.cpp
 
     # ── F37: 数据比较器 ──
-    src/utils/compare/DataComparator.cpp
-    src/utils/compare/DataComparatorStats.cpp
 
     # ── 频率计数器 ──
     src/utils/frequency/FrequencyCounterWidget.cpp
@@ -636,23 +629,14 @@ set(SOURCES
     src/utils/annotation/DataAnnotationWidgetStats.cpp
 
     # ── F29: 报文模板库 ──
-    src/utils/packet_lib/PacketTemplateLib.cpp
-    src/utils/packet_lib/PacketTemplateLibBuiltins.cpp
-    src/utils/packet_lib/PacketTemplateLibStats.cpp
 
     # ── F30: 数据掩码编辑器 ──
-    src/utils/bitmask/DataMaskEditor.cpp
-    src/utils/bitmask/DataMaskEditorIo.cpp
-    src/utils/bitmask/DataMaskEditorStats.cpp
 
     # ── F31: 数据包重组引擎 ──
     src/protocol/reassembly/PacketReassembler.cpp
     src/protocol/reassembly/PacketReassemblerStats.cpp
 
     # ── F31: 字节模式搜索器 ──
-    src/utils/pattern/BytePatternAnalyzer.cpp
-    src/utils/pattern/BytePatternAnalyzerStats.cpp
-    src/utils/pattern/DataPatternDetector.cpp
     src/utils/scaler/DataScalerWidget.cpp
     src/utils/normalize/DataNormalizer.cpp
     src/utils/threshold/DataThresholdMonitor.cpp
@@ -668,7 +652,6 @@ set(SOURCES
     src/utils/filter2/DigitalFilter.cpp
     src/utils/predictor/TrendPredictor.cpp
     src/utils/histogram/HistogramBuilder.cpp
-    src/utils/spectrum/SpectrumAnalyzer.cpp
     src/utils/statdist/StatDistribution.cpp
     src/utils/entropy/EntropyCalculator.cpp
     src/utils/crosscorr/CrossCorrelator.cpp
@@ -744,7 +727,6 @@ set(SOURCES
     # src/utils/autopcor/AutoCorrelation.cpp  # removed: duplicate class
     src/utils/deadzone/DeadZoneFilter.cpp
     src/utils/movingmax/MovingMinMax.cpp
-    src/utils/ringhash/RollingHash.cpp
     src/utils/countmin/CountMinSketch.cpp
     # src/utils/cuckoo/CuckooFilter.cpp  # removed: duplicate class
     # src/utils/bloomfilter2/ScalableBloomFilter.cpp  # removed: duplicate class
@@ -767,7 +749,6 @@ set(SOURCES
     src/utils/combination/CombinationGenerator.cpp
     src/utils/bloomfilter2/CountingBloomFilter.cpp
     src/utils/rscode/ReedSolomonCodec.cpp
-    src/utils/spectrum/SpectralFlatness.cpp
     # src/utils/convolutional/ConvolutionalCoder.cpp  # removed: duplicate of code4/ConvolutionalCoder
     src/utils/cosinedist/CosineDistance.cpp
     src/utils/edgedetect/EdgeDetector.cpp
@@ -1091,10 +1072,6 @@ set(SOURCES
     src/widgets/led_matrix/LedMatrixSimulatorStats.cpp
 
     # ── F32: 十六进制内存编辑器 ──
-    src/utils/hex_editor/MemoryHexEditor.cpp
-    src/utils/hex_editor/MemoryHexEditorExport.cpp
-    src/utils/hex_editor/MemoryHexEditorInternal.cpp
-    src/utils/hex_editor/MemoryHexEditorStats.cpp
 
     # ── 波形模式检测 ──
     src/core/analysis/WaveformPatternDetector.cpp
@@ -1140,17 +1117,12 @@ set(SOURCES
     src/widgets/circular/CircularBufferWidgetStats.cpp
 
     # ── 波形发生器 ──
-    src/utils/waveform/WaveformGenerator.cpp
-    src/utils/waveform/WaveformGeneratorExport.cpp
-    src/utils/waveform/WaveformGeneratorStats.cpp
 
     # ── F35: 数据流分割器 ──
     src/utils/splitter/DataStreamSplitter.cpp
     src/utils/splitter/DataStreamSplitterStats.cpp
 
     # ── F34: 数据速率计算器 ──
-    src/utils/rate/DataRateCalculator.cpp
-    src/utils/rate/DataRateCalculatorStats.cpp
 
     # ── F33: 数据编解码机 ──
     src/utils/encoder/SerialDataEncoder.cpp
@@ -1188,9 +1160,6 @@ set(SOURCES
     src/utils/recorder/StreamCaptureRecorderExport.cpp
 
     # -- F48: Hex差异引擎 --
-    src/utils/hex_diff/HexDiffEngine.cpp
-    src/utils/hex_diff/HexDiffEngineDiff.cpp
-    src/utils/hex_diff/HexDiffEnginePatch.cpp
 
     # -- F43: 高级数据日志 --
     src/utils/logger2/SerialDataLogger.cpp
@@ -1215,7 +1184,6 @@ set(SOURCES
     src/utils/synchronizer/DataSynchronizer.cpp
 
     # -- F52: 数据速率限制器 --
-    src/utils/rate/DataRateLimiter.cpp
 
     # -- F52: 滑动窗口聚合器 --
     src/utils/aggregator2/WindowedAggregator.cpp
@@ -1300,7 +1268,6 @@ set(SOURCES
     src/utils/thd/ThdAnalyzer.cpp
     src/utils/hmm/HiddenMarkovModel.cpp
     # src/utils/viterbi/ViterbiDecoder.cpp  # removed: duplicate of signal16/ViterbiDecoder
-    src/utils/gmm/GaussianMixtureModel.cpp
     src/utils/covariance/CovarianceMatrix.cpp
     src/utils/percentile/PercentileCalculator.cpp
     # src/utils/scrambler/Scrambler.cpp  (duplicate of code23)
@@ -1355,7 +1322,6 @@ set(SOURCES
     # DUPLICATE REMOVED: src/utils/fenwick/FenwickTree.cpp
     # DUPLICATE REMOVED: src/utils/sparsae/SparseArray.cpp
     # DUPLICATE REMOVED: src/utils/roaring/RoaringBitmap.cpp
-    src/utils/ringhash/RingHash.cpp
     # DUPLICATE REMOVED: src/utils/bloomfilter3/ScalableBloomFilter.cpp
     # DUPLICATE REMOVED: src/utils/merkle/MerkleTree.cpp
     # DUPLICATE REMOVED: src/utils/skiplist2/ConcurrentSkipList.cpp
@@ -1459,7 +1425,6 @@ set(SOURCES
     src/utils/sgd/StochasticGradientDescent.cpp
     src/utils/dwt4/WaveletPacket.cpp
     src/utils/btree5/BTreeMap.cpp
-    src/utils/gmm/GaussianMixture3.cpp
     src/utils/graph13/EulerianPath.cpp
     src/utils/lattice/LatticeReducer.cpp
     # suffix3/SuffixAutomaton.cpp removed (duplicate of suffix)
@@ -3673,7 +3638,6 @@ set(HEADERS
     src/ota/protocols/zmodem/ZModemTransfer.h
     src/utils/settings/SettingsManager.h
     src/utils/export/DataExporter.h
-    src/utils/aggregator/DataAggregator.h
     src/utils/pipeline/DataPipeline.h
     src/utils/log/DataLogger.h
     src/utils/data/DataBookmark.h
@@ -3852,22 +3816,18 @@ set(HEADERS
     src/utils/frequency/FrequencyCounterWidget.h
 
     # ── F37: 数据比较器 ──
-    src/utils/compare/DataComparator.h
 
     # ── F28: 数据流标注管理 ──
     src/utils/annotation/DataAnnotationWidget.h
 
     # ── F29: 报文模板库 ──
-    src/utils/packet_lib/PacketTemplateLib.h
 
     # ── F30: 数据掩码编辑器 ──
-    src/utils/bitmask/DataMaskEditor.h
 
     # ── F31: 数据包重组引擎 ──
     src/protocol/reassembly/PacketReassembler.h
 
     # ── F31: 字节模式搜索器 ──
-    src/utils/pattern/BytePatternAnalyzer.h
 
     # ── 滚动折线图 ──
     src/widgets/chart/ScrollChartWidget.h
@@ -3879,7 +3839,6 @@ set(HEADERS
     src/widgets/led_matrix/LedMatrixSimulator.h
 
     # ── F32: 十六进制内存编辑器 ──
-    src/utils/hex_editor/MemoryHexEditor.h
 
     # ── F29: 协议定时分析器 ──
     src/utils/protocol_timer/ProtocolTimerWidget.h
@@ -3917,16 +3876,13 @@ set(HEADERS
     src/widgets/circular/CircularBufferWidget.h
 
     # ── 波形发生器 ──
-    src/utils/waveform/WaveformGenerator.h
 
     # ── F35: 数据流分割器 ──
     src/utils/splitter/DataStreamSplitter.h
 
     # ── F34: 数据速率计算器 ──
-    src/utils/rate/DataRateCalculator.h
 
     # -- F52: 数据速率限制器 --
-    src/utils/rate/DataRateLimiter.h
 
     # ── F33: 数据编解码机 ──
     src/utils/encoder/SerialDataEncoder.h
@@ -3956,7 +3912,6 @@ set(HEADERS
     src/utils/recorder/StreamCaptureRecorder.h
 
     # -- F48: Hex差异引擎 --
-    src/utils/hex_diff/HexDiffEngine.h
 
     # -- F43: 高级数据日志 --
     src/utils/logger2/SerialDataLogger.h
@@ -4052,7 +4007,6 @@ set(HEADERS
     src/utils/histogram/HistogramBuilder.h
 
     # -- F76: 频谱分析器 --
-    src/utils/spectrum/SpectrumAnalyzer.h
 
     # -- F77: 统计分布 --
     src/utils/statdist/StatDistribution.h
@@ -4160,7 +4114,6 @@ set(HEADERS
     # -- F116: Reed-Solomon编解码器 --
     src/utils/rscode/ReedSolomonCodec.h
     # -- F117: 频谱平坦度 --
-    src/utils/spectrum/SpectralFlatness.h
 
     # -- F180~F182: 增强编码/排序 --
     src/utils/rle2/RunLengthEncoder2.h
@@ -4300,7 +4253,6 @@ set(HEADERS
     # src/utils/autopcor/AutoCorrelation.h  # removed: duplicate class
     src/utils/deadzone/DeadZoneFilter.h
     # src/utils/movingmax/MovingMinMax.h  # removed: duplicate class
-    src/utils/ringhash/RollingHash.h
     src/utils/countmin/CountMinSketch.h
     # src/utils/cuckoo/CuckooFilter.h  # removed: duplicate class
     # src/utils/bloomfilter2/ScalableBloomFilter.h  # removed: duplicate class
@@ -4317,7 +4269,6 @@ set(HEADERS
     src/utils/bloom/BloomFilter.h
     # src/utils/hmm/HiddenMarkovModel.h  # removed: duplicate class
     # src/utils/viterbi/ViterbiDecoder.h  # removed: duplicate of signal16/ViterbiDecoder
-    src/utils/gmm/GaussianMixtureModel.h
     src/utils/covariance/CovarianceMatrix.h
     src/utils/percentile/PercentileCalculator.h
     # src/utils/scrambler/Scrambler.h  (duplicate of code23)
@@ -4382,7 +4333,6 @@ set(HEADERS
     src/utils/fenwick/FenwickTree.h
     src/utils/sparsae/SparseArray.h
     src/utils/roaring/RoaringBitmap.h
-    src/utils/ringhash/RingHash.h
     src/utils/bloomfilter3/ScalableBloomFilter.h
     src/utils/merkle/MerkleTree.h
     src/utils/skiplist2/ConcurrentSkipList.h
@@ -4730,7 +4680,6 @@ set(HEADERS
     src/utils/sgd/StochasticGradientDescent.h
     src/utils/dwt4/WaveletPacket.h
     src/utils/btree5/BTreeMap.h
-    src/utils/gmm/GaussianMixture3.h
     src/utils/graph13/EulerianPath.h
     src/utils/lattice/LatticeReducer.h
     # suffix3/SuffixAutomaton.h removed (duplicate of suffix)

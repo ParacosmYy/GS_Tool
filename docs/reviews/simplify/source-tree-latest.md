@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-13 17:27:51
+- Generated: 2026-06-13 17:35:15
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -9,11 +9,11 @@
 | Metric | Value |
 |--------|-------|
 | Working tree source files under src | 82048 |
-| Raw CMake source references | 6058 |
-| Declared CMake source references | 5952 |
-| Active CMake source references | 1651 |
+| Raw CMake source references | 6007 |
+| Declared CMake source references | 5901 |
+| Active CMake source references | 1600 |
 | Filtered utils references | 4301 |
-| Source files not active in CMake | 80422 |
+| Source files not active in CMake | 80473 |
 | Existing src/apps/serial_station files | 50 |
 | CMake refs under src/apps/serial_station | 50 |
 | Generated-looking utils directories | 39670 |
@@ -45,7 +45,7 @@
 
 | Module | References |
 |--------|------------|
-| utils | 788 |
+| utils | 737 |
 | core | 190 |
 | connection | 153 |
 | protocol | 151 |
@@ -177,21 +177,9 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/scripting | 7 | 7 |
 | src/utils/converter | 6 | 6 |
 | src/utils/perf | 6 | 6 |
-| src/utils/compare | 6 | 5 |
-| src/utils/hex_editor | 5 | 5 |
-| src/utils/rate | 5 | 5 |
 | src/utils/timestamp | 5 | 5 |
-| src/utils/aggregator | 4 | 4 |
-| src/utils/bitmask | 4 | 4 |
 | src/utils/crypto | 4 | 4 |
-| src/utils/gmm | 4 | 4 |
-| src/utils/hex_diff | 4 | 4 |
-| src/utils/packet_lib | 4 | 4 |
-| src/utils/pattern | 5 | 4 |
-| src/utils/ringhash | 4 | 4 |
 | src/utils/settings | 3 | 4 |
-| src/utils/spectrum | 4 | 4 |
-| src/utils/waveform | 4 | 4 |
 | src/utils/align | 4 | 3 |
 | src/utils/annotation | 10 | 3 |
 | src/utils/compress | 3 | 3 |
@@ -290,6 +278,18 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/entropy | 2 | 2 |
 | src/utils/envelope | 2 | 2 |
 | src/utils/expmove | 2 | 2 |
+| src/utils/farmhash | 2 | 2 |
+| src/utils/fcs | 2 | 2 |
+| src/utils/fenwick | 2 | 2 |
+| src/utils/fir | 2 | 2 |
+| src/utils/fisher | 2 | 2 |
+| src/utils/flow | 2 | 2 |
+| src/utils/fractal | 4 | 2 |
+| src/utils/freq | 2 | 2 |
+| src/utils/gabor | 2 | 2 |
+| src/utils/gauss_seidel | 2 | 2 |
+| src/utils/geo_dist | 2 | 2 |
+| src/utils/glm | 2 | 2 |
 
 Only the first 120 active utils directories are listed.
 
@@ -297,7 +297,7 @@ Only the first 120 active utils directories are listed.
 
 | Path | Files | Active CMake refs | External include refs | External modules | Canonical |
 |------|-------|-------------------|-----------------------|------------------|-----------|
-| src/utils/crypto | 4 | 4 | 30 | 7 | True |
+| src/utils/crypto | 4 | 4 | 29 | 7 | True |
 | src/utils/settings | 3 | 4 | 12 | 4 | True |
 | src/utils/data | 4 | 3 | 11 | 4 | True |
 | src/utils/log | 9 | 9 | 6 | 1 | True |
@@ -308,18 +308,6 @@ Only the first 120 active utils directories are listed.
 | src/utils/timestamp | 5 | 5 | 4 | 1 | True |
 | src/utils/export | 16 | 16 | 3 | 1 | True |
 | src/utils/scripting | 7 | 7 | 0 | 0 | False |
-| src/utils/compare | 6 | 5 | 0 | 0 | False |
-| src/utils/hex_editor | 5 | 5 | 0 | 0 | False |
-| src/utils/rate | 5 | 5 | 0 | 0 | False |
-| src/utils/aggregator | 4 | 4 | 0 | 0 | False |
-| src/utils/bitmask | 4 | 4 | 0 | 0 | False |
-| src/utils/gmm | 4 | 4 | 0 | 0 | False |
-| src/utils/hex_diff | 4 | 4 | 0 | 0 | False |
-| src/utils/packet_lib | 4 | 4 | 0 | 0 | False |
-| src/utils/pattern | 5 | 4 | 0 | 0 | False |
-| src/utils/ringhash | 4 | 4 | 0 | 0 | False |
-| src/utils/spectrum | 4 | 4 | 0 | 0 | False |
-| src/utils/waveform | 4 | 4 | 0 | 0 | False |
 | src/utils/align | 4 | 3 | 0 | 0 | False |
 | src/utils/annotation | 10 | 3 | 0 | 0 | False |
 | src/utils/compress | 3 | 3 | 0 | 0 | False |
@@ -417,6 +405,18 @@ Only the first 120 active utils directories are listed.
 | src/utils/entropy | 2 | 2 | 0 | 0 | False |
 | src/utils/envelope | 2 | 2 | 0 | 0 | False |
 | src/utils/expmove | 2 | 2 | 0 | 0 | False |
+| src/utils/farmhash | 2 | 2 | 0 | 0 | False |
+| src/utils/fcs | 2 | 2 | 0 | 0 | False |
+| src/utils/fenwick | 2 | 2 | 0 | 0 | False |
+| src/utils/fir | 2 | 2 | 0 | 0 | False |
+| src/utils/fisher | 2 | 2 | 0 | 0 | False |
+| src/utils/flow | 2 | 2 | 0 | 0 | False |
+| src/utils/fractal | 4 | 2 | 0 | 0 | False |
+| src/utils/freq | 2 | 2 | 0 | 0 | False |
+| src/utils/gabor | 2 | 2 | 0 | 0 | False |
+| src/utils/gauss_seidel | 2 | 2 | 0 | 0 | False |
+| src/utils/geo_dist | 2 | 2 | 0 | 0 | False |
+| src/utils/glm | 2 | 2 | 0 | 0 | False |
 
 Only the first 120 active utils dependency rows are listed.
 
@@ -425,18 +425,6 @@ Only the first 120 active utils dependency rows are listed.
 | Path | Files | Active CMake refs | External include refs | External modules |
 |------|-------|-------------------|-----------------------|------------------|
 | src/utils/scripting | 7 | 7 | 0 | 0 |
-| src/utils/compare | 6 | 5 | 0 | 0 |
-| src/utils/hex_editor | 5 | 5 | 0 | 0 |
-| src/utils/rate | 5 | 5 | 0 | 0 |
-| src/utils/aggregator | 4 | 4 | 0 | 0 |
-| src/utils/bitmask | 4 | 4 | 0 | 0 |
-| src/utils/gmm | 4 | 4 | 0 | 0 |
-| src/utils/hex_diff | 4 | 4 | 0 | 0 |
-| src/utils/packet_lib | 4 | 4 | 0 | 0 |
-| src/utils/pattern | 5 | 4 | 0 | 0 |
-| src/utils/ringhash | 4 | 4 | 0 | 0 |
-| src/utils/spectrum | 4 | 4 | 0 | 0 |
-| src/utils/waveform | 4 | 4 | 0 | 0 |
 | src/utils/align | 4 | 3 | 0 | 0 |
 | src/utils/annotation | 10 | 3 | 0 | 0 |
 | src/utils/compress | 3 | 3 | 0 | 0 |
@@ -504,6 +492,18 @@ Only the first 120 active utils dependency rows are listed.
 | src/utils/conjugate | 2 | 2 | 0 | 0 |
 | src/utils/convhull | 2 | 2 | 0 | 0 |
 | src/utils/convolution | 2 | 2 | 0 | 0 |
+| src/utils/correlator | 2 | 2 | 0 | 0 |
+| src/utils/cosinedist | 2 | 2 | 0 | 0 |
+| src/utils/countmin | 2 | 2 | 0 | 0 |
+| src/utils/covariance | 2 | 2 | 0 | 0 |
+| src/utils/crc64b | 2 | 2 | 0 | 0 |
+| src/utils/crosscorr | 2 | 2 | 0 | 0 |
+| src/utils/crossval | 2 | 2 | 0 | 0 |
+| src/utils/cuckoo_hash | 2 | 2 | 0 | 0 |
+| src/utils/davidson | 2 | 2 | 0 | 0 |
+| src/utils/dct | 2 | 2 | 0 | 0 |
+| src/utils/deadzone | 2 | 2 | 0 | 0 |
+| src/utils/decomp | 2 | 2 | 0 | 0 |
 
 Only the first 80 low-risk active utils candidates are listed.
 
