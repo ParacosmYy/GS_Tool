@@ -58,7 +58,7 @@
 
 ## 7. GO 配置
 
-当前样例配置：
+当前样例配置以 `tools/agent-loop/sample.embeddebug.json` 为准。该配置不直接把 `.\\EmbedDebug.bat` 放进 `check`，而是先跑 Doctor，再用启动探针验证并清理本轮新启动的进程：
 
 ```json
 {
@@ -66,10 +66,10 @@
   "max_rounds": 20,
   "max_minutes": 30,
   "execute": [
-    "cmake --build .\\build --config Release --parallel 4"
+    "powershell -NoProfile -ExecutionPolicy Bypass -File .\\tools\\doctor.ps1"
   ],
   "check": [
-    ".\\EmbedDebug.bat"
+    "powershell -NoProfile -ExecutionPolicy Bypass -File .\\tools\\verify_embeddebug_launch.ps1"
   ],
   "fix": []
 }
@@ -96,3 +96,15 @@ Pop-Location
 - Doctor：用于验证 Qt 构建和 `EmbedDebug.bat`。
 - Debug：用于处理 Go 配置解析或执行器错误。
 - Simplify：用于防止工具逻辑膨胀；Go 工具暂保持单命令入口和简单 JSON 配置。
+
+## 10. 当前验证记录
+
+| 项 | 结果 |
+|----|------|
+| Specs 模板 | 已存在：`docs/superpowers/specs/SPECS_TEMPLATE.md` |
+| PRD-072 实例 | 已存在：`docs/superpowers/specs/PRD_072_Agent_Iteration_Runtime_Specs.md` |
+| GO 源码 | 已存在：`tools/agent-loop/main.go` |
+| GO 测试 | 已存在：`tools/agent-loop/main_test.go`；当前机器未安装 `go.exe`，因此未运行 |
+| BATCH 文档 | 已存在：`docs/superpowers/BATCH_PROTOCOL.md` |
+| LOOP 文档 | 已存在：`docs/superpowers/LOOP_PROTOCOL.md` |
+| 启动探针 | `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\verify_embeddebug_launch.ps1` 已验证通过 |
