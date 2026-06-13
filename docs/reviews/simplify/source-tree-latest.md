@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-13 18:13:27
+- Generated: 2026-06-13 18:23:40
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -9,11 +9,11 @@
 | Metric | Value |
 |--------|-------|
 | Working tree source files under src | 82048 |
-| Raw CMake source references | 5821 |
-| Declared CMake source references | 5705 |
-| Active CMake source references | 1404 |
+| Raw CMake source references | 5765 |
+| Declared CMake source references | 5645 |
+| Active CMake source references | 1344 |
 | Filtered utils references | 4301 |
-| Source files not active in CMake | 80669 |
+| Source files not active in CMake | 80729 |
 | Existing src/apps/serial_station files | 50 |
 | CMake refs under src/apps/serial_station | 50 |
 | Generated-looking utils directories | 39670 |
@@ -45,7 +45,7 @@
 
 | Module | References |
 |--------|------------|
-| utils | 541 |
+| utils | 481 |
 | core | 190 |
 | connection | 153 |
 | protocol | 151 |
@@ -181,36 +181,6 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/crypto | 4 | 4 |
 | src/utils/settings | 3 | 4 |
 | src/utils/data | 4 | 3 |
-| src/utils/davidson | 2 | 2 |
-| src/utils/dct | 2 | 2 |
-| src/utils/deadzone | 2 | 2 |
-| src/utils/decomp | 2 | 2 |
-| src/utils/delta | 2 | 2 |
-| src/utils/deque | 2 | 2 |
-| src/utils/derivative | 2 | 2 |
-| src/utils/detector | 2 | 2 |
-| src/utils/detrend | 2 | 2 |
-| src/utils/dict | 2 | 2 |
-| src/utils/disjoint | 2 | 2 |
-| src/utils/divided_diff | 2 | 2 |
-| src/utils/dynhistogram | 2 | 2 |
-| src/utils/echohash | 2 | 2 |
-| src/utils/edgedetect | 2 | 2 |
-| src/utils/edmonds | 2 | 2 |
-| src/utils/ekf | 2 | 2 |
-| src/utils/emd | 2 | 2 |
-| src/utils/ensemble | 2 | 2 |
-| src/utils/entropy | 2 | 2 |
-| src/utils/envelope | 2 | 2 |
-| src/utils/expmove | 2 | 2 |
-| src/utils/farmhash | 2 | 2 |
-| src/utils/fcs | 2 | 2 |
-| src/utils/fenwick | 2 | 2 |
-| src/utils/fir | 2 | 2 |
-| src/utils/fisher | 2 | 2 |
-| src/utils/flow | 2 | 2 |
-| src/utils/fractal | 4 | 2 |
-| src/utils/freq | 2 | 2 |
 | src/utils/gabor | 2 | 2 |
 | src/utils/gauss_seidel | 2 | 2 |
 | src/utils/geo_dist | 2 | 2 |
@@ -290,6 +260,36 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/normalize | 2 | 2 |
 | src/utils/notch | 2 | 2 |
 | src/utils/nqueens | 2 | 2 |
+| src/utils/nystrom | 2 | 2 |
+| src/utils/octree | 2 | 2 |
+| src/utils/ode | 2 | 2 |
+| src/utils/optimize | 2 | 2 |
+| src/utils/outlier | 2 | 2 |
+| src/utils/pade | 2 | 2 |
+| src/utils/pagerank | 2 | 2 |
+| src/utils/pca | 2 | 2 |
+| src/utils/peakdetect | 2 | 2 |
+| src/utils/peakhold | 2 | 2 |
+| src/utils/percentile | 2 | 2 |
+| src/utils/permutation | 2 | 2 |
+| src/utils/phase | 2 | 2 |
+| src/utils/pingpong | 2 | 2 |
+| src/utils/pipeline | 2 | 2 |
+| src/utils/pitch | 2 | 2 |
+| src/utils/point_location | 2 | 2 |
+| src/utils/polar | 4 | 2 |
+| src/utils/poly_interp | 2 | 2 |
+| src/utils/poly_roots | 2 | 2 |
+| src/utils/polygon | 2 | 2 |
+| src/utils/polyhash | 2 | 2 |
+| src/utils/polynomial_root | 2 | 2 |
+| src/utils/polyreg | 2 | 2 |
+| src/utils/powerquad | 2 | 2 |
+| src/utils/predictor | 2 | 2 |
+| src/utils/predictor_corrector | 2 | 2 |
+| src/utils/procrustes | 2 | 2 |
+| src/utils/qr | 2 | 2 |
+| src/utils/quadtree | 2 | 2 |
 
 Only the first 120 active utils directories are listed.
 
@@ -308,36 +308,6 @@ Only the first 120 active utils directories are listed.
 | src/utils/timestamp | 5 | 5 | 4 | 1 | True |
 | src/utils/export | 16 | 16 | 3 | 1 | True |
 | src/utils/scripting | 7 | 7 | 0 | 0 | False |
-| src/utils/davidson | 2 | 2 | 0 | 0 | False |
-| src/utils/dct | 2 | 2 | 0 | 0 | False |
-| src/utils/deadzone | 2 | 2 | 0 | 0 | False |
-| src/utils/decomp | 2 | 2 | 0 | 0 | False |
-| src/utils/delta | 2 | 2 | 0 | 0 | False |
-| src/utils/deque | 2 | 2 | 0 | 0 | False |
-| src/utils/derivative | 2 | 2 | 0 | 0 | False |
-| src/utils/detector | 2 | 2 | 0 | 0 | False |
-| src/utils/detrend | 2 | 2 | 0 | 0 | False |
-| src/utils/dict | 2 | 2 | 0 | 0 | False |
-| src/utils/disjoint | 2 | 2 | 0 | 0 | False |
-| src/utils/divided_diff | 2 | 2 | 0 | 0 | False |
-| src/utils/dynhistogram | 2 | 2 | 0 | 0 | False |
-| src/utils/echohash | 2 | 2 | 0 | 0 | False |
-| src/utils/edgedetect | 2 | 2 | 0 | 0 | False |
-| src/utils/edmonds | 2 | 2 | 0 | 0 | False |
-| src/utils/ekf | 2 | 2 | 0 | 0 | False |
-| src/utils/emd | 2 | 2 | 0 | 0 | False |
-| src/utils/ensemble | 2 | 2 | 0 | 0 | False |
-| src/utils/entropy | 2 | 2 | 0 | 0 | False |
-| src/utils/envelope | 2 | 2 | 0 | 0 | False |
-| src/utils/expmove | 2 | 2 | 0 | 0 | False |
-| src/utils/farmhash | 2 | 2 | 0 | 0 | False |
-| src/utils/fcs | 2 | 2 | 0 | 0 | False |
-| src/utils/fenwick | 2 | 2 | 0 | 0 | False |
-| src/utils/fir | 2 | 2 | 0 | 0 | False |
-| src/utils/fisher | 2 | 2 | 0 | 0 | False |
-| src/utils/flow | 2 | 2 | 0 | 0 | False |
-| src/utils/fractal | 4 | 2 | 0 | 0 | False |
-| src/utils/freq | 2 | 2 | 0 | 0 | False |
 | src/utils/gabor | 2 | 2 | 0 | 0 | False |
 | src/utils/gauss_seidel | 2 | 2 | 0 | 0 | False |
 | src/utils/geo_dist | 2 | 2 | 0 | 0 | False |
@@ -417,6 +387,36 @@ Only the first 120 active utils directories are listed.
 | src/utils/normalize | 2 | 2 | 0 | 0 | False |
 | src/utils/notch | 2 | 2 | 0 | 0 | False |
 | src/utils/nqueens | 2 | 2 | 0 | 0 | False |
+| src/utils/nystrom | 2 | 2 | 0 | 0 | False |
+| src/utils/octree | 2 | 2 | 0 | 0 | False |
+| src/utils/ode | 2 | 2 | 0 | 0 | False |
+| src/utils/optimize | 2 | 2 | 0 | 0 | False |
+| src/utils/outlier | 2 | 2 | 0 | 0 | False |
+| src/utils/pade | 2 | 2 | 0 | 0 | False |
+| src/utils/pagerank | 2 | 2 | 0 | 0 | False |
+| src/utils/pca | 2 | 2 | 0 | 0 | False |
+| src/utils/peakdetect | 2 | 2 | 0 | 0 | False |
+| src/utils/peakhold | 2 | 2 | 0 | 0 | False |
+| src/utils/percentile | 2 | 2 | 0 | 0 | False |
+| src/utils/permutation | 2 | 2 | 0 | 0 | False |
+| src/utils/phase | 2 | 2 | 0 | 0 | False |
+| src/utils/pingpong | 2 | 2 | 0 | 0 | False |
+| src/utils/pipeline | 2 | 2 | 0 | 0 | True |
+| src/utils/pitch | 2 | 2 | 0 | 0 | False |
+| src/utils/point_location | 2 | 2 | 0 | 0 | False |
+| src/utils/polar | 4 | 2 | 0 | 0 | False |
+| src/utils/poly_interp | 2 | 2 | 0 | 0 | False |
+| src/utils/poly_roots | 2 | 2 | 0 | 0 | False |
+| src/utils/polygon | 2 | 2 | 0 | 0 | False |
+| src/utils/polyhash | 2 | 2 | 0 | 0 | False |
+| src/utils/polynomial_root | 2 | 2 | 0 | 0 | False |
+| src/utils/polyreg | 2 | 2 | 0 | 0 | False |
+| src/utils/powerquad | 2 | 2 | 0 | 0 | False |
+| src/utils/predictor | 2 | 2 | 0 | 0 | False |
+| src/utils/predictor_corrector | 2 | 2 | 0 | 0 | False |
+| src/utils/procrustes | 2 | 2 | 0 | 0 | False |
+| src/utils/qr | 2 | 2 | 0 | 0 | False |
+| src/utils/quadtree | 2 | 2 | 0 | 0 | False |
 
 Only the first 120 active utils dependency rows are listed.
 
@@ -425,36 +425,6 @@ Only the first 120 active utils dependency rows are listed.
 | Path | Files | Active CMake refs | External include refs | External modules |
 |------|-------|-------------------|-----------------------|------------------|
 | src/utils/scripting | 7 | 7 | 0 | 0 |
-| src/utils/davidson | 2 | 2 | 0 | 0 |
-| src/utils/dct | 2 | 2 | 0 | 0 |
-| src/utils/deadzone | 2 | 2 | 0 | 0 |
-| src/utils/decomp | 2 | 2 | 0 | 0 |
-| src/utils/delta | 2 | 2 | 0 | 0 |
-| src/utils/deque | 2 | 2 | 0 | 0 |
-| src/utils/derivative | 2 | 2 | 0 | 0 |
-| src/utils/detector | 2 | 2 | 0 | 0 |
-| src/utils/detrend | 2 | 2 | 0 | 0 |
-| src/utils/dict | 2 | 2 | 0 | 0 |
-| src/utils/disjoint | 2 | 2 | 0 | 0 |
-| src/utils/divided_diff | 2 | 2 | 0 | 0 |
-| src/utils/dynhistogram | 2 | 2 | 0 | 0 |
-| src/utils/echohash | 2 | 2 | 0 | 0 |
-| src/utils/edgedetect | 2 | 2 | 0 | 0 |
-| src/utils/edmonds | 2 | 2 | 0 | 0 |
-| src/utils/ekf | 2 | 2 | 0 | 0 |
-| src/utils/emd | 2 | 2 | 0 | 0 |
-| src/utils/ensemble | 2 | 2 | 0 | 0 |
-| src/utils/entropy | 2 | 2 | 0 | 0 |
-| src/utils/envelope | 2 | 2 | 0 | 0 |
-| src/utils/expmove | 2 | 2 | 0 | 0 |
-| src/utils/farmhash | 2 | 2 | 0 | 0 |
-| src/utils/fcs | 2 | 2 | 0 | 0 |
-| src/utils/fenwick | 2 | 2 | 0 | 0 |
-| src/utils/fir | 2 | 2 | 0 | 0 |
-| src/utils/fisher | 2 | 2 | 0 | 0 |
-| src/utils/flow | 2 | 2 | 0 | 0 |
-| src/utils/fractal | 4 | 2 | 0 | 0 |
-| src/utils/freq | 2 | 2 | 0 | 0 |
 | src/utils/gabor | 2 | 2 | 0 | 0 |
 | src/utils/gauss_seidel | 2 | 2 | 0 | 0 |
 | src/utils/geo_dist | 2 | 2 | 0 | 0 |
@@ -504,6 +474,36 @@ Only the first 120 active utils dependency rows are listed.
 | src/utils/lobatto | 2 | 2 | 0 | 0 |
 | src/utils/lomb | 2 | 2 | 0 | 0 |
 | src/utils/lpc | 2 | 2 | 0 | 0 |
+| src/utils/lrc | 2 | 2 | 0 | 0 |
+| src/utils/lzw | 2 | 2 | 0 | 0 |
+| src/utils/mahal | 2 | 2 | 0 | 0 |
+| src/utils/mass | 2 | 2 | 0 | 0 |
+| src/utils/matmul | 2 | 2 | 0 | 0 |
+| src/utils/mcmc | 2 | 2 | 0 | 0 |
+| src/utils/medfilt | 2 | 2 | 0 | 0 |
+| src/utils/median_abs | 2 | 2 | 0 | 0 |
+| src/utils/medoid | 2 | 2 | 0 | 0 |
+| src/utils/merger | 2 | 2 | 0 | 0 |
+| src/utils/mergesort | 2 | 2 | 0 | 0 |
+| src/utils/merkle | 2 | 2 | 0 | 0 |
+| src/utils/metro | 2 | 2 | 0 | 0 |
+| src/utils/mfcc | 2 | 2 | 0 | 0 |
+| src/utils/min_cut | 2 | 2 | 0 | 0 |
+| src/utils/min_rotation | 2 | 2 | 0 | 0 |
+| src/utils/minhash | 2 | 2 | 0 | 0 |
+| src/utils/minimizer | 2 | 2 | 0 | 0 |
+| src/utils/minres | 2 | 2 | 0 | 0 |
+| src/utils/modulation | 2 | 2 | 0 | 0 |
+| src/utils/monte | 2 | 2 | 0 | 0 |
+| src/utils/mst | 2 | 2 | 0 | 0 |
+| src/utils/multiproc | 2 | 2 | 0 | 0 |
+| src/utils/multiset | 2 | 2 | 0 | 0 |
+| src/utils/nelder_mead | 2 | 2 | 0 | 0 |
+| src/utils/ngram | 2 | 2 | 0 | 0 |
+| src/utils/norm_test | 2 | 2 | 0 | 0 |
+| src/utils/normalize | 2 | 2 | 0 | 0 |
+| src/utils/notch | 2 | 2 | 0 | 0 |
+| src/utils/nqueens | 2 | 2 | 0 | 0 |
 
 Only the first 80 low-risk active utils candidates are listed.
 
