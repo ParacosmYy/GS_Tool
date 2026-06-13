@@ -1,6 +1,7 @@
 #include "apps/serial_station/services/SerialProfileCatalogService.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtCore/QVariant>
 
 #include "utils/settings/SettingsManager.h"
@@ -36,9 +37,7 @@ bool SerialProfileCatalogService::recordProfilePath(const QString& filePath)
     }
 
     writeRecentPaths(paths);
-    m_settings->set(QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
-                                               QLatin1String(kLastProfileKey)),
-                    normalizedPath);
+    writeLastProfilePath(normalizedPath);
     m_settings->sync();
     return true;
 }
@@ -73,17 +72,42 @@ bool SerialProfileCatalogService::removeProfilePath(const QString& filePath)
     writeRecentPaths(paths);
     const QString currentLastPath = lastProfilePath();
     if (currentLastPath == normalizedPath || !paths.contains(currentLastPath)) {
-        const QString lastKey = QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
-                                                            QLatin1String(kLastProfileKey));
-        if (paths.isEmpty()) {
-            m_settings->remove(lastKey);
-        } else {
-            m_settings->set(lastKey, paths.first());
-        }
+        writeLastProfilePath(paths.isEmpty() ? QString() : paths.first());
     }
 
     m_settings->sync();
     return true;
+}
+
+int SerialProfileCatalogService::pruneMissingProfilePaths()
+{
+    const QStringList paths = normalizedRecentPaths();
+    QStringList existingPaths;
+    int removedCount = 0;
+    for (const QString& path : paths) {
+        if (QFileInfo::exists(path)) {
+            existingPaths.append(path);
+        } else {
+            ++removedCount;
+        }
+    }
+
+    if (removedCount > 0) {
+        writeRecentPaths(existingPaths);
+    }
+
+    const QString currentLastPath = lastProfilePath();
+    const bool hasUsableLast = !currentLastPath.isEmpty()
+        && existingPaths.contains(currentLastPath)
+        && QFileInfo::exists(currentLastPath);
+    if (!hasUsableLast) {
+        writeLastProfilePath(existingPaths.isEmpty() ? QString() : existingPaths.first());
+    }
+
+    if (removedCount > 0 || !hasUsableLast) {
+        m_settings->sync();
+    }
+    return removedCount;
 }
 
 QString SerialProfileCatalogService::lastProfilePath() const
@@ -137,6 +161,17 @@ void SerialProfileCatalogService::writeRecentPaths(const QStringList& paths)
     m_settings->set(QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
                                                 QLatin1String(kRecentProfilesKey)),
                     paths);
+}
+
+void SerialProfileCatalogService::writeLastProfilePath(const QString& path)
+{
+    const QString key = QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
+                                                    QLatin1String(kLastProfileKey));
+    if (path.isEmpty()) {
+        m_settings->remove(key);
+    } else {
+        m_settings->set(key, path);
+    }
 }
 
 } // namespace serial_station

@@ -55,10 +55,16 @@ private slots:
     void protocolSelectionUpdatesControllerAndLog();
     void workbenchExposesProfileControls();
     void workbenchExposesRecentProfileControls();
+    void workbenchExposesPruneMissingProfileControl();
     void loadingProfileAppliesWorkbenchState();
     void successfulProfileLoadUpdatesRecentCatalog();
     void failedProfileLoadDoesNotUpdateRecentCatalog();
     void reloadLastProfileAppliesPersistedCatalogPath();
+    void reloadLastProfileFallsBackToNextExistingRecentProfile();
+    void pruneMissingProfilesRemovesMissingCatalogEntries();
+    void clickingPruneMissingProfilesLogsRemovedCount();
+    void clickingPruneMissingProfilesLogsNoMissingWhenCatalogClean();
+    void pruneMissingProfilesKeepsExistingProfileFiles();
     void clearRecentProfilesDisablesCatalogControls();
     void clearRecentProfilesPersistsAcrossWindows();
     void clickingClearRecentProfilesLogsSystemMessage();
@@ -74,6 +80,8 @@ private slots:
     void loadingStartupLastProfileWithoutCatalogReportsFailure();
     void loadingStartupLastProfileAfterClearReportsFailure();
     void loadingStartupLastProfileMissingFileKeepsWorkbenchState();
+    void loadingStartupLastProfileFallsBackToNextExistingRecentProfile();
+    void loadingStartupLastProfilePrunesAllMissingAndReportsFailure();
     void loadingStartupLastProfileInvalidFileKeepsPreviousState();
     void loadingStartupLastProfileRefreshesRecentControls();
     void loadingMissingStartupProfileReportsFailure();
@@ -408,12 +416,25 @@ void SerialStationWorkbenchTest::workbenchExposesRecentProfileControls()
     auto* recentCombo = window.findChild<QComboBox*>(QStringLiteral("serialProfileRecentCombo"));
     auto* reloadButton = window.findChild<QPushButton*>(QStringLiteral("serialProfileReloadLastButton"));
     auto* clearButton = window.findChild<QPushButton*>(QStringLiteral("serialProfileClearRecentButton"));
+    auto* pruneButton = window.findChild<QPushButton*>(QStringLiteral("serialProfilePruneMissingButton"));
     QVERIFY(recentCombo != nullptr);
     QVERIFY(reloadButton != nullptr);
     QVERIFY(clearButton != nullptr);
+    QVERIFY(pruneButton != nullptr);
     QVERIFY(!recentCombo->isEnabled());
     QVERIFY(!reloadButton->isEnabled());
     QVERIFY(!clearButton->isEnabled());
+    QVERIFY(!pruneButton->isEnabled());
+}
+
+void SerialStationWorkbenchTest::workbenchExposesPruneMissingProfileControl()
+{
+    SerialStationWindow window;
+
+    auto* pruneButton = window.findChild<QPushButton*>(QStringLiteral("serialProfilePruneMissingButton"));
+    QVERIFY(pruneButton != nullptr);
+    QCOMPARE(pruneButton->text(), QStringLiteral("清理失效"));
+    QVERIFY(!pruneButton->isEnabled());
 }
 
 void SerialStationWorkbenchTest::loadingProfileAppliesWorkbenchState()
@@ -516,6 +537,134 @@ void SerialStationWorkbenchTest::reloadLastProfileAppliesPersistedCatalogPath()
     QCOMPARE(portPanel->currentConfig().portName, QStringLiteral("COM8"));
     QCOMPARE(commandPanel->commandText(), QStringLiteral("AA 55"));
     QVERIFY(logView->toPlainText().contains(QStringLiteral("重载上次配置档案")));
+}
+
+void SerialStationWorkbenchTest::reloadLastProfileFallsBackToNextExistingRecentProfile()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString existingPath = QDir(tempDir.path()).filePath(QStringLiteral("fallback.edserialprofile"));
+    const QString missingPath = QDir(tempDir.path()).filePath(QStringLiteral("missing.edserialprofile"));
+    SerialStationProfile fallbackProfile = sampleProfile();
+    fallbackProfile.port.portName = QStringLiteral("COM15");
+    fallbackProfile.commands = {{QStringLiteral("Fallback"), QStringLiteral("FALLBACK?"), QStringLiteral("ascii")}};
+    fallbackProfile.sendMode = QStringLiteral("ascii");
+    QVERIFY(service.saveToFile(fallbackProfile, existingPath).ok);
+
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(existingPath));
+    QVERIFY(catalog.recordProfilePath(missingPath));
+
+    SerialStationWindow window;
+    QVERIFY(window.reloadLastProfile());
+
+    auto* portPanel = window.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel"));
+    auto* commandPanel = window.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(portPanel != nullptr);
+    QVERIFY(commandPanel != nullptr);
+    QVERIFY(logView != nullptr);
+    QCOMPARE(window.recentProfilePaths(), QStringList({existingPath}));
+    QCOMPARE(window.lastProfilePath(), existingPath);
+    QCOMPARE(portPanel->currentConfig().portName, QStringLiteral("COM15"));
+    QCOMPARE(commandPanel->commandText(), QStringLiteral("FALLBACK?"));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("已清理失效配置档案: 1")));
+}
+
+void SerialStationWorkbenchTest::pruneMissingProfilesRemovesMissingCatalogEntries()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString existingPath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    const QString missingPath = QDir(tempDir.path()).filePath(QStringLiteral("missing.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), existingPath).ok);
+
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(existingPath));
+    QVERIFY(catalog.recordProfilePath(missingPath));
+
+    SerialStationWindow window;
+    QCOMPARE(window.pruneMissingProfiles(), 1);
+
+    auto* recentCombo = window.findChild<QComboBox*>(QStringLiteral("serialProfileRecentCombo"));
+    auto* pruneButton = window.findChild<QPushButton*>(QStringLiteral("serialProfilePruneMissingButton"));
+    QVERIFY(recentCombo != nullptr);
+    QVERIFY(pruneButton != nullptr);
+    QCOMPARE(window.recentProfilePaths(), QStringList({existingPath}));
+    QCOMPARE(window.lastProfilePath(), existingPath);
+    QCOMPARE(recentCombo->count(), 1);
+    QCOMPARE(recentCombo->itemData(0).toString(), existingPath);
+    QVERIFY(pruneButton->isEnabled());
+}
+
+void SerialStationWorkbenchTest::clickingPruneMissingProfilesLogsRemovedCount()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString existingPath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    const QString missingPath = QDir(tempDir.path()).filePath(QStringLiteral("missing.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), existingPath).ok);
+
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(existingPath));
+    QVERIFY(catalog.recordProfilePath(missingPath));
+
+    SerialStationWindow window;
+    auto* pruneButton = window.findChild<QPushButton*>(QStringLiteral("serialProfilePruneMissingButton"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(pruneButton != nullptr);
+    QVERIFY(logView != nullptr);
+    QVERIFY(pruneButton->isEnabled());
+
+    QTest::mouseClick(pruneButton, Qt::LeftButton);
+
+    QCOMPARE(window.recentProfilePaths(), QStringList({existingPath}));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("已清理失效配置档案: 1")));
+}
+
+void SerialStationWorkbenchTest::clickingPruneMissingProfilesLogsNoMissingWhenCatalogClean()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString existingPath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), existingPath).ok);
+
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(existingPath));
+
+    SerialStationWindow window;
+    auto* pruneButton = window.findChild<QPushButton*>(QStringLiteral("serialProfilePruneMissingButton"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(pruneButton != nullptr);
+    QVERIFY(logView != nullptr);
+    QVERIFY(pruneButton->isEnabled());
+
+    QTest::mouseClick(pruneButton, Qt::LeftButton);
+
+    QCOMPARE(window.recentProfilePaths(), QStringList({existingPath}));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("没有失效配置档案")));
+}
+
+void SerialStationWorkbenchTest::pruneMissingProfilesKeepsExistingProfileFiles()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString existingPath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), existingPath).ok);
+
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(existingPath));
+
+    SerialStationWindow window;
+    QCOMPARE(window.pruneMissingProfiles(), 0);
+
+    QVERIFY(QFile::exists(existingPath));
+    QCOMPARE(window.recentProfilePaths(), QStringList({existingPath}));
 }
 
 void SerialStationWorkbenchTest::clearRecentProfilesDisablesCatalogControls()
@@ -870,7 +1019,70 @@ void SerialStationWorkbenchTest::loadingStartupLastProfileMissingFileKeepsWorkbe
 
     QCOMPARE(portPanel->currentConfig().portName, originalConfig.portName);
     QCOMPARE(commandPanel->commandText(), originalCommand);
-    QVERIFY(logView->toPlainText().contains(QStringLiteral("启动档案加载失败")));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("已清理失效配置档案: 1")));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("没有可用于启动的上次配置档案")));
+}
+
+void SerialStationWorkbenchTest::loadingStartupLastProfileFallsBackToNextExistingRecentProfile()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString existingPath = QDir(tempDir.path()).filePath(QStringLiteral("fallback.edserialprofile"));
+    const QString missingPath = QDir(tempDir.path()).filePath(QStringLiteral("missing.edserialprofile"));
+    SerialStationProfile fallbackProfile = sampleProfile();
+    fallbackProfile.name = QStringLiteral("Fallback Line");
+    fallbackProfile.port.portName = QStringLiteral("COM16");
+    fallbackProfile.commands = {{QStringLiteral("Fallback"), QStringLiteral("PING?"), QStringLiteral("ascii")}};
+    fallbackProfile.sendMode = QStringLiteral("ascii");
+    QVERIFY(service.saveToFile(fallbackProfile, existingPath).ok);
+
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(existingPath));
+    QVERIFY(catalog.recordProfilePath(missingPath));
+
+    SerialStationWindow window;
+    QVERIFY(window.loadStartupLastProfile());
+
+    auto* portPanel = window.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel"));
+    auto* commandPanel = window.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(portPanel != nullptr);
+    QVERIFY(commandPanel != nullptr);
+    QVERIFY(logView != nullptr);
+    QCOMPARE(window.recentProfilePaths(), QStringList({existingPath}));
+    QCOMPARE(window.lastProfilePath(), existingPath);
+    QCOMPARE(portPanel->currentConfig().portName, QStringLiteral("COM16"));
+    QCOMPARE(commandPanel->commandText(), QStringLiteral("PING?"));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("已清理失效配置档案: 1")));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("启动上次配置档案")));
+}
+
+void SerialStationWorkbenchTest::loadingStartupLastProfilePrunesAllMissingAndReportsFailure()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString firstMissing = QDir(tempDir.path()).filePath(QStringLiteral("first-missing.edserialprofile"));
+    const QString secondMissing = QDir(tempDir.path()).filePath(QStringLiteral("second-missing.edserialprofile"));
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(firstMissing));
+    QVERIFY(catalog.recordProfilePath(secondMissing));
+
+    SerialStationWindow window;
+    QVERIFY(!window.loadStartupLastProfile());
+
+    auto* recentCombo = window.findChild<QComboBox*>(QStringLiteral("serialProfileRecentCombo"));
+    auto* reloadButton = window.findChild<QPushButton*>(QStringLiteral("serialProfileReloadLastButton"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(recentCombo != nullptr);
+    QVERIFY(reloadButton != nullptr);
+    QVERIFY(logView != nullptr);
+    QVERIFY(window.recentProfilePaths().isEmpty());
+    QCOMPARE(window.lastProfilePath(), QString());
+    QCOMPARE(recentCombo->count(), 0);
+    QVERIFY(!reloadButton->isEnabled());
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("已清理失效配置档案: 2")));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("没有可用于启动的上次配置档案")));
 }
 
 void SerialStationWorkbenchTest::loadingStartupLastProfileInvalidFileKeepsPreviousState()

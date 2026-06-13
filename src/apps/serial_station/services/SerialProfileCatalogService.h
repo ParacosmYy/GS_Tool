@@ -42,6 +42,12 @@ public:
     bool removeProfilePath(const QString& filePath);
 
     /**
+     * @brief 移除索引中已不存在的档案路径。
+     * @return 被移除的失效路径数量
+     */
+    int pruneMissingProfilePaths();
+
+    /**
      * @brief 最近一次成功使用的档案路径。
      */
     QString lastProfilePath() const;
@@ -55,6 +61,7 @@ private:
     QString normalizePath(const QString& filePath) const;
     QStringList normalizedRecentPaths() const;
     void writeRecentPaths(const QStringList& paths);
+    void writeLastProfilePath(const QString& path);
 
     SettingsManager* m_settings = nullptr; ///< 应用配置管理器，默认复用全局 SettingsManager
 };

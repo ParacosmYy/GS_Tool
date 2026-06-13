@@ -97,6 +97,8 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
 
     m_reloadLastProfileButton = new QPushButton(tr("重载上次"), profileToolbar);
     m_reloadLastProfileButton->setObjectName(QStringLiteral("serialProfileReloadLastButton"));
+    m_pruneMissingProfilesButton = new QPushButton(tr("清理失效"), profileToolbar);
+    m_pruneMissingProfilesButton->setObjectName(QStringLiteral("serialProfilePruneMissingButton"));
     m_clearRecentProfilesButton = new QPushButton(tr("清空最近"), profileToolbar);
     m_clearRecentProfilesButton->setObjectName(QStringLiteral("serialProfileClearRecentButton"));
 
@@ -108,6 +110,7 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     profileToolbarLayout->addWidget(recentProfileLabel);
     profileToolbarLayout->addWidget(m_recentProfileCombo, 1);
     profileToolbarLayout->addWidget(m_reloadLastProfileButton);
+    profileToolbarLayout->addWidget(m_pruneMissingProfilesButton);
     profileToolbarLayout->addWidget(m_clearRecentProfilesButton);
     profileToolbarLayout->addWidget(loadProfileButton);
     profileToolbarLayout->addWidget(saveProfileButton);
@@ -234,6 +237,10 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             this, &SerialStationWindow::loadProfileWithDialog);
     connect(m_reloadLastProfileButton, &QPushButton::clicked,
             this, &SerialStationWindow::reloadLastProfile);
+    connect(m_pruneMissingProfilesButton, &QPushButton::clicked,
+            this, [this]() {
+                pruneMissingProfiles();
+            });
     connect(m_clearRecentProfilesButton, &QPushButton::clicked,
             this, &SerialStationWindow::clearRecentProfiles);
     connect(m_recentProfileCombo, QOverload<int>::of(&QComboBox::activated),
@@ -288,6 +295,7 @@ bool SerialStationWindow::loadStartupProfile(const QString& filePath)
 
 bool SerialStationWindow::loadStartupLastProfile()
 {
+    pruneMissingProfiles(false);
     const QString path = lastProfilePath();
     if (path.isEmpty()) {
         m_logPanel->appendSystem(tr("没有可用于启动的上次配置档案"));
@@ -311,6 +319,7 @@ QString SerialStationWindow::lastProfilePath() const
 
 bool SerialStationWindow::reloadLastProfile()
 {
+    pruneMissingProfiles(false);
     const QString path = lastProfilePath();
     if (path.isEmpty()) {
         m_logPanel->appendSystem(tr("没有可重载的配置档案"));
@@ -323,6 +332,11 @@ bool SerialStationWindow::reloadLastProfile()
         m_logPanel->appendSystem(tr("重载上次配置档案: %1").arg(path));
     }
     return result.ok;
+}
+
+int SerialStationWindow::pruneMissingProfiles()
+{
+    return pruneMissingProfiles(true);
 }
 
 bool SerialStationWindow::clearRecentProfiles()
@@ -377,9 +391,22 @@ void SerialStationWindow::recordSuccessfulProfilePath(const QString& filePath)
     }
 }
 
+int SerialStationWindow::pruneMissingProfiles(bool logWhenEmpty)
+{
+    const int removedCount = m_profileCatalog->pruneMissingProfilePaths();
+    refreshProfileCatalogUi();
+    if (removedCount > 0) {
+        m_logPanel->appendSystem(tr("已清理失效配置档案: %1").arg(removedCount));
+    } else if (logWhenEmpty) {
+        m_logPanel->appendSystem(tr("没有失效配置档案"));
+    }
+    return removedCount;
+}
+
 void SerialStationWindow::refreshProfileCatalogUi()
 {
-    if (!m_recentProfileCombo || !m_reloadLastProfileButton || !m_clearRecentProfilesButton) {
+    if (!m_recentProfileCombo || !m_reloadLastProfileButton
+        || !m_pruneMissingProfilesButton || !m_clearRecentProfilesButton) {
         return;
     }
 
@@ -396,6 +423,7 @@ void SerialStationWindow::refreshProfileCatalogUi()
     const bool hasLastProfile = !lastProfilePath().isEmpty();
     m_recentProfileCombo->setEnabled(!paths.isEmpty());
     m_reloadLastProfileButton->setEnabled(hasLastProfile);
+    m_pruneMissingProfilesButton->setEnabled(!paths.isEmpty());
     m_clearRecentProfilesButton->setEnabled(!paths.isEmpty() || hasLastProfile);
 }
 

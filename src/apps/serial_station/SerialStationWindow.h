@@ -76,6 +76,12 @@ public:
     bool reloadLastProfile();
 
     /**
+     * @brief 清理最近档案中已不存在的路径。
+     * @return 被清理的失效档案数量
+     */
+    int pruneMissingProfiles();
+
+    /**
      * @brief 清空最近配置档案索引。
      * @return true 表示清空前存在最近档案
      */
@@ -88,6 +94,7 @@ private:
     void applyProfileToUi(const SerialStationProfile& profile);
     void recordSuccessfulProfilePath(const QString& filePath);
     void refreshProfileCatalogUi();
+    int pruneMissingProfiles(bool logWhenEmpty);
     void saveProfileWithDialog();
     void loadProfileWithDialog();
     void loadSelectedRecentProfile(int index);
@@ -101,6 +108,7 @@ private:
     SerialStatusBar* m_statusBar = nullptr;
     QComboBox* m_recentProfileCombo = nullptr;
     QPushButton* m_reloadLastProfileButton = nullptr;
+    QPushButton* m_pruneMissingProfilesButton = nullptr;
     QPushButton* m_clearRecentProfilesButton = nullptr;
 };
 
