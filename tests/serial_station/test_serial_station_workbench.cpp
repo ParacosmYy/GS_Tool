@@ -54,6 +54,10 @@ private slots:
     void workbenchExposesProtocolSelectionControls();
     void protocolSelectionUpdatesControllerAndLog();
     void workbenchExposesProfileControls();
+    void defaultProfileDirectoryStartsWithFallbackPath();
+    void settingDefaultProfileDirectoryNormalizesPath();
+    void settingBlankDefaultProfileDirectoryRestoresFallbackPath();
+    void settingDefaultProfileDirectoryKeepsExistingProfileCatalog();
     void workbenchExposesRecentProfileControls();
     void workbenchExposesPruneMissingProfileControl();
     void loadingProfileAppliesWorkbenchState();
@@ -407,6 +411,60 @@ void SerialStationWorkbenchTest::workbenchExposesProfileControls()
 
     QVERIFY(window.findChild<QPushButton*>(QStringLiteral("serialProfileSaveButton")) != nullptr);
     QVERIFY(window.findChild<QPushButton*>(QStringLiteral("serialProfileLoadButton")) != nullptr);
+}
+
+void SerialStationWorkbenchTest::defaultProfileDirectoryStartsWithFallbackPath()
+{
+    SerialStationWindow window;
+
+    QVERIFY(!window.defaultProfileDirectory().isEmpty());
+    QVERIFY(QDir(window.defaultProfileDirectory()).isAbsolute());
+}
+
+void SerialStationWorkbenchTest::settingDefaultProfileDirectoryNormalizesPath()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QVERIFY(dir.mkpath(QStringLiteral("profiles/line-a")));
+    const QString rawPath = dir.filePath(QStringLiteral("profiles/./line-a"));
+    const QString expectedPath = QDir::cleanPath(rawPath);
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(rawPath);
+
+    QCOMPARE(window.defaultProfileDirectory(), expectedPath);
+}
+
+void SerialStationWorkbenchTest::settingBlankDefaultProfileDirectoryRestoresFallbackPath()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+
+    SerialStationWindow window;
+    const QString fallbackPath = window.defaultProfileDirectory();
+    window.setDefaultProfileDirectory(QDir(tempDir.path()).filePath(QStringLiteral("profiles")));
+    QVERIFY(window.defaultProfileDirectory() != fallbackPath);
+
+    window.setDefaultProfileDirectory(QStringLiteral("   "));
+
+    QCOMPARE(window.defaultProfileDirectory(), fallbackPath);
+}
+
+void SerialStationWorkbenchTest::settingDefaultProfileDirectoryKeepsExistingProfileCatalog()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString profilePath = QDir(tempDir.path()).filePath(QStringLiteral("line-a.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), profilePath).ok);
+
+    SerialStationWindow window;
+    QVERIFY(window.loadProfileFromFile(profilePath).ok);
+    window.setDefaultProfileDirectory(QDir(tempDir.path()).filePath(QStringLiteral("profiles")));
+
+    QCOMPARE(window.recentProfilePaths(), QStringList({profilePath}));
+    QCOMPARE(window.lastProfilePath(), profilePath);
 }
 
 void SerialStationWorkbenchTest::workbenchExposesRecentProfileControls()

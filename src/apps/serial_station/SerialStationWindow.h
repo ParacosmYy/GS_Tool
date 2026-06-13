@@ -48,6 +48,17 @@ public:
     SerialProfileResult loadProfileFromFile(const QString& filePath);
 
     /**
+     * @brief 设置保存/加载配置档案对话框的默认目录。
+     * @param directoryPath 目录路径；为空时恢复系统默认目录
+     */
+    void setDefaultProfileDirectory(const QString& directoryPath);
+
+    /**
+     * @brief 当前保存/加载配置档案对话框的默认目录。
+     */
+    QString defaultProfileDirectory() const;
+
+    /**
      * @brief 启动阶段加载配置档案。
      * @return true 表示档案已成功应用；失败时保持工站打开供用户修正
      */
@@ -106,6 +117,7 @@ private:
     SerialCommandPanel* m_commandPanel = nullptr;
     SerialLogPanel* m_logPanel = nullptr;
     SerialStatusBar* m_statusBar = nullptr;
+    QString m_defaultProfileDirectory; ///< 档案保存/加载对话框默认目录
     QComboBox* m_recentProfileCombo = nullptr;
     QPushButton* m_reloadLastProfileButton = nullptr;
     QPushButton* m_pruneMissingProfilesButton = nullptr;

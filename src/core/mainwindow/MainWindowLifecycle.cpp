@@ -55,13 +55,19 @@ bool MainWindow::applyStartupOptions(const StartupOptions& options)
         routeOk = openPanelById(options.panelId());
     }
 
-    if (options.profileFilePath().isEmpty() && !options.loadLastProfile()) {
+    if (options.profileFilePath().isEmpty()
+        && options.profileDirectoryPath().isEmpty()
+        && !options.loadLastProfile()) {
         return routeOk;
     }
 
     auto* serialStation = m_panelManager ? m_panelManager->serialStationWindow() : nullptr;
     if (!serialStation) {
         return false;
+    }
+    serialStation->setDefaultProfileDirectory(options.profileDirectoryPath());
+    if (options.profileFilePath().isEmpty() && !options.loadLastProfile()) {
+        return routeOk;
     }
     if (!options.profileFilePath().isEmpty()) {
         return routeOk && serialStation->loadStartupProfile(options.profileFilePath());

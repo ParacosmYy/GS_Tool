@@ -50,6 +50,7 @@ set(SOURCES
     src/core/factory/WidgetFactory.cpp
     src/apps/serial_station/SerialStationApp.cpp
     src/apps/serial_station/SerialStationWindow.cpp
+    src/apps/serial_station/SerialStationWindowProfiles.cpp
     src/apps/serial_station/SerialStationController.cpp
     src/apps/serial_station/SerialStationControllerExport.cpp
     src/apps/serial_station/SerialStationControllerReplay.cpp

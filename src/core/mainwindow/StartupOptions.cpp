@@ -67,9 +67,11 @@ bool parseBooleanFlagValue(const QString& rawValue, bool* ok)
 
 StartupOptions::StartupOptions(const QString& panelId,
                                const QString& profileFilePath,
+                               const QString& profileDirectoryPath,
                                bool loadLastProfile)
     : m_panelId(panelId.trimmed())
     , m_profileFilePath(profileFilePath.trimmed())
+    , m_profileDirectoryPath(profileDirectoryPath.trimmed())
     , m_loadLastProfile(loadLastProfile)
 {
 }
@@ -78,6 +80,7 @@ StartupOptions StartupOptions::fromArguments(const QStringList& arguments)
 {
     QString panelId;
     QString profileFilePath;
+    QString profileDirectoryPath;
     bool loadLastProfile = false;
 
     for (int index = 1; index < arguments.size(); ++index) {
@@ -85,7 +88,7 @@ StartupOptions StartupOptions::fromArguments(const QStringList& arguments)
         if (argument == QStringLiteral("--panel")) {
             const QString value = valueAfterFlag(arguments, index);
             if (value.isEmpty()) {
-                return StartupOptions({}, {}, false);
+                return StartupOptions({}, {}, {}, false);
             }
             panelId = value;
             ++index;
@@ -98,7 +101,7 @@ StartupOptions StartupOptions::fromArguments(const QStringList& arguments)
         if (argument == QStringLiteral("--station")) {
             const QString value = valueAfterFlag(arguments, index);
             if (value.isEmpty()) {
-                return StartupOptions({}, {}, false);
+                return StartupOptions({}, {}, {}, false);
             }
             panelId = stationAliasToPanelId(value);
             ++index;
@@ -116,7 +119,7 @@ StartupOptions StartupOptions::fromArguments(const QStringList& arguments)
                     && isLastProfileFlagArgument(arguments.at(nextIndex).trimmed())) {
                     continue;
                 }
-                return StartupOptions({}, {}, false);
+                return StartupOptions({}, {}, {}, false);
             }
             profileFilePath = value;
             ++index;
@@ -128,6 +131,30 @@ StartupOptions StartupOptions::fromArguments(const QStringList& arguments)
         }
         if (argument.startsWith(QStringLiteral("--serial-profile="))) {
             profileFilePath = argument.mid(QStringLiteral("--serial-profile=").size()).trimmed();
+            continue;
+        }
+        if (argument == QStringLiteral("--profile-dir")
+            || argument == QStringLiteral("--serial-profile-dir")) {
+            const QString value = valueAfterFlag(arguments, index);
+            if (value.isEmpty()) {
+                return StartupOptions({}, {}, {}, false);
+            }
+            profileDirectoryPath = value;
+            ++index;
+            continue;
+        }
+        if (argument.startsWith(QStringLiteral("--profile-dir="))) {
+            const QString value = argument.mid(QStringLiteral("--profile-dir=").size()).trimmed();
+            if (!value.isEmpty()) {
+                profileDirectoryPath = value;
+            }
+            continue;
+        }
+        if (argument.startsWith(QStringLiteral("--serial-profile-dir="))) {
+            const QString value = argument.mid(QStringLiteral("--serial-profile-dir=").size()).trimmed();
+            if (!value.isEmpty()) {
+                profileDirectoryPath = value;
+            }
             continue;
         }
         if (argument == QStringLiteral("--last-profile")
@@ -148,10 +175,11 @@ StartupOptions StartupOptions::fromArguments(const QStringList& arguments)
             continue;
         }
     }
-    if ((!profileFilePath.isEmpty() || loadLastProfile) && panelId.isEmpty()) {
+    if ((!profileFilePath.isEmpty() || !profileDirectoryPath.isEmpty() || loadLastProfile)
+        && panelId.isEmpty()) {
         panelId = QStringLiteral("serial.station");
     }
-    return StartupOptions(panelId, profileFilePath, loadLastProfile);
+    return StartupOptions(panelId, profileFilePath, profileDirectoryPath, loadLastProfile);
 }
 
 QString StartupOptions::panelId() const
@@ -162,6 +190,11 @@ QString StartupOptions::panelId() const
 QString StartupOptions::profileFilePath() const
 {
     return m_profileFilePath;
+}
+
+QString StartupOptions::profileDirectoryPath() const
+{
+    return m_profileDirectoryPath;
 }
 
 bool StartupOptions::loadLastProfile() const

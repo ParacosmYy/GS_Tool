@@ -39,6 +39,12 @@ public:
     QString profileFilePath() const;
 
     /**
+     * @brief 获取 Serial Station 配置档案默认目录。
+     * @return 档案目录；为空表示使用工作台默认目录
+     */
+    QString profileDirectoryPath() const;
+
+    /**
      * @brief 是否请求加载 Serial Station 最近一次成功使用的配置档案。
      * @return true 表示未提供显式档案路径时应尝试加载上次档案
      */
@@ -47,9 +53,11 @@ public:
 private:
     StartupOptions(const QString& panelId,
                    const QString& profileFilePath,
+                   const QString& profileDirectoryPath,
                    bool loadLastProfile); ///< 写入已标准化启动选项
     QString m_panelId; ///< 启动后需要打开的稳定面板ID
     QString m_profileFilePath; ///< 启动后需要加载的 Serial Station 档案路径
+    QString m_profileDirectoryPath; ///< Serial Station 档案保存/加载默认目录
     bool m_loadLastProfile = false; ///< 是否加载最近一次成功使用的 Serial Station 档案
 };
 

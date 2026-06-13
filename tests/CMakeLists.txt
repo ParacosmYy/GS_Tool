@@ -1356,6 +1356,7 @@ add_test(NAME SerialProfileCatalogService COMMAND test_serial_profile_catalog_se
 add_executable(test_serial_station_replay_flow
     serial_station/test_serial_station_replay_flow.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationWindow.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationWindowProfiles.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerExport.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerReplay.cpp
@@ -1536,6 +1537,7 @@ add_test(NAME SerialStationController COMMAND test_serial_station_controller)
 add_executable(test_serial_station_workbench
     serial_station/test_serial_station_workbench.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationWindow.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationWindowProfiles.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationController.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerExport.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/SerialStationControllerReplay.cpp

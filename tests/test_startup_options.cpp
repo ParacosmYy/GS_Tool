@@ -62,6 +62,21 @@ private slots:
     void lastProfileFlagCanAppearBetweenProfileFlagAndValue();
     void lastProfileEqualsTrueKeepsExplicitPanel();
     void serialLastProfileFlagDoesNotConsumeStationFlag();
+    void parsesProfileDirectoryFlagAndRoutesToSerialStation();
+    void parsesProfileDirectoryEqualsAndRoutesToSerialStation();
+    void parsesSerialProfileDirectoryFlagAndRoutesToSerialStation();
+    void parsesSerialProfileDirectoryEqualsAndRoutesToSerialStation();
+    void trimsProfileDirectoryValues();
+    void ignoresEmptyProfileDirectoryEquals();
+    void rejectsMissingProfileDirectoryValue();
+    void preservesExplicitPanelWhenProfileDirectoryIsProvided();
+    void explicitProfileWinsOverProfileDirectory();
+    void lastProfileWorksWithProfileDirectory();
+    void lastProfileDirectoryLikeArgumentWins();
+    void emptyProfileDirectoryEqualsDoesNotClearExistingDirectory();
+    void profileDirectoryWithUnknownStationFallsBackToSerialStation();
+    void profileDirectoryPathWithSpacesIsPreserved();
+    void profileDirectoryStillRoutesWhenLastProfileIsFalse();
 };
 
 void StartupOptionsTest::keepsEmptyPanelWhenNoStartupTarget()
@@ -739,6 +754,187 @@ void StartupOptionsTest::serialLastProfileFlagDoesNotConsumeStationFlag()
     QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
     QVERIFY(options.loadLastProfile());
     QCOMPARE(options.profileFilePath(), QString());
+}
+
+void StartupOptionsTest::parsesProfileDirectoryFlagAndRoutesToSerialStation()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--profile-dir"),
+        QStringLiteral("profiles/line-a"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles/line-a"));
+}
+
+void StartupOptionsTest::parsesProfileDirectoryEqualsAndRoutesToSerialStation()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--profile-dir=C:/Factory Profiles"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("C:/Factory Profiles"));
+}
+
+void StartupOptionsTest::parsesSerialProfileDirectoryFlagAndRoutesToSerialStation()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--serial-profile-dir"),
+        QStringLiteral("profiles/line-b"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles/line-b"));
+}
+
+void StartupOptionsTest::parsesSerialProfileDirectoryEqualsAndRoutesToSerialStation()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--serial-profile-dir=profiles/line-c"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles/line-c"));
+}
+
+void StartupOptionsTest::trimsProfileDirectoryValues()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--profile-dir"),
+        QStringLiteral("  profiles/line-a  "),
+    });
+
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles/line-a"));
+}
+
+void StartupOptionsTest::ignoresEmptyProfileDirectoryEquals()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--profile-dir="),
+    });
+
+    QCOMPARE(options.panelId(), QString());
+    QCOMPARE(options.profileDirectoryPath(), QString());
+}
+
+void StartupOptionsTest::rejectsMissingProfileDirectoryValue()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--profile-dir"),
+        QStringLiteral("--station"),
+        QStringLiteral("serial"),
+    });
+
+    QCOMPARE(options.panelId(), QString());
+    QCOMPARE(options.profileDirectoryPath(), QString());
+}
+
+void StartupOptionsTest::preservesExplicitPanelWhenProfileDirectoryIsProvided()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--panel=diagnostics.dashboard"),
+        QStringLiteral("--profile-dir=profiles/line-a"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("diagnostics.dashboard"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles/line-a"));
+}
+
+void StartupOptionsTest::explicitProfileWinsOverProfileDirectory()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--profile-dir=profiles"),
+        QStringLiteral("--profile=profiles/line-a.edserialprofile"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles"));
+    QCOMPARE(options.profileFilePath(), QStringLiteral("profiles/line-a.edserialprofile"));
+}
+
+void StartupOptionsTest::lastProfileWorksWithProfileDirectory()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--serial-profile-dir=profiles"),
+        QStringLiteral("--last-profile"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles"));
+    QVERIFY(options.loadLastProfile());
+}
+
+void StartupOptionsTest::lastProfileDirectoryLikeArgumentWins()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--profile-dir=profiles/line-a"),
+        QStringLiteral("--serial-profile-dir"),
+        QStringLiteral("profiles/line-b"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles/line-b"));
+}
+
+void StartupOptionsTest::emptyProfileDirectoryEqualsDoesNotClearExistingDirectory()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--profile-dir=profiles/line-a"),
+        QStringLiteral("--serial-profile-dir="),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles/line-a"));
+}
+
+void StartupOptionsTest::profileDirectoryWithUnknownStationFallsBackToSerialStation()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--station=unknown"),
+        QStringLiteral("--profile-dir=profiles/line-a"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles/line-a"));
+}
+
+void StartupOptionsTest::profileDirectoryPathWithSpacesIsPreserved()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--serial-profile-dir"),
+        QStringLiteral("C:/Factory Profiles/Line A"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("C:/Factory Profiles/Line A"));
+}
+
+void StartupOptionsTest::profileDirectoryStillRoutesWhenLastProfileIsFalse()
+{
+    const StartupOptions options = StartupOptions::fromArguments({
+        QStringLiteral("EmbedDebug.exe"),
+        QStringLiteral("--profile-dir=profiles/line-a"),
+        QStringLiteral("--last-profile=false"),
+    });
+
+    QCOMPARE(options.panelId(), QStringLiteral("serial.station"));
+    QCOMPARE(options.profileDirectoryPath(), QStringLiteral("profiles/line-a"));
+    QVERIFY(!options.loadLastProfile());
 }
 
 QTEST_MAIN(StartupOptionsTest)
