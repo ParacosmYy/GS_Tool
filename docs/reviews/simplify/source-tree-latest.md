@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-13 17:35:15
+- Generated: 2026-06-13 17:45:04
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -9,11 +9,11 @@
 | Metric | Value |
 |--------|-------|
 | Working tree source files under src | 82048 |
-| Raw CMake source references | 6007 |
-| Declared CMake source references | 5901 |
-| Active CMake source references | 1600 |
+| Raw CMake source references | 5962 |
+| Declared CMake source references | 5856 |
+| Active CMake source references | 1555 |
 | Filtered utils references | 4301 |
-| Source files not active in CMake | 80473 |
+| Source files not active in CMake | 80518 |
 | Existing src/apps/serial_station files | 50 |
 | CMake refs under src/apps/serial_station | 50 |
 | Generated-looking utils directories | 39670 |
@@ -45,7 +45,7 @@
 
 | Module | References |
 |--------|------------|
-| utils | 737 |
+| utils | 692 |
 | core | 190 |
 | connection | 153 |
 | protocol | 151 |
@@ -180,22 +180,7 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/timestamp | 5 | 5 |
 | src/utils/crypto | 4 | 4 |
 | src/utils/settings | 3 | 4 |
-| src/utils/align | 4 | 3 |
-| src/utils/annotation | 10 | 3 |
-| src/utils/compress | 3 | 3 |
 | src/utils/data | 4 | 3 |
-| src/utils/data_inspector | 3 | 3 |
-| src/utils/decoder | 3 | 3 |
-| src/utils/encoder | 3 | 3 |
-| src/utils/frequency | 3 | 3 |
-| src/utils/fuzzer | 3 | 3 |
-| src/utils/loss | 3 | 3 |
-| src/utils/protocol_timer | 3 | 3 |
-| src/utils/recorder | 3 | 3 |
-| src/utils/signal_gen | 3 | 3 |
-| src/utils/splitter | 3 | 3 |
-| src/utils/template_lib | 3 | 3 |
-| src/utils/validator | 3 | 3 |
 | src/utils/adams | 2 | 2 |
 | src/utils/adaptive_fft | 2 | 2 |
 | src/utils/agc | 2 | 2 |
@@ -290,6 +275,21 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/gauss_seidel | 2 | 2 |
 | src/utils/geo_dist | 2 | 2 |
 | src/utils/glm | 2 | 2 |
+| src/utils/gmixture | 2 | 2 |
+| src/utils/gmres | 2 | 2 |
+| src/utils/gof | 2 | 2 |
+| src/utils/golomb | 2 | 2 |
+| src/utils/gradient | 2 | 2 |
+| src/utils/gram_schmidt | 2 | 2 |
+| src/utils/graph | 2 | 2 |
+| src/utils/greville | 2 | 2 |
+| src/utils/haar | 2 | 2 |
+| src/utils/hankel | 2 | 2 |
+| src/utils/hanoi | 2 | 2 |
+| src/utils/hermite | 2 | 2 |
+| src/utils/hilbert | 2 | 2 |
+| src/utils/histogram | 2 | 2 |
+| src/utils/holtwinters | 2 | 2 |
 
 Only the first 120 active utils directories are listed.
 
@@ -297,7 +297,7 @@ Only the first 120 active utils directories are listed.
 
 | Path | Files | Active CMake refs | External include refs | External modules | Canonical |
 |------|-------|-------------------|-----------------------|------------------|-----------|
-| src/utils/crypto | 4 | 4 | 29 | 7 | True |
+| src/utils/crypto | 4 | 4 | 28 | 7 | True |
 | src/utils/settings | 3 | 4 | 12 | 4 | True |
 | src/utils/data | 4 | 3 | 11 | 4 | True |
 | src/utils/log | 9 | 9 | 6 | 1 | True |
@@ -308,21 +308,6 @@ Only the first 120 active utils directories are listed.
 | src/utils/timestamp | 5 | 5 | 4 | 1 | True |
 | src/utils/export | 16 | 16 | 3 | 1 | True |
 | src/utils/scripting | 7 | 7 | 0 | 0 | False |
-| src/utils/align | 4 | 3 | 0 | 0 | False |
-| src/utils/annotation | 10 | 3 | 0 | 0 | False |
-| src/utils/compress | 3 | 3 | 0 | 0 | False |
-| src/utils/data_inspector | 3 | 3 | 0 | 0 | False |
-| src/utils/decoder | 3 | 3 | 0 | 0 | False |
-| src/utils/encoder | 3 | 3 | 0 | 0 | False |
-| src/utils/frequency | 3 | 3 | 0 | 0 | False |
-| src/utils/fuzzer | 3 | 3 | 0 | 0 | False |
-| src/utils/loss | 3 | 3 | 0 | 0 | False |
-| src/utils/protocol_timer | 3 | 3 | 0 | 0 | False |
-| src/utils/recorder | 3 | 3 | 0 | 0 | False |
-| src/utils/signal_gen | 3 | 3 | 0 | 0 | False |
-| src/utils/splitter | 3 | 3 | 0 | 0 | False |
-| src/utils/template_lib | 3 | 3 | 0 | 0 | False |
-| src/utils/validator | 3 | 3 | 0 | 0 | False |
 | src/utils/adams | 2 | 2 | 0 | 0 | False |
 | src/utils/adaptive_fft | 2 | 2 | 0 | 0 | False |
 | src/utils/agc | 2 | 2 | 0 | 0 | False |
@@ -417,6 +402,21 @@ Only the first 120 active utils directories are listed.
 | src/utils/gauss_seidel | 2 | 2 | 0 | 0 | False |
 | src/utils/geo_dist | 2 | 2 | 0 | 0 | False |
 | src/utils/glm | 2 | 2 | 0 | 0 | False |
+| src/utils/gmixture | 2 | 2 | 0 | 0 | False |
+| src/utils/gmres | 2 | 2 | 0 | 0 | False |
+| src/utils/gof | 2 | 2 | 0 | 0 | False |
+| src/utils/golomb | 2 | 2 | 0 | 0 | False |
+| src/utils/gradient | 2 | 2 | 0 | 0 | False |
+| src/utils/gram_schmidt | 2 | 2 | 0 | 0 | False |
+| src/utils/graph | 2 | 2 | 0 | 0 | False |
+| src/utils/greville | 2 | 2 | 0 | 0 | False |
+| src/utils/haar | 2 | 2 | 0 | 0 | False |
+| src/utils/hankel | 2 | 2 | 0 | 0 | False |
+| src/utils/hanoi | 2 | 2 | 0 | 0 | False |
+| src/utils/hermite | 2 | 2 | 0 | 0 | False |
+| src/utils/hilbert | 2 | 2 | 0 | 0 | False |
+| src/utils/histogram | 2 | 2 | 0 | 0 | False |
+| src/utils/holtwinters | 2 | 2 | 0 | 0 | False |
 
 Only the first 120 active utils dependency rows are listed.
 
@@ -425,21 +425,6 @@ Only the first 120 active utils dependency rows are listed.
 | Path | Files | Active CMake refs | External include refs | External modules |
 |------|-------|-------------------|-----------------------|------------------|
 | src/utils/scripting | 7 | 7 | 0 | 0 |
-| src/utils/align | 4 | 3 | 0 | 0 |
-| src/utils/annotation | 10 | 3 | 0 | 0 |
-| src/utils/compress | 3 | 3 | 0 | 0 |
-| src/utils/data_inspector | 3 | 3 | 0 | 0 |
-| src/utils/decoder | 3 | 3 | 0 | 0 |
-| src/utils/encoder | 3 | 3 | 0 | 0 |
-| src/utils/frequency | 3 | 3 | 0 | 0 |
-| src/utils/fuzzer | 3 | 3 | 0 | 0 |
-| src/utils/loss | 3 | 3 | 0 | 0 |
-| src/utils/protocol_timer | 3 | 3 | 0 | 0 |
-| src/utils/recorder | 3 | 3 | 0 | 0 |
-| src/utils/signal_gen | 3 | 3 | 0 | 0 |
-| src/utils/splitter | 3 | 3 | 0 | 0 |
-| src/utils/template_lib | 3 | 3 | 0 | 0 |
-| src/utils/validator | 3 | 3 | 0 | 0 |
 | src/utils/adams | 2 | 2 | 0 | 0 |
 | src/utils/adaptive_fft | 2 | 2 | 0 | 0 |
 | src/utils/agc | 2 | 2 | 0 | 0 |
@@ -504,6 +489,21 @@ Only the first 120 active utils dependency rows are listed.
 | src/utils/dct | 2 | 2 | 0 | 0 |
 | src/utils/deadzone | 2 | 2 | 0 | 0 |
 | src/utils/decomp | 2 | 2 | 0 | 0 |
+| src/utils/delta | 2 | 2 | 0 | 0 |
+| src/utils/deque | 2 | 2 | 0 | 0 |
+| src/utils/derivative | 2 | 2 | 0 | 0 |
+| src/utils/detector | 2 | 2 | 0 | 0 |
+| src/utils/detrend | 2 | 2 | 0 | 0 |
+| src/utils/dict | 2 | 2 | 0 | 0 |
+| src/utils/disjoint | 2 | 2 | 0 | 0 |
+| src/utils/divided_diff | 2 | 2 | 0 | 0 |
+| src/utils/dynhistogram | 2 | 2 | 0 | 0 |
+| src/utils/echohash | 2 | 2 | 0 | 0 |
+| src/utils/edgedetect | 2 | 2 | 0 | 0 |
+| src/utils/edmonds | 2 | 2 | 0 | 0 |
+| src/utils/ekf | 2 | 2 | 0 | 0 |
+| src/utils/emd | 2 | 2 | 0 | 0 |
+| src/utils/ensemble | 2 | 2 | 0 | 0 |
 
 Only the first 80 low-risk active utils candidates are listed.
 

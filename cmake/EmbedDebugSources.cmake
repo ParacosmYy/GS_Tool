@@ -603,8 +603,6 @@ set(SOURCES
     src/utils/simulator/DeviceSimulatorPanel.cpp
 
     # ── 数据检查器 ──
-    src/utils/data_inspector/DataInspectorWidget.cpp
-    src/utils/data_inspector/DataInspectorWidgetStats.cpp
 
     # ── F26: 设备注册表 ──
     src/core/device/DeviceRegistry.cpp
@@ -612,21 +610,15 @@ set(SOURCES
     src/core/device/DeviceProfilePanelActions.cpp
 
     # ── 信号发生器 ──
-    src/utils/signal_gen/SignalGeneratorWidget.cpp
-    src/utils/signal_gen/SignalGeneratorWidgetStats.cpp
 
     # ── F27: 数据字节级对比 ──
 
     # ── F37: 数据比较器 ──
 
     # ── 频率计数器 ──
-    src/utils/frequency/FrequencyCounterWidget.cpp
-    src/utils/frequency/FrequencyCounterWidgetStats.cpp
 
     # ── F28: 数据流标注管理 ──
     src/core/profiles/ConnectionProfileManager.cpp
-    src/utils/annotation/DataAnnotationWidget.cpp
-    src/utils/annotation/DataAnnotationWidgetStats.cpp
 
     # ── F29: 报文模板库 ──
 
@@ -849,7 +841,6 @@ set(SOURCES
     src/utils/medfilt/MedianFilter.cpp
     src/utils/notch/NotchFilter.cpp
     # src/utils/peakdetect2/PeakDetector2.cpp  # removed: duplicate class
-    src/utils/align/SignalAligner.cpp
     # src/utils/window2/WindowFunction.cpp  # removed: duplicate of dsp6/WindowFunction
 
     # -- Wave 40: 特征提取 --
@@ -1019,7 +1010,6 @@ set(SOURCES
     src/utils/compress2/LzssCompressor.cpp
     src/utils/heap3/BinaryHeap.cpp
     src/utils/graph5/GraphColoring.cpp
-    src/utils/align/NeedlemanWunsch.cpp
     src/utils/cluster3/KMedoids.cpp
 
     # ── Wave 54: 新增工具模块 ──
@@ -1078,8 +1068,6 @@ set(SOURCES
     src/core/analysis/WaveformPatternDetectorStats.cpp
 
     # ── F29: 协议定时分析器 ──
-    src/utils/protocol_timer/ProtocolTimerWidget.cpp
-    src/utils/protocol_timer/ProtocolTimerWidgetStats.cpp
 
     # ── F33: 设备配置档案管理 ──
     src/core/settings/ConfigProfileManager.cpp
@@ -1119,34 +1107,22 @@ set(SOURCES
     # ── 波形发生器 ──
 
     # ── F35: 数据流分割器 ──
-    src/utils/splitter/DataStreamSplitter.cpp
-    src/utils/splitter/DataStreamSplitterStats.cpp
 
     # ── F34: 数据速率计算器 ──
 
     # ── F33: 数据编解码机 ──
-    src/utils/encoder/SerialDataEncoder.cpp
-    src/utils/encoder/SerialDataEncoderStats.cpp
 
     # ── F36: 丢包检测器 ──
-    src/utils/loss/PacketLossDetector.cpp
-    src/utils/loss/PacketLossDetectorStats.cpp
 
     # ── F38: 字节频率分析器 ──
     src/utils/frequency2/ByteFrequencyAnalyzer.cpp
     src/utils/frequency2/ByteFrequencyAnalyzerStats.cpp
 
     # ── F39: 协议模糊测试器 ──
-    src/utils/fuzzer/SerialProtocolFuzzer.cpp
-    src/utils/fuzzer/SerialProtocolFuzzerStats.cpp
 
     # ── F40: 帧模板库 ──
-    src/utils/template_lib/FrameTemplateLibrary.cpp
-    src/utils/template_lib/FrameTemplateLibraryStats.cpp
 
     # ── F41: 帧解码器 ──
-    src/utils/decoder/SerialFrameDecoder.cpp
-    src/utils/decoder/SerialFrameDecoderBuild.cpp
 
     # -- F42: 数据加密引擎 --
     src/utils/crypto/DataEncryptionEngine.cpp
@@ -1156,8 +1132,6 @@ set(SOURCES
     src/chart/filter/WaveformFilterCompute.cpp
 
     # -- F47: 数据流录制器 --
-    src/utils/recorder/StreamCaptureRecorder.cpp
-    src/utils/recorder/StreamCaptureRecorderExport.cpp
 
     # -- F48: Hex差异引擎 --
 
@@ -1203,12 +1177,8 @@ set(SOURCES
     src/protocol/parser2/ByteStreamParserStateMachine.cpp
 
     # -- F56: 数据验证器 --
-    src/utils/validator/DataValidator.cpp
-    src/utils/validator/DataValidatorRules.cpp
 
     # -- F55: 数据压缩器 --
-    src/utils/compress/DataCompressor.cpp
-    src/utils/compress/DataCompressorAlgo.cpp
 
     # -- F62: 数据包组装器 --
     src/protocol/assembly/PacketAssembler.cpp
@@ -3802,7 +3772,6 @@ set(HEADERS
     src/utils/simulator/DeviceSimulatorPanel.h
 
     # ── 数据检查器 ──
-    src/utils/data_inspector/DataInspectorWidget.h
 
     # ── F26: 设备注册表 ──
     src/core/device/DeviceProfile.h
@@ -3810,15 +3779,12 @@ set(HEADERS
     src/core/device/DeviceProfilePanel.h
 
     # ── 信号发生器 ──
-    src/utils/signal_gen/SignalGeneratorWidget.h
 
     # ── 频率计数器 ──
-    src/utils/frequency/FrequencyCounterWidget.h
 
     # ── F37: 数据比较器 ──
 
     # ── F28: 数据流标注管理 ──
-    src/utils/annotation/DataAnnotationWidget.h
 
     # ── F29: 报文模板库 ──
 
@@ -3841,7 +3807,6 @@ set(HEADERS
     # ── F32: 十六进制内存编辑器 ──
 
     # ── F29: 协议定时分析器 ──
-    src/utils/protocol_timer/ProtocolTimerWidget.h
 
     # ── 波形模式检测 ──
     src/core/analysis/WaveformPatternDetector.h
@@ -3878,29 +3843,23 @@ set(HEADERS
     # ── 波形发生器 ──
 
     # ── F35: 数据流分割器 ──
-    src/utils/splitter/DataStreamSplitter.h
 
     # ── F34: 数据速率计算器 ──
 
     # -- F52: 数据速率限制器 --
 
     # ── F33: 数据编解码机 ──
-    src/utils/encoder/SerialDataEncoder.h
 
     # ── F36: 丢包检测器 ──
-    src/utils/loss/PacketLossDetector.h
 
     # ── F38: 字节频率分析器 ──
     src/utils/frequency2/ByteFrequencyAnalyzer.h
 
     # ── F39: 协议模糊测试器 ──
-    src/utils/fuzzer/SerialProtocolFuzzer.h
 
     # ── F40: 帧模板库 ──
-    src/utils/template_lib/FrameTemplateLibrary.h
 
     # ── F41: 帧解码器 ──
-    src/utils/decoder/SerialFrameDecoder.h
 
     # -- F42: 数据加密引擎 --
     src/utils/crypto/DataEncryptionEngine.h
@@ -3909,7 +3868,6 @@ set(HEADERS
     src/chart/filter/WaveformFilter.h
 
     # -- F47: 数据流录制器 --
-    src/utils/recorder/StreamCaptureRecorder.h
 
     # -- F48: Hex差异引擎 --
 
@@ -3944,10 +3902,8 @@ set(HEADERS
     src/utils/cache/DataCache.h
 
     # -- F56: 数据验证器 --
-    src/utils/validator/DataValidator.h
 
     # -- F55: 数据压缩器 --
-    src/utils/compress/DataCompressor.h
 
     # -- F62: 数据包组装器 --
     src/protocol/assembly/PacketAssembler.h
@@ -4558,7 +4514,6 @@ set(HEADERS
     src/utils/compress2/LzssCompressor.h
     src/utils/heap3/BinaryHeap.h
     src/utils/graph5/GraphColoring.h
-    src/utils/align/NeedlemanWunsch.h
     src/utils/cluster3/KMedoids.h
 
     # ── Wave 54: 新增工具模块头文件 ──
