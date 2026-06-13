@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-13 17:59:30
+- Generated: 2026-06-13 18:06:10
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -9,11 +9,11 @@
 | Metric | Value |
 |--------|-------|
 | Working tree source files under src | 82048 |
-| Raw CMake source references | 5932 |
-| Declared CMake source references | 5825 |
-| Active CMake source references | 1524 |
+| Raw CMake source references | 5877 |
+| Declared CMake source references | 5765 |
+| Active CMake source references | 1464 |
 | Filtered utils references | 4301 |
-| Source files not active in CMake | 80549 |
+| Source files not active in CMake | 80609 |
 | Existing src/apps/serial_station files | 50 |
 | CMake refs under src/apps/serial_station | 50 |
 | Generated-looking utils directories | 39670 |
@@ -45,7 +45,7 @@
 
 | Module | References |
 |--------|------------|
-| utils | 661 |
+| utils | 601 |
 | core | 190 |
 | connection | 153 |
 | protocol | 151 |
@@ -181,36 +181,6 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/crypto | 4 | 4 |
 | src/utils/settings | 3 | 4 |
 | src/utils/data | 4 | 3 |
-| src/utils/adams | 2 | 2 |
-| src/utils/adaptive_fft | 2 | 2 |
-| src/utils/agc | 2 | 2 |
-| src/utils/aho | 2 | 2 |
-| src/utils/anomaly | 2 | 2 |
-| src/utils/anova | 2 | 2 |
-| src/utils/arima | 2 | 2 |
-| src/utils/armodel | 2 | 2 |
-| src/utils/arnoldi | 2 | 2 |
-| src/utils/autocorr | 2 | 2 |
-| src/utils/autodiff | 2 | 2 |
-| src/utils/backtrack | 2 | 2 |
-| src/utils/bandmat | 2 | 2 |
-| src/utils/bayes | 2 | 2 |
-| src/utils/bernstein | 2 | 2 |
-| src/utils/bessel | 2 | 2 |
-| src/utils/bezier | 2 | 2 |
-| src/utils/bicgstab | 2 | 2 |
-| src/utils/bintree | 2 | 2 |
-| src/utils/bisect | 2 | 2 |
-| src/utils/bitalloc | 2 | 2 |
-| src/utils/bitfield | 2 | 2 |
-| src/utils/bitmap | 2 | 2 |
-| src/utils/bloom | 2 | 2 |
-| src/utils/bootstrap | 2 | 2 |
-| src/utils/bsp_tree | 2 | 2 |
-| src/utils/btree | 2 | 2 |
-| src/utils/butterfly | 2 | 2 |
-| src/utils/butterworth | 2 | 2 |
-| src/utils/cache | 2 | 2 |
 | src/utils/catboost | 2 | 2 |
 | src/utils/cauchy | 2 | 2 |
 | src/utils/cepstrum | 2 | 2 |
@@ -290,6 +260,36 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/hilbert | 2 | 2 |
 | src/utils/histogram | 2 | 2 |
 | src/utils/holtwinters | 2 | 2 |
+| src/utils/horner | 2 | 2 |
+| src/utils/huffman | 2 | 2 |
+| src/utils/hungarian | 2 | 2 |
+| src/utils/hurst | 2 | 2 |
+| src/utils/hysteresis | 2 | 2 |
+| src/utils/iir | 2 | 2 |
+| src/utils/ilu | 2 | 2 |
+| src/utils/integrator | 2 | 2 |
+| src/utils/interleaver | 2 | 2 |
+| src/utils/interpolator | 2 | 2 |
+| src/utils/interval_tree | 2 | 2 |
+| src/utils/jacobi_iter | 2 | 2 |
+| src/utils/jaro | 2 | 2 |
+| src/utils/jh | 2 | 2 |
+| src/utils/kalman | 2 | 2 |
+| src/utils/kdtree | 2 | 2 |
+| src/utils/keccak | 2 | 2 |
+| src/utils/ks | 2 | 2 |
+| src/utils/lagrange | 2 | 2 |
+| src/utils/laguerre | 2 | 2 |
+| src/utils/lanczos | 2 | 2 |
+| src/utils/lattice | 2 | 2 |
+| src/utils/lcp_array | 2 | 2 |
+| src/utils/levenshtein | 4 | 2 |
+| src/utils/lfsr | 2 | 2 |
+| src/utils/life | 2 | 2 |
+| src/utils/line_sweep | 2 | 2 |
+| src/utils/lobatto | 2 | 2 |
+| src/utils/lomb | 2 | 2 |
+| src/utils/lpc | 2 | 2 |
 
 Only the first 120 active utils directories are listed.
 
@@ -308,36 +308,6 @@ Only the first 120 active utils directories are listed.
 | src/utils/timestamp | 5 | 5 | 4 | 1 | True |
 | src/utils/export | 16 | 16 | 3 | 1 | True |
 | src/utils/scripting | 7 | 7 | 0 | 0 | False |
-| src/utils/adams | 2 | 2 | 0 | 0 | False |
-| src/utils/adaptive_fft | 2 | 2 | 0 | 0 | False |
-| src/utils/agc | 2 | 2 | 0 | 0 | False |
-| src/utils/aho | 2 | 2 | 0 | 0 | False |
-| src/utils/anomaly | 2 | 2 | 0 | 0 | False |
-| src/utils/anova | 2 | 2 | 0 | 0 | False |
-| src/utils/arima | 2 | 2 | 0 | 0 | False |
-| src/utils/armodel | 2 | 2 | 0 | 0 | False |
-| src/utils/arnoldi | 2 | 2 | 0 | 0 | False |
-| src/utils/autocorr | 2 | 2 | 0 | 0 | False |
-| src/utils/autodiff | 2 | 2 | 0 | 0 | False |
-| src/utils/backtrack | 2 | 2 | 0 | 0 | False |
-| src/utils/bandmat | 2 | 2 | 0 | 0 | False |
-| src/utils/bayes | 2 | 2 | 0 | 0 | False |
-| src/utils/bernstein | 2 | 2 | 0 | 0 | False |
-| src/utils/bessel | 2 | 2 | 0 | 0 | False |
-| src/utils/bezier | 2 | 2 | 0 | 0 | False |
-| src/utils/bicgstab | 2 | 2 | 0 | 0 | False |
-| src/utils/bintree | 2 | 2 | 0 | 0 | False |
-| src/utils/bisect | 2 | 2 | 0 | 0 | False |
-| src/utils/bitalloc | 2 | 2 | 0 | 0 | False |
-| src/utils/bitfield | 2 | 2 | 0 | 0 | False |
-| src/utils/bitmap | 2 | 2 | 0 | 0 | False |
-| src/utils/bloom | 2 | 2 | 0 | 0 | False |
-| src/utils/bootstrap | 2 | 2 | 0 | 0 | False |
-| src/utils/bsp_tree | 2 | 2 | 0 | 0 | False |
-| src/utils/btree | 2 | 2 | 0 | 0 | False |
-| src/utils/butterfly | 2 | 2 | 0 | 0 | False |
-| src/utils/butterworth | 2 | 2 | 0 | 0 | False |
-| src/utils/cache | 2 | 2 | 0 | 0 | False |
 | src/utils/catboost | 2 | 2 | 0 | 0 | False |
 | src/utils/cauchy | 2 | 2 | 0 | 0 | False |
 | src/utils/cepstrum | 2 | 2 | 0 | 0 | False |
@@ -417,6 +387,36 @@ Only the first 120 active utils directories are listed.
 | src/utils/hilbert | 2 | 2 | 0 | 0 | False |
 | src/utils/histogram | 2 | 2 | 0 | 0 | False |
 | src/utils/holtwinters | 2 | 2 | 0 | 0 | False |
+| src/utils/horner | 2 | 2 | 0 | 0 | False |
+| src/utils/huffman | 2 | 2 | 0 | 0 | False |
+| src/utils/hungarian | 2 | 2 | 0 | 0 | False |
+| src/utils/hurst | 2 | 2 | 0 | 0 | False |
+| src/utils/hysteresis | 2 | 2 | 0 | 0 | False |
+| src/utils/iir | 2 | 2 | 0 | 0 | False |
+| src/utils/ilu | 2 | 2 | 0 | 0 | False |
+| src/utils/integrator | 2 | 2 | 0 | 0 | False |
+| src/utils/interleaver | 2 | 2 | 0 | 0 | False |
+| src/utils/interpolator | 2 | 2 | 0 | 0 | False |
+| src/utils/interval_tree | 2 | 2 | 0 | 0 | False |
+| src/utils/jacobi_iter | 2 | 2 | 0 | 0 | False |
+| src/utils/jaro | 2 | 2 | 0 | 0 | False |
+| src/utils/jh | 2 | 2 | 0 | 0 | False |
+| src/utils/kalman | 2 | 2 | 0 | 0 | False |
+| src/utils/kdtree | 2 | 2 | 0 | 0 | False |
+| src/utils/keccak | 2 | 2 | 0 | 0 | False |
+| src/utils/ks | 2 | 2 | 0 | 0 | False |
+| src/utils/lagrange | 2 | 2 | 0 | 0 | False |
+| src/utils/laguerre | 2 | 2 | 0 | 0 | False |
+| src/utils/lanczos | 2 | 2 | 0 | 0 | False |
+| src/utils/lattice | 2 | 2 | 0 | 0 | False |
+| src/utils/lcp_array | 2 | 2 | 0 | 0 | False |
+| src/utils/levenshtein | 4 | 2 | 0 | 0 | False |
+| src/utils/lfsr | 2 | 2 | 0 | 0 | False |
+| src/utils/life | 2 | 2 | 0 | 0 | False |
+| src/utils/line_sweep | 2 | 2 | 0 | 0 | False |
+| src/utils/lobatto | 2 | 2 | 0 | 0 | False |
+| src/utils/lomb | 2 | 2 | 0 | 0 | False |
+| src/utils/lpc | 2 | 2 | 0 | 0 | False |
 
 Only the first 120 active utils dependency rows are listed.
 
@@ -425,36 +425,6 @@ Only the first 120 active utils dependency rows are listed.
 | Path | Files | Active CMake refs | External include refs | External modules |
 |------|-------|-------------------|-----------------------|------------------|
 | src/utils/scripting | 7 | 7 | 0 | 0 |
-| src/utils/adams | 2 | 2 | 0 | 0 |
-| src/utils/adaptive_fft | 2 | 2 | 0 | 0 |
-| src/utils/agc | 2 | 2 | 0 | 0 |
-| src/utils/aho | 2 | 2 | 0 | 0 |
-| src/utils/anomaly | 2 | 2 | 0 | 0 |
-| src/utils/anova | 2 | 2 | 0 | 0 |
-| src/utils/arima | 2 | 2 | 0 | 0 |
-| src/utils/armodel | 2 | 2 | 0 | 0 |
-| src/utils/arnoldi | 2 | 2 | 0 | 0 |
-| src/utils/autocorr | 2 | 2 | 0 | 0 |
-| src/utils/autodiff | 2 | 2 | 0 | 0 |
-| src/utils/backtrack | 2 | 2 | 0 | 0 |
-| src/utils/bandmat | 2 | 2 | 0 | 0 |
-| src/utils/bayes | 2 | 2 | 0 | 0 |
-| src/utils/bernstein | 2 | 2 | 0 | 0 |
-| src/utils/bessel | 2 | 2 | 0 | 0 |
-| src/utils/bezier | 2 | 2 | 0 | 0 |
-| src/utils/bicgstab | 2 | 2 | 0 | 0 |
-| src/utils/bintree | 2 | 2 | 0 | 0 |
-| src/utils/bisect | 2 | 2 | 0 | 0 |
-| src/utils/bitalloc | 2 | 2 | 0 | 0 |
-| src/utils/bitfield | 2 | 2 | 0 | 0 |
-| src/utils/bitmap | 2 | 2 | 0 | 0 |
-| src/utils/bloom | 2 | 2 | 0 | 0 |
-| src/utils/bootstrap | 2 | 2 | 0 | 0 |
-| src/utils/bsp_tree | 2 | 2 | 0 | 0 |
-| src/utils/btree | 2 | 2 | 0 | 0 |
-| src/utils/butterfly | 2 | 2 | 0 | 0 |
-| src/utils/butterworth | 2 | 2 | 0 | 0 |
-| src/utils/cache | 2 | 2 | 0 | 0 |
 | src/utils/catboost | 2 | 2 | 0 | 0 |
 | src/utils/cauchy | 2 | 2 | 0 | 0 |
 | src/utils/cepstrum | 2 | 2 | 0 | 0 |
@@ -504,6 +474,36 @@ Only the first 120 active utils dependency rows are listed.
 | src/utils/ekf | 2 | 2 | 0 | 0 |
 | src/utils/emd | 2 | 2 | 0 | 0 |
 | src/utils/ensemble | 2 | 2 | 0 | 0 |
+| src/utils/entropy | 2 | 2 | 0 | 0 |
+| src/utils/envelope | 2 | 2 | 0 | 0 |
+| src/utils/expmove | 2 | 2 | 0 | 0 |
+| src/utils/farmhash | 2 | 2 | 0 | 0 |
+| src/utils/fcs | 2 | 2 | 0 | 0 |
+| src/utils/fenwick | 2 | 2 | 0 | 0 |
+| src/utils/fir | 2 | 2 | 0 | 0 |
+| src/utils/fisher | 2 | 2 | 0 | 0 |
+| src/utils/flow | 2 | 2 | 0 | 0 |
+| src/utils/fractal | 4 | 2 | 0 | 0 |
+| src/utils/freq | 2 | 2 | 0 | 0 |
+| src/utils/gabor | 2 | 2 | 0 | 0 |
+| src/utils/gauss_seidel | 2 | 2 | 0 | 0 |
+| src/utils/geo_dist | 2 | 2 | 0 | 0 |
+| src/utils/glm | 2 | 2 | 0 | 0 |
+| src/utils/gmixture | 2 | 2 | 0 | 0 |
+| src/utils/gmres | 2 | 2 | 0 | 0 |
+| src/utils/gof | 2 | 2 | 0 | 0 |
+| src/utils/golomb | 2 | 2 | 0 | 0 |
+| src/utils/gradient | 2 | 2 | 0 | 0 |
+| src/utils/gram_schmidt | 2 | 2 | 0 | 0 |
+| src/utils/graph | 2 | 2 | 0 | 0 |
+| src/utils/greville | 2 | 2 | 0 | 0 |
+| src/utils/haar | 2 | 2 | 0 | 0 |
+| src/utils/hankel | 2 | 2 | 0 | 0 |
+| src/utils/hanoi | 2 | 2 | 0 | 0 |
+| src/utils/hermite | 2 | 2 | 0 | 0 |
+| src/utils/hilbert | 2 | 2 | 0 | 0 |
+| src/utils/histogram | 2 | 2 | 0 | 0 |
+| src/utils/holtwinters | 2 | 2 | 0 | 0 |
 
 Only the first 80 low-risk active utils candidates are listed.
 
