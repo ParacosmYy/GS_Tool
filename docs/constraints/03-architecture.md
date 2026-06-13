@@ -23,6 +23,19 @@
 
 ## 二、统一依赖矩阵
 
+### 2.0 架构准入原则
+
+任何新增功能、重构或跨模块调用，必须先回答下面 6 个问题，答案写入 PRD/Specs 或本轮说明：
+
+1. **属于哪个模块**：只能选择一个主模块，不能同时把业务写进 `core/`、`serial/`、`protocol/` 和 UI。
+2. **对外暴露什么接口**：优先暴露纯接口、值对象、Qt signal/slot 或 service API，不暴露内部实现类。
+3. **依赖谁**：只能依赖下层或已冻结的接口，不能反向 include、同层横向 include 或跳到主窗口。
+4. **谁来装配**：装配只发生在 `core/`、app 入口或明确 controller，业务模块不得自己拉取高层对象。
+5. **如何验证**：至少有构建或测试证据；涉及用户路径时要有界面入口证据；涉及设备时要有替身/虚拟/真实设备证据。
+6. **状态提升依据**：如果声称功能状态提升，必须说明从 `E/U/D` 哪个等级提升到哪个等级，以及证据路径。
+
+禁止用“先能跑再说”绕过上述问题。没有清晰归属的新能力默认不允许进入生产源码。
+
 ### 2.1 分层定义
 
 > 下面的分层是本项目的唯一架构口径。`shared/` 是正式的公共基础层；当前仓库仍在使用 `core/theme/Constants.h` 作为兼容伞头，但它只允许承接旧入口，不允许继续扩张。
@@ -57,6 +70,23 @@ L0 interfaces/  →  无
 - 除 `core/` 外，任何模块都不得跳过中间层直接依赖高层实现。
 - `shared/` 只放“跨模块稳定事实”，不放 UI 逻辑、不放业务编排、不放可变状态。
 - `core/theme/Constants.h` 只做过渡伞头，新增常量必须写入 `shared/` 的正式入口，不能继续堆在伞头里。
+- UI 层不能直接持有底层连接、协议、线程、文件写入对象；必须通过 controller/service 的信号或窄接口调用。
+- 业务层不能 include `MainWindow`、`PanelManager` 或具体 QWidget 面板；如果需要展示结果，只能发信号或返回值对象。
+- 新增模块不得复制 CRC、Hex、RingBuffer、Settings、日志、导出、协议校验等已有基础能力。
+
+### 2.3-A 模块接口准入
+
+新增跨模块接口时，必须满足：
+
+| 检查项 | 要求 |
+|--------|------|
+| 契约位置 | 稳定纯接口放 `src/interfaces/`；模块私有接口放模块内部 `interface/` 或 `protocols/` |
+| 数据类型 | 参数优先使用值对象、Qt Core 类型、枚举、轻量 struct；不传 QWidget、不传主窗口、不传具体面板 |
+| 生命周期 | 谁创建谁拥有；QObject 走父子树，非 QObject 走智能指针或值语义 |
+| 错误路径 | 接口必须有明确错误返回、错误 signal 或结果对象，不允许只写日志吞掉失败 |
+| 测试入口 | 接口消费者和实现至少有一侧可通过 QTest 或替身验证 |
+
+接口一旦被多个模块依赖，修改必须走 PRD/Specs，并列出所有消费者和回归命令。
 
 ### 2.4 唯一真相路径
 
@@ -80,6 +110,24 @@ L0 interfaces/  →  无
 - 任何新公共能力先判断是否属于 `shared/`，只有真正需要运行时行为的内容才进入 `core/`。
 - 历史分叉目录只允许冻结，不允许再向外扩张；新增实现优先进入 canonical 路径，不要再造平行目录。
 - 新串口上位机能力优先进入 `src/apps/serial_station/`，不要继续把协议、收发、日志和 UI 混写进旧 `src/serial/` 或 `MainWindow`。
+- `core/` 可以装配下层模块，但不能因此成为业务状态仓库；新增状态优先放在对应模块 model/session/service 中。
+- `PanelManager` 新增面板时只注册和包装，不读取业务配置、不拼协议帧、不处理文件导出。
+- `MainWindow` 新增连接时只连信号和生命周期，不写 if/else 业务流程。
+
+### 2.5-0 状态提升与架构证据
+
+架构审查不仅看文件是否存在，还必须看交付状态是否有证据：
+
+| 状态提升 | 最低架构证据 |
+|----------|--------------|
+| `E2 -> E3` | 新增源码已加入 `CMakeLists.txt`，无未引用死代码 |
+| `E3 -> E4` | QTest、构建或可重复命令通过，失败路径有覆盖 |
+| `E4 -> E5` | 模块边界清晰，无重复基础能力，无跨层 include，有文档入口 |
+| `U1 -> U2` | 用户可见入口存在，局部操作有反馈和错误提示 |
+| `U2 -> U3` | 用户能完成端到端主流程，例如连接、发送、接收、导出 |
+| `D1 -> D2/D3/D4` | 有替身、虚拟设备或真实设备验证记录；外设能力不得跳过设备证据 |
+
+任何缺少证据的状态只能保持原等级，不得在 README、评分追踪或 PRD 中提升。
 
 ### 2.5-C Serial Station 内部边界
 
@@ -100,6 +148,8 @@ services/ -> shared/utils，不直接操作 QWidget 或串口线程
 - 具体协议只能通过 `ISerialProtocol` 和 registry 进入运行时。
 - 协议目录不能 include QWidget、`SerialStationWindow`、`SerialStationController`。
 - 日志、导出、回放属于 `services/`，不能散落在 UI 槽函数或协议 parser 中。
+- Serial Station 的用户完成状态必须以工作台入口和端到端操作为准；只有协议单测不能把用户状态提升到 `U3`。
+- Serial Station 的设备完成状态必须以 fake serial、虚拟串口或真实 COM/J-Link/设备验证为准；纯 parser 测试只能算 `D1`。
 - 更完整规则以 `docs/serial_station_architecture.md` 为准。
 
 ### 2.5-A 迁移骨架
@@ -142,6 +192,22 @@ services/ -> shared/utils，不直接操作 QWidget 或串口线程
 | `PanelManager` 过载 | 集中创建大量面板，容易演变成“面板总桶” | Phase 2 把面板创建、包装、注册拆成更细的 Provider/Factory 边界，避免继续膨胀 |
 | `core/theme/Constants.h` 伞头化 | 旧常量入口承接过多 include，掩盖真实依赖 | Phase 3 迁移新常量到 `shared/`，仅保留向后兼容的转发头 |
 | `core/` 职责回流 | 新特性容易以“先放 core/ 里再说”的方式进入主线 | Phase 4 以模块归属表做准入检查，非协调类逻辑不得进入 `core/` |
+
+### 2.7 并行开发架构锁
+
+多 Agent 同时开发时，以下文件或概念默认只能由主 Agent 或单一负责人修改：
+
+| 锁定对象 | 原因 |
+|----------|------|
+| `CMakeLists.txt` | 所有新增源码合流点，容易产生重复注册或漏注册 |
+| `src/core/mainwindow/` | 应用入口和生命周期合流点 |
+| `src/core/panels/` | 面板创建、导航映射和 UI 汇聚点 |
+| `src/shared/`、`src/interfaces/` | 跨模块契约，一处变更影响所有消费者 |
+| `resources/themes/*.qss` | 主题 token 和 objectName 全局共享 |
+| `EmbedDebug.bat`、`tools/launch_embeddebug.ps1` | 用户最低启动链路 |
+| README 和约束文档 | 对外口径和 Agent 执行规则 |
+
+如果确实需要多个子任务触碰同一锁定对象，必须先由主 Agent 拆成顺序任务，禁止并行写同一文件。
 
 ---
 

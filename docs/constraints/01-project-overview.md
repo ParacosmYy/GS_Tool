@@ -88,6 +88,7 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 ## 三、模块清单
 
 > src/ 下有主模块，基础层已经落地到 `shared/` 与 `interfaces/`，当前进入兼容迁移与骨架化收口阶段。
+> 模块清单只说明代码归属，不代表用户完成度。功能成熟度必须按 `CLAUDE.md` 的工程状态、用户状态、设备验证三轴口径记录。
 
 ### 现有模块（12个）
 
@@ -124,6 +125,16 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 | 冻结历史分叉 | `animation2/`、`widgets2/`、`loader2/`、`fonts/`、`icons/`、`responsive/` |
 | 未来迁移落点 | `src/features/`、`src/shared/`、`src/interfaces/`、`src/core/` 的各自 canonical 子目录 |
 
+### 功能成熟度口径
+
+后续所有模块状态不得只写“已实现”：
+
+- `E` 轴说明工程实现：源码、CMake、测试、可维护性。
+- `U` 轴说明用户可用：入口、主流程、错误反馈、体验完整度。
+- `D` 轴说明设备验证：纯单测、替身、虚拟设备、真实硬件。
+- 外设能力默认不能跳过设备验证；UART/RTT/CAN/BLE/USB/SPI/I2C 没有 `D4` 时必须写“真实设备未验证”。
+- README 和 ROADMAP 只能宣传有证据的能力；骨架、stub、空方法、无入口模块必须标为预览或待完善。
+
 ---
 
 ## 四、Serial Station 重构目标
@@ -145,3 +156,14 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 2. 再建 `core/SerialPort.h/.cpp`、`core/SerialManager.h/.cpp`、`workers/SerialReaderWorker.h/.cpp`。
 3. 最后接 `ui/` 面板和 `SerialStationController.h/.cpp`。
 4. 第一批协议只保留 `ascii_text`、`modbus_rtu`、`custom_md`，并配套 QTest 测试。
+
+### 当前验收优先级
+
+Serial Station 后续迭代优先补齐用户闭环，而不是继续堆新协议或新面板：
+
+1. 主程序入口可达，用户能打开独立串口工站。
+2. UART 配置、连接、断开、发送、接收、日志在同一工作台路径内闭环。
+3. 使用 fake serial、虚拟串口或真实 USB-UART 做 D2/D3/D4 验证。
+4. 再扩展协议模板、回放、导出、设备档案和高级监控。
+
+没有完成上述闭环前，Serial Station 相关能力最多写为“工程已实现/用户局部可用/设备未充分验证”。

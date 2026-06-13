@@ -38,6 +38,13 @@ User_Serial/
 
 > 下面按当前仓库真实目录写法整理。`shared/` 与 `interfaces/` 已落地为正式基础层，`core/theme/Constants.h` 仅保留兼容承接。
 
+目录结构遵循“唯一归属、单一入口、禁止平行桶”原则。任何新增目录都必须先说明：
+
+1. 它解决哪个现有 canonical 目录无法承接的问题。
+2. 它属于哪个架构层，允许依赖哪些目录。
+3. 它是否影响三轴交付状态；只建目录或骨架不能提升用户状态。
+4. 它的 CMake、测试、README 或约束索引是否需要同步。
+
 | 目录 | 当前状态 | 角色口径 | 说明 |
 |------|----------|----------|------|
 | `apps/` | 规划新增 | 独立工站 app 层 | 新串口工站等可独立演进的工作站模块 |
@@ -158,6 +165,8 @@ tests/serial_station/
 3. `MainWindow` 和 `PanelManager` 继续做编排，但新增业务流必须优先下沉到独立 Controller/Manager。
 4. `font/` 与 `fonts/`、`icon/` 与 `icons/`、`responsive/` 与 `layout/`、`shortcut/` 与 `managers/`、`widgets/` 与 `widgets2/`、`animation/` 与 `animation2/`、`loader/` 与 `loader2/` 这些分叉目录只允许冻结，不允许继续复制新分支。
 5. 目录命名优先沿用已有主线目录，不要再创造“更像”的新桶。
+6. 并行 Agent 不得各自创建临时目录承接同一能力；目录归属必须在 BATCH 方案里先锁定。
+7. 任何 `2`、`new`、`backup`、`tmp`、`experimental` 命名的生产目录默认禁止；确需实验只能放文档或工具临时区，不能进入主 GUI 目标。
 
 ### 四-A、目标骨架
 
@@ -177,6 +186,8 @@ tests/serial_station/
 - 如果历史分叉已经存在，只能冻结，不能继续复制。
 - 如果确实需要未来迁移入口，先在 `src/features/` 里放归属说明，再讨论是否新增具体目录。
 - 如果是串口上位机重构或新增串口业务协议，优先进入 `src/apps/serial_station/`，不要继续扩张旧 `src/serial/` 和 `src/protocol/` 的耦合点。
+- 新增目录不能单独作为“功能完成”证据；必须配套源码、CMake、测试或用户入口，才能提升工程/用户状态。
+- 新增目录若要进入并行开发，必须在 BATCH 方案中写明唯一负责人和禁止触碰的相邻目录。
 
 ### 四-B、冻结目录
 
@@ -196,6 +207,25 @@ tests/serial_station/
 - 可以保留旧 include、旧资源引用和转发适配。
 - 不允许把新需求继续写入冻结目录。
 - 任何新骨架都应先落到 `src/features/` 或 canonical 路径。
+- 冻结目录只允许做兼容修复、删除迁移或引用转发；不得因为“已有类似文件”继续追加功能。
+- 如果冻结目录中的能力仍被主目标引用，新增迭代应优先写迁移 PRD，而不是继续扩张冻结目录。
+
+---
+
+## 四-C、并行开发目录锁
+
+多 Agent 开发时，目录分配必须满足：
+
+| 区域 | 并行策略 |
+|------|----------|
+| `src/core/mainwindow/`、`src/core/panels/` | 单负责人串行修改 |
+| `src/shared/`、`src/interfaces/` | 单负责人串行修改，先定契约再分发 |
+| `src/apps/serial_station/ui/`、`core/`、`protocols/`、`services/`、`workers/` | 可按层拆分，但每个子任务默认只改一个层 |
+| `resources/themes/` | 单负责人汇总 objectName 和 token，避免样式冲突 |
+| `tests/serial_station/` | 可按生产层拆分，但测试名不得重复，CMake 注册由主 Agent 合流 |
+| `tools/` | 只在构建/启动/审计工具任务中修改，不与产品功能并行混写 |
+
+如果某个子任务需要跨越两个以上目录层级，必须先说明调用链和验收点，并由主 Agent 审查后执行。
 
 ---
 
