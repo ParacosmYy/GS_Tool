@@ -1,102 +1,125 @@
 # EmbedDebug
 
-> Industrial desktop workbench for embedded debugging: serial station, protocol decoding, waveform analysis, OTA workflows, recording, automation, and engineering diagnostics in one Qt application.
+> A modular Qt desktop workbench for embedded debugging: Serial Station, protocol inspection, terminal workflows, waveform analysis, OTA tooling, recording, replay, automation, and engineering diagnostics in one application.
+
+![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?style=flat-square)
+![Qt 6](https://img.shields.io/badge/Qt-6-41CD52?style=flat-square)
+![CMake](https://img.shields.io/badge/build-CMake%20%2B%20Ninja-064F8C?style=flat-square)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-0078D4?style=flat-square)
+![Status](https://img.shields.io/badge/status-active%20engineering%20build-f59e0b?style=flat-square)
 
 ![EmbedDebug interface preview](docs/assets/readme/interface-preview.svg)
 
-## Project Status
+## Why It Exists
 
-| Item | Status |
-|------|--------|
-| Main application | `EmbedDebug` |
-| Repository | `GS_Tool` |
+Embedded debugging is usually fragmented across a serial assistant, a waveform viewer, a protocol decoder, a log recorder, an OTA tool, and one-off scripts. EmbedDebug is being shaped into a single repeatable workstation where firmware engineers can configure links, send commands, inspect frames, capture logs, replay sessions, and move between diagnostics without constantly switching tools.
+
+This repository is not presented as a finished commercial release. It is an active engineering build with strict PRD/spec gates, layered architecture rules, QTest coverage for key paths, and a verified Windows launch path.
+
+## Product Snapshot
+
+| Area | Current state |
+|------|---------------|
+| Primary app | `EmbedDebug` |
 | Primary branch | `feat/embed-debug` |
-| Platform | Windows 10+ |
-| Stack | C++17, Qt 6, CMake, Ninja, MinGW |
-| Current maturity | Active engineering build; core desktop workflows are implemented, some device integrations remain staged |
 | User entry point | `EmbedDebug.bat` from the repository root |
+| Fast station entry | `EmbedDebug.bat --station serial` |
+| Build system | CMake + Ninja, single `build/` directory only |
+| UI stack | Qt Widgets, QSS themes, SVG icon pipeline |
+| Engineering posture | Constraint-driven development with PRD, Specs, tests, launch verification, and score tracking |
 
-EmbedDebug is built for firmware and embedded-tool engineers who need one quiet, repeatable desktop workflow for serial communication, binary protocols, live signals, OTA operations, recorded sessions, and automation rules. It is not positioned as a simple serial assistant; the repository is being shaped into a modular workbench with strict architecture, staged PRDs, tests, and launch verification.
+## Capability Matrix
 
-## What It Solves
+| Capability | Evidence in repo | Engineering | User path | Device validation |
+|------------|------------------|-------------|-----------|-------------------|
+| Serial Station workbench | `src/apps/serial_station/`, QTest targets, README entry | E5 | U4 for profile/log/command workflow | D1, pure automated tests |
+| UART setup workflow | Port discovery, manual COM input, UART summary, connect/disconnect UI | E4 | U3 | D1, real hardware not verified in this repo state |
+| Protocol send/parse | `ascii_text`, `modbus_rtu`, `custom_md`, registry tests | E4 | U3 through station workflow | D1 |
+| Command history and profiles | Recent commands, `.edserialprofile` save/load, service tests | E5 | U4 | D1 |
+| Logs, export, replay preview | Structured log service, export service, replay service, UI flow tests | E4/E5 | U3 | D1 |
+| Terminal and data views | terminal, chart, FFT, heatmap, histogram/scatter, dashboard modules | E3/E4 by module | U2/U3 by module | D0-D1 |
+| OTA and file workflows | X/Y/ZMODEM modules, HEX/BIN handling, export foundations | E3/E4 by module | U2 | D0-D1 |
+| BLE/CAN/MQTT/USB/RTT | Framework code and staged integrations | E2-E4 by module | U1-U2 | D0-D1 unless separately verified |
 
-Embedded debugging often spreads one session across a serial terminal, a waveform viewer, a protocol decoder, a log recorder, an OTA tool, and hand-written scripts. EmbedDebug brings those loops into one application so engineers can inspect bytes, protocol frames, charts, commands, and device workflows without constantly switching tools.
-
-## Highlights
-
-| Area | Current capability |
-|------|--------------------|
-| Serial Station | Independent `src/apps/serial_station/` workbench with UART port discovery, manual COM input, 115200 8N1-style configuration summary, selectable default protocol, command panel with recent command history, profile save/load, structured logs, log export, replay preview, status bar, send/receive loop, dispatcher, codec, and protocol registry |
-| Protocols | `ascii_text`, `modbus_rtu`, and `custom_md` are implemented under the new Serial Station protocol boundary with QTest coverage |
-| Encoding | ASCII, HEX, and protocol command send paths are centralized through `SerialCodec` |
-| Data views | Terminal, waveform preview, FFT, multi-axis charts, histogram/scatter, heatmap, dashboard widgets, and performance panels are present in the application modules |
-| OTA and files | XMODEM/YMODEM/ZMODEM-oriented OTA modules, HEX/BIN workflows, export, recording, and replay foundations exist in the source tree |
-| Automation | Trigger engine, script recording/playback, command history, and rule-management modules are present |
-| Engineering loop | `tools/doctor.ps1`, `tools/verify_embeddebug_launch.ps1`, and `tools/agent-loop/` support Doctor/GO style verification |
-| UI system | Qt Widgets application with QSS themes, Lucide SVG assets, icon manager, command palette, empty/loading states, and panel wrappers |
-
-Some integrations are intentionally marked as staged: BLE, CAN, MQTT, USB, and SEGGER RTT have framework code or stubs, but not every external device path is production-complete yet.
-
-## Interface Preview
-
-The preview above is a maintained repository asset, not a generated build artifact. It summarizes the current workbench layout:
-
-- left navigation for connection, protocol, terminal, chart, OTA, dashboard, and automation areas;
-- main navigation entry for the Serial Station workbench, with UART port setup, manual COM entry, protocol selection, protocol mode, command send with recent history, profile save/load, structured logs, export/replay preview, and status;
-- right-side analysis surfaces for waveforms, decoded frames, recordings, and diagnostics.
-
-## Architecture
-
-The project uses a layered dependency model. New work should follow the constraint documents before code is changed.
+Status language follows the project three-axis policy:
 
 ```text
-L6  src/core/                 application coordination, main window, navigation, theme runtime
-L5  src/ota/ automation/      scenario workflows: OTA, automation, dashboard, plugin
-L4  src/terminal/ chart/ rtt/ data presentation and live inspection
-L3  src/connection/ protocol/ serial/ external access and legacy protocol modules
-L5A src/apps/serial_station/  new serial workbench with internal ui/controller/core/protocol split
-L2  src/utils/                reusable CRC, HEX, export, logging, cache, and timestamp tools
-L1  src/shared/               shared constants, enums, and lightweight types
-L0  src/interfaces/           pure contracts
+Engineering: E0 not started -> E5 maintainable closure
+User path:   U0 invisible -> U4 complete workflow
+Device:      D0 unverified -> D4 real device verified
 ```
 
-Serial Station has an additional internal rule:
+External device capabilities are intentionally not overstated. If a workflow has not been verified with real hardware, the README says so.
+
+## Serial Station
+
+Serial Station is the most active workstation track and lives under `src/apps/serial_station/`.
+
+Current user-facing path:
+
+1. Launch directly with `.\EmbedDebug.bat --station serial`.
+2. Select or type a COM port.
+3. Configure baud rate, frame format, flow control, DTR, and RTS.
+4. Choose a protocol: `ascii_text`, `modbus_rtu`, or `custom_md`.
+5. Send ASCII, HEX, or protocol commands.
+6. Review TX/RX/system logs and status counters.
+7. Export logs or generate replay previews.
+8. Save or load reusable UART/protocol/command profiles.
+
+Internal boundary:
 
 ```text
 ui/ -> SerialStationController -> core/ + protocols/ + services/
 workers/ -> core/
 core/ -> ISerialProtocol + SerialProtocolRegistry
 protocols/<name>/ -> protocol interface + shared/utils only
+services/ -> JSON, logs, export, replay, profiles
 ```
 
-UI panels do not parse bytes. Protocols do not touch widgets. `MainWindow` and `PanelManager` stay as assembly/navigation layers.
+UI panels do not parse bytes or write profile files directly. Protocols do not touch widgets. `MainWindow` and `PanelManager` stay as assembly and navigation layers.
+
+## Architecture
+
+EmbedDebug uses a layered dependency model. New code must follow the constraint documents before implementation.
+
+```text
+L6   src/core/                 application coordination, main window, navigation, theme runtime
+L5   src/ota/ automation/      scenario workflows: OTA, automation, dashboard, plugin
+L4   src/terminal/ chart/ rtt/ data presentation and live inspection
+L3   src/connection/ protocol/ serial/ external access and legacy protocol modules
+L5A  src/apps/serial_station/  standalone serial workstation with internal boundaries
+L2   src/utils/                reusable CRC, HEX, export, logging, cache, and algorithms
+L1   src/shared/               shared constants, enums, and lightweight types
+L0   src/interfaces/           pure contracts
+```
+
+Core rules:
+
+| Rule | Meaning |
+|------|---------|
+| No feature without PRD | New behavior requires PRD/Specs before code |
+| One build directory | Only `build/` is supported |
+| No dead C++ files | New `.h/.cpp` files must be registered in CMake |
+| No business logic in shell layers | `MainWindow` and `PanelManager` assemble and navigate only |
+| Reuse first | CRC, HEX, settings, logs, export, and buffers are shared capabilities |
+| Evidence before claims | Build, tests, launch probes, and status records back every state change |
 
 ## Quick Start
 
-Recommended first run on this repository:
+First run on a configured Windows workstation:
 
 ```powershell
 .\tools\bootstrap_env.bat
 .\EmbedDebug.bat
 ```
 
-`local_env.bat` is generated for the local machine and must not be committed.
-
-To open directly into the Serial Station workbench:
+Open directly into Serial Station:
 
 ```powershell
 .\EmbedDebug.bat --station serial
 ```
 
-UV start shortcut:
-
-```powershell
-uv run start-embeddebug
-```
-
-This delegates to `EmbedDebug.bat`; the batch file remains the minimum supported user entry point.
-
-Manual configure/build path:
+Manual configure and build:
 
 ```powershell
 cmake -G Ninja -B build -DCMAKE_PREFIX_PATH=C:/msys64/mingw64
@@ -104,85 +127,85 @@ cmake --build build --target EmbedDebug --parallel 4
 .\EmbedDebug.bat
 ```
 
-The only supported build directory is `build/`. Parallel build directories are not part of the documented workflow.
+The repository only supports `build/`. Do not create `build2/`, `build-debug/`, `build-release/`, or IDE-generated parallel build folders.
 
-UV packaging shortcut:
+## Tooling Shortcuts
 
 ```powershell
+uv run start-embeddebug
 uv run package-embeddebug --skip-build --clean
 uv run package-embeddebug --skip-build --clean --zip
 uv run verify-package-embeddebug
 uv run test-embeddebug-tools
 ```
 
-This is the supported packaging shortcut for the C++/Qt application. PyInstaller is for Python application bodies; EmbedDebug is packaged by reusing `build/EmbedDebug.exe`, running Qt `windeployqt`, and writing a distributable folder under ignored `dist/`.
-`verify-package-embeddebug` checks the packaged folder offline before release, including the executable, Qt platform plugin, README, and bundled constraint document.
+The `uv` launch helper delegates to `EmbedDebug.bat`; the batch file remains the minimum supported user entry point. Packaging reuses `build/EmbedDebug.exe`, runs Qt deployment, and writes ignored release artifacts under `dist/`.
 
 ## Verification
 
-Core local checks:
+Core local verification:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\verify_embeddebug_launch.ps1
+cmake -G Ninja -B build -DCMAKE_PREFIX_PATH=C:/msys64/mingw64
+cmake --build build --target EmbedDebug --parallel 4
+.\EmbedDebug.bat --station serial
 ```
 
-Serial Station focused checks:
+Serial Station focused verification:
+
+```powershell
+cmake --build build --target test_serial_command_panel test_serial_port_panel test_serial_station_workbench --parallel 4
+.\build\tests\test_serial_command_panel.exe
+.\build\tests\test_serial_port_panel.exe
+.\build\tests\test_serial_station_workbench.exe
+```
+
+Protocol verification:
 
 ```powershell
 cmake --build build --target test_ascii_text_protocol test_modbus_rtu_protocol test_custom_md_protocol test_serial_protocol_registry --parallel 4
 ctest --test-dir build -R "AsciiTextProtocol|ModbusRtuProtocol|CustomMdProtocol|SerialProtocolRegistry" --output-on-failure
 ```
 
-GO loop, when Go is available on PATH:
-
-```powershell
-Push-Location .\tools\agent-loop
-go test ./...
-go run . -config .\sample.embeddebug.json -dry-run
-Pop-Location
-```
-
-If `go.exe` is not installed, `tools\doctor.ps1` reports a warning. The equivalent manual path is the doctor command plus `tools\verify_embeddebug_launch.ps1`.
-
 ## Repository Map
 
 ```text
 GS_Tool/
-├── src/
-│   ├── apps/serial_station/   # new serial workbench
-│   ├── core/                  # application coordination and shared UI runtime
-│   ├── connection/            # connection implementations and factories
-│   ├── protocol/              # legacy/general protocol engines and bridges
-│   ├── terminal/              # terminal model, filtering, rendering
-│   ├── chart/                 # waveform, FFT, overlays, heatmap, zoom
-│   ├── ota/                   # firmware update workflows
-│   ├── automation/            # trigger/rule automation
-│   ├── dashboard/             # gauge, LED, numeric dashboard widgets
-│   ├── rtt/                   # SEGGER RTT integration layer
-│   ├── utils/                 # reusable utility layer
-│   ├── shared/                # shared constants and lightweight types
-│   └── interfaces/            # pure contracts
-├── tests/                     # QTest targets
-├── resources/                 # themes, icons, backgrounds
-├── docs/                      # constraints, PRDs, specs, reviews, tracking
-├── tools/                     # bootstrap, doctor, launch, GO loop, audit tools
-├── CMakeLists.txt
-├── EmbedDebug.bat
-└── README.md
+|-- src/
+|   |-- apps/serial_station/   # Serial Station workstation
+|   |-- core/                  # application coordination and shared UI runtime
+|   |-- connection/            # connection implementations and factories
+|   |-- protocol/              # protocol engines, bridges, schemas
+|   |-- terminal/              # terminal model, filtering, rendering
+|   |-- chart/                 # waveform, FFT, overlays, heatmap, zoom
+|   |-- ota/                   # firmware update workflows
+|   |-- automation/            # trigger/rule automation
+|   |-- dashboard/             # gauge, LED, numeric dashboard widgets
+|   |-- rtt/                   # SEGGER RTT integration layer
+|   |-- utils/                 # reusable utility layer
+|   |-- shared/                # shared constants and lightweight types
+|   `-- interfaces/            # pure contracts
+|-- tests/                     # QTest targets
+|-- resources/                 # themes, icons, translations, app resources
+|-- docs/                      # constraints, PRDs, specs, reviews, tracking
+|-- tools/                     # bootstrap, packaging, audit and launch helpers
+|-- cmake/EmbedDebugSources.cmake
+|-- CMakeLists.txt
+|-- EmbedDebug.bat
+`-- README.md
 ```
 
 ## Engineering Workflow
 
 This repository is intentionally constraint-driven.
 
-| Step | Meaning |
-|------|---------|
-| Specs | Define objective, non-goals, constraints, acceptance checks, and failure conditions before implementation |
-| GO | Run execute -> check -> fix loops with a maximum of 20 rounds or 30 minutes |
-| BATCH | Split large work into 5-30 reviewed tasks before any 3-agent or 6-agent parallel execution |
-| LOOP | Route failures through Doctor, Debug, or Simplify instead of widening the change blindly |
-| Commit | Commit by phase: PRD/Specs, tools/build, production code, tests, cleanup/report |
+| Stage | Purpose |
+|-------|---------|
+| PRD | Define the user problem, boundaries, non-goals, and state targets |
+| Specs | Convert PRD into implementation constraints and verification commands |
+| TDD | Add or update QTest coverage before production behavior changes |
+| GO loop | Execute, check, fix, and verify without widening the scope blindly |
+| Commit | Commit each closed iteration with status, verification evidence, and score |
 
 Primary entry documents:
 
@@ -194,17 +217,20 @@ Primary entry documents:
 
 ## Roadmap
 
-Near-term work is focused on making the product body more coherent, not just expanding build files:
+Near-term work is focused on turning the current engineering body into a coherent workstation:
 
-- add profile list/recent-profile management and one-click apply/connect flows on top of the current profile save/load path;
-- harden logging/export/replay services in the Serial Station UI without crossing controller boundaries;
-- continue replacing ad hoc UI styling with maintainable QSS and generated theme tokens;
-- fill staged BLE/CAN/MQTT/USB/RTT integrations with real backend behavior and tests;
-- add release packaging after the `EmbedDebug.bat` launch path remains stable.
+| Priority | Direction | Target outcome |
+|----------|-----------|----------------|
+| P0 | Serial Station profile list and one-click apply/connect | Configuration profiles become a daily workflow, not just file import/export |
+| P0 | UART verification with fake or virtual serial pair | Lift Serial Station device evidence beyond pure unit tests |
+| P1 | QSS token generation and UI consistency | Reduce hand-maintained theme drift |
+| P1 | Dialog and error feedback unification | Replace ad hoc message flows with consistent app dialogs |
+| P2 | BLE/CAN/MQTT/USB/RTT hardening | Move staged integrations from framework code toward verified workflows |
+| P2 | Release packaging polish | Make `dist/` verification and launch docs suitable for handoff |
 
 ## Contributing
 
-Before changing code, read the constraint documents for the affected area. New features need PRD/Specs first. New `.h/.cpp` files must be registered in CMake. Any change affecting build, launch, dependencies, resources, or startup must verify `EmbedDebug.bat` before commit.
+Before changing code, read the constraint documents for the affected area. New features need PRD/Specs first. New `.h/.cpp` files must be registered in the CMake source list. Any change affecting build, launch, dependencies, resources, or startup must verify `EmbedDebug.bat` before commit.
 
 ## License
 
