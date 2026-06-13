@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-13 17:45:04
+- Generated: 2026-06-13 17:59:30
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -9,11 +9,11 @@
 | Metric | Value |
 |--------|-------|
 | Working tree source files under src | 82048 |
-| Raw CMake source references | 5962 |
-| Declared CMake source references | 5856 |
-| Active CMake source references | 1555 |
+| Raw CMake source references | 5932 |
+| Declared CMake source references | 5825 |
+| Active CMake source references | 1524 |
 | Filtered utils references | 4301 |
-| Source files not active in CMake | 80518 |
+| Source files not active in CMake | 80549 |
 | Existing src/apps/serial_station files | 50 |
 | CMake refs under src/apps/serial_station | 50 |
 | Generated-looking utils directories | 39670 |
@@ -45,7 +45,7 @@
 
 | Module | References |
 |--------|------------|
-| utils | 692 |
+| utils | 661 |
 | core | 190 |
 | connection | 153 |
 | protocol | 151 |

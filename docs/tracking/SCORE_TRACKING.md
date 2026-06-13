@@ -217,12 +217,13 @@
 | 513 | CMake低风险utils首批瘦身 | 从主GUI目标移除filter_design/firmware/gps/network/statemachine/wavegen六组无外部引用证据的utils条目，构建和启动探针通过 |
 | 514 | CMake低风险utils第二批瘦身 | 从主GUI目标移除compare/hex_editor/rate/aggregator/bitmask/gmm/hex_diff/packet_lib/pattern/ringhash/spectrum/waveform条目，构建和启动探针通过 |
 | 515 | CMake低风险utils第三批瘦身 | 从主GUI目标移除align/annotation/compress/data_inspector/decoder/encoder/frequency/fuzzer/loss/protocol_timer/recorder/signal_gen/splitter/template_lib/validator条目，构建和启动探针通过 |
+| 516 | CMake单引用utils第四批瘦身 | 从主GUI目标移除avltree/bfgs/capture/crc_verifier/cycle/decomposer/gaussquad/golay/groebner/heap/hessenberg/hmm/inv_perm/lfu/lifting/lru/moment/movingmax/qrupdate/redblack/scaler/segment/skiplist/sliding/smoother/state/threshold/trie/trigger/twoway/warp条目，构建和启动探针通过 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#515` 的完整记录
+- 当前文档已整理到 `#516` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

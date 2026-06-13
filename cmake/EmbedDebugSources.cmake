@@ -629,12 +629,7 @@ set(SOURCES
     src/protocol/reassembly/PacketReassemblerStats.cpp
 
     # ── F31: 字节模式搜索器 ──
-    src/utils/scaler/DataScalerWidget.cpp
     src/utils/normalize/DataNormalizer.cpp
-    src/utils/threshold/DataThresholdMonitor.cpp
-    src/utils/capture/DataCaptureBuffer.cpp
-    src/utils/crc_verifier/CrcStreamVerifier.cpp
-    src/utils/segment/DataSegmentAnalyzer.cpp
     src/utils/outlier/OutlierDetector.cpp
     src/utils/quality/DataQualityScorer.cpp
     src/utils/sampler/DataSampler.cpp
@@ -649,14 +644,7 @@ set(SOURCES
     src/utils/crosscorr/CrossCorrelator.cpp
     src/utils/derivative/NumericalDerivative.cpp
     src/utils/window/DataWindowManager.cpp
-    src/utils/decomposer/SignalDecomposer.cpp
-    src/utils/sliding/SlidingWindowStats.cpp
-    src/utils/trigger/DataTrigger.cpp
-    src/utils/state/StateTracker.cpp
-    src/utils/cycle/CycleDetector.cpp
-    src/utils/smoother/DataSmoother.cpp
     # src/utils/peaks/PeakDetector.cpp  # removed: duplicate of peak/PeakDetector
-    src/utils/warp/TimeWarp.cpp
     src/utils/resample/DataResampler.cpp
     src/utils/classifier/DataClassifier.cpp
     src/utils/quantize/DataQuantizer.cpp
@@ -718,7 +706,6 @@ set(SOURCES
     src/utils/slidingpercentile/SlidingPercentile.cpp
     # src/utils/autopcor/AutoCorrelation.cpp  # removed: duplicate class
     src/utils/deadzone/DeadZoneFilter.cpp
-    src/utils/movingmax/MovingMinMax.cpp
     src/utils/countmin/CountMinSketch.cpp
     # src/utils/cuckoo/CuckooFilter.cpp  # removed: duplicate class
     # src/utils/bloomfilter2/ScalableBloomFilter.cpp  # removed: duplicate class
@@ -775,7 +762,6 @@ set(SOURCES
     src/utils/dwt2/DaubechiesWavelet.cpp
     src/utils/huffman2/AdaptiveHuffman.cpp
     # src/utils/hyperloglog/HyperLogLog.cpp  # removed: duplicate class
-    src/utils/lifting/LiftingScheme.cpp
     src/utils/lzw2/LzwCodec2.cpp
     src/utils/mergesort/MergeSorter.cpp
 
@@ -871,7 +857,6 @@ set(SOURCES
     src/utils/dft2/GoertzelSpectrum.cpp
     src/utils/qr2/HouseholderQR.cpp
     # src/utils/eigen2/PowerIteration.cpp  # removed: duplicate class
-    src/utils/bfgs/BfgsOptimizer.cpp
     src/utils/dct/DctTransform.cpp
     # src/utils/distance/DistanceMetric.cpp  # removed: duplicate class
     src/utils/cluster2/DbScan.cpp
@@ -902,7 +887,6 @@ set(SOURCES
     src/utils/laguerre/LaguerreSolver.cpp
     src/utils/horner/HornerScheme.cpp
     # src/utils/newtonroot/NewtonRaphson.cpp  # removed: duplicate class
-    src/utils/gaussquad/GaussLegendre.cpp
     src/utils/richardson/RichardsonExtrapolation.cpp
     src/utils/autodiff/numericalDifferentiator.cpp
     src/utils/rk2/Rk2Solver.cpp
@@ -921,7 +905,6 @@ set(SOURCES
     src/utils/pade/PadeApproximant.cpp
     src/utils/sturm/SturmSequence.cpp
     # src/utils/qrstep/QrEigenSolver.cpp  # removed: duplicate class
-    src/utils/hessenberg/HessenbergReduction.cpp
     src/utils/butterfly/ButterflyOperation.cpp
     src/utils/circulant/CirculantSolver.cpp
 
@@ -952,7 +935,6 @@ set(SOURCES
     src/utils/qz/QzDecomposition.cpp
     src/utils/svd2/SvdSolver.cpp
     # src/utils/polar/PolarDecomposition.cpp  # removed: duplicate class
-    src/utils/qrupdate/QrUpdate.cpp
     src/utils/cholupdate/CholeskyUpdate.cpp
     src/utils/schur_update/SchurReorder.cpp
     src/utils/arnoldi/ArnoldiProcess.cpp
@@ -971,7 +953,6 @@ set(SOURCES
     src/utils/min_rotation/MinimalRotation.cpp
     src/utils/polynomial_root/PolynomialRoots.cpp
     # src/utils/resultant/PolynomialResultant.cpp  # removed: duplicate class
-    src/utils/groebner/GroebnerBasis.cpp
     src/utils/grobner2/MultivariatePolynomial.cpp
 
     # ── Wave 49: 计算几何/空间索引 ──
@@ -1236,7 +1217,6 @@ set(SOURCES
     src/utils/stft/StftAnalyzer.cpp
     src/utils/zcr/ZeroCrossingRate.cpp
     src/utils/thd/ThdAnalyzer.cpp
-    src/utils/hmm/HiddenMarkovModel.cpp
     # src/utils/viterbi/ViterbiDecoder.cpp  # removed: duplicate of signal16/ViterbiDecoder
     src/utils/covariance/CovarianceMatrix.cpp
     src/utils/percentile/PercentileCalculator.cpp
@@ -1255,7 +1235,6 @@ set(SOURCES
     src/utils/gabor/GaborTransform.cpp
     src/utils/pitch/PitchDetector.cpp
     # src/utils/ttest/TTestCalculator.cpp  # removed: duplicate class
-    src/utils/moment/StatisticalMoments.cpp
     src/utils/ks/KsTestCalculator.cpp
 
     # -- F158~F171: Wave 24 工具模块 --
@@ -1323,10 +1302,8 @@ set(SOURCES
     src/utils/btree4/BStarTree.cpp
     src/utils/dict/TrieMap.cpp
     # src/utils/friedman/FriedmanTest.cpp  # removed: duplicate class
-    src/utils/golay/GolayCode.cpp
     src/utils/haar2/HaarWavelet2D.cpp
     # src/utils/horner2/HornerScheme.cpp  # removed: duplicate class
-    src/utils/inv_perm/InversePermutation.cpp
     src/utils/levenshtein2/DamerauLevenshtein.cpp
     src/utils/lfsr/LfsrSequence.cpp
     src/utils/median3/MedianFilter3D.cpp
@@ -4049,9 +4026,7 @@ set(HEADERS
     # -- F105: 索引双端队列 --
     src/utils/deque/IndexedDeque.h
     # -- F106: AVL平衡二叉搜索树 --
-    src/utils/avltree/AvlTree.h
     # -- F107: 红黑树 --
-    src/utils/redblack/RedBlackTree.h
     # -- F108: 汉明码编解码器 (duplicate removed) --
     # -- F109: 数值梯度计算器 --
     src/utils/gradient/NumericalGradient.h
@@ -4107,7 +4082,6 @@ set(HEADERS
     src/utils/whitening/SpectralWhitener.h
     src/utils/peaks2/MultiPeakDetector.h
     src/utils/pingpong/PingPongBuffer.h
-    src/utils/twoway/TwoWayMap.h
     # DUPLICATE REMOVED: src/utils/rle2/RunLengthEncoder2.h
     # DUPLICATE REMOVED: src/utils/shannon2/HuffmanTreeBuilder.h
     src/utils/graph2/TopologicalSorter.h
@@ -4221,7 +4195,6 @@ set(HEADERS
     src/utils/stft/StftAnalyzer.h
     src/utils/zcr/ZeroCrossingRate.h
     src/utils/thd/ThdAnalyzer.h
-    src/utils/lru/LruCache.h
     src/utils/bloom/BloomFilter.h
     # src/utils/hmm/HiddenMarkovModel.h  # removed: duplicate class
     # src/utils/viterbi/ViterbiDecoder.h  # removed: duplicate of signal16/ViterbiDecoder
@@ -4246,10 +4219,6 @@ set(HEADERS
 
     # -- F158~F171: Wave 24 工具模块 --
     src/utils/bootstrap/BootstrapResampler.h
-    src/utils/lfu/LfuCache.h
-    src/utils/trie/TrieMap.h
-    src/utils/skiplist/SkipList.h
-    src/utils/heap/GenHeap.h
     src/utils/chisq/ChiSquareTest.h
     src/utils/anova/AnovaTest.h
     src/utils/lrc/LrcChecksum.h
