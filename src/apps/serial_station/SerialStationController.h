@@ -12,6 +12,7 @@
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
 #include "apps/serial_station/services/SerialExportService.h"
 #include "apps/serial_station/services/SerialLogService.h"
+#include "apps/serial_station/services/SerialMeasurementService.h"
 #include "apps/serial_station/services/SerialProfileService.h"
 #include "apps/serial_station/services/SerialReplayService.h"
 
@@ -107,49 +108,28 @@ public slots:
     void setActiveProtocol(const QString& protocolName);
 
 signals:
-    /**
-     * @brief 串口会话状态变化。
-     * @param state 新状态
-     */
+    /** @brief 串口会话状态变化。 */
     void serialStateChanged(SerialSessionState state);
 
-    /**
-     * @brief 串口错误向 UI 层传播。
-     * @param message 错误描述
-     */
+    /** @brief 串口错误向 UI 层传播。 */
     void serialErrorOccurred(const QString& message);
 
-    /**
-     * @brief 发送日志需要展示到 UI。
-     * @param text 日志文本
-     */
+    /** @brief 发送日志需要展示到 UI。 */
     void serialTxLogged(const QString& text);
 
-    /**
-     * @brief 接收日志需要展示到 UI。
-     * @param text 日志文本
-     */
+    /** @brief 接收日志需要展示到 UI。 */
     void serialRxLogged(const QString& text);
 
-    /**
-     * @brief 系统日志需要展示到 UI。
-     * @param text 日志文本
-     */
+    /** @brief 系统日志需要展示到 UI。 */
     void serialSystemLogged(const QString& text);
 
-    /**
-     * @brief 一次发送成功。
-     */
+    /** @brief 一次发送成功。 */
     void serialTxCounted();
 
-    /**
-     * @brief 一次接收帧解析成功。
-     */
+    /** @brief 一次接收帧解析成功。 */
     void serialRxCounted();
 
-    /**
-     * @brief 一次发送失败。
-     */
+    /** @brief 一次发送失败。 */
     void serialErrorCounted();
 
     /**
@@ -176,11 +156,11 @@ signals:
      */
     void serialCommandFailed(const QString& command, const QString& mode, const QString& message);
 
-    /**
-     * @brief 当前默认协议已变化。
-     * @param protocolName 协议注册名
-     */
+    /** @brief 当前默认协议已变化。 */
     void activeProtocolChanged(const QString& protocolName);
+
+    /** @brief 当前测量通道摘要已变化；空列表表示清空。 */
+    void serialMeasurementUpdated(const QStringList& lines);
 
 private:
     QString normalizeSendMode(const QString& mode) const;
@@ -205,6 +185,7 @@ private:
     SerialDispatcher m_dispatcher;
     SerialCodec m_codec;
     SerialLogService m_logService;
+    SerialMeasurementService m_measurementService;
     SerialExportService m_exportService;
     SerialProfileService m_profileService;
     SerialReplayService m_replayService;

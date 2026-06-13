@@ -1180,6 +1180,34 @@ endif()
 add_test(NAME SerialProtocolPanel COMMAND test_serial_protocol_panel)
 
 # ============================================================
+# Serial Station测量通道面板测试
+# ============================================================
+
+add_executable(test_serial_measurement_panel
+    serial_station/test_serial_measurement_panel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialMeasurementPanel.cpp
+)
+
+target_include_directories(test_serial_measurement_panel PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_measurement_panel PRIVATE
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_measurement_panel PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialMeasurementPanel COMMAND test_serial_measurement_panel)
+
+# ============================================================
 # Serial Station发送编码器测试
 # ============================================================
 
@@ -1319,6 +1347,33 @@ endif()
 add_test(NAME SerialReplayService COMMAND test_serial_replay_service)
 
 # ============================================================
+# Serial Station测量通道服务测试
+# ============================================================
+
+add_executable(test_serial_measurement_service
+    serial_station/test_serial_measurement_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialMeasurementService.cpp
+)
+
+target_include_directories(test_serial_measurement_service PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_measurement_service PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_measurement_service PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialMeasurementService COMMAND test_serial_measurement_service)
+
+# ============================================================
 # Serial Station配置档案服务测试
 # ============================================================
 
@@ -1393,6 +1448,7 @@ add_executable(test_serial_station_replay_flow
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialProtocolPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialMeasurementPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandHistoryModel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialLogPanel.cpp
@@ -1402,6 +1458,7 @@ add_executable(test_serial_station_replay_flow
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialMeasurementService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileCatalogService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialReplayService.cpp
@@ -1452,6 +1509,7 @@ add_executable(test_serial_station_controller_log_service
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialMeasurementService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
@@ -1495,6 +1553,7 @@ add_executable(test_serial_station_export_flow
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialMeasurementService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
@@ -1538,6 +1597,7 @@ add_executable(test_serial_station_controller
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialMeasurementService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/SerialProtocolRegistry.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp
@@ -1581,6 +1641,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialProtocolPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialMeasurementPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandHistoryModel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialLogPanel.cpp
@@ -1590,6 +1651,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialSession.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialExportService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialLogService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialMeasurementService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileCatalogService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialProfileService.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialReplayService.cpp

@@ -182,6 +182,8 @@ void SerialStationController::resetReceiveDispatcher()
 void SerialStationController::clearLogRecords()
 {
     m_logService.clear();
+    m_measurementService.reset();
+    emit serialMeasurementUpdated(QStringList());
 }
 
 void SerialStationController::setActiveProtocol(const QString& protocolName)
@@ -242,6 +244,9 @@ void SerialStationController::processProtocolEvent(const SerialProtocolEvent& ev
     if (event.type == QStringLiteral("measurement")) {
         const QString measurementText = measurementPayloadText(event);
         const QString text = measurementText.isEmpty() ? eventPayloadText(event) : measurementText;
+        if (m_measurementService.appendEvent(event)) {
+            emit serialMeasurementUpdated(m_measurementService.displayLines());
+        }
         emit serialRxCounted();
         logRx(text,
               event.raw,

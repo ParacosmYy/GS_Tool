@@ -1,48 +1,46 @@
 # EmbedDebug
 
-> 面向嵌入式研发与调试现场的 Qt 桌面工作台：把串口工站、协议收发、终端日志、波形分析、OTA、录制回放、自动化和工程诊断收敛到一个可验证、可扩展、可交付的应用中。
+> 面向嵌入式研发、硬件联调和测试现场的 Qt 桌面调试工作台。EmbedDebug 将串口工站、协议收发、日志留存、回放预览、测量观察、OTA、自动化和工程诊断收敛到一个可验证、可扩展、可交付的应用入口。
 
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?style=flat-square)
 ![Qt 6](https://img.shields.io/badge/Qt-6-41CD52?style=flat-square)
 ![CMake](https://img.shields.io/badge/build-CMake%20%2B%20Ninja-064F8C?style=flat-square)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-0078D4?style=flat-square)
+![Windows](https://img.shields.io/badge/platform-Windows%2010%2B-0078D4?style=flat-square)
 ![Status](https://img.shields.io/badge/status-active%20engineering%20build-f59e0b?style=flat-square)
 
 ![EmbedDebug 界面预览](docs/assets/readme/interface-preview.svg)
 
 ## 项目定位
 
-嵌入式调试现场通常被拆散在多个工具里：串口助手、协议解析器、波形查看器、日志记录器、OTA 工具、脚本工具和临时诊断面板。EmbedDebug 的目标是把这些链路整理成一个稳定的工程工作台，让固件、硬件和测试工程师能在同一个入口完成连接配置、命令发送、帧解析、日志留存、会话回放和问题复现。
+嵌入式调试现场常被拆散在串口助手、协议解析器、波形查看器、日志工具、脚本工具和临时诊断面板中。EmbedDebug 的目标是把这些链路整理成一个稳定的工程工作台，让固件、硬件和测试工程师能在同一个入口完成连接配置、命令发送、帧解析、日志留存、会话回放和问题复现。
 
-当前仓库不是对外宣称完成的商业发行版，而是一个持续演进的工程版本。项目使用 PRD/Specs 约束、分层架构边界、QTest 自动化覆盖、Windows 启动探针和评分追踪来管理每一轮迭代。README 中的能力状态只描述已经能在仓库中找到证据的内容；未做真实硬件验证的能力不会被包装成已量产能力。
+当前仓库是持续演进的工程版本。项目以 PRD/Specs、分层架构约束、QTest 自动化、启动探针和评分追踪管理每轮迭代。README 只声明仓库内已有证据支撑的能力；未经过真实设备验证的能力不会包装成量产结论。
 
-## 产品快照
+## 当前快照
 
-| 项目 | 当前状态 |
-|------|----------|
+| 项目 | 状态 |
+|------|------|
 | 应用名称 | `EmbedDebug` |
 | 主开发分支 | `feat/embed-debug` |
-| 用户入口 | 仓库根目录 `EmbedDebug.bat` |
+| 启动入口 | `EmbedDebug.bat` |
 | 串口工站直达 | `EmbedDebug.bat --station serial` |
-| 档案化串口工站 | `EmbedDebug.bat --station serial --profile <file.edserialprofile>`、`--last-profile` 或 `--profile-dir <dir>`，工作台内支持最近档案、重载上次、清理失效、清空最近、默认目录记忆和目录导入 |
-| 构建系统 | CMake + Ninja，只允许使用 `build/` |
-| UI 技术栈 | Qt Widgets、QSS 主题、SVG 图标资源 |
-| 工程治理 | PRD、Specs、TDD、启动验证、架构约束、评分追踪 |
+| 档案启动 | `--profile <file.edserialprofile>`、`--last-profile`、`--profile-dir <dir>` |
+| 技术栈 | C++17、Qt Widgets、CMake、Ninja、QTest |
+| 构建目录 | 仅允许 `build/` |
 
 ## 能力成熟度
 
 | 能力域 | 仓库证据 | 工程状态 | 用户路径 | 设备验证 |
 |--------|----------|----------|----------|----------|
-| Serial Station 串口工站 | `src/apps/serial_station/`、QTest、README 启动入口 | E5 | U4，档案/日志/命令闭环 | D1，自动化测试 |
-| UART 配置链路 | 端口枚举、手动 COM、UART 摘要、连接/断开 UI | E4 | U3 | D1，未声明真实硬件验证 |
-| 协议收发与解析 | `ascii_text`、`modbus_rtu`、`custom_md`、`just_float`、registry 测试 | E5 | U3 | D1 |
-| 命令历史与配置档案 | 最近命令、`.edserialprofile` 保存/加载、启动加载、默认档案目录持久化、目录导入、最近档案索引、失效清理与回退 | E5 | U4 | D1 |
-| 日志、导出、回放预览 | 结构化日志服务、导出服务、回放服务、UI 流程测试 | E4/E5 | U3 | D1 |
-| 终端与数据视图 | terminal、chart、FFT、heatmap、histogram/scatter、dashboard 模块 | E3/E4，按模块不同 | U2/U3 | D0-D1 |
-| OTA 与文件链路 | X/Y/ZMODEM、HEX/BIN、导出基础设施 | E3/E4 | U2 | D0-D1 |
-| BLE/CAN/MQTT/USB/RTT | 框架代码和阶段性集成 | E2-E4，按模块不同 | U1-U2 | D0-D1 |
+| Serial Station 串口工站 | `src/apps/serial_station/`、QTest、启动入口 | E5 | U4 | D1 |
+| UART 配置链路 | 端口枚举、手动 COM、配置摘要、连接日志 | E4 | U3 | D1 |
+| 协议收发与解析 | `ascii_text`、`modbus_rtu`、`custom_md`、`just_float` | E5 | U3 | D1 |
+| 测量通道观察 | JustFloat measurement、测量服务、通道摘要面板 | E5 | U3 | D1 |
+| 命令历史与配置档案 | 最近命令、`.edserialprofile`、最近/上次/默认目录 | E5 | U4 | D1 |
+| 日志、导出、回放预览 | 结构化日志、导出服务、回放服务、UI 闭环 | E4/E5 | U3 | D1 |
+| 终端、图表、OTA、BLE/CAN/MQTT/USB/RTT | 阶段性模块和集成代码 | E2-E4 | U1-U3 | D0-D1 |
 
-状态口径遵循项目三轴标准：
+状态口径：
 
 ```text
 Engineering: E0 未开始 -> E5 可维护闭环
@@ -52,67 +50,44 @@ Device:      D0 未验证 -> D4 真实设备验证
 
 ## Serial Station
 
-Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial_station/`。它已经从“串口助手入口”推进到“可保存、可加载、可启动套用配置档案，并能固定和记忆档案目录、批量导入目录档案、从最近档案快速恢复、清理失效路径和维护工位配置”的调试工站。
+Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial_station/`。它已经覆盖串口配置、协议选择、ASCII/HEX/协议模式发送、结构化日志、导出、回放预览、命令历史、配置档案、最近档案索引、默认档案目录和 JustFloat 测量摘要。
 
-典型使用路径：
+常用入口：
 
-1. 使用 `.\EmbedDebug.bat --station serial` 直达串口工站。
-2. 选择真实端口或手动输入 COM 端口。
-3. 配置波特率、数据位、校验位、停止位、流控、DTR 和 RTS。
-4. 选择协议：`ascii_text`、`modbus_rtu`、`custom_md` 或 `just_float`。
-5. 使用 ASCII、HEX 或协议模式发送命令。
-6. 查看 TX/RX/System 日志和状态计数。
-7. 导出日志，或生成回放预览。
-8. 保存或加载 UART/协议/命令档案。
-9. 使用 `.\EmbedDebug.bat --station serial --profile <file.edserialprofile>` 直接打开预配置工站。
-10. 在工作台内通过“最近档案”下拉或“重载上次”恢复上次工位配置。
-11. 档案被删除或临时路径失效时，使用“清理失效”维护最近档案索引；该操作不会删除 `.edserialprofile` 文件。
-12. 临时测试档案污染列表时，使用“清空最近”清理索引；该操作同样不会删除真实档案文件。
-13. 使用 `.\EmbedDebug.bat --last-profile` 直接恢复最近一次成功使用的串口工站档案；若上次档案已不存在，会自动回退到下一个仍存在的最近档案。
-14. 使用 `.\EmbedDebug.bat --station serial --profile-dir .\profiles\line-a` 固定保存/加载档案的默认目录；该目录会持久化，后续普通启动也会优先回到上次工位目录。
-15. 成功保存或加载 `.edserialprofile` 后，工作台会自动把该文件所在目录记为新的默认档案目录；清空最近档案不会删除真实档案文件，也不会丢失工位默认目录。
-16. 默认目录中已有多个 `.edserialprofile` 或 `.json` 档案时，使用“导入目录”一次纳入最近档案列表，再从下拉框切换工位配置。
+```powershell
+.\EmbedDebug.bat --station serial
+.\EmbedDebug.bat --station serial --profile .\profiles\line-a.edserialprofile
+.\EmbedDebug.bat --last-profile
+.\EmbedDebug.bat --station serial --profile-dir .\profiles\line-a
+```
 
-协议方向说明：
+协议支持：
 
-- `ascii_text` 面向常规文本终端和 AT 类命令。
-- `modbus_rtu` 面向基础 Modbus 主站请求与响应解析。
-- `custom_md` 面向自定义 MCU 调试帧。
-- `just_float` 参考 VOFA+ JustFloat 数据路径，支持小端 IEEE754 float 数组 + `00 00 80 7F` 帧尾解析，当前达到 E5/U3/D1：可在工作台选择并经自动化测试验证解析，但尚未接入完整波形工作区，真实设备未验证。
+| 协议 | 用途 |
+|------|------|
+| `ascii_text` | 文本终端、AT 类命令 |
+| `modbus_rtu` | 基础 Modbus RTU 主站请求与响应解析 |
+| `custom_md` | 自定义 MCU 调试帧 |
+| `just_float` | 参考 VOFA+ JustFloat 数据路径，解析小端 IEEE754 float 数组 + `00 00 80 7F` 帧尾，并汇总到测量通道面板 |
 
-内部边界：
+JustFloat 当前已完成协议注册、流式解析、工作台选择和测量摘要显示；下一步重点是接入波形工作区，并通过虚拟串口或真实硬件样本提升设备验证等级。
+
+## 架构边界
 
 ```text
 ui/ -> SerialStationController -> core/ + protocols/ + services/
 workers/ -> core/
 core/ -> ISerialProtocol + SerialProtocolRegistry
 protocols/<name>/ -> protocol interface + shared/utils only
-services/ -> JSON、日志、导出、回放、档案
-```
-
-UI 面板不直接解析字节流，不直接写档案文件。协议层不接触 QWidget。`MainWindow` 和 `PanelManager` 只负责装配、导航和面板编排。
-
-## 架构边界
-
-EmbedDebug 使用分层依赖模型。新增代码必须先阅读对应约束文档，并保持依赖方向清晰。
-
-```text
-L6   src/core/                 应用协调、主窗口、导航、主题运行时
-L5   src/ota/ automation/      场景工作流：OTA、自动化、仪表盘、插件
-L4   src/terminal/ chart/ rtt/ 数据呈现、终端、波形和实时观察
-L3   src/connection/ protocol/ serial/ 连接实现、协议引擎和历史串口模块
-L5A  src/apps/serial_station/  独立串口工站，内部继续分层
-L2   src/utils/                CRC、HEX、导出、日志、缓存、算法等复用能力
-L1   src/shared/               共享常量、枚举、轻量类型
-L0   src/interfaces/           纯接口契约
+services/ -> JSON、日志、导出、回放、档案、测量摘要
 ```
 
 核心规则：
 
-| 规则 | 含义 |
+| 规则 | 要求 |
 |------|------|
 | 不经 PRD 不写新功能 | 新行为必须先有 PRD/Specs |
-| 只允许一个构建目录 | 固定使用 `build/`，禁止平行构建目录 |
+| 只允许一个构建目录 | 固定使用 `build/` |
 | 不提交死源码 | 新增 `.h/.cpp` 必须加入 CMake |
 | 壳层不写业务逻辑 | `MainWindow` 和 `PanelManager` 只装配和导航 |
 | 公共能力优先复用 | CRC、HEX、Settings、日志、导出、RingBuffer 等不重复造 |
@@ -127,30 +102,6 @@ L0   src/interfaces/           纯接口契约
 .\EmbedDebug.bat
 ```
 
-直达 Serial Station：
-
-```powershell
-.\EmbedDebug.bat --station serial
-```
-
-直达 Serial Station 并套用已保存的 UART/协议/命令档案：
-
-```powershell
-.\EmbedDebug.bat --station serial --profile .\profiles\line-a.edserialprofile
-```
-
-直达 Serial Station 并恢复最近一次成功使用的档案：
-
-```powershell
-.\EmbedDebug.bat --last-profile
-```
-
-直达 Serial Station 并固定工位档案目录：
-
-```powershell
-.\EmbedDebug.bat --station serial --profile-dir .\profiles\line-a
-```
-
 手动配置和构建：
 
 ```powershell
@@ -159,9 +110,7 @@ cmake --build build --target EmbedDebug --parallel 4
 .\EmbedDebug.bat
 ```
 
-仓库只支持 `build/`。不要创建 `build2/`、`build-debug/`、`build-release/` 或 IDE 自动生成的平行构建目录。
-
-## 工具入口
+常用工具：
 
 ```powershell
 uv run start-embeddebug
@@ -171,8 +120,6 @@ uv run verify-package-embeddebug
 uv run test-embeddebug-tools
 ```
 
-`uv run start-embeddebug` 最终仍委托 `EmbedDebug.bat`，批处理文件是最低可用启动入口。打包工具复用 `build/EmbedDebug.exe`，执行 Qt 部署，并将忽略提交的产物写入 `dist/`。
-
 ## 本地验证
 
 核心验证：
@@ -181,19 +128,16 @@ uv run test-embeddebug-tools
 cmake -G Ninja -B build -DCMAKE_PREFIX_PATH=C:/msys64/mingw64
 cmake --build build --target EmbedDebug --parallel 4
 .\EmbedDebug.bat --station serial
-.\EmbedDebug.bat --station serial --profile <file.edserialprofile>
-.\EmbedDebug.bat --last-profile
-.\EmbedDebug.bat --station serial --profile-dir .\profiles
 ```
 
 Serial Station 聚焦验证：
 
 ```powershell
-cmake --build build --target test_startup_options test_serial_profile_catalog_service test_serial_command_panel test_serial_port_panel test_serial_station_workbench --parallel 4
+cmake --build build --target test_startup_options test_serial_measurement_service test_serial_measurement_panel test_serial_station_controller test_serial_station_workbench --parallel 4
 .\build\tests\test_startup_options.exe
-.\build\tests\test_serial_profile_catalog_service.exe
-.\build\tests\test_serial_command_panel.exe
-.\build\tests\test_serial_port_panel.exe
+.\build\tests\test_serial_measurement_service.exe
+.\build\tests\test_serial_measurement_panel.exe
+.\build\tests\test_serial_station_controller.exe
 .\build\tests\test_serial_station_workbench.exe
 ```
 
@@ -213,14 +157,9 @@ GS_Tool/
 |   |-- core/                  # 应用协调和共享 UI 运行时
 |   |-- connection/            # 连接实现与工厂
 |   |-- protocol/              # 协议引擎、桥接、Schema
-|   |-- terminal/              # 终端模型、过滤、渲染
-|   |-- chart/                 # 波形、FFT、游标、热力图、缩放
-|   |-- ota/                   # 固件更新工作流
-|   |-- automation/            # 触发器和规则自动化
-|   |-- dashboard/             # 仪表盘控件
-|   |-- rtt/                   # SEGGER RTT 集成层
-|   |-- utils/                 # 可复用工具层
-|   |-- shared/                # 共享常量和轻量类型
+|   |-- terminal/ chart/       # 终端、波形和数据呈现
+|   |-- ota/ automation/       # OTA 与自动化
+|   |-- utils/ shared/         # 复用工具和轻量类型
 |   `-- interfaces/            # 纯接口
 |-- tests/                     # QTest 目标
 |-- resources/                 # 主题、图标、翻译和资源
@@ -232,43 +171,28 @@ GS_Tool/
 `-- README.md
 ```
 
-## 工程工作流
-
-本仓库刻意采用约束驱动流程，目的是让功能推进、架构边界和验证证据同步增长。
-
-| 阶段 | 作用 |
-|------|------|
-| PRD | 定义用户问题、边界、非目标和状态目标 |
-| Specs | 将 PRD 转成实现约束、调用链和验证命令 |
-| TDD | 先补或更新 QTest，再改生产代码 |
-| GO loop | 执行、检查、修复、验证，避免盲目扩大范围 |
-| Commit | 每个闭环迭代提交一次，写清状态、验证和评分 |
-
-入口文档：
-
-- [CLAUDE.md](CLAUDE.md)
-- [docs/constraints/01-project-overview.md](docs/constraints/01-project-overview.md)
-- [docs/constraints/02-workflow.md](docs/constraints/02-workflow.md)
-- [docs/constraints/03-architecture.md](docs/constraints/03-architecture.md)
-- [docs/serial_station_architecture.md](docs/serial_station_architecture.md)
-
 ## 路线图
-
-近期重点是把已有工程体量继续收敛成可靠的一体化工作站。
 
 | 优先级 | 方向 | 目标 |
 |--------|------|------|
-| P0 | Serial Station 一键套用/连接和档案管理深化 | 最近档案索引、目录导入、清空、失效清理、默认档案目录记忆、上次档案快捷启动和缺失回退已落地，下一步补可控连接策略 |
-| P0 | VOFA+/OmniProbe 式数据观察路径 | JustFloat 基础解析和协议选择已落地，下一步把 measurement 事件接入字段侧栏、波形工作区和虚拟串口样本验证 |
-| P0 | 虚拟串口或硬件回环验证 | 将串口工站设备证据从 D1 提升到更接近真实现场 |
-| P1 | QSS token 生成和 UI 一致性 | 降低手写主题漂移，统一控件层级 |
-| P1 | 对话框和错误反馈统一 | 用一致的应用级反馈替代零散消息流 |
-| P2 | BLE/CAN/MQTT/USB/RTT 强化 | 将阶段性集成推进到可验证工作流 |
-| P2 | 发布包体验打磨 | 让 `dist/` 校验、随包文档和启动路径适合交付 |
+| P0 | Serial Station 连接策略 | 补可控连接、异常恢复和现场可诊断反馈 |
+| P0 | VOFA+/OmniProbe 式数据观察 | 将 JustFloat measurement 接入波形工作区和虚拟串口样本验证 |
+| P0 | 虚拟串口或硬件回环验证 | 将设备证据从 D1 推向更接近真实现场 |
+| P1 | QSS token 与 UI 一致性 | 降低主题漂移，统一控件层级 |
+| P1 | 发布包体验 | 强化 `dist/` 校验、随包文档和启动路径 |
 
-## 贡献约束
+## 贡献方式
 
-修改代码前先阅读受影响区域的约束文档。新增功能必须先有 PRD/Specs。新增 `.h/.cpp` 必须加入 CMake。任何影响构建、启动、入口、资源、依赖或路径的改动，收口前必须验证 `EmbedDebug.bat`，无法验证时需要说明具体原因。
+欢迎提交 Issue 和 Pull Request，尤其是以下方向：
+
+- 串口协议适配、真实设备样本、虚拟串口验证脚本。
+- VOFA+/OmniProbe 式波形观察、测量面板和数据回放体验。
+- Qt Widgets UI 一致性、QSS 主题、图标和可访问性改进。
+- Windows 构建、打包、启动和交付链路优化。
+
+提交 PR 前请先阅读 [CLAUDE.md](CLAUDE.md) 与 `docs/constraints/` 下的相关约束文档。新增功能需要配套 PRD/Specs、CMake 注册和可运行验证；涉及真实设备的结论请写明设备、端口、样本和复现步骤。
+
+项目联系邮箱：1264206065@qq.com
 
 ## License
 

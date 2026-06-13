@@ -78,6 +78,8 @@ private slots:
     void receiveAfterOversizedBufferStartsFresh();
     void emptyBytesBetweenPartialChunksDoNotBreakFrame();
     void justFloatMeasurementProducesRxLog();
+    void justFloatMeasurementEmitsSummaryLines();
+    void clearLogRecordsClearsMeasurementSummary();
     void reconnectResetsPartialReceiveBuffer();
     void disconnectResetsPartialReceiveBuffer();
     void disconnectThenNewLineDoesNotUseOldPartialBytes();
@@ -661,6 +663,38 @@ void SerialStationControllerTest::justFloatMeasurementProducesRxLog()
     QVERIFY(text.contains(QStringLiteral("JustFloat")));
     QVERIFY(text.contains(QStringLiteral("1.5")));
     QVERIFY(text.contains(QStringLiteral("-2.25")));
+}
+
+void SerialStationControllerTest::justFloatMeasurementEmitsSummaryLines()
+{
+    SerialStationController controller;
+    QSignalSpy measurementSpy(&controller,
+                              &SerialStationController::serialMeasurementUpdated);
+
+    controller.setActiveProtocol(QStringLiteral("just_float"));
+    controller.handleBytesReceived(controllerTestJustFloatFrame({1.5F, -2.25F}));
+
+    QCOMPARE(measurementSpy.count(), 1);
+    const QStringList lines = measurementSpy.takeFirst().at(0).toStringList();
+    QCOMPARE(lines.size(), 2);
+    QVERIFY(lines.at(0).contains(QStringLiteral("ch1")));
+    QVERIFY(lines.at(0).contains(QStringLiteral("1.5")));
+    QVERIFY(lines.at(1).contains(QStringLiteral("ch2")));
+    QVERIFY(lines.at(1).contains(QStringLiteral("-2.25")));
+}
+
+void SerialStationControllerTest::clearLogRecordsClearsMeasurementSummary()
+{
+    SerialStationController controller;
+    QSignalSpy measurementSpy(&controller,
+                              &SerialStationController::serialMeasurementUpdated);
+
+    controller.setActiveProtocol(QStringLiteral("just_float"));
+    controller.handleBytesReceived(controllerTestJustFloatFrame({1.0F}));
+    controller.clearLogRecords();
+
+    QCOMPARE(measurementSpy.count(), 2);
+    QVERIFY(measurementSpy.takeLast().at(0).toStringList().isEmpty());
 }
 
 void SerialStationControllerTest::reconnectResetsPartialReceiveBuffer()

@@ -1,6 +1,8 @@
 #include <QtTest/QtTest>
+#include <QtCore/QDataStream>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
+#include <QtCore/QIODevice>
 #include <QtCore/QTemporaryDir>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
@@ -15,12 +17,14 @@
 #include "apps/serial_station/services/SerialProfileService.h"
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 #include "apps/serial_station/ui/SerialLogPanel.h"
+#include "apps/serial_station/ui/SerialMeasurementPanel.h"
 #include "apps/serial_station/ui/SerialPortPanel.h"
 #include "apps/serial_station/ui/SerialProtocolPanel.h"
 #include "apps/serial_station/ui/SerialStatusBar.h"
 
 using serial_station::SerialCommandPanel;
 using serial_station::SerialLogPanel;
+using serial_station::SerialMeasurementPanel;
 using serial_station::SerialPortPanel;
 using serial_station::SerialProfileCatalogService;
 using serial_station::SerialProfileCommand;
@@ -54,6 +58,9 @@ private slots:
     void workbenchExposesProtocolSelectionControls();
     void protocolSelectionUpdatesControllerAndLog();
     void protocolSelectionCanChooseJustFloat();
+    void workbenchExposesMeasurementPanel();
+    void justFloatReceiveUpdatesMeasurementPanel();
+    void logClearClearsMeasurementPanel();
     void workbenchExposesProfileControls();
     void defaultProfileDirectoryStartsWithFallbackPath();
     void settingDefaultProfileDirectoryNormalizesPath();
@@ -147,6 +154,26 @@ static SerialStationProfile sampleProfile()
         {QStringLiteral("Read Version"), QStringLiteral("AT+GMR"), QStringLiteral("ascii")},
     };
     return profile;
+}
+
+static QByteArray workbenchTestFloatBytes(float value)
+{
+    QByteArray bytes;
+    QDataStream stream(&bytes, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    stream << value;
+    return bytes;
+}
+
+static QByteArray workbenchTestJustFloatFrame(std::initializer_list<float> values)
+{
+    QByteArray frame;
+    for (const float value : values) {
+        frame.append(workbenchTestFloatBytes(value));
+    }
+    frame.append(QByteArray::fromHex("0000807F"));
+    return frame;
 }
 
 void SerialStationWorkbenchTest::windowContainsWorkbenchRegions()
@@ -444,6 +471,56 @@ void SerialStationWorkbenchTest::protocolSelectionCanChooseJustFloat()
     QCOMPARE(controller->activeProtocolName(), QStringLiteral("just_float"));
     QVERIFY(logView->toPlainText().contains(QStringLiteral("已切换串口协议")));
     QVERIFY(logView->toPlainText().contains(QStringLiteral("just_float")));
+}
+
+void SerialStationWorkbenchTest::workbenchExposesMeasurementPanel()
+{
+    SerialStationWindow window;
+    auto* panel = window.findChild<SerialMeasurementPanel*>(QStringLiteral("serialMeasurementPanel"));
+    auto* view = window.findChild<QPlainTextEdit*>(QStringLiteral("serialMeasurementView"));
+    auto* summary = window.findChild<QLabel*>(QStringLiteral("serialMeasurementSummaryLabel"));
+
+    QVERIFY(panel != nullptr);
+    QVERIFY(view != nullptr);
+    QVERIFY(summary != nullptr);
+    QVERIFY(summary->text().contains(QStringLiteral("暂无测量数据")));
+}
+
+void SerialStationWorkbenchTest::justFloatReceiveUpdatesMeasurementPanel()
+{
+    SerialStationWindow window;
+    auto* controller = window.findChild<SerialStationController*>();
+    auto* view = window.findChild<QPlainTextEdit*>(QStringLiteral("serialMeasurementView"));
+    QVERIFY(controller != nullptr);
+    QVERIFY(view != nullptr);
+
+    controller->setActiveProtocol(QStringLiteral("just_float"));
+    controller->handleBytesReceived(workbenchTestJustFloatFrame({1.5F, -2.25F}));
+
+    QVERIFY(view->toPlainText().contains(QStringLiteral("ch1")));
+    QVERIFY(view->toPlainText().contains(QStringLiteral("1.5")));
+    QVERIFY(view->toPlainText().contains(QStringLiteral("ch2")));
+    QVERIFY(view->toPlainText().contains(QStringLiteral("-2.25")));
+}
+
+void SerialStationWorkbenchTest::logClearClearsMeasurementPanel()
+{
+    SerialStationWindow window;
+    auto* controller = window.findChild<SerialStationController*>();
+    auto* clearButton = window.findChild<QPushButton*>(QStringLiteral("serialLogClearButton"));
+    auto* view = window.findChild<QPlainTextEdit*>(QStringLiteral("serialMeasurementView"));
+    auto* summary = window.findChild<QLabel*>(QStringLiteral("serialMeasurementSummaryLabel"));
+    QVERIFY(controller != nullptr);
+    QVERIFY(clearButton != nullptr);
+    QVERIFY(view != nullptr);
+    QVERIFY(summary != nullptr);
+
+    controller->setActiveProtocol(QStringLiteral("just_float"));
+    controller->handleBytesReceived(workbenchTestJustFloatFrame({1.0F}));
+    QTest::mouseClick(clearButton, Qt::LeftButton);
+
+    QVERIFY(view->toPlainText().isEmpty());
+    QVERIFY(summary->text().contains(QStringLiteral("暂无测量数据")));
 }
 
 void SerialStationWorkbenchTest::workbenchExposesProfileControls()

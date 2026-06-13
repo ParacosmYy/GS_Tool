@@ -16,6 +16,7 @@
 #include "apps/serial_station/services/SerialProfileCatalogService.h"
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 #include "apps/serial_station/ui/SerialLogPanel.h"
+#include "apps/serial_station/ui/SerialMeasurementPanel.h"
 #include "apps/serial_station/ui/SerialPortPanel.h"
 #include "apps/serial_station/ui/SerialProtocolPanel.h"
 #include "apps/serial_station/ui/SerialStatusBar.h"
@@ -124,9 +125,11 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     m_protocolPanel = new SerialProtocolPanel(leftPanel);
     m_protocolPanel->setProtocols(m_controller->availableProtocolNames(),
                                   m_controller->activeProtocolName());
+    m_measurementPanel = new SerialMeasurementPanel(leftPanel);
 
     leftLayout->addWidget(m_portPanel);
     leftLayout->addWidget(m_protocolPanel);
+    leftLayout->addWidget(m_measurementPanel);
     leftLayout->addStretch();
     workbench->addWidget(leftPanel);
 
@@ -177,6 +180,8 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             m_logPanel, &SerialLogPanel::appendRx);
     connect(m_controller.get(), &SerialStationController::serialSystemLogged,
             m_logPanel, &SerialLogPanel::appendSystem);
+    connect(m_controller.get(), &SerialStationController::serialMeasurementUpdated,
+            m_measurementPanel, &SerialMeasurementPanel::setSummaryLines);
     connect(m_controller.get(), &SerialStationController::serialTxCounted,
             m_statusBar, &SerialStatusBar::incrementTx);
     connect(m_controller.get(), &SerialStationController::serialTxCounted,

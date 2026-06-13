@@ -13,6 +13,7 @@ namespace serial_station {
 
 class SerialCommandPanel;
 class SerialLogPanel;
+class SerialMeasurementPanel;
 class SerialProtocolPanel;
 class SerialProfileCatalogService;
 struct SerialProfileResult;
@@ -120,6 +121,7 @@ private:
     std::unique_ptr<SerialProfileCatalogService> m_profileCatalog;
     SerialPortPanel* m_portPanel = nullptr;
     SerialProtocolPanel* m_protocolPanel = nullptr;
+    SerialMeasurementPanel* m_measurementPanel = nullptr;
     SerialCommandPanel* m_commandPanel = nullptr;
     SerialLogPanel* m_logPanel = nullptr;
     SerialStatusBar* m_statusBar = nullptr;
