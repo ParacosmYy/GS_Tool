@@ -25,6 +25,16 @@ SerialProtocolRegistry& SerialStationController::protocols()
     return m_protocols;
 }
 
+QStringList SerialStationController::availableProtocolNames() const
+{
+    return m_protocols.protocolNames();
+}
+
+QString SerialStationController::activeProtocolName() const
+{
+    return m_protocols.defaultProtocol();
+}
+
 SerialManager& SerialStationController::serialManager()
 {
     return m_serialManager;
@@ -142,6 +152,33 @@ void SerialStationController::resetReceiveDispatcher()
 void SerialStationController::clearLogRecords()
 {
     m_logService.clear();
+}
+
+void SerialStationController::setActiveProtocol(const QString& protocolName)
+{
+    const QString trimmed = protocolName.trimmed();
+    const QString previous = m_protocols.defaultProtocol();
+
+    if (trimmed.isEmpty() || !m_protocols.contains(trimmed)) {
+        emit serialErrorCounted();
+        logError(tr("串口协议不可用: %1").arg(trimmed.isEmpty() ? tr("<empty>") : trimmed),
+                 {{QStringLiteral("protocolName"), trimmed},
+                  {QStringLiteral("previousProtocol"), previous}});
+        emit activeProtocolChanged(previous);
+        return;
+    }
+
+    if (trimmed == previous) {
+        emit activeProtocolChanged(previous);
+        return;
+    }
+
+    m_protocols.setDefaultProtocol(trimmed);
+    resetReceiveDispatcher();
+    logSystem(tr("已切换串口协议: %1").arg(trimmed),
+              {{QStringLiteral("protocolName"), trimmed},
+               {QStringLiteral("previousProtocol"), previous}});
+    emit activeProtocolChanged(trimmed);
 }
 
 void SerialStationController::handleSerialManagerError(const QString& message)

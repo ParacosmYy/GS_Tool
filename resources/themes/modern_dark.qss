@@ -1253,8 +1253,9 @@ QLabel#mqttStatusIndicator[state="error"] {
     background-color: #f7768e;
 }
 
-/* === Serial Station UART配置面板 === */
-QWidget#serialPortPanel {
+/* === Serial Station UART/协议配置面板 === */
+QWidget#serialPortPanel,
+QWidget#serialProtocolPanel {
     background-color: #1f2335;
     border: 1px solid #2f354f;
     border-radius: 8px;
@@ -1282,7 +1283,8 @@ QComboBox#serialBaudCombo,
 QComboBox#serialDataBitsCombo,
 QComboBox#serialParityCombo,
 QComboBox#serialStopBitsCombo,
-QComboBox#serialFlowControlCombo {
+QComboBox#serialFlowControlCombo,
+QComboBox#serialProtocolCombo {
     background-color: #1a1b26;
     border: 1px solid #414868;
     border-radius: 6px;
@@ -1295,7 +1297,8 @@ QComboBox#serialBaudCombo:hover,
 QComboBox#serialDataBitsCombo:hover,
 QComboBox#serialParityCombo:hover,
 QComboBox#serialStopBitsCombo:hover,
-QComboBox#serialFlowControlCombo:hover {
+QComboBox#serialFlowControlCombo:hover,
+QComboBox#serialProtocolCombo:hover {
     border-color: #7aa2f7;
 }
 QComboBox#serialPortCombo:disabled,
@@ -1303,7 +1306,8 @@ QComboBox#serialBaudCombo:disabled,
 QComboBox#serialDataBitsCombo:disabled,
 QComboBox#serialParityCombo:disabled,
 QComboBox#serialStopBitsCombo:disabled,
-QComboBox#serialFlowControlCombo:disabled {
+QComboBox#serialFlowControlCombo:disabled,
+QComboBox#serialProtocolCombo:disabled {
     background-color: #24283b;
     color: #565f89;
     border-color: #292e42;
@@ -1413,9 +1417,32 @@ QLabel#serialPortStatusLabel[state="error"] {
     border-color: #f7768e;
     background-color: rgba(247, 118, 142, 0.10);
 }
+QLabel#serialProtocolTitle {
+    color: #c0caf5;
+    font-weight: bold;
+}
+QLabel#serialProtocolHint,
+QLabel#serialProtocolComboLabel {
+    color: #7f849c;
+}
+QLabel#serialProtocolStatusLabel {
+    color: #9ece6a;
+    border: 1px solid rgba(158, 206, 106, 0.42);
+    border-radius: 6px;
+    background-color: rgba(158, 206, 106, 0.10);
+    padding: 5px 8px;
+}
+QLabel#serialProtocolStatusLabel[state="empty"] {
+    color: #e0af68;
+    border-color: rgba(224, 175, 104, 0.42);
+    background-color: rgba(224, 175, 104, 0.10);
+}
 QSplitter#serialWorkbenchSplitter::handle {
     background-color: #1a1b26;
     width: 8px;
+}
+QWidget#serialWorkbenchLeft {
+    background-color: transparent;
 }
 QWidget#serialWorkbenchCenter,
 QWidget#serialCommandPanel,

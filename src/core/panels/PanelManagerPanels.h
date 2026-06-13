@@ -87,6 +87,10 @@ class BasePanel;
 // ==================== 导出辅助 ====================
 class ExportDialog;
 
+namespace serial_station {
+class SerialStationWindow;
+}
+
 // ==================== 面板成员指针结构体 ====================
 /**
  * @brief 所有面板的成员指针集合
@@ -97,6 +101,7 @@ class ExportDialog;
 struct PanelManagerMembers {
     // --- 核心面板 ---
     SerialConfigPanel* m_serialConfig = nullptr;
+    serial_station::SerialStationWindow* m_serialStationWindow = nullptr;
     DataStatistics* m_dataStats = nullptr;
     ProtocolView* m_protocolView = nullptr;
     FrameVisualEditor* m_frameEditor = nullptr;

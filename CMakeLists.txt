@@ -83,6 +83,7 @@ set(SOURCES
     src/apps/serial_station/SerialStationControllerReplay.cpp
     src/apps/serial_station/SerialStationConfig.cpp
     src/apps/serial_station/ui/SerialPortPanel.cpp
+    src/apps/serial_station/ui/SerialProtocolPanel.cpp
     src/apps/serial_station/ui/SerialCommandPanel.cpp
     src/apps/serial_station/ui/SerialCommandHistoryModel.cpp
     src/apps/serial_station/ui/SerialLogPanel.cpp
@@ -3613,6 +3614,7 @@ set(HEADERS
     src/apps/serial_station/SerialStationModels.h
     src/apps/serial_station/SerialStationConstants.h
     src/apps/serial_station/ui/SerialPortPanel.h
+    src/apps/serial_station/ui/SerialProtocolPanel.h
     src/apps/serial_station/ui/SerialCommandPanel.h
     src/apps/serial_station/ui/SerialCommandHistoryModel.h
     src/apps/serial_station/ui/SerialLogPanel.h

@@ -9,6 +9,7 @@ namespace serial_station {
 
 class SerialCommandPanel;
 class SerialLogPanel;
+class SerialProtocolPanel;
 class SerialStationController;
 class SerialStatusBar;
 class SerialPortPanel;
@@ -28,6 +29,7 @@ public:
 private:
     std::unique_ptr<SerialStationController> m_controller;
     SerialPortPanel* m_portPanel = nullptr;
+    SerialProtocolPanel* m_protocolPanel = nullptr;
     SerialCommandPanel* m_commandPanel = nullptr;
     SerialLogPanel* m_logPanel = nullptr;
     SerialStatusBar* m_statusBar = nullptr;

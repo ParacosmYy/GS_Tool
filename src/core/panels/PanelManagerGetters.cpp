@@ -11,6 +11,7 @@
 #include "core/widgets/BasePanel.h"
 
 // ---- 核心 ----
+#include "apps/serial_station/SerialStationWindow.h"
 #include "serial/config/SerialConfigPanel.h"
 #include "serial/data/DataStatistics.h"
 #include "serial/commands/QuickCommandBar.h"
@@ -77,6 +78,8 @@
 
 /** @brief 获取串口配置面板 @return 串口配置面板指针 */
 SerialConfigPanel*   PanelManager::serialConfig()      const { return m_serialConfig; }
+/** @brief 获取新串口工站入口 @return Serial Station 工作台指针 */
+serial_station::SerialStationWindow* PanelManager::serialStationWindow() const { return m_serialStationWindow; }
 /** @brief 获取数据统计面板 @return 数据统计面板指针 */
 DataStatistics*      PanelManager::dataStats()          const { return m_dataStats; }
 /** @brief 获取协议解析视图面板 @return 协议视图指针 */

@@ -11,6 +11,7 @@
 #include "core/panels/PanelManager.h"
 
 // ---- 核心 ----
+#include "apps/serial_station/SerialStationWindow.h"
 #include "serial/config/SerialConfigPanel.h"
 #include "serial/data/DataStatistics.h"
 #include "serial/commands/QuickCommandBar.h"
@@ -42,6 +43,10 @@ void PanelManager::createPanels(OtaManager* otaManager, TerminalModel* terminalM
     m_serialConfig = new SerialConfigPanel(widgetParent);           // 串口配置
     m_serialConfig->setObjectName("serialConfigPanel");
     m_serialConfig->setVisible(false);
+
+    m_serialStationWindow = new serial_station::SerialStationWindow(widgetParent); // 新串口工站
+    m_serialStationWindow->setObjectName("serialStationWindow");
+    m_serialStationWindow->setVisible(false);
 
     m_dataStats = new DataStatistics(widgetParent);                 // 数据统计
     m_dataStats->setObjectName("dataStatsPanel");

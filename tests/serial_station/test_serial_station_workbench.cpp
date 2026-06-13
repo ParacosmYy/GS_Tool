@@ -11,11 +11,13 @@
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 #include "apps/serial_station/ui/SerialLogPanel.h"
 #include "apps/serial_station/ui/SerialPortPanel.h"
+#include "apps/serial_station/ui/SerialProtocolPanel.h"
 #include "apps/serial_station/ui/SerialStatusBar.h"
 
 using serial_station::SerialCommandPanel;
 using serial_station::SerialLogPanel;
 using serial_station::SerialPortPanel;
+using serial_station::SerialProtocolPanel;
 using serial_station::SerialStationController;
 using serial_station::SerialStationWindow;
 using serial_station::SerialStatusBar;
@@ -38,6 +40,8 @@ private slots:
     void quickCommandFillsCommandInput();
     void logClearRemovesPreviewLines();
     void workbenchExposesCommandHistoryControls();
+    void workbenchExposesProtocolSelectionControls();
+    void protocolSelectionUpdatesControllerAndLog();
 };
 
 void SerialStationWorkbenchTest::windowContainsWorkbenchRegions()
@@ -46,6 +50,7 @@ void SerialStationWorkbenchTest::windowContainsWorkbenchRegions()
 
     QVERIFY(window.findChild<SerialPortPanel*>(QStringLiteral("serialPortPanel")) != nullptr);
     QVERIFY(window.findChild<SerialCommandPanel*>(QStringLiteral("serialCommandPanel")) != nullptr);
+    QVERIFY(window.findChild<SerialProtocolPanel*>(QStringLiteral("serialProtocolPanel")) != nullptr);
     QVERIFY(window.findChild<SerialLogPanel*>(QStringLiteral("serialLogPanel")) != nullptr);
     QVERIFY(window.findChild<SerialStatusBar*>(QStringLiteral("serialStatusBar")) != nullptr);
     QVERIFY(window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView")) != nullptr);
@@ -276,6 +281,43 @@ void SerialStationWorkbenchTest::workbenchExposesCommandHistoryControls()
 
     QVERIFY(!historyCombo->isEnabled());
     QVERIFY(!historyClearButton->isEnabled());
+}
+
+void SerialStationWorkbenchTest::workbenchExposesProtocolSelectionControls()
+{
+    SerialStationWindow window;
+    auto* panel = window.findChild<SerialProtocolPanel*>(QStringLiteral("serialProtocolPanel"));
+    auto* combo = window.findChild<QComboBox*>(QStringLiteral("serialProtocolCombo"));
+    auto* status = window.findChild<QLabel*>(QStringLiteral("serialProtocolStatusLabel"));
+    QVERIFY(panel != nullptr);
+    QVERIFY(combo != nullptr);
+    QVERIFY(status != nullptr);
+
+    QVERIFY(combo->findData(QStringLiteral("ascii_text")) >= 0);
+    QVERIFY(combo->findData(QStringLiteral("custom_md")) >= 0);
+    QVERIFY(combo->findData(QStringLiteral("modbus_rtu")) >= 0);
+    QCOMPARE(panel->activeProtocol(), QStringLiteral("ascii_text"));
+    QVERIFY(status->text().contains(QStringLiteral("ascii_text")));
+}
+
+void SerialStationWorkbenchTest::protocolSelectionUpdatesControllerAndLog()
+{
+    SerialStationWindow window;
+    auto* controller = window.findChild<SerialStationController*>();
+    auto* combo = window.findChild<QComboBox*>(QStringLiteral("serialProtocolCombo"));
+    auto* logView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialLogView"));
+    QVERIFY(controller != nullptr);
+    QVERIFY(combo != nullptr);
+    QVERIFY(logView != nullptr);
+
+    const int customIndex = combo->findData(QStringLiteral("custom_md"));
+    QVERIFY(customIndex >= 0);
+    combo->setCurrentIndex(customIndex);
+    emit combo->activated(customIndex);
+
+    QCOMPARE(controller->activeProtocolName(), QStringLiteral("custom_md"));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("已切换串口协议")));
+    QVERIFY(logView->toPlainText().contains(QStringLiteral("custom_md")));
 }
 
 QTEST_MAIN(SerialStationWorkbenchTest)

@@ -13,6 +13,7 @@
 #include "core/widgets/BasePanel.h"
 
 // ---- 核心 ----
+#include "apps/serial_station/SerialStationWindow.h"
 #include "serial/config/SerialConfigPanel.h"
 #include "serial/data/DataStatistics.h"
 #include "serial/commands/QuickCommandBar.h"
@@ -82,7 +83,7 @@
 QVector<PanelDescriptor> PanelManager::panelDescriptors() const
 {
     QVector<PanelDescriptor> descriptors;
-    descriptors.reserve(47);
+    descriptors.reserve(48);
 
     auto add = [&descriptors](const char* id,
                               const char* objectName,
@@ -111,6 +112,7 @@ QVector<PanelDescriptor> PanelManager::panelDescriptors() const
     };
 
     add("serial.config", "serialConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "配置"), "cable", m_serialConfig, PanelWrapperPolicy::Wrapped, 0, 0);
+    add("serial.station", "serialStationWindow", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "串口工站"), "terminal", m_serialStationWindow, PanelWrapperPolicy::Wrapped, 1, 47);
     add("connection.ble.config", "bleConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "BLE配置"), "bluetooth", m_bleConfigPanel, PanelWrapperPolicy::Wrapped, 1, 14);
     add("connection.ble.gatt", "bleGattBrowserPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "BLE浏览"), "bluetooth-connected", m_bleGattBrowser, PanelWrapperPolicy::Wrapped, 2, 15);
     add("connection.can.config", "canConfigPanel", QT_TRANSLATE_NOOP("Nav", "连接"), QT_TRANSLATE_NOOP("MainWindow", "CAN配置"), "circle-gauge", m_canConfigPanel, PanelWrapperPolicy::Wrapped, 3, 16);

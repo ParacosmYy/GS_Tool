@@ -18,6 +18,10 @@ class SerialStationControllerTest : public QObject {
 private slots:
     void initTestCase();
     void defaultProtocolIsAvailable();
+    void availableProtocolNamesExposeBuiltIns();
+    void activeProtocolSwitchUpdatesDefaultAndLogs();
+    void missingActiveProtocolDoesNotChangeDefault();
+    void selectingSameProtocolDoesNotCreateSystemLog();
     void emptyCommandFailsBeforeFrameBuild_data();
     void emptyCommandFailsBeforeFrameBuild();
     void unsupportedModeFailsBeforeConnectionCheck_data();
@@ -69,6 +73,66 @@ void SerialStationControllerTest::defaultProtocolIsAvailable()
     QVERIFY(controller.protocols().contains(QStringLiteral("ascii_text")));
     QCOMPARE(controller.protocols().defaultProtocol(), QStringLiteral("ascii_text"));
     QVERIFY(controller.protocols().createDefault() != nullptr);
+}
+
+void SerialStationControllerTest::availableProtocolNamesExposeBuiltIns()
+{
+    SerialStationController controller;
+    const QStringList names = controller.availableProtocolNames();
+
+    QVERIFY(names.contains(QStringLiteral("ascii_text")));
+    QVERIFY(names.contains(QStringLiteral("custom_md")));
+    QVERIFY(names.contains(QStringLiteral("modbus_rtu")));
+    QCOMPARE(controller.activeProtocolName(), QStringLiteral("ascii_text"));
+}
+
+void SerialStationControllerTest::activeProtocolSwitchUpdatesDefaultAndLogs()
+{
+    SerialStationController controller;
+    QSignalSpy changedSpy(&controller, &SerialStationController::activeProtocolChanged);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+
+    controller.setActiveProtocol(QStringLiteral("custom_md"));
+
+    QCOMPARE(controller.activeProtocolName(), QStringLiteral("custom_md"));
+    QCOMPARE(controller.protocols().defaultProtocol(), QStringLiteral("custom_md"));
+    QCOMPARE(changedSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 1);
+    QCOMPARE(errorSpy.count(), 0);
+    QCOMPARE(changedSpy.takeFirst().at(0).toString(), QStringLiteral("custom_md"));
+    QVERIFY(systemLogSpy.takeFirst().at(0).toString().contains(QStringLiteral("custom_md")));
+}
+
+void SerialStationControllerTest::missingActiveProtocolDoesNotChangeDefault()
+{
+    SerialStationController controller;
+    QSignalSpy changedSpy(&controller, &SerialStationController::activeProtocolChanged);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+
+    controller.setActiveProtocol(QStringLiteral("custom_md"));
+    controller.setActiveProtocol(QStringLiteral("missing_protocol"));
+
+    QCOMPARE(controller.activeProtocolName(), QStringLiteral("custom_md"));
+    QCOMPARE(changedSpy.count(), 2);
+    QCOMPARE(systemLogSpy.count(), 2);
+    QCOMPARE(errorSpy.count(), 1);
+    QCOMPARE(changedSpy.takeLast().at(0).toString(), QStringLiteral("custom_md"));
+    QVERIFY(systemLogSpy.takeLast().at(0).toString().contains(QStringLiteral("missing_protocol")));
+}
+
+void SerialStationControllerTest::selectingSameProtocolDoesNotCreateSystemLog()
+{
+    SerialStationController controller;
+    QSignalSpy changedSpy(&controller, &SerialStationController::activeProtocolChanged);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.setActiveProtocol(QStringLiteral("ascii_text"));
+
+    QCOMPARE(controller.activeProtocolName(), QStringLiteral("ascii_text"));
+    QCOMPARE(changedSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 0);
 }
 
 void SerialStationControllerTest::emptyCommandFailsBeforeFrameBuild_data()

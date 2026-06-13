@@ -4,6 +4,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QObject>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 #include "apps/serial_station/core/SerialCodec.h"
 #include "apps/serial_station/core/SerialDispatcher.h"
@@ -27,6 +28,8 @@ public:
     explicit SerialStationController(QObject* parent = nullptr);
 
     SerialProtocolRegistry& protocols();
+    QStringList availableProtocolNames() const;
+    QString activeProtocolName() const;
     SerialManager& serialManager();
     SerialLogService& logService();
     const SerialLogService& logService() const;
@@ -88,6 +91,12 @@ public slots:
      * @brief 清空 controller 持有的结构化日志。
      */
     void clearLogRecords();
+
+    /**
+     * @brief 切换 protocol 模式和接收 dispatcher 使用的默认协议。
+     * @param protocolName 协议注册名
+     */
+    void setActiveProtocol(const QString& protocolName);
 
 signals:
     /**
@@ -158,6 +167,12 @@ signals:
      * @param message 失败原因
      */
     void serialCommandFailed(const QString& command, const QString& mode, const QString& message);
+
+    /**
+     * @brief 当前默认协议已变化。
+     * @param protocolName 协议注册名
+     */
+    void activeProtocolChanged(const QString& protocolName);
 
 private:
     QString normalizeSendMode(const QString& mode) const;

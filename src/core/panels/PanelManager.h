@@ -26,6 +26,7 @@ public:
 
     // ==================== 面板 Getter ====================
     SerialConfigPanel* serialConfig() const;
+    serial_station::SerialStationWindow* serialStationWindow() const;
     DataStatistics* dataStats() const;
     ProtocolView* protocolView() const;
     FrameVisualEditor* frameEditor() const;

@@ -12,6 +12,7 @@
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 #include "apps/serial_station/ui/SerialLogPanel.h"
 #include "apps/serial_station/ui/SerialPortPanel.h"
+#include "apps/serial_station/ui/SerialProtocolPanel.h"
 #include "apps/serial_station/ui/SerialStatusBar.h"
 
 namespace serial_station {
@@ -69,9 +70,22 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     workbench->setObjectName(QStringLiteral("serialWorkbenchSplitter"));
     workbench->setChildrenCollapsible(false);
 
-    m_portPanel = new SerialPortPanel(this);
+    auto* leftPanel = new QWidget(this);
+    leftPanel->setObjectName(QStringLiteral("serialWorkbenchLeft"));
+    auto* leftLayout = new QVBoxLayout(leftPanel);
+    leftLayout->setContentsMargins(0, 0, 0, 0);
+    leftLayout->setSpacing(8);
+
+    m_portPanel = new SerialPortPanel(leftPanel);
     m_portPanel->setObjectName(QStringLiteral("serialPortPanel"));
-    workbench->addWidget(m_portPanel);
+    m_protocolPanel = new SerialProtocolPanel(leftPanel);
+    m_protocolPanel->setProtocols(m_controller->availableProtocolNames(),
+                                  m_controller->activeProtocolName());
+
+    leftLayout->addWidget(m_portPanel);
+    leftLayout->addWidget(m_protocolPanel);
+    leftLayout->addStretch();
+    workbench->addWidget(leftPanel);
 
     auto* centerPanel = new QWidget(this);
     centerPanel->setObjectName(QStringLiteral("serialWorkbenchCenter"));
@@ -102,6 +116,10 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             m_portPanel, &SerialPortPanel::setSessionState);
     connect(m_controller.get(), &SerialStationController::serialErrorOccurred,
             m_portPanel, &SerialPortPanel::setErrorMessage);
+    connect(m_protocolPanel, &SerialProtocolPanel::protocolSelected,
+            m_controller.get(), &SerialStationController::setActiveProtocol);
+    connect(m_controller.get(), &SerialStationController::activeProtocolChanged,
+            m_protocolPanel, &SerialProtocolPanel::setActiveProtocol);
     connect(m_controller.get(), &SerialStationController::serialStateChanged,
             m_statusBar, &SerialStatusBar::setSessionState);
     connect(m_controller.get(), &SerialStationController::serialErrorOccurred,

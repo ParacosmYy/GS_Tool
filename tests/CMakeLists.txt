@@ -1097,6 +1097,34 @@ endif()
 add_test(NAME SerialCommandPanel COMMAND test_serial_command_panel)
 
 # ============================================================
+# Serial Station协议选择面板测试
+# ============================================================
+
+add_executable(test_serial_protocol_panel
+    serial_station/test_serial_protocol_panel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialProtocolPanel.cpp
+)
+
+target_include_directories(test_serial_protocol_panel PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_protocol_panel PRIVATE
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_protocol_panel PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialProtocolPanel COMMAND test_serial_protocol_panel)
+
+# ============================================================
 # Serial Station发送编码器测试
 # ============================================================
 
@@ -1249,6 +1277,7 @@ add_executable(test_serial_station_replay_flow
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialProtocolPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandHistoryModel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialLogPanel.cpp
@@ -1423,6 +1452,7 @@ add_executable(test_serial_station_workbench
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialCodec.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/core/SerialDispatcher.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialPortPanel.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialProtocolPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandPanel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialCommandHistoryModel.cpp
     ${CMAKE_SOURCE_DIR}/src/apps/serial_station/ui/SerialLogPanel.cpp
