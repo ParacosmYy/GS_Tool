@@ -22,6 +22,7 @@ public:
 
 public slots:
     void setSummaryLines(const QStringList& lines);
+    void setTrendLines(const QStringList& lines);
     void clear();
 
 private:
@@ -30,6 +31,8 @@ private:
 
     QLabel* m_summaryLabel = nullptr;
     QPlainTextEdit* m_view = nullptr;
+    QLabel* m_trendLabel = nullptr;
+    QPlainTextEdit* m_trendView = nullptr;
 };
 
 } // namespace serial_station

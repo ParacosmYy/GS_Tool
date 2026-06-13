@@ -79,7 +79,9 @@ private slots:
     void emptyBytesBetweenPartialChunksDoNotBreakFrame();
     void justFloatMeasurementProducesRxLog();
     void justFloatMeasurementEmitsSummaryLines();
+    void justFloatMeasurementEmitsTrendLines();
     void clearLogRecordsClearsMeasurementSummary();
+    void clearLogRecordsClearsMeasurementTrend();
     void reconnectResetsPartialReceiveBuffer();
     void disconnectResetsPartialReceiveBuffer();
     void disconnectThenNewLineDoesNotUseOldPartialBytes();
@@ -683,6 +685,24 @@ void SerialStationControllerTest::justFloatMeasurementEmitsSummaryLines()
     QVERIFY(lines.at(1).contains(QStringLiteral("-2.25")));
 }
 
+void SerialStationControllerTest::justFloatMeasurementEmitsTrendLines()
+{
+    SerialStationController controller;
+    QSignalSpy trendSpy(&controller,
+                        &SerialStationController::serialMeasurementTrendUpdated);
+
+    controller.setActiveProtocol(QStringLiteral("just_float"));
+    controller.handleBytesReceived(controllerTestJustFloatFrame({1.5F, -2.25F}));
+    controller.handleBytesReceived(controllerTestJustFloatFrame({3.0F, 4.0F}));
+
+    QCOMPARE(trendSpy.count(), 2);
+    const QStringList lines = trendSpy.takeLast().at(0).toStringList();
+    QCOMPARE(lines.size(), 2);
+    QVERIFY(lines.last().contains(QStringLiteral("#2")));
+    QVERIFY(lines.last().contains(QStringLiteral("ch1=3")));
+    QVERIFY(lines.last().contains(QStringLiteral("ch2=4")));
+}
+
 void SerialStationControllerTest::clearLogRecordsClearsMeasurementSummary()
 {
     SerialStationController controller;
@@ -695,6 +715,20 @@ void SerialStationControllerTest::clearLogRecordsClearsMeasurementSummary()
 
     QCOMPARE(measurementSpy.count(), 2);
     QVERIFY(measurementSpy.takeLast().at(0).toStringList().isEmpty());
+}
+
+void SerialStationControllerTest::clearLogRecordsClearsMeasurementTrend()
+{
+    SerialStationController controller;
+    QSignalSpy trendSpy(&controller,
+                        &SerialStationController::serialMeasurementTrendUpdated);
+
+    controller.setActiveProtocol(QStringLiteral("just_float"));
+    controller.handleBytesReceived(controllerTestJustFloatFrame({1.0F}));
+    controller.clearLogRecords();
+
+    QCOMPARE(trendSpy.count(), 2);
+    QVERIFY(trendSpy.takeLast().at(0).toStringList().isEmpty());
 }
 
 void SerialStationControllerTest::reconnectResetsPartialReceiveBuffer()

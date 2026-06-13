@@ -162,6 +162,9 @@ signals:
     /** @brief 当前测量通道摘要已变化；空列表表示清空。 */
     void serialMeasurementUpdated(const QStringList& lines);
 
+    /** @brief 当前测量最近帧已变化；空列表表示清空。 */
+    void serialMeasurementTrendUpdated(const QStringList& lines);
+
 private:
     QString normalizeSendMode(const QString& mode) const;
     SerialCodec::EncodeResult buildCommandFrame(const QString& command,

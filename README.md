@@ -35,7 +35,7 @@
 | Serial Station 串口工站 | `src/apps/serial_station/`、QTest、启动入口 | E5 | U4 | D1 |
 | UART 配置链路 | 端口枚举、手动 COM、配置摘要、连接日志 | E4 | U3 | D1 |
 | 协议收发与解析 | `ascii_text`、`modbus_rtu`、`custom_md`、`just_float` | E5 | U3 | D1 |
-| 测量通道观察 | JustFloat measurement、测量服务、通道摘要面板 | E5 | U3 | D1 |
+| 测量通道观察 | JustFloat measurement、通道摘要、最近帧趋势、CSV 导出服务 | E5 | U3 | D1 |
 | 命令历史与配置档案 | 最近命令、`.edserialprofile`、最近/上次/默认目录 | E5 | U4 | D1 |
 | 日志、导出、回放预览 | 结构化日志、导出服务、回放服务、UI 闭环 | E4/E5 | U3 | D1 |
 | 终端、图表、OTA、BLE/CAN/MQTT/USB/RTT | 阶段性模块和集成代码 | E2-E4 | U1-U3 | D0-D1 |
@@ -50,7 +50,7 @@ Device:      D0 未验证 -> D4 真实设备验证
 
 ## Serial Station
 
-Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial_station/`。它已经覆盖串口配置、协议选择、ASCII/HEX/协议模式发送、结构化日志、导出、回放预览、命令历史、配置档案、最近档案索引、默认档案目录和 JustFloat 测量摘要。
+Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial_station/`。它已经覆盖串口配置、协议选择、ASCII/HEX/协议模式发送、结构化日志、导出、回放预览、命令历史、配置档案、最近档案索引、默认档案目录、JustFloat 测量摘要、最近帧趋势和测量 CSV 导出服务。
 
 常用入口：
 
@@ -68,9 +68,9 @@ Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial
 | `ascii_text` | 文本终端、AT 类命令 |
 | `modbus_rtu` | 基础 Modbus RTU 主站请求与响应解析 |
 | `custom_md` | 自定义 MCU 调试帧 |
-| `just_float` | 参考 VOFA+ JustFloat 数据路径，解析小端 IEEE754 float 数组 + `00 00 80 7F` 帧尾，并汇总到测量通道面板 |
+| `just_float` | 参考 VOFA+ JustFloat 数据路径，解析小端 IEEE754 float 数组 + `00 00 80 7F` 帧尾，并汇总到测量通道面板和最近帧趋势区 |
 
-JustFloat 当前已完成协议注册、流式解析、工作台选择和测量摘要显示；下一步重点是接入波形工作区，并通过虚拟串口或真实硬件样本提升设备验证等级。
+JustFloat 当前已完成协议注册、流式解析、工作台选择、测量摘要、最近帧趋势显示和测量 CSV 服务；下一步重点是接入波形工作区，并通过虚拟串口或真实硬件样本提升设备验证等级。
 
 ## 架构边界
 
@@ -79,7 +79,7 @@ ui/ -> SerialStationController -> core/ + protocols/ + services/
 workers/ -> core/
 core/ -> ISerialProtocol + SerialProtocolRegistry
 protocols/<name>/ -> protocol interface + shared/utils only
-services/ -> JSON、日志、导出、回放、档案、测量摘要
+services/ -> JSON、日志、导出、回放、档案、测量摘要和趋势缓冲
 ```
 
 核心规则：
@@ -133,9 +133,10 @@ cmake --build build --target EmbedDebug --parallel 4
 Serial Station 聚焦验证：
 
 ```powershell
-cmake --build build --target test_startup_options test_serial_measurement_service test_serial_measurement_panel test_serial_station_controller test_serial_station_workbench --parallel 4
+cmake --build build --target test_startup_options test_serial_measurement_service test_serial_measurement_export_service test_serial_measurement_panel test_serial_station_controller test_serial_station_workbench --parallel 4
 .\build\tests\test_startup_options.exe
 .\build\tests\test_serial_measurement_service.exe
+.\build\tests\test_serial_measurement_export_service.exe
 .\build\tests\test_serial_measurement_panel.exe
 .\build\tests\test_serial_station_controller.exe
 .\build\tests\test_serial_station_workbench.exe
@@ -176,7 +177,7 @@ GS_Tool/
 | 优先级 | 方向 | 目标 |
 |--------|------|------|
 | P0 | Serial Station 连接策略 | 补可控连接、异常恢复和现场可诊断反馈 |
-| P0 | VOFA+/OmniProbe 式数据观察 | 将 JustFloat measurement 接入波形工作区和虚拟串口样本验证 |
+| P0 | VOFA+/OmniProbe 式数据观察 | JustFloat measurement 摘要和最近帧趋势已落地，下一步接入波形工作区和虚拟串口样本验证 |
 | P0 | 虚拟串口或硬件回环验证 | 将设备证据从 D1 推向更接近真实现场 |
 | P1 | QSS token 与 UI 一致性 | 降低主题漂移，统一控件层级 |
 | P1 | 发布包体验 | 强化 `dist/` 校验、随包文档和启动路径 |

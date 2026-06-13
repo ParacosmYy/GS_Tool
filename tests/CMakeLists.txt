@@ -1374,6 +1374,34 @@ endif()
 add_test(NAME SerialMeasurementService COMMAND test_serial_measurement_service)
 
 # ============================================================
+# Serial Station测量导出服务测试
+# ============================================================
+
+add_executable(test_serial_measurement_export_service
+    serial_station/test_serial_measurement_export_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialMeasurementService.cpp
+    ${CMAKE_SOURCE_DIR}/src/apps/serial_station/services/SerialMeasurementExportService.cpp
+)
+
+target_include_directories(test_serial_measurement_export_service PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(test_serial_measurement_export_service PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+if(WIN32)
+    target_compile_definitions(test_serial_measurement_export_service PRIVATE
+        UNICODE
+        _UNICODE
+    )
+endif()
+
+add_test(NAME SerialMeasurementExportService COMMAND test_serial_measurement_export_service)
+
+# ============================================================
 # Serial Station配置档案服务测试
 # ============================================================
 

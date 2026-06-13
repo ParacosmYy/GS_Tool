@@ -16,6 +16,11 @@ private slots:
     void updatesMinMaxAndSampleCount();
     void resetClearsSnapshot();
     void displayLinesContainChannelStats();
+    void recordsRecentFramesForTrendView();
+    void recentFramesRespectHistoryCapacity();
+    void trendLinesContainFrameAndChannelValues();
+    void csvExportContainsHeaderAndRows();
+    void setHistoryCapacityClampsToOne();
 };
 
 namespace {
@@ -137,6 +142,80 @@ void SerialMeasurementServiceTest::displayLinesContainChannelStats()
     QVERIFY(lines.at(0).contains(QStringLiteral("min")));
     QVERIFY(lines.at(1).contains(QStringLiteral("ch2")));
     QVERIFY(lines.at(1).contains(QStringLiteral("-2.5")));
+}
+
+void SerialMeasurementServiceTest::recordsRecentFramesForTrendView()
+{
+    SerialMeasurementService service;
+
+    service.appendEvent(measurementEvent({1.0, 2.0}));
+    service.appendEvent(measurementEvent({3.0, 4.0}));
+
+    const SerialMeasurementSnapshot snapshot = service.snapshot();
+
+    QCOMPARE(snapshot.recentFrames.size(), 2);
+    QCOMPARE(snapshot.recentFrames.first().frameIndex, 1);
+    QCOMPARE(snapshot.recentFrames.last().frameIndex, 2);
+    QCOMPARE(snapshot.recentFrames.last().values.at(0), 3.0);
+    QCOMPARE(snapshot.recentFrames.last().values.at(1), 4.0);
+}
+
+void SerialMeasurementServiceTest::recentFramesRespectHistoryCapacity()
+{
+    SerialMeasurementService service;
+    service.setHistoryCapacity(2);
+
+    service.appendEvent(measurementEvent({1.0}));
+    service.appendEvent(measurementEvent({2.0}));
+    service.appendEvent(measurementEvent({3.0}));
+
+    const SerialMeasurementSnapshot snapshot = service.snapshot();
+
+    QCOMPARE(snapshot.historyCapacity, 2);
+    QCOMPARE(snapshot.recentFrames.size(), 2);
+    QCOMPARE(snapshot.recentFrames.first().frameIndex, 2);
+    QCOMPARE(snapshot.recentFrames.last().frameIndex, 3);
+}
+
+void SerialMeasurementServiceTest::trendLinesContainFrameAndChannelValues()
+{
+    SerialMeasurementService service;
+    service.appendEvent(measurementEvent({1.25, -2.5}));
+
+    const QStringList lines = service.trendLines();
+
+    QCOMPARE(lines.size(), 1);
+    QVERIFY(lines.first().contains(QStringLiteral("#1")));
+    QVERIFY(lines.first().contains(QStringLiteral("ch1=1.25")));
+    QVERIFY(lines.first().contains(QStringLiteral("ch2=-2.5")));
+}
+
+void SerialMeasurementServiceTest::csvExportContainsHeaderAndRows()
+{
+    SerialMeasurementService service;
+    service.appendEvent(measurementEvent({1.0, 2.0}));
+    service.appendEvent(measurementEvent({3.5, 4.5}));
+
+    const QString csv = service.formatCsv();
+
+    QVERIFY(csv.startsWith(QStringLiteral("frame,ch1,ch2\n")));
+    QVERIFY(csv.contains(QStringLiteral("1,1,2")));
+    QVERIFY(csv.contains(QStringLiteral("2,3.5,4.5")));
+}
+
+void SerialMeasurementServiceTest::setHistoryCapacityClampsToOne()
+{
+    SerialMeasurementService service;
+
+    service.setHistoryCapacity(0);
+    service.appendEvent(measurementEvent({1.0}));
+    service.appendEvent(measurementEvent({2.0}));
+
+    const SerialMeasurementSnapshot snapshot = service.snapshot();
+
+    QCOMPARE(snapshot.historyCapacity, 1);
+    QCOMPARE(snapshot.recentFrames.size(), 1);
+    QCOMPARE(snapshot.recentFrames.first().frameIndex, 2);
 }
 
 QTEST_MAIN(SerialMeasurementServiceTest)

@@ -60,6 +60,7 @@ private slots:
     void protocolSelectionCanChooseJustFloat();
     void workbenchExposesMeasurementPanel();
     void justFloatReceiveUpdatesMeasurementPanel();
+    void justFloatReceiveUpdatesMeasurementTrendPanel();
     void logClearClearsMeasurementPanel();
     void workbenchExposesProfileControls();
     void defaultProfileDirectoryStartsWithFallbackPath();
@@ -478,10 +479,12 @@ void SerialStationWorkbenchTest::workbenchExposesMeasurementPanel()
     SerialStationWindow window;
     auto* panel = window.findChild<SerialMeasurementPanel*>(QStringLiteral("serialMeasurementPanel"));
     auto* view = window.findChild<QPlainTextEdit*>(QStringLiteral("serialMeasurementView"));
+    auto* trendView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialMeasurementTrendView"));
     auto* summary = window.findChild<QLabel*>(QStringLiteral("serialMeasurementSummaryLabel"));
 
     QVERIFY(panel != nullptr);
     QVERIFY(view != nullptr);
+    QVERIFY(trendView != nullptr);
     QVERIFY(summary != nullptr);
     QVERIFY(summary->text().contains(QStringLiteral("暂无测量数据")));
 }
@@ -503,16 +506,36 @@ void SerialStationWorkbenchTest::justFloatReceiveUpdatesMeasurementPanel()
     QVERIFY(view->toPlainText().contains(QStringLiteral("-2.25")));
 }
 
+void SerialStationWorkbenchTest::justFloatReceiveUpdatesMeasurementTrendPanel()
+{
+    SerialStationWindow window;
+    auto* controller = window.findChild<SerialStationController*>();
+    auto* trendView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialMeasurementTrendView"));
+    QVERIFY(controller != nullptr);
+    QVERIFY(trendView != nullptr);
+
+    controller->setActiveProtocol(QStringLiteral("just_float"));
+    controller->handleBytesReceived(workbenchTestJustFloatFrame({1.5F, -2.25F}));
+    controller->handleBytesReceived(workbenchTestJustFloatFrame({3.0F, 4.0F}));
+
+    QVERIFY(trendView->toPlainText().contains(QStringLiteral("#1")));
+    QVERIFY(trendView->toPlainText().contains(QStringLiteral("#2")));
+    QVERIFY(trendView->toPlainText().contains(QStringLiteral("ch1=3")));
+    QVERIFY(trendView->toPlainText().contains(QStringLiteral("ch2=4")));
+}
+
 void SerialStationWorkbenchTest::logClearClearsMeasurementPanel()
 {
     SerialStationWindow window;
     auto* controller = window.findChild<SerialStationController*>();
     auto* clearButton = window.findChild<QPushButton*>(QStringLiteral("serialLogClearButton"));
     auto* view = window.findChild<QPlainTextEdit*>(QStringLiteral("serialMeasurementView"));
+    auto* trendView = window.findChild<QPlainTextEdit*>(QStringLiteral("serialMeasurementTrendView"));
     auto* summary = window.findChild<QLabel*>(QStringLiteral("serialMeasurementSummaryLabel"));
     QVERIFY(controller != nullptr);
     QVERIFY(clearButton != nullptr);
     QVERIFY(view != nullptr);
+    QVERIFY(trendView != nullptr);
     QVERIFY(summary != nullptr);
 
     controller->setActiveProtocol(QStringLiteral("just_float"));
@@ -520,6 +543,7 @@ void SerialStationWorkbenchTest::logClearClearsMeasurementPanel()
     QTest::mouseClick(clearButton, Qt::LeftButton);
 
     QVERIFY(view->toPlainText().isEmpty());
+    QVERIFY(trendView->toPlainText().isEmpty());
     QVERIFY(summary->text().contains(QStringLiteral("暂无测量数据")));
 }
 

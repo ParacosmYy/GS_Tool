@@ -69,6 +69,7 @@ set(SOURCES
     src/apps/serial_station/core/SerialSession.cpp
     src/apps/serial_station/services/SerialExportService.cpp
     src/apps/serial_station/services/SerialLogService.cpp
+    src/apps/serial_station/services/SerialMeasurementExportService.cpp
     src/apps/serial_station/services/SerialMeasurementService.cpp
     src/apps/serial_station/services/SerialProfileCatalogService.cpp
     src/apps/serial_station/services/SerialProfileService.cpp
@@ -3391,6 +3392,7 @@ set(HEADERS
     src/apps/serial_station/core/SerialSession.h
     src/apps/serial_station/services/SerialExportService.h
     src/apps/serial_station/services/SerialLogService.h
+    src/apps/serial_station/services/SerialMeasurementExportService.h
     src/apps/serial_station/services/SerialMeasurementService.h
     src/apps/serial_station/services/SerialProfileCatalogService.h
     src/apps/serial_station/services/SerialProfileService.h
