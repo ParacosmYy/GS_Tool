@@ -98,6 +98,7 @@ func loadConfig(path string) (Config, error) {
 
 func runLoop(cfg Config) error {
 	deadline := time.Now().Add(time.Duration(cfg.MaxMinutes) * time.Minute)
+	var lastCheckFailure commandResult
 
 	for round := 1; round <= cfg.MaxRounds; round++ {
 		if time.Now().After(deadline) {
@@ -114,6 +115,7 @@ func runLoop(cfg Config) error {
 			fmt.Println("GO loop passed")
 			return nil
 		} else {
+			lastCheckFailure = failed
 			fmt.Printf("check failed: %s\n%s\n", failed.Command, failed.Output)
 		}
 
@@ -125,6 +127,12 @@ func runLoop(cfg Config) error {
 		}
 	}
 
+	if lastCheckFailure.Err != nil {
+		return fmt.Errorf("safety brake: exceeded %d rounds; last check failed: %s\n%s",
+			cfg.MaxRounds,
+			lastCheckFailure.Command,
+			lastCheckFailure.Output)
+	}
 	return fmt.Errorf("safety brake: exceeded %d rounds", cfg.MaxRounds)
 }
 

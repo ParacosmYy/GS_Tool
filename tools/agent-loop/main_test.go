@@ -137,6 +137,28 @@ func TestRunLoopPassesAfterFixCommand(t *testing.T) {
 	}
 }
 
+func TestRunLoopRoundSafetyBrakeReportsLastCheckFailure(t *testing.T) {
+	dir := t.TempDir()
+	cfg := Config{
+		Workdir:    dir,
+		MaxRounds:  2,
+		MaxMinutes: 1,
+		Check:      []string{failureWithOutputCommand("still failing")},
+		Fix:        []string{successCommand()},
+	}
+
+	err := runLoop(cfg)
+	if err == nil {
+		t.Fatal("runLoop returned nil, want round safety brake error")
+	}
+	if !strings.Contains(err.Error(), "exceeded 2 rounds") {
+		t.Fatalf("runLoop error = %v, want round safety brake", err)
+	}
+	if !strings.Contains(err.Error(), "still failing") {
+		t.Fatalf("runLoop error = %v, want last check output", err)
+	}
+}
+
 func writeConfig(t *testing.T, dir string, body string) string {
 	t.Helper()
 
@@ -159,6 +181,13 @@ func failureCommand() string {
 		return "exit 1"
 	}
 	return "exit 1"
+}
+
+func failureWithOutputCommand(message string) string {
+	if runtime.GOOS == "windows" {
+		return "Write-Output '" + message + "'; exit 1"
+	}
+	return "echo '" + message + "'; exit 1"
 }
 
 func flagCheckCommand() string {

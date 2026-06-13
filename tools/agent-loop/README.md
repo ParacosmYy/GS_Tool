@@ -6,6 +6,7 @@ Safety brakes:
 
 - Maximum 20 rounds.
 - Maximum 30 minutes.
+- When the round brake trips after repeated check failures, the error includes the last failing check command and output so the next step can route into LOOP Debug or Simplify.
 
 Example:
 
@@ -32,3 +33,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\verify_embeddebug_la
 ```
 
 This tool does not call an LLM and does not modify C++ code by itself. It only executes commands listed in the JSON config.
+
+Recommended closeout after a GO run:
+
+1. If the loop passes, record the executed config and resulting state in the Specs closeout section.
+2. If `execute` fails, run Doctor first and route build errors into Debug.
+3. If repeated `check` failures hit the round brake, use the reported last check command/output as the Debug trace repro.
+4. If repeated fixes do not converge, open Simplify before expanding the implementation.
