@@ -17,6 +17,15 @@ go run . -config .\sample.embeddebug.json
 Pop-Location
 ```
 
+Verification:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\agent-loop\verify.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\agent-loop\verify.ps1 -RunSample
+```
+
+`verify.ps1` first checks whether `go.exe` is available. If Go is missing it exits with code `2` and prints `agent_loop_go=UNAVAILABLE`; if Go exists it runs `go test .`, the sample dry-run, and optionally the full sample config.
+
 Environment notes:
 
 - Run `tools\bootstrap_env.bat` once before using the loop on a fresh machine.

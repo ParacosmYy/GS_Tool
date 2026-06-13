@@ -76,10 +76,13 @@
 
 ```powershell
 cmake --build .\build --config Release --parallel 4
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\agent-loop\verify.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\verify_embeddebug_launch.ps1
 Push-Location .\tools\agent-loop; go test .; Pop-Location
 ```
+
+`tools\agent-loop\verify.ps1` 是 GO 执行器的本地验证入口：它先检查 `go.exe`，有 Go 时运行 `go test .` 和样例 dry-run，可选 `-RunSample` 执行 Doctor + 启动探针；没有 Go 时输出 `agent_loop_go=UNAVAILABLE` 并以退出码 `2` 收口。
 
 `verify_embeddebug_launch.ps1` 是自动化启动探针：它通过 `EmbedDebug.bat` 启动应用，确认出现新的 `EmbedDebug.exe` 进程，然后只关闭本次新启动的进程，避免 GO Loop 被 GUI 长时间占用。
 

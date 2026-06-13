@@ -105,6 +105,7 @@ Pop-Location
 | PRD-072 实例 | 已存在：`docs/superpowers/specs/PRD_072_Agent_Iteration_Runtime_Specs.md` |
 | GO 源码 | 已存在：`tools/agent-loop/main.go` |
 | GO 测试 | 已存在：`tools/agent-loop/main_test.go`；`go version` 失败，当前 PATH 无 `go.exe`，因此未运行 |
+| GO 验证入口 | `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\agent-loop\verify.ps1` 输出 `agent_loop_go=UNAVAILABLE reason=go.exe_not_on_PATH`，退出码 `2` |
 | BATCH 文档 | 已存在：`docs/superpowers/BATCH_PROTOCOL.md` |
 | LOOP 文档 | 已存在：`docs/superpowers/LOOP_PROTOCOL.md` |
 | Doctor | `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1` 通过：0 failure，1 warning（`go.exe` 不在 PATH） |
@@ -119,4 +120,10 @@ Pop-Location
 Push-Location .\tools\agent-loop; go test .; Pop-Location
 ```
 
-在 `go.exe` 可用前，PRD-072 只能声明“源码和测试已落地，Doctor 与启动探针已验证”，不能声明 GO 执行器单测已通过。
+也可以运行统一入口：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\agent-loop\verify.ps1
+```
+
+在 `go.exe` 可用前，PRD-072 只能声明“源码、测试和验证入口已落地，Doctor 与启动探针已验证”，不能声明 GO 执行器单测已通过。
