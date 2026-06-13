@@ -634,23 +634,19 @@ set(SOURCES
     src/utils/quality/DataQualityScorer.cpp
     src/utils/sampler/DataSampler.cpp
     src/utils/interpolator/DataInterpolator.cpp
-    src/utils/correlator/DataCorrelator.cpp
     src/utils/filter2/DigitalFilter.cpp
     src/utils/predictor/TrendPredictor.cpp
     src/utils/histogram/HistogramBuilder.cpp
     src/utils/statdist/StatDistribution.cpp
     src/utils/entropy/EntropyCalculator.cpp
-    src/utils/crosscorr/CrossCorrelator.cpp
     src/utils/derivative/NumericalDerivative.cpp
     src/utils/window/DataWindowManager.cpp
     # src/utils/peaks/PeakDetector.cpp  # removed: duplicate of peak/PeakDetector
     src/utils/resample/DataResampler.cpp
-    src/utils/classifier/DataClassifier.cpp
     src/utils/quantize/DataQuantizer.cpp
     src/utils/peakdetect/RidgeDetector.cpp
     src/utils/freq/FrequencyCounter2.cpp
     src/utils/integrator/NumericalIntegrator.cpp
-    src/utils/convolution/ConvolutionEngine.cpp
     src/utils/modulation/Demodulator.cpp
     src/utils/pid/PidController.cpp
     src/utils/pid/PidSimulator.cpp
@@ -661,7 +657,6 @@ set(SOURCES
     src/utils/regress/RegressionEngine.cpp
     src/utils/pca/PcaAnalyzer.cpp
     src/utils/dtw2/FastDtw.cpp
-    src/utils/circbuf/CircularStatsBuffer.cpp
     src/utils/hysteresis/HysteresisFilter.cpp
     src/utils/kalman/KalmanFilter1D.cpp
     src/utils/wavelet/WaveletTransform.cpp
@@ -678,7 +673,6 @@ set(SOURCES
     src/utils/votecomp/VotingCompositor.cpp
     src/utils/markov2/MarkovChain.cpp
     src/utils/fuzzy2/FuzzyLogicEngine.cpp
-    src/utils/crc64b/Crc64Engine.cpp
     src/utils/rle/RunLengthCodec.cpp
     src/utils/lzw/LzwCompressor.cpp
     src/utils/huffman/HuffmanCodec.cpp
@@ -687,7 +681,6 @@ set(SOURCES
     src/utils/voicedetect/VoiceActivityDetector.cpp
     src/utils/dynhistogram/DynamicHistogram.cpp
     src/utils/ticker/TickEngine.cpp
-    src/utils/circqueue/CircularPriorityQueue.cpp
     src/utils/rollingrank/RollingRank.cpp
     src/utils/expmove/ExponentialMoving.cpp
     src/utils/polyreg/PolynomialRegression.cpp
@@ -700,7 +693,6 @@ set(SOURCES
     src/utils/slidingpercentile/SlidingPercentile.cpp
     # src/utils/autopcor/AutoCorrelation.cpp  # removed: duplicate class
     src/utils/deadzone/DeadZoneFilter.cpp
-    src/utils/countmin/CountMinSketch.cpp
     # src/utils/cuckoo/CuckooFilter.cpp  # removed: duplicate class
     # src/utils/bloomfilter2/ScalableBloomFilter.cpp  # removed: duplicate class
     src/utils/ratechange/RateOfChange.cpp
@@ -709,8 +701,6 @@ set(SOURCES
     src/utils/multiproc/ProcessMonitor.cpp
     src/utils/slidingwindow3/SlidingWindowCounter.cpp
     src/utils/segmenter/StreamSegmenter.cpp
-    src/utils/cluster/KMeansClusterer.cpp
-    src/utils/changept/ChangepointDetector.cpp
     src/utils/symbol/SymbolDecoder.cpp
     src/utils/multiset/CountingMultiSet.cpp
     src/utils/deque/IndexedDeque.cpp
@@ -718,11 +708,9 @@ set(SOURCES
     src/utils/fractal/FractalDimension.cpp
     src/utils/hurst/HurstExponent.cpp
     src/utils/permutation/PermutationGenerator.cpp
-    src/utils/combination/CombinationGenerator.cpp
     src/utils/bloomfilter2/CountingBloomFilter.cpp
     src/utils/rscode/ReedSolomonCodec.cpp
     # src/utils/convolutional/ConvolutionalCoder.cpp  # removed: duplicate of code4/ConvolutionalCoder
-    src/utils/cosinedist/CosineDistance.cpp
     src/utils/edgedetect/EdgeDetector.cpp
     src/utils/mass/MassEstimator.cpp
     src/utils/lcs2/LcsSolver.cpp
@@ -784,7 +772,6 @@ set(SOURCES
     src/utils/quadtree/QuadTree.cpp
 
     # -- F216~F225: Wave 36 工具模块(linter) --
-    src/utils/convhull/ConvexHull.cpp
     src/utils/disjoint/DisjointSet.cpp
     src/utils/radixtree/RadixTree.cpp
     src/utils/rle3/BurrowsWheelerTransform.cpp
@@ -793,13 +780,11 @@ set(SOURCES
     # src/utils/wavelet2/HaarWavelet2D.cpp  # removed: duplicate class
 
     # -- F226~F231: Wave 39 DSP工具模块 --
-    src/utils/chebyshev/ChebyshevFilter.cpp
     # goertzel/GoertzelAlgorithm.cpp removed (duplicate of fft8)
     src/utils/welch/WelchSpectrum.cpp
     src/utils/yulewalker/YuleWalker.cpp
 
     # -- Wave 38 --
-    src/utils/catboost/CatBoostEstimator.cpp
     src/utils/lru3/ArcCache.cpp
     src/utils/quantile/QuantileSketch.cpp
     src/utils/rle4/LempelZivWelch.cpp
@@ -810,7 +795,6 @@ set(SOURCES
     # src/utils/wiener2/WienerFilter2.cpp  # removed: duplicate of signal6/WienerFilter
     src/utils/kalman4/ParticleFilter.cpp
     src/utils/ekf/ExtendedKalman.cpp
-    src/utils/complement/ComplementaryFilter.cpp
     src/utils/savitzky/SavitzkyGolay.cpp
     src/utils/medfilt/MedianFilter.cpp
     src/utils/notch/NotchFilter.cpp
@@ -836,7 +820,6 @@ set(SOURCES
     src/utils/treap/Treap.cpp
     src/utils/splay/SplayTree.cpp
     src/utils/kdtree/KDTree.cpp
-    src/utils/cic/CicFilter.cpp
     src/utils/optimize/SimulatedAnnealing.cpp
     src/utils/optimize2/GeneticOptimizer.cpp
     src/utils/rabin2/RabinKarpMulti.cpp
@@ -850,7 +833,6 @@ set(SOURCES
     src/utils/cluster2/DbScan.cpp
     src/utils/gmixture/GaussianMixture.cpp
     src/utils/bayes3/NaiveBayesClassifier.cpp
-    src/utils/crossval/CrossValidator.cpp
     src/utils/emd/EarthMoverDistance.cpp
     src/utils/peakhold2/PeakTracker.cpp
     src/utils/cepstrum3/CepstralAnalysis.cpp
@@ -863,7 +845,6 @@ set(SOURCES
     src/utils/hermite/HermiteInterpolation.cpp
 
     # ── Wave 44: 数值方法/ODE求根/积分 ──
-    src/utils/conjugate/ConjugateGradient.cpp
     src/utils/lagrange/LagrangeInterpolation.cpp
     src/utils/romberg/RombergIntegration.cpp
     src/utils/predictor_corrector/PredictorCorrector.cpp
@@ -873,7 +854,6 @@ set(SOURCES
     # src/utils/newtonroot/NewtonRaphson.cpp  # removed: duplicate class
     src/utils/richardson/RichardsonExtrapolation.cpp
     src/utils/rk2/Rk2Solver.cpp
-    src/utils/collocation/CollocationSolver.cpp
 
     # ── Wave 45: 线性代数/特征值/逼近 ──
     src/utils/minimizer/GoldenSectionSearch.cpp
@@ -886,7 +866,6 @@ set(SOURCES
     src/utils/pade/PadeApproximant.cpp
     src/utils/sturm/SturmSequence.cpp
     # src/utils/qrstep/QrEigenSolver.cpp  # removed: duplicate class
-    src/utils/circulant/CirculantSolver.cpp
 
     # ── Wave 46: 优化/特征值/迭代求解 ──
     src/utils/gram_schmidt/GramSchmidt.cpp
@@ -895,7 +874,6 @@ set(SOURCES
     src/utils/lanczos/LanczosEigen.cpp
     src/utils/powerquad/PowerMethodGeneralized.cpp
     src/utils/lobatto/LobattoIntegration.cpp
-    src/utils/clenshaw_curtis/ClenshawCurtis.cpp
     src/utils/toeplitz/ToeplitzSolver.cpp
     src/utils/hankel/HankelSolver.cpp
     src/utils/vandermonde/VandermondeSolver.cpp
@@ -906,7 +884,6 @@ set(SOURCES
     src/utils/gauss_seidel/GaussSeidelSolver.cpp
 
     # ── Wave 47: 线性求解器/特征值/分解更新 ──
-    src/utils/cgls/CglsSolver.cpp
     src/utils/gmres/GmresSolver.cpp
     src/utils/minres/MinresSolver.cpp
     src/utils/symm_eigen/SymmetricEigenSolver.cpp
@@ -914,7 +891,6 @@ set(SOURCES
     src/utils/qz/QzDecomposition.cpp
     src/utils/svd2/SvdSolver.cpp
     # src/utils/polar/PolarDecomposition.cpp  # removed: duplicate class
-    src/utils/cholupdate/CholeskyUpdate.cpp
     src/utils/schur_update/SchurReorder.cpp
     src/utils/power2/InverseIteration.cpp
     src/utils/nystrom/NystromApproximation.cpp
@@ -996,7 +972,6 @@ set(SOURCES
     src/utils/cluster3/GaussianMixture2.cpp
 
     # ── Wave 71: 节律/解码/编码/螺旋 ──
-    src/utils/circadian/CircadianRhythm.cpp
     src/utils/viterbi2/ViterbiDecoder2.cpp
     src/utils/golomb2/GolombRiceCoder.cpp
     src/utils/spiral/SpiralMatrix.cpp
@@ -1194,7 +1169,6 @@ set(SOURCES
     src/utils/zcr/ZeroCrossingRate.cpp
     src/utils/thd/ThdAnalyzer.cpp
     # src/utils/viterbi/ViterbiDecoder.cpp  # removed: duplicate of signal16/ViterbiDecoder
-    src/utils/covariance/CovarianceMatrix.cpp
     src/utils/percentile/PercentileCalculator.cpp
     # src/utils/scrambler/Scrambler.cpp  (duplicate of code23)
 
@@ -1204,14 +1178,12 @@ set(SOURCES
     src/utils/ngram/NgramAnalyzer.cpp
     src/utils/rabin/RabinKarpMatcher.cpp
     src/utils/interleaver/BlockInterleaver.cpp
-    src/utils/cepstrum/CepstrumAnalyzer.cpp
     src/utils/gabor/GaborTransform.cpp
     src/utils/pitch/PitchDetector.cpp
     # src/utils/ttest/TTestCalculator.cpp  # removed: duplicate class
     src/utils/ks/KsTestCalculator.cpp
 
     # -- F158~F171: Wave 24 工具模块 --
-    src/utils/chisq/ChiSquareTest.cpp
     src/utils/lrc/LrcChecksum.cpp
     src/utils/fcs/FcsChecker.cpp
     src/utils/snr/SnrEstimator.cpp
@@ -1287,7 +1259,6 @@ set(SOURCES
     src/utils/suffix2/SuffixArray2.cpp
     src/utils/tensor3/TensorDecomposition.cpp
     src/utils/treap2/ImplicitTreap.cpp
-    src/utils/cuckoo_hash/CuckooHashTable.cpp
     src/utils/qr3/HouseholderQR.cpp
     src/utils/sturm2/SturmSequence.cpp
     src/utils/whitening2/ZcaWhitening.cpp
@@ -1314,7 +1285,6 @@ set(SOURCES
     src/utils/spooky/SpookyHash.cpp
 
     # ── Wave 89: Cauchy分布/原子环形缓冲/MCMC采样/Catmull-Rom样条 ──
-    src/utils/cauchy/CauchyDistribution.cpp
     src/utils/ring4/RingBufferAtomic.cpp
     src/utils/mcmc/MetropolisHastings.cpp
     src/utils/spline3/CatmullRomSpline.cpp
@@ -3885,7 +3855,6 @@ set(HEADERS
     src/protocol/validator/ProtocolFrameValidator.h
 
     # -- F68: 数据关联器 --
-    src/utils/correlator/DataCorrelator.h
 
     # -- F69: 数据插值器 --
     src/utils/interpolator/DataInterpolator.h
@@ -3919,7 +3888,6 @@ set(HEADERS
     src/utils/normalize/DataNormalizer.h
 
     # -- F79: 互相关分析器 --
-    src/utils/crosscorr/CrossCorrelator.h
 
     # -- F80: 数值微分器 --
     src/utils/derivative/NumericalDerivative.h
@@ -3928,7 +3896,6 @@ set(HEADERS
     src/utils/window/DataWindowManager.h
 
     # -- F82: 数据分类器 --
-    src/utils/classifier/DataClassifier.h
 
     # -- F83: 数据量化器 --
     src/utils/quantize/DataQuantizer.h
@@ -3948,7 +3915,6 @@ set(HEADERS
     src/utils/integrator/NumericalIntegrator.h
 
     # -- F89: 卷积引擎 --
-    src/utils/convolution/ConvolutionEngine.h
 
     # -- F90: 解调器 --
     src/utils/modulation/Demodulator.h
@@ -3960,10 +3926,8 @@ set(HEADERS
     src/utils/segmenter/StreamSegmenter.h
 
     # -- F93: K-Means聚类器 --
-    src/utils/cluster/KMeansClusterer.h
 
     # -- F94: 变点检测器 --
-    src/utils/changept/ChangepointDetector.h
 
     # -- F95: PID控制器 --
     src/utils/pid/PidController.h
@@ -4004,7 +3968,6 @@ set(HEADERS
     # -- F113: 排列生成器 --
     src/utils/permutation/PermutationGenerator.h
     # -- F114: 组合生成器 --
-    src/utils/combination/CombinationGenerator.h
     # -- F115: 计数型布隆过滤器 --
     src/utils/bloomfilter2/CountingBloomFilter.h
     # -- F116: Reed-Solomon编解码器 --
@@ -4062,7 +4025,6 @@ set(HEADERS
     # -- F103: 位域解析器 --
 
     # -- F104: 统计环形缓冲区 --
-    src/utils/circbuf/CircularStatsBuffer.h
 
     # -- F105: 滞后滤波器 --
     src/utils/hysteresis/HysteresisFilter.h
@@ -4114,7 +4076,6 @@ set(HEADERS
     src/utils/fuzzy2/FuzzyLogicEngine.h
 
     # -- F124: CRC-64校验引擎 --
-    src/utils/crc64b/Crc64Engine.h
 
     # -- F125: 游程编码 --
     src/utils/rle/RunLengthCodec.h
@@ -4129,7 +4090,6 @@ set(HEADERS
     src/utils/voicedetect/VoiceActivityDetector.h
     src/utils/dynhistogram/DynamicHistogram.h
     src/utils/ticker/TickEngine.h
-    src/utils/circqueue/CircularPriorityQueue.h
     src/utils/rollingrank/RollingRank.h
     src/utils/expmove/ExponentialMoving.h
     src/utils/polyreg/PolynomialRegression.h
@@ -4143,7 +4103,6 @@ set(HEADERS
     # src/utils/autopcor/AutoCorrelation.h  # removed: duplicate class
     src/utils/deadzone/DeadZoneFilter.h
     # src/utils/movingmax/MovingMinMax.h  # removed: duplicate class
-    src/utils/countmin/CountMinSketch.h
     # src/utils/cuckoo/CuckooFilter.h  # removed: duplicate class
     # src/utils/bloomfilter2/ScalableBloomFilter.h  # removed: duplicate class
 
@@ -4157,7 +4116,6 @@ set(HEADERS
     src/utils/thd/ThdAnalyzer.h
     # src/utils/hmm/HiddenMarkovModel.h  # removed: duplicate class
     # src/utils/viterbi/ViterbiDecoder.h  # removed: duplicate of signal16/ViterbiDecoder
-    src/utils/covariance/CovarianceMatrix.h
     src/utils/percentile/PercentileCalculator.h
     # src/utils/scrambler/Scrambler.h  (duplicate of code23)
 
@@ -4167,7 +4125,6 @@ set(HEADERS
     src/utils/ngram/NgramAnalyzer.h
     src/utils/rabin/RabinKarpMatcher.h
     src/utils/interleaver/BlockInterleaver.h
-    src/utils/cepstrum/CepstrumAnalyzer.h
     src/utils/gabor/GaborTransform.h
     src/utils/pitch/PitchDetector.h
     # src/utils/ttest/TTestCalculator.h  # removed: duplicate class
@@ -4175,13 +4132,11 @@ set(HEADERS
     src/utils/ks/KsTestCalculator.h
 
     # -- F158~F171: Wave 24 工具模块 --
-    src/utils/chisq/ChiSquareTest.h
     src/utils/lrc/LrcChecksum.h
     src/utils/fcs/FcsChecker.h
     src/utils/snr/SnrEstimator.h
     src/utils/jaro/JaroWinkler.h
     # src/utils/convolutional/ConvolutionalCoder.h  # removed: duplicate of code4/ConvolutionalCoder
-    src/utils/cosinedist/CosineDistance.h
     src/utils/edgedetect/EdgeDetector.h
     src/utils/mass/MassEstimator.h
     src/utils/lcs2/LcsSolver.h
@@ -4226,7 +4181,6 @@ set(HEADERS
     src/utils/quadtree/QuadTree.h
 
     # -- F216~F225: Wave 36 工具模块(linter) --
-    src/utils/convhull/ConvexHull.h
     src/utils/disjoint/DisjointSet.h
     src/utils/radixtree/RadixTree.h
     src/utils/rle3/BurrowsWheelerTransform.h
@@ -4235,7 +4189,6 @@ set(HEADERS
     # src/utils/wavelet2/HaarWavelet2D.h  # removed: duplicate class
 
     # -- F226~F231: Wave 39 DSP工具模块 --
-    src/utils/chebyshev/ChebyshevFilter.h
     # goertzel/GoertzelAlgorithm.h removed (duplicate of fft8)
     src/utils/welch/WelchSpectrum.h
     src/utils/yulewalker/YuleWalker.h
@@ -4250,7 +4203,6 @@ set(HEADERS
     # src/utils/lomb2/LombScargle.h  # removed: duplicate class
 
     # -- Wave 38 --
-    src/utils/catboost/CatBoostEstimator.h
     src/utils/lru3/ArcCache.h
     src/utils/quantile/QuantileSketch.h
     src/utils/rle4/LempelZivWelch.h
@@ -4261,7 +4213,6 @@ set(HEADERS
     # src/utils/wiener2/WienerFilter2.h  # removed: duplicate of signal6/WienerFilter
     src/utils/kalman4/ParticleFilter.h
     src/utils/ekf/ExtendedKalman.h
-    src/utils/complement/ComplementaryFilter.h
     src/utils/savitzky/SavitzkyGolay.h
     src/utils/medfilt/MedianFilter.h
     src/utils/notch/NotchFilter.h
@@ -4285,7 +4236,6 @@ set(HEADERS
     src/utils/treap/Treap.h
     src/utils/splay/SplayTree.h
     src/utils/kdtree/KDTree.h
-    src/utils/cic/CicFilter.h
     src/utils/optimize/SimulatedAnnealing.h
     src/utils/optimize2/GeneticOptimizer.h
     src/utils/rabin2/RabinKarpMulti.h
@@ -4302,7 +4252,6 @@ set(HEADERS
     # -- Wave 42 头文件 --
     src/utils/bayes3/NaiveBayesClassifier.h
     src/utils/cepstrum3/CepstralAnalysis.h
-    src/utils/crossval/CrossValidator.h
     src/utils/emd/EarthMoverDistance.h
     src/utils/ensemble/BaggingEnsemble.h
     src/utils/entropy2/RenyiEntropy.h
@@ -4315,7 +4264,6 @@ set(HEADERS
     src/utils/taylor/TaylorSeries.h
 
     # ── Wave 44: 数值方法/ODE求根/积分 ──
-    src/utils/conjugate/ConjugateGradient.h
     src/utils/lagrange/LagrangeInterpolation.h
     src/utils/romberg/RombergIntegration.h
     src/utils/predictor_corrector/PredictorCorrector.h
@@ -4326,7 +4274,6 @@ set(HEADERS
     # src/utils/gaussquad/GaussLegendre.h  # removed: duplicate class
     src/utils/richardson/RichardsonExtrapolation.h
     src/utils/rk2/Rk2Solver.h
-    src/utils/collocation/CollocationSolver.h
 
     # ── Wave 45: 线性代数/特征值/逼近 ──
     src/utils/minimizer/GoldenSectionSearch.h
@@ -4340,7 +4287,6 @@ set(HEADERS
     src/utils/sturm/SturmSequence.h
     # src/utils/qrstep/QrEigenSolver.h  # removed: duplicate class
     # src/utils/hessenberg/HessenbergReduction.h  # removed: duplicate class
-    src/utils/circulant/CirculantSolver.h
 
     # ── Wave 46: 优化/特征值/迭代求解 ──
     src/utils/gram_schmidt/GramSchmidt.h
@@ -4349,7 +4295,6 @@ set(HEADERS
     src/utils/lanczos/LanczosEigen.h
     src/utils/powerquad/PowerMethodGeneralized.h
     src/utils/lobatto/LobattoIntegration.h
-    src/utils/clenshaw_curtis/ClenshawCurtis.h
     src/utils/toeplitz/ToeplitzSolver.h
     src/utils/hankel/HankelSolver.h
     src/utils/vandermonde/VandermondeSolver.h
@@ -4360,7 +4305,6 @@ set(HEADERS
     src/utils/gauss_seidel/GaussSeidelSolver.h
 
     # ── Wave 47: 线性求解器/特征值/分解更新 ──
-    src/utils/cgls/CglsSolver.h
     src/utils/gmres/GmresSolver.h
     src/utils/minres/MinresSolver.h
     src/utils/symm_eigen/SymmetricEigenSolver.h
@@ -4369,7 +4313,6 @@ set(HEADERS
     src/utils/svd2/SvdSolver.h
     # src/utils/polar/PolarDecomposition.h  # removed: duplicate class
     # src/utils/qrupdate/QrUpdate.h  # removed: duplicate class
-    src/utils/cholupdate/CholeskyUpdate.h
     src/utils/schur_update/SchurReorder.h
     src/utils/power2/InverseIteration.h
     src/utils/nystrom/NystromApproximation.h
@@ -4453,7 +4396,6 @@ set(HEADERS
     src/utils/cluster3/GaussianMixture2.h
 
     # ── Wave 71: 节律/解码/编码/螺旋 ──
-    src/utils/circadian/CircadianRhythm.h
     src/utils/viterbi2/ViterbiDecoder2.h
     src/utils/golomb2/GolombRiceCoder.h
     src/utils/spiral/SpiralMatrix.h
@@ -4466,7 +4408,6 @@ set(HEADERS
     # -- Wave 73: linter未跟踪模块集成 --
     src/utils/aho2/CommentzWalter.h
     src/utils/btree4/BStarTree.h
-    src/utils/cuckoo_hash/CuckooHashTable.h
     src/utils/dict/TrieMap.h
     # src/utils/friedman/FriedmanTest.h  # removed: duplicate class
     # src/utils/golay/GolayCode.h  # removed: duplicate class
@@ -4516,7 +4457,6 @@ set(HEADERS
     src/utils/sha512/Sha512Hash.h
 
     # ── Wave 89: Cauchy分布/原子环形缓冲/MCMC采样/CatmullRom样条 ──
-    src/utils/cauchy/CauchyDistribution.h
     src/utils/ring4/RingBufferAtomic.h
     src/utils/mcmc/MetropolisHastings.h
     src/utils/spline3/CatmullRomSpline.h

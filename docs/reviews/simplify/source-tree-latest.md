@@ -1,6 +1,6 @@
 ﻿# Source Tree Audit
 
-- Generated: 2026-06-13 18:06:10
+- Generated: 2026-06-13 18:13:27
 - Repo: D:\Workplace\Embedded_workplace\User_workplace\GS_Tool
 - Mode: read-only audit
 
@@ -9,11 +9,11 @@
 | Metric | Value |
 |--------|-------|
 | Working tree source files under src | 82048 |
-| Raw CMake source references | 5877 |
-| Declared CMake source references | 5765 |
-| Active CMake source references | 1464 |
+| Raw CMake source references | 5821 |
+| Declared CMake source references | 5705 |
+| Active CMake source references | 1404 |
 | Filtered utils references | 4301 |
-| Source files not active in CMake | 80609 |
+| Source files not active in CMake | 80669 |
 | Existing src/apps/serial_station files | 50 |
 | CMake refs under src/apps/serial_station | 50 |
 | Generated-looking utils directories | 39670 |
@@ -45,7 +45,7 @@
 
 | Module | References |
 |--------|------------|
-| utils | 601 |
+| utils | 541 |
 | core | 190 |
 | connection | 153 |
 | protocol | 151 |
@@ -181,36 +181,6 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/crypto | 4 | 4 |
 | src/utils/settings | 3 | 4 |
 | src/utils/data | 4 | 3 |
-| src/utils/catboost | 2 | 2 |
-| src/utils/cauchy | 2 | 2 |
-| src/utils/cepstrum | 2 | 2 |
-| src/utils/cgls | 2 | 2 |
-| src/utils/changept | 2 | 2 |
-| src/utils/chebyshev | 2 | 2 |
-| src/utils/chisq | 2 | 2 |
-| src/utils/cholupdate | 2 | 2 |
-| src/utils/cic | 2 | 2 |
-| src/utils/circadian | 2 | 2 |
-| src/utils/circbuf | 2 | 2 |
-| src/utils/circqueue | 2 | 2 |
-| src/utils/circulant | 2 | 2 |
-| src/utils/classifier | 2 | 2 |
-| src/utils/clenshaw_curtis | 2 | 2 |
-| src/utils/cluster | 2 | 2 |
-| src/utils/collocation | 2 | 2 |
-| src/utils/combination | 2 | 2 |
-| src/utils/complement | 2 | 2 |
-| src/utils/conjugate | 2 | 2 |
-| src/utils/convhull | 2 | 2 |
-| src/utils/convolution | 2 | 2 |
-| src/utils/correlator | 2 | 2 |
-| src/utils/cosinedist | 2 | 2 |
-| src/utils/countmin | 2 | 2 |
-| src/utils/covariance | 2 | 2 |
-| src/utils/crc64b | 2 | 2 |
-| src/utils/crosscorr | 2 | 2 |
-| src/utils/crossval | 2 | 2 |
-| src/utils/cuckoo_hash | 2 | 2 |
 | src/utils/davidson | 2 | 2 |
 | src/utils/dct | 2 | 2 |
 | src/utils/deadzone | 2 | 2 |
@@ -290,6 +260,36 @@ Only the first 80 generated-looking utils directories are listed.
 | src/utils/lobatto | 2 | 2 |
 | src/utils/lomb | 2 | 2 |
 | src/utils/lpc | 2 | 2 |
+| src/utils/lrc | 2 | 2 |
+| src/utils/lzw | 2 | 2 |
+| src/utils/mahal | 2 | 2 |
+| src/utils/mass | 2 | 2 |
+| src/utils/matmul | 2 | 2 |
+| src/utils/mcmc | 2 | 2 |
+| src/utils/medfilt | 2 | 2 |
+| src/utils/median_abs | 2 | 2 |
+| src/utils/medoid | 2 | 2 |
+| src/utils/merger | 2 | 2 |
+| src/utils/mergesort | 2 | 2 |
+| src/utils/merkle | 2 | 2 |
+| src/utils/metro | 2 | 2 |
+| src/utils/mfcc | 2 | 2 |
+| src/utils/min_cut | 2 | 2 |
+| src/utils/min_rotation | 2 | 2 |
+| src/utils/minhash | 2 | 2 |
+| src/utils/minimizer | 2 | 2 |
+| src/utils/minres | 2 | 2 |
+| src/utils/modulation | 2 | 2 |
+| src/utils/monte | 2 | 2 |
+| src/utils/mst | 2 | 2 |
+| src/utils/multiproc | 2 | 2 |
+| src/utils/multiset | 2 | 2 |
+| src/utils/nelder_mead | 2 | 2 |
+| src/utils/ngram | 2 | 2 |
+| src/utils/norm_test | 2 | 2 |
+| src/utils/normalize | 2 | 2 |
+| src/utils/notch | 2 | 2 |
+| src/utils/nqueens | 2 | 2 |
 
 Only the first 120 active utils directories are listed.
 
@@ -308,36 +308,6 @@ Only the first 120 active utils directories are listed.
 | src/utils/timestamp | 5 | 5 | 4 | 1 | True |
 | src/utils/export | 16 | 16 | 3 | 1 | True |
 | src/utils/scripting | 7 | 7 | 0 | 0 | False |
-| src/utils/catboost | 2 | 2 | 0 | 0 | False |
-| src/utils/cauchy | 2 | 2 | 0 | 0 | False |
-| src/utils/cepstrum | 2 | 2 | 0 | 0 | False |
-| src/utils/cgls | 2 | 2 | 0 | 0 | False |
-| src/utils/changept | 2 | 2 | 0 | 0 | False |
-| src/utils/chebyshev | 2 | 2 | 0 | 0 | False |
-| src/utils/chisq | 2 | 2 | 0 | 0 | False |
-| src/utils/cholupdate | 2 | 2 | 0 | 0 | False |
-| src/utils/cic | 2 | 2 | 0 | 0 | False |
-| src/utils/circadian | 2 | 2 | 0 | 0 | False |
-| src/utils/circbuf | 2 | 2 | 0 | 0 | False |
-| src/utils/circqueue | 2 | 2 | 0 | 0 | False |
-| src/utils/circulant | 2 | 2 | 0 | 0 | False |
-| src/utils/classifier | 2 | 2 | 0 | 0 | False |
-| src/utils/clenshaw_curtis | 2 | 2 | 0 | 0 | False |
-| src/utils/cluster | 2 | 2 | 0 | 0 | False |
-| src/utils/collocation | 2 | 2 | 0 | 0 | False |
-| src/utils/combination | 2 | 2 | 0 | 0 | False |
-| src/utils/complement | 2 | 2 | 0 | 0 | False |
-| src/utils/conjugate | 2 | 2 | 0 | 0 | False |
-| src/utils/convhull | 2 | 2 | 0 | 0 | False |
-| src/utils/convolution | 2 | 2 | 0 | 0 | False |
-| src/utils/correlator | 2 | 2 | 0 | 0 | False |
-| src/utils/cosinedist | 2 | 2 | 0 | 0 | False |
-| src/utils/countmin | 2 | 2 | 0 | 0 | False |
-| src/utils/covariance | 2 | 2 | 0 | 0 | False |
-| src/utils/crc64b | 2 | 2 | 0 | 0 | False |
-| src/utils/crosscorr | 2 | 2 | 0 | 0 | False |
-| src/utils/crossval | 2 | 2 | 0 | 0 | False |
-| src/utils/cuckoo_hash | 2 | 2 | 0 | 0 | False |
 | src/utils/davidson | 2 | 2 | 0 | 0 | False |
 | src/utils/dct | 2 | 2 | 0 | 0 | False |
 | src/utils/deadzone | 2 | 2 | 0 | 0 | False |
@@ -417,6 +387,36 @@ Only the first 120 active utils directories are listed.
 | src/utils/lobatto | 2 | 2 | 0 | 0 | False |
 | src/utils/lomb | 2 | 2 | 0 | 0 | False |
 | src/utils/lpc | 2 | 2 | 0 | 0 | False |
+| src/utils/lrc | 2 | 2 | 0 | 0 | False |
+| src/utils/lzw | 2 | 2 | 0 | 0 | False |
+| src/utils/mahal | 2 | 2 | 0 | 0 | False |
+| src/utils/mass | 2 | 2 | 0 | 0 | False |
+| src/utils/matmul | 2 | 2 | 0 | 0 | False |
+| src/utils/mcmc | 2 | 2 | 0 | 0 | False |
+| src/utils/medfilt | 2 | 2 | 0 | 0 | False |
+| src/utils/median_abs | 2 | 2 | 0 | 0 | False |
+| src/utils/medoid | 2 | 2 | 0 | 0 | False |
+| src/utils/merger | 2 | 2 | 0 | 0 | False |
+| src/utils/mergesort | 2 | 2 | 0 | 0 | False |
+| src/utils/merkle | 2 | 2 | 0 | 0 | False |
+| src/utils/metro | 2 | 2 | 0 | 0 | False |
+| src/utils/mfcc | 2 | 2 | 0 | 0 | False |
+| src/utils/min_cut | 2 | 2 | 0 | 0 | False |
+| src/utils/min_rotation | 2 | 2 | 0 | 0 | False |
+| src/utils/minhash | 2 | 2 | 0 | 0 | False |
+| src/utils/minimizer | 2 | 2 | 0 | 0 | False |
+| src/utils/minres | 2 | 2 | 0 | 0 | False |
+| src/utils/modulation | 2 | 2 | 0 | 0 | False |
+| src/utils/monte | 2 | 2 | 0 | 0 | False |
+| src/utils/mst | 2 | 2 | 0 | 0 | False |
+| src/utils/multiproc | 2 | 2 | 0 | 0 | False |
+| src/utils/multiset | 2 | 2 | 0 | 0 | False |
+| src/utils/nelder_mead | 2 | 2 | 0 | 0 | False |
+| src/utils/ngram | 2 | 2 | 0 | 0 | False |
+| src/utils/norm_test | 2 | 2 | 0 | 0 | False |
+| src/utils/normalize | 2 | 2 | 0 | 0 | False |
+| src/utils/notch | 2 | 2 | 0 | 0 | False |
+| src/utils/nqueens | 2 | 2 | 0 | 0 | False |
 
 Only the first 120 active utils dependency rows are listed.
 
@@ -425,36 +425,6 @@ Only the first 120 active utils dependency rows are listed.
 | Path | Files | Active CMake refs | External include refs | External modules |
 |------|-------|-------------------|-----------------------|------------------|
 | src/utils/scripting | 7 | 7 | 0 | 0 |
-| src/utils/catboost | 2 | 2 | 0 | 0 |
-| src/utils/cauchy | 2 | 2 | 0 | 0 |
-| src/utils/cepstrum | 2 | 2 | 0 | 0 |
-| src/utils/cgls | 2 | 2 | 0 | 0 |
-| src/utils/changept | 2 | 2 | 0 | 0 |
-| src/utils/chebyshev | 2 | 2 | 0 | 0 |
-| src/utils/chisq | 2 | 2 | 0 | 0 |
-| src/utils/cholupdate | 2 | 2 | 0 | 0 |
-| src/utils/cic | 2 | 2 | 0 | 0 |
-| src/utils/circadian | 2 | 2 | 0 | 0 |
-| src/utils/circbuf | 2 | 2 | 0 | 0 |
-| src/utils/circqueue | 2 | 2 | 0 | 0 |
-| src/utils/circulant | 2 | 2 | 0 | 0 |
-| src/utils/classifier | 2 | 2 | 0 | 0 |
-| src/utils/clenshaw_curtis | 2 | 2 | 0 | 0 |
-| src/utils/cluster | 2 | 2 | 0 | 0 |
-| src/utils/collocation | 2 | 2 | 0 | 0 |
-| src/utils/combination | 2 | 2 | 0 | 0 |
-| src/utils/complement | 2 | 2 | 0 | 0 |
-| src/utils/conjugate | 2 | 2 | 0 | 0 |
-| src/utils/convhull | 2 | 2 | 0 | 0 |
-| src/utils/convolution | 2 | 2 | 0 | 0 |
-| src/utils/correlator | 2 | 2 | 0 | 0 |
-| src/utils/cosinedist | 2 | 2 | 0 | 0 |
-| src/utils/countmin | 2 | 2 | 0 | 0 |
-| src/utils/covariance | 2 | 2 | 0 | 0 |
-| src/utils/crc64b | 2 | 2 | 0 | 0 |
-| src/utils/crosscorr | 2 | 2 | 0 | 0 |
-| src/utils/crossval | 2 | 2 | 0 | 0 |
-| src/utils/cuckoo_hash | 2 | 2 | 0 | 0 |
 | src/utils/davidson | 2 | 2 | 0 | 0 |
 | src/utils/dct | 2 | 2 | 0 | 0 |
 | src/utils/deadzone | 2 | 2 | 0 | 0 |
@@ -504,6 +474,36 @@ Only the first 120 active utils dependency rows are listed.
 | src/utils/hilbert | 2 | 2 | 0 | 0 |
 | src/utils/histogram | 2 | 2 | 0 | 0 |
 | src/utils/holtwinters | 2 | 2 | 0 | 0 |
+| src/utils/horner | 2 | 2 | 0 | 0 |
+| src/utils/huffman | 2 | 2 | 0 | 0 |
+| src/utils/hungarian | 2 | 2 | 0 | 0 |
+| src/utils/hurst | 2 | 2 | 0 | 0 |
+| src/utils/hysteresis | 2 | 2 | 0 | 0 |
+| src/utils/iir | 2 | 2 | 0 | 0 |
+| src/utils/ilu | 2 | 2 | 0 | 0 |
+| src/utils/integrator | 2 | 2 | 0 | 0 |
+| src/utils/interleaver | 2 | 2 | 0 | 0 |
+| src/utils/interpolator | 2 | 2 | 0 | 0 |
+| src/utils/interval_tree | 2 | 2 | 0 | 0 |
+| src/utils/jacobi_iter | 2 | 2 | 0 | 0 |
+| src/utils/jaro | 2 | 2 | 0 | 0 |
+| src/utils/jh | 2 | 2 | 0 | 0 |
+| src/utils/kalman | 2 | 2 | 0 | 0 |
+| src/utils/kdtree | 2 | 2 | 0 | 0 |
+| src/utils/keccak | 2 | 2 | 0 | 0 |
+| src/utils/ks | 2 | 2 | 0 | 0 |
+| src/utils/lagrange | 2 | 2 | 0 | 0 |
+| src/utils/laguerre | 2 | 2 | 0 | 0 |
+| src/utils/lanczos | 2 | 2 | 0 | 0 |
+| src/utils/lattice | 2 | 2 | 0 | 0 |
+| src/utils/lcp_array | 2 | 2 | 0 | 0 |
+| src/utils/levenshtein | 4 | 2 | 0 | 0 |
+| src/utils/lfsr | 2 | 2 | 0 | 0 |
+| src/utils/life | 2 | 2 | 0 | 0 |
+| src/utils/line_sweep | 2 | 2 | 0 | 0 |
+| src/utils/lobatto | 2 | 2 | 0 | 0 |
+| src/utils/lomb | 2 | 2 | 0 | 0 |
+| src/utils/lpc | 2 | 2 | 0 | 0 |
 
 Only the first 80 low-risk active utils candidates are listed.
 

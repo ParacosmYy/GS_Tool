@@ -219,12 +219,13 @@
 | 515 | CMake低风险utils第三批瘦身 | 从主GUI目标移除align/annotation/compress/data_inspector/decoder/encoder/frequency/fuzzer/loss/protocol_timer/recorder/signal_gen/splitter/template_lib/validator条目，构建和启动探针通过 |
 | 516 | CMake单引用utils第四批瘦身 | 从主GUI目标移除avltree/bfgs/capture/crc_verifier/cycle/decomposer/gaussquad/golay/groebner/heap/hessenberg/hmm/inv_perm/lfu/lifting/lru/moment/movingmax/qrupdate/redblack/scaler/segment/skiplist/sliding/smoother/state/threshold/trie/trigger/twoway/warp条目，构建和启动探针通过 |
 | 517 | CMake双引用utils第五批瘦身 | 从主GUI目标移除adams/adaptive_fft/agc/aho/anomaly/anova/arima/armodel/arnoldi/autocorr/autodiff/backtrack/bandmat/bayes/bernstein/bessel/bezier/bicgstab/bintree/bisect/bitalloc/bitfield/bitmap/bloom/bootstrap/bsp_tree/btree/butterfly/butterworth/cache条目，构建和启动探针通过 |
+| 518 | CMake双引用utils第六批瘦身 | 从主GUI目标移除catboost/cauchy/cepstrum/cgls/changept/chebyshev/chisq/cholupdate/cic/circadian/circbuf/circqueue/circulant/classifier/clenshaw_curtis/cluster/collocation/combination/complement/conjugate/convhull/convolution/correlator/cosinedist/countmin/covariance/crc64b/crosscorr/crossval/cuckoo_hash条目，构建和启动探针通过 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#517` 的完整记录
+- 当前文档已整理到 `#518` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
