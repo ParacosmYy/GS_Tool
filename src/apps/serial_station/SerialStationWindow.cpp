@@ -67,6 +67,7 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     , m_profileCatalog(std::make_unique<SerialProfileCatalogService>())
 {
     setObjectName(QStringLiteral("serialStationWindow"));
+    m_defaultProfileDirectory = m_profileCatalog->defaultProfileDirectory();
 
     auto* rootLayout = new QVBoxLayout(this);
     rootLayout->setContentsMargins(10, 10, 10, 10);
@@ -301,7 +302,12 @@ int SerialStationWindow::pruneMissingProfiles()
 bool SerialStationWindow::clearRecentProfiles()
 {
     const bool hadRecentProfiles = !recentProfilePaths().isEmpty() || !lastProfilePath().isEmpty();
+    const QString defaultDirectory = m_profileCatalog->defaultProfileDirectory();
     m_profileCatalog->clear();
+    if (!defaultDirectory.isEmpty()) {
+        m_profileCatalog->setDefaultProfileDirectory(defaultDirectory);
+        m_defaultProfileDirectory = m_profileCatalog->defaultProfileDirectory();
+    }
     refreshProfileCatalogUi();
     m_logPanel->appendSystem(tr("最近配置档案已清空"));
     return hadRecentProfiles;

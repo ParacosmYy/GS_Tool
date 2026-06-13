@@ -53,6 +53,23 @@ public:
     QString lastProfilePath() const;
 
     /**
+     * @brief 设置保存/加载档案对话框的默认目录。
+     * @param directoryPath 目录路径
+     * @return true 表示目录有效并已写入配置
+     */
+    bool setDefaultProfileDirectory(const QString& directoryPath);
+
+    /**
+     * @brief 已持久化的保存/加载档案默认目录。
+     */
+    QString defaultProfileDirectory() const;
+
+    /**
+     * @brief 仅清理已持久化的默认档案目录。
+     */
+    void clearDefaultProfileDirectory();
+
+    /**
      * @brief 清理已持久化的档案索引。
      */
     void clear();

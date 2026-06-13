@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 529分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 471分
+> 当前: 530分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 470分
 
 ---
 
@@ -231,12 +231,13 @@
 | 527 | Serial Station上次档案快捷启动 | 新增 `--last-profile`/`--serial-last-profile` 启动参数，复用最近档案索引直接恢复上次工位配置，补充PRD/Specs和启动/工作台QTest |
 | 528 | Serial Station失效档案清理 | 最近档案索引支持移除不存在路径，工作台新增清理失效入口，`--last-profile` 和重载上次支持缺失档案回退，补充PRD/Specs和QTest |
 | 529 | Serial Station档案目录快捷启动 | 新增 `--profile-dir`/`--serial-profile-dir` 启动参数，工作台保存/加载档案默认目录可由启动脚本固定，并拆分窗口档案实现文件 |
+| 530 | Serial Station默认档案目录持久化 | 默认档案目录写入 `SerialProfileCatalogService`，启动参数、保存和加载成功后自动记忆目录，后续窗口恢复工位目录且清空最近不丢目录 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#529` 的完整记录
+- 当前文档已整理到 `#530` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

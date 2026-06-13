@@ -14,6 +14,7 @@ constexpr int kMaxRecentProfiles = 8;
 const char* kCatalogGroup = "serial_station/profiles";
 const char* kRecentProfilesKey = "recent";
 const char* kLastProfileKey = "last";
+const char* kDefaultProfileDirectoryKey = "defaultDirectory";
 
 } // namespace
 
@@ -115,6 +116,35 @@ QString SerialProfileCatalogService::lastProfilePath() const
     return normalizePath(m_settings->get(QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
                                                                      QLatin1String(kLastProfileKey)))
                              .toString());
+}
+
+bool SerialProfileCatalogService::setDefaultProfileDirectory(const QString& directoryPath)
+{
+    const QString normalizedPath = normalizePath(directoryPath);
+    if (normalizedPath.isEmpty()) {
+        return false;
+    }
+
+    m_settings->set(QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
+                                                QLatin1String(kDefaultProfileDirectoryKey)),
+                    normalizedPath);
+    m_settings->sync();
+    return true;
+}
+
+QString SerialProfileCatalogService::defaultProfileDirectory() const
+{
+    return normalizePath(m_settings->get(QStringLiteral("%1/%2").arg(
+                                             QLatin1String(kCatalogGroup),
+                                             QLatin1String(kDefaultProfileDirectoryKey)))
+                             .toString());
+}
+
+void SerialProfileCatalogService::clearDefaultProfileDirectory()
+{
+    m_settings->remove(QStringLiteral("%1/%2").arg(QLatin1String(kCatalogGroup),
+                                                   QLatin1String(kDefaultProfileDirectoryKey)));
+    m_settings->sync();
 }
 
 void SerialProfileCatalogService::clear()

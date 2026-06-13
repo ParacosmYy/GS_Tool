@@ -58,6 +58,17 @@ private slots:
     void settingDefaultProfileDirectoryNormalizesPath();
     void settingBlankDefaultProfileDirectoryRestoresFallbackPath();
     void settingDefaultProfileDirectoryKeepsExistingProfileCatalog();
+    void defaultProfileDirectoryPersistsAcrossWindows();
+    void loadingProfileUpdatesDefaultProfileDirectory();
+    void savingProfileUpdatesDefaultProfileDirectory();
+    void blankDefaultProfileDirectoryClearsPersistedDirectory();
+    void persistedDefaultProfileDirectorySurvivesRecentProfileClear();
+    void failedProfileLoadKeepsDefaultProfileDirectory();
+    void failedProfileSaveKeepsDefaultProfileDirectory();
+    void newWindowUsesCatalogDefaultProfileDirectory();
+    void clearRecentProfilesWithoutRecentKeepsDefaultDirectory();
+    void loadStartupProfileUpdatesDefaultProfileDirectory();
+    void loadStartupLastProfileUpdatesDefaultProfileDirectory();
     void workbenchExposesRecentProfileControls();
     void workbenchExposesPruneMissingProfileControl();
     void loadingProfileAppliesWorkbenchState();
@@ -465,6 +476,187 @@ void SerialStationWorkbenchTest::settingDefaultProfileDirectoryKeepsExistingProf
 
     QCOMPARE(window.recentProfilePaths(), QStringList({profilePath}));
     QCOMPARE(window.lastProfilePath(), profilePath);
+}
+
+void SerialStationWorkbenchTest::defaultProfileDirectoryPersistsAcrossWindows()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QVERIFY(dir.mkpath(QStringLiteral("profiles/line-a")));
+    const QString expectedPath = dir.filePath(QStringLiteral("profiles/line-a"));
+
+    {
+        SerialStationWindow window;
+        window.setDefaultProfileDirectory(expectedPath);
+        QCOMPARE(window.defaultProfileDirectory(), QDir::cleanPath(expectedPath));
+    }
+
+    SerialStationWindow reloadedWindow;
+
+    QCOMPARE(reloadedWindow.defaultProfileDirectory(), QDir::cleanPath(expectedPath));
+}
+
+void SerialStationWorkbenchTest::loadingProfileUpdatesDefaultProfileDirectory()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QVERIFY(dir.mkpath(QStringLiteral("profiles/line-a")));
+    const QString profilePath = dir.filePath(QStringLiteral("profiles/line-a/loaded.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), profilePath).ok);
+
+    SerialStationWindow window;
+    QVERIFY(window.loadProfileFromFile(profilePath).ok);
+
+    QCOMPARE(window.defaultProfileDirectory(), QFileInfo(profilePath).absolutePath());
+}
+
+void SerialStationWorkbenchTest::savingProfileUpdatesDefaultProfileDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QVERIFY(dir.mkpath(QStringLiteral("profiles/line-b")));
+    const QString profilePath = dir.filePath(QStringLiteral("profiles/line-b/saved.edserialprofile"));
+
+    SerialStationWindow window;
+    const auto result = window.saveCurrentProfileToFile(profilePath, QStringLiteral("Saved Profile"));
+    QVERIFY2(result.ok, qPrintable(result.errorMessage));
+
+    QCOMPARE(window.defaultProfileDirectory(), QFileInfo(result.filePath).absolutePath());
+}
+
+void SerialStationWorkbenchTest::blankDefaultProfileDirectoryClearsPersistedDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString directoryPath = QDir(tempDir.path()).filePath(QStringLiteral("profiles"));
+
+    {
+        SerialStationWindow window;
+        const QString fallbackPath = window.defaultProfileDirectory();
+        window.setDefaultProfileDirectory(directoryPath);
+        QVERIFY(window.defaultProfileDirectory() != fallbackPath);
+        window.setDefaultProfileDirectory(QStringLiteral("   "));
+        QCOMPARE(window.defaultProfileDirectory(), fallbackPath);
+    }
+
+    SerialStationWindow reloadedWindow;
+
+    QVERIFY(reloadedWindow.defaultProfileDirectory() != QDir::cleanPath(directoryPath));
+}
+
+void SerialStationWorkbenchTest::persistedDefaultProfileDirectorySurvivesRecentProfileClear()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QVERIFY(dir.mkpath(QStringLiteral("profiles/line-a")));
+    const QString directoryPath = dir.filePath(QStringLiteral("profiles/line-a"));
+    const QString profilePath = dir.filePath(QStringLiteral("profiles/line-a/profile.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), profilePath).ok);
+
+    SerialStationWindow window;
+    QVERIFY(window.loadProfileFromFile(profilePath).ok);
+    window.setDefaultProfileDirectory(directoryPath);
+
+    QVERIFY(window.clearRecentProfiles());
+
+    QCOMPARE(window.defaultProfileDirectory(), QDir::cleanPath(directoryPath));
+}
+
+void SerialStationWorkbenchTest::failedProfileLoadKeepsDefaultProfileDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString directoryPath = QDir(tempDir.path()).filePath(QStringLiteral("profiles"));
+    const QString missingPath = QDir(tempDir.path()).filePath(QStringLiteral("missing.edserialprofile"));
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(directoryPath);
+    const QString before = window.defaultProfileDirectory();
+
+    const auto result = window.loadProfileFromFile(missingPath);
+
+    QVERIFY(!result.ok);
+    QCOMPARE(window.defaultProfileDirectory(), before);
+}
+
+void SerialStationWorkbenchTest::failedProfileSaveKeepsDefaultProfileDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString directoryPath = QDir(tempDir.path()).filePath(QStringLiteral("profiles"));
+    const QString invalidPath = QDir(tempDir.path()).filePath(QStringLiteral("missing-dir/saved.edserialprofile"));
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(directoryPath);
+    const QString before = window.defaultProfileDirectory();
+
+    const auto result = window.saveCurrentProfileToFile(invalidPath, QStringLiteral("Save Should Fail"));
+
+    QVERIFY(!result.ok);
+    QCOMPARE(window.defaultProfileDirectory(), before);
+}
+
+void SerialStationWorkbenchTest::newWindowUsesCatalogDefaultProfileDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString directoryPath = QDir(tempDir.path()).filePath(QStringLiteral("profiles/./line-a"));
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(directoryPath));
+
+    SerialStationWindow window;
+
+    QCOMPARE(window.defaultProfileDirectory(), QDir::cleanPath(directoryPath));
+}
+
+void SerialStationWorkbenchTest::clearRecentProfilesWithoutRecentKeepsDefaultDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString directoryPath = QDir(tempDir.path()).filePath(QStringLiteral("profiles"));
+
+    SerialStationWindow window;
+    window.setDefaultProfileDirectory(directoryPath);
+
+    QVERIFY(!window.clearRecentProfiles());
+
+    QCOMPARE(window.defaultProfileDirectory(), QDir::cleanPath(directoryPath));
+}
+
+void SerialStationWorkbenchTest::loadStartupProfileUpdatesDefaultProfileDirectory()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString profilePath = QDir(tempDir.path()).filePath(QStringLiteral("startup.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), profilePath).ok);
+
+    SerialStationWindow window;
+    QVERIFY(window.loadStartupProfile(profilePath));
+
+    QCOMPARE(window.defaultProfileDirectory(), QFileInfo(profilePath).absolutePath());
+}
+
+void SerialStationWorkbenchTest::loadStartupLastProfileUpdatesDefaultProfileDirectory()
+{
+    SerialProfileService service;
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString profilePath = QDir(tempDir.path()).filePath(QStringLiteral("last.edserialprofile"));
+    QVERIFY(service.saveToFile(sampleProfile(), profilePath).ok);
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(profilePath));
+
+    SerialStationWindow window;
+    QVERIFY(window.loadStartupLastProfile());
+
+    QCOMPARE(window.defaultProfileDirectory(), QFileInfo(profilePath).absolutePath());
 }
 
 void SerialStationWorkbenchTest::workbenchExposesRecentProfileControls()

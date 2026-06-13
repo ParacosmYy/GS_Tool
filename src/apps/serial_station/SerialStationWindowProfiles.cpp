@@ -6,6 +6,7 @@
 #include <QtWidgets/QFileDialog>
 
 #include "apps/serial_station/SerialStationController.h"
+#include "apps/serial_station/services/SerialProfileCatalogService.h"
 #include "apps/serial_station/ui/SerialLogPanel.h"
 
 namespace serial_station {
@@ -51,6 +52,7 @@ SerialProfileWriteResult SerialStationWindow::saveCurrentProfileToFile(
     const SerialProfileWriteResult result = m_controller->saveProfileToFile(profile, filePath);
     if (result.ok) {
         recordSuccessfulProfilePath(result.filePath);
+        setDefaultProfileDirectory(QFileInfo(result.filePath).absolutePath());
         m_logPanel->appendSystem(tr("已保存配置档案: %1").arg(result.filePath));
     } else {
         m_logPanel->appendSystem(tr("保存配置档案失败: %1").arg(result.errorMessage));
@@ -68,13 +70,23 @@ SerialProfileResult SerialStationWindow::loadProfileFromFile(const QString& file
 
     applyProfileToUi(result.profile);
     recordSuccessfulProfilePath(filePath);
+    setDefaultProfileDirectory(QFileInfo(filePath).absolutePath());
     m_logPanel->appendSystem(tr("已加载配置档案: %1").arg(result.profile.name));
     return result;
 }
 
 void SerialStationWindow::setDefaultProfileDirectory(const QString& directoryPath)
 {
-    m_defaultProfileDirectory = normalizedDirectoryPath(directoryPath);
+    const QString normalizedPath = normalizedDirectoryPath(directoryPath);
+    if (normalizedPath.isEmpty()) {
+        m_profileCatalog->clearDefaultProfileDirectory();
+        m_defaultProfileDirectory.clear();
+        return;
+    }
+
+    if (m_profileCatalog->setDefaultProfileDirectory(normalizedPath)) {
+        m_defaultProfileDirectory = m_profileCatalog->defaultProfileDirectory();
+    }
 }
 
 QString SerialStationWindow::defaultProfileDirectory() const

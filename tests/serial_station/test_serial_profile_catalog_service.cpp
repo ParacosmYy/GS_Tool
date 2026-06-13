@@ -49,6 +49,26 @@ private slots:
     void pruneMissingProfilePathsHandlesEmptyCatalog();
     void pruneMissingProfilePathsRetainsLastWhenStillExisting();
     void pruneMissingProfilePathsClearsStrayLastWithoutRecentProfiles();
+    void defaultProfileDirectoryStartsEmpty();
+    void setDefaultProfileDirectoryPersistsNormalizedPath();
+    void setDefaultProfileDirectoryRejectsBlankPath();
+    void clearDefaultProfileDirectoryRemovesStoredPath();
+    void clearRemovesDefaultProfileDirectory();
+    void defaultProfileDirectoryPersistsAcrossInstances();
+    void setDefaultProfileDirectoryDoesNotChangeRecentProfiles();
+    void setDefaultProfileDirectoryHandlesDuplicateSeparators();
+    void clearDefaultProfileDirectoryKeepsRecentProfiles();
+    void defaultProfileDirectoryCanBeReplaced();
+    void blankDefaultProfileDirectoryDoesNotCreateStoredValue();
+    void clearDefaultProfileDirectoryPersistsAcrossInstances();
+    void recordProfilePathDoesNotChangeDefaultDirectory();
+    void removeProfilePathDoesNotChangeDefaultDirectory();
+    void pruneMissingProfilePathsDoesNotChangeDefaultDirectory();
+    void defaultProfileDirectoryNormalizesStoredRawValue();
+    void setDefaultProfileDirectoryAcceptsRelativePath();
+    void setDefaultProfileDirectoryCollapsesParentSegments();
+    void clearDefaultProfileDirectoryIsIdempotent();
+    void defaultProfileDirectoryKeepsLastProfilePathIndependent();
 };
 
 void SerialProfileCatalogServiceTest::init()
@@ -589,6 +609,232 @@ void SerialProfileCatalogServiceTest::pruneMissingProfilePathsClearsStrayLastWit
     QCOMPARE(catalog.pruneMissingProfilePaths(), 0);
     QVERIFY(catalog.recentProfilePaths().isEmpty());
     QCOMPARE(catalog.lastProfilePath(), QString());
+}
+
+void SerialProfileCatalogServiceTest::defaultProfileDirectoryStartsEmpty()
+{
+    SerialProfileCatalogService catalog;
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QString());
+}
+
+void SerialProfileCatalogServiceTest::setDefaultProfileDirectoryPersistsNormalizedPath()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    QDir dir(tempDir.path());
+    QVERIFY(dir.mkpath(QStringLiteral("profiles/line-a")));
+    const QString rawPath = dir.filePath(QStringLiteral("profiles/./line-a"));
+    const QString expectedPath = QDir::cleanPath(rawPath);
+
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(rawPath));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), expectedPath);
+}
+
+void SerialProfileCatalogServiceTest::setDefaultProfileDirectoryRejectsBlankPath()
+{
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/line-a")));
+
+    QVERIFY(!catalog.setDefaultProfileDirectory(QStringLiteral("   ")));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QStringLiteral("C:/profiles/line-a"));
+}
+
+void SerialProfileCatalogServiceTest::clearDefaultProfileDirectoryRemovesStoredPath()
+{
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/line-a")));
+
+    catalog.clearDefaultProfileDirectory();
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QString());
+}
+
+void SerialProfileCatalogServiceTest::clearRemovesDefaultProfileDirectory()
+{
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/line-a")));
+    QVERIFY(catalog.recordProfilePath(QStringLiteral("C:/profiles/line-a/profile.edserialprofile")));
+
+    catalog.clear();
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QString());
+    QVERIFY(catalog.recentProfilePaths().isEmpty());
+    QCOMPARE(catalog.lastProfilePath(), QString());
+}
+
+void SerialProfileCatalogServiceTest::defaultProfileDirectoryPersistsAcrossInstances()
+{
+    {
+        SerialProfileCatalogService catalog;
+        QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/line-a")));
+    }
+
+    SerialProfileCatalogService reloadedCatalog;
+
+    QCOMPARE(reloadedCatalog.defaultProfileDirectory(), QStringLiteral("C:/profiles/line-a"));
+}
+
+void SerialProfileCatalogServiceTest::setDefaultProfileDirectoryDoesNotChangeRecentProfiles()
+{
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(QStringLiteral("C:/profiles/line-a/profile.edserialprofile")));
+    QVERIFY(catalog.recordProfilePath(QStringLiteral("C:/profiles/line-b/profile.edserialprofile")));
+
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/line-c")));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QStringLiteral("C:/profiles/line-c"));
+    QCOMPARE(catalog.recentProfilePaths(),
+             QStringList({QStringLiteral("C:/profiles/line-b/profile.edserialprofile"),
+                          QStringLiteral("C:/profiles/line-a/profile.edserialprofile")}));
+    QCOMPARE(catalog.lastProfilePath(), QStringLiteral("C:/profiles/line-b/profile.edserialprofile"));
+}
+
+void SerialProfileCatalogServiceTest::setDefaultProfileDirectoryHandlesDuplicateSeparators()
+{
+    SerialProfileCatalogService catalog;
+
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral(" C:/profiles//line-a/./profiles ")));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QStringLiteral("C:/profiles/line-a/profiles"));
+}
+
+void SerialProfileCatalogServiceTest::clearDefaultProfileDirectoryKeepsRecentProfiles()
+{
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(QStringLiteral("C:/profiles/line-a/profile.edserialprofile")));
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/line-a")));
+
+    catalog.clearDefaultProfileDirectory();
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QString());
+    QCOMPARE(catalog.recentProfilePaths(),
+             QStringList({QStringLiteral("C:/profiles/line-a/profile.edserialprofile")}));
+    QCOMPARE(catalog.lastProfilePath(), QStringLiteral("C:/profiles/line-a/profile.edserialprofile"));
+}
+
+void SerialProfileCatalogServiceTest::defaultProfileDirectoryCanBeReplaced()
+{
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/line-a")));
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/line-b")));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QStringLiteral("C:/profiles/line-b"));
+}
+
+void SerialProfileCatalogServiceTest::blankDefaultProfileDirectoryDoesNotCreateStoredValue()
+{
+    SerialProfileCatalogService catalog;
+
+    QVERIFY(!catalog.setDefaultProfileDirectory(QStringLiteral("   ")));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QString());
+}
+
+void SerialProfileCatalogServiceTest::clearDefaultProfileDirectoryPersistsAcrossInstances()
+{
+    {
+        SerialProfileCatalogService catalog;
+        QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/line-a")));
+        catalog.clearDefaultProfileDirectory();
+    }
+
+    SerialProfileCatalogService reloadedCatalog;
+
+    QCOMPARE(reloadedCatalog.defaultProfileDirectory(), QString());
+}
+
+void SerialProfileCatalogServiceTest::recordProfilePathDoesNotChangeDefaultDirectory()
+{
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/default")));
+
+    QVERIFY(catalog.recordProfilePath(QStringLiteral("C:/profiles/line-a/profile.edserialprofile")));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QStringLiteral("C:/profiles/default"));
+    QCOMPARE(catalog.lastProfilePath(), QStringLiteral("C:/profiles/line-a/profile.edserialprofile"));
+}
+
+void SerialProfileCatalogServiceTest::removeProfilePathDoesNotChangeDefaultDirectory()
+{
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/default")));
+    QVERIFY(catalog.recordProfilePath(QStringLiteral("C:/profiles/line-a/profile.edserialprofile")));
+
+    QVERIFY(catalog.removeProfilePath(QStringLiteral("C:/profiles/line-a/profile.edserialprofile")));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QStringLiteral("C:/profiles/default"));
+    QVERIFY(catalog.recentProfilePaths().isEmpty());
+}
+
+void SerialProfileCatalogServiceTest::pruneMissingProfilePathsDoesNotChangeDefaultDirectory()
+{
+    QTemporaryDir tempDir;
+    QVERIFY(tempDir.isValid());
+    const QString missingPath = QDir(tempDir.path()).filePath(QStringLiteral("missing.edserialprofile"));
+
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.setDefaultProfileDirectory(QDir(tempDir.path()).filePath(QStringLiteral("profiles"))));
+    QVERIFY(catalog.recordProfilePath(missingPath));
+
+    QCOMPARE(catalog.pruneMissingProfilePaths(), 1);
+
+    QCOMPARE(catalog.defaultProfileDirectory(),
+             QDir::cleanPath(QDir(tempDir.path()).filePath(QStringLiteral("profiles"))));
+}
+
+void SerialProfileCatalogServiceTest::defaultProfileDirectoryNormalizesStoredRawValue()
+{
+    SettingsManager::instance().set(QStringLiteral("serial_station/profiles/defaultDirectory"),
+                                    QStringLiteral(" C:/profiles//line-a/./profiles "));
+    SettingsManager::instance().sync();
+
+    SerialProfileCatalogService catalog;
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QStringLiteral("C:/profiles/line-a/profiles"));
+}
+
+void SerialProfileCatalogServiceTest::setDefaultProfileDirectoryAcceptsRelativePath()
+{
+    SerialProfileCatalogService catalog;
+
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("./profiles/line-a")));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QStringLiteral("profiles/line-a"));
+}
+
+void SerialProfileCatalogServiceTest::setDefaultProfileDirectoryCollapsesParentSegments()
+{
+    SerialProfileCatalogService catalog;
+
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/factory/profiles/../line-a")));
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QStringLiteral("C:/factory/line-a"));
+}
+
+void SerialProfileCatalogServiceTest::clearDefaultProfileDirectoryIsIdempotent()
+{
+    SerialProfileCatalogService catalog;
+
+    catalog.clearDefaultProfileDirectory();
+    catalog.clearDefaultProfileDirectory();
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QString());
+}
+
+void SerialProfileCatalogServiceTest::defaultProfileDirectoryKeepsLastProfilePathIndependent()
+{
+    SerialProfileCatalogService catalog;
+    QVERIFY(catalog.recordProfilePath(QStringLiteral("C:/profiles/line-a/profile.edserialprofile")));
+    QVERIFY(catalog.setDefaultProfileDirectory(QStringLiteral("C:/profiles/default")));
+
+    catalog.clearDefaultProfileDirectory();
+
+    QCOMPARE(catalog.defaultProfileDirectory(), QString());
+    QCOMPARE(catalog.lastProfilePath(), QStringLiteral("C:/profiles/line-a/profile.edserialprofile"));
 }
 
 QTEST_GUILESS_MAIN(SerialProfileCatalogServiceTest)
