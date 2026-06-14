@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <QtCore/QQueue>
 #include <QtCore/QVariantMap>
 
 #include "apps/serial_station/core/SerialCodec.h"
@@ -229,10 +230,37 @@ private:
     void logRx(const QString& text, const QByteArray& payload, const QVariantMap& fields);
     void logSystem(const QString& text, const QVariantMap& fields = QVariantMap());
     void logError(const QString& text, const QVariantMap& fields = QVariantMap());
+    void enqueueSend(const QString& command,
+                     const QString& mode,
+                     const QByteArray& frame,
+                     int retryCount,
+                     int retryDelayMs);
+    void processNextQueuedSend();
+    void processQueuedSendAttempt();
+    void finishSendWithFailure(const QString& command,
+                              const QString& mode,
+                              const QString& detail,
+                              const QString& reason);
     void emitSendFailure(const QString& command,
                          const QString& mode,
                          const QString& message,
                          const QString& reason = QStringLiteral("unknown"));
+
+    struct SendRetryContext {
+        QString command;
+        QString mode;
+        QByteArray frame;
+        int maxRetryCount = 0;
+        int retryDelayMs = 0;
+        int attempt = 0;
+        int retriesUsed = 0;
+        qint64 bytesWritten = 0;
+    };
+
+    bool m_sendInFlight = false;
+    bool m_sendQueueFrozen = false;
+    SendRetryContext m_sendContext;
+    QQueue<SendRetryContext> m_sendQueue;
 
     SerialProtocolRegistry m_protocols;
     SerialManager m_serialManager;

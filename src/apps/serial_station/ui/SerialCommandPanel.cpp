@@ -47,6 +47,8 @@ void SerialCommandPanel::setSendEnabled(bool enabled)
     m_readIdButton->setEnabled(enabled);
     m_pingButton->setEnabled(enabled);
     m_resetButton->setEnabled(enabled);
+    m_retryCountSpin->setEnabled(enabled);
+    m_retryIntervalSpin->setEnabled(enabled);
 }
 
 int SerialCommandPanel::historyCount() const

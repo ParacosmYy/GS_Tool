@@ -37,6 +37,15 @@ QByteArray controllerTestJustFloatFrame(std::initializer_list<float> values)
     return frame;
 }
 
+QString controllerTestMeasurementFrame(int frameIndex, std::initializer_list<double> values)
+{
+    QStringList valuesText;
+    for (double value : values) {
+        valuesText.append(QString::number(value, 'g', 6));
+    }
+    return QStringLiteral("%1|%2").arg(frameIndex).arg(valuesText.join(QLatin1Char(',')));
+}
+
 } // namespace
 
 class SerialStationControllerTest : public QObject {
@@ -55,6 +64,7 @@ private slots:
     void unsupportedModeFailsBeforeConnectionCheck();
     void closedSerialPortRejectsAsciiSend();
     void closedSerialPortRejectsHexSend();
+    void sendCommandAcceptsRetryArgumentsWithoutRetryPath();
     void invalidHexFailsBeforeConnectionCheck_data();
     void invalidHexFailsBeforeConnectionCheck();
     void closedSerialPortRejectsProtocolSend();
@@ -80,8 +90,10 @@ private slots:
     void justFloatMeasurementProducesRxLog();
     void justFloatMeasurementEmitsSummaryLines();
     void justFloatMeasurementEmitsTrendLines();
+    void justFloatMeasurementEmitsWaveformFrames();
     void clearLogRecordsClearsMeasurementSummary();
     void clearLogRecordsClearsMeasurementTrend();
+    void clearLogRecordsClearsMeasurementFrames();
     void reconnectResetsPartialReceiveBuffer();
     void disconnectResetsPartialReceiveBuffer();
     void disconnectThenNewLineDoesNotUseOldPartialBytes();
@@ -280,6 +292,23 @@ void SerialStationControllerTest::closedSerialPortRejectsHexSend()
     QCOMPARE(args.at(0).toString(), QStringLiteral("01 03 00 00 00 02"));
     QCOMPARE(args.at(1).toString(), QStringLiteral("hex"));
     QCOMPARE(args.at(2).toString(), QStringLiteral("串口未连接，无法发送"));
+}
+
+void SerialStationControllerTest::sendCommandAcceptsRetryArgumentsWithoutRetryPath()
+{
+    SerialStationController controller;
+    QSignalSpy failedSpy(&controller, &SerialStationController::serialCommandFailed);
+    QSignalSpy preparedSpy(&controller, &SerialStationController::serialCommandPrepared);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+    QSignalSpy systemLogSpy(&controller, &SerialStationController::serialSystemLogged);
+
+    controller.sendCommand(QStringLiteral("AT+GMR"), QStringLiteral("ascii"), 3, 120);
+
+    QCOMPARE(failedSpy.count(), 1);
+    QCOMPARE(preparedSpy.count(), 0);
+    QCOMPARE(errorSpy.count(), 1);
+    QCOMPARE(systemLogSpy.count(), 1);
+    QCOMPARE(failedSpy.takeFirst().at(2).toString(), QStringLiteral("串口未连接，无法发送"));
 }
 
 void SerialStationControllerTest::invalidHexFailsBeforeConnectionCheck_data()
@@ -703,6 +732,33 @@ void SerialStationControllerTest::justFloatMeasurementEmitsTrendLines()
     QVERIFY(lines.last().contains(QStringLiteral("ch2=4")));
 }
 
+void SerialStationControllerTest::justFloatMeasurementEmitsWaveformFrames()
+{
+    SerialStationController controller;
+    int emittedCount = 0;
+    QStringList lastFrames;
+    connect(&controller,
+            &SerialStationController::serialMeasurementFramesUpdated,
+            &controller,
+            [&](const QStringList& frames) {
+                ++emittedCount;
+                lastFrames = frames;
+            });
+
+    controller.setActiveProtocol(QStringLiteral("just_float"));
+    controller.handleBytesReceived(controllerTestJustFloatFrame({1.5F, -2.25F}));
+    controller.handleBytesReceived(controllerTestJustFloatFrame({3.0F, 4.0F}));
+
+    QCOMPARE(emittedCount, 2);
+    QCOMPARE(lastFrames.size(), 2);
+    const QStringList lastFrame = lastFrames.last().split(QLatin1Char('|'));
+    QCOMPARE(lastFrame.first().toInt(), 2);
+    const QStringList values = lastFrame.last().split(QLatin1Char(','), Qt::SkipEmptyParts);
+    QCOMPARE(values.size(), 2);
+    QCOMPARE(values.at(0).toDouble(), 3.0);
+    QCOMPARE(values.at(1).toDouble(), 4.0);
+}
+
 void SerialStationControllerTest::clearLogRecordsClearsMeasurementSummary()
 {
     SerialStationController controller;
@@ -729,6 +785,27 @@ void SerialStationControllerTest::clearLogRecordsClearsMeasurementTrend()
 
     QCOMPARE(trendSpy.count(), 2);
     QVERIFY(trendSpy.takeLast().at(0).toStringList().isEmpty());
+}
+
+void SerialStationControllerTest::clearLogRecordsClearsMeasurementFrames()
+{
+    SerialStationController controller;
+    int emittedCount = 0;
+    QStringList lastFrames;
+    connect(&controller,
+            &SerialStationController::serialMeasurementFramesUpdated,
+            &controller,
+            [&](const QStringList& frames) {
+                ++emittedCount;
+                lastFrames = frames;
+            });
+
+    controller.setActiveProtocol(QStringLiteral("just_float"));
+    controller.handleBytesReceived(controllerTestJustFloatFrame({1.0F}));
+    controller.clearLogRecords();
+
+    QCOMPARE(emittedCount, 2);
+    QVERIFY(lastFrames.isEmpty());
 }
 
 void SerialStationControllerTest::reconnectResetsPartialReceiveBuffer()
