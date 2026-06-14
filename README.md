@@ -25,6 +25,33 @@
 - **证据入口**：本仓库约束链路、CMake、startup smoke
 - **本周期新增**：命令面板失败分级提示（编码/未连接/写入）接入 `serialCommandFailedWithReason`，并在主工作区显示具体失败归类；`Ctrl+Enter`/`Ctrl+O`/`Ctrl+W` 快捷闭环接入同步补齐 `send.execute`
 
+### 企业级架构快照（本轮）
+
+- **入口层（L6）**：`EmbedDebug.bat` -> `main` -> `MainWindow`  
+  - 只进行装配与路由，不承接串口/协议解析的业务逻辑；
+  - 通过 `PanelManager` 与导航策略保持视图编排和上下文隔离。
+- **能力域层（L5-L4）**：`SerialStation`/`Terminal`/`Automation` 按能力域分片；
+  - 能力接口优先落在 `src/interfaces` 与 `src/shared`，跨域调用走接口契约；
+  - 功能扩展通过模块化注册，而非主窗口硬编码。
+- **执行层（L3-L1）**：`protocols` 仅承担帧语义与解析，`core` 做会话/收发分发，`services/workers` 承担持久化与异步任务；
+  - Worker 仅通过 signal 下沉到 Controller，不直接变更 UI。
+- **数据与交付层（L0）**：`src/utils/shared/services` 管理日志、会话持久化、导出和回放，保证复用与可观测性。
+
+#### 架构闭环（可核验）
+
+```text
+MainWindow -> SendController -> SerialStationController
+      -> SerialManager -> ISerialProtocol / ProtocolRegistry
+      -> ProtocolParser / FrameDecoder
+      -> Services/Workers -> Log/Snapshot/Export
+```
+
+#### 风险治理（本轮）
+
+- **高优先级**：设备侧验收仍偏 D1，缺少替身/真实链路回放一体化证据，短期会影响对外“可用”口径；
+- **中优先级**：串口关闭/重连失败分支仍需统一错误模型复用到 UI 提示；
+- **已缓解**：主窗口与业务层分离、命令失败归因链路与快捷键入口闭环已经打通。
+
 ### 本周期收敛重点
 
 - 约束与闭环文件同步：`docs/constraints/*.md`、`docs/serial_station_architecture.md`
