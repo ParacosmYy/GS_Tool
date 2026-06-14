@@ -10,6 +10,47 @@
 
 ![EmbedDebug 界面预览](docs/assets/readme/interface-preview.svg)
 
+## 企业级精简快照（Push 前更新）
+
+更新时间：`2026-06-15`  
+阶段目标：`500/1000 -> 1000/1000`  
+当前分数：`500/1000`（按每次门禁 `+1`）  
+周期规则：每 2 次门禁通过 commit 形成 1 个 Push 周期，周期末更新本快照后方可 push。
+
+### 快速状态（精简）
+
+- **启动链路**：`EmbedDebug.bat` → `build/EmbedDebug.exe`
+- **最小验收**：`cmake --build build -j 4` + 3~5 秒窗口主窗口可见
+- **三轴**：E4-E5 / U2-U3 / D1-D2
+- **证据入口**：本仓库约束链路、CMake、startup smoke
+- **本周期新增**：命令面板失败分级提示（编码/未连接/写入）接入 `serialCommandFailedWithReason`，并在主工作区显示具体失败归类；`Ctrl+Enter`/`Ctrl+O`/`Ctrl+W` 快捷闭环接入同步补齐 `send.execute`
+
+### 本周期收敛重点
+
+- 约束与闭环文件同步：`docs/constraints/*.md`、`docs/serial_station_architecture.md`
+- 下周期目标：把 `D2` 提升到 `D3`，补齐真实/虚拟链路闭环
+
+## 关键决策：构建工具（Bazel 与 CMake）
+
+### 结论先行
+
+- 当前不建议默认切到 Bazel。对该仓库，优先保持 `CMake + Ninja` 更稳，收益确定性更高。
+- Bazel 不是“天然更快”，通常需要先满足高复用场景（大量重复子图、跨语言依赖、增量编译模式稳定）才明显收益。
+
+### 触发阈值（满足才可提交迁移 PRD）
+
+1. `cmake --build build` 的典型增量构建持续超过 2 分钟，且连续 3 次以上。  
+2. 连续增量改动中，重编译率持续高于 80%，且二次修改同一模块后可复建时间降幅持续不足 60%。  
+3. 有明确收益目标（首轮目标：增量周期下降 ≥ 30%，并保持现有启动链路不变）。  
+4. 迁移不影响 `EmbedDebug.bat` 的双击启动与 `build/EmbedDebug.exe` 约定产物。
+
+不满足以上任一项，不作为默认迁移理由；先优化 CMake + Ninja（ccache/sccache、预编译、模块拆分）再复评。
+
+### Push 前 README 规则（复核）
+
+- push 前必须更新本精简快照（当前文件首屏）
+- 保持“启动链路 + 最小验收 + 三轴 + 周期分数”四项始终可核验
+
 ## 项目定位
 
 嵌入式调试现场常被拆散在串口助手、协议解析器、波形查看器、日志工具、脚本工具和临时诊断面板中。EmbedDebug 的目标是把这些链路整理成一个稳定的工程工作台，让固件、硬件和测试工程师能在同一个入口完成连接配置、命令发送、帧解析、日志留存、会话回放和问题复现。
@@ -35,7 +76,7 @@
 | Serial Station 串口工站 | `src/apps/serial_station/`、QTest、启动入口 | E5 | U4 | D1 |
 | UART 配置链路 | 端口枚举、手动 COM、配置摘要、连接日志 | E4 | U3 | D1 |
 | 协议收发与解析 | `ascii_text`、`modbus_rtu`、`custom_md`、`just_float` | E5 | U3 | D1 |
-| 测量通道观察 | JustFloat measurement、通道摘要、最近帧趋势、CSV 导出服务 | E5 | U3 | D1 |
+| 测量通道观察 | JustFloat measurement、通道摘要、最近帧趋势、轻量波形预览、CSV 导出服务 | E5 | U3 | D1 |
 | 命令历史与配置档案 | 最近命令、`.edserialprofile`、最近/上次/默认目录 | E5 | U4 | D1 |
 | 日志、导出、回放预览 | 结构化日志、导出服务、回放服务、UI 闭环 | E4/E5 | U3 | D1 |
 | 终端、图表、OTA、BLE/CAN/MQTT/USB/RTT | 阶段性模块和集成代码 | E2-E4 | U1-U3 | D0-D1 |
@@ -50,7 +91,7 @@ Device:      D0 未验证 -> D4 真实设备验证
 
 ## Serial Station
 
-Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial_station/`。它已经覆盖串口配置、协议选择、ASCII/HEX/协议模式发送、结构化日志、导出、回放预览、命令历史、配置档案、最近档案索引、默认档案目录、JustFloat 测量摘要、最近帧趋势和测量 CSV 导出服务。
+Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial_station/`。它已经覆盖串口配置、协议选择、ASCII/HEX/协议模式发送、结构化日志、导出、回放预览、命令历史、配置档案、最近档案索引、默认档案目录、JustFloat 测量摘要、最近帧趋势、轻量波形预览和测量 CSV 导出服务。
 
 常用入口：
 
@@ -68,9 +109,9 @@ Serial Station 是当前最活跃的工作台方向，落点为 `src/apps/serial
 | `ascii_text` | 文本终端、AT 类命令 |
 | `modbus_rtu` | 基础 Modbus RTU 主站请求与响应解析 |
 | `custom_md` | 自定义 MCU 调试帧 |
-| `just_float` | 参考 VOFA+ JustFloat 数据路径，解析小端 IEEE754 float 数组 + `00 00 80 7F` 帧尾，并汇总到测量通道面板和最近帧趋势区 |
+| `just_float` | 参考 VOFA+ JustFloat 数据路径，解析小端 IEEE754 float 数组 + `00 00 80 7F` 帧尾，并汇总到测量摘要、最近帧趋势和轻量波形预览 |
 
-JustFloat 当前已完成协议注册、流式解析、工作台选择、测量摘要、最近帧趋势显示和测量 CSV 服务；下一步重点是接入波形工作区，并通过虚拟串口或真实硬件样本提升设备验证等级。
+JustFloat 当前已完成协议注册、流式解析、工作台选择、测量摘要、最近帧趋势、轻量波形预览和测量 CSV 服务；下一步重点是接入完整波形工作区，并通过虚拟串口或真实硬件样本提升设备验证等级。
 
 ## 架构边界
 
@@ -82,6 +123,21 @@ protocols/<name>/ -> protocol interface + shared/utils only
 services/ -> JSON、日志、导出、回放、档案、测量摘要和趋势缓冲
 ```
 
+## 企业级架构快照（本轮）
+
+- **入口层（L6）**：`EmbedDebug.bat` 及 `main` -> `MainWindow`，仅编排导航与装配，不承载业务解析。  
+- **控制层（L5）**：`MainWindow/Controller/Manager` 负责会话、连接、发送与设置编排，业务动作下沉到能力域控制器。  
+- **能力域层（L4-L2）**：串口、协议、数据、日志、展示等能力按既有目录解耦，快捷键通过 `ShortcutManager` 做上下文分发（`Global`/`Terminal`/`SendArea`）。  
+- **共享服务层（L1-L0）**：`Utils/Shared/Interfaces` 提供状态、事件、持久化与协议注册的横切能力，防止 UI 直接依赖底层协议实现。  
+- **闭环路径（真实可验）**：  
+  - `Ctrl+Enter` → `MainWindow::executeSendShortcut` → `SendController::executeSend` → `SendController::onSendData`  
+  - `Ctrl+O` → `openProjectForShortcut` → `ProjectManager::loadProject`  
+  - `Ctrl+W` → `closeTabForShortcut`（工程关闭降级实现）  
+  - `Ctrl+P` 命令面板新增 `send.execute`，形成“命令面板-快捷键-业务动作”一致化入口  
+  - `SerialCommandPanel::emitSendRequested` → `SerialStationController::sendCommand` → `emitSendFailure`（带分类码） → `SerialStationWindow` → `SerialCommandPanel::notifyCommandFailed(reason, message)`  
+
+证据路径：`src/core/mainwindow/MainWindowInit.cpp`、`src/core/mainwindow/MainWindowInitShortcuts.cpp`、`src/core/mainwindow/MainWindowSetupUI.cpp`、`src/core/send/SendController.h`、`src/core/send/SendControllerSend.cpp`。
+
 核心规则：
 
 | 规则 | 要求 |
@@ -91,6 +147,7 @@ services/ -> JSON、日志、导出、回放、档案、测量摘要和趋势缓
 | 不提交死源码 | 新增 `.h/.cpp` 必须加入 CMake |
 | 壳层不写业务逻辑 | `MainWindow` 和 `PanelManager` 只装配和导航 |
 | 公共能力优先复用 | CRC、HEX、Settings、日志、导出、RingBuffer 等不重复造 |
+| 严格对外文档 | README 企业级快照与代码行为同步更新 |
 | 先验证再声明 | 构建、测试、启动探针和状态记录支撑每次提交 |
 
 ## 快速开始
@@ -133,10 +190,11 @@ cmake --build build --target EmbedDebug --parallel 4
 Serial Station 聚焦验证：
 
 ```powershell
-cmake --build build --target test_startup_options test_serial_measurement_service test_serial_measurement_export_service test_serial_measurement_panel test_serial_station_controller test_serial_station_workbench --parallel 4
+cmake --build build --target test_startup_options test_serial_measurement_service test_serial_measurement_export_service test_serial_measurement_waveform_widget test_serial_measurement_panel test_serial_station_controller test_serial_station_workbench --parallel 4
 .\build\tests\test_startup_options.exe
 .\build\tests\test_serial_measurement_service.exe
 .\build\tests\test_serial_measurement_export_service.exe
+.\build\tests\test_serial_measurement_waveform_widget.exe
 .\build\tests\test_serial_measurement_panel.exe
 .\build\tests\test_serial_station_controller.exe
 .\build\tests\test_serial_station_workbench.exe
@@ -177,14 +235,14 @@ GS_Tool/
 | 优先级 | 方向 | 目标 |
 |--------|------|------|
 | P0 | Serial Station 连接策略 | 补可控连接、异常恢复和现场可诊断反馈 |
-| P0 | VOFA+/OmniProbe 式数据观察 | JustFloat measurement 摘要和最近帧趋势已落地，下一步接入波形工作区和虚拟串口样本验证 |
+| P0 | VOFA+/OmniProbe 式数据观察 | JustFloat measurement 摘要、最近帧趋势和轻量波形预览已落地，下一步接入完整波形工作区和虚拟串口样本验证 |
 | P0 | 虚拟串口或硬件回环验证 | 将设备证据从 D1 推向更接近真实现场 |
 | P1 | QSS token 与 UI 一致性 | 降低主题漂移，统一控件层级 |
 | P1 | 发布包体验 | 强化 `dist/` 校验、随包文档和启动路径 |
 
 ## 贡献方式
 
-欢迎提交 Issue 和 Pull Request，尤其是以下方向：
+欢迎提交 Issue 和 Pull Request。项目鼓励大家把真实设备样本、协议适配、UI 体验和工程化修复以 PR 形式贡献回来，尤其是以下方向：
 
 - 串口协议适配、真实设备样本、虚拟串口验证脚本。
 - VOFA+/OmniProbe 式波形观察、测量面板和数据回放体验。
