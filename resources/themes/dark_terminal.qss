@@ -1463,6 +1463,19 @@ QLabel#serialQuickLabel,
 QLabel#serialLogCountLabel {
     color: #9399b2;
 }
+QLabel#serialCommandStatus {
+    color: #cdd6f4;
+    font-weight: bold;
+}
+QLabel#serialCommandStatus[state="ok"] {
+    color: #a6e3a1;
+}
+QLabel#serialCommandStatus[state="warning"] {
+    color: #fab387;
+}
+QLabel#serialCommandStatus[state="error"] {
+    color: #f38ba8;
+}
 QLineEdit#serialCommandEdit,
 QLineEdit#serialLogFilterEdit,
 QComboBox#serialCommandModeCombo,

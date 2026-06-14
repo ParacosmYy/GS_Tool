@@ -82,6 +82,7 @@ void SerialCommandPanel::confirmLastSentCommand()
     }
 
     recordSentCommand(m_pendingCommand, m_pendingMode);
+    m_commandEdit->setText(QString());
     m_pendingCommand.clear();
     m_pendingMode.clear();
 }
@@ -318,12 +319,6 @@ void SerialCommandPanel::refreshStatus(const QString& status, const QString& sta
     m_statusLabel->setText(safeStatus.isEmpty() ? tr("就绪") : safeStatus);
     const QString safeState = state.trimmed().toLower();
     m_statusLabel->setProperty(QStringLiteral("state"), safeState);
-
-    const QString color =
-        (safeState == QStringLiteral("error")) ? QStringLiteral("red") :
-        (safeState == QStringLiteral("warning")) ? QStringLiteral("#d97706") :
-        QStringLiteral("#4CAF50");
-    m_statusLabel->setStyleSheet(QStringLiteral("color: %1;").arg(color));
 }
 
 QToolButton* SerialCommandPanel::createQuickButton(const QString& text, const QString& command)
