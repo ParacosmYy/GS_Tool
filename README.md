@@ -40,11 +40,40 @@
 #### 架构闭环（可核验）
 
 ```text
-MainWindow -> SendController -> SerialStationController
-      -> SerialManager -> ISerialProtocol / ProtocolRegistry
-      -> ProtocolParser / FrameDecoder
-      -> Services/Workers -> Log/Snapshot/Export
+┌─────────────── UI / 入口层（L6） ───────────────┐
+│ EmbedDebug.bat / main / MainWindow / PanelManager │
+└───────────────────────┬────────────────────────┘
+                        调度
+                        │
+                        ▼
+┌─────────────── 能力总线（L5） ───────────────────────────┐
+│ SendController / PanelController / Shortcuts / Dialogs │
+└──────────────────────────┬──────────────────────────────┘
+                           │
+                           │ 事件/回调
+                           ▼
+┌────────── 串口能力域（L4） ───────────────────────────────────────────┐
+│ SerialStationController                                    │
+│  • Session（SerialManager） • 发送队列/重试 • 协议注册/分发       │
+└───────────────────────┬───────────────────────────────────────────┘
+                        流式字节收发
+                        ▼
+┌────────── 协议与服务层（L3-L1） ──────────────────────────────────┐
+│ Protocols（帧/解析） • Services（日志/导出/回放/测量） • Workers │
+└───────────────────────┬───────────────────────────────────────────┘
+                        结构化产物
+                        ▼
+┌────────── 数据与交付层（L0） ─────────────────────────────────────┐
+│ 序列化日志 • 回放预案 • 测量摘要 • 配置档案 • 文件导出       │
+└───────────────────────────────────────────────────────────────────┘
 ```
+
+#### 本轮验收点（本次 commit 影响）
+
+- **可观测性**：`serialCommandPrepared / sent / failed` 全链路事件持续上报；错误分级含 `encode / not_connected / write_failed`。
+- **控制一致性**：`SerialCommandPanel` 与 `SerialStationController` 的 `retryCount/retryDelayMs` 配置路径打通。
+- **执行一致性**：发送流程改为 `enqueue + state-machine + timer`，避免 UI 主线程阻塞。
+- **证据核验**：`tests/serial_station/test_serial_station_controller.cpp`、`src/apps/serial_station/SerialStationController.cpp`、`src/apps/serial_station/ui/SerialCommandPanel.cpp`。
 
 #### 风险治理（本轮）
 
