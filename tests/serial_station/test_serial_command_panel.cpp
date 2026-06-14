@@ -2,6 +2,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QToolButton>
 
 #include "apps/serial_station/ui/SerialCommandHistoryModel.h"
@@ -22,6 +23,8 @@ private slots:
     void sendModeTracksSelectedItem();
     void sendButtonEmitsTrimmedCommandAndMode();
     void hexModeSendEmitsHexMode();
+    void sendButtonDefaultRetryPolicy();
+    void sendButtonEmitsRetryPolicyWhenCustomized();
     void emptyCommandDoesNotEmitSendRequest();
     void quickCommandFillsInputAndEmitsSelection();
     void disablingSendDisablesInputsAndQuickButtons();
@@ -106,6 +109,8 @@ void SerialCommandPanelTest::sendButtonEmitsTrimmedCommandAndMode()
     const QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toString(), QStringLiteral("AT+GMR"));
     QCOMPARE(args.at(1).toString(), QStringLiteral("ascii"));
+    QCOMPARE(args.at(2).toInt(), 0);
+    QCOMPARE(args.at(3).toInt(), 30);
 }
 
 void SerialCommandPanelTest::hexModeSendEmitsHexMode()
@@ -131,6 +136,59 @@ void SerialCommandPanelTest::hexModeSendEmitsHexMode()
     const QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toString(), QStringLiteral("01 03 00 00 00 02"));
     QCOMPARE(args.at(1).toString(), QStringLiteral("hex"));
+    QCOMPARE(args.at(2).toInt(), 0);
+    QCOMPARE(args.at(3).toInt(), 30);
+}
+
+void SerialCommandPanelTest::sendButtonDefaultRetryPolicy()
+{
+    SerialCommandPanel panel;
+    auto* commandEdit = panel.findChild<QLineEdit*>(QStringLiteral("serialCommandEdit"));
+    auto* sendButton = panel.findChild<QPushButton*>(QStringLiteral("serialCommandSendButton"));
+    auto* retryCountSpin = panel.findChild<QSpinBox*>(QStringLiteral("serialCommandRetryCountSpin"));
+    auto* retryIntervalSpin = panel.findChild<QSpinBox*>(QStringLiteral("serialCommandRetryIntervalSpin"));
+    QVERIFY(commandEdit != nullptr);
+    QVERIFY(sendButton != nullptr);
+    QVERIFY(retryCountSpin != nullptr);
+    QVERIFY(retryIntervalSpin != nullptr);
+
+    QCOMPARE(retryCountSpin->value(), 0);
+    QCOMPARE(retryIntervalSpin->value(), 30);
+
+    commandEdit->setText(QStringLiteral("PING"));
+    QSignalSpy spy(&panel, &SerialCommandPanel::sendRequested);
+    QTest::mouseClick(sendButton, Qt::LeftButton);
+
+    QCOMPARE(spy.count(), 1);
+    const QList<QVariant> args = spy.takeFirst();
+    QCOMPARE(args.at(2).toInt(), 0);
+    QCOMPARE(args.at(3).toInt(), 30);
+}
+
+void SerialCommandPanelTest::sendButtonEmitsRetryPolicyWhenCustomized()
+{
+    SerialCommandPanel panel;
+    auto* commandEdit = panel.findChild<QLineEdit*>(QStringLiteral("serialCommandEdit"));
+    auto* sendButton = panel.findChild<QPushButton*>(QStringLiteral("serialCommandSendButton"));
+    auto* retryCountSpin = panel.findChild<QSpinBox*>(QStringLiteral("serialCommandRetryCountSpin"));
+    auto* retryIntervalSpin = panel.findChild<QSpinBox*>(QStringLiteral("serialCommandRetryIntervalSpin"));
+    QVERIFY(commandEdit != nullptr);
+    QVERIFY(sendButton != nullptr);
+    QVERIFY(retryCountSpin != nullptr);
+    QVERIFY(retryIntervalSpin != nullptr);
+
+    commandEdit->setText(QStringLiteral("PING"));
+    retryCountSpin->setValue(2);
+    retryIntervalSpin->setValue(120);
+
+    QSignalSpy spy(&panel, &SerialCommandPanel::sendRequested);
+    QVERIFY(spy.isValid());
+    QTest::mouseClick(sendButton, Qt::LeftButton);
+
+    QCOMPARE(spy.count(), 1);
+    const QList<QVariant> args = spy.takeFirst();
+    QCOMPARE(args.at(2).toInt(), 2);
+    QCOMPARE(args.at(3).toInt(), 120);
 }
 
 void SerialCommandPanelTest::emptyCommandDoesNotEmitSendRequest()

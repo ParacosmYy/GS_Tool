@@ -23,7 +23,7 @@
 - **最小验收**：`cmake --build build -j 4` + 3~5 秒窗口主窗口可见
 - **三轴**：E4-E5 / U2-U3 / D1-D2
 - **证据入口**：本仓库约束链路、CMake、startup smoke
-- **本周期新增**：命令面板失败分级提示（编码/未连接/写入）接入 `serialCommandFailedWithReason`，并在主工作区显示具体失败归类；`Ctrl+Enter`/`Ctrl+O`/`Ctrl+W` 快捷闭环接入同步补齐 `send.execute`
+- **本周期新增**：命令面板失败分级提示（编码/未连接/写入）接入 `serialCommandFailedWithReason`，并在主工作区显示具体失败归类；新增“重试策略”配置（重试次数+间隔）并由 `SerialStationController::sendCommand` 落地执行重试与审计；`Ctrl+Enter`/`Ctrl+O`/`Ctrl+W` 快捷闭环接入同步补齐 `send.execute`
 
 ### 企业级架构快照（本轮）
 
@@ -164,11 +164,13 @@ services/ -> JSON、日志、导出、回放、档案、测量摘要和趋势缓
 - **能力域层（L4-L2）**：串口、协议、数据、日志、展示等能力按既有目录解耦，快捷键通过 `ShortcutManager` 做上下文分发（`Global`/`Terminal`/`SendArea`）。  
 - **共享服务层（L1-L0）**：`Utils/Shared/Interfaces` 提供状态、事件、持久化与协议注册的横切能力，防止 UI 直接依赖底层协议实现。  
 - **闭环路径（真实可验）**：  
-  - `Ctrl+Enter` → `MainWindow::executeSendShortcut` → `SendController::executeSend` → `SendController::onSendData`  
+- `Ctrl+Enter` → `MainWindow::executeSendShortcut` → `SendController::executeSend` → `SendController::onSendData`  
   - `Ctrl+O` → `openProjectForShortcut` → `ProjectManager::loadProject`  
   - `Ctrl+W` → `closeTabForShortcut`（工程关闭降级实现）  
   - `Ctrl+P` 命令面板新增 `send.execute`，形成“命令面板-快捷键-业务动作”一致化入口  
-  - `SerialCommandPanel::emitSendRequested` → `SerialStationController::sendCommand` → `emitSendFailure`（带分类码） → `SerialStationWindow` → `SerialCommandPanel::notifyCommandFailed(reason, message)`  
+  - `SerialCommandPanel::emitSendRequested` → `SerialStationController::sendCommand`（携带 `retryCount/retryDelayMs`） → `SerialManager::send`（分块重试）→ `SerialStationController` 失败/成功日志与 `SerialCommandFailed` 重试审计（含配置）→ `SerialStationWindow` → `SerialCommandPanel::notifyCommandFailed(reason, message)`  
+
+**重试闭环审计证据**：`src/apps/serial_station/ui/SerialCommandPanel.cpp/.h`（界面参数采集）、`src/apps/serial_station/SerialStationController.cpp`（重试循环与失败原因）、`tests/serial_station/test_serial_command_panel.cpp`（信号携带默认与透传值）。
 
 证据路径：`src/core/mainwindow/MainWindowInit.cpp`、`src/core/mainwindow/MainWindowInitShortcuts.cpp`、`src/core/mainwindow/MainWindowSetupUI.cpp`、`src/core/send/SendController.h`、`src/core/send/SendControllerSend.cpp`。
 
