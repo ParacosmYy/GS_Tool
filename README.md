@@ -57,6 +57,13 @@ MainWindow -> SendController -> SerialStationController
 - 约束与闭环文件同步：`docs/constraints/*.md`、`docs/serial_station_architecture.md`
 - 下周期目标：把 `D2` 提升到 `D3`，补齐真实/虚拟链路闭环
 
+### 企业级发布治理（本轮）
+
+- **发布前闭环**：必须有构建、启动 smoke、三轴更新、证据引用四项齐备。
+- **口径治理**：任何能力标记需带 `E/U/D`，并且必须可由源码、测试、文档或启动记录追溯。
+- **风险处理**：`P0/P1/P2` 风险需给出责任人、缓解动作与截止时间。
+- **一致性原则**：README、约束文档、任务 PRD/Specs 与代码行为在同一版本周期内保持一致。
+
 ## 关键决策：构建工具（Bazel 与 CMake）
 
 ### 结论先行
