@@ -22,6 +22,8 @@
 
 namespace serial_station {
 
+class QTimer;
+
 /**
  * @brief Serial Station 控制器。
  *
@@ -96,6 +98,11 @@ public slots:
      * @param config UART 配置
      */
     void connectSerialPort(const SerialPortConfig& config);
+    /**
+     * @brief 应用完整连接配置并尝试打开串口。
+     * @param config 含有重连策略的连接配置
+     */
+    void connectSerialPort(const SerialStationConfig& config);
 
     /**
      * @brief 关闭当前串口会话。
@@ -220,6 +227,11 @@ private:
     SerialCodec::EncodeResult buildCommandFrame(const QString& command,
                                                 const QString& mode) const;
     void resetReceiveDispatcher();
+    void applyReconnectConfig(const SerialStationConfig& config);
+    void scheduleAutoReconnect();
+    void attemptAutoReconnect();
+    void cancelAutoReconnect();
+    void clearReconnectState();
     void handleSerialManagerError(const QString& message);
     void processProtocolEvent(const SerialProtocolEvent& event);
     void handleMeasurementEvent(const SerialProtocolEvent& event);
@@ -260,8 +272,13 @@ private:
 
     bool m_sendInFlight = false;
     bool m_sendQueueFrozen = false;
+    bool m_autoReconnectEnabled = false;
+    bool m_manualDisconnectRequested = false;
+    bool m_reconnectInFlight = false;
     SendRetryContext m_sendContext;
     QQueue<SendRetryContext> m_sendQueue;
+    SerialStationConfig m_lastConnectConfig;
+    QTimer* m_reconnectTimer = nullptr;
 
     SerialProtocolRegistry m_protocols;
     SerialManager m_serialManager;

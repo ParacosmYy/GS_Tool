@@ -11,9 +11,15 @@ namespace serial_station {
 SerialStationController::SerialStationController(QObject* parent)
     : QObject(parent)
     , m_serialManager(this)
+    , m_reconnectTimer(new QTimer(this))
 {
     m_protocols.registerBuiltInProtocols();
     resetReceiveDispatcher();
+    m_reconnectTimer->setSingleShot(true);
+    connect(m_reconnectTimer,
+            &QTimer::timeout,
+            this,
+            &SerialStationController::attemptAutoReconnect);
     connect(&m_serialManager, &SerialManager::stateChanged,
             this, &SerialStationController::serialStateChanged);
     connect(&m_serialManager, &SerialManager::errorOccurred,
@@ -44,31 +50,131 @@ SerialManager& SerialStationController::serialManager()
 
 void SerialStationController::connectSerialPort(const SerialPortConfig& config)
 {
+    SerialStationConfig stationConfig;
+    stationConfig.port = config;
+    connectSerialPort(stationConfig);
+}
+
+void SerialStationController::connectSerialPort(const SerialStationConfig& config)
+{
+    applyReconnectConfig(config);
+    clearReconnectState();
     m_sendQueueFrozen = false;
     resetReceiveDispatcher();
-    const QString validationError = config.validationError();
+    const QString validationError = m_lastConnectConfig.port.validationError();
     if (!validationError.isEmpty()) {
-        m_serialManager.rejectConfiguration(config, validationError);
+        m_serialManager.rejectConfiguration(m_lastConnectConfig.port, validationError);
         emit serialErrorCounted();
         logSystem(validationError, {{QStringLiteral("reason"), validationError}});
         return;
     }
 
-    logSystem(tr("正在打开串口: %1").arg(config.summary()),
-              {{QStringLiteral("portName"), config.portName.trimmed()},
-               {QStringLiteral("baudRate"), config.baudRate}});
-    m_serialManager.configure(config);
+    logSystem(tr("正在打开串口: %1").arg(m_lastConnectConfig.port.summary()),
+              {{QStringLiteral("portName"), m_lastConnectConfig.port.portName.trimmed()},
+               {QStringLiteral("baudRate"), m_lastConnectConfig.port.baudRate}});
+    m_serialManager.configure(m_lastConnectConfig.port);
     if (!m_serialManager.open()) {
-        m_sendQueueFrozen = true;
+        emit serialErrorCounted();
         emit serialErrorOccurred(m_serialManager.session().errorString());
+        logSystem(m_serialManager.session().errorString(),
+                  {{QStringLiteral("error"), m_serialManager.session().errorString()}});
+        if (m_autoReconnectEnabled) {
+            m_sendQueueFrozen = true;
+            scheduleAutoReconnect();
+            return;
+        }
+
+        m_sendQueueFrozen = true;
         return;
     }
 
+    m_sendQueueFrozen = false;
     processNextQueuedSend();
+}
+
+void SerialStationController::applyReconnectConfig(const SerialStationConfig& config)
+{
+    m_lastConnectConfig = config;
+    m_lastConnectConfig.port = config.port.normalized();
+    m_autoReconnectEnabled = config.isReconnectEnabled();
+    m_manualDisconnectRequested = false;
+
+    if (m_lastConnectConfig.reconnectIntervalMs < 500) {
+        m_lastConnectConfig.reconnectIntervalMs = 500;
+    }
+}
+
+void SerialStationController::clearReconnectState()
+{
+    if (!m_reconnectTimer) {
+        return;
+    }
+
+    m_reconnectTimer->stop();
+    m_reconnectInFlight = false;
+}
+
+void SerialStationController::cancelAutoReconnect()
+{
+    clearReconnectState();
+}
+
+void SerialStationController::scheduleAutoReconnect()
+{
+    if (!m_autoReconnectEnabled || m_manualDisconnectRequested) {
+        return;
+    }
+
+    if (!m_reconnectTimer || m_reconnectTimer->isActive()) {
+        return;
+    }
+
+    m_sendQueueFrozen = true;
+    m_reconnectInFlight = true;
+    m_reconnectTimer->start(m_lastConnectConfig.reconnectIntervalMs);
+    logSystem(
+        tr("检测到连接中断，%1 ms 后将重试连接（重连策略已启用）").arg(m_lastConnectConfig.reconnectIntervalMs),
+        {{QStringLiteral("reason"), QStringLiteral("auto_reconnect")}});
+}
+
+void SerialStationController::attemptAutoReconnect()
+{
+    if (!m_autoReconnectEnabled || m_manualDisconnectRequested) {
+        m_sendQueueFrozen = true;
+        m_reconnectInFlight = false;
+        return;
+    }
+
+    if (m_lastConnectConfig.port.validationError().isEmpty()
+        && m_serialManager.session().state() != SerialSessionState::Open) {
+        m_reconnectInFlight = true;
+        m_serialManager.configure(m_lastConnectConfig.port);
+        if (m_serialManager.open()) {
+            m_sendQueueFrozen = false;
+            m_reconnectInFlight = false;
+            logSystem(tr("自动重连成功"),
+                      {{QStringLiteral("state"), QStringLiteral("open")}}); 
+            processNextQueuedSend();
+            return;
+        }
+
+        emit serialErrorCounted();
+        emit serialErrorOccurred(m_serialManager.session().errorString());
+        logSystem(tr("自动重连失败: %1").arg(m_serialManager.session().errorString()),
+                  {{QStringLiteral("state"), QStringLiteral("error")}}
+        );
+        m_reconnectInFlight = false;
+    }
+
+    scheduleAutoReconnect();
 }
 
 void SerialStationController::disconnectSerialPort()
 {
+    m_manualDisconnectRequested = true;
+    cancelAutoReconnect();
+
+    m_sendQueueFrozen = false;
     if (m_sendInFlight && !m_sendContext.command.isEmpty()) {
         emitSendFailure(m_sendContext.command,
                         m_sendContext.mode,
@@ -352,6 +458,32 @@ void SerialStationController::handleSerialManagerError(const QString& message)
                              QStringLiteral("serial_manager"),
                              {{QStringLiteral("source"), QStringLiteral("serial_manager")}});
     emit serialErrorOccurred(message);
+
+    if (!m_manualDisconnectRequested && m_autoReconnectEnabled) {
+        if (m_sendInFlight && !m_sendContext.command.isEmpty()) {
+            m_sendContext.bytesWritten = 0;
+            m_sendContext.attempt = 0;
+            m_sendContext.retriesUsed = 0;
+            m_sendQueue.prepend(m_sendContext);
+            m_sendContext = SendRetryContext();
+            m_sendInFlight = false;
+        }
+
+        m_sendQueueFrozen = true;
+        scheduleAutoReconnect();
+        return;
+    }
+
+    if (m_sendInFlight && !m_sendContext.command.isEmpty()) {
+        emitSendFailure(m_sendContext.command,
+                        m_sendContext.mode,
+                        tr("串口连接已断开，发送请求中断"),
+                        QStringLiteral("not_connected"));
+        m_sendContext = SendRetryContext();
+        m_sendInFlight = false;
+    }
+    failQueuedSendsWithReason(QStringLiteral("not_connected"),
+                              tr("串口连接已断开"));
 }
 
 void SerialStationController::processProtocolEvent(const SerialProtocolEvent& event)

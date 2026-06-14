@@ -104,6 +104,9 @@ private slots:
     void invalidConfigConnectReportsConfigValidationReason_data();
     void invalidConfigConnectReportsConfigValidationReason();
     void disconnectReturnsClosedState();
+    void autoReconnectEnabledConfigSchedulesRetryAttempt();
+    void autoReconnectPreservesInFlightAndQueuedSends();
+    void manualDisconnectCancelsAutoReconnect();
 };
 
 void SerialStationControllerTest::initTestCase()
@@ -1030,6 +1033,80 @@ void SerialStationControllerTest::disconnectReturnsClosedState()
 
     QCOMPARE(controller.serialManager().session().state(), SerialSessionState::Closed);
     QCOMPARE(stateSpy.count(), 1);
+}
+
+void SerialStationControllerTest::autoReconnectEnabledConfigSchedulesRetryAttempt()
+{
+    SerialStationController controller;
+    SerialStationConfig config;
+    config.port.portName = QStringLiteral("COM_VIRTUAL_404");
+    config.autoReconnect = true;
+    config.reconnectIntervalMs = 20;
+
+    QSignalSpy stateSpy(&controller, &SerialStationController::serialStateChanged);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorOccurred);
+    QSignalSpy queueSpy(&controller, &SerialStationController::serialCommandFailedWithReason);
+
+    controller.connectSerialPort(config);
+
+    QCOMPARE(errorSpy.count(), 1);
+    QCOMPARE(stateSpy.count(), 2);
+    QVERIFY(controller.m_reconnectTimer->isActive() || controller.m_reconnectInFlight);
+
+    QTest::qWait(config.reconnectIntervalMs + 50);
+    QVERIFY(controller.m_reconnectTimer->isActive());
+    QVERIFY(stateSpy.count() >= 4);
+    QCOMPARE(queueSpy.count(), 0);
+}
+
+void SerialStationControllerTest::autoReconnectPreservesInFlightAndQueuedSends()
+{
+    SerialStationController controller;
+    SerialStationConfig config;
+    config.autoReconnect = true;
+    config.reconnectIntervalMs = 50;
+    config.port.portName = QStringLiteral("COM_VIRTUAL_405");
+    controller.applyReconnectConfig(config);
+    controller.clearReconnectState();
+
+    SerialStationController::SendRetryContext inFlight;
+    inFlight.command = QStringLiteral("PING");
+    inFlight.mode = QStringLiteral("ascii");
+    inFlight.frame = QByteArrayLiteral("PING");
+
+    SerialStationController::SendRetryContext queued;
+    queued.command = QStringLiteral("RESET");
+    queued.mode = QStringLiteral("ascii");
+    queued.frame = QByteArrayLiteral("RESET");
+
+    controller.m_sendContext = inFlight;
+    controller.m_sendInFlight = true;
+    controller.m_sendQueue.enqueue(queued);
+
+    controller.handleSerialManagerError(QStringLiteral("serial disconnect"));
+
+    QCOMPARE(controller.m_sendInFlight, false);
+    QCOMPARE(controller.m_sendContext.command, QString());
+    QCOMPARE(controller.m_sendQueue.size(), 2);
+    QCOMPARE(controller.m_sendQueue.at(0).command, QStringLiteral("PING"));
+    QCOMPARE(controller.m_sendQueue.at(1).command, QStringLiteral("RESET"));
+    QVERIFY(controller.m_sendQueueFrozen);
+    QVERIFY(controller.m_reconnectTimer->isActive() || controller.m_reconnectInFlight);
+}
+
+void SerialStationControllerTest::manualDisconnectCancelsAutoReconnect()
+{
+    SerialStationController controller;
+    SerialStationConfig config;
+    config.port.portName = QStringLiteral("COM_VIRTUAL_406");
+    config.autoReconnect = true;
+    config.reconnectIntervalMs = 20;
+
+    controller.connectSerialPort(config);
+    QVERIFY(controller.m_reconnectTimer->isActive() || controller.m_reconnectInFlight);
+
+    controller.disconnectSerialPort();
+    QVERIFY(!controller.m_reconnectTimer->isActive());
 }
 
 QTEST_MAIN(SerialStationControllerTest)
