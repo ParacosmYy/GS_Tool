@@ -1463,6 +1463,21 @@ QLabel#serialQuickLabel,
 QLabel#serialLogCountLabel {
     color: #9399b2;
 }
+QCheckBox#serialCommandAppendLineBreak,
+QCheckBox#serialCommandAppendLineBreak:disabled {
+    color: #9399b2;
+    spacing: 8px;
+}
+QCheckBox#serialCommandAppendLineBreak:disabled {
+    color: #6c7086;
+}
+QCheckBox#serialCommandAppendLineBreak::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    background: #11111b;
+}
 QLabel#serialCommandStatus {
     color: #cdd6f4;
     font-weight: bold;
