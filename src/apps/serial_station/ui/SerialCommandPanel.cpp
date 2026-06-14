@@ -3,8 +3,8 @@
 #include <QtCore/QSignalBlocker>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFrame>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QToolButton>
@@ -91,6 +91,37 @@ void SerialCommandPanel::recordSentCommand(const QString& command, const QString
     if (m_history.recordCommand(command, mode)) {
         refreshHistoryUi();
     }
+    refreshStatus(tr("发送成功"), QStringLiteral("ok"));
+}
+
+void SerialCommandPanel::notifyCommandFailed(const QString& message)
+{
+    notifyCommandFailed(QStringLiteral("unknown"), message);
+}
+
+void SerialCommandPanel::notifyCommandFailed(const QString& reason, const QString& message)
+{
+    const QString safeReason = failureReasonLabel(reason);
+    const QString safeMessage = message.trimmed();
+    const QString text = safeMessage.isEmpty()
+                            ? safeReason
+                            : tr("%1：%2").arg(safeReason, safeMessage);
+    refreshStatus(text, QStringLiteral("error"));
+}
+
+QString SerialCommandPanel::failureReasonLabel(const QString& reason) const
+{
+    const QString normalizedReason = reason.trimmed().toLower();
+    if (normalizedReason == QStringLiteral("encode")) {
+        return tr("发送失败（编码）");
+    }
+    if (normalizedReason == QStringLiteral("not_connected")) {
+        return tr("发送失败（未连接）");
+    }
+    if (normalizedReason == QStringLiteral("write_failed")) {
+        return tr("发送失败（写入）");
+    }
+    return tr("发送失败");
 }
 
 void SerialCommandPanel::emitSendRequested()
@@ -100,9 +131,26 @@ void SerialCommandPanel::emitSendRequested()
         updateSendButtonState();
         return;
     }
+
+    if (!m_sendButton->isEnabled() || !m_commandEdit->isEnabled()) {
+        refreshStatus(tr("发送未启用，请先连接串口"), QStringLiteral("error"));
+        return;
+    }
+
+    const QDateTime now = QDateTime::currentDateTimeUtc();
+    if (m_lastSendTime.isValid()) {
+        const qint64 deltaMs = m_lastSendTime.msecsTo(now);
+        if (deltaMs >= 0 && deltaMs < kSendIntervalMs) {
+            refreshStatus(tr("发送频率过快，请稍后重试"), QStringLiteral("warning"));
+            return;
+        }
+    }
+    m_lastSendTime = now;
+
     m_pendingCommand = command;
     m_pendingMode = sendMode();
     emit sendRequested(command, sendMode());
+    refreshStatus(tr("发送中"), QStringLiteral("ok"));
 }
 
 void SerialCommandPanel::applyQuickCommand()
@@ -165,6 +213,9 @@ void SerialCommandPanel::setupUi()
 
     headerRow->addWidget(title);
     headerRow->addStretch();
+    m_statusLabel = new QLabel(tr("就绪"), this);
+    m_statusLabel->setObjectName(QStringLiteral("serialCommandStatus"));
+    headerRow->addWidget(m_statusLabel);
     headerRow->addWidget(hint, 1);
 
     auto* inputRow = new QHBoxLayout();
@@ -255,6 +306,24 @@ void SerialCommandPanel::connectSignals()
             this, &SerialCommandPanel::applyQuickCommand);
     connect(m_resetButton, &QToolButton::clicked,
             this, &SerialCommandPanel::applyQuickCommand);
+}
+
+void SerialCommandPanel::refreshStatus(const QString& status, const QString& state)
+{
+    if (!m_statusLabel) {
+        return;
+    }
+
+    const QString safeStatus = status.trimmed();
+    m_statusLabel->setText(safeStatus.isEmpty() ? tr("就绪") : safeStatus);
+    const QString safeState = state.trimmed().toLower();
+    m_statusLabel->setProperty(QStringLiteral("state"), safeState);
+
+    const QString color =
+        (safeState == QStringLiteral("error")) ? QStringLiteral("red") :
+        (safeState == QStringLiteral("warning")) ? QStringLiteral("#d97706") :
+        QStringLiteral("#4CAF50");
+    m_statusLabel->setStyleSheet(QStringLiteral("color: %1;").arg(color));
 }
 
 QToolButton* SerialCommandPanel::createQuickButton(const QString& text, const QString& command)

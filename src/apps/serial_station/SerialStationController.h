@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <QtCore/QVariantMap>
 
 #include "apps/serial_station/core/SerialCodec.h"
 #include "apps/serial_station/core/SerialDispatcher.h"
@@ -12,7 +13,9 @@
 #include "apps/serial_station/protocols/SerialProtocolRegistry.h"
 #include "apps/serial_station/services/SerialExportService.h"
 #include "apps/serial_station/services/SerialLogService.h"
+#include "apps/serial_station/services/SerialMeasurementExportService.h"
 #include "apps/serial_station/services/SerialMeasurementService.h"
+#include "apps/serial_station/services/SerialSymbolCatalogService.h"
 #include "apps/serial_station/services/SerialProfileService.h"
 #include "apps/serial_station/services/SerialReplayService.h"
 
@@ -25,7 +28,6 @@ namespace serial_station {
  */
 class SerialStationController : public QObject {
     Q_OBJECT
-
 public:
     explicit SerialStationController(QObject* parent = nullptr);
 
@@ -59,6 +61,22 @@ public:
 
     /** @brief 根据导出格式生成建议文件名。 */
     QString suggestedExportFileName(SerialExportFormat format) const;
+
+    /** @brief 根据当前测量快照生成建议文件名。 */
+    QString suggestedMeasurementExportFileName() const;
+
+    /** @brief 导出当前测量快照。 */
+    SerialMeasurementExportResult exportMeasurementSnapshot(
+        const SerialMeasurementExportRequest& request);
+
+    /** @brief 导入 AXF/ELF 符号目录。 */
+    SerialSymbolCatalogResult importSymbolCatalogFromFile(const QString& filePath);
+
+    /** @brief 当前会话持有的符号目录快照。 */
+    SerialSymbolCatalogSnapshot symbolCatalog() const;
+
+    /** @brief 当前会话符号目录的可视化文本行。 */
+    QStringList symbolCatalogLines() const;
 
     /** @brief 基于当前日志生成回放预览计划。 */
     SerialReplayPlan previewReplayPlan(
@@ -106,6 +124,17 @@ public slots:
      * @param protocolName 协议注册名
      */
     void setActiveProtocol(const QString& protocolName);
+
+    /**
+     * @brief 从本地 AXF/ELF 文件导入符号目录（UI 触发入口）。
+     * @param filePath 镜像文件路径
+     */
+    void requestImportSymbolCatalogFromFile(const QString& filePath);
+
+    /**
+     * @brief 清空当前会话的符号目录。
+     */
+    void clearSymbolCatalog();
 
 signals:
     /** @brief 串口会话状态变化。 */
@@ -155,6 +184,17 @@ signals:
      * @param message 失败原因
      */
     void serialCommandFailed(const QString& command, const QString& mode, const QString& message);
+    /**
+     * @brief 命令发送失败（附带失败分类）。
+     * @param command 命令文本
+     * @param mode 发送模式
+     * @param reason 失败分类码：config/encode/not_connected/write_failed
+     * @param message 失败原因
+     */
+    void serialCommandFailedWithReason(const QString& command,
+                                      const QString& mode,
+                                      const QString& reason,
+                                      const QString& message);
 
     /** @brief 当前默认协议已变化。 */
     void activeProtocolChanged(const QString& protocolName);
@@ -162,8 +202,12 @@ signals:
     /** @brief 当前测量通道摘要已变化；空列表表示清空。 */
     void serialMeasurementUpdated(const QStringList& lines);
 
-    /** @brief 当前测量最近帧已变化；空列表表示清空。 */
+    /** @brief 当前测量最近帧文本和快照已变化；空列表表示清空。 */
     void serialMeasurementTrendUpdated(const QStringList& lines);
+    void serialMeasurementFramesUpdated(const QStringList& frames);
+
+    /** @brief 当前符号目录已变化；空列表表示清空。 */
+    void serialSymbolCatalogUpdated(const QStringList& lines);
 
 private:
     QString normalizeSendMode(const QString& mode) const;
@@ -172,6 +216,7 @@ private:
     void resetReceiveDispatcher();
     void handleSerialManagerError(const QString& message);
     void processProtocolEvent(const SerialProtocolEvent& event);
+    void handleMeasurementEvent(const SerialProtocolEvent& event);
     QString eventPayloadText(const SerialProtocolEvent& event) const;
     QString rawBytesSummary(const QByteArray& bytes) const;
     QString bufferedReceiveText(const SerialDispatcher::FeedSummary& summary) const;
@@ -181,17 +226,21 @@ private:
     void logError(const QString& text, const QVariantMap& fields = QVariantMap());
     void emitSendFailure(const QString& command,
                          const QString& mode,
-                         const QString& message);
+                         const QString& message,
+                         const QString& reason = QStringLiteral("unknown"));
 
     SerialProtocolRegistry m_protocols;
     SerialManager m_serialManager;
     SerialDispatcher m_dispatcher;
     SerialCodec m_codec;
     SerialLogService m_logService;
-    SerialMeasurementService m_measurementService;
+    SerialMeasurementExportService m_measurementExportService;
     SerialExportService m_exportService;
+    SerialSymbolCatalogService m_symbolCatalogService;
     SerialProfileService m_profileService;
     SerialReplayService m_replayService;
+    SerialMeasurementService m_measurementService;
+    SerialSymbolCatalogSnapshot m_symbolCatalog;
 };
 
 } // namespace serial_station

@@ -13,6 +13,7 @@
 #include <QtWidgets/QVBoxLayout>
 
 #include "apps/serial_station/SerialStationController.h"
+#include "apps/serial_station/SerialStationModels.h"
 #include "apps/serial_station/services/SerialProfileCatalogService.h"
 #include "apps/serial_station/ui/SerialCommandPanel.h"
 #include "apps/serial_station/ui/SerialLogPanel.h"
@@ -58,6 +59,16 @@ QString normalizedExportPath(const QString& filePath)
     }
 
     return filePath + QStringLiteral(".jsonl");
+}
+
+QString normalizedMeasurementExportPath(const QString& filePath)
+{
+    const QFileInfo fileInfo(filePath);
+    if (!fileInfo.suffix().isEmpty()) {
+        return filePath;
+    }
+
+    return filePath + QStringLiteral(".csv");
 }
 
 } // namespace
@@ -184,6 +195,46 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             m_measurementPanel, &SerialMeasurementPanel::setSummaryLines);
     connect(m_controller.get(), &SerialStationController::serialMeasurementTrendUpdated,
             m_measurementPanel, &SerialMeasurementPanel::setTrendLines);
+    connect(m_controller.get(), &SerialStationController::serialMeasurementFramesUpdated,
+            m_measurementPanel, &SerialMeasurementPanel::setRecentFrames);
+    connect(m_controller.get(), &SerialStationController::serialStateChanged,
+            this, [this](SerialSessionState state) {
+                m_commandPanel->setSendEnabled(state == SerialSessionState::Open);
+                if (state == SerialSessionState::Open) {
+                    m_logPanel->appendSystem(tr("串口已连接，命令发送已启用"));
+                } else if (state == SerialSessionState::Error) {
+                    m_logPanel->appendSystem(tr("串口连接异常，命令发送已停用"));
+                } else if (state == SerialSessionState::Opening) {
+                    m_logPanel->appendSystem(tr("串口连接中，命令发送暂不可用"));
+                } else {
+                    m_logPanel->appendSystem(tr("串口已断开，命令发送已停用"));
+                }
+            });
+    connect(m_measurementPanel, &SerialMeasurementPanel::symbolCatalogImportRequested,
+            this, &SerialStationWindow::selectMeasurementSymbolCatalog);
+    connect(m_measurementPanel, &SerialMeasurementPanel::symbolCatalogBindRequested,
+            this, &SerialStationWindow::bindMeasurementSymbolCatalog);
+    connect(m_controller.get(), &SerialStationController::serialSymbolCatalogUpdated,
+            this, &SerialStationWindow::applySymbolCatalogStatus);
+    connect(m_measurementPanel, &SerialMeasurementPanel::exportRequested,
+            this, [this]() {
+                const QString defaultPath = QDir(defaultExportDirectory())
+                    .filePath(m_controller->suggestedMeasurementExportFileName());
+                const QString selectedPath = QFileDialog::getSaveFileName(
+                    this,
+                    tr("导出测量数据"),
+                    defaultPath,
+                    tr("CSV (*.csv)"));
+
+                if (selectedPath.trimmed().isEmpty()) {
+                    m_logPanel->appendSystem(tr("测量导出已取消"));
+                    return;
+                }
+
+                SerialMeasurementExportRequest request;
+                request.filePath = normalizedMeasurementExportPath(selectedPath);
+                m_controller->exportMeasurementSnapshot(request);
+            });
     connect(m_controller.get(), &SerialStationController::serialTxCounted,
             m_statusBar, &SerialStatusBar::incrementTx);
     connect(m_controller.get(), &SerialStationController::serialTxCounted,
@@ -192,11 +243,18 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
             m_statusBar, &SerialStatusBar::incrementRx);
     connect(m_controller.get(), &SerialStationController::serialErrorCounted,
             m_statusBar, &SerialStatusBar::incrementErrors);
+    connect(m_controller.get(), &SerialStationController::serialCommandFailed,
+            this, [this](const QString&, const QString&, const QString& message) {
+                m_commandPanel->notifyCommandFailed(message);
+            });
+    connect(m_controller.get(), &SerialStationController::serialCommandFailedWithReason,
+            this, [this](const QString&, const QString&, const QString& reason, const QString& message) {
+                m_commandPanel->notifyCommandFailed(reason, message);
+            });
     connect(m_portPanel, &SerialPortPanel::connectRequested,
             this, [this](const SerialPortConfig& config) {
                 m_statusBar->setPortConfig(config);
-                m_logPanel->appendSystem(tr("应用串口配置: %1 @ %2")
-                                             .arg(config.portName, QString::number(config.baudRate)));
+                m_logPanel->appendSystem(tr("应用连接配置: %1").arg(config.endpointSummary()));
             });
     connect(m_commandPanel, &SerialCommandPanel::sendRequested,
             m_controller.get(), &SerialStationController::sendCommand);
@@ -249,6 +307,7 @@ SerialStationWindow::SerialStationWindow(QWidget* parent)
     connect(m_recentProfileCombo, QOverload<int>::of(&QComboBox::activated),
             this, &SerialStationWindow::loadSelectedRecentProfile);
 
+    m_commandPanel->setSendEnabled(false);
     refreshProfileCatalogUi();
 }
 
@@ -341,6 +400,76 @@ int SerialStationWindow::importProfilesFromDefaultDirectory()
     return importedCount;
 }
 
+void SerialStationWindow::selectMeasurementSymbolCatalog()
+{
+    const QString defaultDirectory = m_measurementSymbolCatalogPath.isEmpty()
+        ? (m_defaultProfileDirectory.isEmpty() ? defaultExportDirectory()
+                                               : m_defaultProfileDirectory)
+        : QFileInfo(m_measurementSymbolCatalogPath).absolutePath();
+    const QString selectedPath = QFileDialog::getOpenFileName(
+        this,
+        tr("选择 AXF 符号目录"),
+        defaultDirectory,
+        tr("AXF/ELF 文件 (*.axf *.elf);;所有文件 (*)"));
+
+    if (selectedPath.trimmed().isEmpty()) {
+        m_logPanel->appendSystem(tr("AXF 符号目录导入已取消"));
+        return;
+    }
+
+    const SerialSymbolCatalogResult result =
+        m_controller->requestImportSymbolCatalogFromFile(selectedPath);
+    if (!result.ok) {
+        m_measurementSymbolCatalogPath.clear();
+        m_measurementSymbolCatalogBound = false;
+        m_measurementPanel->setSymbolCatalogStatus(tr("导入失败: %1")
+                                                       .arg(result.errorMessage),
+                                                   false);
+        m_logPanel->appendSystem(
+            tr("AXF 符号目录导入失败: %1").arg(result.errorMessage));
+        return;
+    }
+
+    m_measurementSymbolCatalogBound = false;
+    m_measurementSymbolCatalogPath = result.catalog.sourceFilePath;
+    m_logPanel->appendSystem(
+        tr("AXF 符号目录导入成功: %1 (%2 条)")
+            .arg(QFileInfo(result.catalog.sourceFilePath).fileName())
+            .arg(result.catalog.records.size()));
+    applySymbolCatalogStatus();
+}
+
+void SerialStationWindow::bindMeasurementSymbolCatalog()
+{
+    const SerialSymbolCatalogSnapshot snapshot = m_controller->symbolCatalog();
+    if (snapshot.records.isEmpty()) {
+        m_logPanel->appendSystem(tr("请先导入 AXF 符号目录"));
+        m_measurementSymbolCatalogBound = false;
+        updateMeasurementSymbolCatalogStatus(snapshot.sourceFilePath, false);
+        return;
+    }
+
+    m_measurementSymbolCatalogBound = true;
+    m_measurementSymbolCatalogPath = snapshot.sourceFilePath;
+    updateMeasurementSymbolCatalogStatus(snapshot.sourceFilePath, true);
+    m_logPanel->appendSystem(
+        tr("AXF 符号目录已绑定: %1")
+            .arg(QFileInfo(snapshot.sourceFilePath).fileName()));
+}
+
+void SerialStationWindow::applySymbolCatalogStatus()
+{
+    applySymbolCatalogStatus(m_controller->symbolCatalogLines());
+}
+
+void SerialStationWindow::applySymbolCatalogStatus(const QStringList& lines)
+{
+    Q_UNUSED(lines)
+
+    const SerialSymbolCatalogSnapshot snapshot = m_controller->symbolCatalog();
+    updateMeasurementSymbolCatalogStatus(snapshot.sourceFilePath, m_measurementSymbolCatalogBound);
+}
+
 SerialStationProfile SerialStationWindow::collectCurrentProfile(
     const QString& name,
     const QString& description,
@@ -375,6 +504,33 @@ void SerialStationWindow::applyProfileToUi(const SerialStationProfile& profile)
     m_controller->setActiveProtocol(profile.protocolName);
     m_commandPanel->applyProfileCommands(profile.commands, profile.sendMode);
     m_statusBar->setPortConfig(profile.port);
+}
+
+void SerialStationWindow::updateMeasurementSymbolCatalogStatus()
+{
+    updateMeasurementSymbolCatalogStatus(m_measurementSymbolCatalogPath, m_measurementSymbolCatalogBound);
+}
+
+void SerialStationWindow::updateMeasurementSymbolCatalogStatus(
+    const QString& catalogPath,
+    bool bound)
+{
+    const QString trimmedPath = catalogPath.trimmed();
+    const SerialSymbolCatalogSnapshot snapshot = m_controller->symbolCatalog();
+    if (trimmedPath.isEmpty() || snapshot.records.isEmpty()) {
+        m_measurementSymbolCatalogPath.clear();
+        m_measurementSymbolCatalogBound = false;
+        m_measurementPanel->setSymbolCatalogStatus(tr("未导入 AXF 符号目录"), false);
+        return;
+    }
+
+    const QString displayName = QFileInfo(trimmedPath).fileName();
+    const QString label = bound ? tr("已绑定: %1") : tr("已导入: %1");
+    m_measurementSymbolCatalogPath = trimmedPath;
+    m_measurementSymbolCatalogBound = bound;
+    m_measurementPanel->setSymbolCatalogStatus(
+        label.arg(displayName.isEmpty() ? trimmedPath : displayName),
+        !bound);
 }
 
 void SerialStationWindow::recordSuccessfulProfilePath(const QString& filePath)

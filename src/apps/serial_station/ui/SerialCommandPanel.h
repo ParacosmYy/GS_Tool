@@ -3,6 +3,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QVector>
+#include <QtCore/QDateTime>
 #include <QtWidgets/QWidget>
 
 #include "apps/serial_station/ui/SerialCommandHistoryModel.h"
@@ -10,6 +11,7 @@
 class QComboBox;
 class QLineEdit;
 class QPushButton;
+class QLabel;
 class QToolButton;
 
 namespace serial_station {
@@ -73,6 +75,17 @@ public slots:
      * @param mode 发送模式
      */
     void recordSentCommand(const QString& command, const QString& mode);
+    /**
+     * @brief 显示命令发送失败信息（用于错误反馈）
+     * @param message 失败原因
+     */
+    void notifyCommandFailed(const QString& message);
+    /**
+     * @brief 显示带失败分类的命令发送失败信息（用于错误归类）
+     * @param reason 失败分类码
+     * @param message 失败原因
+     */
+    void notifyCommandFailed(const QString& reason, const QString& message);
 
 signals:
     /**
@@ -94,6 +107,7 @@ private slots:
     void applyHistoryCommand(int index);
     void clearHistory();
     void updateSendButtonState();
+    void refreshStatus(const QString& status, const QString& state);
 
 private:
     void setupUi();
@@ -101,10 +115,12 @@ private:
     QToolButton* createQuickButton(const QString& text, const QString& command);
     void refreshHistoryUi();
     void setModeById(const QString& mode);
+    QString failureReasonLabel(const QString& reason) const;
 
     QLineEdit* m_commandEdit = nullptr;
     QComboBox* m_modeCombo = nullptr;
     QComboBox* m_historyCombo = nullptr;
+    QLabel* m_statusLabel = nullptr;
     QPushButton* m_sendButton = nullptr;
     QPushButton* m_clearHistoryButton = nullptr;
     QToolButton* m_readIdButton = nullptr;
@@ -113,6 +129,8 @@ private:
     SerialCommandHistoryModel m_history;
     QString m_pendingCommand;
     QString m_pendingMode;
+    QDateTime m_lastSendTime;
+    constexpr static int kSendIntervalMs = 180;
 };
 
 } // namespace serial_station

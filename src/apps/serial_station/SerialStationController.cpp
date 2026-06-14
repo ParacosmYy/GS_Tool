@@ -1,40 +1,11 @@
 #include "apps/serial_station/SerialStationController.h"
 
-#include <QtCore/QCoreApplication>
+#include <QtCore/QMetaType>
 #include <QtCore/QStringList>
-#include <QtCore/QVariantList>
-
-#include <memory>
 
 #include "apps/serial_station/SerialStationConstants.h"
 
 namespace serial_station {
-namespace {
-
-QString measurementPayloadText(const SerialProtocolEvent& event)
-{
-    const QVariantList values = event.payload.value(QStringLiteral("values")).toList();
-    if (values.isEmpty()) {
-        return QString();
-    }
-
-    QStringList parts;
-    parts.reserve(values.size());
-    for (int i = 0; i < values.size(); ++i) {
-        parts.append(QCoreApplication::translate("SerialStationController", "ch%1=%2")
-                         .arg(QString::number(i + 1),
-                              QString::number(values.at(i).toDouble(), 'g', 6)));
-    }
-
-    const QString format = event.payload.value(QStringLiteral("format")).toString();
-    const QString label = format.compare(QStringLiteral("just_float"), Qt::CaseInsensitive) == 0
-                              ? QStringLiteral("JustFloat")
-                              : format.trimmed();
-    return QCoreApplication::translate("SerialStationController", "%1 measurement: %2")
-        .arg(label.isEmpty() ? event.protocolName : label, parts.join(QStringLiteral(", ")));
-}
-
-} // namespace
 
 SerialStationController::SerialStationController(QObject* parent)
     : QObject(parent)
@@ -104,12 +75,18 @@ void SerialStationController::sendCommand(const QString& command, const QString&
     const SerialCodec::EncodeResult encodeResult =
         buildCommandFrame(trimmedCommand, normalizedMode);
     if (!encodeResult.ok) {
-        emitSendFailure(trimmedCommand, encodeResult.normalizedMode, encodeResult.errorMessage);
+        emitSendFailure(trimmedCommand,
+                        encodeResult.normalizedMode,
+                        encodeResult.errorMessage,
+                        QStringLiteral("encode"));
         return;
     }
 
     if (!m_serialManager.session().isOpen()) {
-        emitSendFailure(trimmedCommand, normalizedMode, tr("串口未连接，无法发送"));
+        emitSendFailure(trimmedCommand,
+                        normalizedMode,
+                        tr("串口未连接，无法发送"),
+                        QStringLiteral("not_connected"));
         return;
     }
 
@@ -117,7 +94,10 @@ void SerialStationController::sendCommand(const QString& command, const QString&
 
     const qint64 bytesWritten = m_serialManager.send(encodeResult.frame);
     if (bytesWritten <= 0) {
-        emitSendFailure(trimmedCommand, encodeResult.normalizedMode, tr("串口写入失败"));
+        emitSendFailure(trimmedCommand,
+                        encodeResult.normalizedMode,
+                        tr("串口写入失败"),
+                        QStringLiteral("write_failed"));
         return;
     }
 
@@ -185,6 +165,7 @@ void SerialStationController::clearLogRecords()
     m_measurementService.reset();
     emit serialMeasurementUpdated(QStringList());
     emit serialMeasurementTrendUpdated(QStringList());
+    emit serialMeasurementFramesUpdated(QStringList());
 }
 
 void SerialStationController::setActiveProtocol(const QString& protocolName)
@@ -243,19 +224,7 @@ void SerialStationController::processProtocolEvent(const SerialProtocolEvent& ev
     }
 
     if (event.type == QStringLiteral("measurement")) {
-        const QString measurementText = measurementPayloadText(event);
-        const QString text = measurementText.isEmpty() ? eventPayloadText(event) : measurementText;
-        if (m_measurementService.appendEvent(event)) {
-            emit serialMeasurementUpdated(m_measurementService.displayLines());
-            emit serialMeasurementTrendUpdated(m_measurementService.trendLines());
-        }
-        emit serialRxCounted();
-        logRx(text,
-              event.raw,
-              {{QStringLiteral("eventType"), event.type},
-               {QStringLiteral("protocolName"), event.protocolName},
-               {QStringLiteral("channelCount"),
-                event.payload.value(QStringLiteral("channelCount")).toInt()}});
+        handleMeasurementEvent(event);
         return;
     }
 
@@ -263,44 +232,6 @@ void SerialStationController::processProtocolEvent(const SerialProtocolEvent& ev
     logError(tr("未知接收事件: %1").arg(event.type),
              {{QStringLiteral("eventType"), event.type},
               {QStringLiteral("protocolName"), event.protocolName}});
-}
-
-QString SerialStationController::eventPayloadText(const SerialProtocolEvent& event) const
-{
-    const QString text = event.payload.value(QStringLiteral("text")).toString().trimmed();
-    if (!text.isEmpty()) {
-        return text;
-    }
-
-    const QString message = event.payload.value(QStringLiteral("message")).toString().trimmed();
-    if (!message.isEmpty()) {
-        return message;
-    }
-
-    if (!event.raw.isEmpty()) {
-        return rawBytesSummary(event.raw);
-    }
-
-    return tr("空接收事件");
-}
-
-QString SerialStationController::rawBytesSummary(const QByteArray& bytes) const
-{
-    if (bytes.isEmpty()) {
-        return tr("<empty>");
-    }
-
-    return QString::fromLatin1(bytes.toHex(' ').toUpper());
-}
-
-QString SerialStationController::bufferedReceiveText(const SerialDispatcher::FeedSummary& summary) const
-{
-    if (summary.protocolName.isEmpty()) {
-        return tr("接收缓存 %1 bytes，等待完整帧").arg(summary.inputBytes);
-    }
-
-    return tr("接收缓存 %1 bytes，等待 %2 完整帧")
-        .arg(QString::number(summary.inputBytes), summary.protocolName);
 }
 
 void SerialStationController::logTx(const QString& text,
@@ -333,7 +264,8 @@ void SerialStationController::logError(const QString& text, const QVariantMap& f
 
 void SerialStationController::emitSendFailure(const QString& command,
                                               const QString& mode,
-                                              const QString& message)
+                                              const QString& message,
+                                              const QString& reason)
 {
     QString logText = message;
     if (!command.isEmpty()) {
@@ -344,8 +276,10 @@ void SerialStationController::emitSendFailure(const QString& command,
     logError(logText,
              {{QStringLiteral("command"), command},
               {QStringLiteral("mode"), mode},
+              {QStringLiteral("reason"), reason},
               {QStringLiteral("message"), message}});
     emit serialCommandFailed(command, mode, message);
+    emit serialCommandFailedWithReason(command, mode, reason, message);
 }
 
 } // namespace serial_station
