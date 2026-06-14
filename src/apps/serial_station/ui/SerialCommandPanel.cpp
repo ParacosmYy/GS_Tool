@@ -5,6 +5,7 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QShortcut>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -40,6 +41,7 @@ void SerialCommandPanel::setSendEnabled(bool enabled)
     m_modeCombo->setEnabled(enabled);
     m_historyCombo->setEnabled(enabled && m_history.count() > 0);
     m_sendButton->setEnabled(enabled && !commandText().isEmpty());
+    m_appendLineBreakCheck->setEnabled(enabled && m_modeCombo->currentData().toString() == QStringLiteral("ascii"));
     m_clearHistoryButton->setEnabled(m_history.count() > 0);
     m_readIdButton->setEnabled(enabled);
     m_pingButton->setEnabled(enabled);
@@ -78,13 +80,14 @@ void SerialCommandPanel::applyProfileCommands(const QVector<SerialProfileCommand
 
 void SerialCommandPanel::confirmLastSentCommand()
 {
-    if (m_pendingCommand.trimmed().isEmpty()) {
+    if (m_pendingRawCommand.trimmed().isEmpty()) {
         return;
     }
 
-    recordSentCommand(m_pendingCommand, m_pendingMode);
+    recordSentCommand(m_pendingRawCommand, m_pendingMode);
     m_commandEdit->setText(QString());
     m_pendingCommand.clear();
+    m_pendingRawCommand.clear();
     m_pendingMode.clear();
 }
 
@@ -149,9 +152,18 @@ void SerialCommandPanel::emitSendRequested()
     }
     m_lastSendTime = now;
 
-    m_pendingCommand = command;
-    m_pendingMode = sendMode();
-    emit sendRequested(command, sendMode());
+    const QString mode = sendMode();
+    QString preparedCommand = command;
+    if (mode == QStringLiteral("ascii") && m_appendLineBreakCheck->isChecked()) {
+        if (!preparedCommand.endsWith(QStringLiteral("\r")) && !preparedCommand.endsWith(QStringLiteral("\n"))) {
+            preparedCommand += QStringLiteral("\r\n");
+        }
+    }
+
+    m_pendingCommand = preparedCommand;
+    m_pendingRawCommand = command;
+    m_pendingMode = mode;
+    emit sendRequested(preparedCommand, mode);
     refreshStatus(tr("发送中"), QStringLiteral("ok"));
 }
 
@@ -237,10 +249,15 @@ void SerialCommandPanel::setupUi()
 
     m_sendButton = new QPushButton(tr("发送"), this);
     m_sendButton->setObjectName(QStringLiteral("serialCommandSendButton"));
+    m_appendLineBreakCheck = new QCheckBox(tr("追加 CRLF"), this);
+    m_appendLineBreakCheck->setObjectName(QStringLiteral("serialCommandAppendLineBreak"));
+    m_appendLineBreakCheck->setToolTip(tr("仅对 ASCII 命令自动追加 CRLF"));
+    m_appendLineBreakCheck->setChecked(true);
 
     inputRow->addWidget(m_commandEdit, 1);
     inputRow->addWidget(m_modeCombo);
     inputRow->addWidget(m_sendButton);
+    inputRow->addWidget(m_appendLineBreakCheck);
 
     auto* historyRow = new QHBoxLayout();
     historyRow->setContentsMargins(0, 0, 0, 0);
@@ -312,6 +329,13 @@ void SerialCommandPanel::connectSignals()
             this, &SerialCommandPanel::applyQuickCommand);
     connect(m_resetButton, &QToolButton::clicked,
             this, &SerialCommandPanel::applyQuickCommand);
+    connect(m_modeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
+        if (!m_appendLineBreakCheck || !m_modeCombo) {
+            return;
+        }
+        m_appendLineBreakCheck->setEnabled(
+            m_commandEdit->isEnabled() && m_modeCombo->currentData().toString() == QStringLiteral("ascii"));
+    });
 }
 
 void SerialCommandPanel::refreshStatus(const QString& status, const QString& state)
@@ -354,6 +378,11 @@ void SerialCommandPanel::setModeById(const QString& mode)
     const int index = m_modeCombo->findData(mode);
     if (index >= 0) {
         m_modeCombo->setCurrentIndex(index);
+    }
+
+    if (m_appendLineBreakCheck && m_modeCombo) {
+        m_appendLineBreakCheck->setEnabled(
+            m_commandEdit->isEnabled() && m_modeCombo->currentData().toString() == QStringLiteral("ascii"));
     }
 }
 

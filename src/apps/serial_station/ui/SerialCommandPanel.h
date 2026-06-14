@@ -12,6 +12,7 @@ class QComboBox;
 class QLineEdit;
 class QPushButton;
 class QLabel;
+class QCheckBox;
 class QToolButton;
 
 namespace serial_station {
@@ -121,6 +122,7 @@ private:
     QComboBox* m_modeCombo = nullptr;
     QComboBox* m_historyCombo = nullptr;
     QLabel* m_statusLabel = nullptr;
+    QCheckBox* m_appendLineBreakCheck = nullptr;
     QPushButton* m_sendButton = nullptr;
     QPushButton* m_clearHistoryButton = nullptr;
     QToolButton* m_readIdButton = nullptr;
@@ -128,6 +130,7 @@ private:
     QToolButton* m_resetButton = nullptr;
     SerialCommandHistoryModel m_history;
     QString m_pendingCommand;
+    QString m_pendingRawCommand;
     QString m_pendingMode;
     QDateTime m_lastSendTime;
     constexpr static int kSendIntervalMs = 180;
