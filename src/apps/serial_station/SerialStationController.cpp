@@ -69,9 +69,17 @@ void SerialStationController::connectSerialPort(const SerialPortConfig& config)
 
 void SerialStationController::disconnectSerialPort()
 {
+    if (m_sendInFlight && !m_sendContext.command.isEmpty()) {
+        emitSendFailure(m_sendContext.command,
+                        m_sendContext.mode,
+                        tr("串口连接已断开，发送请求中断"),
+                        QStringLiteral("not_connected"));
+    }
+    failQueuedSendsWithReason(QStringLiteral("not_connected"),
+                              tr("串口未连接，无法发送"));
+
     m_serialManager.close();
     m_dispatcher.reset();
-    m_sendQueue.clear();
     m_sendQueueFrozen = true;
     m_sendInFlight = false;
     m_sendContext = SendRetryContext();
@@ -145,8 +153,9 @@ void SerialStationController::processNextQueuedSend()
     }
 
     if (!m_serialManager.session().isOpen()) {
-        m_sendQueue.clear();
-        m_sendQueueFrozen = false;
+        failQueuedSendsWithReason(QStringLiteral("not_connected"),
+                                  tr("串口未连接，无法发送"));
+        m_sendQueueFrozen = true;
         return;
     }
 
@@ -157,6 +166,14 @@ void SerialStationController::processNextQueuedSend()
     m_sendContext = m_sendQueue.dequeue();
     m_sendInFlight = true;
     processQueuedSendAttempt();
+}
+
+void SerialStationController::failQueuedSendsWithReason(const QString& reason, const QString& message)
+{
+    while (!m_sendQueue.isEmpty()) {
+        const SendRetryContext context = m_sendQueue.dequeue();
+        emitSendFailure(context.command, context.mode, message, reason);
+    }
 }
 
 void SerialStationController::processQueuedSendAttempt()

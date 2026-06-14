@@ -237,6 +237,7 @@ private:
                      int retryDelayMs);
     void processNextQueuedSend();
     void processQueuedSendAttempt();
+    void failQueuedSendsWithReason(const QString& reason, const QString& message);
     void finishSendWithFailure(const QString& command,
                               const QString& mode,
                               const QString& detail,
@@ -274,6 +275,7 @@ private:
     SerialReplayService m_replayService;
     SerialMeasurementService m_measurementService;
     SerialSymbolCatalogSnapshot m_symbolCatalog;
+    friend class ::SerialStationControllerTest;
 };
 
 } // namespace serial_station

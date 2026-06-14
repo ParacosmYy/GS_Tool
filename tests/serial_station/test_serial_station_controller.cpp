@@ -72,6 +72,7 @@ private slots:
     void rejectedCommandsDoNotEmitPortError();
     void rejectedCommandsKeepClosedSessionState();
     void repeatedRejectedCommandsCountEveryFailure();
+    void queuedAndInFlightSendsFailOnDisconnect();
     void emptyCommandSystemLogDoesNotInventCommandContext();
     void defaultProtocolBuildsAsciiFrame();
     void emptyReceiveBytesAreIgnored();
@@ -309,6 +310,44 @@ void SerialStationControllerTest::sendCommandAcceptsRetryArgumentsWithoutRetryPa
     QCOMPARE(errorSpy.count(), 1);
     QCOMPARE(systemLogSpy.count(), 1);
     QCOMPARE(failedSpy.takeFirst().at(2).toString(), QStringLiteral("串口未连接，无法发送"));
+}
+
+void SerialStationControllerTest::queuedAndInFlightSendsFailOnDisconnect()
+{
+    SerialStationController controller;
+    QSignalSpy failedSpy(&controller, &SerialStationController::serialCommandFailedWithReason);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+
+    controller.m_sendInFlight = true;
+    controller.m_sendContext.command = QStringLiteral("PING");
+    controller.m_sendContext.mode = QStringLiteral("ascii");
+    controller.m_sendContext.frame = QByteArrayLiteral("PING");
+
+    SerialStationController::SendRetryContext queued1;
+    queued1.command = QStringLiteral("AT+GMR");
+    queued1.mode = QStringLiteral("ascii");
+    queued1.frame = QByteArrayLiteral("AT+GMR");
+
+    SerialStationController::SendRetryContext queued2;
+    queued2.command = QStringLiteral("RESET");
+    queued2.mode = QStringLiteral("ascii");
+    queued2.frame = QByteArrayLiteral("RESET");
+
+    controller.m_sendQueue.enqueue(queued1);
+    controller.m_sendQueue.enqueue(queued2);
+
+    controller.disconnectSerialPort();
+
+    QCOMPARE(failedSpy.count(), 3);
+    QCOMPARE(errorSpy.count(), 3);
+
+    QCOMPARE(failedSpy.at(0).at(3).toString(), QStringLiteral("串口连接已断开，发送请求中断"));
+    QCOMPARE(failedSpy.at(0).at(2).toString(), QStringLiteral("not_connected"));
+    QCOMPARE(failedSpy.at(1).at(0).toString(), QStringLiteral("AT+GMR"));
+    QCOMPARE(failedSpy.at(1).at(1).toString(), QStringLiteral("ascii"));
+    QCOMPARE(failedSpy.at(1).at(2).toString(), QStringLiteral("not_connected"));
+    QCOMPARE(failedSpy.at(2).at(0).toString(), QStringLiteral("RESET"));
+    QCOMPARE(failedSpy.at(2).at(2).toString(), QStringLiteral("not_connected"));
 }
 
 void SerialStationControllerTest::invalidHexFailsBeforeConnectionCheck_data()
