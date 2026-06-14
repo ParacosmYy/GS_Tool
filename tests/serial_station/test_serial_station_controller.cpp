@@ -95,6 +95,7 @@ private slots:
     void clearLogRecordsClearsMeasurementSummary();
     void clearLogRecordsClearsMeasurementTrend();
     void clearLogRecordsClearsMeasurementFrames();
+    void queuedSendAttemptsFailWhenSessionClosed();
     void reconnectResetsPartialReceiveBuffer();
     void disconnectResetsPartialReceiveBuffer();
     void disconnectThenNewLineDoesNotUseOldPartialBytes();
@@ -348,6 +349,26 @@ void SerialStationControllerTest::queuedAndInFlightSendsFailOnDisconnect()
     QCOMPARE(failedSpy.at(1).at(2).toString(), QStringLiteral("not_connected"));
     QCOMPARE(failedSpy.at(2).at(0).toString(), QStringLiteral("RESET"));
     QCOMPARE(failedSpy.at(2).at(2).toString(), QStringLiteral("not_connected"));
+}
+
+void SerialStationControllerTest::queuedSendAttemptsFailWhenSessionClosed()
+{
+    SerialStationController controller;
+    QSignalSpy failedSpy(&controller, &SerialStationController::serialCommandFailedWithReason);
+    QSignalSpy errorSpy(&controller, &SerialStationController::serialErrorCounted);
+
+    SerialStationController::SendRetryContext queued;
+    queued.command = QStringLiteral("AT+PING");
+    queued.mode = QStringLiteral("ascii");
+    queued.frame = QByteArrayLiteral("AT+PING");
+    controller.m_sendQueue.enqueue(queued);
+
+    controller.processNextQueuedSend();
+
+    QCOMPARE(failedSpy.count(), 1);
+    QCOMPARE(errorSpy.count(), 1);
+    QCOMPARE(failedSpy.at(0).at(0).toString(), QStringLiteral("AT+PING"));
+    QCOMPARE(failedSpy.at(0).at(2).toString(), QStringLiteral("not_connected"));
 }
 
 void SerialStationControllerTest::invalidHexFailsBeforeConnectionCheck_data()
