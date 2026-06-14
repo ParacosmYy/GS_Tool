@@ -24,6 +24,14 @@
 - **三轴**：E4-E5 / U2-U3 / D1-D2
 - **证据入口**：本仓库约束链路、CMake、startup smoke
 - **本周期新增**：命令面板失败分级提示（编码/未连接/写入）接入 `serialCommandFailedWithReason`，并在主工作区显示具体失败归类；新增“重试策略”配置（重试次数+间隔）并由 `SerialStationController::sendCommand` 落地执行重试与审计；`Ctrl+Enter`/`Ctrl+O`/`Ctrl+W` 快捷闭环接入同步补齐 `send.execute`
+- **本周期新增（连贯性）**：`SerialStationConfig` 可携带自动重连参数；`SerialStationController` 在异常断线/打开失败且策略开启时，按最小间隔重试，不立即清空发送队列，优先保障短时抖动场景的发送连续性。配置项暂未进入 Profile 配置面板，当前以策略默认关闭态启用。
+
+### 关键流程
+
+- **连接**：`EmbedDebug.bat --station serial` → `SerialStationController::connectSerialPort` → `SerialManager::configure/open`。
+- **发送**：`SerialCommandPanel` → `sendCommand` → 编码/入队/重试 → `serialCommandSent` / `serialCommandFailed`。
+- **恢复**：断连错误 → `handleSerialManagerError` → 冻结队列 → 自动重连 → 恢复队列继续发送。
+- **观测**：`SerialLogService`、测量服务、回放服务、导出服务共同提供可追踪输出。
 
 ### 企业级架构快照（本轮）
 
@@ -73,7 +81,20 @@
 - **可观测性**：`serialCommandPrepared / sent / failed` 全链路事件持续上报；错误分级含 `encode / not_connected / write_failed`。
 - **控制一致性**：`SerialCommandPanel` 与 `SerialStationController` 的 `retryCount/retryDelayMs` 配置路径打通。
 - **执行一致性**：发送流程改为 `enqueue + state-machine + timer`，避免 UI 主线程阻塞。
+- **弹性一致性**：`SerialStationController` 增补自动重连支路，支持 `autoReconnect/reconnectIntervalMs` 的可控重试，错误断线状态下保留在途发送队列。
 - **证据核验**：`tests/serial_station/test_serial_station_controller.cpp`、`src/apps/serial_station/SerialStationController.cpp`、`src/apps/serial_station/ui/SerialCommandPanel.cpp`。
+
+### 变更记录
+
+- `2026-06-15`：补齐 Serial Station 发送链路的自动重连支路，断线和打开失败时按策略重试，避免短时抖动直接打断在途发送。
+- `2026-06-15`：命令发送失败归因继续沿 `encode / not_connected / write_failed` 分级，便于 UI 与日志统一展示。
+- `2026-06-15`：README 增补关键流程、变更记录和已知限制，保持对外入口与当前工程状态一致。
+
+### 已知限制
+
+- `autoReconnect` 配置暂未进入 Profile 配置面板，当前仍通过策略参数和默认开关控制。
+- 设备验证等级仍以 `D1` 为主，真实串口/虚拟串口闭环未在本轮重新 smoke 验证。
+- 断连恢复属于策略性增强，不等价于真实硬件现场的完整稳定性结论。
 
 #### 风险治理（本轮）
 
