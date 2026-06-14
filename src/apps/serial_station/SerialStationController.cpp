@@ -93,10 +93,15 @@ void SerialStationController::sendCommand(const QString& command, const QString&
     emit serialCommandPrepared(trimmedCommand, encodeResult.normalizedMode, encodeResult.frame);
 
     const qint64 bytesWritten = m_serialManager.send(encodeResult.frame);
-    if (bytesWritten <= 0) {
+    if (bytesWritten < static_cast<qint64>(encodeResult.frame.size())) {
+        const QString detail = bytesWritten <= 0
+                                  ? tr("串口写入失败")
+                                  : tr("串口写入不完整: %1/%2 字节")
+                                        .arg(bytesWritten)
+                                        .arg(encodeResult.frame.size());
         emitSendFailure(trimmedCommand,
                         encodeResult.normalizedMode,
-                        tr("串口写入失败"),
+                        detail,
                         QStringLiteral("write_failed"));
         return;
     }
