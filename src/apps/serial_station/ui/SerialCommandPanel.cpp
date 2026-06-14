@@ -9,6 +9,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 
@@ -163,8 +164,28 @@ void SerialCommandPanel::emitSendRequested()
     m_pendingCommand = preparedCommand;
     m_pendingRawCommand = command;
     m_pendingMode = mode;
-    emit sendRequested(preparedCommand, mode);
+    emit sendRequested(preparedCommand, mode, retryCount(), retryDelayMs());
     refreshStatus(tr("发送中"), QStringLiteral("ok"));
+}
+
+int SerialCommandPanel::retryCount() const
+{
+    if (!m_retryCountSpin) {
+        return 0;
+    }
+
+    const int value = m_retryCountSpin->value();
+    return value > 0 ? value : 0;
+}
+
+int SerialCommandPanel::retryDelayMs() const
+{
+    if (!m_retryIntervalSpin) {
+        return 0;
+    }
+
+    const int value = m_retryIntervalSpin->value();
+    return value > 0 ? value : 0;
 }
 
 void SerialCommandPanel::applyQuickCommand()
@@ -259,6 +280,37 @@ void SerialCommandPanel::setupUi()
     inputRow->addWidget(m_sendButton);
     inputRow->addWidget(m_appendLineBreakCheck);
 
+    auto* retryRow = new QHBoxLayout();
+    retryRow->setContentsMargins(0, 0, 0, 0);
+    retryRow->setSpacing(8);
+
+    auto* retryLabel = new QLabel(tr("重试策略"), this);
+    retryLabel->setObjectName(QStringLiteral("serialCommandRetryLabel"));
+    auto* retryCountLabel = new QLabel(tr("次数"), this);
+    retryCountLabel->setObjectName(QStringLiteral("serialCommandRetryCountLabel"));
+    auto* retryIntervalLabel = new QLabel(tr("间隔(ms)"), this);
+    retryIntervalLabel->setObjectName(QStringLiteral("serialCommandRetryIntervalLabel"));
+
+    m_retryCountSpin = new QSpinBox(this);
+    m_retryCountSpin->setObjectName(QStringLiteral("serialCommandRetryCountSpin"));
+    m_retryCountSpin->setRange(0, 20);
+    m_retryCountSpin->setValue(0);
+    m_retryCountSpin->setToolTip(tr("发送失败时的重试次数，0 表示不重试"));
+    m_retryCountSpin->setSuffix(QStringLiteral(" 次"));
+    m_retryIntervalSpin = new QSpinBox(this);
+    m_retryIntervalSpin->setObjectName(QStringLiteral("serialCommandRetryIntervalSpin"));
+    m_retryIntervalSpin->setRange(0, 2000);
+    m_retryIntervalSpin->setValue(30);
+    m_retryIntervalSpin->setToolTip(tr("每次重试等待时间（毫秒）"));
+    m_retryIntervalSpin->setSuffix(QStringLiteral(" ms"));
+
+    retryRow->addWidget(retryLabel);
+    retryRow->addWidget(retryCountLabel);
+    retryRow->addWidget(m_retryCountSpin);
+    retryRow->addWidget(retryIntervalLabel);
+    retryRow->addWidget(m_retryIntervalSpin);
+    retryRow->addStretch();
+
     auto* historyRow = new QHBoxLayout();
     historyRow->setContentsMargins(0, 0, 0, 0);
     historyRow->setSpacing(8);
@@ -306,6 +358,7 @@ void SerialCommandPanel::setupUi()
 
     root->addLayout(headerRow);
     root->addLayout(inputRow);
+    root->addLayout(retryRow);
     root->addLayout(historyRow);
     root->addWidget(divider);
     root->addLayout(quickRow);

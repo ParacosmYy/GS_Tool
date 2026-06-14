@@ -1,5 +1,7 @@
 #include "apps/serial_station/SerialStationController.h"
 
+#include <QtCore/QThread>
+
 #include <QtCore/QMetaType>
 #include <QtCore/QStringList>
 
@@ -67,7 +69,10 @@ void SerialStationController::disconnectSerialPort()
     m_dispatcher.reset();
 }
 
-void SerialStationController::sendCommand(const QString& command, const QString& mode)
+void SerialStationController::sendCommand(const QString& command,
+                                         const QString& mode,
+                                         int retryCount,
+                                         int retryDelayMs)
 {
     const QString trimmedCommand = command.trimmed();
     const QString normalizedMode = normalizeSendMode(mode);
@@ -92,13 +97,46 @@ void SerialStationController::sendCommand(const QString& command, const QString&
 
     emit serialCommandPrepared(trimmedCommand, encodeResult.normalizedMode, encodeResult.frame);
 
-    const qint64 bytesWritten = m_serialManager.send(encodeResult.frame);
+    const int maxRetryCount = qMax(0, retryCount);
+    const int intervalMs = qMax(0, retryDelayMs);
+    qint64 bytesWritten = 0;
+    int retriesUsed = 0;
+
+    for (int attempt = 0; attempt <= maxRetryCount; ++attempt) {
+        if (attempt > 0 && intervalMs > 0) {
+            QThread::msleep(intervalMs);
+        }
+
+        if (attempt > 0) {
+            logSystem(tr("命令发送重试 %1/%2（间隔 %3ms）").arg(attempt).arg(maxRetryCount).arg(intervalMs),
+                      {{QStringLiteral("command"), trimmedCommand},
+                       {QStringLiteral("mode"), encodeResult.normalizedMode},
+                       {QStringLiteral("retryAttempt"), attempt},
+                       {QStringLiteral("retryDelayMs"), intervalMs},
+                       {QStringLiteral("frameSize"), encodeResult.frame.size()}});
+        }
+
+        const QByteArray pendingFrame =
+            encodeResult.frame.mid(static_cast<int>(bytesWritten));
+        bytesWritten += m_serialManager.send(pendingFrame);
+        if (bytesWritten >= encodeResult.frame.size()) {
+            break;
+        }
+
+        if (attempt >= maxRetryCount) {
+            break;
+        }
+
+        ++retriesUsed;
+    }
+
     if (bytesWritten < static_cast<qint64>(encodeResult.frame.size())) {
         const QString detail = bytesWritten <= 0
-                                  ? tr("串口写入失败")
-                                  : tr("串口写入不完整: %1/%2 字节")
+                                  ? tr("串口写入失败（已重试 %1 次）").arg(retriesUsed)
+                                  : tr("串口写入不完整: %1/%2 字节（已重试 %3 次）")
                                         .arg(bytesWritten)
-                                        .arg(encodeResult.frame.size());
+                                        .arg(encodeResult.frame.size())
+                                        .arg(retriesUsed);
         emitSendFailure(trimmedCommand,
                         encodeResult.normalizedMode,
                         detail,
@@ -115,7 +153,10 @@ void SerialStationController::sendCommand(const QString& command, const QString&
           encodeResult.frame,
           {{QStringLiteral("command"), trimmedCommand},
            {QStringLiteral("mode"), encodeResult.normalizedMode},
-           {QStringLiteral("bytesWritten"), bytesWritten}});
+           {QStringLiteral("bytesWritten"), bytesWritten},
+           {QStringLiteral("retryCountConfigured"), maxRetryCount},
+           {QStringLiteral("retryDelayMs"), intervalMs},
+           {QStringLiteral("retriesUsed"), retriesUsed}});
     emit serialCommandSent(trimmedCommand, encodeResult.normalizedMode, bytesWritten);
 }
 

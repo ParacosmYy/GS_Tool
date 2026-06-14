@@ -10,6 +10,7 @@
 
 class QComboBox;
 class QLineEdit;
+class QSpinBox;
 class QPushButton;
 class QLabel;
 class QCheckBox;
@@ -93,8 +94,13 @@ signals:
      * @brief 用户请求发送一条命令。
      * @param command 命令文本
      * @param mode 发送模式
+     * @param retryCount 重试次数
+     * @param retryDelayMs 每次重试间隔（毫秒）
      */
-    void sendRequested(const QString& command, const QString& mode);
+    void sendRequested(const QString& command,
+                       const QString& mode,
+                       int retryCount,
+                       int retryDelayMs);
 
     /**
      * @brief 用户选择了一个快捷命令。
@@ -117,6 +123,8 @@ private:
     void refreshHistoryUi();
     void setModeById(const QString& mode);
     QString failureReasonLabel(const QString& reason) const;
+    int retryCount() const;
+    int retryDelayMs() const;
 
     QLineEdit* m_commandEdit = nullptr;
     QComboBox* m_modeCombo = nullptr;
@@ -125,6 +133,8 @@ private:
     QCheckBox* m_appendLineBreakCheck = nullptr;
     QPushButton* m_sendButton = nullptr;
     QPushButton* m_clearHistoryButton = nullptr;
+    QSpinBox* m_retryCountSpin = nullptr;
+    QSpinBox* m_retryIntervalSpin = nullptr;
     QToolButton* m_readIdButton = nullptr;
     QToolButton* m_pingButton = nullptr;
     QToolButton* m_resetButton = nullptr;

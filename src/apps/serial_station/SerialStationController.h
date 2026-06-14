@@ -105,8 +105,13 @@ public slots:
      * @brief 发送 UI 提交的命令。
      * @param command 命令文本
      * @param mode 发送模式
+     * @param retryCount 发送失败后的重试次数（额外次数）
+     * @param retryDelayMs 每次重试之间的间隔（毫秒）
      */
-    void sendCommand(const QString& command, const QString& mode);
+    void sendCommand(const QString& command,
+                     const QString& mode,
+                     int retryCount = 0,
+                     int retryDelayMs = 0);
 
     /**
      * @brief 处理串口核心层收到的原始字节。
