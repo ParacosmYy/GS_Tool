@@ -4,6 +4,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QShortcut>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -281,6 +282,10 @@ void SerialCommandPanel::setupUi()
     auto* divider = new QFrame(this);
     divider->setObjectName(QStringLiteral("serialCommandDivider"));
     divider->setFrameShape(QFrame::HLine);
+
+    auto* sendShortcut = new QShortcut(QKeySequence(QStringLiteral("Ctrl+Return")), this);
+    sendShortcut->setObjectName(QStringLiteral("serialCommandSendShortcut"));
+    connect(sendShortcut, &QShortcut::activated, this, &SerialCommandPanel::emitSendRequested);
 
     root->addLayout(headerRow);
     root->addLayout(inputRow);
