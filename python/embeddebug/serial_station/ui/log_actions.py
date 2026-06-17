@@ -53,5 +53,15 @@ def update_log_stats(host: LogActionHost) -> None:
     total = len(entries)
     tx_count = sum(1 for entry in entries if entry.direction == "tx")
     rx_count = sum(1 for entry in entries if entry.direction == "rx")
+    system_count = sum(1 for entry in entries if entry.direction == "system")
+    error_count = sum(1 for entry in entries if entry.direction == "error")
     visible = sum(1 for entry in entries if log_entry_visible(host, entry))
-    set_log_stats_label(host, visible=visible, total=total, tx=tx_count, rx=rx_count)
+    set_log_stats_label(
+        host,
+        visible=visible,
+        total=total,
+        tx=tx_count,
+        rx=rx_count,
+        system=system_count,
+        error=error_count,
+    )

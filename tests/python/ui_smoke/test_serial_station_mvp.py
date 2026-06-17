@@ -238,7 +238,7 @@ def test_pyqt_mvp_log_stats_follow_entries_and_filters(qtbot):
     assert clear_button is not None
     assert log_filter_combo is not None
     assert log_stats_label is not None
-    assert log_stats_label.text() == "Visible 0 / Total 0 | TX 0 | RX 0"
+    assert log_stats_label.text() == "Visible 0 / Total 0 | TX 0 | RX 0 | System 0 | Error 0"
 
     qtbot.mouseClick(connect_button, Qt.MouseButton.LeftButton)
     send_edit.setText("stat-tx")
@@ -251,10 +251,10 @@ def test_pyqt_mvp_log_stats_follow_entries_and_filters(qtbot):
     assert "RX 1" in log_stats_label.text()
 
     log_filter_combo.setCurrentText("TX")
-    assert log_stats_label.text() == "Visible 1 / Total 2 | TX 1 | RX 1"
+    assert log_stats_label.text() == "Visible 1 / Total 2 | TX 1 | RX 1 | System 0 | Error 0"
 
     qtbot.mouseClick(clear_button, Qt.MouseButton.LeftButton)
-    assert log_stats_label.text() == "Visible 0 / Total 0 | TX 0 | RX 0"
+    assert log_stats_label.text() == "Visible 0 / Total 0 | TX 0 | RX 0 | System 0 | Error 0"
 
 
 def test_pyqt_mvp_shortcuts_send_clear_and_refresh(qtbot, monkeypatch):

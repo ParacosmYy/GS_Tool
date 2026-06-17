@@ -106,9 +106,12 @@ def test_set_profile_label_writes_translated_profile_name_to_profile_label():
 def test_set_log_stats_label_writes_translated_counts_to_log_stats_label():
     host = TrHost()
 
-    set_log_stats_label(host, visible=2, total=3, tx=1, rx=2)
+    set_log_stats_label(host, visible=2, total=4, tx=1, rx=1, system=1, error=1)
 
-    assert host._log_stats_label.text == "tr:Visible 2 / Total 3 | TX 1 | RX 2"
+    assert (
+        host._log_stats_label.text
+        == "tr:Visible 2 / Total 4 | TX 1 | RX 1 | System 1 | Error 1"
+    )
 
 
 def test_append_log_entry_line_writes_translated_direction_and_text_to_log_view():
@@ -117,3 +120,15 @@ def test_append_log_entry_line_writes_translated_direction_and_text_to_log_view(
     append_log_entry_line(host, direction="rx", text="0A 0B")
 
     assert host._log_view.lines == ["tr:RX 0A 0B"]
+
+
+def test_append_log_entry_line_writes_translated_diagnostic_directions():
+    host = TrHost()
+
+    append_log_entry_line(host, direction="system", text="profile loaded")
+    append_log_entry_line(host, direction="error", text="port denied")
+
+    assert host._log_view.lines == [
+        "tr:System profile loaded",
+        "tr:Error port denied",
+    ]

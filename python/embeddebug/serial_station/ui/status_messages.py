@@ -113,21 +113,33 @@ def set_log_stats_label(
     total: int,
     tx: int,
     rx: int,
+    system: int,
+    error: int,
 ) -> None:
     """Write translated log statistics to the host log statistics label."""
 
     host._log_stats_label.setText(
-        host.tr("Visible {visible} / Total {total} | TX {tx} | RX {rx}").format(
+        host.tr(
+            "Visible {visible} / Total {total} | TX {tx} | RX {rx} | System {system} | Error {error}"
+        ).format(
             visible=visible,
             total=total,
             tx=tx,
             rx=rx,
+            system=system,
+            error=error,
         )
     )
 
 
 def append_log_entry_line(host: LogEntryLineHost, *, direction: str, text: str) -> None:
-    """Append a translated TX/RX log line to the host log view."""
+    """Append a translated log line to the host log view."""
 
-    template = "TX {text}" if direction == "tx" else "RX {text}"
+    templates = {
+        "tx": "TX {text}",
+        "rx": "RX {text}",
+        "system": "System {text}",
+        "error": "Error {text}",
+    }
+    template = templates.get(direction, "System {text}")
     host._log_view.appendPlainText(host.tr(template).format(text=text))

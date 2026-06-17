@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 597分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 403分
+> 当前: 598分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 402分
 
 ---
 
@@ -299,12 +299,13 @@
 | 595 | Serial Station log filter options helper | 新增 `log_filter_options` helper，sections 复用日志筛选下拉选项与默认选中规则并补单测 |
 | 596 | Serial Station serial config options helper | 新增 `serial_config_options` helper，sections 复用波特率、数据位、校验、停止位和流控选项与默认值并补单测 |
 | 597 | Serial Station diagnostic log filters | 日志筛选入口新增 System/Error 选项，复用 log_filter_options/log_entry_filter 规则并补单测 |
+| 598 | Serial Station diagnostic log stats | 日志行渲染与统计支持 System/Error，诊断日志不再归入 RX，并补单测与 UI smoke |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#597` 的完整记录
+- 当前文档已整理到 `#598` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
