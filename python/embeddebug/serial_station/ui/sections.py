@@ -9,6 +9,10 @@ from PyQt6.QtWidgets import QComboBox, QHBoxLayout, QLabel, QLineEdit, QPlainTex
 
 from embeddebug.serial_station.controllers import SerialWorkbenchController
 from embeddebug.serial_station.ui import connection_actions
+from embeddebug.serial_station.ui.log_filter_options import (
+    default_log_filter_text,
+    log_filter_options,
+)
 from embeddebug.serial_station.ui.shortcuts import install_shortcuts
 from embeddebug.serial_station.ui.tcp_controls import build_tcp_controls
 from embeddebug.serial_station.ui.udp_controls import build_udp_controls
@@ -232,8 +236,8 @@ def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayou
     owner._log_filter_combo = QComboBox(root)
     owner._log_filter_combo.setObjectName("serialStationLogFilterCombo")
     owner._log_filter_combo.setToolTip(owner.tr("Filter visible log entries"))
-    owner._log_filter_combo.addItems([owner.tr("All"), owner.tr("TX"), owner.tr("RX")])
-    owner._log_filter_combo.setCurrentText(owner.tr("All"))
+    owner._log_filter_combo.addItems([owner.tr(text) for text in log_filter_options()])
+    owner._log_filter_combo.setCurrentText(owner.tr(default_log_filter_text()))
     owner._log_filter_combo.currentTextChanged.connect(owner._render_log_entries)
     owner._log_search_edit = QLineEdit(root)
     owner._log_search_edit.setObjectName("serialStationLogSearchEdit")
