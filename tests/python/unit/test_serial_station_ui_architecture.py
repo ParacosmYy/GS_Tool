@@ -7,6 +7,7 @@ from embeddebug.serial_station.ui import (
     connection_actions,
     injection_actions,
     main_window,
+    sections,
     session_actions,
     shortcuts,
     tcp_controls,
@@ -21,6 +22,23 @@ def test_tcp_connection_action_lives_with_connection_actions():
     source = inspect.getsource(tcp_controls)
     assert "connect_tcp_result" not in source
     assert "_status_label.setText" not in source
+
+
+def test_connection_toolbar_builder_lives_outside_main_sections():
+    connection_toolbar = importlib.import_module(
+        "embeddebug.serial_station.ui.connection_toolbar"
+    )
+
+    assert hasattr(connection_toolbar, "build_connection_toolbar")
+
+    source = inspect.getsource(sections.build_main_layout)
+    assert "build_connection_toolbar(owner, controller, root)" in source
+    assert "serialStationProtocolCombo" not in source
+
+    sections_path = inspect.getsourcefile(sections)
+    assert sections_path is not None
+    with open(sections_path, encoding="utf-8") as handle:
+        assert len(handle.read().splitlines()) < 260
 
 
 def test_udp_connection_action_lives_with_connection_actions():
