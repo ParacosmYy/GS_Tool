@@ -12,9 +12,18 @@ class SessionActionHost(Protocol):
 
     def _render_log_entries(self) -> None: ...
 
+    def _update_log_stats(self) -> None: ...
+
     def _apply_profile_controls(self, profile: dict[str, object]) -> None: ...
 
     def _refresh_command_history(self) -> None: ...
+
+
+def clear_log(host: SessionActionHost) -> None:
+    host._controller.clear_log()
+    host._log_view.clear()
+    host._update_log_stats()
+    host._status_label.setText(host.tr("Log cleared"))
 
 
 def export_log(host: SessionActionHost) -> None:

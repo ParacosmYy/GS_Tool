@@ -172,10 +172,7 @@ class SerialStationMainWindow(QMainWindow):
         self._waveform_preview.update_batch(batch)
 
     def _clear_log(self) -> None:
-        self._controller.clear_log()
-        self._log_view.clear()
-        self._update_log_stats()
-        self._status_label.setText(self.tr("Log cleared"))
+        session_actions.clear_log(self)
 
     def _export_log(self) -> None:
         session_actions.export_log(self)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 
-from embeddebug.serial_station.ui import connection_actions, tcp_controls
+from embeddebug.serial_station.ui import connection_actions, main_window, session_actions, tcp_controls
 
 
 def test_tcp_connection_action_lives_with_connection_actions():
@@ -12,3 +12,11 @@ def test_tcp_connection_action_lives_with_connection_actions():
     source = inspect.getsource(tcp_controls)
     assert "connect_tcp_result" not in source
     assert "_status_label.setText" not in source
+
+
+def test_clear_log_action_lives_with_session_actions():
+    assert hasattr(session_actions, "clear_log")
+
+    source = inspect.getsource(main_window.SerialStationMainWindow._clear_log)
+    assert "session_actions.clear_log(self)" in source
+    assert "_controller.clear_log" not in source
