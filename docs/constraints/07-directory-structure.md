@@ -14,18 +14,14 @@
   - `build2/`
   - `build-debug/`
   - `build-release/`
-- `cmake-build-*`
+- `native-build-*`
 - 固定考核路径：`uv run start-embeddebug --smoke` + `cmd /c EmbedDebug.bat --smoke`。
 
 ## 二、Canonical 路径
 
-- `src/interfaces/`：接口与契约
-- `src/shared/`：跨模块常量和轻量值对象
-- `src/core/`：应用协调与主窗口
-- `src/apps/serial_station/`：串口新工站
 - `python/embeddebug/`：Python/PyQt 新主线运行时代码，按 `app/`、`ui/`、`controllers/`、`core/`、`protocols/`、`services/`、`workers/`、`drivers/` 分层
 - `tests/python/`：Python/PyQt 新主线测试，按 `unit/`、`integration/`、`ui_smoke/` 分层
-- `tests/fixtures/serial_station/`：C++/Python 可共享的串口协议 golden fixtures、日志样本和回放样本
+- `tests/fixtures/serial_station/`：串口协议 golden fixtures、日志样本和回放样本
 - `packaging/pyinstaller/`：未来 Python/PyInstaller 打包 spec 与包装脚本；不得输出产物到该目录
 - `tests/`：按模块分层编写测试
 - `docs/constraints/`：约束与执行规则
@@ -34,16 +30,14 @@
 ## 三、新建文件分流规则
 
 ### 3.1 串口工站相关
-- 只允许新增到 `src/apps/serial_station/`，内部按 `ui/`、`core/`、`protocols/`、`services/`、`workers/`。
 - Python/PyQt 串口工站迁移只允许新增到 `python/embeddebug/serial_station/`，内部按 `ui/`、`controllers/`、`core/`、`protocols/`、`services/`、`workers/`、`drivers/`。
-- C++ 串口工站仅保留历史参考和兼容维护；PRD-136/B22 后默认启动、打包和验收入口均进入 Python/PyQt。
+- C++ 串口工站已移除；PRD-136/B23 后默认启动、打包和验收入口均进入 Python/PyQt。
 - 不得把 Python 产品运行时代码放入 `tools/`；`tools/` 只放工程管理、启动、审计和包装辅助脚本。
-- 不得把 Python 产品运行时代码放入 `src/`，除非后续有单独 cutover PRD 明确废弃 C++ 主线。
+- 不得恢复 `src/` native 产品主线。
 - 不得把 Python 运行时代码回填到 C++ 构建或历史源码目录。
 
 ### 3.2 接口与共享
-- 跨模块公共能力优先到 `src/interfaces/`，通用常量/枚举到 `src/shared/`。
-- Python 主线的共享值对象优先放在 `python/embeddebug/shared/` 或对应 app 内 `core/`，不得复制 C++ `.h/.cpp` 到 Python 目录。
+- Python 主线的共享值对象优先放在 `python/embeddebug/shared/` 或对应 app 内 `core/`，不得复制 legacy native 源码到 Python 目录。
 
 ### 3.3 工具与文档
 - 新工具脚本放 `tools/`，仅工程管理目的，不进入运行时模块。
@@ -70,8 +64,8 @@
 - `responsive/`
 - `font/` 与 `fonts/`
 - `shortcut/` 与 `managers/` 的平行能力
-- `src/` 下既有 C++ 运行时代码（除非单独归档/删除任务明确授权）
-- `cmake/` 与根 `CMakeLists.txt` 历史构建文件（不得新增活跃打包入口）
+- `src/` native 产品目录（已移除，不得恢复）
+- native 构建文件（已移除，不得恢复）
 
 冻结规则：
 - 不允许在冻结目录新增新业务功能。
@@ -79,7 +73,7 @@
 
 ## 五、文件落地检查（工程门禁）
 
-新增或改动的 `.h/.cpp` 默认禁止进入活跃产品主线；仅允许历史兼容修复，并必须在任务说明中写明为何不能落到 Python/PyQt 主线。
+新增或改动 native 源码默认禁止进入活跃产品主线；如确需恢复，必须有单独 PRD 和用户明确批准。
 
 新增或改动的 Python 运行时代码必须满足：
 - 已有 PRD/Specs 授权具体批次。

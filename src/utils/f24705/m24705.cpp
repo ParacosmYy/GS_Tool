@@ -1,2 +1,0 @@
-#include "f24705/m24705.h"
-QVector<double> m24705::run(const QVector<double>&in) { m_s.c++; m_s.i+=in.size(); return in; }

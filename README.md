@@ -20,7 +20,7 @@ EmbedDebug 的目标不是再做一个单点串口助手，而是把嵌入式现
 - 打包统一：Windows 交付包通过 `uv run package-embeddebug` 生成。
 - 验证统一：测试、启动 smoke、包结构校验全部走 `uv run ...`。
 
-C++/CMake 打包链路不再作为活跃工作流、fallback 或发布门禁。既有 C++ 源码仅作为历史参考和兼容维护对象，后续如需归档或删除，应单独开任务处理。
+C++/CMake 打包链路、native 源码树和 C++ 测试入口已从当前仓库形态移除；后续新增能力只能进入 Python/PyQt 主线。
 
 ## 二、企业级架构总览
 

@@ -1,2 +1,0 @@
-#include "l10811/m10811.h"
-QVector<double> m10811::run(const QVector<double>&in) { m_s.c++; m_s.i+=in.size(); return in; }

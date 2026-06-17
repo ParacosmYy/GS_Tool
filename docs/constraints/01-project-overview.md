@@ -100,7 +100,7 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-smoke-windows-x
 
 - `EmbedDebug.bat` 是用户侧最低验收入口，必须双击可启动。
 - 自 PRD-136/B22 起，`EmbedDebug.bat` 默认且唯一活跃启动链路为 Python/PyQt：`uv run start-embeddebug`。
-- C++/CMake 打包链路不再作为活跃工程入口、fallback 或验收口径。
+- C++/CMake 打包链路、native 源码树和 C++ 测试入口已移除，不再作为活跃工程入口、fallback 或验收口径。
 - 建议每轮考核固定执行：
   - `uv run start-embeddebug --smoke`
   - `cmd /c EmbedDebug.bat --smoke`
@@ -115,25 +115,17 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-smoke-windows-x
 
 | 模块 | 目录 | 职责 | 当前状态 |
 |------|------|------|----------|
-| automation | `src/automation/` | 脚本触发与自动化流程 | 已上线 |
-| chart | `src/chart/` | 可视化控件（波形/散点/直方） | 已上线 |
-| connection | `src/connection/` | 连接抽象与多连接实现 | 在建（含串口/TCP等） |
-| core | `src/core/` | 应用协调、导航、会话、基础窗口 | 关键枢纽 |
-| dashboard | `src/dashboard/` | 仪表盘展示 | 在建 |
-| ota | `src/ota/` | 固件升级能力 | 在建 |
-| plugin | `src/plugin/` | 插件系统与扩展能力 | 在建 |
-| protocol | `src/protocol/` | 协议解析和数据建模 | 在建 |
-| rtt | `src/rtt/` | RTT 相关连接 | 在建 |
-| serial | `src/serial/` | 旧串口能力（历史兼容） | 冻结兼容 |
-| terminal | `src/terminal/` | 终端交互与日志显示 | 已上线 |
-| utils | `src/utils/` | CRC、RingBuffer、日志、公共工具 | 已上线 |
+| app | `python/embeddebug/app/` | Python/PyQt 应用入口与 smoke | 主线 |
+| serial_station | `python/embeddebug/serial_station/` | 串口工作台 | 主线 |
+| devtools | `python/embeddebug/devtools/` | 测试、打包、验证入口 | 主线 |
+| tests | `tests/python/` | Python 单测、集成测试、UI smoke | 主线 |
 
 ### 4.2 新增优先落地点（必须使用）
 
-- `src/interfaces/`：纯接口与契约
-- `src/shared/`：跨模块稳定常量、枚举、值对象
-- `src/features/`：迁移承接（不直接承载生产实现）
-- `src/apps/serial_station/`：串口工站重构落地
+- `python/embeddebug/`：产品运行时代码
+- `python/embeddebug/serial_station/`：串口工作台主线
+- `tests/python/`：Python 测试
+- `tests/fixtures/`：协议样本、日志和回放 fixtures
 
 ---
 
@@ -169,7 +161,7 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-smoke-windows-x
 ## 六、Serial Station 当前目标（不写在这里就不能开始该子域）
 
 - Python/PyQt 新增落点为 `python/embeddebug/serial_station/`，明确 `ui`、`controllers`、`core`、`protocols`、`services`、`workers`、`drivers` 分层。
-- C++ 串口目录仅保留历史参考和兼容维护，不再新增默认交付能力。
+- C++ 串口目录已移除，不再新增默认交付能力。
 - 首先实现用户闭环（连接-发送-接收-日志-导出-回放），再扩展高级功能。
 - 任何新协议必须有 `tests/serial_station/` 对应 parser/build 测试。
 - 真实设备验证与模拟验证必须记录，不允许只在 parser 测试下宣称“工程可调试”。

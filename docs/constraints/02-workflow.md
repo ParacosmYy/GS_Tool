@@ -212,9 +212,10 @@
 - `pyproject.toml`、`uv.lock`
 - `README.md`
 - `EmbedDebug.bat`、启动脚本
-- `src/core/mainwindow/`、`src/core/panels/`
+- `python/embeddebug/app/`
+- `python/embeddebug/serial_station/ui/`
 - `resources/themes/` 与图标资源
-- 公共接口（`src/interfaces/`, `src/shared/`）
+- Python 公共接口与共享值对象
 - 串口工站的入口与核心控制类
 
 ### 6.3 合流规则

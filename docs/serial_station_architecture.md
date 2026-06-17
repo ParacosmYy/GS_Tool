@@ -1,6 +1,6 @@
 # Serial Station 架构与交付标准（重构版）
 
-> 适用范围：任何涉及 C++ `src/apps/serial_station/` 或 Python/PyQt `python/embeddebug/serial_station/` 的新增、重构、协议扩展、测试与发布动作。
+> 适用范围：任何涉及 Python/PyQt `python/embeddebug/serial_station/` 的新增、重构、协议扩展、测试与发布动作。
 
 ---
 
@@ -8,12 +8,11 @@
 
 Serial Station 是串口上位机的重构落点。目标是把“连接、协议、服务、展示”拆开，避免在单层堆积。
 
-- 历史 C++ 目录：`src/apps/serial_station/`（兼容维护和参考）
 - Python/PyQt 主线目录：`python/embeddebug/serial_station/`
 - 对外唯一协议入口：`ISerialProtocol` + `SerialProtocolRegistry`
-- 不允许回流到旧 `src/serial/` 与主窗口核心层实现
+- 不允许恢复旧 native 串口目录或主窗口核心层实现
 - 每次改动必须能映射到三轴状态与可执行验收条款
-- 自 PRD-136/B22 起，Python/PyQt 是 `EmbedDebug.bat -> uv run start-embeddebug` 的默认生产方向；C++/CMake 打包链路不再作为 fallback、对照或验收入口。
+- 自 PRD-136/B23 起，Python/PyQt 是 `EmbedDebug.bat -> uv run start-embeddebug` 的默认生产方向；C++/CMake 打包链路、native 源码树和 C++ 测试入口已移除。
 
 ### 成功口径
 
@@ -58,40 +57,7 @@ Serial Station 是串口上位机的重构落点。目标是把“连接、协�
 
 ## 四、目录与文件约束（串口专项）
 
-### 4.1 C++/Qt 历史参考
-
-```text
-src/apps/serial_station/
-  SerialStationApp.h/.cpp
-  SerialStationWindow.h/.cpp
-  SerialStationController.h/.cpp
-  SerialStationConfig.h/.cpp
-  SerialStationModels.h
-  SerialStationConstants.h
-  ui/
-    ...
-  core/
-    SerialPort.h/.cpp
-    SerialManager.h/.cpp
-    SerialSession.h/.cpp
-    SerialDispatcher.h/.cpp
-    SerialCodec.h/.cpp
-  protocols/
-    ISerialProtocol.h
-    SerialProtocolRegistry.h/.cpp
-    ...
-  services/
-    SerialLogService.h/.cpp
-    SerialExportService.h/.cpp
-    SerialReplayService.h/.cpp
-    SerialProfileService.h/.cpp
-  workers/
-    SerialReaderWorker.h/.cpp
-```
-
-上述目录不再作为新增功能的默认落点；除历史兼容修复外，新能力进入 Python/PyQt 主线。
-
-### 4.2 Python/PyQt 主线
+### 4.1 Python/PyQt 主线
 
 ```text
 python/embeddebug/serial_station/
@@ -144,7 +110,7 @@ Python/PyQt lane 规则：
 ### 5.1 已具备（当前）
 
 - UART 配置、连接、发送、接收、日志、回放、导出闭环
-- 规则化协议层与 C++QTest 测试雏形
+- 规则化协议层与 pytest 测试雏形
 - 配置档案化与会话记录
 
 ### 5.2 仍缺（高优先）
@@ -181,7 +147,7 @@ Python/PyQt 迁移不是只替换 UI 技术栈，必须按 VOFA+ 能力追平：
 
 1. `S` Scope：明确本次范围是否只改 serial_station。
 2. `E` Edge：检查边界不越界 `ui/controller/core/protocols/services/workers`。
-3. `L` Layer：确认新增文件都在 `src/apps/serial_station/`。
+3. `L` Layer：确认新增文件都在 `python/embeddebug/serial_station/`。
 4. `T` Test：更新并绑定 `tests/serial_station/`。
 5. `V` Verify：连接、发送、接收、日志、回放至少各有一次证据。
 6. `Q` Quantize：更新量化指标（缺口项和达成率）。

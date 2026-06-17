@@ -53,3 +53,16 @@ def test_active_tools_do_not_reintroduce_cpp_packaging():
         text = path.read_text(encoding="utf-8", errors="ignore").lower()
         for token in forbidden:
             assert token not in text, f"{path} still references {token}"
+
+
+def test_repository_no_longer_contains_legacy_cpp_cmake_project():
+    forbidden_paths = [
+        Path("CMakeLists.txt"),
+        Path("cmake"),
+        Path("src"),
+        Path("tests/CMakeLists.txt"),
+        Path("tests/serial_station"),
+    ]
+
+    for path in forbidden_paths:
+        assert not path.exists(), f"{path} should be removed from the Python/PyQt-only repo"

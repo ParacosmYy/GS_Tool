@@ -31,9 +31,9 @@
 3. **每次 commit 必须为一次完整代码增量，代码变更量≥500行** — 不足500行不允许代码 commit（不计文档/空白/注释）。
 4. **零编译错误才能commit** — 编译不过必须先修
 5. **`EmbedDebug.bat` 双击能启动是最低验收线** — 每次 commit 后必须验证；任何影响构建、启动、入口、资源、依赖、路径的改动，收口前也必须验证或说明无法验证的具体原因
-5.5. **禁止提交构建系统(CMakeLists.txt)中不存在的源文件** — 所有 .h/.cpp 必须先在 CMakeLists.txt 注册才能提交。禁止"查无产生"死代码刷分
-5.6. **禁止提交build产物** — 严禁将编译中间文件(.o/.obj)、生成文件(moc_*/ui_*/qrc_*)、构建目录(build/)、二进制产物(.exe/.dll/.a/.so)等作为commit内容提交。仅允许提交源码(.h/.cpp/.qss/.qrc/.ui/.cmake/CMakeLists.txt等)和项目配置文件。build产物充数一律回退
-5.7. **构建目录永远只允许 `build/` 一个** — 禁止创建、引用、兼容 `build2/`、`build-debug/`、`build-release/` 等平行构建目录；`EmbedDebug.bat` 只能从 `build/EmbedDebug.exe` 启动
+5.5. **禁止恢复 C++/CMake 主线** — 不再新增 `.h/.cpp`、`CMakeLists.txt`、`cmake/` 或 C++ 测试入口。
+5.6. **禁止提交构建产物** — 严禁提交 `build/`、`dist/`、PyInstaller workpath、缓存、二进制产物或虚拟环境。
+5.7. **启动入口永远走 Python/PyQt** — `EmbedDebug.bat` 只能进入 `uv run start-embeddebug`，不得恢复 native exe fallback。
 5.8. **README 必须按企业级宣传入口维护** — README 是项目对外第一入口，后续涉及产品能力、UI、Serial Station、协议、构建或启动方式变化时，必须按 [02-workflow §4.1](docs/constraints/02-workflow.md#41-readme-企业级宣传标准) 检查是否同步更新，禁止只堆命令、空泛口号或无法由代码/测试/文档证明的宣传点
 5.9. **禁止把工程存在当作用户完成** — 功能状态必须同时标记工程状态、用户可用状态和设备验证状态；没有入口、没有用户路径或没有真实/替身验证的能力，不得写成“已完成”
 5.10. **每轮迭代完成必须提交** — 一个 PRD/Specs/批次子任务收口后必须 commit；不能把多轮迭代长期堆在工作区。若因构建失败、用户已有改动或环境缺失暂不能 commit，必须在收口说明中写清阻塞原因和下一可提交点
@@ -41,28 +41,28 @@
 ### 架构铁律
 6. **分层单向依赖**: 表现层→业务层→数据层→基础设施层，**禁止反向**
 7. **禁止在MainWindow中写业务逻辑** — 委托给Controller/Manager
-8. **MainWindow.cpp ≤ 500行** — 超过必须拆分
+8. **PyQt 主窗口模块 ≤ 300行** — 超过必须拆分
 9. **公共组件只写一次** — CRC/HexConverter/RingBuffer/SettingsManager等已验证组件不得重写
 10. **模块间依赖必须遵循 [03-architecture.md](docs/constraints/03-architecture.md) 的依赖方向规则** — 禁止反向依赖、禁止同层横向依赖、禁止跨层跳级
 10.5. **Serial Station必须遵循 [docs/serial_station_architecture.md](docs/serial_station_architecture.md)** — UI、core、protocols、services、workers 边界必须隔离；core 不依赖具体协议，协议不依赖 UI
-10.6. **并行开发必须先切边界** — 多 Agent 并行只允许在文件、接口、验收命令和合流顺序都写清后启动；共享入口、CMake、MainWindow、PanelManager、Theme/QSS token、公共接口、启动脚本默认单 Agent 串行
+10.6. **并行开发必须先切边界** — 多 Agent 并行只允许在文件、接口、验收命令和合流顺序都写清后启动；共享入口、`pyproject.toml`、`uv.lock`、启动脚本默认单 Agent 串行
 
 ### 编码铁律
-11. **C++17标准** — 头文件引用: Qt→STL→项目，使用相对src路径
-12. **Qt信号/槽用新式connect语法** — 禁止SIGNAL/SLOT宏
-13. **详细中文注释** — Doxygen格式，每个公开方法/成员变量必须有注释
-14. **禁止裸new不配对delete** — QObject父子树或智能指针
+11. **Python 3.10+ 标准** — import 顺序: 标准库→第三方→项目内部
+12. **PyQt 信号/槽集中装配** — UI 只发意图，controller 编排状态，不跨层随意连接
+13. **必要中文注释/docstring** — 公开类和复杂公开方法必须说明职责
+14. **QObject 生命周期明确** — QWidget/QObject 使用 parent 体系，后台任务不直接更新 UI
 
 ### UI铁律
-15. **禁止C++中硬编码颜色到setStyleSheet()** — 颜色从QSS主题获取
+15. **禁止在 PyQt 逻辑中散落硬编码颜色** — 颜色和状态样式集中管理
 16. **所有QWidget必须设置objectName** — QSS依赖
 17. **按钮必须有hover/pressed/disabled三种状态**
 18. **面板切换必须有过渡动画** — 禁止突然出现/消失
-19. **所有用户可见文字必须用tr()包裹**
+19. **所有用户可见文字必须走翻译入口或集中常量**
 
 ### 文件体积铁律
-20. **.cpp ≤ 500行** — 超过说明职责过多
-21. **.h ≤ 200行** — 超过说明成员/方法过多
+20. **.py ≤ 300行** — 超过说明职责过多
+21. **测试文件聚焦单一行为域** — 超过应拆分为 unit/integration/ui_smoke
 22. **单个方法 ≤ 80行** — 超过说明逻辑过于复杂
 
 ---
@@ -76,13 +76,13 @@
 
 | 轴 | 说明 | 允许状态 |
 |----|------|----------|
-| 工程状态 | 代码、CMake、测试、架构边界是否落地 | `E0未开始` / `E1设计中` / `E2骨架` / `E3已接入构建` / `E4自动化测试通过` / `E5可维护收口` |
+| 工程状态 | Python 代码、测试、启动、打包、架构边界是否落地 | `E0未开始` / `E1设计中` / `E2骨架` / `E3已接入主线` / `E4自动化测试通过` / `E5可维护收口` |
 | 用户可用状态 | 用户是否能从主界面或明确入口完成真实操作路径 | `U0不可见` / `U1可见不可用` / `U2局部可用` / `U3主流程可用` / `U4体验完整` |
 | 设备验证状态 | 是否经过替身、虚拟设备或真实硬件验证 | `D0未验证` / `D1纯单测` / `D2替身/模拟验证` / `D3虚拟设备验证` / `D4真实设备验证` |
 
 ### 完成定义
 
-- **工程完成**：至少达到 `E4`，且新增源码已进 CMake、相关测试可运行。
+- **工程完成**：至少达到 `E4`，且 Python 测试、启动 smoke 和必要打包验证可运行。
 - **用户完成**：至少达到 `U3`，用户能按 README 或界面入口完成核心路径。
 - **设备完成**：至少达到 `D3`；涉及 UART、RTT、CAN、BLE、USB、SPI/I2C 等外设时，未到 `D4` 必须明确写“真实设备未验证”。
 - **对外宣传完成**：必须同时满足 `E4 + U3 + D2`；如果文案暗示真实硬件可用，必须满足 `D4`。
@@ -91,7 +91,7 @@
 ### 禁止表述
 
 - 禁止只写“已实现”“完成”“骨架完成”而没有三轴状态。
-- 禁止把 stub、TODO、空方法、只加入 CMake、只写 UI 壳层描述为用户可用。
+- 禁止把 stub、TODO、空方法、只写 UI 壳层描述为用户可用。
 - 禁止把没有入口的模块描述为用户已可使用。
 - 禁止把没有硬件、虚拟设备或替身测试的外设能力描述为设备已验证。
 
@@ -108,11 +108,12 @@
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
 
-### 构建命令
-```bash
-cmake -G Ninja -B build -DCMAKE_PREFIX_PATH=E:/Tool/DevEnv/Qt/6.8.3/mingw_64
-cmake --build build
-E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
+### Python/PyQt 命令
+```powershell
+uv run start-embeddebug
+uv run test-embeddebug-py
+uv run package-embeddebug --version local --clean
+uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x64
 ```
 
 ### Commit Message格式
@@ -129,7 +130,7 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 
 ## 项目现状审计 (2026-06-03)
 
-> 以下基于对 src/ 源码结构、PRD_043~PRD_069、ROADMAP 文档、约束文档体系的全面审计。
+> 以下历史审计仅保留迁移背景；当前实现以 `python/embeddebug/`、`tests/python/` 和 PRD-135/136 为准。
 > 旧状态标记仅保留历史阅读，不再作为完成依据。后续必须使用“工程状态 / 用户状态 / 设备验证”三轴口径。
 > 更新: 2026-06-03 二次审计 — UI-01~UX-03已全部实现，审计表已更正
 
@@ -147,8 +148,8 @@ E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
 
 | 能力 | 工程状态 | 用户状态 | 设备验证 | 当前口径 |
 |------|----------|----------|----------|----------|
-| Serial Station UART 基础工站 | E4 自动化测试通过 | U2 局部可用 | D1 纯单测 | 已有 `src/apps/serial_station/`、CMake 和 QTest，但仍需主入口可达性、真实/虚拟串口收发验证和用户路径验收，不能再笼统写“UART 完成” |
-| Serial Station 协议选择/ASCII/Modbus/Custom MD | E4 自动化测试通过 | U2 局部可用 | D1 纯单测 | 协议构建和解析有测试，真实设备协议链路未验证前不得宣传为硬件调试完整闭环 |
+| Serial Station UART 基础工站 | E4 自动化测试通过 | U2 局部可用 | D1 纯单测 | 当前证据位于 `python/embeddebug/serial_station/` 与 `tests/python/`，仍需真实/虚拟串口收发验证和用户路径验收 |
+| Serial Station 协议选择/ASCII/Modbus/Custom MD | E4 自动化测试通过 | U2 局部可用 | D1 纯单测 | 协议构建和解析有 pytest 覆盖，真实设备协议链路未验证前不得宣传为硬件调试完整闭环 |
 | SEGGER RTT | E2/E3 骨架或构建接入 | U1 可见不可用 | D0 未验证 | J-Link SDK stub 或未真实 DLL 调用时，只能标为“待真实集成” |
 | BLE/CAN/MQTT/SPI/I2C/USB 扩展 | E2-E4 视模块而定 | U1-U2 视入口而定 | D0-D1 默认 | 有代码框架不等于用户完成，必须逐项补三轴状态和验收证据 |
 

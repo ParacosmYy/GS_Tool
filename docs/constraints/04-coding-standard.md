@@ -1,6 +1,6 @@
 # 04 - Python/PyQt 编码标准（约束版）
 
-> 适用范围：`python/embeddebug/` 下 Python/PyQt 运行时代码。`src/` 下 C++ 代码仅允许历史兼容维护。
+> 适用范围：`python/embeddebug/` 下 Python/PyQt 运行时代码。native 源码主线已移除。
 
 ---
 
@@ -73,7 +73,7 @@
 - 新增/修改核心逻辑必须至少一条 pytest、pytest-qt 或替身测试验证
 - 关键错误路径必须有回归测试（失败连接、格式错误、空输入、超限输入）
 - 跨层调用需最小接口替身验证
-- UI 逻辑分离可在 `QTest` 中用 fake 信号验证
+- UI 逻辑分离可在 pytest-qt 中用 fake 信号验证
 
 ### 6.1 测试可量化指标
 

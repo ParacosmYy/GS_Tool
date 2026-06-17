@@ -1,2 +1,0 @@
-#include "n16953/m16953.h"
-QVector<double> m16953::run(const QVector<double>&in) { m_s.c++; m_s.i+=in.size(); return in; }

@@ -16,7 +16,6 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 
-SOURCE_EXTENSIONS = {".cpp", ".h", ".hpp", ".ipp"}
 PYTHON_EXTENSIONS = {".py"}
 NUMBERED_UTIL_RE = re.compile(r"^([A-Za-z_]+)(\d+)$")
 

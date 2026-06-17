@@ -45,23 +45,21 @@
 
 | 层 | 目录 | 职责边界 |
 |----|------|----------|
-| L0 | `src/interfaces/` | 纯接口与契约 |
-| L1 | `src/shared/` | 跨模块常量、枚举、轻量值对象 |
-| L2 | `src/utils/` | 通用工具（CRC、编码、日志、通道） |
-| L3 | `src/connection/`、`src/protocol/`、`src/serial/` | 连接与协议处理 |
-| L4 | `src/terminal/`、`src/chart/`、`src/rtt/` | 呈现与数据消费 |
-| L5 | `src/ota/`、`src/automation/`、`src/dashboard/`、`src/plugin/` | 场景编排 |
-| L5-A | `src/apps/serial_station/` | 串口工站独立 app（内部再分层） |
-| L6 | `src/core/` | 应用协调、导航、会话、主题、入口 |
-| PY-A | `python/embeddebug/` | Python/PyQt 默认主线；不反向依赖 C++ UI |
+| L0 | `python/embeddebug/serial_station/protocols/` | 协议抽象、帧构建、流式解析 |
+| L1 | `python/embeddebug/serial_station/core/` | 会话、dispatcher、transport coordination |
+| L2 | `python/embeddebug/serial_station/services/` | 日志、导出、回放、档案 |
+| L3 | `python/embeddebug/serial_station/controllers/` | UI 意图编排、状态映射 |
+| L4 | `python/embeddebug/serial_station/ui/` | PyQt 展示与用户意图收集 |
+| L5 | `python/embeddebug/app/` | 应用入口、QApplication、smoke |
+| T | `tests/python/` | 单测、集成测试、UI smoke |
 
 ### 2.2 依赖矩阵（简化）
 
 - L6 可依赖全部下层；下层不得依赖 L6。
 - 同层禁止直接 include，必须通过接口或事件。
-- `serial_station` 内部固定：`ui -> controller -> core/protocols/services`，`workers -> core -> signal -> controller`。
-- `python/embeddebug/` 是 PRD-136 后的默认主线：Python 可以通过 golden fixtures、配置文件或明确兼容格式对齐 C++ 行为，不得 import、生成或修改 C++ 运行时对象作为正常业务路径。
-- C++ `src/` 不得依赖 `python/`；C++/CMake 打包链路不再驱动默认启动、fallback 或验收入口。
+- `serial_station` 内部固定：`ui -> controllers -> core/protocols/services`，`workers -> controllers`。
+- `python/embeddebug/` 是默认主线；不得 import、生成或修改 C++ 运行时对象作为正常业务路径。
+- C++ `src/` 与 CMake 工程已移除；不得恢复 native exe fallback。
 
 ---
 
@@ -80,7 +78,7 @@
 
 ## 四、关键接口契约（示例约束）
 
-> 新增/修改跨模块接口前必须放入 `src/interfaces/` 或模块内 `interface/`，并写最小测试。
+> 新增/修改跨模块接口前必须放入 Python 模块内清晰的协议/抽象文件，并写最小测试。
 
 - `IConnection`：连接抽象（open/close/send/state/error）
 - `IPanelProvider`：面板注册与创建
@@ -98,7 +96,7 @@
 
 ## 五、Serial Station 强制边界（再次强调）
 
-以 `python/embeddebug/serial_station/` 为当前唯一新落地路径，禁止新功能回流旧 `src/serial/` 或 C++ 串口目录。
+以 `python/embeddebug/serial_station/` 为当前唯一新落地路径，禁止新功能恢复旧 `src/serial/` 或 C++ 串口目录。
 
 内部边界：
 
