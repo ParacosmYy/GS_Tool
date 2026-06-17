@@ -115,6 +115,16 @@ def test_python_runtime_files_stay_within_maintainability_line_budget():
     assert not offenders, "oversized Python runtime files: " + "; ".join(offenders)
 
 
+def test_serial_station_ui_sections_use_explicit_owner_contract():
+    sections = Path("python/embeddebug/serial_station/ui/sections.py").read_text(
+        encoding="utf-8",
+    )
+
+    assert "class SerialStationSectionsHost(Protocol):" in sections
+    assert "from typing import Any" not in sections
+    assert "owner: Any" not in sections
+
+
 def test_active_governance_docs_do_not_reference_legacy_native_workflow():
     docs = [
         Path("AGENTS.md"),

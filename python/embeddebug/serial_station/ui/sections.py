@@ -2,26 +2,38 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Protocol
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QKeySequence, QShortcut
-from PyQt6.QtWidgets import (
-    QComboBox,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QPlainTextEdit,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt6.QtWidgets import QComboBox, QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit, QPushButton, QVBoxLayout, QWidget
 
 from embeddebug.serial_station.controllers import SerialWorkbenchController
 from embeddebug.serial_station.ui.waveform_preview import SerialWaveformPreview
 
 
-def build_main_layout(owner: Any, controller: SerialWorkbenchController) -> QWidget:
+class SerialStationSectionsHost(Protocol):
+    def tr(self, source_text: str) -> str: ...
+    def _set_protocol(self, name: str) -> None: ...
+    def _refresh_port_combo(self) -> None: ...
+    def _refresh_serial_ports(self) -> None: ...
+    def _has_serial_ports(self) -> bool: ...
+    def _connect_fake(self) -> None: ...
+    def _connect_serial(self) -> None: ...
+    def _disconnect(self) -> None: ...
+    def _send_text(self) -> None: ...
+    def _select_command_history(self, text: str) -> None: ...
+    def _inject_received(self) -> None: ...
+    def _render_log_entries(self) -> None: ...
+    def _update_log_stats(self) -> None: ...
+    def _export_log(self) -> None: ...
+    def _replay_log(self) -> None: ...
+    def _save_profile(self) -> None: ...
+    def _load_profile(self) -> None: ...
+    def _clear_log(self) -> None: ...
+
+
+def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbenchController) -> QWidget:
     root = QWidget(owner)
     root.setObjectName("serialStationPyRoot")
 
@@ -158,7 +170,7 @@ def build_main_layout(owner: Any, controller: SerialWorkbenchController) -> QWid
     return root
 
 
-def build_send_row(owner: Any, root: QWidget) -> QHBoxLayout:
+def build_send_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:
     row = QHBoxLayout()
     row.setSpacing(8)
     owner._send_edit = QLineEdit(root)
@@ -181,7 +193,7 @@ def build_send_row(owner: Any, root: QWidget) -> QHBoxLayout:
     return row
 
 
-def build_inject_row(owner: Any, root: QWidget) -> QHBoxLayout:
+def build_inject_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:
     row = QHBoxLayout()
     row.setSpacing(8)
     owner._inject_edit = QLineEdit(root)
@@ -197,7 +209,7 @@ def build_inject_row(owner: Any, root: QWidget) -> QHBoxLayout:
     return row
 
 
-def build_log_row(owner: Any, root: QWidget) -> QHBoxLayout:
+def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:
     row = QHBoxLayout()
     row.setSpacing(8)
     owner._log_filter_combo = QComboBox(root)
@@ -231,7 +243,7 @@ def build_log_row(owner: Any, root: QWidget) -> QHBoxLayout:
     return row
 
 
-def build_profile_row(owner: Any, root: QWidget) -> QHBoxLayout:
+def build_profile_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:
     row = QHBoxLayout()
     row.setSpacing(8)
     owner._profile_path_edit = QLineEdit(root)
@@ -255,7 +267,7 @@ def build_profile_row(owner: Any, root: QWidget) -> QHBoxLayout:
     return row
 
 
-def build_footer(owner: Any, root: QWidget) -> QHBoxLayout:
+def build_footer(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:
     row = QHBoxLayout()
     row.addStretch(1)
     owner._clear_button = QPushButton(owner.tr("Clear"), root)
@@ -266,7 +278,7 @@ def build_footer(owner: Any, root: QWidget) -> QHBoxLayout:
     return row
 
 
-def install_shortcuts(owner: Any) -> None:
+def install_shortcuts(owner: SerialStationSectionsHost) -> None:
     send_shortcut = QShortcut(QKeySequence("Ctrl+Return"), owner)
     send_shortcut.setObjectName("serialStationSendShortcut")
     send_shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
