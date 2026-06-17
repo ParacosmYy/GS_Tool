@@ -6,6 +6,7 @@ from typing import Protocol
 
 from PyQt6.QtWidgets import QComboBox
 
+from embeddebug.serial_station.ui.profile_name_text import apply_profile_name_text
 from embeddebug.serial_station.ui.status_messages import (
     set_profile_label,
     set_result_status,
@@ -90,7 +91,7 @@ def load_profile(host: SessionActionHost) -> None:
         return
     profile = result.value
     name = str(profile.get("name", "unnamed"))
-    host._profile_name_edit.setText(name)
+    apply_profile_name_text(host._profile_name_edit, name)
     apply_profile_controls(host, profile)
     host._refresh_command_history()
     set_profile_label(host, name)
