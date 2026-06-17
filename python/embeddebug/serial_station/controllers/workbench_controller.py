@@ -97,6 +97,9 @@ class SerialWorkbenchController:
     def available_serial_ports(self) -> tuple[str, ...]:
         return self._transport_registry.available_ports("serial")
 
+    def available_transport_modes(self) -> tuple[str, ...]:
+        return self._transport_registry.modes
+
     def set_protocol(self, name: str) -> None:
         self._dispatcher.set_protocol(self._registry.create(name))
         self._measurement_ring = None
@@ -129,6 +132,14 @@ class SerialWorkbenchController:
                 stop_bits=stop_bits,
                 flow_control=flow_control,
             )
+        )
+
+    def connect_tcp(self, host: str, port: int) -> bool:
+        transport = self._transport_registry.create("tcp")
+        self._replace_transport(transport)
+        self._transport_mode = "tcp"
+        return self._transport.open(
+            SerialPortConfig(port_name=f"{host}:{port}", baud_rate=0)
         )
 
     def disconnect(self) -> None:

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from embeddebug.serial_station.drivers.base import SerialTransport
 from embeddebug.serial_station.drivers.fake import FakeSerialTransport
 from embeddebug.serial_station.drivers.qt_serial import QtSerialPortTransport
+from embeddebug.serial_station.drivers.tcp_client import TcpClientTransport
 
 
 TransportFactory = Callable[[], SerialTransport]
@@ -44,6 +45,11 @@ class TransportRegistry:
             "serial",
             factory=serial_factory or QtSerialPortTransport,
             port_provider=serial_port_provider or QtSerialPortTransport.available_ports,
+        )
+        registry.register(
+            "tcp",
+            factory=TcpClientTransport,
+            port_provider=TcpClientTransport.available_ports,
         )
         return registry
 
