@@ -7,10 +7,22 @@ from pathlib import Path
 from typing import Iterable
 
 from embeddebug.serial_station.protocols import ProtocolEvent
+from embeddebug.shared import OperationResult
 
 
 class SerialMeasurementExportService:
     """Export measurement events to CSV."""
+
+    def export_csv_result(
+        self,
+        path: str | Path,
+        events: Iterable[ProtocolEvent],
+    ) -> OperationResult[Path]:
+        try:
+            self.export_csv(path, events)
+        except OSError as exc:
+            return OperationResult.failure("measurement_export_failed", str(exc))
+        return OperationResult.success(Path(path))
 
     def export_csv(self, path: str | Path, events: Iterable[ProtocolEvent]) -> None:
         measurements = [event for event in events if event.type == "measurement"]

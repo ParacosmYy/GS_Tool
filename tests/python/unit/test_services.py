@@ -75,6 +75,18 @@ def test_measurement_export_service_writes_ordered_csv(tmp_path):
     ]
 
 
+def test_measurement_export_service_result_reports_write_failure(tmp_path):
+    blocked_parent = tmp_path / "blocked"
+    blocked_parent.write_text("not a directory", encoding="utf-8")
+    service = SerialMeasurementExportService()
+
+    result = service.export_csv_result(blocked_parent / "measurements.csv", [])
+
+    assert result.failed
+    assert result.error_code == "measurement_export_failed"
+    assert "blocked" in result.message
+
+
 def test_profile_service_round_trips_json_profile(tmp_path):
     profile_path = tmp_path / "profile.json"
     service = SerialProfileService()
@@ -88,3 +100,29 @@ def test_profile_service_round_trips_json_profile(tmp_path):
 
     assert service.load(profile_path) == profile
     assert json.loads(profile_path.read_text(encoding="utf-8"))["protocol"] == "just_float"
+
+
+def test_profile_service_result_reports_save_and_load_failures(tmp_path):
+    blocked_parent = tmp_path / "blocked"
+    blocked_parent.write_text("not a directory", encoding="utf-8")
+    service = SerialProfileService()
+
+    save_result = service.save_result(blocked_parent / "profile.json", {"name": "bad"})
+    load_result = service.load_result(tmp_path / "missing.json")
+
+    assert save_result.failed
+    assert save_result.error_code == "profile_save_failed"
+    assert "blocked" in save_result.message
+    assert load_result.failed
+    assert load_result.error_code == "profile_load_failed"
+    assert "missing.json" in load_result.message
+
+
+def test_replay_service_result_reports_load_failure(tmp_path):
+    service = SerialReplayService()
+
+    result = service.load_events_result(tmp_path / "missing.jsonl")
+
+    assert result.failed
+    assert result.error_code == "replay_load_failed"
+    assert "missing.jsonl" in result.message

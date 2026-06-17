@@ -7,10 +7,17 @@ from pathlib import Path
 
 from embeddebug.serial_station.protocols import ProtocolEvent
 from embeddebug.serial_station.services.event_codec import event_from_record
+from embeddebug.shared import OperationResult
 
 
 class SerialReplayService:
     """Load protocol events from a JSON Lines log."""
+
+    def load_events_result(self, path: str | Path) -> OperationResult[list[ProtocolEvent]]:
+        try:
+            return OperationResult.success(self.load_events(path))
+        except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
+            return OperationResult.failure("replay_load_failed", str(exc))
 
     def load_events(self, path: str | Path) -> list[ProtocolEvent]:
         events: list[ProtocolEvent] = []

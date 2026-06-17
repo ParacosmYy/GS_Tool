@@ -15,7 +15,7 @@
 | 工程状态 | `E4`，Python 测试与启动 smoke 可复现 | `uv run test-embeddebug-py` |
 | 用户状态 | `U3`，Serial Station 主流程已有可见入口 | `uv run start-embeddebug` |
 | 设备状态 | `D2`，TCP 已有 loopback 替身验证，真实硬件仍需补证 | `tests/python/unit/test_tcp_client_transport.py` |
-| 评分进度 | `550 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
+| 评分进度 | `551 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
 
 ## 产品能力
 
