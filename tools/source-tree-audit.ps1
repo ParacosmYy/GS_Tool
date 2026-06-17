@@ -42,14 +42,6 @@ function Assert-ReportPath {
     return $target
 }
 
-function Get-TopModule {
-    param([string]$RepoPath)
-    if ($RepoPath -match "^src/([^/]+)/") {
-        return $Matches[1]
-    }
-    return "(root)"
-}
-
 function Add-Section {
     param(
         [System.Collections.Generic.List[string]]$Lines,
@@ -60,58 +52,21 @@ function Add-Section {
     $Lines.Add("")
 }
 
-function Remove-CMakeLineComments {
-    param([string]$Text)
-
-    $cleanLines = foreach ($line in ($Text -split "`r?`n")) {
-        $quoteCount = 0
-        $cutIndex = -1
-
-        for ($i = 0; $i -lt $line.Length; $i++) {
-            $ch = $line[$i]
-            if ($ch -eq '"') {
-                $quoteCount++
-            } elseif ($ch -eq '#' -and (($quoteCount % 2) -eq 0)) {
-                $cutIndex = $i
-                break
-            }
-        }
-
-        if ($cutIndex -ge 0) {
-            $line.Substring(0, $cutIndex)
-        } else {
-            $line
-        }
+function Get-TopPythonModule {
+    param([string]$RepoPath)
+    if ($RepoPath -match "^python/embeddebug/([^/]+)/") {
+        return $Matches[1]
     }
-
-    return ($cleanLines -join [Environment]::NewLine)
-}
-
-function Get-CMakeSourceRefs {
-    param([string]$Text)
-
-    $absoluteStyleRefs = @(
-        [regex]::Matches($Text, "(?:src|tests)/[A-Za-z0-9_./+-]+\.(?:cpp|cxx|cc|c|h|hpp|hh|ui|qrc)") |
-            ForEach-Object { Convert-ToRepoPath $_.Value } |
-            Sort-Object -Unique
-    )
-    $testRelativeRefs = @(
-        [regex]::Matches($Text, "(?<!apps/)serial_station/[A-Za-z0-9_./+-]+\.(?:cpp|cxx|cc|c|h|hpp|hh|ui|qrc)") |
-            ForEach-Object { Convert-ToRepoPath ("tests/" + $_.Value) } |
-            Sort-Object -Unique
-    )
-
-    return @($absoluteStyleRefs + $testRelativeRefs | Sort-Object -Unique)
-}
-
-function Remove-FilteredUtilsRefs {
-    param([string[]]$Refs)
-
-    return @(
-        $Refs |
-            Where-Object { $_ -notmatch "^src/utils/([^/]*[0-9]+|pid|simulator)/" } |
-            Sort-Object -Unique
-    )
+    if ($RepoPath -match "^tests/python/([^/]+)/") {
+        return "tests/$($Matches[1])"
+    }
+    if ($RepoPath -match "^tools/([^/]+)/") {
+        return "tools/$($Matches[1])"
+    }
+    if ($RepoPath -like "tools/*.py") {
+        return "tools"
+    }
+    return "(root)"
 }
 
 $repoRoot = Get-RepoRoot
@@ -119,8 +74,6 @@ Set-Location $repoRoot
 
 $resolvedOutFile = Assert-ReportPath -RepoRoot $repoRoot -Path $OutFile
 
-$sourceExtensions = @(".cpp", ".cxx", ".cc", ".c", ".h", ".hpp", ".hh", ".ui", ".qrc")
-$includeScanExtensions = @(".cpp", ".cxx", ".cc", ".c", ".h", ".hpp", ".hh")
 $trackedFiles = @(git ls-files)
 $untrackedFiles = @(git ls-files --others --exclude-standard)
 $repoFiles = @(
@@ -128,258 +81,47 @@ $repoFiles = @(
         Sort-Object -Unique |
         Where-Object { Test-Path -LiteralPath (Join-Path $repoRoot $_) }
 )
-$srcFiles = @(
+$pythonFiles = @(
     $repoFiles |
         ForEach-Object { Convert-ToRepoPath $_ } |
         Where-Object {
-            $_ -like "src/*" -and $sourceExtensions -contains ([System.IO.Path]::GetExtension($_).ToLowerInvariant())
+            ($_ -like "python/embeddebug/*.py" -or
+             $_ -like "python/embeddebug/*/*.py" -or
+             $_ -like "python/embeddebug/*/*/*.py" -or
+             $_ -like "tests/python/*.py" -or
+             $_ -like "tests/python/*/*.py" -or
+             $_ -like "tests/python/*/*/*.py" -or
+             $_ -like "tools/*.py" -or
+             $_ -like "tools/*/*.py")
         }
 )
 
-$srcByModule = $srcFiles |
-    Group-Object { Get-TopModule $_ } |
+$moduleGroups = $pythonFiles |
+    Group-Object { Get-TopPythonModule $_ } |
     Sort-Object Count -Descending
 
-$cmakeFiles = @(
-    $repoFiles |
-        ForEach-Object { Convert-ToRepoPath $_ } |
-        Where-Object {
-            ($_ -match "(^|/)CMakeLists\.txt$" -or $_ -match "^cmake/.+\.cmake$") -and
-            $_ -notlike "build/*"
-        }
-)
-$cmakeText = ($cmakeFiles | ForEach-Object { Get-Content -Raw -Path (Join-Path $repoRoot $_) }) -join [Environment]::NewLine
-$declaredCmakeText = Remove-CMakeLineComments $cmakeText
-$rawCmakeRefs = @(Get-CMakeSourceRefs $cmakeText)
-$declaredCmakeRefs = @(Get-CMakeSourceRefs $declaredCmakeText)
-$activeCmakeRefs = @(Remove-FilteredUtilsRefs $declaredCmakeRefs)
-$filteredUtilsRefs = @(
-    $declaredCmakeRefs |
-        Where-Object { $_ -match "^src/utils/([^/]*[0-9]+|pid|simulator)/" } |
-        Sort-Object -Unique
+$entrypoints = @(
+    "EmbedDebug.bat",
+    "tools/launch_embeddebug.ps1",
+    "tools/start_embeddebug.py",
+    "python/embeddebug/app/main.py",
+    "python/embeddebug/devtools/package_pyinstaller.py",
+    "python/embeddebug/devtools/verify_pyinstaller_package.py"
 )
 
-$cmakeByModule = $activeCmakeRefs |
-    Group-Object { Get-TopModule $_ } |
-    Sort-Object Count -Descending
-
-$cmakeSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
-foreach ($ref in $activeCmakeRefs) {
-    [void]$cmakeSet.Add($ref)
-}
-
-$notDirectlyInCMake = @($srcFiles | Where-Object { -not $cmakeSet.Contains($_) })
-
-$frozenPatterns = @(
-    "src/core/animation2/",
-    "src/core/widgets2/",
-    "src/plugin/loader2/",
-    "src/core/fonts/",
-    "src/core/icons/",
-    "src/core/responsive/",
-    "src/core/font/",
-    "src/core/icon/",
-    "src/core/shortcut/",
-    "src/core/managers/",
-    "src/chart/heatmap2/",
-    "src/serial/profiler2/"
-)
-
-$frozenHits = foreach ($pattern in $frozenPatterns) {
-    $files = @($srcFiles | Where-Object { $_.StartsWith($pattern, [System.StringComparison]::OrdinalIgnoreCase) })
-    [pscustomobject]@{
-        Path = $pattern.TrimEnd("/")
-        Count = $files.Count
-        CMakeRefs = @($activeCmakeRefs | Where-Object { $_.StartsWith($pattern, [System.StringComparison]::OrdinalIgnoreCase) }).Count
-    }
-}
-
-$utilsFileCounts = @{}
-foreach ($path in $srcFiles) {
-    if ($path -match "^src/utils/([^/]+)/") {
-        $dir = $Matches[1]
-        if (-not $utilsFileCounts.ContainsKey($dir)) {
-            $utilsFileCounts[$dir] = 0
-        }
-        $utilsFileCounts[$dir]++
-    }
-}
-
-$utilsCMakeCounts = @{}
-foreach ($path in $activeCmakeRefs) {
-    if ($path -match "^src/utils/([^/]+)/") {
-        $dir = $Matches[1]
-        if (-not $utilsCMakeCounts.ContainsKey($dir)) {
-            $utilsCMakeCounts[$dir] = 0
-        }
-        $utilsCMakeCounts[$dir]++
-    }
-}
-
-$utilsDirs = @($utilsFileCounts.Keys | Sort-Object)
-
-$generatedUtilsDirs = @(
-    $utilsDirs |
-        Where-Object {
-            $_ -match "\d{2,}$" -or
-            $_ -match "^(c|poly|graph|tree|signal|matrix|vector|sort|search|hash|compress|crypto|math)\d+$"
-        }
-)
-
-$generatedUtilsStats = foreach ($dir in $generatedUtilsDirs) {
-    [pscustomobject]@{
-        Path = "src/utils/$dir"
-        Count = $utilsFileCounts[$dir]
-        CMakeRefs = if ($utilsCMakeCounts.ContainsKey($dir)) { $utilsCMakeCounts[$dir] } else { 0 }
-    }
-}
-
-$activeUtilsStats = foreach ($dir in ($utilsCMakeCounts.Keys | Sort-Object)) {
-    [pscustomobject]@{
-        Path = "src/utils/$dir"
-        Files = if ($utilsFileCounts.ContainsKey($dir)) { $utilsFileCounts[$dir] } else { 0 }
-        ActiveCMakeRefs = $utilsCMakeCounts[$dir]
-    }
-}
-
-$canonicalUtilsDirs = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
-foreach ($dir in @(
-    "checksum",
-    "converter",
-    "crypto",
-    "data",
-    "export",
-    "log",
-    "packet",
-    "perf",
-    "pipeline",
-    "settings",
-    "timestamp"
-)) {
-    [void]$canonicalUtilsDirs.Add($dir)
-}
-
-$includeScanFiles = @(
-    $activeCmakeRefs |
-        Where-Object {
-            ($_ -like "src/*" -or $_ -like "tests/*") -and
-            $includeScanExtensions -contains ([System.IO.Path]::GetExtension($_).ToLowerInvariant()) -and
-            (Test-Path -LiteralPath (Join-Path $repoRoot $_) -PathType Leaf)
-        } |
-        Sort-Object -Unique
-)
-
-$utilsExternalIncludeRefs = @{}
-$utilsExternalIncludeModules = @{}
-foreach ($dir in $utilsCMakeCounts.Keys) {
-    $utilsExternalIncludeRefs[$dir] = 0
-    $utilsExternalIncludeModules[$dir] = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
-}
-
-$includePattern = '^\s*#\s*include\s*[<"]([^>"]+)[>"]'
-foreach ($file in $includeScanFiles) {
-    $filePath = Join-Path $repoRoot $file
-    foreach ($match in (Select-String -LiteralPath $filePath -Pattern $includePattern -AllMatches)) {
-        foreach ($includeMatch in $match.Matches) {
-            $includePath = Convert-ToRepoPath $includeMatch.Groups[1].Value
-            if ($includePath -match "^utils/([^/]+)/") {
-                $targetDir = $Matches[1]
-                if (-not $utilsCMakeCounts.ContainsKey($targetDir)) {
-                    continue
-                }
-
-                $targetPrefix = "src/utils/$targetDir/"
-                if ($file.StartsWith($targetPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
-                    continue
-                }
-
-                $utilsExternalIncludeRefs[$targetDir]++
-                [void]$utilsExternalIncludeModules[$targetDir].Add((Get-TopModule $file))
-            }
-        }
-    }
-}
-
-$activeUtilsDependencyStats = foreach ($row in $activeUtilsStats) {
-    $dir = $row.Path -replace "^src/utils/", ""
-    [pscustomobject]@{
-        Path = $row.Path
-        Files = $row.Files
-        ActiveCMakeRefs = $row.ActiveCMakeRefs
-        ExternalIncludeRefs = $utilsExternalIncludeRefs[$dir]
-        ExternalModules = $utilsExternalIncludeModules[$dir].Count
-        Canonical = $canonicalUtilsDirs.Contains($dir)
-    }
-}
-
-$lowRiskActiveUtilsCandidates = @(
-    $activeUtilsDependencyStats |
-        Where-Object {
-            $_.ActiveCMakeRefs -gt 0 -and
-            $_.ExternalIncludeRefs -eq 0 -and
-            -not $_.Canonical
-        } |
-        Sort-Object -Property @{Expression = "ActiveCMakeRefs"; Descending = $true}, Path
-)
-
-$oldUartEvidence = @(
-    "src/serial/config/SerialConfigPanel.h",
-    "src/serial/config/SerialConfigPanelUI.cpp",
-    "src/serial/config/SerialConfigPanelConfig.cpp",
-    "src/connection/serial_port/SerialConnection.h",
-    "src/connection/serial_port/SerialConnectionStats.cpp",
-    "src/core/connect/ConnectionControllerLifecycle.cpp",
-    "src/core/panels/PanelManagerQuery.cpp"
-)
-
-$oldUartRows = foreach ($path in $oldUartEvidence) {
+$entryRows = foreach ($path in $entrypoints) {
     [pscustomobject]@{
         Path = $path
         Exists = Test-Path (Join-Path $repoRoot $path)
-        InCMake = $cmakeSet.Contains($path)
     }
 }
 
-$serialStationExpected = @(
-    "src/apps/serial_station/SerialStationApp.h",
-    "src/apps/serial_station/SerialStationApp.cpp",
-    "src/apps/serial_station/SerialStationWindow.h",
-    "src/apps/serial_station/SerialStationWindow.cpp",
-    "src/apps/serial_station/SerialStationController.h",
-    "src/apps/serial_station/SerialStationController.cpp",
-    "src/apps/serial_station/SerialStationConfig.h",
-    "src/apps/serial_station/SerialStationConfig.cpp",
-    "src/apps/serial_station/ui/SerialPortPanel.h",
-    "src/apps/serial_station/ui/SerialPortPanel.cpp",
-    "src/apps/serial_station/core/SerialPort.h",
-    "src/apps/serial_station/core/SerialPort.cpp",
-    "src/apps/serial_station/core/SerialManager.h",
-    "src/apps/serial_station/core/SerialManager.cpp",
-    "src/apps/serial_station/core/SerialSession.h",
-    "src/apps/serial_station/core/SerialSession.cpp",
-    "src/apps/serial_station/protocols/ISerialProtocol.h",
-    "src/apps/serial_station/protocols/SerialProtocolRegistry.h",
-    "src/apps/serial_station/protocols/SerialProtocolRegistry.cpp",
-    "src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.h",
-    "src/apps/serial_station/protocols/ascii_text/AsciiTextProtocol.cpp",
-    "tests/serial_station/test_serial_manager.cpp",
-    "tests/serial_station/test_serial_protocol_registry.cpp",
-    "tests/serial_station/test_ascii_text_protocol.cpp"
-)
-
-$serialStationRows = foreach ($path in $serialStationExpected) {
-    [pscustomobject]@{
-        Path = $path
-        Exists = Test-Path (Join-Path $repoRoot $path)
-        InCMake = $cmakeSet.Contains($path)
-    }
-}
-
-$existingSerialStationFiles = @($repoFiles | ForEach-Object { Convert-ToRepoPath $_ } | Where-Object { $_ -like "src/apps/serial_station/*" })
-$serialStationCMakeRefs = @($activeCmakeRefs | Where-Object { $_ -like "src/apps/serial_station/*" })
+$serialStationFiles = @($pythonFiles | Where-Object { $_ -like "python/embeddebug/serial_station/*" })
+$pythonTests = @($pythonFiles | Where-Object { $_ -like "tests/python/*" })
+$toolFiles = @($pythonFiles | Where-Object { $_ -like "tools/*" })
 
 $lines = [System.Collections.Generic.List[string]]::new()
-$lines.Add("# Source Tree Audit")
+$lines.Add("# Python Source Tree Audit")
 $lines.Add("")
 $lines.Add("- Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')")
 $lines.Add("- Repo: $repoRoot")
@@ -388,112 +130,39 @@ $lines.Add("- Mode: read-only audit")
 Add-Section $lines "Summary"
 $lines.Add("| Metric | Value |")
 $lines.Add("|--------|-------|")
-$lines.Add("| Working tree source files under src | $($srcFiles.Count) |")
-$lines.Add("| Raw CMake source references | $($rawCmakeRefs.Count) |")
-$lines.Add("| Declared CMake source references | $($declaredCmakeRefs.Count) |")
-$lines.Add("| Active CMake source references | $($activeCmakeRefs.Count) |")
-$lines.Add("| Filtered utils references | $($filteredUtilsRefs.Count) |")
-$lines.Add("| Source files not active in CMake | $($notDirectlyInCMake.Count) |")
-$lines.Add("| Existing src/apps/serial_station files | $($existingSerialStationFiles.Count) |")
-$lines.Add("| CMake refs under src/apps/serial_station | $($serialStationCMakeRefs.Count) |")
-$lines.Add("| Generated-looking utils directories | $($generatedUtilsDirs.Count) |")
+$lines.Add("| Python runtime/test/tool files | $($pythonFiles.Count) |")
+$lines.Add("| Serial Station Python files | $($serialStationFiles.Count) |")
+$lines.Add("| Python test files | $($pythonTests.Count) |")
+$lines.Add("| Python tool files | $($toolFiles.Count) |")
 
-Add-Section $lines "Source Files By Module"
+Add-Section $lines "Python Files By Module"
 $lines.Add("| Module | Files |")
 $lines.Add("|--------|-------|")
-foreach ($group in $srcByModule) {
+foreach ($group in $moduleGroups) {
     $lines.Add("| $($group.Name) | $($group.Count) |")
 }
 
-Add-Section $lines "Active CMake References By Module"
-$lines.Add("| Module | References |")
-$lines.Add("|--------|------------|")
-foreach ($group in $cmakeByModule) {
-    $lines.Add("| $($group.Name) | $($group.Count) |")
+Add-Section $lines "Active Entrypoints"
+$lines.Add("| Path | Exists |")
+$lines.Add("|------|--------|")
+foreach ($row in $entryRows) {
+    $lines.Add("| $($row.Path) | $($row.Exists) |")
 }
 
-Add-Section $lines "Frozen Or Duplicate Directory Hits"
-$lines.Add("| Path | Files | CMake refs |")
-$lines.Add("|------|-------|------------|")
-foreach ($row in ($frozenHits | Sort-Object Count -Descending)) {
-    $lines.Add("| $($row.Path) | $($row.Count) | $($row.CMakeRefs) |")
-}
-
-Add-Section $lines "Generated-Looking Utils Directories"
-$lines.Add("| Path | Files | CMake refs |")
-$lines.Add("|------|-------|------------|")
-foreach ($row in ($generatedUtilsStats | Sort-Object Count -Descending | Select-Object -First 80)) {
-    $lines.Add("| $($row.Path) | $($row.Count) | $($row.CMakeRefs) |")
-}
-if ($generatedUtilsStats.Count -gt 80) {
-    $lines.Add("")
-    $lines.Add("Only the first 80 generated-looking utils directories are listed.")
-}
-
-Add-Section $lines "Active Utils Directories By CMake References"
-$lines.Add("| Path | Files | Active CMake refs |")
-$lines.Add("|------|-------|-------------------|")
-foreach ($row in ($activeUtilsStats | Sort-Object -Property @{Expression = "ActiveCMakeRefs"; Descending = $true}, Path | Select-Object -First 120)) {
-    $lines.Add("| $($row.Path) | $($row.Files) | $($row.ActiveCMakeRefs) |")
-}
-if ($activeUtilsStats.Count -gt 120) {
-    $lines.Add("")
-    $lines.Add("Only the first 120 active utils directories are listed.")
-}
-
-Add-Section $lines "Active Utils External Include Evidence"
-$lines.Add("| Path | Files | Active CMake refs | External include refs | External modules | Canonical |")
-$lines.Add("|------|-------|-------------------|-----------------------|------------------|-----------|")
-foreach ($row in ($activeUtilsDependencyStats | Sort-Object -Property @{Expression = "ExternalIncludeRefs"; Descending = $true}, @{Expression = "ActiveCMakeRefs"; Descending = $true}, Path | Select-Object -First 120)) {
-    $lines.Add("| $($row.Path) | $($row.Files) | $($row.ActiveCMakeRefs) | $($row.ExternalIncludeRefs) | $($row.ExternalModules) | $($row.Canonical) |")
-}
-if ($activeUtilsDependencyStats.Count -gt 120) {
-    $lines.Add("")
-    $lines.Add("Only the first 120 active utils dependency rows are listed.")
-}
-
-Add-Section $lines "Low-Risk Active Utils Split Candidates"
-$lines.Add("| Path | Files | Active CMake refs | External include refs | External modules |")
-$lines.Add("|------|-------|-------------------|-----------------------|------------------|")
-foreach ($row in ($lowRiskActiveUtilsCandidates | Select-Object -First 80)) {
-    $lines.Add("| $($row.Path) | $($row.Files) | $($row.ActiveCMakeRefs) | $($row.ExternalIncludeRefs) | $($row.ExternalModules) |")
-}
-if ($lowRiskActiveUtilsCandidates.Count -eq 0) {
-    $lines.Add("| (none) | 0 | 0 | 0 | 0 |")
-} elseif ($lowRiskActiveUtilsCandidates.Count -gt 80) {
-    $lines.Add("")
-    $lines.Add("Only the first 80 low-risk active utils candidates are listed.")
-}
-
-Add-Section $lines "Old UART Configuration Evidence"
-$lines.Add("| Path | Exists | In CMake |")
-$lines.Add("|------|--------|----------|")
-foreach ($row in $oldUartRows) {
-    $lines.Add("| $($row.Path) | $($row.Exists) | $($row.InCMake) |")
-}
-
-Add-Section $lines "Serial Station Minimal UART Gap"
-$lines.Add("| Path | Exists | In CMake |")
-$lines.Add("|------|--------|----------|")
-foreach ($row in $serialStationRows) {
-    $lines.Add("| $($row.Path) | $($row.Exists) | $($row.InCMake) |")
-}
-
-Add-Section $lines "Existing Serial Station Files"
-if ($existingSerialStationFiles.Count -eq 0) {
-    $lines.Add('No tracked files found under `src/apps/serial_station/`.')
+Add-Section $lines "Serial Station Python Files"
+if ($serialStationFiles.Count -eq 0) {
+    $lines.Add("No Python Serial Station files found.")
 } else {
-    foreach ($path in $existingSerialStationFiles | Sort-Object) {
+    foreach ($path in $serialStationFiles | Sort-Object) {
         $lines.Add("- ``$path``")
     }
 }
 
 Add-Section $lines "Interpretation"
-$lines.Add('1. A high `src/utils` count usually means historical generated or duplicate utility code should be frozen and audited before deletion.')
-$lines.Add('2. Old UART configuration exists in the current mainline. The missing part is the new `src/apps/serial_station/` minimal UART loop.')
-$lines.Add("3. Do not delete by directory name alone. First remove unneeded files from CMake, build, launch, then delete in a separate reviewed step.")
-$lines.Add("4. Use active CMake references, not raw text references, as the closest audit signal for the main GUI target compile surface.")
-$lines.Add("5. Low-risk active utils candidates are inputs for a later CMake split PRD; they are not deletion approval.")
+$lines.Add("1. Active product code should land under `python/embeddebug/`.")
+$lines.Add("2. Python tests should land under `tests/python/` or shared fixtures under `tests/fixtures/`.")
+$lines.Add("3. Startup, package, and verification behavior should remain exposed through `uv run ...` scripts.")
+$lines.Add("4. Generated packages, caches, and temporary work directories must stay out of git.")
 
 $output = $lines -join [Environment]::NewLine
 

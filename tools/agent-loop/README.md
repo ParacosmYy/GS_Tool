@@ -29,10 +29,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\agent-loop\verify.ps
 Environment notes:
 
 - Run `tools\bootstrap_env.bat` once before using the loop on a fresh machine.
-- The sample config uses `tools\doctor.ps1` and `EmbedDebug.bat` because those entry points load the project-local Qt/MinGW paths.
-- Direct `cmake --build build` commands from an arbitrary shell can fail to start Qt tools such as `moc.exe` if `QT_PREFIX\bin` and `QT_PREFIX\share\qt6\bin` are not on `PATH`.
+- The sample config uses `tools\doctor.ps1` and `tools\verify_embeddebug_launch.ps1` because those entry points validate the Python/PyQt uv workflow.
 - If `go.exe` is missing, `tools\doctor.ps1` reports a warning. Install Go or run the listed commands manually until Go is available.
-- The sample config uses `tools\verify_embeddebug_launch.ps1` instead of calling `EmbedDebug.bat` directly. The probe starts the app, waits for a new `EmbedDebug.exe` process, reports `launch_result=PASSED`, and then closes only the process it started.
+- The sample config uses `tools\verify_embeddebug_launch.ps1` instead of calling the app directly. The probe runs `EmbedDebug.bat --smoke` and reports `launch_result=PASSED` when the smoke exits successfully.
 
 Manual fallback when Go is not available:
 
@@ -41,7 +40,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\verify_embeddebug_launch.ps1
 ```
 
-This tool does not call an LLM and does not modify C++ code by itself. It only executes commands listed in the JSON config.
+This tool does not call an LLM and does not modify product code by itself. It only executes commands listed in the JSON config.
 
 Recommended closeout after a GO run:
 

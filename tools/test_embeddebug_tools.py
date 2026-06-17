@@ -10,13 +10,13 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from zipfile import ZipFile
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from tools import package_embeddebug, start_embeddebug, verify_package_embeddebug
+from embeddebug.devtools import package_pyinstaller, verify_pyinstaller_package
+from tools import start_embeddebug
 
 
 def load_project_audit_module():
@@ -37,70 +37,48 @@ class StartEmbedDebugToolTest(unittest.TestCase):
         self.assertTrue((root / "EmbedDebug.bat").is_file())
         self.assertEqual(root.name, "GS_Tool")
 
-    def test_embeddebug_bat_resolves_root_entrypoint(self) -> None:
-        bat_path = start_embeddebug.embeddebug_bat(start_embeddebug.repo_root())
-
-        self.assertEqual(bat_path.name, "EmbedDebug.bat")
-        self.assertTrue(bat_path.is_file())
-
-    def test_dry_run_prints_bat_command_without_launching(self) -> None:
+    def test_dry_run_prints_python_uv_command_without_launching(self) -> None:
         output = io.StringIO()
 
         with contextlib.redirect_stdout(output):
             exit_code = start_embeddebug.main(["--dry-run"])
 
         self.assertEqual(exit_code, 0)
-        self.assertIn("cmd.exe /c", output.getvalue())
-        self.assertIn("EmbedDebug.bat", output.getvalue())
+        self.assertIn("uv run start-embeddebug", output.getvalue())
+        self.assertNotIn("EmbedDebug.bat", output.getvalue())
 
 
 class PackageEmbedDebugToolTest(unittest.TestCase):
     def test_package_name_sanitizes_version_text(self) -> None:
-        name = package_embeddebug.package_name("dev build/001")
+        name = package_pyinstaller.package_name("dev build/001")
 
-        self.assertEqual(name, "EmbedDebug-dev-build-001-windows-x64")
+        self.assertEqual(name, "EmbedDebugPy-dev-build-001-windows-x64")
 
-    def test_read_local_env_parses_bat_assignments(self) -> None:
+    def test_pyinstaller_command_has_no_cpp_toolchain_steps(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            env_file = root / "local_env.bat"
-            env_file.write_text(
-                '\n'.join(
-                    [
-                        "@echo off",
-                        'set "QT_PREFIX=C:\\Qt"',
-                        'set "MINGW_BIN=C:\\mingw64\\bin"',
-                    ]
-                ),
-                encoding="utf-8",
+            entry_script = root / "python" / "embeddebug" / "app" / "main.py"
+            entry_script.parent.mkdir(parents=True)
+            entry_script.write_text("raise SystemExit(0)\n", encoding="utf-8")
+
+            command = package_pyinstaller.pyinstaller_command(
+                package_pyinstaller.PackageConfig(
+                    root=root,
+                    version="dev",
+                    temp_root=root / ".tmp",
+                )
             )
 
-            env_map = package_embeddebug.read_local_env(root)
-
-        self.assertEqual(env_map["QT_PREFIX"], "C:\\Qt")
-        self.assertEqual(env_map["MINGW_BIN"], "C:\\mingw64\\bin")
-
-    def test_create_zip_archives_package_contents(self) -> None:
-        with tempfile.TemporaryDirectory() as temp_dir:
-            package_dir = Path(temp_dir) / "EmbedDebug-dev-windows-x64"
-            nested_dir = package_dir / "docs"
-            nested_dir.mkdir(parents=True)
-            (package_dir / "EmbedDebug.exe").write_text("fake exe", encoding="utf-8")
-            (nested_dir / "README.txt").write_text("docs", encoding="utf-8")
-
-            zip_path = package_embeddebug.create_zip(package_dir)
-
-            self.assertTrue(zip_path.is_file())
-            with ZipFile(zip_path) as archive:
-                names = set(archive.namelist())
-
-        self.assertIn("EmbedDebug-dev-windows-x64/EmbedDebug.exe", names)
-        self.assertIn("EmbedDebug-dev-windows-x64/docs/README.txt", names)
+        command_text = " ".join(command).lower()
+        self.assertIn("pyinstaller", command_text)
+        self.assertNotIn("cmake", command_text)
+        self.assertNotIn("windeployqt", command_text)
+        self.assertNotIn("build/embeddebug.exe", command_text.replace("\\", "/"))
 
 
 class VerifyPackageEmbedDebugToolTest(unittest.TestCase):
     def test_missing_package_dir_reports_failure(self) -> None:
-        ok, messages = verify_package_embeddebug.verify_package_dir(Path("missing-package"))
+        ok, messages = verify_pyinstaller_package.verify_package_dir(Path("missing-package"))
 
         self.assertFalse(ok)
         self.assertEqual(messages, ["missing: package directory missing-package"])
@@ -108,35 +86,35 @@ class VerifyPackageEmbedDebugToolTest(unittest.TestCase):
     def test_verify_package_dir_reports_required_files(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             package_dir = Path(temp_dir) / "EmbedDebug-dev-windows-x64"
-            for relative_path in verify_package_embeddebug.REQUIRED_RELATIVE_PATHS:
+            for relative_path in verify_pyinstaller_package.REQUIRED_RELATIVE_PATHS:
                 target = package_dir / relative_path
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text("placeholder", encoding="utf-8")
 
-            ok, messages = verify_package_embeddebug.verify_package_dir(package_dir)
+            ok, messages = verify_pyinstaller_package.verify_package_dir(package_dir)
 
         self.assertTrue(ok)
-        self.assertIn("ok: EmbedDebug.exe", messages)
-        self.assertIn("ok: platforms/qwindows.dll", messages)
+        self.assertIn("ok: EmbedDebugPy.exe", messages)
+        self.assertIn("ok: _internal/PyQt6/Qt6/plugins/platforms/qwindows.dll", messages)
 
     def test_verify_package_dir_lists_missing_files(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
-            package_dir = Path(temp_dir) / "EmbedDebug-dev-windows-x64"
+            package_dir = Path(temp_dir) / "EmbedDebugPy-dev-windows-x64"
             package_dir.mkdir()
-            (package_dir / "EmbedDebug.exe").write_text("placeholder", encoding="utf-8")
+            (package_dir / "EmbedDebugPy.exe").write_text("placeholder", encoding="utf-8")
 
-            ok, messages = verify_package_embeddebug.verify_package_dir(package_dir)
+            ok, messages = verify_pyinstaller_package.verify_package_dir(package_dir)
 
         self.assertFalse(ok)
-        self.assertIn("ok: EmbedDebug.exe", messages)
-        self.assertIn("missing: platforms/qwindows.dll", messages)
+        self.assertIn("ok: EmbedDebugPy.exe", messages)
+        self.assertIn("missing: THIRD_PARTY_NOTICES.md", messages)
 
     def test_latest_package_dir_selects_newest_candidate(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
             dist_root = root / "dist"
-            old_dir = dist_root / "EmbedDebug-old-windows-x64"
-            new_dir = dist_root / "EmbedDebug-new-windows-x64"
+            old_dir = dist_root / "EmbedDebugPy-old-windows-x64"
+            new_dir = dist_root / "EmbedDebugPy-new-windows-x64"
             ignored_dir = dist_root / "OtherTool-new-windows-x64"
             old_dir.mkdir(parents=True)
             new_dir.mkdir()
@@ -152,34 +130,28 @@ class VerifyPackageEmbedDebugToolTest(unittest.TestCase):
             os.utime(new_dir, (new_time, new_time))
             os.utime(ignored_dir, (new_time + 60, new_time + 60))
 
-            latest = verify_package_embeddebug.latest_package_dir(root)
+            latest = verify_pyinstaller_package.latest_package_dir(root)
 
-        self.assertEqual(latest.name, "EmbedDebug-new-windows-x64")
+        self.assertEqual(latest.name, "EmbedDebugPy-new-windows-x64")
 
 
 class ProjectAuditToolTest(unittest.TestCase):
-    def test_cmake_entries_reads_included_cmake_source_list(self) -> None:
+    def test_python_counts_reads_runtime_and_tests(self) -> None:
         project_audit = load_project_audit_module()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            cmake_dir = root / "cmake"
-            src_dir = root / "src"
-            cmake_dir.mkdir()
-            src_dir.mkdir()
-            (root / "CMakeLists.txt").write_text(
-                "include(cmake/EmbedDebugSources.cmake)\n",
-                encoding="utf-8",
-            )
-            (cmake_dir / "EmbedDebugSources.cmake").write_text(
-                "set(SOURCES\n    src/main.cpp\n)\n",
-                encoding="utf-8",
-            )
-            (src_dir / "main.cpp").write_text("int main() { return 0; }\n", encoding="utf-8")
+            runtime = root / "python" / "embeddebug" / "app" / "main.py"
+            test_file = root / "tests" / "python" / "unit" / "test_main.py"
+            runtime.parent.mkdir(parents=True)
+            test_file.parent.mkdir(parents=True)
+            runtime.write_text("raise SystemExit(0)\n", encoding="utf-8")
+            test_file.write_text("def test_ok(): assert True\n", encoding="utf-8")
 
-            entries = project_audit.cmake_entries(root)
+            counts = project_audit.python_counts(root)
 
-        self.assertIn("src/main.cpp", entries)
+        self.assertEqual(counts["runtime"], 1)
+        self.assertEqual(counts["tests"], 1)
 
 
 def main() -> int:

@@ -1,298 +1,116 @@
-# 07 - 项目目录结构
+# 07 - 目录结构与新增文件约束（重构版）
 
-> 本文档是 EmbedDebug 约束体系的第7模块。涉及文件创建/移动时必须加载。
-
----
-
-## 一、根目录结构
-
-```
-User_Serial/
-├── CMakeLists.txt                 # CMake 构建配置
-├── AGENTS.md                      # Agent 强制入口（索引+稳定规则）
-├── CLAUDE.md                      # 约束文档主入口（索引+铁律）
-├── README.md                      # 项目说明文档
-├── EmbedDebug.bat                 # 双击启动脚本；最低运行入口，必须保持可用
-├── Beta.bat                       # 兼容启动入口，调用 EmbedDebug.bat
-├── embeddebug_settings.json       # 运行时配置
-├── docs/                          # 文档目录
-│   ├── constraints/               # 约束文档模块
-│   ├── prd/                       # PRD 需求文档
-│   ├── architecture/              # 架构文档（设计+审查）
-│   ├── reviews/                   # 代码审查 + UI/UX 审查 + QA 报告
-│   └── tracking/                  # 评分追踪
-├── tools/                         # 本地开发、启动、审计和 Agent 执行工具
-├── resources/                     # 资源文件
-├── src/                           # 源代码
-└── tests/                         # 测试
-```
-
-`EmbedDebug.bat` 是用户侧最低运行入口，不属于可随意替换的临时脚本。任何改变构建输出目录、可执行文件名、Qt 部署路径或启动参数的改动，都必须同步检查并验证该 bat 双击启动链路。
-`Beta.bat` 仅保留兼容调用，不得承载独立构建/部署逻辑。
-
-构建目录只能有一个：`build/`。根目录下禁止出现或引用 `build2/`、`build-debug/`、`build-release/`、`cmake-build-*` 等平行构建目录；`EmbedDebug.bat` 也不得为这些目录保留 fallback。
+> 适用范围：新建、移动、删除文件或目录时必须遵守。
 
 ---
 
-## 二、src/ 顶层目录
+## 一、Python/PyQt 启动与产物约束
 
-> 下面按当前仓库真实目录写法整理。`shared/` 与 `interfaces/` 已落地为正式基础层，`core/theme/Constants.h` 仅保留兼容承接。
+- Python/PyQt 默认入口固定：`EmbedDebug.bat` -> `uv run start-embeddebug` -> Python/PyQt。
+- 用户侧启动、测试、打包和验证统一经 `uv run ...` 项目脚本暴露。
+- PyInstaller 输出固定到 `dist/EmbedDebugPy-*-windows-x64/`，产物不提交。
+- PyInstaller workpath 不得使用仓库 `build/`；必须由包装脚本设置到 `%TEMP%` 或其他非仓库构建目录。
+- 禁止创建/引用：
+  - `build2/`
+  - `build-debug/`
+  - `build-release/`
+- `cmake-build-*`
+- 固定考核路径：`uv run start-embeddebug --smoke` + `cmd /c EmbedDebug.bat --smoke`。
 
-目录结构遵循“唯一归属、单一入口、禁止平行桶”原则。任何新增目录都必须先说明：
+## 二、Canonical 路径
 
-1. 它解决哪个现有 canonical 目录无法承接的问题。
-2. 它属于哪个架构层，允许依赖哪些目录。
-3. 它是否影响三轴交付状态；只建目录或骨架不能提升用户状态。
-4. 它的 CMake、测试、README 或约束索引是否需要同步。
+- `src/interfaces/`：接口与契约
+- `src/shared/`：跨模块常量和轻量值对象
+- `src/core/`：应用协调与主窗口
+- `src/apps/serial_station/`：串口新工站
+- `python/embeddebug/`：Python/PyQt 新主线运行时代码，按 `app/`、`ui/`、`controllers/`、`core/`、`protocols/`、`services/`、`workers/`、`drivers/` 分层
+- `tests/python/`：Python/PyQt 新主线测试，按 `unit/`、`integration/`、`ui_smoke/` 分层
+- `tests/fixtures/serial_station/`：C++/Python 可共享的串口协议 golden fixtures、日志样本和回放样本
+- `packaging/pyinstaller/`：未来 Python/PyInstaller 打包 spec 与包装脚本；不得输出产物到该目录
+- `tests/`：按模块分层编写测试
+- `docs/constraints/`：约束与执行规则
+- `resources/themes/`、`resources/icons/`：统一资源入口
 
-| 目录 | 当前状态 | 角色口径 | 说明 |
-|------|----------|----------|------|
-| `apps/` | 规划新增 | 独立工站 app 层 | 新串口工站等可独立演进的工作站模块 |
-| `interfaces/` | 已存在 | 纯虚接口层 | 放 `IConnection`、`IPanelProvider`、`IDataSink` 等契约 |
-| `shared/` | 已存在 | 公共基础层 | 共享常量、枚举、轻量类型的唯一真相路径 |
-| `core/` | 已存在 | 应用协调 + 基础 UI | `MainWindow`、`PanelManager`、`ThemeManager`、导航、基础 Widget |
-| `serial/` | 已存在 | 串口功能模块 | 配置、指令、数据、端口、信号线 |
-| `connection/` | 已存在 | 连接接入模块 | 串口、网络、BLE、CAN、MQTT、USB、WS 等连接实现 |
-| `protocol/` | 已存在 | 协议解析模块 | 帧解析、协议桥、协议编辑、Modbus、Hex、Schema |
-| `terminal/` | 已存在 | 终端显示模块 | 自绘终端、搜索、选择、过滤、布局 |
-| `chart/` | 已存在 | 图表展示模块 | 波形、FFT、热力图、统计图、游标、缩放 |
-| `ota/` | 已存在 | 固件升级模块 | OTA 管理、历史、传输协议、升级界面 |
-| `rtt/` | 已存在 | RTT 接入模块 | J-Link SDK 适配和 RTT 通道管理 |
-| `automation/` | 已存在 | 自动化模块 | 触发器与脚本自动化 |
-| `dashboard/` | 已存在 | 仪表盘模块 | Gauge、LED、数值、进度条等可视化控件 |
-| `plugin/` | 已存在 | 插件扩展模块 | 插件管理、加载器、配置面板 |
-| `utils/` | 已存在 | 通用工具层 | 编解码、导出、日志、缓存、性能、时间戳等 |
-| `widgets/` | 已存在 | 独立复用控件库 | autocomplete、dialog、diff、palette、recorder、toast 等 |
-| `features/` | 迁移骨架 | 未来功能入口 | 只放归属说明和迁移骨架，不承载现有实现 |
+## 三、新建文件分流规则
 
----
+### 3.1 串口工站相关
+- 只允许新增到 `src/apps/serial_station/`，内部按 `ui/`、`core/`、`protocols/`、`services/`、`workers/`。
+- Python/PyQt 串口工站迁移只允许新增到 `python/embeddebug/serial_station/`，内部按 `ui/`、`controllers/`、`core/`、`protocols/`、`services/`、`workers/`、`drivers/`。
+- C++ 串口工站仅保留历史参考和兼容维护；PRD-136/B22 后默认启动、打包和验收入口均进入 Python/PyQt。
+- 不得把 Python 产品运行时代码放入 `tools/`；`tools/` 只放工程管理、启动、审计和包装辅助脚本。
+- 不得把 Python 产品运行时代码放入 `src/`，除非后续有单独 cutover PRD 明确废弃 C++ 主线。
+- 不得把 Python 运行时代码回填到 C++ 构建或历史源码目录。
 
-## 三、真实子目录与分叉现状
+### 3.2 接口与共享
+- 跨模块公共能力优先到 `src/interfaces/`，通用常量/枚举到 `src/shared/`。
+- Python 主线的共享值对象优先放在 `python/embeddebug/shared/` 或对应 app 内 `core/`，不得复制 C++ `.h/.cpp` 到 Python 目录。
 
-> 这里不写“理想树”，只写当前仓库里已经出现的真实子目录。带 `2` 的目录、同义复数目录、重复能力目录都属于历史分叉，后续只能收敛，不要继续扩张。
+### 3.3 工具与文档
+- 新工具脚本放 `tools/`，仅工程管理目的，不进入运行时模块。
+- 新约束或执行说明放 `docs/constraints/`；专项方案放 `docs/serial_station_architecture.md`。
+- 文档改动必须写明目标分更新点与对应约束条目。
 
-| 模块 | 当前真实子目录 |
-|------|----------------|
-| `core/` | `animation/`, `animation2/`, `background/`, `clipboard/`, `connect/`, `device/`, `event/`, `factory/`, `font/`, `fonts/`, `icon/`, `icons/`, `iconprovider/`, `layout/`, `mainwindow/`, `managers/`, `navigation/`, `notification/`, `panels/`, `pipeline/`, `recording/`, `responsive/`, `send/`, `shortcut/`, `terminal/`, `theme/`, `toolbar/`, `widgets/`, `widgets2/`, `workspace/` |
-| `connection/` | `ble/`, `can/`, `interface/`, `monitor/`, `mqtt/`, `network/`, `pool/`, `serial_port/`, `spi_i2c/`, `tcp/`, `usb/`, `ws/` |
-| `protocol/` | `bridge/`, `can/`, `editor/`, `engine/`, `hex/`, `modbus/`, `parser/`, `protobuf/`, `schema/`, `view/` |
-| `serial/` | `commands/`, `config/`, `data/`, `detector/`, `port/`, `signals/` |
-| `terminal/` | `filter/`, `layout/`, `menu/`, `model/`, `search/`, `selection/`, `types/`, `widget/` |
-| `chart/` | `fft/`, `heatmap/`, `heatmap2/`, `model/`, `overlay/`, `scale/`, `stats/`, `waterfall/`, `widget/`, `zoom/` |
-| `ota/` | `history/`, `manager/`, `protocols/`, `widget/` |
-| `rtt/` | 平铺结构，直接放连接/SDK/通道管理相关类 |
-| `automation/` | 平铺结构，直接放触发器引擎与列表面板 |
-| `dashboard/` | 平铺结构，直接放仪表盘模型与控件 |
-| `plugin/` | `loader/`, `loader2/` |
-| `utils/` | `aggregator/`, `checksum/`, `clipboard/`, `converter/`, `crypto/`, `data/`, `export/`, `log/`, `packet/`, `perf/`, `pipeline/`, `timestamp/` |
-| `widgets/` | `audio/`, `autocomplete/`, `dialog/`, `diff/`, `freq/`, `palette/`, `recorder/`, `scope/`, `toast/` |
-| `features/` | 迁移骨架目录，默认平铺，后续仅承接归属说明 |
+### 3.4 Python/PyQt 工具链与打包
+- Python GUI 启动、测试、打包、验证统一通过 `uv run ...` 项目脚本收束。
+- 预留 Python lane：
+  - `uv run start-embeddebug-py`
+  - `uv run test-embeddebug-py`
+  - `uv run package-embeddebug-py`
+  - `uv run verify-package-embeddebug-py`
+- `uv run start-embeddebug`、`uv run package-embeddebug`、`uv run verify-package-embeddebug` 是 Python/PyQt 默认 lane。
+- PyInstaller 只允许用于 Python lane；优先 `onedir`，输出到 `dist/`，产物不提交。
+- PyInstaller workpath 不得使用仓库 `build/`；必须由包装脚本设置到 `%TEMP%` 或其他非仓库构建目录。
 
-### Serial Station 目标子目录
-
-> 这是 C++/Qt 目标结构，不是 Python 目录。所有生产文件使用 `.h/.cpp`，测试使用 QTest。
-
-```text
-src/apps/serial_station/
-├── SerialStationApp.h/.cpp
-├── SerialStationWindow.h/.cpp
-├── SerialStationController.h/.cpp
-├── SerialStationModels.h
-├── SerialStationConstants.h
-├── SerialStationConfig.h/.cpp
-├── ui/
-│   ├── SerialMainPanel.h/.cpp
-│   ├── SerialPortPanel.h/.cpp
-│   ├── SerialProtocolPanel.h/.cpp
-│   ├── SerialLogPanel.h/.cpp
-│   ├── SerialCommandPanel.h/.cpp
-│   └── SerialStatusBar.h/.cpp
-├── core/
-│   ├── SerialPort.h/.cpp
-│   ├── SerialManager.h/.cpp
-│   ├── SerialSession.h/.cpp
-│   ├── SerialDispatcher.h/.cpp
-│   ├── SerialCodec.h/.cpp
-│   └── SerialError.h
-├── protocols/
-│   ├── ISerialProtocol.h
-│   ├── SerialProtocolRegistry.h/.cpp
-│   ├── SerialProtocolEvent.h
-│   ├── modbus_rtu/
-│   ├── custom_md/
-│   └── ascii_text/
-├── services/
-│   ├── SerialLogService.h/.cpp
-│   ├── SerialExportService.h/.cpp
-│   ├── SerialReplayService.h/.cpp
-│   └── DeviceProfileService.h/.cpp
-└── workers/
-    ├── SerialReaderWorker.h/.cpp
-    └── SerialCommandWorker.h/.cpp
-```
-
-对应测试目录：
-
-```text
-tests/serial_station/
-├── test_serial_manager.cpp
-├── test_serial_dispatcher.cpp
-├── test_serial_protocol_registry.cpp
-├── test_modbus_rtu_protocol.cpp
-├── test_custom_md_protocol.cpp
-└── test_ascii_text_protocol.cpp
-```
-
----
-
-## 四、唯一真相路径与收敛规则
-
-| 主题 | 口径 | 约束 |
-|------|------|------|
-| 共享常量与枚举 | `src/shared/` | 新增跨模块常量、枚举、轻量类型优先放这里 |
-| 旧常量伞头 | `src/core/theme/Constants.h` | 只允许转发旧 include，不允许新增域定义 |
-| 未来功能骨架 | `src/features/` | 仅作为迁移骨架和未来归属说明，不承载现有实现 |
-| 应用协调入口 | `src/core/mainwindow/MainWindow.*` | 只负责初始化、组装 UI、连接信号/槽 |
-| Serial Station 新工站 | `src/apps/serial_station/` | 新串口上位机重构落点，内部按 ui/controller/core/protocols/services/workers 分层 |
-| 面板编排中心 | `src/core/panels/PanelManager.*` | 只负责面板创建、注册、包装、映射和统计 |
-| 基础 UI 组件 | `src/core/widgets/` | 只放可复用壳层，不放功能桶里的业务逻辑 |
-| 主题运行时 | `src/core/theme/ThemeManager.*` | 只管主题切换、QSS 加载和主题状态 |
-
-### 收敛建议
-
-1. `shared/` 先落地，再把新常量从 `core/theme/Constants.h` 迁出去。
-2. `core/` 只保留协调、导航、基础 UI 和会话管理，不再吸纳新功能桶。
-3. `MainWindow` 和 `PanelManager` 继续做编排，但新增业务流必须优先下沉到独立 Controller/Manager。
-4. `font/` 与 `fonts/`、`icon/` 与 `icons/`、`responsive/` 与 `layout/`、`shortcut/` 与 `managers/`、`widgets/` 与 `widgets2/`、`animation/` 与 `animation2/`、`loader/` 与 `loader2/` 这些分叉目录只允许冻结，不允许继续复制新分支。
-5. 目录命名优先沿用已有主线目录，不要再创造“更像”的新桶。
-6. 并行 Agent 不得各自创建临时目录承接同一能力；目录归属必须在 BATCH 方案里先锁定。
-7. 任何 `2`、`new`、`backup`、`tmp`、`experimental` 命名的生产目录默认禁止；确需实验只能放文档或工具临时区，不能进入主 GUI 目标。
-
-### 四-A、目标骨架
-
-> 这部分描述兼容迁移阶段的目标落点，不要求一次性移动现有源码。
-
-| 目录 | 角色 | 新增规则 |
-|------|------|----------|
-| `src/shared/` | 共享基础层 | 新常量、枚举、轻量值类型优先落这里 |
-| `src/interfaces/` | 契约层 | 纯接口、抽象协议、回调类型放这里 |
-| `src/core/` | 应用协调层 | 只保留装配、导航、主题、基础 UI、会话 |
-| `src/features/` | 迁移骨架层 | 只做归属说明、骨架 README、未来功能入口说明 |
-| `src/apps/serial_station/` | 新串口工站层 | 按专项文档落地，不回流到旧 `src/serial/` |
-| `src/connection/` 等现有业务模块 | 业务实现层 | 继续按领域收敛，不再新建平行实现目录 |
-
-新增目录规则:
-- 新功能优先寻找 canonical 目录，不要新建 `2`、`new`、`old`、`backup` 之类平行目录。
-- 如果历史分叉已经存在，只能冻结，不能继续复制。
-- 如果确实需要未来迁移入口，先在 `src/features/` 里放归属说明，再讨论是否新增具体目录。
-- 如果是串口上位机重构或新增串口业务协议，优先进入 `src/apps/serial_station/`，不要继续扩张旧 `src/serial/` 和 `src/protocol/` 的耦合点。
-- 新增目录不能单独作为“功能完成”证据；必须配套源码、CMake、测试或用户入口，才能提升工程/用户状态。
-- 新增目录若要进入并行开发，必须在 BATCH 方案中写明唯一负责人和禁止触碰的相邻目录。
-
-### 四-B、冻结目录
-
-以下目录仅保留兼容和历史引用，不再承载新实现：
+## 四、冻结目录（只允许兼容维护）
 
 - `animation2/`
 - `widgets2/`
 - `loader2/`
-- `fonts/`
-- `icons/`
+- `icons/` 与 `icon/`（现有资源仅兼容）
 - `responsive/`
 - `font/` 与 `fonts/`
-- `icon/` 与 `icons/`
-- `shortcut/` 与 `managers/`
+- `shortcut/` 与 `managers/` 的平行能力
+- `src/` 下既有 C++ 运行时代码（除非单独归档/删除任务明确授权）
+- `cmake/` 与根 `CMakeLists.txt` 历史构建文件（不得新增活跃打包入口）
 
-冻结规则:
-- 可以保留旧 include、旧资源引用和转发适配。
-- 不允许把新需求继续写入冻结目录。
-- 任何新骨架都应先落到 `src/features/` 或 canonical 路径。
-- 冻结目录只允许做兼容修复、删除迁移或引用转发；不得因为“已有类似文件”继续追加功能。
-- 如果冻结目录中的能力仍被主目标引用，新增迭代应优先写迁移 PRD，而不是继续扩张冻结目录。
+冻结规则：
+- 不允许在冻结目录新增新业务功能。
+- 仅允许兼容修复、历史引用、迁移补丁。
 
----
+## 五、文件落地检查（工程门禁）
 
-## 四-C、并行开发目录锁
+新增或改动的 `.h/.cpp` 默认禁止进入活跃产品主线；仅允许历史兼容修复，并必须在任务说明中写明为何不能落到 Python/PyQt 主线。
 
-多 Agent 开发时，目录分配必须满足：
+新增或改动的 Python 运行时代码必须满足：
+- 已有 PRD/Specs 授权具体批次。
+- 生产代码位于 `python/embeddebug/`。
+- 测试位于 `tests/python/` 或共享 fixtures 位于 `tests/fixtures/serial_station/`。
+- 通过 `pyproject.toml` 的 uv script 暴露入口，不新增未登记的裸脚本工作流。
+- PyQt6 依赖必须先完成 GPLv3/商业授权决策记录。
 
-| 区域 | 并行策略 |
-|------|----------|
-| `src/core/mainwindow/`、`src/core/panels/` | 单负责人串行修改 |
-| `src/shared/`、`src/interfaces/` | 单负责人串行修改，先定契约再分发 |
-| `src/apps/serial_station/ui/`、`core/`、`protocols/`、`services/`、`workers/` | 可按层拆分，但每个子任务默认只改一个层 |
-| `resources/themes/` | 单负责人汇总 objectName 和 token，避免样式冲突 |
-| `tests/serial_station/` | 可按生产层拆分，但测试名不得重复，CMake 注册由主 Agent 合流 |
-| `tools/` | 只在构建/启动/审计工具任务中修改，不与产品功能并行混写 |
+### 5.1 分数门禁补充
 
-如果某个子任务需要跨越两个以上目录层级，必须先说明调用链和验收点，并由主 Agent 审查后执行。
+- 新建文件无落点映射：本次提交 `+0`。
+- 写入冻结目录且不属于兼容修复：本次提交 `+0` 并生成修复单。
+- 文件目录与约束分流符合要求：仅可进入 `+1` 计分闭环。
 
----
+## 六、文档化落点
 
-## 五、resources/ 目录
+- 目录变更需同步更新：
+  - 本文件
+  - 主任务 PRD/Specs
+  - 相关架构文档（如串口、平台迁移）
+- 每次目录变更需记录在 `01-project-overview.md` 的评分日志中。
 
-```
-resources/
-├── icons/                         # 图标资源
-│   └── lucide/                    #   Lucide 图标库 (MIT)
-│       ├── cable.svg
-│       ├── bluetooth.svg
-│       └── ...
-├── themes/                        # QSS 主题文件
-│   ├── dark_terminal.qss          #   暗色终端风
-│   ├── modern_dark.qss            #   现代深色
-│   └── light.qss                  #   浅色
-├── translations/                  # 翻译文件
-└── app.qrc                        # Qt 资源文件
-```
+## 七、目录稳定性 KPI
 
----
+- 新建路径重名率为 0。
+- 平行目录写入为 0。
+- 单次任务新增目录 ≤ 3，超过必须提交拆分理由。
 
-## 六、docs/ 目录
+## 八、每轮高效启动核验（目录变更亦适用）
 
-```
-docs/
-├── constraints/                   # 约束文档
-│   ├── 01-project-overview.md
-│   ├── 02-workflow.md
-│   ├── 03-architecture.md
-│   ├── 04-coding-standard.md
-│   ├── 05-ui-standard.md
-│   ├── 06-git-commit.md
-│   ├── 07-directory-structure.md  # 本文件
-│   └── 08-icon-standard.md
-├── architecture/                  # 架构骨架与迁移说明
-│   ├── README.md
-│   ├── target-structure.md
-│   ├── frozen-dirs.md
-│   ├── module-boundaries.md
-│   └── migration-roadmap.md
-├── superpowers/                   # Specs、BATCH、LOOP 和执行计划
-│   ├── specs/                     # Specs 模板
-│   ├── plans/                     # 分步执行计划
-│   ├── BATCH_PROTOCOL.md
-│   └── LOOP_PROTOCOL.md
-├── prd/                           # PRD 需求文档
-├── reviews/                       # 代码/UI/QA 审查
-│   ├── debug/                     # LOOP Debug 追踪报告
-│   └── simplify/                  # LOOP Simplify 只读扫描报告
-└── tracking/                      # 评分追踪
-```
-
----
-
-## 七、tools/ 目录
-
-```
-tools/
-├── bootstrap_env.bat              # 本机环境探测，生成 local_env.bat
-├── debug-trace.ps1                # LOOP Debug 追踪报告生成入口
-├── doctor.ps1                     # LOOP Doctor 系统体检，只读诊断，构建/启动需显式参数
-├── launch_embeddebug.ps1          # EmbedDebug.bat 调用的启动/构建/部署脚本
-├── simplify-scan.ps1              # LOOP Simplify 只读扫描入口
-├── qss-generator/                 # QSS 生成工具
-├── project-audit/                 # 项目审计工具
-└── agent-loop/                    # Specs 驱动的 Go 执行循环工具
-```
-
-`tools/agent-loop/` 只用于 Agent 迭代执行辅助，不属于 EmbedDebug 产品运行时，不接入 CMake，不生成或引用第二构建目录。
+1. 修改文件落点确认后，执行 `uv run test-embeddebug-py`。
+2. 启动 `uv run start-embeddebug --smoke`。
+3. 启动 `cmd /c EmbedDebug.bat --smoke`。
+4. 任一项失败则阻断目录类加分记录。

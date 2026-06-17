@@ -1,4 +1,4 @@
-"""Start EmbedDebug through the repository batch entrypoint."""
+"""Start the default Python/PyQt EmbedDebug entrypoint."""
 
 from __future__ import annotations
 
@@ -12,17 +12,9 @@ def repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def embeddebug_bat(root: Path) -> Path:
-    path = root / "EmbedDebug.bat"
-    if not path.is_file():
-        raise RuntimeError(f"EmbedDebug.bat not found: {path}")
-    return path
-
-
 def start_app(args: argparse.Namespace) -> int:
     root = repo_root()
-    bat_path = embeddebug_bat(root)
-    command = ["cmd.exe", "/c", str(bat_path)]
+    command = ["uv", "run", "start-embeddebug", *args.app_args]
 
     if args.dry_run:
         print(" ".join(command))
@@ -32,7 +24,7 @@ def start_app(args: argparse.Namespace) -> int:
     if args.wait:
         return process.wait()
 
-    print(f"started EmbedDebug.bat pid={process.pid}")
+    print(f"started Python/PyQt EmbedDebug pid={process.pid}")
     return 0
 
 
@@ -40,6 +32,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true", help="print the launch command")
     parser.add_argument("--wait", action="store_true", help="wait for the batch process")
+    parser.add_argument("app_args", nargs="*", help="arguments forwarded to start-embeddebug")
     return parser.parse_args(argv)
 
 

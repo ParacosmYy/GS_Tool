@@ -12,14 +12,6 @@ function Resolve-RepoRoot {
     return $resolved.Path
 }
 
-function Get-EmbedDebugProcessIds {
-    $processes = Get-Process -Name "EmbedDebug" -ErrorAction SilentlyContinue
-    if (-not $processes) {
-        return @()
-    }
-    return @($processes | Select-Object -ExpandProperty Id)
-}
-
 $root = Resolve-RepoRoot -Path $RootDir
 $launcher = Join-Path $root "EmbedDebug.bat"
 if (-not (Test-Path -LiteralPath $launcher)) {
@@ -27,42 +19,23 @@ if (-not (Test-Path -LiteralPath $launcher)) {
     exit 1
 }
 
-$beforeIds = Get-EmbedDebugProcessIds
-
 try {
-    Start-Process `
+    $process = Start-Process `
         -FilePath "cmd.exe" `
-        -ArgumentList "/c", "EmbedDebug.bat" `
+        -ArgumentList "/c", "EmbedDebug.bat", "--smoke" `
         -WorkingDirectory $root `
-        -WindowStyle Hidden | Out-Null
+        -WindowStyle Hidden `
+        -Wait `
+        -PassThru
 } catch {
     Write-Output "launch_result=FAILED reason=start_process_error message=$($_.Exception.Message)"
     exit 1
 }
 
-$newProcess = $null
-for ($i = 0; $i -lt $TimeoutSeconds; $i++) {
-    Start-Sleep -Seconds 1
-    $newProcess = Get-Process -Name "EmbedDebug" -ErrorAction SilentlyContinue |
-        Where-Object { $beforeIds -notcontains $_.Id } |
-        Select-Object -First 1
-    if ($newProcess) {
-        break
-    }
-}
-
-if (-not $newProcess) {
-    Write-Output "launch_result=FAILED reason=process_not_found timeout_seconds=$TimeoutSeconds"
+if ($process.ExitCode -ne 0) {
+    Write-Output "launch_result=FAILED reason=smoke_exit_code exit_code=$($process.ExitCode) timeout_seconds=$TimeoutSeconds"
     exit 1
 }
 
-Write-Output "launch_result=PASSED pid=$($newProcess.Id)"
-
-try {
-    $newProcess | Stop-Process -Force
-} catch {
-    Write-Output "cleanup_warning=failed_to_stop pid=$($newProcess.Id) message=$($_.Exception.Message)"
-    exit 1
-}
-
+Write-Output "launch_result=PASSED mode=python_pyqt_smoke"
 exit 0

@@ -5,7 +5,7 @@ EmbedDebug project audit helper.
 Generates a lightweight, read-only summary for iteration planning:
 - source/header counts by top-level module
 - numbered utility directory families
-- CMake source/header list duplicate and missing-file checks
+- Python/PyQt runtime and test file counts
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from pathlib import Path
 
 
 SOURCE_EXTENSIONS = {".cpp", ".h", ".hpp", ".ipp"}
-CMAKE_LIST_RE = re.compile(r"^\s*(src/[^\s#]+\.(?:cpp|h|hpp|ipp))\s*(?:#.*)?$")
+PYTHON_EXTENSIONS = {".py"}
 NUMBERED_UTIL_RE = re.compile(r"^([A-Za-z_]+)(\d+)$")
 
 
@@ -58,24 +58,20 @@ def numbered_utils(root: Path):
     return dict(sorted(families.items(), key=lambda item: (-len(item[1]), item[0])))
 
 
-def cmake_audit_files(root: Path) -> list[Path]:
-    """返回需要参与源码清单审计的 CMake 文件。"""
-    paths = [path for path in root.rglob("CMakeLists.txt") if "build" not in path.parts]
-    cmake_dir = root / "cmake"
-    if cmake_dir.exists():
-        paths.extend(path for path in cmake_dir.rglob("*.cmake") if "build" not in path.parts)
-    return sorted(set(paths))
+def python_counts(root: Path) -> Counter[str]:
+    counts: Counter[str] = Counter()
+    runtime_root = root / "python" / "embeddebug"
+    tests_root = root / "tests" / "python"
 
-
-def cmake_entries(root: Path):
-    entries: list[str] = []
-
-    for cmake_path in cmake_audit_files(root):
-        for line in cmake_path.read_text(encoding="utf-8", errors="replace").splitlines():
-            match = CMAKE_LIST_RE.match(line.replace("\\", "/"))
-            if match:
-                entries.append(match.group(1))
-    return entries
+    if runtime_root.exists():
+        counts["runtime"] = sum(
+            1 for path in runtime_root.rglob("*") if path.is_file() and path.suffix in PYTHON_EXTENSIONS
+        )
+    if tests_root.exists():
+        counts["tests"] = sum(
+            1 for path in tests_root.rglob("*") if path.is_file() and path.suffix in PYTHON_EXTENSIONS
+        )
+    return counts
 
 
 def print_module_counts(counts: Counter[str], limit: int) -> None:
@@ -94,19 +90,10 @@ def print_numbered_utils(families: dict[str, list[str]], limit: int) -> None:
     print()
 
 
-def print_cmake_audit(root: Path, entries: list[str], limit: int) -> None:
-    print("## CMake list audit")
-    duplicates = [path for path, count in Counter(entries).items() if count > 1]
-    missing = [path for path in entries if not (root / path).exists()]
-
-    print(f"listed code entries: {len(entries)}")
-    print(f"duplicate entries: {len(duplicates)}")
-    for path in duplicates[:limit]:
-        print(f"  duplicate: {path}")
-
-    print(f"missing listed files: {len(missing)}")
-    for path in missing[:limit]:
-        print(f"  missing: {path}")
+def print_python_counts(counts: Counter[str]) -> None:
+    print("## Python/PyQt File Counts")
+    print(f"runtime: {counts.get('runtime', 0)}")
+    print(f"tests: {counts.get('tests', 0)}")
     print()
 
 
@@ -121,7 +108,7 @@ def main() -> int:
     print()
     print_module_counts(module_counts(root), args.limit)
     print_numbered_utils(numbered_utils(root), args.limit)
-    print_cmake_audit(root, cmake_entries(root), args.limit)
+    print_python_counts(python_counts(root))
     return 0
 
 

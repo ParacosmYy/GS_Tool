@@ -1,169 +1,196 @@
-# 01 - 项目概况与构建环境
+# 01 - 项目概况、构建环境与约束入口
 
-> 本文档是 EmbedDebug 约束体系的第1模块。每次开发前必须了解。
+> 适用范围：所有开发任务。
+> 版本：2026-06-14 重构版
+> 更新目标：把项目基线、启动链路、模块结构、三轴状态与约束加载顺序统一化，并引入可量化评分闭环。
 
 ---
 
-## 一、项目概况
+## 一、项目基础信息
 
 | 项 | 值 |
 |----|-----|
-| 应用名称 | EmbedDebug |
-| 项目路径 | `D:\Workplace\Embedded_workplace\User_workplace\GS_Tool` |
-| 当前版本 | 0.1.0 |
-| 评分起点 | 1分 / 目标 1000分 |
-| Git分支 | `feat/embed-debug` |
-| Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
+| 项目名称 | EmbedDebug |
+| 仓库路径 | `D:\Workplace\Embedded_workplace\User_workplace\GS_Tool` |
+| 当前版本 | `0.1.0` |
+| 远端仓库 | `https://github.com/ParacosmYy/GS_Tool.git` |
+| 默认分支 | `feat/embed-debug` |
+| 目标 | `D1`（当前工程） → `E5 + U4 + D4`（最终） |
+| 当前得分 | `500 / 1000` |
+| 目标得分 | `1000 / 1000` |
 
 ---
 
-## 二、构建环境
+## 二、强制加载顺序（每次任务）
 
-| 项目 | 路径/版本 |
-|------|-----------|
-| Qt 6.8.3 | `E:/Tool/DevEnv/Qt/6.8.3/mingw_64` |
-| GCC 14.2.0 (MinGW) | `E:/Tool/DevEnv/x86_64-14.2.0-release-win32-seh-msvcrt-rt_v12-rev2/mingw64/bin` |
-| CMake ≥ 3.24 (当前 4.0.1) | `E:/Tool/DevEnv/cmake-4.0.1-windows-x86_64/cmake-4.0.1-windows-x86_64/bin` |
-| Ninja 1.13.2 | PATH中 |
-| GDB 16.2 | PATH中 |
-| J-Link V932 | `E:/Embedded/Tool/SEGGER_IOT/JLink_V932` |
+1. `CLAUDE.md`（最顶层铁律，修改约束前必须核对）
+2. `docs/constraints/01-project-overview.md`（本文件）
+3. 涉及架构新增类/跨层修改：`docs/constraints/03-architecture.md`
+4. 涉及文件新建/移动/删除：`docs/constraints/07-directory-structure.md`
+5. 涉及串口工具：`docs/serial_station_architecture.md`
+6. 关联构建行为：`docs/constraints/06-git-commit.md`
 
-### Qt模块依赖
+> 任何偏离这条加载链路的任务，视为流程未开始，不执行变更。
 
-| 模块 | 用途 |
-|------|------|
-| Qt Core | 核心非GUI功能（QObject, 事件循环, 文件IO） |
-| Qt Widgets | UI控件体系（QWidget, 布局, 对话框） |
-| Qt Gui | 图形基础（QPainter, 图片, 字体） |
-| Qt SerialPort | 串口通信（QSerialPort） |
-| Qt Network | TCP/UDP/SSL网络通信 |
-| Qt Svg | SVG图标渲染（Lucide图标集） |
-| Qt Charts | 数据波形图表（QChart, QLineSeries） |
+## 二-a、AI 可执行评分目标（全项目统一）
 
-### 构建命令
+### 2-a.1 评分基础
 
-```bash
-cmake -G Ninja -B build -DCMAKE_PREFIX_PATH=E:/Tool/DevEnv/Qt/6.8.3/mingw_64
-cmake --build build
-E:/Tool/DevEnv/Qt/6.8.3/mingw_64/bin/windeployqt.exe build/EmbedDebug.exe
+- 当前目标分：`500`。
+- 目标分：`1000`。
+- 每次通过门禁的 commit：`+1` 分。
+- Push 节拍：每 2 次门禁通过 commit 形成一个 Push 周期（第 2、4、6 次...）。
+- Push 周期发起前，先更新 README 的企业级精简快照。
+- 未通过门禁的 commit：不得提交。
+- 任何单轮关闭循环后必须记录得分变化并同步到对应约束条目。
+
+### 2-a.2 评分闭环触发条件
+
+- PRD/Specs 与约束映射都已更新。
+- 至少一类验收证据可复现（构建、测试、启动、文档证据）。
+- 本轮变更没有越界目录、层级、Python 主线落点等硬边界。
+- 每轮评分闭环前必须完成 Python/PyQt 启动 smoke 证据：`uv run start-embeddebug --smoke` 与 `cmd /c EmbedDebug.bat --smoke`。
+- 三轴 `E/U/D` 至少一项有真实改变量。
+- `EmbedDebug.bat` 相关链路变化需补充启动复测结论。
+
+### 2-a.3 量化里程碑
+
+| 分数档 | 目标 | 说明 |
+|---|---|---|
+| 500~599 | 约束对齐期 | 将已有规则统一到可执行清单 |
+| 600~699 | 结构与流程稳定期 | 形成闭环执行模板并落地 |
+| 700~799 | 串口核心能力增强期 | 约束与功能一体化推进 |
+| 800~899 | 体验一致性期 | UI、日志、回放、脚本、错误可恢复能力齐备 |
+| 900~999 | 交付前硬化期 | 完整闭环证据、回归率与风险缓释 |
+| 1000 | 目标达成 | 可持续执行的主线与长期开启状态 |
+
+### 2-a.4 可量化最小验收（每 20 分）
+
+每完成 20 分至少满足一条：
+
+1. 一个主要闭环从触发到验收闭环可追踪。
+2. 至少 2 个约束文档条目更新且与代码状态一致。
+3. 一个关键场景有三轴证据（至少 E 或 U 或 D）。
+4. 进行一次最小可复现 smoke：`uv run start-embeddebug --smoke` 与 `cmd /c EmbedDebug.bat --smoke`。
+
+
+---
+
+## 三、Python/PyQt 启动、测试与打包环境
+
+### 3.1 环境
+
+- uv：PATH 中可执行 `uv`
+- Python：由 `uv` 根据 `pyproject.toml` 与 `uv.lock` 管理
+- GUI：PyQt6
+- 打包：PyInstaller（通过 `uv run package-embeddebug`）
+- J-Link：`E:/Embedded/Tool/SEGGER_IOT/JLink_V932`
+
+### 3.2 Python/PyQt 工具链
+
+```powershell
+uv run start-embeddebug
+uv run test-embeddebug-py
+uv run test-embeddebug-tools
+uv run package-embeddebug --version smoke --clean
+uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-smoke-windows-x64
 ```
 
-### 启动底线
+### 3.3 启动最低验收线
 
-`EmbedDebug.bat` 是用户侧最低运行入口，必须保持双击可启动。若 `build/EmbedDebug.exe` 不存在，`EmbedDebug.bat` 必须在当前机器可用环境下自动尝试配置/构建；失败时必须在弹窗输出具体缺失组件和修复命令。
-
-### 克隆后可运行环境
-
-克隆后首次运行只允许按固定顺序操作：
-
-1. 双击 `tools\bootstrap_env.bat`（自动写入 `local_env.bat`）。
-2. 确认控制台显示了 `QT_PREFIX / MINGW_BIN / CMAKE_BIN / NINJA_BIN`。
-3. 双击 `EmbedDebug.bat`（或 `Beta.bat`）启动。
-
-约束：`local_env.bat` 仅为机器本地环境文件，不提交 git；若启动失败，必须直接指出缺的依赖项并给出修复命令。
-
-- bat 只能从 `build/EmbedDebug.exe` 启动应用。
-- 如果缺少 Qt 运行库，bat 应尝试执行 `windeployqt` 或给出明确错误信息。
-- 任何修改 CMake、输出目录、可执行文件名、资源路径、Qt 部署路径、启动脚本的任务，收口前必须验证 `EmbedDebug.bat`。
-- 不能验证时必须写明原因，不能只写“未测试”。
-
-### 构建目录唯一性
-
-项目只允许一个构建目录：`build/`。
-
-- 禁止创建或引用 `build2/`、`build-debug/`、`build-release/`、`cmake-build-*` 等平行构建目录。
-- 所有构建、部署、启动、测试命令都必须指向 `build/`。
-- `EmbedDebug.bat` 不允许兼容第二构建目录；如果 `build/EmbedDebug.exe` 不存在，应直接报错。
-
-### VS Code IntelliSense
-
-`.vscode/c_cpp_properties.json` 配置:
-- includePath: `${workspaceFolder}/src`, `E:/Tool/DevEnv/Qt/6.8.3/mingw_64/include/**`, GCC标准库头文件
-- defines: `UNICODE`, `_UNICODE`, `QT_CORE_LIB`, `QT_GUI_LIB`, `QT_WIDGETS_LIB`, `QT_SERIALPORT_LIB`, `QT_CHARTS_LIB`, `QT_NETWORK_LIB`
-- compilerPath: `E:/Tool/DevEnv/.../mingw64/bin/g++.exe`
-- intelliSenseMode: `gcc-x64`, cppStandard: `c++17`
+- `EmbedDebug.bat` 是用户侧最低验收入口，必须双击可启动。
+- 自 PRD-136/B22 起，`EmbedDebug.bat` 默认且唯一活跃启动链路为 Python/PyQt：`uv run start-embeddebug`。
+- C++/CMake 打包链路不再作为活跃工程入口、fallback 或验收口径。
+- 建议每轮考核固定执行：
+  - `uv run start-embeddebug --smoke`
+  - `cmd /c EmbedDebug.bat --smoke`
+- 任何涉及 Python 依赖、路径、资源、部署、启动脚本的修改，收口前必须验证 Python/PyQt 默认入口；不能验证必须写明缺失组件与修复命令。
+- 严禁平行构建目录：`build2/`、`build-debug/`、`build-release/`、`cmake-build-*`。
 
 ---
 
-## 三、模块清单
+## 四、模块与目录快照（当前）
 
-> src/ 下有主模块，基础层已经落地到 `shared/` 与 `interfaces/`，当前进入兼容迁移与骨架化收口阶段。
-> 模块清单只说明代码归属，不代表用户完成度。功能成熟度必须按 `CLAUDE.md` 的工程状态、用户状态、设备验证三轴口径记录。
+### 4.1 已确认主模块
 
-### 现有模块（12个）
+| 模块 | 目录 | 职责 | 当前状态 |
+|------|------|------|----------|
+| automation | `src/automation/` | 脚本触发与自动化流程 | 已上线 |
+| chart | `src/chart/` | 可视化控件（波形/散点/直方） | 已上线 |
+| connection | `src/connection/` | 连接抽象与多连接实现 | 在建（含串口/TCP等） |
+| core | `src/core/` | 应用协调、导航、会话、基础窗口 | 关键枢纽 |
+| dashboard | `src/dashboard/` | 仪表盘展示 | 在建 |
+| ota | `src/ota/` | 固件升级能力 | 在建 |
+| plugin | `src/plugin/` | 插件系统与扩展能力 | 在建 |
+| protocol | `src/protocol/` | 协议解析和数据建模 | 在建 |
+| rtt | `src/rtt/` | RTT 相关连接 | 在建 |
+| serial | `src/serial/` | 旧串口能力（历史兼容） | 冻结兼容 |
+| terminal | `src/terminal/` | 终端交互与日志显示 | 已上线 |
+| utils | `src/utils/` | CRC、RingBuffer、日志、公共工具 | 已上线 |
 
-| 模块 | 路径 | 职责 | 所属层级 |
-|------|------|------|---------|
-| `automation` | `src/automation/` | 脚本自动化引擎、触发器 | 业务层 |
-| `chart` | `src/chart/` | 数据波形显示（折线/FFT/散点/直方） | 表现层 |
-| `connection` | `src/connection/` | 连接抽象与多种连接方式实现 | 基础设施层 |
-| `core` | `src/core/` | 应用协调 + 基础 UI（MainWindow, PanelManager, ThemeManager, 各Controller） | 应用协调层 |
-| `dashboard` | `src/dashboard/` | 仪表盘模式（Gauge/LED/数值） | 表现层 |
-| `ota` | `src/ota/` | 固件OTA升级（XMODEM/YMODEM/ZMODEM） | 业务层 |
-| `plugin` | `src/plugin/` | 插件系统（DLL动态加载） | 业务层 |
-| `protocol` | `src/protocol/` | 协议解析引擎（帧解析/Modbus/JustFloat/FireWater） | 业务层 |
-| `rtt` | `src/rtt/` | SEGGER RTT连接（J-Link SDK适配） | 基础设施层 |
-| `serial` | `src/serial/` | 串口功能UI（配置面板/快捷指令/信号线监控） | 表现层 |
-| `terminal` | `src/terminal/` | 终端显示（自绘制控件/搜索/选择/过滤） | 表现层 |
-| `utils` | `src/utils/` | 公共工具（CRC/RingBuffer/DataLogger/SettingsManager） | 基础设施层 |
+### 4.2 新增优先落地点（必须使用）
 
-### 收敛中的基础层
-
-| 模块 | 路径 | 职责 | 状态 |
-|------|------|------|------|
-| `interfaces` | `src/interfaces/` | 纯虚接口定义（IConnection, IPanelProvider, IDataSink, IProtocolParser, IDevice） | 已定义，持续扩展 |
-| `shared` | `src/shared/` | 共享常量+枚举正式层（`core/theme/Constants.h` 仅作兼容转发） | ✅ 已落地，持续收口 |
-
-### 现阶段骨架口径
-
-| 入口 | 口径 |
-|------|------|
-| 稳定入口 | `AGENTS.md` 只保留索引和稳定规则，详细约束入口为 `CLAUDE.md` |
-| 主架构文档 | `docs/constraints/03-architecture.md` |
-| 目录骨架文档 | `docs/constraints/07-directory-structure.md` |
-| 串口工站专项架构 | `docs/serial_station_architecture.md` |
-| 冻结历史分叉 | `animation2/`、`widgets2/`、`loader2/`、`fonts/`、`icons/`、`responsive/` |
-| 未来迁移落点 | `src/features/`、`src/shared/`、`src/interfaces/`、`src/core/` 的各自 canonical 子目录 |
-
-### 功能成熟度口径
-
-后续所有模块状态不得只写“已实现”：
-
-- `E` 轴说明工程实现：源码、CMake、测试、可维护性。
-- `U` 轴说明用户可用：入口、主流程、错误反馈、体验完整度。
-- `D` 轴说明设备验证：纯单测、替身、虚拟设备、真实硬件。
-- 外设能力默认不能跳过设备验证；UART/RTT/CAN/BLE/USB/SPI/I2C 没有 `D4` 时必须写“真实设备未验证”。
-- README 和 ROADMAP 只能宣传有证据的能力；骨架、stub、空方法、无入口模块必须标为预览或待完善。
+- `src/interfaces/`：纯接口与契约
+- `src/shared/`：跨模块稳定常量、枚举、值对象
+- `src/features/`：迁移承接（不直接承载生产实现）
+- `src/apps/serial_station/`：串口工站重构落地
 
 ---
 
-## 四、Serial Station 重构目标
+## 五、项目质量口径（必须同步到所有说明）
 
-`serial_station` 是后续串口上位机重构的独立 app 模块，目标是把“串口框架层”和“业务协议层”切开，避免继续把 UI、串口收发、协议解析和文件服务耦合在一起。
+### 5.1 三轴状态
 
-### 目标定位
+- `E` 工程：`E0/E1/E2/E3/E4/E5`
+- `U` 用户：`U0/U1/U2/U3/U4`
+- `D` 设备：`D0/D1/D2/D3/D4`
 
-| 项 | 约束 |
-|----|------|
-| 模块路径 | `src/apps/serial_station/` |
-| 专项文档 | `docs/serial_station_architecture.md` |
-| 入口方式 | 作为 C++/Qt 新工站模块接入现有主窗口或启动入口，不直接污染现有 WiFi/RF/UWB 等工站 |
-| 核心边界 | UI 只通过 `SerialStationController` 协调；`core/` 只管串口 bytes；`protocols/` 只管协议；`services/` 只管日志/导出/回放 |
+### 5.2 状态提升条件（最小集合）
 
-### 优先落地顺序
+- `E` 仅能在源码、关键路径测试、启动或打包证据齐备时提升。
+- `U` 仅有主入口 + 完整闭环+错误反馈时可提升。
+- `D` 外设能力未有 `D2+` 不能提升为“硬件可用”。
 
-1. 先建 `protocols/ISerialProtocol.h`、`protocols/SerialProtocolRegistry.h/.cpp`、`core/SerialCodec.h/.cpp`、`core/SerialDispatcher.h/.cpp`。
-2. 再建 `core/SerialPort.h/.cpp`、`core/SerialManager.h/.cpp`、`workers/SerialReaderWorker.h/.cpp`。
-3. 最后接 `ui/` 面板和 `SerialStationController.h/.cpp`。
-4. 第一批协议只保留 `ascii_text`、`modbus_rtu`、`custom_md`，并配套 QTest 测试。
+### 5.3 约束入口联动
 
-### 当前验收优先级
+> 任何功能/文档升级不能跳过约束链路。
+> 约束映射：
 
-Serial Station 后续迭代优先补齐用户闭环，而不是继续堆新协议或新面板：
+- 工程风格与边界：`03-architecture.md`
+- 工作流与 PRD/Specs：`02-workflow.md`
+- UI 改造：`05-ui-standard.md`
+- 文件变更与目录：`07-directory-structure.md`
+- 图标与主题：`08-icon-standard.md`
+- 代码提交与验收：`06-git-commit.md`
+- 串口专项：`docs/serial_station_architecture.md`
 
-1. 主程序入口可达，用户能打开独立串口工站。
-2. UART 配置、连接、断开、发送、接收、日志在同一工作台路径内闭环。
-3. 使用 fake serial、虚拟串口或真实 USB-UART 做 D2/D3/D4 验证。
-4. 再扩展协议模板、回放、导出、设备档案和高级监控。
+---
 
-没有完成上述闭环前，Serial Station 相关能力最多写为“工程已实现/用户局部可用/设备未充分验证”。
+## 六、Serial Station 当前目标（不写在这里就不能开始该子域）
+
+- Python/PyQt 新增落点为 `python/embeddebug/serial_station/`，明确 `ui`、`controllers`、`core`、`protocols`、`services`、`workers`、`drivers` 分层。
+- C++ 串口目录仅保留历史参考和兼容维护，不再新增默认交付能力。
+- 首先实现用户闭环（连接-发送-接收-日志-导出-回放），再扩展高级功能。
+- 任何新协议必须有 `tests/serial_station/` 对应 parser/build 测试。
+- 真实设备验证与模拟验证必须记录，不允许只在 parser 测试下宣称“工程可调试”。
+
+---
+
+## 七、即时行动清单（适用于本轮）
+
+1. 统一补齐约束文档并在 PRD/Specs/迭代说明中引用本文件版本。
+2. 串口工站与主界面所有入口需能在版本文档中明确 `E/U/D` 和验收链接。
+3. 任何宣传文案需与文档证据一致，避免“完成”误导。
+
+## 八、项目评分执行日志要求（AI 永久执行）
+
+每次任务结束追加一条评分日志，格式如下：
+
+- 时间：YYYY-MM-DD HH:mm
+- 本轮增量：`+N`（默认 0~1，若门禁未过为 0）
+- 当前得分：`xx/1000`
+- 本轮影响：`文件列表`、`约束文档列表`、`E/U/D`变更
+- 证据摘要：`build/test/startup/doc` 三类至少 1 项
+- smoke 证据：`uv run start-embeddebug --smoke` 与 `cmd /c EmbedDebug.bat --smoke` 的退出码
+- 阶段：`500->1000` 中的当前区间
+- 子代理闭环：A-1 / A-2 / D-1 / D-2 / D-3 / P-1 / U-1 的结论状态

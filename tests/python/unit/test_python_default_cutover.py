@@ -1,0 +1,55 @@
+from __future__ import annotations
+
+import tomllib
+from pathlib import Path
+
+
+def test_default_uv_commands_point_to_python_lane():
+    pyproject = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+
+    scripts = pyproject["project"]["scripts"]
+
+    assert scripts["start-embeddebug"] == "embeddebug.app.main:main"
+    assert scripts["package-embeddebug"] == "embeddebug.devtools.package_pyinstaller:main"
+    assert scripts["verify-package-embeddebug"] == (
+        "embeddebug.devtools.verify_pyinstaller_package:main"
+    )
+
+
+def test_batch_launcher_uses_uv_python_startup():
+    bat_text = Path("EmbedDebug.bat").read_text(encoding="utf-8", errors="ignore")
+    launcher_text = Path("tools/launch_embeddebug.ps1").read_text(
+        encoding="utf-8",
+        errors="ignore",
+    )
+
+    assert "tools\\launch_embeddebug.ps1" in bat_text
+    assert "uv run start-embeddebug" in launcher_text
+    assert "build\\EmbedDebug.exe" not in launcher_text
+    assert "cmake" not in launcher_text.lower()
+
+
+def test_active_tools_do_not_reintroduce_cpp_packaging():
+    active_tool_paths = [
+        Path("tools/launch_embeddebug.ps1"),
+        Path("tools/start_embeddebug.py"),
+        Path("tools/package_embeddebug.py"),
+        Path("tools/verify_package_embeddebug.py"),
+        Path("tools/doctor.ps1"),
+        Path("tools/verify_embeddebug_launch.ps1"),
+        Path("tools/bootstrap_env.bat"),
+        Path("tools/source-tree-audit.ps1"),
+        Path("tools/simplify-scan.ps1"),
+    ]
+    forbidden = [
+        "cmake",
+        "windeployqt",
+        "mingw",
+        "build/embeddebug.exe",
+        "build\\embeddebug.exe",
+    ]
+
+    for path in active_tool_paths:
+        text = path.read_text(encoding="utf-8", errors="ignore").lower()
+        for token in forbidden:
+            assert token not in text, f"{path} still references {token}"

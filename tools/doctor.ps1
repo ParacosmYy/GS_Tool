@@ -1,6 +1,7 @@
 param(
-    [switch]$RunBuild,
-    [switch]$RunLaunch
+    [switch]$RunTests,
+    [switch]$RunLaunch,
+    [switch]$RunPackageDryRun
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,47 +29,10 @@ function Resolve-RepoRoot {
     return [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 }
 
-function Read-LocalEnv([string]$EnvFile) {
-    $result = @{}
-    if (-not (Test-Path -LiteralPath $EnvFile -PathType Leaf)) {
-        return $result
-    }
-
-    foreach ($line in Get-Content -LiteralPath $EnvFile) {
-        if ($line -match '^\s*set\s+"([^=]+)=(.*)"\s*$') {
-            $result[$matches[1]] = $matches[2]
-        }
-    }
-    return $result
-}
-
 function Resolve-CommandSource([string]$Name) {
     $cmd = Get-Command $Name -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($cmd) { return $cmd.Source }
     return $null
-}
-
-function Test-Leaf([string]$Path) {
-    return -not [string]::IsNullOrWhiteSpace($Path) -and (Test-Path -LiteralPath $Path -PathType Leaf)
-}
-
-function Test-ContainerPath([string]$Path) {
-    return -not [string]::IsNullOrWhiteSpace($Path) -and (Test-Path -LiteralPath $Path -PathType Container)
-}
-
-function Check-EnvPath([hashtable]$EnvMap, [string]$Name, [string]$ExpectedLeaf) {
-    if (-not $EnvMap.ContainsKey($Name) -or [string]::IsNullOrWhiteSpace($EnvMap[$Name])) {
-        Warn "$Name is not set in local_env.bat"
-        return
-    }
-
-    $base = $EnvMap[$Name]
-    $target = if ([string]::IsNullOrWhiteSpace($ExpectedLeaf)) { $base } else { Join-Path $base $ExpectedLeaf }
-    if (Test-Leaf $target -or Test-ContainerPath $target) {
-        Pass "$Name=$base"
-    } else {
-        Fail "$Name points to missing path: $base"
-    }
 }
 
 function Check-Command([string]$Name, [bool]$Required) {
@@ -85,9 +49,12 @@ function Check-Command([string]$Name, [bool]$Required) {
     }
 }
 
-function Check-BuildDirs([string]$Root) {
+function Check-ForbiddenBuildDirs([string]$Root) {
     $bad = Get-ChildItem -LiteralPath $Root -Force -Directory |
-        Where-Object { $_.Name -match '^(build2|build-debug|build-release|cmake-build)' }
+        Where-Object {
+            $_.Name -in @("build2", "build-debug", "build-release") -or
+            ($_.Name -like "*-build" -and $_.Name -ne "build")
+        }
 
     if ($bad) {
         foreach ($item in $bad) {
@@ -114,27 +81,13 @@ function Invoke-CheckedCommand([string]$Label, [string]$FilePath, [string[]]$Arg
 }
 
 $root = Resolve-RepoRoot
-$buildDir = Join-Path $root "build"
-$exePath = Join-Path $buildDir "EmbedDebug.exe"
-$envFile = Join-Path $root "local_env.bat"
-$envMap = Read-LocalEnv $envFile
-
-if ($envMap.ContainsKey("QT_PREFIX")) {
-    $qtBin = Join-Path $envMap["QT_PREFIX"] "bin"
-    if (Test-Path -LiteralPath $qtBin -PathType Container) {
-        $env:PATH = "$qtBin;$env:PATH"
-    }
-    $qtToolBin = Join-Path $envMap["QT_PREFIX"] "share\qt6\bin"
-    if (Test-Path -LiteralPath $qtToolBin -PathType Container) {
-        $env:PATH = "$qtToolBin;$env:PATH"
-    }
-}
-if ($envMap.ContainsKey("MINGW_BIN") -and (Test-Path -LiteralPath $envMap["MINGW_BIN"] -PathType Container)) {
-    $env:PATH = "$($envMap["MINGW_BIN"]);$env:PATH"
+$uv = Resolve-CommandSource "uv.exe"
+if (-not $uv) {
+    $uv = Resolve-CommandSource "uv"
 }
 
 Write-Host "-------------------------------------------------"
-Write-Host "EmbedDebug Doctor"
+Write-Host "EmbedDebug Python/PyQt Doctor"
 Write-Host "Root : $root"
 Write-Host "-------------------------------------------------"
 
@@ -144,90 +97,53 @@ if (Test-Path -LiteralPath (Join-Path $root "CLAUDE.md") -PathType Leaf) {
     Fail "CLAUDE.md not found; run doctor from repository checkout"
 }
 
-Check-BuildDirs $root
+Check-ForbiddenBuildDirs $root
+Check-Command "uv.exe" $false
+Check-Command "uv" $true
 
-if (Test-Path -LiteralPath $buildDir -PathType Container) {
-    Pass "build directory exists"
+if (Test-Path -LiteralPath (Join-Path $root "pyproject.toml") -PathType Leaf) {
+    Pass "pyproject.toml exists"
 } else {
-    Warn "build directory does not exist yet"
+    Fail "pyproject.toml missing"
 }
 
-if (Test-Leaf $exePath) {
-    Pass "build/EmbedDebug.exe exists"
+if (Test-Path -LiteralPath (Join-Path $root "uv.lock") -PathType Leaf) {
+    Pass "uv.lock exists"
 } else {
-    Warn "build/EmbedDebug.exe is missing"
+    Warn "uv.lock missing"
 }
 
-if (Test-Leaf $envFile) {
-    Pass "local_env.bat exists"
+if (Test-Path -LiteralPath (Join-Path $root "python\embeddebug\app\main.py") -PathType Leaf) {
+    Pass "Python/PyQt entrypoint exists"
 } else {
-    Warn "local_env.bat is missing; run tools\\bootstrap_env.bat if needed"
+    Fail "Python/PyQt entrypoint missing"
 }
 
-Check-EnvPath $envMap "QT_PREFIX" "bin\windeployqt.exe"
-Check-EnvPath $envMap "MINGW_BIN" "g++.exe"
-
-if ($envMap.ContainsKey("CMAKE_BIN") -and (Test-Leaf $envMap["CMAKE_BIN"])) {
-    Pass "CMAKE_BIN=$($envMap["CMAKE_BIN"])"
-} else {
-    Warn "CMAKE_BIN is missing or invalid in local_env.bat"
-}
-
-if ($envMap.ContainsKey("NINJA_BIN") -and (Test-Leaf $envMap["NINJA_BIN"])) {
-    Pass "NINJA_BIN=$($envMap["NINJA_BIN"])"
-} else {
-    Warn "NINJA_BIN is missing or invalid in local_env.bat"
-}
-
-Check-Command "cmake.exe" $true
-Check-Command "ninja.exe" $true
-Check-Command "go.exe" $false
-
-$mocPath = $null
-if ($envMap.ContainsKey("QT_PREFIX")) {
-    $candidateMoc = Join-Path $envMap["QT_PREFIX"] "share\qt6\bin\moc.exe"
-    if (Test-Leaf $candidateMoc) {
-        $mocPath = $candidateMoc
+if ($RunTests) {
+    if ($uv) {
+        Invoke-CheckedCommand "uv run test-embeddebug-py" $uv @("run", "test-embeddebug-py") $root
+        Invoke-CheckedCommand "uv run test-embeddebug-tools" $uv @("run", "test-embeddebug-tools") $root
     } else {
-        $candidateMoc = Join-Path $envMap["QT_PREFIX"] "bin\moc.exe"
-        if (Test-Leaf $candidateMoc) {
-            $mocPath = $candidateMoc
-        }
-    }
-}
-if ($mocPath) {
-    & $mocPath -h > $null 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        Pass "moc.exe runnable: $mocPath"
-    } else {
-        Fail "moc.exe exists but cannot run: $mocPath"
+        Fail "Cannot run tests because uv is unavailable"
     }
 } else {
-    Fail "moc.exe not found under QT_PREFIX"
+    Skip "Test check not requested; use -RunTests"
 }
 
-$running = Get-Process EmbedDebug -ErrorAction SilentlyContinue | Select-Object -First 1
-if ($running) {
-    Warn "EmbedDebug is currently running with PID $($running.Id); linking may fail if a rebuild is needed"
-} else {
-    Pass "EmbedDebug process is not running"
-}
-
-if ($RunBuild) {
-    $cmake = Resolve-CommandSource "cmake.exe"
-    if ($cmake) {
-        Invoke-CheckedCommand "cmake build" $cmake @("--build", ".\build", "--config", "Release", "--parallel", "4") $root
+if ($RunPackageDryRun) {
+    if ($uv) {
+        Invoke-CheckedCommand "uv run package-embeddebug --dry-run" $uv @("run", "package-embeddebug", "--dry-run") $root
     } else {
-        Fail "Cannot run build because cmake.exe is unavailable"
+        Fail "Cannot run package dry-run because uv is unavailable"
     }
 } else {
-    Skip "Build check not requested; use -RunBuild"
+    Skip "Package dry-run not requested; use -RunPackageDryRun"
 }
 
 if ($RunLaunch) {
     $bat = Join-Path $root "EmbedDebug.bat"
-    if (Test-Leaf $bat) {
-        Invoke-CheckedCommand "EmbedDebug.bat launch" $bat @() $root
+    if (Test-Path -LiteralPath $bat -PathType Leaf) {
+        Invoke-CheckedCommand "EmbedDebug.bat Python/PyQt smoke" $bat @("--smoke") $root
     } else {
         Fail "EmbedDebug.bat not found"
     }
