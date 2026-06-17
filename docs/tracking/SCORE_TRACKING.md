@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 573分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 427分
+> 当前: 574分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 426分
 
 ---
 
@@ -275,12 +275,13 @@
 | 571 | Serial Station UDP UI entry | 工作台新增 UDP host/port 与 Connect UDP 入口，Profile 可保存 UDP endpoint，补 UI smoke 与架构边界测试 |
 | 572 | Serial Station UDP UI loopback | 补 PyQt UI UDP loopback 收发 smoke，状态栏显示 UDP 本地绑定端口，形成可回包诊断闭环 |
 | 573 | Serial Station endpoint validation helper | 新增 TCP/UDP host:port 公共校验 helper，connection_actions 复用字段级校验，补纯单测并保持 UI smoke 通过 |
+| 574 | Serial Station status message helper | 新增 OperationResult 状态消息 helper，connection_actions 复用连接/发送成功失败文案格式，补纯单测并保持 UI smoke 通过 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#573` 的完整记录
+- 当前文档已整理到 `#574` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
