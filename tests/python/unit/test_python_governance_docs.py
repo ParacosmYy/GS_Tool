@@ -174,3 +174,10 @@ def test_workbench_controller_unit_tests_are_split_by_behavior_domain():
     line_count = len(path.read_text(encoding="utf-8").splitlines())
 
     assert line_count <= 180, f"{path} has {line_count} lines; split connection/profile cases"
+
+
+def test_workbench_controller_runtime_facade_stays_below_250_lines():
+    path = Path("python/embeddebug/serial_station/controllers/workbench_controller.py")
+    line_count = len(path.read_text(encoding="utf-8").splitlines())
+
+    assert line_count <= 250, f"{path} has {line_count} lines; split runtime state helpers"

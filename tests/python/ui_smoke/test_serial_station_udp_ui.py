@@ -81,6 +81,7 @@ def test_pyqt_serial_station_udp_loopback_send_and_receive(qtbot):
     send_edit = window.findChild(QLineEdit, "serialStationSendEdit")
     send_button = window.findChild(QPushButton, "serialStationSendButton")
     log_view = window.findChild(QPlainTextEdit, "serialStationLogView")
+    status_label = window.findChild(QLabel, "serialStationStatusLabel")
 
     for widget in [
         udp_host_edit,
@@ -89,6 +90,7 @@ def test_pyqt_serial_station_udp_loopback_send_and_receive(qtbot):
         send_edit,
         send_button,
         log_view,
+        status_label,
     ]:
         assert widget is not None
 
@@ -96,8 +98,9 @@ def test_pyqt_serial_station_udp_loopback_send_and_receive(qtbot):
     udp_port_edit.setText(str(peer.localPort()))
     qtbot.mouseClick(connect_udp_button, Qt.MouseButton.LeftButton)
 
-    assert isinstance(window._controller._transport, UdpDatagramTransport)
-    ui_udp_port = window._controller._transport.local_port
+    status_text = status_label.text()
+    assert "Connected to UDP 127.0.0.1" in status_text
+    ui_udp_port = int(status_text.rsplit("local ", maxsplit=1)[-1])
     assert ui_udp_port > 0
 
     send_edit.setText("udp-ping")
