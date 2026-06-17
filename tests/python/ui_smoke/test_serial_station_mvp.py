@@ -247,17 +247,21 @@ def test_pyqt_mvp_log_stats_follow_entries_and_filters(qtbot):
     assert log_stats_label.text() == "Visible 0 / Total 0 | TX 0 | RX 0 | System 0 | Error 0"
 
     qtbot.mouseClick(connect_button, Qt.MouseButton.LeftButton)
+    qtbot.waitUntil(lambda: "Visible 1 / Total 1" in log_stats_label.text(), timeout=1000)
+    assert "System 1" in log_stats_label.text()
+
     send_edit.setText("stat-tx")
     qtbot.mouseClick(send_button, Qt.MouseButton.LeftButton)
     inject_edit.setText("stat-rx")
     qtbot.mouseClick(inject_button, Qt.MouseButton.LeftButton)
 
-    qtbot.waitUntil(lambda: "Visible 2 / Total 2" in log_stats_label.text(), timeout=1000)
+    qtbot.waitUntil(lambda: "Visible 3 / Total 3" in log_stats_label.text(), timeout=1000)
     assert "TX 1" in log_stats_label.text()
     assert "RX 1" in log_stats_label.text()
+    assert "System 1" in log_stats_label.text()
 
     log_filter_combo.setCurrentText("TX")
-    assert log_stats_label.text() == "Visible 1 / Total 2 | TX 1 | RX 1 | System 0 | Error 0"
+    assert log_stats_label.text() == "Visible 1 / Total 3 | TX 1 | RX 1 | System 1 | Error 0"
 
     qtbot.mouseClick(clear_button, Qt.MouseButton.LeftButton)
     assert log_stats_label.text() == "Visible 0 / Total 0 | TX 0 | RX 0 | System 0 | Error 0"

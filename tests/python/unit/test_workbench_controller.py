@@ -53,14 +53,18 @@ def test_workbench_controller_exports_replays_and_profiles(tmp_path):
     controller.inject_received_text("pong")
 
     controller.export_log(log_path)
-    assert len(log_path.read_text(encoding="utf-8").splitlines()) == 2
+    assert len(log_path.read_text(encoding="utf-8").splitlines()) == 3
 
     controller.clear_log()
     assert controller.entries == ()
 
     controller.replay_log(log_path)
-    assert [entry.text for entry in controller.entries] == ["ping", "pong"]
-    assert replayed[-2:] == ["tx:ping", "rx:pong"]
+    assert [(entry.direction, entry.text) for entry in controller.entries] == [
+        ("system", "connected: fake FAKE_LOOPBACK"),
+        ("tx", "ping"),
+        ("rx", "pong"),
+    ]
+    assert replayed[-3:] == ["system:connected: fake FAKE_LOOPBACK", "tx:ping", "rx:pong"]
 
     controller.save_profile(profile_path, "bench-profile")
     loaded = controller.load_profile(profile_path)
@@ -94,6 +98,30 @@ def test_workbench_controller_tracks_successful_command_history():
     assert controller.send_text("ping")
 
     assert controller.command_history == ("pong", "ping")
+
+
+def test_workbench_controller_records_connection_lifecycle_entries():
+    controller = SerialWorkbenchController()
+    logged: list[str] = []
+    controller.on_log_entry(lambda entry: logged.append(f"{entry.direction}:{entry.text}"))
+
+    result = controller.connect_fake_result()
+
+    assert result.ok
+    assert controller.entries[-1].direction == "system"
+    assert controller.entries[-1].text == "connected: fake FAKE_LOOPBACK"
+    assert logged[-1] == "system:connected: fake FAKE_LOOPBACK"
+
+    controller.disconnect()
+
+    assert [(entry.direction, entry.text) for entry in controller.entries[-2:]] == [
+        ("system", "connected: fake FAKE_LOOPBACK"),
+        ("system", "disconnected: fake"),
+    ]
+    assert logged[-2:] == [
+        "system:connected: fake FAKE_LOOPBACK",
+        "system:disconnected: fake",
+    ]
 
 
 def test_workbench_controller_inject_received_text_reports_non_fake_failure():
@@ -156,7 +184,10 @@ def test_workbench_controller_service_result_success_paths(tmp_path):
     controller.clear_log()
     replay_result = controller.replay_log_result(log_path)
     assert replay_result.ok
-    assert [entry.text for entry in controller.entries] == ["status?"]
+    assert [(entry.direction, entry.text) for entry in controller.entries] == [
+        ("system", "connected: fake FAKE_LOOPBACK"),
+        ("tx", "status?"),
+    ]
 
     save_result = controller.save_profile_result(profile_path, "result-profile")
     assert save_result.ok

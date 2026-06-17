@@ -10,6 +10,7 @@ from embeddebug.serial_station.core import ChannelBatch, ChannelRingBuffer, Seri
 from embeddebug.serial_station.controllers.connection_results import open_transport_result
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
 from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event, event_from_entry
+from embeddebug.serial_station.controllers.measurement_buffer import append_measurement_batch
 from embeddebug.serial_station.controllers.profile_snapshot import build_profile_snapshot
 from embeddebug.serial_station.controllers.session_operations import (
     export_log_result as export_session_log_result,
@@ -72,8 +73,7 @@ class SerialWorkbenchController:
 
     @property
     def active_local_port(self) -> int | None:
-        port = int(getattr(self._transport, "local_port", 0) or 0)
-        return port or None
+        return int(getattr(self._transport, "local_port", 0) or 0) or None
 
     def on_log_entry(self, callback: LogEntryCallback) -> None:
         self._log_callbacks.append(callback)
@@ -105,7 +105,9 @@ class SerialWorkbenchController:
             self._replace_transport(self._transport_registry.create("fake"))
         self._transport_mode = "fake"
         config = SerialPortConfig(port_name="FAKE_LOOPBACK", baud_rate=115200)
-        return open_transport_result(self._transport, config, "fake")
+        result = open_transport_result(self._transport, config, "fake")
+        self._append_connected_entry(result, "fake")
+        return result
 
     def connect_serial(
         self,
@@ -135,7 +137,7 @@ class SerialWorkbenchController:
         flow_control: str = "none",
     ) -> OperationResult[SerialPortConfig]:
         self._transport_mode = "serial"
-        return open_serial_transport(
+        result = open_serial_transport(
             self._transport_registry,
             self._replace_transport,
             port_name,
@@ -145,23 +147,33 @@ class SerialWorkbenchController:
             stop_bits=stop_bits,
             flow_control=flow_control,
         )
+        self._append_connected_entry(result, "serial")
+        return result
 
     def connect_tcp(self, host: str, port: int) -> bool:
         return self.connect_tcp_result(host, port).ok
 
     def connect_tcp_result(self, host: str, port: int) -> OperationResult[SerialPortConfig]:
         self._transport_mode = "tcp"
-        return open_endpoint_transport(self._transport_registry, self._replace_transport, "tcp", host, port)
+        result = open_endpoint_transport(self._transport_registry, self._replace_transport, "tcp", host, port)
+        self._append_connected_entry(result, "tcp")
+        return result
 
     def connect_udp(self, host: str, port: int) -> bool:
         return self.connect_udp_result(host, port).ok
 
     def connect_udp_result(self, host: str, port: int) -> OperationResult[SerialPortConfig]:
         self._transport_mode = "udp"
-        return open_endpoint_transport(self._transport_registry, self._replace_transport, "udp", host, port)
+        result = open_endpoint_transport(self._transport_registry, self._replace_transport, "udp", host, port)
+        self._append_connected_entry(result, "udp")
+        return result
 
     def disconnect(self) -> None:
+        was_connected = self._transport.is_open
+        mode = self._transport_mode
         self._transport.close()
+        if was_connected:
+            self._append_system_entry(f"disconnected: {mode}")
 
     def send_text(self, text: str) -> bool:
         return self.send_text_result(text).ok
@@ -169,18 +181,12 @@ class SerialWorkbenchController:
     def send_text_result(self, text: str) -> OperationResult[SerialWorkbenchLogEntry]:
         if not self._transport.is_open:
             self._handle_error("transport_not_open")
-            return OperationResult.failure(
-                "transport_not_open",
-                "Open a transport before sending",
-            )
+            return OperationResult.failure("transport_not_open", "Open a transport before sending")
         payload = self._dispatcher.build_command(text)
         written = self._transport.write(payload)
         if written != len(payload):
             self._handle_error("transport_write_incomplete")
-            return OperationResult.failure(
-                "transport_write_incomplete",
-                "Transport accepted fewer bytes than requested",
-            )
+            return OperationResult.failure("transport_write_incomplete", "Transport accepted fewer bytes than requested")
         self._remember_command(text)
         entry = SerialWorkbenchLogEntry(direction="tx", text=text, raw=payload)
         self._append_entry(entry)
@@ -189,10 +195,7 @@ class SerialWorkbenchController:
     def inject_received_text(self, text: str) -> OperationResult[None]:
         if not isinstance(self._transport, FakeSerialTransport):
             self._handle_error("fake_injection_requires_fake_transport")
-            return OperationResult.failure(
-                "fake_injection_requires_fake_transport",
-                "Fake RX injection requires fake transport",
-            )
+            return OperationResult.failure("fake_injection_requires_fake_transport", "Fake RX injection requires fake transport")
         self._transport.inject_rx(decode_injected_text(text).encode("utf-8"))
         return OperationResult.success()
 
@@ -258,6 +261,13 @@ class SerialWorkbenchController:
         for callback in list(self._log_callbacks):
             callback(entry)
 
+    def _append_system_entry(self, text: str) -> None:
+        self._append_entry(SerialWorkbenchLogEntry(direction="system", text=text, raw=text.encode("utf-8")))
+
+    def _append_connected_entry(self, result: OperationResult[SerialPortConfig], mode: str) -> None:
+        if result.ok and result.value is not None:
+            self._append_system_entry(f"connected: {mode} {result.value.port_name}")
+
     def _remember_command(self, text: str) -> None:
         if text in self._command_history:
             self._command_history.remove(text)
@@ -265,11 +275,10 @@ class SerialWorkbenchController:
 
     def _restore_command_history(self, values: object) -> None:
         self._command_history.clear()
-        if not isinstance(values, list):
-            return
-        for value in values:
-            if isinstance(value, str) and value:
-                self._remember_command(value)
+        if isinstance(values, list):
+            for value in values:
+                if isinstance(value, str) and value:
+                    self._remember_command(value)
 
     def _replace_transport(self, transport: SerialTransport) -> None:
         if self._transport.is_open:
@@ -279,18 +288,7 @@ class SerialWorkbenchController:
         self._transport.on_error(self._handle_error)
 
     def _append_measurements(self, batch: ChannelBatch) -> None:
-        if (
-            self._measurement_ring is None
-            or self._measurement_ring.latest().values.shape[1] != batch.values.shape[1]
-        ):
-            self._measurement_ring = ChannelRingBuffer(
-                capacity=4096,
-                channel_count=batch.values.shape[1],
-                channel_names=batch.channel_names,
-                dt_ns=batch.dt_ns,
-            )
-        self._measurement_ring.append(batch)
-        latest = self._measurement_ring.latest()
+        self._measurement_ring, latest = append_measurement_batch(self._measurement_ring, batch)
         for callback in list(self._measurement_callbacks):
             callback(latest)
 

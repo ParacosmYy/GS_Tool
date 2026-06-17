@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 600分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 400分
+> 当前: 601分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 399分
 
 ---
 
@@ -302,12 +302,13 @@
 | 598 | Serial Station diagnostic log stats | 日志行渲染与统计支持 System/Error，诊断日志不再归入 RX，并补单测与 UI smoke |
 | 599 | Serial Station diagnostic log replay | 导出回放保持 System/Error 诊断方向，修复 event/entry codec 回放归类并补 codec 与 controller 测试 |
 | 600 | Serial Station controller error log entries | controller 错误进入 Error 日志 entries，发送失败可在日志区筛选、统计、导出和回放，并补单测与 UI smoke |
+| 601 | Serial Station connection lifecycle logs | 连接成功和断开进入 System 日志 entries，可筛选、统计、导出和回放，并补 controller 与 UI smoke 测试 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#600` 的完整记录
+- 当前文档已整理到 `#601` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
