@@ -62,6 +62,21 @@ def connect_tcp(host: ConnectionActionHost) -> None:
     host._status_label.setText(host.tr("Connection failed: {message}").format(message=result.message))
 
 
+def connect_udp(host: ConnectionActionHost) -> None:
+    endpoint = _validated_udp_endpoint(host)
+    if endpoint is None:
+        return
+    udp_host, port = endpoint
+    result = host._controller.connect_udp_result(udp_host, port)
+    if result.ok:
+        host._status_label.setText(
+            host.tr("Connected to UDP {endpoint}").format(endpoint=f"{udp_host}:{port}")
+        )
+        host._set_connected_controls(True)
+        return
+    host._status_label.setText(host.tr("Connection failed: {message}").format(message=result.message))
+
+
 def disconnect(host: ConnectionActionHost) -> None:
     host._controller.disconnect()
     host._status_label.setText(host.tr("Disconnected"))
@@ -72,6 +87,7 @@ def set_connected_controls(host: ConnectionActionHost, connected: bool) -> None:
     host._connect_button.setEnabled(not connected)
     host._connect_serial_button.setEnabled(not connected and has_serial_ports(host))
     host._connect_tcp_button.setEnabled(not connected)
+    host._connect_udp_button.setEnabled(not connected)
     host._disconnect_button.setEnabled(connected)
 
 
@@ -141,3 +157,20 @@ def _validated_tcp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | Non
         host._status_label.setText(host.tr("TCP port is invalid"))
         return None
     return tcp_host, port
+
+
+def _validated_udp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | None:
+    udp_host = host._udp_host_edit.text().strip()
+    port_text = host._udp_port_edit.text().strip()
+    if not udp_host:
+        host._status_label.setText(host.tr("UDP host is empty"))
+        return None
+    try:
+        port = int(port_text)
+    except ValueError:
+        host._status_label.setText(host.tr("UDP port is invalid"))
+        return None
+    if port < 1 or port > 65535:
+        host._status_label.setText(host.tr("UDP port is invalid"))
+        return None
+    return udp_host, port

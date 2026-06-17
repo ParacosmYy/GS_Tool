@@ -11,6 +11,7 @@ from embeddebug.serial_station.controllers import SerialWorkbenchController
 from embeddebug.serial_station.ui import connection_actions
 from embeddebug.serial_station.ui.shortcuts import install_shortcuts
 from embeddebug.serial_station.ui.tcp_controls import build_tcp_controls
+from embeddebug.serial_station.ui.udp_controls import build_udp_controls
 from embeddebug.serial_station.ui.waveform_preview import SerialWaveformPreview
 
 
@@ -22,6 +23,7 @@ class SerialStationSectionsHost(Protocol):
     def _connect_fake(self) -> None: ...
     def _connect_serial(self) -> None: ...
     def _connect_tcp(self) -> None: ...
+    def _connect_udp(self) -> None: ...
     def _disconnect(self) -> None: ...
     def _send_text(self) -> None: ...
     def _select_command_history(self, text: str) -> None: ...
@@ -120,6 +122,9 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     owner._tcp_host_edit, owner._tcp_port_edit, owner._connect_tcp_button = build_tcp_controls(
         owner, root
     )
+    owner._udp_host_edit, owner._udp_port_edit, owner._connect_udp_button = build_udp_controls(
+        owner, root
+    )
 
     owner._disconnect_button = QPushButton(owner.tr("Disconnect"), root)
     owner._disconnect_button.setObjectName("serialStationDisconnectButton")
@@ -141,6 +146,9 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
         owner._tcp_host_edit,
         owner._tcp_port_edit,
         owner._connect_tcp_button,
+        owner._udp_host_edit,
+        owner._udp_port_edit,
+        owner._connect_udp_button,
         owner._disconnect_button,
     ):
         toolbar.addWidget(widget)

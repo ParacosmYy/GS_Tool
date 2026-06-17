@@ -7,6 +7,7 @@ from typing import Protocol
 from PyQt6.QtWidgets import QComboBox
 
 from embeddebug.serial_station.ui.tcp_controls import apply_tcp_profile_controls
+from embeddebug.serial_station.ui.udp_controls import apply_udp_profile_controls
 
 
 class SessionActionHost(Protocol):
@@ -103,6 +104,7 @@ def apply_profile_controls(host: SessionActionHost, profile: dict[str, object]) 
     if port_name:
         _select_combo_value(host._port_combo, port_name)
     apply_tcp_profile_controls(host, transport, port_name)
+    apply_udp_profile_controls(host, transport, port_name)
     baud_rate = transport.get("baudRate")
     if baud_rate is not None:
         _select_combo_value(host._baud_combo, str(baud_rate))

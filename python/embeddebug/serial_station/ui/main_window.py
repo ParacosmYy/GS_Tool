@@ -59,6 +59,9 @@ class SerialStationMainWindow(QMainWindow):
     def _connect_tcp(self) -> None:
         connection_actions.connect_tcp(self)
 
+    def _connect_udp(self) -> None:
+        connection_actions.connect_udp(self)
+
     def _disconnect(self) -> None:
         connection_actions.disconnect(self)
 

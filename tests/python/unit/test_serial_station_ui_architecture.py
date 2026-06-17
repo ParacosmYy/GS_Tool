@@ -9,6 +9,7 @@ from embeddebug.serial_station.ui import (
     session_actions,
     shortcuts,
     tcp_controls,
+    udp_controls,
 )
 
 
@@ -18,6 +19,15 @@ def test_tcp_connection_action_lives_with_connection_actions():
 
     source = inspect.getsource(tcp_controls)
     assert "connect_tcp_result" not in source
+    assert "_status_label.setText" not in source
+
+
+def test_udp_connection_action_lives_with_connection_actions():
+    assert hasattr(connection_actions, "connect_udp")
+    assert not hasattr(udp_controls, "connect_udp_from_controls")
+
+    source = inspect.getsource(udp_controls)
+    assert "connect_udp_result" not in source
     assert "_status_label.setText" not in source
 
 
