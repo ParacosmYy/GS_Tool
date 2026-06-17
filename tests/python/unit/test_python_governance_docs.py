@@ -167,3 +167,10 @@ def test_ui_smoke_tests_are_split_by_focused_behavior_domain():
     ]
 
     assert not offenders, "ui_smoke test files exceed 225 lines: " + ", ".join(offenders)
+
+
+def test_workbench_controller_unit_tests_are_split_by_behavior_domain():
+    path = Path("tests/python/unit/test_workbench_controller.py")
+    line_count = len(path.read_text(encoding="utf-8").splitlines())
+
+    assert line_count <= 180, f"{path} has {line_count} lines; split connection/profile cases"

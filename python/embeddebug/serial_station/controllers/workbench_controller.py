@@ -6,17 +6,18 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from embeddebug.serial_station.core import ChannelBatch, SerialDispatcher
+from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.controllers import controller_connection_state as connection_state
 from embeddebug.serial_station.controllers import controller_io_state as io_state
 from embeddebug.serial_station.controllers import controller_log_state as log_state
 from embeddebug.serial_station.controllers import controller_profile_state as profile_state
+from embeddebug.serial_station.controllers import controller_protocol_state as protocol_state
 from embeddebug.serial_station.controllers import controller_receive_state as receive_state
 from embeddebug.serial_station.controllers import controller_session_state as session_state
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
-from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event, event_from_entry
+from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event
 from embeddebug.serial_station.drivers import FakeSerialTransport, SerialPortConfig, SerialTransport, TransportRegistry
-from embeddebug.serial_station.protocols import ProtocolEvent, create_default_registry
+from embeddebug.serial_station.protocols import ProtocolEvent
 from embeddebug.shared import OperationResult
 
 
@@ -35,20 +36,18 @@ class SerialWorkbenchController:
         serial_transport_factory: TransportFactory | None = None,
         port_provider: PortProvider | None = None,
     ) -> None:
-        self._registry = create_default_registry()
+        self._protocol_runtime = protocol_state.create_protocol_runtime()
         self._transport_registry = transport_registry or TransportRegistry.with_defaults(
             serial_factory=serial_transport_factory,
             serial_port_provider=port_provider,
         )
         self._transport = transport or FakeSerialTransport()
         self._transport_mode = "fake"
-        self._dispatcher = SerialDispatcher(self._registry.create("raw_data"))
         self._log_callbacks: list[log_state.LogEntryCallback] = []
         self._error_callbacks: list[log_state.ErrorCallback] = []
         self._measurement_callbacks: list[MeasurementCallback] = []
         self._entries: list[SerialWorkbenchLogEntry] = []
         self._command_history: list[str] = []
-        self._receive_state = receive_state.ReceiveState()
         connection_state.bind_transport(self._transport, self._handle_bytes_received, self._handle_error)
 
     @property
@@ -77,7 +76,7 @@ class SerialWorkbenchController:
         self._measurement_callbacks.append(callback)
 
     def available_protocols(self) -> tuple[str, ...]:
-        return tuple(self._registry.names())
+        return protocol_state.available_protocols(self._protocol_runtime)
 
     def available_serial_ports(self) -> tuple[str, ...]:
         return self._transport_registry.available_ports("serial")
@@ -86,9 +85,12 @@ class SerialWorkbenchController:
         return self._transport_registry.modes
 
     def set_protocol(self, name: str) -> None:
-        self._dispatcher.set_protocol(self._registry.create(name))
-        self._receive_state = receive_state.ReceiveState()
-        log_state.append_system_entry(self._entries, self._log_callbacks, f"protocol: {name}")
+        self._protocol_runtime = protocol_state.set_protocol(
+            self._protocol_runtime,
+            name,
+            entries=self._entries,
+            log_callbacks=self._log_callbacks,
+        )
 
     def connect_fake(self) -> bool:
         return self.connect_fake_result().ok
@@ -165,7 +167,7 @@ class SerialWorkbenchController:
     def send_text_result(self, text: str) -> OperationResult[SerialWorkbenchLogEntry]:
         return io_state.send_text_result(
             self._transport,
-            self._dispatcher,
+            self._protocol_runtime.dispatcher,
             text,
             self._command_history,
             self._entries,
@@ -212,7 +214,7 @@ class SerialWorkbenchController:
             name=name,
             config=self._transport.config,
             is_connected=self.is_connected,
-            protocol=self._dispatcher.protocol_name,
+            protocol=self._protocol_runtime.dispatcher.protocol_name,
             command_history=self.command_history,
         )
 
@@ -231,17 +233,16 @@ class SerialWorkbenchController:
         )
 
     def _handle_bytes_received(self, data: bytes) -> None:
-        self._receive_state = receive_state.handle_received_bytes(
-            state=self._receive_state,
+        self._protocol_runtime = protocol_state.handle_received_bytes(
+            self._protocol_runtime,
             data=data,
-            dispatcher=self._dispatcher,
             entries=self._entries,
             log_callbacks=self._log_callbacks,
             measurement_callbacks=self._measurement_callbacks,
         )
 
     def _protocol_event_from_entry(self, entry: SerialWorkbenchLogEntry) -> ProtocolEvent:
-        return event_from_entry(entry, self._dispatcher.protocol_name)
+        return protocol_state.protocol_event_from_entry(self._protocol_runtime, entry)
 
     def _connect_endpoint_result(self, mode: str, host: str, port: int) -> OperationResult[SerialPortConfig]:
         self._transport_mode = mode
