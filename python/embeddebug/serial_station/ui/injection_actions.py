@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from embeddebug.serial_station.ui.status_messages import set_result_status
+from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
 
 
 class InjectionActionHost(Protocol):
@@ -16,7 +16,7 @@ class InjectionActionHost(Protocol):
 def inject_received(host: InjectionActionHost) -> None:
     text = host._inject_edit.text()
     if not text:
-        host._status_label.setText(host.tr("RX text is empty"))
+        set_status_text(host, "RX text is empty")
         return
     result = host._controller.inject_received_text(text)
     if result.ok:

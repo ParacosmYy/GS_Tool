@@ -6,7 +6,7 @@ from typing import Protocol
 
 from PyQt6.QtWidgets import QComboBox
 
-from embeddebug.serial_station.ui.status_messages import set_result_status
+from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
 from embeddebug.serial_station.ui.tcp_controls import apply_tcp_profile_controls
 from embeddebug.serial_station.ui.udp_controls import apply_udp_profile_controls
 
@@ -29,13 +29,13 @@ def clear_log(host: SessionActionHost) -> None:
     host._controller.clear_log()
     host._log_view.clear()
     host._update_log_stats()
-    host._status_label.setText(host.tr("Log cleared"))
+    set_status_text(host, "Log cleared")
 
 
 def export_log(host: SessionActionHost) -> None:
     path = host._log_path_edit.text()
     if not path:
-        host._status_label.setText(host.tr("Log path is empty"))
+        set_status_text(host, "Log path is empty")
         return
     result = host._controller.export_log_result(path)
     if result.failed:
@@ -47,7 +47,7 @@ def export_log(host: SessionActionHost) -> None:
 def replay_log(host: SessionActionHost) -> None:
     path = host._log_path_edit.text()
     if not path:
-        host._status_label.setText(host.tr("Log path is empty"))
+        set_status_text(host, "Log path is empty")
         return
     result = host._controller.replay_log_result(path)
     if result.failed:
@@ -62,10 +62,10 @@ def save_profile(host: SessionActionHost) -> None:
     path = host._profile_path_edit.text()
     name = host._profile_name_edit.text()
     if not path:
-        host._status_label.setText(host.tr("Profile path is empty"))
+        set_status_text(host, "Profile path is empty")
         return
     if not name:
-        host._status_label.setText(host.tr("Profile name is empty"))
+        set_status_text(host, "Profile name is empty")
         return
     result = host._controller.save_profile_result(path, name)
     if result.failed:
@@ -78,7 +78,7 @@ def save_profile(host: SessionActionHost) -> None:
 def load_profile(host: SessionActionHost) -> None:
     path = host._profile_path_edit.text()
     if not path:
-        host._status_label.setText(host.tr("Profile path is empty"))
+        set_status_text(host, "Profile path is empty")
         return
     result = host._controller.load_profile_result(path)
     if result.failed or result.value is None:

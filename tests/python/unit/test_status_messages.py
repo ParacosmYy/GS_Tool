@@ -3,6 +3,7 @@ from __future__ import annotations
 from embeddebug.serial_station.ui.status_messages import (
     result_message,
     set_result_status,
+    set_status_text,
     translated_result_message,
 )
 from embeddebug.shared.results import OperationResult
@@ -70,3 +71,11 @@ def test_set_result_status_writes_translated_message_to_status_label():
     )
 
     assert host._status_label.text == "tr:Connected to 127.0.0.1:19000"
+
+
+def test_set_status_text_writes_translated_and_formatted_text_to_status_label():
+    host = TrHost()
+
+    set_status_text(host, "Protocol: {name}", name="RawData")
+
+    assert host._status_label.text == "tr:Protocol: RawData"

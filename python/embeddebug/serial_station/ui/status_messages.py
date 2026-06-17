@@ -62,3 +62,9 @@ def set_result_status(
             **format_values,
         )
     )
+
+
+def set_status_text(host: StatusMessageHost, text: str, **format_values: object) -> None:
+    """Write a translated plain status message to the host status label."""
+
+    host._status_label.setText(host.tr(text).format(**format_values))

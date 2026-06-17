@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
-from embeddebug.serial_station.ui.status_messages import set_result_status
+from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
 
 
 class ConnectionActionHost(Protocol):
@@ -37,7 +37,7 @@ def connect_fake(host: ConnectionActionHost) -> None:
 def connect_serial(host: ConnectionActionHost) -> None:
     port_name = host._port_combo.currentText()
     if not port_name or not host._has_serial_ports():
-        host._status_label.setText(host.tr("Serial port is empty"))
+        set_status_text(host, "Serial port is empty")
         return
     baud_rate = int(host._baud_combo.currentText())
     result = host._controller.connect_serial_result(
@@ -103,7 +103,7 @@ def connect_udp(host: ConnectionActionHost) -> None:
 
 def disconnect(host: ConnectionActionHost) -> None:
     host._controller.disconnect()
-    host._status_label.setText(host.tr("Disconnected"))
+    set_status_text(host, "Disconnected")
     host._set_connected_controls(False)
 
 
@@ -134,13 +134,13 @@ def populate_serial_port_combo(host: ConnectionActionHost) -> None:
 def refresh_serial_ports(host: ConnectionActionHost) -> None:
     populate_serial_port_combo(host)
     host._set_connected_controls(host._controller.is_connected)
-    host._status_label.setText(host.tr("Serial ports refreshed"))
+    set_status_text(host, "Serial ports refreshed")
 
 
 def send_text(host: ConnectionActionHost) -> None:
     text = host._send_edit.text()
     if not text:
-        host._status_label.setText(host.tr("Command is empty"))
+        set_status_text(host, "Command is empty")
         return
     result = host._controller.send_text_result(text)
     if result.ok:
@@ -170,7 +170,7 @@ def _validated_tcp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | Non
     result = validate_endpoint_fields(host._tcp_host_edit.text(), host._tcp_port_edit.text(), "TCP")
     if result.ok:
         return result.host, result.port
-    host._status_label.setText(host.tr(result.message))
+    set_status_text(host, result.message)
     return None
 
 
@@ -178,5 +178,5 @@ def _validated_udp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | Non
     result = validate_endpoint_fields(host._udp_host_edit.text(), host._udp_port_edit.text(), "UDP")
     if result.ok:
         return result.host, result.port
-    host._status_label.setText(host.tr(result.message))
+    set_status_text(host, result.message)
     return None

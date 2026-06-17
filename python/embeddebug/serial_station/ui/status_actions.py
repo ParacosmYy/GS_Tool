@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from embeddebug.serial_station.ui.status_messages import set_status_text
+
 
 class StatusActionHost(Protocol):
     """Minimal main-window surface needed by status action handlers."""
@@ -12,4 +14,4 @@ class StatusActionHost(Protocol):
 
 
 def show_error(host: StatusActionHost, message: str) -> None:
-    host._status_label.setText(host.tr("Error: {message}").format(message=message))
+    set_status_text(host, "Error: {message}", message=message)
