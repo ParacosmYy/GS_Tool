@@ -6,6 +6,10 @@ from typing import Protocol
 
 from PyQt6.QtWidgets import QLineEdit, QPushButton, QWidget
 
+from embeddebug.serial_station.ui.endpoint_profile_controls import (
+    apply_endpoint_profile_controls,
+)
+
 
 class SerialStationTcpHost(Protocol):
     def tr(self, source_text: str) -> str: ...
@@ -35,8 +39,10 @@ def build_tcp_controls(owner: SerialStationTcpHost, root: QWidget) -> tuple[QLin
 
 
 def apply_tcp_profile_controls(window: object, transport: dict[str, object], port_name: str) -> None:
-    if str(transport.get("mode", "")) != "tcp" or ":" not in port_name:
-        return
-    host, _, port_text = port_name.rpartition(":")
-    window._tcp_host_edit.setText(host)
-    window._tcp_port_edit.setText(port_text)
+    apply_endpoint_profile_controls(
+        window._tcp_host_edit,
+        window._tcp_port_edit,
+        transport=transport,
+        port_name=port_name,
+        expected_mode="tcp",
+    )
