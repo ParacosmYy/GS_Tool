@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QComboBox, QMainWindow
+from PyQt6.QtWidgets import QMainWindow
 
 from embeddebug.serial_station.controllers import (
     SerialWorkbenchController,
@@ -17,9 +17,6 @@ from embeddebug.serial_station.ui import (
     session_actions,
 )
 from embeddebug.serial_station.ui.sections import build_main_layout
-from embeddebug.serial_station.ui.tcp_controls import (
-    apply_tcp_profile_controls,
-)
 
 
 class SerialStationMainWindow(QMainWindow):
@@ -168,39 +165,7 @@ class SerialStationMainWindow(QMainWindow):
         session_actions.load_profile(self)
 
     def _apply_profile_controls(self, profile: dict[str, object]) -> None:
-        protocol = str(profile.get("protocol", ""))
-        if protocol:
-            self._select_combo_value(self._protocol_combo, protocol)
-
-        transport = profile.get("transport", {})
-        if not isinstance(transport, dict):
-            return
-        port_name = str(transport.get("portName", ""))
-        if port_name:
-            self._select_combo_value(self._port_combo, port_name)
-        apply_tcp_profile_controls(self, transport, port_name)
-        baud_rate = transport.get("baudRate")
-        if baud_rate is not None:
-            self._select_combo_value(self._baud_combo, str(baud_rate))
-        data_bits = transport.get("dataBits")
-        if data_bits is not None:
-            self._select_combo_value(self._data_bits_combo, str(data_bits))
-        parity = str(transport.get("parity", ""))
-        if parity:
-            self._select_combo_value(self._parity_combo, parity.capitalize())
-        stop_bits = transport.get("stopBits")
-        if stop_bits is not None:
-            self._select_combo_value(self._stop_bits_combo, str(stop_bits))
-        flow_control = str(transport.get("flowControl", ""))
-        if flow_control:
-            self._select_combo_value(self._flow_control_combo, flow_control.capitalize())
-        self._set_connected_controls(self._controller.is_connected)
-
-    @staticmethod
-    def _select_combo_value(combo: QComboBox, value: str) -> None:
-        if combo.findText(value) < 0:
-            combo.addItem(value)
-        combo.setCurrentText(value)
+        session_actions.apply_profile_controls(self, profile)
 
     def _show_error(self, message: str) -> None:
         self._status_label.setText(self.tr("Error: {message}").format(message=message))

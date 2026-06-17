@@ -57,6 +57,16 @@ def test_clear_log_action_lives_with_session_actions():
     assert "_controller.clear_log" not in source
 
 
+def test_profile_control_apply_action_lives_with_session_actions():
+    assert hasattr(session_actions, "apply_profile_controls")
+
+    source = inspect.getsource(main_window.SerialStationMainWindow._apply_profile_controls)
+    module_source = inspect.getsource(main_window)
+    assert "session_actions.apply_profile_controls(self, profile)" in source
+    assert "_select_combo_value" not in source
+    assert "apply_tcp_profile_controls" not in module_source
+
+
 def test_protocol_selection_action_lives_with_protocol_actions():
     protocol_actions = importlib.import_module("embeddebug.serial_station.ui.protocol_actions")
 
