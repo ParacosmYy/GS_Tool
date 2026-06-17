@@ -13,6 +13,8 @@ from embeddebug.serial_station.core import (
     SerialDispatcher,
     batch_from_measurement_events,
 )
+from embeddebug.serial_station.controllers.connection_results import open_transport_result
+from embeddebug.serial_station.controllers.profile_snapshot import build_profile_snapshot
 from embeddebug.serial_station.drivers import (
     FakeSerialTransport,
     SerialPortConfig,
@@ -42,7 +44,6 @@ ErrorCallback = Callable[[str], None]
 MeasurementCallback = Callable[[ChannelBatch], None]
 TransportFactory = Callable[[], SerialTransport]
 PortProvider = Callable[[], list[str]]
-
 
 class SerialWorkbenchController:
     """Coordinate fake transport, raw protocol dispatch and log facts."""
@@ -106,11 +107,14 @@ class SerialWorkbenchController:
         self._measurement_ring = None
 
     def connect_fake(self) -> bool:
+        return self.connect_fake_result().ok
+
+    def connect_fake_result(self) -> OperationResult[SerialPortConfig]:
         if not isinstance(self._transport, FakeSerialTransport):
             self._replace_transport(self._transport_registry.create("fake"))
         self._transport_mode = "fake"
         config = SerialPortConfig(port_name="FAKE_LOOPBACK", baud_rate=115200)
-        return self._transport.open(config)
+        return open_transport_result(self._transport, config, "fake")
 
     def connect_serial(
         self,
@@ -121,27 +125,46 @@ class SerialWorkbenchController:
         stop_bits: str = "1",
         flow_control: str = "none",
     ) -> bool:
+        return self.connect_serial_result(
+            port_name,
+            baud_rate,
+            data_bits=data_bits,
+            parity=parity,
+            stop_bits=stop_bits,
+            flow_control=flow_control,
+        ).ok
+
+    def connect_serial_result(
+        self,
+        port_name: str,
+        baud_rate: int,
+        data_bits: int = 8,
+        parity: str = "none",
+        stop_bits: str = "1",
+        flow_control: str = "none",
+    ) -> OperationResult[SerialPortConfig]:
         transport = self._transport_registry.create("serial")
         self._replace_transport(transport)
         self._transport_mode = "serial"
-        return self._transport.open(
-            SerialPortConfig(
-                port_name=port_name,
-                baud_rate=baud_rate,
-                data_bits=data_bits,
-                parity=parity,
-                stop_bits=stop_bits,
-                flow_control=flow_control,
-            )
+        config = SerialPortConfig(
+            port_name=port_name,
+            baud_rate=baud_rate,
+            data_bits=data_bits,
+            parity=parity,
+            stop_bits=stop_bits,
+            flow_control=flow_control,
         )
+        return open_transport_result(self._transport, config, "serial")
 
     def connect_tcp(self, host: str, port: int) -> bool:
+        return self.connect_tcp_result(host, port).ok
+
+    def connect_tcp_result(self, host: str, port: int) -> OperationResult[SerialPortConfig]:
         transport = self._transport_registry.create("tcp")
         self._replace_transport(transport)
         self._transport_mode = "tcp"
-        return self._transport.open(
-            SerialPortConfig(port_name=f"{host}:{port}", baud_rate=0)
-        )
+        config = SerialPortConfig(port_name=f"{host}:{port}", baud_rate=0)
+        return open_transport_result(self._transport, config, "tcp")
 
     def disconnect(self) -> None:
         self._transport.close()
@@ -190,21 +213,14 @@ class SerialWorkbenchController:
             self._append_entry(self._entry_from_event(event))
 
     def save_profile(self, path: str | Path, name: str) -> None:
-        profile = {
-            "name": name,
-            "transport": {
-                "mode": self._transport_mode,
-                "portName": self._transport.config.port_name if self._transport.config else "",
-                "baudRate": self._transport.config.baud_rate if self._transport.config else 0,
-                "dataBits": self._transport.config.data_bits if self._transport.config else 8,
-                "parity": self._transport.config.parity if self._transport.config else "none",
-                "stopBits": self._transport.config.stop_bits if self._transport.config else "1",
-                "flowControl": self._transport.config.flow_control if self._transport.config else "none",
-                "connected": self.is_connected,
-            },
-            "protocol": self._dispatcher.protocol_name,
-            "commandHistory": list(self._command_history),
-        }
+        profile = build_profile_snapshot(
+            name=name,
+            mode=self._transport_mode,
+            config=self._transport.config,
+            is_connected=self.is_connected,
+            protocol=self._dispatcher.protocol_name,
+            command_history=self.command_history,
+        )
         SerialProfileService().save(path, profile)
 
     def load_profile(self, path: str | Path) -> dict[str, Any]:
