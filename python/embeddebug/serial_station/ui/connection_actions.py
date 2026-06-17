@@ -47,6 +47,21 @@ def connect_serial(host: ConnectionActionHost) -> None:
     host._status_label.setText(host.tr("Connection failed: {message}").format(message=result.message))
 
 
+def connect_tcp(host: ConnectionActionHost) -> None:
+    endpoint = _validated_tcp_endpoint(host)
+    if endpoint is None:
+        return
+    tcp_host, port = endpoint
+    result = host._controller.connect_tcp_result(tcp_host, port)
+    if result.ok:
+        host._status_label.setText(
+            host.tr("Connected to TCP {endpoint}").format(endpoint=f"{tcp_host}:{port}")
+        )
+        host._set_connected_controls(True)
+        return
+    host._status_label.setText(host.tr("Connection failed: {message}").format(message=result.message))
+
+
 def send_text(host: ConnectionActionHost) -> None:
     text = host._send_edit.text()
     if not text:
@@ -58,3 +73,20 @@ def send_text(host: ConnectionActionHost) -> None:
         host._status_label.setText(host.tr("Command sent"))
         return
     host._status_label.setText(host.tr("Send failed: {message}").format(message=result.message))
+
+
+def _validated_tcp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | None:
+    tcp_host = host._tcp_host_edit.text().strip()
+    port_text = host._tcp_port_edit.text().strip()
+    if not tcp_host:
+        host._status_label.setText(host.tr("TCP host is empty"))
+        return None
+    try:
+        port = int(port_text)
+    except ValueError:
+        host._status_label.setText(host.tr("TCP port is invalid"))
+        return None
+    if port < 1 or port > 65535:
+        host._status_label.setText(host.tr("TCP port is invalid"))
+        return None
+    return tcp_host, port

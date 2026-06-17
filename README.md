@@ -15,14 +15,14 @@
 | 工程状态 | `E4`，Python 测试与启动 smoke 可复现 | `uv run test-embeddebug-py` |
 | 用户状态 | `U3`，Serial Station 主流程已有可见入口 | `uv run start-embeddebug` |
 | 设备状态 | `D2`，TCP 已有 loopback 替身验证，真实硬件仍需补证 | `tests/python/unit/test_tcp_client_transport.py` |
-| 评分进度 | `555 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
+| 评分进度 | `556 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
 
 ## 产品能力
 
 | 能力 | 当前口径 | 入口 |
 |---|---|---|
 | PyQt 桌面工作台 | 默认主线，支持 smoke 启动 | `EmbedDebug.bat` |
-| Serial Station | UART/TCP 主流程可用，连接、发送和 Fake RX 注入失败可诊断 | `python/embeddebug/serial_station/ui/injection_actions.py` |
+| Serial Station | UART/TCP 主流程可用，连接、发送和 Fake RX 注入失败可诊断 | `python/embeddebug/serial_station/ui/connection_actions.py` |
 | 协议解析 | RawData / FireWater / JustFloat 已纳入测试 | `tests/python/unit/test_protocols.py` |
 | 日志与回放 | 支持结构化记录、导出、重放和失败可恢复反馈 | `python/embeddebug/serial_station/ui/session_actions.py` |
 | 波形预览 | 基于 pyqtgraph 接入轻量趋势视图 | `python/embeddebug/serial_station/ui/waveform_preview.py` |

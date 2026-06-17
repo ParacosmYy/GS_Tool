@@ -14,7 +14,6 @@ from embeddebug.serial_station.ui import connection_actions, injection_actions, 
 from embeddebug.serial_station.ui.sections import build_main_layout
 from embeddebug.serial_station.ui.tcp_controls import (
     apply_tcp_profile_controls,
-    connect_tcp_from_controls,
 )
 
 
@@ -81,7 +80,7 @@ class SerialStationMainWindow(QMainWindow):
         connection_actions.connect_serial(self)
 
     def _connect_tcp(self) -> None:
-        connect_tcp_from_controls(self)
+        connection_actions.connect_tcp(self)
 
     def _disconnect(self) -> None:
         self._controller.disconnect()
