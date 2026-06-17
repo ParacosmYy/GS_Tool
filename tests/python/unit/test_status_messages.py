@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from embeddebug.serial_station.ui.status_messages import (
     result_message,
+    set_profile_label,
     set_result_status,
     set_status_text,
     translated_result_message,
@@ -19,6 +20,7 @@ class Label:
 
 class TrHost:
     def __init__(self) -> None:
+        self._profile_label = Label()
         self._status_label = Label()
 
     def tr(self, text: str) -> str:
@@ -79,3 +81,11 @@ def test_set_status_text_writes_translated_and_formatted_text_to_status_label():
     set_status_text(host, "Protocol: {name}", name="RawData")
 
     assert host._status_label.text == "tr:Protocol: RawData"
+
+
+def test_set_profile_label_writes_translated_profile_name_to_profile_label():
+    host = TrHost()
+
+    set_profile_label(host, "factory-default")
+
+    assert host._profile_label.text == "tr:Profile: factory-default"

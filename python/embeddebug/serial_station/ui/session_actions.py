@@ -6,7 +6,11 @@ from typing import Protocol
 
 from PyQt6.QtWidgets import QComboBox
 
-from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
+from embeddebug.serial_station.ui.status_messages import (
+    set_profile_label,
+    set_result_status,
+    set_status_text,
+)
 from embeddebug.serial_station.ui.tcp_controls import apply_tcp_profile_controls
 from embeddebug.serial_station.ui.udp_controls import apply_udp_profile_controls
 
@@ -71,7 +75,7 @@ def save_profile(host: SessionActionHost) -> None:
     if result.failed:
         set_result_status(host, result, success_text="", failure_prefix="Save profile failed")
         return
-    host._profile_label.setText(host.tr("Profile: {name}").format(name=name))
+    set_profile_label(host, name)
     set_result_status(host, result, success_text="Saved profile", failure_prefix="Save profile failed")
 
 
@@ -89,7 +93,7 @@ def load_profile(host: SessionActionHost) -> None:
     host._profile_name_edit.setText(name)
     apply_profile_controls(host, profile)
     host._refresh_command_history()
-    host._profile_label.setText(host.tr("Profile: {name}").format(name=name))
+    set_profile_label(host, name)
     set_result_status(host, result, success_text="Loaded profile", failure_prefix="Load profile failed")
 
 

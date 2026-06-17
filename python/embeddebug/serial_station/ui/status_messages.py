@@ -21,6 +21,14 @@ class StatusMessageHost(Protocol):
     def tr(self, text: str) -> str: ...
 
 
+class ProfileLabelHost(Protocol):
+    """Minimal host surface needed for translated profile label messages."""
+
+    _profile_label: StatusLabel
+
+    def tr(self, text: str) -> str: ...
+
+
 def result_message(result: OperationResult[object], *, success_text: str, failure_prefix: str) -> str:
     """Return a display message for a controller operation result."""
 
@@ -68,3 +76,9 @@ def set_status_text(host: StatusMessageHost, text: str, **format_values: object)
     """Write a translated plain status message to the host status label."""
 
     host._status_label.setText(host.tr(text).format(**format_values))
+
+
+def set_profile_label(host: ProfileLabelHost, name: str) -> None:
+    """Write a translated profile name to the host profile label."""
+
+    host._profile_label.setText(host.tr("Profile: {name}").format(name=name))
