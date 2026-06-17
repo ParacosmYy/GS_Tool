@@ -6,9 +6,13 @@ from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEn
 from embeddebug.serial_station.protocols import ProtocolEvent
 
 
+_KNOWN_DIRECTIONS = {"tx", "rx", "system", "error"}
+
+
 def entry_from_event(event: ProtocolEvent) -> SerialWorkbenchLogEntry:
     text = str(event.payload.get("text", event.raw.decode("utf-8", errors="replace")))
-    direction = "tx" if event.type == "tx" else "rx"
+    payload_direction = event.payload.get("direction")
+    direction = payload_direction if payload_direction in _KNOWN_DIRECTIONS else _direction_from_type(event.type)
     return SerialWorkbenchLogEntry(direction=direction, text=text, raw=event.raw)
 
 
@@ -20,3 +24,7 @@ def event_from_entry(entry: SerialWorkbenchLogEntry, protocol_name: str) -> Prot
         payload={"text": entry.text, "direction": entry.direction},
         raw=entry.raw,
     )
+
+
+def _direction_from_type(event_type: str) -> str:
+    return "tx" if event_type == "tx" else "rx"

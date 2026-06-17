@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 from embeddebug.serial_station.controllers import SerialWorkbenchController
+from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
 from embeddebug.serial_station.drivers import (
     FakeSerialTransport,
     SerialPortConfig,
@@ -162,6 +163,25 @@ def test_workbench_controller_service_result_success_paths(tmp_path):
     assert load_result.value is not None
     assert load_result.value["name"] == "result-profile"
     assert controller.command_history == ("status?",)
+
+
+def test_workbench_controller_replays_diagnostic_log_directions(tmp_path):
+    controller = SerialWorkbenchController()
+    log_path = tmp_path / "diagnostic-session.jsonl"
+
+    controller._append_entry(SerialWorkbenchLogEntry("system", "profile loaded", b"profile loaded"))
+    controller._append_entry(SerialWorkbenchLogEntry("error", "port denied", b"port denied"))
+
+    assert controller.export_log_result(log_path).ok
+    controller.clear_log()
+
+    replay_result = controller.replay_log_result(log_path)
+
+    assert replay_result.ok
+    assert [(entry.direction, entry.text) for entry in controller.entries] == [
+        ("system", "profile loaded"),
+        ("error", "port denied"),
+    ]
 
 
 def test_workbench_controller_service_result_failures_do_not_mutate_state(tmp_path):
