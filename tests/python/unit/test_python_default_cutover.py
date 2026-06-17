@@ -134,6 +134,15 @@ def test_serial_station_ui_sections_use_explicit_owner_contract():
     assert "owner: Any" not in sections
 
 
+def test_python_tests_are_split_by_behavior_domain():
+    required_files = (Path("tests/python/unit/test_workbench_controller_profiles.py"),)
+    files = Path("tests/python").rglob("test_*.py")
+    oversized = [f"{p} has {len(p.read_text(encoding='utf-8').splitlines())} lines" for p in files if len(p.read_text(encoding="utf-8").splitlines()) > 300]
+
+    assert all(path.exists() for path in required_files)
+    assert oversized == []
+
+
 def test_active_architecture_docs_are_python_pyqt_only():
     expected_docs = {
         "README.md",

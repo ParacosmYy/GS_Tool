@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 607分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 393分
+> 当前: 608分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 392分
 
 ---
 
@@ -309,12 +309,13 @@
 | 605 | Serial Station connection toolbar helper | 连接/协议/串口参数/TCP/UDP 工具栏拆出 UI helper，sections.py 降到 199 行并补架构测试 |
 | 606 | Serial Station controller log state helper | 普通/System/Error 日志追加与回调通知拆出 controller helper，workbench_controller 降到 279 行并补纯单测 |
 | 607 | Serial Station connected log helper | 连接成功 System 日志追加规则并入 controller 日志 helper，workbench_controller 降到 275 行并补纯单测 |
+| 608 | Serial Station test behavior split | Profile/Session/Replay controller 回归与 MVP UI smoke 按行为域拆分，Python 测试文件全部低于 300 行并补结构门禁 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#607` 的完整记录
+- 当前文档已整理到 `#608` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message

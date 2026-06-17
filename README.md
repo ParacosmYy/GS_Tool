@@ -15,7 +15,7 @@
 | 工程状态 | `E4`，Python 测试与启动 smoke 可复现 | `uv run test-embeddebug-py` |
 | 用户状态 | `U3`，Serial Station 主流程已有可见入口 | `uv run start-embeddebug` |
 | 设备状态 | `D2`，TCP/UDP 已有替身或 loopback 验证，真实硬件仍需补证 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
-| 评分进度 | `607 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
+| 评分进度 | `608 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
 
 ## 产品能力
 
@@ -52,7 +52,7 @@ Serial Station
 
 核心边界：UI 不解析字节流，controller 不写协议细节，core 不依赖具体协议，services 不反向驱动界面，所有入口收敛到 Python/PyQt 主线。
 
-当前 controller 已将测量缓冲、命令历史、日志状态和连接日志等内部状态拆成小 helper，UI 主布局已将连接工具栏拆出独立 helper，保持主编排文件低于 300 行，后续功能增量必须继续维持这个边界。
+当前 controller 已将测量缓冲、命令历史、日志状态和连接日志等内部状态拆成小 helper，UI 主布局已将连接工具栏拆出独立 helper，Controller 与 Serial Station UI smoke 回归测试已按行为域拆分，保持主编排与 Python 测试文件低于 300 行，后续功能增量必须继续维持这个边界。
 
 ## 快速启动
 
