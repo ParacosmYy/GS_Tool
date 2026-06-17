@@ -117,6 +117,7 @@ def test_pyqt_workflow_loads_profile_into_serial_controls(qtbot, tmp_path, monke
 
     profile_path_edit = window.findChild(QLineEdit, "serialStationProfilePathEdit")
     load_profile_button = window.findChild(QPushButton, "serialStationLoadProfileButton")
+    log_view = window.findChild(QPlainTextEdit, "serialStationLogView")
     protocol_combo = window.findChild(QComboBox, "serialStationProtocolCombo")
     port_combo = window.findChild(QComboBox, "serialStationPortCombo")
     baud_combo = window.findChild(QComboBox, "serialStationBaudCombo")
@@ -131,6 +132,7 @@ def test_pyqt_workflow_loads_profile_into_serial_controls(qtbot, tmp_path, monke
     for widget in [
         profile_path_edit,
         load_profile_button,
+        log_view,
         protocol_combo,
         port_combo,
         baud_combo,
@@ -158,6 +160,7 @@ def test_pyqt_workflow_loads_profile_into_serial_controls(qtbot, tmp_path, monke
     history_combo.setCurrentText("status?")
     assert send_edit.text() == "status?"
     assert "Loaded profile" in status_label.text()
+    assert "System profile loaded: serial-profile" in log_view.toPlainText()
 
 
 def test_pyqt_workflow_replay_failure_preserves_visible_log(qtbot, tmp_path):

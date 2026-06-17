@@ -181,6 +181,21 @@ def test_workbench_controller_persists_command_history_in_profiles(tmp_path):
     assert restored.command_history == ("status?", "reset")
 
 
+def test_workbench_controller_records_profile_load_entry(tmp_path):
+    profile_path = tmp_path / "factory-profile.json"
+    controller = SerialWorkbenchController()
+    logged: list[str] = []
+    controller.save_profile(profile_path, "factory-profile")
+    controller.on_log_entry(lambda entry: logged.append(f"{entry.direction}:{entry.text}"))
+
+    result = controller.load_profile_result(profile_path)
+
+    assert result.ok
+    assert controller.entries[-1].direction == "system"
+    assert controller.entries[-1].text == "profile loaded: factory-profile"
+    assert logged[-1] == "system:profile loaded: factory-profile"
+
+
 def test_workbench_controller_service_result_success_paths(tmp_path):
     controller = SerialWorkbenchController()
     log_path = tmp_path / "session-result.jsonl"

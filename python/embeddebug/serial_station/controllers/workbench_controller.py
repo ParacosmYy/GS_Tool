@@ -244,6 +244,8 @@ class SerialWorkbenchController:
         result = load_session_profile_result(path)
         if result.ok and result.value is not None:
             self._restore_command_history(result.value.get("commandHistory", []))
+            name = str(result.value.get("name", "unnamed"))
+            self._append_system_entry(f"profile loaded: {name}")
         return result
 
     def _handle_bytes_received(self, data: bytes) -> None:
