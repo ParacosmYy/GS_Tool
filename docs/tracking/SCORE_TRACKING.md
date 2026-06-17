@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 610分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 390分
+> 当前: 611分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 389分
 
 ---
 
@@ -312,12 +312,13 @@
 | 608 | Serial Station test behavior split | Profile/Session/Replay controller 回归与 MVP UI smoke 按行为域拆分，Python 测试文件全部低于 300 行并补结构门禁 |
 | 609 | Serial Station controller state helpers | transport 生命周期与发送/注入 I/O 结果映射拆出 controller helper，保持主 controller 低于 300 行并补纯单测 |
 | 610 | Serial Station controller profile/session state helpers | Profile 保存快照、命令历史恢复、profile loaded 日志、Session 清空/导出/回放状态拆出 controller helper，workbench_controller 降到 270 行；治理文档测试拆出独立行为域并收紧测试文件 250 行门禁 |
+| 611 | Serial Station controller receive state helper | 接收字节后的日志映射、测量 ring 状态和错误入库拆出 controller helper，workbench_controller 保持 272 行且接收职责外移；UI smoke 按端点与失败路径继续拆分并收紧到 225 行门禁 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#610` 的完整记录
+- 当前文档已整理到 `#611` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message

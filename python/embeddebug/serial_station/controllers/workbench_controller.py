@@ -6,15 +6,15 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from embeddebug.serial_station.core import ChannelBatch, ChannelRingBuffer, SerialDispatcher, batch_from_measurement_events
+from embeddebug.serial_station.core import ChannelBatch, SerialDispatcher
 from embeddebug.serial_station.controllers import controller_connection_state as connection_state
 from embeddebug.serial_station.controllers import controller_io_state as io_state
 from embeddebug.serial_station.controllers import controller_log_state as log_state
 from embeddebug.serial_station.controllers import controller_profile_state as profile_state
+from embeddebug.serial_station.controllers import controller_receive_state as receive_state
 from embeddebug.serial_station.controllers import controller_session_state as session_state
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
 from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event, event_from_entry
-from embeddebug.serial_station.controllers.measurement_buffer import append_measurement_batch
 from embeddebug.serial_station.drivers import FakeSerialTransport, SerialPortConfig, SerialTransport, TransportRegistry
 from embeddebug.serial_station.protocols import ProtocolEvent, create_default_registry
 from embeddebug.shared import OperationResult
@@ -48,7 +48,7 @@ class SerialWorkbenchController:
         self._measurement_callbacks: list[MeasurementCallback] = []
         self._entries: list[SerialWorkbenchLogEntry] = []
         self._command_history: list[str] = []
-        self._measurement_ring: ChannelRingBuffer | None = None
+        self._receive_state = receive_state.ReceiveState()
         connection_state.bind_transport(self._transport, self._handle_bytes_received, self._handle_error)
 
     @property
@@ -87,7 +87,7 @@ class SerialWorkbenchController:
 
     def set_protocol(self, name: str) -> None:
         self._dispatcher.set_protocol(self._registry.create(name))
-        self._measurement_ring = None
+        self._receive_state = receive_state.ReceiveState()
         log_state.append_system_entry(self._entries, self._log_callbacks, f"protocol: {name}")
 
     def connect_fake(self) -> bool:
@@ -231,12 +231,14 @@ class SerialWorkbenchController:
         )
 
     def _handle_bytes_received(self, data: bytes) -> None:
-        events = self._dispatcher.feed(data)
-        for event in events:
-            log_state.append_log_entry(self._entries, self._log_callbacks, entry_from_event(event))
-        batch = batch_from_measurement_events(events)
-        if batch is not None:
-            self._append_measurements(batch)
+        self._receive_state = receive_state.handle_received_bytes(
+            state=self._receive_state,
+            data=data,
+            dispatcher=self._dispatcher,
+            entries=self._entries,
+            log_callbacks=self._log_callbacks,
+            measurement_callbacks=self._measurement_callbacks,
+        )
 
     def _protocol_event_from_entry(self, entry: SerialWorkbenchLogEntry) -> ProtocolEvent:
         return event_from_entry(entry, self._dispatcher.protocol_name)
@@ -261,10 +263,10 @@ class SerialWorkbenchController:
             self._handle_error,
         )
 
-    def _append_measurements(self, batch: ChannelBatch) -> None:
-        self._measurement_ring, latest = append_measurement_batch(self._measurement_ring, batch)
-        for callback in list(self._measurement_callbacks):
-            callback(latest)
-
     def _handle_error(self, message: str) -> None:
-        log_state.append_error_entry(self._entries, self._log_callbacks, self._error_callbacks, message)
+        receive_state.handle_error(
+            message,
+            entries=self._entries,
+            log_callbacks=self._log_callbacks,
+            error_callbacks=self._error_callbacks,
+        )

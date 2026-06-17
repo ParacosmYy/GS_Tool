@@ -157,3 +157,13 @@ def test_active_governance_docs_do_not_reference_removed_shell_scripts():
         text = path.read_text(encoding="utf-8", errors="ignore")
         for token in forbidden:
             assert token.lower() not in text.lower(), f"{path} still references {token}"
+
+
+def test_ui_smoke_tests_are_split_by_focused_behavior_domain():
+    offenders = [
+        f"{path}:{len(path.read_text(encoding='utf-8').splitlines())}"
+        for path in Path("tests/python/ui_smoke").glob("test_*.py")
+        if len(path.read_text(encoding="utf-8").splitlines()) > 225
+    ]
+
+    assert not offenders, "ui_smoke test files exceed 225 lines: " + ", ".join(offenders)
