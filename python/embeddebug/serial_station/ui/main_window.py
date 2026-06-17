@@ -89,18 +89,10 @@ class SerialStationMainWindow(QMainWindow):
         connection_actions.send_text(self)
 
     def _refresh_command_history(self) -> None:
-        history = self._controller.command_history
-        self._command_history_combo.blockSignals(True)
-        self._command_history_combo.clear()
-        self._command_history_combo.addItems(history)
-        if history:
-            self._command_history_combo.setCurrentText(history[-1])
-        self._command_history_combo.setEnabled(bool(history))
-        self._command_history_combo.blockSignals(False)
+        connection_actions.refresh_command_history(self)
 
     def _select_command_history(self, text: str) -> None:
-        if text:
-            self._send_edit.setText(text)
+        connection_actions.select_command_history(self, text)
 
     def _inject_received(self) -> None:
         injection_actions.inject_received(self)

@@ -37,6 +37,18 @@ def test_serial_port_refresh_action_lives_with_connection_actions():
     assert "_refresh_port_combo" not in source
 
 
+def test_command_history_actions_live_with_connection_actions():
+    assert hasattr(connection_actions, "refresh_command_history")
+    assert hasattr(connection_actions, "select_command_history")
+
+    refresh_source = inspect.getsource(main_window.SerialStationMainWindow._refresh_command_history)
+    select_source = inspect.getsource(main_window.SerialStationMainWindow._select_command_history)
+    assert "connection_actions.refresh_command_history(self)" in refresh_source
+    assert "connection_actions.select_command_history(self, text)" in select_source
+    assert "_controller.command_history" not in refresh_source
+    assert "_send_edit.setText" not in select_source
+
+
 def test_clear_log_action_lives_with_session_actions():
     assert hasattr(session_actions, "clear_log")
 

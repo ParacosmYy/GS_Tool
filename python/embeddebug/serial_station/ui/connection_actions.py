@@ -93,10 +93,26 @@ def send_text(host: ConnectionActionHost) -> None:
         return
     result = host._controller.send_text_result(text)
     if result.ok:
-        host._refresh_command_history()
+        refresh_command_history(host)
         host._status_label.setText(host.tr("Command sent"))
         return
     host._status_label.setText(host.tr("Send failed: {message}").format(message=result.message))
+
+
+def refresh_command_history(host: ConnectionActionHost) -> None:
+    history = host._controller.command_history
+    host._command_history_combo.blockSignals(True)
+    host._command_history_combo.clear()
+    host._command_history_combo.addItems(history)
+    if history:
+        host._command_history_combo.setCurrentText(history[-1])
+    host._command_history_combo.setEnabled(bool(history))
+    host._command_history_combo.blockSignals(False)
+
+
+def select_command_history(host: ConnectionActionHost, text: str) -> None:
+    if text:
+        host._send_edit.setText(text)
 
 
 def _validated_tcp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | None:
