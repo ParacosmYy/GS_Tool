@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 582分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 418分
+> 当前: 583分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 417分
 
 ---
 
@@ -284,12 +284,13 @@
 | 580 | Serial Station log stats label helper | 新增 `set_log_stats_label` 公共 helper，log actions 复用日志统计标签写入并补单测 |
 | 581 | Serial Station log entry line helper | 新增 `append_log_entry_line` 公共 helper，log actions 复用 TX/RX 日志行展示并补单测 |
 | 582 | Serial Station serial port option helper | 新增 `serial_port_options` helper，connection actions 复用串口端口 Combo 空态、刷新和有效性判断并补单测 |
+| 583 | Serial Station command history option helper | 新增 `command_history_options` helper，connection actions 复用命令历史 Combo 刷新、选中和启用状态并补单测 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#582` 的完整记录
+- 当前文档已整理到 `#583` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

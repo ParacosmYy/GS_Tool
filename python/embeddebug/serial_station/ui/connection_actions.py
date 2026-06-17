@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from embeddebug.serial_station.ui.command_history_options import populate_command_history_options
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
 from embeddebug.serial_station.ui.serial_port_options import (
     combo_has_serial_ports,
@@ -150,13 +151,7 @@ def send_text(host: ConnectionActionHost) -> None:
 
 def refresh_command_history(host: ConnectionActionHost) -> None:
     history = host._controller.command_history
-    host._command_history_combo.blockSignals(True)
-    host._command_history_combo.clear()
-    host._command_history_combo.addItems(history)
-    if history:
-        host._command_history_combo.setCurrentText(history[-1])
-    host._command_history_combo.setEnabled(bool(history))
-    host._command_history_combo.blockSignals(False)
+    populate_command_history_options(host._command_history_combo, history)
 
 
 def select_command_history(host: ConnectionActionHost, text: str) -> None:
