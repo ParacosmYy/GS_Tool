@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from embeddebug.serial_station.controllers import SerialWorkbenchLogEntry
+from embeddebug.serial_station.ui.log_entry_filter import log_entry_matches_filter
 from embeddebug.serial_station.ui.log_view_content import clear_log_view
 from embeddebug.serial_station.ui.status_messages import append_log_entry_line, set_log_stats_label
 
@@ -36,20 +37,13 @@ def render_log_entries(host: LogActionHost) -> None:
 
 
 def log_entry_visible(host: LogActionHost, entry: SerialWorkbenchLogEntry) -> bool:
-    selected = host._log_filter_combo.currentText()
-    if selected == host.tr("TX"):
-        direction_matches = entry.direction == "tx"
-    elif selected == host.tr("RX"):
-        direction_matches = entry.direction == "rx"
-    else:
-        direction_matches = True
-    if not direction_matches:
-        return False
-    search_text = host._log_search_edit.text().strip().lower()
-    if not search_text:
-        return True
-    prefix = "tx" if entry.direction == "tx" else "rx"
-    return search_text in f"{prefix} {entry.text}".lower()
+    return log_entry_matches_filter(
+        entry,
+        selected_filter=host._log_filter_combo.currentText(),
+        search_text=host._log_search_edit.text(),
+        tx_text=host.tr("TX"),
+        rx_text=host.tr("RX"),
+    )
 
 
 def update_log_stats(host: LogActionHost) -> None:
