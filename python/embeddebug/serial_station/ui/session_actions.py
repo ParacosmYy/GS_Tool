@@ -7,6 +7,7 @@ from typing import Protocol
 from embeddebug.serial_station.ui.log_view_content import clear_log_view
 from embeddebug.serial_station.ui.profile_combo_options import select_profile_combo_value
 from embeddebug.serial_station.ui.profile_name_text import apply_profile_name_text
+from embeddebug.serial_station.ui.serial_profile_controls import apply_serial_profile_controls
 from embeddebug.serial_station.ui.status_messages import (
     set_profile_label,
     set_result_status,
@@ -111,19 +112,5 @@ def apply_profile_controls(host: SessionActionHost, profile: dict[str, object]) 
         select_profile_combo_value(host._port_combo, port_name)
     apply_tcp_profile_controls(host, transport, port_name)
     apply_udp_profile_controls(host, transport, port_name)
-    baud_rate = transport.get("baudRate")
-    if baud_rate is not None:
-        select_profile_combo_value(host._baud_combo, str(baud_rate))
-    data_bits = transport.get("dataBits")
-    if data_bits is not None:
-        select_profile_combo_value(host._data_bits_combo, str(data_bits))
-    parity = str(transport.get("parity", ""))
-    if parity:
-        select_profile_combo_value(host._parity_combo, parity.capitalize())
-    stop_bits = transport.get("stopBits")
-    if stop_bits is not None:
-        select_profile_combo_value(host._stop_bits_combo, str(stop_bits))
-    flow_control = str(transport.get("flowControl", ""))
-    if flow_control:
-        select_profile_combo_value(host._flow_control_combo, flow_control.capitalize())
+    apply_serial_profile_controls(host, transport)
     host._set_connected_controls(host._controller.is_connected)
