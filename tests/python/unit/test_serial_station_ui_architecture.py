@@ -5,6 +5,7 @@ import inspect
 
 from embeddebug.serial_station.ui import (
     connection_actions,
+    injection_actions,
     main_window,
     session_actions,
     shortcuts,
@@ -85,6 +86,13 @@ def test_session_result_messages_reuse_status_message_helper():
 
     assert "translated_result_message" in source
     assert "failed: {message}" not in source
+
+
+def test_injection_result_messages_reuse_status_message_helper():
+    source = inspect.getsource(injection_actions)
+
+    assert "translated_result_message" in source
+    assert "Inject failed: {message}" not in source
 
 
 def test_profile_control_apply_action_lives_with_session_actions():
