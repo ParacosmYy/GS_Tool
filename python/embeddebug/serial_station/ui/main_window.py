@@ -14,6 +14,7 @@ from embeddebug.serial_station.ui import (
     connection_actions,
     injection_actions,
     log_actions,
+    measurement_actions,
     protocol_actions,
     session_actions,
 )
@@ -108,7 +109,7 @@ class SerialStationMainWindow(QMainWindow):
         log_actions.update_log_stats(self)
 
     def _append_measurement_batch(self, batch: ChannelBatch) -> None:
-        self._waveform_preview.update_batch(batch)
+        measurement_actions.append_measurement_batch(self, batch)
 
     def _clear_log(self) -> None:
         session_actions.clear_log(self)

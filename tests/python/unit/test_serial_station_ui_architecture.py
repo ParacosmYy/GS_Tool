@@ -96,6 +96,18 @@ def test_log_display_actions_live_with_log_actions():
     assert "_log_stats_label.setText" not in stats_source
 
 
+def test_measurement_display_action_lives_with_measurement_actions():
+    measurement_actions = importlib.import_module(
+        "embeddebug.serial_station.ui.measurement_actions"
+    )
+
+    assert hasattr(measurement_actions, "append_measurement_batch")
+
+    source = inspect.getsource(main_window.SerialStationMainWindow._append_measurement_batch)
+    assert "measurement_actions.append_measurement_batch(self, batch)" in source
+    assert "_waveform_preview.update_batch" not in source
+
+
 def test_protocol_selection_action_lives_with_protocol_actions():
     protocol_actions = importlib.import_module("embeddebug.serial_station.ui.protocol_actions")
 
