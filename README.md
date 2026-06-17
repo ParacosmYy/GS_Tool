@@ -15,14 +15,14 @@
 | 工程状态 | `E4`，Python 测试与启动 smoke 可复现 | `uv run test-embeddebug-py` |
 | 用户状态 | `U3`，Serial Station 主流程已有可见入口 | `uv run start-embeddebug` |
 | 设备状态 | `D2`，TCP 已有 loopback 替身验证，真实硬件仍需补证 | `tests/python/unit/test_tcp_client_transport.py` |
-| 评分进度 | `568 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
+| 评分进度 | `569 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
 
 ## 产品能力
 
 | 能力 | 当前口径 | 入口 |
 |---|---|---|
 | PyQt 桌面工作台 | 默认主线，支持 smoke 启动 | `EmbedDebug.bat` |
-| Serial Station | UART/TCP 主流程可用，连接状态、断开、刷新端口、发送、快捷键、命令历史、Profile 恢复、错误状态反馈和窗口生命周期可诊断 | `python/embeddebug/serial_station/ui/lifecycle_actions.py` |
+| Serial Station | UART/TCP 主流程可用，UDP 驱动层已接入 registry；连接状态、断开、刷新端口、发送、快捷键、命令历史、Profile 恢复、错误状态反馈和窗口生命周期可诊断 | `python/embeddebug/serial_station/drivers/udp_datagram.py` |
 | 协议解析 | RawData / FireWater / JustFloat 已纳入测试，协议选择动作已独立 | `python/embeddebug/serial_station/ui/protocol_actions.py` |
 | 日志与回放 | 支持结构化记录、过滤、搜索、统计、清空、导出、重放和失败可恢复反馈 | `python/embeddebug/serial_station/ui/log_actions.py` |
 | 波形预览 | 基于 pyqtgraph 接入轻量趋势视图，测量展示动作已独立 | `python/embeddebug/serial_station/ui/measurement_actions.py` |

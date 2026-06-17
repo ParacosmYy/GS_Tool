@@ -5,6 +5,7 @@ from embeddebug.serial_station.drivers.fake import FakeSerialTransport
 from embeddebug.serial_station.drivers.qt_serial import QtSerialPortTransport
 from embeddebug.serial_station.drivers.registry import TransportRegistry
 from embeddebug.serial_station.drivers.tcp_client import TcpClientTransport
+from embeddebug.serial_station.drivers.udp_datagram import UdpDatagramTransport
 
 __all__ = [
     "FakeSerialTransport",
@@ -13,4 +14,5 @@ __all__ = [
     "SerialTransport",
     "TcpClientTransport",
     "TransportRegistry",
+    "UdpDatagramTransport",
 ]

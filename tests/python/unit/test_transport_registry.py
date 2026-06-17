@@ -6,13 +6,14 @@ from embeddebug.serial_station.drivers import (
     SerialPortConfig,
     TcpClientTransport,
     TransportRegistry,
+    UdpDatagramTransport,
 )
 
 
 def test_transport_registry_exposes_default_modes_and_fake_transport():
     registry = TransportRegistry.with_defaults()
 
-    assert registry.modes == ("fake", "serial", "tcp")
+    assert registry.modes == ("fake", "serial", "tcp", "udp")
     assert registry.available_ports("fake") == ("FAKE_LOOPBACK",)
 
     transport = registry.create("fake")
@@ -20,6 +21,7 @@ def test_transport_registry_exposes_default_modes_and_fake_transport():
     assert transport.open(SerialPortConfig(port_name="FAKE_LOOPBACK"))
 
     assert isinstance(registry.create("tcp"), TcpClientTransport)
+    assert isinstance(registry.create("udp"), UdpDatagramTransport)
 
 
 def test_transport_registry_injects_serial_driver_into_controller(tmp_path):
