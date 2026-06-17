@@ -120,6 +120,17 @@ def test_key_press_dispatch_lives_with_shortcuts():
     assert "_refresh_serial_ports()" not in source
 
 
+def test_status_error_action_lives_with_status_actions():
+    status_actions = importlib.import_module("embeddebug.serial_station.ui.status_actions")
+
+    assert hasattr(status_actions, "show_error")
+
+    source = inspect.getsource(main_window.SerialStationMainWindow._show_error)
+    assert "status_actions.show_error(self, message)" in source
+    assert "_status_label.setText" not in source
+    assert "Error: {message}" not in source
+
+
 def test_protocol_selection_action_lives_with_protocol_actions():
     protocol_actions = importlib.import_module("embeddebug.serial_station.ui.protocol_actions")
 

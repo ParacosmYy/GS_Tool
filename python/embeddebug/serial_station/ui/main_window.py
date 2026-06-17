@@ -17,6 +17,7 @@ from embeddebug.serial_station.ui import (
     protocol_actions,
     session_actions,
     shortcuts,
+    status_actions,
 )
 from embeddebug.serial_station.ui.sections import build_main_layout
 
@@ -115,7 +116,7 @@ class SerialStationMainWindow(QMainWindow):
         session_actions.apply_profile_controls(self, profile)
 
     def _show_error(self, message: str) -> None:
-        self._status_label.setText(self.tr("Error: {message}").format(message=message))
+        status_actions.show_error(self, message)
 
     def closeEvent(self, event: object) -> None:
         self._waveform_preview.shutdown()
