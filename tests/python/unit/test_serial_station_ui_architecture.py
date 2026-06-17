@@ -67,6 +67,23 @@ def test_profile_control_apply_action_lives_with_session_actions():
     assert "apply_tcp_profile_controls" not in module_source
 
 
+def test_log_display_actions_live_with_log_actions():
+    log_actions = importlib.import_module("embeddebug.serial_station.ui.log_actions")
+
+    assert hasattr(log_actions, "append_log_entry")
+    assert hasattr(log_actions, "render_log_entries")
+    assert hasattr(log_actions, "update_log_stats")
+
+    append_source = inspect.getsource(main_window.SerialStationMainWindow._append_log_entry)
+    render_source = inspect.getsource(main_window.SerialStationMainWindow._render_log_entries)
+    stats_source = inspect.getsource(main_window.SerialStationMainWindow._update_log_stats)
+    assert "log_actions.append_log_entry(self, entry)" in append_source
+    assert "log_actions.render_log_entries(self)" in render_source
+    assert "log_actions.update_log_stats(self)" in stats_source
+    assert "_controller.entries" not in render_source
+    assert "_log_stats_label.setText" not in stats_source
+
+
 def test_protocol_selection_action_lives_with_protocol_actions():
     protocol_actions = importlib.import_module("embeddebug.serial_station.ui.protocol_actions")
 

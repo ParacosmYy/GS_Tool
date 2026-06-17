@@ -13,6 +13,7 @@ from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.ui import (
     connection_actions,
     injection_actions,
+    log_actions,
     protocol_actions,
     session_actions,
 )
@@ -95,56 +96,19 @@ class SerialStationMainWindow(QMainWindow):
         injection_actions.inject_received(self)
 
     def _append_log_entry(self, entry: SerialWorkbenchLogEntry) -> None:
-        if not self._log_entry_visible(entry):
-            self._update_log_stats()
-            return
-        self._append_log_line(entry)
-        self._update_log_stats()
+        log_actions.append_log_entry(self, entry)
 
     def _append_log_line(self, entry: SerialWorkbenchLogEntry) -> None:
-        if entry.direction == "tx":
-            line = self.tr("TX {text}").format(text=entry.text)
-        else:
-            line = self.tr("RX {text}").format(text=entry.text)
-        self._log_view.appendPlainText(line)
+        log_actions.append_log_line(self, entry)
 
     def _render_log_entries(self) -> None:
-        self._log_view.clear()
-        for entry in self._controller.entries:
-            if self._log_entry_visible(entry):
-                self._append_log_line(entry)
-        self._update_log_stats()
+        log_actions.render_log_entries(self)
 
     def _log_entry_visible(self, entry: SerialWorkbenchLogEntry) -> bool:
-        selected = self._log_filter_combo.currentText()
-        if selected == self.tr("TX"):
-            direction_matches = entry.direction == "tx"
-        elif selected == self.tr("RX"):
-            direction_matches = entry.direction == "rx"
-        else:
-            direction_matches = True
-        if not direction_matches:
-            return False
-        search_text = self._log_search_edit.text().strip().lower()
-        if not search_text:
-            return True
-        prefix = "tx" if entry.direction == "tx" else "rx"
-        return search_text in f"{prefix} {entry.text}".lower()
+        return log_actions.log_entry_visible(self, entry)
 
     def _update_log_stats(self) -> None:
-        entries = self._controller.entries
-        total = len(entries)
-        tx_count = sum(1 for entry in entries if entry.direction == "tx")
-        rx_count = sum(1 for entry in entries if entry.direction == "rx")
-        visible = sum(1 for entry in entries if self._log_entry_visible(entry))
-        self._log_stats_label.setText(
-            self.tr("Visible {visible} / Total {total} | TX {tx} | RX {rx}").format(
-                visible=visible,
-                total=total,
-                tx=tx_count,
-                rx=rx_count,
-            )
-        )
+        log_actions.update_log_stats(self)
 
     def _append_measurement_batch(self, batch: ChannelBatch) -> None:
         self._waveform_preview.update_batch(batch)
