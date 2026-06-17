@@ -69,8 +69,12 @@ def connect_udp(host: ConnectionActionHost) -> None:
     udp_host, port = endpoint
     result = host._controller.connect_udp_result(udp_host, port)
     if result.ok:
+        local_port = host._controller.active_local_port or 0
         host._status_label.setText(
-            host.tr("Connected to UDP {endpoint}").format(endpoint=f"{udp_host}:{port}")
+            host.tr("Connected to UDP {endpoint} local {local_port}").format(
+                endpoint=f"{udp_host}:{port}",
+                local_port=local_port,
+            )
         )
         host._set_connected_controls(True)
         return

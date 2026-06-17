@@ -70,6 +70,11 @@ class SerialWorkbenchController:
     def command_history(self) -> tuple[str, ...]:
         return tuple(self._command_history)
 
+    @property
+    def active_local_port(self) -> int | None:
+        port = int(getattr(self._transport, "local_port", 0) or 0)
+        return port or None
+
     def on_log_entry(self, callback: LogEntryCallback) -> None:
         self._log_callbacks.append(callback)
 
