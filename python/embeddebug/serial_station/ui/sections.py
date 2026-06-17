@@ -5,10 +5,11 @@ from __future__ import annotations
 from typing import Protocol
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6.QtWidgets import QComboBox, QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit, QPushButton, QVBoxLayout, QWidget
 
 from embeddebug.serial_station.controllers import SerialWorkbenchController
+from embeddebug.serial_station.ui.shortcuts import install_shortcuts
+from embeddebug.serial_station.ui.tcp_controls import build_tcp_controls
 from embeddebug.serial_station.ui.waveform_preview import SerialWaveformPreview
 
 
@@ -20,6 +21,7 @@ class SerialStationSectionsHost(Protocol):
     def _has_serial_ports(self) -> bool: ...
     def _connect_fake(self) -> None: ...
     def _connect_serial(self) -> None: ...
+    def _connect_tcp(self) -> None: ...
     def _disconnect(self) -> None: ...
     def _send_text(self) -> None: ...
     def _select_command_history(self, text: str) -> None: ...
@@ -115,6 +117,10 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     owner._connect_serial_button.setEnabled(owner._has_serial_ports())
     owner._connect_serial_button.clicked.connect(owner._connect_serial)
 
+    owner._tcp_host_edit, owner._tcp_port_edit, owner._connect_tcp_button = build_tcp_controls(
+        owner, root
+    )
+
     owner._disconnect_button = QPushButton(owner.tr("Disconnect"), root)
     owner._disconnect_button.setObjectName("serialStationDisconnectButton")
     owner._disconnect_button.setToolTip(owner.tr("Close the active transport"))
@@ -132,6 +138,9 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
         owner._flow_control_combo,
         owner._connect_button,
         owner._connect_serial_button,
+        owner._tcp_host_edit,
+        owner._tcp_port_edit,
+        owner._connect_tcp_button,
         owner._disconnect_button,
     ):
         toolbar.addWidget(widget)
@@ -277,20 +286,3 @@ def build_footer(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout
     row.addWidget(owner._clear_button)
     return row
 
-
-def install_shortcuts(owner: SerialStationSectionsHost) -> None:
-    send_shortcut = QShortcut(QKeySequence("Ctrl+Return"), owner)
-    send_shortcut.setObjectName("serialStationSendShortcut")
-    send_shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
-    send_shortcut.activated.connect(owner._send_text)
-
-    clear_shortcut = QShortcut(QKeySequence("Ctrl+L"), owner)
-    clear_shortcut.setObjectName("serialStationClearShortcut")
-    clear_shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
-    clear_shortcut.activated.connect(owner._clear_log)
-
-    refresh_shortcut = QShortcut(QKeySequence("Ctrl+R"), owner)
-    refresh_shortcut.setObjectName("serialStationRefreshPortsShortcut")
-    refresh_shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
-    refresh_shortcut.activated.connect(owner._refresh_serial_ports)
-    owner._shortcuts = [send_shortcut, clear_shortcut, refresh_shortcut]

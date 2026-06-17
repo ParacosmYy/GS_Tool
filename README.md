@@ -15,7 +15,7 @@ EmbedDebug 将串口连接、协议解析、数据观察、日志回放、波形
 | 能力 | 当前口径 | 证据入口 |
 |---|---|---|
 | PyQt 桌面入口 | 默认主线，可 smoke 启动 | `EmbedDebug.bat`、`python/embeddebug/app/` |
-| Serial Station | 主流程可用，真实硬件仍需补证 | `python/embeddebug/serial_station/` |
+| Serial Station | UART 主流程可用，TCP client 已有 UI 入口；真实硬件仍需补证 | `python/embeddebug/serial_station/` |
 | 协议解析 | RawData / FireWater / JustFloat 已纳入测试 | `tests/python/unit/test_protocols.py` |
 | 日志与回放 | 支持结构化记录、导出、重放 | `services/`、`tests/python/unit/test_services.py` |
 | 波形预览 | 基于 pyqtgraph 渐进接入 | `ui/waveform_preview.py` |
@@ -39,7 +39,7 @@ Serial Station 工作台
   core/          会话、收发、dispatcher、codec
   protocols/     帧定义、命令构建、流式解析
   services/      日志、导出、回放、Profile
-  drivers/       串口与替身设备适配
+  drivers/       串口、TCP 与替身设备适配
   workers/       后台任务，不直接更新 UI
       |
       v
@@ -76,7 +76,7 @@ cmd /c EmbedDebug.bat --smoke
 
 - 工程状态：`E4`，Python 测试与启动 smoke 可复现。
 - 用户状态：`U3`，Serial Station 主流程已有入口与可见反馈。
-- 设备状态：`D1`，已有单测与替身路径；真实硬件验证未完成，不能宣传为硬件全闭环。
+- 设备状态：`D2`，TCP 已有本机 loopback 替身验证；真实硬件验证未完成，不能宣传为硬件全闭环。
 
 ## Windows 交付
 

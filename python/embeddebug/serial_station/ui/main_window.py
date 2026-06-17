@@ -11,6 +11,10 @@ from embeddebug.serial_station.controllers import (
 )
 from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.ui.sections import build_main_layout
+from embeddebug.serial_station.ui.tcp_controls import (
+    apply_tcp_profile_controls,
+    connect_tcp_from_controls,
+)
 
 
 class SerialStationMainWindow(QMainWindow):
@@ -95,6 +99,9 @@ class SerialStationMainWindow(QMainWindow):
             return
         self._status_label.setText(self.tr("Connection failed"))
 
+    def _connect_tcp(self) -> None:
+        connect_tcp_from_controls(self)
+
     def _disconnect(self) -> None:
         self._controller.disconnect()
         self._status_label.setText(self.tr("Disconnected"))
@@ -103,6 +110,7 @@ class SerialStationMainWindow(QMainWindow):
     def _set_connected_controls(self, connected: bool) -> None:
         self._connect_button.setEnabled(not connected)
         self._connect_serial_button.setEnabled(not connected and self._has_serial_ports())
+        self._connect_tcp_button.setEnabled(not connected)
         self._disconnect_button.setEnabled(connected)
 
     def _has_serial_ports(self) -> bool:
@@ -257,6 +265,7 @@ class SerialStationMainWindow(QMainWindow):
         port_name = str(transport.get("portName", ""))
         if port_name:
             self._select_combo_value(self._port_combo, port_name)
+        apply_tcp_profile_controls(self, transport, port_name)
         baud_rate = transport.get("baudRate")
         if baud_rate is not None:
             self._select_combo_value(self._baud_combo, str(baud_rate))
