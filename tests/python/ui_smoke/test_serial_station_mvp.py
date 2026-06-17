@@ -426,6 +426,43 @@ def test_pyqt_mvp_tcp_connection_failure_shows_result_message(qtbot, monkeypatch
     assert "Connection failed: Failed to open tcp transport" in status_label.text()
 
 
+def test_pyqt_mvp_inject_failure_shows_result_message(qtbot, monkeypatch):
+    def open_tcp(self, config):
+        self._config = config
+        return True
+
+    monkeypatch.setattr(TcpClientTransport, "open", open_tcp)
+
+    window = build_main_window()
+    qtbot.addWidget(window)
+    window.show()
+
+    tcp_host_edit = window.findChild(QLineEdit, "serialStationTcpHostEdit")
+    tcp_port_edit = window.findChild(QLineEdit, "serialStationTcpPortEdit")
+    connect_tcp_button = window.findChild(QPushButton, "serialStationConnectTcpButton")
+    inject_edit = window.findChild(QLineEdit, "serialStationInjectEdit")
+    inject_button = window.findChild(QPushButton, "serialStationInjectButton")
+    status_label = window.findChild(QLabel, "serialStationStatusLabel")
+
+    for widget in [
+        tcp_host_edit,
+        tcp_port_edit,
+        connect_tcp_button,
+        inject_edit,
+        inject_button,
+        status_label,
+    ]:
+        assert widget is not None
+
+    tcp_host_edit.setText("127.0.0.1")
+    tcp_port_edit.setText("19004")
+    qtbot.mouseClick(connect_tcp_button, Qt.MouseButton.LeftButton)
+    inject_edit.setText("not-fake")
+    qtbot.mouseClick(inject_button, Qt.MouseButton.LeftButton)
+
+    assert "Inject failed: Fake RX injection requires fake transport" in status_label.text()
+
+
 def test_pyqt_mvp_refreshes_serial_ports_without_restart(qtbot, monkeypatch):
     port_snapshots = iter([[], ["COM_REFRESHED"]])
     monkeypatch.setattr(

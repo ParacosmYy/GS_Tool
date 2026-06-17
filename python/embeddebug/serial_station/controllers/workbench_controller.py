@@ -22,6 +22,7 @@ from embeddebug.serial_station.controllers.session_operations import (
     replay_entries_result as replay_session_entries_result,
     save_profile_result as save_session_profile_result,
 )
+from embeddebug.serial_station.controllers.text_decode import decode_injected_text
 from embeddebug.serial_station.drivers import (
     FakeSerialTransport,
     SerialPortConfig,
@@ -185,11 +186,15 @@ class SerialWorkbenchController:
         self._append_entry(entry)
         return OperationResult.success(entry)
 
-    def inject_received_text(self, text: str) -> None:
+    def inject_received_text(self, text: str) -> OperationResult[None]:
         if not isinstance(self._transport, FakeSerialTransport):
             self._handle_error("fake_injection_requires_fake_transport")
-            return
-        self._transport.inject_rx(_decode_injected_text(text).encode("utf-8"))
+            return OperationResult.failure(
+                "fake_injection_requires_fake_transport",
+                "Fake RX injection requires fake transport",
+            )
+        self._transport.inject_rx(decode_injected_text(text).encode("utf-8"))
+        return OperationResult.success()
 
     def clear_log(self) -> None:
         self._entries.clear()
@@ -292,7 +297,3 @@ class SerialWorkbenchController:
     def _handle_error(self, message: str) -> None:
         for callback in list(self._error_callbacks):
             callback(message)
-
-
-def _decode_injected_text(text: str) -> str:
-    return text.replace("\\r", "\r").replace("\\n", "\n").replace("\\t", "\t")

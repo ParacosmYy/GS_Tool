@@ -10,7 +10,7 @@ from embeddebug.serial_station.controllers import (
     SerialWorkbenchLogEntry,
 )
 from embeddebug.serial_station.core import ChannelBatch
-from embeddebug.serial_station.ui import connection_actions, session_actions
+from embeddebug.serial_station.ui import connection_actions, injection_actions, session_actions
 from embeddebug.serial_station.ui.sections import build_main_layout
 from embeddebug.serial_station.ui.tcp_controls import (
     apply_tcp_profile_controls,
@@ -115,12 +115,7 @@ class SerialStationMainWindow(QMainWindow):
             self._send_edit.setText(text)
 
     def _inject_received(self) -> None:
-        text = self._inject_edit.text()
-        if not text:
-            self._status_label.setText(self.tr("RX text is empty"))
-            return
-        self._controller.inject_received_text(text)
-        self._status_label.setText(self.tr("Received fake bytes"))
+        injection_actions.inject_received(self)
 
     def _append_log_entry(self, entry: SerialWorkbenchLogEntry) -> None:
         if not self._log_entry_visible(entry):

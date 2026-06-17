@@ -3,7 +3,40 @@ from __future__ import annotations
 import json
 
 from embeddebug.serial_station.controllers import SerialWorkbenchController
-from embeddebug.serial_station.drivers import FakeSerialTransport, TransportRegistry
+from embeddebug.serial_station.drivers import (
+    FakeSerialTransport,
+    SerialPortConfig,
+    SerialTransport,
+    TransportRegistry,
+)
+
+
+class _NonFakeTransport(SerialTransport):
+    def __init__(self) -> None:
+        self._errors = []
+
+    @property
+    def config(self) -> SerialPortConfig | None:
+        return None
+
+    @property
+    def is_open(self) -> bool:
+        return True
+
+    def open(self, config: SerialPortConfig) -> bool:
+        return True
+
+    def close(self) -> None:
+        return None
+
+    def write(self, data: bytes) -> int:
+        return len(data)
+
+    def on_bytes_received(self, callback):
+        return None
+
+    def on_error(self, callback):
+        self._errors.append(callback)
 
 
 def test_workbench_controller_exports_replays_and_profiles(tmp_path):
@@ -55,6 +88,19 @@ def test_workbench_controller_tracks_successful_command_history():
     assert controller.send_text("ping")
 
     assert controller.command_history == ("pong", "ping")
+
+
+def test_workbench_controller_inject_received_text_reports_non_fake_failure():
+    controller = SerialWorkbenchController(transport=_NonFakeTransport())
+    errors: list[str] = []
+    controller.on_error(errors.append)
+
+    result = controller.inject_received_text("pong")
+
+    assert result.failed
+    assert result.error_code == "fake_injection_requires_fake_transport"
+    assert result.message == "Fake RX injection requires fake transport"
+    assert errors == ["fake_injection_requires_fake_transport"]
 
 
 def test_workbench_controller_connect_fake_result_reports_open_failure():
