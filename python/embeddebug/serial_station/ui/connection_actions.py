@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from embeddebug.serial_station.ui.command_entry_text import apply_command_history_selection
 from embeddebug.serial_station.ui.command_history_options import populate_command_history_options
 from embeddebug.serial_station.ui.connection_control_state import set_connection_control_state
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
@@ -152,8 +153,7 @@ def refresh_command_history(host: ConnectionActionHost) -> None:
 
 
 def select_command_history(host: ConnectionActionHost, text: str) -> None:
-    if text:
-        host._send_edit.setText(text)
+    apply_command_history_selection(host._send_edit, text)
 
 
 def _validated_tcp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | None:
