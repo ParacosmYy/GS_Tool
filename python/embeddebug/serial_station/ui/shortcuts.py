@@ -30,3 +30,23 @@ def install_shortcuts(owner: SerialStationShortcutHost) -> None:
     refresh_shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
     refresh_shortcut.activated.connect(owner._refresh_serial_ports)
     owner._shortcuts = [send_shortcut, clear_shortcut, refresh_shortcut]
+
+
+def handle_key_press(owner: SerialStationShortcutHost, event: object) -> bool:
+    modifiers = event.modifiers()
+    key = event.key()
+    if not modifiers & Qt.KeyboardModifier.ControlModifier:
+        return False
+    if key in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+        owner._send_text()
+        event.accept()
+        return True
+    if key == Qt.Key.Key_L:
+        owner._clear_log()
+        event.accept()
+        return True
+    if key == Qt.Key.Key_R:
+        owner._refresh_serial_ports()
+        event.accept()
+        return True
+    return False

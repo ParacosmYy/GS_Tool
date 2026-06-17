@@ -7,6 +7,7 @@ from embeddebug.serial_station.ui import (
     connection_actions,
     main_window,
     session_actions,
+    shortcuts,
     tcp_controls,
 )
 
@@ -106,6 +107,17 @@ def test_measurement_display_action_lives_with_measurement_actions():
     source = inspect.getsource(main_window.SerialStationMainWindow._append_measurement_batch)
     assert "measurement_actions.append_measurement_batch(self, batch)" in source
     assert "_waveform_preview.update_batch" not in source
+
+
+def test_key_press_dispatch_lives_with_shortcuts():
+    assert hasattr(shortcuts, "handle_key_press")
+
+    source = inspect.getsource(main_window.SerialStationMainWindow.keyPressEvent)
+    assert "shortcuts.handle_key_press(self, event)" in source
+    assert "Qt.Key" not in source
+    assert "_send_text()" not in source
+    assert "_clear_log()" not in source
+    assert "_refresh_serial_ports()" not in source
 
 
 def test_protocol_selection_action_lives_with_protocol_actions():

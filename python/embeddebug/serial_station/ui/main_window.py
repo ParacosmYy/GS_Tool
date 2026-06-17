@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow
 
 from embeddebug.serial_station.controllers import (
@@ -17,6 +16,7 @@ from embeddebug.serial_station.ui import (
     measurement_actions,
     protocol_actions,
     session_actions,
+    shortcuts,
 )
 from embeddebug.serial_station.ui.sections import build_main_layout
 
@@ -38,22 +38,7 @@ class SerialStationMainWindow(QMainWindow):
         self.setCentralWidget(build_main_layout(self, self._controller))
 
     def keyPressEvent(self, event: object) -> None:
-        modifiers = event.modifiers()
-        key = event.key()
-        if modifiers & Qt.KeyboardModifier.ControlModifier and key in (
-            Qt.Key.Key_Return,
-            Qt.Key.Key_Enter,
-        ):
-            self._send_text()
-            event.accept()
-            return
-        if modifiers & Qt.KeyboardModifier.ControlModifier and key == Qt.Key.Key_L:
-            self._clear_log()
-            event.accept()
-            return
-        if modifiers & Qt.KeyboardModifier.ControlModifier and key == Qt.Key.Key_R:
-            self._refresh_serial_ports()
-            event.accept()
+        if shortcuts.handle_key_press(self, event):
             return
         super().keyPressEvent(event)
 
