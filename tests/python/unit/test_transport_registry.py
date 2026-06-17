@@ -81,3 +81,41 @@ def test_transport_registry_injects_tcp_driver_into_controller(tmp_path):
     assert tcp_transport.written == [b"tcp-registry"]
     assert '"mode": "tcp"' in profile_text
     assert '"portName": "127.0.0.1:19001"' in profile_text
+
+
+def test_transport_registry_injects_udp_driver_into_controller(tmp_path):
+    udp_transport = FakeSerialTransport()
+    registry = TransportRegistry()
+    registry.register(
+        "udp",
+        factory=lambda: udp_transport,
+        port_provider=lambda: [],
+    )
+    registry.register(
+        "serial",
+        factory=FakeSerialTransport,
+        port_provider=lambda: ["COM_REGISTRY"],
+    )
+    registry.register(
+        "fake",
+        factory=FakeSerialTransport,
+        port_provider=lambda: ["FAKE_LOOPBACK"],
+    )
+    controller = SerialWorkbenchController(transport_registry=registry)
+    profile_path = tmp_path / "udp-profile.json"
+
+    assert controller.available_transport_modes() == ("udp", "serial", "fake")
+    result = controller.connect_udp_result("127.0.0.1", 19003)
+
+    assert result.ok
+    assert result.value is not None
+    assert result.value.port_name == "127.0.0.1:19003"
+    assert controller.connect_udp("127.0.0.1", 19003)
+    assert controller.send_text("udp-registry")
+
+    controller.save_profile(profile_path, "udp-profile")
+
+    profile_text = profile_path.read_text(encoding="utf-8")
+    assert udp_transport.written == [b"udp-registry"]
+    assert '"mode": "udp"' in profile_text
+    assert '"portName": "127.0.0.1:19003"' in profile_text

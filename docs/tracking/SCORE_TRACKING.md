@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 569分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 431分
+> 当前: 570分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 430分
 
 ---
 
@@ -271,12 +271,13 @@
 | 567 | Serial Station status error action boundary | controller 错误回调展示归并到 status_actions，MainWindow 只保留委托并新增 UI 架构边界测试 |
 | 568 | Serial Station window lifecycle action boundary | 窗口关闭资源释放归并到 lifecycle_actions，MainWindow 只保留委托并新增 UI 架构边界测试 |
 | 569 | Serial Station UDP datagram transport | 新增 PyQt QUdpSocket 驱动并接入 TransportRegistry 默认 udp 模式，补 UDP loopback 与 registry 单测 |
+| 570 | Serial Station UDP controller connection | 新增 controller UDP 连接 API，抽出 endpoint 连接 helper，补 registry 注入、发送与 Profile 持久化单测 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#569` 的完整记录
+- 当前文档已整理到 `#570` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

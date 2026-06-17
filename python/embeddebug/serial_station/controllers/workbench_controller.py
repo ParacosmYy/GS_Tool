@@ -6,12 +6,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from embeddebug.serial_station.core import (
-    ChannelBatch,
-    ChannelRingBuffer,
-    SerialDispatcher,
-    batch_from_measurement_events,
-)
+from embeddebug.serial_station.core import ChannelBatch, ChannelRingBuffer, SerialDispatcher, batch_from_measurement_events
 from embeddebug.serial_station.controllers.connection_results import open_transport_result
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
 from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event, event_from_entry
@@ -23,12 +18,8 @@ from embeddebug.serial_station.controllers.session_operations import (
     save_profile_result as save_session_profile_result,
 )
 from embeddebug.serial_station.controllers.text_decode import decode_injected_text
-from embeddebug.serial_station.drivers import (
-    FakeSerialTransport,
-    SerialPortConfig,
-    SerialTransport,
-    TransportRegistry,
-)
+from embeddebug.serial_station.controllers.transport_connections import open_endpoint_transport, open_serial_transport
+from embeddebug.serial_station.drivers import FakeSerialTransport, SerialPortConfig, SerialTransport, TransportRegistry
 from embeddebug.serial_station.protocols import ProtocolEvent, create_default_registry
 from embeddebug.shared import OperationResult
 
@@ -38,6 +29,7 @@ ErrorCallback = Callable[[str], None]
 MeasurementCallback = Callable[[ChannelBatch], None]
 TransportFactory = Callable[[], SerialTransport]
 PortProvider = Callable[[], list[str]]
+
 
 class SerialWorkbenchController:
     """Coordinate fake transport, raw protocol dispatch and log facts."""
@@ -137,28 +129,31 @@ class SerialWorkbenchController:
         stop_bits: str = "1",
         flow_control: str = "none",
     ) -> OperationResult[SerialPortConfig]:
-        transport = self._transport_registry.create("serial")
-        self._replace_transport(transport)
         self._transport_mode = "serial"
-        config = SerialPortConfig(
-            port_name=port_name,
-            baud_rate=baud_rate,
+        return open_serial_transport(
+            self._transport_registry,
+            self._replace_transport,
+            port_name,
+            baud_rate,
             data_bits=data_bits,
             parity=parity,
             stop_bits=stop_bits,
             flow_control=flow_control,
         )
-        return open_transport_result(self._transport, config, "serial")
 
     def connect_tcp(self, host: str, port: int) -> bool:
         return self.connect_tcp_result(host, port).ok
 
     def connect_tcp_result(self, host: str, port: int) -> OperationResult[SerialPortConfig]:
-        transport = self._transport_registry.create("tcp")
-        self._replace_transport(transport)
         self._transport_mode = "tcp"
-        config = SerialPortConfig(port_name=f"{host}:{port}", baud_rate=0)
-        return open_transport_result(self._transport, config, "tcp")
+        return open_endpoint_transport(self._transport_registry, self._replace_transport, "tcp", host, port)
+
+    def connect_udp(self, host: str, port: int) -> bool:
+        return self.connect_udp_result(host, port).ok
+
+    def connect_udp_result(self, host: str, port: int) -> OperationResult[SerialPortConfig]:
+        self._transport_mode = "udp"
+        return open_endpoint_transport(self._transport_registry, self._replace_transport, "udp", host, port)
 
     def disconnect(self) -> None:
         self._transport.close()
