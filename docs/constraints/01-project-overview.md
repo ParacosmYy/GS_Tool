@@ -105,7 +105,7 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-smoke-windows-x
   - `uv run start-embeddebug --smoke`
   - `cmd /c EmbedDebug.bat --smoke`
 - 任何涉及 Python 依赖、路径、资源、部署、启动脚本的修改，收口前必须验证 Python/PyQt 默认入口；不能验证必须写明缺失组件与修复命令。
-- 严禁平行构建目录：`build2/`、`build-debug/`、`build-release/`、`cmake-build-*`。
+- 严禁平行构建目录：`build2/`、`build-debug/`、`build-release/`、`native-build-*`。
 
 ---
 

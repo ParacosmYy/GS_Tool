@@ -37,9 +37,6 @@ def test_active_tools_do_not_reintroduce_cpp_packaging():
         Path("tools/verify_package_embeddebug.py"),
         Path("tools/doctor.ps1"),
         Path("tools/verify_embeddebug_launch.ps1"),
-        Path("tools/bootstrap_env.bat"),
-        Path("tools/source-tree-audit.ps1"),
-        Path("tools/simplify-scan.ps1"),
     ]
     forbidden = [
         "cmake",
@@ -91,6 +88,23 @@ def test_tests_tree_contains_only_python_tests():
     )
 
 
+def test_script_surface_is_minimal_python_product_lane():
+    root_bat_files = sorted(path.name for path in Path(".").glob("*.bat"))
+    assert root_bat_files == ["EmbedDebug.bat"]
+
+    removed_tool_paths = [
+        Path("Beta.bat"),
+        Path("tools/bootstrap_env.bat"),
+        Path("tools/debug-trace.ps1"),
+        Path("tools/source-tree-audit.ps1"),
+        Path("tools/simplify-scan.ps1"),
+        Path("tools/agent-loop"),
+    ]
+
+    for path in removed_tool_paths:
+        assert not path.exists(), f"{path} should not be part of the product lane"
+
+
 def test_active_governance_docs_do_not_reference_legacy_native_workflow():
     docs = [
         Path("AGENTS.md"),
@@ -110,8 +124,13 @@ def test_active_governance_docs_do_not_reference_legacy_native_workflow():
         Path("docs/superpowers/specs/SPECS_TEMPLATE.md"),
     ]
     forbidden = [
+        "c++",
+        "cmake",
         "cmake --build",
         "windeployqt",
+        "mingw",
+        "qmake",
+        "msvc",
         "build/embeddebug.exe",
         "build\\embeddebug.exe",
         "src/apps/serial_station",

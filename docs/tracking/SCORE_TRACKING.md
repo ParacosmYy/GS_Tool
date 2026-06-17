@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 537分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 463分
+> 当前: 538分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 462分
 
 ---
 
@@ -239,12 +239,13 @@
 | 535 | Serial Station测量波形预览 | 新增测量波形预览控件，JustFloat 最近帧可在工作台测量面板以轻量多通道折线显示，Controller/Panel/Workbench QTest 覆盖 |
 | 536 | Serial Station测量导出入口 | 测量面板新增导出按钮，工作台弹出保存对话框并调用测量 CSV 导出服务，CSV 写入与 UI 闭环可测 |
 | 537 | Python-only 主线清理 | 删除旧 QTest/C++ 测试源码和 Qt qrc 清单，README 重写为 PyQt 上位机产品入口，约束文档收口到 uv/PyQt/PyInstaller |
+| 538 | Python 工程入口瘦身 | 删除 Beta、bootstrap、debug/simplify/source-tree 脚本和 Go agent-loop，活跃入口收敛为 EmbedDebug.bat、uv scripts、doctor 与 PyInstaller 工具链 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#537` 的完整记录
+- 当前文档已整理到 `#538` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

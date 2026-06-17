@@ -58,8 +58,8 @@
 - L6 可依赖全部下层；下层不得依赖 L6。
 - 同层禁止直接 include，必须通过接口或事件。
 - `serial_station` 内部固定：`ui -> controllers -> core/protocols/services`，`workers -> controllers`。
-- `python/embeddebug/` 是默认主线；不得 import、生成或修改 C++ 运行时对象作为正常业务路径。
-- C++ `src/` 与 CMake 工程已移除；不得恢复 native exe fallback。
+- `python/embeddebug/` 是默认主线；不得 import、生成或修改 legacy native 运行时对象作为正常业务路径。
+- legacy `src/` 与原生工程已移除；不得恢复 native exe fallback。
 
 ---
 
@@ -96,7 +96,7 @@
 
 ## 五、Serial Station 强制边界（再次强调）
 
-以 `python/embeddebug/serial_station/` 为当前唯一新落地路径，禁止新功能恢复旧 `src/serial/` 或 C++ 串口目录。
+以 `python/embeddebug/serial_station/` 为当前唯一新落地路径，禁止新功能恢复旧 `src/serial/` 或 legacy native 串口目录。
 
 内部边界：
 
@@ -118,7 +118,7 @@
 
 ### 5.2 Python/PyQt Serial Station 并行边界
 
-Python/PyQt 迁移按 `PRD-135` 与 `PRD-136` 执行，落点为 `python/embeddebug/serial_station/`。它必须镜像 C++ Serial Station 的分层语义，但不共享 C++ QObject 或 QWidget。PRD-136 后默认用户入口已切换为 Python/PyQt。
+Python/PyQt 迁移按 `PRD-135` 与 `PRD-136` 执行，落点为 `python/embeddebug/serial_station/`。它必须继承原串口工站的分层语义，但不共享 native QObject 或 QWidget。PRD-136 后默认用户入口已切换为 Python/PyQt。
 
 ```text
 python/embeddebug/serial_station/

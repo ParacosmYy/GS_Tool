@@ -1,6 +1,6 @@
 # 05 - UI 标准与交互规范（重构版）
 
-> 适用范围：`python/embeddebug/` 下 PyQt 界面相关代码；历史 C++ UI 仅允许兼容维护。
+> 适用范围：`python/embeddebug/` 下 PyQt 界面相关代码；历史 UI 只作为迁移参考，不作为活跃实现入口。
 
 ---
 

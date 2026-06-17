@@ -27,7 +27,7 @@
 
 ## Serial Station 边界
 
-串口上位机后续重构不恢复旧 C++/CMake 工程树，优先落到 `python/embeddebug/serial_station/`。
+串口上位机后续重构不恢复旧原生工程树，优先落到 `python/embeddebug/serial_station/`。
 
 - UI 面板只发 PyQt signal 或 controller intent，不直接操作串口或具体协议。
 - `SerialStationController` 是 UI 与业务之间的协调入口。

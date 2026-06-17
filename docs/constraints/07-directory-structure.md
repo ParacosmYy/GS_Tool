@@ -31,10 +31,10 @@
 
 ### 3.1 串口工站相关
 - Python/PyQt 串口工站迁移只允许新增到 `python/embeddebug/serial_station/`，内部按 `ui/`、`controllers/`、`core/`、`protocols/`、`services/`、`workers/`、`drivers/`。
-- C++ 串口工站已移除；PRD-136/B23 后默认启动、打包和验收入口均进入 Python/PyQt。
+- 旧串口工站已移除；PRD-136/B23 后默认启动、打包和验收入口均进入 Python/PyQt。
 - 不得把 Python 产品运行时代码放入 `tools/`；`tools/` 只放工程管理、启动、审计和包装辅助脚本。
 - 不得恢复 `src/` native 产品主线。
-- 不得把 Python 运行时代码回填到 C++ 构建或历史源码目录。
+- 不得把 Python 运行时代码回填到历史源码目录或原生构建链路。
 
 ### 3.2 接口与共享
 - Python 主线的共享值对象优先放在 `python/embeddebug/shared/` 或对应 app 内 `core/`，不得复制 legacy native 源码到 Python 目录。

@@ -24,33 +24,33 @@ GO 循环触发 20 轮或 30 分钟安全刹车后，必须进入 LOOP，不允�
 
 - 构建变慢或构建失败。
 - `EmbedDebug.bat` 启动失败。
-- 工具链、PATH、Qt 部署、CMake/Ninja 环境异常。
+- 工具链、PATH、PyQt/PyInstaller 环境异常。
 
 默认动作：
 
 1. 检查 `git status --short`。
-2. 检查 `build/EmbedDebug.exe` 是否存在。
-3. 检查 Qt、CMake、Ninja、MinGW 路径。
-4. 只在显式传入 `-RunBuild` 时运行 `cmake --build .\build --config Release --parallel 4`。
-5. 只在显式传入 `-RunLaunch` 时运行 `.\EmbedDebug.bat` 或启动探针。
+2. 检查 `uv` 与 Python/PyQt 依赖是否可用。
+3. 检查 PyInstaller 打包入口和 package verify 入口。
+4. 只在显式传入 `-RunTests` 时运行 `uv run test-embeddebug-py`。
+5. 只在显式传入 `-RunLaunch` 时运行 `EmbedDebug.bat --smoke`。
 6. 输出 PASS/WARN/FAIL 摘要。
 
 本地入口：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1 -RunBuild
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1 -RunBuild -RunLaunch
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1 -RunTests
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1 -RunTests -RunLaunch
 ```
 
-默认 Doctor 只做诊断，不写入 `local_env.bat`，不创建第二构建目录，不启动应用。
+默认 Doctor 只做诊断，不写入本地环境文件，不创建第二构建目录，不启动应用。
 
 失败后进入 Debug，不直接扩大代码改动。
 
 Doctor 收口要求：
 
 - 如果失败是环境缺失，输出缺失组件和修复命令。
-- 如果失败是构建错误，复制最后一段编译错误进入 Debug。
+- 如果失败是测试错误，复制最后一段 pytest 错误进入 Debug。
 - 如果失败是启动错误，记录启动命令、退出码、窗口/进程观察结果。
 
 ## 3. Debug
@@ -74,17 +74,12 @@ Doctor 收口要求：
 本地入口：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\debug-trace.ps1 `
-  -Title "问题标题" `
-  -Severity P2 `
-  -ReproCommand "复现命令" `
-  -ErrorSummary "错误摘要" `
-  -ImpactScope "影响范围" `
-  -CandidateFiles "src/example.cpp" `
-  -RegressionCommand "回归命令"
+uv run test-embeddebug-py
+uv run start-embeddebug --smoke
+cmd /c EmbedDebug.bat --smoke
 ```
 
-如需归档报告，`-OutFile` 只能写入 `docs/reviews/debug/`。
+如需归档报告，手写 Markdown 只能写入 `docs/reviews/debug/`。
 
 Debug 收口要求：
 
@@ -108,17 +103,17 @@ Debug 收口要求：
 2. 找到 canonical 落点。
 3. 小步拆分或删除重复。
 4. 保持外部接口稳定。
-5. 运行构建和必要测试。
+5. 运行必要测试和启动 smoke。
 6. 如果只做结构清理，不得提升用户状态或设备状态。
 
 本地入口：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\simplify-scan.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\simplify-scan.ps1 -OutFile docs\reviews\simplify\latest.md
+uv run test-embeddebug-py
+uv run test-embeddebug-tools
 ```
 
-默认 Simplify 扫描只读输出 Markdown。归档报告只能写入 `docs/reviews/simplify/`。扫描结果只是选择下一步清理目标的证据，不代表可以跳过 PRD、技术债说明或构建验证。
+Simplify 证据必须来自可复现测试、只读审计或人工写明的 Markdown 记录。归档报告只能写入 `docs/reviews/simplify/`。扫描结果只是选择下一步清理目标的证据，不代表可以跳过 PRD、技术债说明或验证。
 
 Simplify 收口要求：
 
@@ -140,7 +135,7 @@ Simplify 收口要求：
 
 | 最后失败位置 | 路由 |
 |--------------|------|
-| `execute` 失败 | Doctor；如果是编译错误再进入 Debug |
+| `execute` 失败 | Doctor；如果是测试或运行时错误再进入 Debug |
 | `check` 失败且无 fix | Debug；先补复现和回归命令 |
 | `fix` 失败 | Debug；定位 fix 命令本身或候选文件 |
 | 多轮 fix 后仍失败 | Simplify；检查是否任务过大、边界错误或重复实现 |

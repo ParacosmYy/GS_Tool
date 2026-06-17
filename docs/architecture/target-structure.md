@@ -23,4 +23,4 @@
 1. 新能力优先落入 canonical Python 包目录。
 2. 如果归属不清晰，先在 `python/embeddebug/features/` 放归属说明，再决定是否创建实现目录。
 3. 不新增 `2`、`new`、`old`、`bak` 之类的平行实现目录。
-4. 串口上位机重构、新协议扩展和串口收发框架拆分优先落入 `python/embeddebug/serial_station/`，不要恢复旧 C++/CMake 功能桶。
+4. 串口上位机重构、新协议扩展和串口收发框架拆分优先落入 `python/embeddebug/serial_station/`，不要恢复旧原生功能桶。
