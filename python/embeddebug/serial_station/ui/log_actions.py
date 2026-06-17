@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from embeddebug.serial_station.controllers import SerialWorkbenchLogEntry
+from embeddebug.serial_station.ui.status_messages import set_log_stats_label
 
 
 class LogActionHost(Protocol):
@@ -60,11 +61,4 @@ def update_log_stats(host: LogActionHost) -> None:
     tx_count = sum(1 for entry in entries if entry.direction == "tx")
     rx_count = sum(1 for entry in entries if entry.direction == "rx")
     visible = sum(1 for entry in entries if log_entry_visible(host, entry))
-    host._log_stats_label.setText(
-        host.tr("Visible {visible} / Total {total} | TX {tx} | RX {rx}").format(
-            visible=visible,
-            total=total,
-            tx=tx_count,
-            rx=rx_count,
-        )
-    )
+    set_log_stats_label(host, visible=visible, total=total, tx=tx_count, rx=rx_count)

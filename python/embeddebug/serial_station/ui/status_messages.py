@@ -29,6 +29,14 @@ class ProfileLabelHost(Protocol):
     def tr(self, text: str) -> str: ...
 
 
+class LogStatsLabelHost(Protocol):
+    """Minimal host surface needed for translated log statistics messages."""
+
+    _log_stats_label: StatusLabel
+
+    def tr(self, text: str) -> str: ...
+
+
 def result_message(result: OperationResult[object], *, success_text: str, failure_prefix: str) -> str:
     """Return a display message for a controller operation result."""
 
@@ -82,3 +90,23 @@ def set_profile_label(host: ProfileLabelHost, name: str) -> None:
     """Write a translated profile name to the host profile label."""
 
     host._profile_label.setText(host.tr("Profile: {name}").format(name=name))
+
+
+def set_log_stats_label(
+    host: LogStatsLabelHost,
+    *,
+    visible: int,
+    total: int,
+    tx: int,
+    rx: int,
+) -> None:
+    """Write translated log statistics to the host log statistics label."""
+
+    host._log_stats_label.setText(
+        host.tr("Visible {visible} / Total {total} | TX {tx} | RX {rx}").format(
+            visible=visible,
+            total=total,
+            tx=tx,
+            rx=rx,
+        )
+    )

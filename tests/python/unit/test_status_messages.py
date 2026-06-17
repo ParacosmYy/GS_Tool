@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from embeddebug.serial_station.ui.status_messages import (
     result_message,
+    set_log_stats_label,
     set_profile_label,
     set_result_status,
     set_status_text,
@@ -20,6 +21,7 @@ class Label:
 
 class TrHost:
     def __init__(self) -> None:
+        self._log_stats_label = Label()
         self._profile_label = Label()
         self._status_label = Label()
 
@@ -89,3 +91,11 @@ def test_set_profile_label_writes_translated_profile_name_to_profile_label():
     set_profile_label(host, "factory-default")
 
     assert host._profile_label.text == "tr:Profile: factory-default"
+
+
+def test_set_log_stats_label_writes_translated_counts_to_log_stats_label():
+    host = TrHost()
+
+    set_log_stats_label(host, visible=2, total=3, tx=1, rx=2)
+
+    assert host._log_stats_label.text == "tr:Visible 2 / Total 3 | TX 1 | RX 2"
