@@ -31,16 +31,17 @@ GO 循环触发 20 轮或 30 分钟安全刹车后，必须进入 LOOP，不允�
 1. 检查 `git status --short`。
 2. 检查 `uv` 与 Python/PyQt 依赖是否可用。
 3. 检查 PyInstaller 打包入口和 package verify 入口。
-4. 只在显式传入 `-RunTests` 时运行 `uv run test-embeddebug-py`。
-5. 只在显式传入 `-RunLaunch` 时运行 `EmbedDebug.bat --smoke`。
+4. 需要测试证据时运行 `uv run test-embeddebug-py`。
+5. 需要启动证据时运行 `uv run start-embeddebug --smoke` 与 `cmd /c EmbedDebug.bat --smoke`。
 6. 输出 PASS/WARN/FAIL 摘要。
 
 本地入口：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1 -RunTests
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1 -RunTests -RunLaunch
+git status --short
+uv run test-embeddebug-py
+uv run start-embeddebug --smoke
+cmd /c EmbedDebug.bat --smoke
 ```
 
 默认 Doctor 只做诊断，不写入本地环境文件，不创建第二构建目录，不启动应用。

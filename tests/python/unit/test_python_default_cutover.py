@@ -260,3 +260,31 @@ def test_active_governance_docs_do_not_reference_legacy_native_workflow():
         text = path.read_text(encoding="utf-8", errors="ignore").lower()
         for token in forbidden:
             assert token.lower() not in text, f"{path} still references {token}"
+
+
+def test_active_governance_docs_do_not_reference_removed_shell_scripts():
+    docs = [
+        Path("AGENTS.md"),
+        Path("CLAUDE.md"),
+        Path("README.md"),
+        Path("docs/constraints/01-project-overview.md"),
+        Path("docs/constraints/02-workflow.md"),
+        Path("docs/constraints/06-git-commit.md"),
+        Path("docs/constraints/07-directory-structure.md"),
+        Path("docs/serial_station_architecture.md"),
+        Path("docs/superpowers/LOOP_PROTOCOL.md"),
+    ]
+    forbidden = [
+        "tools\\doctor.ps1",
+        "tools/doctor.ps1",
+        ".\\tools\\doctor.ps1",
+        "launch_embeddebug.ps1",
+        "verify_embeddebug_launch.ps1",
+        "bootstrap_env.bat",
+        "Beta.bat",
+    ]
+
+    for path in docs:
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for token in forbidden:
+            assert token.lower() not in text.lower(), f"{path} still references {token}"

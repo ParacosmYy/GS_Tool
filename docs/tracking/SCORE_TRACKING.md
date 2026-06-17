@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 547分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 453分
+> 当前: 548分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 452分
 
 ---
 
@@ -249,12 +249,13 @@
 | 545 | Python 启动面最小化 | `EmbedDebug.bat` 直连 uv，删除无活跃调用链的 PowerShell 工具和旧编辑器配置，README 与门禁同步为单一 Python/PyQt 启动面 |
 | 546 | Serial Station TCP client transport | 新增 PyQt lane TCP client transport，registry 默认暴露 `tcp` mode，controller 可保存 TCP endpoint profile，并通过 loopback 替身链路验证收发 |
 | 547 | Serial Station TCP UI entry | 工作台连接工具栏新增 TCP host/port 与 Connect TCP 入口，用户可从 PyQt UI 建立 TCP client 连接并保存 endpoint profile |
+| 548 | 活跃脚本文档收口 | 活跃治理文档移除已删除 shell 脚本入口，README 更新为企业级精简首页，脚本面继续保持单一 bat + uv scripts |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#547` 的完整记录
+- 当前文档已整理到 `#548` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
