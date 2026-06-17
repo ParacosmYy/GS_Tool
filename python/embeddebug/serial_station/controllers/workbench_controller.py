@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from embeddebug.serial_station.core import ChannelBatch, ChannelRingBuffer, SerialDispatcher, batch_from_measurement_events
+from embeddebug.serial_station.controllers.command_history_state import remember_command, restore_command_history
 from embeddebug.serial_station.controllers.connection_results import open_transport_result
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
 from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event, event_from_entry
@@ -188,7 +189,7 @@ class SerialWorkbenchController:
         if written != len(payload):
             self._handle_error("transport_write_incomplete")
             return OperationResult.failure("transport_write_incomplete", "Transport accepted fewer bytes than requested")
-        self._remember_command(text)
+        remember_command(self._command_history, text)
         entry = SerialWorkbenchLogEntry(direction="tx", text=text, raw=payload)
         self._append_entry(entry)
         return OperationResult.success(entry)
@@ -243,7 +244,7 @@ class SerialWorkbenchController:
     def load_profile_result(self, path: str | Path) -> OperationResult[dict[str, Any]]:
         result = load_session_profile_result(path)
         if result.ok and result.value is not None:
-            self._restore_command_history(result.value.get("commandHistory", []))
+            restore_command_history(self._command_history, result.value.get("commandHistory", []))
             name = str(result.value.get("name", "unnamed"))
             self._append_system_entry(f"profile loaded: {name}")
         return result
@@ -270,17 +271,6 @@ class SerialWorkbenchController:
     def _append_connected_entry(self, result: OperationResult[SerialPortConfig], mode: str) -> None:
         if result.ok and result.value is not None:
             self._append_system_entry(f"connected: {mode} {result.value.port_name}")
-    def _remember_command(self, text: str) -> None:
-        if text in self._command_history:
-            self._command_history.remove(text)
-        self._command_history.append(text)
-
-    def _restore_command_history(self, values: object) -> None:
-        self._command_history.clear()
-        if isinstance(values, list):
-            for value in values:
-                if isinstance(value, str) and value:
-                    self._remember_command(value)
 
     def _replace_transport(self, transport: SerialTransport) -> None:
         if self._transport.is_open:
