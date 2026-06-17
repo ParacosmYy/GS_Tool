@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +13,15 @@ from embeddebug.serial_station.core import (
     batch_from_measurement_events,
 )
 from embeddebug.serial_station.controllers.connection_results import open_transport_result
+from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
+from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event, event_from_entry
 from embeddebug.serial_station.controllers.profile_snapshot import build_profile_snapshot
+from embeddebug.serial_station.controllers.session_operations import (
+    export_log_result as export_session_log_result,
+    load_profile_result as load_session_profile_result,
+    replay_entries_result as replay_session_entries_result,
+    save_profile_result as save_session_profile_result,
+)
 from embeddebug.serial_station.drivers import (
     FakeSerialTransport,
     SerialPortConfig,
@@ -22,21 +29,7 @@ from embeddebug.serial_station.drivers import (
     TransportRegistry,
 )
 from embeddebug.serial_station.protocols import ProtocolEvent, create_default_registry
-from embeddebug.serial_station.services import (
-    SerialLogService,
-    SerialProfileService,
-    SerialReplayService,
-)
 from embeddebug.shared import OperationResult
-
-
-@dataclass(frozen=True)
-class SerialWorkbenchLogEntry:
-    """A UI-ready serial workbench log fact without QWidget dependencies."""
-
-    direction: str
-    text: str
-    raw: bytes
 
 
 LogEntryCallback = Callable[[SerialWorkbenchLogEntry], None]
@@ -202,17 +195,26 @@ class SerialWorkbenchController:
         self._entries.clear()
 
     def export_log(self, path: str | Path) -> None:
-        log_service = SerialLogService(path)
-        for entry in self._entries:
-            log_service.append(self._event_from_entry(entry))
+        self.export_log_result(path)
+
+    def export_log_result(self, path: str | Path) -> OperationResult[Path]:
+        return export_session_log_result(path, self._entries, self._protocol_event_from_entry)
 
     def replay_log(self, path: str | Path) -> None:
-        replay_service = SerialReplayService()
-        self._entries.clear()
-        for event in replay_service.load_events(path):
-            self._append_entry(self._entry_from_event(event))
+        self.replay_log_result(path)
+
+    def replay_log_result(self, path: str | Path) -> OperationResult[list[SerialWorkbenchLogEntry]]:
+        result = replay_session_entries_result(path, entry_from_event)
+        if result.ok:
+            self._entries.clear()
+            for entry in result.value or []:
+                self._append_entry(entry)
+        return result
 
     def save_profile(self, path: str | Path, name: str) -> None:
+        self.save_profile_result(path, name)
+
+    def save_profile_result(self, path: str | Path, name: str) -> OperationResult[Path]:
         profile = build_profile_snapshot(
             name=name,
             mode=self._transport_mode,
@@ -221,34 +223,30 @@ class SerialWorkbenchController:
             protocol=self._dispatcher.protocol_name,
             command_history=self.command_history,
         )
-        SerialProfileService().save(path, profile)
+        return save_session_profile_result(path, profile)
 
     def load_profile(self, path: str | Path) -> dict[str, Any]:
-        profile = SerialProfileService().load(path)
-        self._restore_command_history(profile.get("commandHistory", []))
-        return profile
+        result = self.load_profile_result(path)
+        if result.failed:
+            raise OSError(result.message)
+        return result.value or {}
+
+    def load_profile_result(self, path: str | Path) -> OperationResult[dict[str, Any]]:
+        result = load_session_profile_result(path)
+        if result.ok and result.value is not None:
+            self._restore_command_history(result.value.get("commandHistory", []))
+        return result
 
     def _handle_bytes_received(self, data: bytes) -> None:
         events = self._dispatcher.feed(data)
         for event in events:
-            self._append_entry(self._entry_from_event(event))
+            self._append_entry(entry_from_event(event))
         batch = batch_from_measurement_events(events)
         if batch is not None:
             self._append_measurements(batch)
 
-    def _entry_from_event(self, event: ProtocolEvent) -> SerialWorkbenchLogEntry:
-        text = str(event.payload.get("text", event.raw.decode("utf-8", errors="replace")))
-        direction = "tx" if event.type == "tx" else "rx"
-        return SerialWorkbenchLogEntry(direction=direction, text=text, raw=event.raw)
-
-    def _event_from_entry(self, entry: SerialWorkbenchLogEntry) -> ProtocolEvent:
-        event_type = "tx" if entry.direction == "tx" else "frame"
-        return ProtocolEvent(
-            type=event_type,
-            protocol_name=self._dispatcher.protocol_name,
-            payload={"text": entry.text, "direction": entry.direction},
-            raw=entry.raw,
-        )
+    def _protocol_event_from_entry(self, entry: SerialWorkbenchLogEntry) -> ProtocolEvent:
+        return event_from_entry(entry, self._dispatcher.protocol_name)
 
     def _append_entry(self, entry: SerialWorkbenchLogEntry) -> None:
         self._entries.append(entry)

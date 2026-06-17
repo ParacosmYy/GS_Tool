@@ -89,6 +89,66 @@ def test_workbench_controller_persists_command_history_in_profiles(tmp_path):
     assert restored.command_history == ("status?", "reset")
 
 
+def test_workbench_controller_service_result_success_paths(tmp_path):
+    controller = SerialWorkbenchController()
+    log_path = tmp_path / "session-result.jsonl"
+    profile_path = tmp_path / "profile-result.json"
+
+    assert controller.connect_fake()
+    assert controller.send_text("status?")
+
+    export_result = controller.export_log_result(log_path)
+    assert export_result.ok
+    assert export_result.value == log_path
+
+    controller.clear_log()
+    replay_result = controller.replay_log_result(log_path)
+    assert replay_result.ok
+    assert [entry.text for entry in controller.entries] == ["status?"]
+
+    save_result = controller.save_profile_result(profile_path, "result-profile")
+    assert save_result.ok
+    assert save_result.value == profile_path
+
+    controller.send_text("reset")
+    load_result = controller.load_profile_result(profile_path)
+    assert load_result.ok
+    assert load_result.value is not None
+    assert load_result.value["name"] == "result-profile"
+    assert controller.command_history == ("status?",)
+
+
+def test_workbench_controller_service_result_failures_do_not_mutate_state(tmp_path):
+    controller = SerialWorkbenchController()
+    blocked_parent = tmp_path / "blocked"
+    missing_log = tmp_path / "missing.jsonl"
+    missing_profile = tmp_path / "missing-profile.json"
+    blocked_parent.write_text("not a directory", encoding="utf-8")
+
+    assert controller.connect_fake()
+    assert controller.send_text("status?")
+    before_entries = controller.entries
+    before_history = controller.command_history
+
+    export_result = controller.export_log_result(blocked_parent / "session.jsonl")
+    assert export_result.failed
+    assert export_result.error_code == "log_export_failed"
+
+    replay_result = controller.replay_log_result(missing_log)
+    assert replay_result.failed
+    assert replay_result.error_code == "replay_load_failed"
+    assert controller.entries == before_entries
+
+    save_result = controller.save_profile_result(blocked_parent / "profile.json", "blocked")
+    assert save_result.failed
+    assert save_result.error_code == "profile_save_failed"
+
+    load_result = controller.load_profile_result(missing_profile)
+    assert load_result.failed
+    assert load_result.error_code == "profile_load_failed"
+    assert controller.command_history == before_history
+
+
 def test_workbench_controller_connects_serial_transport_and_profiles(tmp_path):
     serial_transport = FakeSerialTransport()
     controller = SerialWorkbenchController(
