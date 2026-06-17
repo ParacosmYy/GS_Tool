@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+import importlib
 import inspect
 
-from embeddebug.serial_station.ui import connection_actions, main_window, session_actions, tcp_controls
+from embeddebug.serial_station.ui import (
+    connection_actions,
+    main_window,
+    session_actions,
+    tcp_controls,
+)
 
 
 def test_tcp_connection_action_lives_with_connection_actions():
@@ -20,3 +26,13 @@ def test_clear_log_action_lives_with_session_actions():
     source = inspect.getsource(main_window.SerialStationMainWindow._clear_log)
     assert "session_actions.clear_log(self)" in source
     assert "_controller.clear_log" not in source
+
+
+def test_protocol_selection_action_lives_with_protocol_actions():
+    protocol_actions = importlib.import_module("embeddebug.serial_station.ui.protocol_actions")
+
+    assert hasattr(protocol_actions, "select_protocol")
+
+    source = inspect.getsource(main_window.SerialStationMainWindow._set_protocol)
+    assert "protocol_actions.select_protocol(self, name)" in source
+    assert "_controller.set_protocol" not in source

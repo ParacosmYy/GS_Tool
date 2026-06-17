@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 557分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 443分
+> 当前: 558分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 442分
 
 ---
 
@@ -259,12 +259,13 @@
 | 555 | Serial Station UI injection result | UI Fake RX 注入入口接入 OperationResult，非 Fake transport 注入失败展示可诊断原因且不覆盖为成功状态 |
 | 556 | Serial Station TCP action boundary | TCP 连接动作归并到 connection_actions，tcp_controls 回归控件构建职责并新增 UI 架构边界测试 |
 | 557 | Serial Station clear log action boundary | 清空日志动作归并到 session_actions，MainWindow 只保留委托并新增 UI 架构边界测试 |
+| 558 | Serial Station protocol action boundary | 协议选择动作归并到 protocol_actions，MainWindow 只保留委托并新增 UI 架构边界测试 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#557` 的完整记录
+- 当前文档已整理到 `#558` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

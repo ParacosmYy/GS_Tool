@@ -10,7 +10,12 @@ from embeddebug.serial_station.controllers import (
     SerialWorkbenchLogEntry,
 )
 from embeddebug.serial_station.core import ChannelBatch
-from embeddebug.serial_station.ui import connection_actions, injection_actions, session_actions
+from embeddebug.serial_station.ui import (
+    connection_actions,
+    injection_actions,
+    protocol_actions,
+    session_actions,
+)
 from embeddebug.serial_station.ui.sections import build_main_layout
 from embeddebug.serial_station.ui.tcp_controls import (
     apply_tcp_profile_controls,
@@ -54,8 +59,7 @@ class SerialStationMainWindow(QMainWindow):
         super().keyPressEvent(event)
 
     def _set_protocol(self, name: str) -> None:
-        self._controller.set_protocol(name)
-        self._status_label.setText(self.tr("Protocol: {name}").format(name=name))
+        protocol_actions.select_protocol(self, name)
 
     def _refresh_serial_ports(self) -> None:
         self._refresh_port_combo()
