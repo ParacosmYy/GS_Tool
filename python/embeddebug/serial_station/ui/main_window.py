@@ -87,9 +87,7 @@ class SerialStationMainWindow(QMainWindow):
         connection_actions.connect_tcp(self)
 
     def _disconnect(self) -> None:
-        self._controller.disconnect()
-        self._status_label.setText(self.tr("Disconnected"))
-        self._set_connected_controls(False)
+        connection_actions.disconnect(self)
 
     def _set_connected_controls(self, connected: bool) -> None:
         self._connect_button.setEnabled(not connected)

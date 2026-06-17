@@ -20,6 +20,14 @@ def test_tcp_connection_action_lives_with_connection_actions():
     assert "_status_label.setText" not in source
 
 
+def test_disconnect_action_lives_with_connection_actions():
+    assert hasattr(connection_actions, "disconnect")
+
+    source = inspect.getsource(main_window.SerialStationMainWindow._disconnect)
+    assert "connection_actions.disconnect(self)" in source
+    assert "_controller.disconnect" not in source
+
+
 def test_clear_log_action_lives_with_session_actions():
     assert hasattr(session_actions, "clear_log")
 

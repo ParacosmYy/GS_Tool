@@ -62,6 +62,12 @@ def connect_tcp(host: ConnectionActionHost) -> None:
     host._status_label.setText(host.tr("Connection failed: {message}").format(message=result.message))
 
 
+def disconnect(host: ConnectionActionHost) -> None:
+    host._controller.disconnect()
+    host._status_label.setText(host.tr("Disconnected"))
+    host._set_connected_controls(False)
+
+
 def send_text(host: ConnectionActionHost) -> None:
     text = host._send_edit.text()
     if not text:
