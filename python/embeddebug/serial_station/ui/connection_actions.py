@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from embeddebug.serial_station.ui.command_history_options import populate_command_history_options
+from embeddebug.serial_station.ui.connection_control_state import set_connection_control_state
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
 from embeddebug.serial_station.ui.serial_port_options import (
     combo_has_serial_ports,
@@ -113,11 +114,7 @@ def disconnect(host: ConnectionActionHost) -> None:
 
 
 def set_connected_controls(host: ConnectionActionHost, connected: bool) -> None:
-    host._connect_button.setEnabled(not connected)
-    host._connect_serial_button.setEnabled(not connected and has_serial_ports(host))
-    host._connect_tcp_button.setEnabled(not connected)
-    host._connect_udp_button.setEnabled(not connected)
-    host._disconnect_button.setEnabled(connected)
+    set_connection_control_state(host, connected=connected, has_serial_ports=has_serial_ports(host))
 
 
 def has_serial_ports(host: ConnectionActionHost) -> bool:
