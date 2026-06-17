@@ -75,13 +75,10 @@ class SerialStationMainWindow(QMainWindow):
         connection_actions.disconnect(self)
 
     def _set_connected_controls(self, connected: bool) -> None:
-        self._connect_button.setEnabled(not connected)
-        self._connect_serial_button.setEnabled(not connected and self._has_serial_ports())
-        self._connect_tcp_button.setEnabled(not connected)
-        self._disconnect_button.setEnabled(connected)
+        connection_actions.set_connected_controls(self, connected)
 
     def _has_serial_ports(self) -> bool:
-        return self._port_combo.count() > 0 and self._port_combo.currentText() != self.tr("No serial ports")
+        return connection_actions.has_serial_ports(self)
 
     def _send_text(self) -> None:
         connection_actions.send_text(self)

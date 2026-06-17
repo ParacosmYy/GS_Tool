@@ -37,6 +37,18 @@ def test_serial_port_refresh_action_lives_with_connection_actions():
     assert "_refresh_port_combo" not in source
 
 
+def test_connection_control_state_actions_live_with_connection_actions():
+    assert hasattr(connection_actions, "set_connected_controls")
+    assert hasattr(connection_actions, "has_serial_ports")
+
+    controls_source = inspect.getsource(main_window.SerialStationMainWindow._set_connected_controls)
+    ports_source = inspect.getsource(main_window.SerialStationMainWindow._has_serial_ports)
+    assert "connection_actions.set_connected_controls(self, connected)" in controls_source
+    assert "connection_actions.has_serial_ports(self)" in ports_source
+    assert "_connect_button.setEnabled" not in controls_source
+    assert "_port_combo.currentText" not in ports_source
+
+
 def test_command_history_actions_live_with_connection_actions():
     assert hasattr(connection_actions, "refresh_command_history")
     assert hasattr(connection_actions, "select_command_history")

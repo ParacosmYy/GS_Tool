@@ -68,6 +68,17 @@ def disconnect(host: ConnectionActionHost) -> None:
     host._set_connected_controls(False)
 
 
+def set_connected_controls(host: ConnectionActionHost, connected: bool) -> None:
+    host._connect_button.setEnabled(not connected)
+    host._connect_serial_button.setEnabled(not connected and has_serial_ports(host))
+    host._connect_tcp_button.setEnabled(not connected)
+    host._disconnect_button.setEnabled(connected)
+
+
+def has_serial_ports(host: ConnectionActionHost) -> bool:
+    return host._port_combo.count() > 0 and host._port_combo.currentText() != host.tr("No serial ports")
+
+
 def populate_serial_port_combo(host: ConnectionActionHost) -> None:
     current = host._port_combo.currentText()
     host._port_combo.clear()
