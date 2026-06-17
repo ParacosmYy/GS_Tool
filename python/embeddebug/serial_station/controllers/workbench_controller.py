@@ -15,9 +15,9 @@ from embeddebug.serial_station.core import (
 )
 from embeddebug.serial_station.drivers import (
     FakeSerialTransport,
-    QtSerialPortTransport,
     SerialPortConfig,
     SerialTransport,
+    TransportRegistry,
 )
 from embeddebug.serial_station.protocols import ProtocolEvent, create_default_registry
 from embeddebug.serial_station.services import (
@@ -49,12 +49,15 @@ class SerialWorkbenchController:
     def __init__(
         self,
         transport: SerialTransport | None = None,
+        transport_registry: TransportRegistry | None = None,
         serial_transport_factory: TransportFactory | None = None,
         port_provider: PortProvider | None = None,
     ) -> None:
         self._registry = create_default_registry()
-        self._serial_transport_factory = serial_transport_factory or QtSerialPortTransport
-        self._port_provider = port_provider or QtSerialPortTransport.available_ports
+        self._transport_registry = transport_registry or TransportRegistry.with_defaults(
+            serial_factory=serial_transport_factory,
+            serial_port_provider=port_provider,
+        )
         self._transport = transport or FakeSerialTransport()
         self._transport_mode = "fake"
         self._dispatcher = SerialDispatcher(self._registry.create("raw_data"))
@@ -92,7 +95,7 @@ class SerialWorkbenchController:
         return tuple(self._registry.names())
 
     def available_serial_ports(self) -> tuple[str, ...]:
-        return tuple(self._port_provider())
+        return self._transport_registry.available_ports("serial")
 
     def set_protocol(self, name: str) -> None:
         self._dispatcher.set_protocol(self._registry.create(name))
@@ -100,7 +103,7 @@ class SerialWorkbenchController:
 
     def connect_fake(self) -> bool:
         if not isinstance(self._transport, FakeSerialTransport):
-            self._replace_transport(FakeSerialTransport())
+            self._replace_transport(self._transport_registry.create("fake"))
         self._transport_mode = "fake"
         config = SerialPortConfig(port_name="FAKE_LOOPBACK", baud_rate=115200)
         return self._transport.open(config)
@@ -114,7 +117,7 @@ class SerialWorkbenchController:
         stop_bits: str = "1",
         flow_control: str = "none",
     ) -> bool:
-        transport = self._serial_transport_factory()
+        transport = self._transport_registry.create("serial")
         self._replace_transport(transport)
         self._transport_mode = "serial"
         return self._transport.open(
