@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
+
 
 class ConnectionActionHost(Protocol):
     """Minimal main-window surface needed by connection action handlers."""
@@ -147,34 +149,16 @@ def select_command_history(host: ConnectionActionHost, text: str) -> None:
 
 
 def _validated_tcp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | None:
-    tcp_host = host._tcp_host_edit.text().strip()
-    port_text = host._tcp_port_edit.text().strip()
-    if not tcp_host:
-        host._status_label.setText(host.tr("TCP host is empty"))
-        return None
-    try:
-        port = int(port_text)
-    except ValueError:
-        host._status_label.setText(host.tr("TCP port is invalid"))
-        return None
-    if port < 1 or port > 65535:
-        host._status_label.setText(host.tr("TCP port is invalid"))
-        return None
-    return tcp_host, port
+    result = validate_endpoint_fields(host._tcp_host_edit.text(), host._tcp_port_edit.text(), "TCP")
+    if result.ok:
+        return result.host, result.port
+    host._status_label.setText(host.tr(result.message))
+    return None
 
 
 def _validated_udp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | None:
-    udp_host = host._udp_host_edit.text().strip()
-    port_text = host._udp_port_edit.text().strip()
-    if not udp_host:
-        host._status_label.setText(host.tr("UDP host is empty"))
-        return None
-    try:
-        port = int(port_text)
-    except ValueError:
-        host._status_label.setText(host.tr("UDP port is invalid"))
-        return None
-    if port < 1 or port > 65535:
-        host._status_label.setText(host.tr("UDP port is invalid"))
-        return None
-    return udp_host, port
+    result = validate_endpoint_fields(host._udp_host_edit.text(), host._udp_port_edit.text(), "UDP")
+    if result.ok:
+        return result.host, result.port
+    host._status_label.setText(host.tr(result.message))
+    return None
