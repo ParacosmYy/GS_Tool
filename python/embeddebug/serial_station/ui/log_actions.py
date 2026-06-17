@@ -43,6 +43,8 @@ def log_entry_visible(host: LogActionHost, entry: SerialWorkbenchLogEntry) -> bo
         search_text=host._log_search_edit.text(),
         tx_text=host.tr("TX"),
         rx_text=host.tr("RX"),
+        system_text=host.tr("System"),
+        error_text=host.tr("Error"),
     )
 
 

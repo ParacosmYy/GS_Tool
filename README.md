@@ -15,14 +15,14 @@
 | 工程状态 | `E4`，Python 测试与启动 smoke 可复现 | `uv run test-embeddebug-py` |
 | 用户状态 | `U3`，Serial Station 主流程已有可见入口 | `uv run start-embeddebug` |
 | 设备状态 | `D2`，TCP/UDP 已有替身或 loopback 验证，真实硬件仍需补证 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
-| 评分进度 | `596 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
+| 评分进度 | `597 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
 
 ## 产品能力
 
 | 能力 | 当前口径 | 入口 |
 |---|---|---|
 | PyQt 桌面工作台 | 默认主线，支持 smoke 启动 | `EmbedDebug.bat` |
-| Serial Station | UART/TCP/UDP 主流程已有可见入口；连接控件状态、命令输入写入、Profile 名称输入、Profile 下拉选项、端点 Profile 回填、端点默认文本、端点控件文案、串口配置选项、串口 Profile 参数回填、串口连接字段读取、日志视图内容、日志筛选选项、日志过滤规则、串口端口空态、命令历史选项、TCP/UDP 端点校验、普通状态文本、结果状态反馈、Profile 标签反馈、日志行与日志统计反馈、RX 注入反馈已公共化，UDP UI loopback 收发已验证，断开、刷新端口、发送、快捷键、Profile 恢复、错误状态反馈和窗口生命周期可诊断 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
+| Serial Station | UART/TCP/UDP 主流程已有可见入口；连接控件状态、命令输入写入、Profile 名称输入、Profile 下拉选项、端点 Profile 回填、端点默认文本、端点控件文案、串口配置选项、串口 Profile 参数回填、串口连接字段读取、日志视图内容、日志筛选选项、System/Error 诊断日志筛选、日志过滤规则、串口端口空态、命令历史选项、TCP/UDP 端点校验、普通状态文本、结果状态反馈、Profile 标签反馈、日志行与日志统计反馈、RX 注入反馈已公共化，UDP UI loopback 收发已验证，断开、刷新端口、发送、快捷键、Profile 恢复、错误状态反馈和窗口生命周期可诊断 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
 | 协议解析 | RawData / FireWater / JustFloat 已纳入测试，协议选择动作已独立 | `python/embeddebug/serial_station/ui/protocol_actions.py` |
 | 日志与回放 | 支持结构化记录、过滤、搜索、统计、清空、导出、重放和失败可恢复反馈 | `python/embeddebug/serial_station/ui/log_actions.py` |
 | 波形预览 | 基于 pyqtgraph 接入轻量趋势视图，测量展示动作已独立 | `python/embeddebug/serial_station/ui/measurement_actions.py` |

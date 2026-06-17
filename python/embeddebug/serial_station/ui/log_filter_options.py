@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 
-_LOG_FILTER_OPTIONS = ("All", "TX", "RX")
+_LOG_FILTER_OPTIONS = ("All", "TX", "RX", "System", "Error")
 
 
 def log_filter_options() -> tuple[str, ...]:

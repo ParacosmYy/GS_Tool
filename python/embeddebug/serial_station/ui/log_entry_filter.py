@@ -19,18 +19,21 @@ def log_entry_matches_filter(
     search_text: str,
     tx_text: str,
     rx_text: str,
+    system_text: str,
+    error_text: str,
 ) -> bool:
-    if selected_filter == tx_text:
-        direction_matches = entry.direction == "tx"
-    elif selected_filter == rx_text:
-        direction_matches = entry.direction == "rx"
-    else:
-        direction_matches = True
+    filtered_directions = {
+        tx_text: "tx",
+        rx_text: "rx",
+        system_text: "system",
+        error_text: "error",
+    }
+    expected_direction = filtered_directions.get(selected_filter)
+    direction_matches = expected_direction is None or entry.direction == expected_direction
     if not direction_matches:
         return False
 
     normalized_search = search_text.strip().lower()
     if not normalized_search:
         return True
-    prefix = "tx" if entry.direction == "tx" else "rx"
-    return normalized_search in f"{prefix} {entry.text}".lower()
+    return normalized_search in f"{entry.direction} {entry.text}".lower()
