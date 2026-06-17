@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 567分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 433分
+> 当前: 568分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 432分
 
 ---
 
@@ -269,12 +269,13 @@
 | 565 | Serial Station measurement display action boundary | 测量 batch 展示归并到 measurement_actions，MainWindow 只保留委托并新增 UI 架构边界测试 |
 | 566 | Serial Station keypress shortcut action boundary | Ctrl+Enter/Ctrl+L/Ctrl+R 兜底按键分发归并到 shortcuts，MainWindow 只保留委托并新增 UI 架构边界测试 |
 | 567 | Serial Station status error action boundary | controller 错误回调展示归并到 status_actions，MainWindow 只保留委托并新增 UI 架构边界测试 |
+| 568 | Serial Station window lifecycle action boundary | 窗口关闭资源释放归并到 lifecycle_actions，MainWindow 只保留委托并新增 UI 架构边界测试 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#567` 的完整记录
+- 当前文档已整理到 `#568` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

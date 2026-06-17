@@ -131,6 +131,16 @@ def test_status_error_action_lives_with_status_actions():
     assert "Error: {message}" not in source
 
 
+def test_window_lifecycle_action_lives_with_lifecycle_actions():
+    lifecycle_actions = importlib.import_module("embeddebug.serial_station.ui.lifecycle_actions")
+
+    assert hasattr(lifecycle_actions, "close_window")
+
+    source = inspect.getsource(main_window.SerialStationMainWindow.closeEvent)
+    assert "lifecycle_actions.close_window(self)" in source
+    assert "_waveform_preview.shutdown" not in source
+
+
 def test_protocol_selection_action_lives_with_protocol_actions():
     protocol_actions = importlib.import_module("embeddebug.serial_station.ui.protocol_actions")
 

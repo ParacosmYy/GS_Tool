@@ -12,6 +12,7 @@ from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.ui import (
     connection_actions,
     injection_actions,
+    lifecycle_actions,
     log_actions,
     measurement_actions,
     protocol_actions,
@@ -119,5 +120,5 @@ class SerialStationMainWindow(QMainWindow):
         status_actions.show_error(self, message)
 
     def closeEvent(self, event: object) -> None:
-        self._waveform_preview.shutdown()
+        lifecycle_actions.close_window(self)
         super().closeEvent(event)
