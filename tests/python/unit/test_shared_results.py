@@ -1,0 +1,38 @@
+from __future__ import annotations
+
+import pytest
+
+from embeddebug.shared import OperationError, OperationResult
+
+
+def test_operation_result_success_exposes_value_without_error():
+    result = OperationResult.success("connected")
+
+    assert result.ok is True
+    assert result.failed is False
+    assert result.value == "connected"
+    assert result.error is None
+    assert result.error_code == ""
+    assert result.message == ""
+
+
+def test_operation_result_failure_requires_code_and_exposes_message():
+    result = OperationResult.failure("transport_not_open", "Open a connection first")
+
+    assert result.ok is False
+    assert result.failed is True
+    assert result.value is None
+    assert result.error == OperationError(
+        code="transport_not_open",
+        message="Open a connection first",
+    )
+    assert result.error_code == "transport_not_open"
+    assert result.message == "Open a connection first"
+
+
+def test_operation_result_rejects_invalid_state():
+    with pytest.raises(ValueError, match="success result cannot contain an error"):
+        OperationResult(ok=True, error=OperationError("unexpected"))
+
+    with pytest.raises(ValueError, match="failure result requires an error code"):
+        OperationResult.failure("", "missing code")

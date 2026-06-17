@@ -41,6 +41,11 @@ def test_workbench_controller_tracks_successful_command_history():
     controller = SerialWorkbenchController()
 
     assert controller.command_history == ()
+    result = controller.send_text_result("before-open")
+
+    assert result.failed
+    assert result.error_code == "transport_not_open"
+    assert result.message == "Open a transport before sending"
     assert not controller.send_text("before-open")
     assert controller.command_history == ()
 

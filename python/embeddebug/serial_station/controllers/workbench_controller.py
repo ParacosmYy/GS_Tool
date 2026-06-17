@@ -25,6 +25,7 @@ from embeddebug.serial_station.services import (
     SerialProfileService,
     SerialReplayService,
 )
+from embeddebug.shared import OperationResult
 
 
 @dataclass(frozen=True)
@@ -146,16 +147,27 @@ class SerialWorkbenchController:
         self._transport.close()
 
     def send_text(self, text: str) -> bool:
+        return self.send_text_result(text).ok
+
+    def send_text_result(self, text: str) -> OperationResult[SerialWorkbenchLogEntry]:
         if not self._transport.is_open:
             self._handle_error("transport_not_open")
-            return False
+            return OperationResult.failure(
+                "transport_not_open",
+                "Open a transport before sending",
+            )
         payload = self._dispatcher.build_command(text)
         written = self._transport.write(payload)
         if written != len(payload):
-            return False
+            self._handle_error("transport_write_incomplete")
+            return OperationResult.failure(
+                "transport_write_incomplete",
+                "Transport accepted fewer bytes than requested",
+            )
         self._remember_command(text)
-        self._append_entry(SerialWorkbenchLogEntry(direction="tx", text=text, raw=payload))
-        return True
+        entry = SerialWorkbenchLogEntry(direction="tx", text=text, raw=payload)
+        self._append_entry(entry)
+        return OperationResult.success(entry)
 
     def inject_received_text(self, text: str) -> None:
         if not isinstance(self._transport, FakeSerialTransport):
