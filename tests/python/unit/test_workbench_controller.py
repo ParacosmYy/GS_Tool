@@ -73,6 +73,8 @@ def test_workbench_controller_exports_replays_and_profiles(tmp_path):
 
 def test_workbench_controller_tracks_successful_command_history():
     controller = SerialWorkbenchController()
+    logged: list[str] = []
+    controller.on_log_entry(lambda entry: logged.append(f"{entry.direction}:{entry.text}"))
 
     assert controller.command_history == ()
     result = controller.send_text_result("before-open")
@@ -80,6 +82,9 @@ def test_workbench_controller_tracks_successful_command_history():
     assert result.failed
     assert result.error_code == "transport_not_open"
     assert result.message == "Open a transport before sending"
+    assert controller.entries[-1].direction == "error"
+    assert controller.entries[-1].text == "transport_not_open"
+    assert logged[-1] == "error:transport_not_open"
     assert not controller.send_text("before-open")
     assert controller.command_history == ()
 

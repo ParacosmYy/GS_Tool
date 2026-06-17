@@ -295,5 +295,6 @@ class SerialWorkbenchController:
             callback(latest)
 
     def _handle_error(self, message: str) -> None:
+        self._append_entry(SerialWorkbenchLogEntry(direction="error", text=message, raw=message.encode("utf-8")))
         for callback in list(self._error_callbacks):
             callback(message)

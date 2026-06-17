@@ -92,15 +92,21 @@ def test_pyqt_mvp_send_failure_shows_result_message(qtbot):
     send_edit = window.findChild(QLineEdit, "serialStationSendEdit")
     send_button = window.findChild(QPushButton, "serialStationSendButton")
     status_label = window.findChild(QLabel, "serialStationStatusLabel")
+    log_view = window.findChild(QPlainTextEdit, "serialStationLogView")
+    log_stats_label = window.findChild(QLabel, "serialStationLogStatsLabel")
 
     assert send_edit is not None
     assert send_button is not None
     assert status_label is not None
+    assert log_view is not None
+    assert log_stats_label is not None
 
     send_edit.setText("before-open")
     qtbot.mouseClick(send_button, Qt.MouseButton.LeftButton)
 
     assert "Send failed: Open a transport before sending" in status_label.text()
+    assert "Error transport_not_open" in log_view.toPlainText()
+    assert log_stats_label.text() == "Visible 1 / Total 1 | TX 0 | RX 0 | System 0 | Error 1"
 
 
 def test_pyqt_mvp_fake_connection_failure_shows_result_message(qtbot, monkeypatch):
