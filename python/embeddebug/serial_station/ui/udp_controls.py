@@ -6,6 +6,7 @@ from typing import Protocol
 
 from PyQt6.QtWidgets import QLineEdit, QPushButton, QWidget
 
+from embeddebug.serial_station.ui.endpoint_default_text import apply_default_endpoint_text
 from embeddebug.serial_station.ui.endpoint_profile_controls import (
     apply_endpoint_profile_controls,
 )
@@ -21,14 +22,13 @@ def build_udp_controls(owner: SerialStationUdpHost, root: QWidget) -> tuple[QLin
     host_edit.setObjectName("serialStationUdpHostEdit")
     host_edit.setPlaceholderText(owner.tr("UDP host"))
     host_edit.setToolTip(owner.tr("UDP remote host name or address"))
-    host_edit.setText("127.0.0.1")
 
     port_edit = QLineEdit(root)
     port_edit.setObjectName("serialStationUdpPortEdit")
     port_edit.setPlaceholderText(owner.tr("UDP port"))
     port_edit.setToolTip(owner.tr("UDP remote port number"))
-    port_edit.setText("19000")
     port_edit.returnPressed.connect(owner._connect_udp)
+    apply_default_endpoint_text(host_edit, port_edit)
 
     connect_button = QPushButton(owner.tr("Connect UDP"), root)
     connect_button.setObjectName("serialStationConnectUdpButton")
