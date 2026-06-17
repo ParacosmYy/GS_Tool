@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 542分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 458分
+> 当前: 543分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 457分
 
 ---
 
@@ -244,12 +244,13 @@
 | 540 | Serial Station UI section 类型边界 | 为 `ui/sections.py` 增加显式宿主 Protocol，禁止 `Any owner` 隐式耦合，并保持 300 行体积门禁、UI smoke 与启动 smoke 通过 |
 | 541 | 活跃架构文档 PyQt 化 | 删除 `docs/architecture` 中旧原生设计文档，重写架构索引和冻结目录口径，新增门禁确保活跃架构文档只指向 Python/PyQt 主线 |
 | 542 | 活跃 PRD/Specs 旧批次清理 | 删除 CMake、Source Tree、Go Agent Loop 和旧 UV 包装批次文档，新增门禁防止退休 native/tool 批次留在活跃 PRD/Specs 目录 |
+| 543 | 活跃 PRD/Specs 正文 PyQt 化 | 删除活跃 PRD/Specs 中仍含原生路径、CMake 和 `.h/.cpp` 实现口径的旧文档，新增正文门禁确保活跃规划只描述 Python/PyQt 主线 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#542` 的完整记录
+- 当前文档已整理到 `#543` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

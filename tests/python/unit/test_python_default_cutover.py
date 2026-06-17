@@ -181,6 +181,39 @@ def test_active_prd_specs_do_not_keep_retired_native_batches():
     )
 
 
+def test_active_prd_specs_text_is_python_pyqt_only():
+    active_docs = [
+        path
+        for root in (Path("docs/prd"), Path("docs/superpowers/specs"))
+        for path in root.glob("*.md")
+    ]
+    forbidden = [
+        "c++",
+        "cmake",
+        "windeployqt",
+        "mingw",
+        "build/embeddebug.exe",
+        "build\\embeddebug.exe",
+        "src/",
+        "cpp",
+        ".h/cpp",
+        ".h/.cpp",
+        "```cpp",
+    ]
+    offenders = []
+
+    for path in active_docs:
+        text = path.read_text(encoding="utf-8", errors="ignore").lower()
+        for token in forbidden:
+            if token in text:
+                offenders.append(f"{path} contains {token}")
+                break
+
+    assert not offenders, "legacy native wording remains active: " + "; ".join(
+        offenders
+    )
+
+
 def test_active_governance_docs_do_not_reference_legacy_native_workflow():
     docs = [
         Path("AGENTS.md"),
