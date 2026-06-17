@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 576分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 424分
+> 当前: 577分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 423分
 
 ---
 
@@ -278,12 +278,13 @@
 | 574 | Serial Station status message helper | 新增 OperationResult 状态消息 helper，connection_actions 复用连接/发送成功失败文案格式，补纯单测并保持 UI smoke 通过 |
 | 575 | Serial Station session status message helper | session_actions 复用统一 OperationResult 状态消息 helper，导出/回放/Profile 成功失败文案格式收敛并补架构测试 |
 | 576 | Serial Station injection status message helper | injection_actions 复用统一 OperationResult 状态消息 helper，RX 注入成功失败文案格式收敛并补架构测试 |
+| 577 | Serial Station status label helper | 将 action 私有 `_set_result_status` 上移为 status_messages 公共 helper，连接/会话/注入动作统一状态标签写入并补单测与架构测试 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#576` 的完整记录
+- 当前文档已整理到 `#577` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文

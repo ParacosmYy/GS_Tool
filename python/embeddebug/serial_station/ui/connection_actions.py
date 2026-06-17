@@ -5,8 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
-from embeddebug.serial_station.ui.status_messages import translated_result_message
-from embeddebug.shared.results import OperationResult
+from embeddebug.serial_station.ui.status_messages import set_result_status
 
 
 class ConnectionActionHost(Protocol):
@@ -24,7 +23,7 @@ class ConnectionActionHost(Protocol):
 def connect_fake(host: ConnectionActionHost) -> None:
     result = host._controller.connect_fake_result()
     if result.ok:
-        _set_result_status(
+        set_result_status(
             host,
             result,
             success_text="Connected to fake loopback",
@@ -32,7 +31,7 @@ def connect_fake(host: ConnectionActionHost) -> None:
         )
         host._set_connected_controls(True)
         return
-    _set_result_status(host, result, success_text="", failure_prefix="Connection failed")
+    set_result_status(host, result, success_text="", failure_prefix="Connection failed")
 
 
 def connect_serial(host: ConnectionActionHost) -> None:
@@ -50,7 +49,7 @@ def connect_serial(host: ConnectionActionHost) -> None:
         flow_control=host._flow_control_combo.currentText().lower(),
     )
     if result.ok:
-        _set_result_status(
+        set_result_status(
             host,
             result,
             success_text="Connected to {port}",
@@ -59,7 +58,7 @@ def connect_serial(host: ConnectionActionHost) -> None:
         )
         host._set_connected_controls(True)
         return
-    _set_result_status(host, result, success_text="", failure_prefix="Connection failed")
+    set_result_status(host, result, success_text="", failure_prefix="Connection failed")
 
 
 def connect_tcp(host: ConnectionActionHost) -> None:
@@ -69,7 +68,7 @@ def connect_tcp(host: ConnectionActionHost) -> None:
     tcp_host, port = endpoint
     result = host._controller.connect_tcp_result(tcp_host, port)
     if result.ok:
-        _set_result_status(
+        set_result_status(
             host,
             result,
             success_text="Connected to TCP {endpoint}",
@@ -78,7 +77,7 @@ def connect_tcp(host: ConnectionActionHost) -> None:
         )
         host._set_connected_controls(True)
         return
-    _set_result_status(host, result, success_text="", failure_prefix="Connection failed")
+    set_result_status(host, result, success_text="", failure_prefix="Connection failed")
 
 
 def connect_udp(host: ConnectionActionHost) -> None:
@@ -89,7 +88,7 @@ def connect_udp(host: ConnectionActionHost) -> None:
     result = host._controller.connect_udp_result(udp_host, port)
     if result.ok:
         local_port = host._controller.active_local_port or 0
-        _set_result_status(
+        set_result_status(
             host,
             result,
             success_text="Connected to UDP {endpoint} local {local_port}",
@@ -99,7 +98,7 @@ def connect_udp(host: ConnectionActionHost) -> None:
         )
         host._set_connected_controls(True)
         return
-    _set_result_status(host, result, success_text="", failure_prefix="Connection failed")
+    set_result_status(host, result, success_text="", failure_prefix="Connection failed")
 
 
 def disconnect(host: ConnectionActionHost) -> None:
@@ -146,9 +145,9 @@ def send_text(host: ConnectionActionHost) -> None:
     result = host._controller.send_text_result(text)
     if result.ok:
         refresh_command_history(host)
-        _set_result_status(host, result, success_text="Command sent", failure_prefix="Send failed")
+        set_result_status(host, result, success_text="Command sent", failure_prefix="Send failed")
         return
-    _set_result_status(host, result, success_text="", failure_prefix="Send failed")
+    set_result_status(host, result, success_text="", failure_prefix="Send failed")
 
 
 def refresh_command_history(host: ConnectionActionHost) -> None:
@@ -181,22 +180,3 @@ def _validated_udp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | Non
         return result.host, result.port
     host._status_label.setText(host.tr(result.message))
     return None
-
-
-def _set_result_status(
-    host: ConnectionActionHost,
-    result: OperationResult[object],
-    *,
-    success_text: str,
-    failure_prefix: str,
-    **format_values: object,
-) -> None:
-    host._status_label.setText(
-        translated_result_message(
-            host,
-            result,
-            success_text=success_text,
-            failure_prefix=failure_prefix,
-            **format_values,
-        )
-    )

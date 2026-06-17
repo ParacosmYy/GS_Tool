@@ -84,15 +84,24 @@ def test_clear_log_action_lives_with_session_actions():
 def test_session_result_messages_reuse_status_message_helper():
     source = inspect.getsource(session_actions)
 
-    assert "translated_result_message" in source
+    assert "set_result_status" in source
+    assert "_set_result_status" not in source
     assert "failed: {message}" not in source
 
 
 def test_injection_result_messages_reuse_status_message_helper():
     source = inspect.getsource(injection_actions)
 
-    assert "translated_result_message" in source
+    assert "set_result_status" in source
+    assert "_set_result_status" not in source
     assert "Inject failed: {message}" not in source
+
+
+def test_connection_result_messages_reuse_status_message_helper():
+    source = inspect.getsource(connection_actions)
+
+    assert "set_result_status" in source
+    assert "_set_result_status" not in source
 
 
 def test_profile_control_apply_action_lives_with_session_actions():

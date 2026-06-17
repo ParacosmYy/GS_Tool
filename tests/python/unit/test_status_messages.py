@@ -1,10 +1,25 @@
 from __future__ import annotations
 
-from embeddebug.serial_station.ui.status_messages import result_message, translated_result_message
+from embeddebug.serial_station.ui.status_messages import (
+    result_message,
+    set_result_status,
+    translated_result_message,
+)
 from embeddebug.shared.results import OperationResult
 
 
+class Label:
+    def __init__(self) -> None:
+        self.text = ""
+
+    def setText(self, text: str) -> None:
+        self.text = text
+
+
 class TrHost:
+    def __init__(self) -> None:
+        self._status_label = Label()
+
     def tr(self, text: str) -> str:
         return f"tr:{text}"
 
@@ -40,3 +55,18 @@ def test_translated_result_message_applies_translation_then_format_values():
         )
         == "tr:Connected to 127.0.0.1:19000"
     )
+
+
+def test_set_result_status_writes_translated_message_to_status_label():
+    host = TrHost()
+    result = OperationResult.success()
+
+    set_result_status(
+        host,
+        result,
+        success_text="Connected to {endpoint}",
+        failure_prefix="Connection failed",
+        endpoint="127.0.0.1:19000",
+    )
+
+    assert host._status_label.text == "tr:Connected to 127.0.0.1:19000"

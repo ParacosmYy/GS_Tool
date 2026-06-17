@@ -6,10 +6,9 @@ from typing import Protocol
 
 from PyQt6.QtWidgets import QComboBox
 
-from embeddebug.serial_station.ui.status_messages import translated_result_message
+from embeddebug.serial_station.ui.status_messages import set_result_status
 from embeddebug.serial_station.ui.tcp_controls import apply_tcp_profile_controls
 from embeddebug.serial_station.ui.udp_controls import apply_udp_profile_controls
-from embeddebug.shared.results import OperationResult
 
 
 class SessionActionHost(Protocol):
@@ -40,9 +39,9 @@ def export_log(host: SessionActionHost) -> None:
         return
     result = host._controller.export_log_result(path)
     if result.failed:
-        _set_result_status(host, result, success_text="", failure_prefix="Export failed")
+        set_result_status(host, result, success_text="", failure_prefix="Export failed")
         return
-    _set_result_status(host, result, success_text="Saved log", failure_prefix="Export failed")
+    set_result_status(host, result, success_text="Saved log", failure_prefix="Export failed")
 
 
 def replay_log(host: SessionActionHost) -> None:
@@ -52,11 +51,11 @@ def replay_log(host: SessionActionHost) -> None:
         return
     result = host._controller.replay_log_result(path)
     if result.failed:
-        _set_result_status(host, result, success_text="", failure_prefix="Replay failed")
+        set_result_status(host, result, success_text="", failure_prefix="Replay failed")
         return
     host._log_view.clear()
     host._render_log_entries()
-    _set_result_status(host, result, success_text="Replayed log", failure_prefix="Replay failed")
+    set_result_status(host, result, success_text="Replayed log", failure_prefix="Replay failed")
 
 
 def save_profile(host: SessionActionHost) -> None:
@@ -70,10 +69,10 @@ def save_profile(host: SessionActionHost) -> None:
         return
     result = host._controller.save_profile_result(path, name)
     if result.failed:
-        _set_result_status(host, result, success_text="", failure_prefix="Save profile failed")
+        set_result_status(host, result, success_text="", failure_prefix="Save profile failed")
         return
     host._profile_label.setText(host.tr("Profile: {name}").format(name=name))
-    _set_result_status(host, result, success_text="Saved profile", failure_prefix="Save profile failed")
+    set_result_status(host, result, success_text="Saved profile", failure_prefix="Save profile failed")
 
 
 def load_profile(host: SessionActionHost) -> None:
@@ -83,7 +82,7 @@ def load_profile(host: SessionActionHost) -> None:
         return
     result = host._controller.load_profile_result(path)
     if result.failed or result.value is None:
-        _set_result_status(host, result, success_text="", failure_prefix="Load profile failed")
+        set_result_status(host, result, success_text="", failure_prefix="Load profile failed")
         return
     profile = result.value
     name = str(profile.get("name", "unnamed"))
@@ -91,7 +90,7 @@ def load_profile(host: SessionActionHost) -> None:
     apply_profile_controls(host, profile)
     host._refresh_command_history()
     host._profile_label.setText(host.tr("Profile: {name}").format(name=name))
-    _set_result_status(host, result, success_text="Loaded profile", failure_prefix="Load profile failed")
+    set_result_status(host, result, success_text="Loaded profile", failure_prefix="Load profile failed")
 
 
 def apply_profile_controls(host: SessionActionHost, profile: dict[str, object]) -> None:
@@ -129,20 +128,3 @@ def _select_combo_value(combo: QComboBox, value: str) -> None:
     if combo.findText(value) < 0:
         combo.addItem(value)
     combo.setCurrentText(value)
-
-
-def _set_result_status(
-    host: SessionActionHost,
-    result: OperationResult[object],
-    *,
-    success_text: str,
-    failure_prefix: str,
-) -> None:
-    host._status_label.setText(
-        translated_result_message(
-            host,
-            result,
-            success_text=success_text,
-            failure_prefix=failure_prefix,
-        )
-    )
