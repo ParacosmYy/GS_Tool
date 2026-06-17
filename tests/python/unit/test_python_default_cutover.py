@@ -153,6 +153,34 @@ def test_active_architecture_docs_are_python_pyqt_only():
             assert token not in text, f"{path} still references {token}"
 
 
+def test_active_prd_specs_do_not_keep_retired_native_batches():
+    retired_name_tokens = [
+        "cmake",
+        "source_tree",
+        "source-tree",
+        "go_agent_loop",
+        "go-agent-loop",
+        "uv_package_tool",
+        "uv_start_tool",
+        "uv_tools_self_test",
+        "uv_package_verify_tool",
+    ]
+    active_docs = [
+        path
+        for root in (Path("docs/prd"), Path("docs/superpowers/specs"))
+        for path in root.glob("*.md")
+    ]
+    offenders = [
+        str(path)
+        for path in active_docs
+        if any(token in path.name.lower() for token in retired_name_tokens)
+    ]
+
+    assert not offenders, "retired native/tool batches remain active: " + ", ".join(
+        offenders
+    )
+
+
 def test_active_governance_docs_do_not_reference_legacy_native_workflow():
     docs = [
         Path("AGENTS.md"),
