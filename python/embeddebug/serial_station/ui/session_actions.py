@@ -6,6 +6,7 @@ from typing import Protocol
 
 from PyQt6.QtWidgets import QComboBox
 
+from embeddebug.serial_station.ui.log_view_content import clear_log_view
 from embeddebug.serial_station.ui.profile_name_text import apply_profile_name_text
 from embeddebug.serial_station.ui.status_messages import (
     set_profile_label,
@@ -32,7 +33,7 @@ class SessionActionHost(Protocol):
 
 def clear_log(host: SessionActionHost) -> None:
     host._controller.clear_log()
-    host._log_view.clear()
+    clear_log_view(host._log_view)
     host._update_log_stats()
     set_status_text(host, "Log cleared")
 
@@ -58,7 +59,7 @@ def replay_log(host: SessionActionHost) -> None:
     if result.failed:
         set_result_status(host, result, success_text="", failure_prefix="Replay failed")
         return
-    host._log_view.clear()
+    clear_log_view(host._log_view)
     host._render_log_entries()
     set_result_status(host, result, success_text="Replayed log", failure_prefix="Replay failed")
 

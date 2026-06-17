@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from embeddebug.serial_station.controllers import SerialWorkbenchLogEntry
+from embeddebug.serial_station.ui.log_view_content import clear_log_view
 from embeddebug.serial_station.ui.status_messages import append_log_entry_line, set_log_stats_label
 
 
@@ -27,7 +28,7 @@ def append_log_line(host: LogActionHost, entry: SerialWorkbenchLogEntry) -> None
 
 
 def render_log_entries(host: LogActionHost) -> None:
-    host._log_view.clear()
+    clear_log_view(host._log_view)
     for entry in host._controller.entries:
         if log_entry_visible(host, entry):
             append_log_line(host, entry)
