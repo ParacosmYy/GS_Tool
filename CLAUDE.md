@@ -31,7 +31,7 @@
 3. **每次 commit 必须为一次完整代码增量，代码变更量≥500行** — 不足500行不允许代码 commit（不计文档/空白/注释）。
 4. **零编译错误才能commit** — 编译不过必须先修
 5. **`EmbedDebug.bat` 双击能启动是最低验收线** — 每次 commit 后必须验证；任何影响构建、启动、入口、资源、依赖、路径的改动，收口前也必须验证或说明无法验证的具体原因
-5.5. **禁止恢复 C++/CMake 主线** — 不再新增 `.h/.cpp`、`CMakeLists.txt`、`cmake/` 或 C++ 测试入口。
+5.5. **禁止恢复遗留 native 主线** — 不再新增 native 源码、原生构建清单、原生构建目录或 native 测试入口。
 5.6. **禁止提交构建产物** — 严禁提交 `build/`、`dist/`、PyInstaller workpath、缓存、二进制产物或虚拟环境。
 5.7. **启动入口永远走 Python/PyQt** — `EmbedDebug.bat` 只能进入 `uv run start-embeddebug`，不得恢复 native exe fallback。
 5.8. **README 必须按企业级宣传入口维护** — README 是项目对外第一入口，后续涉及产品能力、UI、Serial Station、协议、构建或启动方式变化时，必须按 [02-workflow §4.1](docs/constraints/02-workflow.md#41-readme-企业级宣传标准) 检查是否同步更新，禁止只堆命令、空泛口号或无法由代码/测试/文档证明的宣传点

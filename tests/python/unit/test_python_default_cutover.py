@@ -66,3 +66,60 @@ def test_repository_no_longer_contains_legacy_cpp_cmake_project():
 
     for path in forbidden_paths:
         assert not path.exists(), f"{path} should be removed from the Python/PyQt-only repo"
+
+
+def test_tests_tree_contains_only_python_tests():
+    forbidden_suffixes = {
+        ".c",
+        ".cc",
+        ".cpp",
+        ".cxx",
+        ".h",
+        ".hh",
+        ".hpp",
+        ".qrc",
+        ".ui",
+    }
+    offenders = [
+        path
+        for path in Path("tests").rglob("*")
+        if path.is_file() and path.suffix.lower() in forbidden_suffixes
+    ]
+
+    assert not offenders, "legacy native tests remain: " + ", ".join(
+        str(path) for path in offenders
+    )
+
+
+def test_active_governance_docs_do_not_reference_legacy_native_workflow():
+    docs = [
+        Path("AGENTS.md"),
+        Path("CLAUDE.md"),
+        Path("README.md"),
+        Path("docs/constraints/01-project-overview.md"),
+        Path("docs/constraints/02-workflow.md"),
+        Path("docs/constraints/03-architecture.md"),
+        Path("docs/constraints/04-coding-standard.md"),
+        Path("docs/constraints/05-ui-standard.md"),
+        Path("docs/constraints/06-git-commit.md"),
+        Path("docs/constraints/07-directory-structure.md"),
+        Path("docs/constraints/08-icon-standard.md"),
+        Path("docs/serial_station_architecture.md"),
+        Path("docs/architecture/module-boundaries.md"),
+        Path("docs/architecture/target-structure.md"),
+        Path("docs/superpowers/specs/SPECS_TEMPLATE.md"),
+    ]
+    forbidden = [
+        "cmake --build",
+        "windeployqt",
+        "build/embeddebug.exe",
+        "build\\embeddebug.exe",
+        "src/apps/serial_station",
+        "tests/serial_station",
+        "新增 `.h/.cpp`",
+    ]
+
+    for path in docs:
+        text = path.read_text(encoding="utf-8", errors="ignore").lower()
+        for token in forbidden:
+            assert token.lower() not in text, f"{path} still references {token}"

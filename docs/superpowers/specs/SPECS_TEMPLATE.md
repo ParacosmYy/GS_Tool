@@ -26,9 +26,9 @@
 - `CLAUDE.md`
 - `docs/constraints/01-project-overview.md`
 - 按任务类型补充 `03-architecture.md`、`04-coding-standard.md`、`05-ui-standard.md`、`07-directory-structure.md` 或 `docs/serial_station_architecture.md`
-- 构建目录只能是 `build/`。
+- 运行时、测试、打包统一通过 `uv run ...` 脚本入口。
 - 用户已有改动不得回退。
-- 新增源码必须加入 `CMakeLists.txt`。
+- 新增源码必须落在 canonical Python 包路径，并有 pytest 或启动烟测覆盖。
 - 涉及外设能力时，设备验证状态不得无证据提升。
 
 ## 5. 改动范围
@@ -45,9 +45,9 @@
 - [ ] 工程状态达到 `<E?>`，证据：`<命令/文件/测试>`。
 - [ ] 用户状态达到 `<U?>`，证据：`<入口/截图/人工路径/说明>`。
 - [ ] 设备状态达到 `<D?>`，证据：`<单测/fake/虚拟设备/真实硬件记录>`。
-- [ ] 构建或测试命令通过：`<命令>`。
+- [ ] 测试、启动或打包命令通过：`<命令>`。
 - [ ] `EmbedDebug.bat` 启动链路在受影响时已验证。
-- [ ] 没有新增第二构建目录。
+- [ ] 没有恢复 C++/CMake 原生工程线或新增平行 native 构建目录。
 - [ ] 用户已有改动没有被回退。
 - [ ] 本轮结束有 commit；无法 commit 时写明具体阻塞。
 
@@ -80,7 +80,7 @@ execute -> check -> fix -> 下一轮
   "max_rounds": 20,
   "max_minutes": 30,
   "execute": [
-    "cmake --build .\\build --config Release --parallel 4"
+    "uv run test-embeddebug-py"
   ],
   "check": [
     "git status --short"
@@ -95,7 +95,7 @@ execute -> check -> fix -> 下一轮
 - 若需要，子任务数量：5-30。
 - 并行度上限：1 / 3 / 6。
 - 人工审查状态：未审查 / 已审查。
-- 共享文件锁：`<CMakeLists/README/QSS/MainWindow/PanelManager/接口/启动脚本>`
+- 共享文件锁：`<pyproject.toml/uv.lock/README/QSS/MainWindow/PanelManager/接口/启动脚本>`
 - 子任务是否文件互不重叠：是 / 否。
 
 ## 10. LOOP 路由
@@ -108,7 +108,7 @@ execute -> check -> fix -> 下一轮
 
 | 失败表现 | 路由 | 必须产出 |
 |----------|------|----------|
-| 工具链、Qt、CMake、Ninja、启动脚本异常 | Doctor | 诊断输出或 `docs/reviews/debug/` 报告 |
+| 工具链、uv、PyQt、PyInstaller、启动脚本异常 | Doctor | 诊断输出或 `docs/reviews/debug/` 报告 |
 | 可复现崩溃、编译错误、逻辑错误 | Debug | 复现命令、错误摘要、候选文件、回归命令 |
 | 文件过大、重复实现、目录分叉、职责混杂 | Simplify | 只读扫描报告和下一步技术债 Specs |
 

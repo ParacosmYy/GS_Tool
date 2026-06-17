@@ -100,7 +100,7 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-smoke-windows-x
 
 - `EmbedDebug.bat` 是用户侧最低验收入口，必须双击可启动。
 - 自 PRD-136/B22 起，`EmbedDebug.bat` 默认且唯一活跃启动链路为 Python/PyQt：`uv run start-embeddebug`。
-- C++/CMake 打包链路、native 源码树和 C++ 测试入口已移除，不再作为活跃工程入口、fallback 或验收口径。
+- 遗留 native 打包链路、源码树和测试入口已移除，不再作为活跃工程入口、fallback 或验收口径。
 - 建议每轮考核固定执行：
   - `uv run start-embeddebug --smoke`
   - `cmd /c EmbedDebug.bat --smoke`
@@ -161,9 +161,9 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-smoke-windows-x
 ## 六、Serial Station 当前目标（不写在这里就不能开始该子域）
 
 - Python/PyQt 新增落点为 `python/embeddebug/serial_station/`，明确 `ui`、`controllers`、`core`、`protocols`、`services`、`workers`、`drivers` 分层。
-- C++ 串口目录已移除，不再新增默认交付能力。
+- 遗留串口目录已移除，不再新增默认交付能力。
 - 首先实现用户闭环（连接-发送-接收-日志-导出-回放），再扩展高级功能。
-- 任何新协议必须有 `tests/serial_station/` 对应 parser/build 测试。
+- 任何新协议必须有 `tests/python/` 对应 parser/build 测试。
 - 真实设备验证与模拟验证必须记录，不允许只在 parser 测试下宣称“工程可调试”。
 
 ---

@@ -12,7 +12,7 @@ Serial Station 是串口上位机的重构落点。目标是把“连接、协�
 - 对外唯一协议入口：`ISerialProtocol` + `SerialProtocolRegistry`
 - 不允许恢复旧 native 串口目录或主窗口核心层实现
 - 每次改动必须能映射到三轴状态与可执行验收条款
-- 自 PRD-136/B23 起，Python/PyQt 是 `EmbedDebug.bat -> uv run start-embeddebug` 的默认生产方向；C++/CMake 打包链路、native 源码树和 C++ 测试入口已移除。
+- 自 PRD-136/B23 起，Python/PyQt 是 `EmbedDebug.bat -> uv run start-embeddebug` 的默认生产方向；遗留 native 打包链路、源码树和测试入口已移除。
 
 ### 成功口径
 
@@ -52,7 +52,7 @@ Serial Station 是串口上位机的重构落点。目标是把“连接、协�
 2. `core` 不 include `protocols/<name>/`。
 3. 协议目录不 include UI 或 `SerialStationWindow`。
 4. 文件读写只在 `services/`，日志导出在 service。
-5. 新增协议必须补 `tests/serial_station/` 对应 parser + build 测试。
+5. 新增协议必须补 `tests/python/` 对应 parser + build 测试。
 6. 新增控件/协议能力必须落文档，并更新三轴状态。
 
 ## 四、目录与文件约束（串口专项）
@@ -100,7 +100,7 @@ Python/PyQt lane 规则：
 - 启动、测试、打包、验证通过 uv script 暴露，不使用未登记的裸脚本入口。
 - 默认命令：`start-embeddebug`、`test-embeddebug-py`、`package-embeddebug`、`verify-package-embeddebug`。
 - 兼容命令：`start-embeddebug-py`、`package-embeddebug-py`、`verify-package-embeddebug-py`。
-- `start-embeddebug` 和 `EmbedDebug.bat` 默认进入 Python/PyQt。旧 C++ 入口不再作为用户路径、fallback 或验收路径。
+- `start-embeddebug` 和 `EmbedDebug.bat` 默认进入 Python/PyQt。旧入口不再作为用户路径、fallback 或验收路径。
 - Python 生产代码不得放入 `tools/`。
 - PyInstaller 只用于 Python lane，优先 `onedir`，workpath 不得使用仓库 `build/`。
 - PyQt6 依赖进入 `pyproject.toml` 前必须记录 GPLv3 或商业授权路线。
@@ -138,7 +138,7 @@ Python/PyQt 迁移不是只替换 UI 技术栈，必须按 VOFA+ 能力追平：
 - RawData / FireWater / JustFloat 一等协议。
 - 数据、命令、参数绑定为一等对象。
 - 多通道实时波形、统计、测量和分析视图逐步接入。
-- 日志、导出、回放、Profile 与 C++ baseline 通过 fixtures 或明确差异矩阵对齐。
+- 日志、导出、回放、Profile 通过 fixtures 或明确差异矩阵对齐目标上位机能力。
 - 热路径必须使用 typed batch、NumPy ring buffer、批量信号和 pyqtgraph 定时刷新，不允许逐点信号或无界列表。
 
 ## 六、执行闭环（AI 长期循环）
@@ -148,7 +148,7 @@ Python/PyQt 迁移不是只替换 UI 技术栈，必须按 VOFA+ 能力追平：
 1. `S` Scope：明确本次范围是否只改 serial_station。
 2. `E` Edge：检查边界不越界 `ui/controller/core/protocols/services/workers`。
 3. `L` Layer：确认新增文件都在 `python/embeddebug/serial_station/`。
-4. `T` Test：更新并绑定 `tests/serial_station/`。
+4. `T` Test：更新并绑定 `tests/python/`。
 5. `V` Verify：连接、发送、接收、日志、回放至少各有一次证据。
 6. `Q` Quantize：更新量化指标（缺口项和达成率）。
 7. `R` Run：`uv run start-embeddebug --smoke` + `cmd /c EmbedDebug.bat --smoke`。
