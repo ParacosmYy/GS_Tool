@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from embeddebug.serial_station.ui.status_messages import (
+    append_log_entry_line,
     result_message,
     set_log_stats_label,
     set_profile_label,
@@ -19,8 +20,17 @@ class Label:
         self.text = text
 
 
+class PlainTextView:
+    def __init__(self) -> None:
+        self.lines: list[str] = []
+
+    def appendPlainText(self, text: str) -> None:
+        self.lines.append(text)
+
+
 class TrHost:
     def __init__(self) -> None:
+        self._log_view = PlainTextView()
         self._log_stats_label = Label()
         self._profile_label = Label()
         self._status_label = Label()
@@ -99,3 +109,11 @@ def test_set_log_stats_label_writes_translated_counts_to_log_stats_label():
     set_log_stats_label(host, visible=2, total=3, tx=1, rx=2)
 
     assert host._log_stats_label.text == "tr:Visible 2 / Total 3 | TX 1 | RX 2"
+
+
+def test_append_log_entry_line_writes_translated_direction_and_text_to_log_view():
+    host = TrHost()
+
+    append_log_entry_line(host, direction="rx", text="0A 0B")
+
+    assert host._log_view.lines == ["tr:RX 0A 0B"]

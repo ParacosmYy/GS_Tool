@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from embeddebug.serial_station.controllers import SerialWorkbenchLogEntry
-from embeddebug.serial_station.ui.status_messages import set_log_stats_label
+from embeddebug.serial_station.ui.status_messages import append_log_entry_line, set_log_stats_label
 
 
 class LogActionHost(Protocol):
@@ -23,11 +23,7 @@ def append_log_entry(host: LogActionHost, entry: SerialWorkbenchLogEntry) -> Non
 
 
 def append_log_line(host: LogActionHost, entry: SerialWorkbenchLogEntry) -> None:
-    if entry.direction == "tx":
-        line = host.tr("TX {text}").format(text=entry.text)
-    else:
-        line = host.tr("RX {text}").format(text=entry.text)
-    host._log_view.appendPlainText(line)
+    append_log_entry_line(host, direction=entry.direction, text=entry.text)
 
 
 def render_log_entries(host: LogActionHost) -> None:

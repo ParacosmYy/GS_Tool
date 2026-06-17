@@ -37,6 +37,20 @@ class LogStatsLabelHost(Protocol):
     def tr(self, text: str) -> str: ...
 
 
+class PlainTextLogView(Protocol):
+    """Minimal plain text view surface needed by log display helpers."""
+
+    def appendPlainText(self, text: str) -> None: ...
+
+
+class LogEntryLineHost(Protocol):
+    """Minimal host surface needed for translated log entry lines."""
+
+    _log_view: PlainTextLogView
+
+    def tr(self, text: str) -> str: ...
+
+
 def result_message(result: OperationResult[object], *, success_text: str, failure_prefix: str) -> str:
     """Return a display message for a controller operation result."""
 
@@ -110,3 +124,10 @@ def set_log_stats_label(
             rx=rx,
         )
     )
+
+
+def append_log_entry_line(host: LogEntryLineHost, *, direction: str, text: str) -> None:
+    """Append a translated TX/RX log line to the host log view."""
+
+    template = "TX {text}" if direction == "tx" else "RX {text}"
+    host._log_view.appendPlainText(host.tr(template).format(text=text))
