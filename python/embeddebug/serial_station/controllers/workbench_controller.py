@@ -96,6 +96,7 @@ class SerialWorkbenchController:
     def set_protocol(self, name: str) -> None:
         self._dispatcher.set_protocol(self._registry.create(name))
         self._measurement_ring = None
+        self._append_system_entry(f"protocol: {name}")
 
     def connect_fake(self) -> bool:
         return self.connect_fake_result().ok
@@ -267,7 +268,6 @@ class SerialWorkbenchController:
     def _append_connected_entry(self, result: OperationResult[SerialPortConfig], mode: str) -> None:
         if result.ok and result.value is not None:
             self._append_system_entry(f"connected: {mode} {result.value.port_name}")
-
     def _remember_command(self, text: str) -> None:
         if text in self._command_history:
             self._command_history.remove(text)

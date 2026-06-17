@@ -124,6 +124,18 @@ def test_workbench_controller_records_connection_lifecycle_entries():
     ]
 
 
+def test_workbench_controller_records_protocol_selection_entry():
+    controller = SerialWorkbenchController()
+    logged: list[str] = []
+    controller.on_log_entry(lambda entry: logged.append(f"{entry.direction}:{entry.text}"))
+
+    controller.set_protocol("fire_water")
+
+    assert controller.entries[-1].direction == "system"
+    assert controller.entries[-1].text == "protocol: fire_water"
+    assert logged[-1] == "system:protocol: fire_water"
+
+
 def test_workbench_controller_inject_received_text_reports_non_fake_failure():
     controller = SerialWorkbenchController(transport=_NonFakeTransport())
     errors: list[str] = []

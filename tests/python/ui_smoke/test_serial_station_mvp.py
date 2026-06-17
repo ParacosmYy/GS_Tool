@@ -175,6 +175,31 @@ def test_pyqt_mvp_filters_log_by_direction(qtbot):
     assert "RX rx-only" in log_view.toPlainText()
 
 
+def test_pyqt_mvp_protocol_selection_is_system_log(qtbot):
+    window = build_main_window()
+    qtbot.addWidget(window)
+    window.show()
+
+    protocol_combo = window.findChild(QComboBox, "serialStationProtocolCombo")
+    log_filter_combo = window.findChild(QComboBox, "serialStationLogFilterCombo")
+    log_view = window.findChild(QPlainTextEdit, "serialStationLogView")
+    log_stats_label = window.findChild(QLabel, "serialStationLogStatsLabel")
+
+    assert protocol_combo is not None
+    assert log_filter_combo is not None
+    assert log_view is not None
+    assert log_stats_label is not None
+
+    protocol_combo.setCurrentText("fire_water")
+
+    qtbot.waitUntil(lambda: "System protocol: fire_water" in log_view.toPlainText(), timeout=1000)
+    assert log_stats_label.text() == "Visible 1 / Total 1 | TX 0 | RX 0 | System 1 | Error 0"
+
+    log_filter_combo.setCurrentText("System")
+
+    assert "System protocol: fire_water" in log_view.toPlainText()
+
+
 def test_pyqt_mvp_filters_log_by_search_text(qtbot):
     window = build_main_window()
     qtbot.addWidget(window)
