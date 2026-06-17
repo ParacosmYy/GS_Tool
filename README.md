@@ -44,7 +44,7 @@ Serial Station 工作台
       |
       v
 工程交付层
-  pytest / fixtures / uv scripts / PyInstaller / doctor
+  pytest / fixtures / uv scripts / PyInstaller
 ```
 
 设计边界很明确：UI 不处理字节流，Controller 不写协议细节，Core 不依赖具体协议，Services 不反向驱动界面。
@@ -70,12 +70,6 @@ uv run test-embeddebug-py
 uv run test-embeddebug-tools
 uv run start-embeddebug --smoke
 cmd /c EmbedDebug.bat --smoke
-```
-
-体检入口：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\doctor.ps1 -RunTests -RunPackageDryRun -RunLaunch
 ```
 
 当前对外状态口径：
@@ -119,7 +113,7 @@ GS_Tool/
 |   `-- shared/               # 共享值对象与基础能力
 |-- tests/python/             # 单测、集成测试、UI smoke
 |-- tests/fixtures/           # 协议样本、日志、回放样本
-|-- tools/                    # doctor、启动、审计脚本
+|-- tools/                    # uv script 适配与工程辅助
 |-- docs/constraints/         # 工程约束
 |-- EmbedDebug.bat            # 用户启动入口
 |-- pyproject.toml            # uv scripts 与依赖声明

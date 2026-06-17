@@ -18,25 +18,19 @@ def test_default_uv_commands_point_to_python_lane():
 
 def test_batch_launcher_uses_uv_python_startup():
     bat_text = Path("EmbedDebug.bat").read_text(encoding="utf-8", errors="ignore")
-    launcher_text = Path("tools/launch_embeddebug.ps1").read_text(
-        encoding="utf-8",
-        errors="ignore",
-    )
 
-    assert "tools\\launch_embeddebug.ps1" in bat_text
-    assert "uv run start-embeddebug" in launcher_text
-    assert "build\\EmbedDebug.exe" not in launcher_text
-    assert "cmake" not in launcher_text.lower()
+    assert "uv run start-embeddebug" in bat_text
+    assert "powershell" not in bat_text.lower()
+    assert "tools\\launch_embeddebug.ps1" not in bat_text
+    assert "build\\EmbedDebug.exe" not in bat_text
+    assert "cmake" not in bat_text.lower()
 
 
 def test_active_tools_do_not_reintroduce_cpp_packaging():
     active_tool_paths = [
-        Path("tools/launch_embeddebug.ps1"),
         Path("tools/start_embeddebug.py"),
         Path("tools/package_embeddebug.py"),
         Path("tools/verify_package_embeddebug.py"),
-        Path("tools/doctor.ps1"),
-        Path("tools/verify_embeddebug_launch.ps1"),
     ]
     forbidden = [
         "cmake",
@@ -91,14 +85,29 @@ def test_tests_tree_contains_only_python_tests():
 def test_script_surface_is_minimal_python_product_lane():
     root_bat_files = sorted(path.name for path in Path(".").glob("*.bat"))
     assert root_bat_files == ["EmbedDebug.bat"]
+    powershell_files = sorted(str(path) for path in Path("tools").rglob("*.ps1"))
+    assert powershell_files == []
+    vscode_text = Path(".vscode/settings.json").read_text(
+        encoding="utf-8",
+        errors="ignore",
+    ).lower()
+    assert "cmake" not in vscode_text
+    assert "mingw" not in vscode_text
+    assert "cpp" not in vscode_text
 
     removed_tool_paths = [
         Path("Beta.bat"),
         Path("tools/bootstrap_env.bat"),
+        Path("tools/doctor.ps1"),
         Path("tools/debug-trace.ps1"),
+        Path("tools/launch_embeddebug.ps1"),
         Path("tools/source-tree-audit.ps1"),
         Path("tools/simplify-scan.ps1"),
+        Path("tools/verify_embeddebug_launch.ps1"),
         Path("tools/agent-loop"),
+        Path(".vscode/c_cpp_properties.json"),
+        Path("docs/superpowers/plans/BATCH_001_Active_Utils_CMake_Split.md"),
+        Path("docs/superpowers/plans/BATCH_077_SerialStation_Minimal_UART_Skeleton.md"),
     ]
 
     for path in removed_tool_paths:

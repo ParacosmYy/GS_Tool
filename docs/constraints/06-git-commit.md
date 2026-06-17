@@ -31,7 +31,7 @@
 以下文件默认锁定单一负责人（主 Agent）：
 
 - `pyproject.toml`、`uv.lock`
-- `EmbedDebug.bat`、`tools/launch_embeddebug.ps1`
+- `EmbedDebug.bat`
 - `python/embeddebug/app/`、`python/embeddebug/serial_station/`
 - `resources/themes/*.qss`
 - `docs/constraints/*.md` 与 `CLAUDE.md`

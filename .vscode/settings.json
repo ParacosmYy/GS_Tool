@@ -1,12 +1,9 @@
 {
-    "cmake.buildDirectory": "${workspaceFolder}/build",
-    "cmake.configureSettings": {
-        "CMAKE_PREFIX_PATH": "E:/Tool/DevEnv/Qt/6.8.3/mingw_64"
-    },
-    "cmake.generator": "Ninja",
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/python"
+    ],
     "files.associations": {
-        "*.h": "cpp",
-        "*.cpp": "cpp",
         "*.qss": "css"
     }
 }

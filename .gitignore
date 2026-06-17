@@ -7,17 +7,15 @@
 !/AGENTS.md
 
 # IDE files
-# 保留项目级 .vscode 配置 (c_cpp_properties.json, settings.json)
+# 保留项目级 .vscode 配置 (settings.json)
 .vscode/*
 !.vscode/settings.json
-!.vscode/c_cpp_properties.json
 !.vscode/extensions.json
 !.vscode/launch.json
 !.vscode/tasks.json
 .idea/
 *.user
 *.pro.user
-CMakeSettings.json
 
 # Compiled files
 *.o
@@ -28,12 +26,6 @@ CMakeSettings.json
 *.a
 *.so
 *.dylib
-
-# CMake generated
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-Makefile
 
 # Qt generated
 moc_*
