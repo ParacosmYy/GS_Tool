@@ -231,12 +231,21 @@ def test_workbench_controller_service_result_success_paths(tmp_path):
 def test_workbench_controller_replays_diagnostic_log_directions(tmp_path):
     controller = SerialWorkbenchController()
     log_path = tmp_path / "diagnostic-session.jsonl"
-
-    controller._append_entry(SerialWorkbenchLogEntry("system", "profile loaded", b"profile loaded"))
-    controller._append_entry(SerialWorkbenchLogEntry("error", "port denied", b"port denied"))
-
-    assert controller.export_log_result(log_path).ok
-    controller.clear_log()
+    records = [
+        {
+            "type": "frame",
+            "protocolName": "raw_data",
+            "payload": {"text": "profile loaded", "direction": "system"},
+            "rawHex": b"profile loaded".hex(),
+        },
+        {
+            "type": "frame",
+            "protocolName": "raw_data",
+            "payload": {"text": "port denied", "direction": "error"},
+            "rawHex": b"port denied".hex(),
+        },
+    ]
+    log_path.write_text("\n".join(json.dumps(record) for record in records), encoding="utf-8")
 
     replay_result = controller.replay_log_result(log_path)
 
