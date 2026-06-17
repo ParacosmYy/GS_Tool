@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
+from embeddebug.serial_station.drivers import SerialPortConfig
+from embeddebug.shared import OperationResult
 
 
 LogEntryCallback = Callable[[SerialWorkbenchLogEntry], None]
@@ -46,3 +48,17 @@ def append_error_entry(
     )
     for callback in list(error_callbacks):
         callback(message)
+
+
+def append_connected_entry(
+    entries: list[SerialWorkbenchLogEntry],
+    callbacks: list[LogEntryCallback],
+    result: OperationResult[SerialPortConfig],
+    mode: str,
+) -> None:
+    if result.ok and result.value is not None:
+        append_system_entry(
+            entries,
+            callbacks,
+            f"connected: {mode} {result.value.port_name}",
+        )

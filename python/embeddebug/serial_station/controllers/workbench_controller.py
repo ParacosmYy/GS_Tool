@@ -107,7 +107,7 @@ class SerialWorkbenchController:
         self._transport_mode = "fake"
         config = SerialPortConfig(port_name="FAKE_LOOPBACK", baud_rate=115200)
         result = open_transport_result(self._transport, config, "fake")
-        self._append_connected_entry(result, "fake")
+        log_state.append_connected_entry(self._entries, self._log_callbacks, result, "fake")
         return result
 
     def connect_serial(
@@ -148,7 +148,7 @@ class SerialWorkbenchController:
             stop_bits=stop_bits,
             flow_control=flow_control,
         )
-        self._append_connected_entry(result, "serial")
+        log_state.append_connected_entry(self._entries, self._log_callbacks, result, "serial")
         return result
 
     def connect_tcp(self, host: str, port: int) -> bool:
@@ -253,14 +253,10 @@ class SerialWorkbenchController:
     def _protocol_event_from_entry(self, entry: SerialWorkbenchLogEntry) -> ProtocolEvent:
         return event_from_entry(entry, self._dispatcher.protocol_name)
 
-    def _append_connected_entry(self, result: OperationResult[SerialPortConfig], mode: str) -> None:
-        if result.ok and result.value is not None:
-            log_state.append_system_entry(self._entries, self._log_callbacks, f"connected: {mode} {result.value.port_name}")
-
     def _connect_endpoint_result(self, mode: str, host: str, port: int) -> OperationResult[SerialPortConfig]:
         self._transport_mode = mode
         result = open_endpoint_transport(self._transport_registry, self._replace_transport, mode, host, port)
-        self._append_connected_entry(result, mode)
+        log_state.append_connected_entry(self._entries, self._log_callbacks, result, mode)
         return result
 
     def _replace_transport(self, transport: SerialTransport) -> None:
