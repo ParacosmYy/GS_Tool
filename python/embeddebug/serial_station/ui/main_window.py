@@ -11,6 +11,7 @@ from embeddebug.serial_station.controllers import (
 )
 from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.ui.sections import build_main_layout
+from embeddebug.serial_station.ui import session_actions
 from embeddebug.serial_station.ui.tcp_controls import (
     apply_tcp_profile_controls,
     connect_tcp_from_controls,
@@ -211,48 +212,16 @@ class SerialStationMainWindow(QMainWindow):
         self._status_label.setText(self.tr("Log cleared"))
 
     def _export_log(self) -> None:
-        path = self._log_path_edit.text()
-        if not path:
-            self._status_label.setText(self.tr("Log path is empty"))
-            return
-        self._controller.export_log(path)
-        self._status_label.setText(self.tr("Saved log"))
+        session_actions.export_log(self)
 
     def _replay_log(self) -> None:
-        path = self._log_path_edit.text()
-        if not path:
-            self._status_label.setText(self.tr("Log path is empty"))
-            return
-        self._log_view.clear()
-        self._controller.replay_log(path)
-        self._render_log_entries()
-        self._status_label.setText(self.tr("Replayed log"))
+        session_actions.replay_log(self)
 
     def _save_profile(self) -> None:
-        path = self._profile_path_edit.text()
-        name = self._profile_name_edit.text()
-        if not path:
-            self._status_label.setText(self.tr("Profile path is empty"))
-            return
-        if not name:
-            self._status_label.setText(self.tr("Profile name is empty"))
-            return
-        self._controller.save_profile(path, name)
-        self._profile_label.setText(self.tr("Profile: {name}").format(name=name))
-        self._status_label.setText(self.tr("Saved profile"))
+        session_actions.save_profile(self)
 
     def _load_profile(self) -> None:
-        path = self._profile_path_edit.text()
-        if not path:
-            self._status_label.setText(self.tr("Profile path is empty"))
-            return
-        profile = self._controller.load_profile(path)
-        name = str(profile.get("name", "unnamed"))
-        self._profile_name_edit.setText(name)
-        self._apply_profile_controls(profile)
-        self._refresh_command_history()
-        self._profile_label.setText(self.tr("Profile: {name}").format(name=name))
-        self._status_label.setText(self.tr("Loaded profile"))
+        session_actions.load_profile(self)
 
     def _apply_profile_controls(self, profile: dict[str, object]) -> None:
         protocol = str(profile.get("protocol", ""))

@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 552分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 448分
+> 当前: 553分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 447分
 
 ---
 
@@ -254,12 +254,13 @@
 | 550 | Serial Station connection result | fake/serial/tcp 连接入口新增结构化 OperationResult API，保留 bool 兼容并拆出 profile snapshot 维持 controller 体积门禁 |
 | 551 | Serial Station service result | 测量导出、回放读取和 Profile 读写新增 OperationResult API，service 文件异常具备统一错误码且旧 API 保持兼容 |
 | 552 | Serial Station controller service result | controller 导出、回放和 Profile 操作接入 OperationResult，日志条目与事件转换拆分，失败路径不破坏当前日志和命令历史 |
+| 553 | Serial Station UI service result | UI 日志导出、回放和 Profile 操作接入 OperationResult，失败路径显示状态反馈且不破坏当前可见日志/Profile 状态 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#552` 的完整记录
+- 当前文档已整理到 `#553` 的完整记录
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
