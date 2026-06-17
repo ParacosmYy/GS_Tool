@@ -13,6 +13,7 @@ from embeddebug.serial_station.ui.log_filter_options import (
     default_log_filter_text,
     log_filter_options,
 )
+from embeddebug.serial_station.ui.serial_config_options import apply_serial_config_options
 from embeddebug.serial_station.ui.shortcuts import install_shortcuts
 from embeddebug.serial_station.ui.tcp_controls import build_tcp_controls
 from embeddebug.serial_station.ui.udp_controls import build_udp_controls
@@ -85,32 +86,27 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     owner._baud_combo = QComboBox(root)
     owner._baud_combo.setObjectName("serialStationBaudCombo")
     owner._baud_combo.setToolTip(owner.tr("Select baud rate"))
-    owner._baud_combo.addItems(["9600", "19200", "38400", "57600", "115200", "921600"])
-    owner._baud_combo.setCurrentText("115200")
+    apply_serial_config_options(owner._baud_combo, "baud")
 
     owner._data_bits_combo = QComboBox(root)
     owner._data_bits_combo.setObjectName("serialStationDataBitsCombo")
     owner._data_bits_combo.setToolTip(owner.tr("Select data bits"))
-    owner._data_bits_combo.addItems(["5", "6", "7", "8"])
-    owner._data_bits_combo.setCurrentText("8")
+    apply_serial_config_options(owner._data_bits_combo, "data_bits")
 
     owner._parity_combo = QComboBox(root)
     owner._parity_combo.setObjectName("serialStationParityCombo")
     owner._parity_combo.setToolTip(owner.tr("Select parity"))
-    owner._parity_combo.addItems(["None", "Even", "Odd", "Space", "Mark"])
-    owner._parity_combo.setCurrentText("None")
+    apply_serial_config_options(owner._parity_combo, "parity")
 
     owner._stop_bits_combo = QComboBox(root)
     owner._stop_bits_combo.setObjectName("serialStationStopBitsCombo")
     owner._stop_bits_combo.setToolTip(owner.tr("Select stop bits"))
-    owner._stop_bits_combo.addItems(["1", "1.5", "2"])
-    owner._stop_bits_combo.setCurrentText("1")
+    apply_serial_config_options(owner._stop_bits_combo, "stop_bits")
 
     owner._flow_control_combo = QComboBox(root)
     owner._flow_control_combo.setObjectName("serialStationFlowControlCombo")
     owner._flow_control_combo.setToolTip(owner.tr("Select flow control"))
-    owner._flow_control_combo.addItems(["None", "Hardware", "Software"])
-    owner._flow_control_combo.setCurrentText("None")
+    apply_serial_config_options(owner._flow_control_combo, "flow_control")
 
     owner._connect_button = QPushButton(owner.tr("Connect Fake"), root)
     owner._connect_button.setObjectName("serialStationConnectButton")
