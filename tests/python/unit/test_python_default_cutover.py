@@ -105,6 +105,16 @@ def test_script_surface_is_minimal_python_product_lane():
         assert not path.exists(), f"{path} should not be part of the product lane"
 
 
+def test_python_runtime_files_stay_within_maintainability_line_budget():
+    offenders = []
+    for path in Path("python/embeddebug").rglob("*.py"):
+        line_count = len(path.read_text(encoding="utf-8").splitlines())
+        if line_count > 300:
+            offenders.append(f"{path} has {line_count} lines")
+
+    assert not offenders, "oversized Python runtime files: " + "; ".join(offenders)
+
+
 def test_active_governance_docs_do_not_reference_legacy_native_workflow():
     docs = [
         Path("AGENTS.md"),
