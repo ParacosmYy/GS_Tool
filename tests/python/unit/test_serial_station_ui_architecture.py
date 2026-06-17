@@ -80,6 +80,13 @@ def test_clear_log_action_lives_with_session_actions():
     assert "_controller.clear_log" not in source
 
 
+def test_session_result_messages_reuse_status_message_helper():
+    source = inspect.getsource(session_actions)
+
+    assert "translated_result_message" in source
+    assert "failed: {message}" not in source
+
+
 def test_profile_control_apply_action_lives_with_session_actions():
     assert hasattr(session_actions, "apply_profile_controls")
 
