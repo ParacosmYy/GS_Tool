@@ -7,20 +7,14 @@ from pathlib import Path
 from typing import Any
 
 from embeddebug.serial_station.core import ChannelBatch, ChannelRingBuffer, SerialDispatcher, batch_from_measurement_events
-from embeddebug.serial_station.controllers.command_history_state import restore_command_history
 from embeddebug.serial_station.controllers import controller_connection_state as connection_state
 from embeddebug.serial_station.controllers import controller_io_state as io_state
 from embeddebug.serial_station.controllers import controller_log_state as log_state
+from embeddebug.serial_station.controllers import controller_profile_state as profile_state
+from embeddebug.serial_station.controllers import controller_session_state as session_state
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
 from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event, event_from_entry
 from embeddebug.serial_station.controllers.measurement_buffer import append_measurement_batch
-from embeddebug.serial_station.controllers.profile_snapshot import build_profile_snapshot
-from embeddebug.serial_station.controllers.session_operations import (
-    export_log_result as export_session_log_result,
-    load_profile_result as load_session_profile_result,
-    replay_entries_result as replay_session_entries_result,
-    save_profile_result as save_session_profile_result,
-)
 from embeddebug.serial_station.drivers import FakeSerialTransport, SerialPortConfig, SerialTransport, TransportRegistry
 from embeddebug.serial_station.protocols import ProtocolEvent, create_default_registry
 from embeddebug.shared import OperationResult
@@ -189,38 +183,38 @@ class SerialWorkbenchController:
         )
 
     def clear_log(self) -> None:
-        self._entries.clear()
+        session_state.clear_entries(self._entries)
 
     def export_log(self, path: str | Path) -> None:
         self.export_log_result(path)
 
     def export_log_result(self, path: str | Path) -> OperationResult[Path]:
-        return export_session_log_result(path, self._entries, self._protocol_event_from_entry)
+        return session_state.export_entries_result(path, self._entries, self._protocol_event_from_entry)
 
     def replay_log(self, path: str | Path) -> None:
         self.replay_log_result(path)
 
     def replay_log_result(self, path: str | Path) -> OperationResult[list[SerialWorkbenchLogEntry]]:
-        result = replay_session_entries_result(path, entry_from_event)
-        if result.ok:
-            self._entries.clear()
-            for entry in result.value or []:
-                log_state.append_log_entry(self._entries, self._log_callbacks, entry)
-        return result
+        return session_state.replay_entries_into_state_result(
+            path,
+            self._entries,
+            self._log_callbacks,
+            entry_from_event,
+        )
 
     def save_profile(self, path: str | Path, name: str) -> None:
         self.save_profile_result(path, name)
 
     def save_profile_result(self, path: str | Path, name: str) -> OperationResult[Path]:
-        profile = build_profile_snapshot(
-            name=name,
+        return profile_state.save_profile_state_result(
+            path,
             mode=self._transport_mode,
+            name=name,
             config=self._transport.config,
             is_connected=self.is_connected,
             protocol=self._dispatcher.protocol_name,
             command_history=self.command_history,
         )
-        return save_session_profile_result(path, profile)
 
     def load_profile(self, path: str | Path) -> dict[str, Any]:
         result = self.load_profile_result(path)
@@ -229,12 +223,12 @@ class SerialWorkbenchController:
         return result.value or {}
 
     def load_profile_result(self, path: str | Path) -> OperationResult[dict[str, Any]]:
-        result = load_session_profile_result(path)
-        if result.ok and result.value is not None:
-            restore_command_history(self._command_history, result.value.get("commandHistory", []))
-            name = str(result.value.get("name", "unnamed"))
-            log_state.append_system_entry(self._entries, self._log_callbacks, f"profile loaded: {name}")
-        return result
+        return profile_state.load_profile_state_result(
+            path,
+            self._command_history,
+            self._entries,
+            self._log_callbacks,
+        )
 
     def _handle_bytes_received(self, data: bytes) -> None:
         events = self._dispatcher.feed(data)
