@@ -62,20 +62,7 @@ class SerialStationMainWindow(QMainWindow):
         protocol_actions.select_protocol(self, name)
 
     def _refresh_serial_ports(self) -> None:
-        self._refresh_port_combo()
-        self._set_connected_controls(self._controller.is_connected)
-        self._status_label.setText(self.tr("Serial ports refreshed"))
-
-    def _refresh_port_combo(self) -> None:
-        current = self._port_combo.currentText()
-        self._port_combo.clear()
-        ports = self._controller.available_serial_ports()
-        if ports:
-            self._port_combo.addItems(ports)
-            if current in ports:
-                self._port_combo.setCurrentText(current)
-            return
-        self._port_combo.addItem(self.tr("No serial ports"))
+        connection_actions.refresh_serial_ports(self)
 
     def _connect_fake(self) -> None:
         connection_actions.connect_fake(self)

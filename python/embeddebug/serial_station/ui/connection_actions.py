@@ -68,6 +68,24 @@ def disconnect(host: ConnectionActionHost) -> None:
     host._set_connected_controls(False)
 
 
+def populate_serial_port_combo(host: ConnectionActionHost) -> None:
+    current = host._port_combo.currentText()
+    host._port_combo.clear()
+    ports = host._controller.available_serial_ports()
+    if ports:
+        host._port_combo.addItems(ports)
+        if current in ports:
+            host._port_combo.setCurrentText(current)
+    else:
+        host._port_combo.addItem(host.tr("No serial ports"))
+
+
+def refresh_serial_ports(host: ConnectionActionHost) -> None:
+    populate_serial_port_combo(host)
+    host._set_connected_controls(host._controller.is_connected)
+    host._status_label.setText(host.tr("Serial ports refreshed"))
+
+
 def send_text(host: ConnectionActionHost) -> None:
     text = host._send_edit.text()
     if not text:

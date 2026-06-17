@@ -28,6 +28,15 @@ def test_disconnect_action_lives_with_connection_actions():
     assert "_controller.disconnect" not in source
 
 
+def test_serial_port_refresh_action_lives_with_connection_actions():
+    assert hasattr(connection_actions, "refresh_serial_ports")
+
+    source = inspect.getsource(main_window.SerialStationMainWindow._refresh_serial_ports)
+    assert "connection_actions.refresh_serial_ports(self)" in source
+    assert "_controller.available_serial_ports" not in source
+    assert "_refresh_port_combo" not in source
+
+
 def test_clear_log_action_lives_with_session_actions():
     assert hasattr(session_actions, "clear_log")
 

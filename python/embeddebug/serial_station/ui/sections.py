@@ -8,6 +8,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QComboBox, QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit, QPushButton, QVBoxLayout, QWidget
 
 from embeddebug.serial_station.controllers import SerialWorkbenchController
+from embeddebug.serial_station.ui import connection_actions
 from embeddebug.serial_station.ui.shortcuts import install_shortcuts
 from embeddebug.serial_station.ui.tcp_controls import build_tcp_controls
 from embeddebug.serial_station.ui.waveform_preview import SerialWaveformPreview
@@ -16,7 +17,6 @@ from embeddebug.serial_station.ui.waveform_preview import SerialWaveformPreview
 class SerialStationSectionsHost(Protocol):
     def tr(self, source_text: str) -> str: ...
     def _set_protocol(self, name: str) -> None: ...
-    def _refresh_port_combo(self) -> None: ...
     def _refresh_serial_ports(self) -> None: ...
     def _has_serial_ports(self) -> bool: ...
     def _connect_fake(self) -> None: ...
@@ -67,7 +67,7 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     owner._port_combo = QComboBox(root)
     owner._port_combo.setObjectName("serialStationPortCombo")
     owner._port_combo.setToolTip(owner.tr("Select a serial port"))
-    owner._refresh_port_combo()
+    connection_actions.populate_serial_port_combo(owner)
 
     owner._refresh_ports_button = QPushButton(owner.tr("Refresh Ports"), root)
     owner._refresh_ports_button.setObjectName("serialStationRefreshPortsButton")
@@ -285,4 +285,3 @@ def build_footer(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout
     owner._clear_button.clicked.connect(owner._clear_log)
     row.addWidget(owner._clear_button)
     return row
-
