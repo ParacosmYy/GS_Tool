@@ -1,21 +1,17 @@
 # 冻结目录
 
-> 这里列出允许保留、但不再继续扩张的历史分叉目录。
+> 当前仓库已切到 Python/PyQt 主线。本文件只描述禁止回填的旧路径模式，不再承载历史原生目录清单。
 
 ## 冻结清单
 
-- `src/core/animation2/`
-- `src/core/widgets2/`
-- `src/plugin/loader2/`
-- `src/core/font/`
-- `src/core/fonts/`
-- `src/core/icon/`
-- `src/core/icons/`
-- `src/core/responsive/`
+- 平行实现目录：`*2/`、`*_old/`、`*_bak/`、`*_new/`
+- 原生工程入口、原生构建清单和原生测试入口
+- 未通过 `pyproject.toml` 暴露的裸启动、打包、测试脚本
+- 运行时代码放入 `tools/` 的混用路径
 
 ## 冻结原则
 
-- 可以保留旧 include 和兼容转发。
-- 可以修复编译或链接问题。
-- 不允许再往冻结目录新增功能实现。
-- 如果要继续扩张能力，必须进入 canonical 目录。
+- 新能力必须进入 `python/embeddebug/` 的 canonical 目录。
+- 测试必须进入 `tests/python/` 或授权 fixtures。
+- 用户入口、测试、打包和验证必须经 `uv run ...` 收束。
+- 如需恢复已冻结路径，必须先有独立 PRD 和用户显式批准。

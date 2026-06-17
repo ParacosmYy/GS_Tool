@@ -125,6 +125,34 @@ def test_serial_station_ui_sections_use_explicit_owner_contract():
     assert "owner: Any" not in sections
 
 
+def test_active_architecture_docs_are_python_pyqt_only():
+    expected_docs = {
+        "README.md",
+        "frozen-dirs.md",
+        "migration-roadmap.md",
+        "module-boundaries.md",
+        "target-structure.md",
+    }
+    actual_docs = {path.name for path in Path("docs/architecture").glob("*.md")}
+    forbidden = [
+        "cmake",
+        "c++",
+        "cpp",
+        ".h/",
+        ".h ",
+        ".cpp",
+        "src/",
+        "windeployqt",
+        "mingw",
+    ]
+
+    assert actual_docs == expected_docs
+    for path in Path("docs/architecture").glob("*.md"):
+        text = path.read_text(encoding="utf-8", errors="ignore").lower()
+        for token in forbidden:
+            assert token not in text, f"{path} still references {token}"
+
+
 def test_active_governance_docs_do_not_reference_legacy_native_workflow():
     docs = [
         Path("AGENTS.md"),
