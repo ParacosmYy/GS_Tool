@@ -8,6 +8,7 @@ from embeddebug.serial_station.ui.command_entry_text import apply_command_histor
 from embeddebug.serial_station.ui.command_history_options import populate_command_history_options
 from embeddebug.serial_station.ui.connection_control_state import set_connection_control_state
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
+from embeddebug.serial_station.ui.serial_connection_fields import read_serial_connection_fields
 from embeddebug.serial_station.ui.serial_port_options import (
     combo_has_serial_ports,
     populate_serial_port_options,
@@ -42,18 +43,17 @@ def connect_fake(host: ConnectionActionHost) -> None:
 
 
 def connect_serial(host: ConnectionActionHost) -> None:
-    port_name = host._port_combo.currentText()
-    if not port_name or not host._has_serial_ports():
+    fields = read_serial_connection_fields(host)
+    if not fields.port_name or not host._has_serial_ports():
         set_status_text(host, "Serial port is empty")
         return
-    baud_rate = int(host._baud_combo.currentText())
     result = host._controller.connect_serial_result(
-        port_name,
-        baud_rate,
-        data_bits=int(host._data_bits_combo.currentText()),
-        parity=host._parity_combo.currentText().lower(),
-        stop_bits=host._stop_bits_combo.currentText(),
-        flow_control=host._flow_control_combo.currentText().lower(),
+        fields.port_name,
+        fields.baud_rate,
+        data_bits=fields.data_bits,
+        parity=fields.parity,
+        stop_bits=fields.stop_bits,
+        flow_control=fields.flow_control,
     )
     if result.ok:
         set_result_status(
@@ -61,7 +61,7 @@ def connect_serial(host: ConnectionActionHost) -> None:
             result,
             success_text="Connected to {port}",
             failure_prefix="Connection failed",
-            port=port_name,
+            port=fields.port_name,
         )
         host._set_connected_controls(True)
         return
