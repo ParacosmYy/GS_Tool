@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from PyQt6.QtWidgets import QComboBox
-
 from embeddebug.serial_station.ui.log_view_content import clear_log_view
+from embeddebug.serial_station.ui.profile_combo_options import select_profile_combo_value
 from embeddebug.serial_station.ui.profile_name_text import apply_profile_name_text
 from embeddebug.serial_station.ui.status_messages import (
     set_profile_label,
@@ -102,35 +101,29 @@ def load_profile(host: SessionActionHost) -> None:
 def apply_profile_controls(host: SessionActionHost, profile: dict[str, object]) -> None:
     protocol = str(profile.get("protocol", ""))
     if protocol:
-        _select_combo_value(host._protocol_combo, protocol)
+        select_profile_combo_value(host._protocol_combo, protocol)
 
     transport = profile.get("transport", {})
     if not isinstance(transport, dict):
         return
     port_name = str(transport.get("portName", ""))
     if port_name:
-        _select_combo_value(host._port_combo, port_name)
+        select_profile_combo_value(host._port_combo, port_name)
     apply_tcp_profile_controls(host, transport, port_name)
     apply_udp_profile_controls(host, transport, port_name)
     baud_rate = transport.get("baudRate")
     if baud_rate is not None:
-        _select_combo_value(host._baud_combo, str(baud_rate))
+        select_profile_combo_value(host._baud_combo, str(baud_rate))
     data_bits = transport.get("dataBits")
     if data_bits is not None:
-        _select_combo_value(host._data_bits_combo, str(data_bits))
+        select_profile_combo_value(host._data_bits_combo, str(data_bits))
     parity = str(transport.get("parity", ""))
     if parity:
-        _select_combo_value(host._parity_combo, parity.capitalize())
+        select_profile_combo_value(host._parity_combo, parity.capitalize())
     stop_bits = transport.get("stopBits")
     if stop_bits is not None:
-        _select_combo_value(host._stop_bits_combo, str(stop_bits))
+        select_profile_combo_value(host._stop_bits_combo, str(stop_bits))
     flow_control = str(transport.get("flowControl", ""))
     if flow_control:
-        _select_combo_value(host._flow_control_combo, flow_control.capitalize())
+        select_profile_combo_value(host._flow_control_combo, flow_control.capitalize())
     host._set_connected_controls(host._controller.is_connected)
-
-
-def _select_combo_value(combo: QComboBox, value: str) -> None:
-    if combo.findText(value) < 0:
-        combo.addItem(value)
-    combo.setCurrentText(value)
