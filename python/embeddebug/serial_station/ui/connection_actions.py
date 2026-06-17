@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import Protocol
 
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
+from embeddebug.serial_station.ui.serial_port_options import (
+    combo_has_serial_ports,
+    populate_serial_port_options,
+)
 from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
 
 
@@ -116,19 +120,13 @@ def set_connected_controls(host: ConnectionActionHost, connected: bool) -> None:
 
 
 def has_serial_ports(host: ConnectionActionHost) -> bool:
-    return host._port_combo.count() > 0 and host._port_combo.currentText() != host.tr("No serial ports")
+    return combo_has_serial_ports(host, host._port_combo)
 
 
 def populate_serial_port_combo(host: ConnectionActionHost) -> None:
     current = host._port_combo.currentText()
-    host._port_combo.clear()
     ports = host._controller.available_serial_ports()
-    if ports:
-        host._port_combo.addItems(ports)
-        if current in ports:
-            host._port_combo.setCurrentText(current)
-    else:
-        host._port_combo.addItem(host.tr("No serial ports"))
+    populate_serial_port_options(host, host._port_combo, ports=ports, current=current)
 
 
 def refresh_serial_ports(host: ConnectionActionHost) -> None:
