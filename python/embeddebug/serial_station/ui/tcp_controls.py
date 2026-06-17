@@ -53,14 +53,15 @@ def connect_tcp_from_controls(window: SerialStationTcpWindow) -> None:
     if port < 1 or port > 65535:
         window._status_label.setText(window.tr("TCP port is invalid"))
         return
-    if window._controller.connect_tcp(host, port):
+    result = window._controller.connect_tcp_result(host, port)
+    if result.ok:
         endpoint = f"{host}:{port}"
         window._status_label.setText(
             window.tr("Connected to TCP {endpoint}").format(endpoint=endpoint)
         )
         window._set_connected_controls(True)
         return
-    window._status_label.setText(window.tr("Connection failed"))
+    window._status_label.setText(window.tr("Connection failed: {message}").format(message=result.message))
 
 
 def apply_tcp_profile_controls(window: object, transport: dict[str, object], port_name: str) -> None:

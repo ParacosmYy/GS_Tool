@@ -10,8 +10,8 @@ from embeddebug.serial_station.controllers import (
     SerialWorkbenchLogEntry,
 )
 from embeddebug.serial_station.core import ChannelBatch
+from embeddebug.serial_station.ui import connection_actions, session_actions
 from embeddebug.serial_station.ui.sections import build_main_layout
-from embeddebug.serial_station.ui import session_actions
 from embeddebug.serial_station.ui.tcp_controls import (
     apply_tcp_profile_controls,
     connect_tcp_from_controls,
@@ -75,30 +75,10 @@ class SerialStationMainWindow(QMainWindow):
         self._port_combo.addItem(self.tr("No serial ports"))
 
     def _connect_fake(self) -> None:
-        if self._controller.connect_fake():
-            self._status_label.setText(self.tr("Connected to fake loopback"))
-            self._set_connected_controls(True)
-            return
-        self._status_label.setText(self.tr("Connection failed"))
+        connection_actions.connect_fake(self)
 
     def _connect_serial(self) -> None:
-        port_name = self._port_combo.currentText()
-        if not port_name or not self._has_serial_ports():
-            self._status_label.setText(self.tr("Serial port is empty"))
-            return
-        baud_rate = int(self._baud_combo.currentText())
-        if self._controller.connect_serial(
-            port_name,
-            baud_rate,
-            data_bits=int(self._data_bits_combo.currentText()),
-            parity=self._parity_combo.currentText().lower(),
-            stop_bits=self._stop_bits_combo.currentText(),
-            flow_control=self._flow_control_combo.currentText().lower(),
-        ):
-            self._status_label.setText(self.tr("Connected to {port}").format(port=port_name))
-            self._set_connected_controls(True)
-            return
-        self._status_label.setText(self.tr("Connection failed"))
+        connection_actions.connect_serial(self)
 
     def _connect_tcp(self) -> None:
         connect_tcp_from_controls(self)
@@ -118,15 +98,7 @@ class SerialStationMainWindow(QMainWindow):
         return self._port_combo.count() > 0 and self._port_combo.currentText() != self.tr("No serial ports")
 
     def _send_text(self) -> None:
-        text = self._send_edit.text()
-        if not text:
-            self._status_label.setText(self.tr("Command is empty"))
-            return
-        if self._controller.send_text(text):
-            self._refresh_command_history()
-            self._status_label.setText(self.tr("Command sent"))
-            return
-        self._status_label.setText(self.tr("Send failed"))
+        connection_actions.send_text(self)
 
     def _refresh_command_history(self) -> None:
         history = self._controller.command_history

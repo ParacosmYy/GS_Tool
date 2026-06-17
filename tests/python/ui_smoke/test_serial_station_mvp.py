@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import QComboBox, QLabel, QLineEdit, QPlainTextEdit, QPushB
 
 from embeddebug.app.main import build_main_window
 from embeddebug.serial_station.drivers import QtSerialPortTransport, TcpClientTransport
+from embeddebug.shared import OperationResult
 
 
 def test_pyqt_mvp_fake_connect_send_receive_and_clear(qtbot):
@@ -81,6 +82,45 @@ def test_pyqt_mvp_command_history_refills_send_edit(qtbot):
     history_combo.setCurrentText("first")
 
     assert send_edit.text() == "first"
+
+
+def test_pyqt_mvp_send_failure_shows_result_message(qtbot):
+    window = build_main_window()
+    qtbot.addWidget(window)
+    window.show()
+
+    send_edit = window.findChild(QLineEdit, "serialStationSendEdit")
+    send_button = window.findChild(QPushButton, "serialStationSendButton")
+    status_label = window.findChild(QLabel, "serialStationStatusLabel")
+
+    assert send_edit is not None
+    assert send_button is not None
+    assert status_label is not None
+
+    send_edit.setText("before-open")
+    qtbot.mouseClick(send_button, Qt.MouseButton.LeftButton)
+
+    assert "Send failed: Open a transport before sending" in status_label.text()
+
+
+def test_pyqt_mvp_fake_connection_failure_shows_result_message(qtbot, monkeypatch):
+    monkeypatch.setattr(
+        "embeddebug.serial_station.controllers.SerialWorkbenchController.connect_fake_result",
+        lambda self: OperationResult.failure("transport_open_failed", "fake denied"),
+    )
+    window = build_main_window()
+    qtbot.addWidget(window)
+    window.show()
+
+    connect_button = window.findChild(QPushButton, "serialStationConnectButton")
+    status_label = window.findChild(QLabel, "serialStationStatusLabel")
+
+    assert connect_button is not None
+    assert status_label is not None
+
+    qtbot.mouseClick(connect_button, Qt.MouseButton.LeftButton)
+
+    assert "Connection failed: fake denied" in status_label.text()
 
 
 def test_pyqt_mvp_filters_log_by_direction(qtbot):
@@ -360,6 +400,30 @@ def test_pyqt_mvp_connects_tcp_endpoint_and_profiles(qtbot, monkeypatch, tmp_pat
     profile_text = profile_path.read_text(encoding="utf-8")
     assert '"mode": "tcp"' in profile_text
     assert '"portName": "127.0.0.1:19002"' in profile_text
+
+
+def test_pyqt_mvp_tcp_connection_failure_shows_result_message(qtbot, monkeypatch):
+    monkeypatch.setattr(TcpClientTransport, "open", lambda self, config: False)
+
+    window = build_main_window()
+    qtbot.addWidget(window)
+    window.show()
+
+    tcp_host_edit = window.findChild(QLineEdit, "serialStationTcpHostEdit")
+    tcp_port_edit = window.findChild(QLineEdit, "serialStationTcpPortEdit")
+    connect_tcp_button = window.findChild(QPushButton, "serialStationConnectTcpButton")
+    status_label = window.findChild(QLabel, "serialStationStatusLabel")
+
+    assert tcp_host_edit is not None
+    assert tcp_port_edit is not None
+    assert connect_tcp_button is not None
+    assert status_label is not None
+
+    tcp_host_edit.setText("127.0.0.1")
+    tcp_port_edit.setText("19003")
+    qtbot.mouseClick(connect_tcp_button, Qt.MouseButton.LeftButton)
+
+    assert "Connection failed: Failed to open tcp transport" in status_label.text()
 
 
 def test_pyqt_mvp_refreshes_serial_ports_without_restart(qtbot, monkeypatch):
