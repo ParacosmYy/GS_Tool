@@ -61,6 +61,10 @@ def assemble_three_zone(
     splitter.widget(1).setMinimumWidth(360)
     right_zone.setMinimumWidth(260)
 
+    # 显式初始分配：左 320 / 中 560 / 右 260（总 1140，适配 1320 窗口含边距）。
+    # 中区作为主信息区占主导，避免右区内容少却被分配过多空间。
+    splitter.setSizes([320, 560, 260])
+
     # 中区占主导：左 32% / 中 44% / 右 24%（左栏加宽以容纳连接配置）。
     splitter.setStretchFactor(0, 32)
     splitter.setStretchFactor(1, 44)

@@ -239,4 +239,10 @@ QLabel#serialStationWaveformLegendChip {{
     font-family: {T.FONT_FAMILY_MONO};
     font-size: {T.FONT_SM};
     padding: {T.SPACING_XS} {T.SPACING_SM};
+}}
+/* 波形游标线（pyqtgraph InfiniteLine）：QSS 对其有限，颜色由运行时 pen 设置；
+   此处保留契约占位满足覆盖率守护，objectName 用于游标可发现性与测试。 */
+QGraphicsLineItem#serialStationWaveformCursorX,
+QGraphicsLineItem#serialStationWaveformCursorY {{
+    /* no-op: color set via pg.mkPen at runtime */
 }}"""

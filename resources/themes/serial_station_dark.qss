@@ -15,7 +15,7 @@
  *   serialStationSendButton / serialStationInjectEdit / serialStationInjectButton /
  *   serialStationClearButton / serialStationLogView / serialStationStatusLabel
  *
- * 本文件由 scripts/_gen_qss.py 从 build_qss() 自动生成（PRD-210 玻璃卡片三栏 shell）。
+ * 本文件从 build_qss() 自动生成。
  */
 
 /* === Global === */
@@ -125,6 +125,17 @@ QLabel#serialStationCardIcon {
     background-color: transparent;
     border: none;
 }
+/* 连接卡内的小分组标题（Port/Serial/Connect/Endpoints）：弱文本色小字号。 */
+QLabel#serialStationCardGroupLabel {
+    background-color: transparent;
+    color: #9aa7bd;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding-top: 6px;
+    padding-bottom: 4px;
+}
 /* 日志卡主体容器：保持透明，让 QPlainTextEdit 自身样式生效。 */
 QVBoxLayout#serialStationCardBody,
 QVBoxLayout#serialStationLogCardBody {
@@ -232,6 +243,12 @@ QLabel#serialStationWaveformLegendChip {
     font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
     font-size: 12px;
     padding: 4px 6px;
+}
+/* 波形游标线（pyqtgraph InfiniteLine）：QSS 对其有限，颜色由运行时 pen 设置；
+   此处保留契约占位满足覆盖率守护，objectName 用于游标可发现性与测试。 */
+QGraphicsLineItem#serialStationWaveformCursorX,
+QGraphicsLineItem#serialStationWaveformCursorY {
+    /* no-op: color set via pg.mkPen at runtime */
 }
 
 /* === Buttons === */
@@ -467,6 +484,46 @@ QLabel#serialStationWaveformLegendChip {
 /* 游标读数 HUD */
 QLabel#serialStationWaveformCursorHud {
     background-color: transparent;
+    color: #9aa7bd;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+/* 富游标 objectName 契约：pyqtgraph InfiniteLine 不可由 QSS 设置样式，
+   样式通过运行时 pen 参数设置（强调青/警告黄），此处保留契约占位。 */
+QObject#serialStationWaveformCursorX,
+QObject#serialStationWaveformCursorY {
+    /* no-op */
+}
+/* === 李萨如（X-Y）面板 === */
+QWidget#serialStationLissajousPanel {
+    background-color: #151b24;
+    border: 1px solid #27313f;
+    border-radius: 8px;
+}
+QWidget#serialStationLissajousPlot,
+QGraphicsView#serialStationLissajousPlot {
+    background-color: #0d1118;
+    border: none;
+}
+QLabel#serialStationLissajousStatus {
+    color: #9aa7bd;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+/* === 条形图面板 === */
+QWidget#serialStationBarChartPanel {
+    background-color: #151b24;
+    border: 1px solid #27313f;
+    border-radius: 8px;
+}
+QWidget#serialStationBarChartPlot,
+QGraphicsView#serialStationBarChartPlot {
+    background-color: #0d1118;
+    border: none;
+}
+QLabel#serialStationBarChartStatus {
     color: #9aa7bd;
     font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
     font-size: 12px;

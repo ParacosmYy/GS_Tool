@@ -169,6 +169,40 @@ QLabel#serialStationWaveformCursorHud {{
 QObject#serialStationWaveformCursorX,
 QObject#serialStationWaveformCursorY {{
     /* no-op */
+}}
+/* === 李萨如（X-Y）面板 === */
+QWidget#serialStationLissajousPanel {{
+    background-color: {P.BG_PANEL};
+    border: {T.BORDER_THIN} solid {P.BORDER};
+    border-radius: {T.RADIUS_LG};
+}}
+QWidget#serialStationLissajousPlot,
+QGraphicsView#serialStationLissajousPlot {{
+    background-color: {P.TERM_BACKGROUND};
+    border: none;
+}}
+QLabel#serialStationLissajousStatus {{
+    color: {P.TEXT_MUTED};
+    font-family: {T.FONT_FAMILY_MONO};
+    font-size: {T.FONT_SM};
+    padding: {T.SPACING_XS} {T.SPACING_MD};
+}}
+/* === 条形图面板 === */
+QWidget#serialStationBarChartPanel {{
+    background-color: {P.BG_PANEL};
+    border: {T.BORDER_THIN} solid {P.BORDER};
+    border-radius: {T.RADIUS_LG};
+}}
+QWidget#serialStationBarChartPlot,
+QGraphicsView#serialStationBarChartPlot {{
+    background-color: {P.TERM_BACKGROUND};
+    border: none;
+}}
+QLabel#serialStationBarChartStatus {{
+    color: {P.TEXT_MUTED};
+    font-family: {T.FONT_FAMILY_MONO};
+    font-size: {T.FONT_SM};
+    padding: {T.SPACING_XS} {T.SPACING_MD};
 }}"""
 
 
