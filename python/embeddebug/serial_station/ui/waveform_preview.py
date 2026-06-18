@@ -22,6 +22,7 @@ from PyQt6.QtWidgets import QGraphicsDropShadowEffect
 from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.ui import waveform_measure, waveform_overlays
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.waveform_cursors import CursorManager
 
 
 class SafePlotWidget(pg.PlotWidget):
@@ -53,8 +54,10 @@ class SerialWaveformPreview(QWidget):
         super().__init__(parent)
         self.setObjectName("serialStationWaveformPanel")
         self._curves: list[pg.PlotDataItem] = []
-        self._cursor_x1 = None
-        self._cursor_x2 = None
+        # Batch 7: 用 CursorManager 替换固定双游标（激活 waveform_cursors 死代码）。
+        # 支持运行时增删 X/Y 游标，配合 compute_cursor_measurement 计算测量值。
+        self._cursor_manager: CursorManager | None = None
+        self._sample_rate = 1.0  # 默认采样率 1Hz（ΔT 即 Δindex），供 cursor 测量计算
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -125,11 +128,19 @@ class SerialWaveformPreview(QWidget):
         self._stats_label.setText(f"{name}: {waveform_measure.format_stats(stats)}")
 
     def _ensure_cursors(self) -> None:
-        """首次绘制后附加两条游标（只附加一次）。"""
+        """首次绘制后初始化 CursorManager 并添加两条默认 X 游标（只一次）。
 
-        if self._cursor_x1 is not None:
+        Batch 7：用 CursorManager（可增删）替换旧的固定双游标 attach_cursors，
+        激活 waveform_cursors 死代码。默认两条 X 游标对齐旧观感（25%/75% 位置），
+        用户可通过 cursor_manager() 运行时增删。
+        """
+
+        if self._cursor_manager is not None:
             return
-        self._cursor_x1, self._cursor_x2 = waveform_overlays.attach_cursors(self._plot)
+        self._cursor_manager = CursorManager(self._plot)
+        # 默认两条 X 游标（对齐旧 attach_cursors 的 25%/75% 位置）。
+        self._cursor_manager.add_x_cursor(0.25)
+        self._cursor_manager.add_x_cursor(0.75)
 
     def _update_legend(self, batch: ChannelBatch) -> None:
         """刷新多通道图例的当前值。"""
@@ -140,14 +151,37 @@ class SerialWaveformPreview(QWidget):
         self._legend.update_channels(batch.channel_names, latest)
 
     def _update_cursor_hud(self, values: np.ndarray) -> None:
-        """刷新游标读数 HUD。"""
+        """刷新游标读数 HUD（Batch 7: 用 compute_cursor_measurement 激活死代码）。
 
-        if self._cursor_x1 is None or self._cursor_x2 is None:
+        用 CursorManager 当前的 X/Y 游标值调用 waveform_measure.compute_cursor_measurement
+        计算 ΔT/频率/ΔY，再 format_cursor_measurement 格式化。相比旧版固定双游标的
+        cursor_readout（只显示 ΔX/Y1/Y2），现在支持任意数量游标 + 时间/频率测量。
+        """
+
+        if self._cursor_manager is None:
             return
-        readout = waveform_overlays.cursor_readout(
-            self._cursor_x1, self._cursor_x2, values
+        x_values, y_values = self._cursor_manager.cursor_values()
+        measurement = waveform_measure.compute_cursor_measurement(
+            x_values, y_values, self._sample_rate
         )
-        self._cursor_hud.setText(readout)
+        self._cursor_hud.setText(waveform_measure.format_cursor_measurement(measurement))
+
+    def cursor_manager(self) -> CursorManager | None:
+        """返回当前 CursorManager（供外部增删游标，None 表示尚未初始化）。
+
+        Batch 7：暴露 CursorManager 让上层（如右键菜单/快捷键）可运行时
+        add_x_cursor / add_y_cursor / remove_cursor，替代旧的固定双游标。
+        """
+
+        return self._cursor_manager
+
+    def set_sample_rate(self, rate: float) -> None:
+        """设置采样率（Hz），供游标 ΔT/频率测量计算。
+
+        默认 1.0（ΔT 即 Δindex）；真实采样率已知时设置可获得正确的时间/频率读数。
+        """
+
+        self._sample_rate = max(0.0, float(rate))
 
     def _ensure_curves(self, channel_names: tuple[str, ...]) -> None:
         """确保曲线数与通道数一致，每条曲线配渐变填充 + 发光（Batch 6 美化）。

@@ -81,3 +81,75 @@ def test_waveform_preview_grid_alpha_increased(qtbot):
     qtbot.addWidget(preview)
     # 网格 alpha 通过 showGrid 设置，无法直接读取，但验证 plot 可正常构建不崩溃。
     assert preview._plot is not None
+
+
+# ── Batch 7: CursorManager 接入（激活 waveform_cursors 死代码） ────
+def test_waveform_preview_uses_cursor_manager(qtbot):
+    """update_batch 后应初始化 CursorManager（替代固定双游标）。"""
+
+    from embeddebug.serial_station.ui.waveform_cursors import CursorManager
+
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    # 初始未初始化。
+    assert preview.cursor_manager() is None
+    preview.update_batch(_make_batch(channels=2, samples=50))
+    # 首次更新后应初始化 CursorManager。
+    cm = preview.cursor_manager()
+    assert isinstance(cm, CursorManager)
+    # 默认两条 X 游标（对齐旧 attach_cursors 观感）。
+    assert len(cm.x_cursors) == 2
+
+
+def test_waveform_preview_cursor_manager_can_add_remove(qtbot):
+    """CursorManager 应支持运行时增删游标。"""
+
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    preview.update_batch(_make_batch(channels=1, samples=30))
+    cm = preview.cursor_manager()
+    assert cm is not None
+    # 增加一条 Y 游标。
+    y_cursor = cm.add_y_cursor(0.5)
+    assert len(cm.y_cursors) == 1
+    # 删除一条 X 游标。
+    first_x = cm.x_cursors[0]
+    assert cm.remove_cursor(first_x) is True
+    assert len(cm.x_cursors) == 1
+    # 删除不存在的返回 False。
+    assert cm.remove_cursor(y_cursor) is True
+    assert cm.remove_cursor(y_cursor) is False
+
+
+def test_waveform_preview_cursor_hud_uses_compute_cursor_measurement(qtbot):
+    """HUD 应通过 compute_cursor_measurement 显示 ΔT/频率（激活 waveform_measure）。"""
+
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    preview.update_batch(_make_batch(channels=1, samples=100))
+    # 默认两条 X 游标在 0.25/0.75，sample_rate=1.0，ΔT 应 = 0.5。
+    hud_text = preview._cursor_hud.text()
+    # 应含 ΔT 读数（compute_cursor_measurement 输出）。
+    assert "ΔT" in hud_text
+
+
+def test_waveform_preview_set_sample_rate(qtbot):
+    """set_sample_rate 应更新采样率，影响游标 ΔT/频率计算。"""
+
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    preview.set_sample_rate(1000.0)
+    assert preview._sample_rate == 1000.0
+    preview.update_batch(_make_batch(channels=1, samples=100))
+    # sample_rate=1000，两条游标 Δindex=0.5 → ΔT=0.0005s，频率=2000Hz。
+    hud_text = preview._cursor_hud.text()
+    assert "Hz" in hud_text
+
+
+def test_waveform_preview_no_legacy_cursor_x1_attribute(qtbot):
+    """旧的 _cursor_x1/_cursor_x2 固定游标字段应已移除（改用 CursorManager）。"""
+
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    assert not hasattr(preview, "_cursor_x1")
+    assert not hasattr(preview, "_cursor_x2")
