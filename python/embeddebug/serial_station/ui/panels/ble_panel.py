@@ -159,9 +159,14 @@ class BlePanel:
         self._log.appendPlainText(self._widget.tr("扫描到 {n} 个设备").format(n=1))
 
     def _connect(self, checked: bool) -> None:
+        from embeddebug.serial_station.ui.panels._notify import panel_notify
+
         if self._transport is None:
             self._log.appendPlainText(self._widget.tr("请先扫描设备。"))
             self._connect_btn.setChecked(False)
+            # Batch 14: 未扫描 → warning toast。
+            panel_notify(self._widget, "warning", self._widget.tr("未扫描设备"),
+                         self._widget.tr("请先点击「扫描」搜索设备"))
             return
         if checked:
             ok = self._transport.connect(_STUB_ADDRESS)
@@ -173,9 +178,15 @@ class BlePanel:
                 # Batch 10-2: 已连接 GREEN（呼吸指示）。
                 self._status_dot.set_state(DotState.GREEN)
                 self._log.appendPlainText(self._widget.tr("已连接 {addr}").format(addr=_STUB_ADDRESS))
+                # Batch 14: 连接成功 → success toast。
+                panel_notify(self._widget, "success", self._widget.tr("BLE 已连接"),
+                             self._widget.tr("已连接 {addr}").format(addr=_STUB_ADDRESS))
             else:
                 self._connect_btn.setChecked(False)
                 self._log.appendPlainText(self._widget.tr("连接失败"))
+                # Batch 14: 连接失败 → error toast。
+                panel_notify(self._widget, "error", self._widget.tr("BLE 连接失败"),
+                             self._widget.tr("无法连接到设备"))
         else:
             self._transport.close()
             self._connect_btn.setText(self._widget.tr("连接"))
@@ -185,6 +196,8 @@ class BlePanel:
             # Batch 10-2: 断开后圆点恢复 OFF（静止）。
             self._status_dot.set_state(DotState.OFF)
             self._log.appendPlainText(self._widget.tr("已断开"))
+            # Batch 14: 断开 → info toast。
+            panel_notify(self._widget, "info", self._widget.tr("BLE 已断开"), "")
 
     def _refresh_tree(self) -> None:
         if self._transport is None:

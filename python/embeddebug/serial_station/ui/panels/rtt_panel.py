@@ -134,6 +134,8 @@ class RttPanel:
             self._stop()
 
     def _start(self) -> None:
+        from embeddebug.serial_station.ui.panels._notify import panel_notify
+
         config = RttConfig(channels=_DEMO_CHANNELS)
         transport = self._app_controller.active_transport() if self._app_controller else None
         if transport is not None:
@@ -142,6 +144,9 @@ class RttPanel:
             # Batch 10-2: 串口运行 GREEN（呼吸），文字不再带 ●。
             self._status_dot.set_state(DotState.GREEN)
             self._status.setText(self._widget.tr("运行中（串口）"))
+            # Batch 14: 串口 RTT 启动 → success toast。
+            panel_notify(self._widget, "success", self._widget.tr("RTT 已启动"),
+                         self._widget.tr("正在接收串口 RTT 通道数据"))
         else:
             self._stub = RttTransportStub(open=True)
             self._session = RttSession(self._stub, config)
@@ -151,6 +156,9 @@ class RttPanel:
             # 演示模式 BLUE（活动呼吸）。
             self._status_dot.set_state(DotState.BLUE)
             self._status.setText(self._widget.tr("运行中（演示）"))
+            # Batch 14: 演示模式启动 → info toast（提示非真实数据源）。
+            panel_notify(self._widget, "info", self._widget.tr("RTT 演示模式"),
+                         self._widget.tr("未连接串口，正在播放演示数据"))
         self._session.on_bytes_received(lambda b: self._bridge.bytes_received.emit(b))
         self._session.on_error(lambda m: self._bridge.error.emit(m))
         self._start_btn.setText(self._widget.tr("停止"))
@@ -172,6 +180,10 @@ class RttPanel:
         self._status_dot.set_state(DotState.OFF)
         if self._status is not None:
             self._status.setText(self._widget.tr("未启动"))
+        # Batch 14: RTT 停止 → info toast。
+        from embeddebug.serial_station.ui.panels._notify import panel_notify
+
+        panel_notify(self._widget, "info", self._widget.tr("RTT 已停止"), "")
 
     def _demo_tick(self) -> None:
         if self._stub is None:

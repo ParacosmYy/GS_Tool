@@ -173,10 +173,18 @@ class OtaPanel:
         transport = self._app_controller.active_transport()
         if transport is None:
             self._log.appendPlainText(self._widget.tr("错误：未连接串口"))
+            # Batch 14: 未连接 → warning toast。
+            from embeddebug.serial_station.ui.panels._notify import panel_notify
+            panel_notify(self._widget, "warning", self._widget.tr("无法升级"),
+                         self._widget.tr("请先连接串口"))
             return
         path = self._file_edit.text().strip()
         if not path or not Path(path).is_file():
             self._log.appendPlainText(self._widget.tr("错误：请选择有效固件文件"))
+            # Batch 14: 无效固件 → warning toast。
+            from embeddebug.serial_station.ui.panels._notify import panel_notify
+            panel_notify(self._widget, "warning", self._widget.tr("无效固件"),
+                         self._widget.tr("请选择有效的固件文件"))
             return
         firmware = Path(path).read_bytes()
         kind = _PROTOCOL_OPTIONS[self._protocol_combo.currentIndex()][1]
@@ -211,17 +219,23 @@ class OtaPanel:
     def _on_finished(self, result: TransferResult) -> None:
         # Batch 9-1: 传输完成隐藏 skeleton。
         self._transfer_skeleton.hide()
+        from embeddebug.serial_station.ui.panels._notify import panel_notify
+
         if result.success:
             self._progress.setValue(100)
-            self._log.appendPlainText(
-                self._widget.tr("升级完成：{acked} 块已确认，{retries} 次重传").format(
-                    acked=result.blocks_acked, retries=result.retries
-                )
+            msg = self._widget.tr("升级完成：{acked} 块已确认，{retries} 次重传").format(
+                acked=result.blocks_acked, retries=result.retries
             )
+            self._log.appendPlainText(msg)
+            # Batch 14: 长时异步传输完成 → success toast（用户可能切到别的页）。
+            panel_notify(self._widget, "success", self._widget.tr("升级完成"), msg)
         else:
+            err = result.error or self._widget.tr("未知错误")
             self._log.appendPlainText(
-                self._widget.tr("升级失败：{error}").format(error=result.error or "未知错误")
+                self._widget.tr("升级失败：{error}").format(error=err)
             )
+            # Batch 14: 传输失败 → error toast。
+            panel_notify(self._widget, "error", self._widget.tr("升级失败"), str(err))
         self._start_button.setEnabled(self._app_controller is not None and self._app_controller.is_connected())
 
 

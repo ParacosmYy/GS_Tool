@@ -155,6 +155,8 @@ class AutomationPanel:
         self._set_active(checked)
 
     def _set_active(self, active: bool) -> None:
+        from embeddebug.serial_station.ui.panels._notify import panel_notify
+
         self._active = active
         self._run_btn.setChecked(active)
         if self._app_controller is None or self._engine is None:
@@ -167,11 +169,16 @@ class AutomationPanel:
             self._status_dot.set_state(DotState.GREEN)
             self._status.setText(self._widget.tr("监听中"))
             self._append_log(self._widget.tr("已启用监听，订阅 controller 事件。"))
+            # Batch 14: 启用监听 → success toast。
+            panel_notify(self._widget, "success", self._widget.tr("自动化已启用"),
+                         self._widget.tr("正在监听 RX/测量事件"))
         else:
             # controller 当前无 remove_callback；通过标志停止求值（on_* 检查 _active）。
             self._status_dot.set_state(DotState.OFF)
             self._status.setText(self._widget.tr("监听未启用"))
             self._append_log(self._widget.tr("已停止监听。"))
+            # Batch 14: 停止监听 → info toast。
+            panel_notify(self._widget, "info", self._widget.tr("自动化已停止"), "")
 
     def _on_log_entry(self, entry: object) -> None:
         if not self._active or self._engine is None:

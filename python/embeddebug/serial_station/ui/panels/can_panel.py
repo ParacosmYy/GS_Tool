@@ -180,11 +180,16 @@ class CanPanel:
             self._stats.setText(self._widget.tr("{n} 帧").format(n=row + 1))
 
     def _send(self) -> None:
+        from embeddebug.serial_station.ui.panels._notify import panel_notify
+
         if self._app_controller is None:
             return
         transport = self._app_controller.active_transport()
         if transport is None:
             self._append_local("未连接串口，无法发送")
+            # Batch 14: 未连接 → warning toast。
+            panel_notify(self._widget, "warning", self._widget.tr("无法发送"),
+                         self._widget.tr("未连接串口，无法发送 CAN 帧"))
             return
         try:
             can_id = CanId(int(self._id_edit.text(), 16), is_extended=self._ext_check.isChecked())
@@ -196,6 +201,9 @@ class CanPanel:
             ))
         except (ValueError, OSError) as exc:
             self._append_local(self._widget.tr("发送失败：{err}").format(err=exc))
+            # Batch 14: 发送失败（hex 非法/IO 错误）→ error toast。
+            panel_notify(self._widget, "error", self._widget.tr("CAN 发送失败"),
+                         self._widget.tr("格式或 IO 错误：{err}").format(err=exc))
 
     def _append_local(self, text: str) -> None:
         # 复用 stats 标签暂存发送反馈（无独立日志区，保持简洁）。
