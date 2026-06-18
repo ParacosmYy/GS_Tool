@@ -12,6 +12,7 @@ from embeddebug.serial_station.controllers import controller_profile_state as pr
 from embeddebug.serial_station.controllers import controller_protocol_state as protocol_state
 from embeddebug.serial_station.controllers import controller_session_state as session_state
 from embeddebug.serial_station.controllers import controller_transport_state as transport_state
+from embeddebug.serial_station.controllers import controller_workbench_state as workbench_state
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
 from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event
 from embeddebug.serial_station.drivers import SerialPortConfig, SerialTransport, TransportRegistry
@@ -41,8 +42,7 @@ class SerialWorkbenchController:
             error_callback=self._handle_error,
         )
         self._callbacks = callback_state.create_callback_state()
-        self._entries: list[SerialWorkbenchLogEntry] = []
-        self._command_history: list[str] = []
+        self._state = workbench_state.create_workbench_state()
 
     @property
     def is_connected(self) -> bool:
@@ -50,11 +50,11 @@ class SerialWorkbenchController:
 
     @property
     def entries(self) -> tuple[SerialWorkbenchLogEntry, ...]:
-        return tuple(self._entries)
+        return workbench_state.entries_snapshot(self._state)
 
     @property
     def command_history(self) -> tuple[str, ...]:
-        return tuple(self._command_history)
+        return workbench_state.command_history_snapshot(self._state)
 
     @property
     def active_local_port(self) -> int | None:
@@ -82,7 +82,7 @@ class SerialWorkbenchController:
         self._protocol_runtime = protocol_state.set_protocol(
             self._protocol_runtime,
             name,
-            entries=self._entries,
+            entries=self._state.entries,
             log_callbacks=self._callbacks.log,
         )
 
@@ -91,7 +91,7 @@ class SerialWorkbenchController:
     def connect_fake_result(self) -> OperationResult[SerialPortConfig]:
         self._transport_runtime, result = transport_state.connect_fake_result(
             self._transport_runtime,
-            entries=self._entries,
+            entries=self._state.entries,
             log_callbacks=self._callbacks.log,
         )
         return result
@@ -127,7 +127,7 @@ class SerialWorkbenchController:
             self._transport_runtime,
             port_name,
             baud_rate,
-            entries=self._entries,
+            entries=self._state.entries,
             log_callbacks=self._callbacks.log,
             data_bits=data_bits,
             parity=parity,
@@ -147,7 +147,7 @@ class SerialWorkbenchController:
         return self._connect_endpoint_result("udp", host, port)
 
     def disconnect(self) -> None:
-        transport_state.disconnect(self._transport_runtime, self._entries, self._callbacks.log)
+        transport_state.disconnect(self._transport_runtime, self._state.entries, self._callbacks.log)
 
     def send_text(self, text: str) -> bool: return self.send_text_result(text).ok
 
@@ -156,8 +156,8 @@ class SerialWorkbenchController:
             self._transport_runtime.transport,
             self._protocol_runtime.dispatcher,
             text,
-            self._command_history,
-            self._entries,
+            self._state.command_history,
+            self._state.entries,
             self._callbacks.log,
             self._handle_error,
         )
@@ -166,24 +166,24 @@ class SerialWorkbenchController:
         return io_state.inject_received_text_result(
             self._transport_runtime.transport,
             text,
-            self._entries,
+            self._state.entries,
             self._callbacks.log,
             self._handle_error,
         )
 
-    def clear_log(self) -> None: session_state.clear_entries(self._entries)
+    def clear_log(self) -> None: workbench_state.clear_entries(self._state)
 
     def export_log(self, path: str | Path) -> None: self.export_log_result(path)
 
     def export_log_result(self, path: str | Path) -> OperationResult[Path]:
-        return session_state.export_entries_result(path, self._entries, self._protocol_event_from_entry)
+        return session_state.export_entries_result(path, self._state.entries, self._protocol_event_from_entry)
 
     def replay_log(self, path: str | Path) -> None: self.replay_log_result(path)
 
     def replay_log_result(self, path: str | Path) -> OperationResult[list[SerialWorkbenchLogEntry]]:
         return session_state.replay_entries_into_state_result(
             path,
-            self._entries,
+            self._state.entries,
             self._callbacks.log,
             entry_from_event,
         )
@@ -210,8 +210,8 @@ class SerialWorkbenchController:
     def load_profile_result(self, path: str | Path) -> OperationResult[dict[str, Any]]:
         return profile_state.load_profile_state_result(
             path,
-            self._command_history,
-            self._entries,
+            self._state.command_history,
+            self._state.entries,
             self._callbacks.log,
         )
 
@@ -219,7 +219,7 @@ class SerialWorkbenchController:
         self._protocol_runtime = protocol_state.handle_received_bytes(
             self._protocol_runtime,
             data=data,
-            entries=self._entries,
+            entries=self._state.entries,
             log_callbacks=self._callbacks.log,
             measurement_callbacks=self._callbacks.measurement,
         )
@@ -233,10 +233,10 @@ class SerialWorkbenchController:
             mode,
             host,
             port,
-            entries=self._entries,
+            entries=self._state.entries,
             log_callbacks=self._callbacks.log,
         )
         return result
 
     def _handle_error(self, message: str) -> None:
-        callback_state.handle_error(message, self._callbacks, self._entries)
+        callback_state.handle_error(message, self._callbacks, self._state.entries)
