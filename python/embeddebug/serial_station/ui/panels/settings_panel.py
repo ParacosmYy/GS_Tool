@@ -172,14 +172,28 @@ class SettingsPanel:
 
     # ── 交互 ────────────────────────────────────────────────────────
     def _apply_theme(self) -> None:
+        from embeddebug.serial_station.ui.panels._notify import panel_notify
         from PyQt6.QtWidgets import QApplication
+
         if self._theme_combo is None:
             return
         name = self._theme_combo.currentData() or THEME_DARK
-        apply_theme_by_name(QApplication.instance(), name)
+        try:
+            apply_theme_by_name(QApplication.instance(), name)
+        except Exception as exc:
+            if self._theme_status is not None:
+                self._theme_status.setText(self._widget.tr("主题应用失败"))
+            # Batch 16: 主题应用异常 → error toast。
+            panel_notify(self._widget, "error", self._widget.tr("主题切换失败"),
+                         self._widget.tr("{err}").format(err=exc))
+            return
         if self._theme_status is not None:
             text = self._widget.tr("已应用：深色") if name == THEME_DARK else self._widget.tr("已应用：浅色")
             self._theme_status.setText(text)
+        # Batch 16: 主题切换成功 → success toast（用户可能切到别的页，需可见反馈）。
+        theme_label = self._widget.tr("深色") if name == THEME_DARK else self._widget.tr("浅色")
+        panel_notify(self._widget, "success", self._widget.tr("主题已切换"),
+                     self._widget.tr("已应用 {theme} 主题").format(theme=theme_label))
 
     def _read_git_remote(self) -> str:
         try:
