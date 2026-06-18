@@ -9,12 +9,6 @@
  * 再用 `python -c "from embeddebug.serial_station.ui.theme.qss_builder import build_qss as b; print(b())"`
  * 重新生成。
  *
- * objectName 约定：所有 Serial Station 控件统一带 `serialStation` 前缀，
- * 冒烟测试 (test_serial_station_mvp.py) 用 findChild 硬断言以下 9 个必须存在：
- *   serialStationConnectButton / serialStationSendEdit / serialStationCommandHistoryCombo /
- *   serialStationSendButton / serialStationInjectEdit / serialStationInjectButton /
- *   serialStationClearButton / serialStationLogView / serialStationStatusLabel
- *
  * 本文件从 build_qss() 自动生成。
  */
 
@@ -147,6 +141,11 @@ QVBoxLayout#serialStationLogCardBody {
 QWidget#serialStationLeftZone,
 QWidget#serialStationCenterZone,
 QWidget#serialStationRightZone {
+    background-color: transparent;
+    border: none;
+}
+/* 串口配置面板容器（连接侧栏包装层） */
+QWidget#serialStationSerialPanel {
     background-color: transparent;
     border: none;
 }
@@ -320,6 +319,156 @@ QLabel#serialStationValueNumber {
 }
 QLabel#serialStationValueTrend {
     background-color: transparent;
+}
+/* === Dashboard（画布/控件库/标签页） === */
+QFrame#serialStationDashboardCanvas {
+    background-color: #101218;
+    border: 1px dashed #27313f;
+    border-radius: 8px;
+}
+QTabWidget#serialStationDashboardTabs::pane {
+    background-color: #101218;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+}
+QTabWidget#serialStationDashboardTabs::tab-bar {
+    alignment: left;
+}
+QTabBar#serialStationDashboardTabs {
+    background: transparent;
+}
+QFrame#serialStationWidgetPalette {
+    background-color: #151b24;
+    border: 1px solid #27313f;
+    border-radius: 8px;
+}
+QLabel#serialStationPaletteTitle {
+    color: #d7def3;
+    font-weight: 600;
+    font-size: 13px;
+}
+QPushButton#serialStationPaletteButton {
+    background-color: #0f141d;
+    color: #b7c0d8;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+    padding: 4px 8px;
+    text-align: left;
+}
+QPushButton#serialStationPaletteButton:hover {
+    background-color: #1b2634;
+    border-color: rgba(34, 211, 238, 0.35);
+    color: #d7def3;
+}
+
+/* === App Navigation Rail === */
+QFrame#serialStationNavRail {
+    background-color: #101218;
+    border-right: 1px solid #27313f;
+}
+QLabel#serialStationNavBrand {
+    color: #22d3ee;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 0;
+}
+/* 导航图标按钮：方形、无边框、激活态强调青软底。 */
+QPushButton[objectName^="serialStationNav"] {
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    margin: 0 6px;
+    min-width: 40px;
+    min-height: 40px;
+}
+QPushButton[objectName^="serialStationNav"]:hover {
+    background-color: #1b2634;
+}
+QPushButton[objectName^="serialStationNav"]:checked {
+    background-color: rgba(34, 211, 238, 0.12);
+    border-left: 2px solid #22d3ee;
+}
+
+/* === OTA Panel === */
+QWidget#serialStationOtaPanel {
+    background-color: #101218;
+}
+QLabel#serialStationOtaFieldLabel {
+    color: #b7c0d8;
+    font-size: 12px;
+    font-weight: 600;
+}
+QComboBox#serialStationOtaProtocolCombo {
+    background-color: #0f141d;
+    color: #d7def3;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 5px 8px;
+    min-height: 28px;
+}
+QFrame#serialStationOtaFileEdit {
+    background-color: #0f141d;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    min-height: 28px;
+}
+QLabel#serialStationOtaFileLabel {
+    color: #9aa7bd;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+}
+QProgressBar#serialStationOtaProgress {
+    background-color: #0f141d;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+    text-align: center;
+    color: #d7def3;
+    min-height: 28px;
+}
+QProgressBar#serialStationOtaProgress::chunk {
+    background-color: #22d3ee;
+    border-radius: 6px;
+}
+QPlainTextEdit#serialStationOtaLog {
+    background-color: #0d1118;
+    color: #9aa7bd;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+}
+QLabel#serialStationOtaStatusLabel {
+    color: #9aa7bd;
+    font-size: 12px;
+    padding: 0 8px;
+}
+QPushButton#serialStationOtaBrowseButton {
+    background-color: #151b24;
+    color: #b7c0d8;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+QPushButton#serialStationOtaBrowseButton:hover {
+    background-color: #1b2634;
+    border-color: rgba(34, 211, 238, 0.35);
+}
+QPushButton#serialStationOtaStartButton {
+    background-color: #22d3ee;
+    color: #0d1118;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 600;
+}
+QPushButton#serialStationOtaStartButton:hover {
+    background-color: #67e8f9;
+}
+QPushButton#serialStationOtaStartButton:disabled {
+    background-color: #151b24;
+    color: #5f6f86;
 }
 
 /* === Buttons === */

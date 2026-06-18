@@ -13,6 +13,10 @@
 
 from __future__ import annotations
 
+from embeddebug.serial_station.ui.theme.qss_sections_app import (
+    nav_rail_section,
+    ota_section,
+)
 from embeddebug.serial_station.ui.theme.qss_sections_controls import (
     controls_section,
 )
@@ -56,6 +60,8 @@ def build_qss() -> str:
         command_palette_section(),
         waveform_overlays_section(),
         controls_section(),
+        nav_rail_section(),
+        ota_section(),
         buttons_section(),
         inputs_section(),
         combos_section(),
