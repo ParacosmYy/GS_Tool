@@ -49,6 +49,7 @@ class ConfigurableButton(QPushButton):
         self._formatter: Callable[[], str] | None = None
         self._press_animation_enabled = True
         self._hover_lift_enabled = True
+        self._ripple_enabled = False  # ripple 默认关闭（密集场景），按需开启
         self.clicked.connect(self._on_clicked)
         if icon_name:
             self.set_icon(icon_name)
@@ -88,6 +89,24 @@ class ConfigurableButton(QPushButton):
         if not enabled:
             # 移除已装的 graphics effect（hover lift 通过 QGraphicsDropShadowEffect 实现）。
             self.setGraphicsEffect(None)
+
+    def set_ripple(self, enabled: bool) -> None:
+        """启用/禁用 Material ripple 水波纹反馈（Batch 7-5）。
+
+        默认关闭（密集按钮场景）；主操作按钮可开启获得点击涟漪反馈。
+        ripple 通过 install_ripple 动态注入 paintEvent，与 hover_lift 不冲突
+        （ripple 是 paint overlay，hover_lift 是 graphicsEffect）。
+        """
+
+        if enabled == self._ripple_enabled:
+            return
+        self._ripple_enabled = enabled
+        if enabled:
+            from embeddebug.serial_station.ui.controls.ripple import install_ripple
+
+            install_ripple(self)
+        # 关闭时不主动撤销注入（install_ripple 是单向的），靠 _ripple_enabled 标志
+        # 在 patched_press 内跳过触发。
 
     def _on_clicked(self) -> None:
         """点击处理：先播放按压动画，再发出命令。"""

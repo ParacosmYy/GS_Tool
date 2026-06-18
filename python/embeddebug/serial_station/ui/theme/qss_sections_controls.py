@@ -57,6 +57,11 @@ QLabel#serialStationSliderBubble {{
     font-size: {T.FONT_XS};
     font-weight: 600;
 }}
+/* Batch 7-5: RippleButton（ripple 自绘，QSS 背景透明让涟漪可见） */
+QPushButton#serialStationRippleButton {{
+    background-color: transparent;
+    border: none;
+}}
 /* 可配置按钮 */
 QPushButton#serialStationConfigurableButton {{
     background-color: {P.BG_PANEL_RAISED};

@@ -98,9 +98,12 @@ class EmptyStateWidget(QWidget):
         self._desc_label.setFont(desc_font)
         layout.addWidget(self._desc_label)
 
-        # 可选 CTA 按钮（装 hover lift + 按压动画，Batch 5）。
+        # 可选 CTA 按钮（装 hover lift + ripple，Batch 5/7-5）。
         if cta_text:
-            self._cta_button = QPushButton(cta_text, self)
+            # Batch 7-5: CTA 用 RippleButton（主操作按钮应有 ripple 水波纹反馈）。
+            from embeddebug.serial_station.ui.controls.ripple import RippleButton
+
+            self._cta_button = RippleButton(cta_text, self)
             self._cta_button.setObjectName("serialStationEmptyStateCta")
             self._cta_button.setCursor(Qt.CursorShape.PointingHandCursor)
             # CTA 是空状态的主操作，装完整微交互（hover 上浮 + accent tint 阴影）。

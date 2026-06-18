@@ -6,6 +6,7 @@
 
 from embeddebug.serial_station.ui.controls.gauge import GaugeWidget
 from embeddebug.serial_station.ui.controls.led import LedState, StatusLed
+from embeddebug.serial_station.ui.controls.ripple import RippleButton
 from embeddebug.serial_station.ui.controls.slider import CommandSlider
 from embeddebug.serial_station.ui.controls.value_display import ValueDisplay
 from embeddebug.serial_station.ui.controls.configurable_button import ConfigurableButton
@@ -15,6 +16,7 @@ __all__ = [
     "ConfigurableButton",
     "GaugeWidget",
     "LedState",
+    "RippleButton",
     "StatusLed",
     "ValueDisplay",
 ]
