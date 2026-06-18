@@ -87,6 +87,8 @@ class DashboardPanel:
         # Batch 29: 标签页右键菜单（重命名/复制/关闭）—— customContextMenuRequested。
         self._tabs.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self._tabs.customContextMenuRequested.connect(self._show_tab_context_menu)
+        # Batch 30: 标签页拖拽重排序后自动重存（tab 顺序是持久化 key 顺序）。
+        self._tabs.tab_moved.connect(lambda _frm, _to: self._autosave_layout())
 
         # Batch 18: 双击全屏接线 —— 新放置控件自动装 attach_double_click_fullscreen
         # （激活 fullscreen.py 死代码）。每个画布的 item_added 信号 → 给新控件装双击全屏。

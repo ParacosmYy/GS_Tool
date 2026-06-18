@@ -16,13 +16,18 @@ class DashboardTabs(QTabWidget):
     """多标签页仪表盘容器。"""
 
     canvas_changed = pyqtSignal(object)  # 当前 canvas
+    tab_moved = pyqtSignal(int, int)  # Batch 30: 标签页拖拽重排序 (from, to)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("serialStationDashboardTabs")
         self.setTabsClosable(True)
+        # Batch 30: 标签页可拖拽重排序（对齐浏览器/IDE 标签页交互）。
+        self.setMovable(True)
         self.tabCloseRequested.connect(self._close_tab)
         self.currentChanged.connect(self._on_tab_changed)
+        # Batch 30: 暴露 tabBar().tabMoved 信号（标签页拖拽完成）。
+        self.tabBar().tabMoved.connect(lambda frm, to: self.tab_moved.emit(frm, to))
         self._add_canvas(self._default_tab_name())
 
     def _default_tab_name(self, index: int | None = None) -> str:
