@@ -74,12 +74,22 @@ class SerialStationMainWindow(QMainWindow):
         )
 
     def _install_responsive_layout(self) -> None:
-        """装配响应式布局控制器。"""
+        """装配响应式布局控制器，绑定顶层窗口监听 resize。
+
+        Batch 4 修复：旧版只靠 self.resizeEvent 驱动，但在 AppShell 多模式 shell 下
+        本窗口内容被 reparent 到 AppShell.stack，真正 resize 的是 AppShell，
+        self.resizeEvent 不触发，响应式从未运行。现在用 ``attach_to_top_level``
+        监听 effective 顶层窗口（``self.window()`` 在 reparent 后返回 AppShell），
+        无论被 reparent 到哪都生效。
+        """
 
         splitter = self.findChild(QSplitter, "serialStationMainSplitter")
         if splitter is None:
             return
         self._responsive = ResponsiveLayout(splitter, self)
+        # 绑定 effective 顶层窗口（reparent 后 self.window() 返回 AppShell）。
+        top_level = self.window() or self
+        self._responsive.attach_to_top_level(top_level)
 
     def _open_command_palette(self) -> None:
         """打开命令面板（Ctrl+P）。"""

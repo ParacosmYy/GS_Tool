@@ -2,6 +2,13 @@
 
 对齐 05-ui-standard §十七（响应式布局：窗口 <900px 自动折叠导航、断点动画过渡）。
 
+Batch 4 (B2) 改进：修复 AppShell 模式下响应式功能性失效。
+- 旧版依赖 ``SerialStationMainWindow.resizeEvent`` 驱动，但在多模式 shell 下
+  SerialStationMainWindow 的内容被 reparent 到 AppShell 的 QStackedWidget，
+  真正 resize 的是 AppShell，旧 resizeEvent 不触发，响应式控制器从未运行。
+- 新增 ``attach_to_top_level(window)``：用事件过滤器监听**顶层窗口**的 resize，
+  无论内容被 reparent 到哪都生效。SerialStationMainWindow 装配时调用一次即可。
+
 设计要点：
 - ``ResponsiveLayout`` 持有 QSplitter 与断点阈值，监听窗口 resize。
 - 跨过断点时折叠左区（设为最小宽度）并发出 ``sidebar_collapsed`` 信号；
@@ -13,7 +20,7 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtCore import QEvent, QObject, pyqtSignal
 from PyQt6.QtWidgets import QSplitter, QWidget
 
 BREAKPOINT_COLLAPSE = 900   # 窗口宽度 < 900 折叠侧栏
@@ -23,7 +30,13 @@ LEFT_ZONE_INDEX = 0         # 三区中左区索引
 
 
 class ResponsiveLayout(QObject):
-    """响应式布局控制器：按窗口宽度折叠/展开左区侧栏。"""
+    """响应式布局控制器：按窗口宽度折叠/展开左区侧栏。
+
+    支持两种驱动方式：
+    1. ``on_window_resized(width)``：调用方手动转发窗口宽度（向后兼容）。
+    2. ``attach_to_top_level(window)``：自动监听顶层窗口 resize（推荐），
+       解决 AppShell 多模式 shell 下内容被 reparent 导致旧 resizeEvent 不触发的问题。
+    """
 
     sidebar_collapsed = pyqtSignal()
     sidebar_expanded = pyqtSignal()
@@ -33,10 +46,33 @@ class ResponsiveLayout(QObject):
         self._splitter = splitter
         self._collapsed = False
         self._saved_sizes: list[int] = []
+        self._top_level: QWidget | None = None
 
     @property
     def is_collapsed(self) -> bool:
         return self._collapsed
+
+    def attach_to_top_level(self, window: QWidget) -> None:
+        """绑定顶层窗口，监听其 resize 事件自动驱动断点。
+
+        用于 AppShell 多模式 shell：SerialStationMainWindow 内容被 reparent 后，
+        本控制器仍能通过监听真正 resize 的顶层窗口（AppShell）工作。
+        """
+
+        self._top_level = window
+        window.installEventFilter(self)
+
+    def eventFilter(self, watched: object, event: object) -> bool:
+        """监听顶层窗口 resize，转发到断点逻辑。"""
+
+        if watched is self._top_level and getattr(event, "type", lambda: None)() == QEvent.Type.Resize:
+            width = getattr(event, "size", lambda: None)
+            if width is not None:
+                try:
+                    self.on_window_resized(width().width())
+                except Exception:
+                    pass
+        return False
 
     def on_window_resized(self, window_width: int) -> None:
         """窗口 resize 时调用，按断点折叠/展开侧栏。"""

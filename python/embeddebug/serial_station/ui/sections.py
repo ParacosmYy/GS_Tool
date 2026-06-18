@@ -65,11 +65,7 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     toolbar = build_connection_toolbar(owner, controller, root)
     send_row = command_section.build_send_row(owner, root)
 
-    # log_stats_label 在 build_log_row 内被引用，需先创建。
-    owner._log_stats_label = QLabel(root)
-    owner._log_stats_label.setObjectName("serialStationLogStatsLabel")
-    owner._log_stats_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-
+    # log_stats_label 在 build_log_row 内创建并挂到布局（Batch 4 改为纵向布局）。
     inject_row = build_inject_row(owner, root)
     log_row = build_log_row(owner, root)
     profile_row = build_profile_row(owner, root)
@@ -119,9 +115,25 @@ def build_inject_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLa
     return row
 
 
-def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:
-    row = QHBoxLayout()
-    row.setSpacing(8)
+def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QVBoxLayout:
+    """构建日志工具区（Batch 4 改为纵向分组布局）。
+
+    旧版把 6 控件塞进单个 QHBoxLayout，在右区 260px 窄列必然横向截断。
+    Batch 4 改为纵向 QVBoxLayout 分 3 行：
+    - 第 1 行：filter combo + search edit（filter 弹性较小，search 占主导）
+    - 第 2 行：session log path（占满宽度）
+    - 第 3 行：stats label + Save/Replay 按钮（按钮弹性收缩）
+
+    返回 QVBoxLayout（与调用方 ``addLayout`` 兼容任意 QLayout）。
+    """
+
+    col = QVBoxLayout()
+    col.setSpacing(6)
+    col.setContentsMargins(0, 0, 0, 0)
+
+    # 第 1 行：过滤 + 搜索。
+    row1 = QHBoxLayout()
+    row1.setSpacing(6)
     owner._log_filter_combo = QComboBox(root)
     owner._log_filter_combo.setObjectName("serialStationLogFilterCombo")
     owner._log_filter_combo.setToolTip(owner.tr("Filter visible log entries"))
@@ -133,9 +145,22 @@ def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayou
     owner._log_search_edit.setPlaceholderText(owner.tr("Search log text"))
     owner._log_search_edit.setToolTip(owner.tr("Filter visible log entries by text"))
     owner._log_search_edit.textChanged.connect(owner._render_log_entries)
+    row1.addWidget(owner._log_filter_combo, 1)
+    row1.addWidget(owner._log_search_edit, 2)
+    col.addLayout(row1)
+
+    # 第 2 行：session log 路径（占满宽度）。
     owner._log_path_edit = QLineEdit(root)
     owner._log_path_edit.setObjectName("serialStationLogPathEdit")
     owner._log_path_edit.setPlaceholderText(owner.tr("Session log JSONL path"))
+    col.addWidget(owner._log_path_edit)
+
+    # 第 3 行：统计 + Save/Replay 按钮。
+    row3 = QHBoxLayout()
+    row3.setSpacing(6)
+    owner._log_stats_label = QLabel(owner.tr("0 entries"), root)
+    owner._log_stats_label.setObjectName("serialStationLogStatsLabel")
+    owner._log_stats_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
     owner._export_log_button = QPushButton(owner.tr("Save Log"), root)
     owner._export_log_button.setObjectName("serialStationExportLogButton")
     owner._export_log_button.setToolTip(owner.tr("Save current session log"))
@@ -144,13 +169,11 @@ def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayou
     owner._replay_log_button.setObjectName("serialStationReplayLogButton")
     owner._replay_log_button.setToolTip(owner.tr("Replay saved session log"))
     owner._replay_log_button.clicked.connect(owner._replay_log)
-    row.addWidget(owner._log_filter_combo)
-    row.addWidget(owner._log_search_edit)
-    row.addWidget(owner._log_stats_label)
-    row.addWidget(owner._log_path_edit, 1)
-    row.addWidget(owner._export_log_button)
-    row.addWidget(owner._replay_log_button)
-    return row
+    row3.addWidget(owner._log_stats_label, 1)
+    row3.addWidget(owner._export_log_button)
+    row3.addWidget(owner._replay_log_button)
+    col.addLayout(row3)
+    return col
 
 
 def build_profile_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:
