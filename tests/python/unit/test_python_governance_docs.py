@@ -218,12 +218,7 @@ def test_no_new_batch_suffixed_test_files():
 
     白名单 _PENDING_RENAME 列出已知的、尚未迁移的在途文件；迁移后从此移除。
     """
-    _PENDING_RENAME = frozenset(
-        {
-            # 并发进程 Batch 25 在途，待稳定后 rename 为 test_dashboard_layout_persist.py
-            "test_dashboard_layout_persist_batch25.py",
-        }
-    )
+    _PENDING_RENAME = frozenset()  # 无待迁移项；新增 batch 文件须先 rename 再提交
 
     offenders = sorted(
         p.name
