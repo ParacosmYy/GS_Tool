@@ -119,38 +119,39 @@ class DashboardPanel:
         canvas.item_removed.connect(lambda _id: self._autosave_layout())
 
     def _restore_layout_on_build(self) -> None:
-        """build 时从应用数据目录恢复上一次仪表盘布局（Batch 25）。
+        """build 时从应用数据目录恢复上一次仪表盘布局（Batch 25/27）。
 
-        默认关闭（避免破坏「build 后画布为空」的既有测试前提与多实例串扰）；
-        设环境变量 ``EMBEDDEBUG_DASHBOARD_AUTOSAVE=1`` 启用自动恢复 + 自动保存。
+        Batch 27：改用 restore_all_tabs 恢复全部标签页布局（旧版仅恢复当前 canvas，
+        其他标签页布局丢失）。
         """
 
         if not _autosave_enabled():
             return
         try:
             from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
-                restore_to_canvas,
+                restore_all_tabs,
             )
 
-            canvas = self._tabs.current_canvas() if self._tabs else None
-            if canvas is not None:
-                restore_to_canvas(canvas)
+            if self._tabs is not None:
+                restore_all_tabs(self._tabs)
         except Exception:
             pass  # 恢复失败不阻塞面板构建（用户可手动加载）。
 
     def _autosave_layout(self) -> None:
-        """add/remove 后把当前画布布局写回应用数据目录（Batch 25）。"""
+        """add/remove 后把全部标签页布局写回应用数据目录（Batch 25/27）。
+
+        Batch 27：改用 persist_all_tabs 持久化全部标签页（激活 tab_names，旧版仅存当前 canvas）。
+        """
 
         if not _autosave_enabled():
             return
         try:
             from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
-                persist_from_canvas,
+                persist_all_tabs,
             )
 
-            canvas = self._tabs.current_canvas() if self._tabs else None
-            if canvas is not None:
-                persist_from_canvas(canvas)
+            if self._tabs is not None:
+                persist_all_tabs(self._tabs)
         except Exception:
             pass  # 自动保存失败静默（手动保存按钮仍可用）。
 

@@ -118,7 +118,7 @@ def test_dashboard_panel_restores_on_build(qtbot, tmp_path, monkeypatch):
 
 
 def test_dashboard_panel_autosaves_on_add(qtbot, tmp_path, monkeypatch):
-    """放置控件应触发自动保存（item_added → _autosave_layout）。"""
+    """放置控件应触发自动保存（item_added → _autosave_layout，多标签页格式）。"""
 
     from embeddebug.app.app_controller import AppController
     from embeddebug.serial_station.ui.panels.dashboard_panel import DashboardPanel
@@ -126,16 +126,20 @@ def test_dashboard_panel_autosaves_on_add(qtbot, tmp_path, monkeypatch):
     monkeypatch.setenv("EMBEDDEBUG_DASHBOARD_AUTOSAVE", "1")
     p = tmp_path / "layout.json"
     monkeypatch.setattr(store, "layout_path", lambda: p)
-    # build 时无布局（空），避免恢复干扰。
-    monkeypatch.setattr(store, "restore_to_canvas", lambda canvas: 0)
+    # build 时无布局（空），避免恢复干扰（restore_all_tabs 空）。
+    monkeypatch.setattr(store, "restore_all_tabs", lambda tabs: 0)
     panel = DashboardPanel()
     widget = panel.build(AppController())
     qtbot.addWidget(widget)
     canvas = panel._tabs.current_canvas()
     canvas.add_widget_at("led", QPoint(20, 20))
-    # 自动保存应已写盘。
+    # Batch 27：自动保存按多标签页格式（{tab_name: {items}}）。
     loaded = store.load_layout_dict()
-    assert len(loaded["items"]) == 1
+    # 默认标签页名 "Dashboard 1" 应含 1 个控件。
+    all_items = sum(
+        len(tab.get("items", [])) for tab in loaded.values() if isinstance(tab, dict)
+    )
+    assert all_items >= 1
 
 
 def test_autosave_disabled_by_default(qtbot, tmp_path, monkeypatch):

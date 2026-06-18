@@ -100,3 +100,93 @@ def persist_from_canvas(canvas) -> bool:
     except Exception:
         return False
     return save_layout_dict(layout)
+
+
+def load_tabs_layout() -> dict:
+    """读取多标签页布局 dict（{tab_name: layout_dict}）。
+
+    Batch 27：兼容旧单画布格式（顶层含 ``items`` 列表时归入默认标签页 "Dashboard 1"）。
+    """
+
+    raw = load_layout_dict()
+    # 旧格式：顶层是 {"items": [...]}（单画布）。归入默认标签页。
+    if isinstance(raw.get("items"), list):
+        return {"Dashboard 1": raw}
+    # 新格式：{tab_name: {"items": [...]}}。
+    if isinstance(raw, dict):
+        return {k: v for k, v in raw.items() if isinstance(v, dict)}
+    return {}
+
+
+def save_tabs_layout(tabs_layout: dict) -> bool:
+    """写入多标签页布局 dict（{tab_name: layout_dict}）。"""
+
+    return save_layout_dict(tabs_layout)
+
+
+def persist_all_tabs(tabs) -> bool:
+    """把 DashboardTabs 所有标签页布局持久化（按 tab 名为 key），返回是否成功。
+
+    Batch 27：修复旧版仅持久化 current_canvas 的数据丢失（其他标签页布局丢失）。
+    激活 DashboardTabs.tab_names（此前零消费者）。
+    """
+
+    try:
+        names = tabs.tab_names()
+    except Exception:
+        return False
+    tabs_layout: dict[str, dict] = {}
+    for index, name in enumerate(names):
+        canvas = tabs.widget(index) if hasattr(tabs, "widget") else None
+        if canvas is None:
+            continue
+        try:
+            tabs_layout[name] = canvas.to_layout_dict()
+        except Exception:
+            continue
+    return save_tabs_layout(tabs_layout)
+
+
+def restore_all_tabs(tabs) -> int:
+    """把已保存的多标签页布局恢复到 DashboardTabs，返回恢复的总控件数。
+
+    按保存的 tab 名匹配当前标签页（同名恢复）；保存里有但当前无的标签页跳过。
+    """
+
+    tabs_layout = load_tabs_layout()
+    if not tabs_layout:
+        return 0
+    try:
+        names = tabs.tab_names()
+    except Exception:
+        return 0
+    restored = 0
+    for index, name in enumerate(names):
+        layout = tabs_layout.get(name)
+        if not layout or not isinstance(layout.get("items"), list):
+            continue
+        canvas = tabs.widget(index) if hasattr(tabs, "widget") else None
+        if canvas is None:
+            continue
+        restored += _apply_layout_to_canvas(canvas, layout)
+    return restored
+
+
+def _apply_layout_to_canvas(canvas, layout: dict) -> int:
+    """把单个 layout_dict 应用到画布（复用 canvas.load_layout 的文件接口）。"""
+
+    import tempfile
+
+    try:
+        fd, tmp_name = tempfile.mkstemp(suffix=".json", prefix="dashboard_tab_restore.")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                json.dump(layout, fh)
+            return canvas.load_layout(tmp_name)
+        finally:
+            try:
+                os.remove(tmp_name)
+            except OSError:
+                pass
+    except OSError:
+        return 0

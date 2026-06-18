@@ -26,6 +26,7 @@
 *.a
 *.so
 *.dylib
+*.pyc
 
 # Qt generated
 moc_*
@@ -69,12 +70,3 @@ htmlcov/
 *.toc
 *.pkg
 *.manifest
-
-# Temp files
-*.tmp
-*.bak
-*.swp
-*~
-
-# Dependencies
-node_modules/
