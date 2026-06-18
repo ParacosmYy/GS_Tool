@@ -129,6 +129,10 @@ class BlePanel:
         self._bridge = _BleSignalBridge(widget)
         self._bridge.notify_received.connect(self._on_notify)
         self._bridge.error.connect(self._on_error)
+        # Batch 22: 给面板输入控件装 focus_ring。
+        from embeddebug.serial_station.ui.panels._focus_ring import apply_panel_focus_rings
+
+        apply_panel_focus_rings(widget)
         return widget
 
     def on_enter(self) -> None:

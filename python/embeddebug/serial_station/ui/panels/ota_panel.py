@@ -130,6 +130,10 @@ class OtaPanel:
         self._bridge.progress.connect(self._on_progress)
         self._bridge.finished.connect(self._on_finished)
         self._refresh_connection_state()
+        # Batch 22: 给面板输入控件装 focus_ring（对齐 serial workbench 的输入焦点光环）。
+        from embeddebug.serial_station.ui.panels._focus_ring import apply_panel_focus_rings
+
+        apply_panel_focus_rings(widget)
         return widget
 
     # ── 生命周期 ────────────────────────────────────────────────────

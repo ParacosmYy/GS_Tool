@@ -131,6 +131,10 @@ class AutomationPanel:
         self._widget = widget
         self._engine.rule_fired.connect(self._on_rule_fired)
         self._refresh_table()
+        # Batch 22: 给面板输入控件装 focus_ring。
+        from embeddebug.serial_station.ui.panels._focus_ring import apply_panel_focus_rings
+
+        apply_panel_focus_rings(widget)
         return widget
 
     def on_enter(self) -> None:

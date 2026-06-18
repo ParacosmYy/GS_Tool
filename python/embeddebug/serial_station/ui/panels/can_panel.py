@@ -117,6 +117,10 @@ class CanPanel:
         self._widget = widget
         self._bridge = _CanSignalBridge(widget)
         self._bridge.frame_decoded.connect(self._on_events)
+        # Batch 22: 给面板输入控件装 focus_ring。
+        from embeddebug.serial_station.ui.panels._focus_ring import apply_panel_focus_rings
+
+        apply_panel_focus_rings(widget)
         return widget
 
     def on_enter(self) -> None:
