@@ -23,19 +23,36 @@ def create_application(argv: Sequence[str] | None = None) -> QApplication:
 
     app = QApplication(list(argv) if argv is not None else list(sys.argv))
     app.setApplicationName("EmbedDebugPy")
-    app.setApplicationDisplayName("EmbedDebug PyQt")
+    app.setApplicationDisplayName("EmbedDebug")
     apply_theme(app)
     return app
 
 
 def build_main_window() -> SerialStationMainWindow:
-    """Build the top-level Python/PyQt migration window."""
+    """Build the single-window serial station (legacy/compat path).
+
+    保留为向后兼容入口：现有 smoke 测试与单模式启动走此路径。
+    多模式应用入口见 ``build_app_shell``。
+    """
 
     return SerialStationMainWindow()
 
 
+def build_app_shell():
+    """Build the multi-mode application shell (nav rail + switchable panels).
+
+    注册首批模式面板（串口 / OTA / RTT / 设置）并返回 AppShell。
+    """
+
+    from embeddebug.app.app_shell import AppShell
+    from embeddebug.serial_station.ui.panels import register_default_panels
+
+    register_default_panels()
+    return AppShell()
+
+
 def main(argv: Sequence[str] | None = None) -> int:
-    """Run the Python/PyQt migration entry point."""
+    """Run the application entry point (multi-mode shell by default)."""
 
     parser = argparse.ArgumentParser(prog="start-embeddebug")
     parser.add_argument(
@@ -43,13 +60,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="Create the window and process events without entering the event loop.",
     )
+    parser.add_argument(
+        "--single",
+        action="store_true",
+        help="Use the legacy single-window serial station instead of the multi-mode shell.",
+    )
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     if args.smoke:
         os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
     app = create_application(["start-embeddebug"] if args.smoke else None)
-    window = build_main_window()
+    # 默认多模式 shell；--single 回退单窗口（兼容 smoke 与旧路径）。
+    window = build_main_window() if args.single else build_app_shell()
     window.show()
     app.processEvents()
 

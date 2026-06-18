@@ -32,9 +32,14 @@ from embeddebug.serial_station.ui.sections import build_main_layout
 class SerialStationMainWindow(QMainWindow):
     """PyQt Serial Station MVP window."""
 
-    def __init__(self) -> None:
+    def __init__(self, app_controller: object | None = None) -> None:
         super().__init__()
-        self._controller = SerialWorkbenchController()
+        # 支持注入共享 AppController（多模式 shell 复用串口连接）；
+        # 不传时自建 controller，保持单窗口向后兼容。
+        if app_controller is not None:
+            self._controller = app_controller.serial_controller
+        else:
+            self._controller = SerialWorkbenchController()
         self._controller.on_log_entry(self._append_log_entry)
         self._controller.on_error(self._show_error)
         self._controller.on_measurement_batch(self._append_measurement_batch)

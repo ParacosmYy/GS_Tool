@@ -49,6 +49,14 @@ class SerialWorkbenchController:
         return transport_state.is_connected(self._transport_runtime)
 
     @property
+    def active_transport(self) -> SerialTransport | None:
+        """返回当前已连接的串口 transport，未连接返回 None。
+
+        供跨模式共享 transport（如 OTA 复用已连接串口发包）。只读，不改变连接状态。
+        """
+        return self._transport_runtime.transport if self.is_connected else None
+
+    @property
     def entries(self) -> tuple[SerialWorkbenchLogEntry, ...]:
         return workbench_state.entries_snapshot(self._state)
 

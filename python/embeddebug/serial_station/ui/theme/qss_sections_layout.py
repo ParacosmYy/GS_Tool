@@ -86,6 +86,11 @@ QWidget#serialStationCenterZone,
 QWidget#serialStationRightZone {{
     background-color: transparent;
     border: none;
+}}
+/* 串口配置面板容器（连接侧栏包装层） */
+QWidget#serialStationSerialPanel {{
+    background-color: transparent;
+    border: none;
 }}"""
 
 
