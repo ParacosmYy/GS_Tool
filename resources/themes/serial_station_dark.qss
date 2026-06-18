@@ -1,8 +1,8 @@
 /* EmbedDebug Serial Station — VOFA+ 精致工业风深色主题（参考源）
  *
- * 本文件是 ThemeManager 的外部编辑路径：存在时 ThemeManager.load_qss 优先读取本文件；
- * 缺失或读取失败时回退到 qss_builder.build_qss() 程序化生成。
- * 颜色与尺寸真相源在 palette.py / tokens.py。从 build_qss() 自动生成。
+ * 本文件是 ThemeManager 的外部编辑路径：存在时 ThemeManager.load_qss 优先读取；
+ * 缺失回退到 qss_builder.build_qss()。颜色真相源在 palette.py / tokens.py。
+ * 从 build_qss() 自动生成。
  */
 
 /* === Global === */
@@ -494,6 +494,178 @@ QPushButton#serialStationOtaStartButton:hover {
 QPushButton#serialStationOtaStartButton:disabled {
     background-color: #151b24;
     color: #5f6f86;
+}
+
+/* === Domain Panels (RTT / CAN / BLE / Automation / Settings) === */
+/* 面板根：统一深色应用底。 */
+QWidget#serialStationRttPanel,
+QWidget#serialStationCanPanel,
+QWidget#serialStationBlePanel,
+QWidget#serialStationAutomationPanel,
+QWidget#serialStationSettingsPanel {
+    background-color: #101218;
+}
+/* 字段标签（"通道/设备/ID/数据/特征/主题"等行内标签）。 */
+QLabel#serialStationRttFieldLabel,
+QLabel#serialStationCanFieldLabel,
+QLabel#serialStationBleFieldLabel,
+QLabel#serialStationSettingsFieldLabel {
+    color: #b7c0d8;
+    font-size: 12px;
+    font-weight: 600;
+}
+/* 状态标签。 */
+QLabel#serialStationRttStatusLabel,
+QLabel#serialStationCanStatsLabel,
+QLabel#serialStationAutomationStatusLabel,
+QLabel#serialStationSettingsThemeStatusLabel {
+    color: #9aa7bd;
+    font-size: 12px;
+    padding: 0 8px;
+}
+/* 日志/文本视图（终端风：深底 + 等宽）。 */
+QPlainTextEdit#serialStationRttTextView,
+QPlainTextEdit#serialStationBleLog,
+QPlainTextEdit#serialStationAutomationLog {
+    background-color: #0d1118;
+    color: #9aa7bd;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+}
+/* 主操作按钮（启停/连接/发送/应用：强调青）。 */
+QPushButton#serialStationRttStartButton,
+QPushButton#serialStationCanSendButton,
+QPushButton#serialStationBleConnectButton,
+QPushButton#serialStationAutomationRunButton,
+QPushButton#serialStationSettingsApplyButton {
+    background-color: #22d3ee;
+    color: #0d1118;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-weight: 600;
+}
+QPushButton#serialStationRttStartButton:hover,
+QPushButton#serialStationCanSendButton:hover,
+QPushButton#serialStationBleConnectButton:hover,
+QPushButton#serialStationAutomationRunButton:hover,
+QPushButton#serialStationSettingsApplyButton:hover {
+    background-color: #67e8f9;
+}
+/* 次要按钮（清空/扫描/演示/读/写/订阅/手动触发/刷新）。 */
+QPushButton#serialStationRttClearButton,
+QPushButton#serialStationCanClearButton,
+QPushButton#serialStationCanDemoButton,
+QPushButton#serialStationBleScanButton,
+QPushButton#serialStationBleReadButton,
+QPushButton#serialStationBleWriteButton,
+QPushButton#serialStationBleNotifyButton,
+QPushButton#serialStationAutomationFireButton,
+QPushButton#serialStationAutomationRefreshButton {
+    background-color: #151b24;
+    color: #b7c0d8;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+QPushButton#serialStationRttClearButton:hover,
+QPushButton#serialStationCanClearButton:hover,
+QPushButton#serialStationCanDemoButton:hover,
+QPushButton#serialStationBleScanButton:hover,
+QPushButton#serialStationBleReadButton:hover,
+QPushButton#serialStationBleWriteButton:hover,
+QPushButton#serialStationBleNotifyButton:hover,
+QPushButton#serialStationAutomationFireButton:hover,
+QPushButton#serialStationAutomationRefreshButton:hover {
+    background-color: #1b2634;
+    border-color: rgba(34, 211, 238, 0.35);
+}
+/* 输入框（ID/数据/payload/特征 UUID/主题 combo/通道 combo/设备 combo）。 */
+QLineEdit#serialStationCanIdEdit,
+QLineEdit#serialStationCanDataEdit,
+QLineEdit#serialStationBleCharUuidEdit,
+QLineEdit#serialStationBlePayloadEdit,
+QComboBox#serialStationRttChannelCombo,
+QComboBox#serialStationBleDeviceCombo,
+QComboBox#serialStationSettingsThemeCombo {
+    background-color: #0f141d;
+    color: #d7def3;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 5px 8px;
+    min-height: 28px;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+}
+/* CAN 复选框。 */
+QCheckBox#serialStationCanExtCheckBox {
+    color: #b7c0d8;
+    spacing: 6px;
+}
+/* 表格 / 树（CAN 帧表、Automation 规则表、Settings 快捷键表、BLE GATT 树）。 */
+QTableWidget#serialStationCanFrameTable,
+QTableWidget#serialStationAutomationRuleTable,
+QTableWidget#serialStationSettingsShortcutsTable,
+QTreeWidget#serialStationBleGattTree {
+    background-color: #151b24;
+    color: #d7def3;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+    gridline-color: #27313f;
+    font-size: 12px;
+}
+QTableWidget#serialStationCanFrameTable::item,
+QTableWidget#serialStationAutomationRuleTable::item,
+QTableWidget#serialStationSettingsShortcutsTable::item,
+QTreeWidget#serialStationBleGattTree::item {
+    padding: 4px 6px;
+}
+QTableWidget#serialStationCanFrameTable::item:selected,
+QTableWidget#serialStationAutomationRuleTable::item:selected,
+QTableWidget#serialStationSettingsShortcutsTable::item:selected,
+QTreeWidget#serialStationBleGattTree::item:selected {
+    background-color: rgba(34, 211, 238, 0.12);
+    color: #22d3ee;
+}
+QHeaderView::section {
+    background-color: #1b2634;
+    color: #b7c0d8;
+    border: none;
+    border-bottom: 1px solid #27313f;
+    padding: 4px 6px;
+    font-weight: 600;
+}
+/* 设置页 Tab。 */
+QTabWidget#serialStationSettingsTabWidget::pane {
+    background-color: #151b24;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+}
+QTabBar::tab {
+    background-color: #0f141d;
+    color: #b7c0d8;
+    padding: 6px 12px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+QTabBar::tab:selected {
+    background-color: rgba(34, 211, 238, 0.12);
+    color: #22d3ee;
+}
+/* 关于页标签。 */
+QLabel#serialStationSettingsAppNameLabel {
+    color: #d7def3;
+    font-size: 18px;
+    font-weight: 700;
+}
+QLabel#serialStationSettingsVersionLabel,
+QLabel#serialStationSettingsRemoteLabel {
+    color: #9aa7bd;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
 }
 
 /* === Buttons === */
