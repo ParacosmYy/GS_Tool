@@ -81,6 +81,9 @@ class DashboardPanel:
         body.addWidget(self._tabs, 1)
         layout.addLayout(body, 1)
 
+        # Batch 28: 标签页双击重命名（激活 DashboardTabs.rename_tab，此前零消费者）。
+        self._tabs.tabBarDoubleClicked.connect(self._rename_tab_on_double_click)
+
         # Batch 18: 双击全屏接线 —— 新放置控件自动装 attach_double_click_fullscreen
         # （激活 fullscreen.py 死代码）。每个画布的 item_added 信号 → 给新控件装双击全屏。
         # fullscreen_handlers 防 GC（handler 必须被持有才有效）。
@@ -197,6 +200,30 @@ class DashboardPanel:
         if self._tabs is not None:
             self._tabs.add_tab()
             self._status.setText(self._widget.tr("已新增标签页"))
+
+    def _rename_tab_on_double_click(self, index: int) -> None:
+        """标签页双击 → 弹输入框重命名（Batch 28：激活 rename_tab，此前零消费者）。
+
+        空/取消保持原名；重命名后自动持久化（多标签页布局按 tab 名为 key）。
+        """
+
+        if self._tabs is None or self._widget is None:
+            return
+        if not (0 <= index < self._tabs.count()):
+            return
+        current_name = self._tabs.tabText(index)
+        from PyQt6.QtWidgets import QInputDialog
+
+        new_name, ok = QInputDialog.getText(
+            self._widget,
+            self._widget.tr("重命名标签页"),
+            self._widget.tr("标签页名称："),
+            text=current_name,
+        )
+        if ok and new_name.strip() and new_name.strip() != current_name:
+            self._tabs.rename_tab(index, new_name.strip())
+            self._status.setText(self._widget.tr("标签页已重命名：{name}").format(name=new_name.strip()))
+            self._autosave_layout()  # tab 名是持久化 key，改名后重存。
 
     def _clear_canvas(self) -> None:
         canvas = self._tabs.current_canvas() if self._tabs else None
