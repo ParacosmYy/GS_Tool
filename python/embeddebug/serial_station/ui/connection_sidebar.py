@@ -18,6 +18,7 @@ from typing import Protocol
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QFrame, QLabel, QLayout, QWidget
 
+from embeddebug.serial_station.ui.collapsible_card import CollapsibleCard
 from embeddebug.serial_station.ui.layout_cards import build_card
 
 
@@ -25,10 +26,19 @@ class ConnectionSidebarHost(Protocol):
     def tr(self, source_text: str) -> str: ...
 
 
+# 常驻组（高频，不折叠）：端口选择 + 连接动作。Serial/Endpoints/Other 默认折叠。
+_ALWAYS_ON_GROUPS = {"Port", "Connect"}
+
+
 def build_connection_card(
     owner: ConnectionSidebarHost, parent: QWidget, toolbar_layout: QLayout
 ) -> QFrame:
-    """把横向 toolbar 的控件纵向重排进连接卡片，返回卡片本体。"""
+    """把横向 toolbar 的控件纵向重排进连接卡片，返回卡片本体。
+
+    Port / Connect 组常驻（高频）；Serial / Endpoints / 未识别组默认折叠
+    （低频），释放左栏空间。折叠卡内容用 setVisible 显隐，控件不脱离 widget
+    树，findChild 与 action 模块契约不受影响。
+    """
 
     card, body = build_card(parent, title=owner.tr("Connection"), icon_name="plug")
 
@@ -37,10 +47,19 @@ def build_connection_card(
     for label_text, group_widgets in groups:
         if not group_widgets:
             continue
-        if label_text is not None:
+        if label_text in _ALWAYS_ON_GROUPS:
+            # 常驻组：分组标签 + 控件平铺。
             body.addWidget(make_group_label(parent, owner.tr(label_text)))
-        for widget in group_widgets:
-            body.addWidget(widget)
+            for widget in group_widgets:
+                body.addWidget(widget)
+        else:
+            # 低频组：包进可折叠卡（默认折叠）。
+            title = owner.tr(label_text) if label_text is not None else owner.tr("Other")
+            collapsible = CollapsibleCard(card, title=title, expanded=False)
+            inner = collapsible.body_layout()
+            for widget in group_widgets:
+                inner.addWidget(widget)
+            body.addWidget(collapsible)
     return card
 
 

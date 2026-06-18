@@ -29,6 +29,7 @@ from embeddebug.serial_station.ui.theme.qss_sections_core import (
 )
 from embeddebug.serial_station.ui.theme.qss_sections_layout import (
     cards_section,
+    collapsible_section,
     command_palette_section,
     splitter_section,
     topbar_section,
@@ -55,6 +56,7 @@ def build_qss() -> str:
         labels_section(),
         topbar_section(),
         cards_section(),
+        collapsible_section(),
         zones_section(),
         splitter_section(),
         command_palette_section(),

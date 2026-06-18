@@ -56,7 +56,7 @@ class AppShell(QMainWindow):
         self._stack.setObjectName("serialStationAppStack")
         layout.addWidget(self._stack, 1)
 
-        self._build_pages()
+        self._build_pages(nav)
         self.setCentralWidget(central)
 
         # 默认切到第一个模式（串口）。
@@ -85,13 +85,17 @@ class AppShell(QMainWindow):
         self._nav_group.setExclusive(True)
         return rail
 
-    def _build_pages(self) -> None:
-        """按注册顺序为每个模式构建页 + 导航按钮。"""
+    def _build_pages(self, nav_rail: QFrame) -> None:
+        """按注册顺序为每个模式构建页 + 导航按钮。
+
+        导航按钮以 nav_rail 为父级（**不能**以 self._stack 为父级，否则
+        QStackedWidget 会把按钮当成页面吸收，导致空白屏）。
+        """
 
         registrations = registered_panels()
         for index, reg in enumerate(registrations):
-            # 导航按钮。
-            btn = QPushButton(self._stack)
+            # 导航按钮：父级是 nav_rail，挂进 rail 的竖排布局。
+            btn = QPushButton(nav_rail)
             btn.setObjectName(f"serialStationNav{reg.mode_id.capitalize()}Btn")
             btn.setToolTip(reg.label)
             btn.setCheckable(True)
@@ -102,12 +106,11 @@ class AppShell(QMainWindow):
                 btn.setIconSize(QSize(20, 20))
             self._nav_buttons[reg.mode_id] = btn
             self._nav_group.addButton(btn, index)
-            # 导航栏布局（在 _build_nav_rail 创建的 rail 上追加）。
-            rail = self._nav_buttons[reg.mode_id].parent()
-            rail.layout().addWidget(btn)
+            nav_rail.layout().addWidget(btn)
             btn.clicked.connect(lambda _checked, idx=index: self._switch_to(idx))
 
-            # 模式页（惰性构建面板，但这里一次性构建，MVP 简单）。
+        # 模式页：只把面板控件 addWidget 进 stack（按钮不进 stack）。
+        for reg in registrations:
             panel = reg.factory(self._app_controller)
             widget = panel.build(self._app_controller)
             self._panels[reg.mode_id] = panel

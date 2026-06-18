@@ -251,3 +251,39 @@ QGraphicsLineItem#serialStationWaveformCursorX,
 QGraphicsLineItem#serialStationWaveformCursorY {{
     /* no-op: color set via pg.mkPen at runtime */
 }}"""
+
+
+def collapsible_section() -> str:
+    """可折叠卡 — 嵌套在连接卡内的低频组容器，标题行可点击切换。"""
+
+    return f"""/* === Collapsible Card (connection sidebar low-freq groups) === */
+QFrame#serialStationCollapsibleCard {{
+    background-color: {P.BG_INPUT};
+    border: {T.BORDER_THIN} solid {P.BORDER};
+    border-radius: {T.RADIUS_MD};
+}}
+QWidget#serialStationCollapsibleHeader {{
+    background-color: transparent;
+    border: none;
+    padding: {T.SPACING_XS} {T.SPACING_SM};
+}}
+QWidget#serialStationCollapsibleHeader:hover {{
+    background-color: {P.BG_PANEL_RAISED};
+    border-radius: {T.RADIUS_SM};
+}}
+QLabel#serialStationCollapsibleArrow {{
+    background-color: transparent;
+    border: none;
+}}
+QLabel#serialStationCollapsibleTitle {{
+    background-color: transparent;
+    color: {P.TEXT_SECONDARY};
+    font-size: {T.FONT_XS};
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}}
+QWidget#serialStationCollapsibleBody {{
+    background-color: transparent;
+    border: none;
+}}"""

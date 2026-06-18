@@ -1,15 +1,8 @@
 /* EmbedDebug Serial Station — VOFA+ 精致工业风深色主题（参考源）
  *
- * 本文件是 ThemeManager 的外部编辑路径：当 resources/themes/serial_station_dark.qss
- * 存在时，ThemeManager.load_qss 会优先读取本文件；缺失或读取失败时回退到
- * python/embeddebug/serial_station/ui/theme/qss_builder.py 的程序化生成。
- *
- * 颜色与尺寸真相源在 palette.py / tokens.py；本文件用于设计期手改 QSS 调试。
- * 如需同步本文件与程序化生成器，删除本文件后由 ThemeManager 自动回退到生成器，
- * 再用 `python -c "from embeddebug.serial_station.ui.theme.qss_builder import build_qss as b; print(b())"`
- * 重新生成。
- *
- * 本文件从 build_qss() 自动生成。
+ * 本文件是 ThemeManager 的外部编辑路径：存在时 ThemeManager.load_qss 优先读取本文件；
+ * 缺失或读取失败时回退到 qss_builder.build_qss() 程序化生成。
+ * 颜色与尺寸真相源在 palette.py / tokens.py。从 build_qss() 自动生成。
  */
 
 /* === Global === */
@@ -133,6 +126,38 @@ QLabel#serialStationCardGroupLabel {
 /* 日志卡主体容器：保持透明，让 QPlainTextEdit 自身样式生效。 */
 QVBoxLayout#serialStationCardBody,
 QVBoxLayout#serialStationLogCardBody {
+    background-color: transparent;
+    border: none;
+}
+
+/* === Collapsible Card (connection sidebar low-freq groups) === */
+QFrame#serialStationCollapsibleCard {
+    background-color: #0f141d;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+}
+QWidget#serialStationCollapsibleHeader {
+    background-color: transparent;
+    border: none;
+    padding: 4px 6px;
+}
+QWidget#serialStationCollapsibleHeader:hover {
+    background-color: #1b2634;
+    border-radius: 4px;
+}
+QLabel#serialStationCollapsibleArrow {
+    background-color: transparent;
+    border: none;
+}
+QLabel#serialStationCollapsibleTitle {
+    background-color: transparent;
+    color: #b7c0d8;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+QWidget#serialStationCollapsibleBody {
     background-color: transparent;
     border: none;
 }
