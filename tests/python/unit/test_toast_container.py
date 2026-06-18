@@ -1,12 +1,7 @@
-"""Batch 12 测试：ToastContainer + NotificationManager→ToastWidget 端到端闭环 + AppShell 集成。
+"""ToastContainer 容器层 + AppShell 集成测试。
 
-覆盖：
-1. ToastContainer 接 manager 信号，add/remove 渲染 ToastWidget。
-2. manager.show() → container 出现 toast（端到端闭环）。
-3. toast closed（离场完成）→ 容器移除，空了隐藏。
-4. max_visible 超限挤掉最早一条。
-5. AppShell 实例化 NotificationManager + ToastContainer，notify() helper 落 toast。
-6. QSS 覆盖 toast container objectName。
+覆盖容器渲染闭环 / 管理 API / max_visible 挤兑，以及 AppShell 对
+NotificationManager 的装配与 notify helper 行为。
 """
 
 from __future__ import annotations
@@ -16,17 +11,13 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from unittest.mock import MagicMock
-
-import pytest
-
 from embeddebug.serial_station.notifications import NotificationManager
 from embeddebug.serial_station.notifications.data import NotificationLevel
 from embeddebug.serial_station.ui.widgets.toast import ToastWidget
 from embeddebug.serial_station.ui.widgets.toast_container import ToastContainer
 
 
-# ── ToastContainer 渲染闭环 ────────────────────────────────────────
+# ── 渲染闭环 ──────────────────────────────────────────────────────
 def test_container_has_objectname(qtbot):
     manager = NotificationManager()
     container = ToastContainer(manager)
@@ -84,6 +75,75 @@ def test_manager_remove_triggers_toast_leave(qtbot, monkeypatch):
     assert len(leave_calls) == 1
 
 
+# ── count / is_empty / clear_all / dismiss_oldest ──────────────────
+def test_container_count_and_is_empty(qtbot):
+    """count / is_empty 反映活跃 toast 数。"""
+
+    manager = NotificationManager()
+    container = ToastContainer(manager)
+    qtbot.addWidget(container)
+    assert container.count == 0
+    assert container.is_empty is True
+    manager.show(NotificationLevel.INFO, "1", "", timeout_ms=100000)
+    manager.show(NotificationLevel.INFO, "2", "", timeout_ms=100000)
+    assert container.count == 2
+    assert container.is_empty is False
+
+
+def test_clear_all_leaves_every_toast(qtbot, monkeypatch):
+    """clear_all 应对每条活跃 toast 调 leave（淡出）。"""
+
+    manager = NotificationManager()
+    container = ToastContainer(manager, max_visible=10)
+    qtbot.addWidget(container)
+    leave_calls: list = []
+    for i in range(3):
+        manager.show(NotificationLevel.INFO, f"{i}", "", timeout_ms=100000)
+    for _, t in container._active:
+        monkeypatch.setattr(t, "leave", lambda tt=t: leave_calls.append(tt))
+    container.clear_all()
+    assert len(leave_calls) == 3
+
+
+def test_dismiss_oldest_returns_false_when_empty(qtbot):
+    """无活跃 toast 时 dismiss_oldest 返回 False。"""
+
+    manager = NotificationManager()
+    container = ToastContainer(manager)
+    qtbot.addWidget(container)
+    assert container.dismiss_oldest() is False
+
+
+def test_dismiss_oldest_leaves_first(qtbot, monkeypatch):
+    """dismiss_oldest 应对最早一条调 leave 并返回 True。"""
+
+    manager = NotificationManager()
+    container = ToastContainer(manager, max_visible=10)
+    qtbot.addWidget(container)
+    leave_calls: list = []
+    for i in range(2):
+        manager.show(NotificationLevel.INFO, f"{i}", "", timeout_ms=100000)
+    for _, t in container._active:
+        monkeypatch.setattr(t, "leave", lambda tt=t: leave_calls.append(tt))
+    assert container.dismiss_oldest() is True
+    assert len(leave_calls) == 1  # 只 dismiss 一条
+
+
+def test_manager_clear_propagates_to_container(qtbot, monkeypatch):
+    """manager.clear() → 每条通知 removed 信号 → 对应 toast leave。"""
+
+    manager = NotificationManager()
+    container = ToastContainer(manager, max_visible=10)
+    qtbot.addWidget(container)
+    for i in range(3):
+        manager.show(NotificationLevel.INFO, f"{i}", "", timeout_ms=100000)
+    leave_calls: list = []
+    for _, t in container._active:
+        monkeypatch.setattr(t, "leave", lambda tt=t: leave_calls.append(tt))
+    manager.clear()
+    assert len(leave_calls) == 3
+
+
 # ── max_visible 挤兑 ───────────────────────────────────────────────
 def test_container_enforces_max_visible(qtbot, monkeypatch):
     """超过 max_visible 时挤掉最早一条（对最旧 toast 调 leave）。"""
@@ -122,75 +182,7 @@ def test_enforce_max_visible_directly(qtbot, monkeypatch):
     assert len(leave_calls) >= 1
 
 
-# ── AppShell 集成 ──────────────────────────────────────────────────
-def test_appshell_holds_notification_manager(qtbot):
-    """AppShell 应实例化 NotificationManager + ToastContainer。"""
-
-    from embeddebug.app.app_shell import AppShell
-
-    shell = AppShell()
-    qtbot.addWidget(shell)
-    assert shell.notification_manager() is not None
-    assert getattr(shell, "_toast_container", None) is not None
-
-
-def test_appshell_notify_renders_toast(qtbot):
-    """AppShell.notify() 应通过 manager → container 渲染一条 toast。"""
-
-    from embeddebug.app.app_shell import AppShell
-
-    shell = AppShell()
-    qtbot.addWidget(shell)
-    container = shell._toast_container
-    shell.notify("warning", "测试", "notify helper 落 toast", timeout_ms=100000)
-    assert len(container.active_toasts) == 1
-    toast = container.active_toasts[0]
-    assert toast._title_label.text() == "测试"
-
-
-def test_appshell_notify_unknown_level_defaults_info(qtbot):
-    """未知 level 字符串应回退到 INFO（不崩溃）。"""
-
-    from embeddebug.app.app_shell import AppShell
-
-    shell = AppShell()
-    qtbot.addWidget(shell)
-    shell.notify("bogus_level", "x", "y", timeout_ms=100000)
-    assert len(shell._toast_container.active_toasts) == 1
-
-
-def test_appshell_notify_without_manager_no_crash(qtbot):
-    """无 manager 时 notify 不应崩溃（健壮性，manager 缺失静默返回）。"""
-
-    from embeddebug.app.app_shell import AppShell
-
-    shell = AppShell()
-    qtbot.addWidget(shell)
-    # 模拟 manager 未装配。
-    delattr(shell, "_notification_manager") if hasattr(shell, "_notification_manager") else None
-    shell._notification_manager = None
-    shell.notify("info", "x", "y")  # 不应抛异常
-
-
-# ── 源码接入断言 ───────────────────────────────────────────────────
-def test_appshell_sources_wire_notification_subsystem():
-    """AppShell 应委托 app_notifications 装配，并保留 notify/_show_ready_toast 入口。
-
-    Batch 15 重构后 NotificationManager/ToastContainer 实例化移到 app_notifications.py
-    （守 300 行门禁），AppShell 通过 _app_notifications 委托。
-    """
-
-    from embeddebug.app import app_notifications, app_shell
-
-    shell_src = inspect.getsource(app_shell)
-    helper_src = inspect.getsource(app_notifications)
-    # AppShell 委托 helper + 保留公开入口。
-    assert "app_notifications" in shell_src
-    assert "def notify" in shell_src
-    assert "_show_ready_toast" in shell_src
-    # helper 才是真正引用 NotificationManager/ToastContainer 的地方。
-    assert "NotificationManager" in helper_src
-    assert "ToastContainer" in helper_src
+# ── AppShell 集成见 test_toast_integration.py（守 250 行门禁） ──────
 
 
 # ── QSS 覆盖 ───────────────────────────────────────────────────────

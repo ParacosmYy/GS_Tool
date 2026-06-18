@@ -1,12 +1,8 @@
-"""Batch 11 测试：ToastWidget 控件 + SlideAnimation/FadeTransition/AnimationController 死代码激活。
+"""ToastWidget 控件层测试。
 
-覆盖：
-1. ToastWidget 渲染 + objectName 合规 + 级别色条。
-2. enter() 触发 SlideAnimation.slide_in（死代码激活）。
-3. leave() 触发 FadeTransition.fade_out（死代码激活）。
-4. schedule_dismiss 启动定时器；leave 幂等（is_leaving 防重复）。
-5. closed 信号在离场后发出。
-6. 死代码接入断言（AnimationController + SlideAnimation + FadeTransition）。
+覆盖单条 toast 控件：渲染 / objectName / 级别色条 / 入场(SlideAnimation) /
+离场(FadeTransition) / 自动消失定时器 / closed 信号 / stop_animations /
+源码接入断言（引用三动画模块）。
 """
 
 from __future__ import annotations
@@ -18,13 +14,19 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from unittest.mock import MagicMock
 
-import pytest
-
-from embeddebug.serial_station.notifications.data import NotificationData, NotificationLevel
+from embeddebug.serial_station.notifications.data import (
+    NotificationData,
+    NotificationLevel,
+)
 from embeddebug.serial_station.ui.widgets.toast import ToastWidget
 
 
-def _make_data(level=NotificationLevel.INFO, title="提示", message="内容", timeout_ms=3000) -> NotificationData:
+def _make_data(
+    level=NotificationLevel.INFO,
+    title="提示",
+    message="内容",
+    timeout_ms=3000,
+) -> NotificationData:
     return NotificationData.create(level, title, message, timeout_ms=timeout_ms)
 
 
@@ -179,6 +181,18 @@ def test_toast_closed_signal_on_leave(qtbot, monkeypatch):
     assert received == [toast]
 
 
+# ── stop_animations ────────────────────────────────────────────────
+def test_toast_stop_animations_clears(qtbot):
+    """stop_animations 应停止定时器并清理动画控制器。"""
+
+    toast = ToastWidget(_make_data(timeout_ms=500))
+    qtbot.addWidget(toast)
+    toast.schedule_dismiss(500)
+    assert toast._dismiss_timer is not None
+    toast.stop_animations()
+    assert toast._dismiss_timer is None
+
+
 # ── 死代码接入断言 ─────────────────────────────────────────────────
 def test_toast_imports_three_dead_modules():
     """toast 源码应引用 SlideAnimation + FadeTransition + AnimationController。"""
@@ -189,14 +203,3 @@ def test_toast_imports_three_dead_modules():
     assert "SlideAnimation" in src and "slide_in" in src
     assert "FadeTransition" in src and "fade_out" in src
     assert "AnimationController" in src
-
-
-def test_toast_stop_animations_clears(qtbot):
-    """stop_animations 应停止定时器并清理动画控制器。"""
-
-    toast = ToastWidget(_make_data(timeout_ms=500))
-    qtbot.addWidget(toast)
-    toast.schedule_dismiss(500)
-    assert toast._dismiss_timer is not None
-    toast.stop_animations()
-    assert toast._dismiss_timer is None

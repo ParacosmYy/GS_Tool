@@ -1,4 +1,8 @@
-"""UI 动画引擎单元测试（二）：折叠/淡入淡出/抖动/脉冲/控制器。"""
+"""UI 动画效果测试：折叠/淡入淡出/抖动/脉冲 + AnimationController。
+
+从 test_ui_animations 拆出（守 250 行门禁）。覆盖 animations 模块的效果类
+动画与生命周期控制器。
+"""
 
 from __future__ import annotations
 
@@ -20,7 +24,7 @@ from embeddebug.serial_station.ui.animations import (
 )
 
 
-# ── CollapseAnimation + CollapsiblePanel ──────────────────────────
+# CollapseAnimation + CollapsiblePanel
 def test_collapse_expand(qtbot):
     w = QWidget()
     w.setMaximumHeight(200)
@@ -59,7 +63,7 @@ def test_collapsible_panel_toggle_signal(qtbot):
     assert states == [False, True]
 
 
-# ── FadeTransition ────────────────────────────────────────────────
+# FadeTransition
 def test_fade_in(qtbot):
     w = QLabel("hello")
     qtbot.addWidget(w)
@@ -85,7 +89,7 @@ def test_fade_in_custom_duration(qtbot):
     assert anim.duration() == 500
 
 
-# ── ShakeAnimation ────────────────────────────────────────────────
+# ShakeAnimation
 def test_shake_returns_animation(qtbot):
     w = QWidget()
     qtbot.addWidget(w)
@@ -107,7 +111,7 @@ def test_shake_amplitude(qtbot):
     assert any(abs(o) > 0 for o in offsets)
 
 
-# ── PulseAnimation ────────────────────────────────────────────────
+# PulseAnimation
 def test_pulse(qtbot):
     w = QWidget()
     qtbot.addWidget(w)
@@ -124,7 +128,7 @@ def test_breathing_loops_forever(qtbot):
     assert anim.loopCount() == -1
 
 
-# ── AnimationController ───────────────────────────────────────────
+# AnimationController
 def test_controller_add_and_stop(qtbot):
     w = QWidget()
     qtbot.addWidget(w)

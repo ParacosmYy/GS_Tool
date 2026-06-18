@@ -1,4 +1,8 @@
-"""UI 动画引擎单元测试（一）：token / 缩放 / 滑动。"""
+"""UI 动画引擎单元测试：token / 缩放 / 滑动（基础变换）。
+
+效果类动画（折叠/淡入淡出/抖动/脉冲/控制器）见 test_ui_animations_effects.py
+（守 250 行门禁，按行为域拆分）。
+"""
 
 from __future__ import annotations
 
@@ -6,7 +10,7 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PyQt6.QtCore import QEasingCurve, QPoint, QRect
+from PyQt6.QtCore import QEasingCurve, QRect
 from PyQt6.QtWidgets import QPushButton, QWidget
 
 from embeddebug.serial_station.ui.animations import (
@@ -17,7 +21,7 @@ from embeddebug.serial_station.ui.animations import (
 )
 
 
-# ── AnimationTokens ───────────────────────────────────────────────
+# AnimationTokens
 def test_tokens_durations():
     assert AnimationTokens.DURATION_INSTANT < AnimationTokens.DURATION_FAST
     assert AnimationTokens.DURATION_FAST < AnimationTokens.DURATION_NORMAL
@@ -35,7 +39,7 @@ def test_tokens_scale_values():
     assert AnimationTokens.SCALE_NORMAL == 1.0
 
 
-# ── ScaleAnimation ────────────────────────────────────────────────
+# ScaleAnimation
 def test_scale_press_returns_animation(qtbot):
     btn = QPushButton("X")
     qtbot.addWidget(btn)
@@ -61,7 +65,7 @@ def test_scale_bounce(qtbot):
     assert isinstance(anim.endValue(), QRect)
 
 
-# ── SlideAnimation ────────────────────────────────────────────────
+# SlideAnimation
 def test_slide_in_left(qtbot):
     w = QWidget()
     qtbot.addWidget(w)
