@@ -73,7 +73,11 @@ class SettingsPanel:
         return widget
 
     def on_enter(self) -> None:
-        """切入设置页：播放入场动画 + 同步当前主题到 combo。"""
+        """切入设置页：播放入场动画 + 同步当前主题到 combo。
+
+        Batch 19: 同步时用 blockSignals 暂停实时预览，避免 setCurrentText 触发
+        _preview_theme 在入场动画/构建竞态下应用主题（曾导致 Qt 销毁崩溃）。
+        """
 
         from embeddebug.serial_station.ui.panels._enter_anim import play_panel_enter
 
@@ -83,7 +87,9 @@ class SettingsPanel:
         from embeddebug.serial_station.ui.theme.manager import ThemeManager
         current = ThemeManager().current_theme or THEME_DARK
         if current in AVAILABLE_THEMES:
+            self._theme_combo.blockSignals(True)
             self._theme_combo.setCurrentText(current)
+            self._theme_combo.blockSignals(False)
 
     def on_leave(self) -> None:
         """切出设置页：停止入场动画。"""
@@ -110,6 +116,9 @@ class SettingsPanel:
         apply_btn = QPushButton(self._widget.tr("应用"), tab)
         apply_btn.setObjectName("serialStationSettingsApplyButton")
         apply_btn.clicked.connect(self._apply_theme)
+        # Batch 19: 实时预览 —— 切换 combo 选择即应用主题（无需点「应用」）。
+        # 预览不弹 toast（避免噪音），「应用」按钮保留为带 toast 的确认。
+        self._theme_combo.currentIndexChanged.connect(self._preview_theme)
         self._theme_status = QLabel(tab)
         self._theme_status.setObjectName("serialStationSettingsThemeStatusLabel")
         row.addWidget(label)
@@ -171,6 +180,26 @@ class SettingsPanel:
         return tab
 
     # ── 交互 ────────────────────────────────────────────────────────
+    def _preview_theme(self, _index: int) -> None:
+        """实时预览：切换 combo 选择即应用主题（Batch 19，不弹 toast）。
+
+        与 ``_apply_theme`` 区别：预览只应用 QSS + 更新状态标签，不弹 success toast
+        （避免 combo 每次切换都弹通知）。用户点「应用」按钮才确认（带 toast）。
+        """
+
+        from PyQt6.QtWidgets import QApplication
+
+        if self._theme_combo is None:
+            return
+        name = self._theme_combo.currentData() or THEME_DARK
+        try:
+            apply_theme_by_name(QApplication.instance(), name)
+        except Exception:
+            return  # 预览失败静默（_apply_theme 才报错）
+        if self._theme_status is not None:
+            text = self._widget.tr("预览：深色") if name == THEME_DARK else self._widget.tr("预览：浅色")
+            self._theme_status.setText(text)
+
     def _apply_theme(self) -> None:
         from embeddebug.serial_station.ui.panels._notify import panel_notify
         from PyQt6.QtWidgets import QApplication
