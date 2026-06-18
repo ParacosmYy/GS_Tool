@@ -71,6 +71,18 @@ SCROLLBAR_BACKGROUND = "transparent"
 # ── 阴影 ───────────────────────────────────────────────────────────
 SHADOW = "rgba(0, 0, 0, 0.35)"
 
+# ── 玻璃卡片 / TopBar 视觉层（QSS 无 blur，用渐变+边框近似 EK-OmniProbe surface） ──
+# 卡片顶部高光（inner highlight，模拟玻璃反光）。
+CARD_HIGHLIGHT_TOP = "rgba(255, 255, 255, 0.05)"
+CARD_HIGHLIGHT_BOTTOM = "rgba(255, 255, 255, 0.00)"
+# TopBar 表面：比窗口底略亮的分层渐变。
+TOPBAR_BG_TOP = "#131a25"
+TOPBAR_BG_BOTTOM = "#10141d"
+TOPBAR_BORDER = "#2a3647"
+# 品牌徽标底（强调青软底，对齐 EK-OmniProbe logo chip）。
+BRAND_CHIP_BG = "rgba(34, 211, 238, 0.14)"
+BRAND_CHIP_BORDER = "rgba(34, 211, 238, 0.40)"
+
 
 def all_tokens() -> dict[str, str]:
     """返回色板常量名 -> 颜色值的有序映射，供 QSS 生成与测试校验。"""
@@ -119,4 +131,11 @@ def all_tokens() -> dict[str, str]:
         "scrollbar_hover": SCROLLBAR_HOVER,
         "scrollbar_background": SCROLLBAR_BACKGROUND,
         "shadow": SHADOW,
+        "card_highlight_top": CARD_HIGHLIGHT_TOP,
+        "card_highlight_bottom": CARD_HIGHLIGHT_BOTTOM,
+        "topbar_bg_top": TOPBAR_BG_TOP,
+        "topbar_bg_bottom": TOPBAR_BG_BOTTOM,
+        "topbar_border": TOPBAR_BORDER,
+        "brand_chip_bg": BRAND_CHIP_BG,
+        "brand_chip_border": BRAND_CHIP_BORDER,
     }

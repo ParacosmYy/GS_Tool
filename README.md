@@ -24,6 +24,7 @@
 | PyQt 桌面工作台 | 默认主线，支持 smoke 启动 | `EmbedDebug.bat` |
 | Serial Station | UART/TCP/UDP 主流程已有可见入口；Profile 加载 System 日志、协议切换 System 日志、连接生命周期 System 日志、连接控件状态、命令输入写入、Profile 名称输入、Profile 下拉选项、端点 Profile 回填、端点默认文本、端点控件文案、串口配置选项、串口 Profile 参数回填、串口连接字段读取、日志视图内容、日志筛选选项、System/Error 诊断日志筛选、System/Error 日志显示与统计、System/Error 导出回放方向保持、controller 错误日志入库、日志过滤规则、串口端口空态、命令历史选项、TCP/UDP 端点校验、普通状态文本、结果状态反馈、Profile 标签反馈、日志行与日志统计反馈、RX 注入反馈已公共化，UDP UI loopback 收发已验证，断开、刷新端口、发送、快捷键、Profile 恢复、错误状态反馈和窗口生命周期可诊断 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
 | 主题系统 | VOFA+ 精致工业风深色主题，启动即生效；色板/尺寸 token 集中管理，QSS 程序化生成覆盖全部 `serialStation*` 控件，连接按钮三态、日志区终端配色、状态药丸、滚动条与波形区统一深色工业风；支持运行时切换与外部 QSS 编辑路径 | `python/embeddebug/serial_station/ui/theme/` |
+| 三区卡片化布局 | 主窗口三区分栏（左连接配置 / 中波形+日志 / 右命令+Profile），6 张圆角卡片面板，QSplitter 可拖拽分区；按钮接入 lucide SVG 图标（plug/refresh-cw/send/save/play 等）按 palette 着色 | `python/embeddebug/serial_station/ui/layout_main.py` |
 | 协议解析 | RawData / FireWater / JustFloat 已纳入测试，协议选择动作已独立 | `python/embeddebug/serial_station/ui/protocol_actions.py` |
 | 日志与回放 | 支持结构化记录、过滤、搜索、统计、清空、导出、重放和失败可恢复反馈 | `python/embeddebug/serial_station/ui/log_actions.py` |
 | 波形预览 | 基于 pyqtgraph 接入轻量趋势视图，测量展示动作已独立 | `python/embeddebug/serial_station/ui/measurement_actions.py` |
@@ -41,6 +42,10 @@
 Serial Station
   ui/                  只收集用户意图与展示状态
     theme/             VOFA+ 工业风深色主题：palette/tokens/QSS 生成与 ThemeManager
+    layout_cards/      卡片化面板（serialStationCard 圆角+边框+标题行）
+    layout_main        三区分栏 QSplitter 装配
+    icons              IconManager：lucide SVG 加载 + palette 着色 + 缓存
+    button_icons       按 objectName 装饰按钮图标
   controllers/         编排流程、错误映射、状态同步
   core/                会话、字节收发、dispatcher、codec
   protocols/           帧定义、命令构建、流式解析

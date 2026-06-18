@@ -22,6 +22,7 @@ from embeddebug.serial_station.ui import (
     shortcuts,
     status_actions,
 )
+from embeddebug.serial_station.ui import button_icons
 from embeddebug.serial_station.ui.sections import build_main_layout
 
 
@@ -37,9 +38,10 @@ class SerialStationMainWindow(QMainWindow):
 
         self.setObjectName("embeddebugPySerialStationWindow")
         self.setWindowTitle(self.tr("EmbedDebug PyQt"))
-        self.resize(960, 640)
+        self.resize(1180, 720)
 
         self.setCentralWidget(build_main_layout(self, self._controller))
+        button_icons.apply_button_icons(self)
 
     def keyPressEvent(self, event: object) -> None:
         if shortcuts.handle_key_press(self, event):

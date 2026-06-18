@@ -9,13 +9,15 @@ from PyQt6.QtWidgets import QComboBox, QHBoxLayout, QLabel, QLineEdit, QPlainTex
 
 from embeddebug.serial_station.controllers import SerialWorkbenchController
 from embeddebug.serial_station.ui import command_section
+from embeddebug.serial_station.ui import layout_cards
+from embeddebug.serial_station.ui import layout_main
 from embeddebug.serial_station.ui.connection_toolbar import build_connection_toolbar
 from embeddebug.serial_station.ui.log_filter_options import (
     default_log_filter_text,
     log_filter_options,
 )
 from embeddebug.serial_station.ui.shortcuts import install_shortcuts
-from embeddebug.serial_station.ui.waveform_preview import SerialWaveformPreview
+from embeddebug.serial_station.ui.top_bar import build_top_bar
 
 
 class SerialStationSectionsHost(Protocol):
@@ -45,12 +47,8 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     root.setObjectName("serialStationPyRoot")
 
     layout = QVBoxLayout(root)
-    layout.setContentsMargins(16, 16, 16, 16)
-    layout.setSpacing(12)
-
-    title = QLabel(owner.tr("Serial Station PyQt MVP"), root)
-    title.setObjectName("serialStationPyTitle")
-    title.setAlignment(Qt.AlignmentFlag.AlignLeft)
+    layout.setContentsMargins(12, 12, 12, 12)
+    layout.setSpacing(10)
 
     owner._status_label = QLabel(owner.tr("Disconnected"), root)
     owner._status_label.setObjectName("serialStationStatusLabel")
@@ -59,37 +57,50 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     owner._profile_label.setObjectName("serialStationProfileLabel")
     owner._profile_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
+    # TopBar 复用上面的状态/Profile 标签（reparent 到右侧药丸区），保持 findChild 契约。
+    top_bar = build_top_bar(owner, root)
+    layout.addWidget(top_bar)
+
+    # 字面量委托：架构测试要求这两行原样存在。
     toolbar = build_connection_toolbar(owner, controller, root)
-
     send_row = command_section.build_send_row(owner, root)
-    inject_row = build_inject_row(owner, root)
 
-    owner._log_view = QPlainTextEdit(root)
-    owner._log_view.setObjectName("serialStationLogView")
-    owner._log_view.setPlaceholderText(owner.tr("No serial log entries"))
-    owner._log_view.setReadOnly(True)
-
+    # log_stats_label 在 build_log_row 内被引用，需先创建。
     owner._log_stats_label = QLabel(root)
     owner._log_stats_label.setObjectName("serialStationLogStatsLabel")
     owner._log_stats_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-    owner._update_log_stats()
 
-    owner._waveform_preview = SerialWaveformPreview(root)
+    inject_row = build_inject_row(owner, root)
     log_row = build_log_row(owner, root)
     profile_row = build_profile_row(owner, root)
     footer = build_footer(owner, root)
 
-    layout.addWidget(title)
-    layout.addLayout(toolbar)
-    layout.addLayout(send_row)
-    layout.addLayout(inject_row)
-    layout.addWidget(owner._waveform_preview, 1)
-    layout.addWidget(owner._log_view, 1)
-    layout.addLayout(log_row)
-    layout.addLayout(profile_row)
-    layout.addLayout(footer)
+    splitter = layout_main.assemble_three_zone(
+        owner, root, toolbar, send_row, inject_row, log_row, profile_row, footer
+    )
+    layout.addWidget(splitter, 1)
+
+    # 中区日志卡由 layout_main 创建；log_view 注入到其主体。
+    _populate_center_log_card(owner)
+
     install_shortcuts(owner)
     return root
+
+
+def _populate_center_log_card(owner: SerialStationSectionsHost) -> None:
+    """把 log_view 注入中区日志卡主体（log_stats_label 随 log_row 在右区）。"""
+
+    log_card = getattr(owner, "_center_log_card", None)
+    if log_card is None:
+        return
+    body = layout_cards.card_body(log_card)
+
+    owner._log_view = QPlainTextEdit(log_card)
+    owner._log_view.setObjectName("serialStationLogView")
+    owner._log_view.setPlaceholderText(owner.tr("No serial log entries"))
+    owner._log_view.setReadOnly(True)
+    body.addWidget(owner._log_view, 1)
+    owner._update_log_stats()
 
 
 def build_inject_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:

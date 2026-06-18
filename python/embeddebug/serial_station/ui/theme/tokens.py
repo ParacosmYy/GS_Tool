@@ -11,6 +11,8 @@ RADIUS_NONE = "0px"
 RADIUS_SM = "4px"   # 小控件（徽章、标签）
 RADIUS_MD = "6px"   # 输入框、按钮、下拉
 RADIUS_LG = "8px"   # 卡片、面板
+RADIUS_XL = "12px"  # 大卡片、TopBar（对齐 EK-OmniProbe surface-card）
+RADIUS_2XL = "16px" # 主信息卡（波形/日志）玻璃卡片观感
 RADIUS_PILL = "12px"  # 状态药丸
 
 # ── 间距 ───────────────────────────────────────────────────────────
@@ -49,6 +51,15 @@ CONTROL_HEIGHT_SM = "24px"
 CONTROL_HEIGHT_MD = "28px"
 CONTROL_HEIGHT_LG = "32px"
 
+# ── 卡片 / 玻璃质感（QSS 无 blur，用分层渐变与边框近似 EK-OmniProbe surface-card） ──
+# 卡片顶部高光渐变（模拟玻璃 inner highlight），由 QSS qlineargradient 引用。
+CARD_HIGHLIGHT_STOP_0 = "rgba(255, 255, 255, 0.05)"
+CARD_HIGHLIGHT_STOP_1 = "rgba(255, 255, 255, 0.00)"
+# 卡片悬浮时强调描边色（半透明强调青，由 palette.ACCENT_BORDER 复用）。
+# 主信息卡内边距（波形/日志卡，内容区更宽松）。
+PADDING_CARD = "12px"
+PADDING_CARD_LG = "14px"
+
 
 def all_tokens() -> dict[str, str]:
     """返回尺寸 token 名 -> 值的有序映射，供 QSS 生成与测试校验。"""
@@ -58,6 +69,8 @@ def all_tokens() -> dict[str, str]:
         "radius_sm": RADIUS_SM,
         "radius_md": RADIUS_MD,
         "radius_lg": RADIUS_LG,
+        "radius_xl": RADIUS_XL,
+        "radius_2xl": RADIUS_2XL,
         "radius_pill": RADIUS_PILL,
         "spacing_none": SPACING_NONE,
         "spacing_xs": SPACING_XS,
@@ -84,4 +97,8 @@ def all_tokens() -> dict[str, str]:
         "control_height_sm": CONTROL_HEIGHT_SM,
         "control_height_md": CONTROL_HEIGHT_MD,
         "control_height_lg": CONTROL_HEIGHT_LG,
+        "card_highlight_stop_0": CARD_HIGHLIGHT_STOP_0,
+        "card_highlight_stop_1": CARD_HIGHLIGHT_STOP_1,
+        "padding_card": PADDING_CARD,
+        "padding_card_lg": PADDING_CARD_LG,
     }

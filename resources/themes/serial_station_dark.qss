@@ -348,3 +348,33 @@ QObject#serialStationClearShortcut,
 QObject#serialStationRefreshPortsShortcut {
     /* no-op */
 }
+
+/* === 卡片与三区分栏 === */
+QFrame#serialStationCard {
+    background-color: #151b24;
+    border: 1px solid #27313f;
+    border-radius: 8px;
+}
+QWidget#serialStationCardHeader {
+    background-color: transparent;
+}
+QLabel#serialStationCardTitle {
+    color: #d7def3;
+    font-size: 14px;
+    font-weight: 600;
+}
+QLabel#serialStationCardIcon {
+    background-color: transparent;
+}
+QWidget#serialStationLeftZone,
+QWidget#serialStationCenterZone,
+QWidget#serialStationRightZone {
+    background-color: transparent;
+    border: none;
+}
+QSplitter#serialStationMainSplitter::handle {
+    background-color: #27313f;
+}
+QSplitter#serialStationMainSplitter::handle:horizontal {
+    width: 2px;
+}

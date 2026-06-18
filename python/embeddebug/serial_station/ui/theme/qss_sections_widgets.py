@@ -1,6 +1,7 @@
 """QSS 分区生成器 — 交互控件与展示区。
 
 包含按钮、日志视图、波形、状态标签、滚动条、快捷键契约分区。
+卡片/三栏 Shell/TopBar 的样式已迁移到 ``qss_sections_layout``，便于统一深化。
 颜色引用 ``palette``，尺寸引用 ``tokens``，不 import PyQt。
 """
 
