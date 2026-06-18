@@ -23,6 +23,7 @@ from PyQt6.QtWidgets import (
 
 from embeddebug.app.app_controller import AppController
 from embeddebug.serial_station.rtt import RttChannel, RttConfig, RttSession, RttTransportStub
+from embeddebug.serial_station.ui.controls import DotState, StatusDot
 
 _DEMO_CHANNELS = (
     RttChannel(name="terminal", buffer_size=1024, mode="up"),
@@ -71,6 +72,8 @@ class RttPanel:
         self._start_btn.setObjectName("serialStationRttStartButton")
         self._start_btn.setCheckable(True)
         self._start_btn.clicked.connect(self._toggle)
+        # Batch 10-2: 运行状态圆点（GREEN=串口 / BLUE=演示 / OFF=停止，呼吸激活 PulseAnimation）。
+        self._status_dot = StatusDot(parent=widget)
         self._status = QLabel(widget.tr("未启动"), widget)
         self._status.setObjectName("serialStationRttStatusLabel")
         top.addWidget(ch_label)
@@ -78,6 +81,7 @@ class RttPanel:
         top.addWidget(clear_btn)
         top.addStretch(1)
         top.addWidget(self._start_btn)
+        top.addWidget(self._status_dot)
         top.addWidget(self._status)
         layout.addLayout(top)
 
@@ -135,14 +139,18 @@ class RttPanel:
         if transport is not None:
             self._stub = None
             self._session = RttSession(transport, config)
-            self._status.setText(self._widget.tr("● 运行中（串口）"))
+            # Batch 10-2: 串口运行 GREEN（呼吸），文字不再带 ●。
+            self._status_dot.set_state(DotState.GREEN)
+            self._status.setText(self._widget.tr("运行中（串口）"))
         else:
             self._stub = RttTransportStub(open=True)
             self._session = RttSession(self._stub, config)
             self._demo_timer = QTimer(self._widget)
             self._demo_timer.timeout.connect(self._demo_tick)
             self._demo_timer.start(800)
-            self._status.setText(self._widget.tr("● 运行中（演示）"))
+            # 演示模式 BLUE（活动呼吸）。
+            self._status_dot.set_state(DotState.BLUE)
+            self._status.setText(self._widget.tr("运行中（演示）"))
         self._session.on_bytes_received(lambda b: self._bridge.bytes_received.emit(b))
         self._session.on_error(lambda m: self._bridge.error.emit(m))
         self._start_btn.setText(self._widget.tr("停止"))
@@ -160,6 +168,8 @@ class RttPanel:
         self._stub = None
         if self._start_btn is not None:
             self._start_btn.setText(self._widget.tr("启动"))
+        # Batch 10-2: 停止后圆点恢复 OFF（静止）。
+        self._status_dot.set_state(DotState.OFF)
         if self._status is not None:
             self._status.setText(self._widget.tr("未启动"))
 

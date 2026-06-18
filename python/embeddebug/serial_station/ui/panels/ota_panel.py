@@ -33,6 +33,7 @@ from embeddebug.ota import (
     TransferResult,
     make_protocol,
 )
+from embeddebug.serial_station.ui.controls import DotState, StatusDot
 
 
 _PROTOCOL_OPTIONS = (
@@ -110,6 +111,9 @@ class OtaPanel:
 
         # 状态 + 开始按钮行。
         action_row = QHBoxLayout()
+        # Batch 10-2: 连接状态圆点（呼吸指示，替代 ●/○ 字符；激活 PulseAnimation）。
+        self._status_dot = StatusDot(parent=widget)
+        action_row.addWidget(self._status_dot)
         self._status_label = QLabel(widget.tr("未连接"), widget)
         self._status_label.setObjectName("serialStationOtaStatusLabel")
         action_row.addWidget(self._status_label)
@@ -156,8 +160,10 @@ class OtaPanel:
         if self._app_controller is None:
             return
         connected = self._app_controller.is_connected()
+        # Batch 10-2: 圆点承担 ●/○ 视觉，文字不再带字符。
+        self._status_dot.set_state(DotState.GREEN if connected else DotState.OFF)
         self._status_label.setText(
-            self._widget.tr("● 已连接") if connected else self._widget.tr("○ 未连接")
+            self._widget.tr("已连接") if connected else self._widget.tr("未连接")
         )
         self._start_button.setEnabled(connected and bool(self._file_edit.text()))
 

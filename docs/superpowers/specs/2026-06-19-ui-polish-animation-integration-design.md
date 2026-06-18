@@ -138,12 +138,27 @@ harness 现实：当前环境唯一 subagent 类型是只读 `Explore`（Glob/Gr
 | 7-5 按钮 ripple 水波纹 | `f765552c8` | 911 passed | =0 | 628→629 | 剩余项④ripple 反馈 |
 | 7-6 域面板 stagger 入场动画 | `2ae46ca3d` | 920 passed | =0 | 629→630 | 6 个域面板入场动画（原仅 PlaceholderPanel） |
 | 8 ShakeAnimation 接入校验失败 | `d85a30af7` | 930 passed | =0 | 630→631 | 抖动接入输入校验失败路径（5 项微交互清单最后 1 项） |
-| 9 域面板占位+游标右键交互 | 待提交 | 941 passed | =0 | 631→632 | OTA skeleton/CAN·BLE·RTT EmptyState/CursorManager 右键交互 |
+| 9 域面板占位+游标右键交互 | `6074e610f` | 941 passed | =0 | 631→632 | OTA skeleton/CAN·BLE·RTT EmptyState/CursorManager 右键交互 |
 
 - 本轮总增量：`+14`（618 → 632）
 - 测试增量：838 → 941（+103 个新测试覆盖 6 个问题域 + 9 个续迭代子项）
 - 双 smoke 入口（`uv run start-embeddebug --smoke` + `cmd /c EmbedDebug.bat --smoke`）全程退出码 0
 - 阶段：600→699（结构与流程稳定期）
+
+### 6.3 续迭代（Batch 10，连接状态指示器统一）
+
+Batch 7~9 把 5 项微交互清单和域面板占位收口后，发现域面板的「连接/运行状态」仍用
+`●`/`○` 文本字符占位，未走真正的自绘指示控件 + 动画。Batch 10 新建 `StatusDot`
+自绘圆点控件，把 `PulseAnimation` 接入更通用的状态指示路径，替换三个域面板的字符占位：
+
+| Batch | Commit | 测试 | smoke | 得分 | 收口项 |
+|---|---|---|---|---|---|
+| 10-1 StatusDot 控件 + PulseAnimation 激活 | 待提交 | 955 passed | =0 | 632→633 | 新建 StatusDot（自绘径向渐变球 + flash 闪光 + breathing 呼吸），PulseAnimation.breathing 从单点 LED 扩到通用状态指示 |
+| 10-2 域面板状态圆点接线 | 待提交 | 959 passed | =0 | — | OTA/RTT/Automation/BLE 四面板 ●/○ 字符→StatusDot；模块级 import 修复 lazy-import NameError |
+
+- 本轮增量：`+1`（632 → 633）
+- 测试增量：941 → 959（+18，含 StatusDot 控件 + PulseAnimation 死代码激活 + QSS 覆盖断言）
+- 关键修复：三面板 lazy import 把 `DotState` 限制在 `build()` 作用域，运行时 `_refresh_connection_state`/`_toggle_active` 报 NameError → 改模块级 import
 
 ## 七、收口结论
 
@@ -178,5 +193,9 @@ harness 现实：当前环境唯一 subagent 类型是只读 `Explore`（Glob/Gr
 9. **域面板占位（Batch 7-5/7-6/9）**：按钮 ripple 水波纹（7-5）；6 个域面板 stagger
    入场动画（7-6，原仅 PlaceholderPanel）；OTA 传输 skeleton shimmer + CAN/BLE/RTT 空数据
    EmptyState 占位（有数据 hide/清空 show，Batch 9-1/9-2）。
+10. **连接状态指示器统一（Batch 10）**：新建 `StatusDot` 自绘圆点控件（径向渐变球体 +
+    flash 闪光 + PulseAnimation 呼吸），替代 OTA/RTT/Automation/BLE 四面板的 `●`/`○` 文本
+    字符占位；PulseAnimation 死代码接入路径从单点 LED 扩到通用状态指示，呼吸态仅在
+    GREEN/BLUE 活动态启动（OFF/YELLOW/RED 静止避免干扰）。
 
 剩余可选优化：**全部已收口**，无遗留项。

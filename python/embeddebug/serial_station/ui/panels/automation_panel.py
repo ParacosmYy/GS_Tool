@@ -32,6 +32,7 @@ from embeddebug.serial_station.automation import (
     TriggerType,
 )
 from embeddebug.serial_station.controllers import SerialWorkbenchController
+from embeddebug.serial_station.ui.controls import DotState, StatusDot
 
 _COLUMNS = ("启用", "名称", "触发", "动作", "冷却(ms)")
 
@@ -88,10 +89,13 @@ class AutomationPanel:
         self._run_btn.setObjectName("serialStationAutomationRunButton")
         self._run_btn.setCheckable(True)
         self._run_btn.clicked.connect(self._toggle_active)
+        # Batch 10-2: 监听状态圆点（GREEN 呼吸=监听中 / OFF=未启用，激活 PulseAnimation）。
+        self._status_dot = StatusDot(parent=widget)
         self._status = QLabel(widget.tr("监听未启用"), widget)
         self._status.setObjectName("serialStationAutomationStatusLabel")
         top.addWidget(self._run_btn)
         top.addStretch(1)
+        top.addWidget(self._status_dot)
         top.addWidget(self._status)
         layout.addLayout(top)
 
@@ -159,11 +163,14 @@ class AutomationPanel:
         if active:
             controller.on_log_entry(self._on_log_entry)
             controller.on_measurement_batch(self._on_measurement)
-            self._status.setText(self._widget.tr("● 监听中"))
+            # Batch 10-2: 监听中 GREEN 呼吸，文字不带 ●。
+            self._status_dot.set_state(DotState.GREEN)
+            self._status.setText(self._widget.tr("监听中"))
             self._append_log(self._widget.tr("已启用监听，订阅 controller 事件。"))
         else:
             # controller 当前无 remove_callback；通过标志停止求值（on_* 检查 _active）。
-            self._status.setText(self._widget.tr("○ 监听未启用"))
+            self._status_dot.set_state(DotState.OFF)
+            self._status.setText(self._widget.tr("监听未启用"))
             self._append_log(self._widget.tr("已停止监听。"))
 
     def _on_log_entry(self, entry: object) -> None:

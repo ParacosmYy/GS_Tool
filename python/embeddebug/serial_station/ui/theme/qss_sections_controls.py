@@ -15,6 +15,10 @@ def controls_section() -> str:
 QWidget#serialStationStatusLed {{
     background-color: transparent;
 }}
+/* Batch 10-1: 状态圆点（自绘 + PulseAnimation 呼吸），QSS 仅契约占位。 */
+QWidget#serialStationStatusDot {{
+    background-color: transparent;
+}}
 /* 命令滑块容器与子控件 */
 QWidget#serialStationCommandSlider {{
     background-color: {P.BG_PANEL};

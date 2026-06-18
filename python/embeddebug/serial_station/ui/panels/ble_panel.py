@@ -26,6 +26,7 @@ from PyQt6.QtWidgets import (
 
 from embeddebug.app.app_controller import AppController
 from embeddebug.serial_station.ble import BleFrameCodec, BleTransportStub, expand_uuid
+from embeddebug.serial_station.ui.controls import DotState, StatusDot
 
 _STUB_ADDRESS = "AA:BB:CC:DD:EE:FF"
 
@@ -61,10 +62,13 @@ class BlePanel:
         self._connect_btn.setObjectName("serialStationBleConnectButton")
         self._connect_btn.setCheckable(True)
         self._connect_btn.clicked.connect(self._connect)
+        # Batch 10-2: 连接状态圆点（GREEN 呼吸=已连接 / OFF=未连接，激活 PulseAnimation）。
+        self._status_dot = StatusDot(parent=widget)
         scan.addWidget(scan_label)
         scan.addWidget(self._device_combo, 1)
         scan.addWidget(scan_btn)
         scan.addWidget(self._connect_btn)
+        scan.addWidget(self._status_dot)
         layout.addLayout(scan)
 
         # GATT 树。
@@ -166,6 +170,8 @@ class BlePanel:
                 self._refresh_tree()
                 # Batch 9-2: 连接成功填充树后隐藏空状态。
                 self._empty_state.hide()
+                # Batch 10-2: 已连接 GREEN（呼吸指示）。
+                self._status_dot.set_state(DotState.GREEN)
                 self._log.appendPlainText(self._widget.tr("已连接 {addr}").format(addr=_STUB_ADDRESS))
             else:
                 self._connect_btn.setChecked(False)
@@ -176,6 +182,8 @@ class BlePanel:
             self._tree.clear()
             # Batch 9-2: 断开后恢复空状态占位。
             self._empty_state.show()
+            # Batch 10-2: 断开后圆点恢复 OFF（静止）。
+            self._status_dot.set_state(DotState.OFF)
             self._log.appendPlainText(self._widget.tr("已断开"))
 
     def _refresh_tree(self) -> None:

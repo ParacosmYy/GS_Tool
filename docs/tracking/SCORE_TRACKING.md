@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 632分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 368分
+> 当前: 633分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 367分
 
 ---
 
@@ -334,14 +334,15 @@
 | 630 | Serial Station UI 美化 Batch 7-6 — 域面板 stagger 入场动画 | 新建 panels/_enter_anim play/stop_panel_enter；6 个域面板 on_enter/on_leave 接入场动画；8 files |
 | 631 | Serial Station UI 美化 Batch 8 — ShakeAnimation 接入校验失败 | 抖动接入 3 个校验路径（空命令/endpoint host-port/空端口）；至此按压/hover/focus/抖动/呼吸灯 5 项全接线；4 files |
 | 632 | Serial Station UI 美化 Batch 9 — 域面板占位+游标右键交互 | OTA 传输 skeleton shimmer；CAN/BLE/RTT 空数据 EmptyState（有数据 hide/清空 show）；CursorManager 右键/双击游标交互（install_cursor_interactions 接入 preview，Qt6 鼠标事件兼容 helper）；清理测试文件重复 import |
+| 633 | Serial Station UI 美化 Batch 10 — StatusDot 状态圆点+面板接线 | 新建 StatusDot 自绘圆点控件（径向渐变球+flash 闪光+PulseAnimation breathing），PulseAnimation 死代码接入路径从单点 LED 扩到通用状态指示；OTA/RTT/Automation/BLE 四面板 ●/○ 字符→StatusDot（GREEN/BLUE 活动态呼吸，OFF/YELLOW/RED 静止）；修复四面板 lazy-import 把 DotState 限制在 build() 作用域导致的运行时 NameError（改模块级 import）；14 个新单测覆盖控件+PulseAnimation 激活+QSS 覆盖 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#632` 的完整记录
+- 当前文档已整理到 `#633` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
-- 619~632 为「UI 美化与动画接线」连续迭代（Batch 1~9），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
+- 619~633 为「UI 美化与动画接线」连续迭代（Batch 1~10），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
