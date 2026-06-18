@@ -184,14 +184,13 @@ def test_workbench_controller_runtime_facade_stays_below_250_lines():
 
 
 def test_score_tracking_head_not_behind_max_record():
-    """SCORE_TRACKING 头部声明的当前分不得落后于文档内最大记录编号。
+    """SCORE_TRACKING 不得滞后：头部>=最大记录，且文档 batch 号不落后 git 太多。
 
-    防止「头部忘了更新、记录已追加」或「头部超前、记录缺失」的脱节——
-    这是反复出现的文档滞后问题（曾滞后 619~631、634~648 两轮）。
-    守护只校验单调一致性（head >= max_record），不强制精确等于 commit 数，
-    避免因 commit 计数口径差异而脆弱失败。
+    1. 内部一致性：head_score >= max_record。
+    2. 外部滞后：文档最大 Batch 号 >= git 最新 Batch 号 - 3（容差 3）。
     """
     import re
+    import subprocess
 
     text = Path("docs/tracking/SCORE_TRACKING.md").read_text(encoding="utf-8")
     head_match = re.search(r"当前:\s*(\d+)分", text)
@@ -206,6 +205,24 @@ def test_score_tracking_head_not_behind_max_record():
         f"SCORE_TRACKING 头部分数 {head_score} 落后于最大记录编号 {max_record}；"
         f"请回填头部「当前」分到至少 {max_record}"
     )
+
+    # 外部滞后检查：文档 Batch 号 vs git 最新 Batch 号（容差 3）。
+    doc_batches = [int(m) for m in re.findall(r"Batch (\d+)", text)]
+    try:
+        log = subprocess.check_output(
+            ["git", "log", "--oneline", "-50"], text=True, stderr=subprocess.DEVNULL
+        )
+        git_batches = [int(m) for m in re.findall(r"Batch (\d+)", log)]
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return  # git 不可用，跳过外部检查。
+
+    if doc_batches and git_batches:
+        doc_max_batch = max(doc_batches)
+        git_max_batch = max(git_batches)
+        assert doc_max_batch >= git_max_batch - 3, (
+            f"SCORE_TRACKING 文档最新 Batch {doc_max_batch} 严重落后于 git "
+            f"最新 Batch {git_max_batch}（容差 3）；请回填 SCORE_TRACKING"
+        )
 
 
 def test_no_new_batch_suffixed_test_files():
