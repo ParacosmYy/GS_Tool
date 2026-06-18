@@ -7,7 +7,7 @@ from typing import Sequence
 
 import numpy as np
 
-from embeddebug.serial_station.protocols import ProtocolEvent
+from embeddebug.serial_station.protocols.base import ProtocolEvent
 
 
 @dataclass(frozen=True)
