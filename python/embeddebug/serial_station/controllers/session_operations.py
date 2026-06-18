@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
-from embeddebug.serial_station.protocols import ProtocolEvent
+from embeddebug.serial_station.protocols.base import ProtocolEvent
 from embeddebug.serial_station.services import (
     SerialLogService,
     SerialProfileService,

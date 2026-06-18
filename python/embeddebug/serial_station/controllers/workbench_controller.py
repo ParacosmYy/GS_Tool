@@ -16,7 +16,7 @@ from embeddebug.serial_station.controllers import controller_workbench_state as 
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
 from embeddebug.serial_station.controllers.log_entry_codec import entry_from_event
 from embeddebug.serial_station.drivers import SerialPortConfig, SerialTransport, TransportRegistry
-from embeddebug.serial_station.protocols import ProtocolEvent
+from embeddebug.serial_station.protocols.base import ProtocolEvent
 from embeddebug.shared import OperationResult
 
 

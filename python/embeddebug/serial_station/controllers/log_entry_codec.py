@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
-from embeddebug.serial_station.protocols import ProtocolEvent
+from embeddebug.serial_station.protocols.base import ProtocolEvent
 
 
 _KNOWN_DIRECTIONS = {"tx", "rx", "system", "error"}
