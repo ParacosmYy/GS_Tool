@@ -139,4 +139,34 @@ QPushButton#serialStationPaletteButton:hover {{
     background-color: {P.BG_PANEL_RAISED};
     border-color: {P.ACCENT_BORDER};
     color: {P.TEXT_PRIMARY};
+}}
+/* Batch 17: DashboardPanel 顶栏控件 + 主体容器 */
+QWidget#serialStationDashboardPanel {{
+    background-color: transparent;
+}}
+QFrame#serialStationDashboardPalette {{
+    background-color: {P.BG_PANEL};
+    border: {T.BORDER_THIN} solid {P.BORDER};
+    border-radius: {T.RADIUS_LG};
+}}
+QPushButton#serialStationDashboardAddTabButton,
+QPushButton#serialStationDashboardClearButton,
+QPushButton#serialStationDashboardSaveButton,
+QPushButton#serialStationDashboardLoadButton {{
+    background-color: {P.BG_PANEL_RAISED};
+    color: {P.TEXT_PRIMARY};
+    border: {T.BORDER_THIN} solid {P.ACCENT_BORDER};
+    border-radius: {T.RADIUS_MD};
+    padding: {T.PADDING_SM};
+}}
+QPushButton#serialStationDashboardAddTabButton:hover,
+QPushButton#serialStationDashboardClearButton:hover,
+QPushButton#serialStationDashboardSaveButton:hover,
+QPushButton#serialStationDashboardLoadButton:hover {{
+    background-color: {P.ACCENT_SOFT};
+    border-color: {P.ACCENT};
+}}
+QLabel#serialStationDashboardStatusLabel {{
+    color: {P.TEXT_SECONDARY};
+    font-size: {T.FONT_SM};
 }}"""

@@ -80,6 +80,11 @@ def register_default_panels() -> None:
         "automation", "zap", "自动化", "规则触发器与动作（即将就绪）。",
         "embeddebug.serial_station.ui.panels.automation_panel", "AutomationPanel",
     )
+    # 仪表盘（拖拽式控件仪表盘，Batch 17 激活 dashboard 子系统）。
+    _register_real_or_placeholder(
+        "dashboard", "layout-dashboard", "仪表盘", "拖拽式控件仪表盘（即将就绪）。",
+        "embeddebug.serial_station.ui.panels.dashboard_panel", "DashboardPanel",
+    )
     # 设置（主题切换 + 快捷键 + 关于）。
     _register_real_or_placeholder(
         "settings", "settings", "设置", "应用设置与主题（即将就绪）。",

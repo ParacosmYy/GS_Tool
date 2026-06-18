@@ -55,13 +55,12 @@ def test_settings_panel_builds_and_applies_theme(qtbot):
     assert panel._theme_status is not None
 
 
-# ── dashboard 死代码审计（记录缺口） ───────────────────────────────
-def test_dashboard_subsystem_has_no_external_consumers():
-    """审计：dashboard 子系统应无外部消费者（记录为后续 batch 的死代码缺口）。
+# ── dashboard 激活验证（Batch 17 反转 Batch 16 审计） ──────────────
+def test_dashboard_subsystem_has_external_consumer():
+    """Batch 17 激活后：dashboard 子系统应有外部消费者（DashboardPanel）。
 
-    dashboard.canvas/factory/fullscreen/palette/tabs 全部只在 dashboard/ 内部互相
-    引用，无面板/窗口实际接入。本测试固化这一事实，供后续 batch 决定是否激活。
-    若未来有面板接入 dashboard，本测试需更新（或删除）。
+    Batch 16 时 dashboard 是零外部消费者的死代码骨架；Batch 17 注册 DashboardPanel
+    后反转此事实。本测试固化 dashboard 已被面板接入，防止回归成死代码。
     """
 
     from pathlib import Path
@@ -76,20 +75,17 @@ def test_dashboard_subsystem_has_no_external_consumers():
             text = py.read_text(encoding="utf-8")
         except OSError:
             continue
-        if "dashboard" in text and "import" in text:
-            # 过滤注释/docstring 中的提及，只看真实 import 行。
-            for line in text.splitlines():
-                stripped = line.strip()
-                if stripped.startswith("#"):
-                    continue
-                if "import" in stripped and "dashboard" in stripped:
-                    external_importers.append(str(py))
-                    break
-    # 当前 dashboard 是死代码（无外部消费者）。记录这一事实；未来激活时此断言会失败，
-    # 提醒更新测试。
-    assert external_importers == [], (
-        f"dashboard has external importers {external_importers}; "
-        "if dashboard is now activated, update this audit test"
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith("#"):
+                continue
+            if "import" in stripped and "dashboard" in stripped:
+                external_importers.append(str(py))
+                break
+    # Batch 17 后 dashboard_panel.py 应是消费者（不再为空）。
+    assert any("dashboard_panel.py" in p for p in external_importers), (
+        "dashboard_panel.py should import the dashboard subsystem; "
+        "if dashboard is deactivated again, this test catches the regression"
     )
 
 
