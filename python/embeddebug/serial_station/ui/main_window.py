@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QSplitter
 
 from embeddebug.serial_station.controllers import (
     SerialWorkbenchController,
@@ -23,6 +24,8 @@ from embeddebug.serial_station.ui import (
     status_actions,
 )
 from embeddebug.serial_station.ui import button_icons
+from embeddebug.serial_station.ui.command_palette import CommandItem, CommandPalette
+from embeddebug.serial_station.ui.responsive_layout import ResponsiveLayout
 from embeddebug.serial_station.ui.sections import build_main_layout
 
 
@@ -42,6 +45,53 @@ class SerialStationMainWindow(QMainWindow):
 
         self.setCentralWidget(build_main_layout(self, self._controller))
         button_icons.apply_button_icons(self)
+        self._install_command_palette()
+        self._install_responsive_layout()
+
+    def _install_command_palette(self) -> None:
+        """装配命令面板（Ctrl+P）并注册常用命令。"""
+
+        self._command_palette = CommandPalette(self)
+        self._command_palette.set_commands(self._build_command_items())
+
+    def _build_command_items(self) -> tuple[CommandItem, ...]:
+        """构建命令面板可用命令。"""
+
+        return (
+            CommandItem(self.tr("Connect (Fake)"), self._connect_fake, self.tr("Transport")),
+            CommandItem(self.tr("Disconnect"), self._disconnect, self.tr("Transport")),
+            CommandItem(self.tr("Refresh Ports"), self._refresh_serial_ports, self.tr("Transport")),
+            CommandItem(self.tr("Clear Log"), self._clear_log, self.tr("Session")),
+            CommandItem(self.tr("Save Log"), self._export_log, self.tr("Session")),
+            CommandItem(self.tr("Replay Log"), self._replay_log, self.tr("Session")),
+            CommandItem(self.tr("Save Profile"), self._save_profile, self.tr("Profile")),
+            CommandItem(self.tr("Load Profile"), self._load_profile, self.tr("Profile")),
+        )
+
+    def _install_responsive_layout(self) -> None:
+        """装配响应式布局控制器。"""
+
+        splitter = self.findChild(QSplitter, "serialStationMainSplitter")
+        if splitter is None:
+            return
+        self._responsive = ResponsiveLayout(splitter, self)
+
+    def _open_command_palette(self) -> None:
+        """打开命令面板（Ctrl+P）。"""
+
+        palette = getattr(self, "_command_palette", None)
+        if palette is None:
+            return
+        palette.set_commands(self._build_command_items())
+        palette.open()
+
+    def resizeEvent(self, event: object) -> None:
+        """窗口 resize 时驱动响应式断点。"""
+
+        super().resizeEvent(event)
+        responsive = getattr(self, "_responsive", None)
+        if responsive is not None:
+            responsive.on_window_resized(self.width())
 
     def keyPressEvent(self, event: object) -> None:
         if shortcuts.handle_key_press(self, event):

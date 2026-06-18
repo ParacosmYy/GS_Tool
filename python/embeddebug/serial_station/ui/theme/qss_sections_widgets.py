@@ -146,6 +146,23 @@ QLabel#serialStationWaveformStatusLabel {{
     font-family: {T.FONT_FAMILY_MONO};
     font-size: {T.FONT_SM};
     padding: {T.SPACING_SM} {T.SPACING_MD};
+}}
+/* 多通道图例（对齐 VOFA+ 通道色块） */
+QWidget#serialStationWaveformLegend {{
+    background-color: transparent;
+    border-top: {T.BORDER_THIN} solid {P.BORDER};
+}}
+QLabel#serialStationWaveformLegendChip {{
+    background-color: transparent;
+    font-size: {T.FONT_SM};
+}}
+/* 游标读数 HUD */
+QLabel#serialStationWaveformCursorHud {{
+    background-color: transparent;
+    color: {P.TEXT_MUTED};
+    font-family: {T.FONT_FAMILY_MONO};
+    font-size: {T.FONT_SM};
+    padding: {T.SPACING_XS} {T.SPACING_MD};
 }}"""
 
 
@@ -218,11 +235,10 @@ QPlainTextEdit {{
 
 def shortcut_section() -> str:
     return """/* === Shortcut objectName contract === */
-/* QShortcut#serialStationSendShortcut / serialStationClearShortcut /
-   serialStationRefreshPortsShortcut — QShortcut 无可视样式，
-   objectName 仅用于测试与可发现性，此处保留契约占位。 */
+/* QShortcut 无可视样式，objectName 仅用于测试与可发现性，此处保留契约占位。 */
 QObject#serialStationSendShortcut,
 QObject#serialStationClearShortcut,
-QObject#serialStationRefreshPortsShortcut {
+QObject#serialStationRefreshPortsShortcut,
+QObject#serialStationCommandPaletteShortcut {
     /* no-op */
 }"""

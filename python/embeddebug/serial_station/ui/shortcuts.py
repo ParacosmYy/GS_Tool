@@ -12,6 +12,7 @@ class SerialStationShortcutHost(Protocol):
     def _send_text(self) -> None: ...
     def _clear_log(self) -> None: ...
     def _refresh_serial_ports(self) -> None: ...
+    def _open_command_palette(self) -> None: ...
 
 
 def install_shortcuts(owner: SerialStationShortcutHost) -> None:
@@ -29,7 +30,12 @@ def install_shortcuts(owner: SerialStationShortcutHost) -> None:
     refresh_shortcut.setObjectName("serialStationRefreshPortsShortcut")
     refresh_shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
     refresh_shortcut.activated.connect(owner._refresh_serial_ports)
-    owner._shortcuts = [send_shortcut, clear_shortcut, refresh_shortcut]
+
+    palette_shortcut = QShortcut(QKeySequence("Ctrl+P"), owner)
+    palette_shortcut.setObjectName("serialStationCommandPaletteShortcut")
+    palette_shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
+    palette_shortcut.activated.connect(owner._open_command_palette)
+    owner._shortcuts = [send_shortcut, clear_shortcut, refresh_shortcut, palette_shortcut]
 
 
 def handle_key_press(owner: SerialStationShortcutHost, event: object) -> bool:
@@ -47,6 +53,10 @@ def handle_key_press(owner: SerialStationShortcutHost, event: object) -> bool:
         return True
     if key == Qt.Key.Key_R:
         owner._refresh_serial_ports()
+        event.accept()
+        return True
+    if key == Qt.Key.Key_P:
+        owner._open_command_palette()
         event.accept()
         return True
     return False
