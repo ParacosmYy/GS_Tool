@@ -174,15 +174,23 @@ def test_appshell_notify_without_manager_no_crash(qtbot):
 
 # ── 源码接入断言 ───────────────────────────────────────────────────
 def test_appshell_sources_wire_notification_subsystem():
-    """AppShell 源码应引用 NotificationManager + ToastContainer + notify。"""
+    """AppShell 应委托 app_notifications 装配，并保留 notify/_show_ready_toast 入口。
 
-    from embeddebug.app import app_shell
+    Batch 15 重构后 NotificationManager/ToastContainer 实例化移到 app_notifications.py
+    （守 300 行门禁），AppShell 通过 _app_notifications 委托。
+    """
 
-    src = inspect.getsource(app_shell)
-    assert "NotificationManager" in src
-    assert "ToastContainer" in src
-    assert "def notify" in src
-    assert "_show_ready_toast" in src
+    from embeddebug.app import app_notifications, app_shell
+
+    shell_src = inspect.getsource(app_shell)
+    helper_src = inspect.getsource(app_notifications)
+    # AppShell 委托 helper + 保留公开入口。
+    assert "app_notifications" in shell_src
+    assert "def notify" in shell_src
+    assert "_show_ready_toast" in shell_src
+    # helper 才是真正引用 NotificationManager/ToastContainer 的地方。
+    assert "NotificationManager" in helper_src
+    assert "ToastContainer" in helper_src
 
 
 # ── QSS 覆盖 ───────────────────────────────────────────────────────

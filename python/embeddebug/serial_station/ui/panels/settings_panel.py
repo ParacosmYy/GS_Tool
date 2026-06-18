@@ -33,12 +33,15 @@ from embeddebug.serial_station.ui.theme.theme_switcher import (
     apply_theme_by_name,
 )
 
-# 快捷键静态映射（真相源：shortcuts.py 的 install_shortcuts）。
+# 快捷键静态映射（真相源：shortcuts.py 的 install_shortcuts + app_shell.keyPressEvent）。
 _SHORTCUT_ROWS = (
     ("发送输入", "Ctrl+Return"),
     ("清空日志", "Ctrl+L"),
     ("刷新串口列表", "Ctrl+R"),
     ("打开命令面板", "Ctrl+P"),
+    # Batch 15: toast 通知快捷键（AppShell 全局处理）。
+    ("关闭最早通知", "Esc"),
+    ("清空所有通知", "Ctrl+Shift+Esc"),
 )
 _FALLBACK_REMOTE = "（未读取到 Git 远程）"
 
