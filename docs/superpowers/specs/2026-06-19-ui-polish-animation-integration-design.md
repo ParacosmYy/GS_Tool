@@ -114,7 +114,43 @@ harness 现实：当前环境唯一 subagent 类型是只读 `Explore`（Glob/Gr
 
 ## 六、评分日志
 
-- 时间：2026-06-19
-- Batch 1 增量：`+1`（838 测试通过 + 双 smoke 入口 0）
-- 当前得分：618 → 619
+全部 6 个 Batch 于 2026-06-19 完成并提交：
+
+| Batch | Commit | 测试 | smoke | 得分 |
+|---|---|---|---|---|
+| 1 (A1) 动画引擎整合 | `9e288125e` | 838 passed | =0 | 618→619 |
+| 2 (A2) QSS主题深度+死代码清除 | `69e541831` | 844 passed | =0 | 619→620 |
+| 3 (B1) 控件动效接线+图标bug | `6c2dd6c29` | 854 passed | =0 | 620→621 |
+| 4 (B2) 布局修复 | `26756dca8` | 863 passed | =0 | 621→622 |
+| 5 (C1) EmptyState/骨架屏/hover_lift | `480b58803` | 879 passed | =0 | 622→623 |
+| 6 (C2) 波形美化+统计接入 | `76acf6293` | 884 passed | =0 | 623→624 |
+
+- 本轮总增量：`+6`（618 → 624）
+- 测试增量：838 → 884（+46 个新测试覆盖 6 个问题域）
+- 双 smoke 入口（`uv run start-embeddebug --smoke` + `cmd /c EmbedDebug.bat --smoke`）全程退出码 0
 - 阶段：600→699（结构与流程稳定期）
+
+## 七、收口结论
+
+诊断报告列出的 6 个问题域全部修复并有测试覆盖：
+
+1. **动画引擎**：`animations/` 8 类动画死代码全部激活并接线（ScaleAnimation.press→Button，
+   PulseAnimation.breathing→LED，CollapseAnimation→CollapsibleCard，card_enter→PlaceholderPanel，
+   install_hover_lift→ConfigurableButton/EmptyState CTA）。token 双轨制消除，cross_fade 竞态修复，
+   _HoverLiftFilter 真位移修复。
+2. **QSS 主题**：删 palette_defs.py 229 行死代码 + palette sync/reset 死代码；BG_PANEL 亮度差
+   3%→8% 卡片浮起；elevation token + accent gradient 引入；3 处硬编码 RGBA 修复（浅色切换不漏色）。
+3. **布局**：响应式 AppShell 模式失效修复（attach_to_top_level 事件过滤器）；折叠卡硬切→高度动画；
+   右区 6 控件横向截断→纵向 3 行；_log_stats_label 重复创建 bug 修复。
+4. **控件**：Gauge 指针 tween；LED 常亮呼吸；Button 按压回弹 + hover_lift；图标缓存键 pixels bug
+   + 多 path 着色 bug 修复。
+5. **面板**：新建 EmptyStateWidget + SkeletonWidget（shimmer）；PlaceholderPanel 重做渲染 icon +
+   入场动画。
+6. **波形**：曲线渐变填充 + 发光；waveform_measure 死代码激活（stats label 显示 Vpp/RMS 等）；
+   网格 alpha 0.12→0.18。
+
+剩余可选优化（未在本轮范围，留待后续迭代）：
+- CursorManager 接入 preview（可增删游标，当前是固定双游标）。
+- waveform_perf 的 RefreshThrottle/BatchAccumulator 接入热路径节流。
+- 全局输入框 focus_ring 接线（当前只接了 hover_lift）。
+- ripple 水波纹按钮反馈（Material 风）。
