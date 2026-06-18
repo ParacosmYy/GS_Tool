@@ -46,6 +46,17 @@ QSlider#serialStationSliderTrack::handle:horizontal {{
     margin: -5px 0;
     border-radius: 7px;
 }}
+/* Batch 7-4: 滑块跟手气泡（拖拽时显示 value，跟随 handle） */
+QLabel#serialStationSliderBubble {{
+    background-color: {P.ACCENT};
+    color: {P.TEXT_ON_ACCENT};
+    border: none;
+    border-radius: 8px;
+    padding: 2px 6px;
+    font-family: {T.FONT_FAMILY_MONO};
+    font-size: {T.FONT_XS};
+    font-weight: 600;
+}}
 /* 可配置按钮 */
 QPushButton#serialStationConfigurableButton {{
     background-color: {P.BG_PANEL_RAISED};
