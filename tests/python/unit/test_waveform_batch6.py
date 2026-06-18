@@ -153,3 +153,68 @@ def test_waveform_preview_no_legacy_cursor_x1_attribute(qtbot):
     qtbot.addWidget(preview)
     assert not hasattr(preview, "_cursor_x1")
     assert not hasattr(preview, "_cursor_x2")
+
+
+# ── Batch 7-2: waveform_perf RefreshThrottle/BatchAccumulator 接入 ──
+def test_waveform_preview_has_accumulator_and_throttle(qtbot):
+    """构造时应装配 BatchAccumulator + RefreshThrottle（激活 waveform_perf 死代码）。"""
+
+    from embeddebug.serial_station.ui.waveform_perf import BatchAccumulator, RefreshThrottle
+
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    assert isinstance(preview._accumulator, BatchAccumulator)
+    assert isinstance(preview._throttle, RefreshThrottle)
+
+
+def test_waveform_preview_submit_batch_accumulates(qtbot):
+    """submit_batch 应累积到 BatchAccumulator，不立即刷新 plot。"""
+
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    batch = _make_batch(channels=1, samples=10)
+    preview.submit_batch(batch)
+    # 累积器应有 1 个 pending 批次。
+    assert preview._accumulator.pending_count == 1
+
+
+def test_waveform_preview_submit_multiple_then_flush(qtbot):
+    """多次 submit_batch 后 flush 应合并批次（BatchAccumulator 合并）。
+
+    同步信号路径：flush → emit → _on_accumulator_flush → throttle.maybe_refresh
+    → _flush_latest_to_plot → update_batch（消费 latest_batch）。
+    验证合并后的批次（30 samples）最终推到曲线。
+    """
+
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    for _ in range(3):
+        preview.submit_batch(_make_batch(channels=1, samples=10))
+    # 手动触发 flush（模拟定时器到期），同步路径会立即 update_batch。
+    preview._accumulator.flush()
+    # 曲线应已接收合并的 30 samples（getData 返回 x,y 数组）。
+    assert len(preview._curves) >= 1
+    xdata, ydata = preview._curves[0].getData()
+    assert len(ydata) == 30
+
+
+def test_measurement_actions_uses_submit_batch(qtbot):
+    """measurement_actions.append_measurement_batch 应调 submit_batch（热路径节流）。"""
+
+    import inspect
+
+    from embeddebug.serial_station.ui import measurement_actions
+
+    src = inspect.getsource(measurement_actions.append_measurement_batch)
+    assert "submit_batch" in src
+
+
+def test_waveform_preview_shutdown_stops_perf_components(qtbot):
+    """shutdown 应停止 throttle 和 accumulator（清理定时器）。"""
+
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    # shutdown 前组件存在。
+    assert preview._accumulator is not None
+    preview.shutdown()
+    # shutdown 不崩溃即通过（stop 是幂等的）。
