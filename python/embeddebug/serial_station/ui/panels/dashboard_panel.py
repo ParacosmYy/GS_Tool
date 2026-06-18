@@ -81,8 +81,56 @@ class DashboardPanel:
         body.addWidget(self._tabs, 1)
         layout.addLayout(body, 1)
 
+        # Batch 18: 双击全屏接线 —— 新放置控件自动装 attach_double_click_fullscreen
+        # （激活 fullscreen.py 死代码）。每个画布的 item_added 信号 → 给新控件装双击全屏。
+        # fullscreen_handlers 防 GC（handler 必须被持有才有效）。
+        self._fullscreen_handlers: list = []
+        self._wire_canvas_fullscreen(self._tabs.current_canvas())
+        self._tabs.canvas_changed.connect(self._wire_canvas_fullscreen)
+
         self._widget = widget
         return widget
+
+    def _wire_canvas_fullscreen(self, canvas: object) -> None:
+        """把给定画布的 item_added 信号接到双击全屏安装器（Batch 18）。
+
+        每个画布只接一次（用 _wired_canvases 去重，防止 canvas_changed 重复连接）。
+        """
+
+        if canvas is None:
+            return
+        wired = getattr(self, "_wired_canvases", None)
+        if wired is None:
+            wired = set()
+            self._wired_canvases = wired
+        canvas_id = id(canvas)
+        if canvas_id in wired:
+            return
+        wired.add(canvas_id)
+        canvas.item_added.connect(self._on_item_added_fullscreen)
+
+    def _on_item_added_fullscreen(self, item_id: str) -> None:
+        """新控件放置 → 给它装双击全屏 + 发 toast 提示（Batch 18）。
+
+        从画布 items 字典按 item_id 取出 widget，调 attach_double_click_fullscreen。
+        """
+
+        canvas = self._tabs.current_canvas() if self._tabs else None
+        if canvas is None:
+            return
+        item = canvas.items.get(item_id)
+        if item is None:
+            return
+        from embeddebug.serial_station.ui.dashboard import attach_double_click_fullscreen
+        from embeddebug.serial_station.ui.panels._notify import panel_notify
+
+        handler = attach_double_click_fullscreen(item.widget, host=self._widget)
+        self._fullscreen_handlers.append(handler)
+        panel_notify(
+            self._widget, "info",
+            self._widget.tr("已添加控件"),
+            self._widget.tr("{kind}，双击可全屏").format(kind=item.widget_type),
+        )
 
     def on_enter(self) -> None:
         """切入仪表盘页：播放入场动画。"""
