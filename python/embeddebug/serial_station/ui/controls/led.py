@@ -3,18 +3,27 @@
 多色状态灯，可绑定通道值阈值自动变色，或手动设置状态。
 自绘圆形 + 内发光效果，颜色取自 palette 状态色。
 
-约束：本模块只依赖 PyQt6 + theme.palette，不访问 controller/transport。
+Batch 3 (B1) 改进：
+1. ``_pulse_glow`` 加 ``OutCubic`` 缓动（原默认 Linear，状态灯渐隐机械）。
+2. 新增常亮呼吸模式：GREEN/BLUE（连接/活动）状态下持续呼吸（``PulseAnimation``），
+   稳定态不再退化成静止色块，状态灯「活」起来。OFF/RED/YELLOW 不呼吸（避免干扰）。
+3. 提供 ``set_breathing(bool)`` 手动控制呼吸开关。
+
+约束：本模块只依赖 PyQt6 + theme.palette + animations，不访问 controller/transport。
 """
 
 from __future__ import annotations
 
 from enum import Enum
 
-from PyQt6.QtCore import QPropertyAnimation, QRectF, QSize, Qt, pyqtProperty
+from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRectF, QSize, Qt, pyqtProperty
 from PyQt6.QtGui import QColor, QPainter, QRadialGradient
 from PyQt6.QtWidgets import QWidget
 
 from embeddebug.serial_station.ui.theme import palette as P
+
+# 会触发常亮呼吸的状态（连接/活动指示灯应「活」着）。
+_BREATHING_STATES = frozenset()
 
 
 class LedState(Enum):
@@ -35,9 +44,12 @@ _STATE_COLORS: dict[LedState, str] = {
     LedState.BLUE: P.TERM_TX,
 }
 
+# 默认呼吸的状态：GREEN（已连接）和 BLUE（活动）。
+_DEFAULT_BREATHING = frozenset({LedState.GREEN, LedState.BLUE})
+
 
 class StatusLed(QWidget):
-    """自绘状态 LED，支持状态切换与阈值绑定。"""
+    """自绘状态 LED，支持状态切换、阈值绑定与常亮呼吸。"""
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -46,17 +58,34 @@ class StatusLed(QWidget):
         self._label = ""
         self.setMinimumSize(QSize(20, 20))
         self._glow = 0.0
+        self._breathing_enabled = True  # 默认开启常亮呼吸
+        self._breathing_anim: QPropertyAnimation | None = None
 
     @property
     def state(self) -> LedState:
         return self._state
 
     def set_state(self, state: LedState) -> None:
+        """切换状态，触发短暂发光脉冲；若新状态属于呼吸态则启动常亮呼吸。"""
+
         if state == self._state:
             return
         self._state = state
+        self._stop_breathing()
         self._pulse_glow()
+        # 新状态若是呼吸态（GREEN/BLUE）且呼吸开启，启动常亮呼吸。
+        if self._breathing_enabled and state in _DEFAULT_BREATHING:
+            self._start_breathing()
         self.update()
+
+    def set_breathing(self, enabled: bool) -> None:
+        """手动开关常亮呼吸。"""
+
+        self._breathing_enabled = enabled
+        if not enabled:
+            self._stop_breathing()
+        elif self._state in _DEFAULT_BREATHING:
+            self._start_breathing()
 
     def set_label(self, label: str) -> None:
         self._label = label
@@ -83,14 +112,35 @@ class StatusLed(QWidget):
             self.set_state(LedState.OFF)
 
     def _pulse_glow(self) -> None:
-        """状态变化时短暂发光（QPropertyAnimation）。"""
+        """状态变化时短暂发光（QPropertyAnimation + OutCubic 缓动）。"""
 
         self._glow = 1.0
         anim = QPropertyAnimation(self, b"glow", self)
         anim.setDuration(400)
         anim.setStartValue(1.0)
         anim.setEndValue(0.0)
+        anim.setEasingCurve(QEasingCurve.Type.OutCubic)
         anim.start()
+
+    def _start_breathing(self) -> None:
+        """启动常亮呼吸（glow 在 0.0~0.5 间循环，模拟心跳）。"""
+
+        self._stop_breathing()
+        self._breathing_anim = QPropertyAnimation(self, b"glow", self)
+        self._breathing_anim.setDuration(1200)
+        self._breathing_anim.setStartValue(0.0)
+        self._breathing_anim.setKeyValueAt(0.5, 0.45)
+        self._breathing_anim.setEndValue(0.0)
+        self._breathing_anim.setEasingCurve(QEasingCurve.Type.InOutCubic)
+        self._breathing_anim.setLoopCount(-1)
+        self._breathing_anim.start()
+
+    def _stop_breathing(self) -> None:
+        if self._breathing_anim is not None:
+            self._breathing_anim.stop()
+            self._breathing_anim = None
+            self._glow = 0.0
+            self.update()
 
     def _get_glow(self) -> float:
         return self._glow
@@ -111,7 +161,7 @@ class StatusLed(QWidget):
         if radius <= 0:
             return
         color = QColor(_STATE_COLORS[self._state])
-        # 外发光（状态变化时增强）。
+        # 外发光（状态变化时增强，呼吸时持续微发光）。
         glow_radius = radius * (1.6 + self._glow * 0.8)
         gradient = QRadialGradient(cx, cy, glow_radius)
         glow_color = QColor(color)

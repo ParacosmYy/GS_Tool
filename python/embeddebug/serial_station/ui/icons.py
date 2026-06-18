@@ -40,7 +40,8 @@ class IconManager:
 
     def __init__(self) -> None:
         if not hasattr(self, "_cache"):
-            self._cache: dict[tuple[str, str], QIcon] = {}
+            # 缓存键必须含 pixels 维度，否则不同尺寸会互相命中返回错误尺寸图标。
+            self._cache: dict[tuple[str, str, int], QIcon] = {}
 
     def icon(
         self,
@@ -53,7 +54,7 @@ class IconManager:
         缺失图标时返回空 QIcon（不抛异常），保证 UI 不因缺图崩溃。
         """
 
-        key = (name, color)
+        key = (name, color, pixels)
         cached = self._cache.get(key)
         if cached is not None:
             return cached
@@ -95,14 +96,19 @@ class IconManager:
 
     @staticmethod
     def _tint(svg_text: str, color: str) -> str:
-        """把 SVG 的 currentColor 与裸 stroke 颜色替换为目标颜色。"""
+        """把 SVG 的 currentColor 与裸 stroke 颜色替换为目标颜色。
+
+        修正（Batch 3）：旧版 ``count=1`` 只替换第一个 stroke 属性，多 path 图标
+        （如 lucide 的多笔画图标）后续 path 仍是原色，着色不全。改为替换全部
+        stroke 属性，保证多 path 图标整体着色。
+        """
 
         tinted = svg_text.replace("currentColor", color)
         # 兜底：部分 lucide 变体用裸 stroke="#xxx"，统一覆盖为 stroke="color"。
-        # 仅替换属性值，避免误伤 path data。用简单正则替换 stroke="..." 起始处。
+        # 替换全部 stroke 属性（多 path 图标需整体着色）。
         import re
 
-        tinted = re.sub(r'stroke="[^"]*"', f'stroke="{color}"', tinted, count=1)
+        tinted = re.sub(r'stroke="[^"]*"', f'stroke="{color}"', tinted)
         return tinted
 
 

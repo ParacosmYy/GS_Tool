@@ -38,6 +38,42 @@ def test_icon_manager_caches_by_name_and_color():
     assert different is not first
 
 
+def test_icon_manager_cache_key_includes_pixels():
+    """缓存键必须含 pixels 维度，否则不同尺寸互相命中返回错误尺寸。
+
+    Batch 3 修复：旧版缓存键只有 (name, color)，18px 和 24px 的 send 图标
+    会互相命中缓存，返回错误尺寸的 QIcon。
+    """
+
+    manager = IconManager()
+    manager.reset()
+    small = manager.icon("send", color=P.ACCENT, pixels=18)
+    big = manager.icon("send", color=P.ACCENT, pixels=24)
+    # 不同 pixels 应是不同缓存条目（不同 QIcon 对象）。
+    assert small is not big
+
+
+def test_tint_replaces_all_strokes_for_multi_path_icons():
+    """多 path 图标的所有 stroke 属性都应被着色（旧版 count=1 只换第一个）。
+
+    Batch 3 修复：lucide 多笔画图标（如 'activity' 有多个 path），
+    旧版 re.sub count=1 只替换第一个 stroke，后续 path 仍是原色。
+    """
+
+    svg = (
+        '<svg stroke="#000">'
+        '<path d="M1"/><path d="M2" stroke="#fff"/>'
+        '<circle stroke="#aaa"/>'
+        '</svg>'
+    )
+    tinted = IconManager._tint(svg, "#abcdef")
+    # 所有 stroke 属性都应变成目标色。
+    assert tinted.count('stroke="#abcdef"') == 3
+    assert "#000" not in tinted
+    assert "#fff" not in tinted
+    assert "#aaa" not in tinted
+
+
 def test_icon_manager_returns_empty_icon_for_missing_name():
     manager = IconManager()
     manager.reset()

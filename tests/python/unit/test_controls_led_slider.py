@@ -115,3 +115,102 @@ def test_command_slider_track_objectname(qtbot):
     qtbot.addWidget(slider)
     track = slider.findChild(QSlider, "serialStationSliderTrack")
     assert track is not None
+
+
+# ── Batch 3 (B1): LED 常亮呼吸 / Gauge 指针 tween / Button 按压 ──────
+def test_status_led_breathing_starts_on_green(qtbot):
+    """切到 GREEN（连接态）应启动常亮呼吸动画。"""
+
+    led = StatusLed()
+    qtbot.addWidget(led)
+    led.set_state(LedState.GREEN)
+    assert led.state == LedState.GREEN
+    # 呼吸动画应已启动（_breathing_anim 非 None）。
+    assert led._breathing_anim is not None
+    assert led._breathing_anim.loopCount() == -1  # 无限循环
+
+
+def test_status_led_no_breathing_on_red(qtbot):
+    """RED（错误态）不应呼吸（避免干扰，错误态应稳定醒目）。"""
+
+    led = StatusLed()
+    qtbot.addWidget(led)
+    led.set_state(LedState.RED)
+    assert led._breathing_anim is None
+
+
+def test_status_led_breathing_can_be_disabled(qtbot):
+    """set_breathing(False) 应停止呼吸。"""
+
+    led = StatusLed()
+    qtbot.addWidget(led)
+    led.set_state(LedState.GREEN)
+    assert led._breathing_anim is not None
+    led.set_breathing(False)
+    assert led._breathing_anim is None
+
+
+def test_status_led_state_switch_stops_previous_breathing(qtbot):
+    """从 GREEN 切到 RED 应停止呼吸（避免呼吸态泄漏到错误态）。"""
+
+    led = StatusLed()
+    qtbot.addWidget(led)
+    led.set_state(LedState.GREEN)
+    green_anim = led._breathing_anim
+    led.set_state(LedState.RED)
+    assert led._breathing_anim is None
+    assert green_anim is not None  # 确实曾经有呼吸
+
+
+def test_gauge_value_tween_uses_displayed_value(qtbot):
+    """Gauge set_value 应启动 tween，displayed_value 从旧值插值到新值。"""
+
+    from embeddebug.serial_station.ui.controls import GaugeWidget
+
+    g = GaugeWidget()
+    qtbot.addWidget(g)
+    g.set_value(50.0)
+    # tween 关闭时 displayed 直接等于 value。
+    g.set_tween(False)
+    g.set_value(80.0)
+    assert g.displayed_value == 80.0
+
+
+def test_gauge_tween_disabled_snaps(qtbot):
+    """关闭 tween 后 set_value 应立即 snap（无动画）。"""
+
+    from embeddebug.serial_station.ui.controls import GaugeWidget
+
+    g = GaugeWidget()
+    qtbot.addWidget(g)
+    g.set_tween(False)
+    g.set_value(42.0)
+    assert g.displayed_value == 42.0
+    assert g.value() == 42.0
+
+
+def test_configurable_button_press_animation(qtbot):
+    """点击 ConfigurableButton 应触发按压动画并发出 command。"""
+
+    from embeddebug.serial_station.ui.controls import ConfigurableButton
+
+    btn = ConfigurableButton("Send", command_template="AT+SEND")
+    qtbot.addWidget(btn)
+    commands: list[str] = []
+    btn.command.connect(lambda cmd: commands.append(cmd))
+    btn.click()
+    assert "AT+SEND" in commands
+
+
+def test_configurable_button_press_animation_can_disable(qtbot):
+    """set_press_animation(False) 后点击不触发动画但仍发命令。"""
+
+    from embeddebug.serial_station.ui.controls import ConfigurableButton
+
+    btn = ConfigurableButton("Send", command_template="AT+PING")
+    qtbot.addWidget(btn)
+    btn.set_press_animation(False)
+    commands: list[str] = []
+    btn.command.connect(lambda cmd: commands.append(cmd))
+    btn.click()
+    assert "AT+PING" in commands
