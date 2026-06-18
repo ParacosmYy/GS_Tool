@@ -15,40 +15,9 @@ from embeddebug.serial_station.ui import responsive_layout
 from embeddebug.serial_station.ui import waveform_overlays
 
 
-# ── 波形游标 ──────────────────────────────────────────────────────
-def test_attach_cursors_adds_two_movable_lines(qtbot):
-    plot = pg.PlotWidget()
-    qtbot.addWidget(plot)
-    x1, x2 = waveform_overlays.attach_cursors(plot)
-    assert x1.movable is True
-    assert x2.movable is True
-    # 游标应被加入绘图区。
-    items = plot.items()
-    assert x1 in items
-    assert x2 in items
-
-
-def test_cursor_readout_reports_delta_and_y_values(qtbot):
-    plot = pg.PlotWidget()
-    qtbot.addWidget(plot)
-    x1, x2 = waveform_overlays.attach_cursors(plot)
-    x1.setPos(0.0)
-    x2.setPos(4.0)
-    values = np.array([[1.0], [2.0], [3.0], [4.0], [5.0]])
-    readout = waveform_overlays.cursor_readout(x1, x2, values)
-    assert "ΔX 4.000" in readout
-    assert "Y1 1.000" in readout
-    assert "Y2 5.000" in readout
-
-
-def test_cursor_readout_handles_empty_values(qtbot):
-    plot = pg.PlotWidget()
-    qtbot.addWidget(plot)
-    x1, x2 = waveform_overlays.attach_cursors(plot)
-    readout = waveform_overlays.cursor_readout(x1, x2, None)
-    assert "ΔX" in readout
-
-
+# ── 波形游标读数 HUD ───────────────────────────────────────────────
+# Batch 20：旧 attach_cursors/cursor_readout 已删除（被 CursorManager + waveform_measure
+# 取代）。游标能力由 waveform_cursors / waveform_measure 测试覆盖。
 def test_build_cursor_hud_has_expected_objectname(qtbot):
     parent = QWidget()
     qtbot.addWidget(parent)

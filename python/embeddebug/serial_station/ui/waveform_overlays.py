@@ -1,76 +1,26 @@
-"""波形游标与多通道图例（对齐 VOFA+ 波形引擎能力）。
+"""波形多通道图例 + 游标读数 HUD（对齐 VOFA+ 波形引擎能力）。
 
-为 SerialWaveformPreview 提供两条可拖拽游标（X1/X2）和通道图例：
-- 游标：点击波形区放置 X1，按住拖拽移动；显示 ΔX 与两游标处 Y 值。
-- 图例：按通道名列出颜色块 + 名称 + 当前值，点击切换可见性。
+为 SerialWaveformPreview 提供多通道图例（颜色块 + 名称 + 当前值，点击切换可见性）
+和游标读数 HUD 标签容器。
+
+历史：旧版固定双游标 API（``attach_cursors`` / ``cursor_readout`` / ``_make_cursor``）
+已被 ``waveform_cursors.CursorManager``（可增删任意数量 X/Y 游标）+ ``waveform_measure``
+（ΔT/频率/ΔY 测量）取代，Batch 20 删除这些遗留死代码。
 
 设计要点：
-- 游标用 pyqtgraph ``InfiniteLine``，可拖拽，颜色取 palette 强调色。
 - 图例是 QWidget（QHBoxLayout of QLabel），objectName 带 ``serialStationWaveformLegend`` 前缀。
-- 读数 HUD 显示游标间距与 Y 值，objectName ``serialStationWaveformCursorHud``。
+- 读数 HUD 是 QLabel 容器，objectName ``serialStationWaveformCursorHud``，
+  实际读数由 waveform_measure.format_cursor_measurement 填充。
 
 约束：本模块只依赖 PyQt6 + pyqtgraph + theme.palette，不访问 controller/transport。
 """
 
 from __future__ import annotations
 
-import numpy as np
 import pyqtgraph as pg
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QWidget
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from embeddebug.serial_station.ui.theme import palette as P
-
-
-def attach_cursors(plot: pg.PlotWidget) -> tuple[pg.InfiniteLine, pg.InfiniteLine]:
-    """给绘图区附加两条可拖拽 X 游标，返回 (cursor_x1, cursor_x2)。"""
-
-    x1 = _make_cursor(P.ACCENT, 0.25)
-    x2 = _make_cursor(P.WARNING, 0.75)
-    plot.addItem(x1)
-    plot.addItem(x2)
-    return x1, x2
-
-
-def _make_cursor(color: str, start_ratio: float) -> pg.InfiniteLine:
-    line = pg.InfiniteLine(
-        pos=start_ratio,
-        angle=90,
-        pen=pg.mkPen(color=color, width=1.4, style=Qt.PenStyle.DashLine),
-        movable=True,
-        label="{value:.3f}",
-        labelOpts={"position": 0.96, "color": color, "fill": P.BG_PANEL},
-    )
-    return line
-
-
-def cursor_readout(
-    x1: pg.InfiniteLine,
-    x2: pg.InfiniteLine,
-    values: np.ndarray | None,
-) -> str:
-    """计算两游标的 ΔX 与各自处 Y 值（取首通道插值），返回读数字符串。"""
-
-    xa = float(x1.value())
-    xb = float(x2.value())
-    delta = abs(xb - xa)
-    y1 = y2 = float("nan")
-    if values is not None and values.size > 0:
-        y1 = _sample_y(values, xa)
-        y2 = _sample_y(values, xb)
-    return f"ΔX {delta:.3f}  ·  Y1 {y1:.3f}  ·  Y2 {y2:.3f}"
-
-
-def _sample_y(values: np.ndarray, x: float) -> float:
-    """对首通道在 x 处做线性插值取 Y。"""
-
-    n = values.shape[0]
-    if n == 0:
-        return float("nan")
-    col = values[:, 0] if values.ndim == 2 else values
-    idx = int(round(x))
-    idx = max(0, min(n - 1, idx))
-    return float(col[idx])
 
 
 class WaveformLegend(QWidget):
