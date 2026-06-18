@@ -40,11 +40,13 @@ from embeddebug.serial_station.ui.theme.qss_sections_empty import (
 from embeddebug.serial_station.ui.theme.qss_sections_layout import (
     cards_section,
     collapsible_section,
-    command_palette_section,
     splitter_section,
     topbar_section,
-    waveform_overlays_section,
     zones_section,
+)
+from embeddebug.serial_station.ui.theme.qss_sections_overlays import (
+    command_palette_section,
+    waveform_overlays_section,
 )
 from embeddebug.serial_station.ui.theme.qss_sections_widgets import (
     buttons_section,
