@@ -58,6 +58,10 @@ TERM_SYSTEM = "#9aa7bd"      # 系统日志
 TERM_BACKGROUND = "#0d1118"  # 日志区底
 TERM_SELECTION = "#2563eb"   # 日志区选中底
 
+# ── 波形曲线配色序列（固定循环，对齐 EK-OmniProbe PRESET_COLORS 范式） ──
+# 前 4 色复用现有强调/状态 token，后 3 色补足深底高对比。避免 pg.intColor 随通道数漂移。
+WAVE_CURVES = (ACCENT, SUCCESS, WARNING, TERM_TX, "#a78bfa", "#ec4899", "#f97316")
+
 # ── 边框 / 分隔 ────────────────────────────────────────────────────
 BORDER = "#27313f"           # 默认边框 / 分隔线
 BORDER_STRONG = "#334155"    # 输入框边框

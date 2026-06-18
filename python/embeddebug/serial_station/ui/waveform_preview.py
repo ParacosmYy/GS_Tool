@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.ui import waveform_overlays
+from embeddebug.serial_station.ui.theme import palette as P
 
 
 class SafePlotWidget(pg.PlotWidget):
@@ -51,7 +52,13 @@ class SerialWaveformPreview(QWidget):
         self._plot = SafePlotWidget(self)
         self._plot.setObjectName("serialStationWaveformPlot")
         self._plot.setMinimumHeight(180)
-        self._plot.showGrid(x=True, y=True, alpha=0.25)
+        # 深色绘图区背景（与终端一致）+ 柔和网格 + 弱化坐标轴文字（对齐 EK-OmniProbe）。
+        self._plot.setBackground(P.TERM_BACKGROUND)
+        self._plot.showGrid(x=True, y=True, alpha=0.12)
+        for axis_name in ("left", "bottom"):
+            axis = self._plot.getAxis(axis_name)
+            axis.setTextPen(P.TEXT_MUTED)
+            axis.setPen(pg.mkPen(color=P.BORDER, width=1))
         self._plot.setLabel("bottom", self.tr("Sample"))
         self._plot.setLabel("left", self.tr("Value"))
         layout.addWidget(self._plot, 1)
@@ -114,8 +121,9 @@ class SerialWaveformPreview(QWidget):
     def _ensure_curves(self, channel_names: tuple[str, ...]) -> None:
         while len(self._curves) < len(channel_names):
             index = len(self._curves)
+            color = P.WAVE_CURVES[index % len(P.WAVE_CURVES)]
             curve = self._plot.plot(
-                pen=pg.intColor(index, hues=max(3, len(channel_names))),
+                pen=pg.mkPen(color=color, width=2),
                 name=channel_names[index],
             )
             self._curves.append(curve)

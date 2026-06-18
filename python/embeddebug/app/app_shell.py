@@ -117,7 +117,7 @@ class AppShell(QMainWindow):
             self._stack.addWidget(widget)
 
     def _switch_to(self, index: int) -> None:
-        """切换到第 index 页，触发 on_leave/on_enter 生命周期。"""
+        """切换到第 index 页，触发 on_leave/on_enter 生命周期 + 入场动画。"""
 
         registrations = registered_panels()
         if not (0 <= index < len(registrations)):
@@ -130,6 +130,26 @@ class AppShell(QMainWindow):
         self._nav_buttons[registrations[index].mode_id].setChecked(True)
         entering = registrations[index]
         self._call_panel(entering.mode_id, "on_enter")
+        # 入场动画：淡入 + 轻微上滑（260ms OutCubic，对齐 EK-OmniProbe mode-stage-enter）。
+        self._animate_page_enter(self._stack.currentWidget())
+
+    def _animate_page_enter(self, page: QWidget) -> None:
+        """页面入场动画（fade + slide），持有引用防 GC。"""
+
+        try:
+            from embeddebug.serial_station.ui.panel_animations import card_enter
+
+            # 停止上一组动画（连续快速切换时）。
+            for anim in getattr(self, "_page_anims", []):
+                try:
+                    anim.stop()
+                except Exception:
+                    pass
+            self._page_anims = card_enter(page)
+            for anim in self._page_anims:
+                anim.start()
+        except Exception:
+            pass  # 动画是锦上添花，失败不阻塞切换。
 
     def _call_panel(self, mode_id: str, method: str) -> None:
         """安全调用面板生命周期方法（缺失或异常不中断切换）。"""

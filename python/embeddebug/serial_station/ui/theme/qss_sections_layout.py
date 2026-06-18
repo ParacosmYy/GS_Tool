@@ -58,6 +58,11 @@ QLabel#serialStationCardIcon {{
     background-color: transparent;
     border: none;
 }}
+/* 可折叠面板 */
+QWidget#serialStationCollapsiblePanel {{
+    background-color: transparent;
+    border: none;
+}}
 /* 连接卡内的小分组标题（Port/Serial/Connect/Endpoints）：弱文本色小字号。 */
 QLabel#serialStationCardGroupLabel {{
     background-color: transparent;

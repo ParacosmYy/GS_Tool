@@ -93,7 +93,8 @@ class WaveformLegend(QWidget):
 
         self._clear_chips()
         for index, name in enumerate(channel_names):
-            color = pg.intColor(index, hues=max(3, len(channel_names)))
+            color_hex = P.WAVE_CURVES[index % len(P.WAVE_CURVES)]
+            color = pg.QtGui.QColor(color_hex)
             chip = self._make_chip(name, color, latest_values, index)
             self._layout.addWidget(chip)
             self._chips[name] = chip
