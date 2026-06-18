@@ -207,8 +207,8 @@ class CanPanel:
             self._table.setRowCount(0)
         if self._stats is not None:
             self._stats.setText(self._widget.tr("0 帧"))
-        # Batch 9-2: 清空后恢复空状态占位。
-        self._empty_state.show()
+        # Batch 9-2: 清空后恢复空状态占位；Batch 11: 淡入显示（激活 FadeTransition）。
+        self._empty_state.show_with_fade()
 
 
 class _CanSignalBridge(QWidget):

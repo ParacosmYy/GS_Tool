@@ -180,8 +180,8 @@ class BlePanel:
             self._transport.close()
             self._connect_btn.setText(self._widget.tr("连接"))
             self._tree.clear()
-            # Batch 9-2: 断开后恢复空状态占位。
-            self._empty_state.show()
+            # Batch 9-2: 断开后恢复空状态占位；Batch 11: 淡入显示（激活 FadeTransition）。
+            self._empty_state.show_with_fade()
             # Batch 10-2: 断开后圆点恢复 OFF（静止）。
             self._status_dot.set_state(DotState.OFF)
             self._log.appendPlainText(self._widget.tr("已断开"))

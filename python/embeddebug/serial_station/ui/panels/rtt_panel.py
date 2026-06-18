@@ -194,9 +194,9 @@ class RttPanel:
     def _clear(self) -> None:
         if self._text is not None:
             self._text.clear()
-        # Batch 9-2: 清屏后恢复空状态占位。
+        # Batch 9-2: 清屏后恢复空状态占位；Batch 11: 淡入显示（激活 FadeTransition）。
         if self._empty_state is not None:
-            self._empty_state.show()
+            self._empty_state.show_with_fade()
 
 
 class _RttSignalBridge(QWidget):

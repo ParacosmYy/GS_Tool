@@ -31,7 +31,7 @@ def test_ota_panel_has_transfer_skeleton():
 
 
 def test_can_panel_has_empty_state():
-    """CAN 面板应含 _empty_state + 首帧 hide/清空 show。"""
+    """CAN 面板应含 _empty_state + 首帧 hide/清空 show（Batch 11 后可为 show_with_fade）。"""
 
     from embeddebug.serial_station.ui.panels.can_panel import CanPanel
 
@@ -40,8 +40,8 @@ def test_can_panel_has_empty_state():
     assert "EmptyStateWidget" in src
     # _append_frame 首帧 hide。
     assert "self._empty_state.hide()" in src
-    # _clear 恢复 show。
-    assert "self._empty_state.show()" in src
+    # _clear 恢复显示（Batch 9 show / Batch 11 show_with_fade 均可）。
+    assert _assert_empty_state_revealed(src)
 
 
 def test_ble_panel_has_empty_state():
@@ -54,7 +54,7 @@ def test_ble_panel_has_empty_state():
     assert "EmptyStateWidget" in src
     # 连接成功 hide，断开 show。
     assert "self._empty_state.hide()" in src
-    assert "self._empty_state.show()" in src
+    assert _assert_empty_state_revealed(src)
 
 
 def test_rtt_panel_has_empty_state():
@@ -66,7 +66,13 @@ def test_rtt_panel_has_empty_state():
     assert "_empty_state" in src
     assert "EmptyStateWidget" in src
     assert "self._empty_state.hide()" in src
-    assert "self._empty_state.show()" in src
+    assert _assert_empty_state_revealed(src)
+
+
+def _assert_empty_state_revealed(src: str) -> bool:
+    """空状态恢复路径：show()（Batch 9）或 show_with_fade()（Batch 11）均可。"""
+
+    return "self._empty_state.show()" in src or "self._empty_state.show_with_fade()" in src
 
 
 def test_skeleton_block_importable():

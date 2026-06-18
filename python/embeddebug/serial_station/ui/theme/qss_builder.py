@@ -51,6 +51,7 @@ from embeddebug.serial_station.ui.theme.qss_sections_widgets import (
     status_section,
     waveform_section,
 )
+from embeddebug.serial_station.ui.theme.qss_sections_toast import toast_section
 
 
 def build_qss() -> str:
@@ -81,5 +82,6 @@ def build_qss() -> str:
         plaintext_section(),
         shortcut_section(),
         empty_state_section(),
+        toast_section(),
     ]
     return "\n\n".join(sections) + "\n"

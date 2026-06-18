@@ -119,3 +119,29 @@ class EmptyStateWidget(QWidget):
 
     def set_description(self, description: str) -> None:
         self._desc_label.setText(description)
+
+    def show_with_fade(self, duration: int | None = None) -> None:
+        """淡入显示空状态（激活 FadeTransition 死代码，Batch 11）。
+
+        相比直接 ``show()``（瞬切），本方法用 ``FadeTransition.fade_in`` 做透明度
+        0→1 过渡，空状态出现更自然，对齐 Linear/Arc 的渐进式占位语言。
+
+        Args:
+            duration: 淡入时长（ms），默认用 FadeTransition 默认值（DURATION_NORMAL=240）。
+
+        动画引用存 ``self._fade_anim`` 防 GC；连续调用先停旧动画。
+        """
+
+        from embeddebug.serial_station.ui.animations.fade import FadeTransition
+
+        # 停止进行中的淡入动画（连续触发时）。
+        old = getattr(self, "_fade_anim", None)
+        if old is not None:
+            try:
+                old.stop()
+            except Exception:
+                pass
+        kwargs = {} if duration is None else {"duration": duration}
+        anim = FadeTransition.fade_in(self, **kwargs)
+        anim.start()
+        self._fade_anim = anim
