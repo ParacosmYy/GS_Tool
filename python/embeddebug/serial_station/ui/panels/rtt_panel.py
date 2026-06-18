@@ -96,11 +96,18 @@ class RttPanel:
         return widget
 
     def on_enter(self) -> None:
-        """切入 RTT 页（无副作用，启动由按钮触发）。"""
+        """切入 RTT 页：播放入场动画（启动由按钮触发）。"""
+
+        from embeddebug.serial_station.ui.panels._enter_anim import play_panel_enter
+
+        play_panel_enter(self)
 
     def on_leave(self) -> None:
-        """切出 RTT 页：停止演示避免后台泄漏。"""
+        """切出 RTT 页：停止入场动画 + 停止演示避免后台泄漏。"""
 
+        from embeddebug.serial_station.ui.panels._enter_anim import stop_panel_enter
+
+        stop_panel_enter(self)
         if self._start_btn is not None and self._start_btn.isChecked():
             self._toggle(False)
 

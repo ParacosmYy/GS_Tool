@@ -122,12 +122,19 @@ class OtaPanel:
 
     # ── 生命周期 ────────────────────────────────────────────────────
     def on_enter(self) -> None:
-        """切入 OTA 模式时刷新连接态。"""
+        """切入 OTA 模式：播放入场动画 + 刷新连接态。"""
 
+        from embeddebug.serial_station.ui.panels._enter_anim import play_panel_enter
+
+        play_panel_enter(self)
         self._refresh_connection_state()
 
     def on_leave(self) -> None:
-        """切出时不中止传输（保留后台进行）。"""
+        """切出：停止入场动画（不中止传输，保留后台进行）。"""
+
+        from embeddebug.serial_station.ui.panels._enter_anim import stop_panel_enter
+
+        stop_panel_enter(self)
 
     # ── 交互 ────────────────────────────────────────────────────────
     def _browse_file(self) -> None:

@@ -109,11 +109,18 @@ class CanPanel:
         return widget
 
     def on_enter(self) -> None:
-        """切入 CAN 页（无副作用）。"""
+        """切入 CAN 页：播放入场动画。"""
+
+        from embeddebug.serial_station.ui.panels._enter_anim import play_panel_enter
+
+        play_panel_enter(self)
 
     def on_leave(self) -> None:
-        """切出 CAN 页：停止演示。"""
+        """切出 CAN 页：停止入场动画 + 停止演示。"""
 
+        from embeddebug.serial_station.ui.panels._enter_anim import stop_panel_enter
+
+        stop_panel_enter(self)
         if self._demo_timer is not None:
             self._demo_timer.stop()
             self._demo_timer = None

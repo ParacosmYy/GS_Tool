@@ -70,8 +70,11 @@ class SettingsPanel:
         return widget
 
     def on_enter(self) -> None:
-        """切入设置页时同步当前主题到 combo。"""
+        """切入设置页：播放入场动画 + 同步当前主题到 combo。"""
 
+        from embeddebug.serial_station.ui.panels._enter_anim import play_panel_enter
+
+        play_panel_enter(self)
         if self._theme_combo is None:
             return
         from embeddebug.serial_station.ui.theme.manager import ThemeManager
@@ -80,7 +83,11 @@ class SettingsPanel:
             self._theme_combo.setCurrentText(current)
 
     def on_leave(self) -> None:
-        """切出设置页（无副作用）。"""
+        """切出设置页：停止入场动画。"""
+
+        from embeddebug.serial_station.ui.panels._enter_anim import stop_panel_enter
+
+        stop_panel_enter(self)
 
     # ── Tab 构建 ────────────────────────────────────────────────────
     def _build_theme_tab(self, parent: QWidget) -> QWidget:

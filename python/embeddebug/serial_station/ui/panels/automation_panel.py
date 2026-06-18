@@ -130,13 +130,19 @@ class AutomationPanel:
         return widget
 
     def on_enter(self) -> None:
-        """切入自动化页：刷新表格。"""
+        """切入自动化页：播放入场动画 + 刷新表格。"""
 
+        from embeddebug.serial_station.ui.panels._enter_anim import play_panel_enter
+
+        play_panel_enter(self)
         self._refresh_table()
 
     def on_leave(self) -> None:
-        """切出自动化页：停止监听（避免后台静默发包）。"""
+        """切出自动化页：停止入场动画 + 停止监听（避免后台静默发包）。"""
 
+        from embeddebug.serial_station.ui.panels._enter_anim import stop_panel_enter
+
+        stop_panel_enter(self)
         if self._active:
             self._set_active(False)
 

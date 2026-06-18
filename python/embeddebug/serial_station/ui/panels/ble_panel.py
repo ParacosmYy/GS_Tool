@@ -117,11 +117,18 @@ class BlePanel:
         return widget
 
     def on_enter(self) -> None:
-        """切入 BLE 页（无副作用，扫描由按钮触发）。"""
+        """切入 BLE 页：播放入场动画（扫描由按钮触发）。"""
+
+        from embeddebug.serial_station.ui.panels._enter_anim import play_panel_enter
+
+        play_panel_enter(self)
 
     def on_leave(self) -> None:
-        """切出 BLE 页：断开 stub（避免后台回调）。"""
+        """切出 BLE 页：停止入场动画 + 断开 stub（避免后台回调）。"""
 
+        from embeddebug.serial_station.ui.panels._enter_anim import stop_panel_enter
+
+        stop_panel_enter(self)
         if self._transport is not None:
             try:
                 self._transport.close()
