@@ -30,7 +30,7 @@ def configure_high_performance_plot(plot: pg.PlotWidget) -> None:
     - 启用 OpenGL 加速（如可用，失败则静默回退）。
     """
 
-    plot.setDownsampling(auto=False, method="peak")
+    plot.setDownsampling(auto=False)
     plot.setClipToView(True)
     plot.showGrid(x=True, y=True, alpha=0.2)
     try_enable_opengl(plot)
@@ -54,7 +54,7 @@ def try_enable_opengl(plot: pg.PlotWidget) -> bool:
 def apply_curve_perf(curve: pg.PlotDataItem) -> None:
     """给单条曲线应用高性能渲染参数。"""
 
-    curve.setDownsampling(auto=False, method="peak")
+    curve.setDownsampling(auto=False)
     curve.setClipToView(True)
     # connect='finite' 让 NaN/inf 处断开，避免跨断点连线。
     try:
