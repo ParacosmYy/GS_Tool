@@ -14,6 +14,10 @@ from embeddebug.serial_station.ui.dashboard.factory import (
     WIDGET_CATALOG,
     create_widget,
 )
+from embeddebug.serial_station.ui.dashboard.fullscreen import (
+    WidgetFullscreenHandler,
+    attach_double_click_fullscreen,
+)
 from embeddebug.serial_station.ui.dashboard.palette import (
     MIME_TYPE,
     WidgetPalette,
@@ -29,8 +33,10 @@ __all__ = [
     "MIME_TYPE",
     "SUPPORTED_WIDGET_TYPES",
     "WIDGET_CATALOG",
+    "WidgetFullscreenHandler",
     "WidgetPalette",
     "WidgetPaletteButton",
+    "attach_double_click_fullscreen",
     "create_widget",
     "snap_to_grid",
 ]

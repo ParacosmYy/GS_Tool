@@ -79,4 +79,44 @@ QLabel#serialStationValueNumber {{
 }}
 QLabel#serialStationValueTrend {{
     background-color: transparent;
+}}
+/* === Dashboard（画布/控件库/标签页） === */
+QFrame#serialStationDashboardCanvas {{
+    background-color: {P.BG_APP};
+    border: 1px dashed {P.BORDER};
+    border-radius: {T.RADIUS_LG};
+}}
+QTabWidget#serialStationDashboardTabs::pane {{
+    background-color: {P.BG_APP};
+    border: {T.BORDER_THIN} solid {P.BORDER};
+    border-radius: {T.RADIUS_MD};
+}}
+QTabWidget#serialStationDashboardTabs::tab-bar {{
+    alignment: left;
+}}
+QTabBar#serialStationDashboardTabs {{
+    background: transparent;
+}}
+QFrame#serialStationWidgetPalette {{
+    background-color: {P.BG_PANEL};
+    border: {T.BORDER_THIN} solid {P.BORDER};
+    border-radius: {T.RADIUS_LG};
+}}
+QLabel#serialStationPaletteTitle {{
+    color: {P.TEXT_PRIMARY};
+    font-weight: 600;
+    font-size: {T.FONT_BASE};
+}}
+QPushButton#serialStationPaletteButton {{
+    background-color: {P.BG_INPUT};
+    color: {P.TEXT_SECONDARY};
+    border: {T.BORDER_THIN} solid {P.BORDER};
+    border-radius: {T.RADIUS_MD};
+    padding: {T.PADDING_SM};
+    text-align: left;
+}}
+QPushButton#serialStationPaletteButton:hover {{
+    background-color: {P.BG_PANEL_RAISED};
+    border-color: {P.ACCENT_BORDER};
+    color: {P.TEXT_PRIMARY};
 }}"""
