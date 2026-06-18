@@ -6,12 +6,10 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from embeddebug.serial_station.core import ChannelBatch
+from embeddebug.serial_station.controllers import controller_callback_state as callback_state
 from embeddebug.serial_station.controllers import controller_io_state as io_state
-from embeddebug.serial_station.controllers import controller_log_state as log_state
 from embeddebug.serial_station.controllers import controller_profile_state as profile_state
 from embeddebug.serial_station.controllers import controller_protocol_state as protocol_state
-from embeddebug.serial_station.controllers import controller_receive_state as receive_state
 from embeddebug.serial_station.controllers import controller_session_state as session_state
 from embeddebug.serial_station.controllers import controller_transport_state as transport_state
 from embeddebug.serial_station.controllers.log_entry import SerialWorkbenchLogEntry
@@ -21,7 +19,6 @@ from embeddebug.serial_station.protocols import ProtocolEvent
 from embeddebug.shared import OperationResult
 
 
-MeasurementCallback = Callable[[ChannelBatch], None]
 TransportFactory = Callable[[], SerialTransport]
 PortProvider = Callable[[], list[str]]
 
@@ -43,9 +40,7 @@ class SerialWorkbenchController:
             bytes_callback=self._handle_bytes_received,
             error_callback=self._handle_error,
         )
-        self._log_callbacks: list[log_state.LogEntryCallback] = []
-        self._error_callbacks: list[log_state.ErrorCallback] = []
-        self._measurement_callbacks: list[MeasurementCallback] = []
+        self._callbacks = callback_state.create_callback_state()
         self._entries: list[SerialWorkbenchLogEntry] = []
         self._command_history: list[str] = []
 
@@ -65,11 +60,14 @@ class SerialWorkbenchController:
     def active_local_port(self) -> int | None:
         return transport_state.active_local_port(self._transport_runtime)
 
-    def on_log_entry(self, callback: log_state.LogEntryCallback) -> None: self._log_callbacks.append(callback)
+    def on_log_entry(self, callback: callback_state.LogEntryCallback) -> None:
+        callback_state.add_log_callback(self._callbacks, callback)
 
-    def on_error(self, callback: log_state.ErrorCallback) -> None: self._error_callbacks.append(callback)
+    def on_error(self, callback: callback_state.ErrorCallback) -> None:
+        callback_state.add_error_callback(self._callbacks, callback)
 
-    def on_measurement_batch(self, callback: MeasurementCallback) -> None: self._measurement_callbacks.append(callback)
+    def on_measurement_batch(self, callback: callback_state.MeasurementCallback) -> None:
+        callback_state.add_measurement_callback(self._callbacks, callback)
 
     def available_protocols(self) -> tuple[str, ...]:
         return protocol_state.available_protocols(self._protocol_runtime)
@@ -85,7 +83,7 @@ class SerialWorkbenchController:
             self._protocol_runtime,
             name,
             entries=self._entries,
-            log_callbacks=self._log_callbacks,
+            log_callbacks=self._callbacks.log,
         )
 
     def connect_fake(self) -> bool: return self.connect_fake_result().ok
@@ -94,7 +92,7 @@ class SerialWorkbenchController:
         self._transport_runtime, result = transport_state.connect_fake_result(
             self._transport_runtime,
             entries=self._entries,
-            log_callbacks=self._log_callbacks,
+            log_callbacks=self._callbacks.log,
         )
         return result
 
@@ -130,7 +128,7 @@ class SerialWorkbenchController:
             port_name,
             baud_rate,
             entries=self._entries,
-            log_callbacks=self._log_callbacks,
+            log_callbacks=self._callbacks.log,
             data_bits=data_bits,
             parity=parity,
             stop_bits=stop_bits,
@@ -149,7 +147,7 @@ class SerialWorkbenchController:
         return self._connect_endpoint_result("udp", host, port)
 
     def disconnect(self) -> None:
-        transport_state.disconnect(self._transport_runtime, self._entries, self._log_callbacks)
+        transport_state.disconnect(self._transport_runtime, self._entries, self._callbacks.log)
 
     def send_text(self, text: str) -> bool: return self.send_text_result(text).ok
 
@@ -160,7 +158,7 @@ class SerialWorkbenchController:
             text,
             self._command_history,
             self._entries,
-            self._log_callbacks,
+            self._callbacks.log,
             self._handle_error,
         )
 
@@ -169,7 +167,7 @@ class SerialWorkbenchController:
             self._transport_runtime.transport,
             text,
             self._entries,
-            self._log_callbacks,
+            self._callbacks.log,
             self._handle_error,
         )
 
@@ -186,7 +184,7 @@ class SerialWorkbenchController:
         return session_state.replay_entries_into_state_result(
             path,
             self._entries,
-            self._log_callbacks,
+            self._callbacks.log,
             entry_from_event,
         )
 
@@ -214,7 +212,7 @@ class SerialWorkbenchController:
             path,
             self._command_history,
             self._entries,
-            self._log_callbacks,
+            self._callbacks.log,
         )
 
     def _handle_bytes_received(self, data: bytes) -> None:
@@ -222,8 +220,8 @@ class SerialWorkbenchController:
             self._protocol_runtime,
             data=data,
             entries=self._entries,
-            log_callbacks=self._log_callbacks,
-            measurement_callbacks=self._measurement_callbacks,
+            log_callbacks=self._callbacks.log,
+            measurement_callbacks=self._callbacks.measurement,
         )
 
     def _protocol_event_from_entry(self, entry: SerialWorkbenchLogEntry) -> ProtocolEvent:
@@ -236,14 +234,9 @@ class SerialWorkbenchController:
             host,
             port,
             entries=self._entries,
-            log_callbacks=self._log_callbacks,
+            log_callbacks=self._callbacks.log,
         )
         return result
 
     def _handle_error(self, message: str) -> None:
-        receive_state.handle_error(
-            message,
-            entries=self._entries,
-            log_callbacks=self._log_callbacks,
-            error_callbacks=self._error_callbacks,
-        )
+        callback_state.handle_error(message, self._callbacks, self._entries)

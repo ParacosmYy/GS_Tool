@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 613分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 387分
+> 当前: 614分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 386分
 
 ---
 
@@ -315,12 +315,13 @@
 | 611 | Serial Station controller receive state helper | 接收字节后的日志映射、测量 ring 状态和错误入库拆出 controller helper，workbench_controller 保持 272 行且接收职责外移；UI smoke 按端点与失败路径继续拆分并收紧到 225 行门禁 |
 | 612 | Serial Station controller protocol runtime helper | 协议 registry、dispatcher、接收状态和 entry/event 转换聚合到 protocol runtime helper，workbench_controller 不再直接创建协议运行态；连接/Profile controller 单测拆出独立行为域 |
 | 613 | Serial Station controller transport runtime helper | 当前 transport、registry、活跃模式和回调绑定聚合到 transport runtime helper，workbench_controller 降到 249 行并新增 250 行门禁；fake/endpoint 连接回归覆盖 |
+| 614 | Serial Station controller callback state helper | 日志、错误和测量回调集合聚合到 callback state helper，workbench_controller 降到 242 行；回调注册和错误入库具备独立单测 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#613` 的完整记录
+- 当前文档已整理到 `#614` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
