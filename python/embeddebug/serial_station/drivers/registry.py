@@ -9,6 +9,7 @@ from embeddebug.serial_station.drivers.base import SerialTransport
 from embeddebug.serial_station.drivers.fake import FakeSerialTransport
 from embeddebug.serial_station.drivers.qt_serial import QtSerialPortTransport
 from embeddebug.serial_station.drivers.tcp_client import TcpClientTransport
+from embeddebug.serial_station.drivers.tcp_server import TcpServerTransport
 from embeddebug.serial_station.drivers.udp_datagram import UdpDatagramTransport
 
 
@@ -51,6 +52,11 @@ class TransportRegistry:
             "tcp",
             factory=TcpClientTransport,
             port_provider=TcpClientTransport.available_ports,
+        )
+        registry.register(
+            "tcp_server",
+            factory=TcpServerTransport,
+            port_provider=TcpServerTransport.available_ports,
         )
         registry.register(
             "udp",

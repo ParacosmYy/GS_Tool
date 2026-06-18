@@ -13,7 +13,7 @@ from embeddebug.serial_station.drivers import (
 def test_transport_registry_exposes_default_modes_and_fake_transport():
     registry = TransportRegistry.with_defaults()
 
-    assert registry.modes == ("fake", "serial", "tcp", "udp")
+    assert registry.modes == ("fake", "serial", "tcp", "tcp_server", "udp")
     assert registry.available_ports("fake") == ("FAKE_LOOPBACK",)
 
     transport = registry.create("fake")
