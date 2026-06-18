@@ -20,6 +20,7 @@ from PyQt6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QTabWidget,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
@@ -54,6 +55,8 @@ class SettingsPanel:
         self._widget: QWidget | None = None
         self._theme_combo: QComboBox | None = None
         self._theme_status: QLabel | None = None
+        # Batch 10: 强调色选择色点（7 套 accent 变体）+ 当前选中态记录。
+        self._accent_swatches: list[QToolButton] = []
 
     def build(self, app_controller: AppController) -> QWidget:
         self._app_controller = app_controller
@@ -127,6 +130,9 @@ class SettingsPanel:
         row.addWidget(self._theme_status, 1)
         layout.addLayout(row)
 
+        # Batch 10: 强调色选择行（7 套 accent 变体，点击即时切换 + 过渡动画）。
+        layout.addLayout(self._build_accent_row(tab))
+
         hint = QLabel(
             self._widget.tr("切换深色/浅色工业风主题。浅色对齐 EK-OmniProbe 默认玻璃观感。"),
             tab,
@@ -179,6 +185,13 @@ class SettingsPanel:
         layout.addStretch(1)
         return tab
 
+    def _build_accent_row(self, parent: QWidget) -> QHBoxLayout:
+        """Batch 10: 强调色选择行。委托给 ``_accent_row`` 模块（守 300 行门禁）。"""
+
+        from embeddebug.serial_station.ui.panels._accent_row import build_accent_row
+
+        return build_accent_row(self, parent)
+
     # ── 交互 ────────────────────────────────────────────────────────
     def _preview_theme(self, _index: int) -> None:
         """实时预览：切换 combo 选择即应用主题（Batch 19，不弹 toast）。
@@ -208,7 +221,13 @@ class SettingsPanel:
             return
         name = self._theme_combo.currentData() or THEME_DARK
         try:
-            apply_theme_by_name(QApplication.instance(), name)
+            # Batch 10: 主题切换带 windowOpacity 暗淡+回亮过渡（掩盖 QSS 硬切闪烁）。
+            from embeddebug.serial_station.ui.theme.theme_transition import transition_theme
+
+            def apply_fn() -> None:
+                apply_theme_by_name(QApplication.instance(), name)
+
+            transition_theme(QApplication.instance(), apply_fn)
         except Exception as exc:
             if self._theme_status is not None:
                 self._theme_status.setText(self._widget.tr("主题应用失败"))

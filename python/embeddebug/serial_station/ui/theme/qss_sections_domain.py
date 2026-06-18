@@ -174,6 +174,36 @@ QTabBar::tab:selected {{
     background-color: {P.ACCENT_SOFT};
     color: {P.ACCENT};
 }}
+/* Batch 10: 强调色选择色点（7 套 accent 变体）。底色由 inline style 填充（每按钮不同），
+   QSS 只控选中态 ring 与 hover。checked = 当前活动 accent，画 2px accent 描边外环。 */
+QToolButton#serialStationAccentSwatch0,
+QToolButton#serialStationAccentSwatch1,
+QToolButton#serialStationAccentSwatch2,
+QToolButton#serialStationAccentSwatch3,
+QToolButton#serialStationAccentSwatch4,
+QToolButton#serialStationAccentSwatch5,
+QToolButton#serialStationAccentSwatch6 {{
+    border: 2px solid transparent;
+    padding: 0;
+}}
+QToolButton#serialStationAccentSwatch0:checked,
+QToolButton#serialStationAccentSwatch1:checked,
+QToolButton#serialStationAccentSwatch2:checked,
+QToolButton#serialStationAccentSwatch3:checked,
+QToolButton#serialStationAccentSwatch4:checked,
+QToolButton#serialStationAccentSwatch5:checked,
+QToolButton#serialStationAccentSwatch6:checked {{
+    border: 2px solid {P.ACCENT};
+}}
+QToolButton#serialStationAccentSwatch0:hover,
+QToolButton#serialStationAccentSwatch1:hover,
+QToolButton#serialStationAccentSwatch2:hover,
+QToolButton#serialStationAccentSwatch3:hover,
+QToolButton#serialStationAccentSwatch4:hover,
+QToolButton#serialStationAccentSwatch5:hover,
+QToolButton#serialStationAccentSwatch6:hover {{
+    margin-top: -2px;
+}}
 /* 关于页标签。 */
 QLabel#serialStationSettingsAppNameLabel {{
     color: {P.TEXT_PRIMARY};

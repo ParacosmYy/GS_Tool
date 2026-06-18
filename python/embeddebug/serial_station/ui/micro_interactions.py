@@ -28,7 +28,6 @@ from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import QGraphicsDropShadowEffect, QWidget
 
 from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
-from embeddebug.serial_station.ui.theme import palette as P
 
 # 模块级兼容别名：旧测试和外部代码可能直接引用 micro_interactions.SHADOW_BLUR_* /
 # LIFT_PIXELS / ANIM_DURATION。统一指向 AnimationTokens，保持单一真相源。
@@ -106,7 +105,11 @@ class _HoverLiftFilter(QObject):
 
         if self._accent_tint:
             # 阴影色：normal 黑 → hover accent 半透明（品牌辉光）。
-            target_color = QColor(P.ACCENT_BORDER) if hover else QColor(*AnimationTokens.SHADOW_COLOR_RGB)
+            # Batch 10: accent 跟随用户选中的强调色变体（cyan/blue/.../teal），
+            # 而非写死 cyan。accent 变体切换时辉光随之变色。
+            from embeddebug.serial_station.ui.theme.accents import active_accent_border
+
+            target_color = QColor(active_accent_border()) if hover else QColor(*AnimationTokens.SHADOW_COLOR_RGB)
             # QGraphicsDropShadowEffect.color 是 QColor，无原生动画；用 setKeyValueAt 近似。
             # 这里直接 set，淡入由 blurRadius 动画的视觉融合承担（阴影半径变化时颜色过渡自然）。
             self._effect.setColor(target_color)
@@ -131,9 +134,12 @@ class _HoverLiftFilter(QObject):
 def install_focus_ring(widget: QWidget) -> None:
     """给输入框安装 focus 光环（focus 时阴影变强调色 + 扩散）。"""
 
+    # Batch 10: focus 光环色跟随当前 accent 变体（cyan/blue/.../teal）。
+    from embeddebug.serial_station.ui.theme.accents import active_accent_base
+
     effect = QGraphicsDropShadowEffect(widget)
     effect.setBlurRadius(0)
-    effect.setColor(QColor(P.ACCENT))
+    effect.setColor(QColor(active_accent_base()))
     effect.setOffset(0, 0)
     widget.setGraphicsEffect(effect)
     widget.installEventFilter(_FocusRingFilter(effect, widget))

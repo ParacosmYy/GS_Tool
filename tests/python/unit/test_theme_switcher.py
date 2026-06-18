@@ -130,13 +130,14 @@ def test_theme_switcher_apply_dark(qapp):
 
 
 def test_theme_switcher_light_cached(qapp):
+    # Batch 10: QSS 缓存改为 (theme, accent_id) 联合键字典。
     switcher = ThemeSwitcher(qapp)
     switcher.apply_light()
-    cached = switcher._light_qss
+    cached = switcher._qss_cache.get((THEME_LIGHT, "cyan"))
     assert cached is not None
     switcher.apply_light()
     # 第二次应复用缓存（同一对象）。
-    assert switcher._light_qss is cached
+    assert switcher._qss_cache.get((THEME_LIGHT, "cyan")) is cached
 
 
 def test_apply_theme_by_name_dark(qapp):
