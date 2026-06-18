@@ -14,9 +14,11 @@
  *   serialStationConnectButton / serialStationSendEdit / serialStationCommandHistoryCombo /
  *   serialStationSendButton / serialStationInjectEdit / serialStationInjectButton /
  *   serialStationClearButton / serialStationLogView / serialStationStatusLabel
+ *
+ * 本文件由 scripts/_gen_qss.py 从 build_qss() 自动生成（PRD-210 玻璃卡片三栏 shell）。
  */
 
-/* === 全局 === */
+/* === Global === */
 QWidget {
     background-color: #0d1118;
     color: #d7def3;
@@ -27,7 +29,7 @@ QWidget:disabled {
     color: #5f6f86;
 }
 
-/* === 主窗口与根容器 === */
+/* === Window & Root === */
 QMainWindow,
 QMainWindow#embeddebugPySerialStationWindow {
     background-color: #0d1118;
@@ -42,7 +44,7 @@ QLabel#serialStationPyTitle {
     padding: 6px 0px;
 }
 
-/* === 标签 === */
+/* === Labels === */
 QLabel {
     background-color: transparent;
     color: #b7c0d8;
@@ -54,7 +56,185 @@ QLabel#serialStationLogStatsLabel {
     padding: 0 8px;
 }
 
-/* === 按钮 === */
+/* === TopBar (Brand + Status + Profile) === */
+QFrame#serialStationTopBar {
+    background-color: #131a25;
+    background-image: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #131a25,
+        stop:1 #10141d
+    );
+    border: 1px solid #2a3647;
+    border-radius: 12px;
+}
+/* 品牌徽标 chip：强调青软底 + 图标。 */
+QFrame#serialStationBrandChip {
+    background-color: rgba(34, 211, 238, 0.14);
+    border: 1px solid rgba(34, 211, 238, 0.40);
+    border-radius: 6px;
+}
+QLabel#serialStationBrandIcon {
+    background-color: transparent;
+    border: none;
+}
+QLabel#serialStationBrandName {
+    background-color: transparent;
+    color: #d7def3;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+QLabel#serialStationBrandTagline {
+    background-color: transparent;
+    color: #9aa7bd;
+    font-size: 11px;
+}
+
+/* === Glass Cards (EK-OmniProbe surface-card, dark industrial) === */
+QFrame#serialStationCard {
+    background-color: #151b24;
+    border: 1px solid #27313f;
+    border-radius: 16px;
+    /* 顶部高光渐变：模拟玻璃 inner highlight（QSS 无 blur 的近似手段）。 */
+    background-image: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 rgba(255, 255, 255, 0.05),
+        stop:1 rgba(255, 255, 255, 0.00)
+    );
+    padding: 12px;
+}
+QFrame#serialStationCard:hover {
+    border-color: rgba(34, 211, 238, 0.35);
+    background-color: #1b2634;
+}
+/* 卡片标题行：底部细分隔线，拉开标题与内容。 */
+QWidget#serialStationCardHeader {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #27313f;
+    padding-bottom: 6px;
+}
+QLabel#serialStationCardTitle {
+    background-color: transparent;
+    color: #d7def3;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+QLabel#serialStationCardIcon {
+    background-color: transparent;
+    border: none;
+}
+/* 日志卡主体容器：保持透明，让 QPlainTextEdit 自身样式生效。 */
+QVBoxLayout#serialStationCardBody,
+QVBoxLayout#serialStationLogCardBody {
+    background-color: transparent;
+    border: none;
+}
+
+/* === Three-Zone Shell Containers === */
+QWidget#serialStationLeftZone,
+QWidget#serialStationCenterZone,
+QWidget#serialStationRightZone {
+    background-color: transparent;
+    border: none;
+}
+
+/* === Splitter Handles === */
+QSplitter#serialStationMainSplitter::handle {
+    background-color: #27313f;
+}
+QSplitter#serialStationMainSplitter::handle:hover {
+    background-color: rgba(34, 211, 238, 0.35);
+}
+QSplitter#serialStationMainSplitter::handle:horizontal {
+    width: 2px;
+    margin: 8px 0;
+}
+QSplitter#serialStationMainSplitter::handle:vertical {
+    height: 2px;
+    margin: 0 8px;
+}
+
+/* === Command Palette (VS Code Ctrl+P style) === */
+QWidget#serialStationCommandPalette {
+    background-color: rgba(13, 17, 24, 200);
+}
+QFrame#serialStationCommandPaletteCard {
+    background-color: #151b24;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    /* 顶部高光渐变：与主卡片一致的玻璃反光。 */
+    background-image: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 rgba(255, 255, 255, 0.05),
+        stop:1 rgba(255, 255, 255, 0.00)
+    );
+}
+QLineEdit#serialStationCommandPaletteEdit {
+    background-color: #0f141d;
+    color: #d7def3;
+    border: none;
+    border-bottom: 1px solid #27313f;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 8px 16px;
+    font-size: 14px;
+    selection-background-color: #2563eb;
+    selection-color: #f8fafc;
+}
+QLineEdit#serialStationCommandPaletteEdit:focus {
+    border-bottom-color: #22d3ee;
+}
+QListWidget#serialStationCommandPaletteList {
+    background-color: transparent;
+    color: #d7def3;
+    border: none;
+    padding: 6px;
+    outline: none;
+}
+QListWidget#serialStationCommandPaletteList::item {
+    padding: 6px 8px;
+    border-radius: 4px;
+}
+QListWidget#serialStationCommandPaletteList::item:selected {
+    background-color: rgba(34, 211, 238, 0.12);
+    color: #22d3ee;
+}
+QListWidget#serialStationCommandPaletteList::item:hover {
+    background-color: #1b2634;
+}
+QLabel#serialStationCommandPaletteHint {
+    background-color: transparent;
+    color: #9aa7bd;
+    font-size: 11px;
+    padding: 6px 8px;
+    border-top: 1px solid #27313f;
+}
+
+/* === Waveform Cursor HUD & Legend === */
+QLabel#serialStationWaveformCursorHud {
+    background-color: #151b24;
+    color: #9aa7bd;
+    border: 1px solid #27313f;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+}
+QWidget#serialStationWaveformLegend {
+    background-color: transparent;
+    border: none;
+}
+QLabel#serialStationWaveformLegendChip {
+    background-color: transparent;
+    border: none;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+    padding: 4px 6px;
+}
+
+/* === Buttons === */
 QPushButton {
     background-color: #151b24;
     color: #d7def3;
@@ -77,7 +257,6 @@ QPushButton:disabled {
     color: #5f6f86;
     border-color: #27313f;
 }
-
 /* 连接类主按钮 — 强调青底 */
 QPushButton#serialStationConnectButton,
 QPushButton#serialStationConnectSerialButton,
@@ -107,7 +286,6 @@ QPushButton#serialStationConnectUdpButton:disabled {
     background-color: #151b24;
     color: #5f6f86;
 }
-
 /* 断开按钮 — 危险红 */
 QPushButton#serialStationDisconnectButton {
     background-color: rgba(239, 68, 68, 0.10);
@@ -121,7 +299,6 @@ QPushButton#serialStationDisconnectButton:hover {
 QPushButton#serialStationDisconnectButton:pressed {
     background-color: #f87171;
 }
-
 /* 次要工具按钮 */
 QPushButton#serialStationRefreshPortsButton,
 QPushButton#serialStationExportLogButton,
@@ -146,7 +323,6 @@ QPushButton#serialStationSendButton:hover {
     color: #d7def3;
     border-color: rgba(34, 211, 238, 0.35);
 }
-
 /* 发送/注入 — 终端 TX 蓝 */
 QPushButton#serialStationSendButton,
 QPushButton#serialStationInjectButton {
@@ -159,7 +335,7 @@ QPushButton#serialStationInjectButton:hover {
     color: #f8fafc;
 }
 
-/* === 输入框 === */
+/* === Line Edits === */
 QLineEdit {
     background-color: #0f141d;
     color: #d7def3;
@@ -195,7 +371,7 @@ QLineEdit#serialStationUdpPortEdit {
     font-size: 12px;
 }
 
-/* === 下拉框 === */
+/* === ComboBoxes === */
 QComboBox {
     background-color: #0f141d;
     color: #d7def3;
@@ -247,7 +423,7 @@ QComboBox#serialStationLogFilterCombo {
     font-size: 12px;
 }
 
-/* === 日志视图（终端风） === */
+/* === Log View (Terminal) === */
 QPlainTextEdit#serialStationLogView {
     background-color: #0d1118;
     color: #9aa7bd;
@@ -260,7 +436,7 @@ QPlainTextEdit#serialStationLogView {
     selection-color: #f8fafc;
 }
 
-/* === 波形预览 === */
+/* === Waveform Preview === */
 QWidget#serialStationWaveformPanel {
     background-color: #151b24;
     border: 1px solid #27313f;
@@ -279,8 +455,25 @@ QLabel#serialStationWaveformStatusLabel {
     font-size: 12px;
     padding: 6px 8px;
 }
+/* 多通道图例（对齐 VOFA+ 通道色块） */
+QWidget#serialStationWaveformLegend {
+    background-color: transparent;
+    border-top: 1px solid #27313f;
+}
+QLabel#serialStationWaveformLegendChip {
+    background-color: transparent;
+    font-size: 12px;
+}
+/* 游标读数 HUD */
+QLabel#serialStationWaveformCursorHud {
+    background-color: transparent;
+    color: #9aa7bd;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+    padding: 4px 8px;
+}
 
-/* === 状态与 Profile 标签 === */
+/* === Status & Profile Labels === */
 QLabel#serialStationStatusLabel {
     color: #f59e0b;
     padding: 4px 8px;
@@ -296,7 +489,7 @@ QLabel#serialStationProfileLabel {
     padding: 4px 8px;
 }
 
-/* === 滚动条 === */
+/* === Scrollbars === */
 QScrollBar:vertical {
     background: transparent;
     width: 10px;
@@ -332,7 +525,7 @@ QScrollBar::sub-line:horizontal {
     width: 0;
 }
 
-/* === QPlainTextEdit 兜底 === */
+/* === PlainTextEdit Fallback === */
 QPlainTextEdit {
     background-color: #0f141d;
     color: #d7def3;
@@ -341,40 +534,11 @@ QPlainTextEdit {
     padding: 5px 8px;
 }
 
-/* === 快捷键 objectName 契约 === */
-/* QShortcut 无可视样式，objectName 仅用于测试与可发现性。 */
+/* === Shortcut objectName contract === */
+/* QShortcut 无可视样式，objectName 仅用于测试与可发现性，此处保留契约占位。 */
 QObject#serialStationSendShortcut,
 QObject#serialStationClearShortcut,
-QObject#serialStationRefreshPortsShortcut {
+QObject#serialStationRefreshPortsShortcut,
+QObject#serialStationCommandPaletteShortcut {
     /* no-op */
-}
-
-/* === 卡片与三区分栏 === */
-QFrame#serialStationCard {
-    background-color: #151b24;
-    border: 1px solid #27313f;
-    border-radius: 8px;
-}
-QWidget#serialStationCardHeader {
-    background-color: transparent;
-}
-QLabel#serialStationCardTitle {
-    color: #d7def3;
-    font-size: 14px;
-    font-weight: 600;
-}
-QLabel#serialStationCardIcon {
-    background-color: transparent;
-}
-QWidget#serialStationLeftZone,
-QWidget#serialStationCenterZone,
-QWidget#serialStationRightZone {
-    background-color: transparent;
-    border: none;
-}
-QSplitter#serialStationMainSplitter::handle {
-    background-color: #27313f;
-}
-QSplitter#serialStationMainSplitter::handle:horizontal {
-    width: 2px;
 }

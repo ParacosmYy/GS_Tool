@@ -139,3 +139,44 @@ def all_tokens() -> dict[str, str]:
         "brand_chip_bg": BRAND_CHIP_BG,
         "brand_chip_border": BRAND_CHIP_BORDER,
     }
+
+
+# ── 主题变体同步（支持运行时切换深/浅色板） ─────────────────────────
+# 本模块常量是 section 函数（``P.BG_PANEL`` …）的读取源；section 在函数调用期
+# 求值，因此运行时把模块全局变量改写为目标色板的值，再 ``build_qss()`` 即可
+# 生成对应主题的 QSS，无需给每个 section 函数加参数。
+#
+# 默认状态恒为深色（PRD-071），满足
+# ``test_palette_constants_match_modern_dark_industrial_palette`` 的硬断言；
+# 切换构建后应调用 ``reset_to_dark()`` 恢复默认，避免污染后续读取。
+
+# 记录深色默认快照（模块加载时的值），供 reset 使用。
+_DARK_DEFAULTS: dict[str, str] = all_tokens()
+
+
+def sync_to_palette(palette: object) -> None:
+    """把本模块全部色板常量改写为目标 ``Palette`` 的值（运行时主题切换）。
+
+    ``palette`` 需提供 ``as_token_map()``（返回与 ``all_tokens()`` 同 key 集合）。
+    改写后，section 函数的 ``P.BG_PANEL`` 等读取即指向目标主题，再调用
+    ``build_qss()`` 可生成对应主题的 QSS。调用方负责在构建后 ``reset_to_dark()``。
+    """
+
+    token_map = palette.as_token_map() if hasattr(palette, "as_token_map") else {}
+    if not token_map:
+        return
+    globals_ref = globals()
+    for key, value in token_map.items():
+        const_name = key.upper()
+        if const_name in globals_ref:
+            globals_ref[const_name] = value
+
+
+def reset_to_dark() -> None:
+    """恢复深色默认色板（默认主题状态，保证测试硬断言成立）。"""
+
+    globals_ref = globals()
+    for key, value in _DARK_DEFAULTS.items():
+        const_name = key.upper()
+        if const_name in globals_ref:
+            globals_ref[const_name] = value

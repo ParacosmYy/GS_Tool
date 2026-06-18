@@ -163,6 +163,12 @@ QLabel#serialStationWaveformCursorHud {{
     font-family: {T.FONT_FAMILY_MONO};
     font-size: {T.FONT_SM};
     padding: {T.SPACING_XS} {T.SPACING_MD};
+}}
+/* 富游标 objectName 契约：pyqtgraph InfiniteLine 不可由 QSS 设置样式，
+   样式通过运行时 pen 参数设置（强调青/警告黄），此处保留契约占位。 */
+QObject#serialStationWaveformCursorX,
+QObject#serialStationWaveformCursorY {{
+    /* no-op */
 }}"""
 
 

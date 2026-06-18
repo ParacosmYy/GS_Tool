@@ -41,7 +41,7 @@ class SerialStationMainWindow(QMainWindow):
 
         self.setObjectName("embeddebugPySerialStationWindow")
         self.setWindowTitle(self.tr("EmbedDebug PyQt"))
-        self.resize(1180, 720)
+        self.resize(1320, 820)
 
         self.setCentralWidget(build_main_layout(self, self._controller))
         button_icons.apply_button_icons(self)

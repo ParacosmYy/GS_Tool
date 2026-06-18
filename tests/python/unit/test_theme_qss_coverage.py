@@ -15,9 +15,11 @@ from embeddebug.serial_station.ui.theme.qss_builder import build_qss
 REPO_ROOT = Path(__file__).resolve().parents[3]
 UI_DIR = REPO_ROOT / "python" / "embeddebug" / "serial_station" / "ui"
 
-# QShortcut objectName 在源码中通过 setObjectName 设置，但 QShortcut 无可视样式，
-# 仅用于测试与可发现性，不要求 QSS 覆盖。
-STYLE_EXEMPT_SUFFIXES = ("Shortcut",)
+# 以下 objectName 在源码中通过 setObjectName 设置，但所属控件不可由 QSS 设置样式，
+# 仅用于测试与可发现性，不要求 QSS 覆盖：
+# - Shortcut：QShortcut 无可视样式。
+# - CursorX/CursorY：pyqtgraph InfiniteLine，样式通过运行时 pen 参数设置（非 QSS）。
+STYLE_EXEMPT_SUFFIXES = ("Shortcut", "CursorX", "CursorY")
 
 _OBJECTNAME_PATTERN = re.compile(r'setObjectName\(\s*["\']([A-Za-z0-9_]+)["\']\s*\)')
 

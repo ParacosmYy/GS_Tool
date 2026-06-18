@@ -58,6 +58,17 @@ QLabel#serialStationCardIcon {{
     background-color: transparent;
     border: none;
 }}
+/* 连接卡内的小分组标题（Port/Serial/Connect/Endpoints）：弱文本色小字号。 */
+QLabel#serialStationCardGroupLabel {{
+    background-color: transparent;
+    color: {P.TEXT_MUTED};
+    font-size: {T.FONT_XS};
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding-top: {T.SPACING_SM};
+    padding-bottom: {T.SPACING_XS};
+}}
 /* 日志卡主体容器：保持透明，让 QPlainTextEdit 自身样式生效。 */
 QVBoxLayout#serialStationCardBody,
 QVBoxLayout#serialStationLogCardBody {{
