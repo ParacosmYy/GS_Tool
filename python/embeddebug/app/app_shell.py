@@ -43,6 +43,8 @@ class AppShell(QMainWindow):
         self._app_controller = AppController()
         self._panels: dict[str, object] = {}
         self._nav_buttons: dict[str, QPushButton] = {}
+        # Batch 23: 页面离场淡出动画引用（防 GC），_stop_page_anims 清理。
+        self._leave_anims: list = []
 
         central = QWidget(self)
         layout = QHBoxLayout(central)
@@ -192,6 +194,11 @@ class AppShell(QMainWindow):
         if 0 <= old_index < len(registrations):
             leaving = registrations[old_index]
             self._call_panel(leaving.mode_id, "on_leave")
+            # Batch 23: 老页面快速淡出（激活 panel_animations.fade_out 死代码，
+            # 实现 docstring 承诺的「两端都有过渡」，满足铁律 18 禁止突然消失）。
+            leaving_widget = self._stack.widget(old_index)
+            if leaving_widget is not None:
+                self._animate_page_leave(leaving_widget)
 
         self._stack.setCurrentIndex(index)
         self._nav_buttons[registrations[index].mode_id].setChecked(True)
@@ -209,6 +216,13 @@ class AppShell(QMainWindow):
             except Exception:
                 pass
         self._page_anims = []
+        # Batch 23: 也停止离场淡出动画。
+        for anim in getattr(self, "_leave_anims", []):
+            try:
+                anim.stop()
+            except Exception:
+                pass
+        self._leave_anims = []
 
     def _animate_page_enter(self, page: QWidget) -> None:
         """页面入场动画（fade + slide），持有引用防 GC。"""
@@ -221,6 +235,25 @@ class AppShell(QMainWindow):
                 anim.start()
         except Exception:
             pass  # 动画是锦上添花，失败不阻塞切换。
+
+    def _animate_page_leave(self, page: QWidget) -> None:
+        """页面离场快速淡出（Batch 23：激活 panel_animations.fade_out 死代码）。
+
+        fade_out 完成后会 hide() 离场页面（QStackedWidget 切 index 后该页本就不可见，
+        hide 无副作用）。动画引用存 ``_leave_anims`` 防 GC，连续切换时由
+        ``_stop_page_anims`` 停止。
+        """
+
+        if page is None:
+            return
+        try:
+            from embeddebug.serial_station.ui.panel_animations import fade_out
+
+            anim = fade_out(page)
+            self._leave_anims.append(anim)
+            anim.start()
+        except Exception:
+            pass  # 离场淡出是锦上添花，失败不阻塞切换。
 
     def _call_panel(self, mode_id: str, method: str) -> None:
         """安全调用面板生命周期方法（缺失或异常不中断切换）。"""
