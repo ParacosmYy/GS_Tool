@@ -41,4 +41,12 @@ QPushButton#serialStationToastCloseButton {{
 }}
 QPushButton#serialStationToastCloseButton:hover {{
     color: {P.TEXT_PRIMARY};
+}}
+/* === Toast 容器（Batch 12）=== */
+QWidget#serialStationToastContainer {{
+    background-color: transparent;
+    border: none;
+}}
+QLabel#serialStationToastPlaceholder {{
+    background-color: transparent;
 }}"""

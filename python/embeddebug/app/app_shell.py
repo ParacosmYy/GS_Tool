@@ -59,9 +59,85 @@ class AppShell(QMainWindow):
         self._build_pages(nav)
         self.setCentralWidget(central)
 
+        # 通知子系统（Batch 12）：NotificationManager 逻辑层 + ToastContainer 渲染层。
+        # 容器浮在窗口右上角，manager.show() 触发 toast 从右滑入。
+        self._build_notifications()
+
         # 默认切到第一个模式（串口）。
         if self._stack.count() > 0:
             self._switch_to(0)
+
+        # Batch 12: 启动就绪 toast（真实用户可见通知，验证端到端 manager→toast 闭环）。
+        # 用 QTimer 延迟，让窗口先完成首次布局再弹 toast，避免浮层位置错位。
+        from PyQt6.QtCore import QTimer
+
+        QTimer.singleShot(50, self._show_ready_toast)
+
+    def _show_ready_toast(self) -> None:
+        """启动就绪通知：证明通知子系统端到端可用。"""
+
+        try:
+            self.notify("success", self.tr("EmbedDebug 已就绪"),
+                        self.tr("串口工站已加载，选择端口或 endpoint 开始调试"), timeout_ms=4000)
+        except Exception:
+            pass  # toast 是锦上添花，失败不阻塞启动。
+
+    def _build_notifications(self) -> None:
+        """装配通知子系统：manager + 浮层 toast 容器（右上角）。"""
+
+        from embeddebug.serial_station.notifications import NotificationManager
+        from embeddebug.serial_station.ui.widgets.toast_container import ToastContainer
+
+        self._notification_manager = NotificationManager(parent=self)
+        self._toast_container = ToastContainer(self._notification_manager, parent=self)
+        # 容器定位到窗口右上角（resizeEvent 重新对齐）。
+        self._toast_container.setFixedWidth(340)
+        self._toast_container.raise_()
+        self._toast_container.hide()
+
+    def resizeEvent(self, event: object) -> None:
+        """窗口尺寸变化时把 toast 容器对齐到右上角。"""
+
+        super().resizeEvent(event)
+        container = getattr(self, "_toast_container", None)
+        if container is None:
+            return
+        margin = 16
+        try:
+            width = self.width()
+            container.move(width - container.width() - margin, margin)
+        except Exception:
+            pass
+
+    def notify(self, level: str, title: str, message: str, timeout_ms: int = 3000) -> None:
+        """向用户弹一条非模态通知（toast）。
+
+        Args:
+            level: "info" / "success" / "warning" / "error"（对应 NotificationLevel）。
+            title: 标题（加粗）。
+            message: 描述（可选，空串则无副标题）。
+            timeout_ms: 自动消失毫秒；<=0 需手动关闭。
+        """
+
+        from embeddebug.serial_station.notifications.data import NotificationLevel
+
+        level_map = {
+            "info": NotificationLevel.INFO,
+            "success": NotificationLevel.SUCCESS,
+            "warning": NotificationLevel.WARNING,
+            "error": NotificationLevel.ERROR,
+        }
+        resolved = level_map.get(level, NotificationLevel.INFO)
+        manager = getattr(self, "_notification_manager", None)
+        if manager is None:
+            return
+        manager.show(resolved, title, message, timeout_ms=timeout_ms)
+
+    def notification_manager(self):
+        """暴露 NotificationManager（供面板/测试驱动通知）。"""
+
+        return getattr(self, "_notification_manager", None)
+
 
     def _build_nav_rail(self, parent: QWidget) -> QFrame:
         """构建左侧图标导航栏（56px 竖排）。"""

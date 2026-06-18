@@ -9,5 +9,6 @@
 from embeddebug.serial_station.ui.widgets.empty_state import EmptyStateWidget
 from embeddebug.serial_station.ui.widgets.skeleton import SkeletonWidget
 from embeddebug.serial_station.ui.widgets.toast import ToastWidget
+from embeddebug.serial_station.ui.widgets.toast_container import ToastContainer
 
-__all__ = ["EmptyStateWidget", "SkeletonWidget", "ToastWidget"]
+__all__ = ["EmptyStateWidget", "SkeletonWidget", "ToastContainer", "ToastWidget"]
