@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from embeddebug.serial_station.protocols import ProtocolEvent
+from embeddebug.serial_station.protocols.base import ProtocolEvent
 from embeddebug.serial_station.services.event_codec import event_from_record
 from embeddebug.shared import OperationResult
 

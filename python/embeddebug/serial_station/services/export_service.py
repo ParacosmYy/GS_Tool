@@ -6,7 +6,7 @@ import csv
 from pathlib import Path
 from typing import Iterable
 
-from embeddebug.serial_station.protocols import ProtocolEvent
+from embeddebug.serial_station.protocols.base import ProtocolEvent
 from embeddebug.shared import OperationResult
 
 

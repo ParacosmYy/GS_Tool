@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from embeddebug.serial_station.protocols import ProtocolEvent
+from embeddebug.serial_station.protocols.base import ProtocolEvent
 
 
 def event_to_record(event: ProtocolEvent) -> dict[str, Any]:
