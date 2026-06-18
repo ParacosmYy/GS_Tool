@@ -114,3 +114,57 @@ def test_apply_button_icons_skips_missing_buttons(qtbot):
 
     count = button_icons.apply_button_icons(parent)
     assert count == 0
+
+
+# ── Batch 7-3: apply_focus_rings 全局输入框 focus_ring 接线 ─────────
+def test_apply_focus_rings_decorates_line_edits(qtbot):
+    """apply_focus_rings 应为所有 QLineEdit 装 focus_ring（激活死代码）。"""
+
+    from PyQt6.QtWidgets import QLineEdit
+
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    le1 = QLineEdit(parent)
+    le1.setObjectName("serialStationLogSearchEdit")
+    le2 = QLineEdit(parent)
+    le2.setObjectName("serialStationLogPathEdit")
+    count = button_icons.apply_focus_rings(parent)
+    assert count >= 2
+    # 装 focus_ring 后控件应有 graphicsEffect。
+    assert le1.graphicsEffect() is not None
+    assert le2.graphicsEffect() is not None
+
+
+def test_apply_focus_rings_skips_readonly(qtbot):
+    """只读控件不应装 focus_ring（对只读无意义）。"""
+
+    from PyQt6.QtWidgets import QLineEdit
+
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    readonly_le = QLineEdit(parent)
+    readonly_le.setReadOnly(True)
+    count = button_icons.apply_focus_rings(parent)
+    # 只读控件应被跳过。
+    assert readonly_le.graphicsEffect() is None
+
+
+def test_apply_focus_rings_handles_combos(qtbot):
+    """QComboBox 也应被装 focus_ring。"""
+
+    from PyQt6.QtWidgets import QComboBox
+
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    QComboBox(parent)
+    count = button_icons.apply_focus_rings(parent)
+    assert count >= 1
+
+
+def test_apply_focus_rings_returns_zero_on_no_inputs(qtbot):
+    """无输入控件时返回 0。"""
+
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    count = button_icons.apply_focus_rings(parent)
+    assert count == 0

@@ -50,6 +50,8 @@ class SerialStationMainWindow(QMainWindow):
 
         self.setCentralWidget(build_main_layout(self, self._controller))
         button_icons.apply_button_icons(self)
+        # Batch 7-3: 为所有可聚焦输入控件装 focus_ring（激活 micro_interactions 死代码）。
+        button_icons.apply_focus_rings(self)
         self._install_command_palette()
         self._install_responsive_layout()
 
