@@ -193,6 +193,22 @@ class SerialStationMainWindow(QMainWindow):
     def _show_error(self, message: str) -> None:
         status_actions.show_error(self, message)
 
+    def _notify(self, level: str, title: str, message: str, timeout_ms: int = 3000) -> None:
+        """把通知意图委托给 effective 顶层窗口（AppShell）的 toast 系统（Batch 13）。
+
+        reparent 到 AppShell.stack 后 ``self.window()`` 返回 AppShell；AppShell.notify
+        经 NotificationManager → ToastContainer 渲染 toast。无顶层 notify 时静默返回，
+        不影响无 AppShell 的单窗口/测试场景。
+        """
+
+        top = self.window()
+        notify_fn = getattr(top, "notify", None)
+        if callable(notify_fn):
+            try:
+                notify_fn(level, title, message, timeout_ms=timeout_ms)
+            except Exception:
+                pass  # toast 是锦上添花，失败不阻塞连接工作流。
+
     def closeEvent(self, event: object) -> None:
         lifecycle_actions.close_window(self)
         super().closeEvent(event)

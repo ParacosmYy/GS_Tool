@@ -23,6 +23,8 @@ def send_text(host: CommandActionHost) -> None:
         set_status_text(host, "Command is empty")
         # Batch 8: 空命令校验失败 → 抖动 send_edit 反馈（激活 ShakeAnimation）。
         _shake_widget(host._send_edit)
+        # Batch 13: 空命令 → warning toast。
+        _notify(host, "warning", host.tr("命令为空"), host.tr("请输入要发送的命令"))
         return
     result = host._controller.send_text_result(text)
     if result.ok:
@@ -30,6 +32,22 @@ def send_text(host: CommandActionHost) -> None:
         set_result_status(host, result, success_text="Command sent", failure_prefix="Send failed")
         return
     set_result_status(host, result, success_text="", failure_prefix="Send failed")
+    # Batch 13: 发送失败 → error toast。
+    _notify(host, "error", host.tr("发送失败"), getattr(result, "message", "") or "")
+
+
+def _notify(host: CommandActionHost, level: str, title: str, message: str) -> None:
+    """触发 toast 通知（Batch 13：命令发送工作流 → 通知系统）。
+
+    host 可能未实现 _notify（无 AppShell 的单窗口/测试场景），getattr 安全降级。
+    """
+
+    notify_fn = getattr(host, "_notify", None)
+    if callable(notify_fn):
+        try:
+            notify_fn(level, title, message)
+        except Exception:
+            pass
 
 
 def _shake_widget(widget: object) -> None:

@@ -31,8 +31,13 @@ def connect_tcp(host: EndpointConnectionActionHost) -> None:
             endpoint=f"{tcp_host}:{port}",
         )
         host._set_connected_controls(True)
+        _notify(
+            host, "success", host.tr("已连接"),
+            host.tr("TCP {endpoint} 已就绪").format(endpoint=f"{tcp_host}:{port}"),
+        )
         return
     set_result_status(host, result, success_text="", failure_prefix="Connection failed")
+    _notify_result(host, result, failure_title=host.tr("TCP 连接失败"))
 
 
 def connect_udp(host: EndpointConnectionActionHost) -> None:
@@ -52,8 +57,15 @@ def connect_udp(host: EndpointConnectionActionHost) -> None:
             local_port=local_port,
         )
         host._set_connected_controls(True)
+        _notify(
+            host, "success", host.tr("已连接"),
+            host.tr("UDP {endpoint} 本地 {local_port}").format(
+                endpoint=f"{udp_host}:{port}", local_port=local_port
+            ),
+        )
         return
     set_result_status(host, result, success_text="", failure_prefix="Connection failed")
+    _notify_result(host, result, failure_title=host.tr("UDP 连接失败"))
 
 
 def _validated_tcp_endpoint(host: EndpointConnectionActionHost) -> tuple[str, int] | None:
@@ -63,6 +75,8 @@ def _validated_tcp_endpoint(host: EndpointConnectionActionHost) -> tuple[str, in
     set_status_text(host, result.message)
     # Batch 8: 校验失败 → 抖动出错字段（host 空抖 host_edit，port 非法抖 port_edit）。
     _shake_failed_endpoint_field(host, result.message, host._tcp_host_edit, host._tcp_port_edit)
+    # Batch 13: 校验失败 → warning toast。
+    _notify(host, "warning", host.tr("TCP 地址非法"), result.message)
     return None
 
 
@@ -73,7 +87,34 @@ def _validated_udp_endpoint(host: EndpointConnectionActionHost) -> tuple[str, in
     set_status_text(host, result.message)
     # Batch 8: 校验失败 → 抖动出错字段。
     _shake_failed_endpoint_field(host, result.message, host._udp_host_edit, host._udp_port_edit)
+    # Batch 13: 校验失败 → warning toast。
+    _notify(host, "warning", host.tr("UDP 地址非法"), result.message)
     return None
+
+
+def _notify(host: EndpointConnectionActionHost, level: str, title: str, message: str) -> None:
+    """触发 toast 通知（Batch 13：TCP/UDP 连接工作流 → 通知系统）。
+
+    host 可能未实现 _notify（无 AppShell 的单窗口/测试场景），getattr 安全降级。
+    """
+
+    notify_fn = getattr(host, "_notify", None)
+    if callable(notify_fn):
+        try:
+            notify_fn(level, title, message)
+        except Exception:
+            pass
+
+
+def _notify_result(
+    host: EndpointConnectionActionHost, result: object, *, failure_title: str
+) -> None:
+    """OperationResult 失败路径 → error toast（Batch 13）。"""
+
+    if getattr(result, "ok", True):
+        return
+    message = getattr(result, "message", "") or ""
+    _notify(host, "error", failure_title, message)
 
 
 def _shake_failed_endpoint_field(host: EndpointConnectionActionHost, message: str,
