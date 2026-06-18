@@ -1,4 +1,4 @@
-"""Batch 18 测试：DashboardPanel 双击全屏接线（激活 WidgetFullscreenHandler 死代码）。
+"""DashboardPanel 双击全屏接线测试（激活 WidgetFullscreenHandler 死代码）。
 
 覆盖：
 1. DashboardPanel 构建后初始画布已接 item_added（fullscreen wiring 就绪）。

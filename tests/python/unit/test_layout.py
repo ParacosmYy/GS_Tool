@@ -1,4 +1,4 @@
-"""Batch 4 (B2) 布局修复测试：响应式 AppShell 模式 + 折叠卡高度动画。
+"""布局修复测试：响应式 AppShell 模式 + 折叠卡高度动画。
 
 覆盖三个修复：
 1. ResponsiveLayout.attach_to_top_level —— 监听顶层窗口 resize（AppShell 模式生效）。

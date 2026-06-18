@@ -1,4 +1,4 @@
-"""Batch 10 测试：StatusDot 控件 + PulseAnimation 死代码激活。
+"""StatusDot 控件 + PulseAnimation 死代码激活测试。
 
 覆盖：
 1. StatusDot 控件自绘 + objectName 合规 + 状态切换。

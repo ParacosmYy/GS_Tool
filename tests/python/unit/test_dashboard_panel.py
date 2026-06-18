@@ -1,4 +1,4 @@
-"""Batch 17 测试：DashboardPanel 装配 + 仪表盘模式注册（激活 dashboard 死代码）。
+"""DashboardPanel 装配 + 仪表盘模式注册测试（激活 dashboard 死代码）。
 
 覆盖：
 1. DashboardPanel 构建返回含 palette + tabs 的控件。

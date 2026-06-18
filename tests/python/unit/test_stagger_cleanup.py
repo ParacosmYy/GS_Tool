@@ -1,4 +1,4 @@
-"""Batch 24 测试：panel_animations.stagger 死代码清理守护。
+"""panel_animations.stagger 死代码清理守护测试。
 
 Batch 21 用 stagger_fade（纯淡入，不 move 控件）接入工作台卡片后，旧 stagger
 （card_enter 含 slide_in 变体，会 move 控件与布局冲突）成为零生产消费者的死代码。

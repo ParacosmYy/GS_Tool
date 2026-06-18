@@ -1,4 +1,4 @@
-"""Batch 13 测试（分体 2）：命令发送 + RX 注入工作流 → 通知系统。
+"""命令发送 + RX 注入工作流 → 通知系统测试。
 
 从 test_connection_notify_batch13.py 拆出，满足 250 行测试文件预算。
 覆盖 command_actions.send_text 与 injection_actions.inject_received 的

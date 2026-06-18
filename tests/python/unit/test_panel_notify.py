@@ -1,4 +1,4 @@
-"""Batch 14 测试：域面板通知接入（OTA/BLE/RTT → panel_notify → toast）。
+"""域面板通知接入测试（OTA/BLE/RTT → panel_notify → toast）。
 
 覆盖：
 1. panel_notify helper 行为：解析顶层 window、无 notify 降级、None widget 安全。

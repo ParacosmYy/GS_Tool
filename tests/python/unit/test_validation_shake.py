@@ -1,4 +1,4 @@
-"""Batch 8 测试：ShakeAnimation 接入输入校验失败路径。
+"""ShakeAnimation 接入输入校验失败路径测试。
 
 覆盖诊断清单剩余项『抖动（ShakeAnimation）从未接入实际校验失败路径』：
 - command_actions.send_text 空命令 → 抖动 send_edit

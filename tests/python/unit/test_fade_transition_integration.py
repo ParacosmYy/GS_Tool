@@ -1,4 +1,4 @@
-"""Batch 11 测试：EmptyStateWidget.show_with_fade 激活 FadeTransition 死代码。
+"""EmptyStateWidget.show_with_fade 激活 FadeTransition 死代码测试。
 
 覆盖：
 1. show_with_fade 创建并启动 FadeTransition.fade_in 动画。

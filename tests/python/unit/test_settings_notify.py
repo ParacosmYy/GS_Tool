@@ -1,4 +1,4 @@
-"""Batch 16 测试：settings_panel 主题切换 → 通知系统 + dashboard 死代码审计。
+"""settings_panel 主题切换 → 通知系统 + dashboard 死代码审计测试。
 
 覆盖：
 1. settings_panel._apply_theme 成功 → success toast（panel_notify 接入）。

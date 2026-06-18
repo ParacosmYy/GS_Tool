@@ -1,4 +1,4 @@
-"""Batch 13 测试：连接工作流 → 通知系统端到端接线。
+"""连接工作流 → 通知系统端到端接线测试。
 
 覆盖：
 1. connection_actions connect_fake/serial 成功/失败/断开 → host._notify 调用。

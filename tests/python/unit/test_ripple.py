@@ -1,4 +1,4 @@
-"""Batch 7-5 测试：按钮 ripple 水波纹反馈（Material 风格）。
+"""按钮 ripple 水波纹反馈测试（Material 风格）。
 
 覆盖诊断报告剩余项『按钮无 ripple』：
 1. RippleButton 自绘 ripple：点击位置扩散 accent 圆形涟漪。

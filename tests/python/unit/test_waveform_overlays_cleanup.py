@@ -1,4 +1,4 @@
-"""Batch 20 测试：waveform_overlays 遗留死代码清理守护。
+"""waveform_overlays 遗留死代码清理守护测试。
 
 Batch 7 用 CursorManager + waveform_measure 取代旧版固定双游标 API 后，
 attach_cursors/cursor_readout/_make_cursor/_sample_y 仍残留为死代码（仅注释引用）。

@@ -1,4 +1,4 @@
-"""Batch 5 (C1) 测试：EmptyStateWidget / SkeletonWidget / PlaceholderPanel。
+"""控件美化测试：EmptyStateWidget / SkeletonWidget / PlaceholderPanel。
 
 覆盖三个新建/重做组件：
 1. EmptyStateWidget —— 图标+标题+描述+可选 CTA，objectName 合规。

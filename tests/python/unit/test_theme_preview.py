@@ -1,4 +1,4 @@
-"""Batch 19 测试：settings_panel 主题实时预览。
+"""settings_panel 主题实时预览测试。
 
 覆盖：
 1. settings_panel 构建后 combo 接了 currentIndexChanged → _preview_theme。

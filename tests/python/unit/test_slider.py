@@ -1,4 +1,4 @@
-"""Batch 7-4 测试：CommandSlider 跟手气泡 + release 发包语义。
+"""CommandSlider 跟手气泡 + release 发包语义测试。
 
 覆盖诊断报告剩余项『Slider 原生无跟手』：
 1. 跟手气泡：拖拽时显示 value 气泡跟随 handle 位置，释放隐藏。

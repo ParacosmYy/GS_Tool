@@ -1,4 +1,4 @@
-"""Batch 21 测试：panel_animations.stagger_fade 激活 + workbench 卡片错峰淡入。
+"""panel_animations.stagger_fade 激活 + workbench 卡片错峰淡入测试。
 
 覆盖：
 1. stagger_fade 存在且返回 N 个动画（每张卡片一个）。
