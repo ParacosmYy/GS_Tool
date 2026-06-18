@@ -51,24 +51,26 @@ def assemble_three_zone(
     splitter.setHandleWidth(2)
     splitter.setChildrenCollapsible(False)
 
-    left_zone = _build_left_zone(owner, splitter, toolbar_layout, send_row_layout, inject_row_layout)
-    log_card, waveform_card = _build_center_zone(owner, splitter)
+    # 框架：左=连接配置（精简侧栏）、中=主工作区（波形+日志+命令行）、右=日志工具+Profile。
+    # 命令行(send/inject)移到中区底部，紧贴日志：发送→看日志是连续视线流，且左栏不再溢出。
+    left_zone = _build_left_zone(owner, splitter, toolbar_layout)
+    log_card, waveform_card = _build_center_zone(
+        owner, splitter, send_row_layout, inject_row_layout
+    )
     right_zone = _build_right_zone(owner, splitter, log_row_layout, profile_row_layout, footer_layout)
 
     # 三区最小宽度：防止窄栏把横向 toolbar 控件挤压到字符截断。
-    # 左栏需容纳连接配置（多 combo），中栏是主信息区，右栏是日志工具。
-    left_zone.setMinimumWidth(320)
-    splitter.widget(1).setMinimumWidth(360)
+    left_zone.setMinimumWidth(300)
+    splitter.widget(1).setMinimumWidth(380)
     right_zone.setMinimumWidth(260)
 
-    # 显式初始分配：左 320 / 中 560 / 右 260（总 1140，适配 1320 窗口含边距）。
-    # 中区作为主信息区占主导，避免右区内容少却被分配过多空间。
-    splitter.setSizes([320, 560, 260])
+    # 显式初始分配：左 300 / 中 620 / 右 260（中区主工作区占主导）。
+    splitter.setSizes([300, 620, 260])
 
-    # 中区占主导：左 32% / 中 44% / 右 24%（左栏加宽以容纳连接配置）。
-    splitter.setStretchFactor(0, 32)
-    splitter.setStretchFactor(1, 44)
-    splitter.setStretchFactor(2, 24)
+    # stretch：中区主导（resize 时多余空间优先给中区）。
+    splitter.setStretchFactor(0, 1)
+    splitter.setStretchFactor(1, 3)
+    splitter.setStretchFactor(2, 1)
 
     # 把中区卡片挂到 owner，供 sections 注入 log_view/log_stats_label。
     owner._center_log_card = log_card
@@ -80,10 +82,8 @@ def _build_left_zone(
     owner: LayoutMainHost,
     splitter: QSplitter,
     toolbar_layout: QLayout,
-    send_row_layout: QLayout,
-    inject_row_layout: QLayout,
 ) -> QWidget:
-    """左区：连接配置卡（toolbar 纵向重排）+ 命令卡（发送/注入）。"""
+    """左区：仅连接配置卡（命令行已移到中区，避免左栏纵向溢出）。"""
 
     zone = QWidget(splitter)
     zone.setObjectName("serialStationLeftZone")
@@ -97,11 +97,6 @@ def _build_left_zone(
     connection_card = _build_connection_card_vertical(owner, zone, toolbar_layout)
     zone_layout.addWidget(connection_card)
 
-    command_card = wrap_layout(zone, send_row_layout)
-    command_body = card_body(command_card)
-    command_body.addLayout(inject_row_layout)
-    zone_layout.addWidget(command_card)
-
     zone_layout.addStretch(1)
     return zone
 
@@ -109,141 +104,24 @@ def _build_left_zone(
 def _build_connection_card_vertical(
     owner: LayoutMainHost, parent: QWidget, toolbar_layout: QLayout
 ) -> QFrame:
-    """把横向 toolbar 的控件纵向重排进连接卡片。
+    """委托 connection_sidebar 把横向 toolbar 纵向重排进连接卡片。"""
 
-    toolbar_layout 由 ``build_connection_toolbar`` 构建为横向一行；这里
-    抽取其全部子控件（保留 objectName 与已连接的信号），按端口/串口参数/
-    连接动作/端点分组纵向排列，避免窄栏字符截断。控件 parent 不变，
-    findChild 与 action 模块契约不受影响。
-    """
+    from embeddebug.serial_station.ui.connection_sidebar import build_connection_card
 
-    card, body = build_card(parent, title=owner.tr("Connection"), icon_name="plug")
-
-    # 提取 toolbar 全部子项（控件 + stretch）。
-    widgets = _take_layout_widgets(toolbar_layout)
-
-    # owner 上的控件引用分组（顺序与 build_connection_toolbar 一致）。
-    groups = _group_connection_widgets(owner, widgets)
-    for label_text, group_widgets in groups:
-        if not group_widgets:
-            continue
-        if label_text is not None:
-            body.addWidget(_make_group_label(parent, owner.tr(label_text)))
-        for widget in group_widgets:
-            body.addWidget(widget)
-    return card
+    return build_connection_card(owner, parent, toolbar_layout)
 
 
-def _take_layout_widgets(layout: QLayout) -> list[QWidget]:
-    """从 layout 提取全部子控件（跳过 stretch / spacer），控件从原 layout 移除。
-
-    status/profile label 归 TopBar 管理（已被 reparent），不提取，
-    避免从 TopBar 被拽进连接卡。
-    """
-
-    topbar_owned = {"serialStationStatusLabel", "serialStationProfileLabel"}
-    widgets: list[QWidget] = []
-    # 先收集要保留的 item（label），只提取其余控件。
-    remaining: list = []
-    while layout.count():
-        item = layout.takeAt(0)
-        if item is None:
-            continue
-        widget = item.widget()
-        if widget is None:
-            continue
-        if widget.objectName() in topbar_owned:
-            # 保留在原位（实际由 TopBar 管理），不提取。
-            remaining.append(item)
-            continue
-        widgets.append(widget)
-    # 把保留的 label item 放回 toolbar（它们实际由 TopBar parent）。
-    for item in remaining:
-        layout.addItem(item)
-    return widgets
-
-
-def _group_connection_widgets(
-    owner: LayoutMainHost, widgets: list[QWidget]
-) -> list[tuple[str | None, list[QWidget]]]:
-    """按 objectName 把控件分到语义组，未识别的归到 None 组（保留显示）。"""
-
-    by_name = {w.objectName(): w for w in widgets}
-    get = lambda name: [by_name[name]] if name in by_name else []
-
-    # 端口选择：protocol + port + refresh。
-    port = []
-    for n in ("serialStationProtocolCombo", "serialStationPortCombo"):
-        port.extend(get(n))
-    port.extend(get("serialStationRefreshPortsButton"))
-
-    # 串口参数：baud / data bits / parity / stop bits / flow control。
-    serial_params = []
-    for n in (
-        "serialStationBaudCombo",
-        "serialStationDataBitsCombo",
-        "serialStationParityCombo",
-        "serialStationStopBitsCombo",
-        "serialStationFlowControlCombo",
-    ):
-        serial_params.extend(get(n))
-
-    # 连接动作：fake / serial / disconnect。
-    actions = []
-    for n in ("serialStationConnectButton", "serialStationConnectSerialButton", "serialStationDisconnectButton"):
-        actions.extend(get(n))
-
-    # 端点：TCP / UDP。
-    endpoints = []
-    for n in (
-        "serialStationConnectTcpButton",
-        "serialStationTcpHostEdit",
-        "serialStationTcpPortEdit",
-        "serialStationConnectUdpButton",
-        "serialStationUdpHostEdit",
-        "serialStationUdpPortEdit",
-    ):
-        endpoints.extend(get(n))
-
-    # 已分组的 objectName 集合，剩余归 None 组。
-    grouped = set()
-    for grp in (port, serial_params, actions, endpoints):
-        for w in grp:
-            grouped.add(w.objectName())
-    # status/profile label 归 TopBar，不进连接卡（避免从 TopBar 被拽走）。
-    topbar_owned = {"serialStationStatusLabel", "serialStationProfileLabel"}
-    rest = [
-        w for w in widgets
-        if w.objectName() not in grouped and w.objectName() not in topbar_owned
-    ]
-
-    result: list[tuple[str | None, list[QWidget]]] = []
-    if port:
-        result.append(("Port", port))
-    if serial_params:
-        result.append(("Serial", serial_params))
-    if actions:
-        result.append(("Connect", actions))
-    if endpoints:
-        result.append(("Endpoints", endpoints))
-    if rest:
-        result.append((None, rest))
-    return result
-
-
-def _make_group_label(parent: QWidget, text: str) -> QLabel:
-    """连接卡片内的小分组标题（弱文本色，小字号）。"""
-
-    label = QLabel(text, parent)
-    label.setObjectName("serialStationCardGroupLabel")
-    label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-    return label
-
-
-def _build_center_zone(owner: LayoutMainHost, splitter: QSplitter) -> tuple[QWidget, QWidget]:
-    """中区：波形预览 + 日志视图（主信息区）。
+def _build_center_zone(
+    owner: LayoutMainHost,
+    splitter: QSplitter,
+    send_row_layout: QLayout,
+    inject_row_layout: QLayout,
+) -> tuple[QWidget, QWidget]:
+    """中区：主工作区 = 波形(上) + 日志(中,主体) + 命令卡(下)。
 
     返回 (log_card, waveform_card)，波形卡内已嵌入 waveform_preview。
+    日志是主要信息区（用户看收发数据），stretch 3；波形辅助观察，stretch 2；
+    命令行(send/inject)贴在日志下方，发送→看日志是连续视线流。
     """
 
     zone = QWidget(splitter)
@@ -252,15 +130,25 @@ def _build_center_zone(owner: LayoutMainHost, splitter: QSplitter) -> tuple[QWid
     zone_layout.setContentsMargins(0, 0, 0, 0)
     zone_layout.setSpacing(10)
 
+    # 波形卡（上）：辅助观察，stretch 2，设最小高度防压扁。
     waveform_card, wave_body = build_card(
         zone, title=owner.tr("Waveform"), icon_name="activity"
     )
     owner._waveform_preview = SerialWaveformPreview(waveform_card)
     wave_body.addWidget(owner._waveform_preview, 1)
-    zone_layout.addWidget(waveform_card, 1)
+    waveform_card.setMinimumHeight(160)
+    zone_layout.addWidget(waveform_card, 2)
 
+    # 日志卡（中,主体）：主要信息区，stretch 3，设最小高度保证可读。
     log_card, log_body = build_card(zone, title=owner.tr("Log"), icon_name="terminal")
-    zone_layout.addWidget(log_card, 1)
+    log_card.setMinimumHeight(200)
+    zone_layout.addWidget(log_card, 3)
+
+    # 命令卡（下）：send + inject 紧贴日志底部。
+    command_card = wrap_layout(zone, send_row_layout)
+    command_body = card_body(command_card)
+    command_body.addLayout(inject_row_layout)
+    zone_layout.addWidget(command_card)
     return log_card, waveform_card
 
 
