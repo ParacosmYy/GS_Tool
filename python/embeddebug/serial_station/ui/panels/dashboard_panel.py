@@ -88,11 +88,17 @@ class DashboardPanel:
         self._wire_canvas_fullscreen(self._tabs.current_canvas())
         self._tabs.canvas_changed.connect(self._wire_canvas_fullscreen)
 
+        # 先赋 _widget，再恢复布局（恢复会触发 item_added → _on_item_added_fullscreen
+        # 用 self._widget.tr(...)，必须在恢复前就绪）。
         self._widget = widget
+
+        # Batch 25: 自动恢复上一次仪表盘布局（应用数据目录 JSON）。
+        self._restore_layout_on_build()
+
         return widget
 
     def _wire_canvas_fullscreen(self, canvas: object) -> None:
-        """把给定画布的 item_added 信号接到双击全屏安装器（Batch 18）。
+        """把给定画布的 item_added/item_removed 信号接到全屏安装 + 自动保存（Batch 18/25）。
 
         每个画布只接一次（用 _wired_canvases 去重，防止 canvas_changed 重复连接）。
         """
@@ -108,6 +114,45 @@ class DashboardPanel:
             return
         wired.add(canvas_id)
         canvas.item_added.connect(self._on_item_added_fullscreen)
+        # Batch 25: add/remove 后自动持久化布局。
+        canvas.item_added.connect(lambda _id: self._autosave_layout())
+        canvas.item_removed.connect(lambda _id: self._autosave_layout())
+
+    def _restore_layout_on_build(self) -> None:
+        """build 时从应用数据目录恢复上一次仪表盘布局（Batch 25）。
+
+        默认关闭（避免破坏「build 后画布为空」的既有测试前提与多实例串扰）；
+        设环境变量 ``EMBEDDEBUG_DASHBOARD_AUTOSAVE=1`` 启用自动恢复 + 自动保存。
+        """
+
+        if not _autosave_enabled():
+            return
+        try:
+            from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
+                restore_to_canvas,
+            )
+
+            canvas = self._tabs.current_canvas() if self._tabs else None
+            if canvas is not None:
+                restore_to_canvas(canvas)
+        except Exception:
+            pass  # 恢复失败不阻塞面板构建（用户可手动加载）。
+
+    def _autosave_layout(self) -> None:
+        """add/remove 后把当前画布布局写回应用数据目录（Batch 25）。"""
+
+        if not _autosave_enabled():
+            return
+        try:
+            from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
+                persist_from_canvas,
+            )
+
+            canvas = self._tabs.current_canvas() if self._tabs else None
+            if canvas is not None:
+                persist_from_canvas(canvas)
+        except Exception:
+            pass  # 自动保存失败静默（手动保存按钮仍可用）。
 
     def _on_item_added_fullscreen(self, item_id: str) -> None:
         """新控件放置 → 给它装双击全屏 + 发 toast 提示（Batch 18）。
@@ -192,3 +237,14 @@ class DashboardPanel:
             )
         except (OSError, ValueError, KeyError) as exc:
             self._status.setText(self._widget.tr("加载失败：{err}").format(err=exc))
+
+
+def _autosave_enabled() -> bool:
+    """是否启用仪表盘布局自动持久化（默认关，env EMBEDDEBUG_DASHBOARD_AUTOSAVE=1 开）。
+
+    模块级函数（必须在 DashboardPanel 类定义之后，避免切断类体）。
+    """
+
+    import os
+
+    return os.environ.get("EMBEDDEBUG_DASHBOARD_AUTOSAVE", "") == "1"

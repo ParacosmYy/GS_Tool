@@ -206,3 +206,33 @@ def test_score_tracking_head_not_behind_max_record():
         f"SCORE_TRACKING 头部分数 {head_score} 落后于最大记录编号 {max_record}；"
         f"请回填头部「当前」分到至少 {max_record}"
     )
+
+
+def test_no_new_batch_suffixed_test_files():
+    """禁止新增 *_batch*.py 测试文件（白名单覆盖已知在途项）。
+
+    UI 美化迭代曾持续产出 test_*_batchNN.py 碎片文件，文件名携带无意义迭代
+    编号，降低可搜索性。存量已全部 rename 清零（3c912fff3/f1ab1a995）。
+    本守护防止复发：新增的 batch 文件必须先 rename 为语义命名（去 _batchNN
+    后缀）再提交。
+
+    白名单 _PENDING_RENAME 列出已知的、尚未迁移的在途文件；迁移后从此移除。
+    """
+    _PENDING_RENAME = frozenset(
+        {
+            # 并发进程 Batch 25 在途，待稳定后 rename 为 test_dashboard_layout_persist.py
+            "test_dashboard_layout_persist_batch25.py",
+        }
+    )
+
+    offenders = sorted(
+        p.name
+        for root in (Path("tests/python/unit"), Path("tests/python/ui_smoke"))
+        for p in root.glob("test_*_batch*.py")
+        if p.name not in _PENDING_RENAME
+    )
+
+    assert not offenders, (
+        "发现新的 batch 后缀测试文件，请改为语义命名（去 _batchNN 后缀）再提交: "
+        + ", ".join(offenders)
+    )
