@@ -1,8 +1,9 @@
-"""Batch 9 测试：SkeletonWidget/EmptyState 接入面板加载占位路径。
+"""Batch 9 测试：域面板加载占位 + 波形游标右键交互接线。
 
 覆盖：
 1. OTA 传输中 skeleton shimmer（传输开始 show/完成 hide）。
 2. CAN/BLE/RTT 空数据 EmptyState（有数据 hide/清空 show）。
+3. CursorManager 右键/双击游标交互（install_cursor_interactions 接入 preview）。
 
 源码级断言（避免实例化复杂面板需要 AppController/transport），验证接入点存在。
 """
@@ -13,9 +14,7 @@ import inspect
 import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-import os
 
-os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
 def test_ota_panel_has_transfer_skeleton():
@@ -100,18 +99,22 @@ def test_cursor_interactions_module_provides_install():
 
 
 def test_waveform_preview_installs_cursor_interactions(qtbot):
-    """preview 构造时应装双击/右键游标交互（mouseDoubleClickEvent 被替换为闭包）。"""
+    """preview 构造时应装双击/右键游标交互（mouseDoubleClickEvent 被替换为闭包）。
+
+    用实例 __dict__ 验证 override：pyqtgraph 对 bound method 的 getattr 会回退到
+    类方法，实例属性需通过 __dict__ 检查。
+    """
 
     from embeddebug.serial_station.ui.waveform_preview import SerialWaveformPreview
 
     preview = SerialWaveformPreview()
     qtbot.addWidget(preview)
     plot = preview._plot
-    # install_cursor_interactions 替换 handler 为命名闭包。
-    dc_name = getattr(plot.mouseDoubleClickEvent, "__name__", "")
-    ctx_name = getattr(plot.contextMenuEvent, "__name__", "")
-    assert dc_name == "_on_double_click"
-    assert ctx_name == "_on_context"
+    # install_cursor_interactions 在 plot.__dict__ 写入命名闭包。
+    dc = plot.__dict__.get("mouseDoubleClickEvent")
+    ctx = plot.__dict__.get("contextMenuEvent")
+    assert dc is not None and getattr(dc, "__name__", "") == "_on_double_click"
+    assert ctx is not None and getattr(ctx, "__name__", "") == "_on_context"
 
 
 def test_cursor_interactions_cursor_manager_available_after_update(qtbot):

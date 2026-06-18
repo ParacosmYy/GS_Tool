@@ -114,7 +114,7 @@ harness 现实：当前环境唯一 subagent 类型是只读 `Explore`（Glob/Gr
 
 ## 六、评分日志
 
-全部 6 个 Batch 于 2026-06-19 完成并提交：
+### 6.1 初始 6 批（Batch 1~6，2026-06-19 完成）
 
 | Batch | Commit | 测试 | smoke | 得分 |
 |---|---|---|---|---|
@@ -125,8 +125,23 @@ harness 现实：当前环境唯一 subagent 类型是只读 `Explore`（Glob/Gr
 | 5 (C1) EmptyState/骨架屏/hover_lift | `480b58803` | 879 passed | =0 | 622→623 |
 | 6 (C2) 波形美化+统计接入 | `76acf6293` | 884 passed | =0 | 623→624 |
 
-- 本轮总增量：`+6`（618 → 624）
-- 测试增量：838 → 884（+46 个新测试覆盖 6 个问题域）
+### 6.2 续迭代（Batch 7~9，诊断报告「剩余可选优化」逐项收口）
+
+初始 6 批收口后，第七节列出的 4 项「剩余可选优化」继续作为后续批次目标，逐项接线并有测试覆盖：
+
+| Batch | Commit | 测试 | smoke | 得分 | 收口项 |
+|---|---|---|---|---|---|
+| 7-1 CursorManager 接入预览 | `6d8e60f27` | 902 passed | =0 | 624→625 | 剩余项①游标可增删 |
+| 7-2 waveform_perf 热路径节流 | `162df9088` | 905 passed | =0 | 625→626 | 剩余项②RefreshThrottle/BatchAccumulator |
+| 7-3 全局输入框 focus_ring | `e34d3d17f` | 908 passed | =0 | 626→627 | 剩余项③focus_ring 接线 |
+| 7-4 Slider 跟手气泡+release 发包 | `91228f970` | 904 passed | =0 | 627→628 | Slider 原生无跟手+valueChanged 刷屏 |
+| 7-5 按钮 ripple 水波纹 | `f765552c8` | 911 passed | =0 | 628→629 | 剩余项④ripple 反馈 |
+| 7-6 域面板 stagger 入场动画 | `2ae46ca3d` | 920 passed | =0 | 629→630 | 6 个域面板入场动画（原仅 PlaceholderPanel） |
+| 8 ShakeAnimation 接入校验失败 | `d85a30af7` | 930 passed | =0 | 630→631 | 抖动接入输入校验失败路径（5 项微交互清单最后 1 项） |
+| 9 域面板占位+游标右键交互 | 待提交 | 941 passed | =0 | 631→632 | OTA skeleton/CAN·BLE·RTT EmptyState/CursorManager 右键交互 |
+
+- 本轮总增量：`+14`（618 → 632）
+- 测试增量：838 → 941（+103 个新测试覆盖 6 个问题域 + 9 个续迭代子项）
 - 双 smoke 入口（`uv run start-embeddebug --smoke` + `cmd /c EmbedDebug.bat --smoke`）全程退出码 0
 - 阶段：600→699（结构与流程稳定期）
 
@@ -149,8 +164,19 @@ harness 现实：当前环境唯一 subagent 类型是只读 `Explore`（Glob/Gr
 6. **波形**：曲线渐变填充 + 发光；waveform_measure 死代码激活（stats label 显示 Vpp/RMS 等）；
    网格 alpha 0.12→0.18。
 
-剩余可选优化（未在本轮范围，留待后续迭代）：
-- CursorManager 接入 preview（可增删游标，当前是固定双游标）。
-- waveform_perf 的 RefreshThrottle/BatchAccumulator 接入热路径节流。
-- 全局输入框 focus_ring 接线（当前只接了 hover_lift）。
-- ripple 水波纹按钮反馈（Material 风）。
+### 7.1 续迭代收口（Batch 7~9，2026-06-19 续）
+
+诊断报告第一节 6 个问题域修复后，原列出的「剩余可选优化」全部在 Batch 7~9 收口：
+
+7. **游标交互（Batch 7-1/7-2/9-3）**：CursorManager 接入 preview（双游标默认+可增删，
+   7-1）；RefreshThrottle+BatchAccumulator 接热路径节流（7-2）；右键/双击游标交互
+   install_cursor_interactions 接入 preview + Qt6 鼠标事件兼容 helper（9-3）。
+8. **输入反馈（Batch 7-3/7-4/8）**：全局输入框 focus_ring 光环动画（7-3）；Slider 跟手
+   气泡 + release 发包语义（7-4，消除 valueChanged 刷屏）；ShakeAnimation 接入 3 个输入
+   校验失败路径（空命令/endpoint host-port/空端口，Batch 8）。至此「按钮按压/hover/focus/
+   抖动/呼吸灯」5 项微交互清单全部接线。
+9. **域面板占位（Batch 7-5/7-6/9）**：按钮 ripple 水波纹（7-5）；6 个域面板 stagger
+   入场动画（7-6，原仅 PlaceholderPanel）；OTA 传输 skeleton shimmer + CAN/BLE/RTT 空数据
+   EmptyState 占位（有数据 hide/清空 show，Batch 9-1/9-2）。
+
+剩余可选优化：**全部已收口**，无遗留项。

@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 618分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 382分
+> 当前: 632分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 368分
 
 ---
 
@@ -320,13 +320,28 @@
 | 616 | Serial Station command action boundary | 命令发送和命令历史动作从 connection actions 拆入 command actions，main window 仅做委托；UI 架构测试防止命令职责回流 |
 | 617 | Serial Station endpoint connection action boundary | TCP/UDP endpoint 连接动作从 connection actions 拆入 endpoint connection actions，connection_actions 降到 89 行；endpoint UI smoke 覆盖 |
 | 618 | Serial Station command section boundary | 命令发送行从 sections 拆入 command_section，sections.py 降到 152 行；UI 架构测试防止命令控件构建职责回流 |
+| 619 | Serial Station UI 美化 Batch 1 (A1) — 动画引擎整合 | 统一 token 时长消除双轨制；ScaleAnimation 中心缩放+防 GC；FadeTransition.cross_fade 竞态修复；micro_interactions hover_lift 真位移；app_shell 加 on_leave 生命周期+同页跳过+动画停止防叠加；11 files +619/-166 |
+| 620 | Serial Station UI 美化 Batch 2 (A2) — QSS 主题深度+死代码清除 | 删 palette_defs.py 229 行死代码；BG_PANEL 亮度差 3%→8% 卡片浮起；elevation token + accent gradient；3 处硬编码 RGBA 修复（浅色切换不漏色）；8 files +155/-313 |
+| 621 | Serial Station UI 美化 Batch 3 (B1) — 控件动效接线+图标 bug | ConfigurableButton 接按压回弹+hover_lift；StatusLed 接呼吸；Gauge 指针 tween；icons 缓存键漏 pixels bug + 多 path 着色 bug 修复；6 files +280/-24 |
+| 622 | Serial Station UI 美化 Batch 4 (B2) — 布局修复 | 响应式 resize 驱动点迁到 AppShell（事件过滤器 attach_to_top_level）；折叠卡硬切→高度动画；右区 6 控件横向截断→纵向换行；5 files +295/-24 |
+| 623 | Serial Station UI 美化 Batch 5 (C1) — EmptyState/骨架屏/占位重做 | 新建 EmptyStateWidget+SkeletonWidget(shimmer)；PlaceholderPanel 重做渲染 icon+入场动画；全局卡片 hover_lift；10 files +564/-25 |
+| 624 | Serial Station UI 美化 Batch 6 (C2) — 波形美化 | 曲线渐变填充+发光主线；waveform_measure 死代码激活（Vpp/RMS 统计）；网格 alpha 0.12→0.18；3 files +150/-3 |
+| 625 | Serial Station UI 美化 Batch 7-1 — CursorManager 接入波形预览 | preview 接入 CursorManager（双游标默认+可增删）；激活游标 HUD 死代码；2 files +95/-7 |
+| 626 | Serial Station UI 美化 Batch 7-2 — waveform_perf 热路径节流 | preview 接入 RefreshThrottle+BatchAccumulator（激活死代码），submit_batch 累积+flush，不再逐批重建；3 files +95/-8 |
+| 627 | Serial Station UI 美化 Batch 7-3 — 全局输入框 focus_ring | button_icons.apply_focus_rings 遍历子树可聚焦控件装 focus 光环动画；main_window 装配调用；3 files +94/-1 |
+| 628 | Serial Station UI 美化 Batch 7-4 — Slider 跟手气泡+release 发包 | 拖拽时显示 value 气泡跟随 handle；release 才发包（原 valueChanged 刷屏→拖 100px 只发 1 个最终命令）；5 files +220/-56 |
+| 629 | Serial Station UI 美化 Batch 7-5 — 按钮 ripple 水波纹 | 新建 RippleButton+install_ripple；EmptyState CTA 改用 RippleButton；ConfigurableButton.set_ripple 动态注入；6 files |
+| 630 | Serial Station UI 美化 Batch 7-6 — 域面板 stagger 入场动画 | 新建 panels/_enter_anim play/stop_panel_enter；6 个域面板 on_enter/on_leave 接入场动画；8 files |
+| 631 | Serial Station UI 美化 Batch 8 — ShakeAnimation 接入校验失败 | 抖动接入 3 个校验路径（空命令/endpoint host-port/空端口）；至此按压/hover/focus/抖动/呼吸灯 5 项全接线；4 files |
+| 632 | Serial Station UI 美化 Batch 9 — 域面板占位+游标右键交互 | OTA 传输 skeleton shimmer；CAN/BLE/RTT 空数据 EmptyState（有数据 hide/清空 show）；CursorManager 右键/双击游标交互（install_cursor_interactions 接入 preview，Qt6 鼠标事件兼容 helper）；清理测试文件重复 import |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#618` 的完整记录
+- 当前文档已整理到 `#632` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
+- 619~632 为「UI 美化与动画接线」连续迭代（Batch 1~9），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
