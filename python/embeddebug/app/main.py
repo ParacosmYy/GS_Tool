@@ -11,6 +11,7 @@ from PyQt6.QtCore import QCoreApplication, QEvent
 from PyQt6.QtWidgets import QApplication
 
 from embeddebug.serial_station.ui.main_window import SerialStationMainWindow
+from embeddebug.serial_station.ui.theme import apply_theme
 
 
 def create_application(argv: Sequence[str] | None = None) -> QApplication:
@@ -23,6 +24,7 @@ def create_application(argv: Sequence[str] | None = None) -> QApplication:
     app = QApplication(list(argv) if argv is not None else list(sys.argv))
     app.setApplicationName("EmbedDebugPy")
     app.setApplicationDisplayName("EmbedDebug PyQt")
+    apply_theme(app)
     return app
 
 

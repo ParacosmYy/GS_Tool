@@ -1,0 +1,350 @@
+/* EmbedDebug Serial Station — VOFA+ 精致工业风深色主题（参考源）
+ *
+ * 本文件是 ThemeManager 的外部编辑路径：当 resources/themes/serial_station_dark.qss
+ * 存在时，ThemeManager.load_qss 会优先读取本文件；缺失或读取失败时回退到
+ * python/embeddebug/serial_station/ui/theme/qss_builder.py 的程序化生成。
+ *
+ * 颜色与尺寸真相源在 palette.py / tokens.py；本文件用于设计期手改 QSS 调试。
+ * 如需同步本文件与程序化生成器，删除本文件后由 ThemeManager 自动回退到生成器，
+ * 再用 `python -c "from embeddebug.serial_station.ui.theme.qss_builder import build_qss as b; print(b())"`
+ * 重新生成。
+ *
+ * objectName 约定：所有 Serial Station 控件统一带 `serialStation` 前缀，
+ * 冒烟测试 (test_serial_station_mvp.py) 用 findChild 硬断言以下 9 个必须存在：
+ *   serialStationConnectButton / serialStationSendEdit / serialStationCommandHistoryCombo /
+ *   serialStationSendButton / serialStationInjectEdit / serialStationInjectButton /
+ *   serialStationClearButton / serialStationLogView / serialStationStatusLabel
+ */
+
+/* === 全局 === */
+QWidget {
+    background-color: #0d1118;
+    color: #d7def3;
+    font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
+    font-size: 13px;
+}
+QWidget:disabled {
+    color: #5f6f86;
+}
+
+/* === 主窗口与根容器 === */
+QMainWindow,
+QMainWindow#embeddebugPySerialStationWindow {
+    background-color: #0d1118;
+}
+QWidget#serialStationPyRoot {
+    background-color: #101218;
+}
+QLabel#serialStationPyTitle {
+    color: #d7def3;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 6px 0px;
+}
+
+/* === 标签 === */
+QLabel {
+    background-color: transparent;
+    color: #b7c0d8;
+}
+QLabel#serialStationLogStatsLabel {
+    color: #9aa7bd;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+    padding: 0 8px;
+}
+
+/* === 按钮 === */
+QPushButton {
+    background-color: #151b24;
+    color: #d7def3;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+    padding: 6px 12px;
+    min-height: 28px;
+    font-size: 13px;
+}
+QPushButton:hover {
+    background-color: #1b2634;
+    border-color: #334155;
+}
+QPushButton:pressed {
+    background-color: #203044;
+    border-color: #0891b2;
+}
+QPushButton:disabled {
+    background-color: #151b24;
+    color: #5f6f86;
+    border-color: #27313f;
+}
+
+/* 连接类主按钮 — 强调青底 */
+QPushButton#serialStationConnectButton,
+QPushButton#serialStationConnectSerialButton,
+QPushButton#serialStationConnectTcpButton,
+QPushButton#serialStationConnectUdpButton {
+    background-color: #22d3ee;
+    color: #0d1118;
+    border: 0px;
+    font-weight: 600;
+}
+QPushButton#serialStationConnectButton:hover,
+QPushButton#serialStationConnectSerialButton:hover,
+QPushButton#serialStationConnectTcpButton:hover,
+QPushButton#serialStationConnectUdpButton:hover {
+    background-color: #67e8f9;
+}
+QPushButton#serialStationConnectButton:pressed,
+QPushButton#serialStationConnectSerialButton:pressed,
+QPushButton#serialStationConnectTcpButton:pressed,
+QPushButton#serialStationConnectUdpButton:pressed {
+    background-color: #0891b2;
+}
+QPushButton#serialStationConnectButton:disabled,
+QPushButton#serialStationConnectSerialButton:disabled,
+QPushButton#serialStationConnectTcpButton:disabled,
+QPushButton#serialStationConnectUdpButton:disabled {
+    background-color: #151b24;
+    color: #5f6f86;
+}
+
+/* 断开按钮 — 危险红 */
+QPushButton#serialStationDisconnectButton {
+    background-color: rgba(239, 68, 68, 0.10);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+}
+QPushButton#serialStationDisconnectButton:hover {
+    background-color: #ef4444;
+    color: #f8fafc;
+}
+QPushButton#serialStationDisconnectButton:pressed {
+    background-color: #f87171;
+}
+
+/* 次要工具按钮 */
+QPushButton#serialStationRefreshPortsButton,
+QPushButton#serialStationExportLogButton,
+QPushButton#serialStationReplayLogButton,
+QPushButton#serialStationSaveProfileButton,
+QPushButton#serialStationLoadProfileButton,
+QPushButton#serialStationClearButton,
+QPushButton#serialStationInjectButton,
+QPushButton#serialStationSendButton {
+    background-color: #151b24;
+    color: #b7c0d8;
+}
+QPushButton#serialStationRefreshPortsButton:hover,
+QPushButton#serialStationExportLogButton:hover,
+QPushButton#serialStationReplayLogButton:hover,
+QPushButton#serialStationSaveProfileButton:hover,
+QPushButton#serialStationLoadProfileButton:hover,
+QPushButton#serialStationClearButton:hover,
+QPushButton#serialStationInjectButton:hover,
+QPushButton#serialStationSendButton:hover {
+    background-color: #1b2634;
+    color: #d7def3;
+    border-color: rgba(34, 211, 238, 0.35);
+}
+
+/* 发送/注入 — 终端 TX 蓝 */
+QPushButton#serialStationSendButton,
+QPushButton#serialStationInjectButton {
+    color: #38bdf8;
+    border-color: #38bdf8;
+}
+QPushButton#serialStationSendButton:hover,
+QPushButton#serialStationInjectButton:hover {
+    background-color: #38bdf8;
+    color: #f8fafc;
+}
+
+/* === 输入框 === */
+QLineEdit {
+    background-color: #0f141d;
+    color: #d7def3;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 5px 8px;
+    selection-background-color: #2563eb;
+    selection-color: #f8fafc;
+}
+QLineEdit:focus {
+    border: 1px solid #22d3ee;
+    background-color: #111827;
+}
+QLineEdit:disabled {
+    background-color: #151b24;
+    color: #5f6f86;
+    border-color: #27313f;
+}
+QLineEdit::placeholder {
+    color: #9aa7bd;
+}
+QLineEdit#serialStationSendEdit,
+QLineEdit#serialStationInjectEdit,
+QLineEdit#serialStationLogSearchEdit,
+QLineEdit#serialStationLogPathEdit,
+QLineEdit#serialStationProfilePathEdit,
+QLineEdit#serialStationProfileNameEdit,
+QLineEdit#serialStationTcpHostEdit,
+QLineEdit#serialStationTcpPortEdit,
+QLineEdit#serialStationUdpHostEdit,
+QLineEdit#serialStationUdpPortEdit {
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+}
+
+/* === 下拉框 === */
+QComboBox {
+    background-color: #0f141d;
+    color: #d7def3;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 5px 8px;
+    min-height: 28px;
+    selection-background-color: #203044;
+}
+QComboBox:hover {
+    border-color: rgba(34, 211, 238, 0.35);
+}
+QComboBox:focus {
+    border: 1px solid #22d3ee;
+}
+QComboBox:disabled {
+    background-color: #151b24;
+    color: #5f6f86;
+    border-color: #27313f;
+}
+QComboBox::drop-down {
+    border: none;
+    width: 22px;
+}
+QComboBox::down-arrow {
+    width: 10px;
+    height: 10px;
+}
+QComboBox QAbstractItemView {
+    background-color: #151b24;
+    color: #d7def3;
+    border: 1px solid #27313f;
+    border-radius: 6px;
+    padding: 6px;
+    selection-background-color: #203044;
+    selection-color: #22d3ee;
+    outline: none;
+}
+QComboBox#serialStationProtocolCombo,
+QComboBox#serialStationPortCombo,
+QComboBox#serialStationBaudCombo,
+QComboBox#serialStationDataBitsCombo,
+QComboBox#serialStationParityCombo,
+QComboBox#serialStationStopBitsCombo,
+QComboBox#serialStationFlowControlCombo,
+QComboBox#serialStationCommandHistoryCombo,
+QComboBox#serialStationLogFilterCombo {
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+}
+
+/* === 日志视图（终端风） === */
+QPlainTextEdit#serialStationLogView {
+    background-color: #0d1118;
+    color: #9aa7bd;
+    border: 1px solid #27313f;
+    border-radius: 8px;
+    padding: 8px;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+    selection-background-color: #2563eb;
+    selection-color: #f8fafc;
+}
+
+/* === 波形预览 === */
+QWidget#serialStationWaveformPanel {
+    background-color: #151b24;
+    border: 1px solid #27313f;
+    border-radius: 8px;
+}
+/* pyqtgraph PlotWidget：QSS 仅控制背景，绘图区背景在运行时通过
+   setBackground 设置，此处保证控件框与面板一致。 */
+QWidget#serialStationWaveformPlot,
+QGraphicsView#serialStationWaveformPlot {
+    background-color: #0d1118;
+    border: none;
+}
+QLabel#serialStationWaveformStatusLabel {
+    color: #9aa7bd;
+    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-size: 12px;
+    padding: 6px 8px;
+}
+
+/* === 状态与 Profile 标签 === */
+QLabel#serialStationStatusLabel {
+    color: #f59e0b;
+    padding: 4px 8px;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 12px;
+    background-color: rgba(245, 158, 11, 0.08);
+    font-size: 12px;
+    font-weight: 600;
+}
+QLabel#serialStationProfileLabel {
+    color: #9aa7bd;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+/* === 滚动条 === */
+QScrollBar:vertical {
+    background: transparent;
+    width: 10px;
+    margin: 0;
+}
+QScrollBar::handle:vertical {
+    background: #334155;
+    border-radius: 5px;
+    min-height: 30px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #475569;
+}
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0;
+}
+QScrollBar:horizontal {
+    background: transparent;
+    height: 10px;
+    margin: 0;
+}
+QScrollBar::handle:horizontal {
+    background: #334155;
+    border-radius: 5px;
+    min-width: 30px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: #475569;
+}
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0;
+}
+
+/* === QPlainTextEdit 兜底 === */
+QPlainTextEdit {
+    background-color: #0f141d;
+    color: #d7def3;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 5px 8px;
+}
+
+/* === 快捷键 objectName 契约 === */
+/* QShortcut 无可视样式，objectName 仅用于测试与可发现性。 */
+QObject#serialStationSendShortcut,
+QObject#serialStationClearShortcut,
+QObject#serialStationRefreshPortsShortcut {
+    /* no-op */
+}
