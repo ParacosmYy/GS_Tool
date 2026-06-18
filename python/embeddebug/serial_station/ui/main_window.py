@@ -12,6 +12,7 @@ from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.ui import (
     command_actions,
     connection_actions,
+    endpoint_connection_actions,
     injection_actions,
     lifecycle_actions,
     log_actions,
@@ -58,10 +59,10 @@ class SerialStationMainWindow(QMainWindow):
         connection_actions.connect_serial(self)
 
     def _connect_tcp(self) -> None:
-        connection_actions.connect_tcp(self)
+        endpoint_connection_actions.connect_tcp(self)
 
     def _connect_udp(self) -> None:
-        connection_actions.connect_udp(self)
+        endpoint_connection_actions.connect_udp(self)
 
     def _disconnect(self) -> None:
         connection_actions.disconnect(self)

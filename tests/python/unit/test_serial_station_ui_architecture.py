@@ -6,6 +6,7 @@ import inspect
 from embeddebug.serial_station.ui import (
     command_actions,
     connection_actions,
+    endpoint_connection_actions,
     injection_actions,
     main_window,
     sections,
@@ -16,8 +17,9 @@ from embeddebug.serial_station.ui import (
 )
 
 
-def test_tcp_connection_action_lives_with_connection_actions():
-    assert hasattr(connection_actions, "connect_tcp")
+def test_tcp_connection_action_lives_with_endpoint_connection_actions():
+    assert hasattr(endpoint_connection_actions, "connect_tcp")
+    assert not hasattr(connection_actions, "connect_tcp")
     assert not hasattr(tcp_controls, "connect_tcp_from_controls")
 
     source = inspect.getsource(tcp_controls)
@@ -42,8 +44,9 @@ def test_connection_toolbar_builder_lives_outside_main_sections():
         assert len(handle.read().splitlines()) < 260
 
 
-def test_udp_connection_action_lives_with_connection_actions():
-    assert hasattr(connection_actions, "connect_udp")
+def test_udp_connection_action_lives_with_endpoint_connection_actions():
+    assert hasattr(endpoint_connection_actions, "connect_udp")
+    assert not hasattr(connection_actions, "connect_udp")
     assert not hasattr(udp_controls, "connect_udp_from_controls")
 
     source = inspect.getsource(udp_controls)

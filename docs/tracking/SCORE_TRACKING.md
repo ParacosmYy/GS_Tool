@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 616分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 384分
+> 当前: 617分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 383分
 
 ---
 
@@ -318,12 +318,13 @@
 | 614 | Serial Station controller callback state helper | 日志、错误和测量回调集合聚合到 callback state helper，workbench_controller 降到 242 行；回调注册和错误入库具备独立单测 |
 | 615 | Serial Station controller workbench state helper | entries 与 command history 聚合到 workbench state helper，controller 不再直接创建两组共享 list；状态快照和日志清空具备独立单测 |
 | 616 | Serial Station command action boundary | 命令发送和命令历史动作从 connection actions 拆入 command actions，main window 仅做委托；UI 架构测试防止命令职责回流 |
+| 617 | Serial Station endpoint connection action boundary | TCP/UDP endpoint 连接动作从 connection actions 拆入 endpoint connection actions，connection_actions 降到 89 行；endpoint UI smoke 覆盖 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#616` 的完整记录
+- 当前文档已整理到 `#617` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
