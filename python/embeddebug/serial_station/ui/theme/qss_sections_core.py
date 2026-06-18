@@ -20,6 +20,15 @@ QWidget {{
 }}
 QWidget:disabled {{
     color: {P.TEXT_DISABLED};
+}}
+/* 全局 tooltip：深底圆角，对齐应用主题。 */
+QToolTip {{
+    background-color: {P.BG_PANEL_RAISED};
+    color: {P.TEXT_PRIMARY};
+    border: {T.BORDER_THIN} solid {P.BORDER_STRONG};
+    border-radius: {T.RADIUS_MD};
+    padding: 4px 8px;
+    font-size: {T.FONT_SM};
 }}"""
 
 
@@ -76,9 +85,12 @@ QLineEdit {{
     color: {P.TEXT_PRIMARY};
     border: {T.BORDER_THIN} solid {P.BORDER_STRONG};
     border-radius: {T.RADIUS_MD};
-    padding: {T.PADDING_INPUT};
-    selection-background-color: {P.TERM_SELECTION};
-    selection-color: {P.TEXT_INVERTED};
+    padding: 6px 10px;
+    selection-background-color: {P.ACCENT_SOFT};
+    selection-color: {P.TEXT_PRIMARY};
+}}
+QLineEdit:hover {{
+    border-color: {P.ACCENT_BORDER};
 }}
 QLineEdit:focus {{
     border: {T.BORDER_THIN} solid {P.BORDER_FOCUS};
@@ -90,7 +102,7 @@ QLineEdit:disabled {{
     border-color: {P.BORDER};
 }}
 QLineEdit::placeholder {{
-    color: {P.TEXT_MUTED};
+    color: rgba(154, 167, 189, 0.55);
 }}
 {selectors} {{
     font-family: {T.FONT_FAMILY_MONO};
@@ -145,12 +157,19 @@ QComboBox::down-arrow {{
 QComboBox QAbstractItemView {{
     background-color: {P.BG_PANEL};
     color: {P.TEXT_PRIMARY};
-    border: {T.BORDER_THIN} solid {P.BORDER};
-    border-radius: {T.RADIUS_MD};
-    padding: {T.SPACING_SM};
-    selection-background-color: {P.BG_SELECTION};
+    border: {T.BORDER_THIN} solid {P.BORDER_STRONG};
+    border-radius: {T.RADIUS_LG};
+    padding: {T.SPACING_XS};
+    selection-background-color: {P.ACCENT_SOFT};
     selection-color: {P.ACCENT};
     outline: none;
+}}
+QComboBox QAbstractItemView::item {{
+    padding: 4px 8px;
+    border-radius: {T.RADIUS_SM};
+}}
+QComboBox QAbstractItemView::item:hover {{
+    background-color: {P.BG_PANEL_RAISED};
 }}
 {selectors} {{
     font-family: {T.FONT_FAMILY_MONO};

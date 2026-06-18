@@ -76,9 +76,18 @@ SCROLLBAR_BACKGROUND = "transparent"
 SHADOW = "rgba(0, 0, 0, 0.35)"
 
 # ── 玻璃卡片 / TopBar 视觉层（QSS 无 blur，用渐变+边框近似 EK-OmniProbe surface） ──
-# 卡片顶部高光（inner highlight，模拟玻璃反光）。
-CARD_HIGHLIGHT_TOP = "rgba(255, 255, 255, 0.05)"
-CARD_HIGHLIGHT_BOTTOM = "rgba(255, 255, 255, 0.00)"
+# 卡片顶部光带（3-stop 玻璃高光，压缩到顶部 18%）。
+CARD_SHEEN_TOP = "rgba(255, 255, 255, 0.12)"
+CARD_SHEEN_MID = "rgba(255, 255, 255, 0.04)"
+CARD_SHEEN_BOTTOM = "rgba(255, 255, 255, 0.00)"
+# 卡片 per-side border（内顶白光 + 接地暗边，近似 inset shadow + 投影）。
+CARD_INNER_TOP_EDGE = "rgba(255, 255, 255, 0.12)"
+CARD_GROUND_SHADOW = "rgba(0, 0, 0, 0.30)"
+# 卡片悬停外环（比 ACCENT_BORDER 更亮的强调青）。
+CARD_HOVER_RING = "rgba(34, 211, 238, 0.55)"
+# 向后兼容别名（all_tokens / _DARK_DEFAULTS / tokens.CARD_HIGHLIGHT_STOP_* 仍引用）。
+CARD_HIGHLIGHT_TOP = CARD_SHEEN_TOP
+CARD_HIGHLIGHT_BOTTOM = CARD_SHEEN_BOTTOM
 # TopBar 表面：比窗口底略亮的分层渐变。
 TOPBAR_BG_TOP = "#131a25"
 TOPBAR_BG_BOTTOM = "#10141d"

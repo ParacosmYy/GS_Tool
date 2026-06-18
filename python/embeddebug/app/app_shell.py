@@ -74,10 +74,11 @@ class AppShell(QMainWindow):
         rail_layout.setSpacing(6)
         rail_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        # 顶部品牌徽标（应用名首字母）。
+        # 顶部品牌徽标（应用名首字母，强调青渐变方块）。
         brand = QLabel("ED", rail)
         brand.setObjectName("serialStationNavBrand")
         brand.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        brand.setFixedSize(32, 32)
         rail_layout.addWidget(brand)
         rail_layout.addSpacing(10)
 

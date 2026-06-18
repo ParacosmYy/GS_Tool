@@ -1,8 +1,7 @@
 /* EmbedDebug Serial Station — VOFA+ 精致工业风深色主题（参考源）
  *
  * 本文件是 ThemeManager 的外部编辑路径：存在时 ThemeManager.load_qss 优先读取；
- * 缺失回退到 qss_builder.build_qss()。颜色真相源在 palette.py / tokens.py。
- * 从 build_qss() 自动生成。
+ * 缺失回退到 qss_builder.build_qss()。从 build_qss() 自动生成。
  */
 
 /* === Global === */
@@ -14,6 +13,15 @@ QWidget {
 }
 QWidget:disabled {
     color: #5f6f86;
+}
+/* 全局 tooltip：深底圆角，对齐应用主题。 */
+QToolTip {
+    background-color: #1b2634;
+    color: #d7def3;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
 }
 
 /* === Window & Root === */
@@ -38,7 +46,7 @@ QLabel {
 }
 QLabel#serialStationLogStatsLabel {
     color: #9aa7bd;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
     padding: 0 8px;
 }
@@ -81,25 +89,31 @@ QLabel#serialStationBrandTagline {
 QFrame#serialStationCard {
     background-color: #151b24;
     border: 1px solid #27313f;
+    border-top-color: rgba(255, 255, 255, 0.12);
+    border-bottom-color: rgba(0, 0, 0, 0.30);
     border-radius: 16px;
-    /* 顶部高光渐变：模拟玻璃 inner highlight（QSS 无 blur 的近似手段）。 */
+    /* 3-stop 顶部光带：压缩到顶部 ~18%，模拟玻璃 inner highlight + 反光带。 */
     background-image: qlineargradient(
         x1:0, y1:0, x2:0, y2:1,
-        stop:0 rgba(255, 255, 255, 0.05),
-        stop:1 rgba(255, 255, 255, 0.00)
+        stop:0 rgba(255, 255, 255, 0.12),
+        stop:0.18 rgba(255, 255, 255, 0.04),
+        stop:0.5 rgba(255, 255, 255, 0.00)
     );
     padding: 12px;
 }
 QFrame#serialStationCard:hover {
-    border-color: rgba(34, 211, 238, 0.35);
+    border: 1px solid rgba(34, 211, 238, 0.55);
     background-color: #1b2634;
 }
-/* 卡片标题行：底部细分隔线，拉开标题与内容。 */
+/* 卡片标题行：底部柔和分隔线（半透明 + hover 联动转强调青）。 */
 QWidget#serialStationCardHeader {
     background-color: transparent;
     border: none;
-    border-bottom: 1px solid #27313f;
+    border-bottom: 1px solid rgba(39, 49, 63, 0.6);
     padding-bottom: 6px;
+}
+QFrame#serialStationCard:hover QWidget#serialStationCardHeader {
+    border-bottom-color: rgba(34, 211, 238, 0.35);
 }
 QLabel#serialStationCardTitle {
     background-color: transparent;
@@ -109,6 +123,11 @@ QLabel#serialStationCardTitle {
     letter-spacing: 0.2px;
 }
 QLabel#serialStationCardIcon {
+    background-color: transparent;
+    border: none;
+}
+/* 可折叠面板 */
+QWidget#serialStationCollapsiblePanel {
     background-color: transparent;
     border: none;
 }
@@ -254,7 +273,7 @@ QLabel#serialStationWaveformCursorHud {
     border: 1px solid #27313f;
     border-radius: 4px;
     padding: 4px 8px;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
 }
 QWidget#serialStationWaveformLegend {
@@ -264,7 +283,7 @@ QWidget#serialStationWaveformLegend {
 QLabel#serialStationWaveformLegendChip {
     background-color: transparent;
     border: none;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
     padding: 4px 6px;
 }
@@ -292,7 +311,7 @@ QLabel#serialStationSliderLabel {
 }
 QLabel#serialStationSliderValue {
     color: #22d3ee;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
 }
 QSlider#serialStationSliderTrack::groove:horizontal {
@@ -391,16 +410,27 @@ QFrame#serialStationNavRail {
     background-color: #101218;
     border-right: 1px solid #27313f;
 }
+/* 品牌徽标 ED：强调青渐变方块 + 反白字（仿 EK-OmniProbe logo chip）。 */
 QLabel#serialStationNavBrand {
-    color: #22d3ee;
+    background-color: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #67e8f9, stop:1 #0891b2
+    );
+    color: #f8fafc;
+    border: 1px solid rgba(34, 211, 238, 0.35);
+    border-radius: 8px;
     font-size: 12px;
-    font-weight: 700;
-    padding: 6px 0;
+    font-weight: 800;
+    min-width: 32px;
+    max-width: 32px;
+    min-height: 32px;
+    max-height: 32px;
 }
-/* 导航图标按钮：方形、无边框、激活态强调青软底。 */
+/* 导航图标按钮：方形、无边框、hover 微背景、激活态强调青软底 + 左指示条。 */
 QPushButton[objectName^="serialStationNav"] {
     background-color: transparent;
     border: none;
+    border-left: 3px solid transparent;
     border-radius: 6px;
     padding: 8px;
     margin: 0 6px;
@@ -412,7 +442,7 @@ QPushButton[objectName^="serialStationNav"]:hover {
 }
 QPushButton[objectName^="serialStationNav"]:checked {
     background-color: rgba(34, 211, 238, 0.12);
-    border-left: 2px solid #22d3ee;
+    border-left: 3px solid #22d3ee;
 }
 
 /* === OTA Panel === */
@@ -440,7 +470,7 @@ QFrame#serialStationOtaFileEdit {
 }
 QLabel#serialStationOtaFileLabel {
     color: #9aa7bd;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
 }
 QProgressBar#serialStationOtaProgress {
@@ -461,7 +491,7 @@ QPlainTextEdit#serialStationOtaLog {
     border: 1px solid #27313f;
     border-radius: 6px;
     padding: 5px 8px;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
 }
 QLabel#serialStationOtaStatusLabel {
@@ -532,7 +562,7 @@ QPlainTextEdit#serialStationAutomationLog {
     border: 1px solid #27313f;
     border-radius: 6px;
     padding: 5px 8px;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
 }
 /* 主操作按钮（启停/连接/发送/应用：强调青）。 */
@@ -597,7 +627,7 @@ QComboBox#serialStationSettingsThemeCombo {
     border-radius: 6px;
     padding: 5px 8px;
     min-height: 28px;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
 }
 /* CAN 复选框。 */
@@ -664,7 +694,7 @@ QLabel#serialStationSettingsAppNameLabel {
 QLabel#serialStationSettingsVersionLabel,
 QLabel#serialStationSettingsRemoteLabel {
     color: #9aa7bd;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
 }
 
@@ -775,9 +805,12 @@ QLineEdit {
     color: #d7def3;
     border: 1px solid #334155;
     border-radius: 6px;
-    padding: 5px 8px;
-    selection-background-color: #2563eb;
-    selection-color: #f8fafc;
+    padding: 6px 10px;
+    selection-background-color: rgba(34, 211, 238, 0.12);
+    selection-color: #d7def3;
+}
+QLineEdit:hover {
+    border-color: rgba(34, 211, 238, 0.35);
 }
 QLineEdit:focus {
     border: 1px solid #22d3ee;
@@ -789,7 +822,7 @@ QLineEdit:disabled {
     border-color: #27313f;
 }
 QLineEdit::placeholder {
-    color: #9aa7bd;
+    color: rgba(154, 167, 189, 0.55);
 }
 QLineEdit#serialStationSendEdit,
 QLineEdit#serialStationInjectEdit,
@@ -801,7 +834,7 @@ QLineEdit#serialStationTcpHostEdit,
 QLineEdit#serialStationTcpPortEdit,
 QLineEdit#serialStationUdpHostEdit,
 QLineEdit#serialStationUdpPortEdit {
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
 }
 
@@ -837,12 +870,19 @@ QComboBox::down-arrow {
 QComboBox QAbstractItemView {
     background-color: #151b24;
     color: #d7def3;
-    border: 1px solid #27313f;
-    border-radius: 6px;
-    padding: 6px;
-    selection-background-color: #203044;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 4px;
+    selection-background-color: rgba(34, 211, 238, 0.12);
     selection-color: #22d3ee;
     outline: none;
+}
+QComboBox QAbstractItemView::item {
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+QComboBox QAbstractItemView::item:hover {
+    background-color: #1b2634;
 }
 QComboBox#serialStationProtocolCombo,
 QComboBox#serialStationPortCombo,
@@ -853,7 +893,7 @@ QComboBox#serialStationStopBitsCombo,
 QComboBox#serialStationFlowControlCombo,
 QComboBox#serialStationCommandHistoryCombo,
 QComboBox#serialStationLogFilterCombo {
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
 }
 
@@ -863,11 +903,14 @@ QPlainTextEdit#serialStationLogView {
     color: #9aa7bd;
     border: 1px solid #27313f;
     border-radius: 8px;
-    padding: 8px;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    padding: 6px 12px;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
-    selection-background-color: #2563eb;
-    selection-color: #f8fafc;
+    selection-background-color: rgba(34, 211, 238, 0.12);
+    selection-color: #d7def3;
+}
+QPlainTextEdit#serialStationLogView:focus {
+    border-color: rgba(34, 211, 238, 0.35);
 }
 
 /* === Waveform Preview === */
@@ -885,7 +928,7 @@ QGraphicsView#serialStationWaveformPlot {
 }
 QLabel#serialStationWaveformStatusLabel {
     color: #9aa7bd;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
     padding: 6px 8px;
 }
@@ -902,7 +945,7 @@ QLabel#serialStationWaveformLegendChip {
 QLabel#serialStationWaveformCursorHud {
     background-color: transparent;
     color: #9aa7bd;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
     padding: 4px 8px;
 }
@@ -925,7 +968,7 @@ QGraphicsView#serialStationLissajousPlot {
 }
 QLabel#serialStationLissajousStatus {
     color: #9aa7bd;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
     padding: 4px 8px;
 }
@@ -942,7 +985,7 @@ QGraphicsView#serialStationBarChartPlot {
 }
 QLabel#serialStationBarChartStatus {
     color: #9aa7bd;
-    font-family: Consolas, "Cascadia Code", "JetBrains Mono", monospace;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     font-size: 12px;
     padding: 4px 8px;
 }
@@ -963,40 +1006,44 @@ QLabel#serialStationProfileLabel {
     padding: 4px 8px;
 }
 
-/* === Scrollbars === */
+/* === Scrollbars (8px capsule, soft hover) === */
 QScrollBar:vertical {
     background: transparent;
-    width: 10px;
-    margin: 0;
+    width: 8px;
+    margin: 1px;
 }
 QScrollBar::handle:vertical {
-    background: #334155;
-    border-radius: 5px;
+    background: rgba(51, 65, 85, 0.55);
+    border-radius: 4px;
     min-height: 30px;
 }
 QScrollBar::handle:vertical:hover {
-    background: #475569;
+    background: rgba(71, 85, 105, 0.85);
 }
 QScrollBar::add-line:vertical,
 QScrollBar::sub-line:vertical {
     height: 0;
+    border: none;
+    background: none;
 }
 QScrollBar:horizontal {
     background: transparent;
-    height: 10px;
-    margin: 0;
+    height: 8px;
+    margin: 1px;
 }
 QScrollBar::handle:horizontal {
-    background: #334155;
-    border-radius: 5px;
+    background: rgba(51, 65, 85, 0.55);
+    border-radius: 4px;
     min-width: 30px;
 }
 QScrollBar::handle:horizontal:hover {
-    background: #475569;
+    background: rgba(71, 85, 105, 0.85);
 }
 QScrollBar::add-line:horizontal,
 QScrollBar::sub-line:horizontal {
     width: 0;
+    border: none;
+    background: none;
 }
 
 /* === PlainTextEdit Fallback === */

@@ -21,31 +21,37 @@ from embeddebug.serial_station.ui.theme import tokens as T
 
 
 def cards_section() -> str:
-    """玻璃卡片样式 — 对齐 EK-OmniProbe surface-card（深色工业风落地）。"""
+    """玻璃卡片样式 — 3-stop 光带 + per-side border 近似 EK-OmniProbe surface-card。"""
 
     return f"""/* === Glass Cards (EK-OmniProbe surface-card, dark industrial) === */
 QFrame#serialStationCard {{
     background-color: {P.BG_PANEL};
     border: {T.BORDER_THIN} solid {P.BORDER};
+    border-top-color: {P.CARD_INNER_TOP_EDGE};
+    border-bottom-color: {P.CARD_GROUND_SHADOW};
     border-radius: {T.RADIUS_2XL};
-    /* 顶部高光渐变：模拟玻璃 inner highlight（QSS 无 blur 的近似手段）。 */
+    /* 3-stop 顶部光带：压缩到顶部 ~18%，模拟玻璃 inner highlight + 反光带。 */
     background-image: qlineargradient(
         x1:0, y1:0, x2:0, y2:1,
-        stop:0 {T.CARD_HIGHLIGHT_STOP_0},
-        stop:1 {T.CARD_HIGHLIGHT_STOP_1}
+        stop:0 {P.CARD_SHEEN_TOP},
+        stop:0.18 {P.CARD_SHEEN_MID},
+        stop:0.5 {P.CARD_SHEEN_BOTTOM}
     );
     padding: {T.PADDING_CARD};
 }}
 QFrame#serialStationCard:hover {{
-    border-color: {P.ACCENT_BORDER};
+    border: {T.BORDER_THIN} solid {P.CARD_HOVER_RING};
     background-color: {P.BG_PANEL_RAISED};
 }}
-/* 卡片标题行：底部细分隔线，拉开标题与内容。 */
+/* 卡片标题行：底部柔和分隔线（半透明 + hover 联动转强调青）。 */
 QWidget#serialStationCardHeader {{
     background-color: transparent;
     border: none;
-    border-bottom: {T.BORDER_THIN} solid {P.BORDER};
+    border-bottom: {T.BORDER_THIN} solid rgba(39, 49, 63, 0.6);
     padding-bottom: {T.SPACING_SM};
+}}
+QFrame#serialStationCard:hover QWidget#serialStationCardHeader {{
+    border-bottom-color: {P.ACCENT_BORDER};
 }}
 QLabel#serialStationCardTitle {{
     background-color: transparent;

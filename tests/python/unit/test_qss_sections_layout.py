@@ -55,23 +55,23 @@ def test_cards_section_covers_card_objectnames():
 
 
 def test_cards_section_uses_glass_highlight_gradient():
-    """玻璃卡片顶部高光渐变必须引用 tokens 高光停止点（近似 EK-OmniProbe surface）。"""
+    """玻璃卡片顶部高光渐变必须引用 palette 光带停止点（近似 EK-OmniProbe surface）。"""
 
     qss = cards_section()
-    assert T.CARD_HIGHLIGHT_STOP_0 in qss
-    assert T.CARD_HIGHLIGHT_STOP_1 in qss
+    assert P.CARD_SHEEN_TOP in qss
+    assert P.CARD_SHEEN_MID in qss
     assert "qlineargradient" in qss
     # 大圆角拉开视觉层级。
     assert T.RADIUS_2XL in qss
 
 
-def test_cards_section_hover_lifts_to_accent_border():
-    """卡片悬浮应提亮到 BG_PANEL_RAISED 并转强调青软边。"""
+def test_cards_section_hover_lifts_to_hover_ring():
+    """卡片悬浮应提亮到 BG_PANEL_RAISED 并转强调青外环。"""
 
     qss = cards_section()
     assert ":hover" in qss
     assert P.BG_PANEL_RAISED in qss
-    assert P.ACCENT_BORDER in qss
+    assert P.CARD_HOVER_RING in qss
 
 
 def test_cards_section_header_has_bottom_separator():

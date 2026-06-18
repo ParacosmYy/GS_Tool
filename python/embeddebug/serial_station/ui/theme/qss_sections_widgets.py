@@ -119,11 +119,14 @@ QPlainTextEdit#serialStationLogView {{
     color: {P.TERM_SYSTEM};
     border: {T.BORDER_THIN} solid {P.BORDER};
     border-radius: {T.RADIUS_LG};
-    padding: {T.SPACING_MD};
+    padding: {T.SPACING_SM} {T.SPACING_LG};
     font-family: {T.FONT_FAMILY_MONO};
     font-size: {T.FONT_SM};
-    selection-background-color: {P.TERM_SELECTION};
-    selection-color: {P.TEXT_INVERTED};
+    selection-background-color: {P.ACCENT_SOFT};
+    selection-color: {P.TEXT_PRIMARY};
+}}
+QPlainTextEdit#serialStationLogView:focus {{
+    border-color: {P.ACCENT_BORDER};
 }}"""
 
 
@@ -225,40 +228,44 @@ QLabel#serialStationProfileLabel {{
 
 
 def scrollbar_section() -> str:
-    return f"""/* === Scrollbars === */
+    return f"""/* === Scrollbars (8px capsule, soft hover) === */
 QScrollBar:vertical {{
-    background: {P.SCROLLBAR_BACKGROUND};
-    width: 10px;
-    margin: 0;
+    background: transparent;
+    width: 8px;
+    margin: 1px;
 }}
 QScrollBar::handle:vertical {{
-    background: {P.SCROLLBAR};
-    border-radius: 5px;
+    background: rgba(51, 65, 85, 0.55);
+    border-radius: 4px;
     min-height: 30px;
 }}
 QScrollBar::handle:vertical:hover {{
-    background: {P.SCROLLBAR_HOVER};
+    background: rgba(71, 85, 105, 0.85);
 }}
 QScrollBar::add-line:vertical,
 QScrollBar::sub-line:vertical {{
     height: 0;
+    border: none;
+    background: none;
 }}
 QScrollBar:horizontal {{
-    background: {P.SCROLLBAR_BACKGROUND};
-    height: 10px;
-    margin: 0;
+    background: transparent;
+    height: 8px;
+    margin: 1px;
 }}
 QScrollBar::handle:horizontal {{
-    background: {P.SCROLLBAR};
-    border-radius: 5px;
+    background: rgba(51, 65, 85, 0.55);
+    border-radius: 4px;
     min-width: 30px;
 }}
 QScrollBar::handle:horizontal:hover {{
-    background: {P.SCROLLBAR_HOVER};
+    background: rgba(71, 85, 105, 0.85);
 }}
 QScrollBar::add-line:horizontal,
 QScrollBar::sub-line:horizontal {{
     width: 0;
+    border: none;
+    background: none;
 }}"""
 
 

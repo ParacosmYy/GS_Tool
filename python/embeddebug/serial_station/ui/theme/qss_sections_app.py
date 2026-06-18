@@ -11,23 +11,34 @@ from embeddebug.serial_station.ui.theme import tokens as T
 
 
 def nav_rail_section() -> str:
-    """左侧图标导航栏 — 深色窄栏，激活项强调青软底。"""
+    """左侧图标导航栏 — 深色窄栏，品牌徽标方块 + 激活态指示条。"""
 
     return f"""/* === App Navigation Rail === */
 QFrame#serialStationNavRail {{
     background-color: {P.BG_APP};
     border-right: {T.BORDER_THIN} solid {P.BORDER};
 }}
+/* 品牌徽标 ED：强调青渐变方块 + 反白字（仿 EK-OmniProbe logo chip）。 */
 QLabel#serialStationNavBrand {{
-    color: {P.ACCENT};
+    background-color: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 {P.ACCENT_HOVER}, stop:1 {P.ACCENT_PRESSED}
+    );
+    color: {P.TEXT_INVERTED};
+    border: {T.BORDER_THIN} solid {P.ACCENT_BORDER};
+    border-radius: {T.RADIUS_LG};
     font-size: {T.FONT_SM};
-    font-weight: 700;
-    padding: {T.SPACING_SM} 0;
+    font-weight: 800;
+    min-width: 32px;
+    max-width: 32px;
+    min-height: 32px;
+    max-height: 32px;
 }}
-/* 导航图标按钮：方形、无边框、激活态强调青软底。 */
+/* 导航图标按钮：方形、无边框、hover 微背景、激活态强调青软底 + 左指示条。 */
 QPushButton[objectName^="serialStationNav"] {{
     background-color: transparent;
     border: none;
+    border-left: 3px solid transparent;
     border-radius: {T.RADIUS_MD};
     padding: {T.SPACING_MD};
     margin: 0 {T.SPACING_SM};
@@ -39,7 +50,7 @@ QPushButton[objectName^="serialStationNav"]:hover {{
 }}
 QPushButton[objectName^="serialStationNav"]:checked {{
     background-color: {P.ACCENT_SOFT};
-    border-left: {T.BORDER_THICK} solid {P.ACCENT};
+    border-left: 3px solid {P.ACCENT};
 }}"""
 
 

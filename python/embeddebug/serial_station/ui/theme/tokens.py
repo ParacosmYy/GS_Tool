@@ -44,7 +44,7 @@ FONT_LG = "16px"
 FONT_XL = "18px"
 
 FONT_FAMILY = '"Microsoft YaHei UI", "Segoe UI", sans-serif'
-FONT_FAMILY_MONO = 'Consolas, "Cascadia Code", "JetBrains Mono", monospace'
+FONT_FAMILY_MONO = '"JetBrains Mono", "Cascadia Code", Consolas, monospace'
 
 # ── 控件高度 ───────────────────────────────────────────────────────
 CONTROL_HEIGHT_SM = "24px"
