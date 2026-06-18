@@ -214,3 +214,26 @@ def test_configurable_button_press_animation_can_disable(qtbot):
     btn.command.connect(lambda cmd: commands.append(cmd))
     btn.click()
     assert "AT+PING" in commands
+
+
+def test_configurable_button_hover_lift_installed_by_default(qtbot):
+    """构造时应默认安装 hover lift（Batch 5 接线）。"""
+
+    from embeddebug.serial_station.ui.controls import ConfigurableButton
+
+    btn = ConfigurableButton("Send")
+    qtbot.addWidget(btn)
+    # hover lift 通过 QGraphicsDropShadowEffect 实现，graphicsEffect 应非 None。
+    assert btn.graphicsEffect() is not None
+
+
+def test_configurable_button_hover_lift_can_disable(qtbot):
+    """set_hover_lift(False) 应移除 graphics effect。"""
+
+    from embeddebug.serial_station.ui.controls import ConfigurableButton
+
+    btn = ConfigurableButton("Send")
+    qtbot.addWidget(btn)
+    assert btn.graphicsEffect() is not None
+    btn.set_hover_lift(False)
+    assert btn.graphicsEffect() is None

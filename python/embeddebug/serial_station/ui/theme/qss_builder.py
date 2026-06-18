@@ -30,6 +30,9 @@ from embeddebug.serial_station.ui.theme.qss_sections_core import (
     labels_section,
     window_section,
 )
+from embeddebug.serial_station.ui.theme.qss_sections_empty import (
+    empty_state_section,
+)
 from embeddebug.serial_station.ui.theme.qss_sections_layout import (
     cards_section,
     collapsible_section,
@@ -77,5 +80,6 @@ def build_qss() -> str:
         scrollbar_section(),
         plaintext_section(),
         shortcut_section(),
+        empty_state_section(),
     ]
     return "\n\n".join(sections) + "\n"

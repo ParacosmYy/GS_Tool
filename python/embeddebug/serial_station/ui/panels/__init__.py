@@ -16,7 +16,10 @@ from embeddebug.serial_station.ui.panels.serial_panel import SerialPanel
 def _register_real_or_placeholder(
     mode_id: str, icon: str, label: str, desc: str, module: str, cls: str
 ) -> None:
-    """注册真实面板；import 失败回退占位（保证导航完整不空屏）。"""
+    """注册真实面板；import 失败回退占位（保证导航完整不空屏）。
+
+    占位面板会渲染对应 lucide icon（Batch 5 改进：替代朴素双 QLabel）。
+    """
 
     try:
         factory = _import_factory(module, cls)
@@ -24,7 +27,8 @@ def _register_real_or_placeholder(
     except ImportError:
         register_panel(
             mode_id, icon, label,
-            lambda app, _desc=desc: PlaceholderPanel(mode_id, label, _desc),
+            lambda app, _desc=desc, _icon=icon, _label=label:
+                PlaceholderPanel(mode_id, _label, _desc, icon_name=_icon),
         )
 
 

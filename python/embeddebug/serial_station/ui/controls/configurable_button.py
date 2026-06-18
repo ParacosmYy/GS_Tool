@@ -7,6 +7,10 @@ Batch 3 (B1) 改进：接入 ``ScaleAnimation.press`` 按压回弹动画，点�
 物理按压反馈（缩小到 0.94 再 OutBack 回弹），符合 05-ui-standard 铁律 17
 （按钮必须有 hover/pressed/disabled 三态）的动效层。
 
+Batch 5 (C1) 改进：默认接入 ``install_hover_lift``（hover 时上浮 + accent tint
+阴影），可通过 ``set_hover_lift(False)`` 关闭（表格密集场景）。按压 + hover
+双重微交互，达到 Linear/Vercel 级按钮质感。
+
 约束：本模块只依赖 PyQt6 + icons + theme.palette + animations，不访问 controller/transport。
 """
 
@@ -19,6 +23,7 @@ from PyQt6.QtWidgets import QPushButton, QWidget
 
 from embeddebug.serial_station.ui.animations.scale import ScaleAnimation
 from embeddebug.serial_station.ui.icons import IconManager
+from embeddebug.serial_station.ui.micro_interactions import install_hover_lift
 from embeddebug.serial_station.ui.theme import palette as P
 
 
@@ -43,9 +48,14 @@ class ConfigurableButton(QPushButton):
         self._command_template = command_template
         self._formatter: Callable[[], str] | None = None
         self._press_animation_enabled = True
+        self._hover_lift_enabled = True
         self.clicked.connect(self._on_clicked)
         if icon_name:
             self.set_icon(icon_name)
+        # 默认装 hover lift（Batch 5）：控件库按钮通常在仪表盘/独立容器，不在会被
+        # QSplitter 挤压的主布局里，hover 上浮 + accent tint 阴影安全。
+        if self._hover_lift_enabled:
+            install_hover_lift(self)
 
     def set_icon(self, icon_name: str, color: str = P.TEXT_SECONDARY) -> None:
         """设置 lucide 图标。"""
@@ -66,6 +76,18 @@ class ConfigurableButton(QPushButton):
         """启用/禁用按压回弹动画（表格内密集按钮可关闭以减少视觉干扰）。"""
 
         self._press_animation_enabled = enabled
+
+    def set_hover_lift(self, enabled: bool) -> None:
+        """启用/禁用 hover 上浮动画。
+
+        构造时已默认安装；若需在会被父布局挤压的位置（如 QSplitter 紧邻区）
+        关闭以避免位移引起重排，调用本方法。
+        """
+
+        self._hover_lift_enabled = enabled
+        if not enabled:
+            # 移除已装的 graphics effect（hover lift 通过 QGraphicsDropShadowEffect 实现）。
+            self.setGraphicsEffect(None)
 
     def _on_clicked(self) -> None:
         """点击处理：先播放按压动画，再发出命令。"""
