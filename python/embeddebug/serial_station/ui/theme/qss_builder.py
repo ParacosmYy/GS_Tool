@@ -17,6 +17,9 @@ from embeddebug.serial_station.ui.theme.qss_sections_app import (
     nav_rail_section,
     ota_section,
 )
+from embeddebug.serial_station.ui.theme.qss_sections_domain import (
+    domain_panels_section,
+)
 from embeddebug.serial_station.ui.theme.qss_sections_controls import (
     controls_section,
 )
@@ -64,6 +67,7 @@ def build_qss() -> str:
         controls_section(),
         nav_rail_section(),
         ota_section(),
+        domain_panels_section(),
         buttons_section(),
         inputs_section(),
         combos_section(),
