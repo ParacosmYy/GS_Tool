@@ -100,6 +100,14 @@ class OtaPanel:
         self._log.setPlaceholderText(widget.tr("升级日志…"))
         layout.addWidget(self._log, 1)
 
+        # Batch 9-1: 传输中 skeleton shimmer 占位（叠在日志区，传输开始 show/完成 hide）。
+        # 保留 SkeletonBlock 默认 objectName（serialStationSkeletonBlock，已有 QSS 覆盖）。
+        from embeddebug.serial_station.ui.widgets.skeleton import SkeletonBlock
+
+        self._transfer_skeleton = SkeletonBlock(widget, rows=4, with_title=True)
+        self._transfer_skeleton.hide()
+        layout.addWidget(self._transfer_skeleton)
+
         # 状态 + 开始按钮行。
         action_row = QHBoxLayout()
         self._status_label = QLabel(widget.tr("未连接"), widget)
@@ -178,6 +186,8 @@ class OtaPanel:
                 name=Path(path).name, bytes=len(firmware), proto=kind.value
             )
         )
+        # Batch 9-1: 传输中显示 skeleton shimmer 占位。
+        self._transfer_skeleton.show()
         self._worker = threading.Thread(
             target=self._run_engine, args=(self._engine,), daemon=True
         )
@@ -193,6 +203,8 @@ class OtaPanel:
         self._log.appendPlainText(self._widget.tr("已发送块 {done}/{total}").format(done=done, total=total))
 
     def _on_finished(self, result: TransferResult) -> None:
+        # Batch 9-1: 传输完成隐藏 skeleton。
+        self._transfer_skeleton.hide()
         if result.success:
             self._progress.setValue(100)
             self._log.appendPlainText(

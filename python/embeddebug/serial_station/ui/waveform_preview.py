@@ -79,6 +79,9 @@ class SerialWaveformPreview(QWidget):
         self._plot.setLabel("left", self.tr("Value"))
         layout.addWidget(self._plot, 1)
 
+        # Batch 9-3: 游标交互（双击添加 X 游标，右键游标删除）。
+        self._install_cursor_interactions()
+
         # 游标 + 读数 HUD（对齐 VOFA+ 波形游标能力）。
         self._cursor_hud = waveform_overlays.build_cursor_hud(self)
         layout.addWidget(self._cursor_hud)
@@ -179,6 +182,20 @@ class SerialWaveformPreview(QWidget):
         # 默认两条 X 游标（对齐旧 attach_cursors 的 25%/75% 位置）。
         self._cursor_manager.add_x_cursor(0.25)
         self._cursor_manager.add_x_cursor(0.75)
+
+    def _install_cursor_interactions(self) -> None:
+        """装双击添加 X 游标 + 右键删除菜单（Batch 9-3，委托独立模块）。
+
+        游标交互逻辑在 waveform_cursor_interactions.install_cursor_interactions，
+        本方法只负责委托（避免本文件超 300 行门禁）。cursor_manager 通过
+        lambda 惰性求值（首次 update_batch 才初始化）。
+        """
+
+        from embeddebug.serial_station.ui.waveform_cursor_interactions import (
+            install_cursor_interactions,
+        )
+
+        install_cursor_interactions(self._plot, lambda: self._cursor_manager)
 
     def _update_legend(self, batch: ChannelBatch) -> None:
         """刷新多通道图例的当前值。"""

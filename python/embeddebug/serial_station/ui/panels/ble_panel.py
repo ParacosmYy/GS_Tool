@@ -74,6 +74,17 @@ class BlePanel:
         self._tree.itemSelectionChanged.connect(self._on_tree_select)
         layout.addWidget(self._tree, 1)
 
+        # Batch 9-2: 空 GATT 树占位（扫描连接后填充，初始无设备引导）。
+        from embeddebug.serial_station.ui.widgets import EmptyStateWidget
+
+        self._empty_state = EmptyStateWidget(
+            icon_name="bluetooth",
+            title=widget.tr("未发现 BLE 设备"),
+            description=widget.tr("点击「扫描」搜索附近设备，连接后显示 GATT 服务树"),
+            parent=widget,
+        )
+        layout.addWidget(self._empty_state)
+
         # 读写行。
         ops = QHBoxLayout()
         char_label = QLabel(widget.tr("特征"), widget)
@@ -153,6 +164,8 @@ class BlePanel:
             if ok:
                 self._connect_btn.setText(self._widget.tr("断开"))
                 self._refresh_tree()
+                # Batch 9-2: 连接成功填充树后隐藏空状态。
+                self._empty_state.hide()
                 self._log.appendPlainText(self._widget.tr("已连接 {addr}").format(addr=_STUB_ADDRESS))
             else:
                 self._connect_btn.setChecked(False)
@@ -161,6 +174,8 @@ class BlePanel:
             self._transport.close()
             self._connect_btn.setText(self._widget.tr("连接"))
             self._tree.clear()
+            # Batch 9-2: 断开后恢复空状态占位。
+            self._empty_state.show()
             self._log.appendPlainText(self._widget.tr("已断开"))
 
     def _refresh_tree(self) -> None:

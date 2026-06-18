@@ -78,6 +78,17 @@ class CanPanel:
         self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         layout.addWidget(self._table, 1)
 
+        # Batch 9-2: 空帧表占位（EmptyStateWidget，有数据后隐藏）。
+        from embeddebug.serial_station.ui.widgets import EmptyStateWidget
+
+        self._empty_state = EmptyStateWidget(
+            icon_name="network",
+            title=widget.tr("暂无 CAN 帧"),
+            description=widget.tr("点击「演示」生成示例帧，或连接 CAN 设备后发送数据"),
+            parent=widget,
+        )
+        layout.addWidget(self._empty_state)
+
         # 发送行。
         send = QHBoxLayout()
         id_label = QLabel(widget.tr("ID"), widget)
@@ -152,6 +163,9 @@ class CanPanel:
     def _append_frame(self, payload: dict) -> None:
         if self._table is None:
             return
+        # Batch 9-2: 首帧数据到达，隐藏空状态占位。
+        if self._table.rowCount() == 0:
+            self._empty_state.hide()
         row = self._table.rowCount()
         self._table.insertRow(row)
         self._table.setItem(row, 0, QTableWidgetItem(str(row + 1)))
@@ -193,6 +207,8 @@ class CanPanel:
             self._table.setRowCount(0)
         if self._stats is not None:
             self._stats.setText(self._widget.tr("0 帧"))
+        # Batch 9-2: 清空后恢复空状态占位。
+        self._empty_state.show()
 
 
 class _CanSignalBridge(QWidget):

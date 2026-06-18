@@ -89,6 +89,17 @@ class RttPanel:
         self._text.setPlaceholderText(widget.tr("RTT 通道数据…"))
         layout.addWidget(self._text, 1)
 
+        # Batch 9-2: 未启动时空状态占位（收到数据后隐藏）。
+        from embeddebug.serial_station.ui.widgets import EmptyStateWidget
+
+        self._empty_state = EmptyStateWidget(
+            icon_name="activity",
+            title=widget.tr("RTT 未启动"),
+            description=widget.tr("点击「启动」开始接收 SEGGER RTT 通道数据"),
+            parent=widget,
+        )
+        layout.addWidget(self._empty_state)
+
         self._widget = widget
         self._bridge = _RttSignalBridge(widget)
         self._bridge.bytes_received.connect(self._on_bytes)
@@ -162,6 +173,9 @@ class RttPanel:
     def _on_bytes(self, data: bytes) -> None:
         if self._text is not None:
             self._text.appendPlainText(data.decode("utf-8", errors="replace").rstrip())
+        # Batch 9-2: 首次收到数据隐藏空状态。
+        if self._empty_state is not None and not self._empty_state.isHidden():
+            self._empty_state.hide()
 
     def _on_error(self, msg: str) -> None:
         if self._text is not None:
@@ -170,6 +184,9 @@ class RttPanel:
     def _clear(self) -> None:
         if self._text is not None:
             self._text.clear()
+        # Batch 9-2: 清屏后恢复空状态占位。
+        if self._empty_state is not None:
+            self._empty_state.show()
 
 
 class _RttSignalBridge(QWidget):
