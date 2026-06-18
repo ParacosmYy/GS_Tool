@@ -19,6 +19,7 @@
 
 from __future__ import annotations
 
+from PyQt6.QtCore import QPoint, Qt
 from PyQt6.QtWidgets import (
     QFileDialog,
     QHBoxLayout,
@@ -83,6 +84,9 @@ class DashboardPanel:
 
         # Batch 28: 标签页双击重命名（激活 DashboardTabs.rename_tab，此前零消费者）。
         self._tabs.tabBarDoubleClicked.connect(self._rename_tab_on_double_click)
+        # Batch 29: 标签页右键菜单（重命名/复制/关闭）—— customContextMenuRequested。
+        self._tabs.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self._tabs.customContextMenuRequested.connect(self._show_tab_context_menu)
 
         # Batch 18: 双击全屏接线 —— 新放置控件自动装 attach_double_click_fullscreen
         # （激活 fullscreen.py 死代码）。每个画布的 item_added 信号 → 给新控件装双击全屏。
@@ -224,6 +228,15 @@ class DashboardPanel:
             self._tabs.rename_tab(index, new_name.strip())
             self._status.setText(self._widget.tr("标签页已重命名：{name}").format(name=new_name.strip()))
             self._autosave_layout()  # tab 名是持久化 key，改名后重存。
+
+    def _show_tab_context_menu(self, pos: QPoint) -> None:
+        """标签页右键菜单（重命名/复制/关闭）——委托 _dashboard_tab_menu（守 300 行门禁）。"""
+
+        from embeddebug.serial_station.ui.panels._dashboard_tab_menu import (
+            show_tab_context_menu,
+        )
+
+        show_tab_context_menu(self, pos)
 
     def _clear_canvas(self) -> None:
         canvas = self._tabs.current_canvas() if self._tabs else None
