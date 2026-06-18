@@ -6,10 +6,11 @@
 - ``fade_in`` / ``fade_out``：QWidget 透明度淡入淡出（用 QGraphicsOpacityEffect）。
 - ``slide_in``：QWidget 从下方滑入（pos 动画）。
 - ``card_enter``：卡片进入组合动画（淡入 + 上滑），用于面板首次显示。
+- ``stagger``：多卡片错峰进入。
 
 设计要点：
-- 动画时长遵循 VOFA+ 观感基线（180~260ms），缓动用 OutCubic。
-- 工厂返回 ``(animation, effect)``，调用方需持有 effect 防止 GC。
+- 时长与缓动**统一引用** ``animations.tokens.AnimationTokens``，消除旧的双轨制常量。
+- 工厂返回 ``QPropertyAnimation``（持有 effect 引用防 GC，effect 以 widget 为 parent）。
 - 不依赖 controller/core/protocol。
 
 约束：本模块只依赖 PyQt6 + 标准库。
@@ -17,16 +18,19 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QPoint, QRectF, QTimer
-from PyQt6.QtWidgets import QGraphicsBlurEffect, QGraphicsOpacityEffect, QWidget
+from PyQt6.QtCore import QPropertyAnimation, QPoint, QTimer
+from PyQt6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
-DURATION_FAST = 160
-DURATION_NORMAL = 220
-DURATION_SLOW = 300
+from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
+
+# 兼容性别名：旧代码可能 import DURATION_* 常量；保留并指向 token。
+DURATION_FAST = AnimationTokens.DURATION_FAST
+DURATION_NORMAL = AnimationTokens.DURATION_NORMAL
+DURATION_SLOW = AnimationTokens.DURATION_NORMAL  # 历史语义：卡片入场用 normal
 SLIDE_PIXELS = 16
 
 
-def fade_in(widget: QWidget, duration_ms: int = DURATION_NORMAL) -> QPropertyAnimation:
+def fade_in(widget: QWidget, duration_ms: int = AnimationTokens.DURATION_NORMAL) -> QPropertyAnimation:
     """淡入动画：透明度 0 → 1。"""
 
     effect = QGraphicsOpacityEffect(widget)
@@ -36,11 +40,11 @@ def fade_in(widget: QWidget, duration_ms: int = DURATION_NORMAL) -> QPropertyAni
     anim.setDuration(duration_ms)
     anim.setStartValue(0.0)
     anim.setEndValue(1.0)
-    anim.setEasingCurve(QEasingCurve.Type.OutCubic)
+    anim.setEasingCurve(AnimationTokens.EASE_OUT)
     return anim
 
 
-def fade_out(widget: QWidget, duration_ms: int = DURATION_NORMAL) -> QPropertyAnimation:
+def fade_out(widget: QWidget, duration_ms: int = AnimationTokens.DURATION_FAST) -> QPropertyAnimation:
     """淡出动画：透明度 1 → 0，完成后隐藏 widget。"""
 
     effect = QGraphicsOpacityEffect(widget)
@@ -50,12 +54,12 @@ def fade_out(widget: QWidget, duration_ms: int = DURATION_NORMAL) -> QPropertyAn
     anim.setDuration(duration_ms)
     anim.setStartValue(1.0)
     anim.setEndValue(0.0)
-    anim.setEasingCurve(QEasingCurve.Type.OutCubic)
+    anim.setEasingCurve(AnimationTokens.EASE_OUT)
     anim.finished.connect(widget.hide)
     return anim
 
 
-def slide_in(widget: QWidget, duration_ms: int = DURATION_NORMAL) -> QPropertyAnimation:
+def slide_in(widget: QWidget, duration_ms: int = AnimationTokens.DURATION_NORMAL) -> QPropertyAnimation:
     """滑入动画：从原位下方 SLIDE_PIXELS 处上滑到原位。"""
 
     target_pos = widget.pos()
@@ -65,14 +69,15 @@ def slide_in(widget: QWidget, duration_ms: int = DURATION_NORMAL) -> QPropertyAn
     anim.setDuration(duration_ms)
     anim.setStartValue(start_pos)
     anim.setEndValue(target_pos)
-    anim.setEasingCurve(QEasingCurve.Type.OutCubic)
+    anim.setEasingCurve(AnimationTokens.EASE_OUT)
     return anim
 
 
 def card_enter(widget: QWidget) -> list[QPropertyAnimation]:
     """卡片进入组合动画：淡入 + 上滑，返回动画列表（调用方需 start）。"""
 
-    return [fade_in(widget, DURATION_NORMAL), slide_in(widget, DURATION_NORMAL)]
+    return [fade_in(widget, AnimationTokens.DURATION_NORMAL),
+            slide_in(widget, AnimationTokens.DURATION_NORMAL)]
 
 
 def stagger(cards: list[QWidget], delay_ms: int = 60) -> list[QPropertyAnimation]:

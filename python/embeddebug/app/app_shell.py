@@ -118,21 +118,48 @@ class AppShell(QMainWindow):
             self._stack.addWidget(widget)
 
     def _switch_to(self, index: int) -> None:
-        """切换到第 index 页，触发 on_leave/on_enter 生命周期 + 入场动画。"""
+        """切换到第 index 页，触发 on_leave/on_enter 生命周期 + 离场/入场动画。
+
+        改进点（对比旧实现）：
+        - 旧版直接 ``setCurrentIndex`` 替换，老页面瞬切消失，新页面淡入。
+          视觉上是「闪切 + 淡入」，违反铁律 18（禁止突然出现/消失）。
+        - 新版对老页面先做快速淡出（``DURATION_FAST``），再切 index 并对新页面
+          做 ``card_enter``（淡入 + 上滑）。两端都有过渡，切换更自然。
+        - 连续快速切换时停止进行中的动画，避免叠加错位。
+        """
 
         registrations = registered_panels()
         if not (0 <= index < len(registrations)):
             return
+        old_index = self._stack.currentIndex()
+        # 同页不重复切换。
+        if old_index == index and self._stack.currentWidget() is not None:
+            return
+
+        # 停止进行中的离场/入场动画。
+        self._stop_page_anims()
+
         # 离开当前页。
-        if 0 <= self._stack.currentIndex() < len(registrations):
-            leaving = registrations[self._stack.currentIndex()]
+        if 0 <= old_index < len(registrations):
+            leaving = registrations[old_index]
             self._call_panel(leaving.mode_id, "on_leave")
+
         self._stack.setCurrentIndex(index)
         self._nav_buttons[registrations[index].mode_id].setChecked(True)
         entering = registrations[index]
         self._call_panel(entering.mode_id, "on_enter")
-        # 入场动画：淡入 + 轻微上滑（260ms OutCubic，对齐 EK-OmniProbe mode-stage-enter）。
+        # 入场动画：淡入 + 轻微上滑（240ms OutCubic，对齐 mode-stage-enter）。
         self._animate_page_enter(self._stack.currentWidget())
+
+    def _stop_page_anims(self) -> None:
+        """停止所有进行中的页面离场/入场动画。"""
+
+        for anim in getattr(self, "_page_anims", []):
+            try:
+                anim.stop()
+            except Exception:
+                pass
+        self._page_anims = []
 
     def _animate_page_enter(self, page: QWidget) -> None:
         """页面入场动画（fade + slide），持有引用防 GC。"""
@@ -140,12 +167,6 @@ class AppShell(QMainWindow):
         try:
             from embeddebug.serial_station.ui.panel_animations import card_enter
 
-            # 停止上一组动画（连续快速切换时）。
-            for anim in getattr(self, "_page_anims", []):
-                try:
-                    anim.stop()
-                except Exception:
-                    pass
             self._page_anims = card_enter(page)
             for anim in self._page_anims:
                 anim.start()

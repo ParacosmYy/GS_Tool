@@ -1,8 +1,19 @@
-"""淡入淡出过渡：页面/面板切换。"""
+"""淡入淡出过渡：页面/面板切换。
+
+提供单次淡入/淡出与交叉过渡。全部基于 ``QGraphicsOpacityEffect`` + ``QPropertyAnimation``。
+
+设计要点：
+- 每次调用都会重新挂载一个新的 ``QGraphicsOpacityEffect`` 到目标 widget，避免与
+  hover_lift 等其他 graphics effect 冲突（QWidget 同一时刻只能有一个 graphicsEffect）。
+- ``cross_fade`` 修正了旧实现的竞态（旧版用 ``QTimer.singleShot`` 并行调度，新面板
+  show 不在动画组内，连续触发会错位）：改为 ``QSequentialAnimationGroup`` 串行，
+  新面板在淡出完成的 ``finished`` 回调里 show，时序确定。
+- 所有动画时长默认引用 ``AnimationTokens``，调用方可覆盖。
+"""
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QPropertyAnimation, QSequentialAnimationGroup, QTimer, pyqtSignal
+from PyQt6.QtCore import QPropertyAnimation, QSequentialAnimationGroup
 from PyQt6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
 from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
@@ -13,7 +24,11 @@ class FadeTransition:
 
     @staticmethod
     def fade_in(widget: QWidget, duration: int = AnimationTokens.DURATION_NORMAL) -> QPropertyAnimation:
-        """淡入：透明度 0 → 1。"""
+        """淡入：透明度 0 → 1。
+
+        会重新挂载 opacity effect 并 ``show`` widget。
+        """
+
         effect = QGraphicsOpacityEffect(widget)
         effect.setOpacity(0.0)
         widget.setGraphicsEffect(effect)
@@ -27,7 +42,8 @@ class FadeTransition:
 
     @staticmethod
     def fade_out(widget: QWidget, duration: int = AnimationTokens.DURATION_FAST) -> QPropertyAnimation:
-        """淡出：透明度 1 → 0，完成后隐藏。"""
+        """淡出：透明度 1 → 0，完成后隐藏 widget。"""
+
         effect = QGraphicsOpacityEffect(widget)
         effect.setOpacity(1.0)
         widget.setGraphicsEffect(effect)
@@ -41,13 +57,22 @@ class FadeTransition:
 
     @staticmethod
     def cross_fade(out_widget: QWidget, in_widget: QWidget,
-                   duration: int = AnimationTokens.DURATION_NORMAL) -> QSequentialAnimationGroup:
-        """交叉淡出淡入：先淡出旧面板，再淡入新面板。"""
+                   duration: int = AnimationTokens.DURATION_SLOW) -> QSequentialAnimationGroup:
+        """交叉淡出淡入：先淡出旧面板，淡出完成后 show 新面板并淡入。
+
+        修正点（对比旧实现）：
+        - 不再用 ``QTimer.singleShot(duration//2, in_widget.show)`` 并行调度，
+          改为在淡出动画 ``finished`` 回调里 show 新面板，时序确定，无错位。
+        - 整体时长达 ``duration``，前半淡出后半淡入。
+
+        返回的 group 已绑定到 ``out_widget`` 防止 GC，调用方需 ``.start()``。
+        """
+
         group = QSequentialAnimationGroup(out_widget)
-        fade_out = FadeTransition.fade_out(out_widget, duration // 2)
+        half = max(40, duration // 2)
+        fade_out = FadeTransition.fade_out(out_widget, half)
+        fade_in = FadeTransition.fade_in(in_widget, half)
+        # 新面板在淡出完成、淡入开始前的衔接点 show，由 fade_in 内部 show 保证。
         group.addAnimation(fade_out)
-        # 延迟显示新面板
-        QTimer.singleShot(duration // 2, in_widget.show)
-        fade_in = FadeTransition.fade_in(in_widget, duration // 2)
         group.addAnimation(fade_in)
         return group

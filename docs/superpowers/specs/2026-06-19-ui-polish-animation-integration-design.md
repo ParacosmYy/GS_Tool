@@ -1,0 +1,120 @@
+# 2026-06-19 — UI 美化与动画引擎接线迭代设计
+
+> 触发：用户反馈「UI 太丑、动画过渡做得差」，要求大规模并行 subagent 迭代优化。
+> 本文档是该轮迭代的总设计，覆盖 6 个 batch 的边界、接口、验收命令与合流顺序。
+> 遵循 CLAUDE.md 铁律 10.6（并行开发必须先切边界）与铁律 18（面板切换必须有过渡动画）。
+
+---
+
+## 一、背景与诊断结论
+
+6 个只读 subagent 对 `python/embeddebug/serial_station/ui/` 做了全面审查，核心结论：
+**「基建齐全但接线全断」**——动画/微交互/控件/QSS 的「架子」都在，但几乎没有「通电」。
+
+| 系统 | 现状 | 核心问题 |
+|---|---|---|
+| 动画引擎 | `animations/` 8 类动画 + controller + tokens 全是死代码；只有 `panel_animations.py` 4 个函数在跑，且只 1 处调用（`app_shell.py:141`） | 两套重复引擎、token 时长不一致（160/220/300 vs 180/280/400）、按钮按压/hover/focus/抖动/呼吸灯全部未接线 |
+| QSS 主题 | 程序化 builder + 22 个 section，深色青色调单一色相 | 卡片浮不起来（窗口底 `#0d1118` 与面板底 `#151b24` 亮度差仅 3%）、无真实投影/玻璃模糊/渐变；`palette_defs.py` 229 行死代码与活跃 palette 数值冲突 |
+| 布局 | 三栏 QSplitter + 卡片化，objectName 规范 | 响应式在 AppShell 模式下功能性失效（resize 驱动点错位）；折叠卡硬切 `setVisible`；右区 Log Tools 6 控件塞 260px 窄列 |
+| 控件 | Gauge/LED/Slider/Button 全 QPainter/QSS | Gauge 指针硬跳、LED 稳定态不发光、Slider 原生无跟手、按钮无 ripple；图标缓存键漏 pixels 维度（bug） |
+| 面板 | 7 个域面板 + placeholder | 占位面板朴素到只有两个 QLabel；全仓零骨架屏/EmptyState；动画死代码全没接 |
+| 波形 | pyqtgraph 黑底白线 | 零渐变填充、零发光、CursorManager/waveform_measure/waveform_perf 全是死代码未接入 |
+
+## 二、关于「10 个 subagent 持续迭代」的边界约束
+
+harness 现实：当前环境唯一 subagent 类型是只读 `Explore`（Glob/Grep/Read/Bash），无法 Write/Edit。
+因此「10 个 subagent 并行写代码」不可行；真正落代码由主 Agent 串行执行，subagent 仅做并行调研辅助。
+
+仓库约束（铁律 10.6）：QSS/palette/动画 token 是高共享区，多 Agent 并行改同一批文件必然冲突。
+共享入口（`pyproject.toml`、`uv.lock`、启动脚本、QSS 主题文件、`palette.py`）默认单 Agent 串行。
+
+**结论**：采用「分批串行 + 批内独立文件边界」策略。每批独立可验证、可提交；批与批之间串行收口、跑 smoke、提交。
+
+## 三、六批次边界与接口
+
+### Batch 1 (A1) — 动画引擎整合【已完成 2026-06-19】
+- **文件边界**（独占，无并发冲突）：
+  - `animations/tokens.py` / `scale.py` / `slide.py` / `collapse.py` / `fade.py` / `shake.py` / `pulse.py`
+  - `panel_animations.py` / `micro_interactions.py` / `app/app_shell.py`
+- **改动**：
+  - 统一 token 时长（`DURATION_FAST=160` / `NORMAL=240` / `SLOW=360` / `SLOWER=600`）消除双轨制。
+  - `ScaleAnimation` 改中心对齐 geometry 缩放 + 自动防 GC 活跃列表 + `hover_in`。
+  - `FadeTransition.cross_fade` 修竞态（去掉 `QTimer.singleShot` 并行调度，改 sequential group 串行）。
+  - `micro_interactions.install_hover_lift` 真实垂直位移 + accent tint 阴影色（不再只动 blurRadius）。
+  - `app_shell._switch_to` 加老页面 on_leave 生命周期 + 同页跳过 + 动画停止防叠加。
+  - 所有 shake/pulse/slide/collapse 补 `_track` 防 GC。
+  - 保留模块级兼容别名（`SCALE_HOVER` / `SHADOW_BLUR_*` / `LIFT_PIXELS` / `ANIM_DURATION`）。
+- **验收**：`uv run test-embeddebug-py` = 838 passed；`uv run start-embeddebug --smoke` = 0；`cmd /c EmbedDebug.bat --smoke` = 0。
+
+### Batch 2 (A2) — QSS 主题深度（深色质感升级）
+- **文件边界**：`theme/palette.py` / `palette_defs.py`（删除）/ `qss_sections_*.py` / `tokens.py`
+- **改动**：
+  - 删 `palette_defs.py` 229 行死代码（消除与活跃 palette 数值冲突）。
+  - 拉 `BG_WINDOW` 与 `BG_PANEL` 亮度差到 ≥8%（卡片真正浮起）。
+  - 修 3 处硬编码 RGBA（滚动条 `qss_sections_widgets.py:238`、placeholder `qss_sections_core.py:105`、卡片头 `qss_sections_layout.py:50`），改走 token，浅色主题切换不漏色。
+  - 引入 elevation token（`SHADOW_CARD` / `SHADOW_POPOVER`）+ accent gradient（按钮/激活态 2-stop 跨色相渐变）。
+- **验收**：`test_theme_qss_coverage` / `test_theme_switcher` 全绿；浅色主题无残留深色值。
+
+### Batch 3 (B1) — 控件动效接线
+- **文件边界**：`controls/configurable_button.py` / `led.py` / `gauge.py` / `slider.py` / `value_display.py` / `icons.py`
+- **改动**：
+  - `ConfigurableButton` 接 `ScaleAnimation.press`（按压回弹）+ `install_hover_lift`。
+  - `StatusLed` 接 `PulseAnimation.breathing`（连接常亮呼吸）。
+  - `Gauge` 指针角度 tween（`QPropertyAnimation` 驱动自定义 `angle` 属性）。
+  - `Slider` handle hover 放大 + value 气泡 + release 才发包语义。
+  - `icons.py` 修缓存键漏 pixels 维度 bug + stroke 多 path 全着色。
+  - `value_display` 数字 tween（count-up）。
+- **验收**：新增 `test_controls_animations.py`；既有 controls 测试全绿。
+
+### Batch 4 (B2) — 布局修复
+- **文件边界**：`responsive_layout.py` / `collapsible_card.py` / `layout_main.py` / `sections.py` / `main_window.py`
+- **改动**：
+  - 响应式 resize 驱动点从 `SerialStationMainWindow` 迁到 `AppShell`（AppShell 模式下真正生效）。
+  - 折叠断点 900 与三区最小宽度和 940 对齐（消除逻辑失效）。
+  - `CollapsibleCard` 接 `CollapseAnimation`（折叠/展开高度动画，不再硬切 setVisible）。
+  - 右区 Log Tools 6 控件改 `QGridLayout`/Flow 换行。
+  - 全局卡片接 `install_hover_lift`、输入框接 `install_focus_ring`。
+- **验收**：`test_responsive_layout` / `test_collapsible_card` 新增；窗口缩到 800px 不破。
+
+### Batch 5 (C1) — 面板占位与骨架
+- **文件边界**：新建 `widgets/empty_state.py` / `widgets/skeleton.py`；`panels/placeholder_panel.py` 重做；各面板接 stagger
+- **改动**：
+  - 新建 `EmptyStateWidget`（图标 + 标题 + 描述 + 可选 CTA）。
+  - 新建 `SkeletonWidget` + shimmer 动画（QSS keyframe 近似）。
+  - `PlaceholderPanel` 重做用 `EmptyStateWidget`，渲染模式 icon。
+  - 各域面板首屏卡片接 `panel_animations.stagger`。
+- **验收**：`test_empty_state` / `test_skeleton` 新增。
+
+### Batch 6 (C2) — 波形美化
+- **文件边界**：`waveform_preview.py` / `waveform_engine.py` / `waveform_overlays.py`
+- **改动**：
+  - 曲线接 `setFillLevel` + `QLinearGradient`（半透明渐变填充）。
+  - 曲线接 `QGraphicsDropShadowEffect` 同色 blur（发光主线）。
+  - `waveform_preview` 接入 `CursorManager` + `compute_cursor_measurement` + `RefreshThrottle`/`BatchAccumulator`（激活全部死代码）。
+  - 坐标轴接 `pg.SIFormat`（工程记数法）。
+- **验收**：`test_waveform_*` 全绿；preview 不再逐批重建数组（接 ring buffer 思路）。
+
+## 四、合流顺序与共享区保护
+
+严格串行：A1 → A2 → B1 → B2 → C1 → C2。原因：
+- A1 是所有控件/面板/卡片接线动画的 API 地基，必须先稳定。
+- A2 的 palette/elevation token 是 B1 控件配色和 B2 布局阴影的前置。
+- B1/B2 的控件与布局改动会触发 C1 面板重排，C1 必须后做。
+- C2 波形独立，但 CursorManager 接线依赖 B1 的控件动画基建，放最后。
+
+共享区保护：每批内所有改动集中在该批声明的文件边界内，不交叉改 `pyproject.toml`、`uv.lock`、启动脚本（这些永不并发）。
+
+## 五、验收口径（每批收口必过）
+
+1. `uv run test-embeddebug-py` 全绿（新增测试同步落地）。
+2. `uv run start-embeddebug --smoke` 退出码 0。
+3. `cmd /c EmbedDebug.bat --smoke` 退出码 0。
+4. 三轴状态更新：本轮 UI 动画接线 → U2→U3（关键路径有动效反馈且可恢复）。
+5. 代码变更量 ≥500 行（铁律 3），不足则补测试或文档。
+
+## 六、评分日志
+
+- 时间：2026-06-19
+- Batch 1 增量：`+1`（838 测试通过 + 双 smoke 入口 0）
+- 当前得分：618 → 619
+- 阶段：600→699（结构与流程稳定期）
