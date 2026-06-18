@@ -1,4 +1,4 @@
-"""Batch 10 测试：多强调色变体 + accent recolor 恒等性/无残留。
+"""多强调色变体 + accent recolor 恒等性/无残留测试。
 
 覆盖：
 - 7 套 accent 变体结构（id 唯一、cyan 在首位、色调字段齐全）。

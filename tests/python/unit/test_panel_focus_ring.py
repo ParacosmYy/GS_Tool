@@ -1,4 +1,4 @@
-"""Batch 22 测试：域面板输入控件 focus_ring 接入。
+"""域面板输入控件 focus_ring 接入测试。
 
 覆盖：
 1. apply_panel_focus_rings 给输入控件装 focus ring（返回装饰数 > 0）。

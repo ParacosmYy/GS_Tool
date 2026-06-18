@@ -1,4 +1,4 @@
-"""Batch 26 测试：dashboard widget 全屏 ESC 退出。
+"""dashboard widget 全屏 ESC 退出测试。
 
 覆盖：
 1. attach_double_click_fullscreen 重写 keyPressEvent（ESC 退出全屏）。

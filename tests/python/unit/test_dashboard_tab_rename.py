@@ -1,4 +1,4 @@
-"""Batch 28 测试：dashboard 标签页双击重命名（激活 rename_tab 死代码）。
+"""dashboard 标签页双击重命名测试（激活 rename_tab 死代码）。
 
 覆盖：
 1. DashboardPanel 接 tabBarDoubleClicked → _rename_tab_on_double_click。

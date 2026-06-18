@@ -1,4 +1,4 @@
-"""Batch 27 测试：dashboard 多标签页布局独立持久化。
+"""dashboard 多标签页布局独立持久化测试。
 
 覆盖：
 1. persist_all_tabs 按标签页名存全部 canvas 布局。

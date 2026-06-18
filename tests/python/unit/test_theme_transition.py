@@ -1,4 +1,4 @@
-"""Batch 10 测试：主题切换 windowOpacity 过渡动画。
+"""主题切换 windowOpacity 过渡动画测试。
 
 覆盖：
 - ``ThemeTransition.run`` 创建动画组、目标属性是 ``windowOpacity``、起止 1.0/1.0。

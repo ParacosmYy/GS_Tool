@@ -1,4 +1,4 @@
-"""Batch 30 测试：dashboard 标签页拖拽重排序（setMovable + tab_moved）。
+"""dashboard 标签页拖拽重排序测试（setMovable + tab_moved）。
 
 覆盖：
 1. DashboardTabs setMovable(True)（标签页可拖拽）。

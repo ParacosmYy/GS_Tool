@@ -1,4 +1,4 @@
-"""Batch 25 测试：仪表盘布局自动持久化/恢复。
+"""仪表盘布局自动持久化/恢复测试。
 
 覆盖：
 1. _dashboard_layout_store save/load dict 往返。

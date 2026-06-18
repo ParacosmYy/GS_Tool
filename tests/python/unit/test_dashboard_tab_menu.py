@@ -1,4 +1,4 @@
-"""Batch 29 测试：dashboard 标签页右键菜单（重命名/复制/关闭）。
+"""dashboard 标签页右键菜单测试（重命名/复制/关闭）。
 
 覆盖：
 1. dashboard_panel 接 customContextMenuRequested → _show_tab_context_menu。

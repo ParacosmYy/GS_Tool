@@ -1,4 +1,4 @@
-"""Batch 23 测试：AppShell 页面切换离场淡出（激活 panel_animations.fade_out 死代码）。
+"""AppShell 页面切换离场淡出测试（激活 panel_animations.fade_out 死代码）。
 
 覆盖：
 1. AppShell 切换页面时对老页面调 fade_out（_animate_page_leave）。
