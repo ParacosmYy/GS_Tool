@@ -4,6 +4,7 @@ import importlib
 import inspect
 
 from embeddebug.serial_station.ui import (
+    command_actions,
     connection_actions,
     injection_actions,
     main_window,
@@ -79,14 +80,21 @@ def test_connection_control_state_actions_live_with_connection_actions():
     assert "_port_combo.currentText" not in ports_source
 
 
-def test_command_history_actions_live_with_connection_actions():
-    assert hasattr(connection_actions, "refresh_command_history")
-    assert hasattr(connection_actions, "select_command_history")
+def test_command_send_and_history_actions_live_with_command_actions():
+    assert hasattr(command_actions, "send_text")
+    assert hasattr(command_actions, "refresh_command_history")
+    assert hasattr(command_actions, "select_command_history")
+    assert not hasattr(connection_actions, "send_text")
+    assert not hasattr(connection_actions, "refresh_command_history")
+    assert not hasattr(connection_actions, "select_command_history")
 
+    send_source = inspect.getsource(main_window.SerialStationMainWindow._send_text)
     refresh_source = inspect.getsource(main_window.SerialStationMainWindow._refresh_command_history)
     select_source = inspect.getsource(main_window.SerialStationMainWindow._select_command_history)
-    assert "connection_actions.refresh_command_history(self)" in refresh_source
-    assert "connection_actions.select_command_history(self, text)" in select_source
+    assert "command_actions.send_text(self)" in send_source
+    assert "command_actions.refresh_command_history(self)" in refresh_source
+    assert "command_actions.select_command_history(self, text)" in select_source
+    assert "_controller.send_text_result" not in send_source
     assert "_controller.command_history" not in refresh_source
     assert "_send_edit.setText" not in select_source
 

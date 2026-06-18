@@ -1,11 +1,9 @@
-"""Connection and send actions for the Serial Station main window."""
+"""Connection actions for the Serial Station main window."""
 
 from __future__ import annotations
 
 from typing import Protocol
 
-from embeddebug.serial_station.ui.command_entry_text import apply_command_history_selection
-from embeddebug.serial_station.ui.command_history_options import populate_command_history_options
 from embeddebug.serial_station.ui.connection_control_state import set_connection_control_state
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
 from embeddebug.serial_station.ui.serial_connection_fields import read_serial_connection_fields
@@ -24,8 +22,6 @@ class ConnectionActionHost(Protocol):
     def _set_connected_controls(self, connected: bool) -> None: ...
 
     def _has_serial_ports(self) -> bool: ...
-
-    def _refresh_command_history(self) -> None: ...
 
 
 def connect_fake(host: ConnectionActionHost) -> None:
@@ -132,28 +128,6 @@ def refresh_serial_ports(host: ConnectionActionHost) -> None:
     populate_serial_port_combo(host)
     host._set_connected_controls(host._controller.is_connected)
     set_status_text(host, "Serial ports refreshed")
-
-
-def send_text(host: ConnectionActionHost) -> None:
-    text = host._send_edit.text()
-    if not text:
-        set_status_text(host, "Command is empty")
-        return
-    result = host._controller.send_text_result(text)
-    if result.ok:
-        refresh_command_history(host)
-        set_result_status(host, result, success_text="Command sent", failure_prefix="Send failed")
-        return
-    set_result_status(host, result, success_text="", failure_prefix="Send failed")
-
-
-def refresh_command_history(host: ConnectionActionHost) -> None:
-    history = host._controller.command_history
-    populate_command_history_options(host._command_history_combo, history)
-
-
-def select_command_history(host: ConnectionActionHost, text: str) -> None:
-    apply_command_history_selection(host._send_edit, text)
 
 
 def _validated_tcp_endpoint(host: ConnectionActionHost) -> tuple[str, int] | None:

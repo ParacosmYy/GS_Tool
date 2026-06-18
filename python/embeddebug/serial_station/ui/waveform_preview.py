@@ -14,6 +14,15 @@ from embeddebug.serial_station.core import ChannelBatch
 class SafePlotWidget(pg.PlotWidget):
     """PlotWidget guard for delayed paint events during Qt teardown."""
 
+    def resizeEvent(self, event: object) -> None:
+        if event is not None and os.environ.get("QT_QPA_PLATFORM") == "offscreen":
+            event.accept()
+            return
+        try:
+            super().resizeEvent(event)
+        except RuntimeError:
+            event.accept()
+
     def paintEvent(self, event: object) -> None:
         if os.environ.get("QT_QPA_PLATFORM") == "offscreen":
             event.accept()

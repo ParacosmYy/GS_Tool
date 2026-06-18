@@ -10,6 +10,7 @@ from embeddebug.serial_station.controllers import (
 )
 from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.ui import (
+    command_actions,
     connection_actions,
     injection_actions,
     lifecycle_actions,
@@ -72,13 +73,13 @@ class SerialStationMainWindow(QMainWindow):
         return connection_actions.has_serial_ports(self)
 
     def _send_text(self) -> None:
-        connection_actions.send_text(self)
+        command_actions.send_text(self)
 
     def _refresh_command_history(self) -> None:
-        connection_actions.refresh_command_history(self)
+        command_actions.refresh_command_history(self)
 
     def _select_command_history(self, text: str) -> None:
-        connection_actions.select_command_history(self, text)
+        command_actions.select_command_history(self, text)
 
     def _inject_received(self) -> None:
         injection_actions.inject_received(self)
