@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 649分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 351分
+> 当前: 650分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 350分
 
 ---
 
@@ -351,14 +351,15 @@
 | 647 | Serial Station UI 美化 Batch 24 — 清理 panel_animations.stagger 遗留死代码 | panel_animations.py 清理（112→98 行，-14 行）：删除 stagger（card_enter 含 slide_in 变体，与布局冲突，被 stagger_fade 取代）；test_stagger_cleanup 固化守护 |
 | 648 | Serial Station UI 美化 Batch 10'（并行线）— 多强调色配色+主题切换过渡动画 | ⚠️ 编号注：此为并发进程第二条 batch 线的 Batch 10，时间上晚于 Batch 22；accents.py 7 套 AccentVariant（dark+light 双色调），cyan 默认与 palette 常量对齐；theme_transition.py ThemeTransition.run 整窗 windowOpacity 1.0→0.6→1.0 过渡掩盖 QSS 硬切闪烁 |
 | 649 | Serial Station UI 美化 Batch 25 — 仪表盘布局自动持久化/恢复（env-gated） | DashboardPanel 此前只有手动保存/加载，关掉应用布局丢失；新增 _dashboard_layout_store.py：persist_from_canvas（画布 to_layout_dict 写盘）+ restore_to_canvas（读盘恢复）；build 自动恢复 + add 自动保存；env-gated（DASHBOARD_LAYOUT 默认关，防测试污染）；10 个新单测覆盖 store 往返/损坏兜底/restore-persist 画布/build 自动恢复 |
+| 650 | Serial Station UI 美化 Batch 26 — dashboard 全屏 ESC 退出 | WidgetFullscreenHandler 此前仅双击 toggle 进出全屏，进入后无键盘退出；Batch 26 给 attach_double_click_fullscreen 加 keyPressEvent override，全屏态按 ESC 退出；enter() setFocus 确保全屏 widget 收按键事件 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#649` 的完整记录
+- 当前文档已整理到 `#650` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
-- 619~649 为「UI 美化与动画接线」连续迭代（Batch 1~25），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
+- 619~650 为「UI 美化与动画接线」连续迭代（Batch 1~26），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
 - ⚠️ Batch 编号注：Batch 10 出现两次（StatusDot 线 633 / accent 配色线 648），因并发进程有两条独立 batch 编号线；评分按 commit 时间顺序线性 +1，不依赖 batch 编号
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
