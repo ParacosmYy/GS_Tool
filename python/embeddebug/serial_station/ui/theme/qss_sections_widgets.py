@@ -150,6 +150,12 @@ QLabel#serialStationWaveformStatusLabel {{
     font-size: {T.FONT_SM};
     padding: {T.SPACING_SM} {T.SPACING_MD};
 }}
+QLabel#serialStationWaveformStatsLabel {{
+    color: {P.TEXT_SECONDARY};
+    font-family: {T.FONT_FAMILY_MONO};
+    font-size: {T.FONT_SM};
+    padding: {T.SPACING_XS} {T.SPACING_MD};
+}}
 /* 多通道图例（对齐 VOFA+ 通道色块） */
 QWidget#serialStationWaveformLegend {{
     background-color: transparent;
