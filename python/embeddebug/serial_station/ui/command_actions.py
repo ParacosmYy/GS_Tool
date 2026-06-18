@@ -21,6 +21,8 @@ def send_text(host: CommandActionHost) -> None:
     text = host._send_edit.text()
     if not text:
         set_status_text(host, "Command is empty")
+        # Batch 8: 空命令校验失败 → 抖动 send_edit 反馈（激活 ShakeAnimation）。
+        _shake_widget(host._send_edit)
         return
     result = host._controller.send_text_result(text)
     if result.ok:
@@ -28,6 +30,21 @@ def send_text(host: CommandActionHost) -> None:
         set_result_status(host, result, success_text="Command sent", failure_prefix="Send failed")
         return
     set_result_status(host, result, success_text="", failure_prefix="Send failed")
+
+
+def _shake_widget(widget: object) -> None:
+    """对控件触发左右抖动动画（校验失败反馈）。
+
+    Batch 8：激活 ShakeAnimation 死代码，输入校验失败时控件抖动。
+    动画失败不阻塞（抖动是锦上添花）。
+    """
+
+    try:
+        from embeddebug.serial_station.ui.animations.shake import ShakeAnimation
+
+        ShakeAnimation.shake(widget).start()
+    except Exception:
+        pass
 
 
 def refresh_command_history(host: CommandActionHost) -> None:

@@ -61,6 +61,8 @@ def _validated_tcp_endpoint(host: EndpointConnectionActionHost) -> tuple[str, in
     if result.ok:
         return result.host, result.port
     set_status_text(host, result.message)
+    # Batch 8: 校验失败 → 抖动出错字段（host 空抖 host_edit，port 非法抖 port_edit）。
+    _shake_failed_endpoint_field(host, result.message, host._tcp_host_edit, host._tcp_port_edit)
     return None
 
 
@@ -69,4 +71,28 @@ def _validated_udp_endpoint(host: EndpointConnectionActionHost) -> tuple[str, in
     if result.ok:
         return result.host, result.port
     set_status_text(host, result.message)
+    # Batch 8: 校验失败 → 抖动出错字段。
+    _shake_failed_endpoint_field(host, result.message, host._udp_host_edit, host._udp_port_edit)
     return None
+
+
+def _shake_failed_endpoint_field(host: EndpointConnectionActionHost, message: str,
+                                 host_edit: object, port_edit: object) -> None:
+    """根据校验失败消息抖动对应字段（Batch 8：激活 ShakeAnimation）。
+
+    消息含 'host' 抖 host_edit，含 'port' 抖 port_edit，无法区分时两者都抖。
+    """
+
+    try:
+        from embeddebug.serial_station.ui.animations.shake import ShakeAnimation
+
+        msg_lower = message.lower()
+        if "host" in msg_lower:
+            ShakeAnimation.shake(host_edit).start()
+        elif "port" in msg_lower:
+            ShakeAnimation.shake(port_edit).start()
+        else:
+            # 无法区分，抖 host 字段（通常 host 先校验）。
+            ShakeAnimation.shake(host_edit).start()
+    except Exception:
+        pass

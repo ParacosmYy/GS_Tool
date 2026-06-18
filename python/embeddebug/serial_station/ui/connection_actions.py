@@ -41,6 +41,8 @@ def connect_serial(host: ConnectionActionHost) -> None:
     fields = read_serial_connection_fields(host)
     if not fields.port_name or not host._has_serial_ports():
         set_status_text(host, "Serial port is empty")
+        # Batch 8: 空端口校验失败 → 抖动 port_combo 反馈（激活 ShakeAnimation）。
+        _shake_widget(host._port_combo)
         return
     result = host._controller.connect_serial_result(
         fields.port_name,
@@ -61,6 +63,20 @@ def connect_serial(host: ConnectionActionHost) -> None:
         host._set_connected_controls(True)
         return
     set_result_status(host, result, success_text="", failure_prefix="Connection failed")
+
+
+def _shake_widget(widget: object) -> None:
+    """对控件触发左右抖动动画（校验失败反馈，Batch 8：激活 ShakeAnimation）。
+
+    动画失败不阻塞（抖动是锦上添花）。
+    """
+
+    try:
+        from embeddebug.serial_station.ui.animations.shake import ShakeAnimation
+
+        ShakeAnimation.shake(widget).start()
+    except Exception:
+        pass
 
 
 def disconnect(host: ConnectionActionHost) -> None:
