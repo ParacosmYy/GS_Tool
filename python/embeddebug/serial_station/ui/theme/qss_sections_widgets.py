@@ -59,9 +59,9 @@ QPushButton:disabled {{
     color: {P.TEXT_DISABLED};
     border-color: {P.BORDER};
 }}
-/* 连接类主按钮 — 强调青底 */
+/* 连接类主按钮 — 强调青→蓝品牌渐变（跨色相，打破单一色相单调） */
 {connect_sel} {{
-    background-color: {P.ACCENT};
+    background-color: {P.ACCENT_GRADIENT};
     color: {P.TEXT_ON_ACCENT};
     border: {T.BORDER_NONE};
     font-weight: 600;
@@ -235,12 +235,12 @@ QScrollBar:vertical {{
     margin: 1px;
 }}
 QScrollBar::handle:vertical {{
-    background: rgba(51, 65, 85, 0.55);
+    background: {P.SCROLLBAR};
     border-radius: 4px;
     min-height: 30px;
 }}
 QScrollBar::handle:vertical:hover {{
-    background: rgba(71, 85, 105, 0.85);
+    background: {P.SCROLLBAR_HOVER};
 }}
 QScrollBar::add-line:vertical,
 QScrollBar::sub-line:vertical {{
@@ -254,12 +254,12 @@ QScrollBar:horizontal {{
     margin: 1px;
 }}
 QScrollBar::handle:horizontal {{
-    background: rgba(51, 65, 85, 0.55);
+    background: {P.SCROLLBAR};
     border-radius: 4px;
     min-width: 30px;
 }}
 QScrollBar::handle:horizontal:hover {{
-    background: rgba(71, 85, 105, 0.85);
+    background: {P.SCROLLBAR_HOVER};
 }}
 QScrollBar::add-line:horizontal,
 QScrollBar::sub-line:horizontal {{

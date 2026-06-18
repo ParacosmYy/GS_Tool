@@ -47,7 +47,7 @@ QFrame#serialStationCard:hover {{
 QWidget#serialStationCardHeader {{
     background-color: transparent;
     border: none;
-    border-bottom: {T.BORDER_THIN} solid rgba(39, 49, 63, 0.6);
+    border-bottom: {T.BORDER_THIN} solid {P.BORDER};
     padding-bottom: {T.SPACING_SM};
 }}
 QFrame#serialStationCard:hover QWidget#serialStationCardHeader {{

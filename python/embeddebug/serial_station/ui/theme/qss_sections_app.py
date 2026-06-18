@@ -18,11 +18,11 @@ QFrame#serialStationNavRail {{
     background-color: {P.BG_APP};
     border-right: {T.BORDER_THIN} solid {P.BORDER};
 }}
-/* 品牌徽标 ED：强调青渐变方块 + 反白字（仿 EK-OmniProbe logo chip）。 */
+/* 品牌徽标 ED：跨色相品牌渐变（青→蓝）+ 反白字，仿 EK-OmniProbe logo chip。 */
 QLabel#serialStationNavBrand {{
     background-color: qlineargradient(
-        x1:0, y1:0, x2:0, y2:1,
-        stop:0 {P.ACCENT_HOVER}, stop:1 {P.ACCENT_PRESSED}
+        x1:0, y1:0, x2:1, y2:1,
+        stop:0 {P.ACCENT_GRADIENT_FROM}, stop:1 {P.ACCENT_GRADIENT_TO}
     );
     color: {P.TEXT_INVERTED};
     border: {T.BORDER_THIN} solid {P.ACCENT_BORDER};
@@ -34,7 +34,7 @@ QLabel#serialStationNavBrand {{
     min-height: 32px;
     max-height: 32px;
 }}
-/* 导航图标按钮：方形、无边框、hover 微背景、激活态强调青软底 + 左指示条。 */
+/* 导航图标按钮：方形、无边框、hover 微背景、激活态强调青软底 + 渐变左指示条。 */
 QPushButton[objectName^="serialStationNav"] {{
     background-color: transparent;
     border: none;

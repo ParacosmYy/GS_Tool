@@ -102,7 +102,7 @@ QLineEdit:disabled {{
     border-color: {P.BORDER};
 }}
 QLineEdit::placeholder {{
-    color: rgba(154, 167, 189, 0.55);
+    color: {P.TEXT_MUTED};
 }}
 {selectors} {{
     font-family: {T.FONT_FAMILY_MONO};

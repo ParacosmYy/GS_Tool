@@ -32,6 +32,11 @@ ACCENT_PRESSED = "#0e7490"
 ACCENT_SOFT = "rgba(8, 145, 178, 0.10)"
 ACCENT_BORDER = "rgba(8, 145, 178, 0.35)"
 
+# ── accent gradient（浅色版：青→蓝，与深色 ACCENT_GRADIENT 对齐） ───
+ACCENT_GRADIENT_FROM = "#0891b2"
+ACCENT_GRADIENT_TO = "#2563eb"
+ACCENT_GRADIENT = f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {ACCENT_GRADIENT_FROM}, stop:1 {ACCENT_GRADIENT_TO})"
+
 # ── 状态色 ────────────────────────────────────────────────────────
 SUCCESS = "#16a34a"
 SUCCESS_HOVER = "#22c55e"
@@ -62,8 +67,12 @@ SCROLLBAR = "#cbd5e1"
 SCROLLBAR_HOVER = "#94a3b8"
 SCROLLBAR_BACKGROUND = "transparent"
 
-# ── 阴影 ──────────────────────────────────────────────────────────
-SHADOW = "rgba(15, 23, 42, 0.08)"
+# ── 阴影 / elevation（浅色版：深蓝灰半透明，多层 z 轴深度） ────────
+SHADOW = "rgba(15, 23, 42, 0.10)"
+SHADOW_CARD = "rgba(15, 23, 42, 0.08)"
+SHADOW_POPOVER = "rgba(15, 23, 42, 0.14)"
+SHADOW_MODAL = "rgba(15, 23, 42, 0.22)"
+CARD_GLOW = "rgba(8, 145, 178, 0.25)"
 
 # ── 玻璃卡片 / TopBar 视觉层（与深色 palette 对齐，浅色版本） ──────
 CARD_HIGHLIGHT_TOP = "rgba(255, 255, 255, 0.6)"
@@ -99,6 +108,9 @@ def all_tokens() -> dict[str, str]:
         "accent_pressed": ACCENT_PRESSED,
         "accent_soft": ACCENT_SOFT,
         "accent_border": ACCENT_BORDER,
+        "accent_gradient_from": ACCENT_GRADIENT_FROM,
+        "accent_gradient_to": ACCENT_GRADIENT_TO,
+        "accent_gradient": ACCENT_GRADIENT,
         "success": SUCCESS,
         "success_hover": SUCCESS_HOVER,
         "success_soft": SUCCESS_SOFT,
@@ -122,6 +134,10 @@ def all_tokens() -> dict[str, str]:
         "scrollbar_hover": SCROLLBAR_HOVER,
         "scrollbar_background": SCROLLBAR_BACKGROUND,
         "shadow": SHADOW,
+        "shadow_card": SHADOW_CARD,
+        "shadow_popover": SHADOW_POPOVER,
+        "shadow_modal": SHADOW_MODAL,
+        "card_glow": CARD_GLOW,
         "card_highlight_top": CARD_HIGHLIGHT_TOP,
         "card_highlight_bottom": CARD_HIGHLIGHT_BOTTOM,
         "topbar_bg_top": TOPBAR_BG_TOP,

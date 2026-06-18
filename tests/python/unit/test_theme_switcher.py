@@ -152,3 +152,65 @@ def test_apply_theme_by_name_light(qapp):
 def test_apply_theme_by_name_unknown_falls_back_to_dark(qapp):
     result = apply_theme_by_name(qapp, "unknown")
     assert result == THEME_DARK
+
+
+# ── Batch 2 (A2): elevation / gradient / 深度层次 ─────────────────
+def test_dark_palette_has_elevation_tokens():
+    """深色 palette 应含三档 elevation 投影 + accent glow token。"""
+
+    for key in ("shadow_card", "shadow_popover", "shadow_modal", "card_glow"):
+        assert key in dark.all_tokens(), f"missing elevation token: {key}"
+    assert dark.SHADOW_CARD != dark.SHADOW_MODAL  # 三档应有层次差
+
+
+def test_dark_palette_has_accent_gradient():
+    """深色 palette 应含跨色相 accent gradient（青→蓝）。"""
+
+    assert dark.ACCENT_GRADIENT_FROM.startswith("#")
+    assert dark.ACCENT_GRADIENT_TO.startswith("#")
+    assert dark.ACCENT_GRADIENT_FROM != dark.ACCENT_GRADIENT_TO  # 跨色相
+    assert "qlineargradient" in dark.ACCENT_GRADIENT
+
+
+def test_dark_light_tokens_keys_aligned():
+    """深浅色 palette 的 token key 集合必须完全一致（切换不漏 key）。"""
+
+    assert set(dark.all_tokens()) == set(light.all_tokens())
+
+
+def test_card_panel_brightness_gap_for_depth():
+    """BG_PANEL 应明显亮于 BG_WINDOW，让卡片真正浮起（深度层次）。
+
+    Batch 2 改进：原 BG_PANEL=#151b24 与 BG_WINDOW=#0d1118 亮度差仅 ~3%，
+    卡片几乎浮不起来。改进后亮度差应 >=6%。
+    """
+
+    def luminance(hex_color: str) -> int:
+        return int(hex_color[1:3], 16) + int(hex_color[3:5], 16) + int(hex_color[5:7], 16)
+
+    gap = luminance(dark.BG_PANEL) - luminance(dark.BG_WINDOW)
+    assert gap >= 18, f"BG_PANEL 与 BG_WINDOW 亮度差过小 ({gap})，卡片浮不起来"
+
+
+def test_build_qss_uses_gradient_on_primary_buttons():
+    """主按钮 QSS 应使用 accent gradient（跨色相品牌渐变）。"""
+
+    from embeddebug.serial_station.ui.theme.qss_builder import build_qss
+
+    qss = build_qss()
+    assert dark.ACCENT_GRADIENT_FROM in qss or "qlineargradient" in qss
+
+
+def test_no_hardcoded_rgba_in_qss():
+    """QSS 不应残留硬编码 RGBA（应走 palette token，浅色切换才不漏色）。
+
+    Batch 2 修复的三处：滚动条 rgba(51,65,85)、placeholder rgba(154,167,189)、
+    卡片头 rgba(39,49,63)。这三处原绕过 token，浅色切换时会残留深色值。
+    """
+
+    from embeddebug.serial_station.ui.theme.qss_builder import build_qss
+
+    qss = build_qss()
+    forbidden = ["rgba(51, 65, 85", "rgba(71, 85, 105", "rgba(154, 167, 189", "rgba(39, 49, 63"]
+    for frag in forbidden:
+        assert frag not in qss, f"QSS 残留硬编码 RGBA: {frag}"
