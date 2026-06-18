@@ -5,6 +5,7 @@ import inspect
 
 from embeddebug.serial_station.ui import (
     command_actions,
+    command_section,
     connection_actions,
     endpoint_connection_actions,
     injection_actions,
@@ -100,6 +101,15 @@ def test_command_send_and_history_actions_live_with_command_actions():
     assert "_controller.send_text_result" not in send_source
     assert "_controller.command_history" not in refresh_source
     assert "_send_edit.setText" not in select_source
+
+
+def test_command_row_builder_lives_with_command_section():
+    assert hasattr(command_section, "build_send_row")
+    assert not hasattr(sections, "build_send_row")
+
+    source = inspect.getsource(sections.build_main_layout)
+    assert "command_section.build_send_row(owner, root)" in source
+    assert "serialStationSendEdit" not in inspect.getsource(sections)
 
 
 def test_clear_log_action_lives_with_session_actions():
