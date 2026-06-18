@@ -47,6 +47,8 @@ class WidgetFullscreenHandler:
             widget.setGeometry(target_host.rect())
             widget.raise_()
             widget.show()
+        # Batch 26: 全屏时聚焦 widget，确保能收到 ESC 键事件以退出全屏。
+        widget.setFocus(Qt.FocusReason.OtherFocusReason)
         self._fullscreen = True
 
     def restore(self) -> None:
@@ -76,17 +78,31 @@ class WidgetFullscreenHandler:
 
 
 def attach_double_click_fullscreen(widget: QWidget, host: QWidget | None = None) -> WidgetFullscreenHandler:
-    """给 widget 安装双击全屏处理器，返回处理器供外部持有。"""
+    """给 widget 安装双击全屏 + ESC 退出处理器，返回处理器供外部持有。
+
+    Batch 26：双击进入全屏后，ESC 键退出全屏（对齐标准全屏 UX）。enter() 时
+    setFocus 确保 widget 能收到按键事件。
+    """
 
     handler = WidgetFullscreenHandler()
-    original_event = widget.mouseDoubleClickEvent
+    original_double_click = widget.mouseDoubleClickEvent
+    original_key_press = widget.keyPressEvent
 
     def _on_double_click(event: object) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
             handler.toggle(widget, host)
             event.accept()
             return
-        original_event(event)
+        original_double_click(event)
+
+    def _on_key_press(event: object) -> None:
+        # 全屏态按 ESC → restore 退出全屏；否则交父类默认处理。
+        if handler.is_fullscreen and getattr(event, "key", lambda: None)() == Qt.Key.Key_Escape:
+            handler.restore()
+            event.accept()
+            return
+        original_key_press(event)
 
     widget.mouseDoubleClickEvent = _on_double_click  # type: ignore[method-assign]
+    widget.keyPressEvent = _on_key_press  # type: ignore[method-assign]
     return handler
