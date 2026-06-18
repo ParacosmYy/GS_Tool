@@ -81,7 +81,11 @@ def card_enter(widget: QWidget) -> list[QPropertyAnimation]:
 
 
 def stagger(cards: list[QWidget], delay_ms: int = 60) -> list[QPropertyAnimation]:
-    """卡片错峰进入：每张卡片延迟 delay_ms 启动，返回全部动画。"""
+    """卡片错峰进入：每张卡片延迟 delay_ms 启动，返回全部动画。
+
+    注意：card_enter 含 slide_in 会移动控件，与布局定位冲突。本函数适合
+    固定布局卡片；动态布局用 ``stagger_fade``（纯淡入不移动，更安全）。
+    """
 
     animations: list[QPropertyAnimation] = []
     for index, card in enumerate(cards):
@@ -89,4 +93,20 @@ def stagger(cards: list[QWidget], delay_ms: int = 60) -> list[QPropertyAnimation
         for anim in anims:
             QTimer.singleShot(index * delay_ms, anim.start)
             animations.append(anim)
+    return animations
+
+
+def stagger_fade(cards: list[QWidget], delay_ms: int = 60) -> list[QPropertyAnimation]:
+    """卡片错峰淡入（Batch 21）：纯透明度淡入，不移动控件，对动态布局安全。
+
+    相比 ``stagger``（card_enter 含 slide_in 会 move 控件，与布局定位冲突），
+    本函数只调 fade_in（仅设 opacity，不 move），适合布局管理的卡片容器。
+    每张卡片延迟 index*delay_ms 启动，激活 ``stagger`` 死代码同源的错峰语义。
+    """
+
+    animations: list[QPropertyAnimation] = []
+    for index, card in enumerate(cards):
+        anim = fade_in(card, AnimationTokens.DURATION_NORMAL)
+        QTimer.singleShot(index * delay_ms, anim.start)
+        animations.append(anim)
     return animations

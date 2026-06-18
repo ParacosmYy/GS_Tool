@@ -54,6 +54,26 @@ class SerialStationMainWindow(QMainWindow):
         button_icons.apply_focus_rings(self)
         self._install_command_palette()
         self._install_responsive_layout()
+        # Batch 21: 卡片错峰淡入入场（激活 panel_animations.stagger_fade 死代码）。
+        self._stagger_enter_cards()
+
+    def _stagger_enter_cards(self) -> None:
+        """工作台卡片错峰淡入（Batch 21）。
+
+        查找所有 serialStationCard 子控件，调 panel_animations.stagger_fade
+        做纯透明度错峰淡入（不 move 控件，对布局安全）。动画失败不阻塞。
+        """
+
+        try:
+            from PyQt6.QtWidgets import QFrame
+            from embeddebug.serial_station.ui.panel_animations import stagger_fade
+
+            cards = self.findChildren(QFrame, "serialStationCard")
+            if cards:
+                self._card_enter_anims = stagger_fade(cards, delay_ms=70)
+        except Exception:
+            # 错峰淡入是锦上添花，失败不阻塞窗口构建。
+            self._card_enter_anims = []
 
     def _install_command_palette(self) -> None:
         """装配命令面板（Ctrl+P）并注册常用命令。"""
