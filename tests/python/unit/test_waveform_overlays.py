@@ -88,12 +88,16 @@ def test_card_enter_returns_two_animations(qtbot):
 
 
 def test_stagger_returns_animation_per_card(qtbot):
+    """Batch 24：旧 stagger（card_enter 含 slide_in 变体）已删除，统一用 stagger_fade。
+    本测试改为验证 stagger_fade 接口（保持卡片错峰动画覆盖）。
+    """
+
     cards = []
     for _ in range(3):
         card = QWidget()
         cards.append(card)
-    anims = panel_animations.stagger(cards)
-    assert len(anims) == len(cards) * 2
+    anims = panel_animations.stagger_fade(cards)
+    assert len(anims) == len(cards)
 
 
 # ── 响应式断点 ────────────────────────────────────────────────────

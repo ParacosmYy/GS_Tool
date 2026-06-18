@@ -1,12 +1,12 @@
 """面板过渡动画（QPropertyAnimation）。
 
 为卡片/面板提供进入与切换过渡，对齐 05-ui-standard 铁律 18（面板切换必须有过渡动画，
-禁止突然出现/消失）。提供三种可复用动画工厂：
+禁止突然出现/消失）。提供可复用动画工厂：
 
 - ``fade_in`` / ``fade_out``：QWidget 透明度淡入淡出（用 QGraphicsOpacityEffect）。
 - ``slide_in``：QWidget 从下方滑入（pos 动画）。
 - ``card_enter``：卡片进入组合动画（淡入 + 上滑），用于面板首次显示。
-- ``stagger``：多卡片错峰进入。
+- ``stagger_fade``：多卡片错峰纯淡入（不 move 控件，对动态布局安全）。
 
 设计要点：
 - 时长与缓动**统一引用** ``animations.tokens.AnimationTokens``，消除旧的双轨制常量。
@@ -80,28 +80,14 @@ def card_enter(widget: QWidget) -> list[QPropertyAnimation]:
             slide_in(widget, AnimationTokens.DURATION_NORMAL)]
 
 
-def stagger(cards: list[QWidget], delay_ms: int = 60) -> list[QPropertyAnimation]:
-    """卡片错峰进入：每张卡片延迟 delay_ms 启动，返回全部动画。
-
-    注意：card_enter 含 slide_in 会移动控件，与布局定位冲突。本函数适合
-    固定布局卡片；动态布局用 ``stagger_fade``（纯淡入不移动，更安全）。
-    """
-
-    animations: list[QPropertyAnimation] = []
-    for index, card in enumerate(cards):
-        anims = card_enter(card)
-        for anim in anims:
-            QTimer.singleShot(index * delay_ms, anim.start)
-            animations.append(anim)
-    return animations
-
-
 def stagger_fade(cards: list[QWidget], delay_ms: int = 60) -> list[QPropertyAnimation]:
     """卡片错峰淡入（Batch 21）：纯透明度淡入，不移动控件，对动态布局安全。
 
-    相比 ``stagger``（card_enter 含 slide_in 会 move 控件，与布局定位冲突），
-    本函数只调 fade_in（仅设 opacity，不 move），适合布局管理的卡片容器。
-    每张卡片延迟 index*delay_ms 启动，激活 ``stagger`` 死代码同源的错峰语义。
+    只调 fade_in（仅设 opacity，不 move），适合布局管理的卡片容器。
+    每张卡片延迟 index*delay_ms 启动。
+
+    历史：旧版 ``stagger``（card_enter 含 slide_in 会 move 控件，与布局定位冲突）
+    已在 Batch 24 删除，统一用本函数。
     """
 
     animations: list[QPropertyAnimation] = []
