@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 633分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 367分
+> 当前: 648分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 352分
 
 ---
 
@@ -335,14 +335,30 @@
 | 631 | Serial Station UI 美化 Batch 8 — ShakeAnimation 接入校验失败 | 抖动接入 3 个校验路径（空命令/endpoint host-port/空端口）；至此按压/hover/focus/抖动/呼吸灯 5 项全接线；4 files |
 | 632 | Serial Station UI 美化 Batch 9 — 域面板占位+游标右键交互 | OTA 传输 skeleton shimmer；CAN/BLE/RTT 空数据 EmptyState（有数据 hide/清空 show）；CursorManager 右键/双击游标交互（install_cursor_interactions 接入 preview，Qt6 鼠标事件兼容 helper）；清理测试文件重复 import |
 | 633 | Serial Station UI 美化 Batch 10 — StatusDot 状态圆点+面板接线 | 新建 StatusDot 自绘圆点控件（径向渐变球+flash 闪光+PulseAnimation breathing），PulseAnimation 死代码接入路径从单点 LED 扩到通用状态指示；OTA/RTT/Automation/BLE 四面板 ●/○ 字符→StatusDot（GREEN/BLUE 活动态呼吸，OFF/YELLOW/RED 静止）；修复四面板 lazy-import 把 DotState 限制在 build() 作用域导致的运行时 NameError（改模块级 import）；14 个新单测覆盖控件+PulseAnimation 激活+QSS 覆盖 |
+| 634 | Serial Station UI 美化 Batch 11 — ToastWidget 通知控件+三动画引擎死代码激活 | 新建 widgets/toast.py ToastWidget（标题/正文/级别色条/自动消失定时器）；enter() 接 SlideAnimation.slide_in，leave() 接 FadeTransition.fade_out（激活两动画死代码）；closed 信号离场后发出；is_leaving 防重复离场；show_with_fade() 透明度过渡 helper |
+| 635 | Serial Station UI 美化 Batch 12 — ToastContainer 通知 UI 闭环+NotificationManager 端到端 | 新建 toast_container.py：接 NotificationManager 的 notification_added/removed 信号渲染/移除 ToastWidget；max_visible 挤兑（超限对最早 toast 调 leave）；manager.show()→toast 右上角滑入→超时淡出完整闭环 |
+| 636 | Serial Station UI 美化 Batch 13 — 通知系统贯穿核心连接/发送工作流 | main_window._notify 委托方法（reparent 后 self.window() 返回 AppShell→manager→toast）；connection 发送/断开/失败、command 发送成功/空命令、transport 连接状态变化全部接 toast 通知 |
+| 637 | Serial Station UI 美化 Batch 14 — 通知系统贯穿五大域面板 | panel_notify(widget, level, title, message) helper：用 widget.window() 解析 AppShell；OTA 传输开始/完成/失败、RTT 连接、BLE 扫描/连接/断开、CAN 帧收发、Automation 录制/回放全部接 toast |
+| 638 | Serial Station UI 美化 Batch 15 — toast 全局快捷键+通知子系统抽离 | app_notifications.py 抽出 build/show/reposition/handle_key_press 四函数（守 AppShell 300 行门禁）；Esc→dismiss_oldest，Ctrl+Shift+Esc→clear_all；AppShell 持 _app_notifications 委托 |
+| 639 | Serial Station UI 美化 Batch 16 — 设置主题切换 toast+dashboard 死代码审计 | settings apply_theme 成功→success toast（已应用 深色/浅色）；dashboard 子系统死代码审计（为 Batch 17 激活做准备） |
+| 640 | Serial Station UI 美化 Batch 17 — 激活 dashboard 子系统（拖拽式仪表盘模式） | 顶栏新增标签页/清空画布/保存布局/加载布局四操作+状态标签；激活 dashboard 拖拽式仪表盘模式（此前为死代码） |
+| 641 | Serial Station UI 美化 Batch 18 — 激活 WidgetFullscreenHandler 双击全屏 | _wire_canvas_fullscreen：每个画布 item_added 信号接 _on_item_added_fullscreen，新控件放置→attach_double_click_fullscreen 装 handler；双击画布全屏切换 |
+| 642 | Serial Station UI 美化 Batch 19 — 设置主题实时预览（combo 即时切换） | combo currentIndexChanged→_preview_theme：切换选择即应用主题（无需点应用按钮） |
+| 643 | Serial Station UI 美化 Batch 20 — 清理 waveform_overlays 遗留死代码 | waveform_overlays.py 清理（139→88 行，-51 行）：删除 attach_cursors（旧固定双游标 API）等被 CursorManager 取代后的遗留死代码 |
+| 644 | Serial Station UI 美化 Batch 21 — stagger_fade 卡片错峰淡入（激活 panel_animations 死代码） | _stagger_enter_cards：findChildren(serialStationCard)→stagger_fade(delay_ms=70)；纯透明度 fade_in 错峰不 move 控件（card_enter 含 slide_in 会 move，与布局定位冲突） |
+| 645 | Serial Station UI 美化 Batch 22 — 域面板输入控件 focus_ring 接入 | apply_panel_focus_rings(root)：遍历 root 子树 QLineEdit/QComboBox/QPlainTextEdit 等可聚焦控件装 focus 光环动画；域面板 build 后统一接线 |
+| 646 | Serial Station UI 美化 Batch 23 — 页面切换离场淡出（激活 panel_animations.fade_out 死代码） | _switch_to 在切 index 前对老页面调 _animate_page_leave：fade_out（透明度 1→0+完成后 hide），存 _leave_anims 防 GC |
+| 647 | Serial Station UI 美化 Batch 24 — 清理 panel_animations.stagger 遗留死代码 | panel_animations.py 清理（112→98 行，-14 行）：删除 stagger（card_enter 含 slide_in 变体，与布局冲突，被 stagger_fade 取代）；test_stagger_cleanup 固化守护 |
+| 648 | Serial Station UI 美化 Batch 10'（并行线）— 多强调色配色+主题切换过渡动画 | ⚠️ 编号注：此为并发进程第二条 batch 线的 Batch 10，时间上晚于 Batch 22；accents.py 7 套 AccentVariant（dark+light 双色调），cyan 默认与 palette 常量对齐；theme_transition.py ThemeTransition.run 整窗 windowOpacity 1.0→0.6→1.0 过渡掩盖 QSS 硬切闪烁 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#633` 的完整记录
+- 当前文档已整理到 `#648` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
-- 619~633 为「UI 美化与动画接线」连续迭代（Batch 1~10），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
+- 619~648 为「UI 美化与动画接线」连续迭代（Batch 1~24），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
+- ⚠️ Batch 编号注：Batch 10 出现两次（StatusDot 线 633 / accent 配色线 648），因并发进程有两条独立 batch 编号线；评分按 commit 时间顺序线性 +1，不依赖 batch 编号
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
 - 本文件只负责评分追踪，不承载工作流、提交规则或架构约束正文
