@@ -106,7 +106,7 @@ def test_from_extension():
         ExportFormat.from_extension("a.bin")
 
 
-def test_config_validation():
+def test_export_config_validation():
     with pytest.raises(ValueError):
         ExportConfig(format=ExportFormat.CSV, decimal_places=-1)
     with pytest.raises(ValueError):

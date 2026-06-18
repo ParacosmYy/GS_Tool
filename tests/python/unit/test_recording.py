@@ -35,7 +35,7 @@ def _batches() -> list[ChannelBatch]:
 
 
 @pytest.mark.parametrize("fmt", [RecordingFormat.CSV, RecordingFormat.JSONL])
-def test_format_round_trip(fmt, tmp_path):
+def test_recording_format_round_trip(fmt, tmp_path):
     ext = "csv" if fmt == RecordingFormat.CSV else "jsonl"
     path = tmp_path / f"rec.{ext}"
     writer = RecordingWriter(fmt, _header())

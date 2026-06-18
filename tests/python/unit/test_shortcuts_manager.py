@@ -52,7 +52,7 @@ def test_rebind_unknown_returns_false(manager_fixture):
     assert manager_fixture.rebind("ghost", "Ctrl+X") is False
 
 
-def test_reset_restores_defaults(manager_fixture):
+def test_shortcuts_reset_restores_defaults(manager_fixture):
     manager_fixture.rebind("send", "Ctrl+Enter")
     manager_fixture.reset_to_defaults()
     assert manager_fixture.overrides == {}
