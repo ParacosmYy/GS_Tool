@@ -38,7 +38,13 @@ def attach_widget_delete_menu(widget: QWidget, canvas, item_id: str) -> QMenu | 
         # Batch 37: z-order 置顶/置底（控件重叠时调整叠放次序）。
         menu.addAction(widget.tr("置顶"), lambda: _safe_raise(widget))
         menu.addAction(widget.tr("置底"), lambda: _safe_lower(widget, canvas))
+        # Batch 38: 锁定/解锁（防意外删除；config[locked] 持久化）。
+        is_locked = _is_locked(canvas, item_id)
+        lock_text = widget.tr("解锁") if is_locked else widget.tr("锁定")
+        menu.addAction(lock_text, lambda: _toggle_lock(canvas, item_id))
+        # 锁定控件禁用删除（防意外删）。
         delete_action = menu.addAction(widget.tr("删除控件"))
+        delete_action.setEnabled(not is_locked)
         delete_action.triggered.connect(lambda _checked=False: _safe_remove(canvas, item_id))
         menu.exec(widget.mapToGlobal(pos))
 
@@ -121,10 +127,39 @@ def _safe_duplicate(canvas, item_id: str) -> None:
 
 
 def _safe_remove(canvas, item_id: str) -> None:
-    """安全删除控件（remove_item 失败静默，避免竞态崩溃）。"""
+    """安全删除控件（remove_item 失败静默，避免竞态崩溃）。
+
+    Batch 38：锁定控件（config[locked]=True）跳过删除（防意外删）。
+    """
 
     try:
+        if _is_locked(canvas, item_id):
+            return  # 锁定控件不可删。
         canvas.remove_item(item_id)
+    except Exception:
+        pass
+
+
+def _is_locked(canvas, item_id: str) -> bool:
+    """控件是否锁定（config[locked]=True，Batch 38）。"""
+
+    try:
+        item = canvas.items.get(item_id) if canvas is not None else None
+        if item is None:
+            return False
+        return bool(item.config.get("locked", False))
+    except Exception:
+        return False
+
+
+def _toggle_lock(canvas, item_id: str) -> None:
+    """切换控件锁定态（Batch 38）：config[locked] 翻转。"""
+
+    try:
+        item = canvas.items.get(item_id) if canvas is not None else None
+        if item is None:
+            return
+        item.config["locked"] = not bool(item.config.get("locked", False))
     except Exception:
         pass
 
