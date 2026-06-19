@@ -59,12 +59,12 @@
 - 标注搜索与过滤
 - 评分预估: +8
 
-## Wave 58: 波形数学引擎
-- 通道间数学运算 (A+B, A-B, A*B, A/B)
-- 内置函数 (abs, sqrt, log, sin, cos, derivative, integral)
-- 表达式解析器
-- 虚拟通道创建
-- 评分预估: +12
+## Wave 58: 波形数学引擎 ✅ (部分完成, commit #660)
+- ✅ 通道间数学运算 (A+B, A-B, A*B, A/B) — `waveform_math/functions.py`, 除零置 NaN 防尖刺
+- ✅ 内置函数 (abs, sqrt, log, sin, cos, derivative, integral) — 逐点一元（负数→NaN）+ 中心差分导数/梯形累积积分
+- ✅ 表达式解析器 — `waveform_math/expression.py`, stdlib `ast` 白名单节点遍历，拒危险输入
+- ✅ 虚拟通道创建 — `VirtualChannel` dataclass + `evaluate_channel(s)` 引擎编排（ChannelBatch→MathResult）
+- 评分预估: +12 (本轮 +1, 计算内核完成；UI 接线待后续)
 
 ## Wave 59: GPS 数据可视化
 - NMEA 协议解析 (GGA/RMC/GSA/GSV)
