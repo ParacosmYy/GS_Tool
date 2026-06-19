@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 653分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 347分
+> 当前: 654分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 346分
 
 ---
 
@@ -355,14 +355,15 @@
 | 651 | Serial Station UI 美化 Batch 28 — dashboard 标签页双击重命名（激活 rename_tab 死代码） | DashboardTabs.rename_tab 此前仅 test 引用零生产消费者；Batch 28 接 QTabWidget 原生 tabBarDoubleClicked 信号，双击标签页弹 QInputDialog 重命名，激活 rename_tab；对齐浏览器/IDE 标签页标准重命名交互。⚠️ Batch 27 编号跳过（并发进程编号疏忽） |
 | 652 | Serial Station UI 美化 Batch 29 — dashboard 标签页右键菜单（重命名/复制/关闭） | dashboard 标签页此前只有双击重命名+内置关闭按钮，缺标准右键菜单；Batch 29 加右键菜单（重命名/复制标签页/关闭），对齐浏览器/IDE 标签页交互；DashboardPanel 接入 +13 行；test_dashboard_tab_menu 9 个测试（接线断言+duplicate 克隆控件+关闭清理） |
 | 653 | Serial Station UI 美化 Batch 30 — dashboard 标签页拖拽重排序 | DashboardTabs 此前 setTabsClosable 但非 movable，标签页不能拖拽重排序；Batch 30 启用 setMovable + 暴露 tab_moved 信号，重排序后自动持久化（tab 顺序是持久化 key 顺序）；对齐浏览器/IDE 标签页交互 |
+| 654 | Serial Station UI 美化 Batch 31 — dashboard 放置控件右键删除菜单 | 放置的 dashboard 控件此前无单控件删除入口（只有清空画布整批删）；Batch 31 给每个放置控件装右键「删除」菜单，调 canvas.remove_item；双击已被全屏占用（Batch 18），故用右键删除；激活 canvas.remove_item 在面板层使用路径 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#653` 的完整记录
+- 当前文档已整理到 `#654` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
-- 619~653 为「UI 美化与动画接线」连续迭代（Batch 1~30，Batch 27 编号跳过），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
+- 619~654 为「UI 美化与动画接线」连续迭代（Batch 1~31，Batch 27 编号跳过），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
 - ⚠️ Batch 编号注：Batch 10 出现两次（StatusDot 线 633 / accent 配色线 648），因并发进程有两条独立 batch 编号线；评分按 commit 时间顺序线性 +1，不依赖 batch 编号
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
