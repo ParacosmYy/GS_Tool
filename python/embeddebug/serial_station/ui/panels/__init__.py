@@ -3,7 +3,7 @@
 集中注册所有功能模式到 ``mode_panel`` registry，AppShell 按注册顺序装配导航。
 新增模式 = 在此 import + register_panel 一行。
 
-注册顺序即导航栏从上到下顺序：串口 / OTA / RTT / CAN / BLE / 自动化 / 设置。
+注册顺序即导航栏从上到下顺序：串口 / OTA / RTT / CAN / SVD / BLE / 自动化 / 仪表盘 / 设置。
 """
 
 from __future__ import annotations
@@ -69,6 +69,11 @@ def register_default_panels() -> None:
     _register_real_or_placeholder(
         "can", "network", "CAN 调试", "CAN / CAN-FD 帧监视与发送（即将就绪）。",
         "embeddebug.serial_station.ui.panels.can_panel", "CanPanel",
+    )
+    # SVD（CMSIS SVD 寄存器查看器，纯数据浏览无需连接设备）。
+    _register_real_or_placeholder(
+        "svd", "cpu", "SVD 寄存器", "CMSIS SVD 寄存器查看器（即将就绪）。",
+        "embeddebug.serial_station.ui.panels.svd_panel", "SvdPanel",
     )
     # BLE（蓝牙低功耗 + GATT 树 + 读写 + notify）。
     _register_real_or_placeholder(

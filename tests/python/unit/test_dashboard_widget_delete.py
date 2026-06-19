@@ -1,4 +1,4 @@
-"""Batch 31 测试：dashboard 放置控件右键删除菜单。
+"""dashboard 放置控件右键删除菜单测试。
 
 覆盖：
 1. attach_widget_delete_menu 给控件装 customContextMenu（删除项可触发 remove_item）。

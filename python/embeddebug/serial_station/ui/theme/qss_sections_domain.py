@@ -21,14 +21,16 @@ QWidget#serialStationRttPanel,
 QWidget#serialStationCanPanel,
 QWidget#serialStationBlePanel,
 QWidget#serialStationAutomationPanel,
-QWidget#serialStationSettingsPanel {{
+QWidget#serialStationSettingsPanel,
+QWidget#serialStationSvdPanel {{
     background-color: {P.BG_APP};
 }}
 /* 字段标签（"通道/设备/ID/数据/特征/主题"等行内标签）。 */
 QLabel#serialStationRttFieldLabel,
 QLabel#serialStationCanFieldLabel,
 QLabel#serialStationBleFieldLabel,
-QLabel#serialStationSettingsFieldLabel {{
+QLabel#serialStationSettingsFieldLabel,
+QLabel#serialStationSvdFieldLabel {{
     color: {P.TEXT_SECONDARY};
     font-size: {T.FONT_SM};
     font-weight: 600;
@@ -37,7 +39,10 @@ QLabel#serialStationSettingsFieldLabel {{
 QLabel#serialStationRttStatusLabel,
 QLabel#serialStationCanStatsLabel,
 QLabel#serialStationAutomationStatusLabel,
-QLabel#serialStationSettingsThemeStatusLabel {{
+QLabel#serialStationSettingsThemeStatusLabel,
+QLabel#serialStationSvdDeviceLabel,
+QLabel#serialStationSvdDetailTitle,
+QLabel#serialStationSvdDetailValue {{
     color: {P.TEXT_MUTED};
     font-size: {T.FONT_SM};
     padding: 0 {T.SPACING_MD};
@@ -74,7 +79,7 @@ QPushButton#serialStationAutomationRunButton:hover,
 QPushButton#serialStationSettingsApplyButton:hover {{
     background-color: {P.ACCENT_HOVER};
 }}
-/* 次要按钮（清空/扫描/演示/读/写/订阅/手动触发/刷新）。 */
+/* 次要按钮（清空/扫描/演示/读/写/订阅/手动触发/刷新/SVD 加载）。 */
 QPushButton#serialStationRttClearButton,
 QPushButton#serialStationCanClearButton,
 QPushButton#serialStationCanDemoButton,
@@ -83,7 +88,9 @@ QPushButton#serialStationBleReadButton,
 QPushButton#serialStationBleWriteButton,
 QPushButton#serialStationBleNotifyButton,
 QPushButton#serialStationAutomationFireButton,
-QPushButton#serialStationAutomationRefreshButton {{
+QPushButton#serialStationAutomationRefreshButton,
+QPushButton#serialStationSvdLoadButton,
+QPushButton#serialStationSvdDemoButton {{
     background-color: {P.BG_PANEL};
     color: {P.TEXT_SECONDARY};
     border: {T.BORDER_THIN} solid {P.BORDER};
@@ -98,7 +105,9 @@ QPushButton#serialStationBleReadButton:hover,
 QPushButton#serialStationBleWriteButton:hover,
 QPushButton#serialStationBleNotifyButton:hover,
 QPushButton#serialStationAutomationFireButton:hover,
-QPushButton#serialStationAutomationRefreshButton:hover {{
+QPushButton#serialStationAutomationRefreshButton:hover,
+QPushButton#serialStationSvdLoadButton:hover,
+QPushButton#serialStationSvdDemoButton:hover {{
     background-color: {P.BG_PANEL_RAISED};
     border-color: {P.ACCENT_BORDER};
 }}
@@ -124,11 +133,13 @@ QCheckBox#serialStationCanExtCheckBox {{
     color: {P.TEXT_SECONDARY};
     spacing: {T.SPACING_SM};
 }}
-/* 表格 / 树（CAN 帧表、Automation 规则表、Settings 快捷键表、BLE GATT 树）。 */
+/* 表格 / 树（CAN 帧表、Automation 规则表、Settings 快捷键表、BLE GATT 树、SVD 寄存器树/位域表）。 */
 QTableWidget#serialStationCanFrameTable,
 QTableWidget#serialStationAutomationRuleTable,
 QTableWidget#serialStationSettingsShortcutsTable,
-QTreeWidget#serialStationBleGattTree {{
+QTableWidget#serialStationSvdFieldTable,
+QTreeWidget#serialStationBleGattTree,
+QTreeWidget#serialStationSvdTree {{
     background-color: {P.BG_PANEL};
     color: {P.TEXT_PRIMARY};
     border: {T.BORDER_THIN} solid {P.BORDER};
@@ -139,13 +150,17 @@ QTreeWidget#serialStationBleGattTree {{
 QTableWidget#serialStationCanFrameTable::item,
 QTableWidget#serialStationAutomationRuleTable::item,
 QTableWidget#serialStationSettingsShortcutsTable::item,
-QTreeWidget#serialStationBleGattTree::item {{
+QTableWidget#serialStationSvdFieldTable::item,
+QTreeWidget#serialStationBleGattTree::item,
+QTreeWidget#serialStationSvdTree::item {{
     padding: {T.SPACING_XS} {T.SPACING_SM};
 }}
 QTableWidget#serialStationCanFrameTable::item:selected,
 QTableWidget#serialStationAutomationRuleTable::item:selected,
 QTableWidget#serialStationSettingsShortcutsTable::item:selected,
-QTreeWidget#serialStationBleGattTree::item:selected {{
+QTableWidget#serialStationSvdFieldTable::item:selected,
+QTreeWidget#serialStationBleGattTree::item:selected,
+QTreeWidget#serialStationSvdTree::item:selected {{
     background-color: {P.ACCENT_SOFT};
     color: {P.ACCENT};
 }}

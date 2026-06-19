@@ -1,4 +1,4 @@
-"""Batch 32 测试：dashboard 放置控件右键「复制控件」。
+"""dashboard 放置控件右键「复制控件」测试。
 
 覆盖：
 1. _safe_duplicate 在偏移位置克隆同类型控件（items 数 +1）。
