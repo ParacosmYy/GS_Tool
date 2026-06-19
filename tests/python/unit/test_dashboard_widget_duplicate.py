@@ -83,7 +83,7 @@ def test_duplicate_offset_applied(qtbot):
 
 
 # ── 菜单 action 数（Batch 33 加「属性...」后共 3 个） ──────────────
-def test_menu_has_three_actions(qtbot, monkeypatch):
+def test_duplicate_menu_has_three_actions(qtbot, monkeypatch):
     """右键菜单应含 3 个 action（复制控件/属性.../删除控件）。
 
     Batch 32 时为 2 个（复制/删除），Batch 33 加属性编辑后为 3 个。

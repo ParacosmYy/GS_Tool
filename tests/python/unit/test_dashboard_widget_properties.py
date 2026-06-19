@@ -87,7 +87,7 @@ def test_edit_properties_missing_item_no_crash(qtbot, monkeypatch):
 
 
 # ── 菜单含 3 action ────────────────────────────────────────────────
-def test_menu_has_three_actions(qtbot, monkeypatch):
+def test_properties_menu_has_three_actions(qtbot, monkeypatch):
     """右键菜单应含 3 个 action（复制控件/属性.../删除控件）。"""
 
     canvas, item_id = _make_canvas_with_widget(qtbot, "led")
