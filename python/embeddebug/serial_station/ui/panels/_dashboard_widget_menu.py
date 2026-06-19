@@ -44,20 +44,37 @@ def attach_widget_delete_menu(widget: QWidget, canvas, item_id: str) -> QMenu | 
 
 
 def _edit_properties(widget: QWidget, canvas, item_id: str) -> None:
-    """属性编辑：弹 QInputDialog 调整宽/高（Batch 33）。
+    """属性编辑：弹 QInputDialog 调整位置 X/Y（网格吸附）+ 宽/高（Batch 33/35）。
 
     调整后同步 widget.setGeometry + canvas.items[item_id].geometry/config，
-    保持持久化（to_layout_dict 读 geometry）一致。
+    保持持久化（to_layout_dict 读 geometry）一致。任一步取消保持原值。
     """
 
     from PyQt6.QtCore import QRect
     from PyQt6.QtWidgets import QInputDialog
+    from embeddebug.serial_station.ui.dashboard import snap_to_grid
 
     item = canvas.items.get(item_id) if canvas is not None else None
     if item is None:
         return
     geo = item.geometry
-    # 宽度。
+    # Batch 35: 位置 X（网格吸附）。
+    new_x, ok = QInputDialog.getInt(
+        widget, widget.tr("控件 X 坐标"), widget.tr("X（px，自动网格吸附）："),
+        geo.x(), 0, 10000,
+    )
+    if not ok:
+        return
+    new_x = snap_to_grid(new_x)
+    # 位置 Y（网格吸附）。
+    new_y, ok = QInputDialog.getInt(
+        widget, widget.tr("控件 Y 坐标"), widget.tr("Y（px，自动网格吸附）："),
+        geo.y(), 0, 10000,
+    )
+    if not ok:
+        return
+    new_y = snap_to_grid(new_y)
+    # Batch 33: 宽度。
     new_w, ok = QInputDialog.getInt(
         widget, widget.tr("控件宽度"), widget.tr("宽度（px）："), geo.width(), 40, 2000,
     )
@@ -69,7 +86,7 @@ def _edit_properties(widget: QWidget, canvas, item_id: str) -> None:
     )
     if not ok:
         return
-    new_geo = QRect(geo.x(), geo.y(), new_w, new_h)
+    new_geo = QRect(new_x, new_y, new_w, new_h)
     try:
         widget.setGeometry(new_geo)
         item.geometry = new_geo

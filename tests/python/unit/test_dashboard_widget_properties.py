@@ -30,23 +30,30 @@ def _make_canvas_with_widget(qtbot, widget_type="led"):
 
 
 # ── _edit_properties ───────────────────────────────────────────────
-def test_edit_properties_resizes(qtbot, monkeypatch):
-    """属性编辑应同步 widget.setGeometry + item.geometry/config（宽 200/高 120）。"""
+def test_edit_properties_resizes_and_moves(qtbot, monkeypatch):
+    """属性编辑应同步 widget.setGeometry + item.geometry/config（X80/Y60/W200/H120）。
+
+    Batch 35 后 getInt 调用顺序为 X/Y/W/H（位置在前，网格吸附）。
+    """
 
     canvas, item_id = _make_canvas_with_widget(qtbot, "gauge")
     widget = canvas.items[item_id].widget
     import PyQt6.QtWidgets as QtWidgets
 
-    # getInt 连续两次返回（200, True）/（120, True）。
-    values = iter([200, 120])
+    # getInt 连续 4 次返回 X80/Y60/W200/H120（位置 + 宽高，均网格对齐）。
+    values = iter([80, 60, 200, 120])
     monkeypatch.setattr(
         QtWidgets.QInputDialog, "getInt",
         staticmethod(lambda *a, **k: (next(values), True)),
     )
     wm._edit_properties(widget, canvas, item_id)
     item = canvas.items[item_id]
+    # Batch 35: 位置 X80/Y60（网格对齐）+ 宽 200/高 120。
+    assert item.geometry.x() == 80
+    assert item.geometry.y() == 60
     assert item.geometry.width() == 200
     assert item.geometry.height() == 120
+    assert widget.geometry().x() == 80
     assert widget.geometry().width() == 200
     assert widget.geometry().height() == 120
     assert item.config["width"] == 200
@@ -67,6 +74,25 @@ def test_edit_properties_cancel_keeps_geometry(qtbot, monkeypatch):
     )
     wm._edit_properties(widget, canvas, item_id)
     assert canvas.items[item_id].geometry == before  # 未变
+
+
+def test_edit_properties_snaps_position_to_grid(qtbot, monkeypatch):
+    """Batch 35: 位置输入应网格吸附（X=83 → 80，Y=57 → 60，步长 20）。"""
+
+    canvas, item_id = _make_canvas_with_widget(qtbot, "led")
+    widget = canvas.items[item_id].widget
+    import PyQt6.QtWidgets as QtWidgets
+
+    # X=83（吸到 80）/ Y=57（吸到 60）/ W/H 默认。
+    values = iter([83, 57, 160, 80])
+    monkeypatch.setattr(
+        QtWidgets.QInputDialog, "getInt",
+        staticmethod(lambda *a, **k: (next(values), True)),
+    )
+    wm._edit_properties(widget, canvas, item_id)
+    item = canvas.items[item_id]
+    assert item.geometry.x() == 80  # 83 吸到 80
+    assert item.geometry.y() == 60  # 57 吸到 60
 
 
 def test_edit_properties_missing_item_no_crash(qtbot, monkeypatch):
