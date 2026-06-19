@@ -1,11 +1,11 @@
-"""Batch 37 测试：WidgetPaletteButton 手型光标 + 控件 z-order 置顶/置底。
+"""WidgetPaletteButton 手型光标 + 控件 z-order 置顶/置底测试。
 
 覆盖：
 1. WidgetPaletteButton 默认 PointingHandCursor（拖拽可发现性）。
 2. _safe_raise 调 widget.raise_（z-order 置顶）。
 3. _safe_lower 调 widget.lower（z-order 置底）。
 4. _safe_raise/_safe_lower None 安全。
-5. 右键菜单含「置顶」「置底」action（5 action 总）。
+5. 右键菜单含「置顶」「置底」action（6 action 总）。
 6. 源码接入断言。
 """
 
@@ -82,7 +82,7 @@ def test_safe_lower_none_no_crash(qtbot):
 
 # ── 菜单含置顶/置底 ────────────────────────────────────────────────
 def test_menu_has_raise_lower_actions(qtbot, monkeypatch):
-    """右键菜单应含「置顶」「置底」action（共 5 action）。"""
+    """右键菜单应含「置顶」「置底」action（共 6 action）。"""
 
     canvas, item_id = _make_canvas_with_widget(qtbot, "led")
     widget = canvas.items[item_id].widget
@@ -103,7 +103,7 @@ def test_menu_has_raise_lower_actions(qtbot, monkeypatch):
     texts = [a.text() for a in built[0].actions()]
     assert "置顶" in texts
     assert "置底" in texts
-    assert len(texts) == 5  # 复制/属性/置顶/置底/删除
+    assert len(texts) == 6  # 复制/属性/置顶/置底/删除
 
 
 # ── 源码接入断言 ───────────────────────────────────────────────────

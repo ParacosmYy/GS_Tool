@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 661分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 339分
+> 当前: 663分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 337分
 
 ---
 
@@ -363,6 +363,8 @@
 | 659 | Serial Station UI 美化 Batch 35 — dashboard 控件属性编辑加位置 X/Y（网格吸附） | Batch 33 的属性编辑只调宽/高，控件放置后位置不可微调（只能拖拽重放）；Batch 35 加 X/Y 坐标编辑，输入值经 snap_to_grid 自动吸附到 20px 网格（与 add_widget_at 一致） |
 | 660 | Serial Station 波形数学引擎（Wave 58 骨架功能） | 新建 waveform_math/ 子包：通道间四则（add/subtract/multiply/divide，除零置 NaN 防尖刺）+ 逐点一元函数（abs/sqrt/log/sin/cos，负数/非正→NaN）+ 微积分（derivative 中心差分/integral 梯形累积）；ast 安全表达式解析器（白名单节点遍历，拒 __import__/属性/下标/lambda/未知函数/关键字参数，SyntaxError→ExpressionError）；engine 编排（ChannelBatch→MathResult，逐通道独立求值，失败带 error 不阻断）；VirtualChannel/MathResult frozen dataclass；34 个纯 numpy 单测（按行为域拆 2 文件：函数库 + 表达式/引擎），过 250 行测试门禁 |
 | 661 | Serial Station GPS/NMEA 协议解析器（Wave 59 骨架功能） | 新建 gps/ 子包：NMEA 0183 句子解析器（纯 Python 标准库）覆盖 GGA/RMC/GSA/GSV 四类；坐标 ddmm.mmmm→十进制度（南/西负值）；校验和 XOR 验证（不匹配抛 NmeaParseError，缺失容错）；talker 无关助记符识别（GP/GN/GL 都按末 3 字符）；parse_lines 多行容错（跳空行/非 NMEA/解析失败）；GgaFix/RmcTrack/GsaActive/GsvSatellites/SatelliteInfo frozen dataclass + to_payload（ProtocolEvent 兼容）；18 个纯解析器单测 |
+| 662 | Serial Station UI 美化 Batch 36 — dashboard 画布可见网格 + 切换 | DashboardCanvas 此前放置控件靠不可见网格吸附，用户无视觉参考；Batch 36 加 paintEvent 绘制 20px 网格点 + show_grid 切换（palette 工具栏按钮）；网格颜色取 palette 弱色不干扰控件 |
+| 663 | Serial Station UI 美化 Batch 37 — palette 手型光标 + 控件 z-order 置顶/置底 | WidgetPaletteButton 此前无手型光标，拖拽可发现性弱；Batch 37 加 PointingHandCursor；同时给控件右键菜单加「置顶/置底」z-order（控件重叠时调整叠放次序） |
 
 ---
 
