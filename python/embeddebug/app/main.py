@@ -23,18 +23,17 @@ def create_application(argv: Sequence[str] | None = None) -> QApplication:
     app = QApplication(list(argv) if argv is not None else list(sys.argv))
     app.setApplicationName("EmbedDebugPy")
     app.setApplicationDisplayName("EmbedDebug")
-    # Batch 11: 启动期从磁盘恢复上次保存的强调色（多配色偏好持久化），
-    # 必须在应用主题之前，使首帧 QSS 即带上正确 accent recolor。
-    # 走 theme_switcher.apply_theme_by_name（而非 manager.apply_theme），因为它会
-    # 注入当前 accent 的 recolor；manager.apply_theme 只输出原始 cyan QSS。
+    # Batch 11/12: 启动期从磁盘恢复上次保存的主题（深/浅）+ 强调色，必须在应用
+    # 主题之前，使首帧 QSS 即带上正确 theme + accent recolor。走
+    # theme_switcher.apply_theme_by_name（注入 accent recolor；manager.apply_theme
+    # 只输出 cyan QSS）。
     from embeddebug.serial_station.ui.theme.accents import restore_active_accent
-    from embeddebug.serial_station.ui.theme.theme_switcher import (
-        THEME_DARK,
-        apply_theme_by_name,
-    )
+    from embeddebug.serial_station.ui.theme.theme_store import load_theme_id
+    from embeddebug.serial_station.ui.theme.theme_switcher import apply_theme_by_name
 
     restore_active_accent()
-    apply_theme_by_name(app, THEME_DARK)
+    persisted_theme = load_theme_id()
+    apply_theme_by_name(app, persisted_theme)
     return app
 
 

@@ -129,6 +129,7 @@ class ThemeSwitcher:
         manager = ThemeManager()
         manager._current_theme = THEME_DARK  # type: ignore[attr-defined]
         self._current = THEME_DARK
+        self._persist_theme(THEME_DARK)
         return THEME_DARK
 
     def apply_light(self) -> str:
@@ -139,7 +140,24 @@ class ThemeSwitcher:
         manager = ThemeManager()
         manager._current_theme = THEME_LIGHT  # type: ignore[attr-defined]
         self._current = THEME_LIGHT
+        self._persist_theme(THEME_LIGHT)
         return THEME_LIGHT
+
+    @staticmethod
+    def _persist_theme(theme_id: str) -> None:
+        """Batch 12: 持久化主题选择（深/浅）到 theme_store。
+
+        启动期恢复路径（``main.create_application`` → ``apply_theme_by_name``）也会
+        走这里，但那时写入的值与读出的值一致，幂等无害。失败静默（偏好持久化是
+        best-effort，不应阻断主题应用）。
+        """
+
+        try:
+            from embeddebug.serial_station.ui.theme import theme_store
+
+            theme_store.save_theme_id(theme_id)
+        except Exception:  # noqa: BLE001  偏好落盘失败不阻断主题切换
+            pass
 
     def apply_accent(self, accent_id: str) -> str:
         """切换强调色变体，重新应用当前主题。返回当前主题名。

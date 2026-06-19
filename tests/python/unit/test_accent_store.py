@@ -1,12 +1,15 @@
-"""强调色选择持久化测试（accent_store）。
+"""强调色选择持久化测试（accent_store → theme_store shim）。
+
+Batch 12 起 accent_store 转为 theme_store 的薄 shim，真实落点是
+``theme_store.prefs_path()``（``theme_prefs.json``）。测试隔离改为 monkeypatch
+``theme_store.prefs_path``，并把 ``_legacy_accent_path`` 也一并重定向到 tmp_path
+（避免迁移回退误读开发机旧 accent.json）。
 
 覆盖：
 - save/load 往返（round-trip）：保存的 id 能完整读回。
 - 缺失文件 / 损坏 JSON / 非法字段 → 回退 cyan 默认。
 - 原子写入（``.tmp`` + os.replace）：保存后文件存在且内容正确。
 - restore_active_accent 集成：从磁盘恢复后 get_active_accent_id 一致。
-
-用 monkeypatch 把 accent_path 指向 tmp_path 隔离，避免污染开发机真实偏好。
 """
 
 from __future__ import annotations
@@ -16,15 +19,17 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from embeddebug.serial_station.ui.theme import accent_store, accents
+from embeddebug.serial_station.ui.theme import accent_store, accents, theme_store
 
 
 def _isolate(monkeypatch, tmp_path):
-    """把 accent_store 的落点重定向到 tmp_path，隔离开发机真实偏好。"""
+    """把 theme_store 的落点（新 prefs + 旧 legacy accent）重定向到 tmp_path。"""
 
-    target = tmp_path / "embeddebug" / accent_store.ACCENT_FILENAME
-    monkeypatch.setattr(accent_store, "accent_path", lambda: target)
-    return target
+    prefs_target = tmp_path / "embeddebug" / theme_store.PREFS_FILENAME
+    legacy_target = tmp_path / "embeddebug" / accent_store.ACCENT_FILENAME
+    monkeypatch.setattr(theme_store, "prefs_path", lambda: prefs_target)
+    monkeypatch.setattr(theme_store, "_legacy_accent_path", lambda: legacy_target)
+    return prefs_target
 
 
 def test_save_load_roundtrip(monkeypatch, tmp_path):
