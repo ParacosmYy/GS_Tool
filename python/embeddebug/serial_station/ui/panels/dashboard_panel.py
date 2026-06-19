@@ -178,9 +178,14 @@ class DashboardPanel:
             return
         from embeddebug.serial_station.ui.dashboard import attach_double_click_fullscreen
         from embeddebug.serial_station.ui.panels._notify import panel_notify
+        from embeddebug.serial_station.ui.panels._dashboard_widget_menu import (
+            attach_widget_delete_menu,
+        )
 
         handler = attach_double_click_fullscreen(item.widget, host=self._widget)
         self._fullscreen_handlers.append(handler)
+        # Batch 31: 给放置控件装右键「删除」菜单（canvas.remove_item 激活）。
+        attach_widget_delete_menu(item.widget, canvas, item_id)
         panel_notify(
             self._widget, "info",
             self._widget.tr("已添加控件"),
