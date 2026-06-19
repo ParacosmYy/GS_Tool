@@ -145,6 +145,37 @@ def install_focus_ring(widget: QWidget) -> None:
     widget.installEventFilter(_FocusRingFilter(effect, widget))
 
 
+def install_scale_press(button) -> None:
+    """给按钮安装分离式按压 scale 弹性反馈（Batch 14，落地「动态化动画缩放」）。
+
+    - ``pressed`` → ``ScaleAnimation.press_down``（即时陷下到 0.96）；同时捕获
+      press 前原始几何，供 release 回弹归位。
+    - ``released`` → ``ScaleAnimation.press_up``（OutBack 回弹到原几何）。
+
+    与 ``ConfigurableButton`` 的 ``ScaleAnimation.press``（单一合并动画绑 clicked）
+    的区别：分离式绑 pressed/released，按下即陷、松手弹回，观感更物理。
+    适用于任意 ``QPushButton``（含工具栏/设置页等非 ConfigurableButton 按钮）。
+    动画自动防 GC（ScaleAnimation 类级活跃列表），无需持有引用。
+    """
+
+    from PyQt6.QtCore import QRect
+
+    from embeddebug.serial_station.ui.animations.scale import ScaleAnimation
+
+    # press 前原始几何（pressed 时捕获，released 时传给 press_up 归位）。
+    state = {"orig": QRect()}
+
+    def _on_pressed() -> None:
+        state["orig"] = QRect(button.geometry())
+        ScaleAnimation.press_down(button).start()
+
+    def _on_released() -> None:
+        ScaleAnimation.press_up(button, state["orig"]).start()
+
+    button.pressed.connect(_on_pressed)
+    button.released.connect(_on_released)
+
+
 class _FocusRingFilter(QObject):
     """focus in/out 动画调整光环半径与颜色。"""
 

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from typing import List
 
-from PyQt6.QtCore import QPropertyAnimation
+from PyQt6.QtCore import QPropertyAnimation, QRect
 from PyQt6.QtWidgets import QWidget
 
 from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
@@ -58,7 +58,10 @@ class ScaleAnimation:
         orig = widget.geometry()
         new_w = max(1, int(orig.width() * factor))
         new_h = max(1, int(orig.height() * factor))
-        scaled = orig
+        # 必须 copy orig：QRect 是可变对象，直接 alias 会让下面的 setWidth/
+        # setHeight 同时改写 orig，导致 moveCenter(orig.center()) 取到已缩放
+        # 后的中心而非原中心（缩放会偏移）。copy 后 orig.center() 保持原值。
+        scaled = QRect(orig)
         scaled.setWidth(new_w)
         scaled.setHeight(new_h)
         scaled.moveCenter(orig.center())
@@ -122,4 +125,56 @@ class ScaleAnimation:
         anim.setStartValue(orig)
         anim.setEndValue(ScaleAnimation._scaled_rect(widget, 1.03))
         anim.setEasingCurve(AnimationTokens.EASE_OUT)
+        return ScaleAnimation._track(anim)
+
+    # ── 分离式 press_down / press_up（Batch 14） ────────────────────
+    # 与 ``press()``（单一合并动画，绑 clicked）的区别：这对方法分别绑
+    # ``pressed``/``released`` 信号——press 时**立即**缩小（即时响应），release 时
+    # OutBack 回弹（弹性释放）。观感更「物理」：手指按下即陷，松手弹回。
+    # 接入任意 QPushButton 见 ``micro_interactions.install_scale_press``。
+
+    # press_down 目标比例：0.96（比 press() 的 0.94 更克制，因为分离式会停留更久，
+    # 过深凹陷在长按时观感突兀）。
+    SCALE_PRESS_DOWN = 0.96
+
+    @staticmethod
+    def press_down(widget: QWidget) -> QPropertyAnimation:
+        """按压陷下：1.0 → SCALE_PRESS_DOWN（0.96），EASE_OUT 即时陷下。
+
+        绑 ``pressed`` 信号：手指按下瞬间触发，快速（INSTANT=100ms）陷下，
+        给「按下即响应」的物理感。陷下后保持，直到 ``press_up`` 在 release 时弹回。
+        """
+
+        anim = QPropertyAnimation(widget, b"geometry", widget)
+        anim.setDuration(AnimationTokens.DURATION_INSTANT)
+        orig = widget.geometry()
+        anim.setStartValue(orig)
+        anim.setEndValue(ScaleAnimation._scaled_rect(widget, ScaleAnimation.SCALE_PRESS_DOWN))
+        anim.setEasingCurve(AnimationTokens.EASE_OUT)
+        return ScaleAnimation._track(anim)
+
+    @staticmethod
+    def press_up(widget: QWidget, orig_rect: QRect | None = None) -> QPropertyAnimation:
+        """释放回弹：当前 → 原态，EASE_OUT_BACK 轻微过冲回弹。
+
+        绑 ``released`` 信号：手指松开时从陷下态弹回原态，OutBack 产生轻微过冲，
+        时长 FAST（160ms）。与 ``press_down`` 配对使用（``install_scale_press`` 自动接线）。
+
+        Args:
+            widget: 目标控件。
+            orig_rect: press 前的原始几何（由 ``install_scale_press`` 在 pressed 时
+                捕获并传入）。``None`` 时用 ``widget.geometry()``（仅当 widget 未陷下
+                时正确；陷下态下应显式传 orig_rect）。
+        """
+
+        anim = QPropertyAnimation(widget, b"geometry", widget)
+        anim.setDuration(AnimationTokens.DURATION_FAST)
+        cur = widget.geometry()
+        target = orig_rect if orig_rect is not None else QRect(cur)
+        # 以陷下态中心为锚归位（press_down 居中陷下，回弹也居中回）。
+        restored = QRect(target)
+        restored.moveCenter(cur.center())
+        anim.setStartValue(cur)
+        anim.setEndValue(restored)
+        anim.setEasingCurve(AnimationTokens.EASE_OUT_BACK)
         return ScaleAnimation._track(anim)

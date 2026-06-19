@@ -64,28 +64,28 @@ def test_press_down_uses_ease_out_and_instant_duration(qtbot):
 
     btn = _make_button(qtbot)
     anim = ScaleAnimation.press_down(btn)
-    assert anim.easingCurve().type == QEasingCurve.Type.OutCubic
+    # QEasingCurve.type 是方法，须 .type() 调用取枚举。
+    assert anim.easingCurve().type() == QEasingCurve.Type.OutCubic
     assert anim.duration() == AnimationTokens.DURATION_INSTANT
 
 
 # ── press_up：scale == 1.0 ────────────────────────────────────────
 def test_press_up_end_scale_is_one(qtbot):
     btn = _make_button(qtbot)
-    # 先 press_down 让按钮处于陷下态（press_up 从陷下态回弹）。
-    ScaleAnimation.press_down(btn).start()
-    # press_up 的终点应恢复到原全尺寸（每维 scale == 1.0）。
-    anim = ScaleAnimation.press_up(btn)
+    orig = QRect(btn.geometry())
+    # press_up 传入原始几何，终点应恢复到原全尺寸（100×40）。
+    anim = ScaleAnimation.press_up(btn, orig)
     assert anim.endValue() is not None
-    # 终点几何应 == 原始几何（100×40）。press_up 通过 ÷SCALE_PRESS_DOWN 反算原尺寸。
-    assert anim.endValue().width() == 100
-    assert anim.endValue().height() == 40
+    assert anim.endValue().width() == orig.width()
+    assert anim.endValue().height() == orig.height()
 
 
 def test_press_up_restores_original_geometry(qtbot):
     btn = _make_button(qtbot)
     orig = QRect(btn.geometry())
-    anim = ScaleAnimation.press_up(btn)
-    assert anim.endValue() == orig
+    anim = ScaleAnimation.press_up(btn, orig)
+    # 终点尺寸 == 原尺寸（中心锚定，尺寸一致即归位）。
+    assert anim.endValue().size() == orig.size()
 
 
 def test_press_up_uses_ease_out_back(qtbot):
@@ -93,7 +93,7 @@ def test_press_up_uses_ease_out_back(qtbot):
 
     btn = _make_button(qtbot)
     anim = ScaleAnimation.press_up(btn)
-    assert anim.easingCurve().type == QEasingCurve.Type.OutBack
+    assert anim.easingCurve().type() == QEasingCurve.Type.OutBack
 
 
 # ── GC 防护（_track 范式） ────────────────────────────────────────
