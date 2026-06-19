@@ -55,8 +55,8 @@ from embeddebug.serial_station.ui.theme.qss_sections_widgets import (
     scrollbar_section,
     shortcut_section,
     status_section,
-    waveform_section,
 )
+from embeddebug.serial_station.ui.theme.qss_sections_waveform import waveform_section
 from embeddebug.serial_station.ui.theme.qss_sections_toast import toast_section
 
 
