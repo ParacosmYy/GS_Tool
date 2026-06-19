@@ -204,3 +204,61 @@ class _FocusRingFilter(QObject):
         self._anim.setEndValue(end)
         self._anim.setEasingCurve(AnimationTokens.EASE_OUT)
         self._anim.start()
+
+
+def install_nav_hover_scale(button) -> None:
+    """给 NavRail 图标按钮安装 hover scale 高亮（Batch 15，落地「动画缩放」）。
+
+    hover enter → ``ScaleAnimation`` 放大到 1.12（图标「弹出」高亮）；
+    hover leave → 回弹到原态（EASE_OUT_BACK 轻微过冲）。通过事件过滤器监听
+    ``Enter``/``Leave``，比 signal 更精准（覆盖鼠标滑过而不只是停留）。
+
+    与 ``install_scale_press`` 叠加安全：press 改 geometry 到 0.96，hover 改到 1.12，
+    两者都中心锚定，不会冲突（实际交互中 hover 与 press 时序错开）。
+    动画自动防 GC（ScaleAnimation 类级活跃列表）。
+    """
+
+    button.installEventFilter(_NavHoverScaleFilter(button))
+
+
+class _NavHoverScaleFilter(QObject):
+    """NavRail 图标 hover enter/leave 缩放高亮。"""
+
+    # hover 放大比例（1.12：图标「弹出」感，比 hover_in 的 1.03 更显著，
+    # 因为 NavRail 图标是主要导航元素，需更强反馈）。
+    HOVER_SCALE = 1.12
+
+    def __init__(self, button) -> None:
+        super().__init__(button)
+        self._button = button
+        # enter 时捕获原几何，leave 时恢复到它（避免从放大态 ÷1.0 仍放大）。
+        self._orig_rect = None
+
+    def eventFilter(self, obj: object, event: QEvent) -> bool:
+        if obj is not self._button:
+            return False
+        from PyQt6.QtCore import QRect
+
+        from embeddebug.serial_station.ui.animations.scale import ScaleAnimation
+
+        etype = event.type()
+        if etype == QEvent.Type.Enter:
+            self._orig_rect = QRect(self._button.geometry())
+            anim = QPropertyAnimation(self._button, b"geometry", self._button)
+            anim.setDuration(AnimationTokens.DURATION_FAST)
+            anim.setStartValue(self._button.geometry())
+            anim.setEndValue(ScaleAnimation._scaled_rect(self._button, self.HOVER_SCALE))
+            anim.setEasingCurve(AnimationTokens.EASE_OUT)
+            ScaleAnimation._track(anim).start()
+        elif etype == QEvent.Type.Leave:
+            orig = self._orig_rect if self._orig_rect is not None else QRect(self._button.geometry())
+            # 以当前（放大态）中心为锚恢复原尺寸。
+            restored = QRect(orig)
+            restored.moveCenter(self._button.geometry().center())
+            anim = QPropertyAnimation(self._button, b"geometry", self._button)
+            anim.setDuration(AnimationTokens.DURATION_FAST)
+            anim.setStartValue(self._button.geometry())
+            anim.setEndValue(restored)
+            anim.setEasingCurve(AnimationTokens.EASE_OUT_BACK)
+            ScaleAnimation._track(anim).start()
+        return False

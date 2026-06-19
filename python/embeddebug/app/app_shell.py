@@ -159,6 +159,15 @@ class AppShell(QMainWindow):
             self._nav_buttons[reg.mode_id] = btn
             self._nav_group.addButton(btn, index)
             nav_rail.layout().addWidget(btn)
+            # Batch 15: NavRail 图标按钮接入 scale 弹性反馈（按下陷下）+
+            # hover scale 高亮（图标弹出），落地「动态化动画缩放」。
+            from embeddebug.serial_station.ui.micro_interactions import (
+                install_nav_hover_scale,
+                install_scale_press,
+            )
+
+            install_scale_press(btn)
+            install_nav_hover_scale(btn)
             btn.clicked.connect(lambda _checked, idx=index: self._switch_to(idx))
 
         # 模式页：只把面板控件 addWidget 进 stack（按钮不进 stack）。

@@ -30,6 +30,13 @@ def build_send_row(owner: CommandSectionHost, root: QWidget) -> QHBoxLayout:
     owner._send_button.setObjectName("serialStationSendButton")
     owner._send_button.setToolTip(owner.tr("Send command text (Ctrl+Enter)"))
     owner._send_button.clicked.connect(owner._send_text)
+    # Batch 15: Send 按钮接入 scale 弹性反馈（按下陷下、松手回弹）。
+    try:
+        from embeddebug.serial_station.ui.micro_interactions import install_scale_press
+
+        install_scale_press(owner._send_button)
+    except Exception:
+        pass
     row.addWidget(owner._send_edit, 1)
     row.addWidget(owner._command_history_combo)
     row.addWidget(owner._send_button)

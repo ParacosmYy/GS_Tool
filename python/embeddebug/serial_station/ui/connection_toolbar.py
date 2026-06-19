@@ -13,6 +13,20 @@ from embeddebug.serial_station.ui.tcp_controls import build_tcp_controls
 from embeddebug.serial_station.ui.udp_controls import build_udp_controls
 
 
+def _install_scale_press(button) -> None:
+    """Batch 15: 给连接/断开按钮接入 scale 弹性反馈（按下陷下、松手回弹）。
+
+    安全吞异常（按钮构造期失败不阻断工具栏构建），微交互是锦上添花。
+    """
+
+    try:
+        from embeddebug.serial_station.ui.micro_interactions import install_scale_press
+
+        install_scale_press(button)
+    except Exception:
+        pass
+
+
 class ConnectionToolbarHost(Protocol):
     def tr(self, source_text: str) -> str: ...
     def _set_protocol(self, name: str) -> None: ...
@@ -66,21 +80,26 @@ def build_connection_toolbar(
     owner._connect_button.setObjectName("serialStationConnectButton")
     owner._connect_button.setToolTip(owner.tr("Open the fake loopback transport"))
     owner._connect_button.clicked.connect(owner._connect_fake)
+    _install_scale_press(owner._connect_button)
 
     owner._connect_serial_button = QPushButton(owner.tr("Connect Serial"), root)
     owner._connect_serial_button.setObjectName("serialStationConnectSerialButton")
     owner._connect_serial_button.setToolTip(owner.tr("Open the selected serial port"))
     owner._connect_serial_button.setEnabled(owner._has_serial_ports())
     owner._connect_serial_button.clicked.connect(owner._connect_serial)
+    _install_scale_press(owner._connect_serial_button)
 
     owner._tcp_host_edit, owner._tcp_port_edit, owner._connect_tcp_button = build_tcp_controls(owner, root)
     owner._udp_host_edit, owner._udp_port_edit, owner._connect_udp_button = build_udp_controls(owner, root)
+    _install_scale_press(owner._connect_tcp_button)
+    _install_scale_press(owner._connect_udp_button)
 
     owner._disconnect_button = QPushButton(owner.tr("Disconnect"), root)
     owner._disconnect_button.setObjectName("serialStationDisconnectButton")
     owner._disconnect_button.setToolTip(owner.tr("Close the active transport"))
     owner._disconnect_button.setEnabled(False)
     owner._disconnect_button.clicked.connect(owner._disconnect)
+    _install_scale_press(owner._disconnect_button)
 
     for widget in (
         owner._protocol_combo,

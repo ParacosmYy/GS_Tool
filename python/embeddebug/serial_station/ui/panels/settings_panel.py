@@ -119,6 +119,11 @@ class SettingsPanel:
         apply_btn = QPushButton(self._widget.tr("应用"), tab)
         apply_btn.setObjectName("serialStationSettingsApplyButton")
         apply_btn.clicked.connect(self._apply_theme)
+        # Batch 15: Apply 按钮接入 scale 弹性反馈（按下陷下、松手回弹），让
+        # Batch 14 的动画缩放在设置页对用户可见。
+        from embeddebug.serial_station.ui.micro_interactions import install_scale_press
+
+        install_scale_press(apply_btn)
         # Batch 19: 实时预览 —— 切换 combo 选择即应用主题（无需点「应用」）。
         # 预览不弹 toast（避免噪音），「应用」按钮保留为带 toast 的确认。
         self._theme_combo.currentIndexChanged.connect(self._preview_theme)
