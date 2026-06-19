@@ -1,4 +1,4 @@
-"""Batch 36 测试：DashboardCanvas 网格绘制 + show_grid 切换。
+"""DashboardCanvas 网格绘制 + show_grid 切换测试。
 
 覆盖：
 1. DashboardCanvas 默认 show_grid=True。
