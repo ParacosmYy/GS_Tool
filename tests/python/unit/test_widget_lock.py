@@ -1,4 +1,4 @@
-"""Batch 38 测试：dashboard 控件锁定/解锁（防意外删除）。
+"""dashboard 控件锁定/解锁测试（防意外删除）。
 
 覆盖：
 1. _is_locked 默认 False。

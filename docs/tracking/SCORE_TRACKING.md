@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 663分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 337分
+> 当前: 664分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 336分
 
 ---
 
@@ -365,6 +365,7 @@
 | 661 | Serial Station GPS/NMEA 协议解析器（Wave 59 骨架功能） | 新建 gps/ 子包：NMEA 0183 句子解析器（纯 Python 标准库）覆盖 GGA/RMC/GSA/GSV 四类；坐标 ddmm.mmmm→十进制度（南/西负值）；校验和 XOR 验证（不匹配抛 NmeaParseError，缺失容错）；talker 无关助记符识别（GP/GN/GL 都按末 3 字符）；parse_lines 多行容错（跳空行/非 NMEA/解析失败）；GgaFix/RmcTrack/GsaActive/GsvSatellites/SatelliteInfo frozen dataclass + to_payload（ProtocolEvent 兼容）；18 个纯解析器单测 |
 | 662 | Serial Station UI 美化 Batch 36 — dashboard 画布可见网格 + 切换 | DashboardCanvas 此前放置控件靠不可见网格吸附，用户无视觉参考；Batch 36 加 paintEvent 绘制 20px 网格点 + show_grid 切换（palette 工具栏按钮）；网格颜色取 palette 弱色不干扰控件 |
 | 663 | Serial Station UI 美化 Batch 37 — palette 手型光标 + 控件 z-order 置顶/置底 | WidgetPaletteButton 此前无手型光标，拖拽可发现性弱；Batch 37 加 PointingHandCursor；同时给控件右键菜单加「置顶/置底」z-order（控件重叠时调整叠放次序） |
+| 664 | Serial Station UI 美化 Batch 38 — dashboard 控件锁定/解锁（防意外删除） | 放置的控件可被意外删除（右键删除/清空画布）；Batch 38 加锁定/解锁 toggle（config[locked] 持久化），锁定后删除 action 禁用 + _safe_remove 跳过，对齐可视化编辑器锁定语义 |
 
 ---
 
