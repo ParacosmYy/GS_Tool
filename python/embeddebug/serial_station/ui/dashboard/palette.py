@@ -35,7 +35,8 @@ class WidgetPaletteButton(QPushButton):
         icon = IconManager().icon(icon_name, color=P.TEXT_SECONDARY)
         if not icon.isNull():
             self.setIcon(icon)
-        self.setToolTip(f"Drag to canvas to add {label}")
+        # Batch 39: tooltip 走 tr() + format（铁律 19 国际化合规，原为硬编码英文）。
+        self.setToolTip(self.tr("Drag to canvas to add {name}").format(name=label))
 
     def mousePressEvent(self, event: object) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
@@ -88,7 +89,8 @@ class WidgetPalette(QFrame):
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(6)
 
-        title = QLabel("Widgets", self)
+        # Batch 39: 标题走 tr()（铁律 19，原为硬编码 "Widgets"）。
+        title = QLabel(self.tr("Widgets"), self)
         title.setObjectName("serialStationPaletteTitle")
         title.setStyleSheet(f"color: {P.TEXT_PRIMARY}; font-weight: 600; font-size: 13px;")
         layout.addWidget(title)

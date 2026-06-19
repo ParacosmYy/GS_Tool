@@ -32,7 +32,9 @@ class DashboardTabs(QTabWidget):
 
     def _default_tab_name(self, index: int | None = None) -> str:
         count = index if index is not None else self.count()
-        return f"Dashboard {count + 1}" if count == 0 else f"Dashboard {count}"
+        # Batch 39: 默认标签页名走 tr()（铁律 19，原为硬编码英文 f-string）。
+        template = self.tr("Dashboard {n}")
+        return template.format(n=count + 1) if count == 0 else template.format(n=count)
 
     def _add_canvas(self, name: str) -> DashboardCanvas:
         canvas = DashboardCanvas(self)
