@@ -1,4 +1,4 @@
-"""Batch 33 测试：dashboard 控件右键「属性编辑」（宽/高调整）。
+"""dashboard 控件右键「属性编辑」测试（宽/高调整）。
 
 覆盖：
 1. _edit_properties 调整宽/高 → widget.setGeometry + item.geometry/config 同步。

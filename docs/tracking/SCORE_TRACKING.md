@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 656分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 344分
+> 当前: 657分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 343分
 
 ---
 
@@ -358,14 +358,15 @@
 | 654 | Serial Station UI 美化 Batch 31 — dashboard 放置控件右键删除菜单 | 放置的 dashboard 控件此前无单控件删除入口（只有清空画布整批删）；Batch 31 给每个放置控件装右键「删除」菜单，调 canvas.remove_item；双击已被全屏占用（Batch 18），故用右键删除；激活 canvas.remove_item 在面板层使用路径 |
 | 655 | Serial Station UI 美化 Batch 32 — dashboard 控件右键「复制控件」 | Batch 31 给放置控件加了右键删除，Batch 32 补「复制控件」——在源控件偏移 _DUPLICATE_OFFSET 处克隆同类型控件（对齐 Batch 29 标签页复制语义）；右键菜单现含「复制控件/删除控件」两个 action |
 | 656 | Serial Station SVD 寄存器查看器（Wave 50 骨架功能） | 新建 svd/ 子包：CMSIS SVD XML 解析器（xml.etree，纯 Python 无依赖）+ 外设/寄存器/位域数据模型（frozen dataclass）+ <dim> 数组外设展开 + 位域两种位范围写法（bitOffset/Width 与 msb/lsb）+ Access 枚举；新建 SvdPanel（加载 .svd 文件 / 加载演示，三级树外设→寄存器→位域 + 详情面板：绝对地址/复位值/访问/位域表）；复用 StatusDot 绿点状态指示；注册到导航栏（cpu 图标）；QSS 覆盖全部 serialStationSvd* objectName；修复 PyQt6 magic-int setAlignment TypeError（改 Qt.AlignmentFlag 枚举）；15 个纯解析器单测 |
+| 657 | Serial Station UI 美化 Batch 33 — dashboard 控件右键「属性编辑」（宽/高调整） | 放置的 dashboard 控件宽/高在 add_widget_at 后不可变；Batch 33 加右键「属性...」弹 QInputDialog.getInt 调整宽/高，同步 widget.setGeometry + item.geometry/config（保持 to_layout_dict 持久化一致）；右键菜单现含「复制控件/属性.../删除控件」3 action |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#656` 的完整记录
+- 当前文档已整理到 `#657` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
-- 619~655 为「UI 美化与动画接线」连续迭代（Batch 1~32，Batch 27 编号跳过），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
+- 619~657 为「UI 美化与动画接线 + SVD」连续迭代（Batch 1~33，Batch 27 编号跳过），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
 - ⚠️ Batch 编号注：Batch 10 出现两次（StatusDot 线 633 / accent 配色线 648），因并发进程有两条独立 batch 编号线；评分按 commit 时间顺序线性 +1，不依赖 batch 编号
 - 后续新增分数时，优先补"阶段摘要"和"里程碑"，不再恢复长篇流水账
 - 如果需要精确到单次提交，请直接查 `git log` 或对应 commit message
