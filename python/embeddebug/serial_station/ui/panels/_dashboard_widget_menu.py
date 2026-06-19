@@ -34,12 +34,49 @@ def attach_widget_delete_menu(widget: QWidget, canvas, item_id: str) -> QMenu | 
     def _on_context(pos: QPoint) -> None:
         menu = QMenu(widget)
         menu.addAction(widget.tr("复制控件"), lambda: _safe_duplicate(canvas, item_id))
+        menu.addAction(widget.tr("属性..."), lambda: _edit_properties(widget, canvas, item_id))
         delete_action = menu.addAction(widget.tr("删除控件"))
         delete_action.triggered.connect(lambda _checked=False: _safe_remove(canvas, item_id))
         menu.exec(widget.mapToGlobal(pos))
 
     widget.customContextMenuRequested.connect(_on_context)
     return None  # 菜单按需创建，无需持有引用
+
+
+def _edit_properties(widget: QWidget, canvas, item_id: str) -> None:
+    """属性编辑：弹 QInputDialog 调整宽/高（Batch 33）。
+
+    调整后同步 widget.setGeometry + canvas.items[item_id].geometry/config，
+    保持持久化（to_layout_dict 读 geometry）一致。
+    """
+
+    from PyQt6.QtCore import QRect
+    from PyQt6.QtWidgets import QInputDialog
+
+    item = canvas.items.get(item_id) if canvas is not None else None
+    if item is None:
+        return
+    geo = item.geometry
+    # 宽度。
+    new_w, ok = QInputDialog.getInt(
+        widget, widget.tr("控件宽度"), widget.tr("宽度（px）："), geo.width(), 40, 2000,
+    )
+    if not ok:
+        return
+    # 高度。
+    new_h, ok = QInputDialog.getInt(
+        widget, widget.tr("控件高度"), widget.tr("高度（px）："), geo.height(), 30, 2000,
+    )
+    if not ok:
+        return
+    new_geo = QRect(geo.x(), geo.y(), new_w, new_h)
+    try:
+        widget.setGeometry(new_geo)
+        item.geometry = new_geo
+        item.config["width"] = new_w
+        item.config["height"] = new_h
+    except Exception:
+        pass
 
 
 def _safe_duplicate(canvas, item_id: str) -> None:
