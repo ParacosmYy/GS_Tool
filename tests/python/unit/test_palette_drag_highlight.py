@@ -1,4 +1,4 @@
-"""Batch 34 测试：WidgetPaletteButton 拖拽高亮（dragging 属性）。
+"""WidgetPaletteButton 拖拽高亮测试（dragging 属性）。
 
 覆盖：
 1. _set_dragging(True) 设置 dragging 属性为 True。
