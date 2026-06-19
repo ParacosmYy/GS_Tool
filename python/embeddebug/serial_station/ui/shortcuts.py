@@ -13,6 +13,7 @@ class SerialStationShortcutHost(Protocol):
     def _clear_log(self) -> None: ...
     def _refresh_serial_ports(self) -> None: ...
     def _open_command_palette(self) -> None: ...
+    def _toggle_theme(self) -> None: ...
 
 
 def install_shortcuts(owner: SerialStationShortcutHost) -> None:
@@ -57,6 +58,12 @@ def handle_key_press(owner: SerialStationShortcutHost, event: object) -> bool:
         return True
     if key == Qt.Key.Key_P:
         owner._open_command_palette()
+        event.accept()
+        return True
+    # Ctrl+Shift+T: 切换深/浅主题（Batch 13，激活 definitions.toggle_theme）。
+    # 需 Ctrl + Shift 同按；单独 Ctrl+T 不触发（避免与浏览器风格的「 reopen tab」误触）。
+    if key == Qt.Key.Key_T and modifiers & Qt.KeyboardModifier.ShiftModifier:
+        owner._toggle_theme()
         event.accept()
         return True
     return False

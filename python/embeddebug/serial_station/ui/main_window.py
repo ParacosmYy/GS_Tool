@@ -22,6 +22,7 @@ from embeddebug.serial_station.ui import (
     session_actions,
     shortcuts,
     status_actions,
+    theme_actions,
 )
 from embeddebug.serial_station.ui import button_icons
 from embeddebug.serial_station.ui.command_palette import CommandItem, CommandPalette
@@ -121,6 +122,11 @@ class SerialStationMainWindow(QMainWindow):
             return
         palette.set_commands(self._build_command_items())
         palette.open()
+
+    def _toggle_theme(self) -> None:
+        """切换深/浅主题（Ctrl+Shift+T，Batch 13）。"""
+
+        theme_actions.toggle_theme(self)
 
     def resizeEvent(self, event: object) -> None:
         """窗口 resize 时驱动响应式断点。"""
