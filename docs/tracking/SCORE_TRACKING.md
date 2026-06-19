@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 660分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 340分
+> 当前: 661分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 339分
 
 ---
 
@@ -362,12 +362,13 @@
 | 658 | Serial Station UI 美化 Batch 34 — WidgetPaletteButton 拖拽高亮反馈 | WidgetPaletteButton 拖拽时源按钮无视觉反馈（用户不知道哪个按钮在被拖）；Batch 34 加 dragging 属性 + QSS 高亮：拖拽期间源按钮 accent 边框 + 半透明填充，结束清除 |
 | 659 | Serial Station UI 美化 Batch 35 — dashboard 控件属性编辑加位置 X/Y（网格吸附） | Batch 33 的属性编辑只调宽/高，控件放置后位置不可微调（只能拖拽重放）；Batch 35 加 X/Y 坐标编辑，输入值经 snap_to_grid 自动吸附到 20px 网格（与 add_widget_at 一致） |
 | 660 | Serial Station 波形数学引擎（Wave 58 骨架功能） | 新建 waveform_math/ 子包：通道间四则（add/subtract/multiply/divide，除零置 NaN 防尖刺）+ 逐点一元函数（abs/sqrt/log/sin/cos，负数/非正→NaN）+ 微积分（derivative 中心差分/integral 梯形累积）；ast 安全表达式解析器（白名单节点遍历，拒 __import__/属性/下标/lambda/未知函数/关键字参数，SyntaxError→ExpressionError）；engine 编排（ChannelBatch→MathResult，逐通道独立求值，失败带 error 不阻断）；VirtualChannel/MathResult frozen dataclass；34 个纯 numpy 单测（按行为域拆 2 文件：函数库 + 表达式/引擎），过 250 行测试门禁 |
+| 661 | Serial Station GPS/NMEA 协议解析器（Wave 59 骨架功能） | 新建 gps/ 子包：NMEA 0183 句子解析器（纯 Python 标准库）覆盖 GGA/RMC/GSA/GSV 四类；坐标 ddmm.mmmm→十进制度（南/西负值）；校验和 XOR 验证（不匹配抛 NmeaParseError，缺失容错）；talker 无关助记符识别（GP/GN/GL 都按末 3 字符）；parse_lines 多行容错（跳空行/非 NMEA/解析失败）；GgaFix/RmcTrack/GsaActive/GsvSatellites/SatelliteInfo frozen dataclass + to_payload（ProtocolEvent 兼容）；18 个纯解析器单测 |
 
 ---
 
 ## 三、重要状态
 
-- 当前文档已整理到 `#660` 的完整记录
+- 当前文档已整理到 `#661` 的完整记录
 - 当前阶段已从 `500~599 约束对齐期` 进入 `600~699 结构与流程稳定期`
 - 619~659 为「UI 美化与动画接线 + SVD」连续迭代（Batch 1~35，Batch 27 编号跳过），诊断报告「基建齐全但接线全断」6 个问题域全部修复并有测试覆盖，详见 [docs/superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md](../superpowers/specs/2026-06-19-ui-polish-animation-integration-design.md)
 - ⚠️ Batch 编号注：Batch 10 出现两次（StatusDot 线 633 / accent 配色线 648），因并发进程有两条独立 batch 编号线；评分按 commit 时间顺序线性 +1，不依赖 batch 编号

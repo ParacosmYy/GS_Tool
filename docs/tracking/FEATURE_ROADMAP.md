@@ -66,12 +66,12 @@
 - ✅ 虚拟通道创建 — `VirtualChannel` dataclass + `evaluate_channel(s)` 引擎编排（ChannelBatch→MathResult）
 - 评分预估: +12 (本轮 +1, 计算内核完成；UI 接线待后续)
 
-## Wave 59: GPS 数据可视化
-- NMEA 协议解析 (GGA/RMC/GSA/GSV)
-- 实时位置追踪
-- 轨迹回放
-- 卫星状态显示
-- 评分预估: +10
+## Wave 59: GPS 数据可视化 ✅ (部分完成, commit #661)
+- ✅ NMEA 协议解析 (GGA/RMC/GSA/GSV) — `gps/parser.py`, 标准库, 校验和验证 + ddmm.mmmm→十进制度
+- ⏳ 实时位置追踪 — 需 UI 面板 + transport 接入, 后续迭代
+- ⏳ 轨迹回放 — 需 UI + 存储, 后续迭代
+- ⏳ 卫星状态显示 — 需 UI 面板, 后续迭代
+- 评分预估: +10 (本轮 +1, 解析内核完成；UI 接线待后续)
 
 ## Wave 60: 眼图分析器
 - 数字信号眼图生成
