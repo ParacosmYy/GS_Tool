@@ -13,11 +13,12 @@ from embeddebug.serial_station.ui.theme import tokens as T
 from embeddebug.serial_station.ui.theme.qss_builder import build_qss
 from embeddebug.serial_station.ui.theme.qss_sections_layout import (
     cards_section,
-    command_palette_section,
     splitter_section,
     topbar_section,
     zones_section,
 )
+# command_palette_section 在并发重构（拆分 qss_sections_overlays）后移至 overlays 模块。
+from embeddebug.serial_station.ui.theme.qss_sections_overlays import command_palette_section
 
 _CARD_OBJECT_NAMES = (
     "serialStationCard",

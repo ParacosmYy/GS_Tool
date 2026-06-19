@@ -221,16 +221,41 @@ def get_active_accent_id() -> str:
     return get_active_accent().id
 
 
-def set_active_accent(accent_id: str) -> AccentVariant:
+def set_active_accent(accent_id: str, *, persist: bool = True) -> AccentVariant:
     """切换运行时 accent。返回实际生效的变体（未知 id 回退 cyan）。
 
     仅更新模块级状态；不触发 QSS 重生成（由调用方 ``theme_switcher`` 负责）。
+
+    Args:
+        accent_id: 目标 accent id。
+        persist: 是否同时持久化到磁盘（默认 True）；启动期恢复 / 测试传 False。
     """
 
     global _active_override
     variant = get_accent_by_id(accent_id)
     _active_override = variant if variant.id != DEFAULT_ACCENT_ID else None
+    if persist:
+        # 延迟导入避免 accents ↔ accent_store 循环（accent_store 不 import accents）。
+        from embeddebug.serial_station.ui.theme.accent_store import save_accent_id
+
+        save_accent_id(variant.id)
     return variant
+
+
+def restore_active_accent(default: str = DEFAULT_ACCENT_ID) -> str:
+    """从磁盘恢复上次保存的 accent（启动期调用一次）。
+
+    不持久化（已落盘）；返回恢复生效的 accent id。QSS 生成器/switcher 读
+    ``get_active_accent`` 时即取到恢复后的值。
+    """
+
+    global _active_override
+    from embeddebug.serial_station.ui.theme.accent_store import load_accent_id
+
+    accent_id = load_accent_id(default=default)
+    variant = get_accent_by_id(accent_id)
+    _active_override = variant if variant.id != DEFAULT_ACCENT_ID else None
+    return variant.id
 
 
 def reset_active_accent() -> None:

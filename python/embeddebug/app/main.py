@@ -11,7 +11,6 @@ from PyQt6.QtCore import QCoreApplication, QEvent
 from PyQt6.QtWidgets import QApplication
 
 from embeddebug.serial_station.ui.main_window import SerialStationMainWindow
-from embeddebug.serial_station.ui.theme import apply_theme
 
 
 def create_application(argv: Sequence[str] | None = None) -> QApplication:
@@ -24,7 +23,18 @@ def create_application(argv: Sequence[str] | None = None) -> QApplication:
     app = QApplication(list(argv) if argv is not None else list(sys.argv))
     app.setApplicationName("EmbedDebugPy")
     app.setApplicationDisplayName("EmbedDebug")
-    apply_theme(app)
+    # Batch 11: 启动期从磁盘恢复上次保存的强调色（多配色偏好持久化），
+    # 必须在应用主题之前，使首帧 QSS 即带上正确 accent recolor。
+    # 走 theme_switcher.apply_theme_by_name（而非 manager.apply_theme），因为它会
+    # 注入当前 accent 的 recolor；manager.apply_theme 只输出原始 cyan QSS。
+    from embeddebug.serial_station.ui.theme.accents import restore_active_accent
+    from embeddebug.serial_station.ui.theme.theme_switcher import (
+        THEME_DARK,
+        apply_theme_by_name,
+    )
+
+    restore_active_accent()
+    apply_theme_by_name(app, THEME_DARK)
     return app
 
 

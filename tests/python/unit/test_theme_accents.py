@@ -136,7 +136,7 @@ def test_get_active_accent_defaults_to_cyan():
 
 def test_set_and_get_active_accent():
     accents.reset_active_accent()
-    accents.set_active_accent("purple")
+    accents.set_active_accent("purple", persist=False)
     assert accents.get_active_accent_id() == "purple"
     accents.reset_active_accent()
 
@@ -145,9 +145,9 @@ def test_set_active_accent_cyan_clears_override():
     """set 回 cyan 应等价于 reset（_active_override 归 None）。"""
 
     accents.reset_active_accent()
-    accents.set_active_accent("purple")
+    accents.set_active_accent("purple", persist=False)
     assert accents.get_active_accent_id() == "purple"
-    accents.set_active_accent("cyan")
+    accents.set_active_accent("cyan", persist=False)
     assert accents.get_active_accent_id() == "cyan"
     accents.reset_active_accent()
 
