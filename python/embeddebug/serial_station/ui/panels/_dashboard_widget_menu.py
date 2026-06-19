@@ -124,3 +124,24 @@ def _safe_remove(canvas, item_id: str) -> None:
         canvas.remove_item(item_id)
     except Exception:
         pass
+
+
+def make_grid_toggle(panel):
+    """返回网格切换 slot（Batch 36）：切换当前画布网格 + 更新状态标签。
+
+    由 DashboardPanel 的网格按钮 clicked.connect 调用，避免面板超 300 行门禁。
+    """
+
+    def _toggle(checked: bool) -> None:
+        tabs = getattr(panel, "_tabs", None)
+        widget = getattr(panel, "_widget", None)
+        if tabs is None or widget is None:
+            return
+        canvas = tabs.current_canvas()
+        if canvas is None:
+            return
+        canvas.set_show_grid(checked)
+        panel._status.setText(
+            widget.tr("网格已显示") if checked else widget.tr("网格已隐藏"))
+
+    return _toggle

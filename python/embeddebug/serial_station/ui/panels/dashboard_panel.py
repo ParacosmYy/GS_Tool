@@ -2,19 +2,16 @@
 
 把 dashboard 子系统（DashboardTabs + WidgetPalette）装配成用户可访问的 ModePanel：
 左侧控件库面板（拖拽源）+ 右侧多标签页画布（放置区）+ 顶栏操作（新增标签页/
-清空/保存/加载布局）。Batch 16 审计确认 dashboard 491 行代码零外部消费者，本面板
-首次让该子系统从骨架变成用户可达。
+清空/保存/加载布局/网格切换）。Batch 16 审计确认 dashboard 491 行代码零外部消费者，
+本面板首次让该子系统从骨架变成用户可达。
 
 设计要点：
 - ModePanel 契约：build 返回主控件，on_enter/on_leave 播放入场动画 + 通知。
-- 左 WidgetPalette 列出可拖控件（led/slider/button/gauge/value_display）。
-- 右 DashboardTabs 多画布标签页，拖入即放置。
-- 顶栏：新增标签页、清空当前画布、保存布局 JSON、加载布局 JSON。
-- 保存/加载走 QFileDialog，复用 canvas.save_layout/load_layout。
-- 主题切换/关键事件经 panel_notify → toast 反馈。
+- 左 WidgetPalette 列出可拖控件；右 DashboardTabs 多画布标签页，拖入即放置。
+- 顶栏：新增标签页、清空画布、保存/加载布局 JSON、网格切换。
+- 保存/加载走 QFileDialog；关键事件经 panel_notify → toast 反馈。
 
-约束：只调 dashboard 子系统公共 API（DashboardTabs/WidgetPalette/canvas），
-不访问 controller/transport/protocol；不 import 其他域面板。
+约束：只调 dashboard 子系统公共 API，不访问 controller/transport/protocol；不 import 其他域面板。
 """
 
 from __future__ import annotations
@@ -54,18 +51,19 @@ class DashboardPanel:
         add_tab_btn = QPushButton(widget.tr("新增标签页"), widget)
         add_tab_btn.setObjectName("serialStationDashboardAddTabButton")
         add_tab_btn.clicked.connect(self._add_tab)
-        clear_btn = QPushButton(widget.tr("清空画布"), widget)
-        clear_btn.setObjectName("serialStationDashboardClearButton")
+        clear_btn = QPushButton(widget.tr("清空画布"), widget); clear_btn.setObjectName("serialStationDashboardClearButton")
         clear_btn.clicked.connect(self._clear_canvas)
-        save_btn = QPushButton(widget.tr("保存布局"), widget)
-        save_btn.setObjectName("serialStationDashboardSaveButton")
+        save_btn = QPushButton(widget.tr("保存布局"), widget); save_btn.setObjectName("serialStationDashboardSaveButton")
         save_btn.clicked.connect(self._save_layout)
-        load_btn = QPushButton(widget.tr("加载布局"), widget)
-        load_btn.setObjectName("serialStationDashboardLoadButton")
+        load_btn = QPushButton(widget.tr("加载布局"), widget); load_btn.setObjectName("serialStationDashboardLoadButton")
         load_btn.clicked.connect(self._load_layout)
+        # Batch 36: 网格可见性切换（checkable，默认显示），委托 _dashboard_widget_menu。
+        from embeddebug.serial_station.ui.panels._dashboard_widget_menu import make_grid_toggle
+        grid_btn = QPushButton(widget.tr("网格"), widget); grid_btn.setObjectName("serialStationDashboardGridButton")
+        grid_btn.setCheckable(True); grid_btn.setChecked(True); grid_btn.clicked.connect(make_grid_toggle(self))
         self._status = QLabel(widget.tr("拖拽左侧控件到画布"), widget)
         self._status.setObjectName("serialStationDashboardStatusLabel")
-        for btn in (add_tab_btn, clear_btn, save_btn, load_btn):
+        for btn in (add_tab_btn, clear_btn, save_btn, load_btn, grid_btn):
             top.addWidget(btn)
         top.addStretch(1)
         top.addWidget(self._status)

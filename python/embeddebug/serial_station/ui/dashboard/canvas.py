@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from PyQt6.QtCore import QPoint, QRect, Qt, pyqtSignal
+from PyQt6.QtGui import QColor, QPainter, QPen
 from PyQt6.QtWidgets import QFrame, QWidget
 
 from embeddebug.serial_station.ui.theme import palette as P
@@ -59,7 +60,21 @@ class DashboardCanvas(QFrame):
         self.setAcceptDrops(True)
         self._items: dict[str, DashboardItem] = {}
         self._counter = 0
+        # Batch 36: 网格可见性（默认显示，辅助对齐；可经 set_show_grid 切换）。
+        self._show_grid = True
         self.setStyleSheet(f"background-color: {P.BG_APP}; border: 1px dashed {P.BORDER};")
+
+    def set_show_grid(self, show: bool) -> None:
+        """切换网格可见性（Batch 36）。"""
+
+        self._show_grid = bool(show)
+        self.update()
+
+    @property
+    def show_grid(self) -> bool:
+        """当前网格是否可见。"""
+
+        return self._show_grid
 
     @property
     def items(self) -> dict[str, DashboardItem]:
@@ -163,3 +178,26 @@ class DashboardCanvas(QFrame):
             event.acceptProposedAction()
         else:
             super().dropEvent(event)
+
+    # ── 绘制 ────────────────────────────────────────────────────────
+    def paintEvent(self, event: object) -> None:
+        """绘制背景 + 可选网格（Batch 36）。
+
+        网格用 BORDER 色低 alpha 画 GRID_SIZE 步长的交叉点（小圆点），
+        辅助控件对齐（与 snap_to_grid 一致）。_show_grid=False 时不画。
+        """
+
+        super().paintEvent(event)
+        if not self._show_grid:
+            return
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        grid_color = QColor(P.BORDER)
+        grid_color.setAlpha(90)
+        painter.setPen(QPen(grid_color, 1))
+        w = self.width()
+        h = self.height()
+        # 画网格交叉点（1px 点），步长 GRID_SIZE。
+        for y in range(GRID_SIZE, h, GRID_SIZE):
+            for x in range(GRID_SIZE, w, GRID_SIZE):
+                painter.drawPoint(x, y)

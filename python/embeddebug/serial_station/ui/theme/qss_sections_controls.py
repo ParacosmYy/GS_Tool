@@ -158,7 +158,8 @@ QFrame#serialStationDashboardPalette {{
 QPushButton#serialStationDashboardAddTabButton,
 QPushButton#serialStationDashboardClearButton,
 QPushButton#serialStationDashboardSaveButton,
-QPushButton#serialStationDashboardLoadButton {{
+QPushButton#serialStationDashboardLoadButton,
+QPushButton#serialStationDashboardGridButton {{
     background-color: {P.BG_PANEL_RAISED};
     color: {P.TEXT_PRIMARY};
     border: {T.BORDER_THIN} solid {P.ACCENT_BORDER};
@@ -168,7 +169,8 @@ QPushButton#serialStationDashboardLoadButton {{
 QPushButton#serialStationDashboardAddTabButton:hover,
 QPushButton#serialStationDashboardClearButton:hover,
 QPushButton#serialStationDashboardSaveButton:hover,
-QPushButton#serialStationDashboardLoadButton:hover {{
+QPushButton#serialStationDashboardLoadButton:hover,
+QPushButton#serialStationDashboardGridButton:hover {{
     background-color: {P.ACCENT_SOFT};
     border-color: {P.ACCENT};
 }}
