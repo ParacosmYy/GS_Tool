@@ -30,6 +30,8 @@ class WidgetPaletteButton(QPushButton):
         super().__init__(label, parent)
         self.setObjectName("serialStationPaletteButton")
         self._widget_type = widget_type
+        # Batch 37: 手型光标 + tooltip 增强拖拽可发现性（提示可拖）。
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         icon = IconManager().icon(icon_name, color=P.TEXT_SECONDARY)
         if not icon.isNull():
             self.setIcon(icon)

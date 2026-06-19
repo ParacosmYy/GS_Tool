@@ -105,7 +105,8 @@ def test_duplicate_menu_has_three_actions(qtbot, monkeypatch):
     monkeypatch.setattr(QtWidgets.QMenu, "exec", lambda *a, **k: None)
     widget.customContextMenuRequested.emit(QPoint(5, 5))
     assert len(built) == 1
-    assert built[0].actions().__len__() == 3
+    # Batch 37 后菜单 5 action（复制/属性/置顶/置底/删除）。
+    assert built[0].actions().__len__() == 5
 
 
 # ── 源码接入断言 ───────────────────────────────────────────────────

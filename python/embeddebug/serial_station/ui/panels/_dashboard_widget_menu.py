@@ -35,6 +35,9 @@ def attach_widget_delete_menu(widget: QWidget, canvas, item_id: str) -> QMenu | 
         menu = QMenu(widget)
         menu.addAction(widget.tr("复制控件"), lambda: _safe_duplicate(canvas, item_id))
         menu.addAction(widget.tr("属性..."), lambda: _edit_properties(widget, canvas, item_id))
+        # Batch 37: z-order 置顶/置底（控件重叠时调整叠放次序）。
+        menu.addAction(widget.tr("置顶"), lambda: _safe_raise(widget))
+        menu.addAction(widget.tr("置底"), lambda: _safe_lower(widget, canvas))
         delete_action = menu.addAction(widget.tr("删除控件"))
         delete_action.triggered.connect(lambda _checked=False: _safe_remove(canvas, item_id))
         menu.exec(widget.mapToGlobal(pos))
@@ -122,6 +125,27 @@ def _safe_remove(canvas, item_id: str) -> None:
 
     try:
         canvas.remove_item(item_id)
+    except Exception:
+        pass
+
+
+def _safe_raise(widget: QWidget) -> None:
+    """置顶控件 z-order（Batch 37）。raise_ 把控件提到同 parent 兄弟最上层。"""
+
+    try:
+        widget.raise_()
+    except Exception:
+        pass
+
+
+def _safe_lower(widget: QWidget, canvas) -> None:
+    """置底控件 z-order（Batch 37）。lower 把控件压到同 parent 兄弟最下层。
+
+    QWidget.lower() 是实例方法（非 lower_），压到 parent 栈底。
+    """
+
+    try:
+        widget.lower()
     except Exception:
         pass
 
