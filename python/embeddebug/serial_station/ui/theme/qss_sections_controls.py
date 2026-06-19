@@ -140,6 +140,12 @@ QPushButton#serialStationPaletteButton:hover {{
     border-color: {P.ACCENT_BORDER};
     color: {P.TEXT_PRIMARY};
 }}
+/* Batch 34: 拖拽中源按钮高亮（accent 边框 + 半透明填充）。 */
+QPushButton#serialStationPaletteButton[dragging="true"] {{
+    background-color: {P.ACCENT_SOFT};
+    border: {T.BORDER_THIN} solid {P.ACCENT};
+    color: {P.TEXT_PRIMARY};
+}}
 /* Batch 17: DashboardPanel 顶栏控件 + 主体容器 */
 QWidget#serialStationDashboardPanel {{
     background-color: transparent;

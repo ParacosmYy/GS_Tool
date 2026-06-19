@@ -50,7 +50,26 @@ class WidgetPaletteButton(QPushButton):
         pixmap_icon: QIcon = self.icon()
         if not pixmap_icon.isNull():
             drag.setPixmap(pixmap_icon.pixmap(32, 32))
+        # Batch 34: 拖拽期间高亮源按钮（dragging 属性 → QSS 高亮），结束清除。
+        self._set_dragging(True)
         drag.exec(Qt.DropAction.CopyAction)
+        self._set_dragging(False)
+
+    def _set_dragging(self, dragging: bool) -> None:
+        """拖拽态切换：setProperty(dragging) + polish 触发 QSS 高亮（Batch 34）。"""
+
+        self.setProperty("dragging", bool(dragging))
+        # polish 让 QSS 重新评估 [dragging=true] 选择器。
+        try:
+            from PyQt6.QtWidgets import QApplication
+
+            app = QApplication.instance()
+            if app is not None:
+                app.style().unpolish(self)
+                app.style().polish(self)
+        except Exception:
+            pass
+        self.update()
 
     @property
     def widget_type(self) -> str:
