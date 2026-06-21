@@ -49,7 +49,7 @@ class ConfigurableButton(QPushButton):
         self._formatter: Callable[[], str] | None = None
         self._press_animation_enabled = True
         self._hover_lift_enabled = True
-        self._ripple_enabled = False  # ripple 默认关闭（密集场景），按需开启
+        self._ripple_enabled = True  # Batch 46: ripple 默认开启（Material MD3 基线）
         self.clicked.connect(self._on_clicked)
         if icon_name:
             self.set_icon(icon_name)
