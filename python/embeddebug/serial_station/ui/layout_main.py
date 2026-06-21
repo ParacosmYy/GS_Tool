@@ -24,6 +24,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QFrame, QLabel, QLayout, QSplitter, QVBoxLayout, QWidget
 
 from embeddebug.serial_station.ui.layout_cards import build_card, card_body, wrap_layout
+from embeddebug.serial_station.ui.theme import tokens as T
 from embeddebug.serial_station.ui.waveform_preview import SerialWaveformPreview
 
 
@@ -89,7 +90,7 @@ def _build_left_zone(
     zone.setObjectName("serialStationLeftZone")
     zone_layout = QVBoxLayout(zone)
     zone_layout.setContentsMargins(0, 0, 0, 0)
-    zone_layout.setSpacing(10)
+    zone_layout.setSpacing(T.SPACING_INT_LG)
 
     # connection_toolbar 默认返回横向 QHBoxLayout（17 控件一行），
     # 在窄左栏会全部截断；这里把它的控件提取出来纵向重排，并按
@@ -128,7 +129,7 @@ def _build_center_zone(
     zone.setObjectName("serialStationCenterZone")
     zone_layout = QVBoxLayout(zone)
     zone_layout.setContentsMargins(0, 0, 0, 0)
-    zone_layout.setSpacing(10)
+    zone_layout.setSpacing(T.SPACING_INT_LG)
 
     # 波形卡（上）：辅助观察，stretch 2，设最小高度防压扁。
     waveform_card, wave_body = build_card(
@@ -165,7 +166,7 @@ def _build_right_zone(
     zone.setObjectName("serialStationRightZone")
     zone_layout = QVBoxLayout(zone)
     zone_layout.setContentsMargins(0, 0, 0, 0)
-    zone_layout.setSpacing(10)
+    zone_layout.setSpacing(T.SPACING_INT_LG)
 
     log_ops_card, log_ops_body = build_card(
         zone, title=owner.tr("Log Tools"), icon_name="filter"
