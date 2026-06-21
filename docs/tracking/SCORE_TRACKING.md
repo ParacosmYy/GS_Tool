@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 666分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 334分
+> 当前: 667分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 333分
 
 ---
 
@@ -368,6 +368,7 @@
 | 664 | Serial Station UI 美化 Batch 38 — dashboard 控件锁定/解锁（防意外删除） | 放置的控件可被意外删除（右键删除/清空画布）；Batch 38 加锁定/解锁 toggle（config[locked] 持久化），锁定后删除 action 禁用 + _safe_remove 跳过，对齐可视化编辑器锁定语义 |
 | 665 | Serial Station UI 美化 Batch 39 — dashboard 用户可见文字国际化（tr() 合规） | 审计发现 dashboard 多处用户可见文字硬编码英文（WidgetPaletteButton tooltip / WidgetPalette 标题等），违反铁律 19（所有用户可见文字走 tr()）；Batch 39 统一改为 widget.tr() 包裹 |
 | 666 | Serial Station UI 美化 Batch 40 — 10 个并行新增微交互组件 + 全量 pytest 阻塞修复 | 5 动画（BouncePathAnimation/GlowAnimation/RotateAnimation/TypewriterAnimation/ElasticSnapAnimation）+ 5 控件（Chip/SegmentedControl/RichTooltip/InfoBanner/ProgressRing），各带独立单测；同时修复 11 个 Batch 40 测试错误（QPropertyAnimation 未导入 / PyQt6 6.11 QMouseEvent 6 参重载 / QEnterEvent），InfoBanner `_animate_out` access violation 崩溃（finished 信号改绑定方法让 sip 自动追踪生命周期），QSS 覆盖 5 新 objectName，test_chip 行数压到 249；并修复 4 个预存在 bug（src/ 遗留 C++ 删除 / local_env.bat 转入 .gitignore / test_python_governance_docs subprocess 加 encoding=utf-8 修复 Windows GBK 解码 / test_settings 与 test_dashboard_layout_setting_key_exists 因 settings 包未落地改为 skip），全量 pytest 1470 passed + 2 skipped + 0 access violation，ui_smoke 23 passed，start-embeddebug --smoke exit 0 |
+| 667 | Serial Station UI 美化 Batch 41 — 5 个并行新增 UI 组件 + 动画 + 工具面板 | 2 控件（Drawer 侧边抽屉带半透明遮罩四向滑入/Badge 状态徽章 kind 配色）+ 2 动画（SkeletonAnimation windowOpacity 闪烁/PageSlideAnimation 四向页面切换 slide）+ 1 工具（CrcCalculatorPanel 自带 4 个 catalog 预设 CRC-8/MAXIM/CRC-16/MODBUS/CRC-16/CCITT-FALSE/CRC-32/ISO-HDLC，全部 check value 自检通过 0xA1/0x4B37/0x29B1/0xCBF43926）；新建 ui/tools/ 子包；合流更新 controls/animations/__init__.py + tools/__init__.py + qss_sections_controls 覆盖 9 新 objectName；全量 pytest 1565 passed + 2 skipped + 0 access violation，ui_smoke 23 passed，start-embeddebug --smoke exit 0 |
 
 ---
 

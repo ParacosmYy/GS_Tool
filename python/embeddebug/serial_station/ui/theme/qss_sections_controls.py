@@ -187,4 +187,16 @@ QWidget#serialStationInfoBanner,
 QWidget#serialStationProgressRing,
 QWidget#serialStationRichTooltip {{
     background-color: transparent;
+}}
+/* Batch 41: 新增控件/工具面板。控件均自绘主体或自带 QSS，此处仅契约占位。 */
+QWidget#serialStationDrawer,
+QWidget#serialStationDrawerPanel,
+QWidget#serialStationBadge,
+QWidget#serialStationCrcCalculator,
+QWidget#serialStationCrcCalculatorInput,
+QWidget#serialStationCrcCalculatorInputEdit,
+QWidget#serialStationCrcCalculatorConfig,
+QWidget#serialStationCrcCalculatorResult,
+QLineEdit#serialStationCrcResultEdit {{
+    background-color: transparent;
 }}"""

@@ -26,6 +26,8 @@ from embeddebug.serial_station.ui.animations.glow import GlowAnimation
 from embeddebug.serial_station.ui.animations.rotate import RotateAnimation
 from embeddebug.serial_station.ui.animations.typewriter import TypewriterAnimation
 from embeddebug.serial_station.ui.animations.elastic_snap import ElasticSnapAnimation
+from embeddebug.serial_station.ui.animations.skeleton import SkeletonAnimation
+from embeddebug.serial_station.ui.animations.page_slide import PageSlideAnimation
 
 __all__ = [
     "AnimationController",
@@ -36,10 +38,12 @@ __all__ = [
     "ElasticSnapAnimation",
     "FadeTransition",
     "GlowAnimation",
+    "PageSlideAnimation",
     "PulseAnimation",
     "RotateAnimation",
     "ScaleAnimation",
     "ShakeAnimation",
+    "SkeletonAnimation",
     "SlideAnimation",
     "SlideDirection",
     "TypewriterAnimation",

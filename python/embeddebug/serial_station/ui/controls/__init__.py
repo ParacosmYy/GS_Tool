@@ -16,13 +16,18 @@ from embeddebug.serial_station.ui.controls.segmented import SegmentedControl
 from embeddebug.serial_station.ui.controls.rich_tooltip import RichTooltip, install_tooltip, uninstall_tooltip
 from embeddebug.serial_station.ui.controls.info_banner import BannerKind, InfoBanner
 from embeddebug.serial_station.ui.controls.progress_ring import ProgressRing
+from embeddebug.serial_station.ui.controls.badge import Badge, BadgeKind
+from embeddebug.serial_station.ui.controls.drawer import Drawer
 
 __all__ = [
+    "Badge",
+    "BadgeKind",
     "BannerKind",
     "Chip",
     "CommandSlider",
     "ConfigurableButton",
     "DotState",
+    "Drawer",
     "GaugeWidget",
     "InfoBanner",
     "LedState",
