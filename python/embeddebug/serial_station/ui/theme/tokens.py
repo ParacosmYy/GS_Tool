@@ -24,6 +24,14 @@ SPACING_LG = "12px"
 SPACING_XL = "16px"
 SPACING_2XL = "24px"
 
+# ── 整数间距（Python setContentsMargins/setSpacing 用，不用于 QSS） ──
+SPACING_INT_XS = 4
+SPACING_INT_SM = 6
+SPACING_INT_MD = 8
+SPACING_INT_LG = 12
+SPACING_INT_XL = 16
+SPACING_INT_2XL = 24
+
 # ── 内边距 ─────────────────────────────────────────────────────────
 PADDING_SM = "4px 8px"     # 紧凑按钮
 PADDING_MD = "6px 12px"    # 普通按钮
