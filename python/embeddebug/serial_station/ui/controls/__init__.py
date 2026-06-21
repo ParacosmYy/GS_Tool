@@ -11,6 +11,7 @@ from embeddebug.serial_station.ui.controls.slider import CommandSlider
 from embeddebug.serial_station.ui.controls.status_dot import DotState, StatusDot
 from embeddebug.serial_station.ui.controls.value_display import ValueDisplay
 from embeddebug.serial_station.ui.controls.configurable_button import ConfigurableButton
+from embeddebug.serial_station.ui.controls.divider import Divider
 from embeddebug.serial_station.ui.controls.chip import Chip
 from embeddebug.serial_station.ui.controls.segmented import SegmentedControl
 from embeddebug.serial_station.ui.controls.rich_tooltip import RichTooltip, install_tooltip, uninstall_tooltip
@@ -29,6 +30,7 @@ __all__ = [
     "Chip",
     "CommandSlider",
     "ConfigurableButton",
+    "Divider",
     "DotState",
     "Drawer",
     "GaugeWidget",
