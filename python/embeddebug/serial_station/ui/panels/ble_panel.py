@@ -57,6 +57,7 @@ class BlePanel:
         self._device_combo.setObjectName("serialStationBleDeviceCombo")
         scan_btn = QPushButton(widget.tr("扫描"), widget)
         scan_btn.setObjectName("serialStationBleScanButton")
+        self._scan_btn = scan_btn
         scan_btn.clicked.connect(self._scan)
         self._connect_btn = QPushButton(widget.tr("连接"), widget)
         self._connect_btn.setObjectName("serialStationBleConnectButton")
@@ -156,11 +157,19 @@ class BlePanel:
 
     # ── 交互 ────────────────────────────────────────────────────────
     def _scan(self) -> None:
+        btn = self._scan_btn
+        btn._orig_text = btn.text()
+        btn.setEnabled(False)
+        btn.setText(self._widget.tr("…"))
+        from PyQt6.QtWidgets import QApplication
+        QApplication.processEvents()
         self._transport = BleTransportStub()
         device = self._transport.device
         self._device_combo.clear()
         self._device_combo.addItem(f"{device.name} ({device.address})")
         self._log.appendPlainText(self._widget.tr("扫描到 {n} 个设备").format(n=1))
+        btn.setEnabled(True)
+        btn.setText(btn._orig_text)
 
     def _connect(self, checked: bool) -> None:
         from embeddebug.serial_station.ui.panels._notify import panel_notify
