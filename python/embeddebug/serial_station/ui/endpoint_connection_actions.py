@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from embeddebug.serial_station.ui.connection_actions import _set_loading
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
 from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
 
@@ -21,7 +22,9 @@ def connect_tcp(host: EndpointConnectionActionHost) -> None:
     if endpoint is None:
         return
     tcp_host, port = endpoint
+    _set_loading(getattr(host, '_connect_tcp_button', None), True)
     result = host._controller.connect_tcp_result(tcp_host, port)
+    _set_loading(getattr(host, '_connect_tcp_button', None), False)
     if result.ok:
         set_result_status(
             host,
@@ -45,7 +48,9 @@ def connect_udp(host: EndpointConnectionActionHost) -> None:
     if endpoint is None:
         return
     udp_host, port = endpoint
+    _set_loading(getattr(host, '_connect_udp_button', None), True)
     result = host._controller.connect_udp_result(udp_host, port)
+    _set_loading(getattr(host, '_connect_udp_button', None), False)
     if result.ok:
         local_port = host._controller.active_local_port or 0
         set_result_status(
