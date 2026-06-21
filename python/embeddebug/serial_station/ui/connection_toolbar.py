@@ -62,7 +62,17 @@ def build_connection_toolbar(
     owner._refresh_ports_button = QPushButton(owner.tr("Refresh Ports"), root)
     owner._refresh_ports_button.setObjectName("serialStationRefreshPortsButton")
     owner._refresh_ports_button.setToolTip(owner.tr("Refresh available serial ports (Ctrl+R)"))
-    owner._refresh_ports_button.clicked.connect(owner._refresh_serial_ports)
+    def _refresh_with_loading(_checked: bool = False) -> None:
+        btn = owner._refresh_ports_button
+        btn._orig_text = btn.text()
+        btn.setEnabled(False)
+        btn.setText(owner.tr("…"))
+        from PyQt6.QtWidgets import QApplication
+        QApplication.processEvents()
+        owner._refresh_serial_ports()
+        btn.setEnabled(True)
+        btn.setText(btn._orig_text)
+    owner._refresh_ports_button.clicked.connect(_refresh_with_loading)
     _install_rich_tooltips(owner)
 
     owner._baud_combo = _serial_config_combo(root, "serialStationBaudCombo", owner.tr("Select baud rate"), "baud")
