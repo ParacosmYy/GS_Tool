@@ -73,11 +73,11 @@ def test_install_ripple_on_plain_button(qtbot):
 
 
 def test_configurable_button_set_ripple(qtbot):
-    """ConfigurableButton.set_ripple(True) 应注入 ripple（默认关闭）。"""
+    """ConfigurableButton.set_ripple(False) 可关闭 ripple（Batch 46: 默认开启）。"""
 
     btn = ConfigurableButton("Send")
     qtbot.addWidget(btn)
-    assert btn._ripple_enabled is False
+    assert btn._ripple_enabled is True  # Batch 46: 默认改为 True（Material MD3 基线）
     btn.set_ripple(True)
     assert btn._ripple_enabled is True
 
