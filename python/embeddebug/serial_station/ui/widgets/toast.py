@@ -38,6 +38,7 @@ from embeddebug.serial_station.ui.animations.fade import FadeTransition
 from embeddebug.serial_station.ui.animations.slide import SlideAnimation, SlideDirection
 from embeddebug.serial_station.ui.icons import button_icon
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.theme import tokens as T
 
 
 # 级别 → 色条/强调色（取 palette 状态色，无硬编码）。
@@ -113,8 +114,8 @@ class ToastWidget(QFrame):
         # 内容区：级别符号 + 标题/描述 + 关闭按钮。
         body = QWidget(self)
         body_layout = QHBoxLayout(body)
-        body_layout.setContentsMargins(12, 10, 10, 10)
-        body_layout.setSpacing(10)
+        body_layout.setContentsMargins(T.SPACING_INT_LG, T.SPACING_INT_MD, T.SPACING_INT_MD, T.SPACING_INT_MD)
+        body_layout.setSpacing(T.SPACING_INT_LG)
 
         glyph = QLabel(body)
         glyph.setObjectName("serialStationToastGlyph")
