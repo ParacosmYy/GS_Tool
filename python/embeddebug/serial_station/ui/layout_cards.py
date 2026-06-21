@@ -19,6 +19,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLayout, QVBoxLayout, QWidget
 
 from embeddebug.serial_station.ui.icons import button_icon
+from embeddebug.serial_station.ui.theme import tokens as T
 
 _CARD_OBJECT_NAME = "serialStationCard"
 _CARD_TITLE_OBJECT_NAME = "serialStationCardTitle"
@@ -36,15 +37,15 @@ def build_card(
     card = QFrame(parent)
     card.setObjectName(_CARD_OBJECT_NAME)
     card_layout = QVBoxLayout(card)
-    card_layout.setContentsMargins(12, 12, 12, 12)
-    card_layout.setSpacing(8)
+    card_layout.setContentsMargins(T.SPACING_INT_LG, T.SPACING_INT_LG, T.SPACING_INT_LG, T.SPACING_INT_LG)
+    card_layout.setSpacing(T.SPACING_INT_MD)
 
     if title is not None:
         header = _build_header(card, title, icon_name)
         card_layout.addWidget(header)
 
     body = QVBoxLayout()
-    body.setSpacing(8)
+    body.setSpacing(T.SPACING_INT_MD)
     body.setObjectName(_CARD_BODY_OBJECT_NAME)
     card_layout.addLayout(body, 1)
     return card, body
@@ -83,7 +84,7 @@ def _build_header(card: QFrame, title: str, icon_name: str | None) -> QWidget:
     header.setObjectName(_CARD_HEADER_OBJECT_NAME)
     row = QHBoxLayout(header)
     row.setContentsMargins(0, 0, 0, 0)
-    row.setSpacing(6)
+    row.setSpacing(T.SPACING_INT_SM)
 
     if icon_name is not None:
         icon_label = QLabel(header)

@@ -11,6 +11,7 @@ from embeddebug.serial_station.controllers import SerialWorkbenchController
 from embeddebug.serial_station.ui import command_section
 from embeddebug.serial_station.ui import layout_cards
 from embeddebug.serial_station.ui import layout_main
+from embeddebug.serial_station.ui.theme import tokens as T
 from embeddebug.serial_station.ui.connection_toolbar import build_connection_toolbar
 from embeddebug.serial_station.ui.log_filter_options import (
     default_log_filter_text,
@@ -47,8 +48,8 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     root.setObjectName("serialStationPyRoot")
 
     layout = QVBoxLayout(root)
-    layout.setContentsMargins(12, 12, 12, 12)
-    layout.setSpacing(10)
+    layout.setContentsMargins(T.SPACING_INT_LG, T.SPACING_INT_LG, T.SPACING_INT_LG, T.SPACING_INT_LG)
+    layout.setSpacing(T.SPACING_INT_LG)
 
     owner._status_label = QLabel(owner.tr("Disconnected"), root)
     owner._status_label.setObjectName("serialStationStatusLabel")
@@ -101,7 +102,7 @@ def _populate_center_log_card(owner: SerialStationSectionsHost) -> None:
 
 def build_inject_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:
     row = QHBoxLayout()
-    row.setSpacing(8)
+    row.setSpacing(T.SPACING_INT_MD)
     owner._inject_edit = QLineEdit(root)
     owner._inject_edit.setObjectName("serialStationInjectEdit")
     owner._inject_edit.setPlaceholderText(owner.tr("Fake received text"))
@@ -128,12 +129,12 @@ def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QVBoxLayou
     """
 
     col = QVBoxLayout()
-    col.setSpacing(6)
+    col.setSpacing(T.SPACING_INT_SM)
     col.setContentsMargins(0, 0, 0, 0)
 
     # 第 1 行：过滤 + 搜索。
     row1 = QHBoxLayout()
-    row1.setSpacing(6)
+    row1.setSpacing(T.SPACING_INT_SM)
     owner._log_filter_combo = QComboBox(root)
     owner._log_filter_combo.setObjectName("serialStationLogFilterCombo")
     owner._log_filter_combo.setToolTip(owner.tr("Filter visible log entries"))
@@ -157,7 +158,7 @@ def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QVBoxLayou
 
     # 第 3 行：统计 + Save/Replay 按钮。
     row3 = QHBoxLayout()
-    row3.setSpacing(6)
+    row3.setSpacing(T.SPACING_INT_SM)
     owner._log_stats_label = QLabel(owner.tr("0 entries"), root)
     owner._log_stats_label.setObjectName("serialStationLogStatsLabel")
     owner._log_stats_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -178,7 +179,7 @@ def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QVBoxLayou
 
 def build_profile_row(owner: SerialStationSectionsHost, root: QWidget) -> QHBoxLayout:
     row = QHBoxLayout()
-    row.setSpacing(8)
+    row.setSpacing(T.SPACING_INT_MD)
     owner._profile_path_edit = QLineEdit(root)
     owner._profile_path_edit.setObjectName("serialStationProfilePathEdit")
     owner._profile_path_edit.setPlaceholderText(owner.tr("Profile JSON path"))

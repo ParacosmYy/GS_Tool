@@ -21,6 +21,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QLayout, QWidget
 
 from embeddebug.serial_station.ui.icons import button_icon
+from embeddebug.serial_station.ui.theme import tokens as T
 from embeddebug.serial_station.ui.theme import palette as P
 
 
@@ -41,8 +42,8 @@ def build_top_bar(owner: TopBarHost, root: QWidget) -> QFrame:
     bar.setObjectName("serialStationTopBar")
 
     row = QHBoxLayout(bar)
-    row.setContentsMargins(14, 10, 14, 10)
-    row.setSpacing(12)
+    row.setContentsMargins(T.SPACING_INT_XL, T.SPACING_INT_MD, T.SPACING_INT_XL, T.SPACING_INT_MD)
+    row.setSpacing(T.SPACING_INT_LG)
 
     brand = _build_brand_chip(owner, bar)
     row.addWidget(brand)
@@ -59,8 +60,8 @@ def _build_brand_chip(owner: TopBarHost, parent: QWidget) -> QFrame:
     chip = QFrame(parent)
     chip.setObjectName("serialStationBrandChip")
     chip_layout = QHBoxLayout(chip)
-    chip_layout.setContentsMargins(8, 6, 12, 6)
-    chip_layout.setSpacing(8)
+    chip_layout.setContentsMargins(T.SPACING_INT_MD, T.SPACING_INT_SM, T.SPACING_INT_LG, T.SPACING_INT_SM)
+    chip_layout.setSpacing(T.SPACING_INT_MD)
 
     icon_label = QLabel(chip)
     icon_label.setObjectName("serialStationBrandIcon")
@@ -80,7 +81,7 @@ def _build_brand_text(owner: TopBarHost, parent: QWidget) -> QWidget:
     box = QWidget(parent)
     box_layout = QHBoxLayout(box)
     box_layout.setContentsMargins(0, 0, 0, 0)
-    box_layout.setSpacing(8)
+    box_layout.setSpacing(T.SPACING_INT_MD)
 
     name = QLabel(owner.tr("EmbedDebug"), box)
     name.setObjectName("serialStationBrandName")
