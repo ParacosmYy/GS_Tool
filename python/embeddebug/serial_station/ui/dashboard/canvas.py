@@ -206,3 +206,16 @@ class DashboardCanvas(QFrame):
         for y in range(GRID_SIZE, h, GRID_SIZE):
             for x in range(GRID_SIZE, w, GRID_SIZE):
                 painter.drawPoint(x, y)
+        # Batch 47: 空画布提示（UI 审计 #2 — 画布为空时给拖拽指引）。
+        if not self._items:
+            hint_color = QColor(P.TEXT_MUTED)
+            hint_color.setAlpha(120)
+            painter.setPen(hint_color)
+            font = painter.font()
+            font.setPointSize(12)
+            painter.setFont(font)
+            painter.drawText(
+                self.rect(),
+                int(Qt.AlignmentFlag.AlignCenter),
+                self.tr("从右侧控件库拖入 LED / 滑块 / 仪表到画布"),
+            )
