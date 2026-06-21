@@ -23,3 +23,12 @@ def set_connection_control_state(
     host._connect_tcp_button.setEnabled(not connected)
     host._connect_udp_button.setEnabled(not connected)
     host._disconnect_button.setEnabled(connected)
+    # Batch 46 P0-2: 连接成功时对断开按钮做 pop 动画（视觉反馈，
+    # 激活 ScaleAnimation.pop，对标 VOFA+ 连接按钮状态变化反馈）。
+    if connected:
+        try:
+            from embeddebug.serial_station.ui.animations.scale import ScaleAnimation
+
+            ScaleAnimation.pop(host._disconnect_button).start()
+        except Exception:
+            pass  # 动画是锦上添花，失败不阻塞连接逻辑。
