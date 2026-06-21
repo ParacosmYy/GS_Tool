@@ -181,15 +181,7 @@ class AppShell(QMainWindow):
             self._stack.addWidget(widget)
 
     def _switch_to(self, index: int) -> None:
-        """切换到第 index 页，触发 on_leave/on_enter 生命周期 + 离场/入场动画。
-
-        改进点（对比旧实现）：
-        - 旧版直接 ``setCurrentIndex`` 替换，老页面瞬切消失，新页面淡入。
-          视觉上是「闪切 + 淡入」，违反铁律 18（禁止突然出现/消失）。
-        - 新版对老页面先做快速淡出（``DURATION_FAST``），再切 index 并对新页面
-          做 ``card_enter``（淡入 + 上滑）。两端都有过渡，切换更自然。
-        - 连续快速切换时停止进行中的动画，避免叠加错位。
-        """
+        """切换到第 index 页。离场淡出（160ms）→ 切 index → 入场淡入+上滑（240ms）。"""
 
         registrations = registered_panels()
         if not (0 <= index < len(registrations)):
@@ -216,9 +208,7 @@ class AppShell(QMainWindow):
         self._nav_buttons[registrations[index].mode_id].setChecked(True)
 
         # Batch 46: 延迟 setCurrentIndex 让离场淡出可见（160ms = DURATION_FAST）。
-        # 此前 setCurrentIndex 同步执行，老页面立即被 QStackedWidget 隐藏，
-        # fade_out 动画在不可见控件上运行，视觉上等于「闪切 + 入场淡入」，
-        # 违反铁律 18「禁止突然消失」。现在等 fade_out 完成再切 index。
+        # 此前同步 setCurrentIndex 立即隐藏老页面，fade_out 在不可见控件上运行。
         self._switch_index = index
         if self._switch_timer is not None:
             self._switch_timer.stop()
@@ -228,7 +218,7 @@ class AppShell(QMainWindow):
         self._switch_timer.start(160)
 
     def _complete_switch(self) -> None:
-        """延迟切换回调：离场淡出完成后执行 setCurrentIndex + 入场动画。"""
+        """离场淡出完成后执行 setCurrentIndex + 入场动画。"""
 
         self._switch_timer = None
         index = self._switch_index
@@ -275,12 +265,7 @@ class AppShell(QMainWindow):
             pass  # 动画是锦上添花，失败不阻塞切换。
 
     def _animate_page_leave(self, page: QWidget) -> None:
-        """页面离场快速淡出（Batch 23：激活 panel_animations.fade_out 死代码）。
-
-        fade_out 完成后会 hide() 离场页面（QStackedWidget 切 index 后该页本就不可见，
-        hide 无副作用）。动画引用存 ``_leave_anims`` 防 GC，连续切换时由
-        ``_stop_page_anims`` 停止。
-        """
+        """页面离场快速淡出（Batch 23：激活 fade_out 死代码）。"""
 
         if page is None:
             return
