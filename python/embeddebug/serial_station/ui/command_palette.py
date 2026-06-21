@@ -99,7 +99,7 @@ class CommandPalette(QWidget):
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setContentsMargins(T.SPACING_INT_2XL, T.SPACING_INT_2XL, T.SPACING_INT_2XL, T.SPACING_INT_2XL)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         card = QFrame(self)

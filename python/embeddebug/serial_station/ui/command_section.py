@@ -15,7 +15,7 @@ class CommandSectionHost(Protocol):
 
 def build_send_row(owner: CommandSectionHost, root: QWidget) -> QHBoxLayout:
     row = QHBoxLayout()
-    row.setSpacing(8)
+    row.setSpacing(T.SPACING_INT_MD)
     owner._send_edit = QLineEdit(root)
     owner._send_edit.setObjectName("serialStationSendEdit")
     owner._send_edit.setPlaceholderText(owner.tr("Command text"))
@@ -33,6 +33,7 @@ def build_send_row(owner: CommandSectionHost, root: QWidget) -> QHBoxLayout:
     # Batch 15: Send 按钮接入 scale 弹性反馈（按下陷下、松手回弹）。
     try:
         from embeddebug.serial_station.ui.micro_interactions import install_scale_press
+from embeddebug.serial_station.ui.theme import tokens as T
 
         install_scale_press(owner._send_button)
     except Exception:
