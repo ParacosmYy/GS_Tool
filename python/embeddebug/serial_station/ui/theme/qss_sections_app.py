@@ -122,6 +122,15 @@ QPushButton#serialStationOtaBrowseButton:hover {{
     background-color: {P.BG_PANEL_RAISED};
     border-color: {P.ACCENT_BORDER};
 }}
+QPushButton#serialStationOtaBrowseButton:pressed {{
+    background-color: {P.BG_SELECTION};
+    border-color: {P.ACCENT_PRESSED};
+}}
+QPushButton#serialStationOtaBrowseButton:disabled {{
+    background-color: {P.BG_DISABLED};
+    color: {P.TEXT_DISABLED};
+    border-color: {P.BORDER};
+}}
 QPushButton#serialStationOtaStartButton {{
     background-color: {P.ACCENT};
     color: {P.TEXT_ON_ACCENT};
@@ -132,6 +141,9 @@ QPushButton#serialStationOtaStartButton {{
 }}
 QPushButton#serialStationOtaStartButton:hover {{
     background-color: {P.ACCENT_HOVER};
+}}
+QPushButton#serialStationOtaStartButton:pressed {{
+    background-color: {P.ACCENT_PRESSED};
 }}
 QPushButton#serialStationOtaStartButton:disabled {{
     background-color: {P.BG_DISABLED};
