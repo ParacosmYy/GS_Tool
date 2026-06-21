@@ -23,6 +23,7 @@ from PyQt6.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 from embeddebug.serial_station.ui.animations.collapse import CollapseAnimation
 from embeddebug.serial_station.ui.icons import button_icon
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.theme import tokens as T
 
 _CARD = "serialStationCollapsibleCard"
 _HEADER = "serialStationCollapsibleHeader"
@@ -41,8 +42,8 @@ class CollapsibleCard(QFrame):
         self._collapse_anim = None  # 进行中的折叠/展开动画引用
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(8, 6, 8, 6)
-        layout.setSpacing(4)
+        layout.setContentsMargins(T.SPACING_INT_MD, T.SPACING_INT_SM, T.SPACING_INT_MD, T.SPACING_INT_SM)
+        layout.setSpacing(T.SPACING_INT_XS)
 
         self._header = self._build_header(title)
         self._header.installEventFilter(self)
@@ -51,8 +52,8 @@ class CollapsibleCard(QFrame):
         self._body_widget = QWidget(self)
         self._body_widget.setObjectName(_BODY)
         self._body_layout = QVBoxLayout(self._body_widget)
-        self._body_layout.setContentsMargins(0, 4, 0, 0)
-        self._body_layout.setSpacing(6)
+        self._body_layout.setContentsMargins(0, T.SPACING_INT_XS, 0, 0)
+        self._body_layout.setSpacing(T.SPACING_INT_SM)
         layout.addWidget(self._body_widget)
 
         self._apply_expanded_state()
@@ -90,7 +91,7 @@ class CollapsibleCard(QFrame):
         header.setCursor(Qt.CursorShape.PointingHandCursor)
         row = QHBoxLayout(header)
         row.setContentsMargins(0, 0, 0, 0)
-        row.setSpacing(6)
+        row.setSpacing(T.SPACING_INT_SM)
 
         self._arrow = QLabel(header)
         self._arrow.setObjectName(_ARROW)
