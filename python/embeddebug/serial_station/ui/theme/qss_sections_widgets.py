@@ -61,6 +61,10 @@ QPushButton:disabled {{
     color: {P.TEXT_DISABLED};
     border-color: {P.BORDER};
 }}
+QPushButton:focus {{
+    border: {T.BORDER_THIN} solid {P.ACCENT_BORDER};
+    outline: none;
+}}
 /* 连接类主按钮 — 强调青→蓝品牌渐变（跨色相，打破单一色相单调） */
 {connect_sel} {{
     background-color: {P.ACCENT_GRADIENT};

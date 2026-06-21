@@ -151,8 +151,15 @@ QComboBox::drop-down {{
     width: 22px;
 }}
 QComboBox::down-arrow {{
-    width: 10px;
-    height: 10px;
+    image: none;
+    /* CSS border-triangle：纯样式，不依赖文件路径，PyInstaller onedir 也兼容。
+       替代 Qt 默认三角，与 lucide 图标系统视觉一致。 */
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid {P.TEXT_MUTED};
+    width: 0;
+    height: 0;
+    margin: 3px 4px;
 }}
 QComboBox QAbstractItemView {{
     background-color: {P.BG_PANEL};
