@@ -219,7 +219,7 @@ class TimestampConverterPanel(QWidget):
         font = QFont()
         font.setFamilies(["JetBrains Mono", "Cascadia Code", "Consolas", "monospace"])
         font.setStyleHint(QFont.StyleHint.Monospace)
-        font.setPointSize(10)
+        font.setPointSize(T.FONT_POINT_DESC)
         return font
 
     # ── 重算 / Now / Copy ────────────────────────────────────────
