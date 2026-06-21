@@ -251,4 +251,8 @@ QWidget#serialStationByteFreqCanvas {{
 /* Batch 47: StatusBar 组件。自绘背景，QSS 仅契约占位。 */
 QWidget#serialStationStatusBar {{
     background-color: transparent;
+}}
+/* Batch 47: KeyboardShortcut 徽章。自带样式，QSS 仅契约占位。 */
+QLabel#serialStationKeyHint {{
+    background-color: transparent;
 }}"""
