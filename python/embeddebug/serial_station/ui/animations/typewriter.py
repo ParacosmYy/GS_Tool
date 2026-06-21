@@ -122,12 +122,17 @@ class TypewriterAnimation:
         anim = TypewriterAnimation.run(text, cps=cps)
 
         def _on_value(value: int) -> None:
-            # value 是 QVariantAnimation 当前 int 进度（0 → len(text)）。
-            label.setText(text[:value])
+            # Batch 48 fix: 防 QLabel 被 Qt 销毁后回调触发 RuntimeError。
+            try:
+                label.setText(text[:value])
+            except RuntimeError:
+                anim.stop()
 
         def _on_finished() -> None:
-            # 兜底：动画完成（含提前 stop 触发的 finished）时确保完整文本。
-            label.setText(text)
+            try:
+                label.setText(text)
+            except RuntimeError:
+                pass
 
         anim.valueChanged.connect(_on_value)
         anim.finished.connect(_on_finished)
