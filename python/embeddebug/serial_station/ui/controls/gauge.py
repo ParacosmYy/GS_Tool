@@ -21,6 +21,7 @@ from PyQt6.QtWidgets import QWidget
 
 from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.theme import tokens as T
 
 
 class GaugeWidget(QWidget):
@@ -146,7 +147,7 @@ class GaugeWidget(QWidget):
         painter.drawEllipse(QRectF(cx - 4, cy - 4, 8, 8))
         # 数值文本（显示 displayed 值，与指针同步跳动）。
         font = QFont()
-        font.setPointSize(14)
+        font.setPointSize(T.FONT_POINT_HEADING)
         font.setBold(True)
         painter.setFont(font)
         painter.setPen(QColor(P.TEXT_PRIMARY))
@@ -158,7 +159,7 @@ class GaugeWidget(QWidget):
         )
         # 标签。
         if self._label:
-            font.setPointSize(8)
+            font.setPointSize(T.FONT_POINT_TINY)
             font.setBold(False)
             painter.setFont(font)
             painter.setPen(QColor(P.TEXT_MUTED))

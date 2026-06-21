@@ -21,6 +21,7 @@ from PyQt6.QtGui import QColor, QPainter, QRadialGradient
 from PyQt6.QtWidgets import QWidget
 
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.theme import tokens as T
 
 # 会触发常亮呼吸的状态（连接/活动指示灯应「活」着）。
 _BREATHING_STATES = frozenset()
@@ -183,7 +184,7 @@ class StatusLed(QWidget):
         if self._label:
             painter.setPen(QColor(P.TEXT_SECONDARY))
             font = painter.font()
-            font.setPointSize(8)
+            font.setPointSize(T.FONT_POINT_TINY)
             painter.setFont(font)
             painter.drawText(rect, Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter, self._label)
 

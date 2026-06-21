@@ -58,6 +58,10 @@ FONT_FAMILY_MONO = '"JetBrains Mono", "Cascadia Code", Consolas, monospace'
 FONT_POINT_ICON = 40    # EmptyStateWidget 图标 emoji
 FONT_POINT_TITLE = 13   # EmptyStateWidget 标题
 FONT_POINT_DESC = 10    # EmptyStateWidget 描述
+FONT_POINT_LARGE = 20   # value_display 大数字
+FONT_POINT_HEADING = 14 # gauge 标签
+FONT_POINT_BODY = 12    # value_display 趋势
+FONT_POINT_TINY = 8     # led/gauge 副文本
 
 # ── 控件高度 ───────────────────────────────────────────────────────
 CONTROL_HEIGHT_SM = "24px"
