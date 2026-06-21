@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from PyQt6.QtWidgets import QApplication, QPushButton
+
 from embeddebug.serial_station.ui.connection_control_state import set_connection_control_state
 from embeddebug.serial_station.ui.serial_connection_fields import read_serial_connection_fields
 from embeddebug.serial_station.ui.serial_port_options import (
@@ -11,6 +13,22 @@ from embeddebug.serial_station.ui.serial_port_options import (
     populate_serial_port_options,
 )
 from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
+
+
+def _set_loading(button: QPushButton | None, loading: bool) -> None:
+    """Batch 47: 按钮加载态切换（连接中反馈）。None 时安全跳过。"""
+    if button is None:
+        return
+    if loading:
+        button._loading_orig_text = button.text()
+        button.setEnabled(False)
+        button.setText("…")
+        QApplication.processEvents()
+    else:
+        button.setEnabled(True)
+        orig = getattr(button, "_loading_orig_text", None)
+        if orig:
+            button.setText(orig)
 
 
 class ConnectionActionHost(Protocol):
@@ -24,7 +42,9 @@ class ConnectionActionHost(Protocol):
 
 
 def connect_fake(host: ConnectionActionHost) -> None:
+    _set_loading(getattr(host, '_connect_button', None), True)
     result = host._controller.connect_fake_result()
+    _set_loading(getattr(host, '_connect_button', None), False)
     if result.ok:
         set_result_status(
             host,
@@ -47,6 +67,7 @@ def connect_serial(host: ConnectionActionHost) -> None:
         _shake_widget(host._port_combo)
         _notify(host, "warning", host.tr("请选择端口"), host.tr("串口端口为空，无法连接"))
         return
+    _set_loading(getattr(host, '_connect_serial_button', None), True)
     result = host._controller.connect_serial_result(
         fields.port_name,
         fields.baud_rate,
@@ -55,6 +76,7 @@ def connect_serial(host: ConnectionActionHost) -> None:
         stop_bits=fields.stop_bits,
         flow_control=fields.flow_control,
     )
+    _set_loading(getattr(host, '_connect_serial_button', None), False)
     if result.ok:
         set_result_status(
             host,
