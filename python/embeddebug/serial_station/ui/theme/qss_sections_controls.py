@@ -255,4 +255,8 @@ QWidget#serialStationStatusBar {{
 /* Batch 47: KeyboardShortcut 徽章。自带样式，QSS 仅契约占位。 */
 QLabel#serialStationKeyHint {{
     background-color: transparent;
+}}
+/* Batch 48: ToggleSwitch。自绘，QSS 仅契约占位。 */
+QWidget#serialStationToggleSwitch {{
+    background-color: transparent;
 }}"""
