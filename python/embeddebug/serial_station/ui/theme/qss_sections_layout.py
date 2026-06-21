@@ -1,4 +1,4 @@
-"""QSS 分区生成器 — 三栏 Shell 布局与玻璃卡片。
+﻿"""QSS 分区生成器 — 三栏 Shell 布局与玻璃卡片。
 
 把卡片（``serialStationCard``）、三栏 zone 容器、QSplitter 把手与 TopBar
 的样式集中在本模块，便于按 EK-OmniProbe ``surface-card`` 玻璃卡片语言统一深化，
@@ -58,7 +58,7 @@ QLabel#serialStationCardTitle {{
     color: {P.TEXT_PRIMARY};
     font-size: {T.FONT_MD};
     font-weight: 600;
-    letter-spacing: 0.2px;
+    letter-spacing: {T.LETTER_SPACING_SUBTLE};
 }}
 QLabel#serialStationCardIcon {{
     background-color: transparent;
@@ -75,7 +75,7 @@ QLabel#serialStationCardGroupLabel {{
     color: {P.TEXT_MUTED};
     font-size: {T.FONT_XS};
     font-weight: 600;
-    letter-spacing: 0.6px;
+    letter-spacing: {T.LETTER_SPACING_UPPERCASE};
     text-transform: uppercase;
     padding-top: {T.SPACING_SM};
     padding-bottom: {T.SPACING_XS};
@@ -154,7 +154,7 @@ QLabel#serialStationBrandName {{
     color: {P.TEXT_PRIMARY};
     font-size: {T.FONT_MD};
     font-weight: 600;
-    letter-spacing: 0.3px;
+    letter-spacing: {T.LETTER_SPACING_BRAND};
 }}
 QLabel#serialStationBrandTagline {{
     background-color: transparent;
@@ -190,7 +190,7 @@ QLabel#serialStationCollapsibleTitle {{
     color: {P.TEXT_SECONDARY};
     font-size: {T.FONT_XS};
     font-weight: 600;
-    letter-spacing: 0.4px;
+    letter-spacing: {T.LETTER_SPACING_WIDE};
     text-transform: uppercase;
 }}
 QWidget#serialStationCollapsibleBody {{

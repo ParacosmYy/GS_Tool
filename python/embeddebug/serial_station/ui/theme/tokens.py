@@ -63,6 +63,12 @@ FONT_POINT_HEADING = 14 # gauge 标签
 FONT_POINT_BODY = 12    # value_display 趋势
 FONT_POINT_TINY = 8     # led/gauge 副文本
 
+# ── 字间距（QSS letter-spacing 用） ──
+LETTER_SPACING_SUBTLE = "0.2px"      # 卡片标题
+LETTER_SPACING_BRAND = "0.3px"       # 品牌名
+LETTER_SPACING_WIDE = "0.4px"        # 折叠面板标题
+LETTER_SPACING_UPPERCASE = "0.6px"   # 大写分组标签
+
 # ── 控件高度 ───────────────────────────────────────────────────────
 CONTROL_HEIGHT_SM = "24px"
 CONTROL_HEIGHT_MD = "28px"
