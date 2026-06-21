@@ -77,6 +77,12 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     )
     layout.addWidget(splitter, 1)
 
+    # Batch 47: StatusBar 多段状态栏（对标 MobaXterm）。
+    from embeddebug.serial_station.ui.controls.status_bar import StatusBar
+    owner._status_bar = StatusBar(root)
+    owner._status_bar.set_section("connection", owner.tr("Disconnected"))
+    layout.addWidget(owner._status_bar)
+
     # 中区日志卡由 layout_main 创建；log_view 注入到其主体。
     _populate_center_log_card(owner)
 
