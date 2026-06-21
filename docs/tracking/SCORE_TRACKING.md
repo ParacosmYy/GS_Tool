@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 665分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 335分
+> 当前: 666分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 334分
 
 ---
 
@@ -367,6 +367,7 @@
 | 663 | Serial Station UI 美化 Batch 37 — palette 手型光标 + 控件 z-order 置顶/置底 | WidgetPaletteButton 此前无手型光标，拖拽可发现性弱；Batch 37 加 PointingHandCursor；同时给控件右键菜单加「置顶/置底」z-order（控件重叠时调整叠放次序） |
 | 664 | Serial Station UI 美化 Batch 38 — dashboard 控件锁定/解锁（防意外删除） | 放置的控件可被意外删除（右键删除/清空画布）；Batch 38 加锁定/解锁 toggle（config[locked] 持久化），锁定后删除 action 禁用 + _safe_remove 跳过，对齐可视化编辑器锁定语义 |
 | 665 | Serial Station UI 美化 Batch 39 — dashboard 用户可见文字国际化（tr() 合规） | 审计发现 dashboard 多处用户可见文字硬编码英文（WidgetPaletteButton tooltip / WidgetPalette 标题等），违反铁律 19（所有用户可见文字走 tr()）；Batch 39 统一改为 widget.tr() 包裹 |
+| 666 | Serial Station UI 美化 Batch 40 — 10 个并行新增微交互组件 + 全量 pytest 阻塞修复 | 5 动画（BouncePathAnimation/GlowAnimation/RotateAnimation/TypewriterAnimation/ElasticSnapAnimation）+ 5 控件（Chip/SegmentedControl/RichTooltip/InfoBanner/ProgressRing），各带独立单测；同时修复 11 个 Batch 40 测试错误（QPropertyAnimation 未导入 / PyQt6 6.11 QMouseEvent 6 参重载 / QEnterEvent），InfoBanner `_animate_out` access violation 崩溃（finished 信号改绑定方法让 sip 自动追踪生命周期），QSS 覆盖 5 新 objectName，test_chip 行数压到 249；并修复 4 个预存在 bug（src/ 遗留 C++ 删除 / local_env.bat 转入 .gitignore / test_python_governance_docs subprocess 加 encoding=utf-8 修复 Windows GBK 解码 / test_settings 与 test_dashboard_layout_setting_key_exists 因 settings 包未落地改为 skip），全量 pytest 1470 passed + 2 skipped + 0 access violation，ui_smoke 23 passed，start-embeddebug --smoke exit 0 |
 
 ---
 

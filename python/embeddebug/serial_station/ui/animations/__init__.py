@@ -21,16 +21,26 @@ from embeddebug.serial_station.ui.animations.fade import FadeTransition
 from embeddebug.serial_station.ui.animations.shake import ShakeAnimation
 from embeddebug.serial_station.ui.animations.pulse import PulseAnimation
 from embeddebug.serial_station.ui.animations.controller import AnimationController
+from embeddebug.serial_station.ui.animations.bounce_path import BouncePathAnimation
+from embeddebug.serial_station.ui.animations.glow import GlowAnimation
+from embeddebug.serial_station.ui.animations.rotate import RotateAnimation
+from embeddebug.serial_station.ui.animations.typewriter import TypewriterAnimation
+from embeddebug.serial_station.ui.animations.elastic_snap import ElasticSnapAnimation
 
 __all__ = [
     "AnimationController",
     "AnimationTokens",
+    "BouncePathAnimation",
     "CollapseAnimation",
     "CollapsiblePanel",
+    "ElasticSnapAnimation",
     "FadeTransition",
+    "GlowAnimation",
     "PulseAnimation",
+    "RotateAnimation",
     "ScaleAnimation",
     "ShakeAnimation",
     "SlideAnimation",
     "SlideDirection",
+    "TypewriterAnimation",
 ]

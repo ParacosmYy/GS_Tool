@@ -177,4 +177,14 @@ QPushButton#serialStationDashboardGridButton:hover {{
 QLabel#serialStationDashboardStatusLabel {{
     color: {P.TEXT_SECONDARY};
     font-size: {T.FONT_SM};
+}}
+/* Batch 40: 新增微交互控件。控件均自绘主体（paintEvent），QSS 仅契约占位
+   「background-color: transparent」，避免 QWidget 默认底破坏色相；具体配色
+   由 palette + paintEvent 完成，集中管理（05-ui-standard §颜色集中管理）。 */
+QWidget#serialStationChip,
+QWidget#serialStationSegmentedControl,
+QWidget#serialStationInfoBanner,
+QWidget#serialStationProgressRing,
+QWidget#serialStationRichTooltip {{
+    background-color: transparent;
 }}"""

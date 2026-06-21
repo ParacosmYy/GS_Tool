@@ -70,3 +70,11 @@ htmlcov/
 *.toc
 *.pkg
 *.manifest
+nul
+
+# 本地环境自动生成的启动脚本（tools/launch_embeddebug.ps1 产物）
+# 不应提交；提交面只保留 EmbedDebug.bat 一个用户入口。
+local_env.bat
+
+# 临时网络探测脚本
+_netprobe*.ps1

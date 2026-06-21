@@ -209,9 +209,8 @@ def test_score_tracking_head_not_behind_max_record():
     # 外部滞后检查：文档 Batch 号 vs git 最新 Batch 号（容差 3）。
     doc_batches = [int(m) for m in re.findall(r"Batch (\d+)", text)]
     try:
-        log = subprocess.check_output(
-            ["git", "log", "--oneline", "-50"], text=True, stderr=subprocess.DEVNULL
-        )
+        log = subprocess.check_output(["git", "log", "--oneline", "-50"], text=True,
+                                      encoding="utf-8", errors="replace", stderr=subprocess.DEVNULL)
         git_batches = [int(m) for m in re.findall(r"Batch (\d+)", log)]
     except (FileNotFoundError, subprocess.CalledProcessError):
         return  # git 不可用，跳过外部检查。
