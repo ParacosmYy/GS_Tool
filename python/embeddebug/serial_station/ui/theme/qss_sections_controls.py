@@ -199,4 +199,30 @@ QWidget#serialStationCrcCalculatorConfig,
 QWidget#serialStationCrcCalculatorResult,
 QLineEdit#serialStationCrcResultEdit {{
     background-color: transparent;
+}}
+/* Batch 42: 新增 3 个工具面板。均自带本地 QSS，此处仅契约占位满足覆盖率测试。 */
+QWidget#serialStationTimestampConverter,
+QWidget#serialStationTimestampConverterConfig,
+QWidget#serialStationTimestampConverterEpochEdit,
+QWidget#serialStationTimestampConverterInput,
+QWidget#serialStationTimestampConverterNowButton,
+QWidget#serialStationTimestampConverterResult,
+QLineEdit#serialStationTimestampConverterResultEdit,
+QWidget#serialStationHexViewer,
+QWidget#serialStationHexViewerCount,
+QWidget#serialStationHexViewerDump,
+QWidget#serialStationHexViewerFormatBtn,
+QWidget#serialStationHexViewerInput,
+QWidget#serialStationHexViewerInputEdit,
+QWidget#serialStationHexViewerStatus,
+QWidget#serialStationHexViewerView,
+QWidget#serialStationByteFreqAnalyzer,
+QWidget#serialStationByteFreqAnalyzerAnalyzeBtn,
+QWidget#serialStationByteFreqAnalyzerClearBtn,
+QWidget#serialStationByteFreqAnalyzerInput,
+QWidget#serialStationByteFreqAnalyzerInputEdit,
+QWidget#serialStationByteFreqAnalyzerResult,
+QWidget#serialStationByteFreqAnalyzerStatsLabel,
+QWidget#serialStationByteFreqCanvas {{
+    background-color: transparent;
 }}"""
