@@ -23,6 +23,17 @@ def set_connection_control_state(
     host._connect_tcp_button.setEnabled(not connected)
     host._connect_udp_button.setEnabled(not connected)
     host._disconnect_button.setEnabled(connected)
+    # Batch 47: StatusBar 连接状态动态更新。
+    bar = getattr(host, "_status_bar", None)
+    if bar is not None:
+        if connected:
+            port = getattr(host, "_port_combo", None)
+            port_text = port.currentText() if port else "Connected"
+            bar.set_section("connection", str(port_text))
+        else:
+            from PyQt6.QtWidgets import QWidget
+
+            bar.set_section("connection", host.tr("Disconnected") if hasattr(host, "tr") else "Disconnected")
     # Batch 46 P0-2: 连接成功时对断开按钮做 pop 动画（视觉反馈，
     # 激活 ScaleAnimation.pop，对标 VOFA+ 连接按钮状态变化反馈）。
     if connected:
