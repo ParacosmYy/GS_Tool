@@ -36,6 +36,7 @@ from embeddebug.serial_station.notifications.data import NotificationData, Notif
 from embeddebug.serial_station.ui.animations.controller import AnimationController
 from embeddebug.serial_station.ui.animations.fade import FadeTransition
 from embeddebug.serial_station.ui.animations.slide import SlideAnimation, SlideDirection
+from embeddebug.serial_station.ui.icons import button_icon
 from embeddebug.serial_station.ui.theme import palette as P
 
 
@@ -47,12 +48,12 @@ _LEVEL_COLORS: dict[NotificationLevel, str] = {
     NotificationLevel.ERROR: P.ERROR,
 }
 
-# 级别 → lucide 图标名（缺失时 EmptyState 风格的 emoji 兜底，这里用 Unicode 几何符号）。
-_LEVEL_GLYPH: dict[NotificationLevel, str] = {
-    NotificationLevel.INFO: "ℹ",
-    NotificationLevel.SUCCESS: "✓",
-    NotificationLevel.WARNING: "!",
-    NotificationLevel.ERROR: "✕",
+# 级别 → lucide 图标名（Batch 45: 从 Unicode 几何符号迁移到 SVG，对齐全应用图标系统）。
+_LEVEL_ICON: dict[NotificationLevel, str] = {
+    NotificationLevel.INFO: "info",
+    NotificationLevel.SUCCESS: "check-circle",
+    NotificationLevel.WARNING: "alert-triangle",
+    NotificationLevel.ERROR: "x-circle",
 }
 
 _DEFAULT_TIMEOUT_MS = 3000
@@ -115,13 +116,14 @@ class ToastWidget(QFrame):
         body_layout.setContentsMargins(12, 10, 10, 10)
         body_layout.setSpacing(10)
 
-        glyph = QLabel(_LEVEL_GLYPH[self._data.level], body)
+        glyph = QLabel(body)
         glyph.setObjectName("serialStationToastGlyph")
-        glyph.setStyleSheet(
-            f"color: {_LEVEL_COLORS[self._data.level]}; background: transparent; "
-            f"font-weight: 700;"
+        icon = button_icon(
+            _LEVEL_ICON[self._data.level], color=_LEVEL_COLORS[self._data.level]
         )
-        glyph.setFixedWidth(18)
+        if icon is not None and not icon.isNull():
+            glyph.setPixmap(icon.pixmap(18, 18))
+        glyph.setFixedSize(18, 18)
         glyph.setAlignment(Qt.AlignmentFlag.AlignCenter)
         body_layout.addWidget(glyph)
 
@@ -137,11 +139,14 @@ class ToastWidget(QFrame):
             text_box.addWidget(self._message_label)
         body_layout.addLayout(text_box, 1)
 
-        close_btn = QPushButton("✕", body)
+        close_btn = QPushButton(body)
         close_btn.setObjectName("serialStationToastCloseButton")
         close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         close_btn.setFlat(True)
         close_btn.setFixedSize(20, 20)
+        close_icon = button_icon("x", color=P.TEXT_MUTED)
+        if close_icon is not None and not close_icon.isNull():
+            close_btn.setIcon(close_icon)
         close_btn.clicked.connect(self.leave)
         body_layout.addWidget(close_btn)
 
