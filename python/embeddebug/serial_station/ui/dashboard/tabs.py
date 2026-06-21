@@ -65,6 +65,13 @@ class DashboardTabs(QTabWidget):
     def _on_tab_changed(self, index: int) -> None:
         canvas = self.current_canvas()
         if canvas is not None:
+            # Batch 46 P0-3: tab 切换淡入动画（对标 VOFA+ widget canvas 切换过渡）。
+            try:
+                from embeddebug.serial_station.ui.animations.fade import FadeTransition
+
+                FadeTransition.fade_in(canvas).start()
+            except Exception:
+                pass  # 动画是锦上添花。
             self.canvas_changed.emit(canvas)
 
     def tab_names(self) -> list[str]:
