@@ -28,6 +28,8 @@ from embeddebug.serial_station.ui.animations.typewriter import TypewriterAnimati
 from embeddebug.serial_station.ui.animations.elastic_snap import ElasticSnapAnimation
 from embeddebug.serial_station.ui.animations.skeleton import SkeletonAnimation
 from embeddebug.serial_station.ui.animations.page_slide import PageSlideAnimation
+from embeddebug.serial_station.ui.animations.color_tween import ColorTweenAnimation
+from embeddebug.serial_station.ui.animations.stagger import StaggerCoordinator
 
 __all__ = [
     "AnimationController",
@@ -35,6 +37,7 @@ __all__ = [
     "BouncePathAnimation",
     "CollapseAnimation",
     "CollapsiblePanel",
+    "ColorTweenAnimation",
     "ElasticSnapAnimation",
     "FadeTransition",
     "GlowAnimation",
@@ -46,5 +49,6 @@ __all__ = [
     "SkeletonAnimation",
     "SlideAnimation",
     "SlideDirection",
+    "StaggerCoordinator",
     "TypewriterAnimation",
 ]

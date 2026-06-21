@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 668分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 332分
+> 当前: 669分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 331分
 
 ---
 
@@ -370,6 +370,7 @@
 | 666 | Serial Station UI 美化 Batch 40 — 10 个并行新增微交互组件 + 全量 pytest 阻塞修复 | 5 动画（BouncePathAnimation/GlowAnimation/RotateAnimation/TypewriterAnimation/ElasticSnapAnimation）+ 5 控件（Chip/SegmentedControl/RichTooltip/InfoBanner/ProgressRing），各带独立单测；同时修复 11 个 Batch 40 测试错误（QPropertyAnimation 未导入 / PyQt6 6.11 QMouseEvent 6 参重载 / QEnterEvent），InfoBanner `_animate_out` access violation 崩溃（finished 信号改绑定方法让 sip 自动追踪生命周期），QSS 覆盖 5 新 objectName，test_chip 行数压到 249；并修复 4 个预存在 bug（src/ 遗留 C++ 删除 / local_env.bat 转入 .gitignore / test_python_governance_docs subprocess 加 encoding=utf-8 修复 Windows GBK 解码 / test_settings 与 test_dashboard_layout_setting_key_exists 因 settings 包未落地改为 skip），全量 pytest 1470 passed + 2 skipped + 0 access violation，ui_smoke 23 passed，start-embeddebug --smoke exit 0 |
 | 667 | Serial Station UI 美化 Batch 41 — 5 个并行新增 UI 组件 + 动画 + 工具面板 | 2 控件（Drawer 侧边抽屉带半透明遮罩四向滑入/Badge 状态徽章 kind 配色）+ 2 动画（SkeletonAnimation windowOpacity 闪烁/PageSlideAnimation 四向页面切换 slide）+ 1 工具（CrcCalculatorPanel 自带 4 个 catalog 预设 CRC-8/MAXIM/CRC-16/MODBUS/CRC-16/CCITT-FALSE/CRC-32/ISO-HDLC，全部 check value 自检通过 0xA1/0x4B37/0x29B1/0xCBF43926）；新建 ui/tools/ 子包；合流更新 controls/animations/__init__.py + tools/__init__.py + qss_sections_controls 覆盖 9 新 objectName；全量 pytest 1565 passed + 2 skipped + 0 access violation，ui_smoke 23 passed，start-embeddebug --smoke exit 0 |
 | 668 | Serial Station 工具面板 Batch 42 — 3 个并行新增工程师工具（TimestampConverter/HexViewer/ByteFrequencyAnalyzer） | 3 工具面板：TimestampConverterPanel（epoch ↔ datetime ↔ ISO ↔ hex，5 时区预设，纯函数核 5 个：epoch_to_datetime/datetime_to_epoch/epoch_to_iso/iso_to_epoch/epoch_to_hex）；HexViewerPanel（offset+bytes+ASCII 三栏格式化 dump，16 bytes/line，纯函数核 4 个：format_hex_line/format_hex_dump/to_ascii_repr/parse_hex_input）；ByteFrequencyAnalyzer（256 桶字节频率 + Shannon 熵 + 自绘柱状画布 _FrequencyCanvas，纯函数核 4 个：compute_frequency/top_n_bytes/entropy_bits/format_stats_text）；合流 tools/__init__.py 导出 18 个公共符号，qss_sections_controls 覆盖 22 新 objectName；全量 pytest 1626 passed + 2 skipped + 0 access violation，start-embeddebug --smoke exit 0 |
+| 669 | Batch 43 + Batch 44 prep — UI/动画基建 + 30 按钮状态完整化（VOFA+/MobaXterm 对标第一批） | Batch 43 新增 4 模块：ColorTweenAnimation（颜色属性 tween，parse_color/format_color 支持 hex6/hex8/rgba，tween + tween_stylesheet 两个工厂，对标 VOFA+ 连接按钮深→浅蓝过渡）；StaggerCoordinator（编排：N 个动画工厂按 step_ms 错峰启动，cancel + finished + cancelled 信号，对标 Linear/Vercel 卡片入场）；ThemeSerializer（palette JSON 导出/导入，serialize_palette/deserialize_to_dict/apply_overrides + to_json/from_json/save/load + validate_color/snapshot，对标 MobaXterm .mxtcolors）；2 个守护测试（test_no_hardcoded_colors grep QColor 硬编码 + test_no_px_font_sizes grep setPixelSize/font-size:Npx，均用 STRICT_*_COLORS 环境变量切换软/硬模式）。Batch 44 prep：tokens.py 加 6 个 token（EASE_OUT_QUART/EASE_IN_QUINT/EASE_OUT_QUINT/EASE_MATERIAL_EMPHASIZED/DURATION_CONTAINER=300/KEYFRAME_PREVIEW=0.3/STAGGER_STEP_MS=60，对齐 Material 3 emphasized + 动画审计 P0-4）；30 个按钮补齐 :pressed + :disabled（tool 8 + domain primary 5 + domain secondary 11 + dashboard 5 + EmptyStateCTA 1，对齐 UI 审计 §2 P0）。研究：librarian 交付 VOFA+ appTheme token 系统名（bgColor/barColor/mainColor/cbColor1-4/iconColor1-3/textAnsiErr/Tx/Rx/Time）+ MobaXterm catppuccin RGB 值（bg=#1E1E2E fg=#CDD6F4）+ 8 层 50+ 项审计清单；explore 交付 UI 审计（30 按钮缺状态/6 卡片缺 hover-lift/27 按钮缺图标/Toast Unicode 字形/light theme 缺 6 CARD token/无 INFO 色）+ 动画审计（AppShell leave 隐形/PageSlide 死代码/GlowAnimation 死代码/cross_fade sequential bug/stagger_fade GC 风险）。全量 pytest 1649 passed + 2 skipped + 0 access violation，start-embeddebug --smoke exit 0 |
 
 ---
 

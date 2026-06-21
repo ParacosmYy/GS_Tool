@@ -36,6 +36,8 @@ def buttons_section() -> str:
     connect_dis = ",\n".join(f"QPushButton#{n}:disabled" for n in _CONNECT_BUTTONS)
     tool_sel = ",\n".join(f"QPushButton#{n}" for n in _TOOL_BUTTONS)
     tool_hover = ",\n".join(f"QPushButton#{n}:hover" for n in _TOOL_BUTTONS)
+    tool_press = ",\n".join(f"QPushButton#{n}:pressed" for n in _TOOL_BUTTONS)
+    tool_dis = ",\n".join(f"QPushButton#{n}:disabled" for n in _TOOL_BUTTONS)
     return f"""/* === Buttons === */
 QPushButton {{
     background-color: {P.BG_PANEL};
@@ -99,6 +101,15 @@ QPushButton#serialStationDisconnectButton:pressed {{
     color: {P.TEXT_PRIMARY};
     border-color: {P.ACCENT_BORDER};
 }}
+{tool_press} {{
+    background-color: {P.BG_SELECTION};
+    border-color: {P.ACCENT_PRESSED};
+}}
+{tool_dis} {{
+    background-color: {P.BG_DISABLED};
+    color: {P.TEXT_DISABLED};
+    border-color: {P.BORDER};
+}}
 /* 发送/注入 — 终端 TX 蓝 */
 QPushButton#serialStationSendButton,
 QPushButton#serialStationInjectButton {{
@@ -109,6 +120,17 @@ QPushButton#serialStationSendButton:hover,
 QPushButton#serialStationInjectButton:hover {{
     background-color: {P.TERM_TX};
     color: {P.TEXT_INVERTED};
+}}
+QPushButton#serialStationSendButton:pressed,
+QPushButton#serialStationInjectButton:pressed {{
+    background-color: {P.ACCENT_PRESSED};
+    color: {P.TEXT_INVERTED};
+}}
+QPushButton#serialStationSendButton:disabled,
+QPushButton#serialStationInjectButton:disabled {{
+    background-color: {P.BG_DISABLED};
+    color: {P.TEXT_DISABLED};
+    border-color: {P.BORDER};
 }}"""
 
 

@@ -26,6 +26,7 @@ class AnimationTokens:
     DURATION_INSTANT = 100   # 瞬时反馈：状态色切换、tooltip
     DURATION_FAST = 160      # 快速反馈：按钮按压、hover 阴影
     DURATION_NORMAL = 240    # 常规过渡：面板淡入、滑入、折叠
+    DURATION_CONTAINER = 300  # 容器变换：页面/卡片容器 morph（Material 3 emphasized 300ms）
     DURATION_SLOW = 360      # 较慢过渡：页面切换组合动画
     DURATION_SLOWER = 600    # 慢速：呼吸灯、加载脉冲
 
@@ -36,7 +37,16 @@ class AnimationTokens:
     EASE_OUT_BACK = QEasingCurve.Type.OutBack   # 轻微过冲（按压回弹）
     EASE_OUT_BOUNCE = QEasingCurve.Type.OutBounce  # 弹跳（通知）
     EASE_OUT_ELASTIC = QEasingCurve.Type.OutElastic  # 弹性（少用）
+    EASE_OUT_QUART = QEasingCurve.Type.OutQuart  # 强调减速（页面入场、容器变换）
+    EASE_IN_QUART = QEasingCurve.Type.InQuart    # 强调加速（页面离场）
+    EASE_OUT_QUINT = QEasingCurve.Type.OutQuint  # Material 3 emphasized ≈ cubic-bezier(0.2, 0, 0, 1.0)
+    EASE_MATERIAL_EMPHASIZED = EASE_OUT_QUINT    # 别名：Material Design 3 强调缓动
     LINEAR = QEasingCurve.Type.Linear           # 仅进度条/匀速场景
+
+    # === 关键帧位置（choreography 用）===
+    KEYFRAME_PREVIEW = 0.3   # 预览位置：复杂动画在 30% 时刻达到「可识别」状态
+    KEYFRAME_HERALED = 0.5   # hero 元素到中点
+    STAGGER_STEP_MS = 60     # stagger 默认步长（Linear/Vercel 风格）
 
     # === 缩放比例（按压/弹入用）===
     SCALE_PRESSED = 0.94   # 按压缩小比例（比 0.92 更克制，避免过冲突兀）

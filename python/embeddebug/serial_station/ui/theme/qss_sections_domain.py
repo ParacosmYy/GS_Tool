@@ -79,6 +79,22 @@ QPushButton#serialStationAutomationRunButton:hover,
 QPushButton#serialStationSettingsApplyButton:hover {{
     background-color: {P.ACCENT_HOVER};
 }}
+QPushButton#serialStationRttStartButton:pressed,
+QPushButton#serialStationCanSendButton:pressed,
+QPushButton#serialStationBleConnectButton:pressed,
+QPushButton#serialStationAutomationRunButton:pressed,
+QPushButton#serialStationSettingsApplyButton:pressed {{
+    background-color: {P.ACCENT_PRESSED};
+}}
+QPushButton#serialStationRttStartButton:disabled,
+QPushButton#serialStationCanSendButton:disabled,
+QPushButton#serialStationBleConnectButton:disabled,
+QPushButton#serialStationAutomationRunButton:disabled,
+QPushButton#serialStationSettingsApplyButton:disabled {{
+    background-color: {P.BG_DISABLED};
+    color: {P.TEXT_DISABLED};
+    border: none;
+}}
 /* 次要按钮（清空/扫描/演示/读/写/订阅/手动触发/刷新/SVD 加载）。 */
 QPushButton#serialStationRttClearButton,
 QPushButton#serialStationCanClearButton,
@@ -110,6 +126,35 @@ QPushButton#serialStationSvdLoadButton:hover,
 QPushButton#serialStationSvdDemoButton:hover {{
     background-color: {P.BG_PANEL_RAISED};
     border-color: {P.ACCENT_BORDER};
+}}
+QPushButton#serialStationRttClearButton:pressed,
+QPushButton#serialStationCanClearButton:pressed,
+QPushButton#serialStationCanDemoButton:pressed,
+QPushButton#serialStationBleScanButton:pressed,
+QPushButton#serialStationBleReadButton:pressed,
+QPushButton#serialStationBleWriteButton:pressed,
+QPushButton#serialStationBleNotifyButton:pressed,
+QPushButton#serialStationAutomationFireButton:pressed,
+QPushButton#serialStationAutomationRefreshButton:pressed,
+QPushButton#serialStationSvdLoadButton:pressed,
+QPushButton#serialStationSvdDemoButton:pressed {{
+    background-color: {P.BG_SELECTION};
+    border-color: {P.ACCENT_PRESSED};
+}}
+QPushButton#serialStationRttClearButton:disabled,
+QPushButton#serialStationCanClearButton:disabled,
+QPushButton#serialStationCanDemoButton:disabled,
+QPushButton#serialStationBleScanButton:disabled,
+QPushButton#serialStationBleReadButton:disabled,
+QPushButton#serialStationBleWriteButton:disabled,
+QPushButton#serialStationBleNotifyButton:disabled,
+QPushButton#serialStationAutomationFireButton:disabled,
+QPushButton#serialStationAutomationRefreshButton:disabled,
+QPushButton#serialStationSvdLoadButton:disabled,
+QPushButton#serialStationSvdDemoButton:disabled {{
+    background-color: {P.BG_DISABLED};
+    color: {P.TEXT_DISABLED};
+    border-color: {P.BORDER};
 }}
 /* 输入框（ID/数据/payload/特征 UUID/主题 combo/通道 combo/设备 combo）。 */
 QLineEdit#serialStationCanIdEdit,

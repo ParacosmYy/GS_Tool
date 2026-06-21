@@ -45,6 +45,14 @@ QPushButton#serialStationEmptyStateCta {{
 QPushButton#serialStationEmptyStateCta:hover {{
     background-color: {P.ACCENT_HOVER};
 }}
+QPushButton#serialStationEmptyStateCta:pressed {{
+    background-color: {P.ACCENT_PRESSED};
+}}
+QPushButton#serialStationEmptyStateCta:disabled {{
+    background-color: {P.BG_DISABLED};
+    color: {P.TEXT_DISABLED};
+    border: none;
+}}
 QWidget#serialStationSkeleton,
 QWidget#serialStationSkeletonBlock {{
     background-color: transparent;

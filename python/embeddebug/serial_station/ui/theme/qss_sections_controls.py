@@ -174,6 +174,23 @@ QPushButton#serialStationDashboardGridButton:hover {{
     background-color: {P.ACCENT_SOFT};
     border-color: {P.ACCENT};
 }}
+QPushButton#serialStationDashboardAddTabButton:pressed,
+QPushButton#serialStationDashboardClearButton:pressed,
+QPushButton#serialStationDashboardSaveButton:pressed,
+QPushButton#serialStationDashboardLoadButton:pressed,
+QPushButton#serialStationDashboardGridButton:pressed {{
+    background-color: {P.BG_SELECTION};
+    border-color: {P.ACCENT_PRESSED};
+}}
+QPushButton#serialStationDashboardAddTabButton:disabled,
+QPushButton#serialStationDashboardClearButton:disabled,
+QPushButton#serialStationDashboardSaveButton:disabled,
+QPushButton#serialStationDashboardLoadButton:disabled,
+QPushButton#serialStationDashboardGridButton:disabled {{
+    background-color: {P.BG_DISABLED};
+    color: {P.TEXT_DISABLED};
+    border-color: {P.BORDER};
+}}
 QLabel#serialStationDashboardStatusLabel {{
     color: {P.TEXT_SECONDARY};
     font-size: {T.FONT_SM};
