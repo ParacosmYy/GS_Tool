@@ -104,6 +104,13 @@ def _reparent_status_pills(owner: TopBarHost, bar: QFrame, row: QLayout) -> None
     若标签尚未创建（调用顺序异常），静默跳过。
     """
 
+    # Batch 48: Ctrl+P 命令面板快捷键提示（对标 VS Code/MobaXterm 可发现性）。
+    try:
+        from embeddebug.serial_station.ui.controls.key_hint import KeyboardShortcut
+        row.addWidget(KeyboardShortcut("Ctrl+P", bar))
+    except Exception:
+        pass
+
     profile_label = getattr(owner, "_profile_label", None)
     status_label = getattr(owner, "_status_label", None)
 
