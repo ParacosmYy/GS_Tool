@@ -81,6 +81,19 @@ def build_main_layout(owner: SerialStationSectionsHost, controller: SerialWorkbe
     from embeddebug.serial_station.ui.controls.status_bar import StatusBar
     owner._status_bar = StatusBar(root)
     owner._status_bar.set_section("connection", owner.tr("Disconnected"))
+    # Batch 47: StatusBar 时钟段（每秒更新，对标 MobaXterm）。
+    from datetime import datetime
+    from PyQt6.QtCore import QTimer
+    owner._status_bar.set_section("clock", datetime.now().strftime("%H:%M:%S"))
+    # Timer 作为 status_bar 子控件：status_bar 销毁时 timer 自动销毁，避免悬挂访问。
+    _clock_timer = QTimer(owner._status_bar)
+    def _tick() -> None:
+        try:
+            owner._status_bar.set_section("clock", datetime.now().strftime("%H:%M:%S"))
+        except RuntimeError:
+            _clock_timer.stop()
+    _clock_timer.timeout.connect(_tick)
+    _clock_timer.start(1000)
     layout.addWidget(owner._status_bar)
 
     # 中区日志卡由 layout_main 创建；log_view 注入到其主体。
