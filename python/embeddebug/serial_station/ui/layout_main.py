@@ -48,7 +48,7 @@ def assemble_three_zone(
 
     splitter = QSplitter(Qt.Orientation.Horizontal, root)
     splitter.setObjectName("serialStationMainSplitter")
-    splitter.setHandleWidth(2)
+    splitter.setHandleWidth(4)  # Batch 46: 从 2px 加宽到 4px（UI 审计 §2.6，改善拖拽可用性）
     splitter.setChildrenCollapsible(False)
 
     # 框架：左=连接配置（精简侧栏）、中=主工作区（波形+日志+命令行）、右=日志工具+Profile。

@@ -95,6 +95,11 @@ QPushButton#serialStationDisconnectButton:hover {{
 QPushButton#serialStationDisconnectButton:pressed {{
     background-color: {P.ERROR_HOVER};
 }}
+QPushButton#serialStationDisconnectButton:disabled {{
+    background-color: {P.BG_DISABLED};
+    color: {P.TEXT_DISABLED};
+    border-color: {P.BORDER};
+}}
 /* 次要工具按钮 */
 {tool_sel} {{
     background-color: {P.BG_PANEL};
