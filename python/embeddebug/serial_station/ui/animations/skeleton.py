@@ -34,7 +34,7 @@ from __future__ import annotations
 from typing import List
 
 from PyQt6.QtCore import QVariantAnimation
-from PyQt6.QtWidgets import QWidget
+from PyQt6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
 from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 
@@ -93,7 +93,10 @@ class SkeletonAnimation:
 
     @staticmethod
     def shimmer(widget: QWidget, loops: int = 3) -> QVariantAnimation:
-        """加载占位骨架闪烁：windowOpacity 在 0.3 → 1.0 → 0.3 之间脉冲循环。
+        """加载占位骨架闪烁：QGraphicsOpacityEffect 在 0.3 → 1.0 → 0.3 之间脉冲。
+
+        Batch 47 修复：从 windowOpacity（仅顶层窗口有效）迁移到
+        QGraphicsOpacityEffect（对内嵌控件也有效），让骨架屏真正可见。
 
         视觉为对称脉冲：
         1. 起点（0.0）：opacity 0.3（半隐，模拟「未填充」骨架态）。
@@ -126,9 +129,18 @@ class SkeletonAnimation:
             (1.0, SkeletonAnimation.SHIMMER_MIN_OPACITY),
         ])
 
-        # 数值变化驱动 widget.setWindowOpacity。闭包仅捕获 widget 并调用其 Qt
-        # 方法；QVariantAnimation 的 valueChanged 信号生命周期与 anim 一致，
-        # 不存在 finished + deleteLater 的悬挂访问风险。
-        anim.valueChanged.connect(lambda v: widget.setWindowOpacity(v))
+        # Batch 47: 改用 QGraphicsOpacityEffect 驱动透明度（对内嵌控件有效，
+        # 不同于 setWindowOpacity 仅对顶层窗口生效）。
+        # 不传 parent：setGraphicsEffect 会接管 ownership，避免双重 parent 导致 GC。
+        effect = QGraphicsOpacityEffect()
+        effect.setOpacity(1.0)
+        widget.setGraphicsEffect(effect)
+        # 用 try/except 防 widget 被外部销毁后 effect C++ 对象悬挂。
+        def _on_opacity(v):
+            try:
+                effect.setOpacity(v)
+            except RuntimeError:
+                pass
+        anim.valueChanged.connect(_on_opacity)
 
         return SkeletonAnimation._track(anim)

@@ -62,8 +62,13 @@
 
 ### 文件体积铁律
 20. **.py ≤ 300行** — 超过说明职责过多
-21. **测试文件聚焦单一行为域** — 超过应拆分为 unit/integration/ui_smoke
+21. **测试文件聚焦单一行为域，≤ 250 行** — 超过应拆分为 unit/integration/ui_smoke。同域小文件必须合并（2026-06-22 精简：168→112 文件）
 22. **单个方法 ≤ 80行** — 超过说明逻辑过于复杂
+
+### 测试文件组织规则（2026-06-22 新增）
+23. **测试文件按域分组** — 同域测试合并到单文件（如 `test_controller_state_core.py` 含 connection/callback/workbench state）。禁止同域散落 >3 个文件。
+24. **文件命名 `test_<域>_<子域>.py`** — 如 `test_dashboard_layout.py`、`test_animations_factories.py`、`test_theme_core.py`。避免 `test_<单个控件>.py` 孤儿文件。
+25. **commit 前必须跑全量 unit + smoke** — 不能只跑 smoke（Oracle 审计 2026-06-22 发现：仅 smoke 通过但 unit 有 3 个回归未发现）。
 
 ---
 
@@ -102,11 +107,13 @@
 | 项 | 值 |
 |----|-----|
 | 应用名称 | EmbedDebug |
-| 项目路径 | `D:\Workplace\Embedded_workplace\User_workplace\GS_Tool` |
+| 项目路径 | `E:\Embedded\Tool\Serial_tool\User_Serial` |
 | 当前版本 | 0.1.0 |
-| 评分 | 见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md) |
+| 评分 | 677（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
+| 测试文件数 | 112（2026-06-22 精简，原 168） |
+| 测试通过 | 1601 passed, 2 skipped, 0 failed |
 
 ### Python/PyQt 命令
 ```powershell
@@ -253,3 +260,53 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 | **J-Link RTT Viewer** | RTT未实现 | FN-04 RTT集成 |
 | **VS Code** | 无命令面板(Ctrl+P) | UI-04 CommandPalette |
 | **Linear/Arc** | 图标/空状态/动画不一致 | UI-01~UI-03 基础组件 |
+
+---
+
+## 会话成果存档 (2026-06-22)
+
+### Batch 40-46：UI/动画质量提升 + 测试精简
+
+> 21 commits（`016dfab62` → `c5992d0ee`），评分 665 → 677，测试 1421 → 1601 passed。
+
+#### 环境修复
+- `%APPDATA%\uv\uv.toml` 配置清华 PyPI 镜像；`uv.lock` 254 个 URL 重写为 `pypi.tuna.tsinghua.edu.cn`（`uv sync` 从卡死 → 32 秒）
+
+#### 新增模块（22 个）
+- **Batch 40**: 5 动画（bounce_path/glow/rotate/typewriter/elastic_snap）+ 5 控件（chip/segmented/rich_tooltip/info_banner/progress_ring）
+- **Batch 41**: Drawer / Badge / SkeletonAnimation / PageSlideAnimation / CrcCalculatorPanel
+- **Batch 42**: TimestampConverterPanel / HexViewerPanel / ByteFrequencyAnalyzer
+- **Batch 43**: ColorTweenAnimation / StaggerCoordinator / ThemeSerializer / 2 守护测试
+
+#### UI 审计 P0 修复
+- **35+ 按钮补齐 :pressed + :disabled + :focus**（原仅 ~4 个按钮有三态）
+- **35 按钮补齐 lucide 图标**（原仅 13 个）
+- **Toast Unicode 字形 → SVG**（info/check-circle/alert-triangle/x-circle）
+- **INFO 语义色独立**（#3b82f6 蓝，不再复用 ACCENT 青）
+- **QComboBox CSS 三角箭头 + QPushButton :focus 键盘焦点**
+- **QTabBar :hover + :selected:hover**
+- **light theme 补 6 个 CARD_* token**（CARD_SHEEN_*/INNER_TOP_EDGE/GROUND_SHADOW/HOVER_RING）
+- **ConfigurableButton ripple 默认开启 + :disabled**
+- **Splitter handle 2→4px**
+
+#### 动画审计 P0 修复
+- **AppShell 离场动画隐形 bug 修复**（`setCurrentIndex` 延迟到 `QTimer.singleShot(160ms)` 后执行，离场 fade_out 可见）
+- **连接成功 pop 动画**（ScaleAnimation.pop on disconnect 按钮）
+- **Dashboard tab 切换淡入**（FadeTransition.fade_in）
+- **6 个 easing/duration token 新增**（EASE_OUT_QUART/QUINT/MATERIAL_EMPHASIZED + DURATION_CONTAINER + KEYFRAME_PREVIEW + STAGGER_STEP_MS）
+
+#### 测试精简
+- **168 → 112 文件**（-56，按域分组合并，4 个并行 agent）
+- 合并规则：同域小文件合并到 `test_<域>_<子域>.py`，每个 ≤250 行
+
+#### 研究交付（3 份审计）
+- VOFA+ / MobaXterm UI 模式调研（librarian）：appTheme token 系统 + RGB 值 + 8 层 50+ 项审计清单
+- UI gap 审计（explore）：30 按钮缺状态 / 27 缺图标 / Toast Unicode / light theme 缺 token / 无 INFO 色
+- 动画 gap 审计（explore）：AppShell leave 隐形 / dead code 清单 / cross_fade sequential bug / stagger_fade GC 风险
+- 完整路线图：[docs/superpowers/specs/2026-06-22-batch43-ui-animation-polish-iter.md](docs/superpowers/specs/2026-06-22-batch43-ui-animation-polish-iter.md)
+
+#### 后续路线图
+- **Batch 47**: 死代码激活（RichTooltip install / Skeleton windowOpacity→QGraphicsOpacityEffect / RotateAnimation spinner）
+- **Batch 48**: 排版 token（FONT_ROLE_* / LETTER_SPACING_* / LINE_HEIGHT_*）+ 间距 token 统一
+- **Batch 49**: 加载态（Connect/Refresh spinner）+ 空态（log/waveform/dashboard）
+- **Batch 50**: 死代码守护测试 + CI 严格化
