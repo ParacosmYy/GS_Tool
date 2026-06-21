@@ -57,7 +57,7 @@ QLabel#serialStationCardTitle {{
     background-color: transparent;
     color: {P.TEXT_PRIMARY};
     font-size: {T.FONT_MD};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
     letter-spacing: {T.LETTER_SPACING_SUBTLE};
 }}
 QLabel#serialStationCardIcon {{
@@ -74,7 +74,7 @@ QLabel#serialStationCardGroupLabel {{
     background-color: transparent;
     color: {P.TEXT_MUTED};
     font-size: {T.FONT_XS};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
     letter-spacing: {T.LETTER_SPACING_UPPERCASE};
     text-transform: uppercase;
     padding-top: {T.SPACING_SM};
@@ -153,7 +153,7 @@ QLabel#serialStationBrandName {{
     background-color: transparent;
     color: {P.TEXT_PRIMARY};
     font-size: {T.FONT_MD};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
     letter-spacing: {T.LETTER_SPACING_BRAND};
 }}
 QLabel#serialStationBrandTagline {{
@@ -189,7 +189,7 @@ QLabel#serialStationCollapsibleTitle {{
     background-color: transparent;
     color: {P.TEXT_SECONDARY};
     font-size: {T.FONT_XS};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
     letter-spacing: {T.LETTER_SPACING_WIDE};
     text-transform: uppercase;
 }}

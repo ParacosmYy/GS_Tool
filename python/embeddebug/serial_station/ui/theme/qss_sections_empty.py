@@ -1,4 +1,4 @@
-"""QSS 分区生成器 — 空状态与骨架屏（Batch 5 新增）。
+﻿"""QSS 分区生成器 — 空状态与骨架屏（Batch 5 新增）。
 
 EmptyStateWidget（图标+标题+描述+CTA）与 SkeletonWidget（shimmer 骨架）的样式。
 颜色引用 palette，尺寸引用 tokens，不 import PyQt。
@@ -25,7 +25,7 @@ QLabel#serialStationEmptyStateTitle {{
     background-color: transparent;
     color: {P.TEXT_PRIMARY};
     font-size: {T.FONT_LG};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 QLabel#serialStationEmptyStateDescription {{
     background-color: transparent;
@@ -38,7 +38,7 @@ QPushButton#serialStationEmptyStateCta {{
     border: {T.BORDER_NONE};
     border-radius: {T.RADIUS_MD};
     padding: {T.SPACING_SM} {T.SPACING_LG};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
     min-width: 120px;
     max-width: 240px;
 }}

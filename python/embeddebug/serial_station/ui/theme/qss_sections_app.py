@@ -1,4 +1,4 @@
-"""QSS 分区生成器 — 多模式应用 Shell（导航栏 + OTA 面板 + 占位面板）。
+﻿"""QSS 分区生成器 — 多模式应用 Shell（导航栏 + OTA 面板 + 占位面板）。
 
 覆盖 AppShell 导航栏、OTA 升级面板、RTT/设置占位面板的 objectName。
 颜色引用 ``palette``，尺寸引用 ``tokens``，不 import PyQt。
@@ -28,7 +28,7 @@ QLabel#serialStationNavBrand {{
     border: {T.BORDER_THIN} solid {P.ACCENT_BORDER};
     border-radius: {T.RADIUS_LG};
     font-size: {T.FONT_SM};
-    font-weight: 800;
+    font-weight: {T.FONT_WEIGHT_BLACK};
     min-width: 32px;
     max-width: 32px;
     min-height: 32px;
@@ -64,7 +64,7 @@ QWidget#serialStationOtaPanel {{
 QLabel#serialStationOtaFieldLabel {{
     color: {P.TEXT_SECONDARY};
     font-size: {T.FONT_SM};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 QComboBox#serialStationOtaProtocolCombo {{
     background-color: {P.BG_INPUT};
@@ -137,7 +137,7 @@ QPushButton#serialStationOtaStartButton {{
     border: none;
     border-radius: {T.RADIUS_MD};
     padding: {T.PADDING_LG};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 QPushButton#serialStationOtaStartButton:hover {{
     background-color: {P.ACCENT_HOVER};

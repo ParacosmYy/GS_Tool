@@ -1,4 +1,4 @@
-"""QSS 分区生成器 — 交互控件与展示区。
+﻿"""QSS 分区生成器 — 交互控件与展示区。
 
 包含按钮、日志视图、波形、状态标签、滚动条、快捷键契约分区。
 卡片/三栏 Shell/TopBar 的样式已迁移到 ``qss_sections_layout``，便于统一深化。
@@ -70,7 +70,7 @@ QPushButton:focus {{
     background-color: {P.ACCENT_GRADIENT};
     color: {P.TEXT_ON_ACCENT};
     border: {T.BORDER_NONE};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 {connect_hover} {{
     background-color: {P.ACCENT_HOVER};
@@ -170,7 +170,7 @@ QLabel#serialStationStatusLabel {{
     border-radius: {T.RADIUS_PILL};
     background-color: {P.WARNING_SOFT};
     font-size: {T.FONT_SM};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 QLabel#serialStationProfileLabel {{
     color: {P.TEXT_MUTED};

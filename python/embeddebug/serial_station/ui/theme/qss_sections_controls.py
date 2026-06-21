@@ -1,4 +1,4 @@
-"""QSS 分区生成器 — 控件组件库（LED/滑块/按钮/仪表盘/数值显示）。
+﻿"""QSS 分区生成器 — 控件组件库（LED/滑块/按钮/仪表盘/数值显示）。
 
 对齐 VOFA+ 控件目录的样式。颜色引用 ``palette``，尺寸引用 ``tokens``，不 import PyQt。
 """
@@ -59,7 +59,7 @@ QLabel#serialStationSliderBubble {{
     padding: 2px 6px;
     font-family: {T.FONT_FAMILY_MONO};
     font-size: {T.FONT_XS};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 /* Batch 7-5: RippleButton（ripple 自绘，QSS 背景透明让涟漪可见） */
 QPushButton#serialStationRippleButton {{
@@ -100,7 +100,7 @@ QLabel#serialStationValueLabel {{
 }}
 QLabel#serialStationValueNumber {{
     color: {P.TEXT_PRIMARY};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 QLabel#serialStationValueTrend {{
     background-color: transparent;
@@ -129,7 +129,7 @@ QFrame#serialStationWidgetPalette {{
 }}
 QLabel#serialStationPaletteTitle {{
     color: {P.TEXT_PRIMARY};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
     font-size: {T.FONT_BASE};
 }}
 QPushButton#serialStationPaletteButton {{

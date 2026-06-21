@@ -1,4 +1,4 @@
-"""QSS 分区生成器 — 核心容器与输入控件。
+﻿"""QSS 分区生成器 — 核心容器与输入控件。
 
 包含全局、主窗口、标签、输入框、下拉框分区。
 颜色引用 ``palette``，尺寸引用 ``tokens``，不 import PyQt。
@@ -44,7 +44,7 @@ QWidget#serialStationPyRoot {{
 QLabel#serialStationPyTitle {{
     color: {P.TEXT_PRIMARY};
     font-size: {T.FONT_XL};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
     padding: {T.SPACING_SM} {T.SPACING_NONE};
 }}"""
 

@@ -1,4 +1,4 @@
-"""QSS 分区生成器 — RTT/CAN/BLE/Automation/Settings 域面板共享样式。
+﻿"""QSS 分区生成器 — RTT/CAN/BLE/Automation/Settings 域面板共享样式。
 
 覆盖各域面板的全部 serialStation* objectName（面板根/字段标签/状态/日志/按钮/
 输入/表格/树/Tab）。用精确选择器统一覆盖，避免逐个写规则。
@@ -33,7 +33,7 @@ QLabel#serialStationSettingsFieldLabel,
 QLabel#serialStationSvdFieldLabel {{
     color: {P.TEXT_SECONDARY};
     font-size: {T.FONT_SM};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 /* 状态标签。 */
 QLabel#serialStationRttStatusLabel,
@@ -70,7 +70,7 @@ QPushButton#serialStationSettingsApplyButton {{
     border: none;
     border-radius: {T.RADIUS_MD};
     padding: {T.PADDING_MD};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 QPushButton#serialStationRttStartButton:hover,
 QPushButton#serialStationCanSendButton:hover,
@@ -215,7 +215,7 @@ QHeaderView::section {{
     border: none;
     border-bottom: {T.BORDER_THIN} solid {P.BORDER};
     padding: {T.SPACING_XS} {T.SPACING_SM};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 /* 设置页 Tab。 */
 QTabWidget#serialStationSettingsTabWidget::pane {{
@@ -276,7 +276,7 @@ QToolButton#serialStationAccentSwatch6:hover {{
 QLabel#serialStationSettingsAppNameLabel {{
     color: {P.TEXT_PRIMARY};
     font-size: {T.FONT_XL};
-    font-weight: 700;
+    font-weight: {T.FONT_WEIGHT_BOLD};
 }}
 QLabel#serialStationSettingsVersionLabel,
 QLabel#serialStationSettingsRemoteLabel {{

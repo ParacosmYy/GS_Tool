@@ -1,4 +1,4 @@
-"""QSS 分区生成器 — Toast 通知卡片（Batch 11 新增）。
+﻿"""QSS 分区生成器 — Toast 通知卡片（Batch 11 新增）。
 
 ToastWidget（级别色条 + 标题 + 描述 + 关闭按钮）的样式。从 qss_sections_widgets 拆出，
 避免 widgets 分区超 300 行可维护性门禁。颜色引用 palette，尺寸引用 tokens，不 import PyQt。
@@ -28,7 +28,7 @@ QLabel#serialStationToastMessage {{
 }}
 QLabel#serialStationToastTitle {{
     color: {P.TEXT_PRIMARY};
-    font-weight: 600;
+    font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
 QLabel#serialStationToastMessage {{
     color: {P.TEXT_SECONDARY};
