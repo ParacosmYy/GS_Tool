@@ -77,6 +77,14 @@ CARD_GLOW = "rgba(8, 145, 178, 0.25)"
 # ── 玻璃卡片 / TopBar 视觉层（与深色 palette 对齐，浅色版本） ──────
 CARD_HIGHLIGHT_TOP = "rgba(255, 255, 255, 0.6)"
 CARD_HIGHLIGHT_BOTTOM = "rgba(255, 255, 255, 0.0)"
+# Batch 46 P0: 补齐深色 palette 有但浅色缺失的 6 个 CARD_* token（UI 审计 §1.2）。
+# 浅色版本的玻璃质感：顶部更亮（白色高光）、底部渐隐、边缘用极浅黑色阴影。
+CARD_SHEEN_TOP = "rgba(255, 255, 255, 0.8)"
+CARD_SHEEN_MID = "rgba(255, 255, 255, 0.4)"
+CARD_SHEEN_BOTTOM = "rgba(255, 255, 255, 0.0)"
+CARD_INNER_TOP_EDGE = "rgba(0, 0, 0, 0.06)"
+CARD_GROUND_SHADOW = "rgba(0, 0, 0, 0.10)"
+CARD_HOVER_RING = "rgba(8, 145, 178, 0.40)"
 TOPBAR_BG_TOP = "#ffffff"
 TOPBAR_BG_BOTTOM = "#f1f5f9"
 TOPBAR_BORDER = "#e2e8f0"
@@ -140,6 +148,12 @@ def all_tokens() -> dict[str, str]:
         "card_glow": CARD_GLOW,
         "card_highlight_top": CARD_HIGHLIGHT_TOP,
         "card_highlight_bottom": CARD_HIGHLIGHT_BOTTOM,
+        "card_sheen_top": CARD_SHEEN_TOP,
+        "card_sheen_mid": CARD_SHEEN_MID,
+        "card_sheen_bottom": CARD_SHEEN_BOTTOM,
+        "card_inner_top_edge": CARD_INNER_TOP_EDGE,
+        "card_ground_shadow": CARD_GROUND_SHADOW,
+        "card_hover_ring": CARD_HOVER_RING,
         "topbar_bg_top": TOPBAR_BG_TOP,
         "topbar_bg_bottom": TOPBAR_BG_BOTTOM,
         "topbar_border": TOPBAR_BORDER,
