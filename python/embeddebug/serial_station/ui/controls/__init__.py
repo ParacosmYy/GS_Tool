@@ -20,6 +20,7 @@ from embeddebug.serial_station.ui.controls.badge import Badge, BadgeKind
 from embeddebug.serial_station.ui.controls.drawer import Drawer
 from embeddebug.serial_station.ui.controls.status_bar import StatusBar
 from embeddebug.serial_station.ui.controls.key_hint import KeyboardShortcut
+from embeddebug.serial_station.ui.controls.toggle_switch import ToggleSwitch
 
 __all__ = [
     "Badge",
@@ -41,6 +42,7 @@ __all__ = [
     "StatusBar",
     "StatusDot",
     "StatusLed",
+    "ToggleSwitch",
     "ValueDisplay",
     "install_tooltip",
     "uninstall_tooltip",
