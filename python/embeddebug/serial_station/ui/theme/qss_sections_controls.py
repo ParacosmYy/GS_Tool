@@ -247,4 +247,8 @@ QWidget#serialStationByteFreqAnalyzerResult,
 QWidget#serialStationByteFreqAnalyzerStatsLabel,
 QWidget#serialStationByteFreqCanvas {{
     background-color: transparent;
+}}
+/* Batch 47: StatusBar 组件。自绘背景，QSS 仅契约占位。 */
+QWidget#serialStationStatusBar {{
+    background-color: transparent;
 }}"""

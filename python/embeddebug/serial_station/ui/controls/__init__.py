@@ -18,6 +18,7 @@ from embeddebug.serial_station.ui.controls.info_banner import BannerKind, InfoBa
 from embeddebug.serial_station.ui.controls.progress_ring import ProgressRing
 from embeddebug.serial_station.ui.controls.badge import Badge, BadgeKind
 from embeddebug.serial_station.ui.controls.drawer import Drawer
+from embeddebug.serial_station.ui.controls.status_bar import StatusBar
 
 __all__ = [
     "Badge",
@@ -35,6 +36,7 @@ __all__ = [
     "RichTooltip",
     "RippleButton",
     "SegmentedControl",
+    "StatusBar",
     "StatusDot",
     "StatusLed",
     "ValueDisplay",
