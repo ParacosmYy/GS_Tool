@@ -63,6 +63,7 @@ def build_connection_toolbar(
     owner._refresh_ports_button.setObjectName("serialStationRefreshPortsButton")
     owner._refresh_ports_button.setToolTip(owner.tr("Refresh available serial ports (Ctrl+R)"))
     owner._refresh_ports_button.clicked.connect(owner._refresh_serial_ports)
+    _install_rich_tooltips(owner)
 
     owner._baud_combo = _serial_config_combo(root, "serialStationBaudCombo", owner.tr("Select baud rate"), "baud")
     owner._data_bits_combo = _serial_config_combo(
@@ -133,3 +134,27 @@ def _serial_config_combo(root: QWidget, object_name: str, tooltip: str, option_k
     combo.setToolTip(tooltip)
     apply_serial_config_options(combo, option_key)
     return combo
+
+
+def _install_rich_tooltips(owner) -> None:
+    """Batch 47: 为工具栏主按钮挂接 RichTooltip（激活 install_tooltip 死代码）。
+
+    对每个按钮在 setToolTip 基础上叠加富文本 tooltip（标题+正文两行），
+    提供更详细的操作指引。失败静默跳过（RichTooltip 是锦上添花）。
+    """
+    try:
+        from embeddebug.serial_station.ui.controls import install_tooltip
+        install_tooltip(owner._refresh_ports_button,
+                        owner.tr("刷新端口"),
+                        owner.tr("重新扫描系统可用的 COM 端口（快捷键 Ctrl+R）"))
+        install_tooltip(owner._connect_button,
+                        owner.tr("连接（替身）"),
+                        owner.tr("打开本地 loopback 替身传输，无需真实硬件即可测试收发"))
+        install_tooltip(owner._connect_serial_button,
+                        owner.tr("连接串口"),
+                        owner.tr("打开选中的 COM 端口，使用上方配置的波特率/数据位/校验/流控参数"))
+        install_tooltip(owner._disconnect_button,
+                        owner.tr("断开连接"),
+                        owner.tr("关闭当前传输连接，停止收发"))
+    except Exception:
+        pass
