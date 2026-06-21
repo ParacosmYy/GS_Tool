@@ -259,4 +259,11 @@ QLabel#serialStationKeyHint {{
 /* Batch 48: ToggleSwitch。自绘，QSS 仅契约占位。 */
 QWidget#serialStationToggleSwitch {{
     background-color: transparent;
+}}
+/* Batch 48: Divider 分隔线。自绘，QSS 仅契约占位。 */
+QWidget#serialStationDivider {{
+    background-color: transparent;
+}}
+QLabel#serialStationDividerLabel {{
+    background-color: transparent;
 }}"""
