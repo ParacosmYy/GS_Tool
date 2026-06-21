@@ -6,6 +6,8 @@ from typing import Protocol
 
 from PyQt6.QtWidgets import QComboBox, QHBoxLayout, QLineEdit, QPushButton, QWidget
 
+from embeddebug.serial_station.ui.theme import tokens as T
+
 
 class CommandSectionHost(Protocol):
     def tr(self, source_text: str) -> str: ...
@@ -33,7 +35,6 @@ def build_send_row(owner: CommandSectionHost, root: QWidget) -> QHBoxLayout:
     # Batch 15: Send 按钮接入 scale 弹性反馈（按下陷下、松手回弹）。
     try:
         from embeddebug.serial_station.ui.micro_interactions import install_scale_press
-from embeddebug.serial_station.ui.theme import tokens as T
 
         install_scale_press(owner._send_button)
     except Exception:

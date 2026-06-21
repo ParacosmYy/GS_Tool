@@ -13,7 +13,7 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QPropertyAnimation, QSequentialAnimationGroup
+from PyQt6.QtCore import QPropertyAnimation, QParallelAnimationGroup, QSequentialAnimationGroup
 from PyQt6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
 from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
@@ -57,22 +57,19 @@ class FadeTransition:
 
     @staticmethod
     def cross_fade(out_widget: QWidget, in_widget: QWidget,
-                   duration: int = AnimationTokens.DURATION_SLOW) -> QSequentialAnimationGroup:
-        """交叉淡出淡入：先淡出旧面板，淡出完成后 show 新面板并淡入。
+                   duration: int = AnimationTokens.DURATION_SLOW) -> QParallelAnimationGroup:
+        """并行交叉淡出淡入：旧面板淡出 + 新面板淡入同时进行（无中间空白间隙）。
 
-        修正点（对比旧实现）：
-        - 不再用 ``QTimer.singleShot(duration//2, in_widget.show)`` 并行调度，
-          改为在淡出动画 ``finished`` 回调里 show 新面板，时序确定，无错位。
-        - 整体时长达 ``duration``，前半淡出后半淡入。
+        Batch 48 修复：从 QSequentialAnimationGroup（先淡出再淡入，中间有
+        完全透明间隙）迁移到 QParallelAnimationGroup（同时淡出淡入，视觉平滑）。
+        对标 Material Design container transform 的 cross-fade 模式。
 
         返回的 group 已绑定到 ``out_widget`` 防止 GC，调用方需 ``.start()``。
         """
 
-        group = QSequentialAnimationGroup(out_widget)
-        half = max(40, duration // 2)
-        fade_out = FadeTransition.fade_out(out_widget, half)
-        fade_in = FadeTransition.fade_in(in_widget, half)
-        # 新面板在淡出完成、淡入开始前的衔接点 show，由 fade_in 内部 show 保证。
+        group = QParallelAnimationGroup(out_widget)
+        fade_out = FadeTransition.fade_out(out_widget, duration)
+        fade_in = FadeTransition.fade_in(in_widget, duration)
         group.addAnimation(fade_out)
         group.addAnimation(fade_in)
         return group
