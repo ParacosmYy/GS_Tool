@@ -19,6 +19,7 @@ from embeddebug.serial_station.ui.controls.progress_ring import ProgressRing
 from embeddebug.serial_station.ui.controls.badge import Badge, BadgeKind
 from embeddebug.serial_station.ui.controls.drawer import Drawer
 from embeddebug.serial_station.ui.controls.status_bar import StatusBar
+from embeddebug.serial_station.ui.controls.key_hint import KeyboardShortcut
 
 __all__ = [
     "Badge",
@@ -31,6 +32,7 @@ __all__ = [
     "Drawer",
     "GaugeWidget",
     "InfoBanner",
+    "KeyboardShortcut",
     "LedState",
     "ProgressRing",
     "RichTooltip",
