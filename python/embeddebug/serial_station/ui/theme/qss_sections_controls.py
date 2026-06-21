@@ -81,6 +81,11 @@ QPushButton#serialStationConfigurableButton:hover {{
 QPushButton#serialStationConfigurableButton:pressed {{
     background-color: {P.BG_SELECTION};
 }}
+QPushButton#serialStationConfigurableButton:disabled {{
+    background-color: {P.BG_DISABLED};
+    color: {P.TEXT_DISABLED};
+    border-color: {P.BORDER};
+}}
 /* 仪表盘：自绘，QSS 仅控制背景。 */
 QWidget#serialStationGauge {{
     background-color: transparent;
