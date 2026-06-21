@@ -69,6 +69,13 @@ LETTER_SPACING_BRAND = "0.3px"       # 品牌名
 LETTER_SPACING_WIDE = "0.4px"        # 折叠面板标题
 LETTER_SPACING_UPPERCASE = "0.6px"   # 大写分组标签
 
+# ── 字重（QSS font-weight 用） ──
+FONT_WEIGHT_REGULAR = "400"
+FONT_WEIGHT_MEDIUM = "500"
+FONT_WEIGHT_SEMIBOLD = "600"
+FONT_WEIGHT_BOLD = "700"
+FONT_WEIGHT_BLACK = "800"
+
 # ── 控件高度 ───────────────────────────────────────────────────────
 CONTROL_HEIGHT_SM = "24px"
 CONTROL_HEIGHT_MD = "28px"
