@@ -1,8 +1,8 @@
 # EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 669分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 331分
+> 当前: 670分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 330分
 
 ---
 
@@ -371,6 +371,7 @@
 | 667 | Serial Station UI 美化 Batch 41 — 5 个并行新增 UI 组件 + 动画 + 工具面板 | 2 控件（Drawer 侧边抽屉带半透明遮罩四向滑入/Badge 状态徽章 kind 配色）+ 2 动画（SkeletonAnimation windowOpacity 闪烁/PageSlideAnimation 四向页面切换 slide）+ 1 工具（CrcCalculatorPanel 自带 4 个 catalog 预设 CRC-8/MAXIM/CRC-16/MODBUS/CRC-16/CCITT-FALSE/CRC-32/ISO-HDLC，全部 check value 自检通过 0xA1/0x4B37/0x29B1/0xCBF43926）；新建 ui/tools/ 子包；合流更新 controls/animations/__init__.py + tools/__init__.py + qss_sections_controls 覆盖 9 新 objectName；全量 pytest 1565 passed + 2 skipped + 0 access violation，ui_smoke 23 passed，start-embeddebug --smoke exit 0 |
 | 668 | Serial Station 工具面板 Batch 42 — 3 个并行新增工程师工具（TimestampConverter/HexViewer/ByteFrequencyAnalyzer） | 3 工具面板：TimestampConverterPanel（epoch ↔ datetime ↔ ISO ↔ hex，5 时区预设，纯函数核 5 个：epoch_to_datetime/datetime_to_epoch/epoch_to_iso/iso_to_epoch/epoch_to_hex）；HexViewerPanel（offset+bytes+ASCII 三栏格式化 dump，16 bytes/line，纯函数核 4 个：format_hex_line/format_hex_dump/to_ascii_repr/parse_hex_input）；ByteFrequencyAnalyzer（256 桶字节频率 + Shannon 熵 + 自绘柱状画布 _FrequencyCanvas，纯函数核 4 个：compute_frequency/top_n_bytes/entropy_bits/format_stats_text）；合流 tools/__init__.py 导出 18 个公共符号，qss_sections_controls 覆盖 22 新 objectName；全量 pytest 1626 passed + 2 skipped + 0 access violation，start-embeddebug --smoke exit 0 |
 | 669 | Batch 43 + Batch 44 prep — UI/动画基建 + 30 按钮状态完整化（VOFA+/MobaXterm 对标第一批） | Batch 43 新增 4 模块：ColorTweenAnimation（颜色属性 tween，parse_color/format_color 支持 hex6/hex8/rgba，tween + tween_stylesheet 两个工厂，对标 VOFA+ 连接按钮深→浅蓝过渡）；StaggerCoordinator（编排：N 个动画工厂按 step_ms 错峰启动，cancel + finished + cancelled 信号，对标 Linear/Vercel 卡片入场）；ThemeSerializer（palette JSON 导出/导入，serialize_palette/deserialize_to_dict/apply_overrides + to_json/from_json/save/load + validate_color/snapshot，对标 MobaXterm .mxtcolors）；2 个守护测试（test_no_hardcoded_colors grep QColor 硬编码 + test_no_px_font_sizes grep setPixelSize/font-size:Npx，均用 STRICT_*_COLORS 环境变量切换软/硬模式）。Batch 44 prep：tokens.py 加 6 个 token（EASE_OUT_QUART/EASE_IN_QUINT/EASE_OUT_QUINT/EASE_MATERIAL_EMPHASIZED/DURATION_CONTAINER=300/KEYFRAME_PREVIEW=0.3/STAGGER_STEP_MS=60，对齐 Material 3 emphasized + 动画审计 P0-4）；30 个按钮补齐 :pressed + :disabled（tool 8 + domain primary 5 + domain secondary 11 + dashboard 5 + EmptyStateCTA 1，对齐 UI 审计 §2 P0）。研究：librarian 交付 VOFA+ appTheme token 系统名（bgColor/barColor/mainColor/cbColor1-4/iconColor1-3/textAnsiErr/Tx/Rx/Time）+ MobaXterm catppuccin RGB 值（bg=#1E1E2E fg=#CDD6F4）+ 8 层 50+ 项审计清单；explore 交付 UI 审计（30 按钮缺状态/6 卡片缺 hover-lift/27 按钮缺图标/Toast Unicode 字形/light theme 缺 6 CARD token/无 INFO 色）+ 动画审计（AppShell leave 隐形/PageSlide 死代码/GlowAnimation 死代码/cross_fade sequential bug/stagger_fade GC 风险）。全量 pytest 1649 passed + 2 skipped + 0 access violation，start-embeddebug --smoke exit 0 |
+| 670 | Batch 44 — 22 个 domain panel 按钮图标补齐（UI 审计 §4.1 P0） | _BUTTON_ICON_MAP 从 13 条扩到 35 条：BLE 5 个（scan/bluetooth/eye/pencil/bell）+ CAN 3 个（send/trash-2/play）+ RTT 2 个（zap/trash-2）+ Automation 3 个（play/zap/refresh-cw）+ SVD 2 个（folder-open/cpu）+ OTA 2 个（folder-open/upload）+ Dashboard 5 个（plus/trash-2/save/folder-open/grid）+ Settings 1 个（check）。apply_button_icons 函数 findChild 容错（按钮不存在静默跳过，icon 不存在 IconManager 返回 null QIcon 跳过），所以多写 entry 也安全。颜色与 QSS 对齐：domain primary 用 TEXT_ON_ACCENT，secondary 用 TEXT_SECONDARY/TEXT_MUTED，TX 类用 TERM_TX，危险操作用 ERROR/WARNING。全量 pytest 1649 passed + 2 skipped + 0 access violation，smoke exit 0 |
 
 ---
 

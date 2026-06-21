@@ -29,12 +29,16 @@ class ButtonIconHost(Protocol):
 
 
 # objectName -> (lucide 图标名, 着色)。颜色与 QSS 按钮文字色对齐。
+# apply_button_icons 用 findChild 查找，按钮不存在时静默跳过；icon 不存在时
+# IconManager 返回 null QIcon，亦跳过。所以即多写几条 entry 也安全。
 _BUTTON_ICON_MAP: dict[str, tuple[str, str]] = {
+    # ── 连接类主按钮 ──
     "serialStationConnectButton": ("plug-zap", P.TEXT_ON_ACCENT),
     "serialStationConnectSerialButton": ("cable", P.TEXT_ON_ACCENT),
     "serialStationConnectTcpButton": ("ethernet", P.TEXT_ON_ACCENT),
     "serialStationConnectUdpButton": ("radio", P.TEXT_ON_ACCENT),
     "serialStationDisconnectButton": ("unlink", P.ERROR),
+    # ── 工具栏（serial station 通用）──
     "serialStationRefreshPortsButton": ("refresh-cw", P.TEXT_SECONDARY),
     "serialStationSendButton": ("send", P.TERM_TX),
     "serialStationInjectButton": ("download", P.TERM_TX),
@@ -43,6 +47,38 @@ _BUTTON_ICON_MAP: dict[str, tuple[str, str]] = {
     "serialStationSaveProfileButton": ("save", P.TEXT_SECONDARY),
     "serialStationLoadProfileButton": ("folder-open", P.TEXT_SECONDARY),
     "serialStationClearButton": ("trash-2", P.TEXT_MUTED),
+    # ── Batch 44: domain panel 按钮（UI 审计 §4.1 P0 — 27+ 按钮零图标）──
+    # BLE panel
+    "serialStationBleScanButton": ("scan", P.TEXT_SECONDARY),
+    "serialStationBleConnectButton": ("bluetooth", P.TEXT_ON_ACCENT),
+    "serialStationBleReadButton": ("eye", P.TEXT_SECONDARY),
+    "serialStationBleWriteButton": ("pencil", P.TEXT_SECONDARY),
+    "serialStationBleNotifyButton": ("bell", P.TEXT_SECONDARY),
+    # CAN panel
+    "serialStationCanSendButton": ("send", P.TERM_TX),
+    "serialStationCanClearButton": ("trash-2", P.TEXT_MUTED),
+    "serialStationCanDemoButton": ("play", P.TEXT_MUTED),
+    # RTT panel
+    "serialStationRttStartButton": ("zap", P.TEXT_ON_ACCENT),
+    "serialStationRttClearButton": ("trash-2", P.TEXT_MUTED),
+    # Automation panel
+    "serialStationAutomationRunButton": ("play", P.TEXT_ON_ACCENT),
+    "serialStationAutomationFireButton": ("zap", P.WARNING),
+    "serialStationAutomationRefreshButton": ("refresh-cw", P.TEXT_SECONDARY),
+    # SVD panel
+    "serialStationSvdLoadButton": ("folder-open", P.TEXT_SECONDARY),
+    "serialStationSvdDemoButton": ("cpu", P.TEXT_MUTED),
+    # OTA panel
+    "serialStationOtaBrowseButton": ("folder-open", P.TEXT_SECONDARY),
+    "serialStationOtaStartButton": ("upload", P.TEXT_ON_ACCENT),
+    # Dashboard panel
+    "serialStationDashboardAddTabButton": ("plus", P.TEXT_SECONDARY),
+    "serialStationDashboardClearButton": ("trash-2", P.TEXT_MUTED),
+    "serialStationDashboardSaveButton": ("save", P.TEXT_SECONDARY),
+    "serialStationDashboardLoadButton": ("folder-open", P.TEXT_SECONDARY),
+    "serialStationDashboardGridButton": ("grid", P.TEXT_SECONDARY),
+    # Settings panel
+    "serialStationSettingsApplyButton": ("check", P.TEXT_ON_ACCENT),
 }
 
 
