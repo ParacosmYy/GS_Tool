@@ -27,6 +27,7 @@ from PyQt6.QtWidgets import (
 )
 
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.theme import tokens as T
 
 
 class CommandSlider(QWidget):
@@ -86,7 +87,7 @@ class CommandSlider(QWidget):
         self._bubble.setStyleSheet(
             f"background-color: {P.ACCENT}; color: {P.TEXT_ON_ACCENT};"
             f"border-radius: 8px; padding: 2px 6px; font-family: monospace;"
-            f"font-size: 11px; font-weight: 600;"
+            f"font-size: {T.FONT_XS}; font-weight: 600;"
         )
         self._bubble.setFixedHeight(18)
         self._bubble.hide()  # 默认隐藏，拖拽时显示

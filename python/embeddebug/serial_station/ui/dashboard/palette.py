@@ -19,6 +19,7 @@ from PyQt6.QtWidgets import (
 from embeddebug.serial_station.ui.dashboard.factory import WIDGET_CATALOG
 from embeddebug.serial_station.ui.icons import IconManager
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.theme import tokens as T
 
 MIME_TYPE = "application/x-serialstation-widget-type"
 
@@ -92,7 +93,7 @@ class WidgetPalette(QFrame):
         # Batch 39: 标题走 tr()（铁律 19，原为硬编码 "Widgets"）。
         title = QLabel(self.tr("Widgets"), self)
         title.setObjectName("serialStationPaletteTitle")
-        title.setStyleSheet(f"color: {P.TEXT_PRIMARY}; font-weight: 600; font-size: 13px;")
+        title.setStyleSheet(f"color: {P.TEXT_PRIMARY}; font-weight: 600; font-size: {T.FONT_BASE};")
         layout.addWidget(title)
 
         for entry in WIDGET_CATALOG:

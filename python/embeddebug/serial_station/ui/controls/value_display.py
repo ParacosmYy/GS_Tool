@@ -13,6 +13,7 @@ from PyQt6.QtGui import QColor, QFont
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.theme import tokens as T
 
 TREND_UP = "▲"
 TREND_DOWN = "▼"
@@ -36,7 +37,7 @@ class ValueDisplay(QWidget):
 
         self._label_widget = QLabel("", self)
         self._label_widget.setObjectName("serialStationValueLabel")
-        self._label_widget.setStyleSheet(f"color: {P.TEXT_MUTED}; font-size: 11px;")
+        self._label_widget.setStyleSheet(f"color: {P.TEXT_MUTED}; font-size: {T.FONT_XS};")
         layout.addWidget(self._label_widget)
 
         row = QHBoxLayout()

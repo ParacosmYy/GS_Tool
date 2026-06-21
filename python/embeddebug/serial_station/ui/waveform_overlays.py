@@ -21,6 +21,7 @@ import pyqtgraph as pg
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.theme import tokens as T
 
 
 class WaveformLegend(QWidget):
@@ -74,7 +75,7 @@ class WaveformLegend(QWidget):
             f"color: {P.TEXT_SECONDARY}; font-family: {P.BG_PANEL};"
             f"QLabel {{ color: {hex_color}; }}"
         )
-        chip.setStyleSheet(f"color: {hex_color}; font-size: 12px;")
+        chip.setStyleSheet(f"color: {hex_color}; font-size: {T.FONT_SM};")
         return chip
 
 
@@ -84,5 +85,5 @@ def build_cursor_hud(parent: QWidget) -> QLabel:
     hud = QLabel(parent)
     hud.setObjectName("serialStationWaveformCursorHud")
     hud.setText("ΔX —  ·  Y1 —  ·  Y2 —")
-    hud.setStyleSheet(f"color: {P.TEXT_MUTED}; font-size: 12px; padding: 4px 8px;")
+    hud.setStyleSheet(f"color: {P.TEXT_MUTED}; font-size: {T.FONT_SM}; padding: 4px 8px;")
     return hud
