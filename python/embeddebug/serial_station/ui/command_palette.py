@@ -29,6 +29,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from embeddebug.serial_station.ui.theme import tokens as T
+
 
 @dataclass(frozen=True)
 class CommandItem:
