@@ -23,6 +23,7 @@ from PyQt6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 from embeddebug.serial_station.ui.icons import button_icon
 from embeddebug.serial_station.ui.micro_interactions import install_hover_lift
 from embeddebug.serial_station.ui.theme import palette as P
+from embeddebug.serial_station.ui.theme import tokens as T
 
 
 class EmptyStateWidget(QWidget):
@@ -73,7 +74,7 @@ class EmptyStateWidget(QWidget):
         else:
             self._icon_label.setText(emoji)
             font = self._icon_label.font()
-            font.setPointSize(40)
+            font.setPointSize(T.FONT_POINT_ICON)
             self._icon_label.setFont(font)
         layout.addWidget(self._icon_label)
 
@@ -83,7 +84,7 @@ class EmptyStateWidget(QWidget):
         self._title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._title_label.setWordWrap(True)
         title_font = self._title_label.font()
-        title_font.setPointSize(13)
+        title_font.setPointSize(T.FONT_POINT_TITLE)
         title_font.setBold(True)
         self._title_label.setFont(title_font)
         layout.addWidget(self._title_label)
@@ -94,7 +95,7 @@ class EmptyStateWidget(QWidget):
         self._desc_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._desc_label.setWordWrap(True)
         desc_font = self._desc_label.font()
-        desc_font.setPointSize(10)
+        desc_font.setPointSize(T.FONT_POINT_DESC)
         self._desc_label.setFont(desc_font)
         layout.addWidget(self._desc_label)
 

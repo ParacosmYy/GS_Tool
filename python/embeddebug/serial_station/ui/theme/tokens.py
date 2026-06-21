@@ -46,6 +46,11 @@ FONT_XL = "18px"
 FONT_FAMILY = '"Microsoft YaHei UI", "Segoe UI", sans-serif'
 FONT_FAMILY_MONO = '"JetBrains Mono", "Cascadia Code", Consolas, monospace'
 
+# ── Integer point sizes（Python QFont.setPointSize 用，不用于 QSS） ──
+FONT_POINT_ICON = 40    # EmptyStateWidget 图标 emoji
+FONT_POINT_TITLE = 13   # EmptyStateWidget 标题
+FONT_POINT_DESC = 10    # EmptyStateWidget 描述
+
 # ── 控件高度 ───────────────────────────────────────────────────────
 CONTROL_HEIGHT_SM = "24px"
 CONTROL_HEIGHT_MD = "28px"
