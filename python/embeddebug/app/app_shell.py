@@ -12,7 +12,7 @@ AppShell 是应用顶层 ``QMainWindow``：左侧 ``NavRail``（56px 竖排图�
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtCore import QSize, Qt, QTimer
 from PyQt6.QtWidgets import (
     QButtonGroup,
     QFrame,
@@ -45,6 +45,9 @@ class AppShell(QMainWindow):
         self._nav_buttons: dict[str, QPushButton] = {}
         # Batch 23: 页面离场淡出动画引用（防 GC），_stop_page_anims 清理。
         self._leave_anims: list = []
+        # Batch 46: 延迟切换定时器（让离场淡出可见，setCurrentIndex 不再立即隐藏老页）。
+        self._switch_timer: QTimer | None = None
+        self._switch_index: int = -1
 
         central = QWidget(self)
         layout = QHBoxLayout(central)
@@ -209,8 +212,30 @@ class AppShell(QMainWindow):
             if leaving_widget is not None:
                 self._animate_page_leave(leaving_widget)
 
-        self._stack.setCurrentIndex(index)
+        # 导航按钮立即更新（给用户即时反馈，不等动画）。
         self._nav_buttons[registrations[index].mode_id].setChecked(True)
+
+        # Batch 46: 延迟 setCurrentIndex 让离场淡出可见（160ms = DURATION_FAST）。
+        # 此前 setCurrentIndex 同步执行，老页面立即被 QStackedWidget 隐藏，
+        # fade_out 动画在不可见控件上运行，视觉上等于「闪切 + 入场淡入」，
+        # 违反铁律 18「禁止突然消失」。现在等 fade_out 完成再切 index。
+        self._switch_index = index
+        if self._switch_timer is not None:
+            self._switch_timer.stop()
+        self._switch_timer = QTimer(self)
+        self._switch_timer.setSingleShot(True)
+        self._switch_timer.timeout.connect(self._complete_switch)
+        self._switch_timer.start(160)
+
+    def _complete_switch(self) -> None:
+        """延迟切换回调：离场淡出完成后执行 setCurrentIndex + 入场动画。"""
+
+        self._switch_timer = None
+        index = self._switch_index
+        registrations = registered_panels()
+        if not (0 <= index < len(registrations)):
+            return
+        self._stack.setCurrentIndex(index)
         entering = registrations[index]
         self._call_panel(entering.mode_id, "on_enter")
         # 入场动画：淡入 + 轻微上滑（240ms OutCubic，对齐 mode-stage-enter）。
@@ -232,6 +257,10 @@ class AppShell(QMainWindow):
             except Exception:
                 pass
         self._leave_anims = []
+        # Batch 46: 取消待执行的延迟切换定时器（快速连续切换时不串页）。
+        if getattr(self, "_switch_timer", None) is not None:
+            self._switch_timer.stop()
+            self._switch_timer = None
 
     def _animate_page_enter(self, page: QWidget) -> None:
         """页面入场动画（fade + slide），持有引用防 GC。"""
