@@ -109,7 +109,7 @@
 | 应用名称 | EmbedDebug |
 | 项目路径 | `E:\Embedded\Tool\Serial_tool\User_Serial` |
 | 当前版本 | 0.1.0 |
-| 评分 | 677（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
+| 评分 | 691（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
 | 测试文件数 | 112（2026-06-22 精简，原 168） |
@@ -310,3 +310,27 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 - **Batch 48**: 排版 token（FONT_ROLE_* / LETTER_SPACING_* / LINE_HEIGHT_*）+ 间距 token 统一
 - **Batch 49**: 加载态（Connect/Refresh spinner）+ 空态（log/waveform/dashboard）
 - **Batch 50**: 死代码守护测试 + CI 严格化
+
+---
+
+### Batch 47 成果（2026-06-22，score 677→691，18 commits）
+
+#### 死代码激活（7 个模块 → 全部接入生产线）
+- SkeletonAnimation：windowOpacity → QGraphicsOpacityEffect（修复内嵌控件不可见 bug）
+- BouncePathAnimation → canvas.add_widget_at（dashboard 控件放置弹入）
+- TypewriterAnimation → status_messages.set_status_text（状态栏打字机效果）
+- GlowAnimation → connection_control_state（连接成功脉冲发光）
+- ElasticSnapAnimation → _dashboard_widget_menu._edit_properties（属性编辑弹性归位）
+- RichTooltip/install_tooltip → connection_toolbar（4 个工具栏按钮富文本 tooltip）
+- InfoBanner/Chip 关闭 × → lucide x SVG（从手绘线条迁移）
+
+#### UI 审计 P0 修复
+- Dashboard canvas 空态拖拽提示（paintEvent 居中文本）
+- Log view placeholder 改为 actionable 引导
+- **全连接路径加载态**：fake/serial/tcp/udp connect + refresh ports + BLE scan 均有 _set_loading 反馈
+
+#### Token 迁移（全应用字体/间距硬编码清零）
+- font-size:NNpx → FONT_* tokens（value_display/slider/waveform_overlays/dashboard palette）
+- setPointSize(N) → FONT_POINT_* tokens（empty_state/value_display/led/gauge + 4 tools）
+- setContentsMargins/setSpacing 硬编码 → SPACING_INT_* tokens（layout_cards/top_bar/sections/layout_main/toast）
+- tokens.py 新增：FONT_POINT_LARGE/HEADING/BODY/TINY + SPACING_INT_XS~2XL
