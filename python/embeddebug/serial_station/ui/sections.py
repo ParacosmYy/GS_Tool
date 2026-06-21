@@ -93,7 +93,7 @@ def _populate_center_log_card(owner: SerialStationSectionsHost) -> None:
 
     owner._log_view = QPlainTextEdit(log_card)
     owner._log_view.setObjectName("serialStationLogView")
-    owner._log_view.setPlaceholderText(owner.tr("No serial log entries"))
+    owner._log_view.setPlaceholderText(owner.tr("No serial log entries yet.\nConnect a device to start receiving data."))
     owner._log_view.setReadOnly(True)
     body.addWidget(owner._log_view, 1)
     owner._update_log_stats()
