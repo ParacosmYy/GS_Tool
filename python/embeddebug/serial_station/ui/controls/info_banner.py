@@ -35,8 +35,7 @@ from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 from embeddebug.serial_station.ui.theme import palette as P
 
 
-# INFO soft 底色常量（palette 未提供 INFO_SOFT，模块顶层集中声明，避免逻辑内散落）。
-_INFO_SOFT_BG = "rgba(34, 211, 238, 0.10)"
+# INFO soft 底色复用 palette 的 INFO_SOFT token（Batch 45: 从硬编码 rgba 迁移到 palette）。
 # WARNING/ERROR/SUCCESS soft 底色复用 palette 的 *_SOFT token。
 
 
@@ -62,7 +61,7 @@ class InfoBanner(QWidget):
     # kind -> (accent_color, soft_bg_color)。accent 用于左侧条与 hover 高亮，
     # soft_bg 用于整体半透明底色。优先复用 palette 常量。
     KIND_COLORS: dict[BannerKind, tuple[str, str]] = {
-        BannerKind.INFO: (P.ACCENT, _INFO_SOFT_BG),
+        BannerKind.INFO: (P.INFO, P.INFO_SOFT),
         BannerKind.WARNING: (P.WARNING, P.WARNING_SOFT),
         BannerKind.ERROR: (P.ERROR, P.ERROR_SOFT),
         BannerKind.SUCCESS: (P.SUCCESS, P.SUCCESS_SOFT),
@@ -134,7 +133,7 @@ class InfoBanner(QWidget):
         """自绘：底色 + 左 accent 条 + 居中文本 + 右 × 按钮。"""
 
         accent_color, bg_color = self.KIND_COLORS.get(
-            self._kind, (P.ACCENT, _INFO_SOFT_BG)
+            self._kind, (P.ACCENT, P.INFO_SOFT)
         )
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)

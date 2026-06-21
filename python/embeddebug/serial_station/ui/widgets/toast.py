@@ -42,7 +42,7 @@ from embeddebug.serial_station.ui.theme import palette as P
 
 # 级别 → 色条/强调色（取 palette 状态色，无硬编码）。
 _LEVEL_COLORS: dict[NotificationLevel, str] = {
-    NotificationLevel.INFO: P.ACCENT,
+    NotificationLevel.INFO: P.INFO,
     NotificationLevel.SUCCESS: P.SUCCESS,
     NotificationLevel.WARNING: P.WARNING,
     NotificationLevel.ERROR: P.ERROR,

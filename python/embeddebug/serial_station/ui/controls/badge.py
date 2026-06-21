@@ -63,7 +63,7 @@ class Badge(QWidget):
     # kind -> (bg_color, text_color)。bg 走 palette *_SOFT 软底 token，
     # text 走对应状态 accent token（保持 kind 色相可辨识）。
     KIND_COLORS: dict[BadgeKind, tuple[str, str]] = {
-        BadgeKind.INFO: (P.ACCENT_SOFT, P.ACCENT),
+        BadgeKind.INFO: (P.INFO_SOFT, P.INFO),
         BadgeKind.WARNING: (P.WARNING_SOFT, P.WARNING),
         BadgeKind.ERROR: (P.ERROR_SOFT, P.ERROR),
         BadgeKind.SUCCESS: (P.SUCCESS_SOFT, P.SUCCESS),
