@@ -1,4 +1,4 @@
-# EmbedDebug - 项目开发约束文档
+﻿# EmbedDebug - 项目开发约束文档
 
 > 本文档是所有开发行为的最高约束入口。
 > 详细约束已拆分为模块化文档，分布在 `docs/constraints/` 目录下。
@@ -109,7 +109,7 @@
 | 应用名称 | EmbedDebug |
 | 项目路径 | `E:\Embedded\Tool\Serial_tool\User_Serial` |
 | 当前版本 | 0.1.0 |
-| 评分 | 691（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
+| 评分 | 693（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
 | 测试文件数 | 112（2026-06-22 精简，原 168） |
