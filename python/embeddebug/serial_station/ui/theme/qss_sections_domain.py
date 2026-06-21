@@ -230,9 +230,17 @@ QTabBar::tab {{
     border-top-left-radius: {T.RADIUS_SM};
     border-top-right-radius: {T.RADIUS_SM};
 }}
+QTabBar::tab:hover {{
+    background-color: {P.BG_PANEL_RAISED};
+    color: {P.TEXT_PRIMARY};
+}}
 QTabBar::tab:selected {{
     background-color: {P.ACCENT_SOFT};
     color: {P.ACCENT};
+}}
+QTabBar::tab:selected:hover {{
+    background-color: {P.ACCENT_SOFT};
+    color: {P.ACCENT_HOVER};
 }}
 /* Batch 10: 强调色选择色点（7 套 accent 变体）。底色由 inline style 填充（每按钮不同），
    QSS 只控选中态 ring 与 hover。checked = 当前活动 accent，画 2px accent 描边外环。 */
