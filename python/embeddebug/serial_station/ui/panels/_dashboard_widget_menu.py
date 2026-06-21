@@ -98,6 +98,11 @@ def _edit_properties(widget: QWidget, canvas, item_id: str) -> None:
     new_geo = QRect(new_x, new_y, new_w, new_h)
     try:
         widget.setGeometry(new_geo)
+        try:
+            from embeddebug.serial_station.ui.animations.elastic_snap import ElasticSnapAnimation
+            ElasticSnapAnimation.snap_to(widget, new_geo).start()
+        except Exception:
+            pass
         item.geometry = new_geo
         item.config["width"] = new_w
         item.config["height"] = new_h

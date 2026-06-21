@@ -170,23 +170,18 @@ class InfoBanner(QWidget):
         self._draw_close_button(painter, accent_color)
 
     def _draw_close_button(self, painter: QPainter, accent_color: str) -> None:
-        """绘制右侧 × 关闭图标（hover 时颜色切 accent）。"""
-
+        """绘制右侧 × 关闭图标（lucide x SVG）。Batch 47: 从手绘线条迁移。"""
         btn_rect = self._close_button_rect()
-        color = QColor(accent_color) if self._close_hovered else QColor(P.TEXT_SECONDARY)
-        pen = QPen(color)
-        pen.setWidthF(1.6)
-        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-        painter.setPen(pen)
-        painter.setBrush(Qt.BrushStyle.NoBrush)
-
-        inset = 2.0
-        x1 = btn_rect.left() + inset
-        y1 = btn_rect.top() + inset
-        x2 = btn_rect.right() - inset
-        y2 = btn_rect.bottom() - inset
-        painter.drawLine(QPointF(x1, y1), QPointF(x2, y2))
-        painter.drawLine(QPointF(x2, y1), QPointF(x1, y2))
+        color = accent_color if self._close_hovered else P.TEXT_SECONDARY
+        try:
+            from embeddebug.serial_station.ui.icons import button_icon
+            icon = button_icon("x", color=color)
+            if icon and not icon.isNull():
+                sz = int(btn_rect.width())
+                painter.drawPixmap(btn_rect.topLeft().toPoint(), icon.pixmap(sz, sz))
+                return
+        except Exception:
+            pass
 
     # ── 鼠标交互 ────────────────────────────────────────────────────
     def mousePressEvent(self, event: QMouseEvent) -> None:

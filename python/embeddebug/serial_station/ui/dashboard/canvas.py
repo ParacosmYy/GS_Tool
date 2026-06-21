@@ -96,6 +96,11 @@ class DashboardCanvas(QFrame):
         geometry = QRect(snapped_x, snapped_y, width, height)
         widget.setGeometry(geometry)
         widget.show()
+        try:
+            from embeddebug.serial_station.ui.animations.bounce_path import BouncePathAnimation
+            BouncePathAnimation.drop_in(widget).start()
+        except Exception:
+            pass
         self._items[item_id] = DashboardItem(
             widget_type=widget_type,
             widget=widget,

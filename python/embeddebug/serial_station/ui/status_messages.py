@@ -97,7 +97,13 @@ def set_result_status(
 def set_status_text(host: StatusMessageHost, text: str, **format_values: object) -> None:
     """Write a translated plain status message to the host status label."""
 
-    host._status_label.setText(host.tr(text).format(**format_values))
+    message = host.tr(text).format(**format_values)
+    host._status_label.setText(message)
+    try:
+        from embeddebug.serial_station.ui.animations.typewriter import TypewriterAnimation
+        TypewriterAnimation.run_with_label(host._status_label, message).start()
+    except Exception:
+        pass
 
 
 def set_profile_label(host: ProfileLabelHost, name: str) -> None:

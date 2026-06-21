@@ -199,16 +199,18 @@ class Chip(QWidget):
         return QColor("rgba(255, 255, 255, 28)")
 
     def _paint_close_button(self, painter: QPainter) -> None:
-        """绘制 close button（× 图标），颜色随 _close_hovered 变化。"""
-
+        """绘制 close button（lucide x SVG），颜色随 _close_hovered 变化。Batch 47: 从手绘线条迁移。"""
         close_rect = self._close_button_rect()
-        color = QColor(P.TEXT_PRIMARY) if self._close_hovered else QColor(P.TEXT_SECONDARY)
-        painter.setPen(color)
-        # 简单 × ：两条对角线。
-        pad = 2.0
-        r = close_rect.adjusted(pad, pad, -pad, -pad)
-        painter.drawLine(r.topLeft(), r.bottomRight())
-        painter.drawLine(r.topRight(), r.bottomLeft())
+        color = P.TEXT_PRIMARY if self._close_hovered else P.TEXT_SECONDARY
+        try:
+            from embeddebug.serial_station.ui.icons import button_icon
+            icon = button_icon("x", color=color)
+            if icon and not icon.isNull():
+                sz = int(close_rect.width())
+                painter.drawPixmap(close_rect.topLeft().toPoint(), icon.pixmap(sz, sz))
+                return
+        except Exception:
+            pass
 
     # ── 几何辅助 ─────────────────────────────────────────────────────
     def _close_button_rect(self) -> QRectF:

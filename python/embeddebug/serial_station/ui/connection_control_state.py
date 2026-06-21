@@ -32,3 +32,9 @@ def set_connection_control_state(
             ScaleAnimation.pop(host._disconnect_button).start()
         except Exception:
             pass  # 动画是锦上添花，失败不阻塞连接逻辑。
+        try:
+            from embeddebug.serial_station.ui.animations.glow import GlowAnimation
+
+            GlowAnimation.pulse(host._disconnect_button, loops=3).start()
+        except Exception:
+            pass  # 动画是锦上添花，失败不阻塞连接逻辑。
