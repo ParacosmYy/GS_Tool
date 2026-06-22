@@ -109,11 +109,11 @@
 | 应用名称 | EmbedDebug |
 | 项目路径 | `E:\Embedded\Tool\Serial_tool\User_Serial` |
 | 当前版本 | 0.1.0 |
-| 评分 | 727（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
+| 评分 | 728（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
 | 测试文件数 | 112（2026-06-22 精简，原 168） |
-| 测试通过 | 1601 passed, 2 skipped, 0 failed |
+| 测试通过 | 1699 passed, 2 skipped, 0 failed |
 
 ### Python/PyQt 命令
 ```powershell
@@ -167,11 +167,11 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 | # | 待办项 | 状态 | PRD | 说明 |
 |---|--------|------|-----|------|
 | UI-01 | **BasePanel 容器组件** | ✅ | PRD-061 | 已实现: 标题栏/折叠/动画/阴影/空状态/骨架屏(509行) |
-| UI-02 | **IconManager SVG图标系统** | ✅ | PRD-062 | 已实现: SVG着色管线+缓存(138行)。图标数量不足(仅14个SVG，需50+) |
+| UI-02 | **IconManager SVG图标系统** | ✅ | PRD-062 | 已实现: SVG着色管线+缓存(138行)。lucide 图标库 146 个 SVG（2026-06-22 扩展完成） |
 | UI-03 | **EmptyStateWidget/LoadingSpinner/SkeletonWidget** | ✅ | PRD-063 | 已实现: 三个组件全部完成(EmptyState 196行/Spinner 135行/Skeleton 115行) |
 | UI-04 | **CommandPalette 命令面板** | ✅ | PRD-064 | 已实现: 模糊搜索+半透明遮罩+事件过滤(298行) |
 | UI-05 | **IconNavBar 三栏布局** | ✅ | PRD-065 | 已实现: 分类按钮+滑动指示器(133行) |
-| UI-06 | **QSS主题生成器** | ❌ | PRD-066 | 当前3套QSS共4740行手动维护，需自动化生成 |
+| UI-06 | **QSS主题生成器** | ✅ | PRD-066 | 已实现: qss_builder 程序化生成 + palette/tokens 分离 + 12 个 qss_sections_* 模块化段 |
 
 ### 二、交互体验增强 (优先级: 高)
 
@@ -182,7 +182,7 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 | UX-03 | **DataDiffWidget 数据对比** | ✅ | PRD-069 | 已实现: HTML diff渲染+颜色标记(318行) |
 | UX-04 | **键盘快捷键体系完善** | ❌ | 05-ui-standard §十五 | Ctrl+F/Ctrl+P/Ctrl+Shift+R/Ctrl+Enter 等全局快捷键尚未全面实现 |
 | UX-05 | **响应式布局** | ❌ | 05-ui-standard §十七 | 窗口<900px自动折叠导航树、断点动画过渡。窗口resize时布局适配 |
-| UX-06 | **弹窗/对话框体系统一** | ❌ | 05-ui-standard §十六 | 禁止QMessageBox，统一自定义弹窗(确认/警告/错误)。当前仍有QMessageBox使用 |
+| UX-06 | **弹窗/对话框体系统一** | ✅ | 05-ui-standard §十六 | 已实现: QMessageBox 全部替换为自定义弹窗（2026-06-22 审计 0 处残留） |
 
 ### 三、核心功能缺失 (优先级: 高)
 
@@ -225,10 +225,10 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 ### 七、待完成项目 (更新后)
 
 #### 第一优先级: 遗留核心缺失
-1. **UI-06 QSS主题生成器** → 自动化3套主题维护
+1. ~~UI-06 QSS主题生成器~~ ✅ 已完成（qss_builder 程序化生成）
 2. **UX-04 键盘快捷键体系** → ShortcutManager统一管理
 3. **UX-05 响应式布局** → 断点系统+导航树自适应
-4. **UX-06 弹窗体系统一** → 替换QMessageBox
+4. ~~UX-06 弹窗体系统一~~ ✅ 已完成（QMessageBox 0 残留）
 
 #### 第二优先级: 骨架功能完善
 5. **MQTT TopicModel** → 12个空QAbstractItemModel方法实现
@@ -239,10 +239,10 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 10. **DBC解析器** → CAN数据库文件解析
 
 #### 第三优先级: 图标+代码质量
-11. **Lucide SVG扩展** → 从14个扩展到50+个
+11. ~~Lucide SVG扩展~~ ✅ 已完成（14→146 个 SVG）
 12. **Doxygen补全** → 新增模块注释
-13. **tr()合规审计** → 新增文件国际化
-14. **objectName审计** → 新增控件QSS依赖
+13. ~~tr()合规审计~~ ✅ 已完成（test_tr_compliance 守护，0 违规）
+14. ~~objectName审计~~ ✅ 已完成（tools/ 4 文件修复 + qss_sections_tools 契约）
 
 #### 第四优先级: RTT真实集成
 15. **J-Link SDK真实调用** → 需要J-Link DLL
