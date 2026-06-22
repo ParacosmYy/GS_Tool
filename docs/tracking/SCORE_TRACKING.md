@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 909分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 91分
+> 当前: 910分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 90分
 
 ---
 
@@ -559,6 +559,7 @@
 | 907 | Batch 243 — sections build_profile_row + build_footer owner 属性契约（9 测试） | 新建 test_sections_profile_footer_boundary.py（98 行）：build_profile_row 返回 QHBoxLayout + 创建 _profile_path_edit（QLineEdit + objectName serialStationProfilePathEdit + placeholder）+ _profile_name_edit（QLineEdit + objectName serialStationProfileNameEdit）+ _save_profile_button（QPushButton + objectName serialStationSaveProfileButton）+ _load_profile_button（QPushButton + objectName serialStationLoadProfileButton）+ build_footer 返回 QHBoxLayout + 创建 _clear_button（QPushButton + objectName serialStationClearButton + tooltip 非空）。 |
 | 908 | Batch 244 — sections build_inject_row owner 属性契约（5 测试） | 新建 test_sections_inject_row_boundary.py（66 行）：build_inject_row 返回 QHBoxLayout + 创建 _inject_edit（QLineEdit + objectName serialStationInjectEdit + placeholder 非空）+ _inject_button（QPushButton + objectName serialStationInjectButton + tooltip 非空）。 |
 | 909 | Batch 245 — sections build_log_row owner 属性契约（11 测试） | 新建 test_sections_log_row_boundary.py（120 行）：build_log_row 返回 QVBoxLayout + 创建 _log_filter_combo（QComboBox + objectName serialStationLogFilterCombo + 初始 All + 5 项 All/TX/RX/System/Error）+ _log_search_edit（QLineEdit + objectName serialStationLogSearchEdit + placeholder）+ _log_path_edit（QLineEdit + objectName serialStationLogPathEdit）+ _log_stats_label（QLabel + objectName serialStationLogStatsLabel）+ _export_log_button（QPushButton + objectName serialStationExportLogButton）+ _replay_log_button（QPushButton + objectName serialStationReplayLogButton）+ _log_info_banner 创建。 |
+| 910 | Batch 246 — waveform_preview SafePlotWidget + _ensure_curves 边界（11 测试） | 新建 test_waveform_preview_curves_boundary.py（112 行）：SafePlotWidget resizeEvent offscreen 短路 accept + paintEvent offscreen 短路 accept + resizeEvent(None) 安全 + _ensure_curves 创建曲线数==通道数 + 空 names 不创建 + 通道增加新增 + 通道减少多余曲线 setVisible(False) + 活跃曲线保持可见 + 减少后重新增加恢复可见 + _update_legend 空 batch 不崩 + 有通道 batch 不崩。 |
 
 ---
 
