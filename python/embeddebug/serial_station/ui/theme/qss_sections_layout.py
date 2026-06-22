@@ -91,18 +91,18 @@ QVBoxLayout#serialStationLogCardBody {{
 def zones_section() -> str:
     """三栏 zone 容器 — 透明底，让卡片浮在窗口底色上，并对称内边距。"""
 
-    return f"""/* === Three-Zone Shell Containers === */
+    return """/* === Three-Zone Shell Containers === */
 QWidget#serialStationLeftZone,
 QWidget#serialStationCenterZone,
-QWidget#serialStationRightZone {{
+QWidget#serialStationRightZone {
     background-color: transparent;
     border: none;
-}}
+}
 /* 串口配置面板容器（连接侧栏包装层） */
-QWidget#serialStationSerialPanel {{
+QWidget#serialStationSerialPanel {
     background-color: transparent;
     border: none;
-}}"""
+}"""
 
 
 def splitter_section() -> str:

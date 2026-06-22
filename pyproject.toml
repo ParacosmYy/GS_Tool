@@ -22,11 +22,13 @@ test-embeddebug-py = "embeddebug.devtools.test:main"
 test-embeddebug-tools = "tools.test_embeddebug_tools:main"
 verify-package-embeddebug = "embeddebug.devtools.verify_pyinstaller_package:main"
 verify-package-embeddebug-py = "embeddebug.devtools.verify_pyinstaller_package:main"
+lint-embeddebug-py = "embeddebug.devtools.lint:main"
 
 [dependency-groups]
 dev = [
     "pytest>=8,<9",
     "pytest-qt>=4.4,<5",
+    "ruff>=0.6,<1",
 ]
 packaging = [
     "pyinstaller>=6,<7",
@@ -40,3 +42,34 @@ default-groups = ["dev", "packaging"]
 [tool.setuptools.packages.find]
 where = [".", "python"]
 include = ["tools*", "embeddebug*"]
+
+# Batch 50-5: ruff 静态检查配置（机械捕获未使用 import / 变量 / 死代码）。
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = [
+    ".venv",
+    "build",
+    "dist",
+    "resources/themes",
+]
+
+[tool.ruff.lint]
+# 聚焦死代码检测 + 基础卫生（不启用风格类规则，避免大规模格式化噪音）。
+select = [
+    "F",     # Pyflakes（F401 未使用 import / F811 重定义 / F841 未使用变量）
+]
+# 暂时忽略：项目历史代码有少量已知项，逐步清理。
+ignore = [
+    "F401",  # 未使用 import（项目 __init__.py 大量 re-export，逐批清理）
+    "F841",  # 未使用局部变量（少量防御性赋值）
+]
+
+[tool.ruff.lint.per-file-ignores]
+# __init__.py 的 re-export 是设计内（公共 API），不算未使用 import。
+"**/__init__.py" = ["F401"]
+
+# Batch 50-6: pytest 严格化配置（testpaths + strict-markers）。
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+addopts = ["-ra", "--strict-markers"]

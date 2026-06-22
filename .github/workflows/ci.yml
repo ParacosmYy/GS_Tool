@@ -1,0 +1,46 @@
+# Batch 50-4: EmbedDebug CI（Windows runner，每次 push/PR 自动跑全量测试 + lint）。
+# 项目 Windows-only（EmbedDebug.bat + PyInstaller onedir），单 Windows runner 足够。
+# 守护测试（test_no_dead_widgets / test_animation_wiring / STRICT_COLORS/FONTS）在 CI
+# 默认硬模式运行，防止死代码累积和硬编码颜色/字体回潮。
+name: CI
+
+on:
+  push:
+    branches: [feat/embed-debug, main]
+  pull_request:
+    branches: [feat/embed-debug, main]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run tests (offscreen Qt, strict guardians)
+        env:
+          QT_QPA_PLATFORM: offscreen
+          STRICT_COLORS: "1"
+          STRICT_FONTS: "1"
+        run: uv run test-embeddebug-py
+
+      - name: Run devtools self-tests
+        run: uv run test-embeddebug-tools
+
+      - name: Lint (ruff)
+        run: uv run lint-embeddebug-py
+
+      - name: Smoke startup
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: uv run start-embeddebug --smoke

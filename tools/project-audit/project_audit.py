@@ -23,7 +23,7 @@ NUMBERED_UTIL_RE = re.compile(r"^([A-Za-z_]+)(\d+)$")
 def iter_code_files(root: Path):
     src_root = root / "src"
     for path in src_root.rglob("*"):
-        if path.is_file() and path.suffix in SOURCE_EXTENSIONS:
+        if path.is_file() and path.suffix in PYTHON_EXTENSIONS:
             yield path
 
 

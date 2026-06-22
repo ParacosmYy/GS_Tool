@@ -7,6 +7,7 @@
 ![uv](https://img.shields.io/badge/Toolchain-uv-DE5FE9?style=flat-square)
 ![PyInstaller](https://img.shields.io/badge/Package-PyInstaller-00599C?style=flat-square)
 ![Windows](https://img.shields.io/badge/Platform-Windows%2010%2B-0078D4?style=flat-square)
+![CI](https://github.com/ParacosmYy/GS_Tool/actions/workflows/ci.yml/badge.svg)
 
 ## 当前状态
 

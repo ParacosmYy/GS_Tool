@@ -61,6 +61,35 @@ def install_hover_lift(widget: QWidget, accent_tint: bool = True) -> QGraphicsDr
     return effect
 
 
+def install_card_shadow(widget: QWidget, level=None) -> "QGraphicsDropShadowEffect":
+    """给静态卡片/面板安装统一规约的 elevation 阴影（Batch 50-3）。
+
+    与 ``install_hover_lift``（动态 hover 浮起）互补：本函数用于**静态**卡片
+    （如 BasePanel、placeholder），无需 hover 动画，只设固定深度阴影。
+
+    通过 ``elevation_effect(level)`` 统一构造，替代散落的硬编码
+    ``QGraphicsDropShadowEffect`` + setBlurRadius/setColor/setOffset 三连。
+    激活 elevation 模块进入生产链（死代码守护测试 B50-2 要求）。
+
+    Args:
+        widget: 目标卡片/面板。
+        level: ``(blur, offset_y, alpha)`` 三元组，取自 ``AnimationTokens.ELEVATION_*``。
+            默认 ``ELEVATION_L1``（卡片静态深度）。
+
+    Returns:
+        配置好的 ``QGraphicsDropShadowEffect``（已挂到 widget）。
+    """
+
+    from embeddebug.serial_station.ui.animations.elevation import elevation_effect
+
+    if level is None:
+        level = AnimationTokens.ELEVATION_L1
+    effect = elevation_effect(level)
+    effect.setParent(widget)
+    widget.setGraphicsEffect(effect)
+    return effect
+
+
 class _HoverLiftFilter(QObject):
     """hover 进入/离开时：阴影模糊动画 + 阴影色动画 + widget 垂直位移。"""
 
@@ -224,9 +253,9 @@ def install_nav_hover_scale(button) -> None:
 class _NavHoverScaleFilter(QObject):
     """NavRail 图标 hover enter/leave 缩放高亮。"""
 
-    # hover 放大比例（1.12：图标「弹出」感，比 hover_in 的 1.03 更显著，
-    # 因为 NavRail 图标是主要导航元素，需更强反馈）。
-    HOVER_SCALE = 1.12
+    # hover 放大比例（NavRail 图标「弹出」感，比 hover_in 的 1.03 更显著，
+    # 因为主导航元素需更强反馈；token 化以便全应用统一）。
+    HOVER_SCALE = AnimationTokens.SCALE_NAV_HOVER
 
     def __init__(self, button) -> None:
         super().__init__(button)

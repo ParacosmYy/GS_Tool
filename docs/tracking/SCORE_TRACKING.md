@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 708分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 292分
+> 当前: 713分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 287分
 
 ---
 
@@ -374,6 +374,7 @@
 | 703 |
 | 703 | Batch 47-48 — 死代码全激活 + 组件开发 + 全 token 迁移 + 加载态 + 动画修复 | 7 死代码激活（Skeleton/BouncePath/Typewriter/Glow/ElasticSnap/RichTooltip/InfoBanner-Chip SVG）；3 新组件（StatusBar+KeyboardShortcut+ToggleSwitch）；全连接加载态（fake/serial/tcp/udp+refresh+BLE）；全 typography token 系统（FONT_*/FONT_POINT_*/FONT_WEIGHT_*/LETTER_SPACING_*/SPACING_INT_*）；cross_fade parallel 修复；Dashboard canvas 空态提示 | Batch 44 — 22 个 domain panel 按钮图标补齐（UI 审计 §4.1 P0） | _BUTTON_ICON_MAP 从 13 条扩到 35 条：BLE 5 个（scan/bluetooth/eye/pencil/bell）+ CAN 3 个（send/trash-2/play）+ RTT 2 个（zap/trash-2）+ Automation 3 个（play/zap/refresh-cw）+ SVD 2 个（folder-open/cpu）+ OTA 2 个（folder-open/upload）+ Dashboard 5 个（plus/trash-2/save/folder-open/grid）+ Settings 1 个（check）。apply_button_icons 函数 findChild 容错（按钮不存在静默跳过，icon 不存在 IconManager 返回 null QIcon 跳过），所以多写 entry 也安全。颜色与 QSS 对齐：domain primary 用 TEXT_ON_ACCENT，secondary 用 TEXT_SECONDARY/TEXT_MUTED，TX 类用 TERM_TX，危险操作用 ERROR/WARNING。全量 pytest 1649 passed + 2 skipped + 0 access violation，smoke exit 0 |
 | 708 | Batch 49 — 加载态 + 空态完善（对标铁律 5.9 三轴口径） | 6 子任务：B49-1 Log 空态（EmptyStateWidget inbox 图标 + 「暂无日志」，首条日志 hide_with_fade，清空 show_with_fade）；B49-2 Log 加载态（SkeletonBlock 3 行 + 「正在建立连接…」，4 条连接路径 fake/serial/tcp/udp 同步切换）；B49-3 Waveform 空态 + 加载态（activity 图标空态 + ProgressRing 连接覆盖层 + set_connecting 公开方法 + 首批 batch 淡出空态）；B49-4 Dashboard 画布空态（layout-dashboard 图标，替代 paintEvent 单行文字提示，add/remove/clear 全循环）；B49-5 Connection _set_loading 升级（内嵌 ProgressRing 替代「…」文字，setFixedSize 18×18 居中，复用 ring 不重复创建）；B49-5b Port Refresh 复用 _set_loading（消除 connection_toolbar inline 重复逻辑）。新增 3 helper 模块（log_empty_state/log_loading_state/waveform_empty_state/connection_loading/_empty_state_overlay）保持各主文件 ≤300 行；EmptyStateWidget 加 hide_with_fade 对称方法（fade_out finished→hide）；4 条连接路径统一 _show_log_loading/_set_waveform_connecting 同步切换。22 个 ui_smoke 测试覆盖空态/加载态/切换/淡入淡出完整循环（黑盒 waitUntil visibility，不 poke 私有动画属性）。全量 pytest 1695 passed（+54 from 1641 baseline），smoke exit 0 |
+| 713 | Batch 50 — 死代码守护测试 + CI 严格化（对标可维护收口 E5） | 6 子任务：B50-1 test_no_dead_widgets（枚举 controls/__all__，AST 检测每个符号 production 引用，白名单 8 个未 wire widget + RichTooltip 间接实例化）；B50-2 test_animation_wiring（动画模块 + token 双重守护，AST 剥离注释防误判，9 个预留 token 白名单文档化）；B50-3 elevation_effect wired（install_card_shadow helper → layout_cards.build_card 统一卡片 L1 阴影，激活死代码进入生产链）；B50-4 GitHub Actions CI（.github/workflows/ci.yml，Windows runner，push/PR 跑 test-embeddebug-py + STRICT_COLORS/FONTS 硬模式 + lint + smoke，README 加 CI badge）；B50-5 ruff 配置 + devtools/lint.py + lint-embeddebug-py script（F 系列 Pyflakes 机械捕获死代码，修复 3 个 lint 错误：qss F541 f-string 无占位符 / eye_diagram F822 __all__ 幽灵项 / project_audit F821 未定义名）；B50-6 pytest [tool.pytest.ini_options]（testpaths + --strict-markers）。新增 2 守护测试文件（test_no_dead_widgets 201 行 / test_animation_wiring 219 行，均 ≤250 门禁）。全量 pytest 1686 passed（+8 守护），lint 0 errors，smoke exit 0 |
 
 ---
 

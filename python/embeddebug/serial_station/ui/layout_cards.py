@@ -36,6 +36,11 @@ def build_card(
 
     card = QFrame(parent)
     card.setObjectName(_CARD_OBJECT_NAME)
+    # Batch 50-3: 卡片统一 elevation L1 静态阴影（激活 elevation_effect 进入生产链，
+    # 替代散落的硬编码 DropShadowEffect；对齐 Material 3 卡片深度规范）。
+    from embeddebug.serial_station.ui.micro_interactions import install_card_shadow
+
+    install_card_shadow(card)
     card_layout = QVBoxLayout(card)
     card_layout.setContentsMargins(T.SPACING_INT_LG, T.SPACING_INT_LG, T.SPACING_INT_LG, T.SPACING_INT_LG)
     card_layout.setSpacing(T.SPACING_INT_MD)

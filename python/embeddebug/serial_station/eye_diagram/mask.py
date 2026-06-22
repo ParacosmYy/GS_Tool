@@ -109,4 +109,4 @@ def compute_or_skip(diagram: EyeDiagram) -> EyeMetrics:
     return compute_eye_metrics(diagram)
 
 
-__all__ = ["mask_margin", "mask_violation_points", "point_in_polygon", "test_mask"]
+__all__ = ["mask_margin", "mask_violation_points", "point_in_polygon"]

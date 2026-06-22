@@ -109,7 +109,7 @@
 | 应用名称 | EmbedDebug |
 | 项目路径 | `E:\Embedded\Tool\Serial_tool\User_Serial` |
 | 当前版本 | 0.1.0 |
-| 评分 | 708（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
+| 评分 | 713（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
 | 测试文件数 | 112（2026-06-22 精简，原 168） |
@@ -309,7 +309,8 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 - **Batch 47**: 死代码激活（RichTooltip install / Skeleton windowOpacity→QGraphicsOpacityEffect / RotateAnimation spinner）
 - **Batch 48**: 排版 token（FONT_ROLE_* / LETTER_SPACING_* / LINE_HEIGHT_*）+ 间距 token 统一
 - **Batch 49** ✅: 加载态（Connect/Refresh ProgressRing）+ 空态（log/waveform/dashboard）— 6 子任务，22 ui_smoke 测试，1695 passed
-- **Batch 50**: 死代码守护测试 + CI 严格化
+- **Batch 50** ✅: 死代码守护测试（test_no_dead_widgets + test_animation_wiring）+ CI 严格化（GitHub Actions + ruff + pytest config）— 6 子任务，8 守护测试，1686 passed，lint clean
+- **Batch 51**: (待规划)
 
 ---
 
