@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 815分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 185分
+> 当前: 816分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 184分
 
 ---
 
@@ -465,6 +465,7 @@
 | 813 | Batch 149 — SPI/I2C codec 边界扩展（+10 测试） | 本会话扩展 test_spi_i2c_codec.py（12→22）：crc8 0xFF×2=0x24 + 幂等；encode i2c_read length 0/255/-1 + i2c_write register=None/ten_bit；build_response STATUS_ERROR+空body+round-trip；decode_frame 前导/尾部垃圾 ValueError；feed 多帧+部分缓冲+前导垃圾 trim；no_crc feed round-trip + DecodedFrame frozen。文件 203 行 ≤250。 |
 | 814 | Batch 150 — gps/parser 纯 helper 单元测试（32 测试） | 并发会话新建 test_gps_parser_helpers.py（240 行）：_xor_checksum + compute_checksum + _verify_checksum + _int_or + _float_or + _to_decimal + _fields 私有 helper 全覆盖。 |
 | 815 | Batch 151 — MQTT codec 边界扩展（+15 测试） | 本会话扩展 test_mqtt_codec.py（13→28）：remaining_length 16384/大值/offset；encode_publish QoS1/QoS2/retain flags；encode_connack session_present + return_code 0-5；encode_connect 默认 client_id；encode_subscribe QoS body；DISCONNECT/PINGREQ 精确字节；decode_packet_type 空数据/高 nibble；MqttFrameCodec 包装委托。文件 214 行 ≤250。 |
+| 816 | Batch 152 — svd/parser 纯 helper 单元测试（21 测试） | 新建 test_svd_parser_helpers.py（185 行）：_text（取子元素文本/strip 空白/缺失=default/None 元素=default/空文本=default/内部空格保留）+ _int（十进制/0x 十六进制/负数/缺失=default/None=default/非法=default/空文本=default）+ _access（read-only/write-only/read-write 三值/缺失兜底 READ_WRITE/None 兜底/未识别兜底）+ _ACCESS_BY_TEXT 常量映射完备性（3 键→3 枚举值互异）。补强 test_svd_parser.py 未直接断言的私有 helper。 |
 
 ---
 
