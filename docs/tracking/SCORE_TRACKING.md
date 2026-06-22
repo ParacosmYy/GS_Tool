@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 792分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 208分
+> 当前: 793分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 207分
 
 ---
 
@@ -442,6 +442,7 @@
 | 790 | Batch 120 — connection_state transport 生命周期测试（6 测试） | 并发会话补 controller_connection_state transport 安装/替换/清理路径。 |
 | 791 | Batch 121 — command_history_state + svd.demo 单元测试（29 测试） | 并发会话新建 test_command_history_state.py（8）：remember（新/移到末尾/去重）+ restore（列表/清空/非列表忽略/过滤非字符串）。本会话新建 test_svd_demo.py（21）：DEMO_SVD_XML 合法 XML + 关键标签契约（设备元信息 / 2 外设 / GPIOA MODER bitOffset+bitWidth / IDR msb+lsb 替代写法）+ demo_device 元信息 + USART%s dim=3 展开为 USART0/1/2 + 地址按 dimIncrement=0x400 递增 + register_count=5 + field_count=9 + iter_registers/peripheral/register lookup + demo_device 与 SvdParser.parse 幂等 + GPIOA.MODE0/MODE1 offset 验证 + IDR.ID15 msb=lsb=15 解析为 offset=15 width=1 + USART.SR TXE/RXNE 字段。 |
 | 792 | Batch 122 — QSS sections panels/widgets 拆分 + SCORE head 回填 | 并发会话把 test_qss_sections_panels.py（418 行）按域拆分为 panels（198 行）+ widgets（236 行），符合铁律 21（测试文件 ≤250 行）。35 个测试全部保留。 |
+| 793 | Batch 125 — qss_sections core/waveform/controls 单元测试（20 测试） | 新建 test_qss_sections_core.py（244 行）：global/window/labels（BG_WINDOW/TEXT_PRIMARY/QToolTip/QMainWindow root）+ inputs（5 objectName + :focus/:hover/:disabled + BORDER_FOCUS/BG_INPUT_FOCUS）+ combos（4 objectName + CSS border-triangle down-arrow）+ waveform（5 objectName + TERM_BACKGROUND + BG_OVERLAY 加载态）+ controls（LED/滑块/Dashboard 8 objectName + ConfigurableButton 三态 + Dashboard 5 动作按钮三态 + [dragging=true] + 自绘控件透明契约）+ build_qss 集成。补强最后 3 个未测 QSS section 模块。 |
 
 ---
 
