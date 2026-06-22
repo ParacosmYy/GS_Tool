@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 785分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 215分
+> 当前: 786分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 214分
 
 ---
 
@@ -431,6 +431,11 @@
 | 779 | Batch 109 — AppController 单元测试 | serial_controller + active_transport + is_connected。 |
 | 780 | Batch 110 — SerialDispatcher 单元测试 | _FakeProtocol mock + feed/build_command/set_protocol。 |
 | 781 | Batch 111 — measurements 纯函数测试 | batch_from_measurement_events + _default_channel_names。 |
+| 782 | Batch 112 — ProtocolEvent + SerialProtocol 契约测试 | frozen + ABC 不可实例化 + 完整子类。 |
+| 783 | Batch 113 — SerialWorkbenchLogEntry 测试 | frozen dataclass tx/rx/system/error。 |
+| 784 | Batch 114 — CallbackState 回调注册测试 | add_log/error/measurement + handle_error。 |
+| 785 | Batch 115 — log_state 日志追加测试 | append_log/system/error/connected + 回调。 |
+| 786 | Batch 116 — receive_state 收字节测试 | handle_received_bytes + measurement ring + handle_error。 |
 
 ---
 
