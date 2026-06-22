@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 891分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 109分
+> 当前: 892分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 108分
 
 ---
 
@@ -541,6 +541,7 @@
 | 889 | Batch 225 — TransferEngine 边界扩展 mock 协议错误路径（12 测试） | 新建 test_transfer_engine_boundary.py（172 行）：_protocol_total 回退（total_blocks 优先/total_data_blocks 回退/无属性→0/非 int 跳过）+ run eot_not_acked 路径（finish False）+ 进度回调 on_progress 调用（blocks_done,total）+ _send_block_await_ack 帧格式（header+seq+~seq+data+checksum）+ _send_cancel 发 CAN×2 + cancel 路径 error=cancelled + 成功路径 TransferResult 全字段（success/blocks_sent/blocks_acked/retries/error=None）+ 握手失败 handshake_failed + cancel 初始状态 + cancel 置标志。 |
 | 890 | Batch 226 — BleTransportStub write/_handle_request/_find_by_handle 边界（11 测试） | 新建 test_ble_transport_write_boundary.py（138 行）：write 关闭态返回 0+error（transport_not_open）+ 开启态返回长度 + 垃圾字节不崩溃仍追加 written + WRITE 帧到可写特征无回包 + WRITE 帧到不可写特征 error（characteristic_not_writable）+ 非 WRITE 帧触发 READ_RESPONSE 回包（首字节 0x03）+ 未知 handle error（handle_not_found）+ _find_by_handle 已知返回 char/未知 None + 多帧批量各分发。 |
 | 891 | Batch 227 — BLE GATT expand_uuid + 模型边界（20 测试） | 新建 test_ble_gatt_boundary.py（176 行）：BLE_BASE_UUID 结构 + expand_uuid 32 位 int + 超 32 位 mask + 纯 hex 无前缀 + 0x 前缀 + 大写归一化小写 + whitespace strip + invalid/空 hex ValueError + 128 位 str 直传（36 字符）+ 128 位大写归一化 + BleCharacteristic 默认值/can_read/can_write/can_notify 组合 + BleGattTree.find_by_uuid 已知/未知/跨多服务 + frozen（Characteristic 不可变/Service+Device 可变）。 |
+| 892 | Batch 228 — RecordingTimeline + Segment + Gap 边界（27 测试） | 新建 test_recording_timeline_boundary.py（176 行）：RecordingSegment 默认/自定义 source + duration_ns + contains 起终点边界/外部 + frozen AttributeError + Gap.duration_ns/zero + DEFAULT_GAP_THRESHOLD_NS=50ms 类常量 + __init__ 默认用类常量 + total_duration_ns（空 0/单段/多段首尾差）+ total_samples 累加 + gaps 阈值（单段无/超阈值产生/自定义阈值/0 阈值全 gap）+ seek（命中返回偏移/gap 中 None/空 None/起点偏移 0）+ segments 拷贝隔离 + add_segment 累积。 |
 
 ---
 
