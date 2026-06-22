@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 849分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 151分
+> 当前: 850分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 150分
 
 ---
 
@@ -499,6 +499,7 @@
 | 847 | Batch 183 — Shake/Pulse/Collapse 边界（15 测试） | 新建 test_shake_pulse_collapse_boundary.py（188 行）：Shake（返回 QPropertyAnimation + 起止同位 + 默认 duration>0 + count=1 + amplitude=0 end=start）+ Pulse（返回 QPropertyAnimation + start=max/0.5=min/end=max + 自定义 opacity + EASE_IN_OUT）+ Breathing（loopCount=-1 + stop_looping 清理 _active）+ Collapse（expand target_height + collapse end=0 + stop 清理 _active）。 |
 | 848 | Batch 184 — Glow/Typewriter/ElasticSnap 边界（17 测试） | 新建 test_glow_typewriter_elastic_boundary.py（218 行）：_attach_effect（无 effect 新建+挂载 / 复用已有 shadow / 不覆盖 opacity）+ steady（返回 effect + intensity>1.5 clamp + intensity=0 blur=0）+ clear（归零 blur+alpha / 无 effect 静默）+ pulse（loops=0 归 1 / loops=20 封顶 3000ms / EASE_IN_OUT）+ TypewriterAnimation.run（cps=0 不除零 / start_delay 负值 / LINEAR / 空文本最小 INSTANT）+ run_with_label 自动 start + ElasticSnap cancel 清理。 |
 | 849 | Batch 185 — BouncePathAnimation 边界 + plugins 常量（15 测试） | 新建 test_bounce_path_plugins_boundary.py（175 行）：_offset_rect（正 dx/负 dy/零偏移同位/尺寸不变）+ _scaled_rect_centered（factor=1 不变/0.5 减半/0 clamp/中心对齐）+ 常量（DROP_INITIAL_SCALE=0.6/SQUASH_HEIGHT_RATIO=0.92/SQUASH_WIDTH_RATIO=1.04）+ slide_bounce（返回 QPropertyAnimation + GC 注册）+ PLUGIN_FILE=plugin.py + SUPPORTED_PLUGIN_TYPES=('protocol','control') + PluginInfo frozen。 |
+| 850 | Batch 186 — toast/micro_interactions 常量 + toast_container 空容器属性（18 测试） | 新建 test_toast_micro_constants.py（177 行）：toast 常量（_DEFAULT_TIMEOUT_MS=3000/_DEFAULT_SLIDE_DISTANCE=80/_LEVEL_COLORS 4 键/_LEVEL_ICON 4 键非空）+ micro_interactions 常量（LIFT_PIXELS/SHADOW_BLUR_NORMAL/SHADOW_BLUR_HOVER/ANIM_DURATION 对齐 AnimationTokens + hover>normal）+ SkeletonWidget（默认/自定义 height + stop_shimmer 不崩溃）+ ToastContainer 空容器（is_empty/count=0/active_toasts=()/clear_all 不崩溃/dismiss_oldest False）。 |
 
 ---
 
