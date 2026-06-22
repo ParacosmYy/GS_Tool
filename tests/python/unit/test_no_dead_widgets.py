@@ -20,10 +20,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3]
 UI_ROOT = REPO_ROOT / "python" / "embeddebug" / "serial_station" / "ui"
 
-# Batch 51 已 wire Divider/Badge/Chip/ToggleSwitch/SegmentedControl/InfoBanner/BannerKind
-# 到 log_options_bar。剩 Drawer 待独立 UI 批次（需侧栏场景，接入点在 main_window）。
+# Batch 51-52 已 wire 全部 widget 到 log_options_bar。
+# 剩余白名单项均为设计内（非死代码，只是不直接构造）：
 _PENDING_WIRE: dict[str, str] = {
-    "Drawer": "Batch 41 侧边抽屉，未接入（接入点 main_window 被用户改动，待协调）",
     # install_tooltip/uninstall_tooltip：install 已 wire（connection_toolbar 等），
     # uninstall 仅由 destroyed 信号内部触发，无显式 production 调用，属设计内。
     "uninstall_tooltip": "仅由 widget destroyed 信号内部触发，无显式调用",

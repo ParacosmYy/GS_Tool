@@ -27,11 +27,9 @@ TOKENS_PATH = UI_ROOT / "animations" / "tokens.py"
 # → layout_cards.build_card，白名单现为空。
 _PENDING_WIRE: dict[str, str] = {}
 
-# Batch 51 已消费 DURATION_CONTAINER + EASE_OUT_QUART（install_card_shadow 阴影淡入）
-# + DURATION_FLYOUT + EASE_OUT_QUINT（show_log_info_banner fly-in 动画）。
+# Batch 51-52 已消费 DURATION_CONTAINER/EASE_OUT_QUART/DURATION_FLYOUT/EASE_OUT_QUINT/DURATION_DRAWER。
 _RESERVED_TOKENS: dict[str, str] = {
     "DURATION_PROGRESS": "进度条平滑过渡预留（150ms）",
-    "DURATION_DRAWER": "抽屉滑出动画预留（300ms）",
     "DURATION_SCROLL": "滚动到视图动画预留（500ms）",
     "EASE_IN_QUART": "容器变换离场缓动预留（InQuart）",
     "EASE_OUT_QUAD": "轻量出场缓动预留（OutQuad）",

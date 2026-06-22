@@ -120,10 +120,12 @@ class Drawer(QWidget):
         self._run_fade(0.0, 1.0)
 
         # 面板 geometry 滑入（finished 连绑定方法，避免访问冲突）。
+        # Batch 52: 消费预留 token DURATION_DRAWER（抽屉专用滑出时长 300ms，
+        # 比 DURATION_NORMAL 更长，匹配 Material 抽屉观感）。
         if self._slide is not None:
             self._slide.stop()
         slide = QPropertyAnimation(self._panel, b"geometry", self)
-        slide.setDuration(AnimationTokens.DURATION_NORMAL)
+        slide.setDuration(AnimationTokens.DURATION_DRAWER)
         slide.setStartValue(offscreen)
         slide.setEndValue(target)
         slide.setEasingCurve(AnimationTokens.EASE_OUT)

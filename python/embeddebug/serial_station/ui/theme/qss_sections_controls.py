@@ -279,18 +279,4 @@ QWidget#serialStationDivider {{
 }}
 QLabel#serialStationDividerLabel {{
     background-color: transparent;
-}}
-/* Batch 51: 日志选项工具条场景实例（Badge/Chip/ToggleSwitch 自绘，QSS 契约占位）。
-   这些是通用控件在日志区的具体实例，objectName 覆盖契约要求 QSS 文档化。 */
-QWidget#serialStationLogConnectionBadge,
-QWidget#serialStationActiveFilterChip,
-QWidget#serialStationAutoScrollToggle,
-QWidget#serialStationLogViewModeSegmented,
-QWidget#serialStationLogInfoBanner {{
-    background-color: transparent;
-}}
-QLabel#serialStationAutoScrollLabel {{
-    background-color: transparent;
-    color: {P.TEXT_SECONDARY};
-    font-size: {T.FONT_SM};
 }}"""

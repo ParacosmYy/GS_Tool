@@ -16,13 +16,15 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QWidget
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
 
 from embeddebug.serial_station.ui.controls import (
     Badge,
     BadgeKind,
     Chip,
     Divider,
+    Drawer,
     InfoBanner,
     BannerKind,
     SegmentedControl,
@@ -84,8 +86,31 @@ def build_log_options_bar(owner: _LogOptionsHost, parent: QWidget) -> QHBoxLayou
     view_mode.setObjectName("serialStationLogViewModeSegmented")
     row.addWidget(view_mode)
 
+    # Batch 52-1: Drawer 命令历史侧栏按钮（wire 最后一个死 widget）。
+    # 点击打开右侧抽屉显示发送历史，对齐 MobaXterm 命令历史面板。
+    history_btn = QPushButton(owner.tr("历史"), parent)
+    history_btn.setObjectName("serialStationHistoryButton")
+    history_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+    row.addWidget(history_btn)
+
     row.addStretch(1)
     return row
+
+
+def build_history_drawer(owner: _LogOptionsHost, parent: QWidget) -> Drawer:
+    """Batch 52-1: 构建命令历史侧栏抽屉（wire Drawer 到真实场景）。
+
+    右侧滑入，承载一个占位 QLabel（未来接 command_history 数据）。
+    消费预留 token DURATION_DRAWER（抽屉滑出动画时长）。
+    """
+
+    drawer = Drawer(side=Qt.Edge.RightEdge, parent=parent)
+    drawer.setObjectName("serialStationHistoryDrawer")
+    placeholder = QLabel(owner.tr("命令历史（待接入 controller.command_history）"), drawer)
+    placeholder.setObjectName("serialStationHistoryPlaceholder")
+    placeholder.setWordWrap(True)
+    drawer.set_content(placeholder)
+    return drawer
 
 
 def build_log_info_banner(owner: _LogOptionsHost, parent: QWidget) -> InfoBanner:
