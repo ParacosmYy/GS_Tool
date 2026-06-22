@@ -452,6 +452,7 @@
 | 800 | Batch 131 — layout_main 三区分栏装配契约单元测试（10 测试） | 并发会话新建 test_layout_main_contract.py（152 行）：assemble_three_zone QSplitter + objectName + handleWidth=4 + count=3 + 三区 objectName 契约 + 最小宽度 + owner 注入 + 中区卡最小高度。用 mock layout builders 避免重组件树。 |
 | 801 | Batch 133 — serial_panel 包装契约单元测试（9 测试） | 并发会话新建 test_serial_panel_contract.py（113 行）：SerialPanel 构造 + build 返回 wrapper + window 暴露 + on_enter/on_leave + 重复 build。覆盖最后一个未测 UI 模块。 |
 | 802 | Batch 133 — PerfSnapshot format_text 边界扩展（+10 测试） | 本会话扩展 test_diagnostics_snapshot.py（9→19）：format_text 字母序排序 + 空 unit 不附加段 + degraded True 显示 + min/max/avg/n 统计段（update 累积）+ is_degraded 阈值边界（fps=30/latency=100 不劣化）+ 未知指标名忽略 + 默认 timestamp_ns/uptime_s。文件 163 行 ≤250。 |
+| 803 | Batch 135 — InspectionResult.format_text + to_dict 边界（+9 测试） | 本会话扩展 test_data_inspector.py（14→23）：format_text channel 名 + min/max/mean/std + outliers 计数 + 字母序 + 空 channels；to_dict correlations 'a\|b' 序列化 + outliers/threshold 保留 + 默认空状态；timestamp_ns 默认 + inspect threshold 记录。文件 172 行 ≤250。 |
 
 ---
 
