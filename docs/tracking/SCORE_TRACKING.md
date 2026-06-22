@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 819分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 181分
+> 当前: 820分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 180分
 
 ---
 
@@ -469,6 +469,7 @@
 | 817 | Batch 153 — RTT protocol 边界扩展（+15 测试） | 本会话扩展 test_rtt_protocol.py（12→27）：RttChannel/RttConfig frozen + 空 channels + 多通道顺序 + down mode + channel_index 位置/KeyError；control_block_layout down-only + size=16 + acID size + MaxUp/Down size=4 + 大量 buffer 32+32；buffer header 偏移常量 + SEGGER magic/cb_id ASCII 编码。文件 240 行 ≤250。 |
 | 818 | Batch 154 — can/dbc 纯 helper 单元测试（21 测试） | 并发会话新建 test_can_dbc_helpers.py（192 行）：_extract_intel + _extract_motorola + decode_signal + DbcSignal/Message/Database 边界。 |
 | 819 | Batch 155 — OTA protocol 边界扩展（+18 测试） | 本会话扩展 test_ota_protocols.py（10→28，由并发 81fb005b0 合入并修 F401）：crc16_xmodem 2 字节 0x1373 + 幂等 + distinct；pad_block 空/0x1A/block_size=0；checksum_8bit 已知值 + 模 256 wrap；OtaBlock/TransferResult frozen + 默认 error=None；OtaProtocolKind 4 枚举；控制字节常量；YMODEM 128B SOH + total_data_blocks + basename 去路径 + 空文件名。文件 218 行 ≤250。 |
+| 820 | Batch 156 — ota xmodem/zmodem 纯 helper 单元测试（23 测试） | 新建 test_ota_helpers.py（245 行）：_hex_byte（0→"00"/FF→"FF"/单位数补零/>0xFF mask/两位大写）+ build_eot（单字节 EOT）+ build_cancel（双字节 CAN）+ build_eot/cancel 长度契约 + parse_ack 全分支（ack/nak/can/c/unknown）+ crc16_ccitt init 参数（默认=显式 0/非零改变/链式累加/空返回 init）+ is_crc_valid（正确 True/错误 False/frame_type 区分）+ parse_hex_frame 边界（无 marker None/截断 None）+ ZModem 4 帧类型常量互异 + 控制字节契约（ZPAD/ZDLE/ZHEX/CR/LF/XON + SOH/STX/EOT/ACK/NAK/CAN/C）。补强 test_ota.py 未直接断言的边角 helper。 |
 
 ---
 
