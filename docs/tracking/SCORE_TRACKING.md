@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 902分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 98分
+> 当前: 903分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 97分
 
 ---
 
@@ -552,6 +552,7 @@
 | 900 | Batch 236 — command_actions send_text + refresh/select history 行为边界（10 测试） | 新建 test_command_actions_boundary.py（110 行）：send_text 空命令不调 controller + shake send_edit + 成功调 send_text_result + refresh history + 失败设 status 不 refresh + refresh_command_history populate combo（空 history 不崩）+ select_command_history apply setText（空 text 跳过）。 |
 | 901 | Batch 237 — protocol_actions select_protocol + injection_actions inject_received 行为边界（10 测试） | 新建 test_protocol_injection_actions_boundary.py（118 行）：select_protocol 调 controller.set_protocol + set_status_text + inject_received 空文本不调 controller + notify warning + 成功调 inject_received_text 不 notify + 失败 notify error + _notify 安全降级（host 无 _notify 不抛）+ _notify 异常被吞（try/except）。 |
 | 902 | Batch 238 — tcp/udp controls build + apply profile 边界（9 测试） | 新建 test_tcp_udp_controls_boundary.py（128 行）：build_tcp_controls 返回 3-tuple（QLineEdit/QLineEdit/QPushButton）+ objectName（serialStationTcpHostEdit/PortEdit/ConnectTcpButton）+ host placeholder + apply_default_endpoint_text（127.0.0.1/19000）+ build_udp_controls 3-tuple + objectName（Udp 前缀）+ 默认 endpoint + apply_tcp_profile_controls 委托 apply_endpoint_profile_controls（mode=tcp）+ apply_udp_profile_controls（mode=udp）。 |
+| 903 | Batch 239 — log_options_bar build/show/update boundary 边界（12 测试） | 新建 test_log_options_bar_boundary.py（122 行）：build_log_options_bar 返回 QHBoxLayout 不崩 + build_history_drawer 返回 Drawer + objectName serialStationHistoryDrawer + build_log_info_banner 返回 InfoBanner + objectName serialStationLogInfoBanner + 初始 hide + show_log_info_banner None 安全跳过 + set_text/set_kind/show + set_kind ERROR + update_connection_badge None 安全 + connected→SUCCESS + disconnected→INFO + None disconnected 安全。 |
 
 ---
 
