@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 906分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 94分
+> 当前: 907分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 93分
 
 ---
 
@@ -556,6 +556,7 @@
 | 904 | Batch 240 — build_connection_card 重排 toolbar 控件边界（8 测试） | 新建 test_build_connection_card_boundary.py（136 行）：build_connection_card 返回 QFrame + 空 toolbar 不崩 + Port 组（serialStationPortCombo）常驻 + Connect 组（serialStationConnectButton）常驻 + Serial 组（serialStationBaudCombo）折叠 + Endpoints 组（serialStationTcpHostEdit）折叠 + 未识别控件（unknownWidget）进 Other 折叠组 + 混合 Port+Serial+Unknown 全部分组不崩。 |
 | 905 | Batch 241 — serial_station 包 __init__ 导出契约（14 测试） | 新建 test_package_exports_boundary.py（132 行）：core 导出 ChannelBatch/ChannelRingBuffer + can 导出 CanFrame/CanId/CanFilter/CanFrameCodec/PROTOCOL_NAME + __all__ 全可访问 + ble 导出 BleFrameCodec/BleFrameEvent/BleTransportStub + mqtt 导出 MqttConfig/MqttMessage/MqttClientStub + spi_i2c 导出 SpiConfig/I2cConfig/SpiI2cFrameCodec/SpiI2cBridgeStub + ota 导出 TransferResult/make_protocol/OtaProtocolKind/TransferEngine + protocols 导出 RawDataProtocol/FireWaterProtocol/JustFloatProtocol + rtt 导出 RttConfig/RttChannel/RttSession/RttTransportStub + automation 导出 AutomationEngine/AutomationRule/TriggerCondition/AutomationAction + drivers 导出 SerialTransport/SerialPortConfig + session 导出 SessionState/SessionSerializer/SessionManager + notifications 导出 NotificationLevel/NotificationManager + shared 导出 OperationResult/OperationError。 |
 | 906 | Batch 242 — build_connection_toolbar 整体装配边界（13 测试） | 新建 test_build_connection_toolbar_boundary.py（132 行）：返回 QHBoxLayout + protocol_combo objectName + 初始 raw_data + 3 项 + port_combo/refresh_ports_button objectName + 5 个 serial config combos（baud/data_bits/parity/stop_bits/flow_control）objectName + connect/connect_serial/disconnect buttons objectName + disconnect 初始 disabled + connect_serial 无串口时 disabled + tcp/udp endpoint controls 附加（QLineEdit/QLineEdit/QPushButton）+ tcp 默认 endpoint（127.0.0.1/19000）。mock owner 含 _controller（available_protocols/available_serial_ports）+ _profile_label/_status_label QWidget（root 父）。 |
+| 907 | Batch 243 — sections build_profile_row + build_footer owner 属性契约（9 测试） | 新建 test_sections_profile_footer_boundary.py（98 行）：build_profile_row 返回 QHBoxLayout + 创建 _profile_path_edit（QLineEdit + objectName serialStationProfilePathEdit + placeholder）+ _profile_name_edit（QLineEdit + objectName serialStationProfileNameEdit）+ _save_profile_button（QPushButton + objectName serialStationSaveProfileButton）+ _load_profile_button（QPushButton + objectName serialStationLoadProfileButton）+ build_footer 返回 QHBoxLayout + 创建 _clear_button（QPushButton + objectName serialStationClearButton + tooltip 非空）。 |
 
 ---
 
