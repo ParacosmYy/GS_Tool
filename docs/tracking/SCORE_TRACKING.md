@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 824分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 176分
+> 当前: 825分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 175分
 
 ---
 
@@ -474,6 +474,7 @@
 | 822 | Batch 158 — session/serializer + state 纯 helper 单元测试（24 测试） | 新建 test_session_serializer_helpers.py（249 行）：_is_supported_version（1=True/0/2/负数=False/字符串数字/非数字/None/浮点）+ FORMAT_VERSION=1 常量 + _default_geometry（x/y/width/height 结构 + 新实例隔离）+ _default_connection_config（port/baudrate）+ SessionState 默认值/from_dict(None)/to_dict round-trip/to_dict 拷贝隔离 + SessionSerializer 边界（None/空白串/非 dict JSON/未知版本仍解析/字符串版本/紧凑 JSON 无空白/version+payload 顶层/timestamp round-trip）。补强 test_session_restore.py 未直接断言的 _is_supported_version 纯函数 + 默认工厂。 |
 | 823 | Batch 159 — protocol_analyzer report + frame + analyzer helper 边界（23 测试） | 新建 test_protocol_analyzer_helpers.py（233 行）：AnalysisReport format_text 浮点 .3f（avg_frame_size/frequency_hz）+ 整型原样 + 多错误逐行 - 缩进 + 0 错误无条目 + duration .3f + has_errors 空=False/非空=True + 默认值 + to_dict 无错误 has_errors=False + to_dict 拷贝隔离 + ProtocolFrame hex_dump 空<empty>/16B 单行/17B 双行 + to_dict raw_hex 空格分隔 + direction 默认 RX + decoded 默认空 + FrameAnalyzer feed_many 批量 + clear 重置 + frame_count 属性 + clear 后 analyze 空 + DIRECTION_TX/RX + HEX_DUMP_WIDTH=16 常量。补强 test_protocol_analyzer.py 未直接断言的 format_text 浮点格式 + frame 边界。 |
 | 824 | Batch 160 — export/format 纯 helper 边界（23 测试） | 新建 test_export_format_helpers.py（190 行）：ExportFormat.delimiter（CSV=,/TSV=tab/JSON+NUMPY 兜底 tab）+ from_extension（4 格式+大写+Path 对象+未知/无扩展名 ValueError）+ ExportConfig.for_format（默认配置+全 4 格式）+ frozen 不可变 + 验证边角（空 channels ValueError/非枚举 format ValueError/list→tuple 强制转换/time_range start==end 合法/decimal_places=0 合法/默认值）+ ExportFormat 枚举完备性（4 成员 csv/tsv/json/numpy + 值互异）。补强 test_export.py 未直接断言的 delimiter 属性 + for_format + frozen + 空 channels 验证。 |
+| 825 | Batch 161 — core/measurements 边界扩展（25 测试） | 新建 test_measurements_boundary.py（227 行）：ChannelBatch.__post_init__（1D/3D values ValueError + 列数不匹配 + frozen + float32 强制转换 + 默认值）+ ChannelRingBuffer.__init__（capacity=0/-1/channel_count=0 ValueError + 默认/自定义通道名 + 自定义 dt_ns）+ latest 边界（空缓冲区 0 行 + latest(0) 空 + latest(100) clamp + latest(None) 全部）+ append 边界（通道数变更 ValueError + 更新通道名 + 更新 dt_ns + size cap at capacity）+ _payload_values（合法 list/空 list/缺 key=空 + str/bytes ValueError）。补强 test_measurements/test_measurement_ring_buffer 未直接断言的验证路径。 |
 
 ---
 
