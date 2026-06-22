@@ -154,17 +154,16 @@ def _install_rich_tooltips(owner) -> None:
     """
     try:
         from embeddebug.serial_station.ui.controls import install_tooltip
-        install_tooltip(owner._refresh_ports_button,
-                        owner.tr("刷新端口"),
-                        owner.tr("重新扫描系统可用的 COM 端口（快捷键 Ctrl+R）"))
-        install_tooltip(owner._connect_button,
-                        owner.tr("连接（替身）"),
-                        owner.tr("打开本地 loopback 替身传输，无需真实硬件即可测试收发"))
-        install_tooltip(owner._connect_serial_button,
-                        owner.tr("连接串口"),
-                        owner.tr("打开选中的 COM 端口，使用上方配置的波特率/数据位/校验/流控参数"))
-        install_tooltip(owner._disconnect_button,
-                        owner.tr("断开连接"),
-                        owner.tr("关闭当前传输连接，停止收发"))
+        # Batch 100: 统一 getattr 防御（smoke 模式部分按钮未创建）。
+        _tooltips = [
+            ("_refresh_ports_button", owner.tr("刷新端口"), owner.tr("重新扫描系统可用的 COM 端口（快捷键 Ctrl+R）")),
+            ("_connect_button", owner.tr("连接（替身）"), owner.tr("打开本地 loopback 替身传输，无需真实硬件即可测试收发")),
+            ("_connect_serial_button", owner.tr("连接串口"), owner.tr("打开选中的 COM 端口，使用上方配置的波特率/数据位/校验/流控参数")),
+            ("_disconnect_button", owner.tr("断开连接"), owner.tr("关闭当前传输连接，停止收发")),
+        ]
+        for attr, title, body in _tooltips:
+            btn = getattr(owner, attr, None)
+            if btn is not None:
+                install_tooltip(btn, title, body)
     except Exception:
         _log.warning("scale press install failed", exc_info=True)
