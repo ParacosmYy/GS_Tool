@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 817分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 183分
+> 当前: 818分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 182分
 
 ---
 
@@ -467,6 +467,7 @@
 | 815 | Batch 151 — MQTT codec 边界扩展（+15 测试） | 本会话扩展 test_mqtt_codec.py（13→28）：remaining_length 16384/大值/offset；encode_publish QoS1/QoS2/retain flags；encode_connack session_present + return_code 0-5；encode_connect 默认 client_id；encode_subscribe QoS body；DISCONNECT/PINGREQ 精确字节；decode_packet_type 空数据/高 nibble；MqttFrameCodec 包装委托。文件 214 行 ≤250。 |
 | 816 | Batch 152 — svd/parser 纯 helper 单元测试（21 测试） | 并发会话新建 test_svd_parser_helpers.py（185 行）：_text + _int + _access + _ACCESS_BY_TEXT 私有 helper 全覆盖。 |
 | 817 | Batch 153 — RTT protocol 边界扩展（+15 测试） | 本会话扩展 test_rtt_protocol.py（12→27）：RttChannel/RttConfig frozen + 空 channels + 多通道顺序 + down mode + channel_index 位置/KeyError；control_block_layout down-only + size=16 + acID size + MaxUp/Down size=4 + 大量 buffer 32+32；buffer header 偏移常量 + SEGGER magic/cb_id ASCII 编码。文件 240 行 ≤250。 |
+| 818 | Batch 154 — can/dbc 纯 helper 单元测试（21 测试） | 新建 test_can_dbc_helpers.py（192 行）：_extract_intel（单字节全/部分位 + 跨字节边界 + 两字节小端 + 零长度 + start_bit 超字节）+ _extract_motorola（start_bit=0=MSB 语义 + 多位 + 零长度 + 超范围）+ decode_signal（Motorola 字节序 + factor=0 + offset 单独 + 负 factor + bit_length 超字节 mask 截断 + 小数 factor）+ DbcSignal frozen/默认值 + DbcMessage.signal 未知名 KeyError + DbcDatabase.message 未知 id KeyError + 空 messages。补强 test_can_dbc.py 未直接断言的位提取 helper（此前仅通过 decode_signal 间接覆盖小端）。 |
 
 ---
 
