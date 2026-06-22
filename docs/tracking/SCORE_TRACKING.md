@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 893分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 107分
+> 当前: 894分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 106分
 
 ---
 
@@ -543,6 +543,7 @@
 | 891 | Batch 227 — BLE GATT expand_uuid + 模型边界（20 测试） | 新建 test_ble_gatt_boundary.py（176 行）：BLE_BASE_UUID 结构 + expand_uuid 32 位 int + 超 32 位 mask + 纯 hex 无前缀 + 0x 前缀 + 大写归一化小写 + whitespace strip + invalid/空 hex ValueError + 128 位 str 直传（36 字符）+ 128 位大写归一化 + BleCharacteristic 默认值/can_read/can_write/can_notify 组合 + BleGattTree.find_by_uuid 已知/未知/跨多服务 + frozen（Characteristic 不可变/Service+Device 可变）。 |
 | 892 | Batch 228 — RecordingTimeline + Segment + Gap 边界（27 测试） | 新建 test_recording_timeline_boundary.py（176 行）：RecordingSegment 默认/自定义 source + duration_ns + contains 起终点边界/外部 + frozen AttributeError + Gap.duration_ns/zero + DEFAULT_GAP_THRESHOLD_NS=50ms 类常量 + __init__ 默认用类常量 + total_duration_ns（空 0/单段/多段首尾差）+ total_samples 累加 + gaps 阈值（单段无/超阈值产生/自定义阈值/0 阈值全 gap）+ seek（命中返回偏移/gap 中 None/空 None/起点偏移 0）+ segments 拷贝隔离 + add_segment 累积。 |
 | 893 | Batch 229 — RecordingWriter/Reader context manager + 流式 IO 边界（14 测试） | 新建 test_recording_format_io_boundary.py（178 行）：__enter__ 返回 self（不自动 open）+ __exit__ 调 close（_handle None 安全/open 后关闭）+ open 写 CSV header（# EDREC + t_ns,cols）/JSONL header（__header__）+ write_batch 多批 CSV（6 行）/JSONL（3 行）+ close 幂等三次不抛 + reader.open 返回 header + iter_batches 流式（reader 按 dt 合并连续行，总行数验证）+ reader close 幂等 + CSV/JSONL 往返值保留 + 空 header 文件 iter_batches 返回空。 |
+| 894 | Batch 230 — ScriptAction + ScriptRecording 防御性边界（18 测试） | 新建 test_script_action_recording_boundary.py（158 行）：from_dict 缺 type/payload/timestamp_ms raises KeyError + 类型强转（int/str）+ frozen AttributeError + label None→'None' + ScriptRecording 默认值 + to_json 返回字符串/path 写文件返回 None + indent=2 多行格式 + from_json 接受原始 JSON 字符串 + 缺 name/created_at/description 默认空 + 字段类型强转 + duration_ms 单动作/负 timestamp/mixed max + action_count 多个 + add 累积更新 count+duration。 |
 
 ---
 
