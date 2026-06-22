@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 747分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 253分
+> 当前: 748分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 252分
 
 ---
 
@@ -397,6 +397,7 @@
 | 745 | Batch 70 — SVD + EyeDiagram 数据模型单元测试（13 测试） | 新建 test_svd_model.py（7：mask/bit_end/Access/frozen）+ test_eye_diagram_model.py（6：has_density/float32 强制/overlay 一维/frozen/EyeMetrics 默认）。全量 pytest 1752 passed（+13），lint clean。 |
 | 746 | Batch 71 — 控制器辅助函数单元测试（8 测试） | 新建 test_controller_helpers.py：decode_injected_text 转义序列展开（\r\n\t）+ append_measurement_batch 环形缓冲区初始化/累积/通道数变化重建。全量 pytest 1760 passed（+8），lint clean。 |
 | 747 | Batch 72 — event_codec 序列化单元测试（6 测试） | 新建 test_event_codec.py：event_to_record/event_from_record round-trip + 缺字段默认值 + 空 raw。全量 pytest 1766 passed（+6），lint clean。 |
+| 748 | Batch 73 — profile_snapshot 单元测试（5 测试） | 新建 test_profile_snapshot.py：build_profile_snapshot 结构 + transport 子 dict + config=None 默认值 + tuple→list 转换。全量 pytest 1771 passed（+5），lint clean。 |
 
 ---
 
