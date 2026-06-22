@@ -72,8 +72,6 @@ def test_group_connection_widgets(qapp):
     from embeddebug.serial_station.ui.connection_sidebar import group_connection_widgets
     groups = group_connection_widgets([port_combo, refresh_btn, unknown])
     assert isinstance(groups, list)
-    # 至少有 port 组（含 port_combo + refresh_btn）。
-    port_group = [g for g in groups if g[0] is not None and "port" in str(g[0]).lower()]
     # unknown 归 None 组。
     none_group = [g for g in groups if g[0] is None]
     assert len(none_group) >= 1 or any(len(g[1]) == 0 for g in groups if g[0] is None)
