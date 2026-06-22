@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 786分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 214分
+> 当前: 787分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 213分
 
 ---
 
@@ -436,6 +436,7 @@
 | 784 | Batch 114 — CallbackState 回调注册测试 | add_log/error/measurement + handle_error。 |
 | 785 | Batch 115 — log_state 日志追加测试 | append_log/system/error/connected + 回调。 |
 | 786 | Batch 116 — receive_state 收字节测试 | handle_received_bytes + measurement ring + handle_error。 |
+| 787 | Batch 117 — log_entry_codec + session_operations 单元测试（24 测试） | 新建 test_log_entry_codec.py（12）：payload.text/raw 回退 + invalid utf-8 replace + payload.direction 优先于 type 推断 + invalid direction 回退 + frame/measurement→rx + event_from_entry tx/非 tx type + round-trip。新建 test_session_operations.py（12）：export_log_result 写入/空/失败 + replay_entries_result factory/空行跳过/缺失/损坏 JSON + save/load profile round-trip + 创建父目录 + OS 失败 + 损坏 JSON。 |
 
 ---
 
