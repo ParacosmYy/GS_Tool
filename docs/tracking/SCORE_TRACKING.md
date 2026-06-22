@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 766分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 234分
+> 当前: 767分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 233分
 
 ---
 
@@ -412,6 +412,11 @@
 | 760 | Batch 85 — SPI/I2C 配置 + 事务模型单元测试（23 测试） | SpiConfig mode/speed/word_size + I2cConfig 地址/speed + SpiTransaction miso 匹配 + I2cTransaction read 约束。 |
 | 761 | Batch 86 — 录制格式枚举 + Header 单元测试（12 测试） | RecordingFormat.from_extension + RecordingHeader to_dict/from_dict round-trip。 |
 | 762 | Batch 87 — 性能快照 PerfSnapshot 单元测试（10 测试） | is_degraded fps/latency 阈值 + format_text + count=0 忽略。 |
+| 763 | Batch 88 — OTA 配置与进度模型单元测试（15 测试） | OtaConfig.validate + OtaProgress.percent + mark_sent + 枚举。 |
+| 764 | Batch 89 — GPS NMEA 解析器单元测试（12 测试） | NmeaParser.parse GGA/RMC/GSA/GSV + parse_lines + _to_decimal。 |
+| 765 | Batch 90 — CMSIS SVD 解析器单元测试（9 测试） | SvdParser.parse 设备/外设/寄存器/位域 + Access + parse_file。 |
+| 766 | Batch 91 — OTA 协议辅助函数 + YMODEM 单元测试（11 测试） | crc16_xmodem + pad_block + YmodemProtocol _slice_data_blocks。 |
+| 767 | Batch 92 — PerfMetric 性能指标单元测试（9 测试） | update min/max/avg/count + reset + 负值 + 首次采样初始化。 |
 
 ---
 
