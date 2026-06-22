@@ -305,6 +305,42 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 - 动画 gap 审计（explore）：AppShell leave 隐形 / dead code 清单 / cross_fade sequential bug / stagger_fade GC 风险
 - 完整路线图：[docs/superpowers/specs/2026-06-22-batch43-ui-animation-polish-iter.md](docs/superpowers/specs/2026-06-22-batch43-ui-animation-polish-iter.md)
 
+### Batch 49-102：永续迭代（加载态/死代码/CI/lint/测试覆盖）
+
+> 54 commits，评分 677 → 774（+97 from 677 / +71 from 703），测试 1601 → 2034 passed（+433 / +356）。
+
+#### Batch 49 加载态 + 空态（6 子任务，22 ui_smoke）
+- EmptyStateWidget.hide_with_fade 对称方法
+- Log/Waveform/Dashboard 空态 + 加载态全覆盖
+- Connection ProgressRing 内嵌 + 4 条连接路径同步
+
+#### Batch 50-62 lint 严格化（六系列）
+- F（Pyflakes）+ UP（pyupgrade）+ B（bugbear）+ SIM（simplify）+ RUF（ruff-specific）+ C4（comprehensions）
+- 清理 97 未使用 import + 5 未使用变量 + 81 处语法现代化 + 16 bugbear 修复
+- GitHub Actions CI（Windows runner，push/PR 跑 test + STRICT 模式 + lint + smoke）
+
+#### Batch 51-53 死代码治理（widget/token 清零）
+- 7 个死 widget 全部 wire（Drawer/Badge/Chip/InfoBanner/Segmented/ToggleSwitch/Divider）
+- 8 个预留动画 token 消费（DURATION_CONTAINER/FLOUT/DRAWER/PROGRESS + EASE_OUT_QUART/QUINT/IN_QUART/OUT_QUAD）
+- widget 白名单 10→2（设计内），token 白名单 9→1（待场景）
+
+#### Batch 66-96 测试覆盖（+356 测试）
+- MQTT client/codec/message + BLE codec/gatt/transport + CAN frame/dbc
+- SPI/I2C codec/config/bridge + RTT protocol + OTA config/protocols/engine
+- GPS model/parser + SVD model/parser + EyeDiagram model + HexFormatter
+- PerfMetric/Snapshot + RecordingTimeline/Player/Format + OperationResult
+- Plugins discovery + Project audit + Controller helpers + Transport connections
+
+#### Bug 修复（3 个）
+- HexFormatter format_int big_endian 参数被忽略（struct.unpack 总用 little-endian）
+- smoke _connect_button AttributeError（connection_toolbar getattr 防御）
+- devtools 自测目录名硬编码（GS_Tool → 接受 User_Serial）
+
+#### 文档全面更新
+- CLAUDE.md ROADMAP 审计：第一优先级 4 项全完成（UX-04/05/UI-06/DBC）
+- README 工程状态 E4→E5 + CI badge + 质量门禁 lint
+- SCORE_TRACKING 回填 54 个 batch 条目
+
 #### 后续路线图
 - **Batch 47**: 死代码激活（RichTooltip install / Skeleton windowOpacity→QGraphicsOpacityEffect / RotateAnimation spinner）
 - **Batch 48**: 排版 token（FONT_ROLE_* / LETTER_SPACING_* / LINE_HEIGHT_*）+ 间距 token 统一
