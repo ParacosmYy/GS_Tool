@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 812分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 188分
+> 当前: 813分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 187分
 
 ---
 
@@ -462,6 +462,7 @@
 | 810 | Batch 144 — qt_serial 常量映射 + _reverse_lookup 单元测试（16 测试） | 并发会话新建 test_qt_serial_constants.py（156 行）：DATA_BITS/PARITY/STOP_BITS/FLOW_CONTROL 4 映射完备性 + _reverse_lookup 正向反查 + round-trip。 |
 | 811 | Batch 145 — BLE codec 边界扩展（+11 测试） | 本会话扩展 test_ble_codec.py（10→21）：encode handle/type 截断 + encode_frame 默认 value；feed 空数据/部分 header/未知 type/length=0/garbage；BleFrameEvent frozen + little-endian handle + reset 清空。文件 204 行 ≤250。 |
 | 812 | Batch 147 — CanId/CanFrame/CanFilter 边界扩展（+14 测试） | 本会话扩展 test_can_frame.py（17→31）：CanId 0/MAX 边界 + frozen；CanFrame 空 data + frozen + 扩展帧+FD payload + 默认值；CanFilter mask=0 全匹配 + is_extended=False 显式标准 + mask=0 位忽略 + 短路。文件 226 行 ≤250。 |
+| 813 | Batch 149 — SPI/I2C codec 边界扩展（+10 测试） | 本会话扩展 test_spi_i2c_codec.py（12→22）：crc8 0xFF×2=0x24 + 幂等；encode i2c_read length 0/255/-1 + i2c_write register=None/ten_bit；build_response STATUS_ERROR+空body+round-trip；decode_frame 前导/尾部垃圾 ValueError；feed 多帧+部分缓冲+前导垃圾 trim；no_crc feed round-trip + DecodedFrame frozen。文件 203 行 ≤250。 |
 
 ---
 
