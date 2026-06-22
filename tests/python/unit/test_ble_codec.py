@@ -107,3 +107,98 @@ def test_encode_value_truncated_to_255():
     encoded = BleFrameCodec.encode(event)
     assert encoded[3] == 255  # length capped
     assert len(encoded) == 4 + 255
+
+
+# ---- Batch 145: BLE codec 边界扩展 ----
+
+
+def test_encode_handle_masked_to_16_bits():
+    """handle > 0xFFFF 被 & 0xFFFF 截断。"""
+    event = BleFrameEvent(FRAME_NOTIFY, 0x12345, b"")
+    encoded = BleFrameCodec.encode(event)
+    # handle 低字节 = 0x45, 高字节 = 0x23
+    assert encoded[1] == 0x45
+    assert encoded[2] == 0x23
+
+
+def test_encode_frame_type_masked_to_8_bits():
+    """frame_type > 0xFF 被 & 0xFF 截断。"""
+    encoded = BleFrameCodec.encode_frame(0x101, 0, b"")
+    assert encoded[0] == 0x01  # 0x101 & 0xFF = 0x01
+
+
+def test_feed_empty_data_returns_empty():
+    """feed(b"") 不产出事件。"""
+    assert BleFrameCodec().feed(b"") == []
+
+
+def test_feed_partial_header_buffers():
+    """< 4 字节时缓冲，不产出。"""
+    codec = BleFrameCodec()
+    assert codec.feed(b"\x01\x02") == []  # 仅 2 字节
+    # 补齐 header(2 字节) + 1 字节 value
+    events = codec.feed(b"\x00\x01\x42")
+    assert len(events) == 1
+    assert events[0].value == b"\x42"  # 'B'
+
+
+def test_feed_unknown_frame_type():
+    """type=0xFF 是未知类型，is_notify/is_write/is_read_response 全 False。"""
+    codec = BleFrameCodec()
+    frame = BleFrameCodec.encode_frame(0xFF, 0, b"x")
+    events = codec.feed(frame)
+    assert len(events) == 1
+    assert events[0].is_notify is False
+    assert events[0].is_write is False
+    assert events[0].is_read_response is False
+
+
+def test_feed_zero_length_value():
+    """length=0 的帧 value 为空 bytes。"""
+    codec = BleFrameCodec()
+    frame = BleFrameCodec.encode_frame(FRAME_NOTIFY, 5, b"")
+    events = codec.feed(frame)
+    assert len(events) == 1
+    assert events[0].value == b""
+
+
+def test_reset_after_complete_frame_clears_buffer():
+    """完整帧消费后 buffer 为空；reset 不影响。"""
+    codec = BleFrameCodec()
+    frame = BleFrameCodec.encode_frame(FRAME_NOTIFY, 1, b"x")
+    codec.feed(frame)
+    codec.reset()
+    assert codec.feed(b"") == []
+
+
+def test_ble_frame_event_is_frozen():
+    """BleFrameEvent 是 frozen dataclass。"""
+    import pytest
+    e = BleFrameEvent(FRAME_NOTIFY, 0, b"")
+    with pytest.raises((AttributeError, TypeError)):
+        e.handle = 99
+
+
+def test_encode_frame_default_value_empty():
+    """encode_frame 不传 value 时默认 b''。"""
+    encoded = BleFrameCodec.encode_frame(FRAME_WRITE, 10)
+    assert encoded[3] == 0  # length=0
+    assert len(encoded) == 4
+
+
+def test_feed_handles_big_endian_handle():
+    """handle 用 little-endian 编码（低字节在前）。"""
+    codec = BleFrameCodec()
+    frame = BleFrameCodec.encode_frame(FRAME_NOTIFY, 0xBEEF, b"x")
+    events = codec.feed(frame)
+    assert events[0].handle == 0xBEEF
+
+
+def test_feed_garbage_data_still_parses():
+    """任意 4+ 字节数据都会被解析（不校验 type 合法性）。"""
+    codec = BleFrameCodec()
+    # type=0xAA, handle=0x0000, length=1, value=0xFF
+    events = codec.feed(bytes([0xAA, 0x00, 0x00, 0x01, 0xFF]))
+    assert len(events) == 1
+    assert events[0].type == 0xAA
+    assert events[0].value == b"\xFF"
