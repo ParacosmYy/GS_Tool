@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 864分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 136分
+> 当前: 865分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 135分
 
 ---
 
@@ -514,6 +514,7 @@
 | 862 | Batch 198 — BannerKind + _parse_color + Divider + InfoBanner/RichTooltip 边界（19 测试） | 新建 test_banner_tooltip_divider_boundary.py（190 行）：BannerKind 4 成员+小写+互异 + KIND_COLORS 4 键 + _parse_color（hex/rgba/未知/空串）+ Divider（无标签/有标签/objectName）+ InfoBanner（set_text round-trip/初始 INFO/set_kind/objectName）+ RichTooltip install/uninstall_tooltip（不崩溃）+ title/body 初始。 |
 | 863 | Batch 199 — KeyboardShortcut _apply_style + Chip _resolve_color helpers 边界（15 测试） | 新建 test_keyhint_chip_boundary.py（172 行）：KeyboardShortcut _apply_style 有 stylesheet+空文本不崩溃+多次构造独立+幂等 + Chip _resolve_bg_color（unselected/selected QColor）+_resolve_text_color+_resolve_border_pen + selected resolve 可能不同 + _close_button_rect（removable 非 null/not removable null）+_text_rect 非 null + selected+removable 组合 + 默认状态 bool + set_removable 切换。 |
 | 864 | Batch 200 — DotState 枚举 + StatusDot flash + ProgressRing clamp/indeterminate 边界（17 测试） | 新建 test_dot_progress_boundary.py（179 行）：DotState 5 成员+小写+互异+已知值 + StatusDot _get_flash/_set_flash（初始 0/round-trip/0）+ ProgressRing _clamp_value（超 max/min/负值 clamp/正常不 clamp）+ indeterminate（默认 False/set True/翻转）+ setRange/setMinimum/setMaximum。 |
+| 865 | Batch 201 — CrcPreset + compute_crc + _parse_hex_bytes + PlaceholderPanel 边界（18 测试） | 新建 test_crc_placeholder_boundary.py（197 行）：CrcPreset frozen+8 字段+CRC_PRESETS 非空+MODBUS check + compute_crc（空 data/8 位 MAXIM check=0xA1/16 位 MODBUS check=0x4B37/CCITT-FALSE check=0x29B1）+ _parse_hex_bytes（合法/空/含空格/奇数长度）+ _parse_int（十进制/0x hex/空=0）+ PlaceholderPanel（build 返回 QWidget+objectName 非空+on_enter/leave 不崩溃）。 |
 
 ---
 
