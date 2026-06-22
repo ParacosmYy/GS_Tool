@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 799分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 201分
+> 当前: 800分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 200分
 
 ---
 
@@ -447,8 +447,9 @@
 | 795 | Batch 127 — RecordingPlayer 边界扩展（+9 测试） | 本会话扩展 test_recording_player.py（8→17）：step_next 返回 batch 推进 index + emit batch_available/position_changed + 用尽 emit finished + 空 player None；progress 准确反映 0.25/0.75；seek clamp 到 [0,total] + emit position_changed；load() 内部 stop() 暂停+清零。辅助 _player_with_n_batches 改用 JSONL（CSV 合并 batch）。文件 234 行 ≤250。 |
 | 796 | Batch 128 — qss_sections_widgets 6 函数 per-section 单元测试（18 测试） | 并发会话新建 test_qss_sections_widgets_states.py（236 行）：buttons/log_view/status/scrollbar/plaintext/shortcut 6 section 全函数 per-section 断言 + build_qss 集成。 |
 | 797 | Batch 129 — fuzzy_score + SearchIndex 边界扩展（+22 测试） | 本会话扩展 test_search_service.py（10→32）：fuzzy_score 子串路径（空 query / 完整子串 / 偏移降分 / startswith +10 / 大小写不敏感）+ 子序列路径（非连续 cnn/Connect=9 / consecutive 累积 / startswith +5 仅首字符 / query 长/缺字符 -1 / 单字符 / 重复字符 / 子串优先）+ SearchIndex 容量（5000 截断 / 保留最新零填充 / max_results=0/负数 / clear_all / 降序排序 / match_snippet 48 截断 / data 字段保留）。文件 248 行 ≤250。 |
-| 798 | Batch 130 — _empty_state_overlay + _accent_row 单元测试（15 测试） | 新建 test_dashboard_empty_state.py（6 测试，84 行）：build_canvas_empty_state 返回 EmptyStateWidget + parent 关系 + title_label 文案「画布为空」+ desc_label 含「拖」引导 + objectName 契约（serialStationEmptyState/Icon/Title/Description）。新建 test_settings_accent_row.py（9 测试，155 行）：build_accent_row 创建 7 色点 + 行首 field label + 序列 objectName serialStationAccentSwatch{0..6} + active accent checked + inline background-color 填色 + checkable；_sync_checked 切换目标 accent checked + 幂等 + 未知 accent 全 False。覆盖剩余 2 个未测 UI helper 小模块。 |
-| 799 | Batch 131 — layout_main 三区分栏装配契约单元测试（10 测试） | 新建 test_layout_main_contract.py（152 行）：assemble_three_zone 返回 QSplitter + objectName=serialStationMainSplitter + handleWidth=4（Batch 46）+ childrenCollapsible=False + count=3；三区 objectName 契约（LeftZone/CenterZone/RightZone）+ 最小宽度（300/380/260）；owner 属性注入（_center_log_card/_center_waveform_card QFrame + _waveform_preview）；中区卡最小高度（waveform 160 / log 200）。用 mock layout builders 避免重组件树。覆盖 layout_main.py 装配契约。阻塞说明：并发会话 test_recording.py（272 行）违反铁律 21，治理测试 test_python_default_cutovers 暂时失败，非本批次引入。 |
+| 798 | Batch 130 — _empty_state_overlay + _accent_row 单元测试（15 测试） | 并发会话新建 test_dashboard_empty_state.py（6 测试）+ test_settings_accent_row.py（9 测试）。覆盖剩余 2 个未测 UI helper 小模块。 |
+| 799 | Batch 131 — RecordingExporter 失败路径 + _channel_indices 边界（+12 测试） | 本会话扩展 test_recording.py（6→16）：失败路径（源不存在 / 未知通道）+ 通道选择（None/[]/显式顺序/子集数值/同格式复制）+ _channel_indices 静态助手（None+空 / 已知名称顺序 / 未知名 KeyError）。辅助 _write_source 抽取样板，文件 232 行 ≤250（治理测试已恢复）。 |
+| 800 | Batch 131 — layout_main 三区分栏装配契约单元测试（10 测试） | 并发会话新建 test_layout_main_contract.py（152 行）：assemble_three_zone QSplitter + objectName + handleWidth=4 + count=3 + 三区 objectName 契约 + 最小宽度 + owner 注入 + 中区卡最小高度。用 mock layout builders 避免重组件树。 |
 
 ---
 
