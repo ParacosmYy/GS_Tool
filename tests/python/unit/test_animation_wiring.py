@@ -27,17 +27,13 @@ TOKENS_PATH = UI_ROOT / "animations" / "tokens.py"
 # → layout_cards.build_card，白名单现为空。
 _PENDING_WIRE: dict[str, str] = {}
 
-# 预留的动画 token（Batch 43 为 container/flyout/drawer/scroll 场景预留，尚未消费）。
-# 这些是有设计意图的预留，不是死代码。wire 后从此移除。
+# Batch 51 已消费 DURATION_CONTAINER + EASE_OUT_QUART（install_card_shadow 阴影淡入）
+# + DURATION_FLYOUT + EASE_OUT_QUINT（show_log_info_banner fly-in 动画）。
 _RESERVED_TOKENS: dict[str, str] = {
-    "DURATION_CONTAINER": "Material 3 emphasized container transform 预留（300ms）",
     "DURATION_PROGRESS": "进度条平滑过渡预留（150ms）",
-    "DURATION_FLYOUT": "弹出层/浮层动画预留（187ms）",
     "DURATION_DRAWER": "抽屉滑出动画预留（300ms）",
     "DURATION_SCROLL": "滚动到视图动画预留（500ms）",
-    "EASE_OUT_QUART": "容器变换/页面入场强调缓动预留（OutQuart）",
     "EASE_IN_QUART": "容器变换离场缓动预留（InQuart）",
-    "EASE_OUT_QUINT": "Material 3 emphasized 缓动预留（OutQuint）",
     "EASE_OUT_QUAD": "轻量出场缓动预留（OutQuad）",
 }
 

@@ -200,6 +200,19 @@ QLabel#serialStationDashboardStatusLabel {{
     color: {P.TEXT_SECONDARY};
     font-size: {T.FONT_SM};
 }}
+/* Batch 49: 绑定配置对话框（QDialog / QLineEdit 占位契约）。 */
+QDialog#serialStationDashboardBindingDialog,
+QDialog#serialStationDashboardBindingDialogSlider {{
+    background-color: {P.BG_PANEL};
+    color: {P.TEXT_PRIMARY};
+}}
+QLineEdit#serialStationDashboardBindingDialogSliderPrefix {{
+    background-color: {P.BG_APP};
+    color: {P.TEXT_PRIMARY};
+    border: {T.BORDER_THIN} solid {P.ACCENT_BORDER};
+    border-radius: {T.RADIUS_SM};
+    padding: {T.PADDING_SM};
+}}
 /* Batch 40: 新增微交互控件。控件均自绘主体（paintEvent），QSS 仅契约占位
    「background-color: transparent」，避免 QWidget 默认底破坏色相；具体配色
    由 palette + paintEvent 完成，集中管理（05-ui-standard §颜色集中管理）。 */
@@ -266,4 +279,18 @@ QWidget#serialStationDivider {{
 }}
 QLabel#serialStationDividerLabel {{
     background-color: transparent;
+}}
+/* Batch 51: 日志选项工具条场景实例（Badge/Chip/ToggleSwitch 自绘，QSS 契约占位）。
+   这些是通用控件在日志区的具体实例，objectName 覆盖契约要求 QSS 文档化。 */
+QWidget#serialStationLogConnectionBadge,
+QWidget#serialStationActiveFilterChip,
+QWidget#serialStationAutoScrollToggle,
+QWidget#serialStationLogViewModeSegmented,
+QWidget#serialStationLogInfoBanner {{
+    background-color: transparent;
+}}
+QLabel#serialStationAutoScrollLabel {{
+    background-color: transparent;
+    color: {P.TEXT_SECONDARY};
+    font-size: {T.FONT_SM};
 }}"""

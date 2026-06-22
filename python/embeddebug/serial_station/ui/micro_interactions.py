@@ -64,29 +64,25 @@ def install_hover_lift(widget: QWidget, accent_tint: bool = True) -> QGraphicsDr
 def install_card_shadow(widget: QWidget, level=None) -> "QGraphicsDropShadowEffect":
     """给静态卡片/面板安装统一规约的 elevation 阴影（Batch 50-3）。
 
-    与 ``install_hover_lift``（动态 hover 浮起）互补：本函数用于**静态**卡片
-    （如 BasePanel、placeholder），无需 hover 动画，只设固定深度阴影。
-
-    通过 ``elevation_effect(level)`` 统一构造，替代散落的硬编码
-    ``QGraphicsDropShadowEffect`` + setBlurRadius/setColor/setOffset 三连。
-    激活 elevation 模块进入生产链（死代码守护测试 B50-2 要求）。
-
-    Args:
-        widget: 目标卡片/面板。
-        level: ``(blur, offset_y, alpha)`` 三元组，取自 ``AnimationTokens.ELEVATION_*``。
-            默认 ``ELEVATION_L1``（卡片静态深度）。
-
-    Returns:
-        配置好的 ``QGraphicsDropShadowEffect``（已挂到 widget）。
+    通过 ``elevation_effect`` 统一构造，替代散落的硬编码 DropShadowEffect。
+    Batch 51: enter 时从 L0 淡入到目标 level（消费 DURATION_CONTAINER + EASE_OUT_QUART）。
     """
+
+    from PyQt6.QtCore import QPropertyAnimation
 
     from embeddebug.serial_station.ui.animations.elevation import elevation_effect
 
     if level is None:
         level = AnimationTokens.ELEVATION_L1
-    effect = elevation_effect(level)
+    effect = elevation_effect(AnimationTokens.ELEVATION_L0)
     effect.setParent(widget)
     widget.setGraphicsEffect(effect)
+    anim = QPropertyAnimation(effect, b"blurRadius", widget)
+    anim.setDuration(AnimationTokens.DURATION_CONTAINER)
+    anim.setStartValue(0)
+    anim.setEndValue(level[0])
+    anim.setEasingCurve(AnimationTokens.EASE_OUT_QUART)
+    anim.start()
     return effect
 
 

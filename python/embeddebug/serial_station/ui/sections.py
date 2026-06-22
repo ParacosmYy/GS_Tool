@@ -162,6 +162,18 @@ def build_log_row(owner: SerialStationSectionsHost, root: QWidget) -> QVBoxLayou
     col.setSpacing(T.SPACING_INT_SM)
     col.setContentsMargins(0, 0, 0, 0)
 
+    # Batch 51: 日志选项工具条（Divider + Badge + ToggleSwitch + Chip + SegmentedControl），
+    # wire 死 widget 到真实功能场景。helper 在 log_options_bar 模块。
+    from embeddebug.serial_station.ui.log_options_bar import (
+        build_log_info_banner,
+        build_log_options_bar,
+    )
+
+    col.addLayout(build_log_options_bar(owner, root))
+    # Batch 51-4: InfoBanner 持久信息条（初始隐藏，连接/协议事件时 show）。
+    owner._log_info_banner = build_log_info_banner(owner, root)
+    col.addWidget(owner._log_info_banner)
+
     # 第 1 行：过滤 + 搜索。
     row1 = QHBoxLayout()
     row1.setSpacing(T.SPACING_INT_SM)

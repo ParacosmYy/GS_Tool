@@ -20,18 +20,10 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3]
 UI_ROOT = REPO_ROOT / "python" / "embeddebug" / "serial_station" / "ui"
 
-# 已知未 wire 的 widget（定义 + 导出但无 production 构造）。
-# 每项附理由；wire 后从此移除。长期不 wire 的应考虑删除模块。
+# Batch 51 已 wire Divider/Badge/Chip/ToggleSwitch/SegmentedControl/InfoBanner/BannerKind
+# 到 log_options_bar。剩 Drawer 待独立 UI 批次（需侧栏场景，接入点在 main_window）。
 _PENDING_WIRE: dict[str, str] = {
-    "Badge": "Batch 41 新增，未接入任何面板（待状态徽章场景）",
-    "BadgeKind": "Badge 的枚举伴生，随 Badge 一起 wire",
-    "BannerKind": "InfoBanner 的枚举伴生，随 InfoBanner 一起 wire",
-    "Chip": "Batch 40 新增，未接入（待标签/筛选场景）",
-    "Divider": "Batch 48 新增分隔线，未接入面板布局",
-    "Drawer": "Batch 41 侧边抽屉，未接入（待设置/详情侧栏场景）",
-    "InfoBanner": "Batch 40 通知横幅，未接入（toast 已覆盖通知场景）",
-    "SegmentedControl": "Batch 40 分段控件，未接入（待协议/视图切换场景）",
-    "ToggleSwitch": "Batch 48 滑动开关，未接入（待设置项场景）",
+    "Drawer": "Batch 41 侧边抽屉，未接入（接入点 main_window 被用户改动，待协调）",
     # install_tooltip/uninstall_tooltip：install 已 wire（connection_toolbar 等），
     # uninstall 仅由 destroyed 信号内部触发，无显式 production 调用，属设计内。
     "uninstall_tooltip": "仅由 widget destroyed 信号内部触发，无显式调用",
