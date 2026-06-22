@@ -26,13 +26,13 @@ from embeddebug.serial_station.ui.dashboard.palette import (
 from embeddebug.serial_station.ui.dashboard.tabs import DashboardTabs
 
 __all__ = [
-    "DashboardCanvas",
-    "DashboardItem",
-    "DashboardTabs",
     "GRID_SIZE",
     "MIME_TYPE",
     "SUPPORTED_WIDGET_TYPES",
     "WIDGET_CATALOG",
+    "DashboardCanvas",
+    "DashboardItem",
+    "DashboardTabs",
     "WidgetFullscreenHandler",
     "WidgetPalette",
     "WidgetPaletteButton",

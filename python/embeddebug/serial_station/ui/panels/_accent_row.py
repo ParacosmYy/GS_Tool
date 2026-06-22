@@ -90,7 +90,7 @@ def select_accent(panel: SettingsPanel, accent_id: str) -> None:
         from embeddebug.serial_station.services.settings_service import SettingsManager
 
         SettingsManager.instance().update(accent=accent_id)
-    except Exception:  # noqa: BLE001  偏好持久化失败不阻塞 accent 切换
+    except Exception:
         pass
 
     variant = get_accent_by_id(accent_id)

@@ -44,7 +44,7 @@ def create_application(argv: Sequence[str] | None = None) -> QApplication:
         settings = SettingsManager.instance().get()
         app.setFont(QFont("Microsoft YaHei UI", settings.font_point))
         app.setProperty("_embeddebug_animation_enabled", settings.animation_enabled)
-    except Exception:  # noqa: BLE001  偏好应用失败不阻塞启动
+    except Exception:
         pass
     return app
 

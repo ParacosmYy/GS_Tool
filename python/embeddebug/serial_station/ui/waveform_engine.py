@@ -39,9 +39,8 @@ def configure_high_performance_plot(plot: pg.PlotWidget) -> None:
 def try_enable_opengl(plot: pg.PlotWidget) -> bool:
     """尝试启用 OpenGL 加速，失败返回 False（环境无 PyOpenGL 时静默回退）。"""
 
-    try:
-        import OpenGL  # noqa: F401
-    except ImportError:
+    import importlib.util
+    if importlib.util.find_spec("OpenGL") is None:
         return False
     try:
         pg.setConfigOption("useOpenGL", True)

@@ -130,7 +130,7 @@ def test_fullscreen_module_now_has_external_consumer():
     ui = Path("python/embeddebug/serial_station/ui")
     fullscreen_consumers: list[str] = []
     for py in ui.rglob("*.py"):
-        if py.name == "fullscreen.py" or "dashboard" in py.parts and py.name != "dashboard_panel.py":
+        if py.name == "fullscreen.py" or ("dashboard" in py.parts and py.name != "dashboard_panel.py"):
             if py.name != "dashboard_panel.py":
                 continue
         try:

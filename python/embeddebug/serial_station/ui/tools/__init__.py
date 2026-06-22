@@ -33,11 +33,11 @@ from embeddebug.serial_station.ui.tools.byte_frequency import (
 
 __all__ = [
     "CRC_PRESETS",
+    "TZ_PRESETS",
     "ByteFrequencyAnalyzer",
     "CrcCalculatorPanel",
     "CrcPreset",
     "HexViewerPanel",
-    "TZ_PRESETS",
     "TimestampConverterPanel",
     "compute_crc",
     "compute_frequency",

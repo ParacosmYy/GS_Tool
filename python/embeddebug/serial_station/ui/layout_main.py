@@ -141,7 +141,7 @@ def _build_center_zone(
     zone_layout.addWidget(waveform_card, 2)
 
     # 日志卡（中,主体）：主要信息区，stretch 3，设最小高度保证可读。
-    log_card, log_body = build_card(zone, title=owner.tr("Log"), icon_name="terminal")
+    log_card, _log_body = build_card(zone, title=owner.tr("Log"), icon_name="terminal")
     log_card.setMinimumHeight(200)
     zone_layout.addWidget(log_card, 3)
 

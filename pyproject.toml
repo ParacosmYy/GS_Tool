@@ -55,17 +55,17 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-# Batch 56-60: F + UP + B + SIM 系列全强制（死代码 + 现代化 + bugbear + 简化）。
+# Batch 56-61: F + UP + B + SIM + RUF 系列全强制。
 select = [
     "F",     # Pyflakes
     "UP",    # pyupgrade
     "B",     # bugbear
     "SIM",   # flake8-simplify
+    "RUF",   # ruff-specific（RUF100 unused noqa / RUF013 implicit Optional 等）
 ]
-# SIM105（contextlib.suppress）：40 处防御性代码，try/except 更直观。
-# SIM102（嵌套 if 合并）：有时降低可读性，保留显式嵌套。
-# SIM115（context manager for files）：改变资源管理语义，需逐个审查。
-ignore = ["SIM105", "SIM102", "SIM115"]
+# SIM105/102/115：风格争议（见 Batch 60）。
+# RUF001/002/003：中文注释/字符串的 Unicode 字符警告，不适合中文项目（7900+ 处）。
+ignore = ["SIM105", "SIM102", "SIM115", "RUF001", "RUF002", "RUF003", "RUF012"]
 
 [tool.ruff.lint.per-file-ignores]
 # __init__.py 的 re-export 是设计内（公共 API），不算未使用 import。

@@ -10,7 +10,6 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import inspect
 
-import pytest  # noqa: F401  # 保留以兼容 pytest 插件机制
 from PyQt6.QtWidgets import QComboBox, QLineEdit
 from unittest.mock import MagicMock
 

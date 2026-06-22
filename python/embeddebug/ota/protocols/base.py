@@ -138,7 +138,19 @@ def pad_block(data: bytes, block_size: int) -> bytes:
 
 
 __all__ = [
-    "ACK", "CAN", "C", "EOT", "NAK", "SOH", "STX",
-    "OtaBlock", "OtaByteChannel", "OtaProtocol", "OtaProtocolKind",
-    "TransferResult", "checksum_8bit", "crc16_xmodem", "pad_block",
+    "ACK",
+    "CAN",
+    "EOT",
+    "NAK",
+    "SOH",
+    "STX",
+    "C",
+    "OtaBlock",
+    "OtaByteChannel",
+    "OtaProtocol",
+    "OtaProtocolKind",
+    "TransferResult",
+    "checksum_8bit",
+    "crc16_xmodem",
+    "pad_block",
 ]

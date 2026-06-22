@@ -108,7 +108,7 @@ def _build_density(
 ) -> np.ndarray:
     """把折叠后的 ``[period_count, phase_bins]`` 累计成 ``[level_bins, phase_bins]``。"""
 
-    period_count, phase_bins = phased.shape
+    _period_count, phase_bins = phased.shape
     density = np.zeros((level_bins, phase_bins), dtype=np.float32)
     # 幅度 → bin 索引（clip 到 [0, level_bins-1]）。
     norm = (phased - low) / (high - low)

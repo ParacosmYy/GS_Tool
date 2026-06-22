@@ -83,7 +83,7 @@ def test_remaining_length_small():
 def test_remaining_length_large():
     from embeddebug.serial_station.mqtt.codec import encode_remaining_length, decode_remaining_length
     encoded = encode_remaining_length(321)
-    val, consumed = decode_remaining_length(encoded)
+    val, _consumed = decode_remaining_length(encoded)
     assert val == 321
 
 

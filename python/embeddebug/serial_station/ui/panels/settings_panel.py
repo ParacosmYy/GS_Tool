@@ -265,7 +265,7 @@ class SettingsPanel:
             from embeddebug.serial_station.services.settings_service import SettingsManager
 
             SettingsManager.instance().update(theme=name)
-        except Exception:  # noqa: BLE001  偏好持久化失败不阻塞主题应用
+        except Exception:
             pass
         if self._theme_status is not None:
             text = self._widget.tr("已应用：深色") if name == THEME_DARK else self._widget.tr("已应用：浅色")

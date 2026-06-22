@@ -16,12 +16,12 @@ from embeddebug.serial_station.rtt.session import RttSession
 from embeddebug.serial_station.rtt.transport_stub import RttTransportStub
 
 __all__ = [
+    "SEGGER_RTT_CB_ID",
+    "SEGGER_RTT_MAGIC",
+    "SEGGER_RTT_MAGIC_BYTES",
     "RttChannel",
     "RttConfig",
     "RttSession",
     "RttTransportStub",
-    "SEGGER_RTT_CB_ID",
-    "SEGGER_RTT_MAGIC",
-    "SEGGER_RTT_MAGIC_BYTES",
     "control_block_layout",
 ]

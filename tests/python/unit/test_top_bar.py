@@ -30,7 +30,7 @@ class _StubOwner:
             self._profile_label = QLabel("Profile: unsaved", root)
             self._profile_label.setObjectName("serialStationProfileLabel")
 
-    def tr(self, source_text: str) -> str:  # noqa: D401
+    def tr(self, source_text: str) -> str:
         return source_text
 
 

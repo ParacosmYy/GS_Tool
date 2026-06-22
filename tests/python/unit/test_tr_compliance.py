@@ -86,7 +86,7 @@ def _find_tr_violations(path: Path) -> list[tuple[int, str]]:
             elif isinstance(func, ast.Name):
                 api_name = func.id
             # 检查构造函数（QLabel("...") 等）。
-            if api_name in _VISIBLE_TEXT_CTORS and node.args or api_name in _VISIBLE_TEXT_APIS and node.args:
+            if (api_name in _VISIBLE_TEXT_CTORS and node.args) or (api_name in _VISIBLE_TEXT_APIS and node.args):
                 first = node.args[0]
                 if _is_user_visible_text(first):
                     violations.append((node.lineno, f"{api_name}({ast.dump(first)})"))

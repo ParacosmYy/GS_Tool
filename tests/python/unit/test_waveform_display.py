@@ -120,7 +120,7 @@ def test_waveform_preview_submit_multiple_then_flush(qtbot):
         preview.submit_batch(_make_batch(channels=1, samples=10))
     preview._accumulator.flush()
     assert len(preview._curves) >= 1
-    xdata, ydata = preview._curves[0].getData()
+    _xdata, ydata = preview._curves[0].getData()
     assert len(ydata) == 30
 
 def test_measurement_actions_uses_submit_batch(qtbot):

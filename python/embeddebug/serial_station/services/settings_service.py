@@ -99,13 +99,13 @@ class SettingsManager:
             setattr(self._cache, key, value)
             try:
                 self._settings.setValue(key, value)
-            except Exception:  # noqa: BLE001  QSettings 失败不应阻断内存更新
+            except Exception:
                 _log.warning("QSettings setValue failed for %s", key, exc_info=True)
         # theme/accent 双写到 theme_store，使 theme_switcher 读路径一致。
         self._mirror_theme_store()
         try:
             self._settings.sync()
-        except Exception:  # noqa: BLE001  sync 失败不阻塞
+        except Exception:
             _log.warning("QSettings sync failed", exc_info=True)
         return self._cache
 
@@ -116,11 +116,11 @@ class SettingsManager:
         for key in asdict(self._cache):
             try:
                 self._settings.remove(key)
-            except Exception:  # noqa: BLE001
+            except Exception:
                 _log.warning("QSettings remove failed for %s", key, exc_info=True)
         try:
             self._settings.sync()
-        except Exception:  # noqa: BLE001
+        except Exception:
             _log.warning("QSettings sync failed", exc_info=True)
         # theme_store 也回到默认（避免下次启动 theme_switcher 读到旧主题）。
         self._mirror_theme_store()
@@ -151,7 +151,7 @@ class SettingsManager:
                 default_baudrate=baudrate,
                 animation_enabled=animation,
             )
-        except Exception:  # noqa: BLE001  顶层兜底：构造失败也不阻塞启动
+        except Exception:
             _log.warning("settings load failed, using defaults", exc_info=True)
             return UserSettings()
 
@@ -188,5 +188,5 @@ class SettingsManager:
                 theme=self._cache.theme,
                 accent=self._cache.accent,
             )
-        except Exception:  # noqa: BLE001  镜像失败不阻塞主写路径
+        except Exception:
             _log.debug("theme_store mirror failed", exc_info=True)

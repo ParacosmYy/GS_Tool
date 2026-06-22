@@ -228,7 +228,7 @@ class ProgressRing(QWidget):
             )
             ratio = (disp_clamped - float(self._minimum)) / float(span)
             ratio = max(0.0, min(1.0, ratio))
-            percent = int(round(ratio * 100))
+            percent = round(ratio * 100)
             text = f"{percent}%"
             font = QFont()
             font.setPointSizeF(max(7.0, side / 6.0))

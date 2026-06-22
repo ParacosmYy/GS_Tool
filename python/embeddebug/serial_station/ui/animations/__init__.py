@@ -37,7 +37,6 @@ __all__ = [
     "BouncePathAnimation",
     "CollapseAnimation",
     "ElasticSnapAnimation",
-    "elevation_effect",
     "FadeTransition",
     "GlowAnimation",
     "PulseAnimation",
@@ -46,4 +45,5 @@ __all__ = [
     "SlideAnimation",
     "SlideDirection",
     "TypewriterAnimation",
+    "elevation_effect",
 ]

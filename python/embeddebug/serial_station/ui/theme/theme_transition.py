@@ -145,8 +145,8 @@ def transition_theme(app: QApplication, apply_fn: Callable[[], None]) -> bool:
 
 
 __all__ = [
-    "OPACITY_DIP",
     "DIP_MS",
+    "OPACITY_DIP",
     "RISE_MS",
     "ThemeTransition",
     "transition_theme",

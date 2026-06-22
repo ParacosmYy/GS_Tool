@@ -2,4 +2,4 @@
 from embeddebug.serial_station.waveform_advanced.multi_axis import MultiAxisPlot
 from embeddebug.serial_station.waveform_advanced.scatter import ScatterPlot
 from embeddebug.serial_station.waveform_advanced.waterfall import WaterfallPlot, SpectrumWaterfall
-__all__ = ["MultiAxisPlot", "ScatterPlot", "WaterfallPlot", "SpectrumWaterfall"]
+__all__ = ["MultiAxisPlot", "ScatterPlot", "SpectrumWaterfall", "WaterfallPlot"]

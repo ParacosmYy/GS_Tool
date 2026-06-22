@@ -14,11 +14,11 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from datetime import datetime, timezone  # noqa: E402
+from datetime import datetime, timezone
 
-import pytest  # noqa: E402
+import pytest
 
-from embeddebug.serial_station.ui.tools.timestamp_converter import (  # noqa: E402
+from embeddebug.serial_station.ui.tools.timestamp_converter import (
     TZ_PRESETS,
     TimestampConverterPanel,
     datetime_to_epoch,

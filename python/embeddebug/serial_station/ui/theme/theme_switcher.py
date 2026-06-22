@@ -156,7 +156,7 @@ class ThemeSwitcher:
             from embeddebug.serial_station.ui.theme import theme_store
 
             theme_store.save_theme_id(theme_id)
-        except Exception:  # noqa: BLE001  偏好落盘失败不阻断主题切换
+        except Exception:
             pass
 
     def apply_accent(self, accent_id: str) -> str:

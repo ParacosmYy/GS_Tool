@@ -16,7 +16,7 @@ from __future__ import annotations
 # 旧文件名保留导出（测试 / 迁移读取引用）。
 ACCENT_FILENAME = "accent.json"
 
-from embeddebug.serial_station.ui.theme import theme_store  # noqa: E402
+from embeddebug.serial_station.ui.theme import theme_store
 
 
 def accent_path():

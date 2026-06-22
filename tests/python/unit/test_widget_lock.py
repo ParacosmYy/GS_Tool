@@ -139,5 +139,5 @@ def test_menu_delete_disabled_when_locked(qtbot, monkeypatch):
     monkeypatch.setattr(QtWidgets.QMenu, "__init__", _init)
     monkeypatch.setattr(QtWidgets.QMenu, "exec", lambda *a, **k: None)
     widget.customContextMenuRequested.emit(QPoint(5, 5))
-    delete_action = [a for a in built[0].actions() if a.text() == "删除控件"][0]
+    delete_action = next(a for a in built[0].actions() if a.text() == "删除控件")
     assert delete_action.isEnabled() is False  # 锁定时禁用

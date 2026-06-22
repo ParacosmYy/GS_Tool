@@ -20,6 +20,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 
 from embeddebug.serial_station.ui.controls.badge import Badge, BadgeKind
+import itertools
 
 
 def _make_badge(
@@ -111,7 +112,7 @@ def test_badge_size_hint_monotonic_with_text_length(qtbot):
     """同一字体下，sizeHint 宽度应随字符数单调不减。"""
 
     widths = [Badge(text=("X" * n)).sizeHint().width() for n in (1, 5, 10, 20, 40)]
-    for prev, curr in zip(widths, widths[1:], strict=False):
+    for prev, curr in itertools.pairwise(widths):
         assert curr >= prev, f"width not monotonic: {widths}"
 
 

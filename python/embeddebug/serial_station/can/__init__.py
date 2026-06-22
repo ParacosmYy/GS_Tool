@@ -14,6 +14,7 @@ from embeddebug.serial_station.can.frame import (
 )
 
 __all__ = [
+    "PROTOCOL_NAME",
     "CanFilter",
     "CanFrame",
     "CanFrameCodec",
@@ -21,6 +22,5 @@ __all__ = [
     "DbcDatabase",
     "DbcMessage",
     "DbcSignal",
-    "PROTOCOL_NAME",
     "decode_signal",
 ]
