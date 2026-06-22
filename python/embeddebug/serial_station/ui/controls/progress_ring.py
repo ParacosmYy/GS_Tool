@@ -97,7 +97,8 @@ class ProgressRing(QWidget):
         if self._value_anim is not None:
             self._value_anim.stop()
         self._value_anim = QPropertyAnimation(self, b"displayValue", self)
-        self._value_anim.setDuration(AnimationTokens.DURATION_NORMAL)
+        # Batch 53: 消费预留 token DURATION_PROGRESS（进度条专用平滑过渡 150ms）。
+        self._value_anim.setDuration(AnimationTokens.DURATION_PROGRESS)
         self._value_anim.setStartValue(self._display_value)
         self._value_anim.setEndValue(float(clamped))
         self._value_anim.setEasingCurve(AnimationTokens.EASE_OUT)

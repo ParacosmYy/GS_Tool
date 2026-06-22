@@ -27,12 +27,11 @@ TOKENS_PATH = UI_ROOT / "animations" / "tokens.py"
 # → layout_cards.build_card，白名单现为空。
 _PENDING_WIRE: dict[str, str] = {}
 
-# Batch 51-52 已消费 DURATION_CONTAINER/EASE_OUT_QUART/DURATION_FLYOUT/EASE_OUT_QUINT/DURATION_DRAWER。
+# Batch 51-53 已消费 DURATION_CONTAINER/EASE_OUT_QUART/DURATION_FLYOUT/EASE_OUT_QUINT/
+# DURATION_DRAWER/DURATION_PROGRESS/EASE_IN_QUART/EASE_OUT_QUAD。
+# 剩 DURATION_SCROLL 待「滚动到视图」场景实现（如列表项点击定位）。
 _RESERVED_TOKENS: dict[str, str] = {
-    "DURATION_PROGRESS": "进度条平滑过渡预留（150ms）",
-    "DURATION_SCROLL": "滚动到视图动画预留（500ms）",
-    "EASE_IN_QUART": "容器变换离场缓动预留（InQuart）",
-    "EASE_OUT_QUAD": "轻量出场缓动预留（OutQuad）",
+    "DURATION_SCROLL": "滚动到视图动画预留（500ms，待列表项点击定位场景实现）",
 }
 
 _NON_PRODUCTION_MARKERS = (

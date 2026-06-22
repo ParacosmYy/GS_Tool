@@ -242,10 +242,11 @@ class InfoBanner(QWidget):
             0,  # 高度归零
         )
         anim = QPropertyAnimation(self, b"geometry", self)
-        anim.setDuration(AnimationTokens.DURATION_NORMAL)
+        # Batch 53: 消费预留 token EASE_IN_QUART（离场四分位缓动，比 EASE_IN 更急促收尾）。
+        anim.setDuration(AnimationTokens.DURATION_FAST)
         anim.setStartValue(start_rect)
         anim.setEndValue(end_rect)
-        anim.setEasingCurve(AnimationTokens.EASE_IN)
+        anim.setEasingCurve(AnimationTokens.EASE_IN_QUART)
 
         # 绑定方法：PyQt 自动追踪 receiver 生命周期，self 被删除时自动 disconnect。
         anim.finished.connect(self._on_anim_finished)

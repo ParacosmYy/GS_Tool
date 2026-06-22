@@ -146,7 +146,8 @@ class SegmentedControl(QWidget):
         anim.setDuration(AnimationTokens.DURATION_NORMAL)
         anim.setStartValue(self._indicator_rect)
         anim.setEndValue(target_rect)
-        anim.setEasingCurve(AnimationTokens.EASE_OUT)
+        # Batch 53: 消费预留 token EASE_OUT_QUAD（分段指示器轻量出场缓动）。
+        anim.setEasingCurve(AnimationTokens.EASE_OUT_QUAD)
         # per-instance 跟踪，避免 GC。
         self._active_anims.append(anim)
         anim.finished.connect(lambda a=anim: self._on_anim_finished(a))
