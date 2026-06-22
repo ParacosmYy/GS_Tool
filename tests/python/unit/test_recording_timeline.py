@@ -7,7 +7,6 @@ RecordingTimeline add_segment/gaps/total_duration。
 from __future__ import annotations
 
 from embeddebug.serial_station.recording.timeline import (
-    Gap,
     RecordingSegment,
     RecordingTimeline,
 )
