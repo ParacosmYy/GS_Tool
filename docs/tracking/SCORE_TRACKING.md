@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 867分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 133分
+> 当前: 868分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 132分
 
 ---
 
@@ -517,6 +517,7 @@
 | 865 | Batch 201 — CrcPreset + compute_crc + _parse_hex_bytes + PlaceholderPanel 边界（18 测试） | 新建 test_crc_placeholder_boundary.py（197 行）：CrcPreset frozen+8 字段+CRC_PRESETS 非空+MODBUS check + compute_crc（空 data/8 位 MAXIM check=0xA1/16 位 MODBUS check=0x4B37/CCITT-FALSE check=0x29B1）+ _parse_hex_bytes（合法/空/含空格/奇数长度）+ _parse_int（十进制/0x hex/空=0）+ PlaceholderPanel（build 返回 QWidget+objectName 非空+on_enter/leave 不崩溃）。 |
 | 866 | Batch 202 — HexViewer pure functions + TzPreset + TZ_PRESETS + BYTES_PER_LINE 边界（21 测试） | 新建 test_tools_boundary.py（194 行）：BYTES_PER_LINE=16 + to_ascii_repr（可打印/不可打印/边界 0x1F/0x20/0x7E/0x7F）+ parse_hex_input（空/含空格/合法/奇数长度 ValueError）+ format_hex_line（空含 offset/非零 offset/含 ASCII）+ format_hex_dump（空/单行/多行/base_offset）+ TzPreset frozen+3 字段 + TZ_PRESETS（非空/含 UTC/offset [-12h,+14h]/label 非空）。 |
 | 867 | Batch 203 — byte_frequency entropy/top_n/format_stats 边界扩展（15 测试） | 新建 test_byte_frequency_boundary.py（164 行）：entropy_bits（两字节均匀=1.0 bit/偏斜 0<e<8/全 0 freq 不崩溃/256 uniform≈8.0）+ top_n_bytes（n>256 clamp/负数空/n=0 空/默认 n=10）+ format_stats_text（含 Entropy/含 Most common/含字节数/返回 str）+ compute_frequency（单字节/双字节交替/全 256 各一次 sum=256）。 |
+| 868 | Batch 204 — top_bar build helpers + connection_toolbar _install_rich_tooltips/_serial_config_combo 边界（9 测试） | 新建 test_topbar_toolbar_boundary.py（143 行）：build_top_bar（返回 QFrame+objectName+layout）+ _build_brand_chip（返回 QFrame+objectName）+ _build_brand_text（返回 QWidget）+ _install_rich_tooltips（不崩溃）+ _serial_config_combo（返回 QComboBox+objectName+tooltip）。 |
 
 ---
 
