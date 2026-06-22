@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 794分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 206分
+> 当前: 795分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 205分
 
 ---
 
@@ -444,6 +444,7 @@
 | 792 | Batch 122 — QSS sections panels/widgets 拆分 + SCORE head 回填 | 并发会话把 test_qss_sections_panels.py（418 行）按域拆分为 panels（198 行）+ widgets（236 行），符合铁律 21（测试文件 ≤250 行）。35 个测试全部保留。 |
 | 793 | Batch 124 — protocol_analyzer 边界扩展（+16 测试） | 本会话扩展 test_protocol_analyzer.py（10→26）：bytearray→bytes 归一化 + frozen 拒绝 mutation + 多行 hex_dump offset 递增 + 非可见 ASCII 渲染 '.' + timestamp 默认值 + size 属性；analyzer duration 回退 1ms + frequency 真实 duration + detect_errors 跳过缺失字段 + 处理非字符串值 + 无 patterns 空错误 + clear 重置；report format_text 浮点 .3f + 缺失 stat 显示 0 + has_errors + to_dict 默认。 |
 | 794 | Batch 125 — qss_sections core/waveform/controls 单元测试（20 测试） | 并发会话新建 test_qss_sections_core.py（244 行）：global/window/labels + inputs + combos + waveform + controls + build_qss 集成。补强最后 3 个未测 QSS section 模块。 |
+| 795 | Batch 127 — RecordingPlayer 边界扩展（+9 测试） | 本会话扩展 test_recording_player.py（8→17）：step_next 返回 batch 推进 index + emit batch_available/position_changed + 用尽 emit finished + 空 player None；progress 准确反映 0.25/0.75；seek clamp 到 [0,total] + emit position_changed；load() 内部 stop() 暂停+清零。辅助 _player_with_n_batches 改用 JSONL（CSV 合并 batch）。文件 234 行 ≤250。 |
 
 ---
 
