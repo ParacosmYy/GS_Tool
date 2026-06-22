@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 844分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 156分
+> 当前: 845分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 155分
 
 ---
 
@@ -494,6 +494,7 @@
 | 842 | Batch 178 — OtaProgress 状态转换 + OtaConfig 常量边界（22 测试） | 新建 test_ota_progress_boundary.py（226 行）：OtaProgress.begin（state→TRANSFERRING+重置 sent/block/errors+total_bytes clamp 负值/0 合法）+ complete（→COMPLETE）+ fail（→FAILED）+ 默认 IDLE + mark_error 递增 + mark_sent block_index+1/sent 累加/0 字节 + percent begin 后精确+2 位小数 + _VALID_BLOCK_SIZES=(128,1024) + OtaConfig 默认值（protocol=XMODEM/block=128/retry=10/crc=True）+ retry<0 ValueError + OtaProtocol 3 成员 str Enum + OtaState 4 成员。补强 test_ota_config.py 未直接断言的 begin/complete/fail/mark_error 状态转换。 |
 | 843 | Batch 179 — ble/transport_stub 边界（19 测试） | 新建 test_ble_transport_boundary.py（221 行）：DEFAULT_DEVICE_ADDRESS 常量 + 默认设备结构（2 服务+name+rssi+UART 可通知特征）+ connect 未知地址 False/正确地址 True/open(None) 默认 + discover_services（未连接空+报错/连接后 2 服务/拷贝）+ subscribe（可通知 True/不存在 False/不可通知 False）+ emit_notify（订阅后 True+推送/未订阅 False/未连接 False）+ close 清空 notify_handles+connected_address。补强 test_ble_transport_stub.py 未直接断言的 connect/discover/subscribe/emit_notify 边界路径。 |
 | 844 | Batch 180 — data_inspector/inspector 边界（18 测试） | 新建 test_data_inspector_boundary.py（196 行）：构造（默认 bin_count=16+自定义 32+outlier_threshold 属性+DEFAULT_OUTLIER_THRESHOLD 常量）+ inspect（单行/单通道/1D ValueError/默认通道名 ch0/ch1）+ _stat（min/max/mean/std 4 字段+std 正/常量=0）+ _correlations（2 通道正相关/单通道空/3 通道 3 对）+ 离群值检测（极端值检出/正常数据无）+ timestamp_ns 正。补强 test_data_inspector.py 未直接断言的构造参数+_stat/_correlations 私有 helper。 |
+| 845 | Batch 181 — ScaleAnimation._scaled_rect + CAN 常量 + CanFilter 边界（18 测试） | 新建 test_scale_can_constants.py（189 行）：_scaled_rect（factor=1 不变+0.5 减半+2 加倍+中心对齐+0 clamp min(1)）+ CAN 常量（CAN_MAX_DLC=8/CAN_FD_MAX_DLC=64/STANDARD_ID_MAX=0x7FF/EXTENDED_ID_MAX=0x1FFFFFFF）+ CanId（value=0 合法+as_hex 标准零填充 000/扩展 00000000）+ CanFrame（空 data dlc=0+to_payload 9 字段+空 dataHex 空串）+ CanFilter（is_extended=None 不检查/默认 mask=0 全匹配/部分 mask=0x700 高 3 位）。 |
 
 ---
 
