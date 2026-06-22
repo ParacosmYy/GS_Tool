@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 807分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 193分
+> 当前: 808分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 192分
 
 ---
 
@@ -456,7 +456,8 @@
 | 804 | Batch 136 — dashboard_binding_service 解析 + 路由分发单元测试（39 测试） | 并发会话新建 test_dashboard_binding_parse.py（196 行，25 测试）+ 扩展 test_dashboard_binding_service.py（180 行，14 测试）：parse_binding_spec + is_valid_spec + default_spec_for_widget_type + bind/unbind/get_binding/all_bindings/clear_all/覆盖 + route_measurement/route_log。 |
 | 805 | Batch 137 — TemplateManager 边界扩展（+11 测试） | 本会话扩展 test_project_templates.py（10→21）：save 无路径 ValueError + 自动建父目录 + 显式路径覆盖；load 不存在/无路径返回空 + 显式路径覆盖；get(None)/strip；delete 未知 False；add validate；seed_builtins 不覆盖已有。文件 150 行 ≤250。 |
 | 806 | Batch 139 — NotificationManager 边界扩展（+9 测试） | 本会话扩展 test_notifications.py（11→20）：clear_history 只清历史 + dismiss 未知 uid False + max_visible clamp ≥1 + queue/history 防御性拷贝 + 驱逐优先 timeout 通知 + dismiss/clear 触发 notification_removed + show 唯一递增 uid。文件 179 行 ≤250。 |
-| 807 | Batch 140 — tcp/udp _parse_endpoint 边界扩展（24 测试） | 新建 test_endpoint_parsers.py（180 行）：tcp_client._parse_endpoint + udp_datagram._parse_endpoint 纯函数全分支断言。合法（IPv4/主机名含点/边界端口 1 和 65535）+ 缺字段（缺冒号/缺 host/缺 port/空串 → *_endpoint_requires_host_port）+ 非数字端口 + 越界（0/负数/65536 → *_endpoint_port_invalid）+ 多冒号 rpartition 取最后冒号后端口（IPv6 风格）+ tcp_*/udp_* 错误 code 前缀不串。此前 test_tcp/udp_transport 仅通过 open 间接覆盖，未直接断言 parser 全分支。 |
+| 807 | Batch 140 — tcp/udp _parse_endpoint 边界扩展（24 测试） | 并发会话新建 test_endpoint_parsers.py（180 行）：tcp/udp _parse_endpoint 全分支断言。 |
+| 808 | Batch 141 — HelpSystem 边界扩展（+12 测试） | 本会话扩展 test_help_system.py（10→22）：HelpEntry frozen + HelpTopic 5 枚举 + search content/大小写不敏感/strip/去重 + get_topic/all_topics 防御性拷贝 + register setdefault + about_info 5 字段 + PROTOCOL_HELP topic 一致性 + SHORTCUT_HELP 已知键。文件 163 行 ≤250。 |
 
 ---
 
