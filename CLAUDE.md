@@ -113,7 +113,7 @@
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
 | 测试文件数 | 172（Batch 117 新增 2 个测试文件） |
-| 测试通过 | 2133 passed, 2 skipped, 0 failed |
+| 测试通过 | 2165 passed, 2 skipped, 0 failed |
 
 ### Python/PyQt 命令
 ```powershell
