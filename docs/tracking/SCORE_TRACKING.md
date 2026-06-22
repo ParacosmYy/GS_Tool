@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 899分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 101分
+> 当前: 900分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 100分
 
 ---
 
@@ -549,6 +549,7 @@
 | 897 | Batch 233 — set_connection_control_state _status_bar + 动画分支边界（15 测试） | 新建 test_connection_control_state_boundary.py（148 行）：connected=True 有 _status_bar→set_section port_text（COM3）/无 _port_combo→"Connected" + connected=False→set_section "Disconnected"（有 tr 用翻译/无 tr 用原文）+ 无 _status_bar 属性不抛 + connected 触发 ScaleAnimation.pop+GlowAnimation.pulse（异常吞不阻塞）+ disconnected 不触发动画 + has_serial_ports 边界（connected/disconnected 无串口 disable serial button/有串口 enable）+ disconnect_button enable 状态 + connect_button enable 状态。 |
 | 898 | Batch 234 — session_actions export/replay/save/load profile 行为边界（15 测试） | 新建 test_session_actions_boundary.py（148 行）：export_log 空路径不调 controller/成功调 export_log_result/失败不阻塞 + replay_log 空路径不调/成功 clear+render/失败不 render + save_profile 空路径/空 name/成功调 save_profile_result(path,name)/失败不阻塞 + load_profile 空路径/成功 apply name+controls+refresh history/value None 失败/失败不 apply/缺 name 默认 unnamed + mock host 含 protocol/port/tcp/udp/baud/parity/stop_bits combo 全字段。 |
 | 899 | Batch 235 — log_actions append/render/update_stats 行为边界（12 测试） | 新建 test_log_actions_boundary.py（122 行）：append_log_entry 首条 entries 空→hide_log_empty_state + 非首条不 hide + 可见 entry append+update_stats + update_log_stats 不崩溃 + render 清空 log_view.clear + 空 entries 不崩 + filter='TX' 过滤 rx 不可见 + update_log_stats 计数 tx/rx + 空/all-tx + log_entry_visible 用 filter combo + 用 search edit + search 无匹配返回 False。 |
+| 900 | Batch 236 — command_actions send_text + refresh/select history 行为边界（10 测试） | 新建 test_command_actions_boundary.py（110 行）：send_text 空命令不调 controller + shake send_edit + 成功调 send_text_result + refresh history + 失败设 status 不 refresh + refresh_command_history populate combo（空 history 不崩）+ select_command_history apply setText（空 text 跳过）。 |
 
 ---
 
