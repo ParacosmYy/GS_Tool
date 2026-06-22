@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 761分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 239分
+> 当前: 762分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 238分
 
 ---
 
@@ -407,6 +407,11 @@
 | 755 | Batch 80 — MQTT 消息模型 + topic_matches 单元测试（15 测试） | 新建 test_mqtt_message.py：MqttConfig 验证（port/qos/keepalive 边界）+ MqttMessage/MqttTopic/MqttSubscription + topic_matches 精确/+/ /# 通配符匹配全路径覆盖。全量 pytest 1849 passed（+15），lint clean。 |
 | 756 | Batch 81 — BLE GATT 模型 + expand_uuid 单元测试（11 测试） | 新建 test_ble_gatt.py：expand_uuid 16 位短码展开 + 128 位直传 + BleCharacteristic can_read/write/notify 属性 + BleService/BleDevice 结构。全量 pytest 1860 passed（+11），lint clean。 |
 | 757 | Batch 82 — BLE TransportStub 单元测试（8 测试） | 新建 test_ble_transport_stub.py：默认设备构建 + open/close 连接 + write 追加 + tree 服务结构 + on_bytes_received/on_error 回调注册。全量 pytest 1868 passed（+8），lint clean。 |
+| 758 | Batch 83 — CAN/CAN-FD 帧模型单元测试（17 测试） | CanId 标准/扩展 ID 验证 + as_hex + CanFrame DLC 限制 + to_payload + CanFilter mask 匹配。 |
+| 759 | Batch 84 — RTT 协议契约单元测试（11 测试） | SEGGER 常量 + 控制块布局偏移 + RttChannel/RttConfig。 |
+| 760 | Batch 85 — SPI/I2C 配置 + 事务模型单元测试（23 测试） | SpiConfig mode/speed/word_size + I2cConfig 地址/speed + SpiTransaction miso 匹配 + I2cTransaction read 约束。 |
+| 761 | Batch 86 — 录制格式枚举 + Header 单元测试（12 测试） | RecordingFormat.from_extension + RecordingHeader to_dict/from_dict round-trip。 |
+| 762 | Batch 87 — 性能快照 PerfSnapshot 单元测试（10 测试） | is_degraded fps/latency 阈值 + format_text + count=0 忽略。 |
 
 ---
 
