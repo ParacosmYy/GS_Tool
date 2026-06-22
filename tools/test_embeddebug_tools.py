@@ -35,7 +35,8 @@ class StartEmbedDebugToolTest(unittest.TestCase):
         root = start_embeddebug.repo_root()
 
         self.assertTrue((root / "EmbedDebug.bat").is_file())
-        self.assertEqual(root.name, "GS_Tool")
+        # Batch 101: 接受不同克隆目录名（GS_Tool 或 User_Serial）。
+        self.assertIn(root.name, ("GS_Tool", "User_Serial"))
 
     def test_dry_run_prints_python_uv_command_without_launching(self) -> None:
         output = io.StringIO()
