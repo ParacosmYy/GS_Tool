@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 821分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 179分
+> 当前: 822分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 178分
 
 ---
 
@@ -471,6 +471,7 @@
 | 819 | Batch 155 — OTA protocol 边界扩展（+18 测试） | 本会话扩展 test_ota_protocols.py（10→28，由并发 81fb005b0 合入并修 F401）：crc16_xmodem 2 字节 0x1373 + 幂等 + distinct；pad_block 空/0x1A/block_size=0；checksum_8bit 已知值 + 模 256 wrap；OtaBlock/TransferResult frozen + 默认 error=None；OtaProtocolKind 4 枚举；控制字节常量；YMODEM 128B SOH + total_data_blocks + basename 去路径 + 空文件名。文件 218 行 ≤250。 |
 | 820 | Batch 156 — ota xmodem/zmodem 纯 helper 单元测试（23 测试） | 新建 test_ota_helpers.py（245 行）：_hex_byte（0→"00"/FF→"FF"/单位数补零/>0xFF mask/两位大写）+ build_eot（单字节 EOT）+ build_cancel（双字节 CAN）+ build_eot/cancel 长度契约 + parse_ack 全分支（ack/nak/can/c/unknown）+ crc16_ccitt init 参数（默认=显式 0/非零改变/链式累加/空返回 init）+ is_crc_valid（正确 True/错误 False/frame_type 区分）+ parse_hex_frame 边界（无 marker None/截断 None）+ ZModem 4 帧类型常量互异 + 控制字节契约（ZPAD/ZDLE/ZHEX/CR/LF/XON + SOH/STX/EOT/ACK/NAK/CAN/C）。补强 test_ota.py 未直接断言的边角 helper。 |
 | 821 | Batch 157 — hex_formatter + diff_tools 边界扩展（32 测试，2 文件） | 新建 test_hex_formatter_boundary.py（156 行）：format_int 8 字节 struct 快速路径（signed/unsigned/big endian/负数）+ 非标准宽度回退（3/5/7 字节 int.from_bytes）+ 2 字节无符号边界 + format_bytes bytes_per_line clamp（0→1/>16→16/自定义 8/单字节/offset）+ format_float 32 大端/64 小端对称 + 空数据 ValueError + format_ascii 边界字符（0x1F/0x20/0x7E/0x7F）+ 空串。新建 test_diff_tools_boundary.py（145 行）：DiffConfig 默认值 + tolerance=0/max_display_rows=1 边界 + 负值/零值 ValueError + DiffResult format_text 缺字段兜底 + 完整 summary + to_dict round-trip + 空默认 + DataDiffer._pairs 共有名配对 + a/b 索引 + ignore 过滤 + 无交集空。阻塞说明：并发 qss_sections_domain_parts.py（344 行）超 300 行门禁，治理测试 test_python_default_cutovers 暂失败，非本批次引入。 |
+| 822 | Batch 158 — session/serializer + state 纯 helper 单元测试（24 测试） | 新建 test_session_serializer_helpers.py（249 行）：_is_supported_version（1=True/0/2/负数=False/字符串数字/非数字/None/浮点）+ FORMAT_VERSION=1 常量 + _default_geometry（x/y/width/height 结构 + 新实例隔离）+ _default_connection_config（port/baudrate）+ SessionState 默认值/from_dict(None)/to_dict round-trip/to_dict 拷贝隔离 + SessionSerializer 边界（None/空白串/非 dict JSON/未知版本仍解析/字符串版本/紧凑 JSON 无空白/version+payload 顶层/timestamp round-trip）。补强 test_session_restore.py 未直接断言的 _is_supported_version 纯函数 + 默认工厂。 |
 
 ---
 
