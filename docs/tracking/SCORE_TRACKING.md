@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 911分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 89分
+> 当前: 912分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 88分
 
 ---
 
@@ -561,6 +561,7 @@
 | 909 | Batch 245 — sections build_log_row owner 属性契约（11 测试） | 新建 test_sections_log_row_boundary.py（120 行）：build_log_row 返回 QVBoxLayout + 创建 _log_filter_combo（QComboBox + objectName serialStationLogFilterCombo + 初始 All + 5 项 All/TX/RX/System/Error）+ _log_search_edit（QLineEdit + objectName serialStationLogSearchEdit + placeholder）+ _log_path_edit（QLineEdit + objectName serialStationLogPathEdit）+ _log_stats_label（QLabel + objectName serialStationLogStatsLabel）+ _export_log_button（QPushButton + objectName serialStationExportLogButton）+ _replay_log_button（QPushButton + objectName serialStationReplayLogButton）+ _log_info_banner 创建。 |
 | 910 | Batch 246 — waveform_preview SafePlotWidget + _ensure_curves 边界（11 测试） | 新建 test_waveform_preview_curves_boundary.py（112 行）：SafePlotWidget resizeEvent offscreen 短路 accept + paintEvent offscreen 短路 accept + resizeEvent(None) 安全 + _ensure_curves 创建曲线数==通道数 + 空 names 不创建 + 通道增加新增 + 通道减少多余曲线 setVisible(False) + 活跃曲线保持可见 + 减少后重新增加恢复可见 + _update_legend 空 batch 不崩 + 有通道 batch 不崩。 |
 | 911 | Batch 247 — waveform_preview _on_accumulator_flush + _flush_latest_to_plot 边界（10 测试） | 新建 test_waveform_preview_flush_boundary.py（114 行）：_on_accumulator_flush 缓存 _latest_batch（mock throttle）+ 调 throttle.maybe_refresh + 连续多次只保留最新 + _flush_latest_to_plot 有 batch 调 update_batch 并清空 + 无 batch 不调 update_batch + flush 后 _latest_batch 清空 + submit_batch push 到 accumulator（pending_count>0）+ 多次 submit 累积 + _update_stats 空 values 显示 dash + 0 通道显示 dash。 |
+| 912 | Batch 248 — waveform_preview _ensure_cursors + _install_cursor_interactions 边界（9 测试） | 新建 test_waveform_preview_cursors_boundary.py（106 行）：cursor_manager() 初始化前 None + update_batch 后返回 CursorManager + _ensure_cursors 创建 2 条默认 X 游标（25%/75%）+ 幂等（再次调用同一实例）+ 初始无 Y 游标 + _install_cursor_interactions 在 plot.__dict__ 写入 mouseDoubleClickEvent/contextMenuEvent 闭包 + 安装后 cursor_manager 可达 + _update_cursor_hud 有 values 不崩 + 空 values 不崩。 |
 
 ---
 
