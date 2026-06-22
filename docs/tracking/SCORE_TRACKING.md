@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 875分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 125分
+> 当前: 876分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 124分
 
 ---
 
@@ -525,6 +525,7 @@
 | 873 | Batch 209 — CanPanel build 装配 + 帧处理/清空/发送/on_leave 边界（16 测试） | 新建 test_can_panel_build_boundary.py（201 行）：_COLUMNS(7)/_DEMO_FRAMES(3 含扩展帧) 常量 + _CanSignalBridge frame_decoded emit + CanPanel.build 全控件 + _on_events 过滤非 frame + 首帧 hide empty + _clear 重置 + _send 未连接 warning + on_enter 生成 anims + on_leave 防御。 |
 | 874 | Batch 210 — BlePanel build 装配 + 扫描/连接/读写/订阅/notify 边界（16 测试） | 新建 test_ble_panel_build_boundary.py（220 行）：_STUB_ADDRESS 常量 + _BleSignalBridge 双信号 emit + BlePanel.build 全控件 + _scan 填充 combo + _connect 未扫描/连接/断开（兼容 StatusDot 呼吸 GC）+ _read_char 未连接/未找到/合法 + _write_char 非法/合法 hex + on_enter/on_leave 关闭 transport。 |
 | 875 | Batch 211 — RttPanel build 装配 + 通道/收发/演示模式边界（15 测试） | 新建 test_rtt_panel_build_boundary.py（206 行）：_DEMO_CHANNELS(2)/_DEMO_LINES(4) 常量 + _RttSignalBridge bytes/error 双信号 emit + RttPanel.build 全控件（channel_combo 2 通道）+ _on_bytes 首帧 hide empty + decode replace + _on_error [err] 前缀 + _clear 重置 + _start 演示模式（BLUE/session/stub/timer 兼容呼吸 GC）+ _demo_tick index 递增 + on_enter anims + _stop 清空 session/timer。 |
+| 876 | Batch 212 — SessionManager 会话持久化/节流/崩溃恢复/清理边界（19 测试） | 新建 test_session_manager.py（194 行）：SESSION_EXTENSION/AUTOSAVE_INTERVAL_S/_MARKER_SUFFIX 常量 + __init__ 默认/now_ns + save+load 往返（字段一致）+ save 自动建父目录 + save 无效路径 False + load 不存在 None + load 损坏不崩溃 + autosave 首次立即/间隔内节流/超间隔再写 + has_crash_recovery 存在非空/缺失/空文件 + clear 删会话/删 .lock.tmp/幂等。 |
 
 ---
 
