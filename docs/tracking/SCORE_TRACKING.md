@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 869分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 131分
+> 当前: 870分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 130分
 
 ---
 
@@ -519,6 +519,7 @@
 | 867 | Batch 203 — byte_frequency entropy/top_n/format_stats 边界扩展（15 测试） | 新建 test_byte_frequency_boundary.py（164 行）：entropy_bits（两字节均匀=1.0 bit/偏斜 0<e<8/全 0 freq 不崩溃/256 uniform≈8.0）+ top_n_bytes（n>256 clamp/负数空/n=0 空/默认 n=10）+ format_stats_text（含 Entropy/含 Most common/含字节数/返回 str）+ compute_frequency（单字节/双字节交替/全 256 各一次 sum=256）。 |
 | 868 | Batch 204 — top_bar build helpers + connection_toolbar _install_rich_tooltips/_serial_config_combo 边界（9 测试） | 新建 test_topbar_toolbar_boundary.py（143 行）：build_top_bar（返回 QFrame+objectName+layout）+ _build_brand_chip（返回 QFrame+objectName）+ _build_brand_text（返回 QWidget）+ _install_rich_tooltips（不崩溃）+ _serial_config_combo（返回 QComboBox+objectName+tooltip）。 |
 | 869 | Batch 205 — command_section build_send_row + sections build_*_row/footer 边界（9 测试） | 新建 test_sections_boundary.py（179 行）：build_send_row（返回 QHBoxLayout+_send_edit objectName+_command_history_combo objectName+_send_button QPushButton+_send_edit QLineEdit）+ build_inject_row（返回 QHBoxLayout 不崩溃）+ build_log_row（返回 QVBoxLayout）+ build_profile_row（返回 QHBoxLayout）+ build_footer（返回 QHBoxLayout）。用 fake host 避免重组件树。 |
+| 870 | Batch 206 — waveform_preview set_connecting/_update_stats + SettingsPanel build tabs 边界（11 测试） | 新建 test_preview_settings_boundary.py（155 行）：set_connecting（True/False/toggle 不崩溃）+ _update_stats（正常/空 batch 不崩溃）+ cursor_manager 初始可访问 + SettingsPanel.build（返回 QWidget+objectName）+ _build_theme_tab/_build_shortcuts_tab/_build_about_tab（返回 QWidget）。 |
 
 ---
 
