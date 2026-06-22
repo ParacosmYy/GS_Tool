@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 882分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 118分
+> 当前: 883分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 117分
 
 ---
 
@@ -532,6 +532,7 @@
 | 880 | Batch 216 — XmodemProtocol XMODEM/XMODEM-CRC 状态机边界（22 测试） | 新建 test_xmodem_protocol_boundary.py（212 行）：make_xmodem 工厂（CRC/CKSUM kind）+ _slice_blocks（128B 分块/0x1A 填充/空固件≥1块）+ total_blocks/blocks_sent/retries 初始 + start 握手（CRC 期望 C/CKSUM 期望 NAK/错误响应 False/空 False）+ next_block（CRC 2字节/CKSUM 1字节校验/sequence 递增需 ACK/发完 None/blocks_sent 累积）+ handle_response（ACK 推进/NAK 重传/空 timeout/CAN×2 中止）+ finish（EOT+ACK 成功/全 NAK 失败重试 _MAX_RETRIES/空响应失败）。 |
 | 881 | Batch 217 — connection_loading + log_loading_state 加载态 helper 边界（14 测试） | 新建 test_connection_loading_state.py（154 行）：_RING_SIZE=18 常量 + set_button_loading(None) 安全跳过 + enter（缓存文字 _loading_orig_text/禁用/文字清空/ProgressRing indeterminate objectName 18×18）+ 重复 enter 复用 ring + exit（恢复文字/启用/ring hide/_loading_orig_text 清空）+ 未 enter 直接 exit 不崩 + LogLoadingOverlay（objectName/初始 hide/skeleton+label 子控件）+ show/hide 无 _log_loading_state 安全跳过 + None overlay 跳过 + 可见性切换。 |
 | 882 | Batch 218 — log_empty_state 日志区空态 helper 边界（10 测试） | 新建 test_log_empty_state.py（112 行）：build_log_empty_state 返回 EmptyStateWidget + inbox 图标 + 标题「暂无日志」+ 描述含「连接设备」+ hide_log_empty_state 无属性/None 安全跳过 + hide 调用 hide_with_fade（mock 验证）+ show 无属性/None 安全跳过 + show 调用 show_with_fade + _LogEmptyStateHost Protocol 存在。 |
+| 883 | Batch 219 — app_notifications 通知子系统 helper 边界（14 测试） | 新建 test_app_notifications.py（146 行）：_LEVEL_MAP 4 级映射 + build 装配（NotificationManager + ToastContainer 340 宽 + 初始 hide）+ show level 解析（已知 4 级/未知回退 INFO/无 manager 跳过）+ reposition（无 container 跳过/有 container 右上角对齐 444,16）+ handle_key_press（Esc dismiss_oldest True/Ctrl+Shift+Esc clear_all/非 Esc False/无 container False/无 key 方法 False/dismiss 返回 False 时 False）。 |
 
 ---
 
