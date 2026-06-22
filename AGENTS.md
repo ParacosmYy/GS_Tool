@@ -9,11 +9,13 @@
 
 任何 Agent 在修改代码或文档前，必须按任务类型加载对应文档：
 
-1. 每次任务先读 [CLAUDE.md](CLAUDE.md)。
-2. 每次开发先读 [docs/constraints/01-project-overview.md](docs/constraints/01-project-overview.md)。
-3. 涉及实现、重构、新类、跨模块调用时，必须读 [docs/constraints/03-architecture.md](docs/constraints/03-architecture.md)。
-4. 涉及新建、移动、删除文件时，必须读 [docs/constraints/07-directory-structure.md](docs/constraints/07-directory-structure.md)。
-5. 涉及串口上位机重构、串口协议新增、串口收发框架拆分时，必须读 [docs/serial_station_architecture.md](docs/serial_station_architecture.md)。
+1. **每次最先读 [docs/constraints/00-ssot.md](docs/constraints/00-ssot.md)** — 单一真相源指针，确认真相（评分/测试数/分支/版本）落在哪，禁止凭记忆硬编码。
+2. 每次任务先读 [CLAUDE.md](CLAUDE.md)。
+3. 每次开发先读 [docs/constraints/01-project-overview.md](docs/constraints/01-project-overview.md)。
+4. 涉及实现、重构、新类、跨模块调用时，必须读 [docs/constraints/03-architecture.md](docs/constraints/03-architecture.md)。
+5. 涉及新建、移动、删除文件时，必须读 [docs/constraints/07-directory-structure.md](docs/constraints/07-directory-structure.md)。
+6. 涉及串口上位机重构、串口协议新增、串口收发框架拆分时，必须读 [docs/serial_station_architecture.md](docs/serial_station_architecture.md)。
+7. **每次 commit 前必须读 [docs/constraints/09-closed-loop.md](docs/constraints/09-closed-loop.md)** — 5 视角自检 + 6 门禁的唯一定义。
 
 ---
 
@@ -21,6 +23,7 @@
 
 | 场景 | 必读文档 |
 |------|----------|
+| **真相落点（评分/测试数/分支）** | [docs/constraints/00-ssot.md](docs/constraints/00-ssot.md) |
 | 项目概况、构建环境、模块清单 | [docs/constraints/01-project-overview.md](docs/constraints/01-project-overview.md) |
 | 工作流、PRD、技术债、文档线 | [docs/constraints/02-workflow.md](docs/constraints/02-workflow.md) |
 | 架构分层、依赖方向、新增类 | [docs/constraints/03-architecture.md](docs/constraints/03-architecture.md) |
@@ -29,6 +32,7 @@
 | Git、commit、提交前检查 | [docs/constraints/06-git-commit.md](docs/constraints/06-git-commit.md) |
 | 目录结构、canonical 路径 | [docs/constraints/07-directory-structure.md](docs/constraints/07-directory-structure.md) |
 | 图标、SVG、IconManager | [docs/constraints/08-icon-standard.md](docs/constraints/08-icon-standard.md) |
+| **闭环协议（5 视角 + 6 门禁，唯一权威）** | [docs/constraints/09-closed-loop.md](docs/constraints/09-closed-loop.md) |
 | Serial Station Python/PyQt 分层 | [docs/serial_station_architecture.md](docs/serial_station_architecture.md) |
 
 ---
@@ -67,10 +71,14 @@
 每次完成任务前，至少确认：
 
 - [ ] 修改范围符合本次任务边界。
-- [ ] 必读约束文档已经加载。
+- [ ] 必读约束文档已经按 §一 加载顺序读齐（**最先读 00-ssot**，**commit 前读 09-closed-loop**）。
 - [ ] 新增文件路径符合 canonical 目录。
 - [ ] 新增 Python 源码落在 canonical 包路径，并有相邻测试或既有命令覆盖。
 - [ ] 涉及 UI 的控件有 `objectName`，用户可见文字用 `tr()`。
 - [ ] 涉及 Serial Station 的改动没有越过 ui/controller/core/protocols/services/workers 边界。
+- [ ] [09-closed-loop §一](docs/constraints/09-closed-loop.md) 5 视角自检全部打勾（架构/实现/测试/产品/用户）。
+- [ ] [09-closed-loop §一](docs/constraints/09-closed-loop.md) 6 门禁全绿（或未跑项已写明原因）。
+- [ ] `uv run check-constraints` 退出码 0（评分/SSOT/行数漂移检测通过）。
 - [ ] `EmbedDebug.bat` -> `uv run start-embeddebug` 启动路径仍然可用；不能验证时已写明原因。
-- [ ] 能运行的测试、启动或打包命令已经运行；不能运行时说明原因。
+- [ ] 评分已更新到 `docs/tracking/SCORE_TRACKING.md` 首行（唯一处），其他文档未复制硬编码分数。
+- [ ] 闭环结果已追加到 `docs/tracking/LOOP_STATE.md`。

@@ -8,63 +8,62 @@
 
 ## 一、项目基础信息
 
+> ⚠️ 评分/版本/分支等动态值**不在本表硬编码**，统一引用 [00-ssot.md](00-ssot.md) 的 canonical 落点。
+> `uv run check-constraints` 会机械检测漂移。
+
 | 项 | 值 |
 |----|-----|
 | 项目名称 | EmbedDebug |
-| 仓库路径 | `D:\Workplace\Embedded_workplace\User_workplace\GS_Tool` |
-| 当前版本 | `0.1.0` |
+| 仓库路径 | `E:\Embedded\Tool\Serial_tool\User_Serial`（运行 `git rev-parse --show-toplevel` 复核） |
 | 远端仓库 | `https://github.com/ParacosmYy/GS_Tool.git` |
-| 默认分支 | `feat/embed-debug` |
-| 目标 | `D1`（当前工程） → `E5 + U4 + D4`（最终） |
-| 当前得分 | `618 / 1000` |
-| 目标得分 | `1000 / 1000` |
+| 默认分支 | `feat/embed-debug`（运行 `git branch --show-current` 复核） |
+| 当前版本 | 见 `pyproject.toml` `[project].version` |
+| **当前评分** | **见 [docs/tracking/SCORE_TRACKING.md](../tracking/SCORE_TRACKING.md) 首行**（canonical 唯一） |
+| 目标评分 | 1000（起始分 1，每通过门禁 commit +1，规则见 [09-closed-loop §二](09-closed-loop.md)） |
+| 最终三轴目标 | `E5 + U4 + D4` |
 
 ---
 
 ## 二、强制加载顺序（每次任务）
 
-1. `CLAUDE.md`（最顶层铁律，修改约束前必须核对）
-2. `docs/constraints/01-project-overview.md`（本文件）
-3. 涉及架构新增类/跨层修改：`docs/constraints/03-architecture.md`
-4. 涉及文件新建/移动/删除：`docs/constraints/07-directory-structure.md`
-5. 涉及串口工具：`docs/serial_station_architecture.md`
-6. 关联构建行为：`docs/constraints/06-git-commit.md`
+1. **最先读 [00-ssot.md](00-ssot.md)** — 单一真相源指针，确认真相落点，禁止硬编码动态值
+2. `CLAUDE.md`（最顶层铁律，修改约束前必须核对）
+3. `docs/constraints/01-project-overview.md`（本文件）
+4. 涉及架构新增类/跨层修改：`docs/constraints/03-architecture.md`
+5. 涉及文件新建/移动/删除：`docs/constraints/07-directory-structure.md`
+6. 涉及串口工具：`docs/serial_station_architecture.md`
+7. 关联构建行为：`docs/constraints/06-git-commit.md`
+8. **每次 commit 前：`docs/constraints/09-closed-loop.md`** — 5 视角 + 6 门禁
 
 > 任何偏离这条加载链路的任务，视为流程未开始，不执行变更。
 
 ## 二-a、AI 可执行评分目标（全项目统一）
 
-### 2-a.1 评分基础
+> 评分规则、加分门禁、push 节奏、三轴提升证据已统一收口到
+> **[09-closed-loop.md §二 评分闭环](09-closed-loop.md)** 和 **§四 三轴状态**。
+>
+> 本节不再重复定义，避免历史多源矛盾（旧文本曾同时出现 500/618/787 三个"当前分"）。
 
-- 当前目标分：`500`。
-- 目标分：`1000`。
-- 每次通过门禁的 commit：`+1` 分。
-- Push 节拍：每 2 次门禁通过 commit 形成一个 Push 周期（第 2、4、6 次...）。
-- Push 周期发起前，先更新 README 的企业级精简快照。
-- 未通过门禁的 commit：不得提交。
-- 任何单轮关闭循环后必须记录得分变化并同步到对应约束条目。
+要点速览（详见 09-closed-loop）：
 
-### 2-a.2 评分闭环触发条件
+- 起始分 1，目标 1000，每通过门禁 commit `+1`
+- canonical 唯一落点：`docs/tracking/SCORE_TRACKING.md` 首行
+- 其他文档禁止硬编码分数，引用方式见 [00-ssot.md](00-ssot.md)
+- 每 2 个通过门禁 commit 为 1 个 push 周期，push 前必须更新 README
+- 评分闭环触发条件：PRD/Specs 已更新 + 至少一类验收证据可复现 + 无越界 + 三轴至少一项有真实改变 + smoke 退出码 0
 
-- PRD/Specs 与约束映射都已更新。
-- 至少一类验收证据可复现（构建、测试、启动、文档证据）。
-- 本轮变更没有越界目录、层级、Python 主线落点等硬边界。
-- 每轮评分闭环前必须完成 Python/PyQt 启动 smoke 证据：`uv run start-embeddebug --smoke` 与 `cmd /c EmbedDebug.bat --smoke`。
-- 三轴 `E/U/D` 至少一项有真实改变量。
-- `EmbedDebug.bat` 相关链路变化需补充启动复测结论。
-
-### 2-a.3 量化里程碑
+### 量化里程碑（参考）
 
 | 分数档 | 目标 | 说明 |
 |---|---|---|
-| 500~599 | 约束对齐期 | 将已有规则统一到可执行清单 |
-| 600~699 | 结构与流程稳定期 | 形成闭环执行模板并落地 |
-| 700~799 | 串口核心能力增强期 | 约束与功能一体化推进 |
+| 1~199 | 起步期 | 基础设施、协议层、OTA 体系逐步成型 |
+| 200~599 | 约束对齐期 | 将已有规则统一到可执行清单 |
+| 600~799 | 结构与流程稳定期 | 形成闭环执行模板并落地 |
 | 800~899 | 体验一致性期 | UI、日志、回放、脚本、错误可恢复能力齐备 |
 | 900~999 | 交付前硬化期 | 完整闭环证据、回归率与风险缓释 |
 | 1000 | 目标达成 | 可持续执行的主线与长期开启状态 |
 
-### 2-a.4 可量化最小验收（每 20 分）
+### 可量化最小验收（每 20 分）
 
 每完成 20 分至少满足一条：
 
@@ -176,13 +175,18 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-smoke-windows-x
 
 ## 八、项目评分执行日志要求（AI 永久执行）
 
-每次任务结束追加一条评分日志，格式如下：
+> 本节已并入 [09-closed-loop.md §二 评分闭环](09-closed-loop.md) 和
+> [docs/tracking/LOOP_STATE.md](../tracking/LOOP_STATE.md)。
+>
+> 历史格式（保留参考）：
+
+每次任务结束追加一条评分日志到 `docs/tracking/LOOP_STATE.md`（闭环状态表）和 `docs/tracking/SCORE_TRACKING.md`（评分历史），格式如下：
 
 - 时间：YYYY-MM-DD HH:mm
-- 本轮增量：`+N`（默认 0~1，若门禁未过为 0）
-- 当前得分：`xx/1000`
+- 本轮增量：`+1`（门禁全绿时；未过为 `+0`）
+- 当前得分：见 `docs/tracking/SCORE_TRACKING.md` 首行（canonical）
 - 本轮影响：`文件列表`、`约束文档列表`、`E/U/D`变更
 - 证据摘要：`build/test/startup/doc` 三类至少 1 项
 - smoke 证据：`uv run start-embeddebug --smoke` 与 `cmd /c EmbedDebug.bat --smoke` 的退出码
-- 阶段：`500->1000` 中的当前区间
-- 子代理闭环：A-1 / A-2 / D-1 / D-2 / D-3 / P-1 / U-1 的结论状态
+- 阶段：当前所处的量化里程碑区间（见 §二-a）
+- 5 视角 + 6 门禁结果：见 [09-closed-loop §一](09-closed-loop.md)

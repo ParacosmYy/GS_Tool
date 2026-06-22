@@ -10,6 +10,7 @@
 
 | 模块 | 文件 | 何时加载 |
 |------|------|---------|
+| **单一真相源（SSOT）** | [docs/constraints/00-ssot.md](docs/constraints/00-ssot.md) | **每次最先读**，确认真相落点 |
 | 项目概况 + 构建环境 | [docs/constraints/01-project-overview.md](docs/constraints/01-project-overview.md) | 每次开发 |
 | 开发工作流 + Agent | [docs/constraints/02-workflow.md](docs/constraints/02-workflow.md) | 每次迭代 |
 | README 企业级宣传标准 | [docs/constraints/02-workflow.md#41-readme-企业级宣传标准](docs/constraints/02-workflow.md#41-readme-企业级宣传标准) | 涉及 README / 对外说明 / 产品宣传 |
@@ -19,6 +20,7 @@
 | Git + Commit规则 | [docs/constraints/06-git-commit.md](docs/constraints/06-git-commit.md) | 每次提交 |
 | 目录结构 | [docs/constraints/07-directory-structure.md](docs/constraints/07-directory-structure.md) | 涉及文件创建/移动 |
 | 图标标准 | [docs/constraints/08-icon-standard.md](docs/constraints/08-icon-standard.md) | 涉及图标/SVG使用 |
+| **闭环协议（唯一权威）** | [docs/constraints/09-closed-loop.md](docs/constraints/09-closed-loop.md) | **每次 commit 前**，5 视角 + 6 门禁 |
 | Serial Station架构 | [docs/serial_station_architecture.md](docs/serial_station_architecture.md) | 涉及串口上位机重构/新增协议 |
 
 ---
@@ -28,7 +30,7 @@
 ### 工作流铁律
 1. **禁止不经PRD直接写代码** — 每个功能必须有PRD
 2. **禁止不经架构审查直接加新类** — 新类必须通过检查清单
-3. **每次 commit 必须为一次完整代码增量，代码变更量≥500行** — 不足500行不允许代码 commit（不计文档/空白/注释）。
+3. **每次 commit 必须通过 [09-closed-loop.md](docs/constraints/09-closed-loop.md) 的 5 视角自检 + 6 门禁** — 一个完整逻辑增量 + 全门禁绿即可 +1 分。**不再卡行数**（旧"≥500 行"硬规则已废，与现实增量节奏冲突）。文档/测试/refactor commit 不卡行数，但必须过门禁。
 4. **零编译错误才能commit** — 编译不过必须先修
 5. **`EmbedDebug.bat` 双击能启动是最低验收线** — 每次 commit 后必须验证；任何影响构建、启动、入口、资源、依赖、路径的改动，收口前也必须验证或说明无法验证的具体原因
 5.5. **禁止恢复遗留 native 主线** — 不再新增 native 源码、原生构建清单、原生构建目录或 native 测试入口。
@@ -61,14 +63,14 @@
 19. **所有用户可见文字必须走翻译入口或集中常量**
 
 ### 文件体积铁律
-20. **.py ≤ 300行** — 超过说明职责过多
-21. **测试文件聚焦单一行为域，≤ 250 行** — 超过应拆分为 unit/integration/ui_smoke。同域小文件必须合并（2026-06-22 精简：168→112 文件）
+20. **.py ≤ 300行** — 超过说明职责过多。由 `uv run check-constraints`（[tools/check_constraints.py](tools/check_constraints.py)）机械检测，超限 commit 直接 fail。
+21. **测试文件聚焦单一行为域，≤ 250 行** — 超过应拆分为 unit/integration/ui_smoke。同域小文件必须合并。同样由 check-constraints 守护。
 22. **单个方法 ≤ 80行** — 超过说明逻辑过于复杂
 
-### 测试文件组织规则（2026-06-22 新增）
+### 测试文件组织规则
 23. **测试文件按域分组** — 同域测试合并到单文件（如 `test_controller_state_core.py` 含 connection/callback/workbench state）。禁止同域散落 >3 个文件。
 24. **文件命名 `test_<域>_<子域>.py`** — 如 `test_dashboard_layout.py`、`test_animations_factories.py`、`test_theme_core.py`。避免 `test_<单个控件>.py` 孤儿文件。
-25. **commit 前必须跑全量 unit + smoke** — 不能只跑 smoke（Oracle 审计 2026-06-22 发现：仅 smoke 通过但 unit 有 3 个回归未发现）。
+25. **commit 前必须跑全量 unit + smoke** — 不能只跑 smoke（Oracle 审计发现：仅 smoke 通过但 unit 有回归未发现）。门禁定义见 [09-closed-loop §一.2](docs/constraints/09-closed-loop.md)。
 
 ---
 
@@ -104,32 +106,40 @@
 
 ## 快速参考
 
+> ⚠️ **动态值（评分/测试数/文件数）禁止硬编码**，下表已改为引用 canonical 落点。详见 [00-ssot.md](docs/constraints/00-ssot.md)。
+> `uv run check-constraints` 会机械检测漂移。
+
 | 项 | 值 |
 |----|-----|
 | 应用名称 | EmbedDebug |
 | 项目路径 | `E:\Embedded\Tool\Serial_tool\User_Serial` |
-| 当前版本 | 0.1.0 |
-| 评分 | 800（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
-| Git分支 | `feat/embed-debug` |
+| 当前版本 | 见 `pyproject.toml` `[project].version` |
+| **评分** | **见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md) 首行**（canonical 唯一） |
+| Git分支 | 运行 `git branch --show-current` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
-| 测试文件数 | 186（Batch 130/131 新增 _empty_state_overlay + RecordingExporter 扩展） |
-| 测试通过 | 2393 passed, 2 skipped, 0 failed |
+| 测试文件数 | 运行 `git ls-files "tests/python/*.py" \| wc -l`（实时） |
+| 测试通过数 | 运行 `uv run pytest --collect-only -q \| tail -3`（实时） |
 
 ### Python/PyQt 命令
 ```powershell
 uv run start-embeddebug
 uv run test-embeddebug-py
+uv run check-constraints          # SSOT/行数漂移检测（09-closed-loop 门禁 5）
 uv run package-embeddebug --version local --clean
 uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x64
 ```
 
 ### Commit Message格式
+
+**唯一权威模板见 [09-closed-loop.md §五](docs/constraints/09-closed-loop.md)**。简版：
+
 ```
 <模块名>: <简述改了什么>
 
-<详细说明为什么这样改>
-
-评分: <当前总分> + 1 = <新分数>
+门禁: test✓ smoke✓ lint✓ check_constraints✓ [bat✓]
+视角: 架构✓ 实现✓ 测试✓ 产品✓ 用户✓
+三轴: E<x> U<x> D<x>（本轮变化: ...）
+评分: <旧> + 1 = <新>（见 docs/tracking/SCORE_TRACKING.md）
 变更: <文件数> files, <+新增行数> insertions, <-删除行数> deletions
 ```
 
@@ -263,6 +273,10 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 
 ---
 
+<!-- check-constraints: historical -->
+> 以下为历史会话成果存档，仅供回溯。其中的分数/测试数为当时快照，**不作为当前事实依据**。
+> 当前事实以 [00-ssot.md](docs/constraints/00-ssot.md) 的 canonical 落点为准。
+
 ## 会话成果存档 (2026-06-22)
 
 ### Batch 40-46：UI/动画质量提升 + 测试精简
@@ -371,3 +385,4 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 - setPointSize(N) → FONT_POINT_* tokens（empty_state/value_display/led/gauge + 4 tools）
 - setContentsMargins/setSpacing 硬编码 → SPACING_INT_* tokens（layout_cards/top_bar/sections/layout_main/toast）
 - tokens.py 新增：FONT_POINT_LARGE/HEADING/BODY/TINY + SPACING_INT_XS~2XL
+<!-- check-constraints: /historical -->
