@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 834分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 166分
+> 当前: 835分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 165分
 
 ---
 
@@ -484,6 +484,7 @@
 | 832 | Batch 168 — theme_switcher _dark_to_light_map + build_themed_qss + default_accent_id（18 测试） | 新建 test_theme_switcher_helpers.py（171 行）：常量契约（THEME_DARK/LIGHT/AVAILABLE_THEMES=2）+ default_accent_id=cyan + _dark_to_light_map（非空 dict + 只含 dark≠light 项 + 值来自 light_tokens + 键来自 dark_tokens + 含 BG_WINDOW）+ build_light_qss（非空 + 含 light.TEXT_PRIMARY + 不含 dark.BG_WINDOW 已替换）+ build_themed_qss（dark/light 非空 + 两者不同 + accent 不崩溃 + dark 含 dark.BG + light 不含 dark.BG）。补强 test_theme_switching.py 未直接断言的 _dark_to_light_map 结构 + build_themed_qss 路径分支。 |
 | 833 | Batch 169 — automation/triggers _compare + TriggerCondition 全分支（24 测试） | 新建 test_automation_triggers.py（243 行）：_compare（5 操作符>/<=>=/<=/==浮点容差 + 未知 False）+ _VALUE_OPERATORS 映射（VALUE_ABOVE=>/BELOW=</EQUALS===）+ __post_init__（VALUE_*自动设 operator + 显式保留 + 非VALUE_*空串）+ _matches（MANUAL=False/INTERVAL 首次+经过+未到/RX_MATCH 匹配+不匹配+空 pattern/TX_MATCH/VALUE_ABOVE+缺通道）+ evaluate（更新 last_fire_ms + 去抖期内阻止 + 去抖期后允许）+ reset（清除 last_fire）+ to_dict 7 字段 + from_dict round-trip + from_dict 缺字段默认 + TriggerType 7 成员。覆盖此前 0 测试的 automation 模块。 |
 | 834 | Batch 170 — automation/rule + actions（22 测试） | 新建 test_automation_rule_actions.py（248 行）：AutomationAction.execute（SEND_COMMAND 调用+空跳过/PLAY_SOUND/LOG/SET_LED/DELAY 返回 wait+负值 clamp）+ execute context=None 自动创建 + ActionType 5 枚举 + to_dict 6 字段 + from_dict round-trip + 缺字段默认 + 默认值 + AutomationRule.should_fire（enabled+无冷却/disabled=False/mark_fired 冷却期/过冷却）+ mark_fired + reset + to_dict 5 字段 + from_dict round-trip + 缺字段默认 + 默认值。覆盖此前 0 测试的 rule/actions 模块。 |
+| 835 | Batch 171 — automation/engine 全覆盖（18 测试） | 新建 test_automation_engine.py（249 行）：add_rule/remove_rule + rule_added/rule_removed 信号 + enable/disable + rule_names/rules 排序 + 空引擎 + advance_clock/set_clock（累加+负值 clamp+set）+ fire_rule（手动执行+disabled False+未知 False）+ on_measurement（VALUE_ABOVE 触发+低于阈值不触发）+ on_rx/on_tx（pattern 匹配触发）+ 冷却（期内不重复+过冷却后再触发）+ context 跨触发累积。automation 子包 4 模块（triggers/rule/actions/engine）全部从 0 测试达到完整覆盖。 |
 
 ---
 
