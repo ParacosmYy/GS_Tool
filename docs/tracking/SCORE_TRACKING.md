@@ -417,6 +417,10 @@
 | 765 | Batch 90 — CMSIS SVD 解析器单元测试（9 测试） | SvdParser.parse 设备/外设/寄存器/位域 + Access + parse_file。 |
 | 766 | Batch 91 — OTA 协议辅助函数 + YMODEM 单元测试（11 测试） | crc16_xmodem + pad_block + YmodemProtocol _slice_data_blocks。 |
 | 767 | Batch 92 — PerfMetric 性能指标单元测试（9 测试） | update min/max/avg/count + reset + 负值 + 首次采样初始化。 |
+| 768 | Batch 93 — 录制时间线单元测试（8 测试） | RecordingSegment duration/contains + RecordingTimeline property。测试突破 2000。 |
+| 769 | Batch 94 — OTA 传输引擎单元测试（3 测试） | _FakeChannel/_FakeProtocol mock + _protocol_total + cancel + timeouts。 |
+| 770 | Batch 95 — OperationResult 值对象单元测试（12 测试） | success/failure 工厂 + __post_init__ 验证 + frozen + 泛型。 |
+| 771 | Batch 96 — project_audit 工具单元测试（6 测试） | iter_code_files/module_counts/numbered_utils/python_counts（importlib 路径加载）。 |
 
 ---
 
