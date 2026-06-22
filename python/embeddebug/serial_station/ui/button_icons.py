@@ -15,11 +15,15 @@ QPlainTextEdit/QSpinBox）安装 focus_ring 微交互，激活 ``micro_interacti
 
 from __future__ import annotations
 
+import logging
+
 from typing import Protocol
 
 from embeddebug.serial_station.ui.icons import IconManager
 from embeddebug.serial_station.ui.micro_interactions import install_focus_ring
 from embeddebug.serial_station.ui.theme import palette as P
+
+_log = logging.getLogger(__name__)
 
 
 class ButtonIconHost(Protocol):
@@ -142,7 +146,7 @@ def apply_focus_rings(owner: ButtonIconHost) -> int:
                 applied += 1
             except Exception:
                 # 装配失败不阻塞（focus ring 是锦上添花）。
-                pass
+                _log.warning("focus ring install failed", exc_info=True)
     return applied
 
 
@@ -164,5 +168,5 @@ def _is_readonly(widget) -> bool:
                 if check():
                     return True
             except Exception:
-                pass
+                _log.warning("focus ring install failed", exc_info=True)
     return False

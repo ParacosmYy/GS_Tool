@@ -8,7 +8,6 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PyQt6.QtWidgets import QFrame, QLabel, QLineEdit, QPlainTextEdit, QSplitter, QWidget
 
-from embeddebug.serial_station.controllers import SerialWorkbenchController
 from embeddebug.serial_station.ui.layout_cards import build_card, card_body, wrap_layout
 from embeddebug.serial_station.ui.main_window import SerialStationMainWindow
 

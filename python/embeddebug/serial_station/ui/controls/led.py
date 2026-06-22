@@ -16,10 +16,11 @@ from __future__ import annotations
 
 from enum import Enum
 
-from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRectF, QSize, Qt, pyqtProperty
+from PyQt6.QtCore import QPropertyAnimation, QRectF, QSize, Qt, pyqtProperty
 from PyQt6.QtGui import QColor, QPainter, QRadialGradient
 from PyQt6.QtWidgets import QWidget
 
+from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 from embeddebug.serial_station.ui.theme import palette as P
 from embeddebug.serial_station.ui.theme import tokens as T
 
@@ -120,7 +121,7 @@ class StatusLed(QWidget):
         anim.setDuration(400)
         anim.setStartValue(1.0)
         anim.setEndValue(0.0)
-        anim.setEasingCurve(QEasingCurve.Type.OutCubic)
+        anim.setEasingCurve(AnimationTokens.EASE_OUT)
         anim.start()
 
     def _start_breathing(self) -> None:
@@ -132,7 +133,7 @@ class StatusLed(QWidget):
         self._breathing_anim.setStartValue(0.0)
         self._breathing_anim.setKeyValueAt(0.5, 0.45)
         self._breathing_anim.setEndValue(0.0)
-        self._breathing_anim.setEasingCurve(QEasingCurve.Type.InOutCubic)
+        self._breathing_anim.setEasingCurve(AnimationTokens.EASE_IN_OUT)
         self._breathing_anim.setLoopCount(-1)
         self._breathing_anim.start()
 

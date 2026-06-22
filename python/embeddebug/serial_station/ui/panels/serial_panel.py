@@ -9,8 +9,7 @@ SerialStationMainWindow 实例作为 owner（持有所有 action 委托与 contr
 
 from __future__ import annotations
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QMainWindow, QWidget
+from PyQt6.QtWidgets import QWidget
 
 from embeddebug.app.app_controller import AppController
 from embeddebug.serial_station.ui.main_window import SerialStationMainWindow

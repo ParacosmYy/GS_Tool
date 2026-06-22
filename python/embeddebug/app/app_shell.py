@@ -12,6 +12,7 @@ AppShell 是应用顶层 ``QMainWindow``：左侧 ``NavRail``（56px 竖排图�
 
 from __future__ import annotations
 
+import logging
 from PyQt6.QtCore import QSize, Qt, QTimer
 from PyQt6.QtWidgets import (
     QButtonGroup,
@@ -30,6 +31,7 @@ from embeddebug.app.mode_panel import registered_panels
 from embeddebug.serial_station.ui.icons import button_icon
 from embeddebug.serial_station.ui.theme import palette as P
 
+_log = logging.getLogger(__name__)
 
 class AppShell(QMainWindow):
     """多模式应用顶层窗口。"""
@@ -87,7 +89,7 @@ class AppShell(QMainWindow):
             self.notify("success", self.tr("EmbedDebug 已就绪"),
                         self.tr("串口工站已加载，选择端口或 endpoint 开始调试"), timeout_ms=4000)
         except Exception:
-            pass  # toast 是锦上添花，失败不阻塞启动。
+            _log.warning("startup ready toast failed", exc_info=True)  # toast 是锦上添花，失败不阻塞启动。
 
     def resizeEvent(self, event: object) -> None:
         """窗口 resize 时把 toast 容器对齐到右上角（委托 app_notifications）。"""
@@ -238,14 +240,14 @@ class AppShell(QMainWindow):
             try:
                 anim.stop()
             except Exception:
-                pass
+                _log.warning("startup ready toast failed", exc_info=True)
         self._page_anims = []
         # Batch 23: 也停止离场淡出动画。
         for anim in getattr(self, "_leave_anims", []):
             try:
                 anim.stop()
             except Exception:
-                pass
+                _log.warning("startup ready toast failed", exc_info=True)
         self._leave_anims = []
         # Batch 46: 取消待执行的延迟切换定时器（快速连续切换时不串页）。
         if getattr(self, "_switch_timer", None) is not None:
@@ -262,7 +264,7 @@ class AppShell(QMainWindow):
             for anim in self._page_anims:
                 anim.start()
         except Exception:
-            pass  # 动画是锦上添花，失败不阻塞切换。
+            _log.warning("startup ready toast failed", exc_info=True)  # 动画是锦上添花，失败不阻塞切换。
 
     def _animate_page_leave(self, page: QWidget) -> None:
         """页面离场快速淡出（Batch 23：激活 fade_out 死代码）。"""
@@ -276,7 +278,7 @@ class AppShell(QMainWindow):
             self._leave_anims.append(anim)
             anim.start()
         except Exception:
-            pass  # 离场淡出是锦上添花，失败不阻塞切换。
+            _log.warning("startup ready toast failed", exc_info=True)  # 离场淡出是锦上添花，失败不阻塞切换。
 
     def _call_panel(self, mode_id: str, method: str) -> None:
         """安全调用面板生命周期方法（缺失或异常不中断切换）。"""
@@ -290,7 +292,7 @@ class AppShell(QMainWindow):
         try:
             fn()
         except Exception:
-            pass
+            _log.warning("startup ready toast failed", exc_info=True)
 
     def app_controller(self) -> AppController:
         """返回共享 AppController（供测试与命令面板访问）。"""

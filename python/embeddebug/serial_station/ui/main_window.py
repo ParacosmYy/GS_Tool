@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import Qt
+import logging
+
 from PyQt6.QtWidgets import QMainWindow, QSplitter
 
 from embeddebug.serial_station.controllers import (
@@ -28,6 +29,8 @@ from embeddebug.serial_station.ui import button_icons
 from embeddebug.serial_station.ui.command_palette import CommandItem, CommandPalette
 from embeddebug.serial_station.ui.responsive_layout import ResponsiveLayout
 from embeddebug.serial_station.ui.sections import build_main_layout
+
+_log = logging.getLogger(__name__)
 
 
 class SerialStationMainWindow(QMainWindow):
@@ -74,6 +77,7 @@ class SerialStationMainWindow(QMainWindow):
                 self._card_enter_anims = stagger_fade(cards, delay_ms=70)
         except Exception:
             # 错峰淡入是锦上添花，失败不阻塞窗口构建。
+            _log.warning("operation failed", exc_info=True)
             self._card_enter_anims = []
 
     def _install_command_palette(self) -> None:
@@ -233,7 +237,7 @@ class SerialStationMainWindow(QMainWindow):
             try:
                 notify_fn(level, title, message, timeout_ms=timeout_ms)
             except Exception:
-                pass  # toast 是锦上添花，失败不阻塞连接工作流。
+                _log.warning("stagger fade failed", exc_info=True)  # toast 是锦上添花，失败不阻塞连接工作流。
 
     def closeEvent(self, event: object) -> None:
         lifecycle_actions.close_window(self)

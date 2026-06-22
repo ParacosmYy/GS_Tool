@@ -5,11 +5,14 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import Qt, pyqtSignal
+import logging
+
+from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QTabWidget, QWidget
 
 from embeddebug.serial_station.ui.dashboard.canvas import DashboardCanvas
-from embeddebug.serial_station.ui.theme import palette as P
+
+_log = logging.getLogger(__name__)
 
 
 class DashboardTabs(QTabWidget):
@@ -71,7 +74,7 @@ class DashboardTabs(QTabWidget):
 
                 FadeTransition.fade_in(canvas).start()
             except Exception:
-                pass  # 动画是锦上添花。
+                _log.warning("tab fade-in failed", exc_info=True)  # 动画是锦上添花。
             self.canvas_changed.emit(canvas)
 
     def tab_names(self) -> list[str]:

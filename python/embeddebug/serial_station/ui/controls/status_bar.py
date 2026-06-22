@@ -18,7 +18,6 @@ from __future__ import annotations
 
 from typing import Dict
 
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QFrame, QWidget
 
 from embeddebug.serial_station.ui.theme import palette as P

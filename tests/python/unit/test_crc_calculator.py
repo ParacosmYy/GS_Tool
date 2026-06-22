@@ -20,7 +20,6 @@ import pytest
 from embeddebug.serial_station.ui.tools.crc_calculator import (
     CRC_PRESETS,
     CrcCalculatorPanel,
-    CrcPreset,
     compute_crc,
 )
 

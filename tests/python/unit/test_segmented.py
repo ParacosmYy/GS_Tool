@@ -18,10 +18,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from typing import Tuple
 
-import pytest
 from PyQt6.QtCore import QPointF, Qt
 from PyQt6.QtGui import QMouseEvent
-from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt6.QtWidgets import QApplication
 
 from embeddebug.serial_station.ui.controls.segmented import SegmentedControl
 

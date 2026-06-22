@@ -10,7 +10,6 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from embeddebug.serial_station.plugins import (
     PLUGIN_FILE,
-    PluginInfo,
     PluginManager,
     discover_plugins,
     load_plugin,

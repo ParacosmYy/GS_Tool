@@ -16,7 +16,11 @@
 
 from __future__ import annotations
 
+import logging
+
 from PyQt6.QtWidgets import QWidget
+
+_log = logging.getLogger(__name__)
 
 
 def panel_notify(
@@ -41,6 +45,7 @@ def panel_notify(
     try:
         top = widget.window()
     except Exception:
+        _log.warning("operation failed", exc_info=True)
         return
     notify_fn = getattr(top, "notify", None)
     if not callable(notify_fn):
@@ -48,4 +53,4 @@ def panel_notify(
     try:
         notify_fn(level, title, message, timeout_ms=timeout_ms)
     except Exception:
-        pass  # toast 是锦上添花，失败不阻塞面板事件处理。
+        _log.warning("resolve top window failed", exc_info=True)  # toast 是锦上添花，失败不阻塞面板事件处理。

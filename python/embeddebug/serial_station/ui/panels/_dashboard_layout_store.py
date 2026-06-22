@@ -190,3 +190,91 @@ def _apply_layout_to_canvas(canvas, layout: dict) -> int:
                 pass
     except OSError:
         return 0
+
+
+# ── 手动 save/load 对话框 helper（Batch 49：从 dashboard_panel 抽出） ─────
+def save_layout_via_dialog(panel) -> None:
+    """弹 QFileDialog 选保存路径，把当前画布布局写入（带状态反馈）。"""
+
+    from PyQt6.QtWidgets import QFileDialog
+
+    tabs = getattr(panel, "_tabs", None)
+    widget = getattr(panel, "_widget", None)
+    if tabs is None or widget is None:
+        return
+    canvas = tabs.current_canvas()
+    if canvas is None:
+        return
+    path, _ = QFileDialog.getSaveFileName(
+        widget, widget.tr("保存仪表盘布局"), "",
+        widget.tr("Dashboard layout (*.json)"),
+    )
+    if not path:
+        return
+    try:
+        canvas.save_layout(path)
+        panel._status.setText(widget.tr("布局已保存：{path}").format(path=path))
+    except OSError as exc:
+        panel._status.setText(widget.tr("保存失败：{err}").format(err=exc))
+
+
+def load_layout_via_dialog(panel) -> None:
+    """弹 QFileDialog 选加载路径，把布局应用到当前画布（带状态反馈）。"""
+
+    from PyQt6.QtWidgets import QFileDialog
+
+    tabs = getattr(panel, "_tabs", None)
+    widget = getattr(panel, "_widget", None)
+    if tabs is None or widget is None:
+        return
+    canvas = tabs.current_canvas()
+    if canvas is None:
+        return
+    path, _ = QFileDialog.getOpenFileName(
+        widget, widget.tr("加载仪表盘布局"), "",
+        widget.tr("Dashboard layout (*.json)"),
+    )
+    if not path:
+        return
+    try:
+        count = canvas.load_layout(path)
+        panel._status.setText(widget.tr("已加载 {n} 个控件").format(n=count))
+    except (OSError, ValueError, KeyError) as exc:
+        panel._status.setText(widget.tr("加载失败：{err}").format(err=exc))
+
+
+# ── Batch 49：autosave 入口（从 dashboard_panel 抽出） ───────────────
+def restore_panel_layout(panel) -> None:
+    """build 时从应用数据目录恢复上一次仪表盘布局（Batch 25/27/49）。"""
+
+    if not _autosave_enabled_env():
+        return
+    try:
+        tabs = getattr(panel, "_tabs", None)
+        if tabs is None:
+            return
+        restore_all_tabs(tabs)
+    except Exception:
+        pass  # 恢复失败不阻塞面板构建（用户可手动加载）。
+
+
+def persist_panel_layout(panel) -> None:
+    """add/remove 后把全部标签页布局写回应用数据目录（Batch 25/27/49）。"""
+
+    if not _autosave_enabled_env():
+        return
+    try:
+        tabs = getattr(panel, "_tabs", None)
+        if tabs is None:
+            return
+        persist_all_tabs(tabs)
+    except Exception:
+        pass  # 自动保存失败静默（手动保存按钮仍可用）。
+
+
+def _autosave_enabled_env() -> bool:
+    """是否启用仪表盘布局自动持久化（env EMBEDDEBUG_DASHBOARD_AUTOSAVE=1）。"""
+
+    import os
+
+    return os.environ.get("EMBEDDEBUG_DASHBOARD_AUTOSAVE", "") == "1"

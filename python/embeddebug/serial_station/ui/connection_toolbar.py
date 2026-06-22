@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from typing import Protocol
 
 from PyQt6.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QWidget
@@ -11,6 +13,8 @@ from embeddebug.serial_station.ui import connection_actions
 from embeddebug.serial_station.ui.serial_config_options import apply_serial_config_options
 from embeddebug.serial_station.ui.tcp_controls import build_tcp_controls
 from embeddebug.serial_station.ui.udp_controls import build_udp_controls
+
+_log = logging.getLogger(__name__)
 
 
 def _install_scale_press(button) -> None:
@@ -24,7 +28,7 @@ def _install_scale_press(button) -> None:
 
         install_scale_press(button)
     except Exception:
-        pass
+        _log.warning("scale press install failed", exc_info=True)
 
 
 class ConnectionToolbarHost(Protocol):
@@ -163,4 +167,4 @@ def _install_rich_tooltips(owner) -> None:
                         owner.tr("断开连接"),
                         owner.tr("关闭当前传输连接，停止收发"))
     except Exception:
-        pass
+        _log.warning("scale press install failed", exc_info=True)

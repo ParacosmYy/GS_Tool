@@ -9,7 +9,7 @@ import time
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PyQt6.QtCore import QCoreApplication
-from PyQt6.QtNetwork import QAbstractSocket, QTcpServer, QTcpSocket
+from PyQt6.QtNetwork import QAbstractSocket, QTcpSocket
 
 from embeddebug.serial_station.drivers.base import SerialPortConfig
 from embeddebug.serial_station.drivers.registry import TransportRegistry

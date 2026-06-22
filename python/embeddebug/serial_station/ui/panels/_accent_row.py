@@ -85,6 +85,14 @@ def select_accent(panel: "SettingsPanel", accent_id: str) -> None:
     transition_theme(QApplication.instance(), apply_fn)
     _sync_checked(panel, accent_id)
 
+    # Batch 23: 把选择持久化到 SettingsManager（双写 theme_store 镜像）。
+    try:
+        from embeddebug.serial_station.services.settings_service import SettingsManager
+
+        SettingsManager.instance().update(accent=accent_id)
+    except Exception:  # noqa: BLE001  偏好持久化失败不阻塞 accent 切换
+        pass
+
     variant = get_accent_by_id(accent_id)
     panel_notify(panel._widget, "success", panel._widget.tr("强调色已切换"),
                  panel._widget.tr("已应用 {accent} 强调色").format(

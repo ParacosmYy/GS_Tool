@@ -7,7 +7,7 @@ API，不 import transport，不反向依赖 UI 面板内部状态。
 
 from __future__ import annotations
 
-from PyQt6.QtWidgets import QTreeWidget, QTreeWidgetItem, QWidget
+from PyQt6.QtWidgets import QTreeWidget, QTreeWidgetItem
 
 from embeddebug.serial_station.svd import (
     Access,

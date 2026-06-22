@@ -1,13 +1,17 @@
-"""仪表盘放置控件右键菜单 helper（Batch 31/32）。
+"""仪表盘放置控件右键菜单 helper（Batch 31/32/49）。
 
 放置的 dashboard 控件此前无删除入口（只有「清空画布」整批删）。本 helper 给每个
-放置控件装右键菜单「复制控件」「删除」，调 canvas.add_widget_at / remove_item。
+放置控件装右键菜单「复制控件」「删除」「配置数据源...」，调 canvas.add_widget_at /
+remove_item / set_item_binding。
+
 双击已被全屏占用（Batch 18），故用右键。
 
 约束：只依赖 PyQt6 + canvas API，不访问 controller/transport。
 """
 
 from __future__ import annotations
+
+from collections.abc import Callable
 
 from PyQt6.QtCore import QPoint, Qt
 from PyQt6.QtWidgets import QMenu, QWidget
@@ -16,13 +20,20 @@ from PyQt6.QtWidgets import QMenu, QWidget
 _DUPLICATE_OFFSET = 20
 
 
-def attach_widget_delete_menu(widget: QWidget, canvas, item_id: str) -> QMenu | None:
-    """给放置的控件装右键菜单（复制控件/删除）（Batch 31/32）。
+def attach_widget_delete_menu(
+    widget: QWidget,
+    canvas,
+    item_id: str,
+    on_configure_binding: Callable[[str], None] | None = None,
+) -> QMenu | None:
+    """给放置的控件装右键菜单（复制/属性/置顶置底/锁定/配置数据源.../删除）。
 
     Args:
         widget: 放置的控件实例。
         canvas: 控件所在 DashboardCanvas（提供 remove_item / add_widget_at / items）。
         item_id: 控件在 canvas.items 的 key。
+        on_configure_binding: 可选回调，提供时菜单加「配置数据源...」一项，
+            点击时回调 ``on_configure_binding(item_id)``（Batch 49）。
 
     返回 None（菜单按需创建）；失败也返回 None（None 安全）。
     """
@@ -42,6 +53,12 @@ def attach_widget_delete_menu(widget: QWidget, canvas, item_id: str) -> QMenu | 
         is_locked = _is_locked(canvas, item_id)
         lock_text = widget.tr("解锁") if is_locked else widget.tr("锁定")
         menu.addAction(lock_text, lambda: _toggle_lock(canvas, item_id))
+        # Batch 49: 配置数据源...（仅在 panel 提供回调时出现）。
+        if on_configure_binding is not None:
+            menu.addAction(
+                widget.tr("配置数据源..."),
+                lambda: _safe_configure(on_configure_binding, item_id),
+            )
         # 锁定控件禁用删除（防意外删）。
         delete_action = menu.addAction(widget.tr("删除控件"))
         delete_action.setEnabled(not is_locked)
@@ -50,6 +67,20 @@ def attach_widget_delete_menu(widget: QWidget, canvas, item_id: str) -> QMenu | 
 
     widget.customContextMenuRequested.connect(_on_context)
     return None  # 菜单按需创建，无需持有引用
+
+
+def _safe_configure(
+    on_configure_binding: Callable[[str], None] | None,
+    item_id: str,
+) -> None:
+    """安全调用配置数据源回调（Batch 49）。"""
+
+    if on_configure_binding is None:
+        return
+    try:
+        on_configure_binding(item_id)
+    except Exception:
+        pass
 
 
 def _edit_properties(widget: QWidget, canvas, item_id: str) -> None:

@@ -13,9 +13,8 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from unittest.mock import MagicMock
 
-from PyQt6.QtWidgets import QLabel, QWidget
+from PyQt6.QtWidgets import QWidget
 
 from embeddebug.serial_station.ui.panels._notify import panel_notify
 

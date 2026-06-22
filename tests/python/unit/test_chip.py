@@ -18,10 +18,8 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-import pytest
 from PyQt6.QtCore import QEvent, QPoint, QPointF, Qt
 from PyQt6.QtGui import QEnterEvent, QMouseEvent
-from PyQt6.QtWidgets import QApplication
 
 from embeddebug.serial_station.ui.controls.chip import Chip
 

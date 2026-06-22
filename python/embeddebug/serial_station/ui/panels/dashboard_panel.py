@@ -16,9 +16,11 @@
 
 from __future__ import annotations
 
+import logging
+
 from PyQt6.QtCore import QPoint, Qt
 from PyQt6.QtWidgets import (
-    QFileDialog,
+    QFileDialog,  # noqa: F401  测试通过 module attr 访问（test_dashboard_core_b）
     QHBoxLayout,
     QLabel,
     QPushButton,
@@ -29,6 +31,8 @@ from PyQt6.QtWidgets import (
 from embeddebug.app.app_controller import AppController
 from embeddebug.serial_station.ui.dashboard import DashboardTabs, WidgetPalette
 
+_log = logging.getLogger(__name__)
+
 
 class DashboardPanel:
     """仪表盘 ModePanel：控件库 + 多画布标签页 + 布局持久化。"""
@@ -37,6 +41,8 @@ class DashboardPanel:
         self._app_controller: AppController | None = None
         self._widget: QWidget | None = None
         self._tabs: DashboardTabs | None = None
+        # Batch 49: 仪表盘绑定服务（measurement/log → widget 路由）。
+        self._binding_service = None
 
     def build(self, app_controller: AppController) -> QWidget:
         self._app_controller = app_controller
@@ -99,6 +105,18 @@ class DashboardPanel:
         # 用 self._widget.tr(...)，必须在恢复前就绪）。
         self._widget = widget
 
+        # Batch 49: 实例化绑定服务 + 订阅 controller 事件（measurement/log/error）。
+        from embeddebug.serial_station.services.dashboard_binding_service import (
+            DashboardBindingService,
+        )
+        from embeddebug.serial_station.ui.panels._dashboard_binding_wire import (
+            subscribe_controller_events,
+        )
+        self._binding_service = DashboardBindingService()
+        subscribe_controller_events(
+            app_controller.serial_controller, self._binding_service
+        )
+
         # Batch 25: 自动恢复上一次仪表盘布局（应用数据目录 JSON）。
         self._restore_layout_on_build()
 
@@ -126,46 +144,26 @@ class DashboardPanel:
         canvas.item_removed.connect(lambda _id: self._autosave_layout())
 
     def _restore_layout_on_build(self) -> None:
-        """build 时从应用数据目录恢复上一次仪表盘布局（Batch 25/27）。
+        """build 时恢复布局：委托 _dashboard_layout_store.restore_panel_layout（Batch 49 抽出）。"""
 
-        Batch 27：改用 restore_all_tabs 恢复全部标签页布局（旧版仅恢复当前 canvas，
-        其他标签页布局丢失）。
-        """
-
-        if not _autosave_enabled():
-            return
-        try:
-            from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
-                restore_all_tabs,
-            )
-
-            if self._tabs is not None:
-                restore_all_tabs(self._tabs)
-        except Exception:
-            pass  # 恢复失败不阻塞面板构建（用户可手动加载）。
+        from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
+            restore_panel_layout,
+        )
+        restore_panel_layout(self)
 
     def _autosave_layout(self) -> None:
-        """add/remove 后把全部标签页布局写回应用数据目录（Batch 25/27）。
+        """add/remove 后自动保存：委托 _dashboard_layout_store.persist_panel_layout（Batch 49 抽出）。"""
 
-        Batch 27：改用 persist_all_tabs 持久化全部标签页（激活 tab_names，旧版仅存当前 canvas）。
-        """
-
-        if not _autosave_enabled():
-            return
-        try:
-            from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
-                persist_all_tabs,
-            )
-
-            if self._tabs is not None:
-                persist_all_tabs(self._tabs)
-        except Exception:
-            pass  # 自动保存失败静默（手动保存按钮仍可用）。
+        from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
+            persist_panel_layout,
+        )
+        persist_panel_layout(self)
 
     def _on_item_added_fullscreen(self, item_id: str) -> None:
         """新控件放置 → 给它装双击全屏 + 发 toast 提示（Batch 18）。
 
-        从画布 items 字典按 item_id 取出 widget，调 attach_double_click_fullscreen。
+        Batch 49：恢复布局时，如果 item 带 binding，登记到 binding service；
+        给放置控件装右键菜单时传 ``_configure_widget_binding`` 让用户可后续配置。
         """
 
         canvas = self._tabs.current_canvas() if self._tabs else None
@@ -179,16 +177,36 @@ class DashboardPanel:
         from embeddebug.serial_station.ui.panels._dashboard_widget_menu import (
             attach_widget_delete_menu,
         )
+        # Batch 49: 既有 binding 注册到 service（layout 恢复路径）。
+        if self._binding_service is not None:
+            try:
+                from embeddebug.serial_station.ui.panels._dashboard_binding_wire import (
+                    register_item_binding,
+                )
+                register_item_binding(canvas, item_id, self._binding_service)
+            except Exception:
+                _log.warning("layout restore failed", exc_info=True)
 
         handler = attach_double_click_fullscreen(item.widget, host=self._widget)
         self._fullscreen_handlers.append(handler)
-        # Batch 31: 给放置控件装右键「删除」菜单（canvas.remove_item 激活）。
-        attach_widget_delete_menu(item.widget, canvas, item_id)
+        # Batch 31/49: 装右键菜单；同时接入「配置数据源...」回调。
+        attach_widget_delete_menu(
+            item.widget, canvas, item_id,
+            on_configure_binding=self._configure_widget_binding,
+        )
         panel_notify(
             self._widget, "info",
             self._widget.tr("已添加控件"),
             self._widget.tr("{kind}，双击可全屏").format(kind=item.widget_type),
         )
+
+    def _configure_widget_binding(self, item_id: str) -> None:
+        """右键「配置数据源...」入口：弹出对话框，应用结果（Batch 49）。"""
+
+        from embeddebug.serial_station.ui.panels._dashboard_binding_wire import (
+            open_binding_config_for_item,
+        )
+        open_binding_config_for_item(self, item_id)
 
     def on_enter(self) -> None:
         """切入仪表盘页：播放入场动画。"""
@@ -251,46 +269,17 @@ class DashboardPanel:
         self._status.setText(self._widget.tr("画布已清空"))
 
     def _save_layout(self) -> None:
-        canvas = self._tabs.current_canvas() if self._tabs else None
-        if canvas is None or self._widget is None:
-            return
-        path, _ = QFileDialog.getSaveFileName(
-            self._widget, self._widget.tr("保存仪表盘布局"), "",
-            self._widget.tr("Dashboard layout (*.json)"),
+        """保存布局：委托 _dashboard_layout_store.save_layout_via_dialog（Batch 49 抽出）。"""
+
+        from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
+            save_layout_via_dialog,
         )
-        if not path:
-            return
-        try:
-            canvas.save_layout(path)
-            self._status.setText(self._widget.tr("布局已保存：{path}").format(path=path))
-        except OSError as exc:
-            self._status.setText(self._widget.tr("保存失败：{err}").format(err=exc))
+        save_layout_via_dialog(self)
 
     def _load_layout(self) -> None:
-        canvas = self._tabs.current_canvas() if self._tabs else None
-        if canvas is None or self._widget is None:
-            return
-        path, _ = QFileDialog.getOpenFileName(
-            self._widget, self._widget.tr("加载仪表盘布局"), "",
-            self._widget.tr("Dashboard layout (*.json)"),
+        """加载布局：委托 _dashboard_layout_store.load_layout_via_dialog（Batch 49 抽出）。"""
+
+        from embeddebug.serial_station.ui.panels._dashboard_layout_store import (
+            load_layout_via_dialog,
         )
-        if not path:
-            return
-        try:
-            count = canvas.load_layout(path)
-            self._status.setText(
-                self._widget.tr("已加载 {n} 个控件").format(n=count)
-            )
-        except (OSError, ValueError, KeyError) as exc:
-            self._status.setText(self._widget.tr("加载失败：{err}").format(err=exc))
-
-
-def _autosave_enabled() -> bool:
-    """是否启用仪表盘布局自动持久化（默认关，env EMBEDDEBUG_DASHBOARD_AUTOSAVE=1 开）。
-
-    模块级函数（必须在 DashboardPanel 类定义之后，避免切断类体）。
-    """
-
-    import os
-
-    return os.environ.get("EMBEDDEBUG_DASHBOARD_AUTOSAVE", "") == "1"
+        load_layout_via_dialog(self)

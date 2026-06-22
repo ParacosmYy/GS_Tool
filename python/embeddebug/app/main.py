@@ -34,6 +34,18 @@ def create_application(argv: Sequence[str] | None = None) -> QApplication:
     restore_active_accent()
     persisted_theme = load_theme_id()
     apply_theme_by_name(app, persisted_theme)
+    # Batch 23: 启动期应用 SettingsManager 中持久化的字体大小；动画开关存到
+    # app 属性供动画工厂查询（默认 True，关掉时各动画工厂应跳过创建动画）。
+    try:
+        from PyQt6.QtGui import QFont
+
+        from embeddebug.serial_station.services.settings_service import SettingsManager
+
+        settings = SettingsManager.instance().get()
+        app.setFont(QFont("Microsoft YaHei UI", settings.font_point))
+        app.setProperty("_embeddebug_animation_enabled", settings.animation_enabled)
+    except Exception:  # noqa: BLE001  偏好应用失败不阻塞启动
+        pass
     return app
 
 

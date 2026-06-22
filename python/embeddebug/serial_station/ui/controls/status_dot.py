@@ -19,11 +19,12 @@ from __future__ import annotations
 
 from enum import Enum
 
-from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRectF, QSize, Qt, pyqtProperty
+from PyQt6.QtCore import QPropertyAnimation, QRectF, QSize, Qt, pyqtProperty
 from PyQt6.QtGui import QColor, QPainter, QRadialGradient
 from PyQt6.QtWidgets import QWidget
 
 from embeddebug.serial_station.ui.animations.pulse import PulseAnimation
+from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 from embeddebug.serial_station.ui.theme import palette as P
 
 
@@ -127,7 +128,7 @@ class StatusDot(QWidget):
         self._flash_anim.setDuration(380)
         self._flash_anim.setStartValue(1.0)
         self._flash_anim.setEndValue(0.0)
-        self._flash_anim.setEasingCurve(QEasingCurve.Type.OutCubic)
+        self._flash_anim.setEasingCurve(AnimationTokens.EASE_OUT)
         self._flash_anim.start()
 
     def _start_breathing(self) -> None:

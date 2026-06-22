@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sys
 import tempfile
 import tomllib
 from pathlib import Path

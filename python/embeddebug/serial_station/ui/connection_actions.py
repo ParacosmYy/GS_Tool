@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from typing import Protocol
 
 from PyQt6.QtWidgets import QPushButton
@@ -13,6 +15,8 @@ from embeddebug.serial_station.ui.serial_port_options import (
     populate_serial_port_options,
 )
 from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
+
+_log = logging.getLogger(__name__)
 
 
 def _set_loading(button: QPushButton | None, loading: bool) -> None:
@@ -114,7 +118,7 @@ def _shake_widget(widget: object) -> None:
 
         ShakeAnimation.shake(widget).start()
     except Exception:
-        pass
+        _log.warning("shake anim failed", exc_info=True)
 
 
 def _notify(host: ConnectionActionHost, level: str, title: str, message: str) -> None:
@@ -128,7 +132,7 @@ def _notify(host: ConnectionActionHost, level: str, title: str, message: str) ->
         try:
             notify_fn(level, title, message)
         except Exception:
-            pass
+            _log.warning("shake anim failed", exc_info=True)
 
 
 def _notify_result(

@@ -12,8 +12,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from embeddebug.ota.protocols.base import (
-    ACK, CAN, EOT, NAK,
-    OtaByteChannel, OtaProtocol, TransferResult,
+    CAN, OtaByteChannel, OtaProtocol, TransferResult,
 )
 
 _ACK_TIMEOUT_MS = 1000

@@ -12,9 +12,7 @@ import time
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pathlib import Path
 
-import pytest
 
 from embeddebug.serial_station.session import (
     AUTOSAVE_INTERVAL_S,

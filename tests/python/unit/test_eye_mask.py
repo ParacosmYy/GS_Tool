@@ -15,7 +15,6 @@ import numpy as np
 import pytest
 
 from embeddebug.serial_station.eye_diagram import (
-    EyeDiagram,
     EyeMetrics,
     PolyMask,
     evaluate_mask,

@@ -6,12 +6,10 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-import inspect
 import json
 
 from PyQt6.QtCore import QPoint
 
-from embeddebug.app.mode_panel import registered_panels
 from embeddebug.serial_station.ui.controls import (
     CommandSlider,
     ConfigurableButton,
@@ -23,12 +21,10 @@ from embeddebug.serial_station.ui.dashboard import (
     GRID_SIZE,
     SUPPORTED_WIDGET_TYPES,
     DashboardCanvas,
-    DashboardTabs,
     WidgetPalette,
     create_widget,
     snap_to_grid,
 )
-from embeddebug.serial_station.ui.panels import register_default_panels
 
 def _make_panel(qtbot):
     from embeddebug.app.app_controller import AppController

@@ -20,7 +20,6 @@ from PyQt6.QtCore import QEvent, QRectF, QSize, Qt, pyqtSignal
 from PyQt6.QtGui import QColor, QFontMetrics, QPainter, QPaintEvent, QMouseEvent
 from PyQt6.QtWidgets import QWidget
 
-from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 from embeddebug.serial_station.ui.theme import palette as P
 
 

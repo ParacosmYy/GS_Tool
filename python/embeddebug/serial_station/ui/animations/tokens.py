@@ -40,8 +40,26 @@ class AnimationTokens:
     EASE_OUT_QUART = QEasingCurve.Type.OutQuart  # 强调减速（页面入场、容器变换）
     EASE_IN_QUART = QEasingCurve.Type.InQuart    # 强调加速（页面离场）
     EASE_OUT_QUINT = QEasingCurve.Type.OutQuint  # Material 3 emphasized ≈ cubic-bezier(0.2, 0, 0, 1.0)
-    EASE_MATERIAL_EMPHASIZED = EASE_OUT_QUINT    # 别名：Material Design 3 强调缓动
+    EASE_OUT_QUAD = QEasingCurve.Type.OutQuad   # 轻减速（Fluent 风格，比 OutCubic 更柔）
     LINEAR = QEasingCurve.Type.Linear           # 仅进度条/匀速场景
+
+    # === 语义化时长别名（Fluent Design 对标）===
+    DURATION_PROGRESS = 150  # 进度条数值变化（Fluent 标准）
+    DURATION_FLYOUT = 187    # 浮出/flyout（Fluent 标准，≈ FAST 但语义独立可调）
+    DURATION_DRAWER = 300    # 抽屉/侧栏开关（= CONTAINER 别名，保留两者）
+    DURATION_SCROLL = 500    # 滚动条平滑滚动（Fluent 标准）
+
+    # === Elevation 层级（对标 Material 3 L0-L5）===
+    # 每级是 (blur_radius, offset_y, alpha) 三元组，由 elevation_effect() 解析。
+    ELEVATION_L0 = (0, 0, 0)       # resting flat：无阴影
+    ELEVATION_L1 = (8, 1, 60)      # 卡片静态 / 曲线 glow
+    ELEVATION_L2 = (12, 3, 80)     # 抽屉展开 / 折叠面板
+    ELEVATION_L3 = (16, 3, 120)    # hover / focus（默认交互态）
+    ELEVATION_L4 = (24, 4, 160)    # popover / toast / flyout
+    ELEVATION_L5 = (32, 6, 200)    # modal / dragged
+
+    # === 曲线 glow 专用 blur（waveform_preview 用）===
+    SHADOW_BLUR_CURVE_GLOW = 8  # 波形曲线发光（= ELEVATION_L1[0]）
 
     # === 关键帧位置（choreography 用）===
     KEYFRAME_PREVIEW = 0.3   # 预览位置：复杂动画在 30% 时刻达到「可识别」状态
@@ -49,11 +67,18 @@ class AnimationTokens:
     STAGGER_STEP_MS = 60     # stagger 默认步长（Linear/Vercel 风格）
 
     # === 缩放比例（按压/弹入用）===
-    SCALE_PRESSED = 0.94   # 按压缩小比例（比 0.92 更克制，避免过冲突兀）
+    # 统一按压缩小到 0.96（分离式 press_down/up 的克制值，合并式 press() 也用此值）。
+    SCALE_PRESSED = 0.96   # 按压缩小比例（分离式与合并式共用，消除双轨制）
     SCALE_POP_IN = 0.6     # 弹入起始比例
     SCALE_BOUNCE = 1.08    # 弹跳峰值比例
-    SCALE_HOVER = 1.03     # hover 轻微放大（向后兼容别名）
+    SCALE_HOVER = 1.03     # hover 轻微放大（hover_in 方法用）
+    SCALE_NAV_HOVER = 1.12  # NavRail 图标 hover 放大（主导航元素需更强反馈）
     SCALE_NORMAL = 1.0
+
+    # === drop_in 弹跳落地参数（BouncePathAnimation 用）===
+    DROP_VERTICAL_OFFSET = -50  # 起始上偏移：从上方下落
+    SQUASH_HEIGHT_RATIO = 0.92  # 落地挤压：高度收缩 8%
+    SQUASH_WIDTH_RATIO = 1.04   # 落地挤压：宽度膨胀 4%（面积守恒直觉）
 
     # === hover 抬升（像素）===
     LIFT_PIXELS = 3        # hover 时垂直位移

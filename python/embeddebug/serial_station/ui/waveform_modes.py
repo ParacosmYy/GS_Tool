@@ -15,7 +15,6 @@ import numpy as np
 import pyqtgraph as pg
 from PyQt6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
-from embeddebug.serial_station.ui.theme import palette as P
 from embeddebug.serial_station.ui.waveform_preview import SafePlotWidget
 
 

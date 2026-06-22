@@ -1,4 +1,8 @@
-"""效果类动画测试（合并自 color_tween/stagger/stagger_fade/cleanup/ui_animations_effects）。"""
+"""效果类动画测试（合并自 stagger_fade/cleanup/ui_animations_effects）。
+
+（ColorTweenAnimation / StaggerCoordinator / CollapsiblePanel 已作为 dead code 删除，
+相关测试同步移除；保留 stagger_fade / Collapse / Fade / Shake / Pulse / Controller。）
+"""
 from __future__ import annotations
 
 import os
@@ -8,117 +12,18 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import inspect
 import re
 
-import pytest
-from PyQt6.QtCore import QAbstractAnimation, QEasingCurve, QPauseAnimation, QVariantAnimation
 from PyQt6.QtWidgets import QFrame, QLabel, QWidget
 
 from embeddebug.serial_station.ui.animations import (
     AnimationController,
     AnimationTokens,
     CollapseAnimation,
-    CollapsiblePanel,
     FadeTransition,
     PulseAnimation,
     ScaleAnimation,
     ShakeAnimation,
 )
-from embeddebug.serial_station.ui.animations.color_tween import ColorTweenAnimation
-from embeddebug.serial_station.ui.animations.stagger import StaggerCoordinator
 from embeddebug.serial_station.ui.panel_animations import stagger_fade
-
-
-@pytest.fixture(autouse=True)
-def _clean_active():
-    ColorTweenAnimation._active.clear()
-    StaggerCoordinator._active.clear()
-
-
-def _label(qtbot):
-    w = QLabel("x"); qtbot.addWidget(w); return w
-def _pause():
-    return QPauseAnimation(50)
-
-
-# ColorTween
-def test_parse_color():
-    assert ColorTweenAnimation._parse_color("#22d3ee") == (34, 211, 238, 255)
-    assert ColorTweenAnimation._parse_color("#22d3eeff") == (34, 211, 238, 255)
-    assert ColorTweenAnimation._parse_color("rgba(34, 211, 238, 0.12)") == (34, 211, 238, 31)
-    with pytest.raises(ValueError):
-        ColorTweenAnimation._parse_color("not-a-color")
-
-
-def test_format_color_roundtrip():
-    o = (34, 211, 238, 255)
-    f = ColorTweenAnimation._format_color(o)
-    assert f == "rgba(34, 211, 238, 255)" and ColorTweenAnimation._parse_color(f) == o
-
-
-def test_tween_smoke_and_duration(qtbot):
-    anim = ColorTweenAnimation.tween(_label(qtbot), "color", "#22d3ee", "#0ea5b7")
-    assert isinstance(anim, QVariantAnimation)
-    assert anim.duration() == AnimationTokens.DURATION_NORMAL
-
-
-def test_tween_easing_and_keyframes(qtbot):
-    anim = ColorTweenAnimation.tween(_label(qtbot), "color", "#22d3ee", "#0ea5b7")
-    assert anim.easingCurve().type() == QEasingCurve.Type.InOutCubic
-    kvs = anim.keyValues()
-    assert len(kvs) == 2
-    assert tuple(kvs[0][1]) == (34, 211, 238, 255)
-    assert tuple(kvs[1][1]) == (14, 165, 183, 255)
-
-
-def test_tween_registered_for_gc(qtbot):
-    anim = ColorTweenAnimation.tween(
-        _label(qtbot), "color", "#22d3ee", "#0ea5b7", duration=AnimationTokens.DURATION_INSTANT)
-    assert anim in ColorTweenAnimation._active
-    anim.start()
-    qtbot.waitUntil(lambda: anim.state() == QAbstractAnimation.State.Stopped, timeout=3000)
-    assert anim not in ColorTweenAnimation._active
-
-
-# StaggerCoordinator
-def test_stagger_step():
-    assert StaggerCoordinator()._step_ms == 60
-    assert StaggerCoordinator(step_ms=100)._step_ms == 100
-
-
-def test_stagger_add_factory_does_not_start():
-    n = []
-    c = StaggerCoordinator(step_ms=1000)
-    c.add(lambda: n.append(1) or QPauseAnimation(0))
-    assert n == [] and len(c._factories) == 1
-
-
-def test_stagger_start_calls_factories(qtbot):
-    n = []
-    c = StaggerCoordinator(step_ms=10)
-    for _ in range(3): c.add(lambda: n.append(1) or _pause())
-    c.start()
-    qtbot.waitUntil(lambda: len(n) == 3, timeout=1000)
-
-
-def test_stagger_emits_finished(qtbot):
-    c = StaggerCoordinator(step_ms=10)
-    for _ in range(3): c.add(_pause)
-    with qtbot.waitSignal(c.finished, timeout=2000): c.start()
-    assert len(c._anims) == 3
-
-
-def test_stagger_cancel_stops_pending(qtbot):
-    n = []
-    c = StaggerCoordinator(step_ms=1000)
-    for _ in range(3): c.add(lambda: n.append(1) or QPauseAnimation(0))
-    c.start(); c.cancel(); qtbot.wait(300)
-    assert n == []
-
-
-def test_stagger_registered_for_gc(qtbot):
-    c = StaggerCoordinator(step_ms=10); c.add(_pause)
-    assert c not in StaggerCoordinator._active
-    c.start(); assert c in StaggerCoordinator._active
-    qtbot.waitUntil(lambda: c not in StaggerCoordinator._active, timeout=2000)
 
 
 # stagger_fade
@@ -185,21 +90,6 @@ def test_collapse(qtbot):
     w = QWidget(); w.setMaximumHeight(200); qtbot.addWidget(w)
     assert CollapseAnimation.expand(w, 300).endValue() == 300
     assert CollapseAnimation.collapse(w).endValue() == 0
-
-
-def test_collapsible_panel_toggle(qtbot):
-    p = CollapsiblePanel(title="t"); p.set_target_height(150); qtbot.addWidget(p)
-    assert p.is_expanded is True
-    p.collapse(); assert p.is_expanded is False
-    p.expand(); assert p.is_expanded is True
-
-
-def test_collapsible_panel_toggle_signal(qtbot):
-    p = CollapsiblePanel(title="t"); qtbot.addWidget(p)
-    states: list[bool] = []
-    p.toggled.connect(lambda s: states.append(s))
-    p.toggle(); p.toggle()
-    assert states == [False, True]
 
 
 def test_fade(qtbot):

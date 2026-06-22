@@ -30,7 +30,6 @@ from embeddebug.app.app_controller import AppController
 from embeddebug.serial_station.ui.theme.theme_switcher import (
     AVAILABLE_THEMES,
     THEME_DARK,
-    THEME_LIGHT,
     apply_theme_by_name,
 )
 
@@ -57,6 +56,12 @@ class SettingsPanel:
         self._theme_status: QLabel | None = None
         # Batch 10: 强调色选择色点（7 套 accent 变体）+ 当前选中态记录。
         self._accent_swatches: list[QToolButton] = []
+        # Batch 23: 「高级」Tab 控件（字体/动画/波特率/重置）—— 构建与同步由
+        # ``_settings_advanced_tab`` 助手模块负责（守 300 行门禁）。
+        self._font_spin = None  # type: ignore[assignment]
+        self._animation_check = None  # type: ignore[assignment]
+        self._baudrate_combo = None  # type: ignore[assignment]
+        self._reset_button = None  # type: ignore[assignment]
 
     def build(self, app_controller: AppController) -> QWidget:
         self._app_controller = app_controller
@@ -71,8 +76,12 @@ class SettingsPanel:
         tabs.setObjectName("serialStationSettingsTabWidget")
         tabs.addTab(self._build_theme_tab(tabs), widget.tr("主题"))
         tabs.addTab(self._build_shortcuts_tab(tabs), widget.tr("快捷键"))
+        tabs.addTab(self._build_advanced_tab(tabs), widget.tr("高级"))
         tabs.addTab(self._build_about_tab(tabs), widget.tr("关于"))
         layout.addWidget(tabs)
+        # Batch 23: 把 panel 反向引用挂到 widget 上，供 _settings_advanced_tab
+        # 的「恢复默认」按钮回调找到 panel 实例刷新控件显示。
+        widget._settings_panel_ref = self  # type: ignore[attr-defined]
         return widget
 
     def on_enter(self) -> None:
@@ -93,6 +102,10 @@ class SettingsPanel:
             self._theme_combo.blockSignals(True)
             self._theme_combo.setCurrentText(current)
             self._theme_combo.blockSignals(False)
+        # Batch 23: 同步「高级」Tab 控件（外部修改 SettingsManager 后保持显示一致）。
+        from embeddebug.serial_station.ui.panels._settings_advanced_tab import sync_advanced_tab
+
+        sync_advanced_tab(self)
 
     def on_leave(self) -> None:
         """切出设置页：停止入场动画。"""
@@ -197,6 +210,13 @@ class SettingsPanel:
 
         return build_accent_row(self, parent)
 
+    def _build_advanced_tab(self, parent: QWidget) -> QWidget:
+        """Batch 23: 「高级」Tab。委托给 ``_settings_advanced_tab``（守门禁）。"""
+
+        from embeddebug.serial_station.ui.panels._settings_advanced_tab import build_advanced_tab
+
+        return build_advanced_tab(self, parent)
+
     # ── 交互 ────────────────────────────────────────────────────────
     def _preview_theme(self, _index: int) -> None:
         """实时预览：切换 combo 选择即应用主题（Batch 19，不弹 toast）。
@@ -240,6 +260,13 @@ class SettingsPanel:
             panel_notify(self._widget, "error", self._widget.tr("主题切换失败"),
                          self._widget.tr("{err}").format(err=exc))
             return
+        # Batch 23: 把选择持久化到 SettingsManager（双写 theme_store 镜像）。
+        try:
+            from embeddebug.serial_station.services.settings_service import SettingsManager
+
+            SettingsManager.instance().update(theme=name)
+        except Exception:  # noqa: BLE001  偏好持久化失败不阻塞主题应用
+            pass
         if self._theme_status is not None:
             text = self._widget.tr("已应用：深色") if name == THEME_DARK else self._widget.tr("已应用：浅色")
             self._theme_status.setText(text)

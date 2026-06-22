@@ -1,4 +1,7 @@
-"""页面切换 / 淡入淡出 / 校验抖动集成测试（合并自 page_slide/fade_transition/page_leave_fade/validation_shake）。"""
+"""页面切换 / 淡入淡出 / 校验抖动集成测试（合并自 fade_transition/page_leave_fade/validation_shake）。
+
+（PageSlideAnimation 已作为 dead code 删除，相关测试同步移除。）
+"""
 from __future__ import annotations
 
 import os
@@ -7,26 +10,15 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import inspect
 
-import pytest
-from PyQt6.QtCore import QAbstractAnimation, QEasingCurve, QPropertyAnimation, QRect
-from PyQt6.QtWidgets import QComboBox, QLineEdit, QWidget
+import pytest  # noqa: F401  # 保留以兼容 pytest 插件机制
+from PyQt6.QtWidgets import QComboBox, QLineEdit
 from unittest.mock import MagicMock
 
 from embeddebug.serial_station.ui import command_actions, connection_actions, endpoint_connection_actions
-from embeddebug.serial_station.ui.animations.page_slide import PageSlideAnimation
-from embeddebug.serial_station.ui.animations.slide import SlideDirection
-from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 from embeddebug.serial_station.ui.widgets import EmptyStateWidget
 
 
 _SHAKE = "embeddebug.serial_station.ui.animations.shake.ShakeAnimation.shake"
-
-_DIRS = [SlideDirection.LEFT, SlideDirection.RIGHT, SlideDirection.UP, SlideDirection.DOWN]
-
-
-def _widget(qtbot, x=20, y=30, w=100, h=40):
-    wid = QWidget(); wid.setGeometry(x, y, w, h); qtbot.addWidget(wid)
-    return wid
 
 
 def _patch_shake(monkeypatch):
@@ -69,52 +61,6 @@ class _SerialHost:
     def tr(self, t): return t
     def _set_connected_controls(self, c): pass
     def _has_serial_ports(self): return self._has_ports
-
-
-# PageSlideAnimation
-@pytest.mark.parametrize("direction", _DIRS)
-def test_slide_in_properties(qtbot, direction):
-    wid = _widget(qtbot); orig = QRect(wid.geometry())
-    anim = PageSlideAnimation.slide_in(wid, direction)
-    assert isinstance(anim, QPropertyAnimation)
-    assert anim.duration() == AnimationTokens.DURATION_NORMAL
-    assert anim.easingCurve().type() == QEasingCurve.Type.OutQuart
-    assert QRect(anim.endValue()) == orig
-
-
-def test_slide_in_left_start_offset(qtbot):
-    wid = _widget(qtbot, w=100, h=40); orig = QRect(wid.geometry())
-    anim = PageSlideAnimation.slide_in(wid, SlideDirection.LEFT)
-    sr = QRect(anim.startValue())
-    assert sr.x() == orig.x() - orig.width() and sr.size() == orig.size()
-
-
-def test_slide_in_up_start_offset(qtbot):
-    wid = _widget(qtbot); orig = QRect(wid.geometry())
-    sr = QRect(PageSlideAnimation.slide_in(wid, SlideDirection.UP).startValue())
-    assert sr.y() < orig.y() and sr.size() == orig.size()
-
-
-def test_slide_in_registered_for_gc(qtbot):
-    anim = PageSlideAnimation.slide_in(_widget(qtbot), SlideDirection.LEFT)
-    assert anim in PageSlideAnimation._active
-    anim.start()
-    qtbot.waitUntil(lambda: anim.state() == QAbstractAnimation.State.Stopped, timeout=3000)
-    assert anim not in PageSlideAnimation._active
-
-
-def test_slide_in_end_geometry_restored(qtbot):
-    wid = _widget(qtbot); orig = QRect(wid.geometry())
-    anim = PageSlideAnimation.slide_in(wid, SlideDirection.RIGHT)
-    anim.setCurrentTime(anim.duration())
-    assert wid.geometry() == orig
-
-
-def test_slide_in_default_direction_is_left(qtbot):
-    wid = _widget(qtbot)
-    d = QRect(PageSlideAnimation.slide_in(wid).startValue())
-    l = QRect(PageSlideAnimation.slide_in(wid, SlideDirection.LEFT).startValue())
-    assert d == l
 
 
 # EmptyStateWidget.show_with_fade（FadeTransition 接入）

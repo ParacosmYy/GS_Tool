@@ -50,9 +50,9 @@ class BouncePathAnimation:
 
     # drop_in 视觉参数（与 tokens 中的 SCALE_POP_IN 配合）。
     DROP_INITIAL_SCALE = AnimationTokens.SCALE_POP_IN  # 0.6
-    DROP_VERTICAL_OFFSET = -50  # 起始上偏移：从上方下落
-    SQUASH_HEIGHT_RATIO = 0.92  # 落地挤压：高度收缩 8%
-    SQUASH_WIDTH_RATIO = 1.04   # 落地挤压：宽度膨胀 4%（面积守恒直觉）
+    DROP_VERTICAL_OFFSET = AnimationTokens.DROP_VERTICAL_OFFSET  # -50
+    SQUASH_HEIGHT_RATIO = AnimationTokens.SQUASH_HEIGHT_RATIO  # 0.92
+    SQUASH_WIDTH_RATIO = AnimationTokens.SQUASH_WIDTH_RATIO  # 1.04
 
     @classmethod
     def _track(cls, anim: QPropertyAnimation) -> QPropertyAnimation:

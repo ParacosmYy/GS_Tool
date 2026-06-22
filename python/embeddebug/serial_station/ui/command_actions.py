@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import logging
+
 from typing import Protocol
 
 from embeddebug.serial_station.ui.command_entry_text import apply_command_history_selection
 from embeddebug.serial_station.ui.command_history_options import populate_command_history_options
 from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
+
+_log = logging.getLogger(__name__)
 
 
 class CommandActionHost(Protocol):
@@ -47,7 +51,7 @@ def _notify(host: CommandActionHost, level: str, title: str, message: str) -> No
         try:
             notify_fn(level, title, message)
         except Exception:
-            pass
+            _log.warning("command notify failed", exc_info=True)
 
 
 def _shake_widget(widget: object) -> None:
@@ -62,7 +66,7 @@ def _shake_widget(widget: object) -> None:
 
         ShakeAnimation.shake(widget).start()
     except Exception:
-        pass
+        _log.warning("command notify failed", exc_info=True)
 
 
 def refresh_command_history(host: CommandActionHost) -> None:

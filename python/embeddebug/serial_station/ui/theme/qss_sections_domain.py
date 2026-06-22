@@ -106,7 +106,8 @@ QPushButton#serialStationBleNotifyButton,
 QPushButton#serialStationAutomationFireButton,
 QPushButton#serialStationAutomationRefreshButton,
 QPushButton#serialStationSvdLoadButton,
-QPushButton#serialStationSvdDemoButton {{
+QPushButton#serialStationSvdDemoButton,
+QPushButton#serialStationSettingsResetButton {{
     background-color: {P.BG_PANEL};
     color: {P.TEXT_SECONDARY};
     border: {T.BORDER_THIN} solid {P.BORDER};
@@ -123,7 +124,8 @@ QPushButton#serialStationBleNotifyButton:hover,
 QPushButton#serialStationAutomationFireButton:hover,
 QPushButton#serialStationAutomationRefreshButton:hover,
 QPushButton#serialStationSvdLoadButton:hover,
-QPushButton#serialStationSvdDemoButton:hover {{
+QPushButton#serialStationSvdDemoButton:hover,
+QPushButton#serialStationSettingsResetButton:hover {{
     background-color: {P.BG_PANEL_RAISED};
     border-color: {P.ACCENT_BORDER};
 }}
@@ -163,7 +165,9 @@ QLineEdit#serialStationBleCharUuidEdit,
 QLineEdit#serialStationBlePayloadEdit,
 QComboBox#serialStationRttChannelCombo,
 QComboBox#serialStationBleDeviceCombo,
-QComboBox#serialStationSettingsThemeCombo {{
+QComboBox#serialStationSettingsThemeCombo,
+QComboBox#serialStationSettingsBaudrateCombo,
+QSpinBox#serialStationSettingsFontSpin {{
     background-color: {P.BG_INPUT};
     color: {P.TEXT_PRIMARY};
     border: {T.BORDER_THIN} solid {P.BORDER_STRONG};
@@ -174,7 +178,8 @@ QComboBox#serialStationSettingsThemeCombo {{
     font-size: {T.FONT_SM};
 }}
 /* CAN 复选框。 */
-QCheckBox#serialStationCanExtCheckBox {{
+QCheckBox#serialStationCanExtCheckBox,
+QCheckBox#serialStationSettingsAnimationCheck {{
     color: {P.TEXT_SECONDARY};
     spacing: {T.SPACING_SM};
 }}

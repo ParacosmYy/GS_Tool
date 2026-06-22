@@ -11,7 +11,6 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from embeddebug.ota.protocols import (
     OtaProtocolKind,
-    TransferResult,
     make_protocol,
 )
 from embeddebug.ota.protocols.base import ACK, C, NAK, crc16_xmodem, checksum_8bit

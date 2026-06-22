@@ -13,7 +13,7 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QPropertyAnimation, QParallelAnimationGroup, QSequentialAnimationGroup
+from PyQt6.QtCore import QPropertyAnimation, QParallelAnimationGroup
 from PyQt6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
 from embeddebug.serial_station.ui.animations.tokens import AnimationTokens

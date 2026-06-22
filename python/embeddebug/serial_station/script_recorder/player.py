@@ -1,6 +1,6 @@
 """脚本回放器。"""
 from __future__ import annotations
-from PyQt6.QtCore import QObject, QTimer, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSignal
 from embeddebug.serial_station.script_recorder.action import ScriptAction
 from embeddebug.serial_station.script_recorder.recording import ScriptRecording
 

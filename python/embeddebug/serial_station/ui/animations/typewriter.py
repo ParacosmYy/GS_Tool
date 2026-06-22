@@ -27,7 +27,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List
 
-from PyQt6.QtCore import QVariantAnimation, pyqtSignal
+from PyQt6.QtCore import QVariantAnimation
 
 from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 

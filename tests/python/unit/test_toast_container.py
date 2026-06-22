@@ -6,7 +6,6 @@ NotificationManager 的装配与 notify helper 行为。
 
 from __future__ import annotations
 
-import inspect
 import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")

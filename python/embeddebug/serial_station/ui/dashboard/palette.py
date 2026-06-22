@@ -9,7 +9,6 @@ from PyQt6.QtCore import QMimeData, Qt
 from PyQt6.QtGui import QDrag, QIcon
 from PyQt6.QtWidgets import (
     QFrame,
-    QHBoxLayout,
     QLabel,
     QPushButton,
     QVBoxLayout,

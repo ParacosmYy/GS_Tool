@@ -2,7 +2,7 @@
 from __future__ import annotations
 import numpy as np
 import pyqtgraph as pg
-from PyQt6.QtWidgets import QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QVBoxLayout, QWidget
 from embeddebug.serial_station.ui.theme import palette as P
 
 class MultiAxisPlot(QWidget):

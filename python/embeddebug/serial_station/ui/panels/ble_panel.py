@@ -10,7 +10,7 @@ ModePanel 实现：用 ``BleTransportStub``（预置 fake 设备）做 D2 演示
 
 from __future__ import annotations
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import (
     QComboBox,
     QHBoxLayout,
@@ -25,7 +25,7 @@ from PyQt6.QtWidgets import (
 )
 
 from embeddebug.app.app_controller import AppController
-from embeddebug.serial_station.ble import BleFrameCodec, BleTransportStub, expand_uuid
+from embeddebug.serial_station.ble import BleFrameCodec, BleTransportStub
 from embeddebug.serial_station.ui.controls import DotState, StatusDot
 
 _STUB_ADDRESS = "AA:BB:CC:DD:EE:FF"

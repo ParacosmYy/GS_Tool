@@ -6,7 +6,6 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-import pytest
 
 from embeddebug.serial_station.protocol_analyzer import DIRECTION_RX, DIRECTION_TX, AnalysisReport, FrameAnalyzer, ProtocolFrame
 

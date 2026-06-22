@@ -21,7 +21,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QFrame, QLabel, QLayout, QSplitter, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QFrame, QLayout, QSplitter, QVBoxLayout, QWidget
 
 from embeddebug.serial_station.ui.layout_cards import build_card, card_body, wrap_layout
 from embeddebug.serial_station.ui.theme import tokens as T

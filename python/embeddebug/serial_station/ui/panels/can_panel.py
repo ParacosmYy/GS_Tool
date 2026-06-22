@@ -9,13 +9,12 @@ ModePanel 实现：演示模式用 CanFrameCodec 造 SLCAN 帧再解码复用同
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QTimer, Qt, pyqtSignal
+from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtWidgets import (
     QCheckBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QPlainTextEdit,
     QPushButton,
     QTableWidget,
     QTableWidgetItem,

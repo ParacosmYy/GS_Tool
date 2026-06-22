@@ -7,7 +7,6 @@ import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from embeddebug.serial_station.ble import (
-    BLE_BASE_UUID,
     BleCharacteristic,
     BleDevice,
     BleFrameCodec,

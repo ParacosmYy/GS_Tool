@@ -12,7 +12,7 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PyQt6.QtWidgets import QLabel, QPushButton
+from PyQt6.QtWidgets import QPushButton
 
 from embeddebug.serial_station.ui.panels.placeholder_panel import PlaceholderPanel
 from embeddebug.serial_station.ui.widgets import EmptyStateWidget, SkeletonWidget

@@ -16,7 +16,7 @@ from embeddebug.serial_station.spi_i2c import (
     SpiI2cFrameCodec,
     SpiTransaction,
 )
-from embeddebug.serial_station.spi_i2c.codec import OP_I2C_READ, OP_I2C_WRITE, OP_SPI_XFER, STATUS_OK, crc8
+from embeddebug.serial_station.spi_i2c.codec import OP_I2C_READ, OP_SPI_XFER, STATUS_OK, crc8
 
 
 def test_spi_config_accepts_all_four_modes():

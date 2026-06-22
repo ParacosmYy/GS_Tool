@@ -8,7 +8,6 @@ QTcpServer 监听端口，接受一个客户端连接，把首条连接的 socke
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QIODeviceBase
 from PyQt6.QtNetwork import QAbstractSocket, QHostAddress, QTcpServer, QTcpSocket
 
 from embeddebug.serial_station.drivers.base import (

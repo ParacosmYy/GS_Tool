@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PyQt6.QtCore import QObject, QTimer, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSignal
 
 from embeddebug.serial_station.core.measurements import ChannelBatch
 from embeddebug.serial_station.recording.format import RecordingFormat, RecordingReader

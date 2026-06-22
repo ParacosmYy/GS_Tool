@@ -18,7 +18,7 @@ Batch 5 (C1) 新建。诊断报告指出全仓无 EmptyStateWidget，占位面�
 from __future__ import annotations
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 from embeddebug.serial_station.ui.icons import button_icon
 from embeddebug.serial_station.ui.micro_interactions import install_hover_lift

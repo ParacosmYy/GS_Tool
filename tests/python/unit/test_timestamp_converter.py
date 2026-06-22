@@ -20,7 +20,6 @@ import pytest  # noqa: E402
 
 from embeddebug.serial_station.ui.tools.timestamp_converter import (  # noqa: E402
     TZ_PRESETS,
-    TzPreset,
     TimestampConverterPanel,
     datetime_to_epoch,
     epoch_to_datetime,

@@ -10,7 +10,11 @@
 
 from __future__ import annotations
 
+import logging
+
 from PyQt6.QtWidgets import QWidget
+
+_log = logging.getLogger(__name__)
 
 # 需要装 focus_ring 的可聚焦输入控件类型（与 button_icons._FOCUSABLE_WIDGET_TYPES 对齐）。
 _FOCUSABLE_WIDGET_TYPES = (
@@ -48,7 +52,7 @@ def apply_panel_focus_rings(root: QWidget) -> int:
                 install_focus_ring(widget)
                 applied += 1
             except Exception:
-                pass  # focus ring 失败不阻塞。
+                _log.warning("panel focus ring install failed", exc_info=True)  # focus ring 失败不阻塞。
     return applied
 
 
@@ -60,5 +64,6 @@ def _is_readonly(widget) -> bool:
         try:
             return bool(check())
         except Exception:
+            _log.warning("operation failed", exc_info=True)
             return False
     return False

@@ -12,21 +12,11 @@ import json
 from PyQt6.QtCore import QPoint
 
 from embeddebug.app.mode_panel import registered_panels
-from embeddebug.serial_station.ui.controls import (
-    CommandSlider,
-    ConfigurableButton,
-    GaugeWidget,
-    StatusLed,
-    ValueDisplay,
-)
 from embeddebug.serial_station.ui.dashboard import (
-    GRID_SIZE,
     SUPPORTED_WIDGET_TYPES,
     DashboardCanvas,
     DashboardTabs,
     WidgetPalette,
-    create_widget,
-    snap_to_grid,
 )
 from embeddebug.serial_station.ui.panels import register_default_panels
 

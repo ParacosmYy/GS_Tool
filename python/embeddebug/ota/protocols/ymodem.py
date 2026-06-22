@@ -18,7 +18,6 @@ from embeddebug.ota.protocols.base import (
     OtaBlock, OtaByteChannel, OtaProtocol, OtaProtocolKind,
     crc16_xmodem, pad_block,
 )
-from embeddebug.ota.protocols.xmodem import XmodemProtocol
 
 _DATA_BLOCK = 1024     # YMODEM 默认 1KB 数据块
 _SMALL_BLOCK = 128     # 末块不足时用 128B

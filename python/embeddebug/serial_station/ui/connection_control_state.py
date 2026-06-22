@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import logging
+
 from typing import Protocol
+
+_log = logging.getLogger(__name__)
 
 
 class ConnectionControlHost(Protocol):
@@ -31,7 +35,6 @@ def set_connection_control_state(
             port_text = port.currentText() if port else "Connected"
             bar.set_section("connection", str(port_text))
         else:
-            from PyQt6.QtWidgets import QWidget
 
             bar.set_section("connection", host.tr("Disconnected") if hasattr(host, "tr") else "Disconnected")
     # Batch 46 P0-2: 连接成功时对断开按钮做 pop 动画（视觉反馈，
@@ -42,10 +45,10 @@ def set_connection_control_state(
 
             ScaleAnimation.pop(host._disconnect_button).start()
         except Exception:
-            pass  # 动画是锦上添花，失败不阻塞连接逻辑。
+            _log.warning("disconnect pop anim failed", exc_info=True)  # 动画是锦上添花，失败不阻塞连接逻辑。
         try:
             from embeddebug.serial_station.ui.animations.glow import GlowAnimation
 
             GlowAnimation.pulse(host._disconnect_button, loops=3).start()
         except Exception:
-            pass  # 动画是锦上添花，失败不阻塞连接逻辑。
+            _log.warning("disconnect pop anim failed", exc_info=True)  # 动画是锦上添花，失败不阻塞连接逻辑。

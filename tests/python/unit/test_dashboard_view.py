@@ -15,7 +15,6 @@ from embeddebug.serial_station.ui.dashboard import (
     WidgetFullscreenHandler,
     attach_double_click_fullscreen,
 )
-from embeddebug.serial_station.ui.panels import _dashboard_layout_store as store
 
 def _make_panel(qtbot):
     from embeddebug.app.app_controller import AppController

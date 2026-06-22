@@ -9,12 +9,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import inspect
 
 from PyQt6.QtCore import QPoint
-from PyQt6.QtWidgets import QLabel, QWidget
 
-from embeddebug.serial_station.ui.dashboard import (
-    WidgetFullscreenHandler,
-    attach_double_click_fullscreen,
-)
 from embeddebug.serial_station.ui.panels import _dashboard_layout_store as store
 
 def _make_panel(qtbot):

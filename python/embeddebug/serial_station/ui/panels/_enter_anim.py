@@ -14,9 +14,13 @@ on_enter 时对顶层 widget 做 card_enter（淡入+上滑）入场。
 
 from __future__ import annotations
 
+import logging
+
 from PyQt6.QtWidgets import QWidget
 
 from embeddebug.serial_station.ui.panel_animations import card_enter
+
+_log = logging.getLogger(__name__)
 
 
 def play_panel_enter(panel: object) -> None:
@@ -38,6 +42,7 @@ def play_panel_enter(panel: object) -> None:
             anim.start()
     except Exception:
         # 动画是锦上添花，失败不阻塞面板进入。
+        _log.warning("operation failed", exc_info=True)
         setattr(panel, "_enter_anims", [])
 
 
@@ -51,5 +56,5 @@ def stop_panel_enter(panel: object) -> None:
         try:
             anim.stop()
         except Exception:
-            pass
+            _log.warning("panel enter anim failed", exc_info=True)
     setattr(panel, "_enter_anims", [])

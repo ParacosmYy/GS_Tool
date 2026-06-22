@@ -13,7 +13,7 @@ NMEA 坐标编码：``ddmm.mmmm``（度度分分.分分分分）。纬度 N/S，
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)

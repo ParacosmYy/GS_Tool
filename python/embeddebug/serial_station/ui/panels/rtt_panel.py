@@ -10,7 +10,7 @@ ModePanel 实现：未连接串口时用 ``RttTransportStub`` + QTimer 注入演
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QTimer, Qt, pyqtSignal
+from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtWidgets import (
     QComboBox,
     QHBoxLayout,

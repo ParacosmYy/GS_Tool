@@ -16,7 +16,7 @@
 from __future__ import annotations
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QMainWindow, QWidget
+from PyQt6.QtWidgets import QMainWindow
 
 from embeddebug.serial_station.notifications.data import NotificationLevel
 

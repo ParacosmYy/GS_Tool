@@ -14,10 +14,11 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import QEasingCurve, QPointF, QPropertyAnimation, QRectF, Qt, pyqtSignal
-from PyQt6.QtGui import QMouseEvent, QPaintEvent, QPainter, QPen
+from PyQt6.QtCore import QPropertyAnimation, QRectF, Qt, pyqtSignal
+from PyQt6.QtGui import QMouseEvent, QPaintEvent, QPainter
 from PyQt6.QtWidgets import QWidget
 
+from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 from embeddebug.serial_station.ui.theme import palette as P
 
 
@@ -96,7 +97,7 @@ class ToggleSwitch(QWidget):
         self._anim.setDuration(160)
         self._anim.setStartValue(self._knob_x)
         self._anim.setEndValue(target)
-        self._anim.setEasingCurve(QEasingCurve.Type.OutCubic)
+        self._anim.setEasingCurve(AnimationTokens.EASE_OUT)
         self._anim.valueChanged.connect(self._on_knob_pos)
         self._anim.start()
 

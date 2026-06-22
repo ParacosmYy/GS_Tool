@@ -59,9 +59,9 @@ extend-exclude = [
 select = [
     "F",     # Pyflakes（F401 未使用 import / F811 重定义 / F841 未使用变量）
 ]
-# 暂时忽略：项目历史代码有少量已知项，逐步清理。
+# Batch 55: 启用 F401（未使用 import），ruff --fix 自动清理。
+# F841 暂留 ignore（少量防御性赋值，逐批清理）。
 ignore = [
-    "F401",  # 未使用 import（项目 __init__.py 大量 re-export，逐批清理）
     "F841",  # 未使用局部变量（少量防御性赋值）
 ]
 

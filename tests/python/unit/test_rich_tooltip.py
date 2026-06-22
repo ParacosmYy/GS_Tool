@@ -20,7 +20,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from unittest.mock import MagicMock
 
-from PyQt6.QtCore import QPoint, QSize
+from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QPushButton
 
 from embeddebug.serial_station.ui.controls import rich_tooltip

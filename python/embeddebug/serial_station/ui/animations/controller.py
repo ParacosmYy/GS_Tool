@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 from PyQt6.QtCore import QParallelAnimationGroup, QSequentialAnimationGroup, QObject
-from PyQt6.QtWidgets import QWidget
 
-from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 
 
 class AnimationController(QObject):

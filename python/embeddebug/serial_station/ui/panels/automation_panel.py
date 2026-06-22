@@ -10,7 +10,6 @@ automation/ 包；不直接调 controller 内部。
 
 from __future__ import annotations
 
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -31,7 +30,6 @@ from embeddebug.serial_station.automation import (
     TriggerCondition,
     TriggerType,
 )
-from embeddebug.serial_station.controllers import SerialWorkbenchController
 from embeddebug.serial_station.ui.controls import DotState, StatusDot
 
 _COLUMNS = ("启用", "名称", "触发", "动作", "冷却(ms)")

@@ -9,7 +9,7 @@
 from __future__ import annotations
 
 import pyqtgraph as pg
-from PyQt6.QtWidgets import QMenu, QWidget
+from PyQt6.QtWidgets import QMenu
 
 
 def install_cursor_interactions(plot: pg.PlotWidget, cursor_manager_ref) -> None:

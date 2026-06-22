@@ -11,44 +11,39 @@
     ShakeAnimation      — 错误抖动反馈
     PulseAnimation      — 脉冲呼吸效果（状态指示）
     AnimationController — 统一管理多个动画的生命周期
+    BouncePathAnimation — 带位移的路径动画（下落、滑入）
+    GlowAnimation       — 辉光脉冲（连接成功反馈）
+    TypewriterAnimation — 打字机效果（状态栏文本）
+    ElasticSnapAnimation — 弹性吸附（拖拽磁吸）
 """
 
 from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 from embeddebug.serial_station.ui.animations.scale import ScaleAnimation
 from embeddebug.serial_station.ui.animations.slide import SlideAnimation, SlideDirection
-from embeddebug.serial_station.ui.animations.collapse import CollapseAnimation, CollapsiblePanel
+from embeddebug.serial_station.ui.animations.collapse import CollapseAnimation
 from embeddebug.serial_station.ui.animations.fade import FadeTransition
 from embeddebug.serial_station.ui.animations.shake import ShakeAnimation
 from embeddebug.serial_station.ui.animations.pulse import PulseAnimation
 from embeddebug.serial_station.ui.animations.controller import AnimationController
 from embeddebug.serial_station.ui.animations.bounce_path import BouncePathAnimation
+from embeddebug.serial_station.ui.animations.elevation import elevation_effect
 from embeddebug.serial_station.ui.animations.glow import GlowAnimation
-from embeddebug.serial_station.ui.animations.rotate import RotateAnimation
 from embeddebug.serial_station.ui.animations.typewriter import TypewriterAnimation
 from embeddebug.serial_station.ui.animations.elastic_snap import ElasticSnapAnimation
-from embeddebug.serial_station.ui.animations.skeleton import SkeletonAnimation
-from embeddebug.serial_station.ui.animations.page_slide import PageSlideAnimation
-from embeddebug.serial_station.ui.animations.color_tween import ColorTweenAnimation
-from embeddebug.serial_station.ui.animations.stagger import StaggerCoordinator
 
 __all__ = [
     "AnimationController",
     "AnimationTokens",
     "BouncePathAnimation",
     "CollapseAnimation",
-    "CollapsiblePanel",
-    "ColorTweenAnimation",
     "ElasticSnapAnimation",
+    "elevation_effect",
     "FadeTransition",
     "GlowAnimation",
-    "PageSlideAnimation",
     "PulseAnimation",
-    "RotateAnimation",
     "ScaleAnimation",
     "ShakeAnimation",
-    "SkeletonAnimation",
     "SlideAnimation",
     "SlideDirection",
-    "StaggerCoordinator",
     "TypewriterAnimation",
 ]
