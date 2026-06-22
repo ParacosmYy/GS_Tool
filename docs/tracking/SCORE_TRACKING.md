@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 826分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 174分
+> 当前: 827分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 173分
 
 ---
 
@@ -476,6 +476,7 @@
 | 824 | Batch 160 — export/format 纯 helper 边界（23 测试） | 新建 test_export_format_helpers.py（190 行）：ExportFormat.delimiter（CSV=,/TSV=tab/JSON+NUMPY 兜底 tab）+ from_extension（4 格式+大写+Path 对象+未知/无扩展名 ValueError）+ ExportConfig.for_format（默认配置+全 4 格式）+ frozen 不可变 + 验证边角（空 channels ValueError/非枚举 format ValueError/list→tuple 强制转换/time_range start==end 合法/decimal_places=0 合法/默认值）+ ExportFormat 枚举完备性（4 成员 csv/tsv/json/numpy + 值互异）。补强 test_export.py 未直接断言的 delimiter 属性 + for_format + frozen + 空 channels 验证。 |
 | 825 | Batch 161 — core/measurements 边界扩展（25 测试） | 新建 test_measurements_boundary.py（227 行）：ChannelBatch.__post_init__（1D/3D values ValueError + 列数不匹配 + frozen + float32 强制转换 + 默认值）+ ChannelRingBuffer.__init__（capacity=0/-1/channel_count=0 ValueError + 默认/自定义通道名 + 自定义 dt_ns）+ latest 边界（空缓冲区 0 行 + latest(0) 空 + latest(100) clamp + latest(None) 全部）+ append 边界（通道数变更 ValueError + 更新通道名 + 更新 dt_ns + size cap at capacity）+ _payload_values（合法 list/空 list/缺 key=空 + str/bytes ValueError）。补强 test_measurements/test_measurement_ring_buffer 未直接断言的验证路径。 |
 | 826 | Batch 162 — protocols fire_water/just_float 解析边界（30 测试） | 新建 test_protocols_parsers_boundary.py（250 行）：_is_float（整数/浮点/负数/科学计数/NaN/Inf/空串/非数字/十六进制）+ _looks_like_header（全文本=True/含数字=False/全数字=False/空字段=False/单文本=True）+ FireWaterProtocol（reset 清缓冲+清通道名 + 空 feed + CRLF 双换行 + 自定义分隔符 + frame_index 递增 + 分片 feed 累积 + 前缀 fw: 剥离）+ JustFloatProtocol（tail 常量 + reset + invalid_payload_length error + 空 payload error + 空 feed + 负浮点 + 默认通道名 + 分片 feed）。补强 test_protocols.py 未直接断言的 _is_float/_looks_like_header 私有 helper。 |
+| 827 | Batch 163 — theme_serializer 纯 helper 边界（34 测试） | 新建 test_theme_serializer_helpers.py（249 行）：_is_exportable_string（普通 str=True/non-str=False/下划线前缀=False/空串=True/dunder 值=True）+ _CONST_NAME_RE（大写常量/含数字/拒绝 dunder/小写/camelCase/数字开头）+ _HEX_COLOR_RE（3/4/6/8 位 hex+大写+拒绝 5 位/无#）+ _RGBA_COLOR_RE（rgb/rgba+int alpha+float alpha+空格+拒绝缺括号）+ validate_color_string（3 位 hex/8 位 hex/大写/rgb 无 alpha/rgba float alpha/transparent/空白 strip/非 str/纯空白/#ab 非法/garbage）。补强 test_theme_quality.py 未直接断言的私有 helper + regex 模式。 |
 
 ---
 
