@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 897分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 103分
+> 当前: 898分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 102分
 
 ---
 
@@ -547,6 +547,7 @@
 | 895 | Batch 231 — RawData + FireWater build_command + feed 边界（19 测试） | 新建 test_protocols_build_command_boundary.py（132 行）：RawData build_command 默认 utf-8/hex 参数 bytes.fromhex/自定义 encoding/中文 utf-8/空 params + feed 空返回 []/无效 UTF-8 replace 解码/raw 拷贝/payload format+size + reset None；FireWater build_command 默认加 \n/自定义 line_ending \r\n + 自定义 delimiter 分号 + max_channels=1 单通道通过/双通道 too_many_channels error + reset 清空缓冲 + _is_float（合法数字/非法/nan/inf）。 |
 | 896 | Batch 232 — ui/shortcuts install_shortcuts + handle_key_press 边界（13 测试） | 新建 test_ui_shortcuts_boundary.py（146 行）：install_shortcuts 创建 4 个 QShortcut（send/clear/refresh/palette）+ owner._shortcuts 列表 + objectName 契约 + 连接 activated 到 host 方法；handle_key_press Ctrl+Return/Ctrl+Enter→_send_text True + Ctrl+L→_clear_log + Ctrl+R→_refresh_serial_ports + Ctrl+P→_open_command_palette + Ctrl+Shift+T→_toggle_theme + 单 Ctrl+T 无 Shift 不触发主题 + 无 Ctrl 修饰 False + Shift 单独 False + 未知 Ctrl+X/Z False + 未知不调任何回调 + event.accept 被调用。 |
 | 897 | Batch 233 — set_connection_control_state _status_bar + 动画分支边界（15 测试） | 新建 test_connection_control_state_boundary.py（148 行）：connected=True 有 _status_bar→set_section port_text（COM3）/无 _port_combo→"Connected" + connected=False→set_section "Disconnected"（有 tr 用翻译/无 tr 用原文）+ 无 _status_bar 属性不抛 + connected 触发 ScaleAnimation.pop+GlowAnimation.pulse（异常吞不阻塞）+ disconnected 不触发动画 + has_serial_ports 边界（connected/disconnected 无串口 disable serial button/有串口 enable）+ disconnect_button enable 状态 + connect_button enable 状态。 |
+| 898 | Batch 234 — session_actions export/replay/save/load profile 行为边界（15 测试） | 新建 test_session_actions_boundary.py（148 行）：export_log 空路径不调 controller/成功调 export_log_result/失败不阻塞 + replay_log 空路径不调/成功 clear+render/失败不 render + save_profile 空路径/空 name/成功调 save_profile_result(path,name)/失败不阻塞 + load_profile 空路径/成功 apply name+controls+refresh history/value None 失败/失败不 apply/缺 name 默认 unnamed + mock host 含 protocol/port/tcp/udp/baud/parity/stop_bits combo 全字段。 |
 
 ---
 
