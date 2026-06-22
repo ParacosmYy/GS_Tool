@@ -226,21 +226,21 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 
 #### 第一优先级: 遗留核心缺失
 1. ~~UI-06 QSS主题生成器~~ ✅ 已完成（qss_builder 程序化生成）
-2. **UX-04 键盘快捷键体系** → ShortcutManager统一管理
-3. **UX-05 响应式布局** → 断点系统+导航树自适应
+2. ~~UX-04 键盘快捷键体系~~ ✅ 已完成（shortcuts/ 包：ShortcutDef + ShortcutCategory + DEFAULT_SHORTCUTS 14 快捷键 + manager.py）
+3. ~~UX-05 响应式布局~~ ✅ 已完成（responsive_layout.py + main_window._install_responsive_layout 断点系统）
 4. ~~UX-06 弹窗体系统一~~ ✅ 已完成（QMessageBox 0 残留）
 
 #### 第二优先级: 骨架功能完善
 5. **MQTT TopicModel** → 12个空QAbstractItemModel方法实现
 6. **BLE GattModel** → 11个空方法实现
 7. **USB libusb集成** → 11个TODO stub实现
-8. **Dashboard布局持久化** → JSON序列化
+8. ~~Dashboard布局持久化~~ ✅ 已完成（canvas.save_layout/load_layout + to_layout_dict JSON 序列化）
 9. **ProtocolEngine CRC校验** → 协议完整性验证
 10. **DBC解析器** → CAN数据库文件解析
 
 #### 第三优先级: 图标+代码质量
 11. ~~Lucide SVG扩展~~ ✅ 已完成（14→146 个 SVG）
-12. **Doxygen补全** → 新增模块注释
+12. ~~Doxygen补全~~ ✅ 已完成（340/348 模块 docstring，98% 覆盖）
 13. ~~tr()合规审计~~ ✅ 已完成（test_tr_compliance 守护，0 违规）
 14. ~~objectName审计~~ ✅ 已完成（tools/ 4 文件修复 + qss_sections_tools 契约）
 
