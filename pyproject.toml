@@ -55,9 +55,10 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-# 聚焦死代码检测 + 基础卫生（不启用风格类规则，避免大规模格式化噪音）。
+# Batch 56-58: F 系列（死代码）+ UP 系列（pyupgrade 现代化）全强制。
 select = [
     "F",     # Pyflakes（F401 未使用 import / F811 重定义 / F841 未使用变量）
+    "UP",    # pyupgrade（现代化语法：新式 super()/类型注解/格式化等）
 ]
 # Batch 55-56: 启用 F401 + F841（未使用 import / 变量），ruff 机械清理。
 # 项目历史死代码已清零，现在 CI 强制保持。

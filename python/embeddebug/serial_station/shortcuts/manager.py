@@ -89,7 +89,7 @@ class ShortcutManager:
         return {"version": 1, "overrides": dict(self.overrides)}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "ShortcutManager":
+    def from_dict(cls, data: dict[str, Any]) -> ShortcutManager:
         raw = data.get("overrides", {}) if isinstance(data, dict) else {}
         valid_ids = {d.id for d in DEFAULT_SHORTCUTS}
         overrides = {str(k): str(v) for k, v in raw.items() if k in valid_ids and v is not None}

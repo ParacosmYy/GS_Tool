@@ -101,7 +101,7 @@ class TriggerCondition:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, object]) -> "TriggerCondition":
+    def from_dict(cls, data: dict[str, object]) -> TriggerCondition:
         return cls(
             trigger_type=TriggerType[str(data["trigger_type"])],  # type: ignore[index]
             channel_name=str(data.get("channel_name", "")),

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import csv
 from pathlib import Path
-from typing import Iterable
+from collections.abc import Iterable
 
 from embeddebug.serial_station.protocols.base import ProtocolEvent
 from embeddebug.shared import OperationResult

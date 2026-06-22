@@ -24,7 +24,7 @@ GC 防护采用 ``animations.scale`` 的 ``_active``/``_track``/``_discard`` 类
 
 from __future__ import annotations
 
-from typing import Callable, List
+from collections.abc import Callable
 
 from PyQt6.QtCore import (
     QPropertyAnimation,
@@ -54,7 +54,7 @@ class ThemeTransition:
     """
 
     # 持有进行中的过渡动画引用，防止 Python 侧 GC（完成自动移除）。
-    _active: List[QSequentialAnimationGroup] = []
+    _active: list[QSequentialAnimationGroup] = []
 
     @classmethod
     def _track(cls, group: QSequentialAnimationGroup) -> QSequentialAnimationGroup:

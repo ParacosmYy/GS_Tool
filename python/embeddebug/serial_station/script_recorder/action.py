@@ -16,5 +16,5 @@ class ScriptAction:
         return {"type": self.type, "payload": self.payload, "timestamp_ms": self.timestamp_ms, "label": self.label}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "ScriptAction":
+    def from_dict(cls, data: dict[str, Any]) -> ScriptAction:
         return cls(type=str(data["type"]), payload=str(data["payload"]), timestamp_ms=int(data["timestamp_ms"]), label=str(data.get("label", "")))

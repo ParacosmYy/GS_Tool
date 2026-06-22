@@ -25,7 +25,7 @@ class ModePanel(Protocol):
     ``on_enter`` / ``on_leave`` 在切换到/离开该模式时调用。
     """
 
-    def build(self, app_controller: "AppController") -> "QWidget":
+    def build(self, app_controller: AppController) -> QWidget:
         """构建并返回该模式的主控件（装进 QStackedWidget）。"""
         ...
 
@@ -45,7 +45,7 @@ class PanelRegistration:
     mode_id: str          # 唯一标识（如 "serial" / "ota"）
     icon: str             # lucide 图标名（如 "cable"）
     label: str            # 导航 tooltip / 文字
-    factory: "PanelFactory"
+    factory: PanelFactory
 
 
 # factory 接受 AppController，返回 ModePanel 实例。

@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-from typing import Dict
 
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QFrame, QWidget
 
@@ -38,7 +37,7 @@ class StatusBar(QWidget):
         self.setObjectName("serialStationStatusBar")
         self.setFixedHeight(self.FIXED_HEIGHT)
 
-        self._sections: Dict[str, QLabel] = {}
+        self._sections: dict[str, QLabel] = {}
         self._dividers: list[QFrame] = []
 
         self._layout = QHBoxLayout(self)

@@ -49,7 +49,7 @@ class DbcDatabase:
         return self.messages[can_id]
 
     @classmethod
-    def parse(cls, text: str) -> "DbcDatabase":
+    def parse(cls, text: str) -> DbcDatabase:
         """解析最小 DBC 文本：仅识别 BO_ 与 SG_ 两类定义行。"""
         db = cls()
         current: DbcMessage | None = None

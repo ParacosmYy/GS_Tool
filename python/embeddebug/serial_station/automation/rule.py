@@ -47,7 +47,7 @@ class AutomationRule:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "AutomationRule":
+    def from_dict(cls, data: dict[str, Any]) -> AutomationRule:
         raw_actions = data.get("actions", [])
         return cls(
             name=str(data["name"]),

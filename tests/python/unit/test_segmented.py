@@ -16,7 +16,6 @@ import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from typing import Tuple
 
 from PyQt6.QtCore import QPointF, Qt
 from PyQt6.QtGui import QMouseEvent
@@ -25,7 +24,7 @@ from PyQt6.QtWidgets import QApplication
 from embeddebug.serial_station.ui.controls.segmented import SegmentedControl
 
 
-def _make_seg(qtbot, options: Tuple[str, ...] = ("A", "B", "C")) -> SegmentedControl:
+def _make_seg(qtbot, options: tuple[str, ...] = ("A", "B", "C")) -> SegmentedControl:
     """构造一个固定尺寸的 SegmentedControl（200x32）用于测试。"""
 
     seg = SegmentedControl(list(options))

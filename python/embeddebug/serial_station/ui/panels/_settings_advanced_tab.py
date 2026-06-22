@@ -37,7 +37,7 @@ _BAUDRATES: tuple[int, ...] = (
 )
 
 
-def build_advanced_tab(panel: "SettingsPanel", parent: QWidget) -> QWidget:
+def build_advanced_tab(panel: SettingsPanel, parent: QWidget) -> QWidget:
     """构建「高级」Tab：字体大小 / 动画 / 默认波特率 / 恢复默认按钮。
 
     控件存到 ``panel._font_spin`` / ``panel._animation_check`` /
@@ -116,7 +116,7 @@ def build_advanced_tab(panel: "SettingsPanel", parent: QWidget) -> QWidget:
     return tab
 
 
-def sync_advanced_tab(panel: "SettingsPanel") -> None:
+def sync_advanced_tab(panel: SettingsPanel) -> None:
     """``on_enter`` 时把 SettingsManager 当前值同步到控件（避免外部修改后失同步）。"""
 
     settings = SettingsManager.instance().get()
@@ -193,7 +193,7 @@ def _find_active_combo() -> QComboBox | None:
     return None
 
 
-def _find_active_panel() -> "SettingsPanel | None":
+def _find_active_panel() -> SettingsPanel | None:
     """从顶层窗口反查 SettingsPanel 实例（reset 按钮回调后刷新控件用）。"""
 
     from PyQt6.QtWidgets import QApplication

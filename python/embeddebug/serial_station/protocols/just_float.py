@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import struct
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 
 from embeddebug.serial_station.protocols.base import ProtocolEvent, SerialProtocol
 

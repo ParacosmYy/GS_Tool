@@ -15,7 +15,6 @@ fade in/out 对齐 ``DURATION_INSTANT``。
 
 from __future__ import annotations
 
-from typing import Dict, Optional
 
 from PyQt6.QtCore import (
     QPoint, QRect, QSize, QTimer, QPropertyAnimation, Qt,
@@ -66,10 +65,10 @@ class RichTooltip(QWidget):
         )
         self._title: str = title
         self._body: str = body
-        self._icon: Optional[QPixmap] = icon
-        self._opacity_anim: Optional[QPropertyAnimation] = None
-        self._target_widget: Optional[QWidget] = None
-        self._pending_timer: Optional[QTimer] = None
+        self._icon: QPixmap | None = icon
+        self._opacity_anim: QPropertyAnimation | None = None
+        self._target_widget: QWidget | None = None
+        self._pending_timer: QTimer | None = None
         self.setWindowOpacity(0.0)
         self.resize(self.sizeHint())
 
@@ -82,7 +81,7 @@ class RichTooltip(QWidget):
         """返回正文文本。"""
         return self._body
 
-    def icon(self) -> Optional[QPixmap]:
+    def icon(self) -> QPixmap | None:
         """返回图标（可能为 None）。"""
         return self._icon
 
@@ -221,7 +220,7 @@ class RichTooltip(QWidget):
 
 # ── 模块级 install/uninstall ────────────────────────────────────────
 # 以 id(widget) 为键的注册表，重复 install 复用同一 RichTooltip 实例。
-_installed: Dict[int, RichTooltip] = {}
+_installed: dict[int, RichTooltip] = {}
 
 
 def install_tooltip(

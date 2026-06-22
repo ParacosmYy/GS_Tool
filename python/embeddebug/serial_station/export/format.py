@@ -16,7 +16,7 @@ class ExportFormat(Enum):
     NUMPY = "numpy"
 
     @classmethod
-    def from_extension(cls, path: str | Path) -> "ExportFormat":
+    def from_extension(cls, path: str | Path) -> ExportFormat:
         suffix = Path(path).suffix.lower().lstrip(".")
         for member in cls:
             if member.value == suffix:
@@ -53,5 +53,5 @@ class ExportConfig:
             object.__setattr__(self, "channels", tuple(self.channels))
 
     @classmethod
-    def for_format(cls, fmt: ExportFormat) -> "ExportConfig":
+    def for_format(cls, fmt: ExportFormat) -> ExportConfig:
         return cls(format=fmt)

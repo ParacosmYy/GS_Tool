@@ -60,7 +60,7 @@ def install_hover_lift(widget: QWidget, accent_tint: bool = True) -> QGraphicsDr
     return effect
 
 
-def install_card_shadow(widget: QWidget, level=None) -> "QGraphicsDropShadowEffect":
+def install_card_shadow(widget: QWidget, level=None) -> QGraphicsDropShadowEffect:
     """给静态卡片/面板安装统一规约的 elevation 阴影（Batch 50-3）。
 
     通过 ``elevation_effect`` 统一构造，替代散落的硬编码 DropShadowEffect。

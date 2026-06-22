@@ -17,7 +17,7 @@ class ProjectTemplate:
         return {"name": self.name, "description": self.description, "transport_config": dict(self.transport_config), "protocol": self.protocol, "commands": list(self.commands), "settings": dict(self.settings)}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "ProjectTemplate":
+    def from_dict(cls, data: dict[str, Any] | None) -> ProjectTemplate:
         if not isinstance(data, dict):
             return cls()
         return cls(name=str(data.get("name", "")), description=str(data.get("description", "")), transport_config=dict(data.get("transport_config", {})), protocol=str(data.get("protocol", "raw_data")), commands=list(data.get("commands", [])), settings=dict(data.get("settings", {})))

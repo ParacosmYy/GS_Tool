@@ -27,7 +27,6 @@ GC 安全范式（与 ``ScaleAnimation`` 一致）：
 
 from __future__ import annotations
 
-from typing import List
 
 from PyQt6.QtCore import QPropertyAnimation, QRect
 from PyQt6.QtWidgets import QWidget
@@ -46,7 +45,7 @@ class BouncePathAnimation:
     """
 
     # 持有进行中的动画引用，防止 Python 侧 GC（动画完成自动从列表移除）。
-    _active: List[QPropertyAnimation] = []
+    _active: list[QPropertyAnimation] = []
 
     # drop_in 视觉参数（与 tokens 中的 SCALE_POP_IN 配合）。
     DROP_INITIAL_SCALE = AnimationTokens.SCALE_POP_IN  # 0.6

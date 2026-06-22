@@ -61,7 +61,7 @@ class SessionState:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any] | None) -> "SessionState":
+    def from_dict(cls, data: dict[str, Any] | None) -> SessionState:
         """从字典构造状态，缺失字段使用默认值以保证向后兼容。"""
 
         if not isinstance(data, dict):

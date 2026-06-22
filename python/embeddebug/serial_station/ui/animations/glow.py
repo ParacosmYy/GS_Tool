@@ -24,7 +24,6 @@
 
 from __future__ import annotations
 
-from typing import List
 
 from PyQt6.QtCore import QPropertyAnimation
 from PyQt6.QtGui import QColor
@@ -52,7 +51,7 @@ class GlowAnimation:
     """
 
     # 持有进行中的动画引用，防止 Python 侧 GC（动画完成自动从列表移除）。
-    _active: List[QPropertyAnimation] = []
+    _active: list[QPropertyAnimation] = []
 
     @classmethod
     def _track(cls, anim: QPropertyAnimation) -> QPropertyAnimation:

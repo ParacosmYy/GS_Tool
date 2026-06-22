@@ -30,9 +30,9 @@ _DEFAULT_COLOR = P.TEXT_SECONDARY
 class IconManager:
     """单例图标管理器，负责 SVG 加载、着色与缓存。"""
 
-    _instance: "IconManager | None" = None
+    _instance: IconManager | None = None
 
-    def __new__(cls) -> "IconManager":
+    def __new__(cls) -> IconManager:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._cache = {}  # type: ignore[attr-defined]

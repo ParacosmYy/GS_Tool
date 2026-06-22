@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from embeddebug.serial_station.ui.panels.settings_panel import SettingsPanel
 
 
-def build_accent_row(panel: "SettingsPanel", parent: QWidget) -> QHBoxLayout:
+def build_accent_row(panel: SettingsPanel, parent: QWidget) -> QHBoxLayout:
     """构建 7 色点选择行。色点存到 ``panel._accent_swatches`` 供后续 checked 同步。"""
 
     row = QHBoxLayout()
@@ -60,7 +60,7 @@ def build_accent_row(panel: "SettingsPanel", parent: QWidget) -> QHBoxLayout:
     return row
 
 
-def select_accent(panel: "SettingsPanel", accent_id: str) -> None:
+def select_accent(panel: SettingsPanel, accent_id: str) -> None:
     """切换强调色，带 windowOpacity 暗淡+回亮过渡。"""
 
     from PyQt6.QtWidgets import QApplication
@@ -99,7 +99,7 @@ def select_accent(panel: "SettingsPanel", accent_id: str) -> None:
                      accent=panel._widget.tr(variant.label_key)))
 
 
-def _sync_checked(panel: "SettingsPanel", accent_id: str) -> None:
+def _sync_checked(panel: SettingsPanel, accent_id: str) -> None:
     """同步色点 checked 态到指定 accent（被选中的画 ring）。"""
 
     for index, variant in enumerate(ACCENTS):

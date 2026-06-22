@@ -25,7 +25,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from PyQt6.QtCore import QVariantAnimation
 
@@ -44,7 +44,7 @@ class TypewriterAnimation:
     """
 
     # 持有进行中的动画引用，防止 Python 侧 GC（动画完成自动从列表移除）。
-    _active: List[QVariantAnimation] = []
+    _active: list[QVariantAnimation] = []
 
     @classmethod
     def _track(cls, anim: QVariantAnimation) -> QVariantAnimation:
@@ -103,7 +103,7 @@ class TypewriterAnimation:
 
     @staticmethod
     def run_with_label(
-        label: "QLabel", text: str, cps: int = 30
+        label: QLabel, text: str, cps: int = 30
     ) -> QVariantAnimation:
         """便利方法：创建打字机动画并自动接线到 ``QLabel.setText``。
 

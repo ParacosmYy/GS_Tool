@@ -9,7 +9,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
 __all__ = ["LogicSample", "TimingEdge", "TimingSignal"]
 
@@ -82,7 +82,7 @@ class TimingSignal:
         samples: Iterable[LogicSample],
         *,
         initial_level: bool = False,
-    ) -> "TimingSignal":
+    ) -> TimingSignal:
         """从 ``LogicSample`` 序列构造信号。
 
         仅在电平发生变化时记录跳变，连续相同样本会被压缩。

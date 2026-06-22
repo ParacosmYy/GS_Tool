@@ -44,7 +44,7 @@ class SlideAnimation:
             pass
 
     @staticmethod
-    def _offset(pos: QPoint, direction: "SlideDirection", distance: int) -> QPoint:
+    def _offset(pos: QPoint, direction: SlideDirection, distance: int) -> QPoint:
         if direction == SlideDirection.LEFT:
             return QPoint(pos.x() - distance, pos.y())
         if direction == SlideDirection.RIGHT:

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterator
+from collections.abc import Iterator
 
 
 class Access(Enum):

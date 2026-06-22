@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 
 from embeddebug.serial_station.protocols.base import ProtocolEvent, SerialProtocol
 
@@ -22,7 +23,7 @@ class FireWaterProtocol(SerialProtocol):
 
     def build_command(self, command: str, params: Mapping[str, Any] | None = None) -> bytes:
         line_ending = str(params.get("line_ending", "\n")) if params else "\n"
-        return f"{command}{line_ending}".encode("utf-8")
+        return f"{command}{line_ending}".encode()
 
     def feed(self, data: bytes) -> list[ProtocolEvent]:
         if data:

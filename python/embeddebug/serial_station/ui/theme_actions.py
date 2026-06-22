@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from embeddebug.serial_station.ui.main_window import SerialStationMainWindow
 
 
-def toggle_theme(owner: "SerialStationMainWindow | QWidget") -> None:
+def toggle_theme(owner: SerialStationMainWindow | QWidget) -> None:
     """切换深/浅主题，带 windowOpacity 暗淡+回亮过渡动画。
 
     在过渡透明度谷值时执行 ``ThemeSwitcher.toggle()``（换 QSS + 落盘 theme，

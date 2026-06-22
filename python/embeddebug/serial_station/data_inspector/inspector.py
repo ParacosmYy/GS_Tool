@@ -1,6 +1,6 @@
 """数据检查引擎。"""
 from __future__ import annotations
-from typing import Sequence
+from collections.abc import Sequence
 import numpy as np
 from embeddebug.serial_station.data_inspector.result import InspectionResult
 

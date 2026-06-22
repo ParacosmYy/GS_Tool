@@ -1,7 +1,7 @@
 """脚本录制器。"""
 from __future__ import annotations
 import time
-from typing import Iterable
+from collections.abc import Iterable
 from embeddebug.serial_station.script_recorder.action import ScriptAction
 from embeddebug.serial_station.script_recorder.recording import ScriptRecording
 

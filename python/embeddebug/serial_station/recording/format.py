@@ -7,7 +7,8 @@ import json
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
+from collections.abc import Iterator
 
 import numpy as np
 
@@ -21,7 +22,7 @@ class RecordingFormat(Enum):
     JSONL = "jsonl"
 
     @classmethod
-    def from_extension(cls, path: str | Path) -> "RecordingFormat":
+    def from_extension(cls, path: str | Path) -> RecordingFormat:
         suffix = Path(path).suffix.lower().lstrip(".")
         if suffix == "csv":
             return cls.CSV
@@ -44,7 +45,7 @@ class RecordingHeader:
         return {"start_time_ns": self.start_time_ns, "dt_ns": self.dt_ns, "channel_names": list(self.channel_names)}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "RecordingHeader":
+    def from_dict(cls, data: dict[str, Any]) -> RecordingHeader:
         return cls(start_time_ns=int(data["start_time_ns"]), dt_ns=int(data.get("dt_ns", DEFAULT_DT_NS)), channel_names=tuple(str(n) for n in data.get("channel_names", ())))
 
 

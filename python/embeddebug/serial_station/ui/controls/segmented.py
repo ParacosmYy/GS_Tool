@@ -15,7 +15,6 @@
 
 from __future__ import annotations
 
-from typing import List
 
 from PyQt6.QtCore import (
     QPropertyAnimation,
@@ -49,13 +48,13 @@ class SegmentedControl(QWidget):
 
     def __init__(
         self,
-        options: List[str] | None = None,
+        options: list[str] | None = None,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self.setObjectName("serialStationSegmentedControl")
 
-        self._options: List[str] = list(options) if options else []
+        self._options: list[str] = list(options) if options else []
         self._current: int = 0 if self._options else -1
         self._indicator_rect: QRectF = QRectF()
         # 指示器动画（per-widget，避免类级共享）。
@@ -69,7 +68,7 @@ class SegmentedControl(QWidget):
             self._indicator_rect = self._segment_rect(0)
 
     # ── 属性 ────────────────────────────────────────────────────────
-    def setOptions(self, options: List[str]) -> None:
+    def setOptions(self, options: list[str]) -> None:
         """替换选项列表，钳制 current 到合法区间并即时刷新指示器。"""
 
         self._options = list(options)
@@ -85,7 +84,7 @@ class SegmentedControl(QWidget):
         self._indicator_rect = self._segment_rect(self._current)
         self.update()
 
-    def options(self) -> List[str]:
+    def options(self) -> list[str]:
         """返回当前选项列表的拷贝。"""
 
         return list(self._options)

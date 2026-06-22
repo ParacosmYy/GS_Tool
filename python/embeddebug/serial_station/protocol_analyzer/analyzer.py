@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Iterable
+from collections.abc import Iterable
 
 from embeddebug.serial_station.protocol_analyzer.frame import DIRECTION_RX, DIRECTION_TX, ProtocolFrame
 from embeddebug.serial_station.protocol_analyzer.report import AnalysisReport

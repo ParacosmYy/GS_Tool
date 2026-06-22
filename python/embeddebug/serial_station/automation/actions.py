@@ -70,7 +70,7 @@ class AutomationAction:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, object]) -> "AutomationAction":
+    def from_dict(cls, data: dict[str, object]) -> AutomationAction:
         return cls(
             action_type=ActionType[str(data["action_type"])],  # type: ignore[index]
             command=str(data.get("command", "")),

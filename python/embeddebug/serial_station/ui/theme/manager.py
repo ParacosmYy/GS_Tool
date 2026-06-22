@@ -31,9 +31,9 @@ _THEME_RESOURCE_REL = Path("resources") / "themes"
 class ThemeManager:
     """单例主题管理器，负责 QSS 生成、加载与应用。"""
 
-    _instance: "ThemeManager | None" = None
+    _instance: ThemeManager | None = None
 
-    def __new__(cls) -> "ThemeManager":
+    def __new__(cls) -> ThemeManager:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._current_theme = None  # type: ignore[attr-defined]

@@ -58,14 +58,14 @@ class SettingsManager:
     兼容既有 ``theme_switcher.apply_*`` 的读路径）。
     """
 
-    _instance: "SettingsManager | None" = None
+    _instance: SettingsManager | None = None
 
     def __init__(self) -> None:
         self._settings = QSettings(_ORG_NAME, _APP_NAME)
         self._cache: UserSettings = self._load()
 
     @classmethod
-    def instance(cls) -> "SettingsManager":
+    def instance(cls) -> SettingsManager:
         """返回单例（首次调用时构造）。"""
 
         if cls._instance is None:

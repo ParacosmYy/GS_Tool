@@ -6,7 +6,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Sequence
+from typing import Any
+from collections.abc import Sequence
 
 from embeddebug.serial_station.timing_diagram.measurement import TimingMeasurement
 from embeddebug.serial_station.timing_diagram.signal import TimingSignal

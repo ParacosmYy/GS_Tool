@@ -32,7 +32,7 @@ class ScriptRecording:
         return None
 
     @classmethod
-    def from_json(cls, source: str | Path) -> "ScriptRecording":
+    def from_json(cls, source: str | Path) -> ScriptRecording:
         text = str(source)
         try:
             p = Path(text)
