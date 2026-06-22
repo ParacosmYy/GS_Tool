@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 887分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 113分
+> 当前: 888分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 112分
 
 ---
 
@@ -537,6 +537,7 @@
 | 885 | Batch 221 — YmodemProtocol 生命周期 + make_ymodem 工厂边界（19 测试） | 新建 test_ymodem_protocol_boundary.py（186 行）：make_ymodem 工厂（YMODEM stream=False/YMODEM_G stream=True）+ start 握手（'C' 成功/NAK 失败/空 False）+ next_block phase 状态机（info 块 seq=0 SOH→data 块 STX seq=1→发完 None）+ blocks_sent 累积 + handle_response（ACK 推进/NAK retries/空 timeout/CAN×2 中止/stream 模式直推 True）+ finish（YMODEM EOT+ACK+空块0/stream 直写 EOT/全 NAK 失败）+ 初始计数器 + 常量 _DATA_BLOCK=1024/_SMALL_BLOCK=128/_MAX_RETRIES=10。 |
 | 886 | Batch 222 — CanFrame/CanId/CanFilter 边界扩展（25 测试） | 新建 test_can_frame_filter_boundary.py（172 行）：CanFilter.matches is_extended 三态（None 忽略/True 仅扩展/False 仅标准）+ mask 边界（全 0 通配/全 1 精确/多 bit 部分匹配）+ CanId.is_standard + as_hex 宽度（标准 3/扩展 8 大写）+ 边界值（0/MAX valid / 超限+负数 ValueError）+ CanFrame.to_payload 全键 + dataHex 小写空格分隔 + 空数据 + frozen 不可变（FrozenInstanceError）+ DLC 边界（0/CAN_MAX/CAN_FD_MAX/超限 ValueError）。 |
 | 887 | Batch 223 — SessionSerializer 会话状态序列化器边界（20 测试） | 新建 test_session_serializer.py（166 行）：FORMAT_VERSION=1 + _is_supported_version（1 True/0/2 False/非数字 False/1.5→True）+ serialize 结构（version+payload 紧凑 JSON）+ serialize→deserialize 往返（全字段一致/默认状态/空集合）+ deserialize 损坏全分支（空串/whitespace/非字符串/非 JSON/非 dict JSON 返回默认）+ 兼容旧格式（直接状态字典无 version/payload）+ 未知 version 仍解析 + payload 非 dict 回退 + 静态方法契约。 |
+| 888 | Batch 224 — SessionState to_dict/from_dict 防御性边界（17 测试） | 新建 test_session_state_boundary.py（150 行）：_default_geometry/_default_connection_config 结构 + 工厂返回新实例（不共享可变默认）+ SessionState 默认值 + to_dict 全键 + 拷贝隔离（list/dict 修改不影响原）+ from_dict None/空 dict/部分键默认 + None 字段值回退（_get 守卫）+ 类型不符回退（geometry/connection 非 dict→默认/history 非 list→[]）+ history 项 str 强转（1/2.5/True→"1"/"2.5"/"True"）+ timestamp_ns float→int + transport_mode 强转 + to_dict→from_dict 往返全字段等价。 |
 
 ---
 
