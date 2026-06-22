@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 860分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 140分
+> 当前: 861分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 139分
 
 ---
 
@@ -510,6 +510,7 @@
 | 858 | Batch 194 — _resolve + StatusBar + ValueDisplay 边界（17 测试） | 新建 test_resolve_controls_boundary.py（176 行）：_resolve（callable 返回结果/非 callable 返回自身/None 返回 None/callable 抛异常 None/callable 返 None None）+ StatusBar（初始 count=0/set_section 创建+更新/clear_section 删除/未知名空串/clear 未知名不崩溃）+ ValueDisplay（初始 value=0.0/set_value 正负/set_label/set_unit 不崩溃）。 |
 | 859 | Batch 195 — GaugeWidget + StatusLed LedState + set_from_value 边界（17 测试） | 新建 test_gauge_led_boundary.py（171 行）：GaugeWidget（初始 value=0/set 正负/set_range/set_tween/set_unit/set_label 不崩溃/sizeHint 正/_value_to_angle min≠max）+ LedState 枚举（成员存在+value 小写+OFF="off"）+ StatusLed（set_from_value 低/正常/高阈值/set_breathing 不崩溃/sizeHint 正）。 |
 | 860 | Batch 196 — CommandSlider + ConfigurableButton 边界（16 测试） | 新建 test_slider_button_boundary.py（161 行）：CommandSlider（初始 label/set_value min/max/set_formatter 不崩溃/默认 formatter/objectName）+ ConfigurableButton（set_icon+color/set_press_animation/set_hover_lift/set_ripple/get_command 默认空+set_command_template/formatter 覆盖 template/objectName）。 |
+| 861 | Batch 197 — BadgeKind 枚举 + Drawer + SegmentedControl + ToggleSwitch 边界（19 测试） | 新建 test_badge_drawer_segmented_toggle_boundary.py（198 行）：BadgeKind 4 成员+小写+互异 + Drawer（初始 is_open=False/open/close/set_content 不崩溃/sizeHint）+ SegmentedControl（初始 current=0/options/setCurrent/负值 clamp/sizeHint）+ ToggleSwitch（初始 unchecked/set_checked True/False/toggle 翻转/sizeHint）。 |
 
 ---
 
