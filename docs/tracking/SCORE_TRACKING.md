@@ -421,6 +421,9 @@
 | 769 | Batch 94 — OTA 传输引擎单元测试（3 测试） | _FakeChannel/_FakeProtocol mock + _protocol_total + cancel + timeouts。 |
 | 770 | Batch 95 — OperationResult 值对象单元测试（12 测试） | success/failure 工厂 + __post_init__ 验证 + frozen + 泛型。 |
 | 771 | Batch 96 — project_audit 工具单元测试（6 测试） | iter_code_files/module_counts/numbered_utils/python_counts（importlib 路径加载）。 |
+| 772 | Batch 98 — 录制回放器 RecordingPlayer 单元测试（8 测试） | 初始状态 + play/pause/stop + set_speed clamp + load CSV。 |
+| 773 | Batch 100 — 修复 smoke AttributeError（pre-existing） | connection_toolbar getattr 循环防御，smoke 输出从此干净。 |
+| 774 | Batch 101 — 修复 devtools 自测目录名硬编码 | test_repo_root_contains_bat 接受 GS_Tool/User_Serial。 |
 
 ---
 

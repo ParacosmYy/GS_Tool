@@ -75,4 +75,4 @@ ignore = ["SIM105", "SIM102", "SIM115", "RUF001", "RUF002", "RUF003", "RUF012"]
 # Batch 50-6: pytest 严格化配置（testpaths + strict-markers）。
 [tool.pytest.ini_options]
 testpaths = ["tests/python"]
-addopts = ["-ra", "--strict-markers"]
+addopts = ["-ra", "--strict-markers", "--tb=short"]
