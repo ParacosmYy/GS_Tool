@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 856分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 144分
+> 当前: 857分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 143分
 
 ---
 
@@ -506,6 +506,7 @@
 | 854 | Batch 190 — waveform_fft WINDOW 常量 + FFTResult 对齐 + HistogramResult 边界（14 测试） | 新建 test_waveform_fft_histogram_boundary.py（148 行）：WINDOW 4 常量（RECT/HANN/HAMMING/BLACKMAN 小写+互异）+ window_coefficients（4 窗型非空+RECT 全 1+HANN 非全 1+对称）+ FFTResult（frequencies/magnitudes/magnitudes_db 形状对齐+全有限）+ HistogramResult（bin_edges+counts+centers 字段+counts.sum=信号长+bin_edges.size=bin_count+1+空信号空+自定义 range）。 |
 | 855 | Batch 191 — CursorMeasurement + ChannelStats + OperationError 边界（17 测试） | 新建 test_measure_results_boundary.py（191 行）：ChannelStats frozen+6 字段+format_stats 含全部指标+常量信号 vpp=0/std=0 + CursorMeasurement frozen+全 None 合法+compute（无游标 None/单 X 无 delta_t/两 X delta_t+frequency/0 sample_rate frequency=None/两 Y delta_y）+ format_cursor_measurement 全 None 不崩溃 + OperationError frozen+默认 message=""+自定义+空 code ValueError。 |
 | 856 | Batch 192 — mode_panel register/reset + waveform_engine 配置函数边界（10 测试） | 新建 test_mode_panel_engine_boundary.py（155 行）：PanelRegistration frozen+4 字段 + register_panel（注册后 registered_panels 含/同 mode_id 去重/顺序保留/返回 tuple）+ reset_registry 清空 + waveform_engine（try_enable_opengl 返回 bool/configure_high_performance_plot 不崩溃/apply_curve_perf 不崩溃）。 |
+| 857 | Batch 193 — waveform_empty_state overlays + waveform_math _lookup_function + ExpressionError 边界（13 测试） | 新建 test_waveform_overlays_math_boundary.py（139 行）：build_waveform_overlays 返回 (EmptyOverlay, LoadingOverlay) tuple + objectName 契约（serialStationEmptyState / serialStationWaveformLoadingOverlay）+ parent 关系 + _lookup_function（sqrt/sin callable / 未知 None / 空 None）+ ExpressionError 是 ValueError 子类（可 raise / except ValueError 捕获）。 |
 
 ---
 
