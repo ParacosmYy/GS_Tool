@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 808分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 192分
+> 当前: 809分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 191分
 
 ---
 
@@ -458,6 +458,7 @@
 | 806 | Batch 139 — NotificationManager 边界扩展（+9 测试） | 本会话扩展 test_notifications.py（11→20）：clear_history 只清历史 + dismiss 未知 uid False + max_visible clamp ≥1 + queue/history 防御性拷贝 + 驱逐优先 timeout 通知 + dismiss/clear 触发 notification_removed + show 唯一递增 uid。文件 179 行 ≤250。 |
 | 807 | Batch 140 — tcp/udp _parse_endpoint 边界扩展（24 测试） | 并发会话新建 test_endpoint_parsers.py（180 行）：tcp/udp _parse_endpoint 全分支断言。 |
 | 808 | Batch 141 — HelpSystem 边界扩展（+12 测试） | 本会话扩展 test_help_system.py（10→22）：HelpEntry frozen + HelpTopic 5 枚举 + search content/大小写不敏感/strip/去重 + get_topic/all_topics 防御性拷贝 + register setdefault + about_info 5 字段 + PROTOCOL_HELP topic 一致性 + SHORTCUT_HELP 已知键。文件 163 行 ≤250。 |
+| 809 | Batch 143 — ScriptRecorder/Player/Recording 边界扩展（+15 测试） | 本会话扩展 test_script_recorder.py（9→24）：ScriptAction 常量/frozen/from_dict兜底/to_dict 字段；ScriptRecording 空状态/JSON round-trip 元数据/写文件/缺 actions 兜底；ScriptRecorder start 幂等/stop 重置/record 相对时间戳/多类型过滤；ScriptPlayer 初始状态/step 越界 finished/load 重置/play 未加载/pause 不阻断/position 信号/speed 边界。文件 232 行 ≤250。 |
 
 ---
 
