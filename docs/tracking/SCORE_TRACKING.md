@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 852分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 148分
+> 当前: 853分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 147分
 
 ---
 
@@ -502,6 +502,7 @@
 | 850 | Batch 186 — toast/micro_interactions 常量 + toast_container 空容器属性（18 测试） | 新建 test_toast_micro_constants.py（177 行）：toast 常量（_DEFAULT_TIMEOUT_MS=3000/_DEFAULT_SLIDE_DISTANCE=80/_LEVEL_COLORS 4 键/_LEVEL_ICON 4 键非空）+ micro_interactions 常量（LIFT_PIXELS/SHADOW_BLUR_NORMAL/SHADOW_BLUR_HOVER/ANIM_DURATION 对齐 AnimationTokens + hover>normal）+ SkeletonWidget（默认/自定义 height + stop_shimmer 不崩溃）+ ToastContainer 空容器（is_empty/count=0/active_toasts=()/clear_all 不崩溃/dismiss_oldest False）。 |
 | 851 | Batch 187 — NotificationData + NotificationLevel + profile_snapshot 边界（20 测试） | 新建 test_notifications_profile_boundary.py（207 行）：NotificationLevel 4 成员+小写 value+互异 + NotificationData.create（timestamp>0/默认 timeout=3000/默认 action 空/自定义 action_label）+ is_expired（精确边界 1000ms/999ms 未过/timeout=0 永不/负值永不）+ 可变性（uid 可改）+ build_profile_snapshot（protocol/name/commandHistory 非空）+ _transport_snapshot（config 全字段精确/None 默认/connected=False）。 |
 | 852 | Batch 188 — layout_cards + connection_sidebar 边界（16 测试） | 新建 test_layout_connection_boundary.py（192 行）：_ALWAYS_ON_GROUPS={'Port','Connect'} 常量不被修改 + build_card（返回 QFrame+QVBoxLayout + objectName + icon=None + 无标题）+ wrap_layout（无标题/带标题+icon/返回 QFrame 有 body）+ card_body 非 QFrame 抛 ValueError + group_connection_widgets（空列表空/单控件/常量不被修改）+ make_group_label（返回 QLabel/空文本）+ take_layout_widgets 空 layout 空。 |
+| 853 | Batch 189 — svd/model Access + SvdField mask/bit_end + SvdDevice 边界（20 测试） | 新建 test_svd_model_boundary.py（194 行）：Access 3 成员+小写 value+互异 + SvdField mask（1/2/4/8 位精确）+ bit_end（offset+width-1）+ frozen + SvdRegister absolute_address（base+offset + base=0）+ field 未知名 None + 默认 access=READ_WRITE + SvdPeripheral register 未知名 None + SvdDevice peripheral 未知名 None + 空设备 register_count/field_count=0 + iter_registers 空。 |
 
 ---
 
