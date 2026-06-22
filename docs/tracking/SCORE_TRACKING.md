@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 804分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 196分
+> 当前: 805分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 195分
 
 ---
 
@@ -453,7 +453,8 @@
 | 801 | Batch 133 — serial_panel 包装契约单元测试（9 测试） | 并发会话新建 test_serial_panel_contract.py（113 行）：SerialPanel 构造 + build 返回 wrapper + window 暴露 + on_enter/on_leave + 重复 build。覆盖最后一个未测 UI 模块。 |
 | 802 | Batch 133 — PerfSnapshot format_text 边界扩展（+10 测试） | 本会话扩展 test_diagnostics_snapshot.py（9→19）：format_text 字母序排序 + 空 unit 不附加段 + degraded True 显示 + min/max/avg/n 统计段（update 累积）+ is_degraded 阈值边界（fps=30/latency=100 不劣化）+ 未知指标名忽略 + 默认 timestamp_ns/uptime_s。文件 163 行 ≤250。 |
 | 803 | Batch 135 — InspectionResult.format_text + to_dict 边界（+9 测试） | 本会话扩展 test_data_inspector.py（14→23）：format_text channel 名 + min/max/mean/std + outliers 计数 + 字母序 + 空 channels；to_dict correlations 'a\|b' 序列列化 + outliers/threshold 保留 + 默认空状态；timestamp_ns 默认 + inspect threshold 记录。文件 172 行 ≤250。 |
-| 804 | Batch 136 — dashboard_binding_service 解析 + 路由分发单元测试（39 测试） | 新建 test_dashboard_binding_parse.py（196 行，25 测试）：parse_binding_spec value/gauge 通道（ch0/ch12/大写/缺前缀/负通道/非数字）+ led 级别（error/warning/info/未知）+ slider 三段（完整/缺段/min>=max/非整数/空前缀）+ button（命令/含空格）+ 无效输入（空/无冒号/空 detail/未知 kind）+ is_valid_spec + default_spec_for_widget_type 5 widget。扩展 test_dashboard_binding_service.py（180 行，14 测试）：bind/unbind/get_binding/all_bindings/clear_all/覆盖 + route_measurement（命中/非命中/多 widget/异常隔离）+ route_log（level 元组分发/info 独立/未知 level）。 |
+| 804 | Batch 136 — dashboard_binding_service 解析 + 路由分发单元测试（39 测试） | 并发会话新建 test_dashboard_binding_parse.py（196 行，25 测试）+ 扩展 test_dashboard_binding_service.py（180 行，14 测试）：parse_binding_spec + is_valid_spec + default_spec_for_widget_type + bind/unbind/get_binding/all_bindings/clear_all/覆盖 + route_measurement/route_log。 |
+| 805 | Batch 137 — TemplateManager 边界扩展（+11 测试） | 本会话扩展 test_project_templates.py（10→21）：save 无路径 ValueError + 自动建父目录 + 显式路径覆盖；load 不存在/无路径返回空 + 显式路径覆盖；get(None)/strip；delete 未知 False；add validate；seed_builtins 不覆盖已有。文件 150 行 ≤250。 |
 
 ---
 
