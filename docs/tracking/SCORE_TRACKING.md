@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 745分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 255分
+> 当前: 746分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 254分
 
 ---
 
@@ -395,6 +395,7 @@
 | 743 | Batch 68 — HexFormatter 单元测试（14 测试）+ 修复 big_endian bug | 新建 test_hex_formatter.py：format_bytes 三栏/多行偏移/非可打印、format_int 有无符号大小端、format_float 32/64 位、format_ascii。**修复 production bug**：format_int 对标准宽度字节（1/2/4/8）忽略 big_endian 参数（struct.unpack 总用 little-endian prefix），加 `>` / `<` prefix 修正。全量 pytest 1731 passed（+14），lint clean。 |
 | 744 | Batch 69 — GPS NMEA 数据模型单元测试（8 测试） | 新建 test_gps_model.py：GgaFix/RmcTrack/GsaActive/SatelliteInfo/GsvSatellites 的 to_payload camelCase 键、valid/has_fix 属性、frozen 不可变、嵌套 satellites 序列化。全量 pytest 1739 passed（+8），lint clean。 |
 | 745 | Batch 70 — SVD + EyeDiagram 数据模型单元测试（13 测试） | 新建 test_svd_model.py（7：mask/bit_end/Access/frozen）+ test_eye_diagram_model.py（6：has_density/float32 强制/overlay 一维/frozen/EyeMetrics 默认）。全量 pytest 1752 passed（+13），lint clean。 |
+| 746 | Batch 71 — 控制器辅助函数单元测试（8 测试） | 新建 test_controller_helpers.py：decode_injected_text 转义序列展开（\r\n\t）+ append_measurement_batch 环形缓冲区初始化/累积/通道数变化重建。全量 pytest 1760 passed（+8），lint clean。 |
 
 ---
 
