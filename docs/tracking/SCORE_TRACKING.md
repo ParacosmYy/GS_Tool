@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 865分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 135分
+> 当前: 866分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 134分
 
 ---
 
@@ -515,6 +515,7 @@
 | 863 | Batch 199 — KeyboardShortcut _apply_style + Chip _resolve_color helpers 边界（15 测试） | 新建 test_keyhint_chip_boundary.py（172 行）：KeyboardShortcut _apply_style 有 stylesheet+空文本不崩溃+多次构造独立+幂等 + Chip _resolve_bg_color（unselected/selected QColor）+_resolve_text_color+_resolve_border_pen + selected resolve 可能不同 + _close_button_rect（removable 非 null/not removable null）+_text_rect 非 null + selected+removable 组合 + 默认状态 bool + set_removable 切换。 |
 | 864 | Batch 200 — DotState 枚举 + StatusDot flash + ProgressRing clamp/indeterminate 边界（17 测试） | 新建 test_dot_progress_boundary.py（179 行）：DotState 5 成员+小写+互异+已知值 + StatusDot _get_flash/_set_flash（初始 0/round-trip/0）+ ProgressRing _clamp_value（超 max/min/负值 clamp/正常不 clamp）+ indeterminate（默认 False/set True/翻转）+ setRange/setMinimum/setMaximum。 |
 | 865 | Batch 201 — CrcPreset + compute_crc + _parse_hex_bytes + PlaceholderPanel 边界（18 测试） | 新建 test_crc_placeholder_boundary.py（197 行）：CrcPreset frozen+8 字段+CRC_PRESETS 非空+MODBUS check + compute_crc（空 data/8 位 MAXIM check=0xA1/16 位 MODBUS check=0x4B37/CCITT-FALSE check=0x29B1）+ _parse_hex_bytes（合法/空/含空格/奇数长度）+ _parse_int（十进制/0x hex/空=0）+ PlaceholderPanel（build 返回 QWidget+objectName 非空+on_enter/leave 不崩溃）。 |
+| 866 | Batch 202 — HexViewer pure functions + TzPreset + TZ_PRESETS + BYTES_PER_LINE 边界（21 测试） | 新建 test_tools_boundary.py（194 行）：BYTES_PER_LINE=16 + to_ascii_repr（可打印/不可打印/边界 0x1F/0x20/0x7E/0x7F）+ parse_hex_input（空/含空格/合法/奇数长度 ValueError）+ format_hex_line（空含 offset/非零 offset/含 ASCII）+ format_hex_dump（空/单行/多行/base_offset）+ TzPreset frozen+3 字段 + TZ_PRESETS（非空/含 UTC/offset [-12h,+14h]/label 非空）。 |
 
 ---
 
