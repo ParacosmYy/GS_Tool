@@ -144,7 +144,7 @@ def test_apply_focus_rings_skips_readonly(qtbot):
     qtbot.addWidget(parent)
     readonly_le = QLineEdit(parent)
     readonly_le.setReadOnly(True)
-    count = button_icons.apply_focus_rings(parent)
+    button_icons.apply_focus_rings(parent)
     # 只读控件应被跳过。
     assert readonly_le.graphicsEffect() is None
 

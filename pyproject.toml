@@ -59,11 +59,9 @@ extend-exclude = [
 select = [
     "F",     # Pyflakes（F401 未使用 import / F811 重定义 / F841 未使用变量）
 ]
-# Batch 55: 启用 F401（未使用 import），ruff --fix 自动清理。
-# F841 暂留 ignore（少量防御性赋值，逐批清理）。
-ignore = [
-    "F841",  # 未使用局部变量（少量防御性赋值）
-]
+# Batch 55-56: 启用 F401 + F841（未使用 import / 变量），ruff 机械清理。
+# 项目历史死代码已清零，现在 CI 强制保持。
+ignore = []
 
 [tool.ruff.lint.per-file-ignores]
 # __init__.py 的 re-export 是设计内（公共 API），不算未使用 import。

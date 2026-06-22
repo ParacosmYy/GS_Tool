@@ -70,7 +70,7 @@ def test_available_themes_contains_both():
 
 def test_build_light_qss_replaces_dark_colors(qapp):
     from embeddebug.serial_station.ui.theme.qss_builder import build_qss
-    dark_qss = build_qss()
+    build_qss()
     light_qss = build_light_qss()
     assert dark.BG_WINDOW not in light_qss
     assert light.TEXT_PRIMARY in light_qss

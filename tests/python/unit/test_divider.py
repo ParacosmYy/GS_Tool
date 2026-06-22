@@ -25,7 +25,7 @@ def test_divider_no_label(qtbot):
 def test_divider_with_label(qtbot):
     d = Divider("连接设置")
     qtbot.addWidget(d)
-    lbl = d.findChild(type(d), "serialStationDividerLabel")
+    d.findChild(type(d), "serialStationDividerLabel")
     # QLabel is not Divider type; check via findChildren with QLabel
     from PyQt6.QtWidgets import QLabel
     labels = d.findChildren(QLabel)

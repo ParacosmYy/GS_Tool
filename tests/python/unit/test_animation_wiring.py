@@ -123,7 +123,6 @@ def test_animation_tokens_have_factory_references():
     for token in token_names:
         if token in _RESERVED_TOKENS:
             continue  # 有意预留，待场景 wire 后移除
-        pattern = re.compile(r"\b" + re.escape(token) + r"\b")
         found = False
         for path in UI_ROOT.rglob("*.py"):
             rel = str(path.relative_to(UI_ROOT)).replace("\\", "/")

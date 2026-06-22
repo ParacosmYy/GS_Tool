@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 725分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 275分
+> 当前: 727分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 273分
 
 ---
 
@@ -380,6 +380,7 @@
 | 720 | Batch 53 — 消费 3 个预留动画 token（PROGRESS/EASE_IN_QUART/EASE_OUT_QUAD） | progress_ring.py value 动画 DURATION_NORMAL→DURATION_PROGRESS（进度条专用 150ms，更短更快反馈）。info_banner.py slide-out DURATION_NORMAL+EASE_IN→DURATION_FAST+EASE_IN_QUART（离场四分位缓动，比 EASE_IN 更急促收尾）。segmented.py indicator 滑动 EASE_OUT→EASE_OUT_QUAD（轻量出场缓动）。从 _RESERVED_TOKENS 移除 3 个，剩 DURATION_SCROLL 待「滚动到视图」场景（列表项点击定位）。白名单最终：_PENDING_WIRE 2 项（设计内）+ _RESERVED_TOKENS 1 项（待场景）。全量 pytest 1698 passed，lint clean，smoke exit 0 |
 | 723 | Batch 54 — tr() + objectName 合规审计（对标铁律 16/19） | 修复 1 个 tr() 违规（ble_panel.py:78 "handle" 加 widget.tr()）+ ~30 个 objectName 违规集中在 ui/tools/ 4 文件（crc_calculator 加 _labeled helper + 12 widget objectName，byte_frequency/hex_viewer/timestamp_converter 各加 input mode label + radio + combo + edit objectName）。crc_calculator.py 精简 docstring/QSS 压缩保持 ≤300 行。新建 qss_sections_tools.py（25 objectName 契约占位，泛型样式由各面板内联 _PANEL_QSS 处理）+ qss_builder 注册 tools_section()。新建 test_tr_compliance.py 守护测试（AST 扫描 QLabel/QPushButton/setToolTip 等 API 第一参数，检测未包裹 tr 的字面量字符串，软模式默认 STRICT_TR=1 硬模式，0 违规）。objectName 守护测试因误报率高（340 临时构造误判）放弃，tr 守护更精确。全量 pytest 1699 passed（+1 守护），lint clean，smoke exit 0 |
 | 725 | Batch 55 — 启用 F401 lint + 清理 97 个未使用 import | 从 [tool.ruff.lint].ignore 移除 F401（启用未使用 import 检测），per-file-ignores 保留 **/__init__.py 豁免（re-export 设计内）。ruff --fix 自动清理 97 个未使用 import（覆盖 app/ota/serial_station 全树）。dashboard_panel.py 恢复 QFileDialog import 带 noqa: F401（test_dashboard_core_b 通过 module attr 访问，测试反模式但避免破坏）。lint 从「忽略 F401」升级为「强制 F401」，CI 自动拦截未来死 import。全量 pytest 1699 passed，lint clean（F401+F811+F541+F821+F822 全绿），smoke exit 0 |
+| 727 | Batch 56 — 启用 F841 lint + 清理剩余未使用变量 | 从 [tool.ruff.lint].ignore 清空（F401+F841 全强制）。mqtt/client_stub.py 删除未使用 msg/raw 局部变量 + MqttMessage import。tests/ 4 个 F841 自动修复（test_animation_wiring pattern / test_divider lbl / test_gps text / test_icons count / test_theme_switching dark_qss）。lint 现在 F 系列全绿（F401 import + F811 重定义 + F841 变量 + F541 f-string + F821 未定义名 + F822 __all__ 幽灵），CI 严格化完成。全量 pytest 1699 passed，lint clean，smoke exit 0 |
 
 ---
 

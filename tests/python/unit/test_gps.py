@@ -193,7 +193,7 @@ def test_talker_agnostic_mnemonic():
 
 # ── 多行解析 ────────────────────────────────────────────────────────
 def test_parse_lines_skips_invalid_and_blanks():
-    text = "\n".join([
+    "\n".join([
         "$GPGGA,092750.000,4807.038,N,01131.000,E,1,8,0.91,546,M,47,M,,",
         "  ",  # 空行跳过。
         "garbage without dollar",  # 非 NMEA 跳过。

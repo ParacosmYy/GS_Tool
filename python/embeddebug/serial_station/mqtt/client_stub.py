@@ -6,7 +6,6 @@ from collections.abc import Callable
 
 from embeddebug.serial_station.mqtt.message import (
     MqttConfig,
-    MqttMessage,
     MqttSubscription,
     topic_matches,
 )
@@ -74,8 +73,6 @@ class MqttClientStub:
         if not self._is_open:
             self._emit_error("transport_not_open")
             return 0
-        raw = payload.encode("utf-8") if isinstance(payload, str) else bytes(payload)
-        msg = MqttMessage(topic=topic, payload=raw, qos=qos, retain=retain)
         count = 0
         for sub in self._subscriptions:
             if topic_matches(sub.topic_filter, topic):
