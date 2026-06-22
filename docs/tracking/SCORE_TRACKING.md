@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 895分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 105分
+> 当前: 896分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 104分
 
 ---
 
@@ -545,6 +545,7 @@
 | 893 | Batch 229 — RecordingWriter/Reader context manager + 流式 IO 边界（14 测试） | 新建 test_recording_format_io_boundary.py（178 行）：__enter__ 返回 self（不自动 open）+ __exit__ 调 close（_handle None 安全/open 后关闭）+ open 写 CSV header（# EDREC + t_ns,cols）/JSONL header（__header__）+ write_batch 多批 CSV（6 行）/JSONL（3 行）+ close 幂等三次不抛 + reader.open 返回 header + iter_batches 流式（reader 按 dt 合并连续行，总行数验证）+ reader close 幂等 + CSV/JSONL 往返值保留 + 空 header 文件 iter_batches 返回空。 |
 | 894 | Batch 230 — ScriptAction + ScriptRecording 防御性边界（18 测试） | 新建 test_script_action_recording_boundary.py（158 行）：from_dict 缺 type/payload/timestamp_ms raises KeyError + 类型强转（int/str）+ frozen AttributeError + label None→'None' + ScriptRecording 默认值 + to_json 返回字符串/path 写文件返回 None + indent=2 多行格式 + from_json 接受原始 JSON 字符串 + 缺 name/created_at/description 默认空 + 字段类型强转 + duration_ms 单动作/负 timestamp/mixed max + action_count 多个 + add 累积更新 count+duration。 |
 | 895 | Batch 231 — RawData + FireWater build_command + feed 边界（19 测试） | 新建 test_protocols_build_command_boundary.py（132 行）：RawData build_command 默认 utf-8/hex 参数 bytes.fromhex/自定义 encoding/中文 utf-8/空 params + feed 空返回 []/无效 UTF-8 replace 解码/raw 拷贝/payload format+size + reset None；FireWater build_command 默认加 \n/自定义 line_ending \r\n + 自定义 delimiter 分号 + max_channels=1 单通道通过/双通道 too_many_channels error + reset 清空缓冲 + _is_float（合法数字/非法/nan/inf）。 |
+| 896 | Batch 232 — ui/shortcuts install_shortcuts + handle_key_press 边界（13 测试） | 新建 test_ui_shortcuts_boundary.py（146 行）：install_shortcuts 创建 4 个 QShortcut（send/clear/refresh/palette）+ owner._shortcuts 列表 + objectName 契约 + 连接 activated 到 host 方法；handle_key_press Ctrl+Return/Ctrl+Enter→_send_text True + Ctrl+L→_clear_log + Ctrl+R→_refresh_serial_ports + Ctrl+P→_open_command_palette + Ctrl+Shift+T→_toggle_theme + 单 Ctrl+T 无 Shift 不触发主题 + 无 Ctrl 修饰 False + Shift 单独 False + 未知 Ctrl+X/Z False + 未知不调任何回调 + event.accept 被调用。 |
 
 ---
 
