@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 752分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 248分
+> 当前: 753分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 247分
 
 ---
 
@@ -402,6 +402,7 @@
 | 750 | Batch 75 — plugins/discovery 单元测试（9 测试） | 新建 test_plugins_discovery.py：用 tmp_path 创建临时插件目录，覆盖 discover_plugins 扫描 + PluginInfo 元数据提取 + 无效类型/缺 register/非插件目录跳过 + 多插件 + load_plugin 重载 + frozen。全量 pytest 1785 passed（+9），lint clean。 |
 | 751 | Batch 76 — CAN DBC 解析器单元测试（14 测试） | 新建 test_can_dbc.py：DbcDatabase.parse 解析 BO_/SG_ 行 + message/signal 查找 + decode_signal Intel 字节序 factor/offset 转换 + 扩展帧判定（id > 0x7FF）+ 空边界。全量 pytest 1799 passed（+14），lint clean。 |
 | 752 | Batch 77 — MQTT v3.1.1 编解码单元测试（13 测试） | 新建 test_mqtt_codec.py：encode/decode_remaining_length round-trip（0/128/16383/边界）+ encode_connect/connack/subscribe/publish/disconnect/pingreq 包类型验证。全量 pytest 1812 passed（+13），lint clean。 |
+| 753 | Batch 78 — BLE 帧编解码单元测试（10 测试） | 新建 test_ble_codec.py：encode/encode_frame 结构 + feed 流式解码 + 分片重组（header 断/value 断）+ reset 清空 + decode 静态 + BleFrameEvent is_notify/is_write 属性 + value 255 截断。全量 pytest 1822 passed（+10），lint clean。 |
 
 ---
 
