@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 756分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 244分
+> 当前: 757分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 243分
 
 ---
 
@@ -406,6 +406,7 @@
 | 754 | Batch 79 — SPI/I2C 帧编解码 + CRC8 单元测试（12 测试） | 新建 test_spi_i2c_codec.py：crc8 已知值（"123456789"→0xF4）+ encode_spi/i2c_read/write 结构 + length 越界 + build_response + decode_frame round-trip + reset + no_crc 模式。全量 pytest 1834 passed（+12），lint clean。 |
 | 755 | Batch 80 — MQTT 消息模型 + topic_matches 单元测试（15 测试） | 新建 test_mqtt_message.py：MqttConfig 验证（port/qos/keepalive 边界）+ MqttMessage/MqttTopic/MqttSubscription + topic_matches 精确/+/ /# 通配符匹配全路径覆盖。全量 pytest 1849 passed（+15），lint clean。 |
 | 756 | Batch 81 — BLE GATT 模型 + expand_uuid 单元测试（11 测试） | 新建 test_ble_gatt.py：expand_uuid 16 位短码展开 + 128 位直传 + BleCharacteristic can_read/write/notify 属性 + BleService/BleDevice 结构。全量 pytest 1860 passed（+11），lint clean。 |
+| 757 | Batch 82 — BLE TransportStub 单元测试（8 测试） | 新建 test_ble_transport_stub.py：默认设备构建 + open/close 连接 + write 追加 + tree 服务结构 + on_bytes_received/on_error 回调注册。全量 pytest 1868 passed（+8），lint clean。 |
 
 ---
 
