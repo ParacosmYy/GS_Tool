@@ -52,7 +52,7 @@ class _FilterEntry:
     text: str
 
 
-_FILTER_KW = dict(tx_text="TX", rx_text="RX", system_text="System", error_text="Error")
+_FILTER_KW = {"tx_text": "TX", "rx_text": "RX", "system_text": "System", "error_text": "Error"}
 
 
 # ── endpoint default text ──
