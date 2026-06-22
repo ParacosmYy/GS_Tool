@@ -19,7 +19,7 @@ ACCENT_FILENAME = "accent.json"
 from embeddebug.serial_station.ui.theme import theme_store
 
 
-def accent_path():
+def accent_path() -> str:
     """旧 accent.json 路径（迁移期读取兼容；新写入走 theme_store.prefs_path）。"""
 
     return theme_store._legacy_accent_path()
