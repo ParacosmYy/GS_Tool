@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 749分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 251分
+> 当前: 750分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 250分
 
 ---
 
@@ -399,6 +399,7 @@
 | 747 | Batch 72 — event_codec 序列化单元测试（6 测试） | 新建 test_event_codec.py：event_to_record/event_from_record round-trip + 缺字段默认值 + 空 raw。全量 pytest 1766 passed（+6），lint clean。 |
 | 748 | Batch 73 — profile_snapshot 单元测试（5 测试） | 新建 test_profile_snapshot.py：build_profile_snapshot 结构 + transport 子 dict + config=None 默认值 + tuple→list 转换。全量 pytest 1771 passed（+5），lint clean。 |
 | 749 | Batch 74 — transport_connections + connection_results 测试（5 测试） | 新建 test_transport_connections.py：_FakeTransport + _FakeRegistry mock 模式，覆盖 open_transport_result 成功/失败 + open_serial_transport 创建安装 + open_endpoint_transport tcp/udp host:port + 失败路径。全量 pytest 1776 passed（+5），lint clean。 |
+| 750 | Batch 75 — plugins/discovery 单元测试（9 测试） | 新建 test_plugins_discovery.py：用 tmp_path 创建临时插件目录，覆盖 discover_plugins 扫描 + PluginInfo 元数据提取 + 无效类型/缺 register/非插件目录跳过 + 多插件 + load_plugin 重载 + frozen。全量 pytest 1785 passed（+9），lint clean。 |
 
 ---
 
