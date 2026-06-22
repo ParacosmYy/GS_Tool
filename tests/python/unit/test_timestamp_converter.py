@@ -123,7 +123,7 @@ def test_tz_preset_is_frozen_dataclass():
     """TzPreset 必须是 frozen dataclass（不可变）。"""
 
     preset = TZ_PRESETS[0]
-    with pytest.raises(Exception):
+    with pytest.raises((AttributeError, TypeError)):  # frozen dataclass 不可变
         preset.offset_seconds = 999  # type: ignore[misc]
 
 

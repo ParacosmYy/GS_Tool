@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 730分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 270分
+> 当前: 732分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 268分
 
 ---
 
@@ -383,6 +383,7 @@
 | 727 | Batch 56 — 启用 F841 lint + 清理剩余未使用变量 | 从 [tool.ruff.lint].ignore 清空（F401+F841 全强制）。mqtt/client_stub.py 删除未使用 msg/raw 局部变量 + MqttMessage import。tests/ 4 个 F841 自动修复（test_animation_wiring pattern / test_divider lbl / test_gps text / test_icons count / test_theme_switching dark_qss）。lint 现在 F 系列全绿（F401 import + F811 重定义 + F841 变量 + F541 f-string + F821 未定义名 + F822 __all__ 幽灵），CI 严格化完成。全量 pytest 1699 passed，lint clean，smoke exit 0 |
 | 728 | Batch 57 — CLAUDE.md 审计数据同步（对标铁律 5.10 文档一致性） | 更新过时审计数据反映真实状态：UI-02 图标「仅14个SVG」→「146个（扩展完成）」；UI-06 QSS生成器「4740行手动维护」→「qss_builder 程序化生成 + 12 段模块化」；UX-06 弹窗「仍有QMessageBox」→「0 残留」；待完成项 #11/#13/#14 标记完成。测试统计 1601→1699。I 系列（import 排序）尝试启用但因 isort 拆行导致 3 文件超 300 门禁回退（留待文件拆分后启用）。 |
 | 730 | Batch 58 — 启用 UP 系列 pyupgrade + 81 处现代化修复 | 从 [tool.ruff.lint].select 加 UP（pyupgrade）。ruff --fix 自动修复 70 处（UP006 typing.List→list / UP007 Optional→X|None / UP031 % 格式化→format / UP032 .format→f-string 等）+ 11 处连带 F401（pyupgrade 后 typing.List 等未使用 import 清理）。lint 现在 F+UP 双系列强制（死代码 + 语法现代化），CI 自动拦截老式语法。全量 pytest 1699 passed，lint clean，smoke exit 0。 |
+| 732 | Batch 59 — 启用 B 系列 bugbear + 16 处修复 | 从 [tool.ruff.lint].select 加 B（bugbear）。修复：B905 zip() 加 strict=False（5处 zip(x,x[1:]) 模式，trailing 元素故意忽略）；B007 循环变量未用改 _（command_palette qi / toast_container uid×2）；B010 setattr 常量改直接赋值（_enter_anim 3处自动修复）；B017 pytest.raises(Exception) 改具体异常（test_crc_calculator / test_shortcuts_manager / test_timestamp_converter 3处 frozen dataclass 测试）；B011 assert False 改 raise AssertionError（test_layout_cards）。lint 现在 F+UP+B 三系列强制。全量 pytest 1699 passed，lint clean，smoke exit 0。 |
 
 ---
 

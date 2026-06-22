@@ -59,7 +59,7 @@ def fuzzy_score(query: str, target: str) -> int:
     score = 0
     consecutive = 0
     ti = 0
-    for qi, qc in enumerate(query_lower):
+    for _, qc in enumerate(query_lower):
         found = False
         while ti < len(target_lower):
             if target_lower[ti] == qc:

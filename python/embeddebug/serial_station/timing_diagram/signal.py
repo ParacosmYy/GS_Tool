@@ -168,7 +168,7 @@ class TimingSignal:
         # 第一段：[0, first_transition)
         total += self._segment(self.start_time, state)
         # 相邻跳变之间的区间
-        for prev, nxt in zip(self.transitions, self.transitions[1:]):
+        for prev, nxt in zip(self.transitions, self.transitions[1:], strict=False):
             total += self._segment_between(prev[0], nxt[0], prev[1], state)
         # 末段：最后一个跳变之后没有持续时间 (单点)
         return total

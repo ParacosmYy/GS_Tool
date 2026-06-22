@@ -98,7 +98,7 @@ class ToastContainer(QWidget):
     def _on_toast_closed(self, toast: ToastWidget) -> None:
         """ToastWidget 离场完成 → 从布局/映射移除，空了则隐藏容器。"""
 
-        for i, (uid, t) in enumerate(list(self._active)):
+        for i, (_, t) in enumerate(list(self._active)):
             if t is toast:
                 del self._active[i]
                 self._layout.removeWidget(t)
@@ -131,7 +131,7 @@ class ToastContainer(QWidget):
         if len(self._active) <= self._max_visible:
             return
         # 找最早一条未在离场的，触发 leave。
-        for existing_uid, toast in self._active:
+        for _, toast in self._active:
             if not toast.is_leaving:
                 toast.leave()
                 return

@@ -39,7 +39,7 @@ def test_card_body_raises_for_non_card(qtbot):
     qtbot.addWidget(parent)
     try:
         card_body(parent)
-        assert False, "expected ValueError"
+        raise AssertionError("expected ValueError")
     except ValueError:
         pass
 

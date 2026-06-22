@@ -135,11 +135,11 @@ class TimingMeasurement:
 
         rising = signal.transition_times(target=True)
         if len(rising) >= 2:
-            gaps = [b - a for a, b in zip(rising, rising[1:])]
+            gaps = [b - a for a, b in zip(rising, rising[1:], strict=False)]
             return sum(gaps) / len(gaps)
         all_edges = signal.transition_times()
         if len(all_edges) >= 2:
-            gaps = [b - a for a, b in zip(all_edges, all_edges[1:])]
+            gaps = [b - a for a, b in zip(all_edges, all_edges[1:], strict=False)]
             return sum(gaps) / len(gaps)
         return 0.0
 

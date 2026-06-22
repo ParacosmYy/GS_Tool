@@ -37,13 +37,13 @@ def play_panel_enter(panel: object) -> None:
     stop_panel_enter(panel)
     try:
         anims = card_enter(widget)
-        setattr(panel, "_enter_anims", anims)
+        panel._enter_anims = anims
         for anim in anims:
             anim.start()
     except Exception:
         # 动画是锦上添花，失败不阻塞面板进入。
         _log.warning("operation failed", exc_info=True)
-        setattr(panel, "_enter_anims", [])
+        panel._enter_anims = []
 
 
 def stop_panel_enter(panel: object) -> None:
@@ -57,4 +57,4 @@ def stop_panel_enter(panel: object) -> None:
             anim.stop()
         except Exception:
             _log.warning("panel enter anim failed", exc_info=True)
-    setattr(panel, "_enter_anims", [])
+    panel._enter_anims = []

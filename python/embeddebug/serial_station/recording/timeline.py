@@ -58,7 +58,7 @@ class RecordingTimeline:
 
     def gaps(self) -> list[Gap]:
         result: list[Gap] = []
-        for prev, curr in zip(self._segments, self._segments[1:]):
+        for prev, curr in zip(self._segments, self._segments[1:], strict=False):
             delta = curr.start_ns - prev.end_ns
             if delta > self._gap_threshold:
                 result.append(Gap(prev.end_ns, curr.start_ns))

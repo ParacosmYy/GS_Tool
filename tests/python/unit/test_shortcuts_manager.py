@@ -77,7 +77,7 @@ def test_key_sequence_for_unknown_returns_none(manager_fixture):
 
 def test_shortcut_def_is_frozen():
     d = ShortcutDef("x", ShortcutCategory.EDIT, "Ctrl+X", "测试", "x")
-    with pytest.raises(Exception):
+    with pytest.raises((AttributeError, TypeError)):  # frozen dataclass 不可变
         d.id = "y"
 
 

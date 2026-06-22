@@ -55,10 +55,11 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-# Batch 56-58: F 系列（死代码）+ UP 系列（pyupgrade 现代化）全强制。
+# Batch 56-59: F + UP + B 系列全强制（死代码 + 语法现代化 + bugbear）。
 select = [
     "F",     # Pyflakes（F401 未使用 import / F811 重定义 / F841 未使用变量）
-    "UP",    # pyupgrade（现代化语法：新式 super()/类型注解/格式化等）
+    "UP",    # pyupgrade（现代化语法）
+    "B",     # bugbear（B905 zip strict / B007 循环变量 / B010 setattr 常量等）
 ]
 # Batch 55-56: 启用 F401 + F841（未使用 import / 变量），ruff 机械清理。
 # 项目历史死代码已清零，现在 CI 强制保持。

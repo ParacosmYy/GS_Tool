@@ -94,7 +94,7 @@ def test_crc_preset_is_frozen_dataclass():
     """CrcPreset 必须是 frozen dataclass（不可变）。"""
 
     preset = CRC_PRESETS["CRC-8/MAXIM"]
-    with pytest.raises(Exception):
+    with pytest.raises((AttributeError, TypeError)):  # frozen dataclass 不可变
         preset.poly = 0xFF  # type: ignore[misc]
 
 
