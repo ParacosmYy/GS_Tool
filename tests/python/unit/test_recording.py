@@ -124,3 +124,109 @@ def test_exporter_channel_subset(tmp_path):
     reader = RecordingReader(RecordingFormat.CSV)
     header = reader.open(target)
     assert header.channel_names == ("volt",)
+
+
+# ---- Batch 131: RecordingExporter 失败路径 + _channel_indices 边界 ----
+
+
+def _write_source(tmp_path, name="src.jsonl", fmt=RecordingFormat.JSONL):
+    """写入 _batches() 到 tmp_path/name 并返回路径。"""
+    source = tmp_path / name
+    writer = RecordingWriter(fmt, _header())
+    writer.open(source)
+    for batch in _batches():
+        writer.write_batch(batch)
+    writer.close()
+    return source
+
+
+def test_exporter_returns_false_on_missing_source(tmp_path):
+    """源文件不存在 → OSError 被 catch → 返回 False。"""
+    target = tmp_path / "out.jsonl"
+    result = RecordingExporter().export(
+        tmp_path / "nonexistent.jsonl", target, RecordingFormat.JSONL
+    )
+    assert result is False
+    assert not target.exists()  # 失败时不写出
+
+
+def test_exporter_returns_false_on_unknown_channel(tmp_path):
+    """channels 含未知通道名 → KeyError 被 catch → 返回 False。"""
+    source = _write_source(tmp_path)
+    assert RecordingExporter().export(
+        source, tmp_path / "out.csv", RecordingFormat.CSV, channels=["ghost"]
+    ) is False
+
+
+def test_exporter_none_channels_selects_all(tmp_path):
+    """channels=None 选择全部通道。"""
+    source = _write_source(tmp_path)
+    target = tmp_path / "all.csv"
+    assert RecordingExporter().export(source, target, RecordingFormat.CSV, channels=None) is True
+    header = RecordingReader(RecordingFormat.CSV).open(target)
+    assert header.channel_names == ("temp", "volt")
+
+
+def test_exporter_empty_channels_selects_all(tmp_path):
+    """channels=[] 空列表等价于 None（选全部通道）。"""
+    source = _write_source(tmp_path)
+    target = tmp_path / "empty.csv"
+    assert RecordingExporter().export(source, target, RecordingFormat.CSV, channels=[]) is True
+    header = RecordingReader(RecordingFormat.CSV).open(target)
+    assert header.channel_names == ("temp", "volt")
+
+
+def test_exporter_multiple_channels_preserves_order(tmp_path):
+    """channels 显式指定顺序时按指定顺序输出（不按原始顺序）。"""
+    source = _write_source(tmp_path)
+    target = tmp_path / "reordered.csv"
+    assert RecordingExporter().export(
+        source, target, RecordingFormat.CSV, channels=["volt", "temp"]
+    ) is True
+    header = RecordingReader(RecordingFormat.CSV).open(target)
+    assert header.channel_names == ("volt", "temp")
+
+
+def test_exporter_channel_subset_only_writes_selected_values(tmp_path):
+    """通道子集导出时，values 矩阵只包含选定列。"""
+    source = _write_source(tmp_path)
+    target = tmp_path / "only_volt.jsonl"
+    assert RecordingExporter().export(
+        source, target, RecordingFormat.JSONL, channels=["volt"]
+    ) is True
+    reader = RecordingReader(RecordingFormat.JSONL)
+    reader.open(target)
+    batches = list(reader.iter_batches())
+    reader.close()
+    values = np.vstack([b.values for b in batches])
+    assert values.shape[1] == 1
+    assert np.allclose(values.flatten(), [2.0, 4.0, 6.0, 8.0])
+
+
+def test_exporter_same_format_converts(tmp_path):
+    """同格式导出（jsonl→jsonl）也能工作（复制语义）。"""
+    source = _write_source(tmp_path)
+    target = tmp_path / "copy.jsonl"
+    assert RecordingExporter().export(source, target, RecordingFormat.JSONL) is True
+    assert target.exists()
+
+
+def test_exporter_channel_indices_helper_none_and_empty():
+    """_channel_indices(header, None/[]) 返回全部索引 [0, 1]。"""
+    header = _header()
+    assert RecordingExporter._channel_indices(header, None) == [0, 1]
+    assert RecordingExporter._channel_indices(header, []) == [0, 1]
+
+
+def test_exporter_channel_indices_helper_known_names_preserves_order():
+    """_channel_indices 按名称查找索引，保留指定顺序。"""
+    header = _header()
+    assert RecordingExporter._channel_indices(header, ["temp"]) == [0]
+    assert RecordingExporter._channel_indices(header, ["volt"]) == [1]
+    assert RecordingExporter._channel_indices(header, ["volt", "temp"]) == [1, 0]
+
+
+def test_exporter_channel_indices_helper_unknown_name_raises_keyerror():
+    """未知名称抛 KeyError（在 export 外调用时直接抛，不被 catch）。"""
+    with pytest.raises(KeyError):
+        RecordingExporter._channel_indices(_header(), ["ghost"])
