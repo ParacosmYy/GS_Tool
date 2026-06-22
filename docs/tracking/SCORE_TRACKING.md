@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 879分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 121分
+> 当前: 880分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 120分
 
 ---
 
@@ -529,6 +529,7 @@
 | 877 | Batch 213 — ScriptPlayer 脚本回放器边界（16 测试） | 新建 test_script_player.py（182 行）：MIN_SPEED/MAX_SPEED 常量 + __init__ 默认状态 + is_loaded/action_count/current_index/speed 属性 + set_speed clamp（低/高/正常/边界）+ load 重置 index + stop 既有播放 + play 未加载/末尾无效 + stop 重置 + step_next 顺序返回 + position_changed 递增 + action_ready 携带 ScriptAction + 越界 finished emit None + 未加载 None。 |
 | 878 | Batch 214 — FakeSerialTransport 内存传输边界（15 测试） | 新建 test_fake_serial_transport.py（156 行）：__init__ 默认状态 + open 成功（is_open/config 存储/返回 True）+ open 错误（open_error 触发 error callback/is_open False/返回 False）+ close + write 关闭态返回 0+error + write 打开态追加 written + 累积 + bytes 拷贝防 mutate + inject_rx 分发多回调 + bytes 拷贝 + on_error 多回调 + 完整生命周期。 |
 | 879 | Batch 215 — CanFrameCodec SLCAN 编解码边界（22 测试） | 新建 test_can_codec_boundary.py（205 行）：PROTOCOL_NAME/name 属性 + encode 标准帧（t+3位ID+DLC+data+\r）/扩展帧（T+8位ID）/零ID/ASCII 纯净 + _parse 错误全分支（empty_frame/unknown_prefix/frame_too_short std+ext/invalid_hex id+dlc/dlc_exceeds_limit/data_length_mismatch/invalid_data_hex）+ error 含 raw+protocol_name + feed 空不崩溃 + reset 清 buffer（残留丢弃）/清 frameIndex + CAN-FD 扩展帧 dlc>12 is_fd 往返 + frameIndex 跨帧递增。 |
+| 880 | Batch 216 — XmodemProtocol XMODEM/XMODEM-CRC 状态机边界（22 测试） | 新建 test_xmodem_protocol_boundary.py（212 行）：make_xmodem 工厂（CRC/CKSUM kind）+ _slice_blocks（128B 分块/0x1A 填充/空固件≥1块）+ total_blocks/blocks_sent/retries 初始 + start 握手（CRC 期望 C/CKSUM 期望 NAK/错误响应 False/空 False）+ next_block（CRC 2字节/CKSUM 1字节校验/sequence 递增需 ACK/发完 None/blocks_sent 累积）+ handle_response（ACK 推进/NAK 重传/空 timeout/CAN×2 中止）+ finish（EOT+ACK 成功/全 NAK 失败重试 _MAX_RETRIES/空响应失败）。 |
 
 ---
 
