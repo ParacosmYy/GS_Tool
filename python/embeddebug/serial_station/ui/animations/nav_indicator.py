@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 
 from PyQt6.QtCore import QEasingCurve, QPropertyAnimation, QRect, Qt, pyqtProperty
-from PyQt6.QtGui import QColor, QPainter, QPaintEvent
+from PyQt6.QtGui import QColor, QPainter
 from PyQt6.QtWidgets import QWidget
 
 from embeddebug.serial_station.ui.animations.reduced_motion import ReducedMotionState
@@ -70,7 +70,8 @@ class NavIndicator(QWidget):
         target = self._indicator_rect_for(button_rect)
         self._target_rect = target
 
-        if not self.isVisible():
+        if self._opacity <= 0.0:
+            # 首次显示（opacity 仍为 0）：定位 + 淡入。
             self.setGeometry(target)
             self._fade_in()
             return

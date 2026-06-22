@@ -40,7 +40,7 @@ def test_indicator_rect_for_geometry(qtbot):
     _reset_reduced_motion()
     parent = QWidget()
     qtbot.addWidget(parent)
-    indicator = NavIndicator(parent)
+    NavIndicator(parent)  # 构造验证（_indicator_rect_for 是静态方法，不需实例）
     button_rect = QRect(0, 10, 40, 40)
     rect = NavIndicator._indicator_rect_for(button_rect)
     expected_h = int(40 * _INDICATOR_HEIGHT_RATIO)

@@ -16,7 +16,6 @@ from embeddebug.serial_station.ui.animations.stagger import (
     StaggerHandle,
 )
 from embeddebug.serial_station.ui.animations.reduced_motion import ReducedMotionState
-from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 
 
 def _reset_reduced_motion():

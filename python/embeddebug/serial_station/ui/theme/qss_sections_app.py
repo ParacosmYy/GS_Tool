@@ -51,6 +51,12 @@ QPushButton[objectName^="serialStationNav"]:hover {{
 QPushButton[objectName^="serialStationNav"]:checked {{
     background-color: {P.ACCENT_SOFT};
     border-left: 3px solid {P.ACCENT};
+}}
+/* Batch 115: NavIndicator 自绘胶囊指示条（自绘读 palette ACCENT，QSS 仅契约占位
+   防止 QWidget 默认底破坏色相；满足 test_build_qss_covers_all objectName 覆盖率）。 */
+QWidget#serialStationNavIndicator {{
+    background-color: transparent;
+    border: none;
 }}"""
 
 

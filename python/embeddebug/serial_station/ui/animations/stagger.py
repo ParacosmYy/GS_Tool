@@ -10,10 +10,8 @@ stagger 动画 + pending timers，cancel() 一次性停掉，安全配合页面�
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Callable
 
 from PyQt6.QtCore import QTimer
-from PyQt6.QtWidgets import QWidget
 
 from embeddebug.serial_station.ui.animations.controller import AnimationController
 from embeddebug.serial_station.ui.animations.fade import FadeTransition
