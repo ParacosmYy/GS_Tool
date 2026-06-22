@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 827分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 173分
+> 当前: 828分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 172分
 
 ---
 
@@ -477,6 +477,7 @@
 | 825 | Batch 161 — core/measurements 边界扩展（25 测试） | 新建 test_measurements_boundary.py（227 行）：ChannelBatch.__post_init__（1D/3D values ValueError + 列数不匹配 + frozen + float32 强制转换 + 默认值）+ ChannelRingBuffer.__init__（capacity=0/-1/channel_count=0 ValueError + 默认/自定义通道名 + 自定义 dt_ns）+ latest 边界（空缓冲区 0 行 + latest(0) 空 + latest(100) clamp + latest(None) 全部）+ append 边界（通道数变更 ValueError + 更新通道名 + 更新 dt_ns + size cap at capacity）+ _payload_values（合法 list/空 list/缺 key=空 + str/bytes ValueError）。补强 test_measurements/test_measurement_ring_buffer 未直接断言的验证路径。 |
 | 826 | Batch 162 — protocols fire_water/just_float 解析边界（30 测试） | 新建 test_protocols_parsers_boundary.py（250 行）：_is_float（整数/浮点/负数/科学计数/NaN/Inf/空串/非数字/十六进制）+ _looks_like_header（全文本=True/含数字=False/全数字=False/空字段=False/单文本=True）+ FireWaterProtocol（reset 清缓冲+清通道名 + 空 feed + CRLF 双换行 + 自定义分隔符 + frame_index 递增 + 分片 feed 累积 + 前缀 fw: 剥离）+ JustFloatProtocol（tail 常量 + reset + invalid_payload_length error + 空 payload error + 空 feed + 负浮点 + 默认通道名 + 分片 feed）。补强 test_protocols.py 未直接断言的 _is_float/_looks_like_header 私有 helper。 |
 | 827 | Batch 163 — theme_serializer 纯 helper 边界（34 测试） | 新建 test_theme_serializer_helpers.py（249 行）：_is_exportable_string（普通 str=True/non-str=False/下划线前缀=False/空串=True/dunder 值=True）+ _CONST_NAME_RE（大写常量/含数字/拒绝 dunder/小写/camelCase/数字开头）+ _HEX_COLOR_RE（3/4/6/8 位 hex+大写+拒绝 5 位/无#）+ _RGBA_COLOR_RE（rgb/rgba+int alpha+float alpha+空格+拒绝缺括号）+ validate_color_string（3 位 hex/8 位 hex/大写/rgb 无 alpha/rgba float alpha/transparent/空白 strip/非 str/纯空白/#ab 非法/garbage）。补强 test_theme_quality.py 未直接断言的私有 helper + regex 模式。 |
+| 828 | Batch 164 — accents _soft + AnimationTokens 常量契约（21 测试） | 新建 test_accents_tokens_constants.py（247 行）：_soft（rgba 格式+alpha 2 位小数+0/1 边界+截断+RGB 保留）+ AccentTones.as_recolor_map（7 键映射+值一致）+ frozen + tones_for（dark/light 切换）+ 全 accent dark≠light base + AnimationTokens（时长 5 档递增+CONTAINER 居中+全正 + 缓动曲线 QEasingCurve.Type+互异 + ELEVATION L0-L5 三元组+L0 扁平+alpha 递增 + SCALE 值+按压<1+弹跳>1 + 抖动/折叠/阴影常量 + 关键帧/stagger 范围）。补强 test_theme_extras/test_animations_* 未直接断言的 _soft + 常量值契约。 |
 
 ---
 
