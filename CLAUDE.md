@@ -109,11 +109,11 @@
 | 应用名称 | EmbedDebug |
 | 项目路径 | `E:\Embedded\Tool\Serial_tool\User_Serial` |
 | 当前版本 | 0.1.0 |
-| 评分 | 787（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
+| 评分 | 788（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
 | 测试文件数 | 172（Batch 117 新增 2 个测试文件） |
-| 测试通过 | 2192 passed, 2 skipped, 0 failed |
+| 测试通过 | 2197 passed, 2 skipped, 0 failed |
 
 ### Python/PyQt 命令
 ```powershell
