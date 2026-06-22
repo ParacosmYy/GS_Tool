@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 847分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 153分
+> 当前: 848分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 152分
 
 ---
 
@@ -497,6 +497,7 @@
 | 845 | Batch 181 — ScaleAnimation._scaled_rect + CAN 常量 + CanFilter 边界（18 测试） | 新建 test_scale_can_constants.py（189 行）：_scaled_rect（factor=1 不变+0.5 减半+2 加倍+中心对齐+0 clamp min(1)）+ CAN 常量（CAN_MAX_DLC=8/CAN_FD_MAX_DLC=64/STANDARD_ID_MAX=0x7FF/EXTENDED_ID_MAX=0x1FFFFFFF）+ CanId（value=0 合法+as_hex 标准零填充 000/扩展 00000000）+ CanFrame（空 data dlc=0+to_payload 9 字段+空 dataHex 空串）+ CanFilter（is_extended=None 不检查/默认 mask=0 全匹配/部分 mask=0x700 高 3 位）。 |
 | 846 | Batch 182 — FadeTransition + SlideAnimation._offset + SlideDirection 边界（17 测试） | 新建 test_fade_slide_boundary.py（188 行）：SlideDirection 4 枚举+小写 value + _offset（LEFT x-/RIGHT x+/UP y-/DOWN y+ + distance=0 原位 + 另一轴不变）+ fade_in（返回 QPropertyAnimation + 0→1 + 自定义时长 + show）+ fade_out（返回 QPropertyAnimation + 1→0 + finished→hide receiver）+ cross_fade（返回 QParallelAnimationGroup + 2 子动画）。补强 test_animations_transitions 未直接断言的 _offset 4 方向 + fade_in/out start/end 值。 |
 | 847 | Batch 183 — Shake/Pulse/Collapse 边界（15 测试） | 新建 test_shake_pulse_collapse_boundary.py（188 行）：Shake（返回 QPropertyAnimation + 起止同位 + 默认 duration>0 + count=1 + amplitude=0 end=start）+ Pulse（返回 QPropertyAnimation + start=max/0.5=min/end=max + 自定义 opacity + EASE_IN_OUT）+ Breathing（loopCount=-1 + stop_looping 清理 _active）+ Collapse（expand target_height + collapse end=0 + stop 清理 _active）。 |
+| 848 | Batch 184 — Glow/Typewriter/ElasticSnap 边界（17 测试） | 新建 test_glow_typewriter_elastic_boundary.py（218 行）：_attach_effect（无 effect 新建+挂载 / 复用已有 shadow / 不覆盖 opacity）+ steady（返回 effect + intensity>1.5 clamp + intensity=0 blur=0）+ clear（归零 blur+alpha / 无 effect 静默）+ pulse（loops=0 归 1 / loops=20 封顶 3000ms / EASE_IN_OUT）+ TypewriterAnimation.run（cps=0 不除零 / start_delay 负值 / LINEAR / 空文本最小 INSTANT）+ run_with_label 自动 start + ElasticSnap cancel 清理。 |
 
 ---
 
