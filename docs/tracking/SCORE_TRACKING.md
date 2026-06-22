@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 775分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 225分
+> 当前: 776分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 224分
 
 ---
 
@@ -424,6 +424,8 @@
 | 772 | Batch 98 — 录制回放器 RecordingPlayer 单元测试（8 测试） | 初始状态 + play/pause/stop + set_speed clamp + load CSV。 |
 | 773 | Batch 100 — 修复 smoke AttributeError（pre-existing） | connection_toolbar getattr 循环防御，smoke 输出从此干净。 |
 | 774 | Batch 101 — 修复 devtools 自测目录名硬编码 | test_repo_root_contains_bat 接受 GS_Tool/User_Serial。 |
+| 775 | Batch 105 — settings_advanced_tab 测试 + PT 系列评估 | _select_baudrate 测试 + PT 系列 117 违规评估后放弃。 |
+| 776 | Batch 106 — connection_sidebar 辅助函数测试 | take_layout_widgets + make_group_label + group_connection_widgets。 |
 
 ---
 
