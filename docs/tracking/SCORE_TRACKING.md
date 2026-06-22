@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 836分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 164分
+> 当前: 837分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 163分
 
 ---
 
@@ -486,6 +486,7 @@
 | 834 | Batch 170 — automation/rule + actions（22 测试） | 新建 test_automation_rule_actions.py（248 行）：AutomationAction.execute（SEND_COMMAND 调用+空跳过/PLAY_SOUND/LOG/SET_LED/DELAY 返回 wait+负值 clamp）+ execute context=None 自动创建 + ActionType 5 枚举 + to_dict 6 字段 + from_dict round-trip + 缺字段默认 + 默认值 + AutomationRule.should_fire（enabled+无冷却/disabled=False/mark_fired 冷却期/过冷却）+ mark_fired + reset + to_dict 5 字段 + from_dict round-trip + 缺字段默认 + 默认值。覆盖此前 0 测试的 rule/actions 模块。 |
 | 835 | Batch 171 — automation/engine 全覆盖（18 测试） | 新建 test_automation_engine.py（249 行）：add_rule/remove_rule + rule_added/rule_removed 信号 + enable/disable + rule_names/rules 排序 + 空引擎 + advance_clock/set_clock（累加+负值 clamp+set）+ fire_rule（手动执行+disabled False+未知 False）+ on_measurement（VALUE_ABOVE 触发+低于阈值不触发）+ on_rx/on_tx（pattern 匹配触发）+ 冷却（期内不重复+过冷却后再触发）+ context 跨触发累积。automation 子包 4 模块（triggers/rule/actions/engine）全部从 0 测试达到完整覆盖。 |
 | 836 | Batch 172 — shortcuts/definitions 常量契约（19 测试） | 新建 test_shortcuts_definitions.py（179 行）：ShortcutCategory 5 枚举（FILE/EDIT/VIEW/TRANSPORT/HELP）+ value 小写一致性 + ShortcutDef frozen 不可变 + 5 字段 + DEFAULT_SHORTCUTS 非空（≥10）+ id 唯一 + key_sequence/description/callback_name 非空 + category 有效枚举 + 含 connect/disconnect/command_palette/toggle_theme/send/quit + send 用 Ctrl+Return + F1=HELP 分类 + 覆盖≥3 分类。 |
+| 837 | Batch 173 — script_recorder 边界（23 测试） | 新建 test_script_recorder_helpers.py（222 行）：ScriptAction 常量（SEND/RECEIVE/CONNECT/DISCONNECT/DELAY/WAIT）+ frozen + to/from_dict round-trip + 缺 label 默认 + ScriptRecording duration_ms 空=0/最大 timestamp + action_count + add + to_json/from_json round-trip + from_json 缺 actions 空 + to_json 写文件 + from_json 读文件 + ScriptRecorder start 幂等 + stop 重置 + record 未录制 False + 录制 True + 类型过滤（record_only 排除/空集全阻/无过滤全录）+ recording 属性录制前可访问 + timestamp 相对 start。 |
 
 ---
 
