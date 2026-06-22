@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 888分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 112分
+> 当前: 889分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 111分
 
 ---
 
@@ -538,6 +538,7 @@
 | 886 | Batch 222 — CanFrame/CanId/CanFilter 边界扩展（25 测试） | 新建 test_can_frame_filter_boundary.py（172 行）：CanFilter.matches is_extended 三态（None 忽略/True 仅扩展/False 仅标准）+ mask 边界（全 0 通配/全 1 精确/多 bit 部分匹配）+ CanId.is_standard + as_hex 宽度（标准 3/扩展 8 大写）+ 边界值（0/MAX valid / 超限+负数 ValueError）+ CanFrame.to_payload 全键 + dataHex 小写空格分隔 + 空数据 + frozen 不可变（FrozenInstanceError）+ DLC 边界（0/CAN_MAX/CAN_FD_MAX/超限 ValueError）。 |
 | 887 | Batch 223 — SessionSerializer 会话状态序列化器边界（20 测试） | 新建 test_session_serializer.py（166 行）：FORMAT_VERSION=1 + _is_supported_version（1 True/0/2 False/非数字 False/1.5→True）+ serialize 结构（version+payload 紧凑 JSON）+ serialize→deserialize 往返（全字段一致/默认状态/空集合）+ deserialize 损坏全分支（空串/whitespace/非字符串/非 JSON/非 dict JSON 返回默认）+ 兼容旧格式（直接状态字典无 version/payload）+ 未知 version 仍解析 + payload 非 dict 回退 + 静态方法契约。 |
 | 888 | Batch 224 — SessionState to_dict/from_dict 防御性边界（17 测试） | 新建 test_session_state_boundary.py（150 行）：_default_geometry/_default_connection_config 结构 + 工厂返回新实例（不共享可变默认）+ SessionState 默认值 + to_dict 全键 + 拷贝隔离（list/dict 修改不影响原）+ from_dict None/空 dict/部分键默认 + None 字段值回退（_get 守卫）+ 类型不符回退（geometry/connection 非 dict→默认/history 非 list→[]）+ history 项 str 强转（1/2.5/True→"1"/"2.5"/"True"）+ timestamp_ns float→int + transport_mode 强转 + to_dict→from_dict 往返全字段等价。 |
+| 889 | Batch 225 — TransferEngine 边界扩展 mock 协议错误路径（12 测试） | 新建 test_transfer_engine_boundary.py（172 行）：_protocol_total 回退（total_blocks 优先/total_data_blocks 回退/无属性→0/非 int 跳过）+ run eot_not_acked 路径（finish False）+ 进度回调 on_progress 调用（blocks_done,total）+ _send_block_await_ack 帧格式（header+seq+~seq+data+checksum）+ _send_cancel 发 CAN×2 + cancel 路径 error=cancelled + 成功路径 TransferResult 全字段（success/blocks_sent/blocks_acked/retries/error=None）+ 握手失败 handshake_failed + cancel 初始状态 + cancel 置标志。 |
 
 ---
 
