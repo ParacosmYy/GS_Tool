@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 814分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 186分
+> 当前: 815分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 185分
 
 ---
 
@@ -463,7 +463,8 @@
 | 811 | Batch 145 — BLE codec 边界扩展（+11 测试） | 本会话扩展 test_ble_codec.py（10→21）：encode handle/type 截断 + encode_frame 默认 value；feed 空数据/部分 header/未知 type/length=0/garbage；BleFrameEvent frozen + little-endian handle + reset 清空。文件 204 行 ≤250。 |
 | 812 | Batch 147 — CanId/CanFrame/CanFilter 边界扩展（+14 测试） | 本会话扩展 test_can_frame.py（17→31）：CanId 0/MAX 边界 + frozen；CanFrame 空 data + frozen + 扩展帧+FD payload + 默认值；CanFilter mask=0 全匹配 + is_extended=False 显式标准 + mask=0 位忽略 + 短路。文件 226 行 ≤250。 |
 | 813 | Batch 149 — SPI/I2C codec 边界扩展（+10 测试） | 本会话扩展 test_spi_i2c_codec.py（12→22）：crc8 0xFF×2=0x24 + 幂等；encode i2c_read length 0/255/-1 + i2c_write register=None/ten_bit；build_response STATUS_ERROR+空body+round-trip；decode_frame 前导/尾部垃圾 ValueError；feed 多帧+部分缓冲+前导垃圾 trim；no_crc feed round-trip + DecodedFrame frozen。文件 203 行 ≤250。 |
-| 814 | Batch 150 — gps/parser 纯 helper 单元测试（32 测试） | 新建 test_gps_parser_helpers.py（240 行）：_xor_checksum（空=0/单字符=ord/多字符累积/真实 NMEA payload/0-255 mask）+ compute_checksum（两位大写 hex/单位数补零/与 _xor_checksum 数值一致）+ _verify_checksum（缺 $ 抛/无 * 容错/合法通过/不匹配抛/非法 hex 抛/strip 空白）+ _int_or（合法/负数/空=default/非法=default/strip）+ _float_or（合法/int 串/空=default/非法=default/负数）+ _to_decimal（0.0 早返回/无效 hemisphere 正值/N+/S-/E+/W-）+ _fields（逗号切分/单字段/空串）。补强 test_gps_parser.py 未直接断言的私有 helper。 |
+| 814 | Batch 150 — gps/parser 纯 helper 单元测试（32 测试） | 并发会话新建 test_gps_parser_helpers.py（240 行）：_xor_checksum + compute_checksum + _verify_checksum + _int_or + _float_or + _to_decimal + _fields 私有 helper 全覆盖。 |
+| 815 | Batch 151 — MQTT codec 边界扩展（+15 测试） | 本会话扩展 test_mqtt_codec.py（13→28）：remaining_length 16384/大值/offset；encode_publish QoS1/QoS2/retain flags；encode_connack session_present + return_code 0-5；encode_connect 默认 client_id；encode_subscribe QoS body；DISCONNECT/PINGREQ 精确字节；decode_packet_type 空数据/高 nibble；MqttFrameCodec 包装委托。文件 214 行 ≤250。 |
 
 ---
 
