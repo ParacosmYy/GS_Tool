@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 805分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 195分
+> 当前: 806分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 194分
 
 ---
 
@@ -455,6 +455,7 @@
 | 803 | Batch 135 — InspectionResult.format_text + to_dict 边界（+9 测试） | 本会话扩展 test_data_inspector.py（14→23）：format_text channel 名 + min/max/mean/std + outliers 计数 + 字母序 + 空 channels；to_dict correlations 'a\|b' 序列列化 + outliers/threshold 保留 + 默认空状态；timestamp_ns 默认 + inspect threshold 记录。文件 172 行 ≤250。 |
 | 804 | Batch 136 — dashboard_binding_service 解析 + 路由分发单元测试（39 测试） | 并发会话新建 test_dashboard_binding_parse.py（196 行，25 测试）+ 扩展 test_dashboard_binding_service.py（180 行，14 测试）：parse_binding_spec + is_valid_spec + default_spec_for_widget_type + bind/unbind/get_binding/all_bindings/clear_all/覆盖 + route_measurement/route_log。 |
 | 805 | Batch 137 — TemplateManager 边界扩展（+11 测试） | 本会话扩展 test_project_templates.py（10→21）：save 无路径 ValueError + 自动建父目录 + 显式路径覆盖；load 不存在/无路径返回空 + 显式路径覆盖；get(None)/strip；delete 未知 False；add validate；seed_builtins 不覆盖已有。文件 150 行 ≤250。 |
+| 806 | Batch 139 — NotificationManager 边界扩展（+9 测试） | 本会话扩展 test_notifications.py（11→20）：clear_history 只清历史 + dismiss 未知 uid False + max_visible clamp ≥1 + queue/history 防御性拷贝 + 驱逐优先 timeout 通知 + dismiss/clear 触发 notification_removed + show 唯一递增 uid。文件 179 行 ≤250。 |
 
 ---
 
