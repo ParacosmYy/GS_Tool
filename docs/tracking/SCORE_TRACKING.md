@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 854分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 146分
+> 当前: 855分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 145分
 
 ---
 
@@ -504,6 +504,7 @@
 | 852 | Batch 188 — layout_cards + connection_sidebar 边界（16 测试） | 新建 test_layout_connection_boundary.py（192 行）：_ALWAYS_ON_GROUPS={'Port','Connect'} 常量不被修改 + build_card（返回 QFrame+QVBoxLayout + objectName + icon=None + 无标题）+ wrap_layout（无标题/带标题+icon/返回 QFrame 有 body）+ card_body 非 QFrame 抛 ValueError + group_connection_widgets（空列表空/单控件/常量不被修改）+ make_group_label（返回 QLabel/空文本）+ take_layout_widgets 空 layout 空。 |
 | 853 | Batch 189 — svd/model Access + SvdField mask/bit_end + SvdDevice 边界（20 测试） | 新建 test_svd_model_boundary.py（194 行）：Access 3 成员+小写 value+互异 + SvdField mask（1/2/4/8 位精确）+ bit_end（offset+width-1）+ frozen + SvdRegister absolute_address（base+offset + base=0）+ field 未知名 None + 默认 access=READ_WRITE + SvdPeripheral register 未知名 None + SvdDevice peripheral 未知名 None + 空设备 register_count/field_count=0 + iter_registers 空。 |
 | 854 | Batch 190 — waveform_fft WINDOW 常量 + FFTResult 对齐 + HistogramResult 边界（14 测试） | 新建 test_waveform_fft_histogram_boundary.py（148 行）：WINDOW 4 常量（RECT/HANN/HAMMING/BLACKMAN 小写+互异）+ window_coefficients（4 窗型非空+RECT 全 1+HANN 非全 1+对称）+ FFTResult（frequencies/magnitudes/magnitudes_db 形状对齐+全有限）+ HistogramResult（bin_edges+counts+centers 字段+counts.sum=信号长+bin_edges.size=bin_count+1+空信号空+自定义 range）。 |
+| 855 | Batch 191 — CursorMeasurement + ChannelStats + OperationError 边界（17 测试） | 新建 test_measure_results_boundary.py（191 行）：ChannelStats frozen+6 字段+format_stats 含全部指标+常量信号 vpp=0/std=0 + CursorMeasurement frozen+全 None 合法+compute（无游标 None/单 X 无 delta_t/两 X delta_t+frequency/0 sample_rate frequency=None/两 Y delta_y）+ format_cursor_measurement 全 None 不崩溃 + OperationError frozen+默认 message=""+自定义+空 code ValueError。 |
 
 ---
 
