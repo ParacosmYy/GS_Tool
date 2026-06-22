@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 780分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 220分
+> 当前: 781分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 219分
 
 ---
 
@@ -426,6 +426,11 @@
 | 774 | Batch 101 — 修复 devtools 自测目录名硬编码 | test_repo_root_contains_bat 接受 GS_Tool/User_Serial。 |
 | 775 | Batch 105 — settings_advanced_tab 测试 + PT 系列评估 | _select_baudrate 测试 + PT 系列 117 违规评估后放弃。 |
 | 776 | Batch 106 — connection_sidebar 辅助函数测试 | take_layout_widgets + make_group_label + group_connection_widgets。 |
+| 777 | Batch 107 — layout_cards 辅助函数测试 | build_card + card_body + wrap_layout。 |
+| 778 | Batch 108 — SVD panel tree 辅助函数测试 | _hex + _access_label + _trunc + field_table_rows。 |
+| 779 | Batch 109 — AppController 单元测试 | serial_controller + active_transport + is_connected。 |
+| 780 | Batch 110 — SerialDispatcher 单元测试 | _FakeProtocol mock + feed/build_command/set_protocol。 |
+| 781 | Batch 111 — measurements 纯函数测试 | batch_from_measurement_events + _default_channel_names。 |
 
 ---
 
