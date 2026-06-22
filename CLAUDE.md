@@ -113,7 +113,7 @@
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
 | 测试文件数 | 186（Batch 130/131 新增 _empty_state_overlay + RecordingExporter 扩展） |
-| 测试通过 | 2387 passed, 2 skipped, 0 failed |
+| 测试通过 | 2393 passed, 2 skipped, 0 failed |
 
 ### Python/PyQt 命令
 ```powershell
