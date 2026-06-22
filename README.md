@@ -13,7 +13,7 @@
 
 | 维度 | 状态 | 证据 |
 |---|---|---|
-| 工程状态 | `E4`，Python 测试与启动 smoke 可复现 | `uv run test-embeddebug-py` |
+| 工程状态 | `E5` 可维护收口（CI + lint 六系列 + 守护测试） | `uv run test-embeddebug-py` + `uv run lint-embeddebug-py` |
 | 用户状态 | `U3`，Serial Station 主流程已有可见入口 | `uv run start-embeddebug` |
 | 设备状态 | `D2`，TCP/UDP 已有替身或 loopback 验证，真实硬件仍需补证 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
 | 评分进度 | `618 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
@@ -81,10 +81,13 @@ cmd /c EmbedDebug.bat --smoke
 
 ```powershell
 uv run test-embeddebug-py
+uv run lint-embeddebug-py
 uv run test-embeddebug-tools
 uv run start-embeddebug --smoke
 cmd /c EmbedDebug.bat --smoke
 ```
+
+CI 自动执行：GitHub Actions（Windows runner）在每次 push/PR 时运行上述全套门禁（含 `STRICT_COLORS=1` / `STRICT_FONTS=1` 硬模式守护测试）。lint 覆盖 F+UP+B+SIM+RUF+C4 六系列（死代码 + 语法现代化 + bugbear + 简化 + ruff-specific + comprehension）。
 
 脚本面约束：仓库只保留 `EmbedDebug.bat` 作为用户侧 Windows 启动入口；测试、打包、验证和工程辅助统一通过 `uv run ...` 暴露。
 
