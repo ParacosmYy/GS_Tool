@@ -1,10 +1,6 @@
-"""CRC 计算器面板。
+"""CRC 计算器面板（compute_crc 纯函数 + CRC_PRESETS 预设 + CrcCalculatorPanel UI）。
 
-- ``compute_crc``：纯函数 CRC 核（无 Qt 依赖，便于单测覆盖 catalog check value）。
-- ``CRC_PRESETS``：4 个常用预设及其 check value（CRC of ``b"123456789"``）。
-- ``CrcCalculatorPanel``：UI 包装层，输入控件变更即重算结果。
-
-约束：仅依赖标准库 + PyQt6 + theme；无第三方 CRC 库；颜色全部走 palette 常量。
+约束：仅依赖标准库 + PyQt6 + theme；颜色走 palette 常量。
 """
 
 from __future__ import annotations
@@ -40,10 +36,7 @@ def compute_crc(
     ref_out: bool,
     xor_out: int,
 ) -> int:
-    """对 data 计算 CRC。width ∈ {8,16,32}，否则抛 ValueError。纯函数。
-
-    ref_in / ref_out 控制输入字节 / 输出 CRC 的按位反射；xor_out 应用到最终结果。
-    """
+    """对 data 计算 CRC（width ∈ {8,16,32}，否则 ValueError；纯函数）。"""
     if width not in (8, 16, 32):
         raise ValueError(f"width must be 8/16/32, got {width}")
     mask = (1 << width) - 1
@@ -65,7 +58,7 @@ def compute_crc(
 # ── 预设 ──────────────────────────────────────────────────────────
 @dataclass(frozen=True)
 class CrcPreset:
-    """CRC 预设：参数 + 自检 check value（CRC of ``b"123456789"``）。"""
+    """CRC 预设（参数 + check value = CRC of b"123456789"）。"""
     name: str
     width: int
     poly: int
@@ -84,27 +77,15 @@ CRC_PRESETS: dict[str, CrcPreset] = {
 }
 
 
-# ── 面板 QSS（颜色全部走 palette / tokens，无硬编码） ──────────────
 _PANEL_QSS = f"""
-QWidget#serialStationCrcCalculator {{
-    background: {P.BG_PANEL}; border: 1px solid {P.BORDER}; border-radius: {T.RADIUS_LG};
-}}
+QWidget#serialStationCrcCalculator {{ background: {P.BG_PANEL}; border: 1px solid {P.BORDER}; border-radius: {T.RADIUS_LG}; }}
 QWidget#serialStationCrcCalculatorInput,
 QWidget#serialStationCrcCalculatorConfig,
-QWidget#serialStationCrcCalculatorResult {{
-    background: {P.BG_PANEL}; border: 1px solid {P.BORDER}; border-radius: {T.RADIUS_MD};
-}}
-QTextEdit, QLineEdit, QComboBox {{
-    background: {P.BG_INPUT}; color: {P.TEXT_PRIMARY};
-    border: 1px solid {P.BORDER}; border-radius: {T.RADIUS_MD};
-    padding: {T.PADDING_INPUT}; font-family: {T.FONT_FAMILY_MONO};
-}}
+QWidget#serialStationCrcCalculatorResult {{ background: {P.BG_PANEL}; border: 1px solid {P.BORDER}; border-radius: {T.RADIUS_MD}; }}
+QTextEdit, QLineEdit, QComboBox {{ background: {P.BG_INPUT}; color: {P.TEXT_PRIMARY}; border: 1px solid {P.BORDER}; border-radius: {T.RADIUS_MD}; padding: {T.PADDING_INPUT}; font-family: {T.FONT_FAMILY_MONO}; }}
 QTextEdit:focus, QLineEdit:focus, QComboBox:focus {{ border: 1px solid {P.ACCENT}; }}
 QLineEdit#serialStationCrcResultEdit {{ color: {P.ACCENT}; font-weight: 600; }}
-QPushButton {{
-    background: {P.ACCENT_SOFT}; color: {P.TEXT_PRIMARY};
-    border: 1px solid {P.BORDER}; border-radius: {T.RADIUS_MD}; padding: {T.PADDING_MD};
-}}
+QPushButton {{ background: {P.ACCENT_SOFT}; color: {P.TEXT_PRIMARY}; border: 1px solid {P.BORDER}; border-radius: {T.RADIUS_MD}; padding: {T.PADDING_MD}; }}
 QPushButton:hover {{ border: 1px solid {P.ACCENT}; color: {P.ACCENT_HOVER}; }}
 QPushButton:pressed {{ background: {P.ACCENT_PRESSED}; }}
 QLabel {{ color: {P.TEXT_SECONDARY}; background: transparent; border: none; }}
@@ -136,9 +117,13 @@ class CrcCalculatorPanel(QWidget):
         input_lay.setSpacing(6)
 
         mode_row = QHBoxLayout()
-        mode_row.addWidget(QLabel(self.tr("输入模式:")))
+        _mode_label = QLabel(self.tr("输入模式:"))
+        _mode_label.setObjectName("serialStationCrcInputModeLabel")
+        mode_row.addWidget(_mode_label)
         self._mode_ascii = QRadioButton(self.tr("ASCII"))
+        self._mode_ascii.setObjectName("serialStationCrcModeAscii")
         self._mode_hex = QRadioButton(self.tr("Hex"))
+        self._mode_hex.setObjectName("serialStationCrcModeHex")
         self._mode_ascii.setChecked(True)
         mode_row.addWidget(self._mode_ascii)
         mode_row.addWidget(self._mode_hex)
@@ -159,10 +144,13 @@ class CrcCalculatorPanel(QWidget):
 
         # ── 预设按钮 ──
         preset_row = QHBoxLayout()
-        preset_row.addWidget(QLabel(self.tr("预设:")))
+        _preset_label = QLabel(self.tr("预设:"))
+        _preset_label.setObjectName("serialStationCrcPresetLabel")
+        preset_row.addWidget(_preset_label)
         self._preset_buttons: dict[str, QPushButton] = {}
         for name, preset in CRC_PRESETS.items():
             btn = QPushButton(self.tr(name))
+            btn.setObjectName(f"serialStationCrcPreset_{name.replace('-', '_').replace('/', '_')}")
             btn.clicked.connect(lambda checked=False, p=preset: self._apply_preset(p))
             preset_row.addWidget(btn)
             self._preset_buttons[name] = btn
@@ -174,13 +162,16 @@ class CrcCalculatorPanel(QWidget):
         result_box.setObjectName("serialStationCrcCalculatorResult")
         result_lay = QHBoxLayout(result_box)
         result_lay.setContentsMargins(8, 8, 8, 8)
-        result_lay.addWidget(QLabel(self.tr("结果:")))
+        _result_label = QLabel(self.tr("结果:"))
+        _result_label.setObjectName("serialStationCrcResultLabel")
+        result_lay.addWidget(_result_label)
         self._result_edit = QLineEdit()
         self._result_edit.setObjectName("serialStationCrcResultEdit")
         self._result_edit.setReadOnly(True)
         self._result_edit.setFont(self._mono_font())
         result_lay.addWidget(self._result_edit, stretch=1)
         copy_btn = QPushButton(self.tr("复制"))
+        copy_btn.setObjectName("serialStationCrcCopyButton")
         copy_btn.clicked.connect(self._copy_result)
         result_lay.addWidget(copy_btn)
         root.addWidget(result_box)
@@ -203,30 +194,42 @@ class CrcCalculatorPanel(QWidget):
         lay.setContentsMargins(8, 8, 8, 8)
         lay.setSpacing(6)
 
-        lay.addWidget(QLabel(self.tr("位宽:")))
+        lay.addWidget(self._labeled("位宽:", "serialStationCrcWidthLabel"))
         self._width_combo = QComboBox()
+        self._width_combo.setObjectName("serialStationCrcWidthCombo")
         self._width_combo.addItems(["8", "16", "32"])
         lay.addWidget(self._width_combo)
 
-        lay.addWidget(QLabel(self.tr("多项式:")))
+        lay.addWidget(self._labeled("多项式:", "serialStationCrcPolyLabel"))
         self._poly_edit = QLineEdit("0x31")
+        self._poly_edit.setObjectName("serialStationCrcPolyEdit")
         lay.addWidget(self._poly_edit)
 
-        lay.addWidget(QLabel(self.tr("初始值:")))
+        lay.addWidget(self._labeled("初始值:", "serialStationCrcInitLabel"))
         self._init_edit = QLineEdit("0x00")
+        self._init_edit.setObjectName("serialStationCrcInitEdit")
         lay.addWidget(self._init_edit)
 
         self._ref_in_check = QCheckBox(self.tr("输入反转"))
+        self._ref_in_check.setObjectName("serialStationCrcRefInCheck")
         self._ref_in_check.setChecked(True)
         self._ref_out_check = QCheckBox(self.tr("输出反转"))
+        self._ref_out_check.setObjectName("serialStationCrcRefOutCheck")
         self._ref_out_check.setChecked(True)
         lay.addWidget(self._ref_in_check)
         lay.addWidget(self._ref_out_check)
 
-        lay.addWidget(QLabel(self.tr("异或输出:")))
+        lay.addWidget(self._labeled("异或输出:", "serialStationCrcXorLabel"))
         self._xor_edit = QLineEdit("0x00")
+        self._xor_edit.setObjectName("serialStationCrcXorEdit")
         lay.addWidget(self._xor_edit)
         root.addWidget(cfg)
+
+    def _labeled(self, text: str, object_name: str) -> QLabel:
+        """Batch 54: 构造带 objectName 的 QLabel。"""
+        lbl = QLabel(self.tr(text))
+        lbl.setObjectName(object_name)
+        return lbl
 
     def _mono_font(self) -> QFont:
         """构建等宽字体（Hex 输入与结果显示用）。"""

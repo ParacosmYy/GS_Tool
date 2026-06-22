@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 720分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 280分
+> 当前: 723分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 277分
 
 ---
 
@@ -378,6 +378,7 @@
 | 716 | Batch 51 — 6 个死 widget 接入生产 + 4 个预留 token 消费（白名单从 10 降至 3） | 新建 log_options_bar.py helper 集中 wire 6 个白名单 widget 到日志工具区真实功能场景：Divider（日志区视觉分组分隔线）+ Badge（连接状态徽章 SUCCESS/INFO 实时反映连接，update_connection_badge 供 connection_control_state 调用）+ ToggleSwitch（日志自动滚动开关，默认开）+ Chip（当前 filter 可视化标签，显示 active filter 文本，removable=True 可关闭）+ SegmentedControl（日志视图模式 ASCII/Hex/Dec 三段切换，currentChanged 信号）+ InfoBanner（持久信息条 BannerKind，show_log_info_banner 带 fly-in 位置动画）。接入点选 sections.py build_log_row（Batch 49 后干净，未撞用户工作区改动文件，保持 ≤260 行 architecture 门禁）。从 _PENDING_WIRE 移除 Badge/BadgeKind/Chip/Divider/ToggleSwitch/InfoBanner/BannerKind/SegmentedControl 共 8 项（白名单从 10 降至 3：剩 Drawer + uninstall_tooltip + RichTooltip 设计内项）。install_card_shadow 升级：enter 时从 L0 淡入到目标 level（消费 DURATION_CONTAINER=300ms + EASE_OUT_QUART，对齐 Material 3 emphasized container transform 语义）。show_log_info_banner fly-in 位置动画消费 DURATION_FLYOUT=187ms + EASE_OUT_QUINT。从 _RESERVED_TOKENS 移除 4 个 token（白名单从 9 降至 5：剩 PROGRESS/DRAWER/SCROLL/EASE_IN_QUART/EASE_OUT_QUAD 待后续场景）。QSS 补 6 个新场景 objectName 占位（serialStationLogConnectionBadge/ActiveFilterChip/AutoScrollToggle/AutoScrollLabel/LogViewModeSegmented/LogInfoBanner，自绘控件 QSS 契约占位满足 test_theme_quality 覆盖门禁）。13 个 ui_smoke 测试覆盖 widget 构造/信号/badge kind 配色/fly-in 动画/分段 setCurrent 切换/Divider 带标签/InfoBanner dismissed 信号。micro_interactions.py 精简 docstring 保持 ≤300 行铁律 20。全量 pytest 1691 passed（+5 ui_smoke +8 守护 from 1678 baseline），lint clean，smoke exit 0 |
 | 718 | Batch 52 — Drawer wire（最后一个死 widget）+ DURATION_DRAWER 消费 + QSS 拆分 | Drawer 接入 log_options_bar：build_history_drawer 构建右侧滑入抽屉（命令历史占位），history_btn 触发，set_content 承载占位 QLabel。drawer.py open() 动画从 DURATION_NORMAL 改为 DURATION_DRAWER=300ms（消费预留 token，匹配 Material 抽屉观感）。从 _PENDING_WIRE 移除 Drawer（白名单降至 2 项：uninstall_tooltip + RichTooltip 设计内项），从 _RESERVED_TOKENS 移除 DURATION_DRAWER（降至 4 项）。QSS 拆分：qss_sections_controls.py 因 Batch 51-52 新增段超 300 行，抽出 qss_sections_log_options.py（57 行独立段文件），qss_builder 注册 log_options_section()。修复 log_options_bar.py 重复 QLabel import（ruff F811）。全量 pytest 1698 passed（+7 from 1691），lint clean，smoke exit 0 |
 | 720 | Batch 53 — 消费 3 个预留动画 token（PROGRESS/EASE_IN_QUART/EASE_OUT_QUAD） | progress_ring.py value 动画 DURATION_NORMAL→DURATION_PROGRESS（进度条专用 150ms，更短更快反馈）。info_banner.py slide-out DURATION_NORMAL+EASE_IN→DURATION_FAST+EASE_IN_QUART（离场四分位缓动，比 EASE_IN 更急促收尾）。segmented.py indicator 滑动 EASE_OUT→EASE_OUT_QUAD（轻量出场缓动）。从 _RESERVED_TOKENS 移除 3 个，剩 DURATION_SCROLL 待「滚动到视图」场景（列表项点击定位）。白名单最终：_PENDING_WIRE 2 项（设计内）+ _RESERVED_TOKENS 1 项（待场景）。全量 pytest 1698 passed，lint clean，smoke exit 0 |
+| 723 | Batch 54 — tr() + objectName 合规审计（对标铁律 16/19） | 修复 1 个 tr() 违规（ble_panel.py:78 "handle" 加 widget.tr()）+ ~30 个 objectName 违规集中在 ui/tools/ 4 文件（crc_calculator 加 _labeled helper + 12 widget objectName，byte_frequency/hex_viewer/timestamp_converter 各加 input mode label + radio + combo + edit objectName）。crc_calculator.py 精简 docstring/QSS 压缩保持 ≤300 行。新建 qss_sections_tools.py（25 objectName 契约占位，泛型样式由各面板内联 _PANEL_QSS 处理）+ qss_builder 注册 tools_section()。新建 test_tr_compliance.py 守护测试（AST 扫描 QLabel/QPushButton/setToolTip 等 API 第一参数，检测未包裹 tr 的字面量字符串，软模式默认 STRICT_TR=1 硬模式，0 违规）。objectName 守护测试因误报率高（340 临时构造误判）放弃，tr 守护更精确。全量 pytest 1699 passed（+1 守护），lint clean，smoke exit 0 |
 
 ---
 

@@ -75,7 +75,7 @@ class BlePanel:
         # GATT 树。
         self._tree = QTreeWidget(widget)
         self._tree.setObjectName("serialStationBleGattTree")
-        self._tree.setHeaderLabels((widget.tr("UUID"), widget.tr("属性"), widget.tr("值(hex)"), "handle"))
+        self._tree.setHeaderLabels((widget.tr("UUID"), widget.tr("属性"), widget.tr("值(hex)"), widget.tr("handle")))
         self._tree.itemSelectionChanged.connect(self._on_tree_select)
         layout.addWidget(self._tree, 1)
 
