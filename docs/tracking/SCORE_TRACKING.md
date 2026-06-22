@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 877分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 123分
+> 当前: 878分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 122分
 
 ---
 
@@ -527,6 +527,7 @@
 | 875 | Batch 211 — RttPanel build 装配 + 通道/收发/演示模式边界（15 测试） | 新建 test_rtt_panel_build_boundary.py（206 行）：_DEMO_CHANNELS(2)/_DEMO_LINES(4) 常量 + _RttSignalBridge bytes/error 双信号 emit + RttPanel.build 全控件（channel_combo 2 通道）+ _on_bytes 首帧 hide empty + decode replace + _on_error [err] 前缀 + _clear 重置 + _start 演示模式（BLUE/session/stub/timer 兼容呼吸 GC）+ _demo_tick index 递增 + on_enter anims + _stop 清空 session/timer。 |
 | 876 | Batch 212 — SessionManager 会话持久化/节流/崩溃恢复/清理边界（19 测试） | 新建 test_session_manager.py（194 行）：SESSION_EXTENSION/AUTOSAVE_INTERVAL_S/_MARKER_SUFFIX 常量 + __init__ 默认/now_ns + save+load 往返（字段一致）+ save 自动建父目录 + save 无效路径 False + load 不存在 None + load 损坏不崩溃 + autosave 首次立即/间隔内节流/超间隔再写 + has_crash_recovery 存在非空/缺失/空文件 + clear 删会话/删 .lock.tmp/幂等。 |
 | 877 | Batch 213 — ScriptPlayer 脚本回放器边界（16 测试） | 新建 test_script_player.py（182 行）：MIN_SPEED/MAX_SPEED 常量 + __init__ 默认状态 + is_loaded/action_count/current_index/speed 属性 + set_speed clamp（低/高/正常/边界）+ load 重置 index + stop 既有播放 + play 未加载/末尾无效 + stop 重置 + step_next 顺序返回 + position_changed 递增 + action_ready 携带 ScriptAction + 越界 finished emit None + 未加载 None。 |
+| 878 | Batch 214 — FakeSerialTransport 内存传输边界（15 测试） | 新建 test_fake_serial_transport.py（156 行）：__init__ 默认状态 + open 成功（is_open/config 存储/返回 True）+ open 错误（open_error 触发 error callback/is_open False/返回 False）+ close + write 关闭态返回 0+error + write 打开态追加 written + 累积 + bytes 拷贝防 mutate + inject_rx 分发多回调 + bytes 拷贝 + on_error 多回调 + 完整生命周期。 |
 
 ---
 
