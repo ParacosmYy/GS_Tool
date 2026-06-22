@@ -16,7 +16,7 @@
 | 工程状态 | `E5` 可维护收口（CI + lint 六系列 + 守护测试） | `uv run test-embeddebug-py` + `uv run lint-embeddebug-py` |
 | 用户状态 | `U3`，Serial Station 主流程已有可见入口 | `uv run start-embeddebug` |
 | 设备状态 | `D2`，TCP/UDP 已有替身或 loopback 验证，真实硬件仍需补证 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
-| 评分进度 | `618 / 1000` | `docs/tracking/SCORE_TRACKING.md` |
+| 评分进度 | `772 / 1000`（本会话 +69 分，50 commits） | `docs/tracking/SCORE_TRACKING.md` |
 
 ## 产品能力
 
