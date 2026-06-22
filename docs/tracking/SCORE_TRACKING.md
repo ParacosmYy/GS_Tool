@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 908分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 92分
+> 当前: 909分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 91分
 
 ---
 
@@ -558,6 +558,7 @@
 | 906 | Batch 242 — build_connection_toolbar 整体装配边界（13 测试） | 新建 test_build_connection_toolbar_boundary.py（132 行）：返回 QHBoxLayout + protocol_combo objectName + 初始 raw_data + 3 项 + port_combo/refresh_ports_button objectName + 5 个 serial config combos（baud/data_bits/parity/stop_bits/flow_control）objectName + connect/connect_serial/disconnect buttons objectName + disconnect 初始 disabled + connect_serial 无串口时 disabled + tcp/udp endpoint controls 附加（QLineEdit/QLineEdit/QPushButton）+ tcp 默认 endpoint（127.0.0.1/19000）。mock owner 含 _controller（available_protocols/available_serial_ports）+ _profile_label/_status_label QWidget（root 父）。 |
 | 907 | Batch 243 — sections build_profile_row + build_footer owner 属性契约（9 测试） | 新建 test_sections_profile_footer_boundary.py（98 行）：build_profile_row 返回 QHBoxLayout + 创建 _profile_path_edit（QLineEdit + objectName serialStationProfilePathEdit + placeholder）+ _profile_name_edit（QLineEdit + objectName serialStationProfileNameEdit）+ _save_profile_button（QPushButton + objectName serialStationSaveProfileButton）+ _load_profile_button（QPushButton + objectName serialStationLoadProfileButton）+ build_footer 返回 QHBoxLayout + 创建 _clear_button（QPushButton + objectName serialStationClearButton + tooltip 非空）。 |
 | 908 | Batch 244 — sections build_inject_row owner 属性契约（5 测试） | 新建 test_sections_inject_row_boundary.py（66 行）：build_inject_row 返回 QHBoxLayout + 创建 _inject_edit（QLineEdit + objectName serialStationInjectEdit + placeholder 非空）+ _inject_button（QPushButton + objectName serialStationInjectButton + tooltip 非空）。 |
+| 909 | Batch 245 — sections build_log_row owner 属性契约（11 测试） | 新建 test_sections_log_row_boundary.py（120 行）：build_log_row 返回 QVBoxLayout + 创建 _log_filter_combo（QComboBox + objectName serialStationLogFilterCombo + 初始 All + 5 项 All/TX/RX/System/Error）+ _log_search_edit（QLineEdit + objectName serialStationLogSearchEdit + placeholder）+ _log_path_edit（QLineEdit + objectName serialStationLogPathEdit）+ _log_stats_label（QLabel + objectName serialStationLogStatsLabel）+ _export_log_button（QPushButton + objectName serialStationExportLogButton）+ _replay_log_button（QPushButton + objectName serialStationReplayLogButton）+ _log_info_banner 创建。 |
 
 ---
 
