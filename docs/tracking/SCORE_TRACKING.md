@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 800分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 200分
+> 当前: 801分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 199分
 
 ---
 
@@ -450,6 +450,7 @@
 | 798 | Batch 130 — _empty_state_overlay + _accent_row 单元测试（15 测试） | 并发会话新建 test_dashboard_empty_state.py（6 测试）+ test_settings_accent_row.py（9 测试）。覆盖剩余 2 个未测 UI helper 小模块。 |
 | 799 | Batch 131 — RecordingExporter 失败路径 + _channel_indices 边界（+12 测试） | 本会话扩展 test_recording.py（6→16）：失败路径（源不存在 / 未知通道）+ 通道选择（None/[]/显式顺序/子集数值/同格式复制）+ _channel_indices 静态助手（None+空 / 已知名称顺序 / 未知名 KeyError）。辅助 _write_source 抽取样板，文件 232 行 ≤250（治理测试已恢复）。 |
 | 800 | Batch 131 — layout_main 三区分栏装配契约单元测试（10 测试） | 并发会话新建 test_layout_main_contract.py（152 行）：assemble_three_zone QSplitter + objectName + handleWidth=4 + count=3 + 三区 objectName 契约 + 最小宽度 + owner 注入 + 中区卡最小高度。用 mock layout builders 避免重组件树。 |
+| 801 | Batch 133 — serial_panel 包装契约单元测试（9 测试） | 新建 test_serial_panel_contract.py（113 行）：SerialPanel 构造 window=None + build 返回 QWidget wrapper objectName=serialStationSerialPanel + build 后 window 暴露 SerialStationMainWindow + wrapper 有 layout + on_enter/on_leave 空实现不抛异常（含 build 前调用）+ 重复 build 创建新 window 实例。覆盖最后一个未测 UI 模块 serial_panel.py。 |
 
 ---
 
