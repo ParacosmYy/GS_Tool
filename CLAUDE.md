@@ -112,7 +112,7 @@
 | 评分 | 774（见 [docs/tracking/SCORE_TRACKING.md](docs/tracking/SCORE_TRACKING.md)） |
 | Git分支 | `feat/embed-debug` |
 | Git远程 | `https://github.com/ParacosmYy/GS_Tool.git` |
-| 测试文件数 | 112（2026-06-22 精简，原 168） |
+| 测试文件数 | 170（Batch 49-103 新增 58 个测试文件） |
 | 测试通过 | 2034 passed, 2 skipped, 0 failed |
 
 ### Python/PyQt 命令
