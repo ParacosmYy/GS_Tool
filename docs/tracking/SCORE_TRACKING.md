@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 741分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 259分
+> 当前: 742分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 258分
 
 ---
 
@@ -387,6 +387,11 @@
 | 734 | Batch 60 — 启用 SIM 系列 flake8-simplify + 10 处修复 | 从 [tool.ruff.lint].select 加 SIM。修复：SIM300 Yoda 条件（3处自动修复）；SIM108 if-else→ternary（measurement setup + 自动修复 hex_viewer 等）；SIM103 return condition directly（test_tr_compliance + 自动修复 xmodem/ymodem）；SIM114 合并 if 分支（test_tr_compliance 自动修复）；SIM118 key in dict.keys()→key in dict（settings_service 自动修复）。ignore SIM105（contextlib.suppress，40处防御性代码保留 try/except）、SIM102（嵌套if合并降低可读性）、SIM115（context manager 改变资源语义）。lint 现在 F+UP+B+SIM 四系列强制。全量 pytest 1699 passed，lint clean，smoke exit 0。 |
 | 736 | Batch 61 — 启用 RUF 系列 ruff-specific + 12 处修复 | 从 [tool.ruff.lint].select 加 RUF。修复：RUF005 collection literal+concat（unsafe-fix）、RUF015 single element concat、RUF007、RUF059 unused __all__ 等 12 处（自动 + unsafe-fixes）。waveform_engine.py OpenGL import 改 importlib.util.find_spec（更 Pythonic 的可用性检测）。ignore RUF001/002/003（中文注释 Unicode 警告，7900+ 处不适合中文项目）、RUF012（mutable class var，语义改动大）。恢复 dashboard_panel QFileDialog noqa: F401（RUF unsafe-fix 误删，测试 module attr 访问依赖）。lint 现在 F+UP+B+SIM+RUF 五系列强制。全量 pytest 1699 passed，lint clean，smoke exit 0。 |
 | 737 | Batch 62 — 启用 C4 系列 flake8-comprehensions | 从 [tool.ruff.lint].select 加 C4。修复 C408 dict()→literal（test_ui_texts _FILTER_KW）。PT 系列（128 个）评估后放弃：PT018（90个 for 循环 assert）改造成本极高，PT011（34个 match=）手动量太大，收益边际。lint 现在 F+UP+B+SIM+RUF+C4 六系列强制。全量 pytest 1699 passed，lint clean，smoke exit 0。 |
+| 738 | Batch 63 — CLAUDE.md ROADMAP 审计（第一优先级全完成） | 标记已完成项：UX-04 快捷键（shortcuts/ 包）、UX-05 响应式布局（responsive_layout.py）、Dashboard 持久化、Doxygen（340/348 = 98% docstring）。第一优先级 4 项全 ✅。 |
+| 739 | Batch 64 — CLAUDE.md 第二优先级审计 | MQTT TopicModel/BLE GattModel 改用 stub+codec 模式（无空壳 model）；DBC 解析器 can/dbc.py（145 行）。第二优先级大部分已完成。 |
+| 740 | Batch 65 — README 质量门禁同步 + 工程状态 E4→E5 | README 质量门禁加 lint-embeddebug-py + CI 说明（STRICT 模式 + 六系列 lint）。工程状态 E4→E5（可维护收口）。 |
+| 741 | Batch 66 — MQTT client_stub 单元测试（11 测试） | 新建 test_mqtt_client_stub.py：生命周期/subscribe-publish 通配符/多订阅者/write 追加/error 回调。全量 pytest 1710 passed（+11），lint clean。 |
+| 741 | Batch 67 — SPI/I2C bridge_stub 单元测试（7 测试） | 新建 test_spi_i2c_bridge_stub.py：SPI 回环/I2C 读 WHO_AM_I/写后读回/多字节序列/无 register 失败/地址回绕/实例隔离。全量 pytest 1717 passed（+7），lint clean。 |
 
 ---
 
