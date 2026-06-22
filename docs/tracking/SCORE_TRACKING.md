@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 845分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 155分
+> 当前: 846分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 154分
 
 ---
 
@@ -495,6 +495,7 @@
 | 843 | Batch 179 — ble/transport_stub 边界（19 测试） | 新建 test_ble_transport_boundary.py（221 行）：DEFAULT_DEVICE_ADDRESS 常量 + 默认设备结构（2 服务+name+rssi+UART 可通知特征）+ connect 未知地址 False/正确地址 True/open(None) 默认 + discover_services（未连接空+报错/连接后 2 服务/拷贝）+ subscribe（可通知 True/不存在 False/不可通知 False）+ emit_notify（订阅后 True+推送/未订阅 False/未连接 False）+ close 清空 notify_handles+connected_address。补强 test_ble_transport_stub.py 未直接断言的 connect/discover/subscribe/emit_notify 边界路径。 |
 | 844 | Batch 180 — data_inspector/inspector 边界（18 测试） | 新建 test_data_inspector_boundary.py（196 行）：构造（默认 bin_count=16+自定义 32+outlier_threshold 属性+DEFAULT_OUTLIER_THRESHOLD 常量）+ inspect（单行/单通道/1D ValueError/默认通道名 ch0/ch1）+ _stat（min/max/mean/std 4 字段+std 正/常量=0）+ _correlations（2 通道正相关/单通道空/3 通道 3 对）+ 离群值检测（极端值检出/正常数据无）+ timestamp_ns 正。补强 test_data_inspector.py 未直接断言的构造参数+_stat/_correlations 私有 helper。 |
 | 845 | Batch 181 — ScaleAnimation._scaled_rect + CAN 常量 + CanFilter 边界（18 测试） | 新建 test_scale_can_constants.py（189 行）：_scaled_rect（factor=1 不变+0.5 减半+2 加倍+中心对齐+0 clamp min(1)）+ CAN 常量（CAN_MAX_DLC=8/CAN_FD_MAX_DLC=64/STANDARD_ID_MAX=0x7FF/EXTENDED_ID_MAX=0x1FFFFFFF）+ CanId（value=0 合法+as_hex 标准零填充 000/扩展 00000000）+ CanFrame（空 data dlc=0+to_payload 9 字段+空 dataHex 空串）+ CanFilter（is_extended=None 不检查/默认 mask=0 全匹配/部分 mask=0x700 高 3 位）。 |
+| 846 | Batch 182 — FadeTransition + SlideAnimation._offset + SlideDirection 边界（17 测试） | 新建 test_fade_slide_boundary.py（188 行）：SlideDirection 4 枚举+小写 value + _offset（LEFT x-/RIGHT x+/UP y-/DOWN y+ + distance=0 原位 + 另一轴不变）+ fade_in（返回 QPropertyAnimation + 0→1 + 自定义时长 + show）+ fade_out（返回 QPropertyAnimation + 1→0 + finished→hide receiver）+ cross_fade（返回 QParallelAnimationGroup + 2 子动画）。补强 test_animations_transitions 未直接断言的 _offset 4 方向 + fade_in/out start/end 值。 |
 
 ---
 
