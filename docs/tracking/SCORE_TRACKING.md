@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 831分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 169分
+> 当前: 832分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 168分
 
 ---
 
@@ -481,6 +481,7 @@
 | 829 | Batch 165 — icons _tint + button_icons helper + _BUTTON_ICON_MAP 契约（18 测试） | 新建 test_icons_helpers.py（196 行）：IconManager._tint（currentColor 替换 + 多 stroke 全替换 re.sub + 非 stroke 属性保留 + rgba 颜色注入 + 空 SVG + 无 stroke 不变）+ _BUTTON_ICON_MAP（非空 + 全 2 元组 + serialStation 前缀 + 含 connect/disconnect）+ _FOCUSABLE_WIDGET_TYPES（5 种 QLineEdit/QComboBox/QPlainTextEdit/QSpinBox/QDoubleSpinBox）+ _resolve_widget_class（已知=类对象/未知=None/全 5 focusable 可解析）+ _is_readonly（True/False/无属性=False）+ button_icon 委托 IconManager。补强 test_icons.py 未直接断言的 _tint 多 stroke + button_icons 私有 helper。 |
 | 830 | Batch 166 — palette_light 浅色主题常量契约（23 测试） | 新建 test_palette_light_constants.py（200 行）：核心常量值契约（BG_WINDOW=#f5f6f8 + BG_APP/BG_PANEL=#ffffff + TEXT_PRIMARY=#1e293b + ACCENT 以#0 开头）+ 浅色>深色亮度关系（BG_WINDOW/BG_PANEL 亮 + TEXT_PRIMARY 暗）+ 状态色存在（SUCCESS/WARNING/ERROR/TERM_*）+ ACCENT 系列（hover>pressed 亮度 + soft/border rgba + gradient from/to distinct）+ all_tokens() 返回 dict[str,str] + 键集与 dark 对齐 + 核心键 + BORDER/BG_INPUT/BG_DISABLED/SCROLLAR/BRAND_CHIP/TEXT_INVERTED 存在。补强 test_theme_switching.py 未直接断言的常量值契约。 |
 | 831 | Batch 167 — theme_store 常量契约 + _read_prefs_dict 迁移逻辑 + 合并写（23 测试） | 新建 test_theme_store_helpers.py（241 行）：常量契约（PREFS_FILENAME=theme_prefs.json/_LEGACY_ACCENT_FILENAME=accent.json/DEFAULT_THEME_ID=serial_station_dark/DEFAULT_ACCENT_ID=cyan/_SUBDIR=embeddebug）+ prefs_path/_legacy_accent_path 结构（文件名+子目录+同父目录）+ _read_prefs_dict 迁移（新文件优先+旧 accent.json 迁移+都不存在空+损坏 JSON 空+非 dict 空+空 accent 跳过）+ load_theme_prefs 回退默认（无文件/非字符串/空串）+ save_theme_prefs 合并写（None 保留旧值+部分更新+创建父目录+无 .tmp 残留）。补强 test_theme_core.py 未直接断言的 _read_prefs_dict 迁移逻辑 + 常量值。 |
+| 832 | Batch 168 — theme_switcher _dark_to_light_map + build_themed_qss + default_accent_id（18 测试） | 新建 test_theme_switcher_helpers.py（171 行）：常量契约（THEME_DARK/LIGHT/AVAILABLE_THEMES=2）+ default_accent_id=cyan + _dark_to_light_map（非空 dict + 只含 dark≠light 项 + 值来自 light_tokens + 键来自 dark_tokens + 含 BG_WINDOW）+ build_light_qss（非空 + 含 light.TEXT_PRIMARY + 不含 dark.BG_WINDOW 已替换）+ build_themed_qss（dark/light 非空 + 两者不同 + accent 不崩溃 + dark 含 dark.BG + light 不含 dark.BG）。补强 test_theme_switching.py 未直接断言的 _dark_to_light_map 结构 + build_themed_qss 路径分支。 |
 
 ---
 
