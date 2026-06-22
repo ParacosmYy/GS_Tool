@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 842分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 158分
+> 当前: 843分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 157分
 
 ---
 
@@ -492,6 +492,7 @@
 | 840 | Batch 176 — elevation_effect 阴影工厂全覆盖（16 测试） | 新建 test_elevation_effect.py（181 行）：返回 QGraphicsDropShadowEffect + 默认 level=L1 + L0-L5 各级参数映射（blur/offset_y/alpha 精确）+ offset_x 全 0（只向下）+ blur 随层级递增 + color=None 黑色+alpha（L0 alpha=0 透明）+ 自定义 color 保留 RGB + level alpha 覆盖 color alpha（L0 alpha=0）+ 自定义三元组。覆盖此前 0 直接测试的 elevation_effect 工厂函数。 |
 | 841 | Batch 177 — mqtt/client_stub + spi_i2c/bridge_stub 边界（23 测试） | 新建 test_mqtt_spi_bridge_boundary.py（248 行）：MqttClientStub（connect 委托 open + open(None) 创建默认 config + open 非 MqttConfig 默认 + close 清空订阅 + subscribe 未 open False + publish 返回匹配计数 + 无匹配 0 + str payload + write 返回字节数 + on_bytes_received 注册 + config None before open）+ SpiI2cBridgeStub 常量（REG_WHO_AM_I=0x75/WHO_AM_I_VALUE=0x68）+ xfer_spi 空字节/原样回环 + read_i2c 不存在=0x00 + 自定义寄存器 + write 覆盖 + 无效地址 ValueError + 10-bit 高地址允许 + 多字节顺序写。 |
 | 842 | Batch 178 — OtaProgress 状态转换 + OtaConfig 常量边界（22 测试） | 新建 test_ota_progress_boundary.py（226 行）：OtaProgress.begin（state→TRANSFERRING+重置 sent/block/errors+total_bytes clamp 负值/0 合法）+ complete（→COMPLETE）+ fail（→FAILED）+ 默认 IDLE + mark_error 递增 + mark_sent block_index+1/sent 累加/0 字节 + percent begin 后精确+2 位小数 + _VALID_BLOCK_SIZES=(128,1024) + OtaConfig 默认值（protocol=XMODEM/block=128/retry=10/crc=True）+ retry<0 ValueError + OtaProtocol 3 成员 str Enum + OtaState 4 成员。补强 test_ota_config.py 未直接断言的 begin/complete/fail/mark_error 状态转换。 |
+| 843 | Batch 179 — ble/transport_stub 边界（19 测试） | 新建 test_ble_transport_boundary.py（221 行）：DEFAULT_DEVICE_ADDRESS 常量 + 默认设备结构（2 服务+name+rssi+UART 可通知特征）+ connect 未知地址 False/正确地址 True/open(None) 默认 + discover_services（未连接空+报错/连接后 2 服务/拷贝）+ subscribe（可通知 True/不存在 False/不可通知 False）+ emit_notify（订阅后 True+推送/未订阅 False/未连接 False）+ close 清空 notify_handles+connected_address。补强 test_ble_transport_stub.py 未直接断言的 connect/discover/subscribe/emit_notify 边界路径。 |
 
 ---
 
