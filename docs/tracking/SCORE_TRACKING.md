@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 874分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 126分
+> 当前: 875分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 125分
 
 ---
 
@@ -520,6 +520,11 @@
 | 868 | Batch 204 — top_bar build helpers + connection_toolbar _install_rich_tooltips/_serial_config_combo 边界（9 测试） | 新建 test_topbar_toolbar_boundary.py（143 行）：build_top_bar（返回 QFrame+objectName+layout）+ _build_brand_chip（返回 QFrame+objectName）+ _build_brand_text（返回 QWidget）+ _install_rich_tooltips（不崩溃）+ _serial_config_combo（返回 QComboBox+objectName+tooltip）。 |
 | 869 | Batch 205 — command_section build_send_row + sections build_*_row/footer 边界（9 测试） | 新建 test_sections_boundary.py（179 行）：build_send_row（返回 QHBoxLayout+_send_edit objectName+_command_history_combo objectName+_send_button QPushButton+_send_edit QLineEdit）+ build_inject_row（返回 QHBoxLayout 不崩溃）+ build_log_row（返回 QVBoxLayout）+ build_profile_row（返回 QHBoxLayout）+ build_footer（返回 QHBoxLayout）。用 fake host 避免重组件树。 |
 | 870 | Batch 206 — waveform_preview set_connecting/_update_stats + SettingsPanel build tabs 边界（11 测试） | 新建 test_preview_settings_boundary.py（155 行）：set_connecting（True/False/toggle 不崩溃）+ _update_stats（正常/空 batch 不崩溃）+ cursor_manager 初始可访问 + SettingsPanel.build（返回 QWidget+objectName）+ _build_theme_tab/_build_shortcuts_tab/_build_about_tab（返回 QWidget）。 |
+| 871 | Batch 207 — SvdPanel/AutomationPanel build 装配 + on_enter/leave 边界（19 测试） | 新建 test_domain_panels_build_boundary.py（227 行）：SvdPanel.build（objectName + tree/field_table/detail_form/status_dot/device_label 全控件）+ _FIELD_COLUMNS 常量 + AutomationPanel.build（engine/rule_table/log/status_dot + 默认规则注入）+ _COLUMNS 常量 + on_enter 生成 _enter_anims + on_leave 置 _active False + _default_rules 全部未启用 + _trigger_summary 三分支 + _action_summary 四分支。 |
+| 872 | Batch 208 — OtaPanel build 装配 + _PlaceholderLineEdit/_OtaSignalBridge/_on_progress 边界（16 测试） | 新建 test_ota_panel_build_boundary.py（203 行）：_PROTOCOL_OPTIONS 4 协议契约 + _PlaceholderLineEdit setText 同步 label+toolTip + _OtaSignalBridge progress/finished emit + OtaPanel.build 全控件 + _refresh_connection_state 未连接 + _on_progress total=0 不除零 + _on_finished success/failure 两路径。 |
+| 873 | Batch 209 — CanPanel build 装配 + 帧处理/清空/发送/on_leave 边界（16 测试） | 新建 test_can_panel_build_boundary.py（201 行）：_COLUMNS(7)/_DEMO_FRAMES(3 含扩展帧) 常量 + _CanSignalBridge frame_decoded emit + CanPanel.build 全控件 + _on_events 过滤非 frame + 首帧 hide empty + _clear 重置 + _send 未连接 warning + on_enter 生成 anims + on_leave 防御。 |
+| 874 | Batch 210 — BlePanel build 装配 + 扫描/连接/读写/订阅/notify 边界（16 测试） | 新建 test_ble_panel_build_boundary.py（220 行）：_STUB_ADDRESS 常量 + _BleSignalBridge 双信号 emit + BlePanel.build 全控件 + _scan 填充 combo + _connect 未扫描/连接/断开（兼容 StatusDot 呼吸 GC）+ _read_char 未连接/未找到/合法 + _write_char 非法/合法 hex + on_enter/on_leave 关闭 transport。 |
+| 875 | Batch 211 — RttPanel build 装配 + 通道/收发/演示模式边界（15 测试） | 新建 test_rtt_panel_build_boundary.py（206 行）：_DEMO_CHANNELS(2)/_DEMO_LINES(4) 常量 + _RttSignalBridge bytes/error 双信号 emit + RttPanel.build 全控件（channel_combo 2 通道）+ _on_bytes 首帧 hide empty + decode replace + _on_error [err] 前缀 + _clear 重置 + _start 演示模式（BLUE/session/stub/timer 兼容呼吸 GC）+ _demo_tick index 递增 + on_enter anims + _stop 清空 session/timer。 |
 
 ---
 
