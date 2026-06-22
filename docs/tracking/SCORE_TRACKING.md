@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 905分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 95分
+> 当前: 906分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 94分
 
 ---
 
@@ -555,6 +555,7 @@
 | 903 | Batch 239 — log_options_bar build/show/update boundary 边界（12 测试） | 新建 test_log_options_bar_boundary.py（122 行）：build_log_options_bar 返回 QHBoxLayout 不崩 + build_history_drawer 返回 Drawer + objectName serialStationHistoryDrawer + build_log_info_banner 返回 InfoBanner + objectName serialStationLogInfoBanner + 初始 hide + show_log_info_banner None 安全跳过 + set_text/set_kind/show + set_kind ERROR + update_connection_badge None 安全 + connected→SUCCESS + disconnected→INFO + None disconnected 安全。 |
 | 904 | Batch 240 — build_connection_card 重排 toolbar 控件边界（8 测试） | 新建 test_build_connection_card_boundary.py（136 行）：build_connection_card 返回 QFrame + 空 toolbar 不崩 + Port 组（serialStationPortCombo）常驻 + Connect 组（serialStationConnectButton）常驻 + Serial 组（serialStationBaudCombo）折叠 + Endpoints 组（serialStationTcpHostEdit）折叠 + 未识别控件（unknownWidget）进 Other 折叠组 + 混合 Port+Serial+Unknown 全部分组不崩。 |
 | 905 | Batch 241 — serial_station 包 __init__ 导出契约（14 测试） | 新建 test_package_exports_boundary.py（132 行）：core 导出 ChannelBatch/ChannelRingBuffer + can 导出 CanFrame/CanId/CanFilter/CanFrameCodec/PROTOCOL_NAME + __all__ 全可访问 + ble 导出 BleFrameCodec/BleFrameEvent/BleTransportStub + mqtt 导出 MqttConfig/MqttMessage/MqttClientStub + spi_i2c 导出 SpiConfig/I2cConfig/SpiI2cFrameCodec/SpiI2cBridgeStub + ota 导出 TransferResult/make_protocol/OtaProtocolKind/TransferEngine + protocols 导出 RawDataProtocol/FireWaterProtocol/JustFloatProtocol + rtt 导出 RttConfig/RttChannel/RttSession/RttTransportStub + automation 导出 AutomationEngine/AutomationRule/TriggerCondition/AutomationAction + drivers 导出 SerialTransport/SerialPortConfig + session 导出 SessionState/SessionSerializer/SessionManager + notifications 导出 NotificationLevel/NotificationManager + shared 导出 OperationResult/OperationError。 |
+| 906 | Batch 242 — build_connection_toolbar 整体装配边界（13 测试） | 新建 test_build_connection_toolbar_boundary.py（132 行）：返回 QHBoxLayout + protocol_combo objectName + 初始 raw_data + 3 项 + port_combo/refresh_ports_button objectName + 5 个 serial config combos（baud/data_bits/parity/stop_bits/flow_control）objectName + connect/connect_serial/disconnect buttons objectName + disconnect 初始 disabled + connect_serial 无串口时 disabled + tcp/udp endpoint controls 附加（QLineEdit/QLineEdit/QPushButton）+ tcp 默认 endpoint（127.0.0.1/19000）。mock owner 含 _controller（available_protocols/available_serial_ports）+ _profile_label/_status_label QWidget（root 父）。 |
 
 ---
 
