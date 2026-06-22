@@ -43,6 +43,20 @@ QWidget#serialStationWaveformLegend {{
     background-color: transparent;
     border-top: {T.BORDER_THIN} solid {P.BORDER};
 }}
+/* Batch 49-3: 连接加载态覆盖层（ProgressRing 居中 + 文案）。
+   复用 BG_OVERLAY 模态遮罩色，覆盖在 plot 上方，对齐铁律 18 过渡动画语义。 */
+QWidget#serialStationWaveformLoadingOverlay {{
+    background-color: {P.BG_OVERLAY};
+    border-radius: {T.RADIUS_LG};
+}}
+QWidget#serialStationWaveformLoadingRing {{
+    background-color: transparent;
+}}
+QLabel#serialStationWaveformLoadingLabel {{
+    color: {P.TEXT_PRIMARY};
+    font-size: {T.FONT_MD};
+    padding: {T.SPACING_SM} {T.SPACING_MD};
+}}
 QLabel#serialStationWaveformLegendChip {{
     background-color: transparent;
     font-size: {T.FONT_SM};

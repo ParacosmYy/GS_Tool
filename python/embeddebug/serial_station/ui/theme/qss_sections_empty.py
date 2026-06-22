@@ -57,4 +57,26 @@ QWidget#serialStationSkeleton,
 QWidget#serialStationSkeletonBlock {{
     background-color: transparent;
     border: none;
+}}
+/* Batch 49-2: 日志连接加载态覆盖层（SkeletonBlock + 「正在建立连接…」文案）。
+   复用 BG_OVERLAY 模态遮罩色，覆盖在 log_view 上方。 */
+QWidget#serialStationLogLoadingOverlay {{
+    background-color: {P.BG_OVERLAY};
+    border-radius: {T.RADIUS_LG};
+}}
+QWidget#serialStationLogLoadingSkeleton {{
+    background-color: transparent;
+    border: none;
+}}
+QLabel#serialStationLogLoadingLabel {{
+    background-color: transparent;
+    color: {P.TEXT_MUTED};
+    font-size: {T.FONT_SM};
+    padding: {T.SPACING_XS} {T.SPACING_MD};
+}}
+/* Batch 49-5: 连接按钮内嵌 ProgressRing（加载态旋转指示器）。
+   透明背景，由按钮 background 透出。 */
+QWidget#serialStationButtonLoadingRing {{
+    background-color: transparent;
+    border: none;
 }}"""

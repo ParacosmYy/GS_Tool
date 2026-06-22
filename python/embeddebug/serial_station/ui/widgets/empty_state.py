@@ -135,14 +135,41 @@ class EmptyStateWidget(QWidget):
 
         from embeddebug.serial_station.ui.animations.fade import FadeTransition
 
-        # 停止进行中的淡入动画（连续触发时）。
-        old = getattr(self, "_fade_anim", None)
-        if old is not None:
-            try:
-                old.stop()
-            except Exception:
-                pass
+        # 停止进行中的反向动画（连续触发时避免 fade_out 仍把 widget 隐藏）。
+        self._stop_inflight_fade()
         kwargs = {} if duration is None else {"duration": duration}
         anim = FadeTransition.fade_in(self, **kwargs)
         anim.start()
         self._fade_anim = anim
+
+    def hide_with_fade(self, duration: int | None = None) -> None:
+        """淡出隐藏空状态（Batch 49-1：日志/波形/仪表盘首条数据到达时调用）。
+
+        与 ``show_with_fade`` 对称：用 ``FadeTransition.fade_out`` 做透明度 1→0
+        过渡（默认 DURATION_FAST=160ms），动画结束后 widget 由 fade_out 自带
+        的 ``finished → hide`` 钩子隐藏。相比 ``.hide()`` 瞬切，淡出更平滑，
+        对齐铁律 18「面板切换必须有过渡动画」。
+
+        Args:
+            duration: 淡出时长（ms），默认用 FadeTransition 默认值（DURATION_FAST=160）。
+        """
+
+        from embeddebug.serial_station.ui.animations.fade import FadeTransition
+
+        # 停止进行中的反向动画（连续触发时避免 fade_in 又把 widget 显示回来）。
+        self._stop_inflight_fade()
+        kwargs = {} if duration is None else {"duration": duration}
+        anim = FadeTransition.fade_out(self, **kwargs)
+        anim.start()
+        self._fade_anim = anim
+
+    def _stop_inflight_fade(self) -> None:
+        """停止进行中的淡入/淡出动画（连续触发空态切换时防叠加）。"""
+
+        old = getattr(self, "_fade_anim", None)
+        if old is None:
+            return
+        try:
+            old.stop()
+        except Exception:
+            pass

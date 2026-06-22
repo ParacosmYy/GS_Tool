@@ -17,6 +17,11 @@ class LogActionHost(Protocol):
 
 
 def append_log_entry(host: LogActionHost, entry: SerialWorkbenchLogEntry) -> None:
+    # Batch 49-1: 首条日志写入前淡出空态占位（0→1 转换，仅一次）。
+    if not host._controller.entries:
+        from embeddebug.serial_station.ui.log_empty_state import hide_log_empty_state
+
+        hide_log_empty_state(host)
     if not log_entry_visible(host, entry):
         update_log_stats(host)
         return

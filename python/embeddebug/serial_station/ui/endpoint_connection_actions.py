@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from embeddebug.serial_station.ui.connection_actions import _set_loading
+from embeddebug.serial_station.ui.connection_actions import (
+    _hide_log_loading,
+    _set_loading,
+    _set_waveform_connecting,
+    _show_log_loading,
+)
 from embeddebug.serial_station.ui.endpoint_validation import validate_endpoint_fields
 from embeddebug.serial_station.ui.status_messages import set_result_status, set_status_text
 
@@ -23,8 +28,13 @@ def connect_tcp(host: EndpointConnectionActionHost) -> None:
         return
     tcp_host, port = endpoint
     _set_loading(getattr(host, '_connect_tcp_button', None), True)
+    # Batch 49-2/49-3: 同步日志 + 波形加载态。
+    _show_log_loading(host)
+    _set_waveform_connecting(host, True)
     result = host._controller.connect_tcp_result(tcp_host, port)
     _set_loading(getattr(host, '_connect_tcp_button', None), False)
+    _set_waveform_connecting(host, False)
+    _hide_log_loading(host)
     if result.ok:
         set_result_status(
             host,
@@ -49,8 +59,13 @@ def connect_udp(host: EndpointConnectionActionHost) -> None:
         return
     udp_host, port = endpoint
     _set_loading(getattr(host, '_connect_udp_button', None), True)
+    # Batch 49-2/49-3: 同步日志 + 波形加载态。
+    _show_log_loading(host)
+    _set_waveform_connecting(host, True)
     result = host._controller.connect_udp_result(udp_host, port)
     _set_loading(getattr(host, '_connect_udp_button', None), False)
+    _set_waveform_connecting(host, False)
+    _hide_log_loading(host)
     if result.ok:
         local_port = host._controller.active_local_port or 0
         set_result_status(

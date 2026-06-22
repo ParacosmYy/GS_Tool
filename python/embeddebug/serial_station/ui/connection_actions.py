@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from PyQt6.QtWidgets import QApplication, QPushButton
+from PyQt6.QtWidgets import QPushButton
 
 from embeddebug.serial_station.ui.connection_control_state import set_connection_control_state
 from embeddebug.serial_station.ui.serial_connection_fields import read_serial_connection_fields
@@ -16,19 +16,16 @@ from embeddebug.serial_station.ui.status_messages import set_result_status, set_
 
 
 def _set_loading(button: QPushButton | None, loading: bool) -> None:
-    """Batch 47: 按钮加载态切换（连接中反馈）。None 时安全跳过。"""
-    if button is None:
-        return
-    if loading:
-        button._loading_orig_text = button.text()
-        button.setEnabled(False)
-        button.setText("…")
-        QApplication.processEvents()
-    else:
-        button.setEnabled(True)
-        orig = getattr(button, "_loading_orig_text", None)
-        if orig:
-            button.setText(orig)
+    """Batch 47/49-5: 按钮加载态切换（连接中反馈）。None 时安全跳过。
+
+    Batch 49-5 升级：原实现只 swap 文字「…」，现委托到
+    ``connection_loading.set_button_loading``，在按钮内嵌 indeterminate
+    ProgressRing（小尺寸居中），对齐 spec B49-5 加载态要求。
+    """
+
+    from embeddebug.serial_station.ui.connection_loading import set_button_loading
+
+    set_button_loading(button, loading)
 
 
 class ConnectionActionHost(Protocol):
@@ -43,8 +40,14 @@ class ConnectionActionHost(Protocol):
 
 def connect_fake(host: ConnectionActionHost) -> None:
     _set_loading(getattr(host, '_connect_button', None), True)
+    # Batch 49-2: 连接开始显示日志加载态（SkeletonBlock + 文案）。
+    _show_log_loading(host)
+    # Batch 49-3: 同步切换波形加载态（连接中显示 ProgressRing 覆盖层）。
+    _set_waveform_connecting(host, True)
     result = host._controller.connect_fake_result()
     _set_loading(getattr(host, '_connect_button', None), False)
+    _set_waveform_connecting(host, False)
+    _hide_log_loading(host)
     if result.ok:
         set_result_status(
             host,
@@ -68,6 +71,9 @@ def connect_serial(host: ConnectionActionHost) -> None:
         _notify(host, "warning", host.tr("请选择端口"), host.tr("串口端口为空，无法连接"))
         return
     _set_loading(getattr(host, '_connect_serial_button', None), True)
+    # Batch 49-2/49-3: 同步日志 + 波形加载态。
+    _show_log_loading(host)
+    _set_waveform_connecting(host, True)
     result = host._controller.connect_serial_result(
         fields.port_name,
         fields.baud_rate,
@@ -77,6 +83,8 @@ def connect_serial(host: ConnectionActionHost) -> None:
         flow_control=fields.flow_control,
     )
     _set_loading(getattr(host, '_connect_serial_button', None), False)
+    _set_waveform_connecting(host, False)
+    _hide_log_loading(host)
     if result.ok:
         set_result_status(
             host,
@@ -138,6 +146,9 @@ def disconnect(host: ConnectionActionHost) -> None:
     host._controller.disconnect()
     set_status_text(host, "Disconnected")
     host._set_connected_controls(False)
+    # Batch 49-2/49-3: 断开时确保加载态已隐藏（防御性，正常路径 connect 结束已 hide）。
+    _hide_log_loading(host)
+    _set_waveform_connecting(host, False)
     _notify(host, "info", host.tr("已断开"), host.tr("连接已关闭"))
 
 
@@ -165,3 +176,33 @@ def refresh_serial_ports(host: ConnectionActionHost) -> None:
         host, "info", host.tr("端口已刷新"),
         host.tr("发现 {n} 个串口端口").format(n=port_count),
     )
+
+
+def _show_log_loading(host: ConnectionActionHost) -> None:
+    """Batch 49-2: 显示日志连接加载态（委托 log_loading_state helper）。"""
+
+    from embeddebug.serial_station.ui.log_loading_state import show_log_loading_state
+
+    show_log_loading_state(host)
+
+
+def _hide_log_loading(host: ConnectionActionHost) -> None:
+    """Batch 49-2: 隐藏日志连接加载态。"""
+
+    from embeddebug.serial_station.ui.log_loading_state import hide_log_loading_state
+
+    hide_log_loading_state(host)
+
+
+def _set_waveform_connecting(host: ConnectionActionHost, connecting: bool) -> None:
+    """Batch 49-3: 切换波形连接加载态（ProgressRing 覆盖层）。
+
+    host 可能没有 _waveform_preview（测试场景或非主窗口），getattr 安全降级。
+    """
+
+    preview = getattr(host, "_waveform_preview", None)
+    if preview is None:
+        return
+    set_connecting = getattr(preview, "set_connecting", None)
+    if callable(set_connecting):
+        set_connecting(connecting)

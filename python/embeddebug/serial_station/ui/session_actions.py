@@ -35,6 +35,10 @@ def clear_log(host: SessionActionHost) -> None:
     host._controller.clear_log()
     clear_log_view(host._log_view)
     host._update_log_stats()
+    # Batch 49-1: 清空日志后重新淡入空态占位（可恢复，对齐铁律 5.9）。
+    from embeddebug.serial_station.ui.log_empty_state import show_log_empty_state
+
+    show_log_empty_state(host)
     set_status_text(host, "Log cleared")
 
 

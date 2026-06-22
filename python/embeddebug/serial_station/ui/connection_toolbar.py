@@ -63,15 +63,11 @@ def build_connection_toolbar(
     owner._refresh_ports_button.setObjectName("serialStationRefreshPortsButton")
     owner._refresh_ports_button.setToolTip(owner.tr("Refresh available serial ports (Ctrl+R)"))
     def _refresh_with_loading(_checked: bool = False) -> None:
-        btn = owner._refresh_ports_button
-        btn._orig_text = btn.text()
-        btn.setEnabled(False)
-        btn.setText(owner.tr("…"))
-        from PyQt6.QtWidgets import QApplication
-        QApplication.processEvents()
+        # Batch 49-5b: 复用 connection_actions._set_loading（消除重复逻辑）。
+        # 原 inline 实现 swap 文字「…」+ disable，现统一走 ProgressRing 加载态。
+        connection_actions._set_loading(owner._refresh_ports_button, True)
         owner._refresh_serial_ports()
-        btn.setEnabled(True)
-        btn.setText(btn._orig_text)
+        connection_actions._set_loading(owner._refresh_ports_button, False)
     owner._refresh_ports_button.clicked.connect(_refresh_with_loading)
     _install_rich_tooltips(owner)
 

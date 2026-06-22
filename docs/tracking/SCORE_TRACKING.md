@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 703分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 297分
+> 当前: 708分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 292分
 
 ---
 
@@ -373,6 +373,7 @@
 | 669 | Batch 43 + Batch 44 prep — UI/动画基建 + 30 按钮状态完整化（VOFA+/MobaXterm 对标第一批） | Batch 43 新增 4 模块：ColorTweenAnimation（颜色属性 tween，parse_color/format_color 支持 hex6/hex8/rgba，tween + tween_stylesheet 两个工厂，对标 VOFA+ 连接按钮深→浅蓝过渡）；StaggerCoordinator（编排：N 个动画工厂按 step_ms 错峰启动，cancel + finished + cancelled 信号，对标 Linear/Vercel 卡片入场）；ThemeSerializer（palette JSON 导出/导入，serialize_palette/deserialize_to_dict/apply_overrides + to_json/from_json/save/load + validate_color/snapshot，对标 MobaXterm .mxtcolors）；2 个守护测试（test_no_hardcoded_colors grep QColor 硬编码 + test_no_px_font_sizes grep setPixelSize/font-size:Npx，均用 STRICT_*_COLORS 环境变量切换软/硬模式）。Batch 44 prep：tokens.py 加 6 个 token（EASE_OUT_QUART/EASE_IN_QUINT/EASE_OUT_QUINT/EASE_MATERIAL_EMPHASIZED/DURATION_CONTAINER=297/KEYFRAME_PREVIEW=0.3/STAGGER_STEP_MS=60，对齐 Material 3 emphasized + 动画审计 P0-4）；30 个按钮补齐 :pressed + :disabled（tool 8 + domain primary 5 + domain secondary 11 + dashboard 5 + EmptyStateCTA 1，对齐 UI 审计 §2 P0）。研究：librarian 交付 VOFA+ appTheme token 系统名（bgColor/barColor/mainColor/cbColor1-4/iconColor1-3/textAnsiErr/Tx/Rx/Time）+ MobaXterm catppuccin RGB 值（bg=#1E1E2E fg=#CDD6F4）+ 8 层 50+ 项审计清单；explore 交付 UI 审计（30 按钮缺状态/6 卡片缺 hover-lift/27 按钮缺图标/Toast Unicode 字形/light theme 缺 6 CARD token/无 INFO 色）+ 动画审计（AppShell leave 隐形/PageSlide 死代码/GlowAnimation 死代码/cross_fade sequential bug/stagger_fade GC 风险）。全量 pytest 1649 passed + 2 skipped + 0 access violation，start-embeddebug --smoke exit 0 |
 | 703 |
 | 703 | Batch 47-48 — 死代码全激活 + 组件开发 + 全 token 迁移 + 加载态 + 动画修复 | 7 死代码激活（Skeleton/BouncePath/Typewriter/Glow/ElasticSnap/RichTooltip/InfoBanner-Chip SVG）；3 新组件（StatusBar+KeyboardShortcut+ToggleSwitch）；全连接加载态（fake/serial/tcp/udp+refresh+BLE）；全 typography token 系统（FONT_*/FONT_POINT_*/FONT_WEIGHT_*/LETTER_SPACING_*/SPACING_INT_*）；cross_fade parallel 修复；Dashboard canvas 空态提示 | Batch 44 — 22 个 domain panel 按钮图标补齐（UI 审计 §4.1 P0） | _BUTTON_ICON_MAP 从 13 条扩到 35 条：BLE 5 个（scan/bluetooth/eye/pencil/bell）+ CAN 3 个（send/trash-2/play）+ RTT 2 个（zap/trash-2）+ Automation 3 个（play/zap/refresh-cw）+ SVD 2 个（folder-open/cpu）+ OTA 2 个（folder-open/upload）+ Dashboard 5 个（plus/trash-2/save/folder-open/grid）+ Settings 1 个（check）。apply_button_icons 函数 findChild 容错（按钮不存在静默跳过，icon 不存在 IconManager 返回 null QIcon 跳过），所以多写 entry 也安全。颜色与 QSS 对齐：domain primary 用 TEXT_ON_ACCENT，secondary 用 TEXT_SECONDARY/TEXT_MUTED，TX 类用 TERM_TX，危险操作用 ERROR/WARNING。全量 pytest 1649 passed + 2 skipped + 0 access violation，smoke exit 0 |
+| 708 | Batch 49 — 加载态 + 空态完善（对标铁律 5.9 三轴口径） | 6 子任务：B49-1 Log 空态（EmptyStateWidget inbox 图标 + 「暂无日志」，首条日志 hide_with_fade，清空 show_with_fade）；B49-2 Log 加载态（SkeletonBlock 3 行 + 「正在建立连接…」，4 条连接路径 fake/serial/tcp/udp 同步切换）；B49-3 Waveform 空态 + 加载态（activity 图标空态 + ProgressRing 连接覆盖层 + set_connecting 公开方法 + 首批 batch 淡出空态）；B49-4 Dashboard 画布空态（layout-dashboard 图标，替代 paintEvent 单行文字提示，add/remove/clear 全循环）；B49-5 Connection _set_loading 升级（内嵌 ProgressRing 替代「…」文字，setFixedSize 18×18 居中，复用 ring 不重复创建）；B49-5b Port Refresh 复用 _set_loading（消除 connection_toolbar inline 重复逻辑）。新增 3 helper 模块（log_empty_state/log_loading_state/waveform_empty_state/connection_loading/_empty_state_overlay）保持各主文件 ≤300 行；EmptyStateWidget 加 hide_with_fade 对称方法（fade_out finished→hide）；4 条连接路径统一 _show_log_loading/_set_waveform_connecting 同步切换。22 个 ui_smoke 测试覆盖空态/加载态/切换/淡入淡出完整循环（黑盒 waitUntil visibility，不 poke 私有动画属性）。全量 pytest 1695 passed（+54 from 1641 baseline），smoke exit 0 |
 
 ---
 

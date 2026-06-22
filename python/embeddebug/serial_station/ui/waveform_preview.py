@@ -21,6 +21,7 @@ from PyQt6.QtWidgets import QGraphicsDropShadowEffect
 
 from embeddebug.serial_station.core import ChannelBatch
 from embeddebug.serial_station.ui import waveform_measure, waveform_overlays
+from embeddebug.serial_station.ui.animations.tokens import AnimationTokens
 from embeddebug.serial_station.ui.theme import palette as P
 from embeddebug.serial_station.ui.waveform_cursors import CursorManager
 from embeddebug.serial_station.ui.waveform_perf import BatchAccumulator, RefreshThrottle
@@ -113,6 +114,11 @@ class SerialWaveformPreview(QWidget):
             parent=self,
         )
         self._latest_batch: ChannelBatch | None = None
+        # Batch 49-3: 空态 + 加载态覆盖层（helper 在 waveform_empty_state 模块）。
+        from embeddebug.serial_station.ui.waveform_empty_state import build_waveform_overlays
+
+        self._empty_overlay, self._loading_overlay = build_waveform_overlays(self)
+        self._empty_overlay.show_with_fade()
 
     def submit_batch(self, batch: ChannelBatch) -> None:
         """热路径入口：累积批次并节流刷新（Batch 7-2）。
@@ -123,6 +129,25 @@ class SerialWaveformPreview(QWidget):
         """
 
         self._accumulator.push(batch.values, batch.channel_names, batch.dt_ns)
+
+    def resizeEvent(self, event: object) -> None:
+        super().resizeEvent(event)
+        rect = self.rect()
+        for overlay in (self._empty_overlay, self._loading_overlay):
+            if overlay is not None:
+                overlay.setGeometry(rect)
+
+    def set_connecting(self, connecting: bool) -> None:
+        """Batch 49-3: 切换连接加载态（连接中显示 ProgressRing 覆盖层）。"""
+
+        if connecting:
+            self._empty_overlay.hide()
+            self._loading_overlay.show()
+            self._loading_overlay.raise_()
+        else:
+            self._loading_overlay.hide()
+            if self._latest_batch is None:
+                self._empty_overlay.show_with_fade()
 
     def _on_accumulator_flush(self, merged: ChannelBatch) -> None:
         """BatchAccumulator flush 回调：缓存最新合并批次，请求节流刷新。"""
@@ -138,6 +163,10 @@ class SerialWaveformPreview(QWidget):
             self._latest_batch = None
 
     def update_batch(self, batch: ChannelBatch) -> None:
+        # Batch 49-3: 首个真实刷新批次到达，淡出空态（仅一次，覆盖 submit_batch
+        # 节流路径与直接 update_batch 两条入口）。
+        if not self._curves and not self._empty_overlay.isHidden():
+            self._empty_overlay.hide_with_fade()
         self._ensure_curves(batch.channel_names)
         self._ensure_cursors()
         x_values = np.arange(batch.values.shape[0], dtype=np.float32)
@@ -169,12 +198,7 @@ class SerialWaveformPreview(QWidget):
         self._stats_label.setText(f"{name}: {waveform_measure.format_stats(stats)}")
 
     def _ensure_cursors(self) -> None:
-        """首次绘制后初始化 CursorManager 并添加两条默认 X 游标（只一次）。
-
-        Batch 7：用 CursorManager（可增删）替换旧的固定双游标 attach_cursors，
-        激活 waveform_cursors 死代码。默认两条 X 游标对齐旧观感（25%/75% 位置），
-        用户可通过 cursor_manager() 运行时增删。
-        """
+        """首次绘制后初始化 CursorManager（替换旧固定双游标，Batch 7）。"""
 
         if self._cursor_manager is not None:
             return
@@ -184,12 +208,7 @@ class SerialWaveformPreview(QWidget):
         self._cursor_manager.add_x_cursor(0.75)
 
     def _install_cursor_interactions(self) -> None:
-        """装双击添加 X 游标 + 右键删除菜单（Batch 9-3，委托独立模块）。
-
-        游标交互逻辑在 waveform_cursor_interactions.install_cursor_interactions，
-        本方法只负责委托（避免本文件超 300 行门禁）。cursor_manager 通过
-        lambda 惰性求值（首次 update_batch 才初始化）。
-        """
+        """装双击添加 X 游标 + 右键删除菜单（委托独立模块，Batch 9-3）。"""
 
         from embeddebug.serial_station.ui.waveform_cursor_interactions import (
             install_cursor_interactions,
@@ -206,12 +225,7 @@ class SerialWaveformPreview(QWidget):
         self._legend.update_channels(batch.channel_names, latest)
 
     def _update_cursor_hud(self, values: np.ndarray) -> None:
-        """刷新游标读数 HUD（Batch 7: 用 compute_cursor_measurement 激活死代码）。
-
-        用 CursorManager 当前的 X/Y 游标值调用 waveform_measure.compute_cursor_measurement
-        计算 ΔT/频率/ΔY，再 format_cursor_measurement 格式化。相比旧版固定双游标的
-        cursor_readout（只显示 ΔX/Y1/Y2），现在支持任意数量游标 + 时间/频率测量。
-        """
+        """刷新游标读数 HUD（compute_cursor_measurement + format，Batch 7）。"""
 
         if self._cursor_manager is None:
             return
@@ -222,11 +236,7 @@ class SerialWaveformPreview(QWidget):
         self._cursor_hud.setText(waveform_measure.format_cursor_measurement(measurement))
 
     def cursor_manager(self) -> CursorManager | None:
-        """返回当前 CursorManager（供外部增删游标，None 表示尚未初始化）。
-
-        Batch 7：暴露 CursorManager 让上层（如右键菜单/快捷键）可运行时
-        add_x_cursor / add_y_cursor / remove_cursor，替代旧的固定双游标。
-        """
+        """返回当前 CursorManager（供外部增删游标，None 表示尚未初始化）。"""
 
         return self._cursor_manager
 
@@ -239,15 +249,7 @@ class SerialWaveformPreview(QWidget):
         self._sample_rate = max(0.0, float(rate))
 
     def _ensure_curves(self, channel_names: tuple[str, ...]) -> None:
-        """确保曲线数与通道数一致，每条曲线配渐变填充 + 发光（Batch 6 美化）。
-
-        改进（对比旧版）：
-        - 旧版只有 2px 纯色折线，零填充零发光，黑底白线科学计算风。
-        - 新版每条曲线下方加半透明渐变填充（``setFillLevel`` + ``QLinearGradient``，
-          从曲线色 25% alpha 渐隐到透明），多通道叠加时有面积感。
-        - 曲线加发光（``QGraphicsDropShadowEffect`` 同色 blur=8），主线带辉光，
-          质感对齐现代数据可视化。
-        """
+        """确保曲线数与通道数一致，配渐变填充 + 发光（Batch 6 美化）。"""
 
         while len(self._curves) < len(channel_names):
             index = len(self._curves)
@@ -269,7 +271,7 @@ class SerialWaveformPreview(QWidget):
             curve.setBrush(QBrush(gradient))
             # Batch 6: 曲线发光（同色 DropShadow blur=8）。
             glow = QGraphicsDropShadowEffect(curve)
-            glow.setBlurRadius(8)
+            glow.setBlurRadius(AnimationTokens.SHADOW_BLUR_CURVE_GLOW)
             glow.setColor(QColor(color))
             glow.setOffset(0, 0)
             curve.setGraphicsEffect(glow)

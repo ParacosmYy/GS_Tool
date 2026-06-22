@@ -116,6 +116,17 @@ def _populate_center_log_card(owner: SerialStationSectionsHost) -> None:
     owner._log_view.setPlaceholderText(owner.tr("No serial log entries yet.\nConnect a device to start receiving data."))
     owner._log_view.setReadOnly(True)
     body.addWidget(owner._log_view, 1)
+    # Batch 49-1: 日志空态占位（helper 在 log_empty_state 模块，保持本文件 ≤ 260 行）。
+    from embeddebug.serial_station.ui.log_empty_state import build_log_empty_state
+
+    owner._log_empty_state = build_log_empty_state(log_card)
+    body.addWidget(owner._log_empty_state)
+    owner._log_empty_state.show_with_fade()
+    # Batch 49-2: 日志连接加载态覆盖层（SkeletonBlock + 文案，连接开始显示）。
+    from embeddebug.serial_station.ui.log_loading_state import build_log_loading_state
+
+    owner._log_loading_state = build_log_loading_state(log_card)
+    body.addWidget(owner._log_loading_state)
     owner._update_log_stats()
 
 
