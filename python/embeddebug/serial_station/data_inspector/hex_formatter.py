@@ -28,7 +28,8 @@ class HexFormatter:
             fc = {1: "b", 2: "h", 4: "i", 8: "q"}[len(data)]
             if not signed:
                 fc = fc.upper()
-            return int(struct.unpack(fc, data)[0])
+            prefix = ">" if big_endian else "<"
+            return int(struct.unpack(prefix + fc, data)[0])
         return int.from_bytes(data, byteorder=order, signed=signed)
 
     @staticmethod

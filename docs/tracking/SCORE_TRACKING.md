@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 742分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 258分
+> 当前: 743分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 257分
 
 ---
 
@@ -392,6 +392,7 @@
 | 740 | Batch 65 — README 质量门禁同步 + 工程状态 E4→E5 | README 质量门禁加 lint-embeddebug-py + CI 说明（STRICT 模式 + 六系列 lint）。工程状态 E4→E5（可维护收口）。 |
 | 741 | Batch 66 — MQTT client_stub 单元测试（11 测试） | 新建 test_mqtt_client_stub.py：生命周期/subscribe-publish 通配符/多订阅者/write 追加/error 回调。全量 pytest 1710 passed（+11），lint clean。 |
 | 741 | Batch 67 — SPI/I2C bridge_stub 单元测试（7 测试） | 新建 test_spi_i2c_bridge_stub.py：SPI 回环/I2C 读 WHO_AM_I/写后读回/多字节序列/无 register 失败/地址回绕/实例隔离。全量 pytest 1717 passed（+7），lint clean。 |
+| 743 | Batch 68 — HexFormatter 单元测试（14 测试）+ 修复 big_endian bug | 新建 test_hex_formatter.py：format_bytes 三栏/多行偏移/非可打印、format_int 有无符号大小端、format_float 32/64 位、format_ascii。**修复 production bug**：format_int 对标准宽度字节（1/2/4/8）忽略 big_endian 参数（struct.unpack 总用 little-endian prefix），加 `>` / `<` prefix 修正。全量 pytest 1731 passed（+14），lint clean。 |
 
 ---
 
