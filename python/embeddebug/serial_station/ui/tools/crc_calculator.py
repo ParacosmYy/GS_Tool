@@ -46,10 +46,7 @@ def compute_crc(
         b = _reflect(byte, 8) if ref_in else byte
         crc ^= (b << (width - 8)) & mask
         for _ in range(8):
-            if crc & top_bit:
-                crc = ((crc << 1) ^ poly) & mask
-            else:
-                crc = (crc << 1) & mask
+            crc = (crc << 1 ^ poly) & mask if crc & top_bit else crc << 1 & mask
     if ref_out:
         crc = _reflect(crc, width)
     return (crc ^ xor_out) & mask

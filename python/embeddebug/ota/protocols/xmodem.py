@@ -53,9 +53,7 @@ class XmodemProtocol(OtaProtocol):
         self._channel = channel
         expected = bytes([C if self._use_crc else NAK])
         response = channel.read(_HANDSHAKE_TIMEOUT_MS)
-        if response and expected[0] in response:
-            return True
-        return False
+        return bool(response and expected[0] in response)
 
     def next_block(self) -> OtaBlock | None:
         """返回下一块；固件发完返回 None（触发 finish EOT）。"""

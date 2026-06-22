@@ -54,11 +54,8 @@ class TimingMeasurement:
             window_start = edge_ns - setup_window_ns
             # 落在 (window_start, edge_ns] 内的数据跳变
             within = [t for t in data_changes if window_start < t <= edge_ns]
-            if within:
-                # 数据在该窗口内最后一次变化距离窗口起点的余量
-                setup = setup_window_ns - (within[-1] - window_start)
-            else:
-                setup = setup_window_ns
+            # 数据在该窗口内最后一次变化距离窗口起点的余量
+            setup = setup_window_ns - (within[-1] - window_start) if within else setup_window_ns
             min_setup = min(min_setup, setup)
         return min_setup
 

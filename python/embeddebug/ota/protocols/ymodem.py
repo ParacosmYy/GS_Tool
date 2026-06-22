@@ -72,9 +72,7 @@ class YmodemProtocol(OtaProtocol):
 
         self._channel = channel
         response = channel.read(_HANDSHAKE_TIMEOUT_MS)
-        if response and C in response:
-            return True
-        return False
+        return bool(response and C in response)
 
     def next_block(self) -> OtaBlock | None:
         """按 phase 返回：信息块 → 数据块 → None(触发 EOT)。"""

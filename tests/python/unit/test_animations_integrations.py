@@ -44,8 +44,8 @@ def test_tokens_contract():
     assert AnimationTokens.DURATION_INSTANT < AnimationTokens.DURATION_FAST
     assert AnimationTokens.DURATION_FAST < AnimationTokens.DURATION_NORMAL
     assert AnimationTokens.DURATION_NORMAL < AnimationTokens.DURATION_SLOW
-    assert AnimationTokens.EASE_OUT == QEasingCurve.Type.OutCubic
-    assert AnimationTokens.EASE_OUT_BACK == QEasingCurve.Type.OutBack
+    assert QEasingCurve.Type.OutCubic == AnimationTokens.EASE_OUT
+    assert QEasingCurve.Type.OutBack == AnimationTokens.EASE_OUT_BACK
     assert 0 < AnimationTokens.SCALE_PRESSED < 1.0
     assert AnimationTokens.SCALE_HOVER > 1.0
     assert AnimationTokens.SCALE_NORMAL == 1.0

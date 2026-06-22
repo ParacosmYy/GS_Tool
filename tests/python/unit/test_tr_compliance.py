@@ -57,10 +57,7 @@ def _is_user_visible_text(value: object) -> bool:
         if any(ord(c) > 127 for c in s):
             return True
         # 纯 ASCII：长度 > 8 且含空格/字母组合 → 可能是英文 UI 文案。
-        if len(s) > 8 and re.search(r"[a-zA-Z]", s) and " " in s:
-            return True
-        # 短技术值（0x31, Hex, ASCII, OK 等）豁免。
-        return False
+        return len(s) > 8 and bool(re.search(r"[a-zA-Z]", s)) and " " in s
     if isinstance(value, ast.Call):
         # tr() / self.tr() / widget.tr() 调用 → 已包裹，豁免。
         func = value.func
@@ -89,12 +86,7 @@ def _find_tr_violations(path: Path) -> list[tuple[int, str]]:
             elif isinstance(func, ast.Name):
                 api_name = func.id
             # 检查构造函数（QLabel("...") 等）。
-            if api_name in _VISIBLE_TEXT_CTORS and node.args:
-                first = node.args[0]
-                if _is_user_visible_text(first):
-                    violations.append((node.lineno, f"{api_name}({ast.dump(first)})"))
-            # 检查可见文字 setter。
-            elif api_name in _VISIBLE_TEXT_APIS and node.args:
+            if api_name in _VISIBLE_TEXT_CTORS and node.args or api_name in _VISIBLE_TEXT_APIS and node.args:
                 first = node.args[0]
                 if _is_user_visible_text(first):
                     violations.append((node.lineno, f"{api_name}({ast.dump(first)})"))

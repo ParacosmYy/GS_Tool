@@ -52,10 +52,7 @@ def format_hex_line(offset: int, data: bytes, bytes_per_line: int = BYTES_PER_LI
 
     g1_ascii = "".join(to_ascii_repr(b) for b in g1_data)
     g2_ascii = "".join(to_ascii_repr(b) for b in g2_data)
-    if g2_ascii:
-        ascii_part = f"{g1_ascii} {g2_ascii}"
-    else:
-        ascii_part = g1_ascii
+    ascii_part = f"{g1_ascii} {g2_ascii}" if g2_ascii else g1_ascii
 
     return f"{offset:08x}  {g1_hex:<{g1_width}}  {g2_hex:<{g2_width}}  {ascii_part}"
 

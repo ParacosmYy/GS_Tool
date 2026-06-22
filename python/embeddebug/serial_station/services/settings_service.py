@@ -113,7 +113,7 @@ class SettingsManager:
         """恢复全部默认值（清掉 QSettings 中所有 key + theme_store 同步）。"""
 
         self._cache = UserSettings()
-        for key in asdict(self._cache).keys():
+        for key in asdict(self._cache):
             try:
                 self._settings.remove(key)
             except Exception:  # noqa: BLE001

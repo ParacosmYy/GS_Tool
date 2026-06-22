@@ -215,10 +215,7 @@ class SegmentedControl(QWidget):
             cx = i * seg_w + seg_w / 2.0
             cy = self.height() / 2.0 + fm.ascent() - text_h / 2.0
             # 指示器覆盖范围内的文字走 on-accent 色。
-            if i == self._current:
-                color = QColor(P.TEXT_ON_ACCENT)
-            else:
-                color = QColor(P.TEXT_SECONDARY)
+            color = QColor(P.TEXT_ON_ACCENT) if i == self._current else QColor(P.TEXT_SECONDARY)
             painter.setPen(color)
             painter.drawText(
                 int(cx - text_w / 2.0),

@@ -55,15 +55,17 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-# Batch 56-59: F + UP + B 系列全强制（死代码 + 语法现代化 + bugbear）。
+# Batch 56-60: F + UP + B + SIM 系列全强制（死代码 + 现代化 + bugbear + 简化）。
 select = [
-    "F",     # Pyflakes（F401 未使用 import / F811 重定义 / F841 未使用变量）
-    "UP",    # pyupgrade（现代化语法）
-    "B",     # bugbear（B905 zip strict / B007 循环变量 / B010 setattr 常量等）
+    "F",     # Pyflakes
+    "UP",    # pyupgrade
+    "B",     # bugbear
+    "SIM",   # flake8-simplify
 ]
-# Batch 55-56: 启用 F401 + F841（未使用 import / 变量），ruff 机械清理。
-# 项目历史死代码已清零，现在 CI 强制保持。
-ignore = []
+# SIM105（contextlib.suppress）：40 处防御性代码，try/except 更直观。
+# SIM102（嵌套 if 合并）：有时降低可读性，保留显式嵌套。
+# SIM115（context manager for files）：改变资源管理语义，需逐个审查。
+ignore = ["SIM105", "SIM102", "SIM115"]
 
 [tool.ruff.lint.per-file-ignores]
 # __init__.py 的 re-export 是设计内（公共 API），不算未使用 import。

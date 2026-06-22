@@ -100,7 +100,7 @@ def test_apply_overrides_changes_existing():
         assert palette.ACCENT == "#ff0000"
     finally:
         palette.ACCENT = original
-    assert palette.ACCENT == original
+    assert original == palette.ACCENT
 def test_apply_overrides_skips_unknown():
     changed = apply_overrides(palette, {"NONEXISTENT_ATTR": "x"})
     assert changed == []
