@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 890分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 110分
+> 当前: 891分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 109分
 
 ---
 
@@ -540,6 +540,7 @@
 | 888 | Batch 224 — SessionState to_dict/from_dict 防御性边界（17 测试） | 新建 test_session_state_boundary.py（150 行）：_default_geometry/_default_connection_config 结构 + 工厂返回新实例（不共享可变默认）+ SessionState 默认值 + to_dict 全键 + 拷贝隔离（list/dict 修改不影响原）+ from_dict None/空 dict/部分键默认 + None 字段值回退（_get 守卫）+ 类型不符回退（geometry/connection 非 dict→默认/history 非 list→[]）+ history 项 str 强转（1/2.5/True→"1"/"2.5"/"True"）+ timestamp_ns float→int + transport_mode 强转 + to_dict→from_dict 往返全字段等价。 |
 | 889 | Batch 225 — TransferEngine 边界扩展 mock 协议错误路径（12 测试） | 新建 test_transfer_engine_boundary.py（172 行）：_protocol_total 回退（total_blocks 优先/total_data_blocks 回退/无属性→0/非 int 跳过）+ run eot_not_acked 路径（finish False）+ 进度回调 on_progress 调用（blocks_done,total）+ _send_block_await_ack 帧格式（header+seq+~seq+data+checksum）+ _send_cancel 发 CAN×2 + cancel 路径 error=cancelled + 成功路径 TransferResult 全字段（success/blocks_sent/blocks_acked/retries/error=None）+ 握手失败 handshake_failed + cancel 初始状态 + cancel 置标志。 |
 | 890 | Batch 226 — BleTransportStub write/_handle_request/_find_by_handle 边界（11 测试） | 新建 test_ble_transport_write_boundary.py（138 行）：write 关闭态返回 0+error（transport_not_open）+ 开启态返回长度 + 垃圾字节不崩溃仍追加 written + WRITE 帧到可写特征无回包 + WRITE 帧到不可写特征 error（characteristic_not_writable）+ 非 WRITE 帧触发 READ_RESPONSE 回包（首字节 0x03）+ 未知 handle error（handle_not_found）+ _find_by_handle 已知返回 char/未知 None + 多帧批量各分发。 |
+| 891 | Batch 227 — BLE GATT expand_uuid + 模型边界（20 测试） | 新建 test_ble_gatt_boundary.py（176 行）：BLE_BASE_UUID 结构 + expand_uuid 32 位 int + 超 32 位 mask + 纯 hex 无前缀 + 0x 前缀 + 大写归一化小写 + whitespace strip + invalid/空 hex ValueError + 128 位 str 直传（36 字符）+ 128 位大写归一化 + BleCharacteristic 默认值/can_read/can_write/can_notify 组合 + BleGattTree.find_by_uuid 已知/未知/跨多服务 + frozen（Characteristic 不可变/Service+Device 可变）。 |
 
 ---
 
