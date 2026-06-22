@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 839分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 161分
+> 当前: 840分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 160分
 
 ---
 
@@ -489,6 +489,7 @@
 | 837 | Batch 173 — script_recorder 边界（23 测试） | 新建 test_script_recorder_helpers.py（222 行）：ScriptAction 常量（SEND/RECEIVE/CONNECT/DISCONNECT/DELAY/WAIT）+ frozen + to/from_dict round-trip + 缺 label 默认 + ScriptRecording duration_ms 空=0/最大 timestamp + action_count + add + to_json/from_json round-trip + from_json 缺 actions 空 + to_json 写文件 + from_json 读文件 + ScriptRecorder start 幂等 + stop 重置 + record 未录制 False + 录制 True + 类型过滤（record_only 排除/空集全阻/无过滤全录）+ recording 属性录制前可访问 + timestamp 相对 start。 |
 | 838 | Batch 174 — export _channel_indices + shortcuts manager 边界（22 测试） | 新建 test_export_shortcuts_helpers.py（214 行）：DataExporter._channel_indices（None=全选/已知名顺序/未知 KeyError/空 names/重复名最后索引/子集）+ _effective_key（默认/override 覆盖/其他 id 忽略）+ ShortcutManager（list_shortcuts 全默认 + key_sequence_for 默认/override + to_dict version=1 + from_dict 非 dict 空/None 值过滤/未知 id 过滤 + grouped_by_category 多组+键有效+项 ShortcutDef + reset 清空 + _find_def 已知/未知）。补强 test_export/test_shortcuts_manager 未直接断言的 _channel_indices 静态方法 + _effective_key 纯函数。 |
 | 839 | Batch 175 — diagnostics/monitor 边界（21 测试） | 新建 test_diagnostics_monitor_helpers.py（225 行）：常量契约（DEFAULT_SNAPSHOT_INTERVAL_MS=1000 + DEFAULT_METRIC_UNITS 5 映射）+ start_ns 正整数 + uptime_s 非负+不减少 + set_snapshot_interval（正值/负值 clamp/0 clamp）+ reset（清指标 count 归零 + 更新 start_ns + 清 tick_fps 首帧 0）+ is_running start/stop/幂等 + _get_or_create（默认单位映射/自定义覆盖/未知名空/同实例）+ snapshot（timestamp 正+uptime 非负 + metrics 拷贝隔离）。补强 test_diagnostics.py 未直接断言的常量 + reset/set_interval/_get_or_create 边角。 |
+| 840 | Batch 176 — elevation_effect 阴影工厂全覆盖（16 测试） | 新建 test_elevation_effect.py（181 行）：返回 QGraphicsDropShadowEffect + 默认 level=L1 + L0-L5 各级参数映射（blur/offset_y/alpha 精确）+ offset_x 全 0（只向下）+ blur 随层级递增 + color=None 黑色+alpha（L0 alpha=0 透明）+ 自定义 color 保留 RGB + level alpha 覆盖 color alpha（L0 alpha=0）+ 自定义三元组。覆盖此前 0 直接测试的 elevation_effect 工厂函数。 |
 
 ---
 
