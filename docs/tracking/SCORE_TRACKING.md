@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 809分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 191分
+> 当前: 810分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 190分
 
 ---
 
@@ -459,6 +459,7 @@
 | 807 | Batch 140 — tcp/udp _parse_endpoint 边界扩展（24 测试） | 并发会话新建 test_endpoint_parsers.py（180 行）：tcp/udp _parse_endpoint 全分支断言。 |
 | 808 | Batch 141 — HelpSystem 边界扩展（+12 测试） | 本会话扩展 test_help_system.py（10→22）：HelpEntry frozen + HelpTopic 5 枚举 + search content/大小写不敏感/strip/去重 + get_topic/all_topics 防御性拷贝 + register setdefault + about_info 5 字段 + PROTOCOL_HELP topic 一致性 + SHORTCUT_HELP 已知键。文件 163 行 ≤250。 |
 | 809 | Batch 143 — ScriptRecorder/Player/Recording 边界扩展（+15 测试） | 本会话扩展 test_script_recorder.py（9→24）：ScriptAction 常量/frozen/from_dict兜底/to_dict 字段；ScriptRecording 空状态/JSON round-trip 元数据/写文件/缺 actions 兜底；ScriptRecorder start 幂等/stop 重置/record 相对时间戳/多类型过滤；ScriptPlayer 初始状态/step 越界 finished/load 重置/play 未加载/pause 不阻断/position 信号/speed 边界。文件 232 行 ≤250。 |
+| 810 | Batch 144 — qt_serial 常量映射 + _reverse_lookup 单元测试（16 测试） | 新建 test_qt_serial_constants.py（156 行）：DATA_BITS 4 键（5/6/7/8）映射 QSerialPort.DataBits 全集 + 值互异；PARITY 5 键（none/even/odd/space/mark）映射 Parity 全集 + 互异；STOP_BITS 3 键（1/1.5/2）映射 StopBits 全集；FLOW_CONTROL 3 键（none/hardware/software）映射 FlowControl 全集；_reverse_lookup 正向反查 + 未知值空串 + int/str 键类型保留 + 空映射 + None 值 + 重复值首匹配 + 4 映射 round-trip。此前 test_transports 仅通过 configure 间接覆盖，未直接断言常量完备性与反查行为。 |
 
 ---
 
