@@ -231,12 +231,12 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 4. ~~UX-06 弹窗体系统一~~ ✅ 已完成（QMessageBox 0 残留）
 
 #### 第二优先级: 骨架功能完善
-5. **MQTT TopicModel** → 12个空QAbstractItemModel方法实现
-6. **BLE GattModel** → 11个空方法实现
+5. ~~MQTT TopicModel~~ ✅ 已完成（改用 client_stub + codec 模式，未引入空壳 QAbstractItemModel）
+6. ~~BLE GattModel~~ ✅ 已完成（改用 gatt + transport_stub 模式，未引入空壳 model）
 7. **USB libusb集成** → 11个TODO stub实现
 8. ~~Dashboard布局持久化~~ ✅ 已完成（canvas.save_layout/load_layout + to_layout_dict JSON 序列化）
 9. **ProtocolEngine CRC校验** → 协议完整性验证
-10. **DBC解析器** → CAN数据库文件解析
+10. ~~DBC解析器~~ ✅ 已完成（can/dbc.py，145 行，11 函数/类）
 
 #### 第三优先级: 图标+代码质量
 11. ~~Lucide SVG扩展~~ ✅ 已完成（14→146 个 SVG）
