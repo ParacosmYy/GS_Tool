@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 833分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 167分
+> 当前: 834分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 166分
 
 ---
 
@@ -483,6 +483,7 @@
 | 831 | Batch 167 — theme_store 常量契约 + _read_prefs_dict 迁移逻辑 + 合并写（23 测试） | 新建 test_theme_store_helpers.py（241 行）：常量契约（PREFS_FILENAME=theme_prefs.json/_LEGACY_ACCENT_FILENAME=accent.json/DEFAULT_THEME_ID=serial_station_dark/DEFAULT_ACCENT_ID=cyan/_SUBDIR=embeddebug）+ prefs_path/_legacy_accent_path 结构（文件名+子目录+同父目录）+ _read_prefs_dict 迁移（新文件优先+旧 accent.json 迁移+都不存在空+损坏 JSON 空+非 dict 空+空 accent 跳过）+ load_theme_prefs 回退默认（无文件/非字符串/空串）+ save_theme_prefs 合并写（None 保留旧值+部分更新+创建父目录+无 .tmp 残留）。补强 test_theme_core.py 未直接断言的 _read_prefs_dict 迁移逻辑 + 常量值。 |
 | 832 | Batch 168 — theme_switcher _dark_to_light_map + build_themed_qss + default_accent_id（18 测试） | 新建 test_theme_switcher_helpers.py（171 行）：常量契约（THEME_DARK/LIGHT/AVAILABLE_THEMES=2）+ default_accent_id=cyan + _dark_to_light_map（非空 dict + 只含 dark≠light 项 + 值来自 light_tokens + 键来自 dark_tokens + 含 BG_WINDOW）+ build_light_qss（非空 + 含 light.TEXT_PRIMARY + 不含 dark.BG_WINDOW 已替换）+ build_themed_qss（dark/light 非空 + 两者不同 + accent 不崩溃 + dark 含 dark.BG + light 不含 dark.BG）。补强 test_theme_switching.py 未直接断言的 _dark_to_light_map 结构 + build_themed_qss 路径分支。 |
 | 833 | Batch 169 — automation/triggers _compare + TriggerCondition 全分支（24 测试） | 新建 test_automation_triggers.py（243 行）：_compare（5 操作符>/<=>=/<=/==浮点容差 + 未知 False）+ _VALUE_OPERATORS 映射（VALUE_ABOVE=>/BELOW=</EQUALS===）+ __post_init__（VALUE_*自动设 operator + 显式保留 + 非VALUE_*空串）+ _matches（MANUAL=False/INTERVAL 首次+经过+未到/RX_MATCH 匹配+不匹配+空 pattern/TX_MATCH/VALUE_ABOVE+缺通道）+ evaluate（更新 last_fire_ms + 去抖期内阻止 + 去抖期后允许）+ reset（清除 last_fire）+ to_dict 7 字段 + from_dict round-trip + from_dict 缺字段默认 + TriggerType 7 成员。覆盖此前 0 测试的 automation 模块。 |
+| 834 | Batch 170 — automation/rule + actions（22 测试） | 新建 test_automation_rule_actions.py（248 行）：AutomationAction.execute（SEND_COMMAND 调用+空跳过/PLAY_SOUND/LOG/SET_LED/DELAY 返回 wait+负值 clamp）+ execute context=None 自动创建 + ActionType 5 枚举 + to_dict 6 字段 + from_dict round-trip + 缺字段默认 + 默认值 + AutomationRule.should_fire（enabled+无冷却/disabled=False/mark_fired 冷却期/过冷却）+ mark_fired + reset + to_dict 5 字段 + from_dict round-trip + 缺字段默认 + 默认值。覆盖此前 0 测试的 rule/actions 模块。 |
 
 ---
 
