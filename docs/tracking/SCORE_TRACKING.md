@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 952分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 48分
+> 当前: 953分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 47分
 
 ---
 
@@ -602,6 +602,7 @@
 | 950 | Batch 286 — binding_dialog suggest_default_spec + _SpecDialog 边界（8 测试） | 新建 test_binding_dialog_boundary.py（66 行）：suggest_default_spec value_display='value:ch0' + gauge='gauge:ch0' + led='led:info' + slider 含 'slider:' + button 含 'button:' + 未知 widget_type 返回 '' + _SpecDialog objectName=serialStationDashboardBindingDialog + _SpecDialog 是 QDialog 子类。 |
 | 951 | Batch 287 — _safe_configure + _is_locked + _toggle_lock 边界（9 测试） | 新建 test_widget_menu_safe_configure_boundary.py（84 行）：_safe_configure None 回调不崩 + 正常回调调用 + 异常吞（RuntimeError 不崩）+ mock 回调验证 item_id + _is_locked 无 config False + locked=True True + locked=False False + _toggle_lock 翻转 + _toggle_lock 未知 item 不崩。 |
 | 952 | Batch 288 — controller_transport_state active_local_port/available_serial/modes 边界（8 测试） | 新建 test_transport_helpers_boundary.py（84 行）：active_local_port 未连接返回 None + available_serial_ports 返回 tuple + available_transport_modes 返回 tuple 含 serial/tcp/udp + is_connected 未连接 False + 连接 True + create_transport_runtime 默认值 + TransportRuntime frozen。 |
+| 953 | Batch 289 — controller_receive_state handle_received_bytes 边界（8 测试） | 新建 test_receive_state_boundary.py（106 行）：handle_received_bytes 空数据 state 不变 + 非 measurement 数据 entries 增长 + 无 measurement ring 不变 + ReceiveState 默认 ring=None + 多次调用累积 entries + 空 callbacks 不崩 + 有 log_callback 被调用 + RawData 不产生 measurement callback 不调用。 |
 
 ---
 
