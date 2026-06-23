@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 917分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 83分
+> 当前: 918分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 82分
 
 ---
 
@@ -567,6 +567,7 @@
 | 915 | Batch 251 — CursorManager remove/clear/cursor_values 边界（8 测试） | 新建 test_cursor_manager_boundary.py（98 行）：remove_cursor 从 3 条 X 中间删除保留首尾 + 删 X 不影响 Y + 删 Y 游标 + cursor_values 部分清空后正确 + clear 返回 None + clear 多次不崩 + 空 manager cursor_values 返回 ([],[]) + 交替 add_x/add_y 后 cursor_values 正确分离 X/Y。 |
 | 916 | Batch 252 — cursor_interactions _resolve + install 行为边界（8 测试） | 新建 test_cursor_interactions_resolve_boundary.py（90 行）：_resolve callable ref 返回结果 + callable 抛异常返回 None + 非 callable 原样返回 + None 原样返回 + int 原样返回 + install 替换 mouseDoubleClickEvent 为 _on_double_click 闭包 + install 替换 contextMenuEvent 为 _on_context 闭包 + install 时 ref 返回 None 不崩。 |
 | 917 | Batch 253 — WaveformLegend update_channels _make_chip 边界（8 测试） | 新建 test_waveform_legend_boundary.py（100 行）：update_channels None latest_values→chip 无数值后缀 + 短 latest_values（少于通道数）超出部分无数值 + 长 latest_values（多于通道数）多余忽略 + 空 channel_names 无 chip + 多次调用清旧 chip + chip 文本含通道名 + 有数值时含 .3f 数值 + chip objectName serialStationWaveformLegendChip 契约。 |
+| 918 | Batch 254 — BarChartPanel update_batch + latest_per_channel 边界（11 测试） | 新建 test_bar_chart_latest_boundary.py（106 行）：latest_per_channel 1D 返回空 + 3D 返回空 + 单行返回该行 + float32 类型 + BarChartPanel update_batch 1D 不创建 _bar + 0 行不创建 _bar + status_label 多通道含通道数 + 单通道含 '1' + shutdown 清空 _bar + shutdown 后再 update 恢复 _bar + 多次 update 替换旧 _bar（新对象）。 |
 
 ---
 
