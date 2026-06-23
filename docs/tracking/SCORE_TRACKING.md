@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 924分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 76分
+> 当前: 925分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 75分
 
 ---
 
@@ -574,6 +574,7 @@
 | 922 | Batch 258 — StatusLed _glow + LedState 枚举 + set_label 边界（12 测试） | 新建 test_status_led_glow_boundary.py（112 行）：_get_glow/_set_glow round-trip + _set_glow 触发 update 不崩 + _glow 默认 0.0 + LedState 5 成员 + value 小写 + 互异 + 已知值（off/green/yellow/red/blue）+ state 属性 round-trip + set_label 更新文本（多次/空串）+ set_breathing(True) 显式启动 + toggle 循环 + _pulse_glow QTimer 回调不崩。 |
 | 923 | Batch 259 — WaveformEmptyOverlay + WaveformLoadingOverlay 内部结构边界（10 测试） | 新建 test_waveform_overlay_internals_boundary.py（112 行）：empty overlay _icon_label 存在 + title='等待波形数据' + description 含'连接设备' + loading _ring objectName serialStationWaveformLoadingRing + _ring indeterminate=True + _label objectName serialStationWaveformLoadingLabel + _label 含'连接' + 初始 hide + build 两 overlay 共享 parent + build loading 默认 hide。 |
 | 924 | Batch 260 — ConfigurableButton set_ripple/set_hover_lift/_emit_command 边界（11 测试） | 新建 test_configurable_button_internals_boundary.py（122 行）：set_ripple(True) _ripple_enabled=True + 幂等（同值早退）+ set_ripple(False) 标志 + set_hover_lift(False) graphicsEffect None + set_hover_lift(True) 不崩 + press_animation 标志 round-trip + _emit_command formatter 路径（emit 'FMT_RESULT'）+ template 路径（emit 'TEMPLATE_CMD'）+ 无 formatter/template 不 emit + formatter 优先于 template + _on_clicked 触发 emit。 |
+| 925 | Batch 261 — RippleButton _ripple_progress + _start_ripple 边界（10 测试） | 新建 test_ripple_progress_boundary.py（96 行）：_get_ripple_progress/_set_ripple_progress round-trip（0.5）+ 默认 0.0 + _set 触发 update 不崩 + _start_ripple 设置 _ripple_anim 非 None + 不同中心点（0,0/50,50/100,100）+ 多次替换旧 anim + _ripple_anim 初始 None + set_ripple(True/False) 标志 + toggle 循环（True→False→True）。 |
 
 ---
 
