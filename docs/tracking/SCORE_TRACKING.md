@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 932分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 68分
+> 当前: 933分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 67分
 
 ---
 
@@ -582,6 +582,7 @@
 | 930 | Batch 266 — qss_sections_controls_parts _led/_slider/_gauge/_dashboard_panel/_auxiliary 边界（12 测试） | 新建 test_qss_sections_controls_parts_boundary.py（90 行）：_led_part 返回非空 str + 含 serialStationStatusLed objectName + 含 color/background + _slider_part 返回非空 str + 含 serialStationCommandSlider + 含 groove/handle + _gauge_value_part 返回非空 str + 含 serialStation + _dashboard_panel_part 返回非空 str + 含 serialStation + _auxiliary_widgets_part 返回非空 str + 含 serialStation。 |
 | 931 | Batch 267 — qss_sections_domain_parts 9 个私有 helper 边界（11 测试） | 新建 test_qss_sections_domain_parts_boundary.py（76 行）：_panel_roots/_field_labels/_status_labels/_text_views/_main_buttons/_secondary_buttons/_inputs/_checkboxes/_tables_and_trees 各返回非空 str + 含 serialStation objectName + _main_buttons 含 hover/pressed/checked + _secondary_buttons 含 hover/disabled。 |
 | 932 | Batch 268 — qss_sections_overlays waveform_overlays_section 边界（7 测试） | 新建 test_qss_sections_overlays_boundary.py（66 行）：waveform_overlays_section 返回非空 str + 含 serialStationWaveformCursorHud/Legend/LegendChip/CursorX/CursorY objectName + 含 font-family 等宽字体引用 + 含 background-color/color palette 引用。 |
+| 933 | Batch 269 — _dashboard_binding_wire subscribe/register/open/notify/autosave 边界（8 测试） | 新建 test_dashboard_binding_wire_boundary.py（96 行）：subscribe_controller_events 注册回调不崩 + _dispatch_measurement_batch 安全调度（mock service/None service）+ register_item_binding 已知 item 返回 bool + 未知 item 返回 False + open_binding_config_for_item 不崩 + _notify_status 不崩 + _trigger_autosave 不崩。 |
 
 ---
 
