@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 937分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 63分
+> 当前: 938分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 62分
 
 ---
 
@@ -587,6 +587,7 @@
 | 935 | Batch 271 — SkeletonBlock with_title/rows/row_height/stop_all 边界（11 测试） | 新建 test_skeleton_block_boundary.py（96 行）：with_title=True _skeletons=rows+1 + with_title=False _skeletons=rows + rows=0+title 只标题 + rows=0+no_title 空 + 默认 rows=3（4 skeletons）+ objectName serialStationSkeletonBlock + 自定义 row_height 不崩 + stop_all 清理 shimmer + stop_all 多次不崩 + SkeletonWidget offset round-trip + 默认 offset 0.0。 |
 | 936 | Batch 272 — EmptyStateWidget set_description/show_with_fade/hide_with_fade 边界（11 测试） | 新建 test_empty_state_methods_boundary.py（96 行）：set_title 更新 + set_description 更新 + 两者独立 + show_with_fade 默认/自定义 duration 不崩 + 连续 show 停旧动画 + hide_with_fade 默认/自定义 duration 不崩 + 连续 hide 不崩 + _stop_inflight_fade 无动画安全 + show 后 _stop_inflight 停止。 |
 | 937 | Batch 273 — ToastWidget data/is_leaving/stop_animations 边界（8 测试） | 新建 test_toast_widget_data_boundary.py（82 行）：data 属性返回 NotificationData + title/message/level 匹配构造 + is_leaving 初始 False + stop_animations 不崩 + stop_animations 幂等（多次）+ schedule_dismiss(0) 不启动 timer 不崩。 |
+| 938 | Batch 274 — ToastContainer _on_added/_find/_active_count_widget_index 边界（7 测试） | 新建 test_toast_container_internals_boundary.py（82 行）：_on_added 创建 ToastWidget + count 增加 + 多次累积 + _active_count_widget_index 返回插入位置（placeholder 后=1）+ _find 已知 uid 返回 ToastWidget + _find 未知 uid 返回 None + _find 空容器返回 None。 |
 
 ---
 
