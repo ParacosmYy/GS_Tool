@@ -17,6 +17,7 @@ from embeddebug.serial_station.can import (
     DbcSignal,
     decode_signal,
 )
+from embeddebug.serial_station.can.frame import EXTENDED_ID_MAX, STANDARD_ID_MAX
 
 DBC_SAMPLE = """\
 VERSION ""
@@ -123,3 +124,40 @@ def test_decode_signal_intel():
 def test_decode_signal_with_offset():
     sig = DbcSignal(name="t", start_bit=0, bit_length=8, is_little_endian=True, factor=1.0, offset=-40.0)
     assert decode_signal(bytes([100]), sig) == pytest.approx(60.0)
+
+
+# ---- Batch A: frame/filter 边界（合并自 test_can_frame.py）----
+
+
+def test_can_id_zero_and_max_boundaries():
+    """ID=0 合法；STANDARD_ID_MAX / EXTENDED_ID_MAX 是合法边界。"""
+    assert CanId(0).value == 0
+    assert CanId(STANDARD_ID_MAX).value == 0x7FF
+    assert CanId(EXTENDED_ID_MAX, is_extended=True).value == 0x1FFFFFFF
+    with pytest.raises(ValueError):
+        CanId(STANDARD_ID_MAX + 1)
+    with pytest.raises(ValueError):
+        CanId(EXTENDED_ID_MAX + 1, is_extended=True)
+
+
+def test_can_frame_empty_data_and_fd_payload():
+    """空 data DLC=0；扩展帧+FD 的 to_payload。"""
+    assert CanFrame(CanId(0x100), b"").dlc == 0
+    frame = CanFrame(CanId(0x12345, is_extended=True), b"\x01" * 10, is_fd=True)
+    payload = frame.to_payload()
+    assert payload["isExtended"] is True and payload["isFd"] is True
+
+
+def test_can_filter_mask_zero_and_explicit_standard():
+    """mask=0 匹配所有；is_extended=False 只匹配标准帧。"""
+    f_all = CanFilter(id=0, mask=0)
+    assert f_all.matches(CanId(0x7FF)) and f_all.matches(CanId(0x12345, is_extended=True))
+    f_std = CanFilter(id=0x100, mask=0x7FF, is_extended=False)
+    assert f_std.matches(CanId(0x100)) and not f_std.matches(CanId(0x100, is_extended=True))
+
+
+def test_can_filter_extended_mismatch_short_circuits():
+    """is_extended 不匹配时短路返回 False。"""
+    f = CanFilter(id=0x100, mask=0, is_extended=True)
+    assert not f.matches(CanId(0x100))  # 标准帧被拒绝
+    assert f.matches(CanId(0x100, is_extended=True))
