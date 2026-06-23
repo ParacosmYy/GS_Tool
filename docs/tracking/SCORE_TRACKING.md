@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 959分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 41分
+> 当前: 960分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 40分
 
 ---
 
@@ -609,6 +609,7 @@
 | 957 | Batch 293 — UdpDatagramTransport available_ports/local_port/config/is_open 边界（8 测试） | 新建 test_udp_datagram_boundary.py（56 行）：available_ports 返回 list + 非空 + local_port 属性未连接==0 + config 未连接 None + is_open 初始 False + on_bytes_received 注册不崩 + on_error 注册不崩 + close 未连接不崩。 |
 | 958 | Batch 294 — TcpClientTransport available_ports/config/is_open/_emit_error 边界（8 测试） | 新建 test_tcp_client_boundary.py（62 行）：available_ports 返回 list + config 未连接 None + is_open 初始 False + on_bytes_received 注册不崩 + on_error 注册不崩 + close 未连接不崩 + _emit_error 触发 callback + _emit_error 无 callback 不崩。 |
 | 959 | Batch 295 — TcpServerTransport local_port/has_client/on_error/close 边界（8 测试） | 新建 test_tcp_server_boundary.py（50 行）：local_port 未连接 None + has_client 未连接 False + is_open 初始 False + config 未连接 None + on_bytes_received 注册不崩 + on_error 注册不崩 + close 未连接不崩 + available_ports 返回空列表。 |
+| 960 | Batch 296 — QtSerialPortTransport 属性边界（8 测试） | 新建 test_qt_serial_transport_boundary.py（56 行）：config 未连接 None + port_name 空 + baud_rate 默认 9600（QSerialPort 默认）+ is_open False + available_ports 返回 list + on_bytes/on_error 注册不崩 + close 未连接不崩。 |
 
 ---
 
