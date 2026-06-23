@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 926分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 74分
+> 当前: 927分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 73分
 
 ---
 
@@ -576,6 +576,7 @@
 | 924 | Batch 260 — ConfigurableButton set_ripple/set_hover_lift/_emit_command 边界（11 测试） | 新建 test_configurable_button_internals_boundary.py（122 行）：set_ripple(True) _ripple_enabled=True + 幂等（同值早退）+ set_ripple(False) 标志 + set_hover_lift(False) graphicsEffect None + set_hover_lift(True) 不崩 + press_animation 标志 round-trip + _emit_command formatter 路径（emit 'FMT_RESULT'）+ template 路径（emit 'TEMPLATE_CMD'）+ 无 formatter/template 不 emit + formatter 优先于 template + _on_clicked 触发 emit。 |
 | 925 | Batch 261 — RippleButton _ripple_progress + _start_ripple 边界（10 测试） | 新建 test_ripple_progress_boundary.py（96 行）：_get_ripple_progress/_set_ripple_progress round-trip（0.5）+ 默认 0.0 + _set 触发 update 不崩 + _start_ripple 设置 _ripple_anim 非 None + 不同中心点（0,0/50,50/100,100）+ 多次替换旧 anim + _ripple_anim 初始 None + set_ripple(True/False) 标志 + toggle 循环（True→False→True）。 |
 | 926 | Batch 262 — AnimationController add/play/stop_all/active_count 边界（13 测试） | 新建 test_animation_controller_boundary.py（130 行）：active_count 初始 0 + add 增长 _animations + 多次 add 累积 + active_count 统计 Running（2/3）+ play_sequential 空列表不崩 + play_parallel 空列表不崩 + play_sequential 返回 QSequentialAnimationGroup（真实 QPropertyAnimation）+ play_parallel 返回 QParallelAnimationGroup + play 累积 _groups + stop_all 清空 _animations + stop_all 清空 _groups + stop_all 幂等（三次）+ stop_all 后 active_count==0。 |
+| 927 | Batch 263 — ElasticSnap snap_to_pos/snap_center_to + drop_in 边界（9 测试） | 新建 test_elastic_snap_boundary.py（106 行）：snap_to_pos 返回 QPropertyAnimation + 注册 _active + 不同位置不崩 + snap_center_to 返回 QPropertyAnimation + 注册 _active + 不同尺寸不崩 + drop_in（bounce_path）返回 QPropertyAnimation + 注册 _active + cancel 清理多个 _active（snap_to+snap_to_pos 后 cancel）。 |
 
 ---
 
