@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 915分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 85分
+> 当前: 916分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 84分
 
 ---
 
@@ -565,6 +565,7 @@
 | 913 | Batch 249 — waveform_preview set_connecting overlay 可见性 + resizeEvent 边界（9 测试） | 新建 test_waveform_preview_connecting_boundary.py（106 行）：初始 _empty_overlay 可见 + _loading_overlay 隐藏 + set_connecting(True) loading 显示 + empty 隐藏 + set_connecting(False) 无 batch loading 隐藏 + empty 恢复 + 有 batch empty 保持隐藏 + toggle 循环 3 次最终状态正确 + resizeEvent 重新定位 overlay 不崩（geometry 跟随）。 |
 | 914 | Batch 250 — waveform_preview update_batch status_label + 曲线 setData 边界（8 测试） | 新建 test_waveform_preview_status_boundary.py（108 行）：update_batch 后 status_label 含 channels 数（2）+ samples 数（50）+ 单通道含 '1' + 4 通道含 '4' + 不同 batch 文本更新 + 首次 update_batch hide_with_fade empty_overlay + 第二次不重复 hide + 曲线 getData 长度==samples（50）+ y_data 匹配 batch 第一通道（np.assert_allclose）。 |
 | 915 | Batch 251 — CursorManager remove/clear/cursor_values 边界（8 测试） | 新建 test_cursor_manager_boundary.py（98 行）：remove_cursor 从 3 条 X 中间删除保留首尾 + 删 X 不影响 Y + 删 Y 游标 + cursor_values 部分清空后正确 + clear 返回 None + clear 多次不崩 + 空 manager cursor_values 返回 ([],[]) + 交替 add_x/add_y 后 cursor_values 正确分离 X/Y。 |
+| 916 | Batch 252 — cursor_interactions _resolve + install 行为边界（8 测试） | 新建 test_cursor_interactions_resolve_boundary.py（90 行）：_resolve callable ref 返回结果 + callable 抛异常返回 None + 非 callable 原样返回 + None 原样返回 + int 原样返回 + install 替换 mouseDoubleClickEvent 为 _on_double_click 闭包 + install 替换 contextMenuEvent 为 _on_context 闭包 + install 时 ref 返回 None 不崩。 |
 
 ---
 
