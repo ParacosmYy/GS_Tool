@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 954分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 46分
+> 当前: 955分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 45分
 
 ---
 
@@ -604,6 +604,7 @@
 | 952 | Batch 288 — controller_transport_state active_local_port/available_serial/modes 边界（8 测试） | 新建 test_transport_helpers_boundary.py（84 行）：active_local_port 未连接返回 None + available_serial_ports 返回 tuple + available_transport_modes 返回 tuple 含 serial/tcp/udp + is_connected 未连接 False + 连接 True + create_transport_runtime 默认值 + TransportRuntime frozen。 |
 | 953 | Batch 289 — controller_receive_state handle_received_bytes 边界（8 测试） | 新建 test_receive_state_boundary.py（106 行）：handle_received_bytes 空数据 state 不变 + 非 measurement 数据 entries 增长 + 无 measurement ring 不变 + ReceiveState 默认 ring=None + 多次调用累积 entries + 空 callbacks 不崩 + 有 log_callback 被调用 + RawData 不产生 measurement callback 不调用。 |
 | 954 | Batch 290 — protocol_state handle_received_bytes + create_protocol_runtime 边界（8 测试） | 新建 test_protocol_state_handle_boundary.py（82 行）：create_protocol_runtime 返回非空 ProtocolRuntime + available_protocols 含 'raw_data' + handle_received_bytes 空数据不崩 + 非 measurement entries 增长 + 多次累积 + 空 callbacks 不崩 + log_callback 被调 + 返回新 ProtocolRuntime。 |
+| 955 | Batch 291 — connection_state connect_fake/serial/endpoint_transport_result 边界（8 测试） | 新建 test_connection_state_connect_boundary.py（88 行）：connect_fake 成功 ok + 追加 entry + connect_serial 成功 + 追加 entry + connect_endpoint tcp 成功 + 失败不崩 + connect_fake 已有 FakeSerialTransport 不替换 + 非 FakeSerialTransport 创建新实例并替换。 |
 
 ---
 
