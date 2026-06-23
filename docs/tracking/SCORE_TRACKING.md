@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 934分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 66分
+> 当前: 935分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 65分
 
 ---
 
@@ -584,6 +584,7 @@
 | 932 | Batch 268 — qss_sections_overlays waveform_overlays_section 边界（7 测试） | 新建 test_qss_sections_overlays_boundary.py（66 行）：waveform_overlays_section 返回非空 str + 含 serialStationWaveformCursorHud/Legend/LegendChip/CursorX/CursorY objectName + 含 font-family 等宽字体引用 + 含 background-color/color palette 引用。 |
 | 933 | Batch 269 — _dashboard_binding_wire subscribe/register/open/notify/autosave 边界（8 测试） | 新建 test_dashboard_binding_wire_boundary.py（96 行）：subscribe_controller_events 注册回调不崩 + _dispatch_measurement_batch 安全调度（mock service/None service）+ register_item_binding 已知 item 返回 bool + 未知 item 返回 False + open_binding_config_for_item 不崩 + _notify_status 不崩 + _trigger_autosave 不崩。 |
 | 934 | Batch 270 — _settings_advanced_tab _select_baudrate + _find_active_combo 边界（7 测试） | 新建 test_settings_advanced_tab_boundary.py（94 行）：_select_baudrate 已存在 rate setCurrentIndex + 不存在 rate 追加末尾 + 多次不重复 + 空 combo 追加 + _find_active_combo 无匹配返回 None + 有 serialStationSettingsBaudrateCombo（QMainWindow 内）找到 + build_advanced_tab 返回 QWidget（SimpleNamespace mock）。 |
+| 935 | Batch 271 — SkeletonBlock with_title/rows/row_height/stop_all 边界（11 测试） | 新建 test_skeleton_block_boundary.py（96 行）：with_title=True _skeletons=rows+1 + with_title=False _skeletons=rows + rows=0+title 只标题 + rows=0+no_title 空 + 默认 rows=3（4 skeletons）+ objectName serialStationSkeletonBlock + 自定义 row_height 不崩 + stop_all 清理 shimmer + stop_all 多次不崩 + SkeletonWidget offset round-trip + 默认 offset 0.0。 |
 
 ---
 
