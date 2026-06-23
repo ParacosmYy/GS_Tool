@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 931分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 69分
+> 当前: 932分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 68分
 
 ---
 
@@ -581,6 +581,7 @@
 | 929 | Batch 265 — qss_sections_domain_parts_aux _settings_tabs/_accent_swatches/_about_labels 边界（10 测试） | 新建 test_qss_sections_aux_boundary.py（80 行）：_settings_tabs 返回非空 str + 含 serialStationSettingsTab objectName + 含 selected 状态 + hover 状态 + _accent_swatches 返回非空 str + 含 serialStationAccentSwatch objectName + 含 checked 状态 + _about_labels 返回非空 str + 含 serialStationAbout/Settings objectName + 含 TEXT_MUTED/TEXT_SECONDARY/color 引用。 |
 | 930 | Batch 266 — qss_sections_controls_parts _led/_slider/_gauge/_dashboard_panel/_auxiliary 边界（12 测试） | 新建 test_qss_sections_controls_parts_boundary.py（90 行）：_led_part 返回非空 str + 含 serialStationStatusLed objectName + 含 color/background + _slider_part 返回非空 str + 含 serialStationCommandSlider + 含 groove/handle + _gauge_value_part 返回非空 str + 含 serialStation + _dashboard_panel_part 返回非空 str + 含 serialStation + _auxiliary_widgets_part 返回非空 str + 含 serialStation。 |
 | 931 | Batch 267 — qss_sections_domain_parts 9 个私有 helper 边界（11 测试） | 新建 test_qss_sections_domain_parts_boundary.py（76 行）：_panel_roots/_field_labels/_status_labels/_text_views/_main_buttons/_secondary_buttons/_inputs/_checkboxes/_tables_and_trees 各返回非空 str + 含 serialStation objectName + _main_buttons 含 hover/pressed/checked + _secondary_buttons 含 hover/disabled。 |
+| 932 | Batch 268 — qss_sections_overlays waveform_overlays_section 边界（7 测试） | 新建 test_qss_sections_overlays_boundary.py（66 行）：waveform_overlays_section 返回非空 str + 含 serialStationWaveformCursorHud/Legend/LegendChip/CursorX/CursorY objectName + 含 font-family 等宽字体引用 + 含 background-color/color palette 引用。 |
 
 ---
 
