@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 940分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 60分
+> 当前: 941分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 59分
 
 ---
 
@@ -590,6 +590,7 @@
 | 938 | Batch 274 — ToastContainer _on_added/_find/_active_count_widget_index 边界（7 测试） | 新建 test_toast_container_internals_boundary.py（82 行）：_on_added 创建 ToastWidget + count 增加 + 多次累积 + _active_count_widget_index 返回插入位置（placeholder 后=1）+ _find 已知 uid 返回 ToastWidget + _find 未知 uid 返回 None + _find 空容器返回 None。 |
 | 939 | Batch 275 — StatusBar set_section/clear_section/section_count 边界（7 测试） | 新建 test_status_bar_extra_boundary.py（76 行）：section_count 初始 0 + set_section 空字符串不崩 + 多 section 有序（conn/clock/status 3 键）+ clear 所有后 count 0 + 同键多次更新不增加 count + clear 后 section_text 返回空 + clear 后重新 set_section 创建新 section。 |
 | 940 | Batch 276 — fuzzy_score + rank_commands 边界（10 测试） | 新建 test_command_palette_fuzzy_boundary.py（82 行）：fuzzy_score 单字符/长查询-1/数字/全匹配/符号 + rank_commands 空命令列表/空查询空命令/单条目/全不匹配/相同分数稳定排序（CommandItem frozen dataclass）。 |
+| 941 | Batch 277 — CommandItem frozen + CommandPalette set_commands/execute/key 边界（12 测试） | 新建 test_command_palette_item_boundary.py（108 行）：CommandItem frozen AttributeError + 默认 hint='' + 自定义 hint + title 访问 + set_commands 空列表不崩 + 替换旧命令 + _execute_item(None) 安全 + _execute_selected 无项不崩 + keyPressEvent Down/Up/未知键不崩 + open/close 多次循环。 |
 
 ---
 
