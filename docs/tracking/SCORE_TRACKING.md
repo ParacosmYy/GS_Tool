@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 957分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 43分
+> 当前: 958分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 42分
 
 ---
 
@@ -607,6 +607,7 @@
 | 955 | Batch 291 — connection_state connect_fake/serial/endpoint_transport_result 边界（8 测试） | 新建 test_connection_state_connect_boundary.py（88 行）：connect_fake 成功 ok + 追加 entry + connect_serial 成功 + 追加 entry + connect_endpoint tcp 成功 + 失败不崩 + connect_fake 已有 FakeSerialTransport 不替换 + 非 FakeSerialTransport 创建新实例并替换。 |
 | 956 | Batch 292 — TransportRegistry with_defaults/available_ports/modes/create 边界（8 测试） | 新建 test_transport_registry_methods_boundary.py（72 行）：with_defaults 返回 TransportRegistry + modes 非空含 serial/tcp/udp + available_ports('serial') 返回 tuple + create('serial') 返回 SerialTransport + create('fake') 返回 FakeSerialTransport + create('nonexistent') raises KeyError/ValueError。 |
 | 957 | Batch 293 — UdpDatagramTransport available_ports/local_port/config/is_open 边界（8 测试） | 新建 test_udp_datagram_boundary.py（56 行）：available_ports 返回 list + 非空 + local_port 属性未连接==0 + config 未连接 None + is_open 初始 False + on_bytes_received 注册不崩 + on_error 注册不崩 + close 未连接不崩。 |
+| 958 | Batch 294 — TcpClientTransport available_ports/config/is_open/_emit_error 边界（8 测试） | 新建 test_tcp_client_boundary.py（62 行）：available_ports 返回 list + config 未连接 None + is_open 初始 False + on_bytes_received 注册不崩 + on_error 注册不崩 + close 未连接不崩 + _emit_error 触发 callback + _emit_error 无 callback 不崩。 |
 
 ---
 
