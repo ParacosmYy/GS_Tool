@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 962分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 38分
+> 当前: 963分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 37分
 
 ---
 
@@ -612,6 +612,7 @@
 | 960 | Batch 296 — QtSerialPortTransport 属性边界（8 测试） | 新建 test_qt_serial_transport_boundary.py（56 行）：config 未连接 None + port_name 空 + baud_rate 默认 9600（QSerialPort 默认）+ is_open False + available_ports 返回 list + on_bytes/on_error 注册不崩 + close 未连接不崩。 |
 | 961 | Batch 297 — SerialPortConfig 默认值/frozen/自定义 边界（8 测试） | 新建 test_serial_port_config_boundary.py（58 行）：默认 baud_rate=115200 + data_bits=8 + parity='none' + stop_bits='1' + flow_control='none' + 自定义全字段（9600/7/even/2/hardware）+ frozen AttributeError。 |
 | 962 | Batch 298 — OperationError code/message/frozen 边界（8 测试） | 新建 test_operation_error_boundary.py（56 行）：code+message 构造 + 默认 message='' + 空 code raises ValueError（match 'error code'）+ code/message 属性 + 自定义 message + frozen AttributeError + 多实例独立。 |
+| 963 | Batch 299 — OperationResult 泛型/failed/error_code/message 边界（8 测试） | 新建 test_operation_result_generic_boundary.py（50 行）：泛型 value（OperationResult[int]=42）+ success 默认 value=None + 带 value + failed 属性（not ok）+ error_code 成功空/失败返回 code + message 成功空/失败返回 error.message。 |
 
 ---
 
