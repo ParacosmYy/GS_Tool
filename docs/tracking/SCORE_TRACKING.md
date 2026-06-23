@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 922分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 78分
+> 当前: 923分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 77分
 
 ---
 
@@ -572,6 +572,7 @@
 | 920 | Batch 256 — ValueDisplay set_value/_refresh 格式化 + trend 边界（10 测试） | 新建 test_value_display_boundary.py（110 行）：set_value 返回新值 + _previous 追踪旧值 + _refresh .2f 格式化（3.14159→3.14）+ set_unit 文本含 unit + 大值 1e6 不崩 + 负值含 '-42.50' + 零值 trend flat（◆）+ 连续相同值 flat + 微小 delta<1e-9 flat + set_label 更新 label_widget。 |
 | 921 | Batch 257 — CommandSlider _build_command + set_formatter + value 边界（10 测试） | 新建 test_command_slider_boundary.py（108 行）：_build_command 用 command_template.format(value=) + hex 格式（0x{value:04X}→00FF）+ formatter 覆盖 template + formatter 优先级（设置后优先于 template）+ set_value 更新 value() + value() 初始默认 + set_value clamp 到 maximum + label() 返回标签文本 + _build_command 多值（0/50/100）+ set_formatter 改变输出（OLD→NEW）。 |
 | 922 | Batch 258 — StatusLed _glow + LedState 枚举 + set_label 边界（12 测试） | 新建 test_status_led_glow_boundary.py（112 行）：_get_glow/_set_glow round-trip + _set_glow 触发 update 不崩 + _glow 默认 0.0 + LedState 5 成员 + value 小写 + 互异 + 已知值（off/green/yellow/red/blue）+ state 属性 round-trip + set_label 更新文本（多次/空串）+ set_breathing(True) 显式启动 + toggle 循环 + _pulse_glow QTimer 回调不崩。 |
+| 923 | Batch 259 — WaveformEmptyOverlay + WaveformLoadingOverlay 内部结构边界（10 测试） | 新建 test_waveform_overlay_internals_boundary.py（112 行）：empty overlay _icon_label 存在 + title='等待波形数据' + description 含'连接设备' + loading _ring objectName serialStationWaveformLoadingRing + _ring indeterminate=True + _label objectName serialStationWaveformLoadingLabel + _label 含'连接' + 初始 hide + build 两 overlay 共享 parent + build loading 默认 hide。 |
 
 ---
 
