@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 964分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 36分
+> 当前: 965分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 35分
 
 ---
 
@@ -614,6 +614,7 @@
 | 962 | Batch 298 — OperationError code/message/frozen 边界（8 测试） | 新建 test_operation_error_boundary.py（56 行）：code+message 构造 + 默认 message='' + 空 code raises ValueError（match 'error code'）+ code/message 属性 + 自定义 message + frozen AttributeError + 多实例独立。 |
 | 963 | Batch 299 — OperationResult 泛型/failed/error_code/message 边界（8 测试） | 新建 test_operation_result_generic_boundary.py（50 行）：泛型 value（OperationResult[int]=42）+ success 默认 value=None + 带 value + failed 属性（not ok）+ error_code 成功空/失败返回 code + message 成功空/失败返回 error.message。 |
 | 964 | Batch 300 — NotificationLevel 枚举 + NotificationData 字段/is_expired 边界（8 测试） | 新建 test_notification_data_boundary.py（58 行）：NotificationLevel 4 成员 + 值小写 + NotificationData 全字段（level/title/message/timestamp_ns）+ 默认 timeout_ms=3000 + is_expired 未超时 False + 超时 True + is_persistent timeout_ms=0 永不过期 + 默认 uid=0。 |
+| 965 | Batch 301 — help/topics HelpTopic + HelpEntry + PROTOCOL/SHORTCUT_HELP 边界（8 测试） | 新建 test_help_topics_boundary.py（58 行）：HelpTopic 5 成员 + 值小写 + HelpEntry frozen AttributeError + 默认 tags 空 list + 自定义 tags + PROTOCOL_HELP 3 协议（raw_data/fire_water/just_float）+ SHORTCUT_HELP 含 Ctrl+Enter + SHORTCUT_HELP 含 F1。 |
 
 ---
 
