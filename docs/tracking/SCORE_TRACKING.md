@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 944分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 56分
+> 当前: 945分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 55分
 
 ---
 
@@ -594,6 +594,7 @@
 | 942 | Batch 278 — app/main create_application 边界（6 测试） | 新建 test_app_main_boundary.py（58 行）：create_application 返回 QApplication + 复用现有 instance（单例）+ 设置 applicationName 非空 + applicationDisplayName 非空 + 设置 font 不崩 + 设置 _embeddebug_animation_enabled 属性（None 或 bool 兼容）。build_main_window/build_app_shell 涉及完整 UI 构建在 offscreen 下超时不覆盖。 |
 | 943 | Batch 279 — dashboard/factory apply_binding + read_binding 边界（8 测试） | 新建 test_dashboard_factory_binding_boundary.py（90 行）：apply_binding value_display→binding_channel（int 3）+ led:warning→binding_level + button:RESET_NOW→command_template + invalid spec→False + binding_spec raw 属性写入 + read_binding 无属性→None + slider 读回含 SET_VOLTAGE + button 读回含 RESET。 |
 | 944 | Batch 280 — settings_service DEFAULT_* 常量 + UserSettings 边界（11 测试） | 新建 test_settings_constants_boundary.py（86 行）：DEFAULT_THEME='serial_station_dark' + DEFAULT_ACCENT='cyan' + DEFAULT_FONT_POINT=13 + DEFAULT_BAUDRATE=115200 + DEFAULT_ANIMATION_ENABLED=True + DEFAULT_DATA_DIR='' + UserSettings 全字段默认 + 可变（非 frozen）+ 自定义值 + 自定义 baudrate + update 未知字段 AttributeError。 |
+| 945 | Batch 281 — micro_interactions install_card_shadow + install_hover_lift 边界（8 测试） | 新建 test_micro_interactions_install_boundary.py（78 行）：install_card_shadow 返回 QGraphicsDropShadowEffect + blurRadius>=0 + widget 有 graphicsEffect + 自定义 ELEVATION_L2 level + install_hover_lift accent_tint=True/False 返回 effect + widget 有 graphicsEffect + 默认 accent_tint 不崩。 |
 
 ---
 
