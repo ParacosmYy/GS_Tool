@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 927分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 73分
+> 当前: 928分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 72分
 
 ---
 
@@ -577,6 +577,7 @@
 | 925 | Batch 261 — RippleButton _ripple_progress + _start_ripple 边界（10 测试） | 新建 test_ripple_progress_boundary.py（96 行）：_get_ripple_progress/_set_ripple_progress round-trip（0.5）+ 默认 0.0 + _set 触发 update 不崩 + _start_ripple 设置 _ripple_anim 非 None + 不同中心点（0,0/50,50/100,100）+ 多次替换旧 anim + _ripple_anim 初始 None + set_ripple(True/False) 标志 + toggle 循环（True→False→True）。 |
 | 926 | Batch 262 — AnimationController add/play/stop_all/active_count 边界（13 测试） | 新建 test_animation_controller_boundary.py（130 行）：active_count 初始 0 + add 增长 _animations + 多次 add 累积 + active_count 统计 Running（2/3）+ play_sequential 空列表不崩 + play_parallel 空列表不崩 + play_sequential 返回 QSequentialAnimationGroup（真实 QPropertyAnimation）+ play_parallel 返回 QParallelAnimationGroup + play 累积 _groups + stop_all 清空 _animations + stop_all 清空 _groups + stop_all 幂等（三次）+ stop_all 后 active_count==0。 |
 | 927 | Batch 263 — ElasticSnap snap_to_pos/snap_center_to + drop_in 边界（9 测试） | 新建 test_elastic_snap_boundary.py（106 行）：snap_to_pos 返回 QPropertyAnimation + 注册 _active + 不同位置不崩 + snap_center_to 返回 QPropertyAnimation + 注册 _active + 不同尺寸不崩 + drop_in（bounce_path）返回 QPropertyAnimation + 注册 _active + cancel 清理多个 _active（snap_to+snap_to_pos 后 cancel）。 |
+| 928 | Batch 264 — ThemeTransition _track/_discard/is_running + 常量边界（12 测试） | 新建 test_theme_transition_internals_boundary.py（110 行）：OPACITY_DIP=0.6 + DIP_MS=120 + RISE_MS=180 + RISE_MS>DIP_MS + is_running 初始 False + _track 添加到 _active + _discard 移除 + _discard 移除不存在元素不抛（ValueError 吞）+ _track+_discard 往返空 + is_running 反映 _active 非空 True + discard 后 False + 多次 _track 累积（3 个）。 |
 
 ---
 
