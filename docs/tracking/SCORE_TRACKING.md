@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 948分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 52分
+> 当前: 949分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 51分
 
 ---
 
@@ -598,6 +598,7 @@
 | 946 | Batch 282 — IconManager _read_svg + reset 边界（7 测试） | 新建 test_icon_manager_internals_boundary.py（56 行）：_read_svg 已知图标（send）返回非空 str 含 svg 标签 + 未知图标返回 None + reset 清空 _cache={} + _read_svg cable 含 svg + 多图标批量（send/cable/settings）+ _cache 是 dict + reset 多次不崩。 |
 | 947 | Batch 283 — button_icons _find_child_by_object_name + apply_button_icons 边界（6 测试） | 新建 test_button_icons_find_boundary.py（74 行）：_find_child 已知 objectName 返回 widget + 未知返回 None + 空 owner（无 findChild）返回 None + 多子控件找目标 + apply_button_icons 返回 int>=0 + 空窗口返回 0。 |
 | 948 | Batch 284 — layout_cards build_card icon_name + wrap_layout icon 边界（8 测试） | 新建 test_layout_cards_icon_boundary.py（76 行）：build_card 带 icon_name='cable' 不崩 + card objectName=_CARD_OBJECT_NAME + body objectName=_CARD_BODY_OBJECT_NAME + title+icon 创建 header（findChild QLabel 含 'My Card'）+ wrap_layout 带 icon 不崩 + _CARD_OBJECT_NAME 以 serialStation 开头 + _CARD_BODY_OBJECT_NAME 以 serialStation 开头 + card_body 从 card 提取同一 body layout。 |
+| 949 | Batch 285 — _dashboard_layout_store _app_data_dir + load/save 边界（8 测试） | 新建 test_dashboard_layout_store_boundary.py（74 行）：_app_data_dir 返回 Path 非空 + layout_path 返回 Path 含 'layout' + load_layout_dict 缺失文件返回 {} + save+load 往返（tabs/items dict）+ save_layout_dict 返回 True + 损坏 JSON load 返回 {}（monkeypatch layout_path 到 tmp_path）。 |
 
 ---
 
