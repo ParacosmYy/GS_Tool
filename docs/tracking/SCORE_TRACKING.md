@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 945分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 55分
+> 当前: 946分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 54分
 
 ---
 
@@ -595,6 +595,7 @@
 | 943 | Batch 279 — dashboard/factory apply_binding + read_binding 边界（8 测试） | 新建 test_dashboard_factory_binding_boundary.py（90 行）：apply_binding value_display→binding_channel（int 3）+ led:warning→binding_level + button:RESET_NOW→command_template + invalid spec→False + binding_spec raw 属性写入 + read_binding 无属性→None + slider 读回含 SET_VOLTAGE + button 读回含 RESET。 |
 | 944 | Batch 280 — settings_service DEFAULT_* 常量 + UserSettings 边界（11 测试） | 新建 test_settings_constants_boundary.py（86 行）：DEFAULT_THEME='serial_station_dark' + DEFAULT_ACCENT='cyan' + DEFAULT_FONT_POINT=13 + DEFAULT_BAUDRATE=115200 + DEFAULT_ANIMATION_ENABLED=True + DEFAULT_DATA_DIR='' + UserSettings 全字段默认 + 可变（非 frozen）+ 自定义值 + 自定义 baudrate + update 未知字段 AttributeError。 |
 | 945 | Batch 281 — micro_interactions install_card_shadow + install_hover_lift 边界（8 测试） | 新建 test_micro_interactions_install_boundary.py（78 行）：install_card_shadow 返回 QGraphicsDropShadowEffect + blurRadius>=0 + widget 有 graphicsEffect + 自定义 ELEVATION_L2 level + install_hover_lift accent_tint=True/False 返回 effect + widget 有 graphicsEffect + 默认 accent_tint 不崩。 |
+| 946 | Batch 282 — IconManager _read_svg + reset 边界（7 测试） | 新建 test_icon_manager_internals_boundary.py（56 行）：_read_svg 已知图标（send）返回非空 str 含 svg 标签 + 未知图标返回 None + reset 清空 _cache={} + _read_svg cable 含 svg + 多图标批量（send/cable/settings）+ _cache 是 dict + reset 多次不崩。 |
 
 ---
 
