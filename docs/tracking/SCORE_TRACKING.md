@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 938分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 62分
+> 当前: 939分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 61分
 
 ---
 
@@ -588,6 +588,7 @@
 | 936 | Batch 272 — EmptyStateWidget set_description/show_with_fade/hide_with_fade 边界（11 测试） | 新建 test_empty_state_methods_boundary.py（96 行）：set_title 更新 + set_description 更新 + 两者独立 + show_with_fade 默认/自定义 duration 不崩 + 连续 show 停旧动画 + hide_with_fade 默认/自定义 duration 不崩 + 连续 hide 不崩 + _stop_inflight_fade 无动画安全 + show 后 _stop_inflight 停止。 |
 | 937 | Batch 273 — ToastWidget data/is_leaving/stop_animations 边界（8 测试） | 新建 test_toast_widget_data_boundary.py（82 行）：data 属性返回 NotificationData + title/message/level 匹配构造 + is_leaving 初始 False + stop_animations 不崩 + stop_animations 幂等（多次）+ schedule_dismiss(0) 不启动 timer 不崩。 |
 | 938 | Batch 274 — ToastContainer _on_added/_find/_active_count_widget_index 边界（7 测试） | 新建 test_toast_container_internals_boundary.py（82 行）：_on_added 创建 ToastWidget + count 增加 + 多次累积 + _active_count_widget_index 返回插入位置（placeholder 后=1）+ _find 已知 uid 返回 ToastWidget + _find 未知 uid 返回 None + _find 空容器返回 None。 |
+| 939 | Batch 275 — StatusBar set_section/clear_section/section_count 边界（7 测试） | 新建 test_status_bar_extra_boundary.py（76 行）：section_count 初始 0 + set_section 空字符串不崩 + 多 section 有序（conn/clock/status 3 键）+ clear 所有后 count 0 + 同键多次更新不增加 count + clear 后 section_text 返回空 + clear 后重新 set_section 创建新 section。 |
 
 ---
 
