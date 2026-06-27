@@ -10,7 +10,7 @@
 - 禁止提交构建产物、`build/`、中间文件、自动生成的 moc/ui/qrc 临时产物。
 - 禁止提交空提交（无功能/验证增益）。
 - 不能提交与本轮无关文件。
-- 每次提交仅在门禁通过后可加分，默认本轮加分 1 点（`+1`）且可复用作全局目标评分。
+- 每次提交仅在门禁通过且本次 diff 修改行数（新增+删除）≥1000 行后可加分；未达 1000 行仍可提交，但本轮评分必须为 `+0`。
 
 ---
 
@@ -41,13 +41,13 @@
 > ⚠️ **本节原定义的 "A-I-R-C-L-M-P 七环"、7 角色子代理回执、"起始分 500" 已全部废除**。
 >
 > 历史问题：
-> - 起始分曾写成 500，与 CLAUDE.md/SCORE_TRACKING 的真实起始分（1，当前 800+）矛盾
+> - 起始分曾写成 500，与 CLAUDE.md/SCORE_TRACKING 的现行起始分（100）矛盾
 > - 7 角色子代理在单 Agent 会话（如 ZCode）无法自动派发，是永远 +0 的幽灵门禁
 > - 7 环编号与 02-workflow、serial_station_architecture 的闭环编号三重冲突
 >
 > **统一权威定义见 [09-closed-loop.md](09-closed-loop.md)**：
 > - **§一 单轮闭环**：5 视角自检 + 6 门禁
-> - **§二 评分闭环**：起始分 1，目标 1000，每通过门禁 commit +1，canonical 落点 `docs/tracking/SCORE_TRACKING.md`
+> - **§二 评分闭环**：起始分 100，目标 1000；每次 commit 只有全门禁绿且 diff 修改行数≥1000 才允许 +1；canonical 落点 `docs/tracking/SCORE_TRACKING.md`
 > - **§五 commit message 模板**（取代本节旧模板）
 
 ### 4.1 提交门禁速览（详见 09-closed-loop §一.2）
@@ -58,10 +58,11 @@
 3. `cmd /c EmbedDebug.bat --smoke`（启动/入口/依赖改动时必跑）
 4. `uv run lint-embeddebug-py`（无新错误）
 5. `uv run check-constraints`（评分/SSOT/行数漂移检测，退出码 0）
+6. 若本轮需要 `+1`：确认 `git diff --numstat HEAD --` 的新增+删除行数合计 ≥1000
 
 ### 4.2 Push 节奏（详见 09-closed-loop §二.2）
 
-- 每 2 个通过门禁的 commit 为 1 个 push 周期
+- 每 2 个通过门禁且实际加分的 commit 为 1 个 push 周期
 - push 前必须更新 `README.md` 状态表（评分、能力、证据入口）
 - push 前若未更新 README，视为收口缺陷，不得进入下一轮加分
 
@@ -73,7 +74,7 @@
 门禁: test✓ smoke✓ lint✓ check_constraints✓ [bat✓]
 视角: 架构✓ 实现✓ 测试✓ 产品✓ 用户✓
 三轴: E<x> U<x> D<x>（本轮变化: <无 / E↑ / U↑ / D↑>）
-评分: <旧分> + 1 = <新分>（见 docs/tracking/SCORE_TRACKING.md）
+评分: <旧分> + <0或1> = <新分>（见 docs/tracking/SCORE_TRACKING.md；+1 必须满足 diff≥1000 行）
 变更: <N> files, <+M> insertions, <-K> deletions
 ```
 
@@ -94,6 +95,7 @@
 - [ ] [09-closed-loop §一](09-closed-loop.md) 6 门禁全绿（或未跑项已写明原因）？
 - [ ] commit message 符合 [09-closed-loop §五](09-closed-loop.md) 模板？
 - [ ] 评分已更新到 `docs/tracking/SCORE_TRACKING.md` 首行（唯一处）？
+- [ ] 若评分 `+1`，本次 diff 修改行数（新增+删除）是否 ≥1000？
 - [ ] 闭环结果已追加到 `docs/tracking/LOOP_STATE.md`？
 - [ ] 若本次为 push 周期结尾（2 次提交）：README 已更新且可追溯证据摘要齐全
 

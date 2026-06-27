@@ -19,7 +19,7 @@
 | 默认分支 | `feat/embed-debug`（运行 `git branch --show-current` 复核） |
 | 当前版本 | 见 `pyproject.toml` `[project].version` |
 | **当前评分** | **见 [docs/tracking/SCORE_TRACKING.md](../tracking/SCORE_TRACKING.md) 首行**（canonical 唯一） |
-| 目标评分 | 1000（起始分 1，每通过门禁 commit +1，规则见 [09-closed-loop §二](09-closed-loop.md)） |
+| 目标评分 | 1000（起始分 100；只有全门禁绿且 diff 修改行数≥1000 的 commit 才允许 +1，规则见 [09-closed-loop §二](09-closed-loop.md)） |
 | 最终三轴目标 | `E5 + U4 + D4` |
 
 ---
@@ -46,17 +46,17 @@
 
 要点速览（详见 09-closed-loop）：
 
-- 起始分 1，目标 1000，每通过门禁 commit `+1`
+- 起始分 100，目标 1000；只有全门禁绿且 diff 修改行数（新增+删除）≥1000 的 commit 才允许 `+1`
 - canonical 唯一落点：`docs/tracking/SCORE_TRACKING.md` 首行
 - 其他文档禁止硬编码分数，引用方式见 [00-ssot.md](00-ssot.md)
-- 每 2 个通过门禁 commit 为 1 个 push 周期，push 前必须更新 README
-- 评分闭环触发条件：PRD/Specs 已更新 + 至少一类验收证据可复现 + 无越界 + 三轴至少一项有真实改变 + smoke 退出码 0
+- 每 2 个通过门禁且实际加分的 commit 为 1 个 push 周期，push 前必须更新 README
+- 评分闭环触发条件：PRD/Specs 已更新 + 至少一类验收证据可复现 + 无越界 + 三轴至少一项有真实改变 + smoke 退出码 0 + diff 修改行数≥1000
 
 ### 量化里程碑（参考）
 
 | 分数档 | 目标 | 说明 |
 |---|---|---|
-| 1~199 | 起步期 | 基础设施、协议层、OTA 体系逐步成型 |
+| 100~199 | 起步期 | 基础设施、协议层、OTA 体系逐步成型 |
 | 200~599 | 约束对齐期 | 将已有规则统一到可执行清单 |
 | 600~799 | 结构与流程稳定期 | 形成闭环执行模板并落地 |
 | 800~899 | 体验一致性期 | UI、日志、回放、脚本、错误可恢复能力齐备 |
@@ -183,7 +183,7 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-smoke-windows-x
 每次任务结束追加一条评分日志到 `docs/tracking/LOOP_STATE.md`（闭环状态表）和 `docs/tracking/SCORE_TRACKING.md`（评分历史），格式如下：
 
 - 时间：YYYY-MM-DD HH:mm
-- 本轮增量：`+1`（门禁全绿时；未过为 `+0`）
+- 本轮增量：`+1`（门禁全绿且 diff 修改行数≥1000 时；未满足为 `+0`）
 - 当前得分：见 `docs/tracking/SCORE_TRACKING.md` 首行（canonical）
 - 本轮影响：`文件列表`、`约束文档列表`、`E/U/D`变更
 - 证据摘要：`build/test/startup/doc` 三类至少 1 项

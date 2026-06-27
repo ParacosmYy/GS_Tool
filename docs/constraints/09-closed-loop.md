@@ -42,12 +42,14 @@
 | 5 | `uv run check-constraints` | 退出码 0 | 每次 commit |
 | 6 | （含在门禁 5 内）文件行数 ≤300（.py）/ ≤250（test） | 脚本检测 | 每次 commit |
 | 7 | （含在门禁 5 内）测试组织：无新增孤儿文件 / unit 层不混 PyQt | 脚本检测 | 每次 commit |
+| 8 | （含在门禁 5 内）加分行数门槛：若本轮分数上调，diff 新增+删除 ≥1000 行 | 脚本检测 | 每次 +1 commit |
 
 **门禁 5（check-constraints）机械检测清单**（详见 [tools/check_constraints.py](../../tools/check_constraints.py)）：
 - 评分一致性：CLAUDE.md / README.md / 01-overview / 06 出现的分数与 SCORE_TRACKING 一致
 - SSOT 合规：核心文档无硬编码 `NNNN passed` / `NNN 个测试文件`
 - 冻结目录：仓库根无 `src/`、`build2/`、`native-build-*`
 - 文件行数：runtime ≤300 / test ≤250
+- **评分加分行数**：若 SCORE_TRACKING 分数相对 HEAD 上调，`git diff --numstat HEAD --` 新增+删除合计必须 ≥1000
 - **测试孤儿**：新增 `test_*.py` 若 <3 个测试函数即阻断（既有孤儿只警告，列技术债）
 - **unit 层纯度**：新增 unit 测试若 import PyQt/pyqtgraph 即阻断（应放 ui_smoke/ 或用 fake）
 
@@ -69,15 +71,15 @@
 
 ### 2.1 评分规则
 
-- 起始分 1，目标 1000
-- 每个通过 §一 全部门禁的 commit：**+1 分**
-- 门禁任一失败：本轮 +0，不得进入加分闭环
+- 起始分 100，目标 1000
+- 每个通过 §一 全部门禁且 diff 修改行数（新增+删除）≥1000 的 commit：**+1 分**
+- 门禁任一失败或 diff 修改行数 <1000：本轮 +0，不得进入加分闭环
 - canonical 唯一落点：[docs/tracking/SCORE_TRACKING.md](../tracking/SCORE_TRACKING.md) 首行
 - 其他文档**禁止复制分数**，只能引用（见 [00-ssot.md](00-ssot.md)）
 
 ### 2.2 Push 节奏
 
-- 每 2 个通过门禁的 commit 为 1 个 push 周期（第 2/4/6 次 commit 后 push）
+- 每 2 个通过门禁且实际加分的 commit 为 1 个 push 周期（第 2/4/6 次 +1 commit 后 push）
 - push 前必须更新 `README.md` 状态表（评分、能力、证据入口）
 - push 前若未更新 README，视为收口缺陷，不得进入下一轮加分
 
@@ -151,13 +153,13 @@ GO 循环触发以下任一条件，必须停止当前循环，进 LOOP：
 门禁: test✓ smoke✓ lint✓ check_constraints✓ [bat✓]
 视角: 架构✓ 实现✓ 测试✓ 产品✓ 用户✓
 三轴: E<x> U<x> D<x>（本轮变化: <无 / E↑ / U↑ / D↑>）
-评分: <旧分> + 1 = <新分>（见 docs/tracking/SCORE_TRACKING.md）
+评分: <旧分> + <0或1> = <新分>（见 docs/tracking/SCORE_TRACKING.md；+1 必须满足 diff≥1000 行）
 变更: <N> files, <+M> insertions, <-K> deletions
 ```
 
 说明：
 - `[bat✓]` 仅在跑了 `cmd /c EmbedDebug.bat --smoke` 时打勾
-- `评分` 行的 `<旧分>` `<新分>` 必须与 SCORE_TRACKING.md 一致
+- `评分` 行的 `<旧分>` `<新分>` 必须与 SCORE_TRACKING.md 一致；`+1` 必须同时满足全门禁绿与 diff 修改行数≥1000
 - 若某门禁未跑，写 `X✗（原因：...）`，不得省略
 
 示例：
@@ -168,7 +170,7 @@ controllers: Batch 118 — X 状态助手单元测试（5 测试）
 门禁: test✓ smoke✓ lint✓ check_constraints✓
 视角: 架构✓ 实现✓ 测试✓ 产品✓ 用户✓
 三轴: E4 U2 D1（本轮变化: 无，纯测试增量）
-评分: 787 + 1 = 788（见 docs/tracking/SCORE_TRACKING.md）
+评分: 100 + 0 = 100（见 docs/tracking/SCORE_TRACKING.md；diff<1000，本轮不加分）
 变更: 3 files, +120 insertions, -8 deletions
 ```
 
@@ -205,4 +207,5 @@ controllers: Batch 118 — X 状态助手单元测试（5 测试）
 - [ ] 涉及 Serial Station 的改动未越 ui/controller/core/protocols/services/workers 边界
 - [ ] commit message 符合 §五 模板
 - [ ] 评分已更新到 SCORE_TRACKING.md（唯一处），其他文档未复制
+- [ ] 若评分 `+1`，本次 diff 修改行数（新增+删除）≥1000，且 `uv run check-constraints` 已验证
 - [ ] 闭环结果已追加到 [docs/tracking/LOOP_STATE.md](../tracking/LOOP_STATE.md)

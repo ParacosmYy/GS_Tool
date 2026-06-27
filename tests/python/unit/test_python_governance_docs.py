@@ -197,7 +197,8 @@ def test_score_tracking_head_not_behind_max_record():
     assert head_match, "SCORE_TRACKING.md 头部缺少「当前: NNN分」声明"
     head_score = int(head_match.group(1))
 
-    record_nums = [int(n) for n in re.findall(r"^\|\s*(\d+)\s*\|", text, re.MULTILINE)]
+    current_policy_text = text.split("## 二、旧制评分历史存档", maxsplit=1)[0]
+    record_nums = [int(n) for n in re.findall(r"^\|\s*(\d+)\s*\|", current_policy_text, re.MULTILINE)]
     assert record_nums, "SCORE_TRACKING.md 无任何评分记录行（| NNN | ...）"
     max_record = max(record_nums)
 

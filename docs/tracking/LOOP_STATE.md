@@ -20,6 +20,7 @@
 | 2026-06-27 | Batch 308 — 测试文件聚合精简（QSS/Transport/Measurement/Connection） | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（4647 passed, 2 skipped） | ✓ exit0 | ✓ exit0 | ✓ All passed | ✓ exit0 | ✓（check_constraints 通过） | E5/U3/D2（本轮变化：E↑，测试文件总数 352→344，重复边界测试合并；D 不提升） | 971 + 1 = 972 | 通过 | 下一轮继续按 dashboard/waveform/command/theme 大域做测试文件瘦身，不触碰 CI |
 | 2026-06-27 | Batch 309 — dashboard 测试文件聚合精简 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（4634 passed, 2 skipped） | ✓ exit0 | ✓ exit0 | ✓ All passed | ✓ exit0 | ✓（check_constraints 通过） | E5/U3/D2（本轮变化：E↑，测试文件总数 344→340，dashboard 重复拆分测试合并；D 不提升） | 972 + 1 = 973 | 通过 | 下一轮继续按 waveform/command/theme 大域做测试文件瘦身，不触碰 CI |
 | 2026-06-27 | Batch 310 — command 测试文件聚合精简 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（4634 passed, 2 skipped） | ✓ exit0 | ✓ exit0 | ✓ All passed | ✓ exit0 | ✓（check_constraints 通过） | E5/U3/D2（本轮变化：E↑，测试文件总数 340→337，command 重复边界测试合并；D 不提升） | 973 + 1 = 974 | 通过 | 下一轮继续按 waveform/theme 大域做测试文件瘦身，不触碰 CI |
+| 2026-06-27 | Batch 311 — waveform 测试文件聚合精简 + 评分制度重置 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（4634 passed, 2 skipped） | ✓ exit0 | ✓ exit0 | ✓ All passed | ✓ exit0 | ✓（check_constraints 通过） | E5/U3/D2（本轮变化：E↑，测试文件总数 337→335，waveform preview/overlay 重复边界测试合并；评分基线重置为 100；D 不提升） | 100 + 0 = 100（diff<1000，新规不加分） | 通过 | 下一轮继续按 waveform/theme 大域做测试文件瘦身；只有 diff≥1000 且门禁全绿才 +1，不触碰 CI |
 
 ### 1.1 并发会话说明
 

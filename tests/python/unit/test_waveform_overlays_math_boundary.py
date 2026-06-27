@@ -137,3 +137,74 @@ def test_expression_error_caught_as_value_error():
 
     with pytest.raises(ValueError):
         raise ExpressionError("test")
+
+
+def test_empty_overlay_icon_label_exists(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    overlay = WaveformEmptyOverlay(parent)
+    assert overlay._icon_label is not None
+
+
+def test_empty_overlay_title_text(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    overlay = WaveformEmptyOverlay(parent)
+    assert overlay._title_label.text() == "等待波形数据"
+
+
+def test_empty_overlay_description_text(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    overlay = WaveformEmptyOverlay(parent)
+    assert "连接设备" in overlay._desc_label.text()
+
+
+def test_loading_overlay_ring_objectname(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    overlay = WaveformLoadingOverlay(parent)
+    assert overlay._ring.objectName() == "serialStationWaveformLoadingRing"
+
+
+def test_loading_overlay_ring_indeterminate(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    overlay = WaveformLoadingOverlay(parent)
+    assert overlay._ring.isIndeterminate() is True
+
+
+def test_loading_overlay_label_objectname(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    overlay = WaveformLoadingOverlay(parent)
+    assert overlay._label.objectName() == "serialStationWaveformLoadingLabel"
+
+
+def test_loading_overlay_label_text(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    overlay = WaveformLoadingOverlay(parent)
+    assert "连接" in overlay._label.text()
+
+
+def test_loading_overlay_initially_hidden(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    overlay = WaveformLoadingOverlay(parent)
+    assert overlay.isHidden()
+
+
+def test_build_overlays_both_share_parent(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    empty, loading = build_waveform_overlays(parent)
+    assert empty.parent() is parent
+    assert loading.parent() is parent
+
+
+def test_build_overlays_empty_not_hidden_initially(qtbot):
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    _empty, loading = build_waveform_overlays(parent)
+    assert loading.isHidden()

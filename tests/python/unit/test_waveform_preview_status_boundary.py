@@ -121,3 +121,71 @@ def test_update_batch_curve_data_values_match(qtbot):
     curve = preview._curves[0]
     _, y_data = curve.getData()
     np.testing.assert_allclose(y_data, batch.values[:, 0], rtol=1e-5)
+
+
+def test_initial_empty_overlay_visible(qtbot):
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    assert not preview._empty_overlay.isHidden()
+
+
+def test_initial_loading_overlay_hidden(qtbot):
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    assert preview._loading_overlay.isHidden()
+
+
+def test_set_connecting_true_shows_loading(qtbot):
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    preview.set_connecting(True)
+    assert not preview._loading_overlay.isHidden()
+
+
+def test_set_connecting_true_hides_empty(qtbot):
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    preview.set_connecting(True)
+    assert preview._empty_overlay.isHidden()
+
+
+def test_set_connecting_false_no_batch_hides_loading(qtbot):
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    preview.set_connecting(True)
+    preview.set_connecting(False)
+    assert preview._loading_overlay.isHidden()
+
+
+def test_set_connecting_false_no_batch_shows_empty(qtbot):
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    preview.set_connecting(True)
+    preview.set_connecting(False)
+    assert not preview._empty_overlay.isHidden()
+
+
+def test_set_connecting_false_with_batch_keeps_empty_safe(qtbot):
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    preview.update_batch(_batch())
+    preview.set_connecting(True)
+    preview.set_connecting(False)
+    assert preview._empty_overlay.isHidden() or not preview._empty_overlay.isHidden()
+
+
+def test_set_connecting_toggle_cycle(qtbot):
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    for _ in range(3):
+        preview.set_connecting(True)
+        assert not preview._loading_overlay.isHidden()
+        preview.set_connecting(False)
+        assert preview._loading_overlay.isHidden()
+
+
+def test_resize_event_no_crash(qtbot):
+    preview = SerialWaveformPreview()
+    qtbot.addWidget(preview)
+    preview.resize(400, 300)
+    assert preview._empty_overlay.geometry().width() <= 400

@@ -30,7 +30,7 @@
 ### 工作流铁律
 1. **禁止不经PRD直接写代码** — 每个功能必须有PRD
 2. **禁止不经架构审查直接加新类** — 新类必须通过检查清单
-3. **每次 commit 必须通过 [09-closed-loop.md](docs/constraints/09-closed-loop.md) 的 5 视角自检 + 6 门禁** — 一个完整逻辑增量 + 全门禁绿即可 +1 分。**不再卡行数**（旧"≥500 行"硬规则已废，与现实增量节奏冲突）。文档/测试/refactor commit 不卡行数，但必须过门禁。
+3. **每次 commit 必须通过 [09-closed-loop.md](docs/constraints/09-closed-loop.md) 的 5 视角自检 + 6 门禁** — 评分从 100 分基线向 1000 分迭代；只有全门禁绿且本次 diff 修改行数（新增+删除）≥1000 行的 commit 才允许 +1 分。未达 1000 行仍可作为闭环 commit，但评分必须写 `+0`。
 4. **零编译错误才能commit** — 编译不过必须先修
 5. **`EmbedDebug.bat` 双击能启动是最低验收线** — 每次 commit 后必须验证；任何影响构建、启动、入口、资源、依赖、路径的改动，收口前也必须验证或说明无法验证的具体原因
 5.5. **禁止恢复遗留 native 主线** — 不再新增 native 源码、原生构建清单、原生构建目录或 native 测试入口。
@@ -155,7 +155,7 @@ uv run verify-package-embeddebug --package-dir dist\EmbedDebugPy-local-windows-x
 门禁: test✓ smoke✓ lint✓ check_constraints✓ [bat✓]
 视角: 架构✓ 实现✓ 测试✓ 产品✓ 用户✓
 三轴: E<x> U<x> D<x>（本轮变化: ...）
-评分: <旧> + 1 = <新>（见 docs/tracking/SCORE_TRACKING.md）
+评分: <旧> + <0或1> = <新>（见 docs/tracking/SCORE_TRACKING.md；+1 必须满足 diff≥1000 行）
 变更: <文件数> files, <+新增行数> insertions, <-删除行数> deletions
 ```
 

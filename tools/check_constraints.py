@@ -8,7 +8,8 @@
    "NNN 个测试文件" 字样（应由命令实时采集）。
 3. 冻结目录守护：仓库根不得出现 src/、build2/、build-debug/、build-release/、
    native-build-*。
-4. 文件行数门禁：python/embeddebug/**/*.py 单文件 ≤300 行；
+4. 评分加分门禁：若本次改动把 canonical 分数上调，diff 修改行数必须 ≥1000。
+5. 文件行数门禁：python/embeddebug/**/*.py 单文件 ≤300 行；
    tests/python/**/*.py 单文件 ≤250 行。
 
 退出码 0 = 全绿；非 0 = 有漂移（stdout 打印每条违规，最后汇总）。
@@ -19,6 +20,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -45,6 +47,9 @@ FORBIDDEN_DIRS = {
 # 文件行数门禁
 RUNTIME_LINE_LIMIT = 300
 TEST_LINE_LIMIT = 250
+
+# 评分加分门槛：只有本次 diff 修改行数达到该值，才允许 canonical 分数 +1。
+SCORE_INCREMENT_LINE_THRESHOLD = 1000
 
 # 测试组织门禁：孤儿文件阈值（<此数测试函数的新 test 文件即孤儿）
 TEST_ORPHAN_THRESHOLD = 3
@@ -115,6 +120,86 @@ def extract_canonical_score() -> int | None:
         if match:
             return int(match.group(1))
     return None
+
+
+def _extract_score_from_text(text: str) -> int | None:
+    """从给定文本前几行抽取 canonical 分数。"""
+    for line in text.splitlines()[:5]:
+        match = SCORE_LINE_RE.search(line)
+        if match:
+            return int(match.group(1))
+    return None
+
+
+def _head_score() -> int | None:
+    """读取 HEAD 版本的 SCORE_TRACKING 分数，用于判断本次是否加分。"""
+    try:
+        result = subprocess.run(
+            ["git", "show", f"HEAD:{SCORE_FILE.relative_to(REPO_ROOT).as_posix()}"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0:
+        return None
+    return _extract_score_from_text(result.stdout)
+
+
+def _changed_line_count() -> int | None:
+    """统计本次相对 HEAD 的新增+删除行数。"""
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--numstat", "HEAD", "--"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0:
+        return None
+    total = 0
+    for line in result.stdout.splitlines():
+        parts = line.split("\t")
+        if len(parts) < 3:
+            continue
+        added, deleted = parts[0], parts[1]
+        if added == "-" or deleted == "-":
+            continue
+        total += int(added) + int(deleted)
+    return total
+
+
+def check_score_increment_line_gate(canonical: int | None) -> list[str]:
+    """若本次分数上调，强制检查 diff 修改行数 ≥1000。"""
+    violations: list[str] = []
+    if canonical is None:
+        return violations
+    previous = _head_score()
+    if previous is None or canonical <= previous:
+        return violations
+    changed_lines = _changed_line_count()
+    if changed_lines is None:
+        violations.append(
+            "[score-line-gate] 无法统计本次 diff 行数，分数上调被阻断"
+        )
+        return violations
+    if changed_lines < SCORE_INCREMENT_LINE_THRESHOLD:
+        violations.append(
+            f"[score-line-gate] 本次分数 {previous}→{canonical}，但 diff 修改行数 "
+            f"{changed_lines} < {SCORE_INCREMENT_LINE_THRESHOLD}；不得 +1"
+        )
+    return violations
 
 
 def check_score_consistency(canonical: int | None) -> list[str]:
@@ -345,6 +430,8 @@ def _git_tracked_files(prefix: str) -> set[str]:
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=10,
             check=False,
         )
@@ -353,6 +440,8 @@ def _git_tracked_files(prefix: str) -> set[str]:
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=10,
             check=False,
         )
@@ -371,6 +460,7 @@ def main(argv: list[str] | None = None) -> int:
 
     canonical = extract_canonical_score()
     all_violations += check_score_consistency(canonical)
+    all_violations += check_score_increment_line_gate(canonical)
     all_violations += check_hardcoded_test_counts()
     all_violations += check_forbidden_dirs()
     all_violations += check_line_limits()

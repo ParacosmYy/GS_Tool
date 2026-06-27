@@ -66,13 +66,13 @@
 | 连接稳定性 | 0~100 | 重连、超时、错误可观测 |
 | 可维护性 | 0~100 | 层级边界清晰、测试覆盖对应逻辑 |
 
-单轮可计分上限 100 分，不是 1 分，但项目目标分每次 commit 只加 1 分。
+单轮可计分上限 100 分是任务内部评估口径；项目目标分从 100 分起步，且每次 commit 只有全门禁绿并且 diff 修改行数（新增+删除）≥1000 行时才允许 +1。
 
 ### 3.2 Given / When / Then 计分门禁
 
 - Given：有 PRD 且任务为实现线
 - When：按约束顺序读齐并提交最小变更
-- Then：Required gate 全通过、证据齐备、约束更新、得分 +1
+- Then：Required gate 全通过、证据齐备、约束更新、diff 修改行数≥1000，得分 +1
 
 - Given：少一项 Required gate
 - When：尝试提交
@@ -89,7 +89,7 @@
 1. `uv run test-embeddebug-py`
 2. `uv run start-embeddebug --smoke`
 3. `cmd /c EmbedDebug.bat --smoke`
-4. 未满足时本轮不得记 `+1`
+4. 未满足或 diff 修改行数<1000 时本轮不得记 `+1`
 
 ---
 
@@ -248,7 +248,7 @@ GO 循环 20 轮或 30 分钟触发安全刹车，必须进 LOOP，不允许盲�
 - [ ] `uv run check-constraints` 退出码 0
 - [ ] 代码变更文件与约束文档已同步
 - [ ] 下一轮入口清晰，无遗留"已完成"误标
-- [ ] 评分更新到 `docs/tracking/SCORE_TRACKING.md` 首行（唯一处），本轮 `+0` 或 `+1` 并说明原因
+- [ ] 评分更新到 `docs/tracking/SCORE_TRACKING.md` 首行（唯一处），本轮 `+0` 或 `+1` 并说明原因；`+1` 必须满足 diff 修改行数≥1000
 - [ ] 闭环结果追加到 `docs/tracking/LOOP_STATE.md`
 
 ## 十一、工具链效率：uv 与 PyInstaller 评估门槛
