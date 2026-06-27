@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 100分 | 目标: 1000分 | 评分从 100 起步；仅当单次 commit diff 修改行数（新增+删除）≥1000 且全门禁绿时 +1
-> 距离目标还差 900分
+> 当前: 101分 | 目标: 1000分 | 评分从 100 起步；仅当单次 commit diff 修改行数（新增+删除）≥1000 且全门禁绿时 +1
+> 距离目标还差 899分
 
 ---
 
@@ -15,6 +15,7 @@
 |------|----------|------|
 | 100 | 新制评分基线 | 起始分重置为 100；后续只有全门禁绿且 diff 修改行数（新增+删除）≥1000 的 commit 才允许 +1。 |
 | 100 | Batch 311 — waveform 测试文件聚合精简 + 评分制度重置 | 合并 waveform preview connecting/status 与 overlay internals/math 小测试文件；同步约束文档与 check_constraints 加分行数门槛；本轮 diff<1000，按新规 +0。 |
+| 101 | Batch 312 — shared/transport/toast/sections 测试文件聚合精简 | 合并 shared results、TCP/UDP transport、notifications/toast、sections log row 小测试文件；本轮 diff 修改行数 1066，满足新制 +1 行数门槛。 |
 
 ---
 

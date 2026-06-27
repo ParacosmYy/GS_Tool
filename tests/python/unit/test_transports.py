@@ -9,6 +9,7 @@ from embeddebug.serial_station.drivers import (
     TcpClientTransport,
     UdpDatagramTransport,
 )
+from embeddebug.serial_station.drivers.tcp_server import TcpServerTransport
 
 
 def test_fake_transport_open_write_inject_and_close():
@@ -138,3 +139,52 @@ def test_udp_datagram_transport_loopback_read_write(qtbot):
 
     transport.close()
     peer.close()
+
+
+def test_tcp_client_available_ports_returns_list():
+    assert isinstance(TcpClientTransport.available_ports(), list)
+
+
+def test_tcp_client_disconnected_state_and_callbacks():
+    errors: list[str] = []
+    transport = TcpClientTransport()
+
+    transport.on_bytes_received(lambda b: None)
+    transport.on_error(errors.append)
+    transport._emit_error("test_error")
+    transport.close()
+
+    assert transport.config is None
+    assert transport.is_open is False
+    assert errors == ["test_error"]
+
+
+def test_tcp_client_emit_error_without_callback_no_crash():
+    TcpClientTransport()._emit_error("no_callback")
+
+
+def test_tcp_server_disconnected_state_and_callbacks():
+    transport = TcpServerTransport()
+
+    transport.on_bytes_received(lambda b: None)
+    transport.on_error(lambda m: None)
+    transport.close()
+
+    assert transport.local_port is None
+    assert transport.has_client is False
+    assert transport.config is None
+    assert transport.is_open is False
+    assert TcpServerTransport.available_ports() == []
+
+
+def test_udp_datagram_disconnected_state_and_callbacks():
+    transport = UdpDatagramTransport()
+
+    transport.on_bytes_received(lambda b: None)
+    transport.on_error(lambda m: None)
+    transport.close()
+
+    assert isinstance(UdpDatagramTransport.available_ports(), list)
+    assert transport.local_port == 0
+    assert transport.config is None
+    assert transport.is_open is False

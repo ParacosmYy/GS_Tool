@@ -11,9 +11,19 @@ import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from embeddebug.serial_station.notifications import NotificationManager
-from embeddebug.serial_station.notifications.data import NotificationLevel
+from embeddebug.serial_station.notifications.data import NotificationData, NotificationLevel
 from embeddebug.serial_station.ui.widgets.toast import ToastWidget
 from embeddebug.serial_station.ui.widgets.toast_container import ToastContainer
+
+
+def _make_data(uid=0, level=NotificationLevel.INFO):
+    return NotificationData(
+        level=level,
+        title="t",
+        message="m",
+        timestamp_ns=0,
+        uid=uid,
+    )
 
 
 # ── 渲染闭环 ──────────────────────────────────────────────────────
@@ -46,6 +56,18 @@ def test_container_empty_hides(qtbot):
     assert container.is_empty is True
 
 
+def test_on_added_creates_toast_and_accumulates(qtbot):
+    manager = NotificationManager()
+    container = ToastContainer(manager)
+    qtbot.addWidget(container)
+
+    container._on_added(_make_data(uid=1))
+    container._on_added(_make_data(uid=2))
+
+    assert container.count == 2
+    assert container._active_count_widget_index() >= 1
+
+
 def test_toast_closed_removes_from_container(qtbot):
     """ToastWidget 离场完成 → 从容器移除。"""
 
@@ -72,6 +94,17 @@ def test_manager_remove_triggers_toast_leave(qtbot, monkeypatch):
     monkeypatch.setattr(toast, "leave", lambda: leave_calls.append(toast))
     manager.dismiss(data.uid)
     assert len(leave_calls) == 1
+
+
+def test_find_known_and_unknown_uid(qtbot):
+    manager = NotificationManager()
+    container = ToastContainer(manager)
+    qtbot.addWidget(container)
+
+    container._on_added(_make_data(uid=42))
+
+    assert container._find(42) is not None
+    assert container._find(999) is None
 
 
 # ── count / is_empty / clear_all / dismiss_oldest ──────────────────

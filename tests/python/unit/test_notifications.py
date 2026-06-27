@@ -74,8 +74,27 @@ def test_clear_removes_all(qtbot):
 
 
 def test_level_enum_values():
+    assert len(NotificationLevel) == 4
     assert NotificationLevel.INFO.value == "info"
     assert NotificationLevel.ERROR.value == "error"
+    for level in NotificationLevel:
+        assert level.value == level.value.lower()
+
+
+def test_notification_data_fields_and_defaults():
+    data = NotificationData(
+        level=NotificationLevel.INFO,
+        title="Test",
+        message="Body",
+        timestamp_ns=1000,
+    )
+
+    assert data.level == NotificationLevel.INFO
+    assert data.title == "Test"
+    assert data.message == "Body"
+    assert data.timestamp_ns == 1000
+    assert data.timeout_ms == 3000
+    assert data.uid == 0
 
 
 def test_history_capped(qtbot):

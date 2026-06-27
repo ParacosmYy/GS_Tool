@@ -42,6 +42,16 @@ def test_toast_renders_title_and_message(qtbot):
     qtbot.addWidget(toast)
     assert toast._title_label.text() == "连接成功"
     assert toast._message_label.text() == "串口已就绪"
+    assert toast.data.title == "连接成功"
+    assert toast.data.message == "串口已就绪"
+
+
+def test_toast_data_returns_notification_data(qtbot):
+    toast = ToastWidget(_make_data(level=NotificationLevel.ERROR))
+    qtbot.addWidget(toast)
+
+    assert isinstance(toast.data, NotificationData)
+    assert toast.data.level == NotificationLevel.ERROR
 
 
 def test_toast_message_optional(qtbot):
@@ -62,6 +72,13 @@ def test_toast_accent_uses_level_color(qtbot):
     qtbot.addWidget(toast)
     style = toast._accent.styleSheet()
     assert P.ERROR in style
+
+
+def test_toast_is_leaving_initial_false(qtbot):
+    toast = ToastWidget(_make_data())
+    qtbot.addWidget(toast)
+
+    assert toast.is_leaving is False
 
 
 # ── 入场动画：SlideAnimation 激活 ───────────────────────────────────
@@ -191,6 +208,14 @@ def test_toast_stop_animations_clears(qtbot):
     assert toast._dismiss_timer is not None
     toast.stop_animations()
     assert toast._dismiss_timer is None
+
+
+def test_toast_stop_animations_idempotent(qtbot):
+    toast = ToastWidget(_make_data())
+    qtbot.addWidget(toast)
+
+    toast.stop_animations()
+    toast.stop_animations()
 
 
 # ── 死代码接入断言 ─────────────────────────────────────────────────

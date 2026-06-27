@@ -1,11 +1,6 @@
 """command_section build_send_row + sections build_*_row/footer 边界测试。
 
-补强 test_animations_integrations / test_serial_station_ui_architecture 未直接断言的边角：
-- build_send_row：返回 QHBoxLayout + 创建 send_edit + command_history_combo + objectName。
-- build_inject_row：返回 QHBoxLayout + inject_edit + inject_button。
-- build_log_row：返回 QVBoxLayout + export/replay buttons。
-- build_profile_row：返回 QHBoxLayout + save/load buttons。
-- build_footer：返回 QHBoxLayout + clear button。
+补强 test_animations_integrations / test_serial_station_ui_architecture 未直接断言的边角。
 """
 
 from __future__ import annotations
@@ -16,14 +11,17 @@ import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
-from PyQt6.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import (
+    QComboBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from embeddebug.serial_station.ui.command_section import build_send_row
-
-
-# ── Fake hosts ────────────────────────────────────────────────────────
-
-
 class _SendHost:
     """模拟 CommandSectionHost（send_row 最小协议）。"""
 
@@ -39,10 +37,6 @@ class _SendHost:
 
     def _select_command_history(self, text: str) -> None:
         self._select_history_called = text
-
-
-# ── build_send_row ────────────────────────────────────────────────────
-
 
 def test_build_send_row_returns_hboxlayout(qtbot):
     """build_send_row 返回 QHBoxLayout。"""
@@ -117,10 +111,6 @@ def test_build_send_row_send_edit_is_lineedit(qtbot):
     build_send_row(owner, root)
     assert isinstance(owner._send_edit, QLineEdit)
 
-
-# ── sections build_*_row / footer ─────────────────────────────────────
-
-
 class _SectionsHost:
     """模拟 SerialStationSectionsHost（最小协议：tr + 所有回调 + 属性）。"""
 
@@ -174,6 +164,52 @@ def test_build_log_row_no_crash(qtbot):
     qtbot.addWidget(root)
     row = build_log_row(owner, root)
     assert isinstance(row, QVBoxLayout)
+
+
+def test_build_log_row_creates_filter_and_search_controls(qtbot):
+    from embeddebug.serial_station.ui.sections import build_log_row
+
+    owner = _SectionsHost()
+    root = QWidget()
+    qtbot.addWidget(root)
+    build_log_row(owner, root)
+
+    assert isinstance(owner._log_filter_combo, QComboBox)
+    assert owner._log_filter_combo.objectName() == "serialStationLogFilterCombo"
+    assert owner._log_filter_combo.currentText() == "All"
+    assert owner._log_filter_combo.count() == 5
+    assert isinstance(owner._log_search_edit, QLineEdit)
+    assert owner._log_search_edit.objectName() == "serialStationLogSearchEdit"
+    assert owner._log_search_edit.placeholderText() != ""
+
+
+def test_build_log_row_creates_path_stats_and_banner(qtbot):
+    from embeddebug.serial_station.ui.sections import build_log_row
+
+    owner = _SectionsHost()
+    root = QWidget()
+    qtbot.addWidget(root)
+    build_log_row(owner, root)
+
+    assert isinstance(owner._log_path_edit, QLineEdit)
+    assert owner._log_path_edit.objectName() == "serialStationLogPathEdit"
+    assert isinstance(owner._log_stats_label, QLabel)
+    assert owner._log_stats_label.objectName() == "serialStationLogStatsLabel"
+    assert owner._log_info_banner is not None
+
+
+def test_build_log_row_creates_action_buttons(qtbot):
+    from embeddebug.serial_station.ui.sections import build_log_row
+
+    owner = _SectionsHost()
+    root = QWidget()
+    qtbot.addWidget(root)
+    build_log_row(owner, root)
+
+    assert isinstance(owner._export_log_button, QPushButton)
+    assert owner._export_log_button.objectName() == "serialStationExportLogButton"
+    assert isinstance(owner._replay_log_button, QPushButton)
+    assert owner._replay_log_button.objectName() == "serialStationReplayLogButton"
 
 
 def test_build_profile_row_no_crash(qtbot):
