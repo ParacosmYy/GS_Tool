@@ -53,8 +53,26 @@ def test_defaults_dataclass_matches_manager_defaults():
     assert d.theme == DEFAULT_THEME
     assert d.accent == DEFAULT_ACCENT
     assert d.font_point == DEFAULT_FONT_POINT
+    assert d.data_dir == DEFAULT_DATA_DIR
     assert d.default_baudrate == DEFAULT_BAUDRATE
+    assert d.animation_enabled is DEFAULT_ANIMATION_ENABLED
 
+
+def test_default_constants_are_expected_values():
+    assert DEFAULT_THEME == "serial_station_dark"
+    assert DEFAULT_ACCENT == "cyan"
+    assert (DEFAULT_FONT_POINT, DEFAULT_DATA_DIR, DEFAULT_BAUDRATE) == (13, "", 115200)
+    assert DEFAULT_ANIMATION_ENABLED is True
+
+
+def test_user_settings_mutable_and_custom_values():
+    settings = UserSettings(theme="light", accent="rose", font_point=16, default_baudrate=9600)
+    settings.theme = "custom"
+
+    assert settings.theme == "custom"
+    assert settings.accent == "rose"
+    assert settings.font_point == 16
+    assert settings.default_baudrate == 9600
 
 # ── update() ────────────────────────────────────────────────────────
 def test_update_single_field_persists_and_caches():

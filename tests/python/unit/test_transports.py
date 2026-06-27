@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from PyQt6.QtNetwork import QHostAddress, QTcpServer, QUdpSocket
 
 from embeddebug.serial_station.drivers import (
@@ -57,6 +58,38 @@ def test_qt_serial_transport_configures_port_without_opening(qtbot):
     assert isinstance(QtSerialPortTransport.available_ports(), list)
 
 
+def test_serial_port_config_defaults_and_custom_values():
+    default = SerialPortConfig(port_name="COM1")
+    custom = SerialPortConfig(
+        port_name="/dev/ttyUSB0",
+        baud_rate=9600,
+        data_bits=7,
+        parity="even",
+        stop_bits="2",
+        flow_control="hardware",
+    )
+
+    assert default.port_name == "COM1"
+    assert default.baud_rate == 115200
+    assert default.data_bits == 8
+    assert default.parity == "none"
+    assert default.stop_bits == "1"
+    assert default.flow_control == "none"
+    assert custom.port_name == "/dev/ttyUSB0"
+    assert custom.baud_rate == 9600
+    assert custom.data_bits == 7
+    assert custom.parity == "even"
+    assert custom.stop_bits == "2"
+    assert custom.flow_control == "hardware"
+
+
+def test_serial_port_config_is_frozen():
+    config = SerialPortConfig(port_name="COM1")
+
+    with pytest.raises(AttributeError):
+        config.port_name = "COM2"  # type: ignore[misc]
+
+
 def test_qt_serial_transport_configures_frame_settings(qtbot):
     transport = QtSerialPortTransport()
     config = SerialPortConfig(
@@ -75,6 +108,19 @@ def test_qt_serial_transport_configures_frame_settings(qtbot):
     assert transport.parity == "even"
     assert transport.stop_bits == "2"
     assert transport.flow_control == "hardware"
+
+
+def test_qt_serial_transport_disconnected_state_and_callbacks(qtbot):
+    transport = QtSerialPortTransport()
+
+    transport.on_bytes_received(lambda b: None)
+    transport.on_error(lambda m: None)
+    transport.close()
+
+    assert transport.config is None
+    assert transport.port_name == ""
+    assert transport.baud_rate > 0
+    assert transport.is_open is False
 
 
 def test_tcp_client_transport_rejects_invalid_endpoint(qtbot):

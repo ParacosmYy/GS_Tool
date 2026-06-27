@@ -27,6 +27,7 @@ def test_status_bar_fixed_height(qtbot):
     bar = StatusBar()
     qtbot.addWidget(bar)
     assert bar.FIXED_HEIGHT == 24
+    assert bar.section_count() == 0
 
 
 def test_set_section_creates(qtbot):
@@ -53,6 +54,9 @@ def test_multiple_sections(qtbot):
     bar.set_section("rx", "RX: 1KB")
     bar.set_section("tx", "TX: 256B")
     assert bar.section_count() == 3
+    assert bar.section_text("conn") == "Connected"
+    assert bar.section_text("rx") == "RX: 1KB"
+    assert bar.section_text("tx") == "TX: 256B"
 
 
 def test_clear_section(qtbot):
@@ -64,6 +68,18 @@ def test_clear_section(qtbot):
     assert bar.section_count() == 1
     assert bar.section_text("fps") == ""
     assert bar.section_text("conn") == "COM3"
+
+
+def test_set_section_empty_and_recreate(qtbot):
+    bar = StatusBar()
+    qtbot.addWidget(bar)
+    bar.set_section("empty", "")
+    assert bar.section_text("empty") == ""
+    bar.clear_section("empty")
+    assert bar.section_count() == 0
+    bar.set_section("empty", "new")
+    assert bar.section_count() == 1
+    assert bar.section_text("empty") == "new"
 
 
 def test_clear_nonexistent_noop(qtbot):

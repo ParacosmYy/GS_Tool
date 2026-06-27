@@ -24,33 +24,37 @@ def _make_engine() -> tuple[AutomationEngine, list[str]]:
     return engine, sent
 
 
+def test_automation_enum_contracts():
+    action_values = {action.value for action in ActionType}
+    trigger_values = {trigger.value for trigger in TriggerType}
+    assert len(ActionType) == len(action_values) == 5
+    assert len(TriggerType) == len(trigger_values) == 7
+    assert ActionType.SEND_COMMAND in ActionType
+    assert TriggerType.RX_MATCH in TriggerType
+
+
 def test_trigger_value_above_fires_when_over_threshold():
     cond = TriggerCondition(TriggerType.VALUE_ABOVE, channel_name="temp", threshold=50.0)
     assert cond.evaluate({"temp": 60.0}) is True
 
-
 def test_trigger_value_above_no_fire_when_under():
     cond = TriggerCondition(TriggerType.VALUE_ABOVE, channel_name="temp", threshold=50.0)
     assert cond.evaluate({"temp": 40.0}) is False
-
 
 def test_trigger_value_below_fires_when_under_threshold():
     cond = TriggerCondition(TriggerType.VALUE_BELOW, channel_name="vbat", threshold=3.0)
     assert cond.evaluate({"vbat": 2.7}) is True
     assert cond.evaluate({"vbat": 3.5}) is False
 
-
 def test_trigger_value_equals_fires_on_match():
     cond = TriggerCondition(TriggerType.VALUE_EQUALS, channel_name="mode", threshold=7.0)
     assert cond.evaluate({"mode": 7.0}) is True
     assert cond.evaluate({"mode": 8.0}) is False
 
-
 def test_trigger_missing_channel_does_not_fire():
     cond = TriggerCondition(TriggerType.VALUE_ABOVE, channel_name="x", threshold=1.0)
     assert cond.evaluate({"other": 99.0}) is False
     assert cond.evaluate({}) is False
-
 
 def test_trigger_debounce_blocks_rapid_refire():
     cond = TriggerCondition(
@@ -61,7 +65,6 @@ def test_trigger_debounce_blocks_rapid_refire():
     assert cond.evaluate({"t": 20.0}, elapsed_ms=99) is False
     assert cond.evaluate({"t": 20.0}, elapsed_ms=100) is True
 
-
 def test_trigger_interval_fires_on_period():
     cond = TriggerCondition(TriggerType.INTERVAL, interval_ms=200, debounce_ms=0)
     assert cond.evaluate({}, elapsed_ms=0) is True
@@ -70,18 +73,15 @@ def test_trigger_interval_fires_on_period():
     assert cond.evaluate({}, elapsed_ms=350) is False
     assert cond.evaluate({}, elapsed_ms=400) is True
 
-
 def test_trigger_rx_match_regex():
     cond = TriggerCondition(TriggerType.RX_MATCH, pattern=r"ERR:\d+")
     assert cond.evaluate({}, rx_text="boot ok\nERR:42 timeout") is True
     assert cond.evaluate({}, rx_text="boot ok") is False
 
-
 def test_trigger_tx_match_regex():
     cond = TriggerCondition(TriggerType.TX_MATCH, pattern=r"^RESET$")
     assert cond.evaluate({}, tx_text="RESET") is True
     assert cond.evaluate({}, tx_text="RESETX") is False
-
 
 def test_action_send_command_calls_send_callable():
     sent: list[str] = []

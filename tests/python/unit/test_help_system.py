@@ -80,6 +80,16 @@ def test_help_topic_enum_has_five_members():
     assert {t.value for t in HelpTopic} == {
         "getting_started", "protocols", "shortcuts", "troubleshooting", "about"
     }
+    for topic in HelpTopic:
+        assert topic.value == topic.value.lower()
+
+
+def test_help_entry_tags_defaults_and_custom_values():
+    default = HelpEntry(HelpTopic.ABOUT, "x", "y")
+    custom = HelpEntry(HelpTopic.ABOUT, "x", "y", ["a", "b"])
+
+    assert default.tags == []
+    assert custom.tags == ["a", "b"]
 
 
 def test_search_matches_content():

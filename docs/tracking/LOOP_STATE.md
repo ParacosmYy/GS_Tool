@@ -22,6 +22,7 @@
 | 2026-06-27 | Batch 310 — command 测试文件聚合精简 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（4634 passed, 2 skipped） | ✓ exit0 | ✓ exit0 | ✓ All passed | ✓ exit0 | ✓（check_constraints 通过） | E5/U3/D2（本轮变化：E↑，测试文件总数 340→337，command 重复边界测试合并；D 不提升） | 973 + 1 = 974 | 通过 | 下一轮继续按 waveform/theme 大域做测试文件瘦身，不触碰 CI |
 | 2026-06-27 | Batch 311 — waveform 测试文件聚合精简 + 评分制度重置 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（4634 passed, 2 skipped） | ✓ exit0 | ✓ exit0 | ✓ All passed | ✓ exit0 | ✓（check_constraints 通过） | E5/U3/D2（本轮变化：E↑，测试文件总数 337→335，waveform preview/overlay 重复边界测试合并；评分基线重置为 100；D 不提升） | 100 + 0 = 100（diff<1000，新规不加分） | 通过 | 下一轮继续按 waveform/theme 大域做测试文件瘦身；只有 diff≥1000 且门禁全绿才 +1，不触碰 CI |
 | 2026-06-27 | Batch 312 — shared/transport/toast/sections 测试文件聚合精简 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（4570 passed, 2 skipped） | ✓ exit0 | ✓ exit0 | ✓ All passed | ✓ exit0 | ✓（diff 1066≥1000，check_constraints 通过） | E5/U3/D2（本轮变化：E↑，测试文件总数 336→326，shared results/transport/toast/sections 小测试文件合并；D 不提升） | 100 + 1 = 101 | 通过 | 下一轮继续精简剩余 *_boundary 小文件或转向真实功能缺口；不触碰 CI |
+| 2026-06-27 | Batch 313 — transport/help/settings/rtt/icons 测试文件聚合精简 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（4485 passed, 2 skipped） | ✓ exit0 | ✓ exit0 | ✓ All passed | ✓ exit0 | ✓（diff 1247≥1000，check_constraints 通过） | E5/U3/D2（本轮变化：E↑，测试文件总数 326→313，transport/help/settings/rtt/icons 小测试文件合并；D 不提升） | 101 + 1 = 102 | 通过 | 下一轮继续按大域聚合精简测试文件，并保持全门禁绿；不触碰 CI |
 
 ### 1.1 并发会话说明
 

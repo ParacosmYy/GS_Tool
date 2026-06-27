@@ -95,16 +95,12 @@ class SerialWaveformPreview(QWidget):
         self._status_label.setObjectName("serialStationWaveformStatusLabel")
         layout.addWidget(self._status_label)
 
-        # Batch 6: 通道统计读数（激活 waveform_measure 死代码）。
-        # 显示首通道 Vpp/Mean/Max/Min/Std/RMS，对齐 VOFA+ 测量面板。
+        # 首通道 Vpp/Mean/Max/Min/Std/RMS，对齐 VOFA+ 测量面板。
         self._stats_label = QLabel(self.tr("Stats: —"), self)
         self._stats_label.setObjectName("serialStationWaveformStatsLabel")
         layout.addWidget(self._stats_label)
 
-        # Batch 7-2: 热路径节流（激活 waveform_perf 死代码）。
-        # BatchAccumulator 累积多批次 → 定时 flush 合并；RefreshThrottle 按 60Hz
-        # 节流真实 setData，避免高频数据逐批次刷新卡 UI。
-        # 对齐 serial_station_architecture §5.4 VOFA+ parity：批量信号 + 定时刷新。
+        # 热路径：批次累积 + 60Hz 节流刷新，避免高频逐批 setData 卡 UI。
         self._accumulator = BatchAccumulator(flush_interval_ms=50, parent=self)
         self._accumulator.flush_signal.connect(self._on_accumulator_flush)
         self._accumulator.start()
@@ -114,6 +110,7 @@ class SerialWaveformPreview(QWidget):
             parent=self,
         )
         self._latest_batch: ChannelBatch | None = None
+        self._is_shutting_down = False
         # Batch 49-3: 空态 + 加载态覆盖层（helper 在 waveform_empty_state 模块）。
         from embeddebug.serial_station.ui.waveform_empty_state import build_waveform_overlays
 
@@ -121,13 +118,10 @@ class SerialWaveformPreview(QWidget):
         self._empty_overlay.show_with_fade()
 
     def submit_batch(self, batch: ChannelBatch) -> None:
-        """热路径入口：累积批次并节流刷新（Batch 7-2）。
+        """热路径入口：累积批次并节流刷新。"""
 
-        controller 的高频 measurement_batch 应调本方法而非 update_batch。
-        BatchAccumulator 累积窗口内批次合并，RefreshThrottle 按 60Hz 节流
-        真实 setData，避免逐批次刷新卡 UI。
-        """
-
+        if self._is_shutting_down:
+            return
         self._accumulator.push(batch.values, batch.channel_names, batch.dt_ns)
 
     def resizeEvent(self, event: object) -> None:
@@ -152,6 +146,8 @@ class SerialWaveformPreview(QWidget):
     def _on_accumulator_flush(self, merged: ChannelBatch) -> None:
         """BatchAccumulator flush 回调：缓存最新合并批次，请求节流刷新。"""
 
+        if self._is_shutting_down:
+            return
         self._latest_batch = merged
         self._throttle.maybe_refresh()
 
@@ -283,9 +279,15 @@ class SerialWaveformPreview(QWidget):
                 curve.setVisible(False)
 
     def shutdown(self) -> None:
+        if self._is_shutting_down:
+            return
+        self._is_shutting_down = True
         self.setUpdatesEnabled(False)
-        # Batch 7-2: 停止热路径节流组件，flush 残留批次。
         self._throttle.stop()
+        try:
+            self._accumulator.flush_signal.disconnect(self._on_accumulator_flush)
+        except TypeError:
+            pass
         self._accumulator.stop()
         self._plot.setUpdatesEnabled(False)
         self._plot.hide()

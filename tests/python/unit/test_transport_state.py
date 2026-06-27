@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+import pytest
+
 from embeddebug.serial_station.controllers.controller_transport_state import (
     TransportRuntime,
+    active_local_port,
+    available_serial_ports,
+    available_transport_modes,
     create_transport_runtime,
     is_connected,
 )
+from embeddebug.serial_station.drivers import FakeSerialTransport, SerialPortConfig
 
 
 def test_create_transport_runtime_defaults():
@@ -26,8 +32,34 @@ def test_is_connected_initial_false():
     assert is_connected(runtime) is False
 
 
+def test_transport_state_helpers_on_closed_runtime():
+    runtime = create_transport_runtime(
+        bytes_callback=lambda b: None,
+        error_callback=lambda m: None,
+    )
+
+    assert active_local_port(runtime) is None
+    assert isinstance(available_serial_ports(runtime), tuple)
+    modes = available_transport_modes(runtime)
+    assert isinstance(modes, tuple)
+    assert "serial" in modes
+    assert "tcp" in modes or "tcp_client" in modes
+    assert "udp" in modes or "udp_datagram" in modes
+
+
+def test_is_connected_true_when_transport_open():
+    transport = FakeSerialTransport()
+    transport.open(SerialPortConfig(port_name="COM1"))
+    runtime = create_transport_runtime(
+        transport=transport,
+        bytes_callback=lambda b: None,
+        error_callback=lambda m: None,
+    )
+
+    assert is_connected(runtime) is True
+
+
 def test_runtime_frozen():
-    import pytest
     runtime = create_transport_runtime(
         bytes_callback=lambda b: None,
         error_callback=lambda m: None,

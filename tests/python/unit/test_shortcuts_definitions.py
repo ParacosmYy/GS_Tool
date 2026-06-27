@@ -126,6 +126,8 @@ def test_default_shortcuts_contains_connect():
     ids = {s.id for s in DEFAULT_SHORTCUTS}
     assert "connect" in ids
     assert "disconnect" in ids
+    assert "send" in ids
+    assert "toggle_theme" in ids
 
 
 def test_default_shortcuts_contains_command_palette():

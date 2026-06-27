@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import pytest
+
 from embeddebug.serial_station.controllers import SerialWorkbenchController
 from embeddebug.serial_station.drivers import (
     FakeSerialTransport,
     SerialPortConfig,
+    SerialTransport,
     TcpClientTransport,
     TransportRegistry,
     UdpDatagramTransport,
@@ -22,6 +25,26 @@ def test_transport_registry_exposes_default_modes_and_fake_transport():
 
     assert isinstance(registry.create("tcp"), TcpClientTransport)
     assert isinstance(registry.create("udp"), UdpDatagramTransport)
+
+
+def test_transport_registry_default_methods_contract():
+    registry = TransportRegistry.with_defaults()
+
+    assert isinstance(registry, TransportRegistry)
+    assert len(registry.modes) > 0
+    assert "serial" in registry.modes
+    assert "tcp" in registry.modes or "tcp_client" in registry.modes
+    assert "udp" in registry.modes or "udp_datagram" in registry.modes
+    assert isinstance(registry.available_ports("serial"), tuple)
+    assert isinstance(registry.create("serial"), SerialTransport)
+    assert isinstance(registry.create("fake"), FakeSerialTransport)
+
+
+def test_transport_registry_create_unknown_raises():
+    registry = TransportRegistry.with_defaults()
+
+    with pytest.raises((KeyError, ValueError)):
+        registry.create("nonexistent_mode")
 
 
 def test_transport_registry_injects_serial_driver_into_controller(tmp_path):

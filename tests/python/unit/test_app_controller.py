@@ -5,7 +5,14 @@
 
 from __future__ import annotations
 
+import os
+
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+from PyQt6.QtWidgets import QApplication
+
 from embeddebug.app.app_controller import AppController
+from embeddebug.app.main import create_application
 from embeddebug.serial_station.controllers import SerialWorkbenchController
 
 
@@ -37,3 +44,16 @@ def test_app_controller_multiple_instances_independent():
     a1 = AppController()
     a2 = AppController()
     assert a1.serial_controller is not a2.serial_controller
+
+
+def test_create_application_reuses_qapplication_and_sets_metadata():
+    app1 = create_application([])
+    app2 = create_application([])
+
+    assert app1 is app2
+    assert isinstance(app1, QApplication)
+    assert app1.applicationName() != ""
+    assert app1.applicationDisplayName() != ""
+    assert app1.font() is not None
+    animation_enabled = app1.property("_embeddebug_animation_enabled")
+    assert animation_enabled is None or isinstance(animation_enabled, bool)

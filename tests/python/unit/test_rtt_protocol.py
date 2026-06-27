@@ -51,6 +51,7 @@ def test_control_block_layout_basic():
     assert len(layout) == 5
     assert layout[0] == ("acID", 0, 16)
     assert layout[1] == ("MaxNumUpBuffers", 16, 4)
+    assert "acID" in [entry[0] for entry in layout]
 
 
 def test_control_block_layout_offsets_increment():
@@ -151,6 +152,15 @@ def test_channel_index_returns_position():
     assert channel_index(channels, "up0") == 0
     assert channel_index(channels, "down0") == 1
     assert channel_index(channels, "up1") == 2
+
+
+def test_channel_index_known_boundary_name():
+    from embeddebug.serial_station.rtt.protocol import channel_index
+    channels = (
+        RttChannel(name="a", buffer_size=1, mode="up"),
+        RttChannel(name="b", buffer_size=1, mode="up"),
+    )
+    assert channel_index(channels, "b") == 1
 
 
 def test_channel_index_unknown_name_raises_keyerror():

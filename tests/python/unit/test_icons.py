@@ -28,6 +28,21 @@ def test_icon_manager_renders_existing_lucide_icon():
     assert not icon.isNull()
 
 
+def test_icon_manager_read_svg_and_reset_contract():
+    manager = IconManager()
+    manager.reset()
+
+    send_svg = manager._read_svg("send")
+    cable_svg = manager._read_svg("cable")
+
+    assert send_svg is not None and "svg" in send_svg.lower()
+    assert cable_svg is not None and "svg" in cable_svg.lower()
+    assert manager._read_svg("nonexistent_icon_xyz") is None
+    assert isinstance(manager._cache, dict)
+    manager.reset()
+    assert manager._cache == {}
+
+
 def test_icon_manager_caches_by_name_and_color():
     manager = IconManager()
     manager.reset()
@@ -105,6 +120,24 @@ def test_apply_button_icons_decorates_known_buttons(qtbot):
     count = button_icons.apply_button_icons(parent)
     assert count >= 1
     assert not button.icon().isNull()
+
+
+def test_find_child_by_object_name_contract(qtbot):
+    from types import SimpleNamespace
+
+    from embeddebug.serial_station.ui.button_icons import _find_child_by_object_name
+
+    parent = QWidget()
+    qtbot.addWidget(parent)
+    connect = QPushButton("Connect", parent)
+    connect.setObjectName("serialStationConnectButton")
+    disconnect = QPushButton("Disconnect", parent)
+    disconnect.setObjectName("serialStationDisconnectButton")
+
+    assert _find_child_by_object_name(parent, "serialStationConnectButton") is connect
+    assert _find_child_by_object_name(parent, "serialStationDisconnectButton") is disconnect
+    assert _find_child_by_object_name(parent, "missing") is None
+    assert _find_child_by_object_name(SimpleNamespace(), "anything") is None
 
 
 def test_apply_button_icons_skips_missing_buttons(qtbot):
