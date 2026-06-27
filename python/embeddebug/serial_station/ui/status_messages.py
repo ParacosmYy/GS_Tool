@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Protocol
 
 from embeddebug.shared.results import OperationResult
+
+_log = logging.getLogger(__name__)
 
 
 class StatusLabel(Protocol):
@@ -103,7 +106,7 @@ def set_status_text(host: StatusMessageHost, text: str, **format_values: object)
         from embeddebug.serial_station.ui.animations.typewriter import TypewriterAnimation
         TypewriterAnimation.run_with_label(host._status_label, message).start()
     except Exception:
-        pass
+        _log.debug("typewriter status animation failed", exc_info=True)
 
 
 def set_profile_label(host: ProfileLabelHost, name: str) -> None:

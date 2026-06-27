@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import logging
+
+from embeddebug.serial_station.ui.animations.typewriter import TypewriterAnimation
 from embeddebug.serial_station.ui.status_messages import (
     append_log_entry_line,
     result_message,
@@ -93,6 +96,23 @@ def test_set_status_text_writes_translated_and_formatted_text_to_status_label():
     set_status_text(host, "Protocol: {name}", name="RawData")
 
     assert host._status_label.text == "tr:Protocol: RawData"
+
+
+def test_set_status_text_logs_typewriter_failure(monkeypatch, caplog):
+    """打字机动画失败不阻断状态文本，但必须留下 debug 诊断日志。"""
+
+    def fail_run_with_label(label, text):
+        del label, text
+        raise RuntimeError("animation deleted")
+
+    host = TrHost()
+    monkeypatch.setattr(TypewriterAnimation, "run_with_label", fail_run_with_label)
+    caplog.set_level(logging.DEBUG, logger="embeddebug.serial_station.ui.status_messages")
+
+    set_status_text(host, "Protocol: {name}", name="RawData")
+
+    assert host._status_label.text == "tr:Protocol: RawData"
+    assert "typewriter status animation failed" in caplog.text
 
 
 def test_set_profile_label_writes_translated_profile_name_to_profile_label():

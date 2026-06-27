@@ -16,7 +16,8 @@
 | 工程状态 | `E5` 可维护收口（CI + lint 六系列 + 守护测试） | `uv run test-embeddebug-py` + `uv run lint-embeddebug-py` |
 | 用户状态 | `U3`，Serial Station 主流程已有可见入口 | `uv run start-embeddebug` |
 | 设备状态 | `D2`，TCP/UDP 已有替身或 loopback 验证，真实硬件仍需补证 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
-| 评分进度 | `772 / 1000`（本会话 +69 分，50 commits） | `docs/tracking/SCORE_TRACKING.md` |
+| 评分进度 | 见 `docs/tracking/SCORE_TRACKING.md` 首行（canonical 唯一） | `docs/tracking/SCORE_TRACKING.md` |
+| 最近闭环 | Batch 305-306：QSS 分区拆分、测试组织门禁 staged 新增文件守护、状态打字机动画失败日志化 | `docs/tracking/LOOP_STATE.md` |
 
 ## 产品能力
 
@@ -24,7 +25,7 @@
 |---|---|---|
 | PyQt 桌面工作台 | 默认主线，支持 smoke 启动 | `EmbedDebug.bat` |
 | Serial Station | UART/TCP/UDP 主流程已有可见入口；Profile 加载 System 日志、协议切换 System 日志、连接生命周期 System 日志、连接控件状态、命令输入写入、Profile 名称输入、Profile 下拉选项、端点 Profile 回填、端点默认文本、端点控件文案、串口配置选项、串口 Profile 参数回填、串口连接字段读取、日志视图内容、日志筛选选项、System/Error 诊断日志筛选、System/Error 日志显示与统计、System/Error 导出回放方向保持、controller 错误日志入库、日志过滤规则、串口端口空态、命令历史选项、TCP/UDP 端点校验、普通状态文本、结果状态反馈、Profile 标签反馈、日志行与日志统计反馈、RX 注入反馈已公共化，UDP UI loopback 收发已验证，断开、刷新端口、发送、快捷键、Profile 恢复、错误状态反馈和窗口生命周期可诊断 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
-| 主题系统 | VOFA+ 精致工业风深色主题，启动即生效；色板/尺寸 token 集中管理，QSS 程序化生成覆盖全部 `serialStation*` 控件，连接按钮三态、日志区终端配色、状态药丸、滚动条与波形区统一深色工业风；支持运行时切换与外部 QSS 编辑路径 | `python/embeddebug/serial_station/ui/theme/` |
+| 主题系统 | VOFA+ 精致工业风深色主题，启动即生效；色板/尺寸 token 集中管理，QSS 程序化生成覆盖全部 `serialStation*` 控件，连接按钮三态、日志区终端配色、状态药丸、滚动条与波形区统一深色工业风；控件/域面板 QSS 已按分区 helper 拆分并受行数门禁约束 | `python/embeddebug/serial_station/ui/theme/` |
 | 三区卡片化布局 | 主窗口三区分栏（左连接配置 / 中波形+日志 / 右命令+Profile），6 张圆角卡片面板，QSplitter 可拖拽分区；按钮接入 lucide SVG 图标（plug/refresh-cw/send/save/play 等）按 palette 着色 | `python/embeddebug/serial_station/ui/layout_main.py` |
 | 体验增强 | Ctrl+P 命令面板（模糊搜索 8 条命令）、波形双游标测量（ΔX/Y1/Y2 读数 HUD）、多通道图例（色块+当前值）、响应式断点（窗口<900 折叠侧栏）、面板过渡动画（淡入+滑入+错峰） | `python/embeddebug/serial_station/ui/command_palette.py` |
 | 协议解析 | RawData / FireWater / JustFloat 已纳入测试，协议选择动作已独立 | `python/embeddebug/serial_station/ui/protocol_actions.py` |
