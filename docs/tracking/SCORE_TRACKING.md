@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 973分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 27分
+> 当前: 974分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 26分
 
 ---
 
@@ -623,6 +623,7 @@
 | 971 | Batch 307 — command_section 发送按钮微交互安装失败日志化 | build_send_row 保持发送行 UI 构建主路径不受 install_scale_press 失败影响，同时写入 debug 诊断日志；新增 test_sections_boundary 回归测试覆盖失败日志路径；本轮门禁：4669 passed, 2 skipped；tools 9/9；lint/check/smoke/bat smoke 均 exit 0。 |
 | 972 | Batch 308 — QSS/Transport/Measurement/Connection 测试文件聚合精简 | 合并 QSS helper/widgets、TCP/UDP transport、measurement ring buffer、connection_control_state 小测试文件；测试文件总数 352→344（净减 8），全量测试 4647 passed, 2 skipped；lint/check/smoke/bat/tools 均 exit 0。 |
 | 973 | Batch 309 — dashboard 测试文件聚合精简 | 合并 dashboard view/widgets/core/binding service 小测试文件，删除 *_b 与 parse 拆分文件；测试文件总数 344→340（本轮净减 4），全量测试 4634 passed, 2 skipped；lint/check/smoke/bat/tools 均 exit 0。 |
+| 974 | Batch 310 — command 测试文件聚合精简 | 合并 command history/binding、palette fuzzy/item、actions/notify 小测试文件；测试文件总数 340→337（本轮净减 3），全量测试 4634 passed, 2 skipped；lint/check/smoke/bat/tools 均 exit 0。 |
 
 ---
 

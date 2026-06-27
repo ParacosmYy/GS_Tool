@@ -13,10 +13,14 @@ refresh_command_history + select_command_history 行为。
 
 from __future__ import annotations
 
+import inspect
+import os
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-from embeddebug.serial_station.ui import command_actions
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+from embeddebug.serial_station.ui import command_actions, injection_actions
 from embeddebug.shared.results import OperationResult
 
 
@@ -114,3 +118,90 @@ def test_select_command_history_empty_text_skips():
     command_actions.select_command_history(host, "")
     # 空 text 不调 setText（apply 内部跳过空）。
     host._send_edit.setText.assert_not_called()
+
+
+class _SendHost:
+    """模拟 CommandActionHost，捕获 _notify 调用。"""
+
+    def __init__(self, text="", send_ok=True) -> None:
+        self._send_edit = MagicMock()
+        self._send_edit.text.return_value = text
+        self._controller = MagicMock()
+        self._controller.send_text_result.return_value = MagicMock(
+            ok=send_ok, message="" if send_ok else "transport closed"
+        )
+        self._command_history_combo = MagicMock()
+        self._status_label = MagicMock()
+        self.notify_calls: list = []
+
+    def tr(self, text: str) -> str:
+        return text
+
+    def _refresh_command_history(self) -> None:
+        pass
+
+    def _notify(self, level, title, message, timeout_ms=3000):
+        self.notify_calls.append((level, title, message))
+
+
+def test_send_empty_command_notifies_warning(qtbot):
+    host = _SendHost(text="")
+    command_actions.send_text(host)
+    assert "warning" in [c[0] for c in host.notify_calls]
+
+
+def test_send_failure_notifies_error(qtbot):
+    host = _SendHost(text="ATI", send_ok=False)
+    command_actions.send_text(host)
+    levels = [c[0] for c in host.notify_calls]
+    assert "error" in levels
+    error_msgs = [c[2] for c in host.notify_calls if c[0] == "error"]
+    assert any("transport closed" in m for m in error_msgs)
+
+
+def test_send_success_no_notify(qtbot):
+    host = _SendHost(text="ATI", send_ok=True)
+    command_actions.send_text(host)
+    assert host.notify_calls == []
+
+
+def test_command_actions_has_notify_helper():
+    src = inspect.getsource(command_actions)
+    assert "_notify" in src
+
+
+class _InjectHost:
+    """模拟 InjectionActionHost，捕获 _notify 调用。"""
+
+    def __init__(self, text="", inject_ok=True) -> None:
+        self._inject_edit = MagicMock()
+        self._inject_edit.text.return_value = text
+        self._controller = MagicMock()
+        self._controller.inject_received_text.return_value = MagicMock(
+            ok=inject_ok, message="" if inject_ok else "not fake transport"
+        )
+        self._status_label = MagicMock()
+        self.notify_calls: list = []
+
+    def tr(self, text: str) -> str:
+        return text
+
+    def _notify(self, level, title, message, timeout_ms=3000):
+        self.notify_calls.append((level, title, message))
+
+
+def test_inject_empty_text_notifies_warning(qtbot):
+    host = _InjectHost(text="")
+    injection_actions.inject_received(host)
+    assert "warning" in [c[0] for c in host.notify_calls]
+
+
+def test_inject_failure_notifies_error(qtbot):
+    host = _InjectHost(text="OK", inject_ok=False)
+    injection_actions.inject_received(host)
+    assert "error" in [c[0] for c in host.notify_calls]
+
+
+def test_injection_actions_has_notify_helper():
+    src = inspect.getsource(injection_actions)
+    assert "_notify" in src

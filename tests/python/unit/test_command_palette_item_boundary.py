@@ -27,7 +27,12 @@ import pytest
 from PyQt6.QtCore import QEvent, Qt
 from PyQt6.QtGui import QKeyEvent
 
-from embeddebug.serial_station.ui.command_palette import CommandItem, CommandPalette
+from embeddebug.serial_station.ui.command_palette import (
+    CommandItem,
+    CommandPalette,
+    fuzzy_score,
+    rank_commands,
+)
 
 
 def _make_item(title="Test", hint=""):
@@ -130,3 +135,47 @@ def test_open_close_cycle(qtbot):
     palette.close()
     palette.open()
     palette.close()
+
+
+def test_fuzzy_score_single_char():
+    assert fuzzy_score("c", "connect") > 0
+
+
+def test_fuzzy_score_long_query_no_match():
+    assert fuzzy_score("verylongquery", "ab") == -1
+
+
+def test_fuzzy_score_numbers():
+    assert fuzzy_score("123", "test123") > 0
+
+
+def test_fuzzy_score_exact_match():
+    assert fuzzy_score("connect", "connect") > 0
+
+
+def test_fuzzy_score_symbol_in_query():
+    assert fuzzy_score("+", "AT+RST") > 0
+
+
+def test_rank_commands_empty_commands():
+    assert rank_commands("test", ()) == []
+
+
+def test_rank_commands_empty_query_empty_commands():
+    assert rank_commands("", ()) == []
+
+
+def test_rank_commands_single_item():
+    commands = (_make_item("Connect"),)
+    assert len(rank_commands("con", commands)) == 1
+
+
+def test_rank_commands_all_no_match():
+    commands = (_make_item("Connect"), _make_item("Reset"))
+    assert rank_commands("xyz", commands) == []
+
+
+def test_rank_commands_preserves_order_same_score():
+    commands = (_make_item("abc"), _make_item("abc"))
+    result = rank_commands("abc", commands)
+    assert len(result) == 2
