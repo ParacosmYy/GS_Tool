@@ -17,7 +17,7 @@
 | 用户状态 | `U3`，Serial Station 主流程已有可见入口 | `uv run start-embeddebug` |
 | 设备状态 | `D2`，TCP/UDP 已有替身或 loopback 验证，真实硬件仍需补证 | `tests/python/ui_smoke/test_serial_station_udp_ui.py` |
 | 评分进度 | 见 `docs/tracking/SCORE_TRACKING.md` 首行（canonical 唯一） | `docs/tracking/SCORE_TRACKING.md` |
-| 最近闭环 | Batch 305-306：QSS 分区拆分、测试组织门禁 staged 新增文件守护、状态打字机动画失败日志化 | `docs/tracking/LOOP_STATE.md` |
+| 最近闭环 | Batch 314-315：测试文件聚合精简；Batch 315 已按 6 个 subagents 并行合并 connection/sidebar/animation/OTA/CAN/ripple 小测试文件 | `docs/tracking/LOOP_STATE.md` |
 
 ## 产品能力
 

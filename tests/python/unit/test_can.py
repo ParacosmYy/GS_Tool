@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import FrozenInstanceError
 import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -17,7 +18,7 @@ from embeddebug.serial_station.can import (
     DbcSignal,
     decode_signal,
 )
-from embeddebug.serial_station.can.frame import EXTENDED_ID_MAX, STANDARD_ID_MAX
+from embeddebug.serial_station.can.frame import CAN_FD_MAX_DLC, CAN_MAX_DLC, EXTENDED_ID_MAX, STANDARD_ID_MAX
 
 DBC_SAMPLE = """\
 VERSION ""
@@ -44,6 +45,23 @@ def test_can_id_rejects_out_of_range():
         CanId(0x800)
     with pytest.raises(ValueError):
         CanId(0x20000000, is_extended=True)
+    with pytest.raises(ValueError):
+        CanId(-1)
+
+
+@pytest.mark.parametrize(
+    ("can_id", "is_extended", "expected_hex", "is_standard"),
+    [
+        (0x001, False, "001", True),
+        (STANDARD_ID_MAX, False, "7FF", True),
+        (0x00000001, True, "00000001", False),
+        (0x12345ABC, True, "12345ABC", False),
+    ],
+)
+def test_can_id_hex_width_and_standard_flag(can_id, is_extended, expected_hex, is_standard):
+    cid = CanId(can_id, is_extended=is_extended)
+    assert cid.as_hex() == expected_hex
+    assert cid.is_standard() is is_standard
 
 
 def test_can_frame_dlc_and_payload():
@@ -54,12 +72,36 @@ def test_can_frame_dlc_and_payload():
 
 def test_can_frame_rejects_oversize_data():
     with pytest.raises(ValueError):
-        CanFrame(can_id=CanId(0x10), data=b"\x00" * 9)
+        CanFrame(can_id=CanId(0x10), data=b"\x00" * (CAN_MAX_DLC + 1))
 
 
 def test_can_fd_accepts_up_to_64():
-    frame = CanFrame(can_id=CanId(0x10), data=b"\x00" * 64, is_fd=True)
-    assert frame.dlc == 64
+    frame = CanFrame(can_id=CanId(0x10), data=b"\x00" * CAN_FD_MAX_DLC, is_fd=True)
+    assert frame.dlc == CAN_FD_MAX_DLC
+
+
+def test_can_fd_rejects_oversize_data():
+    with pytest.raises(ValueError):
+        CanFrame(can_id=CanId(0x10), data=b"\x00" * (CAN_FD_MAX_DLC + 1), is_fd=True)
+
+
+def test_can_frame_payload_contract_and_frozen():
+    frame = CanFrame(can_id=CanId(0x123), data=b"\xAB", timestamp=1.5, frame_index=7)
+    payload = frame.to_payload()
+    assert set(payload) == {
+        "canId",
+        "canIdHex",
+        "isExtended",
+        "isFd",
+        "dlc",
+        "data",
+        "dataHex",
+        "timestamp",
+        "frameIndex",
+    }
+    assert payload["dataHex"] == "ab"
+    with pytest.raises((AttributeError, FrozenInstanceError)):
+        frame.can_id = CanId(0x2)  # type: ignore[misc]
 
 
 def test_codec_roundtrip_standard_frame():
@@ -99,10 +141,40 @@ def test_codec_reports_invalid_frame():
     assert events[0]["type"] == "error"
 
 
-def test_filter_mask_matching():
-    flt = CanFilter(id=0x100, mask=0x700)
-    assert flt.matches(CanId(0x123)) is True
-    assert flt.matches(CanId(0x200)) is False
+@pytest.mark.parametrize(
+    ("filter_id", "mask", "candidate_id", "expected"),
+    [
+        (0x100, 0x700, 0x123, True),
+        (0x100, 0x700, 0x200, False),
+        (0x000, 0x000, 0x123, True),
+        (0x000, 0x000, 0x7FF, True),
+        (0x000, 0x000, 0x000, True),
+        (0x123, 0x7FF, 0x123, True),
+        (0x123, 0x7FF, 0x124, False),
+        (0x120, 0x0F0, 0x123, True),
+        (0x120, 0x0F0, 0x12F, True),
+        (0x120, 0x0F0, 0x100, False),
+    ],
+)
+def test_filter_mask_matching_boundaries(filter_id, mask, candidate_id, expected):
+    flt = CanFilter(id=filter_id, mask=mask)
+    assert flt.matches(CanId(candidate_id)) is expected
+
+
+@pytest.mark.parametrize(
+    ("filter_extended", "frame_extended", "expected"),
+    [
+        (None, False, True),
+        (None, True, True),
+        (True, True, True),
+        (True, False, False),
+        (False, False, True),
+        (False, True, False),
+    ],
+)
+def test_filter_frame_type_gate(filter_extended, frame_extended, expected):
+    flt = CanFilter(id=0x100, mask=0x700, is_extended=filter_extended)
+    assert flt.matches(CanId(0x123, is_extended=frame_extended)) is expected
 
 
 def test_dbc_parses_messages_and_signals():
@@ -146,14 +218,6 @@ def test_can_frame_empty_data_and_fd_payload():
     frame = CanFrame(CanId(0x12345, is_extended=True), b"\x01" * 10, is_fd=True)
     payload = frame.to_payload()
     assert payload["isExtended"] is True and payload["isFd"] is True
-
-
-def test_can_filter_mask_zero_and_explicit_standard():
-    """mask=0 匹配所有；is_extended=False 只匹配标准帧。"""
-    f_all = CanFilter(id=0, mask=0)
-    assert f_all.matches(CanId(0x7FF)) and f_all.matches(CanId(0x12345, is_extended=True))
-    f_std = CanFilter(id=0x100, mask=0x7FF, is_extended=False)
-    assert f_std.matches(CanId(0x100)) and not f_std.matches(CanId(0x100, is_extended=True))
 
 
 def test_can_filter_extended_mismatch_short_circuits():

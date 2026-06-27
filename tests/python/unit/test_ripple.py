@@ -4,6 +4,7 @@
 1. RippleButton 自绘 ripple：点击位置扩散 accent 圆形涟漪。
 2. install_ripple 动态注入：给现有 QPushButton 注入 ripple。
 3. ConfigurableButton.set_ripple 开关。
+4. ripple_progress 与重复启动边界。
 """
 
 from __future__ import annotations
@@ -35,6 +36,18 @@ def test_ripple_button_click_starts_animation(qtbot):
     btn._start_ripple(QPointF(10, 10))
     assert btn._ripple_anim is not None
     assert btn._ripple_center == QPointF(10, 10)
+    assert btn._get_ripple_progress() == 0.0
+
+
+def test_ripple_button_restarts_from_latest_center(qtbot):
+    """连续启动 ripple 应记录最新中心并保持动画有效。"""
+
+    btn = RippleButton("Click")
+    qtbot.addWidget(btn)
+    for center in (QPointF(0, 0), QPointF(50, 50), QPointF(100, 100)):
+        btn._start_ripple(center)
+    assert btn._ripple_anim is not None
+    assert btn._ripple_center == QPointF(100, 100)
 
 
 def test_ripple_button_set_ripple_disable(qtbot):
@@ -42,11 +55,14 @@ def test_ripple_button_set_ripple_disable(qtbot):
 
     btn = RippleButton("Click")
     qtbot.addWidget(btn)
+    assert btn._ripple_enabled is True
     btn.set_ripple(False)
     btn._start_ripple(QPointF(5, 5))
     # set_ripple(False) 不阻止手动 _start_ripple（它是底层 API），
     # 但 mousePressEvent 会检查 _ripple_enabled 跳过。验证标志。
     assert btn._ripple_enabled is False
+    btn.set_ripple(True)
+    assert btn._ripple_enabled is True
 
 
 def test_ripple_button_progress_property(qtbot):
@@ -54,9 +70,13 @@ def test_ripple_button_progress_property(qtbot):
 
     btn = RippleButton("Click")
     qtbot.addWidget(btn)
+    assert btn._get_ripple_progress() == 0.0
     btn._ripple_center = QPointF(10, 10)
     btn.ripple_progress = 0.5
     assert btn.ripple_progress == 0.5
+    assert btn._get_ripple_progress() == 0.5
+    btn._set_ripple_progress(1.0)
+    assert btn.ripple_progress == 1.0
 
 
 def test_install_ripple_on_plain_button(qtbot):

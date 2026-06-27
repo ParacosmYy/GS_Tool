@@ -11,7 +11,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import inspect
 import re
+from unittest.mock import MagicMock
 
+from PyQt6.QtCore import QParallelAnimationGroup, QSequentialAnimationGroup
 from PyQt6.QtWidgets import QFrame, QLabel, QWidget
 
 from embeddebug.serial_station.ui.animations import (
@@ -24,6 +26,17 @@ from embeddebug.serial_station.ui.animations import (
     ShakeAnimation,
 )
 from embeddebug.serial_station.ui.panel_animations import stagger_fade
+
+
+def _mock_animation(running=False):
+    from PyQt6.QtCore import QAbstractAnimation
+
+    anim = MagicMock()
+    anim.State = QAbstractAnimation.State
+    anim.state.return_value = (
+        QAbstractAnimation.State.Running if running else QAbstractAnimation.State.Stopped
+    )
+    return anim
 
 
 # stagger_fade
@@ -137,3 +150,41 @@ def test_controller_lifecycle(qtbot):
     assert s.duration() > 0
     ctrl.stop_all()
     assert len(ctrl._animations) == 0
+
+
+def test_controller_counts_running_animations():
+    ctrl = AnimationController()
+    ctrl.add(_mock_animation(running=True))
+    ctrl.add(_mock_animation(running=False))
+    ctrl.add(_mock_animation(running=True))
+    assert len(ctrl._animations) == 3
+    assert ctrl.active_count == 2
+
+
+def test_controller_empty_play_returns_groups():
+    ctrl = AnimationController()
+    assert isinstance(ctrl.play_sequential([]), QSequentialAnimationGroup)
+    assert isinstance(ctrl.play_parallel([]), QParallelAnimationGroup)
+
+
+def test_controller_tracks_and_clears_groups(qtbot):
+    w1 = QWidget(); w2 = QWidget()
+    for widget in (w1, w2): qtbot.addWidget(widget)
+    ctrl = AnimationController()
+    sequential = ctrl.play_sequential([ScaleAnimation.press(w1)])
+    parallel = ctrl.play_parallel([ShakeAnimation.shake(w2)])
+    assert isinstance(sequential, QSequentialAnimationGroup)
+    assert isinstance(parallel, QParallelAnimationGroup)
+    assert len(ctrl._groups) == 2
+    ctrl.stop_all()
+    assert ctrl._animations == []
+    assert ctrl._groups == []
+    assert ctrl.active_count == 0
+
+
+def test_controller_stop_all_idempotent():
+    ctrl = AnimationController()
+    ctrl.add(_mock_animation(running=True))
+    ctrl.stop_all()
+    ctrl.stop_all()
+    assert ctrl.active_count == 0

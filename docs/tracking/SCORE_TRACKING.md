@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 103分 | 目标: 1000分 | 评分从 100 起步；仅当单次 commit diff 修改行数（新增+删除）≥1000 且全门禁绿时 +1
-> 距离目标还差 897分
+> 当前: 104分 | 目标: 1000分 | 评分从 100 起步；仅当单次 commit diff 修改行数（新增+删除）≥1000 且全门禁绿时 +1
+> 距离目标还差 896分
 
 ---
 
@@ -18,6 +18,7 @@
 | 101 | Batch 312 — shared/transport/toast/sections 测试文件聚合精简 | 合并 shared results、TCP/UDP transport、notifications/toast、sections log row 小测试文件；本轮 diff 修改行数 1066，满足新制 +1 行数门槛。 |
 | 102 | Batch 313 — transport/help/settings/rtt/icons 测试文件聚合精简 | 合并 transport registry/state、shortcuts/status/help、settings/rtt/app、automation/icons 小测试文件，并修复波形预览关闭期残留 flush 触发的 pyqtgraph teardown 抖动；本轮 diff 修改行数 1247，满足新制 +1 行数门槛。 |
 | 103 | Batch 314 — settings/receive/diff/svd/hex/ota 测试文件聚合精简 | 合并 settings advanced、receive state、diff tools、SVD model、hex formatter、OTA transfer engine 小测试文件；本轮 diff 修改行数 1215，满足新制 +1 行数门槛。 |
+| 104 | Batch 315 — 6 subagents 并行聚合精简测试文件 | 6 个 subagents 并行合并 connection、sidebar、animation、OTA、CAN、ripple 小测试文件；本轮 diff 修改行数 1420，满足新制 +1 行数门槛。 |
 
 ---
 
