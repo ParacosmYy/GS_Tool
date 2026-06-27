@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -84,6 +85,27 @@ def test_build_send_row_creates_send_button(qtbot):
     build_send_row(owner, root)
     assert hasattr(owner, "_send_button")
     assert isinstance(owner._send_button, QPushButton)
+
+
+def test_build_send_row_logs_scale_press_install_failure(qtbot, monkeypatch, caplog):
+    """发送按钮微交互安装失败不阻断 UI 构建，但必须留下 debug 日志。"""
+
+    from embeddebug.serial_station.ui import micro_interactions
+
+    def fail_install(button):
+        del button
+        raise RuntimeError("effect unavailable")
+
+    owner = _SendHost()
+    root = QWidget()
+    qtbot.addWidget(root)
+    monkeypatch.setattr(micro_interactions, "install_scale_press", fail_install)
+    caplog.set_level(logging.DEBUG, logger="embeddebug.serial_station.ui.command_section")
+
+    build_send_row(owner, root)
+
+    assert isinstance(owner._send_button, QPushButton)
+    assert "install send button scale press failed" in caplog.text
 
 
 def test_build_send_row_send_edit_is_lineedit(qtbot):

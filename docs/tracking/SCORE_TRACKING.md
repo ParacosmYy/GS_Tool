@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 970分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 30分
+> 当前: 971分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 29分
 
 ---
 
@@ -620,6 +620,7 @@
 | 968 | Batch 304 — rtt/protocol RttChannel/RttConfig frozen + control_block_layout/channel_index 边界（8 测试） | 新建 test_rtt_protocol_boundary.py（68 行）：RttChannel frozen AttributeError + 字段（name/buffer_size/mode）+ RttConfig frozen + 默认 ram_base=0x20000000 + control_block_layout 返回 list 含 acID + channel_index 已知返回索引 + 未知 raises KeyError。 |
 | 969 | Batch 305 — check_constraints staged 新增测试文件守护 + QSS 分区收口 | 增强 check_constraints 测试组织门禁：新增 staged added 测试文件从 tracked 集合中扣除，防止孤儿测试/错误分层在暂存后漏检；补 test_tools_boundary 回归测试与 rtt panel lint 断言修复；本轮门禁：4667 passed, 2 skipped；tools 9/9；lint/check/smoke/bat smoke 均 exit 0。 |
 | 970 | Batch 306 — status_messages 打字机动画失败日志化 | set_status_text 保持状态文本主路径不受动画失败影响，同时在 TypewriterAnimation 失败时写入 debug 诊断日志；新增 test_status_messages 回归测试覆盖日志路径；README 改为引用 SCORE_TRACKING SSOT 并同步 Batch 305-306 状态；本轮门禁：4668 passed, 2 skipped；lint/check/smoke/bat smoke 均 exit 0。 |
+| 971 | Batch 307 — command_section 发送按钮微交互安装失败日志化 | build_send_row 保持发送行 UI 构建主路径不受 install_scale_press 失败影响，同时写入 debug 诊断日志；新增 test_sections_boundary 回归测试覆盖失败日志路径；本轮门禁：4669 passed, 2 skipped；tools 9/9；lint/check/smoke/bat smoke 均 exit 0。 |
 
 ---
 

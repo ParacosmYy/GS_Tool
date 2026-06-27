@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Protocol
 
 from PyQt6.QtWidgets import QComboBox, QHBoxLayout, QLineEdit, QPushButton, QWidget
 
 from embeddebug.serial_station.ui.theme import tokens as T
+
+_log = logging.getLogger(__name__)
 
 
 class CommandSectionHost(Protocol):
@@ -38,7 +41,7 @@ def build_send_row(owner: CommandSectionHost, root: QWidget) -> QHBoxLayout:
 
         install_scale_press(owner._send_button)
     except Exception:
-        pass
+        _log.debug("install send button scale press failed", exc_info=True)
     row.addWidget(owner._send_edit, 1)
     row.addWidget(owner._command_history_combo)
     row.addWidget(owner._send_button)
