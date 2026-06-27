@@ -9,6 +9,7 @@ AppShell 按注册顺序生成导航图标，点击切换 QStackedWidget 对应�
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
 
@@ -38,6 +39,14 @@ class ModePanel(Protocol):
         ...
 
 
+# 工厂签名：接收 AppController，返回 ModePanel 实例。
+# 放在 ModePanel 类定义之后，让前向引用解析到真实 Protocol。
+# 仅在类型检查期生效；运行期通过 ``from __future__ import annotations``
+# 把所有注解保留为字符串，从不解析 PanelFactory 符号。
+if TYPE_CHECKING:
+    PanelFactory = Callable[[AppController], ModePanel]
+
+
 @dataclass(frozen=True)
 class PanelRegistration:
     """一个模式在导航栏的注册项。"""
@@ -48,15 +57,11 @@ class PanelRegistration:
     factory: PanelFactory
 
 
-# factory 接受 AppController，返回 ModePanel 实例。
-PanelFactory = "__factory_placeholder__"  # 真实类型在运行时是 Callable[[AppController], ModePanel]
-
-
 _REGISTRY: list[PanelRegistration] = []
 
 
 def register_panel(
-    mode_id: str, icon: str, label: str, factory: object
+    mode_id: str, icon: str, label: str, factory: PanelFactory
 ) -> None:
     """注册一个模式面板（按注册顺序追加到导航栏）。
 
@@ -65,7 +70,7 @@ def register_panel(
 
     if any(r.mode_id == mode_id for r in _REGISTRY):
         return
-    _REGISTRY.append(PanelRegistration(mode_id=mode_id, icon=icon, label=label, factory=factory))  # type: ignore[arg-type]
+    _REGISTRY.append(PanelRegistration(mode_id=mode_id, icon=icon, label=label, factory=factory))
 
 
 def registered_panels() -> tuple[PanelRegistration, ...]:

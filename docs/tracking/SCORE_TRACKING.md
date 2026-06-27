@@ -1,8 +1,8 @@
 ﻿# EmbedDebug 评分追踪
 
 > 分支: `feat/embed-debug` | 远程: `https://github.com/ParacosmYy/GS_Tool.git`
-> 当前: 968分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
-> 距离目标还差 32分
+> 当前: 969分 | 目标: 1000分 | 每次 commit 默认记 1 分（固定节奏，不按工作量梯度）
+> 距离目标还差 31分
 
 ---
 
@@ -618,6 +618,7 @@
 | 966 | Batch 302 — shortcuts/definitions ShortcutCategory + ShortcutDef 边界（8 测试） | 新建 test_shortcuts_definitions_boundary.py（62 行）：ShortcutCategory 5 成员（FILE/EDIT/VIEW/TRANSPORT/HELP）+ 值小写 + ShortcutDef frozen AttributeError + 5 字段（id/category/default_key_sequence/description/callback_name）+ DEFAULT_SHORTCUTS 非空 + id 唯一 + 含 'send' + 含 'toggle_theme'。 |
 | 967 | Batch 303 — automation ActionType + TriggerType 枚举边界（8 测试） | 新建 test_automation_enums_boundary.py（48 行）：ActionType 5 成员 + 值非 None + 互异 + TriggerType 7 成员 + 值非 None + 互异 + ActionType 含 SEND_COMMAND + TriggerType 含 RX_MATCH。 |
 | 968 | Batch 304 — rtt/protocol RttChannel/RttConfig frozen + control_block_layout/channel_index 边界（8 测试） | 新建 test_rtt_protocol_boundary.py（68 行）：RttChannel frozen AttributeError + 字段（name/buffer_size/mode）+ RttConfig frozen + 默认 ram_base=0x20000000 + control_block_layout 返回 list 含 acID + channel_index 已知返回索引 + 未知 raises KeyError。 |
+| 969 | Batch 305 — check_constraints staged 新增测试文件守护 + QSS 分区收口 | 增强 check_constraints 测试组织门禁：新增 staged added 测试文件从 tracked 集合中扣除，防止孤儿测试/错误分层在暂存后漏检；补 test_tools_boundary 回归测试与 rtt panel lint 断言修复；本轮门禁：4667 passed, 2 skipped；tools 9/9；lint/check/smoke/bat smoke 均 exit 0。 |
 
 ---
 

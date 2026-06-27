@@ -12,7 +12,11 @@
 
 from __future__ import annotations
 
+import subprocess
+
 import pytest
+
+from tools import check_constraints
 
 from embeddebug.serial_station.ui.tools.hex_viewer import (
     BYTES_PER_LINE,
@@ -192,3 +196,33 @@ def test_tz_presets_labels_non_empty():
 
     for p in TZ_PRESETS:
         assert p.label
+
+
+# ── check_constraints git 新增文件判定 ────────────────────────────────
+
+
+def test_check_constraints_treats_staged_added_test_as_new(monkeypatch):
+    """staged 新增测试文件即使出现在 git ls-files，也必须按新增文件阻断。"""
+
+    path = "tests/python/unit/test_new_orphan.py"
+
+    def fake_run(command, **kwargs):
+        del kwargs
+
+        class Result:
+            stdout = ""
+
+        result = Result()
+        if command[:2] == ["git", "ls-files"]:
+            result.stdout = f"{path}\n"
+            return result
+        if command[:3] == ["git", "diff", "--cached"]:
+            result.stdout = f"{path}\n"
+            return result
+        raise AssertionError(f"unexpected git command: {command}")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    tracked = check_constraints._git_tracked_files("tests/python/")
+
+    assert path not in tracked

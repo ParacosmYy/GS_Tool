@@ -29,16 +29,9 @@ _TOOL_BUTTONS = [
 ]
 
 
-def buttons_section() -> str:
-    connect_sel = ",\n".join(f"QPushButton#{n}" for n in _CONNECT_BUTTONS)
-    connect_hover = ",\n".join(f"QPushButton#{n}:hover" for n in _CONNECT_BUTTONS)
-    connect_press = ",\n".join(f"QPushButton#{n}:pressed" for n in _CONNECT_BUTTONS)
-    connect_dis = ",\n".join(f"QPushButton#{n}:disabled" for n in _CONNECT_BUTTONS)
-    tool_sel = ",\n".join(f"QPushButton#{n}" for n in _TOOL_BUTTONS)
-    tool_hover = ",\n".join(f"QPushButton#{n}:hover" for n in _TOOL_BUTTONS)
-    tool_press = ",\n".join(f"QPushButton#{n}:pressed" for n in _TOOL_BUTTONS)
-    tool_dis = ",\n".join(f"QPushButton#{n}:disabled" for n in _TOOL_BUTTONS)
-    return f"""/* === Buttons === */
+def _default_button_qss() -> str:
+    """默认 QPushButton 基线样式 — 含 hover/pressed/disabled 三态与 focus 焦点边框。"""
+    return f"""/* 默认 QPushButton 基线 */
 QPushButton {{
     background-color: {P.BG_PANEL};
     color: {P.TEXT_PRIMARY};
@@ -64,25 +57,37 @@ QPushButton:disabled {{
 QPushButton:focus {{
     border: {T.BORDER_THIN} solid {P.ACCENT_BORDER};
     outline: none;
-}}
-/* 连接类主按钮 — 强调青→蓝品牌渐变（跨色相，打破单一色相单调） */
-{connect_sel} {{
+}}"""
+
+
+def _connect_buttons_qss() -> str:
+    """连接类主按钮 — 强调青→蓝品牌渐变（跨色相，打破单一色相单调）+ 三态。"""
+    sel = ",\n".join(f"QPushButton#{n}" for n in _CONNECT_BUTTONS)
+    hover = ",\n".join(f"QPushButton#{n}:hover" for n in _CONNECT_BUTTONS)
+    press = ",\n".join(f"QPushButton#{n}:pressed" for n in _CONNECT_BUTTONS)
+    dis = ",\n".join(f"QPushButton#{n}:disabled" for n in _CONNECT_BUTTONS)
+    return f"""/* 连接类主按钮 — 品牌渐变 */
+{sel} {{
     background-color: {P.ACCENT_GRADIENT};
     color: {P.TEXT_ON_ACCENT};
     border: {T.BORDER_NONE};
     font-weight: {T.FONT_WEIGHT_SEMIBOLD};
 }}
-{connect_hover} {{
+{hover} {{
     background-color: {P.ACCENT_HOVER};
 }}
-{connect_press} {{
+{press} {{
     background-color: {P.ACCENT_PRESSED};
 }}
-{connect_dis} {{
+{dis} {{
     background-color: {P.BG_DISABLED};
     color: {P.TEXT_DISABLED};
-}}
-/* 断开按钮 — 危险红 */
+}}"""
+
+
+def _disconnect_button_qss() -> str:
+    """断开按钮 — 危险红配色（ERROR_SOFT 底 + ERROR 描边）+ 三态。"""
+    return f"""/* 断开按钮 — 危险红 */
 QPushButton#serialStationDisconnectButton {{
     background-color: {P.ERROR_SOFT};
     color: {P.ERROR};
@@ -99,27 +104,39 @@ QPushButton#serialStationDisconnectButton:disabled {{
     background-color: {P.BG_DISABLED};
     color: {P.TEXT_DISABLED};
     border-color: {P.BORDER};
-}}
-/* 次要工具按钮 */
-{tool_sel} {{
+}}"""
+
+
+def _tool_buttons_qss() -> str:
+    """次要工具按钮 — 默认态弱化为次要文本色 + hover/pressed/disabled 三态。"""
+    sel = ",\n".join(f"QPushButton#{n}" for n in _TOOL_BUTTONS)
+    hover = ",\n".join(f"QPushButton#{n}:hover" for n in _TOOL_BUTTONS)
+    press = ",\n".join(f"QPushButton#{n}:pressed" for n in _TOOL_BUTTONS)
+    dis = ",\n".join(f"QPushButton#{n}:disabled" for n in _TOOL_BUTTONS)
+    return f"""/* 次要工具按钮 */
+{sel} {{
     background-color: {P.BG_PANEL};
     color: {P.TEXT_SECONDARY};
 }}
-{tool_hover} {{
+{hover} {{
     background-color: {P.BG_PANEL_RAISED};
     color: {P.TEXT_PRIMARY};
     border-color: {P.ACCENT_BORDER};
 }}
-{tool_press} {{
+{press} {{
     background-color: {P.BG_SELECTION};
     border-color: {P.ACCENT_PRESSED};
 }}
-{tool_dis} {{
+{dis} {{
     background-color: {P.BG_DISABLED};
     color: {P.TEXT_DISABLED};
     border-color: {P.BORDER};
-}}
-/* 发送/注入 — 终端 TX 蓝 */
+}}"""
+
+
+def _send_inject_buttons_qss() -> str:
+    """发送/注入按钮 — 终端 TX 蓝高亮（区分 TX 方向）+ 三态。"""
+    return f"""/* 发送/注入 — 终端 TX 蓝 */
 QPushButton#serialStationSendButton,
 QPushButton#serialStationInjectButton {{
     color: {P.TERM_TX};
@@ -141,6 +158,18 @@ QPushButton#serialStationInjectButton:disabled {{
     color: {P.TEXT_DISABLED};
     border-color: {P.BORDER};
 }}"""
+
+
+def buttons_section() -> str:
+    """按钮分区编排：默认 + 连接 + 断开 + 工具 + 发送/注入 5 个子分区拼接。"""
+    return "\n\n".join([
+        "/* === Buttons === */",
+        _default_button_qss(),
+        _connect_buttons_qss(),
+        _disconnect_button_qss(),
+        _tool_buttons_qss(),
+        _send_inject_buttons_qss(),
+    ])
 
 
 def log_view_section() -> str:

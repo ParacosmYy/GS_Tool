@@ -49,7 +49,7 @@ def test_card_body_no_layout_raises(qapp):
     parent = QWidget()
     from embeddebug.serial_station.ui.layout_cards import card_body
     bare = QWidget(parent)
-    with pytest.raises(ValueError, match=""):
+    with pytest.raises(ValueError, match="has no layout"):
         card_body(bare)
 
 

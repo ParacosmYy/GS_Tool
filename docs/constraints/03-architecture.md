@@ -25,6 +25,8 @@
 
 ## 一-a、架构量化验收（可闭环）
 
+> 通用闭环门禁（5 视角 + 6 门禁）统一由 [09-closed-loop.md](09-closed-loop.md) 定义；本节只列架构专项量化项。
+
 - `I/O-依赖越界`：每次变更目标 ≤0 例。
 - `分层越界`：每次提交必须为 0。
 - `接口化覆盖率`：跨层调用必须通过 interface。
@@ -36,6 +38,7 @@
 - 每轮架构相关考核必须至少执行一次 `uv run test-embeddebug-py`。
 - 每轮架构相关考核必须有一次 Python/PyQt smoke：`uv run start-embeddebug --smoke`。
 - 若启动失败，架构考核记阻断并不得记 `+1`。
+- 完整门禁清单（含 `uv run check-constraints`）见 [09-closed-loop §一.2](09-closed-loop.md)。
 
 ---
 

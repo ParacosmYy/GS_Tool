@@ -104,6 +104,8 @@
 
 ## 八、每轮高效启动核验（目录变更亦适用）
 
+> 完整门禁清单（5 视角 + 6 门禁）见 [09-closed-loop.md](09-closed-loop.md)。目录变更必跑项：
+
 1. 修改文件落点确认后，执行 `uv run test-embeddebug-py`。
 2. 启动 `uv run start-embeddebug --smoke`。
 3. 启动 `cmd /c EmbedDebug.bat --smoke`。

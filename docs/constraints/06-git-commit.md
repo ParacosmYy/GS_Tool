@@ -36,66 +36,48 @@
 - `resources/themes/*.qss`
 - `docs/constraints/*.md` 与 `CLAUDE.md`
 
-## 四、AI 永久闭环与分数系统（与 02/workflow 联动）
+## 四、闭环、评分与 commit 模板（统一引用 09-closed-loop）
 
-### 4.1 评分目标
+> ⚠️ **本节原定义的 "A-I-R-C-L-M-P 七环"、7 角色子代理回执、"起始分 500" 已全部废除**。
+>
+> 历史问题：
+> - 起始分曾写成 500，与 CLAUDE.md/SCORE_TRACKING 的真实起始分（1，当前 800+）矛盾
+> - 7 角色子代理在单 Agent 会话（如 ZCode）无法自动派发，是永远 +0 的幽灵门禁
+> - 7 环编号与 02-workflow、serial_station_architecture 的闭环编号三重冲突
+>
+> **统一权威定义见 [09-closed-loop.md](09-closed-loop.md)**：
+> - **§一 单轮闭环**：5 视角自检 + 6 门禁
+> - **§二 评分闭环**：起始分 1，目标 1000，每通过门禁 commit +1，canonical 落点 `docs/tracking/SCORE_TRACKING.md`
+> - **§五 commit message 模板**（取代本节旧模板）
 
-- 工程起始分：`500`
-- 目标分：`1000`
-- 单 commit 通过后得分：`+1`
-- 关闭门禁失败：`+0`
+### 4.1 提交门禁速览（详见 09-closed-loop §一.2）
 
-### 4.1a 提交与 push 节奏门禁
+每次 commit 前必须跑：
+1. `uv run test-embeddebug-py`（退出码 0）
+2. `uv run start-embeddebug --smoke`（退出码 0）
+3. `cmd /c EmbedDebug.bat --smoke`（启动/入口/依赖改动时必跑）
+4. `uv run lint-embeddebug-py`（无新错误）
+5. `uv run check-constraints`（评分/SSOT/行数漂移检测，退出码 0）
 
-- 两次通过门禁的 commit 形成一次推送周期。
-- 每个推送周期前必须先完成 `README.md` 企业级精简版更新。
-- 本次周期若未更新 README，禁止执行 push。
-- README 变更必须包含：启动路径、最小 smoke、周期得分与证据入口。
+### 4.2 Push 节奏（详见 09-closed-loop §二.2）
 
-### 4.2 提交前门禁（A→I→R→C→L）
+- 每 2 个通过门禁的 commit 为 1 个 push 周期
+- push 前必须更新 `README.md` 状态表（评分、能力、证据入口）
+- push 前若未更新 README，视为收口缺陷，不得进入下一轮加分
 
-1. A（Aim）：本轮目标与 PRD 是否一致，是否包含可量化验收条目。
-2. I（Inspect）：必须检查 01、02、03、06、07、08、`serial_station_architecture.md` 的关联更新。
-3. R（Record）：确保约束文档和目标分日志可追溯。
-4. C（Check）：至少有一次可复现证据（Python 测试、启动 smoke 或 PyInstaller 包验证）。
-5. L（Limit）：不允许无关文件、build 产物或边界越界。
-6. M（Multi-agent）：必须接收 7 角色闭环（A-1/A-2/D-1/D-2/D-3/P-1/U-1）或等价 6+1 合并产出。
-7. P（Push）：满足两次提交周期（第 2/4/6 次门禁提交）后，必须在 push 前同步更新 README 与本周期证据摘要。
-
-### 4.1b Push 周期证据最小模板（企业级）
-
-- 周期口径：`提交1 -> 提交2`（或 `3->4`...）
-- 分数变化：`n -> n+1`（本周期最低 +1）
-- 证据清单：一次 Python 测试 + `EmbedDebug.bat --smoke` 启动 + 约束文档变更路径
-
-### 4.3 Commit Message 规范（建议）
-
----
+### 4.3 Commit Message 模板（唯一权威，见 09-closed-loop §五）
 
 ```text
-<模块名>: <本轮变更摘要>
+<模块>: <简述改了什么>
 
-背景：<为什么改>
-验收：<构建/测试/启动证据>
-状态：E<U/D>
+门禁: test✓ smoke✓ lint✓ check_constraints✓ [bat✓]
+视角: 架构✓ 实现✓ 测试✓ 产品✓ 用户✓
+三轴: E<x> U<x> D<x>（本轮变化: <无 / E↑ / U↑ / D↑>）
+评分: <旧分> + 1 = <新分>（见 docs/tracking/SCORE_TRACKING.md）
+变更: <N> files, <+M> insertions, <-K> deletions
 ```
 
-示例：
-
-```text
-serial_station: 重构约束文档并补齐可量化闭环
-
-背景：统一 Serial Station 与总体约束口径，新增主流工具对齐项和验收标准。
-验收：uv run test-embeddebug-py ; cmd /c EmbedDebug.bat --smoke
-状态：E3 U2 D2
-积分：从 500 提升到 501（+1）
-```
-
-### 4.4 提交时子代理闭环最小要求
-
-- 每次提交至少附上子代理闭环结论条目，未附者视为门禁失败（不得加分）。
-- 任何关键冲突未在 `P`/`U` 环节给出处理结论，提交不得通过。
-- 若子代理建议一致但证据不足，按 `+0` 处理并补齐证据后再提交。
+若某门禁未跑，写 `X✗（原因：...）`，不得省略。`[bat✓]` 仅在跑了 `cmd /c EmbedDebug.bat --smoke` 时打勾。
 
 ---
 
@@ -104,11 +86,16 @@ serial_station: 重构约束文档并补齐可量化闭环
 - [ ] 是否有测试证据？
 - [ ] 是否有启动证据（若涉及启动链路）？
 - [ ] 是否完成最小 smoke：`uv run start-embeddebug --smoke` 与 `cmd /c EmbedDebug.bat --smoke`？
+- [ ] `uv run check-constraints` 退出码 0（评分/SSOT/行数漂移检测通过）？
 - [ ] 是否有 `E/U/D` 更新？
 - [ ] 是否有测试/替身证据（若涉及核心行为）？
 - [ ] 是否有约束文档对应更新？
-- [ ] 是否有 7 角色子代理闭环（A-1/A-2/D-1/D-2/D-3/P-1/U-1）并有仲裁结论？
-- [ ] 若本次为周期结尾（2 次提交）：README 已更新且可追溯证据摘要齐全
+- [ ] [09-closed-loop §一](09-closed-loop.md) 5 视角自检全部打勾（架构/实现/测试/产品/用户）？
+- [ ] [09-closed-loop §一](09-closed-loop.md) 6 门禁全绿（或未跑项已写明原因）？
+- [ ] commit message 符合 [09-closed-loop §五](09-closed-loop.md) 模板？
+- [ ] 评分已更新到 `docs/tracking/SCORE_TRACKING.md` 首行（唯一处）？
+- [ ] 闭环结果已追加到 `docs/tracking/LOOP_STATE.md`？
+- [ ] 若本次为 push 周期结尾（2 次提交）：README 已更新且可追溯证据摘要齐全
 
 ## 六、提交前固定高效验收
 

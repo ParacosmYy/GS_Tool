@@ -150,7 +150,7 @@ def test_start_demo_mode_initializes_session(qtbot):
     assert panel._stub is not None
     assert panel._demo_timer is not None
     try:
-        panel._status_dot._state == DotState.BLUE
+        assert panel._status_dot._state == DotState.BLUE
     except RuntimeError:
         pass
     # 清理：停止避免 demo timer 在后续测试触发。

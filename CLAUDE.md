@@ -67,10 +67,26 @@
 21. **测试文件聚焦单一行为域，≤ 250 行** — 超过应拆分为 unit/integration/ui_smoke。同域小文件必须合并。同样由 check-constraints 守护。
 22. **单个方法 ≤ 80行** — 超过说明逻辑过于复杂
 
-### 测试文件组织规则
-23. **测试文件按域分组** — 同域测试合并到单文件（如 `test_controller_state_core.py` 含 connection/callback/workbench state）。禁止同域散落 >3 个文件。
-24. **文件命名 `test_<域>_<子域>.py`** — 如 `test_dashboard_layout.py`、`test_animations_factories.py`、`test_theme_core.py`。避免 `test_<单个控件>.py` 孤儿文件。
-25. **commit 前必须跑全量 unit + smoke** — 不能只跑 smoke（Oracle 审计发现：仅 smoke 通过但 unit 有回归未发现）。门禁定义见 [09-closed-loop §一.2](docs/constraints/09-closed-loop.md)。
+### 测试文件组织规则（可维护可迭代核心，强制）
+
+> 本节是项目长期可维护的命脉。**测试文件要少、框架要正确、按域聚合、按层分层**。
+> 散乱的测试会让框架失去价值：跑得慢、找不到代码、改一个功能漏一片回归。
+> 历史教训：曾经 168 → 112 文件大精简，但后续又涨回 195 个 unit 文件，孤儿文件回潮。
+> 因此本节由 `uv run check-constraints`（[tools/check_constraints.py](tools/check_constraints.py)）机械守护。
+
+23. **测试文件要少** — 同域测试必须合并到单文件（如 `test_controller_state_core.py` 含 connection/callback/workbench state）。每个 commit 不得新增孤儿测试文件（<3 个测试函数的新文件禁止，必须并入同域既有文件）。同域散落 >3 个文件视为技术债，必须合并。
+24. **测试框架要正确分层** — 测试必须落在 `tests/python/` 的三个子层之一：
+    - `unit/` — 纯函数/类/算法单测，**无 Qt、无 IO、无网络**，毫秒级
+    - `integration/` — 跨模块协作（controller+core+service）、fixture 加载、替身 transport
+    - `ui_smoke/` — PyQt 窗口实例化、信号槽装配、objectName/tr() 合规
+    - 禁止把 integration/ui_smoke 测试写进 `unit/`（污染 unit 的毫秒级特性）
+    - 禁止把纯函数单测写进 `ui_smoke/`（拖慢 smoke）
+25. **文件命名 `test_<域>_<子域>.py`** — 如 `test_dashboard_layout.py`、`test_animations_factories.py`、`test_theme_core.py`。禁止 `test_<单个控件>.py` 孤儿命名（如 `test_ble.py`、`test_can.py`），必须按域聚合为 `test_ble_codec.py` / `test_ble_gatt.py` 等子域文件。
+26. **commit 前必须跑全量 unit + smoke** — 不能只跑 smoke（Oracle 审计发现：仅 smoke 通过但 unit 有回归未发现）。门禁定义见 [09-closed-loop §一.2](docs/constraints/09-closed-loop.md)。
+27. **测试可迭代三原则** —
+    - **快**：unit 全量 < 30 秒（单文件 < 1 秒）；超时说明混入了 IO/Qt/网络，必须拆到 integration 或 ui_smoke
+    - **独立**：每个测试不依赖其他测试的执行顺序或共享可变状态；`pytest -p no:randomly` 之外乱序也必须绿
+    - **可定位**：测试名描述被测行为（`test_parse_justfloat_returns_none_on_short_frame`），禁止 `test_it_works` / `test_1` 这类无信息命名
 
 ---
 

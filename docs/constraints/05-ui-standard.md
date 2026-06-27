@@ -111,6 +111,8 @@
 
 ## 九、最小启动 smoke（UI 变更共用）
 
+> 完整门禁清单（5 视角 + 6 门禁）见 [09-closed-loop.md](09-closed-loop.md)。UI 变更必跑项：
+
 1. 执行 `uv run test-embeddebug-py`。
 2. 执行 `uv run start-embeddebug --smoke`。
 3. 执行 `cmd /c EmbedDebug.bat --smoke`。

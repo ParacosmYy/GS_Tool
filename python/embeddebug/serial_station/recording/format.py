@@ -77,6 +77,13 @@ class RecordingWriter:
     def close(self) -> None:
         if self._handle:
             self._handle.close()
+            self._handle = None
+
+    def __enter__(self) -> RecordingWriter:
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
 
 
 class RecordingReader:

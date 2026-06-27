@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 
 from PyQt6.QtWidgets import QWidget
@@ -25,6 +26,8 @@ from PyQt6.QtWidgets import QWidget
 from embeddebug.serial_station.ui.panels._dashboard_binding_dialog import (
     open_binding_dialog,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def make_widget_update_handler(
@@ -38,7 +41,7 @@ def make_widget_update_handler(
             try:
                 widget.set_value(float(value))  # type: ignore[attr-defined]
             except Exception:
-                pass
+                _LOGGER.debug("value_handler set_value failed", exc_info=True)
 
         return _value_handler
 
@@ -56,7 +59,7 @@ def make_widget_update_handler(
                 level = payload[0] if isinstance(payload, tuple) else "info"
                 widget.set_state(level_map.get(level, LedState.OFF))  # type: ignore[attr-defined]
             except Exception:
-                pass
+                _LOGGER.debug("led_handler set_state failed", exc_info=True)
 
         return _led_handler
 
@@ -66,7 +69,7 @@ def make_widget_update_handler(
 def subscribe_controller_events(serial_controller, binding_service) -> None:
     """订阅 controller 的 measurement/log/error 事件，路由到 binding_service。
 
-    任何订阅失败静默（不阻塞面板构建；controller 不存在 / 已订阅等场景）。
+    任何订阅失败记录到 debug 日志（不阻塞面板构建；controller 不存在 / 已订阅等场景）。
     """
 
     try:
@@ -74,19 +77,19 @@ def subscribe_controller_events(serial_controller, binding_service) -> None:
             lambda batch: _dispatch_measurement_batch(binding_service, batch)
         )
     except Exception:
-        pass
+        _LOGGER.debug("subscribe on_measurement_batch failed", exc_info=True)
     try:
         serial_controller.on_log_entry(
             lambda entry: binding_service.route_log("info", entry.text)
         )
     except Exception:
-        pass
+        _LOGGER.debug("subscribe on_log_entry failed", exc_info=True)
     try:
         serial_controller.on_error(
             lambda message: binding_service.route_log("error", message)
         )
     except Exception:
-        pass
+        _LOGGER.debug("subscribe on_error failed", exc_info=True)
 
 
 def _dispatch_measurement_batch(binding_service, batch) -> None:
@@ -101,9 +104,9 @@ def _dispatch_measurement_batch(binding_service, batch) -> None:
             try:
                 binding_service.route_measurement(channel, float(value))
             except Exception:
-                pass
+                _LOGGER.debug("route_measurement ch=%d failed", channel, exc_info=True)
     except Exception:
-        pass
+        _LOGGER.debug("dispatch measurement batch failed", exc_info=True)
 
 
 def register_item_binding(canvas, item_id: str, binding_service) -> bool:
@@ -115,6 +118,7 @@ def register_item_binding(canvas, item_id: str, binding_service) -> bool:
     try:
         item = canvas.items.get(item_id)
     except Exception:
+        _LOGGER.debug("register_item_binding: canvas.items.get failed", exc_info=True)
         return False
     if item is None:
         return False
@@ -128,6 +132,7 @@ def register_item_binding(canvas, item_id: str, binding_service) -> bool:
     try:
         binding_service.bind(item_id, spec, handler)
     except Exception:
+        _LOGGER.debug("register_item_binding: bind failed", exc_info=True)
         return False
     return True
 
@@ -176,22 +181,22 @@ def open_binding_config_for_item(panel, item_id: str) -> None:
 
 
 def _notify_status(panel, widget_root, spec: str) -> None:
-    """更新状态栏文字（失败静默）。"""
+    """更新状态栏文字（失败记录到 debug 日志）。"""
 
     try:
         status = getattr(panel, "_status", None)
         if status is not None:
             status.setText(widget_root.tr("已绑定：{spec}").format(spec=spec))
     except Exception:
-        pass
+        _LOGGER.debug("_notify_status setText failed", exc_info=True)
 
 
 def _trigger_autosave(panel) -> None:
-    """binding 变更后触发 autosave（失败静默）。"""
+    """binding 变更后触发 autosave（失败记录到 debug 日志）。"""
 
     try:
         autosave = getattr(panel, "_autosave_layout", None)
         if callable(autosave):
             autosave()
     except Exception:
-        pass
+        _LOGGER.debug("_trigger_autosave failed", exc_info=True)

@@ -141,28 +141,39 @@ Python/PyQt 迁移不是只替换 UI 技术栈，必须按 VOFA+ 能力追平：
 - 日志、导出、回放、Profile 通过 fixtures 或明确差异矩阵对齐目标上位机能力。
 - 热路径必须使用 typed batch、NumPy ring buffer、批量信号和 pyqtgraph 定时刷新，不允许逐点信号或无界列表。
 
-## 六、执行闭环（AI 长期循环）
+## 六、执行闭环（统一引用 09-closed-loop）
 
-每次更改 Serial Station 时，必须执行并记录本节 6 环：
+> ⚠️ **本节原定义的 "S-E-L-T-V-Q-R" + "P-U-L-G-S-B" 双段十三环已废除**。
+>
+> 历史问题：与 02-workflow（S-I-P-E-V-R-L 七环）、06-git-commit（A-I-R-C-L-M-P 七环）
+> 三重编号冲突，AI 不知跑哪套。**统一权威定义见 [docs/constraints/09-closed-loop.md](constraints/09-closed-loop.md)**。
 
-1. `S` Scope：明确本次范围是否只改 serial_station。
-2. `E` Edge：检查边界不越界 `ui/controller/core/protocols/services/workers`。
-3. `L` Layer：确认新增文件都在 `python/embeddebug/serial_station/`。
-4. `T` Test：更新并绑定 `tests/python/`。
-5. `V` Verify：连接、发送、接收、日志、回放至少各有一次证据。
-6. `Q` Quantize：更新量化指标（缺口项和达成率）。
-7. `R` Run：`uv run start-embeddebug --smoke` + `cmd /c EmbedDebug.bat --smoke`。
+### 6.1 通用闭环（每次 Serial Station 改动都跑）
 
-只要闭环不完整，该轮 Serial Station 改动不进入 `+1` 计分。
+按 [09-closed-loop §一](constraints/09-closed-loop.md) 执行 5 视角自检 + 6 门禁：
 
-Python lane 追加闭环：
+1. **5 视角**：架构（分层边界）/ 实现（公共能力复用）/ 测试（parser+build）/ 产品（E/U/D）/ 用户（入口可达）
+2. **6 门禁**：`uv run test-embeddebug-py` + `uv run start-embeddebug --smoke` + `cmd /c EmbedDebug.bat --smoke`（启动链路改动时）+ `uv run lint-embeddebug-py` + `uv run check-constraints` + 行数门禁
 
-1. `P` Path：确认文件只进入 `python/embeddebug/`、`tests/python/`、`tests/fixtures/serial_station/` 或授权 packaging 路径。
-2. `U` UV：所有用户命令经 `uv run ...` 暴露。
-3. `L` License：PyQt6、Qt 模块、PyInstaller 和第三方依赖有授权/notice 记录。
-4. `G` Golden：协议迁移先通过 golden fixtures。
-5. `S` Smoke：PyQt UI 至少有 pytest-qt 或 `--smoke` 入口。
-6. `B` Baseline：本轮默认入口为 Python/PyQt；若触碰入口，必须复测 `uv run start-embeddebug --smoke` 与 `cmd /c EmbedDebug.bat --smoke`。
+### 6.2 Serial Station 专项追加（在通用闭环之上）
+
+无论闭环是否完整，Serial Station 改动还需额外满足：
+
+1. **Scope**：明确本次范围是否只改 `serial_station/` 子域
+2. **Edge**：检查不越界 `ui/controller/core/protocols/services/workers/drivers`
+3. **Path**：确认文件只进入 `python/embeddebug/serial_station/`、`tests/python/` 或授权 fixtures
+4. **Test**：新增/修改协议必须配 `tests/python/` 对应 **parser + build** 双测试
+5. **License**：PyQt6、PyInstaller 和第三方依赖有授权/notice 记录
+6. **Golden**：协议迁移先通过 `tests/fixtures/serial_station/` 的 golden fixtures
+7. **Verify**：连接、发送、接收、日志、回放至少各有一次证据（替身/虚拟即可）
+
+闭环不完整时，该轮 Serial Station 改动不进入 `+1` 计分。
+
+### 6.3 门禁失败 → LOOP
+
+按 [docs/superpowers/LOOP_PROTOCOL.md](superpowers/LOOP_PROTOCOL.md) 分层（详见 [09-closed-loop §三](constraints/09-closed-loop.md)）：
+环境/启动失败 → Doctor；可复现缺陷 → Debug；重复/过大 → Simplify。
+GO 循环 20 轮或 30 分钟触发安全刹车，必须进 LOOP。
 
 ## 七、验收清单（每次变更前后）
 

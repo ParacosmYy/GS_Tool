@@ -46,6 +46,13 @@ FORBIDDEN_DIRS = {
 RUNTIME_LINE_LIMIT = 300
 TEST_LINE_LIMIT = 250
 
+# 测试组织门禁：孤儿文件阈值（<此数测试函数的新 test 文件即孤儿）
+TEST_ORPHAN_THRESHOLD = 3
+# 测试三层目录（unit 必须纯、ui_smoke 必须 QApplication）
+TEST_UNIT_DIR = REPO_ROOT / "tests" / "python" / "unit"
+TEST_INTEGRATION_DIR = REPO_ROOT / "tests" / "python" / "integration"
+TEST_UI_SMOKE_DIR = REPO_ROOT / "tests" / "python" / "ui_smoke"
+
 # 评分抽取正则：匹配 "当前: 787分" / "当前 787" / "787 / 1000"
 SCORE_LINE_RE = re.compile(r"当前[：:]\s*(\d+)\s*分")
 SCORE_GENERIC_RE = re.compile(r"\b(\d{2,4})\s*/\s*1000\b")
@@ -53,6 +60,12 @@ SCORE_GENERIC_RE = re.compile(r"\b(\d{2,4})\s*/\s*1000\b")
 TESTS_PASSED_RE = re.compile(r"\b\d{3,5}\s+passed\b", re.IGNORECASE)
 # 硬编码测试文件数："测试文件数 172" / "172 个测试文件" / "测试文件 172"
 TEST_FILES_RE = re.compile(r"测试文件[数]?\s*\d{2,4}|(\d{2,4})\s*个测试文件")
+# 测试函数定义行（用于孤儿检测与计数）
+TEST_FUNC_RE = re.compile(r"^\s*def\s+test_", re.MULTILINE)
+# unit 层禁止 import PyQt（layer-misplacement 检测）
+UNIT_PYQT_IMPORT_RE = re.compile(
+    r"^\s*(?:from|import)\s+(?:PyQt\d?|pyqtgraph)", re.MULTILINE
+)
 
 
 # 历史快照围栏：标记存档/历史段，其内的硬编码数字不算漂移
@@ -241,6 +254,116 @@ def check_line_limits() -> list[str]:
     return violations
 
 
+def _count_test_functions(path: Path) -> int:
+    """统计一个测试文件的 def test_ 函数数量。"""
+    text = path.read_text(encoding="utf-8")
+    return len(TEST_FUNC_RE.findall(text))
+
+
+def check_test_orphans() -> list[str]:
+    """检测测试孤儿文件：<TEST_ORPHAN_THRESHOLD 个测试函数的 test_*.py。
+
+    规则来源：CLAUDE.md §测试文件组织规则 23 / 04-coding-standard §6.3。
+    孤儿文件（<3 个测试）应并入同域既有文件，不是新建。
+    本检查扫描工作区所有 test_*.py，但不阻断既有孤儿（只报告），目的是防止新增孤儿。
+
+    设计权衡：既有仓库已有不少历史孤儿（如 test_tr_compliance 1 个测试），
+    这些是技术债，应在后续 Simplify 批次清理，而非本次 commit 阻断。
+    因此本检查只对 **git 暂存区/未跟踪的新增文件** 报违规；既有跟踪文件只警告。
+    """
+    violations: list[str] = []
+    if not TEST_UNIT_DIR.is_dir():
+        return violations
+
+    # 获取 git 跟踪的文件集合，用于区分"新增 vs 既有"
+    tracked = _git_tracked_files("tests/python/")
+
+    for layer_dir in [TEST_UNIT_DIR, TEST_INTEGRATION_DIR, TEST_UI_SMOKE_DIR]:
+        if not layer_dir.is_dir():
+            continue
+        for py in layer_dir.glob("test_*.py"):
+            if "__pycache__" in py.parts:
+                continue
+            count = _count_test_functions(py)
+            if count >= TEST_ORPHAN_THRESHOLD:
+                continue
+            rel = py.relative_to(REPO_ROOT)
+            rel_str = str(rel).replace("\\", "/")
+            is_tracked = rel_str in tracked
+            severity = "既有技术债（不阻断，建议 Simplify 清理）" if is_tracked else "新增孤儿（阻断，必须并入同域既有文件）"
+            tag = "[test-orphan]" if not is_tracked else "[test-orphan-warning]"
+            violations.append(
+                f"{tag} {rel} 仅 {count} 个测试函数（< {TEST_ORPHAN_THRESHOLD}），"
+                f"{severity}"
+            )
+    # 既有技术债只警告不 fail：过滤掉 warning，只保留真阻断项
+    return [v for v in violations if not v.startswith("[test-orphan-warning]")]
+
+
+def check_unit_layer_purity() -> list[str]:
+    """检测 unit 层是否混入 PyQt/pyqtgraph import（layer-misplacement）。
+
+    规则来源：CLAUDE.md §测试文件组织规则 24 / 04-coding-standard §6.2。
+    unit 层必须纯函数/类、无 Qt 无 IO 无网络、毫秒级。
+    import PyQt 或 pyqtgraph 即说明该测试属于 ui_smoke，放错了层。
+
+    与 check_test_orphans 同策略：既有跟踪文件只警告，新增文件阻断。
+    """
+    violations: list[str] = []
+    if not TEST_UNIT_DIR.is_dir():
+        return violations
+
+    tracked = _git_tracked_files("tests/python/unit/")
+    for py in TEST_UNIT_DIR.rglob("test_*.py"):
+        if "__pycache__" in py.parts:
+            continue
+        text = py.read_text(encoding="utf-8")
+        if not UNIT_PYQT_IMPORT_RE.search(text):
+            continue
+        rel = py.relative_to(REPO_ROOT)
+        rel_str = str(rel).replace("\\", "/")
+        is_tracked = rel_str in tracked
+        severity = (
+            "既有技术债（不阻断，建议迁移到 ui_smoke/）"
+            if is_tracked
+            else "新增 unit 误用 PyQt（阻断，必须放 ui_smoke/ 或改用 fake）"
+        )
+        tag = "[layer-misplace]" if not is_tracked else "[layer-misplace-warning]"
+        violations.append(
+            f"{tag} {rel} unit 层混入 PyQt/pyqtgraph import，{severity}"
+        )
+    return [v for v in violations if not v.startswith("[layer-misplace-warning]")]
+
+
+def _git_tracked_files(prefix: str) -> set[str]:
+    """返回已提交跟踪的指定前缀文件集合（排除 staged 新增文件）。"""
+    import subprocess
+
+    try:
+        tracked = subprocess.run(
+            ["git", "ls-files", prefix],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+        added = subprocess.run(
+            ["git", "diff", "--cached", "--name-only", "--diff-filter=A", "--", prefix],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+        tracked_files = {line.strip() for line in tracked.stdout.splitlines() if line.strip()}
+        staged_added = {line.strip() for line in added.stdout.splitlines() if line.strip()}
+        return tracked_files - staged_added
+    except (OSError, subprocess.SubprocessError):
+        # git 不可用时退化为"全部视为既有"，避免误阻断
+        return {"*"}
+
+
 def main(argv: list[str] | None = None) -> int:
     """主入口：跑全部检查，汇总违规，返回退出码。"""
     del argv  # 无参数
@@ -251,6 +374,8 @@ def main(argv: list[str] | None = None) -> int:
     all_violations += check_hardcoded_test_counts()
     all_violations += check_forbidden_dirs()
     all_violations += check_line_limits()
+    all_violations += check_test_orphans()
+    all_violations += check_unit_layer_purity()
 
     if not all_violations:
         score_str = f"{canonical}" if canonical is not None else "未知"

@@ -39,8 +39,19 @@
 | 2 | `uv run start-embeddebug --smoke` | 退出码 0 | 每次 commit |
 | 3 | `cmd /c EmbedDebug.bat --smoke` | 退出码 0 | 启动/入口/依赖/资源/路径改动时 |
 | 4 | `uv run lint-embeddebug-py` | 无新增错误 | 每次 commit |
-| 5 | `uv run check-constraints` | 退出码 0（评分/SSOT 漂移检测） | 每次 commit |
+| 5 | `uv run check-constraints` | 退出码 0 | 每次 commit |
 | 6 | （含在门禁 5 内）文件行数 ≤300（.py）/ ≤250（test） | 脚本检测 | 每次 commit |
+| 7 | （含在门禁 5 内）测试组织：无新增孤儿文件 / unit 层不混 PyQt | 脚本检测 | 每次 commit |
+
+**门禁 5（check-constraints）机械检测清单**（详见 [tools/check_constraints.py](../../tools/check_constraints.py)）：
+- 评分一致性：CLAUDE.md / README.md / 01-overview / 06 出现的分数与 SCORE_TRACKING 一致
+- SSOT 合规：核心文档无硬编码 `NNNN passed` / `NNN 个测试文件`
+- 冻结目录：仓库根无 `src/`、`build2/`、`native-build-*`
+- 文件行数：runtime ≤300 / test ≤250
+- **测试孤儿**：新增 `test_*.py` 若 <3 个测试函数即阻断（既有孤儿只警告，列技术债）
+- **unit 层纯度**：新增 unit 测试若 import PyQt/pyqtgraph 即阻断（应放 ui_smoke/ 或用 fake）
+
+测试组织规则详见 [CLAUDE.md §测试文件组织规则](../../CLAUDE.md) 和 [04-coding-standard §六](04-coding-standard.md)。
 
 不能运行某门禁时（如无 GUI 环境），必须在 commit message 写明"未跑 X，原因 Y"，不得静默跳过。
 

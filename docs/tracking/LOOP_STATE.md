@@ -12,7 +12,19 @@
 
 | 日期 | Batch / 任务 | 架构 | 实现 | 测试 | 产品 | 用户 | test | smoke | bat | lint | check | 行数 | E/U/D 变化 | 评分 | 结果 | 下一步 |
 |------|-------------|------|------|------|------|------|------|-------|-----|------|-------|------|-----------|------|------|------|
-| 2026-06-22 | 约束文档闭环化改造（本次） | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ✓ | ✓ | 无（纯文档） | 787→788 预期 | 通过 | dogfooding 首条；后续 AI 按本表追加 |
+| 2026-06-22 | 约束文档闭环化改造（本次，纯文档+1脚本） | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（tools 9/9） | ✓ exit0 | — | ✓ All passed | ✓ exit0 | ✓（新脚本 211 行 ≤300） | 无（纯文档/工具，不改运行时） | 804（canonical，未 +1，因未 commit） | 通过 | dogfooding 首条；并发会话 Batch 123-137 已在使用本脚本，证明闭环可被其他 Agent 复用 |
+| 2026-06-23 | 测试组织规则强化（文件少+框架分层+可迭代） | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ exit0 | — | ✓ All passed | ✓ exit0 | ✓（脚本增至 267 行 ≤300） | 无（纯文档+脚本） | 820（canonical） | 通过 | 新增孤儿/分层守护；既有孤儿（test_tr_compliance 等）列为技术债，新增才阻断 |
+| 2026-06-27 | Batch 305 — QSS 分区拆分 + 测试组织门禁 staged 新增文件守护 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓（4667 passed, 2 skipped） | ✓ exit0 | ✓ exit0 | ✓ All passed | ✓ exit0 | ✓（check_constraints 通过） | E5/U2/D1（本轮变化：E↑，门禁覆盖增强；D 不提升） | 968 + 1 = 969 | 通过 | 下一轮继续收敛测试组织技术债，优先清理既有孤儿/分层误放并保持 full gate 绿 |
+
+### 1.1 并发会话说明
+
+本次改造期间检测到另一并发 Agent 会话（Batch 123 "check_constraints F401 修复"、Batch 136-137）正在使用本次新建的 `tools/check_constraints.py` 脚本，并已将 `SCORE_TRACKING.md` 推进到 804 分、修改了 `tests/python/unit/test_dashboard_binding_service.py`、新增 `tests/python/unit/test_dashboard_binding_parse.py`。
+
+按 [AGENTS.md §三.7](../../AGENTS.md) "用户已有改动不得擅自回退" 与 [09-closed-loop §六](../constraints/09-closed-loop.md) 并行合流规则，本次改造：
+- 未触碰并发会话的测试文件
+- 未覆盖 SCORE_TRACKING 的 804 推进
+- 仅修改 9 份约束文档 + 新建 4 个文件（00-ssot / 09-closed-loop / LOOP_STATE / check_constraints.py）+ pyproject.toml script 入口
+- 合流建议：并发会话下次 commit 时跑 `uv run check-constraints` 即可验证本次改造已纳入主线
 
 ---
 
