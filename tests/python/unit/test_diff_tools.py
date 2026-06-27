@@ -54,3 +54,38 @@ def test_config_validation():
 def test_no_common_columns():
     r = DataDiffer().compare(np.array([[1.0]]), np.array([[1.0]]), ["x"], ["y"])
     assert r.summary["total_cells"] == 0
+
+def test_diff_config_defaults():
+    cfg = DiffConfig()
+    assert cfg.tolerance == 0.0 and cfg.ignore_columns == []
+    assert cfg.align_by_timestamp is False and cfg.max_display_rows == 100
+
+def test_diff_config_validate_boundaries():
+    DiffConfig(tolerance=0.0).validate()
+    DiffConfig(max_display_rows=1).validate()
+    with pytest.raises(ValueError, match="max_display_rows"):
+        DiffConfig(max_display_rows=0).validate()
+    with pytest.raises(ValueError, match="tolerance"):
+        DiffConfig(tolerance=-0.1).validate()
+
+def test_diff_result_format_text_and_to_dict():
+    from embeddebug.serial_station.diff_tools.result import DiffResult
+    empty = DiffResult(summary={}, is_identical=False)
+    assert "matching=0" in empty.format_text()
+    result = DiffResult(summary={"matching_cells": 5, "differing_cells": 2, "max_diff": 1.5},
+                        row_diffs=[{"column": "x"}], is_identical=False)
+    text = result.format_text()
+    assert "matching=5" in text and "differing=2" in text and "max_diff=1.5" in text
+    assert result.to_dict()["row_diffs"] == [{"column": "x"}]
+
+def test_diff_result_empty_defaults():
+    from embeddebug.serial_station.diff_tools.result import DiffResult
+    result = DiffResult()
+    assert result.summary == {} and result.row_diffs == [] and result.is_identical is False
+
+def test_pairs_intersection_indices_and_ignore():
+    pairs = DataDiffer._pairs(["a", "b", "c"], ["b", "c", "d"], ignore=[])
+    assert [p[0] for p in pairs] == ["b", "c"]
+    assert next(p for p in DataDiffer._pairs(["x", "y"], ["y", "x"], ignore=[]) if p[0] == "x") == ("x", 0, 1)
+    assert [p[0] for p in DataDiffer._pairs(["a", "b"], ["a", "b"], ignore=["b"])] == ["a"]
+    assert DataDiffer._pairs(["a"], ["b"], ignore=[]) == []

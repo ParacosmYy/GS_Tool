@@ -77,3 +77,43 @@ def test_receive_state_frozen():
     s = ReceiveState()
     with pytest.raises((AttributeError, TypeError)):
         s.measurement_ring = "x"  # type: ignore[assignment]
+
+
+def test_handle_received_bytes_multiple_calls_accumulate_entries():
+    state = ReceiveState()
+    entries = []
+    dispatcher = _FakeDispatcher([ProtocolEvent(type="byte", protocol_name="ascii", payload={"data": "41"})])
+    for _ in range(3):
+        handle_received_bytes(
+            state=state, data=b"A", dispatcher=dispatcher,
+            entries=entries, log_callbacks=[], measurement_callbacks=[],
+        )
+    assert len(entries) == 3
+
+
+def test_handle_received_bytes_log_callback_called():
+    calls = []
+    event = ProtocolEvent(type="byte", protocol_name="ascii", payload={"data": "41"})
+    handle_received_bytes(
+        state=ReceiveState(), data=b"A", dispatcher=_FakeDispatcher([event]),
+        entries=[], log_callbacks=[calls.append], measurement_callbacks=[],
+    )
+    assert len(calls) == 1
+
+
+def test_handle_received_bytes_empty_callbacks_no_crash():
+    handle_received_bytes(
+        state=ReceiveState(), data=b"x", dispatcher=_FakeDispatcher([]),
+        entries=[], log_callbacks=[], measurement_callbacks=[],
+    )
+
+
+def test_handle_received_bytes_raw_event_skips_measurement_callback():
+    event = ProtocolEvent(type="byte", protocol_name="raw_data", payload={"data": "hello"})
+    calls = []
+    state = handle_received_bytes(
+        state=ReceiveState(), data=b"hello", dispatcher=_FakeDispatcher([event]),
+        entries=[], log_callbacks=[], measurement_callbacks=[calls.append],
+    )
+    assert calls == []
+    assert state.measurement_ring is None

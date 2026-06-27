@@ -99,3 +99,34 @@ def test_format_ascii_printable():
 def test_format_ascii_non_printable_dots():
     """非可打印替换为点。"""
     assert HexFormatter.format_ascii(bytes([0x00, 0x41, 0x80])) == ".A."
+
+
+def test_format_int_8_bytes_and_nonstandard_widths():
+    assert HexFormatter.format_int(struct.pack("<q", 1234567890), signed=True) == 1234567890
+    assert HexFormatter.format_int(struct.pack(">Q", 0xFFFFFFFFFFFFFFFF), signed=False, big_endian=True) == 0xFFFFFFFFFFFFFFFF
+    assert HexFormatter.format_int(struct.pack("<q", -42), signed=True) == -42
+    assert HexFormatter.format_int(b"\x03\x02\x01") == 0x010203
+    assert HexFormatter.format_int(b"\xFF\x00\x00\x00\x00") == 255
+    assert HexFormatter.format_int(b"\x00\x00\x00\x00\x00\x00\x80", signed=True) < 0
+
+
+def test_format_bytes_line_width_clamps_and_offset():
+    assert len(HexFormatter.format_bytes(b"AB", bytes_per_line=0)) == 2
+    assert len(HexFormatter.format_bytes(bytes(range(20)), bytes_per_line=100)) == 2
+    assert len(HexFormatter.format_bytes(bytes(range(16)), bytes_per_line=8)) == 2
+    line = HexFormatter.format_bytes(b"AB", offset=0x100)[0]
+    assert line.startswith("00000100")
+
+
+def test_format_float_additional_boundaries():
+    import pytest
+    assert HexFormatter.format_float(struct.pack(">f", 1.5), big_endian=True) == pytest.approx(1.5)
+    assert HexFormatter.format_float(struct.pack("<d", 3.14159)) == pytest.approx(3.14159)
+    with pytest.raises(ValueError):
+        HexFormatter.format_float(b"")
+
+
+def test_format_ascii_boundary_chars_and_empty():
+    assert HexFormatter.format_ascii(bytes([0x1F, 0x20, 0x7E, 0x7F])) == ". ~."
+    assert HexFormatter.format_ascii(b"") == ""
+    assert HexFormatter.format_ascii(b"Hello!@#") == "Hello!@#"

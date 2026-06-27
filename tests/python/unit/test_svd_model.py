@@ -52,3 +52,36 @@ def test_svd_field_frozen():
     f = SvdField(name="X", description="", bit_offset=0, bit_width=1)
     with pytest.raises((AttributeError, TypeError)):
         f.bit_offset = 1
+
+
+def test_access_values_are_distinct():
+    assert {a.value for a in Access} == {"read-only", "write-only", "read-write"}
+
+
+def test_svd_field_mask_small_widths():
+    assert SvdField("F", "", 0, 1).mask() == 1
+    assert SvdField("F", "", 0, 2).mask() == 3
+
+
+def test_svd_register_boundaries():
+    from embeddebug.serial_station.svd.model import SvdRegister
+    reg = SvdRegister(name="DATA", description="", address_offset=0x04)
+    assert reg.absolute_address(0x40000000) == 0x40000004
+    assert reg.absolute_address(0) == 0x04
+    assert reg.field("ghost") is None
+    assert reg.access == Access.READ_WRITE
+
+
+def test_svd_peripheral_empty_register_lookup():
+    from embeddebug.serial_station.svd.model import SvdPeripheral
+    peripheral = SvdPeripheral(name="P", description="", base_address=0x40000000)
+    assert peripheral.register("ghost") is None
+
+
+def test_svd_device_empty_counts_and_lookup():
+    from embeddebug.serial_station.svd.model import SvdDevice
+    device = SvdDevice(name="D", description="", peripherals=())
+    assert device.peripheral("ghost") is None
+    assert device.register_count == 0
+    assert device.field_count == 0
+    assert list(device.iter_registers()) == []
