@@ -1,19 +1,12 @@
-"""qss_sections 组件域分区生成器单元测试（Tools / Empty / Toast / Log options）。
+"""QSS widgets 分区聚合测试。
 
-补强 test_qss_sections_layout 未覆盖的 4 个 section 函数（无 Qt 依赖，纯字符串）：
-- qss_sections_tools.tools_section（CRC/HexViewer/ByteFrequency/Timestamp 工具）
-- qss_sections_empty.empty_state_section（空状态 + 骨架屏 + 加载态覆盖层）
-- qss_sections_toast.toast_section（Toast 卡片 + 容器）
-- qss_sections_log_options.log_options_section（日志工具条场景实例）
-
-验证维度（对齐 test_qss_sections_layout 既有契约）：
-1. 各 objectName 都有对应选择器（防 objectName 漂移导致 QSS 失效）。
-2. 主操作按钮有三态（hover/pressed/disabled）— 铁律 17。
-3. 引用 palette/tokens 而非硬编码颜色（铁律 15）。
-4. build_qss 已接入对应 section（防分区漏挂主输出）。
+覆盖按钮、日志视图、状态、滚动条、快捷键，以及 tools/empty/toast/log-options
+组件分区。原先拆成 widgets / widgets_states 两个文件，这里按域合并。
 """
 
 from __future__ import annotations
+
+import pytest
 
 from embeddebug.serial_station.ui.theme import palette as P
 from embeddebug.serial_station.ui.theme import tokens as T
@@ -24,213 +17,137 @@ from embeddebug.serial_station.ui.theme.qss_sections_log_options import (
 )
 from embeddebug.serial_station.ui.theme.qss_sections_toast import toast_section
 from embeddebug.serial_station.ui.theme.qss_sections_tools import tools_section
+from embeddebug.serial_station.ui.theme.qss_sections_widgets import (
+    buttons_section,
+    log_view_section,
+    plaintext_section,
+    scrollbar_section,
+    shortcut_section,
+    status_section,
+)
 
-# ── Tools（qss_sections_tools.tools_section） ────────────────────────────
-
-_TOOLS_GROUPS = ("Crc", "ByteFreq", "HexViewer", "Timestamp")
-_TOOLS_SAMPLE_NAMES = (
-    "serialStationCrcCopyButton",
-    "serialStationCrcWidthCombo",
-    "serialStationByteFreqModeHex",
-    "serialStationHexViewerModeAscii",
-    "serialStationTimestampFmtMs",
-    "serialStationTimestampTzCombo",
+_CONNECT_BUTTONS = (
+    "serialStationConnectButton",
+    "serialStationConnectSerialButton",
+    "serialStationConnectTcpButton",
+    "serialStationConnectUdpButton",
+)
+_TOOL_BUTTONS = (
+    "serialStationRefreshPortsButton",
+    "serialStationExportLogButton",
+    "serialStationReplayLogButton",
+    "serialStationSaveProfileButton",
+    "serialStationLoadProfileButton",
+    "serialStationClearButton",
+    "serialStationInjectButton",
+    "serialStationSendButton",
 )
 
 
-def test_tools_section_covers_sample_objectnames():
-    """tools_section 生成所有 4 个工具面板的关键 objectName 选择器。"""
+def test_buttons_section_default_button_states_and_focus():
+    qss = buttons_section()
 
-    qss = tools_section()
-    for name in _TOOLS_SAMPLE_NAMES:
-        assert f"#{name}" in qss, f"tools_section missing objectName: {name}"
-
-
-def test_tools_section_covers_multiple_widget_types():
-    """tools_section 为每个 objectName 生成 7 种控件类型选择器（契约占位）。"""
-
-    qss = tools_section()
-    for widget_type in ("QWidget", "QLabel", "QRadioButton", "QComboBox",
-                        "QLineEdit", "QCheckBox", "QPushButton"):
-        assert widget_type in qss, f"tools_section missing widget type: {widget_type}"
+    for selector in (
+        "QPushButton:hover",
+        "QPushButton:pressed",
+        "QPushButton:disabled",
+        "QPushButton:focus",
+    ):
+        assert selector in qss
+    assert P.BG_PANEL in qss
+    assert P.ACCENT_BORDER in qss
 
 
-def test_tools_section_returns_nonempty_contract():
-    """tools_section 至少含所有 4 个工具组（CRC/ByteFreq/HexViewer/Timestamp）。"""
+@pytest.mark.parametrize("name", _CONNECT_BUTTONS)
+def test_buttons_section_connect_buttons_have_brand_palette_and_states(name):
+    qss = buttons_section()
 
-    qss = tools_section()
-    for group in _TOOLS_GROUPS:
-        assert group in qss, f"tools_section missing tool group marker: {group}"
+    assert f"#{name}" in qss
+    for state in (":hover", ":pressed", ":disabled"):
+        assert f"#{name}{state}" in qss
+    assert P.ACCENT_GRADIENT in qss
+    assert P.TEXT_ON_ACCENT in qss
 
 
-# ── Empty State（qss_sections_empty.empty_state_section） ────────────────
+def test_buttons_section_disconnect_button_uses_error_palette_and_states():
+    qss = buttons_section()
 
-_EMPTY_STATE_OBJECT_NAMES = (
-    "serialStationEmptyState",
-    "serialStationEmptyStateIcon",
-    "serialStationEmptyStateTitle",
-    "serialStationEmptyStateDescription",
-    "serialStationEmptyStateCta",
-    "serialStationSkeleton",
-    "serialStationSkeletonBlock",
-    "serialStationLogLoadingOverlay",
-    "serialStationLogLoadingSkeleton",
-    "serialStationLogLoadingLabel",
-    "serialStationButtonLoadingRing",
+    assert "#serialStationDisconnectButton" in qss
+    assert P.ERROR_SOFT in qss
+    assert P.ERROR in qss
+    for state in (":hover", ":pressed", ":disabled"):
+        assert f"#serialStationDisconnectButton{state}" in qss
+
+
+@pytest.mark.parametrize("name", _TOOL_BUTTONS)
+def test_buttons_section_tool_buttons_have_three_states(name):
+    qss = buttons_section()
+
+    for state in (":hover", ":pressed", ":disabled"):
+        assert f"#{name}{state}" in qss
+
+
+def test_buttons_section_send_inject_use_terminal_tx_blue():
+    qss = buttons_section()
+
+    assert P.TERM_TX in qss
+    assert "#serialStationSendButton" in qss
+    assert "#serialStationInjectButton" in qss
+
+
+@pytest.mark.parametrize(
+    ("factory", "required"),
+    [
+        (log_view_section, ("#serialStationLogView", P.TERM_BACKGROUND, T.FONT_FAMILY_MONO)),
+        (status_section, ("#serialStationStatusLabel", P.WARNING, T.RADIUS_PILL)),
+        (status_section, ("#serialStationProfileLabel", P.TEXT_MUTED)),
+        (scrollbar_section, ("QScrollBar:vertical", "QScrollBar::handle:horizontal:hover")),
+        (plaintext_section, ("QPlainTextEdit", P.BG_INPUT, T.RADIUS_MD)),
+        (shortcut_section, ("#serialStationSendShortcut", "#serialStationCommandPaletteShortcut")),
+        (tools_section, ("#serialStationCrcCopyButton", "#serialStationTimestampTzCombo")),
+        (empty_state_section, ("#serialStationEmptyState", "#serialStationEmptyStateCta:hover")),
+        (toast_section, ("#serialStationToast", "#serialStationToastCloseButton:hover")),
+        (log_options_section, ("#serialStationHistoryButton", "#serialStationHistoryButton:disabled")),
+    ],
 )
+def test_widget_sections_keep_core_contracts(factory, required):
+    qss = factory()
+
+    for token in required:
+        assert token in qss
 
 
-def test_empty_state_section_covers_all_objectnames():
-    qss = empty_state_section()
-    for name in _EMPTY_STATE_OBJECT_NAMES:
-        assert f"#{name}" in qss, f"empty_state_section missing objectName: {name}"
-
-
-def test_empty_state_section_cta_has_three_states():
-    """空状态 CTA 按钮必须有三态 — 铁律 17。"""
-
-    qss = empty_state_section()
-    assert "#serialStationEmptyStateCta:hover" in qss
-    assert "#serialStationEmptyStateCta:pressed" in qss
-    assert "#serialStationEmptyStateCta:disabled" in qss
-
-
-def test_empty_state_section_loading_overlay_uses_overlay_palette():
-    """日志加载态覆盖层用 BG_OVERLAY 模态遮罩色。"""
-
-    qss = empty_state_section()
-    assert "#serialStationLogLoadingOverlay" in qss
-    assert P.BG_OVERLAY in qss
-
-
-def test_empty_state_section_title_uses_text_primary():
-    """空状态标题用主文本色 + 大字号（拉开视觉层级）。"""
-
-    qss = empty_state_section()
-    assert P.TEXT_PRIMARY in qss
-    assert T.FONT_LG in qss
-
-
-# ── Toast（qss_sections_toast.toast_section） ────────────────────────────
-
-_TOAST_OBJECT_NAMES = (
-    "serialStationToast",
-    "serialStationToastAccent",
-    "serialStationToastGlyph",
-    "serialStationToastTitle",
-    "serialStationToastMessage",
-    "serialStationToastCloseButton",
-    "serialStationToastContainer",
-    "serialStationToastPlaceholder",
+@pytest.mark.parametrize(
+    ("factory", "tokens"),
+    [
+        (log_view_section, (P.TERM_SYSTEM, P.ACCENT_SOFT)),
+        (scrollbar_section, (P.SCROLLBAR, P.SCROLLBAR_HOVER, "height: 0", "width: 0")),
+        (tools_section, ("QWidget", "QPushButton", "Crc", "Timestamp")),
+        (empty_state_section, (P.BG_OVERLAY, P.TEXT_PRIMARY, T.FONT_LG)),
+        (toast_section, (P.BG_PANEL_RAISED, P.BORDER_STRONG, T.FONT_WEIGHT_SEMIBOLD)),
+        (log_options_section, ("transparent", P.ACCENT_SOFT, P.ACCENT_HOVER)),
+    ],
 )
+def test_widget_sections_keep_palette_and_state_details(factory, tokens):
+    qss = factory()
+
+    for token in tokens:
+        assert token in qss
 
 
-def test_toast_section_covers_all_objectnames():
-    qss = toast_section()
-    for name in _TOAST_OBJECT_NAMES:
-        assert f"#{name}" in qss, f"toast_section missing objectName: {name}"
-
-
-def test_toast_section_card_uses_raised_panel_palette():
-    """Toast 卡片底用 BG_PANEL_RAISED（浮起视觉），边框用 BORDER_STRONG。"""
-
-    qss = toast_section()
-    assert P.BG_PANEL_RAISED in qss
-    assert P.BORDER_STRONG in qss
-
-
-def test_toast_section_title_uses_semibold_weight():
-    """Toast 标题用 SEMIBOLD 字重（视觉强调）。"""
-
-    qss = toast_section()
-    assert T.FONT_WEIGHT_SEMIBOLD in qss
-
-
-def test_toast_section_close_button_has_hover():
-    """关闭按钮 hover 提亮到 TEXT_PRIMARY（可达性反馈）。"""
-
-    qss = toast_section()
-    assert "#serialStationToastCloseButton:hover" in qss
-    assert P.TEXT_PRIMARY in qss
-
-
-# ── Log Options（qss_sections_log_options.log_options_section） ──────────
-
-_LOG_OPTIONS_OBJECT_NAMES = (
-    "serialStationLogConnectionBadge",
-    "serialStationActiveFilterChip",
-    "serialStationAutoScrollToggle",
-    "serialStationLogViewModeSegmented",
-    "serialStationLogInfoBanner",
-    "serialStationHistoryDrawer",
-    "serialStationHistoryPlaceholder",
-    "serialStationAutoScrollLabel",
-    "serialStationHistoryButton",
-)
-
-
-def test_log_options_section_covers_all_objectnames():
-    qss = log_options_section()
-    for name in _LOG_OPTIONS_OBJECT_NAMES:
-        assert f"#{name}" in qss, f"log_options_section missing objectName: {name}"
-
-
-def test_log_options_section_history_button_has_three_states():
-    """历史按钮必须有三态 — 铁律 17。"""
-
-    qss = log_options_section()
-    assert "#serialStationHistoryButton:hover" in qss
-    assert "#serialStationHistoryButton:pressed" in qss
-    assert "#serialStationHistoryButton:disabled" in qss
-
-
-def test_log_options_section_self_drawn_widgets_transparent():
-    """Badge/Chip/ToggleSwitch/Segmented/InfoBanner/Drawer 是自绘控件，QSS 仅透明契约。"""
-
-    qss = log_options_section()
-    self_drawn = (
-        "serialStationLogConnectionBadge",
-        "serialStationActiveFilterChip",
-        "serialStationAutoScrollToggle",
-        "serialStationLogViewModeSegmented",
-        "serialStationLogInfoBanner",
-        "serialStationHistoryDrawer",
-    )
-    for name in self_drawn:
-        assert f"#{name}" in qss
-    assert "transparent" in qss
-
-
-def test_log_options_section_history_button_hover_uses_accent_soft():
-    """历史按钮 hover 转强调青软底 + 强调青文字。"""
-
-    qss = log_options_section()
-    assert P.ACCENT_SOFT in qss
-    assert P.ACCENT_HOVER in qss
-
-
-# ── build_qss 集成（Tools / Empty / Toast / Log options 必须挂入主输出） ──
-
-
-def test_build_qss_integrates_tools_section():
+def test_build_qss_integrates_all_widget_sections():
     qss = build_qss()
-    assert "#serialStationCrcCopyButton" in qss
-    assert "#serialStationTimestampTzCombo" in qss
 
-
-def test_build_qss_integrates_empty_state_section():
-    qss = build_qss()
-    assert "#serialStationEmptyState" in qss
-    assert "#serialStationSkeleton" in qss
-
-
-def test_build_qss_integrates_toast_section():
-    qss = build_qss()
-    assert "#serialStationToast" in qss
-    assert "#serialStationToastContainer" in qss
-
-
-def test_build_qss_integrates_log_options_section():
-    qss = build_qss()
-    assert "#serialStationHistoryButton" in qss
-    assert "#serialStationAutoScrollToggle" in qss
+    for selector in (
+        "#serialStationConnectButton",
+        "#serialStationDisconnectButton",
+        "#serialStationLogView",
+        "#serialStationStatusLabel",
+        "QScrollBar:vertical",
+        "#serialStationSendShortcut",
+        "#serialStationCrcCopyButton",
+        "#serialStationEmptyState",
+        "#serialStationToast",
+        "#serialStationHistoryButton",
+    ):
+        assert selector in qss
