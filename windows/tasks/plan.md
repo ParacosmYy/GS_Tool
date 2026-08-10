@@ -215,6 +215,12 @@ normalization, validation, and aggregate refresh.
 - [x] 退出、服务地址切换和 refresh 失效清除同样检查本地提交结果；失败不伪装为成功。
 - [x] Android README、架构角色复核和 ADR-043 已同步；APK 构建和设备验证仍等待工具链批准。
 
+### Task B9: Caddy 边缘日志保留策略
+
+- [x] Caddy 示例显式配置每日/100 MiB 滚动、14 文件/14 天保留和本地文件名时间。
+- [x] Caddy filter、header、reverse proxy 边界与部署说明同步；配置语法依据官方文档记录。
+- [>] 正式主机上的 `caddy validate`、ACL、权限和真实轮转样本仍需部署负责人执行。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

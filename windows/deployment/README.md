@@ -78,6 +78,10 @@ HTTPS 生产模式分离，不会代替正式 HTTPS，也不会自动修改防�
 caddy run --config .\deployment\Caddyfile --adapter caddyfile
 ```
 
+示例配置显式限制 Caddy access log：每天或达到 `100MiB` 时滚动，最多保留 14 个文件/14 天，
+文件名使用本地时间；Caddy 的 JSON filter 继续删除认证头、Cookie、Set-Cookie、User-Agent，
+并遮罩客户端地址。正式主机仍必须执行 `preflight-edge.ps1` 和实际 `caddy validate`，不能仅凭示例文件视为通过。
+
 Caddy 负责 HTTPS 证书和边缘安全响应头，Waitress 只绑定 `127.0.0.1`；反向代理不能替代
 应用自身的认证、RBAC、CSRF、限流和脱敏日志。上线后应从外部网络检查
 `https://host.example/api/health`、`https://host.example/api/v1/ready`、登录、Android

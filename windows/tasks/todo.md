@@ -132,3 +132,4 @@
 - [x] ADR-043 固化 Android Keystore 会话 blob 的同步提交与清除失败语义，避免 bearer 生命周期异步落盘。
 - [x] Android Release 运行时沿 endpoint/repository/HTTP adapter 传播 HTTPS 门禁，补充 ADR-044。
 - [x] 修正 `preflight` 只读语义：路径解析不再创建数据库父目录，补充 ADR-045。
+- [x] Caddy 示例显式固定 access log 轮转/保留策略，补充 ADR-046；正式主机验证仍待部署权限。
