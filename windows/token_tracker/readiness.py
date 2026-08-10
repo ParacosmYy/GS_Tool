@@ -12,17 +12,17 @@ import sqlite3
 from pathlib import Path
 
 
-REQUIRED_TABLES = frozenset(
-    {
-        "users",
-        "usage_records",
-        "auth_tokens",
-        "work_events",
-        "app_logs",
-        "audit_events",
-        "rate_limit_buckets",
-    }
+_REQUIRED_TABLE_NAMES = (
+    "users",
+    "usage_records",
+    "auth_tokens",
+    "work_events",
+    "app_logs",
+    "audit_events",
+    "rate_limit_buckets",
 )
+REQUIRED_TABLES = frozenset(_REQUIRED_TABLE_NAMES)
+_TABLE_PLACEHOLDERS = ", ".join("?" for _ in _REQUIRED_TABLE_NAMES)
 
 
 def is_ready(path: str) -> bool:
@@ -36,9 +36,9 @@ def is_ready(path: str) -> bool:
         connection = sqlite3.connect(f"{database_path.as_uri()}?mode=ro", uri=True)
         connection.row_factory = sqlite3.Row
         rows = connection.execute(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN "
-            "('users', 'usage_records', 'auth_tokens', 'work_events', "
-            "'app_logs', 'audit_events', 'rate_limit_buckets')"
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ("
+            f"{_TABLE_PLACEHOLDERS})",
+            _REQUIRED_TABLE_NAMES,
         ).fetchall()
     except (OSError, sqlite3.Error, TypeError, ValueError):
         return False
