@@ -1,7 +1,7 @@
 # UI 动效与多端开发技能栈
 
 **作者：** AI Token Tracker Engineering Team  
-**来源核对：** `https://github.com/addyosmani/agent-skills`，2026-08-10
+**来源核对：** `https://github.com/addyosmani/agent-skills`，ref `7676817c12a1317454ae3898a0c5c1eacf5dd3d5`，2026-08-10
 
 这些 skill 是开发代理的工作流，不是应用运行时依赖，因此不复制到 Python 或 APK 的依赖列表中。当前项目按以下顺序使用：
 
