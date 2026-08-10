@@ -125,6 +125,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
     required = (
         "README.md",
         "windows/docs/release-readiness.md",
+        "windows/docs/decisions/ADR-065-scene-background-v8.md",
         "windows/skills/README.md",
         "windows/skills/project-ui-orchestration/SKILL.md",
         "windows/skills/ci-cd-and-automation/SKILL.md",
@@ -357,6 +358,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v8.png"),
         ("web-scene-image-layer", "windows/token_tracker/templates/base.html", "story-backdrop-image"),
         ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v8"),
+        ("scene-background-decision", "windows/docs/decisions/ADR-065-scene-background-v8.md", "embedded-rust-engineer-bg-v8.png"),
         ("kimi-provider-presets", "windows/token_tracker/templates/dashboard.html", "kimi-code"),
         ("provider-response-projection", "windows/token_tracker/provider_service.py", "project_response"),
         ("usage-ingest-endpoint", "windows/token_tracker/api_v1.py", "/ingest/usage"),
