@@ -10,6 +10,7 @@
 package com.aitokentracker.data.secure
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Base64
 import com.aitokentracker.data.SessionSnapshot
 import com.aitokentracker.data.TokenPair
@@ -29,7 +30,7 @@ private const val PREFS_NAME = "ai-token-tracker.secure-session"
 private const val SESSION_KEY = "encrypted_session"
 private const val GCM_TAG_BITS = 128
 
-/** Main-safe encrypted storage; the repository invokes it away from the UI. */
+/** Worker-thread encrypted storage; the repository invokes it away from the UI. */
 internal class EncryptedSessionStore(context: Context) {
     private val preferences = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -43,7 +44,7 @@ internal class EncryptedSessionStore(context: Context) {
                 .put("id", pair.user.id)
                 .put("username", pair.user.username)
                 .put("role", pair.user.role))
-        preferences.edit().putString(SESSION_KEY, encrypt(snapshot.toString())).apply()
+        commit(preferences.edit().putString(SESSION_KEY, encrypt(snapshot.toString())), "保存")
     }
 
     @Synchronized
@@ -71,7 +72,12 @@ internal class EncryptedSessionStore(context: Context) {
 
     @Synchronized
     fun clear() {
-        preferences.edit().remove(SESSION_KEY).apply()
+        commit(preferences.edit().remove(SESSION_KEY), "清除")
+    }
+
+    /** Keep bearer lifecycle changes durable before the repository returns. */
+    private fun commit(editor: SharedPreferences.Editor, operation: String) {
+        check(editor.commit()) { "本地会话$operation失败" }
     }
 
     private fun encrypt(plaintext: String): String {

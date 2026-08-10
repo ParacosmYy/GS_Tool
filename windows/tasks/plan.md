@@ -207,6 +207,12 @@ normalization, validation, and aggregate refresh.
 - [x] 失败返回 `503 SERVICE_NOT_READY`，不泄露数据库路径、表名、异常或业务数据。
 - [x] API 契约、部署检查说明、脱敏访问日志关联和 ADR-042 已同步。
 
+### Task B8: Android 加密会话持久性门禁
+
+- [x] 登录/刷新后的 access/refresh token 加密 blob 使用 worker 线程同步提交，避免进程快速终止造成半持久状态。
+- [x] 退出、服务地址切换和 refresh 失效清除同样检查本地提交结果；失败不伪装为成功。
+- [x] Android README、架构角色复核和 ADR-043 已同步；APK 构建和设备验证仍等待工具链批准。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

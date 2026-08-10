@@ -70,7 +70,8 @@ android/
 
 - 模拟器默认请求 `http://10.0.2.2:5000/api/v1`；实体手机必须替换为 Windows 主机局域网 HTTPS 地址。
 - Android 端暂时使用平台 `HttpURLConnection`，避免在未获批准前下载网络依赖；Repository 已预留未来替换为 OkHttp/Ktor 的接口边界。
-- access/refresh token 只以 Android Keystore 加密 blob 形式落入本地容器；页面、日志和普通明文偏好设置不接触 token。
+- access/refresh token 只以 Android Keystore 加密 blob 形式落入本地容器；登录轮换和退出清除在
+  worker 线程同步提交后才返回，页面、日志和普通明文偏好设置不接触 token。
 - 服务端明确拒绝 refresh token 时清除本地加密会话；网络超时不会清除会话，便于恢复后重试。
 - 写入事件使用服务端的 `protocol_version`、`command`、`request_id` 和 `Idempotency-Key` 约束；token 记录也会为一次操作生成稳定 `Idempotency-Key`，避免 bearer 刷新或网络重试重复计数。
 - 仪表盘的“记录 token 用量”只允许模型、输入/输出 token 和备注，服务端按 `/api/v1/records` 执行统一校验并固定来源；成功写入后客户端自动刷新汇总。客户端同步时还会通过同一路径的 `GET` 分页读取最近个人记录，服务端仍负责范围和用户隔离。

@@ -129,3 +129,4 @@
 - [x] Android 跨端 Remote/Repository/DTO/Compose 公开边界补齐 KDoc，保留工具链未批准的构建门禁。
 - [x] ADR-041 增加 Android Release HTTPS 构建门禁，保留 Debug 模拟器 HTTP 默认值。
 - [x] ADR-042 增加 `/api/v1/ready` SQLite schema readiness 探针，和 liveness health 分离。
+- [x] ADR-043 固化 Android Keystore 会话 blob 的同步提交与清除失败语义，避免 bearer 生命周期异步落盘。
