@@ -9,13 +9,16 @@ Module: Local integration / provider gateway
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 import hmac
 import ipaddress
+import uuid
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 
 from flask import Flask, Response, g, jsonify, request
+import requests
 
 from . import ingest_auth, providers, request_ids
 
@@ -24,6 +27,7 @@ GATEWAY_ACCESS_HEADER = "Authorization"
 USAGE_STATUS_HEADER = "X-AI-Tracker-Usage"
 MAX_INGEST_URL_LENGTH = 2048
 MAX_GATEWAY_TOKEN_LENGTH = 256
+MAX_IDEMPOTENCY_KEY_LENGTH = 160
 LOOPBACK_HOSTS = frozenset({"127.0.0.1", "::1", "localhost"})
 
 
@@ -133,6 +137,16 @@ def create_gateway_app(config: GatewayConfig) -> Flask:
     def health() -> Response:
         return jsonify({"status": "ok", "protocol_version": 1, "mode": "local-gateway"})
 
+    @app.get("/v1/models")
+    @app.get("/models")
+    def models() -> Any:
+        return _list_models(config)
+
+    @app.post("/v1/chat/completions")
+    @app.post("/chat/completions")
+    def chat_completions() -> Any:
+        return _chat_completions(config)
+
     return app
 
 
@@ -147,7 +161,173 @@ def _authorized(config: GatewayConfig) -> bool:
 
 
 def _error(code: str, message: str, status: int) -> tuple[Response, int]:
-    return jsonify({"error": {"code": code, "message": message}, "request_id": getattr(g, "request_id", "unknown")}), status
+    return (
+        jsonify({"error": {"code": code, "message": message}, "request_id": getattr(g, "request_id", "unknown")}),
+        status,
+    )
+
+
+def _list_models(config: GatewayConfig) -> Any:
+    """Forward model discovery with the configured upstream identity only."""
+
+    try:
+        response = providers.list_models(
+            config.upstream_url,
+            config.provider_key,
+            [config.upstream_url],
+            config.allow_http,
+            config.timeout,
+        )
+        body = providers.decode_json_response(response, config.maximum_response_bytes)
+    except providers.ProviderNetworkError:
+        return _error("UPSTREAM_UNAVAILABLE", "gateway 无法连接上游 provider", 502)
+    except providers.ProviderResponseTooLarge:
+        return _error("UPSTREAM_RESPONSE_TOO_LARGE", "上游模型响应超过大小限制", 502)
+    except ValueError:
+        return _error("UPSTREAM_INVALID_RESPONSE", "上游模型响应不是有效 JSON", 502)
+    return _json_body(body, _upstream_status(response.status_code))
+
+
+def _chat_completions(config: GatewayConfig) -> Any:
+    """Proxy one JSON chat call and report authoritative usage afterward."""
+
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return _error("BAD_REQUEST", "请求 JSON 必须是对象", 400)
+    try:
+        chat_request = _prepare_gateway_request(payload, config)
+    except providers.UsageValidationError as exc:
+        return _error("PROVIDER_INPUT_INVALID", str(exc), 400)
+    try:
+        provider_response = providers.call_chat(chat_request, config.timeout)
+    except providers.ProviderNetworkError:
+        return _error("UPSTREAM_UNAVAILABLE", "gateway 调用上游 provider 失败", 502)
+    if provider_response.status_code >= 400:
+        return _decode_error_response(provider_response, config)
+    if chat_request.payload.get("stream") is True:
+        return _stream_response(provider_response, chat_request.model, config)
+    try:
+        body = providers.decode_json_response(provider_response, config.maximum_response_bytes)
+    except providers.ProviderResponseTooLarge:
+        return _error("UPSTREAM_RESPONSE_TOO_LARGE", "上游响应超过大小限制", 502)
+    except ValueError:
+        return _error("UPSTREAM_INVALID_RESPONSE", "上游响应不是有效 JSON", 502)
+    usage, input_tokens, output_tokens = providers.extract_usage(body)
+    status = _report_usage(
+        config,
+        _response_model(body, chat_request.model),
+        input_tokens,
+        output_tokens,
+        _request_idempotency_key(),
+    ) if usage is not None else "missing"
+    return _json_body(body, 200, {USAGE_STATUS_HEADER: status})
+
+
+def _prepare_gateway_request(payload: dict[str, Any], config: GatewayConfig) -> providers.ChatRequest:
+    """Replace client routing/credential fields before entering the adapter."""
+
+    internal_payload = dict(payload)
+    internal_payload["base_url"] = config.upstream_url
+    internal_payload["api_key"] = config.provider_key
+    if internal_payload.get("stream") is True:
+        stream_options = internal_payload.get("stream_options")
+        if stream_options is None:
+            internal_payload["stream_options"] = {"include_usage": True}
+        elif isinstance(stream_options, dict):
+            internal_payload["stream_options"] = {**stream_options, "include_usage": True}
+    return providers.prepare_chat_request(
+        internal_payload,
+        [config.upstream_url],
+        config.allow_http,
+        allow_stream=True,
+    )
+
+
+def _decode_error_response(response: requests.Response, config: GatewayConfig) -> Any:
+    try:
+        body = providers.decode_json_response(response, config.maximum_response_bytes)
+    except providers.ProviderResponseTooLarge:
+        return _error("UPSTREAM_RESPONSE_TOO_LARGE", "上游错误响应超过大小限制", 502)
+    except ValueError:
+        return _error("UPSTREAM_INVALID_RESPONSE", "上游错误响应不是有效 JSON", 502)
+    return _json_body(body, _upstream_status(response.status_code))
+
+
+def _json_body(body: Any, status: int, headers: Mapping[str, str] | None = None) -> Response:
+    response = jsonify(body)
+    response.status_code = status
+    for name, value in (headers or {}).items():
+        response.headers[name] = value
+    return response
+
+
+def _upstream_status(status_code: int) -> int:
+    return status_code if 400 <= status_code <= 599 else 200
+
+
+def _response_model(body: Any, requested_model: str) -> str:
+    if isinstance(body, dict):
+        response_model = str(body.get("model") or "").strip()
+        if response_model:
+            return response_model
+    return requested_model
+
+
+def _request_idempotency_key() -> str:
+    candidate = request.headers.get("Idempotency-Key", "").strip()
+    if candidate and len(candidate) <= MAX_IDEMPOTENCY_KEY_LENGTH:
+        return candidate
+    return f"gateway-{uuid.uuid4().hex}"
+
+
+def _report_usage(
+    config: GatewayConfig,
+    model: str,
+    input_tokens: Any,
+    output_tokens: Any,
+    idempotency_key: str,
+) -> str:
+    """Report only validated usage facts; never send provider credentials onward."""
+
+    input_value = _usage_count(input_tokens)
+    output_value = _usage_count(output_tokens)
+    model_value = str(model or "").strip()
+    if input_value is None or output_value is None or not 1 <= len(model_value) <= 200:
+        return "report-failed"
+    try:
+        response = requests.post(
+            config.ingest_url,
+            headers={
+                ingest_auth.INGEST_TOKEN_HEADER: config.ingest_token,
+                "Idempotency-Key": idempotency_key,
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model_value,
+                "input_tokens": input_value,
+                "output_tokens": output_value,
+                "note": "本地 Gateway 自动采集",
+            },
+            timeout=config.report_timeout,
+            allow_redirects=False,
+            stream=True,
+        )
+    except requests.RequestException:
+        return "report-failed"
+    try:
+        return "recorded" if response.status_code in {200, 201} else "report-failed"
+    finally:
+        response.close()
+
+
+def _usage_count(value: Any) -> int | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    try:
+        parsed = int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed >= 0 else None
 
 
 def _bounded_secret(value: Any, maximum: int, field_name: str) -> str:
