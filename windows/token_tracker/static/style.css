@@ -208,6 +208,7 @@ input::placeholder, textarea::placeholder { color: #aaa8b3; opacity: 1; }
 .hero-topline { border-bottom: 1px solid var(--line); padding-bottom: 14px; }
 #dashboard-status { transition: color .4s ease; }
 #dashboard-status.is-error { color: var(--hot); }
+.legend-note.is-error { color: var(--hot); }
 .hero-stage { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(350px, .96fr); gap: 3vw; align-items: center; min-height: 570px; padding: 35px 0 48px; }
 .hero-copy { position: relative; z-index: 2; }
 .hero-title-stack { margin: 0; }

@@ -190,3 +190,13 @@
   `.table-wrap` 内水平滚动，页面本身没有横向溢出；本次浏览器 error/warning 日志为空。
 - 该证据覆盖了受保护页面的真实会话、空态、焦点和两档显式 viewport；仍不等同于真实手机硬件指标，
   Provider 成功/失败、导出下载、reduced-motion 和完整四档焦点回归继续保持 UI-3 未关闭门禁。
+
+## v16 动态错误播报与恢复回归
+
+- Dashboard 在隔离合法会话下点击“自动检测模型”但不提交 Key，错误消息与 Provider 状态均切换为
+  `role="alert"`、`aria-live="assertive"`、`aria-atomic="true"`；页面无 console error/warning。
+- 切换统计周期并成功刷新后，Dashboard 状态恢复为 `role="status"`、`aria-live="polite"`，错误样式被清除，
+  证明错误语义不会污染后续正常状态。
+- Admin 明细加载保持 `role="status"`、`aria-live="polite"`，焦点进入关闭按钮；新增 `live-region.js`
+  统一 Dashboard/Admin/Provider 的动态播报边界，详见 ADR-067。
+- 本切片仍未宣称 Provider 网络失败、导出下载、真实设备 reduced-motion 和完整四档焦点门禁通过。

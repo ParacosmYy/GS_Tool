@@ -1,5 +1,6 @@
 import { createApiClient } from "./modules/api-client.js";
 import { createChartRenderer } from "./modules/charts.js";
+import { setLiveMessage, setLiveRegionSemantics } from "./modules/live-region.js";
 /* Author: AI Token Tracker Engineering Team | Maintainer: Project Owner | Purpose: Dashboard orchestration and feature-specific form state. */
 
 import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollower, setupReveal, setupSurfaceMotion } from "./modules/motion.js";
@@ -16,15 +17,12 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
   function byId(id) { return document.getElementById(id); }
   function formatNumber(value) { return numberFormat.format(Number(value || 0)); }
   function setMessage(element, message, isError) {
-    element.textContent = message || "";
-    element.classList.toggle("is-error", Boolean(isError));
+    setLiveMessage(element, message, Boolean(isError));
   }
 
   function setDashboardStatus(message, isError) {
     const element = byId("dashboard-status");
-    if (!element) return;
-    element.textContent = message || "";
-    element.classList.toggle("is-error", Boolean(isError));
+    setLiveMessage(element, message, Boolean(isError));
   }
 
   const charts = createChartRenderer(numberFormat, formatNumber);
@@ -163,9 +161,9 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
       status.textContent = "";
       const dot = document.createElement("i");
       status.appendChild(dot);
-      status.append(` ${message}`);
+      status.append(message);
+      setLiveRegionSemantics(status, kind === "error");
       status.classList.toggle("is-ready", kind === "ready");
-      status.classList.toggle("is-error", kind === "error");
     }
 
     function renderDetectedModels(models) {

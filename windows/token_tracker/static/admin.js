@@ -1,5 +1,7 @@
 /* Author: AI Token Tracker Engineering Team | Maintainer: Project Owner | Purpose: Admin data states and accessible detail rendering. */
 
+import { setLiveMessage } from './modules/live-region.js';
+
 const numberFormatter = new Intl.NumberFormat('zh-CN');
 let detailTrigger = null;
 
@@ -104,13 +106,13 @@ function renderDetail(activity, name) {
 
 async function showUserDetail(userId, userName) {
   const message = document.getElementById('admin-message');
-  message.textContent = '正在读取成员明细……';
+  setLiveMessage(message, '正在读取成员明细……');
   try {
     const activity = await requestAdmin(`/api/v1/admin/users/${encodeURIComponent(userId)}/records?limit=40`);
     renderDetail(activity, userName);
-    message.textContent = '成员明细已加载。';
+    setLiveMessage(message, '成员明细已加载。');
   } catch (error) {
-    message.textContent = error.message;
+    setLiveMessage(message, error.message, true);
   }
 }
 
@@ -127,8 +129,8 @@ async function loadAdminData() {
     renderUsers(users.items || []);
     status.textContent = 'LIVE / AUDITED';
   } catch (error) {
-    status.textContent = '读取失败';
-    document.getElementById('admin-message').textContent = error.message;
+    setLiveMessage(status, '读取失败', true);
+    setLiveMessage(document.getElementById('admin-message'), error.message, true);
   }
 }
 

@@ -79,6 +79,7 @@
 - [x] loading/connection/empty 状态统一视觉组件
 - [x] UI-3 静态语义切片：单一仪表盘 h1、表格 scope/caption、管理员详情焦点回流和密码长度边界
 - [x] UI-3 v14/v15：Dashboard glitch 标题单次无障碍名称、隔离合法会话 Dashboard/Admin 空态/焦点/320/768 viewport 运行时证据
+- [x] UI-3 v16：共享 live-region 状态契约、Dashboard 错误/恢复播报和 Admin 正常状态运行时证据（ADR-067）
 - [x] `token_tracker audit` 增加 Web UI 静态契约门禁：label、table caption/scope、图片 alt、跳过链接和动效降级（ADR-063）
 - [x] `token_tracker audit` 扩展代码/配置/文档文本 1000 行门禁，作者头仍按自有代码边界检查（ADR-064）
 - [x] UI-3 v14：Dashboard glitch 标题的装饰副本从无障碍树隔离，保留一次稳定可读标题
