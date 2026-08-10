@@ -441,12 +441,19 @@ internal class TrackerViewModel(
 
 /** UI states are immutable and renderable without reading a data source. */
 internal sealed interface TrackerUiState {
+    /** The repository is restoring or checking the local session. */
     data object Booting : TrackerUiState
+    /** No authenticated user is available for the application surface. */
     data object SignedOut : TrackerUiState
+    /** Credentials are being submitted and no duplicate login is accepted. */
     data object SigningIn : TrackerUiState
+    /** Logout is clearing remote and encrypted local session state. */
     data object SigningOut : TrackerUiState
+    /** A refresh is in flight while the last safe projection remains visible. */
     data class Refreshing(val user: UserProfile, val summary: UsageSummary?) : TrackerUiState
+    /** The authenticated dashboard has a server-owned summary projection. */
     data class Ready(val user: UserProfile, val summary: UsageSummary) : TrackerUiState
+    /** A user-safe error with optional last-known projection for recovery UI. */
     data class Failure(
         val message: String,
         val user: UserProfile?,

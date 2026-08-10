@@ -34,6 +34,7 @@ private const val GCM_TAG_BITS = 128
 internal class EncryptedSessionStore(context: Context) {
     private val preferences = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    /** Encrypt and durably commit the current access/refresh session. */
     @Synchronized
     fun save(pair: TokenPair) {
         val snapshot = JSONObject()
@@ -47,6 +48,7 @@ internal class EncryptedSessionStore(context: Context) {
         commit(preferences.edit().putString(SESSION_KEY, encrypt(snapshot.toString())), "保存")
     }
 
+    /** Decrypt the session snapshot or fail closed when local data is invalid. */
     @Synchronized
     fun load(): SessionSnapshot? {
         val encrypted = preferences.getString(SESSION_KEY, null) ?: return null
@@ -70,6 +72,7 @@ internal class EncryptedSessionStore(context: Context) {
         }
     }
 
+    /** Remove all encrypted session material from the local container. */
     @Synchronized
     fun clear() {
         commit(preferences.edit().remove(SESSION_KEY), "清除")

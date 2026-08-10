@@ -28,11 +28,13 @@ internal class ApiEndpointStore(
     )
     private val safeDefault = normalizeApiBaseUrl(defaultEndpoint, allowInsecureHttp)
 
+    /** Load the last validated endpoint or the safe build-time default. */
     fun load(): String {
         val stored = preferences.getString(ENDPOINT_KEY, null) ?: return safeDefault
         return runCatching { normalizeApiBaseUrl(stored, allowInsecureHttp) }.getOrDefault(safeDefault)
     }
 
+    /** Validate, normalize, and persist a non-secret service endpoint. */
     fun save(endpoint: String): String {
         val normalized = normalizeApiBaseUrl(endpoint, allowInsecureHttp)
         preferences.edit().putString(ENDPOINT_KEY, normalized).apply()

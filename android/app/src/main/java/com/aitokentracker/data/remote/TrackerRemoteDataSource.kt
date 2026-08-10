@@ -53,6 +53,7 @@ internal interface TrackerRemoteDataSource {
         idempotencyKey: String,
     ): RemoteProviderCall
 
+    /** Read a bounded page of the authenticated user's usage records. */
     fun listUsageRecords(
         accessToken: String,
         period: String,

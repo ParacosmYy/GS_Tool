@@ -16,6 +16,7 @@ import json
 from importlib.util import find_spec
 import os
 from pathlib import Path
+import re
 import shutil
 from typing import Any, Iterable
 
@@ -64,6 +65,7 @@ def run_audit(root: Path | None = None) -> list[AuditCheck]:
     _check_source_line_cap(project_root, checks)
     _check_source_headers(project_root, checks)
     _check_public_api_docstrings(project_root, checks)
+    _check_android_kdoc(project_root, checks)
     _check_scene_assets(project_root, checks)
     _check_chartjs_asset(project_root, checks)
     _check_runtime_dependencies(checks)
@@ -234,6 +236,53 @@ def _check_public_api_docstrings(root: Path, checks: list[AuditCheck]) -> None:
         checks.append(AuditCheck("public-api-docstrings", FAIL, f"{len(missing)} 个公开接口缺少 docstring"))
     else:
         checks.append(AuditCheck("public-api-docstrings", PASS, "模块公开接口与公开类方法均有 docstring"))
+
+
+def _check_android_kdoc(root: Path, checks: list[AuditCheck]) -> None:
+    """Require KDoc on public Android classes and functions in the app source."""
+
+    declaration = re.compile(
+        r"^(?P<indent>\s*)(?P<modifiers>(?:(?:public|private|internal|protected|override|"
+        r"suspend|data|sealed|enum|abstract|open|inline|operator|infix|tailrec)\s+)*)"
+        r"(?P<kind>class|object|interface|fun)\s+(?P<name>[A-Za-z_]\w*)"
+    )
+    source_root = root / "android/app/src/main/java"
+    missing: list[str] = []
+    for path in sorted(source_root.rglob("*.kt")):
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError):
+            missing.append(path.relative_to(root).as_posix())
+            continue
+        for index, line in enumerate(lines):
+            match = declaration.match(line)
+            if not match:
+                continue
+            modifiers = match.group("modifiers") or ""
+            if any(f"{visibility} " in modifiers for visibility in ("private", "internal", "protected")):
+                continue
+            if modifiers.strip() == "override":
+                continue
+            if not _has_kdoc(lines, index):
+                relative = path.relative_to(root).as_posix()
+                missing.append(f"{relative}:{index + 1}:{match.group('name')}")
+    if missing:
+        checks.append(AuditCheck("android-kdoc", FAIL, f"{len(missing)} 个 Android 公开声明缺少 KDoc"))
+    else:
+        checks.append(AuditCheck("android-kdoc", PASS, "Android 公开类与函数均有 KDoc"))
+
+
+def _has_kdoc(lines: list[str], declaration_index: int) -> bool:
+    """Check for a KDoc block immediately before a declaration and annotations."""
+
+    cursor = declaration_index - 1
+    while cursor >= 0:
+        stripped = lines[cursor].strip()
+        if not stripped or stripped.startswith("@") or stripped.startswith("override "):
+            cursor -= 1
+            continue
+        return stripped.endswith("*/")
+    return False
 
 
 def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
