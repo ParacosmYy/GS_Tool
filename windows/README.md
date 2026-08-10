@@ -200,7 +200,39 @@ python -m token_tracker ingest-token revoke --username your-name --id 1
 `POST /api/v1/ingest/usage` 携带 `X-AI-Tracker-Ingest-Token` 和必填的
 `Idempotency-Key` 上报模型、输入/输出 token、时间和短备注。中心服务只保存 token 摘要，固定
 以 `source=ingest` 入账，不接受 API Key、原始 prompt 或完整 provider 响应。这个入口不会自动
-拦截 stock Kimi Code 进程；要实现“调用即上报”，仍需后续适配器或 Gateway。
+拦截 stock Kimi Code 进程；要实现“调用即上报”，需要让客户端明确指向下方的本地 Gateway。
+
+### 本地 Gateway：让外部客户端自动记账
+
+本项目现在提供独立的本地 OpenAI-compatible Gateway。它默认只监听 `127.0.0.1`，provider
+Key 和中心 ingest token 只从环境变量进入 Gateway 进程内存，不写入中心 SQLite、日志或命令行：
+
+```powershell
+# 1. 先为当前账户创建一次性 Usage Ingest Token，并把输出的 ait_... 保存到 windows/.env
+python -m token_tracker ingest-token create --username your-name --label kimi-code --expires-days 90
+
+# 2. 在 windows/.env 填入，不要提交该文件
+TOKEN_TRACKER_GATEWAY_PROVIDER_KEY=<your-kimi-code-api-key>
+TOKEN_TRACKER_GATEWAY_INGEST_TOKEN=<ait-token-from-step-1>
+
+# 3. 启动本机 Gateway；本地 HTTP 中心只在明确调试时加 --allow-http
+python -m token_tracker gateway `
+  --upstream-url https://api.kimi.com/coding/v1 `
+  --ingest-url http://127.0.0.1:5000/api/v1/ingest/usage `
+  --allow-http
+```
+
+然后把 Kimi Code 或其他 OpenAI-compatible 客户端的 Base URL 指向
+`http://127.0.0.1:8787/v1`。客户端自身要求填写的 API Key 只作为本机 Gateway 访问占位值；
+Gateway 会忽略它并使用 `TOKEN_TRACKER_GATEWAY_PROVIDER_KEY` 调用真实上游。Kimi Code 官方
+OpenAI-compatible Base URL 为 `https://api.kimi.com/coding/v1`，并支持第三方工具覆盖 Base
+URL，详见 [Kimi Code API access](https://www.kimi.com/code/docs/en/)。
+
+Gateway 支持 `/v1/models`、非流式 Chat Completions 和 SSE 流式 Chat Completions；流式请求
+只在完成 chunk 提供合法输入/输出 usage 时入账，否则响应头 `X-AI-Tracker-Usage` 为
+`missing`，不会估算。中心短暂不可用时本次 provider 调用仍会返回，响应状态会标为
+`report-failed`；持久化重试队列属于后续可靠性切片。不要把 Gateway 绑定到公网或可信 LAN，
+除非另外配置 `TOKEN_TRACKER_GATEWAY_ACCESS_TOKEN` 并使用 HTTPS 边缘保护。
 
 ## 5. Android 与跨端协议
 

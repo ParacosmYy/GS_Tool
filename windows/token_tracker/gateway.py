@@ -207,6 +207,8 @@ def _list_models(config: GatewayConfig) -> Any:
         return _error("UPSTREAM_RESPONSE_TOO_LARGE", "上游模型响应超过大小限制", 502)
     except ValueError:
         return _error("UPSTREAM_INVALID_RESPONSE", "上游模型响应不是有效 JSON", 502)
+    if 300 <= response.status_code <= 399:
+        return _error("UPSTREAM_REDIRECT", "上游 provider 返回了被禁止的重定向", 502)
     return _json_body(body, _upstream_status(response.status_code))
 
 
@@ -224,7 +226,10 @@ def _chat_completions(config: GatewayConfig) -> Any:
         provider_response = providers.call_chat(chat_request, config.timeout)
     except providers.ProviderNetworkError:
         return _error("UPSTREAM_UNAVAILABLE", "gateway 调用上游 provider 失败", 502)
-    if provider_response.status_code >= 400:
+    if not 200 <= provider_response.status_code <= 299:
+        if 300 <= provider_response.status_code <= 399:
+            provider_response.close()
+            return _error("UPSTREAM_REDIRECT", "上游 provider 返回了被禁止的重定向", 502)
         return _decode_error_response(provider_response, config)
     if chat_request.payload.get("stream") is True:
         return _stream_response(provider_response, chat_request.model, config)
@@ -263,6 +268,7 @@ def _prepare_gateway_request(payload: dict[str, Any], config: GatewayConfig) -> 
         [config.upstream_url],
         config.allow_http,
         allow_stream=True,
+        user_agent=request.headers.get("User-Agent"),
     )
 
 
@@ -285,7 +291,9 @@ def _json_body(body: Any, status: int, headers: Mapping[str, str] | None = None)
 
 
 def _upstream_status(status_code: int) -> int:
-    return status_code if 400 <= status_code <= 599 else 200
+    if 200 <= status_code <= 299 or 400 <= status_code <= 599:
+        return status_code
+    return 502
 
 
 def _response_model(body: Any, requested_model: str) -> str:

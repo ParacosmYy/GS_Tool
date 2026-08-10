@@ -53,12 +53,13 @@ class ProviderResponseTooLarge(RuntimeError):
 
 @dataclass(frozen=True)
 class ChatRequest:
-    """Validated data needed for one non-streaming usage-aware call."""
+    """Validated data needed for one JSON or SSE usage-aware call."""
 
     endpoint: str
     api_key: str
     model: str
     payload: dict[str, Any]
+    user_agent: str | None = None
 
 
 class ProviderAdapter(Protocol):
@@ -77,6 +78,7 @@ class ProviderAdapter(Protocol):
         allowed_base_urls: list[str],
         allow_http: bool,
         allow_stream: bool = False,
+        user_agent: Any = None,
     ) -> ChatRequest: ...
 
     def list_models(
@@ -108,8 +110,15 @@ class OpenAICompatibleAdapter:
         allowed_base_urls: list[str],
         allow_http: bool,
         allow_stream: bool = False,
+        user_agent: Any = None,
     ) -> ChatRequest:
-        return prepare_chat_request(payload, allowed_base_urls, allow_http, allow_stream=allow_stream)
+        return prepare_chat_request(
+            payload,
+            allowed_base_urls,
+            allow_http,
+            allow_stream=allow_stream,
+            user_agent=user_agent,
+        )
 
     def list_models(
         self,
@@ -213,6 +222,7 @@ def prepare_chat_request(
     allow_http: bool = False,
     *,
     allow_stream: bool = False,
+    user_agent: Any = None,
 ) -> ChatRequest:
     """Validate the browser contract and create a safe upstream payload."""
 
@@ -239,19 +249,29 @@ def prepare_chat_request(
     for field in FORWARDED_CHAT_FIELDS:
         if field in payload:
             request_payload[field] = payload[field]
-    return ChatRequest(endpoint=endpoint, api_key=api_key, model=model, payload=request_payload)
+    safe_user_agent = _optional_user_agent(user_agent)
+    return ChatRequest(
+        endpoint=endpoint,
+        api_key=api_key,
+        model=model,
+        payload=request_payload,
+        user_agent=safe_user_agent,
+    )
 
 
 def call_chat(request_data: ChatRequest, timeout: int) -> requests.Response:
     """Call once with redirects disabled so the allowlist cannot be bypassed."""
 
     try:
+        headers = {
+            "Authorization": f"Bearer {request_data.api_key}",
+            "Content-Type": "application/json",
+        }
+        if request_data.user_agent:
+            headers["User-Agent"] = request_data.user_agent
         return requests.post(
             request_data.endpoint,
-            headers={
-                "Authorization": f"Bearer {request_data.api_key}",
-                "Content-Type": "application/json",
-            },
+            headers=headers,
             json=request_data.payload,
             timeout=timeout,
             allow_redirects=False,
@@ -259,6 +279,15 @@ def call_chat(request_data: ChatRequest, timeout: int) -> requests.Response:
         )
     except requests.RequestException as exc:
         raise ProviderNetworkError from exc
+
+
+def _optional_user_agent(value: Any) -> str | None:
+    """Keep a client's safe identity hint without accepting header injection."""
+
+    text = str(value or "").strip()
+    if not text or len(text) > 256 or "\r" in text or "\n" in text:
+        return None
+    return text
 
 
 def list_models(base_url: Any, api_key: Any, allowed_base_urls: list[str], allow_http: bool, timeout: int) -> requests.Response:

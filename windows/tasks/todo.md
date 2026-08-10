@@ -61,8 +61,8 @@
 - [x] 统一结构化 API error envelope，保持现有客户端兼容
 - [x] provider adapter registry，支持按 provider 扩展而不改路由
 - [x] 评估 OpenAI-compatible 外部 gateway 的用户归属和密钥边界（见 ADR-003/053）
-- [ ] 本地 OpenAI-compatible Gateway：loopback 默认、独立访问令牌、Kimi/OpenAI-compatible 上游转发、SSE usage 解析和 Usage Ingest 上报
-- [x] per-user Usage Ingest Token 和 `/api/v1/ingest/usage` 已落地（ADR-053）；stock client wrapper/Gateway 仍待独立设计
+- [x] 本地 OpenAI-compatible Gateway：loopback 默认、独立访问令牌、Kimi/OpenAI-compatible 上游转发、SSE usage 解析和 Usage Ingest 上报
+- [x] per-user Usage Ingest Token 和 `/api/v1/ingest/usage` 已落地（ADR-053）；stock client 可通过本地 Gateway（ADR-054）自动上报，持久化重试队列仍待独立设计
 
 ## UI / motion
 

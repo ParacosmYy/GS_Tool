@@ -270,10 +270,10 @@ normalization, validation, and aggregate refresh.
 
 ### Task B17: 本地 OpenAI-compatible Usage Gateway
 
-- [ ] 先固定本地 Gateway 契约：`/v1/models`、`/v1/chat/completions`、流式 SSE、最终 usage 和失败语义。
-- [ ] provider Key 只从进程启动环境进入内存；Gateway 默认只监听 loopback，非 loopback 必须配置独立访问令牌。
-- [ ] Gateway 复用 provider adapter 做上游 HTTPS/大小/超时校验，并用 Usage Ingest Token 上报，不写中心 SQLite。
-- [ ] CLI 提供无密钥参数的启动方式，README 写明 Kimi Code/OpenAI-compatible 配置示例。
+- [x] 固定本地 Gateway 契约：`/v1/models`、`/v1/chat/completions`、流式 SSE、最终 usage 和失败语义。
+- [x] provider Key 只从进程启动环境进入内存；Gateway 默认只监听 loopback，非 loopback 必须配置独立访问令牌。
+- [x] Gateway 复用 provider adapter 做上游 HTTPS/大小/超时校验，并用 Usage Ingest Token 上报，不写中心 SQLite。
+- [x] CLI 提供无密钥参数的启动方式，README 写明 Kimi Code/OpenAI-compatible 配置示例。
 - [>] 没有用户合法 provider Key 的真实上游调用仍不能伪造；持久化失败重试队列作为下一项可靠性切片。
 
 ## 目标
@@ -334,7 +334,7 @@ API / 动画 / 设计 token 契约
 - [x] 连接器检测模型并保留最近的非敏感设置。
 - [x] 非流式调用从真实响应自动归档模型、输入、输出、时间和来源。
 - [x] 外部 provider 失败、缺 usage、限流、超时和白名单错误均有可读反馈。
-- [>] 外部客户端 Usage Ingest Token 已落地；本地 Gateway 正在把 Kimi Code/OpenAI-compatible stock client 接入自动上报链路。
+- [x] 外部客户端 Usage Ingest Token + 本地 Gateway 已把 Kimi Code/OpenAI-compatible stock client 接入自动上报链路；真实 provider 联调仍需合法 Key。
 
 ### Phase 4：Moonshot 级视觉与交互（已完成）
 
@@ -364,7 +364,7 @@ API / 动画 / 设计 token 契约
 ### Phase 7：长线最终交付门禁（进行中）
 
 - [>] API、认证、RBAC、密钥、备份和部署安全按 B 阶段逐项验收。
-- [>] 外部自动采集：安全 ingest API 已完成，本地 Gateway 正在实现；Gateway 的持久化失败重试与真实 provider 联调仍未完成。
+- [>] 外部自动采集：安全 ingest API 与本地 Gateway 已完成；Gateway 的持久化失败重试与真实 provider 联调仍未完成。
 - [>] UI-3 已完成 v5 登录页 320/768/1024/1440 独立浏览器证据、焦点、ARIA、对比度和横向溢出复核；v6 背景已接入但需在可用 CDP 后重拍四档证据，并完成仪表盘/管理员页面合法会话的空/错误态复核。
 - [ ] Android 工具链获批准后完成可复现构建、安装、设备联调和 APK 产物校验。
 - [>] 隔离 staging 恢复、应用/Werkzeug 访问日志脱敏和只读 Caddy edge preflight 已完成；正式 HTTPS/Caddy validate、生产 ACL/轮转、限流负载证据、真实数据恢复和回滚流程仍待部署演练。

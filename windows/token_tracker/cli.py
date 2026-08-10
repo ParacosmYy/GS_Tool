@@ -400,6 +400,9 @@ def cmd_gateway(args: argparse.Namespace) -> int:
     """Start a local provider gateway without persisting either credential."""
 
     try:
+        from dotenv import load_dotenv
+
+        load_dotenv()
         provider_key = gateway.read_environment_secret(
             args.provider_key_env,
             "provider_key",
