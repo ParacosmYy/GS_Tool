@@ -354,9 +354,9 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
     """Verify that key decisions are wired into the current source tree."""
 
     references = (
-        ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v7.png"),
+        ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v8.png"),
         ("web-scene-image-layer", "windows/token_tracker/templates/base.html", "story-backdrop-image"),
-        ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v7"),
+        ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v8"),
         ("kimi-provider-presets", "windows/token_tracker/templates/dashboard.html", "kimi-code"),
         ("provider-response-projection", "windows/token_tracker/provider_service.py", "project_response"),
         ("usage-ingest-endpoint", "windows/token_tracker/api_v1.py", "/ingest/usage"),
@@ -553,17 +553,17 @@ def _check_deployment_contract(root: Path, checks: list[AuditCheck]) -> None:
 
 
 def _check_scene_assets(root: Path, checks: list[AuditCheck]) -> None:
-    web_asset = root / "windows/token_tracker/static/assets/embedded-rust-engineer-bg-v7.png"
-    android_asset = root / "android/app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v7.png"
+    web_asset = root / "windows/token_tracker/static/assets/embedded-rust-engineer-bg-v8.png"
+    android_asset = root / "android/app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v8.png"
     if not web_asset.is_file() or not android_asset.is_file():
-        checks.append(AuditCheck("cross-platform-scene", FAIL, "v7 Web/Android 资产不完整"))
+        checks.append(AuditCheck("cross-platform-scene", FAIL, "v8 Web/Android 资产不完整"))
         return
     web_hash = _sha256(web_asset)
     android_hash = _sha256(android_asset)
     if web_hash != android_hash:
-        checks.append(AuditCheck("cross-platform-scene", FAIL, "v7 Web/Android SHA-256 不一致"))
+        checks.append(AuditCheck("cross-platform-scene", FAIL, "v8 Web/Android SHA-256 不一致"))
         return
-    checks.append(AuditCheck("cross-platform-scene", PASS, f"v7 SHA-256 一致 {web_hash[:12]}…"))
+    checks.append(AuditCheck("cross-platform-scene", PASS, f"v8 SHA-256 一致 {web_hash[:12]}…"))
 
 
 def _check_chartjs_asset(root: Path, checks: list[AuditCheck]) -> None:

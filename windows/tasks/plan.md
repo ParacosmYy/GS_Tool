@@ -225,10 +225,10 @@ normalization, validation, and aggregate refresh.
 
 ### Task B10: Web/Android 场景资产一致性
 
-- [x] Web 切换到 `embedded-rust-engineer-bg-v7.png`，保留 v6 及之前版本作为回滚资产。
-- [x] Android Compose 切换到同一像素资产的 `embedded_rust_engineer_bg_v7.png`，端侧遮罩和漂移实现不互相耦合。
+- [x] Web 切换到 `embedded-rust-engineer-bg-v8.png`，保留 v7 及之前版本作为回滚资产。
+- [x] Android Compose 切换到同一像素资产的 `embedded_rust_engineer_bg_v8.png`，端侧遮罩和漂移实现不互相耦合。
 - [x] 两端资源 SHA-256 一致，资源引用、注释和视觉规范同步。
-- [>] Web v7 四档浏览器证据和 Android 编译/设备视觉验收仍分别等待 CDP 与 Android 工具链门禁。
+- [>] Web v8 四档浏览器证据和 Android 编译/设备视觉验收仍分别等待 CDP 与 Android 工具链门禁。
 
 ### Task B11: Kimi provider 快速连接预设
 
@@ -246,7 +246,7 @@ normalization, validation, and aggregate refresh.
 
 ### Task B13: 只读发布就绪审计
 
-- [x] 新增 `token_tracker audit`，集中检查关键交付文件、1000 行门禁、作者头、Python docstring、Android KDoc、层间依赖边界、跨端 v7 SHA-256 和 Python 运行时。
+- [x] 新增 `token_tracker audit`，集中检查关键交付文件、1000 行门禁、作者头、Python docstring、Android KDoc、层间依赖边界、跨端 v8 SHA-256 和 Python 运行时。
 - [x] 普通/JSON/strict 输出区分源码通过与 Android/EXE/Caddy 环境 pending，且不触碰数据库或敏感配置。
 - [>] 正式流水线接入与全部外部工具链 pass 证据仍待部署环境。
 
@@ -377,7 +377,7 @@ API / 动画 / 设计 token 契约
 
 - [>] API、认证、RBAC、密钥、备份和部署安全按 B 阶段逐项验收。
 - [>] 外部自动采集：安全 ingest API、本地 Gateway 和 DPAPI 跨重启重试已完成；真实 provider 联调仍需合法 Key。
-- [>] UI-3 已完成登录页、v7/v9/v10 场景合成、首帧可读性和隔离空 schema 下仪表盘/管理员页的本地观察；真实 320px 设备指标及合法会话的焦点、错误态、导出和 API 失败路径仍待完成。
+- [>] UI-3 已完成登录页、v8/v9/v10 场景合成、首帧可读性和隔离空 schema 下仪表盘/管理员页的本地观察；真实 320px 设备指标及合法会话的焦点、错误态、导出和 API 失败路径仍待完成。
 - [ ] Android 工具链获批准后完成可复现构建、安装、设备联调和 APK 产物校验。
 - [>] 隔离 staging 恢复、应用/Werkzeug 访问日志脱敏和只读 Caddy edge preflight 已完成；正式 HTTPS/Caddy validate、生产 ACL/轮转、限流负载证据、真实数据恢复和回滚流程仍待部署演练。
 - [x] 当前 checkout 已建立本地 `main` Git 基线；敏感数据忽略边界已用真实路径验证，远程仓库与上传仍未启用（ADR-036）。
