@@ -183,7 +183,7 @@ python -m token_tracker serve --host 0.0.0.0 --port 5000 --lan-preview
 ```dotenv
 TOKEN_TRACKER_SECRET_KEY=<随机长字符串>
 TOKEN_TRACKER_SECURE_COOKIE=1
-TOKEN_TRACKER_ALLOWED_BASE_URLS=https://api.moonshot.cn/v1,https://api.openai.com/v1
+TOKEN_TRACKER_ALLOWED_BASE_URLS=https://api.moonshot.cn/v1,https://api.moonshot.ai/v1,https://api.openai.com/v1
 ```
 
 不要直接把 Flask 开发服务器暴露到公网，也不要把 `.env`、SQLite 文件或真实 API Key 提交到 GitHub。正式部署还应在反向代理或网关层增加 HTTPS、访问日志脱敏和更严格的限流。

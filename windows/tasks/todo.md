@@ -49,6 +49,7 @@
 - [x] Android SDK 用户授权入口：`android/accept-sdk-license.bat` 要求显式 `ACCEPT`，复用官方 license/install/doctor 流程，不自动代签（ADR-098）
 - [>] 用户交互接受 SDK license 后安装 API 37/Build Tools，完成 Debug APK 编译、设备联调与 APK 产物验收
 - [x] Kimi provider 快速连接预设：Kimi Code / Kimi 开放平台 / OpenAI / 自定义 URL，Key 仍只留在页面内存
+- [x] Kimi 官方 endpoint 上下文核对：保留 Kimi Code `.kimi.com` 与开放平台 `.moonshot.cn` 分离，`.moonshot.ai` 仅作为可选 allowlist（ADR-099）
 - [>] Windows 分享入口：已提供需确认的可信局域网预览、本地校验备份命令、隔离 staging 恢复演练和隐私说明；正式 HTTPS、生产 ACL/轮转与真实数据恢复仍是部署门禁
 - [x] Caddy v2.11.4 Windows amd64 项目缓存、SHA-512 校验、edge preflight 和显式前台启动入口已完成（ADR-083）；实际域名/证书/ACL/外部 health 仍待部署主机
 - [x] Caddy 慢速下载超时和 edge 预检相对路径边界已加固；项目缓存版本、SHA-512 与示例配置 validate 已留证（ADR-083）
