@@ -208,7 +208,8 @@ input::placeholder, textarea::placeholder { color: #aaa8b3; opacity: 1; }
 #dashboard-status.is-error { color: var(--hot); }
 .hero-stage { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(350px, .96fr); gap: 3vw; align-items: center; min-height: 570px; padding: 35px 0 48px; }
 .hero-copy { position: relative; z-index: 2; }
-.hero-title { position: relative; margin: 0; color: var(--copy); font-size: clamp(82px, 13.6vw, 208px); font-weight: 800; line-height: .76; letter-spacing: -.12em; text-indent: -.08em; animation: title-breathe 8s ease-in-out infinite; }
+.hero-title-stack { margin: 0; }
+.hero-title { position: relative; display: block; margin: 0; color: var(--copy); font-size: clamp(82px, 13.6vw, 208px); font-weight: 800; line-height: .76; letter-spacing: -.12em; text-indent: -.08em; animation: title-breathe 8s ease-in-out infinite; }
 .hero-title::before, .hero-title::after { position: absolute; inset: 0; color: inherit; content: attr(data-text); pointer-events: none; opacity: 0; }
 .hero-title::before { color: var(--hot); animation: glitch-a 10s steps(1, end) infinite; mix-blend-mode: screen; }
 .hero-title::after { color: var(--signal); animation: glitch-b 10s steps(1, end) infinite; mix-blend-mode: screen; }

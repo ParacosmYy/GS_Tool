@@ -7,8 +7,7 @@
   <div class="hero-stage">
     <div class="hero-copy" data-reveal>
       <p class="eyebrow">YOUR USAGE, IN MOTION</p>
-      <h1 class="hero-title" data-text="TOKEN">TOKEN</h1>
-      <h1 class="hero-title hero-title-outline" data-text="SIGNAL">SIGNAL</h1>
+      <h1 class="hero-title-stack"><span class="hero-title" data-text="TOKEN">TOKEN</span><span class="hero-title hero-title-outline" data-text="SIGNAL">SIGNAL</span></h1>
       <span class="hero-scanline" aria-hidden="true"></span>
       <p class="hero-lede">连接一次，之后让每次兼容接口调用自动留下 token usage。你只需要观察变化，不需要手动记账。</p>
       <div class="hero-actions">
@@ -140,7 +139,7 @@
     <table>
       <caption class="sr-only">当前统计范围内的最近 token 用量记录</caption>
       <thead>
-        <tr><th>模型</th><th>输入</th><th>输出</th><th>总 token</th><th>时间</th><th>来源 / 备注</th></tr>
+        <tr><th scope="col">模型</th><th scope="col">输入</th><th scope="col">输出</th><th scope="col">总 token</th><th scope="col">时间</th><th scope="col">来源 / 备注</th></tr>
       </thead>
       <tbody id="records-body"><tr><td colspan="6" class="table-empty">正在加载……</td></tr></tbody>
     </table>

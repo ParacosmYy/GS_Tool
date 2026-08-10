@@ -1,6 +1,7 @@
 /* Author: AI Token Tracker Engineering Team | Maintainer: Project Owner | Purpose: Admin data states and accessible detail rendering. */
 
 const numberFormatter = new Intl.NumberFormat('zh-CN');
+let detailTrigger = null;
 
 /** Fetch a same-origin administrator resource and preserve permission errors. */
 async function requestAdmin(path) {
@@ -52,8 +53,13 @@ function renderUsers(items) {
     const button = document.createElement('button');
     button.className = 'button button-ghost button-small';
     button.type = 'button';
+    button.setAttribute('aria-controls', 'admin-detail');
+    button.setAttribute('aria-expanded', 'false');
     button.textContent = '查看';
-    button.addEventListener('click', () => showUserDetail(user.id, user.username));
+    button.addEventListener('click', () => {
+      detailTrigger = button;
+      showUserDetail(user.id, user.username);
+    });
     action.appendChild(button);
     row.appendChild(action);
     body.appendChild(row);
@@ -83,6 +89,8 @@ function renderDetail(activity, name) {
   });
   const detail = document.getElementById('admin-detail');
   detail.hidden = false;
+  detailTrigger?.setAttribute('aria-expanded', 'true');
+  document.getElementById('admin-detail-close')?.focus();
   detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -118,5 +126,7 @@ async function loadAdminData() {
 
 document.getElementById('admin-detail-close')?.addEventListener('click', () => {
   document.getElementById('admin-detail').hidden = true;
+  detailTrigger?.setAttribute('aria-expanded', 'false');
+  detailTrigger?.focus();
 });
 loadAdminData();

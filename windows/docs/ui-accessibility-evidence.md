@@ -44,6 +44,7 @@
 - v5 四档真实浏览器截图已生成：`ui-audit-v5-1440.png`、`ui-audit-v5-1024.png`、`ui-audit-v5-768.png`、`ui-audit-v5-320.png`。
 - 四档 `document.scrollWidth` 均等于可视布局宽度；320px 为 `clientWidth=305`、`scrollWidth=305`，差值只来自垂直滚动条。
 - v5 浏览器控制台没有 warn/error；320px 键盘焦点序列为 `username → password → submit → Create one`。
+- 本轮静态语义切片已通过：仪表盘只保留一个 `h1`、记录表列头和管理员详情表使用 `scope="col"`、表格有 caption，管理员详情打开后焦点进入关闭按钮并在关闭后返回触发按钮；登录/注册密码 maxlength 与服务端 256 字符边界一致。
 - v4 截图保留为历史基线，不再作为 v5 默认渲染证据。
 
 ## 尚未关闭的门禁
