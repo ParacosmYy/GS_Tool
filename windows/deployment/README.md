@@ -20,6 +20,23 @@ Windows 电脑只需要运行一个中心服务；同学不安装 Python、不�
 
 ## 一命令分享预检
 
+在交付或部署前，可以先运行统一的只读交付预检。它会汇总源码审计、EXE/Android 工具链和对应部署模式，
+不安装软件、不启动服务、不修改主机状态：
+
+```powershell
+cd D:\Workplace\Agent_Workplace\ai-token-tracker\windows
+.\release-doctor.bat -Mode Local
+```
+
+退出码约定为：`0` 全部通过，`3` 存在待批准的外部工具链，`2` 存在失败。可信局域网和正式生产模式分别为：
+
+```powershell
+.\release-doctor.bat -Mode LanPreview
+.\release-doctor.bat -Mode Production -Caddyfile .\deployment\Caddyfile -LogsDirectory .\deployment\logs
+```
+
+编排边界记录在 [`ADR-071`](../docs/decisions/ADR-071-release-doctor-composition.md)。
+
 在真正分享前，先运行只读 handoff doctor。它不会启动服务、创建数据库、改防火墙或申请证书：
 
 ```powershell

@@ -39,6 +39,7 @@
 - [x] Kimi provider 快速连接预设：Kimi Code / Kimi 开放平台 / OpenAI / 自定义 URL，Key 仍只留在页面内存
 - [>] Windows 分享入口：已提供需确认的可信局域网预览、本地校验备份命令、隔离 staging 恢复演练和隐私说明；正式 HTTPS、生产 ACL/轮转与真实数据恢复仍是部署门禁
 - [x] 分享 handoff 预检：`deployment/share-doctor.ps1` 统一 LAN/Production 只读配置门禁，不启动服务或修改主机状态（ADR-069）
+- [x] 统一交付预检：`release-doctor.ps1/.bat` 编排源码、EXE、Android 和 Local/LAN/Production 门禁，退出码区分通过、pending、失败（ADR-071）
 
 ## Foundation
 
