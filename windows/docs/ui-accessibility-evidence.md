@@ -225,3 +225,17 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `error/warning` 日志为空，viewport override 已在结束时重置。
 - 该证据覆盖隔离浏览器 viewport，不等同于真实设备指标；Provider 网络失败、导出下载、真实
   reduced-motion/高对比度系统环境和历史非空数据仍保持未关闭门禁。
+
+## v18 连接失败、历史非空与导出回归
+
+- 使用同一忽略目录下的隔离 SQLite 和短生命周期 `5019` 源服务，通过合法隔离会话在真实页面提交
+  一条补录记录；页面收到 `POST /api/records` `201`，历史表显示 `kimi-code`、输入 `1,200`、输出
+  `350`、合计 `1,550`，并保留备注。该记录只存在于隔离库，不是项目测试数据或生产数据。
+- 切换到 `Week` 后，历史记录仍可见，导出链接同步为 `/api/export?period=week`，Dashboard 状态恢复为
+  `role=status`、`aria-live=polite`。应用访问日志记录 CSV 请求 HTTP `200`；独立浏览器随后将下载动作
+  拦截为 `ERR_BLOCKED_BY_CLIENT`，因此本证据证明服务端导出响应，不宣称浏览器下载落盘已通过。
+- 使用合成无效 Key 对白名单 OpenAI-compatible 地址执行只读模型检测；服务端记录
+  `POST /api/provider/models` HTTP `502`，页面显示“检测失败”，Provider 状态和错误消息均切换为
+  `role=alert`、`aria-live=assertive`、`aria-atomic=true`，检测按钮最终恢复可用。
+- 本轮应用页面 DevTools `error/warning` 日志为空；浏览器工具自身的外部 Statsig 超时不属于应用页面日志，
+  不计入应用失败。真实 Provider 成功、真实设备下载、系统级 reduced-motion/高对比度仍需后续门禁。
