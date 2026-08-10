@@ -33,6 +33,8 @@
 - [x] EXE v13 交付一致性：重建 EXE/ZIP，隔离验证 v13 资源 200、ready/login、包 verifier 和 `%LOCALAPPDATA%` 数据目录边界（ADR-091）
 - [x] EXE v12→v13→v12 升级/回滚：通过真实 `/api/v1/records` 验证同一记录在包切换后保留（ADR-092）
 - [x] EXE 签名门禁：加入 SHA-256/HTTPS timestamp/Code Signing EKU 要求、签名入口和只读签名验证器；缺少批准工具或证书时 fail-closed（ADR-093）
+- [x] Web/Android 场景 v14：提升成年御姐嵌入式 Rust/RL 工程师、MacBook Pro/Mac Studio 风格设备和实验室光影层次；v13 继续作为回滚资产（ADR-095）
+- [x] EXE v14 交付一致性：重建 EXE/ZIP，校验 v14 资源、包 manifest、隔离启动及 v13→v14→v13 记录保留回滚（ADR-096）
 - [x] 新增只读 `token_tracker audit` 发布审计入口，区分源码通过与外部工具链 pending
 - [x] Chart.js 4.4.7 固定为项目本地静态资产，核心图表不再依赖 CDN
 - [x] Provider 响应投影：Web/Android 只接收有界助手文本和稳定字段，不透传原始上游 JSON
@@ -97,7 +99,7 @@
 - [x] pointer aura/ring、count-up、reveal、glitch、scanline
 - [x] 将动画从分散 CSS 规则收敛为可追踪的 motion state contract
 - [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛、注册页 heading 顺序和 v10 场景可见度；v15/v16/v17/v18 已补隔离合法会话下 Dashboard/Admin、ARIA、动态错误播报、四档 viewport、焦点回流、历史非空、服务端 CSV 200 和 Provider 502 错误态证据；真实设备指标、浏览器下载落盘、真实 Provider 成功、对比度与 reduced-motion 真实环境仍待补齐）
-- [x] 背景品牌资产升级：v13 御姐二次元嵌入式工程师、MacBook Pro/Mac Studio 风格工作站、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v12/v11/v10/v9/v8 及之前版本保留回滚（ADR-090）
+- [x] 背景品牌资产升级：v14 御姐二次元嵌入式工程师、MacBook Pro/Mac Studio 风格工作站、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v13/v12/v11/v10/v9/v8 及之前版本保留回滚（ADR-095）
 - [x] UI-1 v10 场景可见度调校：保留左侧正文安全区，提升右侧角色、笔记本、工作站与示波器辨识度（ADR-074/076）
 - [x] loading/connection/empty 状态统一视觉组件
 - [x] UI-3 静态语义切片：单一仪表盘 h1、表格 scope/caption、管理员详情焦点回流和密码长度边界
