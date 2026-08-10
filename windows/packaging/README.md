@@ -52,13 +52,14 @@ PyInstaller 模块/启动器是否存在，不执行 Python 导入、不下载�
 
 ```powershell
 .\packaging\verify-upgrade-rollback.ps1 `
-  -PreviousPackageDirectory .\.cache\package-verify-v12-final `
-  -CurrentPackageDirectory .\.cache\exe-v13-package-verify-20260810 `
-  -Port 5020
+  -PreviousPackageDirectory .\.cache\exe-upgrade-rollback-v13-20260810 `
+  -CurrentPackageDirectory .\.cache\exe-upgrade-rollback-v14-20260810 `
+  -Port 5023
 ```
 
 该入口只使用项目缓存目录，并通过 `POST /api/v1/records` 验证同一用户数据在升级和回滚后仍可读取。
-Authenticode 签名和正式分发仍需要部署负责人验收，详细证据见 [`ADR-092`](../docs/decisions/ADR-092-exe-upgrade-rollback-evidence.md)。
+当前 checkout 已完成 v13→v14→v13 的真实记录保留演练；Authenticode 签名和正式分发仍需要部署负责人验收，
+详细 v14 证据见 [`ADR-096`](../docs/decisions/ADR-096-exe-v14-rebuild-evidence.md)。
 
 构建前必须检查：
 
@@ -67,8 +68,9 @@ Authenticode 签名和正式分发仍需要部署负责人验收，详细证据�
 - `dist/` 只作为构建产物，不提交 Git；源码体验入口仍是根目录 `start.bat`。
 - 构建环境允许访问已批准的 Python 包缓存；脚本不会使用未锁定的 PyInstaller 版本。
 
-当前 checkout 已按锁文件安装 PyInstaller 6.22.0，并完成 v13 `--onedir` EXE 构建、隔离启动及升级/回滚验收。
-构建产物的 SHA-256、用户数据目录和已知未完成门禁见 [`ADR-091`](../docs/decisions/ADR-091-exe-v13-rebuild-evidence.md)。
+当前 checkout 已按锁文件安装 PyInstaller 6.22.0，并完成 v14 `--onedir` EXE 构建、隔离启动及
+v13→v14→v13 升级/回滚验收。v14 构建产物的 SHA-256、用户数据目录和已知未完成门禁见
+[`ADR-096`](../docs/decisions/ADR-096-exe-v14-rebuild-evidence.md)；v13 仍作为可验证回滚包保留。
 这不等于正式分发完成：签名、中心 HTTPS 和真实部署数据恢复仍需单独验收。
 
 ## Authenticode 签名
