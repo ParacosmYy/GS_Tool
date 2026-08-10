@@ -8,6 +8,7 @@ Purpose: Parse terminal commands and delegate to application services.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import secrets
 import sys
@@ -95,6 +96,41 @@ def build_parser() -> argparse.ArgumentParser:
         help="备份目录，默认数据库旁的 backups/",
     )
     backup_parser.set_defaults(handler=cmd_backup)
+
+    backup_inventory_parser = subparsers.add_parser(
+        "backup-inventory",
+        help="只读检查本地备份数量、年龄、容量和可选完整性",
+    )
+    backup_inventory_parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="备份目录，默认数据库旁的 backups/；不会自动创建",
+    )
+    backup_inventory_parser.add_argument(
+        "--min-count",
+        type=non_negative_int,
+        default=None,
+        help="可选的最小备份数量，低于该值返回非零状态",
+    )
+    backup_inventory_parser.add_argument(
+        "--max-age-days",
+        type=non_negative_int,
+        default=None,
+        help="可选的最大备份年龄（本地时间天数），超过则返回非零状态",
+    )
+    backup_inventory_parser.add_argument(
+        "--max-size-mib",
+        type=non_negative_int,
+        default=None,
+        help="可选的备份总容量上限（MiB），超过则返回非零状态",
+    )
+    backup_inventory_parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="对每个候选备份执行只读 integrity/foreign-key/schema 验证",
+    )
+    backup_inventory_parser.add_argument("--json", action="store_true", help="以 JSON 输出稳定清单")
+    backup_inventory_parser.set_defaults(handler=cmd_backup_inventory)
 
     verify_backup_parser = subparsers.add_parser("verify-backup", help="只读验证 SQLite 备份")
     verify_backup_parser.add_argument("--path", required=True, help="待验证的 SQLite 备份路径")
@@ -257,6 +293,16 @@ def format_number(value: int) -> str:
     return f"{int(value):,}"
 
 
+def format_bytes(value: int) -> str:
+    """Format a non-negative byte count for concise operator output."""
+
+    if value >= 1024 * 1024:
+        return f"{value / (1024 * 1024):.2f} MiB"
+    if value >= 1024:
+        return f"{value / 1024:.2f} KiB"
+    return f"{value} B"
+
+
 def print_table(rows: Iterable[dict], columns: list[tuple[str, str]]) -> None:
     """Render bounded tabular projections without a third-party dependency."""
 
@@ -351,6 +397,67 @@ def cmd_backup(args: argparse.Namespace) -> int:
         return 2
     print(f"已创建并校验备份：{target}")
     return 0
+
+
+def cmd_backup_inventory(args: argparse.Namespace) -> int:
+    """Print a bounded, read-only backup inventory and retention result."""
+
+    database = db.get_db_path(args.db, ensure_parent=False)
+    output_dir = args.output_dir or backup.default_backup_dir(database)
+    try:
+        result = backup.inventory_backups(
+            output_dir,
+            min_count=args.min_count,
+            max_age_days=args.max_age_days,
+            max_size_mib=args.max_size_mib,
+            verify=args.verify,
+        )
+    except backup.BackupError as exc:
+        print(f"错误：{exc}", file=sys.stderr)
+        return 2
+
+    if args.json:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+    else:
+        summary = result["summary"]
+        policy = result["policy"]
+        print(f"备份目录：{result['directory']}")
+        print(
+            f"状态：{result['status']}；数量 {summary['count']}；"
+            f"总容量 {format_bytes(int(summary['total_size_bytes']))}；"
+            f"最新 {summary['latest_modified_at'] or '-'}"
+        )
+        print(
+            f"策略：最小数量 {policy['min_count'] if policy['min_count'] is not None else '-'}；"
+            f"最大年龄 {policy['max_age_days'] if policy['max_age_days'] is not None else '-'} 天；"
+            f"最大容量 {policy['max_size_mib'] if policy['max_size_mib'] is not None else '-'} MiB；"
+            f"完整性验证 {'on' if policy['verify'] else 'off'}"
+        )
+        files = result["files"]
+        if files:
+            print()
+            print_table(
+                [
+                    {
+                        **item,
+                        "size_bytes": format_bytes(int(item["size_bytes"])),
+                        "age_days": f"{float(item['age_days']):.2f}",
+                    }
+                    for item in files
+                ],
+                [
+                    ("name", "文件"),
+                    ("size_bytes", "大小"),
+                    ("age_days", "年龄(天)"),
+                    ("modified_at", "修改时间"),
+                    ("integrity", "完整性"),
+                ],
+            )
+        else:
+            print("暂无可识别的备份文件。")
+        for violation in result["violations"]:
+            print(f"告警 [{violation['code']}]：{violation['message']}")
+    return 0 if result["status"] == "pass" else 2
 
 
 def cmd_verify_backup(args: argparse.Namespace) -> int:

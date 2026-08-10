@@ -13,9 +13,11 @@ tokens or provider keys into a separate export format.
 from __future__ import annotations
 
 from contextlib import closing
+from datetime import datetime
 import os
 import sqlite3
 from pathlib import Path
+import stat
 import uuid
 
 from . import db
@@ -25,10 +27,145 @@ class BackupError(RuntimeError):
     """Raised when a verified local backup cannot be produced."""
 
 
+MAX_INVENTORY_FILES = 512
+BACKUP_NAME_PREFIX = "token_tracker-"
+BACKUP_SUFFIX = ".sqlite3"
+
+
 def default_backup_dir(database: Path) -> Path:
     """Return the project-local backup directory beside the configured database."""
 
     return database.parent / "backups"
+
+
+def inventory_backups(
+    output_dir: str | os.PathLike[str] | Path,
+    *,
+    min_count: int | None = None,
+    max_age_days: int | None = None,
+    max_size_mib: int | None = None,
+    verify: bool = False,
+) -> dict[str, object]:
+    """Read backup metadata and evaluate optional retention policies.
+
+    The inventory deliberately operates on directory metadata and, when
+    requested, the existing read-only verifier. It never creates the target
+    directory, opens the configured live database, recursively traverses
+    folders, deletes files, or returns SQLite business rows.
+    """
+
+    _validate_inventory_policy(min_count, max_age_days, max_size_mib)
+    directory = Path(output_dir).expanduser().resolve()
+    if directory.exists() and not directory.is_dir():
+        raise BackupError(f"备份清单目录不是文件夹：{directory}")
+
+    candidates = _inventory_candidates(directory)
+    if len(candidates) > MAX_INVENTORY_FILES:
+        raise BackupError(f"备份文件数量超过只读扫描上限：{MAX_INVENTORY_FILES}")
+
+    now = db.local_now()
+    files: list[dict[str, object]] = []
+    age_seconds_values: list[float] = []
+    verification_failures = 0
+    for candidate in sorted(candidates, key=lambda item: item.name):
+        try:
+            metadata = candidate.stat()
+            modified = datetime.fromtimestamp(metadata.st_mtime).replace(microsecond=0)
+        except (OSError, OverflowError, ValueError) as exc:
+            raise BackupError(f"读取备份元数据失败：{candidate.name}") from exc
+        age_seconds = max(0.0, (now - modified).total_seconds())
+        age_seconds_values.append(age_seconds)
+        item: dict[str, object] = {
+            "name": candidate.name,
+            "size_bytes": metadata.st_size,
+            "modified_at": modified.strftime(db.TIMESTAMP_FORMAT),
+            "age_days": round(age_seconds / 86400, 2),
+            "integrity": "not_checked",
+        }
+        if verify:
+            try:
+                verify_backup(candidate)
+            except BackupError as exc:
+                verification_failures += 1
+                item["integrity"] = "failed"
+                item["verification_error"] = str(exc)[:200]
+            else:
+                item["integrity"] = "ok"
+        files.append(item)
+
+    total_size_bytes = sum(int(item["size_bytes"]) for item in files)
+    modified_values = [str(item["modified_at"]) for item in files]
+    violations: list[dict[str, object]] = []
+    if not directory.exists():
+        violations.append({"code": "BACKUP_DIRECTORY_MISSING", "message": "备份目录不存在"})
+    elif not files:
+        violations.append({"code": "NO_BACKUPS", "message": "目录中没有可识别的 SQLite 备份"})
+    if min_count is not None and len(files) < min_count:
+        violations.append({"code": "MIN_COUNT", "message": f"备份数量 {len(files)} 小于最小值 {min_count}"})
+    if max_age_days is not None and any(age > max_age_days * 86400 for age in age_seconds_values):
+        violations.append({"code": "MAX_AGE_DAYS", "message": f"存在超过 {max_age_days} 天的备份"})
+    if max_size_mib is not None and total_size_bytes > max_size_mib * 1024 * 1024:
+        violations.append({"code": "MAX_SIZE_MIB", "message": f"备份总容量超过 {max_size_mib} MiB"})
+    if verification_failures:
+        violations.append({"code": "INTEGRITY_CHECK", "message": f"有 {verification_failures} 个备份完整性验证失败"})
+
+    return {
+        "directory": str(directory),
+        "status": "pass" if not violations else "attention",
+        "policy": {
+            "min_count": min_count,
+            "max_age_days": max_age_days,
+            "max_size_mib": max_size_mib,
+            "verify": verify,
+        },
+        "summary": {
+            "count": len(files),
+            "total_size_bytes": total_size_bytes,
+            "latest_modified_at": max(modified_values) if modified_values else None,
+            "oldest_modified_at": min(modified_values) if modified_values else None,
+            "verification_failures": verification_failures,
+        },
+        "violations": violations,
+        "files": files,
+    }
+
+
+def _validate_inventory_policy(
+    min_count: int | None,
+    max_age_days: int | None,
+    max_size_mib: int | None,
+) -> None:
+    """Reject negative inventory policy values before touching the filesystem."""
+
+    for label, value in (
+        ("最小备份数量", min_count),
+        ("最大备份年龄", max_age_days),
+        ("最大容量", max_size_mib),
+    ):
+        if value is not None and value < 0:
+            raise BackupError(f"{label}不能为负数")
+
+
+def _inventory_candidates(directory: Path) -> list[Path]:
+    """Return bounded, direct-child regular SQLite backup files only."""
+
+    if not directory.exists():
+        return []
+    try:
+        entries = list(directory.iterdir())
+    except OSError as exc:
+        raise BackupError(f"读取备份目录失败：{directory}") from exc
+    candidates: list[Path] = []
+    for entry in entries:
+        if not entry.name.startswith(BACKUP_NAME_PREFIX) or not entry.name.endswith(BACKUP_SUFFIX):
+            continue
+        try:
+            is_regular = not entry.is_symlink() and stat.S_ISREG(entry.stat().st_mode)
+        except OSError:
+            is_regular = False
+        if is_regular:
+            candidates.append(entry)
+    return candidates
 
 
 def create_backup(
