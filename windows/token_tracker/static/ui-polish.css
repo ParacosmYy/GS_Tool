@@ -205,6 +205,13 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
 @media (max-width: 620px) {
   .site-header, .site-main { width: calc(100% - 30px); }
   .auth-shell, .auth-shell-reverse { grid-template-columns: minmax(0, 1fr); gap: 34px; padding-top: 34px; }
+  /* A narrow viewport must be allowed to shrink the grid track all the way
+     down to the content box. Without an explicit width/min-width boundary,
+     the form card can preserve a desktop-sized intrinsic track and be clipped
+     on small phones even though the parent has a responsive width. */
+  .auth-shell, .auth-shell-reverse { width: 100%; max-width: 100%; min-width: 0; }
+  .auth-intro, .auth-card, .auth-card form, .auth-card label { min-width: 0; }
+  .auth-card { width: 100%; max-width: 100%; }
   .display-title { font-size: clamp(60px, 18vw, 92px); }
   .intro-copy { font-size: 13px; }
   .scene-signature { gap: 7px; font-size: 9px; letter-spacing: .07em; white-space: nowrap; }

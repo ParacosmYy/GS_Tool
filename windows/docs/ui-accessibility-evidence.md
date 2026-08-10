@@ -60,6 +60,22 @@
 - 透明卡片、pointer follower、背景视差和 reduced-motion 规则保持不变；下一次具备浏览器
   CDP 运行时后需要重拍 v6.1 四档截图并复核透明卡片后的局部对比度。
 
+## v6.2 本机 Chrome 只读视觉回归
+
+- 本轮使用本机 Chrome headless 对 `http://127.0.0.1:5011/login` 生成了四档截图：
+  [`login-v6-fixed-1440.png`](../.cache/ui-audit-v6/login-v6-fixed-1440.png)、
+  [`login-v6-fixed-1024.png`](../.cache/ui-audit-v6/login-v6-fixed-1024.png)、
+  [`login-v6-fixed-768.png`](../.cache/ui-audit-v6/login-v6-fixed-768.png) 和
+  [`login-v6-fixed-320.png`](../.cache/ui-audit-v6/login-v6-fixed-320.png)。
+- 1440/1024/768 档确认 v6 场景、登录卡片、输入焦点和主要文本正常加载；本次没有提交
+  真实账户、Key、Cookie 或 localStorage。
+- 320px 文件只作为渲染器观察样本：当前 Chrome CLI 路径不是 DevTools Protocol 的
+  设备指标覆盖，且自动聚焦会改变初始滚动位置，因此不把它当作横向溢出、焦点顺序或
+  reduced-motion 的通过证据。移动端 CSS 已增加 `width/max-width/min-width` 收敛，真实
+  320px 设备指标仍需可用 CDP 后复核。
+- 本次静态回归通过：Python 模块编译、前端脚本语法、只读 `token_tracker audit --json`
+  和 `git diff --check`；审计结果为 `pass=6 / pending=3 / fail=0`。
+
 ## 尚未关闭的门禁
 
 本证据只覆盖无需创建测试账户的登录运行时。仪表盘、连接、历史和管理员页面仍需在合法认证会话中分别完成截图、空态、错误态和键盘回归；在没有用户提供可用体验账号且项目禁止创建测试数据的情况下，不能把模板静态检查冒充为受保护页面运行时通过。UI-3 总闸门因此继续保持进行中。
