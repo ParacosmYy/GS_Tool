@@ -257,6 +257,13 @@ normalization, validation, and aggregate refresh.
 - [x] CSP `script-src` 收敛为 self，空态错误提示改为本地静态资源语义。
 - [>] 浏览器 CDP 仍需复核图表真实渲染、空态和 reduced-motion。
 
+### Task B15: Android 工具链版本契约
+
+- [x] 按官方 AGP 9.3.0 兼容矩阵固定 Gradle 9.5.0、JDK 17 和 API 37；Compose BOM 固定为 2026.06.00。
+- [x] `android/toolchain-doctor.ps1` 只读校验 JDK 主版本和 Gradle Wrapper distribution，不下载、不改 PATH、不生成 Wrapper。
+- [x] Android README、开发文档、Gradle 配置和 `token_tracker audit` 的契约引用已同步。
+- [>] JDK、官方 Wrapper、SDK API 37/build-tools、APK 构建和设备联调仍待用户批准的工具环境。
+
 ### Task B15: Provider 响应投影边界
 
 - [x] 新增 `provider_projection.py`，将上游响应收敛为有界助手文本和稳定标识符。
