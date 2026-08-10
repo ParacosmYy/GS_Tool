@@ -238,6 +238,46 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
   .button { translate: none; }
 }
 
+/* Respect platform contrast preferences without changing the product's
+   default editorial palette. Decorative light yields to content contrast. */
+@media (prefers-contrast: more) {
+  :root {
+    --ink-soft: #eef1f7;
+    --ink-muted: #d5dae5;
+    --line-soft: rgba(242, 245, 250, .32);
+    --line-visible: rgba(242, 245, 250, .58);
+  }
+
+  .story-backdrop { opacity: .46; }
+  .story-backdrop::before {
+    background:
+      linear-gradient(90deg, rgba(8, 9, 12, .998) 0%, rgba(8, 9, 12, .96) 44%, rgba(8, 9, 12, .78) 100%),
+      linear-gradient(180deg, rgba(8, 9, 12, .72), transparent 34%, rgba(8, 9, 12, .88));
+  }
+
+  .auth-card, .chart-card, .form-card, .records-card, .guide-card, .manual-details {
+    border-color: var(--line-visible);
+    background: rgba(10, 12, 16, .97);
+  }
+
+  input, textarea, select { border-color: var(--line-visible); }
+}
+
+/* Windows forced-colors mode owns the palette. Keep the DOM and focus order,
+   but remove image blending and decorative cursor layers that can obscure it. */
+@media (forced-colors: active) {
+  .story-backdrop, .pointer-aura, .pointer-ring, .ambient-noise, .ambient-light { display: none; }
+  .site-header, .auth-card, .chart-card, .form-card, .records-card, .guide-card, .manual-details {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    color: CanvasText;
+  }
+  input, textarea, select, button { border: 1px solid CanvasText; background: Canvas; color: CanvasText; }
+  a { color: LinkText; }
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid Highlight; }
+}
+
 /* Privacy page: keep governance copy readable without borrowing dashboard density. */
 .site-footer {
   display: flex;

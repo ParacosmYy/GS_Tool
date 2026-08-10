@@ -29,6 +29,8 @@
 - 永久循环只允许使用轨道、呼吸、低频扫描；禁止大面积文字不停抖动。
 - hover 不使用突兀的 `scale(1.1)`；面板最多上移 5px，按钮以颜色/边框/箭头位移反馈。
 - 所有动画必须遵守 `prefers-reduced-motion: reduce`。
+- 当用户启用 `prefers-contrast: more` 或 Windows `forced-colors: active` 时，正文/边框提升对比度，
+  背景图与鼠标装饰降级或移除；表单、链接和键盘焦点仍保持原生语义。
 
 ## 可读性与交互
 
