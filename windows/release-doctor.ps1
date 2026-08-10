@@ -51,7 +51,7 @@ function Invoke-CommandCheck {
     & $Command
     $exitCode = if ($null -eq $LASTEXITCODE) { 0 } else { $LASTEXITCODE }
     if ($exitCode -eq 0) {
-        Add-Result -Name $Name -Status "pass" -Detail "命令通过"
+        Add-Result -Name $Name -Status "pass" -Detail "command passed"
         return
     }
     $status = if ($NonZeroStatus -eq "pass") { "fail" } else { $NonZeroStatus }
@@ -61,7 +61,7 @@ function Invoke-CommandCheck {
 Write-Host "AI Token Tracker release doctor: mode=$Mode"
 
 if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
-    Add-Result -Name "source-runtime" -Status "fail" -Detail "windows/.venv Python 不存在"
+    Add-Result -Name "source-runtime" -Status "fail" -Detail "windows/.venv Python is missing"
 } else {
     $auditRaw = & $python -m token_tracker audit --json 2>&1
     $auditExit = if ($null -eq $LASTEXITCODE) { 0 } else { $LASTEXITCODE }
@@ -73,10 +73,10 @@ if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
         } elseif ([int]$summary.pending -gt 0) {
             Add-Result -Name "source-audit" -Status "pending" -Detail "pass=$($summary.pass) pending=$($summary.pending)"
         } else {
-            Add-Result -Name "source-audit" -Status "pass" -Detail "所有源码审计通过"
+            Add-Result -Name "source-audit" -Status "pass" -Detail "source audit passed"
         }
     } catch {
-        Add-Result -Name "source-audit" -Status "fail" -Detail "审计 JSON 无法解析"
+        Add-Result -Name "source-audit" -Status "fail" -Detail "audit JSON could not be parsed"
     }
 }
 
@@ -100,7 +100,7 @@ if ($Mode -eq "LanPreview") {
 
 if ($Mode -eq "Production") {
     if ([string]::IsNullOrWhiteSpace($Caddyfile) -or [string]::IsNullOrWhiteSpace($LogsDirectory)) {
-        Add-Result -Name "production-deployment" -Status "fail" -Detail "Production 必须同时提供 -Caddyfile 和 -LogsDirectory"
+        Add-Result -Name "production-deployment" -Status "fail" -Detail "Production requires both -Caddyfile and -LogsDirectory"
     } else {
         Invoke-CommandCheck -Name "production-deployment" -Command {
             & (Join-Path $windowsRoot "deployment\share-doctor.ps1") `

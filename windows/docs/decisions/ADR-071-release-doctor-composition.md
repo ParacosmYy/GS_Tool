@@ -23,7 +23,8 @@
 
 ## 验收边界
 
-- 通过：脚本解析、Local 模式输出完整源码/部署/工具链结果、退出码可脚本化、1000 行门禁、敏感参数不进入命令行。
+- 通过：脚本解析、Windows PowerShell 5.1 `.bat` 包装器、Local/LAN/Production 模式输出完整源码/部署/工具链结果、
+  退出码可脚本化、1000 行门禁、敏感参数不进入命令行；编排脚本保持 ASCII，避免无 BOM 的 Windows PowerShell 编码歧义。
 - 待完成：具体机器上的 JDK/Android SDK、PyInstaller、Caddy、真实 Provider Key 和正式部署负责人验收；编排器
   只能准确报告这些外部状态，不能替代安装或实际联调。
 
