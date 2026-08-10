@@ -70,7 +70,7 @@ export function createChartRenderer(numberFormat, formatNumber) {
     const hasSignal = normalized.some((point) => Number(point.input_tokens || 0) + Number(point.output_tokens || 0) > 0);
     if (trendChart) trendChart.destroy();
     if (!window.Chart) {
-      setChartState(canvas, "unavailable", "图表组件未加载", "检查网络后刷新页面");
+      setChartState(canvas, "unavailable", "图表组件未加载", "检查本地静态资源后刷新页面");
       return;
     }
     if (!hasSignal) {
@@ -111,7 +111,7 @@ export function createChartRenderer(numberFormat, formatNumber) {
     const labels = normalized.map((model) => model.model);
     const values = normalized.map((model) => model.total_tokens);
     if (!window.Chart) {
-      setChartState(canvas, "unavailable", "图表组件未加载", "检查网络后刷新页面");
+      setChartState(canvas, "unavailable", "图表组件未加载", "检查本地静态资源后刷新页面");
       legend.replaceChildren();
       return;
     }

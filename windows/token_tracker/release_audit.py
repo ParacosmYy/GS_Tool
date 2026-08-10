@@ -103,6 +103,8 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/deployment/Caddyfile.example",
         "windows/token_tracker/web.py",
         "windows/token_tracker/api_v1.py",
+        "windows/token_tracker/static/vendor/chart.umd.min.js",
+        "windows/token_tracker/static/vendor/CHARTJS-LICENSE.txt",
         "android/app/src/main/AndroidManifest.xml",
     )
     missing = [item for item in required if not (root / item).is_file()]
@@ -143,6 +145,8 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v6.png"),
         ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v6"),
         ("kimi-provider-presets", "windows/token_tracker/templates/dashboard.html", "kimi-code"),
+        ("chartjs-local-reference", "windows/token_tracker/templates/dashboard.html", "vendor/chart.umd.min.js"),
+        ("chartjs-local-csp", "windows/token_tracker/web.py", "script-src 'self';"),
         ("caddy-log-retention", "windows/deployment/Caddyfile.example", "roll_keep 14"),
         ("root-launcher", "start.bat", "call start.bat"),
     )
