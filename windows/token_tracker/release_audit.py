@@ -69,7 +69,9 @@ def format_report(checks: list[AuditCheck], as_json: bool = False) -> str:
     if as_json:
         return json.dumps(
             {"checks": [asdict(check) for check in checks], "summary": counts},
-            ensure_ascii=False,
+            # ASCII escapes keep redirected output valid regardless of the
+            # legacy Windows console code page; CI can decode it as UTF-8.
+            ensure_ascii=True,
             indent=2,
         )
     lines = ["AI Token Tracker release audit (read-only)"]
