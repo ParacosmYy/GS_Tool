@@ -100,11 +100,11 @@
   `login-v8-source-768.png` 与 `login-v8-source-320.png`；1440 档确认主图已进入渲染层，
   768/320 档仅作为 headless renderer observation，不替代 CDP 或真实设备指标。
 - 用户当前保持运行的旧 5000 端口进程仍返回 v7 改造前的模板（缺少显式 `<img>` 和场景样式），
-  因此本轮不终止该进程；重启 Windows 服务后才会加载 v9 源码。5000/5011 均保持 loopback。
+  因此本轮不终止该进程；重启 Windows 服务后才会加载 v10 源码。5000/5011 均保持 loopback。
 
 ## v9 背景资产视觉升级（生成资产与静态证据）
 
-- 当前默认场景已升级为 `embedded-rust-engineer-bg-v9.png`，Android 同步使用
+- v9 阶段默认场景曾升级为 `embedded-rust-engineer-bg-v9.png`，Android 同步使用
   `embedded_rust_engineer_bg_v9.png`；两份 PNG 的 SHA-256 为
   `98E7CD8F291DE1EC2708736B963883CD9C7111CE349F1825C1D40FD8789C54B5`。
 - v9 在保留左侧正文安全区的前提下，增强了角色的温和御姐表情、银色 Pro 形态笔记本、紧凑银色桌面
@@ -147,9 +147,9 @@ Dashboard/Admin 空态、动态错误播报、四档 viewport 和焦点回流观
 图表/记录、导出下载、真实设备指标、实际 reduced-motion/高对比度环境仍需分别复核，不能把隔离
 viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此继续保持进行中。
 
-## v10 场景可见度构图
+## v10 场景可见度构图（v9 资产阶段）
 
-- 当前默认场景使用 v9 同 SHA-256 资产；本轮只调整桌面遮罩和亮度，将右侧角色、Pro
+- 当时默认场景使用 v9 同 SHA-256 资产；本轮只调整桌面遮罩和亮度，将右侧角色、Pro
   笔记本、工作站与示波器从低可见轮廓提升为可识别背景，同时保留左侧正文安全区。
 - 普通模式、`prefers-contrast: more`、`forced-colors: active` 和 `prefers-reduced-motion`
   均保留独立降级路径；背景不参与语义、焦点或业务状态。
@@ -276,3 +276,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   页面没有新增横向溢出。
 - 本轮只覆盖临时源码实例的桌面登录页；真实 320px 设备、系统 reduced-motion/高对比度、受保护页和
   Android 硬件仍保持 UI-3 未关闭，不把截图扩展为正式发布证据。
+
+## v22 v10 场景资产切换（当前）
+
+- 当前默认场景已切换到 `embedded-rust-engineer-bg-v10.png`，Android 同步使用
+  `embedded_rust_engineer_bg_v10.png`；两端 SHA-256 均为
+  `04DBB4FD9F57CBAAA9D5D719D6B562AD4F22B13AF87691638B6B370E8AB2FB7E`。
+- v10 保留左侧深色文案安全区，强化右侧成年二次元嵌入式工程师、Rust/RL 代码与训练曲线、银色
+  专业笔记本、银色紧凑桌面工作站、示波器和实验板的辨识度；图片不承载业务文案、Logo 或水印。
+- v9/v8 继续保留为回滚资产；此次切换只更新 Web/Android 静态资源引用，不改变业务 API、认证、
+  数据库或动效契约。真实设备、系统级 reduced-motion/高对比度和 Android 编译仍待对应门禁。

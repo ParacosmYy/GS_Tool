@@ -225,8 +225,8 @@ normalization, validation, and aggregate refresh.
 
 ### Task B10: Web/Android 场景资产一致性
 
-- [x] Web 切换到 `embedded-rust-engineer-bg-v9.png`，保留 v8 及之前版本作为回滚资产。
-- [x] Android Compose 切换到同一像素资产的 `embedded_rust_engineer_bg_v9.png`，端侧遮罩和漂移实现不互相耦合。
+- [x] Web 切换到 `embedded-rust-engineer-bg-v10.png`，保留 v9/v8 及之前版本作为回滚资产。
+- [x] Android Compose 切换到同一像素资产的 `embedded_rust_engineer_bg_v10.png`，端侧遮罩和漂移实现不互相耦合。
 - [x] 两端资源 SHA-256 一致，资源引用、注释和视觉规范同步。
 - [>] Web v8 四档浏览器证据和 Android 编译/设备视觉验收仍分别等待 CDP 与 Android 工具链门禁。
 
@@ -368,6 +368,7 @@ API / 动画 / 设计 token 契约
 - [x] 首屏轨道/光环、标题扫描、滚动 reveal 和数字变化有统一状态机。
 - [x] 鼠标跟随只提供空间反馈，不干扰点击和键盘。
 - [x] 桌面、平板、手机和 reduced-motion 状态均有静态可用内容。
+- [x] v10 场景资产强化成熟二次元嵌入式工程师、Rust/RL 屏幕语义、专业笔记本和银色桌面工作站；v9/v8 保留回滚（ADR-076）。
 
 ### Phase 5：七槽位复核
 

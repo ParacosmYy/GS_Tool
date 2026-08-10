@@ -199,7 +199,7 @@ private fun AnimatedBrandBackdrop() {
         label = "brand-backdrop-y",
     )
     Image(
-        painter = painterResource(R.drawable.embedded_rust_engineer_bg_v9),
+        painter = painterResource(R.drawable.embedded_rust_engineer_bg_v10),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier
