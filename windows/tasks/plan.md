@@ -97,6 +97,7 @@ normalization, validation, and aggregate refresh.
 - [x] 提供 `python -m token_tracker backup`，使用 SQLite online backup API 生成时间戳副本。
 - [x] 备份发布前执行 `PRAGMA integrity_check`，使用临时文件和原子替换避免暴露半成品。
 - [x] 默认备份目录固定在数据库旁的 `backups/`，不进入网站静态目录，不上传云端。
+- [x] 当前 schema 必要表包含 `usage_ingest_tokens`，同一秒重复备份使用唯一后缀避免覆盖（ADR-060）。
 - [ ] 正式部署仍需管理员按策略执行恢复演练、HTTPS、限流和访问日志脱敏。
 
 ## Next Iteration — Application boundary alignment
@@ -187,7 +188,7 @@ normalization, validation, and aggregate refresh.
 
 - [x] `backup.verify_backup` 执行 integrity、foreign key 和必要表检查。
 - [x] 新增 `verify-backup` CLI，不修改当前数据库、不覆盖备份、不输出敏感数据。
-- [x] ADR-025、README 和部署说明已同步；staging 恢复演练保留为后续部署门禁。
+- [x] ADR-025/060、README 和部署说明已同步；staging 恢复演练保留为后续部署门禁。
 
 ### Task B5: 共享/生产部署只读预检
 

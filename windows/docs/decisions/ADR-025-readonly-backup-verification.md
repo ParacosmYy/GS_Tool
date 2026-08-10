@@ -18,7 +18,7 @@ Accepted
 
 - 新增 `python -m token_tracker verify-backup --path <backup.sqlite3>`；
 - 命令以 SQLite read-only URI 打开文件，执行 `integrity_check`、`foreign_key_check` 和
-  必要表检查；
+  必要表检查（包括 `usage_ingest_tokens` 当前生产表）；
 - 只输出路径和验证摘要，不输出账户、日志、token 或密钥内容；
 - 命令不修改备份、不修改当前数据库、不删除旧文件；
 - 真正的恢复演练仍需管理员提供明确 staging 目标，并单独记录结果。

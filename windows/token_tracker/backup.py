@@ -16,6 +16,7 @@ from contextlib import closing
 import os
 import sqlite3
 from pathlib import Path
+import uuid
 
 from . import db
 
@@ -43,8 +44,8 @@ def create_backup(
     target_dir.mkdir(parents=True, exist_ok=True)
     stamp = db.local_now().strftime("%Y%m%d-%H%M%S")
     target = target_dir / f"token_tracker-{stamp}.sqlite3"
-    if target.exists():
-        target = target_dir / f"token_tracker-{stamp}-{os.getpid()}.sqlite3"
+    while target.exists():
+        target = target_dir / f"token_tracker-{stamp}-{os.getpid()}-{uuid.uuid4().hex[:8]}.sqlite3"
     partial = target.with_name(f".{target.name}.partial")
     if partial.exists():
         raise BackupError(f"临时备份文件已存在，请先处理：{partial}")
@@ -96,6 +97,7 @@ def verify_backup(backup_path: str | os.PathLike[str] | Path) -> dict[str, objec
         "users",
         "usage_records",
         "auth_tokens",
+        "usage_ingest_tokens",
         "work_events",
         "app_logs",
         "audit_events",

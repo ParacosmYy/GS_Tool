@@ -129,6 +129,7 @@
 - [x] 应用层访问日志只记录脱敏 method/path/status/duration/request_id；不记录 query、Header、Cookie、Key、IP 或 body，并过滤 Werkzeug 默认 request-line（ADR-032）。
 - [>] ADR-032 已提供 Caddy 显式日志过滤模板；正式 HTTPS 主机上的 Caddy validate、ACL、轮转和真实日志样本仍待部署权限。
 - [x] ADR-028 备份恢复边界通过隔离空 schema staging 演练；Windows SQLite 连接显式关闭，避免文件句柄阻塞原子发布。
+- [x] 备份验证覆盖当前 `usage_ingest_tokens` schema，重复秒级备份使用唯一后缀避免覆盖（ADR-060）。
 - [x] ADR-033 提供只读 Caddy/日志目录/宽泛 ACL 预检器；当前环境未安装 Caddy，真实 edge validate 仍待正式部署环境。
 - [x] ADR-034 将 `windows/start-lan.bat` 收敛为带 `SHARE` 确认的 canonical LAN 预览 wrapper，消除无确认绑定 `0.0.0.0` 的入口。
 - [x] ADR-035 补齐 data 子目录 SQLite、backups、staging 的仓库忽略边界，避免敏感数据库误提交。
