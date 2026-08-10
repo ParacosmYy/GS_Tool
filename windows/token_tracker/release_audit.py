@@ -729,12 +729,15 @@ def _check_external_tool_gates(root: Path, checks: list[AuditCheck]) -> None:
             else f"等待 {', '.join(android_missing)}",
         )
     )
-    caddy_ready = shutil.which("caddy") is not None
+    project_caddy = root / "windows/.cache/caddy/2.11.4/caddy.exe"
+    caddy_ready = shutil.which("caddy") is not None or project_caddy.is_file()
     checks.append(
         AuditCheck(
             "edge-toolchain",
             PASS if caddy_ready else PENDING,
-            "Caddy 可用" if caddy_ready else "Caddy 未安装，正式 edge validate 待部署主机",
+            "Caddy 系统命令或项目缓存可用"
+            if caddy_ready
+            else "Caddy 未安装，运行 provision-caddy.ps1 或准备部署主机",
         )
     )
 
