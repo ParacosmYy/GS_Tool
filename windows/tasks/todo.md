@@ -92,6 +92,7 @@
 - [x] UI-3 v17：Dashboard/Admin 320/768/1024/1440 viewport、无横向溢出、四档焦点和明细焦点回流运行时证据
 - [x] UI-3 v18：隔离合法会话下历史非空、周期切换、服务端 CSV 200、Provider 502 错误态和 ARIA 恢复运行时证据
 - [>] UI-3 v19：个人工作信号写入、最近活动历史、错误播报、响应式表格与隐私边界运行时证据
+- [x] UI-3 v23：认证页唯一语义 h1 与 aria-hidden glitch 视觉层、键盘顺序、无横向溢出和控制台无错误证据
 - [x] `token_tracker audit` 增加 Web UI 静态契约门禁：label、table caption/scope、图片 alt、跳过链接和动效降级（ADR-063）
 - [x] `token_tracker audit` 扩展代码/配置/文档文本 1000 行门禁，作者头仍按自有代码边界检查（ADR-064）
 - [x] UI-3 v14：Dashboard glitch 标题的装饰副本从无障碍树隔离，保留一次稳定可读标题

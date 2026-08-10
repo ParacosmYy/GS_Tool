@@ -91,7 +91,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   letter-spacing: -.115em;
   text-shadow: 0 0 34px rgba(255,255,255,.04);
 }
-.display-title em { color: var(--signal-lavender); }
+.display-title-visual em { color: var(--signal-lavender); }
 .intro-copy { max-width: 540px; color: var(--ink-soft); font-size: 15px; line-height: 1.85; }
 .feature-lines { border-color: var(--line-soft); }
 .feature-lines span { color: var(--ink-muted); border-color: var(--line-soft); animation: ui-line-in .54s var(--ui-ease) .34s both; }

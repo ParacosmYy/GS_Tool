@@ -1,4 +1,4 @@
-<!-- Author: AI Token Tracker Engineering Team | Maintainer: Project Owner -->
+<!-- Author: AI Token Tracker Engineering Team | Maintainer: Project Owner | Purpose: Accessible registration surface | Module: Web auth presentation -->
 {% extends "base.html" %}
 {% block title %}注册 · AI Token Tracker{% endblock %}
 {% block content %}
@@ -11,7 +11,8 @@
     </div>
     <div class="scene-signature" aria-hidden="true"><span>RUST / RL WORKBENCH</span><i></i><span>MACBOOK / STUDIO SCENE</span></div>
     <p class="eyebrow">YOUR PRIVATE / LOCAL LEDGER</p>
-    <h1 class="display-title" data-text="TRACK THE FLOW" aria-label="TRACK THE FLOW.">TRACK THE<br><em>FLOW.</em></h1>
+    <h1 class="sr-only">TRACK THE FLOW.</h1>
+    <div class="display-title" aria-hidden="true"><span class="display-title-visual" data-text="TRACK THE FLOW">TRACK THE<br><em>FLOW.</em></span></div>
     <p class="muted intro-copy">连接兼容接口后自动读取 usage。每一次真实调用都会成为你的模型地图，历史异常再用补录修正。</p>
     <div class="feature-lines">
       <span><b>01</b> Daily / weekly / monthly</span>

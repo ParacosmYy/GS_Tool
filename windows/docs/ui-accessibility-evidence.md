@@ -286,3 +286,17 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   专业笔记本、银色紧凑桌面工作站、示波器和实验板的辨识度；图片不承载业务文案、Logo 或水印。
 - v9/v8 继续保留为回滚资产；此次切换只更新 Web/Android 静态资源引用，不改变业务 API、认证、
   数据库或动效契约。真实设备、系统级 reduced-motion/高对比度和 Android 编译仍待对应门禁。
+
+## v23 认证页 glitch 标题语义层修复
+
+- 在当前 checkout 启动的隔离源码实例 `127.0.0.1:5019` 中复核登录/注册页；数据库位于临时目录，
+  未读取真实数据库、Cookie、Key 或令牌，验证结束后临时进程已停止且临时 SQLite 已删除。
+- 发现并修复认证页 `h1` 的 CSS generated content 可能被无障碍树重复观察的问题：语义层改为唯一的
+  `sr-only` `h1`，视觉层使用相邻 `aria-hidden` 容器承载分行字形和 glitch 伪元素。登录页
+  `getByRole('heading', name="SEE THE SIGNAL.")`、注册页 `getByRole('heading', name="TRACK THE FLOW.")`
+  均返回 1 个，且每页只有 1 个 `h1`。
+- 当前源码实例截图确认注册页 v10 角色、笔记本、银色桌面工作站和示波器仍可见；键盘顺序为用户名、
+  密码、提交、页内链接、隐私链接；登录/注册页面级 `scrollWidth` 等于 `clientWidth`，应用控制台
+  error/warning 为空。
+- 该切片只关闭认证标题重复语义风险；真实系统 `prefers-reduced-motion`、高对比度/forced-colors、
+  真实设备指标、下载落盘和 Provider 成功仍保持 UI-3 未关闭门禁。

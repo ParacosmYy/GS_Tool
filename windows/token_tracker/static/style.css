@@ -163,10 +163,11 @@ h2 span { margin-left: 8px; color: var(--copy-dim); font-family: "DM Mono", mono
 .auth-orbit-core::before { width: 6px; height: 6px; border-radius: 50%; content: ""; background: var(--signal); box-shadow: 0 0 16px 4px rgba(201,198,255,.64); animation: auth-core-dot 2.4s ease-in-out infinite; }
 .auth-orbit-label { position: absolute; right: -40px; bottom: 26px; color: var(--copy-dim); font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: .14em; transform: rotate(-90deg); transform-origin: left center; animation: auth-label-flicker 5s steps(1, end) infinite; }
 .display-title { position: relative; margin: 0 0 28px; color: var(--copy); font-size: clamp(57px, 8vw, 110px); font-weight: 800; line-height: .82; letter-spacing: -.105em; }
-.display-title::before, .display-title::after { position: absolute; inset: 0; color: var(--copy); content: attr(data-text); pointer-events: none; opacity: 0; }
-.display-title::before { color: var(--hot); animation: glitch-a 9s steps(1, end) infinite; mix-blend-mode: screen; }
-.display-title::after { color: var(--signal); animation: glitch-b 9s steps(1, end) infinite; mix-blend-mode: screen; }
-.display-title em { color: var(--signal); font-style: normal; }
+.display-title-visual { position: relative; display: block; color: var(--copy); }
+.display-title-visual::before, .display-title-visual::after { position: absolute; inset: 0; color: var(--copy); content: attr(data-text); pointer-events: none; opacity: 0; }
+.display-title-visual::before { color: var(--hot); animation: glitch-a 9s steps(1, end) infinite; mix-blend-mode: screen; }
+.display-title-visual::after { color: var(--signal); animation: glitch-b 9s steps(1, end) infinite; mix-blend-mode: screen; }
+.display-title-visual em { color: var(--signal); font-style: normal; }
 .intro-copy { max-width: 470px; margin-bottom: 28px; font-size: 14px; line-height: 1.8; }
 .feature-lines { display: grid; max-width: 450px; border-top: 1px solid var(--line); }
 .feature-lines span { display: flex; gap: 17px; align-items: center; min-height: 39px; border-bottom: 1px solid var(--line); color: var(--muted); font-family: "DM Mono", monospace; font-size: 10px; opacity: 0; animation: auth-line-in .7s var(--ease-out) .64s both; }

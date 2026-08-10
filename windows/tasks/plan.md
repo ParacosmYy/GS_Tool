@@ -315,6 +315,16 @@ normalization, validation, and aggregate refresh.
 - [>] 已用隔离缺失/非备份目录验证 JSON、退出码和“不创建目录”边界；满足策略、失败策略和真实候选文件 `--verify` 演练仍需批准的备份样本。
 - [>] 真实部署仍需负责人确认保留周期、离线副本和恢复责任人。
 
+### Task B21: 认证页视觉与语义标题分层
+
+**目标：** 保留认证页 glitch 视觉表现，同时让无障碍树只暴露一个稳定标题，避免 CSS generated
+content 复制层参与语义名称。
+
+- [x] 登录/注册页使用唯一 `sr-only` `h1`，装饰字形与 glitch 伪元素移入 `aria-hidden` 视觉层。
+- [x] 当前 checkout 隔离源码实例验证两页 heading role 唯一、键盘顺序、无横向溢出和控制台日志。
+- [x] ADR-063、UI-3 证据、角色复核、发布矩阵和任务清单已同步。
+- [>] 真实系统 reduced-motion、高对比度/forced-colors 和真实设备指标仍待部署级浏览器/设备门禁。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。
