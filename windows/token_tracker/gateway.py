@@ -154,6 +154,8 @@ def create_gateway_app(config: GatewayConfig) -> Flask:
 
     @app.before_request
     def guard_request() -> Any:
+        """Attach a correlation id and enforce the gateway bearer boundary."""
+
         g.request_id = request_ids.resolve(request.headers.get(request_ids.HEADER_NAME))
         if request.path == "/health" or _authorized(config):
             return
@@ -162,26 +164,36 @@ def create_gateway_app(config: GatewayConfig) -> Flask:
 
     @app.after_request
     def add_gateway_headers(response: Response) -> Response:
+        """Apply no-store and correlation headers to every gateway response."""
+
         response.headers.setdefault("Cache-Control", "no-store")
         response.headers.setdefault(request_ids.HEADER_NAME, getattr(g, "request_id", "unknown"))
         return response
 
     @app.errorhandler(413)
     def request_too_large(_exception: Any) -> tuple[Response, int]:
+        """Return a bounded error when a client exceeds the gateway limit."""
+
         return _error("REQUEST_TOO_LARGE", "gateway 请求超过大小限制", 413)
 
     @app.get("/health")
     def health() -> Response:
+        """Expose gateway liveness without requiring the gateway bearer token."""
+
         return jsonify({"status": "ok", "protocol_version": 1, "mode": "local-gateway"})
 
     @app.get("/v1/models")
     @app.get("/models")
     def models() -> Any:
+        """Forward model discovery through the configured upstream adapter."""
+
         return _list_models(config)
 
     @app.post("/v1/chat/completions")
     @app.post("/chat/completions")
     def chat_completions() -> Any:
+        """Forward a chat request and report usage through the ingest contract."""
+
         return _chat_completions(config, app.extensions["usage_reporter"])
 
     return app
@@ -357,6 +369,8 @@ def _stream_response(
 
     @stream_with_context
     def generate() -> Any:
+        """Yield bounded upstream SSE chunks and append tracker usage status."""
+
         final_status = "missing"
         total_bytes = 0
         try:
@@ -413,6 +427,8 @@ class _SSEUsageAccumulator:
         self.usage: dict[str, Any] | None = None
 
     def feed(self, chunk: bytes) -> None:
+        """Consume one response chunk while retaining only event metadata."""
+
         self._buffer += chunk.decode("utf-8", errors="replace")
         self._buffer = self._buffer.replace("\r\n", "\n").replace("\r", "\n")
         if len(self._buffer.encode("utf-8")) > self._maximum_buffer_bytes:
@@ -422,11 +438,15 @@ class _SSEUsageAccumulator:
             self._consume_event(event)
 
     def finish(self) -> None:
+        """Flush the final partial SSE event and release its bounded buffer."""
+
         if self._buffer.strip():
             self._consume_event(self._buffer)
         self._buffer = ""
 
     def usage_values(self) -> tuple[dict[str, Any] | None, Any, Any]:
+        """Return normalized usage fields collected from completed SSE events."""
+
         if self.usage is None:
             return None, None, None
         input_tokens = self.usage.get("prompt_tokens", self.usage.get("input_tokens", self.usage.get("promptTokens")))

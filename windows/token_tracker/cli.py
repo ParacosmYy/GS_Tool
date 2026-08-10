@@ -19,6 +19,8 @@ from .services import UsageValidationError, add_usage, query_range
 
 
 def non_negative_int(value: str) -> int:
+    """Parse a CLI integer that may be zero but never negative."""
+
     try:
         parsed = int(value)
     except ValueError as exc:
@@ -29,6 +31,8 @@ def non_negative_int(value: str) -> int:
 
 
 def positive_int(value: str) -> int:
+    """Parse a CLI integer that must be greater than zero."""
+
     try:
         parsed = int(value)
     except ValueError as exc:
@@ -39,6 +43,8 @@ def positive_int(value: str) -> int:
 
 
 def port_number(value: str) -> int:
+    """Parse a TCP port within the IANA 1-65535 range."""
+
     parsed = positive_int(value)
     if parsed > 65535:
         raise argparse.ArgumentTypeError("port must be between 1 and 65535")
@@ -46,6 +52,8 @@ def port_number(value: str) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the stable command tree without executing a command."""
+
     parser = argparse.ArgumentParser(
         prog="ai-token-tracker",
         description="记录、汇总并导出不同 AI 模型的 token 用量。时间按本地时间处理。",
@@ -185,6 +193,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def add_range_arguments(parser: argparse.ArgumentParser) -> None:
+    """Attach the shared local-time period and date-range options."""
+
     parser.add_argument(
         "--period",
         choices=("day", "week", "month", "all"),
@@ -196,17 +206,23 @@ def add_range_arguments(parser: argparse.ArgumentParser) -> None:
 
 
 def get_user(args: argparse.Namespace, database: Path) -> dict:
+    """Initialize the CLI database and resolve its bounded local user."""
+
     db.init_db(database)
     return db.get_or_create_cli_user(args.user, database)
 
 
 def cmd_init(args: argparse.Namespace) -> int:
+    """Create the configured SQLite schema and report its path."""
+
     database = db.init_db(args.db)
     print(f"数据库已初始化：{database}")
     return 0
 
 
 def cmd_add(args: argparse.Namespace) -> int:
+    """Validate and append one CLI usage record."""
+
     database = db.get_db_path(args.db)
     user = get_user(args, database)
     try:
@@ -231,10 +247,14 @@ def cmd_add(args: argparse.Namespace) -> int:
 
 
 def format_number(value: int) -> str:
+    """Format a token count with stable thousands separators."""
+
     return f"{int(value):,}"
 
 
 def print_table(rows: Iterable[dict], columns: list[tuple[str, str]]) -> None:
+    """Render bounded tabular projections without a third-party dependency."""
+
     materialized = [[str(row[key]) for key, _ in columns] for row in rows]
     headers = [title for _, title in columns]
     widths = [len(header) for header in headers]
@@ -248,6 +268,8 @@ def print_table(rows: Iterable[dict], columns: list[tuple[str, str]]) -> None:
 
 
 def cmd_summary(args: argparse.Namespace) -> int:
+    """Print model-level and total usage for one validated local range."""
+
     database = db.get_db_path(args.db)
     user = get_user(args, database)
     try:
@@ -293,6 +315,8 @@ def cmd_summary(args: argparse.Namespace) -> int:
 
 
 def cmd_export(args: argparse.Namespace) -> int:
+    """Write one bounded, BOM-compatible usage CSV to an explicit path."""
+
     database = db.get_db_path(args.db)
     user = get_user(args, database)
     try:
@@ -378,6 +402,8 @@ def cmd_audit(args: argparse.Namespace) -> int:
 
 
 def cmd_serve(args: argparse.Namespace) -> int:
+    """Start the selected local, LAN, or production web runtime."""
+
     from .web import create_app
     from .settings import build_settings
 
@@ -564,6 +590,8 @@ def cmd_ingest_token(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Parse arguments, dispatch one command, and map Ctrl+C to a CLI exit."""
+
     parser = build_parser()
     args = parser.parse_args(argv)
     try:

@@ -155,12 +155,16 @@ def ingest_usage() -> Response:
 @api_v1.get("/me")
 @_required_user
 def me() -> Response:
+    """Return the authenticated user's bounded profile projection."""
+
     return jsonify({"user": {"id": g.user["id"], "username": g.user["username"], "role": g.user.get("role", "user")}})
 
 
 @api_v1.get("/me/summary")
 @_required_user
 def me_summary() -> Response:
+    """Return one user's validated local-time usage summary."""
+
     try:
         payload = usage_summary(
             user_id=g.user["id"],
@@ -177,6 +181,8 @@ def me_summary() -> Response:
 @api_v1.get("/events/work")
 @_required_user
 def get_work_events() -> Response:
+    """Return a bounded page of the authenticated user's work events."""
+
     try:
         limit = int(request.args.get("limit", "50"))
     except ValueError:
@@ -296,6 +302,8 @@ def proxy_chat_completions() -> Response:
 @api_v1.post("/events/work")
 @_required_user
 def create_work_event() -> Response:
+    """Validate and persist one user-scoped work event or idempotent replay."""
+
     payload = _payload()
     if payload is None:
         return error_response("BAD_REQUEST", "请求 JSON 必须是对象", 400)
@@ -312,6 +320,8 @@ def create_work_event() -> Response:
 @api_v1.get("/logs")
 @_required_user
 def get_logs() -> Response:
+    """Return a bounded page of the authenticated user's diagnostic logs."""
+
     try:
         limit = max(1, min(int(request.args.get("limit", "50")), 200))
     except ValueError:
@@ -330,6 +340,8 @@ def get_logs() -> Response:
 @api_v1.post("/logs")
 @_required_user
 def create_log() -> Response:
+    """Validate and persist one bounded, privacy-filtered application log."""
+
     payload = _payload()
     if payload is None:
         return error_response("BAD_REQUEST", "请求 JSON 必须是对象", 400)
@@ -344,12 +356,16 @@ def create_log() -> Response:
 @api_v1.get("/admin/overview")
 @_required_admin
 def admin_overview() -> Response:
+    """Return the server-authorized administrator team overview."""
+
     return jsonify(admin_service.get_overview(g.user["id"], g.request_id, _database()))
 
 
 @api_v1.get("/admin/users")
 @_required_admin
 def admin_users() -> Response:
+    """Return the bounded administrator member read model."""
+
     return jsonify(admin_service.list_users(
         g.user["id"], g.request_id, _database(), request.args.get("limit"), request.args.get("offset")
     ))
@@ -358,6 +374,8 @@ def admin_users() -> Response:
 @api_v1.get("/admin/users/<int:user_id>/records")
 @_required_admin
 def admin_user_activity(user_id: int) -> Response:
+    """Return bounded activity for one member after server-side RBAC."""
+
     activity = admin_service.get_user_activity(
         g.user["id"], user_id, g.request_id, _database(), request.args.get("limit")
     )
@@ -369,6 +387,8 @@ def admin_user_activity(user_id: int) -> Response:
 @api_v1.get("/admin/export")
 @_required_admin
 def admin_export() -> Response:
+    """Export one fixed administrator data projection within safety limits."""
+
     kind = str(request.args.get("kind", "usage") or "usage").strip().lower()
     try:
         csv_bytes = admin_service.export_csv(g.user["id"], kind, g.request_id, _database())
@@ -388,6 +408,8 @@ def admin_export() -> Response:
 
 @api_v1.get("/health")
 def health() -> Response:
+    """Report process liveness without touching business data."""
+
     return jsonify({"status": "ok", "protocol_version": 1})
 
 

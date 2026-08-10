@@ -79,7 +79,10 @@ class ProviderAdapter(Protocol):
         allow_http: bool,
         allow_stream: bool = False,
         user_agent: Any = None,
-    ) -> ChatRequest: ...
+    ) -> ChatRequest:
+        """Validate and normalize a provider chat request."""
+
+        ...
 
     def list_models(
         self,
@@ -88,15 +91,30 @@ class ProviderAdapter(Protocol):
         allowed_base_urls: list[str],
         allow_http: bool,
         timeout: int,
-    ) -> requests.Response: ...
+    ) -> requests.Response:
+        """Fetch the provider's model catalog."""
 
-    def call_chat(self, request_data: ChatRequest, timeout: int) -> requests.Response: ...
+        ...
 
-    def extract_model_ids(self, response_json: Any) -> list[str]: ...
+    def call_chat(self, request_data: ChatRequest, timeout: int) -> requests.Response:
+        """Execute one validated provider chat request."""
 
-    def extract_usage(self, response_json: Any) -> tuple[dict[str, Any] | None, Any, Any]: ...
+        ...
 
-    def decode_response(self, response: requests.Response, maximum_bytes: int) -> Any: ...
+    def extract_model_ids(self, response_json: Any) -> list[str]:
+        """Project provider model metadata into stable model identifiers."""
+
+        ...
+
+    def extract_usage(self, response_json: Any) -> tuple[dict[str, Any] | None, Any, Any]:
+        """Extract input and output usage aliases from a provider response."""
+
+        ...
+
+    def decode_response(self, response: requests.Response, maximum_bytes: int) -> Any:
+        """Decode one bounded provider response into JSON data."""
+
+        ...
 
 
 class OpenAICompatibleAdapter:
@@ -112,6 +130,8 @@ class OpenAICompatibleAdapter:
         allow_stream: bool = False,
         user_agent: Any = None,
     ) -> ChatRequest:
+        """Delegate request validation to the OpenAI-compatible boundary."""
+
         return prepare_chat_request(
             payload,
             allowed_base_urls,
@@ -128,18 +148,28 @@ class OpenAICompatibleAdapter:
         allow_http: bool,
         timeout: int,
     ) -> requests.Response:
+        """Delegate model discovery to the OpenAI-compatible boundary."""
+
         return list_models(base_url, api_key, allowed_base_urls, allow_http, timeout)
 
     def call_chat(self, request_data: ChatRequest, timeout: int) -> requests.Response:
+        """Delegate one chat request to the OpenAI-compatible transport."""
+
         return call_chat(request_data, timeout)
 
     def extract_usage(self, response_json: Any) -> tuple[dict[str, Any] | None, Any, Any]:
+        """Delegate usage extraction to the shared response projector."""
+
         return extract_usage(response_json)
 
     def extract_model_ids(self, response_json: Any) -> list[str]:
+        """Delegate model projection to the shared response projector."""
+
         return extract_model_ids(response_json)
 
     def decode_response(self, response: requests.Response, maximum_bytes: int) -> Any:
+        """Delegate bounded response decoding to the shared transport helper."""
+
         return decode_json_response(response, maximum_bytes)
 
 
@@ -160,6 +190,8 @@ def resolve_provider_adapter(provider: Any = "auto") -> ProviderAdapter:
 
 
 def required_text(value: Any, field_name: str, maximum: int = 4096) -> str:
+    """Require a bounded, non-empty text value at the provider boundary."""
+
     text = str(value or "").strip()
     if not text:
         raise UsageValidationError(f"{field_name} is required")

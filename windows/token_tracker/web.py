@@ -45,6 +45,8 @@ from .settings import build_settings, resolve_database
 
 
 def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
+    """Compose the modular Flask application around one configured database."""
+
     app = Flask(__name__, template_folder="templates", static_folder="static")
     access_logging.install_server_log_filters()
     configured_db = resolve_database(db_path)
@@ -58,6 +60,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
 
     @app.before_request
     def load_current_user() -> None:
+        """Resolve session or bearer identity and enforce browser CSRF policy."""
+
         # A short correlation id lets a user report one failing request without
         # putting provider credentials or traceback details into the response.
         g.request_id = request_ids.resolve(request.headers.get(request_ids.HEADER_NAME))
@@ -87,6 +91,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
 
     @app.after_request
     def add_security_headers(response: Response) -> Response:
+        """Apply the shared browser security, cache, and request-id headers."""
+
         # Keep this policy close to response creation: a new page or JSON route
         # should inherit the same browser boundary without remembering headers.
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
@@ -125,10 +131,14 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
 
     @app.context_processor
     def inject_template_values() -> dict[str, Any]:
+        """Expose request-scoped template values without leaking credentials."""
+
         return {"csrf_token": get_csrf_token()}
 
     @app.get("/")
     def index() -> Response:
+        """Route visitors to the appropriate authenticated application surface."""
+
         if not g.user:
             return redirect(url_for("login"))
         return redirect(url_for("admin" if g.user.get("role") == "admin" else "dashboard"))
@@ -147,6 +157,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
 
     @app.route("/register", methods=["GET", "POST"])
     def register() -> str | Response:
+        """Render registration and create a local account with rate limiting."""
+
         if g.user:
             return redirect(url_for("admin" if g.user.get("role") == "admin" else "dashboard"))
         if request.method == "POST":
@@ -173,6 +185,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
 
     @app.route("/login", methods=["GET", "POST"])
     def login() -> str | Response:
+        """Authenticate a local account and establish a browser session."""
+
         if g.user:
             return redirect(url_for("admin" if g.user.get("role") == "admin" else "dashboard"))
         if request.method == "POST":
@@ -194,23 +208,31 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
     @app.post("/logout")
     @login_required
     def logout() -> Response:
+        """Clear the current browser session and return to login."""
+
         session.clear()
         return redirect(url_for("login"))
 
     @app.get("/dashboard")
     @login_required
     def dashboard() -> str:
+        """Render the personal usage dashboard shell."""
+
         return render_template("dashboard.html", user=g.user)
 
     @app.get("/admin")
     @admin_required
     def admin() -> str:
+        """Render the administrator overview shell and record the page view."""
+
         admin_service.record_page_view(g.user["id"], g.request_id, app.config["DATABASE"])
         return render_template("admin.html", user=g.user)
 
     @app.get("/api/summary")
     @login_required
     def api_summary() -> Response:
+        """Return the current user's aggregated dashboard summary as JSON."""
+
         try:
             payload = usage_summary(
                 user_id=g.user["id"],
@@ -226,6 +248,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
     @app.route("/api/records", methods=["GET", "POST"])
     @login_required
     def api_records() -> Response:
+        """List or append the current user's usage records."""
+
         if request.method == "GET":
             try:
                 payload = usage_records_page(
@@ -261,6 +285,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
     @app.get("/api/export")
     @login_required
     def api_export() -> Response:
+        """Download the current user's bounded usage range as CSV."""
+
         try:
             csv_bytes = export_usage_csv(
                 user_id=g.user["id"],
@@ -309,6 +335,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
     @app.post("/api/proxy/chat/completions")
     @login_required
     def proxy_chat_completions() -> Response:
+        """Proxy one allowlisted provider call and persist returned usage."""
+
         if not rate_limit.allow("proxy", str(g.user["id"]), 30, 60):
             return error_response("RATE_LIMITED", "代理请求过于频繁，请稍后再试", 429)
         payload = request.get_json(silent=True)
@@ -339,10 +367,14 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
 
     @app.get("/api/health")
     def health() -> Response:
+        """Expose a minimal liveness response without authentication data."""
+
         return jsonify(status="ok")
 
     @app.errorhandler(400)
     def bad_request(error: Any) -> tuple[Response, int]:
+        """Render validation and CSRF failures in page or JSON form."""
+
         description = getattr(error, "description", "请求无效")
         if request.path.startswith("/api/"):
             code = "CSRF_INVALID" if str(description).startswith("CSRF") else "BAD_REQUEST"
@@ -351,24 +383,32 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
 
     @app.errorhandler(404)
     def not_found(error: Any) -> tuple[Response, int]:
+        """Render a consistent not-found response for pages and APIs."""
+
         if request.path.startswith("/api/"):
             return error_response("NOT_FOUND", "请求的资源不存在", 404)
         return render_template("error.html", title="页面不存在", message="请求的页面不存在"), 404
 
     @app.errorhandler(405)
     def method_not_allowed(error: Any) -> tuple[Response, int]:
+        """Render a consistent method-not-allowed response for pages and APIs."""
+
         if request.path.startswith("/api/"):
             return error_response("METHOD_NOT_ALLOWED", "当前请求方法不受支持", 405)
         return render_template("error.html", title="操作不支持", message="当前请求方法不受支持"), 405
 
     @app.errorhandler(413)
     def request_too_large(error: Any) -> tuple[Response, int]:
+        """Render a consistent payload-size error for pages and APIs."""
+
         if request.path.startswith("/api/"):
             return error_response("PAYLOAD_TOO_LARGE", "请求内容过大，最大支持 256 KB", 413)
         return render_template("error.html", title="请求过大", message="请求内容过大，最大支持 256 KB"), 413
 
     @app.errorhandler(500)
     def internal_error(error: Any) -> tuple[Response, int]:
+        """Render a safe generic server error without exposing traceback data."""
+
         if request.path.startswith("/api/"):
             return error_response("INTERNAL_ERROR", "服务器内部错误", 500)
         return render_template("error.html", title="服务器错误", message="服务器暂时无法完成请求"), 500
@@ -377,6 +417,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
 
 
 def login_required(view: Callable[..., Any]) -> Callable[..., Any]:
+    """Require an authenticated session or bearer token for a route."""
+
     @wraps(view)
     def wrapped(*args: Any, **kwargs: Any) -> Any:
         if g.user is None:
@@ -408,6 +450,8 @@ def admin_required(view: Callable[..., Any]) -> Callable[..., Any]:
 
 
 def get_csrf_token() -> str:
+    """Return the current browser CSRF token, creating it when necessary."""
+
     token = session.get("csrf_token")
     if not token:
         token = secrets.token_urlsafe(32)

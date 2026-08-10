@@ -9,6 +9,7 @@ Module: Delivery / release audit application boundary
 
 from __future__ import annotations
 
+import ast
 from dataclasses import asdict, dataclass
 import hashlib
 import json
@@ -62,6 +63,7 @@ def run_audit(root: Path | None = None) -> list[AuditCheck]:
     _check_contract_references(project_root, checks)
     _check_source_line_cap(project_root, checks)
     _check_source_headers(project_root, checks)
+    _check_public_api_docstrings(project_root, checks)
     _check_scene_assets(project_root, checks)
     _check_chartjs_asset(project_root, checks)
     _check_runtime_dependencies(checks)
@@ -203,6 +205,35 @@ def _check_source_headers(root: Path, checks: list[AuditCheck]) -> None:
         checks.append(AuditCheck("source-headers", FAIL, f"{len(missing)} 个文件缺少作者头"))
     else:
         checks.append(AuditCheck("source-headers", PASS, "自有源文件均包含作者头（vendor 已排除）"))
+
+
+def _check_public_api_docstrings(root: Path, checks: list[AuditCheck]) -> None:
+    """Require docstrings on public module definitions and class methods."""
+
+    missing: list[str] = []
+    package_root = root / "windows/token_tracker"
+    for path in sorted(package_root.glob("*.py")):
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        except (OSError, UnicodeDecodeError, SyntaxError):
+            missing.append(path.relative_to(root).as_posix())
+            continue
+        for node in tree.body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                if not node.name.startswith("_") and ast.get_docstring(node) is None:
+                    missing.append(f"{path.name}:{node.lineno}:{node.name}")
+                if isinstance(node, ast.ClassDef):
+                    for member in node.body:
+                        if (
+                            isinstance(member, (ast.FunctionDef, ast.AsyncFunctionDef))
+                            and not member.name.startswith("_")
+                            and ast.get_docstring(member) is None
+                        ):
+                            missing.append(f"{path.name}:{member.lineno}:{node.name}.{member.name}")
+    if missing:
+        checks.append(AuditCheck("public-api-docstrings", FAIL, f"{len(missing)} 个公开接口缺少 docstring"))
+    else:
+        checks.append(AuditCheck("public-api-docstrings", PASS, "模块公开接口与公开类方法均有 docstring"))
 
 
 def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:

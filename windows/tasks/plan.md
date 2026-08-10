@@ -244,7 +244,7 @@ normalization, validation, and aggregate refresh.
 
 ### Task B13: 只读发布就绪审计
 
-- [x] 新增 `token_tracker audit`，集中检查关键交付文件、1000 行门禁、跨端 v7 SHA-256 和 Python 运行时。
+- [x] 新增 `token_tracker audit`，集中检查关键交付文件、1000 行门禁、作者头、公开接口 docstring、跨端 v7 SHA-256 和 Python 运行时。
 - [x] 普通/JSON/strict 输出区分源码通过与 Android/EXE/Caddy 环境 pending，且不触碰数据库或敏感配置。
 - [>] 正式流水线接入与全部外部工具链 pass 证据仍待部署环境。
 

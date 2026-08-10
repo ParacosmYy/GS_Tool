@@ -26,6 +26,8 @@ USAGE_EXPORT_MAX_BYTES = csv_export.MAX_EXPORT_BYTES
 
 
 def non_negative_int(value: Any, field_name: str) -> int:
+    """Parse one token count and reject booleans, malformed values, and negatives."""
+
     if isinstance(value, bool):
         raise UsageValidationError(f"{field_name} must be a non-negative integer")
     try:
@@ -113,6 +115,8 @@ def query_range(
     date_from: str | None = None,
     date_to: str | None = None,
 ) -> tuple[str | None, str | None]:
+    """Translate a user-facing period or date range into SQL boundaries."""
+
     try:
         return db.get_period_bounds(period, date_from, date_to)
     except (TypeError, ValueError) as exc:

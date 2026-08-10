@@ -22,7 +22,7 @@
 | Android APK | pending | `android/toolchain-doctor.ps1` 当前等待 JDK 17、Gradle wrapper 和 Android SDK API 37/build-tools |
 | HTTPS 中心部署 | pending | Caddy、正式域名、ACL、证书、日志轮转和外部 health/ready 检查需在部署主机完成 |
 | 备份恢复/回滚 | 条件通过 | 隔离 staging 恢复和 schema 校验已完成；真实数据恢复、保留周期和负责人记录仍待部署演练 |
-| 工程质量门禁 | pass（当前 checkout） | `token_tracker audit --json`：源码行数、作者头、契约引用、跨端资产和 Chart.js 供应链通过 |
+| 工程质量门禁 | pass（当前 checkout） | `token_tracker audit --json`：源码行数、作者头、公开接口 docstring、契约引用、跨端资产和 Chart.js 供应链通过 |
 
 ## 每次交付必须执行
 

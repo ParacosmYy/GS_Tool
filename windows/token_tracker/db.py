@@ -38,6 +38,8 @@ def get_db_path(
 
 
 def connect(path: str | os.PathLike[str] | None = None) -> sqlite3.Connection:
+    """Open one foreign-key-enforced SQLite connection with row mappings."""
+
     connection = sqlite3.connect(str(get_db_path(path)))
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA foreign_keys = ON")
@@ -46,6 +48,8 @@ def connect(path: str | os.PathLike[str] | None = None) -> sqlite3.Connection:
 
 @contextmanager
 def db_session(path: str | os.PathLike[str] | None = None) -> Iterator[sqlite3.Connection]:
+    """Provide one transactional connection and rollback on any exception."""
+
     connection = connect(path)
     try:
         yield connection
@@ -77,6 +81,8 @@ def local_now() -> datetime:
 
 
 def local_now_string() -> str:
+    """Return local wall-clock time in the persisted second-resolution format."""
+
     return local_now().strftime(TIMESTAMP_FORMAT)
 
 
@@ -102,6 +108,8 @@ def _row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
 
 
 def find_user(username: str, path: str | os.PathLike[str] | None = None) -> dict[str, Any] | None:
+    """Load one account projection by its unique username."""
+
     with db_session(path) as connection:
         row = connection.execute(
             "SELECT id, username, password_hash, created_at, role FROM users WHERE username = ?",
@@ -111,6 +119,8 @@ def find_user(username: str, path: str | os.PathLike[str] | None = None) -> dict
 
 
 def find_user_by_id(user_id: int, path: str | os.PathLike[str] | None = None) -> dict[str, Any] | None:
+    """Load one account projection by server-assigned user id."""
+
     with db_session(path) as connection:
         row = connection.execute(
             "SELECT id, username, password_hash, created_at, role FROM users WHERE id = ?",
@@ -125,6 +135,8 @@ def create_user(
     path: str | os.PathLike[str] | None = None,
     role: str = "user",
 ) -> dict[str, Any]:
+    """Create one validated account with a normalized user or admin role."""
+
     normalized_role = role.strip().lower()
     if normalized_role not in {"user", "admin"}:
         raise ValueError("role must be user or admin")
@@ -149,6 +161,8 @@ def set_user_role(
     role: str,
     path: str | os.PathLike[str] | None = None,
 ) -> dict[str, Any] | None:
+    """Return one active, unrevoked token digest projection if still valid."""
+
     """Set a role for an explicitly named local account.
 
     This function is intentionally repository-level; the CLI is the only
@@ -194,6 +208,8 @@ def find_active_auth_token(
     token_type: str,
     path: str | os.PathLike[str] | None = None,
 ) -> dict[str, Any] | None:
+    """Find a non-revoked, non-expired token by its stored digest."""
+
     with db_session(path) as connection:
         row = connection.execute(
             """
@@ -211,6 +227,8 @@ def revoke_auth_token(
     token_type: str | None = None,
     path: str | os.PathLike[str] | None = None,
 ) -> bool:
+    """Revoke a token digest and report whether a row changed."""
+
     with db_session(path) as connection:
         if token_type:
             cursor = connection.execute(
@@ -267,6 +285,8 @@ def list_ingest_tokens(
     user_id: int,
     path: str | os.PathLike[str] | None = None,
 ) -> list[dict[str, Any]]:
+    """Return per-model aggregates within one user-scoped half-open range."""
+
     """Return metadata only; token secrets are never reconstructable."""
 
     with db_session(path) as connection:
@@ -460,6 +480,8 @@ def summary_by_model(
     end: str | None = None,
     path: str | os.PathLike[str] | None = None,
 ) -> list[dict[str, Any]]:
+    """Aggregate call count and token totals for each model in a range."""
+
     where, params = _where_clause(user_id, start, end)
     with db_session(path) as connection:
         rows = connection.execute(
@@ -486,6 +508,8 @@ def summary_totals(
     end: str | None = None,
     path: str | os.PathLike[str] | None = None,
 ) -> dict[str, int]:
+    """Return total calls and input/output/combined tokens for one user."""
+
     where, params = _where_clause(user_id, start, end)
     with db_session(path) as connection:
         row = connection.execute(
@@ -510,6 +534,8 @@ def recent_records(
     end: str | None = None,
     path: str | os.PathLike[str] | None = None,
 ) -> list[dict[str, Any]]:
+    """Return a bounded newest-first usage projection for one user."""
+
     where, params = _where_clause(user_id, start, end)
     safe_limit = max(1, min(int(limit), 200))
     with db_session(path) as connection:
@@ -536,6 +562,8 @@ def recent_records_page(
     end: str | None = None,
     path: str | os.PathLike[str] | None = None,
 ) -> dict[str, Any]:
+    """Compose the bounded totals, model, trend, and recent-record read model."""
+
     """Return a bounded, user-isolated usage-record page for versioned APIs."""
 
     where, params = _where_clause(user_id, start, end)
@@ -668,6 +696,8 @@ def summary_bundle(
     end: str | None = None,
     path: str | os.PathLike[str] | None = None,
 ) -> dict[str, Any]:
+    """Build the dashboard projection: totals, model mix, trend, and recent rows."""
+
     trend_start, trend_end = start, end
     if trend_start is None and trend_end is None:
         trend_start = (local_now() - timedelta(days=29)).replace(hour=0, minute=0, second=0).strftime(TIMESTAMP_FORMAT)
@@ -686,6 +716,8 @@ def export_csv(
     end: str | None = None,
     path: str | os.PathLike[str] | None = None,
 ) -> bytes:
+    """Serialize one user-scoped usage range through the shared CSV boundary."""
+
     where, params = _where_clause(user_id, start, end)
     with db_session(path) as connection:
         rows = connection.execute(
