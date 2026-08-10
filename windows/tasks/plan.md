@@ -239,6 +239,7 @@ normalization, validation, and aggregate refresh.
 
 - [x] PyInstaller 与 Windows 构建依赖拆到 `packaging/requirements-build.lock`，不再使用未锁定安装。
 - [x] EXE `--onedir` 资源收集、冻结数据目录和清理路径保护写入脚本与 ADR-049。
+- [x] `packaging/toolchain-doctor.ps1` 提供只读构建前检查，明确区分工具缺失 pending 与构建失败。
 - [>] 当前环境未安装 PyInstaller，正式 EXE 生成、启动、升级和签名仍待批准构建环境。
 
 ### Task B13: 只读发布就绪审计

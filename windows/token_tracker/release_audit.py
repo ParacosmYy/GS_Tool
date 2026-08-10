@@ -103,6 +103,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/.env.example",
         "windows/requirements.lock",
         "windows/packaging/requirements-build.lock",
+        "windows/packaging/toolchain-doctor.ps1",
         "windows/deployment/Caddyfile.example",
         "windows/token_tracker/web.py",
         "windows/token_tracker/api_v1.py",
@@ -165,6 +166,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("caddy-log-retention", "windows/deployment/Caddyfile.example", "roll_keep 14"),
         ("root-launcher", "start.bat", "call start.bat"),
         ("android-toolchain-doctor", "android/toolchain-doctor.ps1", "Android toolchain pending"),
+        ("exe-toolchain-doctor", "windows/packaging/toolchain-doctor.ps1", "EXE packaging pending"),
     )
     missing: list[str] = []
     for name, relative_path, fragment in references:

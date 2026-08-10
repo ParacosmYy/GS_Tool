@@ -20,8 +20,13 @@
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
+.\packaging\toolchain-doctor.ps1
 .\packaging\build.ps1
 ```
+
+`toolchain-doctor.ps1` 是只读检查：它只验证项目虚拟环境、锁文件、入口资源和
+PyInstaller 模块/启动器是否存在，不执行 Python 导入、不下载依赖、不修改 PATH、不清理 `dist/`/`build/`。缺少
+批准的构建工具时会以 exit code `3` 报告 `PENDING`；不要把这个状态当成 EXE 已构建。
 
 脚本会先按 `windows/requirements.lock` 和 `packaging/requirements-build.lock` 对齐运行时与构建依赖，生成 `windows/dist/AI-Token-Tracker/AI-Token-Tracker.exe`。首次启动会在 `%LOCALAPPDATA%\AITokenTracker\token_tracker.sqlite3` 创建持久化数据库，不会把数据写入 EXE 临时解包目录。PyInstaller 仍是独立的构建工具依赖，发布前必须在批准的构建环境中执行并审查版本。
 
