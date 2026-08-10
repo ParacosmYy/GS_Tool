@@ -37,15 +37,36 @@ function Resolve-Tool([string]$Name, [string]$HomeVariable, [string]$RelativePat
     return $null
 }
 
-$java = Resolve-Tool "java.exe" "JAVA_HOME" "bin\java.exe"
-$javac = Resolve-Tool "javac.exe" "JAVA_HOME" "bin\javac.exe"
-$javaVersionOutput = if ($java) { (& $java -version 2>&1 | Out-String) } else { "" }
+$projectJdk = Join-Path $androidRoot ".toolchain\jdk-17"
+$projectJava = Join-Path $projectJdk "bin\java.exe"
+$projectJavac = Join-Path $projectJdk "bin\javac.exe"
+$java = if (Test-Path -LiteralPath $projectJava -PathType Leaf) {
+    $projectJava
+} else {
+    Resolve-Tool "java.exe" "JAVA_HOME" "bin\java.exe"
+}
+$javac = if (Test-Path -LiteralPath $projectJavac -PathType Leaf) {
+    $projectJavac
+} else {
+    Resolve-Tool "javac.exe" "JAVA_HOME" "bin\javac.exe"
+}
+$javaVersionOutput = if ($java) {
+    $savedErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        (& $java -version 2>&1 | Out-String)
+    } finally {
+        $ErrorActionPreference = $savedErrorActionPreference
+    }
+} else {
+    ""
+}
 $javaMajor = $null
 if ($javaVersionOutput -match 'version "(?<major>\d+)') {
     $javaMajor = [int]$Matches['major']
 }
 $jdkReady = ($null -ne $java) -and ($null -ne $javac) -and $javaMajor -eq 17
-$jdkDetail = if ($jdkReady) { "JDK 17 java/javac found" } else { "JDK 17 required; set JAVA_HOME or PATH" }
+$jdkDetail = if ($jdkReady) { "JDK 17 java/javac found (project-local preferred)" } else { "JDK 17 required; run provision-toolchain.ps1 or set JAVA_HOME/PATH" }
 Add-Check "JDK 17" $jdkReady $jdkDetail
 
 $wrapper = Join-Path $androidRoot "gradlew.bat"
@@ -54,7 +75,7 @@ $wrapperProperties = Join-Path $androidRoot "gradle\wrapper\gradle-wrapper.prope
 $wrapperReady = (Test-Path -LiteralPath $wrapper -PathType Leaf) -and
     (Test-Path -LiteralPath $wrapperJar -PathType Leaf) -and
     (Test-Path -LiteralPath $wrapperProperties -PathType Leaf)
-$wrapperDetail = if ($wrapperReady) { "project wrapper files are complete" } else { "approved Gradle environment must generate gradlew.bat and wrapper jar" }
+$wrapperDetail = if ($wrapperReady) { "project wrapper files are complete" } else { "run provision-toolchain.ps1 -GenerateGradleWrapper after the project Gradle is available" }
 Add-Check "Gradle Wrapper" $wrapperReady $wrapperDetail
 $wrapperVersion = if (Test-Path -LiteralPath $wrapperProperties -PathType Leaf) {
     Get-Content -LiteralPath $wrapperProperties -Raw
@@ -69,7 +90,7 @@ $sdkRoot = Join-Path $androidRoot ".toolchain\android-sdk"
 $platformJar = Join-Path $sdkRoot "platforms\android-37\android.jar"
 $aapt2 = Get-ChildItem -LiteralPath (Join-Path $sdkRoot "build-tools") -Filter "aapt2.exe" -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
 $sdkReady = (Test-Path -LiteralPath $platformJar -PathType Leaf) -and ($null -ne $aapt2)
-$sdkDetail = if ($sdkReady) { "project API 37 platform and build-tools are available" } else { "install API 37 and build-tools under android\\.toolchain\\android-sdk" }
+$sdkDetail = if ($sdkReady) { "project API 37 platform and build-tools are available" } else { "run provision-toolchain.ps1 -InstallSdkPackages after explicit SDK license acceptance" }
 Add-Check "Android SDK API 37" $sdkReady $sdkDetail
 
 $adb = Resolve-Tool "adb.exe" "ANDROID_SDK_ROOT" "platform-tools\adb.exe"

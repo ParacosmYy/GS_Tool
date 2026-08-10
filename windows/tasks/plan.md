@@ -261,9 +261,11 @@ normalization, validation, and aggregate refresh.
 ### Task B15: Android 工具链版本契约
 
 - [x] 按官方 AGP 9.3.0 兼容矩阵固定 Gradle 9.5.0、JDK 17 和 API 37；Compose BOM 固定为 2026.06.00。
-- [x] `android/toolchain-doctor.ps1` 只读校验 JDK 主版本和 Gradle Wrapper distribution，不下载、不改 PATH、不生成 Wrapper。
+- [x] `android/provision-toolchain.ps1` 固定 JDK/Gradle/command-line tools URL 与 SHA-256；只写项目目录，不改全局 PATH。
+- [x] `android/toolchain-doctor.ps1` 优先校验项目内 JDK、官方 Wrapper 和 Gradle distribution；SDK license 不自动代签。
+- [x] AGP 9 内置 Kotlin、BuildConfig 和 Release HTTPS 任务边界已修复并由 ADR-081 固化。
 - [x] Android README、开发文档、Gradle 配置和 `token_tracker audit` 的契约引用已同步。
-- [>] JDK、官方 Wrapper、SDK API 37/build-tools、APK 构建和设备联调仍待用户批准的工具环境。
+- [>] 用户交互接受 SDK license 后安装 API 37/build-tools、APK 构建和设备联调仍待完成。
 
 ### Task B15: Provider 响应投影边界
 

@@ -1,7 +1,7 @@
 # Android 客户端开发环境
 
 **作者：** AI Token Tracker Engineering Team  
-**状态：** Android 第一条联动竖切片已完成；项目内 v11 场景已接入，工具链构建门禁单独跟踪
+**状态：** Android 第一条联动竖切片已完成；项目内 v11 场景和命令行工具链已接入，SDK license/APK 门禁单独跟踪
 
 ## 选型
 
@@ -18,21 +18,22 @@
 检查日期：2026-08-10（Asia/Shanghai）
 
 - `adb`：已安装，但当前不属于项目内 Android SDK；只能用于只读设备检查，不能替代构建 SDK。
-- JDK 17：未发现。
-- Gradle：未发现。
+- JDK 17：项目内 `.toolchain/jdk-17/` 已准备。
+- Gradle 9.5.0：项目内 `.toolchain/gradle-9.5.0/` 已准备，官方 Wrapper 已生成并提交。
 - Android Studio：未发现。
-- Android SDK 环境变量：未发现；项目预留路径为 `android/.toolchain/android-sdk/`。
+- Android command-line tools：项目内 `.toolchain/android-sdk/cmdline-tools/latest/` 已准备。
+- Android SDK API 37 / Build Tools：未安装；当前缺少用户交互确认的 Google SDK license。
 
-因此当前可以编辑工程和 API 契约，但不能在这台机器上声称 APK 已成功编译。安装 Android Studio/JDK/Gradle/SDK 属于用户批准的环境变更；在批准前不下载或自动配置这些工具。安装 Android Studio 后，把 SDK 包安装到 `android/.toolchain/android-sdk/`；AGP 9.3.0 的官方兼容要求是 Gradle 9.5.0、JDK 17，最大支持 API 37。Wrapper 配置已经把发行包路径放到 `android/.gradle/`，官方 Wrapper 文件尚未生成。
+因此当前可以编辑工程和 API 契约，并能复现 Wrapper；仍不能声称 APK 已成功编译。Android Studio 是可选 IDE，不是命令行构建前置；SDK 包必须在用户交互接受 license 后安装到 `android/.toolchain/android-sdk/`。AGP 9.3.0 的官方兼容要求是 Gradle 9.5.0、JDK 17，最大支持 API 37。工具链来源、哈希和迁移边界见 [`ADR-081`](decisions/ADR-081-android-project-toolchain.md)。
 
 ## 建议安装顺序
 
-1. 安装最新版 Android Studio。
-2. 在 Setup Wizard 中安装 Android SDK、Platform Tools、Build Tools 和一个 API 级别 36/37 的模拟器镜像。
-3. 配置 `JAVA_HOME` 指向 Android Studio 自带的 JDK 17，或独立 JDK 17。
-4. 在 Android Studio 打开本目录，执行 Gradle Sync。
-5. 在 `android/local.properties` 中由 IDE 写入本机 SDK 路径；此文件不提交。
-6. 连接实体设备或启动模拟器，先验证登录和只读仪表盘，再接入写入/同步能力。
+1. 在项目内运行 `android\provision-toolchain.ps1 -GenerateGradleWrapper`，准备固定版本的 JDK、Gradle 和 command-line tools。
+2. 由用户交互运行 `sdkmanager --licenses`；脚本不会自动同意 Google SDK license。
+3. 在项目内运行 `android\provision-toolchain.ps1 -InstallSdkPackages`，安装 Platform Tools、API 37 和 Build Tools 37.0.0。
+4. 运行 `android\toolchain-doctor.ps1`，再执行 `android\build-local.bat assembleDebug`。
+5. Android Studio 只作为可选 IDE；若使用 IDE，SDK 路径必须仍指向 `android/.toolchain/android-sdk/`，`local.properties` 不提交。
+6. 获得授权后连接实体设备或启动模拟器，先验证登录和只读仪表盘，再接入写入/同步能力。
 
 命令行构建前先执行项目内只读诊断：
 
@@ -40,7 +41,7 @@
 powershell -NoProfile -ExecutionPolicy Bypass -File .\android\toolchain-doctor.ps1
 ```
 
-诊断不会下载、安装、修改 PATH 或生成 wrapper；只有 JDK、官方 Wrapper、项目内 SDK API 37/build-tools 完整后才允许进入 `android/build-local.bat assembleDebug`。该入口把 `GRADLE_USER_HOME`、`ANDROID_USER_HOME` 和 `ANDROID_SDK_ROOT` 指向 Android 项目目录，因此 Gradle 发行包、Maven 缓存、Android 元数据和 SDK 都能留在项目边界；Android Studio 的 Sync 仍需在工具链批准后单独核对其缓存策略。Release 必须显式传入 HTTPS 地址：
+诊断不会下载、安装或修改 PATH；只有 JDK、官方 Wrapper、项目内 SDK API 37/build-tools 完整后才允许进入 `android/build-local.bat assembleDebug`。该入口把 `JAVA_HOME`、`GRADLE_USER_HOME`、`ANDROID_USER_HOME` 和 `ANDROID_SDK_ROOT` 指向 Android 项目目录，因此 Gradle 发行包、Maven 缓存、Android 元数据和 SDK 都能留在项目边界；Android Studio 的 Sync 仍需单独核对其缓存策略。Release 必须显式传入 HTTPS 地址：
 
 ```powershell
 android\build-local.bat assembleRelease -PtrackerApiBaseUrl="https://your-host.example/api/v1"

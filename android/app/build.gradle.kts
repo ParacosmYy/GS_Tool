@@ -4,7 +4,6 @@
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
@@ -14,6 +13,9 @@ val trackerApiBaseUrlRaw = providers.gradleProperty("trackerApiBaseUrl")
 val trackerApiBaseUrl = trackerApiBaseUrlRaw
     .replace("\\", "\\\\")
     .replace("\"", "\\\"")
+val releaseTaskRequested = gradle.startParameter.taskNames.any {
+    it.contains("release", ignoreCase = true)
+}
 
 android {
     namespace = "com.aitokentracker"
@@ -34,7 +36,7 @@ android {
             manifestPlaceholders["allowCleartext"] = true
         }
         release {
-            check(trackerApiBaseUrlRaw.startsWith("https://", ignoreCase = true)) {
+            check(!releaseTaskRequested || trackerApiBaseUrlRaw.startsWith("https://", ignoreCase = true)) {
                 "Release 构建必须通过 -PtrackerApiBaseUrl 配置 HTTPS 服务地址"
             }
             manifestPlaceholders["allowCleartext"] = false

@@ -13,7 +13,7 @@ Android 端与 `windows/` 中心服务使用同一个账号和 `/api/v1` 契约�
 - Compose BOM 2026.06.00
 - compileSdk / targetSdk 37，minSdk 23
 
-这些版本以 2026-08-10 核对的 Android/Gradle 官方文档为依据；如果 Android Studio 提示稳定版升级，优先使用 IDE 的升级助手并同步修改版本说明。Wrapper 的发行包与缓存路径已指向项目内 `android/.gradle/`；Android SDK 预留在 `android/.toolchain/android-sdk/`。当前机器没有 JDK/Gradle/Android Studio，因此没有下载额外工具链，也没有声称 APK 已构建。
+这些版本以 2026-08-10 核对的 Android/Gradle 官方文档为依据；如果 Android Studio 提示稳定版升级，优先使用 IDE 的升级助手并同步修改版本说明。Wrapper 的发行包与缓存路径已指向项目内 `android/.gradle/`；Android SDK 位于 `android/.toolchain/android-sdk/`。本机已按 ADR-081 配置项目内 JDK 17、Gradle 9.5.0 和 command-line tools，并已生成官方 Wrapper；SDK API 37/Build Tools 仍需用户交互确认 license 后安装，APK 尚未宣称构建完成。
 
 官方版本依据：
 
@@ -23,15 +23,30 @@ Android 端与 `windows/` 中心服务使用同一个账号和 `/api/v1` 契约�
 
 ## 本机环境
 
-当前机器检查到 `adb`，但没有 JDK、Gradle、Android Studio 或 Android SDK，因此尚未执行 APK 编译验证。仓库目前只有 Wrapper 配置文件，没有伪造 `gradlew.bat` 或 `gradle-wrapper.jar`；待用户批准后，使用实际 Gradle 生成并验证它们，并把 SDK 包安装到 `.toolchain/android-sdk/`。安装顺序、用户批准门槛和官方链接见 [`windows/docs/android-development.md`](../windows/docs/android-development.md)。
+当前机器检查到 `adb`；项目内 JDK、Gradle、command-line tools 和官方 `gradlew.bat`/`gradlew`/`gradle-wrapper.jar` 已准备完成。Android Studio 仍未安装，但命令行构建不依赖 IDE；SDK API 37/Build Tools 尚未安装，因为 SDK license 必须由用户交互接受。安装顺序、哈希、用户批准门槛和官方链接见 [`windows/docs/android-development.md`](../windows/docs/android-development.md) 与 ADR-081。
 
-批准工具链并生成官方 Wrapper 后，先运行只读诊断：
+工具链入口完成后，先运行只读诊断：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\toolchain-doctor.ps1
 ```
 
-所有门禁通过后再使用 `android/build-local.bat assembleDebug`。该入口会把 Gradle 用户目录、Android 用户元数据、发行包和依赖缓存指向 `android/.gradle/`，并拒绝使用未配置的外部 Android SDK。
+如果需要在新 checkout 复现项目内工具链，可运行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\provision-toolchain.ps1 -GenerateGradleWrapper
+```
+
+首次安装 SDK 前，必须由用户在交互终端确认 license；脚本不会自动代签：
+
+```powershell
+$sdk = (Resolve-Path .\.toolchain\android-sdk).Path
+$manager = Join-Path $sdk 'cmdline-tools\latest\bin\sdkmanager.bat'
+& $manager --sdk_root=$sdk --licenses
+powershell -NoProfile -ExecutionPolicy Bypass -File .\provision-toolchain.ps1 -InstallSdkPackages
+```
+
+doctor 全部通过后再使用 `android/build-local.bat assembleDebug`。该入口会把 Gradle 用户目录、Android 用户元数据、发行包和依赖缓存指向 `android/.gradle/`，并拒绝使用未配置的外部 Android SDK。
 
 ## 开发 API 地址
 
@@ -74,6 +89,10 @@ android/
     ui/theme/                 # 颜色、字体、Material 主题
   app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v11.png
                             # 嵌入式 Rust/RL 工程师与 Pro 工作站品牌背景（v11）
+  .toolchain/jdk-17/       # 项目内 JDK 17（忽略，不提交）
+  .toolchain/gradle-9.5.0/ # 项目内 Gradle 发行包（忽略，不提交）
+  .toolchain/android-sdk/  # command-line tools/SDK（忽略，不提交）
+  provision-toolchain.ps1  # 固定 URL/SHA-256 的工具链入口
   .toolchain/android-sdk/    # 获批后安装 Android SDK 的项目内位置
   skills/                   # 项目内 Android Compose 技能资料
   app/build.gradle.kts

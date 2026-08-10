@@ -34,9 +34,9 @@
 - [x] Android 首屏背景资产、低干扰遮罩、Compose edge-to-edge 约束和 Rust/RL 工程师视觉主题已落地
 - [x] Web/Android 统一切换 v10 场景资产；端侧遮罩、漂移实现保持解耦，v9/v8 及之前版本保留回滚（ADR-076）
 - [x] Web/Android 场景 v11：御姐风嵌入式工程师、银色专业笔记本、独立桌面工作站与 Rust/RL 训练语义，左侧正文安全区和 v10 回滚已固化（ADR-080）
-- [x] Android 构建入口已固定项目内 SDK、Gradle 和 Android 用户缓存路径；未获批准不下载工具链
-- [x] Android 工具链契约已按官方兼容矩阵固定为 AGP 9.3.0、Gradle 9.5.0、JDK 17、API 37 和 Compose BOM 2026.06.00；只读 doctor 会校验版本，实际工具仍待批准
-- [ ] 用户批准工具链后完成 Android Studio/Gradle/SDK 编译、设备联调与 APK 产物验收
+- [x] Android 构建入口已固定项目内 JDK、SDK、Gradle 和 Android 用户缓存路径；不改全局 PATH
+- [x] Android JDK 17、Gradle 9.5.0、command-line tools 与官方 Wrapper 已按固定 SHA-256 配置；AGP 9 内置 Kotlin/BuildConfig/Release 任务门禁已修复（ADR-081）
+- [>] 用户交互接受 SDK license 后安装 API 37/Build Tools，完成 Debug APK 编译、设备联调与 APK 产物验收
 - [x] Kimi provider 快速连接预设：Kimi Code / Kimi 开放平台 / OpenAI / 自定义 URL，Key 仍只留在页面内存
 - [>] Windows 分享入口：已提供需确认的可信局域网预览、本地校验备份命令、隔离 staging 恢复演练和隐私说明；正式 HTTPS、生产 ACL/轮转与真实数据恢复仍是部署门禁
 - [x] 分享 handoff 预检：`deployment/share-doctor.ps1` 统一 LAN/Production 只读配置门禁，不启动服务或修改主机状态（ADR-069）

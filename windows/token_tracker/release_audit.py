@@ -40,6 +40,7 @@ SOURCE_IGNORED_DIRS = frozenset({
     "data",
     "dist",
     "staging",
+    ".gradle",
     ".toolchain",
 })
 EXPECTED_CHARTJS_SHA256 = "206B6E8BB00FC7BBA2C7EE80CA41DB3E9E05BA7BE0AA35ABEBA9CFD5357F5D0E"
@@ -138,6 +139,8 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/docs/decisions/ADR-078-personal-launcher-loopback.md",
         "windows/docs/decisions/ADR-079-android-motion-preference.md",
         "windows/docs/decisions/ADR-080-scene-background-v11.md",
+        "windows/docs/decisions/ADR-081-android-project-toolchain.md",
+        "android/provision-toolchain.ps1",
         "windows/docs/decisions/ADR-075-gateway-center-discovery.md",
         "windows/docs/decisions/ADR-071-release-doctor-composition.md",
         "windows/docs/decisions/ADR-072-web-activity-signal-boundary.md",
@@ -239,7 +242,7 @@ def _check_source_headers(root: Path, checks: list[AuditCheck]) -> None:
     missing: list[str] = []
     for path in _source_files(root):
         relative_parts = {part.casefold() for part in path.relative_to(root).parts}
-        if "vendor" in relative_parts:
+        if "vendor" in relative_parts or path.name.casefold() in {"gradlew.bat"}:
             continue
         try:
             head = "\n".join(path.read_text(encoding="utf-8").splitlines()[:12])
@@ -411,7 +414,10 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("scene-visibility-decision", "windows/docs/decisions/ADR-074-scene-visibility-tuning.md", "scene-motion.css"),
         ("write-budget-decision", "windows/docs/decisions/ADR-066-per-user-write-budgets.md", "allow_user_write(resource, user_id)"),
         ("android-agp-version", "android/build.gradle.kts", "id(\"com.android.application\") version \"9.3.0\""),
-        ("android-kotlin-version", "android/build.gradle.kts", "id(\"org.jetbrains.kotlin.android\") version \"2.3.21\""),
+        ("android-kotlin-version", "android/build.gradle.kts", "id(\"org.jetbrains.kotlin.plugin.compose\") version \"2.3.21\""),
+        ("android-toolchain-provisioner", "android/provision-toolchain.ps1", "InstallSdkPackages"),
+        ("android-toolchain-decision", "windows/docs/decisions/ADR-081-android-project-toolchain.md", "project-local"),
+        ("android-release-task-gate", "android/app/build.gradle.kts", "releaseTaskRequested"),
         ("android-gradle-version", "android/gradle/wrapper/gradle-wrapper.properties", "gradle-9.5.0-bin.zip"),
         ("android-sdk-api-contract", "android/app/build.gradle.kts", "compileSdk = 37"),
         ("android-compose-bom", "android/app/build.gradle.kts", "compose-bom:2026.06.00"),
@@ -466,7 +472,8 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         if fragment not in content:
             missing.append(name)
     if missing:
-        checks.append(AuditCheck("contract-references", FAIL, f"{len(missing)} 个关键引用未接入"))
+        preview = ", ".join(missing[:4])
+        checks.append(AuditCheck("contract-references", FAIL, f"{len(missing)} 个关键引用未接入：{preview}"))
     else:
         checks.append(AuditCheck("contract-references", PASS, f"已核对 {len(references)} 个关键引用"))
 
@@ -689,7 +696,7 @@ def _check_external_tool_gates(root: Path, checks: list[AuditCheck]) -> None:
         )
     )
     gradle_ready = _gradle_runtime_available(root)
-    java_ready = _java_runtime_available()
+    java_ready = _java_runtime_available(root)
     sdk_root = _android_sdk_root(root)
     sdk_ready = bool(
         sdk_root
@@ -724,11 +731,11 @@ def _check_external_tool_gates(root: Path, checks: list[AuditCheck]) -> None:
     )
 
 
-def _java_runtime_available() -> bool:
-    """Detect a JDK 17 launcher without mutating PATH or installing tools."""
+def _java_runtime_available(root: Path) -> bool:
+    """Detect a project-local or configured JDK 17 without mutating state."""
 
-    java = _resolve_jdk_tool("java")
-    javac = _resolve_jdk_tool("javac")
+    java = _resolve_jdk_tool("java", root)
+    javac = _resolve_jdk_tool("javac", root)
     if not java or not javac:
         return False
     try:
@@ -746,16 +753,20 @@ def _java_runtime_available() -> bool:
     return bool(match and match.group("major") == "17")
 
 
-def _resolve_jdk_tool(name: str) -> Path | None:
-    """Resolve one JDK launcher from PATH or JAVA_HOME without changing state."""
+def _resolve_jdk_tool(name: str, root: Path) -> Path | None:
+    """Resolve one launcher from project-local JDK, JAVA_HOME, or PATH."""
 
+    suffix = ".exe" if os.name == "nt" else ""
+    project_tool = root / "android/.toolchain/jdk-17/bin" / f"{name}{suffix}"
+    if project_tool.is_file():
+        return project_tool
     command = shutil.which(name)
     if command:
         return Path(command)
     java_home = os.getenv("JAVA_HOME", "").strip()
     if not java_home:
         return None
-    launcher = Path(java_home) / "bin" / (f"{name}.exe" if os.name == "nt" else name)
+    launcher = Path(java_home) / "bin" / f"{name}{suffix}"
     return launcher if launcher.is_file() else None
 
 

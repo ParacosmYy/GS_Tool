@@ -9,6 +9,8 @@ set "GRADLE_USER_HOME=%~dp0.gradle\user-home"
 set "ANDROID_USER_HOME=%~dp0.gradle\android-user"
 set "ANDROID_SDK_ROOT=%~dp0.toolchain\android-sdk"
 set "ANDROID_HOME=%ANDROID_SDK_ROOT%"
+set "PROJECT_JDK=%~dp0.toolchain\jdk-17"
+if exist "%PROJECT_JDK%\bin\java.exe" set "JAVA_HOME=%PROJECT_JDK%"
 
 if exist "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" (
     powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0toolchain-doctor.ps1"
@@ -17,19 +19,19 @@ if exist "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" (
 
 if not exist "%~dp0gradlew.bat" (
     echo [AI Token Tracker] Android Gradle Wrapper is not provisioned yet.
-    echo Ask for approval before installing JDK/Gradle or generating wrapper files.
+    echo Run provision-toolchain.ps1 -GenerateGradleWrapper after the local Gradle is ready.
     exit /b 2
 )
 
 if not exist "%ANDROID_SDK_ROOT%\platforms\android-37\android.jar" (
     echo [AI Token Tracker] Project-local Android SDK platform 37 is not provisioned.
-    echo Ask for approval before installing Android SDK packages into android\.toolchain\.
+    echo Run provision-toolchain.ps1 -InstallSdkPackages after accepting the SDK licenses.
     exit /b 3
 )
 
 if not exist "%ANDROID_SDK_ROOT%\build-tools" (
     echo [AI Token Tracker] Project-local Android SDK build-tools are not provisioned.
-    echo Ask for approval before installing Android SDK packages into android\.toolchain\.
+    echo Run provision-toolchain.ps1 -InstallSdkPackages after accepting the SDK licenses.
     exit /b 3
 )
 
