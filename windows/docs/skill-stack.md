@@ -15,6 +15,7 @@
 | `api-and-interface-design` | 跨网页/Android 的 `/api/v1` 契约 | 认证、日志、统计 |
 | `security-and-hardening` | RBAC、密钥、日志、HTTPS、SSRF | 中心化服务 |
 | `documentation-and-adrs` | 记录架构取舍和迁移边界 | Windows/Android 分层 |
+| `ci-cd-and-automation` | 工具链 doctor、发布证据、pending/pass 语义 | 交付与部署闸门 |
 | `android/skills/adaptive` | Compose 响应式布局资料 | Android 多尺寸屏幕 |
 | `android/skills/styles` | Compose 样式与动效资料 | Android 视觉系统（实验 API 需门禁） |
 | `android/skills/edge-to-edge` | 系统栏、安全区和 IME 约束 | Android edge-to-edge |

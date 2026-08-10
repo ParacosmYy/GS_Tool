@@ -16,6 +16,7 @@
 | `api-and-interface-design` | v1 契约、跨端字段、错误 envelope | ARCH-1 |
 | `code-review-and-quality` | 多维质量审查和合并前门禁 | ARCH-2 |
 | `documentation-and-adrs` | ADR、契约和工程决策记录 | ARCH-1/ARCH-2 |
+| `ci-cd-and-automation` | 源码门禁、工具链 doctor、证据和发布顺序 | ARCH-2/交付集成 |
 
 项目专用组合规则见 [`project-ui-orchestration/SKILL.md`](project-ui-orchestration/SKILL.md)。它把上游通用技能绑定到五个模块、Moonshot-inspired 视觉目标和企业级注释要求。
 

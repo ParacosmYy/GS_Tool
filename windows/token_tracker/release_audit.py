@@ -116,6 +116,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/docs/release-readiness.md",
         "windows/skills/README.md",
         "windows/skills/project-ui-orchestration/SKILL.md",
+        "windows/skills/ci-cd-and-automation/SKILL.md",
         "windows/roles/README.md",
         "windows/ui-modules/01-shell/README.md",
         "windows/ui-modules/02-auth/README.md",
@@ -228,6 +229,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("exe-toolchain-doctor", "windows/packaging/toolchain-doctor.ps1", "EXE packaging pending"),
         ("project-skills-source", "windows/skills/README.md", "7676817c12a1317454ae3898a0c5c1eacf5dd3d5"),
         ("project-ui-orchestration", "windows/skills/project-ui-orchestration/SKILL.md", "AI Token Tracker UI"),
+        ("project-ci-cd", "windows/skills/ci-cd-and-automation/SKILL.md", "Project CI/CD and Automation Skill"),
         ("role-framework", "windows/roles/README.md", "七角色独立交付区"),
         ("ui-module-framework", "windows/ui-modules/01-shell/README.md", "UI Module 01"),
     )
