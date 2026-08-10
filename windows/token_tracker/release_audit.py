@@ -246,6 +246,8 @@ def _check_public_api_docstrings(root: Path, checks: list[AuditCheck]) -> None:
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 if not node.name.startswith("_") and ast.get_docstring(node) is None:
                     missing.append(f"{path.name}:{node.lineno}:{node.name}")
+                if _has_adjacent_string_literals(node.body):
+                    missing.append(f"{path.name}:{node.lineno}:{node.name}:duplicate-docstring-literal")
                 if isinstance(node, ast.ClassDef):
                     for member in node.body:
                         if (
@@ -254,10 +256,27 @@ def _check_public_api_docstrings(root: Path, checks: list[AuditCheck]) -> None:
                             and ast.get_docstring(member) is None
                         ):
                             missing.append(f"{path.name}:{member.lineno}:{node.name}.{member.name}")
+                        if isinstance(member, (ast.FunctionDef, ast.AsyncFunctionDef)) and _has_adjacent_string_literals(member.body):
+                            missing.append(
+                                f"{path.name}:{member.lineno}:{node.name}.{member.name}:duplicate-docstring-literal"
+                            )
     if missing:
         checks.append(AuditCheck("public-api-docstrings", FAIL, f"{len(missing)} 个公开接口缺少 docstring"))
     else:
         checks.append(AuditCheck("public-api-docstrings", PASS, "模块公开接口与公开类方法均有 docstring"))
+
+
+def _has_adjacent_string_literals(body: list[ast.stmt]) -> bool:
+    """Detect a second standalone string that would hide documentation intent."""
+
+    if len(body) < 2:
+        return False
+    return all(
+        isinstance(statement, ast.Expr)
+        and isinstance(statement.value, ast.Constant)
+        and isinstance(statement.value.value, str)
+        for statement in body[:2]
+    )
 
 
 def _check_android_kdoc(root: Path, checks: list[AuditCheck]) -> None:

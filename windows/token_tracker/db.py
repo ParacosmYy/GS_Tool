@@ -161,8 +161,6 @@ def set_user_role(
     role: str,
     path: str | os.PathLike[str] | None = None,
 ) -> dict[str, Any] | None:
-    """Return one active, unrevoked token digest projection if still valid."""
-
     """Set a role for an explicitly named local account.
 
     This function is intentionally repository-level; the CLI is the only
@@ -560,8 +558,6 @@ def recent_records_page(
     end: str | None = None,
     path: str | os.PathLike[str] | None = None,
 ) -> dict[str, Any]:
-    """Compose the bounded totals, model, trend, and recent-record read model."""
-
     """Return a bounded, user-isolated usage-record page for versioned APIs."""
 
     where, params = _where_clause(user_id, start, end)
