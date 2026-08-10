@@ -14,7 +14,7 @@
 | UI-3 响应式与可访问性 | 语义标题、label、live region、表格 caption、focus-visible、空/错误状态 | 条件通过 | 登录页已完成 320/768/1024/1440 截图、320px 横向溢出修复、焦点、ARIA、reduced-motion 和运行时颜色证据；受保护页面仍需合法会话复核，详见 `docs/ui-accessibility-evidence.md`。 |
 | 前端工程师 | API client、CSRF、XSS 边界、Key 生命周期、状态编排 | 通过 | `app.js` 仅编排；API/图表/motion 已拆模块；渲染记录统一使用 `textContent`；Key 仅页面内存。 |
 | 后端工程师 | 鉴权、用户隔离、参数化 SQL、SSRF、provider usage、响应上限、限流 | 通过 | `web.py`/`providers.py`/`db.py`；health 200、未登录 summary 401、统一错误包络和安全响应头已验证。 |
-| 架构师 | 依赖方向、API/ADR、六角色边界、根入口、演进风险 | 通过（源码边界） | `docs/architecture.md`、`docs/api-contract.md`、ADR-003/032/033/034/035、`roles/`、`start.bat`/`run.py`；访问日志、Caddy 边缘预检、LAN 分享确认和敏感 artifact 隔离均有独立边界，外部客户端自动采集明确以 gateway/adapter 为边界。正式 HTTPS/Android 仍是环境门禁。 |
+| 架构师 | 依赖方向、API/ADR、七槽位边界、根入口、版本控制和演进风险 | 通过（源码边界） | `docs/architecture.md`、`docs/api-contract.md`、ADR-003/032/033/034/035/036、`roles/`、`start.bat`/`run.py`；访问日志、Caddy 边缘预检、LAN 分享确认、敏感 artifact 隔离和本地 Git 保存点均有独立边界，外部客户端自动采集明确以 gateway/adapter 为边界。正式 HTTPS/Android 仍是环境门禁。 |
 
 ## 集成闸门
 

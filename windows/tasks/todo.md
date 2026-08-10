@@ -37,6 +37,7 @@
 - [x] Flask auth、CSRF、security headers、per-user isolation
 - [x] 根目录 `start.bat` 和 `run.py` 体验入口
 - [x] 个人入口检测默认端口冲突并回退到可用端口；不终止已有服务，浏览器打开当前源码实际地址（ADR-031）
+- [x] 当前 checkout 建立本地 `main` Git 基线，真实验证数据库、凭据、缓存和部署日志不会进入提交（ADR-036）
 
 ## Role framework
 
@@ -119,3 +120,4 @@
 - [x] ADR-033 提供只读 Caddy/日志目录/宽泛 ACL 预检器；当前环境未安装 Caddy，真实 edge validate 仍待正式部署环境。
 - [x] ADR-034 将 `windows/start-lan.bat` 收敛为带 `SHARE` 确认的 canonical LAN 预览 wrapper，消除无确认绑定 `0.0.0.0` 的入口。
 - [x] ADR-035 补齐 data 子目录 SQLite、backups、staging 的仓库忽略边界，避免敏感数据库误提交。
+- [x] ADR-036 建立当前 checkout 的本地 `main` 版本控制保存点，不配置远程、不上传，并通过 `git check-ignore` 验证敏感路径。
