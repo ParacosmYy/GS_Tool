@@ -23,7 +23,7 @@
 | EXE | conditional | PyInstaller 6.22.0 已锁定并按 v12 资源重建 onedir EXE/ZIP；隔离 `/login`、v12 资源、`/api/v1/ready`、真实记录写入/重启读取和 `%LOCALAPPDATA%` 建库已通过（ADR-082/087）；升级/回滚、签名和正式分发仍待验收 |
 | Android APK | pending | 项目内 JDK 17、Gradle 9.5.0、command-line tools 和官方 Wrapper 已准备并由 doctor 识别；Android v12 背景与 SignalOrbit 已接入系统减少动画边界（ADR-079/086），API 37/Build Tools 因 SDK license 尚未交互确认仍 pending，APK/设备联调未验收（ADR-081） |
 | HTTPS 中心部署 | pending | 应用生产绑定已强制 loopback（ADR-061）；Caddy v2.11.4 已在项目缓存中完成 SHA-512、版本和示例配置 validate，配置预检与显式 edge 启动器已接入（ADR-083），正式域名、ACL、证书、日志轮转和外部 health/ready 检查仍需在部署主机完成 |
-| 备份恢复/回滚 | 条件通过 | 隔离 staging 恢复、当前 schema（含 Usage Ingest Token）校验、防覆盖命名、只读 `backup-inventory --verify` 和 `release-doctor -CheckBackups` 接入已完成（ADR-060/077）；真实数据恢复、负责人确认的保留周期/离线副本和回滚记录仍待部署演练 |
+| 备份恢复/回滚 | 条件通过 | 已填充隔离 EXE 数据库完成备份、`verify-backup`、`backup-inventory --verify` 和 staging 恢复二次校验，当前 schema（含 Usage Ingest Token）与防覆盖命名仍受门禁保护（ADR-060/077/088）；真实数据恢复、负责人确认的保留周期/离线副本和回滚记录仍待部署演练 |
 | 工程质量门禁 | pass（当前 checkout） | `token_tracker audit --json`：代码/文本 1000 行门禁、作者头、Python docstring、Android KDoc、Web UI 静态契约、production/Caddy/LAN 部署契约、层间依赖边界、契约引用、跨端资产和 Chart.js 供应链通过；`windows/ci/quality-gate.ps1` 与 GitHub Actions 已接入（ADR-085）；`release-doctor` 提供统一只读编排入口 |
 
 ## 每次交付必须执行

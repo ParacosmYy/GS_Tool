@@ -52,6 +52,7 @@
 - [x] Web 个人工作信号竖切片：方向、结果、效率、正确/错误码写入既有 v1 Application 边界，最近活动表仅渲染脱敏结构化字段（ADR-072）
 - [x] Admin 成员详情补齐脱敏诊断日志读模型：等级、事件、错误码、消息和 request id 使用 textContent 展示，不复制 SQL
 - [>] 备份运维 B20：只读清单、年龄/数量/容量保留策略、可选完整性验证和显式 `release-doctor -CheckBackups` 接入；不自动删除备份，真实周期与责任人仍待部署确认
+- [x] 备份运维 B29：已填充隔离 EXE 数据库完成备份、完整性/外键校验和 staging 恢复二次验证（ADR-088）
 
 ## Foundation
 
