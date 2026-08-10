@@ -67,6 +67,7 @@ def run_audit(root: Path | None = None) -> list[AuditCheck]:
     _check_required_files(project_root, checks)
     _check_contract_references(project_root, checks)
     _check_web_ui_contract(project_root, checks)
+    _check_deployment_contract(project_root, checks)
     _check_source_line_cap(project_root, checks)
     _check_source_headers(project_root, checks)
     _check_public_api_docstrings(project_root, checks)
@@ -497,6 +498,55 @@ def _check_web_ui_contract(root: Path, checks: list[AuditCheck]) -> None:
         checks.append(AuditCheck("web-ui-contracts", FAIL, f"{len(problems)} 个 UI 契约问题"))
     else:
         checks.append(AuditCheck("web-ui-contracts", PASS, f"已核对 {parsed_templates} 个模板和无障碍动效降级"))
+
+
+def _check_deployment_contract(root: Path, checks: list[AuditCheck]) -> None:
+    """Verify that production and LAN launchers cannot silently swap boundaries."""
+
+    required_fragments = (
+        ("windows/deployment/start-production.ps1", "preflight"),
+        ("windows/deployment/start-production.ps1", "--host $BindAddress"),
+        ("windows/deployment/start-production.ps1", "serve"),
+        ("windows/deployment/Caddyfile.example", "reverse_proxy 127.0.0.1:5000"),
+        ("windows/deployment/start-lan-preview.bat", "SHARE"),
+        ("windows/deployment/start-lan-preview.bat", "--lan-preview"),
+        ("windows/deployment/start-lan-preview.bat", "0.0.0.0"),
+    )
+    problems: list[str] = []
+    contents: dict[str, str] = {}
+    for relative_path, fragment in required_fragments:
+        path = root / relative_path
+        try:
+            contents.setdefault(relative_path, path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError):
+            problems.append(f"{relative_path}: unreadable")
+            continue
+        if fragment not in contents[relative_path]:
+            problems.append(f"{relative_path}: missing {fragment}")
+
+    production_docs = (
+        "windows/README.md",
+        "windows/deployment/README.md",
+        "windows/packaging/README.md",
+    )
+    forbidden_production_example = re.compile(
+        r"serve\s+--host\s+0\.0\.0\.0\s+--port\s+\d+\s+--production",
+        re.IGNORECASE,
+    )
+    for relative_path in production_docs:
+        path = root / relative_path
+        try:
+            source = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            problems.append(f"{relative_path}: unreadable")
+            continue
+        if forbidden_production_example.search(source):
+            problems.append(f"{relative_path}: non-loopback production example")
+
+    if problems:
+        checks.append(AuditCheck("deployment-contracts", FAIL, f"{len(problems)} 个部署契约问题"))
+    else:
+        checks.append(AuditCheck("deployment-contracts", PASS, "production/Caddy/LAN 启动边界已固定"))
 
 
 def _check_scene_assets(root: Path, checks: list[AuditCheck]) -> None:

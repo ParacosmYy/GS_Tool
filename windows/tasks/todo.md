@@ -149,3 +149,4 @@
 - [x] Caddy 示例显式固定 access log 轮转/保留策略，补充 ADR-046；正式主机验证仍待部署权限。
 - [x] 生产 Waitress 强制 loopback 绑定，防止绕过 Caddy HTTPS；LAN 预览保持独立确认路径（ADR-061）。
 - [x] production wrapper 将实际 `-BindAddress` 同时传给 preflight 和 Waitress，并清除旧的非 loopback production 示例。
+- [x] `token_tracker audit` 固定 production/Caddy/LAN 启动边界，防止部署示例回退（loopback/Caddy/SHARE）。
