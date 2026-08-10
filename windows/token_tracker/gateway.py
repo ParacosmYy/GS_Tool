@@ -13,11 +13,12 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 import hmac
 import ipaddress
+import json
 import uuid
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 
-from flask import Flask, Response, g, jsonify, request
+from flask import Flask, Response, g, jsonify, request, stream_with_context
 import requests
 
 from . import ingest_auth, providers, request_ids
@@ -213,13 +214,14 @@ def _chat_completions(config: GatewayConfig) -> Any:
     except ValueError:
         return _error("UPSTREAM_INVALID_RESPONSE", "上游响应不是有效 JSON", 502)
     usage, input_tokens, output_tokens = providers.extract_usage(body)
-    status = _report_usage(
+    status = _usage_status(
         config,
+        usage,
         _response_model(body, chat_request.model),
         input_tokens,
         output_tokens,
         _request_idempotency_key(),
-    ) if usage is not None else "missing"
+    )
     return _json_body(body, 200, {USAGE_STATUS_HEADER: status})
 
 
@@ -278,6 +280,150 @@ def _request_idempotency_key() -> str:
     if candidate and len(candidate) <= MAX_IDEMPOTENCY_KEY_LENGTH:
         return candidate
     return f"gateway-{uuid.uuid4().hex}"
+
+
+def _usage_status(
+    config: GatewayConfig,
+    usage: dict[str, Any] | None,
+    model: str,
+    input_tokens: Any,
+    output_tokens: Any,
+    idempotency_key: str,
+) -> str:
+    if usage is None or _usage_count(input_tokens) is None or _usage_count(output_tokens) is None:
+        return "missing"
+    return _report_usage(config, model, input_tokens, output_tokens, idempotency_key)
+
+
+def _stream_response(
+    provider_response: requests.Response,
+    requested_model: str,
+    config: GatewayConfig,
+) -> Response | tuple[Response, int]:
+    """Pass through SSE while retaining only bounded usage metadata."""
+
+    if _advertised_size_exceeds(provider_response, config.maximum_response_bytes):
+        provider_response.close()
+        return _error("UPSTREAM_RESPONSE_TOO_LARGE", "上游流式响应超过大小限制", 502)
+    accumulator = _SSEUsageAccumulator(config.maximum_response_bytes)
+    idempotency_key = _request_idempotency_key()
+
+    @stream_with_context
+    def generate() -> Any:
+        final_status = "missing"
+        total_bytes = 0
+        try:
+            for chunk in provider_response.iter_content(chunk_size=16 * 1024):
+                if not chunk:
+                    continue
+                chunk_bytes = chunk.encode("utf-8") if isinstance(chunk, str) else bytes(chunk)
+                total_bytes += len(chunk_bytes)
+                if total_bytes > config.maximum_response_bytes:
+                    final_status = "stream-failed"
+                    break
+                try:
+                    accumulator.feed(chunk_bytes)
+                except ValueError:
+                    final_status = "stream-failed"
+                    break
+                yield chunk_bytes
+            else:
+                accumulator.finish()
+                usage, input_tokens, output_tokens = accumulator.usage_values()
+                final_status = _usage_status(
+                    config,
+                    usage,
+                    accumulator.model or requested_model,
+                    input_tokens,
+                    output_tokens,
+                    idempotency_key,
+                )
+        except requests.RequestException:
+            final_status = "stream-failed"
+        finally:
+            provider_response.close()
+        yield f": ai-token-tracker-usage={final_status}\n\n".encode("utf-8")
+
+    return Response(
+        generate(),
+        content_type="text/event-stream; charset=utf-8",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            USAGE_STATUS_HEADER: "pending",
+        },
+    )
+
+
+class _SSEUsageAccumulator:
+    """Parse SSE data events without retaining the generated assistant text."""
+
+    def __init__(self, maximum_buffer_bytes: int) -> None:
+        self._buffer = ""
+        self._maximum_buffer_bytes = maximum_buffer_bytes
+        self.model: str | None = None
+        self.usage: dict[str, Any] | None = None
+
+    def feed(self, chunk: bytes) -> None:
+        self._buffer += chunk.decode("utf-8", errors="replace")
+        self._buffer = self._buffer.replace("\r\n", "\n").replace("\r", "\n")
+        if len(self._buffer.encode("utf-8")) > self._maximum_buffer_bytes:
+            raise ValueError("SSE event exceeds the response safety boundary")
+        while "\n\n" in self._buffer:
+            event, self._buffer = self._buffer.split("\n\n", 1)
+            self._consume_event(event)
+
+    def finish(self) -> None:
+        if self._buffer.strip():
+            self._consume_event(self._buffer)
+        self._buffer = ""
+
+    def usage_values(self) -> tuple[dict[str, Any] | None, Any, Any]:
+        if self.usage is None:
+            return None, None, None
+        input_tokens = self.usage.get("prompt_tokens", self.usage.get("input_tokens", self.usage.get("promptTokens")))
+        output_tokens = self.usage.get("completion_tokens", self.usage.get("output_tokens", self.usage.get("completionTokens")))
+        return self.usage, input_tokens, output_tokens
+
+    def _consume_event(self, event: str) -> None:
+        data_lines = [line[5:].lstrip() for line in event.split("\n") if line.startswith("data:")]
+        if not data_lines:
+            return
+        data = "\n".join(data_lines).strip()
+        if not data or data == "[DONE]":
+            return
+        try:
+            payload = json.loads(data)
+        except (TypeError, ValueError):
+            return
+        if not isinstance(payload, dict):
+            return
+        model = str(payload.get("model") or "").strip()
+        if model:
+            self.model = model
+        usage = _chunk_usage(payload)
+        if usage is not None:
+            self.usage = usage
+
+
+def _chunk_usage(payload: dict[str, Any]) -> dict[str, Any] | None:
+    usage = payload.get("usage")
+    if isinstance(usage, dict):
+        return usage
+    choices = payload.get("choices")
+    if isinstance(choices, list):
+        for choice in choices:
+            if isinstance(choice, dict) and isinstance(choice.get("usage"), dict):
+                return choice["usage"]
+    return None
+
+
+def _advertised_size_exceeds(response: requests.Response, maximum_bytes: int) -> bool:
+    try:
+        advertised = response.headers.get("Content-Length")
+        return bool(advertised and int(advertised) > maximum_bytes)
+    except (TypeError, ValueError):
+        return False
 
 
 def _report_usage(
