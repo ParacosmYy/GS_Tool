@@ -265,3 +265,14 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `admin-detail-close`，页面级横向溢出为 `0`，长表格保持在自身容器边界内。
 - 本轮应用页面 DevTools `error/warning` 日志为空。该证据不替代真实生产日志保留、ACL、导出审计和真实
   设备四档 UI-3 门禁。
+
+## v21 v9 场景背景可见度调校
+
+- 在临时源码实例 `127.0.0.1:5019` 和隔离 SQLite 中打开登录页；未读取真实数据库、Cookie、Key 或令牌。
+- 运行时截图确认右侧御姐二次元嵌入式工程师、笔记本、银色桌面工作站和示波器已从暗纹理提升为
+  可辨识场景，左侧 `SEE THE SIGNAL` 标题、中文说明和登录卡片仍保持独立高对比内容层。
+- DOM 只读检查确认 v9 PNG `naturalWidth/naturalHeight` 有效，`story-backdrop` 的滤镜为
+  `saturate(1.18) contrast(1.08) brightness(1.1)`，`backdrop-glow`/`backdrop-scan` 仍为 16s/13s，
+  页面没有新增横向溢出。
+- 本轮只覆盖临时源码实例的桌面登录页；真实 320px 设备、系统 reduced-motion/高对比度、受保护页和
+  Android 硬件仍保持 UI-3 未关闭，不把截图扩展为正式发布证据。

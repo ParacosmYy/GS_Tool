@@ -54,7 +54,9 @@ body {
   background-position: calc(40% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
   background-size: cover;
   background-repeat: no-repeat;
-  filter: saturate(1.12) contrast(1.05) brightness(1.02);
+  /* Keep the scene legible behind the glass panels. The image carries the
+     product story, so it must not be treated as an almost-black texture. */
+  filter: saturate(1.18) contrast(1.08) brightness(1.1);
   will-change: background-position;
   transition: opacity .8s var(--ui-ease);
 }
@@ -83,8 +85,11 @@ body {
   inset: 0;
   content: "";
   background:
-    linear-gradient(90deg, rgba(8, 9, 12, .99) 0%, rgba(8, 9, 12, .88) 22%, rgba(8, 9, 12, .54) 46%, rgba(8, 9, 12, .2) 70%, rgba(8, 9, 12, .08) 100%),
-    linear-gradient(180deg, rgba(8, 9, 12, .42), transparent 36%, rgba(8, 9, 12, .58));
+    /* The left editorial column keeps a calm contrast floor; the right
+       workstation remains visible so the character and hardware read as
+       intentional product identity instead of a hidden wallpaper. */
+    linear-gradient(90deg, rgba(8, 9, 12, .97) 0%, rgba(8, 9, 12, .84) 22%, rgba(8, 9, 12, .44) 46%, rgba(8, 9, 12, .12) 70%, rgba(8, 9, 12, .025) 100%),
+    linear-gradient(180deg, rgba(8, 9, 12, .3), transparent 36%, rgba(8, 9, 12, .38));
 }
 
 .story-backdrop::after {
@@ -131,8 +136,8 @@ body::after {
   .story-backdrop-image { object-position: 60% 50%; }
   .story-backdrop::before {
     background:
-      linear-gradient(90deg, rgba(8, 9, 12, .998) 0%, rgba(8, 9, 12, .92) 40%, rgba(8, 9, 12, .62) 100%),
-      linear-gradient(180deg, rgba(8, 9, 12, .45), transparent 36%, rgba(8, 9, 12, .74));
+      linear-gradient(90deg, rgba(8, 9, 12, .985) 0%, rgba(8, 9, 12, .86) 34%, rgba(8, 9, 12, .3) 72%, rgba(8, 9, 12, .08) 100%),
+      linear-gradient(180deg, rgba(8, 9, 12, .34), transparent 36%, rgba(8, 9, 12, .46));
   }
 }
 
@@ -142,13 +147,13 @@ body::after {
   .story-backdrop {
     background-position: calc(86% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
     background-size: auto 100%;
-    opacity: .68;
+    opacity: .78;
   }
   .story-backdrop-image { object-position: 86% 50%; }
   .story-backdrop::before {
     background:
-      linear-gradient(90deg, rgba(8, 9, 12, .99) 0%, rgba(8, 9, 12, .92) 46%, rgba(8, 9, 12, .7) 100%),
-      linear-gradient(180deg, rgba(8, 9, 12, .5), transparent 34%, rgba(8, 9, 12, .78));
+      linear-gradient(90deg, rgba(8, 9, 12, .99) 0%, rgba(8, 9, 12, .9) 42%, rgba(8, 9, 12, .42) 78%, rgba(8, 9, 12, .14) 100%),
+      linear-gradient(180deg, rgba(8, 9, 12, .42), transparent 34%, rgba(8, 9, 12, .58));
   }
 }
 

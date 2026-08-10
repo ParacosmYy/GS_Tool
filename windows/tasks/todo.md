@@ -82,6 +82,7 @@
 - [x] 将动画从分散 CSS 规则收敛为可追踪的 motion state contract
 - [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛、注册页 heading 顺序和 v10 场景可见度；v15/v16/v17/v18 已补隔离合法会话下 Dashboard/Admin、ARIA、动态错误播报、四档 viewport、焦点回流、历史非空、服务端 CSV 200 和 Provider 502 错误态证据；真实设备指标、浏览器下载落盘、真实 Provider 成功、对比度与 reduced-motion 真实环境仍待补齐）
 - [x] 背景品牌资产升级：v9 御姐二次元嵌入式工程师、MacBook Pro/Mac Studio 形态、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v8 及之前版本保留回滚
+- [x] UI-1 v10 场景可见度调校：保留左侧正文安全区，提升右侧角色、笔记本、工作站与示波器辨识度（ADR-074）
 - [x] loading/connection/empty 状态统一视觉组件
 - [x] UI-3 静态语义切片：单一仪表盘 h1、表格 scope/caption、管理员详情焦点回流和密码长度边界
 - [x] UI-3 v14/v15：Dashboard glitch 标题单次无障碍名称、隔离合法会话 Dashboard/Admin 空态/焦点/320/768 viewport 运行时证据
