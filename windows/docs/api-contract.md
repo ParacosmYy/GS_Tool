@@ -98,6 +98,12 @@ CSV 导出和日志分页由 Application 用例统一组合，时间范围、分
 
 管理员页面访问、用户明细查看、导出和角色变更都必须落入 `audit_events`。
 
+### 运行状态接口
+
+- `GET /api/v1/health`：进程存活探针，只证明 HTTP 路由可达，不读取业务表。
+- `GET /api/v1/ready`：SQLite 核心 schema 就绪探针；成功返回 `status=ready`，失败返回
+  `503 SERVICE_NOT_READY`，不暴露数据库路径、表名或内部异常。
+
 管理员只读移动端使用以下稳定字段；服务端仍是最终授权者，客户端不能仅凭本地 `role` 绕过检查：
 
 ```json
@@ -164,7 +170,7 @@ CSV 导出和日志分页由 Application 用例统一组合，时间范围、分
 }
 ```
 
-状态码约定：`400` 输入/CSRF 无效、`401` 未登录、`403` 无权、`404` 资源不存在、`405` 方法不支持、`413` 请求或 CSV 导出结果过大、`429` 限流、`502` provider 失败、`500` 内部错误。所有 `/api/*` 错误都返回该 envelope，不返回 Flask 默认 HTML。响应头 `X-Request-ID` 与 envelope 的 `request_id` 用于排障关联；它不代表身份或权限。后端不把 Python traceback、API Key、上游请求头或未经筛选的 provider 响应返回给浏览器。`PROVIDER_RESPONSE_TOO_LARGE` 表示上游 JSON 超过服务端配置的响应上限（默认 2 MB）；`EXPORT_TOO_LARGE` 表示个人或管理员 CSV 超过 100,000 行或 16 MiB 安全边界。
+状态码约定：`400` 输入/CSRF 无效、`401` 未登录、`403` 无权、`404` 资源不存在、`405` 方法不支持、`413` 请求或 CSV 导出结果过大、`429` 限流、`502` provider 失败、`503` 服务未就绪、`500` 内部错误。所有 `/api/*` 错误都返回该 envelope，不返回 Flask 默认 HTML。响应头 `X-Request-ID` 与 envelope 的 `request_id` 用于排障关联；它不代表身份或权限。后端不把 Python traceback、API Key、上游请求头或未经筛选的 provider 响应返回给浏览器。`PROVIDER_RESPONSE_TOO_LARGE` 表示上游 JSON 超过服务端配置的响应上限（默认 2 MB）；`EXPORT_TOO_LARGE` 表示个人或管理员 CSV 超过 100,000 行或 16 MiB 安全边界；`SERVICE_NOT_READY` 表示中心数据库 schema 尚未就绪。
 
 ## `GET /api/summary?period=day`
 

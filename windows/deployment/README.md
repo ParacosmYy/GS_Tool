@@ -80,7 +80,8 @@ caddy run --config .\deployment\Caddyfile --adapter caddyfile
 
 Caddy 负责 HTTPS 证书和边缘安全响应头，Waitress 只绑定 `127.0.0.1`；反向代理不能替代
 应用自身的认证、RBAC、CSRF、限流和脱敏日志。上线后应从外部网络检查
-`https://host.example/api/health`、登录、Android `/api/v1/health` 和安全响应头。
+`https://host.example/api/health`、`https://host.example/api/v1/ready`、登录、Android
+`/api/v1/health` 和安全响应头；其中 health 是存活探针，ready 是 SQLite 就绪探针。
 `preflight-edge.ps1` 是只读门禁：Caddy 未安装、配置无效或日志目录存在宽泛写权限时会失败，
 不会自动安装软件、申请证书、修改 ACL、防火墙或启动服务。
 

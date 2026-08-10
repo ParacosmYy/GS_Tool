@@ -201,6 +201,12 @@ normalization, validation, and aggregate refresh.
 - [x] Release Manifest 继续关闭明文流量，构建命令、工具链门禁和 ADR-041 已同步。
 - [>] APK 编译、安装和设备联调仍等待用户批准 JDK/Gradle/SDK 工具链。
 
+### Task B7: 中心服务 liveness/readiness 探针
+
+- [x] 保留 `/api/v1/health` 进程存活语义，新增 `/api/v1/ready` 核心 schema 就绪语义。
+- [x] 失败返回 `503 SERVICE_NOT_READY`，不泄露数据库路径、表名、异常或业务数据。
+- [x] API 契约、部署检查说明、脱敏访问日志关联和 ADR-042 已同步。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

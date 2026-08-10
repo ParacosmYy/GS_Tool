@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 from flask import Blueprint, Response, current_app, g, jsonify, request
 
-from . import admin_service, auth_service, events, mobile_auth, provider_service, rate_limit
+from . import admin_service, auth_service, events, mobile_auth, provider_service, rate_limit, readiness
 from .api_contract import error_response
 from .providers import ProviderNetworkError, ProviderResponseTooLarge
 from .services import UsageValidationError, add_usage_result, usage_records_page, usage_summary
@@ -354,3 +354,12 @@ def admin_export() -> Response:
 @api_v1.get("/health")
 def health() -> Response:
     return jsonify({"status": "ok", "protocol_version": 1})
+
+
+@api_v1.get("/ready")
+def ready() -> Response:
+    """Report schema readiness without exposing database paths or internals."""
+
+    if not readiness.is_ready(_database()):
+        return error_response("SERVICE_NOT_READY", "中心服务暂不可用，请稍后重试", 503)
+    return jsonify({"status": "ready", "protocol_version": 1})

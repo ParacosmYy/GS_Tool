@@ -128,3 +128,4 @@
 - [x] ADR-040 让个人 Web/API/CLI CSV 复用共享有界序列化器，保持字段与 BOM 契约不变。
 - [x] Android 跨端 Remote/Repository/DTO/Compose 公开边界补齐 KDoc，保留工具链未批准的构建门禁。
 - [x] ADR-041 增加 Android Release HTTPS 构建门禁，保留 Debug 模拟器 HTTP 默认值。
+- [x] ADR-042 增加 `/api/v1/ready` SQLite schema readiness 探针，和 liveness health 分离。
