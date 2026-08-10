@@ -19,6 +19,26 @@
 .\.venv\Scripts\python.exe -m token_tracker admin set-role --username your-name --role admin
 ```
 
+## 自动采集外部客户端
+
+网页里的“自动采集”会在模型检测和调用完成后读取上游真实 `usage` 并自动入账，不需要日常手动
+填写 token 数。Kimi Code、OpenAI SDK 等独立客户端不能被网页偷偷观察；如果希望它们自动进入账本，
+必须让客户端把 Base URL 指向项目提供的本地 Gateway：
+
+```powershell
+cd D:\Workplace\Agent_Workplace\ai-token-tracker\windows
+python -m token_tracker ingest-token create --username your-name --label kimi-code --expires-days 90
+# 将命令只显示一次的 ait_... 保存到 windows/.env；同时在 .env 设置：
+# TOKEN_TRACKER_GATEWAY_PROVIDER_KEY=<你的 provider key>
+# TOKEN_TRACKER_GATEWAY_INGEST_TOKEN=<上一步的 ait_...>
+.\start-gateway.bat -AllowHttp
+```
+
+然后将兼容客户端的 Base URL 改为 `http://127.0.0.1:8787/v1`。`-AllowHttp` 仅适用于本机调试；
+正式中心服务和跨设备使用必须改为 HTTPS。Gateway 会自动提取非流式 JSON 或流式 SSE 的真实 usage，
+没有完整 usage 时明确标记未记录，不会猜测。完整配置、撤销 token 和生产边界见
+[`windows/README.md`](windows/README.md) 的“如何自动接入”章节。
+
 ## 目录
 
 ```text
