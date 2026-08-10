@@ -1,0 +1,133 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Isolate decorative scene layers and pointer choreography from
+ *          page-surface styling so visual changes remain low-coupled.
+ * Module: Web presentation / scene motion layer
+ */
+
+/* Pointer layer: the native cursor remains available and keyboard focus is
+   never represented by this decorative feedback alone. */
+.pointer-aura {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(217,255,120,.16), rgba(196,192,255,.06) 36%, transparent 72%);
+  filter: blur(13px);
+  transition: opacity .45s var(--ui-ease), transform .7s var(--ui-ease), width .45s var(--ui-ease), height .45s var(--ui-ease);
+}
+
+.pointer-ring {
+  width: 36px;
+  height: 36px;
+  border-color: rgba(217,255,120,.86);
+  box-shadow: 0 0 20px rgba(217,255,120,.28), inset 0 0 8px rgba(217,255,120,.12);
+  transition: opacity .35s var(--ui-ease), width .35s var(--ui-ease), height .35s var(--ui-ease), border-color .35s var(--ui-ease), box-shadow .35s var(--ui-ease), transform .24s var(--ui-ease);
+}
+
+body.pointer-interactive .pointer-aura { width: 320px; height: 320px; opacity: .82; transform: translate3d(-50%, -50%, 0) scale(1.08); }
+body.pointer-interactive .pointer-ring { width: 54px; height: 54px; border-color: rgba(217,255,120,.98); box-shadow: 0 0 28px rgba(217,255,120,.36), inset 0 0 12px rgba(217,255,120,.16); }
+body.pointer-press .pointer-ring { transform: translate3d(-50%, -50%, 0) scale(.78); }
+
+/* Brand scene: the illustration is a fixed, non-interactive layer. */
+body {
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+    radial-gradient(ellipse at 12% 0%, rgba(196,192,255,.12), transparent 38%),
+    radial-gradient(ellipse at 95% 74%, rgba(217,255,120,.07), transparent 36%);
+  background-position: 0 0, 0 0, center, center;
+  background-size: 64px 64px, 64px 64px, auto, auto;
+  background-repeat: repeat, repeat, no-repeat, no-repeat;
+}
+
+.story-backdrop {
+  position: fixed;
+  z-index: -3;
+  inset: 0;
+  pointer-events: none;
+  opacity: .95;
+  background-image: url("/static/assets/embedded-rust-engineer-bg-v5.png");
+  background-position: calc(40% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: saturate(1.08) contrast(1.04) brightness(.98);
+  will-change: background-position;
+  transition: opacity .8s var(--ui-ease);
+}
+
+.story-backdrop::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(8, 9, 12, .985) 0%, rgba(8, 9, 12, .86) 24%, rgba(8, 9, 12, .52) 52%, rgba(8, 9, 12, .28) 100%),
+    linear-gradient(180deg, rgba(8, 9, 12, .48), transparent 36%, rgba(8, 9, 12, .7));
+}
+
+.story-backdrop::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    radial-gradient(circle at 80% 27%, rgba(217,255,120,.12), transparent 22%),
+    radial-gradient(circle at 65% 68%, rgba(196,192,255,.1), transparent 30%),
+    linear-gradient(112deg, transparent 38%, rgba(217,255,120,.055) 48%, transparent 58%);
+  mix-blend-mode: screen;
+  background-size: auto, auto, 210% 100%;
+  animation: backdrop-glow 16s ease-in-out infinite alternate, backdrop-scan 13s linear infinite;
+}
+
+body::after {
+  background:
+    radial-gradient(ellipse at 50% -20%, rgba(255,255,255,.09), transparent 42%),
+    radial-gradient(ellipse at 50% 120%, rgba(86, 110, 86, .12), transparent 46%);
+  animation: observatory-haze 18s ease-in-out infinite alternate;
+}
+
+@keyframes backdrop-glow {
+  from { opacity: .34; transform: scale(1); }
+  to { opacity: .7; transform: scale(1.035) translate3d(-.35%, .25%, 0); }
+}
+
+@keyframes backdrop-scan {
+  from { background-position: center, center, -120% 0; }
+  to { background-position: center, center, 120% 0; }
+}
+
+@keyframes observatory-haze {
+  from { opacity: .32; transform: scale(1); }
+  to { opacity: .52; transform: scale(1.025) translate3d(-.5%, .4%, 0); }
+}
+
+@media (max-width: 900px) {
+  .story-backdrop {
+    background-position: calc(60% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
+    background-size: auto 100%;
+  }
+  .story-backdrop::before {
+    background:
+      linear-gradient(90deg, rgba(8, 9, 12, .998) 0%, rgba(8, 9, 12, .92) 40%, rgba(8, 9, 12, .62) 100%),
+      linear-gradient(180deg, rgba(8, 9, 12, .45), transparent 36%, rgba(8, 9, 12, .74));
+  }
+}
+
+@media (max-width: 620px) {
+  /* Keep the decorative scene inside the narrow viewport; depth comes from
+     background positioning, not an oversized fixed box that can widen the document. */
+  .story-backdrop {
+    background-position: calc(86% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
+    background-size: auto 100%;
+    opacity: .78;
+  }
+  .story-backdrop::before {
+    background:
+      linear-gradient(90deg, rgba(8, 9, 12, 1) 0%, rgba(8, 9, 12, .97) 51%, rgba(8, 9, 12, .78) 100%),
+      linear-gradient(180deg, rgba(8, 9, 12, .5), transparent 34%, rgba(8, 9, 12, .78));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-backdrop { transition: none; }
+  .story-backdrop::after, body::after { animation: none; }
+  body.pointer-interactive .pointer-aura, body.pointer-interactive .pointer-ring { width: auto; height: auto; transform: translate3d(-50%, -50%, 0); }
+}

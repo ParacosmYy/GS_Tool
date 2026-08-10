@@ -1,0 +1,43 @@
+<!-- Author: AI Token Tracker Engineering Team | Maintainer: Project Owner -->
+{% extends "base.html" %}
+{% block title %}登录 · AI Token Tracker{% endblock %}
+{% block content %}
+<section class="auth-shell auth-shell-login" data-auth-scene="login">
+  <div class="auth-intro">
+    <div class="auth-orbit-art" aria-hidden="true">
+      <span class="auth-orbit-ring ring-one"></span><span class="auth-orbit-ring ring-two"></span><span class="auth-orbit-ring ring-three"></span>
+      <span class="auth-orbit-crosshair"></span><span class="auth-orbit-satellite satellite-one"></span><span class="auth-orbit-satellite satellite-two"></span>
+      <span class="auth-orbit-core"></span><span class="auth-orbit-label">SIGNAL / 01</span>
+    </div>
+    <p class="eyebrow">LOCAL-FIRST / PRIVATE LEDGER</p>
+    <h1 class="display-title" data-text="SEE THE SIGNAL" aria-label="SEE THE SIGNAL.">SEE THE<br><em>SIGNAL.</em></h1>
+    <p class="muted intro-copy">把每一次 AI 调用转成清晰的信号。跨模型记录、按周期汇总，数据留在本地。</p>
+    <div class="feature-lines">
+      <span><b>01</b> SQLite persistence</span>
+      <span><b>02</b> Per-user isolation</span>
+      <span><b>03</b> Key never stored</span>
+    </div>
+  </div>
+  <div class="auth-card">
+    <div class="auth-card-top"><p class="eyebrow">WELCOME BACK</p><span>01 / 02</span></div>
+    <h2>进入观测台</h2>
+    <p class="muted">登录后查看属于你的 token signal。</p>
+    <form method="post" class="stack-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>
+        用户名
+        <input name="username" autocomplete="username" required autofocus>
+      </label>
+      <label>
+        密码
+        <input type="password" name="password" autocomplete="current-password" required>
+      </label>
+      <button class="button button-primary button-wide" type="submit">Enter observatory <span>↗</span></button>
+    </form>
+    <p class="form-footnote">还没有账户？<a href="{{ url_for('register') }}">Create one <span>↗</span></a></p>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='auth.js') }}"></script>
+{% endblock %}

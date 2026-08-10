@@ -1,0 +1,35 @@
+<!-- Author: AI Token Tracker Engineering Team | Maintainer: Project Owner -->
+{% extends "base.html" %}
+{% block title %}隐私与数据说明 · AI Token Tracker{% endblock %}
+{% block content %}
+<section class="info-page" aria-labelledby="privacy-title">
+  <article class="info-card">
+    <p class="eyebrow">TRUST / DATA BOUNDARY</p>
+    <h1 id="privacy-title">你的数据，留在中心服务边界内。</h1>
+    <p class="muted info-lead">这是一份面向同学的简明说明。管理员应在分享链接前确认部署地址、保存期限和团队治理规则。</p>
+    <div class="info-grid">
+      <section>
+        <h2>会记录什么</h2>
+        <p>模型名称、输入/输出 token、调用时间、备注，以及你主动提交的工作方向、结果、效率评分和诊断日志。</p>
+      </section>
+      <section>
+        <h2>谁能看到</h2>
+        <p>普通账户只能看到自己的数据。管理员可以查看团队汇总、授权成员明细、脱敏日志和导出记录；相关操作写入审计表。</p>
+      </section>
+      <section>
+        <h2>不会保存什么</h2>
+        <p>provider API Key 不写入数据库、CSV 或应用日志。Android 的密码、access token 和 refresh token 不写入普通偏好设置。</p>
+      </section>
+      <section>
+        <h2>数据在哪里</h2>
+        <p>当前中心数据库保存在运行 Windows 服务的主机上。网页与 Android 通过 `/api/v1` 访问，不直接共享 SQLite 文件。</p>
+      </section>
+    </div>
+    <div class="info-callout">
+      <strong>分享前请确认</strong>
+      <span>正式公网访问必须使用 HTTPS、备份、访问日志脱敏、明确的数据保存期限和参与者知情同意。局域网预览只适用于可信网络。</span>
+    </div>
+    <p class="form-footnote"><a href="{{ url_for('login') }}">返回登录 <span>↗</span></a></p>
+  </article>
+</section>
+{% endblock %}

@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- Author: AI Token Tracker Engineering Team | Maintainer: Project Owner -->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}AI Token 用量追踪器{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='ui-polish.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='scene-motion.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  <div class="ambient-noise" aria-hidden="true"></div>
+  <div class="ambient-light ambient-light-one" aria-hidden="true"></div>
+  <div class="ambient-light ambient-light-two" aria-hidden="true"></div>
+  <div class="story-backdrop" aria-hidden="true"></div>
+  <div class="pointer-aura" aria-hidden="true"></div>
+  <div class="pointer-ring" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('dashboard') if g.user else url_for('login') }}">
+      <span class="brand-mark" aria-hidden="true"><span></span></span>
+      <span class="brand-lockup"><strong>AI TOKEN</strong><small>OBSERVATORY</small></span>
+    </a>
+    {% if g.user %}
+      <nav class="site-nav" aria-label="主要导航">
+        <a href="{{ url_for('dashboard') }}#analysis">Analysis</a>
+        <a href="{{ url_for('dashboard') }}#connect">Connect</a>
+        <a href="{{ url_for('dashboard') }}#history">History</a>
+        {% if g.user.role == 'admin' %}<a href="{{ url_for('admin') }}">Admin</a>{% endif %}
+      </nav>
+      <div class="user-menu">
+        <span class="user-chip"><i></i>{{ g.user.username }}</span>
+        <form method="post" action="{{ url_for('logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="button button-ghost button-small" type="submit">Log out</button>
+        </form>
+      </div>
+    {% endif %}
+  </header>
+
+  <main class="site-main" id="main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <a href="{{ url_for('privacy') }}">隐私与数据说明</a>
+    <span>AI Token Tracker · local-first observatory</span>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

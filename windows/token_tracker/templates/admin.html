@@ -1,0 +1,41 @@
+<!-- Author: AI Token Tracker Engineering Team | Maintainer: Project Owner | Module: 05-history / Admin -->
+{% extends "base.html" %}
+{% block title %}管理员观测台 · AI Token Tracker{% endblock %}
+{% block content %}
+<section class="admin-hero" data-reveal>
+  <div>
+    <p class="eyebrow">ADMIN / TEAM OBSERVATORY</p>
+    <h1 class="page-title">看见团队的<br><em>signal。</em></h1>
+    <p class="muted intro-copy">管理员可以查看每位同学的汇总、工作事件、错误日志和脱敏导出。密码哈希、Key 与 refresh token 永远不进入页面。</p>
+  </div>
+  <div class="admin-hero-meta"><span class="status-dot"></span><span>SERVER-SIDE RBAC / ACTIVE</span></div>
+</section>
+
+<section class="signal-strip admin-metrics" aria-label="团队概览" data-reveal>
+  <article class="signal-cell"><span class="signal-index">01</span><div><span class="stat-label">TEAM MEMBERS</span><strong class="stat-value" id="admin-users">0</strong><small>registered accounts</small></div></article>
+  <article class="signal-cell"><span class="signal-index">02</span><div><span class="stat-label">TOTAL SIGNAL</span><strong class="stat-value" id="admin-tokens">0</strong><small>all tracked tokens</small></div></article>
+  <article class="signal-cell"><span class="signal-index">03</span><div><span class="stat-label">WORK EVENTS</span><strong class="stat-value" id="admin-events">0</strong><small><span id="admin-success">0</span> success / <span id="admin-failure">0</span> failure</small></div></article>
+  <article class="signal-cell"><span class="signal-index">04</span><div><span class="stat-label">DIAGNOSTIC LOGS</span><strong class="stat-value" id="admin-logs">0</strong><small>privacy-filtered entries</small></div></article>
+</section>
+
+<section class="admin-grid" data-reveal>
+  <article class="chart-card admin-users-card">
+    <div class="card-heading"><div><p class="eyebrow">01 / PEOPLE</p><h2>同学账户 <span>Member signals</span></h2></div><span id="admin-status" class="legend-note" role="status" aria-live="polite">加载中</span></div>
+    <div class="table-wrap"><table class="data-table"><caption class="sr-only">团队成员 token 和工作事件汇总</caption><thead><tr><th scope="col">账户</th><th scope="col">角色</th><th scope="col">调用</th><th scope="col">Token</th><th scope="col">事件</th><th scope="col">查看</th></tr></thead><tbody id="admin-user-rows"></tbody></table></div>
+  </article>
+  <aside class="guide-card admin-export-card">
+    <p class="eyebrow">02 / EXPORT</p><h2>导出团队数据 <span>Audit first</span></h2>
+    <p class="muted small-copy">CSV 导出只允许管理员使用，并在服务器审计表记录操作者、类型和 request id。</p>
+    <div class="admin-export-actions"><a class="button button-secondary" href="/api/v1/admin/export?kind=usage">Usage CSV ↗</a><a class="button button-ghost" href="/api/v1/admin/export?kind=events">Events CSV ↗</a><a class="button button-ghost" href="/api/v1/admin/export?kind=logs">Logs CSV ↗</a></div>
+    <div id="admin-message" class="form-message" role="status" aria-live="polite"></div>
+  </aside>
+</section>
+
+<section class="chart-card admin-detail-card" id="admin-detail" data-reveal hidden>
+  <div class="card-heading"><div><p class="eyebrow">03 / MEMBER DETAIL</p><h2 id="admin-detail-title">选择一位同学 <span>Activity trace</span></h2></div><button class="button button-ghost button-small" type="button" id="admin-detail-close">关闭</button></div>
+  <div class="admin-detail-grid"><div><h3>Token records</h3><div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">时间</th><th scope="col">模型</th><th scope="col">总 token</th><th scope="col">来源</th></tr></thead><tbody id="admin-record-rows"></tbody></table></div></div><div><h3>Work events</h3><div class="table-wrap"><table class="data-table"><thead><tr><th scope="col">方向</th><th scope="col">结果</th><th scope="col">效率</th><th scope="col">代码</th></tr></thead><tbody id="admin-event-rows"></tbody></table></div></div></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='admin.js') }}"></script>
+{% endblock %}

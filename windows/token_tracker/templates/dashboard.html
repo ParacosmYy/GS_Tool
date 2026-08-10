@@ -1,0 +1,153 @@
+<!-- Author: AI Token Tracker Engineering Team | Maintainer: Project Owner -->
+{% extends "base.html" %}
+{% block title %}仪表盘 · AI Token Tracker{% endblock %}
+{% block content %}
+<section class="observatory-hero" id="overview">
+  <div class="hero-topline"><span>AI TOKEN / OBSERVATORY</span><span id="dashboard-status" role="status" aria-live="polite">LOCAL LEDGER / LIVE</span></div>
+  <div class="hero-stage">
+    <div class="hero-copy" data-reveal>
+      <p class="eyebrow">YOUR USAGE, IN MOTION</p>
+      <h1 class="hero-title" data-text="TOKEN">TOKEN</h1>
+      <h1 class="hero-title hero-title-outline" data-text="SIGNAL">SIGNAL</h1>
+      <span class="hero-scanline" aria-hidden="true"></span>
+      <p class="hero-lede">连接一次，之后让每次兼容接口调用自动留下 token usage。你只需要观察变化，不需要手动记账。</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#auto-entry">开始自动采集 <span>↘</span></a>
+        <a class="button button-ghost" href="#analysis">查看分析 <span>↘</span></a>
+      </div>
+    </div>
+    <div class="hero-orbit" data-reveal aria-label="当前范围总 token">
+      <span class="orbit-track orbit-track-one"></span><span class="orbit-track orbit-track-two"></span><span class="orbit-track orbit-track-three"></span>
+      <span class="orbit-particle particle-one"></span><span class="orbit-particle particle-two"></span>
+      <div class="hero-core"><span class="core-eyebrow">TOTAL SIGNAL</span><strong id="total-tokens">0</strong><span id="call-count">0 calls / today</span></div>
+    </div>
+  </div>
+  <div class="hero-foot"><div class="scroll-cue"><span></span> Scroll to explore</div><div class="range-switcher" role="group" aria-label="统计周期"><button type="button" class="range-button is-active" data-period="day">Today</button><button type="button" class="range-button" data-period="week">Week</button><button type="button" class="range-button" data-period="month">Month</button><button type="button" class="range-button" data-period="all">All time</button></div></div>
+</section>
+
+<section class="signal-strip" aria-label="用量概览" data-reveal>
+  <article class="signal-cell"><span class="signal-index">01</span><div><span class="stat-label">INPUT TOKENS</span><strong class="stat-value" id="input-tokens">0</strong><small>prompt / context</small></div></article>
+  <article class="signal-cell"><span class="signal-index">02</span><div><span class="stat-label">OUTPUT TOKENS</span><strong class="stat-value" id="output-tokens">0</strong><small>generated content</small></div></article>
+  <article class="signal-cell"><span class="signal-index">03</span><div><span class="stat-label">ACTIVE MODELS</span><strong class="stat-value" id="model-count">0</strong><small>in selected range</small></div></article>
+</section>
+
+<section class="visual-grid" id="analysis" data-reveal data-motion-state="idle" aria-busy="false">
+  <article class="chart-card chart-wide">
+    <div class="card-heading">
+      <div>
+        <p class="eyebrow">01 / VOLUME TREND</p>
+        <h2>用量趋势 <span>Usage in motion</span></h2>
+      </div>
+      <span class="legend-note">输入 + 输出</span>
+    </div>
+    <div class="chart-wrap"><canvas id="trend-chart" role="img" aria-label="输入和输出 token 的每日趋势图"></canvas></div>
+  </article>
+  <article class="chart-card">
+    <div class="card-heading">
+      <div>
+        <p class="eyebrow">02 / MODEL MIX</p>
+        <h2>模型占比 <span>Where it goes</span></h2>
+      </div>
+    </div>
+    <div class="chart-wrap chart-doughnut-wrap"><canvas id="model-chart" role="img" aria-label="各模型 token 占比图"></canvas></div>
+    <div id="model-legend" class="model-legend"></div>
+  </article>
+</section>
+
+<section class="tool-grid auto-layout" id="connect" data-reveal>
+  <article class="form-card proxy-card auto-card" id="auto-entry" data-motion-state="idle" aria-busy="false">
+    <div class="card-heading">
+      <div>
+        <p class="eyebrow">03 / AUTOMATIC COLLECTION</p>
+        <h2>自动采集 <span>Connect once, track every call</span></h2>
+      </div>
+      <span class="connection-badge" id="provider-status" role="status" aria-live="polite"><i></i> 未连接</span>
+    </div>
+    <p class="muted small-copy">填入一次 Base URL 和自己的 Key。系统会先自动检测模型，随后从每次响应的 <code>usage</code> 中识别输入/输出 token、实际模型和来源并保存；Key 永远不写入数据库。</p>
+    <form id="proxy-form" class="stack-form" data-motion-state="idle" aria-busy="false">
+      <div class="form-row">
+        <label>Provider Base URL<input name="base_url" type="url" placeholder="https://api.moonshot.cn/v1" required></label>
+        <div class="secret-field">
+          <label>API Key<input name="api_key" type="password" autocomplete="off" placeholder="sk-..." required></label>
+          <button class="button button-ghost button-small" type="button" id="clear-provider-key">清除 Key</button>
+        </div>
+      </div>
+      <div class="model-detection-row">
+        <label>模型（可自动检测）<input name="model" list="provider-model-options" placeholder="先点击自动检测，或直接填写" required></label>
+        <datalist id="provider-model-options"></datalist>
+        <button class="button button-secondary" type="button" id="detect-models">自动检测模型</button>
+      </div>
+      <label>发送给模型的内容<textarea name="prompt" rows="4" placeholder="输入一次真实请求，返回 usage 后会自动记录……" required></textarea></label>
+      <label>备注 <span class="optional">可选</span><input name="note" placeholder="例如：自动代理调用"></label>
+      <div class="auto-form-actions">
+        <button class="button button-primary" type="submit" id="proxy-submit">发送 · 自动记账 <span>↗</span></button>
+        <span class="privacy-note"><i></i> Key 只保存在当前页面内存，刷新即清除</span>
+      </div>
+      <div id="proxy-message" class="form-message" role="status"></div>
+    </form>
+    <div id="proxy-response" class="proxy-response" hidden></div>
+  </article>
+
+  <aside class="guide-card">
+    <p class="eyebrow">HOW IT WORKS</p>
+    <h2>把记录交给系统 <span>自动分配</span></h2>
+    <ol class="auto-steps">
+      <li><b>01</b><span>检测 <strong>/models</strong>，把可用模型放进选择列表。</span></li>
+      <li><b>02</b><span>代理一次真实请求，不需要你再填输入/输出 token。</span></li>
+      <li><b>03</b><span>读取响应的 <strong>usage</strong>，按实际返回模型归档。</span></li>
+    </ol>
+    <div class="guide-callout"><span class="material-dot"></span><p>当前网页代理发出的调用会自动产生记录。外部 Kimi Code / OpenAI 客户端不会被网页凭空读取；要纳入它们，需要让调用经过专用 gateway 或客户端适配器。</p></div>
+  </aside>
+</section>
+
+<details class="manual-details" id="manual-entry" data-reveal>
+  <summary><span><b>异常补录</b><small>仅当 provider 没有返回 usage 时使用</small></span><i>+</i></summary>
+  <div class="manual-details-body">
+    <article class="form-card" data-motion-state="idle" aria-busy="false">
+      <div class="card-heading">
+        <div>
+          <p class="eyebrow">04 / FALLBACK</p>
+          <h2>补录历史调用 <span>Manual fallback</span></h2>
+        </div>
+        <span class="card-icon">+</span>
+      </div>
+      <form id="manual-form" class="stack-form" data-motion-state="idle" aria-busy="false">
+        <div class="form-row">
+          <label>模型名称<input name="model" placeholder="kimi-code" required></label>
+          <label>记录时间<input name="timestamp" type="datetime-local"></label>
+        </div>
+        <div class="form-row">
+          <label>输入 token<input name="input_tokens" type="number" min="0" step="1" placeholder="1200" required></label>
+          <label>输出 token<input name="output_tokens" type="number" min="0" step="1" placeholder="350" required></label>
+        </div>
+        <label>备注 <span class="optional">可选</span><input name="note" placeholder="例如：导入历史账单"></label>
+        <button class="button button-secondary" type="submit">保存补录</button>
+        <div id="manual-message" class="form-message" role="status"></div>
+      </form>
+    </article>
+  </div>
+</details>
+
+<section class="records-card" id="history" data-reveal>
+  <div class="card-heading records-heading">
+    <div>
+      <p class="eyebrow">05 / RECENT ENTRIES</p>
+      <h2>最近记录 <span>Signal history</span></h2>
+    </div>
+    <a class="button button-ghost" id="export-button" href="{{ url_for('api_export') }}?period=day">导出 CSV <span>↓</span></a>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <caption class="sr-only">当前统计范围内的最近 token 用量记录</caption>
+      <thead>
+        <tr><th>模型</th><th>输入</th><th>输出</th><th>总 token</th><th>时间</th><th>来源 / 备注</th></tr>
+      </thead>
+      <tbody id="records-body"><tr><td colspan="6" class="table-empty">正在加载……</td></tr></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script type="module" src="{{ url_for('static', filename='app.js') }}"></script>
+{% endblock %}

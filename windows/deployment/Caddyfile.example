@@ -1,0 +1,47 @@
+# Author: AI Token Tracker Engineering Team
+# Maintainer: Project Owner
+# Purpose: Example HTTPS reverse-proxy boundary for the central Windows website.
+# Module: Deployment / edge configuration
+
+tracker.example.com {
+    # Automatic HTTPS is provided by Caddy for a real DNS name. Replace the
+    # site address before deployment; do not use this example unchanged.
+    encode zstd gzip
+
+    # The application also sets these headers; keeping them at the edge makes
+    # the policy survive an upstream error response or a future app change.
+    header {
+        -Server
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    # Caddy access logs use JSON. The filter is explicit so a future global
+    # logging option cannot accidentally re-enable credentials or client IPs.
+    # Create the logs directory with restricted ACLs before starting Caddy.
+    log {
+        output file ./logs/caddy-access.json
+        format filter {
+            request>headers>Authorization delete
+            request>headers>Proxy-Authorization delete
+            request>headers>Cookie delete
+            response>headers>Set-Cookie delete
+            request>headers>User-Agent delete
+            request>remote_ip ip_mask 16 32
+            request>client_ip ip_mask 16 32
+            request>uri query {
+                delete period
+                delete from
+                delete to
+                delete limit
+                delete offset
+                delete kind
+            }
+            wrap json
+        }
+    }
+
+    reverse_proxy 127.0.0.1:5000
+}

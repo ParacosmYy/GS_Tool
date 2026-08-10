@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Author: AI Token Tracker Engineering Team | Maintainer: Project Owner -->
+<resources>
+    <style name="Theme.AITokenTracker" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#0B0C10</item>
+        <item name="android:navigationBarColor">#0B0C10</item>
+    </style>
+</resources>
