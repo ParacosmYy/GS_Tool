@@ -33,11 +33,15 @@ Set-Location windows
 - ZIP 清单包含 `AI-Token-Tracker.exe`、`README.txt` 和 `embedded-rust-engineer-bg-v12.png`。
 - 使用隔离的项目缓存 `LOCALAPPDATA` 和端口 5019 启动 EXE：`GET /login`、`GET /api/v1/ready` 与 v12 PNG 均返回 200。
 - 隔离数据库创建在 `LOCALAPPDATA\AITokenTracker\token_tracker.sqlite3`，EXE 发布目录没有生成 `data/token_tracker.sqlite3`。
+- 在隔离 `%LOCALAPPDATA%` 中通过真实 `/api/v1` 流程注册账户、写入一条 `kimi-code` 用量
+  `321 + 654 = 975`，停止 EXE 后用同一数据目录重启并重新登录读取到同一 `record id=1`；
+  数据库大小为 `110592` bytes，证明默认用户目录跨进程持久化。
 - 验收结束后已停止本次 EXE，未触碰 5000/5011 既有服务。
 
 ## 未完成门禁
 
-真实记录停止/重启持久化、升级/回滚、Windows Authenticode 签名、正式分发渠道和用户数据恢复仍未由本 ADR 虚构通过；这些门禁继续由最终验收矩阵跟踪。
+升级/回滚、Windows Authenticode 签名、正式分发渠道和用户数据恢复仍未由本 ADR 虚构通过；
+这些门禁继续由最终验收矩阵跟踪。
 
 ## 回滚
 

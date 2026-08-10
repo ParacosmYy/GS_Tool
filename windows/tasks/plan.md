@@ -454,7 +454,8 @@ API / 动画 / 设计 token 契约
 - [x] 隔离端口 5019 验证 EXE 的 `/login`、`/api/v1/ready` 和 v12 PNG 均返回 200。
 - [x] 验证数据库位于隔离 `LOCALAPPDATA\AITokenTracker\`，EXE 目录不产生 `data/`。
 - [x] 新增 ADR-087 并将发布审计切换到本次 EXE/ZIP SHA-256。
-- [>] 真实记录重启持久化、升级/回滚、签名和正式分发仍属于最终交付门禁。
+- [x] 隔离 `%LOCALAPPDATA%` 中真实写入 `kimi-code` `321+654=975`，停止/重启 EXE 后重新读取同一 `record id=1`。
+- [>] 升级/回滚、签名和正式分发仍属于最终交付门禁。
 
 ### Task B28: Caddy 边缘工具链与相对路径门禁
 
