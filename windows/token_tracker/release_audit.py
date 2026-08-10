@@ -420,6 +420,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("backup-inventory-cli", "windows/token_tracker/cli.py", "backup-inventory"),
         ("backup-inventory-service", "windows/token_tracker/backup.py", "inventory_backups"),
         ("backup-inventory-decision", "windows/docs/decisions/ADR-077-backup-inventory-retention.md", "backup-inventory"),
+        ("backup-inventory-release-doctor", "windows/release-doctor.ps1", "CheckBackups"),
         ("share-doctor-handoff", "windows/deployment/share-doctor.ps1", "share-doctor"),
         ("release-doctor-script", "windows/release-doctor.ps1", "release-doctor summary"),
         ("release-doctor-wrapper", "windows/release-doctor.bat", "release-doctor.ps1"),

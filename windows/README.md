@@ -313,6 +313,20 @@ python -m token_tracker backup-inventory `
 该命令永远不会自动删除旧备份；正式部署的保留周期、离线副本和责任人必须由管理员确认，详见
 `docs/decisions/ADR-077-backup-inventory-retention.md`。
 
+发布预检默认不检查备份，保证新安装可以直接体验；管理员确认备份策略后，可显式加入同一条只读预检链：
+
+```powershell
+.\release-doctor.ps1 -Mode Local `
+  -CheckBackups `
+  -MinBackupCount 1 `
+  -MaxBackupAgeDays 7 `
+  -MaxBackupSizeMiB 2048 `
+  -VerifyBackups
+```
+
+`release-doctor.bat` 支持同样的参数。`-CheckBackups` 开启后，备份缺失、策略不满足或完整性检查失败会使
+发布预检返回失败；不传该开关时不会扫描、创建或修改备份目录。
+
 验证已有副本（只读，不改数据库）：
 
 ```powershell

@@ -311,6 +311,7 @@ normalization, validation, and aggregate refresh.
 - [x] `backup-inventory` 只扫描明确目录下的常规 SQLite 备份文件，不递归、不读取业务表、不删除或改名文件。
 - [x] 支持可选的最小数量、最大年龄、最大容量和完整性验证策略；策略失败返回稳定非零退出码并输出脱敏诊断。
 - [x] JSON/文本输出、README、发布矩阵、ADR、角色复核和只读审计引用保持一致。
+- [x] `release-doctor.ps1/.bat` 支持显式 `-CheckBackups` 复用清单策略；默认 Local/LAN/Production 流程保持不变。
 - [>] 已用隔离缺失/非备份目录验证 JSON、退出码和“不创建目录”边界；满足策略、失败策略和真实候选文件 `--verify` 演练仍需批准的备份样本。
 - [>] 真实部署仍需负责人确认保留周期、离线副本和恢复责任人。
 

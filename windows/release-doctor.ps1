@@ -15,7 +15,13 @@ param(
     [ValidateSet("Local", "LanPreview", "Production")]
     [string]$Mode = "Local",
     [string]$Caddyfile = "",
-    [string]$LogsDirectory = ""
+    [string]$LogsDirectory = "",
+    [switch]$CheckBackups,
+    [string]$BackupDirectory = "",
+    [int]$MinBackupCount = -1,
+    [int]$MaxBackupAgeDays = -1,
+    [int]$MaxBackupSizeMiB = -1,
+    [switch]$VerifyBackups
 )
 
 $ErrorActionPreference = "Continue"
@@ -58,6 +64,44 @@ function Invoke-CommandCheck {
     Add-Result -Name $Name -Status $status -Detail "exit=$exitCode"
 }
 
+function Invoke-BackupInventoryCheck {
+    if (-not $CheckBackups) {
+        return
+    }
+
+    $invalidPolicy = @(
+        @("MinBackupCount", $MinBackupCount),
+        @("MaxBackupAgeDays", $MaxBackupAgeDays),
+        @("MaxBackupSizeMiB", $MaxBackupSizeMiB)
+    ) | Where-Object { $_[1] -lt -1 }
+    if ($invalidPolicy.Count -gt 0) {
+        $names = ($invalidPolicy | ForEach-Object { $_[0] }) -join ", "
+        Add-Result -Name "backup-inventory" -Status "fail" -Detail "policy values must be -1 or non-negative: $names"
+        return
+    }
+
+    $backupArguments = @("-m", "token_tracker", "backup-inventory")
+    if (-not [string]::IsNullOrWhiteSpace($BackupDirectory)) {
+        $backupArguments += @("--output-dir", $BackupDirectory)
+    }
+    if ($MinBackupCount -ge 0) {
+        $backupArguments += @("--min-count", $MinBackupCount.ToString())
+    }
+    if ($MaxBackupAgeDays -ge 0) {
+        $backupArguments += @("--max-age-days", $MaxBackupAgeDays.ToString())
+    }
+    if ($MaxBackupSizeMiB -ge 0) {
+        $backupArguments += @("--max-size-mib", $MaxBackupSizeMiB.ToString())
+    }
+    if ($VerifyBackups) {
+        $backupArguments += "--verify"
+    }
+
+    Invoke-CommandCheck -Name "backup-inventory" -Command {
+        & $python @backupArguments
+    } -NonZeroStatus "pass"
+}
+
 Write-Host "AI Token Tracker release doctor: mode=$Mode"
 
 if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
@@ -83,6 +127,8 @@ if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
 Invoke-CommandCheck -Name "local-preflight" -Command {
     & $python -m token_tracker preflight --host 127.0.0.1
 }
+
+Invoke-BackupInventoryCheck
 
 Invoke-CommandCheck -Name "exe-toolchain" -Command {
     & (Join-Path $windowsRoot "packaging\toolchain-doctor.ps1")
