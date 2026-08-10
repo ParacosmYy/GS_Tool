@@ -134,6 +134,18 @@ python -m token_tracker preflight --production
 预检只解析配置和数据库路径，不会创建数据库文件或父目录；目录创建仅发生在显式初始化
 或启动服务流程中。
 
+发布前可运行只读交付审计：
+
+```powershell
+python -m token_tracker audit
+python -m token_tracker audit --json
+python -m token_tracker audit --strict
+```
+
+普通审计会区分源码通过项与等待 Android/EXE/Caddy 工具链的 pending 项；`--strict` 会在仍有
+外部环境门禁时返回非零，适合接入正式发布流水线。审计不会创建数据库、用户、备份、构建产物或
+读取 `.env` 内容。
+
 局域网分享给同学（Windows 电脑作为中心服务和数据库宿主）：
 
 ```powershell

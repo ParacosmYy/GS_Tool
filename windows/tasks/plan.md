@@ -241,6 +241,12 @@ normalization, validation, and aggregate refresh.
 - [x] EXE `--onedir` 资源收集、冻结数据目录和清理路径保护写入脚本与 ADR-049。
 - [>] 当前环境未安装 PyInstaller，正式 EXE 生成、启动、升级和签名仍待批准构建环境。
 
+### Task B13: 只读发布就绪审计
+
+- [x] 新增 `token_tracker audit`，集中检查关键交付文件、1000 行门禁、跨端 v6 SHA-256 和 Python 运行时。
+- [x] 普通/JSON/strict 输出区分源码通过与 Android/EXE/Caddy 环境 pending，且不触碰数据库或敏感配置。
+- [>] 正式流水线接入与全部外部工具链 pass 证据仍待部署环境。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
-from . import backup, csv_export, db, deployment_checks, events
+from . import backup, csv_export, db, deployment_checks, events, release_audit
 from .services import UsageValidationError, add_usage, query_range
 
 
@@ -91,6 +91,11 @@ def build_parser() -> argparse.ArgumentParser:
     preflight_parser = subparsers.add_parser("preflight", help="只读检查共享/生产部署配置")
     preflight_parser.add_argument("--production", action="store_true", help="按 HTTPS 生产门禁检查")
     preflight_parser.set_defaults(handler=cmd_preflight)
+
+    audit_parser = subparsers.add_parser("audit", help="只读检查当前 checkout 的发布就绪状态")
+    audit_parser.add_argument("--json", action="store_true", help="以 JSON 输出稳定的检查结果")
+    audit_parser.add_argument("--strict", action="store_true", help="将未具备的外部工具链门禁视为失败")
+    audit_parser.set_defaults(handler=cmd_audit)
 
     serve_parser = subparsers.add_parser("serve", help="启动 Web 仪表盘")
     serve_parser.add_argument("--host", default=None, help="监听地址，默认 TOKEN_TRACKER_HOST 或 127.0.0.1")
@@ -294,6 +299,14 @@ def cmd_preflight(args: argparse.Namespace) -> int:
     mode = settings.get("RUNTIME_MODE", "local")
     print(f"部署预检通过：mode={mode}；HTTPS 门禁={'on' if args.production else 'off'}")
     return 0
+
+
+def cmd_audit(args: argparse.Namespace) -> int:
+    """Print release evidence without touching the configured database."""
+
+    checks = release_audit.run_audit()
+    print(release_audit.format_report(checks, as_json=args.json))
+    return release_audit.exit_code(checks, strict=args.strict)
 
 
 def cmd_serve(args: argparse.Namespace) -> int:

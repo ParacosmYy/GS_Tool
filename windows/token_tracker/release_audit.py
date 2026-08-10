@@ -1,0 +1,191 @@
+"""Read-only release readiness audit for the local checkout.
+
+Author: AI Token Tracker Engineering Team
+Maintainer: Project Owner
+Purpose: Collect reproducible source and environment gate evidence without
+         creating databases, users, build artifacts, or deployment state.
+Module: Delivery / release audit application boundary
+"""
+
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass
+import hashlib
+import json
+from importlib.util import find_spec
+from pathlib import Path
+import shutil
+from typing import Any, Iterable
+
+
+PASS = "pass"
+PENDING = "pending"
+FAIL = "fail"
+SOURCE_EXTENSIONS = frozenset({".bat", ".css", ".html", ".js", ".json", ".kt", ".py", ".ps1", ".xml"})
+
+
+@dataclass(frozen=True)
+class AuditCheck:
+    """One named gate with a stable status and human-readable evidence."""
+
+    name: str
+    status: str
+    detail: str
+
+
+def repository_root() -> Path:
+    """Resolve the checkout root from the installed package location."""
+
+    return Path(__file__).resolve().parents[2]
+
+
+def run_audit(root: Path | None = None) -> list[AuditCheck]:
+    """Collect read-only release checks for the supplied repository root."""
+
+    project_root = (root or repository_root()).resolve()
+    checks: list[AuditCheck] = []
+    _check_required_files(project_root, checks)
+    _check_source_line_cap(project_root, checks)
+    _check_scene_assets(project_root, checks)
+    _check_runtime_dependencies(checks)
+    _check_external_tool_gates(project_root, checks)
+    return checks
+
+
+def summarize(checks: Iterable[AuditCheck]) -> dict[str, int]:
+    """Return stable counts for CLI, JSON consumers, and release notes."""
+
+    counts = {PASS: 0, PENDING: 0, FAIL: 0}
+    for check in checks:
+        counts[check.status] = counts.get(check.status, 0) + 1
+    return counts
+
+
+def format_report(checks: list[AuditCheck], as_json: bool = False) -> str:
+    """Render an audit without printing paths that could contain secrets."""
+
+    counts = summarize(checks)
+    if as_json:
+        return json.dumps(
+            {"checks": [asdict(check) for check in checks], "summary": counts},
+            ensure_ascii=False,
+            indent=2,
+        )
+    lines = ["AI Token Tracker release audit (read-only)"]
+    for check in checks:
+        lines.append(f"[{check.status.upper():7}] {check.name}: {check.detail}")
+    lines.append(
+        f"summary: pass={counts[PASS]} pending={counts[PENDING]} fail={counts[FAIL]}"
+    )
+    return "\n".join(lines)
+
+
+def exit_code(checks: Iterable[AuditCheck], strict: bool) -> int:
+    """Map audit state to a scriptable exit code without hiding pending gates."""
+
+    counts = summarize(checks)
+    if counts[FAIL]:
+        return 2
+    if strict and counts[PENDING]:
+        return 3
+    return 0
+
+
+def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
+    required = (
+        "start.bat",
+        "windows/.env.example",
+        "windows/requirements.lock",
+        "windows/packaging/requirements-build.lock",
+        "windows/deployment/Caddyfile.example",
+        "windows/token_tracker/web.py",
+        "windows/token_tracker/api_v1.py",
+        "android/app/src/main/AndroidManifest.xml",
+    )
+    missing = [item for item in required if not (root / item).is_file()]
+    if missing:
+        checks.append(AuditCheck("required-artifacts", FAIL, f"缺少 {len(missing)} 个交付文件"))
+    else:
+        checks.append(AuditCheck("required-artifacts", PASS, f"已检查 {len(required)} 个关键文件"))
+
+
+def _check_source_line_cap(root: Path, checks: list[AuditCheck]) -> None:
+    source_roots = (root / "windows/token_tracker", root / "windows/packaging", root / "android/app/src/main")
+    files = [
+        path
+        for source_root in source_roots
+        if source_root.is_dir()
+        for path in source_root.rglob("*")
+        if path.is_file() and path.suffix.casefold() in SOURCE_EXTENSIONS
+    ]
+    oversized: list[str] = []
+    for path in files:
+        try:
+            lines = sum(1 for _ in path.open("r", encoding="utf-8"))
+        except (OSError, UnicodeDecodeError):
+            oversized.append("unreadable")
+            continue
+        if lines > 1000:
+            oversized.append(path.name)
+    if oversized:
+        checks.append(AuditCheck("source-line-cap", FAIL, f"{len(oversized)} 个文件超过 1000 行"))
+    else:
+        checks.append(AuditCheck("source-line-cap", PASS, f"已扫描 {len(files)} 个源文件"))
+
+
+def _check_scene_assets(root: Path, checks: list[AuditCheck]) -> None:
+    web_asset = root / "windows/token_tracker/static/assets/embedded-rust-engineer-bg-v6.png"
+    android_asset = root / "android/app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v6.png"
+    if not web_asset.is_file() or not android_asset.is_file():
+        checks.append(AuditCheck("cross-platform-scene", FAIL, "v6 Web/Android 资产不完整"))
+        return
+    web_hash = _sha256(web_asset)
+    android_hash = _sha256(android_asset)
+    if web_hash != android_hash:
+        checks.append(AuditCheck("cross-platform-scene", FAIL, "v6 Web/Android SHA-256 不一致"))
+        return
+    checks.append(AuditCheck("cross-platform-scene", PASS, f"v6 SHA-256 一致 {web_hash[:12]}…"))
+
+
+def _check_runtime_dependencies(checks: list[AuditCheck]) -> None:
+    required = ("flask", "requests", "dotenv", "waitress")
+    missing = [name for name in required if find_spec(name) is None]
+    if missing:
+        checks.append(AuditCheck("python-runtime", FAIL, f"缺少 {', '.join(missing)}"))
+    else:
+        checks.append(AuditCheck("python-runtime", PASS, "Flask/requests/dotenv/Waitress 可导入"))
+
+
+def _check_external_tool_gates(root: Path, checks: list[AuditCheck]) -> None:
+    pyinstaller_ready = find_spec("PyInstaller") is not None
+    checks.append(
+        AuditCheck(
+            "exe-toolchain",
+            PASS if pyinstaller_ready else PENDING,
+            "PyInstaller 可用" if pyinstaller_ready else "PyInstaller 未安装，等待批准构建环境",
+        )
+    )
+    gradle_ready = (root / "android/gradlew.bat").is_file() or shutil.which("gradle") is not None
+    checks.append(
+        AuditCheck(
+            "android-toolchain",
+            PASS if gradle_ready else PENDING,
+            "Gradle wrapper/命令可用" if gradle_ready else "Gradle wrapper 与系统 Gradle 均不可用",
+        )
+    )
+    caddy_ready = shutil.which("caddy") is not None
+    checks.append(
+        AuditCheck(
+            "edge-toolchain",
+            PASS if caddy_ready else PENDING,
+            "Caddy 可用" if caddy_ready else "Caddy 未安装，正式 edge validate 待部署主机",
+        )
+    )
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest().upper()
