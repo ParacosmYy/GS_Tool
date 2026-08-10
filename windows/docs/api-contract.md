@@ -105,10 +105,14 @@ python -m token_tracker ingest-token revoke --username alice --id 1
 ```
 
 `direction`、`outcome`、代码值和长度均由服务端白名单校验；事件不接受原始 prompt、密钥或任意 HTML。`efficiency_score` 为可选的 0-100 主观/规则评分，不代表生产绩效结论。
+同一账户的工作事件写入受服务端滑动窗口保护；超过预算返回 `429 RATE_LIMITED`，客户端应等待后重试。
 
 ### `POST /api/v1/logs`
 
 需要登录。接受 `level`、`event_type`、`message`、`error_code`、`request_id` 和有限 metadata；服务端会截断并脱敏。日志用于故障诊断，不等同于审计事件。
+同一账户的日志写入受服务端滑动窗口保护；超过预算返回 `429 RATE_LIMITED`，客户端应等待后重试。
+
+`POST /api/v1/records`、`POST /api/v1/events/work` 和 `POST /api/v1/logs` 的预算按账户在 Web 与 Android 之间共享，避免通过切换客户端绕过保护。
 
 ### 分页列表响应
 

@@ -126,6 +126,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
     required = (
         "README.md",
         "windows/docs/release-readiness.md",
+        "windows/docs/decisions/ADR-066-per-user-write-budgets.md",
         "windows/docs/decisions/ADR-065-scene-background-v8.md",
         "windows/skills/README.md",
         "windows/skills/project-ui-orchestration/SKILL.md",
@@ -382,6 +383,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("web-scene-image-layer", "windows/token_tracker/templates/base.html", "story-backdrop-image"),
         ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v8"),
         ("scene-background-decision", "windows/docs/decisions/ADR-065-scene-background-v8.md", "embedded-rust-engineer-bg-v8.png"),
+        ("write-budget-decision", "windows/docs/decisions/ADR-066-per-user-write-budgets.md", "allow_user_write(resource, user_id)"),
         ("android-agp-version", "android/build.gradle.kts", "id(\"com.android.application\") version \"9.3.0\""),
         ("android-kotlin-version", "android/build.gradle.kts", "id(\"org.jetbrains.kotlin.android\") version \"2.3.21\""),
         ("android-gradle-version", "android/gradle/wrapper/gradle-wrapper.properties", "gradle-9.5.0-bin.zip"),

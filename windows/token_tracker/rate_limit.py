@@ -27,6 +27,12 @@ _DATABASE: Path | None = None
 _PERSISTENT = False
 _LAST_PRUNE = 0.0
 _PRUNE_INTERVAL_SECONDS = 300.0
+_USER_WRITE_POLICIES: dict[str, tuple[int, int]] = {
+    "usage-record": (120, 60),
+    "work-event": (180, 60),
+    "app-log": (300, 60),
+    "admin-export": (12, 60),
+}
 
 
 def configure(database: str | Path, *, persistent: bool) -> None:
@@ -59,6 +65,27 @@ def allow(bucket: str, identity: str, limit: int, window_seconds: int) -> bool:
     if _PERSISTENT and _DATABASE is not None:
         return _allow_persistent(bucket, identity, limit, window_seconds, _DATABASE)
     return _allow_memory(bucket, identity, limit, window_seconds)
+
+
+def allow_user_write(resource: str, user_id: int) -> bool:
+    """Apply one shared per-user write budget across Web and API v1.
+
+    The policy is intentionally kept beside the replaceable limiter rather
+    than copied into controllers. This prevents a user from bypassing the
+    same protection by switching between the browser and Android surfaces.
+    Unknown resource names fail closed so a new write route cannot silently
+    ship without an explicit budget.
+    """
+
+    policy = _USER_WRITE_POLICIES.get(resource)
+    if policy is None:
+        return False
+    try:
+        identity = str(int(user_id))
+    except (TypeError, ValueError):
+        return False
+    limit, window_seconds = policy
+    return allow(f"user-write:{resource}", identity, limit, window_seconds)
 
 
 def _allow_memory(bucket: str, identity: str, limit: int, window_seconds: int) -> bool:

@@ -98,6 +98,10 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
     const card = form.closest(".form-card");
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+      if (form.dataset.submitting === "true") return;
+      form.dataset.submitting = "true";
+      const submit = form.querySelector('button[type="submit"]');
+      if (submit) submit.disabled = true;
       const message = byId("manual-message");
       setMotionState(card, "loading");
       setMotionState(form, "loading");
@@ -114,6 +118,9 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
         setMotionState(card, "error");
         setMotionState(form, "error");
         setMessage(message, error.message, true);
+      } finally {
+        form.dataset.submitting = "false";
+        if (submit) submit.disabled = false;
       }
     });
   }

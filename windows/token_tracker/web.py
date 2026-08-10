@@ -265,6 +265,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
                 return error_response("INVALID_RANGE", str(exc), 400)
             return jsonify({"records": payload["records"]})
 
+        if not rate_limit.allow_user_write("usage-record", g.user["id"]):
+            return error_response("RATE_LIMITED", "记录写入过于频繁，请稍后再试", 429)
         payload = request.get_json(silent=True) or {}
         if not isinstance(payload, dict):
             return error_response("BAD_REQUEST", "请求 JSON 必须是对象", 400)

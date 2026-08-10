@@ -200,6 +200,8 @@ def get_work_events() -> Response:
 def create_usage_record() -> Response:
     """Persist one client-entered usage record under the bearer account."""
 
+    if not rate_limit.allow_user_write("usage-record", g.user["id"]):
+        return error_response("RATE_LIMITED", "记录写入过于频繁，请稍后再试", 429)
     payload = _payload()
     if payload is None:
         return error_response("BAD_REQUEST", "请求 JSON 必须是对象", 400)
@@ -304,6 +306,8 @@ def proxy_chat_completions() -> Response:
 def create_work_event() -> Response:
     """Validate and persist one user-scoped work event or idempotent replay."""
 
+    if not rate_limit.allow_user_write("work-event", g.user["id"]):
+        return error_response("RATE_LIMITED", "工作事件写入过于频繁，请稍后再试", 429)
     payload = _payload()
     if payload is None:
         return error_response("BAD_REQUEST", "请求 JSON 必须是对象", 400)
@@ -342,6 +346,8 @@ def get_logs() -> Response:
 def create_log() -> Response:
     """Validate and persist one bounded, privacy-filtered application log."""
 
+    if not rate_limit.allow_user_write("app-log", g.user["id"]):
+        return error_response("RATE_LIMITED", "日志写入过于频繁，请稍后再试", 429)
     payload = _payload()
     if payload is None:
         return error_response("BAD_REQUEST", "请求 JSON 必须是对象", 400)
@@ -389,6 +395,8 @@ def admin_user_activity(user_id: int) -> Response:
 def admin_export() -> Response:
     """Export one fixed administrator data projection within safety limits."""
 
+    if not rate_limit.allow_user_write("admin-export", g.user["id"]):
+        return error_response("RATE_LIMITED", "导出请求过于频繁，请稍后再试", 429)
     kind = str(request.args.get("kind", "usage") or "usage").strip().lower()
     try:
         csv_bytes = admin_service.export_csv(g.user["id"], kind, g.request_id, _database())

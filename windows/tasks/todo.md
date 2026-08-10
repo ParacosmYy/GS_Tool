@@ -15,6 +15,7 @@
 - [x] 安全门禁 B3：Web 与 `/api/v1` 共享凭据校验，bearer token 生命周期独立
 - [x] 安全门禁 B4：新增 SQLite 备份只读验证命令和必要 schema 检查
 - [x] 安全门禁 B5：新增共享/生产部署只读预检和 HTTPS 配置门禁
+- [x] 安全门禁 B6：Web/Android 共用账号写入预算，记录、工作事件、日志和管理员导出按用户滑动限流
 
 - [x] 已将 Windows 个人账本升级为中心化多用户服务设计，保留根目录 `start.bat` 体验入口
 - [>] `windows/` 服务端与 `android/` 客户端目录已建立，Android Compose 工程骨架待工具链编译验证
@@ -93,6 +94,7 @@
 
 - [x] Windows 阶段基线 README quick start、API contract 和 ADR 已更新
 - [x] 当前阶段 compile/help/health/security-header 和浏览器证据已保存
+- [x] ADR-066 固化多人分享场景的 per-user 写入预算和 `429 RATE_LIMITED` 契约
 - [x] 当前阶段未提交真实密钥、测试数据或生成 QA 数据
 - [>] 长线最终交付审计仍进行中，不能把阶段基线当作全部项目完成
 
