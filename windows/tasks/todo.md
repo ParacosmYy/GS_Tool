@@ -32,6 +32,7 @@
 - [x] Web/Android 场景 v13：强化御姐嵌入式工程师、MacBook Pro/Mac Studio 风格工作站与 Rust/RL 屏幕语义；v12 继续作为回滚资产（ADR-090）
 - [x] EXE v13 交付一致性：重建 EXE/ZIP，隔离验证 v13 资源 200、ready/login、包 verifier 和 `%LOCALAPPDATA%` 数据目录边界（ADR-091）
 - [x] EXE v12→v13→v12 升级/回滚：通过真实 `/api/v1/records` 验证同一记录在包切换后保留（ADR-092）
+- [x] EXE 签名门禁：加入 SHA-256/HTTPS timestamp/Code Signing EKU 要求、签名入口和只读签名验证器；缺少批准工具或证书时 fail-closed（ADR-093）
 - [x] 新增只读 `token_tracker audit` 发布审计入口，区分源码通过与外部工具链 pending
 - [x] Chart.js 4.4.7 固定为项目本地静态资产，核心图表不再依赖 CDN
 - [x] Provider 响应投影：Web/Android 只接收有界助手文本和稳定字段，不透传原始上游 JSON
@@ -136,7 +137,7 @@
 - [>] Web UI-3 四档响应式、焦点、ARIA、对比度和空状态独立证据（Dashboard/Admin 四档、动态错误播报、历史非空、服务端导出 200 和 Provider 网络失败已有隔离证据；浏览器下载落盘、真实 Provider 成功和真实设备环境仍待）
 - [ ] Android JDK/Gradle/SDK 获批准后的构建、安装、设备联调和 APK
 - [>] HTTPS 中心部署、备份恢复演练、限流和脱敏访问日志：隔离 staging 恢复、应用/Werkzeug 日志脱敏已通过；正式 Caddy/HTTPS、生产 ACL/轮转、限流压测和真实数据恢复仍待执行
-- [>] 架构师最终审计、签名/正式分发说明、回滚说明和正式交付归档
+- [>] 架构师最终审计、批准证书签名/正式分发说明、回滚说明和正式交付归档
 
 ## Architecture governance evidence
 

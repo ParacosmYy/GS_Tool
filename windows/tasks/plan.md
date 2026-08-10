@@ -487,6 +487,15 @@ API / 动画 / 设计 token 契约
 - [x] 记录 v12/v13 场景资源 HTTP 200、manifest verifier、隔离 LocalAppData 和端口释放证据（ADR-092）。
 - [>] Authenticode 签名、正式分发渠道和生产数据回滚仍待部署负责人验收。
 
+### Task B33: Authenticode 签名 fail-closed 门禁
+
+**目标：** 为 Windows 分享包提供可审计的签名顺序，避免 unsigned、自签名或未信任文件被误发布。
+
+- [x] 新增 `packaging/sign-build.ps1`，要求批准证书 thumbprint、私钥、Code Signing EKU、未过期证书和 HTTPS timestamp URL。
+- [x] 新增只读 `packaging/verify-signature.ps1`，检查所有 `.exe`、`.dll` 和 `.pyd` 的 `Valid` 状态及可选 signer thumbprint。
+- [x] 将签名必须发生在 `package.ps1` 之前、签名后重新生成 manifest 的顺序写入 README、ADR-093、发布矩阵和发布审计。
+- [>] 当前环境缺少 `signtool.exe` 和批准的生产签名材料；实际签名、timestamp、正式渠道仍待部署负责人验收。
+
 ### Task B28: Caddy 边缘工具链与相对路径门禁
 
 **目标：** 让慢速网络下的 Caddy 项目缓存下载有明确超时边界，并确保 edge 预检与正式启动使用同一工作目录，避免相对日志路径污染调用者目录。

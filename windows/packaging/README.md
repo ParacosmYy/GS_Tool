@@ -71,6 +71,21 @@ Authenticode 签名和正式分发仍需要部署负责人验收，详细证据�
 构建产物的 SHA-256、用户数据目录和已知未完成门禁见 [`ADR-091`](../docs/decisions/ADR-091-exe-v13-rebuild-evidence.md)。
 这不等于正式分发完成：签名、中心 HTTPS 和真实部署数据恢复仍需单独验收。
 
+## Authenticode 签名
+
+正式发布必须先在批准的 Windows SDK/SignTool 环境中签名，再重新生成 ZIP：
+
+```powershell
+.\packaging\sign-build.ps1 `
+  -CertificateThumbprint "<approved-code-signing-thumbprint>" `
+  -TimestampUrl "https://<approved-timestamp-service>"
+.\packaging\package.ps1 -Version 0.1.0
+.\packaging\verify-signature.ps1 -PackageDirectory .\dist\AI-Token-Tracker `
+  -ExpectedThumbprint "<approved-code-signing-thumbprint>"
+```
+
+证书私钥、timestamp 服务和 `signtool.exe` 不进入仓库或发布包。缺少任一项时签名门禁失败，不能用本地自签名证书替代正式发布证书；边界和官方依据见 [`ADR-093`](../docs/decisions/ADR-093-authenticode-signing-gate.md)。
+
 ## 团队分享
 
 团队分享需要在 Windows 中心机运行：
