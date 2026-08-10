@@ -19,7 +19,7 @@
 
 - [x] 已将 Windows 个人账本升级为中心化多用户服务设计，保留根目录 `start.bat` 体验入口
 - [>] `windows/` 服务端与 `android/` 客户端目录已建立，Android Compose 工程骨架待工具链编译验证
-- [x] 写入 1 UI + 4 DEV + 2 ARCH 角色约束、五个 UI 模块归属和 1000 行文件硬门禁
+- [x] 按用户要求固定 3 UI + FE + BE + ARCH 六个正式责任角色；细分开发槽位降级为执行子轨道（ADR-084）
 - [x] 写入企业级文件头、公共接口 KDoc/docstring、跨端契约和高内聚低耦合注释规范
 - [x] users.role、admin RBAC、管理员概览、审计事件和安全导出（Windows 首切片）
 - [x] work_events/app_logs 结构化模型：方向、效率、正确/错误码、request_id、日志等级
@@ -58,7 +58,7 @@
 
 ## Role framework
 
-- [x] 建立七槽位独立交付目录（1 UI + 4 DEV + 2 ARCH）
+- [x] 建立六角色责任目录与 FE/ARCH 执行子轨道，保留历史目录引用并统一合并顺序（ADR-084）
 - [x] 为每个角色记录输入、输出、验收点和集成边界
 - [x] 统一源文件作者头和企业级注释规范
 - [x] 将所有公共决策链接到 ADR/API/UI 契约

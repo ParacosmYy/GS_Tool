@@ -142,6 +142,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/docs/decisions/ADR-081-android-project-toolchain.md",
         "windows/docs/decisions/ADR-082-exe-build-evidence.md",
         "windows/docs/decisions/ADR-083-caddy-project-cache.md",
+        "windows/docs/decisions/ADR-084-six-accountable-roles.md",
         "android/provision-toolchain.ps1",
         "windows/docs/decisions/ADR-075-gateway-center-discovery.md",
         "windows/docs/decisions/ADR-071-release-doctor-composition.md",
@@ -469,7 +470,8 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("project-skills-source", "windows/skills/README.md", "7676817c12a1317454ae3898a0c5c1eacf5dd3d5"),
         ("project-ui-orchestration", "windows/skills/project-ui-orchestration/SKILL.md", "AI Token Tracker UI"),
         ("project-ci-cd", "windows/skills/ci-cd-and-automation/SKILL.md", "Project CI/CD and Automation Skill"),
-        ("role-framework", "windows/roles/README.md", "七角色独立交付区"),
+        ("role-framework", "windows/roles/README.md", "六角色责任模型"),
+        ("role-model-decision", "windows/docs/decisions/ADR-084-six-accountable-roles.md", "六个正式责任角色"),
         ("ui-module-framework", "windows/ui-modules/01-shell/README.md", "UI Module 01"),
     )
     missing: list[str] = []
