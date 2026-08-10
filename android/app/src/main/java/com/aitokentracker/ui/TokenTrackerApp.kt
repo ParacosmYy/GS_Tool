@@ -150,7 +150,7 @@ private fun AppBackdrop(content: @Composable () -> Unit) {
             .fillMaxSize()
             .background(androidx.compose.material3.MaterialTheme.colorScheme.background),
     ) {
-        AnimatedBrandBackdrop()
+        BrandBackdrop()
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -176,6 +176,29 @@ private fun AppBackdrop(content: @Composable () -> Unit) {
         )
         content()
     }
+}
+
+/** Select a static or animated illustration without changing content semantics. */
+@Composable
+private fun BrandBackdrop() {
+    if (rememberReducedMotion()) {
+        StaticBrandBackdrop()
+    } else {
+        AnimatedBrandBackdrop()
+    }
+}
+
+/** Render the same decorative scene without starting an infinite transition. */
+@Composable
+private fun StaticBrandBackdrop() {
+    Image(
+        painter = painterResource(R.drawable.embedded_rust_engineer_bg_v10),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .fillMaxSize()
+            .alpha(.36f),
+    )
 }
 
 /**

@@ -300,3 +300,12 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   error/warning 为空。
 - 该切片只关闭认证标题重复语义风险；真实系统 `prefers-reduced-motion`、高对比度/forced-colors、
   真实设备指标、下载落盘和 Provider 成功仍保持 UI-3 未关闭门禁。
+
+## v24 Android 系统减少动画策略（源码交付）
+
+- 新增 `android/app/src/main/java/com/aitokentracker/ui/MotionPreferences.kt`，统一读取
+  `ANIMATOR_DURATION_SCALE` 与 `TRANSITION_ANIMATION_SCALE`；任一为 `0` 时返回减少动画状态。
+- `TokenTrackerApp` 的品牌背景在该状态下使用 `StaticBrandBackdrop`，`SignalOrbit` 使用
+  `StaticSignalOrbit`；动态分支才创建 `rememberInfiniteTransition`，静态分支不启动无限循环。
+- 这一步是跨端源码和依赖方向证据，不冒充 Android 真机/模拟器运行证据；JDK、Gradle、SDK、系统
+  设置和帧耗时仍需获批工具链完成。

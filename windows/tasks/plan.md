@@ -343,6 +343,15 @@ content 复制层参与语义名称。
 - [x] ADR-078、README、架构、发布就绪、角色复核、验收矩阵和静态审计引用已同步。
 - [>] 正式 HTTPS、局域网 ACL、防火墙和外部暴露仍属于部署门禁。
 
+### Task B24: Android 系统动效偏好边界
+
+**目标：** 让 Android 端的装饰动效与 Web 的 reduced-motion 契约一致，并保持业务状态、数据访问和 UI 动效解耦。
+
+- [x] 新增独立 `MotionPreferences.kt`，集中读取 Android 动画缩放设置，不在 ViewModel/Repository 中读取平台配置。
+- [x] 品牌背景和 `SignalOrbit` 在减少动画时渲染静态分支，动态分支才创建无限过渡。
+- [x] ADR-079、Android README、UI-3 证据、发布矩阵、角色复核和发布审计引用已同步。
+- [>] JDK/Gradle/SDK、真机系统设置和帧耗时仍需批准工具链验证。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

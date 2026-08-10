@@ -70,6 +70,7 @@ android/
     feature/dashboard/       # 普通成员观测台
     feature/admin/           # 管理员团队只读观测台
     ui/                       # Compose 壳和动效原语
+    MotionPreferences.kt      # Android 系统减少动画策略边界
     ui/theme/                 # 颜色、字体、Material 主题
   app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v9.png
                             # 嵌入式 Rust/RL 工程师与 Pro 工作站品牌背景（v8）
@@ -94,3 +95,4 @@ android/
 - 仪表盘“自动采集”调用 `/api/v1/provider/models` 与 `/api/v1/proxy/chat/completions`；API Key 只由当前表单以内存参数传入，Android 仅解析助手文本、usage 摘要和记录投影，不保存完整 provider 响应。
 - 管理员端只读取 `/admin/overview`、`/admin/users` 和选中成员的 `/admin/users/<id>/records`；成员明细按需加载，服务端继续执行 RBAC、字段脱敏和审计记录。
 - Android 不保存或展示密码哈希、访问令牌、refresh token、上游 API Key、原始 prompt 或完整 provider 响应；管理员 CSV 导出仍保留在 Windows 网页端。
+- 品牌背景和 `SignalOrbit` 遵守 Android 系统动画缩放设置；关闭系统动画时只渲染静态装饰，不改变业务内容或网络状态，详见 ADR-079。
