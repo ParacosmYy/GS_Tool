@@ -66,6 +66,7 @@ def run_audit(root: Path | None = None) -> list[AuditCheck]:
     _check_source_headers(project_root, checks)
     _check_public_api_docstrings(project_root, checks)
     _check_android_kdoc(project_root, checks)
+    _check_architecture_boundaries(project_root, checks)
     _check_scene_assets(project_root, checks)
     _check_chartjs_asset(project_root, checks)
     _check_runtime_dependencies(checks)
@@ -283,6 +284,50 @@ def _has_kdoc(lines: list[str], declaration_index: int) -> bool:
             continue
         return stripped.endswith("*/")
     return False
+
+
+def _check_architecture_boundaries(root: Path, checks: list[AuditCheck]) -> None:
+    """Verify that UI surfaces do not bypass the Android/data and Python layers."""
+
+    violations: list[str] = []
+    android_root = root / "android/app/src/main/java"
+    forbidden_android_imports = re.compile(
+        r"import .*?(?:java\.net|android\.database|androidx\.room|data\.remote|data\.secure|HttpURLConnection)"
+    )
+    for path in sorted(android_root.rglob("*.kt")):
+        normalized = path.as_posix()
+        is_ui_surface = (
+            "/feature/admin/" in normalized
+            or "/feature/dashboard/" in normalized
+            or path.name == "LoginScreen.kt"
+            or "/ui/" in normalized
+            or path.name == "MainActivity.kt"
+        )
+        if not is_ui_surface:
+            continue
+        for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            if forbidden_android_imports.search(line):
+                violations.append(f"{path.name}:{line_number}")
+
+    python_rules = {
+        "services.py": ("flask", "sqlite3"),
+        "providers.py": ("flask", "sqlite3"),
+        "db.py": ("flask",),
+        "web.py": ("requests",),
+    }
+    python_root = root / "windows/token_tracker"
+    for filename, forbidden_modules in python_rules.items():
+        path = python_root / filename
+        for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            if any(
+                re.search(rf"(?:from|import)\s+{re.escape(module)}(?:\.|\s|$)", line)
+                for module in forbidden_modules
+            ):
+                violations.append(f"{filename}:{line_number}")
+    if violations:
+        checks.append(AuditCheck("architecture-boundaries", FAIL, f"{len(violations)} 个层间依赖越界"))
+    else:
+        checks.append(AuditCheck("architecture-boundaries", PASS, "Android UI/Python 应用层未绕过数据与网络边界"))
 
 
 def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
