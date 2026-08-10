@@ -37,19 +37,18 @@
 - [`ui-audit-v4-1024.png`](../.cache/ui-audit-v4-1024.png)：平板/桌面过渡断点登录页。
 - [`ui-audit-v4-1440.png`](../.cache/ui-audit-v4-1440.png)：桌面登录页。
 
-## v5 背景与四档回归
+## v6 背景与四档回归
 
-- v5 资源已完成本地视觉检查：左侧 42% 平均亮度约 `10.59`，右侧场景约 `29.70`，负空间仍明显暗于主体区域。
-- 隔离本地服务返回 `/login`、`scene-motion.css` 和 `/static/assets/embedded-rust-engineer-bg-v5.png` 均为 `200`；CSS 实际包含 v5 资源引用。
-- v5 四档真实浏览器截图已生成：`ui-audit-v5-1440.png`、`ui-audit-v5-1024.png`、`ui-audit-v5-768.png`、`ui-audit-v5-320.png`。
-- 四档 `document.scrollWidth` 均等于可视布局宽度；320px 为 `clientWidth=305`、`scrollWidth=305`，差值只来自垂直滚动条。
-- v5 浏览器控制台没有 warn/error；320px 键盘焦点序列为 `username → password → submit → Create one`。
+- v6 资源已完成本地视觉检查：保持左侧登录负空间、右侧单角色构图，并强化笔记本、桌面工作站、Rust/RL telemetry 屏幕与服务器机架的层次。
+- CSS 已切换到 `/static/assets/embedded-rust-engineer-bg-v6.png`；v5 资产仍保留，可在不改动业务模板的情况下回滚。
+- v6 仅有图像生成器和本地文件检查证据；当前环境没有可用浏览器 CDP，因此没有把旧 v5 截图冒充 v6 运行时证据。
+- 下一次具备浏览器 CDP 运行时后，需要重新生成 `ui-audit-v6-1440/1024/768/320.png`，并复核四档横向溢出、空态、焦点和局部对比度。
 - 本轮静态语义切片已通过：仪表盘只保留一个 `h1`、记录表列头和管理员详情表使用 `scope="col"`、表格有 caption，管理员详情打开后焦点进入关闭按钮并在关闭后返回触发按钮；登录/注册密码 maxlength 与服务端 256 字符边界一致。
-- v4 截图保留为历史基线，不再作为 v5 默认渲染证据。
+- v4 截图保留为历史基线，不再作为 v6 默认渲染证据。
 
-## v5.1 场景层增强（源码与空 schema smoke）
+## v6.1 场景层增强（源码与空 schema smoke）
 
-- 登录/注册页的 v5 角色场景增加 `RUST / RL WORKBENCH` 与
+- 登录/注册页的 v6 角色场景增加 `RUST / RL WORKBENCH` 与
   `MACBOOK / STUDIO SCENE` 的低频场景签名；它标记为 `aria-hidden`，不伪装成真实
   硬件连接状态，也不参与业务状态判断。
 - 认证卡片改为受控透明度并启用 `backdrop-filter`，让工作台插画可见，同时保留深色
@@ -57,9 +56,9 @@
 - 320px 额外收紧签名字距和字号，避免场景标签导致横向溢出；`prefers-reduced-motion`
   会关闭 beacon 脉冲。
 - 使用隔离空 schema 的 Flask 渲染 smoke 检查 `/login`、`/register`、`/privacy` 均为
-  `200`，v5 背景与场景签名均存在；没有创建真实用户或写入项目数据库。
-- 本次仅做源码级增强，v5 既有四档浏览器截图仍是最新运行时图像证据；下一次具备浏览器
-  CDP 运行时后需要重拍 v5.1 四档截图并复核透明卡片后的局部对比度。
+  `200`，v6 背景与场景签名均存在；没有创建真实用户或写入项目数据库。
+- 透明卡片、pointer follower、背景视差和 reduced-motion 规则保持不变；下一次具备浏览器
+  CDP 运行时后需要重拍 v6.1 四档截图并复核透明卡片后的局部对比度。
 
 ## 尚未关闭的门禁
 
