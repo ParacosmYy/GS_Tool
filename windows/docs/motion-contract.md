@@ -33,6 +33,8 @@ reduced 是用户偏好覆盖层，覆盖所有非必要运动。
 - 成功/失败文案放在同一 `role="status" aria-live="polite"` 节点，不能只改变颜色。
 - 禁用按钮是状态结果，不是唯一 loading 反馈；文本必须说明正在发生什么。
 - `prefers-reduced-motion: reduce` 由 CSS 和 JS 同时处理，JS 不启动 pointer follower 和无限 requestAnimationFrame 循环。
+- 由用户动作触发的焦点回流可以在普通模式使用平滑定位；减少动效模式必须使用即时定位，不能让焦点
+  因滚动动画延迟或持续移动。
 
 认证页使用同一套约束：`.auth-shell` 负责入场与信号场，`.auth-orbit-art` 负责低频轨道，`auth.js` 只在 fine pointer 下更新 spotlight；焦点反馈独立于指针能力，触摸和键盘用户仍能看到表单状态。
 

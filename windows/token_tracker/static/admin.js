@@ -114,7 +114,8 @@ function renderDetail(activity, name) {
   detail.hidden = false;
   detailTrigger?.setAttribute('aria-expanded', 'true');
   document.getElementById('admin-detail-close')?.focus();
-  detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  detail.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
 }
 
 async function showUserDetail(userId, userName) {
