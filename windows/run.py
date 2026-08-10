@@ -16,8 +16,6 @@ import threading
 import webbrowser
 from pathlib import Path
 
-from token_tracker.web import create_app
-
 
 def configure_frozen_storage() -> None:
     """Give a packaged EXE a writable, user-scoped database location.
@@ -108,6 +106,12 @@ def main() -> None:
     """Compose the local app and serve it through the locked WSGI runtime."""
 
     configure_frozen_storage()
+    # Import configuration only after the frozen storage boundary is set. The
+    # application configuration loader reads the project ``.env`` file; doing
+    # this import at module load time would let its relative database path win
+    # over the packaged EXE's user-scoped LOCALAPPDATA path.
+    from token_tracker.web import create_app
+
     try:
         host = resolve_local_host(os.getenv("TOKEN_TRACKER_HOST"))
     except ValueError as exc:

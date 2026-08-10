@@ -37,7 +37,9 @@ PyInstaller 模块/启动器是否存在，不执行 Python 导入、不下载�
 - `dist/` 只作为构建产物，不提交 Git；源码体验入口仍是根目录 `start.bat`。
 - 构建环境允许访问已批准的 Python 包缓存；脚本不会使用未锁定的 PyInstaller 版本。
 
-当前 checkout 未安装 PyInstaller，因此只保留可复现构建脚本和锁文件，不能声称 EXE 已生成或验收通过。
+当前 checkout 已按锁文件安装 PyInstaller 6.22.0，并完成一次 `--onedir` EXE 构建和隔离启动验收。
+构建产物的 SHA-256、用户数据目录和已知未完成门禁见 [`ADR-082`](../docs/decisions/ADR-082-exe-build-evidence.md)。
+这不等于正式分发完成：签名、升级/回滚、中心 HTTPS 和真实部署数据恢复仍需单独验收。
 
 ## 团队分享
 

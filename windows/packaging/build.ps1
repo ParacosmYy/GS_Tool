@@ -17,13 +17,13 @@ $distRoot = Join-Path $windowsRoot "dist"
 $buildRoot = Join-Path $windowsRoot "build"
 
 if (-not (Test-Path -LiteralPath $venvPython)) {
-    throw "找不到 windows/.venv。请先运行 windows/start.bat 或创建 Python 虚拟环境。"
+    throw "windows/.venv is missing. Run windows/start.bat or create the project virtual environment first."
 }
 if (-not (Test-Path -LiteralPath $runtimeRequirements)) {
-    throw "找不到 windows/requirements.lock。请先完成依赖锁定。"
+    throw "windows/requirements.lock is missing. Complete the runtime dependency lock first."
 }
 if (-not (Test-Path -LiteralPath $buildRequirements)) {
-    throw "找不到 packaging/requirements-build.lock。请先完成构建工具锁定。"
+    throw "packaging/requirements-build.lock is missing. Complete the build dependency lock first."
 }
 
 if ($Clean) {
@@ -32,7 +32,7 @@ if ($Clean) {
         if (Test-Path -LiteralPath $target) {
             $normalizedTarget = [System.IO.Path]::GetFullPath($target)
             if (-not $normalizedTarget.StartsWith($normalizedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
-                throw "拒绝清理工作区外路径：$normalizedTarget"
+                throw "Refusing to clean a path outside the workspace: $normalizedTarget"
             }
             Remove-Item -LiteralPath $target -Recurse -Force
         }
@@ -40,7 +40,7 @@ if ($Clean) {
 }
 
 & $venvPython -m pip install --disable-pip-version-check -r $runtimeRequirements -r $buildRequirements
-if ($LASTEXITCODE -ne 0) { throw "依赖安装失败。" }
+if ($LASTEXITCODE -ne 0) { throw "Dependency installation failed." }
 
 $entryPoint = Join-Path $windowsRoot "run.py"
 $templates = Join-Path $windowsRoot "token_tracker\templates"
@@ -49,9 +49,10 @@ $static = Join-Path $windowsRoot "token_tracker\static"
     --name "AI-Token-Tracker" `
     --distpath $distRoot `
     --workpath $buildRoot `
+    --specpath $buildRoot `
     --add-data "$templates;token_tracker/templates" `
     --add-data "$static;token_tracker/static" `
     $entryPoint
-if ($LASTEXITCODE -ne 0) { throw "PyInstaller 构建失败。" }
+if ($LASTEXITCODE -ne 0) { throw "PyInstaller build failed." }
 
-Write-Host "EXE 已生成：$distRoot\AI-Token-Tracker\AI-Token-Tracker.exe"
+Write-Host "EXE generated: $distRoot\AI-Token-Tracker\AI-Token-Tracker.exe"
