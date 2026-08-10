@@ -15,6 +15,7 @@ import hmac
 import ipaddress
 import json
 import os
+from pathlib import Path
 import re
 import uuid
 from typing import Any
@@ -23,7 +24,7 @@ from urllib.parse import urlparse, urlunparse
 from flask import Flask, Response, g, jsonify, request, stream_with_context
 import requests
 
-from . import ingest_auth, providers, request_ids
+from . import gateway_queue, ingest_auth, providers, request_ids
 from .gateway_reporting import UsageReporter
 
 
@@ -55,6 +56,7 @@ class GatewayConfig:
     report_timeout: int = 10
     maximum_request_bytes: int = 256 * 1024
     maximum_response_bytes: int = 2 * 1024 * 1024
+    queue_path: Path | None = None
 
 
 def build_config(
@@ -70,6 +72,7 @@ def build_config(
     report_timeout: Any = 10,
     maximum_request_bytes: Any = 256 * 1024,
     maximum_response_bytes: Any = 2 * 1024 * 1024,
+    queue_path: Any = None,
 ) -> GatewayConfig:
     """Validate startup inputs before a socket can be opened."""
 
@@ -97,6 +100,7 @@ def build_config(
         report_timeout_value = _positive_int(report_timeout, "report_timeout")
         request_bytes = _positive_int(maximum_request_bytes, "maximum_request_bytes")
         response_bytes = _positive_int(maximum_response_bytes, "maximum_response_bytes")
+        queue_value = _normalize_queue_path(queue_path)
     except ValueError as exc:
         raise GatewayConfigError(str(exc)) from exc
     return GatewayConfig(
@@ -111,6 +115,7 @@ def build_config(
         report_timeout=report_timeout_value,
         maximum_request_bytes=request_bytes,
         maximum_response_bytes=response_bytes,
+        queue_path=queue_value,
     )
 
 
@@ -137,14 +142,18 @@ def create_gateway_app(config: GatewayConfig) -> Flask:
 
     app = Flask("token_tracker.gateway")
     app.config["MAX_CONTENT_LENGTH"] = config.maximum_request_bytes
-    app.extensions["usage_reporter"] = UsageReporter(
-        config.ingest_url,
-        config.ingest_token,
-        config.report_timeout,
-    )
+    try:
+        app.extensions["usage_reporter"] = UsageReporter(
+            config.ingest_url,
+            config.ingest_token,
+            config.report_timeout,
+            queue_path=config.queue_path,
+        )
+    except (gateway_queue.QueueProtectionError, gateway_queue.QueueStorageError) as exc:
+        raise GatewayConfigError(f"Gateway 加密重试队列不可用：{exc}") from exc
 
     @app.before_request
-    def guard_request() -> None:
+    def guard_request() -> Any:
         g.request_id = request_ids.resolve(request.headers.get(request_ids.HEADER_NAME))
         if request.path == "/health" or _authorized(config):
             return
@@ -500,6 +509,22 @@ def _normalize_ingest_url(value: Any, allow_http: bool) -> str:
     if not parsed.path.endswith("/api/v1/ingest/usage"):
         raise ValueError("ingest_url must end with /api/v1/ingest/usage")
     return urlunparse((parsed.scheme, parsed.netloc, parsed.path, "", "", ""))
+
+
+def _normalize_queue_path(value: Any) -> Path | None:
+    """Validate an optional local queue path without creating it at config time."""
+
+    if value is None or not str(value).strip():
+        return None
+    text = str(value).strip()
+    if len(text) > 4096 or "\x00" in text:
+        raise ValueError("queue_path must be a valid local path")
+    path = Path(text).expanduser()
+    if not path.is_absolute():
+        path = (Path.cwd() / path).resolve()
+    if path.exists() and path.is_dir():
+        raise ValueError("queue_path must point to a file")
+    return path
 
 
 def _positive_int(value: Any, field_name: str) -> int:

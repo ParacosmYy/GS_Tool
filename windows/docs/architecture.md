@@ -57,7 +57,9 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 | `token_tracker/mobile_auth.py` | access/refresh token digest、轮换和撤销 | 不把 bearer secret 写入数据库 |
 | `token_tracker/ingest_auth.py` | 外部用量采集 token 的签发、摘要解析、过期和撤销边界 | 不保存 provider Key、原始 prompt 或 token 原文 |
 | `token_tracker/gateway.py` | 本地 OpenAI-compatible `/v1/models`、chat JSON/SSE 转发和 usage 上报 | 不写中心 SQLite，不接受客户端 base URL/API Key，不承担 Anthropic/Responses 私有协议 |
-| `token_tracker/gateway_reporting.py` | Gateway Usage Ingest 同步投递、有界内存重试和退避 | 不保存 provider Key、prompt 或跨重启队列，不改变中心入账契约 |
+| `token_tracker/gateway_reporting.py` | Gateway Usage Ingest 同步投递、退避和 worker 调度 | 不保存 provider Key、prompt 或 SQL 细节，不改变中心入账契约 |
+| `token_tracker/gateway_contracts.py` | Gateway 内部 UsageReport DTO 与序列化投影 | 不读取 HTTP、环境变量、SQLite 或 provider response |
+| `token_tracker/gateway_queue.py` | Windows DPAPI 密文队列、SQLite 事务和跨重启恢复 | 不接收 provider Key/prompt，不承担 HTTP 投递或页面会话 |
 | `token_tracker/schema.py` | SQLite DDL、索引和加法式兼容迁移 | 不读取 request/session，不组合业务查询 |
 | `token_tracker/db.py` | SQLite 连接、事务、参数化查询和 CSV | 不处理 HTTP 请求 |
 | `token_tracker/rate_limit.py` | 限流策略、内存/SQLite 状态适配和哈希 key | 不读取 Flask session，不保存原始 IP、用户 ID 或 provider Key |
@@ -151,8 +153,10 @@ Android 通过 bearer 认证的 `POST /api/v1/records` 写入手动 token 记录
 3. 非流式响应直接返回有界的兼容 JSON；流式响应按 SSE 原样转发并在完成 chunk 解析 usage。
 4. 有效 usage 通过 `POST /api/v1/ingest/usage` 上报，使用客户端幂等键或 Gateway 生成的请求键；
    上报失败不伪造 token，也不回滚已经完成的 provider 调用。
-5. Gateway 与中心服务是两个可独立替换的进程边界；后续重试队列和 Anthropic/Responses adapter
-   应作为独立切片实现，不在 `web.py` 增加厂商分支。
+5. Reporter 默认把短暂失败放入 Windows DPAPI 密文队列，使用同一幂等键跨重启恢复；容量、
+   尝试次数和 payload 均有界，`--memory-only` 只能显式用于临时调试。
+6. Gateway 与中心服务是两个可独立替换的进程边界；Anthropic/Responses adapter 应作为独立
+   切片实现，不在 `web.py` 增加厂商分支。
 
 Android 复用同一 application/provider service，但入口是 bearer 版本的
 `/api/v1/provider/models` 与 `/api/v1/proxy/chat/completions`。`data/remote`

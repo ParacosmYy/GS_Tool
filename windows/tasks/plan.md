@@ -274,13 +274,15 @@ normalization, validation, and aggregate refresh.
 - [x] provider Key 只从进程启动环境进入内存；Gateway 默认只监听 loopback，非 loopback 必须配置独立访问令牌。
 - [x] Gateway 复用 provider adapter 做上游 HTTPS/大小/超时校验，并用 Usage Ingest Token 上报，不写中心 SQLite。
 - [x] CLI 提供无密钥参数的启动方式，README 写明 Kimi Code/OpenAI-compatible 配置示例。
-- [>] 没有用户合法 provider Key 的真实上游调用仍不能伪造；持久化失败重试队列作为下一项可靠性切片。
+- [>] 没有用户合法 provider Key 的真实上游调用仍不能伪造；真实非流式/流式联调仍待用户授权。
 
 ### Task B18: Gateway 上报可靠性
 
 - [x] 将 Usage Ingest HTTP 投递抽成独立 reporter，不让 Gateway 路由持有重试细节。
 - [x] 中心短暂失败时进入有界内存队列，使用原幂等键、退避和最大重试次数，不写 provider Key/prompt。
-- [>] 进程重启后的持久化恢复仍需单独设计加密/脱敏存储，未获密钥管理方案前不落盘。
+- [x] Windows 默认使用 DPAPI 加密 SQLite 队列，跨实例恢复保持原幂等键；启动时校验 schema 和全部 payload，无法解密时 fail closed。
+- [x] `--memory-only` 作为显式临时调试选项；默认路径、容量、尝试次数、payload 大小和源文件行数均有边界。
+- [x] ADR-056、架构模块表、README、角色复核、发布审计和隔离 restart smoke 已同步。
 
 ## 目标
 
@@ -370,8 +372,8 @@ API / 动画 / 设计 token 契约
 ### Phase 7：长线最终交付门禁（进行中）
 
 - [>] API、认证、RBAC、密钥、备份和部署安全按 B 阶段逐项验收。
-- [>] 外部自动采集：安全 ingest API 与本地 Gateway 已完成；Gateway 的重试可靠性与真实 provider 联调仍未完成。
-- [>] UI-3 已完成 v5 登录页 320/768/1024/1440 独立浏览器证据、焦点、ARIA、对比度和横向溢出复核；v6 背景已接入但需在可用 CDP 后重拍四档证据，并完成仪表盘/管理员页面合法会话的空/错误态复核。
+- [>] 外部自动采集：安全 ingest API、本地 Gateway 和 DPAPI 跨重启重试已完成；真实 provider 联调仍需合法 Key。
+- [>] UI-3 已完成登录页和 v7 背景的本地四档观察；真实 320px 设备指标及仪表盘/连接/管理员页面合法会话的空/错误态复核仍待完成。
 - [ ] Android 工具链获批准后完成可复现构建、安装、设备联调和 APK 产物校验。
 - [>] 隔离 staging 恢复、应用/Werkzeug 访问日志脱敏和只读 Caddy edge preflight 已完成；正式 HTTPS/Caddy validate、生产 ACL/轮转、限流负载证据、真实数据恢复和回滚流程仍待部署演练。
 - [x] 当前 checkout 已建立本地 `main` Git 基线；敏感数据忽略边界已用真实路径验证，远程仓库与上传仍未启用（ADR-036）。

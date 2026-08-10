@@ -205,7 +205,8 @@ python -m token_tracker ingest-token revoke --username your-name --id 1
 ### 本地 Gateway：让外部客户端自动记账
 
 本项目现在提供独立的本地 OpenAI-compatible Gateway。它默认只监听 `127.0.0.1`，provider
-Key 和中心 ingest token 只从环境变量进入 Gateway 进程内存，不写入中心 SQLite、日志或命令行：
+Key 和中心 ingest token 只从环境变量进入 Gateway 进程内存，不写入中心业务 SQLite、日志或命令行；
+中心上报失败时默认只把有界 usage DTO 写入 Windows DPAPI 加密队列：
 
 ```powershell
 # 1. 先为当前账户创建一次性 Usage Ingest Token，并把输出的 ait_... 保存到 windows/.env
@@ -231,8 +232,10 @@ URL，详见 [Kimi Code API access](https://www.kimi.com/code/docs/en/)。
 Gateway 支持 `/v1/models`、非流式 Chat Completions 和 SSE 流式 Chat Completions；流式请求
 只在完成 chunk 提供合法输入/输出 usage 时入账，否则响应头 `X-AI-Tracker-Usage` 为
 `missing`，不会估算。中心短暂不可用时本次 provider 调用仍会返回，响应状态会标为
-`report-failed`；持久化重试队列属于后续可靠性切片。不要把 Gateway 绑定到公网或可信 LAN，
-除非另外配置 `TOKEN_TRACKER_GATEWAY_ACCESS_TOKEN` 并使用 HTTPS 边缘保护。
+`queued`，失败记录默认在 `data/gateway-usage-queue.sqlite3` 中以 DPAPI 密文跨重启恢复；达到
+容量/次数上限才会返回 `report-failed`。临时调试可以显式加 `--memory-only`，此时重启会丢失
+未上报记录。不要把 Gateway 绑定到公网或可信 LAN，除非另外配置
+`TOKEN_TRACKER_GATEWAY_ACCESS_TOKEN` 并使用 HTTPS 边缘保护。
 
 ## 5. Android 与跨端协议
 

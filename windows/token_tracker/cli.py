@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
-from . import backup, csv_export, db, deployment_checks, events, gateway, ingest_auth, release_audit
+from . import backup, csv_export, db, deployment_checks, events, gateway, gateway_queue, ingest_auth, release_audit
 from .services import UsageValidationError, add_usage, query_range
 
 
@@ -146,6 +146,16 @@ def build_parser() -> argparse.ArgumentParser:
     gateway_parser.add_argument("--allow-http", action="store_true", help="仅本地调试时允许 HTTP 上游/中心地址")
     gateway_parser.add_argument("--timeout", type=positive_int, default=120, help="上游请求超时秒数，默认 120")
     gateway_parser.add_argument("--report-timeout", type=positive_int, default=10, help="中心上报超时秒数，默认 10")
+    gateway_parser.add_argument(
+        "--queue-path",
+        default=str(gateway_queue.default_queue_path()),
+        help="DPAPI 加密重试队列路径，默认 data/gateway-usage-queue.sqlite3",
+    )
+    gateway_parser.add_argument(
+        "--memory-only",
+        action="store_true",
+        help="显式关闭跨重启队列，仅适用于临时调试",
+    )
     gateway_parser.add_argument("--debug", action="store_true", help="仅本机调试使用 Flask 开发服务器")
     gateway_parser.set_defaults(handler=cmd_gateway)
 
@@ -429,13 +439,22 @@ def cmd_gateway(args: argparse.Namespace) -> int:
             allow_http=args.allow_http,
             timeout=args.timeout,
             report_timeout=args.report_timeout,
+            queue_path=None if args.memory_only else args.queue_path,
         )
     except gateway.GatewayConfigError as exc:
         print(f"Gateway 启动被拒绝：{exc}", file=sys.stderr)
         return 2
-    app = gateway.create_gateway_app(config)
+    try:
+        app = gateway.create_gateway_app(config)
+    except gateway.GatewayConfigError as exc:
+        print(f"Gateway 启动被拒绝：{exc}", file=sys.stderr)
+        return 2
     print(f"本地 Gateway：http://{config.host}:{args.port}/v1")
     print("provider Key 和 Usage Ingest Token 仅驻留在当前进程内存。")
+    if config.queue_path:
+        print(f"失败重试队列：Windows DPAPI 加密存储于 {config.queue_path}")
+    else:
+        print("警告：当前使用仅进程内存的失败重试队列，重启后未上报记录会丢失。", file=sys.stderr)
     if args.allow_http:
         print("警告：当前允许 HTTP，仅适用于本机调试。", file=sys.stderr)
     if args.debug:

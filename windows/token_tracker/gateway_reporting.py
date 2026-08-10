@@ -1,8 +1,8 @@
-"""Bounded in-memory Usage Ingest delivery for the local Gateway.
+"""Bounded Usage Ingest delivery for the local Gateway.
 
 Author: AI Token Tracker Engineering Team
 Maintainer: Project Owner
-Purpose: Retry transient center-service failures without persisting secrets.
+Purpose: Retry transient center-service failures with an optional encrypted queue.
 Module: Local integration / usage reporting infrastructure
 """
 
@@ -11,12 +11,14 @@ from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass
 import threading
-from time import monotonic
+from time import monotonic, time
 from typing import Any
 
 import requests
 
 from . import ingest_auth
+from .gateway_contracts import UsageReport
+from .gateway_queue import EncryptedUsageQueue, QueueItem
 
 
 MAX_MODEL_LENGTH = 200
@@ -25,17 +27,6 @@ DEFAULT_MAX_PENDING = 256
 DEFAULT_MAX_ATTEMPTS = 5
 DEFAULT_RETRY_BASE_SECONDS = 2.0
 MAX_RETRY_DELAY_SECONDS = 300.0
-
-
-@dataclass(frozen=True)
-class UsageReport:
-    """Non-sensitive facts accepted by the central ingest contract."""
-
-    model: str
-    input_tokens: int
-    output_tokens: int
-    idempotency_key: str
-    note: str = "本地 Gateway 自动采集"
 
 
 @dataclass
@@ -67,6 +58,7 @@ class UsageReporter:
         max_pending: int = DEFAULT_MAX_PENDING,
         max_attempts: int = DEFAULT_MAX_ATTEMPTS,
         retry_base_seconds: float = DEFAULT_RETRY_BASE_SECONDS,
+        queue_path: str | None = None,
     ) -> None:
         self._ingest_url = ingest_url
         self._ingest_token = ingest_token
@@ -78,6 +70,12 @@ class UsageReporter:
         self._condition = threading.Condition()
         self._worker: threading.Thread | None = None
         self._stopping = False
+        self._persistent_queue = (
+            EncryptedUsageQueue(queue_path, self._max_pending) if queue_path else None
+        )
+        if self._persistent_queue and self._persistent_queue.pending_count:
+            with self._condition:
+                self._ensure_worker_locked()
 
     def report(
         self,
@@ -99,7 +97,7 @@ class UsageReporter:
         return self._enqueue(report)
 
     def close(self, timeout: float = 1.0) -> None:
-        """Stop the daemon worker; queued reports are intentionally not persisted."""
+        """Stop the daemon worker while leaving persistent items recoverable."""
 
         with self._condition:
             self._stopping = True
@@ -113,11 +111,26 @@ class UsageReporter:
         """Expose a bounded operational count without exposing report contents."""
 
         with self._condition:
+            if self._persistent_queue:
+                return self._persistent_queue.pending_count
             return len(self._pending)
 
     def _enqueue(self, report: UsageReport) -> str:
         with self._condition:
-            if self._stopping or len(self._pending) >= self._max_pending:
+            if self._stopping:
+                return "report-failed"
+            if self._persistent_queue:
+                stored = self._persistent_queue.enqueue(
+                    report,
+                    attempts=1,
+                    next_attempt_at=time() + self._retry_base_seconds,
+                )
+                if not stored:
+                    return "report-failed"
+                self._ensure_worker_locked()
+                self._condition.notify_all()
+                return "queued"
+            if len(self._pending) >= self._max_pending:
                 return "report-failed"
             self._pending.append(
                 _PendingReport(
@@ -138,24 +151,50 @@ class UsageReporter:
 
     def _run(self) -> None:
         while True:
-            pending = self._next_pending()
+            pending = self._next_persistent() if self._persistent_queue else self._next_pending()
             if pending is None:
                 return
             result = self._post(pending.report)
             if result.delivered or not result.retryable:
+                if self._persistent_queue:
+                    self._persistent_queue.remove(pending.item_id)
                 continue
             if pending.attempts >= self._max_attempts:
+                if self._persistent_queue:
+                    self._persistent_queue.remove(pending.item_id)
                 continue
             pending.attempts += 1
             delay = min(
                 MAX_RETRY_DELAY_SECONDS,
                 self._retry_base_seconds * (2 ** (pending.attempts - 1)),
             )
-            pending.next_attempt_at = monotonic() + delay
+            pending.next_attempt_at = (time() if self._persistent_queue else monotonic()) + delay
+            if self._persistent_queue:
+                self._persistent_queue.reschedule(
+                    pending.item_id,
+                    pending.attempts,
+                    pending.next_attempt_at,
+                )
+                with self._condition:
+                    self._condition.notify_all()
+                continue
             with self._condition:
                 if not self._stopping and len(self._pending) < self._max_pending:
                     self._pending.append(pending)
                     self._condition.notify_all()
+
+    def _next_persistent(self) -> QueueItem | None:
+        with self._condition:
+            while not self._stopping:
+                pending = self._persistent_queue.next_due(time())
+                if pending is not None:
+                    return pending
+                next_attempt_at = self._persistent_queue.next_attempt_at()
+                if next_attempt_at is None:
+                    self._condition.wait()
+                    continue
+                self._condition.wait(timeout=max(0.0, next_attempt_at - time()))
+            return None
 
     def _next_pending(self) -> _PendingReport | None:
         with self._condition:
@@ -170,6 +209,17 @@ class UsageReporter:
                     continue
                 return self._pending.popleft()
             return None
+
+    def _ensure_worker_locked(self) -> None:
+        """Start one daemon worker; the caller must hold the condition lock."""
+
+        if self._worker is None or not self._worker.is_alive():
+            self._worker = threading.Thread(
+                target=self._run,
+                name="ai-token-tracker-usage-reporter",
+                daemon=True,
+            )
+            self._worker.start()
 
     def _post(self, report: UsageReport) -> _PostResult:
         try:
