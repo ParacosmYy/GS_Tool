@@ -13,6 +13,7 @@ from dataclasses import asdict, dataclass
 import hashlib
 import json
 from importlib.util import find_spec
+import os
 from pathlib import Path
 import shutil
 from typing import Any, Iterable
@@ -215,11 +216,29 @@ def _check_external_tool_gates(root: Path, checks: list[AuditCheck]) -> None:
         )
     )
     gradle_ready = (root / "android/gradlew.bat").is_file() or shutil.which("gradle") is not None
+    java_ready = _java_runtime_available()
+    sdk_root = _android_sdk_root(root)
+    sdk_ready = bool(
+        sdk_root
+        and (sdk_root / "platforms/android-37/android.jar").is_file()
+        and any((sdk_root / "build-tools").glob("*/aapt2.exe"))
+    )
+    android_missing = [
+        label
+        for label, available in (
+            ("JDK", java_ready),
+            ("Gradle wrapper/命令", gradle_ready),
+            ("Android SDK API 37/build-tools", sdk_ready),
+        )
+        if not available
+    ]
     checks.append(
         AuditCheck(
             "android-toolchain",
-            PASS if gradle_ready else PENDING,
-            "Gradle wrapper/命令可用" if gradle_ready else "Gradle wrapper 与系统 Gradle 均不可用",
+            PASS if not android_missing else PENDING,
+            "JDK、Gradle、Android SDK API 37 与 build-tools 可用"
+            if not android_missing
+            else f"等待 {', '.join(android_missing)}",
         )
     )
     caddy_ready = shutil.which("caddy") is not None
@@ -230,6 +249,34 @@ def _check_external_tool_gates(root: Path, checks: list[AuditCheck]) -> None:
             "Caddy 可用" if caddy_ready else "Caddy 未安装，正式 edge validate 待部署主机",
         )
     )
+
+
+def _java_runtime_available() -> bool:
+    """Detect a usable Java launcher without mutating PATH or installing tools."""
+
+    if shutil.which("java"):
+        return True
+    java_home = os.getenv("JAVA_HOME", "").strip()
+    if not java_home:
+        return False
+    launcher = Path(java_home) / "bin" / ("java.exe" if os.name == "nt" else "java")
+    return launcher.is_file()
+
+
+def _android_sdk_root(root: Path) -> Path | None:
+    """Resolve an existing SDK location in env or the project-local reserve."""
+
+    candidates = (
+        os.getenv("ANDROID_SDK_ROOT", "").strip(),
+        os.getenv("ANDROID_HOME", "").strip(),
+        str(root / "android/.toolchain/android-sdk"),
+    )
+    for candidate in candidates:
+        if candidate:
+            path = Path(candidate).expanduser()
+            if path.is_dir():
+                return path
+    return None
 
 
 def _sha256(path: Path) -> str:

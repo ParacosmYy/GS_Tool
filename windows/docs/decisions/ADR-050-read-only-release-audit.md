@@ -17,6 +17,8 @@
   将 pending 映射为非零，任何 fail 始终返回非零。
 - 审计不调用 `db.init_db`，不读取 `.env` 内容，不创建用户/记录/备份/构建目录，不启动服务，不
   执行 Caddy、Gradle、PyInstaller 或网络请求。
+- Android 工具链只有在 JDK、Gradle wrapper/命令、API 37 `android.jar` 和 build-tools
+  同时存在时才算 `pass`；只发现 Gradle 时保持 `pending`，避免误报 APK 可构建。
 - JSON 输出只包含检查名、状态和脱敏摘要，并使用 ASCII 转义避免 Windows legacy code page 破坏
   重定向文件，便于发布流水线保存证据而不暴露本地绝对路径或凭据。
 
