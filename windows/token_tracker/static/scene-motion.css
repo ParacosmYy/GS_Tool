@@ -49,12 +49,12 @@ body {
   inset: 0;
   pointer-events: none;
   isolation: isolate;
-  opacity: .95;
+  opacity: 1;
   background-image: url("/static/assets/embedded-rust-engineer-bg-v7.png");
   background-position: calc(40% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
   background-size: cover;
   background-repeat: no-repeat;
-  filter: saturate(1.08) contrast(1.04) brightness(.98);
+  filter: saturate(1.12) contrast(1.05) brightness(1.02);
   will-change: background-position;
   transition: opacity .8s var(--ui-ease);
 }
@@ -83,8 +83,8 @@ body {
   inset: 0;
   content: "";
   background:
-    linear-gradient(90deg, rgba(8, 9, 12, .985) 0%, rgba(8, 9, 12, .86) 24%, rgba(8, 9, 12, .52) 52%, rgba(8, 9, 12, .28) 100%),
-    linear-gradient(180deg, rgba(8, 9, 12, .48), transparent 36%, rgba(8, 9, 12, .7));
+    linear-gradient(90deg, rgba(8, 9, 12, .99) 0%, rgba(8, 9, 12, .88) 22%, rgba(8, 9, 12, .54) 46%, rgba(8, 9, 12, .2) 70%, rgba(8, 9, 12, .08) 100%),
+    linear-gradient(180deg, rgba(8, 9, 12, .42), transparent 36%, rgba(8, 9, 12, .58));
 }
 
 .story-backdrop::after {

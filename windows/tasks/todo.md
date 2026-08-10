@@ -72,7 +72,7 @@
 - [x] Material 3 semantic color tokens and readable form controls
 - [x] pointer aura/ring、count-up、reveal、glitch、scanline
 - [x] 将动画从分散 CSS 规则收敛为可追踪的 motion state contract
-- [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛和注册页 heading 顺序；headless 320/768px 仍只作 renderer observation，真实设备指标、焦点、ARIA、对比度、reduced-motion 和受保护页面仍待 CDP/合法会话）
+- [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛、注册页 heading 顺序和 v10 场景可见度；headless 320/768px 仍只作 renderer observation，真实设备指标、焦点、ARIA、对比度、reduced-motion 和受保护页面仍待 CDP/合法会话）
 - [x] 背景品牌资产升级：v7 御姐二次元嵌入式工程师、MacBook Pro/Mac Studio 形态、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v6 及之前版本保留回滚
 - [x] loading/connection/empty 状态统一视觉组件
 - [x] UI-3 静态语义切片：单一仪表盘 h1、表格 scope/caption、管理员详情焦点回流和密码长度边界
