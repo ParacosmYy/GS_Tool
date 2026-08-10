@@ -11,17 +11,19 @@
 
 ## 决策
 
-- 使用 `embedded-rust-engineer-bg-v6.png` 作为当前固定场景层：右侧为单个成熟、可爱但非性化的二次元
+- 使用 `embedded-rust-engineer-bg-v6.png` 作为 Windows 当前固定场景层，并将同一像素资产复制为
+  Android 的 `embedded_rust_engineer_bg_v6.png`：右侧为单个成熟、可爱但非性化的二次元
   嵌入式工程师，持专业铝制笔记本，旁侧为小型铝制桌面工作站，背景包含服务器、示波器和 Rust/RL
   训练 telemetry 视觉元素。
 - 保留左侧约 42% 的暗色负空间；场景仍通过 `.story-backdrop` 的遮罩层承载，业务文本不叠加在原始
   插画像素上。
-- v6 仅替换静态资源引用，不改变 pointer follower、背景视差、卡片动效、响应式定位或
-  `prefers-reduced-motion` 规则；v5 不删除，作为可回滚版本。
+- v6 仅替换静态资源引用，不改变 Web pointer follower、背景视差、卡片动效、响应式定位或
+  `prefers-reduced-motion` 规则；Android 继续只对背景执行低幅漂移，v5 不删除，作为可回滚版本。
 - 不在图片中依赖品牌 logo、可读文字或真实硬件状态；页面的硬件/连接状态仍只能来自业务数据。
 
 ## 验证边界
 
 - 已完成：生成资产保存到项目、静态引用检查、图像目视检查、源文件行数门禁。
+- 已完成：Windows 与 Android 资源 SHA-256 一致，Compose 背景引用已切换到 v6。
 - 待完成：可用浏览器 CDP 后重新生成 v6 四档截图，并复核 320px 横向溢出、局部对比度、焦点序列和
-  reduced-motion 运行时证据。
+  reduced-motion 运行时证据；Android 仍待批准工具链完成编译与设备视觉验收。

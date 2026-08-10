@@ -59,8 +59,8 @@ android/
     feature/admin/           # 管理员团队只读观测台
     ui/                       # Compose 壳和动效原语
     ui/theme/                 # 颜色、字体、Material 主题
-  app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v5.png
-                            # 嵌入式 Rust/RL 工程师与 Pro 工作站品牌背景
+  app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v6.png
+                            # 嵌入式 Rust/RL 工程师与 Pro 工作站品牌背景（v6）
   .toolchain/android-sdk/    # 获批后安装 Android SDK 的项目内位置
   skills/                   # 项目内 Android Compose 技能资料
   app/build.gradle.kts
