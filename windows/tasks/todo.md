@@ -74,7 +74,7 @@
 - [x] Material 3 semantic color tokens and readable form controls
 - [x] pointer aura/ring、count-up、reveal、glitch、scanline
 - [x] 将动画从分散 CSS 规则收敛为可追踪的 motion state contract
-- [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛、注册页 heading 顺序和 v10 场景可见度；headless 320/768px 仍只作 renderer observation，真实设备指标、焦点、ARIA、对比度、reduced-motion 和受保护页面仍待 CDP/合法会话）
+- [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛、注册页 heading 顺序和 v10 场景可见度；v15 已补隔离合法会话下 Dashboard/Admin、ARIA、焦点回流和 320/768 viewport 证据；真实设备指标、连接/历史/错误态/导出路径、完整四档焦点、对比度与 reduced-motion 仍待补齐）
 - [x] 背景品牌资产升级：v8 御姐二次元嵌入式工程师、MacBook Pro/Mac Studio 形态、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v7 及之前版本保留回滚
 - [x] loading/connection/empty 状态统一视觉组件
 - [x] UI-3 静态语义切片：单一仪表盘 h1、表格 scope/caption、管理员详情焦点回流和密码长度边界
@@ -87,7 +87,7 @@
 
 - [x] UI-1 visual review
 - [x] UI-2 motion/performance review
-- [>] UI-3 responsive/accessibility review（登录/注册页语义顺序、场景层和运行时观察已补齐；仪表盘/连接/历史/管理员页面仍待合法会话）
+- [>] UI-3 responsive/accessibility review（登录/注册页语义顺序、Dashboard/Admin 隔离合法会话空态、焦点回流和 320/768 viewport 运行时观察已补齐；连接/历史/错误态/导出、完整四档焦点、真实设备指标、对比度与 reduced-motion 仍待补证）
 - [x] frontend boundary review
 - [x] backend security/data review
 - [x] architect integration review
@@ -103,7 +103,7 @@
 ### Long-term completion audit
 
 - [>] Windows 安全/部署 B 阶段持续交付
-- [>] Web UI-3 四档响应式、焦点、ARIA、对比度和空状态独立证据
+- [>] Web UI-3 四档响应式、焦点、ARIA、对比度和空状态独立证据（Dashboard/Admin 已有隔离合法会话证据；连接/历史/错误态/导出和真实设备仍待）
 - [ ] Android JDK/Gradle/SDK 获批准后的构建、安装、设备联调和 APK
 - [>] HTTPS 中心部署、备份恢复演练、限流和脱敏访问日志：隔离 staging 恢复、应用/Werkzeug 日志脱敏已通过；正式 Caddy/HTTPS、生产 ACL/轮转、限流压测和真实数据恢复仍待执行
 - [ ] 架构师最终审计、回滚说明和正式交付归档
