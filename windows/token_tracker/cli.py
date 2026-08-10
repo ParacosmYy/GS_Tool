@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
-from . import backup, csv_export, db, deployment_checks, events, ingest_auth, release_audit
+from . import backup, csv_export, db, deployment_checks, events, gateway, ingest_auth, release_audit
 from .services import UsageValidationError, add_usage, query_range
 
 
@@ -25,6 +25,23 @@ def non_negative_int(value: str) -> int:
         raise argparse.ArgumentTypeError("must be a non-negative integer") from exc
     if parsed < 0:
         raise argparse.ArgumentTypeError("must be a non-negative integer")
+    return parsed
+
+
+def positive_int(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a positive integer") from exc
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return parsed
+
+
+def port_number(value: str) -> int:
+    parsed = positive_int(value)
+    if parsed > 65535:
+        raise argparse.ArgumentTypeError("port must be between 1 and 65535")
     return parsed
 
 
@@ -105,6 +122,32 @@ def build_parser() -> argparse.ArgumentParser:
     serve_mode.add_argument("--production", action="store_true", help="HTTPS 生产模式：Waitress + 严格 HTTPS 预检")
     serve_mode.add_argument("--lan-preview", action="store_true", help="可信局域网 HTTP 预览：Waitress + 显式 LAN 模式")
     serve_parser.set_defaults(handler=cmd_serve)
+
+    gateway_parser = subparsers.add_parser("gateway", help="启动本地 OpenAI-compatible 自动采集 Gateway")
+    gateway_parser.add_argument("--upstream-url", required=True, help="固定的 provider Base URL，例如 Kimi Code /v1")
+    gateway_parser.add_argument("--ingest-url", required=True, help="中心服务的 /api/v1/ingest/usage 地址")
+    gateway_parser.add_argument("--host", default="127.0.0.1", help="监听地址，默认只绑定 127.0.0.1")
+    gateway_parser.add_argument("--port", type=port_number, default=8787, help="监听端口，默认 8787")
+    gateway_parser.add_argument(
+        "--provider-key-env",
+        default="TOKEN_TRACKER_GATEWAY_PROVIDER_KEY",
+        help="provider Key 所在环境变量名，不会把 Key 放入参数或日志",
+    )
+    gateway_parser.add_argument(
+        "--ingest-token-env",
+        default="TOKEN_TRACKER_GATEWAY_INGEST_TOKEN",
+        help="中心 Usage Ingest Token 所在环境变量名",
+    )
+    gateway_parser.add_argument(
+        "--gateway-token-env",
+        default="TOKEN_TRACKER_GATEWAY_ACCESS_TOKEN",
+        help="非 loopback 监听时的独立 Gateway Bearer Token 环境变量名",
+    )
+    gateway_parser.add_argument("--allow-http", action="store_true", help="仅本地调试时允许 HTTP 上游/中心地址")
+    gateway_parser.add_argument("--timeout", type=positive_int, default=120, help="上游请求超时秒数，默认 120")
+    gateway_parser.add_argument("--report-timeout", type=positive_int, default=10, help="中心上报超时秒数，默认 10")
+    gateway_parser.add_argument("--debug", action="store_true", help="仅本机调试使用 Flask 开发服务器")
+    gateway_parser.set_defaults(handler=cmd_gateway)
 
     admin_parser = subparsers.add_parser("admin", help="管理本地账户角色（首次部署使用）")
     admin_subparsers = admin_parser.add_subparsers(dest="admin_command", required=True)
@@ -350,6 +393,54 @@ def cmd_serve(args: argparse.Namespace) -> int:
         serve(app, host=host, port=port)
         return 0
     app.run(host=host, port=port, debug=args.debug)
+    return 0
+
+
+def cmd_gateway(args: argparse.Namespace) -> int:
+    """Start a local provider gateway without persisting either credential."""
+
+    try:
+        provider_key = gateway.read_environment_secret(
+            args.provider_key_env,
+            "provider_key",
+            4096,
+        )
+        ingest_token = gateway.read_environment_secret(
+            args.ingest_token_env,
+            "ingest_token",
+            256,
+        )
+        gateway_token = gateway.read_environment_secret(
+            args.gateway_token_env,
+            "gateway_token",
+            256,
+            required=False,
+        )
+        config = gateway.build_config(
+            upstream_url=args.upstream_url,
+            provider_key=provider_key,
+            ingest_url=args.ingest_url,
+            ingest_token=ingest_token,
+            host=args.host,
+            gateway_token=gateway_token,
+            allow_http=args.allow_http,
+            timeout=args.timeout,
+            report_timeout=args.report_timeout,
+        )
+    except gateway.GatewayConfigError as exc:
+        print(f"Gateway 启动被拒绝：{exc}", file=sys.stderr)
+        return 2
+    app = gateway.create_gateway_app(config)
+    print(f"本地 Gateway：http://{config.host}:{args.port}/v1")
+    print("provider Key 和 Usage Ingest Token 仅驻留在当前进程内存。")
+    if args.allow_http:
+        print("警告：当前允许 HTTP，仅适用于本机调试。", file=sys.stderr)
+    if args.debug:
+        app.run(host=config.host, port=args.port, debug=True)
+    else:
+        from waitress import serve
+
+        serve(app, host=config.host, port=args.port)
     return 0
 
 

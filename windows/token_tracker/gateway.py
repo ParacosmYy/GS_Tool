@@ -14,6 +14,8 @@ from dataclasses import dataclass
 import hmac
 import ipaddress
 import json
+import os
+import re
 import uuid
 from typing import Any
 from urllib.parse import urlparse, urlunparse
@@ -30,6 +32,7 @@ MAX_INGEST_URL_LENGTH = 2048
 MAX_GATEWAY_TOKEN_LENGTH = 256
 MAX_IDEMPOTENCY_KEY_LENGTH = 160
 LOOPBACK_HOSTS = frozenset({"127.0.0.1", "::1", "localhost"})
+_ENVIRONMENT_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
 
 
 class GatewayConfigError(ValueError):
@@ -108,6 +111,24 @@ def build_config(
         maximum_request_bytes=request_bytes,
         maximum_response_bytes=response_bytes,
     )
+
+
+def read_environment_secret(
+    variable_name: Any,
+    field_name: str,
+    maximum: int,
+    *,
+    required: bool = True,
+) -> str | None:
+    """Read one secret by validated variable name without logging its value."""
+
+    name = str(variable_name or "").strip()
+    if not _ENVIRONMENT_NAME.fullmatch(name):
+        raise GatewayConfigError(f"{field_name} environment variable name is invalid")
+    value = os.getenv(name, "").strip()
+    if not value and not required:
+        return None
+    return _bounded_secret(value, maximum, field_name)
 
 
 def create_gateway_app(config: GatewayConfig) -> Flask:
