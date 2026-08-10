@@ -126,7 +126,9 @@ python -m token_tracker export --period month --output exports/august.csv
 python -m token_tracker serve
 ```
 
-浏览器打开启动窗口打印的实际地址（通常是 <http://127.0.0.1:5000>），注册账户即可使用。
+普通 `serve` 使用 Waitress，不会出现 Flask development server 警告。浏览器打开启动窗口打印的
+实际地址（通常是 <http://127.0.0.1:5000>），注册账户即可使用；只有需要调试器时才显式添加
+`--debug`。本地命令拒绝非 loopback 监听，可信局域网必须使用下方的 `--lan-preview`。
 
 启动前进行只读配置预检：
 

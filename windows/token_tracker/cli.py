@@ -8,12 +8,13 @@ Purpose: Parse terminal commands and delegate to application services.
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 import os
 import secrets
 import sys
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable
 
 from . import backup, csv_export, db, deployment_checks, events, gateway, gateway_queue, ingest_auth, release_audit
 from .services import UsageValidationError, add_usage, query_range
@@ -521,8 +522,16 @@ def cmd_serve(args: argparse.Namespace) -> int:
     from .web import create_app
     from .settings import build_settings
 
+    effective_host = str(args.host or os.getenv("TOKEN_TRACKER_HOST", "127.0.0.1")).strip() or "127.0.0.1"
+    if not (args.production or args.lan_preview) and not _is_loopback_host(effective_host):
+        # Reject an unsafe bind before resolving the database path or composing
+        # the application; a failed local command should have no side effect.
+        print(
+            "本地服务启动被拒绝：非 loopback 地址必须显式使用 --lan-preview 或 --production。",
+            file=sys.stderr,
+        )
+        return 2
     database = db.get_db_path(args.db)
-    effective_host = args.host or os.getenv("TOKEN_TRACKER_HOST", "127.0.0.1")
     if args.production or args.lan_preview:
         # Shared modes must not silently fall back to an ephemeral session key;
         # local mode keeps the zero-config personal experience.
@@ -539,13 +548,28 @@ def cmd_serve(args: argparse.Namespace) -> int:
     host = effective_host or app.config.get("TOKEN_TRACKER_HOST", "127.0.0.1")
     port = args.port or int(app.config.get("TOKEN_TRACKER_PORT", 5000))
     print(f"Web 仪表盘：http://{host}:{port}")
-    if args.production or args.lan_preview:
-        from waitress import serve
-
-        serve(app, host=host, port=port)
+    if args.debug:
+        # Flask's development server remains an explicit opt-in for debugger
+        # workflows; the normal CLI path uses the same WSGI boundary as the
+        # root launcher and never prints a development-server warning.
+        app.run(host=host, port=port, debug=True)
         return 0
-    app.run(host=host, port=port, debug=args.debug)
+    from waitress import serve
+
+    serve(app, host=host, port=port)
     return 0
+
+
+def _is_loopback_host(value: Any) -> bool:
+    """Return whether a CLI bind value stays inside the local machine."""
+
+    host = str(value or "").strip()
+    if host.casefold() in {"localhost", "127.0.0.1", "::1"}:
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
 
 
 def cmd_gateway(args: argparse.Namespace) -> int:
