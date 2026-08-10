@@ -446,6 +446,16 @@ API / 动画 / 设计 token 契约
 - [x] 新增 ADR-086，并同步发布审计、Android 说明、UI 动效规范和角色复核。
 - [>] UI-3 真实设备、reduced-motion/高对比度和正式发布环境仍按独立门禁验收，不以生成图替代运行证据。
 
+### Task B27: EXE v12 交付一致性
+
+**目标：** 保证根目录源码、Web、Android 与可分享 Windows EXE 使用同一 v12 品牌场景，避免发布产物滞后于当前 checkout。
+
+- [x] 使用锁定 PyInstaller 6.22.0 重建 onedir EXE，并重新生成 0.1.0 ZIP。
+- [x] 隔离端口 5019 验证 EXE 的 `/login`、`/api/v1/ready` 和 v12 PNG 均返回 200。
+- [x] 验证数据库位于隔离 `LOCALAPPDATA\AITokenTracker\`，EXE 目录不产生 `data/`。
+- [x] 新增 ADR-087 并将发布审计切换到本次 EXE/ZIP SHA-256。
+- [>] 真实记录重启持久化、升级/回滚、签名和正式分发仍属于最终交付门禁。
+
 ### Phase 5：六角色复核
 
 - [x] UI-1 复核视觉层级和 token 使用。

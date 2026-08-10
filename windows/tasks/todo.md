@@ -26,6 +26,7 @@
 - [>] `/api/v1` 登录/会话/统计/记录/事件/日志契约与网页、Android 双端接入（Windows 已接入，Android 登录/汇总/记录分页读取、幂等写入与管理员只读竖切片已完成）
 - [>] 企业级模块化单体、网站/EXE 双部署形态与项目级 skills 已写入架构和交付文档
 - [x] EXE 构建工具链独立锁定，PyInstaller 资源收集和用户数据目录边界已写入 ADR-049/082；6.22.0 onedir 构建和隔离启动已留证
+- [x] EXE v12 交付一致性：重建含 v12 背景的 EXE/ZIP，隔离验证 `/login`、`/api/v1/ready`、v12 静态资源和 `%LOCALAPPDATA%` 数据目录（ADR-087）
 - [x] 新增只读 `token_tracker audit` 发布审计入口，区分源码通过与外部工具链 pending
 - [x] Chart.js 4.4.7 固定为项目本地静态资产，核心图表不再依赖 CDN
 - [x] Provider 响应投影：Web/Android 只接收有界助手文本和稳定字段，不透传原始上游 JSON
