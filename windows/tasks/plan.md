@@ -228,6 +228,13 @@ normalization, validation, and aggregate refresh.
 - [x] 两端资源 SHA-256 一致，资源引用、注释和视觉规范同步。
 - [>] Web v6 四档浏览器证据和 Android 编译/设备视觉验收仍分别等待 CDP 与 Android 工具链门禁。
 
+### Task B11: Kimi provider 快速连接预设
+
+- [x] Web 自动采集增加 Kimi Code、Kimi 开放平台、OpenAI 和自定义 OpenAI-compatible 地址预设。
+- [x] 预设只填充 URL，不接触 Key；服务端 allowlist、HTTPS、超时、响应大小和 usage 记录边界不变。
+- [x] 官方 Kimi Base URL、Key 隔离、协议和错误语义写入 README 与 ADR-048。
+- [>] 真实 `/models`/chat usage smoke 仍需用户本人合法 Key，不得在无授权时伪造或读取凭据。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

@@ -29,6 +29,7 @@
 - [x] Web/Android 统一切换 v6 场景资产；端侧遮罩、漂移实现保持解耦，v5 保留回滚
 - [x] Android 构建入口已固定项目内 SDK、Gradle 和 Android 用户缓存路径；未获批准不下载工具链
 - [ ] 用户批准工具链后完成 Android Studio/Gradle/SDK 编译、设备联调与 APK 产物验收
+- [x] Kimi provider 快速连接预设：Kimi Code / Kimi 开放平台 / OpenAI / 自定义 URL，Key 仍只留在页面内存
 - [>] Windows 分享入口：已提供需确认的可信局域网预览、本地校验备份命令、隔离 staging 恢复演练和隐私说明；正式 HTTPS、生产 ACL/轮转与真实数据恢复仍是部署门禁
 
 ## Foundation
