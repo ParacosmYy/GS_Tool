@@ -28,6 +28,7 @@
 - [x] 新增只读 `token_tracker audit` 发布审计入口，区分源码通过与外部工具链 pending
 - [x] Chart.js 4.4.7 固定为项目本地静态资产，核心图表不再依赖 CDN
 - [x] Provider 响应投影：Web/Android 只接收有界助手文本和稳定字段，不透传原始上游 JSON
+- [x] 外部 Usage Ingest Token：按用户签发/撤销、摘要存储、固定 `source=ingest`、幂等写入和限流边界
 - [>] Android 登录、个人仪表盘、token 分页历史、结构化工作信号写入、最近活动历史和管理员只读观测台已接入；待工具链批准后编译联调
 - [x] Android 首屏背景资产、低干扰遮罩、Compose edge-to-edge 约束和 Rust/RL 工程师视觉主题已落地
 - [x] Web/Android 统一切换 v6 场景资产；端侧遮罩、漂移实现保持解耦，v5 保留回滚
@@ -60,6 +61,7 @@
 - [x] 统一结构化 API error envelope，保持现有客户端兼容
 - [x] provider adapter registry，支持按 provider 扩展而不改路由
 - [x] 评估 OpenAI-compatible 外部 gateway 的用户归属和密钥边界（见 ADR-003；实现另立 gateway ADR）
+- [x] per-user Usage Ingest Token 和 `/api/v1/ingest/usage` 已落地（ADR-053）；stock client wrapper/Gateway 仍待独立设计
 
 ## UI / motion
 

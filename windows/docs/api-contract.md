@@ -3,7 +3,7 @@
 **作者：** AI Token Tracker Engineering Team  
 **状态：** Accepted；`/api/v1` 为网页、Android 和未来采集器的正式跨端契约。
 
-所有 `/api/*` 受保护接口都需要已登录会话。修改数据的 `POST` 请求还需要 `X-CSRF-Token` 请求头；页面从 `<meta name="csrf-token">` 读取令牌。
+所有 `/api/*` 受保护接口都需要已登录会话。修改数据的 `POST` 请求还需要 `X-CSRF-Token` 请求头；页面从 `<meta name="csrf-token">` 读取令牌。外部用量采集接口使用独立的 `X-AI-Tracker-Ingest-Token`，不依赖浏览器 Cookie/CSRF。
 
 实现边界：控制器只负责请求解析、认证装饰器和稳定响应映射；个人汇总、记录分页、
 CSV 导出和日志分页由 Application 用例统一组合，时间范围、分页上限和用户隔离不能
@@ -43,6 +43,44 @@ CSV 导出和日志分页由 Application 用例统一组合，时间范围、分
 ### `POST /api/v1/auth/logout`
 
 需要 bearer access token，撤销当前令牌。服务端仍允许管理员从数据库/运维侧撤销全部令牌。
+
+### `POST /api/v1/ingest/usage`
+
+供受信任的外部客户端适配器、SDK wrapper 或中心 Gateway 上报一次已经获得的用量事实。
+请求不需要浏览器 Cookie 或 CSRF，但必须携带由本地 CLI 为指定账户创建的：
+
+```text
+X-AI-Tracker-Ingest-Token: ait_<one-time-secret>
+Idempotency-Key: <client-generated-unique-key>
+```
+
+请求体只允许提交有界的统计字段，不接受 provider Key、密码、原始 prompt、完整响应或自定义
+`source`：
+
+```json
+{
+  "model": "kimi-code",
+  "input_tokens": 1200,
+  "output_tokens": 350,
+  "timestamp": "2026-08-10T14:30",
+  "note": "外部 Kimi Code wrapper"
+}
+```
+
+服务端从令牌反查用户归属，并固定以 `source=ingest` 入账。`Idempotency-Key` 是必填的用户级
+重试键；重复键返回第一次记录（`200`、`replayed=true`）；新记录返回
+`201`、`replayed=false`。令牌只在创建命令的 stdout 显示一次，数据库只保存 SHA-256 摘要，
+且令牌支持到期和撤销。创建、列出和撤销命令示例：
+
+```text
+python -m token_tracker ingest-token create --username alice --label kimi-code --expires-days 90
+python -m token_tracker ingest-token list --username alice
+python -m token_tracker ingest-token revoke --username alice --id 1
+```
+
+该接口是安全的遥测输入边界，不会自动观察其他进程的网络流量；Kimi Code 等现有客户端仍需
+通过后续 wrapper 或 Gateway 将真实 `usage` 转换为上述请求。令牌请求必须使用 HTTPS，服务端
+按账户限流，不在访问日志、审计元数据或 CSV 中写入令牌原文。
 
 ### `GET /api/v1/me/summary?period=day`
 
@@ -170,7 +208,7 @@ CSV 导出和日志分页由 Application 用例统一组合，时间范围、分
 }
 ```
 
-状态码约定：`400` 输入/CSRF 无效、`401` 未登录、`403` 无权、`404` 资源不存在、`405` 方法不支持、`413` 请求或 CSV 导出结果过大、`429` 限流、`502` provider 失败、`503` 服务未就绪、`500` 内部错误。所有 `/api/*` 错误都返回该 envelope，不返回 Flask 默认 HTML。响应头 `X-Request-ID` 与 envelope 的 `request_id` 用于排障关联；它不代表身份或权限。后端不把 Python traceback、API Key、上游请求头或未经筛选的 provider 响应返回给浏览器。`PROVIDER_RESPONSE_TOO_LARGE` 表示上游 JSON 超过服务端配置的响应上限（默认 2 MB）；`EXPORT_TOO_LARGE` 表示个人或管理员 CSV 超过 100,000 行或 16 MiB 安全边界；`SERVICE_NOT_READY` 表示中心数据库 schema 尚未就绪。
+状态码约定：`400` 输入/CSRF 无效、`401` 未登录或外部采集 token 无效、`403` 无权、`404` 资源不存在、`405` 方法不支持、`413` 请求或 CSV 导出结果过大、`429` 限流、`502` provider 失败、`503` 服务未就绪、`500` 内部错误。所有 `/api/*` 错误都返回该 envelope，不返回 Flask 默认 HTML。响应头 `X-Request-ID` 与 envelope 的 `request_id` 用于排障关联；它不代表身份或权限。后端不把 Python traceback、API Key、上游请求头或未经筛选的 provider 响应返回给浏览器。`PROVIDER_RESPONSE_TOO_LARGE` 表示上游 JSON 超过服务端配置的响应上限（默认 2 MB）；`EXPORT_TOO_LARGE` 表示个人或管理员 CSV 超过 100,000 行或 16 MiB 安全边界；`SERVICE_NOT_READY` 表示中心数据库 schema 尚未就绪。
 
 ## `GET /api/summary?period=day`
 

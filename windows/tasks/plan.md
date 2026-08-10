@@ -260,6 +260,14 @@ normalization, validation, and aggregate refresh.
 - [x] Web/Android 继续使用 `choices[0].message.content`，不暴露供应商私有字段、工具参数或隐藏推理。
 - [x] ADR-052、API 契约、架构模块表和只读发布审计引用已同步。
 
+### Task B16: 外部客户端 Usage Ingest 边界
+
+- [x] 新增 `usage_ingest_tokens` 表和 `ingest_auth.py`；只保存 SHA-256 digest，支持到期和撤销。
+- [x] CLI 提供 `ingest-token create/list/revoke`，创建时只显示一次原文，并输出集成请求头提示。
+- [x] 新增 `POST /api/v1/ingest/usage`；固定 `source=ingest`，复用统一 token 校验、幂等写入、限流和错误 envelope。
+- [x] API 契约、架构模块表、企业级安全规范、角色复核和 ADR-053 已同步。
+- [>] Kimi Code 等 stock 客户端仍不会自动调用该接口；后续必须单独实现 wrapper/Gateway，定义 provider Key 隔离和真实 usage 适配。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。
@@ -318,6 +326,7 @@ API / 动画 / 设计 token 契约
 - [x] 连接器检测模型并保留最近的非敏感设置。
 - [x] 非流式调用从真实响应自动归档模型、输入、输出、时间和来源。
 - [x] 外部 provider 失败、缺 usage、限流、超时和白名单错误均有可读反馈。
+- [x] 外部客户端 Usage Ingest Token 和固定来源写入边界已落地；stock client wrapper/Gateway 仍是后续独立切片。
 
 ### Phase 4：Moonshot 级视觉与交互（已完成）
 
@@ -347,6 +356,7 @@ API / 动画 / 设计 token 契约
 ### Phase 7：长线最终交付门禁（进行中）
 
 - [>] API、认证、RBAC、密钥、备份和部署安全按 B 阶段逐项验收。
+- [>] 外部自动采集：安全 ingest API 已完成，Kimi Code/SDK wrapper 或中心 Gateway 尚未交付。
 - [>] UI-3 已完成 v5 登录页 320/768/1024/1440 独立浏览器证据、焦点、ARIA、对比度和横向溢出复核；v6 背景已接入但需在可用 CDP 后重拍四档证据，并完成仪表盘/管理员页面合法会话的空/错误态复核。
 - [ ] Android 工具链获批准后完成可复现构建、安装、设备联调和 APK 产物校验。
 - [>] 隔离 staging 恢复、应用/Werkzeug 访问日志脱敏和只读 Caddy edge preflight 已完成；正式 HTTPS/Caddy validate、生产 ACL/轮转、限流负载证据、真实数据恢复和回滚流程仍待部署演练。

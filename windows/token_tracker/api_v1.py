@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 from flask import Blueprint, Response, current_app, g, jsonify, request
 
-from . import admin_service, auth_service, events, mobile_auth, provider_service, rate_limit, readiness
+from . import admin_service, auth_service, events, ingest_auth, mobile_auth, provider_service, rate_limit, readiness
 from .api_contract import error_response
 from .providers import ProviderNetworkError, ProviderResponseTooLarge
 from .services import UsageValidationError, add_usage_result, usage_records_page, usage_summary
@@ -115,6 +115,41 @@ def auth_logout() -> Response:
 
     mobile_auth.revoke_access_token(request.headers.get("Authorization"), _database())
     return jsonify({"revoked": True})
+
+
+@api_v1.post("/ingest/usage")
+def ingest_usage() -> Response:
+    """Accept bounded usage facts from a cooperating external client."""
+
+    if not rate_limit.allow("v1-ingest-auth", request.remote_addr or "unknown", 60, 60):
+        return error_response("RATE_LIMITED", "外部采集请求过于频繁，请稍后再试", 429)
+    token_value = request.headers.get(ingest_auth.INGEST_TOKEN_HEADER)
+    user_id = ingest_auth.resolve_user_id(token_value, _database())
+    if user_id is None:
+        return error_response("INGEST_TOKEN_INVALID", "外部采集 token 无效或已过期", 401)
+    if not rate_limit.allow("v1-ingest-usage", str(user_id), 120, 60):
+        return error_response("RATE_LIMITED", "外部采集请求过于频繁，请稍后再试", 429)
+    payload = _payload()
+    if payload is None:
+        return error_response("BAD_REQUEST", "请求 JSON 必须是对象", 400)
+    idempotency_key = request.headers.get("Idempotency-Key")
+    if not str(idempotency_key or "").strip():
+        return error_response("IDEMPOTENCY_KEY_REQUIRED", "外部采集必须携带 Idempotency-Key", 400)
+    try:
+        record, replayed = add_usage_result(
+            user_id=user_id,
+            model=payload.get("model"),
+            input_tokens=payload.get("input_tokens"),
+            output_tokens=payload.get("output_tokens"),
+            timestamp=payload.get("timestamp"),
+            note=payload.get("note", ""),
+            source="ingest",
+            idempotency_key=idempotency_key,
+            path=_database(),
+        )
+    except UsageValidationError as exc:
+        return error_response("VALIDATION_ERROR", str(exc), 400)
+    return jsonify({"record": record, "request_id": g.request_id, "replayed": replayed}), 200 if replayed else 201
 
 
 @api_v1.get("/me")

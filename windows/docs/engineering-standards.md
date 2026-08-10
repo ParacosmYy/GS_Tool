@@ -65,7 +65,8 @@ model = response_json.get("model") or requested_model
 - 外部响应也必须有可配置的大小上限；解析 JSON 前按 chunk 读取，不能只依赖浏览器请求大小限制。
 - provider 原始响应必须经过 `provider_projection.py` 才能进入 Web/Android 公共响应；不得把
   隐藏推理、工具参数、供应商 metadata 或请求回显直接透传给客户端。
-- 所有写接口都需要会话授权和 CSRF；错误响应不得暴露 traceback。
+- 所有浏览器 Cookie 写接口都需要会话授权和 CSRF；使用独立 `X-AI-Tracker-Ingest-Token` 的外部采集入口必须通过摘要、到期、撤销、限流和 HTTPS 边界，不能把“免 CSRF”扩散到其他接口。错误响应不得暴露 traceback。
+- 外部采集 token 只能授权固定的用量事实写入；数据库仅保存 digest，CLI 只在创建时显示原文一次，不能把 provider Key、原始 prompt 或完整响应带入采集请求。
 - 不提交 `.env`、SQLite、密码、真实 Key 或个人日志。
 
 ## 6. 前端和动效

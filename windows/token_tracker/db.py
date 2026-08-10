@@ -225,6 +225,82 @@ def revoke_auth_token(
     return cursor.rowcount > 0
 
 
+def insert_ingest_token(
+    user_id: int,
+    token_hash: str,
+    label: str,
+    expires_at: str,
+    path: str | os.PathLike[str] | None = None,
+) -> int:
+    """Persist one external-usage token digest and no raw token material."""
+
+    with db_session(path) as connection:
+        cursor = connection.execute(
+            """
+            INSERT INTO usage_ingest_tokens(user_id, token_hash, label, created_at, expires_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (user_id, token_hash, label, local_now_string(), expires_at),
+        )
+    return int(cursor.lastrowid)
+
+
+def find_active_ingest_token(
+    token_hash: str,
+    path: str | os.PathLike[str] | None = None,
+) -> dict[str, Any] | None:
+    """Resolve an unexpired, non-revoked ingest digest to its user boundary."""
+
+    with db_session(path) as connection:
+        row = connection.execute(
+            """
+            SELECT id, user_id, label, created_at, expires_at
+            FROM usage_ingest_tokens
+            WHERE token_hash = ? AND revoked_at IS NULL AND expires_at > ?
+            """,
+            (token_hash, local_now_string()),
+        ).fetchone()
+    return _row_to_dict(row)
+
+
+def list_ingest_tokens(
+    user_id: int,
+    path: str | os.PathLike[str] | None = None,
+) -> list[dict[str, Any]]:
+    """Return metadata only; token secrets are never reconstructable."""
+
+    with db_session(path) as connection:
+        rows = connection.execute(
+            """
+            SELECT id, user_id, label, created_at, expires_at, revoked_at
+            FROM usage_ingest_tokens
+            WHERE user_id = ?
+            ORDER BY created_at DESC, id DESC
+            """,
+            (user_id,),
+        ).fetchall()
+    return [dict(row) for row in rows]
+
+
+def revoke_ingest_token(
+    token_id: int,
+    user_id: int,
+    path: str | os.PathLike[str] | None = None,
+) -> bool:
+    """Revoke one token only inside its owning user's scope."""
+
+    with db_session(path) as connection:
+        cursor = connection.execute(
+            """
+            UPDATE usage_ingest_tokens
+            SET revoked_at = ?
+            WHERE id = ? AND user_id = ? AND revoked_at IS NULL
+            """,
+            (local_now_string(), token_id, user_id),
+        )
+    return cursor.rowcount > 0
+
+
 def get_or_create_cli_user(
     username: str = "local",
     path: str | os.PathLike[str] | None = None,

@@ -77,7 +77,8 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
             # token exchange endpoints are intentionally outside cookie CSRF.
             token_auth = request.path.startswith("/api/v1/") and authorization
             public_token_exchange = request.path in {"/api/v1/auth/login", "/api/v1/auth/refresh"}
-            if token_auth or public_token_exchange:
+            external_ingest = request.path == "/api/v1/ingest/usage"
+            if token_auth or public_token_exchange or external_ingest:
                 return
             expected = session.get("csrf_token")
             provided = request.headers.get("X-CSRF-Token") or request.form.get("csrf_token")

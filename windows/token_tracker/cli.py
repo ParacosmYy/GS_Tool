@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
-from . import backup, csv_export, db, deployment_checks, events, release_audit
+from . import backup, csv_export, db, deployment_checks, events, ingest_auth, release_audit
 from .services import UsageValidationError, add_usage, query_range
 
 
@@ -112,6 +112,21 @@ def build_parser() -> argparse.ArgumentParser:
     role_parser.add_argument("--username", required=True, help="已注册账户名")
     role_parser.add_argument("--role", choices=("user", "admin"), default="admin", help="目标角色，默认 admin")
     role_parser.set_defaults(handler=cmd_admin_set_role)
+
+    ingest_parser = subparsers.add_parser("ingest-token", help="管理外部客户端用量采集 token")
+    ingest_subparsers = ingest_parser.add_subparsers(dest="ingest_command", required=True)
+    ingest_create = ingest_subparsers.add_parser("create", help="创建一次性显示的采集 token")
+    ingest_create.add_argument("--username", required=True, help="已注册账户名")
+    ingest_create.add_argument("--label", default="external-client", help="客户端标签")
+    ingest_create.add_argument("--expires-days", type=int, default=90, help="有效天数，1-3650，默认 90")
+    ingest_create.set_defaults(handler=cmd_ingest_token)
+    ingest_list = ingest_subparsers.add_parser("list", help="列出账户的采集 token 元数据")
+    ingest_list.add_argument("--username", required=True, help="已注册账户名")
+    ingest_list.set_defaults(handler=cmd_ingest_token)
+    ingest_revoke = ingest_subparsers.add_parser("revoke", help="撤销一个采集 token")
+    ingest_revoke.add_argument("--username", required=True, help="已注册账户名")
+    ingest_revoke.add_argument("--id", type=int, required=True, dest="token_id", help="采集 token ID")
+    ingest_revoke.set_defaults(handler=cmd_ingest_token)
 
     return parser
 
@@ -359,6 +374,80 @@ def cmd_admin_set_role(args: argparse.Namespace) -> int:
     )
     print(f"已更新角色：{user['username']} -> {user['role']}")
     return 0
+
+
+def cmd_ingest_token(args: argparse.Namespace) -> int:
+    """Create, inspect, or revoke external ingest credentials locally."""
+
+    database = db.get_db_path(args.db)
+    db.init_db(database)
+    user = db.find_user(args.username.strip(), database)
+    if user is None:
+        print(f"错误：账户不存在：{args.username}", file=sys.stderr)
+        return 2
+
+    if args.ingest_command == "create":
+        try:
+            result = ingest_auth.issue_token(
+                user_id=user["id"],
+                label=args.label,
+                expires_days=args.expires_days,
+                path=str(database),
+            )
+        except ValueError as exc:
+            print(f"错误：{exc}", file=sys.stderr)
+            return 2
+        events.insert_audit_event(
+            actor_user_id=None,
+            target_user_id=user["id"],
+            action="cli.ingest_token.create",
+            resource_type="ingest_token",
+            resource_id=str(result["id"]),
+            request_id=f"cli-{secrets.token_hex(4)}",
+            path=str(database),
+            metadata={"label": result["label"], "expires_at": result["expires_at"]},
+        )
+        print(f"采集 token #{result['id']} 已创建：账户={user['username']}，标签={result['label']}，到期={result['expires_at']}")
+        print(f"仅此一次显示 token：{result['token']}")
+        print(f"请求头：{ingest_auth.INGEST_TOKEN_HEADER}: <token>")
+        return 0
+
+    if args.ingest_command == "list":
+        rows = db.list_ingest_tokens(user["id"], database)
+        if not rows:
+            print("该账户暂无外部采集 token。")
+            return 0
+        print_table(
+            [
+                {
+                    **row,
+                    "status": "revoked" if row["revoked_at"] else "active",
+                    "revoked_at": row["revoked_at"] or "-",
+                }
+                for row in rows
+            ],
+            [("id", "ID"), ("label", "标签"), ("created_at", "创建时间"), ("expires_at", "到期时间"), ("status", "状态"), ("revoked_at", "撤销时间")],
+        )
+        return 0
+
+    if args.ingest_command == "revoke":
+        if not db.revoke_ingest_token(args.token_id, user["id"], database):
+            print(f"错误：找不到可撤销的采集 token #{args.token_id}", file=sys.stderr)
+            return 2
+        events.insert_audit_event(
+            actor_user_id=None,
+            target_user_id=user["id"],
+            action="cli.ingest_token.revoke",
+            resource_type="ingest_token",
+            resource_id=str(args.token_id),
+            request_id=f"cli-{secrets.token_hex(4)}",
+            path=str(database),
+        )
+        print(f"已撤销采集 token #{args.token_id}（账户：{user['username']}）。")
+        return 0
+
+    print("错误：不支持的 ingest-token 操作", file=sys.stderr)
+    return 2
 
 
 def main(argv: list[str] | None = None) -> int:

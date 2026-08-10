@@ -188,6 +188,20 @@ Android 使用同一套 provider 能力，但通过 bearer 版本接口调用：
 
 如果希望 Kimi Code、OpenAI SDK 或其他外部客户端也自动进入账本，调用必须经过本项目的代理（或增加对应客户端插件/适配器）。任何网页都不能凭空读取另一个进程或云产品的调用记录；代理模式是自动采集的边界。当前页面已经把“检测模型 → 发起调用 → 读取 usage → 入库 → 刷新图表”串成一条自动链路，不要求日常填写 token 数。
 
+对于已经由外部 wrapper/SDK 获得真实 `usage` 的客户端，可以为账户创建独立的 Usage Ingest Token：
+
+```powershell
+python -m token_tracker ingest-token create --username your-name --label kimi-code --expires-days 90
+python -m token_tracker ingest-token list --username your-name
+python -m token_tracker ingest-token revoke --username your-name --id 1
+```
+
+创建命令只在终端显示一次 `ait_...` 原文；wrapper 通过
+`POST /api/v1/ingest/usage` 携带 `X-AI-Tracker-Ingest-Token` 和必填的
+`Idempotency-Key` 上报模型、输入/输出 token、时间和短备注。中心服务只保存 token 摘要，固定
+以 `source=ingest` 入账，不接受 API Key、原始 prompt 或完整 provider 响应。这个入口不会自动
+拦截 stock Kimi Code 进程；要实现“调用即上报”，仍需后续适配器或 Gateway。
+
 ## 5. Android 与跨端协议
 
 Android 工程位于同级目录 `../android/`，默认模拟器地址为 `http://10.0.2.2:5000/api/v1`；真机需要把 API Base URL 改为 Windows 主机的局域网 HTTPS 地址。Android 的登录流程为：

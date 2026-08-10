@@ -56,6 +56,22 @@ def ensure_schema(connection: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_auth_tokens_hash
             ON auth_tokens(token_hash, token_type, expires_at);
 
+        CREATE TABLE IF NOT EXISTS usage_ingest_tokens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            token_hash TEXT NOT NULL UNIQUE,
+            label TEXT NOT NULL DEFAULT '',
+            created_at TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            revoked_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_ingest_tokens_user
+            ON usage_ingest_tokens(user_id, created_at);
+        CREATE INDEX IF NOT EXISTS idx_ingest_tokens_hash
+            ON usage_ingest_tokens(token_hash, expires_at);
+
         CREATE TABLE IF NOT EXISTS work_events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,

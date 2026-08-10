@@ -55,6 +55,7 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 | `token_tracker/csv_export.py` | 个人/管理员固定列 CSV 的统一有界序列化 | 不拼接 SQL、不读取 request/session、不改变业务列投影 |
 | `token_tracker/readiness.py` | liveness/readiness 之外的 SQLite 核心 schema 探针 | 不返回路径、表名、异常或业务数据 |
 | `token_tracker/mobile_auth.py` | access/refresh token digest、轮换和撤销 | 不把 bearer secret 写入数据库 |
+| `token_tracker/ingest_auth.py` | 外部用量采集 token 的签发、摘要解析、过期和撤销边界 | 不保存 provider Key、原始 prompt 或 token 原文 |
 | `token_tracker/schema.py` | SQLite DDL、索引和加法式兼容迁移 | 不读取 request/session，不组合业务查询 |
 | `token_tracker/db.py` | SQLite 连接、事务、参数化查询和 CSV | 不处理 HTTP 请求 |
 | `token_tracker/rate_limit.py` | 限流策略、内存/SQLite 状态适配和哈希 key | 不读取 Flask session，不保存原始 IP、用户 ID 或 provider Key |
@@ -85,12 +86,17 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 - `input_tokens` / `output_tokens`: 非负整数。
 - `timestamp`: 本地时间文本 `YYYY-MM-DD HH:MM:SS`。
 - `note`: 用户备注。
-- `source`: `manual`、`proxy` 或 `android`，便于区分来源。
+- `source`: `manual`、`proxy`、`android` 或 `ingest`，便于区分来源。
 - `idempotency_key`: 可空的移动端重试键，只参与同用户去重，不进入公开投影。
 
 ### `auth_tokens`
 
 只保存 access/refresh token 的 SHA-256 digest、类型、过期和撤销时间；原文只在 HTTPS token exchange 响应中出现。
+
+### `usage_ingest_tokens`
+
+只保存外部采集 token 的 SHA-256 digest、所属用户、标签、到期和撤销时间。原文由 CLI 创建时只显示
+一次；该表只授权用量事实入口，不授权读取 provider Key、用户密码或其他用户数据。
 
 ### `rate_limit_buckets`
 
@@ -124,6 +130,15 @@ Android 通过 bearer 认证的 `POST /api/v1/records` 写入手动 token 记录
 4. 只从上游 `usage.prompt_tokens` / `completion_tokens`（或兼容字段）取数字。
 5. 成功解析后写入 `usage_records`；API Key 不入库、不写日志、不回传浏览器。
 
+### 外部客户端用量采集
+
+1. 管理员/账户持有人通过 CLI 为指定账户创建有期限的 Usage Ingest Token；服务端只写入摘要。
+2. 外部 wrapper、SDK adapter 或中心 Gateway 从自己已经拿到的 provider `usage` 中提取模型、输入和输出
+   token，通过 `POST /api/v1/ingest/usage` 上报；服务端不接收 provider Key 或原始 prompt。
+3. `ingest_auth.py` 通过 token digest 解析用户归属，接口固定 `source=ingest`，并使用用户级幂等键避免重试重复计数。
+4. token 支持到期与撤销，接口独立于浏览器 Cookie/CSRF；HTTPS、限流、字段预算和统一错误 envelope 仍由中心服务强制。
+5. 该边界不会观察 Kimi Code 等其他进程的网络流量；现有 stock 客户端仍需后续 wrapper/Gateway 适配才能实现自动上报。
+
 Android 复用同一 application/provider service，但入口是 bearer 版本的
 `/api/v1/provider/models` 与 `/api/v1/proxy/chat/completions`。`data/remote`
 只解析助手文本、usage 摘要和记录投影，Compose 不接触原始 provider JSON、SQLite
@@ -145,7 +160,7 @@ Android 复用同一 application/provider service，但入口是 bearer 版本�
 
 - 新 provider：先增加 `ProviderAdapter` 实现并明确兼容契约，不在路由里堆厂商分支；OpenAI-compatible 的公共逻辑集中在 `providers.py`。
 - 页面 Key 只能在内存中复用；持久化 Key 或外部 gateway 必须新增认证/密钥隔离 ADR。
-- 外部客户端自动采集的延后边界见 `docs/decisions/ADR-004-external-gateway-boundary.md`；当前页面代理不能读取其他进程的调用。
+- 外部客户端自动采集使用 `POST /api/v1/ingest/usage` 的 per-user token 边界；stock 客户端不能被网页凭空观察，后续 wrapper/Gateway 仍需遵守 ADR-004 与 ADR-053。
 - 新统计：进入对应 application/read-model 模块；个人 token 查询留在 `db.py`，管理员聚合进入 `admin_data.py`，避免跨角色 SQL 混在一起。
 - 前后端拆分：先保留本文档中的 API 契约，新增 CORS、跨域 CSRF 和独立会话方案后再拆服务。
 - 生产共享：使用 HTTPS 反向代理、Waitress/WSGI 服务、持久化数据卷和环境变量；不要使用 `debug=True`。
