@@ -130,3 +130,4 @@
 - [x] ADR-041 增加 Android Release HTTPS 构建门禁，保留 Debug 模拟器 HTTP 默认值。
 - [x] ADR-042 增加 `/api/v1/ready` SQLite schema readiness 探针，和 liveness health 分离。
 - [x] ADR-043 固化 Android Keystore 会话 blob 的同步提交与清除失败语义，避免 bearer 生命周期异步落盘。
+- [x] Android Release 运行时沿 endpoint/repository/HTTP adapter 传播 HTTPS 门禁，补充 ADR-044。

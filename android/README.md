@@ -43,7 +43,9 @@ Release 不允许使用默认的 `10.0.2.2` 或任意 `http://` 地址；这条�
 
 开发 HTTP 仅为本机模拟器临时调试，发布版本必须 HTTPS；不要把真实 API Key 写进 `gradle.properties` 或 APK。
 
-服务地址只允许 `http`/`https`、主机名和路径，不允许用户名、密码、query 或 fragment。实体设备与公网分享必须使用 HTTPS，并在 Windows 防火墙、反向代理和证书层完成最小暴露。
+服务地址只允许 `http`/`https`、主机名和路径，不允许用户名、密码、query 或 fragment。Debug
+模拟器可以使用 `http://10.0.2.2`；Release 会在写入 endpoint 或发起请求前拒绝任何 HTTP。
+实体设备与公网分享必须使用 HTTPS，并在 Windows 防火墙、反向代理和证书层完成最小暴露。
 
 ## 目录
 

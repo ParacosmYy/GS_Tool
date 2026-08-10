@@ -38,12 +38,13 @@ private const val MAX_ASSISTANT_PREVIEW_CHARS = 6_000
 /** Main-safe JSON data source; callers must invoke it off the main thread. */
 internal class JsonHttpDataSource(
     baseUrl: String,
+    private val allowInsecureHttp: Boolean,
 ) : TrackerRemoteDataSource {
     @Volatile
-    private var normalizedBaseUrl = normalizeApiBaseUrl(baseUrl)
+    private var normalizedBaseUrl = normalizeApiBaseUrl(baseUrl, allowInsecureHttp)
 
     override fun configureBaseUrl(baseUrl: String) {
-        normalizedBaseUrl = normalizeApiBaseUrl(baseUrl)
+        normalizedBaseUrl = normalizeApiBaseUrl(baseUrl, allowInsecureHttp)
     }
 
     override fun login(username: String, password: String): TokenPair {

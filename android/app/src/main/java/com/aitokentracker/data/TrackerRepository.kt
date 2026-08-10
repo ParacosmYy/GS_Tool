@@ -20,6 +20,7 @@ internal class TrackerRepository(
     private val remote: TrackerRemoteDataSource,
     private val sessionStore: EncryptedSessionStore,
     private val endpointStore: ApiEndpointStore,
+    private val allowInsecureHttp: Boolean,
 ) {
     val endpoint: String
         get() = endpointStore.load()
@@ -109,7 +110,7 @@ internal class TrackerRepository(
 
     /** Normalize and persist a new endpoint, clearing tokens scoped to the old host. */
     private fun configureEndpoint(baseUrl: String) {
-        val normalized = normalizeApiBaseUrl(baseUrl)
+        val normalized = normalizeApiBaseUrl(baseUrl, allowInsecureHttp)
         if (normalized != endpointStore.load()) {
             // Tokens are scoped to the previous Windows service; never replay
             // them against a newly entered host or classroom deployment.

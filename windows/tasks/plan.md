@@ -199,6 +199,7 @@ normalization, validation, and aggregate refresh.
 
 - [x] Debug 保留模拟器 HTTP 默认地址，Release Gradle 配置阶段强制 `https://`。
 - [x] Release Manifest 继续关闭明文流量，构建命令、工具链门禁和 ADR-041 已同步。
+- [x] Release endpoint store、repository 和 HTTP adapter 在请求前共享 HTTPS 门禁，避免用户输入 HTTP 后才由平台失败。
 - [>] APK 编译、安装和设备联调仍等待用户批准 JDK/Gradle/SDK 工具链。
 
 ### Task B7: 中心服务 liveness/readiness 探针

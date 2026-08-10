@@ -24,9 +24,10 @@ internal class TrackerViewModelFactory(context: Context) : ViewModelProvider.Fac
         require(modelClass.isAssignableFrom(TrackerViewModel::class.java)) {
             "Unsupported ViewModel: ${modelClass.name}"
         }
+        val allowInsecureHttp = BuildConfig.DEBUG
         val store = EncryptedSessionStore(applicationContext)
-        val endpointStore = ApiEndpointStore(applicationContext, BuildConfig.API_BASE_URL)
-        val remote = JsonHttpDataSource(endpointStore.load())
-        return TrackerViewModel(TrackerRepository(remote, store, endpointStore)) as T
+        val endpointStore = ApiEndpointStore(applicationContext, BuildConfig.API_BASE_URL, allowInsecureHttp)
+        val remote = JsonHttpDataSource(endpointStore.load(), allowInsecureHttp)
+        return TrackerViewModel(TrackerRepository(remote, store, endpointStore, allowInsecureHttp)) as T
     }
 }
