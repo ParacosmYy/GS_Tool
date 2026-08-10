@@ -131,3 +131,11 @@
 - 注册页 DOM 顺序已调整为 `h1` 主标题在前、认证卡片 `h2` 在后；桌面端通过显式 grid placement 保持“卡片左、场景右”的原视觉构图，窄屏端按 DOM 顺序自然排列。
 - 当前源码隔离服务生成了 [`register-v11-1440.png`](../.cache/ui-audit-v11/register-v11-1440.png) 和 [`register-v11-768.png`](../.cache/ui-audit-v11/register-v11-768.png)；1440 档布局和焦点样式可读，768 档仍受 headless 自动聚焦/滚动行为影响，只作为观察样本。
 - 模板静态 heading 扫描结果：`register.html`、`login.html`、`dashboard.html`、`admin.html` 和 `privacy.html` 均以 `h1` 开始；表单 label、图片 alt、表格 caption/scope 继续通过静态检查。
+
+## v12 认证反馈语义补强
+
+- `base.html` 的 flash 错误现在使用原生 `role="alert"`，成功和提示使用 `role="status"` 与
+  `aria-live="polite"`；颜色仍保留视觉区分，但屏幕阅读器不再需要依赖颜色或轮询 DOM 才能获知
+  登录/注册失败。
+- 该切片只证明模板语义和静态边界已补齐；受保护页面的真实错误态、键盘回归、真实设备指标和
+  合法会话仍属于 UI-3 未关闭门禁。
