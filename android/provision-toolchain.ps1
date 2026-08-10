@@ -122,8 +122,16 @@ if ($GenerateGradleWrapper) {
 if ($InstallSdkPackages) {
     $sdkManager = Join-Path $cmdlineRoot "bin\sdkmanager.bat"
     $licenseRoot = Join-Path $sdkRoot "licenses"
-    if (-not (Test-Path -LiteralPath $licenseRoot -PathType Container)) {
-        throw "Android SDK licenses are not present. Run '$sdkManager --sdk_root=$sdkRoot --licenses' interactively, then rerun with -InstallSdkPackages."
+    $licenseFile = Join-Path $licenseRoot "android-sdk-license"
+    $hasLicenseFile = Test-Path -LiteralPath $licenseFile -PathType Leaf
+    $hasLicenseContent = if ($hasLicenseFile) {
+        @(Get-Content -LiteralPath $licenseFile -ErrorAction Stop |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }).Count -gt 0
+    } else {
+        $false
+    }
+    if (-not $hasLicenseContent) {
+        throw "Android SDK license is not ready. Run '$sdkManager --sdk_root=$sdkRoot --licenses' interactively, accept the required terms, then rerun with -InstallSdkPackages."
     }
     Write-Host "[ACTION] installing platform-tools, API 37 and Build Tools 37.0.0"
     & $sdkManager --sdk_root=$sdkRoot "platform-tools" "platforms;android-37" "build-tools;37.0.0"
