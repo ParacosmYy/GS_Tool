@@ -45,6 +45,9 @@ function Assert-NoBroadWriteAcl([string]$PathValue) {
         "Everyone",
         "BUILTIN\Users"
     )
+    # Keep FullControl out of the bitmask: it contains read bits too, so
+    # including it would classify ReadAndExecute as writable. FullControl
+    # still matches because it contains each explicit write flag below.
     $writeRights = [System.Security.AccessControl.FileSystemRights]::WriteData -bor `
         [System.Security.AccessControl.FileSystemRights]::AppendData -bor `
         [System.Security.AccessControl.FileSystemRights]::CreateFiles -bor `
@@ -54,8 +57,7 @@ function Assert-NoBroadWriteAcl([string]$PathValue) {
         [System.Security.AccessControl.FileSystemRights]::Delete -bor `
         [System.Security.AccessControl.FileSystemRights]::DeleteSubdirectoriesAndFiles -bor `
         [System.Security.AccessControl.FileSystemRights]::ChangePermissions -bor `
-        [System.Security.AccessControl.FileSystemRights]::TakeOwnership -bor `
-        [System.Security.AccessControl.FileSystemRights]::FullControl
+        [System.Security.AccessControl.FileSystemRights]::TakeOwnership
     $acl = Get-Acl -LiteralPath $PathValue
     foreach ($entry in $acl.Access) {
         $identity = $entry.IdentityReference.Value
@@ -95,9 +97,18 @@ Get-ChildItem -LiteralPath $logs -File -Force | ForEach-Object {
     Assert-NoBroadWriteAcl $_.FullName
 }
 
-& $caddyExecutable validate --config $config --adapter caddyfile
-if ($LASTEXITCODE -ne 0) {
-    throw "Caddyfile validation failed; HTTPS startup is rejected."
+Push-Location (Split-Path -Parent $config)
+try {
+    # Caddy resolves relative log/certificate paths from its working directory.
+    # Match start-edge.ps1 so validation cannot create files in the caller's
+    # current directory or validate a different relative-path boundary.
+    & $caddyExecutable validate --config $config --adapter caddyfile
+    if ($LASTEXITCODE -ne 0) {
+        throw "Caddyfile validation failed; HTTPS startup is rejected."
+    }
+}
+finally {
+    Pop-Location
 }
 
 Write-Host "Edge preflight passed: config=$config logs=$logs"

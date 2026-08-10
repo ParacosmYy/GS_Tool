@@ -42,6 +42,8 @@
 - [x] Kimi provider 快速连接预设：Kimi Code / Kimi 开放平台 / OpenAI / 自定义 URL，Key 仍只留在页面内存
 - [>] Windows 分享入口：已提供需确认的可信局域网预览、本地校验备份命令、隔离 staging 恢复演练和隐私说明；正式 HTTPS、生产 ACL/轮转与真实数据恢复仍是部署门禁
 - [x] Caddy v2.11.4 Windows amd64 项目缓存、SHA-512 校验、edge preflight 和显式前台启动入口已完成（ADR-083）；实际域名/证书/ACL/外部 health 仍待部署主机
+- [x] Caddy 慢速下载超时和 edge 预检相对路径边界已加固；项目缓存版本、SHA-512 与示例配置 validate 已留证（ADR-083）
+- [x] Caddy edge ACL 检查修正为显式写权限位，隔离 preflight 通过且未污染调用者根目录（ADR-083）
 - [x] 分享 handoff 预检：`deployment/share-doctor.ps1` 统一 LAN/Production 只读配置门禁，不启动服务或修改主机状态（ADR-069）
 - [x] 统一交付预检：`release-doctor.ps1/.bat` 编排源码、EXE、Android 和 Local/LAN/Production 门禁，退出码区分通过、pending、失败（ADR-071）
 - [x] 新增提交级 windows/ci/quality-gate.ps1 与 GitHub Actions 源码质量闸门：compileall、PowerShell AST、审计、CLI help 和 diff check（ADR-085)

@@ -22,6 +22,8 @@ windows/*.spec
 windows/packaging/*.log
 windows/deployment/Caddyfile
 windows/deployment/logs/
+# Relative-path runtime logs must never become source artifacts.
+logs/
 token_usage*.csv
 windows/token_usage*.csv
 .pytest_cache/

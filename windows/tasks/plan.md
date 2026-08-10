@@ -456,6 +456,16 @@ API / 动画 / 设计 token 契约
 - [x] 新增 ADR-087 并将发布审计切换到本次 EXE/ZIP SHA-256。
 - [>] 真实记录重启持久化、升级/回滚、签名和正式分发仍属于最终交付门禁。
 
+### Task B28: Caddy 边缘工具链与相对路径门禁
+
+**目标：** 让慢速网络下的 Caddy 项目缓存下载有明确超时边界，并确保 edge 预检与正式启动使用同一工作目录，避免相对日志路径污染调用者目录。
+
+- [x] `provision-caddy.ps1` 支持 600 秒默认下载超时和显式 `-DownloadTimeoutSeconds` 覆盖，继续使用固定 SHA-512 校验。
+- [x] 项目缓存完成 Caddy v2.11.4 版本、固定 SHA-512 和 `Caddyfile.example` `validate` 证据。
+- [x] `preflight-edge.ps1` 在 Caddyfile 所在目录执行校验，并纳入源代码发布审计与 1000 行门禁。
+- [x] 修正 ACL 显式写权限位掩码，隔离配置/日志目录预检通过且未在调用者根目录生成日志。
+- [>] 真实域名、证书、ACL、外部 HTTPS/ready、服务监督和日志轮转仍属于部署主机门禁。
+
 ### Phase 5：六角色复核
 
 - [x] UI-1 复核视觉层级和 token 使用。
