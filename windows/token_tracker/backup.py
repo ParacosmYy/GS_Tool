@@ -60,8 +60,6 @@ def inventory_backups(
         raise BackupError(f"备份清单目录不是文件夹：{directory}")
 
     candidates = _inventory_candidates(directory)
-    if len(candidates) > MAX_INVENTORY_FILES:
-        raise BackupError(f"备份文件数量超过只读扫描上限：{MAX_INVENTORY_FILES}")
 
     now = db.local_now()
     files: list[dict[str, object]] = []
@@ -152,7 +150,7 @@ def _inventory_candidates(directory: Path) -> list[Path]:
     if not directory.exists():
         return []
     try:
-        entries = list(directory.iterdir())
+        entries = directory.iterdir()
     except OSError as exc:
         raise BackupError(f"读取备份目录失败：{directory}") from exc
     candidates: list[Path] = []
@@ -165,6 +163,8 @@ def _inventory_candidates(directory: Path) -> list[Path]:
             is_regular = False
         if is_regular:
             candidates.append(entry)
+            if len(candidates) > MAX_INVENTORY_FILES:
+                raise BackupError(f"备份文件数量超过只读扫描上限：{MAX_INVENTORY_FILES}")
     return candidates
 
 
