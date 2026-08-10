@@ -76,6 +76,7 @@
 - [x] 背景品牌资产升级：v7 御姐二次元嵌入式工程师、MacBook Pro/Mac Studio 形态、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v6 及之前版本保留回滚
 - [x] loading/connection/empty 状态统一视觉组件
 - [x] UI-3 静态语义切片：单一仪表盘 h1、表格 scope/caption、管理员详情焦点回流和密码长度边界
+- [x] `token_tracker audit` 增加 Web UI 静态契约门禁：label、table caption/scope、图片 alt、跳过链接和动效降级（ADR-063）
 
 ## Review gates
 

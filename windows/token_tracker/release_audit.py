@@ -12,6 +12,7 @@ from __future__ import annotations
 import ast
 from dataclasses import asdict, dataclass
 import hashlib
+from html.parser import HTMLParser
 import json
 from importlib.util import find_spec
 import os
@@ -62,6 +63,7 @@ def run_audit(root: Path | None = None) -> list[AuditCheck]:
     checks: list[AuditCheck] = []
     _check_required_files(project_root, checks)
     _check_contract_references(project_root, checks)
+    _check_web_ui_contract(project_root, checks)
     _check_source_line_cap(project_root, checks)
     _check_source_headers(project_root, checks)
     _check_public_api_docstrings(project_root, checks)
@@ -372,6 +374,114 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         checks.append(AuditCheck("contract-references", FAIL, f"{len(missing)} 个关键引用未接入"))
     else:
         checks.append(AuditCheck("contract-references", PASS, f"已核对 {len(references)} 个关键引用"))
+
+
+class _UiMarkupContractParser(HTMLParser):
+    """Collect the markup facts required by the static UI accessibility gate."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.label_depth = 0
+        self.images_without_alt: list[str] = []
+        self.controls_without_label: list[str] = []
+        self.tables_without_caption = 0
+        self.tables_without_scoped_heading = 0
+        self._tables: list[dict[str, bool]] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        """Record accessibility-relevant start tags without executing templates."""
+
+        normalized = tag.casefold()
+        attributes = {name.casefold(): value for name, value in attrs}
+        if normalized == "label":
+            self.label_depth += 1
+        elif normalized == "img" and "alt" not in attributes:
+            self.images_without_alt.append("img")
+        elif normalized in {"input", "textarea", "select"}:
+            input_type = str(attributes.get("type", "")).casefold()
+            if input_type != "hidden" and self.label_depth == 0:
+                self.controls_without_label.append(normalized)
+        elif normalized == "table":
+            self._tables.append({"caption": False, "scoped_heading": False})
+        elif normalized == "caption" and self._tables:
+            self._tables[-1]["caption"] = True
+        elif normalized == "th" and self._tables:
+            scope = str(attributes.get("scope", "")).casefold()
+            if scope in {"col", "row", "colgroup", "rowgroup"}:
+                self._tables[-1]["scoped_heading"] = True
+
+    def handle_endtag(self, tag: str) -> None:
+        """Close tracked labels and tables as the parser reaches their end tags."""
+
+        normalized = tag.casefold()
+        if normalized == "label":
+            self.label_depth = max(0, self.label_depth - 1)
+        elif normalized == "table" and self._tables:
+            table = self._tables.pop()
+            if not table["caption"]:
+                self.tables_without_caption += 1
+            if not table["scoped_heading"]:
+                self.tables_without_scoped_heading += 1
+
+
+def _check_web_ui_contract(root: Path, checks: list[AuditCheck]) -> None:
+    """Verify static markup and motion fallbacks before a Web release."""
+
+    template_root = root / "windows/token_tracker/templates"
+    templates = sorted(template_root.glob("*.html"))
+    problems: list[str] = []
+    parsed_templates = 0
+    for path in templates:
+        try:
+            source = path.read_text(encoding="utf-8")
+            parser = _UiMarkupContractParser()
+            parser.feed(source)
+            parser.close()
+        except (OSError, UnicodeDecodeError) as exc:
+            problems.append(f"{path.name}: unreadable ({type(exc).__name__})")
+            continue
+        parsed_templates += 1
+        problems.extend(f"{path.name}: image missing alt" for _ in parser.images_without_alt)
+        problems.extend(f"{path.name}: {control} outside label" for control in parser.controls_without_label)
+        if parser.tables_without_caption:
+            problems.append(f"{path.name}: table missing caption")
+        if parser.tables_without_scoped_heading:
+            problems.append(f"{path.name}: table missing scoped heading")
+
+    required_fragments = (
+        ("base.html", 'href="#main-content"'),
+        ("base.html", 'class="story-backdrop-image"'),
+        ("base.html", 'aria-hidden="true"'),
+        ("login.html", "<h1"),
+        ("register.html", "<h1"),
+    )
+    for filename, fragment in required_fragments:
+        path = template_root / filename
+        try:
+            if fragment not in path.read_text(encoding="utf-8"):
+                problems.append(f"{filename}: missing {fragment}")
+        except (OSError, UnicodeDecodeError):
+            problems.append(f"{filename}: required fragment unreadable")
+
+    css_sources = []
+    for relative in (
+        "windows/token_tracker/static/style.css",
+        "windows/token_tracker/static/ui-polish.css",
+        "windows/token_tracker/static/scene-motion.css",
+    ):
+        try:
+            css_sources.append((root / relative).read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError):
+            problems.append(f"{relative}: stylesheet unreadable")
+    css = "\n".join(css_sources)
+    for fragment in (":focus-visible", "prefers-reduced-motion", "forced-colors: active"):
+        if fragment not in css:
+            problems.append(f"stylesheets: missing {fragment}")
+
+    if problems:
+        checks.append(AuditCheck("web-ui-contracts", FAIL, f"{len(problems)} 个 UI 契约问题"))
+    else:
+        checks.append(AuditCheck("web-ui-contracts", PASS, f"已核对 {parsed_templates} 个模板和无障碍动效降级"))
 
 
 def _check_scene_assets(root: Path, checks: list[AuditCheck]) -> None:
