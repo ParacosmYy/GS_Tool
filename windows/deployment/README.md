@@ -18,6 +18,29 @@
 
 Windows 电脑只需要运行一个中心服务；同学不安装 Python、不接触 SQLite，也不需要知道项目目录。Android 只配置同一个 HTTPS Base URL。
 
+## 一命令分享预检
+
+在真正分享前，先运行只读 handoff doctor。它不会启动服务、创建数据库、改防火墙或申请证书：
+
+```powershell
+cd D:\Workplace\Agent_Workplace\ai-token-tracker\windows
+Set-ExecutionPolicy -Scope Process Bypass
+.\deployment\share-doctor.ps1 -Mode LanPreview
+```
+
+LAN 预检通过后，再运行 `start-lan-preview.bat` 并在明确提示处输入 `SHARE`。正式 HTTPS 交付需要额外提供
+Caddy 配置和已创建的受限日志目录：
+
+```powershell
+.\deployment\share-doctor.ps1 `
+  -Mode Production `
+  -Caddyfile .\deployment\Caddyfile `
+  -LogsDirectory .\deployment\logs
+```
+
+Production 预检失败时不得继续启动 Waitress；Caddy、域名、证书、防火墙和服务监督仍需部署负责人完成。
+该脚本的边界记录在 [`ADR-069`](decisions/ADR-069-share-doctor-handoff.md)。
+
 ## 本机/局域网体验
 
 根目录 `start.bat` 仍是个人体验入口。它默认使用 5000；如果旧的本机服务已经占用
