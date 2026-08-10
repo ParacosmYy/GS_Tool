@@ -66,6 +66,7 @@
 - [x] 本地 OpenAI-compatible Gateway：loopback 默认、独立访问令牌、Kimi/OpenAI-compatible 上游转发、SSE usage 解析和 Usage Ingest 上报
 - [x] Gateway 上报失败的有界内存重试、幂等键复用和退避；Windows DPAPI 加密 SQLite 队列已支持跨重启恢复（ADR-056）
 - [x] Gateway 响应读取/重定向/幂等键和非回环传输门禁、队列元数据 fail-closed 已补齐（ADR-058/059）
+- [x] Gateway 持久队列运行时 SQLite/DPAPI 故障 fail-closed，避免 worker 静默退出或透传未封装 500（ADR-068）
 - [x] per-user Usage Ingest Token 和 `/api/v1/ingest/usage` 已落地（ADR-053）；stock client 可通过本地 Gateway（ADR-054）自动上报，真实 provider 联调仍待合法 Key
 
 ## UI / motion

@@ -244,7 +244,8 @@ Gateway 支持 `/v1/models`、非流式 Chat Completions 和 SSE 流式 Chat Com
 只在完成 chunk 提供合法输入/输出 usage 时入账，否则响应头 `X-AI-Tracker-Usage` 为
 `missing`，不会估算。中心短暂不可用时本次 provider 调用仍会返回，响应状态会标为
 `queued`，失败记录默认在 `data/gateway-usage-queue.sqlite3` 中以 DPAPI 密文跨重启恢复；达到
-容量/次数上限才会返回 `report-failed`。临时调试可以显式加 `--memory-only`，此时重启会丢失
+容量/次数上限或持久队列运行时故障时会返回 `report-failed`。队列运行时故障会 fail-closed，
+保留未确认的密文行并暂停该进程的持久投递，详见 ADR-068。临时调试可以显式加 `--memory-only`，此时重启会丢失
 未上报记录。不要把 Gateway 绑定到公网或可信 LAN，除非另外配置
 `TOKEN_TRACKER_GATEWAY_ACCESS_TOKEN` 并使用 HTTPS 边缘保护。
 

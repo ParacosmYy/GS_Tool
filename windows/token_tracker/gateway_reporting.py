@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass
+import logging
 import threading
 from time import monotonic, time
 from typing import Any
@@ -18,7 +19,12 @@ import requests
 
 from . import ingest_auth
 from .gateway_contracts import UsageReport
-from .gateway_queue import EncryptedUsageQueue, QueueItem
+from .gateway_queue import (
+    EncryptedUsageQueue,
+    QueueItem,
+    QueueProtectionError,
+    QueueStorageError,
+)
 
 
 MAX_MODEL_LENGTH = 200
@@ -27,6 +33,7 @@ DEFAULT_MAX_PENDING = 256
 DEFAULT_MAX_ATTEMPTS = 5
 DEFAULT_RETRY_BASE_SECONDS = 2.0
 MAX_RETRY_DELAY_SECONDS = 300.0
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -70,6 +77,7 @@ class UsageReporter:
         self._condition = threading.Condition()
         self._worker: threading.Thread | None = None
         self._stopping = False
+        self._queue_faulted = False
         self._persistent_queue = (
             EncryptedUsageQueue(queue_path, self._max_pending) if queue_path else None
         )
@@ -117,14 +125,18 @@ class UsageReporter:
 
     def _enqueue(self, report: UsageReport) -> str:
         with self._condition:
-            if self._stopping:
+            if self._stopping or self._queue_faulted:
                 return "report-failed"
             if self._persistent_queue:
-                stored = self._persistent_queue.enqueue(
-                    report,
-                    attempts=1,
-                    next_attempt_at=time() + self._retry_base_seconds,
-                )
+                try:
+                    stored = self._persistent_queue.enqueue(
+                        report,
+                        attempts=1,
+                        next_attempt_at=time() + self._retry_base_seconds,
+                    )
+                except (QueueProtectionError, QueueStorageError) as exc:
+                    self._mark_queue_fault_locked(exc)
+                    return "report-failed"
                 if not stored:
                     return "report-failed"
                 self._ensure_worker_locked()
@@ -150,38 +162,54 @@ class UsageReporter:
         return "queued"
 
     def _run(self) -> None:
-        while True:
-            pending = self._next_persistent() if self._persistent_queue else self._next_pending()
-            if pending is None:
-                return
-            result = self._post(pending.report)
-            if result.delivered or not result.retryable:
-                if self._persistent_queue:
-                    self._persistent_queue.remove(pending.item_id)
-                continue
-            if pending.attempts >= self._max_attempts:
-                if self._persistent_queue:
-                    self._persistent_queue.remove(pending.item_id)
-                continue
-            pending.attempts += 1
-            delay = min(
-                MAX_RETRY_DELAY_SECONDS,
-                self._retry_base_seconds * (2 ** (pending.attempts - 1)),
-            )
-            pending.next_attempt_at = (time() if self._persistent_queue else monotonic()) + delay
-            if self._persistent_queue:
-                self._persistent_queue.reschedule(
-                    pending.item_id,
-                    pending.attempts,
-                    pending.next_attempt_at,
+        try:
+            while True:
+                pending = self._next_persistent() if self._persistent_queue else self._next_pending()
+                if pending is None:
+                    return
+                result = self._post(pending.report)
+                if result.delivered or not result.retryable:
+                    if self._persistent_queue:
+                        self._persistent_queue.remove(pending.item_id)
+                    continue
+                if pending.attempts >= self._max_attempts:
+                    if self._persistent_queue:
+                        self._persistent_queue.remove(pending.item_id)
+                    continue
+                pending.attempts += 1
+                delay = min(
+                    MAX_RETRY_DELAY_SECONDS,
+                    self._retry_base_seconds * (2 ** (pending.attempts - 1)),
                 )
+                pending.next_attempt_at = (time() if self._persistent_queue else monotonic()) + delay
+                if self._persistent_queue:
+                    self._persistent_queue.reschedule(
+                        pending.item_id,
+                        pending.attempts,
+                        pending.next_attempt_at,
+                    )
+                    with self._condition:
+                        self._condition.notify_all()
+                    continue
                 with self._condition:
-                    self._condition.notify_all()
-                continue
+                    if not self._stopping and len(self._pending) < self._max_pending:
+                        self._pending.append(pending)
+                        self._condition.notify_all()
+        except (QueueProtectionError, QueueStorageError) as exc:
             with self._condition:
-                if not self._stopping and len(self._pending) < self._max_pending:
-                    self._pending.append(pending)
-                    self._condition.notify_all()
+                self._mark_queue_fault_locked(exc)
+
+    def _mark_queue_fault_locked(self, error: BaseException) -> None:
+        """Pause persistent delivery without deleting an unreconciled item."""
+
+        if self._queue_faulted:
+            return
+        self._queue_faulted = True
+        LOGGER.error(
+            "Gateway persistent usage queue fault; delivery is paused until restart",
+            exc_info=(type(error), error, error.__traceback__),
+        )
+        self._condition.notify_all()
 
     def _next_persistent(self) -> QueueItem | None:
         with self._condition:

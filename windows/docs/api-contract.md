@@ -377,7 +377,8 @@ Gateway 支持 OpenAI-compatible 模型发现、非流式 JSON 和流式 SSE。�
 重定向会被拒绝并返回 `502 UPSTREAM_REDIRECT`，不会先尝试解析重定向正文。
 
 成功调用会在响应头返回 `X-AI-Tracker-Usage`：`recorded`、`queued`、`missing` 或
-`report-failed`。流式响应还会在结束 SSE 中追加 tracker 注释；客户端应以该状态和中心最终记录为准，
+`report-failed`。持久队列容量/次数达到上限或运行时存储故障时返回 `report-failed`，不删除未确认的
+密文行。流式响应还会在结束 SSE 中追加 tracker 注释；客户端应以该状态和中心最终记录为准，
 不能根据本地输出字符数估算 token。
 
 客户端可以省略 `Idempotency-Key`，此时 Gateway 为本次调用生成唯一键；如果提供该请求头，长度必须不
