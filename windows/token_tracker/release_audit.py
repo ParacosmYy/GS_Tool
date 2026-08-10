@@ -114,6 +114,8 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
     required = (
         "README.md",
         "windows/docs/release-readiness.md",
+        "windows/skills/README.md",
+        "windows/skills/project-ui-orchestration/SKILL.md",
         "start.bat",
         "windows/.env.example",
         "windows/requirements.lock",
@@ -211,6 +213,8 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("root-launcher", "start.bat", "call start.bat"),
         ("android-toolchain-doctor", "android/toolchain-doctor.ps1", "Android toolchain pending"),
         ("exe-toolchain-doctor", "windows/packaging/toolchain-doctor.ps1", "EXE packaging pending"),
+        ("project-skills-source", "windows/skills/README.md", "7676817c12a1317454ae3898a0c5c1eacf5dd3d5"),
+        ("project-ui-orchestration", "windows/skills/project-ui-orchestration/SKILL.md", "AI Token Tracker UI"),
     )
     missing: list[str] = []
     for name, relative_path, fragment in references:
