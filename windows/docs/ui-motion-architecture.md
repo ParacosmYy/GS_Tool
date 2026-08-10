@@ -32,7 +32,7 @@
 
 ## 背景版本策略
 
-当前品牌资产为 `embedded-rust-engineer-bg-v12`：左侧保留标题负空间，右侧承载成年、御姐气质且非性化的二次元嵌入式 Rust/RL 工程师、银色专业笔记本、独立紧凑银色桌面工作站与抽象遥测屏幕。v11、v10、v9、v8、v7、v6、v5、v4、v3、v2 与更早版本保留作回滚参考，不直接参与默认渲染；Windows 与 Android 通过各自静态资源路径消费同一像素资产，端侧遮罩和动效实现保持解耦。详见 ADR-086。
+当前品牌资产为 `embedded-rust-engineer-bg-v13`：左侧保留标题负空间，右侧承载成年、御姐气质且非性化的二次元嵌入式 Rust/RL 工程师、银色 MacBook Pro 风格专业笔记本、紧凑 Mac Studio 风格桌面工作站与 Rust/RL 遥测屏幕。v12、v11、v10、v9、v8、v7、v6、v5、v4、v3、v2 与更早版本保留作回滚参考，不直接参与默认渲染；Windows 与 Android 通过各自静态资源路径消费同一像素资产，端侧遮罩和动效实现保持解耦。详见 ADR-090。
 
 Windows 和 Android 各自复制同一 PNG，并通过 SHA-256 校验保持内容一致；网页只通过
 `.story-backdrop` 内的显式 `.story-backdrop-image` 和 CSS 回退引用图片，业务组件不直接依赖

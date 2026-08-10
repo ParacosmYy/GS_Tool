@@ -192,7 +192,7 @@ private fun BrandBackdrop() {
 @Composable
 private fun StaticBrandBackdrop() {
     Image(
-        painter = painterResource(R.drawable.embedded_rust_engineer_bg_v12),
+        painter = painterResource(R.drawable.embedded_rust_engineer_bg_v13),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier
@@ -222,7 +222,7 @@ private fun AnimatedBrandBackdrop() {
         label = "brand-backdrop-y",
     )
     Image(
-        painter = painterResource(R.drawable.embedded_rust_engineer_bg_v12),
+        painter = painterResource(R.drawable.embedded_rust_engineer_bg_v13),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier
