@@ -23,6 +23,18 @@ PASS = "pass"
 PENDING = "pending"
 FAIL = "fail"
 SOURCE_EXTENSIONS = frozenset({".bat", ".css", ".html", ".js", ".json", ".kt", ".py", ".ps1", ".xml"})
+SOURCE_IGNORED_DIRS = frozenset({
+    ".cache",
+    ".git",
+    ".venv",
+    "__pycache__",
+    "backups",
+    "build",
+    "data",
+    "dist",
+    "staging",
+    ".toolchain",
+})
 EXPECTED_CHARTJS_SHA256 = "206B6E8BB00FC7BBA2C7EE80CA41DB3E9E05BA7BE0AA35ABEBA9CFD5357F5D0E"
 
 
@@ -124,13 +136,14 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
 
 
 def _check_source_line_cap(root: Path, checks: list[AuditCheck]) -> None:
-    source_roots = (root / "windows/token_tracker", root / "windows/packaging", root / "android/app/src/main")
     files = [
         path
-        for source_root in source_roots
-        if source_root.is_dir()
-        for path in source_root.rglob("*")
-        if path.is_file() and path.suffix.casefold() in SOURCE_EXTENSIONS
+        for path in root.rglob("*")
+        if path.is_file()
+        and path.suffix.casefold() in SOURCE_EXTENSIONS
+        and not SOURCE_IGNORED_DIRS.intersection(
+            part.casefold() for part in path.relative_to(root).parts
+        )
     ]
     oversized: list[str] = []
     for path in files:
