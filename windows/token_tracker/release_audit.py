@@ -25,7 +25,10 @@ from typing import Any, Iterable
 PASS = "pass"
 PENDING = "pending"
 FAIL = "fail"
-SOURCE_EXTENSIONS = frozenset({".bat", ".css", ".html", ".js", ".json", ".kt", ".py", ".ps1", ".xml"})
+SOURCE_EXTENSIONS = frozenset({
+    ".bat", ".css", ".gradle", ".html", ".java", ".js", ".json", ".kt", ".kts", ".py", ".ps1", ".xml",
+})
+LINE_CAP_EXTENSIONS = SOURCE_EXTENSIONS | frozenset({".md", ".properties", ".toml", ".txt", ".yaml", ".yml"})
 SOURCE_IGNORED_DIRS = frozenset({
     ".cache",
     ".git",
@@ -161,7 +164,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
 
 
 def _check_source_line_cap(root: Path, checks: list[AuditCheck]) -> None:
-    files = _source_files(root)
+    files = _line_cap_files(root)
     oversized: list[str] = []
     for path in files:
         try:
@@ -174,17 +177,29 @@ def _check_source_line_cap(root: Path, checks: list[AuditCheck]) -> None:
     if oversized:
         checks.append(AuditCheck("source-line-cap", FAIL, f"{len(oversized)} 个文件超过 1000 行"))
     else:
-        checks.append(AuditCheck("source-line-cap", PASS, f"已扫描 {len(files)} 个源文件"))
+        checks.append(AuditCheck("source-line-cap", PASS, f"已扫描 {len(files)} 个代码/文本文件"))
 
 
 def _source_files(root: Path) -> list[Path]:
     """Return authored source files while excluding generated checkout state."""
 
+    return _files_with_extensions(root, SOURCE_EXTENSIONS)
+
+
+def _line_cap_files(root: Path) -> list[Path]:
+    """Return authored and documented text files covered by the 1000-line cap."""
+
+    return _files_with_extensions(root, LINE_CAP_EXTENSIONS)
+
+
+def _files_with_extensions(root: Path, extensions: frozenset[str]) -> list[Path]:
+    """Return readable candidate files while excluding generated checkout state."""
+
     return [
         path
         for path in root.rglob("*")
         if path.is_file()
-        and path.suffix.casefold() in SOURCE_EXTENSIONS
+        and path.suffix.casefold() in extensions
         and not SOURCE_IGNORED_DIRS.intersection(
             part.casefold() for part in path.relative_to(root).parts
         )
