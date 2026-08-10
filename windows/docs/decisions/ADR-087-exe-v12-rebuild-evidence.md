@@ -26,12 +26,12 @@ Set-Location windows
 
 - EXE：`windows/dist/AI-Token-Tracker/AI-Token-Tracker.exe`
 - EXE 大小：`5,789,359` bytes
-- EXE SHA-256：`4B8C52BC393CFD7F7D6D3530A6C028EA3949DC3C13BFF28AF3ECCEAD38651DCE`
+- EXE SHA-256：`1FE1EBE3223B934E51529584721669E3675808CD477CDBB3A576B1239FD96CA1`
 - ZIP：`windows/release/AI-Token-Tracker-windows-x64-0.1.0.zip`
-- ZIP 大小：`36,427,169` bytes
-- ZIP SHA-256：`5A8E05660A692FB82F0F3EE9636D2D902B6A53CBECE597B0E705BB0FA23049BE`
-- ZIP 清单包含 `AI-Token-Tracker.exe`、`README.txt` 和 `embedded-rust-engineer-bg-v12.png`。
-- 使用隔离的项目缓存 `LOCALAPPDATA` 和端口 5019 启动 EXE：`GET /login`、`GET /api/v1/ready` 与 v12 PNG 均返回 200。
+- ZIP 大小：`36,428,766` bytes
+- ZIP SHA-256：`1DB2C1C603E5E4011C835F5094AFA06905E95125EB2B7E986798BB5BC543ECCC`
+- ZIP 清单包含 `AI-Token-Tracker.exe`、`README.txt`、`RELEASE-MANIFEST.json`、`VERIFY-PACKAGE.ps1` 和 `embedded-rust-engineer-bg-v12.png`。
+- 使用隔离的项目缓存 `LOCALAPPDATA` 和端口 5019 启动当前 EXE：`GET /login`、`GET /api/v1/ready` 与 v12 PNG 均返回 200，PNG 为 `2,007,338` bytes。
 - 隔离数据库创建在 `LOCALAPPDATA\AITokenTracker\token_tracker.sqlite3`，EXE 发布目录没有生成 `data/token_tracker.sqlite3`。
 - 在隔离 `%LOCALAPPDATA%` 中通过真实 `/api/v1` 流程注册账户、写入一条 `kimi-code` 用量
   `321 + 654 = 975`，停止 EXE 后用同一数据目录重启并重新登录读取到同一 `record id=1`；

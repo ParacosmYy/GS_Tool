@@ -28,6 +28,7 @@
 - [x] EXE 构建工具链独立锁定，PyInstaller 资源收集和用户数据目录边界已写入 ADR-049/082；6.22.0 onedir 构建和隔离启动已留证
 - [x] EXE v12 交付一致性：重建含 v12 背景的 EXE/ZIP，隔离验证 `/login`、`/api/v1/ready`、v12 静态资源和 `%LOCALAPPDATA%` 数据目录（ADR-087）
 - [x] EXE v12 真实记录重启持久化：隔离账户写入 `kimi-code` 321+654，重启后读取同一记录（ADR-087）
+- [x] EXE 0.1.0 发布包加入 manifest/hash verifier，补齐升级/回滚操作边界（ADR-089）
 - [x] 新增只读 `token_tracker audit` 发布审计入口，区分源码通过与外部工具链 pending
 - [x] Chart.js 4.4.7 固定为项目本地静态资产，核心图表不再依赖 CDN
 - [x] Provider 响应投影：Web/Android 只接收有界助手文本和稳定字段，不透传原始上游 JSON

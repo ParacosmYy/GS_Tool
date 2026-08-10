@@ -6,6 +6,17 @@ AI Token Tracker - Windows x64
 4. Register or sign in. Personal data is stored at:
    %LOCALAPPDATA%\AITokenTracker\token_tracker.sqlite3
 
+Before upgrading, stop the old EXE and create a verified SQLite backup. Extract
+the new ZIP into a new folder, then run `VERIFY-PACKAGE.ps1` in that folder.
+The package manifest must match the release version and executable SHA-256.
+Never copy `data/` into the package and never delete `%LOCALAPPDATA%` during
+an upgrade.
+
+To roll back, stop the new EXE and launch the previous verified package from
+its old folder. Keep the same `%LOCALAPPDATA%\AITokenTracker` directory; if a
+data restore is needed, use the project's `restore-backup` command against an
+explicit staging target first. Do not replace a live database file.
+
 This package is a personal local experience. It is not the team center
 database. To let classmates share one administrator-owned database, deploy the
 Windows center website over HTTPS and give users that website URL instead.

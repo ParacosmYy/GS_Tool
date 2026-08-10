@@ -24,7 +24,7 @@
 | R-07 | 工作方向、效率、正确/错误码、脱敏日志和导出 | conditional | Web Activity 竖切片（ADR-072、UI-3 v19）、`/api/v1/events/work`、`work_events`/`app_logs` schema、管理员读模型/CSV | 真实部署日志样本和数据保留策略 |
 | R-08 | Android 同账号联动 | conditional | Compose 登录、Remote/Repository/DTO/API v1 契约、v12 共享场景、项目内 JDK/Gradle/Wrapper、系统减少动画 UI 边界（ADR-079/086/081） | 用户接受 SDK license 后安装 API 37/Build Tools、APK 构建与授权设备安装联调 |
 | R-09 | Windows 个人体验入口可直接启动 | pass | 根目录 `start.bat`、根 `run.py` shim、`windows/run.py` 端口无副作用回退、个人入口 loopback fail-closed（ADR-078） | 重启后用户数据持久化验收 |
-| R-10 | EXE 便捷分发 | conditional | PyInstaller 6.22.0 lock、`packaging/build.ps1`/`package.ps1`、ADR-082/087、v12 EXE/ZIP SHA-256、隔离 `/login`/`ready`/资源 200、真实记录重启读取与 `%LOCALAPPDATA%` 建库证据 | 升级、回滚、签名和正式分发 |
+| R-10 | EXE 便捷分发 | conditional | PyInstaller 6.22.0 lock、`packaging/build.ps1`/`package.ps1`、ADR-082/087/089、v12 EXE/ZIP SHA-256、包 manifest/verifier、隔离 `/login`/`ready`/资源 200、真实记录重启读取与 `%LOCALAPPDATA%` 建库证据 | 真实升级、回滚、签名和正式分发 |
 | R-11 | 局域网/公网分享且数据集中在管理员电脑 | conditional | `share-doctor`、LAN wrapper、Caddy/Waitress 契约、项目内 Caddy v2.11.4 固定下载/校验/预检/启动入口（ADR-083）；本机缓存、版本、SHA-512 和示例 `validate` 已通过 | 真实域名、证书、防火墙、ACL、日志轮转和外部 health |
 | R-12 | 备份、恢复、回滚 | conditional | `backup`/`verify-backup`/`restore-backup`/`backup-inventory`、`release-doctor -CheckBackups`、已填充隔离数据库备份/恢复证据（ADR-060/077/088） | 真实中心数据恢复、负责人确认的保留周期/离线副本和回滚记录 |
 | R-13 | 前后端边界、API v1、角色分工和模块化架构 | pass | `api-contract.md`、roles、ui-modules、ADR 目录、层间审计 | 架构师最终签署 |

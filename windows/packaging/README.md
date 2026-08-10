@@ -36,8 +36,19 @@ PyInstaller 模块/启动器是否存在，不执行 Python 导入、不下载�
 .\packaging\package.ps1 -Version 0.1.0
 ```
 
-输出为 `windows/release/AI-Token-Tracker-windows-x64-0.1.0.zip`，内含 onedir 运行目录和终端用户
-`README.txt`。ZIP、EXE 和用户数据库都不提交 Git；签名和正式发布渠道仍需部署负责人另行验收。
+输出为 `windows/release/AI-Token-Tracker-windows-x64-0.1.0.zip`，内含 onedir 运行目录、终端用户
+`README.txt`、`RELEASE-MANIFEST.json` 和只读 `VERIFY-PACKAGE.ps1`。ZIP、EXE 和用户数据库都不提交 Git；
+签名和正式发布渠道仍需部署负责人另行验收。
+
+验证解压后的包（不会启动 EXE 或修改数据）：
+
+```powershell
+.\packaging\verify-package.ps1 -PackageDirectory .\release\AI-Token-Tracker-windows-x64-0.1.0 -ExpectedVersion 0.1.0
+```
+
+升级时先备份并停止旧 EXE，再把新包解压到新目录并通过 manifest/hash 校验；回滚时停止新 EXE，
+重新启动上一份已验证包，保留 `%LOCALAPPDATA%\AITokenTracker` 用户数据目录。真实升级、回滚、
+Authenticode 签名和正式分发仍需要部署负责人验收。
 
 构建前必须检查：
 

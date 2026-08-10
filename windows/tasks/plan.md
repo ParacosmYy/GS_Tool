@@ -455,7 +455,19 @@ API / 动画 / 设计 token 契约
 - [x] 验证数据库位于隔离 `LOCALAPPDATA\AITokenTracker\`，EXE 目录不产生 `data/`。
 - [x] 新增 ADR-087 并将发布审计切换到本次 EXE/ZIP SHA-256。
 - [x] 隔离 `%LOCALAPPDATA%` 中真实写入 `kimi-code` `321+654=975`，停止/重启 EXE 后重新读取同一 `record id=1`。
-- [>] 升级/回滚、签名和正式分发仍属于最终交付门禁。
+- [x] ZIP 增加 RELEASE-MANIFEST.json 与只读 VERIFY-PACKAGE.ps1，记录版本、平台、EXE 哈希和 LocalAppData 策略。
+- [x] verifier 拒绝包目录外路径、哈希不匹配和包内 data/，当前 0.1.0 解压包验证通过。
+- [x] README 补充备份、停止、升级、回滚顺序，并同步 ADR-089、发布审计和验收矩阵。
+- [>] 真实升级/回滚、Authenticode 签名和正式分发渠道仍待部署负责人验收。
+
+### Task B30: EXE 版本清单与包完整性验证
+
+**目标：** 让用户在升级或回滚前可以在解压目录本地验证版本、EXE SHA-256 和用户数据边界。
+
+- [x] ZIP 增加 RELEASE-MANIFEST.json 与只读 VERIFY-PACKAGE.ps1，记录版本、平台、EXE 哈希和 LocalAppData 策略。
+- [x] verifier 拒绝包目录外路径、哈希不匹配和包内 data/，当前 0.1.0 解压包验证通过。
+- [x] README 补充备份、停止、升级、回滚顺序，并同步 ADR-089、发布审计和验收矩阵。
+- [>] 真实升级/回滚、Authenticode 签名和正式分发渠道仍待部署负责人验收。
 
 ### Task B28: Caddy 边缘工具链与相对路径门禁
 
