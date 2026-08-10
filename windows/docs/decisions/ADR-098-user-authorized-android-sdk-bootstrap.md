@@ -21,6 +21,8 @@ SDK 交互提示中确认 license。直接把长 PowerShell 命令复制给使�
 3. 复用 `provision-toolchain.ps1 -InstallSdkPackages` 安装固定的 Platform Tools、
    API 37 和 Build Tools 37.0.0。
 4. 复用 `toolchain-doctor.ps1`，通过后输出 `build-local.bat assembleDebug`。
+5. 安装前要求项目内 `licenses/android-sdk-license` 存在且包含非空许可内容；仅有
+   `licenses` 目录但没有实际授权文件时必须 fail-closed。
 
 脚本不自动输入 `y`、不改全局 PATH、不写入许可证内容、不下载未锁定版本，也不生成
 APK 假证据。用户取消或拒绝 license 时返回明确的非零退出码。

@@ -53,6 +53,10 @@ license 交互提示，不会静默同意第三方协议：
 .\accept-sdk-license.bat
 ```
 
+安装器还会检查项目内 `android/.toolchain/android-sdk/licenses/android-sdk-license`
+存在且包含非空许可内容；只有通过该门禁后才会安装 API 37 与 Build Tools，避免把半完成
+的 SDK 目录误判为可构建环境。
+
 doctor 全部通过后再使用 `android/build-local.bat assembleDebug`。该入口会把 Gradle 用户目录、Android 用户元数据、发行包和依赖缓存指向 `android/.gradle/`，并拒绝使用未配置的外部 Android SDK。
 
 ## 开发 API 地址
