@@ -46,6 +46,7 @@
 - [x] Web/Android 场景 v12：重新平衡角色脸部、银色笔记本、独立桌面工作站与左侧文案安全区；同一 SHA-256 资产已接入两端，v11 继续回滚（ADR-086）
 - [x] Android 构建入口已固定项目内 JDK、SDK、Gradle 和 Android 用户缓存路径；不改全局 PATH
 - [x] Android JDK 17、Gradle 9.5.0、command-line tools 与官方 Wrapper 已按固定 SHA-256 配置；AGP 9 内置 Kotlin/BuildConfig/Release 任务门禁已修复（ADR-081）
+- [x] Android SDK 用户授权入口：`android/accept-sdk-license.bat` 要求显式 `ACCEPT`，复用官方 license/install/doctor 流程，不自动代签（ADR-098）
 - [>] 用户交互接受 SDK license 后安装 API 37/Build Tools，完成 Debug APK 编译、设备联调与 APK 产物验收
 - [x] Kimi provider 快速连接预设：Kimi Code / Kimi 开放平台 / OpenAI / 自定义 URL，Key 仍只留在页面内存
 - [>] Windows 分享入口：已提供需确认的可信局域网预览、本地校验备份命令、隔离 staging 恢复演练和隐私说明；正式 HTTPS、生产 ACL/轮转与真实数据恢复仍是部署门禁

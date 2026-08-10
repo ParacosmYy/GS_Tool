@@ -46,6 +46,13 @@ $manager = Join-Path $sdk 'cmdline-tools\latest\bin\sdkmanager.bat'
 powershell -NoProfile -ExecutionPolicy Bypass -File .\provision-toolchain.ps1 -InstallSdkPackages
 ```
 
+为了减少复制路径，可以直接运行项目内入口；它仍要求你先输入 `ACCEPT`，再进入官方
+license 交互提示，不会静默同意第三方协议：
+
+```powershell
+.\accept-sdk-license.bat
+```
+
 doctor 全部通过后再使用 `android/build-local.bat assembleDebug`。该入口会把 Gradle 用户目录、Android 用户元数据、发行包和依赖缓存指向 `android/.gradle/`，并拒绝使用未配置的外部 Android SDK。
 
 ## 开发 API 地址

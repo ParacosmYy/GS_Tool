@@ -29,7 +29,7 @@
 ## 建议安装顺序
 
 1. 在项目内运行 `android\provision-toolchain.ps1 -GenerateGradleWrapper`，准备固定版本的 JDK、Gradle 和 command-line tools。
-2. 由用户交互运行 `sdkmanager --licenses`；脚本不会自动同意 Google SDK license。
+2. 由用户交互运行 `android\accept-sdk-license.bat`；入口要求明确输入 `ACCEPT`，再调用 `sdkmanager --licenses`，不会自动同意 Google SDK license。
 3. 在项目内运行 `android\provision-toolchain.ps1 -InstallSdkPackages`，安装 Platform Tools、API 37 和 Build Tools 37.0.0。
 4. 运行 `android\toolchain-doctor.ps1`，再执行 `android\build-local.bat assembleDebug`。
 5. Android Studio 只作为可选 IDE；若使用 IDE，SDK 路径必须仍指向 `android/.toolchain/android-sdk/`，`local.properties` 不提交。

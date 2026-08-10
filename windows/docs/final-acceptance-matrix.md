@@ -22,7 +22,7 @@
 | R-05 | Provider URL/Key 输入、自动模型发现、usage 自动归档 | conditional | `provider_service.py`、adapter registry、Web/Android 接入、Gateway 动态中心发现（ADR-075） | 用户合法 Key 的真实非流式/流式联调 |
 | R-06 | 多用户同库、管理员 RBAC、查看成员 token/事件/log | pass | `admin_service.py`、RBAC、Admin UI token/event/log 详情、API v1 | 正式中心主机部署 |
 | R-07 | 工作方向、效率、正确/错误码、脱敏日志和导出 | conditional | Web Activity 竖切片（ADR-072、UI-3 v19）、`/api/v1/events/work`、`work_events`/`app_logs` schema、管理员读模型/CSV | 真实部署日志样本和数据保留策略 |
-| R-08 | Android 同账号联动 | conditional | Compose 登录、Remote/Repository/DTO/API v1 契约、v14 共享场景、项目内 JDK/Gradle/Wrapper、系统减少动画 UI 边界（ADR-079/095/081） | 用户接受 SDK license 后安装 API 37/Build Tools、APK 构建与授权设备安装联调 |
+| R-08 | Android 同账号联动 | conditional | Compose 登录、Remote/Repository/DTO/API v1 契约、v14 共享场景、项目内 JDK/Gradle/Wrapper、用户授权 SDK 入口、系统减少动画 UI 边界（ADR-079/095/081/098） | 用户接受 SDK license 后安装 API 37/Build Tools、APK 构建与授权设备安装联调 |
 | R-09 | Windows 个人体验入口可直接启动 | pass | 根目录 `start.bat`、根 `run.py` shim、`windows/run.py` 端口无副作用回退、个人入口 loopback fail-closed（ADR-078） | 重启后用户数据持久化验收 |
 | R-10 | EXE 便捷分发 | conditional | PyInstaller 6.22.0 lock、`packaging/build.ps1`/`package.ps1`/`sign-build.ps1`/`verify-signature.ps1`/`verify-upgrade-rollback.ps1`、ADR-082/087/089/090/091/092/093/095/096、v14 EXE/ZIP SHA-256、包 manifest/verifier、隔离 `/login`/`ready`/v14 资源 200、真实记录重启读取和 v13→v14→v13 数据保留证据 | 批准的 Authenticode 证书/SignTool/时间戳服务和正式分发 |
 | R-11 | 局域网/公网分享且数据集中在管理员电脑 | conditional | `share-doctor`、LAN wrapper、Caddy/Waitress 契约、项目内 Caddy v2.11.4 固定下载/校验/预检/启动入口（ADR-083）；本机缓存、版本、SHA-512、示例 `validate`、2026-08-10 LAN handoff 与示例 Production edge preflight 已通过（ADR-097） | 真实域名、证书、防火墙、ACL、日志轮转和外部 health |
