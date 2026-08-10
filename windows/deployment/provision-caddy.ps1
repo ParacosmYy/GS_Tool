@@ -35,8 +35,9 @@ if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf) -or (Get-Item -Lit
         throw "Windows curl.exe is required to download the pinned Caddy archive."
     }
     Write-Host "Downloading Caddy $version to the project cache..."
-    & $curl.Source --fail --location --silent --show-error --retry 3 --connect-timeout 10 --max-time 300 --output $archivePath $archiveUrl
+    & $curl.Source --fail --location --silent --show-error --retry 3 --retry-all-errors --connect-timeout 10 --max-time 300 --output $archivePath $archiveUrl
     if ($LASTEXITCODE -ne 0) {
+        Remove-Item -LiteralPath $archivePath -Force -ErrorAction SilentlyContinue
         throw "Caddy archive download failed with exit code $LASTEXITCODE."
     }
 }
