@@ -295,6 +295,14 @@ normalization, validation, and aggregate refresh.
 - [x] Gateway 响应读取异常、重定向、幂等键控制字符、非回环 HTTP 和队列调度元数据完整性已补齐（ADR-058/059）。
 - [x] ADR-056/058/059、架构模块表、README、角色复核、发布审计和隔离 restart smoke 已同步。
 
+### Task B19: Gateway 中心端点自动发现
+
+- [x] 根入口动态端口与 Gateway 默认上报地址的分流风险已记录为 ADR-075。
+- [x] `resolve-center-url.ps1` 只读扫描 `5000–5020/api/v1/ready`，失败时 fail-closed。
+- [x] `start-gateway.ps1` 保留显式 `-IngestUrl` 覆盖，并对 HTTP 继续要求 `-AllowHttp`。
+- [x] 隔离源码实例与假凭据 Gateway 联动、Gateway health、PowerShell 语法、compile、audit 和行数门禁已通过。
+- [ ] 真实中心主机与 HTTPS 域名上线后重新执行正式边缘发现/证书门禁。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

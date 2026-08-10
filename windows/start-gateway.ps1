@@ -8,12 +8,14 @@ This wrapper never accepts provider keys or ingest tokens as parameters. The
 Python CLI loads those values from the ignored .env/process environment.
 Environment names are TOKEN_TRACKER_GATEWAY_PROVIDER_KEY,
 TOKEN_TRACKER_GATEWAY_INGEST_TOKEN, and optional TOKEN_TRACKER_GATEWAY_ACCESS_TOKEN.
+When -IngestUrl is omitted, the wrapper discovers the first ready local center
+service in the root launcher port window.
 #>
 
 [CmdletBinding()]
 param(
     [string]$UpstreamUrl = "https://api.kimi.com/coding/v1",
-    [string]$IngestUrl = "http://127.0.0.1:5000/api/v1/ingest/usage",
+    [string]$IngestUrl,
     [string]$BindHost = "127.0.0.1",
     [int]$BindPort = 8787,
     [switch]$AllowHttp,
@@ -33,6 +35,17 @@ if ($BindPort -lt 1 -or $BindPort -gt 65535) {
 }
 if ([string]::IsNullOrWhiteSpace($BindHost)) {
     throw "Gateway bind host is required"
+}
+if ([string]::IsNullOrWhiteSpace($IngestUrl)) {
+    $resolver = Join-Path $windowsRoot "deployment\resolve-center-url.ps1"
+    if (-not (Test-Path -LiteralPath $resolver -PathType Leaf)) {
+        throw "Center service resolver not found: $resolver"
+    }
+    $IngestUrl = [string](& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $resolver)
+    if ([string]::IsNullOrWhiteSpace($IngestUrl)) {
+        throw "Unable to discover a ready center service"
+    }
+    Write-Host "Automatically discovered center ingest endpoint: $IngestUrl"
 }
 if ($IngestUrl.StartsWith("http://", [System.StringComparison]::OrdinalIgnoreCase) -and -not $AllowHttp) {
     throw "HTTP ingest requires explicit -AllowHttp; production/shared use HTTPS"
