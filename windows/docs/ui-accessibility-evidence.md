@@ -239,3 +239,19 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `role=alert`、`aria-live=assertive`、`aria-atomic=true`，检测按钮最终恢复可用。
 - 本轮应用页面 DevTools `error/warning` 日志为空；浏览器工具自身的外部 Statsig 超时不属于应用页面日志，
   不计入应用失败。真实 Provider 成功、真实设备下载、系统级 reduced-motion/高对比度仍需后续门禁。
+
+## v19 个人工作信号竖切片回归
+
+- 使用同一忽略目录下的隔离 SQLite、`5019` 源服务和合法隔离会话打开 Dashboard；页面请求
+  `GET /api/v1/events/work` 返回 `200`，空状态显示“已加载 0 条工作事件”。
+- 通过真实网页表单提交方向、结果、效率 `91`、项目、任务类型、正确码和结构化备注；服务端记录
+  `POST /api/v1/events/work` `201`，随后列表 `GET` `200`，页面显示“工作信号已保存”和最近活动行。
+  表格使用 `textContent` 渲染，未把输入内容当作 HTML。
+- 使用含空格的非法错误码验证服务端校验；服务端返回 `400`，页面消息切换为
+  `role=alert`、`aria-live=assertive`，卡片进入 error 状态且提交按钮恢复可用。清除错误值后再次提交，
+  服务端返回 `201`，列表显示两条事件，消息恢复为 `role=status`、`aria-live=polite`，卡片回到 success 状态。
+- 当前默认浏览器视口的 `documentElement.scrollWidth - clientWidth = 0`；Activity 双栏在 `900px` 以下
+  堆叠，历史表格自身保留横向滚动。应用页面 DevTools `error/warning` 日志为空；本轮服务端访问日志同时
+  记录了 `GET 200`、`POST 201` 和预期的验证 `POST 400`。
+- 该证据只覆盖隔离合法会话下的功能/状态切片，不宣称真实手机四档指标、Provider 真实成功、下载落盘、
+  系统级 reduced-motion/高对比度或正式部署数据保留门禁已关闭。

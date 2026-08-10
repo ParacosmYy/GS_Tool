@@ -252,7 +252,9 @@ input::placeholder, textarea::placeholder { color: #aaa8b3; opacity: 1; }
 .signal-cell .stat-value { display: block; margin: 0 0 8px; color: var(--copy); font-family: "DM Mono", monospace; font-size: 29px; font-weight: 400; letter-spacing: -.1em; }
 .signal-cell small { color: var(--copy-dim); font-family: "DM Mono", monospace; font-size: 9px; }
 
-.visual-grid, .tool-grid { display: grid; grid-template-columns: 1.52fr 1fr; gap: 16px; margin-top: 16px; }
+.visual-grid, .tool-grid, .activity-grid { display: grid; grid-template-columns: 1.52fr 1fr; gap: 16px; margin-top: 16px; }
+.activity-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); align-items: start; scroll-margin-top: 92px; }
+.activity-grid > * { min-width: 0; }
 .tool-grid.auto-layout { grid-template-columns: minmax(0, 1.42fr) minmax(300px, .78fr); align-items: stretch; }
 .chart-card, .form-card, .records-card, .guide-card, .manual-details { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(32,33,38,.92), rgba(22,23,29,.97)); transition: transform .55s var(--ease-out), border-color .55s var(--ease-out), background .55s var(--ease-out); }
 .chart-card::before, .form-card::before, .records-card::before { position: absolute; top: 0; bottom: 0; left: -40%; width: 24%; content: ""; pointer-events: none; opacity: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent); transform: skewX(-18deg); transition: opacity .3s ease; }
@@ -274,6 +276,12 @@ input::placeholder, textarea::placeholder { color: #aaa8b3; opacity: 1; }
 .secret-field input { padding-right: 88px; }
 .form-card .small-copy { margin: -5px 0 21px; color: #d0ced8; font-size: 12px; line-height: 1.8; }
 .form-card .stack-form { gap: 13px; }
+.activity-capture-card { background: linear-gradient(145deg, rgba(34,40,42,.96), rgba(16,20,24,.98)); }
+.activity-history-card { display: flex; flex-direction: column; min-width: 0; margin-top: 0; }
+.activity-history-card .table-scroll { max-height: 406px; overflow: auto; }
+.activity-history-card table { min-width: 540px; }
+.activity-privacy-note { display: flex; gap: 9px; align-items: flex-start; margin: 18px 0 0; border-top: 1px solid var(--line); padding-top: 15px; color: #c8c6d0; font-family: "DM Mono", monospace; font-size: 9px; line-height: 1.65; }
+.activity-privacy-note i { flex: 0 0 auto; width: 7px; height: 7px; margin-top: 4px; border-radius: 50%; background: var(--md-sys-color-secondary); box-shadow: 0 0 0 4px rgba(215,255,131,.12); }
 .form-message { min-height: 20px; color: var(--md-sys-color-secondary); font-family: "DM Mono", monospace; font-size: 10px; line-height: 1.6; }
 .form-message.is-error { color: var(--hot); }
 .proxy-card { background: linear-gradient(145deg, rgba(39,39,55,.94), rgba(22,23,29,.98)); }
@@ -413,7 +421,7 @@ td:first-child { color: var(--white); font-weight: 700; }
   .hero-stage { grid-template-columns: 1fr; min-height: 780px; }
   .hero-orbit { width: min(72vw, 480px); order: -1; }
   .hero-copy { margin-top: 10px; }
-  .visual-grid, .tool-grid, .tool-grid.auto-layout { grid-template-columns: 1fr; }
+  .visual-grid, .tool-grid, .activity-grid, .tool-grid.auto-layout { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 620px) {
@@ -434,6 +442,7 @@ td:first-child { color: var(--white); font-weight: 700; }
   .signal-cell, .signal-cell + .signal-cell { min-height: 119px; padding: 22px 0; border-right: 0; border-bottom: 1px solid var(--line); }
   .signal-cell:last-child { border-bottom: 0; }
   .chart-card, .form-card, .records-card { padding: 18px; border-radius: 13px; }
+  .activity-history-card { margin-top: 0; }
   .chart-card { min-height: 330px; }
   .chart-wrap { height: 235px; }
   .form-row { grid-template-columns: 1fr; }

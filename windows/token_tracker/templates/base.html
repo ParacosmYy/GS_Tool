@@ -34,6 +34,7 @@
       <nav class="site-nav" aria-label="主要导航">
         <a href="{{ url_for('dashboard') }}#analysis">Analysis</a>
         <a href="{{ url_for('dashboard') }}#connect">Connect</a>
+        <a href="{{ url_for('dashboard') }}#activity">Activity</a>
         <a href="{{ url_for('dashboard') }}#history">History</a>
         {% if g.user.role == 'admin' %}<a href="{{ url_for('admin') }}">Admin</a>{% endif %}
       </nav>

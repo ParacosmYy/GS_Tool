@@ -136,10 +136,75 @@
   </div>
 </details>
 
+<section class="activity-grid" id="activity" data-reveal>
+  <article class="form-card activity-capture-card" id="activity-entry" data-motion-state="idle" aria-busy="false">
+    <div class="card-heading">
+      <div>
+        <p class="eyebrow">05 / WORK SIGNAL</p>
+        <h2>记录工作信号 <span>Direction / outcome / efficiency</span></h2>
+      </div>
+      <span class="card-icon" aria-hidden="true">↗</span>
+    </div>
+    <p class="muted small-copy">记录一次 AI 辅助工作的方向、结果和效率评分。只保存结构化字段，不保存原始 prompt、Key 或完整响应。</p>
+    <form id="work-event-form" class="stack-form" data-motion-state="idle" aria-busy="false">
+      <div class="form-row">
+        <label>工作方向
+          <select name="direction" required>
+            <option value="coding">编码开发</option>
+            <option value="debugging">调试排错</option>
+            <option value="research">技术研究</option>
+            <option value="writing">文档写作</option>
+            <option value="planning">方案规划</option>
+            <option value="review">代码审查</option>
+            <option value="other">其他</option>
+          </select>
+        </label>
+        <label>结果
+          <select name="outcome" required>
+            <option value="success">成功</option>
+            <option value="partial">部分完成</option>
+            <option value="failure">失败</option>
+          </select>
+        </label>
+      </div>
+      <div class="form-row">
+        <label>效率评分 <span class="optional">0–100</span><input name="efficiency_score" type="number" min="0" max="100" step="1" placeholder="例如 86"></label>
+        <label>项目 <span class="optional">可选</span><input name="project" maxlength="120" placeholder="例如：token-tracker"></label>
+      </div>
+      <div class="form-row">
+        <label>正确码 <span class="optional">可选</span><input name="result_code" maxlength="80" placeholder="例如：OK"></label>
+        <label>错误码 <span class="optional">可选</span><input name="error_code" maxlength="80" placeholder="例如：BUILD_FAILED"></label>
+      </div>
+      <label>任务类型 <span class="optional">可选</span><input name="task_type" maxlength="80" placeholder="例如：provider-integration"></label>
+      <label>备注 <span class="optional">可选</span><textarea name="note" rows="3" maxlength="1000" placeholder="只填写必要的结构化说明，不要粘贴 Key 或完整日志……"></textarea></label>
+      <button class="button button-primary" type="submit">保存工作信号 <span>↗</span></button>
+      <div id="work-event-message" class="form-message" role="status" aria-live="polite" aria-atomic="true"></div>
+    </form>
+  </article>
+
+  <article class="records-card activity-history-card">
+    <div class="card-heading records-heading">
+      <div>
+        <p class="eyebrow">06 / ACTIVITY TRACE</p>
+        <h2>最近工作事件 <span>Structured signal history</span></h2>
+      </div>
+      <span id="work-event-status" class="legend-note" role="status" aria-live="polite" aria-atomic="true">加载中</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <caption class="sr-only">当前账号最近的结构化工作事件</caption>
+        <thead><tr><th scope="col">方向</th><th scope="col">结果</th><th scope="col">效率</th><th scope="col">代码</th><th scope="col">时间</th></tr></thead>
+        <tbody id="work-events-body"><tr><td colspan="5" class="table-empty">正在加载……</td></tr></tbody>
+      </table>
+    </div>
+    <p class="activity-privacy-note"><i></i> 原始 prompt、Key 和完整响应不会通过此表单保存。</p>
+  </article>
+</section>
+
 <section class="records-card" id="history" data-reveal>
   <div class="card-heading records-heading">
     <div>
-      <p class="eyebrow">05 / RECENT ENTRIES</p>
+      <p class="eyebrow">07 / RECENT ENTRIES</p>
       <h2>最近记录 <span>Signal history</span></h2>
     </div>
     <a class="button button-ghost" id="export-button" href="{{ url_for('api_export') }}?period=day">导出 CSV <span>↓</span></a>

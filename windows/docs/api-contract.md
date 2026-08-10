@@ -90,6 +90,10 @@ python -m token_tracker ingest-token revoke --username alice --id 1
 
 需要登录。请求 payload 可直接提交工作事件，或放在上面的命令信封 `payload` 中：
 
+Web Dashboard 的“记录工作信号”表单使用同一条契约和浏览器会话，不创建第二套 Web 专用数据写入路径；
+它只提交结构化方向/结果/效率/代码/项目/任务类型/备注，并由 API 层统一执行 CSRF、账户限流、字段校验、
+幂等键和用户隔离。原始 prompt、Provider Key 和完整响应不属于该表单的输入。
+
 ```json
 {
   "direction": "coding",

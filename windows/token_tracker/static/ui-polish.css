@@ -168,6 +168,7 @@ input:focus, textarea:focus { border-color: var(--signal-lime); background: rgba
     linear-gradient(145deg, rgba(23,26,33,.96), rgba(12,14,18,.98));
 }
 .chart-card:hover, .form-card:hover, .records-card:hover, .guide-card:hover { border-color: var(--line-visible); }
+.activity-capture-card { background: linear-gradient(145deg, rgba(34,40,42,.97), rgba(12,16,20,.99)); }
 .card-heading h2, .guide-card h2 { color: var(--ink); }
 .card-heading h2 span, .guide-card h2 span { color: var(--ink-muted); }
 .form-card .small-copy { color: var(--ink-soft); }

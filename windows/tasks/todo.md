@@ -41,6 +41,7 @@
 - [x] 分享 handoff 预检：`deployment/share-doctor.ps1` 统一 LAN/Production 只读配置门禁，不启动服务或修改主机状态（ADR-069）
 - [x] 统一交付预检：`release-doctor.ps1/.bat` 编排源码、EXE、Android 和 Local/LAN/Production 门禁，退出码区分通过、pending、失败（ADR-071）
 - [x] 建立最终交付验收矩阵：逐条映射用户需求、工程约束、直接证据和未关闭门禁，作为架构师最终签署入口
+- [x] Web 个人工作信号竖切片：方向、结果、效率、正确/错误码写入既有 v1 Application 边界，最近活动表仅渲染脱敏结构化字段（ADR-072）
 
 ## Foundation
 
@@ -86,6 +87,7 @@
 - [x] UI-3 v16：共享 live-region 状态契约、Dashboard 错误/恢复播报和 Admin 正常状态运行时证据（ADR-067）
 - [x] UI-3 v17：Dashboard/Admin 320/768/1024/1440 viewport、无横向溢出、四档焦点和明细焦点回流运行时证据
 - [x] UI-3 v18：隔离合法会话下历史非空、周期切换、服务端 CSV 200、Provider 502 错误态和 ARIA 恢复运行时证据
+- [>] UI-3 v19：个人工作信号写入、最近活动历史、错误播报、响应式表格与隐私边界运行时证据
 - [x] `token_tracker audit` 增加 Web UI 静态契约门禁：label、table caption/scope、图片 alt、跳过链接和动效降级（ADR-063）
 - [x] `token_tracker audit` 扩展代码/配置/文档文本 1000 行门禁，作者头仍按自有代码边界检查（ADR-064）
 - [x] UI-3 v14：Dashboard glitch 标题的装饰副本从无障碍树隔离，保留一次稳定可读标题

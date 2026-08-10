@@ -21,7 +21,7 @@
 | R-04 | Web 可视化趋势、模型占比、历史记录 | conditional | Dashboard、Chart.js 本地资产、UI-3 v17/v18 证据 | 真实设备指标、系统动效环境 |
 | R-05 | Provider URL/Key 输入、自动模型发现、usage 自动归档 | conditional | `provider_service.py`、adapter registry、Web/Android 接入 | 用户合法 Key 的真实非流式/流式联调 |
 | R-06 | 多用户同库、管理员 RBAC、查看成员 token/事件/log | pass | `admin_service.py`、RBAC、Admin UI、API v1 | 正式中心主机部署 |
-| R-07 | 工作方向、效率、正确/错误码、脱敏日志和导出 | conditional | `work_events`/`app_logs` schema、管理员读模型/CSV | 真实部署日志样本和数据保留策略 |
+| R-07 | 工作方向、效率、正确/错误码、脱敏日志和导出 | conditional | Web Activity 竖切片（ADR-072、UI-3 v19）、`/api/v1/events/work`、`work_events`/`app_logs` schema、管理员读模型/CSV | 真实部署日志样本和数据保留策略 |
 | R-08 | Android 同账号联动 | conditional | Compose 登录、Remote/Repository/DTO/API v1 契约 | JDK/Gradle/SDK、授权设备安装联调 |
 | R-09 | Windows 个人体验入口可直接启动 | pass | 根目录 `start.bat`、`run.py` 端口无副作用回退 | 重启后用户数据持久化验收 |
 | R-10 | EXE 便捷分发 | conditional | PyInstaller lock、`packaging/build.ps1`、用户数据目录 ADR | PyInstaller 构建、启动、升级、回滚、签名 |
@@ -30,7 +30,7 @@
 | R-13 | 前后端边界、API v1、角色分工和模块化架构 | pass | `api-contract.md`、roles、ui-modules、ADR 目录、层间审计 | 架构师最终签署 |
 | R-14 | 每个文件不超过 1000 行，企业级头部和注释 | pass | `token_tracker audit --json` 行数/头部/docstring/KDoc 门禁 | 新增代码继续纳入审计 |
 | R-15 | 项目内 skills、UI 规范和可维护交付流程 | pass | `windows/skills/`、角色约束、ADR、`release-doctor` | 最终归档与版本签署 |
-| R-16 | UI 可读、动画降级、焦点、ARIA、错误态 | conditional | UI-3 v14/v15/v16/v17/v18 运行证据、motion contract | 真实设备、reduced-motion、高对比度、下载落盘 |
+| R-16 | UI 可读、动画降级、焦点、ARIA、错误态 | conditional | UI-3 v14/v15/v16/v17/v18/v19 运行证据、motion contract | 真实设备、reduced-motion、高对比度、下载落盘 |
 | R-17 | 一条可重复的交付预检命令 | pass | `release-doctor.ps1/.bat`、ADR-071，Local/LAN/Production 退出码验证 | 外部工具准备后重新执行 |
 
 ## 当前未关闭的硬门禁

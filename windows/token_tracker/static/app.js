@@ -1,4 +1,5 @@
 import { createApiClient } from "./modules/api-client.js";
+import { createActivityController } from "./modules/activity.js";
 import { createChartRenderer } from "./modules/charts.js";
 import { setLiveMessage, setLiveRegionSemantics } from "./modules/live-region.js";
 /* Author: AI Token Tracker Engineering Team | Maintainer: Project Owner | Purpose: Dashboard orchestration and feature-specific form state. */
@@ -13,6 +14,7 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
   const numberFormat = new Intl.NumberFormat("zh-CN");
   const activeAnimations = new Map();
   const api = createApiClient(csrfToken);
+  const activity = createActivityController({ api, formatNumber });
 
   function byId(id) { return document.getElementById(id); }
   function formatNumber(value) { return numberFormat.format(Number(value || 0)); }
@@ -284,6 +286,7 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
     setupRangeButtons();
     setupManualForm();
     setupProxyForm();
+    activity.mount();
     setupReveal();
     setupPointerFollower();
     setupBackdropMotion();
