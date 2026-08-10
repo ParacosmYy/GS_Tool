@@ -536,8 +536,10 @@ def _check_web_ui_contract(root: Path, checks: list[AuditCheck]) -> None:
         ("base.html", 'href="#main-content"'),
         ("base.html", 'class="story-backdrop-image"'),
         ("base.html", 'aria-hidden="true"'),
-        ("login.html", "<h1"),
-        ("register.html", "<h1"),
+        ("login.html", '<h1 class="sr-only">'),
+        ("login.html", 'class="display-title" aria-hidden="true"'),
+        ("register.html", '<h1 class="sr-only">'),
+        ("register.html", 'class="display-title" aria-hidden="true"'),
         ("dashboard.html", 'aria-label="TOKEN SIGNAL"'),
     )
     for filename, fragment in required_fragments:
@@ -547,6 +549,17 @@ def _check_web_ui_contract(root: Path, checks: list[AuditCheck]) -> None:
                 problems.append(f"{filename}: missing {fragment}")
         except (OSError, UnicodeDecodeError):
             problems.append(f"{filename}: required fragment unreadable")
+
+    for filename in ("login.html", "register.html"):
+        path = template_root / filename
+        try:
+            source = path.read_text(encoding="utf-8")
+            if re.search(r"<h1\b[^>]*data-text=", source):
+                problems.append(f"{filename}: generated visual text must not be attached to h1")
+            if source.count('<h1 class="sr-only">') != 1:
+                problems.append(f"{filename}: expected exactly one semantic sr-only h1")
+        except (OSError, UnicodeDecodeError):
+            problems.append(f"{filename}: auth heading contract unreadable")
 
     css_sources = []
     for relative in (
