@@ -115,6 +115,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     preflight_parser = subparsers.add_parser("preflight", help="只读检查共享/生产部署配置")
     preflight_parser.add_argument("--production", action="store_true", help="按 HTTPS 生产门禁检查")
+    preflight_parser.add_argument(
+        "--host",
+        default=None,
+        help="预检监听地址，默认 TOKEN_TRACKER_HOST 或 127.0.0.1；必须与 serve 的有效地址一致",
+    )
     preflight_parser.set_defaults(handler=cmd_preflight)
 
     audit_parser = subparsers.add_parser("audit", help="只读检查当前 checkout 的发布就绪状态")
@@ -384,6 +389,8 @@ def cmd_preflight(args: argparse.Namespace) -> int:
     try:
         database = db.get_db_path(args.db, ensure_parent=False)
         settings = build_settings(database)
+        if args.host:
+            settings["TOKEN_TRACKER_HOST"] = args.host
         deployment_checks.assert_valid(settings, require_https=args.production)
     except (deployment_checks.DeploymentCheckError, RuntimeError, ValueError) as exc:
         print(f"部署预检失败：{exc}", file=sys.stderr)

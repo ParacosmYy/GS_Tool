@@ -14,6 +14,8 @@ LAN 预览是不同的显式用户确认场景，不能与生产模式复用同�
 
 - `serve --production` 和 `preflight --production` 要求 `TOKEN_TRACKER_HOST`/有效命令行绑定地址
   为 `localhost`、`127.0.0.1`、`::1` 或其他 loopback IP；非 loopback 地址在监听前拒绝。
+- `preflight --production --host <address>` 支持直接预检命令行地址；若同时传入 `--host`，它覆盖
+  环境变量并必须与后续 `serve --production --host` 使用同一个值。
 - `serve --lan-preview` 不受该 production loopback 门禁影响，但必须走显式 `SHARE` 确认、Waitress
   和 LAN 模式的 Secret 预检；它不被视为 HTTPS 生产部署。
 - 命令行 `--host` 在 production 预检中使用与最终 Waitress 监听相同的有效值，避免“预检检查环境变量、
