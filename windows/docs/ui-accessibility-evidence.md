@@ -62,11 +62,12 @@
 
 ## v6.2 本机 Chrome 只读视觉回归
 
-- 本轮使用本机 Chrome headless 对 `http://127.0.0.1:5011/login` 生成了四档截图：
-  [`login-v6-fixed-1440.png`](../.cache/ui-audit-v6/login-v6-fixed-1440.png)、
-  [`login-v6-fixed-1024.png`](../.cache/ui-audit-v6/login-v6-fixed-1024.png)、
-  [`login-v6-fixed-768.png`](../.cache/ui-audit-v6/login-v6-fixed-768.png) 和
-  [`login-v6-fixed-320.png`](../.cache/ui-audit-v6/login-v6-fixed-320.png)。
+- 本轮使用本机 Chrome headless 对当前源码隔离服务 `http://127.0.0.1:5012/login` 生成了四档截图：
+  [`login-v6-current-1440.png`](../.cache/ui-audit-v6/login-v6-current-1440.png)、
+  [`login-v6-current-1024.png`](../.cache/ui-audit-v6/login-v6-current-1024.png)、
+  [`login-v6-current-768.png`](../.cache/ui-audit-v6/login-v6-current-768.png) 和
+  [`login-v6-current-320.png`](../.cache/ui-audit-v6/login-v6-current-320.png)。5011 为旧进程，
+  不作为当前源码证据。
 - 1440/1024/768 档确认 v6 场景、登录卡片、输入焦点和主要文本正常加载；本次没有提交
   真实账户、Key、Cookie 或 localStorage。
 - 320px 文件只作为渲染器观察样本：当前 Chrome CLI 路径不是 DevTools Protocol 的
