@@ -1,9 +1,9 @@
 # ADR-088：已填充隔离数据库的备份恢复证据
 
-**作者：** AI Token Tracker Engineering Team  
-**维护者：** ARCH-2 / DEV-5  
-**状态：** Accepted  
-**日期：** 2026-08-10  
+**作者：** AI Token Tracker Engineering Team
+**维护者：** ARCH-2 / DEV-5
+**状态：** Accepted
+**日期：** 2026-08-10
 **范围：** 记录真实填充过的隔离 SQLite 数据库备份、校验和 staging 恢复，不替代生产数据演练。
 
 ## 背景
