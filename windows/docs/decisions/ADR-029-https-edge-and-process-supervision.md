@@ -13,6 +13,8 @@
 1. Caddy 负责公网 HTTPS、压缩、边缘安全响应头和 JSON 访问日志；上游只连接 `127.0.0.1:5000`，
    `serve --production` 同样只允许 Waitress 绑定 loopback（详见 ADR-061）。
 2. Waitress 负责 Python WSGI 服务；`start-production.ps1` 只负责执行 production preflight 和启动 `serve --production`，不申请证书、不改防火墙、不创建 Windows 服务。
+   根目录个人体验入口也复用已锁定的 Waitress，不再把正常体验路径交给 Flask development server；
+   个人入口仍只监听 loopback，并独立保留端口回退策略。
 3. Caddy 配置示例使用正式域名占位符，禁止原样用于生产；日志目录由部署负责人预先创建并设置 ACL，
    ADR-032 的显式 `format filter` 负责删除敏感请求/响应头和当前查询参数；不能把 API Key 放进 URL 或日志字段。
 4. 生产启动必须同时通过应用 production 预检和 Caddy `validate`；任一失败都不得监听或对外发布。

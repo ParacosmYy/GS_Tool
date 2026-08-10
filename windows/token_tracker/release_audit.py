@@ -395,6 +395,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
 
     references = (
         ("root-python-entry", "run.py", "WINDOWS_ENTRYPOINT"),
+        ("local-wsgi-entry", "windows/run.py", "from waitress import serve"),
         ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v10.png"),
         ("web-scene-image-layer", "windows/token_tracker/templates/base.html", "story-backdrop-image"),
         ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v10"),

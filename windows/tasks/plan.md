@@ -325,6 +325,15 @@ content 复制层参与语义名称。
 - [x] ADR-063、UI-3 证据、角色复核、发布矩阵和任务清单已同步。
 - [>] 真实系统 reduced-motion、高对比度/forced-colors 和真实设备指标仍待部署级浏览器/设备门禁。
 
+### Task B22: 本机体验入口 WSGI 运行时收敛
+
+**目标：** 让根目录个人体验入口与共享/生产启动链使用同一个锁定的 Waitress WSGI 边界，消除正常
+启动日志中的 Flask development server 警告，同时保留 loopback、零配置和端口回退策略。
+
+- [x] `windows/run.py` 从 `app.run` 切换到锁定的 Waitress，根 `run.py` shim 与 `start.bat` 自动复用。
+- [x] README、ADR-029、发布就绪说明、任务清单和静态审计契约已同步。
+- [>] 正式 Caddy/HTTPS、进程监督和外部部署主机验收仍属于部署门禁。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

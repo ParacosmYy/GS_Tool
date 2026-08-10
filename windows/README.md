@@ -9,7 +9,9 @@
 默认地址：<http://127.0.0.1:5000>。如果 5000 已被其他本地服务占用，`run.py` 会在
 5001–5020 中选择第一个可用端口，并让浏览器打开当前源码对应的实际地址；已有服务不会被终止。
 
-`run.py` 是同一个入口的 Python 版本，适合在终端启动或调试。这个入口默认只监听本机，不会把个人数据暴露给局域网；可信 LAN 预览必须显式使用 `--lan-preview --host 0.0.0.0`，正式分享必须走 HTTPS edge，production 只允许 loopback。
+`run.py` 是同一个入口的 Python 版本，适合在终端启动或调试；正常本机入口使用锁定的 Waitress WSGI
+运行时，不会出现 Flask development server 警告。这个入口默认只监听本机，不会把个人数据暴露给局域网；
+可信 LAN 预览必须显式使用 `--lan-preview --host 0.0.0.0`，正式分享必须走 HTTPS edge，production 只允许 loopback。
 
 ## 能做什么
 

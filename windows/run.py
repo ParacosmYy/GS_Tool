@@ -64,6 +64,8 @@ def resolve_local_port(host: str, configured_port: int) -> int:
 
 
 def main() -> None:
+    """Compose the local app and serve it through the locked WSGI runtime."""
+
     configure_frozen_storage()
     app = create_app()
     host = os.getenv("TOKEN_TRACKER_HOST", "127.0.0.1")
@@ -73,7 +75,9 @@ def main() -> None:
     if os.getenv("TOKEN_TRACKER_NO_BROWSER", "0") != "1":
         threading.Timer(1.0, lambda: webbrowser.open(url)).start()
     print(f"AI Token Tracker is running at {url}")
-    app.run(host=host, port=port, debug=False)
+    from waitress import serve
+
+    serve(app, host=host, port=port)
 
 
 if __name__ == "__main__":
