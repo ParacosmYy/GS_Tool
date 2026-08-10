@@ -26,16 +26,22 @@ internal interface TrackerRemoteDataSource {
     /** Change the server endpoint before the next request is issued. */
     fun configureBaseUrl(baseUrl: String)
 
+    /** Authenticate one account; callers must keep the password transient. */
     fun login(username: String, password: String): TokenPair
 
+    /** Rotate a refresh token and return the replacement bearer pair. */
     fun refresh(refreshToken: String): TokenPair
 
+    /** Revoke the presented access token; network failure is surfaced to the repository. */
     fun logout(accessToken: String)
 
+    /** Read the authenticated user's server-owned summary projection. */
     fun summary(accessToken: String, period: String): RemoteSummary
 
+    /** Discover allowlisted provider models without persisting the submitted key. */
     fun providerModels(accessToken: String, provider: String, baseUrl: String, apiKey: String): RemoteProviderModels
 
+    /** Proxy one non-streaming provider call and return only its bounded projection. */
     fun proxyChat(
         accessToken: String,
         provider: String,
@@ -61,19 +67,25 @@ internal interface TrackerRemoteDataSource {
         idempotencyKey: String,
     ): UsageRecord
 
+    /** Write one structured work event under the authenticated account. */
     fun createWorkEvent(accessToken: String, event: WorkEventDraft, idempotencyKey: String): WorkEvent
 
+    /** Read a bounded page of the authenticated user's work events. */
     fun listWorkEvents(accessToken: String, limit: Int, offset: Int): RemoteWorkEvents
 
+    /** Write one privacy-filtered diagnostic log under the authenticated account. */
     fun createLog(accessToken: String, log: LogDraft): AppLog
 
+    /** Read a bounded page of the authenticated user's diagnostic logs. */
     fun listLogs(accessToken: String, limit: Int, offset: Int): RemoteLogs
 
     /** Administrator-only read models; the server enforces the role again. */
     fun adminOverview(accessToken: String): RemoteAdminOverview
 
+    /** Read a bounded administrator member aggregate page. */
     fun adminMembers(accessToken: String, limit: Int, offset: Int): RemoteAdminMembers
 
+    /** Read one selected member's bounded activity after server-side RBAC. */
     fun adminMemberActivity(accessToken: String, userId: Long, limit: Int): RemoteAdminMemberActivity
 }
 
@@ -136,6 +148,7 @@ internal data class RemoteAdminOverview(
     val trend: List<DailyUsage>,
 )
 
+/** Success/failure aggregate nested in the administrator overview. */
 internal data class RemoteAdminWorkEventTotals(
     val total: Long,
     val success: Long,
@@ -148,6 +161,7 @@ internal data class RemoteAdminMembers(
     val page: PageInfo,
 )
 
+/** Non-secret member aggregate returned only through the admin boundary. */
 internal data class RemoteAdminMember(
     val id: Long,
     val username: String,
@@ -169,6 +183,7 @@ internal data class RemoteAdminMemberActivity(
     val logs: List<AppLog>,
 )
 
+/** Non-secret identity attached to an administrator-selected activity page. */
 internal data class RemoteAdminMemberIdentity(
     val id: Long,
     val username: String,

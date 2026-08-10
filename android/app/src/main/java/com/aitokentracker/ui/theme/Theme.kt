@@ -28,6 +28,7 @@ private val ObservatoryColors = darkColorScheme(
     onSurfaceVariant = Color(0xFFC9C7D1),
 )
 
+/** Apply the shared high-contrast dark scheme to every Android surface. */
 @Composable
 fun TokenTrackerTheme(content: @Composable () -> Unit) {
     MaterialTheme(

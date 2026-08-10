@@ -24,6 +24,7 @@ internal class TrackerRepository(
     val endpoint: String
         get() = endpointStore.load()
 
+    /** Authenticate, rotate session storage, and return the server user projection. */
     fun login(baseUrl: String, username: String, password: String): UserProfile {
         configureEndpoint(baseUrl)
         val pair = remote.login(username.trim(), password)
@@ -31,8 +32,10 @@ internal class TrackerRepository(
         return pair.user
     }
 
+    /** Restore only the non-secret user projection from the encrypted session. */
     fun restoredUser(): UserProfile? = sessionStore.load()?.user
 
+    /** Read a server-owned summary; a 401 triggers one refresh-and-retry cycle. */
     fun summary(period: String): UsageSummary = withAccess { token ->
         remote.summary(token, period).toDomain()
     }
@@ -69,18 +72,22 @@ internal class TrackerRepository(
         remote.createUsageRecord(token, record, idempotencyKey)
     }
 
+    /** Persist a structured work event with the caller-provided idempotency key. */
     fun createWorkEvent(event: WorkEventDraft, idempotencyKey: String): WorkEvent = withAccess { token ->
         remote.createWorkEvent(token, event, idempotencyKey)
     }
 
+    /** Read bounded personal work-event history. */
     fun listWorkEvents(limit: Int = 50, offset: Int = 0): RemoteWorkEvents = withAccess { token ->
         remote.listWorkEvents(token, limit, offset)
     }
 
+    /** Persist a privacy-filtered diagnostic log. */
     fun createLog(log: LogDraft): AppLog = withAccess { token ->
         remote.createLog(token, log)
     }
 
+    /** Read bounded personal diagnostic-log history. */
     fun listLogs(limit: Int = 50, offset: Int = 0): RemoteLogs = withAccess { token ->
         remote.listLogs(token, limit, offset)
     }
@@ -90,14 +97,17 @@ internal class TrackerRepository(
         remote.adminOverview(token).toDomain()
     }
 
+    /** Read the server-authorized member aggregate page. */
     fun adminMembers(limit: Int = 50, offset: Int = 0): AdminMembersPage = withAccess { token ->
         remote.adminMembers(token, limit, offset).toDomain()
     }
 
+    /** Read one server-authorized member activity projection. */
     fun adminMemberActivity(userId: Long, limit: Int = 100): AdminMemberActivity = withAccess { token ->
         remote.adminMemberActivity(token, userId, limit).toDomain()
     }
 
+    /** Normalize and persist a new endpoint, clearing tokens scoped to the old host. */
     private fun configureEndpoint(baseUrl: String) {
         val normalized = normalizeApiBaseUrl(baseUrl)
         if (normalized != endpointStore.load()) {
@@ -109,6 +119,7 @@ internal class TrackerRepository(
         endpointStore.save(normalized)
     }
 
+    /** Attempt remote revocation, then always clear the local encrypted session. */
     fun logout() {
         val current = sessionStore.load()
         if (current != null) {
@@ -121,6 +132,7 @@ internal class TrackerRepository(
         sessionStore.clear()
     }
 
+    /** Execute one bearer operation and perform at most one refresh retry on 401. */
     private fun <T> withAccess(operation: (String) -> T): T {
         val current = sessionStore.load()
             ?: throw TrackerApiException(401, "AUTH_REQUIRED", "请先登录")
