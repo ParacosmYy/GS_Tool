@@ -12,8 +12,8 @@
 ## 决策
 
 - 新增 `python -m token_tracker audit`，只检查关键交付文件、关键契约引用、整个 checkout 中
-  非生成代码的 1000 行门禁、
-  Windows/Android v7 资产 SHA-256、Python 运行时导入和外部工具链可用性。
+  非生成代码的 1000 行门禁、企业级作者头、Windows/Android v7 资产 SHA-256、Python
+  运行时导入和外部工具链可用性。
 - 结果使用稳定的 `pass`、`pending`、`fail` 三态；普通模式允许环境 pending 并返回 0，`--strict`
   将 pending 映射为非零，任何 fail 始终返回非零。
 - 审计不调用 `db.init_db`，不读取 `.env` 内容，不创建用户/记录/备份/构建目录，不启动服务，不

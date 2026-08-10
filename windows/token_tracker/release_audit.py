@@ -61,6 +61,7 @@ def run_audit(root: Path | None = None) -> list[AuditCheck]:
     _check_required_files(project_root, checks)
     _check_contract_references(project_root, checks)
     _check_source_line_cap(project_root, checks)
+    _check_source_headers(project_root, checks)
     _check_scene_assets(project_root, checks)
     _check_chartjs_asset(project_root, checks)
     _check_runtime_dependencies(checks)
@@ -136,15 +137,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
 
 
 def _check_source_line_cap(root: Path, checks: list[AuditCheck]) -> None:
-    files = [
-        path
-        for path in root.rglob("*")
-        if path.is_file()
-        and path.suffix.casefold() in SOURCE_EXTENSIONS
-        and not SOURCE_IGNORED_DIRS.intersection(
-            part.casefold() for part in path.relative_to(root).parts
-        )
-    ]
+    files = _source_files(root)
     oversized: list[str] = []
     for path in files:
         try:
@@ -158,6 +151,41 @@ def _check_source_line_cap(root: Path, checks: list[AuditCheck]) -> None:
         checks.append(AuditCheck("source-line-cap", FAIL, f"{len(oversized)} 个文件超过 1000 行"))
     else:
         checks.append(AuditCheck("source-line-cap", PASS, f"已扫描 {len(files)} 个源文件"))
+
+
+def _source_files(root: Path) -> list[Path]:
+    """Return authored source files while excluding generated checkout state."""
+
+    return [
+        path
+        for path in root.rglob("*")
+        if path.is_file()
+        and path.suffix.casefold() in SOURCE_EXTENSIONS
+        and not SOURCE_IGNORED_DIRS.intersection(
+            part.casefold() for part in path.relative_to(root).parts
+        )
+    ]
+
+
+def _check_source_headers(root: Path, checks: list[AuditCheck]) -> None:
+    """Require the project author header on owned source files, not vendors."""
+
+    missing: list[str] = []
+    for path in _source_files(root):
+        relative_parts = {part.casefold() for part in path.relative_to(root).parts}
+        if "vendor" in relative_parts:
+            continue
+        try:
+            head = "\n".join(path.read_text(encoding="utf-8").splitlines()[:12])
+        except (OSError, UnicodeDecodeError):
+            missing.append("unreadable")
+            continue
+        if "Author:" not in head and "作者：" not in head and "作者:" not in head:
+            missing.append(path.as_posix())
+    if missing:
+        checks.append(AuditCheck("source-headers", FAIL, f"{len(missing)} 个文件缺少作者头"))
+    else:
+        checks.append(AuditCheck("source-headers", PASS, "自有源文件均包含作者头（vendor 已排除）"))
 
 
 def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
