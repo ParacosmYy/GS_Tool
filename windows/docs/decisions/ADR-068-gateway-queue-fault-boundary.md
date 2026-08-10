@@ -24,5 +24,7 @@ DPAPI 解密失败。若这些异常从 daemon worker 逃逸，线程会静默�
 ## 验证与边界
 
 - 已完成 Python 编译、发布审计和 Gateway 源码边界复核；队列数据不因 worker 异常被主动删除。
+- 本地无外部服务的内存 reporter smoke 返回 `queued`，关闭后仍保留 1 条有界待投递项，既有
+  内存重试路径保持可用；该 smoke 不代表真实中心或 Provider 联调。
 - 真实 Provider Key、真实中心短暂故障和正式 Windows DPAPI 现场恢复仍待部署环境联调，不能
   用本地无密钥 smoke 冒充完成证据。
