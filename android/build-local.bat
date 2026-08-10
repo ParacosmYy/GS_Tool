@@ -10,6 +10,11 @@ set "ANDROID_USER_HOME=%~dp0.gradle\android-user"
 set "ANDROID_SDK_ROOT=%~dp0.toolchain\android-sdk"
 set "ANDROID_HOME=%ANDROID_SDK_ROOT%"
 
+if exist "%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" (
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0toolchain-doctor.ps1"
+    if errorlevel 3 exit /b 3
+)
+
 if not exist "%~dp0gradlew.bat" (
     echo [AI Token Tracker] Android Gradle Wrapper is not provisioned yet.
     echo Ask for approval before installing JDK/Gradle or generating wrapper files.

@@ -34,7 +34,13 @@
 5. 在 `android/local.properties` 中由 IDE 写入本机 SDK 路径；此文件不提交。
 6. 连接实体设备或启动模拟器，先验证登录和只读仪表盘，再接入写入/同步能力。
 
-命令行构建统一使用 `android/build-local.bat assembleDebug`。该入口把 `GRADLE_USER_HOME`、`ANDROID_USER_HOME` 和 `ANDROID_SDK_ROOT` 指向 Android 项目目录，因此 Gradle 发行包、Maven 缓存、Android 元数据和 SDK 都能留在项目边界；Android Studio 的 Sync 仍需在工具链批准后单独核对其缓存策略。Release 必须显式传入 HTTPS 地址：
+命令行构建前先执行项目内只读诊断：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\android\toolchain-doctor.ps1
+```
+
+诊断不会下载、安装、修改 PATH 或生成 wrapper；只有 JDK、官方 Wrapper、项目内 SDK API 37/build-tools 完整后才允许进入 `android/build-local.bat assembleDebug`。该入口把 `GRADLE_USER_HOME`、`ANDROID_USER_HOME` 和 `ANDROID_SDK_ROOT` 指向 Android 项目目录，因此 Gradle 发行包、Maven 缓存、Android 元数据和 SDK 都能留在项目边界；Android Studio 的 Sync 仍需在工具链批准后单独核对其缓存策略。Release 必须显式传入 HTTPS 地址：
 
 ```powershell
 android\build-local.bat assembleRelease -PtrackerApiBaseUrl="https://your-host.example/api/v1"

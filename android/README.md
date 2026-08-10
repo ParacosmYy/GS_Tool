@@ -19,7 +19,13 @@ Android 端与 `windows/` 中心服务使用同一个账号和 `/api/v1` 契约�
 
 当前机器检查到 `adb`，但没有 JDK、Gradle、Android Studio 或 Android SDK，因此尚未执行 APK 编译验证。仓库目前只有 Wrapper 配置文件，没有伪造 `gradlew.bat` 或 `gradle-wrapper.jar`；待用户批准后，使用实际 Gradle 生成并验证它们，并把 SDK 包安装到 `.toolchain/android-sdk/`。安装顺序、用户批准门槛和官方链接见 [`windows/docs/android-development.md`](../windows/docs/android-development.md)。
 
-批准工具链并生成官方 Wrapper 后，优先使用 `android/build-local.bat assembleDebug`。该入口会把 Gradle 用户目录、Android 用户元数据、发行包和依赖缓存指向 `android/.gradle/`，并拒绝使用未配置的外部 Android SDK。
+批准工具链并生成官方 Wrapper 后，先运行只读诊断：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\toolchain-doctor.ps1
+```
+
+所有门禁通过后再使用 `android/build-local.bat assembleDebug`。该入口会把 Gradle 用户目录、Android 用户元数据、发行包和依赖缓存指向 `android/.gradle/`，并拒绝使用未配置的外部 Android SDK。
 
 ## 开发 API 地址
 

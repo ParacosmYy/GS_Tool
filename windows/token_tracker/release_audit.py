@@ -112,6 +112,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/token_tracker/static/vendor/chart.umd.min.js",
         "windows/token_tracker/static/vendor/CHARTJS-LICENSE.txt",
         "android/app/src/main/AndroidManifest.xml",
+        "android/toolchain-doctor.ps1",
     )
     missing = [item for item in required if not (root / item).is_file()]
     if missing:
@@ -163,6 +164,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("chartjs-local-csp", "windows/token_tracker/web.py", "script-src 'self';"),
         ("caddy-log-retention", "windows/deployment/Caddyfile.example", "roll_keep 14"),
         ("root-launcher", "start.bat", "call start.bat"),
+        ("android-toolchain-doctor", "android/toolchain-doctor.ps1", "Android toolchain pending"),
     )
     missing: list[str] = []
     for name, relative_path, fragment in references:
