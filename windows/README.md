@@ -229,6 +229,17 @@ Gateway 会忽略它并使用 `TOKEN_TRACKER_GATEWAY_PROVIDER_KEY` 调用真实�
 OpenAI-compatible Base URL 为 `https://api.kimi.com/coding/v1`，并支持第三方工具覆盖 Base
 URL，详见 [Kimi Code API access](https://www.kimi.com/code/docs/en/)。
 
+也可以使用 Windows 快捷入口减少命令行参数：
+
+```powershell
+.\start-gateway.bat -AllowHttp
+```
+
+该入口默认监听 `127.0.0.1:8787`，默认上游为 Kimi Code，中心地址为本机 5000 端口；可用
+`-UpstreamUrl`、`-IngestUrl`、`-BindHost` 和 `-BindPort` 覆盖非密钥配置。provider Key、
+Usage Ingest Token 和可选 Gateway Token 仍只能放在 `.env`/进程环境，不会进入脚本参数。
+如果中心已经通过 HTTPS 暴露，请不要添加 `-AllowHttp`。
+
 Gateway 支持 `/v1/models`、非流式 Chat Completions 和 SSE 流式 Chat Completions；流式请求
 只在完成 chunk 提供合法输入/输出 usage 时入账，否则响应头 `X-AI-Tracker-Usage` 为
 `missing`，不会估算。中心短暂不可用时本次 provider 调用仍会返回，响应状态会标为

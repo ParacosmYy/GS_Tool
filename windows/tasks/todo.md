@@ -150,3 +150,4 @@
 - [x] 生产 Waitress 强制 loopback 绑定，防止绕过 Caddy HTTPS；LAN 预览保持独立确认路径（ADR-061）。
 - [x] production wrapper 将实际 `-BindAddress` 同时传给 preflight 和 Waitress，并清除旧的非 loopback production 示例。
 - [x] `token_tracker audit` 固定 production/Caddy/LAN 启动边界，防止部署示例回退（loopback/Caddy/SHARE）。
+- [x] 增加无密钥参数的 `start-gateway.ps1/.bat` 快捷入口，默认 loopback + DPAPI 队列，HTTP/LAN 仍需显式确认。

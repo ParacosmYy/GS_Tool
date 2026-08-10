@@ -145,7 +145,8 @@ Android 通过 bearer 认证的 `POST /api/v1/records` 写入手动 token 记录
 
 ### 本地 Gateway 自动采集
 
-1. Gateway 作为独立本地进程启动，默认只绑定 loopback；provider Key、中心 ingest token 和可选
+1. Gateway 作为独立本地进程启动，默认只绑定 loopback；`start-gateway.ps1/.bat` 只负责传递
+   非密钥启动参数，provider Key、中心 ingest token 和可选
    Gateway 访问令牌来自环境变量，不进入命令行参数或中心数据库。
 2. Kimi Code/OpenAI-compatible 客户端把 Base URL 改为 Gateway 的 `/v1` 地址；Gateway 忽略
    客户端提供的 upstream 地址和 Key，使用启动配置的 allowlisted upstream 转发 `/models` 与
