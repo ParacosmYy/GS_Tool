@@ -164,7 +164,7 @@ CSV 导出和日志分页由 Application 用例统一组合，时间范围、分
 }
 ```
 
-状态码约定：`400` 输入/CSRF 无效、`401` 未登录、`403` 无权、`404` 资源不存在、`405` 方法不支持、`413` 请求或管理员导出结果过大、`429` 限流、`502` provider 失败、`500` 内部错误。所有 `/api/*` 错误都返回该 envelope，不返回 Flask 默认 HTML。响应头 `X-Request-ID` 与 envelope 的 `request_id` 用于排障关联；它不代表身份或权限。后端不把 Python traceback、API Key、上游请求头或未经筛选的 provider 响应返回给浏览器。`PROVIDER_RESPONSE_TOO_LARGE` 表示上游 JSON 超过服务端配置的响应上限（默认 2 MB）；`EXPORT_TOO_LARGE` 表示管理员 CSV 超过 100,000 行或 16 MiB 安全边界。
+状态码约定：`400` 输入/CSRF 无效、`401` 未登录、`403` 无权、`404` 资源不存在、`405` 方法不支持、`413` 请求或 CSV 导出结果过大、`429` 限流、`502` provider 失败、`500` 内部错误。所有 `/api/*` 错误都返回该 envelope，不返回 Flask 默认 HTML。响应头 `X-Request-ID` 与 envelope 的 `request_id` 用于排障关联；它不代表身份或权限。后端不把 Python traceback、API Key、上游请求头或未经筛选的 provider 响应返回给浏览器。`PROVIDER_RESPONSE_TOO_LARGE` 表示上游 JSON 超过服务端配置的响应上限（默认 2 MB）；`EXPORT_TOO_LARGE` 表示个人或管理员 CSV 超过 100,000 行或 16 MiB 安全边界。
 
 ## `GET /api/summary?period=day`
 
@@ -239,6 +239,9 @@ Android 必须为一次用户操作生成稳定的 `Idempotency-Key` 请求头�
 返回 UTF-8 BOM CSV，字段为：
 
 `id, model, input_tokens, output_tokens, total_tokens, timestamp, note, source`
+
+个人 CSV 同样受最多 100,000 行、16 MiB 的服务端边界保护；超过时不返回部分文件，使用
+`413 EXPORT_TOO_LARGE` 错误 envelope。CLI 导出在写入目标文件前完成边界检查。
 
 ## `POST /api/provider/models`
 

@@ -9,14 +9,20 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import db
+from . import csv_export, db
 
 
 class UsageValidationError(ValueError):
     """Raised when a usage record is invalid."""
 
 
+class UsageExportTooLargeError(RuntimeError):
+    """Raised when a personal CSV exceeds the shared export safety boundary."""
+
+
 MAX_USAGE_PAGE_SIZE = 200
+USAGE_EXPORT_MAX_ROWS = csv_export.MAX_EXPORT_ROWS
+USAGE_EXPORT_MAX_BYTES = csv_export.MAX_EXPORT_BYTES
 
 
 def non_negative_int(value: Any, field_name: str) -> int:
@@ -163,11 +169,14 @@ def export_usage_csv(
     date_from: str | None = None,
     date_to: str | None = None,
     path: str | None = None,
-) -> str:
+) -> bytes:
     """Export only the authenticated user's bounded usage projection."""
 
     _, start, end = _summary_bounds(period, date_from, date_to)
-    return db.export_csv(user_id, start, end, path)
+    try:
+        return db.export_csv(user_id, start, end, path)
+    except csv_export.ExportTooLargeError as exc:
+        raise UsageExportTooLargeError("export exceeds the usage safety bound") from exc
 
 
 def _summary_bounds(

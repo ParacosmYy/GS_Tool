@@ -31,7 +31,16 @@ from . import access_logging, admin_service, auth_service, db, provider_service,
 from .api_contract import error_response
 from .api_v1 import api_v1
 from .mobile_auth import resolve_access_user_id
-from .services import UsageValidationError, add_usage, export_usage_csv, usage_records_page, usage_summary
+from .services import (
+    USAGE_EXPORT_MAX_BYTES,
+    USAGE_EXPORT_MAX_ROWS,
+    UsageExportTooLargeError,
+    UsageValidationError,
+    add_usage,
+    export_usage_csv,
+    usage_records_page,
+    usage_summary,
+)
 from .settings import build_settings, resolve_database
 
 
@@ -252,16 +261,23 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
     @login_required
     def api_export() -> Response:
         try:
-            csv_text = export_usage_csv(
+            csv_bytes = export_usage_csv(
                 user_id=g.user["id"],
                 period=request.args.get("period", "day"),
                 date_from=request.args.get("from"),
                 date_to=request.args.get("to"),
                 path=app.config["DATABASE"],
             )
+        except UsageExportTooLargeError:
+            return error_response(
+                "EXPORT_TOO_LARGE",
+                "导出结果超过安全边界，请缩小范围或分批导出",
+                413,
+                {"max_rows": USAGE_EXPORT_MAX_ROWS, "max_bytes": USAGE_EXPORT_MAX_BYTES},
+            )
         except UsageValidationError as exc:
             return error_response("INVALID_RANGE", str(exc), 400)
-        response = Response(csv_text.encode("utf-8-sig"), mimetype="text/csv; charset=utf-8")
+        response = Response(csv_bytes, mimetype="text/csv; charset=utf-8")
         response.headers["Content-Disposition"] = "attachment; filename=token_usage.csv"
         return response
 

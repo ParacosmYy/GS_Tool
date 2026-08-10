@@ -7,8 +7,6 @@ Purpose: Own schema, parameterized queries, aggregation, and CSV output.
 
 from __future__ import annotations
 
-import csv
-import io
 import os
 import sqlite3
 from contextlib import contextmanager
@@ -16,7 +14,7 @@ from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from typing import Any, Iterator
 
-from . import schema
+from . import csv_export, schema
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -606,7 +604,7 @@ def export_csv(
     start: str | None = None,
     end: str | None = None,
     path: str | os.PathLike[str] | None = None,
-) -> str:
+) -> bytes:
     where, params = _where_clause(user_id, start, end)
     with db_session(path) as connection:
         rows = connection.execute(
@@ -619,13 +617,6 @@ def export_csv(
             ORDER BY timestamp ASC, id ASC
             """,
             params,
-        ).fetchall()
-
-    buffer = io.StringIO(newline="")
-    writer = csv.writer(buffer)
-    writer.writerow(
-        ["id", "model", "input_tokens", "output_tokens", "total_tokens", "timestamp", "note", "source"]
-    )
-    for row in rows:
-        writer.writerow([row[key] for key in ("id", "model", "input_tokens", "output_tokens", "total_tokens", "timestamp", "note", "source")])
-    return buffer.getvalue()
+        )
+        columns = ("id", "model", "input_tokens", "output_tokens", "total_tokens", "timestamp", "note", "source")
+        return csv_export.export_rows(columns, rows)

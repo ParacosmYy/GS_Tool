@@ -51,6 +51,7 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 | `token_tracker/events.py` | work event、app log、audit event 校验和写入 | 不接受原始 prompt、Key 或任意 JSON SQL |
 | `token_tracker/admin_service.py` | 管理员页面、读模型、导出和审计用例编排 | 不绕过管理员装饰器或返回敏感字段 |
 | `token_tracker/admin_data.py` | 管理员聚合、成员明细、固定列有界游标导出 | 不返回密码哈希、令牌或未经脱敏的秘密；不使用无界导出缓冲 |
+| `token_tracker/csv_export.py` | 个人/管理员固定列 CSV 的统一有界序列化 | 不拼接 SQL、不读取 request/session、不改变业务列投影 |
 | `token_tracker/mobile_auth.py` | access/refresh token digest、轮换和撤销 | 不把 bearer secret 写入数据库 |
 | `token_tracker/schema.py` | SQLite DDL、索引和加法式兼容迁移 | 不读取 request/session，不组合业务查询 |
 | `token_tracker/db.py` | SQLite 连接、事务、参数化查询和 CSV | 不处理 HTTP 请求 |

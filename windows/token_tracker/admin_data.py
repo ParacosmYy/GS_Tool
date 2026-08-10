@@ -8,19 +8,9 @@ Module: Admin reporting repository
 
 from __future__ import annotations
 
-import csv
-import io
 from typing import Any
 
-from . import db
-
-
-MAX_EXPORT_ROWS = 100_000
-MAX_EXPORT_BYTES = 16 * 1024 * 1024
-
-
-class ExportTooLargeError(RuntimeError):
-    """Raised when an administrator export crosses a deliberate safety bound."""
+from . import csv_export, db
 
 
 def _safe_limit(value: Any, maximum: int = 200) -> int:
@@ -174,35 +164,9 @@ def _export_projection(connection: Any, kind: str) -> tuple[list[str], Any]:
     return columns, connection.execute(query)
 
 
-def _check_export_size(byte_buffer: io.BytesIO, row_count: int) -> None:
-    """Fail before returning a partial export, keeping memory usage predictable."""
-
-    if row_count > MAX_EXPORT_ROWS:
-        raise ExportTooLargeError(f"export exceeds {MAX_EXPORT_ROWS} rows")
-    if byte_buffer.tell() > MAX_EXPORT_BYTES:
-        raise ExportTooLargeError(f"export exceeds {MAX_EXPORT_BYTES} bytes")
-
-
 def export_csv(kind: str, path: str) -> bytes:
     """Export one fixed projection with cursor iteration and explicit output bounds."""
 
-    byte_buffer = io.BytesIO()
-    text_stream = io.TextIOWrapper(byte_buffer, encoding="utf-8-sig", newline="")
-    writer = csv.writer(text_stream)
-    row_count = 0
-    try:
-        with db.db_session(path) as connection:
-            columns, rows = _export_projection(connection, kind)
-            writer.writerow(columns)
-            text_stream.flush()
-            _check_export_size(byte_buffer, row_count)
-            for row in rows:
-                if row_count >= MAX_EXPORT_ROWS:
-                    raise ExportTooLargeError(f"export exceeds {MAX_EXPORT_ROWS} rows")
-                writer.writerow([row[column] for column in columns])
-                row_count += 1
-                text_stream.flush()
-                _check_export_size(byte_buffer, row_count)
-        return byte_buffer.getvalue()
-    finally:
-        text_stream.detach()
+    with db.db_session(path) as connection:
+        columns, rows = _export_projection(connection, kind)
+        return csv_export.export_rows(columns, rows)

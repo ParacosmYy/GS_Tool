@@ -10,12 +10,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from . import admin_data, events
+from . import admin_data, csv_export, events
 
 
 VALID_EXPORT_KINDS = frozenset({"usage", "events", "logs"})
-EXPORT_MAX_ROWS = admin_data.MAX_EXPORT_ROWS
-EXPORT_MAX_BYTES = admin_data.MAX_EXPORT_BYTES
+EXPORT_MAX_ROWS = csv_export.MAX_EXPORT_ROWS
+EXPORT_MAX_BYTES = csv_export.MAX_EXPORT_BYTES
 
 
 class AdminApplicationError(ValueError):
@@ -86,7 +86,7 @@ def export_csv(actor_user_id: int, kind: str, request_id: str, path: str) -> byt
         raise AdminApplicationError("kind must be usage, events, or logs")
     try:
         csv_bytes = admin_data.export_csv(export_kind, path)
-    except admin_data.ExportTooLargeError as exc:
+    except csv_export.ExportTooLargeError as exc:
         events.insert_audit_event(
             actor_user_id,
             "admin.export.rejected",

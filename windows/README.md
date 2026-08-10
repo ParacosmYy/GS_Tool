@@ -111,6 +111,9 @@ python -m token_tracker summary --from 2026-08-01 --to 2026-08-10
 python -m token_tracker export --period month --output exports/august.csv
 ```
 
+个人和管理员 CSV 导出统一限制为最多 100,000 行、16 MiB；超出时服务端返回 `413`
+（`EXPORT_TOO_LARGE`），CLI 不会写入半成品文件。
+
 ## 3. 启动 Web 仪表盘
 
 本机开发：

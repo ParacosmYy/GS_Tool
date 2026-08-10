@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
-from . import backup, db, deployment_checks, events
+from . import backup, csv_export, db, deployment_checks, events
 from .services import UsageValidationError, add_usage, query_range
 
 
@@ -229,7 +229,12 @@ def cmd_export(args: argparse.Namespace) -> int:
         return 2
     output_path = Path(args.output).expanduser().resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(db.export_csv(user["id"], start, end, database), encoding="utf-8-sig")
+    try:
+        payload = db.export_csv(user["id"], start, end, database)
+    except csv_export.ExportTooLargeError:
+        print("错误：导出结果超过安全边界，请缩小范围或分批导出", file=sys.stderr)
+        return 2
+    output_path.write_bytes(payload)
     print(f"已导出 {output_path}")
     return 0
 
