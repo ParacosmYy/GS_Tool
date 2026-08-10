@@ -54,6 +54,7 @@
 - [x] Caddy edge ACL 检查修正为显式写权限位，隔离 preflight 通过且未污染调用者根目录（ADR-083）
 - [x] 分享 handoff 预检：`deployment/share-doctor.ps1` 统一 LAN/Production 只读配置门禁，不启动服务或修改主机状态（ADR-069）
 - [x] 统一交付预检：`release-doctor.ps1/.bat` 编排源码、EXE、Android 和 Local/LAN/Production 门禁，退出码区分通过、pending、失败（ADR-071）
+- [x] 2026-08-10 部署证据：LAN handoff 与示例 Production edge preflight 通过；真实域名、证书、ACL 和外部 health 仍保持 pending（ADR-097）
 - [x] 新增提交级 windows/ci/quality-gate.ps1 与 GitHub Actions 源码质量闸门：compileall、PowerShell AST、审计、CLI help 和 diff check（ADR-085)
 - [x] 建立最终交付验收矩阵：逐条映射用户需求、工程约束、直接证据和未关闭门禁，作为架构师最终签署入口
 - [x] Web 个人工作信号竖切片：方向、结果、效率、正确/错误码写入既有 v1 Application 边界，最近活动表仅渲染脱敏结构化字段（ADR-072）
