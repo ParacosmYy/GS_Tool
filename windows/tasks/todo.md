@@ -94,6 +94,7 @@
 - [>] UI-3 v19：个人工作信号写入、最近活动历史、错误播报、响应式表格与隐私边界运行时证据
 - [x] UI-3 v23：认证页唯一语义 h1 与 aria-hidden glitch 视觉层、键盘顺序、无横向溢出和控制台无错误证据
 - [x] 本机体验入口 B22：根 `run.py`/`windows/run.py` 统一复用锁定 Waitress，正常启动不再输出 Flask development server 警告
+- [x] 本机体验入口 B23：`TOKEN_TRACKER_HOST` 只允许 loopback，危险配置在应用/数据库创建前 fail-closed；局域网继续走显式 `--lan-preview`（ADR-078）
 - [x] `token_tracker audit` 增加 Web UI 静态契约门禁：label、table caption/scope、图片 alt、跳过链接和动效降级（ADR-063）
 - [x] `token_tracker audit` 扩展代码/配置/文档文本 1000 行门禁，作者头仍按自有代码边界检查（ADR-064）
 - [x] UI-3 v14：Dashboard glitch 标题的装饰副本从无障碍树隔离，保留一次稳定可读标题

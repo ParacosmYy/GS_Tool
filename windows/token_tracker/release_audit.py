@@ -135,6 +135,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/docs/decisions/ADR-074-scene-visibility-tuning.md",
         "windows/docs/decisions/ADR-076-scene-background-v10.md",
         "windows/docs/decisions/ADR-077-backup-inventory-retention.md",
+        "windows/docs/decisions/ADR-078-personal-launcher-loopback.md",
         "windows/docs/decisions/ADR-075-gateway-center-discovery.md",
         "windows/docs/decisions/ADR-071-release-doctor-composition.md",
         "windows/docs/decisions/ADR-072-web-activity-signal-boundary.md",
@@ -396,6 +397,8 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
     references = (
         ("root-python-entry", "run.py", "WINDOWS_ENTRYPOINT"),
         ("local-wsgi-entry", "windows/run.py", "from waitress import serve"),
+        ("personal-launcher-loopback", "windows/run.py", "resolve_local_host"),
+        ("personal-launcher-loopback-decision", "windows/docs/decisions/ADR-078-personal-launcher-loopback.md", "loopback"),
         ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v10.png"),
         ("web-scene-image-layer", "windows/token_tracker/templates/base.html", "story-backdrop-image"),
         ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v10"),

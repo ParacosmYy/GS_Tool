@@ -11,6 +11,7 @@
 
 `run.py` 是同一个入口的 Python 版本，适合在终端启动或调试；正常本机入口使用锁定的 Waitress WSGI
 运行时，不会出现 Flask development server 警告。这个入口默认只监听本机，不会把个人数据暴露给局域网；
+即使设置了 `TOKEN_TRACKER_HOST`，个人入口也只接受 loopback 地址，非法或非 loopback 配置会在创建应用前拒绝启动；
 可信 LAN 预览必须显式使用 `--lan-preview --host 0.0.0.0`，正式分享必须走 HTTPS edge，production 只允许 loopback。
 
 ## 能做什么
@@ -33,6 +34,7 @@
 - [`docs/motion-contract.md`](docs/motion-contract.md)
 - [`docs/engineering-standards.md`](docs/engineering-standards.md)
 - [`roles/README.md`](roles/README.md)
+- [`docs/decisions/ADR-078-personal-launcher-loopback.md`](docs/decisions/ADR-078-personal-launcher-loopback.md)
 - [`skills/README.md`](skills/README.md)
 - [`tasks/todo.md`](tasks/todo.md)
 - [`docs/decisions/`](docs/decisions/)

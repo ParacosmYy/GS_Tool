@@ -186,3 +186,4 @@ Android 复用同一 application/provider service，但入口是 bearer 版本�
 - 前后端拆分：先保留本文档中的 API 契约，新增 CORS、跨域 CSRF 和独立会话方案后再拆服务。
 - 生产共享：使用 HTTPS 反向代理、Waitress/WSGI 服务、持久化数据卷和环境变量；不要使用 `debug=True`。
 - 易部署：个人用根目录 `start.bat` 或 `windows/packaging/build.ps1` 生成 EXE；团队用一个 HTTPS 中心网站，不能把独立 EXE 分发给同学后再期待数据自动汇总。
+- 个人根入口 `run.py`/`windows/run.py` 对 `TOKEN_TRACKER_HOST` 采用 loopback-only、fail-closed 解析；局域网必须走独立的 `--lan-preview` 确认边界，详见 ADR-078。
