@@ -9,7 +9,7 @@
 
 | 角色 | 关注点 | 结果 | 证据与遗留风险 |
 |---|---|---|---|
-| UI-1 视觉系统 | Material 3 语义 token、Moonshot-inspired 黑底大排版、首屏/图表/表单/空状态一致性 | 通过 | `docs/design-tokens.md`、`style.css`；桌面首屏和数据区截图可读。 |
+| UI-1 视觉系统 | Material 3 语义 token、Moonshot-inspired 黑底大排版、首屏/图表/表单/空状态一致性 | 通过 | `docs/design-tokens.md`、`style.css`、`ui-polish.css`；v5 工作站背景、认证玻璃卡片和 RUST/RL 场景签名已落地，桌面首屏和数据区截图可读。 |
 | UI-2 动效交互 | reveal、轨道、scanline、glitch、count-up、pointer follower、异步状态 | 通过 | `docs/motion-contract.md`、`static/modules/motion.js`；pointer follower 只在移动后按需 requestAnimationFrame，reduced-motion 不启动。 |
 | UI-3 响应式与可访问性 | 语义标题、label、live region、表格 caption、focus-visible、空/错误状态 | 条件通过 | 登录页已完成 320/768/1024/1440 截图、320px 横向溢出修复、焦点、ARIA、reduced-motion 和运行时颜色证据；仪表盘/管理员页面已完成单一 h1、表格 scope/caption 和详情焦点回流静态修正，受保护页面仍需合法会话复核，详见 `docs/ui-accessibility-evidence.md`。 |
 | 前端工程师 | API client、CSRF、XSS 边界、Key 生命周期、状态编排 | 通过 | `app.js` 仅编排；API/图表/motion 已拆模块；渲染记录统一使用 `textContent`；Key 仅页面内存。 |
