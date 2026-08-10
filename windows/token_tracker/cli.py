@@ -408,19 +408,21 @@ def cmd_serve(args: argparse.Namespace) -> int:
     from .settings import build_settings
 
     database = db.get_db_path(args.db)
+    effective_host = args.host or os.getenv("TOKEN_TRACKER_HOST", "127.0.0.1")
     if args.production or args.lan_preview:
         # Shared modes must not silently fall back to an ephemeral session key;
         # local mode keeps the zero-config personal experience.
         os.environ["TOKEN_TRACKER_RUNTIME_MODE"] = "production" if args.production else "lan"
         try:
             settings = build_settings(database)
+            settings["TOKEN_TRACKER_HOST"] = effective_host
             deployment_checks.assert_valid(settings, require_https=args.production)
         except (deployment_checks.DeploymentCheckError, RuntimeError, ValueError) as exc:
             mode_label = "生产" if args.production else "LAN 预览"
             print(f"{mode_label}服务启动被拒绝：{exc}", file=sys.stderr)
             return 2
     app = create_app(database)
-    host = args.host or app.config.get("TOKEN_TRACKER_HOST", "127.0.0.1")
+    host = effective_host or app.config.get("TOKEN_TRACKER_HOST", "127.0.0.1")
     port = args.port or int(app.config.get("TOKEN_TRACKER_PORT", 5000))
     print(f"Web 仪表盘：http://{host}:{port}")
     if args.production or args.lan_preview:

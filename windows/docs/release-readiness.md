@@ -20,7 +20,7 @@
 | Web UI-3 | in progress | 登录页 320/768/1024/1440 观察已完成；受保护页面合法会话、真实设备指标、焦点/错误/导出/API 失败路径仍待证据 |
 | EXE | pending | `packaging/toolchain-doctor.ps1` 当前明确等待 PyInstaller；批准环境需生成、启动、持久化、升级和签名验收 |
 | Android APK | pending | `android/toolchain-doctor.ps1` 当前等待 JDK 17、Gradle wrapper 和 Android SDK API 37/build-tools |
-| HTTPS 中心部署 | pending | Caddy、正式域名、ACL、证书、日志轮转和外部 health/ready 检查需在部署主机完成 |
+| HTTPS 中心部署 | pending | 应用生产绑定已强制 loopback（ADR-061）；Caddy、正式域名、ACL、证书、日志轮转和外部 health/ready 检查仍需在部署主机完成 |
 | 备份恢复/回滚 | 条件通过 | 隔离 staging 恢复、当前 schema（含 Usage Ingest Token）校验和防覆盖命名已完成（ADR-060）；真实数据恢复、保留周期和负责人记录仍待部署演练 |
 | 工程质量门禁 | pass（当前 checkout） | `token_tracker audit --json`：源码行数、作者头、Python docstring、Android KDoc、层间依赖边界、契约引用、跨端资产和 Chart.js 供应链通过 |
 

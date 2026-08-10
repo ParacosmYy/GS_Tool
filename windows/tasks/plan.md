@@ -219,6 +219,7 @@ normalization, validation, and aggregate refresh.
 ### Task B9: Caddy 边缘日志保留策略
 
 - [x] Caddy 示例显式配置每日/100 MiB 滚动、14 文件/14 天保留和本地文件名时间。
+- [x] `serve --production` 的命令行/环境绑定地址与预检保持一致，并强制 loopback（ADR-061）。
 - [x] Caddy filter、header、reverse proxy 边界与部署说明同步；配置语法依据官方文档记录。
 - [>] 正式主机上的 `caddy validate`、ACL、权限和真实轮转样本仍需部署负责人执行。
 

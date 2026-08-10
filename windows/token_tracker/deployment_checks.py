@@ -8,6 +8,7 @@ Module: Delivery / deployment verification boundary
 
 from __future__ import annotations
 
+import ipaddress
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -22,6 +23,11 @@ def validate(settings: dict[str, Any], require_https: bool = False) -> list[str]
 
     errors: list[str] = []
     runtime_mode = str(settings.get("RUNTIME_MODE", "local")).casefold()
+    host = str(settings.get("TOKEN_TRACKER_HOST", "127.0.0.1") or "127.0.0.1").strip()
+    if require_https and runtime_mode != "production":
+        errors.append("HTTPS 生产预检要求 RUNTIME_MODE=production")
+    if require_https and not _is_loopback(host):
+        errors.append("HTTPS 生产服务必须只绑定 loopback，由 Caddy 负责对外监听")
     if runtime_mode in {"shared", "production", "lan"}:
         secret = str(settings.get("SECRET_KEY", ""))
         if len(secret) < 32:
@@ -55,3 +61,14 @@ def assert_valid(settings: dict[str, Any], require_https: bool = False) -> None:
     errors = validate(settings, require_https=require_https)
     if errors:
         raise DeploymentCheckError("；".join(errors))
+
+
+def _is_loopback(host: str) -> bool:
+    """Return whether a bind host stays inside the local machine boundary."""
+
+    if host.casefold() in {"localhost", "127.0.0.1", "::1"}:
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
