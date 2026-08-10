@@ -45,6 +45,7 @@ def run_audit(root: Path | None = None) -> list[AuditCheck]:
     project_root = (root or repository_root()).resolve()
     checks: list[AuditCheck] = []
     _check_required_files(project_root, checks)
+    _check_contract_references(project_root, checks)
     _check_source_line_cap(project_root, checks)
     _check_scene_assets(project_root, checks)
     _check_runtime_dependencies(checks)
@@ -131,6 +132,32 @@ def _check_source_line_cap(root: Path, checks: list[AuditCheck]) -> None:
         checks.append(AuditCheck("source-line-cap", FAIL, f"{len(oversized)} 个文件超过 1000 行"))
     else:
         checks.append(AuditCheck("source-line-cap", PASS, f"已扫描 {len(files)} 个源文件"))
+
+
+def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
+    """Verify that key decisions are wired into the current source tree."""
+
+    references = (
+        ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v6.png"),
+        ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v6"),
+        ("kimi-provider-presets", "windows/token_tracker/templates/dashboard.html", "kimi-code"),
+        ("caddy-log-retention", "windows/deployment/Caddyfile.example", "roll_keep 14"),
+        ("root-launcher", "start.bat", "call start.bat"),
+    )
+    missing: list[str] = []
+    for name, relative_path, fragment in references:
+        path = root / relative_path
+        try:
+            content = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            missing.append(name)
+            continue
+        if fragment not in content:
+            missing.append(name)
+    if missing:
+        checks.append(AuditCheck("contract-references", FAIL, f"{len(missing)} 个关键引用未接入"))
+    else:
+        checks.append(AuditCheck("contract-references", PASS, f"已核对 {len(references)} 个关键引用"))
 
 
 def _check_scene_assets(root: Path, checks: list[AuditCheck]) -> None:
