@@ -90,6 +90,17 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'",
         )
+        if request.path.startswith(("/api/", "/api/v1/")) or request.path in {
+            "/login",
+            "/register",
+            "/dashboard",
+            "/admin",
+        }:
+            # Authenticated projections, token exchange responses, and provider
+            # payloads must not be retained by a browser or shared proxy.
+            response.headers.setdefault("Cache-Control", "no-store")
+            response.headers.setdefault("Pragma", "no-cache")
+            response.headers.setdefault("Expires", "0")
         if request.is_secure:
             response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
         response.headers.setdefault(request_ids.HEADER_NAME, getattr(g, "request_id", "unknown"))

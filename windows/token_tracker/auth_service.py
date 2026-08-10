@@ -18,6 +18,7 @@ from . import db
 
 
 MIN_PASSWORD_LENGTH = 8
+MAX_PASSWORD_LENGTH = 256
 MAX_USERNAME_LENGTH = 32
 _USERNAME_PATTERN = re.compile(r"[\w.@+-]{3,32}\Z", flags=re.UNICODE)
 
@@ -34,7 +35,11 @@ def authenticate_user(username: Any, password: Any, path: str) -> dict[str, Any]
     """Verify credentials with one generic failure result for callers."""
 
     username_value = str(username or "").strip()
-    if not _USERNAME_PATTERN.fullmatch(username_value) or not isinstance(password, str):
+    if (
+        not _USERNAME_PATTERN.fullmatch(username_value)
+        or not isinstance(password, str)
+        or not MIN_PASSWORD_LENGTH <= len(password) <= MAX_PASSWORD_LENGTH
+    ):
         return None
     user = db.find_user(username_value, path)
     if user is None:
@@ -78,6 +83,8 @@ def normalize_password(value: Any) -> str:
 
     if not isinstance(value, str) or len(value) < MIN_PASSWORD_LENGTH:
         raise AuthValidationError(f"密码至少需要 {MIN_PASSWORD_LENGTH} 个字符。")
+    if len(value) > MAX_PASSWORD_LENGTH:
+        raise AuthValidationError(f"密码不能超过 {MAX_PASSWORD_LENGTH} 个字符。")
     return value
 
 

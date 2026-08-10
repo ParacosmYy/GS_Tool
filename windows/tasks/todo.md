@@ -121,3 +121,4 @@
 - [x] ADR-034 将 `windows/start-lan.bat` 收敛为带 `SHARE` 确认的 canonical LAN 预览 wrapper，消除无确认绑定 `0.0.0.0` 的入口。
 - [x] ADR-035 补齐 data 子目录 SQLite、backups、staging 的仓库忽略边界，避免敏感数据库误提交。
 - [x] ADR-036 建立当前 checkout 的本地 `main` 版本控制保存点，不配置远程、不上传，并通过 `git check-ignore` 验证敏感路径。
+- [x] ADR-037 收敛密码长度、业务日志脱敏/合法 JSON 和认证响应 `no-store` 边界。

@@ -24,6 +24,8 @@ Session Cookie、Android Authorization、查询参数和同学的访问地址；
    `log_credentials`，除非经过单独安全评审。
 4. 应用层和 Caddy 日志文件都必须使用受限 ACL、轮转和保留策略；正式 HTTPS、Caddy
    `validate`、ACL 和真实日志样本审查仍是部署环境门禁，不在源码中冒充已完成。
+5. 结构化业务日志在 `events.py` 中先按键名和文本值脱敏，再编码为有界 JSON；禁止对
+   已序列化 JSON 做会破坏语法的替换。
 
 ## 取舍
 
@@ -37,6 +39,8 @@ Session Cookie、Android Authorization、查询参数和同学的访问地址；
 - `GET /api/health?api_key=secret-value` 的应用访问日志只包含 `/api/health`、状态、
   耗时和 request ID，未出现 query 或 secret。
 - Python 编译和文件行数门禁通过。
+- `Authorization: Bearer ...`、`api_key` 和 `sk-...` 进入业务日志前会被遮蔽，长 metadata
+  仍保持合法 JSON。
 - Caddy 配置只作为模板保存；正式机器上的 `caddy validate`、HTTPS 访问和真实日志脱敏
   样本仍待具备 Caddy、域名/证书和运维权限后执行。
 

@@ -72,6 +72,7 @@ Android 具体实现保持同一方向：`feature/*` 只渲染 ViewModel 状态�
 - `schema.py` 集中 SQLite DDL 和加法式迁移；`db.py` 集中连接、事务和查询，不再混合 schema 生命周期。
 - 限流策略由 `rate_limit.py` 提供单一接口；local 使用内存滑动窗口，shared/production/lan 使用 SQLite 共享窗口并哈希存储 key，后续高并发迁移 PostgreSQL/Redis 时只替换该基础设施适配器。
 - 应用访问日志由 `access_logging.py` 执行字段白名单；Caddy 边缘日志使用显式 filter 删除凭据、Cookie、查询参数和精确客户端地址，正式部署仍需现场验证。
+- `events.py` 在持久化前脱敏结构化日志并保持合法有界 JSON；认证、Provider 和个人数据响应统一禁止缓存。
 - 结构化应用日志、业务工作事件和安全审计事件分开保留。
 - 每个文件最多 1000 行；接近 800 行必须拆分成高内聚接口。
 - 每个源文件有统一元信息，公共函数/路由/DTO 有输入、输出、权限、失败语义和不变量说明。

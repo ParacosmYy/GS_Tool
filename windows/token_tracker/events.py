@@ -20,7 +20,18 @@ VALID_DIRECTIONS = {"coding", "debugging", "research", "writing", "planning", "r
 VALID_OUTCOMES = {"success", "failure", "partial"}
 VALID_LOG_LEVELS = {"debug", "info", "warning", "error"}
 MAX_REQUEST_ID_LENGTH = 100
-_SECRET_PATTERN = re.compile(r"(?i)(api[_ -]?key|authorization|bearer|sk-[a-z0-9_-]+)\s*[:=]?\s*[^\s,;]+")
+_TEXT_SECRET_PATTERN = re.compile(
+    r"(?:api[_ -]?key|authorization|proxy-authorization|access[_ -]?token|refresh[_ -]?token)"
+    r"\s*(?:[:=]|\s)\s*(?:(?:bearer|token)\s+)?[^\s,;]+"
+    r"|token\s*[:=]\s*(?:(?:bearer|token)\s+)?[^\s,;]+"
+    r"|\bbearer\s+[^\s,;]+"
+    r"|\bsk-[a-z0-9_-]+",
+    flags=re.IGNORECASE,
+)
+_SENSITIVE_KEY_PATTERN = re.compile(
+    r"(?:api[_ -]?key|authorization|proxy-authorization|access[_ -]?token|refresh[_ -]?token|token)",
+    flags=re.IGNORECASE,
+)
 
 
 class EventValidationError(ValueError):
@@ -65,8 +76,33 @@ def _safe_json(value: Any) -> str:
 
     if not isinstance(value, dict):
         return "{}"
-    limited = {str(key)[:60]: str(item)[:300] for key, item in list(value.items())[:20]}
-    return _SECRET_PATTERN.sub(r"\1: [REDACTED]", json.dumps(limited, ensure_ascii=False, separators=(",", ":")))[:4000]
+    limited: dict[str, str] = {}
+    for key, item in list(value.items())[:20]:
+        key_text = str(key)[:60]
+        limited[key_text] = (
+            "[REDACTED]"
+            if _SENSITIVE_KEY_PATTERN.search(key_text)
+            else _redact_text(str(item)[:300])
+        )
+    encoded = json.dumps(limited, ensure_ascii=False, separators=(",", ":"))
+    if len(encoded) <= 4000:
+        return encoded
+
+    compact: dict[str, str | bool] = {}
+    for key, item in limited.items():
+        candidate = dict(compact)
+        candidate[key] = item
+        if len(json.dumps(candidate, ensure_ascii=False, separators=(",", ":"))) > 3900:
+            break
+        compact[key] = item
+    compact["_truncated"] = True
+    return json.dumps(compact, ensure_ascii=False, separators=(",", ":"))
+
+
+def _redact_text(value: str) -> str:
+    """Redact credential-like text while keeping surrounding prose usable."""
+
+    return _TEXT_SECRET_PATTERN.sub("[REDACTED]", value)
 
 
 def normalize_work_event(payload: dict[str, Any]) -> dict[str, Any]:
@@ -87,9 +123,9 @@ def normalize_work_event(payload: dict[str, Any]) -> dict[str, Any]:
         "efficiency_score": efficiency_score,
         "result_code": _code(payload.get("result_code"), "result_code"),
         "error_code": _code(payload.get("error_code"), "error_code"),
-        "project": _text(payload.get("project"), "project", 120),
-        "task_type": _text(payload.get("task_type"), "task_type", 80),
-        "note": _text(payload.get("note"), "note", 1000),
+        "project": _redact_text(_text(payload.get("project"), "project", 120)),
+        "task_type": _redact_text(_text(payload.get("task_type"), "task_type", 80)),
+        "note": _redact_text(_text(payload.get("note"), "note", 1000)),
     }
 
 
@@ -175,11 +211,11 @@ def insert_app_log(
     """Persist a bounded diagnostic log after redacting credential-like values."""
 
     level = _text(payload.get("level", "info"), "level", 12).lower()
-    event_type = _text(payload.get("event_type"), "event_type", 80, required=True)
+    event_type = _redact_text(_text(payload.get("event_type"), "event_type", 80, required=True))
     message = _text(payload.get("message"), "message", 2000, required=True)
     if level not in VALID_LOG_LEVELS:
         raise EventValidationError("level is not supported")
-    safe_message = _SECRET_PATTERN.sub(r"\1: [REDACTED]", message)
+    safe_message = _redact_text(message)
     error_code = _code(payload.get("error_code"), "error_code")
     request_value = _text(payload.get("request_id") or request_id, "request_id", MAX_REQUEST_ID_LENGTH, True)
     created_at = db.local_now_string()
