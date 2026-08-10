@@ -35,6 +35,7 @@
 - [`docs/engineering-standards.md`](docs/engineering-standards.md)
 - [`roles/README.md`](roles/README.md)
 - [`docs/decisions/ADR-078-personal-launcher-loopback.md`](docs/decisions/ADR-078-personal-launcher-loopback.md)
+- [`docs/decisions/ADR-094-cli-waitress-and-bind-gate.md`](docs/decisions/ADR-094-cli-waitress-and-bind-gate.md)
 - [`skills/README.md`](skills/README.md)
 - [`tasks/todo.md`](tasks/todo.md)
 - [`docs/decisions/`](docs/decisions/)

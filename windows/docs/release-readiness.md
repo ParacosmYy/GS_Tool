@@ -16,7 +16,7 @@
 
 | 范围 | 当前状态 | 证据/下一步 |
 | --- | --- | --- |
-| Windows 模块化单体、CLI、SQLite、Web、RBAC | pass（源码/本机运行） | `compileall`、CLI help、health、根 `run.py` shim、Waitress 本机 WSGI、个人入口 loopback fail-closed、API/安全边界和架构文档已核对（ADR-078） |
+| Windows 模块化单体、CLI、SQLite、Web、RBAC | pass（源码/本机运行） | `compileall`、CLI help、health、根 `run.py` shim、CLI/根入口 Waitress 本机 WSGI、个人入口与 CLI loopback fail-closed、API/安全边界和架构文档已核对（ADR-078/094） |
 | 自动 Provider usage / Gateway | 条件通过 | Gateway、SSE usage、Usage Ingest、DPAPI 重试队列、运行时队列故障 fail-closed、动态中心端口只读发现、响应读取/幂等键/非回环 HTTPS 门禁已完成（ADR-058/059/068/075）；仍需用户本人合法 Provider Key 做一次非流式/流式联调 |
 | Web UI-1/UI-2 | pass（源码/本机视觉） | v13 场景、ADR-074 可见度基线、ADR-090 场景资产决策、显式主图层、动效和首帧可读性已在临时源码实例复核；v12/v11/v10/v9/v8 保留回滚 |
 | Web UI-3 | in progress | 登录页四档观察、认证页 v23 唯一语义 h1/aria-hidden glitch 层、隔离合法会话下 Dashboard/Admin 空态、成员脱敏日志详情、动态错误 alert/status 播报、四档 viewport/焦点回流、历史非空、服务端 CSV 200、Provider 502 错误态和个人 Activity 写入切片已有源码/隔离证据；真实设备指标、浏览器下载落盘、真实 Provider 成功、reduced-motion/高对比度环境仍待证据 |
