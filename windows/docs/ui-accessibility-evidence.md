@@ -328,3 +328,18 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   页面滚动，不能替代真实 390px 设备首屏与系统 reduced-motion 证据。
 - 隔离实例只使用临时 SQLite，`GET /login` 返回 200；验证结束后仅停止本轮启动的 5019 进程，受保护的
   5000/5011 进程与监听状态未触碰。Chrome 自身 USB/Web App warning 不属于应用页面日志，不计入应用失败。
+
+## v26 v14 浏览器运行首屏证据
+
+- 在当前 checkout 启动隔离源码实例 `127.0.0.1:5024`，数据库位于
+  `windows/.cache/ui-v14-browser-20260810/token_tracker.sqlite3`；未读取真实数据库、Cookie、Key 或令牌。
+- 默认浏览器视口观测为 `innerWidth=1036`、`innerHeight=850`；页面
+  `documentElement.scrollWidth=1021`，没有横向溢出。浏览器扩展没有应用请求的 390px/1440px viewport override，
+  因此本轮不宣称 320/390/768/1024/1440 响应式证据。
+- 登录页 DOM/CSS 实际引用 `/static/assets/embedded-rust-engineer-bg-v14.png`；焦点自动落在用户名输入框，
+  页面包含唯一语义 `h1`、表单字段和可访问提交按钮。动效完成后，左侧标题/中文说明与右侧认证卡片、角色和设备场景均保持清晰分层。
+- 当前页截图：[`login-v14-default.png`](../.cache/ui-v14-browser-20260810/login-v14-default.png)。浏览器
+  DevTools `error/warning` 日志为空；性能 `performance` API 在该浏览器评估沙箱中不可用，未记录或推断性能指标。
+- 隔离实例验证结束后仅停止本轮启动的 5024 进程，端口已释放；受保护的 5000/5011 进程与监听状态未触碰。
+- 该证据关闭 v14 默认桌面首屏的源码运行观察，不替代真实 320/768/1024/1440、系统
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘和 Android 真机验收。
