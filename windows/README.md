@@ -237,6 +237,11 @@ Gateway 支持 `/v1/models`、非流式 Chat Completions 和 SSE 流式 Chat Com
 未上报记录。不要把 Gateway 绑定到公网或可信 LAN，除非另外配置
 `TOKEN_TRACKER_GATEWAY_ACCESS_TOKEN` 并使用 HTTPS 边缘保护。
 
+Gateway 允许省略 `Idempotency-Key`，会自动生成本次调用的唯一键；如果客户端提供该请求头，必须不
+超过 160 个字符且不能包含控制字符。非法幂等键会在调用 provider 前返回 `400`，不会静默替换成新键，
+以确保客户端重试仍能正确去重。上游响应读取中断会返回 `502`，上游重定向也会明确返回 `502`，不会
+把这两类边界错误伪装成普通 JSON 解析失败。
+
 ## 5. Android 与跨端协议
 
 Android 工程位于同级目录 `../android/`，默认模拟器地址为 `http://10.0.2.2:5000/api/v1`；真机需要把 API Base URL 改为 Windows 主机的局域网 HTTPS 地址。Android 的登录流程为：

@@ -266,6 +266,8 @@ def _normalize_report(
         return None
     if not key_value or len(key_value) > MAX_IDEMPOTENCY_KEY_LENGTH:
         return None
+    if any(ord(character) < 32 or ord(character) == 127 for character in key_value):
+        return None
     if input_value is None or output_value is None:
         return None
     return UsageReport(model_value, input_value, output_value, key_value)

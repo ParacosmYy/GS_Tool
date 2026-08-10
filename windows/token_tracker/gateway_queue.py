@@ -220,6 +220,8 @@ def _decode_payload(payload: bytes) -> UsageReport:
         raise QueueProtectionError("Gateway 队列 model 无效")
     if not isinstance(key, str) or not 1 <= len(key) <= MAX_IDEMPOTENCY_KEY_LENGTH:
         raise QueueProtectionError("Gateway 队列 idempotency_key 无效")
+    if any(ord(character) < 32 or ord(character) == 127 for character in key):
+        raise QueueProtectionError("Gateway 队列 idempotency_key 包含控制字符")
     if not isinstance(note, str) or len(note) > MAX_NOTE_LENGTH:
         raise QueueProtectionError("Gateway 队列 note 无效")
     if not _is_non_negative_int(input_tokens) or not _is_non_negative_int(output_tokens):

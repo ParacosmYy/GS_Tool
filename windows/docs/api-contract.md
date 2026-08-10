@@ -361,6 +361,24 @@ provider 请求在边界限制 API Key 4096 字符、Base URL 2048 字符、模�
 
 上游返回模型优先级：`response.model` → `request.model`。usage 输入别名允许 `prompt_tokens`、`input_tokens`、`promptTokens`；输出别名允许 `completion_tokens`、`output_tokens`、`completionTokens`。只有输入和输出都能通过非负整数校验时才入库。
 
+## 本地 Gateway：`GET /v1/models` 与 `POST /v1/chat/completions`
+
+本地 Gateway 是独立进程，不使用浏览器会话，也不写中心 SQLite。它从启动环境变量读取固定的
+provider Key 和中心 Usage Ingest Token，并默认只绑定 loopback；非 loopback 监听必须配置独立的
+Gateway bearer token。客户端提供的 `base_url` 和 API Key 不会覆盖启动配置。
+
+Gateway 支持 OpenAI-compatible 模型发现、非流式 JSON 和流式 SSE。上游响应体在读取时仍受 2 MiB
+边界保护；上游响应读取中断会返回 `502 UPSTREAM_UNAVAILABLE`，不会落成未解释的服务端 500。上游
+重定向会被拒绝并返回 `502 UPSTREAM_REDIRECT`，不会先尝试解析重定向正文。
+
+成功调用会在响应头返回 `X-AI-Tracker-Usage`：`recorded`、`queued`、`missing` 或
+`report-failed`。流式响应还会在结束 SSE 中追加 tracker 注释；客户端应以该状态和中心最终记录为准，
+不能根据本地输出字符数估算 token。
+
+客户端可以省略 `Idempotency-Key`，此时 Gateway 为本次调用生成唯一键；如果提供该请求头，长度必须不
+超过 160 个字符且不能含控制字符。超限或非法值返回 `400 PROVIDER_INPUT_INVALID`，不会先调用上游后
+静默换键，从而避免客户端重试产生重复入账。
+
 ## Android bearer provider endpoints
 
 Android 使用同一 provider 业务边界，但必须先通过 `/api/v1/auth/login` 获取 bearer access token：

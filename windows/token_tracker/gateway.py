@@ -227,15 +227,19 @@ def _list_models(config: GatewayConfig) -> Any:
             config.allow_http,
             config.timeout,
         )
-        body = providers.decode_json_response(response, config.maximum_response_bytes)
     except providers.ProviderNetworkError:
         return _error("UPSTREAM_UNAVAILABLE", "gateway 无法连接上游 provider", 502)
+    if 300 <= response.status_code <= 399:
+        response.close()
+        return _error("UPSTREAM_REDIRECT", "上游 provider 返回了被禁止的重定向", 502)
+    try:
+        body = providers.decode_json_response(response, config.maximum_response_bytes)
     except providers.ProviderResponseTooLarge:
         return _error("UPSTREAM_RESPONSE_TOO_LARGE", "上游模型响应超过大小限制", 502)
+    except providers.ProviderNetworkError:
+        return _error("UPSTREAM_UNAVAILABLE", "读取上游 provider 响应失败", 502)
     except ValueError:
         return _error("UPSTREAM_INVALID_RESPONSE", "上游模型响应不是有效 JSON", 502)
-    if 300 <= response.status_code <= 399:
-        return _error("UPSTREAM_REDIRECT", "上游 provider 返回了被禁止的重定向", 502)
     return _json_body(body, _upstream_status(response.status_code))
 
 
@@ -246,6 +250,7 @@ def _chat_completions(config: GatewayConfig, reporter: UsageReporter) -> Any:
     if not isinstance(payload, dict):
         return _error("BAD_REQUEST", "请求 JSON 必须是对象", 400)
     try:
+        idempotency_key = _request_idempotency_key()
         chat_request = _prepare_gateway_request(payload, config)
     except providers.UsageValidationError as exc:
         return _error("PROVIDER_INPUT_INVALID", str(exc), 400)
@@ -259,11 +264,19 @@ def _chat_completions(config: GatewayConfig, reporter: UsageReporter) -> Any:
             return _error("UPSTREAM_REDIRECT", "上游 provider 返回了被禁止的重定向", 502)
         return _decode_error_response(provider_response, config)
     if chat_request.payload.get("stream") is True:
-        return _stream_response(provider_response, chat_request.model, config, reporter)
+        return _stream_response(
+            provider_response,
+            chat_request.model,
+            config,
+            reporter,
+            idempotency_key,
+        )
     try:
         body = providers.decode_json_response(provider_response, config.maximum_response_bytes)
     except providers.ProviderResponseTooLarge:
         return _error("UPSTREAM_RESPONSE_TOO_LARGE", "上游响应超过大小限制", 502)
+    except providers.ProviderNetworkError:
+        return _error("UPSTREAM_UNAVAILABLE", "读取上游 provider 响应失败", 502)
     except ValueError:
         return _error("UPSTREAM_INVALID_RESPONSE", "上游响应不是有效 JSON", 502)
     usage, input_tokens, output_tokens = providers.extract_usage(body)
@@ -274,7 +287,7 @@ def _chat_completions(config: GatewayConfig, reporter: UsageReporter) -> Any:
         _response_model(body, chat_request.model),
         input_tokens,
         output_tokens,
-        _request_idempotency_key(),
+        idempotency_key,
     )
     return _json_body(body, 200, {USAGE_STATUS_HEADER: status})
 
@@ -305,6 +318,8 @@ def _decode_error_response(response: requests.Response, config: GatewayConfig) -
         body = providers.decode_json_response(response, config.maximum_response_bytes)
     except providers.ProviderResponseTooLarge:
         return _error("UPSTREAM_RESPONSE_TOO_LARGE", "上游错误响应超过大小限制", 502)
+    except providers.ProviderNetworkError:
+        return _error("UPSTREAM_UNAVAILABLE", "读取上游 provider 错误响应失败", 502)
     except ValueError:
         return _error("UPSTREAM_INVALID_RESPONSE", "上游错误响应不是有效 JSON", 502)
     return _json_body(body, _upstream_status(response.status_code))
@@ -334,7 +349,13 @@ def _response_model(body: Any, requested_model: str) -> str:
 
 def _request_idempotency_key() -> str:
     candidate = request.headers.get("Idempotency-Key", "").strip()
-    if candidate and len(candidate) <= MAX_IDEMPOTENCY_KEY_LENGTH:
+    if candidate:
+        if len(candidate) > MAX_IDEMPOTENCY_KEY_LENGTH:
+            raise providers.UsageValidationError(
+                f"Idempotency-Key must be {MAX_IDEMPOTENCY_KEY_LENGTH} characters or fewer"
+            )
+        if any(ord(character) < 32 or ord(character) == 127 for character in candidate):
+            raise providers.UsageValidationError("Idempotency-Key must not contain control characters")
         return candidate
     return f"gateway-{uuid.uuid4().hex}"
 
@@ -358,6 +379,7 @@ def _stream_response(
     requested_model: str,
     config: GatewayConfig,
     reporter: UsageReporter,
+    idempotency_key: str,
 ) -> Response | tuple[Response, int]:
     """Pass through SSE while retaining only bounded usage metadata."""
 
@@ -365,7 +387,6 @@ def _stream_response(
         provider_response.close()
         return _error("UPSTREAM_RESPONSE_TOO_LARGE", "上游流式响应超过大小限制", 502)
     accumulator = _SSEUsageAccumulator(config.maximum_response_bytes)
-    idempotency_key = _request_idempotency_key()
 
     @stream_with_context
     def generate() -> Any:
