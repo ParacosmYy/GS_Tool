@@ -190,10 +190,12 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
 .auth-card, .chart-card, .form-card, .guide-card, .records-card { --surface-x: 50%; --surface-y: 0%; }
 .button { translate: var(--mag-x, 0) var(--mag-y, 0); transition: translate .35s var(--ui-ease), background .35s var(--ui-ease), border-color .35s var(--ui-ease), color .35s var(--ui-ease), box-shadow .35s var(--ui-ease); }
 
-@keyframes ui-intro-in { from { opacity: .42; transform: translate3d(-18px, 10px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
-@keyframes ui-card-in { from { opacity: .52; transform: translate3d(18px, 12px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
-@keyframes ui-content-in { from { opacity: .45; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes ui-line-in { from { opacity: .5; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+/* Entrance motion may move the surface, but it must never make readable copy
+   look disabled during the first frame or while a screenshot is captured. */
+@keyframes ui-intro-in { from { opacity: .94; transform: translate3d(-18px, 10px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes ui-card-in { from { opacity: .96; transform: translate3d(18px, 12px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes ui-content-in { from { opacity: .96; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ui-line-in { from { opacity: .92; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes scene-beacon { 0%, 100% { opacity: .56; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.1); } }
 
 @media (max-width: 900px) {

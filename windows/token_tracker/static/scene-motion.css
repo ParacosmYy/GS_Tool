@@ -30,6 +30,9 @@ body.pointer-press .pointer-ring { transform: translate3d(-50%, -50%, 0) scale(.
 
 /* Brand scene: the illustration is a fixed, non-interactive layer. */
 body {
+  /* Establish a deterministic stacking context so the negative scene layer
+     sits above the canvas background instead of disappearing behind it. */
+  isolation: isolate;
   background-image:
     linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
@@ -42,9 +45,10 @@ body {
 
 .story-backdrop {
   position: fixed;
-  z-index: -3;
+  z-index: 0;
   inset: 0;
   pointer-events: none;
+  isolation: isolate;
   opacity: .95;
   background-image: url("/static/assets/embedded-rust-engineer-bg-v7.png");
   background-position: calc(40% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
@@ -55,8 +59,27 @@ body {
   transition: opacity .8s var(--ui-ease);
 }
 
+.story-backdrop-image {
+  position: absolute;
+  z-index: 0;
+  inset: -1.5%;
+  width: 103%;
+  height: 103%;
+  object-fit: cover;
+  object-position: 40% 50%;
+  transform: translate3d(var(--backdrop-shift-x, 0px), var(--backdrop-shift-y, 0px), 0);
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* Keep the scene visible without allowing it to become a content surface.
+   Header, main content, footer, and pointer affordances own explicit higher
+   layers so the backdrop remains purely decorative and non-interactive. */
+.site-main, .site-footer { position: relative; z-index: 1; }
+
 .story-backdrop::before {
   position: absolute;
+  z-index: 1;
   inset: 0;
   content: "";
   background:
@@ -66,6 +89,7 @@ body {
 
 .story-backdrop::after {
   position: absolute;
+  z-index: 2;
   inset: 0;
   content: "";
   background:
@@ -104,6 +128,7 @@ body::after {
     background-position: calc(60% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
     background-size: auto 100%;
   }
+  .story-backdrop-image { object-position: 60% 50%; }
   .story-backdrop::before {
     background:
       linear-gradient(90deg, rgba(8, 9, 12, .998) 0%, rgba(8, 9, 12, .92) 40%, rgba(8, 9, 12, .62) 100%),
@@ -117,11 +142,12 @@ body::after {
   .story-backdrop {
     background-position: calc(86% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
     background-size: auto 100%;
-    opacity: .78;
+    opacity: .68;
   }
+  .story-backdrop-image { object-position: 86% 50%; }
   .story-backdrop::before {
     background:
-      linear-gradient(90deg, rgba(8, 9, 12, 1) 0%, rgba(8, 9, 12, .97) 51%, rgba(8, 9, 12, .78) 100%),
+      linear-gradient(90deg, rgba(8, 9, 12, .99) 0%, rgba(8, 9, 12, .92) 46%, rgba(8, 9, 12, .7) 100%),
       linear-gradient(180deg, rgba(8, 9, 12, .5), transparent 34%, rgba(8, 9, 12, .78));
   }
 }
