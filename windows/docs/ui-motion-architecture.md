@@ -14,7 +14,7 @@
 | --- | --- | --- | --- |
 | 结构层 | `templates/base.html`、页面模板 | DOM 顺序、标题层级、语义区域、ARIA live 区域 | 不在模板中写大段样式或业务计算 |
 | 视觉层 | `style.css`、`ui-polish.css` | 设计 token、布局、色彩和业务表面 | 不读取 API、不保存用户数据 |
-| 场景层 | `scene-motion.css`、`static/modules/motion.js` | 背景、指针、RAF 调度、滚动 reveal、减弱动效策略 | 不操作 token、Cookie、API 或表单数据 |
+| 场景层 | `base.html`、`scene-motion.css`、`static/modules/motion.js` | 显式主图、背景、指针、RAF 调度、滚动 reveal、减弱动效策略 | 不操作 token、Cookie、API 或表单数据 |
 | 页面编排层 | `auth.js`、`app.js`、`admin.js` | 调用动效原语、处理页面状态、渲染安全文本 | 不重复实现指针循环或背景物理 |
 | 品牌资产层 | `static/assets/` | 版本化图片资源和回滚资产 | 不把文字、密钥或业务数据嵌入图片 |
 
@@ -34,7 +34,9 @@
 
 当前品牌资产为 `embedded-rust-engineer-bg-v7`：左侧保留标题负空间，右侧承载成年、御姐气质且非性化的二次元嵌入式 Rust/RL 工程师、银色 Pro 笔记本、桌面 Mac Studio 风格计算机与实验板。v6、v5、v4、v3、v2 与更早版本保留作回滚参考，不直接参与默认渲染；Windows 与 Android 通过各自静态资源路径消费同一像素资产，端侧遮罩和动效实现保持解耦。
 
-Windows 和 Android 各自复制同一 PNG，并通过 SHA-256 校验保持内容一致；网页只通过 `.story-backdrop` 引用图片，业务组件不直接依赖资源文件名。v7 的画面不承载可读文案，避免生成式图片中的伪文字干扰产品信息层。
+Windows 和 Android 各自复制同一 PNG，并通过 SHA-256 校验保持内容一致；网页只通过
+`.story-backdrop` 内的显式 `.story-backdrop-image` 和 CSS 回退引用图片，业务组件不直接依赖
+资源文件名。v7 的画面不承载可读文案，避免生成式图片中的伪文字干扰产品信息层。
 
 ## 性能与安全边界
 
