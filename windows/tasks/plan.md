@@ -246,7 +246,7 @@ normalization, validation, and aggregate refresh.
 - [x] `packaging/toolchain-doctor.ps1` 提供只读构建前检查，明确区分工具缺失 pending 与构建失败。
 - [x] PyInstaller 6.22.0 已完成 onedir 构建，隔离启动 `/login`、静态资源和 `%LOCALAPPDATA%` 建库证据已写入 ADR-082。
 - [x] `packaging/package.ps1` 已生成带 `README.txt` 的 Windows x64 ZIP，当前 0.1.0 产物哈希已写入 ADR-082。
-- [>] 带真实记录的重启持久化、升级/回滚、签名和正式分发仍待批准环境验收。
+- [>] 带真实记录的重启持久化和升级/回滚已留证；Authenticode 签名和正式分发仍待批准环境验收。
 
 ### Task B13: 只读发布就绪审计
 
@@ -458,7 +458,7 @@ API / 动画 / 设计 token 契约
 - [x] ZIP 增加 RELEASE-MANIFEST.json 与只读 VERIFY-PACKAGE.ps1，记录版本、平台、EXE 哈希和 LocalAppData 策略。
 - [x] verifier 拒绝包目录外路径、哈希不匹配和包内 data/，当前 0.1.0 解压包验证通过。
 - [x] README 补充备份、停止、升级、回滚顺序，并同步 ADR-089、发布审计和验收矩阵。
-- [>] 真实升级/回滚、Authenticode 签名和正式分发渠道仍待部署负责人验收。
+- [>] Authenticode 签名和正式分发渠道仍待部署负责人验收；v12→v13→v12 升级/回滚已由 ADR-092 记录。
 
 ### Task B30: EXE 版本清单与包完整性验证
 
@@ -467,7 +467,7 @@ API / 动画 / 设计 token 契约
 - [x] ZIP 增加 RELEASE-MANIFEST.json 与只读 VERIFY-PACKAGE.ps1，记录版本、平台、EXE 哈希和 LocalAppData 策略。
 - [x] verifier 拒绝包目录外路径、哈希不匹配和包内 data/，当前 0.1.0 解压包验证通过。
 - [x] README 补充备份、停止、升级、回滚顺序，并同步 ADR-089、发布审计和验收矩阵。
-- [>] 真实升级/回滚、Authenticode 签名和正式分发渠道仍待部署负责人验收。
+- [>] Authenticode 签名和正式分发渠道仍待部署负责人验收；v12→v13→v12 升级/回滚已由 ADR-092 记录。
 
 ### Task B31: Web/Android 场景资产 v13 与 EXE 资源一致性
 
@@ -477,6 +477,15 @@ API / 动画 / 设计 token 契约
 - [x] Web 与 Android 写入同一像素资产，默认引用切换到 v13；v12 及更早版本保留回滚。
 - [x] 新增 ADR-090、更新 UI/Android/发布审计和验收文档；发布审计同时检查 v13 一致性与 v12 回滚资产存在。
 - [x] 重新构建 EXE/ZIP，隔离验证 v13 资源、ready/login 和用户数据目录边界，并更新包哈希证据（ADR-091）。
+
+### Task B32: EXE 版本切换与回滚实证
+
+**目标：** 证明发布包替换不会删除或改变用户 LocalAppData 数据，并为后续正式签名/分发提供可重复的 transition gate。
+
+- [x] 新增 `packaging/verify-upgrade-rollback.ps1`，只启动显式上一包/当前包，禁止碰触既有服务和用户目录。
+- [x] 通过 v12 包写入 `record_id=1`，v13 包读取后再回滚 v12 读取，输入/输出 `222/333` 保持不变。
+- [x] 记录 v12/v13 场景资源 HTTP 200、manifest verifier、隔离 LocalAppData 和端口释放证据（ADR-092）。
+- [>] Authenticode 签名、正式分发渠道和生产数据回滚仍待部署负责人验收。
 
 ### Task B28: Caddy 边缘工具链与相对路径门禁
 

@@ -47,8 +47,18 @@ PyInstaller 模块/启动器是否存在，不执行 Python 导入、不下载�
 ```
 
 升级时先备份并停止旧 EXE，再把新包解压到新目录并通过 manifest/hash 校验；回滚时停止新 EXE，
-重新启动上一份已验证包，保留 `%LOCALAPPDATA%\AITokenTracker` 用户数据目录。真实升级、回滚、
-Authenticode 签名和正式分发仍需要部署负责人验收。
+重新启动上一份已验证包，保留 `%LOCALAPPDATA%\AITokenTracker` 用户数据目录。当前 checkout 已通过
+隔离的真实 API 升级/回滚演练；演练入口如下：
+
+```powershell
+.\packaging\verify-upgrade-rollback.ps1 `
+  -PreviousPackageDirectory .\.cache\package-verify-v12-final `
+  -CurrentPackageDirectory .\.cache\exe-v13-package-verify-20260810 `
+  -Port 5020
+```
+
+该入口只使用项目缓存目录，并通过 `POST /api/v1/records` 验证同一用户数据在升级和回滚后仍可读取。
+Authenticode 签名和正式分发仍需要部署负责人验收，详细证据见 [`ADR-092`](../docs/decisions/ADR-092-exe-upgrade-rollback-evidence.md)。
 
 构建前必须检查：
 
@@ -57,9 +67,9 @@ Authenticode 签名和正式分发仍需要部署负责人验收。
 - `dist/` 只作为构建产物，不提交 Git；源码体验入口仍是根目录 `start.bat`。
 - 构建环境允许访问已批准的 Python 包缓存；脚本不会使用未锁定的 PyInstaller 版本。
 
-当前 checkout 已按锁文件安装 PyInstaller 6.22.0，并完成一次 `--onedir` EXE 构建和隔离启动验收。
-构建产物的 SHA-256、用户数据目录和已知未完成门禁见 [`ADR-082`](../docs/decisions/ADR-082-exe-build-evidence.md)。
-这不等于正式分发完成：签名、升级/回滚、中心 HTTPS 和真实部署数据恢复仍需单独验收。
+当前 checkout 已按锁文件安装 PyInstaller 6.22.0，并完成 v13 `--onedir` EXE 构建、隔离启动及升级/回滚验收。
+构建产物的 SHA-256、用户数据目录和已知未完成门禁见 [`ADR-091`](../docs/decisions/ADR-091-exe-v13-rebuild-evidence.md)。
+这不等于正式分发完成：签名、中心 HTTPS 和真实部署数据恢复仍需单独验收。
 
 ## 团队分享
 

@@ -20,7 +20,7 @@
 | 自动 Provider usage / Gateway | 条件通过 | Gateway、SSE usage、Usage Ingest、DPAPI 重试队列、运行时队列故障 fail-closed、动态中心端口只读发现、响应读取/幂等键/非回环 HTTPS 门禁已完成（ADR-058/059/068/075）；仍需用户本人合法 Provider Key 做一次非流式/流式联调 |
 | Web UI-1/UI-2 | pass（源码/本机视觉） | v13 场景、ADR-074 可见度基线、ADR-090 场景资产决策、显式主图层、动效和首帧可读性已在临时源码实例复核；v12/v11/v10/v9/v8 保留回滚 |
 | Web UI-3 | in progress | 登录页四档观察、认证页 v23 唯一语义 h1/aria-hidden glitch 层、隔离合法会话下 Dashboard/Admin 空态、成员脱敏日志详情、动态错误 alert/status 播报、四档 viewport/焦点回流、历史非空、服务端 CSV 200、Provider 502 错误态和个人 Activity 写入切片已有源码/隔离证据；真实设备指标、浏览器下载落盘、真实 Provider 成功、reduced-motion/高对比度环境仍待证据 |
-| EXE | conditional | PyInstaller 6.22.0 已锁定并按 v13 资源重建 onedir EXE/ZIP；v13 包 verifier、`/login`、`/api/v1/ready`、v13 资源 200、隔离 `%LOCALAPPDATA%` 建库和 EXE 目录无 data 已通过（ADR-087/089/091）；真实升级/回滚、签名和正式分发仍待验收 |
+| EXE | conditional | PyInstaller 6.22.0 已锁定并按 v13 资源重建 onedir EXE/ZIP；v13 包 verifier、`/login`、`/api/v1/ready`、v13 资源 200、隔离 `%LOCALAPPDATA%` 建库和 EXE 目录无 data 已通过；v12→v13→v12 真实 API 升级/回滚与记录保留已通过（ADR-087/089/091/092）；Authenticode 签名和正式分发仍待验收 |
 | Android APK | pending | 项目内 JDK 17、Gradle 9.5.0、command-line tools 和官方 Wrapper 已准备并由 doctor 识别；Android v13 背景与 SignalOrbit 已接入系统减少动画边界（ADR-079/090），API 37/Build Tools 因 SDK license 尚未交互确认仍 pending，APK/设备联调未验收（ADR-081） |
 | HTTPS 中心部署 | pending | 应用生产绑定已强制 loopback（ADR-061）；Caddy v2.11.4 已在项目缓存中完成 SHA-512、版本和示例配置 validate，配置预检与显式 edge 启动器已接入（ADR-083），正式域名、ACL、证书、日志轮转和外部 health/ready 检查仍需在部署主机完成 |
 | 备份恢复/回滚 | 条件通过 | 已填充隔离 EXE 数据库完成备份、`verify-backup`、`backup-inventory --verify` 和 staging 恢复二次校验，当前 schema（含 Usage Ingest Token）与防覆盖命名仍受门禁保护（ADR-060/077/088）；真实数据恢复、负责人确认的保留周期/离线副本和回滚记录仍待部署演练 |
