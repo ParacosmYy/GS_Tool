@@ -23,7 +23,7 @@
 - Android Studio：未发现。
 - Android SDK 环境变量：未发现；项目预留路径为 `android/.toolchain/android-sdk/`。
 
-因此当前可以编辑工程和 API 契约，但不能在这台机器上声称 APK 已成功编译。安装 Android Studio/JDK/Gradle/SDK 属于用户批准的环境变更；在批准前不下载或自动配置这些工具。安装 Android Studio 后，把 SDK 包安装到 `android/.toolchain/android-sdk/`；AGP 9.x 的官方兼容要求包括 JDK 17。Wrapper 配置已经把发行包路径放到 `android/.gradle/`，官方 Wrapper 文件尚未生成。
+因此当前可以编辑工程和 API 契约，但不能在这台机器上声称 APK 已成功编译。安装 Android Studio/JDK/Gradle/SDK 属于用户批准的环境变更；在批准前不下载或自动配置这些工具。安装 Android Studio 后，把 SDK 包安装到 `android/.toolchain/android-sdk/`；AGP 9.3.0 的官方兼容要求是 Gradle 9.5.0、JDK 17，最大支持 API 37。Wrapper 配置已经把发行包路径放到 `android/.gradle/`，官方 Wrapper 文件尚未生成。
 
 ## 建议安装顺序
 
@@ -89,3 +89,6 @@ Release HTTPS 构建门禁记录在 [`ADR-041`](decisions/ADR-041-android-releas
 - Android 应用架构：<https://developer.android.com/topic/architecture>
 - Compose Compiler Gradle Plugin：<https://developer.android.com/develop/ui/compose/setup-compose-dependencies-and-compiler>
 - Android Gradle Plugin 版本与兼容性：<https://developer.android.com/build/releases/about-agp>
+- AGP 9.3.0 发布说明与兼容矩阵：<https://developer.android.com/build/releases/agp-9-3-0-release-notes>
+- Compose BOM 版本管理：<https://developer.android.com/develop/ui/compose/bom>
+- Android 17 SDK / API 37 配置：<https://developer.android.com/about/versions/17/setup-sdk>

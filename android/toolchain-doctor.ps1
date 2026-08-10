@@ -39,8 +39,14 @@ function Resolve-Tool([string]$Name, [string]$HomeVariable, [string]$RelativePat
 
 $java = Resolve-Tool "java.exe" "JAVA_HOME" "bin\java.exe"
 $javac = Resolve-Tool "javac.exe" "JAVA_HOME" "bin\javac.exe"
-$jdkDetail = if ($java -and $javac) { "java/javac found" } else { "JDK 17 required; set JAVA_HOME or PATH" }
-Add-Check "JDK 17" ($java -and $javac) $jdkDetail
+$javaVersionOutput = if ($java) { (& $java -version 2>&1 | Out-String) } else { "" }
+$javaMajor = $null
+if ($javaVersionOutput -match 'version "(?<major>\d+)') {
+    $javaMajor = [int]$Matches['major']
+}
+$jdkReady = ($null -ne $java) -and ($null -ne $javac) -and $javaMajor -eq 17
+$jdkDetail = if ($jdkReady) { "JDK 17 java/javac found" } else { "JDK 17 required; set JAVA_HOME or PATH" }
+Add-Check "JDK 17" $jdkReady $jdkDetail
 
 $wrapper = Join-Path $androidRoot "gradlew.bat"
 $wrapperJar = Join-Path $androidRoot "gradle\wrapper\gradle-wrapper.jar"
@@ -50,6 +56,14 @@ $wrapperReady = (Test-Path -LiteralPath $wrapper -PathType Leaf) -and
     (Test-Path -LiteralPath $wrapperProperties -PathType Leaf)
 $wrapperDetail = if ($wrapperReady) { "project wrapper files are complete" } else { "approved Gradle environment must generate gradlew.bat and wrapper jar" }
 Add-Check "Gradle Wrapper" $wrapperReady $wrapperDetail
+$wrapperVersion = if (Test-Path -LiteralPath $wrapperProperties -PathType Leaf) {
+    Get-Content -LiteralPath $wrapperProperties -Raw
+} else {
+    ""
+}
+$wrapperVersionReady = $wrapperVersion -match 'gradle-9\.5\.0-bin\.zip'
+$wrapperVersionDetail = if ($wrapperVersionReady) { "Gradle 9.5.0 matches AGP 9.3.0 contract" } else { "Gradle 9.5.0 distribution is required by the pinned AGP 9.3.0" }
+Add-Check "Gradle 9.5.0 contract" $wrapperVersionReady $wrapperVersionDetail
 
 $sdkRoot = Join-Path $androidRoot ".toolchain\android-sdk"
 $platformJar = Join-Path $sdkRoot "platforms\android-37\android.jar"

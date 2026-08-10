@@ -15,6 +15,12 @@ Android 端与 `windows/` 中心服务使用同一个账号和 `/api/v1` 契约�
 
 这些版本以 2026-08-10 核对的 Android/Gradle 官方文档为依据；如果 Android Studio 提示稳定版升级，优先使用 IDE 的升级助手并同步修改版本说明。Wrapper 的发行包与缓存路径已指向项目内 `android/.gradle/`；Android SDK 预留在 `android/.toolchain/android-sdk/`。当前机器没有 JDK/Gradle/Android Studio，因此没有下载额外工具链，也没有声称 APK 已构建。
 
+官方版本依据：
+
+- [AGP 9.3.0 兼容性](https://developer.android.com/build/releases/agp-9-3-0-release-notes)：Gradle 9.5.0、JDK 17、API 37。
+- [Compose BOM 2026.06.00](https://developer.android.com/develop/ui/compose/bom)：Compose 依赖使用 BOM 统一版本。
+- [Android 17 SDK 配置](https://developer.android.com/about/versions/17/setup-sdk)：`compileSdk`/`targetSdk` 37 与 Build Tools 37 安装路径。
+
 ## 本机环境
 
 当前机器检查到 `adb`，但没有 JDK、Gradle、Android Studio 或 Android SDK，因此尚未执行 APK 编译验证。仓库目前只有 Wrapper 配置文件，没有伪造 `gradlew.bat` 或 `gradle-wrapper.jar`；待用户批准后，使用实际 Gradle 生成并验证它们，并把 SDK 包安装到 `.toolchain/android-sdk/`。安装顺序、用户批准门槛和官方链接见 [`windows/docs/android-development.md`](../windows/docs/android-development.md)。

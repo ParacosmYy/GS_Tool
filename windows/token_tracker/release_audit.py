@@ -158,6 +158,9 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/token_tracker/static/vendor/chart.umd.min.js",
         "windows/token_tracker/static/vendor/CHARTJS-LICENSE.txt",
         "android/app/src/main/AndroidManifest.xml",
+        "android/build.gradle.kts",
+        "android/app/build.gradle.kts",
+        "android/gradle/wrapper/gradle-wrapper.properties",
         "android/toolchain-doctor.ps1",
     )
     missing = [item for item in required if not (root / item).is_file()]
@@ -378,6 +381,11 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("web-scene-image-layer", "windows/token_tracker/templates/base.html", "story-backdrop-image"),
         ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v8"),
         ("scene-background-decision", "windows/docs/decisions/ADR-065-scene-background-v8.md", "embedded-rust-engineer-bg-v8.png"),
+        ("android-agp-version", "android/build.gradle.kts", "id(\"com.android.application\") version \"9.3.0\""),
+        ("android-kotlin-version", "android/build.gradle.kts", "id(\"org.jetbrains.kotlin.android\") version \"2.3.21\""),
+        ("android-gradle-version", "android/gradle/wrapper/gradle-wrapper.properties", "gradle-9.5.0-bin.zip"),
+        ("android-sdk-api-contract", "android/app/build.gradle.kts", "compileSdk = 37"),
+        ("android-compose-bom", "android/app/build.gradle.kts", "compose-bom:2026.06.00"),
         ("kimi-provider-presets", "windows/token_tracker/templates/dashboard.html", "kimi-code"),
         ("provider-response-projection", "windows/token_tracker/provider_service.py", "project_response"),
         ("usage-ingest-endpoint", "windows/token_tracker/api_v1.py", "/ingest/usage"),
