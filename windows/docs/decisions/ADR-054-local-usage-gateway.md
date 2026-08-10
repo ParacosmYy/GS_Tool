@@ -1,8 +1,8 @@
 # ADR-054：本地 OpenAI-compatible Usage Gateway
 
-**作者：** AI Token Tracker Engineering Team  
-**维护者：** Project Owner  
-**状态：** Accepted  
+**作者：** AI Token Tracker Engineering Team
+**维护者：** Project Owner
+**状态：** Accepted
 **日期：** 2026-08-10
 
 ## 背景
