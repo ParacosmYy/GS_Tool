@@ -32,6 +32,7 @@ ai-token-tracker/
 - [正式 HTTPS 部署](windows/deployment/README.md)
 - [Windows EXE 打包](windows/packaging/README.md)
 - [企业级架构](windows/docs/enterprise-architecture.md)
+- [发布就绪审计](windows/docs/release-readiness.md)
 - [交付任务与外部门禁](windows/tasks/todo.md)
 
 ## 重要边界

@@ -113,6 +113,7 @@ def exit_code(checks: Iterable[AuditCheck], strict: bool) -> int:
 def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
     required = (
         "README.md",
+        "windows/docs/release-readiness.md",
         "start.bat",
         "windows/.env.example",
         "windows/requirements.lock",
