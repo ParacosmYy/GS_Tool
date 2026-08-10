@@ -132,9 +132,10 @@
 
 ## 尚未关闭的门禁
 
-此前本证据只覆盖无需创建账户的登录运行时；v15 已补充隔离库内真实注册/登录后的 Dashboard/Admin
-运行时观察。连接 Provider、历史写入后的图表/记录、错误态、导出下载、完整键盘回归和真实设备指标
-仍需分别复核，不能把隔离 viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此继续保持进行中。
+此前本证据只覆盖无需创建账户的登录运行时；v15/v16/v17 已补充隔离库内真实注册/登录后的
+Dashboard/Admin 空态、动态错误播报、四档 viewport 和焦点回流观察。连接 Provider、历史写入后的
+图表/记录、导出下载、真实设备指标、实际 reduced-motion/高对比度环境仍需分别复核，不能把隔离
+viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此继续保持进行中。
 
 ## v10 场景可见度构图
 
@@ -200,3 +201,16 @@
 - Admin 明细加载保持 `role="status"`、`aria-live="polite"`，焦点进入关闭按钮；新增 `live-region.js`
   统一 Dashboard/Admin/Provider 的动态播报边界，详见 ADR-067。
 - 本切片仍未宣称 Provider 网络失败、导出下载、真实设备 reduced-motion 和完整四档焦点门禁通过。
+
+## v17 四档受保护页面回归
+
+- 使用同一隔离 SQLite 和短生命周期 `5019` 源服务，将 Dashboard/Admin 分别置于 320、768、1024、
+  1440 viewport；页面级 `scrollWidth` 均不超过 `clientWidth`：对应有效内容宽度为
+  `305/753/1009/1425`，四档均无横向溢出。
+- 四档 Dashboard 均只有一个 `h1`；Admin 四档均渲染 3 张表、3 个 caption，表格溢出保持在表格容器内。
+- Dashboard 四档 Tab 顺序均从跳过链接、品牌、导航/退出、主操作进入周期控件；320 档导航按窄屏规则隐藏，
+  不产生不可达的空焦点目标。
+- Admin 四档打开成员明细后焦点均进入 `admin-detail-close`，关闭后均回到原“查看”按钮；本次应用页面
+  `error/warning` 日志为空，viewport override 已在结束时重置。
+- 该证据覆盖隔离浏览器 viewport，不等同于真实设备指标；Provider 网络失败、导出下载、真实
+  reduced-motion/高对比度系统环境和历史非空数据仍保持未关闭门禁。

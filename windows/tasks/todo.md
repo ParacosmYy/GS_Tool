@@ -75,12 +75,13 @@
 - [x] Material 3 semantic color tokens and readable form controls
 - [x] pointer aura/ring、count-up、reveal、glitch、scanline
 - [x] 将动画从分散 CSS 规则收敛为可追踪的 motion state contract
-- [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛、注册页 heading 顺序和 v10 场景可见度；v15 已补隔离合法会话下 Dashboard/Admin、ARIA、焦点回流和 320/768 viewport 证据；真实设备指标、连接/历史/错误态/导出路径、完整四档焦点、对比度与 reduced-motion 仍待补齐）
+- [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛、注册页 heading 顺序和 v10 场景可见度；v15/v16/v17 已补隔离合法会话下 Dashboard/Admin、ARIA、动态错误播报、四档 viewport 和焦点回流证据；真实设备指标、连接/历史/导出路径、Provider 网络失败、对比度与 reduced-motion 真实环境仍待补齐）
 - [x] 背景品牌资产升级：v8 御姐二次元嵌入式工程师、MacBook Pro/Mac Studio 形态、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v7 及之前版本保留回滚
 - [x] loading/connection/empty 状态统一视觉组件
 - [x] UI-3 静态语义切片：单一仪表盘 h1、表格 scope/caption、管理员详情焦点回流和密码长度边界
 - [x] UI-3 v14/v15：Dashboard glitch 标题单次无障碍名称、隔离合法会话 Dashboard/Admin 空态/焦点/320/768 viewport 运行时证据
 - [x] UI-3 v16：共享 live-region 状态契约、Dashboard 错误/恢复播报和 Admin 正常状态运行时证据（ADR-067）
+- [x] UI-3 v17：Dashboard/Admin 320/768/1024/1440 viewport、无横向溢出、四档焦点和明细焦点回流运行时证据
 - [x] `token_tracker audit` 增加 Web UI 静态契约门禁：label、table caption/scope、图片 alt、跳过链接和动效降级（ADR-063）
 - [x] `token_tracker audit` 扩展代码/配置/文档文本 1000 行门禁，作者头仍按自有代码边界检查（ADR-064）
 - [x] UI-3 v14：Dashboard glitch 标题的装饰副本从无障碍树隔离，保留一次稳定可读标题
@@ -89,7 +90,7 @@
 
 - [x] UI-1 visual review
 - [x] UI-2 motion/performance review
-- [>] UI-3 responsive/accessibility review（登录/注册页语义顺序、Dashboard/Admin 隔离合法会话空态、焦点回流和 320/768 viewport 运行时观察已补齐；连接/历史/错误态/导出、完整四档焦点、真实设备指标、对比度与 reduced-motion 仍待补证）
+- [>] UI-3 responsive/accessibility review（登录/注册页语义顺序、Dashboard/Admin 隔离合法会话空态、动态错误播报、四档 viewport 和焦点回流已补齐；连接/历史/导出、Provider 网络失败、真实设备指标、对比度与 reduced-motion 真实环境仍待补证）
 - [x] frontend boundary review
 - [x] backend security/data review
 - [x] architect integration review
@@ -105,7 +106,7 @@
 ### Long-term completion audit
 
 - [>] Windows 安全/部署 B 阶段持续交付
-- [>] Web UI-3 四档响应式、焦点、ARIA、对比度和空状态独立证据（Dashboard/Admin 已有隔离合法会话证据；连接/历史/错误态/导出和真实设备仍待）
+- [>] Web UI-3 四档响应式、焦点、ARIA、对比度和空状态独立证据（Dashboard/Admin 四档与动态错误播报已有隔离证据；连接/历史/导出、Provider 网络失败和真实设备环境仍待）
 - [ ] Android JDK/Gradle/SDK 获批准后的构建、安装、设备联调和 APK
 - [>] HTTPS 中心部署、备份恢复演练、限流和脱敏访问日志：隔离 staging 恢复、应用/Werkzeug 日志脱敏已通过；正式 Caddy/HTTPS、生产 ACL/轮转、限流压测和真实数据恢复仍待执行
 - [ ] 架构师最终审计、回滚说明和正式交付归档
