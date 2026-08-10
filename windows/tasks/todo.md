@@ -33,6 +33,7 @@
 - [>] Android 登录、个人仪表盘、token 分页历史、结构化工作信号写入、最近活动历史和管理员只读观测台已接入；待工具链批准后编译联调
 - [x] Android 首屏背景资产、低干扰遮罩、Compose edge-to-edge 约束和 Rust/RL 工程师视觉主题已落地
 - [x] Web/Android 统一切换 v10 场景资产；端侧遮罩、漂移实现保持解耦，v9/v8 及之前版本保留回滚（ADR-076）
+- [x] Web/Android 场景 v11：御姐风嵌入式工程师、银色专业笔记本、独立桌面工作站与 Rust/RL 训练语义，左侧正文安全区和 v10 回滚已固化（ADR-080）
 - [x] Android 构建入口已固定项目内 SDK、Gradle 和 Android 用户缓存路径；未获批准不下载工具链
 - [x] Android 工具链契约已按官方兼容矩阵固定为 AGP 9.3.0、Gradle 9.5.0、JDK 17、API 37 和 Compose BOM 2026.06.00；只读 doctor 会校验版本，实际工具仍待批准
 - [ ] 用户批准工具链后完成 Android Studio/Gradle/SDK 编译、设备联调与 APK 产物验收
@@ -83,7 +84,7 @@
 - [x] pointer aura/ring、count-up、reveal、glitch、scanline
 - [x] 将动画从分散 CSS 规则收敛为可追踪的 motion state contract
 - [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛、注册页 heading 顺序和 v10 场景可见度；v15/v16/v17/v18 已补隔离合法会话下 Dashboard/Admin、ARIA、动态错误播报、四档 viewport、焦点回流、历史非空、服务端 CSV 200 和 Provider 502 错误态证据；真实设备指标、浏览器下载落盘、真实 Provider 成功、对比度与 reduced-motion 真实环境仍待补齐）
-- [x] 背景品牌资产升级：v10 御姐二次元嵌入式工程师、专业笔记本/银色桌面工作站形态、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v9/v8 及之前版本保留回滚（ADR-076）
+- [x] 背景品牌资产升级：v11 御姐二次元嵌入式工程师、专业笔记本/独立银色桌面工作站形态、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v10/v9/v8 及之前版本保留回滚（ADR-080）
 - [x] UI-1 v10 场景可见度调校：保留左侧正文安全区，提升右侧角色、笔记本、工作站与示波器辨识度（ADR-074/076）
 - [x] loading/connection/empty 状态统一视觉组件
 - [x] UI-3 静态语义切片：单一仪表盘 h1、表格 scope/caption、管理员详情焦点回流和密码长度边界

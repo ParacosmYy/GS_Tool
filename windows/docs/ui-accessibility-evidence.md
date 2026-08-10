@@ -309,3 +309,15 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `StaticSignalOrbit`；动态分支才创建 `rememberInfiniteTransition`，静态分支不启动无限循环。
 - 这一步是跨端源码和依赖方向证据，不冒充 Android 真机/模拟器运行证据；JDK、Gradle、SDK、系统
   设置和帧耗时仍需获批工具链完成。
+
+## v25 v11 场景背景资产与可读性升级
+
+- 当前默认场景已切换到 `embedded-rust-engineer-bg-v11.png`，Android 同步使用
+  `embedded_rust_engineer_bg_v11.png`；两端 SHA-256 均为
+  `48BDB3616CA209F4B6412051F6018C3A47E944D612E966D146EEB4C1DBB7E6A`。
+- v11 将成年御姐风嵌入式工程师、银色专业笔记本、独立紧凑桌面工作站和 Rust/RL 遥测屏幕收束到
+  右侧视觉层，左侧继续保留低细节深海军蓝正文安全区；图片无 Logo、无可读文案、无水印。
+- Web `scene-motion.css` 与 Android Compose 仅更新资源引用和装饰层亮度，不改变业务 API、认证、
+  数据库、网络状态或动效语义；v10/v9/v8 继续作为回滚资产。
+- 本轮已完成生成图静态检查、跨端字节哈希和源码契约更新；真实 320px/设备指标、系统
+  reduced-motion/高对比度与 APK 视觉验收仍保持 UI-3/Android 条件门禁。

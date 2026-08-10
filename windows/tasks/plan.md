@@ -227,6 +227,7 @@ normalization, validation, and aggregate refresh.
 
 - [x] Web 切换到 `embedded-rust-engineer-bg-v10.png`，保留 v9/v8 及之前版本作为回滚资产。
 - [x] Android Compose 切换到同一像素资产的 `embedded_rust_engineer_bg_v10.png`，端侧遮罩和漂移实现不互相耦合。
+- [x] v11 在 B25 中替换为当前默认，v10/v9/v8 继续作为跨端回滚资产。
 - [x] 两端资源 SHA-256 一致，资源引用、注释和视觉规范同步。
 - [>] Web v8 四档浏览器证据和 Android 编译/设备视觉验收仍分别等待 CDP 与 Android 工具链门禁。
 
@@ -350,6 +351,16 @@ content 复制层参与语义名称。
 - [x] 新增独立 `MotionPreferences.kt`，集中读取 Android 动画缩放设置，不在 ViewModel/Repository 中读取平台配置。
 - [x] 品牌背景和 `SignalOrbit` 在减少动画时渲染静态分支，动态分支才创建无限过渡。
 - [x] ADR-079、Android README、UI-3 证据、发布矩阵、角色复核和发布审计引用已同步。
+
+### Task B25: Web/Android 场景资产 v11
+
+**目标：** 让登录页与仪表盘用一张成熟、可辨识且跨端一致的二次元嵌入式工程师场景表达 Rust/RL
+工作流，同时把正文可读性和回滚边界固化为资产契约。
+
+- [x] 生成 v11 宽屏场景：左侧低细节文案安全区，右侧成年工程师、银色专业笔记本和独立桌面工作站。
+- [x] Web/Android 使用同一 PNG 字节内容；v10/v9/v8 及更早资产继续保留回滚。
+- [x] 更新 `base.html`、`scene-motion.css`、Compose 图片引用、ADR-080 和静态审计。
+- [>] 真实四档浏览器、Android APK 和真实设备视觉验收仍由 UI-3/Android 工具链门禁关闭。
 - [>] JDK/Gradle/SDK、真机系统设置和帧耗时仍需批准工具链验证。
 
 ## 目标
@@ -418,6 +429,7 @@ API / 动画 / 设计 token 契约
 - [x] 鼠标跟随只提供空间反馈，不干扰点击和键盘。
 - [x] 桌面、平板、手机和 reduced-motion 状态均有静态可用内容。
 - [x] v10 场景资产强化成熟二次元嵌入式工程师、Rust/RL 屏幕语义、专业笔记本和银色桌面工作站；v9/v8 保留回滚（ADR-076）。
+- [x] v11 场景资产进一步明确御姐风工程师、专业笔记本、独立桌面工作站与左侧文案安全区；v10/v9/v8 保留回滚（ADR-080）。
 
 ### Phase 5：七槽位复核
 
@@ -442,7 +454,7 @@ API / 动画 / 设计 token 契约
 
 - [>] API、认证、RBAC、密钥、备份和部署安全按 B 阶段逐项验收。
 - [>] 外部自动采集：安全 ingest API、本地 Gateway 和 DPAPI 跨重启重试已完成；真实 provider 联调仍需合法 Key。
-- [>] UI-3 已完成登录页、v8/v9/v10 场景合成、首帧可读性和隔离空 schema 下仪表盘/管理员页的本地观察；真实 320px 设备指标及合法会话的焦点、错误态、导出和 API 失败路径仍待完成。
+- [>] UI-3 已完成登录页、v8/v9/v10/v11 场景合成、首帧可读性和隔离空 schema 下仪表盘/管理员页的本地观察；真实 320px 设备指标及合法会话的焦点、错误态、导出和 API 失败路径仍待完成。
 - [ ] Android 工具链获批准后完成可复现构建、安装、设备联调和 APK 产物校验。
 - [>] 隔离 staging 恢复、应用/Werkzeug 访问日志脱敏和只读 Caddy edge preflight 已完成；正式 HTTPS/Caddy validate、生产 ACL/轮转、限流负载证据、真实数据恢复和回滚流程仍待部署演练。
 - [x] 当前 checkout 已建立本地 `main` Git 基线；敏感数据忽略边界已用真实路径验证，远程仓库与上传仍未启用（ADR-036）。

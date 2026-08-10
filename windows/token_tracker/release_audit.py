@@ -137,6 +137,7 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/docs/decisions/ADR-077-backup-inventory-retention.md",
         "windows/docs/decisions/ADR-078-personal-launcher-loopback.md",
         "windows/docs/decisions/ADR-079-android-motion-preference.md",
+        "windows/docs/decisions/ADR-080-scene-background-v11.md",
         "windows/docs/decisions/ADR-075-gateway-center-discovery.md",
         "windows/docs/decisions/ADR-071-release-doctor-composition.md",
         "windows/docs/decisions/ADR-072-web-activity-signal-boundary.md",
@@ -403,10 +404,10 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("android-motion-policy", "android/app/src/main/java/com/aitokentracker/ui/MotionPreferences.kt", "rememberReducedMotion"),
         ("android-motion-backdrop", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "StaticBrandBackdrop"),
         ("android-motion-orbit", "android/app/src/main/java/com/aitokentracker/ui/SignalOrbit.kt", "StaticSignalOrbit"),
-        ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v10.png"),
+        ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v11.png"),
         ("web-scene-image-layer", "windows/token_tracker/templates/base.html", "story-backdrop-image"),
-        ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v10"),
-        ("scene-background-decision", "windows/docs/decisions/ADR-076-scene-background-v10.md", "embedded-rust-engineer-bg-v10.png"),
+        ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v11"),
+        ("scene-background-decision", "windows/docs/decisions/ADR-080-scene-background-v11.md", "embedded-rust-engineer-bg-v11.png"),
         ("scene-visibility-decision", "windows/docs/decisions/ADR-074-scene-visibility-tuning.md", "scene-motion.css"),
         ("write-budget-decision", "windows/docs/decisions/ADR-066-per-user-write-budgets.md", "allow_user_write(resource, user_id)"),
         ("android-agp-version", "android/build.gradle.kts", "id(\"com.android.application\") version \"9.3.0\""),
@@ -642,17 +643,17 @@ def _check_deployment_contract(root: Path, checks: list[AuditCheck]) -> None:
 
 
 def _check_scene_assets(root: Path, checks: list[AuditCheck]) -> None:
-    web_asset = root / "windows/token_tracker/static/assets/embedded-rust-engineer-bg-v10.png"
-    android_asset = root / "android/app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v10.png"
+    web_asset = root / "windows/token_tracker/static/assets/embedded-rust-engineer-bg-v11.png"
+    android_asset = root / "android/app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v11.png"
     if not web_asset.is_file() or not android_asset.is_file():
-        checks.append(AuditCheck("cross-platform-scene", FAIL, "v10 Web/Android 资产不完整"))
+        checks.append(AuditCheck("cross-platform-scene", FAIL, "v11 Web/Android 资产不完整"))
         return
     web_hash = _sha256(web_asset)
     android_hash = _sha256(android_asset)
     if web_hash != android_hash:
-        checks.append(AuditCheck("cross-platform-scene", FAIL, "v10 Web/Android SHA-256 不一致"))
+        checks.append(AuditCheck("cross-platform-scene", FAIL, "v11 Web/Android SHA-256 不一致"))
         return
-    checks.append(AuditCheck("cross-platform-scene", PASS, f"v10 SHA-256 一致 {web_hash[:12]}…"))
+    checks.append(AuditCheck("cross-platform-scene", PASS, f"v11 SHA-256 一致 {web_hash[:12]}…"))
 
 
 def _check_chartjs_asset(root: Path, checks: list[AuditCheck]) -> None:

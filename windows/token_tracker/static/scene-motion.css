@@ -50,13 +50,13 @@ body {
   pointer-events: none;
   isolation: isolate;
   opacity: 1;
-  background-image: url("/static/assets/embedded-rust-engineer-bg-v10.png");
+  background-image: url("/static/assets/embedded-rust-engineer-bg-v11.png");
   background-position: calc(40% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
   background-size: cover;
   background-repeat: no-repeat;
   /* Keep the scene legible behind the glass panels. The image carries the
      product story, so it must not be treated as an almost-black texture. */
-  filter: saturate(1.18) contrast(1.08) brightness(1.1);
+  filter: saturate(1.14) contrast(1.06) brightness(1.08);
   will-change: background-position;
   transition: opacity .8s var(--ui-ease);
 }
@@ -88,7 +88,7 @@ body {
     /* The left editorial column keeps a calm contrast floor; the right
        workstation remains visible so the character and hardware read as
        intentional product identity instead of a hidden wallpaper. */
-    linear-gradient(90deg, rgba(8, 9, 12, .97) 0%, rgba(8, 9, 12, .84) 22%, rgba(8, 9, 12, .44) 46%, rgba(8, 9, 12, .12) 70%, rgba(8, 9, 12, .025) 100%),
+    linear-gradient(90deg, rgba(8, 9, 12, .985) 0%, rgba(8, 9, 12, .88) 23%, rgba(8, 9, 12, .5) 47%, rgba(8, 9, 12, .15) 70%, rgba(8, 9, 12, .025) 100%),
     linear-gradient(180deg, rgba(8, 9, 12, .3), transparent 36%, rgba(8, 9, 12, .38));
 }
 
@@ -98,9 +98,9 @@ body {
   inset: 0;
   content: "";
   background:
-    radial-gradient(circle at 80% 27%, rgba(217,255,120,.12), transparent 22%),
-    radial-gradient(circle at 65% 68%, rgba(196,192,255,.1), transparent 30%),
-    linear-gradient(112deg, transparent 38%, rgba(217,255,120,.055) 48%, transparent 58%);
+    radial-gradient(circle at 75% 22%, rgba(217,255,120,.1), transparent 22%),
+    radial-gradient(circle at 68% 68%, rgba(196,192,255,.1), transparent 31%),
+    linear-gradient(112deg, transparent 38%, rgba(217,255,120,.045) 48%, transparent 58%);
   mix-blend-mode: screen;
   background-size: auto, auto, 210% 100%;
   animation: backdrop-glow 16s ease-in-out infinite alternate, backdrop-scan 13s linear infinite;
@@ -136,7 +136,7 @@ body::after {
   .story-backdrop-image { object-position: 60% 50%; }
   .story-backdrop::before {
     background:
-      linear-gradient(90deg, rgba(8, 9, 12, .985) 0%, rgba(8, 9, 12, .86) 34%, rgba(8, 9, 12, .3) 72%, rgba(8, 9, 12, .08) 100%),
+      linear-gradient(90deg, rgba(8, 9, 12, .99) 0%, rgba(8, 9, 12, .9) 34%, rgba(8, 9, 12, .34) 72%, rgba(8, 9, 12, .08) 100%),
       linear-gradient(180deg, rgba(8, 9, 12, .34), transparent 36%, rgba(8, 9, 12, .46));
   }
 }
@@ -152,7 +152,7 @@ body::after {
   .story-backdrop-image { object-position: 86% 50%; }
   .story-backdrop::before {
     background:
-      linear-gradient(90deg, rgba(8, 9, 12, .99) 0%, rgba(8, 9, 12, .9) 42%, rgba(8, 9, 12, .42) 78%, rgba(8, 9, 12, .14) 100%),
+      linear-gradient(90deg, rgba(8, 9, 12, .995) 0%, rgba(8, 9, 12, .92) 42%, rgba(8, 9, 12, .46) 78%, rgba(8, 9, 12, .14) 100%),
       linear-gradient(180deg, rgba(8, 9, 12, .42), transparent 34%, rgba(8, 9, 12, .58));
   }
 }
