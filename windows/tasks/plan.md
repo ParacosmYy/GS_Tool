@@ -363,7 +363,7 @@ API / 动画 / 设计 token 契约
 ### Phase 0：基线（已完成）
 
 - SQLite 本地持久化、CLI、Flask 登录和仪表盘可运行。
-- 根目录 `start.bat` / `run.py` 可直接启动体验。
+- 根目录 `start.bat` / `run.py` 可直接启动体验；根 `run.py` 只转发到 `windows/run.py`。
 - 已有 Moonshot 风格视觉基线、Material 3 语义 token、自动采集表单和 provider 模块。
 
 ### Phase 1：协作框架与工程规范（已完成）

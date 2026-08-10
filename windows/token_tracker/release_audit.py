@@ -125,6 +125,7 @@ def exit_code(checks: Iterable[AuditCheck], strict: bool) -> int:
 def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
     required = (
         "README.md",
+        "run.py",
         "windows/docs/release-readiness.md",
         "windows/docs/decisions/ADR-066-per-user-write-budgets.md",
         "windows/docs/decisions/ADR-067-live-region-state-contract.md",
@@ -393,6 +394,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
     """Verify that key decisions are wired into the current source tree."""
 
     references = (
+        ("root-python-entry", "run.py", "WINDOWS_ENTRYPOINT"),
         ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v10.png"),
         ("web-scene-image-layer", "windows/token_tracker/templates/base.html", "story-backdrop-image"),
         ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v10"),

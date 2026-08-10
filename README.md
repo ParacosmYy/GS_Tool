@@ -8,6 +8,8 @@
 
 在 Windows 上直接双击根目录的 `start.bat`。它会进入 `windows/`，准备项目虚拟环境，启动本地
 网页并自动打开浏览器；默认地址是 `http://127.0.0.1:5000`，若端口被占用会自动选择附近空闲端口。
+也可以使用已准备好的虚拟环境从根目录执行 `windows\.venv\Scripts\python.exe run.py`；根目录
+`run.py` 只是稳定转发入口，不复制 Web 业务逻辑。
 
 首次进入网页后注册账户；如果要把账户设为管理员，在 `windows/` 目录执行：
 
@@ -21,6 +23,7 @@
 ai-token-tracker/
 ├─ windows/   # Flask 服务、SQLite、CLI、Web UI、EXE 和部署配置
 ├─ android/   # Kotlin + Jetpack Compose 客户端
+├─ run.py     # 根目录 Python 体验入口，转发到 windows/run.py
 ├─ start.bat  # 根目录一键体验入口
 └─ README.md  # 本页总览
 ```

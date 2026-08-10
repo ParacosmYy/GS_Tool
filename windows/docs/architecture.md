@@ -40,7 +40,7 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 
 | 路径 | 责任 | 不负责什么 |
 |---|---|---|
-| `run.py` / `start.bat` | 本机一键体验；默认 5000 被占用时无副作用回退到可用端口 | 不承载业务逻辑、不终止已有进程 |
+| 根目录 `run.py` / `start.bat`、`windows/run.py` | 本机一键体验；根入口只转发到 Windows 组合根，默认 5000 被占用时无副作用回退到可用端口 | 根入口不承载业务逻辑、不终止已有进程 |
 | `token_tracker/cli.py` | CLI 参数和终端输出 | 不实现 SQL 统计细节 |
 | `token_tracker/backup.py` | SQLite 在线备份、只读验证、清单和保留策略检查 | 不自动删除备份、不读取业务行、不上传云端 |
 | `token_tracker/web.py` | HTTP 路由、登录会话、CSRF、安全头 | 不直接拼接业务 SQL、上游 URL 或 provider HTTP |
