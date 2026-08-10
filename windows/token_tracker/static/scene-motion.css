@@ -50,7 +50,7 @@ body {
   pointer-events: none;
   isolation: isolate;
   opacity: 1;
-  background-image: url("/static/assets/embedded-rust-engineer-bg-v11.png");
+  background-image: url("/static/assets/embedded-rust-engineer-bg-v12.png");
   background-position: calc(40% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
   background-size: cover;
   background-repeat: no-repeat;
@@ -145,11 +145,11 @@ body::after {
   /* Keep the decorative scene inside the narrow viewport; depth comes from
      background positioning, not an oversized fixed box that can widen the document. */
   .story-backdrop {
-    background-position: calc(86% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
+    background-position: calc(68% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
     background-size: auto 100%;
-    opacity: .78;
+    opacity: .66;
   }
-  .story-backdrop-image { object-position: 86% 50%; }
+  .story-backdrop-image { object-position: 68% 50%; }
   .story-backdrop::before {
     background:
       linear-gradient(90deg, rgba(8, 9, 12, .995) 0%, rgba(8, 9, 12, .92) 42%, rgba(8, 9, 12, .46) 78%, rgba(8, 9, 12, .14) 100%),

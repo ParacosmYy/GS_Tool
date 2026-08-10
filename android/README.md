@@ -87,8 +87,8 @@ android/
     ui/                       # Compose 壳和动效原语
     MotionPreferences.kt      # Android 系统减少动画策略边界
     ui/theme/                 # 颜色、字体、Material 主题
-  app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v11.png
-                            # 嵌入式 Rust/RL 工程师与 Pro 工作站品牌背景（v11）
+  app/src/main/res/drawable-nodpi/embedded_rust_engineer_bg_v12.png
+                            # 嵌入式 Rust/RL 工程师与 Pro 工作站品牌背景（v12）
   .toolchain/jdk-17/       # 项目内 JDK 17（忽略，不提交）
   .toolchain/gradle-9.5.0/ # 项目内 Gradle 发行包（忽略，不提交）
   .toolchain/android-sdk/  # command-line tools/SDK（忽略，不提交）

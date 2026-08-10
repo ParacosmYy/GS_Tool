@@ -227,6 +227,23 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
     max-width: 100%;
     min-width: 0;
   }
+  /* A flex column removes the grid's intrinsic second-track width on narrow
+     devices; this keeps the card and fields inside the 15px page gutter. */
+  .auth-shell, .auth-shell-reverse {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+    padding-top: 34px;
+  }
+  .auth-intro, .auth-card, .auth-card form, .stack-form, .intro-copy, .feature-lines {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .intro-copy { overflow-wrap: anywhere; word-break: break-word; }
   .display-title { font-size: clamp(60px, 18vw, 92px); }
   .intro-copy { max-width: 100%; overflow-wrap: anywhere; font-size: 13px; }
   .scene-signature { gap: 7px; max-width: 100%; font-size: 9px; letter-spacing: .07em; white-space: normal; flex-wrap: wrap; }

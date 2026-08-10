@@ -2,7 +2,7 @@
 
 **作者：** AI Token Tracker Engineering Team
 **维护者：** UI-1 / UI-2 / ARCH-2
-**状态：** Accepted
+**状态：** Superseded by ADR-086（v11 保留为回滚资产）
 **日期：** 2026-08-10
 **作用：** 固化最新 Web 与 Android 共享品牌场景资产的构图、可读性和回滚边界。
 

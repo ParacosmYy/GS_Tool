@@ -24,6 +24,13 @@ import { setupBackdropMotion, setupPointerFollower, setupSurfaceMotion } from ".
     input.addEventListener("focus", () => { scene.dataset.authFocus = "field"; });
     input.addEventListener("blur", () => { delete scene.dataset.authFocus; });
   });
+
+  const initialField = scene.querySelector('input[name="username"]');
+  if (finePointer && initialField && document.activeElement === document.body) {
+    // Desktop users keep the fast keyboard path, while preventScroll avoids
+    // mobile browsers moving the entire authentication scene to the field.
+    window.requestAnimationFrame(() => initialField.focus({ preventScroll: true }));
+  }
   if (!finePointer || reducedMotion) return;
 
   let frame = 0;

@@ -1,7 +1,7 @@
 # Android 客户端开发环境
 
 **作者：** AI Token Tracker Engineering Team  
-**状态：** Android 第一条联动竖切片已完成；项目内 v11 场景和命令行工具链已接入，SDK license/APK 门禁单独跟踪
+**状态：** Android 第一条联动竖切片已完成；项目内 v12 场景和命令行工具链已接入，SDK license/APK 门禁单独跟踪
 
 ## 选型
 
@@ -58,7 +58,7 @@ Gradle 配置阶段会拒绝 `http://` 或默认模拟器地址，Manifest 的 `
 - `TrackerRepository`：统一 access token 重试、refresh token 轮换和本地退出清理。
 - `TrackerViewModel`：恢复会话并驱动登录、刷新、错误和退出状态。
 - Compose UI：登录、普通成员 token 记录写入、今日汇总、管理员团队总览、趋势、模型占比、成员按需明细、空态与错误态。
-- 视觉资源：Windows 与 Android 共用的 `embedded-rust-engineer-bg-v11`，右侧为成年御姐气质、可爱但非性化的嵌入式 Rust/RL 工程师，手持银色专业笔记本，工作台放置独立紧凑银色桌面工作站、示波器与实验板，左侧保留仪表盘留白；两端都使用渐变遮罩保证文字可读性，Android 背景增加低幅度漂移动画，v10/v9/v8 及之前版本仍保留回滚，资产决策见 ADR-080。
+- 视觉资源：Windows 与 Android 共用的 `embedded-rust-engineer-bg-v12`，右侧为成年御姐气质、可爱但非性化的嵌入式 Rust/RL 工程师，手持银色专业笔记本，工作台放置独立紧凑银色桌面工作站，后方屏幕使用抽象 Rust/RL 遥测语义，左侧保留仪表盘留白；两端都使用渐变遮罩保证文字可读性，Android 背景增加低幅度漂移动画，v11/v10/v9/v8 及之前版本仍保留回滚，资产决策见 ADR-086。
 
 ## 项目内技能资料
 
