@@ -26,11 +26,20 @@ FORWARDED_CHAT_FIELDS = (
     "temperature",
     "top_p",
     "max_tokens",
+    "max_completion_tokens",
     "presence_penalty",
     "frequency_penalty",
     "response_format",
     "tools",
     "tool_choice",
+    "parallel_tool_calls",
+    "reasoning_effort",
+    "stream_options",
+    "seed",
+    "n",
+    "user",
+    "logprobs",
+    "top_logprobs",
 )
 
 
@@ -67,6 +76,7 @@ class ProviderAdapter(Protocol):
         payload: dict[str, Any],
         allowed_base_urls: list[str],
         allow_http: bool,
+        allow_stream: bool = False,
     ) -> ChatRequest: ...
 
     def list_models(
@@ -97,8 +107,9 @@ class OpenAICompatibleAdapter:
         payload: dict[str, Any],
         allowed_base_urls: list[str],
         allow_http: bool,
+        allow_stream: bool = False,
     ) -> ChatRequest:
-        return prepare_chat_request(payload, allowed_base_urls, allow_http)
+        return prepare_chat_request(payload, allowed_base_urls, allow_http, allow_stream=allow_stream)
 
     def list_models(
         self,
@@ -200,6 +211,8 @@ def prepare_chat_request(
     payload: dict[str, Any],
     allowed_base_urls: list[str],
     allow_http: bool = False,
+    *,
+    allow_stream: bool = False,
 ) -> ChatRequest:
     """Validate the browser contract and create a safe upstream payload."""
 
@@ -216,10 +229,13 @@ def prepare_chat_request(
         raise UsageValidationError("messages must be a non-empty list")
     if len(messages) > MAX_MESSAGES:
         raise UsageValidationError(f"messages must contain {MAX_MESSAGES} items or fewer")
-    if payload.get("stream"):
+    stream_value = payload.get("stream", False)
+    if not isinstance(stream_value, bool):
+        raise UsageValidationError("stream must be a boolean")
+    if stream_value and not allow_stream:
         raise UsageValidationError("当前代理先支持非流式请求，以便从响应 usage 自动记录")
 
-    request_payload: dict[str, Any] = {"model": model, "messages": messages, "stream": False}
+    request_payload: dict[str, Any] = {"model": model, "messages": messages, "stream": stream_value}
     for field in FORWARDED_CHAT_FIELDS:
         if field in payload:
             request_payload[field] = payload[field]

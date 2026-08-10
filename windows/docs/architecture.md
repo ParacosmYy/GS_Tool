@@ -56,6 +56,7 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 | `token_tracker/readiness.py` | liveness/readiness 之外的 SQLite 核心 schema 探针 | 不返回路径、表名、异常或业务数据 |
 | `token_tracker/mobile_auth.py` | access/refresh token digest、轮换和撤销 | 不把 bearer secret 写入数据库 |
 | `token_tracker/ingest_auth.py` | 外部用量采集 token 的签发、摘要解析、过期和撤销边界 | 不保存 provider Key、原始 prompt 或 token 原文 |
+| `token_tracker/gateway.py` | 本地 OpenAI-compatible `/v1/models`、chat JSON/SSE 转发和 usage 上报 | 不写中心 SQLite，不接受客户端 base URL/API Key，不承担 Anthropic/Responses 私有协议 |
 | `token_tracker/schema.py` | SQLite DDL、索引和加法式兼容迁移 | 不读取 request/session，不组合业务查询 |
 | `token_tracker/db.py` | SQLite 连接、事务、参数化查询和 CSV | 不处理 HTTP 请求 |
 | `token_tracker/rate_limit.py` | 限流策略、内存/SQLite 状态适配和哈希 key | 不读取 Flask session，不保存原始 IP、用户 ID 或 provider Key |
@@ -139,6 +140,19 @@ Android 通过 bearer 认证的 `POST /api/v1/records` 写入手动 token 记录
 4. token 支持到期与撤销，接口独立于浏览器 Cookie/CSRF；HTTPS、限流、字段预算和统一错误 envelope 仍由中心服务强制。
 5. 该边界不会观察 Kimi Code 等其他进程的网络流量；现有 stock 客户端仍需后续 wrapper/Gateway 适配才能实现自动上报。
 
+### 本地 Gateway 自动采集
+
+1. Gateway 作为独立本地进程启动，默认只绑定 loopback；provider Key、中心 ingest token 和可选
+   Gateway 访问令牌来自环境变量，不进入命令行参数或中心数据库。
+2. Kimi Code/OpenAI-compatible 客户端把 Base URL 改为 Gateway 的 `/v1` 地址；Gateway 忽略
+   客户端提供的 upstream 地址和 Key，使用启动配置的 allowlisted upstream 转发 `/models` 与
+   `/chat/completions`。
+3. 非流式响应直接返回有界的兼容 JSON；流式响应按 SSE 原样转发并在完成 chunk 解析 usage。
+4. 有效 usage 通过 `POST /api/v1/ingest/usage` 上报，使用客户端幂等键或 Gateway 生成的请求键；
+   上报失败不伪造 token，也不回滚已经完成的 provider 调用。
+5. Gateway 与中心服务是两个可独立替换的进程边界；后续重试队列和 Anthropic/Responses adapter
+   应作为独立切片实现，不在 `web.py` 增加厂商分支。
+
 Android 复用同一 application/provider service，但入口是 bearer 版本的
 `/api/v1/provider/models` 与 `/api/v1/proxy/chat/completions`。`data/remote`
 只解析助手文本、usage 摘要和记录投影，Compose 不接触原始 provider JSON、SQLite
@@ -160,7 +174,7 @@ Android 复用同一 application/provider service，但入口是 bearer 版本�
 
 - 新 provider：先增加 `ProviderAdapter` 实现并明确兼容契约，不在路由里堆厂商分支；OpenAI-compatible 的公共逻辑集中在 `providers.py`。
 - 页面 Key 只能在内存中复用；持久化 Key 或外部 gateway 必须新增认证/密钥隔离 ADR。
-- 外部客户端自动采集使用 `POST /api/v1/ingest/usage` 的 per-user token 边界；stock 客户端不能被网页凭空观察，后续 wrapper/Gateway 仍需遵守 ADR-004 与 ADR-053。
+- 外部客户端自动采集使用本地 Gateway + `POST /api/v1/ingest/usage` 的 per-user token 边界；stock 客户端不能被网页凭空观察，Gateway 演进必须遵守 ADR-004、ADR-053 与 ADR-054。
 - 新统计：进入对应 application/read-model 模块；个人 token 查询留在 `db.py`，管理员聚合进入 `admin_data.py`，避免跨角色 SQL 混在一起。
 - 前后端拆分：先保留本文档中的 API 契约，新增 CORS、跨域 CSRF 和独立会话方案后再拆服务。
 - 生产共享：使用 HTTPS 反向代理、Waitress/WSGI 服务、持久化数据卷和环境变量；不要使用 `debug=True`。
