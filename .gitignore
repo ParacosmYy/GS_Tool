@@ -17,6 +17,7 @@ windows/data/backups/
 windows/data/staging/
 windows/dist/
 windows/build/
+windows/release/
 windows/*.spec
 windows/packaging/*.log
 windows/deployment/Caddyfile

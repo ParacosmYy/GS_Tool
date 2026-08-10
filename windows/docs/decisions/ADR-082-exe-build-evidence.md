@@ -24,6 +24,7 @@ PyInstaller 的解包目录或 EXE 发布目录。团队共享仍然使用中心
 2. `packaging/build.ps1` 使用 `--specpath windows/build`，生成的 spec、build 和 dist 都属于忽略的
    构建状态，不进入 Git。构建脚本的输出和错误文本使用 Windows PowerShell 5 可稳定解析的 ASCII，
    避免旧版控制台对无 BOM UTF-8 脚本的误解析。
+   `packaging/package.ps1` 再把 onedir 目录打成带终端用户说明的 ZIP，发布目录同样属于忽略状态。
 3. 冻结 EXE 启动前由 `windows/run.py` 创建
    `%LOCALAPPDATA%\AITokenTracker\`，并将数据库默认指向该目录；源码运行仍使用项目 `data/`。
    用户显式注入的 `TOKEN_TRACKER_DB` 仍可用于批准的运维/隔离场景。
@@ -58,6 +59,9 @@ Set-Location windows
 - EXE 发布目录没有产生 `data/token_tracker.sqlite3`；测试进程停止后 5000/5011 原有服务未受影响。
 - PyInstaller warning 文件中未发现应用顶层模块缺失；其中 `pwd`、`grp`、`fcntl` 等是跨平台依赖的
   可选模块提示，不构成 Windows 运行失败证据。
+- `packaging/package.ps1 -Version 0.1.0` 已生成
+  `windows/release/AI-Token-Tracker-windows-x64-0.1.0.zip`；大小为 34,432,157 bytes，SHA-256 为
+  `78973D45A08206062F9A99EDC9004004BB8C630B717EA6ECFD417A95FEFFE0C6`，ZIP 清单包含 `README.txt`。
 
 ## 未完成门禁
 

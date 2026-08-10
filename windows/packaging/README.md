@@ -30,6 +30,15 @@ PyInstaller 模块/启动器是否存在，不执行 Python 导入、不下载�
 
 脚本会先按 `windows/requirements.lock` 和 `packaging/requirements-build.lock` 对齐运行时与构建依赖，生成 `windows/dist/AI-Token-Tracker/AI-Token-Tracker.exe`。首次启动会在 `%LOCALAPPDATA%\AITokenTracker\token_tracker.sqlite3` 创建持久化数据库，不会把数据写入 EXE 临时解包目录。PyInstaller 仍是独立的构建工具依赖，发布前必须在批准的构建环境中执行并审查版本。
 
+构建成功后可以生成同学直接解压使用的 ZIP：
+
+```powershell
+.\packaging\package.ps1 -Version 0.1.0
+```
+
+输出为 `windows/release/AI-Token-Tracker-windows-x64-0.1.0.zip`，内含 onedir 运行目录和终端用户
+`README.txt`。ZIP、EXE 和用户数据库都不提交 Git；签名和正式发布渠道仍需部署负责人另行验收。
+
 构建前必须检查：
 
 - `TOKEN_TRACKER_SECRET_KEY` 通过部署环境注入，不把真实密钥写进包。

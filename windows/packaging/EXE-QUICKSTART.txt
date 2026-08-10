@@ -1,0 +1,15 @@
+AI Token Tracker - Windows x64
+
+1. Extract this ZIP to a local folder.
+2. Double-click AI-Token-Tracker.exe.
+3. The browser opens at the local address printed by the program.
+4. Register or sign in. Personal data is stored at:
+   %LOCALAPPDATA%\AITokenTracker\token_tracker.sqlite3
+
+This package is a personal local experience. It is not the team center
+database. To let classmates share one administrator-owned database, deploy the
+Windows center website over HTTPS and give users that website URL instead.
+
+Do not place provider API keys in this file or in a command line. Use the
+in-app connection form; keys remain in the current request flow and are not
+stored in the SQLite usage ledger.
