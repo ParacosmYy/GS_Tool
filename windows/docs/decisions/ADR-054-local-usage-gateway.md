@@ -32,9 +32,9 @@ Kimi Code 官方文档说明其 API 提供 OpenAI-compatible Base URL
    allowlist、超时和响应上限约束；Gateway 仅把 provider Key 注入上游请求，不信任客户端传来的
    `base_url` 或 `api_key`。
 4. Gateway 从非流式响应或 SSE 完成 chunk 提取真实 usage。输入或输出缺失时不猜测、不上报；
-   上报使用中心 `X-AI-Tracker-Ingest-Token` 和请求级 `Idempotency-Key`。中心上报失败不篡改
-   已成功的 provider 响应，响应通过 `X-AI-Tracker-Usage` 暴露 `recorded`、`missing` 或
-   `report-failed` 状态。
+   上报使用中心 `X-AI-Tracker-Ingest-Token` 和请求级 `Idempotency-Key`。中心上报失败时进入
+   有界内存重试队列（不跨进程保存），响应通过 `X-AI-Tracker-Usage` 暴露 `recorded`、`missing`、
+   `queued` 或 `report-failed` 状态。
 5. Gateway 仅支持 OpenAI Chat Completions 协议；Anthropic Messages、OpenAI Responses 和
    供应商私有工具协议必须新增 adapter，不得在 Gateway 路由里猜测转换。
 
@@ -43,7 +43,7 @@ Kimi Code 官方文档说明其 API 提供 OpenAI-compatible Base URL
 - 优点：同学只需把 Kimi Code/OpenAI-compatible 客户端的 Base URL 改为本机 Gateway，真实
   provider Key 不离开本机；中心网站只接收用量事实。
 - 限制：每台使用外部客户端的电脑都要运行一个 Gateway；中心服务不能自动观察未经过 Gateway
-  的既有进程流量。首版上报失败不持久化队列，后续可靠性切片必须增加加密/脱敏的本地重试边界。
+  的既有进程流量。当前重试队列只覆盖进程存活期间的短暂故障，跨重启恢复仍需加密/脱敏的本地持久化边界。
 - 兼容：网页自己的代理仍使用原有 `/api/proxy/chat/completions`；Android 继续使用 bearer
   provider API；Gateway 是新增本地进程，不改变现有 API v1 成功字段。
 
@@ -53,6 +53,7 @@ Kimi Code 官方文档说明其 API 提供 OpenAI-compatible Base URL
 - Gateway 默认 loopback；显式 LAN/公网绑定没有访问令牌时启动失败。
 - 上游 URL 和中心 ingest URL 启动时校验 scheme、凭据、查询参数和资源路径；禁止重定向绕过。
 - SSE 解析只保留 bounded buffer 和 usage 摘要，响应大小超过上限即终止；不把 prompt 写入备注。
+- 重试队列只保留有界 usage DTO 和幂等键；达到容量/次数上限时明确失败，不静默丢弃或无限增长。
 - `stream=true` 时尽可能请求 `stream_options.include_usage=true`；没有最终 usage 就明确标记
   `missing`，不按字符或本地 tokenizer 估算。
 

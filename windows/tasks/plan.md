@@ -276,6 +276,12 @@ normalization, validation, and aggregate refresh.
 - [x] CLI 提供无密钥参数的启动方式，README 写明 Kimi Code/OpenAI-compatible 配置示例。
 - [>] 没有用户合法 provider Key 的真实上游调用仍不能伪造；持久化失败重试队列作为下一项可靠性切片。
 
+### Task B18: Gateway 上报可靠性
+
+- [x] 将 Usage Ingest HTTP 投递抽成独立 reporter，不让 Gateway 路由持有重试细节。
+- [x] 中心短暂失败时进入有界内存队列，使用原幂等键、退避和最大重试次数，不写 provider Key/prompt。
+- [>] 进程重启后的持久化恢复仍需单独设计加密/脱敏存储，未获密钥管理方案前不落盘。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。
@@ -364,7 +370,7 @@ API / 动画 / 设计 token 契约
 ### Phase 7：长线最终交付门禁（进行中）
 
 - [>] API、认证、RBAC、密钥、备份和部署安全按 B 阶段逐项验收。
-- [>] 外部自动采集：安全 ingest API 与本地 Gateway 已完成；Gateway 的持久化失败重试与真实 provider 联调仍未完成。
+- [>] 外部自动采集：安全 ingest API 与本地 Gateway 已完成；Gateway 的重试可靠性与真实 provider 联调仍未完成。
 - [>] UI-3 已完成 v5 登录页 320/768/1024/1440 独立浏览器证据、焦点、ARIA、对比度和横向溢出复核；v6 背景已接入但需在可用 CDP 后重拍四档证据，并完成仪表盘/管理员页面合法会话的空/错误态复核。
 - [ ] Android 工具链获批准后完成可复现构建、安装、设备联调和 APK 产物校验。
 - [>] 隔离 staging 恢复、应用/Werkzeug 访问日志脱敏和只读 Caddy edge preflight 已完成；正式 HTTPS/Caddy validate、生产 ACL/轮转、限流负载证据、真实数据恢复和回滚流程仍待部署演练。

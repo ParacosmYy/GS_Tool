@@ -154,6 +154,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("ingest-token-schema", "windows/token_tracker/schema.py", "usage_ingest_tokens"),
         ("local-gateway-route", "windows/token_tracker/gateway.py", "/v1/chat/completions"),
         ("local-gateway-cli", "windows/token_tracker/cli.py", "cmd_gateway"),
+        ("local-gateway-reporter", "windows/token_tracker/gateway_reporting.py", "UsageReporter"),
         ("chartjs-local-reference", "windows/token_tracker/templates/dashboard.html", "vendor/chart.umd.min.js"),
         ("chartjs-local-csp", "windows/token_tracker/web.py", "script-src 'self';"),
         ("caddy-log-retention", "windows/deployment/Caddyfile.example", "roll_keep 14"),

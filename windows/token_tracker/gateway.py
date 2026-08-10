@@ -24,6 +24,7 @@ from flask import Flask, Response, g, jsonify, request, stream_with_context
 import requests
 
 from . import ingest_auth, providers, request_ids
+from .gateway_reporting import UsageReporter
 
 
 GATEWAY_ACCESS_HEADER = "Authorization"
@@ -136,6 +137,11 @@ def create_gateway_app(config: GatewayConfig) -> Flask:
 
     app = Flask("token_tracker.gateway")
     app.config["MAX_CONTENT_LENGTH"] = config.maximum_request_bytes
+    app.extensions["usage_reporter"] = UsageReporter(
+        config.ingest_url,
+        config.ingest_token,
+        config.report_timeout,
+    )
 
     @app.before_request
     def guard_request() -> None:
@@ -167,7 +173,7 @@ def create_gateway_app(config: GatewayConfig) -> Flask:
     @app.post("/v1/chat/completions")
     @app.post("/chat/completions")
     def chat_completions() -> Any:
-        return _chat_completions(config)
+        return _chat_completions(config, app.extensions["usage_reporter"])
 
     return app
 
@@ -212,7 +218,7 @@ def _list_models(config: GatewayConfig) -> Any:
     return _json_body(body, _upstream_status(response.status_code))
 
 
-def _chat_completions(config: GatewayConfig) -> Any:
+def _chat_completions(config: GatewayConfig, reporter: UsageReporter) -> Any:
     """Proxy one JSON chat call and report authoritative usage afterward."""
 
     payload = request.get_json(silent=True)
@@ -232,7 +238,7 @@ def _chat_completions(config: GatewayConfig) -> Any:
             return _error("UPSTREAM_REDIRECT", "上游 provider 返回了被禁止的重定向", 502)
         return _decode_error_response(provider_response, config)
     if chat_request.payload.get("stream") is True:
-        return _stream_response(provider_response, chat_request.model, config)
+        return _stream_response(provider_response, chat_request.model, config, reporter)
     try:
         body = providers.decode_json_response(provider_response, config.maximum_response_bytes)
     except providers.ProviderResponseTooLarge:
@@ -242,6 +248,7 @@ def _chat_completions(config: GatewayConfig) -> Any:
     usage, input_tokens, output_tokens = providers.extract_usage(body)
     status = _usage_status(
         config,
+        reporter,
         usage,
         _response_model(body, chat_request.model),
         input_tokens,
@@ -313,21 +320,23 @@ def _request_idempotency_key() -> str:
 
 def _usage_status(
     config: GatewayConfig,
+    reporter: UsageReporter,
     usage: dict[str, Any] | None,
     model: str,
     input_tokens: Any,
     output_tokens: Any,
     idempotency_key: str,
 ) -> str:
-    if usage is None or _usage_count(input_tokens) is None or _usage_count(output_tokens) is None:
+    if usage is None:
         return "missing"
-    return _report_usage(config, model, input_tokens, output_tokens, idempotency_key)
+    return reporter.report(model, input_tokens, output_tokens, idempotency_key)
 
 
 def _stream_response(
     provider_response: requests.Response,
     requested_model: str,
     config: GatewayConfig,
+    reporter: UsageReporter,
 ) -> Response | tuple[Response, int]:
     """Pass through SSE while retaining only bounded usage metadata."""
 
@@ -361,6 +370,7 @@ def _stream_response(
                 usage, input_tokens, output_tokens = accumulator.usage_values()
                 final_status = _usage_status(
                     config,
+                    reporter,
                     usage,
                     accumulator.model or requested_model,
                     input_tokens,
@@ -455,62 +465,14 @@ def _advertised_size_exceeds(response: requests.Response, maximum_bytes: int) ->
         return False
 
 
-def _report_usage(
-    config: GatewayConfig,
-    model: str,
-    input_tokens: Any,
-    output_tokens: Any,
-    idempotency_key: str,
-) -> str:
-    """Report only validated usage facts; never send provider credentials onward."""
-
-    input_value = _usage_count(input_tokens)
-    output_value = _usage_count(output_tokens)
-    model_value = str(model or "").strip()
-    if input_value is None or output_value is None or not 1 <= len(model_value) <= 200:
-        return "report-failed"
-    try:
-        response = requests.post(
-            config.ingest_url,
-            headers={
-                ingest_auth.INGEST_TOKEN_HEADER: config.ingest_token,
-                "Idempotency-Key": idempotency_key,
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": model_value,
-                "input_tokens": input_value,
-                "output_tokens": output_value,
-                "note": "本地 Gateway 自动采集",
-            },
-            timeout=config.report_timeout,
-            allow_redirects=False,
-            stream=True,
-        )
-    except requests.RequestException:
-        return "report-failed"
-    try:
-        return "recorded" if response.status_code in {200, 201} else "report-failed"
-    finally:
-        response.close()
-
-
-def _usage_count(value: Any) -> int | None:
-    if isinstance(value, bool) or value is None:
-        return None
-    try:
-        parsed = int(str(value).strip())
-    except (TypeError, ValueError):
-        return None
-    return parsed if parsed >= 0 else None
-
-
 def _bounded_secret(value: Any, maximum: int, field_name: str) -> str:
     text = str(value or "").strip()
     if not text:
         raise GatewayConfigError(f"{field_name} is required")
     if len(text) > maximum:
         raise GatewayConfigError(f"{field_name} must be {maximum} characters or fewer")
+    if "\r" in text or "\n" in text:
+        raise GatewayConfigError(f"{field_name} must not contain line breaks")
     return text
 
 
@@ -520,6 +482,8 @@ def _optional_secret(value: Any, maximum: int, field_name: str) -> str | None:
         return None
     if len(text) > maximum:
         raise GatewayConfigError(f"{field_name} must be {maximum} characters or fewer")
+    if "\r" in text or "\n" in text:
+        raise GatewayConfigError(f"{field_name} must not contain line breaks")
     return text
 
 

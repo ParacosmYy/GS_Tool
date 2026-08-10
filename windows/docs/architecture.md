@@ -57,6 +57,7 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 | `token_tracker/mobile_auth.py` | access/refresh token digest、轮换和撤销 | 不把 bearer secret 写入数据库 |
 | `token_tracker/ingest_auth.py` | 外部用量采集 token 的签发、摘要解析、过期和撤销边界 | 不保存 provider Key、原始 prompt 或 token 原文 |
 | `token_tracker/gateway.py` | 本地 OpenAI-compatible `/v1/models`、chat JSON/SSE 转发和 usage 上报 | 不写中心 SQLite，不接受客户端 base URL/API Key，不承担 Anthropic/Responses 私有协议 |
+| `token_tracker/gateway_reporting.py` | Gateway Usage Ingest 同步投递、有界内存重试和退避 | 不保存 provider Key、prompt 或跨重启队列，不改变中心入账契约 |
 | `token_tracker/schema.py` | SQLite DDL、索引和加法式兼容迁移 | 不读取 request/session，不组合业务查询 |
 | `token_tracker/db.py` | SQLite 连接、事务、参数化查询和 CSV | 不处理 HTTP 请求 |
 | `token_tracker/rate_limit.py` | 限流策略、内存/SQLite 状态适配和哈希 key | 不读取 Flask session，不保存原始 IP、用户 ID 或 provider Key |
