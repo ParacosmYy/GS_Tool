@@ -37,7 +37,7 @@ HTTPS 生产模式分离，不会代替正式 HTTPS，也不会自动修改防�
 
 ## 正式 HTTPS
 
-启动前先执行只读生产预检：
+启动前先执行只读生产预检（只解析路径，不创建数据库文件或父目录）：
 
 ```powershell
 .\.venv\Scripts\python.exe -m token_tracker preflight --production

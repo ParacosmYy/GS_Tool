@@ -285,7 +285,8 @@ def cmd_preflight(args: argparse.Namespace) -> int:
     if args.production:
         os.environ["TOKEN_TRACKER_RUNTIME_MODE"] = "production"
     try:
-        settings = build_settings(db.get_db_path(args.db))
+        database = db.get_db_path(args.db, ensure_parent=False)
+        settings = build_settings(database)
         deployment_checks.assert_valid(settings, require_https=args.production)
     except (deployment_checks.DeploymentCheckError, RuntimeError, ValueError) as exc:
         print(f"部署预检失败：{exc}", file=sys.stderr)

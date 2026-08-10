@@ -22,6 +22,7 @@ Accepted
 - `--production` 进入 production mode，并要求 Secure Cookie、provider HTTPS allowlist
   和有效 Session Secret；
 - 检查数据库不在静态资源目录；
+- 预检只解析数据库路径，不创建数据库文件或其父目录；真正的初始化/服务启动流程才负责创建目录；
 - 只读环境和路径检查，不联网、不写数据库、不改防火墙、不创建云资源；
 - 失败返回非零退出码，消息不输出密钥或数据库内容。
 - `serve --production` 在创建 Flask 应用或启动 Waitress 前复用同一套 production 预检，不能绕过该门禁直接监听端口。

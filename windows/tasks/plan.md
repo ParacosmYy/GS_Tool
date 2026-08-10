@@ -193,6 +193,7 @@ normalization, validation, and aggregate refresh.
 
 - [x] 新增 `deployment_checks.py` 和 `preflight` CLI。
 - [x] production 预检强制 Secret、Secure Cookie、HTTPS provider allowlist 和数据库路径门禁。
+- [x] preflight 路径解析与初始化目录创建分离，预检保持无副作用。
 - [x] ADR-026、README 和部署说明已同步，不执行联网、部署或防火墙变更。
 
 ### Task B6: Android Release 传输安全门禁

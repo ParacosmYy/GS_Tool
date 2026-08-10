@@ -131,6 +131,9 @@ python -m token_tracker preflight
 python -m token_tracker preflight --production
 ```
 
+预检只解析配置和数据库路径，不会创建数据库文件或父目录；目录创建仅发生在显式初始化
+或启动服务流程中。
+
 局域网分享给同学（Windows 电脑作为中心服务和数据库宿主）：
 
 ```powershell

@@ -23,12 +23,17 @@ TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 MAX_IDEMPOTENCY_KEY_LENGTH = 160
 
 
-def get_db_path(path: str | os.PathLike[str] | None = None) -> Path:
-    """Return the configured database path and ensure its parent exists."""
+def get_db_path(
+    path: str | os.PathLike[str] | None = None,
+    *,
+    ensure_parent: bool = True,
+) -> Path:
+    """Resolve the database path, optionally creating its parent directory."""
 
     configured = path or os.getenv("TOKEN_TRACKER_DB") or DEFAULT_DB_PATH
     database_path = Path(configured).expanduser().resolve()
-    database_path.parent.mkdir(parents=True, exist_ok=True)
+    if ensure_parent:
+        database_path.parent.mkdir(parents=True, exist_ok=True)
     return database_path
 
 
