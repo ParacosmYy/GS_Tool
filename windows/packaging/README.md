@@ -23,13 +23,16 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\packaging\build.ps1
 ```
 
-脚本会先按 `windows/requirements.lock` 对齐运行时依赖，再在当前 `.venv` 中安装可选 PyInstaller，生成 `windows/dist/AI-Token-Tracker/AI-Token-Tracker.exe`。首次启动会在 `%LOCALAPPDATA%\AITokenTracker\token_tracker.sqlite3` 创建持久化数据库，不会把数据写入 EXE 临时解包目录。PyInstaller 目前仍是独立的构建工具依赖，发布前必须在批准的构建环境中单独审查版本。
+脚本会先按 `windows/requirements.lock` 和 `packaging/requirements-build.lock` 对齐运行时与构建依赖，生成 `windows/dist/AI-Token-Tracker/AI-Token-Tracker.exe`。首次启动会在 `%LOCALAPPDATA%\AITokenTracker\token_tracker.sqlite3` 创建持久化数据库，不会把数据写入 EXE 临时解包目录。PyInstaller 仍是独立的构建工具依赖，发布前必须在批准的构建环境中执行并审查版本。
 
 构建前必须检查：
 
 - `TOKEN_TRACKER_SECRET_KEY` 通过部署环境注入，不把真实密钥写进包。
 - provider allowlist、HTTPS、备份和 Windows 防火墙策略已经确定。
 - `dist/` 只作为构建产物，不提交 Git；源码体验入口仍是根目录 `start.bat`。
+- 构建环境允许访问已批准的 Python 包缓存；脚本不会使用未锁定的 PyInstaller 版本。
+
+当前 checkout 未安装 PyInstaller，因此只保留可复现构建脚本和锁文件，不能声称 EXE 已生成或验收通过。
 
 ## 团队分享
 

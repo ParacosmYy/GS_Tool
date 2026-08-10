@@ -235,6 +235,12 @@ normalization, validation, and aggregate refresh.
 - [x] 官方 Kimi Base URL、Key 隔离、协议和错误语义写入 README 与 ADR-048。
 - [>] 真实 `/models`/chat usage smoke 仍需用户本人合法 Key，不得在无授权时伪造或读取凭据。
 
+### Task B12: Windows EXE 构建工具链锁定
+
+- [x] PyInstaller 与 Windows 构建依赖拆到 `packaging/requirements-build.lock`，不再使用未锁定安装。
+- [x] EXE `--onedir` 资源收集、冻结数据目录和清理路径保护写入脚本与 ADR-049。
+- [>] 当前环境未安装 PyInstaller，正式 EXE 生成、启动、升级和签名仍待批准构建环境。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

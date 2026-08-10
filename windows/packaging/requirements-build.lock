@@ -1,0 +1,15 @@
+# Author: AI Token Tracker Engineering Team
+# Maintainer: Project Owner
+# Purpose: Pin the optional Windows EXE build toolchain separately from runtime dependencies.
+# Module: Delivery / packaging dependency boundary
+#
+# PyInstaller 6.22.0 was selected from the approved build environment's package
+# index. Transitive packages are pinned so a release build does not silently
+# change its freezer or hook behavior.
+altgraph==0.17.5
+packaging==26.3
+pefile==2024.8.26
+pyinstaller==6.22.0
+pyinstaller-hooks-contrib==2026.6
+pywin32-ctypes==0.2.3
+setuptools==84.0.0

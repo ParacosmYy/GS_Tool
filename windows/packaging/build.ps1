@@ -12,6 +12,7 @@ $ErrorActionPreference = "Stop"
 $windowsRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\")).Path
 $venvPython = Join-Path $windowsRoot ".venv\Scripts\python.exe"
 $runtimeRequirements = Join-Path $windowsRoot "requirements.lock"
+$buildRequirements = Join-Path $PSScriptRoot "requirements-build.lock"
 $distRoot = Join-Path $windowsRoot "dist"
 $buildRoot = Join-Path $windowsRoot "build"
 
@@ -21,16 +22,24 @@ if (-not (Test-Path -LiteralPath $venvPython)) {
 if (-not (Test-Path -LiteralPath $runtimeRequirements)) {
     throw "找不到 windows/requirements.lock。请先完成依赖锁定。"
 }
+if (-not (Test-Path -LiteralPath $buildRequirements)) {
+    throw "找不到 packaging/requirements-build.lock。请先完成构建工具锁定。"
+}
 
 if ($Clean) {
+    $normalizedRoot = [System.IO.Path]::GetFullPath($windowsRoot).TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
     foreach ($target in @($distRoot, $buildRoot)) {
         if (Test-Path -LiteralPath $target) {
+            $normalizedTarget = [System.IO.Path]::GetFullPath($target)
+            if (-not $normalizedTarget.StartsWith($normalizedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+                throw "拒绝清理工作区外路径：$normalizedTarget"
+            }
             Remove-Item -LiteralPath $target -Recurse -Force
         }
     }
 }
 
-& $venvPython -m pip install -r $runtimeRequirements pyinstaller
+& $venvPython -m pip install --disable-pip-version-check -r $runtimeRequirements -r $buildRequirements
 if ($LASTEXITCODE -ne 0) { throw "依赖安装失败。" }
 
 $entryPoint = Join-Path $windowsRoot "run.py"
