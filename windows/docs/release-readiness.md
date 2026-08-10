@@ -15,7 +15,7 @@
 | 范围 | 当前状态 | 证据/下一步 |
 | --- | --- | --- |
 | Windows 模块化单体、CLI、SQLite、Web、RBAC | pass（源码/本机运行） | `compileall`、CLI help、health、API/安全边界和架构文档已核对 |
-| 自动 Provider usage / Gateway | 条件通过 | Gateway、SSE usage、Usage Ingest、DPAPI 重试队列已完成；仍需用户本人合法 Provider Key 做一次非流式/流式联调 |
+| 自动 Provider usage / Gateway | 条件通过 | Gateway、SSE usage、Usage Ingest、DPAPI 重试队列、响应读取/幂等键/非回环 HTTPS 门禁已完成（ADR-058/059）；仍需用户本人合法 Provider Key 做一次非流式/流式联调 |
 | Web UI-1/UI-2 | pass（源码/本机视觉） | v7 场景、显式主图层、动效和首帧可读性截图已保存 |
 | Web UI-3 | in progress | 登录页 320/768/1024/1440 观察已完成；受保护页面合法会话、真实设备指标、焦点/错误/导出/API 失败路径仍待证据 |
 | EXE | pending | `packaging/toolchain-doctor.ps1` 当前明确等待 PyInstaller；批准环境需生成、启动、持久化、升级和签名验收 |

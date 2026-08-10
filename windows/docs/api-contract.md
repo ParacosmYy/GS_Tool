@@ -365,7 +365,8 @@ provider 请求在边界限制 API Key 4096 字符、Base URL 2048 字符、模�
 
 本地 Gateway 是独立进程，不使用浏览器会话，也不写中心 SQLite。它从启动环境变量读取固定的
 provider Key 和中心 Usage Ingest Token，并默认只绑定 loopback；非 loopback 监听必须配置独立的
-Gateway bearer token。客户端提供的 `base_url` 和 API Key 不会覆盖启动配置。
+Gateway bearer token，并且不能使用 `--allow-http`。客户端提供的 `base_url` 和 API Key 不会覆盖
+启动配置。
 
 Gateway 支持 OpenAI-compatible 模型发现、非流式 JSON 和流式 SSE。上游响应体在读取时仍受 2 MiB
 边界保护；上游响应读取中断会返回 `502 UPSTREAM_UNAVAILABLE`，不会落成未解释的服务端 500。上游

@@ -285,8 +285,6 @@ def list_ingest_tokens(
     user_id: int,
     path: str | os.PathLike[str] | None = None,
 ) -> list[dict[str, Any]]:
-    """Return per-model aggregates within one user-scoped half-open range."""
-
     """Return metadata only; token secrets are never reconstructable."""
 
     with db_session(path) as connection:

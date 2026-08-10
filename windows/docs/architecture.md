@@ -179,7 +179,7 @@ Android 复用同一 application/provider service，但入口是 bearer 版本�
 
 - 新 provider：先增加 `ProviderAdapter` 实现并明确兼容契约，不在路由里堆厂商分支；OpenAI-compatible 的公共逻辑集中在 `providers.py`。
 - 页面 Key 只能在内存中复用；持久化 Key 或外部 gateway 必须新增认证/密钥隔离 ADR。
-- 外部客户端自动采集使用本地 Gateway + `POST /api/v1/ingest/usage` 的 per-user token 边界；stock 客户端不能被网页凭空观察，Gateway 演进必须遵守 ADR-004、ADR-053 与 ADR-054。
+- 外部客户端自动采集使用本地 Gateway + `POST /api/v1/ingest/usage` 的 per-user token 边界；stock 客户端不能被网页凭空观察，Gateway 演进必须遵守 ADR-004、ADR-053、ADR-054、ADR-058 与 ADR-059。
 - 新统计：进入对应 application/read-model 模块；个人 token 查询留在 `db.py`，管理员聚合进入 `admin_data.py`，避免跨角色 SQL 混在一起。
 - 前后端拆分：先保留本文档中的 API 契约，新增 CORS、跨域 CSRF 和独立会话方案后再拆服务。
 - 生产共享：使用 HTTPS 反向代理、Waitress/WSGI 服务、持久化数据卷和环境变量；不要使用 `debug=True`。

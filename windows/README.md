@@ -237,6 +237,10 @@ Gateway 支持 `/v1/models`、非流式 Chat Completions 和 SSE 流式 Chat Com
 未上报记录。不要把 Gateway 绑定到公网或可信 LAN，除非另外配置
 `TOKEN_TRACKER_GATEWAY_ACCESS_TOKEN` 并使用 HTTPS 边缘保护。
 
+`--allow-http` 只允许与 loopback Gateway 一起使用；非 loopback 监听会在启动前拒绝该组合，避免把
+provider 调用链降级为明文共享服务。DPAPI 队列启动时还会校验行数、尝试次数和调度元数据，损坏或
+篡改会 fail-closed，不会静默重置队列。
+
 Gateway 允许省略 `Idempotency-Key`，会自动生成本次调用的唯一键；如果客户端提供该请求头，必须不
 超过 160 个字符且不能包含控制字符。非法幂等键会在调用 provider 前返回 `400`，不会静默替换成新键，
 以确保客户端重试仍能正确去重。上游响应读取中断会返回 `502`，上游重定向也会明确返回 `502`，不会

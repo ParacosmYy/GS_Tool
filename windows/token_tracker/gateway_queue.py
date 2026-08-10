@@ -12,6 +12,7 @@ from contextlib import contextmanager
 import ctypes
 from dataclasses import dataclass
 import json
+import math
 import os
 from pathlib import Path
 import sqlite3
@@ -74,6 +75,8 @@ class EncryptedUsageQueue:
         """Encrypt and append one report unless the bounded queue is full."""
 
         payload = _protect_payload(report)
+        attempt_value = _positive_bound(attempts, "attempts", 20)
+        scheduled_value = _finite_timestamp(next_attempt_at)
         with self._connection() as connection:
             row = connection.execute("SELECT COUNT(*) FROM gateway_usage_queue").fetchone()
             if row and int(row[0]) >= self._max_pending:
@@ -83,7 +86,7 @@ class EncryptedUsageQueue:
                 INSERT INTO gateway_usage_queue (attempts, next_attempt_at, payload)
                 VALUES (?, ?, ?)
                 """,
-                (_positive_bound(attempts, "attempts", 20), float(next_attempt_at), payload),
+                (attempt_value, scheduled_value, payload),
             )
             connection.commit()
         return True
@@ -104,10 +107,12 @@ class EncryptedUsageQueue:
             ).fetchone()
         if row is None:
             return None
+        attempts = _positive_bound(row[1], "attempts", 20)
+        scheduled = _finite_timestamp(row[2])
         return QueueItem(
             item_id=int(row[0]),
-            attempts=int(row[1]),
-            next_attempt_at=float(row[2]),
+            attempts=attempts,
+            next_attempt_at=scheduled,
             report=_decode_payload(bytes(row[3])),
         )
 
@@ -118,7 +123,7 @@ class EncryptedUsageQueue:
             row = connection.execute("SELECT MIN(next_attempt_at) FROM gateway_usage_queue").fetchone()
         if not row or row[0] is None:
             return None
-        return float(row[0])
+        return _finite_timestamp(row[0])
 
     def remove(self, item_id: int) -> None:
         """Delete an item only after delivery or an explicit terminal failure."""
@@ -130,6 +135,8 @@ class EncryptedUsageQueue:
     def reschedule(self, item_id: int, attempts: int, next_attempt_at: float) -> None:
         """Persist retry state before the worker waits or the process exits."""
 
+        attempt_value = _positive_bound(attempts, "attempts", 20)
+        scheduled_value = _finite_timestamp(next_attempt_at)
         with self._connection() as connection:
             connection.execute(
                 """
@@ -137,7 +144,7 @@ class EncryptedUsageQueue:
                 SET attempts = ?, next_attempt_at = ?
                 WHERE id = ?
                 """,
-                (_positive_bound(attempts, "attempts", 20), float(next_attempt_at), int(item_id)),
+                (attempt_value, scheduled_value, int(item_id)),
             )
             connection.commit()
 
@@ -169,9 +176,17 @@ class EncryptedUsageQueue:
             elif row[0] != QUEUE_SCHEMA_VERSION:
                 raise QueueStorageError("Gateway 队列保护版本不受支持")
             connection.commit()
-            rows = connection.execute("SELECT payload FROM gateway_usage_queue").fetchall()
+            count_row = connection.execute("SELECT COUNT(*) FROM gateway_usage_queue").fetchone()
+            count = int(count_row[0]) if count_row else 0
+            if count > self._max_pending:
+                raise QueueStorageError("Gateway 队列超过容量上限")
+            rows = connection.execute(
+                "SELECT attempts, next_attempt_at, payload FROM gateway_usage_queue ORDER BY id"
+            ).fetchall()
         for row in rows:
-            _decode_payload(bytes(row[0]))
+            attempts = _positive_bound(row[0], "attempts", 20)
+            _finite_timestamp(row[1])
+            _decode_payload(bytes(row[2]))
 
     @contextmanager
     def _connection(self) -> Iterator[sqlite3.Connection]:
@@ -301,6 +316,18 @@ def _positive_bound(value: int, field_name: str, maximum: int) -> int:
         raise QueueStorageError(f"{field_name} must be a positive integer") from exc
     if not 1 <= parsed <= maximum:
         raise QueueStorageError(f"{field_name} must be between 1 and {maximum}")
+    return parsed
+
+
+def _finite_timestamp(value: float) -> float:
+    """Normalize one retry timestamp and reject NaN/Infinity metadata."""
+
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError) as exc:
+        raise QueueStorageError("next_attempt_at must be a finite number") from exc
+    if not math.isfinite(parsed):
+        raise QueueStorageError("next_attempt_at must be a finite number")
     return parsed
 
 

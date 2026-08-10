@@ -94,6 +94,8 @@ def build_config(
         raise GatewayConfigError("gateway_token and ingest_token must be different")
     if not _is_loopback(host_value) and not gateway_value:
         raise GatewayConfigError("non-loopback gateway requires a separate gateway_token")
+    if not _is_loopback(host_value) and allow_http:
+        raise GatewayConfigError("non-loopback gateway requires HTTPS; --allow-http is loopback-only")
     try:
         ingest_endpoint = _normalize_ingest_url(ingest_url, allow_http)
         timeout_value = _positive_int(timeout, "timeout")

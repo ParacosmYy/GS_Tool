@@ -283,7 +283,8 @@ normalization, validation, and aggregate refresh.
 - [x] 中心短暂失败时进入有界内存队列，使用原幂等键、退避和最大重试次数，不写 provider Key/prompt。
 - [x] Windows 默认使用 DPAPI 加密 SQLite 队列，跨实例恢复保持原幂等键；启动时校验 schema 和全部 payload，无法解密时 fail closed。
 - [x] `--memory-only` 作为显式临时调试选项；默认路径、容量、尝试次数、payload 大小和源文件行数均有边界。
-- [x] ADR-056、架构模块表、README、角色复核、发布审计和隔离 restart smoke 已同步。
+- [x] Gateway 响应读取异常、重定向、幂等键控制字符、非回环 HTTP 和队列调度元数据完整性已补齐（ADR-058/059）。
+- [x] ADR-056/058/059、架构模块表、README、角色复核、发布审计和隔离 restart smoke 已同步。
 
 ## 目标
 
