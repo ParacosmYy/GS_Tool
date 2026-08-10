@@ -19,6 +19,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import subprocess
 from typing import Any, Iterable
 
 
@@ -627,7 +628,7 @@ def _check_external_tool_gates(root: Path, checks: list[AuditCheck]) -> None:
             "PyInstaller 可用" if pyinstaller_ready else "PyInstaller 未安装，等待批准构建环境",
         )
     )
-    gradle_ready = (root / "android/gradlew.bat").is_file() or shutil.which("gradle") is not None
+    gradle_ready = _gradle_runtime_available(root)
     java_ready = _java_runtime_available()
     sdk_root = _android_sdk_root(root)
     sdk_ready = bool(
@@ -664,15 +665,71 @@ def _check_external_tool_gates(root: Path, checks: list[AuditCheck]) -> None:
 
 
 def _java_runtime_available() -> bool:
-    """Detect a usable Java launcher without mutating PATH or installing tools."""
+    """Detect a JDK 17 launcher without mutating PATH or installing tools."""
 
-    if shutil.which("java"):
-        return True
+    java = _resolve_jdk_tool("java")
+    javac = _resolve_jdk_tool("javac")
+    if not java or not javac:
+        return False
+    try:
+        completed = subprocess.run(
+            [str(java), "-version"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    version_text = f"{completed.stdout}\n{completed.stderr}"
+    match = re.search(r'version\s+"(?P<major>\d+)', version_text)
+    return bool(match and match.group("major") == "17")
+
+
+def _resolve_jdk_tool(name: str) -> Path | None:
+    """Resolve one JDK launcher from PATH or JAVA_HOME without changing state."""
+
+    command = shutil.which(name)
+    if command:
+        return Path(command)
     java_home = os.getenv("JAVA_HOME", "").strip()
     if not java_home:
+        return None
+    launcher = Path(java_home) / "bin" / (f"{name}.exe" if os.name == "nt" else name)
+    return launcher if launcher.is_file() else None
+
+
+def _gradle_runtime_available(root: Path) -> bool:
+    """Accept only the pinned Gradle 9.5 wrapper or an equivalent CLI."""
+
+    wrapper_properties = root / "android/gradle/wrapper/gradle-wrapper.properties"
+    wrapper_ready = all(
+        path.is_file()
+        for path in (
+            root / "android/gradlew.bat",
+            root / "android/gradle/wrapper/gradle-wrapper.jar",
+            wrapper_properties,
+        )
+    )
+    if wrapper_ready:
+        try:
+            return "gradle-9.5.0-bin.zip" in wrapper_properties.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            return False
+    gradle = shutil.which("gradle")
+    if not gradle:
         return False
-    launcher = Path(java_home) / "bin" / ("java.exe" if os.name == "nt" else "java")
-    return launcher.is_file()
+    try:
+        completed = subprocess.run(
+            [gradle, "--version"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return bool(re.search(r"^Gradle\s+9\.5(?:\.\d+)?$", completed.stdout, re.MULTILINE))
 
 
 def _android_sdk_root(root: Path) -> Path | None:
