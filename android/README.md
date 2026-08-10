@@ -31,11 +31,15 @@ http://10.0.2.2:5000/api/v1
 
 实体手机不能使用 `10.0.2.2`，需要在登录页替换成 Windows 主机的局域网 HTTPS 地址。地址会保存在本机普通偏好设置中，密码、access token 和 refresh token 不会与它混存；更换服务地址会主动清除旧会话，避免把旧服务的令牌发到新服务。
 
-构建时也可以设置初始默认地址：
+Debug 构建时可以设置初始默认地址；Release 构建会在 Gradle 配置阶段拒绝 HTTP 地址：
 
 ```powershell
-gradle assembleDebug -PtrackerApiBaseUrl="https://your-host.example/api/v1"
+android\build-local.bat assembleDebug -PtrackerApiBaseUrl="http://10.0.2.2:5000/api/v1"
+android\build-local.bat assembleRelease -PtrackerApiBaseUrl="https://your-host.example/api/v1"
 ```
+
+Release 不允许使用默认的 `10.0.2.2` 或任意 `http://` 地址；这条门禁与 Manifest
+的 `usesCleartextTraffic=false` 双重生效，避免把开发配置误打进可分享 APK。
 
 开发 HTTP 仅为本机模拟器临时调试，发布版本必须 HTTPS；不要把真实 API Key 写进 `gradle.properties` 或 APK。
 

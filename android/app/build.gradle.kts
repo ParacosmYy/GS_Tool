@@ -8,9 +8,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-val trackerApiBaseUrl = providers.gradleProperty("trackerApiBaseUrl")
+val trackerApiBaseUrlRaw = providers.gradleProperty("trackerApiBaseUrl")
     .orElse("http://10.0.2.2:5000/api/v1")
     .get()
+val trackerApiBaseUrl = trackerApiBaseUrlRaw
     .replace("\\", "\\\\")
     .replace("\"", "\\\"")
 
@@ -33,6 +34,9 @@ android {
             manifestPlaceholders["allowCleartext"] = true
         }
         release {
+            check(trackerApiBaseUrlRaw.startsWith("https://", ignoreCase = true)) {
+                "Release 构建必须通过 -PtrackerApiBaseUrl 配置 HTTPS 服务地址"
+            }
             manifestPlaceholders["allowCleartext"] = false
             isMinifyEnabled = false
             proguardFiles(

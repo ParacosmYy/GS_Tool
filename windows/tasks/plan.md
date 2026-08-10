@@ -159,6 +159,12 @@ normalization, validation, and aggregate refresh.
 - [x] Web 管理员页面和 v1 管理员 API 都经过 Application 审计边界。
 - [x] `admin_data.py` 保留脱敏查询/投影职责，ADR-021 和架构模块表已同步。
 
+### Task A9: 统一个人与管理员有界 CSV 出口
+
+- [x] 新增 `csv_export.py`，以游标逐行消费固定列，统一 100,000 行/16 MiB 边界。
+- [x] 个人 Web/API/CLI 与管理员 Web/v1 导出复用同一序列化器，不返回部分文件。
+- [x] `EXPORT_TOO_LARGE`、拒绝审计、README、API 契约和 ADR-039/040 已同步。
+
 ### Task B1: 共享部署 Session Secret 安全门禁
 
 - [x] `settings.py` 区分 local/shared runtime mode，并对共享模式 fail-closed。
@@ -188,6 +194,12 @@ normalization, validation, and aggregate refresh.
 - [x] 新增 `deployment_checks.py` 和 `preflight` CLI。
 - [x] production 预检强制 Secret、Secure Cookie、HTTPS provider allowlist 和数据库路径门禁。
 - [x] ADR-026、README 和部署说明已同步，不执行联网、部署或防火墙变更。
+
+### Task B6: Android Release 传输安全门禁
+
+- [x] Debug 保留模拟器 HTTP 默认地址，Release Gradle 配置阶段强制 `https://`。
+- [x] Release Manifest 继续关闭明文流量，构建命令、工具链门禁和 ADR-041 已同步。
+- [>] APK 编译、安装和设备联调仍等待用户批准 JDK/Gradle/SDK 工具链。
 
 ## 目标
 

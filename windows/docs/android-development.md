@@ -34,7 +34,14 @@
 5. 在 `android/local.properties` 中由 IDE 写入本机 SDK 路径；此文件不提交。
 6. 连接实体设备或启动模拟器，先验证登录和只读仪表盘，再接入写入/同步能力。
 
-命令行构建统一使用 `android/build-local.bat assembleDebug`。该入口把 `GRADLE_USER_HOME`、`ANDROID_USER_HOME` 和 `ANDROID_SDK_ROOT` 指向 Android 项目目录，因此 Gradle 发行包、Maven 缓存、Android 元数据和 SDK 都能留在项目边界；Android Studio 的 Sync 仍需在工具链批准后单独核对其缓存策略。
+命令行构建统一使用 `android/build-local.bat assembleDebug`。该入口把 `GRADLE_USER_HOME`、`ANDROID_USER_HOME` 和 `ANDROID_SDK_ROOT` 指向 Android 项目目录，因此 Gradle 发行包、Maven 缓存、Android 元数据和 SDK 都能留在项目边界；Android Studio 的 Sync 仍需在工具链批准后单独核对其缓存策略。Release 必须显式传入 HTTPS 地址：
+
+```powershell
+android\build-local.bat assembleRelease -PtrackerApiBaseUrl="https://your-host.example/api/v1"
+```
+
+Gradle 配置阶段会拒绝 `http://` 或默认模拟器地址，Manifest 的 `usesCleartextTraffic=false`
+继续作为运行时第二道门禁；Debug 才允许本机模拟器 HTTP。
 
 ## 当前已完成的 Android 联动
 
@@ -62,6 +69,8 @@ Android 官方技能资料安装在 `android/skills/`，只服务本项目，不
 - Android 手动 token 记录通过 `/api/v1/records` 写入，并可通过同一路径分页读取；服务端固定 `source=android`，成功后重新读取 `/me/summary`，不在客户端自行计算汇总。
 
 端点输入与会话切换的取舍记录在 [`ADR-010`](decisions/ADR-010-android-endpoint-configuration.md)。
+
+Release HTTPS 构建门禁记录在 [`ADR-041`](decisions/ADR-041-android-release-https-gate.md)。
 
 管理员只读边界、字段投影和按需加载策略记录在 [`ADR-011`](decisions/ADR-011-android-admin-readonly.md)。
 
