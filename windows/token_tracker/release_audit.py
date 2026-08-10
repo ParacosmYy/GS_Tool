@@ -22,6 +22,7 @@ PASS = "pass"
 PENDING = "pending"
 FAIL = "fail"
 SOURCE_EXTENSIONS = frozenset({".bat", ".css", ".html", ".js", ".json", ".kt", ".py", ".ps1", ".xml"})
+EXPECTED_CHARTJS_SHA256 = "206B6E8BB00FC7BBA2C7EE80CA41DB3E9E05BA7BE0AA35ABEBA9CFD5357F5D0E"
 
 
 @dataclass(frozen=True)
@@ -48,6 +49,7 @@ def run_audit(root: Path | None = None) -> list[AuditCheck]:
     _check_contract_references(project_root, checks)
     _check_source_line_cap(project_root, checks)
     _check_scene_assets(project_root, checks)
+    _check_chartjs_asset(project_root, checks)
     _check_runtime_dependencies(checks)
     _check_external_tool_gates(project_root, checks)
     return checks
@@ -178,6 +180,20 @@ def _check_scene_assets(root: Path, checks: list[AuditCheck]) -> None:
         checks.append(AuditCheck("cross-platform-scene", FAIL, "v6 Web/Android SHA-256 不一致"))
         return
     checks.append(AuditCheck("cross-platform-scene", PASS, f"v6 SHA-256 一致 {web_hash[:12]}…"))
+
+
+def _check_chartjs_asset(root: Path, checks: list[AuditCheck]) -> None:
+    """Pin the vendored chart runtime to the reviewed release artifact."""
+
+    asset = root / "windows/token_tracker/static/vendor/chart.umd.min.js"
+    if not asset.is_file():
+        checks.append(AuditCheck("chartjs-supply-chain", FAIL, "本地 Chart.js 资源缺失"))
+        return
+    actual = _sha256(asset)
+    if actual != EXPECTED_CHARTJS_SHA256:
+        checks.append(AuditCheck("chartjs-supply-chain", FAIL, "Chart.js SHA-256 与 ADR-051 不一致"))
+        return
+    checks.append(AuditCheck("chartjs-supply-chain", PASS, f"Chart.js 4.4.7 SHA-256 {actual[:12]}…"))
 
 
 def _check_runtime_dependencies(checks: list[AuditCheck]) -> None:

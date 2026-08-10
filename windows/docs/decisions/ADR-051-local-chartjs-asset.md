@@ -14,6 +14,9 @@
 - 固定当前已验证的 Chart.js `4.4.7` UMD 构建到
   `windows/token_tracker/static/vendor/chart.umd.min.js`，页面通过 Flask static URL 使用，运行时
   不再请求 `cdn.jsdelivr.net`。
+- 当前构建资产 SHA-256 固定为
+  `206B6E8BB00FC7BBA2C7EE80CA41DB3E9E05BA7BE0AA35ABEBA9CFD5357F5D0E`；只读发布审计会拒绝不一致
+  的 vendor 文件。
 - 与该资产一起提交 MIT 许可证文件；升级 Chart.js 必须重新核对 API、许可证、SHA-256、浏览器证据和
   发布审计，不允许直接替换未记录版本。
 - `charts.js` 继续只消费全局 `Chart`，业务数据、API 请求、空态和可读文本不迁移到 vendor 资产。

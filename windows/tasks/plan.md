@@ -250,6 +250,7 @@ normalization, validation, and aggregate refresh.
 ### Task B14: 本地 Chart.js 供应链边界
 
 - [x] 固定 Chart.js 4.4.7 UMD 构建与 MIT 许可证到 Web 静态目录，移除核心图表对 CDN 的运行时依赖。
+- [x] 将 vendor SHA-256 固定到 ADR-051 和只读发布审计，防止静态资源漂移。
 - [x] CSP `script-src` 收敛为 self，空态错误提示改为本地静态资源语义。
 - [>] 浏览器 CDP 仍需复核图表真实渲染、空态和 reduced-motion。
 
