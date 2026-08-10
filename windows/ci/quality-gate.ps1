@@ -19,10 +19,16 @@ $ErrorActionPreference = "Stop"
 
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\")).Path
 $windowsRoot = Join-Path $repositoryRoot "windows"
-$python = if ([string]::IsNullOrWhiteSpace($PythonPath)) {
-    (Get-Command python -CommandType Application -ErrorAction Stop).Source
-} else {
+$python = if (-not [string]::IsNullOrWhiteSpace($PythonPath)) {
     (Resolve-Path -LiteralPath $PythonPath).Path
+} else {
+    $projectPython = Join-Path $windowsRoot ".venv\Scripts\python.exe"
+    if (Test-Path -LiteralPath $projectPython -PathType Leaf) {
+        (Resolve-Path -LiteralPath $projectPython).Path
+    } else {
+        $pythonCommand = @(Get-Command python -CommandType Application -ErrorAction Stop | Select-Object -First 1)
+        $pythonCommand.Source
+    }
 }
 
 if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
