@@ -44,7 +44,7 @@ PyInstaller 模块/启动器是否存在，不执行 Python 导入、不下载�
 团队分享需要在 Windows 中心机运行：
 
 ```powershell
-python -m token_tracker serve --host 0.0.0.0 --port 5000 --production
+python -m token_tracker serve --host 127.0.0.1 --port 5000 --production
 ```
 
-正式环境请放在 HTTPS 反向代理后，并为同学提供网站地址；不要直接把 Flask development server 暴露到公网。生产 Windows 服务可调用 `../deployment/start-production.ps1`，它会先执行 HTTPS 预检。
+正式环境请放在 Caddy/Nginx HTTPS 反向代理后，并为同学提供代理网站地址；生产 Waitress 只绑定 loopback，不能直接把应用端口暴露到公网。生产 Windows 服务可调用 `../deployment/start-production.ps1`，它会用实际绑定地址执行 HTTPS 预检。

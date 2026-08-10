@@ -9,7 +9,7 @@
 默认地址：<http://127.0.0.1:5000>。如果 5000 已被其他本地服务占用，`run.py` 会在
 5001–5020 中选择第一个可用端口，并让浏览器打开当前源码对应的实际地址；已有服务不会被终止。
 
-`run.py` 是同一个入口的 Python 版本，适合在终端启动或调试。这个入口默认只监听本机，不会把个人数据暴露给局域网；需要分享时再按下面的部署说明显式使用 `--host 0.0.0.0`。
+`run.py` 是同一个入口的 Python 版本，适合在终端启动或调试。这个入口默认只监听本机，不会把个人数据暴露给局域网；可信 LAN 预览必须显式使用 `--lan-preview --host 0.0.0.0`，正式分享必须走 HTTPS edge，production 只允许 loopback。
 
 ## 能做什么
 
@@ -128,7 +128,7 @@ python -m token_tracker serve
 
 ```powershell
 python -m token_tracker preflight
-python -m token_tracker preflight --production
+python -m token_tracker preflight --production --host 127.0.0.1
 ```
 
 预检只解析配置和数据库路径，不会创建数据库文件或父目录；目录创建仅发生在显式初始化

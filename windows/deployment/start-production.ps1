@@ -26,7 +26,9 @@ if (-not (Test-Path -LiteralPath $pythonPath -PathType Leaf)) {
 
 Push-Location $deploymentRoot
 try {
-    & $pythonPath -m token_tracker preflight --production
+    & $pythonPath -m token_tracker preflight `
+        --production `
+        --host $BindAddress
     if ($LASTEXITCODE -ne 0) {
         throw "Production preflight failed with exit code $LASTEXITCODE"
     }

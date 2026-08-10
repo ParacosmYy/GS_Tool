@@ -40,7 +40,7 @@ HTTPS 生产模式分离，不会代替正式 HTTPS，也不会自动修改防�
 启动前先执行只读生产预检（只解析路径，不创建数据库文件或父目录）：
 
 ```powershell
-.\.venv\Scripts\python.exe -m token_tracker preflight --production
+.\.venv\Scripts\python.exe -m token_tracker preflight --production --host 127.0.0.1
 ```
 
 1. 将域名 DNS 指向中心主机或 VPS。
@@ -50,7 +50,7 @@ HTTPS 生产模式分离，不会代替正式 HTTPS，也不会自动修改防�
    ```powershell
    .\deployment\start-production.ps1 -BindAddress 127.0.0.1 -BindPort 5000
    ```
-   该脚本先执行 `preflight --production`，失败时不会创建应用或监听端口；它不负责申请证书、修改防火墙或创建 Windows 服务。
+   该脚本先用同一个 `-BindAddress` 执行 `preflight --production --host`，失败时不会创建应用或监听端口；它不负责申请证书、修改防火墙或创建 Windows 服务。
 5. 使用内置命令创建经过 SQLite 完整性校验的本地备份，并按组织策略测试恢复；不要把数据库或备份放进网站静态目录。
    ```powershell
    cd D:\Workplace\Agent_Workplace\ai-token-tracker\windows

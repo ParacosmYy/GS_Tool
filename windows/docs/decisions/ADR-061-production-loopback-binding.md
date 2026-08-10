@@ -20,6 +20,8 @@ LAN 预览是不同的显式用户确认场景，不能与生产模式复用同�
   和 LAN 模式的 Secret 预检；它不被视为 HTTPS 生产部署。
 - 命令行 `--host` 在 production 预检中使用与最终 Waitress 监听相同的有效值，避免“预检检查环境变量、
   实际监听另一个地址”的配置漂移。
+- `deployment/start-production.ps1` 必须把 `-BindAddress` 同时传给 `preflight --production --host` 和
+  `serve --production --host`；部署文档和 EXE 文档不得提供非 loopback production 示例。
 
 ## 取舍
 
