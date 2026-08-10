@@ -361,7 +361,10 @@ td:first-child { color: var(--white); font-weight: 700; }
 .data-table tbody tr:hover td, .data-table tbody tr:hover th { background: rgba(255,255,255,.035); color: var(--white); }
 .role-badge { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 999px; padding: 4px 7px; color: var(--copy); font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
 .admin-detail-card { margin-top: 14px; padding: 25px; }
-.admin-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.admin-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.admin-log-column { grid-column: 1 / -1; min-width: 0; }
+.admin-log-column .data-table { min-width: 820px; }
+.admin-log-column .log-message { min-width: 280px; white-space: normal; line-height: 1.55; }
 .admin-detail-grid h3 { margin: 0 0 16px; color: var(--copy); font-size: 13px; font-weight: 600; }
 .admin-detail-card[hidden] { display: none; }
 

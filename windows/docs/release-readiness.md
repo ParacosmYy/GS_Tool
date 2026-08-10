@@ -19,7 +19,7 @@
 | Windows 模块化单体、CLI、SQLite、Web、RBAC | pass（源码/本机运行） | `compileall`、CLI help、health、API/安全边界和架构文档已核对 |
 | 自动 Provider usage / Gateway | 条件通过 | Gateway、SSE usage、Usage Ingest、DPAPI 重试队列、运行时队列故障 fail-closed、响应读取/幂等键/非回环 HTTPS 门禁已完成（ADR-058/059/068）；仍需用户本人合法 Provider Key 做一次非流式/流式联调 |
 | Web UI-1/UI-2 | pass（源码/本机视觉） | v9 场景、v10 可见度构图、显式主图层、动效和首帧可读性截图已保存 |
-| Web UI-3 | in progress | 登录页四档观察、隔离合法会话下 Dashboard/Admin 空态、动态错误 alert/status 播报、四档 viewport/焦点回流、历史非空、服务端 CSV 200、Provider 502 错误态和个人 Activity 写入切片已有源码/隔离证据；真实设备指标、浏览器下载落盘、真实 Provider 成功、reduced-motion/高对比度环境仍待证据 |
+| Web UI-3 | in progress | 登录页四档观察、隔离合法会话下 Dashboard/Admin 空态、成员脱敏日志详情、动态错误 alert/status 播报、四档 viewport/焦点回流、历史非空、服务端 CSV 200、Provider 502 错误态和个人 Activity 写入切片已有源码/隔离证据；真实设备指标、浏览器下载落盘、真实 Provider 成功、reduced-motion/高对比度环境仍待证据 |
 | EXE | pending | `packaging/toolchain-doctor.ps1` 当前明确等待 PyInstaller；批准环境需生成、启动、持久化、升级和签名验收 |
 | Android APK | pending | 版本契约已固定为 AGP 9.3.0 / Gradle 9.5.0 / JDK 17 / API 37 / Compose BOM 2026.06.00；`android/toolchain-doctor.ps1` 仍等待实际 JDK、Wrapper、SDK 和 APK 验收 |
 | HTTPS 中心部署 | pending | 应用生产绑定已强制 loopback（ADR-061）；Caddy、正式域名、ACL、证书、日志轮转和外部 health/ready 检查仍需在部署主机完成 |

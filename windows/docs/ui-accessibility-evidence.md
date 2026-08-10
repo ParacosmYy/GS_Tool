@@ -255,3 +255,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   记录了 `GET 200`、`POST 201` 和预期的验证 `POST 400`。
 - 该证据只覆盖隔离合法会话下的功能/状态切片，不宣称真实手机四档指标、Provider 真实成功、下载落盘、
   系统级 reduced-motion/高对比度或正式部署数据保留门禁已关闭。
+
+## v20 Admin 成员脱敏日志详情回归
+
+- 在忽略目录 `windows/.cache/ui-audit-v12/ui3-20260810.db` 中写入一条无敏感内容的结构化诊断日志，
+  通过真实管理员页面选择成员；`GET /api/v1/admin/users/<id>/records` 返回的 `logs` 投影被页面渲染到
+  `Diagnostic logs` 表格，显示时间、等级、事件、错误码、消息和 request id。
+- 日志表 caption 为“选中成员的脱敏诊断日志”，日志单元格使用 `textContent`；成员详情打开后焦点进入
+  `admin-detail-close`，页面级横向溢出为 `0`，长表格保持在自身容器边界内。
+- 本轮应用页面 DevTools `error/warning` 日志为空。该证据不替代真实生产日志保留、ACL、导出审计和真实
+  设备四档 UI-3 门禁。

@@ -137,7 +137,8 @@ Web Dashboard 的“记录工作信号”表单使用同一条契约和浏览器
 
 - `GET /api/v1/admin/overview`：团队 token 总量、用户数、事件/错误计数和趋势。
 - `GET /api/v1/admin/users`：用户列表及每人聚合，不返回密码哈希、令牌或 API Key。
-- `GET /api/v1/admin/users/<user_id>/records`：查看指定用户的用量/事件分页明细。
+- `GET /api/v1/admin/users/<user_id>/records`：查看指定用户的用量、工作事件和脱敏诊断日志分页明细；
+  Web Admin 成员详情分别渲染 `records`、`events` 和 `logs` 三个投影，不返回密码哈希、令牌或 Provider Key。
 - `GET /api/v1/admin/export?kind=usage|events|logs`：导出授权范围内的脱敏 CSV，并写审计事件。
   结果固定最多 100,000 行、16 MiB；超出时不返回部分文件，返回 `413 EXPORT_TOO_LARGE`，
   并写入拒绝审计事件。

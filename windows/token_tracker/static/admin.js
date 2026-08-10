@@ -81,10 +81,13 @@ function renderDetail(activity, name) {
   title.appendChild(subtitle);
   const records = document.getElementById('admin-record-rows');
   const eventRows = document.getElementById('admin-event-rows');
+  const logRows = document.getElementById('admin-log-rows');
   records.replaceChildren();
   eventRows.replaceChildren();
+  logRows.replaceChildren();
   const recordItems = activity.records || [];
   const eventItems = activity.events || [];
+  const logItems = activity.logs || [];
   recordItems.forEach((record) => {
     const row = document.createElement('tr');
     [record.timestamp, record.model, numberFormatter.format(record.total_tokens || 0), record.source].forEach((value) => row.appendChild(cell(value)));
@@ -95,8 +98,18 @@ function renderDetail(activity, name) {
     [event.direction, event.outcome, event.efficiency_score == null ? '—' : `${Number(event.efficiency_score)}%`, event.error_code || event.result_code || '—'].forEach((value) => row.appendChild(cell(value)));
     eventRows.appendChild(row);
   });
+  logItems.forEach((log) => {
+    const row = document.createElement('tr');
+    [log.created_at, log.level, log.event_type, log.error_code || '—', log.message, log.request_id].forEach((value, index) => {
+      const logCell = cell(value);
+      if (index === 4) logCell.className = 'log-message';
+      row.appendChild(logCell);
+    });
+    logRows.appendChild(row);
+  });
   if (!recordItems.length) emptyRow(records, 4, '当前成员暂无 token 记录。');
   if (!eventItems.length) emptyRow(eventRows, 4, '当前成员暂无工作事件。');
+  if (!logItems.length) emptyRow(logRows, 6, '当前成员暂无诊断日志。');
   const detail = document.getElementById('admin-detail');
   detail.hidden = false;
   detailTrigger?.setAttribute('aria-expanded', 'true');

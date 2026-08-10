@@ -42,6 +42,7 @@
 - [x] 统一交付预检：`release-doctor.ps1/.bat` 编排源码、EXE、Android 和 Local/LAN/Production 门禁，退出码区分通过、pending、失败（ADR-071）
 - [x] 建立最终交付验收矩阵：逐条映射用户需求、工程约束、直接证据和未关闭门禁，作为架构师最终签署入口
 - [x] Web 个人工作信号竖切片：方向、结果、效率、正确/错误码写入既有 v1 Application 边界，最近活动表仅渲染脱敏结构化字段（ADR-072）
+- [x] Admin 成员详情补齐脱敏诊断日志读模型：等级、事件、错误码、消息和 request id 使用 textContent 展示，不复制 SQL
 
 ## Foundation
 
