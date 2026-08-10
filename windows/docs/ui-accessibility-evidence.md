@@ -37,16 +37,16 @@
 - [`ui-audit-v4-1024.png`](../.cache/ui-audit-v4-1024.png)：平板/桌面过渡断点登录页。
 - [`ui-audit-v4-1440.png`](../.cache/ui-audit-v4-1440.png)：桌面登录页。
 
-## v6 背景与四档回归
+## v6 背景与四档回归（历史记录）
 
 - v6 资源已完成本地视觉检查：保持左侧登录负空间、右侧单角色构图，并强化笔记本、桌面工作站、Rust/RL telemetry 屏幕与服务器机架的层次。
-- CSS 已切换到 `/static/assets/embedded-rust-engineer-bg-v6.png`；v5 资产仍保留，可在不改动业务模板的情况下回滚。
+- 历史 v6 CSS 曾切换到 `/static/assets/embedded-rust-engineer-bg-v6.png`；当前默认引用已由 v7 小节记录，v6 资产仍保留作为回滚版本。
 - v6 仅有图像生成器和本地文件检查证据；当前环境没有可用浏览器 CDP，因此没有把旧 v5 截图冒充 v6 运行时证据。
 - 下一次具备浏览器 CDP 运行时后，需要重新生成 `ui-audit-v6-1440/1024/768/320.png`，并复核四档横向溢出、空态、焦点和局部对比度。
 - 本轮静态语义切片已通过：仪表盘只保留一个 `h1`、记录表列头和管理员详情表使用 `scope="col"`、表格有 caption，管理员详情打开后焦点进入关闭按钮并在关闭后返回触发按钮；登录/注册密码 maxlength 与服务端 256 字符边界一致。
 - v4 截图保留为历史基线，不再作为 v6 默认渲染证据。
 
-## v6.1 场景层增强（源码与空 schema smoke）
+## v6.1 场景层增强（历史记录）
 
 - 登录/注册页的 v6 角色场景增加 `RUST / RL WORKBENCH` 与
   `MACBOOK / STUDIO SCENE` 的低频场景签名；它标记为 `aria-hidden`，不伪装成真实
@@ -60,7 +60,7 @@
 - 透明卡片、pointer follower、背景视差和 reduced-motion 规则保持不变；下一次具备浏览器
   CDP 运行时后需要重拍 v6.1 四档截图并复核透明卡片后的局部对比度。
 
-## v6.2 本机 Chrome 只读视觉回归
+## v6.2 本机 Chrome 只读视觉回归（历史记录）
 
 - 本轮使用本机 Chrome headless 对当前源码隔离服务 `http://127.0.0.1:5012/login` 生成了四档截图：
   [`login-v6-current-1440.png`](../.cache/ui-audit-v6/login-v6-current-1440.png)、
@@ -76,6 +76,16 @@
   320px 设备指标仍需可用 CDP 后复核。
 - 本次静态回归通过：Python 模块编译、前端脚本语法、只读 `token_tracker audit --json`
   和 `git diff --check`；审计结果为 `pass=6 / pending=3 / fail=0`。
+
+## v7 背景视觉升级（生成资产与静态证据）
+
+- 当前默认场景已升级为 `embedded-rust-engineer-bg-v7.png`，Android 同步使用
+  `embedded_rust_engineer_bg_v7.png`；两份 PNG 的 SHA-256 为
+  `B48B415E8685B9CB8A32E000ABC148C124A5A7D171E441F03650CD6D30DA1926`。
+- v7 右侧保留成年御姐气质的嵌入式 Rust/RL 工程师、银色 Pro 笔记本、桌面工作站、示波器和
+  开发板；左侧维持低细节深色留白，便于正文和表单阅读。图片不含可读文案、logo 或真实连接状态。
+- 已完成生成器输出与本地文件目视检查；本节不把 v6 截图冒充 v7 运行时截图。合法认证会话下的
+  仪表盘、连接页、管理员页四档截图仍按 UI-3 门禁单独跟踪。
 
 ## 尚未关闭的门禁
 

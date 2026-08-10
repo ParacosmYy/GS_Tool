@@ -46,7 +46,7 @@ body {
   inset: 0;
   pointer-events: none;
   opacity: .95;
-  background-image: url("/static/assets/embedded-rust-engineer-bg-v6.png");
+  background-image: url("/static/assets/embedded-rust-engineer-bg-v7.png");
   background-position: calc(40% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
   background-size: cover;
   background-repeat: no-repeat;
