@@ -287,7 +287,7 @@ Android 工具链安装和构建说明见 `../android/README.md`。如果机器�
 - 月统计按本地自然月计算。
 - CSV 字段：`id`、`model`、`input_tokens`、`output_tokens`、`total_tokens`、`timestamp`、`note`、`source`。
 
-## 8. 本地备份与后续可扩展方向
+## 8. 本地备份、清单与恢复
 
 创建经过 SQLite 原生在线备份和完整性检查的本地副本：
 
@@ -296,6 +296,22 @@ python -m token_tracker backup
 ```
 
 默认输出到 `windows/data/backups/`。备份文件是敏感数据，管理员需要自行制定保留周期、离线存放和恢复演练策略；当前命令不执行云端同步，也不会删除旧备份。
+
+只读盘点备份数量、年龄、容量，并按显式策略返回状态：
+
+```powershell
+python -m token_tracker backup-inventory `
+  --min-count 1 `
+  --max-age-days 7 `
+  --max-size-mib 2048 `
+  --verify
+```
+
+清单默认读取数据库旁的 `backups/`，不会自动创建目录。状态为 `pass` 时退出码为 0；目录缺失、
+没有备份、策略不满足或完整性验证失败时输出 `attention` 并返回退出码 2。需要脚本消费时追加
+`--json`；JSON 只包含文件名、大小、当地修改时间、年龄、策略和完整性状态，不包含数据库记录。
+该命令永远不会自动删除旧备份；正式部署的保留周期、离线副本和责任人必须由管理员确认，详见
+`docs/decisions/ADR-077-backup-inventory-retention.md`。
 
 验证已有副本（只读，不改数据库）：
 

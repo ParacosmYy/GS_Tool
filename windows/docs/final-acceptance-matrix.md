@@ -26,7 +26,7 @@
 | R-09 | Windows 个人体验入口可直接启动 | pass | 根目录 `start.bat`、`run.py` 端口无副作用回退 | 重启后用户数据持久化验收 |
 | R-10 | EXE 便捷分发 | conditional | PyInstaller lock、`packaging/build.ps1`、用户数据目录 ADR | PyInstaller 构建、启动、升级、回滚、签名 |
 | R-11 | 局域网/公网分享且数据集中在管理员电脑 | conditional | `share-doctor`、LAN wrapper、Caddy/Waitress 契约 | Caddy、域名、证书、防火墙、ACL 和外部 health |
-| R-12 | 备份、恢复、回滚 | conditional | `backup`/`verify-backup`/`restore-backup`、staging 演练 | 真实数据恢复、保留周期和负责人记录 |
+| R-12 | 备份、恢复、回滚 | conditional | `backup`/`verify-backup`/`restore-backup`/`backup-inventory`、ADR-060/077、staging 演练 | 真实数据恢复、负责人确认的保留周期/离线副本和回滚记录 |
 | R-13 | 前后端边界、API v1、角色分工和模块化架构 | pass | `api-contract.md`、roles、ui-modules、ADR 目录、层间审计 | 架构师最终签署 |
 | R-14 | 每个文件不超过 1000 行，企业级头部和注释 | pass | `token_tracker audit --json` 行数/头部/docstring/KDoc 门禁 | 新增代码继续纳入审计 |
 | R-15 | 项目内 skills、UI 规范和可维护交付流程 | pass | `windows/skills/`、角色约束、ADR、`release-doctor` | 最终归档与版本签署 |

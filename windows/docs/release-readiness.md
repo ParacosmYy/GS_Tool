@@ -23,7 +23,7 @@
 | EXE | pending | `packaging/toolchain-doctor.ps1` 当前明确等待 PyInstaller；批准环境需生成、启动、持久化、升级和签名验收 |
 | Android APK | pending | 版本契约已固定为 AGP 9.3.0 / Gradle 9.5.0 / JDK 17 / API 37 / Compose BOM 2026.06.00；`android/toolchain-doctor.ps1` 仍等待实际 JDK、Wrapper、SDK 和 APK 验收 |
 | HTTPS 中心部署 | pending | 应用生产绑定已强制 loopback（ADR-061）；Caddy、正式域名、ACL、证书、日志轮转和外部 health/ready 检查仍需在部署主机完成 |
-| 备份恢复/回滚 | 条件通过 | 隔离 staging 恢复、当前 schema（含 Usage Ingest Token）校验和防覆盖命名已完成（ADR-060）；真实数据恢复、保留周期和负责人记录仍待部署演练 |
+| 备份恢复/回滚 | 条件通过 | 隔离 staging 恢复、当前 schema（含 Usage Ingest Token）校验、防覆盖命名和只读 `backup-inventory --verify` 已完成（ADR-060/077）；真实数据恢复、负责人确认的保留周期/离线副本和回滚记录仍待部署演练 |
 | 工程质量门禁 | pass（当前 checkout） | `token_tracker audit --json`：代码/文本 1000 行门禁、作者头、Python docstring、Android KDoc、Web UI 静态契约、production/Caddy/LAN 部署契约、层间依赖边界、契约引用、跨端资产和 Chart.js 供应链通过；`release-doctor` 提供统一只读编排入口 |
 
 ## 每次交付必须执行

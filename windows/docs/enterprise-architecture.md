@@ -69,7 +69,8 @@ Android 具体实现保持同一方向：`feature/*` 只渲染 ViewModel 状态�
 - API 404/405/413/500 统一走 JSON error envelope；`request_ids.py` 只负责关联 ID，不承担身份或授权。
 - 共享/生产模式缺少安全 session secret 时必须 fail-closed；本机模式的临时随机 key 不得被当作生产配置。
 - `deployment_checks.py` 只读验证 shared/production/lan 的 Secret 和数据库路径，并在 production 额外验证 Secure Cookie、provider HTTPS allowlist 和 loopback 绑定；`serve --production` 和 `serve --lan-preview` 都在应用创建和端口监听前强制调用它，前者不允许绕过 HTTPS/Caddy 门禁，后者明确限定为可信 HTTP 预览。
-- `schema.py` 集中 SQLite DDL 和加法式迁移；`db.py` 集中连接、事务和查询，不再混合 schema 生命周期。
+- `schema.py` 集中 SQLite DDL 和加法式迁移；`db.py` 集中连接、事务和查询，不再混合 schema 生命周期；
+  `backup.py` 只负责本地文件备份、只读验证和有限清单，不把保留清理混入业务数据库用例。
 - Android `data/secure/EncryptedSessionStore` 只持有 Keystore 保护的 session blob；登录/刷新/退出的保存与清除在 worker 线程同步提交并检查结果，不把 bearer 生命周期交给异步偏好写入。
 - 限流策略由 `rate_limit.py` 提供单一接口；local 使用内存滑动窗口，shared/production/lan 使用 SQLite 共享窗口并哈希存储 key，后续高并发迁移 PostgreSQL/Redis 时只替换该基础设施适配器。
 - 应用访问日志由 `access_logging.py` 执行字段白名单；Caddy 边缘日志使用显式 filter 删除凭据、Cookie、查询参数和精确客户端地址，并显式配置每日/容量滚动与 14 天保留，正式部署仍需现场验证。

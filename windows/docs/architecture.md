@@ -42,6 +42,7 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 |---|---|---|
 | `run.py` / `start.bat` | 本机一键体验；默认 5000 被占用时无副作用回退到可用端口 | 不承载业务逻辑、不终止已有进程 |
 | `token_tracker/cli.py` | CLI 参数和终端输出 | 不实现 SQL 统计细节 |
+| `token_tracker/backup.py` | SQLite 在线备份、只读验证、清单和保留策略检查 | 不自动删除备份、不读取业务行、不上传云端 |
 | `token_tracker/web.py` | HTTP 路由、登录会话、CSRF、安全头 | 不直接拼接业务 SQL、上游 URL 或 provider HTTP |
 | `token_tracker/api_v1.py` | Android/采集器版本 API、bearer auth、管理员路由编排 | 不保存 token 原文、不绕过 application/repository 边界 |
 | `token_tracker/auth_service.py` | 账号注册、用户名/密码校验和密码哈希 | 不签发/保存 bearer token，不读取 HTTP request |
