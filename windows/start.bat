@@ -5,6 +5,7 @@ setlocal EnableExtensions
 cd /d "%~dp0"
 
 set "PYTHON=%~dp0.venv\Scripts\python.exe"
+set "REQUIREMENTS=%~dp0requirements.lock"
 set "PIP_CACHE_DIR=%~dp0.cache\pip"
 set "PIP_DISABLE_PIP_VERSION_CHECK=1"
 
@@ -26,6 +27,8 @@ if not exist "%PYTHON%" (
     )
 )
 
+if not exist "%REQUIREMENTS%" set "REQUIREMENTS=%~dp0requirements.txt"
+
 if not exist "%~dp0.env" (
     echo [AI Token Tracker] Creating .env from .env.example...
     copy /Y "%~dp0.env.example" "%~dp0.env" >nul
@@ -34,7 +37,7 @@ if not exist "%~dp0.env" (
 "%PYTHON%" -c "import flask, requests, dotenv, waitress" >nul 2>&1
 if errorlevel 1 (
     echo [AI Token Tracker] Installing dependencies...
-    "%PYTHON%" -m pip install -r requirements.txt
+    "%PYTHON%" -m pip install -r "%REQUIREMENTS%"
     if errorlevel 1 (
         echo Dependency installation failed.
         pause

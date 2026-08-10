@@ -78,6 +78,7 @@ Android 具体实现保持同一方向：`feature/*` 只渲染 ViewModel 状态�
 - 每个源文件有统一元信息，公共函数/路由/DTO 有输入、输出、权限、失败语义和不变量说明。
 - UI 变更必须有真实浏览器截图、DOM/ARIA、控制台、网络和四档响应式证据。
 - Android 没有 JDK/Gradle/SDK 时只报告静态配置，不能把骨架当成 APK 构建成功。
+- Windows 运行时以 `requirements.lock` 作为可复现安装边界；可选构建工具不混入运行时锁，升级必须独立审查。
 
 ## 7. Go/Vue 迁移原则
 

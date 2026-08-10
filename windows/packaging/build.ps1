@@ -11,11 +11,15 @@ param(
 $ErrorActionPreference = "Stop"
 $windowsRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\")).Path
 $venvPython = Join-Path $windowsRoot ".venv\Scripts\python.exe"
+$runtimeRequirements = Join-Path $windowsRoot "requirements.lock"
 $distRoot = Join-Path $windowsRoot "dist"
 $buildRoot = Join-Path $windowsRoot "build"
 
 if (-not (Test-Path -LiteralPath $venvPython)) {
     throw "找不到 windows/.venv。请先运行 windows/start.bat 或创建 Python 虚拟环境。"
+}
+if (-not (Test-Path -LiteralPath $runtimeRequirements)) {
+    throw "找不到 windows/requirements.lock。请先完成依赖锁定。"
 }
 
 if ($Clean) {
@@ -26,7 +30,7 @@ if ($Clean) {
     }
 }
 
-& $venvPython -m pip install -r (Join-Path $windowsRoot "requirements.txt") pyinstaller
+& $venvPython -m pip install -r $runtimeRequirements pyinstaller
 if ($LASTEXITCODE -ne 0) { throw "依赖安装失败。" }
 
 $entryPoint = Join-Path $windowsRoot "run.py"

@@ -43,11 +43,11 @@
 cd D:\Workplace\Agent_Workplace\ai-token-tracker\windows
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
+python -m pip install -r requirements.lock
 Copy-Item .env.example .env
 ```
 
-根目录 `start.bat` 会自动创建同一个 `windows/.venv`，并把 pip 缓存固定到 `windows/.cache/pip`；运行依赖不会安装到系统 Python。
+`requirements.txt` 是直接依赖的宽范围契约，`requirements.lock` 是当前 Windows 运行时的可复现安装输入。根目录 `start.bat` 会自动创建同一个 `windows/.venv`，并优先使用锁定文件；pip 缓存固定到 `windows/.cache/pip`，运行依赖不会安装到系统 Python。
 
 然后编辑 `.env`，至少替换 `TOKEN_TRACKER_SECRET_KEY`。如果需要使用 Web 代理，必须配置 `TOKEN_TRACKER_ALLOWED_BASE_URLS` 白名单。
 
