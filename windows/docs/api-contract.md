@@ -93,6 +93,8 @@ CSV 导出和日志分页由 Application 用例统一组合，时间范围、分
 - `GET /api/v1/admin/users`：用户列表及每人聚合，不返回密码哈希、令牌或 API Key。
 - `GET /api/v1/admin/users/<user_id>/records`：查看指定用户的用量/事件分页明细。
 - `GET /api/v1/admin/export?kind=usage|events|logs`：导出授权范围内的脱敏 CSV，并写审计事件。
+  结果固定最多 100,000 行、16 MiB；超出时不返回部分文件，返回 `413 EXPORT_TOO_LARGE`，
+  并写入拒绝审计事件。
 
 管理员页面访问、用户明细查看、导出和角色变更都必须落入 `audit_events`。
 
@@ -136,6 +138,19 @@ CSV 导出和日志分页由 Application 用例统一组合，时间范围、分
 
 成员明细由服务端固定列和安全上限控制；Android 只展示脱敏投影，不缓存管理员导出文件。
 
+当管理员导出超过安全边界时，响应仍使用统一错误 envelope：
+
+```json
+{
+  "error": {
+    "code": "EXPORT_TOO_LARGE",
+    "message": "导出结果超过安全边界，请缩小范围或分批导出",
+    "details": { "max_rows": 100000, "max_bytes": 16777216 }
+  },
+  "request_id": "8c6d3a4b"
+}
+```
+
 ## 通用错误
 
 ```json
@@ -149,7 +164,7 @@ CSV 导出和日志分页由 Application 用例统一组合，时间范围、分
 }
 ```
 
-状态码约定：`400` 输入/CSRF 无效、`401` 未登录、`403` 无权、`404` 资源不存在、`405` 方法不支持、`413` 请求过大、`429` 限流、`502` provider 失败、`500` 内部错误。所有 `/api/*` 错误都返回该 envelope，不返回 Flask 默认 HTML。响应头 `X-Request-ID` 与 envelope 的 `request_id` 用于排障关联；它不代表身份或权限。后端不把 Python traceback、API Key、上游请求头或未经筛选的 provider 响应返回给浏览器。`PROVIDER_RESPONSE_TOO_LARGE` 表示上游 JSON 超过服务端配置的响应上限（默认 2 MB）。
+状态码约定：`400` 输入/CSRF 无效、`401` 未登录、`403` 无权、`404` 资源不存在、`405` 方法不支持、`413` 请求或管理员导出结果过大、`429` 限流、`502` provider 失败、`500` 内部错误。所有 `/api/*` 错误都返回该 envelope，不返回 Flask 默认 HTML。响应头 `X-Request-ID` 与 envelope 的 `request_id` 用于排障关联；它不代表身份或权限。后端不把 Python traceback、API Key、上游请求头或未经筛选的 provider 响应返回给浏览器。`PROVIDER_RESPONSE_TOO_LARGE` 表示上游 JSON 超过服务端配置的响应上限（默认 2 MB）；`EXPORT_TOO_LARGE` 表示管理员 CSV 超过 100,000 行或 16 MiB 安全边界。
 
 ## `GET /api/summary?period=day`
 

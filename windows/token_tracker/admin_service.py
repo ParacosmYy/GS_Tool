@@ -14,10 +14,16 @@ from . import admin_data, events
 
 
 VALID_EXPORT_KINDS = frozenset({"usage", "events", "logs"})
+EXPORT_MAX_ROWS = admin_data.MAX_EXPORT_ROWS
+EXPORT_MAX_BYTES = admin_data.MAX_EXPORT_BYTES
 
 
 class AdminApplicationError(ValueError):
     """Raised when an administrator use-case input is not supported."""
+
+
+class AdminExportTooLargeError(AdminApplicationError):
+    """Raised when a bounded administrator export cannot be completed."""
 
 
 def record_page_view(actor_user_id: int, request_id: str, path: str) -> None:
@@ -72,13 +78,25 @@ def get_user_activity(
     return activity
 
 
-def export_csv(actor_user_id: int, kind: str, request_id: str, path: str) -> str:
+def export_csv(actor_user_id: int, kind: str, request_id: str, path: str) -> bytes:
     """Validate, export, and audit one fixed administrator data class."""
 
     export_kind = str(kind or "usage").strip().lower()
     if export_kind not in VALID_EXPORT_KINDS:
         raise AdminApplicationError("kind must be usage, events, or logs")
-    csv_text = admin_data.export_csv(export_kind, path)
+    try:
+        csv_bytes = admin_data.export_csv(export_kind, path)
+    except admin_data.ExportTooLargeError as exc:
+        events.insert_audit_event(
+            actor_user_id,
+            "admin.export.rejected",
+            "export",
+            export_kind,
+            request_id,
+            path,
+            metadata={"kind": export_kind, "reason": "size_limit"},
+        )
+        raise AdminExportTooLargeError("export exceeds the administrator safety bound") from exc
     events.insert_audit_event(
         actor_user_id,
         "admin.export",
@@ -88,4 +106,4 @@ def export_csv(actor_user_id: int, kind: str, request_id: str, path: str) -> str
         path,
         metadata={"kind": export_kind},
     )
-    return csv_text
+    return csv_bytes

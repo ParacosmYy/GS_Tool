@@ -124,3 +124,4 @@
 - [x] ADR-036 建立当前 checkout 的本地 `main` 版本控制保存点，不配置远程、不上传，并通过 `git check-ignore` 验证敏感路径。
 - [x] ADR-037 收敛密码长度、业务日志脱敏/合法 JSON 和认证响应 `no-store` 边界。
 - [x] ADR-038 固化 Windows Python runtime lock，启动器和 EXE 打包入口统一消费锁定依赖。
+- [x] ADR-039 将管理员 CSV 改为有界游标导出，超限返回 `413 EXPORT_TOO_LARGE` 并写拒绝审计。

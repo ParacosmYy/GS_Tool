@@ -334,12 +334,19 @@ def admin_user_activity(user_id: int) -> Response:
 @api_v1.get("/admin/export")
 @_required_admin
 def admin_export() -> Response:
-    kind = request.args.get("kind", "usage")
+    kind = str(request.args.get("kind", "usage") or "usage").strip().lower()
     try:
-        csv_text = admin_service.export_csv(g.user["id"], kind, g.request_id, _database())
+        csv_bytes = admin_service.export_csv(g.user["id"], kind, g.request_id, _database())
+    except admin_service.AdminExportTooLargeError:
+        return error_response(
+            "EXPORT_TOO_LARGE",
+            "导出结果超过安全边界，请缩小范围或分批导出",
+            413,
+            {"max_rows": admin_service.EXPORT_MAX_ROWS, "max_bytes": admin_service.EXPORT_MAX_BYTES},
+        )
     except admin_service.AdminApplicationError as exc:
         return error_response("INVALID_EXPORT_KIND", str(exc), 400)
-    response = Response(csv_text.encode("utf-8-sig"), mimetype="text/csv; charset=utf-8")
+    response = Response(csv_bytes, mimetype="text/csv; charset=utf-8")
     response.headers["Content-Disposition"] = f"attachment; filename=admin_{kind}.csv"
     return response
 

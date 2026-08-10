@@ -15,6 +15,14 @@ from typing import Any
 from . import db
 
 
+MAX_EXPORT_ROWS = 100_000
+MAX_EXPORT_BYTES = 16 * 1024 * 1024
+
+
+class ExportTooLargeError(RuntimeError):
+    """Raised when an administrator export crosses a deliberate safety bound."""
+
+
 def _safe_limit(value: Any, maximum: int = 200) -> int:
     try:
         parsed = int(value)
@@ -145,34 +153,56 @@ def user_activity(user_id: int, path: str, limit: Any = 100) -> dict[str, Any]:
     }
 
 
-def export_csv(kind: str, path: str) -> str:
-    """Export one administrator-approved data class with a fixed column list."""
+def _export_projection(connection: Any, kind: str) -> tuple[list[str], Any]:
+    """Build a fixed-column query; the returned cursor is consumed by the caller."""
 
-    buffer = io.StringIO(newline="")
-    writer = csv.writer(buffer)
-    with db.db_session(path) as connection:
-        if kind == "usage":
-            columns = ["id", "user_id", "model", "input_tokens", "output_tokens", "total_tokens", "timestamp", "note", "source"]
-            rows = connection.execute(
-                """
-                SELECT id, user_id, model, input_tokens, output_tokens,
-                       input_tokens + output_tokens AS total_tokens, timestamp, note, source
-                FROM usage_records ORDER BY timestamp ASC, id ASC
-                """
-            ).fetchall()
-        elif kind == "events":
-            columns = ["id", "user_id", "request_id", "direction", "outcome", "duration_ms", "efficiency_score", "result_code", "error_code", "project", "task_type", "note", "created_at"]
-            rows = connection.execute(
-                "SELECT " + ", ".join(columns) + " FROM work_events ORDER BY created_at ASC, id ASC"
-            ).fetchall()
-        elif kind == "logs":
-            columns = ["id", "user_id", "request_id", "level", "event_type", "message", "error_code", "metadata_json", "created_at"]
-            rows = connection.execute(
-                "SELECT " + ", ".join(columns) + " FROM app_logs ORDER BY created_at ASC, id ASC"
-            ).fetchall()
-        else:
-            raise ValueError("kind must be usage, events, or logs")
-        writer.writerow(columns)
-        for row in rows:
-            writer.writerow([row[column] for column in columns])
-    return buffer.getvalue()
+    if kind == "usage":
+        columns = ["id", "user_id", "model", "input_tokens", "output_tokens", "total_tokens", "timestamp", "note", "source"]
+        query = """
+            SELECT id, user_id, model, input_tokens, output_tokens,
+                   input_tokens + output_tokens AS total_tokens, timestamp, note, source
+            FROM usage_records ORDER BY timestamp ASC, id ASC
+        """
+    elif kind == "events":
+        columns = ["id", "user_id", "request_id", "direction", "outcome", "duration_ms", "efficiency_score", "result_code", "error_code", "project", "task_type", "note", "created_at"]
+        query = "SELECT " + ", ".join(columns) + " FROM work_events ORDER BY created_at ASC, id ASC"
+    elif kind == "logs":
+        columns = ["id", "user_id", "request_id", "level", "event_type", "message", "error_code", "metadata_json", "created_at"]
+        query = "SELECT " + ", ".join(columns) + " FROM app_logs ORDER BY created_at ASC, id ASC"
+    else:
+        raise ValueError("kind must be usage, events, or logs")
+    return columns, connection.execute(query)
+
+
+def _check_export_size(byte_buffer: io.BytesIO, row_count: int) -> None:
+    """Fail before returning a partial export, keeping memory usage predictable."""
+
+    if row_count > MAX_EXPORT_ROWS:
+        raise ExportTooLargeError(f"export exceeds {MAX_EXPORT_ROWS} rows")
+    if byte_buffer.tell() > MAX_EXPORT_BYTES:
+        raise ExportTooLargeError(f"export exceeds {MAX_EXPORT_BYTES} bytes")
+
+
+def export_csv(kind: str, path: str) -> bytes:
+    """Export one fixed projection with cursor iteration and explicit output bounds."""
+
+    byte_buffer = io.BytesIO()
+    text_stream = io.TextIOWrapper(byte_buffer, encoding="utf-8-sig", newline="")
+    writer = csv.writer(text_stream)
+    row_count = 0
+    try:
+        with db.db_session(path) as connection:
+            columns, rows = _export_projection(connection, kind)
+            writer.writerow(columns)
+            text_stream.flush()
+            _check_export_size(byte_buffer, row_count)
+            for row in rows:
+                if row_count >= MAX_EXPORT_ROWS:
+                    raise ExportTooLargeError(f"export exceeds {MAX_EXPORT_ROWS} rows")
+                writer.writerow([row[column] for column in columns])
+                row_count += 1
+                text_stream.flush()
+                _check_export_size(byte_buffer, row_count)
+        return byte_buffer.getvalue()
+    finally:
+        text_stream.detach()
