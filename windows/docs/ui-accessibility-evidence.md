@@ -40,7 +40,7 @@
 ## v6 背景与四档回归（历史记录）
 
 - v6 资源已完成本地视觉检查：保持左侧登录负空间、右侧单角色构图，并强化笔记本、桌面工作站、Rust/RL telemetry 屏幕与服务器机架的层次。
-- 历史 v6 CSS 曾切换到 `/static/assets/embedded-rust-engineer-bg-v6.png`；当前默认引用已由 v8 小节记录，v6 资产仍保留作为历史回滚版本。
+- 历史 v6 CSS 曾切换到 `/static/assets/embedded-rust-engineer-bg-v6.png`；当前默认引用已由 v9 小节记录，v6 资产仍保留作为历史回滚版本。
 - v6 仅有图像生成器和本地文件检查证据；当前环境没有可用浏览器 CDP，因此没有把旧 v5 截图冒充 v6 运行时证据。
 - 下一次具备浏览器 CDP 运行时后，需要重新生成 `ui-audit-v6-1440/1024/768/320.png`，并复核四档横向溢出、空态、焦点和局部对比度。
 - 本轮静态语义切片已通过：仪表盘只保留一个 `h1`、记录表列头和管理员详情表使用 `scope="col"`、表格有 caption，管理员详情打开后焦点进入关闭按钮并在关闭后返回触发按钮；登录/注册密码 maxlength 与服务端 256 字符边界一致。
@@ -79,7 +79,7 @@
 
 ## v7 背景视觉升级（生成资产与静态证据）
 
-- 当前默认场景已升级为 `embedded-rust-engineer-bg-v7.png`，Android 同步使用
+- 历史阶段默认场景曾升级为 `embedded-rust-engineer-bg-v7.png`，Android 同步使用
   `embedded_rust_engineer_bg_v7.png`；两份 PNG 的 SHA-256 为
   `B48B415E8685B9CB8A32E000ABC148C124A5A7D171E441F03650CD6D30DA1926`。
 - v7 右侧保留成年御姐气质的嵌入式 Rust/RL 工程师、银色 Pro 笔记本、桌面工作站、示波器和
@@ -89,7 +89,7 @@
 
 ## v8 背景资产视觉升级（生成资产与静态证据）
 
-- 当前默认场景已升级为 `embedded-rust-engineer-bg-v8.png`，Android 同步使用
+- 历史阶段默认场景曾升级为 `embedded-rust-engineer-bg-v8.png`，Android 同步使用
   `embedded_rust_engineer_bg_v8.png`；两份 PNG 的 SHA-256 为
   `D85B08787BEC88B558E32BE99921F327EC099B3D2B550B0773143D2C7DF3BE56`。
 - v8 提升了角色面部、银色 Pro 笔记本、桌面 Mac Studio 风格计算机、示波器与实验板的识别度，
@@ -100,7 +100,17 @@
   `login-v8-source-768.png` 与 `login-v8-source-320.png`；1440 档确认主图已进入渲染层，
   768/320 档仅作为 headless renderer observation，不替代 CDP 或真实设备指标。
 - 用户当前保持运行的旧 5000 端口进程仍返回 v7 改造前的模板（缺少显式 `<img>` 和场景样式），
-  因此本轮不终止该进程；重启 Windows 服务后才会加载 v8 源码。5000/5011 均保持 loopback。
+  因此本轮不终止该进程；重启 Windows 服务后才会加载 v9 源码。5000/5011 均保持 loopback。
+
+## v9 背景资产视觉升级（生成资产与静态证据）
+
+- 当前默认场景已升级为 `embedded-rust-engineer-bg-v9.png`，Android 同步使用
+  `embedded_rust_engineer_bg_v9.png`；两份 PNG 的 SHA-256 为
+  `98E7CD8F291DE1EC2708736B963883CD9C7111CE349F1825C1D40FD8789C54B5`。
+- v9 在保留左侧正文安全区的前提下，增强了角色的温和御姐表情、银色 Pro 形态笔记本、紧凑银色桌面
+  工作站、代码/RL telemetry、示波器和开发板的层次；素材不承载可读业务文案、logo 或真实状态。
+- v8 文件不覆盖、不删除，继续作为视觉回滚路径；生成文件已完成 Web/Android 双端目视检查，
+  发布审计会比较两端 SHA-256 并校验当前引用。
 
 ## v8 受保护页面隔离预览（非合法账户证据）
 
@@ -118,7 +128,7 @@
 
 ## v9 场景合成与首帧可读性
 
-- 当前源码进程使用显式装饰性 `<img>` 承载 v8 主图，CSS 背景声明保留为回退；场景层使用
+- 当前源码进程使用显式装饰性 `<img>` 承载 v9 主图，CSS 背景声明保留为回退；场景层使用
   `z-index: 0`，内容/页脚使用 `z-index: 1`，避免固定负层级在 Chromium 中偶发消失。
 - 登录入场动画改为轻微 opacity 变化并保留可见正文，移动端背景透明度和遮罩梯度收敛，
   防止首屏文字在动效尚未完成时显得像禁用状态。
@@ -139,7 +149,7 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 
 ## v10 场景可见度构图
 
-- 当前默认场景使用 v8 同 SHA-256 资产；本轮只调整桌面遮罩和亮度，将右侧角色、Pro
+- 当前默认场景使用 v9 同 SHA-256 资产；本轮只调整桌面遮罩和亮度，将右侧角色、Pro
   笔记本、工作站与示波器从低可见轮廓提升为可识别背景，同时保留左侧正文安全区。
 - 普通模式、`prefers-contrast: more`、`forced-colors: active` 和 `prefers-reduced-motion`
   均保留独立降级路径；背景不参与语义、焦点或业务状态。
@@ -148,7 +158,8 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 ## v10 窄屏边界复核（当前记录）
 
 - 当前源码在隔离端口 `5019` 和临时 SQLite 下重新渲染；未读取真实数据库、Cookie、Key 或令牌。
-- `ui-audit-v10/login-v10-1440.png` 确认 v8 场景、正文层、认证卡片和焦点样式仍可读。
+- `ui-audit-v10/login-v10-1440.png` 是 v8 阶段的历史截图，确认当时场景、正文层、认证卡片和焦点样式可读；
+  当前默认素材由 v9 资产段落单独记录。
 - 追加了窄屏 grid track、表单控件 `min-width: 0`、`100vw` 上限和场景签名换行约束，降低真实 320px 设备发生 intrinsic-width 裁切的风险。
 - Chrome headless 的 320px CLI 截图仍出现比截图画布更宽的布局轨道；该运行器未提供可靠的设备指标覆盖，因此只作为 renderer observation，不能宣称真实手机横向溢出已通过。UI-3 继续保持进行中，待可用 CDP/真实设备证据后复核。
 

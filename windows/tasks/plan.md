@@ -225,8 +225,8 @@ normalization, validation, and aggregate refresh.
 
 ### Task B10: Web/Android 场景资产一致性
 
-- [x] Web 切换到 `embedded-rust-engineer-bg-v8.png`，保留 v7 及之前版本作为回滚资产。
-- [x] Android Compose 切换到同一像素资产的 `embedded_rust_engineer_bg_v8.png`，端侧遮罩和漂移实现不互相耦合。
+- [x] Web 切换到 `embedded-rust-engineer-bg-v9.png`，保留 v8 及之前版本作为回滚资产。
+- [x] Android Compose 切换到同一像素资产的 `embedded_rust_engineer_bg_v9.png`，端侧遮罩和漂移实现不互相耦合。
 - [x] 两端资源 SHA-256 一致，资源引用、注释和视觉规范同步。
 - [>] Web v8 四档浏览器证据和 Android 编译/设备视觉验收仍分别等待 CDP 与 Android 工具链门禁。
 

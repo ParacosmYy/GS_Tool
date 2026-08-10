@@ -32,7 +32,7 @@
 - [x] 外部 Usage Ingest Token：按用户签发/撤销、摘要存储、固定 `source=ingest`、幂等写入和限流边界
 - [>] Android 登录、个人仪表盘、token 分页历史、结构化工作信号写入、最近活动历史和管理员只读观测台已接入；待工具链批准后编译联调
 - [x] Android 首屏背景资产、低干扰遮罩、Compose edge-to-edge 约束和 Rust/RL 工程师视觉主题已落地
-- [x] Web/Android 统一切换 v8 场景资产；端侧遮罩、漂移实现保持解耦，v7 及之前版本保留回滚
+- [x] Web/Android 统一切换 v9 场景资产；端侧遮罩、漂移实现保持解耦，v8 及之前版本保留回滚
 - [x] Android 构建入口已固定项目内 SDK、Gradle 和 Android 用户缓存路径；未获批准不下载工具链
 - [x] Android 工具链契约已按官方兼容矩阵固定为 AGP 9.3.0、Gradle 9.5.0、JDK 17、API 37 和 Compose BOM 2026.06.00；只读 doctor 会校验版本，实际工具仍待批准
 - [ ] 用户批准工具链后完成 Android Studio/Gradle/SDK 编译、设备联调与 APK 产物验收
@@ -77,7 +77,7 @@
 - [x] pointer aura/ring、count-up、reveal、glitch、scanline
 - [x] 将动画从分散 CSS 规则收敛为可追踪的 motion state contract
 - [>] 320/768/1024/1440 四档浏览器验收记录（v9/v10/v11 已补显式主图层、本机 Chrome 只读视觉截图、首帧可读性、窄屏尺寸收敛、注册页 heading 顺序和 v10 场景可见度；v15/v16/v17 已补隔离合法会话下 Dashboard/Admin、ARIA、动态错误播报、四档 viewport 和焦点回流证据；真实设备指标、连接/历史/导出路径、Provider 网络失败、对比度与 reduced-motion 真实环境仍待补齐）
-- [x] 背景品牌资产升级：v8 御姐二次元嵌入式工程师、MacBook Pro/Mac Studio 形态、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v7 及之前版本保留回滚
+- [x] 背景品牌资产升级：v9 御姐二次元嵌入式工程师、MacBook Pro/Mac Studio 形态、Rust/RL 工作站、鼠标视差和移动端低幅漂移；v8 及之前版本保留回滚
 - [x] loading/connection/empty 状态统一视觉组件
 - [x] UI-3 静态语义切片：单一仪表盘 h1、表格 scope/caption、管理员详情焦点回流和密码长度边界
 - [x] UI-3 v14/v15：Dashboard glitch 标题单次无障碍名称、隔离合法会话 Dashboard/Admin 空态/焦点/320/768 viewport 运行时证据

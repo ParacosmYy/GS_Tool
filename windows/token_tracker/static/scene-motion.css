@@ -50,7 +50,7 @@ body {
   pointer-events: none;
   isolation: isolate;
   opacity: 1;
-  background-image: url("/static/assets/embedded-rust-engineer-bg-v8.png");
+  background-image: url("/static/assets/embedded-rust-engineer-bg-v9.png");
   background-position: calc(40% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
   background-size: cover;
   background-repeat: no-repeat;

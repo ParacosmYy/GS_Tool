@@ -57,7 +57,7 @@ Gradle 配置阶段会拒绝 `http://` 或默认模拟器地址，Manifest 的 `
 - `TrackerRepository`：统一 access token 重试、refresh token 轮换和本地退出清理。
 - `TrackerViewModel`：恢复会话并驱动登录、刷新、错误和退出状态。
 - Compose UI：登录、普通成员 token 记录写入、今日汇总、管理员团队总览、趋势、模型占比、成员按需明细、空态与错误态。
-- 视觉资源：Windows 与 Android 共用的 `embedded-rust-engineer-bg-v8`，右侧为成年御姐气质、可爱但非性化的嵌入式 Rust/RL 工程师，手持银色 Pro 笔记本，工作台放置桌面 Mac Studio 风格计算机、示波器与实验板，左侧保留仪表盘留白；两端都使用渐变遮罩保证文字可读性，Android 背景增加低幅度漂移动画，v7 仍保留回滚。
+- 视觉资源：Windows 与 Android 共用的 `embedded-rust-engineer-bg-v9`，右侧为成年御姐气质、可爱但非性化的嵌入式 Rust/RL 工程师，手持银色 Pro 笔记本，工作台放置桌面 Mac Studio 风格计算机、示波器与实验板，左侧保留仪表盘留白；两端都使用渐变遮罩保证文字可读性，Android 背景增加低幅度漂移动画，v8 及之前版本仍保留回滚。
 
 ## 项目内技能资料
 
