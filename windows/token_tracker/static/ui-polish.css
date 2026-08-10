@@ -422,8 +422,9 @@ td { color: var(--ink-soft); font-size: 12px; }
 
 /* Keep below-the-fold content present but never visually absent if a slow
    browser delays IntersectionObserver delivery during the first paint. */
-[data-reveal] { opacity: .16; transform: translateY(18px); transition-duration: .82s; }
-[data-reveal].is-visible { opacity: 1; transform: translateY(0); }
+[data-reveal] { opacity: 1; transform: none; transition-duration: .82s; }
+html.motion-ready [data-reveal] { opacity: .16; transform: translateY(18px); }
+html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
 
 @keyframes empty-marker-breathe {
   0%, 100% { transform: scale(.94); opacity: .66; }
@@ -444,5 +445,6 @@ td { color: var(--ink-soft); font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html.motion-ready [data-reveal], html.motion-ready [data-reveal].is-visible { opacity: 1; transform: none; }
   .chart-empty-marker { animation: none; }
 }

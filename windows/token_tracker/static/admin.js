@@ -22,17 +22,21 @@ function cell(value, tag = 'td') {
   return element;
 }
 
+function emptyRow(body, colSpan, message) {
+  const row = document.createElement('tr');
+  const empty = cell(message);
+  empty.colSpan = colSpan;
+  empty.className = 'table-empty';
+  body.appendChild(row);
+  row.appendChild(empty);
+}
+
 function renderUsers(items) {
   const body = document.getElementById('admin-user-rows');
   if (!body) return;
   body.replaceChildren();
   if (!items.length) {
-    const row = document.createElement('tr');
-    const empty = cell('暂时没有同学账户。');
-    empty.colSpan = 6;
-    empty.className = 'table-empty';
-    row.appendChild(empty);
-    body.appendChild(row);
+    emptyRow(body, 6, '暂时没有同学账户。');
     return;
   }
   items.forEach((user) => {
@@ -77,16 +81,20 @@ function renderDetail(activity, name) {
   const eventRows = document.getElementById('admin-event-rows');
   records.replaceChildren();
   eventRows.replaceChildren();
-  (activity.records || []).forEach((record) => {
+  const recordItems = activity.records || [];
+  const eventItems = activity.events || [];
+  recordItems.forEach((record) => {
     const row = document.createElement('tr');
     [record.timestamp, record.model, numberFormatter.format(record.total_tokens || 0), record.source].forEach((value) => row.appendChild(cell(value)));
     records.appendChild(row);
   });
-  (activity.events || []).forEach((event) => {
+  eventItems.forEach((event) => {
     const row = document.createElement('tr');
     [event.direction, event.outcome, event.efficiency_score == null ? '—' : `${Number(event.efficiency_score)}%`, event.error_code || event.result_code || '—'].forEach((value) => row.appendChild(cell(value)));
     eventRows.appendChild(row);
   });
+  if (!recordItems.length) emptyRow(records, 4, '当前成员暂无 token 记录。');
+  if (!eventItems.length) emptyRow(eventRows, 4, '当前成员暂无工作事件。');
   const detail = document.getElementById('admin-detail');
   detail.hidden = false;
   detailTrigger?.setAttribute('aria-expanded', 'true');

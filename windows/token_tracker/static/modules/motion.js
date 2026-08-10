@@ -4,6 +4,10 @@
  * Purpose: Own motion state, reveal behavior, number transitions, and pointer feedback.
  */
 
+// Opt into reveal opacity only after this module is available. If a script or
+// browser feature fails, the CSS fallback keeps all content fully readable.
+document.documentElement.classList.add("motion-ready");
+
 export function setMotionState(element, state) {
   if (!element) return;
   element.dataset.motionState = state;
