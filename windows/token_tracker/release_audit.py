@@ -116,6 +116,19 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/docs/release-readiness.md",
         "windows/skills/README.md",
         "windows/skills/project-ui-orchestration/SKILL.md",
+        "windows/roles/README.md",
+        "windows/ui-modules/01-shell/README.md",
+        "windows/ui-modules/02-auth/README.md",
+        "windows/ui-modules/03-observatory/README.md",
+        "windows/ui-modules/04-connect/README.md",
+        "windows/ui-modules/05-history/README.md",
+        "windows/roles/01-ui-director/README.md",
+        "windows/roles/02-dev-shell-auth/README.md",
+        "windows/roles/03-dev-observatory/README.md",
+        "windows/roles/04-dev-connect/README.md",
+        "windows/roles/05-dev-runtime/README.md",
+        "windows/roles/06-architect-system/README.md",
+        "windows/roles/07-architect-delivery/README.md",
         "start.bat",
         "windows/.env.example",
         "windows/requirements.lock",
@@ -215,6 +228,8 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("exe-toolchain-doctor", "windows/packaging/toolchain-doctor.ps1", "EXE packaging pending"),
         ("project-skills-source", "windows/skills/README.md", "7676817c12a1317454ae3898a0c5c1eacf5dd3d5"),
         ("project-ui-orchestration", "windows/skills/project-ui-orchestration/SKILL.md", "AI Token Tracker UI"),
+        ("role-framework", "windows/roles/README.md", "七角色独立交付区"),
+        ("ui-module-framework", "windows/ui-modules/01-shell/README.md", "UI Module 01"),
     )
     missing: list[str] = []
     for name, relative_path, fragment in references:
