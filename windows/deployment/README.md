@@ -108,6 +108,17 @@ HTTPS 生产模式分离，不会代替正式 HTTPS，也不会自动修改防�
 
 ## Caddy 边缘配置
 
+项目提供固定版本的 Caddy 项目缓存入口。它只写入被忽略的
+`windows/.cache/caddy/2.11.4/`，并校验官方 release checksums；不会安装系统服务、修改 PATH、申请证书、
+改防火墙或改变日志 ACL：
+
+```powershell
+.\deployment\provision-caddy.ps1
+```
+
+这一步完成后，`preflight-edge.ps1` 和 `start-edge.ps1` 会优先使用项目缓存的 `caddy.exe`。也可以传入
+部署负责人已安装并审核过的 `-CaddyPath`，不必使用项目缓存。
+
 复制 `Caddyfile.example`，将 `tracker.example.com` 替换为已经指向中心主机的真实域名，
 并在 Caddy 工作目录创建 ACL 受限的 `logs/` 目录。启动前先验证配置：
 
@@ -116,6 +127,14 @@ HTTPS 生产模式分离，不会代替正式 HTTPS，也不会自动修改防�
   -ConfigPath .\deployment\Caddyfile `
   -LogsDirectory .\deployment\logs
 caddy run --config .\deployment\Caddyfile --adapter caddyfile
+```
+
+正式启动可使用项目入口；它会先执行 edge preflight，再以前台进程运行 Caddy：
+
+```powershell
+.\deployment\start-edge.ps1 `
+  -ConfigPath .\deployment\Caddyfile `
+  -LogsDirectory .\deployment\logs
 ```
 
 示例配置显式限制 Caddy access log：每天或达到 `100MiB` 时滚动，最多保留 14 个文件/14 天，

@@ -14,7 +14,9 @@ param(
     [string]$ConfigPath,
 
     [Parameter(Mandatory = $true)]
-    [string]$LogsDirectory
+    [string]$LogsDirectory,
+
+    [string]$CaddyPath
 )
 
 Set-StrictMode -Version Latest
@@ -66,9 +68,24 @@ function Assert-NoBroadWriteAcl([string]$PathValue) {
     }
 }
 
-$caddy = Get-Command caddy -CommandType Application -ErrorAction SilentlyContinue
-if (-not $caddy) {
-    throw "找不到 caddy。请先由部署负责人安装并校验 Caddy，再运行边缘预检。"
+$projectRoot = Split-Path -Parent $PSScriptRoot
+$projectCaddyPath = Join-Path $projectRoot ".cache\caddy\2.11.4\caddy.exe"
+$caddyExecutable = $null
+if (-not [string]::IsNullOrWhiteSpace($CaddyPath)) {
+    $resolvedCaddy = Resolve-Path -LiteralPath $CaddyPath -ErrorAction SilentlyContinue
+    if ($resolvedCaddy -and (Test-Path -LiteralPath $resolvedCaddy.Path -PathType Leaf)) {
+        $caddyExecutable = $resolvedCaddy.Path
+    }
+} else {
+    $caddyCommand = Get-Command caddy -CommandType Application -ErrorAction SilentlyContinue
+    if ($caddyCommand) {
+        $caddyExecutable = $caddyCommand.Source
+    } elseif (Test-Path -LiteralPath $projectCaddyPath -PathType Leaf) {
+        $caddyExecutable = $projectCaddyPath
+    }
+}
+if (-not $caddyExecutable) {
+    throw "Caddy is missing. Run deployment\provision-caddy.ps1 or install and verify Caddy on the deployment host."
 }
 
 $config = Resolve-ExistingFile $ConfigPath "Caddy 配置"
@@ -78,7 +95,7 @@ Get-ChildItem -LiteralPath $logs -File -Force | ForEach-Object {
     Assert-NoBroadWriteAcl $_.FullName
 }
 
-& $caddy.Source validate --config $config --adapter caddyfile
+& $caddyExecutable validate --config $config --adapter caddyfile
 if ($LASTEXITCODE -ne 0) {
     throw "Caddyfile 校验失败，拒绝进入 HTTPS 启动步骤。"
 }
