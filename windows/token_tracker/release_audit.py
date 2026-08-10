@@ -143,6 +143,9 @@ def _check_required_files(root: Path, checks: list[AuditCheck]) -> None:
         "windows/docs/decisions/ADR-082-exe-build-evidence.md",
         "windows/docs/decisions/ADR-083-caddy-project-cache.md",
         "windows/docs/decisions/ADR-084-six-accountable-roles.md",
+        "windows/docs/decisions/ADR-085-source-quality-ci-gate.md",
+        "windows/ci/quality-gate.ps1",
+        ".github/workflows/quality-gate.yml",
         "android/provision-toolchain.ps1",
         "windows/docs/decisions/ADR-075-gateway-center-discovery.md",
         "windows/docs/decisions/ADR-071-release-doctor-composition.md",
@@ -472,6 +475,8 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
         ("project-ci-cd", "windows/skills/ci-cd-and-automation/SKILL.md", "Project CI/CD and Automation Skill"),
         ("role-framework", "windows/roles/README.md", "六角色责任模型"),
         ("role-model-decision", "windows/docs/decisions/ADR-084-six-accountable-roles.md", "六个正式责任角色"),
+        ("source-quality-gate", "windows/ci/quality-gate.ps1", "Source quality gate"),
+        ("source-quality-ci-decision", "windows/docs/decisions/ADR-085-source-quality-ci-gate.md", "quality-gate.ps1"),
         ("ui-module-framework", "windows/ui-modules/01-shell/README.md", "UI Module 01"),
     )
     missing: list[str] = []

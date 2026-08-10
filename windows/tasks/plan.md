@@ -251,7 +251,8 @@ normalization, validation, and aggregate refresh.
 
 - [x] 新增 `token_tracker audit`，集中检查关键交付文件、1000 行门禁、作者头、Python docstring、Android KDoc、层间依赖边界、跨端 v8 SHA-256 和 Python 运行时。
 - [x] 普通/JSON/strict 输出区分源码通过与 Android/EXE/Caddy 环境 pending，且不触碰数据库或敏感配置。
-- [>] 正式流水线接入与全部外部工具链 pass 证据仍待部署环境。
+- [x] `windows/ci/quality-gate.ps1` 与 `.github/workflows/quality-gate.yml` 已接入提交级源码质量闸门；本机执行通过，远程首次 CI 仍待仓库连接。
+- [>] 全部外部工具链 pass 证据仍待部署环境。
 
 ### Task B14: 本地 Chart.js 供应链边界
 

@@ -150,6 +150,17 @@ python -m token_tracker audit --strict
 外部环境门禁时返回非零，适合接入正式发布流水线。审计不会创建数据库、用户、备份、构建产物或
 读取 `.env` 内容。
 
+提交级源码质量闸门可以在本机复现：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\\ci\\quality-gate.ps1 `
+  -PythonPath .\\.venv\\Scripts\\python.exe
+```
+
+该闸门执行 `git diff --check`、Python 编译、发布审计、CLI help 和 PowerShell AST 解析；`pending`
+外部工具不会被伪装为通过。远程仓库连接后，`.github/workflows/quality-gate.yml` 会在 Windows runner
+上调用同一入口。
+
 局域网分享给同学（Windows 电脑作为中心服务和数据库宿主）：
 
 ```powershell

@@ -25,7 +25,7 @@ $ErrorActionPreference = "Stop"
 function Resolve-ExistingFile([string]$PathValue, [string]$Label) {
     $resolved = Resolve-Path -LiteralPath $PathValue -ErrorAction SilentlyContinue
     if (-not $resolved -or -not (Test-Path -LiteralPath $resolved.Path -PathType Leaf)) {
-        throw "$Label 不存在或不是文件：$PathValue"
+        throw "$Label must be an existing file: $PathValue"
     }
     return $resolved.Path
 }
@@ -33,7 +33,7 @@ function Resolve-ExistingFile([string]$PathValue, [string]$Label) {
 function Resolve-ExistingDirectory([string]$PathValue, [string]$Label) {
     $resolved = Resolve-Path -LiteralPath $PathValue -ErrorAction SilentlyContinue
     if (-not $resolved -or -not (Test-Path -LiteralPath $resolved.Path -PathType Container)) {
-        throw "$Label 不存在或不是目录：$PathValue"
+        throw "$Label must be an existing directory: $PathValue"
     }
     return $resolved.Path
 }
@@ -63,7 +63,7 @@ function Assert-NoBroadWriteAcl([string]$PathValue) {
         $isBroad = $broadIdentities -contains $identity
         $canWrite = (($entry.FileSystemRights -band $writeRights) -ne 0)
         if ($entry.AccessControlType -eq "Allow" -and $isBroad -and $canWrite) {
-            throw "日志路径存在宽泛写权限：identity=$identity rights=$rights path=$PathValue"
+            throw "Log path has broad write permission: identity=$identity rights=$rights path=$PathValue"
         }
     }
 }
@@ -88,8 +88,8 @@ if (-not $caddyExecutable) {
     throw "Caddy is missing. Run deployment\provision-caddy.ps1 or install and verify Caddy on the deployment host."
 }
 
-$config = Resolve-ExistingFile $ConfigPath "Caddy 配置"
-$logs = Resolve-ExistingDirectory $LogsDirectory "Caddy 日志目录"
+$config = Resolve-ExistingFile $ConfigPath "Caddy configuration"
+$logs = Resolve-ExistingDirectory $LogsDirectory "Caddy log directory"
 Assert-NoBroadWriteAcl $logs
 Get-ChildItem -LiteralPath $logs -File -Force | ForEach-Object {
     Assert-NoBroadWriteAcl $_.FullName
@@ -97,8 +97,8 @@ Get-ChildItem -LiteralPath $logs -File -Force | ForEach-Object {
 
 & $caddyExecutable validate --config $config --adapter caddyfile
 if ($LASTEXITCODE -ne 0) {
-    throw "Caddyfile 校验失败，拒绝进入 HTTPS 启动步骤。"
+    throw "Caddyfile validation failed; HTTPS startup is rejected."
 }
 
 Write-Host "Edge preflight passed: config=$config logs=$logs"
-Write-Host "该检查未申请证书、未修改 ACL/防火墙、未启动 Caddy。"
+Write-Host "No certificate request, ACL/firewall change, or Caddy startup was performed."

@@ -1,0 +1,69 @@
+# Author: AI Token Tracker Engineering Team
+# Maintainer: Project Owner
+# Purpose: Run deterministic source-quality checks for every repository change.
+# Module: CI/CD / GitHub Actions boundary
+
+name: AI Token Tracker quality gate
+
+on:
+  push:
+    paths:
+      - "**.py"
+      - "**.ps1"
+      - "**.bat"
+      - "**.js"
+      - "**.css"
+      - "**.html"
+      - "**.kt"
+      - "**.kts"
+      - "**.md"
+      - "**.yml"
+      - "**.yaml"
+      - ".github/workflows/quality-gate.yml"
+  pull_request:
+    paths:
+      - "**.py"
+      - "**.ps1"
+      - "**.bat"
+      - "**.js"
+      - "**.css"
+      - "**.html"
+      - "**.kt"
+      - "**.kts"
+      - "**.md"
+      - "**.yml"
+      - "**.yaml"
+      - ".github/workflows/quality-gate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-quality:
+    name: Source quality and contract gate
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            windows/requirements.lock
+            windows/packaging/requirements-build.lock
+
+      - name: Install locked runtime and build dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check -r windows/requirements.lock -r windows/packaging/requirements-build.lock
+
+      - name: Run source quality gate
+        shell: pwsh
+        run: |
+          $python = (Get-Command python -CommandType Application).Source
+          & .\windows\ci\quality-gate.ps1 -PythonPath $python
