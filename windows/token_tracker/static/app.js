@@ -128,9 +128,23 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
     const status = byId("provider-status");
     const card = form.closest(".auto-card");
     const clearKeyButton = byId("clear-provider-key");
+    const providerPreset = byId("provider-preset");
+    const providerPresets = {
+      "kimi-code": "https://api.kimi.com/coding/v1",
+      "kimi-platform": "https://api.moonshot.cn/v1",
+      openai: "https://api.openai.com/v1",
+    };
     let sessionKey = "";
     baseUrl.value = localStorage.getItem("ai-tracker-base-url") || "";
     model.value = localStorage.getItem("ai-tracker-model") || "";
+
+    function syncPresetFromUrl() {
+      if (!providerPreset) return;
+      const selected = Object.entries(providerPresets).find(([, url]) => url === baseUrl.value.trim().replace(/\/$/, ""));
+      providerPreset.value = selected ? selected[0] : "";
+    }
+
+    syncPresetFromUrl();
 
     function currentKey() {
       const entered = apiKey.value.trim();
@@ -193,13 +207,26 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
     }
 
     detectButton.addEventListener("click", detectModels);
+    providerPreset?.addEventListener("change", () => {
+      const presetUrl = providerPresets[providerPreset.value];
+      if (!presetUrl) return;
+      baseUrl.value = presetUrl;
+      model.value = "";
+      localStorage.setItem("ai-tracker-base-url", presetUrl);
+      localStorage.removeItem("ai-tracker-model");
+      setProviderStatus("已选择预设，等待检测", "");
+      setMessage(byId("proxy-message"), "地址已填入；请输入 Key 后点击自动检测模型。", false);
+    });
     clearKeyButton.addEventListener("click", () => {
       sessionKey = "";
       apiKey.value = "";
       setProviderStatus("未连接", "");
       setMessage(byId("proxy-message"), "Key 已从当前页面内存清除。", false);
     });
-    baseUrl.addEventListener("change", () => setProviderStatus("等待检测", ""));
+    baseUrl.addEventListener("change", () => {
+      syncPresetFromUrl();
+      setProviderStatus("等待检测", "");
+    });
     model.addEventListener("change", () => localStorage.setItem("ai-tracker-model", model.value));
     form.addEventListener("submit", async (event) => {
       event.preventDefault();

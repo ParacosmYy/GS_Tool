@@ -162,8 +162,8 @@ TOKEN_TRACKER_ALLOWED_BASE_URLS=https://api.moonshot.cn/v1,https://api.openai.co
 
 Web 页面里的“调用并自动记账”面向 OpenAI-compatible 的 `POST /chat/completions` 接口：
 
-1. 在 `.env` 的 `TOKEN_TRACKER_ALLOWED_BASE_URLS` 写入服务的 Base URL；当前自动适配器使用 OpenAI-compatible 的 `/models` 与 `/chat/completions` 形状。
-2. 在页面的“自动采集”区域输入 Base URL 和自己的 API Key，点击“自动检测模型”。
+1. 在 `.env` 的 `TOKEN_TRACKER_ALLOWED_BASE_URLS` 写入服务的 Base URL；当前自动适配器使用 OpenAI-compatible 的 `/models` 与 `/chat/completions` 形状。Kimi 开放平台使用 `https://api.moonshot.cn/v1`；Kimi Code 使用独立的 `https://api.kimi.com/coding/v1`，两者 API Key 不能混用，详见 [Kimi Code API access](https://www.kimi.com/code/docs/en/) 和 [Kimi Code error reference](https://www.kimi.com/code/docs/en/kimi-code/error-reference.html)。
+2. 在页面的“自动采集”区域选择 Kimi Code、Kimi 开放平台或自定义预设，确认 Base URL 后输入自己的 API Key，点击“自动检测模型”。预设只填充地址，不会代填或保存 Key。
 3. 系统请求上游 `/models`，将返回的模型自动放入可选列表；你不需要手动填写输入/输出 token。
 4. 输入 prompt 后点击“发送 · 自动记账”。服务端读取响应中的 `usage.prompt_tokens` 和 `usage.completion_tokens`，优先使用响应里实际返回的模型归档。
 5. API Key 只存在于当前页面内存，页面刷新即清除；前端只持久化 Base URL 和最近选择的模型，不保存 Key，不写入 SQLite。

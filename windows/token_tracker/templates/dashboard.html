@@ -64,6 +64,15 @@
     </div>
     <p class="muted small-copy">填入一次 Base URL 和自己的 Key。系统会先自动检测模型，随后从每次响应的 <code>usage</code> 中识别输入/输出 token、实际模型和来源并保存；Key 永远不写入数据库。</p>
     <form id="proxy-form" class="stack-form" data-motion-state="idle" aria-busy="false">
+      <label class="provider-preset-row">快速连接
+        <select id="provider-preset" name="provider_preset">
+          <option value="">自定义 OpenAI-compatible</option>
+          <option value="kimi-code">Kimi Code · coding API</option>
+          <option value="kimi-platform">Kimi 开放平台 · API</option>
+          <option value="openai">OpenAI · API</option>
+        </select>
+        <small>预设只填充官方地址，最终仍需服务端白名单和你的 Key。</small>
+      </label>
       <div class="form-row">
         <label>Provider Base URL<input name="base_url" type="url" placeholder="https://api.moonshot.cn/v1" required></label>
         <div class="secret-field">

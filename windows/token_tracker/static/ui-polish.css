@@ -356,6 +356,11 @@ body { font-size: 15px; line-height: 1.65; }
 label { color: var(--ink-soft); font-size: 13px; line-height: 1.55; }
 input, textarea { font-size: 15px; }
 input::placeholder, textarea::placeholder { color: #c9ced8; opacity: .86; }
+.provider-preset-row { display: grid; gap: 7px; }
+.provider-preset-row small { color: var(--ink-muted); font-size: 11px; line-height: 1.6; }
+.provider-preset-row select { width: 100%; min-height: 48px; border: 1px solid var(--line-strong); border-radius: 8px; outline: none; color: var(--ink); background: rgba(255,255,255,.065); padding: 12px 14px; font-family: inherit; font-size: 15px; font-weight: 500; line-height: 1.35; transition: background .35s var(--ui-ease), border-color .35s var(--ui-ease), box-shadow .35s var(--ui-ease); }
+.provider-preset-row select:hover { border-color: rgba(217,255,120,.64); background: rgba(255,255,255,.09); }
+.provider-preset-row select:focus-visible { border-color: var(--signal-lime); box-shadow: 0 0 0 3px rgba(217,255,120,.17), 0 12px 28px rgba(0,0,0,.22); }
 .button { font-size: 13px; }
 .button-small { font-size: 11px; }
 .privacy-note, .connection-badge { font-size: 10px; }
