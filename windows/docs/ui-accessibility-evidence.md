@@ -125,3 +125,9 @@
 - `ui-audit-v10/login-v10-1440.png` 确认 v7 场景、正文层、认证卡片和焦点样式仍可读。
 - 追加了窄屏 grid track、表单控件 `min-width: 0`、`100vw` 上限和场景签名换行约束，降低真实 320px 设备发生 intrinsic-width 裁切的风险。
 - Chrome headless 的 320px CLI 截图仍出现比截图画布更宽的布局轨道；该运行器未提供可靠的设备指标覆盖，因此只作为 renderer observation，不能宣称真实手机横向溢出已通过。UI-3 继续保持进行中，待可用 CDP/真实设备证据后复核。
+
+## v11 注册页语义顺序与布局回归
+
+- 注册页 DOM 顺序已调整为 `h1` 主标题在前、认证卡片 `h2` 在后；桌面端通过显式 grid placement 保持“卡片左、场景右”的原视觉构图，窄屏端按 DOM 顺序自然排列。
+- 当前源码隔离服务生成了 [`register-v11-1440.png`](../.cache/ui-audit-v11/register-v11-1440.png) 和 [`register-v11-768.png`](../.cache/ui-audit-v11/register-v11-768.png)；1440 档布局和焦点样式可读，768 档仍受 headless 自动聚焦/滚动行为影响，只作为观察样本。
+- 模板静态 heading 扫描结果：`register.html`、`login.html`、`dashboard.html`、`admin.html` 和 `privacy.html` 均以 `h1` 开始；表单 label、图片 alt、表格 caption/scope 继续通过静态检查。

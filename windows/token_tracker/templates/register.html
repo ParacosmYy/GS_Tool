@@ -3,6 +3,22 @@
 {% block title %}注册 · AI Token Tracker{% endblock %}
 {% block content %}
 <section class="auth-shell auth-shell-reverse auth-shell-register" data-auth-scene="register">
+  <div class="auth-intro">
+    <div class="auth-orbit-art" aria-hidden="true">
+      <span class="auth-orbit-ring ring-one"></span><span class="auth-orbit-ring ring-two"></span><span class="auth-orbit-ring ring-three"></span>
+      <span class="auth-orbit-crosshair"></span><span class="auth-orbit-satellite satellite-one"></span><span class="auth-orbit-satellite satellite-two"></span>
+      <span class="auth-orbit-core"></span><span class="auth-orbit-label">FLOW / 02</span>
+    </div>
+    <div class="scene-signature" aria-hidden="true"><span>RUST / RL WORKBENCH</span><i></i><span>MACBOOK / STUDIO SCENE</span></div>
+    <p class="eyebrow">YOUR PRIVATE / LOCAL LEDGER</p>
+    <h1 class="display-title" data-text="TRACK THE FLOW" aria-label="TRACK THE FLOW.">TRACK THE<br><em>FLOW.</em></h1>
+    <p class="muted intro-copy">连接兼容接口后自动读取 usage。每一次真实调用都会成为你的模型地图，历史异常再用补录修正。</p>
+    <div class="feature-lines">
+      <span><b>01</b> Daily / weekly / monthly</span>
+      <span><b>02</b> Signal trend</span>
+      <span><b>03</b> CSV export</span>
+    </div>
+  </div>
   <div class="auth-card">
     <div class="auth-card-top"><p class="eyebrow">START TRACKING</p><span>02 / 02</span></div>
     <h2>建立你的轨道</h2>
@@ -20,22 +36,6 @@
       <button class="button button-primary button-wide" type="submit">Launch your ledger <span>↗</span></button>
     </form>
     <p class="form-footnote">已有账户？<a href="{{ url_for('login') }}">Return to login <span>↗</span></a></p>
-  </div>
-  <div class="auth-intro">
-    <div class="auth-orbit-art" aria-hidden="true">
-      <span class="auth-orbit-ring ring-one"></span><span class="auth-orbit-ring ring-two"></span><span class="auth-orbit-ring ring-three"></span>
-      <span class="auth-orbit-crosshair"></span><span class="auth-orbit-satellite satellite-one"></span><span class="auth-orbit-satellite satellite-two"></span>
-      <span class="auth-orbit-core"></span><span class="auth-orbit-label">FLOW / 02</span>
-    </div>
-    <div class="scene-signature" aria-hidden="true"><span>RUST / RL WORKBENCH</span><i></i><span>MACBOOK / STUDIO SCENE</span></div>
-    <p class="eyebrow">YOUR PRIVATE / LOCAL LEDGER</p>
-    <h1 class="display-title" data-text="TRACK THE FLOW" aria-label="TRACK THE FLOW.">TRACK THE<br><em>FLOW.</em></h1>
-    <p class="muted intro-copy">连接兼容接口后自动读取 usage。每一次真实调用都会成为你的模型地图，历史异常再用补录修正。</p>
-    <div class="feature-lines">
-      <span><b>01</b> Daily / weekly / monthly</span>
-      <span><b>02</b> Signal trend</span>
-      <span><b>03</b> CSV export</span>
-    </div>
   </div>
 </section>
 {% endblock %}
