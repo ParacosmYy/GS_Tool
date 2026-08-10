@@ -6,7 +6,7 @@
 ## 输入
 
 - 用户需求和 `AGENTS.md`
-- 六角色交付包
+- 历史角色交付包
 - `docs/architecture.md`、`docs/api-contract.md`、`docs/decisions/`
 
 ## 输出

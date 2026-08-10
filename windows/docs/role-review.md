@@ -1,4 +1,4 @@
-# 六角色集成复核记录
+# 七槽位集成复核记录
 
 **作者：** AI Token Tracker Engineering Team  
 **复核对象：** AI Token Tracker 当前 checkout  
