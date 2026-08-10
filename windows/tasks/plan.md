@@ -221,6 +221,13 @@ normalization, validation, and aggregate refresh.
 - [x] Caddy filter、header、reverse proxy 边界与部署说明同步；配置语法依据官方文档记录。
 - [>] 正式主机上的 `caddy validate`、ACL、权限和真实轮转样本仍需部署负责人执行。
 
+### Task B10: Web/Android 场景资产一致性
+
+- [x] Web 切换到 `embedded-rust-engineer-bg-v6.png`，保留 v5 作为回滚资产。
+- [x] Android Compose 切换到同一像素资产的 `embedded_rust_engineer_bg_v6.png`，端侧遮罩和漂移实现不互相耦合。
+- [x] 两端资源 SHA-256 一致，资源引用、注释和视觉规范同步。
+- [>] Web v6 四档浏览器证据和 Android 编译/设备视觉验收仍分别等待 CDP 与 Android 工具链门禁。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。
