@@ -169,3 +169,22 @@
   `forced-colors: active` 会移除背景/鼠标装饰，交给 Windows 系统色处理内容、控件和焦点。
 - 该规则不改变默认桌面构图，也不把动画作为可读信息来源；真实系统高对比度设备仍需在 UI-3
   合法会话验收中复核。
+
+## v14 Dashboard 标题语义修正
+
+- 受保护 Dashboard 的视觉标题包含 glitch 伪元素；此前浏览器无障碍树可能把装饰性副本重复读出。
+- 当前 `h1` 使用稳定的 `aria-label="TOKEN SIGNAL"`，两层视觉字形标记为 `aria-hidden="true"`，
+  保留视觉动画但只向辅助技术暴露一次标题。
+
+## v15 隔离合法会话运行时回归
+
+- 使用忽略目录 `windows/.cache/ui-audit-v12/` 的隔离 SQLite，在短生命周期 `5019` 端口通过真实
+  注册/登录流程创建演示账户；随后只在该隔离库中授予 `admin` 角色，未读取或写入真实数据库。
+- Dashboard 运行时无障碍树将标题暴露为一次 `TOKEN SIGNAL`；320px viewport 的
+  `body/documentElement.scrollWidth=305`、`innerWidth=320`，无文档级横向溢出。
+- Admin 运行时包含团队表、token 明细表和工作事件表；三张表均有 caption 和 scoped headers。
+  成员详情展开后焦点进入关闭按钮，关闭后焦点回到成员“查看”触发按钮；空 token/事件状态均有可读文案。
+- 768px Admin viewport 的 `documentElement.scrollWidth=753`、`innerWidth=768`，表格在自身
+  `.table-wrap` 内水平滚动，页面本身没有横向溢出；本次浏览器 error/warning 日志为空。
+- 该证据覆盖了受保护页面的真实会话、空态、焦点和两档显式 viewport；仍不等同于真实手机硬件指标，
+  Provider 成功/失败、导出下载、reduced-motion 和完整四档焦点回归继续保持 UI-3 未关闭门禁。

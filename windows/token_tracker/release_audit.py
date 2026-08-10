@@ -505,6 +505,7 @@ def _check_web_ui_contract(root: Path, checks: list[AuditCheck]) -> None:
         ("base.html", 'aria-hidden="true"'),
         ("login.html", "<h1"),
         ("register.html", "<h1"),
+        ("dashboard.html", 'aria-label="TOKEN SIGNAL"'),
     )
     for filename, fragment in required_fragments:
         path = template_root / filename
