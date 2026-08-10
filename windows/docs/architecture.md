@@ -47,6 +47,7 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 | `token_tracker/auth_service.py` | 账号注册、用户名/密码校验和密码哈希 | 不签发/保存 bearer token，不读取 HTTP request |
 | `token_tracker/settings.py` | 环境变量、白名单、Cookie 和代理配置 | 不读取 request，不决定用户权限 |
 | `token_tracker/providers.py` | 白名单 URL、adapter 选择、模型发现、OpenAI-compatible 请求和 usage 解析 | 不管理用户会话或写 SQLite |
+| `token_tracker/provider_projection.py` | 将不可信 provider 响应投影为有界客户端字段 | 不保存原始 provider JSON，不决定授权或 token 统计 |
 | `token_tracker/services.py` | 记录校验、日期范围转换 | 不渲染 HTML |
 | `token_tracker/events.py` | work event、app log、audit event 校验和写入 | 不接受原始 prompt、Key 或任意 JSON SQL |
 | `token_tracker/admin_service.py` | 管理员页面、读模型、导出和审计用例编排 | 不绕过管理员装饰器或返回敏感字段 |

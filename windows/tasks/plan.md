@@ -254,6 +254,12 @@ normalization, validation, and aggregate refresh.
 - [x] CSP `script-src` 收敛为 self，空态错误提示改为本地静态资源语义。
 - [>] 浏览器 CDP 仍需复核图表真实渲染、空态和 reduced-motion。
 
+### Task B15: Provider 响应投影边界
+
+- [x] 新增 `provider_projection.py`，将上游响应收敛为有界助手文本和稳定标识符。
+- [x] Web/Android 继续使用 `choices[0].message.content`，不暴露供应商私有字段、工具参数或隐藏推理。
+- [x] ADR-052、API 契约、架构模块表和只读发布审计引用已同步。
+
 ## 目标
 
 在保持本地优先和可直接体验的前提下，把 AI Token Tracker 交付为一个可持续演进的中心化产品：自动采集优先、前后端边界清晰、七个角色按五个 UI 模块交付、网页和 Android 通过统一契约集成。视觉目标是参考 Moonshot 官网的空间感、黑底大排版和克制动效，并用 Material 3 的语义 token、可读性和可访问性把信息体验做得更完整。

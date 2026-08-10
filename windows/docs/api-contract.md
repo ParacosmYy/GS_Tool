@@ -300,9 +300,20 @@ provider 请求在边界限制 API Key 4096 字符、Base URL 2048 字符、模�
   "recorded": true,
   "usage": { "prompt_tokens": 12, "completion_tokens": 24, "total_tokens": 36 },
   "record": {},
-  "response": {}
+  "response": {
+    "id": "provider-response-id",
+    "model": "kimi-code",
+    "choices": [{
+      "message": { "role": "assistant", "content": "有界的助手文本" },
+      "finish_reason": "stop"
+    }]
+  }
 }
 ```
+
+`response` 是服务端投影，不是上游原始 JSON；最多保留第一个 choice 的助手文本，供应商
+私有字段、工具参数、隐藏推理和请求回显不会通过本项目 API 返回。文本和标识符均有长度
+边界，Android 只读取助手文本和独立的 `usage` 摘要。
 
 上游没有 usage 时返回 `recorded=false` 和 `warning`，不猜测 token 数量。
 

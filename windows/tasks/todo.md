@@ -27,6 +27,7 @@
 - [x] EXE 构建工具链独立锁定，PyInstaller 资源收集和用户数据目录边界已写入 ADR-049
 - [x] 新增只读 `token_tracker audit` 发布审计入口，区分源码通过与外部工具链 pending
 - [x] Chart.js 4.4.7 固定为项目本地静态资产，核心图表不再依赖 CDN
+- [x] Provider 响应投影：Web/Android 只接收有界助手文本和稳定字段，不透传原始上游 JSON
 - [>] Android 登录、个人仪表盘、token 分页历史、结构化工作信号写入、最近活动历史和管理员只读观测台已接入；待工具链批准后编译联调
 - [x] Android 首屏背景资产、低干扰遮罩、Compose edge-to-edge 约束和 Rust/RL 工程师视觉主题已落地
 - [x] Web/Android 统一切换 v6 场景资产；端侧遮罩、漂移实现保持解耦，v5 保留回滚

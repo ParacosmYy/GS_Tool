@@ -22,6 +22,7 @@ from .providers import (
     ProviderAdapter,
     resolve_provider_adapter,
 )
+from .provider_projection import project_response
 from .services import UsageValidationError, add_usage_result
 
 
@@ -107,12 +108,13 @@ def proxy_chat(
     response_json = _decode(adapter, provider_response, config.maximum_response_bytes)
     if provider_response.status_code >= 400:
         raise ProviderUpstreamError(provider_response.status_code, "上游服务返回错误")
+    response_projection = project_response(response_json)
 
     usage, input_tokens, output_tokens = adapter.extract_usage(response_json)
     if usage is None:
         return {
             "provider": adapter.name,
-            "response": response_json,
+            "response": response_projection,
             "usage": None,
             "recorded": False,
             "replayed": False,
@@ -123,7 +125,7 @@ def proxy_chat(
     if input_tokens is None or output_tokens is None:
         return {
             "provider": adapter.name,
-            "response": response_json,
+            "response": response_projection,
             "usage": usage,
             "recorded": False,
             "replayed": False,
@@ -145,7 +147,7 @@ def proxy_chat(
     )
     return {
         "provider": adapter.name,
-        "response": response_json,
+        "response": response_projection,
         "usage": usage,
         "recorded": True,
         "replayed": replayed,
