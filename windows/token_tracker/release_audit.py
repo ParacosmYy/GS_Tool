@@ -151,6 +151,7 @@ def _check_contract_references(root: Path, checks: list[AuditCheck]) -> None:
 
     references = (
         ("web-scene-reference", "windows/token_tracker/static/scene-motion.css", "embedded-rust-engineer-bg-v7.png"),
+        ("web-scene-image-layer", "windows/token_tracker/templates/base.html", "story-backdrop-image"),
         ("android-scene-reference", "android/app/src/main/java/com/aitokentracker/ui/TokenTrackerApp.kt", "embedded_rust_engineer_bg_v7"),
         ("kimi-provider-presets", "windows/token_tracker/templates/dashboard.html", "kimi-code"),
         ("provider-response-projection", "windows/token_tracker/provider_service.py", "project_response"),
