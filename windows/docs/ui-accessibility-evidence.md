@@ -540,3 +540,17 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `scrollWidth=305 / clientWidth=305`、导航隐藏；浏览器控制台 `error/warning` 为空。
 - 验证结束后仅停止显式隔离端口 5044；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v38 表单选择控件暗色玻璃表面证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5045`，数据库位于
+  `windows/.cache/ui-v1010-runtime-20260811/token_tracker-5045.sqlite3`；临时账户仅用于浏览器观察，未读取真实
+  数据库、Cookie、Key 或令牌。
+- 工作信号表单的“工作方向/结果”和自动采集的 Provider 预设统一使用暗色玻璃 select：
+  `appearance=none`、`color-scheme=dark`、浅色文字、自定义箭头、聚焦边框与暗色 option 背景，消除原生白色控件
+  与观测台表面的视觉断层。
+- 桌面运行时两个工作信号 select 均为 `48px` 高、文字色为 `rgb(247,248,252)`；自动采集预设同步保留箭头。
+  320×800 移动视口下 select 宽 `237px`，页面 `scrollWidth=305 / clientWidth=305`，实际选择“调试排错”
+  成功更新值；浏览器控制台 `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5045；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
