@@ -31,24 +31,27 @@ body.pointer-interactive .pointer-ring { width: 48px; height: 48px; border-color
 body.pointer-press .pointer-ring { transform: translate3d(-50%, -50%, 0) scale(.78); }
 
 /* Keep the AI TOKEN lockup attached to the scene without turning the header
-   into a filled panel. The resting state is fully transparent; scrolling may
-   add only a minimal local veil so navigation remains legible over surfaces. */
+   into a filled panel. Resting and scrolling states stay fully transparent;
+   the progress line and text halo carry the navigation hierarchy. */
 .site-header {
   background: transparent;
+  background-image: none;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035);
+  border-bottom-color: transparent;
+  box-shadow: none;
   transition: background .45s var(--ui-ease), border-color .45s var(--ui-ease), box-shadow .45s var(--ui-ease), backdrop-filter .45s var(--ui-ease);
 }
 
 .site-header.is-scrolled {
-  border-bottom-color: rgba(230,235,245,.18);
-  /* Keep the brand row transparent after scroll as well. The hairline and
-     existing text halo carry navigation contrast without a tinted glass slab. */
+  border-bottom-color: transparent;
+  /* Keep the brand row transparent after scroll as well. The progress line
+     and existing text halo carry hierarchy without a tinted glass slab. */
   background: transparent;
+  background-image: none;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  box-shadow: none;
 }
 
 /* Signal metadata sits over a moving illustration. Give it a compact glass

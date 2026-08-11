@@ -17,6 +17,7 @@ import { setupBackdropMotion, setupPointerFollower, setupSurfaceMotion } from ".
 
   const scene = document.querySelector("[data-auth-scene]");
   const finePointer = window.matchMedia("(pointer: fine)").matches;
+  const desktopViewport = window.matchMedia("(min-width: 621px)").matches;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!scene) return;
 
@@ -27,11 +28,22 @@ import { setupBackdropMotion, setupPointerFollower, setupSurfaceMotion } from ".
     input.addEventListener("blur", () => { delete scene.dataset.authFocus; });
   });
 
+  // Script autofocus is useful for the desktop keyboard path, but its focus
+  // ring should stay quiet until the user begins an intentional interaction.
+  // The marker is removed on the first pointer or keyboard event so normal
+  // :focus-visible guidance immediately resumes.
+  const clearAutofocusMarker = () => { delete scene.dataset.authAutofocus; };
+  scene.addEventListener("pointerdown", clearAutofocusMarker, { passive: true });
+  scene.addEventListener("keydown", clearAutofocusMarker, { passive: true });
+
   const initialField = scene.querySelector('input[name="username"]');
-  if (finePointer && initialField && document.activeElement === document.body) {
+  if (finePointer && desktopViewport && initialField && document.activeElement === document.body) {
     // Desktop users keep the fast keyboard path, while preventScroll avoids
     // mobile browsers moving the entire authentication scene to the field.
-    window.requestAnimationFrame(() => initialField.focus({ preventScroll: true }));
+    window.requestAnimationFrame(() => {
+      scene.dataset.authAutofocus = "true";
+      initialField.focus({ preventScroll: true });
+    });
   }
   if (!finePointer || reducedMotion) return;
 

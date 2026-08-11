@@ -1,0 +1,37 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Separate authentication focus hierarchy from the shared visual layer.
+ * Module: Web presentation / authentication focus state
+ */
+
+/* Autofocus keeps the desktop keyboard path fast, but it should not read as
+   an alarm on the first frame. Reserve the full halo for keyboard-visible
+   focus while pointer/programmatic focus keeps only a quiet signal edge. */
+.auth-shell input:focus, .auth-shell textarea:focus {
+  border-color: rgba(217,255,120,.72);
+  background: rgba(217,255,120,.05);
+  box-shadow: 0 0 0 1px rgba(217,255,120,.12);
+}
+
+.auth-shell input:focus-visible, .auth-shell textarea:focus-visible {
+  border-color: var(--signal-lime);
+  background: rgba(217,255,120,.08);
+  box-shadow: 0 0 0 3px rgba(217,255,120,.17), 0 12px 28px rgba(0,0,0,.22);
+}
+
+.auth-shell[data-auth-autofocus="true"] input:focus,
+.auth-shell[data-auth-autofocus="true"] textarea:focus {
+  border-color: rgba(217,255,120,.72);
+  background: rgba(217,255,120,.05);
+  box-shadow: 0 0 0 1px rgba(217,255,120,.12);
+}
+
+@media (forced-colors: active) {
+  .auth-shell input:focus, .auth-shell textarea:focus,
+  .auth-shell input:focus-visible, .auth-shell textarea:focus-visible {
+    border-color: Highlight;
+    background: Field;
+    box-shadow: none;
+  }
+}

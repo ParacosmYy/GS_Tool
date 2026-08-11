@@ -40,14 +40,14 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
 .site-header {
   width: min(1320px, calc(100% - 64px));
   min-height: 76px;
-  border-bottom-color: var(--line-soft);
-  /* The header is chrome, not a content panel. Its near-transparent surface
-     lets the illustrated scene pass through the complete AI TOKEN row; the
-     hairline and text shadow preserve scanability without a dark slab. */
+  border-bottom-color: transparent;
+  /* The header is chrome, not a content panel. The scene must pass through
+     the complete AI TOKEN row; text shadow alone preserves scanability. */
   background: transparent;
+  background-image: none;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  box-shadow: none;
   transition: border-color .45s var(--ui-ease), box-shadow .45s var(--ui-ease);
 }
 /* Keep small header labels sharp over the moving scene: a tight keyline

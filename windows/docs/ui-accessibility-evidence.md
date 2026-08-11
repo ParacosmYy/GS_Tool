@@ -904,3 +904,23 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 真实 1440×900 首屏 computed 为透明/无 blur；滚动约 `191.3px` 后 `site-header.is-scrolled` 仍为透明/无 blur，仅保留 `rgba(255,255,255,.04) 0 1px 0 inset`，截图确认品牌栏和登录卡片层级稳定。
 - 320/390/768/1024/1440 矩阵均确认品牌存在、header 透明、无横向溢出，页面宽度分别为 `305/320`、`375/390`、`753/768`、`1009/1024`、`1425/1440`；`tabV67.dev.logs()` 返回空数组。
 - 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；浏览器工具自身的外部网络遥测告警不计入本地应用日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v68 认证焦点层级证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5143`，数据库位于
+  `windows/.cache/ui-v1400-runtime-20260812-5143/token_tracker-5143.sqlite3`；仅使用登录页合成状态观察焦点，不读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前桌面 `auth.js` 的自动聚焦会直接命中 `input:focus-visible`，首屏用户名字段立即呈现完整荧光 halo；本轮以 `data-auth-autofocus` 标记自动聚焦窗口，首个 pointer/keyboard 事件后删除标记，独立 `static/auth-focus.css` 只对该短窗口使用 quiet edge。
+- 真实桌面首屏截图确认自动聚焦的用户名字段不再显示大面积 halo；读取到 `active=username`、`marker=true`，用户操作前视觉保持安静。随后发送一次 Tab，marker 变为缺省，密码字段 `focus-visible=true`，computed border 为 `rgb(217,255,120)`、background 为 `rgba(217,255,120,.08)`、box-shadow 为 `3px` 键盘 halo；截图确认键盘反馈仍清晰。
+- 真实 390×844 移动截图确认登录卡片、品牌栏和标题层级保持，`active=null`、无自动聚焦 marker、页面宽度 `375/390`；移动端不抢占软键盘入口。
+- 320/390/768/1024/1440 矩阵均确认认证卡片与品牌存在、页面无横向溢出，宽度分别为 `305/320`、`375/390`、`753/768`、`1009/1024`、`1425/1440`；`tabV68.dev.logs()` 返回空数组。
+- 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；浏览器工具自身外部网络遥测告警不计入本地页面日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v69 顶部品牌栏完全透景与窄视口焦点边界证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离认证实例 `127.0.0.1:5146`，数据库位于
+  `windows/.cache/ui-v1400-runtime-20260812-5146/token_tracker-5146.sqlite3`；仅使用登录页合成状态观察渲染，未读取真实 Cookie、Key、令牌或用户数据库。
+- `static/ui-polish.css` 与 `static/scene-motion.css` 现在共同声明 `.site-header` / `.site-header.is-scrolled` 的 `background=transparent`、`background-image=none`、`border-bottom-color=transparent`、`box-shadow=none`；只保留文字阴影与滚动进度线，避免边线和内侧高光被看成黑色横带。
+- 真实 1440×900 首屏确认上述透明计算值、`backdrop-filter=none` 与页面宽度 `1425/1425`；PageDown 后 `class=site-header is-scrolled`，仍保持透明/无阴影/无边线，进度线宽度约 `1320px`，截图确认场景直接穿过 AI TOKEN 行。
+- 320/390/768/1024/1440 矩阵均确认品牌存在、header 背景/边线/阴影透明且页面无横向溢出，页面宽度分别为 `305/305`、`375/375`、`753/753`、`1009/1009`、`1425/1425`；移动窄视口 `active=null`、无 `data-auth-autofocus`，桌面自动聚焦仍保留 quiet edge。
+- 桌面首屏读取到用户名字段 `background=rgba(217,255,120,.05)`、1px quiet edge；Tab 后密码字段恢复 `:focus-visible` 的 3px keyboard halo。`auth-focus.css` 已独立加载，`tabV68.dev.logs()` 返回空数组。
+- 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；浏览器工具自身外部网络遥测告警不计入本地页面日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。

@@ -132,6 +132,14 @@ AI TOKEN 顶部品牌栏首屏恢复完全透景，滚动时只保留极轻的�
 
 基础 `.site-header` 现在从第一层 CSS 就使用 transparent/无 blur，不再依赖后加载视觉层覆盖黑玻璃；真实 390px/1440px 首屏与滚动态及五档响应式证据见 `ui-accessibility-evidence.md` 的 v67 章节。reduced-motion 实际模拟、真实设备、Provider 联调和正式部署验收仍未关闭。
 
+## v68 认证焦点反馈
+
+认证页自动聚焦现在保持 quiet edge，用户首次键盘/鼠标操作后恢复完整 `:focus-visible` halo，移动端不抢焦点；真实桌面/移动截图与五档响应式证据见 `ui-accessibility-evidence.md` 的 v68 章节。reduced-motion 实际模拟、真实设备、Provider 联调和正式部署验收仍未关闭。
+
+## v69 透明品牌栏与窄视口焦点边界
+
+AI TOKEN 顶栏默认态与滚动态现在完全透景，移除残留边线、内侧高光、背景图与阴影，仅保留文字可读性阴影和滚动进度线；自动聚焦仅在细指针桌面宽度启用。5146 隔离实例的桌面、移动和五档矩阵证据见 `ui-accessibility-evidence.md` 的 v69 章节。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
