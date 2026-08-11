@@ -196,6 +196,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的共享指标表现层；未改变 DOM、数据契约、图表逻辑、导航或业务状态。
 - UI-3：真实 5170 隔离实例已完成 390/1440px 截图、滚动态 computed style、页面宽度和清洁页面日志确认；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署仍不宣称通过。
 
+## v74 reveal 过渡可读性
+
+- UI-1：保留现有由下向上的 reveal 叙事，只把动效中的可读性地板从 `.34` 提升至 `.62`，并将位移/时长收敛为 `8px/.72s`；用户在等待落位时仍可读取标题、统计和操作文案。
+- UI-2：变更只位于 `responsive-tuning.css` 的 `prefers-reduced-motion: no-preference` 表现层；`reduce` 复位、DOM、API、数据契约、导航和业务状态均未改变，未新增依赖。
+- UI-3：真实 5170 实例已完成 1440px 滚动过渡、320/390/768/1024/1440 矩阵、无障碍快照和页面日志检查；真实 reduced-motion/forced-colors、设备、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

@@ -961,3 +961,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 390×844 滚动至 `scrollY=620` 的截图确认 INPUT/OUTPUT/ACTIVE MODELS 三格仍直接透景，`small` computed color 提升为 `rgb(215,219,229)`；1440×900 滚动态仍保持 `site-header.is-scrolled`、深蓝渐变与 `blur(12px) saturate(1.08)`。
 - 390/1440 页面均保持 `scrollWidth=clientWidth`，分别为 `375/375` 与 `1425/1425`；`tabV1800.dev.logs()` 返回空数组。
 - 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；浏览器工具自身外部遥测队列告警不计入本地页面日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v74 reveal 过渡可读性证据（2026-08-12）
+
+- 在当前 checkout 重新启动无缓存隔离 Dashboard 实例 `127.0.0.1:5170`，数据库位于
+  `windows/.cache/ui-v1800-runtime-20260812-5170/token_tracker-5170.sqlite3`；仅使用运行时创建的合成账号观察布局，未读取真实 Cookie、Key、令牌或用户数据库。
+- 基线复核确认 below-fold `data-reveal` 在 v73 过渡期间会进入 `opacity=.34 / translateY(12px)`；`responsive-tuning.css` 现仅在 `prefers-reduced-motion: no-preference` 下覆盖为 `opacity=.62 / translateY(8px) / .72s`，`.is-visible` 仍为 `opacity=1 / translateY(0)`，没有改变 DOM、数据或业务逻辑。
+- 真实 1440×900 页面滚动到 `scrollY=1500` 后，在 120ms 观察窗口读取 `#analysis`、`#activity`、`#history` 等尚未落位节点，computed style 为 `opacity=.62`、矩阵位移约 `8px`；继续滚动后 `#history` 在 `scrollY=2970` 已落位为 `opacity=.999965`、位移约 `0px`，说明可读性地板与动效方向同时生效。
+- 390×844 首屏读取 `scrollWidth/clientWidth=375/375`，header 为 `background=rgba(0,0,0,0)`、`backgroundImage=none`；320×780 为 `305/305` 且同样保持透明。768×860、1024×900、1440×900 分别为 `753/753`、`1009/1009`、`1425/1425`，均无横向溢出。
+- Dashboard 无障碍快照长度为 `5965`，保留 `main`、`主要导航`、`TOKEN SIGNAL` 等关键语义；读取到 9 个标题、1 个 `main`，`tabV74.dev.logs({})` 返回空数组。浏览器默认媒体结果为 `no-preference=true / reduce=false`。
+- reduced-motion 规则仍由 `ui-polish.css` 的独立 `@media (prefers-reduced-motion: reduce)` 复位；本轮未伪造 reduced-motion、forced-colors、真实设备或 Provider 联调证据。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。

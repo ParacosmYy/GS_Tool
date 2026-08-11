@@ -47,6 +47,23 @@
   color: var(--ink-soft);
 }
 
+/* Reveal motion should preserve scanability while a below-fold card settles
+   into view. Keep the editorial lift, but use a readable floor and a shorter
+   settle time. Reduced-motion users continue through the dedicated rule in
+   ui-polish.css; this contract only applies when motion is allowed. */
+@media (prefers-reduced-motion: no-preference) {
+  html.motion-ready [data-reveal] {
+    opacity: .62;
+    transform: translateY(8px);
+    transition-duration: .72s;
+  }
+
+  html.motion-ready [data-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* At tablet widths the orbit is intentionally above the copy, but the
    illustration must not push the primary actions beyond the first scan. The
    dedicated range keeps this correction isolated from the 320px mobile grid
