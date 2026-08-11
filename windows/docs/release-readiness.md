@@ -116,6 +116,10 @@ AI TOKEN 顶部品牌栏首屏恢复完全透景，滚动时只保留极轻的�
 
 首屏场景插画加入高优先级预加载、图片请求优先级和深蓝解码 fallback，消除首次导航时近黑空画布；冷 origin 的 768×900 首帧与 320/390/768/1024/1440 矩阵证据见 `ui-accessibility-evidence.md` 的 v63 章节。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v64 透明顶栏文字锐化
+
+顶栏品牌、导航和用户标签改用更紧的文字 keyline 与短 halo，在滚动插画上保持锐利而不填充背景；真实桌面首屏/Activity 滚动态、390px 截图和五档 computed matrix 证据见 `ui-accessibility-evidence.md` 的 v64 章节。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

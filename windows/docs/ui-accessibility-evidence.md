@@ -862,3 +862,14 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 真实矩阵均确认图片已完成、无横向溢出：320px `305/305`、390px `375/375`、768px `753/753`、1024px `1009/1009`、1440px `1425/1425`；五档 `imageComplete=true`、`naturalWidth=1672`。
 - 390×844 截图确认移动首屏仍保留角色、轨道、标题和双 CTA 的连续层级；本轮仅改变资源启动和加载 fallback，没有新增动画或业务状态，`uiTabV63Cold.dev.logs()` 返回空数组。
 - 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v64 透明顶栏文字锐化证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5130`，数据库位于
+  `windows/.cache/ui-v1300-runtime-20260812-5130/token_tracker-5130.sqlite3`；仅使用合成账号观察首屏和 Activity 滚动态，未读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前真实 Activity 滚动态截图显示 `AI TOKEN / OBSERVATORY` 在明暗交错插画上呈宽泛发光，原 computed `text-shadow` 为 `0 1px 12px rgba(8,9,12,.52)`；小字号品牌锁定区边缘不够锐利。
+- `static/ui-polish.css` 将共享顶栏文字阴影收敛为 `0 1px 2px rgba(8,9,12,.92), 0 0 8px rgba(8,9,12,.68)`：保留暗色 keyline 和短 halo，不增加背景填充、不改变透明顶栏策略。
+- 真实 1440×900 首屏确认 header `background=rgba(0,0,0,0)`、`backdrop-filter=none`；稳定 Activity 滚动态确认 `site-header.is-scrolled`、约 `.043` alpha 背景、`blur(4px) saturate(1.04)` 和新 text-shadow，品牌文字 opacity 为 `1`。
+- 真实响应式 computed matrix 确认 320/390/768/1024/1440 五档 brand opacity 均为 `1`，且页面宽度分别保持 `305/305`、`375/375`、`753/753`、`1009/1009`、`1425/1425`，无横向溢出。
+- 1440×900 Activity 稳定滚动态与 390×844 首屏截图确认品牌、导航、Log out、状态胶囊和移动 CTA 仍可扫描；`uiTabV64.dev.logs()` 返回空数组，本轮未新增动画、DOM、API 或业务状态。
+- 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。

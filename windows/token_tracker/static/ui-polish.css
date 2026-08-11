@@ -50,7 +50,10 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
   transition: border-color .45s var(--ui-ease), box-shadow .45s var(--ui-ease);
 }
-.brand-lockup strong, .site-nav a, .user-chip { text-shadow: 0 1px 12px rgba(8,9,12,.52); }
+/* Keep small header labels sharp over the moving scene: a tight keyline
+   protects glyph edges while a short halo separates text from the image.
+   Wide blur makes the transparent brand chrome look out of focus on scroll. */
+.brand-lockup strong, .site-nav a, .user-chip { text-shadow: 0 1px 2px rgba(8,9,12,.92), 0 0 8px rgba(8,9,12,.68); }
 .site-header::after {
   position: absolute;
   right: 0;

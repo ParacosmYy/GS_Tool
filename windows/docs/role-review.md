@@ -136,6 +136,12 @@
 - UI-2：变更集中在 `base.html` 的资源提示/图片优先级和 `scene-motion.css` 的背景 fallback，不改变业务 DOM 语义、API、数据契约或交互状态；既有 reduced-motion、forced-colors 和键盘焦点边界保持。
 - UI-3：冷 origin 真实 768×900 首帧截图、320/390/768/1024/1440 图片完成矩阵、无横向溢出与清洁控制台均已确认；真实设备、辅助偏好、Provider 联调和正式部署仍不宣称通过。
 
+## v64 视觉与动效增量
+
+- UI-1：将透明顶栏的品牌、导航和用户标签从宽泛发光改为紧 keyline + 短 halo，提升滚动插画上的字形锐度，不引入实心黑色横条。
+- UI-2：变更仅落在 `ui-polish.css` 的共享文字表现层，不改变 DOM、JS、API、数据契约或交互状态；既有 reduced-motion、forced-colors、键盘焦点和透明 header 规则保持。
+- UI-3：真实 1440×900 首屏/Activity 滚动态、390px 移动截图及 320/390/768/1024/1440 computed matrix 均已确认；真实设备、辅助偏好、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
