@@ -18,69 +18,34 @@
   box-shadow: none;
 }
 
-/* Keep the AI TOKEN brand itself fully transparent, but protect the right
-   navigation/account rail once the sticky header crosses page content. This
-   local veil prevents buttons and chart labels from visually passing through
-   the nav while the scene remains visible and the header stays non-solid. */
+/* The sticky row must remain a single transparent layer. Earlier local veils
+   made the header read as a dark strip over the artwork; text keylines and the
+   progress line below provide enough hierarchy without tinting the scene. */
 @media (min-width: 621px) {
   .site-header.is-scrolled::before {
-    position: absolute;
-    z-index: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 56%;
-    content: "";
-    pointer-events: none;
-    border-bottom: 1px solid rgba(230, 235, 245, .08);
-    border-radius: 0 0 0 14px;
-    background: linear-gradient(90deg, rgba(7, 14, 24, .04), rgba(7, 14, 24, .12) 48%, rgba(7, 14, 24, .24));
-    -webkit-backdrop-filter: blur(12px) saturate(1.06);
-    backdrop-filter: blur(12px) saturate(1.06);
+    display: none;
   }
 
   .site-header.is-scrolled > * {
     position: relative;
-    z-index: 1;
+    z-index: auto;
   }
 }
 
 @media (min-width: 621px) and (max-width: 900px) {
-  /* Tablet navigation compresses toward the brand, so the reading rail must
-     begin earlier to cover the full nav/account cluster without changing the
-     desktop rail geometry. */
-  .site-header.is-scrolled::before {
-    left: 22%;
-    background: linear-gradient(90deg, rgba(7, 14, 24, .03), rgba(7, 14, 24, .09) 48%, rgba(7, 14, 24, .18));
-  }
+  /* Keep the transparent contract when the navigation compresses on tablet. */
+  .site-header.is-scrolled::before { display: none; }
 }
 
-/* The full AI TOKEN row remains transparent while scrolling. A local lens
-   behind the brand lockup keeps section labels from passing through the logo
-   and turning the small identity mark into a mixed reading layer. The lens is
-   pointer-inert, does not change the brand's layout box, and stays absent at
-   rest so the first scene frame remains fully open. */
+/* The brand lockup is part of the transparent chrome, not a floating card.
+   Keep its layout and text halo; remove the old scrolled-state lens. */
 .site-header.is-scrolled .brand {
   position: relative;
   z-index: 1;
-  isolation: isolate;
 }
 
 .site-header.is-scrolled .brand::before {
-  position: absolute;
-  z-index: -1;
-  top: -8px;
-  right: -12px;
-  bottom: -8px;
-  left: -12px;
-  content: "";
-  pointer-events: none;
-  border: 1px solid rgba(230, 235, 245, .08);
-  border-radius: 8px;
-  background: rgba(7, 14, 24, .035);
-  box-shadow: 0 5px 16px rgba(7, 14, 24, .08);
-  -webkit-backdrop-filter: blur(9px) saturate(1.04);
-  backdrop-filter: blur(9px) saturate(1.04);
+  display: none;
 }
 
 /* Once the page has moved, the hero cue has completed its job. Removing it

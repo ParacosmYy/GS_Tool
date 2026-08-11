@@ -250,6 +250,12 @@
 - UI-2：变更集中在 `motion.js` 的 pointer lifecycle 与 `style.css`/`scene-motion.css` 的 visibility 层；复用现有 pointer 节点和 reduced-motion/fine-pointer 门禁，不新增依赖、DOM、API、认证或数据流。
 - UI-3：真实 5178 隔离实例已确认 default hidden → active visible → idle hidden → re-activate visible、无横向溢出、Week/Today 周期交互、可访问性快照和清洁页面日志；本轮四档 viewport 与真实辅助偏好仍按独立门禁记录，证据见 `ui-accessibility-evidence-v82.md`。
 
+## v83 AI TOKEN 顶栏完全透景
+
+- UI-1：移除滚动态右侧 reading rail 与品牌 lockup lens，解决顶部 `AI TOKEN` 行被误读为半透明深色卡片的问题；保留文字 keyline、滚动进度线和系统配色降级。
+- UI-2：变更集中在 `responsive-tuning.css` 的伪元素表现层；不改变 DOM、布局盒、导航、认证、API、数据流或业务状态，所有文件仍低于 1000 行。
+- UI-3：真实 5179 隔离实例已确认默认桌面首屏与 `scrollY = 720` 的透明 computed style、截图、Week/Today、无横向溢出、可访问性树和清洁页面日志；viewport override、真实设备、辅助偏好、Provider 联调和正式部署仍不宣称通过，证据见 `ui-accessibility-evidence-v83.md`。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

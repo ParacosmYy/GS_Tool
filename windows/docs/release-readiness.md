@@ -192,6 +192,10 @@ Dashboard 在滚动态为 AI TOKEN 品牌锁定区增加 `.035` alpha 的局部�
 
 Dashboard 的装饰性鼠标光环现在只在移动时出现，静止 1.8 秒后进入 `pointer-idle` 并停止 requestAnimationFrame，下一次移动可靠恢复；首帧隐藏、原生鼠标、hover/focus、reduced-motion 与 fine-pointer 边界继续保留。5178 隔离实例已完成指针状态序列、无横向溢出、Week/Today、无障碍快照和页面日志检查，独立证据见 `ui-accessibility-evidence-v82.md`；本轮是聚焦生命周期验证，四档 viewport、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v83 AI TOKEN 顶栏完全透景
+
+滚动态不再绘制右侧 reading rail，也不再为 AI TOKEN 品牌锁定区绘制局部 lens；顶栏主体、品牌行和场景保持连续透景，仅保留文字 keyline 与滚动进度线。5179 隔离实例已完成默认桌面首屏/滚动态截图、computed style、Week/Today、无横向溢出、可访问性树和页面日志检查，独立证据见 `ui-accessibility-evidence-v83.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

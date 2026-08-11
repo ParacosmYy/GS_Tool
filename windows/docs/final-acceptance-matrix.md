@@ -235,6 +235,11 @@
 - 装饰性 pointer follower 增加显式生命周期：首帧 hidden、fine-pointer 移动时 visible、1.8 秒静止后 `pointer-idle` hidden 并取消动画帧、再次移动恢复；不改变 DOM 节点、焦点、hover/focus 语义或业务数据。
 - 5178 隔离实例真实确认指针状态序列、无横向溢出、Week/Today 周期交互、无障碍关键语义和清洁页面控制台；独立证据见 `ui-accessibility-evidence-v82.md`，四档 viewport、真实设备与辅助偏好继续独立门禁。
 
+### v83 交付增量
+
+- 滚动态 AI TOKEN 顶栏移除右侧 reading rail 与品牌 lockup lens；普通模式继续 `transparent / no blur / no shadow`，文字 keyline 和进度线保持不变。
+- 5179 隔离实例真实确认默认桌面首屏与 `scrollY = 720` 截图、computed style、Week/Today 周期交互、无横向溢出、可访问性树和清洁页面日志；新证据见 `ui-accessibility-evidence-v83.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
