@@ -26,6 +26,12 @@
 | 备份恢复/回滚 | 条件通过 | 已填充隔离 EXE 数据库完成备份、`verify-backup`、`backup-inventory --verify` 和 staging 恢复二次校验，当前 schema（含 Usage Ingest Token）与防覆盖命名仍受门禁保护（ADR-060/077/088）；真实数据恢复、负责人确认的保留周期/离线副本和回滚记录仍待部署演练 |
 | 工程质量门禁 | pass（当前 checkout） | `token_tracker audit --json`：代码/文本 1000 行门禁、作者头、Python docstring、Android KDoc、Web UI 静态契约、production/Caddy/LAN 部署契约、层间依赖边界、契约引用、跨端资产和 Chart.js 供应链通过；`windows/ci/quality-gate.ps1` 与 GitHub Actions 已接入（ADR-085）；`release-doctor` 提供统一只读编排入口 |
 
+## v43 视觉增量
+
+顶部 `AI TOKEN` 品牌栏已经移除深色底色，保留轻量透景 blur、底线和文本阴影；Token 历史账本补充桌面扫描层级与
+320px 双列卡片布局。隔离浏览器证据、空态回归与未关闭真实设备门禁见 [`ui-accessibility-evidence.md`](ui-accessibility-evidence.md)
+的 v43 章节。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

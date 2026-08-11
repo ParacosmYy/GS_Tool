@@ -30,12 +30,14 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
   }
 
   const charts = createChartRenderer(numberFormat, formatNumber);
+  const recordColumnLabels = ["模型", "输入", "输出", "总 token", "时间", "来源 / 备注"];
 
   function renderRecords(records) {
     const body = byId("records-body");
     body.replaceChildren();
     if (!records.length) {
       const row = document.createElement("tr");
+      row.className = "record-empty-row";
       const cell = document.createElement("td");
       cell.colSpan = 6;
       cell.className = "table-empty table-empty--signal";
@@ -46,15 +48,28 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
     }
     records.forEach((record) => {
       const row = document.createElement("tr");
+      row.className = "record-row";
       [record.model, formatNumber(record.input_tokens), formatNumber(record.output_tokens), formatNumber(record.total_tokens), record.timestamp].forEach((value, index) => {
         const cell = document.createElement("td");
+        cell.dataset.label = recordColumnLabels[index];
         cell.textContent = value;
-        if (index > 0 && index < 4) cell.className = "table-number";
+        if (index === 0) cell.className = "record-model";
+        if (index > 0 && index < 4) cell.classList.add("table-number");
+        if (index === 3) cell.classList.add("record-total");
         row.appendChild(cell);
       });
       const source = document.createElement("td");
-      source.className = "table-source";
-      source.textContent = `${record.source === "proxy" ? "自动采集" : "补录"}${record.note ? ` · ${record.note}` : ""}`;
+      source.className = "table-source record-source";
+      const sourceType = document.createElement("span");
+      sourceType.className = `record-source-type ${record.source === "proxy" ? "is-automatic" : "is-manual"}`;
+      sourceType.textContent = record.source === "proxy" ? "自动采集" : "补录";
+      source.appendChild(sourceType);
+      if (record.note) {
+        const note = document.createElement("span");
+        note.className = "record-source-note";
+        note.textContent = record.note;
+        source.append(" · ", note);
+      }
       row.appendChild(source);
       body.appendChild(row);
     });

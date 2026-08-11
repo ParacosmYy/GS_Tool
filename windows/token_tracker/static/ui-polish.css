@@ -41,13 +41,13 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   width: min(1320px, calc(100% - 64px));
   min-height: 76px;
   border-bottom-color: var(--line-soft);
-  /* Keep the brand readable while letting the scene pass through the first
-     frame. The previous 34% top veil read as an opaque black banner on the
-     illustrated auth/dashboard backdrop. */
-  background: linear-gradient(180deg, rgba(8,9,12,.08), rgba(8,9,12,.02) 58%, rgba(8,9,12,0));
+  /* The header is chrome, not a content panel. A transparent surface lets
+     the illustrated scene pass through the complete AI TOKEN row; only the
+     blur, hairline, and text shadow preserve scanability over bright areas. */
+  background: transparent;
   -webkit-backdrop-filter: blur(8px) saturate(1.08);
   backdrop-filter: blur(8px) saturate(1.08);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 20px rgba(0,0,0,.04);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 20px rgba(0,0,0,.02);
 }
 .brand-lockup strong, .site-nav a, .user-chip { text-shadow: 0 1px 12px rgba(8,9,12,.52); }
 .site-header::after {
@@ -634,6 +634,42 @@ th { color: var(--ink-muted); font-size: 10px; }
 td { color: var(--ink-soft); font-size: 12px; }
 .table-source { color: var(--ink-muted); font-size: 11px; }
 .table-empty { color: var(--ink-muted); font-size: 13px; }
+
+/* The ledger is scanned row-first: model opens the row, total is the anchor,
+   and provenance is a small, consistent badge instead of undifferentiated
+   note text. Keep the semantic table structure and textContent rendering. */
+#records-body td.record-model { position: relative; padding-left: 28px; color: var(--ink); }
+#records-body td.record-model::before {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--signal-lime);
+  border-radius: 50%;
+  content: "";
+  box-shadow: 0 0 10px rgba(217,255,120,.42);
+  transform: translateY(-50%);
+}
+#records-body td.record-total { color: var(--signal-lime); font-weight: 700; }
+#records-body tr:hover td.record-total { color: var(--signal-lime); }
+.record-source { white-space: nowrap; }
+.record-source-type {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  border: 1px solid rgba(196,192,255,.28);
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: var(--ink-soft);
+  background: rgba(196,192,255,.08);
+  font-size: 10px;
+  line-height: 1;
+}
+.record-source-type::before { width: 5px; height: 5px; border-radius: 50%; content: ""; background: var(--signal-lavender); }
+.record-source-type.is-automatic { border-color: rgba(217,255,120,.32); color: var(--signal-lime); background: rgba(217,255,120,.07); }
+.record-source-type.is-automatic::before { background: var(--signal-lime); box-shadow: 0 0 8px rgba(217,255,120,.54); }
+.record-source-note { color: var(--ink-muted); font-size: 11px; }
 /* Empty tables are a quiet product state, not a missing layout. Give the
    zero-signal row the same calm instrument language as the chart empty state. */
 .table-empty--signal {
@@ -747,6 +783,81 @@ html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0
 @keyframes table-empty-scan {
   0%, 100% { opacity: .18; transform: scaleX(.2); }
   50% { opacity: .72; transform: scaleX(1); }
+}
+
+/* On a narrow screen six ledger columns are not a useful interaction. Keep
+   the real table headers for assistive technology, while presenting each
+   record as a complete two-column scan card for sighted users. */
+@media (max-width: 620px) {
+  #history .table-scroll { overflow: visible; }
+  #history table { display: block; min-width: 0; }
+  #history thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  #history tbody { display: grid; gap: 10px; }
+  #history .record-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 14px;
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    padding: 8px 12px;
+    background: linear-gradient(145deg, rgba(21,26,33,.86), rgba(8,11,15,.94));
+  }
+  #history .record-row td {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 7px;
+    align-items: center;
+    min-width: 0;
+    border: 0;
+    padding: 8px 0;
+    white-space: normal;
+  }
+  #history .record-row td::before {
+    position: static;
+    width: auto;
+    height: auto;
+    border: 0;
+    border-radius: 0;
+    content: attr(data-label);
+    color: var(--ink-muted);
+    background: none;
+    box-shadow: none;
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .06em;
+    transform: none;
+  }
+  #history .record-row td.record-model,
+  #history .record-row td:nth-child(4),
+  #history .record-row td:nth-child(5),
+  #history .record-row td:nth-child(6) { grid-column: 1 / -1; }
+  #history .record-row td.record-model { display: flex; gap: 9px; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--line-soft); }
+  #history .record-row td.record-model::after {
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--signal-lime);
+    border-radius: 50%;
+    content: "";
+    box-shadow: 0 0 10px rgba(217,255,120,.42);
+    order: -1;
+  }
+  #history .record-row td.record-total { display: flex; justify-content: space-between; padding-top: 9px; border-top: 1px solid var(--line-soft); }
+  #history .record-row td.record-source { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+  #history .record-row td.record-source::before { flex: 0 0 auto; }
+  #history .record-row .record-source-note { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  #history .record-row:hover { border-color: var(--line-visible); }
+  #history .record-row:hover td { background: transparent; }
+  #history .record-empty-row { display: block; }
+  #history .record-empty-row td { display: block; border: 0; }
 }
 
 @media (max-width: 900px) {

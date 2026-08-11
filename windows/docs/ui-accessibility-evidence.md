@@ -612,3 +612,20 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `scrollWidth=305 / clientWidth=305`；空态与非空图表均可读，浏览器本地应用控制台日志为空。
 - 验证结束后仅停止显式隔离端口 5049/5050；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v43 Token 历史层级、移动卡片化与透明品牌栏证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5053`，数据库位于
+  `.cache/ui-v1015-runtime-20260811-5053/token_tracker-5053.sqlite3`；临时账号仅用于浏览器观察，未读取真实数据库、
+  Cookie、Key 或令牌。以三条补录记录复核非空历史，以一名新账号复核空态。
+- `static/app.js` 为记录单元补充稳定的 `record-row`/`record-empty-row`、列 `data-label`、模型/总 token/来源语义 class；
+  来源文案拆成安全的 `textContent` span，桌面端将模型作为行入口、总 token 作为主指标、自动采集/补录作为来源徽标。
+  `static/ui-polish.css` 将顶部 `.site-header` 改为真正的透明玻璃层，仅保留轻量 blur、底部细线和文字阴影，避免 `AI TOKEN`
+  品牌栏形成黑色横幅。
+- 桌面非空历史截图确认模型标记、lime 总 token、来源 pill 与既有导出入口共同呈现；320×800 下每条记录转为完整双列
+  卡片，`historyTop≈84.03px`、header bottom `76px`、`scrollWidth=305 / clientWidth=305`，完整展示模型、输入、输出、
+  总 token、时间与来源备注，无横向滚动条。
+- 320×800 空账号复核 `record-empty-row` 与原有空态信标仍存在，`scrollWidth=305 / clientWidth=305`；本地应用
+  浏览器控制台日志为空。短内容页面的桌面/空态锚点若受最大滚动边界限制，按既有 v41 内容高度约束处理。
+- 验证结束后仅停止显式隔离端口 5051/5052/5053；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
