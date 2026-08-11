@@ -487,3 +487,16 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `Analysis` 状态保留、顶部玻璃层仍启用；页面控制台 `error/warning` 为空。
 - 验证结束后仅停止显式隔离端口 5033；5000/5011 仍由原有进程监听。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v34 自动采集双栏表面高度证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5041`，数据库位于
+  `windows/.cache/ui-v1006-runtime-20260811/token_tracker-5041.sqlite3`；临时账户仅用于浏览器观察，未读取真实
+  数据库、Cookie、Key 或令牌。
+- `tool-grid.auto-layout` 改为 `align-items: start`，说明卡片显式使用 `align-self: start`；桌面运行时
+  左侧自动采集表单约 `884px`，右侧 `HOW IT WORKS` 说明卡片约 `520px`，卡片在说明内容结束处收口，
+  不再出现被长表单撑出的空黑区域。
+- 320×800 移动视口确认自动采集布局退化为单列、导航隐藏，`scrollWidth=305 / clientWidth=305`；
+  浏览器控制台 `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5041；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
