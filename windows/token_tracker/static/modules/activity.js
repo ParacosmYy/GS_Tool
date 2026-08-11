@@ -33,6 +33,10 @@ function appendCell(row, value, className = "") {
 }
 
 function renderEvents(body, events, formatNumber) {
+  // Keep the empty-state boundary explicit so responsive CSS never has to
+  // infer whether the table is carrying real event rows.
+  const historyCard = body.closest(".activity-history-card");
+  historyCard?.classList.toggle("is-empty", events.length === 0);
   body.replaceChildren();
   if (!events.length) {
     const row = document.createElement("tr");

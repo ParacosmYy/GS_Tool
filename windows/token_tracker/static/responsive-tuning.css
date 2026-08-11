@@ -41,3 +41,29 @@
   .auth-shell.auth-shell-login .auth-card,
   .auth-shell.auth-shell-register .auth-card { order: -1; }
 }
+
+/* An empty activity table is explanatory content, not a data grid. The
+   desktop grid keeps a 540px canvas for real event rows, but that canvas
+   would force a narrow split-column card to scroll sideways just to read one
+   sentence. Keep data-table overflow for populated states and collapse only
+   this intentional empty state into a readable card at every width. */
+.activity-history-card.is-empty .table-scroll {
+  max-height: none;
+  overflow: visible;
+}
+.activity-history-card.is-empty table {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.activity-history-card.is-empty thead { display: none; }
+.activity-history-card.is-empty tbody,
+.activity-history-card.is-empty tbody tr,
+.activity-history-card.is-empty tbody td {
+  display: block;
+  width: 100%;
+}
+.activity-history-card.is-empty tbody td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

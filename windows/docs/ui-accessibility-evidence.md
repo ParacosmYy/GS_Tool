@@ -809,3 +809,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 390×844 真实徽标坐标为 `x=277.7–341.0`，自动采集卡片宽 `344.7px`，未侵入页面右边界；768×900 为 `x=638.7–702.0`，1024×900 为 `x=539.4–602.7`，1440×900 为 `x=802.0–865.3`。
 - 390/768/1024/1440 内容区均为 `scrollWidth=clientWidth`；无缓存截图确认徽标与自动采集卡片、右侧 HOW IT WORKS 面板使用同一透景玻璃语言，页面 `error/warning` 日志为空。
 - 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前应 reset viewport override，并仅清理端口 5077/5078 及其显式隔离临时目录，受保护的 5000/5011 进程不得触碰。
+
+## v59 活动轨迹空态响应式证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5081`，复用隔离数据库
+  `.cache/ui-v1031-runtime-20260812-5079/token_tracker-5079.sqlite3`；仅观察合成空态页面，未读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前真实 390px 空态活动表格为 `540px`，卡片表格容器可用宽度约 `307px`，`overflow-x=auto` 且 `scrollWidth=540`；1024px 双列布局中卡片约 `427px`，同样会继承 `540px` 最小宽度。这是空提示语被截断并出现横向滚动条的直接根因。
+- `static/modules/activity.js` 让活动历史卡片随事件集合切换 `is-empty` 状态，模板提供首屏加载空态；`static/responsive-tuning.css` 仅对空态取消最小宽度、隐藏无意义表头并允许提示语换行，非空事件表格仍保留原有数据网格与横向浏览能力。
+- 修复后真实值：390px 的空态表格为 `307.3px / min-width=0`，滚动容器 `clientWidth=307 / scrollWidth=307 / overflow-x=visible`；768px 为 `657.3/657`；1024px 为 `375.9/376`；1440px 为 `548.5/549`。四档页面 `scrollWidth=clientWidth`，空态提示语完整显示。
+- 390×844 截图确认“当前还没有工作事件。完成一次 AI 辅助工作后再回来看看。”完整落在活动卡片内，底部隐私提示和表单按钮不被横向滚动条挤压；`uiTabV59.dev.logs()` 返回空数组。
+- 本轮未改变表格数据字段、键盘顺序、ARIA live 状态或既有动画；未伪造真实非空事件、真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据。验证结束前应 reset viewport override，并仅清理端口 5079/5080/5081 及对应隔离运行目录，受保护的 5000/5011 进程不得触碰。
