@@ -286,6 +286,60 @@ select option { color: var(--ink); background: var(--panel-strong); }
 .guide-callout { border-color: rgba(217,255,120,.28); background: rgba(217,255,120,.05); }
 .guide-callout p { color: var(--ink-soft); }
 .material-dot { background: var(--signal-lime); box-shadow: 0 0 14px var(--signal-lime); }
+
+/* Manual fallback disclosure: keep the native details/summary interaction,
+   but make its closed, hover, focus, and open states read as one deliberate
+   instrument rather than a loose dark strip. */
+.manual-details {
+  border-color: var(--line-soft);
+  transition: border-color .45s var(--ui-ease), background .45s var(--ui-ease), box-shadow .45s var(--ui-ease);
+}
+.manual-details::before {
+  position: absolute;
+  top: 0;
+  right: 18%;
+  left: 18%;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(217,255,120,.5), transparent);
+  opacity: .35;
+  transform: scaleX(.62);
+  transform-origin: center;
+  transition: opacity .45s var(--ui-ease), transform .6s var(--ui-ease);
+}
+.manual-details summary {
+  position: relative;
+  color: var(--ink-soft);
+  transition: color .35s var(--ui-ease), background-color .45s var(--ui-ease);
+}
+.manual-details summary:hover { color: var(--ink); background-color: rgba(217,255,120,.035); }
+.manual-details summary:focus-visible { outline: 2px solid var(--signal-lime); outline-offset: -3px; }
+.manual-details summary b { color: var(--ink); letter-spacing: .02em; }
+.manual-details summary small { color: var(--ink-muted); }
+.manual-details summary i {
+  color: var(--ink-muted);
+  text-shadow: none;
+  transition: color .35s var(--ui-ease), transform .45s var(--ui-ease), text-shadow .35s var(--ui-ease);
+}
+.manual-details[open] {
+  border-color: rgba(217,255,120,.46);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(217,255,120,.07), transparent 38%),
+    linear-gradient(145deg, rgba(23,29,29,.96), rgba(12,14,18,.98));
+  box-shadow: 0 24px 68px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.06), 0 0 0 1px rgba(217,255,120,.045);
+}
+.manual-details[open]::before { opacity: .95; transform: scaleX(1); }
+.manual-details[open] summary { color: var(--ink); background: linear-gradient(90deg, rgba(217,255,120,.055), transparent 62%); }
+.manual-details[open] summary small { color: var(--ink-soft); }
+.manual-details[open] summary i { color: var(--signal-lime); text-shadow: 0 0 14px rgba(217,255,120,.42); }
+.manual-details-body { animation: manual-details-in .55s var(--ui-ease) both; }
+
+@keyframes manual-details-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 td { color: var(--ink-muted); border-color: var(--line-soft); }
 td:first-child { color: var(--ink); }
 tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
@@ -383,6 +437,8 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
     border-color: var(--line-visible);
     background: rgba(10, 12, 16, .97);
   }
+  .manual-details[open] { border-color: var(--line-visible); background: rgba(10, 12, 16, .97); box-shadow: none; }
+  .manual-details[open] summary { background: transparent; }
 
   input, textarea, select { border-color: var(--line-visible); }
 }
@@ -399,9 +455,13 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
   }
   .auth-card:focus-within { border-color: Highlight; box-shadow: none; }
   .auth-card-top::after { display: none; }
+  .manual-details::before { display: none; }
+  .manual-details[open] { border-color: CanvasText; background: Canvas; box-shadow: none; }
+  .manual-details[open] summary { color: CanvasText; background: transparent; }
+  .manual-details[open] summary i { color: CanvasText; text-shadow: none; }
   input, textarea, select, button { border: 1px solid CanvasText; background: Canvas; color: CanvasText; }
   a { color: LinkText; }
-  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid Highlight; }
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, .manual-details summary:focus-visible { outline: 2px solid Highlight; }
 }
 
 /* Privacy page: keep governance copy readable without borrowing dashboard density. */
@@ -801,4 +861,6 @@ html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0
   html.motion-ready [data-reveal], html.motion-ready [data-reveal].is-visible { opacity: 1; transform: none; }
   .chart-empty-marker { animation: none; }
   .table-empty--signal::before, .table-empty--signal::after { animation: none; }
+  .manual-details, .manual-details::before, .manual-details summary, .manual-details summary i { transition: none; }
+  .manual-details-body { animation: none; }
 }

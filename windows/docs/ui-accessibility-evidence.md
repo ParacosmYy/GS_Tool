@@ -568,3 +568,18 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   浏览器控制台 `error/warning` 为空。
 - 验证结束后仅停止显式隔离端口 5046；受保护的 5000/5011 进程仍分别由 PID 43832/8100 监听。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v40 异常补录 disclosure 状态证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5047`，数据库位于
+  `.cache/ui-v1012-runtime-20260811/token_tracker-5047.sqlite3`；临时账户仅用于浏览器观察，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `#manual-entry` 继续使用原生 `<details>/<summary>`，视觉层新增收起/hover/focus/open 四种状态：打开时边框为
+  `rgba(217,255,120,.46)`、顶部信号线展开、summary 进入浅绿色渐变、图标旋转为关闭态，`.manual-details-body`
+  使用 `manual-details-in` 内容渐入；图标标记为 `aria-hidden=true`，不干扰折叠区语义。
+- 桌面运行时确认初始 `open=false`；点击后 `open=true`、`bodyOpacity=1`、`bodyTransform=none`，使用 `Space`
+  关闭、`Enter` 再打开时焦点仍停留在 summary。320×800 移动视口确认 summary 高 `84px`、折叠区宽约
+  `274.67px`、`scrollWidth=305 / clientWidth=305`、导航隐藏；展开后边框状态与桌面一致，浏览器控制台
+  `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5047；受保护的 5000/5011 进程仍分别由 PID 43832/8100 监听。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
