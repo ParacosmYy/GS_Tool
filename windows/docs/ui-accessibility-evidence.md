@@ -673,3 +673,18 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `headingTop≈150.99px`、`scrollWidth=305 / clientWidth=305`（页面运行时微动效层不引入横向布局扩张）；本地应用浏览器 `error/warning` 日志为空。
 - 验证结束后仅停止显式隔离端口 5056 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v47 透明品牌栏基础态证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5057`，数据库位于
+  `.cache/ui-v1019-runtime-20260812-5057/token_tracker-5057.sqlite3`；仅用于本地登录页观察，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `static/ui-polish.css` 将基础态 `.site-header` 的 `backdrop-filter` 与外部阴影收敛为 `none`，保留透明背景、1px
+  内侧高光、底部细边线和品牌文字阴影；滚动态羽化渐变仍由 `scene-motion.css` 原有状态层承载，不新增脚本或监听器。
+- 桌面 `1683×892` 首屏真实计算值为 `background-color=rgba(0,0,0,0)`、`backdrop-filter=none`、仅保留内侧高光，
+  页面 `scrollWidth=1668 / clientWidth=1668`；滚动后 `is-scrolled`、透明背景、`backdrop-filter=none`、header top=`0`、
+  bottom=`76` 均成立。
+- 320×800 真实计算值为透明背景、`backdrop-filter=none`、`scrollWidth=305 / clientWidth=305`，header 宽约 `274.67px`、
+  高 `76px`；桌面首屏、滚动态和移动首屏截图均确认背景图可连续透过 AI TOKEN 行。本地应用浏览器 `error/warning` 日志为空。
+- 验证结束后仅停止显式隔离端口 5057 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。

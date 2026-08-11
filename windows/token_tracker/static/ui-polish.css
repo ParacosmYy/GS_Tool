@@ -42,13 +42,13 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   min-height: 76px;
   border-bottom-color: var(--line-soft);
   /* The header is chrome, not a content panel. A transparent surface lets
-     the illustrated scene pass through the complete AI TOKEN row; only the
-     blur, hairline, and text shadow preserve scanability over bright areas. */
+     the illustrated scene pass through the complete AI TOKEN row; a hairline
+     and text shadow preserve scanability without adding a dark glass layer. */
   background: transparent;
-  -webkit-backdrop-filter: blur(8px) saturate(1.08);
-  backdrop-filter: blur(8px) saturate(1.08);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 20px rgba(0,0,0,.02);
-  transition: background-color .45s var(--ui-ease), backdrop-filter .45s var(--ui-ease), border-color .45s var(--ui-ease), box-shadow .45s var(--ui-ease);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  transition: border-color .45s var(--ui-ease), box-shadow .45s var(--ui-ease);
 }
 .brand-lockup strong, .site-nav a, .user-chip { text-shadow: 0 1px 12px rgba(8,9,12,.52); }
 .site-header::after {
