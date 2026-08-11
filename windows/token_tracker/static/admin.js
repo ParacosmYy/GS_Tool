@@ -1,6 +1,12 @@
 /* Author: AI Token Tracker Engineering Team | Maintainer: Project Owner | Purpose: Admin data states and accessible detail rendering. */
 
 import { setLiveMessage } from './modules/live-region.js';
+import {
+  setupBackdropMotion,
+  setupPointerFollower,
+  setupReveal,
+  setupSurfaceMotion
+} from './modules/motion.js';
 
 const numberFormatter = new Intl.NumberFormat('zh-CN');
 let detailTrigger = null;
@@ -153,4 +159,11 @@ document.getElementById('admin-detail-close')?.addEventListener('click', () => {
   detailTrigger?.setAttribute('aria-expanded', 'false');
   detailTrigger?.focus();
 });
+
+// Keep the administrator surface on the same motion contract as the personal
+// observatory while leaving data loading and focus behavior in this module.
+setupReveal();
+setupPointerFollower();
+setupBackdropMotion();
+setupSurfaceMotion();
 loadAdminData();

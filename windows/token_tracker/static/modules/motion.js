@@ -54,6 +54,12 @@ export function setupReveal() {
     });
   }, { threshold: .12, rootMargin: "0px 0px -8% 0px" });
   elements.forEach((element, index) => {
+    if (element.hidden) {
+      // Dynamic disclosure panels are hidden at bootstrap; when they open,
+      // their readable state must not depend on a missed observer callback.
+      element.classList.add("is-visible");
+      return;
+    }
     element.style.transitionDelay = `${Math.min(index * 70, 350)}ms`;
     observer.observe(element);
     // Make the first viewport deterministic even when a browser delays the
