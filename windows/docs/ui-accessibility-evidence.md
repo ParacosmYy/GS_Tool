@@ -952,3 +952,12 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 320/390/768/1024/1440 首屏矩阵均保持 `scrollWidth=clientWidth`，分别为 `305/305`、`375/375`、`753/753`、`1009/1009`、`1425/1425`；390px 滚动至 `scrollY=600` 后仍确认移动 veil、`blur(10px) saturate(1.08)` 与 `.12` 底边。
 - Dashboard 可访问性快照确认 banner、主要导航、Log out、main、统计周期按钮、分析 region、表单控件与状态文本均保留可访问名称；`tabV1700.dev.logs()` 返回空数组。
 - 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；浏览器工具自身外部遥测队列告警不计入本地页面日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v73 透明指标栏文字可读性证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5170`，数据库位于
+  `windows/.cache/ui-v1800-runtime-20260812-5170/token_tracker-5170.sqlite3`；仅使用合成账号观察布局，未读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前 `.signal-cell` 的背景与阴影均为无值/透明，第三格 `in selected range` 直接落在角色亮部；现仅为 `.signal-index`、`.stat-label`、`.stat-value` 和 `small` 增加 `rgba(8,9,12,.94/.7)` 局部字形 keyline，未增加面板背景。
+- 390×844 滚动至 `scrollY=620` 的截图确认 INPUT/OUTPUT/ACTIVE MODELS 三格仍直接透景，`small` computed color 提升为 `rgb(215,219,229)`；1440×900 滚动态仍保持 `site-header.is-scrolled`、深蓝渐变与 `blur(12px) saturate(1.08)`。
+- 390/1440 页面均保持 `scrollWidth=clientWidth`，分别为 `375/375` 与 `1425/1425`；`tabV1800.dev.logs()` 返回空数组。
+- 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；浏览器工具自身外部遥测队列告警不计入本地页面日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。

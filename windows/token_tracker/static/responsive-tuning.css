@@ -33,6 +33,20 @@
   color: var(--ink);
 }
 
+/* The metric rail is intentionally transparent, but its secondary captions
+   cross bright artwork on narrow screens. A local glyph keyline protects the
+   reading edge without adding a panel or changing the rail's composition. */
+.signal-index,
+.signal-cell .stat-label,
+.signal-cell .stat-value,
+.signal-cell small {
+  text-shadow: 0 1px 2px rgba(8, 9, 12, .94), 0 0 8px rgba(8, 9, 12, .7);
+}
+
+.signal-cell small {
+  color: var(--ink-soft);
+}
+
 /* At tablet widths the orbit is intentionally above the copy, but the
    illustration must not push the primary actions beyond the first scan. The
    dedicated range keeps this correction isolated from the 320px mobile grid
