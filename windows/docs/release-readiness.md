@@ -3,7 +3,7 @@
 **作者：** AI Token Tracker Engineering Team
 **维护者：** Project Owner
 **状态：** In Progress；未达到最终交付条件
-**最后核对：** 2026-08-11
+**最后核对：** 2026-08-12
 
 ## 目的
 
@@ -36,6 +36,12 @@
 
 sticky header 在首屏保持透明，滚动后切换为低透明度阅读玻璃层；导航滚动状态由共享 `navigation.js` 调度，认证页与受保护页面
 保持一致。桌面/320px 隔离浏览器验证和未关闭真实设备门禁见 `ui-accessibility-evidence.md` 的 v44 章节。
+
+## v45 视觉增量
+
+滚动态 AI TOKEN 品牌栏改为透明羽化渐变，并移除滚动态背景 blur，避免 hero 大字在 sticky header 中形成白色雾带；首屏透明态、
+导航语义、滚动状态调度和移动端无溢出保持不变。桌面/320px 隔离浏览器验证和未关闭真实设备门禁见
+`ui-accessibility-evidence.md` 的 v45 章节。
 
 ## 每次交付必须执行
 

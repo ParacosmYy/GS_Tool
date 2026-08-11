@@ -643,3 +643,19 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `scrollWidth=305 / clientWidth=305`，无横向溢出；本地应用控制台错误/警告为空。
 - 验证结束后仅停止显式隔离端口 5054 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v45 透明品牌栏羽化渐变证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5055`，数据库位于
+  `.cache/ui-v1017-runtime-20260812-5055/token_tracker-5055.sqlite3`；临时账户仅用于本地浏览器观察，写入三条临时记录，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `static/scene-motion.css` 将 `.site-header.is-scrolled` 从 `rgba(8,9,12,.46)` 深色实心阅读层收敛为透明背景和
+  `linear-gradient(180deg, rgba(8,9,12,.14), transparent 88%)` 羽化渐变，并在滚动态关闭 `backdrop-filter`，避免白色
+  `TOKEN/SIGNAL` 字样透过模糊层形成发白的横向雾带；首屏 `.site-header` 仍保持透明与原有低幅透景 blur。
+- 桌面 `1683×892` 运行时确认首屏 `background=rgba(0,0,0,0)`；滚动 `420px` 后确认
+  `class=site-header is-scrolled`、`background=rgba(0,0,0,0)`、羽化渐变生效、`backdrop-filter=none`，截图中 AI TOKEN
+  品牌栏不再形成实心黑色横幅；页面 `scrollWidth=1668 / clientWidth=1668`。
+- 320×800 移动视口确认首屏与滚动态均保持透明，滚动态过渡完成后 `backdrop-filter=none`，导航按既有策略隐藏，页面保持
+  `scrollWidth=305 / clientWidth=305`；本地应用浏览器 `error/warning` 日志为空。
+- 验证结束后仅停止显式隔离端口 5055 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。

@@ -130,6 +130,7 @@
 - [x] UI-1/UI-3 v42：收紧图表、工作事件和 Token 历史数据面的背景遮罩，降低插画透景对文字/空态对比度的干扰，并完成桌面/320px 复核
 - [x] UI-1/UI-3 v43：将顶部 AI TOKEN 品牌栏改为真正透明的玻璃层，强化 Token 历史模型/总量/来源层级并在 320px 卡片化，完成非空/空态复核
 - [x] UI-2/UI-3 v44：为 sticky header 增加滚动态自适应玻璃层，保持首屏透明并消除 hero 字样透景噪声，完成登录页/Dashboard 桌面与 320px 复核
+- [x] UI-1/UI-2/UI-3 v45：将滚动态 AI TOKEN 品牌栏改为透明羽化渐变，移除会把 hero 大字模糊成白雾的背景 blur，并完成桌面/320px 透明度、无溢出与控制台复核
 - [x] 本机体验入口 B22：根 `run.py`/`windows/run.py` 统一复用锁定 Waitress，正常启动不再输出 Flask development server 警告
 - [x] CLI 体验/安全 B25：`token_tracker serve` 默认复用 Waitress；仅 `--debug` 启用 Flask，普通本地命令拒绝非 loopback 绑定（ADR-094）
 - [x] 本机体验入口 B23：`TOKEN_TRACKER_HOST` 只允许 loopback，危险配置在应用/数据库创建前 fail-closed；局域网继续走显式 `--lan-preview`（ADR-078）
