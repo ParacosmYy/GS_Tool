@@ -381,3 +381,27 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   门禁结果，不把既有 v27 截图重新标记为 v28 运行证据；v27 仍是最近一次浏览器四档运行证据。
 - 本切片不改变认证、API、数据库、Provider 或部署边界；真实设备、系统 reduced-motion/高对比度、浏览器下载落盘、
   真实 Provider 和 Android 真机门禁保持原状态。
+
+## v29 场景左上遮罩与导航玻璃层运行证据（2026-08-11）
+
+- 在当前 checkout 启动隔离源码实例 `127.0.0.1:5026`，数据库位于
+  `windows/.cache/ui-v1000-runtime-20260811/token_tracker.sqlite3`；未读取真实数据库、Cookie、Key 或令牌。
+- `scene-motion.css` 将桌面左侧遮罩从 `0.985` 起步的近实心黑层调整为分段半透明 veil，并同步降低 900px/620px
+  断点的遮罩强度；顶部左侧新增低强度蓝色环境光。`ui-polish.css` 将固定导航表面调整为 `rgba(8,9,12,.58)`
+  并保留 `backdrop-filter`，使上方场景连续透出。
+- 浏览器截图观察到左上网格、Rust/RL 工作站、角色、MacBook、Mac Studio 和诊断屏幕均可辨识，正文与认证卡片
+  仍保持独立内容层。默认运行时确认背景图已加载（`naturalWidth=1672`），计算样式中的左侧 veil 与导航半透明值
+  与源码一致。
+- Edge 四档 viewport 结果如下；每档均满足 `scrollWidth <= clientWidth`，唯一语义 `h1`、两个 `label`、提交按钮和
+  `username` 焦点均存在：
+
+  | 视口 | `scrollWidth` | `scrollHeight` | `h1` | `label` | 提交按钮 | 焦点 |
+  | --- | ---: | ---: | ---: | ---: | --- | --- |
+  | 320×800 | 305 | 1350 | 1 | 2 | 是 | `username` |
+  | 768×1024 | 753 | 1338 | 1 | 2 | 是 | `username` |
+  | 1024×768 | 1009 | 959 | 1 | 2 | 是 | `username` |
+  | 1440×900 | 1425 | 1091 | 1 | 2 | 是 | `username` |
+
+- 浏览器控制台 `error/warning` 为空；本轮只停止隔离端口 5026 进程，受保护的 5000/5011 进程与监听状态未触碰。
+- 该证据关闭 v29 场景遮罩源码与隔离浏览器运行观察，不替代真实设备、系统 `prefers-reduced-motion`/高对比度、
+  浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
