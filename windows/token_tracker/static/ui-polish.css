@@ -230,6 +230,8 @@ input:focus, textarea:focus { border-color: var(--signal-lime); background: rgba
 .button-ghost { color: var(--ink-soft); border-color: var(--line-visible); }
 .button-ghost:hover { color: var(--ink); border-color: var(--ink-soft); background: rgba(255,255,255,.06); }
 .guide-card { padding: 28px; }
+.tool-grid.auto-layout { align-items: start; }
+.tool-grid.auto-layout > .guide-card { align-self: start; }
 .guide-callout { border-color: rgba(217,255,120,.28); background: rgba(217,255,120,.05); }
 .guide-callout p { color: var(--ink-soft); }
 .material-dot { background: var(--signal-lime); box-shadow: 0 0 14px var(--signal-lime); }
