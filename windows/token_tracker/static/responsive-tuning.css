@@ -1,0 +1,21 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Preserve first-screen action visibility at tablet widths without
+ *          changing the mobile or desktop observatory composition.
+ * Module: Web presentation / responsive tuning layer
+ */
+
+/* At tablet widths the orbit is intentionally above the copy, but the
+   illustration must not push the primary actions beyond the first scan. The
+   dedicated range keeps this correction isolated from the 320px mobile grid
+   and the two-column desktop composition. */
+@media (min-width: 621px) and (max-width: 900px) {
+  .observatory-hero { padding-top: 28px; }
+  .hero-stage { min-height: 0; gap: 12px; padding: 20px 0 28px; }
+  /* Keep the orbit as the visual anchor while returning enough vertical
+     budget for the primary actions at the 900px breakpoint edge. */
+  .hero-orbit { width: min(46vw, 360px); }
+  .hero-copy { margin-top: 0; }
+  .hero-lede { margin-top: 18px; margin-bottom: 16px; }
+}

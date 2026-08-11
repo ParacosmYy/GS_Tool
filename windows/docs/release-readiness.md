@@ -76,6 +76,10 @@ Analysis/Activity/History 深链接目标不再叠加文档顺序 reveal 的 `35
 
 AI TOKEN 顶部品牌栏的首屏与滚动态均移除黑色渐隐层和 blur，恢复背景场景透视，仅保留细边线与滚动进度线。真实 computed style、滚动截图和控制台证据见 `ui-accessibility-evidence.md` 的 v53 章节；完整响应式、真实设备、辅助偏好和正式部署验收仍未关闭。
 
+## v54 平板首屏 CTA 可见性
+
+621–900px 平板 hero 通过独立响应式层压缩轨道与垂直留白，使主 CTA 在 768×900 和 900×900 首屏完整可见；320、1024、1440 保持既有布局。真实五档几何、截图、焦点和控制台证据见 `ui-accessibility-evidence.md` 的 v54 章节；真实设备、辅助偏好和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

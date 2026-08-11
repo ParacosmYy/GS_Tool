@@ -76,6 +76,12 @@
 - UI-2：本轮仅调整 `scene-motion.css` 的 header 装饰层规则，不新增 DOM、JS、依赖或业务分支；导航、锚点、键盘焦点、reduced-motion 与 forced-colors 边界保持。
 - UI-3：隔离 Dashboard 真实浏览器确认 `scrollY=0` 和 `scrollY=1430` 两种状态的 computed style 与截图，控制台无 error/warning；未将本轮桌面结果扩大为完整响应式或设备验收。
 
+## v54 视觉与动效增量
+
+- UI-1：为 621–900px 平板单列 hero 释放垂直预算，保持轨道为视觉锚点，同时将主 CTA 提前到 768/900px 首屏；320px 双列 CTA 与 1024px 以上桌面构图保持。
+- UI-2：新增独立 `responsive-tuning.css` 并由 `base.html` 按最后一层加载；只包含断点 CSS，不改 DOM、JS、依赖、业务状态或动画控制，文件行数远低于 1000 行。
+- UI-3：真实浏览器确认 320/768/900/1024/1440 五档 CTA 几何、无横向溢出、skip-link 焦点和清洁控制台；真实设备及辅助偏好仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

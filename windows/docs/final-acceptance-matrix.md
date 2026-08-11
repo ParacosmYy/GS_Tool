@@ -90,6 +90,11 @@
 - AI TOKEN 品牌栏首屏与滚动态统一使用透明背景，移除滚动态黑色渐隐层与 blur，保留边线和进度线作为最小层次提示。
 - 通过隔离浏览器确认 `scrollY=0/1430` 的 computed style、滚动截图、`background=rgba(0,0,0,0)`、`backdrop-filter=none` 和清洁控制台；完整响应式、设备、辅助偏好及正式部署限制见 v53 UI 证据。
 
+### v54 交付增量
+
+- 621–900px 平板 hero 轨道收敛为 `min(46vw,360px)` 并压缩垂直间距，主 CTA 在 768/900px 首屏完整可见；320px 两列 CTA、1024/1440 桌面节奏保持。
+- 真实 320/768/900/1024/1440 视口确认按钮坐标、无横向溢出、skip-link 焦点和清洁控制台；真实设备、reduced-motion、forced-colors 与高对比度限制见 v54 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

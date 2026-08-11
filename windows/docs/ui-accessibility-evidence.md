@@ -756,3 +756,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   CUA 滚动至真实 `scrollY=1430` 后，header 为 `class=site-header is-scrolled`，仍为 `background=rgba(0,0,0,0)`、`backgroundImage=none`、`backdropFilter=none`；截图确认场景可透过品牌栏，底下卡片不会再被额外黑色渐隐层覆盖。
 - 变更仅涉及装饰层 CSS，不改变 DOM、导航逻辑、键盘焦点、reduced-motion、forced-colors 或触摸降级；本地应用浏览器 `error/warning` 日志为空，`git diff --check` 通过。
 - 本轮未伪造 320/768/1024/1440 视口、真实设备、辅助偏好和 Provider 联调证据；验证结束后仅停止显式隔离端口 5072 并清理对应临时目录，受保护的 5000/5011 进程与监听状态未触碰。
+
+## v54 平板首屏主操作可见性证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离 Dashboard 实例 `127.0.0.1:5073`，数据库位于
+  `windows/.cache/ui-v1026-runtime-20260812-5073/token_tracker-5073.sqlite3`；仅使用合成账号观察布局，未读取真实 Cookie、Key、令牌或数据库。
+- 修复前真实 768×900 计算值为 `.hero-orbit=480×480`、`.hero-actions y=1018.7`，主 CTA 完全落在首屏之外；900px 边界也沿用同一垂直超出风险。
+- 新增 `static/responsive-tuning.css`，仅作用于 `min-width:621px` 到 `max-width:900px`：缩小 orbit 到 `min(46vw,360px)`，压缩 hero padding/gap 与 lede 留白；手机两列 CTA 和桌面双列 hero 不受该规则影响。
+- 修复后真实结果：320×800 CTA 为 `y=727.9–775.9`、两列等宽 `133.6px`；768×900 CTA 为 `y=802–850`；900×900 CTA 为 `y=836–884`；1024×900 为 `y=639.1–687.1`；1440×900 为 `y=682.1–730.1`。五档均为 `scrollWidth=clientWidth`，无横向溢出。
+- 768px 截图确认轨道仍保持视觉锚点、标题/文案/双 CTA 连续进入；900px 截图确认 CTA 完整可见且未改变按钮文字与焦点语义。首次 `Tab` 仍聚焦 skip-link，焦点为 `2px solid rgb(217,255,120)`、`outline-offset=4px`；本地应用浏览器 `error/warning` 日志为空。
+- 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束后仅停止显式隔离端口 5073 并清理对应临时目录，受保护的 5000/5011 进程与监听状态未触碰。
