@@ -583,3 +583,17 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `error/warning` 为空。
 - 验证结束后仅停止显式隔离端口 5047；受保护的 5000/5011 进程仍分别由 PID 43832/8100 监听。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v41 章节锚点与 sticky header 安全落点证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5048`，数据库位于
+  `.cache/ui-v1013-runtime-20260811/token_tracker-5048.sqlite3`；临时账户仅用于浏览器观察，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `static/ui-polish.css` 为 `#analysis/#connect/#activity/#history` 统一增加
+  `scroll-margin-top: clamp(84px, 7vw, 104px)`；修改前 `Connect` 标题被 sticky header 遮住，修改后桌面端
+  `Analysis/Connect/Activity` 的 section top 均约 `104px`，顶部栏底线为 `76px`，标题和表单完整可见。
+- 320×800 移动视口下 `Connect` section top 约 `84px`，顶部栏底线为 `76px`，导航隐藏，页面保持
+  `scrollWidth=305 / clientWidth=305`；`History` 在页面最大滚动边界处遵守内容高度约束，没有强行制造底部空白。
+  页面控制台中属于本地应用的 `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5048；受保护的 5000/5011 进程仍分别由 PID 43832/8100 监听。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
