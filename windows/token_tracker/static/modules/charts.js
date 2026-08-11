@@ -2,6 +2,7 @@
  * Author: AI Token Tracker Engineering Team
  * Maintainer: Project Owner
  * Purpose: Render trend and model-mix charts without owning dashboard state.
+ * Module: Web observatory / analytics visualization boundary
  */
 
 const CHART_COLORS = ["#d9ff78", "#c4c0ff", "#ff9c82", "#8fe3d4", "#f6d77a", "#aeb4c1", "#5f6572"];
@@ -26,6 +27,9 @@ function chartTheme() {
 function setChartState(canvas, state, title, detail, actionTarget = "") {
   const wrapper = canvas?.closest(".chart-wrap");
   if (!wrapper) return;
+  const card = wrapper.closest(".chart-card");
+  card?.classList.toggle("is-empty", state === "empty");
+  card?.classList.toggle("is-unavailable", state === "unavailable");
   wrapper.dataset.chartState = state;
   let emptyState = wrapper.querySelector(".chart-empty-state");
   if (state === "ready") {

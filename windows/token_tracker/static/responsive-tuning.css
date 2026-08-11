@@ -67,3 +67,35 @@
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+/* Empty analytics should behave like a signal checkpoint, not a blank chart
+   canvas. Keep populated charts at their full plotting height while reducing
+   no-data states enough to reveal the connection surface in the first scroll. */
+.chart-card.is-empty,
+.chart-card.is-unavailable {
+  min-height: 0;
+}
+.chart-card.is-empty .chart-wrap,
+.chart-card.is-unavailable .chart-wrap {
+  height: clamp(205px, 19vw, 220px);
+}
+.chart-card.is-empty .chart-doughnut-wrap,
+.chart-card.is-unavailable .chart-doughnut-wrap {
+  height: clamp(190px, 17vw, 205px);
+}
+.chart-card.is-empty .chart-empty-state,
+.chart-card.is-unavailable .chart-empty-state {
+  gap: 6px;
+  padding: 16px;
+}
+.chart-card.is-empty .chart-empty-marker,
+.chart-card.is-unavailable .chart-empty-marker {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 2px;
+}
+.chart-card.is-empty .chart-empty-action,
+.chart-card.is-unavailable .chart-empty-action {
+  margin-top: 2px;
+  padding: 7px 10px;
+}

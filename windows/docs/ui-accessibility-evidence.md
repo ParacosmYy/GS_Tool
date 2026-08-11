@@ -819,3 +819,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 修复后真实值：390px 的空态表格为 `307.3px / min-width=0`，滚动容器 `clientWidth=307 / scrollWidth=307 / overflow-x=visible`；768px 为 `657.3/657`；1024px 为 `375.9/376`；1440px 为 `548.5/549`。四档页面 `scrollWidth=clientWidth`，空态提示语完整显示。
 - 390×844 截图确认“当前还没有工作事件。完成一次 AI 辅助工作后再回来看看。”完整落在活动卡片内，底部隐私提示和表单按钮不被横向滚动条挤压；`uiTabV59.dev.logs()` 返回空数组。
 - 本轮未改变表格数据字段、键盘顺序、ARIA live 状态或既有动画；未伪造真实非空事件、真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据。验证结束前应 reset viewport override，并仅清理端口 5079/5080/5081 及对应隔离运行目录，受保护的 5000/5011 进程不得触碰。
+
+## v60 分析图表空态密度证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5091`，使用隔离数据库
+  `windows/.cache/ui-v1060-runtime-20260812-5090/token_tracker-5090.sqlite3` 与合成审计账号；未读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前真实空态图表在 390px 下分别约 `378.6px / 390.6px`，默认桌面分析区约 `416.7px`；大部分垂直空间是没有数据的黑色画布，连接区被推迟到更远的滚动位置。
+- `static/modules/charts.js` 为 chart card 同步 `is-empty/is-unavailable` 状态；`static/responsive-tuning.css` 仅压缩这两类无数据状态的绘图区、标记和 CTA 间距，ready 状态不接收该规则，保持原 Chart.js 绘图区和交互。
+- 修复后真实结果：320/390px 两张卡约 `348.6px / 345.6px`；768px 约 `348.4px / 345.4px`；1024px 同行高度约 `351.7px`；1440px 同行高度约 `366.7px`。五档页面均为 `scrollWidth=clientWidth`，空态标题、说明和“开始自动采集”入口完整显示。
+- 320×800 截图确认两个空图表从大面积黑色留白变为紧凑的信号检查点，仍保留加号轨道、状态说明和明确 CTA；页面 `uiTabV60.dev.logs()` 返回空数组。
+- 本轮未改变 Chart.js 数据格式、ready 状态、键盘顺序或 ARIA live 语义；未伪造真实非空图表、真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据。隔离端口和视口已在验证结束前复位，受保护的 5000/5011 进程未触碰。
