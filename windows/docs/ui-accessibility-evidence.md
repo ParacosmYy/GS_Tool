@@ -840,3 +840,14 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 五档页面均保持 `scrollWidth=clientWidth`：320px 页面 `305/305`、390px `375/375`、768px `753/753`、1024px `1009/1009`、1440px `1425/1425`；未引入横向溢出。
 - 桌面首屏/滚动态与 390px 手机首屏/滚动态截图确认 AI TOKEN 标识、导航和 Log out 仍可扫描，顶栏不再形成深色整条横带；`uiTabV61.dev.logs()` 返回空数组。
 - 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前已复位 viewport override，端口 5000/5011 未触碰，隔离运行目录按可恢复清理流程处理。
+
+## v62 短高度桌面首屏周期切换器证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5110`，数据库位于
+  `windows/.cache/ui-v1100-runtime-20260812-5110/token_tracker-5110.sqlite3`；仅使用合成账号观察布局，未读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前真实 1683×845 首屏中 `.hero-foot` 与 `.range-switcher` 的 bottom 均约为 `861.01px`，超出视口约 `16.01px`，周期切换器底部被截断。
+- `static/responsive-tuning.css` 增加 `min-width:901px` + `max-height:860px` 的窄范围规则，将 `.hero-stage` 的下内边距从 `48px` 收敛为 `28px`；轨道尺寸、标题、CTA、移动和平板规则不变。
+- 修复后真实 1683×845 的 `.hero-foot` bottom 为 `841.01px`、`.range-switcher` bottom 为 `841.01px`，在视口底部前保留约 `4px`；截图确认 Today/Week/Month/All time 完整可见。
+- 真实响应式矩阵保持页面无横向溢出：320px `305/305`、390px `375/375`、768px `753/753`、1024px `1009/1009`、1440px `1425/1425`；1024/1440×900 周期切换器 bottom 均约 `874px`，完整位于首屏。
+- 1683×845 与 1440×900 截图确认短桌面首屏操作层更完整，`uiTabV62.dev.logs()` 返回空数组；本轮未新增动画，既有 reduced-motion 与 forced-colors 规则保持。
+- 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。

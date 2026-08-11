@@ -42,6 +42,13 @@
   .auth-shell.auth-shell-register .auth-card { order: -1; }
 }
 
+/* Laptop-height desktop screens need the period control in the first scan.
+   The orbit remains unchanged; reclaim only the stage's lower breathing space
+   so the complete hero footer stays inside a short 845px viewport. */
+@media (min-width: 901px) and (max-height: 860px) {
+  .hero-stage { padding-bottom: 28px; }
+}
+
 /* An empty activity table is explanatory content, not a data grid. The
    desktop grid keeps a 540px canvas for real event rows, but that canvas
    would force a narrow split-column card to scroll sideways just to read one
