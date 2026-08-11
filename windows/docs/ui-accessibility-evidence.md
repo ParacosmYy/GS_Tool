@@ -432,3 +432,25 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   受保护的 5000/5011 进程与监听状态未触碰。
 - 该证据关闭 v30 空态行动入口与非空图表回归观察，不替代真实设备、系统 `prefers-reduced-motion`/高对比度、
   浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v31 左上场景首帧与管理员观测台运行证据（2026-08-11）
+
+- 在当前 checkout 启动隔离源码实例 `127.0.0.1:5028`，数据库位于
+  `windows/.cache/ui-v1001-runtime-20260811/token_tracker.sqlite3`；使用临时管理员会话观察，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `scene-motion.css` 将左侧 veil 收敛为冷色环境光加轻遮罩，并提升场景亮度；900px/620px 断点同步降低黑色层，
+  移动端背景保留 `0.9` 透明度。`style.css` 将全局首帧从 `opacity: 0` 改为 `0.84` 起步，避免登录页在图片/字体
+  稳定前被误认为黑色覆盖层。浏览器首帧观察到 `body opacity≈0.964`，稳定帧左上服务器、代码屏幕、角色和设备均可辨识。
+- `ui-polish.css` 为 Admin People/Export 数据轨道增加紧凑状态胶囊、用户行 signal 点、导出层级和窄屏安全边界；
+  Admin 详情按钮仍保持 `aria-expanded`，打开后焦点回流到 `#admin-detail-close`。
+- 登录页与管理员页四档 viewport 均无页面级横向溢出：
+
+  | 页面 | 320 | 768 | 1024 | 1440 |
+  | --- | ---: | ---: | ---: | ---: |
+  | 登录 `scrollWidth/clientWidth` | 305/305 | 753/753 | 1009/1009 | 1425/1425 |
+  | Admin `scrollWidth/clientWidth` | 305/305 | 753/753 | 1009/1009 | 1425/1425 |
+
+- Admin 隔离会话在四档均返回 `LIVE / AUDITED`；成员详情打开后 `hidden=false`、触发器为
+  `aria-expanded=true`、活动焦点为 `admin-detail-close`。浏览器控制台 `error/warning` 为空。
+- 验证结束后仅停止隔离端口 5028；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、系统
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
