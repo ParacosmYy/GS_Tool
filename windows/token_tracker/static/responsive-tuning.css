@@ -18,6 +18,43 @@
   box-shadow: none;
 }
 
+/* Keep the AI TOKEN brand itself fully transparent, but protect the right
+   navigation/account rail once the sticky header crosses page content. This
+   local veil prevents buttons and chart labels from visually passing through
+   the nav while the scene remains visible and the header stays non-solid. */
+@media (min-width: 621px) {
+  .site-header.is-scrolled::before {
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 56%;
+    content: "";
+    pointer-events: none;
+    border-bottom: 1px solid rgba(230, 235, 245, .08);
+    border-radius: 0 0 0 14px;
+    background: linear-gradient(90deg, rgba(7, 14, 24, .04), rgba(7, 14, 24, .12) 48%, rgba(7, 14, 24, .24));
+    -webkit-backdrop-filter: blur(12px) saturate(1.06);
+    backdrop-filter: blur(12px) saturate(1.06);
+  }
+
+  .site-header.is-scrolled > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@media (min-width: 621px) and (max-width: 900px) {
+  /* Tablet navigation compresses toward the brand, so the reading rail must
+     begin earlier to cover the full nav/account cluster without changing the
+     desktop rail geometry. */
+  .site-header.is-scrolled::before {
+    left: 22%;
+    background: linear-gradient(90deg, rgba(7, 14, 24, .03), rgba(7, 14, 24, .09) 48%, rgba(7, 14, 24, .18));
+  }
+}
+
 /* Transparent chrome must remain readable over both the dark server wall and
    the bright character/laptop highlights. Lift quiet navigation labels one
    semantic step and keep the halo tight so the header stays transparent. */
@@ -133,6 +170,8 @@
     backdrop-filter: none;
     box-shadow: none;
   }
+
+  .site-header.is-scrolled::before { display: none; }
 }
 
 /* Laptop-height desktop screens need the period control in the first scan.

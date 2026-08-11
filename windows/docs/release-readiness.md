@@ -176,6 +176,10 @@ AI TOKEN 顶栏在普通模式继续完全透明；场景 veil 在桌面、平�
 
 登录页自动聚焦现在使用低亮 lavender 边界，避免首帧同时叠加 lime outline、输入框 halo 和卡片光环；首次键盘/指针操作清除 marker 后仍恢复完整键盘焦点反馈。5174 隔离实例已完成 320/390/768/1024/1440px、Tab 行为、无障碍和控制台检查，独立证据见 `ui-accessibility-evidence-v78.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v79 Dashboard 滚动态导航安全层
+
+Dashboard 在静止状态继续使用完全透明 AI TOKEN 顶栏；滚动后仅在 621px 以上的 nav/account 区域启用低 alpha 深蓝 reading rail，桌面与平板分别按真实几何覆盖导航，避免 CTA/表单内容穿透到操作层。5175 隔离实例已完成 320/390/768/1024/1440px 与 768/1440px 滚动态检查，独立证据见 `ui-accessibility-evidence-v79.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

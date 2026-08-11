@@ -275,3 +275,5 @@
 - [x] v77 通过真实隔离 5173 实例确认 390/320/768/1024/1440px computed style、无横向溢出、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v77.md`，真实辅助偏好与设备继续独立门禁。
 - [x] v78 将登录页自动聚焦从荧光绿报警态收敛为 lavender keyline，避免首次进入同时叠加输入框 outline、halo 与卡片光环。
 - [x] v78 通过真实隔离 5174 实例确认 320/390/768/1024/1440px 视觉矩阵、桌面/移动截图、Tab 焦点恢复、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v78.md`，真实辅助偏好与设备继续独立门禁。
+- [x] v79 为 Dashboard 滚动态右侧 nav/account cluster 增加低 alpha 局部 reading rail，保持 AI TOKEN 品牌区透明并阻止内容穿透操作层。
+- [x] v79 通过真实隔离 5175 实例确认 320/390/768/1024/1440px 顶部矩阵、768/1440px 滚动态截图、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v79.md`，真实辅助偏好与设备继续独立门禁。

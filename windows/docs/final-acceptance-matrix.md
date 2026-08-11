@@ -215,6 +215,11 @@
 - 登录页自动聚焦从荧光绿报警态改为低亮 lavender keyline；marker 清除后，Tab 键路径仍显示完整 lime `:focus-visible` 环，不削弱键盘可达性。
 - 5174 隔离实例真实确认 320/390/768/1024/1440px computed style、桌面/移动截图、Tab 焦点、无横向溢出、无障碍关键语义与清洁控制台；独立证据见 `ui-accessibility-evidence-v78.md`，真实设备与辅助偏好继续独立门禁。
 
+### v79 交付增量
+
+- Dashboard AI TOKEN 品牌区保持透明；滚动态为右侧 nav/account cluster 增加低 alpha 局部 reading rail，pointer-events 保持 none，避免导航与 CTA/表单内容重叠。
+- 5175 隔离实例真实确认 320/390/768/1024/1440px 顶部矩阵、768/1440px 滚动态截图和 computed style、无横向溢出、无障碍关键语义与清洁控制台；独立证据见 `ui-accessibility-evidence-v79.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

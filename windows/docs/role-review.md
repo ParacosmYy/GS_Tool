@@ -226,6 +226,12 @@
 - UI-2：变更集中在 `auth-focus.css`，通过现有 `data-auth-autofocus` 状态边界处理表现层，不改变认证 DOM、提交契约、会话、API、数据流或 forced-colors 系统复位。
 - UI-3：真实 5174 隔离实例已完成 320/390/768/1024/1440px computed-style、桌面/移动截图、Tab 焦点行为、无横向溢出、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v78.md`。
 
+## v79 Dashboard 滚动态导航安全层
+
+- UI-1：保持 AI TOKEN 品牌区在静止与滚动态的透明透景；仅为右侧 nav/account cluster 增加低 alpha、pointer-inert 的局部 reading rail，避免 CTA 与导航穿透叠层。
+- UI-2：变更集中在 `responsive-tuning.css` 的滚动态伪元素与平板断点，不改变 DOM、导航契约、业务状态、API、数据流或认证；forced-colors 显式隐藏装饰 rail。
+- UI-3：真实 5175 隔离实例已完成 320/390/768/1024/1440px 顶部矩阵、768/1440px 滚动态截图与 computed-style、无横向溢出、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v79.md`。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
