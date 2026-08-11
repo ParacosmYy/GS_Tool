@@ -56,6 +56,10 @@ sticky header 在首屏保持透明，滚动后切换为低透明度阅读玻璃
 
 登录/注册卡片降低背景梯度 alpha 与 blur 强度，使角色场景真正透过表面，同时保留文字可读性和高对比度/forced-colors 兜底。四档响应式、注册页复用、无溢出和本地控制台证据见 `ui-accessibility-evidence.md` 的 v48 章节。
 
+## v49 交互态指针收敛
+
+交互目标上的鼠标光晕与指针环降低尺寸、亮度和放大比例，保留 pointer follower、surface spotlight 与按钮磁吸，同时让原生焦点边界成为主要反馈。桌面交互态、离开态回收和本地控制台证据见 `ui-accessibility-evidence.md` 的 v49 章节。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

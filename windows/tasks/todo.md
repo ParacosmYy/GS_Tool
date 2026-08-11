@@ -134,6 +134,7 @@
 - [x] UI-2/UI-3 v46：为首屏自动采集 CTA 与补录深链接补充 sticky header 安全落点，完成桌面/320px 平滑滚动收束、无溢出与可读性复核
 - [x] UI-1/UI-2/UI-3 v47：移除 AI TOKEN 品牌栏基础态 backdrop blur 与外部阴影，保留透明透景、细边线和文字可读性，完成桌面/320px/滚动态复核
 - [x] UI-1/UI-2/UI-3 v48：降低登录/注册卡片遮罩与背景模糊强度，让角色场景真正透过半透明表面，完成 320/768/1024/1440 四档复核
+- [x] UI-1/UI-2/UI-3 v49：收敛交互态鼠标光晕与指针环尺寸/亮度，保留跟随和按钮磁吸反馈，完成桌面 pointer 状态与离开态复核
 - [x] 本机体验入口 B22：根 `run.py`/`windows/run.py` 统一复用锁定 Waitress，正常启动不再输出 Flask development server 警告
 - [x] CLI 体验/安全 B25：`token_tracker serve` 默认复用 Waitress；仅 `--debug` 启用 Flask，普通本地命令拒绝非 loopback 绑定（ADR-094）
 - [x] 本机体验入口 B23：`TOKEN_TRACKER_HOST` 只允许 loopback，危险配置在应用/数据库创建前 fail-closed；局域网继续走显式 `--lan-preview`（ADR-078）

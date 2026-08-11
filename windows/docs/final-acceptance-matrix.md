@@ -30,7 +30,7 @@
 | R-13 | 前后端边界、API v1、角色分工和模块化架构 | pass | `api-contract.md`、roles、ui-modules、ADR 目录、层间审计 | 架构师最终签署 |
 | R-14 | 每个文件不超过 1000 行，企业级头部和注释 | pass | `token_tracker audit --json` 行数/头部/docstring/KDoc 门禁 | 新增代码继续纳入审计 |
 | R-15 | 项目内 skills、UI 规范和可维护交付流程 | pass | `windows/skills/`、角色约束、ADR、`release-doctor` | 最终归档与版本签署 |
-| R-16 | UI 可读、动画降级、焦点、ARIA、错误态 | conditional | UI-3 v14/v15/v16/v17/v18/v19/v23/v26/v27/v29/v30/v31/v32/v33/v34/v35/v36/v37/v38/v39/v40/v41/v42/v45/v46/v47/v48 运行证据、motion contract、ADR-063；v27 补齐当前 v14 登录页四档结构，v29 补齐场景遮罩/导航玻璃层，v30 补齐 Dashboard 空态行动入口、非空图表回归和四档运行值，v31 补齐登录/Admin 四档首帧、无溢出、Admin 详情焦点回流和清洁控制台，v32 补齐 Admin 共享 pointer/backdrop/reveal/surface motion、动态详情可读性、焦点回流与清洁控制台观察，v33 补齐导航 active/aria-current、滚动进度线、顶部半透明玻璃层和桌面/移动端复核，v34 补齐自动采集双栏说明卡片收口、320px 单列与清洁控制台观察，v35 补齐待显区块基础可读性、锚点动画收束和 320px 无溢出，v36 补齐 Dashboard/Activity/Admin 表格零信号空态、微动效降级与移动端复核，v37 补齐四周期 active pill、aria-pressed 和 320px 几何同步，v38 补齐暗色 select、箭头、option 可读性与 320px 交互复核，v39 补齐顶部 AI TOKEN 品牌栏透景、滚动保持和移动端无溢出复核，v40 补齐异常补录 disclosure 的 open/closed 状态、Space/Enter 键盘交互与 320px 无溢出复核，v41 补齐主要章节的 sticky header 安全落点和移动端无溢出复核，v42 补齐图表/工作事件/Token 历史数据面阅读遮罩、空/非空状态和 320px 无溢出复核，v45 补齐滚动态透明羽化品牌栏、移除背景 blur、桌面/320px 无溢出和本地控制台复核，v46 补齐自动采集/补录深链接的 sticky header 安全落点与桌面/320px 收束复核，v47 补齐基础态品牌栏透明度、移动/桌面截图和滚动态复核，v48 补齐登录/注册半透明表面、四档响应式和可读性复核 | 真实设备、reduced-motion、高对比度、下载落盘 |
+| R-16 | UI 可读、动画降级、焦点、ARIA、错误态 | conditional | UI-3 v14/v15/v16/v17/v18/v19/v23/v26/v27/v29/v30/v31/v32/v33/v34/v35/v36/v37/v38/v39/v40/v41/v42/v45/v46/v47/v48/v49 运行证据、motion contract、ADR-063；v27 补齐当前 v14 登录页四档结构，v29 补齐场景遮罩/导航玻璃层，v30 补齐 Dashboard 空态行动入口、非空图表回归和四档运行值，v31 补齐登录/Admin 四档首帧、无溢出、Admin 详情焦点回流和清洁控制台，v32 补齐 Admin 共享 pointer/backdrop/reveal/surface motion、动态详情可读性、焦点回流与清洁控制台观察，v33 补齐导航 active/aria-current、滚动进度线、顶部半透明玻璃层和桌面/移动端复核，v34 补齐自动采集双栏说明卡片收口、320px 单列与清洁控制台观察，v35 补齐待显区块基础可读性、锚点动画收束和 320px 无溢出，v36 补齐 Dashboard/Activity/Admin 表格零信号空态、微动效降级与移动端复核，v37 补齐四周期 active pill、aria-pressed 和 320px 几何同步，v38 补齐暗色 select、箭头、option 可读性与 320px 交互复核，v39 补齐顶部 AI TOKEN 品牌栏透景、滚动保持和移动端无溢出复核，v40 补齐异常补录 disclosure 的 open/closed 状态、Space/Enter 键盘交互与 320px 无溢出复核，v41 补齐主要章节的 sticky header 安全落点和移动端无溢出复核，v42 补齐图表/工作事件/Token 历史数据面阅读遮罩、空/非空状态和 320px 无溢出复核，v45 补齐滚动态透明羽化品牌栏、移除背景 blur、桌面/320px 无溢出和本地控制台复核，v46 补齐自动采集/补录深链接的 sticky header 安全落点与桌面/320px 收束复核，v47 补齐基础态品牌栏透明度、移动/桌面截图和滚动态复核，v48 补齐登录/注册半透明表面、四档响应式和可读性复核，v49 补齐 pointer follower 交互态尺度、surface spotlight、按钮磁吸与离开态复核 | 真实设备、reduced-motion、高对比度、下载落盘 |
 | R-17 | 一条可重复的交付预检命令 | pass | `release-doctor.ps1/.bat`、`ci/quality-gate.ps1`、ADR-071/085，Local/LAN/Production 与源码质量门禁入口 | 远程仓库首次 CI 执行、外部工具准备后重新执行 |
 
 ### v43 交付增量
@@ -64,6 +64,11 @@
 
 - 登录/注册共享卡片降低背景遮罩和 blur 强度，让角色场景真实透过半透明表面，同时保留高对比度兜底。
 - 通过隔离浏览器确认 320/768/1024/1440 四档、注册页复用、截图、横向溢出和本地控制台；限制见 v48 UI 证据。
+
+### v49 交付增量
+
+- 收敛交互态 pointer aura/ring 的尺寸和亮度，保留跟随、surface spotlight 与按钮磁吸反馈，不压过原生焦点边界。
+- 通过隔离浏览器确认 pointer-ready/interactive、surface 变量、按钮磁吸、离开态回收和本地控制台；限制见 v49 UI 证据。
 
 ## 当前未关闭的硬门禁
 

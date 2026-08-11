@@ -703,3 +703,16 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `1009`、`1425`）；注册页复用样式后同样无溢出，本地应用浏览器 `error/warning` 日志为空。
 - 验证结束后仅停止显式隔离端口 5058 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v49 交互态指针收敛证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5059`，数据库位于
+  `.cache/ui-v1021-runtime-20260812-5059/token_tracker-5059.sqlite3`；仅用于登录页 pointer/surface 观察，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `static/scene-motion.css` 将交互态 `.pointer-aura` 从 `320px/.82/scale(1.08)` 收敛为 `300px/.68/scale(1.04)`，将
+  `.pointer-ring` 从 `54px/.98` 收敛为 `48px/.92`，同步降低 glow；基础态 `36px` 和 reduced-motion/fine-pointer 门控保持不变。
+- 桌面运行时将鼠标移至登录卡片与主按钮后确认 body 出现 `pointer-ready pointer-interactive`，卡片 `--surface-x/y` 随指针更新，
+  按钮磁吸变量有值；收束计算值为 aura `300px/.68`、ring `48px`，离开交互目标后回到 aura `280px`、ring `36px`。
+- 登录页真实浏览器 `error/warning` 日志为空；本轮不改变 DOM、ARIA、键盘焦点或移动/ reduced-motion 的 JS 退出条件。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、下载落盘、真实 Provider 成功和 Android 真机验收。
+- 验证结束后仅停止显式隔离端口 5059 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。

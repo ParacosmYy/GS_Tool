@@ -46,6 +46,12 @@
 - UI-2：本轮仅调整表面 CSS 参数，不新增监听器、计时器、依赖或动画；既有 focus、reduced-motion 和键盘路径保持不变。
 - UI-3：隔离浏览器确认登录页 320/768/1024/1440 四档卡片几何、注册页复用、无横向溢出和本地控制台清洁。
 
+## v49 视觉与动效增量
+
+- UI-1：将交互态 pointer aura/ring 从大面积高亮收敛为更轻的 `300px/.68` 与 `48px/.92`，避免覆盖登录字段的原生焦点边界；基础跟随、surface spotlight 和按钮磁吸保持。
+- UI-2：本轮仅调整 `scene-motion.css` 参数与注释，不新增监听器、计时器、依赖或业务分支；fine-pointer、reduced-motion 和 touch 降级保持不变。
+- UI-3：隔离浏览器确认登录页 pointer-ready/interactive、surface CSS 变量、按钮磁吸、交互态/离开态回收和清洁控制台。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
