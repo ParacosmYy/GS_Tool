@@ -55,6 +55,47 @@
   }
 }
 
+/* The full AI TOKEN row remains transparent while scrolling. A local lens
+   behind the brand lockup keeps section labels from passing through the logo
+   and turning the small identity mark into a mixed reading layer. The lens is
+   pointer-inert, does not change the brand's layout box, and stays absent at
+   rest so the first scene frame remains fully open. */
+.site-header.is-scrolled .brand {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+.site-header.is-scrolled .brand::before {
+  position: absolute;
+  z-index: -1;
+  top: -8px;
+  right: -12px;
+  bottom: -8px;
+  left: -12px;
+  content: "";
+  pointer-events: none;
+  border: 1px solid rgba(230, 235, 245, .08);
+  border-radius: 8px;
+  background: rgba(7, 14, 24, .035);
+  box-shadow: 0 5px 16px rgba(7, 14, 24, .08);
+  -webkit-backdrop-filter: blur(9px) saturate(1.04);
+  backdrop-filter: blur(9px) saturate(1.04);
+}
+
+/* Once the page has moved, the hero cue has completed its job. Removing it
+   from the sticky header's reading lane prevents the old "scroll to explore"
+   label from crossing the brand on compact screens. */
+.scroll-cue {
+  transition: opacity .35s var(--ui-ease), transform .35s var(--ui-ease);
+}
+
+.site-header.is-scrolled + .site-main .scroll-cue {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+}
+
 /* Transparent chrome must remain readable over both the dark server wall and
    the bright character/laptop highlights. Lift quiet navigation labels one
    semantic step and keep the halo tight so the header stays transparent. */
@@ -172,6 +213,7 @@
   }
 
   .site-header.is-scrolled::before { display: none; }
+  .site-header.is-scrolled .brand::before { display: none; }
 }
 
 /* Laptop-height desktop screens need the period control in the first scan.

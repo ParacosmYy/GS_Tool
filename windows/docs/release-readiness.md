@@ -184,6 +184,10 @@ Dashboard 在静止状态继续使用完全透明 AI TOKEN 顶栏；滚动后仅
 
 Dashboard 零数据图表现在使用低对比网格、零基线、等待扫描线和模型占比导引环，避免空账号看到大面积无意留白；现有空态文案与自动采集入口仍是主交互层。5176 隔离实例已完成 320/390/768/1024/1440px、周期按钮、可访问性快照和页面日志检查，独立证据见 `ui-accessibility-evidence-v80.md`；AI TOKEN 顶栏首屏与滚动态 computed background 继续为 transparent，真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v81 滚动态品牌阅读边界
+
+Dashboard 在滚动态为 AI TOKEN 品牌锁定区增加 `.035` alpha 的局部透景保护镜，并让一次性的 `Scroll to explore` cue 离开 sticky header 阅读通道；整条顶栏仍保持 transparent/no global blur。5177 隔离实例已完成 320/390/768/1024/1440px 顶部矩阵、390/1440px 滚动态截图、周期按钮、可访问性快照和页面日志检查，独立证据见 `ui-accessibility-evidence-v81.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

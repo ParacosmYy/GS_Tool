@@ -238,6 +238,12 @@
 - UI-2：变更集中在 `responsive-tuning.css`，复用现有 `.chart-wrap[data-chart-state="empty"]` 状态边界；不改变 DOM、Chart.js、API、导航、认证或数据流，forced-colors 和 reduced-motion 均有明确复位。
 - UI-3：真实 5176 隔离实例已完成 320/390/768/1024/1440px 矩阵、1440px 滚动态截图、Week/Today 周期交互、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v80.md`。
 
+## v81 滚动态品牌阅读边界
+
+- UI-1：保持整条 AI TOKEN 顶栏透明，只在滚动态品牌锁定区提供低 alpha 透景 lens，并移除已经完成任务的 `Scroll to explore` cue，避免 section copy 穿过身份标识。
+- UI-2：变更集中在 `responsive-tuning.css` 的 `.site-header.is-scrolled .brand` 与相邻 `.scroll-cue` 表现层；不改变 DOM、布局盒、导航、API、认证或数据流，forced-colors 显式隐藏 lens。
+- UI-3：真实 5177 隔离实例已完成 320/390/768/1024/1440px 顶部矩阵、390/1440px 滚动态截图、Week/Today 周期交互、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v81.md`。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

@@ -225,6 +225,11 @@
 - 零数据图表增加低对比网格、零基线、等待扫描线与模型占比导引环；不新增 DOM，不改变 Chart.js 数据契约，reduced-motion/forced-colors 保留静止与系统配色边界。
 - 5176 隔离实例真实确认 320/390/768/1024/1440px 图表尺寸与无横向溢出、Week/Today 周期交互、无障碍关键语义和清洁页面控制台；独立证据见 `ui-accessibility-evidence-v80.md`，真实设备与辅助偏好继续独立门禁。
 
+### v81 交付增量
+
+- 滚动态 AI TOKEN 品牌锁定区增加低 alpha 局部透景 lens，`Scroll to explore` cue 在滚动后离开 sticky header 阅读通道；整条顶栏仍为 transparent/no global blur，不新增 DOM 或焦点 stop。
+- 5177 隔离实例真实确认 320/390/768/1024/1440px 顶部矩阵、390/1440px 滚动态截图与 computed style、Week/Today 周期交互、无障碍关键语义和清洁页面控制台；独立证据见 `ui-accessibility-evidence-v81.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
