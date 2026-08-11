@@ -175,6 +175,11 @@
 - 移动端静止首屏保持透明顶栏；滚动态仅增加低 alpha 安全渐变、短 blur 与轻阴影，避免首屏 CTA 与 AI TOKEN/Log out 重叠；forced-colors 复位已落在移动断点规则中。
 - 5148 隔离实例真实确认 390px `scrollY≈700` 的 CTA/顶栏几何与 1440px 透明滚动态；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署限制见 v70 UI 证据。
 
+### v71 交付增量
+
+- 首屏继续透明透景；滚动态为桌面提供深蓝低透明度安全层，移动端保留较轻安全层，避免指标标题穿入 sticky 导航并保持文字可读性。
+- 5150 隔离实例真实确认 1440/390/320px 首屏与滚动态 computed style、截图、无横向溢出和清洁控制台；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署限制见 v71 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

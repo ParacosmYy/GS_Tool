@@ -178,6 +178,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的移动断点，并显式补齐 forced-colors 系统配色复位；未改变 DOM、导航契约、业务状态、API 或数据流。
 - UI-3：真实 5148 实例已完成 390px 首屏/scrollY≈700、1440px 滚动态和清洁页面观察；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署仍不宣称通过。
 
+## v71 桌面滚动态安全顶栏
+
+- UI-1：保持首屏透明优先，只在滚动态为所有断点提供深蓝低透明度 reading veil；移动端继续使用较轻的局部 veil，避免统计指标穿入 sticky 导航，同时保留场景透景。
+- UI-2：表现变化集中在 `responsive-tuning.css`，仅覆盖 `.site-header.is-scrolled` 的视觉状态，并把 forced-colors 复位提升为全断点系统配色规则；未改变 DOM、导航契约、业务状态、API 或数据流。
+- UI-3：真实 5150 隔离实例已完成 1440/390/320px 首屏与滚动态 computed style、截图、无横向溢出和清洁页面日志确认；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

@@ -6,6 +6,18 @@
  * Module: Web presentation / responsive tuning layer
  */
 
+/* A transparent sticky header is correct at rest, but it must not let
+   headings and metric labels bleed into the navigation row after scrolling.
+   Use a deep-blue, low-opacity reading veil only in the scrolled state; the
+   illustration remains visible while the header owns its content-safe zone. */
+.site-header.is-scrolled {
+  border-bottom-color: rgba(230, 235, 245, .14);
+  background: linear-gradient(180deg, rgba(7, 19, 33, .78), rgba(7, 19, 33, .56) 78%, rgba(7, 19, 33, .18));
+  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+  backdrop-filter: blur(12px) saturate(1.08);
+  box-shadow: 0 12px 28px rgba(8, 9, 12, .18);
+}
+
 /* At tablet widths the orbit is intentionally above the copy, but the
    illustration must not push the primary actions beyond the first scan. The
    dedicated range keeps this correction isolated from the 320px mobile grid
@@ -32,7 +44,7 @@
      the sticky account affordance during scroll. Keep the resting state
      fully transparent, but add a short, low-alpha reading veil only after the user
      starts moving through the page so bright buttons cannot collide with the
-     brand row. Desktop scroll state remains fully transparent. */
+     brand row. Desktop uses the shared, stronger veil defined above. */
   .site-header.is-scrolled {
     border-bottom-color: rgba(230, 235, 245, .12);
     background: linear-gradient(180deg, rgba(8, 9, 12, .54), rgba(8, 9, 12, .18) 78%, transparent);
@@ -55,8 +67,8 @@
   .auth-shell.auth-shell-register .auth-card { order: -1; }
 }
 
-@media (max-width: 620px) and (forced-colors: active) {
-  /* System colors own the mobile reading veil; never let the decorative
+@media (forced-colors: active) {
+  /* System colors own every reading veil; never let the decorative
      gradient override a user's forced-colors contract. */
   .site-header.is-scrolled {
     border-bottom-color: CanvasText;

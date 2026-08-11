@@ -144,6 +144,10 @@ AI TOKEN 顶栏默认态与滚动态现在完全透景，移除残留边线、�
 
 移动端首屏保持完全透明；滚动后使用低 alpha 安全渐变与短 blur，防止首屏 CTA 穿入 sticky brand/account 操作区；桌面仍保持透明顶栏。5148 隔离实例的真实移动/桌面证据见 `ui-accessibility-evidence.md` 的 v70 章节，真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v71 桌面滚动态安全顶栏
+
+首屏继续使用完全透明顶栏；桌面滚动后增加深蓝低透明度渐变、12px blur 和轻阴影，防止 Dashboard 指标穿入品牌/导航行，同时保留背景插画透景。移动端维持较轻的独立 veil，forced-colors 由全断点系统配色规则接管。5150 隔离实例的 1440/390/320px 证据见 `ui-accessibility-evidence.md` 的 v71 章节，真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
