@@ -567,9 +567,11 @@ td { color: var(--ink-soft); font-size: 12px; }
 .chart-empty-action:hover span, .chart-empty-action:focus-visible span { transform: translate(2px, 2px); }
 
 /* Keep below-the-fold content present but never visually absent if a slow
-   browser delays IntersectionObserver delivery during the first paint. */
+   browser delays IntersectionObserver delivery during the first paint. The
+   pre-reveal state is intentionally readable: a long page should feel layered,
+   not like its lower half is covered by an opaque black mask. */
 [data-reveal] { opacity: 1; transform: none; transition-duration: .82s; }
-html.motion-ready [data-reveal] { opacity: .16; transform: translateY(18px); }
+html.motion-ready [data-reveal] { opacity: .34; transform: translateY(12px); }
 html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
 
 @keyframes empty-marker-breathe {
