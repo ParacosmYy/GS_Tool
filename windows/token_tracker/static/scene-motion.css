@@ -49,6 +49,58 @@ body.pointer-press .pointer-ring { transform: translate3d(-50%, -50%, 0) scale(.
   box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 12px 34px rgba(8, 9, 12, .1);
 }
 
+/* Signal metadata sits over a moving illustration. Give it a compact glass
+   boundary so status text remains scannable without becoming a dark banner. */
+#dashboard-status {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  border: 1px solid rgba(230, 235, 245, .22);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--ink-soft);
+  background: rgba(8, 9, 12, .2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 8px 20px rgba(8, 9, 12, .1);
+  -webkit-backdrop-filter: blur(8px) saturate(1.12);
+  backdrop-filter: blur(8px) saturate(1.12);
+  text-shadow: 0 1px 10px rgba(8, 9, 12, .72);
+  white-space: nowrap;
+}
+
+#dashboard-status::before {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  content: "";
+  background: var(--signal-lime);
+  box-shadow: 0 0 11px rgba(217, 255, 120, .78);
+}
+
+#dashboard-status.is-error {
+  border-color: rgba(255, 156, 130, .42);
+  color: #ffd2c8;
+  background: rgba(48, 16, 16, .3);
+}
+
+#dashboard-status.is-error::before {
+  background: var(--signal-warm);
+  box-shadow: 0 0 11px rgba(255, 156, 130, .7);
+}
+
+/* The total counter is a live instrument, not a decorative hole in the
+   artwork. A second low-alpha layer and text shadow keep its signal readable. */
+.hero-core {
+  background:
+    radial-gradient(circle at 35% 25%, rgba(217, 255, 120, .2), rgba(255, 255, 255, .03) 54%, transparent 72%),
+    linear-gradient(145deg, rgba(8, 9, 12, .28), rgba(8, 9, 12, .08));
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  backdrop-filter: blur(8px) saturate(1.1);
+}
+
+.hero-core span,
+.hero-core strong { text-shadow: 0 1px 10px rgba(8, 9, 12, .72); }
+
 /* A deep link already owns motion through native smooth scrolling. Remove the
    document-order stagger from the exact destination so the viewport and its
    content settle together instead of showing a blank/faded landing frame. */
@@ -191,9 +243,43 @@ body::after {
   }
 }
 
+@media (max-width: 360px) {
+  /* Keep the live status as one compact signal on the narrowest phones; the
+     adjacent product label may wrap, but the state pill should not split. */
+  #dashboard-status {
+    gap: 5px;
+    padding: 4px 7px;
+    font-size: 9px;
+    letter-spacing: .08em;
+  }
+}
+
 /* The shared forced-colors contract is loaded before this scene layer. Repeat
    the header reset here so the decorative glass cannot override system colors. */
 @media (forced-colors: active) {
+  #dashboard-status {
+    border-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    color: CanvasText;
+    text-shadow: none;
+  }
+  #dashboard-status::before { background: CanvasText; box-shadow: none; }
+  #dashboard-status.is-error {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+  #dashboard-status.is-error::before { background: CanvasText; box-shadow: none; }
+  .hero-core {
+    border-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .hero-core::after { display: none; }
+  .hero-core span, .hero-core strong { color: CanvasText; text-shadow: none; }
   .site-header,
   .site-header.is-scrolled {
     background: Canvas;

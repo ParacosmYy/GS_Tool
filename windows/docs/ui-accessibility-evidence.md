@@ -788,3 +788,14 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 768×900 CTA 保持 `y=802.0–850.0`，1024×900 保持 `y=639.1–687.1`，1440×900 保持 `y=682.1–730.1`；五档均为 `scrollWidth=clientWidth`，无横向溢出。
 - 390px 截图确认轨道仍是视觉锚点，标题、说明和两个 CTA 形成连续扫描层；源码已有 reduced-motion 全局降级，本轮未新增动画或交互语义，页面 `error/warning` 日志为空。
 - 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度、Provider 联调或真实账号证据；验证结束前应 reset viewport override，并仅清理端口 5075 及其显式隔离临时目录，受保护的 5000/5011 进程不得触碰。
+
+## v57 Dashboard 信号层可读性证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离 Dashboard 实例 `127.0.0.1:5076`，数据库位于
+  `.cache/ui-v1029-runtime-20260812-5076/token_tracker-5076.sqlite3`；仅使用合成账号观察空态页面，未读取真实 Cookie、Key、令牌或数据库。
+- 修复前 `#dashboard-status` 在动态插画上为透明背景、无边界、无文字阴影；`.hero-core` 仅有淡径向背景，核心文案没有阴影，状态与总量信标在复杂画面上缺少稳定阅读底。
+- `static/scene-motion.css` 为状态文案加入低 alpha 胶囊、边界、`blur(8px)`、信号点和文字阴影；为 `.hero-core` 加入低 alpha 第二层与 `blur(8px)`，保留背景透景；错误状态和 forced-colors 均有独立复位。
+- 320×800 真实值：状态胶囊为 `x=204.0,y=124.0,w=85.7,h=24.2`，保持单行；CTA 为 `y=698.6–746.6`。390×844 状态为 `107.3×29.5`，CTA 为 `y=758.8–806.8`。
+- 768×900、1024×900、1440×900 的 CTA 分别为 `y=813.3–861.3`、`644.8–692.8`、`687.8–735.8`；状态胶囊与总量信标均在首屏可见，五档 `scrollWidth=clientWidth`。
+- 五档真实截图确认状态胶囊与总量信标在角色/代码背景上仍然透景但更易扫描；页面 `error/warning` 日志为空。本轮未新增动画，既有 `prefers-reduced-motion` 全局降级继续生效。
+- 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度、Provider 联调或真实账号证据；验证结束前应 reset viewport override，并仅清理端口 5076 及其显式隔离临时目录，受保护的 5000/5011 进程不得触碰。

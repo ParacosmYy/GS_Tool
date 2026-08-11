@@ -88,6 +88,10 @@ AI TOKEN 品牌栏恢复为低 alpha 透景玻璃层，首屏与滚动态分别�
 
 320/390px Dashboard 缩小轨道并压缩文案留白，使主要操作与首屏底边保持约 48px 呼吸空间；768px 以上保持既有布局。真实五档几何、截图和控制台证据见 `ui-accessibility-evidence.md` 的 v56 章节；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v57 Dashboard 信号层可读性
+
+状态文案和 TOTAL SIGNAL 信标增加透景玻璃边界、轻量 blur、文字阴影和窄屏单行约束，使动态插画上的实时信息稳定可读；错误态、forced-colors 与 reduced-motion 兜底保持。真实五档截图、几何和控制台证据见 `ui-accessibility-evidence.md` 的 v57 章节；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
