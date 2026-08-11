@@ -73,14 +73,48 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .auth-intro { animation: ui-intro-in .72s var(--ui-ease) .04s both; }
 .auth-card {
   border-radius: var(--radius-sharp);
-  border-color: var(--line-visible);
+  border-color: rgba(230,235,245,.42);
   background:
-    radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196,192,255,.12), transparent 38%),
-    linear-gradient(145deg, rgba(23,26,33,.88), rgba(10,12,16,.92));
-  -webkit-backdrop-filter: blur(12px) saturate(1.1);
-  backdrop-filter: blur(12px) saturate(1.1);
+    radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196,192,255,.14), transparent 38%),
+    linear-gradient(145deg, rgba(23,26,33,.62), rgba(10,12,16,.72));
+  -webkit-backdrop-filter: blur(18px) saturate(1.18);
+  backdrop-filter: blur(18px) saturate(1.18);
   box-shadow: 0 28px 72px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08);
   animation: ui-card-in .78s var(--ui-ease) .1s both;
+}
+.auth-card:focus-within {
+  border-color: rgba(217,255,120,.76);
+  box-shadow: 0 28px 72px rgba(0,0,0,.42), 0 0 0 4px rgba(217,255,120,.08), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.auth-card-top {
+  position: relative;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.auth-card-top::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent 0%, var(--signal-lime) 42%, var(--signal-lavender) 58%, transparent 100%);
+  background-size: 220% 100%;
+  animation: ui-signal-scan 7.5s var(--ui-ease) infinite;
+}
+.auth-card-top > span {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  letter-spacing: .08em;
+}
+.auth-card-top > span::before {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  content: "";
+  background: var(--signal-lime);
+  box-shadow: 0 0 0 3px rgba(217,255,120,.1), 0 0 12px rgba(217,255,120,.7);
 }
 .auth-card h2 { color: var(--ink); animation: ui-content-in .58s var(--ui-ease) .22s both; }
 .auth-card > .muted, .auth-card .stack-form, .auth-card .form-footnote { animation: ui-content-in .58s var(--ui-ease) .28s both; }
@@ -198,6 +232,7 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
 @keyframes ui-content-in { from { opacity: .96; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes ui-line-in { from { opacity: .92; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes scene-beacon { 0%, 100% { opacity: .56; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes ui-signal-scan { 0%, 62% { background-position: 120% 0; opacity: .24; } 76%, 88% { opacity: .9; } 100% { background-position: -120% 0; opacity: .24; } }
 
 @media (max-width: 900px) {
   .site-header, .site-main { width: min(100% - 44px, 720px); }
@@ -252,7 +287,7 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .auth-intro, .auth-card, .auth-card h2, .auth-card > .muted, .auth-card .stack-form, .auth-card .form-footnote, .feature-lines span, .scene-signature i { animation: none; opacity: 1; transform: none; }
+  .auth-intro, .auth-card, .auth-card h2, .auth-card > .muted, .auth-card .stack-form, .auth-card .form-footnote, .feature-lines span, .scene-signature i, .auth-card-top::after { animation: none; opacity: 1; transform: none; }
   .button { translate: none; }
 }
 
@@ -291,6 +326,8 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
     box-shadow: none;
     color: CanvasText;
   }
+  .auth-card:focus-within { border-color: Highlight; box-shadow: none; }
+  .auth-card-top::after { display: none; }
   input, textarea, select, button { border: 1px solid CanvasText; background: Canvas; color: CanvasText; }
   a { color: LinkText; }
   button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid Highlight; }
