@@ -172,6 +172,12 @@
 - UI-2：表现规则集中在 `ui-polish.css` 与 `scene-motion.css`，自动聚焦边界集中在 `auth.js` 与 `auth-focus.css`；未改变 DOM、API、认证契约、数据流或业务状态。
 - UI-3：真实 5146 隔离实例已完成桌面首屏、PageDown 滚动态、移动首屏与 320/390/768/1024/1440 矩阵；真实设备、辅助偏好、Provider 联调和正式部署仍不宣称通过。
 
+## v70 移动滚动态安全顶栏
+
+- UI-1：移动端静止首屏继续使用完全透明品牌栏；滚动态仅启用低 alpha 渐变、短 blur 和轻阴影，避免首屏 CTA 滑入 AI TOKEN/Log out 的操作安全区；桌面透明策略保持不变。
+- UI-2：变更集中在 `responsive-tuning.css` 的移动断点，并显式补齐 forced-colors 系统配色复位；未改变 DOM、导航契约、业务状态、API 或数据流。
+- UI-3：真实 5148 实例已完成 390px 首屏/scrollY≈700、1440px 滚动态和清洁页面观察；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

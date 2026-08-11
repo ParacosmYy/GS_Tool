@@ -924,3 +924,11 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 320/390/768/1024/1440 矩阵均确认品牌存在、header 背景/边线/阴影透明且页面无横向溢出，页面宽度分别为 `305/305`、`375/375`、`753/753`、`1009/1009`、`1425/1425`；移动窄视口 `active=null`、无 `data-auth-autofocus`，桌面自动聚焦仍保留 quiet edge。
 - 桌面首屏读取到用户名字段 `background=rgba(217,255,120,.05)`、1px quiet edge；Tab 后密码字段恢复 `:focus-visible` 的 3px keyboard halo。`auth-focus.css` 已独立加载，`tabV68.dev.logs()` 返回空数组。
 - 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；浏览器工具自身外部网络遥测告警不计入本地页面日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v70 移动滚动态安全顶栏证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5148`，数据库位于
+  `windows/.cache/ui-v1500-runtime-20260812-5148/token_tracker-5148.sqlite3`；仅使用合成账号观察移动层级，未读取真实 Cookie、Key、令牌或用户数据库。
+- 基线 390×844 首屏仍确认 `.site-header` 为 `background=rgba(0,0,0,0)`、`backgroundImage=none`、`backdrop-filter=none`；移动滚动态新增短安全层：`linear-gradient(rgba(8,9,12,.54), rgba(8,9,12,.18) 78%, transparent)`、`blur(10px) saturate(1.08)` 和低幅阴影，仅遮住穿入顶栏的首屏 CTA。
+- 真实 390px 滚动至 `scrollY≈700` 时确认 `site-header.is-scrolled`，首屏 CTA 几何约为 `top≈58.8px / bottom≈106.8px`；截图显示 AI TOKEN 与 Log out 保持清晰，CTA 不再直接穿过品牌操作层。1440px 滚动态仍为透明背景、无 blur、无阴影，桌面构图未改变。
+- `responsive-tuning.css` 为移动安全层补齐 `forced-colors: active` 的 `Canvas/CanvasText` 复位；本轮未伪造真实 forced-colors、reduced-motion、设备或 Provider 联调证据。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。

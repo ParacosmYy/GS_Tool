@@ -28,6 +28,19 @@
 }
 
 @media (max-width: 620px) {
+  /* A transparent mobile header lets the first-screen CTA slide underneath
+     the sticky account affordance during scroll. Keep the resting state
+     fully transparent, but add a short, low-alpha reading veil only after the user
+     starts moving through the page so bright buttons cannot collide with the
+     brand row. Desktop scroll state remains fully transparent. */
+  .site-header.is-scrolled {
+    border-bottom-color: rgba(230, 235, 245, .12);
+    background: linear-gradient(180deg, rgba(8, 9, 12, .54), rgba(8, 9, 12, .18) 78%, transparent);
+    -webkit-backdrop-filter: blur(10px) saturate(1.08);
+    backdrop-filter: blur(10px) saturate(1.08);
+    box-shadow: 0 10px 24px rgba(8, 9, 12, .12);
+  }
+
   /* The mobile orbit remains the visual anchor, but its desktop-proportioned
      footprint leaves the two primary actions too close to the viewport edge.
      A bounded reduction preserves the scene while returning breathing room. */
@@ -40,6 +53,19 @@
      the introduction remains available immediately below the form. */
   .auth-shell.auth-shell-login .auth-card,
   .auth-shell.auth-shell-register .auth-card { order: -1; }
+}
+
+@media (max-width: 620px) and (forced-colors: active) {
+  /* System colors own the mobile reading veil; never let the decorative
+     gradient override a user's forced-colors contract. */
+  .site-header.is-scrolled {
+    border-bottom-color: CanvasText;
+    background: Canvas;
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
 }
 
 /* Laptop-height desktop screens need the period control in the first scan.
