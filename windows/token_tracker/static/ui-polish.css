@@ -204,7 +204,28 @@ input:focus, textarea:focus { border-color: var(--signal-lime); background: rgba
 .orbit-track-three { border-color: rgba(217,255,120,.42); }
 .particle-two { background: var(--signal-lime); box-shadow: 0 0 16px 3px rgba(217,255,120,.7); }
 .range-switcher { border-color: var(--line-visible); background: rgba(18,21,27,.8); }
+.range-switcher { position: relative; isolation: isolate; }
+.range-switcher::before {
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: var(--range-pill-width, 0px);
+  border-radius: 999px;
+  content: "";
+  pointer-events: none;
+  background: var(--signal-lime);
+  box-shadow: 0 5px 16px rgba(217,255,120,.18), inset 0 1px 0 rgba(255,255,255,.4);
+  transform: translateX(var(--range-pill-x, 0px));
+  transition: width .42s var(--ui-ease), transform .58s var(--ui-ease);
+  will-change: width, transform;
+}
 .range-button { color: var(--ink-muted); }
+.range-button { background: transparent; }
+.range-switcher:not([data-range-ready="true"]) .range-button.is-active { background: var(--signal-lime); }
+.range-switcher[data-range-ready="true"] .range-button.is-active { color: var(--signal-lime-ink); background: transparent; }
+.range-button:focus-visible { z-index: 2; outline: 2px solid var(--signal-lime); outline-offset: 2px; }
 .range-button.is-active { color: var(--signal-lime-ink); background: var(--signal-lime); }
 .signal-strip { border-color: var(--line-soft); }
 .signal-cell { border-color: var(--line-soft); }
