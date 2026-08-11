@@ -214,6 +214,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的普通配色媒体分支，复用现有 surface 变量、边框和文字 token；不改变 DOM、API、数据流、表单行为或依赖。
 - UI-3：真实 5172 实例已完成 390/320/768/1024/1440px 面板 computed style、无横向溢出、无障碍快照和页面日志检查；`forced-colors` 仅完成源码边界保护，真实辅助偏好、设备、Provider 联调和正式部署仍不宣称通过。
 
+## v77 AI TOKEN 顶栏场景透景
+
+- UI-1：保留 AI TOKEN 顶栏的 `transparent / no blur / no shadow` 契约；将场景 `::before` 在桌面、平板和移动断点的黑色 veil 改为低 alpha 深蓝氛围层，避免顶部与左半区呈现黑色覆盖块。
+- UI-2：变更仅位于 `scene-motion.css` 的装饰层，不改变 DOM、导航、API、数据流、认证、Provider 或交互状态；移动断点与桌面断点拥有明确的局部 alpha 约束。
+- UI-3：真实 5173 隔离实例已完成 390/320/768/1024/1440px computed-style、无横向溢出、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v77.md`。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

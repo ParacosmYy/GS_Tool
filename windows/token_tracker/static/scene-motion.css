@@ -204,12 +204,12 @@ body {
   inset: 0;
   content: "";
   background:
-    /* The source artwork already has a dark editorial safe area. Lift its
-       upper-left ambient light first, then use a restrained veil so copy
-       remains readable without turning the scene into a black slab. */
-    radial-gradient(ellipse 58% 48% at 9% 5%, rgba(63, 105, 163, .3), transparent 74%),
-    linear-gradient(90deg, rgba(8, 9, 12, .36) 0%, rgba(8, 9, 12, .27) 23%, rgba(8, 9, 12, .14) 47%, rgba(8, 9, 12, .045) 70%, rgba(8, 9, 12, .01) 100%),
-    linear-gradient(180deg, rgba(8, 9, 12, .045), transparent 36%, rgba(8, 9, 12, .2));
+    /* The source artwork already has a dark editorial safe area. Add a
+       controlled navy atmosphere instead of stacking a black veil over it;
+       copy keeps its safe contrast while the left field gains depth. */
+    radial-gradient(ellipse 62% 55% at 10% 7%, rgba(65, 125, 196, .38), transparent 76%),
+    linear-gradient(90deg, rgba(4, 18, 38, .16) 0%, rgba(4, 18, 38, .12) 23%, rgba(4, 18, 38, .07) 47%, rgba(4, 18, 38, .02) 70%, transparent 100%),
+    linear-gradient(180deg, rgba(4, 12, 24, .02), transparent 36%, rgba(8, 9, 12, .16));
 }
 
 .story-backdrop::after {
@@ -258,9 +258,9 @@ body::after {
   .story-backdrop-image { object-position: 60% 50%; }
   .story-backdrop::before {
     background:
-      radial-gradient(ellipse 70% 42% at 10% 4%, rgba(63, 105, 163, .27), transparent 72%),
-      linear-gradient(90deg, rgba(8, 9, 12, .5) 0%, rgba(8, 9, 12, .38) 34%, rgba(8, 9, 12, .18) 72%, rgba(8, 9, 12, .04) 100%),
-      linear-gradient(180deg, rgba(8, 9, 12, .08), transparent 36%, rgba(8, 9, 12, .24));
+      radial-gradient(ellipse 70% 42% at 10% 4%, rgba(65, 125, 196, .3), transparent 72%),
+      linear-gradient(90deg, rgba(4, 18, 38, .16) 0%, rgba(4, 18, 38, .12) 34%, rgba(4, 18, 38, .07) 72%, rgba(4, 18, 38, .02) 100%),
+      linear-gradient(180deg, rgba(4, 12, 24, .02), transparent 36%, rgba(8, 9, 12, .18));
   }
 }
 
@@ -275,9 +275,9 @@ body::after {
   .story-backdrop-image { object-position: 68% 50%; }
   .story-backdrop::before {
     background:
-      radial-gradient(ellipse 86% 42% at 8% 4%, rgba(63, 105, 163, .25), transparent 72%),
-      linear-gradient(90deg, rgba(8, 9, 12, .6) 0%, rgba(8, 9, 12, .47) 42%, rgba(8, 9, 12, .24) 78%, rgba(8, 9, 12, .06) 100%),
-      linear-gradient(180deg, rgba(8, 9, 12, .1), transparent 34%, rgba(8, 9, 12, .3));
+      radial-gradient(ellipse 86% 42% at 8% 4%, rgba(65, 125, 196, .28), transparent 72%),
+      linear-gradient(90deg, rgba(4, 18, 38, .18) 0%, rgba(4, 18, 38, .14) 42%, rgba(4, 18, 38, .08) 78%, rgba(4, 18, 38, .02) 100%),
+      linear-gradient(180deg, rgba(4, 12, 24, .03), transparent 34%, rgba(8, 9, 12, .2));
   }
 }
 
