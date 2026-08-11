@@ -75,6 +75,11 @@
 - 滚动时为 AI TOKEN 品牌栏增加半透明渐隐层与轻微 blur；首屏仍保持完全透明，解决滚动态统计文案穿过顶栏的问题。
 - 通过隔离 Dashboard 确认桌面首屏/滚动态截图、computed style、skip-link 焦点、无横向溢出和本地控制台；移动矩阵沿用既有证据，限制见 v50 UI 证据。
 
+### v51 交付增量
+
+- 深链接目标 section 清除额外的文档顺序 reveal 延迟，使用 `.56s` 收束，让平滑滚动和内容出现保持同一节奏。
+- 通过隔离 Dashboard 确认 Activity/Analysis 目标 computed style、sticky header 落点、截图、无横向溢出、skip-link 焦点和本地控制台；移动矩阵沿用既有证据，限制见 v51 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

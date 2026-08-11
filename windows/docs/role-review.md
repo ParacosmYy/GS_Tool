@@ -58,6 +58,12 @@
 - UI-2：本轮只修改 `scene-motion.css` 的滚动态 CSS 与企业级注释，不新增 JS 监听器、依赖、DOM 或业务分支；键盘焦点、reduced-motion、forced-colors 和 touch 门控继续复用原实现。
 - UI-3：隔离 Dashboard 真实浏览器确认首屏截图、滚动态截图、透明/半透明 computed style、桌面无横向溢出、skip-link 键盘焦点和清洁控制台；移动矩阵不在本轮重复宣称。
 
+## v51 视觉与动效增量
+
+- UI-1：为 Analysis/Activity/History 等 hash 目标消除文档顺序 reveal 的额外等待，保留短时 `.56s` 收束；长距离平滑滚动负责空间移动，目标内容不再在落点后继续保持低透明度。
+- UI-2：本轮只增加 `scene-motion.css` 的 `:target` 表现规则，不改 JS、DOM、业务状态或依赖；普通滚动 reveal、reduced-motion 和键盘焦点边界保持原实现。
+- UI-3：隔离 Dashboard 真实浏览器确认 Activity/Analysis 深链接的目标 opacity、transform、delay、duration、header 落点、桌面无溢出、skip-link 焦点和清洁控制台；移动矩阵未在本轮重复宣称。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

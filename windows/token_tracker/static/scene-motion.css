@@ -46,6 +46,14 @@ body.pointer-press .pointer-ring { transform: translate3d(-50%, -50%, 0) scale(.
   box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 28px rgba(0,0,0,.08);
 }
 
+/* A deep link already owns motion through native smooth scrolling. Remove the
+   document-order stagger from the exact destination so the viewport and its
+   content settle together instead of showing a blank/faded landing frame. */
+html.motion-ready [data-reveal]:target {
+  transition-delay: 0ms !important;
+  transition-duration: .56s;
+}
+
 /* Brand scene: the illustration is a fixed, non-interactive layer. */
 body {
   /* Establish a deterministic stacking context so the negative scene layer

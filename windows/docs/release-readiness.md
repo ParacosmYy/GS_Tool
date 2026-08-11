@@ -64,6 +64,10 @@ sticky header 在首屏保持透明，滚动后切换为低透明度阅读玻璃
 
 AI TOKEN 品牌栏首屏继续完全透明；用户滚动进入分析区后才启用半透明渐隐层与轻微背景模糊，避免 sticky header 叠住统计文案，同时保留背景图透景和页面层次。桌面截图、computed style、skip-link 焦点、无横向溢出和控制台证据见 `ui-accessibility-evidence.md` 的 v50 章节；移动设备与辅助偏好矩阵仍是未关闭的正式验收项。
 
+## v51 深链接 reveal 收束
+
+Analysis/Activity/History 深链接目标不再叠加文档顺序 reveal 的 `350ms` 等待；目标 section 的透明度/位移在进入落点时以 `.56s` 完成，普通滚动 reveal 保持原节奏。真实桌面浏览器证据、无溢出、焦点与控制台结果见 `ui-accessibility-evidence.md` 的 v51 章节；移动设备、reduced-motion 和高对比度矩阵仍是未关闭的正式验收项。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

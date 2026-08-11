@@ -726,3 +726,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 桌面 `1683×892` 首屏截图确认品牌栏保持透明；点击“查看分析”后真实 `scrollY≈265`，header 进入 `is-scrolled`，计算样式为上述半透明渐隐层，分析空态、自动采集卡片和背景图层次保持稳定。
 - 该实例真实计算值为 `scrollWidth=1668 / clientWidth=1668`，无横向溢出；首次 `Tab` 聚焦 skip-link 时为 `2px solid rgb(217,255,120)`、`outline-offset=4px`；本地应用浏览器 `error/warning` 日志为空。
 - 本轮未伪造 320/768/1024/1440 视口证据；移动/高对比度/forced-colors/reduced-motion 继续引用 v47-v49 的已记录边界，待真实设备和批准浏览器矩阵复核。验证结束后仅清理显式隔离端口 5060/5070 及对应 `.cache/ui-v1022-runtime-20260812-5060`、`.cache/ui-v1023-runtime-20260812-5070`，受保护的 5000/5011 进程与监听状态未触碰。
+
+## v51 深链接 reveal 收束证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离 Dashboard 实例 `127.0.0.1:5071`，数据库位于
+  `.cache/ui-v1024-runtime-20260812-5071/token_tracker-5071.sqlite3`；账号仅用于空态与导航观察，未读取真实数据库、Cookie、Key 或令牌。
+- 修复前点击 Activity 的真实首帧为 `class=is-visible / opacity=.34 / translateY(12px) / transition-delay=.35s / duration=.82s`；这说明原生平滑滚动和文档顺序 reveal 同时占用进入动画，目标内容会在落点后继续等待。
+- `static/scene-motion.css` 新增 `html.motion-ready [data-reveal]:target` 规则：只对当前 hash 目标清除 inline stagger delay，并将收束时间降为 `.56s`；普通滚动进入的 section 仍保留原有顺序 reveal。
+- 修复后真实 Dashboard 深链接确认：Activity 稳定态为 `opacity=1 / transform=none / transition-delay=0s / duration=.56s`；Analysis 稳定态同样为 `top=92px / opacity=1 / transform=none / delay=0s`，sticky header 不遮挡标题。
+- 桌面 `1683×892` 的 Dashboard 真实计算值为 `scrollWidth=1668 / clientWidth=1668`，无横向溢出；首次 `Tab` 仍聚焦 skip-link，焦点为 `2px solid rgb(217,255,120)`、`outline-offset=4px`；本地应用浏览器 `error/warning` 日志为空。
+- 本轮未伪造 320/768/1024/1440 视口证据；移动/高对比度/forced-colors/reduced-motion 继续引用既有章节，待真实设备和批准浏览器矩阵复核。验证结束后仅清理显式隔离端口 5071 与对应 `.cache/ui-v1024-runtime-20260812-5071`，受保护的 5000/5011 进程与监听状态未触碰。

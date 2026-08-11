@@ -218,3 +218,5 @@
 - [x] 增加无密钥参数的 `start-gateway.ps1/.bat` 快捷入口，默认 loopback + DPAPI 队列，HTTP/LAN 仍需显式确认。
 - [x] v50 收敛滚动态 AI TOKEN 品牌栏：保留首屏完全透明，滚动时增加半透明渐隐层与轻微 blur，避免统计文案穿过顶栏。
 - [x] v50 通过隔离 Dashboard 账号确认桌面截图、透明/滚动计算样式、键盘 skip-link 焦点、无横向溢出和页面控制台清洁；移动端沿用 v47-v49 证据，真实设备与 reduced-motion 仍待正式验收。
+- [x] v51 修正 Analysis/Activity/History 深链接与文档顺序 reveal 叠加造成的延迟：目标 section 取消 stagger delay，保留 0.56s 的轻量收束动画。
+- [x] v51 通过隔离 Dashboard 真实浏览器确认锚点目标的 `opacity/transform/transition`、无横向溢出、键盘入口和清洁控制台；移动视口仍沿既有证据，未将桌面结果扩大为移动通过。
