@@ -442,6 +442,11 @@ td:first-child { color: var(--white); font-weight: 700; }
   .hero-orbit { width: min(86vw, 390px); }
   .hero-core strong { font-size: 27px; }
   .hero-foot { display: grid; gap: 18px; justify-items: start; }
+  /* Keep both primary navigation actions in the first mobile scan. A flex
+     wrap leaves the secondary CTA below the 320px viewport; two bounded
+     tracks preserve equal priority without changing the desktop rhythm. */
+  .hero-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  .hero-actions .button { width: 100%; min-width: 0; gap: 8px; padding-inline: 8px; font-size: 11px; }
   .range-switcher { max-width: 100%; overflow-x: auto; }
   .range-button { padding: 8px 10px; white-space: nowrap; }
   .signal-strip { grid-template-columns: 1fr; }

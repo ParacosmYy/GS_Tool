@@ -64,6 +64,18 @@
 - UI-2：本轮只增加 `scene-motion.css` 的 `:target` 表现规则，不改 JS、DOM、业务状态或依赖；普通滚动 reveal、reduced-motion 和键盘焦点边界保持原实现。
 - UI-3：隔离 Dashboard 真实浏览器确认 Activity/Analysis 深链接的目标 opacity、transform、delay、duration、header 落点、桌面无溢出、skip-link 焦点和清洁控制台；移动矩阵未在本轮重复宣称。
 
+## v52 视觉与动效增量
+
+- UI-1：移动端 hero CTA 从可变 flex 换行收敛为 320px 下的两列等宽入口，保证主要自动采集与分析路径在首屏同一视觉扫描层内可见；桌面和平板保留原 flex 节奏。
+- UI-2：本轮只调整 `style.css` 的窄屏表现规则，不新增 DOM、JS、依赖或业务分支；按钮原生键盘焦点、pointer/reduced-motion 和触摸降级继续复用既有实现。
+- UI-3：隔离浏览器确认 320px、768px、默认桌面三档 CTA 几何、无横向溢出、skip-link 焦点和清洁控制台；1024/1440 与真实设备不在本轮重复宣称。
+
+## v53 视觉与动效增量
+
+- UI-1：AI TOKEN 顶部品牌栏在首屏和滚动态均保持透景透明，去除造成黑色横条观感的渐隐 veil 与 blur，仅保留细边线、文字阴影和滚动进度线。
+- UI-2：本轮仅调整 `scene-motion.css` 的 header 装饰层规则，不新增 DOM、JS、依赖或业务分支；导航、锚点、键盘焦点、reduced-motion 与 forced-colors 边界保持。
+- UI-3：隔离 Dashboard 真实浏览器确认 `scrollY=0` 和 `scrollY=1430` 两种状态的 computed style 与截图，控制台无 error/warning；未将本轮桌面结果扩大为完整响应式或设备验收。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

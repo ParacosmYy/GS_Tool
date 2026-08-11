@@ -736,3 +736,23 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 修复后真实 Dashboard 深链接确认：Activity 稳定态为 `opacity=1 / transform=none / transition-delay=0s / duration=.56s`；Analysis 稳定态同样为 `top=92px / opacity=1 / transform=none / delay=0s`，sticky header 不遮挡标题。
 - 桌面 `1683×892` 的 Dashboard 真实计算值为 `scrollWidth=1668 / clientWidth=1668`，无横向溢出；首次 `Tab` 仍聚焦 skip-link，焦点为 `2px solid rgb(217,255,120)`、`outline-offset=4px`；本地应用浏览器 `error/warning` 日志为空。
 - 本轮未伪造 320/768/1024/1440 视口证据；移动/高对比度/forced-colors/reduced-motion 继续引用既有章节，待真实设备和批准浏览器矩阵复核。验证结束后仅清理显式隔离端口 5071 与对应 `.cache/ui-v1024-runtime-20260812-5071`，受保护的 5000/5011 进程与监听状态未触碰。
+
+## v52 移动端首屏 CTA 证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离 Dashboard 实例 `127.0.0.1:5072`，数据库位于
+  `.cache/ui-v1025-runtime-20260812-5072/token_tracker-5072.sqlite3`；账号仅用于移动布局观察，未读取真实数据库、Cookie、Key 或令牌。
+- 320×800 修复前真实计算值为 `hero-actions y=728 / height=106`，主 CTA `149px` 在第一行，次 CTA `123px` 落在 `y=786`，首屏底部仅可见约 14px；这是移动首屏入口被折行遮挡的直接证据。
+- `static/style.css` 的 `max-width:620px` 规则将 `.hero-actions` 改为 `repeat(2, minmax(0, 1fr))`，按钮使用 `width:100%`、`min-width:0` 和紧凑间距；修复后 320×800 的两按钮均为 `134×48px`，坐标分别为 `x=15` 与 `x=157`、同为 `y=728`。
+- 320px 真实值为 `scrollWidth=305 / clientWidth=305`；768×900 保持桌面式 `display=flex`，按钮宽度 `149/123px` 且 `scrollWidth=753 / clientWidth=753`；恢复默认 `1683×892` 后 CTA 仍为 `display=flex`、宽 `660px`，页面 `scrollWidth=1668 / clientWidth=1668`。
+- 320px 修复后截图确认两个入口同时可见；键盘首个 `Tab` 仍聚焦 skip-link，焦点为 `2px solid rgb(217,255,120)`、`outline-offset=4px`；320/768/默认桌面本地应用浏览器 `error/warning` 日志均为空。
+- 本轮未伪造 1024/1440 视口、真实设备、reduced-motion、forced-colors 或高对比度证据；viewport override 已在验证结束前 reset。仅清理显式隔离端口 5072 与对应 `.cache/ui-v1025-runtime-20260812-5072`，受保护的 5000/5011 进程与监听状态未触碰。
+
+## v53 AI TOKEN 品牌栏透明层证据（2026-08-12）
+
+- 复用当前 checkout 的显式隔离 Dashboard 实例 `127.0.0.1:5072` 与
+  `.cache/ui-v1025-runtime-20260812-5072/token_tracker-5072.sqlite3`；仅观察已登录的合成空态页面，未读取真实 Cookie、Key、令牌或数据库。
+- `static/scene-motion.css` 将 `.site-header` 与 `.site-header.is-scrolled` 的背景、背景图和 `backdrop-filter` 统一清零；移除滚动态原有深色渐隐层与 `blur(10px)`，保留边线、顶部细高光与既有滚动进度线。
+- 默认桌面首屏真实 computed style：`scrollY=0`、`background=rgba(0,0,0,0)`、`backgroundImage=none`、`backdropFilter=none`。
+  CUA 滚动至真实 `scrollY=1430` 后，header 为 `class=site-header is-scrolled`，仍为 `background=rgba(0,0,0,0)`、`backgroundImage=none`、`backdropFilter=none`；截图确认场景可透过品牌栏，底下卡片不会再被额外黑色渐隐层覆盖。
+- 变更仅涉及装饰层 CSS，不改变 DOM、导航逻辑、键盘焦点、reduced-motion、forced-colors 或触摸降级；本地应用浏览器 `error/warning` 日志为空，`git diff --check` 通过。
+- 本轮未伪造 320/768/1024/1440 视口、真实设备、辅助偏好和 Provider 联调证据；验证结束后仅停止显式隔离端口 5072 并清理对应临时目录，受保护的 5000/5011 进程与监听状态未触碰。

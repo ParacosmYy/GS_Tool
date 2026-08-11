@@ -80,6 +80,16 @@
 - 深链接目标 section 清除额外的文档顺序 reveal 延迟，使用 `.56s` 收束，让平滑滚动和内容出现保持同一节奏。
 - 通过隔离 Dashboard 确认 Activity/Analysis 目标 computed style、sticky header 落点、截图、无横向溢出、skip-link 焦点和本地控制台；移动矩阵沿用既有证据，限制见 v51 UI 证据。
 
+### v52 交付增量
+
+- 320px hero CTA 改为两列等宽布局，主采集和分析入口在首屏同时可见；768px/默认桌面保持原 flex 布局。
+- 通过隔离浏览器确认 320/768/默认桌面 CTA 几何、无横向溢出、skip-link 焦点和本地控制台；1024/1440 与真实设备限制见 v52 UI 证据。
+
+### v53 交付增量
+
+- AI TOKEN 品牌栏首屏与滚动态统一使用透明背景，移除滚动态黑色渐隐层与 blur，保留边线和进度线作为最小层次提示。
+- 通过隔离浏览器确认 `scrollY=0/1430` 的 computed style、滚动截图、`background=rgba(0,0,0,0)`、`backdrop-filter=none` 和清洁控制台；完整响应式、设备、辅助偏好及正式部署限制见 v53 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

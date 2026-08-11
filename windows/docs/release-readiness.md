@@ -68,6 +68,14 @@ AI TOKEN 品牌栏首屏继续完全透明；用户滚动进入分析区后才�
 
 Analysis/Activity/History 深链接目标不再叠加文档顺序 reveal 的 `350ms` 等待；目标 section 的透明度/位移在进入落点时以 `.56s` 完成，普通滚动 reveal 保持原节奏。真实桌面浏览器证据、无溢出、焦点与控制台结果见 `ui-accessibility-evidence.md` 的 v51 章节；移动设备、reduced-motion 和高对比度矩阵仍是未关闭的正式验收项。
 
+## v52 移动端 CTA 首屏可见性
+
+320px 下 hero 的两个关键入口改为等宽两列，避免“查看分析”因 flex 换行落到首屏底部之外；768px 与桌面维持原有横向节奏。真实 320/768/默认桌面截图、几何、焦点、无溢出和控制台证据见 `ui-accessibility-evidence.md` 的 v52 章节；1024/1440、真实设备和辅助偏好矩阵仍是未关闭的正式验收项。
+
+## v53 顶部品牌栏透明层
+
+AI TOKEN 顶部品牌栏的首屏与滚动态均移除黑色渐隐层和 blur，恢复背景场景透视，仅保留细边线与滚动进度线。真实 computed style、滚动截图和控制台证据见 `ui-accessibility-evidence.md` 的 v53 章节；完整响应式、真实设备、辅助偏好和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

@@ -30,20 +30,24 @@ body.pointer-interactive .pointer-aura { width: 300px; height: 300px; opacity: .
 body.pointer-interactive .pointer-ring { width: 48px; height: 48px; border-color: rgba(217,255,120,.92); box-shadow: 0 0 24px rgba(217,255,120,.3), inset 0 0 10px rgba(217,255,120,.14); }
 body.pointer-press .pointer-ring { transform: translate3d(-50%, -50%, 0) scale(.78); }
 
-/* Sticky chrome keeps the AI TOKEN lockup visually attached to the scene. The
-   scroll state uses a feathered veil instead of a filled panel: the artwork
-   remains visible through the complete header while the soft top tint and
-   existing text shadow preserve contrast over bright chart details. The
-   stronger first stop prevents below-the-fold labels from visually bleeding
-   through the brand row without turning the header into an opaque bar; a
-   restrained blur keeps the veil translucent while separating the layers. */
+/* Keep the AI TOKEN lockup attached to the scene without turning the header
+   into a filled panel. Both the initial and scroll states stay transparent;
+   the hairline, text shadow, and progress rule provide the only separation
+   needed for readability over the illustrated background. */
+.site-header {
+  background: transparent;
+  background-image: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 .site-header.is-scrolled {
   border-bottom-color: rgba(230,235,245,.18);
-  background-color: rgba(8,9,12,.16);
-  background-image: linear-gradient(180deg, rgba(8,9,12,.4), rgba(8,9,12,.18) 54%, rgba(8,9,12,0) 100%);
-  -webkit-backdrop-filter: blur(10px) saturate(1.08);
-  backdrop-filter: blur(10px) saturate(1.08);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 28px rgba(0,0,0,.08);
+  background: transparent;
+  background-image: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
 }
 
 /* A deep link already owns motion through native smooth scrolling. Remove the
