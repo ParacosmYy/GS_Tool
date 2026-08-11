@@ -52,6 +52,10 @@ sticky header 在首屏保持透明，滚动后切换为低透明度阅读玻璃
 
 顶部 AI TOKEN 品牌栏基础态移除背景 blur 与外部阴影，使背景图能够连续透景；细边线、内侧高光和文字阴影继续提供最低限度的结构与可读性。桌面、320px、滚动态、无溢出和本地控制台证据见 `ui-accessibility-evidence.md` 的 v47 章节。
 
+## v48 登录表面半透明
+
+登录/注册卡片降低背景梯度 alpha 与 blur 强度，使角色场景真正透过表面，同时保留文字可读性和高对比度/forced-colors 兜底。四档响应式、注册页复用、无溢出和本地控制台证据见 `ui-accessibility-evidence.md` 的 v48 章节。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

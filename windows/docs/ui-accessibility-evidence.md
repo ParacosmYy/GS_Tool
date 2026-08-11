@@ -688,3 +688,18 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   高 `76px`；桌面首屏、滚动态和移动首屏截图均确认背景图可连续透过 AI TOKEN 行。本地应用浏览器 `error/warning` 日志为空。
 - 验证结束后仅停止显式隔离端口 5057 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v48 登录表面半透明证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5058`，数据库位于
+  `.cache/ui-v1020-runtime-20260812-5058/token_tracker-5058.sqlite3`；仅用于登录/注册页面观察，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `static/ui-polish.css` 将共享 `.auth-card` 的背景梯度由 `rgba(.62/.72)` 收敛为 `rgba(.48/.62)`，顶部光晕由
+  `.14` 收敛为 `.11`，背景模糊由 `blur(18px) saturate(1.18)` 收敛为 `blur(12px) saturate(1.12)`；高对比度和 forced-colors
+  兜底规则保持原有不透明阅读面。
+- 桌面 `1683×892` 真实计算值确认登录卡片 `backdrop-filter=blur(12px) saturate(1.12)`、透明渐变层生效，header 仍为
+  `background=rgba(0,0,0,0)`、`backdrop-filter=none`，页面 `scrollWidth=1668 / clientWidth=1668`。
+- 320×800、768×900、1024×900、1440×900 均确认卡片存在、布局稳定且 `scrollWidth=clientWidth`（分别为 `305`、`753`、
+  `1009`、`1425`）；注册页复用样式后同样无溢出，本地应用浏览器 `error/warning` 日志为空。
+- 验证结束后仅停止显式隔离端口 5058 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
