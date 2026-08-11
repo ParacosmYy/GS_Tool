@@ -277,3 +277,5 @@
 - [x] v78 通过真实隔离 5174 实例确认 320/390/768/1024/1440px 视觉矩阵、桌面/移动截图、Tab 焦点恢复、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v78.md`，真实辅助偏好与设备继续独立门禁。
 - [x] v79 为 Dashboard 滚动态右侧 nav/account cluster 增加低 alpha 局部 reading rail，保持 AI TOKEN 品牌区透明并阻止内容穿透操作层。
 - [x] v79 通过真实隔离 5175 实例确认 320/390/768/1024/1440px 顶部矩阵、768/1440px 滚动态截图、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v79.md`，真实辅助偏好与设备继续独立门禁。
+- [x] v80 将零数据趋势/模型图表收敛为低对比 waiting instrument：增加网格、零基线、等待扫描线与占比导引环，保留空态文案和自动采集入口。
+- [x] v80 通过真实隔离 5176 实例确认 320/390/768/1024/1440px 无横向溢出、空态图表尺寸、Week/Today 周期交互、AI TOKEN 顶栏透明计算值、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v80.md`，真实辅助偏好与设备继续独立门禁。

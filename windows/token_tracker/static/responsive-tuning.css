@@ -238,3 +238,82 @@
   margin-top: 2px;
   padding: 7px 10px;
 }
+
+/* Give an empty plot a restrained instrument surface. The grid and zero line
+   are deliberately quieter than a populated chart, while the short moving
+   trace tells the eye that the ledger is waiting for a first signal rather
+   than failing to render. The DOM and Chart.js canvas contract stay intact. */
+.chart-wrap[data-chart-state="empty"] {
+  overflow: hidden;
+  border: 1px solid rgba(230, 235, 245, .08);
+  border-radius: 4px;
+  background:
+    linear-gradient(rgba(230, 235, 245, .045) 1px, transparent 1px) 0 0 / 100% 44px,
+    linear-gradient(90deg, rgba(230, 235, 245, .032) 1px, transparent 1px) 0 0 / 88px 100%;
+}
+
+.chart-doughnut-wrap[data-chart-state="empty"] {
+  background:
+    radial-gradient(circle, transparent 0 31%, rgba(230, 235, 245, .055) 31.4%, transparent 31.8% 51%, rgba(230, 235, 245, .04) 51.4%, transparent 51.8% 100%);
+}
+
+.chart-wrap[data-chart-state="empty"] .chart-empty-state {
+  isolation: isolate;
+  background: radial-gradient(circle at 50% 46%, rgba(8, 15, 24, .36), transparent 62%);
+}
+
+.chart-wrap[data-chart-state="empty"] .chart-empty-state::before,
+.chart-wrap[data-chart-state="empty"] .chart-empty-state::after {
+  position: absolute;
+  right: 13%;
+  bottom: 15%;
+  left: 13%;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+}
+
+.chart-wrap[data-chart-state="empty"] .chart-empty-state::before {
+  z-index: -1;
+  background: linear-gradient(90deg, transparent, rgba(230, 235, 245, .2) 18%, rgba(230, 235, 245, .2) 82%, transparent);
+}
+
+.chart-wrap[data-chart-state="empty"] .chart-empty-state::after {
+  z-index: 0;
+  width: 20%;
+  left: 13%;
+  background: linear-gradient(90deg, transparent, var(--signal-lime), transparent);
+  box-shadow: 0 0 12px rgba(217, 255, 120, .32);
+  animation: chart-empty-scan 4.6s var(--ui-ease) infinite;
+}
+
+.chart-wrap[data-chart-state="empty"] .chart-empty-state > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes chart-empty-scan {
+  from { transform: translateX(0); opacity: .18; }
+  45%, 62% { opacity: .72; }
+  to { transform: translateX(350%); opacity: .18; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-wrap[data-chart-state="empty"] .chart-empty-state::after { animation: none; }
+}
+
+@media (forced-colors: active) {
+  .chart-wrap[data-chart-state="empty"],
+  .chart-doughnut-wrap[data-chart-state="empty"] {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .chart-wrap[data-chart-state="empty"] .chart-empty-state { background: Canvas; }
+  .chart-wrap[data-chart-state="empty"] .chart-empty-state::before,
+  .chart-wrap[data-chart-state="empty"] .chart-empty-state::after {
+    background: CanvasText;
+    box-shadow: none;
+    animation: none;
+  }
+}

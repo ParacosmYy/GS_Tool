@@ -232,6 +232,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的滚动态伪元素与平板断点，不改变 DOM、导航契约、业务状态、API、数据流或认证；forced-colors 显式隐藏装饰 rail。
 - UI-3：真实 5175 隔离实例已完成 320/390/768/1024/1440px 顶部矩阵、768/1440px 滚动态截图与 computed-style、无横向溢出、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v79.md`。
 
+## v80 空数据图表信号面
+
+- UI-1：将零数据趋势/模型图表从空黑画布收敛为低对比的 waiting instrument；网格、零基线、扫描线和导引环服务于状态识别，不与空态文案抢层级。
+- UI-2：变更集中在 `responsive-tuning.css`，复用现有 `.chart-wrap[data-chart-state="empty"]` 状态边界；不改变 DOM、Chart.js、API、导航、认证或数据流，forced-colors 和 reduced-motion 均有明确复位。
+- UI-3：真实 5176 隔离实例已完成 320/390/768/1024/1440px 矩阵、1440px 滚动态截图、Week/Today 周期交互、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v80.md`。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

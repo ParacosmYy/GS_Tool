@@ -180,6 +180,10 @@ AI TOKEN 顶栏在普通模式继续完全透明；场景 veil 在桌面、平�
 
 Dashboard 在静止状态继续使用完全透明 AI TOKEN 顶栏；滚动后仅在 621px 以上的 nav/account 区域启用低 alpha 深蓝 reading rail，桌面与平板分别按真实几何覆盖导航，避免 CTA/表单内容穿透到操作层。5175 隔离实例已完成 320/390/768/1024/1440px 与 768/1440px 滚动态检查，独立证据见 `ui-accessibility-evidence-v79.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v80 空数据图表信号面
+
+Dashboard 零数据图表现在使用低对比网格、零基线、等待扫描线和模型占比导引环，避免空账号看到大面积无意留白；现有空态文案与自动采集入口仍是主交互层。5176 隔离实例已完成 320/390/768/1024/1440px、周期按钮、可访问性快照和页面日志检查，独立证据见 `ui-accessibility-evidence-v80.md`；AI TOKEN 顶栏首屏与滚动态 computed background 继续为 transparent，真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
