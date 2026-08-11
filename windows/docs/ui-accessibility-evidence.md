@@ -554,3 +554,17 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   成功更新值；浏览器控制台 `error/warning` 为空。
 - 验证结束后仅停止显式隔离端口 5045；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v39 顶部 AI TOKEN 透明玻璃栏证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5046`，数据库位于
+  `.cache/ui-v1011-runtime-20260811/token_tracker-5046.sqlite3`；临时账户仅用于浏览器观察，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `static/ui-polish.css` 将顶部 `.site-header` 的深色渐变遮罩从 `rgba(8,9,12,.34)` 收敛为
+  `rgba(8,9,12,.08) → transparent`，保留 `blur(8px) saturate(1.08)` 作为轻量透景层，并以文本阴影维持
+  `AI TOKEN`、导航和账户操作在插画背景上的可读性；滚动到 `#connect` 后 sticky header 仍保持同一透明层。
+- 桌面运行时确认 header 背景为低不透明度渐变，`backdrop-filter=blur(8px) saturate(1.08)`，滚动后
+  `headerTop=0`；320×800 移动视口确认品牌仍可见、导航按预期隐藏、`scrollWidth=305 / clientWidth=305`。
+  浏览器控制台 `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5046；受保护的 5000/5011 进程仍分别由 PID 43832/8100 监听。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
