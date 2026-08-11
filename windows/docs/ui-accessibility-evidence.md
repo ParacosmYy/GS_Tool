@@ -500,3 +500,16 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   浏览器控制台 `error/warning` 为空。
 - 验证结束后仅停止显式隔离端口 5041；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v35 待显区块可读性与动效收束证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5042`，数据库位于
+  `windows/.cache/ui-v1007-runtime-20260811/token_tracker-5042.sqlite3`；临时账户仅用于浏览器观察，未读取真实
+  数据库、Cookie、Key 或令牌。
+- `ui-polish.css` 将 `html.motion-ready [data-reveal]` 的待显状态从 `opacity: .16 / translateY(18px)`
+  收敛为 `opacity: .34 / translateY(12px)`；桌面长页面中下方表单、活动和历史区块保持可辨识的层次，
+  不再像被黑色遮罩覆盖。通过 `#activity` 锚点进入视口后，运行时确认区块最终 `opacity=1`、位移归零。
+- 320×800 移动视口确认 `scrollWidth=305 / clientWidth=305`、导航隐藏，待显区块仍为 `opacity=.34`；
+  浏览器控制台 `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5042；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
