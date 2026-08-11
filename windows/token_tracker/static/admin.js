@@ -1,6 +1,7 @@
 /* Author: AI Token Tracker Engineering Team | Maintainer: Project Owner | Purpose: Admin data states and accessible detail rendering. */
 
 import { setLiveMessage } from './modules/live-region.js';
+import { setupNavigation } from './modules/navigation.js';
 import {
   setupBackdropMotion,
   setupPointerFollower,
@@ -166,4 +167,5 @@ setupReveal();
 setupPointerFollower();
 setupBackdropMotion();
 setupSurfaceMotion();
+setupNavigation();
 loadAdminData();

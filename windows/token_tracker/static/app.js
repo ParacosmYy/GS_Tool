@@ -2,6 +2,7 @@ import { createApiClient } from "./modules/api-client.js";
 import { createActivityController } from "./modules/activity.js";
 import { createChartRenderer } from "./modules/charts.js";
 import { setLiveMessage, setLiveRegionSemantics } from "./modules/live-region.js";
+import { setupNavigation } from "./modules/navigation.js";
 /* Author: AI Token Tracker Engineering Team | Maintainer: Project Owner | Purpose: Dashboard orchestration and feature-specific form state. */
 
 import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollower, setupReveal, setupSurfaceMotion } from "./modules/motion.js";
@@ -291,6 +292,7 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
     setupPointerFollower();
     setupBackdropMotion();
     setupSurfaceMotion();
+    setupNavigation();
     try { await loadSummary(); } catch (error) { setDashboardStatus(error.message, true); }
   });
 })();
