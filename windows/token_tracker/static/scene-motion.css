@@ -113,6 +113,23 @@ body.pointer-ready:not(.pointer-idle) .pointer-ring { visibility: visible; }
   backdrop-filter: blur(8px) saturate(1.1);
 }
 
+/* Give the total counter one restrained instrument cue. The inner arc is
+   decorative, stays behind the live number, and uses a compositor-friendly
+   transform so the surrounding illustration remains calm while the signal
+   core feels active even before the first usage record arrives. */
+.hero-core::before {
+  position: absolute;
+  z-index: 0;
+  inset: 13%;
+  border: 1px solid rgba(217, 255, 120, .16);
+  border-top-color: rgba(217, 255, 120, .76);
+  border-right-color: transparent;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  animation: core-sweep 7.2s linear infinite;
+}
+
 .hero-core span,
 .hero-core strong { text-shadow: 0 1px 10px rgba(8, 9, 12, .72); }
 
@@ -337,6 +354,7 @@ body::after {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+  .hero-core::before,
   .hero-core::after { display: none; }
   .hero-core span, .hero-core strong { color: CanvasText; text-shadow: none; }
   .site-header,
@@ -353,5 +371,13 @@ body::after {
   .site-header { transition: none; }
   .story-backdrop { transition: none; }
   .story-backdrop::after, body::after { animation: none; }
+  .hero-core::before,
+  .hero-core::after { animation: none; }
   body.pointer-interactive .pointer-aura, body.pointer-interactive .pointer-ring { width: auto; height: auto; transform: translate3d(-50%, -50%, 0); }
+}
+
+@keyframes core-sweep {
+  from { transform: rotate(-24deg); opacity: .38; }
+  46% { opacity: .86; }
+  to { transform: rotate(336deg); opacity: .38; }
 }

@@ -196,6 +196,10 @@ Dashboard 的装饰性鼠标光环现在只在移动时出现，静止 1.8 秒�
 
 滚动态不再绘制右侧 reading rail，也不再为 AI TOKEN 品牌锁定区绘制局部 lens；顶栏主体、品牌行和场景保持连续透景，仅保留文字 keyline 与滚动进度线。5179 隔离实例已完成默认桌面首屏/滚动态截图、computed style、Week/Today、无横向溢出、可访问性树和页面日志检查，独立证据见 `ui-accessibility-evidence-v83.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v84 TOTAL SIGNAL 内部扫描弧
+
+Dashboard 的核心计数器增加低干扰 `core-sweep` 内部扫描弧，强化零数据状态下的 signal instrument 语义；动画仅作用于装饰伪元素，forced-colors 与 reduced-motion 边界明确关闭。5181 隔离实例已完成首屏截图、动画 computed style/时间采样、无横向溢出、可访问性语义和页面日志检查，独立证据见 `ui-accessibility-evidence-v84.md`；周期 pill 同步观察与 viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

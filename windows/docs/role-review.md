@@ -256,6 +256,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的伪元素表现层；不改变 DOM、布局盒、导航、认证、API、数据流或业务状态，所有文件仍低于 1000 行。
 - UI-3：真实 5179 隔离实例已确认默认桌面首屏与 `scrollY = 720` 的透明 computed style、截图、Week/Today、无横向溢出、可访问性树和清洁页面日志；viewport override、真实设备、辅助偏好、Provider 联调和正式部署仍不宣称通过，证据见 `ui-accessibility-evidence-v83.md`。
 
+## v84 TOTAL SIGNAL 内部扫描弧
+
+- UI-1：在现有 TOTAL SIGNAL 核心内部加入一条低 alpha、transform-only 的扫描弧，让零数据状态也拥有连续但克制的仪表反馈，不增加视觉噪声或文字覆盖。
+- UI-2：变更集中在 `scene-motion.css` 的装饰伪元素、forced-colors 与 reduced-motion 表现边界；不改变 DOM、API、业务状态、认证、数据流或依赖。
+- UI-3：真实 5181 隔离实例已确认首屏截图、`core-sweep` computed animation 与时间采样、无横向溢出、可访问性语义和清洁页面日志；周期 pill 的异步同步观察已独立记录，证据见 `ui-accessibility-evidence-v84.md`。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

@@ -285,3 +285,5 @@
 - [x] v82 通过真实隔离 5178 实例确认 default/active/idle/re-activate 指针状态、无横向溢出、Week/Today 周期交互、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v82.md`，四档 viewport、真实辅助偏好与设备继续独立门禁。
 - [x] v83 移除滚动态 AI TOKEN 顶栏右侧 reading rail 与品牌 lockup lens，让最上方品牌行回到完整场景透景。
 - [x] v83 通过真实隔离 5179 实例确认默认桌面首屏/滚动态截图、透明 computed style、Week/Today 周期、无横向溢出、可访问性树和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v83.md`，viewport override、真实辅助偏好与设备继续独立门禁。
+- [x] v84 为 TOTAL SIGNAL 核心计数器增加低干扰内部扫描弧，保留 DOM、数据、forced-colors 与 reduced-motion 边界。
+- [x] v84 通过真实隔离 5181 实例确认首屏截图、动画时间采样、无横向溢出、可访问性语义和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v84.md`，周期 pill 同步观察转入下一枚切片。

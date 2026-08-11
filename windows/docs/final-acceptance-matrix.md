@@ -240,6 +240,11 @@
 - 滚动态 AI TOKEN 顶栏移除右侧 reading rail 与品牌 lockup lens；普通模式继续 `transparent / no blur / no shadow`，文字 keyline 和进度线保持不变。
 - 5179 隔离实例真实确认默认桌面首屏与 `scrollY = 720` 截图、computed style、Week/Today 周期交互、无横向溢出、可访问性树和清洁页面日志；新证据见 `ui-accessibility-evidence-v83.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+### v84 交付增量
+
+- `TOTAL SIGNAL` 计数器增加现有 DOM 内的 `::before` 扫描弧，使用 transform-only `core-sweep` 动画；forced-colors 隐藏，reduced-motion 静止，不改变数据与可访问性结构。
+- 5181 隔离实例真实确认默认桌面首屏、动画时间采样、无横向溢出、可访问性语义和清洁页面日志；新证据见 `ui-accessibility-evidence-v84.md`，周期 pill 同步与 viewport override、真实设备和辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
