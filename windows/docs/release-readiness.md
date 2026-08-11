@@ -32,6 +32,11 @@
 320px 双列卡片布局。隔离浏览器证据、空态回归与未关闭真实设备门禁见 [`ui-accessibility-evidence.md`](ui-accessibility-evidence.md)
 的 v43 章节。
 
+## v44 视觉增量
+
+sticky header 在首屏保持透明，滚动后切换为低透明度阅读玻璃层；导航滚动状态由共享 `navigation.js` 调度，认证页与受保护页面
+保持一致。桌面/320px 隔离浏览器验证和未关闭真实设备门禁见 `ui-accessibility-evidence.md` 的 v44 章节。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

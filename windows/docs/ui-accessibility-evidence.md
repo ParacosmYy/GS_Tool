@@ -629,3 +629,17 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   浏览器控制台日志为空。短内容页面的桌面/空态锚点若受最大滚动边界限制，按既有 v41 内容高度约束处理。
 - 验证结束后仅停止显式隔离端口 5051/5052/5053；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v44 sticky header 自适应透景证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5054`，数据库位于
+  `.cache/ui-v1016-runtime-20260812-5054/token_tracker-5054.sqlite3`；临时账号仅用于本地浏览器观察，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `static/modules/navigation.js` 通过 requestAnimationFrame 复用滚动进度更新，在 `scrollY > 16px` 时为 header 加入
+  `is-scrolled`；`static/auth.js` 也复用同一导航上下文，因此登录页、注册页、Dashboard 和 Admin 的 sticky header 行为一致。
+  首屏保持 `background-color: rgba(0,0,0,0)`，滚动后切换为 `rgba(8,9,12,.46)` 与更强 blur，阻止巨型 hero 字样透过导航形成白色噪声带。
+- 桌面运行时确认初始视口 `1683×892`、页面 `scrollWidth=1668 / clientWidth=1668`、header 为透明背景和 `blur(8px)`；滚动后
+  确认 `class=site-header is-scrolled`、背景 `rgba(8,9,12,.46)`。320×800 登录页确认首屏透明、滚动后自适应玻璃态，
+  `scrollWidth=305 / clientWidth=305`，无横向溢出；本地应用控制台错误/警告为空。
+- 验证结束后仅停止显式隔离端口 5054 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。

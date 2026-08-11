@@ -4,6 +4,7 @@
  * Purpose: Add lightweight pointer and focus feedback to auth scenes.
  */
 
+import { setupNavigation } from "./modules/navigation.js";
 import { setupBackdropMotion, setupPointerFollower, setupSurfaceMotion } from "./modules/motion.js";
 
 (function () {
@@ -12,6 +13,7 @@ import { setupBackdropMotion, setupPointerFollower, setupSurfaceMotion } from ".
   setupPointerFollower();
   setupBackdropMotion();
   setupSurfaceMotion();
+  setupNavigation();
 
   const scene = document.querySelector("[data-auth-scene]");
   const finePointer = window.matchMedia("(pointer: fine)").matches;

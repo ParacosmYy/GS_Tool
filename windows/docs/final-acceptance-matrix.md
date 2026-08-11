@@ -40,6 +40,11 @@
 - 直接证据与限制见 [`ui-accessibility-evidence.md`](ui-accessibility-evidence.md) 的 v43 章节；真实设备、reduced-motion、
   高对比度和浏览器下载落盘仍属于未关闭门禁。
 
+### v44 交付增量
+
+- sticky header 首屏透明、滚动后自适应玻璃态，避免 hero 大字透景造成导航噪声；登录页与 Dashboard 共用同一滚动上下文。
+- 通过隔离浏览器确认桌面/320px、空登录态、透明/滚动态 computed style、本地控制台与横向溢出；限制见 v44 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

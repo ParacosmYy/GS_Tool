@@ -48,6 +48,7 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   -webkit-backdrop-filter: blur(8px) saturate(1.08);
   backdrop-filter: blur(8px) saturate(1.08);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 8px 20px rgba(0,0,0,.02);
+  transition: background-color .45s var(--ui-ease), backdrop-filter .45s var(--ui-ease), border-color .45s var(--ui-ease), box-shadow .45s var(--ui-ease);
 }
 .brand-lockup strong, .site-nav a, .user-chip { text-shadow: 0 1px 12px rgba(8,9,12,.52); }
 .site-header::after {
@@ -413,7 +414,7 @@ tbody tr:hover td { color: var(--ink); background: rgba(217,255,120,.04); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-header::after { transition: none; }
+  .site-header, .site-header::after { transition: none; }
   .auth-intro, .auth-card, .auth-card h2, .auth-card > .muted, .auth-card .stack-form, .auth-card .form-footnote, .feature-lines span, .scene-signature i, .auth-card-top::after { animation: none; opacity: 1; transform: none; }
   .button { translate: none; }
 }

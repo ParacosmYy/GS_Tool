@@ -16,12 +16,16 @@ function setActive(links, activeLink) {
 
 function setupScrollProgress() {
   const root = document.documentElement;
+  const header = document.querySelector('.site-header');
+  if (root.dataset.scrollContextReady === 'true') return;
+  root.dataset.scrollContextReady = 'true';
   let frame = 0;
 
   const render = () => {
     const documentHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
     const progress = Math.min(100, Math.max(0, (window.scrollY / documentHeight) * 100));
     root.style.setProperty('--scroll-progress', `${progress.toFixed(2)}%`);
+    header?.classList.toggle('is-scrolled', window.scrollY > 16);
     frame = 0;
   };
 
@@ -76,11 +80,11 @@ function setupRouteContext(links) {
 }
 
 export function setupNavigation() {
+  setupScrollProgress();
   const nav = document.querySelector('.site-nav');
   if (!nav || nav.dataset.navigationReady === 'true') return;
   nav.dataset.navigationReady = 'true';
   const links = [...nav.querySelectorAll('a')];
   setupRouteContext(links);
   setupSectionContext(links);
-  setupScrollProgress();
 }
