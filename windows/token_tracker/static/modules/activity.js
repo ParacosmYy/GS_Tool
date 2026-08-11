@@ -38,7 +38,7 @@ function renderEvents(body, events, formatNumber) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
     cell.colSpan = 5;
-    cell.className = "table-empty";
+    cell.className = "table-empty table-empty--signal";
     cell.textContent = "当前还没有工作事件。完成一次 AI 辅助工作后再回来看看。";
     row.appendChild(cell);
     body.appendChild(row);

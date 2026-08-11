@@ -35,7 +35,7 @@ function emptyRow(body, colSpan, message) {
   const row = document.createElement('tr');
   const empty = cell(message);
   empty.colSpan = colSpan;
-  empty.className = 'table-empty';
+  empty.className = 'table-empty table-empty--signal';
   body.appendChild(row);
   row.appendChild(empty);
 }

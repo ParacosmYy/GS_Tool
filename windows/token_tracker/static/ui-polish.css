@@ -510,6 +510,44 @@ th { color: var(--ink-muted); font-size: 10px; }
 td { color: var(--ink-soft); font-size: 12px; }
 .table-source { color: var(--ink-muted); font-size: 11px; }
 .table-empty { color: var(--ink-muted); font-size: 13px; }
+/* Empty tables are a quiet product state, not a missing layout. Give the
+   zero-signal row the same calm instrument language as the chart empty state. */
+.table-empty--signal {
+  position: relative;
+  overflow: hidden;
+  padding: 34px 18px 30px;
+  color: var(--ink-soft);
+  background:
+    linear-gradient(90deg, rgba(217,255,120,.035), transparent 42%, rgba(196,192,255,.035)),
+    repeating-linear-gradient(90deg, transparent 0 22px, rgba(255,255,255,.016) 22px 23px);
+  letter-spacing: .01em;
+}
+.table-empty--signal::before {
+  display: block;
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 13px;
+  border: 1px solid rgba(217,255,120,.52);
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--signal-lime), var(--signal-lime)) center / 16px 1px no-repeat,
+    linear-gradient(90deg, var(--signal-lime), var(--signal-lime)) center / 1px 16px no-repeat,
+    radial-gradient(circle, rgba(217,255,120,.14), rgba(217,255,120,.025) 58%, transparent 72%);
+  box-shadow: 0 0 0 7px rgba(217,255,120,.04), 0 0 24px rgba(217,255,120,.1);
+  content: "";
+  animation: table-empty-pulse 3.6s ease-in-out infinite;
+}
+.table-empty--signal::after {
+  position: absolute;
+  right: 14%;
+  bottom: 20px;
+  left: 14%;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(217,255,120,.38), transparent);
+  transform-origin: center;
+  animation: table-empty-scan 3.8s ease-in-out infinite;
+}
 
 /* Chart.js owns the canvas; this layer owns the calm, explanatory no-data
    state so an empty account never looks like a broken or unfinished screen. */
@@ -577,6 +615,14 @@ html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0
 @keyframes empty-marker-breathe {
   0%, 100% { transform: scale(.94); opacity: .66; }
   50% { transform: scale(1.04); opacity: 1; }
+}
+@keyframes table-empty-pulse {
+  0%, 100% { opacity: .62; transform: scale(.94); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+@keyframes table-empty-scan {
+  0%, 100% { opacity: .18; transform: scaleX(.2); }
+  50% { opacity: .72; transform: scaleX(1); }
 }
 
 @media (max-width: 900px) {
@@ -703,4 +749,5 @@ html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0
 @media (prefers-reduced-motion: reduce) {
   html.motion-ready [data-reveal], html.motion-ready [data-reveal].is-visible { opacity: 1; transform: none; }
   .chart-empty-marker { animation: none; }
+  .table-empty--signal::before, .table-empty--signal::after { animation: none; }
 }

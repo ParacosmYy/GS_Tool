@@ -37,7 +37,7 @@ import { animateNumber, setMotionState, setupBackdropMotion, setupPointerFollowe
       const row = document.createElement("tr");
       const cell = document.createElement("td");
       cell.colSpan = 6;
-      cell.className = "table-empty";
+      cell.className = "table-empty table-empty--signal";
       cell.textContent = "当前范围暂无记录，先添加一条吧。";
       row.appendChild(cell);
       body.appendChild(row);
