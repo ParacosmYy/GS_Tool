@@ -454,3 +454,19 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `aria-expanded=true`、活动焦点为 `admin-detail-close`。浏览器控制台 `error/warning` 为空。
 - 验证结束后仅停止隔离端口 5028；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、系统
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v32 Admin 统一动效契约与动态详情可读性证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5030`，数据库位于
+  `windows/.cache/ui-v1003-runtime-20260811/token_tracker.sqlite3`；临时账户仅用于浏览器观察，未读取真实
+  数据库、Cookie、Key 或令牌。
+- `admin.js` 接入共享的 `setupReveal`、`setupPointerFollower`、`setupBackdropMotion` 和
+  `setupSurfaceMotion`；Admin 桌面端指针移动后观察到 `pointer-ready=true`、`pointer-interactive=true`，
+  aura/ring 透明度均为 `1`。
+- `motion.js` 对初始化时 `hidden` 的 `data-reveal` 节点直接标记 `is-visible`。Admin 成员详情
+  打开前 `hidden=true / opacity=1`，点击“查看”后 `hidden=false / opacity=1`，焦点为
+  `admin-detail-close`，触发器 `aria-expanded=true`。
+- 320×800 移动视口确认 `scrollWidth=305 / clientWidth=305`、导航隐藏、详情隐藏节点仍保持
+  `opacity=1`；背景层透明度为 `0.9`。浏览器控制台 `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5030；5000/5011 仍由原有进程监听。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。

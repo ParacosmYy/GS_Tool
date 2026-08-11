@@ -117,6 +117,7 @@
 - [x] UI-1 v29：降低场景左侧/顶部黑色遮罩、恢复左上背景层次、导航半透明玻璃层，并完成 320/768/1024/1440 隔离浏览器复核
 - [x] UI-1 v30：Dashboard 图表空态加入可键盘访问的自动采集入口，验证空/非空图表切换、CTA 消失与四档布局
 - [x] UI-1 v31：修复登录首帧黑幕、提升左上场景层次，收紧 Admin 数据轨道，并完成登录/Admin 四档浏览器复核与详情焦点回流
+- [x] UI-2 v32：Admin 接入共享 pointer/backdrop/reveal/surface motion，隐藏成员详情保持可读，并完成桌面指针、详情焦点和 320px 复核
 - [x] 本机体验入口 B22：根 `run.py`/`windows/run.py` 统一复用锁定 Waitress，正常启动不再输出 Flask development server 警告
 - [x] CLI 体验/安全 B25：`token_tracker serve` 默认复用 Waitress；仅 `--debug` 启用 Flask，普通本地命令拒绝非 loopback 绑定（ADR-094）
 - [x] 本机体验入口 B23：`TOKEN_TRACKER_HOST` 只允许 loopback，危险配置在应用/数据库创建前 fail-closed；局域网继续走显式 `--lan-preview`（ADR-078）
