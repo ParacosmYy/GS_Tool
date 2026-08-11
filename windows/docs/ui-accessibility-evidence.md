@@ -470,3 +470,20 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `opacity=1`；背景层透明度为 `0.9`。浏览器控制台 `error/warning` 为空。
 - 验证结束后仅停止显式隔离端口 5030；5000/5011 仍由原有进程监听。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v33 顶部玻璃导航与滚动章节状态证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5033`，数据库位于
+  `windows/.cache/ui-v1005-runtime-20260811/token_tracker.sqlite3`；临时账户仅用于浏览器观察，未读取真实
+  数据库、Cookie、Key 或令牌。
+- 新增 `static/modules/navigation.js`，由 Dashboard/Admin 页面编排层调用；Admin 桌面端导航将
+  `Admin` 标记为可见 active 状态并设置 `aria-current="location"`，Dashboard 首屏将 `Analysis` 标记为
+  active，点击/滚动到 `Connect`、`Activity` 后分别更新 hash 与当前位置高亮。
+- 1440×900 桌面观察到顶部滚动进度线随页面滚动从 `0.00%` 更新到 `99.93%`；Dashboard 到达
+  `#activity` 时观察到 `aria-current="location"` 与 `Activity` 高亮同步，进度为 `38.29%`。
+- 顶部 `.site-header` 改为低不透明度渐变玻璃层，运行时确认背景为半透明渐变、
+  `backdrop-filter: blur(14px) saturate(1.16)`；截图中品牌背景与场景图可见，AI TOKEN、导航和退出按钮仍保持清晰。
+- 320×800 移动视口确认 `scrollWidth=305 / clientWidth=305`、导航按预期隐藏、Dashboard 默认
+  `Analysis` 状态保留、顶部玻璃层仍启用；页面控制台 `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5033；5000/5011 仍由原有进程监听。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。

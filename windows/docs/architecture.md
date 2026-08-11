@@ -70,6 +70,7 @@ providers.py ── adapter registry ── one request ── allowlisted provi
 | `static/modules/api-client.js` | CSRF、同源 fetch、统一错误解析 | 不管理页面业务状态 |
 | `static/modules/charts.js` | Chart.js 趋势和模型占比渲染 | 不发起 API 请求、不写数据库 |
 | `static/modules/motion.js` | motion state、reveal、count-up、pointer feedback | 不改变业务数据 |
+| `static/modules/navigation.js` | 路由/章节当前位置、`aria-current` 和滚动进度 | 不读取 API、不改变业务状态 |
 | `static/style.css` | UI token、布局、响应式、动效 | 不包含业务判断 |
 | `docs/` | 决策、契约、设计约束 | 不替代代码注释 |
 

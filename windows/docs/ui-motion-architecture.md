@@ -15,10 +15,12 @@
 | 结构层 | `templates/base.html`、页面模板 | DOM 顺序、标题层级、语义区域、ARIA live 区域 | 不在模板中写大段样式或业务计算 |
 | 视觉层 | `style.css`、`ui-polish.css` | 设计 token、布局、色彩和业务表面 | 不读取 API、不保存用户数据 |
 | 场景层 | `base.html`、`scene-motion.css`、`static/modules/motion.js` | 显式主图、背景、指针、RAF 调度、滚动 reveal、减弱动效策略 | 不操作 token、Cookie、API 或表单数据 |
-| 页面编排层 | `auth.js`、`app.js`、`admin.js` | 调用动效原语、处理页面状态、渲染安全文本 | 不重复实现指针循环或背景物理 |
+| 页面编排层 | `auth.js`、`app.js`、`admin.js` | 调用动效/导航原语、处理页面状态、渲染安全文本 | 不重复实现指针循环、背景物理或章节观察 |
 | 品牌资产层 | `static/assets/` | 版本化图片资源和回滚资产 | 不把文字、密钥或业务数据嵌入图片 |
 
-页面脚本只调用 `setupPointerFollower`、`setupBackdropMotion`、`setupSurfaceMotion` 和 `setupReveal` 等稳定入口；行为实现集中在 `motion.js`，装饰样式集中在 `scene-motion.css`，这样登录页、观测台和管理员页共享同一套规则。
+页面脚本只调用 `setupPointerFollower`、`setupBackdropMotion`、`setupSurfaceMotion`、`setupReveal` 和
+`setupNavigation` 等稳定入口；指针/背景/内容动效集中在 `motion.js`，路由与章节位置集中在
+`navigation.js`，装饰样式集中在 `scene-motion.css` 与 `ui-polish.css`，这样登录页、观测台和管理员页共享同一套规则。
 
 ## 动效契约
 
@@ -29,6 +31,7 @@
 5. 加载、成功、错误和空态使用 `data-motion-state`，状态必须同时有文字或 ARIA 信息，不能只依赖颜色。
 6. 背景层的遮罩优先保证正文对比度；插画位置、透明度和裁切在 320px、768px、1024px、1440px 宽度都要有明确规则。
 7. 固定背景和环境光必须收敛在视口内；鼠标视差通过 `background-position` 或内部属性变化实现，不使用会扩大 `scrollWidth` 的负 inset/整体缩放。
+8. 当前路由或章节必须同时通过可见高亮和 `aria-current="location"` 表达；滚动进度线只提供辅助层次，不替代标题、焦点或文字状态。
 
 ## 背景版本策略
 

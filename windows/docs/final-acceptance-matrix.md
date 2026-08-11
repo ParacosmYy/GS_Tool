@@ -30,7 +30,7 @@
 | R-13 | 前后端边界、API v1、角色分工和模块化架构 | pass | `api-contract.md`、roles、ui-modules、ADR 目录、层间审计 | 架构师最终签署 |
 | R-14 | 每个文件不超过 1000 行，企业级头部和注释 | pass | `token_tracker audit --json` 行数/头部/docstring/KDoc 门禁 | 新增代码继续纳入审计 |
 | R-15 | 项目内 skills、UI 规范和可维护交付流程 | pass | `windows/skills/`、角色约束、ADR、`release-doctor` | 最终归档与版本签署 |
-| R-16 | UI 可读、动画降级、焦点、ARIA、错误态 | conditional | UI-3 v14/v15/v16/v17/v18/v19/v23/v26/v27/v29/v30/v31/v32 运行证据、motion contract、ADR-063；v27 补齐当前 v14 登录页四档结构，v29 补齐场景遮罩/导航玻璃层，v30 补齐 Dashboard 空态行动入口、非空图表回归和四档运行值，v31 补齐登录/Admin 四档首帧、无溢出、Admin 详情焦点回流和清洁控制台，v32 补齐 Admin 共享 pointer/backdrop/reveal/surface motion、动态详情可读性、焦点回流与清洁控制台观察 | 真实设备、reduced-motion、高对比度、下载落盘 |
+| R-16 | UI 可读、动画降级、焦点、ARIA、错误态 | conditional | UI-3 v14/v15/v16/v17/v18/v19/v23/v26/v27/v29/v30/v31/v32/v33 运行证据、motion contract、ADR-063；v27 补齐当前 v14 登录页四档结构，v29 补齐场景遮罩/导航玻璃层，v30 补齐 Dashboard 空态行动入口、非空图表回归和四档运行值，v31 补齐登录/Admin 四档首帧、无溢出、Admin 详情焦点回流和清洁控制台，v32 补齐 Admin 共享 pointer/backdrop/reveal/surface motion、动态详情可读性、焦点回流与清洁控制台观察，v33 补齐导航 active/aria-current、滚动进度线、顶部半透明玻璃层和桌面/移动端复核 | 真实设备、reduced-motion、高对比度、下载落盘 |
 | R-17 | 一条可重复的交付预检命令 | pass | `release-doctor.ps1/.bat`、`ci/quality-gate.ps1`、ADR-071/085，Local/LAN/Production 与源码质量门禁入口 | 远程仓库首次 CI 执行、外部工具准备后重新执行 |
 
 ## 当前未关闭的硬门禁
