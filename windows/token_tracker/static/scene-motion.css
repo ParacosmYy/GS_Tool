@@ -85,11 +85,11 @@ body {
   inset: 0;
   content: "";
   background:
-    /* The left editorial column keeps a calm contrast floor; the right
-       workstation remains visible so the character and hardware read as
-       intentional product identity instead of a hidden wallpaper. */
-    linear-gradient(90deg, rgba(8, 9, 12, .985) 0%, rgba(8, 9, 12, .88) 23%, rgba(8, 9, 12, .5) 47%, rgba(8, 9, 12, .15) 70%, rgba(8, 9, 12, .025) 100%),
-    linear-gradient(180deg, rgba(8, 9, 12, .3), transparent 36%, rgba(8, 9, 12, .38));
+    /* Keep the editorial copy zone calm without flattening the scene into a
+       black slab. The source artwork already carries a dark left safe area,
+       so this veil only lifts highlights and preserves depth. */
+    linear-gradient(90deg, rgba(8, 9, 12, .74) 0%, rgba(8, 9, 12, .6) 23%, rgba(8, 9, 12, .34) 47%, rgba(8, 9, 12, .1) 70%, rgba(8, 9, 12, .018) 100%),
+    linear-gradient(180deg, rgba(8, 9, 12, .12), transparent 36%, rgba(8, 9, 12, .28));
 }
 
 .story-backdrop::after {
@@ -98,11 +98,12 @@ body {
   inset: 0;
   content: "";
   background:
+    radial-gradient(circle at 15% 18%, rgba(69, 105, 153, .14), transparent 27%),
     radial-gradient(circle at 75% 22%, rgba(217,255,120,.1), transparent 22%),
     radial-gradient(circle at 68% 68%, rgba(196,192,255,.1), transparent 31%),
     linear-gradient(112deg, transparent 38%, rgba(217,255,120,.045) 48%, transparent 58%);
   mix-blend-mode: screen;
-  background-size: auto, auto, 210% 100%;
+  background-size: auto, auto, auto, 210% 100%;
   animation: backdrop-glow 16s ease-in-out infinite alternate, backdrop-scan 13s linear infinite;
 }
 
@@ -119,8 +120,8 @@ body::after {
 }
 
 @keyframes backdrop-scan {
-  from { background-position: center, center, -120% 0; }
-  to { background-position: center, center, 120% 0; }
+  from { background-position: center, center, center, -120% 0; }
+  to { background-position: center, center, center, 120% 0; }
 }
 
 @keyframes observatory-haze {
@@ -136,8 +137,8 @@ body::after {
   .story-backdrop-image { object-position: 60% 50%; }
   .story-backdrop::before {
     background:
-      linear-gradient(90deg, rgba(8, 9, 12, .99) 0%, rgba(8, 9, 12, .9) 34%, rgba(8, 9, 12, .34) 72%, rgba(8, 9, 12, .08) 100%),
-      linear-gradient(180deg, rgba(8, 9, 12, .34), transparent 36%, rgba(8, 9, 12, .46));
+      linear-gradient(90deg, rgba(8, 9, 12, .78) 0%, rgba(8, 9, 12, .65) 34%, rgba(8, 9, 12, .3) 72%, rgba(8, 9, 12, .06) 100%),
+      linear-gradient(180deg, rgba(8, 9, 12, .16), transparent 36%, rgba(8, 9, 12, .34));
   }
 }
 
@@ -147,13 +148,13 @@ body::after {
   .story-backdrop {
     background-position: calc(68% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
     background-size: auto 100%;
-    opacity: .66;
+    opacity: .82;
   }
   .story-backdrop-image { object-position: 68% 50%; }
   .story-backdrop::before {
     background:
-      linear-gradient(90deg, rgba(8, 9, 12, .995) 0%, rgba(8, 9, 12, .92) 42%, rgba(8, 9, 12, .46) 78%, rgba(8, 9, 12, .14) 100%),
-      linear-gradient(180deg, rgba(8, 9, 12, .42), transparent 34%, rgba(8, 9, 12, .58));
+      linear-gradient(90deg, rgba(8, 9, 12, .84) 0%, rgba(8, 9, 12, .72) 42%, rgba(8, 9, 12, .38) 78%, rgba(8, 9, 12, .1) 100%),
+      linear-gradient(180deg, rgba(8, 9, 12, .2), transparent 34%, rgba(8, 9, 12, .42));
   }
 }
 

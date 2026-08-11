@@ -41,7 +41,9 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   width: min(1320px, calc(100% - 64px));
   min-height: 76px;
   border-bottom-color: var(--line-soft);
-  background: rgba(8,9,12,.82);
+  background: rgba(8,9,12,.58);
+  -webkit-backdrop-filter: blur(18px) saturate(1.12);
+  backdrop-filter: blur(18px) saturate(1.12);
   box-shadow: 0 1px 0 rgba(255,255,255,.02);
 }
 .brand { gap: 13px; }
