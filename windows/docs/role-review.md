@@ -184,6 +184,12 @@
 - UI-2：表现变化集中在 `responsive-tuning.css`，仅覆盖 `.site-header.is-scrolled` 的视觉状态，并把 forced-colors 复位提升为全断点系统配色规则；未改变 DOM、导航契约、业务状态、API 或数据流。
 - UI-3：真实 5150 隔离实例已完成 1440/390/320px 首屏与滚动态 computed style、截图、无横向溢出和清洁页面日志确认；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署仍不宣称通过。
 
+## v72 透明顶栏文字对比度
+
+- UI-1：保持顶栏完全透明与场景连续透景，将非活动导航和用户名提升至 `--ink-soft`，以紧凑深色 keyline 提升亮色插画上的扫描性，不引入装饰性实心条。
+- UI-2：变更集中在 `responsive-tuning.css` 的共享顶栏文字表现层；未改变 DOM、导航契约、业务状态、API、数据流或滚动安全层。
+- UI-3：真实 5160 隔离实例已完成 1440/390/768/1024/1440 矩阵、390px 滚动态、可访问性树、截图和清洁页面日志确认；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

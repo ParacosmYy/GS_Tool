@@ -942,3 +942,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 390×844 首屏为 `375/375` 且完全透明；滚动至 `scrollY=600` 后使用移动端较轻的 `.54/.18` 渐变、`blur(10px) saturate(1.08)` 与 `.12` 边界。320×800 首屏与滚动态分别为 `305/305`、`scrollY=520`，同样无横向溢出。
 - `responsive-tuning.css` 将 `forced-colors: active` 复位提升为全断点规则，由 `Canvas/CanvasText` 接管滚动态安全层；本轮未伪造真实 forced-colors、reduced-motion、真实设备或 Provider 联调证据。
 - `tabV1600.dev.logs()` 返回空数组；浏览器工具自身的外部遥测队列告警不计入本地页面日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v72 透明顶栏文字对比度证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5160`，数据库位于
+  `windows/.cache/ui-v1700-runtime-20260812-5160/token_tracker-5160.sqlite3`；仅使用合成账号观察布局，未读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前 1440×900 首屏的非活动导航与用户名 computed color 为 `rgb(174,180,193)`；`responsive-tuning.css` 现将透明顶栏的 quiet labels 提升为 `var(--ink-soft)`，实际读取为 `rgb(215,219,229)`，并使用 `rgba(8,9,12,.94/.76)` 的短 keyline/halo；活动项继续使用 `var(--ink)`。
+- 1440×900 截图确认 AI TOKEN 行仍为 `background=rgba(0,0,0,0)`、`backgroundImage=none`、`backdrop-filter=none`，但 Analysis/Connect/Activity/History 与用户名在亮色插画区域仍可连续扫描；滚动态深蓝安全层与 12px blur 保持不变。
+- 320/390/768/1024/1440 首屏矩阵均保持 `scrollWidth=clientWidth`，分别为 `305/305`、`375/375`、`753/753`、`1009/1009`、`1425/1425`；390px 滚动至 `scrollY=600` 后仍确认移动 veil、`blur(10px) saturate(1.08)` 与 `.12` 底边。
+- Dashboard 可访问性快照确认 banner、主要导航、Log out、main、统计周期按钮、分析 region、表单控件与状态文本均保留可访问名称；`tabV1700.dev.logs()` 返回空数组。
+- 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；浏览器工具自身外部遥测队列告警不计入本地页面日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。

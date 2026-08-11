@@ -18,6 +18,21 @@
   box-shadow: 0 12px 28px rgba(8, 9, 12, .18);
 }
 
+/* Transparent chrome must remain readable over both the dark server wall and
+   the bright character/laptop highlights. Lift quiet navigation labels one
+   semantic step and keep the halo tight so the header stays transparent. */
+.site-nav a,
+.user-chip {
+  color: var(--ink-soft);
+  text-shadow: 0 1px 2px rgba(8, 9, 12, .94), 0 0 10px rgba(8, 9, 12, .76);
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.site-nav a.is-active {
+  color: var(--ink);
+}
+
 /* At tablet widths the orbit is intentionally above the copy, but the
    illustration must not push the primary actions beyond the first scan. The
    dedicated range keeps this correction isolated from the 320px mobile grid
