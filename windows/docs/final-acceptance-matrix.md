@@ -145,6 +145,11 @@
 - 透明顶栏的 AI TOKEN、导航和用户标签由宽泛 `12px` text-shadow 收敛为紧 keyline + 短 halo，保持背景透景并提升滚动状态字形清晰度。
 - 真实 1440×900 首屏/Activity 滚动态、390px 截图与 320/390/768/1024/1440 computed matrix 确认文字 opacity、透明 header、无横向溢出和清洁控制台；真实设备、辅助偏好、Provider 联调和正式部署限制见 v64 UI 证据。
 
+### v65 交付增量
+
+- 同文档锚点由原生长距离 smooth scroll 改为 420–760ms 可取消受控过渡，完成时重新校准目标落点，并保留 hash、ARIA active、键盘、触摸和 reduced-motion 语义。
+- 真实 1440px Activity、390px auto-entry 及 320/390/768/1024/1440 矩阵确认落点、无横向溢出和清洁控制台；真实 reduced-motion、设备、Provider 联调和正式部署限制见 v65 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

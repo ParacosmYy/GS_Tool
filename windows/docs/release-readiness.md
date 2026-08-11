@@ -120,6 +120,10 @@ AI TOKEN 顶部品牌栏首屏恢复完全透景，滚动时只保留极轻的�
 
 顶栏品牌、导航和用户标签改用更紧的文字 keyline 与短 halo，在滚动插画上保持锐利而不填充背景；真实桌面首屏/Activity 滚动态、390px 截图和五档 computed matrix 证据见 `ui-accessibility-evidence.md` 的 v64 章节。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v65 锚点导航受控过渡
+
+同文档导航使用 420–760ms 可取消过渡，并在完成时按目标的 `scroll-margin-top` 重新校准；真实桌面 Activity、移动 auto-entry 和五档响应式证据见 `ui-accessibility-evidence.md` 的 v65 章节。reduced-motion 实际模拟、真实设备、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

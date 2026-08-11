@@ -142,6 +142,12 @@
 - UI-2：变更仅落在 `ui-polish.css` 的共享文字表现层，不改变 DOM、JS、API、数据契约或交互状态；既有 reduced-motion、forced-colors、键盘焦点和透明 header 规则保持。
 - UI-3：真实 1440×900 首屏/Activity 滚动态、390px 移动截图及 320/390/768/1024/1440 computed matrix 均已确认；真实设备、辅助偏好、Provider 联调和正式部署仍不宣称通过。
 
+## v65 视觉与动效增量
+
+- UI-1：将长距离锚点跳转从浏览器不可控的 distance-based smooth scroll 收敛为 420–760ms 受控过渡，避免用户等待数秒并让目标 section 稳定落在透明 header 下方。
+- UI-2：导航行为集中在 `modules/navigation.js`，保留同文档 hash、ARIA active 状态、键盘/触摸语义和 reduced-motion 直达路径；不改变业务 DOM、API、数据契约或表单状态。
+- UI-3：真实 1440px Activity、390px auto-entry 锚点与 320/390/768/1024/1440 响应式矩阵已确认落点、无横向溢出和清洁控制台；reduced-motion 实际设备模拟、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

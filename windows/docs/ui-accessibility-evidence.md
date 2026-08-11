@@ -873,3 +873,14 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 真实响应式 computed matrix 确认 320/390/768/1024/1440 五档 brand opacity 均为 `1`，且页面宽度分别保持 `305/305`、`375/375`、`753/753`、`1009/1009`、`1425/1425`，无横向溢出。
 - 1440×900 Activity 稳定滚动态与 390×844 首屏截图确认品牌、导航、Log out、状态胶囊和移动 CTA 仍可扫描；`uiTabV64.dev.logs()` 返回空数组，本轮未新增动画、DOM、API 或业务状态。
 - 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v65 锚点导航受控过渡证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5140`，数据库位于
+  `windows/.cache/ui-v1400-runtime-20260812-5140/token_tracker-5140.sqlite3`；仅使用合成账号观察导航，不读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前真实 1440×900 从首屏点击 Activity 的原生 smooth scroll 在 `6537ms` 采样窗口内仍未达到稳定 section 落点，最终 section top 约 `51px`；动态空态布局还会让原始落点发生漂移。
+- `static/modules/navigation.js` 现在接管当前页面的同文档锚点：按距离使用 `420–760ms` cubic easing，监听 wheel/touch/pointer/keyboard 取消未完成过渡，结束时重新计算 `scroll-margin-top` 后校准；hash 通过 `history.pushState` 保留，导航链接即时更新 `aria-current`，reduced-motion 直接跳转。
+- 真实桌面验证：`#activity` 受控滚动后稳定 section top 约 `88.7px`、heading 位于 header 下方，hash 为 `#activity`，nav active 为 `Activity`，页面 `anchorScrollReady=true`。
+- 真实移动验证：390×844 点击首屏“开始自动采集”后，`#auto-entry` 稳定 target top 约 `68px`、标题 top 约 `117px`，header bottom 为 `76px`，页面宽度 `375/375`；截图确认自动采集表单从正确落点开始阅读。
+- 320/390/768/1024/1440 矩阵均确认 `anchorScrollReady=true`、`#activity/#auto-entry` 存在且页面无横向溢出，宽度分别为 `305/305`、`375/375`、`753/753`、`1009/1009`、`1425/1425`；`uiTabV65.dev.logs()` 返回空数组。
+- 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；代码保留 reduced-motion 直达分支，验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
