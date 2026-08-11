@@ -164,6 +164,10 @@ AI TOKEN 顶栏默认态与滚动态现在完全透景，移除残留边线、�
 
 AI TOKEN 顶栏在普通模式的首屏与滚动态现在统一完全透明，移除后加载样式造成的渐变、blur、阴影和底边线覆盖；导航文字 keyline、滚动进度线与 forced-colors 系统 Canvas 复位继续保留。5171 隔离实例的真实桌面/移动/响应式、无障碍和控制台证据见 `ui-accessibility-evidence.md` 的 v75 章节；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v76 Dashboard 深蓝玻璃面板
+
+Dashboard 的图表、表单、记录和引导面板不再使用接近不透明的黑色渐变，普通配色下统一采用 `.84/.92` 深蓝玻璃层和 `16px` blur，让场景背景参与层级表达；`forced-colors: active` 不进入该规则，继续由系统 Canvas 接管。5172 隔离实例的真实响应式、无障碍和控制台证据见 `ui-accessibility-evidence.md` 的 v76 章节；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

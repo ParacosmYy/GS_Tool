@@ -208,6 +208,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的共享顶栏状态层，删除深蓝渐变/blur/阴影覆盖，不改变 DOM、导航契约、业务状态、API 或数据流；移动断点不再引入第二套顶栏 veil。
 - UI-3：真实 5171 实例已完成 1440/390/320/768/1024px 首屏与滚动态 computed style、无横向溢出、无障碍快照和页面日志检查；真实 reduced-motion/forced-colors、设备、Provider 联调和正式部署仍不宣称通过。
 
+## v76 Dashboard 深蓝玻璃面板
+
+- UI-1：将内容面板从接近实心黑色改为深蓝玻璃层，让固定场景在图表、表单和记录卡之间保持可见的纵深；不改变透明 AI TOKEN 顶栏或数据可读性契约。
+- UI-2：变更集中在 `responsive-tuning.css` 的普通配色媒体分支，复用现有 surface 变量、边框和文字 token；不改变 DOM、API、数据流、表单行为或依赖。
+- UI-3：真实 5172 实例已完成 390/320/768/1024/1440px 面板 computed style、无横向溢出、无障碍快照和页面日志检查；`forced-colors` 仅完成源码边界保护，真实辅助偏好、设备、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

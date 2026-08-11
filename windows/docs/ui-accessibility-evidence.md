@@ -981,3 +981,12 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 390×844 首屏与 `scrollY=620` 滚动态均保持上述透明值，页面宽度为 `375/375`；320×780 为 `305/305`。768×860、1024×900、1440×900 滚动态分别为 `753/753`、`1009/1009`、`1425/1425`，均无横向溢出。
 - Dashboard 无障碍快照长度为 `5965`，保留 banner、`主要导航`、main、`TOKEN SIGNAL` 等关键语义；读取到 9 个标题、1 个 main，`tabV75.dev.logs({})` 返回空数组。浏览器工具自身的 Statsig 队列告警未出现在本地页面日志中。
 - 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v76 Dashboard 深蓝玻璃面板证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5172`，数据库位于
+  `windows/.cache/ui-v2000-runtime-20260812-5172/token_tracker-5172.sqlite3`；仅使用运行时创建的合成账号观察页面，未读取真实 Cookie、Key、令牌或用户数据库。
+- 基线 computed style 显示空态图表为近不透明 `rgba(15,19,25,.984) → rgba(7,10,14,.996)`，自动采集/引导面板也在 `.96/.98` 附近；v76 将 `.chart-card`、`.form-card`、`.records-card`、`.guide-card` 和 `.manual-details` 统一到深蓝渐变 `.84/.92`，并启用 `blur(16px) saturate(1.08)`，保留文字与图表自身对比度。
+- 真实 390×844、320×780、768×860、1024×900、1440×900 均读取 `backdrop-filter=blur(16px) saturate(1.08)`，页面宽度分别为 `375/375`、`305/305`、`753/753`、`1009/1009`、`1425/1425`，无横向溢出。
+- 普通浏览器媒体结果为 `forced-colors: none`；玻璃规则被限定在 `@media (forced-colors: none)`，不会覆盖项目既有的系统 Canvas 复位。未伪造真实 forced-colors、reduced-motion、真实设备或 Provider 联调证据。
+- Dashboard 无障碍快照长度为 `5965`，保留 banner、`主要导航`、main、`TOKEN SIGNAL` 等关键语义；读取到 9 个标题、1 个 main，`tabV76.dev.logs({})` 返回空数组。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。

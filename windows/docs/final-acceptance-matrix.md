@@ -200,6 +200,11 @@
 - 普通模式的 AI TOKEN 顶栏在首屏和滚动态统一保持透明、无背景图、无 blur、无阴影和无底边线；滚动进度线和文字 keyline 继续提供状态与可读性反馈，forced-colors 仍使用系统 Canvas。
 - 5171 隔离实例真实确认 1440/390/320/768/1024px 顶栏 computed style、无横向溢出、无障碍关键语义与清洁控制台；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署限制见 v75 UI 证据。
 
+### v76 交付增量
+
+- Dashboard 内容面板在普通配色下改为深蓝玻璃层：`.84/.92` alpha、`16px` blur 和原有边框/文字 token 共同维持可读性；AI TOKEN 顶栏透明契约不变。
+- 5172 隔离实例真实确认 390/320/768/1024/1440px 面板 computed style、无横向溢出、无障碍关键语义与清洁控制台；`forced-colors` 媒体边界已落地，真实设备、辅助偏好、Provider 联调和正式部署限制见 v76 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
