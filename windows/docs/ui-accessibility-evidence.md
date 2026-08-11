@@ -513,3 +513,17 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   浏览器控制台 `error/warning` 为空。
 - 验证结束后仅停止显式隔离端口 5042；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v36 表格零信号空态证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5043`，数据库位于
+  `windows/.cache/ui-v1008-runtime-20260811/token_tracker-5043.sqlite3`；临时账户仅用于浏览器观察，未读取真实
+  数据库、Cookie、Key 或令牌。
+- Dashboard 的 Token 历史表、Activity 工作事件表和 Admin 空表行统一增加
+  `table-empty--signal`；空状态包含结构化中心信标、细扫描线、可读说明和受 `prefers-reduced-motion` 约束的
+  微动效，加载态仍保持纯文本，不把加载误示为无数据。
+- 桌面运行时 Activity 空态单元格约 `549×136px`，Token 历史空态约 `1269×136px`；320×800 移动视口
+  确认空态仍在表格内部滚动容器中，页面 `scrollWidth=305 / clientWidth=305`、导航隐藏，浏览器控制台
+  `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5043；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
