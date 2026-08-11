@@ -122,6 +122,7 @@
 - [x] UI-1 v34：收紧自动采集双栏说明卡片的表面高度，消除被长表单撑出的空黑区域，并完成桌面/320px 复核
 - [x] UI-2 v35：提高待显区块的基础可读性，降低 reveal 位移，并完成桌面锚点滚动与 320px 复核
 - [x] UI-1 v36：统一 Dashboard/Activity/Admin 的表格零信号空态，加入可读信标和降级安全的微动效，并完成桌面/320px 复核
+- [x] UI-2 v37：为周期切换器增加 active pill、aria-pressed 与响应式几何同步，并完成四周期/320px 复核
 - [x] 本机体验入口 B22：根 `run.py`/`windows/run.py` 统一复用锁定 Waitress，正常启动不再输出 Flask development server 警告
 - [x] CLI 体验/安全 B25：`token_tracker serve` 默认复用 Waitress；仅 `--debug` 启用 Flask，普通本地命令拒绝非 loopback 绑定（ADR-094）
 - [x] 本机体验入口 B23：`TOKEN_TRACKER_HOST` 只允许 loopback，危险配置在应用/数据库创建前 fail-closed；局域网继续走显式 `--lan-preview`（ADR-078）

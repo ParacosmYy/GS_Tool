@@ -19,8 +19,9 @@
 | 品牌资产层 | `static/assets/` | 版本化图片资源和回滚资产 | 不把文字、密钥或业务数据嵌入图片 |
 
 页面脚本只调用 `setupPointerFollower`、`setupBackdropMotion`、`setupSurfaceMotion`、`setupReveal` 和
-`setupNavigation` 等稳定入口；指针/背景/内容动效集中在 `motion.js`，路由与章节位置集中在
-`navigation.js`，装饰样式集中在 `scene-motion.css` 与 `ui-polish.css`，这样登录页、观测台和管理员页共享同一套规则。
+`setupNavigation`、`setupRangeSwitcher` 等稳定入口；指针/背景/内容动效集中在 `motion.js`，路由与章节位置集中在
+`navigation.js`，周期选择器状态与 active pill 几何集中在 `range-switcher.js`，装饰样式集中在 `scene-motion.css` 与
+`ui-polish.css`，这样登录页、观测台和管理员页共享同一套规则。
 
 ## 动效契约
 

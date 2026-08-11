@@ -527,3 +527,16 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `error/warning` 为空。
 - 验证结束后仅停止显式隔离端口 5043；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v37 周期切换 active pill 与响应式证据（2026-08-11）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5044`，数据库位于
+  `windows/.cache/ui-v1009-runtime-20260811/token_tracker-5044.sqlite3`；临时账户仅用于浏览器观察，未读取真实
+  数据库、Cookie、Key 或令牌。
+- 新增 `static/modules/range-switcher.js`，周期按钮统一同步 `aria-pressed`、active class 和 CSS 自定义属性；
+  桌面端切换 Today/Week/Month/All time 后，状态分别更新为今天/本周/本月/全部，active pill 的宽度与 X 位移
+  与当前按钮几何一致，切换过程使用连续 transform/width 过渡。
+- 320×800 移动视口确认周期切换器仍在容器内，点击 Month 后 `rangeX` 与按钮实际位移一致，
+  `scrollWidth=305 / clientWidth=305`、导航隐藏；浏览器控制台 `error/warning` 为空。
+- 验证结束后仅停止显式隔离端口 5044；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
