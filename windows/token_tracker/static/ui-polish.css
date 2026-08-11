@@ -591,6 +591,17 @@ body { font-size: 15px; line-height: 1.65; }
 .chart-card, .form-card, .records-card, .guide-card, .manual-details {
   box-shadow: 0 20px 60px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .045);
 }
+
+/* Data surfaces need a firmer reading veil than the transparent hero chrome.
+   The fixed illustration can remain visible around each panel, but it must
+   never compete with chart labels, table headers, or empty-state guidance. */
+.chart-card, .records-card, .activity-capture-card, .activity-history-card {
+  background:
+    radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196,192,255,.065), transparent 38%),
+    linear-gradient(145deg, rgba(15,19,25,.985), rgba(7,10,14,.995));
+}
+.activity-capture-card { background: linear-gradient(145deg, rgba(18,24,27,.99), rgba(7,11,15,.995)); }
+.activity-history-card { background: linear-gradient(145deg, rgba(14,18,24,.99), rgba(7,10,14,.995)); }
 .chart-card::after, .form-card::after, .records-card::after {
   position: absolute;
   top: 0;
