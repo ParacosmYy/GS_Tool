@@ -128,6 +128,10 @@ AI TOKEN 顶部品牌栏首屏恢复完全透景，滚动时只保留极轻的�
 
 滚动态顶栏移除 `.045` 黑色 veil 与 `blur(4px)`，首屏和滚动状态均为完全透明，只保留底线、内侧发丝线和进度线；真实 390px/1440px 证据及五档响应式矩阵见 `ui-accessibility-evidence.md` 的 v66 章节。reduced-motion 实际模拟、真实设备、Provider 联调和正式部署验收仍未关闭。
 
+## v67 基础透明首帧
+
+基础 `.site-header` 现在从第一层 CSS 就使用 transparent/无 blur，不再依赖后加载视觉层覆盖黑玻璃；真实 390px/1440px 首屏与滚动态及五档响应式证据见 `ui-accessibility-evidence.md` 的 v67 章节。reduced-motion 实际模拟、真实设备、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

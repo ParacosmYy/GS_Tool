@@ -93,7 +93,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .skip-link:focus { transform: translateY(0); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-.site-header { position: sticky; top: 0; z-index: 30; display: flex; width: min(1280px, calc(100% - 56px)); min-height: 82px; margin: 0 auto; padding: 20px 0; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(228,225,235,.14); background: rgba(15,16,20,.84); backdrop-filter: blur(20px); }
+.site-header { position: sticky; top: 0; z-index: 30; display: flex; width: min(1280px, calc(100% - 56px)); min-height: 82px; margin: 0 auto; padding: 20px 0; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(228,225,235,.14); background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
 .brand { display: inline-flex; gap: 12px; align-items: center; color: var(--white); letter-spacing: -.035em; }
 .brand-mark { position: relative; display: grid; width: 31px; height: 31px; place-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,.8); border-radius: 50%; }
 .brand-mark::before, .brand-mark::after, .brand-mark span { position: absolute; display: block; width: 25px; height: 8px; border-top: 1px solid rgba(255,255,255,.9); border-bottom: 1px solid rgba(255,255,255,.45); content: ""; transform: rotate(-27deg); }

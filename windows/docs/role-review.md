@@ -154,6 +154,12 @@
 - UI-2：变更集中在 `scene-motion.css` 的 `.site-header.is-scrolled` 表现规则，不改变 DOM、JS、API、数据契约或表单状态；forced-colors 仍由专用规则接管。
 - UI-3：真实 390px/1440px 滚动态 computed style、截图及 320/390/768/1024/1440 矩阵确认完全透明和无横向溢出；reduced-motion 实际设备、Provider 联调和正式部署仍不宣称通过。
 
+## v67 基础样式层级增量
+
+- UI-1：将 `.site-header` 的透明策略下沉到基础 `style.css`，消除默认黑玻璃先绘制、后被主题层覆盖的首帧风险；滚动态仍保持透景和轻量边界。
+- UI-2：变更只触及基础顶栏表现声明，不改变 DOM、JS、API、数据契约、表单状态或强制配色例外；无新增依赖和公共交互分支。
+- UI-3：真实 390px/1440px 首屏与滚动态 computed style、截图及 320/390/768/1024/1440 矩阵确认透明、无 blur、无横向溢出和清洁页面日志；真实辅助偏好、设备、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

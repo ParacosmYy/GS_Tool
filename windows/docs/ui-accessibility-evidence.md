@@ -894,3 +894,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 真实 1440×900 滚动后 `scrollY≈191.3`，同样得到 `background=rgba(0,0,0,0)`、`backdrop-filter=none`、仅保留 `rgba(255,255,255,.04) 0 1px 0 inset`；截图确认顶部 AI TOKEN、导航与滚动进度线可扫描。
 - 320/390/768/1024/1440 矩阵均确认 header `background=rgba(0,0,0,0)`、`backdrop-filter=none`，页面宽度分别为 `305/320`、`375/390`、`753/768`、`1009/1024`、`1425/1440`，无横向溢出；`tabV66.dev.logs()` 返回空数组。
 - 本轮浏览器工具自身曾出现外部遥测队列告警，但不属于本地页面日志；未将其计入应用缺陷。真实 reduced-motion、forced-colors、真实设备、Provider 联调和正式部署仍未宣称通过；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v67 基础顶栏透明策略证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5142`，数据库位于
+  `windows/.cache/ui-v1400-runtime-20260812-5142/token_tracker-5142.sqlite3`；仅使用登录/注册页合成状态观察渲染，不读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前 `static/style.css` 的基础 `.site-header` 先声明 `rgba(15,16,20,.84)` 与 `blur(20px)`，透明策略依赖后加载的 `ui-polish.css`/`scene-motion.css` 覆盖；现在基础规则直接声明 `background: transparent`、`-webkit-backdrop-filter: none`、`backdrop-filter: none`，后续层仅负责滚动态边界与主题例外。
+- 真实 390×844 登录页首屏 computed 为 `background=rgba(0,0,0,0)`、`backdrop-filter=none`，截图确认 AI TOKEN 行直接透过背景场景，页面无横向溢出。
+- 真实 1440×900 首屏 computed 为透明/无 blur；滚动约 `191.3px` 后 `site-header.is-scrolled` 仍为透明/无 blur，仅保留 `rgba(255,255,255,.04) 0 1px 0 inset`，截图确认品牌栏和登录卡片层级稳定。
+- 320/390/768/1024/1440 矩阵均确认品牌存在、header 透明、无横向溢出，页面宽度分别为 `305/320`、`375/390`、`753/768`、`1009/1024`、`1425/1440`；`tabV67.dev.logs()` 返回空数组。
+- 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；浏览器工具自身的外部网络遥测告警不计入本地应用日志。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
