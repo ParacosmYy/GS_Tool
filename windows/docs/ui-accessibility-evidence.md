@@ -829,3 +829,14 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 修复后真实结果：320/390px 两张卡约 `348.6px / 345.6px`；768px 约 `348.4px / 345.4px`；1024px 同行高度约 `351.7px`；1440px 同行高度约 `366.7px`。五档页面均为 `scrollWidth=clientWidth`，空态标题、说明和“开始自动采集”入口完整显示。
 - 320×800 截图确认两个空图表从大面积黑色留白变为紧凑的信号检查点，仍保留加号轨道、状态说明和明确 CTA；页面 `uiTabV60.dev.logs()` 返回空数组。
 - 本轮未改变 Chart.js 数据格式、ready 状态、键盘顺序或 ARIA live 语义；未伪造真实非空图表、真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据。隔离端口和视口已在验证结束前复位，受保护的 5000/5011 进程未触碰。
+
+## v61 AI TOKEN 顶部透明优先证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5101`，复用隔离数据库
+  `windows/.cache/ui-v1070-runtime-20260812-5100/token_tracker-5100.sqlite3`；仅使用合成账号观察布局，未读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前真实 header 首屏为 `linear-gradient(rgba(8,9,12,.14), rgba(8,9,12,.035))` + `blur(14px)`，滚动态为 `.20/.07` + `blur(18px)`；截图显示这层组合形成整条深色横带，切断了背景场景。
+- `static/scene-motion.css` 现将首屏 header 设为 `background: transparent`、无 backdrop blur；滚动态仅使用约 `.045` alpha 的局部黑色 veil、`blur(4px) saturate(1.04)`、细边线和轻阴影，导航可读性与背景连续性同时保留。
+- 真实首屏 computed style 在 320/390/768/1024/1440px 分别确认 `background=rgba(0,0,0,0)`、`backgroundImage=none`、`backdropFilter=none`，header 高度均为 `76px`；滚动态确认 `is-scrolled`、约 `.043` alpha 背景和 `blur(4px) saturate(1.04)`。
+- 五档页面均保持 `scrollWidth=clientWidth`：320px 页面 `305/305`、390px `375/375`、768px `753/753`、1024px `1009/1009`、1440px `1425/1425`；未引入横向溢出。
+- 桌面首屏/滚动态与 390px 手机首屏/滚动态截图确认 AI TOKEN 标识、导航和 Log out 仍可扫描，顶栏不再形成深色整条横带；`uiTabV61.dev.logs()` 返回空数组。
+- 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前已复位 viewport override，端口 5000/5011 未触碰，隔离运行目录按可恢复清理流程处理。

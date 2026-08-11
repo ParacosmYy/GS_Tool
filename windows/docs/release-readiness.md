@@ -104,6 +104,10 @@ AI TOKEN 品牌栏恢复为低 alpha 透景玻璃层，首屏与滚动态分别�
 
 趋势与模型占比无数据时改为紧凑 signal checkpoint，连接区更早进入滚动路径；真实数据 ready 状态仍使用完整绘图区。320/390/768/1024/1440 隔离浏览器几何、截图和页面控制台证据见 `ui-accessibility-evidence.md` 的 v60 章节。真实非空图表、设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v61 顶部品牌栏透明优先
+
+AI TOKEN 顶部品牌栏首屏恢复完全透景，滚动时只保留极轻的局部玻璃、细边线和低强度阴影；真实 320/390/768/1024/1440 计算样式、截图、无横向溢出和清洁控制台证据见 `ui-accessibility-evidence.md` 的 v61 章节。真实设备、reduced-motion、forced-colors、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
