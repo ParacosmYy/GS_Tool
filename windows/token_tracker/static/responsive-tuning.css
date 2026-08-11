@@ -1,8 +1,8 @@
 /*
  * Author: AI Token Tracker Engineering Team
  * Maintainer: Project Owner
- * Purpose: Preserve first-screen action visibility at tablet widths without
- *          changing the mobile or desktop observatory composition.
+ * Purpose: Preserve first-screen action visibility across compact breakpoints
+ *          without coupling responsive tuning to the desktop composition.
  * Module: Web presentation / responsive tuning layer
  */
 
@@ -28,6 +28,13 @@
 }
 
 @media (max-width: 620px) {
+  /* The mobile orbit remains the visual anchor, but its desktop-proportioned
+     footprint leaves the two primary actions too close to the viewport edge.
+     A bounded reduction preserves the scene while returning breathing room. */
+  .hero-orbit { width: min(80vw, 340px); }
+  .hero-copy { margin-top: 4px; }
+  .hero-lede { margin-top: 22px; margin-bottom: 20px; }
+
   /* On a phone, authentication is the primary task. Move the form ahead of
      the editorial illustration so the submit action stays in the first scan;
      the introduction remains available immediately below the form. */

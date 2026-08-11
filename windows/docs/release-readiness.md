@@ -84,6 +84,10 @@ AI TOKEN 顶部品牌栏的首屏与滚动态均移除黑色渐隐层和 blur，
 
 AI TOKEN 品牌栏恢复为低 alpha 透景玻璃层，首屏与滚动态分别使用轻量渐变和受控 blur；390px 手机登录/注册表单提前到介绍区之前，提交按钮进入首屏，桌面分栏保持不变。真实四档认证几何、滚动 computed style、截图和控制台证据见 `ui-accessibility-evidence.md` 的 v55 章节；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v56 移动 Dashboard 首屏节奏
+
+320/390px Dashboard 缩小轨道并压缩文案留白，使主要操作与首屏底边保持约 48px 呼吸空间；768px 以上保持既有布局。真实五档几何、截图和控制台证据见 `ui-accessibility-evidence.md` 的 v56 章节；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

@@ -777,3 +777,14 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 768×900 登录/注册按钮分别落在约 `y=511–559` 与 `y=514–562`；1024×900 为约 `y=598–646` 与 `y=599–647`；1440×900 为约 `y=591–639` 与 `y=596–644`，六个认证状态均可见且无横向溢出。
 - 390/768/1024/1440 四档 `scrollWidth=clientWidth`，页面控制台 `error/warning` 日志为空；手机和桌面截图确认表单优先层级与顶部透景层均实际生效。
 - 源码保留 `forced-colors: active` 的系统配色复位与 `prefers-reduced-motion` 的顶栏过渡关闭；本轮未伪造真实设备、reduced-motion、forced-colors、高对比度、Provider 联调或真实账号证据。验证结束前应 reset viewport override，并仅清理端口 5074 及其显式隔离临时目录，受保护的 5000/5011 进程不得触碰。
+
+## v56 移动 Dashboard 首屏节奏证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离 Dashboard 实例 `127.0.0.1:5075`，数据库位于
+  `.cache/ui-v1028-runtime-20260812-5075/token_tracker-5075.sqlite3`；仅使用合成账号观察空态页面，未读取真实 Cookie、Key、令牌或数据库。
+- 修复前真实 390×844 主 CTA 坐标为 `y=787.9–835.9`，距离首屏底部仅约 8px；`.hero-orbit` 为 `335.4px`，移动首屏视觉锚点挤压了文案和操作区。
+- `static/responsive-tuning.css` 的 `max-width:620px` 规则将 `.hero-orbit` 收敛为 `min(80vw,340px)`，并将 hero copy/lede 留白调整为 `margin-top=4px`、`22px/20px`，仅作用于移动 Dashboard。
+- 修复后真实结果：320×800 CTA 为 `y=692.5–740.5`、轨道 `256px`；390×844 CTA 为 `y=747.5–795.5`、轨道 `312px`；两档均恢复约 48px 底部呼吸空间。
+- 768×900 CTA 保持 `y=802.0–850.0`，1024×900 保持 `y=639.1–687.1`，1440×900 保持 `y=682.1–730.1`；五档均为 `scrollWidth=clientWidth`，无横向溢出。
+- 390px 截图确认轨道仍是视觉锚点，标题、说明和两个 CTA 形成连续扫描层；源码已有 reduced-motion 全局降级，本轮未新增动画或交互语义，页面 `error/warning` 日志为空。
+- 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度、Provider 联调或真实账号证据；验证结束前应 reset viewport override，并仅清理端口 5075 及其显式隔离临时目录，受保护的 5000/5011 进程不得触碰。
