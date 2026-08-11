@@ -659,3 +659,17 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   `scrollWidth=305 / clientWidth=305`；本地应用浏览器 `error/warning` 日志为空。
 - 验证结束后仅停止显式隔离端口 5055 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v46 深链接安全落点证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离数据库实例 `127.0.0.1:5056`，数据库位于
+  `.cache/ui-v1018-runtime-20260812-5056/token_tracker-5056.sqlite3`；临时账户仅用于本地浏览器观察，写入三条临时记录，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `static/ui-polish.css` 将既有锚点安全落点契约扩展到 `#auto-entry` 与 `#manual-entry`，继续使用
+  `scroll-margin-top: clamp(84px, 7vw, 104px)`；不改模板 DOM、不新增滚动监听器，首屏 CTA 仍由原有 hash 导航驱动。
+- 修复前真实点击 `开始自动采集` 并等待平滑滚动收束后，`#auto-entry` top≈`-15.90px`，低于 sticky header bottom=`76px`；修复后桌面
+  `1683×892` 收束为 `entryTop≈104.10px`、标题 top≈`162.92px`，`scrollWidth=1668 / clientWidth=1668`。
+- 直接打开 `#manual-entry` 深链接后确认 `manualTop≈92.05px`；320×800 移动视口点击同一 CTA 后确认 `entryTop≈84.03px`、
+  `headingTop≈150.99px`、`scrollWidth=305 / clientWidth=305`（页面运行时微动效层不引入横向布局扩张）；本地应用浏览器 `error/warning` 日志为空。
+- 验证结束后仅停止显式隔离端口 5056 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。该证据不替代真实设备、
+  `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。

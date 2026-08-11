@@ -43,6 +43,11 @@ sticky header 在首屏保持透明，滚动后切换为低透明度阅读玻璃
 导航语义、滚动状态调度和移动端无溢出保持不变。桌面/320px 隔离浏览器验证和未关闭真实设备门禁见
 `ui-accessibility-evidence.md` 的 v45 章节。
 
+## v46 视觉增量
+
+首屏“开始自动采集”与补录深链接复用统一 `scroll-margin-top` 安全落点，避免目标卡片标题进入 sticky header 下方；桌面/320px
+平滑滚动、无溢出和本地控制台证据见 `ui-accessibility-evidence.md` 的 v46 章节。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
