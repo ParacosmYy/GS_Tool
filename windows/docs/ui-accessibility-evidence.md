@@ -766,3 +766,14 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 修复后真实结果：320×800 CTA 为 `y=727.9–775.9`、两列等宽 `133.6px`；768×900 CTA 为 `y=802–850`；900×900 CTA 为 `y=836–884`；1024×900 为 `y=639.1–687.1`；1440×900 为 `y=682.1–730.1`。五档均为 `scrollWidth=clientWidth`，无横向溢出。
 - 768px 截图确认轨道仍保持视觉锚点、标题/文案/双 CTA 连续进入；900px 截图确认 CTA 完整可见且未改变按钮文字与焦点语义。首次 `Tab` 仍聚焦 skip-link，焦点为 `2px solid rgb(217,255,120)`、`outline-offset=4px`；本地应用浏览器 `error/warning` 日志为空。
 - 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束后仅停止显式隔离端口 5073 并清理对应临时目录，受保护的 5000/5011 进程与监听状态未触碰。
+
+## v55 顶部玻璃品牌栏与认证首屏证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离认证实例 `127.0.0.1:5074`，数据库位于
+  `.cache/ui-v1027-runtime-20260812-5074/token_tracker-5074.sqlite3`；仅使用认证空态页面观察布局，未读取真实 Cookie、Key、令牌或数据库。
+- `static/scene-motion.css` 将 `.site-header` 改为低 alpha 渐变玻璃膜：首屏为 `linear-gradient(rgba(8,9,12,.14), rgba(8,9,12,.035))` + `blur(14px) saturate(1.12)`，滚动态提升为 `.20/.07` + `blur(18px) saturate(1.14)`；背景仍透景，未引入实心黑色面板。
+- 真实浏览器 computed style 确认初始和滚动态均保留渐变背景图、透明背景色与预期 blur；滚动后 header 进入 `site-header is-scrolled`，仅增强边界层次和阴影。
+- 390×844 登录按钮真实坐标约为 `y=497–545`、注册按钮约为 `y=506–554`，两者均在首屏内；手机 `.auth-card` 的 computed `order=-1`，介绍区在表单下方继续可访问。
+- 768×900 登录/注册按钮分别落在约 `y=511–559` 与 `y=514–562`；1024×900 为约 `y=598–646` 与 `y=599–647`；1440×900 为约 `y=591–639` 与 `y=596–644`，六个认证状态均可见且无横向溢出。
+- 390/768/1024/1440 四档 `scrollWidth=clientWidth`，页面控制台 `error/warning` 日志为空；手机和桌面截图确认表单优先层级与顶部透景层均实际生效。
+- 源码保留 `forced-colors: active` 的系统配色复位与 `prefers-reduced-motion` 的顶栏过渡关闭；本轮未伪造真实设备、reduced-motion、forced-colors、高对比度、Provider 联调或真实账号证据。验证结束前应 reset viewport override，并仅清理端口 5074 及其显式隔离临时目录，受保护的 5000/5011 进程不得触碰。

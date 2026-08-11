@@ -41,9 +41,9 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   width: min(1320px, calc(100% - 64px));
   min-height: 76px;
   border-bottom-color: var(--line-soft);
-  /* The header is chrome, not a content panel. A transparent surface lets
-     the illustrated scene pass through the complete AI TOKEN row; a hairline
-     and text shadow preserve scanability without adding a dark glass layer. */
+  /* The header is chrome, not a content panel. Its near-transparent surface
+     lets the illustrated scene pass through the complete AI TOKEN row; the
+     hairline and text shadow preserve scanability without a dark slab. */
   background: transparent;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;

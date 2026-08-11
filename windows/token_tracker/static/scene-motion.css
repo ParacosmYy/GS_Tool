@@ -31,23 +31,22 @@ body.pointer-interactive .pointer-ring { width: 48px; height: 48px; border-color
 body.pointer-press .pointer-ring { transform: translate3d(-50%, -50%, 0) scale(.78); }
 
 /* Keep the AI TOKEN lockup attached to the scene without turning the header
-   into a filled panel. Both the initial and scroll states stay transparent;
-   the hairline, text shadow, and progress rule provide the only separation
-   needed for readability over the illustrated background. */
+   into a filled panel. A low-alpha glass veil preserves the illustration,
+   while a restrained blur and hairline keep the lockup readable in motion. */
 .site-header {
-  background: transparent;
-  background-image: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+  background: linear-gradient(180deg, rgba(8, 9, 12, .14), rgba(8, 9, 12, .035));
+  -webkit-backdrop-filter: blur(14px) saturate(1.12);
+  backdrop-filter: blur(14px) saturate(1.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .055), 0 10px 30px rgba(8, 9, 12, .07);
+  transition: background .45s var(--ui-ease), border-color .45s var(--ui-ease), box-shadow .45s var(--ui-ease);
 }
 
 .site-header.is-scrolled {
   border-bottom-color: rgba(230,235,245,.18);
-  background: transparent;
-  background-image: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+  background: linear-gradient(180deg, rgba(8, 9, 12, .2), rgba(8, 9, 12, .07));
+  -webkit-backdrop-filter: blur(18px) saturate(1.14);
+  backdrop-filter: blur(18px) saturate(1.14);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 12px 34px rgba(8, 9, 12, .1);
 }
 
 /* A deep link already owns motion through native smooth scrolling. Remove the
@@ -192,7 +191,21 @@ body::after {
   }
 }
 
+/* The shared forced-colors contract is loaded before this scene layer. Repeat
+   the header reset here so the decorative glass cannot override system colors. */
+@media (forced-colors: active) {
+  .site-header,
+  .site-header.is-scrolled {
+    background: Canvas;
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .site-header { transition: none; }
   .story-backdrop { transition: none; }
   .story-backdrop::after, body::after { animation: none; }
   body.pointer-interactive .pointer-aura, body.pointer-interactive .pointer-ring { width: auto; height: auto; transform: translate3d(-50%, -50%, 0); }
