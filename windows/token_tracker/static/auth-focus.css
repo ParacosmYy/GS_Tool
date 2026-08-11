@@ -27,11 +27,26 @@
   box-shadow: 0 0 0 1px rgba(217,255,120,.12);
 }
 
+/* Script autofocus is a convenience state, not an error state. Browsers can
+   expose a programmatically focused field through :focus-visible, so make
+   the marker explicit: the first frame uses a quiet lavender edge; the first
+   intentional keyboard event removes the marker and restores the full lime
+   keyboard ring above. */
+.auth-shell[data-auth-autofocus="true"] input:focus-visible,
+.auth-shell[data-auth-autofocus="true"] textarea:focus-visible {
+  outline: none;
+  border-color: rgba(196,192,255,.72);
+  background: rgba(196,192,255,.06);
+  box-shadow: 0 0 0 1px rgba(196,192,255,.16);
+}
+
 @media (forced-colors: active) {
   .auth-shell input:focus, .auth-shell textarea:focus,
   .auth-shell input:focus-visible, .auth-shell textarea:focus-visible {
     border-color: Highlight;
     background: Field;
     box-shadow: none;
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
 }

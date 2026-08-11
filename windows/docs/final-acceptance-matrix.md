@@ -210,6 +210,11 @@
 - 场景 veil 在桌面、平板和移动断点改为低 alpha 深蓝氛围层；AI TOKEN 顶栏继续保持 transparent、无 blur、无阴影和无底边线，避免顶部视觉变成黑色实心条。
 - 5173 隔离实例真实确认 390/320/768/1024/1440px 顶栏 computed style、无横向溢出、无障碍关键语义与清洁控制台；独立证据见 `ui-accessibility-evidence-v77.md`，真实设备与辅助偏好继续独立门禁。
 
+### v78 交付增量
+
+- 登录页自动聚焦从荧光绿报警态改为低亮 lavender keyline；marker 清除后，Tab 键路径仍显示完整 lime `:focus-visible` 环，不削弱键盘可达性。
+- 5174 隔离实例真实确认 320/390/768/1024/1440px computed style、桌面/移动截图、Tab 焦点、无横向溢出、无障碍关键语义与清洁控制台；独立证据见 `ui-accessibility-evidence-v78.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

@@ -220,6 +220,12 @@
 - UI-2：变更仅位于 `scene-motion.css` 的装饰层，不改变 DOM、导航、API、数据流、认证、Provider 或交互状态；移动断点与桌面断点拥有明确的局部 alpha 约束。
 - UI-3：真实 5173 隔离实例已完成 390/320/768/1024/1440px computed-style、无横向溢出、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v77.md`。
 
+## v78 认证自动聚焦舒适度
+
+- UI-1：将首次自动聚焦从荧光绿报警态收敛为单层 lavender keyline；用户发生实际键盘/指针操作后，恢复完整 `:focus-visible` 键盘焦点环。
+- UI-2：变更集中在 `auth-focus.css`，通过现有 `data-auth-autofocus` 状态边界处理表现层，不改变认证 DOM、提交契约、会话、API、数据流或 forced-colors 系统复位。
+- UI-3：真实 5174 隔离实例已完成 320/390/768/1024/1440px computed-style、桌面/移动截图、Tab 焦点行为、无横向溢出、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v78.md`。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

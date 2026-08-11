@@ -273,3 +273,5 @@
 - [x] v76 通过真实隔离实例确认 390/320/768/1024/1440px 面板 computed style、无横向溢出、无障碍快照和清洁页面控制台；玻璃规则限定在 `forced-colors: none`，真实辅助偏好与设备继续独立门禁。
 - [x] v77 将 `scene-motion.css` 的桌面、平板与移动黑色 backdrop veil 收敛为低 alpha 深蓝氛围层，保持 AI TOKEN 顶栏完全透明并恢复左上场景层次。
 - [x] v77 通过真实隔离 5173 实例确认 390/320/768/1024/1440px computed style、无横向溢出、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v77.md`，真实辅助偏好与设备继续独立门禁。
+- [x] v78 将登录页自动聚焦从荧光绿报警态收敛为 lavender keyline，避免首次进入同时叠加输入框 outline、halo 与卡片光环。
+- [x] v78 通过真实隔离 5174 实例确认 320/390/768/1024/1440px 视觉矩阵、桌面/移动截图、Tab 焦点恢复、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v78.md`，真实辅助偏好与设备继续独立门禁。
