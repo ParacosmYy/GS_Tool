@@ -160,6 +160,10 @@ body {
   pointer-events: none;
   isolation: isolate;
   opacity: 1;
+  /* A navy fallback prevents a decoded-image gap from reading as a black
+     overlay during the first paint; the scene bitmap still owns the final
+     visual surface once it is ready. */
+  background-color: #071321;
   background-image: url("/static/assets/embedded-rust-engineer-bg-v14.png");
   background-position: calc(40% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
   background-size: cover;

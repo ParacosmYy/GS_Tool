@@ -851,3 +851,14 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 真实响应式矩阵保持页面无横向溢出：320px `305/305`、390px `375/375`、768px `753/753`、1024px `1009/1009`、1440px `1425/1425`；1024/1440×900 周期切换器 bottom 均约 `874px`，完整位于首屏。
 - 1683×845 与 1440×900 截图确认短桌面首屏操作层更完整，`uiTabV62.dev.logs()` 返回空数组；本轮未新增动画，既有 reduced-motion 与 forced-colors 规则保持。
 - 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v63 Dashboard 场景首帧稳定性证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5120`，数据库位于
+  `windows/.cache/ui-v1200-runtime-20260812-5120/token_tracker-5120.sqlite3`；另以 `localhost:5120` 冷 origin 复核资源首帧，仅使用合成账号，未读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前真实 768×900 首次导航约 `120ms` 的截图中，正文与 TOTAL SIGNAL 已绘制，但场景插画尚未完成绘制，背景短暂呈近黑空画布；约 `1.8s` 后才恢复完整插画。
+- `templates/base.html` 为 v14 场景加入 `rel=preload` + `fetchpriority=high`，并给实际背景 `<img>` 同步声明高优先级；`static/scene-motion.css` 为 `.story-backdrop` 增加 `#071321` 深蓝 fallback，解码间隙不再表现为纯黑遮罩。
+- 冷 origin `localhost:5120` 的 768×900 首帧截图确认场景已经可见；同一时刻读取到 `story-backdrop-image.complete=true`、`naturalWidth=1672`、fallback computed color `rgb(7,19,33)`，页面控制台为空。
+- 真实矩阵均确认图片已完成、无横向溢出：320px `305/305`、390px `375/375`、768px `753/753`、1024px `1009/1009`、1440px `1425/1425`；五档 `imageComplete=true`、`naturalWidth=1672`。
+- 390×844 截图确认移动首屏仍保留角色、轨道、标题和双 CTA 的连续层级；本轮仅改变资源启动和加载 fallback，没有新增动画或业务状态，`uiTabV63Cold.dev.logs()` 返回空数组。
+- 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
