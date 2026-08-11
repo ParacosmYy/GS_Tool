@@ -56,7 +56,7 @@ body {
   background-repeat: no-repeat;
   /* Keep the scene legible behind the glass panels. The image carries the
      product story, so it must not be treated as an almost-black texture. */
-  filter: saturate(1.14) contrast(1.06) brightness(1.08);
+  filter: saturate(1.14) contrast(1.06) brightness(1.12);
   will-change: background-position;
   transition: opacity .8s var(--ui-ease);
 }
@@ -85,11 +85,12 @@ body {
   inset: 0;
   content: "";
   background:
-    /* Keep the editorial copy zone calm without flattening the scene into a
-       black slab. The source artwork already carries a dark left safe area,
-       so this veil only lifts highlights and preserves depth. */
-    linear-gradient(90deg, rgba(8, 9, 12, .74) 0%, rgba(8, 9, 12, .6) 23%, rgba(8, 9, 12, .34) 47%, rgba(8, 9, 12, .1) 70%, rgba(8, 9, 12, .018) 100%),
-    linear-gradient(180deg, rgba(8, 9, 12, .12), transparent 36%, rgba(8, 9, 12, .28));
+    /* The source artwork already has a dark editorial safe area. Lift its
+       upper-left ambient light first, then use a restrained veil so copy
+       remains readable without turning the scene into a black slab. */
+    radial-gradient(ellipse 58% 48% at 9% 5%, rgba(63, 105, 163, .3), transparent 74%),
+    linear-gradient(90deg, rgba(8, 9, 12, .36) 0%, rgba(8, 9, 12, .27) 23%, rgba(8, 9, 12, .14) 47%, rgba(8, 9, 12, .045) 70%, rgba(8, 9, 12, .01) 100%),
+    linear-gradient(180deg, rgba(8, 9, 12, .045), transparent 36%, rgba(8, 9, 12, .2));
 }
 
 .story-backdrop::after {
@@ -98,7 +99,8 @@ body {
   inset: 0;
   content: "";
   background:
-    radial-gradient(circle at 15% 18%, rgba(69, 105, 153, .14), transparent 27%),
+    radial-gradient(circle at 9% 7%, rgba(81, 132, 193, .22), transparent 26%),
+    radial-gradient(circle at 15% 18%, rgba(69, 105, 153, .16), transparent 27%),
     radial-gradient(circle at 75% 22%, rgba(217,255,120,.1), transparent 22%),
     radial-gradient(circle at 68% 68%, rgba(196,192,255,.1), transparent 31%),
     linear-gradient(112deg, transparent 38%, rgba(217,255,120,.045) 48%, transparent 58%);
@@ -137,8 +139,9 @@ body::after {
   .story-backdrop-image { object-position: 60% 50%; }
   .story-backdrop::before {
     background:
-      linear-gradient(90deg, rgba(8, 9, 12, .78) 0%, rgba(8, 9, 12, .65) 34%, rgba(8, 9, 12, .3) 72%, rgba(8, 9, 12, .06) 100%),
-      linear-gradient(180deg, rgba(8, 9, 12, .16), transparent 36%, rgba(8, 9, 12, .34));
+      radial-gradient(ellipse 70% 42% at 10% 4%, rgba(63, 105, 163, .27), transparent 72%),
+      linear-gradient(90deg, rgba(8, 9, 12, .5) 0%, rgba(8, 9, 12, .38) 34%, rgba(8, 9, 12, .18) 72%, rgba(8, 9, 12, .04) 100%),
+      linear-gradient(180deg, rgba(8, 9, 12, .08), transparent 36%, rgba(8, 9, 12, .24));
   }
 }
 
@@ -148,13 +151,14 @@ body::after {
   .story-backdrop {
     background-position: calc(68% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
     background-size: auto 100%;
-    opacity: .82;
+    opacity: .9;
   }
   .story-backdrop-image { object-position: 68% 50%; }
   .story-backdrop::before {
     background:
-      linear-gradient(90deg, rgba(8, 9, 12, .84) 0%, rgba(8, 9, 12, .72) 42%, rgba(8, 9, 12, .38) 78%, rgba(8, 9, 12, .1) 100%),
-      linear-gradient(180deg, rgba(8, 9, 12, .2), transparent 34%, rgba(8, 9, 12, .42));
+      radial-gradient(ellipse 86% 42% at 8% 4%, rgba(63, 105, 163, .25), transparent 72%),
+      linear-gradient(90deg, rgba(8, 9, 12, .6) 0%, rgba(8, 9, 12, .47) 42%, rgba(8, 9, 12, .24) 78%, rgba(8, 9, 12, .06) 100%),
+      linear-gradient(180deg, rgba(8, 9, 12, .1), transparent 34%, rgba(8, 9, 12, .3));
   }
 }
 
