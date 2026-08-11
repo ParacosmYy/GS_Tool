@@ -124,6 +124,10 @@ AI TOKEN 顶部品牌栏首屏恢复完全透景，滚动时只保留极轻的�
 
 同文档导航使用 420–760ms 可取消过渡，并在完成时按目标的 `scroll-margin-top` 重新校准；真实桌面 Activity、移动 auto-entry 和五档响应式证据见 `ui-accessibility-evidence.md` 的 v65 章节。reduced-motion 实际模拟、真实设备、Provider 联调和正式部署验收仍未关闭。
 
+## v66 滚动状态透明顶栏
+
+滚动态顶栏移除 `.045` 黑色 veil 与 `blur(4px)`，首屏和滚动状态均为完全透明，只保留底线、内侧发丝线和进度线；真实 390px/1440px 证据及五档响应式矩阵见 `ui-accessibility-evidence.md` 的 v66 章节。reduced-motion 实际模拟、真实设备、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

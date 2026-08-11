@@ -148,6 +148,12 @@
 - UI-2：导航行为集中在 `modules/navigation.js`，保留同文档 hash、ARIA active 状态、键盘/触摸语义和 reduced-motion 直达路径；不改变业务 DOM、API、数据契约或表单状态。
 - UI-3：真实 1440px Activity、390px auto-entry 锚点与 320/390/768/1024/1440 响应式矩阵已确认落点、无横向溢出和清洁控制台；reduced-motion 实际设备模拟、Provider 联调和正式部署仍不宣称通过。
 
+## v66 透明顶栏滚动态增量
+
+- UI-1：移除滚动态 header 的半透明黑玻璃与 blur，使 AI TOKEN 品牌栏在首屏和滚动后保持一致透景；仅保留发丝边界、文字 halo 与进度线维持层级和可扫描性。
+- UI-2：变更集中在 `scene-motion.css` 的 `.site-header.is-scrolled` 表现规则，不改变 DOM、JS、API、数据契约或表单状态；forced-colors 仍由专用规则接管。
+- UI-3：真实 390px/1440px 滚动态 computed style、截图及 320/390/768/1024/1440 矩阵确认完全透明和无横向溢出；reduced-motion 实际设备、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

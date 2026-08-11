@@ -150,6 +150,11 @@
 - 同文档锚点由原生长距离 smooth scroll 改为 420–760ms 可取消受控过渡，完成时重新校准目标落点，并保留 hash、ARIA active、键盘、触摸和 reduced-motion 语义。
 - 真实 1440px Activity、390px auto-entry 及 320/390/768/1024/1440 矩阵确认落点、无横向溢出和清洁控制台；真实 reduced-motion、设备、Provider 联调和正式部署限制见 v65 UI 证据。
 
+### v66 交付增量
+
+- 滚动态 AI TOKEN 顶栏移除残留 `.045` 黑色玻璃和 `blur(4px)`，首屏/滚动均保持 `background=transparent`、`backdrop-filter=none`，只保留发丝边界和进度线。
+- 真实 390px/1440px 滚动态 computed style、截图与 320/390/768/1024/1440 矩阵确认透景、文字可扫描和无横向溢出；真实辅助偏好、设备、Provider 联调和正式部署限制见 v66 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

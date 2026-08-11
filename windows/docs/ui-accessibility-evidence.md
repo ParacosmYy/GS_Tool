@@ -884,3 +884,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 真实移动验证：390×844 点击首屏“开始自动采集”后，`#auto-entry` 稳定 target top 约 `68px`、标题 top 约 `117px`，header bottom 为 `76px`，页面宽度 `375/375`；截图确认自动采集表单从正确落点开始阅读。
 - 320/390/768/1024/1440 矩阵均确认 `anchorScrollReady=true`、`#activity/#auto-entry` 存在且页面无横向溢出，宽度分别为 `305/305`、`375/375`、`753/753`、`1009/1009`、`1425/1425`；`uiTabV65.dev.logs()` 返回空数组。
 - 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；代码保留 reduced-motion 直达分支，验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v66 滚动状态透明顶栏证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5141`，数据库位于
+  `windows/.cache/ui-v1400-runtime-20260812-5141/token_tracker-5141.sqlite3`；仅使用登录页合成状态观察顶栏，不读取真实 Cookie、Key、令牌或用户数据库。
+- 修复前滚动态规则在 `.site-header.is-scrolled` 上仍设置 `rgba(8,9,12,.045)` 与 `blur(4px) saturate(1.04)`，会让本应透景的 AI TOKEN 行产生黑玻璃感；`static/scene-motion.css` 现在将滚动态与静止态统一为 `background=transparent`、`backdrop-filter=none`，保留发丝内阴影、底线和进度线。
+- 真实 390×844 滚动后 `scrollY≈506`，header class 为 `site-header is-scrolled`，computed `background=rgba(0,0,0,0)`、`backdrop-filter=none`；截图确认品牌行直接叠在角色/场景上，没有横向黑色面板。
+- 真实 1440×900 滚动后 `scrollY≈191.3`，同样得到 `background=rgba(0,0,0,0)`、`backdrop-filter=none`、仅保留 `rgba(255,255,255,.04) 0 1px 0 inset`；截图确认顶部 AI TOKEN、导航与滚动进度线可扫描。
+- 320/390/768/1024/1440 矩阵均确认 header `background=rgba(0,0,0,0)`、`backdrop-filter=none`，页面宽度分别为 `305/320`、`375/390`、`753/768`、`1009/1024`、`1425/1440`，无横向溢出；`tabV66.dev.logs()` 返回空数组。
+- 本轮浏览器工具自身曾出现外部遥测队列告警，但不属于本地页面日志；未将其计入应用缺陷。真实 reduced-motion、forced-colors、真实设备、Provider 联调和正式部署仍未宣称通过；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
