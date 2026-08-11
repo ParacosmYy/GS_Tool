@@ -23,7 +23,7 @@ function chartTheme() {
   };
 }
 
-function setChartState(canvas, state, title, detail) {
+function setChartState(canvas, state, title, detail, actionTarget = "") {
   const wrapper = canvas?.closest(".chart-wrap");
   if (!wrapper) return;
   wrapper.dataset.chartState = state;
@@ -47,6 +47,17 @@ function setChartState(canvas, state, title, detail) {
   const copy = document.createElement("small");
   copy.textContent = detail;
   emptyState.append(marker, heading, copy);
+  if (state === "empty" && actionTarget) {
+    const action = document.createElement("a");
+    action.className = "chart-empty-action";
+    action.href = actionTarget;
+    action.textContent = "开始自动采集";
+    const arrow = document.createElement("span");
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.textContent = "↘";
+    action.append(" ", arrow);
+    emptyState.appendChild(action);
+  }
 }
 
 function dateLabel(value) {
@@ -74,7 +85,7 @@ export function createChartRenderer(numberFormat, formatNumber) {
       return;
     }
     if (!hasSignal) {
-      setChartState(canvas, "empty", "等待第一条用量信号", "完成一次自动采集后，趋势会在这里展开");
+      setChartState(canvas, "empty", "等待第一条用量信号", "完成一次自动采集后，趋势会在这里展开", "#auto-entry");
       return;
     }
     setChartState(canvas, "ready");
@@ -116,7 +127,7 @@ export function createChartRenderer(numberFormat, formatNumber) {
       return;
     }
     if (!normalized.length) {
-      setChartState(canvas, "empty", "还没有模型记录", "连接模型后，这里会显示 token 去向");
+      setChartState(canvas, "empty", "还没有模型记录", "连接模型后，这里会显示 token 去向", "#auto-entry");
       legend.replaceChildren();
       return;
     }
