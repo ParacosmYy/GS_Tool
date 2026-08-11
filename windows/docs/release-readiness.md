@@ -60,6 +60,10 @@ sticky header 在首屏保持透明，滚动后切换为低透明度阅读玻璃
 
 交互目标上的鼠标光晕与指针环降低尺寸、亮度和放大比例，保留 pointer follower、surface spotlight 与按钮磁吸，同时让原生焦点边界成为主要反馈。桌面交互态、离开态回收和本地控制台证据见 `ui-accessibility-evidence.md` 的 v49 章节。
 
+## v50 滚动态品牌栏
+
+AI TOKEN 品牌栏首屏继续完全透明；用户滚动进入分析区后才启用半透明渐隐层与轻微背景模糊，避免 sticky header 叠住统计文案，同时保留背景图透景和页面层次。桌面截图、computed style、skip-link 焦点、无横向溢出和控制台证据见 `ui-accessibility-evidence.md` 的 v50 章节；移动设备与辅助偏好矩阵仍是未关闭的正式验收项。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

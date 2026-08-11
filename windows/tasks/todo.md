@@ -216,3 +216,5 @@
 - [x] production wrapper 将实际 `-BindAddress` 同时传给 preflight 和 Waitress，并清除旧的非 loopback production 示例。
 - [x] `token_tracker audit` 固定 production/Caddy/LAN 启动边界，防止部署示例回退（loopback/Caddy/SHARE）。
 - [x] 增加无密钥参数的 `start-gateway.ps1/.bat` 快捷入口，默认 loopback + DPAPI 队列，HTTP/LAN 仍需显式确认。
+- [x] v50 收敛滚动态 AI TOKEN 品牌栏：保留首屏完全透明，滚动时增加半透明渐隐层与轻微 blur，避免统计文案穿过顶栏。
+- [x] v50 通过隔离 Dashboard 账号确认桌面截图、透明/滚动计算样式、键盘 skip-link 焦点、无横向溢出和页面控制台清洁；移动端沿用 v47-v49 证据，真实设备与 reduced-motion 仍待正式验收。

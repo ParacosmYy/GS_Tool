@@ -52,6 +52,12 @@
 - UI-2：本轮仅调整 `scene-motion.css` 参数与注释，不新增监听器、计时器、依赖或业务分支；fine-pointer、reduced-motion 和 touch 降级保持不变。
 - UI-3：隔离浏览器确认登录页 pointer-ready/interactive、surface CSS 变量、按钮磁吸、交互态/离开态回收和清洁控制台。
 
+## v50 视觉与动效增量
+
+- UI-1：滚动状态的 AI TOKEN 品牌栏保持透景语义，增加有限 alpha 的渐隐层和 `10px` 背景模糊，解决 sticky header 下方统计标签穿透造成的阅读干扰；首屏透明状态不变。
+- UI-2：本轮只修改 `scene-motion.css` 的滚动态 CSS 与企业级注释，不新增 JS 监听器、依赖、DOM 或业务分支；键盘焦点、reduced-motion、forced-colors 和 touch 门控继续复用原实现。
+- UI-3：隔离 Dashboard 真实浏览器确认首屏截图、滚动态截图、透明/半透明 computed style、桌面无横向溢出、skip-link 键盘焦点和清洁控制台；移动矩阵不在本轮重复宣称。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

@@ -716,3 +716,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 登录页真实浏览器 `error/warning` 日志为空；本轮不改变 DOM、ARIA、键盘焦点或移动/ reduced-motion 的 JS 退出条件。该证据不替代真实设备、
   `prefers-reduced-motion`/高对比度、下载落盘、真实 Provider 成功和 Android 真机验收。
 - 验证结束后仅停止显式隔离端口 5059 并清理临时目录；受保护的 5000/5011 进程与监听状态未触碰。
+
+## v50 滚动态品牌栏层次证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离 Dashboard 实例 `127.0.0.1:5070`，数据库位于
+  `.cache/ui-v1023-runtime-20260812-5070/token_tracker-5070.sqlite3`；账号仅用于本地空态观察，未读取真实数据库、Cookie、Key 或令牌。
+- `static/scene-motion.css` 保留首屏 `.site-header` 的 `background=rgba(0,0,0,0)` 与 `backdrop-filter=none`；仅在 `is-scrolled` 状态增加
+  `rgba(8,9,12,.16)` 基底、三段渐隐遮罩和 `blur(10px) saturate(1.08)`，使 AI TOKEN 行仍能透景但不再被下方统计文案穿透干扰。
+- 桌面 `1683×892` 首屏截图确认品牌栏保持透明；点击“查看分析”后真实 `scrollY≈265`，header 进入 `is-scrolled`，计算样式为上述半透明渐隐层，分析空态、自动采集卡片和背景图层次保持稳定。
+- 该实例真实计算值为 `scrollWidth=1668 / clientWidth=1668`，无横向溢出；首次 `Tab` 聚焦 skip-link 时为 `2px solid rgb(217,255,120)`、`outline-offset=4px`；本地应用浏览器 `error/warning` 日志为空。
+- 本轮未伪造 320/768/1024/1440 视口证据；移动/高对比度/forced-colors/reduced-motion 继续引用 v47-v49 的已记录边界，待真实设备和批准浏览器矩阵复核。验证结束后仅清理显式隔离端口 5060/5070 及对应 `.cache/ui-v1022-runtime-20260812-5060`、`.cache/ui-v1023-runtime-20260812-5070`，受保护的 5000/5011 进程与监听状态未触碰。

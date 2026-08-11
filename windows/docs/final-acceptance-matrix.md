@@ -70,6 +70,11 @@
 - 收敛交互态 pointer aura/ring 的尺寸和亮度，保留跟随、surface spotlight 与按钮磁吸反馈，不压过原生焦点边界。
 - 通过隔离浏览器确认 pointer-ready/interactive、surface 变量、按钮磁吸、离开态回收和本地控制台；限制见 v49 UI 证据。
 
+### v50 交付增量
+
+- 滚动时为 AI TOKEN 品牌栏增加半透明渐隐层与轻微 blur；首屏仍保持完全透明，解决滚动态统计文案穿过顶栏的问题。
+- 通过隔离 Dashboard 确认桌面首屏/滚动态截图、computed style、skip-link 焦点、无横向溢出和本地控制台；移动矩阵沿用既有证据，限制见 v50 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
