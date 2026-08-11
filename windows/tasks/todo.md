@@ -113,6 +113,7 @@
 - [x] UI-3 v18：隔离合法会话下历史非空、周期切换、服务端 CSV 200、Provider 502 错误态和 ARIA 恢复运行时证据
 - [>] UI-3 v19：个人工作信号写入、最近活动历史、错误播报、响应式表格与隐私边界运行时证据
 - [x] UI-3 v23：认证页唯一语义 h1 与 aria-hidden glitch 视觉层、键盘顺序、无横向溢出和控制台无错误证据
+- [x] UI-1 v28：登录/注册认证卡片半透明玻璃层、独立表单对比度、focus-within、顶部信号轨道与 reduced-motion/forced-colors 降级源码切片
 - [x] 本机体验入口 B22：根 `run.py`/`windows/run.py` 统一复用锁定 Waitress，正常启动不再输出 Flask development server 警告
 - [x] CLI 体验/安全 B25：`token_tracker serve` 默认复用 Waitress；仅 `--debug` 启用 Flask，普通本地命令拒绝非 loopback 绑定（ADR-094）
 - [x] 本机体验入口 B23：`TOKEN_TRACKER_HOST` 只允许 loopback，危险配置在应用/数据库创建前 fail-closed；局域网继续走显式 `--lan-preview`（ADR-078）

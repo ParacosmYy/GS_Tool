@@ -369,3 +369,15 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
   5000/5011 进程与监听状态未触碰。
 - 该证据强化了当前 v14 登录页的浏览器四档运行观察，不替代真实手机系统指标、
   `prefers-reduced-motion`/高对比度、浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v28 登录认证卡片玻璃层与信号轨道源码切片（2026-08-11）
+
+- `token_tracker/static/ui-polish.css` 将登录/注册认证卡片收敛为半透明玻璃层：渐变表面透明度由近实心层
+  调整为 `rgba(23,26,33,.62)` / `rgba(10,12,16,.72)`，背景模糊提升到 `18px`，并保留独立的可见边框、
+  `focus-within` 高亮、顶部信号轨道和状态点。
+- 输入控件继续使用独立表面与焦点环，不依赖卡片底色承载文字对比度；`prefers-reduced-motion` 会停用信号轨道，
+  `forced-colors` 会隐藏装饰轨道并恢复系统 Canvas/Highlight 语义。
+- 本轮完成 `git diff --check` 与 `token_tracker audit --json`：`14 pass / 1 pending / 0 fail`。本轮只记录源码与静态
+  门禁结果，不把既有 v27 截图重新标记为 v28 运行证据；v27 仍是最近一次浏览器四档运行证据。
+- 本切片不改变认证、API、数据库、Provider 或部署边界；真实设备、系统 reduced-motion/高对比度、浏览器下载落盘、
+  真实 Provider 和 Android 真机门禁保持原状态。
