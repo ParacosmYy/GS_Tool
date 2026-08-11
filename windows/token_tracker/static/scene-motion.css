@@ -101,6 +101,35 @@ body.pointer-press .pointer-ring { transform: translate3d(-50%, -50%, 0) scale(.
 .hero-core span,
 .hero-core strong { text-shadow: 0 1px 10px rgba(8, 9, 12, .72); }
 
+/* Provider state belongs to the form heading, but it still sits over the
+   illustrated scene. Reuse the signal-pill grammar for a quiet, explicit
+   connection state instead of leaving "未连接" as floating text. */
+.connection-badge {
+  border: 1px solid rgba(230, 235, 245, .2);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(8, 9, 12, .2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 7px 18px rgba(8, 9, 12, .08);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  backdrop-filter: blur(8px) saturate(1.1);
+}
+
+.connection-badge i {
+  width: 5px;
+  height: 5px;
+  box-shadow: 0 0 10px rgba(217, 255, 120, .62);
+}
+
+.connection-badge.is-ready {
+  border-color: rgba(217, 255, 120, .34);
+  background: rgba(217, 255, 120, .08);
+}
+
+.connection-badge.is-error {
+  border-color: rgba(255, 156, 130, .38);
+  background: rgba(48, 16, 16, .25);
+}
+
 /* A deep link already owns motion through native smooth scrolling. Remove the
    document-order stagger from the exact destination so the viewport and its
    content settle together instead of showing a blank/faded landing frame. */
@@ -271,6 +300,17 @@ body::after {
     color: CanvasText;
   }
   #dashboard-status.is-error::before { background: CanvasText; box-shadow: none; }
+  .connection-badge,
+  .connection-badge.is-ready,
+  .connection-badge.is-error {
+    border-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    color: CanvasText;
+  }
+  .connection-badge i,
+  .connection-badge.is-ready i,
+  .connection-badge.is-error i { background: CanvasText; box-shadow: none; }
   .hero-core {
     border-color: CanvasText;
     background: Canvas;

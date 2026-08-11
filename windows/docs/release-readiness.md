@@ -92,6 +92,10 @@ AI TOKEN 品牌栏恢复为低 alpha 透景玻璃层，首屏与滚动态分别�
 
 状态文案和 TOTAL SIGNAL 信标增加透景玻璃边界、轻量 blur、文字阴影和窄屏单行约束，使动态插画上的实时信息稳定可读；错误态、forced-colors 与 reduced-motion 兜底保持。真实五档截图、几何和控制台证据见 `ui-accessibility-evidence.md` 的 v57 章节；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v58 自动采集连接状态
+
+自动采集卡片的“未连接”徽标统一为低 alpha 玻璃状态点，并为 ready/error/forced-colors 保留状态边界；真实四档内容区几何、截图和控制台证据见 `ui-accessibility-evidence.md` 的 v58 章节。真实 Provider 联调、设备、辅助偏好和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

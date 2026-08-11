@@ -799,3 +799,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 768×900、1024×900、1440×900 的 CTA 分别为 `y=813.3–861.3`、`644.8–692.8`、`687.8–735.8`；状态胶囊与总量信标均在首屏可见，五档 `scrollWidth=clientWidth`。
 - 五档真实截图确认状态胶囊与总量信标在角色/代码背景上仍然透景但更易扫描；页面 `error/warning` 日志为空。本轮未新增动画，既有 `prefers-reduced-motion` 全局降级继续生效。
 - 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度、Provider 联调或真实账号证据；验证结束前应 reset viewport override，并仅清理端口 5076 及其显式隔离临时目录，受保护的 5000/5011 进程不得触碰。
+
+## v58 自动采集连接徽标证据（2026-08-12）
+
+- 在当前 checkout 启动显式隔离 Dashboard 实例 `127.0.0.1:5078`，复用隔离数据库
+  `.cache/ui-v1030-runtime-20260812-5077/token_tracker-5077.sqlite3`；使用新端口绕过旧静态 CSS 缓存，仅观察合成账号页面，未读取真实 Cookie、Key、令牌或数据库。
+- 修复前 `.connection-badge` 的真实 computed style 为 `46×16.5px`，透明背景、无边界、无阴影、无 blur；“未连接”在自动采集卡片右上角缺少明确状态表面。
+- `static/scene-motion.css` 为徽标增加 `63.3×27.8px` 的低 alpha 胶囊、边界、`blur(8px)`、内侧高光和状态色；`.is-ready`、`.is-error` 与 `forced-colors: active` 均有独立边界和颜色复位。
+- 390×844 真实徽标坐标为 `x=277.7–341.0`，自动采集卡片宽 `344.7px`，未侵入页面右边界；768×900 为 `x=638.7–702.0`，1024×900 为 `x=539.4–602.7`，1440×900 为 `x=802.0–865.3`。
+- 390/768/1024/1440 内容区均为 `scrollWidth=clientWidth`；无缓存截图确认徽标与自动采集卡片、右侧 HOW IT WORKS 面板使用同一透景玻璃语言，页面 `error/warning` 日志为空。
+- 本轮未伪造真实设备、reduced-motion、forced-colors、高对比度或 Provider 联调证据；验证结束前应 reset viewport override，并仅清理端口 5077/5078 及其显式隔离临时目录，受保护的 5000/5011 进程不得触碰。
