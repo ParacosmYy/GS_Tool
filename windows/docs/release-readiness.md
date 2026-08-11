@@ -160,6 +160,10 @@ AI TOKEN 顶栏默认态与滚动态现在完全透景，移除残留边线、�
 
 首屏以下内容的进入动效现在保留 `8px` 位移与 `.72s` 收束，但无障碍允许动效时预落位透明度不低于 `.62`，避免过渡帧把正文压到接近不可读；`prefers-reduced-motion: reduce` 仍走既有静止复位。5170 隔离实例的真实滚动、响应式、无障碍和控制台证据见 `ui-accessibility-evidence.md` 的 v74 章节；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v75 AI TOKEN 顶栏透明契约
+
+AI TOKEN 顶栏在普通模式的首屏与滚动态现在统一完全透明，移除后加载样式造成的渐变、blur、阴影和底边线覆盖；导航文字 keyline、滚动进度线与 forced-colors 系统 Canvas 复位继续保留。5171 隔离实例的真实桌面/移动/响应式、无障碍和控制台证据见 `ui-accessibility-evidence.md` 的 v75 章节；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

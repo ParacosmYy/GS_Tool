@@ -202,6 +202,12 @@
 - UI-2：变更只位于 `responsive-tuning.css` 的 `prefers-reduced-motion: no-preference` 表现层；`reduce` 复位、DOM、API、数据契约、导航和业务状态均未改变，未新增依赖。
 - UI-3：真实 5170 实例已完成 1440px 滚动过渡、320/390/768/1024/1440 矩阵、无障碍快照和页面日志检查；真实 reduced-motion/forced-colors、设备、Provider 联调和正式部署仍不宣称通过。
 
+## v75 AI TOKEN 顶栏透明契约
+
+- UI-1：修正后加载样式覆盖关系，使普通模式下 AI TOKEN 品牌行在首屏和滚动态都直接透景；滚动进度线、文字 keyline 和 forced-colors 系统复位保持各自职责。
+- UI-2：变更集中在 `responsive-tuning.css` 的共享顶栏状态层，删除深蓝渐变/blur/阴影覆盖，不改变 DOM、导航契约、业务状态、API 或数据流；移动断点不再引入第二套顶栏 veil。
+- UI-3：真实 5171 实例已完成 1440/390/320/768/1024px 首屏与滚动态 computed style、无横向溢出、无障碍快照和页面日志检查；真实 reduced-motion/forced-colors、设备、Provider 联调和正式部署仍不宣称通过。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

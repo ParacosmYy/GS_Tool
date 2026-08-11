@@ -971,3 +971,13 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 390×844 首屏读取 `scrollWidth/clientWidth=375/375`，header 为 `background=rgba(0,0,0,0)`、`backgroundImage=none`；320×780 为 `305/305` 且同样保持透明。768×860、1024×900、1440×900 分别为 `753/753`、`1009/1009`、`1425/1425`，均无横向溢出。
 - Dashboard 无障碍快照长度为 `5965`，保留 `main`、`主要导航`、`TOKEN SIGNAL` 等关键语义；读取到 9 个标题、1 个 `main`，`tabV74.dev.logs({})` 返回空数组。浏览器默认媒体结果为 `no-preference=true / reduce=false`。
 - reduced-motion 规则仍由 `ui-polish.css` 的独立 `@media (prefers-reduced-motion: reduce)` 复位；本轮未伪造 reduced-motion、forced-colors、真实设备或 Provider 联调证据。验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。
+
+## v75 AI TOKEN 顶栏透明契约证据（2026-08-12）
+
+- 在当前 checkout 启动无缓存隔离 Dashboard 实例 `127.0.0.1:5171`，数据库位于
+  `windows/.cache/ui-v1900-runtime-20260812-5171/token_tracker-5171.sqlite3`；仅使用运行时创建的合成账号观察页面，未读取真实 Cookie、Key、令牌或用户数据库。
+- 根因是 `scene-motion.css` 已声明滚动态透明，但后加载的 `responsive-tuning.css` 又写入深蓝渐变、`blur(12px)` 和阴影；v75 将后加载覆盖收敛为 `background=transparent`、`backgroundImage=none`、`backdrop-filter=none`、`box-shadow=none` 与透明底边线。普通模式不再出现顶栏黑色/深蓝面板；forced-colors 仍由系统 `Canvas` 规则接管。
+- 真实 1440×900 登录页首屏与 Dashboard 首屏均读取透明顶栏；Dashboard 滚动至 `scrollY=900` 后 class 为 `site-header is-scrolled`，但 computed background 仍为 `rgba(0,0,0,0)`、背景图为 `none`、backdrop 为 `none`、底边线透明、阴影为 `none`。
+- 390×844 首屏与 `scrollY=620` 滚动态均保持上述透明值，页面宽度为 `375/375`；320×780 为 `305/305`。768×860、1024×900、1440×900 滚动态分别为 `753/753`、`1009/1009`、`1425/1425`，均无横向溢出。
+- Dashboard 无障碍快照长度为 `5965`，保留 banner、`主要导航`、main、`TOKEN SIGNAL` 等关键语义；读取到 9 个标题、1 个 main，`tabV75.dev.logs({})` 返回空数组。浏览器工具自身的 Statsig 队列告警未出现在本地页面日志中。
+- 本轮未伪造真实 reduced-motion、forced-colors、真实设备或 Provider 联调证据；验证结束前应 reset viewport override，端口 5000/5011 不得触碰，隔离目录按可恢复清理流程处理。

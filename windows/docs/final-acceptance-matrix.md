@@ -195,6 +195,11 @@
 - `data-reveal` 在允许动效时以 `.62` 可读性地板、`8px` 位移和 `.72s` 过渡进入视口，落位仍回到 `1 / 0`；reduced-motion 继续完全静止。
 - 5170 隔离实例真实确认 1440px 滚动过渡、320/390/768/1024/1440 无横向溢出、无障碍关键语义与清洁控制台；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署限制见 v74 UI 证据。
 
+### v75 交付增量
+
+- 普通模式的 AI TOKEN 顶栏在首屏和滚动态统一保持透明、无背景图、无 blur、无阴影和无底边线；滚动进度线和文字 keyline 继续提供状态与可读性反馈，forced-colors 仍使用系统 Canvas。
+- 5171 隔离实例真实确认 1440/390/320/768/1024px 顶栏 computed style、无横向溢出、无障碍关键语义与清洁控制台；真实设备、reduced-motion、forced-colors、Provider 联调和正式部署限制见 v75 UI 证据。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
