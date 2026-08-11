@@ -37,6 +37,10 @@ export function setupRangeSwitcher({ onChange } = {}) {
     activeButton = button;
     markPressed(buttons, activeButton);
     switcher.dataset.rangeReady = "true";
+    // Paint the indicator in the same task as the pressed-state change so a
+    // slow summary request cannot leave the old pill behind for a frame. The
+    // follow-up frame still catches font, resize, and responsive layout shifts.
+    updateIndicator();
     requestAnimationFrame(updateIndicator);
     if (notify) onChange?.(button.dataset.period || "day");
   };

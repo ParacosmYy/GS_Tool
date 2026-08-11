@@ -262,6 +262,12 @@
 - UI-2：变更集中在 `scene-motion.css` 的装饰伪元素、forced-colors 与 reduced-motion 表现边界；不改变 DOM、API、业务状态、认证、数据流或依赖。
 - UI-3：真实 5181 隔离实例已确认首屏截图、`core-sweep` computed animation 与时间采样、无横向溢出、可访问性语义和清洁页面日志；周期 pill 的异步同步观察已独立记录，证据见 `ui-accessibility-evidence-v84.md`。
 
+## v85 周期 pill 同步
+
+- UI-1：修复周期文字已切换而 active pill 仍停留在上一个周期的视觉不同步；同步测量让状态反馈在同一任务内落位，保留下一帧响应式校准。
+- UI-2：变更集中在 `range-switcher.js` 的 active 状态编排，不改变摘要请求、period 契约、DOM、ARIA、认证或数据流；没有新增依赖。
+- UI-3：真实 5181 隔离实例已确认四档 period 的 active/几何/状态文案、ARIA pressed、无横向溢出、顶栏透明回归和页面日志；证据见 `ui-accessibility-evidence-v85.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

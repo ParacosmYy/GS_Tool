@@ -200,6 +200,10 @@ Dashboard 的装饰性鼠标光环现在只在移动时出现，静止 1.8 秒�
 
 Dashboard 的核心计数器增加低干扰 `core-sweep` 内部扫描弧，强化零数据状态下的 signal instrument 语义；动画仅作用于装饰伪元素，forced-colors 与 reduced-motion 边界明确关闭。5181 隔离实例已完成首屏截图、动画 computed style/时间采样、无横向溢出、可访问性语义和页面日志检查，独立证据见 `ui-accessibility-evidence-v84.md`；周期 pill 同步观察与 viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v85 周期 pill 同步
+
+统计周期按钮在 pressed state 改变的同一任务内同步测量 active pill，并保留下一帧响应式校准，消除异步摘要刷新期间的旧位置残留。5181 隔离实例已完成 Today/Week/Month/All time 四档几何、状态文案、ARIA pressed、无横向溢出、顶栏透明回归和页面日志检查，独立证据见 `ui-accessibility-evidence-v85.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

@@ -245,6 +245,11 @@
 - `TOTAL SIGNAL` 计数器增加现有 DOM 内的 `::before` 扫描弧，使用 transform-only `core-sweep` 动画；forced-colors 隐藏，reduced-motion 静止，不改变数据与可访问性结构。
 - 5181 隔离实例真实确认默认桌面首屏、动画时间采样、无横向溢出、可访问性语义和清洁页面日志；新证据见 `ui-accessibility-evidence-v84.md`，周期 pill 同步与 viewport override、真实设备和辅助偏好继续独立门禁。
 
+### v85 交付增量
+
+- 周期 active pill 在 pressed state 变更任务内立即同步几何，再通过下一帧完成布局校准；不改变 period API、摘要请求或 ARIA pressed 契约。
+- 5181 隔离实例真实确认 Today/Week/Month/All time 四档 active、位置、宽度、状态文案、可访问性和清洁页面日志；新证据见 `ui-accessibility-evidence-v85.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

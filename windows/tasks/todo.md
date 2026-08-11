@@ -287,3 +287,5 @@
 - [x] v83 通过真实隔离 5179 实例确认默认桌面首屏/滚动态截图、透明 computed style、Week/Today 周期、无横向溢出、可访问性树和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v83.md`，viewport override、真实辅助偏好与设备继续独立门禁。
 - [x] v84 为 TOTAL SIGNAL 核心计数器增加低干扰内部扫描弧，保留 DOM、数据、forced-colors 与 reduced-motion 边界。
 - [x] v84 通过真实隔离 5181 实例确认首屏截图、动画时间采样、无横向溢出、可访问性语义和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v84.md`，周期 pill 同步观察转入下一枚切片。
+- [x] v85 修复周期 active pill 落后一拍：pressed state 变更时同步测量，下一帧继续做响应式几何校准。
+- [x] v85 通过真实隔离 5181 实例确认 Today/Week/Month/All time 四档位置、宽度、状态文案、ARIA pressed、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v85.md`，真实辅助偏好与设备继续独立门禁。
