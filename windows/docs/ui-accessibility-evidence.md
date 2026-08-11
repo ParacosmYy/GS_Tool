@@ -405,3 +405,30 @@ viewport 观察扩展为生产或真实手机通过证据。UI-3 总闸门因此
 - 浏览器控制台 `error/warning` 为空；本轮只停止隔离端口 5026 进程，受保护的 5000/5011 进程与监听状态未触碰。
 - 该证据关闭 v29 场景遮罩源码与隔离浏览器运行观察，不替代真实设备、系统 `prefers-reduced-motion`/高对比度、
   浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
+
+## v30 Dashboard 图表空态行动入口与非空回归证据（2026-08-11）
+
+- 在当前 checkout 启动隔离源码实例 `127.0.0.1:5027`，数据库位于
+  `windows/.cache/ui-v1001-runtime-20260811/token_tracker.sqlite3`；使用临时 `uiobserver` 账号验证，未读取真实数据库、
+  Cookie、Key 或令牌。
+- `static/modules/charts.js` 的空态渲染器新增可访问的 `chart-empty-action` 锚点，趋势图和模型占比都指向
+  `#auto-entry`；文案使用 `textContent`/节点追加，未引入 HTML 字符串渲染。`ui-polish.css` 为该入口补充紧凑的
+  lime signal pill、hover/focus-visible 和箭头过渡。
+- 空账户运行时确认两个图表均为 `empty`，`chart-empty-action` 数量为 2；点击第一个入口后 URL hash 为
+  `#auto-entry`，等待平滑滚动结束时 `#auto-entry` 距视口顶部约 `-4px`。
+- 隔离账户通过页面“异常补录”写入一条 `kimi-code` 的 `1200 + 350 = 1550` token 样例后，两个图表均为 `ready`，
+  CTA 数量归零；趋势图和模型占比截图均正常渲染，最近记录显示该样例。该样例仅存在于临时数据库。
+- 四档响应式复核结果如下；每档均满足 `scrollWidth <= clientWidth`，Dashboard 保持唯一 `h1`，自动采集区存在；
+  320px 导航自动隐藏，其余视口导航保持可用：
+
+  | 视口 | `scrollWidth` | `clientWidth` | `h1` | 空态 CTA | 自动采集区 | 导航 |
+  | --- | ---: | ---: | ---: | ---: | --- | --- |
+  | 320×800 | 305 | 305 | 1 | 2 | 存在 | 隐藏 |
+  | 768×1024 | 753 | 753 | 1 | 2 | 存在 | 可见 |
+  | 1024×768 | 1009 | 1009 | 1 | 2 | 存在 | 可见 |
+  | 1440×900 | 1425 | 1425 | 1 | 2 | 存在 | 可见 |
+
+- 空态、补录成功、非空图表和响应式复核后的浏览器控制台 `error/warning` 均为空；本轮只停止隔离端口 5027 进程，
+  受保护的 5000/5011 进程与监听状态未触碰。
+- 该证据关闭 v30 空态行动入口与非空图表回归观察，不替代真实设备、系统 `prefers-reduced-motion`/高对比度、
+  浏览器下载落盘、真实 Provider 成功和 Android 真机验收。
