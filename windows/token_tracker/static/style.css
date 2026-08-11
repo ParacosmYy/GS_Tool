@@ -79,10 +79,10 @@ body::after {
 .ambient-light { position: fixed; z-index: -1; width: min(36rem, 34vw); height: min(36rem, 34vw); border-radius: 50%; pointer-events: none; filter: blur(100px); opacity: .08; }
 .ambient-light-one { top: 24%; left: 0; background: #8b9eff; }
 .ambient-light-two { right: 0; bottom: 3%; background: #d9ff74; }
-.pointer-aura, .pointer-ring { position: fixed; top: 0; left: 0; z-index: 40; display: block; pointer-events: none; opacity: 0; transform: translate3d(-50%, -50%, 0); transition: opacity .45s ease; }
+.pointer-aura, .pointer-ring { position: fixed; top: 0; left: 0; z-index: 40; display: block; pointer-events: none; opacity: 1; visibility: hidden; transform: translate3d(-50%, -50%, 0); transition: visibility 0s linear .45s; }
 .pointer-aura { width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(201,198,255,.13), rgba(201,198,255,.035) 34%, transparent 70%); filter: blur(9px); mix-blend-mode: screen; }
 .pointer-ring { width: 32px; height: 32px; border: 1px solid rgba(245,242,250,.72); border-radius: 50%; box-shadow: 0 0 18px rgba(201,198,255,.24); }
-body.pointer-ready .pointer-aura, body.pointer-ready .pointer-ring { opacity: 1; }
+body.pointer-ready .pointer-aura, body.pointer-ready .pointer-ring { opacity: 1; visibility: visible; transition-delay: 0s; }
 
 a { color: var(--copy); text-decoration: none; }
 a:hover { color: var(--white); }

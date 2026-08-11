@@ -85,21 +85,47 @@ export function setupPointerFollower() {
   let active = false;
   let frame = 0;
   let pressTimer = 0;
+  let idleTimer = 0;
+  const pointerIdleDelay = 1800;
   const interactiveSelector = "a, button, input, textarea, select, summary, [role='button']";
+
+  const clearIdleTimer = () => {
+    if (!idleTimer) return;
+    window.clearTimeout(idleTimer);
+    idleTimer = 0;
+  };
+
+  const armIdleTimer = () => {
+    clearIdleTimer();
+    idleTimer = window.setTimeout(() => {
+      // A stationary marker is stale visual state. Keep the native cursor and
+      // hover styles, but stop the decorative loop before it competes with
+      // charts, forms, or readable history content.
+      document.body.classList.add("pointer-idle");
+      active = false;
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+        frame = 0;
+      }
+      idleTimer = 0;
+    }, pointerIdleDelay);
+  };
 
   const move = (event) => {
     targetX = event.clientX;
     targetY = event.clientY;
-    if (!active) {
-      active = true;
-      document.body.classList.add("pointer-ready");
-      if (!frame) frame = window.requestAnimationFrame(render);
-    }
+    const wasInactive = !active;
+    active = true;
+    document.body.classList.add("pointer-ready");
+    document.body.classList.remove("pointer-idle");
+    armIdleTimer();
+    if (wasInactive && !frame) frame = window.requestAnimationFrame(render);
   };
   const leave = () => {
     active = false;
+    clearIdleTimer();
     document.body.classList.remove("pointer-ready");
-    document.body.classList.remove("pointer-interactive", "pointer-press");
+    document.body.classList.remove("pointer-idle", "pointer-interactive", "pointer-press");
     if (pressTimer) window.clearTimeout(pressTimer);
     if (frame) {
       window.cancelAnimationFrame(frame);

@@ -188,6 +188,10 @@ Dashboard 零数据图表现在使用低对比网格、零基线、等待扫描�
 
 Dashboard 在滚动态为 AI TOKEN 品牌锁定区增加 `.035` alpha 的局部透景保护镜，并让一次性的 `Scroll to explore` cue 离开 sticky header 阅读通道；整条顶栏仍保持 transparent/no global blur。5177 隔离实例已完成 320/390/768/1024/1440px 顶部矩阵、390/1440px 滚动态截图、周期按钮、可访问性快照和页面日志检查，独立证据见 `ui-accessibility-evidence-v81.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v82 指针跟随生命周期
+
+Dashboard 的装饰性鼠标光环现在只在移动时出现，静止 1.8 秒后进入 `pointer-idle` 并停止 requestAnimationFrame，下一次移动可靠恢复；首帧隐藏、原生鼠标、hover/focus、reduced-motion 与 fine-pointer 边界继续保留。5178 隔离实例已完成指针状态序列、无横向溢出、Week/Today、无障碍快照和页面日志检查，独立证据见 `ui-accessibility-evidence-v82.md`；本轮是聚焦生命周期验证，四档 viewport、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

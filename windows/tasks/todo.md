@@ -281,3 +281,5 @@
 - [x] v80 通过真实隔离 5176 实例确认 320/390/768/1024/1440px 无横向溢出、空态图表尺寸、Week/Today 周期交互、AI TOKEN 顶栏透明计算值、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v80.md`，真实辅助偏好与设备继续独立门禁。
 - [x] v81 为滚动态 AI TOKEN 品牌锁定区加入低 alpha 局部透景 lens，并让 `Scroll to explore` cue 在滚动后退出 sticky header 阅读通道，保持整条顶栏透明。
 - [x] v81 通过真实隔离 5177 实例确认 320/390/768/1024/1440px 顶部矩阵、390/1440px 滚动态、Week/Today 周期交互、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v81.md`，真实辅助偏好与设备继续独立门禁。
+- [x] v82 将 pointer follower 收敛为移动时显示、静止 1.8 秒后隐藏并停止动画帧，避免最后坐标的光环遮挡阅读内容。
+- [x] v82 通过真实隔离 5178 实例确认 default/active/idle/re-activate 指针状态、无横向溢出、Week/Today 周期交互、无障碍快照和清洁页面控制台；独立证据写入 `docs/ui-accessibility-evidence-v82.md`，四档 viewport、真实辅助偏好与设备继续独立门禁。

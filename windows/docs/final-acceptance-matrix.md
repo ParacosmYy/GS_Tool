@@ -230,6 +230,11 @@
 - 滚动态 AI TOKEN 品牌锁定区增加低 alpha 局部透景 lens，`Scroll to explore` cue 在滚动后离开 sticky header 阅读通道；整条顶栏仍为 transparent/no global blur，不新增 DOM 或焦点 stop。
 - 5177 隔离实例真实确认 320/390/768/1024/1440px 顶部矩阵、390/1440px 滚动态截图与 computed style、Week/Today 周期交互、无障碍关键语义和清洁页面控制台；独立证据见 `ui-accessibility-evidence-v81.md`，真实设备与辅助偏好继续独立门禁。
 
+### v82 交付增量
+
+- 装饰性 pointer follower 增加显式生命周期：首帧 hidden、fine-pointer 移动时 visible、1.8 秒静止后 `pointer-idle` hidden 并取消动画帧、再次移动恢复；不改变 DOM 节点、焦点、hover/focus 语义或业务数据。
+- 5178 隔离实例真实确认指针状态序列、无横向溢出、Week/Today 周期交互、无障碍关键语义和清洁页面控制台；独立证据见 `ui-accessibility-evidence-v82.md`，四档 viewport、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

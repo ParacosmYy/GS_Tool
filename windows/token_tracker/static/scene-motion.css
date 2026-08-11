@@ -30,6 +30,16 @@ body.pointer-interactive .pointer-aura { width: 300px; height: 300px; opacity: .
 body.pointer-interactive .pointer-ring { width: 48px; height: 48px; border-color: rgba(217,255,120,.92); box-shadow: 0 0 24px rgba(217,255,120,.3), inset 0 0 10px rgba(217,255,120,.14); }
 body.pointer-press .pointer-ring { transform: translate3d(-50%, -50%, 0) scale(.78); }
 
+/* A pointer that has stopped moving should not leave a bright artifact over
+   the current reading surface. Visibility, rather than a one-way opacity
+   target, gives the follower a reliable return path on every new pointermove.
+   The native cursor and target hover state stay available. */
+body.pointer-ready.pointer-idle .pointer-aura,
+body.pointer-ready.pointer-idle .pointer-ring { visibility: hidden; }
+
+body.pointer-ready:not(.pointer-idle) .pointer-aura,
+body.pointer-ready:not(.pointer-idle) .pointer-ring { visibility: visible; }
+
 /* Keep the AI TOKEN lockup attached to the scene without turning the header
    into a filled panel. Resting and scrolling states stay fully transparent;
    the progress line and text halo carry the navigation hierarchy. */

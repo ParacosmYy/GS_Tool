@@ -244,6 +244,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的 `.site-header.is-scrolled .brand` 与相邻 `.scroll-cue` 表现层；不改变 DOM、布局盒、导航、API、认证或数据流，forced-colors 显式隐藏 lens。
 - UI-3：真实 5177 隔离实例已完成 320/390/768/1024/1440px 顶部矩阵、390/1440px 滚动态截图、Week/Today 周期交互、可访问性快照和清洁页面日志检查；证据独立记录于 `ui-accessibility-evidence-v81.md`。
 
+## v82 指针跟随生命周期
+
+- UI-1：将停留在最后坐标的 pointer aura 收敛为移动时出现、静止后隐藏的轻量反馈，避免亮斑遮挡图表、表单和历史内容。
+- UI-2：变更集中在 `motion.js` 的 pointer lifecycle 与 `style.css`/`scene-motion.css` 的 visibility 层；复用现有 pointer 节点和 reduced-motion/fine-pointer 门禁，不新增依赖、DOM、API、认证或数据流。
+- UI-3：真实 5178 隔离实例已确认 default hidden → active visible → idle hidden → re-activate visible、无横向溢出、Week/Today 周期交互、可访问性快照和清洁页面日志；本轮四档 viewport 与真实辅助偏好仍按独立门禁记录，证据见 `ui-accessibility-evidence-v82.md`。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
