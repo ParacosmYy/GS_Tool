@@ -1,0 +1,204 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Shape dashboard analytics empty states into quiet observatory
+ *          surfaces without coupling presentation to chart data or API state.
+ * Module: Web presentation / 03-observatory / signal surfaces
+ */
+
+/*
+ * Empty analytics are an intentional product state. A lower-alpha bay keeps
+ * the illustration present while the chart grid, copy, and action retain a
+ * dependable reading floor. Populated charts keep the canonical data-surface
+ * contract from responsive-tuning.css.
+ */
+@media (forced-colors: none) {
+  .chart-card.is-empty,
+  .chart-card.is-unavailable {
+    border-color: rgba(230, 235, 245, .28);
+    background:
+      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .08), transparent 38%),
+      linear-gradient(145deg, rgba(18, 32, 48, .48), rgba(7, 14, 24, .62));
+    -webkit-backdrop-filter: blur(8px) saturate(1.04);
+    backdrop-filter: blur(8px) saturate(1.04);
+    box-shadow: 0 14px 42px rgba(2, 10, 20, .16), inset 0 1px 0 rgba(255, 255, 255, .06);
+  }
+
+  .chart-card.is-empty::after,
+  .chart-card.is-unavailable::after {
+    position: absolute;
+    top: 0;
+    right: 15%;
+    left: 15%;
+    height: 1px;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(217, 255, 120, .46), rgba(196, 192, 255, .22), transparent);
+    opacity: .62;
+    transform: scaleX(.72);
+    transform-origin: center;
+  }
+
+  .chart-card.is-empty .card-heading,
+  .chart-card.is-unavailable .card-heading {
+    position: relative;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+
+  .chart-card.is-empty .card-heading::after,
+  .chart-card.is-unavailable .card-heading::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(230, 235, 245, .16), transparent 72%);
+  }
+
+  .chart-card.is-empty .legend-note,
+  .chart-card.is-unavailable .legend-note {
+    color: var(--signal-lime);
+    text-shadow: 0 1px 2px rgba(8, 9, 12, .9), 0 0 8px rgba(217, 255, 120, .22);
+  }
+
+  /* This label is decorative context only; the live status remains the
+     localized chart-empty-state with role=status in charts.js. */
+  .chart-wrap[data-chart-state="empty"]::before,
+  .chart-wrap[data-chart-state="unavailable"]::before {
+    position: absolute;
+    z-index: 1;
+    top: 12px;
+    left: 14px;
+    content: "NO SIGNAL / READY";
+    color: rgba(215, 219, 229, .54);
+    font: 500 9px/1 "DM Mono", monospace;
+    letter-spacing: .12em;
+    pointer-events: none;
+  }
+
+  .chart-wrap[data-chart-state="empty"],
+  .chart-wrap[data-chart-state="unavailable"] {
+    border-color: rgba(230, 235, 245, .14);
+    border-radius: var(--radius-sharp);
+    background:
+      linear-gradient(rgba(230, 235, 245, .045) 1px, transparent 1px) 0 0 / 100% 44px,
+      linear-gradient(90deg, rgba(230, 235, 245, .035) 1px, transparent 1px) 0 0 / 88px 100%,
+      linear-gradient(180deg, rgba(8, 18, 30, .18), rgba(8, 18, 30, .04));
+  }
+
+  .chart-doughnut-wrap[data-chart-state="empty"],
+  .chart-doughnut-wrap[data-chart-state="unavailable"] {
+    background:
+      radial-gradient(circle, transparent 0 30%, rgba(230, 235, 245, .06) 30.4%, transparent 30.8% 50%, rgba(230, 235, 245, .045) 50.4%, transparent 50.8% 100%),
+      linear-gradient(180deg, rgba(8, 18, 30, .16), rgba(8, 18, 30, .03));
+  }
+
+  .chart-wrap[data-chart-state="empty"] .chart-empty-state,
+  .chart-wrap[data-chart-state="unavailable"] .chart-empty-state {
+    background: radial-gradient(circle at 50% 48%, rgba(8, 18, 30, .24), transparent 64%);
+  }
+
+  .chart-empty-marker {
+    width: 52px;
+    height: 52px;
+    border-color: rgba(217, 255, 120, .7);
+    box-shadow: 0 0 0 8px rgba(217, 255, 120, .04), 0 0 28px rgba(217, 255, 120, .16);
+  }
+
+  .chart-empty-state strong {
+    text-shadow: 0 1px 2px rgba(8, 9, 12, .92), 0 0 9px rgba(8, 9, 12, .56);
+  }
+
+  .chart-empty-state small {
+    color: var(--ink-soft);
+    text-shadow: 0 1px 2px rgba(8, 9, 12, .9);
+  }
+}
+
+/* The range control is the dashboard's time cursor. Give the group a narrow
+   optical top edge so it reads as part of the hero-foot signal line rather
+   than as a detached pill floating above the artwork. */
+.range-switcher {
+  position: relative;
+}
+
+.range-switcher::after {
+  position: absolute;
+  top: -5px;
+  right: 12%;
+  left: 12%;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(217, 255, 120, .32), transparent);
+  opacity: .72;
+}
+
+/* Avoid a decorative layer competing with a focused period button. */
+.range-switcher:focus-within::after {
+  opacity: .24;
+}
+
+@media (forced-colors: active) {
+  .chart-card.is-empty,
+  .chart-card.is-unavailable {
+    border-color: CanvasText;
+    background: Canvas;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  .chart-card.is-empty::after,
+  .chart-card.is-unavailable::after,
+  .chart-card.is-empty .card-heading::after,
+  .chart-card.is-unavailable .card-heading::after,
+  .range-switcher::after {
+    background: CanvasText;
+    opacity: 1;
+    transform: none;
+  }
+
+  .chart-wrap[data-chart-state="empty"]::before,
+  .chart-wrap[data-chart-state="unavailable"]::before {
+    color: CanvasText;
+  }
+
+  .chart-wrap[data-chart-state="empty"],
+  .chart-wrap[data-chart-state="unavailable"],
+  .chart-doughnut-wrap[data-chart-state="empty"],
+  .chart-doughnut-wrap[data-chart-state="unavailable"] {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-card.is-empty::after,
+  .chart-card.is-unavailable::after,
+  .chart-empty-marker {
+    animation: none;
+  }
+
+  .range-switcher::after {
+    transition: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .chart-wrap[data-chart-state="empty"]::before,
+  .chart-wrap[data-chart-state="unavailable"]::before {
+    top: 10px;
+    left: 12px;
+    font-size: 8px;
+  }
+
+  .chart-card.is-empty .card-heading,
+  .chart-card.is-unavailable .card-heading {
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+  }
+}

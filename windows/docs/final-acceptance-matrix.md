@@ -391,6 +391,10 @@
 
 - 透明 AI TOKEN 顶栏拆出 `header-chrome.css`：以无填充 composited hairline、品牌标记 hover/focus 和文字 keyline 提供层级，不恢复黑色面板、blur 或 shadow。
 - 真实隔离 5216 实例确认 `390×844` 无横向溢出、`1440×900` 登录/Dashboard 首屏、`scrollY=2360` 深滚透明顶栏和进度线；证据见 `docs/ui-accessibility-evidence-v115.md`。
+### v116 交付增量
+
+- Dashboard 空态趋势图与模型占比改为 observatory signal bay；空态 status、自动采集入口、Chart.js canvas 状态和周期控件语义保持。
+- 真实隔离 5217 实例确认 `320/390/768/1024/1440` 五档无横向溢出、`scrollY=820` 深滚空态、`role=status`、Week `aria-pressed` 和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v116.md`。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

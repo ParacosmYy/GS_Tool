@@ -442,6 +442,12 @@
 - 前端：新增 `header-chrome.css` 并在 `base.html` 末尾接入，使用伪元素、`opacity`、`transform` 和既有 focus contract；无新增业务监听器、API 或 DOM 节点。
 - 后端：无后端、接口、数据库改动。
 - 架构：品牌 chrome 与通用表面样式解耦，模块边界、forced-colors/reduced-motion 降级、文件行数和回滚路径清晰；5216 证据见 `docs/ui-accessibility-evidence-v115.md`。
+## v116 Dashboard 空态观测舱
+
+- UI：无数据图表使用低 alpha 观测面、细网格、`NO SIGNAL / READY` 和单一 signal line，首屏插画与分析区材质连续；不伪造数据。
+- 前端：新增 `observatory-signal.css`，仅消费既有 `.is-empty/.is-unavailable`、`data-chart-state` 和 `.range-switcher` DOM contract；不新增脚本监听器或 API。
+- 后端：无后端、接口、数据库改动。
+- 架构：职责限定于 `03-observatory`，与 Chart.js renderer 和业务状态解耦；forced-colors/reduced-motion、文件行数和回滚路径清晰；5217 证据见 `docs/ui-accessibility-evidence-v116.md`。
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
