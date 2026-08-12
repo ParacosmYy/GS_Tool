@@ -379,6 +379,10 @@
 
 - Dashboard 指标栏复用 sticky occlusion 候选机制；三个 `.signal-cell` 穿过透明 AI TOKEN 顶栏时淡出并停止指针命中，离开交叠区后恢复，不改变数据、API、DOM 语义或移动端列布局。
 - 真实隔离 5213 实例确认 `1440×900` 首屏与稳定 `scrollY=980` 深滚的顶栏 `76px` 边界、指标交叠隐藏、无横向溢出和完成态页面；证据见 `docs/ui-accessibility-evidence-v112.md`。
+### v113 交付增量
+
+- 普通配色下 AI TOKEN 顶栏使用真正透明窗口，移除渐变、内侧阴影和模糊层；保留文字 keyline、滚动进度线、forced-colors 和 reduced-motion 边界，不改变模板、API 或认证流程。
+- 真实隔离 5214 实例确认登录页、Dashboard 首屏/深滚及 `320/390/768/1024/1440` 五档无横向溢出、标题层级、控件命名和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v113.md`。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

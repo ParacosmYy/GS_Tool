@@ -305,6 +305,9 @@ Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当�
 ## v112 Dashboard 指标栏 sticky 避让
 
 将三个 `.signal-cell` 纳入既有 `sticky-occlusion.js` 候选集合；当指标实际穿过透明 AI TOKEN 顶栏的 `76px` 阅读带时，复用统一的 `is-under-sticky-header` 规则淡出并停止指针命中，离开交叠区后恢复。焦点恢复、forced-colors 与 reduced-motion 边界沿用既有规则，不改变 Dashboard 数据、API 或布局契约。5213 隔离实例已完成桌面首屏与稳定 `scrollY=980` 深滚验证，证据见 `ui-accessibility-evidence-v112.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+## v113 AI TOKEN 顶栏真正透明
+
+普通配色下的 AI TOKEN 顶栏改为 `background: transparent`、`background-image: none`、无 `backdrop-filter`、无 `box-shadow` 的真实透景窗口；文字 keyline 与独立滚动进度线继续承担可读性和滚动态反馈，避免背景插画高光下出现浅色横带。5214 隔离实例完成登录页、Dashboard 首屏/深滚与 `320/390/768/1024/1440` 五档回归，证据见 `ui-accessibility-evidence-v113.md`；滚动进度线宽度异常作为下一轮独立观察项，真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

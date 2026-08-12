@@ -424,6 +424,12 @@
 - 前端：将 `.signal-cell` 加入 `sticky-occlusion.js` 既有候选集合，沿用 requestAnimationFrame 调度、统一淡出规则和 `focus-within` 恢复；无新增监听器、依赖或页面脚本。
 - 后端：无后端、接口、数据库改动。
 - 架构：变更只涉及共享遮挡选择器与共享过渡样式，遵守低耦合、文件行数和回滚边界；真实隔离 5213 证据见 `docs/ui-accessibility-evidence-v112.md`。
+## v113 AI TOKEN 顶栏真正透明
+
+- UI：移除普通配色下顶栏的低 alpha 渐变和内侧阴影，背景插画可完整穿过 AI TOKEN 行；品牌文字 keyline 与滚动进度线保留。
+- 前端：只修改共享 `responsive-tuning.css` 的顶栏视觉契约，不改变模板、导航、滚动、认证和 API；forced-colors 分支继续由系统颜色接管。
+- 后端：无后端、接口、数据库改动。
+- 架构：单文件局部变更，依赖方向、文件行数和回滚边界保持；5214 浏览器证据见 `docs/ui-accessibility-evidence-v113.md`，滚动进度线 `0px` 异常单独进入下一轮。
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

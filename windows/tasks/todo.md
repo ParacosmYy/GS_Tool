@@ -341,3 +341,5 @@
 - [x] v111 通过真实隔离 5212 实例确认桌面/390px 认证页的动效 computed style、卡片几何、焦点边界、无横向溢出、可访问性计数和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v111.md`。
 - [x] v112 将 Dashboard 三个指标单元纳入既有 sticky occlusion 候选；穿过透明 AI TOKEN 顶栏阅读带时整体淡出并停止指针命中，离开交叠区后恢复，不新增监听器或接口。
 - [x] v112 通过真实隔离 5213 实例确认桌面首屏/稳定深滚 `scrollY=980` 的指标可见性与交叠隐藏、顶栏 `76px` 边界、无横向溢出和清洁页面状态；独立证据写入 `docs/ui-accessibility-evidence-v112.md`。
+- [x] v113 将普通配色下 AI TOKEN 顶栏收敛为真正透明窗口，移除背景渐变、内侧阴影和残留玻璃感；保留文字 keyline 与独立滚动进度线，不改变模板、交互或 API。
+- [x] v113 通过真实隔离 5214 实例确认 `320/390/768/1024/1440` 五档无横向溢出、顶栏透明计算样式、登录页/Dashboard 截图、标题层级、控件命名和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v113.md`。

@@ -11,14 +11,14 @@
    without losing the text contrast required by the moving illustration. */
 .site-header.is-scrolled {
   border-bottom-color: transparent;
-  background:
-    linear-gradient(180deg, rgba(17, 31, 49, .1), rgba(8, 14, 23, .025) 74%, transparent);
+  background: transparent;
   background-color: transparent;
-  /* No backdrop blur here: a blurred strip creates a visible seam at the
-     header edge. The artwork should remain optically continuous underneath. */
+  background-image: none;
+  /* The header is a window, not a glass slab. No blur or shadow is allowed to
+     create a seam while the moving artwork passes beneath the AI TOKEN row. */
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .025);
+  box-shadow: none;
 }
 
 /* The sticky row must remain a single translucent layer. Avoid a dense slab:
@@ -63,18 +63,18 @@
   display: none;
 }
 
-/* Keep the brand row a clear window with a barely-there optical wash. This late,
-   shared rule is intentionally stronger than older surface defaults so both
-   first-frame and sticky states use the same transparent language. */
+  /* Keep the brand row a literal clear window. Text keylines and the separate
+     scroll-progress trace carry hierarchy; painting a wash here would make the
+     top line read as an opaque panel over bright character and monitor pixels. */
 @media (forced-colors: none) {
   .site-header,
   .site-header.is-scrolled {
-    background:
-      linear-gradient(180deg, rgba(17, 31, 49, .1), rgba(8, 14, 23, .025) 74%, transparent);
+    background: transparent;
     background-color: transparent;
+    background-image: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .025);
+    box-shadow: none;
   }
 
   /* The hero metadata line sits directly below the brand chrome. A full
