@@ -325,6 +325,10 @@ Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当�
 ## v118 认证字段 signal lane
 
 新增 `auth-signal.css` 并在共享样式链末尾接入；登录/注册共用模板增加装饰性字段元信息和焦点局部 signal line，认证卡片收敛为低 alpha 深蓝透景层，移动端保留 50px 输入控件和 48px 主按钮。编号使用 `aria-hidden`，不改变 label 可访问名称、认证接口、CSRF、字段值或数据流。5219 隔离实例已完成 `320/390/768/1024/1440` 五档、登录/注册继承、真实焦点和清洁日志验证，证据见 `ui-accessibility-evidence-v118.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
+## v119 自动采集协议 sticky rail
+
+新增 `connect-rail.css` 并在共享样式链末尾接入；桌面 `901px+` 将 `HOW IT WORKS` 说明固定在自动采集长表单旁的 `96px` 阅读带内，触屏与窄桌面恢复普通文档流，保留既有 sticky occlusion、焦点恢复、forced-colors 和 reduced-motion 边界。5220 隔离实例已完成五档响应式、1440px 深滚、Base URL 焦点和 390px 长表单验证，证据见 `ui-accessibility-evidence-v119.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

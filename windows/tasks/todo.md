@@ -353,3 +353,5 @@
 - [x] v117 通过真实隔离 5218 确认 `320/390/768/1024/1440` 五档无横向溢出、登录首屏与滚动态透明计算值、390px 截图和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v117.md`。
 - [x] v118 将登录/注册认证字段收敛为可扫描的 signal lane：新增字段元信息、focus-within 局部 signal line、低 alpha 深蓝阅读面和移动端轻材质；编号使用 `aria-hidden`，不改变认证契约。
 - [x] v118 通过真实隔离 5219 确认 `320/390/768/1024/1440` 五档无横向溢出、登录/注册继承、焦点 signal、控件可访问名称和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v118.md`。
+- [x] v119 将 `03 / AUTOMATIC COLLECTION` 旁的 `HOW IT WORKS` 收敛为桌面 sticky protocol rail，保持三步协议在长表单中段可见；901px 以下恢复普通文档流，不改变 API、表单、Key 生命周期或数据流。
+- [x] v119 通过真实隔离 5220 确认 `320/390/768/1024/1440` 五档无横向溢出、1440px sticky 深滚、Base URL 焦点恢复、390px 长表单和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v119.md`。

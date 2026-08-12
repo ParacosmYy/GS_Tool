@@ -405,6 +405,11 @@
 
 - 登录/注册认证字段新增装饰性 `IDENTITY / 01`、`ACCESS / 02` 元信息、focus-within 局部 signal line 和低 alpha 深蓝阅读面；元信息使用 `aria-hidden`，不改变输入可访问名称、认证接口或数据流。
 - 真实隔离 5219 实例确认 `320/390/768/1024/1440` 五档无横向溢出、登录/注册继承、真实字段焦点、`1 个 h1 / 1 个 h2` 和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v118.md`。
+
+### v119 交付增量
+
+- `03 / AUTOMATIC COLLECTION` 旁的 `HOW IT WORKS` 说明在 `901px+` 变为 `position: sticky; top: 96px` 的 protocol rail，使检测、代理、usage 归档三步协议在长表单中段持续可见；901px 以下恢复普通文档流。
+- 真实隔离 5220 实例确认 `320/390/768/1024/1440` 五档无横向溢出、1440px sticky 深滚、Base URL 焦点恢复、390px 长表单和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v119.md`。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

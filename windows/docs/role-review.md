@@ -464,6 +464,14 @@
 - UI-3：真实隔离 5219 已确认 `320/390/768/1024/1440` 五档无横向溢出、登录/注册继承、焦点 signal、标题层级和应用日志；证据见 `ui-accessibility-evidence-v118.md`。
 - 后端：无后端、数据库、接口、认证、CSRF 或密钥处理改动；保护端口 `5000/5011` 未触碰。
 - 架构师：模块职责限定在 `02-auth`，不向业务脚本引入依赖；新增 CSS/证据文件低于 1000 行，回滚边界为样式链接、模板小结构和独立模块。
+
+## v119 自动采集协议 sticky rail
+
+- UI-1：解决自动采集长表单与 `HOW IT WORKS` 说明在深滚时失去上下文的问题；桌面协议栏保持三步流程可见，移动端不增加额外固定层。
+- UI-2：新增 `connect-rail.css`，只通过 `.tool-grid.auto-layout > .guide-card` 的桌面媒体查询建立 sticky、signal rail 和低 alpha 阅读面；901px 以下、forced-colors、reduced-motion 均显式降级。
+- UI-3：真实隔离 5220 已确认 `320/390/768/1024/1440` 五档无横向溢出、1440px sticky 深滚、Base URL 焦点恢复、390px 长表单和应用日志；证据见 `ui-accessibility-evidence-v119.md`。
+- 后端：无后端、数据库、接口、认证、Key 生命周期或数据流改动；保护端口 `5000/5011` 未触碰。
+- 架构师：模块职责限定在 `04-connect`，不向业务脚本引入依赖；新增 CSS/证据文件低于 1000 行，回滚边界为 stylesheet link 与独立模块。
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
