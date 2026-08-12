@@ -536,3 +536,11 @@
 - 自动采集不猜测缺失的 usage；没有 usage 的 provider 仍提示异常补录。
 - 当前未用真实 provider Key 做上游调用验证，因此“真实 usage 入库”依赖用户提供合法 Base URL/Key，不能用演示数据冒充通过。
 - 外部客户端的 per-user Usage Ingest Token、固定 `/api/v1/ingest/usage` 边界和本地 Gateway 已实现；Kimi Code 等 stock 客户端的真实 provider 联调仍需授权 Key，provider Key 隔离遵守 ADR-054/056/058/059/075。
+
+## v127 顶部品牌行连续透景
+
+- UI-1：旧启动器顶部黑色横条根因已定位为 `ui-polish.css` 的高 alpha header wash；桌面与移动场景均恢复连续透景。
+- UI-2：兼容层与完整链同步降低 alpha，保留文字 keyline、轻量 blur、signal line、forced-colors 和 reduced-motion，不改交互与布局契约。
+- UI-3：真实 `5000` `1683×892`、`390×844` 截图与 computed style 已复核；清洁日志、无正向横向溢出；详见 `ui-accessibility-evidence-v127.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动。
+- 架构师：仅改 `01-shell` 的 `ui-polish.css`/`brand-transparency.css`，无新依赖、无跨层耦合；行数门禁保持通过。

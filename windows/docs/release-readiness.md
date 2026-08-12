@@ -378,3 +378,11 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 4. 合法认证会话下的 Web 五模块和管理员路径完成四档响应式、ARIA、焦点、错误态和导出证据。
 5. HTTPS、备份恢复、限流、脱敏日志、ACL、轮转和回滚由部署负责人记录并复核。
 6. 架构师检查依赖方向、契约、ADR、注释、行数和 Git 交付状态后，才可签署完成。
+
+## v127 顶部品牌行连续透景
+
+- UI-1：顶部品牌行不再由旧启动器的高 alpha wash 形成黑色横带，背景图、AI TOKEN lockup 与导航保持连续透景。
+- UI-2：兼容样式与完整透明契约使用同一低 alpha 视觉边界；文字 keyline 保持阅读对比，forced-colors/reduced-motion 规则未削弱。
+- UI-3：真实 `5000` 桌面与 `390×844` 移动回归通过，控制台无 error/warn，文档宽度无正向溢出；证据见 `ui-accessibility-evidence-v127.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未触碰。
+- 架构师：修改限定在 `01-shell` 两个高内聚 CSS 契约文件，未新增依赖、DOM、脚本或跨层耦合；单独回滚即可恢复 v126。

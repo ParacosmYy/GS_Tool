@@ -14,9 +14,12 @@
  */
 .site-header,
 .site-header.is-scrolled {
-  background-color: rgba(8, 14, 22, .16) !important;
+  /* Keep the artwork continuous through the brand row. The copy owns
+     contrast through its keyline; the shell only supplies a quiet optical
+     wash so this row cannot read as a black navigation slab. */
+  background-color: rgba(8, 14, 22, .07) !important;
   background-image:
-    linear-gradient(180deg, rgba(12, 19, 29, .34), rgba(8, 14, 22, .12)) !important;
+    linear-gradient(180deg, rgba(12, 19, 29, .16), rgba(8, 14, 22, .035)) !important;
   border-bottom-color: rgba(230, 235, 245, .13) !important;
   box-shadow:
     0 10px 30px rgba(2, 8, 14, .08),
@@ -58,7 +61,7 @@
   .site-header,
   .site-header.is-scrolled {
     background-image:
-      linear-gradient(180deg, rgba(8, 14, 22, .42), rgba(8, 14, 22, .18)) !important;
+      linear-gradient(180deg, rgba(8, 14, 22, .22), rgba(8, 14, 22, .06)) !important;
   }
 }
 

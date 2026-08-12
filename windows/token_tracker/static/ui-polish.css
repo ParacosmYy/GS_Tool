@@ -41,11 +41,11 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   width: min(1320px, calc(100% - 64px));
   min-height: 76px;
   border-bottom-color: transparent;
-  /* The header is chrome, not a content panel. Keep the scene visible through
-     the complete AI TOKEN row while providing the legacy launcher a small
-     reading wash; the final brand contract repeats this boundary later. */
-  background-color: rgba(8, 14, 22, .16);
-  background-image: linear-gradient(180deg, rgba(12, 19, 29, .34), rgba(8, 14, 22, .12));
+  /* The header is chrome, not a content panel. Keep the scene continuous
+     through the complete AI TOKEN row; text keylines provide contrast while
+     this low-alpha wash prevents a black slab in the legacy launcher. */
+  background-color: rgba(8, 14, 22, .07);
+  background-image: linear-gradient(180deg, rgba(12, 19, 29, .16), rgba(8, 14, 22, .035));
   box-shadow: 0 10px 30px rgba(2, 8, 14, .08), inset 0 1px 0 rgba(255, 255, 255, .05);
   -webkit-backdrop-filter: blur(11px) saturate(1.08);
   backdrop-filter: blur(11px) saturate(1.08);

@@ -460,3 +460,11 @@
 架构师必须逐行检查本矩阵、`release-readiness.md`、`tasks/todo.md` 和所有 ADR；每个 `conditional`/
 `pending` 都必须转为有直接证据的 `pass`，工作树必须干净，敏感数据不得进入 Git，之后才可以调用
 最终目标完成门禁。
+
+## v127 顶部品牌行连续透景
+
+- UI-1：修复根目录旧个人启动器中顶部 `AI TOKEN / OBSERVATORY` 因高 alpha wash 看起来像黑色横条的问题，恢复导航 chrome 与背景插画的连续关系。
+- UI-2：`ui-polish.css` 兼容层将 header wash 收敛为 `.07/.16/.035`；`brand-transparency.css` 同步完整链和窄屏渐变，保留 `blur(11px)`、文字 keyline、signal line、forced-colors 与 reduced-motion 边界。
+- UI-3：真实 `5000` 桌面 `1683×892` 与移动 `390×844` 已确认 computed style、背景连续、品牌可读、无正向横向溢出和清洁日志；证据见 `ui-accessibility-evidence-v127.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未重启。
+- 架构师：变化限定在 `01-shell / sticky brand transparency compatibility boundary`，无新依赖、无跨层耦合；`ui-polish.css=867`、`brand-transparency.css=94`，回滚边界为两处 header 背景声明。
