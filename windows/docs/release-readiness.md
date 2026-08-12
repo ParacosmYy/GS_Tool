@@ -236,6 +236,10 @@ sticky 避让模块现在将自动采集 `.auto-form-actions` 与其提交按钮
 
 透明 AI TOKEN sticky 顶栏现在由 `sticky-occlusion.js` 同时测量内容表面交叠带；`responsive-tuning.css` 对卡片只裁剪顶栏覆盖的局部区域，让背景插画连续透过品牌行，不给顶栏重新加实心背景。`5189` 隔离实例已完成 `scrollY=2200` 顶栏透明计算样式、76px 交叠带裁切、备注字段 `:focus-within` 恢复、离开交叠带恢复、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v93.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v94 深滚孤立表面边界
+
+当卡片在透明 AI TOKEN 顶栏下方只剩不超过 120px 的孤立下沿时，sticky 表现模块为其增加 `is-sticky-fragment`；非焦点状态整体退出，避免残片被误读为第二条顶栏，`:focus-within` 仍恢复完整卡片。`5190` 隔离实例已完成 `scrollY=2200` 完整过渡后的视觉截图、动作行隐藏、Tab 到备注字段并恢复、中间滚动主体可见、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v94.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

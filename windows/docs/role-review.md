@@ -316,6 +316,12 @@
 - UI-2：变更集中在 `sticky-occlusion.js` 的表面交叠测量与 `responsive-tuning.css` 的 mask 表现；`:focus-within` 清除裁切，保留字段焦点、DOM、Tab 顺序、API、认证、业务数据、reduced-motion 和 forced-colors 边界。
 - UI-3：真实 5189 隔离实例已确认 `scrollY=2200` 顶栏透明、76px 局部裁切、备注字段焦点恢复、离开交叠带恢复、40 个可见焦点控件、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v93.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+## v94 深滚孤立表面边界
+
+- UI-1：解决深滚时卡片只剩一小段位于透明 AI TOKEN 行下方、视觉上形成第二条黑色顶栏的问题；不扩大顶栏背景，而是让孤立表面作为一个完整单元退出。
+- UI-2：变更集中在 `sticky-occlusion.js` 的 120px fragment 判断和 `responsive-tuning.css` 的焦点安全表现；完整交叠仍采用局部 mask/feather，不改变 DOM、Tab 顺序、API、认证、表单值、reduced-motion 或 forced-colors 边界。
+- UI-3：真实 5190 隔离实例已确认 `scrollY=2200` 完整过渡后残片与动作行隐藏、Tab 到备注字段并恢复、中间滚动主体可见、40 个可见焦点控件、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v94.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

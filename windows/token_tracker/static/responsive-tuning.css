@@ -139,8 +139,9 @@
 /* A card surface can cross the sticky row even when none of its controls do.
    Mask only the part that sits behind the transparent chrome so the artwork
    remains visible instead of exposing a dark panel through the AI TOKEN line.
-   The overlap bounds are measured by sticky-occlusion.js; focus-within restores the
-   complete surface while a keyboard user is working inside it. */
+   The overlap bounds are measured by sticky-occlusion.js; the short feather
+   keeps the surface from ending as a hard horizontal cut. Focus-within restores
+   the complete surface while a keyboard user is working inside it. */
 .site-main .has-sticky-occlusion {
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
@@ -155,7 +156,8 @@
     #000 var(--sticky-occlusion-start),
     transparent var(--sticky-occlusion-start),
     transparent var(--sticky-occlusion-end),
-    #000 var(--sticky-occlusion-end),
+    rgba(0, 0, 0, .5) calc(var(--sticky-occlusion-end) + 8px),
+    #000 var(--sticky-occlusion-feather-end),
     #000 100%
   );
   mask-image: linear-gradient(
@@ -164,7 +166,8 @@
     #000 var(--sticky-occlusion-start),
     transparent var(--sticky-occlusion-start),
     transparent var(--sticky-occlusion-end),
-    #000 var(--sticky-occlusion-end),
+    rgba(0, 0, 0, .5) calc(var(--sticky-occlusion-end) + 8px),
+    #000 var(--sticky-occlusion-feather-end),
     #000 100%
   );
 }
@@ -174,11 +177,31 @@
   mask-image: none;
 }
 
+/* When a surface has only a short lower fragment left below the sticky row,
+   remove that fragment as one visual unit. Otherwise a lone dark card edge
+   reads like a second header band. Focus-within restores the entire surface
+   for keyboard users before they interact with its fields or actions. */
+.site-main .is-sticky-fragment:not(:focus-within) {
+  opacity: 0;
+  pointer-events: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+  transition: opacity .24s var(--ui-ease);
+}
+
+.site-main .is-sticky-fragment:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-actions,
   .scroll-cue,
   .site-main .is-under-sticky-header,
-  .site-main .has-sticky-occlusion { transition: none; }
+  .site-main .has-sticky-occlusion,
+  .site-main .is-sticky-fragment { transition: none; }
 
   .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
     transform: none;
@@ -318,6 +341,13 @@
   .site-main .has-sticky-occlusion:focus-within {
     -webkit-mask-image: none;
     mask-image: none;
+  }
+
+  .site-main .is-sticky-fragment,
+  .site-main .is-sticky-fragment:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+    transition: none;
   }
 }
 

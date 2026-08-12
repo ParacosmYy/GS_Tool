@@ -10,6 +10,8 @@ const OCCLUDED_CLASS = "is-under-sticky-header";
 const SURFACE_OCCLUDED_CLASS = "has-sticky-occlusion";
 const CANDIDATE_SELECTOR = ".site-main .button, .site-main summary, .site-main .card-heading, .site-main .auto-form-actions";
 const SURFACE_SELECTOR = ".site-main .auth-card, .site-main .chart-card, .site-main .form-card, .site-main .records-card, .site-main .guide-card, .site-main .manual-details";
+const SURFACE_FEATHER_PX = 16;
+const SURFACE_FRAGMENT_LIMIT_PX = 120;
 
 function intersectsHeader(element, headerRect) {
   const rect = element.getBoundingClientRect();
@@ -30,6 +32,7 @@ function getSurfaceOcclusionBounds(element, headerRect, shouldGuard) {
   return {
     start: Math.max(0, headerRect.top - rect.top),
     end: Math.min(rect.height, headerRect.bottom - rect.top),
+    visibleBelowHeader: Math.max(0, Math.min(rect.bottom, window.innerHeight) - headerRect.bottom),
   };
 }
 
@@ -64,11 +67,21 @@ export function setupStickyOcclusion() {
       if (occlusionBounds) {
         element.style.setProperty("--sticky-occlusion-start", `${occlusionBounds.start}px`);
         element.style.setProperty("--sticky-occlusion-end", `${occlusionBounds.end}px`);
+        element.style.setProperty(
+          "--sticky-occlusion-feather-end",
+          `${Math.min(element.getBoundingClientRect().height, occlusionBounds.end + SURFACE_FEATHER_PX)}px`,
+        );
       } else {
         element.style.removeProperty("--sticky-occlusion-start");
         element.style.removeProperty("--sticky-occlusion-end");
+        element.style.removeProperty("--sticky-occlusion-feather-end");
       }
       element.classList.toggle(SURFACE_OCCLUDED_CLASS, Boolean(occlusionBounds));
+      const isFragment = Boolean(
+        occlusionBounds
+        && occlusionBounds.visibleBelowHeader <= SURFACE_FRAGMENT_LIMIT_PX,
+      );
+      element.classList.toggle("is-sticky-fragment", isFragment);
     });
     frame = 0;
   };
