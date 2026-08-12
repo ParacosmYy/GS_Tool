@@ -107,9 +107,24 @@
   transition: opacity .35s var(--ui-ease), transform .35s var(--ui-ease), visibility 0s linear .35s;
 }
 
+/* A lower form or export control can still meet the transparent header after
+   a free-form scroll. Keep its layout and tab order, but remove its visual
+   weight until it leaves the chrome band; focus-within restores the control. */
+.site-main .is-under-sticky-header {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .24s var(--ui-ease);
+}
+
+.site-main .is-under-sticky-header:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-actions,
-  .scroll-cue { transition: none; }
+  .scroll-cue,
+  .site-main .is-under-sticky-header { transition: none; }
 
   .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
     transform: none;
@@ -236,6 +251,13 @@
   .site-header.is-scrolled .brand::before { display: none; }
   .site-header.is-scrolled .site-nav::before,
   .site-header.is-scrolled .user-menu::before { display: none; }
+
+  .site-main .is-under-sticky-header,
+  .site-main .is-under-sticky-header:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+    transition: none;
+  }
 }
 
 /* Laptop-height desktop screens need the period control in the first scan.

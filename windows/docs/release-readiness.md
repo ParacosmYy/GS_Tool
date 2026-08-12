@@ -212,6 +212,10 @@ Dashboard 的核心计数器增加低干扰 `core-sweep` 内部扫描弧，强�
 
 滚动态不再对整条 AI TOKEN 顶栏做 blur：品牌区和 header 主体保持透明/无 blur，透明局部镜片只服务右侧导航与账户操作；离开首屏后 hero CTA 和 `Scroll to explore` 退出 sticky 阅读通道，键盘焦点中的 CTA、reduced-motion 和 forced-colors 保留独立边界。5183 隔离实例已完成首屏、720px、2220px 与返回顶部恢复的截图、computed style、焦点控件标签、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v87.md`；更广泛的深度滚动内容避让、viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v88 sticky 内容避让
+
+深度滚动时，`sticky-occlusion.js` 只对进入透明 AI TOKEN 顶栏交叠带的非焦点 `.site-main .button` / `summary` 收束视觉层，保留布局盒和 Tab 顺序；`:focus-within` 恢复可见和可交互状态，hero actions 继续由 v87 规则负责。5184 隔离实例已完成首屏、720px、2220px、键盘焦点恢复、截图、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v88.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

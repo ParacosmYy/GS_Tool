@@ -280,6 +280,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的滚动态伪元素、CTA 状态和 reduced-motion/forced-colors 表现边界；`:focus-within` 不隐藏正在操作的 CTA，不改变 DOM、导航、认证、API、业务状态或数据流。
 - UI-3：真实 5183 隔离实例已确认首屏、720px、2220px、返回顶部恢复、透明 computed style、局部镜片、CTA/cue 状态、焦点控件标签、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v87.md`，深度内容自动避让、viewport override、真实设备与辅助偏好继续独立门禁。
 
+## v88 sticky 内容避让
+
+- UI-1：新增独立 `sticky-occlusion.js` 表现模块，解决深度滚动时下方提交按钮穿过透明 AI TOKEN sticky 行的问题；非焦点控件收束视觉，焦点控件保持可见和可操作。
+- UI-2：模块只依赖 header 几何、滚动状态和现有静态候选集合，通过表现类与 CSS 边界工作；不改变 DOM、API、认证、业务状态或数据流，hero actions 继续由 v87 专属规则处理。
+- UI-3：真实 5184 隔离实例已确认首屏/720px/2220px、`#proxy-submit` 避让、Tab 焦点恢复、透明 computed style、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v88.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

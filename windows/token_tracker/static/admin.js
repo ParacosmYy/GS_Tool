@@ -2,6 +2,7 @@
 
 import { setLiveMessage } from './modules/live-region.js';
 import { setupNavigation } from './modules/navigation.js';
+import { setupStickyOcclusion } from './modules/sticky-occlusion.js';
 import {
   setupBackdropMotion,
   setupPointerFollower,
@@ -168,4 +169,5 @@ setupPointerFollower();
 setupBackdropMotion();
 setupSurfaceMotion();
 setupNavigation();
+setupStickyOcclusion();
 loadAdminData();

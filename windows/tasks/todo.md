@@ -293,3 +293,5 @@
 - [x] v86 通过真实隔离 5182 实例确认首屏/720px/900px/1118px 滚动态、透明 computed style、标题安全落点、截图、可访问性语义和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v86.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 - [x] v87 收窄滚动态阅读层：AI TOKEN 品牌区恢复完整透景，局部透明镜片仅保留在右侧导航/账户操作区，并在离开首屏后收起 hero CTA；`:focus-within`、reduced-motion 和 forced-colors 边界保持有效。
 - [x] v87 通过真实隔离 5183 实例确认首屏/720px/2220px、CTA 收束与返回顶部恢复、透明 computed style、截图、焦点控件标签、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v87.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+- [x] v88 新增 sticky 内容避让模块：深度滚动时仅收束穿过透明 AI TOKEN 顶栏的非焦点按钮/折叠控件，保留布局与 Tab 顺序，`:focus-within` 恢复可见和可交互状态。
+- [x] v88 通过真实隔离 5184 实例确认首屏/720px/2220px、深度提交按钮避让、键盘焦点恢复、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v88.md`，viewport override、真实设备与辅助偏好继续独立门禁。
