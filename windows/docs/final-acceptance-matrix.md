@@ -642,3 +642,11 @@
 - UI-3：5026 的 1440/390px 首屏与 390px 深滚分析路由真实回归通过：全部 reveal `opacity=1`、路由上下文与 `aria-current` 正常、文档无正向横向溢出、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v150.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
 - 架构师：新增 CSS 模块高内聚、无新依赖或跨层耦合；`ui-polish.css` 992 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
+
+## v151 Dashboard 分析区扫描轨道
+
+- UI-1：趋势图与模型占比图拥有一致的标题信号点、标题底轨、绘图区边界、状态胶囊与图例分隔线，分析区更容易从长页面中被定位和扫读。
+- UI-2：`analysis-signal.css` 独立拥有 03-observatory 表现规则；模板只增加 `TOKEN SHARE` 语义文本，普通动效、reduced-motion 和 forced-colors 职责边界清晰。
+- UI-3：5026 的 1440/390/320px 真实回归通过：图表 ready 状态、canvas ARIA、移动路由上下文、320px 内部溢出 `0`、文档宽度和页面日志均正常；证据见 `docs/ui-accessibility-evidence-v151.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
+- 架构师：新增 CSS 模块高内聚、无新依赖或跨层耦合；所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。

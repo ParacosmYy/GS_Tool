@@ -542,3 +542,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 源码临时端口 `5026` 的 1440/390px 首屏与 390px `ANALYSIS` 深滚回归通过；无正向横向溢出，页面侧日志为空；证据见 `docs/ui-accessibility-evidence-v150.md`。
 - 本轮只修改共享前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
+
+## v151 Dashboard 分析区扫描轨道
+
+- 分析区现在以标题信号点、状态胶囊、绘图区内框和图例分隔线组织趋势图与模型占比，快速滚动时视觉层级更明确。
+- 源码临时端口 `5026` 的 1440/390/320px 回归通过；320px 图表不越过卡片轨道，页面侧日志为空；证据见 `docs/ui-accessibility-evidence-v151.md`。
+- 本轮只修改分析区模板语义与共享前端 CSS presentation contract，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。

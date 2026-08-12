@@ -720,3 +720,11 @@
 - UI-3：源码临时端口 `5026` 的 1440/390px 首屏与 `390px` 深滚分析路由回归通过；`opacity`、`aria-current`、无横向溢出和页面日志已复核；证据见 `ui-accessibility-evidence-v150.md`。
 - 后端：无后端、数据库、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
 - 架构师：变化限定在共享 presentation boundary，新增模块高内聚、无新依赖或跨层耦合；`ui-polish.css` 992 行，所有文本源码低于 1000 行。
+
+## v151 Dashboard 分析区扫描轨道
+
+- UI-1：为趋势图与模型占比图增加标题信号点、标题底轨、绘图区内框、`TOKEN SHARE` 状态胶囊和图例分隔线，建立清晰的分析扫描起点。
+- UI-2：新增 `analysis-signal.css` 作为 03-observatory 专属表现模块；模板仅补充状态文本，Chart.js、API、数据和导航契约不变。
+- UI-3：源码临时端口 `5026` 的 1440/390/320px 真实浏览器回归通过；320px 分析区内部溢出为 0，canvas ARIA、路由上下文、控制台日志均已复核；证据见 `ui-accessibility-evidence-v151.md`。
+- 后端：无后端、数据库、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
+- 架构师：变化限定在高内聚分析 presentation boundary，新增 CSS 与一处语义模板补充，无新依赖或跨层耦合；所有文本源码低于 1000 行。

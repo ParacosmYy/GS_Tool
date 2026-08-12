@@ -416,3 +416,5 @@
 - [x] v149 通过源码临时端口 `5026` 的登录/注册 1440/390px 真实浏览器回归确认焦点层级、顶栏透明、卡片几何、无横向溢出、清洁页面日志与 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v149.md`。
 - [x] v150 修复 Dashboard 长页 reveal 的灰暗加载感：新增高内聚 `reveal-readability.css`，未显示区保持 `opacity: 1`，仅使用 8px 垂直入场位移，并补齐 reduced-motion/forced-colors 降级。
 - [x] v150 通过项目源码临时端口 `5026` 的 1440/390px 首屏与 390px `ANALYSIS` 深滚回归确认 reveal 可读性、路由上下文、无横向溢出、清洁页面日志和 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v150.md`。
+- [x] v151 为 Dashboard 分析区新增高内聚 `analysis-signal.css`：标题信号点、标题底轨、绘图区边界、TOKEN SHARE 状态胶囊与图例分隔线；不改 Chart.js 数据和接口。
+- [x] v151 通过项目源码临时端口 `5026` 的 1440/390/320px 真实浏览器回归确认图表层级、canvas ARIA、320px 内部溢出为 0、移动路由上下文、清洁页面日志和 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v151.md`。

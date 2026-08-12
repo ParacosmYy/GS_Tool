@@ -1,0 +1,188 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Give the Dashboard analytics bay a clear title rail and a calm
+ *          plotting boundary without touching Chart.js data or API state.
+ * Module: UI-1 visual director / 03-observatory / analysis signal
+ * Contract: Heading, chart viewport, and model legend form one scan path;
+ *           system color and reduced-motion preferences remain authoritative.
+ */
+
+#analysis.visual-grid {
+  position: relative;
+}
+
+#analysis.visual-grid::before {
+  position: absolute;
+  top: -7px;
+  right: 18%;
+  left: 18%;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(217,255,120,.52), rgba(196,192,255,.32), transparent);
+  opacity: .72;
+}
+
+#analysis .chart-card {
+  display: flex;
+  flex-direction: column;
+}
+
+#analysis .card-heading {
+  position: relative;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+}
+
+#analysis .card-heading::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(230,235,245,.2), rgba(230,235,245,.08) 62%, transparent);
+}
+
+#analysis .card-heading .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#analysis .card-heading .eyebrow::before {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 auto;
+  content: "";
+  border-radius: 50%;
+  background: var(--signal-lime);
+  box-shadow: 0 0 10px rgba(217,255,120,.52);
+}
+
+#analysis .legend-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 26px;
+  padding: 5px 9px;
+  border: 1px solid rgba(230,235,245,.22);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  background: rgba(18,32,48,.16);
+  letter-spacing: .08em;
+  line-height: 1;
+}
+
+#analysis .legend-note::before {
+  width: 5px;
+  height: 5px;
+  content: "";
+  border-radius: 50%;
+  background: var(--signal-lime);
+  box-shadow: 0 0 9px rgba(217,255,120,.58);
+}
+
+#analysis .chart-wrap[data-chart-state="ready"] {
+  overflow: hidden;
+  border: 1px solid rgba(230,235,245,.1);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(196,192,255,.035), transparent 26%),
+    rgba(7,14,24,.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+#analysis .chart-wrap[data-chart-state="ready"]::after {
+  position: absolute;
+  top: 0;
+  right: 12%;
+  left: 12%;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(196,192,255,.34), transparent);
+}
+
+#analysis .chart-card > .chart-wrap[data-chart-state="ready"] {
+  flex: 1 1 auto;
+}
+
+#analysis .model-legend {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(230,235,245,.1);
+}
+
+@media (max-width: 620px) {
+  #analysis.visual-grid::before {
+    right: 12%;
+    left: 12%;
+  }
+
+  /* The legacy doughnut bay caps itself at 300px on desktop. On a 320px
+     viewport that cap is wider than the card's content rail, so explicitly
+     let both ready charts shrink with their parent instead of creating a
+     hidden horizontal escape path. */
+  #analysis .chart-wrap[data-chart-state="ready"] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #analysis .chart-wrap[data-chart-state="ready"] canvas {
+    max-width: 100%;
+  }
+
+  #analysis .card-heading {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  #analysis .card-heading .eyebrow {
+    gap: 7px;
+  }
+
+  #analysis .legend-note {
+    min-height: 24px;
+    padding: 4px 7px;
+    font-size: 9px;
+  }
+
+  #analysis .model-legend {
+    margin-top: 12px;
+    padding-top: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #analysis.visual-grid::before,
+  #analysis .card-heading .eyebrow::before,
+  #analysis .legend-note::before {
+    box-shadow: none;
+  }
+}
+
+@media (forced-colors: active) {
+  #analysis.visual-grid::before,
+  #analysis .card-heading::after,
+  #analysis .chart-wrap[data-chart-state="ready"]::after {
+    background: CanvasText;
+    opacity: 1;
+  }
+
+  #analysis .legend-note,
+  #analysis .chart-wrap[data-chart-state="ready"] {
+    border-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+  }
+
+  #analysis .card-heading .eyebrow::before,
+  #analysis .legend-note::before {
+    background: CanvasText;
+    box-shadow: none;
+  }
+}
