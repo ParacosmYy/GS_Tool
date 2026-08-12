@@ -6,16 +6,17 @@
  * Module: Web presentation / responsive tuning layer
  */
 
-/* The AI TOKEN row is scene chrome, not a content panel. Keep the artwork
-   visible through a low-alpha glass wash so the row reads as transparent
-   without losing the text contrast required by the moving illustration. */
+/* The AI TOKEN row is scene chrome, not a content panel. Keep a clear baseline
+   here; the final brand-transparency contract adds the shared low-alpha glass
+   wash after every layer has loaded, without coupling this breakpoint module
+   to the shell material decision. */
 .site-header.is-scrolled {
   border-bottom-color: transparent;
   background: transparent;
   background-color: transparent;
   background-image: none;
-  /* The header is a window, not a glass slab. No blur or shadow is allowed to
-     create a seam while the moving artwork passes beneath the AI TOKEN row. */
+  /* Do not add a second local surface at this breakpoint. The final shell
+     contract owns the single shared material and prevents a dense seam. */
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
   box-shadow: none;
@@ -48,7 +49,8 @@
 }
 
 @media (min-width: 621px) and (max-width: 900px) {
-  /* Keep the transparent contract when the navigation compresses on tablet. */
+  /* Keep the clear baseline when the navigation compresses on tablet; the
+     final shell contract remains the single material owner. */
   .site-header.is-scrolled::before { display: none; }
 }
 
@@ -63,9 +65,10 @@
   display: none;
 }
 
-  /* Keep the brand row a literal clear window. Text keylines and the separate
-     scroll-progress trace carry hierarchy; painting a wash here would make the
-     top line read as an opaque panel over bright character and monitor pixels. */
+  /* Keep the brand row free of a second local surface. Text keylines and the
+     separate scroll-progress trace carry hierarchy; the final shell contract
+     supplies the one shared low-alpha wash over bright character and monitor
+     pixels. */
 @media (forced-colors: none) {
   .site-header,
   .site-header.is-scrolled {

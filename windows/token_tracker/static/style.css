@@ -80,7 +80,7 @@ body::after {
  * Compatibility scene boundary for an already-running personal launcher.
  * Older launcher processes can keep an earlier template stylesheet chain in
  * memory while serving the current static files. Keep the artwork available
- * through the canonical base stylesheet so the transparent brand row never
+ * through the canonical base stylesheet so the translucent brand row never
  * falls back to a black canvas during that transition. The richer scene
  * module loaded by current templates intentionally overrides these defaults.
  */

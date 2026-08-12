@@ -41,8 +41,9 @@ body.pointer-ready:not(.pointer-idle) .pointer-aura,
 body.pointer-ready:not(.pointer-idle) .pointer-ring { visibility: visible; }
 
 /* Keep the AI TOKEN lockup attached to the scene without turning the header
-   into a filled panel. Resting and scrolling states stay fully transparent;
-   the progress line and text halo carry the navigation hierarchy. */
+   into a filled panel. This module owns the clear baseline; the final
+   brand-transparency contract adds only a low-alpha glass wash after the full
+   stylesheet chain has loaded. The progress line and text halo carry hierarchy. */
 .site-header {
   background: transparent;
   background-image: none;
@@ -55,8 +56,9 @@ body.pointer-ready:not(.pointer-idle) .pointer-ring { visibility: visible; }
 
 .site-header.is-scrolled {
   border-bottom-color: transparent;
-  /* Keep the brand row transparent after scroll as well. The progress line
-     and existing text halo carry hierarchy without a tinted glass slab. */
+  /* Keep the clear scrolling baseline here. The final shell contract decides
+     whether the compatible reading wash is active; this module does not own
+     the cross-layer material boundary. */
   background: transparent;
   background-image: none;
   -webkit-backdrop-filter: none;

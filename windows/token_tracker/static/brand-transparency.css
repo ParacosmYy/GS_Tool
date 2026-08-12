@@ -1,29 +1,31 @@
 /*
  * Author: AI Token Tracker Engineering Team
  * Maintainer: Project Owner
- * Purpose: Enforce the transparent contract for the sticky AI TOKEN brand row
- *          after every shared visual layer has been loaded.
+ * Purpose: Enforce the translucent glass contract for the sticky AI TOKEN
+ *          brand row after every shared visual layer has been loaded.
  * Module: Web presentation / 01-shell / brand transparency boundary
  */
 
 /*
- * The artwork is the surface behind the brand row. Keep this contract in its
+ * The artwork remains visible through the brand row. Keep this contract in its
  * own final stylesheet so later visual modules cannot accidentally turn the
  * navigation chrome into an opaque panel. The !important flags are deliberate:
  * this is a cross-module boundary, not a component-level preference.
  */
 .site-header,
 .site-header.is-scrolled {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  border-bottom-color: transparent !important;
-  box-shadow: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
+  background-color: rgba(8, 14, 22, .16) !important;
+  background-image:
+    linear-gradient(180deg, rgba(12, 19, 29, .34), rgba(8, 14, 22, .12)) !important;
+  border-bottom-color: rgba(230, 235, 245, .13) !important;
+  box-shadow:
+    0 10px 30px rgba(2, 8, 14, .08),
+    inset 0 1px 0 rgba(255, 255, 255, .05) !important;
+  -webkit-backdrop-filter: blur(11px) saturate(1.08) !important;
+  backdrop-filter: blur(11px) saturate(1.08) !important;
 }
 
-/* Child surfaces must not reintroduce a local wash inside the transparent row. */
+/* Child surfaces must not reintroduce a local wash inside the glass row. */
 .site-header > *,
 .site-header .brand,
 .site-header .brand-mark,
@@ -36,7 +38,7 @@
   box-shadow: none;
 }
 
-/* Preserve glyph separation without painting a dark capsule behind the copy. */
+/* Preserve glyph separation without painting a solid capsule behind the copy. */
 .site-header .brand-lockup strong,
 .site-header .site-nav a,
 .site-header .user-chip {
@@ -48,6 +50,16 @@
 /* The progress trace is a boundary cue, not a filled header background. */
 .site-header::after {
   box-shadow: 0 0 8px rgba(217, 255, 120, .22);
+}
+
+/* A slightly stronger wash on narrow screens keeps the brand readable over
+   the cropped illustration without making the full row look opaque. */
+@media (max-width: 620px) {
+  .site-header,
+  .site-header.is-scrolled {
+    background-image:
+      linear-gradient(180deg, rgba(8, 14, 22, .42), rgba(8, 14, 22, .18)) !important;
+  }
 }
 
 @media (forced-colors: active) {

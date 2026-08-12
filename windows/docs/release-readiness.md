@@ -362,6 +362,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 
 导航模块为初始 `#connect/#activity/#history` 启用有时限的即时 hash 校正：等待异步 Dashboard 高度稳定后将目标重新放到透明顶栏阅读带下方，用户开始交互时取消并恢复平滑滚动；无 hash 页面与普通导航行为不变。真实 `5000` 已完成全新浏览器上下文三章节矩阵、普通 Connect 点击、滚动策略释放、横向溢出和清洁日志验证，证据见 `ui-accessibility-evidence-v124.md`。
 
+## v125 AI TOKEN 顶部半透明玻璃层
+
+最终品牌边界将顶部 AI TOKEN 行从“强制完全透明”调整为低 alpha 深蓝玻璃：普通模式使用轻量纵向渐变、`blur(11px)` 和弱内侧高光，背景插画仍能连续透出；旧启动器的 `ui-polish.css` 也保留同一兼容规则，`620px` 以下仅提升渐变可读性，`forced-colors` 继续恢复系统 Canvas，避免高对比模式被移动规则覆盖。两个既有本地服务均返回新样式资源，未重启保护端口；证据见 `ui-accessibility-evidence-v125.md`。
+
 ## 最终签署条件
 
 1. Android APK 已由批准工具链构建、安装到授权设备并完成同账号联调。

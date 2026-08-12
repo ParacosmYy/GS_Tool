@@ -1,15 +1,16 @@
 /*
  * Author: AI Token Tracker Engineering Team
  * Maintainer: Project Owner
- * Purpose: Give the transparent sticky brand row an optical boundary without
- *          turning it into a filled panel or coupling it to page content.
+ * Purpose: Give the sticky brand row an optical boundary without turning it
+ *          into a filled panel or coupling it to page content.
  * Module: Web presentation / 01-shell / brand chrome
  */
 
 /*
- * The header is intentionally a window onto the illustration. This hairline
- * is only a composited edge: it carries the reading boundary while the
- * computed surface remains transparent, unblurred, and shadow-free.
+ * The header is intentionally a window onto the illustration. This module
+ * defines the no-fill baseline and composited edge; the final
+ * `brand-transparency.css` contract may add a low-alpha glass wash after all
+ * shared layers are loaded. Neither module owns page content or data state.
  */
 .site-header {
   isolation: isolate;

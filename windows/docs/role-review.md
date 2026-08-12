@@ -510,7 +510,15 @@
 - UI-2：`navigation.js` 新增有时限 `settleInitialHash`，复用目标 `scrollMarginTop` 和 body `ResizeObserver`；初始化 hash 使用即时滚动，连续稳定或用户交互后恢复平滑滚动。
 - UI-3：全新浏览器上下文已确认 `#connect/#activity/#history`、无 hash 首屏、Connect 点击导航、滚动策略释放、heading 结构、无横向溢出和清洁日志；证据见 `ui-accessibility-evidence-v124.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Key 生命周期或数据流改动；保护端口 `5000/5011` 未触碰。
-- 架构师：变化限定在 `01-shell / navigation contract`，无新依赖、无跨层耦合，`navigation.js` 290 行、`style.css` 674 行，回滚边界为 v124 导航函数与滚动 class。
+- 架构师：变化限定在 `01-shell / navigation contract`，无新依赖、无跨层耦合，当前 `navigation.js` 260 行、`style.css` 628 行，回滚边界为 v124 导航函数与滚动 class。
+
+## v125 AI TOKEN 顶部半透明玻璃层
+
+- UI-1：修复最上方 AI TOKEN 行虽然“透明”但在深色场景中看起来像黑色覆盖带的问题；背景角色和设备轮廓继续可见，文字获得有限阅读底。
+- UI-2：最终 `brand-transparency.css` 将强制透明规则改为低 alpha 深蓝渐变、`blur(11px)`、弱边界阴影与窄屏轻增强；`ui-polish.css` 同步提供旧启动器兼容层，移动媒体查询置于 `forced-colors` 之前，系统高对比度可安全覆盖。
+- UI-3：5000/5011 返回新样式资源，Git diff/compileall/文本行数门禁通过；浏览器此前已确认品牌行几何不变，未新增 DOM 或交互状态，独立证据见 `ui-accessibility-evidence-v125.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口 `5000/5011` 未触碰。
+- 架构师：变化限定在 `01-shell` 视觉契约，保留独立回滚点；`brand-transparency.css` 91 行，未引入跨层依赖，forced-colors/reduced-motion 边界明确。
 
 ## 集成闸门
 

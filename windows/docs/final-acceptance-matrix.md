@@ -435,6 +435,11 @@
 - 导航模块为初始分享 hash 增加异步高度稳定定位，确保 `#connect/#activity/#history` 直接打开时章节标题位于透明 AI TOKEN 顶栏下方；用户交互立即取消自动校正，普通平滑导航不变。
 - 全新浏览器上下文确认三个章节最终落点、无 hash 首屏、Connect 点击导航、滚动策略释放、横向溢出和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v124.md`。
 
+### v125 交付增量
+
+- 最上方 AI TOKEN 品牌行改为低 alpha 深蓝玻璃层：保留背景透出、轻量 `blur(11px)`、边界高光和移动端可读性增强；`ui-polish.css` 为旧启动器提供同契约回退，不再由最后一层 CSS 强制清空材质，也不引入实色黑色面板。
+- 同步修正 `header-chrome.css`、`ui-polish.css`、基础样式及证据注释；5000/5011 样式资源返回正常，Python 编译、Git 空白和文本文件行数门禁通过，保护服务未重启；证据见 `docs/ui-accessibility-evidence-v125.md`。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
