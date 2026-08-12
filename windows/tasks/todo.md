@@ -299,3 +299,5 @@
 - [x] v89 通过真实隔离 5185 实例确认首屏/720px/1200px、透明顶栏、预落位与 settled 状态、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v89.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 - [x] v90 将周期切换器外壳从偏黑高 alpha 砖块收敛为低 alpha 深蓝透景层，保留 active lime pill 与 forced-colors 隔离。
 - [x] v90 通过真实隔离 5186 实例确认首屏/滚动态截图、Today/Week/Month/All time 四档状态、ARIA pressed、透明顶栏、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v90.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+- [x] v91 扩展 sticky 避让边界到 `.card-heading`：标题穿过透明 AI TOKEN 顶栏时退出视觉层，离开后恢复；保留 DOM、辅助阅读和焦点恢复。
+- [x] v91 通过真实隔离 5187 实例确认 `scrollY=1118` 深度避让、`scrollY=898` 返回恢复、透明顶栏、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v91.md`，viewport override、真实设备与辅助偏好继续独立门禁。

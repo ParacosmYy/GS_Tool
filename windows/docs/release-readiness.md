@@ -224,6 +224,10 @@ Dashboard 的核心计数器增加低干扰 `core-sweep` 内部扫描弧，强�
 
 周期切换器在普通配色下改为 `.58` alpha 深蓝透景层与 `blur(12px) saturate(1.08)`，active lime pill、四档 period 状态和 forced-colors 边界保持不变。5186 隔离实例已完成首屏与滚动态截图、Today/Week/Month/All time 真实点击、ARIA pressed、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v90.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v91 sticky 标题阅读边界
+
+sticky 避让模块现在同时保护按钮、折叠入口和 `.card-heading`：标题进入透明 AI TOKEN 顶栏交叠带时仅退出视觉层，保留 DOM 与辅助阅读；离开后恢复，包含按钮的管理标题通过 `:focus-within` 保持可操作。5187 隔离实例已完成 `scrollY=1118` 深度避让、`scrollY=898` 返回恢复、截图、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v91.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

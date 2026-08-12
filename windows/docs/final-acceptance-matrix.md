@@ -275,6 +275,11 @@
 - 周期切换器普通配色改为低 alpha 深蓝透景层与轻微 blur，active lime pill、period API、ARIA pressed、DOM 和数据请求契约不变；forced-colors 不进入玻璃规则。
 - 5186 隔离实例真实确认首屏/滚动态、Today/Week/Month/All time 四档状态与 pill 几何、透明顶栏、无横向溢出和清洁页面日志；新证据见 `ui-accessibility-evidence-v90.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+### v91 交付增量
+
+- sticky 避让候选扩展到 `.site-main .card-heading`；深度滚动时标题视觉退出 sticky 顶栏交叠带，返回后恢复，DOM、h1/h2 语义、API 和业务数据不变；`:focus-within` 保留标题内按钮操作。
+- 5187 隔离实例真实确认 `scrollY=1118/898` 的避让与恢复、透明 AI TOKEN 顶栏、无横向溢出和清洁页面日志；新证据见 `ui-accessibility-evidence-v91.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

@@ -1,12 +1,13 @@
 /*
  * Author: AI Token Tracker Engineering Team
  * Maintainer: Project Owner
- * Purpose: Keep interactive content visually clear of the sticky header band.
+ * Purpose: Keep interactive content and card landmarks visually clear of the
+ *          sticky header band.
  * Module: Web presentation / sticky chrome boundary
  */
 
 const OCCLUDED_CLASS = "is-under-sticky-header";
-const CANDIDATE_SELECTOR = ".site-main .button, .site-main summary";
+const CANDIDATE_SELECTOR = ".site-main .button, .site-main summary, .site-main .card-heading";
 
 function intersectsHeader(element, headerRect) {
   const rect = element.getBoundingClientRect();
@@ -18,7 +19,7 @@ function isFocused(element) {
 }
 
 /**
- * Hide only the visual signal of controls crossing sticky chrome.
+ * Hide only the visual signal of controls or landmarks crossing sticky chrome.
  *
  * The element keeps its layout box and tab order. A focused control is never
  * dimmed, so keyboard users can still discover and operate it while scrolling.

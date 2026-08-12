@@ -298,6 +298,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的 `forced-colors: none` 表现规则，不改变 period API、状态编排、DOM、认证、业务数据或请求；系统配色不被新规则覆盖。
 - UI-3：真实 5186 隔离实例已确认首屏/滚动态截图、四档 period 点击、ARIA pressed、42 个可见焦点控件、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v90.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+## v91 sticky 标题阅读边界
+
+- UI-1：解决深度滚动时分析卡片标题穿过透明 sticky 顶栏并被截断的问题，复用现有避让策略，不引入新的视觉遮罩。
+- UI-2：变更集中在 `sticky-occlusion.js` 候选集合与 `responsive-tuning.css` 表现契约；保留 DOM、辅助语义、焦点路径、forced-colors、reduced-motion、API、认证和业务数据边界。
+- UI-3：真实 5187 隔离实例已确认 `scrollY=1118` 避让、`scrollY=898` 恢复、42 个可见焦点控件、1 个 h1/8 个 h2、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v91.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
