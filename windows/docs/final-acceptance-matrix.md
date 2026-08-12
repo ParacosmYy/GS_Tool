@@ -620,3 +620,10 @@
 - UI-3：源码临时端口 `5026` 的 320/390/1440 真实浏览器回归通过：状态文本、`aria-current`、桌面 `display:none`、目标落点、无横向溢出、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v147.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
 - 架构师：新增文件 79 行，`ui-polish.css` 991 行，导航模块 333 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
+
+## v148 AI TOKEN 透明品牌行最终契约
+
+- 顶部 `AI TOKEN` 品牌行在兼容链与完整链统一为透明背景、无 composited shadow、无 blur；signal line 和文字 keyline 保留层级。
+- 5026 隔离登录/注册 1440/390px 与真实 5000/5011 入口回归通过：计算样式、移动端几何、无横向溢出和页面日志均正常；证据见 `docs/ui-accessibility-evidence-v148.md`。
+- 本轮不改变认证、模板语义、导航、数据库、Provider、API、Key 生命周期或数据流；保护服务 PID `43832/8100` 未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。

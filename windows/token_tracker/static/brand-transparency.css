@@ -25,6 +25,17 @@
   backdrop-filter: none !important;
 }
 
+/* `brand-clarity.css` also serves the legacy launcher and intentionally adds
+   a very soft inset edge. The current shell loads this file last, so the
+   final transparency boundary must neutralise that higher-specificity edge:
+   a shadow still composites as a filled strip over bright artwork. The
+   progress trace and glyph keylines below remain the only persistent
+   separation cues. */
+body .site-header,
+body .site-header.is-scrolled {
+  box-shadow: none !important;
+}
+
 /* Child surfaces must not reintroduce a local wash inside the glass row. */
 .site-header > *,
 .site-header .brand,
@@ -52,8 +63,8 @@
   box-shadow: 0 0 8px rgba(217, 255, 120, .22);
 }
 
-/* A slightly stronger wash on narrow screens keeps the brand readable over
-   the cropped illustration without making the full row look opaque. */
+/* Narrow screens use the same no-fill contract. The cropped illustration is
+   separated by the signal line and glyph keylines, never by a mobile wash. */
 @media (max-width: 620px) {
   .site-header,
   .site-header.is-scrolled {

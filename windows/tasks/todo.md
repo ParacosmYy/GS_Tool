@@ -410,3 +410,5 @@
 - [x] v146 通过项目源码临时端口 `5026` 的 320/390/1440 真实浏览器回归确认元数据列、占位文本、48px 提交按钮、无横向溢出、页面日志与 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v146.md`。
 - [x] v147 为移动端透明品牌栏增加当前 Dashboard 分区上下文：复用既有导航 active 状态显示 `OVERVIEW / ANALYSIS / CONNECT / ACTIVITY / HISTORY`，桌面端保持隐藏。
 - [x] v147 通过项目源码临时端口 `5026` 的 320/390/1440 真实浏览器回归确认路由文本、`aria-current`、深链落点、无横向溢出、页面日志与降级规则；独立证据写入 `docs/ui-accessibility-evidence-v147.md`。
+- [x] v148 修复最上方 `AI TOKEN` 品牌行透明但像黑色横带的根因：兼容链与完整链统一移除 header inset shadow，保留透明背景、signal line、文字 keyline、focus 和系统色降级。
+- [x] v148 通过隔离 `5026` 的登录/注册 1440/390px 与真实 `5000/5011` 入口回归确认 computed style、移动端无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v148.md`。

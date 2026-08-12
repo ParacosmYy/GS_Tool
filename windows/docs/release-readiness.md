@@ -521,3 +521,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 项目源码临时服务 `5026` 的 320/390/1440 真实浏览器回归通过；`aria-current`、无横向溢出、深链落点和页面日志正常；证据见 `docs/ui-accessibility-evidence-v147.md`。
 - 本轮修改前端模板、导航表现逻辑与 CSS presentation contract，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
+
+## v148 AI TOKEN 透明品牌行最终契约
+
+- 5000 与 5011 真实入口的 AI TOKEN header 已确认 `background=transparent`、`box-shadow=none`、`backdrop-filter=none`，普通场景不再合成黑色横带。
+- 5026 隔离登录/注册页的 1440/390px 回归通过；文档无横向溢出，表单卡片与焦点路径保持。
+- 本轮只修改共享前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。

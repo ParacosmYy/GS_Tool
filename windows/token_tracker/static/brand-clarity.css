@@ -4,8 +4,8 @@
  * Purpose: Keep the shared AI TOKEN brand rails genuinely transparent across
  *          the legacy launcher and the current web shell.
  * Module: Web presentation / 01-shell / transparency boundary
- * Contract: No filled header surface; optical separation comes from hairline
- *           light and a restrained inset shadow only.
+ * Contract: No filled header surface, blur, or composited shadow; optical
+ *           separation comes from the signal line and text keylines only.
  */
 
 /*
@@ -25,13 +25,12 @@ body .hero-topline {
   -webkit-backdrop-filter: none !important;
 }
 
-/* A light optical edge keeps the transparent row readable over the dark
-   source artwork without painting a black band behind the brand. */
+/* Keep the compatibility chain genuinely clear. Even a low-alpha inset edge
+   composites as a material strip over bright artwork, so the signal line and
+   glyph keylines below remain the only persistent separation cues. */
 body .site-header,
 body .site-header.is-scrolled {
-  box-shadow:
-    inset 0 1px 0 rgba(237, 245, 255, .08),
-    inset 0 -18px 28px -30px rgba(196, 192, 255, .72) !important;
+  box-shadow: none !important;
 }
 
 body .site-header > *,
@@ -54,9 +53,7 @@ body .hero-topline {
 @media (max-width: 620px) {
   body .site-header,
   body .site-header.is-scrolled {
-    box-shadow:
-      inset 0 1px 0 rgba(237, 245, 255, .1),
-      inset 0 -16px 24px -28px rgba(196, 192, 255, .78) !important;
+    box-shadow: none !important;
   }
 }
 
