@@ -508,3 +508,11 @@
 - UI-3：真实 `5000` 的 320/390/768px 与桌面末端、`5011` 完整链、空态文案、卡片溢出和清洁日志已确认；证据见 `docs/ui-accessibility-evidence-v132.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未重启。
 - 架构师：变化限定在 `03-observatory / legacy presentation compatibility boundary`，不改变 populated table、DOM、脚本或数据契约；文件仍低于 1000 行。
+
+## v133 AI TOKEN 品牌行完全透景
+
+- UI-1：修复最上方 `AI TOKEN` 行在旧入口和完整入口中像深色覆盖带的问题；品牌栏现在完全透过背景场景，文字 keyline、进度线和焦点状态保持可读。
+- UI-2：`ui-polish.css` 与 `brand-transparency.css` 统一为普通配色 `transparent / none / no blur / no shadow`；其它 header 模块只维护边界和职责说明，不新增 DOM、脚本或依赖。
+- UI-3：真实 5000 桌面首屏/深滚、5011 完整链 computed style、截图、DOM 快照、无正向横向溢出和清洁日志已确认；证据见 `ui-accessibility-evidence-v133.md`。
+- 后端：无后端、认证、数据库、CSRF、Provider 或数据契约变化；保护 PID 保持不变。
+- 架构师：变化限定在 `01-shell / brand transparency boundary`，`ui-polish.css=919`、`brand-transparency.css=100`，所有修改文件均低于 1000 行；正式 Android、EXE 签名、HTTPS/ACL、真实 Provider、备份恢复和真实设备门禁继续 pending。

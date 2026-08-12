@@ -42,7 +42,7 @@ body.pointer-ready:not(.pointer-idle) .pointer-ring { visibility: visible; }
 
 /* Keep the AI TOKEN lockup attached to the scene without turning the header
    into a filled panel. This module owns the clear baseline; the final
-   brand-transparency contract adds only a low-alpha glass wash after the full
+   brand-transparency contract preserves that no-fill boundary after the full
    stylesheet chain has loaded. The progress line and text halo carry hierarchy. */
 .site-header {
   background: transparent;

@@ -423,3 +423,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实桌面与移动末端、5011 完整链、空态文案和无横向溢出已完成回归；证据见 `ui-accessibility-evidence-v132.md`。
 - 本轮仅改 `legacy-observatory.css`，无后端、认证、数据库、Provider 或数据流变更；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好门禁继续保持 pending。
+
+## v133 AI TOKEN 品牌行完全透景
+
+- 共享旧入口与完整品牌层的 header 已移除普通配色下的背景 wash、blur、阴影和底边线，computed style 统一为透明/无图/无 blur/无 shadow；背景插画和品牌 lockup 连续可见。
+- 真实 5000 首屏、`scrollY=900` 深滚、5011 完整入口和清洁页面日志已完成回归；证据见 `ui-accessibility-evidence-v133.md`。
+- 本轮仅改动前端 CSS 契约与职责注释，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好门禁继续保持 pending。

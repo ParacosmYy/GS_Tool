@@ -9,7 +9,7 @@
 /*
  * The header is intentionally a window onto the illustration. This module
  * defines the no-fill baseline and composited edge; the final
- * `brand-transparency.css` contract may add a low-alpha glass wash after all
+ * `brand-transparency.css` contract preserves the no-fill boundary after all
  * shared layers are loaded. Neither module owns page content or data state.
  */
 .site-header {

@@ -584,3 +584,11 @@
 - UI-3：320/390/768px、桌面末端、5011 完整链、空态宽度、卡片 overflow、页脚和应用日志已复核；证据见 `ui-accessibility-evidence-v132.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
 - 架构师：新增 empty state 与 footer block 保持高内聚，forced-colors/reduced-motion/键盘路径明确，文件行数继续低于 1000 行。
+
+## v133 AI TOKEN 品牌行完全透景
+
+- UI-1：真实运行证据确认旧 `5000` 入口和完整 `5011` 入口的顶栏仍受 header wash 影响；移除普通配色下的背景填充、渐变、blur、阴影和底边线，恢复插画与品牌行的连续透景。
+- UI-2：共享 `ui-polish.css` 与最终 `brand-transparency.css` 统一为透明材质契约；`header-chrome.css`、`scene-motion.css`、`responsive-tuning.css` 只保留边界/注释职责，不新增监听器、DOM、依赖或业务状态。
+- UI-3：真实 `1683×892` 首屏、`scrollY=900` 深滚、5011 完整入口 computed style、截图、DOM 快照和清洁日志已复核；证据见 `ui-accessibility-evidence-v133.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID 保持 `43832/8100`。
+- 架构师：变化限定在 `01-shell / brand transparency boundary`，所有修改文件低于 1000 行；回滚边界为共享材质声明和职责注释。

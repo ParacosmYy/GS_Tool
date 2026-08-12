@@ -382,3 +382,5 @@
 - [x] v131 通过真实 `5000` 桌面/390px 长页面、`5011` 完整链、Week 周期点击和手动补录展开确认材质一致性、无新增横向溢出、交互状态和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v131.md`。
 - [x] v132 修复旧入口活动历史空态在移动端沿用 `540px` 表格宽度导致的横向滚动，补齐 320/390/768px 空态收缩规则，并为 Dashboard 末端增加低 alpha terminal footer signal。
 - [x] v132 通过真实 `5000` 桌面/320px/390px/768px 末端、`5011` 完整链确认空态文案完整、卡片内部溢出为 0、页脚收束和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v132.md`。
+- [x] v133 修复 5000 旧入口与 5011 完整入口最上方 `AI TOKEN` 品牌行的黑色覆盖观感：移除普通配色下 header 的背景填充、渐变、blur、阴影和底边线，保留文字 keyline、signal line、焦点和系统色降级。
+- [x] v133 通过真实 `5000` 首屏/`scrollY=900` 深滚、`5011` 完整链 computed style、截图、DOM 快照、无正向横向溢出、清洁日志、Python 编译和 `14 pass / 1 pending / 0 fail` 审计；独立证据写入 `docs/ui-accessibility-evidence-v133.md`。

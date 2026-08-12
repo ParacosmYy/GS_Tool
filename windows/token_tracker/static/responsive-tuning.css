@@ -7,9 +7,9 @@
  */
 
 /* The AI TOKEN row is scene chrome, not a content panel. Keep a clear baseline
-   here; the final brand-transparency contract adds the shared low-alpha glass
-   wash after every layer has loaded, without coupling this breakpoint module
-   to the shell material decision. */
+   here; the final brand-transparency contract keeps the row fully transparent
+   after every layer has loaded, without coupling this breakpoint module to a
+   surface material decision. */
 .site-header.is-scrolled {
   border-bottom-color: transparent;
   background: transparent;
@@ -36,7 +36,7 @@
 
   /* Keep the complete AI TOKEN row as a clear window onto the scene. The
      right-side controls use text keylines and the active underline for
-     hierarchy; the low-alpha wash is shared by the whole row. */
+     hierarchy; no header-wide wash is allowed here. */
   .site-header.is-scrolled .site-nav,
   .site-header.is-scrolled .user-menu {
     position: relative;
@@ -65,10 +65,9 @@
   display: none;
 }
 
-  /* Keep the brand row free of a second local surface. Text keylines and the
-     separate scroll-progress trace carry hierarchy; the final shell contract
-     supplies the one shared low-alpha wash over bright character and monitor
-     pixels. */
+  /* Keep the brand row free of a local surface. Text keylines and the separate
+     scroll-progress trace carry hierarchy; the scene remains visible beneath
+     bright character and monitor pixels. */
 @media (forced-colors: none) {
   .site-header,
   .site-header.is-scrolled {
