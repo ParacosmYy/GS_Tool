@@ -363,3 +363,5 @@
 - [x] v122 通过真实 `5000` 页面确认 `320×720/320×844/390×844/768×900/1024×900/1440×900` 六档无横向溢出、390px 首屏几何、Week 周期交互、Dashboard 标题层级、深滚空态可读性和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v122.md`，真实设备与辅助偏好继续独立门禁。
 - [x] v123 修复旧个人启动器只加载基础样式时的 sticky 顶栏遮挡兼容边界：基础 `style.css` 实现既有 `is-under-sticky-header`、`has-sticky-occlusion` 与 `is-sticky-fragment` 契约，保持焦点恢复、reduced-motion 和 forced-colors 行为。
 - [x] v123 通过真实 `5000` 页面确认深滚分析标题淡出、卡片 mask、透明顶栏计算值、`320×720/320×844/390×844/768×900/1024×900/1440×900` 六档响应式、Week/键盘焦点和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v123.md`，真实设备与辅助偏好继续独立门禁。
+- [x] v124 为 Dashboard 初始 `#connect/#activity/#history` 分享链接增加有时限的 hash 稳定定位：异步内容高度变化后重新对齐透明顶栏下方，用户滚轮/触摸/指针/键盘操作立即取消，普通导航平滑滚动保持不变。
+- [x] v124 通过全新浏览器上下文确认三个章节最终落点、无 hash 首屏、Connect 点击导航、滚动策略释放、无横向溢出和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v124.md`，真实设备与辅助偏好继续独立门禁。

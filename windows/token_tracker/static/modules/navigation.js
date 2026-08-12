@@ -68,6 +68,86 @@ function targetScrollTop(target) {
 }
 
 /**
+ * Keep an initial shared link aligned while async dashboard surfaces settle.
+ *
+ * Chart states, records, and activity history are populated after the first
+ * document paint. Native hash scrolling can therefore land against an older
+ * document height and leave a shared `#connect`, `#activity`, or `#history`
+ * link above or below its intended reading lane. This bounded synchronizer
+ * owns only the initial hash; once the target is stable, or the user starts a
+ * gesture, normal browser scrolling remains completely in control.
+ *
+ * @param {HTMLElement | null} target Initial same-document hash target.
+ */
+function settleInitialHash(target) {
+  const root = document.documentElement;
+  if (!target || !window.location.hash) {
+    root.classList.add("scroll-motion-enabled");
+    return;
+  }
+
+  root.classList.remove("scroll-motion-enabled");
+  const previousScrollBehavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  let stopped = false;
+  let frame = 0;
+  let timeout = 0;
+  let stableSamples = 0;
+  let previousHeight = 0;
+  let previousDestination = -1;
+  const settleDeadline = performance.now() + 2600;
+
+  const stop = () => {
+    if (stopped) return;
+    stopped = true;
+    if (frame) window.cancelAnimationFrame(frame);
+    if (timeout) window.clearTimeout(timeout);
+    observer?.disconnect();
+    root.style.scrollBehavior = previousScrollBehavior;
+    root.classList.add("scroll-motion-enabled");
+    ["wheel", "touchstart", "pointerdown", "keydown"].forEach((eventName) => {
+      window.removeEventListener(eventName, cancel, { passive: true });
+    });
+  };
+
+  const cancel = () => stop();
+
+  const render = () => {
+    if (stopped) return;
+    const destination = targetScrollTop(target);
+    const documentHeight = document.documentElement.scrollHeight;
+    const destinationStable = Math.abs(destination - previousDestination) < 1;
+    const heightStable = documentHeight === previousHeight;
+    window.scrollTo(0, destination);
+    stableSamples = destinationStable && heightStable ? stableSamples + 1 : 0;
+    previousDestination = destination;
+    previousHeight = documentHeight;
+    if (stableSamples >= 3 || performance.now() >= settleDeadline) {
+      stop();
+      return;
+    }
+    frame = window.requestAnimationFrame(render);
+  };
+
+  const schedule = () => {
+    if (!stopped && !frame) frame = window.requestAnimationFrame(render);
+  };
+
+  // ResizeObserver is the authoritative signal for async chart/table height
+  // changes; the deadline is the safety bound for pages with no observer.
+  let observer;
+  if ("ResizeObserver" in window) {
+    observer = new ResizeObserver(schedule);
+    observer.observe(document.body);
+  }
+  ["wheel", "touchstart", "pointerdown", "keydown"].forEach((eventName) => {
+    window.addEventListener(eventName, cancel, { passive: true });
+  });
+  timeout = window.setTimeout(stop, 2800);
+  schedule();
+}
+
+/**
  * Replace distance-dependent native scrolling with bounded, cancellable motion.
  * The target remains a normal anchor for semantics; only the visual transition
  * is owned here so keyboard, touch, reduced-motion, and sharing behavior stay
@@ -193,8 +273,12 @@ export function setupNavigation() {
   setupScrollProgress();
   const nav = document.querySelector('.site-nav');
   const anchors = [...document.querySelectorAll('a[href]')];
+  const hashTarget = window.location.hash
+    ? document.getElementById(decodeURIComponent(window.location.hash.slice(1)))
+    : null;
   if (!nav || nav.dataset.navigationReady === 'true') {
     setupAnchorScroll(anchors, nav ? [...nav.querySelectorAll('a')] : []);
+    settleInitialHash(hashTarget);
     return;
   }
   nav.dataset.navigationReady = 'true';
@@ -202,4 +286,5 @@ export function setupNavigation() {
   setupRouteContext(links);
   setupSectionContext(links);
   setupAnchorScroll(anchors, links);
+  settleInitialHash(hashTarget);
 }

@@ -358,6 +358,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 
 基础 `style.css` 补齐旧个人启动器下 sticky occlusion class 的视觉契约：深滚内容在透明 AI TOKEN 品牌行覆盖区淡出或使用 feather mask，焦点内容恢复可见，reduced-motion 与 forced-colors 保留降级；不改变透明顶栏本身、模板、脚本、API 或数据流。真实 `5000` 已完成深滚分析区截图、六档响应式、Week/键盘焦点和清洁日志验证，证据见 `ui-accessibility-evidence-v123.md`。
 
+## v124 分享链接章节定位
+
+导航模块为初始 `#connect/#activity/#history` 启用有时限的即时 hash 校正：等待异步 Dashboard 高度稳定后将目标重新放到透明顶栏阅读带下方，用户开始交互时取消并恢复平滑滚动；无 hash 页面与普通导航行为不变。真实 `5000` 已完成全新浏览器上下文三章节矩阵、普通 Connect 点击、滚动策略释放、横向溢出和清洁日志验证，证据见 `ui-accessibility-evidence-v124.md`。
+
 ## 最终签署条件
 
 1. Android APK 已由批准工具链构建、安装到授权设备并完成同账号联调。

@@ -430,6 +430,11 @@
 - 基础 `style.css` 补齐旧个人启动器的 sticky occlusion 视觉契约，使深滚分析标题在透明 AI TOKEN 阅读带内淡出，卡片 surface 使用既有自定义变量 mask，焦点内容恢复可见；顶栏仍保持透明、无 blur、无 shadow。
 - 真实 `5000` 确认深滚标题/卡片层级、六档响应式、Week/键盘焦点、`1 个 h1 / 8 个 h2` 和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v123.md`。
 
+### v124 交付增量
+
+- 导航模块为初始分享 hash 增加异步高度稳定定位，确保 `#connect/#activity/#history` 直接打开时章节标题位于透明 AI TOKEN 顶栏下方；用户交互立即取消自动校正，普通平滑导航不变。
+- 全新浏览器上下文确认三个章节最终落点、无 hash 首屏、Connect 点击导航、滚动策略释放、横向溢出和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v124.md`。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

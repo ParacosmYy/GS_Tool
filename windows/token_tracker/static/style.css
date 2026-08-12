@@ -41,7 +41,8 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; background: var(--bg); }
+html { scroll-behavior: auto; background: var(--bg); }
+html.scroll-motion-enabled { scroll-behavior: smooth; }
 body {
   min-height: 100vh;
   margin: 0;

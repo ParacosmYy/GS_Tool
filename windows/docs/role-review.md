@@ -504,6 +504,14 @@
 - 后端：无后端、数据库、接口、认证、CSRF、Key 生命周期或数据流改动；保护端口 `5000/5011` 未触碰。
 - 架构师：变化限定在 `01-shell` sticky chrome compatibility boundary；无新依赖、无跨层耦合，`style.css` 673 行，回滚边界为 v123 基础样式块。
 
+## v124 分享链接章节定位
+
+- UI-1：解决分享链接因异步内容高度变化而落在错误章节、标题被顶栏遮挡或出现回弹的问题；首次进入即可看到对应上下文。
+- UI-2：`navigation.js` 新增有时限 `settleInitialHash`，复用目标 `scrollMarginTop` 和 body `ResizeObserver`；初始化 hash 使用即时滚动，连续稳定或用户交互后恢复平滑滚动。
+- UI-3：全新浏览器上下文已确认 `#connect/#activity/#history`、无 hash 首屏、Connect 点击导航、滚动策略释放、heading 结构、无横向溢出和清洁日志；证据见 `ui-accessibility-evidence-v124.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Key 生命周期或数据流改动；保护端口 `5000/5011` 未触碰。
+- 架构师：变化限定在 `01-shell / navigation contract`，无新依赖、无跨层耦合，`navigation.js` 290 行、`style.css` 674 行，回滚边界为 v124 导航函数与滚动 class。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
