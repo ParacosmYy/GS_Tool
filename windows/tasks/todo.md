@@ -301,3 +301,5 @@
 - [x] v90 通过真实隔离 5186 实例确认首屏/滚动态截图、Today/Week/Month/All time 四档状态、ARIA pressed、透明顶栏、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v90.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 - [x] v91 扩展 sticky 避让边界到 `.card-heading`：标题穿过透明 AI TOKEN 顶栏时退出视觉层，离开后恢复；保留 DOM、辅助阅读和焦点恢复。
 - [x] v91 通过真实隔离 5187 实例确认 `scrollY=1118` 深度避让、`scrollY=898` 返回恢复、透明顶栏、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v91.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+- [x] v92 将自动采集 `.auto-form-actions` 作为完整 sticky 避让单元，按钮和 Key 隐私说明一起退出视觉层，`:focus-within` 下整行恢复。
+- [x] v92 通过真实隔离 5188 实例确认 `scrollY=2200` 深度避让、Tab 聚焦提交按钮恢复、离开交叠带恢复、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v92.md`，viewport override、真实设备与辅助偏好继续独立门禁。

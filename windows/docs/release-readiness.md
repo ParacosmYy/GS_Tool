@@ -228,6 +228,10 @@ Dashboard 的核心计数器增加低干扰 `core-sweep` 内部扫描弧，强�
 
 sticky 避让模块现在同时保护按钮、折叠入口和 `.card-heading`：标题进入透明 AI TOKEN 顶栏交叠带时仅退出视觉层，保留 DOM 与辅助阅读；离开后恢复，包含按钮的管理标题通过 `:focus-within` 保持可操作。5187 隔离实例已完成 `scrollY=1118` 深度避让、`scrollY=898` 返回恢复、截图、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v91.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v92 自动采集操作行阅读边界
+
+sticky 避让模块现在将自动采集 `.auto-form-actions` 与其提交按钮、隐私说明视为完整视觉单元；深度交叠时整行退出，提交按钮获得焦点时通过 `:focus-within` 恢复，离开后恢复正常显示。5188 隔离实例已完成 `scrollY=2200` 深度避让、Tab 焦点恢复、离开交叠带恢复、截图、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v92.md`；更上方表单字段残影、viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

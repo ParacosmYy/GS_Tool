@@ -121,10 +121,10 @@
   transition: opacity .35s var(--ui-ease), transform .35s var(--ui-ease), visibility 0s linear .35s;
 }
 
-/* A lower form, export control, or card landmark can still meet the
-   transparent header after a free-form scroll. Keep its layout and tab order,
-   but remove its visual weight until it leaves the chrome band; focus-within
-   restores any control inside the boundary. */
+/* A lower form action row, export control, or card landmark can still meet
+   the transparent header after a free-form scroll. Keep its layout and tab
+   order, but remove its visual weight until it leaves the chrome band;
+   focus-within restores any control inside the boundary. */
 .site-main .is-under-sticky-header {
   opacity: 0;
   pointer-events: none;

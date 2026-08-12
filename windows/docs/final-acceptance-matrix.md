@@ -280,6 +280,11 @@
 - sticky 避让候选扩展到 `.site-main .card-heading`；深度滚动时标题视觉退出 sticky 顶栏交叠带，返回后恢复，DOM、h1/h2 语义、API 和业务数据不变；`:focus-within` 保留标题内按钮操作。
 - 5187 隔离实例真实确认 `scrollY=1118/898` 的避让与恢复、透明 AI TOKEN 顶栏、无横向溢出和清洁页面日志；新证据见 `ui-accessibility-evidence-v91.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+### v92 交付增量
+
+- sticky 避让候选扩展到 `.site-main .auto-form-actions`，按钮与隐私说明作为完整操作行退出顶栏交叠带；`:focus-within` 保留提交按钮可见、可达、可操作，DOM、表单值、API 和业务数据不变。
+- 5188 隔离实例真实确认 `scrollY=2200` 避让、Tab 聚焦恢复、离开交叠带恢复、透明 AI TOKEN 顶栏、无横向溢出和清洁页面日志；更上方表单字段避让、viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

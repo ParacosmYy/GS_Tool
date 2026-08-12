@@ -7,7 +7,7 @@
  */
 
 const OCCLUDED_CLASS = "is-under-sticky-header";
-const CANDIDATE_SELECTOR = ".site-main .button, .site-main summary, .site-main .card-heading";
+const CANDIDATE_SELECTOR = ".site-main .button, .site-main summary, .site-main .card-heading, .site-main .auto-form-actions";
 
 function intersectsHeader(element, headerRect) {
   const rect = element.getBoundingClientRect();

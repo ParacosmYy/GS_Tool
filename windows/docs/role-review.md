@@ -304,6 +304,12 @@
 - UI-2：变更集中在 `sticky-occlusion.js` 候选集合与 `responsive-tuning.css` 表现契约；保留 DOM、辅助语义、焦点路径、forced-colors、reduced-motion、API、认证和业务数据边界。
 - UI-3：真实 5187 隔离实例已确认 `scrollY=1118` 避让、`scrollY=898` 恢复、42 个可见焦点控件、1 个 h1/8 个 h2、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v91.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+## v92 自动采集操作行阅读边界
+
+- UI-1：解决深度滚动时提交按钮已隐藏但隐私说明仍穿过透明顶栏的残余视觉问题，将操作行作为完整层级处理。
+- UI-2：变更集中在 `sticky-occlusion.js` 候选集合与既有 CSS 表现类；不改变 DOM、Tab 顺序、表单值、焦点语义、forced-colors、reduced-motion、API、认证或业务数据。
+- UI-3：真实 5188 隔离实例已确认 `scrollY=2200` 避让、提交按钮 Tab 焦点恢复、离开交叠带恢复、42 个可见焦点控件、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v92.md`，更上方字段残影和其他外部门禁继续独立记录。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
