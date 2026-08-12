@@ -321,3 +321,5 @@
 - [x] v101 通过真实隔离 5201 实例确认 `320/390/768/1024/1440` 五档卡片几何、`blur(14px)`、无横向溢出、`7/7` 控件命名与清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v101.md`，真实设备与辅助偏好继续独立门禁。
 - [x] v102 将 Dashboard 周期切换器从深色模糊浮层收敛为低 alpha 垂直渐变、无 blur 的局部透景控件，保留边界、active lime 状态、键盘语义和 forced-colors 隔离，避免透明 AI TOKEN 品牌行与周期控制器出现材质断层。
 - [x] v102 通过真实隔离 5202 实例确认 `320/390/768/1024/1440` 五档无横向溢出、Today/Week/Month/All time 四档真实点击与 `aria-pressed` 同步、36/36 或 40/40 当前控件命名、1 个 h1/8 个 h2、桌面与深滚截图和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v102.md`，真实设备与辅助偏好继续独立门禁。
+- [x] v103 将认证卡片从偏重的深色玻璃进一步收敛为低 alpha 深蓝透景层（`.54/.66` alpha、`blur(11px)`），保留字段局部阅读底、聚焦状态、顶部高光、forced-colors 和 reduced-motion 边界，让登录/注册场景连续可见。
+- [x] v103 通过真实隔离 5203 实例确认 `/login` 与 `/register` 在 `320/390/768/1024/1440` 五档无横向溢出、`blur(11px)`、7/7 控件命名、1 个 h1/1 个 h2；同时确认登录字段焦点和桌面/移动截图，独立证据写入 `docs/ui-accessibility-evidence-v103.md`，真实设备与辅助偏好继续独立门禁。

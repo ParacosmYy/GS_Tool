@@ -332,6 +332,11 @@
 - Dashboard 周期切换器在普通配色下改为低 alpha 垂直渐变、无 blur 的局部透景层，保留 border、active lime、四档 period 语义、键盘状态和 forced-colors/reduced-motion 边界；不改变 DOM、API、认证、表单值、数据流或 Tab 顺序。
 - 5202 隔离实例真实确认 `320/390/768/1024/1440` 五档无横向溢出、Today/Week/Month/All time 四档真实点击与 `aria-pressed` 同步、36/36 或 40/40 当前控件命名、1 个 h1/8 个 h2、桌面与深滚截图和清洁页面日志；证据见 `ui-accessibility-evidence-v102.md`，真实设备与辅助偏好继续独立门禁。
 
+### v103 交付增量
+
+- 登录与注册认证卡片在普通配色下改为 `.54/.66` alpha 深蓝透景层与 `blur(11px) saturate(1.06)`，保留字段局部阅读底、焦点边界、顶部高光和 forced-colors/reduced-motion 边界；不改变 DOM、认证 API、字段、Tab 顺序或数据流。
+- 5203 隔离实例真实确认 `/login` 与 `/register` 在 `320/390/768/1024/1440` 五档无横向溢出、卡片 `blur(11px)`、7/7 当前控件命名、1 个 h1/1 个 h2、登录字段焦点和桌面/移动截图；证据见 `ui-accessibility-evidence-v103.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

@@ -268,6 +268,10 @@ hero 元信息右侧的 `#dashboard-status` 在普通配色下改为透明背景
 
 Dashboard 周期切换器在普通配色下从 `.58` alpha 深蓝玻璃与 `blur(12px)` 收敛为低 alpha 垂直渐变与 `backdrop-filter: none`，保持边界、active lime pill、ARIA pressed、键盘交互和 forced-colors 复位，避免顶部透明 AI TOKEN 品牌行与控件产生材质断层。5202 隔离实例已完成 `320/390/768/1024/1440` 五档无横向溢出、四档 period 点击、控件命名、标题层级、桌面/深滚截图和清洁页面日志检查，独立证据见 `ui-accessibility-evidence-v102.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v103 认证卡片局部透景
+
+登录与注册认证卡片在普通配色下进一步收敛为 `.54/.66` alpha 深蓝渐变与 `blur(11px) saturate(1.06)`，让角色、代码屏和设备场景继续穿透卡片；输入字段的局部阅读底、焦点边界、顶部高光、forced-colors 与 reduced-motion 复位保持不变。5203 隔离实例已完成 `/login` 与 `/register` 的 `320/390/768/1024/1440` 五档无横向溢出、卡片 computed style、7/7 控件命名、焦点状态、桌面/移动截图和页面日志检查，独立证据见 `ui-accessibility-evidence-v103.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
