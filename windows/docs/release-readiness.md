@@ -354,6 +354,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 
 基础 `style.css` 与 `responsive-tuning.css` 在 `620px` 以下统一收敛 Dashboard hero：orbit 使用移动视口上限，hero stage 取消多余最小高度，标题、主要入口与周期游标形成连续首屏阅读路径；不改变模板、周期交互、API、认证、Provider Key 或数据流。真实 `5000` 已完成 `320×720/320×844/390×844/768×900/1024×900/1440×900` 六档无横向溢出、390px 首屏几何、Week 周期交互、深滚空态和清洁日志验证，证据见 `ui-accessibility-evidence-v122.md`。
 
+## v123 Sticky 顶栏兼容遮挡边界
+
+基础 `style.css` 补齐旧个人启动器下 sticky occlusion class 的视觉契约：深滚内容在透明 AI TOKEN 品牌行覆盖区淡出或使用 feather mask，焦点内容恢复可见，reduced-motion 与 forced-colors 保留降级；不改变透明顶栏本身、模板、脚本、API 或数据流。真实 `5000` 已完成深滚分析区截图、六档响应式、Week/键盘焦点和清洁日志验证，证据见 `ui-accessibility-evidence-v123.md`。
+
 ## 最终签署条件
 
 1. Android APK 已由批准工具链构建、安装到授权设备并完成同账号联调。

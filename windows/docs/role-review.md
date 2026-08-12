@@ -496,6 +496,14 @@
 - 后端：无后端、数据库、接口、认证、CSRF、Key 生命周期或数据流改动；保护端口 `5000/5011` 未触碰。
 - 架构师：变化限定在 `03-observatory` 响应式展示边界；两层 CSS 保持同一契约，无新依赖、无跨层耦合，`style.css` 587 行、`responsive-tuning.css` 691 行，回滚边界为 v122 两个媒体查询块。
 
+## v123 Sticky 顶栏兼容遮挡边界
+
+- UI-1：解决旧个人启动器下透明 AI TOKEN 顶栏与深滚分析标题重叠、标题穿透阅读带的问题；不增加黑色背景，保留场景透视。
+- UI-2：基础 `style.css` 复用既有 sticky occlusion class、自定义变量和 focus contract，补齐 mask、淡出、reduced-motion 与 forced-colors 边界；不改 DOM、脚本、接口或数据。
+- UI-3：真实 `5000` 已确认深滚分析区、透明顶栏、六档响应式、Week/键盘焦点、heading 结构和清洁日志；证据见 `ui-accessibility-evidence-v123.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Key 生命周期或数据流改动；保护端口 `5000/5011` 未触碰。
+- 架构师：变化限定在 `01-shell` sticky chrome compatibility boundary；无新依赖、无跨层耦合，`style.css` 673 行，回滚边界为 v123 基础样式块。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

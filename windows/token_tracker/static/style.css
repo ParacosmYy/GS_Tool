@@ -545,6 +545,92 @@ td:first-child { color: var(--white); font-weight: 700; }
 }
 
 /*
+ * Sticky chrome compatibility boundary: the personal launcher may serve an
+ * older template that loads only this base stylesheet and ui-polish.css. Keep
+ * the visual occlusion contract available at that boundary so a transparent
+ * AI TOKEN row never lets a deep-scrolled heading or card surface cut through
+ * the reading lane. The complete stylesheet chain supplies the same policy
+ * with its owning responsive module later in the cascade.
+ */
+.site-main .is-under-sticky-header {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .24s var(--ease-out);
+}
+
+.site-main .is-under-sticky-header:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.site-main .has-sticky-occlusion {
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.site-main .has-sticky-occlusion:not(:focus-within) {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 var(--sticky-occlusion-start),
+    transparent var(--sticky-occlusion-start),
+    transparent var(--sticky-occlusion-end),
+    rgba(0, 0, 0, .5) calc(var(--sticky-occlusion-end) + 8px),
+    #000 var(--sticky-occlusion-feather-end),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 var(--sticky-occlusion-start),
+    transparent var(--sticky-occlusion-start),
+    transparent var(--sticky-occlusion-end),
+    rgba(0, 0, 0, .5) calc(var(--sticky-occlusion-end) + 8px),
+    #000 var(--sticky-occlusion-feather-end),
+    #000 100%
+  );
+}
+
+.site-main .has-sticky-occlusion:focus-within,
+.site-main .is-sticky-fragment:focus-within {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.site-main .is-sticky-fragment:not(:focus-within) {
+  opacity: 0;
+  pointer-events: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+  transition: opacity .24s var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-main .is-under-sticky-header,
+  .site-main .has-sticky-occlusion,
+  .site-main .is-sticky-fragment {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .site-main .is-under-sticky-header,
+  .site-main .is-sticky-fragment {
+    opacity: 1;
+    pointer-events: auto;
+    transition: none;
+  }
+
+  .site-main .has-sticky-occlusion,
+  .site-main .has-sticky-occlusion:focus-within {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/*
  * Mobile auth entry: the visual story remains generous, but the first usable
  * control should not begin below an entire desktop-sized intro composition.
  * Keep the title and trust lines, then tighten only the vertical rhythm so a

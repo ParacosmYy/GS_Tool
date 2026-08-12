@@ -361,3 +361,5 @@
 - [x] v121 通过真实 `5000` 页面确认登录/注册五档响应式、390px 卡片提前、768/1440 截图、键盘焦点、heading 结构、横向溢出和清洁日志；独立证据写入 `docs/ui-accessibility-evidence-v121.md`。
 - [x] v122 收紧 Dashboard `620px` 以下的移动端首屏节奏：orbit 由全高 spacer 收敛为视觉锚点，标题、主要入口和周期控制连续进入第一次扫描范围；基础样式与完整样式链保持同一响应式契约。
 - [x] v122 通过真实 `5000` 页面确认 `320×720/320×844/390×844/768×900/1024×900/1440×900` 六档无横向溢出、390px 首屏几何、Week 周期交互、Dashboard 标题层级、深滚空态可读性和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v122.md`，真实设备与辅助偏好继续独立门禁。
+- [x] v123 修复旧个人启动器只加载基础样式时的 sticky 顶栏遮挡兼容边界：基础 `style.css` 实现既有 `is-under-sticky-header`、`has-sticky-occlusion` 与 `is-sticky-fragment` 契约，保持焦点恢复、reduced-motion 和 forced-colors 行为。
+- [x] v123 通过真实 `5000` 页面确认深滚分析标题淡出、卡片 mask、透明顶栏计算值、`320×720/320×844/390×844/768×900/1024×900/1440×900` 六档响应式、Week/键盘焦点和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v123.md`，真实设备与辅助偏好继续独立门禁。

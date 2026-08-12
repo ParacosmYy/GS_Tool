@@ -425,6 +425,11 @@
 - Dashboard 在 `620px` 以下将 orbit 收敛为视觉锚点，压缩 hero stage 的无效高度，让移动端首次扫描连续经过总量轨道、标题、主要入口和周期控制；桌面构图、模板语义、API 和业务数据不变。
 - 真实 `5000` 确认 `320×720/320×844/390×844/768×900/1024×900/1440×900` 六档无横向溢出，390px 首屏入口与周期控制提前，Week 的 `aria-pressed` 与状态文案正常，深滚空态和应用日志正常；证据见 `docs/ui-accessibility-evidence-v122.md`。
 
+### v123 交付增量
+
+- 基础 `style.css` 补齐旧个人启动器的 sticky occlusion 视觉契约，使深滚分析标题在透明 AI TOKEN 阅读带内淡出，卡片 surface 使用既有自定义变量 mask，焦点内容恢复可见；顶栏仍保持透明、无 blur、无 shadow。
+- 真实 `5000` 确认深滚标题/卡片层级、六档响应式、Week/键盘焦点、`1 个 h1 / 8 个 h2` 和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v123.md`。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
