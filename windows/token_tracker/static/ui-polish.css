@@ -8,6 +8,7 @@
 
 @import url("./legacy-observatory.css");
 @import url("./hero-signal.css");
+@import url("./brand-clarity.css");
 
 :root {
   --canvas: #08090c;

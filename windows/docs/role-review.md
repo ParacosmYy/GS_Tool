@@ -656,3 +656,11 @@
 - UI-3：真实 `5000` 的 320/390/768/1440 与 `5011` 的 390、无横向溢出、透明顶栏和页面侧日志已复核；证据见 `ui-accessibility-evidence-v141.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
 - 架构师：规则归属于共享表单 presentation contract，保持字段语义与焦点顺序不变，文件行数和降级边界有效。
+
+## v143 AI TOKEN 品牌行透明边界
+
+- UI-1：真实 5000/5011 运行时确认 header 本身已透明；新增轻量 optical edge 让透景边界可读，移除黑色覆盖带观感，不增加填充、blur 或背景图。
+- UI-2：新增 `brand-clarity.css` 作为共享 `01-shell / transparency boundary`，由 `ui-polish.css` import 供旧入口和完整入口复用；品牌子层与 hero metadata rail 同步保持透明，forced-colors/reduced-motion 单独降级。
+- UI-3：真实 5000 的 320/390/768/1440 与 5011 的 390 回归通过；computed style、截图、文档宽度、页面侧日志与品牌行几何已记录在 `ui-accessibility-evidence-v143.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID 保持 `43832/8100`。
+- 架构师：变化限定在高内聚 shell presentation boundary，只有 CSS import 与一个独立 CSS 文件，无新依赖、DOM、脚本或跨层耦合；所有文本源码低于 1000 行。

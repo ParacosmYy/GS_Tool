@@ -580,3 +580,11 @@
 - UI-3：真实 5000/5011 的 320/390/768/1440 断点、首个字段高度、表单卡片几何、透明顶栏、无横向溢出和页面日志已确认；证据见 `ui-accessibility-evidence-v141.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 保持不变。
 - 架构师：变化限定在共享表单 presentation boundary，无新依赖、跨层耦合或业务逻辑修改，所有文件低于 1000 行。
+
+## v143 AI TOKEN 品牌行透明边界
+
+- UI-1：最上方 AI TOKEN 行现在是明确的无填充透景层；背景插画连续可见，细微上下光学边缘只负责层次和可读边界。
+- UI-2：共享 `brand-clarity.css` 由 `ui-polish.css` 接入，旧入口和完整入口使用同一契约；`hero-topline`、品牌子层、forced-colors 与 reduced-motion 规则职责清晰。
+- UI-3：5000 的 320/390/768/1440 与 5011 的 390 真实回归通过：header/topline 透明、无 blur、无横向溢出、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v143.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 未重启。
+- 架构师：新增文件 83 行，`ui-polish.css` 985 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。

@@ -486,3 +486,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 320/390/768/1440 与 5011 的 390px 真实回归通过，表单语义、两列桌面布局、透明顶栏、文档宽度和页面日志保持正常，证据见 `docs/ui-accessibility-evidence-v141.md`。
 - 本轮只修改共享 CSS presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。
+
+## v143 AI TOKEN 品牌行透明边界
+
+- 5000 旧启动链与 5011 完整启动链均由共享 `brand-clarity.css` 维护透明品牌行；普通配色 computed style 为透明背景、无背景图、无 blur，仅有低 alpha optical edge。
+- 真实 320/390/768/1440 与 5011 的 390 回归通过；文档无横向溢出，页面侧日志为空；证据见 `docs/ui-accessibility-evidence-v143.md`。
+- 本轮只修改前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。

@@ -1,0 +1,83 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Keep the shared AI TOKEN brand rails genuinely transparent across
+ *          the legacy launcher and the current web shell.
+ * Module: Web presentation / 01-shell / transparency boundary
+ * Contract: No filled header surface; optical separation comes from hairline
+ *           light and a restrained inset shadow only.
+ */
+
+/*
+ * Both local launchers load `ui-polish.css`, but the legacy process does not
+ * load the later shell-specific stylesheets. The body qualifier therefore
+ * makes this boundary win in both chains without coupling the launcher to a
+ * particular template revision.
+ */
+body .site-header,
+body .site-header.is-scrolled,
+body .hero-topline {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border-bottom-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* A light optical edge keeps the transparent row readable over the dark
+   source artwork without painting a black band behind the brand. */
+body .site-header,
+body .site-header.is-scrolled {
+  box-shadow:
+    inset 0 1px 0 rgba(237, 245, 255, .08),
+    inset 0 -18px 28px -30px rgba(196, 192, 255, .72) !important;
+}
+
+body .site-header > *,
+body .site-header .brand,
+body .site-header .brand-mark,
+body .site-header .brand-lockup,
+body .site-header .site-nav,
+body .site-header .user-menu,
+body .site-header .user-menu form {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* The hero metadata rail is the second AI TOKEN landmark on the dashboard;
+   keep it on the same transparent plane as the sticky brand row. */
+body .hero-topline {
+  box-shadow: inset 0 -1px 0 rgba(230, 235, 245, .11);
+}
+
+@media (max-width: 620px) {
+  body .site-header,
+  body .site-header.is-scrolled {
+    box-shadow:
+      inset 0 1px 0 rgba(237, 245, 255, .1),
+      inset 0 -16px 24px -28px rgba(196, 192, 255, .78) !important;
+  }
+}
+
+@media (forced-colors: active) {
+  body .site-header,
+  body .site-header.is-scrolled,
+  body .hero-topline {
+    background: Canvas !important;
+    background-color: Canvas !important;
+    background-image: none !important;
+    border-bottom-color: CanvasText !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body .site-header,
+  body .site-header.is-scrolled,
+  body .hero-topline {
+    transition: none !important;
+  }
+}
