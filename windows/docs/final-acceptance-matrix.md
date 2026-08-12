@@ -307,6 +307,11 @@
 - 新增仅针对 `max-width:360px` 且 `max-height:760px` 的 hero 首屏契约，收紧窄短手机的 stage spacing 与轨道尺寸，使两个主操作完整进入视口；不改变 DOM、API、认证、表单值、数据流、桌面/平板布局或 reduced-motion/forced-colors 复位。
 - 5193 隔离实例真实确认 `320×720` 主操作 `bottom=698`、六档响应式无横向溢出、41 个控件具备名称、1 个 `h1`/8 个 `h2` 和清洁页面日志；真实设备与辅助偏好继续独立门禁。
 
+### v98 交付增量
+
+- 指标栏 `.signal-cell` 使用低 alpha、无模糊局部透景层与轻分隔线，提升三组 token 指标在插画上的扫读稳定性；不改变透明 AI TOKEN 顶栏、DOM、API、认证、表单值、数据流、Tab 顺序或 forced-colors/reduced-motion 复位。
+- 5194 隔离实例真实确认 `320/390/768/1024/1440` 五档无横向溢出、指标单元与顶栏均为 `backdrop-filter = none`、39/39 当前控件具备名称和清洁页面日志；真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

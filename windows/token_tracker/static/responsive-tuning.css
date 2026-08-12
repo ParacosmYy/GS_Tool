@@ -222,6 +222,23 @@
   color: var(--ink-soft);
 }
 
+/* Metrics sit directly on the illustration, so give each reading cell a
+   narrow optical lane instead of darkening the entire transparent rail. The
+   alpha is deliberately low: background continuity remains visible while the
+   three values gain a stable scan surface on desktop and mobile alike. */
+@media (forced-colors: none) {
+  .signal-cell {
+    background:
+      linear-gradient(180deg, rgba(18, 32, 48, .12), rgba(7, 14, 24, .04));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .signal-cell + .signal-cell {
+    box-shadow: inset 1px 0 0 rgba(230, 235, 245, .05);
+  }
+}
+
 /* Dashboard content is a reading surface, but it should still belong to the
    illustrated scene. Use a deep-blue glass layer instead of near-opaque black;
    the stronger text tokens and chart colors remain responsible for contrast.

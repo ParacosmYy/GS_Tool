@@ -334,6 +334,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的窄短手机 media query；只收紧 stage spacing、orbit width、lede margin 和 footer gap，不改变 DOM、Tab 顺序、API、认证、表单值、桌面/平板/普通手机布局或 reduced-motion/forced-colors 边界。
 - UI-3：真实 5193 隔离实例已确认 `320/360/390/768/1024/1440` 六档无横向溢出，320px 主操作 `bottom=698` 位于视口内，41 个交互控件具备名称和清洁页面日志；证据见 `ui-accessibility-evidence-v97.md`，真实设备与辅助偏好继续独立门禁。
 
+## v98 指标栏局部透景层
+
+- UI-1：解决移动端指标栏在人物、代码和设备插画上扫读困难的问题；保留整条透明场景与三段指标的原有信息优先级。
+- UI-2：变更集中在 `responsive-tuning.css` 的 `.signal-cell` 表现规则；低 alpha 渐变提供局部阅读边界，确认会形成暗带的 blur 已移除，不改变 DOM、Tab 顺序、API、认证、表单值、桌面/移动布局或 reduced-motion/forced-colors 边界。
+- UI-3：真实 5194 隔离实例已确认 `320/390/768/1024/1440` 五档无横向溢出、指标单元与顶栏均为无 blur、39/39 当前控件具备名称和清洁页面日志；证据见 `ui-accessibility-evidence-v98.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
