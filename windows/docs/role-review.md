@@ -340,6 +340,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的 `.signal-cell` 表现规则；低 alpha 渐变提供局部阅读边界，确认会形成暗带的 blur 已移除，不改变 DOM、Tab 顺序、API、认证、表单值、桌面/移动布局或 reduced-motion/forced-colors 边界。
 - UI-3：真实 5194 隔离实例已确认 `320/390/768/1024/1440` 五档无横向溢出、指标单元与顶栏均为无 blur、39/39 当前控件具备名称和清洁页面日志；证据见 `ui-accessibility-evidence-v98.md`，真实设备与辅助偏好继续独立门禁。
 
+## v99 AI TOKEN 品牌行透明修正
+
+- UI-1：解决最上方 AI TOKEN 行仍像黑色覆盖层的问题；品牌 header 保持完整透景，hero 元信息只保留局部短信号线，不再使用贯穿整屏的底边线。
+- UI-2：变更集中在 `responsive-tuning.css` 的普通配色表现规则；不改变 DOM、布局盒、导航、周期 API、认证、表单值、数据流或 Tab 顺序，forced-colors 继续由系统配色接管。
+- UI-3：真实 5195 隔离实例已确认 `320/390/768/1024/1440` 五档透明 computed style、390px 滚动态、Today/Week/Month/All time 四档状态、无横向溢出、36/36 可见控件命名和清洁页面日志；证据见 `ui-accessibility-evidence-v99.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

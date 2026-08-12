@@ -312,6 +312,11 @@
 - 指标栏 `.signal-cell` 使用低 alpha、无模糊局部透景层与轻分隔线，提升三组 token 指标在插画上的扫读稳定性；不改变透明 AI TOKEN 顶栏、DOM、API、认证、表单值、数据流、Tab 顺序或 forced-colors/reduced-motion 复位。
 - 5194 隔离实例真实确认 `320/390/768/1024/1440` 五档无横向溢出、指标单元与顶栏均为 `backdrop-filter = none`、39/39 当前控件具备名称和清洁页面日志；真实设备与辅助偏好继续独立门禁。
 
+### v99 交付增量
+
+- AI TOKEN 品牌 header 在普通配色下维持 `transparent / no backdrop-filter / no box-shadow`；hero-topline 取消全宽底线，仅保留局部短信号线，避免最上方场景产生黑色覆盖错觉；不改变 DOM、API、认证、数据流或 forced-colors/reduced-motion 边界。
+- 5195 隔离实例真实确认 `320/390/768/1024/1440` 五档无横向溢出、header/hero-topline 透明计算值、周期四档状态同步、36/36 当前控件具备名称和清洁页面日志；真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

@@ -63,6 +63,48 @@
   display: none;
 }
 
+/* Keep the brand row a literal transparent window. This late, shared rule is
+   intentionally stronger than older surface defaults: the illustration must
+   remain continuous through AI TOKEN on both the first frame and sticky
+   scroll state. Contrast comes from the glyph keyline and the progress line,
+   never from a tinted header slab. */
+@media (forced-colors: none) {
+  .site-header,
+  .site-header.is-scrolled {
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  /* The hero metadata line sits directly below the brand chrome. A full
+     width border makes the transparent scene read as a dark horizontal
+     panel, especially while the backdrop shifts under scroll. Replace it
+     with a short signal trace so the row stays open and editorial. */
+  .hero-topline {
+    position: relative;
+    border-bottom-color: transparent;
+    background: transparent;
+    background-image: none;
+    text-shadow: 0 1px 3px rgba(8, 9, 12, .78);
+  }
+
+  .hero-topline::after {
+    position: absolute;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    width: min(220px, 26%);
+    height: 1px;
+    content: "";
+    background: linear-gradient(90deg, rgba(217, 255, 120, .7), rgba(196, 192, 255, .28), transparent);
+    box-shadow: 0 0 12px rgba(217, 255, 120, .16);
+    opacity: .82;
+  }
+}
+
 /* The period control is a scene instrument, not a dark floating tile. Keep
    the active lime pill as the state anchor while letting the artwork remain
    visible through the control shell. The forced-colors branch below leaves

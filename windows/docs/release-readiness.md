@@ -252,6 +252,10 @@ sticky 避让模块现在将自动采集 `.auto-form-actions` 与其提交按钮
 
 指标栏三个 `.signal-cell` 现在使用低 alpha、无模糊的局部渐变和轻分隔线，数字在人物/设备插画上保持清晰，同时避免移动端形成连续深色横带；5194 隔离实例已完成 `320/390/768/1024/1440` 五档计算样式、截图、无横向溢出、控件命名和清洁日志检查，独立证据见 `ui-accessibility-evidence-v98.md`。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v99 AI TOKEN 品牌行透明修正
+
+最上方 AI TOKEN 品牌 header 在普通配色下明确保持 `transparent / no backdrop-filter / no box-shadow`；hero 元信息行取消贯穿全宽的底边线，改为局部 lime → lavender 短信号线，防止场景暗部被误读为黑色覆盖层。5195 隔离实例已完成 `320/390/768/1024/1440` 五档 computed style、移动滚动态、周期四档交互、无横向溢出和控件命名检查，独立证据见 `ui-accessibility-evidence-v99.md`。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
