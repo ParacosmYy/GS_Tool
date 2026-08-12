@@ -41,7 +41,7 @@ export function animateNumber(element, value, duration, formatNumber, activeAnim
 export function setupReveal() {
   // Reveal only changes presentation. Content is already in the DOM so
   // reduced-motion users, keyboard users, and screen readers see everything.
-  const elements = document.querySelectorAll("[data-reveal]");
+  const elements = [...document.querySelectorAll("[data-reveal]")];
   if (!("IntersectionObserver" in window)) {
     elements.forEach((element) => element.classList.add("is-visible"));
     return;
@@ -53,6 +53,31 @@ export function setupReveal() {
       instance.unobserve(entry.target);
     });
   }, { threshold: .12, rootMargin: "0px 0px -8% 0px" });
+
+  let syncFrame = 0;
+  const settlePassedElements = () => {
+    // IntersectionObserver reports only the current intersection. A fast
+    // scroll can jump over an entire section, leaving it in the readable but
+    // dim pre-reveal state when the user later scrolls back. Once the document
+    // has passed an element's reveal threshold, settle it immediately and
+    // remove its observer work; this keeps long-page navigation deterministic.
+    const revealLine = window.scrollY + (window.innerHeight * .92);
+    elements.forEach((element) => {
+      if (element.hidden) return;
+      const bounds = element.getBoundingClientRect();
+      const documentTop = bounds.top + window.scrollY;
+      if (documentTop > revealLine) return;
+      element.style.transitionDelay = "0ms";
+      element.classList.add("is-visible");
+      observer.unobserve(element);
+    });
+    syncFrame = 0;
+  };
+
+  const scheduleRevealSync = () => {
+    if (!syncFrame) syncFrame = window.requestAnimationFrame(settlePassedElements);
+  };
+
   elements.forEach((element, index) => {
     if (element.hidden) {
       // Dynamic disclosure panels are hidden at bootstrap; when they open,
@@ -62,11 +87,13 @@ export function setupReveal() {
     }
     element.style.transitionDelay = `${Math.min(index * 70, 350)}ms`;
     observer.observe(element);
-    // Make the first viewport deterministic even when a browser delays the
-    // initial observer callback while fonts or charts are still settling.
-    const bounds = element.getBoundingClientRect();
-    if (bounds.top < window.innerHeight * .92 && bounds.bottom > 0) element.classList.add("is-visible");
   });
+
+  // Make the first viewport deterministic even when a browser delays the
+  // initial observer callback while fonts or charts are still settling.
+  settlePassedElements();
+  window.addEventListener("scroll", scheduleRevealSync, { passive: true });
+  window.addEventListener("resize", scheduleRevealSync, { passive: true });
 }
 
 export function setupPointerFollower() {

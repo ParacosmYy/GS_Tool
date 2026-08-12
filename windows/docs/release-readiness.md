@@ -240,6 +240,10 @@ sticky 避让模块现在将自动采集 `.auto-form-actions` 与其提交按钮
 
 当卡片在透明 AI TOKEN 顶栏下方只剩不超过 120px 的孤立下沿时，sticky 表现模块为其增加 `is-sticky-fragment`；非焦点状态整体退出，避免残片被误读为第二条顶栏，`:focus-within` 仍恢复完整卡片。`5190` 隔离实例已完成 `scrollY=2200` 完整过渡后的视觉截图、动作行隐藏、Tab 到备注字段并恢复、中间滚动主体可见、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v94.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v95 长页面 reveal 生命周期
+
+`motion.js` 新增单帧 scroll/resize 同步器：当页面已经越过区块的 reveal 阈值时，立即补齐 `is-visible`、清除 transition delay 并解除观察，避免快速跳转漏掉 `IntersectionObserver` 回调后留下预落位灰度。5191 隔离实例已完成深度快跳约 `scrollY=2995` 与返回 `scrollY=1200` 的 8 区块 settled 检查、39 个交互控件命名、无横向溢出和清洁页面日志，独立证据见 `ui-accessibility-evidence-v95.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

@@ -297,6 +297,11 @@
 - `:focus-within` 清除 fragment 隐藏并恢复卡片与动作行，真实 Tab 顺序保持可达；不改变 DOM、API、认证、表单值、数据流或系统配色复位。
 - 5190 隔离实例真实确认 `scrollY=2200` 完整过渡后的卡片/提交行隐藏、备注字段焦点恢复、中间滚动主体可见、40 个可见焦点控件、1 个 `h1`/8 个 `h2`、无横向溢出和清洁页面日志；viewport override、真实设备与辅助偏好继续独立门禁。
 
+### v95 交付增量
+
+- 长页面 reveal 使用 scroll/resize 单帧同步器补齐漏掉的观察器回调；已越过阈值的区块统一清除延迟并进入 `is-visible`，不改变 DOM、API、认证、表单值、数据流或 reduced-motion/forced-colors 复位。
+- 5191 隔离实例真实确认深度快跳约 `scrollY=2995` 与返回 `scrollY=1200` 后 8 个 reveal 区块均为 `opacity=1 / transform=none`，39 个交互控件具备名称、1 个 `h1`/8 个 `h2`、无横向溢出和清洁页面日志；真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
