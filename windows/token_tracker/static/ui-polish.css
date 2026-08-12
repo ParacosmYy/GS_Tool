@@ -50,9 +50,8 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   min-height: 76px;
   border-bottom-color: transparent;
   /* This shared stylesheet is also the old 5000 launcher boundary. Keep the
-     AI TOKEN row genuinely scene-transparent here: a tiny wash, blur, or
-     outer shadow becomes a visible black band over the left side of the
-     illustration. Text keylines and the progress trace own contrast. */
+     AI TOKEN row genuinely scene-transparent here; text keylines and the
+     progress trace own the readable hierarchy. */
   background: transparent;
   background-image: none;
   box-shadow: none;
@@ -61,8 +60,7 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   transition: border-color .45s var(--ui-ease);
 }
 /* Keep small header labels sharp over the moving scene: a tight keyline
-   protects glyph edges while a short halo separates text from the image.
-   The final glass contract deliberately avoids a wide blur on scroll. */
+   protects glyph edges while a short halo separates text from the image. */
 .brand-lockup strong, .site-nav a, .user-chip { text-shadow: 0 1px 2px rgba(8,9,12,.92), 0 0 8px rgba(8,9,12,.68); }
 .site-header::after {
   position: absolute;

@@ -494,6 +494,14 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 本轮只修改前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
 
+## v153 AI TOKEN 顶栏透明场景窗口
+
+- 品牌行现在使用真正透明场景窗口：无背景图、无 blur、无 shadow、无底边线；场景连续可见且文字保持高对比。
+- 完整 5011 链与兼容 5000 链共用材质边界；390px 移动规则已通过同优先级覆盖验证。
+- 5026 的 1440/390px 登录、Dashboard `#activity`、键盘焦点、深链落点和页面日志回归通过；证据见 `docs/ui-accessibility-evidence-v153.md`。
+- 本轮无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护 PID `43832/8100` 未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。
+
 ## v144 overview 分享锚点首屏定位
 
 - `#overview` 已加入共享 sticky header clearance；旧 5000 与完整 5011 入口的 overview 分享链接均回到 `scrollY=0`，首屏 CTA opacity 为 `1`。

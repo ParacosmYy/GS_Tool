@@ -5,7 +5,7 @@
  *          the legacy launcher and the current web shell.
  * Module: Web presentation / 01-shell / transparency boundary
  * Contract: No filled header surface, blur, or composited shadow; optical
- *           separation comes from the signal line and text keylines only.
+ *           separation comes from signal lines and text keylines only.
  */
 
 /*
@@ -15,7 +15,17 @@
  * particular template revision.
  */
 body .site-header,
-body .site-header.is-scrolled,
+body .site-header.is-scrolled {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border-bottom-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* The metadata rail belongs to the hero scene below the sticky chrome. Keep
+   it clear so the brand row does not become a second horizontal band. */
 body .hero-topline {
   background: transparent !important;
   background-color: transparent !important;
@@ -25,9 +35,9 @@ body .hero-topline {
   -webkit-backdrop-filter: none !important;
 }
 
-/* Keep the compatibility chain genuinely clear. Even a low-alpha inset edge
-   composites as a material strip over bright artwork, so the signal line and
-   glyph keylines below remain the only persistent separation cues. */
+/* Keep the compatibility chain genuinely clear. A composited shadow would
+   read as a material strip over bright artwork, so signal lines and glyph
+   keylines carry separation instead. */
 body .site-header,
 body .site-header.is-scrolled {
   box-shadow: none !important;
@@ -53,6 +63,12 @@ body .hero-topline {
 @media (max-width: 620px) {
   body .site-header,
   body .site-header.is-scrolled {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border-bottom-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
   }
 }

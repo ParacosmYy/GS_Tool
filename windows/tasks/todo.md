@@ -420,3 +420,5 @@
 - [x] v151 通过项目源码临时端口 `5026` 的 1440/390/320px 真实浏览器回归确认图表层级、canvas ARIA、320px 内部溢出为 0、移动路由上下文、清洁页面日志和 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v151.md`。
 - [x] v152 为活动历史空态新增高内聚 `activity-history-signal.css`：桌面与工作信号表单同高、移动端紧凑、状态 beacon/观测面/系统色降级完整，不改事件 API。
 - [x] v152 通过项目源码临时端口 `5026` 的 1440/390px `ACTIVITY` 深链真实浏览器回归确认卡片高度、内部溢出为 0、路由上下文、焦点顺序、清洁页面日志和 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v152.md`。
+- [x] v153 将 `AI TOKEN` 顶栏统一为真正透明的场景窗口：无背景图、无 blur、无 shadow、无底边线，保留场景透视、signal line 与高对比文字；完整链移动规则使用同优先级覆盖。
+- [x] v153 通过隔离 `5026` 的 1440/390px 登录、Dashboard `#activity`、键盘焦点、深链落点、文档宽度和清洁页面日志回归；独立证据写入 `docs/ui-accessibility-evidence-v153.md`。

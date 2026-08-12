@@ -736,3 +736,11 @@
 - UI-3：源码临时端口 `5026` 的 1440/390px `ACTIVITY` 深链真实浏览器回归通过；桌面卡片同高、移动空态紧凑、内部溢出为 0、路由上下文、焦点顺序和页面日志均已复核；证据见 `ui-accessibility-evidence-v152.md`。
 - 后端：无后端、数据库、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
 - 架构师：变化限定在高内聚 activity-trace presentation boundary，新增单一 CSS 模块、无新依赖或跨层耦合；所有文本源码低于 1000 行。
+
+## v153 AI TOKEN 顶栏透明场景窗口
+
+- UI-1：将品牌行收敛为真正透明的场景窗口；移除背景图、blur、shadow 和底边线，保留场景透视、文字 keyline 与 signal line。
+- UI-2：完整链与兼容链共享同一材质契约；移动规则使用同优先级覆盖，`hero-topline` 独立保持透明，职责不外溢到数据或导航层。
+- UI-3：5026 隔离登录与 Dashboard `#activity` 的 1440/390px 真实浏览器回归通过；顶栏 computed style、深链落点、Tab 焦点、文档宽度与页面日志已复核；证据见 `docs/ui-accessibility-evidence-v153.md`。
+- 后端：无后端、认证、数据库、接口、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
+- 架构师：变化限定在 `01-shell / brand material boundary`，仅修改已有 CSS 模块，无新依赖或跨层耦合；所有文本源码低于 1000 行。

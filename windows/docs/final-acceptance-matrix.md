@@ -651,6 +651,14 @@
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
 - 架构师：新增 CSS 模块高内聚、无新依赖或跨层耦合；所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
 
+## v153 AI TOKEN 顶栏透明场景窗口
+
+- UI-1：品牌行保持真正透明的场景窗口；场景、角色和设备保持连续可见，文字层级不降级。
+- UI-2：完整链、兼容链与移动断点的最终材质规则集中在既有 shell CSS 边界；hero metadata rail 不复用品牌行材质。
+- UI-3：5026 的 1440/390px 真实浏览器回归通过：`#activity` 深链目标位于顶栏下方，`Activity` 具备 `aria-current`，Tab 焦点顺序正常，文档无正向横向溢出，日志为空；证据见 `docs/ui-accessibility-evidence-v153.md`。
+- 后端：无接口、认证、数据库、Provider、Key 或数据契约变化；保护 PID `43832/8100` 未重启。
+- 架构师：无新依赖，修改仅限既有高内聚 presentation boundary，所有文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
+
 ## v152 活动历史空态高度与观察面
 
 - UI-1：活动历史空态与工作信号表单形成同高工作区；桌面状态面完整、移动状态面紧凑，空态不再像普通空表行。

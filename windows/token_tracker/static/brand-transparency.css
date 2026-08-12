@@ -1,23 +1,24 @@
 /*
  * Author: AI Token Tracker Engineering Team
  * Maintainer: Project Owner
- * Purpose: Enforce the translucent glass contract for the sticky AI TOKEN
- *          brand row after every shared visual layer has been loaded.
+ * Purpose: Enforce the genuinely transparent scene-window contract for the
+ *          sticky AI TOKEN brand row after every shared visual layer loads.
  * Module: Web presentation / 01-shell / brand transparency boundary
  */
 
 /*
- * The artwork remains visible through the brand row. Keep this contract in its
- * own final stylesheet so later visual modules cannot accidentally turn the
- * navigation chrome into an opaque panel. The !important flags are deliberate:
+ * The artwork must remain visible through the complete brand row. Keep this
+ * contract in its own final stylesheet so later visual modules cannot turn the
+ * navigation chrome into a dark band. The !important flags are deliberate:
  * this is a cross-module boundary, not a component-level preference.
  */
 .site-header,
 .site-header.is-scrolled {
-  /* This is the final cross-entry contract. The brand row is a transparent
-     window onto the scene, not a low-alpha black panel; glyph keylines,
-     focus rings and the progress trace provide the readable boundaries. */
+  /* This is the final cross-entry contract. The row is a clear scene window;
+     signal lines, text keylines, focus rings and the progress trace provide
+     separation without painting a surface over the illustration. */
   background: transparent !important;
+  background-color: transparent !important;
   background-image: none !important;
   border-bottom-color: transparent !important;
   box-shadow: none !important;
@@ -27,16 +28,21 @@
 
 /* `brand-clarity.css` also serves the legacy launcher and intentionally adds
    a very soft inset edge. The current shell loads this file last, so the
-   final transparency boundary must neutralise that higher-specificity edge:
-   a shadow still composites as a filled strip over bright artwork. The
-   progress trace and glyph keylines below remain the only persistent
-   separation cues. */
+   final transparency boundary must neutralise that higher-specificity edge: a
+   shadow would read as a dense strip over bright artwork. The signal line,
+   progress trace and glyph keylines remain the separation cues. */
 body .site-header,
 body .site-header.is-scrolled {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border-bottom-color: transparent !important;
   box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
-/* Child surfaces must not reintroduce a local wash inside the glass row. */
+/* Child surfaces must not reintroduce a second local wash inside the transparent row. */
 .site-header > *,
 .site-header .brand,
 .site-header .brand-mark,
@@ -58,19 +64,25 @@ body .site-header.is-scrolled {
     0 0 5px rgba(8, 9, 12, .28);
 }
 
-/* The progress trace is a boundary cue, not a filled header background. */
+/* The progress trace is a boundary cue, not a second header surface. */
 .site-header::after {
   box-shadow: 0 0 8px rgba(217, 255, 120, .22);
 }
 
-/* Narrow screens use the same no-fill contract. The cropped illustration is
-   separated by the signal line and glyph keylines, never by a mobile wash. */
+/* Narrow screens use the same clear scene-window contract. The cropped
+   illustration remains visible behind the brand row. */
 @media (max-width: 620px) {
-  .site-header,
-  .site-header.is-scrolled {
+  /* Match the compatibility selector above so the clear mobile recipe wins in
+     the complete 5011 stylesheet chain as well as the legacy launcher. */
+  body .site-header,
+  body .site-header.is-scrolled {
     background: transparent !important;
     background-image: none !important;
+    border-bottom-color: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
+
 }
 
 @media (forced-colors: active) {
