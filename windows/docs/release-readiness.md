@@ -437,3 +437,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 1683/390/320 viewport、5011 深滚、computed style、截图、DOM 快照和清洁页面日志已完成回归；证据见 `ui-accessibility-evidence-v134.md`。
 - 本轮仅改动 `hero-signal.css` 与一个 import，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好门禁继续保持 pending。
+
+## v135 移动端空态图表尺寸契约
+
+- Dashboard 空态/不可用态图表不再保留会扩大内部滚动尺寸的 off-canvas sheen；隐藏的 Chart.js placeholder canvas 随容器收缩。
+- 真实 `5000` 的 320/390/1683 viewport 与 `5011` 的 390px 完整入口回归通过，卡片、wrapper、canvas 和文档 `scrollWidth` 与 `clientWidth` 对齐；证据见 `docs/ui-accessibility-evidence-v135.md`。
+- 本轮仅改动旧入口观测区 CSS presentation boundary，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。

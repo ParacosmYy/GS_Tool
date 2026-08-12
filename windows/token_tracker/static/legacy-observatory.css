@@ -51,6 +51,21 @@ body .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
       linear-gradient(145deg, rgba(18, 32, 48, .52), rgba(7, 14, 24, .68));
   }
 
+  /* Empty analytics do not need the hover sheen used by populated surfaces.
+     Hiding that decorative pseudo-element also prevents its off-canvas sweep
+     from creating a hidden horizontal scroll channel on narrow screens. */
+  body .chart-card.is-empty::before,
+  body .chart-card.is-unavailable::before { display: none; }
+
+  body .chart-wrap[data-chart-state="empty"] canvas,
+  body .chart-wrap[data-chart-state="unavailable"] canvas {
+    /* Chart.js keeps a 300px intrinsic canvas until data is available. Keep
+       the hidden placeholder inside the narrow empty-state viewport. */
+    width: 100% !important;
+    max-width: 100%;
+    height: auto !important;
+  }
+
   body .chart-card.is-empty::after,
   body .chart-card.is-unavailable::after {
     position: absolute;
@@ -85,6 +100,11 @@ body .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
 
   body .chart-wrap[data-chart-state="empty"],
   body .chart-wrap[data-chart-state="unavailable"] {
+    /* The scan trace is intentionally animated beyond the plot bounds. Clip
+       only empty/unavailable states so the legacy 5000 launcher cannot expose
+       a hidden horizontal scroll channel; populated charts keep their data
+       viewport contract. */
+    overflow: hidden;
     border: 1px solid rgba(230, 235, 245, .14);
     border-radius: var(--radius-sharp);
     background:
@@ -299,5 +319,10 @@ body .site-footer span {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     box-shadow: none;
+  }
+
+  body .chart-card.is-empty::before,
+  body .chart-card.is-unavailable::before {
+    display: none;
   }
 }

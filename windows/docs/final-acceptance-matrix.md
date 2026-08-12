@@ -524,3 +524,11 @@
 - UI-3：真实桌面、390px、320px、5011 深滚、无正向横向溢出、DOM/ARIA 和清洁日志已确认；证据见 `ui-accessibility-evidence-v134.md`。
 - 后端：无后端、认证、数据库、CSRF、Provider 或数据契约变化；保护 PID 保持不变。
 - 架构师：新增 `hero-signal.css=163`、`ui-polish.css=920`，均低于 1000 行；真实设备、Android、EXE 签名、HTTPS/ACL、Provider、备份恢复门禁继续 pending。
+
+## v135 移动端空态图表尺寸契约
+
+- UI-1：修复 320/390px 空态图表卡片内部隐藏横向通道；off-canvas sheen 已移除，空态 Chart.js canvas 与当前 wrapper 宽度一致，空态文案与信号网格保持可读。
+- UI-2：仅 `empty` / `unavailable` 状态使用 `overflow: hidden`、canvas 收缩和 forced-colors sheen 关闭；populated chart、周期控制、DOM、脚本和数据契约保持不变。
+- UI-3：真实 `5000` `320×720`、`390×844`、`1683×892` 与 `5011` `390×844` 的 computed style、截图、无正向横向溢出和应用侧日志已确认；证据见 `ui-accessibility-evidence-v135.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 保持不变。
+- 架构师：变化限定在 `03-observatory / legacy presentation compatibility boundary`，修改文件低于 1000 行，正常配色/forced-colors/reduced-motion 边界完整。

@@ -386,3 +386,5 @@
 - [x] v133 通过真实 `5000` 首屏/`scrollY=900` 深滚、`5011` 完整链 computed style、截图、DOM 快照、无正向横向溢出、清洁日志、Python 编译和 `14 pass / 1 pending / 0 fail` 审计；独立证据写入 `docs/ui-accessibility-evidence-v133.md`。
 - [x] v134 为 Dashboard hero 元信息新增独立 `hero-signal.css`：产品标签 beacon、更新状态局部信号胶囊、错误态、320/390px 收缩和 reduced-motion/forced-colors 降级，保持 AI TOKEN 顶栏与外围元信息带透明。
 - [x] v134 通过真实 `5000` 的 1683/390/320 viewport、`5011` 深滚、状态文案完整性、DOM/ARIA、无横向溢出和清洁日志复核；独立证据写入 `docs/ui-accessibility-evidence-v134.md`。
+- [x] v135 修复空态/不可用态图表的 off-canvas sheen 隐藏横向通道，并将隐藏 Chart.js canvas 收缩到窄屏容器；populated chart 规则不变。
+- [x] v135 通过真实 `5000` 的 320/390/1683 viewport 与 `5011` 的 390px 完整入口确认卡片、wrapper、canvas 和文档无正向横向溢出、空态文案完整、应用侧日志清洁；独立证据写入 `docs/ui-accessibility-evidence-v135.md`。

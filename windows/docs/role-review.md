@@ -600,3 +600,11 @@
 - UI-3：真实 `1683×892`、`390×844`、`320×720`、5011 深滚 computed style、截图、DOM 快照、无横向溢出和清洁日志已复核；证据见 `ui-accessibility-evidence-v134.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
 - 架构师：变化限定在 `02-observatory / hero signal metadata`，新增文件 163 行、通用样式 920 行，均低于 1000 行。
+
+## v135 移动端空态图表尺寸契约
+
+- UI-1：真实 320px/390px 深滚检查定位到空态图表卡片的 off-canvas sheen 与隐藏 Chart.js canvas intrinsic width；修复后空态卡片、wrapper、canvas 和文档根节点均不产生正向横向溢出。
+- UI-2：规则限定在 `empty` / `unavailable` presentation state；只裁剪空态扫描层并收缩隐藏 canvas，populated chart 的数据 viewport、Chart.js、周期交互和 API 不变。
+- UI-3：5000 的 320/390/桌面、5011 的 390px 完整入口、截图、computed style、空态文案和应用侧日志已复核；证据见 `ui-accessibility-evidence-v135.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
+- 架构师：变化限定在 `03-observatory / legacy presentation compatibility boundary`，文件行数与 forced-colors/reduced-motion 门禁保持有效。
