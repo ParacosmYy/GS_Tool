@@ -509,6 +509,42 @@ td:first-child { color: var(--white); font-weight: 700; }
 }
 
 /*
+ * Mobile observatory first scan: the orbit is a visual anchor, not a full
+ * desktop-height stage. Let the title, CTA and period cursor travel as one
+ * compact observation sequence while preserving the desktop composition.
+ */
+@media (max-width: 620px) {
+  .observatory-hero {
+    min-height: 0;
+    padding-top: 28px;
+    padding-bottom: 18px;
+  }
+
+  .hero-stage {
+    min-height: 0;
+    gap: 0;
+    padding: 16px 0 12px;
+  }
+
+  .hero-orbit {
+    width: min(72vw, 280px);
+  }
+
+  .hero-copy {
+    margin-top: 0;
+  }
+
+  .hero-lede {
+    margin-top: 18px;
+    margin-bottom: 16px;
+  }
+
+  .hero-foot {
+    gap: 4px;
+  }
+}
+
+/*
  * Mobile auth entry: the visual story remains generous, but the first usable
  * control should not begin below an entire desktop-sized intro composition.
  * Keep the title and trust lines, then tighten only the vertical rhythm so a

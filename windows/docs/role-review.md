@@ -488,6 +488,14 @@
 - UI-3：真实 `5000` 已确认登录/注册五档响应式、390px 卡片提前、768/1440 构图、键盘焦点、heading 结构、横向溢出和清洁日志；证据见 `ui-accessibility-evidence-v121.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Key 生命周期或数据流改动；保护端口 `5000/5011` 未触碰。
 - 架构师：变化限定在 `02-auth` 响应式展示边界，无新依赖、无跨层耦合；`style.css` 共 550 行，回滚边界为 v121 媒体查询。
+## v122 Dashboard 移动首屏节奏
+
+- UI-1：解决 Dashboard 移动端 orbit 占据过多纵向空间、主要入口和周期控制被推到首屏之外的问题；建立“轨道—任务—控制”的连续阅读顺序。
+- UI-2：在基础 `style.css` 与 `responsive-tuning.css` 的 `620px` 以下媒体查询中统一调整 orbit 上限、hero stage 最小高度、说明间距和底部节奏；不改变 DOM、周期脚本、接口或数据状态。
+- UI-3：真实 `5000` 已确认六档响应式、390px 首屏几何、Week 交互、Dashboard heading 结构、深滚空态、无横向溢出和清洁日志；证据见 `ui-accessibility-evidence-v122.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Key 生命周期或数据流改动；保护端口 `5000/5011` 未触碰。
+- 架构师：变化限定在 `03-observatory` 响应式展示边界；两层 CSS 保持同一契约，无新依赖、无跨层耦合，`style.css` 587 行、`responsive-tuning.css` 691 行，回滚边界为 v122 两个媒体查询块。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

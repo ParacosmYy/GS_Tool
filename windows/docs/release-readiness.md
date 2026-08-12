@@ -350,6 +350,10 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\packaging\toolchain-do
 Android 和正式边缘门禁只能在对应环境执行；本地缺工具时保留 `pending`，不下载、不伪造
 APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 ADR 和本文件。
 
+## v122 Dashboard 移动首屏节奏
+
+基础 `style.css` 与 `responsive-tuning.css` 在 `620px` 以下统一收敛 Dashboard hero：orbit 使用移动视口上限，hero stage 取消多余最小高度，标题、主要入口与周期游标形成连续首屏阅读路径；不改变模板、周期交互、API、认证、Provider Key 或数据流。真实 `5000` 已完成 `320×720/320×844/390×844/768×900/1024×900/1440×900` 六档无横向溢出、390px 首屏几何、Week 周期交互、深滚空态和清洁日志验证，证据见 `ui-accessibility-evidence-v122.md`。
+
 ## 最终签署条件
 
 1. Android APK 已由批准工具链构建、安装到授权设备并完成同账号联调。
