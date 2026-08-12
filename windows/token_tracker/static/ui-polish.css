@@ -46,11 +46,11 @@ body::after { opacity: .38; background: radial-gradient(ellipse at 50% -20%, rgb
   /* The header is chrome, not a content panel. Keep the scene continuous
      through the complete AI TOKEN row; text keylines provide contrast while
      this low-alpha wash prevents a black slab in the legacy launcher. */
-  background-color: rgba(8, 14, 22, .07);
-  background-image: linear-gradient(180deg, rgba(12, 19, 29, .16), rgba(8, 14, 22, .035));
-  box-shadow: 0 10px 30px rgba(2, 8, 14, .08), inset 0 1px 0 rgba(255, 255, 255, .05);
-  -webkit-backdrop-filter: blur(11px) saturate(1.08);
-  backdrop-filter: blur(11px) saturate(1.08);
+  background-color: rgba(8, 14, 22, .015);
+  background-image: linear-gradient(180deg, rgba(12, 19, 29, .05), rgba(8, 14, 22, 0));
+  box-shadow: 0 8px 22px rgba(2, 8, 14, .035), inset 0 1px 0 rgba(255, 255, 255, .025);
+  -webkit-backdrop-filter: blur(4px) saturate(1.03);
+  backdrop-filter: blur(4px) saturate(1.03);
   transition: border-color .45s var(--ui-ease), box-shadow .45s var(--ui-ease);
 }
 /* Keep small header labels sharp over the moving scene: a tight keyline

@@ -484,3 +484,11 @@
 - UI-3：真实 `5000` `390×844`/`1683×892` 首屏、深滚、空态、Week 键盘切换和清洁日志已确认；证据见 `ui-accessibility-evidence-v129.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动。
 - 架构师：变化限定在 `03-observatory / legacy presentation boundary`，`ui-polish.css=872`、`legacy-observatory.css=131`、`observatory-signal.css=196`，均低于 1000 行。
+
+## v130 AI TOKEN 顶部清透轻玻璃
+
+- UI-1：修复旧体验入口顶部品牌行像黑色覆盖带的问题；背景插画、品牌锁定组和导航重新形成连续透景。
+- UI-2：共享 `ui-polish.css` 与 `brand-transparency.css` 统一为 `.015` 背景色、`5% → 0%` 渐变、`blur(4px) saturate(1.03)` 和弱边界阴影；窄屏增强同步降低，系统高对比度仍由原规则接管。
+- UI-3：真实 `5000` 桌面/移动/滚动态与 `5011` 完整链已确认计算样式、无新增正向横向溢出、观测区构图未回退和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v130.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未重启。
+- 架构师：变化限定在 `01-shell / brand transparency boundary` 的两个高内聚 CSS 文件，无新依赖、DOM、脚本或跨层耦合；所有文本源码继续低于 1000 行。

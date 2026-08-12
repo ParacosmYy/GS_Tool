@@ -376,3 +376,5 @@
 - [x] v128 通过真实 `5000` 的 `390×844`/`1683×892` 首屏与深滚状态确认 CTA 收束、周期切换器可用、无正向横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v128.md`。
 - [x] v129 将 Dashboard 周期切换器与图表观测面收敛为低 alpha 深蓝信号窗口：保留背景透景、空态网格、文字 keyline 和轻量 blur，不改变 Chart.js、API、周期交互或数据流；旧入口兼容规则拆至独立 `legacy-observatory.css`，避免通用样式逼近 1000 行。
 - [x] v129 通过真实 `5000` 的 `390×844`/`1683×892` 首屏、深滚和 Week 键盘切换确认观测区材质、空态可读性、无正向横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v129.md`。
+- [x] v130 将最上方 AI TOKEN 品牌行从偏重的深色 wash 收敛为近乎清透的低 alpha 轻玻璃，旧 5000 共享入口与完整品牌契约同步使用 `blur(4px)`，保持背景连续可见。
+- [x] v130 通过真实 `5000` 的桌面、390px 移动和 `scrollY=900` 滚动态，以及 `5011` 完整链确认 computed style、无新增横向溢出和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v130.md`。

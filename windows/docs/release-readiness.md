@@ -402,3 +402,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - UI-3：真实 `5000` 桌面/移动首屏、`scrollY=1000` 深滚、Week 键盘切换、无正向横向溢出和清洁日志通过；证据见 `ui-accessibility-evidence-v129.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动。
 - 架构师：变化限定在 `03-observatory` 与旧入口兼容模块，无新业务依赖；通用 UI 文件回落至 872 行。
+
+## v130 AI TOKEN 顶部清透轻玻璃
+
+- 共享旧入口与完整品牌层的 header 材质已统一为低 alpha、`blur(4px)` 轻玻璃；背景图连续可见，滚动态不恢复黑色横带。
+- 真实 5000 桌面、390px 移动、`scrollY=900` 与 5011 完整链已完成回归；computed style、横向溢出、截图和本地应用日志证据见 `ui-accessibility-evidence-v130.md`。
+- 本轮无后端、认证、数据库、Provider 或数据流变更；端口 `5000/5011` 未触碰。
+- 本轮不关闭 Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁。

@@ -560,3 +560,11 @@
 - UI-3：`390×844`/`1683×892`、空态、深滚、周期键盘状态和清洁日志已复核；无正向横向溢出，详见 `ui-accessibility-evidence-v129.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动。
 - 架构师：新增模块 131 行，通用样式 872 行，所有文件低于 1000 行且回滚边界独立。
+
+## v130 AI TOKEN 顶部清透轻玻璃
+
+- UI-1：以真实 5000 页面定位顶部品牌行的黑色视觉带，恢复插画与品牌 row 的连续透景，保持导航和图表阅读层级。
+- UI-2：只调整 `ui-polish.css` 与 `brand-transparency.css` 的 header material token；共享入口和最终契约同值，移动、滚动态、forced-colors/reduced-motion 边界未被复制或削弱。
+- UI-3：真实桌面、390px 移动、深滚与 5011 完整链截图/计算样式/日志已复核；证据见 `ui-accessibility-evidence-v130.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
+- 架构师：修改限定在 `01-shell / brand transparency boundary`，无新依赖、跨层耦合或 DOM/脚本变更；文件行数门禁保持有效，回滚边界为两个 CSS header 声明块。
