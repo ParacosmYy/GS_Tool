@@ -335,10 +335,10 @@
   .guide-card,
   .manual-details {
     background:
-      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .07), transparent 40%),
-      linear-gradient(145deg, rgba(18, 32, 48, .84), rgba(7, 14, 24, .92));
-    -webkit-backdrop-filter: blur(16px) saturate(1.08);
-    backdrop-filter: blur(16px) saturate(1.08);
+      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .09), transparent 40%),
+      linear-gradient(145deg, rgba(18, 32, 48, .7), rgba(7, 14, 24, .82));
+    -webkit-backdrop-filter: blur(12px) saturate(1.06);
+    backdrop-filter: blur(12px) saturate(1.06);
   }
 }
 

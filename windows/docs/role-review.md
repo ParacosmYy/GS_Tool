@@ -370,6 +370,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的普通配色 `.auth-card` 与 `:focus-within` 表现规则，将表面收敛为 `.54/.66` alpha、`blur(11px) saturate(1.06)`；不改变 DOM、认证 API、字段、Tab 顺序、数据流或 forced-colors/reduced-motion 边界。
 - UI-3：真实 5203 隔离实例已确认 `/login` 与 `/register` 在 `320/390/768/1024/1440` 五档无横向溢出、卡片 computed style、7/7 控件命名、1 个 h1/1 个 h2、登录字段焦点、桌面/移动截图和清洁页面日志；证据见 `ui-accessibility-evidence-v103.md`，真实设备与辅助偏好继续独立门禁。
 
+## v104 Dashboard 内容卡片透景
+
+- UI-1：解决 Dashboard 进入图表和自动采集区后连续深色玻璃表面压过插画、滚动层级突然变重的问题；保留内容卡片作为稳定阅读单元。
+- UI-2：变更集中在 `responsive-tuning.css` 的普通配色图表/表单/说明/记录/明细卡片表现规则，将外壳收敛为 `.70/.82` alpha、`blur(12px) saturate(1.06)`；不改变 DOM、Tab 顺序、API、认证、表单值、数据流或 forced-colors/reduced-motion 边界。
+- UI-3：真实 5204 隔离实例已确认 `320/390/768/1024/1440` 五档无横向溢出、卡片 computed style、Today/Week/Month/All time 四档真实点击、Base URL 字段焦点、36/37 或 40/41 当前控件命名、1 个 h1/8 个 h2、桌面/移动深滚截图和清洁页面日志；证据见 `ui-accessibility-evidence-v104.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
