@@ -298,6 +298,27 @@
   .auth-shell.auth-shell-register .auth-card { order: -1; }
 }
 
+/* Very short phones need a separate first-scan contract. The normal mobile
+   hero is intentionally spacious, but at 320x720 it pushes the two primary
+   actions below the fold. Reclaim only stage breathing room; the orbit,
+   editorial copy, and period control keep their reading order. */
+@media (max-width: 360px) and (max-height: 760px) {
+  .observatory-hero {
+    padding-top: 24px;
+    padding-bottom: 18px;
+  }
+
+  .hero-stage {
+    min-height: 0;
+    padding-top: 16px;
+    padding-bottom: 20px;
+  }
+
+  .hero-orbit { width: min(78vw, 250px); }
+  .hero-lede { margin-top: 18px; margin-bottom: 16px; }
+  .hero-foot { gap: 12px; }
+}
+
 @media (forced-colors: active) {
   /* System colors own every reading veil; never let the decorative
      gradient override a user's forced-colors contract. */

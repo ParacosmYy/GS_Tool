@@ -244,6 +244,10 @@ sticky 避让模块现在将自动采集 `.auto-form-actions` 与其提交按钮
 
 `motion.js` 新增单帧 scroll/resize 同步器：当页面已经越过区块的 reveal 阈值时，立即补齐 `is-visible`、清除 transition delay 并解除观察，避免快速跳转漏掉 `IntersectionObserver` 回调后留下预落位灰度。5191 隔离实例已完成深度快跳约 `scrollY=2995` 与返回 `scrollY=1200` 的 8 区块 settled 检查、39 个交互控件命名、无横向溢出和清洁页面日志，独立证据见 `ui-accessibility-evidence-v95.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v97 窄短手机首屏动作区
+
+针对 `320×720` 窄短手机，响应式表现层仅收紧 hero stage 的上下留白、轨道尺寸、lede 间距和 footer gap，使“开始自动采集 / 查看分析”两个主操作完整落在第一屏；`320/360/390/768/1024/1440` 六档隔离矩阵均保持无横向溢出，独立证据见 `ui-accessibility-evidence-v97.md`。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

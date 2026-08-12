@@ -328,6 +328,12 @@
 - UI-2：变更集中在 `motion.js`；通过单帧 scroll/resize 同步器补齐已越过阈值的区块，清除 transition delay 并解除 observer，不改变 DOM、Tab 顺序、API、认证、表单值、reduced-motion 或 forced-colors 边界。
 - UI-3：真实 5191 隔离实例已确认深度快跳约 `scrollY=2995` 与返回 `scrollY=1200` 后 8 个 reveal 区块均为 `opacity=1 / transform=none`，39 个交互控件具备名称、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v95.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+## v97 窄短手机首屏动作区
+
+- UI-1：解决 `320×720` 窄短手机首屏两个主操作被 hero stage 推到视口外的问题，保留背景场景、TOTAL SIGNAL 轨道、标题和阅读顺序。
+- UI-2：变更集中在 `responsive-tuning.css` 的窄短手机 media query；只收紧 stage spacing、orbit width、lede margin 和 footer gap，不改变 DOM、Tab 顺序、API、认证、表单值、桌面/平板/普通手机布局或 reduced-motion/forced-colors 边界。
+- UI-3：真实 5193 隔离实例已确认 `320/360/390/768/1024/1440` 六档无横向溢出，320px 主操作 `bottom=698` 位于视口内，41 个交互控件具备名称和清洁页面日志；证据见 `ui-accessibility-evidence-v97.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
