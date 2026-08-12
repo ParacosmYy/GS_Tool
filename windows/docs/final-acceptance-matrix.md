@@ -588,3 +588,11 @@
 - UI-3：5000 的 320/390/768/1440 与 5011 的 390 真实回归通过：header/topline 透明、无 blur、无横向溢出、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v143.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 未重启。
 - 架构师：新增文件 83 行，`ui-polish.css` 985 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
+
+## v144 overview 分享锚点首屏定位
+
+- UI-1：Dashboard overview 分享链接不再把 hero 顶部放到 sticky header 后面；用户打开链接即获得完整首屏，CTA 不会被滚动态提前淡出。
+- UI-2：复用既有 `#analysis/#connect/#activity/#history/#auto-entry/#manual-entry` 的 `scroll-margin-top` 契约，新增 `#overview` 仅为选择器补齐入口，不引入脚本或重复常量。
+- UI-3：5000 的 390px、5011 的 390/1440 overview 深链与 analysis/connect/history 回归通过：scrollY、header state、CTA opacity、文档宽度和页面日志均符合预期；证据见 `docs/ui-accessibility-evidence-v144.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 未重启。
+- 架构师：变化限定在共享锚点 presentation boundary，`ui-polish.css` 988 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。

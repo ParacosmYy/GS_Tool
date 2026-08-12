@@ -664,3 +664,11 @@
 - UI-3：真实 5000 的 320/390/768/1440 与 5011 的 390 回归通过；computed style、截图、文档宽度、页面侧日志与品牌行几何已记录在 `ui-accessibility-evidence-v143.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID 保持 `43832/8100`。
 - 架构师：变化限定在高内聚 shell presentation boundary，只有 CSS import 与一个独立 CSS 文件，无新依赖、DOM、脚本或跨层耦合；所有文本源码低于 1000 行。
+
+## v144 overview 分享锚点首屏定位
+
+- UI-1：修复 `/dashboard#overview` 在 sticky 品牌栏后落点导致的“打开即滚动态”观感；hero 现在回到真实首屏，CTA 保持完整可见。
+- UI-2：仅扩展 `ui-polish.css` 既有 anchor clearance selector，将 `#overview` 与其它 section route 统一；不改 navigation.js、DOM、URL 语义、接口或业务状态。
+- UI-3：真实 5000/5011 的 390px、5011 的 1440px overview 深链，以及 analysis/connect/history 普通深链均已回归；证据见 `ui-accessibility-evidence-v144.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID 保持 `43832/8100`。
+- 架构师：变化限定在共享 anchor presentation contract，避免新增脚本监听器和重复定位逻辑；所有文本源码低于 1000 行。

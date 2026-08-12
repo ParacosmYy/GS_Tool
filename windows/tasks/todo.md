@@ -402,3 +402,5 @@
 - [x] v141 通过真实 `5000` 的 320/390/768/1440 与 `5011` 的 390px 确认字段高度、表单几何、透明顶栏、无横向溢出和清洁日志；独立证据写入 `docs/ui-accessibility-evidence-v141.md`。
 - [x] v143 修复最上方 `AI TOKEN` 行的黑色覆盖观感：新增共享 `brand-clarity.css`，普通配色保持透明背景、无背景图、无 blur，仅保留轻量 optical edge；旧 5000 与完整 5011 入口共用同一契约。
 - [x] v143 通过真实 `5000` 的 320/390/768/1440 与 `5011` 的 390px 确认 header/topline computed style、场景透景、文档宽度和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v143.md`。
+- [x] v144 修复 Dashboard `/dashboard#overview` 分享链接落在 sticky 顶栏后、误触发 `is-scrolled` 和首屏 CTA 淡出的问题：将 `#overview` 纳入共享 anchor clearance 契约。
+- [x] v144 通过真实 `5000/5011` 的 390px、5011 的 1440px overview 深链及 analysis/connect/history 回归确认首屏落点、CTA opacity、sticky header 状态、文档宽度和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v144.md`。

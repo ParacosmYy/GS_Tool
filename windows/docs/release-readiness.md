@@ -493,3 +493,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 320/390/768/1440 与 5011 的 390 回归通过；文档无横向溢出，页面侧日志为空；证据见 `docs/ui-accessibility-evidence-v143.md`。
 - 本轮只修改前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
+
+## v144 overview 分享锚点首屏定位
+
+- `#overview` 已加入共享 sticky header clearance；旧 5000 与完整 5011 入口的 overview 分享链接均回到 `scrollY=0`，首屏 CTA opacity 为 `1`。
+- 真实 390/1440 overview 深链、其它 section 深链、文档宽度和页面侧日志均已复核；证据见 `docs/ui-accessibility-evidence-v144.md`。
+- 本轮只修改共享前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。

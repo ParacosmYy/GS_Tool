@@ -291,7 +291,10 @@ select option { color: var(--ink); background: var(--panel-strong); }
 .hero-lede { color: var(--ink-soft); font-size: 14px; }
 /* Anchor landing zone: the sticky header must never cover a section title or
    a deep-link target reached from a primary action. */
-#analysis, #connect, #activity, #history, #auto-entry, #manual-entry { scroll-margin-top: clamp(84px, 7vw, 104px); }
+/* The hero is also a shareable route target. Give it the same sticky-header
+   clearance as the data sections so `/dashboard#overview` remains a true
+   first-frame landing point instead of entering the scrolled visual state. */
+#overview, #analysis, #connect, #activity, #history, #auto-entry, #manual-entry { scroll-margin-top: clamp(84px, 7vw, 104px); }
 .hero-core { border-color: rgba(217,255,120,.78); background: radial-gradient(circle at 35% 25%, rgba(217,255,120,.2), rgba(255,255,255,.03) 54%, transparent 72%); box-shadow: 0 0 82px rgba(217,255,120,.14), inset 0 0 35px rgba(217,255,120,.12); }
 .hero-core::after { border-color: rgba(217,255,120,.34); }
 .hero-core strong { color: var(--ink); }
