@@ -479,3 +479,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 390/320/768/1440 真实回归通过，移动背景焦点、CTA、周期控件、透明顶栏、ARIA 树、文档宽度和页面侧日志保持正常，证据见 `docs/ui-accessibility-evidence-v140.md`。
 - reduced-motion 与 forced-colors 降级已检查；本轮只修改共享 CSS presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。
+
+## v141 工作信号表单标题轨道收口
+
+- 工作信号表单的可选提示现在与标题同排，390px 字段高度由约 108px 降至 80px；备注 textarea 保持完整编辑空间。
+- 320/390/768/1440 与 5011 的 390px 真实回归通过，表单语义、两列桌面布局、透明顶栏、文档宽度和页面日志保持正常，证据见 `docs/ui-accessibility-evidence-v141.md`。
+- 本轮只修改共享 CSS presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。

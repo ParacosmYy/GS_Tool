@@ -398,3 +398,5 @@
 - [x] v139 通过真实 `5000` 的 390/320/768/1440 viewport 与 `5011` 的 390 完整入口确认场景焦点、透明顶栏、CTA/周期几何、ARIA、无横向溢出和清洁日志；独立证据写入 `docs/ui-accessibility-evidence-v139.md`。
 - [x] v140 修复 5000 旧启动链没有场景环境动效的兼容断层：在共同加载的 `ui-polish.css` 增加低强度 `shared-scene-glow/shared-scene-scan`，不改变完整链正式动效。
 - [x] v140 通过真实 `5000` 的 390/320/768/1440 与 `5011` 的 390/1440、ARIA 快照、透明顶栏、reduced-motion/forced-colors 规则、无横向溢出和清洁日志确认一致性；独立证据写入 `docs/ui-accessibility-evidence-v140.md`。
+- [x] v141 修复工作信号表单移动端 `.optional` 提示被挤到第二行的问题：共享 CSS 让标题/提示同排、输入控件跨满下一行，保持字段语义与桌面两列布局。
+- [x] v141 通过真实 `5000` 的 320/390/768/1440 与 `5011` 的 390px 确认字段高度、表单几何、透明顶栏、无横向溢出和清洁日志；独立证据写入 `docs/ui-accessibility-evidence-v141.md`。
