@@ -27,11 +27,11 @@
     <form method="post" class="stack-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <label>
-        用户名
+        <span class="auth-field-label"><span>用户名</span><small aria-hidden="true">IDENTITY / 01</small></span>
         <input name="username" autocomplete="username" minlength="3" maxlength="32" required>
       </label>
       <label>
-        密码
+        <span class="auth-field-label"><span>密码</span><small aria-hidden="true">ACCESS / 02</small></span>
         <input type="password" name="password" autocomplete="new-password" minlength="8" maxlength="256" required>
       </label>
       <button class="button button-primary button-wide" type="submit">Launch your ledger <span>↗</span></button>

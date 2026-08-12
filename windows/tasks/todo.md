@@ -351,3 +351,5 @@
 - [x] v116 通过真实隔离 5217 确认五档响应式、深滚空态、`role=status`、自动采集入口、Week 周期 `aria-pressed` 和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v116.md`。
 - [x] v117 将最上方 AI TOKEN 品牌栏拆出最终透明契约：普通配色下 header 与子级保持透明、无背景图、无 blur、无 shadow，保留文字 keyline、hairline 和滚动 signal line；不改变认证、导航、DOM、API 或业务数据。
 - [x] v117 通过真实隔离 5218 确认 `320/390/768/1024/1440` 五档无横向溢出、登录首屏与滚动态透明计算值、390px 截图和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v117.md`。
+- [x] v118 将登录/注册认证字段收敛为可扫描的 signal lane：新增字段元信息、focus-within 局部 signal line、低 alpha 深蓝阅读面和移动端轻材质；编号使用 `aria-hidden`，不改变认证契约。
+- [x] v118 通过真实隔离 5219 确认 `320/390/768/1024/1440` 五档无横向溢出、登录/注册继承、焦点 signal、控件可访问名称和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v118.md`。

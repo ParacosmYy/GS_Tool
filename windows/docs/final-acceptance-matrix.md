@@ -400,6 +400,11 @@
 
 - 最上方 AI TOKEN 品牌栏新增最终透明契约：普通配色下 header 与子级 `background: transparent`、`background-image: none`、无 blur、无 shadow；保留文字 keyline、hairline、滚动 signal line，不改变认证、导航、DOM 或 API。
 - 真实隔离 5218 实例确认 `320/390/768/1024/1440` 五档无横向溢出、登录首屏/滚动态/390px 截图、透明 computed style 和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v117.md`。
+
+### v118 交付增量
+
+- 登录/注册认证字段新增装饰性 `IDENTITY / 01`、`ACCESS / 02` 元信息、focus-within 局部 signal line 和低 alpha 深蓝阅读面；元信息使用 `aria-hidden`，不改变输入可访问名称、认证接口或数据流。
+- 真实隔离 5219 实例确认 `320/390/768/1024/1440` 五档无横向溢出、登录/注册继承、真实字段焦点、`1 个 h1 / 1 个 h2` 和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v118.md`。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

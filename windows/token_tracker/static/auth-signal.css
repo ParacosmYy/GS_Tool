@@ -1,0 +1,188 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Turn authentication fields into a readable, stateful signal lane
+ *          without changing the auth contract or adding a second card layer.
+ * Module: Web presentation / 02-auth / field signal surface
+ */
+
+/*
+ * Keep the card translucent but give the controls their own quiet reading
+ * floor. This separation is intentionally local: the scene remains visible
+ * around the card and the field surface remains stable under focus.
+ */
+@media (forced-colors: none) {
+  .auth-card {
+    border-color: rgba(230, 235, 245, .34);
+    background:
+      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .08), transparent 40%),
+      linear-gradient(145deg, rgba(20, 40, 58, .48), rgba(7, 14, 24, .6));
+    -webkit-backdrop-filter: blur(10px) saturate(1.05);
+    backdrop-filter: blur(10px) saturate(1.05);
+    box-shadow: 0 24px 62px rgba(2, 10, 20, .24), inset 0 1px 0 rgba(255, 255, 255, .09);
+  }
+
+  .auth-card:focus-within {
+    border-color: rgba(217, 255, 120, .56);
+    box-shadow: 0 24px 62px rgba(2, 10, 20, .28), 0 0 0 3px rgba(217, 255, 120, .07), inset 0 1px 0 rgba(255, 255, 255, .1);
+  }
+
+  .auth-card-top > span {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    color: var(--ink-muted);
+  }
+
+  .auth-card-top > span::before {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    content: "";
+    background: var(--signal-lime);
+    box-shadow: 0 0 10px rgba(217, 255, 120, .58);
+  }
+
+  .auth-card > .muted {
+    max-width: 34ch;
+    color: var(--ink-soft);
+  }
+
+  .auth-card .stack-form {
+    gap: 13px;
+  }
+
+  .auth-card .stack-form > label {
+    position: relative;
+    gap: 7px;
+    padding-bottom: 3px;
+    color: var(--ink-soft);
+    transition: color .3s var(--ui-ease);
+  }
+
+  .auth-card .stack-form > label::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    content: "";
+    background: linear-gradient(90deg, var(--signal-lime), rgba(196, 192, 255, .46), transparent 78%);
+    opacity: 0;
+    transform: scaleX(.3);
+    transform-origin: left center;
+    transition: opacity .3s var(--ui-ease), transform .45s var(--ui-ease);
+  }
+
+  .auth-card .stack-form > label:focus-within {
+    color: var(--ink);
+  }
+
+  .auth-card .stack-form > label:focus-within::after {
+    opacity: .9;
+    transform: scaleX(1);
+  }
+
+  .auth-field-label {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    justify-content: space-between;
+    min-height: 18px;
+  }
+
+  .auth-field-label small {
+    color: var(--ink-muted);
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    transition: color .3s var(--ui-ease), opacity .3s var(--ui-ease);
+  }
+
+  .auth-card .stack-form > label:focus-within .auth-field-label small {
+    color: var(--signal-lime);
+  }
+
+  .auth-card input {
+    min-height: 49px;
+    border-color: rgba(230, 235, 245, .3);
+    border-radius: 6px;
+    background: rgba(6, 15, 25, .28);
+  }
+
+  .auth-card input:hover {
+    border-color: rgba(230, 235, 245, .52);
+    background: rgba(6, 15, 25, .38);
+  }
+
+  .auth-card input:focus {
+    transform: translateY(-1px);
+  }
+
+  .auth-card .form-footnote {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid rgba(230, 235, 245, .14);
+    padding-top: 14px;
+  }
+}
+
+@media (max-width: 620px) and (forced-colors: none) {
+  .auth-card {
+    border-color: rgba(230, 235, 245, .3);
+    background:
+      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .07), transparent 42%),
+      linear-gradient(145deg, rgba(18, 38, 56, .46), rgba(7, 14, 24, .56));
+    -webkit-backdrop-filter: blur(9px) saturate(1.04);
+    backdrop-filter: blur(9px) saturate(1.04);
+    box-shadow: 0 22px 54px rgba(2, 10, 20, .22), inset 0 1px 0 rgba(255, 255, 255, .08);
+  }
+
+  .auth-card > .muted {
+    margin-bottom: 22px;
+  }
+
+  .auth-card .stack-form {
+    gap: 12px;
+  }
+
+  .auth-card input {
+    min-height: 50px;
+  }
+
+  .auth-card .form-footnote {
+    margin-top: 18px;
+    padding-top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-card,
+  .auth-card:focus-within,
+  .auth-card .stack-form > label,
+  .auth-card .stack-form > label::after,
+  .auth-field-label small,
+  .auth-card input {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .auth-card .stack-form > label::after,
+  .auth-card-top > span::before {
+    display: none;
+  }
+
+  .auth-field-label small {
+    color: CanvasText;
+  }
+
+  .auth-card .form-footnote {
+    border-color: CanvasText;
+  }
+}
