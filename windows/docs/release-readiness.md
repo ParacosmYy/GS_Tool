@@ -276,6 +276,10 @@ Dashboard 周期切换器在普通配色下从 `.58` alpha 深蓝玻璃与 `blur
 
 Dashboard 图表、自动采集、说明、记录和手动明细卡片在普通配色下从 `.84/.92` alpha 与 `blur(16px)` 收敛为 `.70/.82` alpha 深蓝渐变与 `blur(12px) saturate(1.06)`，让滚动态继续保留插画的空间层次；表单字段局部阅读底、空态图表引导、焦点边界、forced-colors 与 reduced-motion 复位保持不变。5204 隔离实例已完成 `320/390/768/1024/1440` 五档无横向溢出、四档 period 点击、字段焦点、控件命名、标题层级、桌面/移动深滚截图和清洁页面日志检查，独立证据见 `ui-accessibility-evidence-v104.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v105 自动采集连接状态透景
+
+自动采集标题旁的 `connection-badge` 在普通配色下改为低 alpha 垂直渐变、无 blur 的局部状态层，和透明 AI TOKEN 顶栏、周期切换器及 Dashboard 内容卡片使用同一层级语言；未连接、ready、error 的语义颜色与边界保留，forced-colors/reduced-motion 复位不变。5205 隔离实例已完成 `320/390/768/1024/1440` 五档无横向溢出、状态 computed style、Base URL 字段焦点、控件命名、标题层级、深滚截图和清洁页面日志检查，独立证据见 `ui-accessibility-evidence-v105.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

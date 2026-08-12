@@ -325,3 +325,5 @@
 - [x] v103 通过真实隔离 5203 实例确认 `/login` 与 `/register` 在 `320/390/768/1024/1440` 五档无横向溢出、`blur(11px)`、7/7 控件命名、1 个 h1/1 个 h2；同时确认登录字段焦点和桌面/移动截图，独立证据写入 `docs/ui-accessibility-evidence-v103.md`，真实设备与辅助偏好继续独立门禁。
 - [x] v104 将 Dashboard 图表、自动采集、说明、记录和手动明细卡片从高密度 `.84/.92 + blur(16px)` 收敛为 `.70/.82 + blur(12px)` 深蓝透景层，保留表单字段局部阅读底、空态图表对比度、forced-colors 和 reduced-motion 边界，让滚动态场景连续。
 - [x] v104 通过真实隔离 5204 实例确认 `320/390/768/1024/1440` 五档无横向溢出、卡片 `blur(12px)`、Today/Week/Month/All time 四档交互、表单字段焦点、36/37 或 40/41 控件命名、1 个 h1/8 个 h2 和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v104.md`，真实设备与辅助偏好继续独立门禁。
+- [x] v105 将自动采集标题旁的 `connection-badge` 从旧深色模糊胶囊统一为低 alpha、无 blur 的局部透景状态层，保留未连接、ready、error 三类颜色与语义边界，forced-colors 和 reduced-motion 规则不变。
+- [x] v105 通过真实隔离 5205 实例确认 `320/390/768/1024/1440` 五档无横向溢出、连接状态 `backdrop-filter: none`、卡片 `blur(12px)`、Base URL 字段焦点、36/37 或 40/41 控件命名、1 个 h1/8 个 h2 和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v105.md`，真实设备与辅助偏好继续独立门禁。

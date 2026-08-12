@@ -342,6 +342,11 @@
 - Dashboard 图表、自动采集、说明、记录和手动明细卡片在普通配色下改为 `.70/.82` alpha、`blur(12px) saturate(1.06)` 深蓝透景层；保留字段局部阅读底、空态图表语义、焦点边界、forced-colors/reduced-motion 边界，不改变 DOM、API、认证、表单值、数据流或 Tab 顺序。
 - 5204 隔离实例真实确认 `320/390/768/1024/1440` 五档无横向溢出、卡片 computed style、Today/Week/Month/All time 四档真实点击、Base URL 字段焦点、36/37 或 40/41 当前控件命名、1 个 h1/8 个 h2、桌面/移动深滚截图和清洁页面日志；证据见 `ui-accessibility-evidence-v104.md`，真实设备与辅助偏好继续独立门禁。
 
+### v105 交付增量
+
+- 自动采集标题旁的 `connection-badge` 在普通配色下改为低 alpha、无 blur 的局部透景层，保留未连接、ready、error 三类状态边界和颜色，不改变 DOM、API、认证、表单值、数据流、Tab 顺序或 forced-colors/reduced-motion 边界。
+- 5205 隔离实例真实确认 `320/390/768/1024/1440` 五档无横向溢出、状态 `backdrop-filter: none`、Dashboard 卡片 `blur(12px)`、Base URL 字段焦点、36/37 或 40/41 当前控件命名、1 个 h1/8 个 h2、深滚截图和清洁页面日志；证据见 `ui-accessibility-evidence-v105.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
