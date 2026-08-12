@@ -310,6 +310,12 @@
 - UI-2：变更集中在 `sticky-occlusion.js` 候选集合与既有 CSS 表现类；不改变 DOM、Tab 顺序、表单值、焦点语义、forced-colors、reduced-motion、API、认证或业务数据。
 - UI-3：真实 5188 隔离实例已确认 `scrollY=2200` 避让、提交按钮 Tab 焦点恢复、离开交叠带恢复、42 个可见焦点控件、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v92.md`，更上方字段残影和其他外部门禁继续独立记录。
 
+## v93 透明品牌行表面边界
+
+- UI-1：解决透明 AI TOKEN 行下方深蓝卡片穿过 sticky 顶栏造成的“顶栏不透明”观感；表面仅在交叠带局部裁切，背景插画恢复连续透景。
+- UI-2：变更集中在 `sticky-occlusion.js` 的表面交叠测量与 `responsive-tuning.css` 的 mask 表现；`:focus-within` 清除裁切，保留字段焦点、DOM、Tab 顺序、API、认证、业务数据、reduced-motion 和 forced-colors 边界。
+- UI-3：真实 5189 隔离实例已确认 `scrollY=2200` 顶栏透明、76px 局部裁切、备注字段焦点恢复、离开交叠带恢复、40 个可见焦点控件、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v93.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

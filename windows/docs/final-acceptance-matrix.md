@@ -285,6 +285,12 @@
 - sticky 避让候选扩展到 `.site-main .auto-form-actions`，按钮与隐私说明作为完整操作行退出顶栏交叠带；`:focus-within` 保留提交按钮可见、可达、可操作，DOM、表单值、API 和业务数据不变。
 - 5188 隔离实例真实确认 `scrollY=2200` 避让、Tab 聚焦恢复、离开交叠带恢复、透明 AI TOKEN 顶栏、无横向溢出和清洁页面日志；更上方表单字段避让、viewport override、真实设备与辅助偏好继续独立门禁。
 
+### v93 交付增量
+
+- 透明 AI TOKEN sticky 顶栏继续保持 `transparent / no blur`；新增内容表面交叠测量和局部裁剪，仅移除穿过 76px 顶栏带的卡片填充，背景场景恢复连续透景。
+- `:focus-within` 清除卡片裁剪，自动采集备注输入仍可通过键盘聚焦并保持完整字段可见；不改变 DOM、Tab 顺序、API、认证、业务数据或 forced-colors/reduced-motion 复位边界。
+- 5189 隔离实例真实确认 `scrollY=2200` 顶栏透明、卡片交叠裁切、备注字段焦点恢复、离开交叠带恢复、40 个可见焦点控件、1 个 `h1`/8 个 `h2`、无横向溢出和清洁页面日志；viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

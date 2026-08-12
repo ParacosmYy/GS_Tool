@@ -303,3 +303,5 @@
 - [x] v91 通过真实隔离 5187 实例确认 `scrollY=1118` 深度避让、`scrollY=898` 返回恢复、透明顶栏、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v91.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 - [x] v92 将自动采集 `.auto-form-actions` 作为完整 sticky 避让单元，按钮和 Key 隐私说明一起退出视觉层，`:focus-within` 下整行恢复。
 - [x] v92 通过真实隔离 5188 实例确认 `scrollY=2200` 深度避让、Tab 聚焦提交按钮恢复、离开交叠带恢复、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v92.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+- [x] v93 修复透明 AI TOKEN 顶栏下方卡片表面穿透：sticky 模块测量内容表面交叠带，CSS 只裁切顶栏覆盖的 76px 区域，品牌行恢复连续透景。
+- [x] v93 通过真实隔离 5189 实例确认 `scrollY=2200` 顶栏透明、卡片交叠带裁切、备注字段焦点恢复、离开交叠带恢复、40 个可见焦点控件、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v93.md`，viewport override、真实设备与辅助偏好继续独立门禁。

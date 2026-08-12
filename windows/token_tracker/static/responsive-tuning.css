@@ -136,10 +136,49 @@
   pointer-events: auto;
 }
 
+/* A card surface can cross the sticky row even when none of its controls do.
+   Mask only the part that sits behind the transparent chrome so the artwork
+   remains visible instead of exposing a dark panel through the AI TOKEN line.
+   The overlap bounds are measured by sticky-occlusion.js; focus-within restores the
+   complete surface while a keyboard user is working inside it. */
+.site-main .has-sticky-occlusion {
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.site-main .has-sticky-occlusion:not(:focus-within) {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 var(--sticky-occlusion-start),
+    transparent var(--sticky-occlusion-start),
+    transparent var(--sticky-occlusion-end),
+    #000 var(--sticky-occlusion-end),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 var(--sticky-occlusion-start),
+    transparent var(--sticky-occlusion-start),
+    transparent var(--sticky-occlusion-end),
+    #000 var(--sticky-occlusion-end),
+    #000 100%
+  );
+}
+
+.site-main .has-sticky-occlusion:focus-within {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-actions,
   .scroll-cue,
-  .site-main .is-under-sticky-header { transition: none; }
+  .site-main .is-under-sticky-header,
+  .site-main .has-sticky-occlusion { transition: none; }
 
   .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
     transform: none;
@@ -273,6 +312,12 @@
     opacity: 1;
     pointer-events: auto;
     transition: none;
+  }
+
+  .site-main .has-sticky-occlusion,
+  .site-main .has-sticky-occlusion:focus-within {
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 }
 

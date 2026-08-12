@@ -232,6 +232,10 @@ sticky 避让模块现在同时保护按钮、折叠入口和 `.card-heading`：
 
 sticky 避让模块现在将自动采集 `.auto-form-actions` 与其提交按钮、隐私说明视为完整视觉单元；深度交叠时整行退出，提交按钮获得焦点时通过 `:focus-within` 恢复，离开后恢复正常显示。5188 隔离实例已完成 `scrollY=2200` 深度避让、Tab 焦点恢复、离开交叠带恢复、截图、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v92.md`；更上方表单字段残影、viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v93 透明品牌行表面边界
+
+透明 AI TOKEN sticky 顶栏现在由 `sticky-occlusion.js` 同时测量内容表面交叠带；`responsive-tuning.css` 对卡片只裁剪顶栏覆盖的局部区域，让背景插画连续透过品牌行，不给顶栏重新加实心背景。`5189` 隔离实例已完成 `scrollY=2200` 顶栏透明计算样式、76px 交叠带裁切、备注字段 `:focus-within` 恢复、离开交叠带恢复、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v93.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

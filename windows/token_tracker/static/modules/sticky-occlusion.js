@@ -7,7 +7,9 @@
  */
 
 const OCCLUDED_CLASS = "is-under-sticky-header";
+const SURFACE_OCCLUDED_CLASS = "has-sticky-occlusion";
 const CANDIDATE_SELECTOR = ".site-main .button, .site-main summary, .site-main .card-heading, .site-main .auto-form-actions";
+const SURFACE_SELECTOR = ".site-main .auth-card, .site-main .chart-card, .site-main .form-card, .site-main .records-card, .site-main .guide-card, .site-main .manual-details";
 
 function intersectsHeader(element, headerRect) {
   const rect = element.getBoundingClientRect();
@@ -16,6 +18,19 @@ function intersectsHeader(element, headerRect) {
 
 function isFocused(element) {
   return element.matches(":focus-within");
+}
+
+function getSurfaceOcclusionBounds(element, headerRect, shouldGuard) {
+  if (!shouldGuard) return null;
+
+  const rect = element.getBoundingClientRect();
+  const intersects = rect.bottom > headerRect.top && rect.top < headerRect.bottom;
+  if (!intersects) return null;
+
+  return {
+    start: Math.max(0, headerRect.top - rect.top),
+    end: Math.min(rect.height, headerRect.bottom - rect.top),
+  };
 }
 
 /**
@@ -31,7 +46,8 @@ export function setupStickyOcclusion() {
 
   const candidates = [...document.querySelectorAll(CANDIDATE_SELECTOR)]
     .filter((element) => !element.closest(".hero-actions"));
-  if (!candidates.length) return;
+  const surfaces = [...document.querySelectorAll(SURFACE_SELECTOR)];
+  if (!candidates.length && !surfaces.length) return;
 
   root.dataset.stickyOcclusionReady = "true";
   let frame = 0;
@@ -42,6 +58,17 @@ export function setupStickyOcclusion() {
     candidates.forEach((element) => {
       const occluded = shouldGuard && intersectsHeader(element, headerRect) && !isFocused(element);
       element.classList.toggle(OCCLUDED_CLASS, occluded);
+    });
+    surfaces.forEach((element) => {
+      const occlusionBounds = getSurfaceOcclusionBounds(element, headerRect, shouldGuard);
+      if (occlusionBounds) {
+        element.style.setProperty("--sticky-occlusion-start", `${occlusionBounds.start}px`);
+        element.style.setProperty("--sticky-occlusion-end", `${occlusionBounds.end}px`);
+      } else {
+        element.style.removeProperty("--sticky-occlusion-start");
+        element.style.removeProperty("--sticky-occlusion-end");
+      }
+      element.classList.toggle(SURFACE_OCCLUDED_CLASS, Boolean(occlusionBounds));
     });
     frame = 0;
   };
