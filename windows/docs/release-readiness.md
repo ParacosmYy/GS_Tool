@@ -458,3 +458,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 `5000` 的 1440/1024/390、Activity 深链接与 `5011` 的 1024 完整入口回归通过；导航不挤压、不产生横向溢出，证据见 `docs/ui-accessibility-evidence-v137.md`。
 - 本轮仅改动前端导航兼容层，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持原状态。
+
+## v138 手机首屏周期切换器收口
+
+- 390×844 的周期切换器现在完整落在首屏底部，5000 旧入口与 5011 共享入口 computed layout 一致；320×720 继续保留 CTA 空间。
+- 768×900 与 1440×900 未命中新规则；四项周期按钮的 `aria-pressed` 状态、文档宽度和页面侧日志保持正常，证据见 `docs/ui-accessibility-evidence-v138.md`。
+- 本轮只修改共享 CSS presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。

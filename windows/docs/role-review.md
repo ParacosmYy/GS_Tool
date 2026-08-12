@@ -624,3 +624,11 @@
 - UI-3：5000 的 1440/1024/390、Activity 深链接、5011 的 1024 完整入口、导航计数、文档宽度和透明品牌栏已复核；证据见 `ui-accessibility-evidence-v137.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
 - 架构师：兼容 guard 与导航状态同模块高内聚，文件行数、响应式、forced-colors/reduced-motion 边界保持有效。
+
+## v138 手机首屏周期切换器收口
+
+- UI-1：修复正常高度手机 390×844 首屏周期切换器被视口截断的问题；共享 `ui-polish.css` 将 hero footer 顶部间距收敛为 10px，Today 活动项完整可见。
+- UI-2：短屏 320×720 保留 18px 间距和 CTA 几何；768/1440 桌面与平板不命中该媒体查询；没有改动 DOM、脚本、周期交互、图表或数据流。
+- UI-3：真实 `5000`/`5011` 的 390×844、`5000` 的 320×720/768×900/1440×900、四项按钮 `aria-pressed`、无横向溢出与页面侧日志已复核；证据见 `ui-accessibility-evidence-v138.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
+- 架构师：规则放在两个启动链共同加载的共享 presentation contract，撤回未加载的重复候选；文件行数、响应式、forced-colors/reduced-motion 边界保持有效。

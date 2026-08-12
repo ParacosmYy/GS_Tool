@@ -918,3 +918,10 @@ html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0
   .manual-details, .manual-details::before, .manual-details summary, .manual-details summary i { transition: none; }
   .manual-details-body { animation: none; }
 }
+
+/* Normal-height phones should show the complete period cursor in the first
+   scan. This shared fallback is loaded by both the legacy and current launch
+   chains; the short-screen contract intentionally keeps more room for CTAs. */
+@media (min-width: 361px) and (max-width: 620px) and (min-height: 761px) {
+  .hero-foot { padding-top: 10px; }
+}

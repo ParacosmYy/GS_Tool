@@ -392,3 +392,5 @@
 - [x] v136 通过真实 `5000` 的 1683/390/320/768 viewport、1200 深滚与 `5011` 的 1440 完整入口确认 reveal 计算样式、首屏构图、无横向溢出和页面侧日志；独立证据写入 `docs/ui-accessibility-evidence-v136.md`。
 - [x] v137 修复旧运行模板缺失 Activity 导航入口的问题：当页面存在 `#activity` 而导航缺失时由 `navigation.js` 兼容补链，当前模板不会重复插入。
 - [x] v137 通过真实 `5000` 的 1440/1024/390 viewport、Activity 深链接与 `5011` 的 1024 完整入口确认四项导航、ARIA active state、sticky 定位、透明品牌栏和无横向溢出；独立证据写入 `docs/ui-accessibility-evidence-v137.md`。
+- [x] v138 修复正常高度手机 390×844 首屏周期切换器被底部视口截断的问题：共享 `ui-polish.css` 将 hero footer 顶部间距收敛为 10px，短屏与桌面保持既有布局。
+- [x] v138 通过真实 `5000`/`5011` 的 390×844、`5000` 的 320×720/768×900/1440×900、周期按钮 ARIA、无横向溢出和页面侧日志确认跨入口一致性；独立证据写入 `docs/ui-accessibility-evidence-v138.md`。
