@@ -592,3 +592,11 @@
 - UI-3：真实 `1683×892` 首屏、`scrollY=900` 深滚、5011 完整入口 computed style、截图、DOM 快照和清洁日志已复核；证据见 `ui-accessibility-evidence-v133.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID 保持 `43832/8100`。
 - 架构师：变化限定在 `01-shell / brand transparency boundary`，所有修改文件低于 1000 行；回滚边界为共享材质声明和职责注释。
+
+## v134 Hero 元信息局部信号胶囊
+
+- UI-1：真实 390px 截图定位到 `已更新：今天` 在插画上缺少阅读边界；新增局部深蓝信号胶囊和产品标签 beacon，保持外层 hero 元信息带与 AI TOKEN 顶栏透明。
+- UI-2：新增 `hero-signal.css` 作为 02-observatory 专属表现模块，由 `ui-polish.css` import 兼容 5000 旧入口；复用既有 DOM、`role=status`、`aria-live` 和 CSS 动效降级，不新增脚本监听器。
+- UI-3：真实 `1683×892`、`390×844`、`320×720`、5011 深滚 computed style、截图、DOM 快照、无横向溢出和清洁日志已复核；证据见 `ui-accessibility-evidence-v134.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
+- 架构师：变化限定在 `02-observatory / hero signal metadata`，新增文件 163 行、通用样式 920 行，均低于 1000 行。

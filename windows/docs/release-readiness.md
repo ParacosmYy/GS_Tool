@@ -430,3 +430,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 5000 首屏、`scrollY=900` 深滚、5011 完整入口和清洁页面日志已完成回归；证据见 `ui-accessibility-evidence-v133.md`。
 - 本轮仅改动前端 CSS 契约与职责注释，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好门禁继续保持 pending。
+
+## v134 Hero 元信息局部信号胶囊
+
+- Dashboard 的 `AI TOKEN / OBSERVATORY` 与更新状态现在使用局部 signal boundary：产品标签 beacon、低 alpha 状态胶囊、错误态和窄屏收缩已完成，外围 hero 与品牌顶栏保持透明。
+- 真实 1683/390/320 viewport、5011 深滚、computed style、截图、DOM 快照和清洁页面日志已完成回归；证据见 `ui-accessibility-evidence-v134.md`。
+- 本轮仅改动 `hero-signal.css` 与一个 import，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好门禁继续保持 pending。

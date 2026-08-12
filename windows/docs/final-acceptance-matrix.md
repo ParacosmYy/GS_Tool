@@ -516,3 +516,11 @@
 - UI-3：真实 5000 桌面首屏/深滚、5011 完整链 computed style、截图、DOM 快照、无正向横向溢出和清洁日志已确认；证据见 `ui-accessibility-evidence-v133.md`。
 - 后端：无后端、认证、数据库、CSRF、Provider 或数据契约变化；保护 PID 保持不变。
 - 架构师：变化限定在 `01-shell / brand transparency boundary`，`ui-polish.css=919`、`brand-transparency.css=100`，所有修改文件均低于 1000 行；正式 Android、EXE 签名、HTTPS/ACL、真实 Provider、备份恢复和真实设备门禁继续 pending。
+
+## v134 Hero 元信息局部信号胶囊
+
+- UI-1：修复 Dashboard 首屏更新状态在插画上不易扫描的问题；状态胶囊增加局部阅读层，产品标签增加 beacon，整条 hero 元信息带和 AI TOKEN 顶栏不恢复为黑色横条。
+- UI-2：`hero-signal.css` 作为独立 02-observatory 表现模块接入旧入口兼容链；复用既有节点、CSS 状态和系统动效边界，不新增业务逻辑。
+- UI-3：真实桌面、390px、320px、5011 深滚、无正向横向溢出、DOM/ARIA 和清洁日志已确认；证据见 `ui-accessibility-evidence-v134.md`。
+- 后端：无后端、认证、数据库、CSRF、Provider 或数据契约变化；保护 PID 保持不变。
+- 架构师：新增 `hero-signal.css=163`、`ui-polish.css=920`，均低于 1000 行；真实设备、Android、EXE 签名、HTTPS/ACL、Provider、备份恢复门禁继续 pending。
