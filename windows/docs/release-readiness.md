@@ -296,6 +296,9 @@ Dashboard 图表、自动采集、说明、记录和手动明细卡片在普通�
 
 Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当透明 AI TOKEN 顶栏覆盖控件时淡出并停止点击，焦点路径通过 `:focus-within` 恢复，未发生实际交叠的移动/桌面视口保持可见。5210 隔离实例已完成 `320/390/768/1024/1440` 五档几何、无横向溢出、焦点恢复和清洁页面日志，独立证据见 `ui-accessibility-evidence-v109.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v110 AI TOKEN 顶部品牌栏透光层
+
+将顶部品牌栏统一为低 alpha 垂直透光渐变，关闭 `backdrop-filter` 与深色外投影，仅保留极轻的底部内侧高光；登录页与 Dashboard 首屏/深滚共用同一视觉契约，避免透明场景被模糊横带或黑色面板切断。5211 隔离实例已完成桌面、`390×844`、`320×720` 和 Dashboard 深滚验证，证据见 `ui-accessibility-evidence-v110.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

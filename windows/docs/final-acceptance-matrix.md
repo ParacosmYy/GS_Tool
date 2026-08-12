@@ -367,6 +367,10 @@
 - Dashboard 周期切换器加入既有 sticky occlusion 候选，透明 AI TOKEN 顶栏发生实际覆盖时收束并停止点击，`focus-within` 恢复可见和可操作；不新增监听器，不改变周期 API、DOM 语义或 Tab 顺序。
 - 真实隔离 5210 实例确认 `320/390/768/1024/1440` 五档无横向溢出、交叠/非交叠边界、焦点恢复、1 个 h1/8 个 h2 和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v109.md`。
 
+### v110 交付增量
+
+- 顶部 AI TOKEN 品牌栏统一使用低 alpha 透光渐变，普通配色下无 blur、无深色外投影，forced-colors 分支仍交给系统颜色；证据见 `docs/ui-accessibility-evidence-v110.md`。
+- 真实隔离 5211 实例确认登录页、Dashboard 首屏/`scrollY=1200` 深滚、`390×844` 与 `320×720` 的 computed style、无横向溢出和清洁页面日志。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

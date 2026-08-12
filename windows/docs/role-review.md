@@ -406,6 +406,12 @@
 - UI-2：复用 `sticky-occlusion.js` 既有 requestAnimationFrame 调度和 `:focus-within` 恢复，不新增监听器、计时器、依赖或动画；reduced-motion/forced-colors 边界保持。
 - UI-3：5210 隔离浏览器确认 `320/390/768/1024/1440` 五档无横向溢出、交叠边界、周期焦点恢复和清洁页面日志；真实设备与辅助偏好仍待独立门禁。
 
+## v110 顶部品牌栏透光层
+
+- UI：将 AI TOKEN 顶栏回归为低 alpha 透光渐变，移除模糊横带，保持品牌层与背景插画的连续性。
+- 前端：仅修改共享 `responsive-tuning.css`，未改变模板、交互、接口或 sticky 避让逻辑。
+- 后端：无后端改动；隔离数据库和受保护服务保持不变。
+- 架构：沿用“共享视觉契约 + forced-colors 隔离 + 独立证据”的边界，文件行数保持在项目硬门禁内。
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
