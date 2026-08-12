@@ -144,6 +144,29 @@
   .auth-card:focus-within {
     box-shadow: 0 26px 68px rgba(2, 10, 20, .3), 0 0 0 4px rgba(217, 255, 120, .08), inset 0 1px 0 rgba(255, 255, 255, .12);
   }
+
+  /* Secondary auth copy sits on the same moving illustration as the glass
+     card. Lift its quiet text one step and give the route link a restrained
+     underline so the alternate path remains discoverable on narrow screens. */
+  .auth-card > .muted,
+  .auth-card .form-footnote {
+    color: var(--ink-soft);
+    text-shadow: 0 1px 2px rgba(8, 9, 12, .9), 0 0 8px rgba(8, 9, 12, .62);
+  }
+
+  .auth-card .form-footnote a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: rgba(217, 255, 120, .58);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .auth-card .form-footnote a:hover,
+  .auth-card .form-footnote a:focus-visible {
+    color: var(--signal-lime);
+    text-decoration-color: var(--signal-lime);
+  }
 }
 
 /* The period control is a scene instrument, not a dark floating tile. Keep

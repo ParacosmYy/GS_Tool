@@ -357,6 +357,11 @@
 - `.hero-lede` 增加局部文字 keyline，保护透明插画上的中文说明阅读边缘；不改变 DOM、API、认证、表单值、数据流、Tab 顺序或 forced-colors/reduced-motion 边界。
 - 真实隔离 5208 实例确认 `320×720/390×844/768/1024/1440` 五档无横向溢出、说明文字阴影、metadata 四边透明、周期 `aria-pressed` 同步、深滚 header/card 层级和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v107.md`。
 
+### v108 交付增量
+
+- 登录/注册共享认证卡片的辅助说明与底部切换链接使用更高语义文字色、局部文字 keyline 和细 lime 下划线；不改变 DOM、API、认证流程、Tab 顺序或 forced-colors/reduced-motion 边界。
+- 真实隔离 5209 实例确认登录/注册 `320/390/768/1440` 四档无横向溢出、卡片 `blur(11px)` 透明材质、链接样式、用户名 `:focus-within` 状态和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v108.md`。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
