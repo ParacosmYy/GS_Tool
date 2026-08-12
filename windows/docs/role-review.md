@@ -688,3 +688,11 @@
 - UI-3：项目源码临时验证端口 `5026` 的 320/390/1440 真实浏览器回归通过；无横向溢出、控件 `tabIndex=0`、提交按钮 48px、页面日志为空；证据见 `ui-accessibility-evidence-v146.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
 - 架构师：变化限定在活动录入 presentation boundary，使用 `fieldset/legend` 保持语义内聚；新增 CSS 122 行，所有文本源码低于 1000 行，无新依赖或跨层耦合。
+
+## v147 移动端滚动路由上下文
+
+- UI-1：手机隐藏主导航后，品牌栏中间新增 `OVERVIEW / ANALYSIS / CONNECT / ACTIVITY / HISTORY` 非交互上下文提示，深链与滚动状态均可快速识别。
+- UI-2：新增 `route-context.css` 作为响应式 shell context 专属表现边界；`navigation.js` 复用既有 `setActive` 更新文本，不增加第二套导航状态或业务耦合。
+- UI-3：源码临时端口 `5026` 的 320/390/1440 真实浏览器回归通过；路由指示、`aria-current`、目标落点、桌面隐藏、无横向溢出和页面日志均已复核；证据见 `ui-accessibility-evidence-v147.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
+- 架构师：变化限定在高内聚导航表现边界，新增 CSS 79 行，导航模块仍 333 行，所有文本源码低于 1000 行；无新依赖或跨层耦合。

@@ -5,6 +5,13 @@
  * Module: Web presentation / navigation contract
  */
 
+function setMobileRouteContext(activeLink, fallback = "OBSERVATORY") {
+  const context = document.querySelector(".mobile-route-context");
+  if (!context) return;
+  const label = activeLink?.textContent?.trim() || fallback;
+  context.textContent = label.toUpperCase();
+}
+
 function setActive(links, activeLink) {
   links.forEach((link) => {
     const active = link === activeLink;
@@ -12,6 +19,7 @@ function setActive(links, activeLink) {
     if (active) link.setAttribute('aria-current', 'location');
     else link.removeAttribute('aria-current');
   });
+  setMobileRouteContext(activeLink);
 }
 
 function setupScrollProgress() {
@@ -275,7 +283,11 @@ function setupSectionContext(links) {
     link
   ]));
   const hashLink = sectionLinks.find((link) => link.hash === window.location.hash);
-  setActive(sectionLinks, hashLink || sectionLinks[0]);
+  if (hashLink) setActive(sectionLinks, hashLink);
+  else {
+    setActive(sectionLinks, null);
+    setMobileRouteContext(null, "OVERVIEW");
+  }
 
   if (!("IntersectionObserver" in window)) return;
   const observer = new IntersectionObserver((entries) => {

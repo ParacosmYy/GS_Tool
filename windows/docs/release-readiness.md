@@ -514,3 +514,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 项目源码临时服务 `5026` 的 320/390/1440 真实浏览器回归通过；文档无横向溢出、表单控件可键盘到达、页面日志为空；证据见 `docs/ui-accessibility-evidence-v146.md`。
 - 本轮修改前端模板与 CSS presentation contract，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
+
+## v147 移动端滚动路由上下文
+
+- 移动端隐藏主导航后，当前 Dashboard 分区会在透明品牌栏中央显示：`OVERVIEW`、`ANALYSIS`、`CONNECT`、`ACTIVITY` 或 `HISTORY`；桌面端保持隐藏。
+- 项目源码临时服务 `5026` 的 320/390/1440 真实浏览器回归通过；`aria-current`、无横向溢出、深链落点和页面日志正常；证据见 `docs/ui-accessibility-evidence-v147.md`。
+- 本轮修改前端模板、导航表现逻辑与 CSS presentation contract，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。

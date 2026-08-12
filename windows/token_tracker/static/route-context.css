@@ -1,0 +1,79 @@
+/**
+ * AI Token Tracker — mobile route context
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Keep the current dashboard section legible after the compact
+ *          navigation collapses, without turning the transparent header into
+ *          a filled panel or adding another interactive control.
+ * Module: UI-1 visual director / responsive shell context
+ */
+
+.mobile-route-context {
+  display: none;
+}
+
+@media (max-width: 620px) {
+  /* The context occupies the existing center lane between the brand and the
+     session action. It is intentionally non-interactive; section navigation
+     remains owned by the existing hero actions and document anchors. */
+  .mobile-route-context {
+    display: inline-flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    margin-inline: 8px;
+    overflow: hidden;
+    color: var(--ink-muted);
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(8, 9, 12, .78);
+    transition: color .35s var(--ui-ease), opacity .35s var(--ui-ease);
+  }
+
+  .mobile-route-context::before {
+    width: 5px;
+    height: 5px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    content: "";
+    background: var(--signal-lime);
+    box-shadow: 0 0 9px rgba(217, 255, 120, .8);
+  }
+
+  .site-header.is-scrolled .mobile-route-context {
+    color: var(--ink-soft);
+  }
+}
+
+@media (max-width: 340px) {
+  .mobile-route-context {
+    margin-inline: 4px;
+    font-size: 8px;
+    letter-spacing: .08em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-route-context {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .mobile-route-context {
+    color: CanvasText;
+    text-shadow: none;
+  }
+
+  .mobile-route-context::before {
+    background: CanvasText;
+    box-shadow: none;
+  }
+}

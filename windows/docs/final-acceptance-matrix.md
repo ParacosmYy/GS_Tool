@@ -612,3 +612,11 @@
 - UI-3：源码临时端口 `5026` 的 320/390/1440 真实浏览器回归通过：无横向溢出、控件 `tabIndex=0`、提交按钮 48px、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v146.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
 - 架构师：新增文件 122 行，`ui-polish.css` 990 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
+
+## v147 移动端滚动路由上下文
+
+- UI-1：移动端透明品牌栏在主导航折叠后显示当前 Dashboard 分区上下文，避免用户在长页面中失去位置感。
+- UI-2：`route-context.css` 只负责窄屏视觉和系统色降级；`navigation.js` 复用 `setActive`，不改现有链接、hash、业务数据或 API。
+- UI-3：源码临时端口 `5026` 的 320/390/1440 真实浏览器回归通过：状态文本、`aria-current`、桌面 `display:none`、目标落点、无横向溢出、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v147.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
+- 架构师：新增文件 79 行，`ui-polish.css` 991 行，导航模块 333 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
