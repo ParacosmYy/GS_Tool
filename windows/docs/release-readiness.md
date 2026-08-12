@@ -472,3 +472,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 320×720 的 CTA 几何、768×900 与 1440×900 的 40% 场景焦点保持；透明顶栏、ARIA 状态、无横向溢出和页面侧日志回归通过，证据见 `docs/ui-accessibility-evidence-v139.md`。
 - 本轮只修改共享 CSS presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。
+
+## v140 旧入口场景动效兼容补链
+
+- 5000 旧入口现在拥有 18s/21s 的低强度共享环境信号，5011 完整入口保持 16s/13s 正式场景动画；两个入口不再出现静态/动态视觉断层。
+- 390/320/768/1440 真实回归通过，移动背景焦点、CTA、周期控件、透明顶栏、ARIA 树、文档宽度和页面侧日志保持正常，证据见 `docs/ui-accessibility-evidence-v140.md`。
+- reduced-motion 与 forced-colors 降级已检查；本轮只修改共享 CSS presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。

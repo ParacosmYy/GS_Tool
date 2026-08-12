@@ -92,6 +92,37 @@ a { color: var(--ink-soft); }
 a:hover { color: var(--ink); }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline-color: var(--signal-lime); }
 
+/* The legacy launcher does not load scene-motion.css, but it still owns the
+   same observatory backdrop. Give that fallback one restrained environmental
+   signal so the old and complete chains do not diverge into static versus
+   animated hero scenes. The later scene module intentionally overrides this
+   equal-specificity rule with its richer choreography. */
+.story-backdrop::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 9% 7%, rgba(81, 132, 193, .1), transparent 28%),
+    linear-gradient(112deg, transparent 38%, rgba(217, 255, 120, .028) 48%, transparent 58%);
+  background-size: auto, 220% 100%;
+  background-position: center, -120% 0;
+  mix-blend-mode: screen;
+  opacity: .36;
+  animation: shared-scene-glow 18s ease-in-out infinite alternate, shared-scene-scan 21s linear infinite;
+}
+
+@keyframes shared-scene-glow {
+  from { opacity: .24; transform: scale(1); }
+  to { opacity: .46; transform: scale(1.014) translate3d(-.25%, .18%, 0); }
+}
+
+@keyframes shared-scene-scan {
+  from { background-position: center, -120% 0; }
+  to { background-position: center, 120% 0; }
+}
+
 /* Login/register: short, visible choreography prevents a blank first frame. */
 .auth-shell {
   max-width: 1180px;
@@ -922,6 +953,7 @@ html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0
 
 @media (prefers-reduced-motion: reduce) {
   html.motion-ready [data-reveal], html.motion-ready [data-reveal].is-visible { opacity: 1; transform: none; }
+  .story-backdrop::after { animation: none; }
   .chart-empty-marker { animation: none; }
   .table-empty--signal::before, .table-empty--signal::after { animation: none; }
   .manual-details, .manual-details::before, .manual-details summary, .manual-details summary i { transition: none; }

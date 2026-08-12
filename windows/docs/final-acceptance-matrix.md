@@ -564,3 +564,11 @@
 - UI-3：真实 5000/5011 的 390×844、5000 的 320×720/768×900/1440×900、透明顶栏、按钮 `aria-pressed`、文档宽度和页面侧日志已确认；证据见 `ui-accessibility-evidence-v139.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 保持不变。
 - 架构师：变化限定在共享场景 presentation boundary，兼容旧入口真实加载链，所有修改文件低于 1000 行。
+
+## v140 旧入口场景动效兼容补链
+
+- UI-1：5000 旧链从 `animation-name: none` 补为低强度 `shared-scene-glow/shared-scene-scan`；5011 保持正式 `backdrop-glow/backdrop-scan`，旧链视觉生命感与完整链对齐。
+- UI-2：新增动效仅作用于 `aria-hidden` 背景伪元素，使用 18s/21s 慢节奏和低透明度，`prefers-reduced-motion` 停止，`forced-colors` 隐藏；不影响阅读层、焦点或文档几何。
+- UI-3：真实两个入口的 390/320/768/1440 断点、动效计算值、无障碍树、透明顶栏、周期 ARIA、无横向溢出和页面日志已确认；证据见 `ui-accessibility-evidence-v140.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 保持不变。
+- 架构师：变化限定在共享 scene presentation boundary，无新依赖、重复逻辑或跨层耦合，所有修改文件低于 1000 行。
