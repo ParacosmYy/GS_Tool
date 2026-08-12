@@ -302,6 +302,9 @@ Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当�
 ## v111 认证卡片 signal line 呼吸
 
 登录/注册卡片只在普通配色且允许动效时让既有顶部 signal line 追加低频光晕呼吸；卡片本体不参与 shadow 动画，`:focus-within` 保留原有键盘 focus 边界，forced-colors/reduced-motion 维持降级。5212 隔离实例完成桌面与 `390×844` 真实浏览器验证，证据见 `ui-accessibility-evidence-v111.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+## v112 Dashboard 指标栏 sticky 避让
+
+将三个 `.signal-cell` 纳入既有 `sticky-occlusion.js` 候选集合；当指标实际穿过透明 AI TOKEN 顶栏的 `76px` 阅读带时，复用统一的 `is-under-sticky-header` 规则淡出并停止指针命中，离开交叠区后恢复。焦点恢复、forced-colors 与 reduced-motion 边界沿用既有规则，不改变 Dashboard 数据、API 或布局契约。5213 隔离实例已完成桌面首屏与稳定 `scrollY=980` 深滚验证，证据见 `ui-accessibility-evidence-v112.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

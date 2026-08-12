@@ -418,6 +418,12 @@
 - 前端：动效限定在 `@media (forced-colors: none)` 与 `prefers-reduced-motion: no-preference`，`:focus-within` 自动恢复原有 focus 视觉。
 - 后端：无后端、接口、数据库改动。
 - 架构：共享样式仍位于 `responsive-tuning.css`，保留低耦合、文件行数和回滚边界。
+## v112 Dashboard 指标栏 sticky 避让
+
+- UI：深滚时指标单元不再与透明 AI TOKEN 顶栏文字叠层，实际进入 `76px` 阅读带后整体退出，离开后保持原有透明构图。
+- 前端：将 `.signal-cell` 加入 `sticky-occlusion.js` 既有候选集合，沿用 requestAnimationFrame 调度、统一淡出规则和 `focus-within` 恢复；无新增监听器、依赖或页面脚本。
+- 后端：无后端、接口、数据库改动。
+- 架构：变更只涉及共享遮挡选择器与共享过渡样式，遵守低耦合、文件行数和回滚边界；真实隔离 5213 证据见 `docs/ui-accessibility-evidence-v112.md`。
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

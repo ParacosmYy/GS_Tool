@@ -271,6 +271,15 @@
   pointer-events: auto;
 }
 
+/* The metric rail is intentionally transparent and can travel underneath the
+   sticky brand chrome during a deep scroll. Hide each reading cell as a unit
+   while it crosses the 76px header band; otherwise its label/value fragments
+   read as a second navigation layer behind the AI TOKEN row. Focus restores a
+   cell for keyboard users through the shared rule above. */
+.site-main .signal-cell {
+  transition: opacity .24s var(--ui-ease), background-color .24s var(--ui-ease);
+}
+
 /* A card surface can cross the sticky row even when none of its controls do.
    Mask only the part that sits behind the transparent chrome so the artwork
    remains visible instead of exposing a dark panel through the AI TOKEN line.

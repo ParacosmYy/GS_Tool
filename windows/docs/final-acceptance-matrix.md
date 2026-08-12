@@ -375,6 +375,10 @@
 
 - 认证卡片既有顶部 signal line 增加低频边界呼吸；仅普通配色/允许动效启用，聚焦、forced-colors、reduced-motion 不改变可访问边界。
 - 真实隔离 5212 实例确认桌面与 `390×844` 的 computed style、焦点边界、卡片几何、可访问性结构、无横向溢出和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v111.md`。
+### v112 交付增量
+
+- Dashboard 指标栏复用 sticky occlusion 候选机制；三个 `.signal-cell` 穿过透明 AI TOKEN 顶栏时淡出并停止指针命中，离开交叠区后恢复，不改变数据、API、DOM 语义或移动端列布局。
+- 真实隔离 5213 实例确认 `1440×900` 首屏与稳定 `scrollY=980` 深滚的顶栏 `76px` 边界、指标交叠隐藏、无横向溢出和完成态页面；证据见 `docs/ui-accessibility-evidence-v112.md`。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
