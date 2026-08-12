@@ -367,3 +367,6 @@
 - [x] v124 通过全新浏览器上下文确认三个章节最终落点、无 hash 首屏、Connect 点击导航、滚动策略释放、无横向溢出和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v124.md`，真实设备与辅助偏好继续独立门禁。
 - [x] v125 将最上方 AI TOKEN 品牌行从被最终透明契约压成的黑色视觉带，修正为低 alpha 深蓝玻璃层：背景可见、`blur(11px)` 控制在阅读范围、移动端轻微增强，forced-colors 规则保持最高优先级；同步修正文档与模块注释。
 - [x] v125 通过两个现有本地服务确认 `brand-transparency.css` 可正常返回并包含玻璃规则，Python 编译检查、Git 空白检查和文本文件行数门禁通过；独立证据写入 `docs/ui-accessibility-evidence-v125.md`，保护端口 `5000/5011` 未重启。
+- [x] v126 修复旧入口 `hero-topline` 全宽底线造成的插画横向断层：改为局部 signal trace，保留状态文字、布局、强制配色边界与完整模板契约，不改变业务数据或接口。
+- [x] v126 通过真实 `5000` 桌面与 `390×844` 回归确认透明元信息层、局部 trace、无正向横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v126.md`。
+- [x] v126 修复全量审计发现的通用样式超限：将 Admin 专属规则从 `ui-polish.css` 拆至 `admin-polish.css`，由 `admin.html` 独立加载；审计恢复 `14 pass / 1 pending / 0 fail`。

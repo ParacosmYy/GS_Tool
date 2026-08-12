@@ -520,6 +520,14 @@
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口 `5000/5011` 未触碰。
 - 架构师：变化限定在 `01-shell` 视觉契约，保留独立回滚点；`brand-transparency.css` 91 行，未引入跨层依赖，forced-colors/reduced-motion 边界明确。
 
+## v126 元信息局部 signal trace
+
+- UI-1：消除旧入口 `AI TOKEN / OBSERVATORY` 元信息行的全宽横线断层，让插画、设备高光和标题保持连续。
+- UI-2：`ui-polish.css` 复用既有 `.hero-topline` 与 signal token，使用局部伪元素绘制 `220px` trace；Admin 专属规则拆至 `admin-polish.css` 并由 `admin.html` 独立加载，forced-colors 下恢复 CanvasText，不新增业务脚本。
+- UI-3：真实 `5000` 桌面截图、`390×844` 回归、computed style、无横向溢出和清洁日志已确认；静态 Admin stylesheet 资源返回 200，见 `ui-accessibility-evidence-v126.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未重启。
+- 架构师：变化限定在 `01-shell / observatory metadata compatibility` 与 `05-history / admin visual boundary`，无新依赖、无跨层耦合；`ui-polish.css=867`、`admin-polish.css=90`，回滚边界为局部 CSS 与 stylesheet link。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

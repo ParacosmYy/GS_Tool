@@ -440,6 +440,12 @@
 - 最上方 AI TOKEN 品牌行改为低 alpha 深蓝玻璃层：保留背景透出、轻量 `blur(11px)`、边界高光和移动端可读性增强；`ui-polish.css` 为旧启动器提供同契约回退，不再由最后一层 CSS 强制清空材质，也不引入实色黑色面板。
 - 同步修正 `header-chrome.css`、`ui-polish.css`、基础样式及证据注释；5000/5011 样式资源返回正常，Python 编译、Git 空白和文本文件行数门禁通过，保护服务未重启；证据见 `docs/ui-accessibility-evidence-v125.md`。
 
+### v126 交付增量
+
+- 旧个人入口的 `AI TOKEN / OBSERVATORY` 元信息行移除全宽底线，改为左侧 `220px` 局部 signal trace；背景插画连续透出，forced-colors 下恢复系统边界。
+- 真实 `5000` 桌面与 `390×844` 页面确认透明元信息层、局部 trace、原有首屏布局、无横向溢出和清洁运行状态；详见 `docs/ui-accessibility-evidence-v126.md`。
+- 因通用 `ui-polish.css` 达到 1019 行，本轮将 Admin 专属视觉规则拆至 `admin-polish.css`，由 `admin.html` 独立加载；审计恢复 `14 pass / 1 pending / 0 fail`，`ui-polish.css=867`、`admin-polish.css=90`。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

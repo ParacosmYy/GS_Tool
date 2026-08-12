@@ -366,6 +366,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 
 最终品牌边界将顶部 AI TOKEN 行从“强制完全透明”调整为低 alpha 深蓝玻璃：普通模式使用轻量纵向渐变、`blur(11px)` 和弱内侧高光，背景插画仍能连续透出；旧启动器的 `ui-polish.css` 也保留同一兼容规则，`620px` 以下仅提升渐变可读性，`forced-colors` 继续恢复系统 Canvas，避免高对比模式被移动规则覆盖。两个既有本地服务均返回新样式资源，未重启保护端口；证据见 `ui-accessibility-evidence-v125.md`。
 
+## v126 元信息局部 signal trace
+
+旧个人入口的 `hero-topline` 不再使用贯穿插画的全宽底线，基础兼容层改为透明行 + `220px` 局部信号线；完整链路、状态文本、布局和强制配色边界保持不变。真实 `5000` 桌面与 `390×844` 页面已完成运行态验证，无正向横向溢出。因通用 `ui-polish.css` 触发 1000 行门禁，Admin 规则已拆分为 `admin-polish.css` 并由 `admin.html` 独立加载；审计恢复 `14 pass / 1 pending / 0 fail`。证据见 `ui-accessibility-evidence-v126.md`。
+
 ## 最终签署条件
 
 1. Android APK 已由批准工具链构建、安装到授权设备并完成同账号联调。
