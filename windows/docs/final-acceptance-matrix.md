@@ -317,6 +317,11 @@
 - AI TOKEN 品牌 header 在普通配色下维持 `transparent / no backdrop-filter / no box-shadow`；hero-topline 取消全宽底线，仅保留局部短信号线，避免最上方场景产生黑色覆盖错觉；不改变 DOM、API、认证、数据流或 forced-colors/reduced-motion 边界。
 - 5195 隔离实例真实确认 `320/390/768/1024/1440` 五档无横向溢出、header/hero-topline 透明计算值、周期四档状态同步、36/36 当前控件具备名称和清洁页面日志；真实设备与辅助偏好继续独立门禁。
 
+### v100 交付增量
+
+- hero 元信息右侧 `#dashboard-status` 在普通配色下改为 `transparent / no backdrop-filter`，错误态继续保留专用边界和颜色；品牌副标题增加局部 keyline，不改变 DOM、API、认证、数据流或 forced-colors/reduced-motion 边界。
+- 5200 隔离实例真实确认 `320/390/768/1024/1440` 五档无横向溢出、状态胶囊透明计算值、`scrollY=720` 滚动态、周期四档状态同步、40/40 当前控件具备名称和清洁页面日志；真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

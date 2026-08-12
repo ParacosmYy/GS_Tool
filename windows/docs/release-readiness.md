@@ -256,6 +256,10 @@ sticky 避让模块现在将自动采集 `.auto-form-actions` 与其提交按钮
 
 最上方 AI TOKEN 品牌 header 在普通配色下明确保持 `transparent / no backdrop-filter / no box-shadow`；hero 元信息行取消贯穿全宽的底边线，改为局部 lime → lavender 短信号线，防止场景暗部被误读为黑色覆盖层。5195 隔离实例已完成 `320/390/768/1024/1440` 五档 computed style、移动滚动态、周期四档交互、无横向溢出和控件命名检查，独立证据见 `ui-accessibility-evidence-v99.md`。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v100 顶部状态胶囊透明修正
+
+hero 元信息右侧的 `#dashboard-status` 在普通配色下改为透明背景、无 blur 的状态边界，保留状态点、错误态颜色和轻量 keyline；`OBSERVATORY` 副标题增加局部字形阴影，保证透明品牌行在亮色插画上仍可扫描。5200 隔离实例已完成 `320/390/768/1024/1440` 五档 computed style、`scrollY=720` 滚动态、周期四档交互、无横向溢出和控件命名检查，独立证据见 `ui-accessibility-evidence-v100.md`。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

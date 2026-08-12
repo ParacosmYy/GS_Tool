@@ -346,6 +346,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的普通配色表现规则；不改变 DOM、布局盒、导航、周期 API、认证、表单值、数据流或 Tab 顺序，forced-colors 继续由系统配色接管。
 - UI-3：真实 5195 隔离实例已确认 `320/390/768/1024/1440` 五档透明 computed style、390px 滚动态、Today/Week/Month/All time 四档状态、无横向溢出、36/36 可见控件命名和清洁页面日志；证据见 `ui-accessibility-evidence-v99.md`，真实设备与辅助偏好继续独立门禁。
 
+## v100 顶部状态胶囊透明修正
+
+- UI-1：解决 hero 元信息右侧“已更新：今天”仍像深色玻璃卡片的问题；状态点、边界与错误语义保留，背景场景连续透过顶部信息层。
+- UI-2：变更集中在 `responsive-tuning.css` 的普通配色表现规则，并补强 `OBSERVATORY` 副标题 keyline；不改变 DOM、布局盒、导航、周期 API、认证、表单值、数据流或 Tab 顺序，forced-colors 继续由系统配色接管。
+- UI-3：真实 5200 隔离实例已确认 `320/390/768/1024/1440` 五档透明 computed style、`scrollY=720` 滚动态、Today/Week/Month/All time 四档状态、无横向溢出、40/40 可见控件命名和清洁页面日志；证据见 `ui-accessibility-evidence-v100.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。
