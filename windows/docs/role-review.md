@@ -568,3 +568,11 @@
 - UI-3：真实桌面、390px 移动、深滚与 5011 完整链截图/计算样式/日志已复核；证据见 `ui-accessibility-evidence-v130.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
 - 架构师：修改限定在 `01-shell / brand transparency boundary`，无新依赖、跨层耦合或 DOM/脚本变更；文件行数门禁保持有效，回滚边界为两个 CSS header 声明块。
+
+## v131 长页面深蓝观测表面
+
+- UI-1：真实长滚动截图确认图表、自动采集、活动和历史区域由黑色实面断层统一为连续深蓝阅读窗；移动端标签、输入框和插画保持可辨。
+- UI-2：视觉职责收敛在 `legacy-observatory.css`，通过 `body` 边界兼容旧入口并被完整链复用；不复制业务脚本、监听器或表单逻辑。
+- UI-3：桌面/移动/完整链、周期点击、手动补录展开、无横向溢出和页面日志已复核；证据见 `ui-accessibility-evidence-v131.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
+- 架构师：单文件新增 61 行，保持高内聚、低耦合和 1000 行硬门禁；forced-colors、reduced-motion、sticky mask 与 focus-within 边界未被削弱。

@@ -409,3 +409,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 5000 桌面、390px 移动、`scrollY=900` 与 5011 完整链已完成回归；computed style、横向溢出、截图和本地应用日志证据见 `ui-accessibility-evidence-v130.md`。
 - 本轮无后端、认证、数据库、Provider 或数据流变更；端口 `5000/5011` 未触碰。
 - 本轮不关闭 Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁。
+
+## v131 长页面深蓝观测表面
+
+- Dashboard 的自动采集、协议说明、活动采集、活动历史和最近记录现在共享低 alpha 深蓝阅读底；移动端增加一档 alpha 以维持长表单文字可读性，仍保留背景透景。
+- 真实 5000 桌面/390px 长滚、5011 完整链、Week 周期和手动补录展开已完成回归；证据见 `ui-accessibility-evidence-v131.md`。
+- 本轮仅改 `legacy-observatory.css`，无后端、认证、数据库、Provider、数据流或依赖变更；保护端口未重启。
+- 本轮不关闭 Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁。

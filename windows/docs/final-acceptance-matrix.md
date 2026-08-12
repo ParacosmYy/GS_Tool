@@ -492,3 +492,11 @@
 - UI-3：真实 `5000` 桌面/移动/滚动态与 `5011` 完整链已确认计算样式、无新增正向横向溢出、观测区构图未回退和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v130.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未重启。
 - 架构师：变化限定在 `01-shell / brand transparency boundary` 的两个高内聚 CSS 文件，无新依赖、DOM、脚本或跨层耦合；所有文本源码继续低于 1000 行。
+
+## v131 长页面深蓝观测表面
+
+- UI-1：修复图表观测窗与自动采集/活动/历史大卡片之间的材质断层，长页面保持同一套深蓝观测语言，背景设备继续透出。
+- UI-2：旧入口新增 `legacy-observatory.css` 长页面 surface block；普通卡片 `.72/.84`、活动采集 `.76/.88`，移动端 `.78/.90` 与 `.82/.92`，统一 `blur(10px) saturate(1.04)`；不改字段、数据或布局。
+- UI-3：真实 `5000` 桌面/390px 长滚、`5011` 完整链、Week 点击、手动补录展开和清洁日志已确认；证据见 `docs/ui-accessibility-evidence-v131.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未重启。
+- 架构师：变化限定在 `03-observatory / legacy presentation compatibility boundary`，单文件保持低于 1000 行，forced-colors/reduced-motion 与焦点恢复边界保留。

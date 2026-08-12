@@ -126,6 +126,67 @@ body .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
   }
 }
 
+/* Keep the below-fold data surfaces in the same observatory family as the
+   chart bays. The older two-file launcher does not load responsive-tuning.css
+   or the full scene chain, so this compatibility boundary must own the
+   material for forms, protocol notes, activity capture, and ledger history.
+   The alpha values are intentionally firmer than the empty chart bay: long
+   form labels and table copy need a stable reading floor over the artwork. */
+@media (forced-colors: none) {
+  body .form-card,
+  body .guide-card,
+  body .manual-details,
+  body .records-card,
+  body .activity-history-card {
+    border-color: rgba(230, 235, 245, .24);
+    background:
+      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .07), transparent 40%),
+      linear-gradient(145deg, rgba(18, 32, 48, .72), rgba(7, 14, 24, .84));
+    -webkit-backdrop-filter: blur(10px) saturate(1.04);
+    backdrop-filter: blur(10px) saturate(1.04);
+    box-shadow: 0 20px 60px rgba(2, 10, 20, .24), inset 0 1px 0 rgba(255, 255, 255, .06);
+  }
+
+  body .activity-capture-card {
+    border-color: rgba(230, 235, 245, .24);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(217, 255, 120, .055), transparent 38%),
+      linear-gradient(145deg, rgba(18, 32, 48, .76), rgba(7, 14, 24, .88));
+    -webkit-backdrop-filter: blur(10px) saturate(1.04);
+    backdrop-filter: blur(10px) saturate(1.04);
+    box-shadow: 0 20px 60px rgba(2, 10, 20, .26), inset 0 1px 0 rgba(255, 255, 255, .06);
+  }
+
+  body .manual-details[open] {
+    border-color: rgba(217, 255, 120, .46);
+    background:
+      radial-gradient(circle at 12% 0%, rgba(217, 255, 120, .07), transparent 38%),
+      linear-gradient(145deg, rgba(18, 32, 48, .76), rgba(7, 14, 24, .88));
+  }
+}
+
+/* Narrow screens expose more of the fixed illustration behind a long form.
+   Add one restrained reading step here instead of changing typography or
+   field geometry; the card remains translucent while labels do not disappear
+   into bright laptop and character highlights during a thumb scroll. */
+@media (max-width: 620px) and (forced-colors: none) {
+  body .form-card,
+  body .guide-card,
+  body .manual-details,
+  body .records-card,
+  body .activity-history-card {
+    background:
+      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .08), transparent 40%),
+      linear-gradient(145deg, rgba(18, 32, 48, .78), rgba(7, 14, 24, .9));
+  }
+
+  body .activity-capture-card {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(217, 255, 120, .06), transparent 38%),
+      linear-gradient(145deg, rgba(18, 32, 48, .82), rgba(7, 14, 24, .92));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   body .scroll-cue,
   body .hero-actions { transition: none; }
