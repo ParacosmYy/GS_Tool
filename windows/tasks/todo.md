@@ -418,3 +418,5 @@
 - [x] v150 通过项目源码临时端口 `5026` 的 1440/390px 首屏与 390px `ANALYSIS` 深滚回归确认 reveal 可读性、路由上下文、无横向溢出、清洁页面日志和 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v150.md`。
 - [x] v151 为 Dashboard 分析区新增高内聚 `analysis-signal.css`：标题信号点、标题底轨、绘图区边界、TOKEN SHARE 状态胶囊与图例分隔线；不改 Chart.js 数据和接口。
 - [x] v151 通过项目源码临时端口 `5026` 的 1440/390/320px 真实浏览器回归确认图表层级、canvas ARIA、320px 内部溢出为 0、移动路由上下文、清洁页面日志和 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v151.md`。
+- [x] v152 为活动历史空态新增高内聚 `activity-history-signal.css`：桌面与工作信号表单同高、移动端紧凑、状态 beacon/观测面/系统色降级完整，不改事件 API。
+- [x] v152 通过项目源码临时端口 `5026` 的 1440/390px `ACTIVITY` 深链真实浏览器回归确认卡片高度、内部溢出为 0、路由上下文、焦点顺序、清洁页面日志和 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v152.md`。

@@ -1,0 +1,188 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Turn the empty activity history into a deliberate observation
+ *          surface and keep it visually aligned with the work-signal form.
+ * Module: UI-1 visual director / 06-activity-trace / empty-state signal
+ * Contract: Populated rows keep the existing table behavior; only the empty
+ *           state owns equal-height presentation and waiting-state motion.
+ */
+
+/* On a wide split layout the capture form defines the row height. Stretching
+   the empty history card to that same grid track removes the large dead zone
+   beneath the shorter table and keeps both sides readable as one workspace. */
+@media (min-width: 901px) {
+  body #activity .activity-history-card {
+    align-self: stretch;
+    margin-top: 0;
+    min-height: 0;
+  }
+
+  body #activity .activity-history-card.is-empty .table-scroll {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  body #activity .activity-history-card.is-empty table,
+  body #activity .activity-history-card.is-empty tbody,
+  body #activity .activity-history-card.is-empty tbody tr {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+  }
+
+  body #activity .activity-history-card.is-empty tbody td.table-empty--signal {
+    display: grid;
+    flex: 1 1 auto;
+    align-content: center;
+    min-height: 0;
+  }
+}
+
+/* The status chip and empty row should read as one waiting checkpoint rather
+   than as an ordinary empty table. The copy stays in the DOM for assistive
+   technology; the marker and rail remain decorative. */
+body #activity .activity-history-card.is-empty .records-heading {
+  position: relative;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(196,192,255,.14);
+}
+
+body #activity .activity-history-card.is-empty .records-heading::after {
+  position: absolute;
+  right: auto;
+  bottom: -1px;
+  left: 0;
+  width: 62px;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--signal-lime), rgba(196,192,255,.38), transparent);
+}
+
+body #activity .activity-history-card.is-empty #work-event-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 25px;
+  border-color: rgba(217,255,120,.28);
+  color: var(--signal-lime);
+  background: rgba(217,255,120,.055);
+}
+
+body #activity .activity-history-card.is-empty #work-event-status::before {
+  width: 5px;
+  height: 5px;
+  content: "";
+  border-radius: 50%;
+  background: var(--signal-lime);
+  box-shadow: 0 0 9px rgba(217,255,120,.56);
+  animation: activity-empty-beacon 3.4s ease-in-out infinite;
+}
+
+body #activity .activity-history-card.is-empty .table-empty--signal {
+  min-height: 190px;
+  padding: 34px 18px 30px;
+  background:
+    linear-gradient(90deg, rgba(217,255,120,.035), transparent 42%, rgba(196,192,255,.035)),
+    repeating-linear-gradient(90deg, transparent 0 22px, rgba(255,255,255,.016) 22px 23px);
+}
+
+body #activity .activity-history-card.is-empty .table-empty--signal::before {
+  width: 42px;
+  height: 42px;
+  margin-bottom: 16px;
+  border-color: rgba(217,255,120,.58);
+  box-shadow: 0 0 0 8px rgba(217,255,120,.045), 0 0 26px rgba(217,255,120,.12);
+}
+
+body #activity .activity-history-card.is-empty .table-empty--signal::after {
+  right: 17%;
+  bottom: 22px;
+  left: 17%;
+}
+
+body #activity .activity-history-card.is-empty .activity-privacy-note {
+  margin-top: 18px;
+  padding-top: 15px;
+}
+
+@keyframes activity-empty-beacon {
+  0%, 100% { opacity: .54; transform: scale(.86); }
+  50% { opacity: 1; transform: scale(1.14); }
+}
+
+@media (max-width: 900px) {
+  body #activity .activity-history-card.is-empty .table-empty--signal {
+    min-height: 168px;
+    padding: 28px 14px 26px;
+  }
+
+  body #activity .activity-history-card.is-empty .table-empty--signal::before {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 13px;
+  }
+}
+
+@media (max-width: 620px) {
+  body #activity .activity-history-card.is-empty .records-heading {
+    padding-bottom: 12px;
+  }
+
+  body #activity .activity-history-card.is-empty #work-event-status {
+    min-height: 24px;
+    padding-inline: 8px;
+    font-size: 9px;
+  }
+
+  body #activity .activity-history-card.is-empty .table-empty--signal {
+    min-height: 156px;
+    padding: 24px 12px 22px;
+  }
+
+  body #activity .activity-history-card.is-empty .activity-privacy-note {
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body #activity .activity-history-card.is-empty #work-event-status::before {
+    animation: none;
+    box-shadow: none;
+  }
+}
+
+@media (forced-colors: active) {
+  body #activity .activity-history-card.is-empty .records-heading {
+    border-bottom-color: CanvasText;
+  }
+
+  body #activity .activity-history-card.is-empty .records-heading::after,
+  body #activity .activity-history-card.is-empty .activity-privacy-note {
+    border-color: CanvasText;
+  }
+
+  body #activity .activity-history-card.is-empty #work-event-status,
+  body #activity .activity-history-card.is-empty #work-event-status::before {
+    border-color: CanvasText;
+    color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+  }
+
+  body #activity .activity-history-card.is-empty .table-empty--signal {
+    background: Canvas;
+  }
+
+  body #activity .activity-history-card.is-empty .table-empty--signal::before,
+  body #activity .activity-history-card.is-empty .table-empty--signal::after {
+    border-color: CanvasText;
+    background-color: Canvas;
+    box-shadow: none;
+    animation: none;
+  }
+}

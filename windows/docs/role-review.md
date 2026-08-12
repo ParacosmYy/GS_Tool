@@ -728,3 +728,11 @@
 - UI-3：源码临时端口 `5026` 的 1440/390/320px 真实浏览器回归通过；320px 分析区内部溢出为 0，canvas ARIA、路由上下文、控制台日志均已复核；证据见 `ui-accessibility-evidence-v151.md`。
 - 后端：无后端、数据库、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
 - 架构师：变化限定在高内聚分析 presentation boundary，新增 CSS 与一处语义模板补充，无新依赖或跨层耦合；所有文本源码低于 1000 行。
+
+## v152 活动历史空态高度与观察面
+
+- UI-1：修复工作信号表单与活动历史空卡片高度失衡；桌面端两侧共享同一网格高度，空态具备标题底轨、状态 beacon、中心 marker 和等待说明。
+- UI-2：新增 `activity-history-signal.css` 作为 06-activity-trace 空态表现模块；仅作用于 `is-empty`，不改变事件 API、表格数据或 populated rows。
+- UI-3：源码临时端口 `5026` 的 1440/390px `ACTIVITY` 深链真实浏览器回归通过；桌面卡片同高、移动空态紧凑、内部溢出为 0、路由上下文、焦点顺序和页面日志均已复核；证据见 `ui-accessibility-evidence-v152.md`。
+- 后端：无后端、数据库、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
+- 架构师：变化限定在高内聚 activity-trace presentation boundary，新增单一 CSS 模块、无新依赖或跨层耦合；所有文本源码低于 1000 行。

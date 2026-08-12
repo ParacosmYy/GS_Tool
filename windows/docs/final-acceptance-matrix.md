@@ -650,3 +650,11 @@
 - UI-3：5026 的 1440/390/320px 真实回归通过：图表 ready 状态、canvas ARIA、移动路由上下文、320px 内部溢出 `0`、文档宽度和页面日志均正常；证据见 `docs/ui-accessibility-evidence-v151.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
 - 架构师：新增 CSS 模块高内聚、无新依赖或跨层耦合；所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
+
+## v152 活动历史空态高度与观察面
+
+- UI-1：活动历史空态与工作信号表单形成同高工作区；桌面状态面完整、移动状态面紧凑，空态不再像普通空表行。
+- UI-2：`activity-history-signal.css` 独立拥有 06-activity-trace 空态规则；populated event rows、事件 API、reduced-motion 和 forced-colors 边界清晰。
+- UI-3：5026 的 1440/390px `ACTIVITY` 深链真实回归通过：桌面 `838.3px` 同高、移动空态 `156px`、活动区内部溢出 `0`、`aria-current`、焦点路径与页面日志均正常；证据见 `docs/ui-accessibility-evidence-v152.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
+- 架构师：新增 CSS 模块高内聚、无新依赖或跨层耦合；所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。

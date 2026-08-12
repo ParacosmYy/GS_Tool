@@ -549,3 +549,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 源码临时端口 `5026` 的 1440/390/320px 回归通过；320px 图表不越过卡片轨道，页面侧日志为空；证据见 `docs/ui-accessibility-evidence-v151.md`。
 - 本轮只修改分析区模板语义与共享前端 CSS presentation contract，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
+
+## v152 活动历史空态高度与观察面
+
+- 活动历史在桌面端与工作信号表单共享同一高度，空态不再留下大面积无意义空洞；移动端保持紧凑状态窗口。
+- 源码临时端口 `5026` 的 1440/390px `ACTIVITY` 深链回归通过；活动区内部无横向溢出，页面侧日志为空；证据见 `docs/ui-accessibility-evidence-v152.md`。
+- 本轮只修改共享前端空态 CSS presentation contract，无后端、认证、数据库、事件 API、Provider、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
