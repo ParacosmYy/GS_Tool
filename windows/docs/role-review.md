@@ -412,6 +412,12 @@
 - 前端：仅修改共享 `responsive-tuning.css`，未改变模板、交互、接口或 sticky 避让逻辑。
 - 后端：无后端改动；隔离数据库和受保护服务保持不变。
 - 架构：沿用“共享视觉契约 + forced-colors 隔离 + 独立证据”的边界，文件行数保持在项目硬门禁内。
+## v111 认证卡片 signal line 呼吸
+
+- UI：只增强认证卡片已有顶部 signal line 的低频呼吸，不新增视觉组件，不改变版式。
+- 前端：动效限定在 `@media (forced-colors: none)` 与 `prefers-reduced-motion: no-preference`，`:focus-within` 自动恢复原有 focus 视觉。
+- 后端：无后端、接口、数据库改动。
+- 架构：共享样式仍位于 `responsive-tuning.css`，保留低耦合、文件行数和回滚边界。
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

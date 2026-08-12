@@ -143,6 +143,19 @@
     box-shadow: 0 26px 68px rgba(2, 10, 20, .3), 0 0 0 4px rgba(217, 255, 120, .08), inset 0 1px 0 rgba(255, 255, 255, .12);
   }
 
+  /* The login card already has a deliberate entrance and a top-edge scan.
+     Let only that existing signal line breathe at rest so the surface feels
+     connected to the live observatory scene instead of becoming a static
+     glass rectangle. Focus-within restores the canonical line animation and
+     keeps the stronger keyboard boundary in charge. */
+  @media (prefers-reduced-motion: no-preference) {
+    .auth-card:not(:focus-within)::before {
+      animation:
+        auth-card-line 6s ease-in-out infinite,
+        auth-card-edge-breathe-v111 9s ease-in-out 1.15s infinite;
+    }
+  }
+
   /* Secondary auth copy sits on the same moving illustration as the glass
      card. Lift its quiet text one step and give the route link a restrained
      underline so the alternate path remains discoverable on narrow screens. */
@@ -164,6 +177,16 @@
   .auth-card .form-footnote a:focus-visible {
     color: var(--signal-lime);
     text-decoration-color: var(--signal-lime);
+  }
+}
+
+@keyframes auth-card-edge-breathe-v111 {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(217, 255, 120, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 14px rgba(217, 255, 120, .16);
   }
 }
 

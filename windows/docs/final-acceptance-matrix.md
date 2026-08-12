@@ -371,6 +371,10 @@
 
 - 顶部 AI TOKEN 品牌栏统一使用低 alpha 透光渐变，普通配色下无 blur、无深色外投影，forced-colors 分支仍交给系统颜色；证据见 `docs/ui-accessibility-evidence-v110.md`。
 - 真实隔离 5211 实例确认登录页、Dashboard 首屏/`scrollY=1200` 深滚、`390×844` 与 `320×720` 的 computed style、无横向溢出和清洁页面日志。
+### v111 交付增量
+
+- 认证卡片既有顶部 signal line 增加低频边界呼吸；仅普通配色/允许动效启用，聚焦、forced-colors、reduced-motion 不改变可访问边界。
+- 真实隔离 5212 实例确认桌面与 `390×844` 的 computed style、焦点边界、卡片几何、可访问性结构、无横向溢出和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v111.md`。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
