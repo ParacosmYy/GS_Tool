@@ -329,3 +329,5 @@
 - [x] v105 通过真实隔离 5205 实例确认 `320/390/768/1024/1440` 五档无横向溢出、连接状态 `backdrop-filter: none`、卡片 `blur(12px)`、Base URL 字段焦点、36/37 或 40/41 控件命名、1 个 h1/8 个 h2 和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v105.md`，真实设备与辅助偏好继续独立门禁。
 - [x] v106 清除 `.hero-topline` 继承的顶部、左右残留边界，仅保留局部 signal trace，让透明 AI TOKEN 品牌行与场景在四边连续透景。
 - [x] v106 通过真实隔离 5206 实例确认 `320/390/768/1024/1440` 五档 metadata 四边透明、无横向溢出、周期切换、深滚 header/card 样式和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v106.md`，真实设备与辅助偏好继续独立门禁。
+- [x] v107 为跨越角色与笔记本高光的 `.hero-lede` 增加局部文字 keyline，不引入黑色卡片，保持透明场景和原有布局。
+- [x] v107 通过真实隔离 5208 实例确认 `320×720/390×844/768/1024/1440` 五档无横向溢出、说明文案 keyline、metadata 四边透明、周期交互、深滚层级和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v107.md`，真实设备与辅助偏好继续独立门禁。

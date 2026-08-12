@@ -388,6 +388,12 @@
 - UI-2：本轮仅调整 `responsive-tuning.css` 的边界参数，不新增监听器、计时器、依赖或动画；既有 pointer/reveal、键盘焦点、reduced-motion 和 forced-colors 契约保持。
 - UI-3：5206 隔离浏览器确认 `320/390/768/1024/1440` 五档四边透明、无横向溢出、周期交互、深滚层级和清洁页面日志；真实设备与辅助偏好仍待独立门禁。
 
+## v107 首屏说明文案可读性
+
+- UI-1：为跨越角色与笔记本高光的 `.hero-lede` 增加局部两级文字 keyline，不引入额外面板，保持透明场景与 Moonshot-inspired 首屏构图。
+- UI-2：本轮仅调整 `responsive-tuning.css` 的文本表现参数，不新增监听器、计时器、依赖或动画；既有 pointer/reveal、键盘焦点、reduced-motion 和 forced-colors 契约保持。
+- UI-3：5208 隔离浏览器确认 `320×720/390×844/768/1024/1440` 五档 keyline、无横向溢出、周期交互、深滚层级和清洁页面日志；真实设备与辅助偏好仍待独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

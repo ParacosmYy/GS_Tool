@@ -328,6 +328,13 @@
   color: var(--ink-soft);
 }
 
+/* The explanatory copy crosses the laptop keyboard and character highlights
+   on compact screens. A tight two-stage keyline protects glyph edges without
+   adding a rectangle or interrupting the transparent scene. */
+.hero-lede {
+  text-shadow: 0 1px 2px rgba(8, 9, 12, .94), 0 0 10px rgba(8, 9, 12, .72);
+}
+
 /* Metrics sit directly on the illustration, so give each reading cell a
    narrow optical lane instead of darkening the entire transparent rail. The
    alpha is deliberately low: background continuity remains visible while the

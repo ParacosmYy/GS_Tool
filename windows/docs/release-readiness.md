@@ -284,6 +284,10 @@ Dashboard 图表、自动采集、说明、记录和手动明细卡片在普通�
 
 `.hero-topline` 不再继承通用 surface 的顶部、左右边线，只保留局部 signal trace；因此透明 AI TOKEN 品牌行下方的场景不再被残留边框切成暗色横带。5206 隔离实例已完成 `320/390/768/1024/1440` 五档 computed style、周期交互、深滚层级、无横向溢出和清洁页面日志，独立证据见 `ui-accessibility-evidence-v106.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v107 首屏说明文案可读性
+
+`.hero-lede` 在普通配色下增加紧凑的两级文字 keyline，解决移动端文案跨越笔记本与角色高光时的读字干扰；不增加背景面板，不改变透明 AI TOKEN 顶栏、hero 构图、DOM 或动效契约。5208 隔离实例已完成 `320×720/390×844/768/1024/1440` 五档 computed style、截图、周期交互、深滚、无横向溢出和清洁页面日志，独立证据见 `ui-accessibility-evidence-v107.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
