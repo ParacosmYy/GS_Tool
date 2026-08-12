@@ -793,6 +793,34 @@ td { color: var(--ink-soft); font-size: 12px; }
 .chart-empty-action:hover, .chart-empty-action:focus-visible { color: var(--signal-lime-ink); border-color: var(--signal-lime); background: var(--signal-lime); transform: translateY(-2px); }
 .chart-empty-action:hover span, .chart-empty-action:focus-visible span { transform: translate(2px, 2px); }
 
+/* Compatibility boundary for the root launcher, whose legacy stylesheet
+   chain stops here. The app already marks the sticky header as scrolled;
+   retire hero-only signals at that state so a bright CTA cannot remain as a
+   fragment beneath the transparent brand row. Focus-within keeps keyboard
+   navigation discoverable while the visual transition settles. */
+.scroll-cue,
+.hero-actions {
+  transition: opacity .35s var(--ui-ease), transform .35s var(--ui-ease), visibility 0s linear 0s;
+}
+.site-header.is-scrolled + .site-main .scroll-cue {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+}
+.site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: opacity .35s var(--ui-ease), transform .35s var(--ui-ease), visibility 0s linear .35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue,
+  .hero-actions { transition: none; }
+  .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) { transform: none; }
+}
+
 /* Keep below-the-fold content present but never visually absent if a slow
    browser delays IntersectionObserver delivery during the first paint. The
    pre-reveal state is intentionally readable: a long page should feel layered,

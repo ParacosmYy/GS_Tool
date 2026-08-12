@@ -468,3 +468,11 @@
 - UI-3：真实 `5000` 桌面 `1683×892` 与移动 `390×844` 已确认 computed style、背景连续、品牌可读、无正向横向溢出和清洁日志；证据见 `ui-accessibility-evidence-v127.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未重启。
 - 架构师：变化限定在 `01-shell / sticky brand transparency compatibility boundary`，无新依赖、无跨层耦合；`ui-polish.css=867`、`brand-transparency.css=94`，回滚边界为两处 header 背景声明。
+
+## v128 首屏 CTA 滚动态收束
+
+- UI-1：修复旧入口滚动后绿色主 CTA 片段留在透明 AI TOKEN 品牌行下方、抢占阅读焦点的问题。
+- UI-2：`ui-polish.css` 复用既有 `site-header.is-scrolled` 状态；非焦点 `.hero-actions` 和 `.scroll-cue` 以受控过渡退出，`:focus-within` 保留键盘路径，周期切换器不受影响。
+- UI-3：真实 `5000` `390×844` 与 `1683×892` 首屏/深滚状态已确认 computed style、周期控件可用、无正向横向溢出和清洁日志；证据见 `ui-accessibility-evidence-v128.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动。
+- 架构师：变化限定在 `01-shell / legacy launcher sticky reading boundary`，无新依赖、无跨层耦合；回滚边界为 `ui-polish.css` v128 兼容块。

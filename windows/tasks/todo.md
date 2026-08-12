@@ -372,3 +372,5 @@
 - [x] v126 修复全量审计发现的通用样式超限：将 Admin 专属规则从 `ui-polish.css` 拆至 `admin-polish.css`，由 `admin.html` 独立加载；审计恢复 `14 pass / 1 pending / 0 fail`。
 - [x] v127 修复最上方 AI TOKEN 品牌行在旧个人启动器中呈现黑色横条的问题：将兼容 header 的 wash 从 `.16/.34/.12` 收敛为 `.07/.16/.035`，完整链同步降低窄屏渐变；保留文字 keyline、blur、signal line、forced-colors 和 reduced-motion 边界。
 - [x] v127 通过真实 `5000` 桌面与 `390×844` 移动页面确认背景连续可见、品牌文字可读、无正向横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v127.md`，保护端口未重启。
+- [x] v128 修复旧个人启动器滚动后首屏 CTA 亮色片段穿过透明 AI TOKEN 品牌行的问题：复用既有 `site-header.is-scrolled` 状态，让非焦点 CTA 与 `Scroll to explore` 退场，焦点状态保持可见可操作；不新增脚本或监听器。
+- [x] v128 通过真实 `5000` 的 `390×844`/`1683×892` 首屏与深滚状态确认 CTA 收束、周期切换器可用、无正向横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v128.md`。

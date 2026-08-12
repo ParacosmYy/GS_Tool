@@ -386,3 +386,11 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - UI-3：真实 `5000` 桌面与 `390×844` 移动回归通过，控制台无 error/warn，文档宽度无正向溢出；证据见 `ui-accessibility-evidence-v127.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未触碰。
 - 架构师：修改限定在 `01-shell` 两个高内聚 CSS 契约文件，未新增依赖、DOM、脚本或跨层耦合；单独回滚即可恢复 v126。
+
+## v128 首屏 CTA 滚动态收束
+
+- UI-1：旧个人入口进入滚动态后，首屏 CTA 与 `Scroll to explore` 不再作为亮色碎片穿过透明品牌栏；当前周期控制器保持可用。
+- UI-2：兼容层只消费已有 `site-header.is-scrolled` class，非焦点 CTA 使用 opacity/visibility/pointer-events 收束，焦点状态和 reduced-motion 边界保留。
+- UI-3：真实 `5000` 移动/桌面首屏与 `scrollY=650/700` 状态通过，日志清洁且无正向横向溢出；证据见 `ui-accessibility-evidence-v128.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动。
+- 架构师：只改旧入口必加载的 `ui-polish.css`，未新增跨层依赖或业务行为。
