@@ -1,0 +1,25 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Keep the primary mobile hero actions and period cursor inside the
+ *          first scan on short phones without changing the desktop scene.
+ * Module: Web presentation / 02-hero / short viewport composition
+ * Contract: Only the decorative scroll cue may leave the short first scan;
+ *           primary CTA and period controls remain visible and keyboard-safe.
+ */
+
+/* A 320×720 viewport cannot show the orbit, editorial copy, CTA pair and
+   period cursor at the desktop-derived mobile scale. Reduce only the orbit
+   footprint and retire the non-interactive cue; the real controls keep their
+   existing DOM order, labels and focus behavior. `!important` is intentional:
+   this late-discovered short-screen boundary must win over shared mobile
+   fallback rules loaded by both launcher chains. */
+@media (max-width: 360px) and (max-height: 760px) {
+  .hero-orbit {
+    width: min(58vw, 190px) !important;
+  }
+
+  .scroll-cue {
+    display: none !important;
+  }
+}

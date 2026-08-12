@@ -422,3 +422,5 @@
 - [x] v152 通过项目源码临时端口 `5026` 的 1440/390px `ACTIVITY` 深链真实浏览器回归确认卡片高度、内部溢出为 0、路由上下文、焦点顺序、清洁页面日志和 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v152.md`。
 - [x] v153 将 `AI TOKEN` 顶栏统一为真正透明的场景窗口：无背景图、无 blur、无 shadow、无底边线，保留场景透视、signal line 与高对比文字；完整链移动规则使用同优先级覆盖。
 - [x] v153 通过隔离 `5026` 的 1440/390px 登录、Dashboard `#activity`、键盘焦点、深链落点、文档宽度和清洁页面日志回归；独立证据写入 `docs/ui-accessibility-evidence-v153.md`。
+- [x] v154 将 `≤360px` 且 `≤760px` 的短屏 Dashboard hero 收敛为可扫描首屏：orbit `185.59px`，隐藏非交互 scroll cue，Today/Week/Month/All time 完整可见；普通 390px 与桌面构图不变。
+- [x] v154 通过隔离 `5026` 的 `320×720`、`320×600`、`390×844` 和默认桌面真实浏览器回归确认周期控件 `tabIndex=0`、透明顶栏、无横向扩张、应用日志为空和源码 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v154.md`。

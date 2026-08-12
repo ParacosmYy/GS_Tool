@@ -13,6 +13,7 @@
 @import url("./activity-signal.css");
 @import url("./route-context.css");
 @import url("./reveal-readability.css");
+@import url("./mobile-hero-scan.css");
 
 :root {
   --canvas: #08090c;

@@ -502,6 +502,13 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 本轮无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护 PID `43832/8100` 未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。
 
+## v154 短屏首屏周期游标
+
+- `320×720` 短屏 Dashboard 现在将轨道收敛为 `185.59px`，隐藏非交互滚动提示，四个周期控件完整落入首屏；普通 `390×844` 与桌面构图保持不变。
+- 5026 的 `320×720`、`320×600`、`390×844` 与默认桌面真实浏览器回归通过；应用侧日志为空，证据见 `docs/ui-accessibility-evidence-v154.md`。
+- 本轮只新增短屏前端 presentation module，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护 PID `43832/8100` 未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。
+
 ## v144 overview 分享锚点首屏定位
 
 - `#overview` 已加入共享 sticky header clearance；旧 5000 与完整 5011 入口的 overview 分享链接均回到 `scrollY=0`，首屏 CTA opacity 为 `1`。

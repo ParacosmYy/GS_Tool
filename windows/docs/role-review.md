@@ -744,3 +744,11 @@
 - UI-3：5026 隔离登录与 Dashboard `#activity` 的 1440/390px 真实浏览器回归通过；顶栏 computed style、深链落点、Tab 焦点、文档宽度与页面日志已复核；证据见 `docs/ui-accessibility-evidence-v153.md`。
 - 后端：无后端、认证、数据库、接口、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
 - 架构师：变化限定在 `01-shell / brand material boundary`，仅修改已有 CSS 模块，无新依赖或跨层耦合；所有文本源码低于 1000 行。
+
+## v154 短屏首屏周期游标
+
+- UI-1：针对 `320×720` 短屏将 orbit 收敛至 `185.59px`，移除非交互 `Scroll to explore`，让标题、CTA 与 Today / Week / Month / All time 同处第一次扫描范围。
+- UI-2：新增 `mobile-hero-scan.css` 作为短屏 hero presentation boundary；仅通过媒体查询调整表现，不改变 DOM、导航、脚本、接口或数据状态。
+- UI-3：5026 的 `320×720`、`320×600`、`390×844` 与默认桌面真实浏览器回归通过；四个周期按钮均可聚焦，桌面透明顶栏、无横向扩张与页面日志均已复核；证据见 `docs/ui-accessibility-evidence-v154.md`。
+- 后端：无后端、认证、数据库、接口、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
+- 架构师：变化限定在 `02-hero / short viewport composition`，新增单一高内聚 CSS 模块，无新依赖或跨层耦合；所有文本源码低于 1000 行。
