@@ -416,3 +416,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 5000 桌面/390px 长滚、5011 完整链、Week 周期和手动补录展开已完成回归；证据见 `ui-accessibility-evidence-v131.md`。
 - 本轮仅改 `legacy-observatory.css`，无后端、认证、数据库、Provider、数据流或依赖变更；保护端口未重启。
 - 本轮不关闭 Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁。
+
+## v132 末端空态与终止信号
+
+- 旧入口活动历史的 empty state 已在 320/390/768px 收缩为容器宽度，真实 populated table 仍保持原有横向滚动行为；页脚增加低 alpha terminal signal。
+- 真实桌面与移动末端、5011 完整链、空态文案和无横向溢出已完成回归；证据见 `ui-accessibility-evidence-v132.md`。
+- 本轮仅改 `legacy-observatory.css`，无后端、认证、数据库、Provider 或数据流变更；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好门禁继续保持 pending。

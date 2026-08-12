@@ -187,6 +187,95 @@ body .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
   }
 }
 
+/* An empty activity history is explanatory copy, not a data grid. The
+   legacy launcher otherwise keeps the populated table's 540px minimum width
+   and creates a horizontal scrollbar on phones, cutting the empty message
+   behind the scene. Collapse only the empty state; populated rows retain the
+   existing scrollable table contract. */
+body .activity-history-card.is-empty .table-scroll {
+  max-height: none;
+  overflow: visible;
+}
+
+body .activity-history-card.is-empty table {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+body .activity-history-card.is-empty thead {
+  display: none;
+}
+
+body .activity-history-card.is-empty tbody,
+body .activity-history-card.is-empty tbody tr,
+body .activity-history-card.is-empty tbody td {
+  display: block;
+  width: 100%;
+}
+
+body .activity-history-card.is-empty tbody td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* End the long observatory with a quiet terminal band instead of a bare gray
+   rule. Keep the artwork continuous underneath, while the local trace and
+   stronger link color give keyboard and mouse users a clear final landmark. */
+body .site-footer {
+  position: relative;
+  isolation: isolate;
+  border-top: 1px solid rgba(230, 235, 245, .14);
+  background: linear-gradient(180deg, rgba(7, 14, 24, .02), rgba(7, 14, 24, .16));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+  -webkit-backdrop-filter: blur(6px) saturate(1.04);
+  backdrop-filter: blur(6px) saturate(1.04);
+}
+
+body .site-footer::before {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: min(360px, 58vw);
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(217, 255, 120, .68), rgba(196, 192, 255, .42), transparent);
+  box-shadow: 0 0 14px rgba(217, 255, 120, .16);
+  transform: translateX(-50%);
+}
+
+body .site-footer a {
+  color: var(--signal-lime);
+  text-shadow: 0 1px 8px rgba(8, 9, 12, .62);
+}
+
+body .site-footer span {
+  color: var(--ink-muted);
+  text-shadow: 0 1px 6px rgba(8, 9, 12, .54);
+}
+
+@media (forced-colors: active) {
+  body .site-footer {
+    border-top-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  body .site-footer::before {
+    background: CanvasText;
+    box-shadow: none;
+  }
+
+  body .site-footer a,
+  body .site-footer span {
+    color: CanvasText;
+    text-shadow: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   body .scroll-cue,
   body .hero-actions { transition: none; }
@@ -197,6 +286,12 @@ body .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
   body .chart-card,
   body .chart-card.is-empty,
   body .chart-card.is-unavailable,
+  body .form-card,
+  body .guide-card,
+  body .manual-details,
+  body .records-card,
+  body .activity-capture-card,
+  body .activity-history-card,
   body .chart-wrap[data-chart-state="empty"],
   body .chart-wrap[data-chart-state="unavailable"] {
     background: Canvas;

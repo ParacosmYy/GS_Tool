@@ -500,3 +500,11 @@
 - UI-3：真实 `5000` 桌面/390px 长滚、`5011` 完整链、Week 点击、手动补录展开和清洁日志已确认；证据见 `docs/ui-accessibility-evidence-v131.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未重启。
 - 架构师：变化限定在 `03-observatory / legacy presentation compatibility boundary`，单文件保持低于 1000 行，forced-colors/reduced-motion 与焦点恢复边界保留。
+
+## v132 末端空态与终止信号
+
+- UI-1：修复旧入口活动历史空态在手机上横向滚动、文案被截断的问题；最近记录与页脚形成明确的 Dashboard 终止层级。
+- UI-2：仅 `.activity-history-card.is-empty` 取消 populated table 的 `540px` min-width 并隐藏表头；新增 footer terminal band、局部 signal trace、低 alpha blur；forced-colors 恢复系统色。
+- UI-3：真实 `5000` 的 320/390/768px 与桌面末端、`5011` 完整链、空态文案、卡片溢出和清洁日志已确认；证据见 `docs/ui-accessibility-evidence-v132.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动；保护端口未重启。
+- 架构师：变化限定在 `03-observatory / legacy presentation compatibility boundary`，不改变 populated table、DOM、脚本或数据契约；文件仍低于 1000 行。

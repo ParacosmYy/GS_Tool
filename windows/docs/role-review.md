@@ -576,3 +576,11 @@
 - UI-3：桌面/移动/完整链、周期点击、手动补录展开、无横向溢出和页面日志已复核；证据见 `ui-accessibility-evidence-v131.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
 - 架构师：单文件新增 61 行，保持高内聚、低耦合和 1000 行硬门禁；forced-colors、reduced-motion、sticky mask 与 focus-within 边界未被削弱。
+
+## v132 末端空态与终止信号
+
+- UI-1：真实移动末端截图定位到活动空态横向滚动和页脚收束不足；修复后文案完整、背景连续、terminal signal 清晰。
+- UI-2：兼容规则只作用于 `.is-empty`，不把 populated table 的行为带入空态；页脚视觉职责仍归旧入口 presentation boundary，不复制脚本或业务状态。
+- UI-3：320/390/768px、桌面末端、5011 完整链、空态宽度、卡片 overflow、页脚和应用日志已复核；证据见 `ui-accessibility-evidence-v132.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
+- 架构师：新增 empty state 与 footer block 保持高内聚，forced-colors/reduced-motion/键盘路径明确，文件行数继续低于 1000 行。
