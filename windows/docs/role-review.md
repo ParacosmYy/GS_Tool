@@ -430,6 +430,12 @@
 - 前端：只修改共享 `responsive-tuning.css` 的顶栏视觉契约，不改变模板、导航、滚动、认证和 API；forced-colors 分支继续由系统颜色接管。
 - 后端：无后端、接口、数据库改动。
 - 架构：单文件局部变更，依赖方向、文件行数和回滚边界保持；5214 浏览器证据见 `docs/ui-accessibility-evidence-v113.md`，滚动进度线 `0px` 异常单独进入下一轮。
+## v114 异步高度下的滚动进度同步
+
+- UI：进度线在异步内容加载、记录刷新和异常补录展开后保持真实比例，使用固定轨道与 `scaleX`，不增加新的装饰层。
+- 前端：`navigation.js` 复用现有 `requestAnimationFrame` 调度并按能力启用 `ResizeObserver`；`ui-polish.css` 只将进度线从 `width` 过渡改为 `transform`，reduced-motion 继续关闭过渡。
+- 后端：无后端、接口、数据库改动。
+- 架构：观察页面尺寸而非业务状态，保持 UI→导航模块边界，无轮询、无循环依赖、文件行数和回滚边界符合门禁；5215 证据见 `docs/ui-accessibility-evidence-v114.md`。
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

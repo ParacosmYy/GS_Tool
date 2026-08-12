@@ -308,6 +308,9 @@ Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当�
 ## v113 AI TOKEN 顶栏真正透明
 
 普通配色下的 AI TOKEN 顶栏改为 `background: transparent`、`background-image: none`、无 `backdrop-filter`、无 `box-shadow` 的真实透景窗口；文字 keyline 与独立滚动进度线继续承担可读性和滚动态反馈，避免背景插画高光下出现浅色横带。5214 隔离实例完成登录页、Dashboard 首屏/深滚与 `320/390/768/1024/1440` 五档回归，证据见 `ui-accessibility-evidence-v113.md`；滚动进度线宽度异常作为下一轮独立观察项，真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+## v114 异步高度下的滚动进度同步
+
+共享导航模块使用 `ResizeObserver` 监听 `document.body` 尺寸变化，并复用既有 `requestAnimationFrame` 合帧，让图表加载、记录刷新和异常补录展开后自动重算阅读比例；品牌进度线由动态 `width` 改为固定宽度 `scaleX`，避免异步布局期间出现 `0px` 的过渡中间态。5215 隔离实例已完成真实展开交互、稳定深滚和 `320/390/768/1024/1440` 五档回归，证据见 `ui-accessibility-evidence-v114.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

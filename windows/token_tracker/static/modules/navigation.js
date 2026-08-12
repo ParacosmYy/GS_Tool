@@ -21,20 +21,31 @@ function setupScrollProgress() {
   root.dataset.scrollContextReady = 'true';
   let frame = 0;
 
-  const render = () => {
-    const documentHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-    const progress = Math.min(100, Math.max(0, (window.scrollY / documentHeight) * 100));
-    root.style.setProperty('--scroll-progress', `${progress.toFixed(2)}%`);
-    header?.classList.toggle('is-scrolled', window.scrollY > 16);
-    frame = 0;
-  };
-
+  /**
+   * Recalculate the visual scroll context after asynchronous sections settle.
+   * Dashboard charts, records, and disclosure panels can change document
+   * height without producing a scroll event; observing the document body keeps
+   * the progress trace honest without polling or coupling navigation to data.
+   */
   const schedule = () => {
     if (!frame) frame = window.requestAnimationFrame(render);
   };
 
+  const render = () => {
+    const documentHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    const progress = Math.min(100, Math.max(0, (window.scrollY / documentHeight) * 100));
+    root.style.setProperty('--scroll-progress', `${progress.toFixed(2)}%`);
+    root.style.setProperty('--scroll-progress-scale', (progress / 100).toFixed(4));
+    header?.classList.toggle('is-scrolled', window.scrollY > 16);
+    frame = 0;
+  };
+
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule, { passive: true });
+  if ('ResizeObserver' in window) {
+    const observer = new ResizeObserver(schedule);
+    observer.observe(document.body);
+  }
   render();
 }
 
