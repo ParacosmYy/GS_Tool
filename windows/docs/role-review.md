@@ -672,3 +672,11 @@
 - UI-3：真实 5000/5011 的 390px、5011 的 1440px overview 深链，以及 analysis/connect/history 普通深链均已回归；证据见 `ui-accessibility-evidence-v144.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID 保持 `43832/8100`。
 - 架构师：变化限定在共享 anchor presentation contract，避免新增脚本监听器和重复定位逻辑；所有文本源码低于 1000 行。
+
+## v145 连接区动作层级与协议轨道
+
+- UI-1：真实 320/390/1440 页面确认检测动作从实心 lime 主按钮降为低强调扫描按钮，发送/自动记账保留唯一主动作；说明文字获得 signal rail 阅读边界。
+- UI-2：新增 `connection-signal.css` 作为 `04-connect / connection signal` 专属表现模块，由共享 `ui-polish.css` import 兼容 5000 和 5011；不改变模板、脚本、表单事件、接口或数据流。
+- UI-3：真实浏览器截图、computed style、按钮键盘可达性、文档宽度、页面日志已复核；静态 forced-colors/reduced-motion 降级完整，证据见 `ui-accessibility-evidence-v145.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID 保持 `43832/8100`。
+- 架构师：变化限定在高内聚连接表现边界，新增文件 122 行，所有文本源码低于 1000 行；无新依赖、DOM、监听器或跨层耦合。

@@ -1,0 +1,122 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Establish a clear action hierarchy and protocol briefing rail for
+ *          the automatic provider connection surface.
+ * Module: Web presentation / 04-connect / connection signal
+ * Contract: Detect is a secondary scan; send-and-record remains the single
+ *           primary action. No form state, network request, or data contract
+ *           is owned by this stylesheet.
+ */
+
+/* Give the connection heading a quiet instrument boundary so the provider
+   state reads as part of the protocol, not as floating text over the scene. */
+body .auto-card > .card-heading {
+  position: relative;
+  align-items: flex-start;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(230, 235, 245, .14);
+}
+
+body .auto-card > .card-heading::after {
+  position: absolute;
+  right: auto;
+  bottom: -1px;
+  left: 0;
+  width: 78px;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--signal-lime), rgba(196, 192, 255, .42), transparent);
+  box-shadow: 0 0 10px rgba(217, 255, 120, .16);
+}
+
+/* The long explanation becomes a readable protocol note with a local signal
+   edge; it remains normal paragraph content for assistive technology. */
+body .auto-card > .small-copy {
+  position: relative;
+  margin-top: 18px;
+  margin-bottom: 20px;
+  padding-left: 14px;
+  border-left: 1px solid rgba(217, 255, 120, .38);
+  background: linear-gradient(90deg, rgba(217, 255, 120, .045), transparent 72%);
+}
+
+body .auto-card > .small-copy::before {
+  position: absolute;
+  top: 8px;
+  left: -3px;
+  width: 5px;
+  height: 5px;
+  border: 1px solid var(--signal-lime);
+  border-radius: 50%;
+  content: "";
+  background: var(--signal-lime);
+  box-shadow: 0 0 10px rgba(217, 255, 120, .58);
+}
+
+/* The automatic scan is preparatory. Keep the lime fill reserved for the
+   actual request/record action below it, while preserving a clear hover and
+   keyboard-focus transition for the scan control. */
+body .auto-card #detect-models {
+  color: var(--ink-soft);
+  border-color: var(--line-visible);
+  background: rgba(196, 192, 255, .055);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+body .auto-card #detect-models:hover,
+body .auto-card #detect-models:focus-visible {
+  color: var(--signal-lime-ink);
+  border-color: var(--signal-lime);
+  background: var(--signal-lime);
+  box-shadow: 0 10px 24px rgba(217, 255, 120, .14);
+}
+
+body .auto-card #detect-models:disabled {
+  color: var(--ink-muted);
+  border-color: var(--line-soft);
+  background: rgba(196, 192, 255, .025);
+  box-shadow: none;
+}
+
+/* The idle beacon communicates that the connection surface is ready for the
+   user's first step without introducing a competing spinner. */
+body .auto-card[data-motion-state="idle"] .connection-badge i {
+  animation: connection-beacon-breathe 3.2s ease-in-out infinite;
+}
+
+@keyframes connection-beacon-breathe {
+  0%, 100% { opacity: .62; transform: scale(.86); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+@media (max-width: 620px) {
+  body .auto-card > .card-heading { padding-bottom: 12px; }
+  body .auto-card > .small-copy { margin-top: 16px; margin-bottom: 18px; }
+}
+
+@media (forced-colors: active) {
+  body .auto-card > .card-heading { border-bottom-color: CanvasText; }
+  body .auto-card > .card-heading::after,
+  body .auto-card > .small-copy::before {
+    border-color: CanvasText;
+    background: CanvasText;
+    box-shadow: none;
+  }
+  body .auto-card > .small-copy { border-left-color: CanvasText; background: transparent; }
+  body .auto-card[data-motion-state="idle"] .connection-badge i { animation: none; }
+  body .auto-card #detect-models,
+  body .auto-card #detect-models:hover,
+  body .auto-card #detect-models:focus-visible,
+  body .auto-card #detect-models:disabled {
+    color: ButtonText;
+    border-color: ButtonText;
+    background: ButtonFace;
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body .auto-card[data-motion-state="idle"] .connection-badge i { animation: none; }
+}

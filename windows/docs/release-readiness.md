@@ -500,3 +500,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 390/1440 overview 深链、其它 section 深链、文档宽度和页面侧日志均已复核；证据见 `docs/ui-accessibility-evidence-v144.md`。
 - 本轮只修改共享前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
+
+## v145 连接区动作层级与协议轨道
+
+- 连接区已明确单一主动作：`发送 · 自动记账` 保持 lime primary，`自动检测模型` 使用次级 signal surface；连接说明具备局部阅读边界。
+- 真实 5000 的 320px、5011 的 390/1440px 回归通过；无横向溢出、按钮可达性和页面侧日志正常；证据见 `docs/ui-accessibility-evidence-v145.md`。
+- 本轮只修改共享前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。

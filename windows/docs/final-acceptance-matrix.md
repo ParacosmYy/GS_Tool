@@ -596,3 +596,11 @@
 - UI-3：5000 的 390px、5011 的 390/1440 overview 深链与 analysis/connect/history 回归通过：scrollY、header state、CTA opacity、文档宽度和页面日志均符合预期；证据见 `docs/ui-accessibility-evidence-v144.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 未重启。
 - 架构师：变化限定在共享锚点 presentation boundary，`ui-polish.css` 988 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
+
+## v145 连接区动作层级与协议轨道
+
+- UI-1：连接区默认只有“发送 · 自动记账”承担强主动作视觉；“自动检测模型”降为扫描型次级按钮，状态点与说明文字拥有一致的 signal language。
+- UI-2：`connection-signal.css` 独立拥有 04-connect 的表现规则；forced-colors 和 reduced-motion 降级不触碰业务状态。
+- UI-3：5000 的 320px、5011 的 390/1440px 真实回归通过：按钮 48px、键盘 tabIndex=0、文档无横向溢出、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v145.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 未重启。
+- 架构师：新增文件 122 行，`ui-polish.css` 989 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。

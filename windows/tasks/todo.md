@@ -404,3 +404,5 @@
 - [x] v143 通过真实 `5000` 的 320/390/768/1440 与 `5011` 的 390px 确认 header/topline computed style、场景透景、文档宽度和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v143.md`。
 - [x] v144 修复 Dashboard `/dashboard#overview` 分享链接落在 sticky 顶栏后、误触发 `is-scrolled` 和首屏 CTA 淡出的问题：将 `#overview` 纳入共享 anchor clearance 契约。
 - [x] v144 通过真实 `5000/5011` 的 390px、5011 的 1440px overview 深链及 analysis/connect/history 回归确认首屏落点、CTA opacity、sticky header 状态、文档宽度和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v144.md`。
+- [x] v145 优化连接区动作层级：将“自动检测模型”收敛为次级扫描按钮，保留“发送 · 自动记账”为唯一 lime 主动作，并为连接说明增加 signal rail；不改表单流程与数据契约。
+- [x] v145 通过真实 `5000` 的 320px、`5011` 的 390/1440px 回归确认按钮尺寸、键盘可达性、无横向溢出、默认动效、页面日志及降级规则；独立证据写入 `docs/ui-accessibility-evidence-v145.md`。
