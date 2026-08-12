@@ -10,6 +10,7 @@
 @import url("./hero-signal.css");
 @import url("./brand-clarity.css");
 @import url("./connection-signal.css");
+@import url("./activity-signal.css");
 
 :root {
   --canvas: #08090c;

@@ -507,3 +507,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 5000 的 320px、5011 的 390/1440px 回归通过；无横向溢出、按钮可达性和页面侧日志正常；证据见 `docs/ui-accessibility-evidence-v145.md`。
 - 本轮只修改共享前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
+
+## v146 工作信号补充信息响应式轨道
+
+- 工作信号表单的四个可选元数据字段现在归入语义化“补充信息”分组；390px/桌面双列，≤340px 单列，避免窄屏占位文本被压缩。
+- 项目源码临时服务 `5026` 的 320/390/1440 真实浏览器回归通过；文档无横向溢出、表单控件可键盘到达、页面日志为空；证据见 `docs/ui-accessibility-evidence-v146.md`。
+- 本轮修改前端模板与 CSS presentation contract，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。

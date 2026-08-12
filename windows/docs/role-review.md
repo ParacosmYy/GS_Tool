@@ -680,3 +680,11 @@
 - UI-3：真实浏览器截图、computed style、按钮键盘可达性、文档宽度、页面日志已复核；静态 forced-colors/reduced-motion 降级完整，证据见 `ui-accessibility-evidence-v145.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID 保持 `43832/8100`。
 - 架构师：变化限定在高内聚连接表现边界，新增文件 122 行，所有文本源码低于 1000 行；无新依赖、DOM、监听器或跨层耦合。
+
+## v146 工作信号补充信息响应式轨道
+
+- UI-1：将项目、任务类型、正确码、错误码收束到语义化“补充信息”分组；390px 及以上双列，≤340px 单列，示例文本保持可读。
+- UI-2：新增 `activity-signal.css` 作为 `05-activity / capture surface` 高内聚表现边界；模板只重组已有字段，保留 name、焦点顺序、提交脚本与数据契约。
+- UI-3：项目源码临时验证端口 `5026` 的 320/390/1440 真实浏览器回归通过；无横向溢出、控件 `tabIndex=0`、提交按钮 48px、页面日志为空；证据见 `ui-accessibility-evidence-v146.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
+- 架构师：变化限定在活动录入 presentation boundary，使用 `fieldset/legend` 保持语义内聚；新增 CSS 122 行，所有文本源码低于 1000 行，无新依赖或跨层耦合。

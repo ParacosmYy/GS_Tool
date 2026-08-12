@@ -604,3 +604,11 @@
 - UI-3：5000 的 320px、5011 的 390/1440px 真实回归通过：按钮 48px、键盘 tabIndex=0、文档无横向溢出、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v145.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 未重启。
 - 架构师：新增文件 122 行，`ui-polish.css` 989 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
+
+## v146 工作信号补充信息响应式轨道
+
+- UI-1：工作信号表单新增“补充信息”语义分组；项目、任务类型、正确码、错误码在 390px 与桌面双列，在 ≤340px 单列，保持示例文本可读。
+- UI-2：`activity-signal.css` 独立拥有 05-activity capture surface 的视觉边界；不改变字段 name、焦点顺序、提交脚本或数据契约。
+- UI-3：源码临时端口 `5026` 的 320/390/1440 真实浏览器回归通过：无横向溢出、控件 `tabIndex=0`、提交按钮 48px、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v146.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
+- 架构师：新增文件 122 行，`ui-polish.css` 990 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。

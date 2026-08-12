@@ -167,15 +167,18 @@
           </select>
         </label>
       </div>
-      <div class="form-row">
-        <label>效率评分 <span class="optional">0–100</span><input name="efficiency_score" type="number" min="0" max="100" step="1" placeholder="例如 86"></label>
-        <label>项目 <span class="optional">可选</span><input name="project" maxlength="120" placeholder="例如：token-tracker"></label>
-      </div>
-      <div class="form-row">
-        <label>正确码 <span class="optional">可选</span><input name="result_code" maxlength="80" placeholder="例如：OK"></label>
-        <label>错误码 <span class="optional">可选</span><input name="error_code" maxlength="80" placeholder="例如：BUILD_FAILED"></label>
-      </div>
-      <label>任务类型 <span class="optional">可选</span><input name="task_type" maxlength="80" placeholder="例如：provider-integration"></label>
+      <label>效率评分 <span class="optional">0–100</span><input name="efficiency_score" type="number" min="0" max="100" step="1" placeholder="例如 86"></label>
+      <fieldset class="work-signal-metadata">
+        <legend>补充信息 <span class="optional">可选</span></legend>
+        <div class="form-row work-signal-metadata-row">
+          <label>项目 <span class="optional">可选</span><input name="project" maxlength="120" placeholder="例如：token-tracker"></label>
+          <label>正确码 <span class="optional">可选</span><input name="result_code" maxlength="80" placeholder="例如：OK"></label>
+        </div>
+        <div class="form-row work-signal-metadata-row">
+          <label>错误码 <span class="optional">可选</span><input name="error_code" maxlength="80" placeholder="例如：BUILD_FAILED"></label>
+          <label>任务类型 <span class="optional">可选</span><input name="task_type" maxlength="80" placeholder="例如：provider-integration"></label>
+        </div>
+      </fieldset>
       <label>备注 <span class="optional">可选</span><textarea name="note" rows="3" maxlength="1000" placeholder="只填写必要的结构化说明，不要粘贴 Key 或完整日志……"></textarea></label>
       <button class="button button-primary" type="submit">保存工作信号 <span>↗</span></button>
       <div id="work-event-message" class="form-message" role="status" aria-live="polite" aria-atomic="true"></div>

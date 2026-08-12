@@ -1,0 +1,122 @@
+/**
+ * AI Token Tracker — work signal capture refinement
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Keep optional result codes compact on narrow screens while
+ *          preserving a clear, full-width reading path for primary fields.
+ * Module: UI-1 visual director / activity capture surface
+ */
+
+/* The activity card shares the same instrument-panel keyline as automatic
+   collection, so the two capture surfaces read as one deliberate system. */
+body .activity-capture-card > .card-heading {
+  position: relative;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(196, 192, 255, .16);
+}
+
+body .activity-capture-card > .card-heading::after {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 58px;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, var(--signal-lime), transparent);
+}
+
+body .activity-capture-card .work-signal-metadata {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid rgba(196, 192, 255, .13);
+  border-radius: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, .025);
+}
+
+body .activity-capture-card .work-signal-metadata legend {
+  padding: 0 6px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body .activity-capture-card .work-signal-metadata legend .optional {
+  margin-left: 4px;
+  color: var(--ink-muted);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  text-transform: none;
+}
+
+/* Result and error codes are supplementary metadata. Grouping them keeps the
+   core direction/outcome/efficiency path calm without hiding any field. */
+body .activity-capture-card .work-signal-metadata-row {
+  gap: 10px;
+}
+
+@media (max-width: 620px) {
+  body .activity-capture-card .work-signal-metadata-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  body .activity-capture-card .work-signal-metadata-row label {
+    min-width: 0;
+  }
+
+  body .activity-capture-card .work-signal-metadata-row input {
+    min-width: 0;
+    padding-inline: 10px;
+    font-size: 14px;
+  }
+
+  body .activity-capture-card .work-signal-metadata-row .optional {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 340px) {
+  body .activity-capture-card .work-signal-metadata {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  body .activity-capture-card .work-signal-metadata-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  body .activity-capture-card .work-signal-metadata-row input {
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body .activity-capture-card > .card-heading::after {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  body .activity-capture-card > .card-heading {
+    border-color: CanvasText;
+  }
+
+  body .activity-capture-card > .card-heading::after {
+    background: CanvasText;
+  }
+
+  body .activity-capture-card .work-signal-metadata {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+}
