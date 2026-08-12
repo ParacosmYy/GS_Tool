@@ -627,3 +627,10 @@
 - 5026 隔离登录/注册 1440/390px 与真实 5000/5011 入口回归通过：计算样式、移动端几何、无横向溢出和页面日志均正常；证据见 `docs/ui-accessibility-evidence-v148.md`。
 - 本轮不改变认证、模板语义、导航、数据库、Provider、API、Key 生命周期或数据流；保护服务 PID `43832/8100` 未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。
+
+## v149 认证首帧自动聚焦层级
+
+- 登录/注册页自动聚焦属于 convenience state：首帧使用 lavender quiet edge，用户 pointer/keyboard 交互后恢复 lime `:focus-visible`，不改变焦点顺序。
+- 5026 源码实例的 1440/390px 登录与注册回归通过：顶栏透明、首帧状态、卡片几何、无横向溢出和页面日志正常；证据见 `docs/ui-accessibility-evidence-v149.md`。
+- 本轮不改变认证、模板字段、数据库、Provider、API、Key 生命周期或数据流；保护服务 PID `43832/8100` 未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。

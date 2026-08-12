@@ -528,3 +528,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 5026 隔离登录/注册页的 1440/390px 回归通过；文档无横向溢出，表单卡片与焦点路径保持。
 - 本轮只修改共享前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
+
+## v149 认证首帧自动聚焦层级
+
+- 登录/注册桌面首帧自动聚焦现在使用 quiet lavender 边界，不再以 lime 光环制造错误态观感；用户操作后完整键盘焦点反馈保持。
+- 源码临时端口 `5026` 的 1440/390px 登录与注册回归通过；顶栏透明、卡片几何、文档宽度和页面日志正常；证据见 `docs/ui-accessibility-evidence-v149.md`。
+- 本轮只修改认证前端脚本/CSS 和工程文档，无后端、认证接口、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。

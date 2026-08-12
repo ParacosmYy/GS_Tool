@@ -412,3 +412,5 @@
 - [x] v147 通过项目源码临时端口 `5026` 的 320/390/1440 真实浏览器回归确认路由文本、`aria-current`、深链落点、无横向溢出、页面日志与降级规则；独立证据写入 `docs/ui-accessibility-evidence-v147.md`。
 - [x] v148 修复最上方 `AI TOKEN` 品牌行透明但像黑色横带的根因：兼容链与完整链统一移除 header inset shadow，保留透明背景、signal line、文字 keyline、focus 和系统色降级。
 - [x] v148 通过隔离 `5026` 的登录/注册 1440/390px 与真实 `5000/5011` 入口回归确认 computed style、移动端无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v148.md`。
+- [x] v149 修复登录/注册首帧自动聚焦过亮：自动聚焦使用 quiet lavender 输入边界与卡片边界，用户首次 pointer/keyboard 交互后恢复完整 lime 焦点反馈；异步自动聚焦不会覆盖用户意图。
+- [x] v149 通过源码临时端口 `5026` 的登录/注册 1440/390px 真实浏览器回归确认焦点层级、顶栏透明、卡片几何、无横向溢出、清洁页面日志与 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v149.md`。

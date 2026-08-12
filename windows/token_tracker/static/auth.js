@@ -32,17 +32,27 @@ import { setupBackdropMotion, setupPointerFollower, setupSurfaceMotion } from ".
   // ring should stay quiet until the user begins an intentional interaction.
   // The marker is removed on the first pointer or keyboard event so normal
   // :focus-visible guidance immediately resumes.
-  const clearAutofocusMarker = () => { delete scene.dataset.authAutofocus; };
+  let autofocusCancelled = false;
+  const clearAutofocusMarker = () => {
+    autofocusCancelled = true;
+    delete scene.dataset.authAutofocus;
+  };
   scene.addEventListener("pointerdown", clearAutofocusMarker, { passive: true });
   scene.addEventListener("keydown", clearAutofocusMarker, { passive: true });
 
   const initialField = scene.querySelector('input[name="username"]');
-  if (finePointer && desktopViewport && initialField && document.activeElement === document.body) {
-    // Desktop users keep the fast keyboard path, while preventScroll avoids
-    // mobile browsers moving the entire authentication scene to the field.
+  const initialFocusIsSafe = initialField &&
+    (document.activeElement === document.body || document.activeElement === initialField);
+  if (finePointer && desktopViewport && initialFocusIsSafe) {
+    // A browser can restore the field focus before this module runs. Treat
+    // that same first-frame state as programmatic focus so the quiet marker
+    // remains reliable across reloads and back/forward navigation.
     window.requestAnimationFrame(() => {
+      if (autofocusCancelled) return;
       scene.dataset.authAutofocus = "true";
-      initialField.focus({ preventScroll: true });
+      if (document.activeElement !== initialField) {
+        initialField.focus({ preventScroll: true });
+      }
     });
   }
   if (!finePointer || reducedMotion) return;
