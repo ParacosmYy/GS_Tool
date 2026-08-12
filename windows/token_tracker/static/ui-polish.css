@@ -12,6 +12,7 @@
 @import url("./connection-signal.css");
 @import url("./activity-signal.css");
 @import url("./route-context.css");
+@import url("./reveal-readability.css");
 
 :root {
   --canvas: #08090c;

@@ -634,3 +634,11 @@
 - 5026 源码实例的 1440/390px 登录与注册回归通过：顶栏透明、首帧状态、卡片几何、无横向溢出和页面日志正常；证据见 `docs/ui-accessibility-evidence-v149.md`。
 - 本轮不改变认证、模板字段、数据库、Provider、API、Key 生命周期或数据流；保护服务 PID `43832/8100` 未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。
+
+## v150 Dashboard reveal 长页面可读性
+
+- UI-1：Dashboard 长页真实数据在 reveal 前后均保持完整可读对比度，入场只使用轻微垂直位移，避免内容被误读为加载中。
+- UI-2：`reveal-readability.css` 独立拥有 reveal 可读性规则；普通动效、reduced-motion 和 forced-colors 职责边界清晰。
+- UI-3：5026 的 1440/390px 首屏与 390px 深滚分析路由真实回归通过：全部 reveal `opacity=1`、路由上下文与 `aria-current` 正常、文档无正向横向溢出、页面日志 `[]`；证据见 `docs/ui-accessibility-evidence-v150.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
+- 架构师：新增 CSS 模块高内聚、无新依赖或跨层耦合；`ui-polish.css` 992 行，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。

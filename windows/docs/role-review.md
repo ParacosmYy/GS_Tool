@@ -712,3 +712,11 @@
 - UI-3：源码临时端口 `5026` 的登录/注册 1440/390px 真实浏览器回归通过；首帧焦点、卡片边界、顶栏透明、无横向溢出和页面日志已复核；证据见 `ui-accessibility-evidence-v149.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
 - 架构师：变化限定在高内聚认证 presentation boundary，新增 23 行，所有文本源码低于 1000 行；无新依赖或模板改动。
+
+## v150 Dashboard reveal 长页面可读性
+
+- UI-1：修复未进入视口的真实 Dashboard 数据区块被压到 `.78` 的灰暗观感；区块保持完整对比度，仅以 `8px` 垂直位移完成入场。
+- UI-2：新增 `reveal-readability.css` 作为 Dashboard reveal 专属表现模块，由 `ui-polish.css` 统一引入；不改模板、脚本、接口或数据流。
+- UI-3：源码临时端口 `5026` 的 1440/390px 首屏与 `390px` 深滚分析路由回归通过；`opacity`、`aria-current`、无横向溢出和页面日志已复核；证据见 `ui-accessibility-evidence-v150.md`。
+- 后端：无后端、数据库、认证、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
+- 架构师：变化限定在共享 presentation boundary，新增模块高内聚、无新依赖或跨层耦合；`ui-polish.css` 992 行，所有文本源码低于 1000 行。

@@ -535,3 +535,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 源码临时端口 `5026` 的 1440/390px 登录与注册回归通过；顶栏透明、卡片几何、文档宽度和页面日志正常；证据见 `docs/ui-accessibility-evidence-v149.md`。
 - 本轮只修改认证前端脚本/CSS 和工程文档，无后端、认证接口、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
+
+## v150 Dashboard reveal 长页面可读性
+
+- Dashboard 未进入视口的真实数据区块现在保持 `opacity: 1`，只保留轻微垂直入场；长页面滚动时不再产生类似加载中的灰暗内容。
+- 源码临时端口 `5026` 的 1440/390px 首屏与 390px `ANALYSIS` 深滚回归通过；无正向横向溢出，页面侧日志为空；证据见 `docs/ui-accessibility-evidence-v150.md`。
+- 本轮只修改共享前端 CSS presentation contract 和工程文档，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好仍为 pending。
