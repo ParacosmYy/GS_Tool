@@ -357,3 +357,5 @@
 - [x] v119 通过真实隔离 5220 确认 `320/390/768/1024/1440` 五档无横向溢出、1440px sticky 深滚、Base URL 焦点恢复、390px 长表单和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v119.md`。
 - [x] v120 修复兼容旧个人入口的场景背景缺失：基础 `style.css` 恢复 `.story-backdrop` 与 `.story-backdrop-image` 的全屏场景边界，保持 AI TOKEN 品牌行透明，不改变业务契约。
 - [x] v120 通过真实 `5000` 页面与隔离 `5221` 复核 `320/390/768/1024/1440`、滚动态、顶部截图、背景图加载、透明 computed style、横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v120.md`。
+- [x] v121 收紧 `620px` 以下认证页垂直节奏，减少移动端进入登录/注册卡片的无效滚动距离；保留标题、信任信息、表单和认证契约。
+- [x] v121 通过真实 `5000` 页面确认登录/注册五档响应式、390px 卡片提前、768/1440 截图、键盘焦点、heading 结构、横向溢出和清洁日志；独立证据写入 `docs/ui-accessibility-evidence-v121.md`。

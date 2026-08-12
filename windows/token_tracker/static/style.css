@@ -508,6 +508,41 @@ td:first-child { color: var(--white); font-weight: 700; }
   .auth-orbit-label { display: none; }
 }
 
+/*
+ * Mobile auth entry: the visual story remains generous, but the first usable
+ * control should not begin below an entire desktop-sized intro composition.
+ * Keep the title and trust lines, then tighten only the vertical rhythm so a
+ * phone user reaches the login card with one deliberate scroll gesture.
+ */
+@media (max-width: 620px) and (min-height: 700px) {
+  .auth-shell,
+  .auth-shell-reverse {
+    gap: 24px;
+    padding-top: 24px;
+    padding-bottom: 64px;
+  }
+
+  .auth-intro {
+    min-height: 0;
+  }
+
+  .display-title {
+    margin-bottom: 20px;
+  }
+
+  .intro-copy {
+    margin-bottom: 18px;
+  }
+
+  .feature-lines span {
+    min-height: 34px;
+  }
+
+  .auth-card {
+    padding-top: 22px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   [data-reveal] { opacity: 1; transform: none; }

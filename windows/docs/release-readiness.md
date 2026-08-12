@@ -333,6 +333,10 @@ Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当�
 ## v120 顶部品牌场景兼容边界
 
 基础 `style.css` 补回 `.story-backdrop` / `.story-backdrop-image` 的全屏背景兼容边界，修复旧个人入口只加载基础样式时透明 `.site-header` 下方落到黑色 body 画布的问题。当前完整模板加载的 `scene-motion.css` 继续覆盖同一选择器，品牌栏保持 `transparent / no backdrop-filter / no box-shadow`；真实 `5000` 与隔离 `5221` 已完成五档响应式、首屏截图、滚动态和清洁日志验证，证据见 `ui-accessibility-evidence-v120.md`。
+
+## v121 移动认证入口节奏
+
+基础 `style.css` 在 `620px` 以下、常规手机高度增加独立的认证入口节奏收敛：介绍区与认证卡片的间距、标题下方间距、说明段落间距和信任线行高略微降低，使主要输入更早进入视野；桌面双栏、认证契约、焦点和无障碍边界不变。真实 `5000` 已完成登录/注册五档、390px/768px/1440px 截图、键盘焦点和清洁日志验证，证据见 `ui-accessibility-evidence-v121.md`。
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
