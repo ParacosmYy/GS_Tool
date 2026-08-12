@@ -909,6 +909,15 @@ html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0
   .card-heading h2, .guide-card h2 { font-size: 21px; }
   .signal-cell .stat-value { font-size: 30px; }
   .chart-empty-state strong { font-size: 13px; }
+
+  /* Both launch chains load this shared layer, while the complete chain may
+     load scene-motion.css later with a wider 68% focal point. Keep the quiet
+     source-image field aligned to the mobile editorial copy lane in either
+     case; the extra body qualifier intentionally wins without !important. */
+  body .story-backdrop {
+    background-position: calc(30% + var(--backdrop-shift-x, 0px)) calc(50% + var(--backdrop-shift-y, 0px));
+  }
+  body .story-backdrop-image { object-position: 30% 50%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

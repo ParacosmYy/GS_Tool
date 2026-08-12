@@ -465,3 +465,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 768×900 与 1440×900 未命中新规则；四项周期按钮的 `aria-pressed` 状态、文档宽度和页面侧日志保持正常，证据见 `docs/ui-accessibility-evidence-v138.md`。
 - 本轮只修改共享 CSS presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。
+
+## v139 窄屏场景焦点收口
+
+- 390×844 的移动首屏现在把标题、说明、CTA 和周期控件放在连续的暗色编辑留白中，笔记本/人物保留在右侧叙事区；5000 与 5011 共享同一焦点契约。
+- 320×720 的 CTA 几何、768×900 与 1440×900 的 40% 场景焦点保持；透明顶栏、ARIA 状态、无横向溢出和页面侧日志回归通过，证据见 `docs/ui-accessibility-evidence-v139.md`。
+- 本轮只修改共享 CSS presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。

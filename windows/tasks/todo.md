@@ -394,3 +394,5 @@
 - [x] v137 通过真实 `5000` 的 1440/1024/390 viewport、Activity 深链接与 `5011` 的 1024 完整入口确认四项导航、ARIA active state、sticky 定位、透明品牌栏和无横向溢出；独立证据写入 `docs/ui-accessibility-evidence-v137.md`。
 - [x] v138 修复正常高度手机 390×844 首屏周期切换器被底部视口截断的问题：共享 `ui-polish.css` 将 hero footer 顶部间距收敛为 10px，短屏与桌面保持既有布局。
 - [x] v138 通过真实 `5000`/`5011` 的 390×844、`5000` 的 320×720/768×900/1440×900、周期按钮 ARIA、无横向溢出和页面侧日志确认跨入口一致性；独立证据写入 `docs/ui-accessibility-evidence-v138.md`。
+- [x] v139 修复窄屏背景高亮侵入标题与 CTA 阅读轨道的问题：在两个启动链共同加载的 `ui-polish.css` 将移动场景焦点收敛为 30%，保留右侧人物/设备叙事。
+- [x] v139 通过真实 `5000` 的 390/320/768/1440 viewport 与 `5011` 的 390 完整入口确认场景焦点、透明顶栏、CTA/周期几何、ARIA、无横向溢出和清洁日志；独立证据写入 `docs/ui-accessibility-evidence-v139.md`。
