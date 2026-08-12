@@ -317,6 +317,10 @@ Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当�
 ## v116 Dashboard 空态观测舱
 
 新增 `observatory-signal.css`，将无数据趋势图/模型占比面收敛为低 alpha 深蓝透景层、细坐标网格、`NO SIGNAL / READY` 标记和局部 signal line；周期切换器增加与 hero-foot 对齐的 hairline，不改变 Chart.js、接口、DOM 语义或 `aria-pressed`。5217 隔离实例已完成五档响应式、深滚空态和 Week 真实切换验证，证据见 `ui-accessibility-evidence-v116.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
+## v117 AI TOKEN 品牌栏最终透明契约
+
+新增 `brand-transparency.css` 并在共享 `base.html` 样式链末尾接入，普通配色下强制品牌栏及其子级保持透明、无背景图、无 blur、无 shadow，避免旧模块的后加载规则重新产生黑色横带；forced-colors 使用系统 Canvas 颜色，reduced-motion 关闭新增过渡。5218 隔离实例已完成 `320/390/768/1024/1440` 五档、首屏/滚动态和窄屏截图验证，证据见 `ui-accessibility-evidence-v117.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

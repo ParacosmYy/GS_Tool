@@ -395,6 +395,11 @@
 
 - Dashboard 空态趋势图与模型占比改为 observatory signal bay；空态 status、自动采集入口、Chart.js canvas 状态和周期控件语义保持。
 - 真实隔离 5217 实例确认 `320/390/768/1024/1440` 五档无横向溢出、`scrollY=820` 深滚空态、`role=status`、Week `aria-pressed` 和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v116.md`。
+
+### v117 交付增量
+
+- 最上方 AI TOKEN 品牌栏新增最终透明契约：普通配色下 header 与子级 `background: transparent`、`background-image: none`、无 blur、无 shadow；保留文字 keyline、hairline、滚动 signal line，不改变认证、导航、DOM 或 API。
+- 真实隔离 5218 实例确认 `320/390/768/1024/1440` 五档无横向溢出、登录首屏/滚动态/390px 截图、透明 computed style 和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v117.md`。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

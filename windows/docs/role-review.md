@@ -448,6 +448,14 @@
 - 前端：新增 `observatory-signal.css`，仅消费既有 `.is-empty/.is-unavailable`、`data-chart-state` 和 `.range-switcher` DOM contract；不新增脚本监听器或 API。
 - 后端：无后端、接口、数据库改动。
 - 架构：职责限定于 `03-observatory`，与 Chart.js renderer 和业务状态解耦；forced-colors/reduced-motion、文件行数和回滚路径清晰；5217 证据见 `docs/ui-accessibility-evidence-v116.md`。
+
+## v117 AI TOKEN 品牌栏最终透明契约
+
+- UI-1：解决最上方 AI TOKEN 行在多层视觉规则叠加后产生黑色覆盖错觉的问题；品牌栏继续作为背景插画的透明窗口，保留轻量边界和字形可读性。
+- UI-2：新增 `brand-transparency.css`，通过最后加载的共享 CSS contract 统一 header、brand、导航与账户子级的透明、无 blur、无 shadow 规则；forced-colors 与 reduced-motion 单独降级。
+- UI-3：真实隔离 5218 已确认 `320/390/768/1024/1440` 五档无横向溢出、首屏/滚动态/窄屏截图与透明 computed style，应用日志无 error/warn；证据见 `ui-accessibility-evidence-v117.md`。
+- 后端：无后端、数据库、接口、认证或密钥处理改动；保护端口 `5000/5011` 未触碰。
+- 架构师：模块职责限定在 `01-shell`，不向业务脚本引入依赖；新增文件低于 1000 行，回滚边界为 stylesheet link 与独立模块。
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

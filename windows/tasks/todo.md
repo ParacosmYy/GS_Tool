@@ -349,3 +349,5 @@
 - [x] v115 通过真实隔离 5216 确认 `390×844` 无横向溢出、`1440×900` 登录首屏与 Dashboard 深滚透明顶栏、hairline、进度线和清洁页面状态；独立证据写入 `docs/ui-accessibility-evidence-v115.md`。
 - [x] v116 将 Dashboard 空态图表收敛为低 alpha observatory signal bay，增加 `NO SIGNAL / READY`、坐标网格、局部 signal line 和周期游标 hairline；不改变图表数据契约。
 - [x] v116 通过真实隔离 5217 确认五档响应式、深滚空态、`role=status`、自动采集入口、Week 周期 `aria-pressed` 和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v116.md`。
+- [x] v117 将最上方 AI TOKEN 品牌栏拆出最终透明契约：普通配色下 header 与子级保持透明、无背景图、无 blur、无 shadow，保留文字 keyline、hairline 和滚动 signal line；不改变认证、导航、DOM、API 或业务数据。
+- [x] v117 通过真实隔离 5218 确认 `320/390/768/1024/1440` 五档无横向溢出、登录首屏与滚动态透明计算值、390px 截图和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v117.md`。
