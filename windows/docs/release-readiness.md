@@ -509,6 +509,13 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 本轮只新增短屏前端 presentation module，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护 PID `43832/8100` 未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。
 
+## v155 认证阅读窗透景材质
+
+- 登录/注册认证卡片现在使用更清透的蓝黑场景层：桌面 `blur(8px)`、移动 `blur(7px)`，输入框维持独立阅读底。
+- 5027 的 1440/390/320px 登录、登录后 Dashboard、透明顶栏、周期控件、pointer follower 和页面日志回归通过；证据见 `docs/ui-accessibility-evidence-v155.md`。
+- 本轮只调整认证前端 CSS presentation contract，无后端、认证接口、数据库、Provider、API、Key 生命周期或依赖变化；保护 PID `43832/8100` 未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。
+
 ## v144 overview 分享锚点首屏定位
 
 - `#overview` 已加入共享 sticky header clearance；旧 5000 与完整 5011 入口的 overview 分享链接均回到 `scrollY=0`，首屏 CTA opacity 为 `1`。

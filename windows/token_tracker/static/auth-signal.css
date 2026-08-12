@@ -16,10 +16,10 @@
     border-color: rgba(230, 235, 245, .34);
     background:
       radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .08), transparent 40%),
-      linear-gradient(145deg, rgba(20, 40, 58, .48), rgba(7, 14, 24, .6));
-    -webkit-backdrop-filter: blur(10px) saturate(1.05);
-    backdrop-filter: blur(10px) saturate(1.05);
-    box-shadow: 0 24px 62px rgba(2, 10, 20, .24), inset 0 1px 0 rgba(255, 255, 255, .09);
+      linear-gradient(145deg, rgba(20, 40, 58, .36), rgba(7, 14, 24, .48));
+    -webkit-backdrop-filter: blur(8px) saturate(1.05);
+    backdrop-filter: blur(8px) saturate(1.05);
+    box-shadow: 0 24px 62px rgba(2, 10, 20, .2), inset 0 1px 0 rgba(255, 255, 255, .09);
   }
 
   .auth-card:focus-within {
@@ -110,7 +110,7 @@
     min-height: 49px;
     border-color: rgba(230, 235, 245, .3);
     border-radius: 6px;
-    background: rgba(6, 15, 25, .28);
+    background: rgba(6, 15, 25, .36);
   }
 
   .auth-card input:hover {
@@ -137,10 +137,10 @@
     border-color: rgba(230, 235, 245, .3);
     background:
       radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .07), transparent 42%),
-      linear-gradient(145deg, rgba(18, 38, 56, .46), rgba(7, 14, 24, .56));
-    -webkit-backdrop-filter: blur(9px) saturate(1.04);
-    backdrop-filter: blur(9px) saturate(1.04);
-    box-shadow: 0 22px 54px rgba(2, 10, 20, .22), inset 0 1px 0 rgba(255, 255, 255, .08);
+      linear-gradient(145deg, rgba(18, 38, 56, .3), rgba(7, 14, 24, .42));
+    -webkit-backdrop-filter: blur(7px) saturate(1.04);
+    backdrop-filter: blur(7px) saturate(1.04);
+    box-shadow: 0 22px 54px rgba(2, 10, 20, .18), inset 0 1px 0 rgba(255, 255, 255, .08);
   }
 
   .auth-card > .muted {
@@ -153,6 +153,7 @@
 
   .auth-card input {
     min-height: 50px;
+    background: rgba(6, 15, 25, .38);
   }
 
   .auth-card .form-footnote {

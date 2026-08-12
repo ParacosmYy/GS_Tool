@@ -424,3 +424,5 @@
 - [x] v153 通过隔离 `5026` 的 1440/390px 登录、Dashboard `#activity`、键盘焦点、深链落点、文档宽度和清洁页面日志回归；独立证据写入 `docs/ui-accessibility-evidence-v153.md`。
 - [x] v154 将 `≤360px` 且 `≤760px` 的短屏 Dashboard hero 收敛为可扫描首屏：orbit `185.59px`，隐藏非交互 scroll cue，Today/Week/Month/All time 完整可见；普通 390px 与桌面构图不变。
 - [x] v154 通过隔离 `5026` 的 `320×720`、`320×600`、`390×844` 和默认桌面真实浏览器回归确认周期控件 `tabIndex=0`、透明顶栏、无横向扩张、应用日志为空和源码 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v154.md`。
+- [x] v155 将认证页卡片收敛为更清透的蓝黑透景层：桌面 blur `8px`、移动 blur `7px`，输入框保留独立阅读底；不改变认证流程与移动表单顺序。
+- [x] v155 通过隔离 `5027` 的 1440/390/320px 登录、登录后 Dashboard、pointer follower、透明顶栏、周期控件、无横向扩张和应用日志回归；独立证据写入 `docs/ui-accessibility-evidence-v155.md`。
