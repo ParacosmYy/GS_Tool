@@ -292,6 +292,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的 `prefers-reduced-motion: no-preference` 表现规则，不改变 DOM、IntersectionObserver、导航、API、认证、业务状态或数据流；移动端和 forced-colors 边界保持原契约。
 - UI-3：真实 5185 隔离实例已确认 `scrollY=720/1200` 的预落位与 settled computed style、透明顶栏、42 个可见焦点控件、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v89.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+## v90 周期切换器透景层
+
+- UI-1：将周期切换器外壳从偏黑高 alpha 砖块收敛为低 alpha 深蓝透景层，active lime pill 继续作为唯一主状态锚点。
+- UI-2：变更集中在 `responsive-tuning.css` 的 `forced-colors: none` 表现规则，不改变 period API、状态编排、DOM、认证、业务数据或请求；系统配色不被新规则覆盖。
+- UI-3：真实 5186 隔离实例已确认首屏/滚动态截图、四档 period 点击、ARIA pressed、42 个可见焦点控件、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v90.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

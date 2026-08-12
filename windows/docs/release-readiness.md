@@ -220,6 +220,10 @@ Dashboard 的核心计数器增加低干扰 `core-sweep` 内部扫描弧，强�
 
 允许动效下的 below-fold 内容预落位从 `.62 / 8px / .72s` 调整为 `.78 / 6px / .64s`，让自动采集卡片在刚进入视口时保持足够文字对比，同时保留轻量 editorial reveal；落位态、移动端静止规则和 reduced-motion 契约不变。5185 隔离实例已完成 `scrollY=720` 预落位、`scrollY=1200` settled、透明顶栏、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v89.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v90 周期切换器透景层
+
+周期切换器在普通配色下改为 `.58` alpha 深蓝透景层与 `blur(12px) saturate(1.08)`，active lime pill、四档 period 状态和 forced-colors 边界保持不变。5186 隔离实例已完成首屏与滚动态截图、Today/Week/Month/All time 真实点击、ARIA pressed、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v90.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

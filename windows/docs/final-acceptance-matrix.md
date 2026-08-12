@@ -270,6 +270,11 @@
 - 允许动效下 `[data-reveal]` 的预落位提高至 `.78` opacity、`6px` 位移和 `.64s` 过渡；落位仍为 `1 / 0`，不改变 DOM、IntersectionObserver、API、数据或业务交互。
 - 5185 隔离实例真实确认 `scrollY=720` 预落位与 `scrollY=1200` settled、透明 AI TOKEN 顶栏、无横向溢出和清洁页面日志；新证据见 `ui-accessibility-evidence-v89.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+### v90 交付增量
+
+- 周期切换器普通配色改为低 alpha 深蓝透景层与轻微 blur，active lime pill、period API、ARIA pressed、DOM 和数据请求契约不变；forced-colors 不进入玻璃规则。
+- 5186 隔离实例真实确认首屏/滚动态、Today/Week/Month/All time 四档状态与 pill 几何、透明顶栏、无横向溢出和清洁页面日志；新证据见 `ui-accessibility-evidence-v90.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
