@@ -8,7 +8,7 @@
 
 const OCCLUDED_CLASS = "is-under-sticky-header";
 const SURFACE_OCCLUDED_CLASS = "has-sticky-occlusion";
-const CANDIDATE_SELECTOR = ".site-main .button, .site-main summary, .site-main .card-heading, .site-main .auto-form-actions";
+const CANDIDATE_SELECTOR = ".site-main .button, .site-main summary, .site-main .card-heading, .site-main .auto-form-actions, .site-main .range-switcher";
 const SURFACE_SELECTOR = ".site-main .auth-card, .site-main .chart-card, .site-main .form-card, .site-main .records-card, .site-main .guide-card, .site-main .manual-details";
 const SURFACE_FEATHER_PX = 16;
 const SURFACE_FRAGMENT_LIMIT_PX = 120;

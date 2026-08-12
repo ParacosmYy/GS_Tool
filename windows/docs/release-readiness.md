@@ -292,6 +292,10 @@ Dashboard 图表、自动采集、说明、记录和手动明细卡片在普通�
 
 登录/注册共享认证卡片的 helper copy 与 alternate-route link 在普通配色下提升到可读语义色，增加紧凑文字 keyline 与细 lime 下划线；不增加不透明遮罩，不改变认证流程、焦点顺序或动效降级。5209 隔离实例已完成登录/注册 `320/390/768/1440` 四档截图、computed style、用户名焦点、无横向溢出和清洁页面日志，独立证据见 `ui-accessibility-evidence-v108.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v109 周期控件 sticky 边界
+
+Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当透明 AI TOKEN 顶栏覆盖控件时淡出并停止点击，焦点路径通过 `:focus-within` 恢复，未发生实际交叠的移动/桌面视口保持可见。5210 隔离实例已完成 `320/390/768/1024/1440` 五档几何、无横向溢出、焦点恢复和清洁页面日志，独立证据见 `ui-accessibility-evidence-v109.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
