@@ -382,6 +382,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的普通配色 `.connection-badge`、`.is-ready` 和 `.is-error` 表现规则，统一为低 alpha、无 blur 的局部透景层；不改变 DOM、Tab 顺序、API、认证、表单值、数据流或 forced-colors/reduced-motion 边界。
 - UI-3：真实 5205 隔离实例已确认 `320/390/768/1024/1440` 五档无横向溢出、状态 computed style、Dashboard 卡片 `blur(12px)`、Base URL 字段焦点、36/37 或 40/41 当前控件命名、1 个 h1/8 个 h2、深滚截图和清洁页面日志；证据见 `ui-accessibility-evidence-v105.md`，真实设备与辅助偏好继续独立门禁。
 
+## v106 顶部元信息边界清理
+
+- UI-1：将 `.hero-topline` 的继承边线归零，只保留局部 signal trace，使透明品牌行、角色场景和元信息保持同一透景材质。
+- UI-2：本轮仅调整 `responsive-tuning.css` 的边界参数，不新增监听器、计时器、依赖或动画；既有 pointer/reveal、键盘焦点、reduced-motion 和 forced-colors 契约保持。
+- UI-3：5206 隔离浏览器确认 `320/390/768/1024/1440` 五档四边透明、无横向溢出、周期交互、深滚层级和清洁页面日志；真实设备与辅助偏好仍待独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

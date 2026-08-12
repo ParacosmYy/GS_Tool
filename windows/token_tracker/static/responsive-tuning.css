@@ -85,7 +85,7 @@
      with a short signal trace so the row stays open and editorial. */
   .hero-topline {
     position: relative;
-    border-bottom-color: transparent;
+    border-color: transparent;
     background: transparent;
     background-image: none;
     text-shadow: 0 1px 3px rgba(8, 9, 12, .78);

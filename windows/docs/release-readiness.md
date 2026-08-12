@@ -280,6 +280,10 @@ Dashboard 图表、自动采集、说明、记录和手动明细卡片在普通�
 
 自动采集标题旁的 `connection-badge` 在普通配色下改为低 alpha 垂直渐变、无 blur 的局部状态层，和透明 AI TOKEN 顶栏、周期切换器及 Dashboard 内容卡片使用同一层级语言；未连接、ready、error 的语义颜色与边界保留，forced-colors/reduced-motion 复位不变。5205 隔离实例已完成 `320/390/768/1024/1440` 五档无横向溢出、状态 computed style、Base URL 字段焦点、控件命名、标题层级、深滚截图和清洁页面日志检查，独立证据见 `ui-accessibility-evidence-v105.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v106 顶部元信息边界清理
+
+`.hero-topline` 不再继承通用 surface 的顶部、左右边线，只保留局部 signal trace；因此透明 AI TOKEN 品牌行下方的场景不再被残留边框切成暗色横带。5206 隔离实例已完成 `320/390/768/1024/1440` 五档 computed style、周期交互、深滚层级、无横向溢出和清洁页面日志，独立证据见 `ui-accessibility-evidence-v106.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

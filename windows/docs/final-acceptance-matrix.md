@@ -347,6 +347,11 @@
 - 自动采集标题旁的 `connection-badge` 在普通配色下改为低 alpha、无 blur 的局部透景层，保留未连接、ready、error 三类状态边界和颜色，不改变 DOM、API、认证、表单值、数据流、Tab 顺序或 forced-colors/reduced-motion 边界。
 - 5205 隔离实例真实确认 `320/390/768/1024/1440` 五档无横向溢出、状态 `backdrop-filter: none`、Dashboard 卡片 `blur(12px)`、Base URL 字段焦点、36/37 或 40/41 当前控件命名、1 个 h1/8 个 h2、深滚截图和清洁页面日志；证据见 `ui-accessibility-evidence-v105.md`，真实设备与辅助偏好继续独立门禁。
 
+### v106 交付增量
+
+- `.hero-topline` 的四边边框在普通配色下统一透明，局部 signal trace 仍提供轻量结构提示；不改变 DOM、API、认证、表单值、数据流、Tab 顺序或 forced-colors/reduced-motion 边界。
+- 真实隔离 5206 实例确认五档响应式无横向溢出、metadata `background: transparent` / `backdrop-filter: none` / 四边透明、周期 `aria-pressed` 同步、深滚 header/card 层级和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v106.md`。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
