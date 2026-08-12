@@ -388,3 +388,5 @@
 - [x] v134 通过真实 `5000` 的 1683/390/320 viewport、`5011` 深滚、状态文案完整性、DOM/ARIA、无横向溢出和清洁日志复核；独立证据写入 `docs/ui-accessibility-evidence-v134.md`。
 - [x] v135 修复空态/不可用态图表的 off-canvas sheen 隐藏横向通道，并将隐藏 Chart.js canvas 收缩到窄屏容器；populated chart 规则不变。
 - [x] v135 通过真实 `5000` 的 320/390/1683 viewport 与 `5011` 的 390px 完整入口确认卡片、wrapper、canvas 和文档无正向横向溢出、空态文案完整、应用侧日志清洁；独立证据写入 `docs/ui-accessibility-evidence-v135.md`。
+- [x] v136 将旧入口长页面 `data-reveal` 预显隐从 `.34 / 12px / .82s` 收敛为 `.78 / 6px / .64s`，与完整链共享同一阅读契约，避免章节在快速滚动时被误读为黑色覆盖层。
+- [x] v136 通过真实 `5000` 的 1683/390/320/768 viewport、1200 深滚与 `5011` 的 1440 完整入口确认 reveal 计算样式、首屏构图、无横向溢出和页面侧日志；独立证据写入 `docs/ui-accessibility-evidence-v136.md`。

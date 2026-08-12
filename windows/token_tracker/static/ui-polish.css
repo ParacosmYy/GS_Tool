@@ -806,8 +806,8 @@ td { color: var(--ink-soft); font-size: 12px; }
    browser delays IntersectionObserver delivery during the first paint. The
    pre-reveal state is intentionally readable: a long page should feel layered,
    not like its lower half is covered by an opaque black mask. */
-[data-reveal] { opacity: 1; transform: none; transition-duration: .82s; }
-html.motion-ready [data-reveal] { opacity: .34; transform: translateY(12px); }
+[data-reveal] { opacity: 1; transform: none; transition-duration: .64s; }
+html.motion-ready [data-reveal] { opacity: .78; transform: translateY(6px); }
 html.motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
 
 @keyframes empty-marker-breathe {

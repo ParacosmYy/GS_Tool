@@ -608,3 +608,11 @@
 - UI-3：5000 的 320/390/桌面、5011 的 390px 完整入口、截图、computed style、空态文案和应用侧日志已复核；证据见 `ui-accessibility-evidence-v135.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
 - 架构师：变化限定在 `03-observatory / legacy presentation compatibility boundary`，文件行数与 forced-colors/reduced-motion 门禁保持有效。
+
+## v136 长页面 reveal 可读性契约
+
+- UI-1：真实 5000 长页面测量确认未进入视口的章节曾降至约 `.44` 中间透明度，造成黑幕覆盖观感；修复后预显隐为 `.78 / 6px`，过渡收敛为 `.64s`，长页面层次与阅读性同时保留。
+- UI-2：直接收敛 `ui-polish.css` 原有 reveal 规则，删除重复末尾覆盖；不改 DOM、脚本、Chart.js、表单、周期切换、API 或数据流。
+- UI-3：5000 的 1683/390/320/768 viewport、1200 深滚、5011 的 1440 完整入口、截图、computed style、无横向溢出和页面侧日志已复核；证据见 `ui-accessibility-evidence-v136.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
+- 架构师：变化限定在共享 UI reveal presentation contract，保持单点职责、reduced-motion/forced-colors 边界和 1000 行硬门禁。

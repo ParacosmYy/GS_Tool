@@ -532,3 +532,11 @@
 - UI-3：真实 `5000` `320×720`、`390×844`、`1683×892` 与 `5011` `390×844` 的 computed style、截图、无正向横向溢出和应用侧日志已确认；证据见 `ui-accessibility-evidence-v135.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 保持不变。
 - 架构师：变化限定在 `03-observatory / legacy presentation compatibility boundary`，修改文件低于 1000 行，正常配色/forced-colors/reduced-motion 边界完整。
+
+## v136 长页面 reveal 可读性契约
+
+- UI-1：修复 Dashboard 章节在 reveal 未完成时过暗、像黑色覆盖层的问题；预显隐改为 `.78` 与 `6px`，仍保留轻量深度，不牺牲背景透景和阅读层级。
+- UI-2：仅调整共享 `data-reveal` CSS contract 并删除重复覆盖，`prefers-reduced-motion` 仍直接显示完整内容；业务 DOM、脚本、图表、表单和数据契约保持不变。
+- UI-3：真实 `5000` `1683×892`/`390×844`/`320×720`/`768×900`、`scrollY=1200` 与 `5011` `1440×900` 的 computed style、截图、无正向横向溢出和页面侧日志已确认；证据见 `ui-accessibility-evidence-v136.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 保持不变。
+- 架构师：变化限定在 `01-shell / shared reveal presentation boundary`，无新依赖、重复模块或跨层耦合，所有修改文件低于 1000 行。

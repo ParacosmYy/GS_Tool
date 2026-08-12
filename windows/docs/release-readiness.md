@@ -444,3 +444,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 `5000` 的 320/390/1683 viewport 与 `5011` 的 390px 完整入口回归通过，卡片、wrapper、canvas 和文档 `scrollWidth` 与 `clientWidth` 对齐；证据见 `docs/ui-accessibility-evidence-v135.md`。
 - 本轮仅改动旧入口观测区 CSS presentation boundary，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持 pending。
+
+## v136 长页面 reveal 可读性契约
+
+- Dashboard 长页面未进入视口的内容由 `.34` 低透明度收敛为 `.78` 轻层次，位移由 `12px` 收敛为 `6px`，过渡由 `0.82s` 收敛为 `0.64s`；快速滚动和慢速 IntersectionObserver 都不再制造黑幕观感。
+- 真实 `5000` 的 1683/390/320/768 viewport、深滚与 `5011` 的 1440 完整入口回归通过；文档根节点无正向横向溢出，证据见 `docs/ui-accessibility-evidence-v136.md`。
+- 本轮仅改动共享前端 reveal presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
+- reduced-motion/forced-colors、Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持原状态。
