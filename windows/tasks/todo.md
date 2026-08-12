@@ -289,3 +289,5 @@
 - [x] v84 通过真实隔离 5181 实例确认首屏截图、动画时间采样、无横向溢出、可访问性语义和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v84.md`，周期 pill 同步观察转入下一枚切片。
 - [x] v85 修复周期 active pill 落后一拍：pressed state 变更时同步测量，下一帧继续做响应式几何校准。
 - [x] v85 通过真实隔离 5181 实例确认 Today/Week/Month/All time 四档位置、宽度、状态文案、ARIA pressed、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v85.md`，真实辅助偏好与设备继续独立门禁。
+- [x] v86 修复深度滚动时 AI TOKEN sticky 顶栏与内容层争夺阅读焦点：保留完全透明填充，滚动态仅启用无填充 `blur(10px) saturate(1.04)` 局部阅读层，并让一次性 `Scroll to explore` cue 退出阅读通道。
+- [x] v86 通过真实隔离 5182 实例确认首屏/720px/900px/1118px 滚动态、透明 computed style、标题安全落点、截图、可访问性语义和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v86.md`，viewport override、真实设备与辅助偏好继续独立门禁。

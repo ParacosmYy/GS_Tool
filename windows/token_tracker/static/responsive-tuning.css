@@ -13,8 +13,10 @@
   border-bottom-color: transparent;
   background: transparent;
   background-image: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+  /* Keep the fill transparent while softening content that passes beneath
+     the sticky chrome. This is a pure optical lens, not a tinted panel. */
+  -webkit-backdrop-filter: blur(10px) saturate(1.04);
+  backdrop-filter: blur(10px) saturate(1.04);
   box-shadow: none;
 }
 

@@ -268,6 +268,12 @@
 - UI-2：变更集中在 `range-switcher.js` 的 active 状态编排，不改变摘要请求、period 契约、DOM、ARIA、认证或数据流；没有新增依赖。
 - UI-3：真实 5181 隔离实例已确认四档 period 的 active/几何/状态文案、ARIA pressed、无横向溢出、顶栏透明回归和页面日志；证据见 `ui-accessibility-evidence-v85.md`，真实设备与辅助偏好继续独立门禁。
 
+## v86 滚动态透明顶栏阅读层
+
+- UI-1：将深度滚动时穿过 AI TOKEN sticky 顶栏的内容收敛为无填充背景模糊，保持品牌行本身完全透明，避免黑色横条和标题/CTA 争夺阅读焦点。
+- UI-2：变更集中在后加载的 `responsive-tuning.css` 滚动态规则；`scene-motion.css` 继续提供基础透明默认值，不重复承担覆盖职责。不改变 DOM、导航、认证、API、业务状态或数据流；forced-colors 继续回到系统 Canvas。
+- UI-3：真实 5182 隔离实例已确认首屏、720px、900px、1118px 滚动态截图与 computed style、标题安全落点、cue 退出、可访问性语义和清洁页面日志；证据见 `ui-accessibility-evidence-v86.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

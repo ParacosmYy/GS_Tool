@@ -250,6 +250,11 @@
 - 周期 active pill 在 pressed state 变更任务内立即同步几何，再通过下一帧完成布局校准；不改变 period API、摘要请求或 ARIA pressed 契约。
 - 5181 隔离实例真实确认 Today/Week/Month/All time 四档 active、位置、宽度、状态文案、可访问性和清洁页面日志；新证据见 `ui-accessibility-evidence-v85.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+### v86 交付增量
+
+- 滚动态 AI TOKEN 顶栏保持透明填充、无背景图、无边线和无阴影，仅增加无填充的 `blur(10px) saturate(1.04)` 内容软化层；首屏继续 `backdrop-filter=none`，不改变 DOM、导航或业务数据。
+- 5182 隔离实例真实确认 `scrollY=0/720/900/1118` 的透明计算值、cue 退出、标题安全落点、截图、可访问性语义和清洁页面日志；新证据见 `ui-accessibility-evidence-v86.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
