@@ -436,6 +436,12 @@
 - 前端：`navigation.js` 复用现有 `requestAnimationFrame` 调度并按能力启用 `ResizeObserver`；`ui-polish.css` 只将进度线从 `width` 过渡改为 `transform`，reduced-motion 继续关闭过渡。
 - 后端：无后端、接口、数据库改动。
 - 架构：观察页面尺寸而非业务状态，保持 UI→导航模块边界，无轮询、无循环依赖、文件行数和回滚边界符合门禁；5215 证据见 `docs/ui-accessibility-evidence-v114.md`。
+## v115 透明品牌行光学边界
+
+- UI：透明 AI TOKEN 行增加单条 1px hairline 和品牌标记的 hover/focus 光学反馈；本体依旧无背景填充、无 blur、无 shadow，深滚不形成第二条黑色横带。
+- 前端：新增 `header-chrome.css` 并在 `base.html` 末尾接入，使用伪元素、`opacity`、`transform` 和既有 focus contract；无新增业务监听器、API 或 DOM 节点。
+- 后端：无后端、接口、数据库改动。
+- 架构：品牌 chrome 与通用表面样式解耦，模块边界、forced-colors/reduced-motion 降级、文件行数和回滚路径清晰；5216 证据见 `docs/ui-accessibility-evidence-v115.md`。
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

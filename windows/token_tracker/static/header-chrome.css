@@ -1,0 +1,137 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Give the transparent sticky brand row an optical boundary without
+ *          turning it into a filled panel or coupling it to page content.
+ * Module: Web presentation / 01-shell / brand chrome
+ */
+
+/*
+ * The header is intentionally a window onto the illustration. This hairline
+ * is only a composited edge: it carries the reading boundary while the
+ * computed surface remains transparent, unblurred, and shadow-free.
+ */
+.site-header {
+  isolation: isolate;
+  border-bottom-color: transparent;
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.site-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+.site-header::before {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(217, 255, 120, .28) 16%,
+    rgba(245, 248, 252, .22) 46%,
+    rgba(196, 192, 255, .24) 72%,
+    transparent 100%
+  );
+  opacity: .42;
+  transform: scaleX(.76);
+  transform-origin: center;
+}
+
+.site-header.is-scrolled::before {
+  display: block;
+}
+
+/* Keep the signal line above the header children. Its width is fixed by the
+   shared scroll module and its transform never changes document geometry. */
+.site-header::after {
+  z-index: 2;
+}
+
+/* A quiet lime point gives the lockup a stable visual anchor. It is a line,
+   not a surface: no background fill, blur, or hit target is introduced. */
+.site-header .brand-mark {
+  box-shadow: 0 0 0 1px rgba(217, 255, 120, .08), 0 0 18px rgba(217, 255, 120, .1);
+  transition: border-color .4s var(--ui-ease), box-shadow .4s var(--ui-ease), transform .4s var(--ui-ease);
+}
+
+.site-header .brand:hover .brand-mark,
+.site-header .brand:focus-visible .brand-mark {
+  border-color: var(--signal-lime);
+  box-shadow: 0 0 0 1px rgba(217, 255, 120, .16), 0 0 22px rgba(217, 255, 120, .2);
+  transform: rotate(-4deg);
+}
+
+/* The navigation inherits transparent-scene contrast, but its baseline is
+   kept optical rather than boxed. The active underline remains the only
+   persistent route indicator. */
+.site-header .site-nav a,
+.site-header .user-chip,
+.site-header .brand-lockup small {
+  text-shadow: 0 1px 2px rgba(8, 9, 12, .94), 0 0 9px rgba(8, 9, 12, .72);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-header::before {
+    animation: chrome-edge-breathe 8s ease-in-out infinite;
+  }
+}
+
+@keyframes chrome-edge-breathe {
+  0%, 100% { opacity: .34; transform: scaleX(.72); }
+  50% { opacity: .58; transform: scaleX(.9); }
+}
+
+@media (max-width: 620px) {
+  .site-header::before {
+    transform: scaleX(.86);
+  }
+}
+
+@media (forced-colors: active) {
+  .site-header,
+  .site-header.is-scrolled {
+    border-bottom-color: CanvasText;
+    background: Canvas;
+    background-image: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  .site-header::before {
+    background: CanvasText;
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .site-header .brand-mark {
+    box-shadow: none;
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header::before,
+  .site-header .brand-mark {
+    animation: none;
+    transition: none;
+  }
+
+  .site-header::before {
+    opacity: .42;
+    transform: scaleX(.82);
+  }
+}

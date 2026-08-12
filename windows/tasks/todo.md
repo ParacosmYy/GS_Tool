@@ -345,3 +345,5 @@
 - [x] v113 通过真实隔离 5214 实例确认 `320/390/768/1024/1440` 五档无横向溢出、顶栏透明计算样式、登录页/Dashboard 截图、标题层级、控件命名和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v113.md`。
 - [x] v114 为共享滚动进度增加 `ResizeObserver` 高度同步，并将品牌进度线改为固定宽度 `scaleX`，避免异步内容和 CSS width 过渡造成瞬态 `0px`。
 - [x] v114 通过真实隔离 5215 确认异常补录展开后文档高度 `3895→4467`、进度 `65.93%→55.19%` 自动同步，五档响应式无横向溢出、进度比例稳定和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v114.md`。
+- [x] v115 将透明 AI TOKEN 品牌行拆出高内聚 `header-chrome.css`，增加无填充的 hairline 边界、品牌标记 hover/focus 光学反馈，并保留透明、无 blur、无 shadow 契约。
+- [x] v115 通过真实隔离 5216 确认 `390×844` 无横向溢出、`1440×900` 登录首屏与 Dashboard 深滚透明顶栏、hairline、进度线和清洁页面状态；独立证据写入 `docs/ui-accessibility-evidence-v115.md`。

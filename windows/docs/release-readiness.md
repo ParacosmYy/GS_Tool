@@ -311,6 +311,9 @@ Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当�
 ## v114 异步高度下的滚动进度同步
 
 共享导航模块使用 `ResizeObserver` 监听 `document.body` 尺寸变化，并复用既有 `requestAnimationFrame` 合帧，让图表加载、记录刷新和异常补录展开后自动重算阅读比例；品牌进度线由动态 `width` 改为固定宽度 `scaleX`，避免异步布局期间出现 `0px` 的过渡中间态。5215 隔离实例已完成真实展开交互、稳定深滚和 `320/390/768/1024/1440` 五档回归，证据见 `ui-accessibility-evidence-v114.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+## v115 透明品牌行光学边界
+
+新增 `header-chrome.css` 作为 01-shell 品牌 chrome 的高内聚样式模块：仅使用 1px composited hairline、品牌标记 hover/focus 反馈和文字 keyline，为真正透明的 AI TOKEN 顶栏补足空间边界；不增加背景填充、模糊、阴影、DOM、API 或业务状态。5216 隔离实例已完成 `390×844`、`1440×900` 登录首屏与 Dashboard 深滚验证，证据见 `ui-accessibility-evidence-v115.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

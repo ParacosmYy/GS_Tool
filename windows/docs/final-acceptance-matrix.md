@@ -387,6 +387,10 @@
 
 - 共享导航在 body 高度发生异步变化时自动重算滚动比例；品牌进度线使用固定宽度 `scaleX`，不改变 DOM、API、认证流程或用户滚动语义。
 - 真实隔离 5215 实例确认异常补录展开后的文档高度/进度同步、`320/390/768/1024/1440` 五档无横向溢出、稳定深滚比例和清洁页面日志；证据见 `docs/ui-accessibility-evidence-v114.md`。
+### v115 交付增量
+
+- 透明 AI TOKEN 顶栏拆出 `header-chrome.css`：以无填充 composited hairline、品牌标记 hover/focus 和文字 keyline 提供层级，不恢复黑色面板、blur 或 shadow。
+- 真实隔离 5216 实例确认 `390×844` 无横向溢出、`1440×900` 登录/Dashboard 首屏、`scrollY=2360` 深滚透明顶栏和进度线；证据见 `docs/ui-accessibility-evidence-v115.md`。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
