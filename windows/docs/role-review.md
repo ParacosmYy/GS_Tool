@@ -274,6 +274,12 @@
 - UI-2：变更集中在后加载的 `responsive-tuning.css` 滚动态规则；`scene-motion.css` 继续提供基础透明默认值，不重复承担覆盖职责。不改变 DOM、导航、认证、API、业务状态或数据流；forced-colors 继续回到系统 Canvas。
 - UI-3：真实 5182 隔离实例已确认首屏、720px、900px、1118px 滚动态截图与 computed style、标题安全落点、cue 退出、可访问性语义和清洁页面日志；证据见 `ui-accessibility-evidence-v86.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+## v87 品牌区透景与 CTA 收束
+
+- UI-1：移除整条滚动态 header blur 对品牌区造成的亮色扩散；AI TOKEN 完整透景，右侧导航/账户保留局部透明镜片，hero CTA 在离开首屏后有节奏地退出阅读区。
+- UI-2：变更集中在 `responsive-tuning.css` 的滚动态伪元素、CTA 状态和 reduced-motion/forced-colors 表现边界；`:focus-within` 不隐藏正在操作的 CTA，不改变 DOM、导航、认证、API、业务状态或数据流。
+- UI-3：真实 5183 隔离实例已确认首屏、720px、2220px、返回顶部恢复、透明 computed style、局部镜片、CTA/cue 状态、焦点控件标签、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v87.md`，深度内容自动避让、viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

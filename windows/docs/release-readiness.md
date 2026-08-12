@@ -208,6 +208,10 @@ Dashboard 的核心计数器增加低干扰 `core-sweep` 内部扫描弧，强�
 
 滚动态 AI TOKEN 顶栏继续保持完全透明填充、无背景图、无边线和无阴影，仅使用 `blur(10px) saturate(1.04)` 软化穿过 sticky chrome 的内容；首屏仍为无 blur 透景，`Scroll to explore` 在滚动后退出阅读通道。5182 隔离实例已完成首屏、720px、900px、1118px 滚动态截图与 computed style、标题安全落点、可访问性语义和页面日志检查，独立证据见 `ui-accessibility-evidence-v86.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v87 品牌区透景与 CTA 收束
+
+滚动态不再对整条 AI TOKEN 顶栏做 blur：品牌区和 header 主体保持透明/无 blur，透明局部镜片只服务右侧导航与账户操作；离开首屏后 hero CTA 和 `Scroll to explore` 退出 sticky 阅读通道，键盘焦点中的 CTA、reduced-motion 和 forced-colors 保留独立边界。5183 隔离实例已完成首屏、720px、2220px 与返回顶部恢复的截图、computed style、焦点控件标签、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v87.md`；更广泛的深度滚动内容避让、viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

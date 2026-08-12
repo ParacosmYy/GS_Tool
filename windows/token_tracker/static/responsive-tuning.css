@@ -13,10 +13,10 @@
   border-bottom-color: transparent;
   background: transparent;
   background-image: none;
-  /* Keep the fill transparent while softening content that passes beneath
-     the sticky chrome. This is a pure optical lens, not a tinted panel. */
-  -webkit-backdrop-filter: blur(10px) saturate(1.04);
-  backdrop-filter: blur(10px) saturate(1.04);
+  /* The brand lockup must remain a clear window onto the scene. The local
+     navigation lens below handles only the operational reading lane. */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow: none;
 }
 
@@ -31,6 +31,34 @@
   .site-header.is-scrolled > * {
     position: relative;
     z-index: auto;
+  }
+
+  /* Keep the AI TOKEN area fully transparent while giving the right-side controls a
+     bounded optical lens. Transparent backdrop filtering on these local
+     boxes softens busy chart pixels without painting a horizontal panel. */
+  .site-header.is-scrolled .site-nav,
+  .site-header.is-scrolled .user-menu {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .site-header.is-scrolled .site-nav::before,
+  .site-header.is-scrolled .user-menu::before {
+    position: absolute;
+    z-index: 0;
+    inset: -9px -12px;
+    border-radius: 999px;
+    content: "";
+    pointer-events: none;
+    background: transparent;
+    -webkit-backdrop-filter: blur(10px) saturate(1.04);
+    backdrop-filter: blur(10px) saturate(1.04);
+  }
+
+  .site-header.is-scrolled .site-nav > *,
+  .site-header.is-scrolled .user-menu > * {
+    position: relative;
+    z-index: 1;
   }
 }
 
@@ -61,6 +89,31 @@
   opacity: 0;
   pointer-events: none;
   transform: translateY(-6px);
+}
+
+/* The hero actions belong to the opening scene. Once the user has moved into
+   the observatory, retire them from the sticky header's reading lane so a
+   bright CTA cannot peek through the transparent brand row. Visibility keeps
+   the hidden controls out of the keyboard path while the fade settles. */
+.hero-actions {
+  transition: opacity .35s var(--ui-ease), transform .35s var(--ui-ease), visibility 0s linear 0s;
+}
+
+.site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: opacity .35s var(--ui-ease), transform .35s var(--ui-ease), visibility 0s linear .35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-actions,
+  .scroll-cue { transition: none; }
+
+  .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
+    transform: none;
+  }
 }
 
 /* Transparent chrome must remain readable over both the dark server wall and
@@ -181,6 +234,8 @@
 
   .site-header.is-scrolled::before { display: none; }
   .site-header.is-scrolled .brand::before { display: none; }
+  .site-header.is-scrolled .site-nav::before,
+  .site-header.is-scrolled .user-menu::before { display: none; }
 }
 
 /* Laptop-height desktop screens need the period control in the first scan.

@@ -255,6 +255,11 @@
 - 滚动态 AI TOKEN 顶栏保持透明填充、无背景图、无边线和无阴影，仅增加无填充的 `blur(10px) saturate(1.04)` 内容软化层；首屏继续 `backdrop-filter=none`，不改变 DOM、导航或业务数据。
 - 5182 隔离实例真实确认 `scrollY=0/720/900/1118` 的透明计算值、cue 退出、标题安全落点、截图、可访问性语义和清洁页面日志；新证据见 `ui-accessibility-evidence-v86.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+### v87 交付增量
+
+- 滚动态 AI TOKEN 品牌区恢复 `background=transparent`、`backdrop-filter=none`；右侧 nav/account 使用无填充局部镜片，hero actions 在非焦点状态下退出 sticky 阅读区，不改变 DOM、API、认证或业务数据。
+- 5183 隔离实例真实确认 `scrollY=0/720/2220`、返回顶部恢复、局部镜片、CTA/cue 状态、焦点控件标签、无横向溢出和清洁页面日志；新证据见 `ui-accessibility-evidence-v87.md`，深度内容自动避让、viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。
