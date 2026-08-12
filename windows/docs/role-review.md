@@ -286,6 +286,12 @@
 - UI-2：模块只依赖 header 几何、滚动状态和现有静态候选集合，通过表现类与 CSS 边界工作；不改变 DOM、API、认证、业务状态或数据流，hero actions 继续由 v87 专属规则处理。
 - UI-3：真实 5184 隔离实例已确认首屏/720px/2220px、`#proxy-submit` 避让、Tab 焦点恢复、透明 computed style、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v88.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+## v89 预落位 reveal 可读性
+
+- UI-1：提高 below-fold reveal 的预落位可读地板，避免内容已经进入视口却仍以低透明度显示；保留短距离、短时长的层次动画。
+- UI-2：变更集中在 `responsive-tuning.css` 的 `prefers-reduced-motion: no-preference` 表现规则，不改变 DOM、IntersectionObserver、导航、API、认证、业务状态或数据流；移动端和 forced-colors 边界保持原契约。
+- UI-3：真实 5185 隔离实例已确认 `scrollY=720/1200` 的预落位与 settled computed style、透明顶栏、42 个可见焦点控件、无横向溢出和清洁页面日志；证据见 `ui-accessibility-evidence-v89.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

@@ -295,3 +295,5 @@
 - [x] v87 通过真实隔离 5183 实例确认首屏/720px/2220px、CTA 收束与返回顶部恢复、透明 computed style、截图、焦点控件标签、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v87.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 - [x] v88 新增 sticky 内容避让模块：深度滚动时仅收束穿过透明 AI TOKEN 顶栏的非焦点按钮/折叠控件，保留布局与 Tab 顺序，`:focus-within` 恢复可见和可交互状态。
 - [x] v88 通过真实隔离 5184 实例确认首屏/720px/2220px、深度提交按钮避让、键盘焦点恢复、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v88.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+- [x] v89 提高 below-fold reveal 的可读地板：预落位 opacity `.78`、位移 `6px`、过渡 `.64s`，保留落位动画和 reduced-motion 复位。
+- [x] v89 通过真实隔离 5185 实例确认首屏/720px/1200px、透明顶栏、预落位与 settled 状态、无横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v89.md`，viewport override、真实设备与辅助偏好继续独立门禁。

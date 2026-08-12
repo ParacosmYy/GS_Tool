@@ -265,6 +265,11 @@
 - 新增 sticky 内容避让表现模块：穿过透明 AI TOKEN 顶栏的非焦点 `.site-main .button` / `summary` 视觉收束，布局与 Tab 顺序保留；焦点控件通过 `:focus-within` 恢复，不改变 DOM、API、认证或业务数据。
 - 5184 隔离实例真实确认 `scrollY≈0/720/2220`、`#proxy-submit` 的避让类/计算样式、Tab 焦点恢复、无横向溢出和清洁页面日志；新证据见 `ui-accessibility-evidence-v88.md`，viewport override、真实设备与辅助偏好继续独立门禁。
 
+### v89 交付增量
+
+- 允许动效下 `[data-reveal]` 的预落位提高至 `.78` opacity、`6px` 位移和 `.64s` 过渡；落位仍为 `1 / 0`，不改变 DOM、IntersectionObserver、API、数据或业务交互。
+- 5185 隔离实例真实确认 `scrollY=720` 预落位与 `scrollY=1200` settled、透明 AI TOKEN 顶栏、无横向溢出和清洁页面日志；新证据见 `ui-accessibility-evidence-v89.md`，viewport override、真实设备与辅助偏好继续独立门禁。
+
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

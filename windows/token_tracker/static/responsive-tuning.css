@@ -180,14 +180,15 @@
 }
 
 /* Reveal motion should preserve scanability while a below-fold card settles
-   into view. Keep the editorial lift, but use a readable floor and a shorter
-   settle time. Reduced-motion users continue through the dedicated rule in
-   ui-polish.css; this contract only applies when motion is allowed. */
+   into view. Keep the editorial lift, but bring the readable floor closer to
+   resting contrast so the first visible line is not needlessly dimmed.
+   Reduced-motion users continue through the dedicated rule in ui-polish.css;
+   this contract only applies when motion is allowed. */
 @media (prefers-reduced-motion: no-preference) {
   html.motion-ready [data-reveal] {
-    opacity: .62;
-    transform: translateY(8px);
-    transition-duration: .72s;
+    opacity: .78;
+    transform: translateY(6px);
+    transition-duration: .64s;
   }
 
   html.motion-ready [data-reveal].is-visible {

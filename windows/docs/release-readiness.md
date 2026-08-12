@@ -216,6 +216,10 @@ Dashboard 的核心计数器增加低干扰 `core-sweep` 内部扫描弧，强�
 
 深度滚动时，`sticky-occlusion.js` 只对进入透明 AI TOKEN 顶栏交叠带的非焦点 `.site-main .button` / `summary` 收束视觉层，保留布局盒和 Tab 顺序；`:focus-within` 恢复可见和可交互状态，hero actions 继续由 v87 规则负责。5184 隔离实例已完成首屏、720px、2220px、键盘焦点恢复、截图、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v88.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v89 预落位 reveal 可读性
+
+允许动效下的 below-fold 内容预落位从 `.62 / 8px / .72s` 调整为 `.78 / 6px / .64s`，让自动采集卡片在刚进入视口时保持足够文字对比，同时保留轻量 editorial reveal；落位态、移动端静止规则和 reduced-motion 契约不变。5185 隔离实例已完成 `scrollY=720` 预落位、`scrollY=1200` settled、透明顶栏、无横向溢出和页面日志检查，独立证据见 `ui-accessibility-evidence-v89.md`；viewport override、真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
