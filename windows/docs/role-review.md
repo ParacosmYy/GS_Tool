@@ -352,6 +352,12 @@
 - UI-2：变更集中在 `responsive-tuning.css` 的普通配色表现规则，并补强 `OBSERVATORY` 副标题 keyline；不改变 DOM、布局盒、导航、周期 API、认证、表单值、数据流或 Tab 顺序，forced-colors 继续由系统配色接管。
 - UI-3：真实 5200 隔离实例已确认 `320/390/768/1024/1440` 五档透明 computed style、`scrollY=720` 滚动态、Today/Week/Month/All time 四档状态、无横向溢出、40/40 可见控件命名和清洁页面日志；证据见 `ui-accessibility-evidence-v100.md`，真实设备与辅助偏好继续独立门禁。
 
+## v101 登录认证卡片透景材质
+
+- UI-1：解决登录页认证卡片仍像黑色大块的问题；使用低 alpha 深蓝透景层让角色、代码和设备场景参与层次，同时保留字段的稳定阅读面。
+- UI-2：变更集中在 `responsive-tuning.css` 的普通配色 `.auth-card` 与 `:focus-within` 表现规则；不改变 DOM、认证 API、字段、焦点顺序、导航、数据流或 forced-colors/reduced-motion 边界。
+- UI-3：真实 5201 隔离实例已确认 `320/390/768/1024/1440` 五档卡片几何、`blur(14px)`、无横向溢出、聚焦状态、7/7 可见控件命名和清洁页面日志；证据见 `ui-accessibility-evidence-v101.md`，真实设备与辅助偏好继续独立门禁。
+
 ## 集成闸门
 
 - 共享运行代码仍集中在当前 checkout，没有创建 worktree 或角色复制源代码。

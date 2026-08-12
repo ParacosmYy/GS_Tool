@@ -260,6 +260,10 @@ sticky 避让模块现在将自动采集 `.auto-form-actions` 与其提交按钮
 
 hero 元信息右侧的 `#dashboard-status` 在普通配色下改为透明背景、无 blur 的状态边界，保留状态点、错误态颜色和轻量 keyline；`OBSERVATORY` 副标题增加局部字形阴影，保证透明品牌行在亮色插画上仍可扫描。5200 隔离实例已完成 `320/390/768/1024/1440` 五档 computed style、`scrollY=720` 滚动态、周期四档交互、无横向溢出和控件命名检查，独立证据见 `ui-accessibility-evidence-v100.md`。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
 
+## v101 登录认证卡片透景材质
+
+登录认证卡片在普通配色下改为低 alpha 深蓝透景层与 `blur(14px) saturate(1.08)`，减少黑色大块感并让背景插画参与层次；字段对比、焦点边界、顶部高光和 forced-colors 复位保持不变。5201 隔离实例已完成 `320/390/768/1024/1440` 五档几何、无横向溢出、聚焦状态、控件命名和清洁日志检查，独立证据见 `ui-accessibility-evidence-v101.md`。真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：
