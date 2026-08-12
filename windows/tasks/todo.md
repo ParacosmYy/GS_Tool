@@ -390,3 +390,5 @@
 - [x] v135 通过真实 `5000` 的 320/390/1683 viewport 与 `5011` 的 390px 完整入口确认卡片、wrapper、canvas 和文档无正向横向溢出、空态文案完整、应用侧日志清洁；独立证据写入 `docs/ui-accessibility-evidence-v135.md`。
 - [x] v136 将旧入口长页面 `data-reveal` 预显隐从 `.34 / 12px / .82s` 收敛为 `.78 / 6px / .64s`，与完整链共享同一阅读契约，避免章节在快速滚动时被误读为黑色覆盖层。
 - [x] v136 通过真实 `5000` 的 1683/390/320/768 viewport、1200 深滚与 `5011` 的 1440 完整入口确认 reveal 计算样式、首屏构图、无横向溢出和页面侧日志；独立证据写入 `docs/ui-accessibility-evidence-v136.md`。
+- [x] v137 修复旧运行模板缺失 Activity 导航入口的问题：当页面存在 `#activity` 而导航缺失时由 `navigation.js` 兼容补链，当前模板不会重复插入。
+- [x] v137 通过真实 `5000` 的 1440/1024/390 viewport、Activity 深链接与 `5011` 的 1024 完整入口确认四项导航、ARIA active state、sticky 定位、透明品牌栏和无横向溢出；独立证据写入 `docs/ui-accessibility-evidence-v137.md`。

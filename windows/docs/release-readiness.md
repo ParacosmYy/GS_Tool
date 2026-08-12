@@ -451,3 +451,10 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 真实 `5000` 的 1683/390/320/768 viewport、深滚与 `5011` 的 1440 完整入口回归通过；文档根节点无正向横向溢出，证据见 `docs/ui-accessibility-evidence-v136.md`。
 - 本轮仅改动共享前端 reveal presentation contract，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
 - reduced-motion/forced-colors、Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持原状态。
+
+## v137 Activity 导航兼容补链
+
+- 旧运行模板在页面已有 Activity 工作信号区时，导航模块会补入唯一的 `#activity` route；当前模板已含链接时不会重复。
+- 真实 `5000` 的 1440/1024/390、Activity 深链接与 `5011` 的 1024 完整入口回归通过；导航不挤压、不产生横向溢出，证据见 `docs/ui-accessibility-evidence-v137.md`。
+- 本轮仅改动前端导航兼容层，无后端、认证、数据库、Provider、数据流或依赖变化；保护端口未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备辅助偏好等发布门禁继续保持原状态。

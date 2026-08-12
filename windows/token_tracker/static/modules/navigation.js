@@ -62,6 +62,36 @@ function anchorTarget(link) {
   return target ? { target, targetUrl } : null;
 }
 
+/**
+ * Restore a section route for older launcher templates that predate Activity.
+ *
+ * The current server template already renders this link. This compatibility
+ * guard only inserts the fixed, same-document route when the live page has an
+ * Activity section but its cached navigation shell does not. Keeping the
+ * repair here preserves one owner for active state, anchor motion, and the
+ * legacy launcher boundary without changing business data or API behavior.
+ *
+ * @param {HTMLElement | null} nav Navigation container.
+ */
+function ensureActivityLink(nav) {
+  const activity = document.getElementById("activity");
+  if (!nav || !activity || nav.querySelector('a[href*="#activity"]')) return;
+
+  const historyLink = [...nav.querySelectorAll("a[href]")].find((link) => {
+    const target = new URL(link.href, window.location.href);
+    return target.pathname === window.location.pathname && target.hash === "#history";
+  });
+  if (!historyLink) return;
+
+  const activityLink = document.createElement("a");
+  const targetUrl = new URL(historyLink.href, window.location.href);
+  targetUrl.hash = "#activity";
+  activityLink.href = targetUrl.href;
+  activityLink.textContent = "Activity";
+  activityLink.dataset.compatibilityLink = "activity";
+  historyLink.before(activityLink);
+}
+
 function targetScrollTop(target) {
   const marginTop = Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
   return Math.max(0, target.getBoundingClientRect().top + window.scrollY - marginTop);
@@ -272,6 +302,7 @@ function setupRouteContext(links) {
 export function setupNavigation() {
   setupScrollProgress();
   const nav = document.querySelector('.site-nav');
+  ensureActivityLink(nav);
   const anchors = [...document.querySelectorAll('a[href]')];
   const hashTarget = window.location.hash
     ? document.getElementById(decodeURIComponent(window.location.hash.slice(1)))

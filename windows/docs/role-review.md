@@ -616,3 +616,11 @@
 - UI-3：5000 的 1683/390/320/768 viewport、1200 深滚、5011 的 1440 完整入口、截图、computed style、无横向溢出和页面侧日志已复核；证据见 `ui-accessibility-evidence-v136.md`。
 - 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
 - 架构师：变化限定在共享 UI reveal presentation contract，保持单点职责、reduced-motion/forced-colors 边界和 1000 行硬门禁。
+
+## v137 Activity 导航兼容补链
+
+- UI-1：真实运行实例确认页面存在 `#activity` 工作信号区但顶部导航缺失入口；兼容补链恢复四项导航，Activity 深链接可落在 sticky 顶部下方。
+- UI-2：新增逻辑限定在 `navigation.js`，仅当 `#activity` 存在且导航缺失 Activity 时插入；复用既有 hash scroll、active state 和 ARIA 语义，当前新模板不会重复。
+- UI-3：5000 的 1440/1024/390、Activity 深链接、5011 的 1024 完整入口、导航计数、文档宽度和透明品牌栏已复核；证据见 `ui-accessibility-evidence-v137.md`。
+- 后端：无后端、数据库、接口、认证、Provider、Key 或数据流改动；保护服务未重启。
+- 架构师：兼容 guard 与导航状态同模块高内聚，文件行数、响应式、forced-colors/reduced-motion 边界保持有效。

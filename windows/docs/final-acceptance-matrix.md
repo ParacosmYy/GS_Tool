@@ -540,3 +540,11 @@
 - UI-3：真实 `5000` `1683×892`/`390×844`/`320×720`/`768×900`、`scrollY=1200` 与 `5011` `1440×900` 的 computed style、截图、无正向横向溢出和页面侧日志已确认；证据见 `ui-accessibility-evidence-v136.md`。
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 保持不变。
 - 架构师：变化限定在 `01-shell / shared reveal presentation boundary`，无新依赖、重复模块或跨层耦合，所有修改文件低于 1000 行。
+
+## v137 Activity 导航兼容补链
+
+- UI-1：Activity 工作信号区现在在旧缓存入口中也有明确顶部导航入口；四项导航在桌面/平板可见，移动端按既有规则隐藏。
+- UI-2：兼容 guard 只在页面存在 `#activity` 且导航缺失时插入链接；重复检测、路径、hash、active state、ARIA 与现有滚动契约保持一致。
+- UI-3：真实 `5000` `1440×900`/`1024×900`/`390×844`、Activity 深链接与 `5011` `1024×900` 的导航计数、定位、透明顶栏、无正向横向溢出和页面侧日志已确认；证据见 `ui-accessibility-evidence-v137.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID 保持不变。
+- 架构师：变化限定在 `01-shell / navigation compatibility boundary`，无新依赖，`navigation.js` 仍低于 1000 行。
