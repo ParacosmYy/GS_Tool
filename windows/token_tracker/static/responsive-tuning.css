@@ -33,32 +33,17 @@
     z-index: auto;
   }
 
-  /* Keep the AI TOKEN area fully transparent while giving the right-side controls a
-     bounded optical lens. Transparent backdrop filtering on these local
-     boxes softens busy chart pixels without painting a horizontal panel. */
+  /* Keep the complete AI TOKEN row as a clear window onto the scene. The
+     right-side controls use text keylines and the active underline for
+     hierarchy; a local backdrop lens would still read as a hidden panel. */
   .site-header.is-scrolled .site-nav,
   .site-header.is-scrolled .user-menu {
     position: relative;
-    isolation: isolate;
   }
 
   .site-header.is-scrolled .site-nav::before,
   .site-header.is-scrolled .user-menu::before {
-    position: absolute;
-    z-index: 0;
-    inset: -9px -12px;
-    border-radius: 999px;
-    content: "";
-    pointer-events: none;
-    background: transparent;
-    -webkit-backdrop-filter: blur(10px) saturate(1.04);
-    backdrop-filter: blur(10px) saturate(1.04);
-  }
-
-  .site-header.is-scrolled .site-nav > *,
-  .site-header.is-scrolled .user-menu > * {
-    position: relative;
-    z-index: 1;
+    display: none;
   }
 }
 
