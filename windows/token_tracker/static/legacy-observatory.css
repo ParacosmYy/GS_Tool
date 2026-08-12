@@ -1,0 +1,147 @@
+/*
+ * Author: AI Token Tracker Engineering Team
+ * Maintainer: Project Owner
+ * Purpose: Keep the root launcher's older two-file stylesheet chain visually
+ *          aligned with the current Dashboard observatory contracts.
+ * Module: Web presentation / legacy launcher compatibility
+ */
+
+/* The imported sheet is intentionally more specific than the legacy base
+   declarations that follow ui-polish.css. The complete template chain adds
+   its dedicated modules later and can therefore own the same surfaces. */
+body .range-switcher {
+  border-color: rgba(230, 235, 245, .34);
+  background: linear-gradient(180deg, rgba(18, 32, 48, .22), rgba(7, 14, 24, .08));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+/* Retire hero-only signals when the existing navigation module marks the
+   header as scrolled. Focus-within keeps a keyboard user in a visible path. */
+body .site-header.is-scrolled + .site-main .scroll-cue,
+body .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+}
+
+body .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) {
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity .35s var(--ui-ease), transform .35s var(--ui-ease), visibility 0s linear .35s;
+}
+
+/* Keep the analytics bay readable without returning to an opaque black slab.
+   The root launcher does not load observatory-signal.css, so this fallback
+   owns the empty-state grid and local copy keyline at this boundary. */
+@media (forced-colors: none) {
+  body .chart-card {
+    border-color: rgba(230, 235, 245, .24);
+    background:
+      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .08), transparent 40%),
+      linear-gradient(145deg, rgba(18, 32, 48, .76), rgba(7, 14, 24, .88));
+    -webkit-backdrop-filter: blur(8px) saturate(1.04);
+    backdrop-filter: blur(8px) saturate(1.04);
+    box-shadow: 0 18px 54px rgba(2, 10, 20, .22), inset 0 1px 0 rgba(255, 255, 255, .06);
+  }
+
+  body .chart-card.is-empty,
+  body .chart-card.is-unavailable {
+    background:
+      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .09), transparent 40%),
+      linear-gradient(145deg, rgba(18, 32, 48, .52), rgba(7, 14, 24, .68));
+  }
+
+  body .chart-card.is-empty::after,
+  body .chart-card.is-unavailable::after {
+    position: absolute;
+    top: 0;
+    right: 15%;
+    left: 15%;
+    height: 1px;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(217, 255, 120, .46), rgba(196, 192, 255, .22), transparent);
+    opacity: .62;
+  }
+
+  body .chart-card.is-empty .card-heading,
+  body .chart-card.is-unavailable .card-heading {
+    position: relative;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+
+  body .chart-card.is-empty .card-heading::after,
+  body .chart-card.is-unavailable .card-heading::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(230, 235, 245, .16), transparent 72%);
+  }
+
+  body .chart-wrap[data-chart-state="empty"],
+  body .chart-wrap[data-chart-state="unavailable"] {
+    border: 1px solid rgba(230, 235, 245, .14);
+    border-radius: var(--radius-sharp);
+    background:
+      linear-gradient(rgba(230, 235, 245, .045) 1px, transparent 1px) 0 0 / 100% 44px,
+      linear-gradient(90deg, rgba(230, 235, 245, .035) 1px, transparent 1px) 0 0 / 88px 100%,
+      linear-gradient(180deg, rgba(8, 18, 30, .18), rgba(8, 18, 30, .04));
+  }
+
+  body .chart-wrap[data-chart-state="empty"]::before,
+  body .chart-wrap[data-chart-state="unavailable"]::before {
+    position: absolute;
+    z-index: 1;
+    top: 12px;
+    left: 14px;
+    content: "NO SIGNAL / READY";
+    color: rgba(215, 219, 229, .54);
+    font: 500 9px/1 "DM Mono", monospace;
+    letter-spacing: .12em;
+    pointer-events: none;
+  }
+
+  body .chart-empty-state {
+    background: radial-gradient(circle at 50% 48%, rgba(8, 18, 30, .26), transparent 64%);
+  }
+
+  body .chart-empty-state strong {
+    text-shadow: 0 1px 2px rgba(8, 9, 12, .92), 0 0 9px rgba(8, 9, 12, .56);
+  }
+
+  body .chart-empty-state small {
+    color: var(--ink-soft);
+    text-shadow: 0 1px 2px rgba(8, 9, 12, .9);
+  }
+
+  body .chart-empty-marker {
+    width: 52px;
+    height: 52px;
+    border-color: rgba(217, 255, 120, .7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body .scroll-cue,
+  body .hero-actions { transition: none; }
+  body .site-header.is-scrolled + .site-main .hero-actions:not(:focus-within) { transform: none; }
+}
+
+@media (forced-colors: active) {
+  body .chart-card,
+  body .chart-card.is-empty,
+  body .chart-card.is-unavailable,
+  body .chart-wrap[data-chart-state="empty"],
+  body .chart-wrap[data-chart-state="unavailable"] {
+    background: Canvas;
+    border-color: CanvasText;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+}

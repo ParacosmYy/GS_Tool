@@ -374,3 +374,5 @@
 - [x] v127 通过真实 `5000` 桌面与 `390×844` 移动页面确认背景连续可见、品牌文字可读、无正向横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v127.md`，保护端口未重启。
 - [x] v128 修复旧个人启动器滚动后首屏 CTA 亮色片段穿过透明 AI TOKEN 品牌行的问题：复用既有 `site-header.is-scrolled` 状态，让非焦点 CTA 与 `Scroll to explore` 退场，焦点状态保持可见可操作；不新增脚本或监听器。
 - [x] v128 通过真实 `5000` 的 `390×844`/`1683×892` 首屏与深滚状态确认 CTA 收束、周期切换器可用、无正向横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v128.md`。
+- [x] v129 将 Dashboard 周期切换器与图表观测面收敛为低 alpha 深蓝信号窗口：保留背景透景、空态网格、文字 keyline 和轻量 blur，不改变 Chart.js、API、周期交互或数据流；旧入口兼容规则拆至独立 `legacy-observatory.css`，避免通用样式逼近 1000 行。
+- [x] v129 通过真实 `5000` 的 `390×844`/`1683×892` 首屏、深滚和 Week 键盘切换确认观测区材质、空态可读性、无正向横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v129.md`。

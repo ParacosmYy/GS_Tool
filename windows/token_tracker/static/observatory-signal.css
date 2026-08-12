@@ -202,3 +202,19 @@
     padding-bottom: 10px;
   }
 }
+
+/* Populated chart bays share the same signal-rail material as the empty
+   state, but retain a firmer reading floor for real canvas data. Keeping the
+   rule here makes the analytics module the material owner in the complete
+   stylesheet chain; ui-polish.css carries only the legacy fallback. */
+@media (forced-colors: none) {
+  .chart-card:not(.is-empty):not(.is-unavailable) {
+    border-color: rgba(230, 235, 245, .24);
+    background:
+      radial-gradient(circle at var(--surface-x, 50%) var(--surface-y, 0%), rgba(196, 192, 255, .08), transparent 40%),
+      linear-gradient(145deg, rgba(18, 32, 48, .76), rgba(7, 14, 24, .88));
+    -webkit-backdrop-filter: blur(8px) saturate(1.04);
+    backdrop-filter: blur(8px) saturate(1.04);
+    box-shadow: 0 18px 54px rgba(2, 10, 20, .22), inset 0 1px 0 rgba(255, 255, 255, .06);
+  }
+}

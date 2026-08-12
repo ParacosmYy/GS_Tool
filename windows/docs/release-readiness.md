@@ -394,3 +394,11 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - UI-3：真实 `5000` 移动/桌面首屏与 `scrollY=650/700` 状态通过，日志清洁且无正向横向溢出；证据见 `ui-accessibility-evidence-v128.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动。
 - 架构师：只改旧入口必加载的 `ui-polish.css`，未新增跨层依赖或业务行为。
+
+## v129 观测区深蓝信号窗口
+
+- UI-1：周期切换器和图表空态从偏重的深色实面收敛为连续深蓝观测窗，背景设备仍可见，空态说明获得稳定阅读层。
+- UI-2：完整链由 `observatory-signal.css` 负责，旧入口通过 `legacy-observatory.css` 兼容，`ui-polish.css` 仅保留导入边界；`blur(8px)`、forced-colors 与 reduced-motion 规则明确。
+- UI-3：真实 `5000` 桌面/移动首屏、`scrollY=1000` 深滚、Week 键盘切换、无正向横向溢出和清洁日志通过；证据见 `ui-accessibility-evidence-v129.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动。
+- 架构师：变化限定在 `03-observatory` 与旧入口兼容模块，无新业务依赖；通用 UI 文件回落至 872 行。

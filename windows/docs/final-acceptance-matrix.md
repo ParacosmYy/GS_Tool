@@ -476,3 +476,11 @@
 - UI-3：真实 `5000` `390×844` 与 `1683×892` 首屏/深滚状态已确认 computed style、周期控件可用、无正向横向溢出和清洁日志；证据见 `ui-accessibility-evidence-v128.md`。
 - 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动。
 - 架构师：变化限定在 `01-shell / legacy launcher sticky reading boundary`，无新依赖、无跨层耦合；回滚边界为 `ui-polish.css` v128 兼容块。
+
+## v129 观测区深蓝信号窗口
+
+- UI-1：修复周期切换器、指标轨与图表空态之间的材质断层，避免观测区被读成两个重黑卡片。
+- UI-2：周期切换器与图表面使用低 alpha 深蓝渐变、轻量 `blur(8px)`、网格、局部 signal line 和文字 keyline；旧入口兼容规则拆至 `legacy-observatory.css`，完整链由 `observatory-signal.css` 持有，不改数据/Chart.js/API 契约。
+- UI-3：真实 `5000` `390×844`/`1683×892` 首屏、深滚、空态、Week 键盘切换和清洁日志已确认；证据见 `ui-accessibility-evidence-v129.md`。
+- 后端：无后端、数据库、接口、认证、CSRF、Provider 或 Key 生命周期改动。
+- 架构师：变化限定在 `03-observatory / legacy presentation boundary`，`ui-polish.css=872`、`legacy-observatory.css=131`、`observatory-signal.css=196`，均低于 1000 行。
