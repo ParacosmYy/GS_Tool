@@ -410,6 +410,11 @@
 
 - `03 / AUTOMATIC COLLECTION` 旁的 `HOW IT WORKS` 说明在 `901px+` 变为 `position: sticky; top: 96px` 的 protocol rail，使检测、代理、usage 归档三步协议在长表单中段持续可见；901px 以下恢复普通文档流。
 - 真实隔离 5220 实例确认 `320/390/768/1024/1440` 五档无横向溢出、1440px sticky 深滚、Base URL 焦点恢复、390px 长表单和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v119.md`。
+
+### v120 交付增量
+
+- 基础 `style.css` 补回共享场景背景的兼容边界，确保 `.site-header` 的透明材质确实透出背景图，而不是落到黑色 body 画布；完整样式链继续保留既有 scene motion 覆盖与无障碍降级。
+- 真实 `5000` 页面与隔离 `5221` 确认 `320/390/768/1024/1440` 五档无横向溢出、背景图加载、透明 computed style、1440px 滚动态和清洁应用日志；证据见 `docs/ui-accessibility-evidence-v120.md`。
 ## 当前未关闭的硬门禁
 
 1. 合法 Provider Key 的脱敏非流式与流式 usage 联调。

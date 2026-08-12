@@ -329,6 +329,10 @@ Dashboard 周期切换器复用既有 `sticky-occlusion.js` 候选集合：当�
 ## v119 自动采集协议 sticky rail
 
 新增 `connect-rail.css` 并在共享样式链末尾接入；桌面 `901px+` 将 `HOW IT WORKS` 说明固定在自动采集长表单旁的 `96px` 阅读带内，触屏与窄桌面恢复普通文档流，保留既有 sticky occlusion、焦点恢复、forced-colors 和 reduced-motion 边界。5220 隔离实例已完成五档响应式、1440px 深滚、Base URL 焦点和 390px 长表单验证，证据见 `ui-accessibility-evidence-v119.md`；真实设备、辅助偏好、Provider 联调和正式部署验收仍未关闭。
+
+## v120 顶部品牌场景兼容边界
+
+基础 `style.css` 补回 `.story-backdrop` / `.story-backdrop-image` 的全屏背景兼容边界，修复旧个人入口只加载基础样式时透明 `.site-header` 下方落到黑色 body 画布的问题。当前完整模板加载的 `scene-motion.css` 继续覆盖同一选择器，品牌栏保持 `transparent / no backdrop-filter / no box-shadow`；真实 `5000` 与隔离 `5221` 已完成五档响应式、首屏截图、滚动态和清洁日志验证，证据见 `ui-accessibility-evidence-v120.md`。
 ## 每次交付必须执行
 
 从 `windows/` 目录执行：

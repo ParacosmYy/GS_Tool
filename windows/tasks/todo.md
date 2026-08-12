@@ -355,3 +355,5 @@
 - [x] v118 通过真实隔离 5219 确认 `320/390/768/1024/1440` 五档无横向溢出、登录/注册继承、焦点 signal、控件可访问名称和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v118.md`。
 - [x] v119 将 `03 / AUTOMATIC COLLECTION` 旁的 `HOW IT WORKS` 收敛为桌面 sticky protocol rail，保持三步协议在长表单中段可见；901px 以下恢复普通文档流，不改变 API、表单、Key 生命周期或数据流。
 - [x] v119 通过真实隔离 5220 确认 `320/390/768/1024/1440` 五档无横向溢出、1440px sticky 深滚、Base URL 焦点恢复、390px 长表单和清洁应用日志；独立证据写入 `docs/ui-accessibility-evidence-v119.md`。
+- [x] v120 修复兼容旧个人入口的场景背景缺失：基础 `style.css` 恢复 `.story-backdrop` 与 `.story-backdrop-image` 的全屏场景边界，保持 AI TOKEN 品牌行透明，不改变业务契约。
+- [x] v120 通过真实 `5000` 页面与隔离 `5221` 复核 `320/390/768/1024/1440`、滚动态、顶部截图、背景图加载、透明 computed style、横向溢出和清洁页面日志；独立证据写入 `docs/ui-accessibility-evidence-v120.md`。

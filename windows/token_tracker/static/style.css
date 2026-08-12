@@ -75,6 +75,42 @@ body::after {
   background: radial-gradient(ellipse at 50% -15%, rgba(202,198,255,.11), transparent 42%), radial-gradient(ellipse at 50% 120%, rgba(86, 110, 86, .11), transparent 46%);
 }
 
+/*
+ * Compatibility scene boundary for an already-running personal launcher.
+ * Older launcher processes can keep an earlier template stylesheet chain in
+ * memory while serving the current static files. Keep the artwork available
+ * through the canonical base stylesheet so the transparent brand row never
+ * falls back to a black canvas during that transition. The richer scene
+ * module loaded by current templates intentionally overrides these defaults.
+ */
+.story-backdrop {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background-color: #071321;
+  background-image: url("/static/assets/embedded-rust-engineer-bg-v14.png");
+  background-position: 40% 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: saturate(1.14) contrast(1.06) brightness(1.12);
+}
+
+.story-backdrop-image {
+  position: absolute;
+  inset: -1.5%;
+  width: 103%;
+  height: 103%;
+  object-fit: cover;
+  object-position: 40% 50%;
+}
+
+.site-main,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
 .ambient-noise { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .11; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E"); mix-blend-mode: overlay; }
 .ambient-light { position: fixed; z-index: -1; width: min(36rem, 34vw); height: min(36rem, 34vw); border-radius: 50%; pointer-events: none; filter: blur(100px); opacity: .08; }
 .ambient-light-one { top: 24%; left: 0; background: #8b9eff; }
