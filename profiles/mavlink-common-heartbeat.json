@@ -1,0 +1,76 @@
+{
+  "codec": {
+    "crc_extra": [
+      {
+        "extra": 50,
+        "message_id": 0
+      }
+    ],
+    "dialect": "common",
+    "fields": [
+      {
+        "name": "version",
+        "source": "version"
+      },
+      {
+        "name": "payload_length",
+        "source": "payload_length"
+      },
+      {
+        "name": "incompat_flags",
+        "source": "incompat_flags"
+      },
+      {
+        "name": "compat_flags",
+        "source": "compat_flags"
+      },
+      {
+        "name": "sequence",
+        "source": "sequence"
+      },
+      {
+        "name": "system_id",
+        "source": "system_id"
+      },
+      {
+        "name": "component_id",
+        "source": "component_id"
+      },
+      {
+        "name": "message_id",
+        "source": "message_id"
+      },
+      {
+        "name": "signed",
+        "source": "signed"
+      },
+      {
+        "name": "crc_extra",
+        "source": "crc_extra"
+      },
+      {
+        "name": "received_crc",
+        "source": "received_crc"
+      },
+      {
+        "name": "calculated_crc",
+        "source": "calculated_crc"
+      },
+      {
+        "name": "payload",
+        "source": "payload_hex"
+      },
+      {
+        "name": "signature",
+        "source": "signature_hex"
+      }
+    ],
+    "kind": "mavlink",
+    "mapping_revision": "master (pin before production)",
+    "mapping_source": "official MAVLink common dialect",
+    "version": 1,
+    "version_policy": "auto"
+  },
+  "name": "MAVLink common · HEARTBEAT RX",
+  "schema_version": 2
+}

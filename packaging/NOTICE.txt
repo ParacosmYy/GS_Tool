@@ -1,0 +1,14 @@
+SerialForge engineering-build notice
+
+This bundle is an internal engineering build. It is unsigned, hardware acceptance is
+pending, and it is not a formal release or a certification claim.
+
+The accompanying PROVENANCE.json records the exact build variant, mode, toolchain,
+payload hashes, package-content scan, and license-inventory status. The accompanying
+THIRD_PARTY_NOTICES.md is an inventory for engineering review; it is not a substitute
+for the complete third-party license texts and legal review required before external
+redistribution.
+
+The core variant does not bundle Bleak/WinRT or SEGGER/J-Link vendor software. J-Link
+RTT remains an attach-only, last-stage capability and its driver, SDK, DLLs, and vendor
+tools are not distributed by SerialForge.

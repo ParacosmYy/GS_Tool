@@ -1,0 +1,46 @@
+{
+  "codec": {
+    "fields": [
+      {
+        "name": "address",
+        "source": "address"
+      },
+      {
+        "name": "function",
+        "source": "function"
+      },
+      {
+        "name": "base_function",
+        "source": "base_function"
+      },
+      {
+        "name": "is_exception",
+        "source": "is_exception"
+      },
+      {
+        "name": "data_length",
+        "source": "data_length"
+      },
+      {
+        "name": "data",
+        "source": "data_hex"
+      },
+      {
+        "name": "exception_code",
+        "source": "exception_code"
+      },
+      {
+        "name": "received_crc",
+        "source": "received_crc"
+      },
+      {
+        "name": "calculated_crc",
+        "source": "calculated_crc"
+      }
+    ],
+    "kind": "modbus_rtu",
+    "version": 1
+  },
+  "name": "Modbus RTU RX · 已分帧 ADU",
+  "schema_version": 2
+}

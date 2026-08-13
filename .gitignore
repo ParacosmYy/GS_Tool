@@ -1,0 +1,21 @@
+/target/
+/dist/
+/build/
+/node_modules/
+/.venv/
+/.ruff_cache/
+packaging/*.spec
+__pycache__/
+*.py[cod]
+*.log
+*.pcapng
+*.sqlite
+
+# Packaged binaries produced by PyInstaller (do not commit build artifacts).
+SerialForge.exe
+SerialForge-latest.exe
+*.exe
+
+# Generated optimization/backup copies (machine-specific, do not commit).
+.optimize_backup/
+.optimize_backup

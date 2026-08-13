@@ -1,0 +1,164 @@
+# SerialForge UI 交付清单
+
+- [x] UI-1.15：原生 ComboBox popup / Tab overflow 暗色兜底
+- [x] UI-1.16：顶栏状态胶囊与动效控制胶囊
+- [x] UI-1.17：实时观测带状态表面
+- [x] UI-1.18：发送状态胶囊
+- [x] UI-1.19：协议流水线摘要来源/状态表面
+- [x] UI-1.20：三套主题语义 token 与低层控件全覆盖
+- [x] UI-1.21：工作区 TabBar 原生 base 白线修复
+- [x] UI-1.22：协议/遥测页响应式网格与动态标签边界
+- [x] UI-1.23：批量命令状态表面与结果表白色回退修复
+- [x] UI-1.24：UART/TCP/BLE/RTT 连接页响应式宽度边界
+- [x] UI-1.25：内置连接快速配置入口与主题化选择状态
+- [x] UI-1.26：终端空态、实时观测与发送工具栏响应式层级
+- [x] UI-1.27：协议/遥测派生工具条响应式分区与 surface 层级
+- [x] UI-1.28：协议流水线摘要主题化轨道与共享动效生命周期
+- [x] UI-1.29：顶栏连接状态指示器六状态几何与共享动效增强
+- [x] UI-1.30：命令批量步骤轨道与回放活动轨迹的共享动效反馈
+- [x] UI-1.31：协议/Component/Dataset/Curve 通用状态信号轨道与共享动效生命周期
+- [x] UI-1.32：主题选择器语义色点阵/星轨与共享动效生命周期
+- [x] UI-1.33：连接控制带端点→传输→会话→数据状态路径与共享动效生命周期
+- [x] UI-1.34：终端空态观测网格、扫描线与共享动效静态回退
+- [x] UI-1.35：主题切换一次性淡入过渡与 Qt effect 生命周期清理
+- [x] UI-1.36：真实数据终端上下观测标尺与共享扫描信号
+- [x] UI-1.37：共享 MotionController 环境动效与可见空闲 shell 信号
+- [x] UI-1.38：三节点工作区路线 beacon 与 layout-owned route strip
+- [x] UI-1.39：终端空态连接导航 CTA、显式 workspace owner 与焦点恢复
+- [x] UI-1.40：空态 CTA 共享 frame signal rail 与统一静态回退
+- [x] UI-1.41：批量命令空态 CTA、共享 action rail 与结果表互斥可见性
+- [x] UI-1.42：批量编辑器 vertical header 与 SpinBox 箭头白色回退修复
+- [x] UI-1.43：连接快速配置自定义选中态、三主题回退与无障碍上下文同步
+- [x] UI-1.44：协议确认弹窗主题外壳、标准按钮语义与无障碍上下文
+- [x] UI-1.45：ComboBox popup 顶层 QFrame 白带修复、三主题刷新与原生交互保留
+- [x] UI-1.46：QFileDialog 目录树/文件列表白色 palette 修复、open/save wrapper 与三主题主题桥
+- [x] UI-1.47：UART 刷新/BLE 扫描 busy 状态共享 MotionController activity rail
+- [x] UI-1.48：QStatusBar session/RX 状态 footer signal rail 与三主题静态回退
+- [x] UI-1.49：发送输入框 state rail、焦点反馈与原生 QLineEdit 契约保持
+- [x] UI-1.50：errorBar 故障 beacon、清除复位与共享 MotionController 静态回退
+- [x] UI-1.51：原始记录按钮异步 activity rail 与 RecordingState 投影
+- [x] UI-1.52：连接主按钮 opening/closing activity rail 与 SessionState 投影
+- [x] UI-1.53：批量停止/历史回放暂停按钮 activity rail 与既有状态投影
+- [x] UI-1.54：实时接收数据 activity rail、实时/历史来源与 QLabel 契约保持
+- [x] UI-1.55：发送状态 blocked/waiting/ready/busy/history activity rail
+- [x] UI-1.56：连接快速配置来源/传输类型可视摘要与共享动态 rail
+- [x] UI-1.57：主题切换一次性 fade + 语义色 sweep 过渡
+- [x] UI-1.58：发送 mode / payload / wire / CRLF 上下文摘要与共享 byte rail
+- [x] UI-1.59：协议 framing / checksum / max-frame 草稿应用摘要与共享 config rail
+- [x] UI-1.60：Component 空态卡片、近场 Profile/Codec CTA 与空表头互斥显示
+- [x] UI-1.61：Dataset 曲线无 series / 等待 sample 空态画布与共享 signal rail
+- [x] UI-1.62：链路传输模式六类几何 glyph、共享动效与 980/1180 响应式验证
+- [x] UI-1.63：Component/Dataset ObservationViewport 共享预览装饰、scope signal rail 与三主题响应式验证
+- [x] UI-1.64：连接方式配置 panel 一次性 fade、共享 motion policy 与 effect 生命周期清理
+- [x] UI-1.65：工作区原生 Tab 主题化语义 glyph、三态 icon 与主题刷新
+- [x] UI-1.66：Header 资源无关星轨/S 几何品牌徽记与共享动效生命周期
+- [x] UI-1.67：Header 品牌层/控制层双层响应式布局与 980/1180 边界
+- [x] UI-1.68：发送控制带 Ctrl+Enter 快捷键提示、非白色主题 keycap 与原生焦点语义保持
+- [x] UI-1.69：连接配置 UART/网络/BLE 字段标签主题语义层级与 section/hint 契约保持
+- [x] UI-1.70：主题选择器 item ThemeSpec 色盘 icon 与原生 combo 语义保持
+- [x] UI-1.71：协议/遥测普通字段标签主题语义层级与 section/status/hint 契约保持
+- [x] UI-1.72：批量命令编辑器字段/辅助说明主题语义层级与空态/错误契约保持
+- [x] UI-1.73：实时观测工具栏显示字段主题语义层级与状态/快捷键契约保持
+- [x] UI-1.74：自定义 dialog 入口淡入、低动效回退与 hide 清理
+- [x] UI-1.75：自定义连接配置 dialog metadata surface 与字段语义层级
+- [x] UI-1.76：快速配置选择确认 rail 与 shared MotionController activity pulse
+- [x] UI-1.77：连接方式 section 标题与 UART/网络/BLE transport panel 可见性同步
+- [x] UI-1.78：工作区三 tab 可见用户切换 activity pulse 与生命周期静态回退
+- [x] UI-1.79：错误通知 fault beacon 即时 activity pulse 与清除/低动效静态回退
+- [x] UI-1.80：Component/Dataset 非空派生快照 shared activity pulse 与页面/生命周期静态回退
+- [x] UI-1.81：历史回放 EOF/STOPPED/ERROR 终态确认 pulse 与 history/error marker
+- [x] UI-1.82：批量命令 COMPLETED/STOPPED/FAILED 终态确认 pulse 与步骤 marker
+- [x] UI-1.83：Protocol/Component/Dataset/Curve 分析状态 error/blocked/history 静态 marker
+- [x] UI-1.84：共享设置页横向滚动/亮色横带收敛与响应式宽度策略
+- [x] UI-1.85：稳定 QSS 近白文字/选中色语义 token 收敛
+- [x] UI-1.86：表格/表头/状态栏/滚动条/Tooltip 稳定表面语义 token 收敛
+- [x] UI-1.87：状态面/输入/按钮/Tab/终端空态稳定控件语义 token 收敛
+- [x] UI-1.88：稳定 shell/base QSS 全量语义 token 收敛
+- [x] UI-1.89：共享 MotionController 帧 lifecycle 门禁与隐藏/最小化/低动效/关闭静态回退
+- [x] UI-1.90：嵌入式扩展工具站 capability page、四节点 workspace route 与第四个主题化 Tab glyph
+- [x] UI-1.91：扩展 capability card 标题/状态 badge 语义层级与三主题回退
+- [x] UI-1.92：工作区 Tab 淡入动效 effect 生命周期清理与低动效回退
+- [x] UI-1.93：扩展 capability title 非 status 语义与 state badge 无障碍回退
+- [x] UI-1.94：UART 参数摘要 rail 与手动选择/快速配置即时投影
+- [x] UI-1.95：扩展工具站接入概览与只读规划状态摘要
+- [x] ARCH-7d / UI-1.96：扩展站摘要派生收回 application，presentation 只消费 immutable summary DTO
+- [x] UI-1.97：UART 常用选项中文化、下拉不可手输与 accessibility 说明
+- [x] UI-1.98：网络/BLE/RTT/TCP Server 选项 affordance、本地化与辅助说明
+- [x] UI-1.99：协议/遥测 selector 中文化、动态刷新文案一致性与状态辅助说明
+- [x] UI-1.100：Pipeline 状态/来源语义化节点、共享动效 gating 与非法属性安全回退
+- [x] UI-1.101：SignalField 二次元星芒、彗尾与共享动效复用
+- [x] UI-1.102：扩展工具站能力卡/接入概览三主题表面与状态色带
+- [x] UI-1.103：工作区外壳与路线装饰条三主题表面
+- [x] UI-1.104：QStatusBar 原生 item 与内部标签边界主题化
+- [x] UI-1.105：传输方式选择器 semantic surface 与状态态样式
+- [x] UI-1.106：主题选择器 semantic surface 与交互态
+- [x] UI-1.107：连接状态 rail 共享帧彗尾与中心光点
+- [x] UI-1.108：用户选择器显式不可编辑、提示与无障碍 affordance
+- [x] UI-1.109：关键动作与 UART 超时 affordance 文案
+- [x] UI-1.110：回放/连接/录制动作 tooltip 与动态状态 affordance 同步
+- [x] UI-1.111：UART 字节间超时、发送字段与 CRLF payload affordance
+- [x] UI-1.112：批量/preset/确认对话框与快捷命令 QAction affordance 完整化
+- [x] UI-1.113：协议/组件/Dataset 四个派生动作的启用/禁用 affordance
+- [x] UI-1.114：协议/组件/Dataset 派生动作共享 signal rail 与 lifecycle fan-out
+- [x] UI-1.115：工作区 Tab 原生导航 signal underline/halo 与共享生命周期
+- [x] UI-1.116：连接/协议/终端/批量动作统一 signal rail 与共享生命周期
+- [x] UI-1.117：presentation 字体运行时 fallback、中文可读性与三主题响应式审计
+- [x] UI-1.118：Qt scrollbar signal rail default/hover/pressed 可见性与双尺寸审计
+- [x] UI-1.133：扩展工具站接入路线 glyph、typed panel bundle 与共享动效生命周期
+- [x] UI-1.134：UART selector bounded width 与 980px 连接页横向溢出修复
+- [x] UI-1.135：扩展工具站 OTA 传输 / OTA 安全 / 调试输出分组摘要与响应式 metrics
+- [x] UI-1.136：工作区 route strip 滚动可发现性提示、四态语义与旧 scrollbar signal 生命周期
+- [x] UI-1.137：工作区 route strip 当前页上下文提示、typed binding 与三主题响应式验证
+- [x] ARCH-6r：UART 控件 frozen binding、消费者收敛与 24 组真实组合根验证
+- [x] ARCH-6s：网络/TCP Server/UDP/RTT 控件 frozen binding、消费者收敛与 30 组真实组合根验证
+- [x] ARCH-6t：BLE GATT 控件 frozen binding、生命周期状态隔离与 30 组真实组合根验证
+- [x] ARCH-6u：终端/发送/历史控件 frozen binding、状态隔离与 24 组真实组合根验证
+- [x] ARCH-6v / UI-1.138：120Hz 共享动效调度、可见 fan-out、相位错峰与站台响应式布局
+- [x] ARCH-6w / UI-1.139：命令批处理控件 frozen binding、跨 controller 动态读取清零与布局/运行时验证
+- [x] ARCH-6x / UI-1.140：链路控制外壳 frozen binding、跨 controller 动态读取清零与静态迁移
+- [x] ARCH-6y / UI-1.141：Header 状态/动效/主题控件 frozen binding 与 shared motion 生命周期验证
+- [x] ARCH-6z / UI-1.142：配置页路由自适应 focus、总览恢复与 120Hz/三主题响应式验证
+- [x] ARCH-70 / UI-1.143：空态“打开链路连接”CTA 直接进入 connection focus 与状态隔离验证
+- [x] ARCH-71 / UI-1.144：workspace 主导航过渡与 page fade 互斥编排，避免动画叠加拥挤
+- [x] ARCH-72 / UI-1.145：header 长状态文案 bounded elision、完整 tooltip/accessibility 与响应式布局验证
+- [x] ARCH-73 / UI-1.146：主题切换 sweep 限制到顶部 shell 带，降低全窗口动画遮挡并验证生命周期
+- [x] ARCH-74 / UI-1.147：主题 fade target 与 header sweep host 解耦，resize 中断过期几何并验证生命周期
+- [x] ARCH-75 / UI-1.148：focus 几何过渡按实测高度动画，resize 中断旧目标并验证 120Hz/生命周期
+- [x] ARCH-76 / UI-1.149：未连接首次启动 connection onboarding focus、OPEN 返回总览与跨 Tab 生命周期验证
+- [x] 终端/发送区紧凑布局与状态反馈细化
+- [x] 协议/遥测派生视图的空态、busy、历史来源视觉统一
+- [x] 命令批量/回放操作的进行中与停止反馈细化
+- [x] UI-1.19 已调用架构师并记录边界结论
+- [x] UI-1.19 已完成静态审计、复核调用与 handoff 归档
+- [x] UI-1.19 已重新生成并覆盖根目录 onefile EXE
+- [x] 已记录 MainWindow/controller 拆分约束与 ADR 0024
+- [x] ARCH-1：建立 `presentation/controllers/` 与 `presentation/contracts.py` 最小边界
+- [x] ARCH-2：迁移 Protocol/Component/Dataset/Curve 面板与状态投影
+- [x] ARCH-3：迁移 Terminal/Recording/Send 与 Command Batch
+- [x] ARCH-4：迁移 Connection/BLE/TCP Server 回调
+- [x] ARCH-5：迁移 Workspace/生命周期与 bootstrap，MainWindow <=1000 行
+- [ ] ARCH-6：按 feature state/action DTO 继续收窄 controller 对 MainWindow facade 的依赖
+- [x] ARCH-6q：workspace shell Qt wiring 收敛为 frozen `WorkspaceShellBindings`，移除散落 `_workspace_*` facade
+- [x] ARCH-6a：连接配置 builder owner-module contract 迁移，MainWindow 951 行
+- [x] ARCH-6b：terminal runtime owner-module contract 迁移，MainWindow 939 行
+- [x] ARCH-6c：composition/workspace owner-module contract 迁移，删除页面构建/Tab 动效/焦点安装 facade
+- [x] ARCH-6d：连接按钮通过显式 `ConnectionActionCallback` 注入，删除 `MainWindow._toggle_connection` 纯动作 facade
+- [x] ARCH-6e：纯端点/历史展示 formatter 独立成 presentation 模块，删除两个 MainWindow 静态 facade
+- [x] ARCH-6f：动态 QSS property refresh 独立成 presentation 模块，删除 MainWindow 静态 facade
+- [x] ARCH-6g：状态 surface source 与 TCP Server readiness 归还 owner controller，删除两个 MainWindow facade
+- [x] ARCH-6h：typed command mode/batch selector 独立成 presentation 模块，删除两个 MainWindow facade
+- [x] ARCH-6i：发送/批量 Qt action payload adapter 归还 commands owner，删除五个 MainWindow facade
+- [x] ARCH-6j：commands batch signal/结果 owner 直连，删除四个 MainWindow signal facade
+- [x] ARCH-6k：主题/动效 callback 直连与 workspace_runtime 运行态边界，修复 workspace↔lifecycle 循环依赖
+- [x] ARCH-6l：BLE write-mode selector/capability 独立 presentation 模块，删除三个 MainWindow helper facade
+- [x] ARCH-6m：protocol scope query 独立 presentation 模块，删除三个 MainWindow scope facade
+- [x] ARCH-6n：连接控件刷新 callback 归还组合根，删除 MainWindow 单调用点 facade
+- [x] ARCH-6o：transport/protocol framing callback 归还组合根，删除两个 MainWindow 转发 facade
+- [x] ARCH-6p：按 feature owner 分域绑定剩余 callback，MainWindow 收敛为 composition shell
+- [x] ARCH-7a：主题/动效偏好版本化 DTO、PreferenceStore port 与 QSettings adapter
+- [x] ARCH-7b：连接配置与 preset catalog 的版本化 store port（最小读取/持久化边界）
+- [x] ARCH-7c：用户自定义 preset editor、builtin/custom merge 与显式保存动作
+- [ ] ARCH-8：目标资料与硬件授权后实现 OTA/debug application orchestration
+- [x] ARCH-9：新增源码行数质量门禁并纳入 `scripts/check.ps1`
+- [x] ARCH-10：自绘控件与弹窗主题继承统一，消除主题切换分裂
+- [ ] 用户授权后完成 GUI/offscreen/HIDPI/EXE 启动与真实设备验收
