@@ -760,3 +760,11 @@
 - UI-3：5027 的 1440/390/320px 登录与登录后 Dashboard 真实浏览器回归通过；提交按钮 48px、文档无横向扩张、透明顶栏、周期控件、pointer follower 和页面日志均已复核；证据见 `docs/ui-accessibility-evidence-v155.md`。
 - 后端：无后端、认证接口、数据库、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
 - 架构师：变化限定在 `02-auth / field signal surface`，无新依赖或跨层耦合；所有文本源码低于 1000 行。
+
+## v156 窄屏分析标题轨道
+
+- UI-1：修复 320px 分析卡片编号标题与状态胶囊争夺宽度的问题；标题保持单行，状态胶囊下沉为第二扫描层。
+- UI-2：新增规则仅属于 `analysis-signal.css` 的 `03-observatory` 窄屏 presentation boundary；不改变模板、Chart.js、接口、数据或交互语义。
+- UI-3：5028 的 320/390/1440px `#analysis` 深链真实回归通过；目标落点、标题几何、空态 CTA 键盘可达性、透明顶栏、文档宽度与页面日志均已复核；证据见 `docs/ui-accessibility-evidence-v156.md`。
+- 后端：无后端、认证、数据库、接口、Provider、Key 或数据流改动；保护服务 PID `43832/8100` 未重启。
+- 架构师：变化限定在 `03-observatory / analysis signal`，新增单一窄屏 CSS 规则，无新依赖或跨层耦合；所有文本源码低于 1000 行。

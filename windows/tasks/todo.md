@@ -426,3 +426,5 @@
 - [x] v154 通过隔离 `5026` 的 `320×720`、`320×600`、`390×844` 和默认桌面真实浏览器回归确认周期控件 `tabIndex=0`、透明顶栏、无横向扩张、应用日志为空和源码 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v154.md`。
 - [x] v155 将认证页卡片收敛为更清透的蓝黑透景层：桌面 blur `8px`、移动 blur `7px`，输入框保留独立阅读底；不改变认证流程与移动表单顺序。
 - [x] v155 通过隔离 `5027` 的 1440/390/320px 登录、登录后 Dashboard、pointer follower、透明顶栏、周期控件、无横向扩张和应用日志回归；独立证据写入 `docs/ui-accessibility-evidence-v155.md`。
+- [x] v156 修复 `≤360px` 分析卡片标题轨道冲突：eyebrow 保持单行，状态胶囊独立落到标题下方，避免 `01 / VOLUME TREND` 在 320px 被拆行。
+- [x] v156 通过隔离 `5028` 的 320/390/1440px `#analysis` 深链真实浏览器回归确认落点、空态 CTA `tabIndex=0`、透明顶栏、无横向扩张、页面日志与 1000 行门禁；独立证据写入 `docs/ui-accessibility-evidence-v156.md`。

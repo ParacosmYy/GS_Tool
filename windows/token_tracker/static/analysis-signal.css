@@ -157,6 +157,30 @@
   }
 }
 
+/* On the narrowest phones the status note and the eyebrow compete for the
+   same 236px content rail. Stack the status below the heading so the
+   instrument label stays on one readable line instead of wrapping between
+   the sequence number and its semantic title. */
+@media (max-width: 360px) {
+  #analysis .card-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  #analysis .card-heading > div {
+    min-width: 0;
+  }
+
+  #analysis .card-heading .eyebrow {
+    white-space: nowrap;
+  }
+
+  #analysis .card-heading .legend-note {
+    align-self: flex-start;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #analysis.visual-grid::before,
   #analysis .card-heading .eyebrow::before,

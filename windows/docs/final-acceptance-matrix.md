@@ -675,6 +675,14 @@
 - 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
 - 架构师：无新依赖或跨层耦合，所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
 
+## v156 窄屏分析标题轨道
+
+- UI-1：`≤360px` 的分析标题采用纵向信号轨道，编号/标题与状态胶囊不再互相挤压；空态 marker、说明和 CTA 仍保持中心对齐。
+- UI-2：`analysis-signal.css` 独立拥有该断点规则；390px、桌面、populated chart、reduced-motion 与 forced-colors 契约不变。
+- UI-3：5028 的 320/390/1440px `#analysis` 真实回归通过：eyebrow 单行、目标落点位于顶栏下方、空态 CTA `tabIndex=0`、文档无正向横向扩张、应用日志 `[]`；证据见 `docs/ui-accessibility-evidence-v156.md`。
+- 后端：无后端、认证、数据库、Provider、API 或数据契约变化；保护 PID `43832/8100` 未重启。
+- 架构师：新增规则高内聚、无新依赖或跨层耦合；所有修改文本源码低于 1000 行；Android、EXE、HTTPS/ACL 和真实设备发布门禁保持 pending。
+
 ## v152 活动历史空态高度与观察面
 
 - UI-1：活动历史空态与工作信号表单形成同高工作区；桌面状态面完整、移动状态面紧凑，空态不再像普通空表行。

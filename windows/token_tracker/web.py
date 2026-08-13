@@ -220,6 +220,13 @@ def create_app(db_path: str | os.PathLike[str] | None = None) -> Flask:
 
         return render_template("dashboard.html", user=g.user)
 
+    @app.get("/simulation")
+    @login_required
+    def simulation() -> str:
+        """Render the Live Simulation control surface for an authenticated user."""
+
+        return render_template("simulation.html", user=g.user)
+
     @app.get("/admin")
     @admin_required
     def admin() -> str:

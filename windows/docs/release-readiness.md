@@ -516,6 +516,13 @@ APK/EXE/Caddy 通过证据。所有变更必须回写 `tasks/todo.md`、必要 A
 - 本轮只调整认证前端 CSS presentation contract，无后端、认证接口、数据库、Provider、API、Key 生命周期或依赖变化；保护 PID `43832/8100` 未重启。
 - Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。
 
+## v156 窄屏分析标题轨道
+
+- 320px 分析卡片的 `01 / VOLUME TREND` 与 `02 / MODEL MIX` 现在保持单行，输入/输出和 TOKEN SHARE 状态胶囊独立落在标题下方。
+- 5028 的 320/390/1440px `#analysis` 深链回归通过；空态 CTA、深链落点、透明顶栏、无横向扩张和应用日志正常，证据见 `docs/ui-accessibility-evidence-v156.md`。
+- 本轮只调整分析区前端 CSS presentation contract，无后端、认证、数据库、Provider、API、Key 生命周期或依赖变化；保护 PID `43832/8100` 未重启。
+- Android、EXE 签名、真实 Provider、HTTPS/ACL、备份恢复、限流和真实设备发布门禁保持 pending。
+
 ## v144 overview 分享锚点首屏定位
 
 - `#overview` 已加入共享 sticky header clearance；旧 5000 与完整 5011 入口的 overview 分享链接均回到 `scrollY=0`，首屏 CTA opacity 为 `1`。

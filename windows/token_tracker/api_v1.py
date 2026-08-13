@@ -13,7 +13,7 @@ from typing import Any, Callable
 
 from flask import Blueprint, Response, current_app, g, jsonify, request
 
-from . import admin_service, auth_service, events, ingest_auth, mobile_auth, provider_service, rate_limit, readiness
+from . import admin_service, auth_service, events, ingest_auth, mobile_auth, provider_service, rate_limit, readiness, simulation
 from .api_contract import error_response
 from .providers import ProviderNetworkError, ProviderResponseTooLarge
 from .services import UsageValidationError, add_usage_result, usage_records_page, usage_summary
@@ -428,3 +428,91 @@ def ready() -> Response:
     if not readiness.is_ready(_database()):
         return error_response("SERVICE_NOT_READY", "中心服务暂不可用，请稍后重试", 503)
     return jsonify({"status": "ready", "protocol_version": 1})
+
+
+@api_v1.post("/simulation/start")
+@_required_user
+def simulation_start() -> Response:
+    """Create one Live Simulation job and launch its background worker.
+
+    Body (all optional): ``rounds`` (default 1000, max 100_000),
+    ``speed_ms`` (default 40, 10-500), ``seed`` (int|null for reproducibility).
+    Out-of-range values are rejected with ``BAD_REQUEST`` before any thread is
+    spawned. Auth is enforced by ``_required_user``.
+    """
+
+    payload = _payload()
+    if payload is None:
+        return error_response("BAD_REQUEST", "请求 JSON 必须是对象", 400)
+    rounds = int(payload.get("rounds", 1000))
+    speed_ms = int(payload.get("speed_ms", 40))
+    raw_seed = payload.get("seed", None)
+    seed = None if raw_seed is None else int(raw_seed)
+    try:
+        job_id = simulation.create_job(rounds=rounds, speed_ms=speed_ms, seed=seed)
+    except ValueError as exc:
+        return error_response("BAD_REQUEST", str(exc), 400)
+    return jsonify({
+        "job_id": job_id,
+        "total_rounds": rounds,
+        "status": "running",
+        "request_id": g.request_id,
+    }), 200
+
+
+@api_v1.get("/simulation/<job_id>")
+@_required_user
+def simulation_state(job_id: str) -> Response:
+    """Return the live snapshot of one simulation job.
+
+    Unknown job ids map to ``NOT_FOUND``. The body mirrors ``JobState.snapshot``
+    and is safe to ``jsonify`` (no lock/stop internals leak).
+    """
+
+    state = simulation.get_state(job_id)
+    if state is None:
+        return error_response("NOT_FOUND", "未知任务", 404)
+    state["request_id"] = g.request_id
+    return jsonify(state), 200
+
+
+@api_v1.post("/simulation/<job_id>/stop")
+@_required_user
+def simulation_stop(job_id: str) -> Response:
+    """Request cooperative early stop of a running simulation job."""
+
+    if not simulation.stop_job(job_id):
+        return error_response("NOT_FOUND", "未知任务", 404)
+    state = simulation.get_state(job_id)
+    return jsonify({
+        "job_id": job_id,
+        "status": "stopped",
+        "round": state["round"] if state else 0,
+        "request_id": g.request_id,
+    }), 200
+
+
+@api_v1.post("/simulation/<job_id>/commit")
+@_required_user
+def simulation_commit(job_id: str) -> Response:
+    """Persist a simulation's events into the caller's own usage records.
+
+    A job may be committed exactly once; a repeat call returns ``ALREADY_COMMITTED``
+    (409). Unknown job ids return ``NOT_FOUND``.
+    """
+
+    try:
+        committed = simulation.commit_job(job_id, g.user["id"])
+    except ValueError:
+        return error_response("ALREADY_COMMITTED", "已保存", 409)
+    except KeyError:
+        return error_response("NOT_FOUND", "未知任务", 404)
+    state = simulation.get_state(job_id)
+    if state is None:
+        return error_response("NOT_FOUND", "未知任务", 404)
+    return jsonify({
+        "job_id": job_id,
+        "committed": committed,
+        "status": state["status"],
+        "request_id": g.request_id,
+    }), 200
